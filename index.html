@@ -27,20 +27,22 @@ body {
 
 /* PAGE HEAD */
 header.page-head {
-  border-bottom: 2px solid #b32d23;
-  padding: 28px 0 22px;
-  margin-bottom: 28px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 14px 0 6px;
+  margin-bottom: 16px;
 }
-header.page-head h1 {
-  font-size: 38px;
+header.page-head .version {
+  color: #c9d1d9;
+  font-size: 26px;
   font-weight: 700;
-  color: #f0f6fc;
+  font-variant-numeric: tabular-nums;
   letter-spacing: 0.5px;
-}
-header.page-head .subtitle {
-  color: #8b949e;
-  margin-top: 6px;
-  font-size: 14px;
+  background: rgba(48, 54, 61, 0.45);
+  border: 1px solid #30363d;
+  padding: 4px 14px;
+  border-radius: 4px;
 }
 
 /* LEGEND */
@@ -243,18 +245,8 @@ ul.changes {
   margin: 4px 0 4px 30px;
 }
 ul.changes li {
-  padding: 4px 0 4px 16px;
-  position: relative;
+  padding: 4px 0;
   color: #c9d1d9;
-}
-ul.changes li::before {
-  content: "−";
-  color: #6e7681;
-  position: absolute;
-  left: 0;
-  top: 4px;
-  font-weight: normal;
-  opacity: 0.55;
 }
 ul.subnotes {
   list-style: none;
@@ -307,28 +299,36 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
 }
 
 /* BUFF GRADIENT (10 tiers, soft-saturated greens) */
-.badge.buff1  { background: rgba(120, 215, 145, 0.10); color: #88bf94; border: 1px solid rgba(120, 215, 145, 0.26); }
-.badge.buff2  { background: rgba(115, 215, 140, 0.13); color: #92c89e; border: 1px solid rgba(115, 215, 140, 0.32); }
-.badge.buff3  { background: rgba(110, 215, 135, 0.17); color: #9bd0a4; border: 1px solid rgba(110, 215, 135, 0.38); }
-.badge.buff4  { background: rgba(105, 215, 130, 0.21); color: #95cd9e; border: 1px solid rgba(105, 215, 130, 0.44); }
-.badge.buff5  { background: rgba(95, 210, 125, 0.25);  color: #82c490; border: 1px solid rgba(95, 210, 125, 0.50); }
-.badge.buff6  { background: rgba(85, 205, 115, 0.29);  color: #71be7e; border: 1px solid rgba(85, 205, 115, 0.55); }
-.badge.buff7  { background: rgba(75, 200, 105, 0.33);  color: #5db568; border: 1px solid rgba(75, 200, 105, 0.60); }
-.badge.buff8  { background: rgba(65, 195, 95, 0.37);   color: #4aac55; border: 1px solid rgba(65, 195, 95, 0.65); }
-.badge.buff9  { background: rgba(55, 190, 85, 0.41);   color: #38a342; border: 1px solid rgba(55, 190, 85, 0.70); }
-.badge.buff10 { background: rgba(45, 185, 75, 0.45);   color: #289a32; border: 1px solid rgba(45, 185, 75, 0.75); }
+.badge.buff1  { background: rgba(120, 215, 145, 0.10); color: #b2d8b8; border: 1px solid rgba(120, 215, 145, 0.26); }
+.badge.buff2  { background: rgba(115, 215, 140, 0.13); color: #b4dab6; border: 1px solid rgba(115, 215, 140, 0.32); }
+.badge.buff3  { background: rgba(110, 215, 135, 0.17); color: #b2dab2; border: 1px solid rgba(110, 215, 135, 0.38); }
+.badge.buff4  { background: rgba(105, 215, 130, 0.22); color: #aedaa8; border: 1px solid rgba(105, 215, 130, 0.44); }
+.badge.buff5  { background: rgba(95, 210, 125, 0.27);  color: #a8d6a0; border: 1px solid rgba(95, 210, 125, 0.50); }
+.badge.buff6  { background: rgba(85, 205, 115, 0.32);  color: #a4d496; border: 1px solid rgba(85, 205, 115, 0.55); }
+.badge.buff7  { background: rgba(75, 200, 105, 0.36);  color: #9cd28a; border: 1px solid rgba(75, 200, 105, 0.60); }
+.badge.buff8  { background: rgba(65, 195, 95, 0.40);   color: #94d07c; border: 1px solid rgba(65, 195, 95, 0.65); }
+.badge.buff9  { background: rgba(55, 190, 85, 0.45);   color: #88cc6e; border: 1px solid rgba(55, 190, 85, 0.70); }
+.badge.buff10 { background: rgba(45, 185, 75, 0.50);   color: #7ec862; border: 1px solid rgba(45, 185, 75, 0.78); }
 
 /* NERF GRADIENT (10 tiers, soft-saturated reds) */
-.badge.nerf1  { background: rgba(230, 130, 120, 0.10); color: #b89894; border: 1px solid rgba(230, 130, 120, 0.24); }
-.badge.nerf2  { background: rgba(228, 122, 110, 0.13); color: #be948e; border: 1px solid rgba(228, 122, 110, 0.30); }
-.badge.nerf3  { background: rgba(225, 115, 100, 0.16); color: #c1908a; border: 1px solid rgba(225, 115, 100, 0.36); }
-.badge.nerf4  { background: rgba(225, 108, 92, 0.20);  color: #c08884; border: 1px solid rgba(225, 108, 92, 0.42); }
-.badge.nerf5  { background: rgba(225, 100, 85, 0.24);  color: #be7e78; border: 1px solid rgba(225, 100, 85, 0.48); }
-.badge.nerf6  { background: rgba(225, 90, 75, 0.28);   color: #ba716a; border: 1px solid rgba(225, 90, 75, 0.54); }
-.badge.nerf7  { background: rgba(225, 80, 65, 0.32);   color: #b6645a; border: 1px solid rgba(225, 80, 65, 0.60); }
-.badge.nerf8  { background: rgba(225, 70, 55, 0.36);   color: #b2574b; border: 1px solid rgba(225, 70, 55, 0.66); }
-.badge.nerf9  { background: rgba(225, 60, 45, 0.40);   color: #ad4a3d; border: 1px solid rgba(225, 60, 45, 0.72); }
-.badge.nerf10 { background: rgba(225, 50, 35, 0.44);   color: #a73e30; border: 1px solid rgba(225, 50, 35, 0.78); }
+.badge.nerf1  { background: rgba(230, 130, 120, 0.10); color: #d8b0ac; border: 1px solid rgba(230, 130, 120, 0.24); }
+.badge.nerf2  { background: rgba(228, 122, 110, 0.13); color: #dcaca8; border: 1px solid rgba(228, 122, 110, 0.30); }
+.badge.nerf3  { background: rgba(225, 115, 100, 0.16); color: #dca8a0; border: 1px solid rgba(225, 115, 100, 0.36); }
+.badge.nerf4  { background: rgba(225, 108, 92, 0.20);  color: #dca298; border: 1px solid rgba(225, 108, 92, 0.42); }
+.badge.nerf5  { background: rgba(225, 100, 85, 0.25);  color: #de9c8e; border: 1px solid rgba(225, 100, 85, 0.50); }
+.badge.nerf6  { background: rgba(225, 90, 75, 0.30);   color: #e09484; border: 1px solid rgba(225, 90, 75, 0.56); }
+.badge.nerf7  { background: rgba(225, 80, 65, 0.34);   color: #e08c78; border: 1px solid rgba(225, 80, 65, 0.62); }
+.badge.nerf8  { background: rgba(225, 70, 55, 0.38);   color: #e08470; border: 1px solid rgba(225, 70, 55, 0.68); }
+.badge.nerf9  { background: rgba(225, 60, 45, 0.42);   color: #e07c66; border: 1px solid rgba(225, 60, 45, 0.74); }
+.badge.nerf10 { background: rgba(225, 50, 35, 0.46);   color: #e0745c; border: 1px solid rgba(225, 50, 35, 0.80); }
+
+/* Make digits readable on saturated backgrounds */
+.badge.buff1, .badge.buff2, .badge.buff3, .badge.buff4, .badge.buff5,
+.badge.buff6, .badge.buff7, .badge.buff8, .badge.buff9, .badge.buff10,
+.badge.nerf1, .badge.nerf2, .badge.nerf3, .badge.nerf4, .badge.nerf5,
+.badge.nerf6, .badge.nerf7, .badge.nerf8, .badge.nerf9, .badge.nerf10 {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
 
 /* Text-tag versions of BUFF/NERF (used by t() for non-numeric changes; pick mid tier) */
 .badge.buff-text { background: rgba(85, 205, 115, 0.22); color: #74bd80; border: 1px solid rgba(85, 205, 115, 0.50); }
@@ -378,6 +378,40 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
 /* IMAGE FALLBACK STYLE */
 .entity-icon img[alt]:not([src*="//"]) { background: #21262d; }
 img { max-width: 100%; }
+
+/* BACK TO TOP — fixed bottom-right */
+.back-to-top {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(22, 27, 34, 0.92);
+  border: 1px solid rgba(121, 192, 255, 0.45);
+  color: #79c0ff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: all 0.18s ease;
+  z-index: 100;
+  font-family: inherit;
+  padding: 0;
+  padding-bottom: 3px;
+}
+.back-to-top:hover {
+  background: rgba(121, 192, 255, 0.2);
+  border-color: #79c0ff;
+  transform: translateY(-2px);
+}
+.back-to-top.visible {
+  display: flex;
+}
 
 /* WRONG-WORD HIGHLIGHT — subtle, just to mark it (no italic, gray) */
 .wrong-word {
@@ -431,7 +465,7 @@ img { max-width: 100%; }
   border-spacing: 2px;
   font-size: 11px;
   width: 100%;
-  max-width: 880px;
+  max-width: 1020px;
   table-layout: fixed;
   font-variant-numeric: tabular-nums;
 }
@@ -473,6 +507,11 @@ img { max-width: 100%; }
 }
 .formula-table .row-label-old { color: #ff9a8c; }
 .formula-table .row-label-new { color: #92c89e; }
+/* Visual gap before L20 (after L1-15 sequential block) */
+.formula-table .lvl-jump {
+  border-left: 6px solid transparent;
+  background-clip: padding-box !important;
+}
 
 /* FILTER BUTTONS in legend — make tags clickable */
 .legend-tags .badge.filter-btn {
@@ -572,8 +611,7 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
 <div class="container">
 
 <header class="page-head">
-  <h1>Dota Patch Notes — 7.41c</h1>
-  <div class="subtitle">Annotated with per-level percentage changes. Colors graduate from subtle (small change) to vivid (large change). Green = buff, Red = nerf.</div>
+  <span class="version">7.41c</span>
 </header>
 
 <div class="legend">
@@ -1241,7 +1279,7 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
   <div class="entity-name">Spirit Bear</div>
 </div>
 <ul class="changes">
-<li data-tag="buff rework">Gold/Experience Bounty changed from <span class="formula-old">175 + 8 per Spirit Bear level</span> up to <span class="formula-trigger" data-formula="f1">165 + 10 per Spirit Bear level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><table class="formula-table" id="f1" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>183</td><td>191</td><td>199</td><td>207</td><td>215</td><td>223</td><td>231</td><td>239</td><td>247</td><td>255</td><td>263</td><td>271</td><td>279</td><td>287</td><td>295</td></tr><tr><th class="row-label-new">new</th><td>175</td><td>185</td><td>195</td><td>205</td><td>215</td><td>225</td><td>235</td><td>245</td><td>255</td><td>265</td><td>275</td><td>285</td><td>295</td><td>305</td><td>315</td></tr><tr><th>Δ %</th><td><span class="badge buff1">+4%</span></td><td><span class="badge buff1">+3%</span></td><td><span class="badge buff1">+2%</span></td><td><span class="badge buff1">+1%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf1">-1%</span></td><td><span class="badge nerf1">-2%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-4%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-7%</span></td></tr></tbody></table></li>
+<li data-tag="buff rework">Gold/Experience Bounty changed from <span class="formula-old">175 + 8 per Spirit Bear level</span> up to <span class="formula-trigger" data-formula="f1">165 + 10 per Spirit Bear level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><table class="formula-table" id="f1" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th><th class="lvl-jump">L20</th><th>L25</th><th>L30</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>183</td><td>191</td><td>199</td><td>207</td><td>215</td><td>223</td><td>231</td><td>239</td><td>247</td><td>255</td><td>263</td><td>271</td><td>279</td><td>287</td><td>295</td><td class="lvl-jump">335</td><td>375</td><td>415</td></tr><tr><th class="row-label-new">new</th><td>175</td><td>185</td><td>195</td><td>205</td><td>215</td><td>225</td><td>235</td><td>245</td><td>255</td><td>265</td><td>275</td><td>285</td><td>295</td><td>305</td><td>315</td><td class="lvl-jump">365</td><td>415</td><td>465</td></tr><tr><th>Δ %</th><td><span class="badge buff1">+4%</span></td><td><span class="badge buff1">+3%</span></td><td><span class="badge buff1">+2%</span></td><td><span class="badge buff1">+1%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf1">-1%</span></td><td><span class="badge nerf1">-2%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-4%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-7%</span></td><td class="lvl-jump"><span class="badge nerf2">-9%</span></td><td><span class="badge nerf3">-11%</span></td><td><span class="badge nerf3">-12%</span></td></tr></tbody></table></li>
 </ul>
 <h4 class="subgroup">Talents</h4>
 <ul class="changes">
@@ -1673,7 +1711,7 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
 <h4 class="subgroup">Abilities</h4>
 <h4 class="ability-title">M.A.D.</h4>
 <ul class="changes">
-<li data-tag="buff rework">Mana Pool as Regen rescaled from <span class="formula-old">0.08% + 0.02% per level</span> to <span class="formula-trigger" data-formula="f2">0.1% + 0.01% per level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span></span><table class="formula-table" id="f2" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>0.10%</td><td>0.12%</td><td>0.14%</td><td>0.16%</td><td>0.18%</td><td>0.20%</td><td>0.22%</td><td>0.24%</td><td>0.26%</td><td>0.28%</td><td>0.30%</td><td>0.32%</td><td>0.34%</td><td>0.36%</td><td>0.38%</td></tr><tr><th class="row-label-new">new</th><td>0.11%</td><td>0.12%</td><td>0.13%</td><td>0.14%</td><td>0.15%</td><td>0.16%</td><td>0.17%</td><td>0.18%</td><td>0.19%</td><td>0.20%</td><td>0.21%</td><td>0.22%</td><td>0.23%</td><td>0.24%</td><td>0.25%</td></tr><tr><th>Δ %</th><td><span class="badge buff2">+10%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf2">-7%</span></td><td><span class="badge nerf3">-12%</span></td><td><span class="badge nerf4">-17%</span></td><td><span class="badge nerf4">-20%</span></td><td><span class="badge nerf5">-23%</span></td><td><span class="badge nerf5">-25%</span></td><td><span class="badge nerf6">-27%</span></td><td><span class="badge nerf6">-29%</span></td><td><span class="badge nerf6">-30%</span></td><td><span class="badge nerf6">-31%</span></td><td><span class="badge nerf6">-32%</span></td><td><span class="badge nerf6">-33%</span></td><td><span class="badge nerf7">-34%</span></td></tr></tbody></table></li>
+<li data-tag="buff rework">Mana Pool as Regen rescaled from <span class="formula-old">0.08% + 0.02% per level</span> to <span class="formula-trigger" data-formula="f2">0.1% + 0.01% per level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span></span><table class="formula-table" id="f2" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th><th class="lvl-jump">L20</th><th>L25</th><th>L30</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>0.10%</td><td>0.12%</td><td>0.14%</td><td>0.16%</td><td>0.18%</td><td>0.20%</td><td>0.22%</td><td>0.24%</td><td>0.26%</td><td>0.28%</td><td>0.30%</td><td>0.32%</td><td>0.34%</td><td>0.36%</td><td>0.38%</td><td class="lvl-jump">0.48%</td><td>0.58%</td><td>0.68%</td></tr><tr><th class="row-label-new">new</th><td>0.11%</td><td>0.12%</td><td>0.13%</td><td>0.14%</td><td>0.15%</td><td>0.16%</td><td>0.17%</td><td>0.18%</td><td>0.19%</td><td>0.20%</td><td>0.21%</td><td>0.22%</td><td>0.23%</td><td>0.24%</td><td>0.25%</td><td class="lvl-jump">0.30%</td><td>0.35%</td><td>0.40%</td></tr><tr><th>Δ %</th><td><span class="badge buff2">+10%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf2">-7%</span></td><td><span class="badge nerf3">-12%</span></td><td><span class="badge nerf4">-17%</span></td><td><span class="badge nerf4">-20%</span></td><td><span class="badge nerf5">-23%</span></td><td><span class="badge nerf5">-25%</span></td><td><span class="badge nerf6">-27%</span></td><td><span class="badge nerf6">-29%</span></td><td><span class="badge nerf6">-30%</span></td><td><span class="badge nerf6">-31%</span></td><td><span class="badge nerf6">-32%</span></td><td><span class="badge nerf6">-33%</span></td><td><span class="badge nerf7">-34%</span></td><td class="lvl-jump"><span class="badge nerf7">-37%</span></td><td><span class="badge nerf7">-40%</span></td><td><span class="badge nerf7">-41%</span></td></tr></tbody></table></li>
 </ul>
 <h4 class="ability-title">Reactive Tazer</h4>
 <ul class="changes">
@@ -1876,9 +1914,17 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
 </ul>
 </div>
 
+<button class="back-to-top" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
 
 <script>
 (function() {
+  // ---- BACK TO TOP visibility ----
+  const btt = document.querySelector('.back-to-top');
+  function updateBtt() {
+    btt.classList.toggle('visible', window.scrollY > 400);
+  }
+  window.addEventListener('scroll', updateBtt, { passive: true });
+  updateBtt();
   // ---- TAG FILTERING ----
   const buttons = document.querySelectorAll('.filter-btn');
   const filterName = document.getElementById('filter-name');
