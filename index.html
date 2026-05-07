@@ -221,6 +221,29 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   margin-left: 6px;
 }
 
+/* WRONG-CHANGE LINE + CORRECTION NOTE */
+.wrong-line {
+  text-decoration: line-through;
+  text-decoration-color: rgba(201, 209, 217, 0.5);
+  text-decoration-thickness: 1px;
+  opacity: 0.55;
+}
+.correction-note {
+  display: block;
+  margin: 6px 0 4px 0;
+  padding: 6px 12px;
+  background: rgba(240, 198, 116, 0.06);
+  border-left: 2px solid rgba(240, 198, 116, 0.6);
+  border-radius: 0 3px 3px 0;
+  color: #a89378;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.5;
+}
+.correction-note .badge {
+  font-style: normal;
+}
+
 /* IMAGE FALLBACK STYLE */
 .entity-icon img[alt]:not([src*="//"]) { background: #21262d; }
 img { max-width: 100%; }
@@ -276,7 +299,7 @@ img { max-width: 100%; }
   <div class="entity-name">Bloodstone</div>
 </div>
 <ul class="changes">
-<li>Health bonus increased from +600 to +625 <span class="badge-group"><span class="badge buff1">+4%</span></span></li>
+<li><span class="wrong-line">Health bonus increased from +600 to +625 <span class="badge-group"><span class="badge buff1">+4%</span></span></span><span class="correction-note">⚠ This change is wrongly stated. The real change is 650 → 625 <span class="badge-group"><span class="badge nerf1">-4%</span></span></span></li>
 <li>Bloodpact cooldown increased from 30s to 35s <span class="badge-group"><span class="badge nerf2">-17%</span></span></li>
 <li>Spell Weakness Aura damage from spells taken decreased from 12% to 10% <span class="badge-group"><span class="badge nerf2">-17%</span></span></li>
 </ul>
