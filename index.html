@@ -336,7 +336,7 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   margin-left: 6px;
 }
 
-/* WRONG-CHANGE LINE + CORRECTION NOTE */
+/* WRONG-CHANGE LINE + CORRECTION NOTE — subtle gray */
 .wrong-line {
   text-decoration: line-through;
   text-decoration-color: rgba(201, 209, 217, 0.5);
@@ -347,10 +347,10 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   display: block;
   margin: 6px 0 4px 0;
   padding: 6px 12px;
-  background: rgba(240, 198, 116, 0.06);
-  border-left: 2px solid rgba(240, 198, 116, 0.6);
+  background: rgba(139, 148, 158, 0.05);
+  border-left: 2px solid rgba(139, 148, 158, 0.40);
   border-radius: 0 3px 3px 0;
-  color: #a89378;
+  color: #7c8590;
   font-size: 12.5px;
   font-style: italic;
   line-height: 1.5;
@@ -365,7 +365,7 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   font-size: 10.5px;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: #f0c674;
+  color: #8b949e;
   margin-right: 4px;
 }
 
@@ -373,15 +373,14 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
 .entity-icon img[alt]:not([src*="//"]) { background: #21262d; }
 img { max-width: 100%; }
 
-/* WRONG-WORD HIGHLIGHT (used inline within text — no strikethrough) */
+/* WRONG-WORD HIGHLIGHT — subtle, just to mark it (no italic, gray) */
 .wrong-word {
-  background: rgba(240, 198, 116, 0.16);
-  color: #f0c674;
+  background: rgba(139, 148, 158, 0.08);
+  color: #8b949e;
   padding: 0 5px;
   border-radius: 3px;
-  font-style: italic;
   text-decoration: line-through;
-  text-decoration-color: rgba(240, 198, 116, 0.6);
+  text-decoration-color: rgba(139, 148, 158, 0.45);
   text-decoration-thickness: 1px;
 }
 
@@ -411,6 +410,12 @@ img { max-width: 100%; }
   background: rgba(200, 130, 60, 0.20);
   border-color: rgba(200, 130, 60, 0.55);
   color: #ecbe8a;
+}
+/* OLD FORMULA — just a subtle dotted underline so it stands out as "the old one" */
+.formula-old {
+  text-decoration: underline dotted rgba(139, 148, 158, 0.45);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
 }
 
 /* FORMULA COMPARISON TABLE */
@@ -1230,7 +1235,7 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
   <div class="entity-name">Spirit Bear</div>
 </div>
 <ul class="changes">
-<li data-tag="buff rework">Gold/Experience Bounty changed from 175 + 8 per Spirit Bear level up to <span class="formula-trigger" data-formula="f1">165 + 10 per Spirit Bear level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><table class="formula-table" id="f1" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>183</td><td>191</td><td>199</td><td>207</td><td>215</td><td>223</td><td>231</td><td>239</td><td>247</td><td>255</td></tr><tr><th class="row-label-new">new</th><td>175</td><td>185</td><td>195</td><td>205</td><td>215</td><td>225</td><td>235</td><td>245</td><td>255</td><td>265</td></tr><tr><th>Δ %</th><td><span class="badge buff1">+4%</span></td><td><span class="badge buff1">+3%</span></td><td><span class="badge buff1">+2%</span></td><td><span class="badge buff1">+1%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf1">-1%</span></td><td><span class="badge nerf1">-2%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-4%</span></td></tr></tbody></table></li>
+<li data-tag="buff rework">Gold/Experience Bounty changed from <span class="formula-old">175 + 8 per Spirit Bear level</span> up to <span class="formula-trigger" data-formula="f1">165 + 10 per Spirit Bear level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><table class="formula-table" id="f1" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>183</td><td>191</td><td>199</td><td>207</td><td>215</td><td>223</td><td>231</td><td>239</td><td>247</td><td>255</td></tr><tr><th class="row-label-new">new</th><td>175</td><td>185</td><td>195</td><td>205</td><td>215</td><td>225</td><td>235</td><td>245</td><td>255</td><td>265</td></tr><tr><th>Δ %</th><td><span class="badge buff1">+4%</span></td><td><span class="badge buff1">+3%</span></td><td><span class="badge buff1">+2%</span></td><td><span class="badge buff1">+1%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf1">-1%</span></td><td><span class="badge nerf1">-2%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-4%</span></td></tr></tbody></table></li>
 </ul>
 <h4 class="subgroup">Talents</h4>
 <ul class="changes">
@@ -1662,7 +1667,7 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
 <h4 class="subgroup">Abilities</h4>
 <h4 class="ability-title">M.A.D.</h4>
 <ul class="changes">
-<li data-tag="buff rework">Mana Pool as Regen rescaled from 0.08% + 0.02% per level to <span class="formula-trigger" data-formula="f2">0.1% + 0.01% per level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span></span><table class="formula-table" id="f2" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>0.10%</td><td>0.12%</td><td>0.14%</td><td>0.16%</td><td>0.18%</td><td>0.20%</td><td>0.22%</td><td>0.24%</td><td>0.26%</td><td>0.28%</td></tr><tr><th class="row-label-new">new</th><td>0.11%</td><td>0.12%</td><td>0.13%</td><td>0.14%</td><td>0.15%</td><td>0.16%</td><td>0.17%</td><td>0.18%</td><td>0.19%</td><td>0.20%</td></tr><tr><th>Δ %</th><td><span class="badge buff2">+10%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf2">-7%</span></td><td><span class="badge nerf3">-12%</span></td><td><span class="badge nerf4">-17%</span></td><td><span class="badge nerf4">-20%</span></td><td><span class="badge nerf5">-23%</span></td><td><span class="badge nerf5">-25%</span></td><td><span class="badge nerf6">-27%</span></td><td><span class="badge nerf6">-29%</span></td></tr></tbody></table></li>
+<li data-tag="buff rework">Mana Pool as Regen rescaled from <span class="formula-old">0.08% + 0.02% per level</span> to <span class="formula-trigger" data-formula="f2">0.1% + 0.01% per level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span></span><table class="formula-table" id="f2" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>0.10%</td><td>0.12%</td><td>0.14%</td><td>0.16%</td><td>0.18%</td><td>0.20%</td><td>0.22%</td><td>0.24%</td><td>0.26%</td><td>0.28%</td></tr><tr><th class="row-label-new">new</th><td>0.11%</td><td>0.12%</td><td>0.13%</td><td>0.14%</td><td>0.15%</td><td>0.16%</td><td>0.17%</td><td>0.18%</td><td>0.19%</td><td>0.20%</td></tr><tr><th>Δ %</th><td><span class="badge buff2">+10%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf2">-7%</span></td><td><span class="badge nerf3">-12%</span></td><td><span class="badge nerf4">-17%</span></td><td><span class="badge nerf4">-20%</span></td><td><span class="badge nerf5">-23%</span></td><td><span class="badge nerf5">-25%</span></td><td><span class="badge nerf6">-27%</span></td><td><span class="badge nerf6">-29%</span></td></tr></tbody></table></li>
 </ul>
 <h4 class="ability-title">Reactive Tazer</h4>
 <ul class="changes">
