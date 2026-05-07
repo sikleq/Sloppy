@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dota Patch Notes - 7.41c</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0a0e13;
+  background-image:
+    radial-gradient(at 20% 0%, rgba(179, 45, 35, 0.08) 0, transparent 50%),
+    radial-gradient(at 80% 100%, rgba(255, 100, 50, 0.05) 0, transparent 50%);
+  background-attachment: fixed;
+  color: #c9d1d9;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.55;
+  font-size: 15px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px 28px 80px;
+}
+
+/* PAGE HEAD */
+header.page-head {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0 6px;
+  margin-bottom: 16px;
+}
+header.page-head .release-date {
+  color: #8b949e;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+header.page-head .version {
+  color: #c9d1d9;
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  background: rgba(48, 54, 61, 0.45);
+  border: 1px solid #30363d;
+  padding: 4px 14px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+header.page-head .version:hover {
+  background: rgba(48, 54, 61, 0.7);
+  border-color: #58a6ff;
+}
+header.page-head .version-chev {
+  font-size: 14px;
+  color: #8b949e;
+  line-height: 1;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+/* LEGEND */
+.legend {
+  background: #161b22;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 28px;
+  border: 1px solid #30363d;
+  font-size: 13px;
+  color: #8b949e;
+}
+.legend-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.legend-tags strong {
+  color: #c9d1d9;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-right: 4px;
+}
+
+/* SEARCH BOX */
+.search-box {
+  position: relative;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #21262d;
+}
+.search-box input {
+  width: 100%;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 7px 12px;
+  color: #c9d1d9;
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color 0.15s;
+}
+.search-box input::placeholder { color: #6e7681; }
+.search-box input:focus {
+  outline: none;
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+}
+.search-results {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  margin-top: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+.search-results.show { display: block; }
+.search-results .result-item {
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #c9d1d9;
+  border-bottom: 1px solid #21262d;
+}
+.search-results .result-item:last-child { border-bottom: none; }
+.search-results .result-item:hover,
+.search-results .result-item.active {
+  background: rgba(88, 166, 255, 0.1);
+  color: #fff;
+}
+.search-results .result-item img {
+  width: 32px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 2px;
+  background: #21262d;
+  flex-shrink: 0;
+}
+.search-results .result-item .kind {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: #6e7681;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.search-results .empty {
+  padding: 10px 12px;
+  color: #8b949e;
+  font-style: italic;
+  font-size: 12.5px;
+}
+.search-results mark {
+  background: rgba(240, 198, 116, 0.25);
+  color: inherit;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+
+/* MAJOR SECTION */
+h2.section {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.45) 0%, transparent 18%, transparent 82%, rgba(0, 0, 0, 0.45) 100%),
+    linear-gradient(180deg, #b53528 0%, #4a120c 100%);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  padding: 12px 18px;
+  margin: 36px 0 20px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.4);
+  text-shadow:
+    1px 1px 0 rgba(0, 0, 0, 0.55),
+    -1px 0 0 rgba(0, 0, 0, 0.35),
+    0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ENTITY (HERO/ITEM HEADER WITH ICON) */
+.entity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(90deg, #1a1f29 0%, #161b22 100%);
+  border-left: 3px solid #f0c674;
+  border-radius: 4px;
+  padding: 8px 14px;
+  margin: 20px 0 8px;
+}
+.entity-name {
+  color: #f0c674;
+  font-size: 19px;
+  font-weight: 700;
+}
+.entity-icon img {
+  display: block;
+  border-radius: 3px;
+}
+.hero-icon img {
+  width: 80px;
+  height: 45px;
+  object-fit: cover;
+}
+.item-icon img {
+  width: 50px;
+  height: 36px;
+  object-fit: cover;
+}
+.ability-icon img {
+  width: 45px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.plain-entity {
+  border-left-color: #79c0ff;
+}
+.plain-entity .entity-name {
+  color: #79c0ff;
+}
+
+/* SUBGROUPS */
+h4.subgroup {
+  color: #79c0ff;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 16px 0 4px 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid #21262d;
+  padding-bottom: 4px;
+}
+h4.ability-title {
+  color: #d2a8ff;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 12px 0 4px 14px;
+}
+
+/* CHANGES LIST */
+ul.changes {
+  list-style: none;
+  margin: 4px 0 4px 30px;
+}
+ul.changes li {
+  padding: 4px 0;
+  color: #c9d1d9;
+}
+ul.subnotes {
+  list-style: none;
+  margin: -2px 0 6px 50px;
+}
+ul.subnotes li {
+  color: #8b949e;
+  font-size: 13.5px;
+  padding: 2px 0;
+}
+ul.subnotes li::before { content: "↳ "; color: #6e7681; }
+
+/* BADGES */
+.badge-group {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 6px;
+  flex-wrap: wrap;
+  vertical-align: middle;
+}
+.badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  margin-left: 4px;
+}
+.badge-group .badge { margin-left: 0; }
+
+/* NEUTRAL & TEXT TAGS */
+.badge.neutral {
+  background: rgba(139, 148, 158, 0.12);
+  color: #8b949e;
+  border: 1px solid rgba(139, 148, 158, 0.3);
+}
+.badge.rework {
+  background: rgba(180, 145, 220, 0.07);
+  color: #9988aa;
+  border: 1px solid rgba(180, 145, 220, 0.22);
+}
+.badge.misc {
+  background: rgba(139, 148, 158, 0.10);
+  color: #8b949e;
+  border: 1px solid rgba(139, 148, 158, 0.28);
+}
+.badge.qol {
+  background: rgba(121, 192, 255, 0.10);
+  color: #a8c0d8;
+  border: 1px solid rgba(121, 192, 255, 0.32);
+}
+
+/* BUFF GRADIENT (10 tiers, soft-saturated greens) */
+.badge.buff1  { background: rgba(120, 215, 145, 0.10); color: #b2d8b8; border: 1px solid rgba(120, 215, 145, 0.26); }
+.badge.buff2  { background: rgba(115, 215, 140, 0.13); color: #b4dab6; border: 1px solid rgba(115, 215, 140, 0.32); }
+.badge.buff3  { background: rgba(110, 215, 135, 0.17); color: #b2dab2; border: 1px solid rgba(110, 215, 135, 0.38); }
+.badge.buff4  { background: rgba(105, 215, 130, 0.22); color: #aedaa8; border: 1px solid rgba(105, 215, 130, 0.44); }
+.badge.buff5  { background: rgba(95, 210, 125, 0.27);  color: #a8d6a0; border: 1px solid rgba(95, 210, 125, 0.50); }
+.badge.buff6  { background: rgba(85, 205, 115, 0.32);  color: #a4d496; border: 1px solid rgba(85, 205, 115, 0.55); }
+.badge.buff7  { background: rgba(75, 200, 105, 0.36);  color: #9cd28a; border: 1px solid rgba(75, 200, 105, 0.60); }
+.badge.buff8  { background: rgba(65, 195, 95, 0.40);   color: #94d07c; border: 1px solid rgba(65, 195, 95, 0.65); }
+.badge.buff9  { background: rgba(55, 190, 85, 0.45);   color: #88cc6e; border: 1px solid rgba(55, 190, 85, 0.70); }
+.badge.buff10 { background: rgba(45, 185, 75, 0.50);   color: #7ec862; border: 1px solid rgba(45, 185, 75, 0.78); }
+
+/* NERF GRADIENT (10 tiers, soft-saturated reds) */
+.badge.nerf1  { background: rgba(230, 130, 120, 0.10); color: #d8b0ac; border: 1px solid rgba(230, 130, 120, 0.24); }
+.badge.nerf2  { background: rgba(228, 122, 110, 0.13); color: #dcaca8; border: 1px solid rgba(228, 122, 110, 0.30); }
+.badge.nerf3  { background: rgba(225, 115, 100, 0.16); color: #dca8a0; border: 1px solid rgba(225, 115, 100, 0.36); }
+.badge.nerf4  { background: rgba(225, 108, 92, 0.20);  color: #dca298; border: 1px solid rgba(225, 108, 92, 0.42); }
+.badge.nerf5  { background: rgba(225, 100, 85, 0.25);  color: #de9c8e; border: 1px solid rgba(225, 100, 85, 0.50); }
+.badge.nerf6  { background: rgba(225, 90, 75, 0.30);   color: #e09484; border: 1px solid rgba(225, 90, 75, 0.56); }
+.badge.nerf7  { background: rgba(225, 80, 65, 0.34);   color: #e08c78; border: 1px solid rgba(225, 80, 65, 0.62); }
+.badge.nerf8  { background: rgba(225, 70, 55, 0.38);   color: #e08470; border: 1px solid rgba(225, 70, 55, 0.68); }
+.badge.nerf9  { background: rgba(225, 60, 45, 0.42);   color: #e07c66; border: 1px solid rgba(225, 60, 45, 0.74); }
+.badge.nerf10 { background: rgba(225, 50, 35, 0.46);   color: #e0745c; border: 1px solid rgba(225, 50, 35, 0.80); }
+
+/* Make digits readable on saturated backgrounds */
+.badge.buff1, .badge.buff2, .badge.buff3, .badge.buff4, .badge.buff5,
+.badge.buff6, .badge.buff7, .badge.buff8, .badge.buff9, .badge.buff10,
+.badge.nerf1, .badge.nerf2, .badge.nerf3, .badge.nerf4, .badge.nerf5,
+.badge.nerf6, .badge.nerf7, .badge.nerf8, .badge.nerf9, .badge.nerf10 {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+/* Text-tag versions of BUFF/NERF (used by t() for non-numeric changes; pick mid tier) */
+.badge.buff-text { background: rgba(85, 205, 115, 0.22); color: #74bd80; border: 1px solid rgba(85, 205, 115, 0.50); }
+.badge.nerf-text { background: rgba(225, 90, 75, 0.22);  color: #b87468; border: 1px solid rgba(225, 90, 75, 0.50); }
+
+/* TYPO NOTE */
+.typo-note {
+  color: #f0c674;
+  font-size: 11px;
+  font-style: italic;
+  margin-left: 6px;
+}
+
+/* WRONG-CHANGE LINE + CORRECTION NOTE — subtle gray */
+.wrong-line {
+  text-decoration: line-through;
+  text-decoration-color: rgba(201, 209, 217, 0.5);
+  text-decoration-thickness: 1px;
+  opacity: 0.55;
+}
+.correction-note {
+  display: block;
+  margin: 6px 0 4px 0;
+  padding: 6px 12px;
+  background: rgba(139, 148, 158, 0.05);
+  border-left: 2px solid rgba(139, 148, 158, 0.40);
+  border-radius: 0 3px 3px 0;
+  color: #7c8590;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.5;
+}
+.correction-note .badge {
+  font-style: normal;
+}
+.correction-label {
+  display: inline-block;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #8b949e;
+  margin-right: 4px;
+}
+
+/* IMAGE FALLBACK STYLE */
+.entity-icon img[alt]:not([src*="//"]) { background: #21262d; }
+img { max-width: 100%; }
+
+/* BACK TO TOP — fixed bottom-right */
+.back-to-top {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(22, 27, 34, 0.92);
+  border: 1px solid rgba(121, 192, 255, 0.45);
+  color: #79c0ff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: all 0.18s ease;
+  z-index: 100;
+  font-family: inherit;
+  padding: 0;
+  padding-bottom: 3px;
+}
+.back-to-top:hover {
+  background: rgba(121, 192, 255, 0.2);
+  border-color: #79c0ff;
+  transform: translateY(-2px);
+}
+.back-to-top.visible {
+  display: flex;
+}
+
+/* WRONG-WORD HIGHLIGHT — subtle, just to mark it (no italic, gray) */
+.wrong-word {
+  background: rgba(139, 148, 158, 0.08);
+  color: #8b949e;
+  padding: 0 5px;
+  border-radius: 3px;
+  text-decoration: line-through;
+  text-decoration-color: rgba(139, 148, 158, 0.45);
+  text-decoration-thickness: 1px;
+}
+
+/* FORMULA TRIGGER (clickable pill on the formula text itself) */
+.formula-trigger {
+  display: inline-block;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: rgba(200, 130, 60, 0.07);
+  color: #d4a070;
+  border: 1px solid rgba(200, 130, 60, 0.22);
+  font-size: 13.5px;
+  cursor: pointer;
+  text-decoration: underline dotted rgba(212, 160, 112, 0.55);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: all 0.14s;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+.formula-trigger:hover {
+  background: rgba(200, 130, 60, 0.14);
+  border-color: rgba(200, 130, 60, 0.42);
+  color: #e0b080;
+}
+.formula-trigger.active {
+  background: rgba(200, 130, 60, 0.20);
+  border-color: rgba(200, 130, 60, 0.55);
+  color: #ecbe8a;
+}
+/* OLD FORMULA — just a subtle dotted underline so it stands out as "the old one" */
+.formula-old {
+  text-decoration: underline dotted rgba(139, 148, 158, 0.45);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+/* FORMULA COMPARISON TABLE */
+.formula-table {
+  margin: 10px 0 6px 4px;
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: 11px;
+  width: 100%;
+  max-width: 1020px;
+  table-layout: fixed;
+  font-variant-numeric: tabular-nums;
+}
+.formula-table[hidden] { display: none; }
+.formula-table thead th {
+  background: rgba(48, 54, 61, 0.55);
+  color: #79c0ff;
+  font-weight: 600;
+  font-size: 10.5px;
+  padding: 4px 0;
+  text-align: center;
+  border-radius: 3px;
+}
+.formula-table tbody th {
+  width: 42px;
+  text-align: left;
+  padding: 4px 8px;
+  background: rgba(48, 54, 61, 0.5);
+  color: #c9d1d9;
+  font-weight: 700;
+  font-size: 10.5px;
+  border-radius: 3px;
+  letter-spacing: 0.3px;
+}
+.formula-table tbody td {
+  padding: 4px 4px;
+  text-align: center;
+  background: rgba(48, 54, 61, 0.30);
+  color: #c9d1d9;
+  border-radius: 3px;
+  font-size: 11px;
+}
+.formula-table tbody td .badge {
+  margin-left: 0;
+  padding: 1px 4px;
+  font-size: 10.5px;
+  border-radius: 8px;
+  display: inline-block;
+}
+.formula-table .row-label-old { color: #ff9a8c; }
+.formula-table .row-label-new { color: #92c89e; }
+/* Visual gap before L20 (after L1-15 sequential block) */
+.formula-table .lvl-jump {
+  border-left: 6px solid transparent;
+  background-clip: padding-box !important;
+}
+
+/* FILTER BUTTONS in legend — make tags clickable */
+.legend-tags .badge.filter-btn {
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 2px 9px;
+  transition: filter 0.12s, transform 0.12s;
+}
+.legend-tags .badge.filter-btn:hover {
+  filter: brightness(1.18);
+  transform: translateY(-1px);
+}
+.legend-tags .badge.filter-btn.active {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  filter: brightness(1.35);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
+}
+
+/* ENTITY-BLOCK wrapper (used for filtering hide/show) */
+.entity-block { margin-bottom: 6px; }
+
+/* === FILTER MODE === */
+body.filter-active h2.section { display: none; }
+body.filter-active h4.subgroup { display: none; }
+body.filter-active ul.subnotes { display: none; }
+/* Hide filtered elements via .f-hide class set by JS */
+.f-hide { display: none !important; }
+
+/* MOBILE: stack legend label above strip so 10 segments fit */
+@media (max-width: 540px) {
+  .legend-strip {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .legend-label {
+    min-width: 0;
+    font-size: 10px;
+  }
+  .gradient-strip { height: 12px; }
+  .gradient-strip .seg { font-size: 8px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="page-head">
+  <span class="release-date">06.05.2026</span>
+  <button class="version" type="button" aria-label="Patch version (dropdown coming soon)">7.41c <span class="version-chev">▾</span></button>
+</header>
+
+<div class="legend">
+  <div class="legend-tags">
+    <strong>Tags:</strong>
+    <button class="badge buff-text filter-btn" data-filter="buff">BUFF</button>
+    <button class="badge nerf-text filter-btn" data-filter="nerf">NERF</button>
+    <button class="badge rework filter-btn" data-filter="rework">REWORK</button>
+    <button class="badge misc filter-btn" data-filter="misc">MISC</button>
+    <button class="badge qol filter-btn" data-filter="qol">QoL</button>
+  </div>
+  <div class="search-box">
+    <input type="text" id="entity-search" placeholder="Search heroes, items, mechanics…" autocomplete="off" spellcheck="false">
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
+
+<h2 class="section">General Updates</h2>
+<div class="entity-block">
+<div class="entity plain-entity"><div class="entity-name">Mechanics</div></div>
+<ul class="changes">
+<li data-tag="nerf">Units with flying vision no longer ignore vision restrictions of Roshan's pits. They can no longer see into them from outside and vice versa <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+</ul>
+<ul class="subnotes"><li>Affects Clockwerk during Jetpack, Drow Ranger's Glacier, Monkey King during Tree Dance, Night Stalker during Dark Ascension, Treant Protector's Eyes in the Forest, and Visage's Familiars</li></ul>
+</div>
+<div class="entity-block">
+<div class="entity plain-entity"><div class="entity-name">Tormentor</div></div>
+<ul class="changes">
+<li data-tag="buff">Alleviation: Max health regen increased from 2% to 2.25% <span class="badge-group" data-overall="buff"><span class="badge buff3">+12%</span></span></li>
+<li data-tag="buff">Alleviation: Duration increased from 10s to 15s <span class="badge-group" data-overall="buff"><span class="badge buff8">+50%</span></span></li>
+</ul>
+</div>
+<h2 class="section">Item Updates</h2>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/bloodstone.png" alt="Bloodstone" loading="lazy"></div>
+  <div class="entity-name">Bloodstone</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf"><span class="wrong-line">Health bonus increased from +600 to +625 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span></span> <div class="correction-note"><span class="correction-label">Note</span>— This change is wrongly stated. The real change is 650 → 625 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span></span></div></li>
+<li data-tag="nerf">Bloodpact cooldown increased from 30s to 35s <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-17%</span></span></li>
+<li data-tag="nerf">Spell Weakness Aura damage from spells taken decreased from 12% to 10% <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-17%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/boots_of_bearing.png" alt="Boots of Bearing" loading="lazy"></div>
+  <div class="entity-name">Boots of Bearing</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Swiftness Aura allied movement speed decreased from 20 to 15 <span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/crellas_crozier.png" alt="Crella's Crozier" loading="lazy"></div>
+  <div class="entity-name">Crella's Crozier</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Rite of Rumusque movement speed steal increased from 5% to 6% <span class="badge-group" data-overall="buff"><span class="badge buff4">+20%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/disperser.png" alt="Disperser" loading="lazy"></div>
+  <div class="entity-name">Disperser</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Suppress duration decreased from 5s to 4s <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/essence_distiller.png" alt="Essence Distiller" loading="lazy"></div>
+  <div class="entity-name">Essence Distiller</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Soul Release radius when ground targeted increased from 400 to 450 <span class="badge-group" data-overall="buff"><span class="badge buff3">+12%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/harpoon.png" alt="Harpoon" loading="lazy"></div>
+  <div class="entity-name">Harpoon</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Draw Forth can no longer move the Harpoon caster when rooted/leashed/bound <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+</ul>
+<ul class="subnotes"><li>The target is still moved for the unchanged distance in this case, however a tree cast won't have any effect</li></ul>
+<ul class="subnotes"><li>Still affects rooted/leashed/bound targets</li></ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/heart.png" alt="Heart of Tarrasque" loading="lazy"></div>
+  <div class="entity-name">Heart of Tarrasque</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Recipe cost increased from 600 to 700 <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-17%</span></span></li>
+<li data-tag="nerf">Total cost increased from 5100g to 5200g <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/mage_slayer.png" alt="Mage Slayer" loading="lazy"></div>
+  <div class="entity-name">Mage Slayer</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Mage Slayer damage per second decreased from 40 to 35 <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-12%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/silver_edge.png" alt="Silver Edge" loading="lazy"></div>
+  <div class="entity-name">Silver Edge</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Shadow Walk bonus movement speed decreased from 25% to 22% <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-12%</span></span></li>
+<li data-tag="nerf">Shadow Walk cooldown increased from 20s to 22s <span class="badge-group" data-overall="nerf"><span class="badge nerf2">-10%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/shivas_guard.png" alt="Shiva's Guard" loading="lazy"></div>
+  <div class="entity-name">Shiva's Guard</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Freezing Aura attack speed reduction decreased from 45 to 40 <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-11%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/soul_ring.png" alt="Soul Ring" loading="lazy"></div>
+  <div class="entity-name">Soul Ring</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Cooldown increased from 25s to 30s <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity item-entity">
+  <div class="entity-icon item-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/specialists_array.png" alt="Specialist's Array" loading="lazy"></div>
+  <div class="entity-name">Specialist's Array</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Agility bonus increased from +12 to +15 <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span></span></li>
+</ul>
+</div>
+<h2 class="section">Neutral Item Updates</h2>
+<div class="entity-block">
+<div class="entity plain-entity"><div class="entity-name">Crude</div></div>
+<ul class="changes">
+<li data-tag="nerf">Intelligence penalty increased from 6% to 9% <span class="badge-group" data-overall="nerf"><span class="badge nerf8">-50%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity plain-entity"><div class="entity-name">Greedy</div></div>
+<ul class="changes">
+<li data-tag="nerf">Mana bonus decreased from 200/250 to 150/200 <span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span><span class="badge nerf4">-20%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity plain-entity"><div class="entity-name">Tough</div></div>
+<ul class="changes">
+<li data-tag="nerf">Damage bonus decreased from +7/10/13/16 to +6/9/12/15 <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-14%</span><span class="badge nerf2">-10%</span><span class="badge nerf2">-8%</span><span class="badge nerf2">-6%</span></span></li>
+</ul>
+</div>
+<h2 class="section">Hero Updates</h2>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/abaddon.png" alt="Abaddon" loading="lazy"></div>
+  <div class="entity-name">Abaddon</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Intelligence increased by 1 <span class="badge buff-text" data-tag="buff">BUFF</span></li>
+<li>Damage at level 1 unchanged at 49-59 </li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 10 — Curse of Avernus DPS increased from +25 to +30 <span class="badge-group" data-overall="buff"><span class="badge buff4">+20%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/alchemist.png" alt="Alchemist" loading="lazy"></div>
+  <div class="entity-name">Alchemist</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Greevil's Greed</h4>
+<ul class="changes">
+<li data-tag="nerf">Bonus base/max Extra Gold per melted Scepter decreased from +6 to +3 <span class="badge-group" data-overall="nerf"><span class="badge nerf8">-50%</span></span></li>
+</ul>
+<h4 class="ability-title">Acid Spray</h4>
+<ul class="changes">
+<li data-tag="nerf">Cooldown rescaled from 22/21/20/19s to 21s <span class="badge-group" data-overall="nerf"><span class="badge buff1">+5%</span><span class="badge neutral">0%</span><span class="badge nerf1">-5%</span><span class="badge nerf3">-11%</span></span></li>
+</ul>
+<h4 class="ability-title">Chemical Rage</h4>
+<ul class="changes">
+<li data-tag="nerf">Bonus Health Regen decreased from 60/90/120 to 50/85/120 <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-17%</span><span class="badge nerf2">-6%</span><span class="badge neutral">0%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/ancient_apparition.png" alt="Ancient Apparition" loading="lazy"></div>
+  <div class="entity-name">Ancient Apparition</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Ice Blast</h4>
+<ul class="changes">
+<li data-tag="buff">Path Radius increased from 275 to 300 <span class="badge-group" data-overall="buff"><span class="badge buff2">+9%</span></span></li>
+<li data-tag="buff">Base Area of Effect Radius increased from 275 to 300 <span class="badge-group" data-overall="buff"><span class="badge buff2">+9%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 20 — Chilling Touch Damage increased from +80 to +100 <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/antimage.png" alt="Anti-Mage" loading="lazy"></div>
+  <div class="entity-name">Anti-Mage</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Persecutor</h4>
+<ul class="changes">
+<li data-tag="buff">Minimum mana threshold for slow improved from 50% to 60% <span class="badge-group" data-overall="buff"><span class="badge buff4">+20%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/arc_warden.png" alt="Arc Warden" loading="lazy"></div>
+  <div class="entity-name">Arc Warden</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Agility increased from 20 to 22 <span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span></span></li>
+<li data-tag="buff">Damage at level 1 increased from 51-57 to 52-58 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/bane.png" alt="Bane" loading="lazy"></div>
+  <div class="entity-name">Bane</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Brain Sap</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 120/130/140/150 to 105/120/135/150 <span class="badge-group" data-overall="buff"><span class="badge buff3">+12%</span><span class="badge buff2">+8%</span><span class="badge buff1">+4%</span><span class="badge neutral">0%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/batrider.png" alt="Batrider" loading="lazy"></div>
+  <div class="entity-name">Batrider</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Movement Speed decreased from 320 to 310 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-3%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Sticky Napalm</h4>
+<ul class="changes">
+<li data-tag="nerf">Aghanim's Shard building damage decreased from 25% to 20% <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+</ul>
+<h4 class="ability-title">Firefly</h4>
+<ul class="changes">
+<li data-tag="nerf">Damage per second decreased from 25/50/75/100 to 20/40/60/80 <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+</ul>
+<h4 class="ability-title">Flaming Lasso</h4>
+<ul class="changes">
+<li data-tag="nerf">Total Damage decreased from 200/350/500 to 125/250/375 <span class="badge-group" data-overall="nerf"><span class="badge nerf7">-38%</span><span class="badge nerf6">-29%</span><span class="badge nerf5">-25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/beastmaster.png" alt="Beastmaster" loading="lazy"></div>
+  <div class="entity-name">Beastmaster</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Strength decreased from 25 to 24 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span></span></li>
+<li data-tag="nerf">Damage at level 1 decreased from 50-54 to 49-53 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Wild Axes</h4>
+<ul class="changes">
+<li data-tag="nerf">Mana Cost increased from 50/55/60/65 to 65 <span class="badge-group" data-overall="nerf"><span class="badge nerf6">-30%</span><span class="badge nerf4">-18%</span><span class="badge nerf2">-8%</span><span class="badge neutral">0%</span></span></li>
+</ul>
+<h4 class="ability-title">Summon Razorback</h4>
+<ul class="changes">
+<li data-tag="nerf">Boar Attack Damage decreased from 30/45/60/75 to 24/41/58/75 <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span><span class="badge nerf2">-9%</span><span class="badge nerf1">-3%</span><span class="badge neutral">0%</span></span></li>
+</ul>
+<h4 class="ability-title">Drums of Slom</h4>
+<ul class="changes">
+<li data-tag="nerf">Damage Radius decreased from 600 to 525 <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-12%</span></span></li>
+<li data-tag="nerf">Drum Hit Damage decreased from 80 to 70 <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-12%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/bounty_hunter.png" alt="Bounty Hunter" loading="lazy"></div>
+  <div class="entity-name">Bounty Hunter</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Shuriken Toss</h4>
+<ul class="changes">
+<li data-tag="nerf">Mana Cost increased from 75/80/85/90 to 75/85/95/105 <span class="badge-group" data-overall="nerf"><span class="badge neutral">0%</span><span class="badge nerf2">-6%</span><span class="badge nerf3">-12%</span><span class="badge nerf4">-17%</span></span></li>
+</ul>
+<h4 class="ability-title">Shadow Walk</h4>
+<ul class="changes">
+<li data-tag="buff">Bonus Speed increased from 8/12/16/20% to 11/14/17/20% <span class="badge-group" data-overall="buff"><span class="badge buff7">+38%</span><span class="badge buff4">+17%</span><span class="badge buff2">+6%</span><span class="badge neutral">0%</span></span></li>
+</ul>
+<h4 class="ability-title">Track</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 60 to 50 <span class="badge-group" data-overall="buff"><span class="badge buff4">+17%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/brewmaster.png" alt="Brewmaster" loading="lazy"></div>
+  <div class="entity-name">Brewmaster</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Primal Split</h4>
+<ul class="changes">
+<li data-tag="qol">Cancel Split now has a 3s initial cooldown <span class="badge qol" data-tag="qol">QoL</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/bristleback.png" alt="Bristleback" loading="lazy"></div>
+  <div class="entity-name">Bristleback</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Warpath</h4>
+<ul class="changes">
+<li data-tag="nerf">Damage per stack decreased from 15/20/25 to 12/16/20 <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+</ul>
+<h4 class="ability-title">Hairball</h4>
+<ul class="changes">
+<li data-tag="nerf">Cooldown increased from 13s to 15s <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-15%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 25 — Bristleback Damage Threshold Reduction increased from 25 to 30 <span class="badge-group" data-overall="buff"><span class="badge buff4">+20%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/broodmother.png" alt="Broodmother" loading="lazy"></div>
+  <div class="entity-name">Broodmother</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Insatiable Hunger</h4>
+<ul class="changes">
+<li data-tag="buff">Spiderling Radius increased from 800 to 1200 <span class="badge-group" data-overall="buff"><span class="badge buff8">+50%</span></span></li>
+</ul>
+<h4 class="ability-title">Spinner's Snare</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 100 to 70 <span class="badge-group" data-overall="buff"><span class="badge buff6">+30%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/centaur.png" alt="Centaur Warrunner" loading="lazy"></div>
+  <div class="entity-name">Centaur Warrunner</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Strength increased from 27 to 28 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span></li>
+<li data-tag="buff">Damage at level 1 increased from 63-65 to 64-66 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>
+<li data-tag="buff">Strength gain increased from 4.2 to 4.3 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 25 — Hoof Stomp Duration increased from +0.8s to +1.0s <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/chaos_knight.png" alt="Chaos Knight" loading="lazy"></div>
+  <div class="entity-name">Chaos Knight</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Chaos Strike</h4>
+<ul class="changes">
+<li data-tag="buff">Critical Max increased from 140/180/220/260% to 150/190/230/270% <span class="badge-group" data-overall="buff"><span class="badge buff2">+7%</span><span class="badge buff2">+6%</span><span class="badge buff1">+5%</span><span class="badge buff1">+4%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dark_seer.png" alt="Dark Seer" loading="lazy"></div>
+  <div class="entity-name">Dark Seer</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Intelligence increased from 22 to 23 <span class="badge-group" data-overall="buff"><span class="badge buff1">+5%</span></span></li>
+<li data-tag="buff">Damage at level 1 increased from 53-59 to 54-60 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dark_willow.png" alt="Dark Willow" loading="lazy"></div>
+  <div class="entity-name">Dark Willow</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Terrorize</h4>
+<ul class="changes">
+<li data-tag="buff">Radius increased from 400/450/500 to 450/500/550 <span class="badge-group" data-overall="buff"><span class="badge buff3">+12%</span><span class="badge buff3">+11%</span><span class="badge buff2">+10%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dawnbreaker.png" alt="Dawnbreaker" loading="lazy"></div>
+  <div class="entity-name">Dawnbreaker</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Damage decreased by 1 <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+<li data-tag="nerf">Damage at level 1 decreased from 56-60 to 55-59 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Solar Guardian</h4>
+<ul class="changes">
+<li data-tag="nerf">Landing Stun Duration decreased from 1.4/1.6/1.8s to 1.2/1.4/1.6s <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-14%</span><span class="badge nerf3">-13%</span><span class="badge nerf3">-11%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/doom_bringer.png" alt="Doom" loading="lazy"></div>
+  <div class="entity-name">Doom</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Scorched Earth</h4>
+<ul class="changes">
+<li data-tag="nerf">Bonus HP Regen decreased from 7/8/9/10 to 6.66 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-5%</span><span class="badge nerf4">-17%</span><span class="badge nerf6">-26%</span><span class="badge nerf6">-33%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/drow_ranger.png" alt="Drow Ranger" loading="lazy"></div>
+  <div class="entity-name">Drow Ranger</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Frost Arrows</h4>
+<ul class="changes">
+<li data-tag="buff">Bonus Damage increased from 10/15/20/25 to 12/18/24/30 <span class="badge-group" data-overall="buff"><span class="badge buff4">+20%</span></span></li>
+</ul>
+<h4 class="ability-title">Gust</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 70 to 55 <span class="badge-group" data-overall="buff"><span class="badge buff5">+21%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/earth_spirit.png" alt="Earth Spirit" loading="lazy"></div>
+  <div class="entity-name">Earth Spirit</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Strength increased from 22 to 23 <span class="badge-group" data-overall="buff"><span class="badge buff1">+5%</span></span></li>
+<li data-tag="buff">Damage at level 1 increased from 47-51 to 48-52 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/elder_titan.png" alt="Elder Titan" loading="lazy"></div>
+  <div class="entity-name">Elder Titan</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Echo Stomp</h4>
+<ul class="changes">
+<li data-tag="buff">Damage increased from 60/100/140/180 to 65/110/155/200 <span class="badge-group" data-overall="buff"><span class="badge buff2">+8%</span><span class="badge buff2">+10%</span><span class="badge buff3">+11%</span><span class="badge buff3">+11%</span></span></li>
+<li data-tag="nerf">Aghanim's Shard with alt-cast no longer swaps the position if Elder Titan is rooted <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/ember_spirit.png" alt="Ember Spirit" loading="lazy"></div>
+  <div class="entity-name">Ember Spirit</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Strength decreased from 22 to 21 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-5%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/faceless_void.png" alt="Faceless Void" loading="lazy"></div>
+  <div class="entity-name">Faceless Void</div>
+</div>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="nerf">Level 20 — Time Walk Cooldown Reduction decreased from 1.25s to 1s <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+<li data-tag="nerf">Level 20 — Attack Speed during Chronosphere decreased from +100 to +80 <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/gyrocopter.png" alt="Gyrocopter" loading="lazy"></div>
+  <div class="entity-name">Gyrocopter</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Afterburner</h4>
+<ul class="changes">
+<li data-tag="buff">Duration increased from 4s to 5s <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/hoodwink.png" alt="Hoodwink" loading="lazy"></div>
+  <div class="entity-name">Hoodwink</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Damage increased by 3 <span class="badge buff-text" data-tag="buff">BUFF</span></li>
+<li data-tag="nerf">Base Agility decreased from 25 to 22 <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-12%</span></span></li>
+<li>Damage at level 1 unchanged at 47-54 </li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Sharpshooter</h4>
+<ul class="changes">
+<li data-tag="nerf">Knockback to Hoodwink won't be applied if Hoodwink is rooted <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/huskar.png" alt="Huskar" loading="lazy"></div>
+  <div class="entity-name">Huskar</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Health Regen decreased by 0.25 <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/invoker.png" alt="Invoker" loading="lazy"></div>
+  <div class="entity-name">Invoker</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Movement Speed decreased from 285 to 280 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/wisp.png" alt="Io" loading="lazy"></div>
+  <div class="entity-name">Io</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Tether</h4>
+<ul class="changes">
+<li data-tag="nerf">HP/Mana Transfer decreased from 60/80/100/120% to 55/75/95/115% <span class="badge-group" data-overall="nerf"><span class="badge nerf2">-8%</span><span class="badge nerf2">-6%</span><span class="badge nerf1">-5%</span><span class="badge nerf1">-4%</span></span></li>
+</ul>
+<h4 class="ability-title">Spirits</h4>
+<ul class="changes">
+<li data-tag="qol">Now remembers the radius of the spirits between casts <span class="badge qol" data-tag="qol">QoL</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/jakiro.png" alt="Jakiro" loading="lazy"></div>
+  <div class="entity-name">Jakiro</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Strength gain increased from 2.5 to 2.6 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Macropyre</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 250/350/450 to 225/325/425 <span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span><span class="badge buff2">+7%</span><span class="badge buff2">+6%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/juggernaut.png" alt="Juggernaut" loading="lazy"></div>
+  <div class="entity-name">Juggernaut</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Blade Fury</h4>
+<ul class="changes">
+<li data-tag="buff">Damage per second increased from 80/110/140/170 to 85/115/145/175 <span class="badge-group" data-overall="buff"><span class="badge buff2">+6%</span><span class="badge buff1">+5%</span><span class="badge buff1">+4%</span><span class="badge buff1">+3%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/keeper_of_the_light.png" alt="Keeper of the Light" loading="lazy"></div>
+  <div class="entity-name">Keeper of the Light</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Movement Speed decreased from 315 to 310 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/kunkka.png" alt="Kunkka" loading="lazy"></div>
+  <div class="entity-name">Kunkka</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Admiral's Rum</h4>
+<ul class="changes">
+<li data-tag="buff">Cooldown decreased from 60.5s − 0.5s per level to 50.5s − 0.5s per level <span class="badge-group" data-overall="buff"><span class="badge buff4">+17%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/largo.png" alt="Largo" loading="lazy"></div>
+  <div class="entity-name">Largo</div>
+</div>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="rework">Level 20 — +200 Catchy Lick Damage replaced with 2× Catchy Lick Charges <span class="badge rework" data-tag="rework">REWORK</span></li>
+<li data-tag="rework">Level 25 — 2× Catchy Lick Charges replaced with 2× Frogstomp Stomps / Interval <span class="badge rework" data-tag="rework">REWORK</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/lich.png" alt="Lich" loading="lazy"></div>
+  <div class="entity-name">Lich</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Sinister Gaze</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Drain per second increased from 20% to 25% <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/lina.png" alt="Lina" loading="lazy"></div>
+  <div class="entity-name">Lina</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Light Strike Array</h4>
+<ul class="changes">
+<li data-tag="buff">Damage increased from 80/120/160/200 to 80/125/170/215 <span class="badge-group" data-overall="buff"><span class="badge neutral">0%</span><span class="badge buff1">+4%</span><span class="badge buff2">+6%</span><span class="badge buff2">+8%</span></span></li>
+</ul>
+<h4 class="ability-title">Laguna Blade</h4>
+<ul class="changes">
+<li data-tag="buff">Damage increased from 380/565/750 to 400/580/760 <span class="badge-group" data-overall="buff"><span class="badge buff1">+5%</span><span class="badge buff1">+3%</span><span class="badge buff1">+1%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/lone_druid.png" alt="Lone Druid" loading="lazy"></div>
+  <div class="entity-name">Lone Druid</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Summon Spirit Bear</h4>
+<ul class="changes">
+<li data-tag="nerf">Mana Cost increased from 75 to 100 <span class="badge-group" data-overall="nerf"><span class="badge nerf6">-33%</span></span></li>
+</ul>
+<h4 class="ability-title">Spirit Link</h4>
+<ul class="changes">
+<li data-tag="nerf">Shared Lifesteal now follows general lifesteal rules and has a creep penalty of 40% <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+</ul>
+<h4 class="ability-title">Savage Roar</h4>
+<ul class="changes">
+<li data-tag="nerf">Aghanim's Shard buff duration decreased from 5s to 4s <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+</ul>
+<ul class="changes">
+<li data-tag="nerf">Aghanim's Shard bonus movement speed decreased from 15% to 10% <span class="badge-group" data-overall="nerf"><span class="badge nerf6">-33%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="rework">Level 10 — −25s Summon Spirit Bear Cooldown replaced with +5s True Form Duration <span class="badge rework" data-tag="rework">REWORK</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon ability-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/lone_druid_spirit_bear.png" alt="Spirit Bear" loading="lazy"></div>
+  <div class="entity-name">Spirit Bear</div>
+</div>
+<ul class="changes">
+<li data-tag="buff rework">Gold/Experience Bounty changed from <span class="formula-old">175 + 8 per Spirit Bear level</span> up to <span class="formula-trigger" data-formula="f1">165 + 10 per Spirit Bear level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><table class="formula-table" id="f1" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th><th class="lvl-jump">L20</th><th>L25</th><th>L30</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>183</td><td>191</td><td>199</td><td>207</td><td>215</td><td>223</td><td>231</td><td>239</td><td>247</td><td>255</td><td>263</td><td>271</td><td>279</td><td>287</td><td>295</td><td class="lvl-jump">335</td><td>375</td><td>415</td></tr><tr><th class="row-label-new">new</th><td>175</td><td>185</td><td>195</td><td>205</td><td>215</td><td>225</td><td>235</td><td>245</td><td>255</td><td>265</td><td>275</td><td>285</td><td>295</td><td>305</td><td>315</td><td class="lvl-jump">365</td><td>415</td><td>465</td></tr><tr><th>Δ %</th><td><span class="badge buff1">+4%</span></td><td><span class="badge buff1">+3%</span></td><td><span class="badge buff1">+2%</span></td><td><span class="badge buff1">+1%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf1">-1%</span></td><td><span class="badge nerf1">-2%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-4%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-7%</span></td><td class="lvl-jump"><span class="badge nerf2">-9%</span></td><td><span class="badge nerf3">-11%</span></td><td><span class="badge nerf3">-12%</span></td></tr></tbody></table></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="nerf">Level 25 — Demolish Bonus Building Damage decreased from +20% to +15% <span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/lycan.png" alt="Lycan" loading="lazy"></div>
+  <div class="entity-name">Lycan</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Feral Impulse</h4>
+<ul class="changes">
+<li data-tag="buff">Health Regen increased from 1/3/5/7 to 2/4/6/8 <span class="badge-group" data-overall="buff"><span class="badge buff10">+100%</span><span class="badge buff6">+33%</span><span class="badge buff4">+20%</span><span class="badge buff3">+14%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 10 — Wolves Damage increased from +10 to +14 <span class="badge-group" data-overall="buff"><span class="badge buff7">+40%</span></span></li>
+<li data-tag="buff">Level 15 — Summon Wolves Health increased from +350 to +375 <span class="badge-group" data-overall="buff"><span class="badge buff2">+7%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/magnataur.png" alt="Magnus" loading="lazy"></div>
+  <div class="entity-name">Magnus</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Shockwave</h4>
+<ul class="changes">
+<li data-tag="buff">Slow Duration increased from 0.4/0.6/0.8/1.0s to 0.55/0.7/0.85/1.0s <span class="badge-group" data-overall="buff"><span class="badge buff7">+38%</span><span class="badge buff4">+17%</span><span class="badge buff2">+6%</span><span class="badge neutral">0%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 15 — All Attributes per hero hit with Reverse Polarity increased from +12 to +14 <span class="badge-group" data-overall="buff"><span class="badge buff4">+17%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/marci.png" alt="Marci" loading="lazy"></div>
+  <div class="entity-name">Marci</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Bodyguard</h4>
+<ul class="changes">
+<li data-tag="buff">Cast Range increased from 500 to 600 <span class="badge-group" data-overall="buff"><span class="badge buff4">+20%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 15 — Dispose Damage increased from +100 to +115 <span class="badge-group" data-overall="buff"><span class="badge buff3">+15%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/mars.png" alt="Mars" loading="lazy"></div>
+  <div class="entity-name">Mars</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Dauntless</h4>
+<ul class="changes">
+<li data-tag="buff">HP Regen per extra enemy increased from 40% to 50% <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span></span></li>
+</ul>
+<h4 class="ability-title">Spear of Mars</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 100/110/120/130 to 90/100/110/120 <span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span><span class="badge buff2">+9%</span><span class="badge buff2">+8%</span><span class="badge buff2">+8%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/mirana.png" alt="Mirana" loading="lazy"></div>
+  <div class="entity-name">Mirana</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Sacred Arrow</h4>
+<ul class="changes">
+<li data-tag="buff">Damage increased from 60/150/240/330 to 60/160/260/360 <span class="badge-group" data-overall="buff"><span class="badge neutral">0%</span><span class="badge buff2">+7%</span><span class="badge buff2">+8%</span><span class="badge buff2">+9%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 15 — Leap Attack Speed increased from +90 to +100 <span class="badge-group" data-overall="buff"><span class="badge buff3">+11%</span></span></li>
+<li data-tag="buff">Level 20 — Celestial Quiver Damage increased from +40 to +50 <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/monkey_king.png" alt="Monkey King" loading="lazy"></div>
+  <div class="entity-name">Monkey King</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Agility decreased from 24 to 23 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span></span></li>
+<li data-tag="nerf">Damage at level 1 decreased from 53-57 to 52-56 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Primal Spring</h4>
+<ul class="changes">
+<li data-tag="nerf">Movement Slow decreased from 35/50/65/80% to 30/40/50/60% <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-14%</span><span class="badge nerf4">-20%</span><span class="badge nerf5">-23%</span><span class="badge nerf5">-25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/morphling.png" alt="Morphling" loading="lazy"></div>
+  <div class="entity-name">Morphling</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Waveform</h4>
+<ul class="changes">
+<li data-tag="qol">Will now be cast in the desired direction, if the target location is further than the cast range <span class="badge qol" data-tag="qol">QoL</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/muerta.png" alt="Muerta" loading="lazy"></div>
+  <div class="entity-name">Muerta</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Attack Speed decreased from 115 to 110 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Supernatural</h4>
+<ul class="changes">
+<li data-tag="buff">Maximum Stack Count increased from 1 per hero level to 5 + 1 per hero level <span class="badge buff-text" data-tag="buff">BUFF</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/furion.png" alt="Nature's Prophet" loading="lazy"></div>
+  <div class="entity-name">Nature's Prophet</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Nature's Call</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 100 to 85/90/95/100 <span class="badge-group" data-overall="buff"><span class="badge buff3">+15%</span><span class="badge buff2">+10%</span><span class="badge buff1">+5%</span><span class="badge neutral">0%</span></span></li>
+<li data-tag="buff">Treant Bonus Hero Damage increased from 4/8/12/16 to 6/10/14/18 <span class="badge-group" data-overall="buff"><span class="badge buff8">+50%</span><span class="badge buff5">+25%</span><span class="badge buff4">+17%</span><span class="badge buff3">+12%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 20 — Sprout Damage increased from +170 to +220 <span class="badge-group" data-overall="buff"><span class="badge buff6">+29%</span></span></li>
+<li data-tag="buff">Level 20 — Wrath of Nature Cooldown Reduction increased from 15s to 20s <span class="badge-group" data-overall="buff"><span class="badge buff6">+33%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/ogre_magi.png" alt="Ogre Magi" loading="lazy"></div>
+  <div class="entity-name">Ogre Magi</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Strength gain decreased from 4.2 to 4.0 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-5%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/omniknight.png" alt="Omniknight" loading="lazy"></div>
+  <div class="entity-name">Omniknight</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Repel</h4>
+<ul class="changes">
+<li data-tag="buff">Cooldown decreased from 40/36/32/28s to 40/35/30/25s <span class="badge-group" data-overall="buff"><span class="badge neutral">0%</span><span class="badge buff1">+3%</span><span class="badge buff2">+6%</span><span class="badge buff3">+11%</span></span></li>
+</ul>
+<h4 class="ability-title">Hammer of Purity</h4>
+<ul class="changes">
+<li data-tag="buff">Damage increased from 20/40/60/80 to 25/45/65/85 <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span><span class="badge buff3">+12%</span><span class="badge buff2">+8%</span><span class="badge buff2">+6%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/obsidian_destroyer.png" alt="Outworld Destroyer" loading="lazy"></div>
+  <div class="entity-name">Outworld Destroyer</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Objurgation</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 250 to 175 <span class="badge-group" data-overall="buff"><span class="badge buff6">+30%</span></span></li>
+</ul>
+<h4 class="ability-title">Sanity's Eclipse</h4>
+<ul class="changes">
+<li data-tag="buff">Radius increased from 450/500/550 to 500/525/550 <span class="badge-group" data-overall="buff"><span class="badge buff3">+11%</span><span class="badge buff1">+5%</span><span class="badge neutral">0%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 20 — Astral Imprisonment Mana Capacity Steal increased from 10% to 12% <span class="badge-group" data-overall="buff"><span class="badge buff4">+20%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/pangolier.png" alt="Pangolier" loading="lazy"></div>
+  <div class="entity-name">Pangolier</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Health Regen decreased by 1.0 <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Swashbuckle</h4>
+<ul class="changes">
+<li data-tag="nerf">Mana Cost increased from 75/80/85/90 to 85/90/95/100 <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-13%</span><span class="badge nerf3">-12%</span><span class="badge nerf3">-12%</span><span class="badge nerf3">-11%</span></span></li>
+</ul>
+<h4 class="ability-title">Roll Up</h4>
+<ul class="changes">
+<li data-tag="nerf">Mana Cost increased from 50 to 75 <span class="badge-group" data-overall="nerf"><span class="badge nerf8">-50%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="nerf">Level 10 — Lucky Shot Armor Reduction decreased from +3 to +2 <span class="badge-group" data-overall="nerf"><span class="badge nerf6">-33%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/phantom_assassin.png" alt="Phantom Assassin" loading="lazy"></div>
+  <div class="entity-name">Phantom Assassin</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Agility increased from 21 to 22 <span class="badge-group" data-overall="buff"><span class="badge buff1">+5%</span></span></li>
+<li data-tag="buff">Damage at level 1 increased from 56-58 to 57-59 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 10 — Phantom Strike Duration increased from +0.6 to +0.8s <span class="badge-group" data-overall="buff"><span class="badge buff6">+33%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/phantom_lancer.png" alt="Phantom Lancer" loading="lazy"></div>
+  <div class="entity-name">Phantom Lancer</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Phantom Rush</h4>
+<ul class="changes">
+<li data-tag="nerf">Aghanim's Scepter bonus max rush distance decreased from +625 to +575 <span class="badge-group" data-overall="nerf"><span class="badge nerf2">-8%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/phoenix.png" alt="Phoenix" loading="lazy"></div>
+  <div class="entity-name">Phoenix</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Dying Light</h4>
+<ul class="changes">
+<li data-tag="nerf">Missing Health as Damage decreased from 4% to 3.5% <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-12%</span></span></li>
+</ul>
+<h4 class="ability-title">Sun Ray</h4>
+<ul class="changes">
+<li data-tag="nerf">Max Health as Heal per second decreased from 0.5/1/1.5/2% to 0.4/0.8/1.2/1.6% <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+</ul>
+<h4 class="ability-title">Supernova</h4>
+<ul class="changes">
+<li data-tag="nerf">Damage per second decreased from 60/90/120 to 50/80/110 <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-17%</span><span class="badge nerf3">-11%</span><span class="badge nerf2">-8%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/primal_beast.png" alt="Primal Beast" loading="lazy"></div>
+  <div class="entity-name">Primal Beast</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Trample</h4>
+<ul class="changes">
+<li data-tag="nerf">Damage AoE decreased from 230 to 200 <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-13%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/puck.png" alt="Puck" loading="lazy"></div>
+  <div class="entity-name">Puck</div>
+</div>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="rework">Level 15 — −15s Dream Coil Cooldown replaced with +2% Puckish Health and Mana Restoration <span class="badge rework" data-tag="rework">REWORK</span></li>
+<li data-tag="rework">Level 25 — Dream Coil Pierces Debuff Immunity replaced with −30s Dream Coil Cooldown <span class="badge rework" data-tag="rework">REWORK</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/queenofpain.png" alt="Queen of Pain" loading="lazy"></div>
+  <div class="entity-name">Queen of Pain</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Agility decreased from 22 to 20 <span class="badge-group" data-overall="nerf"><span class="badge nerf2">-9%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Shadow Strike</h4>
+<ul class="changes">
+<li data-tag="nerf">Cooldown rescaled from 13/10/7/4s to 11/9/7/5s <span class="badge-group" data-overall="nerf"><span class="badge buff3">+15%</span><span class="badge buff2">+10%</span><span class="badge neutral">0%</span><span class="badge nerf5">-25%</span></span></li>
+<li data-tag="nerf">Aghanim's Scepter AoE decreased from 375 to 300 <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/razor.png" alt="Razor" loading="lazy"></div>
+  <div class="entity-name">Razor</div>
+</div>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 15 — Static Link Damage Steal increased from +5 to +6 <span class="badge-group" data-overall="buff"><span class="badge buff4">+20%</span></span></li>
+<li data-tag="buff">Level 20 — Storm Surge Slow and Damage increased from +30% to +35% <span class="badge-group" data-overall="buff"><span class="badge buff4">+17%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/rubick.png" alt="Rubick" loading="lazy"></div>
+  <div class="entity-name">Rubick</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Agility gain decreased from 2.5 to 2.2 <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-12%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 15 — Fade Bolt Cooldown Reduction increased from 3s to 4s <span class="badge-group" data-overall="buff"><span class="badge buff6">+33%</span></span></li>
+<li data-tag="nerf">Level 15 — Stolen Spells Mana Cost Reduction decreased from 50% to 40% <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+<li data-tag="nerf">Level 25 — Curiosity Bonuses decreased from 2× to 1.5× <span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/sand_king.png" alt="Sand King" loading="lazy"></div>
+  <div class="entity-name">Sand King</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Attack Speed decreased from 110 to 100 <span class="badge-group" data-overall="nerf"><span class="badge nerf2">-9%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Stinger</h4>
+<ul class="changes">
+<li data-tag="nerf">Slow Duration rescaled from 4/5/6/7s to 5s <span class="badge-group" data-overall="nerf"><span class="badge buff5">+25%</span><span class="badge neutral">0%</span><span class="badge nerf4">-17%</span><span class="badge nerf6">-29%</span></span></li>
+</ul>
+<h4 class="ability-title">Epicenter</h4>
+<ul class="changes">
+<li data-tag="nerf">Base Radius decreased from 500 to 450 <span class="badge-group" data-overall="nerf"><span class="badge nerf2">-10%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/nevermore.png" alt="Shadow Fiend" loading="lazy"></div>
+  <div class="entity-name">Shadow Fiend</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Shadowraze</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 80 to 75 <span class="badge-group" data-overall="buff"><span class="badge buff2">+6%</span></span></li>
+</ul>
+<h4 class="ability-title">Presence of the Dark Lord</h4>
+<ul class="changes">
+<li data-tag="buff">Armor Reduction rescaled from 3/4/5/6 to 2.5/4/5.5/7 <span class="badge-group" data-overall="buff"><span class="badge nerf4">-17%</span><span class="badge neutral">0%</span><span class="badge buff2">+10%</span><span class="badge buff4">+17%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/skywrath_mage.png" alt="Skywrath Mage" loading="lazy"></div>
+  <div class="entity-name">Skywrath Mage</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Mystic Flare</h4>
+<ul class="changes">
+<li data-tag="buff">Cooldown decreased from 60/40/20s to 55/35/15s <span class="badge-group" data-overall="buff"><span class="badge buff2">+8%</span><span class="badge buff3">+12%</span><span class="badge buff5">+25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/slardar.png" alt="Slardar" loading="lazy"></div>
+  <div class="entity-name">Slardar</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Slithereen Crush</h4>
+<ul class="changes">
+<li data-tag="nerf">Cooldown increased from 7s to 8.5/8/7.5/7s <span class="badge-group" data-overall="nerf"><span class="badge nerf5">-21%</span><span class="badge nerf3">-14%</span><span class="badge nerf2">-7%</span><span class="badge neutral">0%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/snapfire.png" alt="Snapfire" loading="lazy"></div>
+  <div class="entity-name">Snapfire</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Damage increased by 2 <span class="badge buff-text" data-tag="buff">BUFF</span></li>
+<li data-tag="buff">Damage at level 1 increased from 51-57 to 53-59 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/spectre.png" alt="Spectre" loading="lazy"></div>
+  <div class="entity-name">Spectre</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Agility increased from 26 to 29 <span class="badge-group" data-overall="buff"><span class="badge buff3">+12%</span></span></li>
+<li data-tag="buff">Damage at level 1 <span class="wrong-word">decreased</span> from 49-53 to 52-56 <span class="badge-group" data-overall="buff"><span class="badge buff2">+6%</span></span><div class="correction-note"><span class="correction-label">Note</span>— The patch text says "decreased", but the values actually went up.</div></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Dispersion</h4>
+<ul class="changes">
+<li data-tag="nerf">Damage rescaled from 8/12/16/20% to 9/12/15/18% <span class="badge-group" data-overall="nerf"><span class="badge buff3">+12%</span><span class="badge neutral">0%</span><span class="badge nerf2">-6%</span><span class="badge nerf2">-10%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/storm_spirit.png" alt="Storm Spirit" loading="lazy"></div>
+  <div class="entity-name">Storm Spirit</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Galvanized</h4>
+<ul class="changes">
+<li data-tag="rework">Now gains a charge every 3 levels <span class="badge rework" data-tag="rework">REWORK</span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 10 — Overload Attack/Movement Speed Slow increased from +20/20% to +25/25% <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/sven.png" alt="Sven" loading="lazy"></div>
+  <div class="entity-name">Sven</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Storm Hammer</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 110/115/120/125 to 110 <span class="badge-group" data-overall="buff"><span class="badge neutral">0%</span><span class="badge buff1">+4%</span><span class="badge buff2">+8%</span><span class="badge buff3">+12%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/techies.png" alt="Techies" loading="lazy"></div>
+  <div class="entity-name">Techies</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Mana Regen decreased by 0.5 <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+<li data-tag="nerf">Intelligence gain decreased from 3.0 to 2.7 <span class="badge-group" data-overall="nerf"><span class="badge nerf2">-10%</span></span></li>
+<li data-tag="nerf">Damage gain per level decreased from 3.3 to 3.2 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-3%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">M.A.D.</h4>
+<ul class="changes">
+<li data-tag="buff rework">Mana Pool as Regen rescaled from <span class="formula-old">0.08% + 0.02% per level</span> to <span class="formula-trigger" data-formula="f2">0.1% + 0.01% per level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span></span><table class="formula-table" id="f2" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th><th class="lvl-jump">L20</th><th>L25</th><th>L30</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>0.10%</td><td>0.12%</td><td>0.14%</td><td>0.16%</td><td>0.18%</td><td>0.20%</td><td>0.22%</td><td>0.24%</td><td>0.26%</td><td>0.28%</td><td>0.30%</td><td>0.32%</td><td>0.34%</td><td>0.36%</td><td>0.38%</td><td class="lvl-jump">0.48%</td><td>0.58%</td><td>0.68%</td></tr><tr><th class="row-label-new">new</th><td>0.11%</td><td>0.12%</td><td>0.13%</td><td>0.14%</td><td>0.15%</td><td>0.16%</td><td>0.17%</td><td>0.18%</td><td>0.19%</td><td>0.20%</td><td>0.21%</td><td>0.22%</td><td>0.23%</td><td>0.24%</td><td>0.25%</td><td class="lvl-jump">0.30%</td><td>0.35%</td><td>0.40%</td></tr><tr><th>Δ %</th><td><span class="badge buff2">+10%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf2">-7%</span></td><td><span class="badge nerf3">-12%</span></td><td><span class="badge nerf4">-17%</span></td><td><span class="badge nerf4">-20%</span></td><td><span class="badge nerf5">-23%</span></td><td><span class="badge nerf5">-25%</span></td><td><span class="badge nerf6">-27%</span></td><td><span class="badge nerf6">-29%</span></td><td><span class="badge nerf6">-30%</span></td><td><span class="badge nerf6">-31%</span></td><td><span class="badge nerf6">-32%</span></td><td><span class="badge nerf6">-33%</span></td><td><span class="badge nerf7">-34%</span></td><td class="lvl-jump"><span class="badge nerf7">-37%</span></td><td><span class="badge nerf7">-40%</span></td><td><span class="badge nerf7">-41%</span></td></tr></tbody></table></li>
+</ul>
+<h4 class="ability-title">Reactive Tazer</h4>
+<ul class="changes">
+<li data-tag="nerf">Explosion Radius decreased from 450 to 400 <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-11%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/templar_assassin.png" alt="Templar Assassin" loading="lazy"></div>
+  <div class="entity-name">Templar Assassin</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Movement Speed increased from 310 to 315 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/tidehunter.png" alt="Tidehunter" loading="lazy"></div>
+  <div class="entity-name">Tidehunter</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Mana Regen decreased by 0.5 <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/shredder.png" alt="Timbersaw" loading="lazy"></div>
+  <div class="entity-name">Timbersaw</div>
+</div>
+<ul class="changes">
+<li data-tag="buff">Base Damage increased by 2 <span class="badge buff-text" data-tag="buff">BUFF</span></li>
+<li data-tag="buff">Damage at level 1 <span class="wrong-word">decreased</span> from 46-50 to 48-52 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><div class="correction-note"><span class="correction-label">Note</span>— The patch text says "decreased", but the values actually went up.</div></li>
+<li data-tag="buff">Base Intelligence increased from 23 to 24 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Reactive Armor</h4>
+<ul class="changes">
+<li data-tag="buff">Bonus HP Regen increased from 0.4/0.5/0.6/0.7 to 0.5/0.6/0.7/0.8 <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span><span class="badge buff4">+20%</span><span class="badge buff4">+17%</span><span class="badge buff3">+14%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/tinker.png" alt="Tinker" loading="lazy"></div>
+  <div class="entity-name">Tinker</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Deploy Turrets</h4>
+<ul class="changes">
+<li data-tag="misc">Updated sound effects <span class="badge misc" data-tag="misc">MISC</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/tiny.png" alt="Tiny" loading="lazy"></div>
+  <div class="entity-name">Tiny</div>
+</div>
+<ul class="changes">
+<li data-tag="nerf">Base Attack Speed decreased from 90 to 85 <span class="badge-group" data-overall="nerf"><span class="badge nerf2">-6%</span></span></li>
+</ul>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Grow</h4>
+<ul class="changes">
+<li data-tag="buff">Toss Bonus Damage increased from 50/175/300 to 50/200/350 <span class="badge-group" data-overall="buff"><span class="badge neutral">0%</span><span class="badge buff3">+14%</span><span class="badge buff4">+17%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="rework">Level 10 — +8 Strength replaced with +2 Tree Grab Attacks <span class="badge rework" data-tag="rework">REWORK</span></li>
+<li data-tag="rework">Level 15 — −8% Grow Attack Speed Reduction replaced with +10 Strength <span class="badge rework" data-tag="rework">REWORK</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/treant.png" alt="Treant Protector" loading="lazy"></div>
+  <div class="entity-name">Treant Protector</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Eyes In The Forest</h4>
+<ul class="changes">
+<li data-tag="qol">Added AoE indicator to cast <span class="badge qol" data-tag="qol">QoL</span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="nerf">Level 10 — Living Armor Heal Per Second decreased from +4 to +3 <span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/troll_warlord.png" alt="Troll Warlord" loading="lazy"></div>
+  <div class="entity-name">Troll Warlord</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Whirling Axes (Ranged)</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 60 to 50 <span class="badge-group" data-overall="buff"><span class="badge buff4">+17%</span></span></li>
+</ul>
+<h4 class="ability-title">Whirling Axes (Melee)</h4>
+<ul class="changes">
+<li data-tag="buff">Damage increased from 50/100/150/200 to 75/120/165/210 <span class="badge-group" data-overall="buff"><span class="badge buff8">+50%</span><span class="badge buff4">+20%</span><span class="badge buff2">+10%</span><span class="badge buff1">+5%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/tusk.png" alt="Tusk" loading="lazy"></div>
+  <div class="entity-name">Tusk</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Drinking Buddies</h4>
+<ul class="changes">
+<li data-tag="nerf">No longer castable while rooted <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/vengefulspirit.png" alt="Vengeful Spirit" loading="lazy"></div>
+  <div class="entity-name">Vengeful Spirit</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Vengeance Aura</h4>
+<ul class="changes">
+<li data-tag="buff">Self Bonus increased from 20% to 25% <span class="badge-group" data-overall="buff"><span class="badge buff5">+25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/venomancer.png" alt="Venomancer" loading="lazy"></div>
+  <div class="entity-name">Venomancer</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Poison Sting</h4>
+<ul class="changes">
+<li data-tag="nerf">Movement Slow decreased from 10% to 8% <span class="badge-group" data-overall="nerf"><span class="badge nerf4">-20%</span></span></li>
+</ul>
+<h4 class="ability-title">Snakebite</h4>
+<ul class="changes">
+<li data-tag="nerf">Damage per second rescaled from 20/25/30/35 to 10/20/30/40 <span class="badge-group" data-overall="nerf"><span class="badge nerf8">-50%</span><span class="badge nerf4">-20%</span><span class="badge neutral">0%</span><span class="badge buff3">+14%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="buff">Level 15 — Poison Sting Slow increased from +7% to +10% <span class="badge-group" data-overall="buff"><span class="badge buff7">+43%</span></span></li>
+<li data-tag="rework">Level 20 — +40% Snakebite Damage replaced with +100 Snakebite Initial Damage <span class="badge rework" data-tag="rework">REWORK</span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/viper.png" alt="Viper" loading="lazy"></div>
+  <div class="entity-name">Viper</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Nosedive</h4>
+<ul class="changes">
+<li data-tag="nerf">Cooldown increased from 20s to 25s <span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/weaver.png" alt="Weaver" loading="lazy"></div>
+  <div class="entity-name">Weaver</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">The Swarm</h4>
+<ul class="changes">
+<li data-tag="buff">Mana Cost decreased from 110 to 110/105/100/95 <span class="badge-group" data-overall="buff"><span class="badge neutral">0%</span><span class="badge buff1">+5%</span><span class="badge buff2">+9%</span><span class="badge buff3">+14%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/windrunner.png" alt="Windranger" loading="lazy"></div>
+  <div class="entity-name">Windranger</div>
+</div>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="nerf">Level 25 — Focus Fire Cooldown Advance on Kills decreased from 18s to 16s <span class="badge-group" data-overall="nerf"><span class="badge nerf3">-11%</span></span></li>
+<li data-tag="buff">Level 25 — Powershot Max HP Execution Threshold increased from 15% to 16% <span class="badge-group" data-overall="buff"><span class="badge buff2">+7%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/winter_wyvern.png" alt="Winter Wyvern" loading="lazy"></div>
+  <div class="entity-name">Winter Wyvern</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Splinter Blast</h4>
+<ul class="changes">
+<li data-tag="nerf">Slow Duration decreased from 28/32/36/40% to 27/30/33/36% <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span><span class="badge nerf2">-6%</span><span class="badge nerf2">-8%</span><span class="badge nerf2">-10%</span></span></li>
+</ul>
+<h4 class="subgroup">Talents</h4>
+<ul class="changes">
+<li data-tag="nerf">Level 10 — Cold Embrace Base Heal per Second decreased from +20 to +15 <span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span></span></li>
+</ul>
+</div>
+<div class="entity-block">
+<div class="entity hero-entity">
+  <div class="entity-icon hero-icon"><img src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/witch_doctor.png" alt="Witch Doctor" loading="lazy"></div>
+  <div class="entity-name">Witch Doctor</div>
+</div>
+<h4 class="subgroup">Abilities</h4>
+<h4 class="ability-title">Voodoo Restoration</h4>
+<ul class="changes">
+<li data-tag="buff">Radius increased from 500/550/600/650 to 650 <span class="badge-group" data-overall="buff"><span class="badge buff6">+30%</span><span class="badge buff4">+18%</span><span class="badge buff2">+8%</span><span class="badge neutral">0%</span></span></li>
+</ul>
+</div>
+
+<button class="back-to-top" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+
+<script>
+(function() {
+  // ---- BACK TO TOP visibility ----
+  const btt = document.querySelector('.back-to-top');
+  function updateBtt() {
+    btt.classList.toggle('visible', window.scrollY > 400);
+  }
+  window.addEventListener('scroll', updateBtt, { passive: true });
+  updateBtt();
+  // ---- TAG FILTERING (multi-select, OR semantics) ----
+  const buttons = document.querySelectorAll('.filter-btn');
+  const activeFilters = new Set();
+  function applyFilter() {
+    const isActive = activeFilters.size > 0;
+    document.body.classList.toggle('filter-active', isActive);
+    document.querySelectorAll('.f-hide').forEach(el => el.classList.remove('f-hide'));
+    if (!isActive) return;
+    document.querySelectorAll('ul.changes > li').forEach(li => {
+      const tags = (li.dataset.tag || '').split(' ').filter(Boolean);
+      const matches = tags.some(t => activeFilters.has(t));
+      if (!matches) li.classList.add('f-hide');
+    });
+    document.querySelectorAll('ul.changes').forEach(ul => {
+      const hasVisible = Array.from(ul.children).some(c => !c.classList.contains('f-hide'));
+      if (!hasVisible) ul.classList.add('f-hide');
+    });
+    document.querySelectorAll('h4.ability-title').forEach(h => {
+      let nx = h.nextElementSibling;
+      while (nx && nx.tagName !== 'UL') nx = nx.nextElementSibling;
+      if (!nx || nx.classList.contains('f-hide')) h.classList.add('f-hide');
+    });
+    document.querySelectorAll('.entity-block').forEach(block => {
+      const visible = block.querySelectorAll('ul.changes > li:not(.f-hide)').length;
+      if (!visible) block.classList.add('f-hide');
+    });
+  }
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.filter;
+      if (activeFilters.has(tag)) {
+        activeFilters.delete(tag);
+        btn.classList.remove('active');
+      } else {
+        activeFilters.add(tag);
+        btn.classList.add('active');
+      }
+      applyFilter();
+    });
+  });
+
+  // ---- FORMULA TABLES (click pill to toggle table) ----
+  document.querySelectorAll('.formula-trigger').forEach(trig => {
+    trig.addEventListener('click', () => {
+      const id = trig.dataset.formula;
+      const table = document.getElementById(id);
+      if (!table) return;
+      const wasHidden = table.hasAttribute('hidden');
+      if (wasHidden) {
+        table.removeAttribute('hidden');
+        trig.classList.add('active');
+      } else {
+        table.setAttribute('hidden', '');
+        trig.classList.remove('active');
+      }
+    });
+  });
+
+  // ---- ENTITY SEARCH ----
+  const searchInput = document.getElementById('entity-search');
+  const resultsBox = document.getElementById('search-results');
+  const entities = [];
+  document.querySelectorAll('.entity').forEach(entity => {
+    const nameEl = entity.querySelector('.entity-name');
+    const imgEl = entity.querySelector('.entity-icon img');
+    if (!nameEl) return;
+    let kind = 'mechanic';
+    if (entity.classList.contains('hero-entity')) kind = 'hero';
+    else if (entity.classList.contains('item-entity')) kind = 'item';
+    entities.push({
+      name: nameEl.textContent.trim(),
+      element: entity,
+      icon: imgEl ? imgEl.src : null,
+      kind: kind
+    });
+  });
+
+  function escapeHtml(s) { return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+  function highlight(name, q) {
+    const idx = name.toLowerCase().indexOf(q.toLowerCase());
+    if (idx === -1) return escapeHtml(name);
+    return escapeHtml(name.slice(0, idx)) +
+           '<mark>' + escapeHtml(name.slice(idx, idx + q.length)) + '</mark>' +
+           escapeHtml(name.slice(idx + q.length));
+  }
+
+  let activeIdx = -1;
+
+  function render(query) {
+    if (!query) {
+      resultsBox.classList.remove('show');
+      resultsBox.innerHTML = '';
+      activeIdx = -1;
+      return;
+    }
+    const q = query.toLowerCase();
+    const matches = entities.filter(e => e.name.toLowerCase().includes(q)).slice(0, 12);
+    if (matches.length === 0) {
+      resultsBox.innerHTML = '<div class="empty">no matches</div>';
+      resultsBox.classList.add('show');
+      activeIdx = -1;
+      return;
+    }
+    resultsBox.innerHTML = matches.map((m, i) =>
+      `<div class="result-item" data-idx="${i}">${
+        m.icon ? `<img src="${m.icon}" alt="">` : '<span style="width:32px;display:inline-block"></span>'
+      }<span>${highlight(m.name, query)}</span><span class="kind">${m.kind}</span></div>`
+    ).join('');
+    resultsBox.classList.add('show');
+    activeIdx = -1;
+
+    resultsBox.querySelectorAll('.result-item').forEach((el, i) => {
+      el.addEventListener('mouseenter', () => { setActive(i); });
+      el.addEventListener('click', () => { jumpTo(matches[i]); });
+    });
+    window._currentMatches = matches;
+  }
+
+  function setActive(i) {
+    activeIdx = i;
+    resultsBox.querySelectorAll('.result-item').forEach((el, idx) => {
+      el.classList.toggle('active', idx === i);
+    });
+  }
+
+  function jumpTo(target) {
+    if (!target) return;
+    target.element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    target.element.style.transition = 'box-shadow 0.4s';
+    target.element.style.boxShadow = '0 0 0 2px #58a6ff';
+    setTimeout(() => target.element.style.boxShadow = '', 1400);
+    searchInput.value = '';
+    resultsBox.classList.remove('show');
+    resultsBox.innerHTML = '';
+  }
+
+  searchInput.addEventListener('input', () => render(searchInput.value));
+  searchInput.addEventListener('keydown', (e) => {
+    const items = resultsBox.querySelectorAll('.result-item');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive((activeIdx + 1) % items.length); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((activeIdx - 1 + items.length) % items.length); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      const idx = activeIdx >= 0 ? activeIdx : 0;
+      if (window._currentMatches && window._currentMatches[idx]) jumpTo(window._currentMatches[idx]);
+    }
+    else if (e.key === 'Escape') {
+      searchInput.value = '';
+      render('');
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !resultsBox.contains(e.target)) {
+      resultsBox.classList.remove('show');
+    }
+  });
+})();
+</script>
+
+</div></body></html>
