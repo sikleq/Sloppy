@@ -46,76 +46,17 @@ header.page-head .subtitle {
 /* LEGEND */
 .legend {
   background: #161b22;
-  padding: 14px 16px;
+  padding: 12px 16px;
   border-radius: 6px;
   margin-bottom: 28px;
   border: 1px solid #30363d;
   font-size: 13px;
   color: #8b949e;
 }
-.legend-strip {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-.legend-strip:last-of-type { margin-bottom: 0; }
-.legend-label {
-  flex: 0 0 auto;
-  color: #c9d1d9;
-  font-weight: 600;
-  font-size: 11px;
-  min-width: 110px;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-}
-.gradient-strip {
-  flex: 1;
-  display: flex;
-  height: 14px;
-  border-radius: 7px;
-  overflow: hidden;
-}
-.gradient-strip .seg {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0;
-  color: #1a1a1a;
-}
-/* BUFF strip — 10 solid pastel-vivid green tiers */
-.gradient-strip .seg.buff1  { background: #b8e0c2; }
-.gradient-strip .seg.buff2  { background: #aad8b6; }
-.gradient-strip .seg.buff3  { background: #9ccfa9; }
-.gradient-strip .seg.buff4  { background: #8ec79c; }
-.gradient-strip .seg.buff5  { background: #80be90; }
-.gradient-strip .seg.buff6  { background: #72b683; }
-.gradient-strip .seg.buff7  { background: #65ad77; }
-.gradient-strip .seg.buff8  { background: #57a56b; }
-.gradient-strip .seg.buff9  { background: #4a9d5f; }
-.gradient-strip .seg.buff10 { background: #3d9554; }
-/* NERF strip — 10 solid pastel-vivid red tiers */
-.gradient-strip .seg.nerf1  { background: #efb6ad; }
-.gradient-strip .seg.nerf2  { background: #eba59a; }
-.gradient-strip .seg.nerf3  { background: #e79388; }
-.gradient-strip .seg.nerf4  { background: #e38275; }
-.gradient-strip .seg.nerf5  { background: #df7164; }
-.gradient-strip .seg.nerf6  { background: #db5f51; }
-.gradient-strip .seg.nerf7  { background: #d74e3f; }
-.gradient-strip .seg.nerf8  { background: #d33d2c; }
-.gradient-strip .seg.nerf9  { background: #ce2d1a; }
-.gradient-strip .seg.nerf10 { background: #c61d10; }
 .legend-tags {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #21262d;
   flex-wrap: wrap;
 }
 .legend-tags strong {
@@ -126,7 +67,90 @@ header.page-head .subtitle {
   letter-spacing: 0.6px;
   margin-right: 4px;
 }
-.legend strong { color: #c9d1d9; }
+
+/* SEARCH BOX */
+.search-box {
+  position: relative;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #21262d;
+}
+.search-box input {
+  width: 100%;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 7px 12px;
+  color: #c9d1d9;
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color 0.15s;
+}
+.search-box input::placeholder { color: #6e7681; }
+.search-box input:focus {
+  outline: none;
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+}
+.search-results {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  margin-top: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+.search-results.show { display: block; }
+.search-results .result-item {
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #c9d1d9;
+  border-bottom: 1px solid #21262d;
+}
+.search-results .result-item:last-child { border-bottom: none; }
+.search-results .result-item:hover,
+.search-results .result-item.active {
+  background: rgba(88, 166, 255, 0.1);
+  color: #fff;
+}
+.search-results .result-item img {
+  width: 32px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 2px;
+  background: #21262d;
+  flex-shrink: 0;
+}
+.search-results .result-item .kind {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: #6e7681;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.search-results .empty {
+  padding: 10px 12px;
+  color: #8b949e;
+  font-style: italic;
+  font-size: 12.5px;
+}
+.search-results mark {
+  background: rgba(240, 198, 116, 0.25);
+  color: inherit;
+  padding: 0 1px;
+  border-radius: 2px;
+}
 
 /* MAJOR SECTION */
 h2.section {
@@ -138,8 +162,13 @@ h2.section {
   margin: 36px 0 20px;
   border-radius: 4px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   box-shadow: 0 2px 8px rgba(179, 45, 35, 0.3);
+  text-shadow:
+    1px 1px 0 rgba(0, 0, 0, 0.45),
+    -1px 0 0 rgba(0, 0, 0, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 0 8px rgba(0, 0, 0, 0.4);
 }
 
 /* ENTITY (HERO/ITEM HEADER WITH ICON) */
@@ -356,58 +385,83 @@ img { max-width: 100%; }
   text-decoration-thickness: 1px;
 }
 
-/* LEVEL-BY-LEVEL BREAKDOWN (formula changes, expandable) */
-details.level-breakdown {
-  margin: 6px 0 4px 0;
-  padding-left: 4px;
-}
-details.level-breakdown summary {
-  cursor: pointer;
-  color: #79c0ff;
-  font-size: 11.5px;
-  user-select: none;
-  list-style: none;
+/* FORMULA TRIGGER (clickable pill on the formula text itself) */
+.formula-trigger {
   display: inline-block;
-  padding: 1px 8px;
-  border-radius: 9px;
-  background: rgba(121, 192, 255, 0.07);
-  border: 1px solid rgba(121, 192, 255, 0.18);
+  padding: 0 8px;
+  border-radius: 10px;
+  background: rgba(200, 130, 60, 0.07);
+  color: #d4a070;
+  border: 1px solid rgba(200, 130, 60, 0.22);
+  font-size: 13.5px;
+  cursor: pointer;
+  text-decoration: underline dotted rgba(212, 160, 112, 0.55);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: all 0.14s;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
 }
-details.level-breakdown summary::-webkit-details-marker { display: none; }
-details.level-breakdown summary::before {
-  content: "▶ ";
-  font-size: 8px;
-  margin-right: 2px;
+.formula-trigger:hover {
+  background: rgba(200, 130, 60, 0.14);
+  border-color: rgba(200, 130, 60, 0.42);
+  color: #e0b080;
 }
-details.level-breakdown[open] summary::before {
-  content: "▼ ";
+.formula-trigger.active {
+  background: rgba(200, 130, 60, 0.20);
+  border-color: rgba(200, 130, 60, 0.55);
+  color: #ecbe8a;
 }
-details.level-breakdown summary:hover {
-  background: rgba(121, 192, 255, 0.13);
-  border-color: rgba(121, 192, 255, 0.35);
-}
-.level-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  padding: 8px 0 4px 0;
-}
-.level-grid > .lvl {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(48, 54, 61, 0.4);
-  border: 1px solid rgba(48, 54, 61, 0.7);
-  border-radius: 12px;
-  padding: 1px 5px 1px 8px;
+
+/* FORMULA COMPARISON TABLE */
+.formula-table {
+  margin: 10px 0 6px 4px;
+  border-collapse: separate;
+  border-spacing: 2px;
   font-size: 11px;
+  width: 100%;
+  max-width: 720px;
+  table-layout: fixed;
+  font-variant-numeric: tabular-nums;
 }
-.level-grid > .lvl b {
+.formula-table[hidden] { display: none; }
+.formula-table thead th {
+  background: rgba(48, 54, 61, 0.55);
   color: #79c0ff;
   font-weight: 600;
   font-size: 10.5px;
+  padding: 4px 0;
+  text-align: center;
+  border-radius: 3px;
 }
-.level-grid > .lvl .badge { margin-left: 0; }
+.formula-table tbody th {
+  width: 42px;
+  text-align: left;
+  padding: 4px 8px;
+  background: rgba(48, 54, 61, 0.5);
+  color: #c9d1d9;
+  font-weight: 700;
+  font-size: 10.5px;
+  border-radius: 3px;
+  letter-spacing: 0.3px;
+}
+.formula-table tbody td {
+  padding: 4px 4px;
+  text-align: center;
+  background: rgba(48, 54, 61, 0.30);
+  color: #c9d1d9;
+  border-radius: 3px;
+  font-size: 11px;
+}
+.formula-table tbody td .badge {
+  margin-left: 0;
+  padding: 1px 4px;
+  font-size: 10.5px;
+  border-radius: 8px;
+  display: inline-block;
+}
+.formula-table .row-label-old { color: #ff9a8c; }
+.formula-table .row-label-new { color: #92c89e; }
 
 /* FILTER BUTTONS in legend — make tags clickable */
 .legend-tags .badge.filter-btn {
@@ -512,36 +566,6 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
 </header>
 
 <div class="legend">
-  <div class="legend-strip">
-    <span class="legend-label">Buff intensity</span>
-    <div class="gradient-strip">
-      <div class="seg buff1">+5%</div>
-      <div class="seg buff2">+10%</div>
-      <div class="seg buff3">+15%</div>
-      <div class="seg buff4">+20%</div>
-      <div class="seg buff5">+25%</div>
-      <div class="seg buff6">+33%</div>
-      <div class="seg buff7">+45%</div>
-      <div class="seg buff8">+60%</div>
-      <div class="seg buff9">+80%</div>
-      <div class="seg buff10">+100%</div>
-    </div>
-  </div>
-  <div class="legend-strip">
-    <span class="legend-label">Nerf intensity</span>
-    <div class="gradient-strip">
-      <div class="seg nerf1">-5%</div>
-      <div class="seg nerf2">-10%</div>
-      <div class="seg nerf3">-15%</div>
-      <div class="seg nerf4">-20%</div>
-      <div class="seg nerf5">-25%</div>
-      <div class="seg nerf6">-33%</div>
-      <div class="seg nerf7">-45%</div>
-      <div class="seg nerf8">-60%</div>
-      <div class="seg nerf9">-80%</div>
-      <div class="seg nerf10">-100%</div>
-    </div>
-  </div>
   <div class="legend-tags">
     <strong>Tags:</strong>
     <button class="badge buff-text filter-btn" data-filter="buff">BUFF</button>
@@ -549,6 +573,10 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
     <button class="badge rework filter-btn" data-filter="rework">REWORK</button>
     <button class="badge neutral filter-btn" data-filter="info">INFO</button>
     <button class="badge qol filter-btn" data-filter="qol">QoL</button>
+  </div>
+  <div class="search-box">
+    <input type="text" id="entity-search" placeholder="Search heroes, items, mechanics…" autocomplete="off" spellcheck="false">
+    <div class="search-results" id="search-results"></div>
   </div>
 </div>
 
@@ -1202,7 +1230,7 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
   <div class="entity-name">Spirit Bear</div>
 </div>
 <ul class="changes">
-<li data-tag="buff rework">Gold/Experience Bounty changed from 175 + 8 per Spirit Bear level up to 165 + 10 per Spirit Bear level <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><details class="level-breakdown"><summary>level-by-level (L1–L10)</summary><div class="level-grid"><span class="lvl"><b>L1</b><span class="badge buff1">+4%</span></span><span class="lvl"><b>L2</b><span class="badge buff1">+3%</span></span><span class="lvl"><b>L3</b><span class="badge buff1">+2%</span></span><span class="lvl"><b>L4</b><span class="badge buff1">+1%</span></span><span class="lvl"><b>L5</b><span class="badge neutral">0%</span></span><span class="lvl"><b>L6</b><span class="badge nerf1">-1%</span></span><span class="lvl"><b>L7</b><span class="badge nerf1">-2%</span></span><span class="lvl"><b>L8</b><span class="badge nerf1">-3%</span></span><span class="lvl"><b>L9</b><span class="badge nerf1">-3%</span></span><span class="lvl"><b>L10</b><span class="badge nerf1">-4%</span></span></div></details></li>
+<li data-tag="buff rework">Gold/Experience Bounty changed from 175 + 8 per Spirit Bear level up to <span class="formula-trigger" data-formula="f1">165 + 10 per Spirit Bear level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><table class="formula-table" id="f1" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>183</td><td>191</td><td>199</td><td>207</td><td>215</td><td>223</td><td>231</td><td>239</td><td>247</td><td>255</td></tr><tr><th class="row-label-new">new</th><td>175</td><td>185</td><td>195</td><td>205</td><td>215</td><td>225</td><td>235</td><td>245</td><td>255</td><td>265</td></tr><tr><th>Δ %</th><td><span class="badge buff1">+4%</span></td><td><span class="badge buff1">+3%</span></td><td><span class="badge buff1">+2%</span></td><td><span class="badge buff1">+1%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf1">-1%</span></td><td><span class="badge nerf1">-2%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-4%</span></td></tr></tbody></table></li>
 </ul>
 <h4 class="subgroup">Talents</h4>
 <ul class="changes">
@@ -1634,7 +1662,7 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
 <h4 class="subgroup">Abilities</h4>
 <h4 class="ability-title">M.A.D.</h4>
 <ul class="changes">
-<li data-tag="buff rework">Mana Pool as Regen rescaled from 0.08% + 0.02% per level to 0.1% + 0.01% per level <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span></span><details class="level-breakdown"><summary>level-by-level (L1–L10)</summary><div class="level-grid"><span class="lvl"><b>L1</b><span class="badge buff2">+10%</span></span><span class="lvl"><b>L2</b><span class="badge neutral">0%</span></span><span class="lvl"><b>L3</b><span class="badge nerf2">-7%</span></span><span class="lvl"><b>L4</b><span class="badge nerf3">-12%</span></span><span class="lvl"><b>L5</b><span class="badge nerf4">-17%</span></span><span class="lvl"><b>L6</b><span class="badge nerf4">-20%</span></span><span class="lvl"><b>L7</b><span class="badge nerf5">-23%</span></span><span class="lvl"><b>L8</b><span class="badge nerf5">-25%</span></span><span class="lvl"><b>L9</b><span class="badge nerf6">-27%</span></span><span class="lvl"><b>L10</b><span class="badge nerf6">-29%</span></span></div></details></li>
+<li data-tag="buff rework">Mana Pool as Regen rescaled from 0.08% + 0.02% per level to <span class="formula-trigger" data-formula="f2">0.1% + 0.01% per level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span></span><table class="formula-table" id="f2" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>0.10%</td><td>0.12%</td><td>0.14%</td><td>0.16%</td><td>0.18%</td><td>0.20%</td><td>0.22%</td><td>0.24%</td><td>0.26%</td><td>0.28%</td></tr><tr><th class="row-label-new">new</th><td>0.11%</td><td>0.12%</td><td>0.13%</td><td>0.14%</td><td>0.15%</td><td>0.16%</td><td>0.17%</td><td>0.18%</td><td>0.19%</td><td>0.20%</td></tr><tr><th>Δ %</th><td><span class="badge buff2">+10%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf2">-7%</span></td><td><span class="badge nerf3">-12%</span></td><td><span class="badge nerf4">-17%</span></td><td><span class="badge nerf4">-20%</span></td><td><span class="badge nerf5">-23%</span></td><td><span class="badge nerf5">-25%</span></td><td><span class="badge nerf6">-27%</span></td><td><span class="badge nerf6">-29%</span></td></tr></tbody></table></li>
 </ul>
 <h4 class="ability-title">Reactive Tazer</h4>
 <ul class="changes">
@@ -1840,6 +1868,7 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
 
 <script>
 (function() {
+  // ---- TAG FILTERING ----
   const buttons = document.querySelectorAll('.filter-btn');
   const filterName = document.getElementById('filter-name');
   let active = null;
@@ -1864,6 +1893,123 @@ body[data-filter="rework"] .entity-block:not(:has(li[data-tag~="rework"])) { dis
     delete document.body.dataset.filter;
     buttons.forEach(b => b.classList.remove('active'));
   };
+
+  // ---- FORMULA TABLES (click pill to toggle table) ----
+  document.querySelectorAll('.formula-trigger').forEach(trig => {
+    trig.addEventListener('click', () => {
+      const id = trig.dataset.formula;
+      const table = document.getElementById(id);
+      if (!table) return;
+      const wasHidden = table.hasAttribute('hidden');
+      if (wasHidden) {
+        table.removeAttribute('hidden');
+        trig.classList.add('active');
+      } else {
+        table.setAttribute('hidden', '');
+        trig.classList.remove('active');
+      }
+    });
+  });
+
+  // ---- ENTITY SEARCH ----
+  const searchInput = document.getElementById('entity-search');
+  const resultsBox = document.getElementById('search-results');
+  const entities = [];
+  document.querySelectorAll('.entity').forEach(entity => {
+    const nameEl = entity.querySelector('.entity-name');
+    const imgEl = entity.querySelector('.entity-icon img');
+    if (!nameEl) return;
+    let kind = 'mechanic';
+    if (entity.classList.contains('hero-entity')) kind = 'hero';
+    else if (entity.classList.contains('item-entity')) kind = 'item';
+    entities.push({
+      name: nameEl.textContent.trim(),
+      element: entity,
+      icon: imgEl ? imgEl.src : null,
+      kind: kind
+    });
+  });
+
+  function escapeHtml(s) { return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+  function highlight(name, q) {
+    const idx = name.toLowerCase().indexOf(q.toLowerCase());
+    if (idx === -1) return escapeHtml(name);
+    return escapeHtml(name.slice(0, idx)) +
+           '<mark>' + escapeHtml(name.slice(idx, idx + q.length)) + '</mark>' +
+           escapeHtml(name.slice(idx + q.length));
+  }
+
+  let activeIdx = -1;
+
+  function render(query) {
+    if (!query) {
+      resultsBox.classList.remove('show');
+      resultsBox.innerHTML = '';
+      activeIdx = -1;
+      return;
+    }
+    const q = query.toLowerCase();
+    const matches = entities.filter(e => e.name.toLowerCase().includes(q)).slice(0, 12);
+    if (matches.length === 0) {
+      resultsBox.innerHTML = '<div class="empty">no matches</div>';
+      resultsBox.classList.add('show');
+      activeIdx = -1;
+      return;
+    }
+    resultsBox.innerHTML = matches.map((m, i) =>
+      `<div class="result-item" data-idx="${i}">${
+        m.icon ? `<img src="${m.icon}" alt="">` : '<span style="width:32px;display:inline-block"></span>'
+      }<span>${highlight(m.name, query)}</span><span class="kind">${m.kind}</span></div>`
+    ).join('');
+    resultsBox.classList.add('show');
+    activeIdx = -1;
+
+    resultsBox.querySelectorAll('.result-item').forEach((el, i) => {
+      el.addEventListener('mouseenter', () => { setActive(i); });
+      el.addEventListener('click', () => { jumpTo(matches[i]); });
+    });
+    window._currentMatches = matches;
+  }
+
+  function setActive(i) {
+    activeIdx = i;
+    resultsBox.querySelectorAll('.result-item').forEach((el, idx) => {
+      el.classList.toggle('active', idx === i);
+    });
+  }
+
+  function jumpTo(target) {
+    if (!target) return;
+    target.element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    target.element.style.transition = 'box-shadow 0.4s';
+    target.element.style.boxShadow = '0 0 0 2px #58a6ff';
+    setTimeout(() => target.element.style.boxShadow = '', 1400);
+    searchInput.value = '';
+    resultsBox.classList.remove('show');
+    resultsBox.innerHTML = '';
+  }
+
+  searchInput.addEventListener('input', () => render(searchInput.value));
+  searchInput.addEventListener('keydown', (e) => {
+    const items = resultsBox.querySelectorAll('.result-item');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive((activeIdx + 1) % items.length); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((activeIdx - 1 + items.length) % items.length); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      const idx = activeIdx >= 0 ? activeIdx : 0;
+      if (window._currentMatches && window._currentMatches[idx]) jumpTo(window._currentMatches[idx]);
+    }
+    else if (e.key === 'Escape') {
+      searchInput.value = '';
+      render('');
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !resultsBox.contains(e.target)) {
+      resultsBox.classList.remove('show');
+    }
+  });
 })();
 </script>
 
