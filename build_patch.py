@@ -445,8 +445,7 @@ nav.top-nav {
 }
 .nav-tab.active {
   background: rgba(0, 0, 0, 0.22);
-  font-weight: 600;
-  border-bottom: 2px solid #58a6ff;
+  /* keep weight + transparent border identical to inactive — prevents header jump */
 }
 .nav-context {
   display: flex;
@@ -672,7 +671,6 @@ nav.top-nav {
   color: #6e7681;
   font-size: 11px;
   display: inline-block;
-  margin-left: auto;
   transition: transform 0.15s;
 }
 .cal-year-block[data-collapsed="true"] .cal-year-label::after {
@@ -753,22 +751,17 @@ nav.top-nav {
 .cal-patch.sub {
   background: rgba(110, 118, 129, 0.22);
 }
+/* Major patches — unified solid orange (compact) */
 .cal-patch.major {
-  background: rgba(212, 138, 78, 0.22);
-  border-color: rgba(212, 138, 78, 0.32);
-}
-
-/* Major-big compact: solid orange (same vibe as expanded) */
-.cal-patch.major-big {
   background: rgba(212, 138, 78, 0.60);
   border-color: rgba(212, 138, 78, 0.75);
 }
-.cal-patch.major-big .cal-day {
+.cal-patch.major .cal-day {
   color: #fff;
   font-weight: 700;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
-.cal-patch.major-big .cal-version {
+.cal-patch.major .cal-version {
   color: rgba(255, 255, 255, 0.82);
   font-weight: 500;
   text-decoration-color: rgba(255, 255, 255, 0.40);
@@ -788,11 +781,6 @@ nav.top-nav {
   transform: scale(1.18);
   z-index: 4;
 }
-.cal-patch.current .cal-version {
-  color: #79c0ff;
-  text-decoration-color: rgba(121, 192, 255, 0.55);
-}
-
 span.cal-patch {
   cursor: default;
   opacity: 0.55;
@@ -847,13 +835,8 @@ span.cal-patch {
   background: rgba(110, 118, 129, 0.4);
   color: #c9d1d9;
 }
+/* Major patches — unified solid orange (full grid) */
 .cal-full-day.has-patch.major {
-  background: rgba(212, 138, 78, 0.45);
-  color: #fff;
-}
-
-/* Major-big full grid: solid orange */
-.cal-full-day.has-patch.major-big {
   background: rgba(212, 138, 78, 0.80);
   color: #fff;
   font-weight: 700;
@@ -1698,10 +1681,22 @@ JS_TEXT = '''
 (function() {
   // ---- BACK-FROM-CALENDAR ----
   const params = new URLSearchParams(window.location.search);
-  if (params.get('from') === 'calendar') {
-    const back = document.querySelector('.nav-back-arrow');
-    if (back) back.classList.add('visible');
+  const back = document.querySelector('.nav-back-arrow');
+  if (params.get('from') === 'calendar' && back) {
+    back.classList.add('visible');
   }
+  // Vertically center the back-arrow on the toolbar
+  function alignBackArrow() {
+    if (!back) return;
+    const tb = document.querySelector('.toolbar');
+    if (!tb) return;
+    const r = tb.getBoundingClientRect();
+    const center = r.top + r.height / 2;
+    const top = Math.round(center - back.offsetHeight / 2);
+    back.style.top = top + 'px';
+  }
+  alignBackArrow();
+  window.addEventListener('resize', alignBackArrow, { passive: true });
 
   // ---- BACK TO TOP visibility ----
   const btt = document.querySelector('.back-to-top');
@@ -2018,12 +2013,12 @@ def save_calendar_html():
     years = sorted({p['year'] for p in patches}, reverse=True)
     months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     has_html = {p['version'] for p in PATCHES}
-    expanded_years = set(years[:2])  # newest 2 expanded by default
+    expanded_years = {years[0]} if years else set()  # only current (newest) year expanded by default
 
     def patch_class(v):
         if _re.search(r'[a-z]$', v):
             return 'sub'
-        return 'major-big' if PATCH_ENTRY_COUNTS.get(v, 0) >= 500 else 'major'
+        return 'major'
 
     def chip_tag(v):
         if v in has_html:
