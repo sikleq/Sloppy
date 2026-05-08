@@ -401,22 +401,6 @@ body {
   padding: 24px 28px 80px;
 }
 
-.nav-back-btn {
-  padding: 6px 12px;
-  margin-right: 6px;
-  color: #c9d1d9;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.18);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
-  transition: background 0.15s;
-}
-.nav-back-btn:hover {
-  background: rgba(0, 0, 0, 0.32);
-}
-
 /* TOP NAV (full-width, sits above container) */
 nav.top-nav {
   background:
@@ -465,14 +449,19 @@ nav.top-nav {
   align-items: center;
   gap: 10px;
 }
+
+/* RELEASE INFO + VERSION — одна высота */
 .nav-context .release-info {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  justify-content: center;
   gap: 1px;
   background: rgba(0, 0, 0, 0.28);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
-  padding: 4px 11px;
+  border: 1px solid transparent;
+  padding: 0 12px;
+  height: 38px;
   border-radius: 6px;
 }
 .nav-context .release-date {
@@ -480,6 +469,7 @@ nav.top-nav {
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.3px;
+  line-height: 1.15;
 }
 .nav-context .patch-age {
   color: #a8b3bd;
@@ -487,17 +477,19 @@ nav.top-nav {
   font-weight: 400;
   letter-spacing: 0.15px;
   font-variant-numeric: tabular-nums;
+  line-height: 1.15;
 }
 .nav-context .version {
   color: #c9d1d9;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.5px;
   background: rgba(0, 0, 0, 0.28);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
   border: 1px solid transparent;
-  padding: 5px 12px;
+  padding: 0 14px;
+  height: 38px;
   border-radius: 6px;
   display: inline-flex;
   align-items: center;
@@ -572,7 +564,41 @@ nav.top-nav {
   color: rgba(88, 166, 255, 0.6);
 }
 
-/* LEGEND */
+/* NAV BACK ARROW — отдельная стрелка слева, как back-to-top, только в другую сторону */
+.nav-back-arrow {
+  position: fixed;
+  top: 90px;
+  left: 22px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(22, 27, 34, 0.92);
+  border: 1px solid rgba(121, 192, 255, 0.45);
+  color: #79c0ff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: all 0.18s ease;
+  z-index: 100;
+  font-family: inherit;
+  padding: 0;
+  padding-bottom: 3px;
+}
+.nav-back-arrow:hover {
+  background: rgba(121, 192, 255, 0.2);
+  border-color: #79c0ff;
+  transform: translateX(-2px);
+}
+.nav-back-arrow.visible {
+  display: flex;
+}
+
 /* CALENDAR PAGE */
 .calendar { margin: 24px 0; }
 .cal-toggle-bar {
@@ -580,6 +606,7 @@ nav.top-nav {
   align-items: center;
   gap: 10px;
   margin-bottom: 16px;
+  padding-left: 16px;
   font-size: 13px;
   color: #8b949e;
 }
@@ -689,12 +716,14 @@ nav.top-nav {
   font-family: inherit;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: filter 0.15s, transform 0.1s;
+  transition: filter 0.15s, transform 0.13s ease;
   border: 1px solid transparent;
+  position: relative;
 }
 .cal-patch:hover {
   filter: brightness(1.35);
   transform: scale(1.08);
+  z-index: 3;
 }
 .cal-patch .cal-version {
   font-size: 9.5px;
@@ -717,12 +746,42 @@ nav.top-nav {
   background: rgba(212, 138, 78, 0.22);
   border-color: rgba(212, 138, 78, 0.32);
 }
+
+/* GLASS STYLE for major-big — тёмный текст на полупрозрачном янтаре */
 .cal-patch.major-big {
-  background: rgba(212, 138, 78, 0.55);
-  border-color: rgba(212, 138, 78, 0.75);
+  background: linear-gradient(135deg, rgba(255, 188, 110, 0.42) 0%, rgba(225, 138, 70, 0.55) 100%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-color: rgba(255, 215, 165, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 205, 0.30),
+    0 0 0 1px rgba(212, 138, 78, 0.30);
 }
-.cal-patch.major-big .cal-day { color: #fff; }
-.cal-patch.major-big .cal-version { color: #f0e0c8; }
+.cal-patch.major-big .cal-day {
+  color: #2d1408;
+  font-weight: 800;
+  text-shadow: 0 1px 0 rgba(255, 220, 180, 0.35);
+}
+.cal-patch.major-big .cal-version {
+  color: #5a2a10;
+  font-weight: 600;
+}
+
+/* CURRENT patch — заранее увеличена (compact mode) */
+.cal-patch.current {
+  transform: scale(1.10);
+  filter: brightness(1.12);
+  z-index: 2;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 205, 0.35),
+    0 0 0 1px rgba(121, 192, 255, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.cal-patch.current:hover {
+  transform: scale(1.18);
+  z-index: 4;
+}
+
 span.cal-patch {
   cursor: default;
   opacity: 0.55;
@@ -788,11 +847,34 @@ span.cal-patch {
   background: rgba(212, 138, 78, 0.45);
   color: #fff;
 }
+
+/* GLASS STYLE for major-big — full grid */
 .cal-full-day.has-patch.major-big {
-  background: rgba(212, 138, 78, 0.85);
-  color: #fff;
-  box-shadow: 0 0 0 1px rgba(212, 138, 78, 0.5);
+  background: linear-gradient(135deg, rgba(255, 188, 110, 0.55) 0%, rgba(225, 138, 70, 0.72) 100%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #2d1408;
+  font-weight: 800;
+  text-shadow: 0 1px 0 rgba(255, 220, 180, 0.40);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 205, 0.35),
+    0 0 0 1px rgba(255, 215, 165, 0.55);
 }
+
+/* CURRENT patch — заранее увеличена (full mode) */
+.cal-full-day.has-patch.current {
+  transform: scale(1.5);
+  z-index: 4;
+  filter: brightness(1.15);
+  box-shadow:
+    0 0 0 1.5px rgba(121, 192, 255, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.55);
+}
+.cal-full-day.has-patch.current:hover {
+  transform: scale(1.7);
+  z-index: 6;
+}
+
 span.cal-full-day.has-patch {
   cursor: default;
   opacity: 0.7;
@@ -1565,7 +1647,6 @@ def _render_top_nav(active="changelogs", current_version=None, date=None):
 
     return f'''<nav class="top-nav">
   <div class="nav-inner">
-    <a class="nav-back-btn" href="calendar.html" style="display:none;">← Calendar</a>
     <div class="nav-tabs">
       <a class="nav-tab {cls_changelogs}" href="{latest}">Changelogs</a>
       <a class="nav-tab {cls_calendar}" href="calendar.html">Calendar</a>
@@ -1588,6 +1669,7 @@ def write_head(version, date):
 <body>
 
 {nav}
+<a class="nav-back-arrow" href="calendar.html" aria-label="Back to calendar" title="Back to calendar">←</a>
 <div class="container">
 
 <div class="toolbar">
@@ -1611,8 +1693,8 @@ JS_TEXT = '''(function() {
   // ---- BACK-FROM-CALENDAR ----
   const params = new URLSearchParams(window.location.search);
   if (params.get('from') === 'calendar') {
-    const back = document.querySelector('.nav-back-btn');
-    if (back) back.style.display = 'inline-flex';
+    const back = document.querySelector('.nav-back-arrow');
+    if (back) back.classList.add('visible');
   }
 
   // ---- BACK TO TOP visibility ----
@@ -1874,6 +1956,14 @@ PATCH_ENTRY_COUNTS = {
 }
 
 
+
+def _current_version():
+    """Return version string of the most recently released patch."""
+    if not RELEASE_HISTORY:
+        return None
+    return sorted(RELEASE_HISTORY, key=lambda p: _parse_date(p["date"]))[-1]["version"]
+
+
 def save_calendar_html():
     """Generate calendar.html — both modes inside a shared collapsible year block."""
     from datetime import datetime
@@ -1895,6 +1985,7 @@ def save_calendar_html():
         by_month[k].sort(key=lambda p: p['day'])
 
     by_day = {(p['year'], p['month'], p['day']): p for p in patches}
+    current_v = _current_version()
     years = sorted({p['year'] for p in patches}, reverse=True)
     months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     has_html = {p['version'] for p in PATCHES}
@@ -1943,7 +2034,8 @@ def save_calendar_html():
                 if p:
                     cls = patch_class(p['version'])
                     tag, href = chip_tag(p['version'])
-                    body.append(f'<{tag} class="cal-full-day has-patch {cls}"{href}>{p["version"]}</{tag}>')
+                    cur = " current" if p['version'] == current_v else ""
+                    body.append(f'<{tag} class="cal-full-day has-patch {cls}{cur}"{href}>{p["version"]}</{tag}>')
                 else:
                     body.append(f'<div class="cal-full-day">{d}</div>')
         body.append('</div></div>')
@@ -1959,8 +2051,9 @@ def save_calendar_html():
                 v = p['version']
                 cls = patch_class(v)
                 tag, href = chip_tag(v)
+                cur = " current" if v == current_v else ""
                 body.append(
-                    f'<{tag} class="cal-patch {cls}"{href}>'
+                    f'<{tag} class="cal-patch {cls}{cur}"{href}>'
                     f'<span class="cal-version">{v}</span>'
                     f'<span class="cal-day">{p["day"]:02d}</span>'
                     f'</{tag}>'
