@@ -211,7 +211,7 @@ def fold(text):
 
 
 def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
-       level_prefix='L', jump_at=20, headline_level=1):
+       level_prefix='L', level_fmt=None, jump_at=20, headline_level=1):
     """Formula-based change. Returns (trigger_html, badge_html, table_html).
     The trigger wraps formula_text as a clickable pill that toggles the table.
     Tag is determined by `headline_level` (default L1).
@@ -219,11 +219,20 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
             Can also pass an int N → range(1, N+1).
     value_fmt: format string for level values (e.g. '{:.2f}%' or '{:g}').
     level_prefix: prefix shown before each column header (default 'L').
-    jump_at: level value that gets the visual gap class (default 20)."""
+                  Ignored when level_fmt is provided.
+    level_fmt: optional callable(L) → header label; lets the caller override
+               the default 'L1', 'L2'… formatting (e.g. '1:00', '2:00').
+    jump_at: level value that gets the visual gap class (default 20).
+
+    The Δ% row is dropped automatically when every level resolves to the same
+    delta — in that case the headline badge already conveys the full picture."""
     if levels is None:
         levels = list(range(1, 16)) + [20, 25, 30]
     elif isinstance(levels, int):
         levels = list(range(1, levels + 1))
+
+    if level_fmt is None:
+        level_fmt = lambda L: f'{level_prefix}{L}'
 
     _formula_id_counter[0] += 1
     fid = f"f{_formula_id_counter[0]}"
@@ -239,13 +248,20 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
     def cls_for(L):
         return ' class="lvl-jump"' if L == jump_at else ''
 
-    head_cells = "".join(f'<th{cls_for(L)}>{level_prefix}{L}</th>' for L in levels)
+    head_cells = "".join(f'<th{cls_for(L)}>{level_fmt(L)}</th>' for L in levels)
     old_cells = "".join(f'<td{cls_for(L)}>{value_fmt.format(old_fn(L))}</td>' for L in levels)
     new_cells = "".join(f'<td{cls_for(L)}>{value_fmt.format(new_fn(L))}</td>' for L in levels)
-    pct_cells = []
-    for L in levels:
-        cls, disp, _, _ = _compute_pct(old_fn(L), new_fn(L), l)
-        pct_cells.append(f'<td{cls_for(L)}><span class="badge {cls}">{disp}</span></td>')
+
+    pct_data = [_compute_pct(old_fn(L), new_fn(L), l) for L in levels]
+    pct_cells = [
+        f'<td{cls_for(L)}><span class="badge {cls}">{disp}</span></td>'
+        for L, (cls, disp, _, _) in zip(levels, pct_data)
+    ]
+    uniform_delta = len({(cls, disp) for cls, disp, _, _ in pct_data}) == 1
+
+    pct_row = "" if uniform_delta else (
+        f'<tr><th>Δ %</th>{"".join(pct_cells)}</tr>'
+    )
 
     table = (
         f'<table class="formula-table" id="{fid}" hidden>'
@@ -253,7 +269,7 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
         f'<tbody>'
         f'<tr><th class="row-label-old">old</th>{old_cells}</tr>'
         f'<tr><th class="row-label-new">new</th>{new_cells}</tr>'
-        f'<tr><th>Δ %</th>{"".join(pct_cells)}</tr>'
+        f'{pct_row}'
         f'</tbody>'
         f'</table>'
     )
@@ -1142,9 +1158,9 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   border: 1px solid rgba(121, 192, 255, 0.32);
 }
 .badge.new {
-  background: rgba(240, 198, 116, 0.14);
-  color: #f0c674;
-  border: 1px solid rgba(240, 198, 116, 0.45);
+  background: rgba(220, 175, 95, 0.09);
+  color: #b8945a;
+  border: 1px solid rgba(220, 175, 95, 0.32);
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -1159,7 +1175,7 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
 .badge.buff7  { background: rgba(75, 200, 105, 0.36);  color: #9cd28a; border: 1px solid rgba(75, 200, 105, 0.60); }
 .badge.buff8  { background: rgba(65, 195, 95, 0.40);   color: #94d07c; border: 1px solid rgba(65, 195, 95, 0.65); }
 .badge.buff9  { background: rgba(55, 190, 85, 0.45);   color: #88cc6e; border: 1px solid rgba(55, 190, 85, 0.70); }
-.badge.buff10 { background: rgba(45, 185, 75, 0.50);   color: #7ec862; border: 1px solid rgba(45, 185, 75, 0.78); }
+.badge.buff10 { background: rgba(50, 175, 80, 0.34);   color: #b8e2a4; border: 1px solid rgba(50, 175, 80, 0.55); }
 
 /* NERF GRADIENT (10 tiers, soft-saturated reds) */
 .badge.nerf1  { background: rgba(230, 130, 120, 0.10); color: #d8b0ac; border: 1px solid rgba(230, 130, 120, 0.24); }
@@ -1171,7 +1187,7 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
 .badge.nerf7  { background: rgba(225, 80, 65, 0.34);   color: #e08c78; border: 1px solid rgba(225, 80, 65, 0.62); }
 .badge.nerf8  { background: rgba(225, 70, 55, 0.38);   color: #e08470; border: 1px solid rgba(225, 70, 55, 0.68); }
 .badge.nerf9  { background: rgba(225, 60, 45, 0.42);   color: #e07c66; border: 1px solid rgba(225, 60, 45, 0.74); }
-.badge.nerf10 { background: rgba(225, 50, 35, 0.46);   color: #e0745c; border: 1px solid rgba(225, 50, 35, 0.80); }
+.badge.nerf10 { background: rgba(220, 70, 55, 0.32);   color: #f1bcb0; border: 1px solid rgba(220, 70, 55, 0.55); }
 
 /* Make digits readable on saturated backgrounds */
 .badge.buff1, .badge.buff2, .badge.buff3, .badge.buff4, .badge.buff5,
@@ -1264,43 +1280,37 @@ img { max-width: 100%; }
   display: flex;
 }
 
-/* WRONG-WORD HIGHLIGHT — subtle, just to mark it (no italic, gray) */
+/* WRONG-WORD HIGHLIGHT — subtle, neutral marker (no strikethrough) */
 .wrong-word {
   background: rgba(139, 148, 158, 0.08);
   color: #8b949e;
   padding: 0 5px;
   border-radius: 3px;
-  text-decoration: line-through;
-  text-decoration-color: rgba(139, 148, 158, 0.45);
-  text-decoration-thickness: 1px;
 }
 
-/* FORMULA TRIGGER (clickable pill on the formula text itself) */
+/* FORMULA TRIGGER — same neutral, squared-off look as .wrong-word, clickable */
 .formula-trigger {
   display: inline-block;
-  padding: 0 8px;
-  border-radius: 10px;
-  background: rgba(200, 130, 60, 0.07);
-  color: #d4a070;
-  border: 1px solid rgba(200, 130, 60, 0.22);
+  padding: 0 5px;
+  border-radius: 3px;
+  background: rgba(139, 148, 158, 0.08);
+  color: #8b949e;
+  border: 1px solid rgba(139, 148, 158, 0.30);
   font-size: 13.5px;
   cursor: pointer;
-  text-decoration: underline dotted rgba(212, 160, 112, 0.55);
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
   transition: all 0.14s;
   font-variant-numeric: tabular-nums;
   user-select: none;
 }
 .formula-trigger:hover {
-  background: rgba(200, 130, 60, 0.14);
-  border-color: rgba(200, 130, 60, 0.42);
-  color: #e0b080;
+  background: rgba(139, 148, 158, 0.16);
+  border-color: rgba(139, 148, 158, 0.50);
+  color: #c9d1d9;
 }
 .formula-trigger.active {
-  background: rgba(200, 130, 60, 0.20);
-  border-color: rgba(200, 130, 60, 0.55);
-  color: #ecbe8a;
+  background: rgba(139, 148, 158, 0.22);
+  border-color: rgba(139, 148, 158, 0.60);
+  color: #c9d1d9;
 }
 /* OLD FORMULA — just a subtle dotted underline so it stands out as "the old one" */
 .formula-old {
@@ -3204,7 +3214,7 @@ HANDCRAFTED_7_41C_BODY = '''<h2 class="section">General Updates</h2>
 <h4 class="subgroup">Abilities</h4>
 <h4 class="ability-title">Galvanized</h4>
 <ul class="changes">
-<li data-tag="buff">Now gains a charge every 3 levels <span class="badge buff-text" data-tag="buff">BUFF</span></li>
+<li data-tag="buff new">Now gains a charge every 3 levels <span class="badge new" data-tag="new" data-overall="buff">NEW</span></li>
 </ul>
 <h4 class="subgroup">Talents</h4>
 <ul class="changes">
@@ -3796,7 +3806,7 @@ W(ul_close())
 W(hero_header("Invoker"))
 W(ability("Invoke"))
 W(ul_open())
-W(li("Now grants Invoker an additional Ability Point at hero levels 6, 12, and 18", t("BUFF")))
+W(li("Now grants Invoker an additional Ability Point at hero levels 6, 12, and 18", t("NEW")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -4241,7 +4251,8 @@ W(li_formula(
     "2/min", "4/min",
     lambda T: 2 * T, lambda T: 4 * T,
     levels=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
-    level_prefix='m', jump_at=15,
+    level_fmt=lambda T: f'{T}:00',
+    jump_at=15,
     rework_badge=False,
     value_fmt="{:g}g",
 ))
