@@ -674,7 +674,7 @@ ul.changes {
   margin: 4px 0 4px 30px;
 }
 ul.changes li {
-  padding: 4px 0;
+  padding: 2px 0;
   color: #c9d1d9;
 }
 ul.subnotes {
@@ -1009,11 +1009,48 @@ PATCHES = [
 ]
 
 # Includes patches without HTML (e.g. 7.41a) — used only for "days between" math.
-# When new patches release, append them here in any order; sorted internally.
+# Major-patch dates sourced from odota/dotaconstants build/patch.json.
+# When new patches release, append them here; sorted internally.
 RELEASE_HISTORY = [
+    # Current cycle — sub-patches we have HTML for
     {"version": "7.41c", "date": "06.05.2026"},
     {"version": "7.41b", "date": "07.04.2026"},
     {"version": "7.41a", "date": "28.03.2026"},
+    # Major patches (from OpenDota)
+    {"version": "7.41", "date": "24.03.2026"},
+    {"version": "7.40", "date": "16.12.2025"},
+    {"version": "7.39", "date": "22.05.2025"},
+    {"version": "7.38", "date": "19.02.2025"},
+    {"version": "7.37", "date": "01.08.2024"},
+    {"version": "7.36", "date": "23.05.2024"},
+    {"version": "7.35", "date": "14.12.2023"},
+    {"version": "7.34", "date": "09.08.2023"},
+    {"version": "7.33", "date": "21.04.2023"},
+    {"version": "7.32", "date": "24.08.2022"},
+    {"version": "7.31", "date": "23.02.2022"},
+    {"version": "7.30", "date": "18.08.2021"},
+    {"version": "7.29", "date": "10.04.2021"},
+    {"version": "7.28", "date": "18.12.2020"},
+    {"version": "7.27", "date": "29.06.2020"},
+    {"version": "7.26", "date": "18.04.2020"},
+    {"version": "7.25", "date": "17.03.2020"},
+    {"version": "7.24", "date": "27.01.2020"},
+    {"version": "7.23", "date": "26.11.2019"},
+    {"version": "7.22", "date": "25.05.2019"},
+    {"version": "7.21", "date": "29.01.2019"},
+    {"version": "7.20", "date": "19.11.2018"},
+    {"version": "7.19", "date": "30.07.2018"},
+    {"version": "7.18", "date": "24.06.2018"},
+    {"version": "7.17", "date": "10.06.2018"},
+    {"version": "7.16", "date": "27.05.2018"},
+    {"version": "7.15", "date": "10.05.2018"},
+    {"version": "7.14", "date": "26.04.2018"},
+    {"version": "7.13", "date": "12.04.2018"},
+    {"version": "7.12", "date": "29.03.2018"},
+    {"version": "7.11", "date": "15.03.2018"},
+    {"version": "7.10", "date": "01.03.2018"},
+    {"version": "7.09", "date": "15.02.2018"},
+    {"version": "7.08", "date": "01.02.2018"},
 ]
 
 
