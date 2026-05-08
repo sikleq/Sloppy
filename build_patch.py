@@ -1290,7 +1290,7 @@ img { max-width: 100%; }
 
 /* FORMULA COMPARISON TABLE */
 .formula-table {
-  margin: 10px 0 6px 4px;
+  margin: 10px auto 6px;
   border-collapse: separate;
   border-spacing: 2px;
   font-size: 11px;
@@ -2106,7 +2106,9 @@ def save_calendar_html():
 })();
 </script>'''
 
-    nav = _render_top_nav(active="calendar")
+    cur_v = _current_version()
+    cur_date = next((r["date"] for r in RELEASE_HISTORY if r["version"] == cur_v), None)
+    nav = _render_top_nav(active="calendar", current_version=cur_v, date=cur_date)
     html = (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
         '<meta charset="UTF-8">\n'
