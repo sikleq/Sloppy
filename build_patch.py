@@ -403,7 +403,6 @@ body {
 
 /* TOP NAV (full-width, sits above container) */
 nav.top-nav {
-  /* slightly lighter than body, with subtle gradient so it's not flat */
   background:
     linear-gradient(180deg, rgba(48, 54, 61, 0.35) 0%, rgba(22, 27, 34, 0.6) 100%),
     #161b22;
@@ -411,9 +410,8 @@ nav.top-nav {
   width: 100%;
 }
 .nav-inner {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 10px 28px;
+  width: 100%;
+  padding: 10px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -434,17 +432,17 @@ nav.top-nav {
   background: transparent;
   border: none;
   font-family: inherit;
-  transition: background 0.15s;
+  transition: background 0.15s, box-shadow 0.15s;
   display: inline-flex;
   align-items: center;
 }
 .nav-tab:hover {
-  background: rgba(48, 54, 61, 0.6);
+  background: rgba(48, 54, 61, 0.5);
 }
 .nav-tab.active {
-  background: rgba(48, 54, 61, 0.9);
+  background: rgba(0, 0, 0, 0.28);
   font-weight: 600;
-  box-shadow: inset 0 -2px 0 #8b949e;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 .nav-context {
   display: flex;
@@ -555,6 +553,99 @@ nav.top-nav {
 }
 
 /* LEGEND */
+/* CALENDAR PAGE */
+.calendar { margin: 24px 0; }
+.cal-year {
+  margin-bottom: 24px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+.cal-year-label {
+  color: #c9d1d9;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 4px;
+}
+.cal-month {
+  display: flex;
+  flex-direction: column;
+}
+.cal-month-name {
+  text-align: center;
+  font-size: 10.5px;
+  color: #6e7681;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+.cal-month-cells {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 44px;
+  padding: 2px;
+  border-left: 1px solid #21262d;
+}
+.cal-patch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 2px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  border: 1px solid transparent;
+}
+.cal-patch:hover {
+  filter: brightness(1.35);
+  transform: translateY(-1px);
+}
+.cal-patch .cal-letter {
+  font-size: 9px;
+  font-weight: 500;
+  color: #8b949e;
+  text-transform: lowercase;
+  line-height: 1;
+  min-height: 9px;
+  margin-bottom: 1px;
+}
+.cal-patch .cal-day {
+  font-size: 12px;
+  font-weight: 600;
+  color: #c9d1d9;
+  line-height: 1;
+}
+.cal-patch.sub {
+  background: rgba(110, 118, 129, 0.2);
+}
+.cal-patch.major {
+  background: rgba(88, 130, 178, 0.28);
+  border-color: rgba(88, 130, 178, 0.4);
+}
+.cal-patch.major-big {
+  background: rgba(88, 130, 178, 0.6);
+  border-color: rgba(88, 130, 178, 0.8);
+}
+.cal-patch.major-big .cal-day { color: #fff; }
+.cal-patch.major-big .cal-letter { color: #c9d1d9; }
+/* Non-clickable (no HTML page yet) */
+span.cal-patch {
+  cursor: default;
+  opacity: 0.55;
+}
+
 /* TOOLBAR (legend tags + search in one row) */
 .toolbar {
   display: flex;
@@ -1291,13 +1382,49 @@ def _dropdown_options_html(current_version):
     return "".join(items)
 
 
+def _render_top_nav(active="changelogs", current_version=None, date=None):
+    """Render the top nav. active in ('changelogs', 'calendar').
+    If current_version is set, adds the right-side context (date + version dropdown)."""
+    latest = PATCHES[0]['filename'] if PATCHES else "#"
+    cls_changelogs = "active" if active == "changelogs" else ""
+    cls_calendar  = "active" if active == "calendar" else ""
+
+    if current_version is not None and date is not None:
+        options = _dropdown_options_html(current_version)
+        age_line = _patch_age_line(current_version)
+        age_html = f'<span class="patch-age">{age_line}</span>' if age_line else ''
+        right_side = f'''
+    <div class="nav-context">
+      <div class="release-info">
+        <span class="release-date">{date}</span>
+        {age_html}
+      </div>
+      <div class="version-dropdown">
+        <button class="version" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Select patch version">
+          {current_version} <span class="version-chev">▾</span>
+        </button>
+        <div class="version-menu" role="menu">
+          {options}
+        </div>
+      </div>
+    </div>'''
+    else:
+        right_side = '<div class="nav-context"></div>'
+
+    return f'''<nav class="top-nav">
+  <div class="nav-inner">
+    <div class="nav-tabs">
+      <a class="nav-tab {cls_changelogs}" href="{latest}">Changelogs</a>
+      <a class="nav-tab {cls_calendar}" href="calendar.html">Calendar</a>
+    </div>{right_side}
+  </div>
+</nav>
+'''
+
+
 def write_head(version, date):
-    """Render head + top nav (tabs + version) + container + toolbar (tags + search)."""
-    options = _dropdown_options_html(version)
-    age_line = _patch_age_line(version)
-    age_html = f'<span class="patch-age">{age_line}</span>' if age_line else ''
-    # Latest patch HTML — for Changelogs tab href
-    latest_filename = PATCHES[0]["filename"] if PATCHES else "#"
+    """Render head + top nav (Changelogs+Calendar tabs + version) + container + toolbar."""
+    nav = _render_top_nav(active="changelogs", current_version=version, date=date)
     W(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1307,28 +1434,7 @@ def write_head(version, date):
 </head>
 <body>
 
-<nav class="top-nav">
-  <div class="nav-inner">
-    <div class="nav-tabs">
-      <a class="nav-tab active" href="{latest_filename}">Changelogs</a>
-    </div>
-    <div class="nav-context">
-      <div class="release-info">
-        <span class="release-date">{date}</span>
-        {age_html}
-      </div>
-      <div class="version-dropdown">
-        <button class="version" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Select patch version">
-          {version} <span class="version-chev">▾</span>
-        </button>
-        <div class="version-menu" role="menu">
-          {options}
-        </div>
-      </div>
-    </div>
-  </div>
-</nav>
-
+{nav}
 <div class="container">
 
 <div class="toolbar">
@@ -1341,7 +1447,7 @@ def write_head(version, date):
     <button class="badge qol filter-btn" data-filter="qol">QoL</button>
   </div>
   <div class="search-box">
-    <input type="text" id="entity-search" placeholder="Search heroes, items, mechanics…" autocomplete="off" spellcheck="false">
+    <input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">
     <div class="search-results" id="search-results"></div>
   </div>
 </div>
@@ -1576,6 +1682,108 @@ def save_html(filename):
     print(f"  → {filename}: {len(out):,} bytes")
     H.clear()
     _State.block_open = False
+
+
+# Pre-computed KV-entry counts per patch (from patchnotes_english.txt analysis).
+# Used in calendar to highlight "extra-major" patches that contain >= 500 entries.
+# When patches release, these counts get updated. Missing keys default to 0.
+PATCH_ENTRY_COUNTS = {
+    "7.08":   140, "7.09":    14, "7.10":    66, "7.11":    44, "7.12":    77,
+    "7.13":    52, "7.13b":    8, "7.14":    65, "7.15":    33, "7.16":    74,
+    "7.17":    32, "7.18":    33, "7.19":   122, "7.19b":   42, "7.19c":   38,
+    "7.19d":   40, "7.20":   428, "7.20b":   77, "7.20c":  104, "7.20d":   45,
+    "7.20e":   75, "7.21":   245, "7.21b":  124, "7.21c":   68, "7.21d":   65,
+    "7.22":   336, "7.22b":   13, "7.22c":   57, "7.22d":   63, "7.22e":   45,
+    "7.22f":   85, "7.22g":   33, "7.22h":   16, "7.23":   349, "7.23a":   47,
+    "7.23b":   90, "7.23c":   28, "7.23d":   37, "7.23e":   68, "7.23f":   53,
+    "7.24":   232, "7.24b":   70, "7.25":   210, "7.25a":   11, "7.25b":    9,
+    "7.25c":   84, "7.26":     6, "7.26a":   24, "7.26b":   17, "7.26c":   46,
+    "7.27":   367, "7.27a":    3, "7.27b":  495, "7.27c":   34, "7.27d":   75,
+    "7.28":   353, "7.28a":  153, "7.28b":  165, "7.28c":  200, "7.29":  1066,
+    "7.29b":  127, "7.29c":   68, "7.29d":   91, "7.30":   698, "7.30b":   11,
+    "7.30c":   54, "7.30d":  148, "7.30e":   77, "7.31":  1204, "7.31b":  168,
+    "7.31c":  158, "7.31d":  203, "7.32":   729, "7.32b":  152, "7.32c":   78,
+    "7.32d":  121, "7.32e":   73, "7.33":  1463, "7.33b":  274, "7.33c":  260,
+    "7.33d":  256, "7.33e":   99, "7.34":   636, "7.34b":  132, "7.34c":  292,
+    "7.34d":  104, "7.34e":  147, "7.35":   643, "7.35b":  102, "7.35c":  189,
+    "7.35d":  151, "7.36":  1869, "7.36a":  286, "7.36b":  100, "7.36c":  225,
+    "7.37":   692, "7.37b":  259, "7.37c":   84, "7.37d":  216, "7.37e":  119,
+    "7.38":  1768, "7.38b":  202, "7.38c":   68, "7.39":   821, "7.39b":  133,
+    "7.39c":  162, "7.39d":  146, "7.39e":   86, "7.40":  1054, "7.40b":  143,
+    "7.40c":  152, "7.41":  1795, "7.41a":   60, "7.41b":  191, "7.41c":  204,
+}
+
+
+def save_calendar_html():
+    """Generate calendar.html — yearly grids of all patches color-coded by type."""
+    from datetime import datetime
+    import re as _re
+
+    by_month = {}
+    for r in RELEASE_HISTORY:
+        d = datetime.strptime(r['date'], '%d.%m.%Y')
+        by_month.setdefault((d.year, d.month), []).append({
+            'version': r['version'], 'date': r['date'], 'day': d.day
+        })
+    for k in by_month:
+        by_month[k].sort(key=lambda p: p['day'])
+
+    years = sorted({datetime.strptime(r['date'], '%d.%m.%Y').year for r in RELEASE_HISTORY})
+    months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+    has_html = {p['version'] for p in PATCHES}
+
+    body = ['<div class="calendar">']
+    for year in sorted(years, reverse=True):  # newest year first
+        body.append('<div class="cal-year">')
+        body.append(f'<h2 class="cal-year-label">{year}</h2>')
+        body.append('<div class="cal-grid">')
+        for mi, mname in enumerate(months, 1):
+            body.append('<div class="cal-month">')
+            body.append(f'<div class="cal-month-name">{mname}</div>')
+            body.append('<div class="cal-month-cells">')
+            for p in by_month.get((year, mi), []):
+                v = p['version']
+                lm = _re.search(r'([a-z])$', v)
+                letter = lm.group(1) if lm else ''
+                count = PATCH_ENTRY_COUNTS.get(v, 0)
+                if letter:
+                    cls = 'sub'
+                elif count >= 500:
+                    cls = 'major-big'
+                else:
+                    cls = 'major'
+                if v in has_html:
+                    tag, href = 'a', f' href="{v}.html"'
+                else:
+                    tag, href = 'span', ''
+                body.append(
+                    f'<{tag} class="cal-patch {cls}"{href} title="{v} — {p["date"]}">'
+                    f'<span class="cal-letter">{letter}</span>'
+                    f'<span class="cal-day">{p["day"]:02d}</span>'
+                    f'</{tag}>'
+                )
+            body.append('</div></div>')
+        body.append('</div></div>')
+    body.append('</div>')
+
+    nav = _render_top_nav(active="calendar")
+    html = (
+        '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
+        '<meta charset="UTF-8">\n'
+        '<title>Dota Patch Calendar</title>\n'
+        '<link rel="stylesheet" href="styles.css">\n'
+        '</head>\n<body>\n\n'
+        + nav
+        + '\n<div class="container">\n'
+        + '\n'.join(body)
+        + '\n</div>\n\n'
+        + '<script src="scripts.js"></script>\n'
+        + '</body>\n</html>\n'
+    )
+    with open('/home/claude/calendar.html', 'w', encoding='utf-8') as f:
+        f.write(html)
+    print(f"  → calendar.html: {len(html):,} bytes")
 
 
 # ============================================================
@@ -3648,3 +3856,4 @@ W(ul_close())
 
 write_footer()
 save_html('7.41b.html')
+save_calendar_html()
