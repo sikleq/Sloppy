@@ -398,46 +398,82 @@ body {
 .container {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 32px 28px 80px;
+  padding: 24px 28px 80px;
 }
 
-/* PAGE HEAD */
-header.page-head {
+/* TOP NAV (full-width, sits above container) */
+nav.top-nav {
+  background: #0d1117;
+  border-bottom: 1px solid #21262d;
+  width: 100%;
+}
+.nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 10px 28px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.nav-tabs {
+  display: flex;
+  gap: 2px;
+}
+.nav-tab {
+  padding: 8px 16px;
+  color: #8b949e;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+.nav-tab:hover {
+  background: rgba(48, 54, 61, 0.5);
+  color: #c9d1d9;
+}
+.nav-tab.active {
+  background: rgba(88, 166, 255, 0.12);
+  color: #58a6ff;
+}
+.nav-context {
+  display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 0 6px;
-  margin-bottom: 16px;
 }
-header.page-head .release-info {
+.nav-context .release-info {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 1px;
 }
-header.page-head .release-date {
+.nav-context .release-date {
   color: #8b949e;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 500;
   letter-spacing: 0.3px;
 }
-header.page-head .patch-age {
+.nav-context .patch-age {
   color: #6e7681;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 400;
   letter-spacing: 0.15px;
   font-variant-numeric: tabular-nums;
 }
-header.page-head .version {
+.nav-context .version {
   color: #c9d1d9;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.5px;
   background: rgba(48, 54, 61, 0.45);
   border: 1px solid #30363d;
-  padding: 4px 14px;
+  padding: 3px 12px;
   border-radius: 4px;
   display: inline-flex;
   align-items: center;
@@ -446,12 +482,12 @@ header.page-head .version {
   font-family: inherit;
   transition: all 0.15s ease;
 }
-header.page-head .version:hover {
+.nav-context .version:hover {
   background: rgba(48, 54, 61, 0.7);
   border-color: #58a6ff;
 }
-header.page-head .version-chev {
-  font-size: 14px;
+.nav-context .version-chev {
+  font-size: 12px;
   color: #8b949e;
   line-height: 1;
   margin-top: 2px;
@@ -514,20 +550,25 @@ header.page-head .version-chev {
 }
 
 /* LEGEND */
-.legend {
+/* TOOLBAR (legend tags + search in one row) */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 18px 0 24px;
+  padding: 8px 14px;
   background: #161b22;
-  padding: 12px 16px;
-  border-radius: 6px;
-  margin-bottom: 28px;
   border: 1px solid #30363d;
+  border-radius: 6px;
   font-size: 13px;
   color: #8b949e;
 }
 .legend-tags {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 .legend-tags strong {
   color: #c9d1d9;
@@ -541,16 +582,15 @@ header.page-head .version-chev {
 /* SEARCH BOX */
 .search-box {
   position: relative;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #21262d;
+  flex: 1 1 auto;
+  min-width: 200px;
 }
 .search-box input {
   width: 100%;
   background: #0d1117;
   border: 1px solid #30363d;
   border-radius: 6px;
-  padding: 7px 12px;
+  padding: 6px 12px;
   color: #c9d1d9;
   font-family: inherit;
   font-size: 13px;
@@ -1059,13 +1099,13 @@ RELEASE_HISTORY = [
     # 7.40 cycle
     {"version": "7.40c", "date": "21.01.2026"},
     {"version": "7.40b", "date": "23.12.2025"},
-    {"version": "7.40",  "date": "16.12.2025"},
+    {"version": "7.40",  "date": "15.12.2025"},
     # 7.39 cycle
     {"version": "7.39e", "date": "02.10.2025"},
     {"version": "7.39d", "date": "05.08.2025"},
     {"version": "7.39c", "date": "24.06.2025"},
     {"version": "7.39b", "date": "29.05.2025"},
-    {"version": "7.39",  "date": "22.05.2025"},
+    {"version": "7.39",  "date": "21.05.2025"},
     # 7.38 cycle
     {"version": "7.38c", "date": "27.03.2025"},
     {"version": "7.38b", "date": "05.03.2025"},
@@ -1075,12 +1115,12 @@ RELEASE_HISTORY = [
     {"version": "7.37d", "date": "01.10.2024"},
     {"version": "7.37c", "date": "28.08.2024"},
     {"version": "7.37b", "date": "14.08.2024"},
-    {"version": "7.37",  "date": "01.08.2024"},
+    {"version": "7.37",  "date": "31.07.2024"},
     # 7.36 cycle
     {"version": "7.36c", "date": "24.06.2024"},
     {"version": "7.36b", "date": "05.06.2024"},
     {"version": "7.36a", "date": "26.05.2024"},
-    {"version": "7.36",  "date": "23.05.2024"},
+    {"version": "7.36",  "date": "22.05.2024"},
     # 7.35 cycle
     {"version": "7.35d", "date": "21.03.2024"},
     {"version": "7.35c", "date": "21.02.2024"},
@@ -1091,49 +1131,99 @@ RELEASE_HISTORY = [
     {"version": "7.34d", "date": "05.10.2023"},
     {"version": "7.34c", "date": "08.09.2023"},
     {"version": "7.34b", "date": "14.08.2023"},
-    {"version": "7.34",  "date": "09.08.2023"},
+    {"version": "7.34",  "date": "08.08.2023"},
     # 7.33 cycle
     {"version": "7.33e", "date": "13.07.2023"},
     {"version": "7.33d", "date": "15.06.2023"},
     {"version": "7.33c", "date": "13.05.2023"},
-    {"version": "7.33",  "date": "21.04.2023"},
+    {"version": "7.33b", "date": "25.04.2023"},
+    {"version": "7.33",  "date": "20.04.2023"},
     # 7.32 cycle
-    {"version": "7.32e", "date": "06.03.2023"},
+    {"version": "7.32e", "date": "07.03.2023"},
     {"version": "7.32d", "date": "29.11.2022"},
     {"version": "7.32c", "date": "27.09.2022"},
+    {"version": "7.32b", "date": "30.08.2022"},
     {"version": "7.32",  "date": "24.08.2022"},
     # 7.31 cycle
     {"version": "7.31d", "date": "08.06.2022"},
     {"version": "7.31c", "date": "04.05.2022"},
     {"version": "7.31b", "date": "28.02.2022"},
     {"version": "7.31",  "date": "23.02.2022"},
-    # 7.30 cycle (sub-patches not yet sourced — major only)
+    # 7.30 cycle
+    {"version": "7.30e", "date": "28.10.2021"},
+    {"version": "7.30d", "date": "25.09.2021"},
+    {"version": "7.30c", "date": "11.09.2021"},
+    {"version": "7.30b", "date": "23.08.2021"},
     {"version": "7.30",  "date": "18.08.2021"},
     # 7.29 cycle
     {"version": "7.29d", "date": "24.05.2021"},
     {"version": "7.29c", "date": "29.04.2021"},
     {"version": "7.29b", "date": "16.04.2021"},
-    {"version": "7.29",  "date": "10.04.2021"},
+    {"version": "7.29",  "date": "09.04.2021"},
     # 7.28 cycle
-    {"version": "7.28c", "date": "21.02.2021"},
+    {"version": "7.28c", "date": "19.02.2021"},
     {"version": "7.28b", "date": "10.01.2021"},
     {"version": "7.28a", "date": "22.12.2020"},
-    {"version": "7.28",  "date": "18.12.2020"},
-    # 7.08-7.27 (major only — sub-patches not yet sourced)
-    {"version": "7.27",  "date": "29.06.2020"},
-    {"version": "7.26",  "date": "18.04.2020"},
+    {"version": "7.28",  "date": "17.12.2020"},
+    # 7.27 cycle
+    {"version": "7.27d", "date": "26.08.2020"},
+    {"version": "7.27c", "date": "17.07.2020"},
+    {"version": "7.27b", "date": "15.07.2020"},
+    {"version": "7.27a", "date": "04.07.2020"},
+    {"version": "7.27",  "date": "28.06.2020"},
+    # 7.26 cycle
+    {"version": "7.26c", "date": "02.05.2020"},
+    {"version": "7.26b", "date": "28.04.2020"},
+    {"version": "7.26a", "date": "21.04.2020"},
+    {"version": "7.26",  "date": "17.04.2020"},
+    # 7.25 cycle
+    {"version": "7.25c", "date": "06.04.2020"},
+    {"version": "7.25b", "date": "25.03.2020"},
+    {"version": "7.25a", "date": "18.03.2020"},
     {"version": "7.25",  "date": "17.03.2020"},
-    {"version": "7.24",  "date": "27.01.2020"},
+    # 7.24 cycle
+    {"version": "7.24b", "date": "26.02.2020"},
+    {"version": "7.24",  "date": "26.01.2020"},
+    # 7.23 cycle
+    {"version": "7.23f", "date": "07.01.2020"},
+    {"version": "7.23e", "date": "14.12.2019"},
+    {"version": "7.23d", "date": "11.12.2019"},
+    {"version": "7.23c", "date": "06.12.2019"},
+    {"version": "7.23b", "date": "29.11.2019"},
+    {"version": "7.23a", "date": "27.11.2019"},
     {"version": "7.23",  "date": "26.11.2019"},
-    {"version": "7.22",  "date": "25.05.2019"},
+    # 7.22 cycle
+    {"version": "7.22h", "date": "29.09.2019"},
+    {"version": "7.22g", "date": "06.09.2019"},
+    {"version": "7.22f", "date": "28.07.2019"},
+    {"version": "7.22e", "date": "14.07.2019"},
+    {"version": "7.22d", "date": "30.06.2019"},
+    {"version": "7.22c", "date": "09.06.2019"},
+    {"version": "7.22b", "date": "27.05.2019"},
+    {"version": "7.22",  "date": "24.05.2019"},
+    # 7.21 cycle
+    {"version": "7.21d", "date": "24.03.2019"},
+    {"version": "7.21c", "date": "02.03.2019"},
+    {"version": "7.21b", "date": "16.02.2019"},
     {"version": "7.21",  "date": "29.01.2019"},
+    # 7.20 cycle
+    {"version": "7.20e", "date": "09.12.2018"},
+    {"version": "7.20d", "date": "30.11.2018"},
+    {"version": "7.20c", "date": "24.11.2018"},
+    {"version": "7.20b", "date": "20.11.2018"},
     {"version": "7.20",  "date": "19.11.2018"},
-    {"version": "7.19",  "date": "30.07.2018"},
-    {"version": "7.18",  "date": "24.06.2018"},
+    # 7.19 cycle
+    {"version": "7.19d", "date": "12.10.2018"},
+    {"version": "7.19c", "date": "14.09.2018"},
+    {"version": "7.19b", "date": "01.09.2018"},
+    {"version": "7.19",  "date": "29.07.2018"},
+    # 7.08-7.18 (Spring Cleaning era)
+    {"version": "7.18",  "date": "25.06.2018"},
     {"version": "7.17",  "date": "10.06.2018"},
     {"version": "7.16",  "date": "27.05.2018"},
     {"version": "7.15",  "date": "10.05.2018"},
     {"version": "7.14",  "date": "26.04.2018"},
+    {"version": "7.13b", "date": "13.04.2018"},
     {"version": "7.13",  "date": "12.04.2018"},
     {"version": "7.12",  "date": "29.03.2018"},
     {"version": "7.11",  "date": "15.03.2018"},
@@ -1197,7 +1287,7 @@ def _dropdown_options_html(current_version):
 
 
 def write_head(version, date):
-    """Render head + opening container + version dropdown + tags."""
+    """Render head + top nav (tabs + version) + container + toolbar (tags + search)."""
     options = _dropdown_options_html(version)
     age_line = _patch_age_line(version)
     age_html = f'<span class="patch-age">{age_line}</span>' if age_line else ''
@@ -1209,24 +1299,32 @@ def write_head(version, date):
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="container">
 
-<header class="page-head">
-  <div class="release-info">
-    <span class="release-date">{date}</span>
-    {age_html}
-  </div>
-  <div class="version-dropdown">
-    <button class="version" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Select patch version">
-      {version} <span class="version-chev">▾</span>
-    </button>
-    <div class="version-menu" role="menu">
-      {options}
+<nav class="top-nav">
+  <div class="nav-inner">
+    <div class="nav-tabs">
+      <button class="nav-tab active" type="button">Changelogs</button>
+    </div>
+    <div class="nav-context">
+      <div class="release-info">
+        <span class="release-date">{date}</span>
+        {age_html}
+      </div>
+      <div class="version-dropdown">
+        <button class="version" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Select patch version">
+          {version} <span class="version-chev">▾</span>
+        </button>
+        <div class="version-menu" role="menu">
+          {options}
+        </div>
+      </div>
     </div>
   </div>
-</header>
+</nav>
 
-<div class="legend">
+<div class="container">
+
+<div class="toolbar">
   <div class="legend-tags">
     <strong>Tags:</strong>
     <button class="badge buff-text filter-btn" data-filter="buff">BUFF</button>
