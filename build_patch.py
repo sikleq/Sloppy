@@ -1318,9 +1318,8 @@ HANDCRAFTED_7_41C_BODY = '''<h2 class="section">General Updates</h2>
   <div class="entity-name">Harpoon</div>
 </div>
 <ul class="changes">
-<li data-tag="nerf">Draw Forth can no longer move the Harpoon caster when rooted/leashed/bound <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
+<li data-tag="nerf">Draw Forth can no longer move the Harpoon caster if they are rooted/leashed/bound <span class="badge nerf-text" data-tag="nerf">NERF</span></li>
 </ul>
-<ul class="subnotes"><li>The target is still moved for the unchanged distance in this case, however a tree cast won't have any effect</li></ul>
 <ul class="subnotes"><li>Still affects rooted/leashed/bound targets</li></ul>
 </div>
 <div class="entity-block">
@@ -2279,7 +2278,7 @@ HANDCRAFTED_7_41C_BODY = '''<h2 class="section">General Updates</h2>
 </div>
 <ul class="changes">
 <li data-tag="buff">Base Agility increased from 26 to 29 <span class="badge-group" data-overall="buff"><span class="badge buff3">+12%</span></span></li>
-<li data-tag="buff">Damage at level 1 <span class="wrong-word">decreased</span> from 49-53 to 52-56 <span class="badge-group" data-overall="buff"><span class="badge buff2">+6%</span></span><div class="correction-note"><span class="correction-label">Note</span>— The patch text says "decreased", but the values actually went up.</div></li>
+<li data-tag="buff">Damage at level 1 increased from 49-53 to 52-56 <span class="badge-group" data-overall="buff"><span class="badge buff2">+6%</span></span></li>
 </ul>
 <h4 class="subgroup">Abilities</h4>
 <h4 class="ability-title">Dispersion</h4>
@@ -2510,7 +2509,7 @@ HANDCRAFTED_7_41C_BODY = '''<h2 class="section">General Updates</h2>
 <h4 class="subgroup">Abilities</h4>
 <h4 class="ability-title">Splinter Blast</h4>
 <ul class="changes">
-<li data-tag="nerf">Slow Duration decreased from 28/32/36/40% to 27/30/33/36% <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span><span class="badge nerf2">-6%</span><span class="badge nerf2">-8%</span><span class="badge nerf2">-10%</span></span></li>
+<li data-tag="nerf">Movement Slow decreased from 28/32/36/40% to 27/30/33/36% <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span><span class="badge nerf2">-6%</span><span class="badge nerf2">-8%</span><span class="badge nerf2">-10%</span></span></li>
 </ul>
 <h4 class="subgroup">Talents</h4>
 <ul class="changes">
