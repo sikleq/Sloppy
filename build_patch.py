@@ -805,13 +805,6 @@ span.cal-patch {
   gap: 2px;
   font-variant-numeric: tabular-nums;
 }
-.cal-full-day-header {
-  display: none;
-}
-/* Also hide the empty top-left cell in the header row */
-.cal-full-grid > .cal-full-month-name:first-child {
-  display: none;
-}
 .cal-full-month-name {
   color: #8b949e;
   font-size: 11px;
@@ -1943,18 +1936,18 @@ def write_footer():
 
 def save_assets():
     """Write styles.css and scripts.js once. Called before any save_html()."""
-    with open('/home/claude/styles.css', 'w', encoding='utf-8') as f:
+    with open('styles.css', 'w', encoding='utf-8') as f:
         f.write(CSS)
-    with open('/home/claude/scripts.js', 'w', encoding='utf-8') as f:
+    with open('scripts.js', 'w', encoding='utf-8') as f:
         f.write(JS_TEXT)
     print(f"  → styles.css: {len(CSS):,} bytes")
     print(f"  → scripts.js: {len(JS_TEXT):,} bytes")
 
 
 def save_html(filename):
-    """Write current accumulator to /home/claude/{filename} and reset state."""
+    """Write current accumulator to ./{filename} and reset state."""
     out = "\n".join(H)
-    path = f"/home/claude/{filename}"
+    path = filename
     with open(path, "w", encoding="utf-8") as f:
         f.write(out)
     print(f"  → {filename}: {len(out):,} bytes")
@@ -2056,9 +2049,6 @@ def save_calendar_html():
         # ---- MODE FULL ----
         body.append('<div class="cal-mode-full">')
         body.append('<div class="cal-full-grid">')
-        body.append('<div class="cal-full-month-name"></div>')
-        for d in range(1, 32):
-            body.append(f'<div class="cal-full-day-header">{d}</div>')
         for month in range(1, 13):
             body.append(f'<div class="cal-full-month-name">{months[month-1]}</div>')
             days_in_m = monthrange(year, month)[1]
@@ -2136,7 +2126,7 @@ def save_calendar_html():
         + toggle_script + '\n'
         + '</body>\n</html>\n'
     )
-    with open('/home/claude/calendar.html', 'w', encoding='utf-8') as f:
+    with open('calendar.html', 'w', encoding='utf-8') as f:
         f.write(html)
     print(f"  → calendar.html: {len(html):,} bytes")
 
