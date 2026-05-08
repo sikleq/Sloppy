@@ -10,37 +10,58 @@ ABIL_CDN = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/
 HERO_SLUG = {
     "Abaddon": "abaddon", "Alchemist": "alchemist",
     "Ancient Apparition": "ancient_apparition", "Anti-Mage": "antimage",
-    "Arc Warden": "arc_warden", "Bane": "bane", "Batrider": "batrider",
-    "Beastmaster": "beastmaster", "Bounty Hunter": "bounty_hunter",
+    "Arc Warden": "arc_warden", "Axe": "axe", "Bane": "bane",
+    "Batrider": "batrider", "Beastmaster": "beastmaster",
+    "Bloodseeker": "bloodseeker", "Bounty Hunter": "bounty_hunter",
     "Brewmaster": "brewmaster", "Bristleback": "bristleback",
     "Broodmother": "broodmother", "Centaur Warrunner": "centaur",
-    "Chaos Knight": "chaos_knight", "Dark Seer": "dark_seer",
-    "Dark Willow": "dark_willow", "Dawnbreaker": "dawnbreaker",
-    "Doom": "doom_bringer", "Drow Ranger": "drow_ranger",
-    "Earth Spirit": "earth_spirit", "Elder Titan": "elder_titan",
-    "Ember Spirit": "ember_spirit", "Faceless Void": "faceless_void",
-    "Gyrocopter": "gyrocopter", "Hoodwink": "hoodwink", "Huskar": "huskar",
-    "Invoker": "invoker", "Io": "wisp", "Jakiro": "jakiro",
-    "Juggernaut": "juggernaut", "Keeper of the Light": "keeper_of_the_light",
-    "Kunkka": "kunkka", "Largo": "largo", "Lich": "lich", "Lina": "lina",
-    "Lone Druid": "lone_druid", "Lycan": "lycan", "Magnus": "magnataur",
-    "Marci": "marci", "Mars": "mars", "Mirana": "mirana",
-    "Monkey King": "monkey_king", "Morphling": "morphling", "Muerta": "muerta",
-    "Nature's Prophet": "furion", "Ogre Magi": "ogre_magi",
-    "Omniknight": "omniknight", "Outworld Destroyer": "obsidian_destroyer",
+    "Chaos Knight": "chaos_knight", "Chen": "chen", "Clinkz": "clinkz",
+    "Clockwerk": "rattletrap", "Crystal Maiden": "crystal_maiden",
+    "Dark Seer": "dark_seer", "Dark Willow": "dark_willow",
+    "Dawnbreaker": "dawnbreaker", "Dazzle": "dazzle",
+    "Death Prophet": "death_prophet", "Disruptor": "disruptor",
+    "Doom": "doom_bringer", "Dragon Knight": "dragon_knight",
+    "Drow Ranger": "drow_ranger", "Earth Spirit": "earth_spirit",
+    "Earthshaker": "earthshaker", "Elder Titan": "elder_titan",
+    "Ember Spirit": "ember_spirit", "Enchantress": "enchantress",
+    "Enigma": "enigma", "Faceless Void": "faceless_void",
+    "Grimstroke": "grimstroke", "Gyrocopter": "gyrocopter",
+    "Hoodwink": "hoodwink", "Huskar": "huskar", "Invoker": "invoker",
+    "Io": "wisp", "Jakiro": "jakiro", "Juggernaut": "juggernaut",
+    "Keeper of the Light": "keeper_of_the_light", "Kez": "kez",
+    "Kunkka": "kunkka", "Largo": "largo",
+    "Legion Commander": "legion_commander", "Leshrac": "leshrac",
+    "Lich": "lich", "Lifestealer": "life_stealer", "Lina": "lina",
+    "Lion": "lion", "Lone Druid": "lone_druid", "Luna": "luna",
+    "Lycan": "lycan", "Magnus": "magnataur", "Marci": "marci",
+    "Mars": "mars", "Medusa": "medusa", "Meepo": "meepo",
+    "Mirana": "mirana", "Monkey King": "monkey_king",
+    "Morphling": "morphling", "Muerta": "muerta", "Naga Siren": "naga_siren",
+    "Nature's Prophet": "furion", "Necrophos": "necrolyte",
+    "Night Stalker": "night_stalker", "Nyx Assassin": "nyx_assassin",
+    "Ogre Magi": "ogre_magi", "Omniknight": "omniknight",
+    "Oracle": "oracle", "Outworld Destroyer": "obsidian_destroyer",
     "Pangolier": "pangolier", "Phantom Assassin": "phantom_assassin",
     "Phantom Lancer": "phantom_lancer", "Phoenix": "phoenix",
-    "Primal Beast": "primal_beast", "Puck": "puck",
-    "Queen of Pain": "queenofpain", "Razor": "razor", "Rubick": "rubick",
-    "Sand King": "sand_king", "Shadow Fiend": "nevermore",
-    "Skywrath Mage": "skywrath_mage", "Slardar": "slardar",
-    "Snapfire": "snapfire", "Spectre": "spectre", "Storm Spirit": "storm_spirit",
-    "Sven": "sven", "Techies": "techies", "Templar Assassin": "templar_assassin",
+    "Primal Beast": "primal_beast", "Puck": "puck", "Pudge": "pudge",
+    "Pugna": "pugna", "Queen of Pain": "queenofpain", "Razor": "razor",
+    "Riki": "riki", "Ringmaster": "ringmaster", "Rubick": "rubick",
+    "Sand King": "sand_king", "Shadow Demon": "shadow_demon",
+    "Shadow Fiend": "nevermore", "Shadow Shaman": "shadow_shaman",
+    "Silencer": "silencer", "Skywrath Mage": "skywrath_mage",
+    "Slardar": "slardar", "Slark": "slark", "Snapfire": "snapfire",
+    "Sniper": "sniper", "Spectre": "spectre", "Spirit Breaker": "spirit_breaker",
+    "Storm Spirit": "storm_spirit", "Sven": "sven", "Techies": "techies",
+    "Templar Assassin": "templar_assassin", "Terrorblade": "terrorblade",
     "Tidehunter": "tidehunter", "Timbersaw": "shredder", "Tinker": "tinker",
-    "Tiny": "tiny", "Treant Protector": "treant", "Troll Warlord": "troll_warlord",
-    "Tusk": "tusk", "Vengeful Spirit": "vengefulspirit", "Venomancer": "venomancer",
-    "Viper": "viper", "Weaver": "weaver", "Windranger": "windrunner",
-    "Winter Wyvern": "winter_wyvern", "Witch Doctor": "witch_doctor",
+    "Tiny": "tiny", "Treant Protector": "treant",
+    "Troll Warlord": "troll_warlord", "Tusk": "tusk", "Underlord": "abyssal_underlord",
+    "Undying": "undying", "Ursa": "ursa", "Vengeful Spirit": "vengefulspirit",
+    "Venomancer": "venomancer", "Viper": "viper", "Visage": "visage",
+    "Void Spirit": "void_spirit", "Warlock": "warlock", "Weaver": "weaver",
+    "Windranger": "windrunner", "Winter Wyvern": "winter_wyvern",
+    "Witch Doctor": "witch_doctor", "Wraith King": "skeleton_king",
+    "Zeus": "zuus",
 }
 
 ITEM_SLUG = {
@@ -129,23 +150,21 @@ def b(old, new, l=False):
         parts.append(f'<span class="badge {cls}">{display}</span>')
         keys.append((cls, display))
 
-    # Determine overall tag
+    # Determine overall tag.
+    # Logic: use the LAST non-zero per-level delta (i.e. max ability level).
+    # Reason: in actual play, abilities are usually maxed by the time they
+    # matter, so the final-level value is what determines whether a change
+    # feels like a buff or nerf.
     overall = ""
     if signed_pcts:
-        avg = sum(signed_pcts) / len(signed_pcts)
-        if round(avg) > 0:
-            overall = "buff"
-        elif round(avg) < 0:
-            overall = "nerf"
-        else:
-            # avg ≈ 0 — fall back to last non-zero
-            for v in reversed(signed_pcts):
-                if v > 0:
-                    overall = "buff"
-                    break
-                if v < 0:
-                    overall = "nerf"
-                    break
+        for v in reversed(signed_pcts):
+            if v > 0:
+                overall = "buff"
+                break
+            if v < 0:
+                overall = "nerf"
+                break
+        # If all zeros, overall stays empty (neutral)
 
     # Collapse if every level produced an identical badge
     if len(keys) > 1 and len(set(keys)) == 1:
@@ -336,6 +355,23 @@ def li(text, badge="", extra="", force_tag=None):
 
 def subnote(text):
     return f'<ul class="subnotes"><li>{text}</li></ul>'
+
+
+def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False):
+    """Convenience: emit <li> with formula table.
+
+    prefix:        text BEFORE 'from' (e.g. 'Max Damage Increase decreased')
+    old_formula:   human-readable old-formula string
+    new_formula:   human-readable new-formula string
+    old_fn/new_fn: callable(level) → value, used to compute per-level table
+    l:             lower-is-buff flag (passed through to bf gradient)
+    """
+    trigger, badge, table = bf(old_fn, new_fn, new_formula, l=l)
+    full_text = (f'{prefix} from <span class="formula-old">{old_formula}</span> '
+                 f'to {trigger}')
+    full_badge = ('<span class="badge rework" data-tag="rework">REWORK</span>'
+                  + badge)
+    return li(full_text, full_badge, extra=table)
 
 
 # ---------- CSS ----------
@@ -1009,48 +1045,98 @@ PATCHES = [
 ]
 
 # Includes patches without HTML (e.g. 7.41a) — used only for "days between" math.
-# Major-patch dates sourced from odota/dotaconstants build/patch.json.
-# When new patches release, append them here; sorted internally.
+# Major-patch dates from odota/dotaconstants. Sub-patches sourced from Liquipedia
+# and Fandom. Append new entries here when patches release; sorted internally.
 RELEASE_HISTORY = [
-    # Current cycle — sub-patches we have HTML for
+    # 7.41 cycle
     {"version": "7.41c", "date": "06.05.2026"},
     {"version": "7.41b", "date": "07.04.2026"},
     {"version": "7.41a", "date": "28.03.2026"},
-    # Major patches (from OpenDota)
-    {"version": "7.41", "date": "24.03.2026"},
-    {"version": "7.40", "date": "16.12.2025"},
-    {"version": "7.39", "date": "22.05.2025"},
-    {"version": "7.38", "date": "19.02.2025"},
-    {"version": "7.37", "date": "01.08.2024"},
-    {"version": "7.36", "date": "23.05.2024"},
-    {"version": "7.35", "date": "14.12.2023"},
-    {"version": "7.34", "date": "09.08.2023"},
-    {"version": "7.33", "date": "21.04.2023"},
-    {"version": "7.32", "date": "24.08.2022"},
-    {"version": "7.31", "date": "23.02.2022"},
-    {"version": "7.30", "date": "18.08.2021"},
-    {"version": "7.29", "date": "10.04.2021"},
-    {"version": "7.28", "date": "18.12.2020"},
-    {"version": "7.27", "date": "29.06.2020"},
-    {"version": "7.26", "date": "18.04.2020"},
-    {"version": "7.25", "date": "17.03.2020"},
-    {"version": "7.24", "date": "27.01.2020"},
-    {"version": "7.23", "date": "26.11.2019"},
-    {"version": "7.22", "date": "25.05.2019"},
-    {"version": "7.21", "date": "29.01.2019"},
-    {"version": "7.20", "date": "19.11.2018"},
-    {"version": "7.19", "date": "30.07.2018"},
-    {"version": "7.18", "date": "24.06.2018"},
-    {"version": "7.17", "date": "10.06.2018"},
-    {"version": "7.16", "date": "27.05.2018"},
-    {"version": "7.15", "date": "10.05.2018"},
-    {"version": "7.14", "date": "26.04.2018"},
-    {"version": "7.13", "date": "12.04.2018"},
-    {"version": "7.12", "date": "29.03.2018"},
-    {"version": "7.11", "date": "15.03.2018"},
-    {"version": "7.10", "date": "01.03.2018"},
-    {"version": "7.09", "date": "15.02.2018"},
-    {"version": "7.08", "date": "01.02.2018"},
+    {"version": "7.41",  "date": "24.03.2026"},
+    # 7.40 cycle
+    {"version": "7.40c", "date": "21.01.2026"},
+    {"version": "7.40b", "date": "23.12.2025"},
+    {"version": "7.40",  "date": "16.12.2025"},
+    # 7.39 cycle
+    {"version": "7.39e", "date": "02.10.2025"},
+    {"version": "7.39d", "date": "05.08.2025"},
+    {"version": "7.39c", "date": "24.06.2025"},
+    {"version": "7.39b", "date": "29.05.2025"},
+    {"version": "7.39",  "date": "22.05.2025"},
+    # 7.38 cycle
+    {"version": "7.38c", "date": "27.03.2025"},
+    {"version": "7.38b", "date": "05.03.2025"},
+    {"version": "7.38",  "date": "19.02.2025"},
+    # 7.37 cycle
+    {"version": "7.37e", "date": "19.11.2024"},
+    {"version": "7.37d", "date": "01.10.2024"},
+    {"version": "7.37c", "date": "28.08.2024"},
+    {"version": "7.37b", "date": "14.08.2024"},
+    {"version": "7.37",  "date": "01.08.2024"},
+    # 7.36 cycle
+    {"version": "7.36c", "date": "24.06.2024"},
+    {"version": "7.36b", "date": "05.06.2024"},
+    {"version": "7.36a", "date": "26.05.2024"},
+    {"version": "7.36",  "date": "23.05.2024"},
+    # 7.35 cycle
+    {"version": "7.35d", "date": "21.03.2024"},
+    {"version": "7.35c", "date": "21.02.2024"},
+    {"version": "7.35b", "date": "21.12.2023"},
+    {"version": "7.35",  "date": "14.12.2023"},
+    # 7.34 cycle
+    {"version": "7.34e", "date": "20.11.2023"},
+    {"version": "7.34d", "date": "05.10.2023"},
+    {"version": "7.34c", "date": "08.09.2023"},
+    {"version": "7.34b", "date": "14.08.2023"},
+    {"version": "7.34",  "date": "09.08.2023"},
+    # 7.33 cycle
+    {"version": "7.33e", "date": "13.07.2023"},
+    {"version": "7.33d", "date": "15.06.2023"},
+    {"version": "7.33c", "date": "13.05.2023"},
+    {"version": "7.33",  "date": "21.04.2023"},
+    # 7.32 cycle
+    {"version": "7.32e", "date": "06.03.2023"},
+    {"version": "7.32d", "date": "29.11.2022"},
+    {"version": "7.32c", "date": "27.09.2022"},
+    {"version": "7.32",  "date": "24.08.2022"},
+    # 7.31 cycle
+    {"version": "7.31d", "date": "08.06.2022"},
+    {"version": "7.31c", "date": "04.05.2022"},
+    {"version": "7.31b", "date": "28.02.2022"},
+    {"version": "7.31",  "date": "23.02.2022"},
+    # 7.30 cycle (sub-patches not yet sourced — major only)
+    {"version": "7.30",  "date": "18.08.2021"},
+    # 7.29 cycle
+    {"version": "7.29d", "date": "24.05.2021"},
+    {"version": "7.29c", "date": "29.04.2021"},
+    {"version": "7.29b", "date": "16.04.2021"},
+    {"version": "7.29",  "date": "10.04.2021"},
+    # 7.28 cycle
+    {"version": "7.28c", "date": "21.02.2021"},
+    {"version": "7.28b", "date": "10.01.2021"},
+    {"version": "7.28a", "date": "22.12.2020"},
+    {"version": "7.28",  "date": "18.12.2020"},
+    # 7.08-7.27 (major only — sub-patches not yet sourced)
+    {"version": "7.27",  "date": "29.06.2020"},
+    {"version": "7.26",  "date": "18.04.2020"},
+    {"version": "7.25",  "date": "17.03.2020"},
+    {"version": "7.24",  "date": "27.01.2020"},
+    {"version": "7.23",  "date": "26.11.2019"},
+    {"version": "7.22",  "date": "25.05.2019"},
+    {"version": "7.21",  "date": "29.01.2019"},
+    {"version": "7.20",  "date": "19.11.2018"},
+    {"version": "7.19",  "date": "30.07.2018"},
+    {"version": "7.18",  "date": "24.06.2018"},
+    {"version": "7.17",  "date": "10.06.2018"},
+    {"version": "7.16",  "date": "27.05.2018"},
+    {"version": "7.15",  "date": "10.05.2018"},
+    {"version": "7.14",  "date": "26.04.2018"},
+    {"version": "7.13",  "date": "12.04.2018"},
+    {"version": "7.12",  "date": "29.03.2018"},
+    {"version": "7.11",  "date": "15.03.2018"},
+    {"version": "7.10",  "date": "01.03.2018"},
+    {"version": "7.09",  "date": "15.02.2018"},
+    {"version": "7.08",  "date": "01.02.2018"},
 ]
 
 
@@ -2428,7 +2514,7 @@ HANDCRAFTED_7_41C_BODY = '''<h2 class="section">General Updates</h2>
 <h4 class="subgroup">Abilities</h4>
 <h4 class="ability-title">Galvanized</h4>
 <ul class="changes">
-<li data-tag="rework">Now gains a charge every 3 levels <span class="badge rework" data-tag="rework">REWORK</span></li>
+<li data-tag="buff">Now gains a charge every 3 levels <span class="badge buff-text" data-tag="buff">BUFF</span></li>
 </ul>
 <h4 class="subgroup">Talents</h4>
 <ul class="changes">
@@ -2594,7 +2680,7 @@ HANDCRAFTED_7_41C_BODY = '''<h2 class="section">General Updates</h2>
 </ul>
 <h4 class="ability-title">Snakebite</h4>
 <ul class="changes">
-<li data-tag="nerf">Damage per second rescaled from 20/25/30/35 to 10/20/30/40 <span class="badge-group" data-overall="nerf"><span class="badge nerf8">-50%</span><span class="badge nerf4">-20%</span><span class="badge neutral">0%</span><span class="badge buff3">+14%</span></span></li>
+<li data-tag="buff">Damage per second rescaled from 20/25/30/35 to 10/20/30/40 <span class="badge-group" data-overall="buff"><span class="badge nerf8">-50%</span><span class="badge nerf4">-20%</span><span class="badge neutral">0%</span><span class="badge buff3">+14%</span></span></li>
 </ul>
 <h4 class="subgroup">Talents</h4>
 <ul class="changes">
@@ -2684,16 +2770,16 @@ W(section("Item Updates"))
 
 W(item_header("Black King Bar"))
 W(ul_open())
-W(li("Avatar now has a fixed duration and is not affected by buff duration amplification", t("REWORK")))
+W(li("Avatar now has a fixed duration and is not affected by buff duration amplification", t("NERF")))
 W(ul_close())
 W(item_header("Consecrated Wraps"))
 W(ul_open())
 W(li("All Attributes bonus decreased from +6 to +5", b(6, 5)))
 W(li("Hallowed stacks are now item charges instead of a stack counter on the buff", t("REWORK")))
-W(li("All charges are consumed when the barrier is created", t("MISC")))
-W(li("Charge Restore Time of Hallowed is not affected by effects that reduce or modify cooldowns", t("MISC")))
-W(li("Hallowed now starts with all 3 charges when Consecrated Wraps is purchased or built", t("REWORK")))
-W(li("Gaining max stacks requirement for the speedup buff is removed", t("MISC")))
+W(li("All charges are consumed when the barrier is created", t("NERF")))
+W(li("Charge Restore Time of Hallowed is not affected by effects that reduce or modify cooldowns", t("NERF")))
+W(li("Hallowed now starts with all 3 charges when Consecrated Wraps is purchased or built", t("MISC")))
+W(li("Gaining max stacks requirement for the speedup buff is removed", t("BUFF")))
 W(li("Initial 3 charges don't provide the movement speed buff", t("MISC")))
 W(li("Hallowed charge gain time increased from 3s to 4s", b(3, 4)))
 W(ul_close())
@@ -2883,7 +2969,7 @@ W(ul_close())
 W(hero_header("Broodmother"))
 W(ul_open())
 W(li("Base agility increased from 18 to 20", b(18, 20)))
-W(li("Damage at level 1 increased from 45-51 to 47-53", t("BUFF")))
+W(li("Damage at level 1 increased from 45-51 to 47-53", b(48, 50)))
 W(ul_close())
 
 # Chaos Knight
@@ -2920,7 +3006,7 @@ W(ul_close())
 W(hero_header("Dawnbreaker"))
 W(ability("Break of Dawn"))
 W(ul_open())
-W(li("Max Damage Increase decreased from 10% + 1% per level to 8% + 1% per level", t("NERF")))
+W(li_formula("Max Damage Increase decreased", "10% + 1% per level", "8% + 1% per level", lambda L: 10.0 + 1.0*L, lambda L: 8.0 + 1.0*L))
 W(ul_close())
 
 # Death Prophet
@@ -2928,7 +3014,7 @@ W(hero_header("Death Prophet"))
 W(ability("Exorcism"))
 W(ul_open())
 W(li("Spirit Damage increased from 64 to 65/68/71 ", b(64, [65, 68, 71])))
-W(li("From 62-67 to 62-68/65-71/68-74", t("MISC")))
+W(li("From 62-67 to 62-68/65-71/68-74", b(64.5, [65, 68, 71])))
 W(ul_close())
 
 # Doom
@@ -2952,7 +3038,7 @@ W(ul_close())
 W(hero_header("Drow Ranger"))
 W(ul_open())
 W(li("Base Agility increased from 22 to 24", b(22, 24)))
-W(li("Damage at level 1 increased from 49-56 to 51-58", t("BUFF")))
+W(li("Damage at level 1 increased from 49-56 to 51-58", b(52.5, 54.5)))
 W(ul_close())
 W(ability("Marksmanship"))
 W(ul_open())
@@ -2960,7 +3046,7 @@ W(li("Enemy hero disable range decreased from 325 to 300", b(325, 300)))
 W(ul_close())
 W(ability("Glacier"))
 W(ul_open())
-W(li("While on the glacier, Marksmanship now can be disabled by enemies in the proximity", t("REWORK")))
+W(li("While on the glacier, Marksmanship now can be disabled by enemies in the proximity", t("NERF")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -2971,14 +3057,14 @@ W(ul_close())
 W(hero_header("Elder Titan"))
 W(ability("Momentum"))
 W(ul_open())
-W(li("Bonus Speed to Armor increased from 3.6% + 0.4% per level to 5.0% + 0.5% per level", t("BUFF")))
+W(li_formula("Bonus Speed to Armor increased", "3.6% + 0.4% per level", "5.0% + 0.5% per level", lambda L: 3.6 + 0.4*L, lambda L: 5.0 + 0.5*L))
 W(ul_close())
 
 # Ember Spirit
 W(hero_header("Ember Spirit"))
 W(ul_open())
 W(li("Base Damage decreased by 3", t("NERF")))
-W(li("Damage at level 1 decreased from 55-59 to 52-56", t("NERF")))
+W(li("Damage at level 1 decreased from 55-59 to 52-56", b(57, 54)))
 W(ul_close())
 W(ability("Sleight of Fist"))
 W(ul_open())
@@ -2989,7 +3075,7 @@ W(ul_close())
 W(hero_header("Enigma"))
 W(ability("Event Horizon"))
 W(ul_open())
-W(li("Movement Slow increased from 4% + 1% per level to 5% + 1% per level", t("BUFF")))
+W(li_formula("Movement Slow increased", "4% + 1% per level", "5% + 1% per level", lambda L: 4.0 + 1.0*L, lambda L: 5.0 + 1.0*L))
 W(ul_close())
 W(ability("Demonic Conversion"))
 W(ul_open())
@@ -3053,7 +3139,7 @@ W(li("Base Movement Speed increased from 300 to 305", b(300, 305)))
 W(ul_close())
 W(ability("Bladeform"))
 W(ul_open())
-W(li("Base Agility per stack increased from 2.5% + 0.05% per level to 2.5% + 0.1% per level", t("BUFF")))
+W(li_formula("Base Agility per stack increased", "2.5% + 0.05% per level", "2.5% + 0.1% per level", lambda L: 2.5 + 0.05*L, lambda L: 2.5 + 0.1*L))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -3079,7 +3165,7 @@ W(ul_close())
 W(hero_header("Largo"))
 W(ability("Encore"))
 W(ul_open())
-W(li("Bonus Duration increased from 9% + 1% per level to 10% + 1% per level", t("BUFF")))
+W(li_formula("Bonus Duration increased", "9% + 1% per level", "10% + 1% per level", lambda L: 9.0 + 1.0*L, lambda L: 10.0 + 1.0*L))
 W(ul_close())
 W(ability("Croak of Genius"))
 W(ul_open())
@@ -3121,8 +3207,8 @@ W(li("Health Steal (Heroes) decreased from 9/12/15/18 to 7/10/13/16", b([9, 12, 
 W(ul_close())
 W(ability("Divided We Stand"))
 W(ul_open())
-W(li("Max Health and Max Mana bonuses from items are now penalized by the number of Meepos (like other item bonuses)", t("REWORK")))
-W(li("No longer shares cooldowns of Town Portal Scrolls", t("NERF")))
+W(li("Max Health and Max Mana bonuses from items are now penalized by the number of Meepos (like other item bonuses)", t("NERF")))
+W(li("No longer shares cooldowns of Town Portal Scrolls", t("BUFF")))
 W(ul_close())
 W(ability("MegaMeepo"))
 W(ul_open())
@@ -3154,7 +3240,7 @@ W(li("Base Attack Speed decreased from 110 to 100", b(110, 100)))
 W(ul_close())
 W(ability("Eelskin"))
 W(ul_open())
-W(li("Evasion per Naga decreased from 4.9% + 0.1% per level to 4% + 0.1% per level", t("NERF")))
+W(li_formula("Evasion per Naga decreased", "4.9% + 0.1% per level", "4% + 0.1% per level", lambda L: 4.9 + 0.1*L, lambda L: 4.0 + 0.1*L))
 W(ul_close())
 
 # Nature's Prophet
@@ -3358,16 +3444,16 @@ W(ul_close())
 W(hero_header("Tidehunter"))
 W(ul_open())
 W(li("Base Strength decreased from 26 to 25", b(26, 25)))
-W(li("Damage at level 1 decreased from 51-57 to 50-56", t("NERF")))
+W(li("Damage at level 1 decreased from 51-57 to 50-56", b(54, 53)))
 W(ul_close())
 W(ability("Leviathan's Catch"))
 W(ul_open())
-W(li("Now gains fish on every even level instead of every level", t("REWORK")))
+W(li("Now gains fish on every even level instead of every level", t("NERF")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
 W(li("Level 15 Talent Gush Damage decreased from +100 to +90", b(100, 90)))
-W(li("Level 25 Talent Anchor Smash affects buildings now deals 50% damage to buildings", t("REWORK")))
+W(li("Level 25 Talent Anchor Smash affects buildings now deals 50% damage to buildings", t("NERF")))
 W(ul_close())
 
 # Timbersaw
@@ -3391,7 +3477,7 @@ W(ability("Deploy Turrets"))
 W(ul_open())
 W(li("Missile speed increased from 1200 to 1350", b(1200, 1350)))
 W(li("Base activation time decreased from 0.3s to 0s", b(0.3, 0, l=True)))
-W(li("Aghanim's Scepter no longer makes activation faster", t("NERF")))
+W(li("Aghanim's Scepter no longer makes activation faster", ""))
 W(ul_close())
 
 # Tiny
@@ -3419,7 +3505,7 @@ W(li("Attack Slow decreased from 17 + 3 per level to 12 + 3 per level", t("NERF"
 W(ul_close())
 W(ability("Drinking Buddies"))
 W(ul_open())
-W(li("No longer has an alt-cast", t("NERF")))
+W(li("No longer has an alt-cast", t("MISC")))
 W(li("Bonus Armor decreased from 10 to 7", b(10, 7)))
 W(ul_close())
 
