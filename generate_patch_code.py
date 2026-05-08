@@ -217,7 +217,107 @@ def _detect_text_tag(text):
     return 'MISC'
 
 
+# Manual overrides for descriptions where heuristics give wrong tags.
+# Match by substring (case-sensitive). New entries can be added freely.
+# Value: tag string ("BUFF"/"NERF"/"REWORK"/"MISC") or None for empty badge.
+TAG_OVERRIDES = {
+    # 7.41b
+    "Avatar now has a fixed duration and is not affected by buff": "NERF",
+    "All charges are consumed when the barrier is created": "NERF",
+    "Charge Restore Time of Hallowed is not affected by effects": "NERF",
+    "Hallowed now starts with all 3 charges": "MISC",
+    "Gaining max stacks requirement for the speedup buff is removed": "BUFF",
+    "While on the glacier, Marksmanship now can be disabled": "NERF",
+    "Max Health and Max Mana bonuses from items are now penalized": "NERF",
+    "No longer shares cooldowns of Town Portal Scrolls": "BUFF",
+    "Now gains fish on every even level": "NERF",
+    "Talent Anchor Smash affects buildings now deals 50% damage": "NERF",
+    "Aghanim's Scepter no longer makes activation faster": None,  # no badge
+    "No longer has an alt-cast": "MISC",
+}
+
+
+# Match formulas like "from 10% + 1% per level to 8% + 1% per level"
+# Captures four numbers: old_base, old_perlvl, new_base, new_perlvl
+FORMULA_RE = re.compile(
+    r'from\s+(\d+(?:\.\d+)?)\s*%\s*\+\s*(\d+(?:\.\d+)?)\s*%\s+per\s+level\s+to\s+'
+    r'(\d+(?:\.\d+)?)\s*%\s*\+\s*(\d+(?:\.\d+)?)\s*%\s+per\s+level',
+    re.I
+)
+
+
+# Match "from X-Y to A-B" (damage range like "Damage at level 1 from 45-51 to 47-53")
+# Captures min1, max1, min2, max2
+RANGE_TO_RANGE_RE = re.compile(
+    r'from\s+(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)\s+to\s+(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)',
+    re.I
+)
+
+# Match "from X-Y to A-B/C-D/E-F" (range that becomes per-level)
+RANGE_TO_RANGE_LIST_RE = re.compile(
+    r'from\s+(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)\s+to\s+'
+    r'((?:\d+(?:\.\d+)?-\d+(?:\.\d+)?)(?:/\d+(?:\.\d+)?-\d+(?:\.\d+)?)+)',
+    re.I
+)
+
+
 def parse_value_change(text):
+    # 0) Check manual overrides first (highest priority)
+    for substr, override_tag in TAG_OVERRIDES.items():
+        if substr in text:
+            if override_tag is None:
+                return '""'  # empty badge
+            return f't("{override_tag}")'
+
+    # 1) Try per-level formula "from X% + Y% per level to A% + B% per level"
+    m = FORMULA_RE.search(text)
+    if m:
+        old_base, old_per = float(m.group(1)), float(m.group(2))
+        new_base, new_per = float(m.group(3)), float(m.group(4))
+        # Extract prefix BEFORE the "from" clause
+        prefix = text[:m.start()].rstrip()
+        if prefix.lower().endswith('from'):
+            prefix = prefix[:-4].rstrip()
+        old_formula = f"{m.group(1)}% + {m.group(2)}% per level"
+        new_formula = f"{m.group(3)}% + {m.group(4)}% per level"
+        l = _detect_l(text)
+        l_arg = ', l=True' if l else ''
+        # Marker prefix tells generator to emit W(li_formula(...)) directly
+        return (f'__FORMULA__:li_formula("{_escape(prefix)}", '
+                f'"{old_formula}", "{new_formula}", '
+                f'lambda L: {old_base} + {old_per}*L, '
+                f'lambda L: {new_base} + {new_per}*L{l_arg})')
+
+    # 2) Try multi-range "from X-Y to A-B/C-D/E-F"
+    m = RANGE_TO_RANGE_LIST_RE.search(text)
+    if m:
+        min1, max1 = float(m.group(1)), float(m.group(2))
+        old_avg = (min1 + max1) / 2
+        new_ranges = m.group(3).split('/')
+        new_avgs = []
+        for r in new_ranges:
+            a, b = r.split('-')
+            new_avgs.append((float(a) + float(b)) / 2)
+        old_v = int(old_avg) if old_avg.is_integer() else old_avg
+        new_v = [int(x) if x.is_integer() else x for x in new_avgs]
+        l = _detect_l(text)
+        l_arg = ', l=True' if l else ''
+        return f'b({old_v!r}, {new_v!r}{l_arg})'
+
+    # 3) Try simple range-to-range "from X-Y to A-B" (single comparison)
+    m = RANGE_TO_RANGE_RE.search(text)
+    if m:
+        min1, max1 = float(m.group(1)), float(m.group(2))
+        min2, max2 = float(m.group(3)), float(m.group(4))
+        old_avg = (min1 + max1) / 2
+        new_avg = (min2 + max2) / 2
+        old_v = int(old_avg) if old_avg.is_integer() else old_avg
+        new_v = int(new_avg) if new_avg.is_integer() else new_avg
+        l = _detect_l(text)
+        l_arg = ', l=True' if l else ''
+        return f'b({old_v!r}, {new_v!r}{l_arg})'
+
+    # 4) Original "from X to Y" with /-separated lists
     m = FROM_TO_RE.search(text)
     if m:
         old_v = _split_values(m.group(1))
@@ -645,12 +745,14 @@ def generate(version):
                     out.append(f'W(plain_header("{info["entity"].replace("_", " ")}"))')
                 last_entity_key = entity_key
             if info['is_info']:
+                if _try_merge_info(out, desc):
+                    continue
                 end_ul()
                 out.append(f'W(subnote("{_escape(desc)}"))')
             else:
                 start_ul()
                 call = parse_value_change(desc)
-                out.append(f'W(li("{_escape(desc)}", {call}))')
+                _emit_li(out, desc, call)
             continue
 
         if t == 'item':
@@ -662,12 +764,14 @@ def generate(version):
                 out.append(f'W(item_header("{_escape(name)}"))')
                 last_entity_key = entity_key
             if info['is_info']:
+                if _try_merge_info(out, desc):
+                    continue
                 end_ul()
                 out.append(f'W(subnote("{_escape(desc)}"))')
             else:
                 start_ul()
                 call = parse_value_change(desc)
-                out.append(f'W(li("{_escape(desc)}", {call}))')
+                _emit_li(out, desc, call)
             continue
 
         if t == 'enchantment':
@@ -679,12 +783,14 @@ def generate(version):
                 out.append(f'W(plain_header("{_escape(name)}"))')
                 last_entity_key = entity_key
             if info['is_info']:
+                if _try_merge_info(out, desc):
+                    continue
                 end_ul()
                 out.append(f'W(subnote("{_escape(desc)}"))')
             else:
                 start_ul()
                 call = parse_value_change(desc)
-                out.append(f'W(li("{_escape(desc)}", {call}))')
+                _emit_li(out, desc, call)
             continue
 
         if t == 'neutral':
@@ -697,7 +803,7 @@ def generate(version):
                 last_entity_key = entity_key
             start_ul()
             call = parse_value_change(desc)
-            out.append(f'W(li("{_escape(desc)}", {call}))')
+            _emit_li(out, desc, call)
             continue
 
         if t in ('hero_base', 'hero_ability', 'hero_talent', 'spirit_bear', 'spirit_bear_talent'):
@@ -714,7 +820,7 @@ def generate(version):
             if t == 'hero_base':
                 start_ul()
                 call = parse_value_change(desc)
-                out.append(f'W(li("{_escape(desc)}", {call}))')
+                _emit_li(out, desc, call)
             elif t == 'hero_talent':
                 if last_ability != '__talent__':
                     end_ul()
@@ -722,7 +828,7 @@ def generate(version):
                     last_ability = '__talent__'
                 start_ul()
                 call = parse_value_change(desc)
-                out.append(f'W(li("{_escape(desc)}", {call}))')
+                _emit_li(out, desc, call)
             elif t == 'spirit_bear':
                 if last_ability != '__spirit_bear__':
                     end_ul()
@@ -730,7 +836,7 @@ def generate(version):
                     last_ability = '__spirit_bear__'
                 start_ul()
                 call = parse_value_change(desc)
-                out.append(f'W(li("{_escape(desc)}", {call}))')
+                _emit_li(out, desc, call)
             elif t == 'spirit_bear_talent':
                 if last_ability != '__spirit_bear_talent__':
                     end_ul()
@@ -738,7 +844,7 @@ def generate(version):
                     last_ability = '__spirit_bear_talent__'
                 start_ul()
                 call = parse_value_change(desc)
-                out.append(f'W(li("{_escape(desc)}", {call}))')
+                _emit_li(out, desc, call)
             elif t == 'hero_ability':
                 ab = info['ability']
                 if last_ability != ab:
@@ -748,9 +854,15 @@ def generate(version):
                            else ability_display_name(info['entity'] + '_' + ab)
                     out.append(f'W(ability("{_escape(name)}"))')
                     last_ability = ab
-                start_ul()
-                call = parse_value_change(desc)
-                out.append(f'W(li("{_escape(desc)}", {call}))')
+                if info['is_info']:
+                    if _try_merge_info(out, desc):
+                        continue
+                    end_ul()
+                    out.append(f'W(subnote("{_escape(desc)}"))')
+                else:
+                    start_ul()
+                    call = parse_value_change(desc)
+                    _emit_li(out, desc, call)
             continue
 
         if t == 'unknown':
@@ -759,6 +871,59 @@ def generate(version):
 
     end_ul()
     return '\n'.join(out)
+
+
+
+def _emit_li(out, desc, call):
+    """Emit either W(li(text, badge)) or W(li_formula(...)) based on parser output."""
+    if call.startswith('__FORMULA__:'):
+        out.append(f'W({call[len("__FORMULA__:"):]})')
+    else:
+        out.append(f'W(li("{_escape(desc)}", {call}))')
+
+
+def _try_merge_info(out, info_desc):
+    """If info_desc is 'From X-Y to A-B[/C-D...]' style (range info),
+    merge it with the previous main li entry instead of emitting a subnote.
+    Returns True if successfully merged, False to fall back to subnote."""
+    if not out or not out[-1].startswith('W(li('):
+        return False
+    # Detect range-to-range[-list] pattern in info text
+    m = re.search(r'(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)\s+to\s+([\d./\-]+)', info_desc, re.I)
+    if not m:
+        return False
+    old_min, old_max = float(m.group(1)), float(m.group(2))
+    new_part = m.group(3).strip().rstrip('.')
+    try:
+        new_avgs = []
+        for r in new_part.split('/'):
+            if '-' not in r:
+                return False
+            a, b_v = r.split('-')
+            new_avgs.append((float(a) + float(b_v)) / 2)
+    except ValueError:
+        return False
+    # Extract prefix from previous main entry's text
+    pm = re.match(r'W\(li\("([^"]+)", (.+?)\)\)$', out[-1])
+    if not pm:
+        return False
+    prev_text = pm.group(1)
+    prefix_m = re.match(r'^(.+?)\s+from\s+', prev_text)
+    if not prefix_m:
+        return False
+    prefix = prefix_m.group(1)
+    # Numbers
+    old_avg = (old_min + old_max) / 2
+    old_v = int(old_avg) if old_avg.is_integer() else old_avg
+    new_v = [int(x) if x.is_integer() else x for x in new_avgs]
+    # Display: original range strings (preserve formatting)
+    old_range_disp = f'{m.group(1)}-{m.group(2)}'
+    new_range_disp = new_part
+    # Build merged HTML text. Use repr() to safely embed in Python source
+    merged_html = (f'{prefix} from <span class="formula-old">{old_range_disp}</span> '
+                   f'↪ {new_range_disp}')
+    out[-1] = f'W(li({merged_html!r}, b({old_v!r}, {new_v!r})))'
+    return True
 
 
 def _escape(s):

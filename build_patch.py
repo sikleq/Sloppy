@@ -403,8 +403,11 @@ body {
 
 /* TOP NAV (full-width, sits above container) */
 nav.top-nav {
-  background: #0d1117;
-  border-bottom: 1px solid #21262d;
+  /* slightly lighter than body, with subtle gradient so it's not flat */
+  background:
+    linear-gradient(180deg, rgba(48, 54, 61, 0.35) 0%, rgba(22, 27, 34, 0.6) 100%),
+    #161b22;
+  border-bottom: 1px solid #30363d;
   width: 100%;
 }
 .nav-inner {
@@ -422,7 +425,7 @@ nav.top-nav {
 }
 .nav-tab {
   padding: 8px 16px;
-  color: #8b949e;
+  color: #c9d1d9;
   border-radius: 6px;
   cursor: pointer;
   text-decoration: none;
@@ -431,15 +434,17 @@ nav.top-nav {
   background: transparent;
   border: none;
   font-family: inherit;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s;
+  display: inline-flex;
+  align-items: center;
 }
 .nav-tab:hover {
-  background: rgba(48, 54, 61, 0.5);
-  color: #c9d1d9;
+  background: rgba(48, 54, 61, 0.6);
 }
 .nav-tab.active {
-  background: rgba(88, 166, 255, 0.12);
-  color: #58a6ff;
+  background: rgba(48, 54, 61, 0.9);
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 #8b949e;
 }
 .nav-context {
   display: flex;
@@ -1291,6 +1296,8 @@ def write_head(version, date):
     options = _dropdown_options_html(version)
     age_line = _patch_age_line(version)
     age_html = f'<span class="patch-age">{age_line}</span>' if age_line else ''
+    # Latest patch HTML — for Changelogs tab href
+    latest_filename = PATCHES[0]["filename"] if PATCHES else "#"
     W(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1303,7 +1310,7 @@ def write_head(version, date):
 <nav class="top-nav">
   <div class="nav-inner">
     <div class="nav-tabs">
-      <button class="nav-tab active" type="button">Changelogs</button>
+      <a class="nav-tab active" href="{latest_filename}">Changelogs</a>
     </div>
     <div class="nav-context">
       <div class="release-info">
@@ -1447,6 +1454,15 @@ JS_TEXT = '''(function() {
       element: entity,
       icon: imgEl ? imgEl.src : null,
       kind: kind
+    });
+  });
+  // Also index ability titles (h4.ability-title)
+  document.querySelectorAll('h4.ability-title').forEach(h => {
+    entities.push({
+      name: h.textContent.trim(),
+      element: h,
+      icon: null,
+      kind: 'ability'
     });
   });
 
@@ -3114,8 +3130,7 @@ W(ul_close())
 W(hero_header("Death Prophet"))
 W(ability("Exorcism"))
 W(ul_open())
-W(li("Spirit Damage increased from 64 to 65/68/71 ", b(64, [65, 68, 71])))
-W(li("From 62-67 to 62-68/65-71/68-74", b(64.5, [65, 68, 71])))
+W(li('Spirit Damage increased from <span class="formula-old">62-67</span> ↪ 62-68/65-71/68-74', b(64.5, [65, 68, 71])))
 W(ul_close())
 
 # Doom
