@@ -401,12 +401,28 @@ body {
   padding: 24px 28px 80px;
 }
 
+.nav-back-btn {
+  padding: 6px 12px;
+  margin-right: 6px;
+  color: #c9d1d9;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.18);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  transition: background 0.15s;
+}
+.nav-back-btn:hover {
+  background: rgba(0, 0, 0, 0.32);
+}
+
 /* TOP NAV (full-width, sits above container) */
 nav.top-nav {
   background:
-    linear-gradient(180deg, rgba(48, 54, 61, 0.35) 0%, rgba(22, 27, 34, 0.6) 100%),
-    #161b22;
-  border-bottom: 1px solid #30363d;
+    linear-gradient(180deg, rgba(120, 130, 142, 0.18) 0%, rgba(60, 68, 78, 0.18) 100%),
+    #2a2f37;
+  border-bottom: 1px solid #3a4048;
   width: 100%;
 }
 .nav-inner {
@@ -447,22 +463,26 @@ nav.top-nav {
 .nav-context {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 .nav-context .release-info {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 1px;
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  padding: 4px 11px;
+  border-radius: 6px;
 }
 .nav-context .release-date {
-  color: #8b949e;
+  color: #c9d1d9;
   font-size: 12.5px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.3px;
 }
 .nav-context .patch-age {
-  color: #6e7681;
+  color: #a8b3bd;
   font-size: 10.5px;
   font-weight: 400;
   letter-spacing: 0.15px;
@@ -470,28 +490,28 @@ nav.top-nav {
 }
 .nav-context .version {
   color: #c9d1d9;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.5px;
-  background: rgba(48, 54, 61, 0.45);
-  border: 1px solid #30363d;
-  padding: 3px 12px;
-  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  border: 1px solid transparent;
+  padding: 5px 12px;
+  border-radius: 6px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: background 0.15s;
 }
 .nav-context .version:hover {
-  background: rgba(48, 54, 61, 0.7);
-  border-color: #58a6ff;
+  background: rgba(0, 0, 0, 0.4);
 }
 .nav-context .version-chev {
-  font-size: 12px;
-  color: #8b949e;
+  font-size: 11px;
+  color: #a8b3bd;
   line-height: 1;
   margin-top: 2px;
   font-weight: 600;
@@ -555,20 +575,84 @@ nav.top-nav {
 /* LEGEND */
 /* CALENDAR PAGE */
 .calendar { margin: 24px 0; }
-.cal-year {
-  margin-bottom: 24px;
+.cal-toggle-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #8b949e;
+}
+.cal-toggle-bar strong {
+  color: #c9d1d9;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.cal-mode-select {
   background: #161b22;
   border: 1px solid #30363d;
+  color: #c9d1d9;
+  padding: 5px 28px 5px 12px;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238b949e' d='M0 0l5 6 5-6z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.cal-mode-select:hover {
+  border-color: #58a6ff;
+}
+
+/* YEAR BLOCK (shared between modes, collapsible) */
+.cal-year-block {
+  margin-bottom: 12px;
+  background: #14191f;
+  border: 1px solid #21262d;
   border-radius: 6px;
-  padding: 14px 16px;
+  overflow: hidden;
 }
 .cal-year-label {
   color: #c9d1d9;
   font-size: 16px;
   font-weight: 600;
-  margin-bottom: 12px;
   letter-spacing: 0.5px;
+  cursor: pointer;
+  user-select: none;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.12s;
 }
+.cal-year-label:hover {
+  background: rgba(48, 54, 61, 0.25);
+}
+.cal-year-label::before {
+  content: '▾';
+  color: #6e7681;
+  font-size: 11px;
+  display: inline-block;
+  width: 10px;
+  transition: transform 0.15s;
+}
+.cal-year-block[data-collapsed="true"] .cal-year-label::before {
+  transform: rotate(-90deg);
+}
+.cal-year-block[data-collapsed="true"] .cal-mode-full,
+.cal-year-block[data-collapsed="true"] .cal-mode-compact {
+  display: none;
+}
+.cal-mode-full, .cal-mode-compact {
+  padding: 0 16px 14px;
+}
+
+/* MODE 2: COMPACT */
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -599,7 +683,7 @@ nav.top-nav {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3px 2px;
+  padding: 4px 2px;
   border-radius: 4px;
   text-decoration: none;
   font-family: inherit;
@@ -610,41 +694,113 @@ nav.top-nav {
 }
 .cal-patch:hover {
   filter: brightness(1.35);
-  transform: translateY(-1px);
+  transform: scale(1.08);
 }
-.cal-patch .cal-letter {
-  font-size: 9px;
+.cal-patch .cal-version {
+  font-size: 9.5px;
   font-weight: 500;
-  color: #8b949e;
-  text-transform: lowercase;
-  line-height: 1;
-  min-height: 9px;
-  margin-bottom: 1px;
+  color: #b8b8b8;
+  line-height: 1.1;
+  margin-bottom: 2px;
+  white-space: nowrap;
 }
 .cal-patch .cal-day {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: #c9d1d9;
   line-height: 1;
 }
 .cal-patch.sub {
-  background: rgba(110, 118, 129, 0.2);
+  background: rgba(110, 118, 129, 0.22);
 }
 .cal-patch.major {
-  background: rgba(88, 130, 178, 0.28);
-  border-color: rgba(88, 130, 178, 0.4);
+  background: rgba(212, 138, 78, 0.22);
+  border-color: rgba(212, 138, 78, 0.32);
 }
 .cal-patch.major-big {
-  background: rgba(88, 130, 178, 0.6);
-  border-color: rgba(88, 130, 178, 0.8);
+  background: rgba(212, 138, 78, 0.55);
+  border-color: rgba(212, 138, 78, 0.75);
 }
 .cal-patch.major-big .cal-day { color: #fff; }
-.cal-patch.major-big .cal-letter { color: #c9d1d9; }
-/* Non-clickable (no HTML page yet) */
+.cal-patch.major-big .cal-version { color: #f0e0c8; }
 span.cal-patch {
   cursor: default;
   opacity: 0.55;
 }
+
+/* MODE 1: FULL (every day) */
+.cal-full-grid {
+  display: grid;
+  grid-template-columns: 60px repeat(31, 1fr);
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.cal-full-day-header {
+  font-size: 9px;
+  color: #6e7681;
+  text-align: center;
+  padding: 2px 0;
+  font-weight: 500;
+}
+.cal-full-month-name {
+  color: #8b949e;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 6px;
+}
+.cal-full-day {
+  aspect-ratio: 1;
+  min-height: 22px;
+  border-radius: 3px;
+  background: rgba(110, 118, 129, 0.05);
+  font-size: 9.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4a5058;
+  text-decoration: none;
+  position: relative;
+  transition: transform 0.13s ease, filter 0.13s, z-index 0s;
+}
+.cal-full-day.no-day { background: transparent; }
+.cal-full-day.has-patch {
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+}
+.cal-full-day.has-patch:hover {
+  transform: scale(1.6);
+  z-index: 5;
+  filter: brightness(1.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+.cal-full-day.has-patch.sub {
+  background: rgba(110, 118, 129, 0.4);
+  color: #c9d1d9;
+}
+.cal-full-day.has-patch.major {
+  background: rgba(212, 138, 78, 0.45);
+  color: #fff;
+}
+.cal-full-day.has-patch.major-big {
+  background: rgba(212, 138, 78, 0.85);
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(212, 138, 78, 0.5);
+}
+span.cal-full-day.has-patch {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* Display toggling */
+.calendar.mode-compact .cal-mode-full { display: none; }
+.calendar.mode-full .cal-mode-compact { display: none; }
 
 /* TOOLBAR (legend tags + search in one row) */
 .toolbar {
@@ -788,7 +944,6 @@ h2.section {
   align-items: center;
   gap: 14px;
   background: linear-gradient(90deg, #1a1f29 0%, #161b22 100%);
-  border-left: 3px solid #f0c674;
   border-radius: 4px;
   padding: 8px 14px;
   margin: 20px 0 8px;
@@ -817,9 +972,6 @@ h2.section {
   height: 45px;
   object-fit: cover;
   border-radius: 4px;
-}
-.plain-entity {
-  border-left-color: #79c0ff;
 }
 .plain-entity .entity-name {
   color: #79c0ff;
@@ -1413,6 +1565,7 @@ def _render_top_nav(active="changelogs", current_version=None, date=None):
 
     return f'''<nav class="top-nav">
   <div class="nav-inner">
+    <a class="nav-back-btn" href="calendar.html" style="display:none;">← Calendar</a>
     <div class="nav-tabs">
       <a class="nav-tab {cls_changelogs}" href="{latest}">Changelogs</a>
       <a class="nav-tab {cls_calendar}" href="calendar.html">Calendar</a>
@@ -1455,6 +1608,13 @@ def write_head(version, date):
 
 
 JS_TEXT = '''(function() {
+  // ---- BACK-FROM-CALENDAR ----
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('from') === 'calendar') {
+    const back = document.querySelector('.nav-back-btn');
+    if (back) back.style.display = 'inline-flex';
+  }
+
   // ---- BACK TO TOP visibility ----
   const btt = document.querySelector('.back-to-top');
   function updateBtt() {
@@ -1715,28 +1875,81 @@ PATCH_ENTRY_COUNTS = {
 
 
 def save_calendar_html():
-    """Generate calendar.html — yearly grids of all patches color-coded by type."""
+    """Generate calendar.html — both modes inside a shared collapsible year block."""
     from datetime import datetime
+    from calendar import monthrange
     import re as _re
 
-    by_month = {}
+    patches = []
     for r in RELEASE_HISTORY:
-        d = datetime.strptime(r['date'], '%d.%m.%Y')
-        by_month.setdefault((d.year, d.month), []).append({
-            'version': r['version'], 'date': r['date'], 'day': d.day
+        d = datetime.strptime(r['date'], '%d.%m.%Y').date()
+        patches.append({
+            'version': r['version'], 'date': r['date'],
+            'year': d.year, 'month': d.month, 'day': d.day,
         })
+
+    by_month = {}
+    for p in patches:
+        by_month.setdefault((p['year'], p['month']), []).append(p)
     for k in by_month:
         by_month[k].sort(key=lambda p: p['day'])
 
-    years = sorted({datetime.strptime(r['date'], '%d.%m.%Y').year for r in RELEASE_HISTORY})
+    by_day = {(p['year'], p['month'], p['day']): p for p in patches}
+    years = sorted({p['year'] for p in patches}, reverse=True)
     months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-
     has_html = {p['version'] for p in PATCHES}
+    expanded_years = set(years[:2])  # newest 2 expanded by default
 
-    body = ['<div class="calendar">']
-    for year in sorted(years, reverse=True):  # newest year first
-        body.append('<div class="cal-year">')
+    def patch_class(v):
+        if _re.search(r'[a-z]$', v):
+            return 'sub'
+        return 'major-big' if PATCH_ENTRY_COUNTS.get(v, 0) >= 500 else 'major'
+
+    def chip_tag(v):
+        if v in has_html:
+            return ('a', f' href="{v}.html?from=calendar"')
+        return ('span', '')
+
+    body = []
+    body.append('<div class="cal-toggle-bar">')
+    body.append('<strong>View:</strong>')
+    body.append('<select class="cal-mode-select">')
+    body.append('<option value="full" selected>Expanded</option>')
+    body.append('<option value="compact">Compact</option>')
+    body.append('</select>')
+    body.append('</div>')
+
+    body.append('<div class="calendar mode-full">')
+
+    for year in years:
+        collapsed = "false" if year in expanded_years else "true"
+        body.append(f'<div class="cal-year-block" data-collapsed="{collapsed}">')
         body.append(f'<h2 class="cal-year-label">{year}</h2>')
+
+        # ---- MODE FULL ----
+        body.append('<div class="cal-mode-full">')
+        body.append('<div class="cal-full-grid">')
+        body.append('<div class="cal-full-month-name"></div>')
+        for d in range(1, 32):
+            body.append(f'<div class="cal-full-day-header">{d}</div>')
+        for month in range(1, 13):
+            body.append(f'<div class="cal-full-month-name">{months[month-1]}</div>')
+            days_in_m = monthrange(year, month)[1]
+            for d in range(1, 32):
+                if d > days_in_m:
+                    body.append('<div class="cal-full-day no-day"></div>')
+                    continue
+                p = by_day.get((year, month, d))
+                if p:
+                    cls = patch_class(p['version'])
+                    tag, href = chip_tag(p['version'])
+                    body.append(f'<{tag} class="cal-full-day has-patch {cls}"{href}>{p["version"]}</{tag}>')
+                else:
+                    body.append(f'<div class="cal-full-day">{d}</div>')
+        body.append('</div></div>')
+
+        # ---- MODE COMPACT ----
+        body.append('<div class="cal-mode-compact">')
         body.append('<div class="cal-grid">')
         for mi, mname in enumerate(months, 1):
             body.append('<div class="cal-month">')
@@ -1744,28 +1957,40 @@ def save_calendar_html():
             body.append('<div class="cal-month-cells">')
             for p in by_month.get((year, mi), []):
                 v = p['version']
-                lm = _re.search(r'([a-z])$', v)
-                letter = lm.group(1) if lm else ''
-                count = PATCH_ENTRY_COUNTS.get(v, 0)
-                if letter:
-                    cls = 'sub'
-                elif count >= 500:
-                    cls = 'major-big'
-                else:
-                    cls = 'major'
-                if v in has_html:
-                    tag, href = 'a', f' href="{v}.html"'
-                else:
-                    tag, href = 'span', ''
+                cls = patch_class(v)
+                tag, href = chip_tag(v)
                 body.append(
-                    f'<{tag} class="cal-patch {cls}"{href} title="{v} — {p["date"]}">'
-                    f'<span class="cal-letter">{letter}</span>'
+                    f'<{tag} class="cal-patch {cls}"{href}>'
+                    f'<span class="cal-version">{v}</span>'
                     f'<span class="cal-day">{p["day"]:02d}</span>'
                     f'</{tag}>'
                 )
             body.append('</div></div>')
         body.append('</div></div>')
+
+        body.append('</div>')
+
     body.append('</div>')
+
+    toggle_script = '''<script>
+(function() {
+  const cal = document.querySelector('.calendar');
+  const select = document.querySelector('.cal-mode-select');
+  if (select) {
+    select.addEventListener('change', () => {
+      cal.classList.remove('mode-full', 'mode-compact');
+      cal.classList.add('mode-' + select.value);
+    });
+  }
+  document.querySelectorAll('.cal-year-label').forEach(label => {
+    label.addEventListener('click', () => {
+      const block = label.parentElement;
+      const c = block.dataset.collapsed === 'true';
+      block.dataset.collapsed = c ? 'false' : 'true';
+    });
+  });
+})();
+</script>'''
 
     nav = _render_top_nav(active="calendar")
     html = (
@@ -1779,6 +2004,7 @@ def save_calendar_html():
         + '\n'.join(body)
         + '\n</div>\n\n'
         + '<script src="scripts.js"></script>\n'
+        + toggle_script + '\n'
         + '</body>\n</html>\n'
     )
     with open('/home/claude/calendar.html', 'w', encoding='utf-8') as f:
@@ -3338,8 +3564,9 @@ W(ul_close())
 W(hero_header("Death Prophet"))
 W(ability("Exorcism"))
 W(ul_open())
-W(li('Spirit Damage increased from <span class="formula-old">62-67</span> ↪ 62-68/65-71/68-74', b(64.5, [65, 68, 71])))
+W(li("Spirit Damage increased from 64 to 65/68/71 ", b(64, [65, 68, 71])))
 W(ul_close())
+W(subnote("From 62-67 to 62-68/65-71/68-74"))
 
 # Doom
 W(hero_header("Doom"))
@@ -3825,7 +4052,7 @@ W(ul_close())
 W(hero_header("Tusk"))
 W(ability("Bitter Chill"))
 W(ul_open())
-W(li("Attack Slow decreased from 17 + 3 per level to 12 + 3 per level", t("NERF")))
+W(li_formula("Attack Slow decreased", "17 + 3 per level", "12 + 3 per level", lambda L: 17.0 + 3.0*L, lambda L: 12.0 + 3.0*L))
 W(ul_close())
 W(ability("Drinking Buddies"))
 W(ul_open())

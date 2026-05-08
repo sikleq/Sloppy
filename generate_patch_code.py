@@ -238,10 +238,11 @@ TAG_OVERRIDES = {
 
 
 # Match formulas like "from 10% + 1% per level to 8% + 1% per level"
+# OR "from 17 + 3 per level to 12 + 3 per level" (no % signs).
 # Captures four numbers: old_base, old_perlvl, new_base, new_perlvl
 FORMULA_RE = re.compile(
-    r'from\s+(\d+(?:\.\d+)?)\s*%\s*\+\s*(\d+(?:\.\d+)?)\s*%\s+per\s+level\s+to\s+'
-    r'(\d+(?:\.\d+)?)\s*%\s*\+\s*(\d+(?:\.\d+)?)\s*%\s+per\s+level',
+    r'from\s+(\d+(?:\.\d+)?)\s*%?\s*\+\s*(\d+(?:\.\d+)?)\s*%?\s+per\s+level\s+to\s+'
+    r'(\d+(?:\.\d+)?)\s*%?\s*\+\s*(\d+(?:\.\d+)?)\s*%?\s+per\s+level',
     re.I
 )
 
@@ -269,20 +270,20 @@ def parse_value_change(text):
                 return '""'  # empty badge
             return f't("{override_tag}")'
 
-    # 1) Try per-level formula "from X% + Y% per level to A% + B% per level"
+    # 1) Try per-level formula "from X[%] + Y[%] per level to A[%] + B[%] per level"
     m = FORMULA_RE.search(text)
     if m:
         old_base, old_per = float(m.group(1)), float(m.group(2))
         new_base, new_per = float(m.group(3)), float(m.group(4))
-        # Extract prefix BEFORE the "from" clause
+        # Preserve % suffix only if present in original
+        suffix = '%' if '%' in m.group(0) else ''
         prefix = text[:m.start()].rstrip()
         if prefix.lower().endswith('from'):
             prefix = prefix[:-4].rstrip()
-        old_formula = f"{m.group(1)}% + {m.group(2)}% per level"
-        new_formula = f"{m.group(3)}% + {m.group(4)}% per level"
+        old_formula = f"{m.group(1)}{suffix} + {m.group(2)}{suffix} per level"
+        new_formula = f"{m.group(3)}{suffix} + {m.group(4)}{suffix} per level"
         l = _detect_l(text)
         l_arg = ', l=True' if l else ''
-        # Marker prefix tells generator to emit W(li_formula(...)) directly
         return (f'__FORMULA__:li_formula("{_escape(prefix)}", '
                 f'"{old_formula}", "{new_formula}", '
                 f'lambda L: {old_base} + {old_per}*L, '
@@ -745,8 +746,6 @@ def generate(version):
                     out.append(f'W(plain_header("{info["entity"].replace("_", " ")}"))')
                 last_entity_key = entity_key
             if info['is_info']:
-                if _try_merge_info(out, desc):
-                    continue
                 end_ul()
                 out.append(f'W(subnote("{_escape(desc)}"))')
             else:
@@ -764,8 +763,6 @@ def generate(version):
                 out.append(f'W(item_header("{_escape(name)}"))')
                 last_entity_key = entity_key
             if info['is_info']:
-                if _try_merge_info(out, desc):
-                    continue
                 end_ul()
                 out.append(f'W(subnote("{_escape(desc)}"))')
             else:
@@ -783,8 +780,6 @@ def generate(version):
                 out.append(f'W(plain_header("{_escape(name)}"))')
                 last_entity_key = entity_key
             if info['is_info']:
-                if _try_merge_info(out, desc):
-                    continue
                 end_ul()
                 out.append(f'W(subnote("{_escape(desc)}"))')
             else:
@@ -855,8 +850,6 @@ def generate(version):
                     out.append(f'W(ability("{_escape(name)}"))')
                     last_ability = ab
                 if info['is_info']:
-                    if _try_merge_info(out, desc):
-                        continue
                     end_ul()
                     out.append(f'W(subnote("{_escape(desc)}"))')
                 else:
