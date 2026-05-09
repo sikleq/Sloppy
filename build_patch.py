@@ -4628,7 +4628,7 @@ W(ul_close())
 # Windranger
 W(hero_header("Windranger"))
 W(ul_open())
-W(li("Base Health Regen increased by 0.5", t("BUFF")))
+W(li("Base Health Regen increased by 0.5", bstat_h("Windranger", "StatusHealthRegen", "7.41b", 0.5), extra=note_box(hero="Windranger", field="StatusHealthRegen", before_patch="7.41b")))
 W(ul_close())
 W(ability("Powershot"))
 W(ul_open())
