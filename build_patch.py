@@ -2146,7 +2146,9 @@ img { max-width: 100%; }
    with all other rows in the list). */
 ul.changes li.aghanim-scepter,
 ul.changes li.aghanim-shard {
-  background: linear-gradient(90deg, transparent 0 56px, rgba(121, 192, 255, 0.22) 56px, rgba(121, 192, 255, 0.10) 55%, transparent 100%);
+  /* Stripe starts at 64px (right after the tag column, which is 0..64).
+     Tag column stays untinted. */
+  background: linear-gradient(90deg, transparent 0 64px, rgba(121, 192, 255, 0.22) 64px, rgba(121, 192, 255, 0.10) 55%, transparent 100%);
   border-radius: 3px;
 }
 ul.changes li.aghanim-scepter > .row-text,
@@ -2155,12 +2157,15 @@ ul.changes li.aghanim-shard > .row-text {
 }
 ul.changes li.aghanim-scepter > .row-text::before,
 ul.changes li.aghanim-shard > .row-text::before {
+  /* 12×12 icon anchored at left:-12 from .row-text (col 2 starts at 76),
+     so the icon spans 64..76 — exactly inside the gap between tag and text
+     columns, never overlapping the tag. */
   content: "";
   position: absolute;
-  left: -20px;            /* sit in the 12px gap (col 1 ends at 64, col 2 starts at 76) */
-  top: 4px;
-  width: 14px;
-  height: 14px;
+  left: -12px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
