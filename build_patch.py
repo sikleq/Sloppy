@@ -405,6 +405,7 @@ def t(tag):
 
 class _State:
     block_open = False
+    current_hero = None  # internal slug of current hero block (for ability icon derivation)
 
 def _open_block():
     s = ('</div>\n' if _State.block_open else '') + '<div class="entity-block">\n'
@@ -419,6 +420,7 @@ def _close_block():
 
 
 def hero_header(name):
+    _State.current_hero = HERO_SLUG.get(name, name.lower().replace(" ", "_").replace("'", "").replace("-", ""))
     return _open_block() + f'''<div class="entity hero-entity">
   <div class="entity-icon hero-icon"><img src="{hero_img(name)}" alt="{name}" loading="lazy"></div>
   <div class="entity-name">{name}</div>
@@ -427,6 +429,7 @@ def hero_header(name):
 
 def unit_header(name, icon_url):
     """Header for a separate summoned unit (e.g. Spirit Bear) with custom icon URL."""
+    _State.current_hero = None
     return _open_block() + f'''<div class="entity hero-entity">
   <div class="entity-icon ability-icon"><img src="{icon_url}" alt="{name}" loading="lazy"></div>
   <div class="entity-name">{name}</div>
@@ -435,6 +438,7 @@ def unit_header(name, icon_url):
 
 def item_header(name, new=False):
     """Item header. If new=True, appends a NEW badge to the entity name."""
+    _State.current_hero = None
     new_badge = ' <span class="badge new" data-tag="new" data-overall="buff">NEW</span>' if new else ''
     return _open_block() + f'''<div class="entity item-entity">
   <div class="entity-icon item-icon"><img src="{item_img(name)}" alt="{name}" loading="lazy"></div>
@@ -443,6 +447,7 @@ def item_header(name, new=False):
 
 
 def plain_header(name):
+    _State.current_hero = None
     return _open_block() + f'<div class="entity plain-entity"><div class="entity-name">{name}</div></div>'
 
 
@@ -460,6 +465,7 @@ def enchant_header(name, slug=None):
 
 
 def section(title):
+    _State.current_hero = None
     return _close_block() + f'<h2 class="section">{title}</h2>'
 
 
@@ -467,8 +473,86 @@ def subgroup(title):
     return f'<h4 class="subgroup">{title}</h4>'
 
 
-def ability(title):
-    return f'<h4 class="ability-title">{title}</h4>'
+# Manual ability-name → CDN-slug overrides for cases where naive transform is wrong.
+# Key = display name (within hero context); value = CDN slug part (after the hero_internal prefix).
+ABILITY_DISPLAY_TO_SLUG = {
+    # Anti-Mage
+    ("antimage", "Persecutor"): "persectur",
+    # Alchemist
+    ("alchemist", "Greevil's Greed"): "goblins_greed",
+    # Bounty Hunter
+    ("bounty_hunter", "Shadow Walk"): "wind_walk",
+    # Drow Ranger
+    ("drow_ranger", "Gust"): "wave_of_silence",
+    # Skywrath Mage
+    # Naga Siren
+    # Vengeful Spirit
+    ("vengefulspirit", "Vengeance Aura"): "command_aura",
+    # Nature's Prophet
+    ("furion", "Nature's Call"): "force_of_nature",
+    # Outworld Destroyer
+    ("obsidian_destroyer", "Sanity's Eclipse"): "sanity_eclipse",
+    # Sand King
+    ("sand_king", "Stinger"): "scorpion_strike",
+    # Pangolier
+    ("pangolier", "Roll Up"): "rollup",
+    # Phantom Lancer
+    ("phantom_lancer", "Phantom Rush"): "phantom_edge",
+    # Shadow Fiend
+    ("nevermore", "Shadowraze"): "shadowraze1",
+    ("nevermore", "Presence of the Dark Lord"): "dark_lord",
+    # Sven
+    ("sven", "Storm Hammer"): "storm_bolt",
+    # Techies
+    ("techies", "M.A.D."): "mutually_assured_destruction",
+    # Wraith King
+    ("skeleton_king", "Wraithfire Blast"): "hellfire_blast",
+    # Largo
+    # Marci
+    ("marci", "Bodyguard"): "bodyguard",
+    # Mars
+    ("mars", "Spear of Mars"): "spear",
+    # Mirana
+    ("mirana", "Sacred Arrow"): "arrow",
+    # Lone Druid
+    ("lone_druid", "Summon Spirit Bear"): "spirit_bear",
+    # Clockwerk (rattletrap)
+    ("rattletrap", "Cog"): "power_cogs",
+    # Tidehunter
+    ("tidehunter", "Leviathan's Catch"): "leviathans_catch",
+    # Hoodwink
+    ("hoodwink", "Hunter's Boomerang"): "hunters_boomerang",
+    # Pudge
+    ("pudge", "Graft Flesh"): "innate_graft_flesh",
+    # Storm Spirit
+    ("storm_spirit", "Galvanized"): "galvanized",
+}
+
+
+def ability(title, slug=None):
+    """Ability heading. Adds an icon when we know the CDN slug.
+    The slug is derived from the current hero context + ability title:
+      - manual override in ABILITY_DISPLAY_TO_SLUG, OR
+      - naive: lowercased + spaces→underscores, with apostrophes/hyphens stripped.
+    Image hides itself on 404 via onerror."""
+    icon_html = ''
+    if slug is None and _State.current_hero:
+        hero = _State.current_hero
+        key = (hero, title)
+        if key in ABILITY_DISPLAY_TO_SLUG:
+            ability_part = ABILITY_DISPLAY_TO_SLUG[key]
+        else:
+            ability_part = (title.lower()
+                            .replace("'", "")
+                            .replace("-", "_")
+                            .replace(" ", "_")
+                            .replace(".", ""))
+        slug = f"{hero}_{ability_part}"
+    if slug:
+        icon_html = (f'<img src="{ABIL_CDN}{slug}.png" alt="" '
+                     f'class="ability-icon-img" loading="lazy" '
+                     f'onerror="this.style.display=\'none\'">')
+    return f'<h4 class="ability-title">{icon_html}{title}</h4>'
 
 
 def ul_open():
@@ -1261,6 +1345,16 @@ h4.ability-title {
   font-size: 15px;
   font-weight: 600;
   margin: 12px 0 4px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+h4.ability-title .ability-icon-img {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  object-fit: cover;
 }
 
 /* CHANGES LIST — grid layout: [tag] [text] [percentages] */
@@ -1337,8 +1431,9 @@ ul.changes li:not(:has(> .row-text))::before {
   color: #a86158;
   border: 1px solid rgba(225, 90, 75, 0.28);
 }
-/* Formula tables inside raw rows — extend back to left edge of entity-block */
-ul.changes li:not(:has(> .row-text)) > .formula-table {
+/* Extras inside raw rows (formula-table, correction-note) — extend to left edge */
+ul.changes li:not(:has(> .row-text)) > .formula-table,
+ul.changes li:not(:has(> .row-text)) > .correction-note {
   margin-left: -76px;
   width: calc(100% + 76px);
 }
@@ -2963,7 +3058,12 @@ W(ul_close())
 W(subgroup("Abilities"))
 W(ability("Supernatural"))
 W(ul_open())
-W(li("Maximum Stack Count increased from 1 per hero level to 5 + 1 per hero level", t("BUFF")))
+W(li_formula("Maximum Stack Count increased",
+             "1 per hero level",
+             "5 + 1 per hero level",
+             lambda L: 1 * L,
+             lambda L: 5 + 1 * L,
+             rework_badge=False))
 W(ul_close())
 W(hero_header("Nature's Prophet"))
 W(subgroup("Abilities"))
