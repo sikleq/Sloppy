@@ -1532,8 +1532,7 @@ h4.subgroup {
 }
 /* Formula tables INSIDE .ability-block — extend back to entity-block left edge,
    not just within content column (else they look right-aligned past the icon). */
-.ability-block ul.changes li > .formula-table,
-.ability-block ul.changes li > .correction-note {
+.ability-block ul.changes li > .formula-table {
   margin-left: -60px;          /* counter ability-block icon column (48 + 12 gap) */
   width: calc(100% + 60px);
 }
@@ -1828,6 +1827,13 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   line-height: 1.5;
 }
 .correction-note .badge {
+  font-style: normal;
+}
+/* Badge-group inside correction-note: float to the right edge of the note
+   so it visually mirrors the row's main % (which sits in the right grid column). */
+.correction-note > .badge-group {
+  float: right;
+  margin-left: 12px;
   font-style: normal;
 }
 .correction-label {
