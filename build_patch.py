@@ -482,9 +482,12 @@ import os
 import re
 
 def li(text, badge="", extra="", force_tag=None):
-    """Generate <li>. Auto-extracts data-tag from badges for filtering.
-    Priority: force_tag > data-overall > data-tag (text tags) > buff*/nerf* class scan.
-    extra: optional HTML appended inside the li (e.g. correction note)."""
+    """Generate <li>. Layout is: [left-tag] [description] [right percentages] [extra].
+    The left tag is either:
+      - Extracted from `badge` if it contains a text tag (BUFF/NERF/REWORK/MISC/QoL/NEW/DEL)
+      - OR derived from data-overall (numeric badges → BUFF or NERF text tag on left)
+      - OR an empty placeholder for visual alignment if neither.
+    Auto-extracts data-tag from badges for filtering."""
     if force_tag is not None:
         tag_str = force_tag
     else:
@@ -498,8 +501,27 @@ def li(text, badge="", extra="", force_tag=None):
             for cls in re.findall(r'badge (buff|nerf)\d+', badge):
                 tags.add(cls)
         tag_str = " ".join(sorted(tags))
+
+    # Extract or derive the LEFT tag
+    text_tag_re = re.search(
+        r'<span class="badge (buff-text|nerf-text|rework|misc|qol|new|del)"[^>]*>\w+</span>\s*',
+        badge
+    )
+    if text_tag_re:
+        left_tag = text_tag_re.group(0).rstrip()
+        rest = badge[:text_tag_re.start()] + badge[text_tag_re.end():]
+    elif 'data-overall="buff"' in badge:
+        left_tag = '<span class="badge buff-text" data-tag="buff" data-overall="buff">BUFF</span>'
+        rest = badge
+    elif 'data-overall="nerf"' in badge:
+        left_tag = '<span class="badge nerf-text" data-tag="nerf" data-overall="nerf">NERF</span>'
+        rest = badge
+    else:
+        left_tag = '<span class="row-tag-empty"></span>'
+        rest = badge
+
     attr = f' data-tag="{tag_str}"' if tag_str else ""
-    return f'<li{attr}>{text} {badge}{extra}</li>'
+    return f'<li{attr}>{left_tag}<span class="row-text">{text}</span>{rest}{extra}</li>'
 
 
 def subnote(text):
@@ -1225,19 +1247,47 @@ h4.ability-title {
   margin: 12px 0 4px 14px;
 }
 
-/* CHANGES LIST */
+/* CHANGES LIST — grid layout: [tag] [text] [percentages] */
 ul.changes {
   list-style: none;
   margin: 3px 0 3px 30px;
 }
 ul.changes li {
-  padding: 0 0 1px 0;
-  line-height: 1.45;
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  column-gap: 12px;
+  row-gap: 0;
+  align-items: baseline;
+  padding: 1px 0;
+  line-height: 1.5;
   color: #c9d1d9;
 }
+/* Left column: text-tag goes here */
+ul.changes li > .badge:first-child,
+ul.changes li > .row-tag-empty {
+  grid-column: 1;
+  text-align: center;
+  align-self: start;
+  margin-top: 2px;
+}
+/* Middle column: description */
+ul.changes li > .row-text {
+  grid-column: 2;
+}
+/* Right column: numeric percentages */
+ul.changes li > .badge-group {
+  grid-column: 3;
+  margin-left: 0;
+}
+/* extras (correction-note, formula-table, NOTE box) span all columns */
+ul.changes li > .correction-note,
+ul.changes li > .formula-table {
+  grid-column: 1 / -1;
+}
+
 ul.subnotes {
   list-style: none;
-  margin: -2px 0 4px 50px;
+  margin: -2px 0 4px 80px;
 }
 ul.subnotes li {
   color: #8b949e;
@@ -1247,27 +1297,48 @@ ul.subnotes li {
 }
 ul.subnotes li::before { content: "↳ "; color: #6e7681; }
 
-/* BADGES */
-.badge-group {
-  display: inline-flex;
-  gap: 3px;
-  margin-left: 6px;
-  flex-wrap: wrap;
-  vertical-align: middle;
-}
+/* BADGES — flat rectangular tag boxes */
 .badge {
   display: inline-block;
-  padding: 1px 7px;
-  border-radius: 10px;
-  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
   vertical-align: middle;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  margin-left: 4px;
+  min-width: 56px;
+  text-align: center;
 }
-.badge-group .badge { margin-left: 0; }
+/* When inside .badge-group → strip the box, become plain colored text */
+.badge-group {
+  display: inline-flex;
+  gap: 0;
+  flex-wrap: wrap;
+  vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 13px;
+}
+.badge-group .badge {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  text-shadow: none !important;
+  margin: 0;
+  min-width: 0;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: inherit;
+}
+/* Comma separator between multi-level badges */
+.badge-group .badge:not(:last-child)::after {
+  content: ", ";
+  color: #6e7681;
+  font-weight: 400;
+}
 
 /* NEUTRAL & TEXT TAGS */
 .badge.neutral {
@@ -4407,7 +4478,9 @@ W(li("Lotus Pools have been moved slightly closer to their respective offlane to
 W(li("Twin Gates slightly moved away from the stairs towards the map border", t("MISC")))
 W(li("The watcher between the safe lane tier 1 tower and the tormentor has been repositioned. Result:", t("MISC")))
 W(ul_close())
-W(subnote("Tormentor is on the low ground which has three stairs: one leading to the Lotus Pool, one leading to the lane, and one leading to even higher ground area with the Twin Gate. Twin Gate highground area is now smaller and has three stairs: one that leads to new Tormentor area, one that leads back to the lane, and one that goes two levels down straight to the end of the stream. Watcher is now between two stairs: one that goes down to the Tormentor and one that goes up to the Twin Gate."))
+W(subnote("Tormentor is on the low ground which has three stairs: one leading to the Lotus Pool, one leading to the lane, and one leading to even higher ground area with the Twin Gate"))
+W(subnote("Twin Gate highground area is now smaller and has three stairs: one that leads to new Tormentor area, one that leads back to the lane, and one that goes two levels down straight to the end of the stream"))
+W(subnote("Watcher is now between two stairs: one that goes down to the Tormentor and one that goes up to the Twin Gate"))
 W(ul_open())
 W(li("Ancient neutral camps near stream ends demoted to medium camps and moved slightly towards bases", t("MISC")))
 W(li("Medium neutral camp near offlane defender's gate has been demoted to a small neutral camp", t("MISC")))
