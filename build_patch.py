@@ -554,15 +554,15 @@ OTHER_ICON_URL = "../icons/other.svg"
 # case the generic "Other" icon is swapped for an icon matching the stat.
 # Files live in /icons/ at the repo root; patches reference ../icons/<file>.
 STAT_ICONS = {
-    "movement_speed": "../icons/move_speed.png",
+    "movement_speed": "../icons/move_speed.webp",
     "attack_speed":   "../icons/attack_speed.png",
-    "damage":         "../icons/damage.png",
-    "armor":          "../icons/armor.png",
-    "attack_range":   "../icons/range.png",
-    "strength":       "../icons/str.png",
-    "agility":        "../icons/agi.png",
-    "intelligence":   "../icons/intel.png",
-    "universal":      "../icons/uni.png",
+    "damage":         "../icons/damage.webp",
+    "armor":          "../icons/armor.webp",
+    "attack_range":   "../icons/range.webp",
+    "strength":       "../icons/strength.webp",
+    "agility":        "../icons/agility.webp",
+    "intelligence":   "../icons/intelligence.webp",
+    "universal":      "../icons/universal.webp",
 }
 # Order matters: longer/more-specific keys first to avoid e.g. "damage" matching
 # inside "magic damage" before we get a chance to check more specific phrases.
