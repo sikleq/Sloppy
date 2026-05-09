@@ -407,15 +407,25 @@ class _State:
     block_open = False
     current_hero = None  # internal slug of current hero block (for ability icon derivation)
     ability_icons = set()  # all ability-icon URLs emitted during build (for icon-validator)
+    ability_block_open = False  # tracks <div class="ability-block"> wrapper
 
 def _open_block():
-    s = ('</div>\n' if _State.block_open else '') + '<div class="entity-block">\n'
+    pre = _close_ability_block()
+    s = pre + ('</div>\n' if _State.block_open else '') + '<div class="entity-block">\n'
     _State.block_open = True
     return s
 
 def _close_block():
+    out = _close_ability_block()
     if _State.block_open:
         _State.block_open = False
+        out += '</div>\n'
+    return out
+
+
+def _close_ability_block():
+    if _State.ability_block_open:
+        _State.ability_block_open = False
         return '</div>\n'
     return ''
 
@@ -439,17 +449,19 @@ def unit_header(name, icon_url):
 
 def item_header(name, new=False):
     """Item header. If new=True, appends a NEW badge to the entity name."""
+    out = _close_ability_block()
     _State.current_hero = None
     new_badge = ' <span class="badge new" data-tag="new" data-overall="buff">NEW</span>' if new else ''
-    return _open_block() + f'''<div class="entity item-entity">
+    return out + _open_block() + f'''<div class="entity item-entity">
   <div class="entity-icon item-icon"><img src="{item_img(name)}" alt="{name}" loading="lazy"></div>
   <div class="entity-name">{name}{new_badge}</div>
 </div>'''
 
 
 def plain_header(name):
+    out = _close_ability_block()
     _State.current_hero = None
-    return _open_block() + f'<div class="entity plain-entity"><div class="entity-name">{name}</div></div>'
+    return out + _open_block() + f'<div class="entity plain-entity"><div class="entity-name">{name}</div></div>'
 
 
 def enchant_header(name, slug=None):
@@ -470,8 +482,26 @@ def section(title):
     return _close_block() + f'<h2 class="section">{title}</h2>'
 
 
+# Generic talent-tree icon (falls back to innate_icon on 404 via onerror).
+TALENT_ICON_URL = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/icons/talent_tree.png"
+INNATE_ICON_URL = "https://cdn.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png"
+
 def subgroup(title):
-    return f'<h4 class="subgroup">{title}</h4>'
+    """Subgroup heading. For "Talents", wraps in an ability-block with a talent icon."""
+    out = _close_ability_block()
+    if title.lower() == "talents":
+        on_err = (
+            "this.onerror=function(){this.style.display='none'};"
+            f"this.src='{INNATE_ICON_URL}';"
+        )
+        icon = (f'<img src="{TALENT_ICON_URL}" alt="" '
+                f'class="ability-icon-img talent-icon" loading="lazy" '
+                f'onerror="{on_err}">')
+        _State.ability_block_open = True
+        _State.ability_icons.add(TALENT_ICON_URL)
+        return out + (f'<div class="ability-block talents-block">{icon}'
+                      f'<h4 class="ability-title">{title}</h4>')
+    return out + f'<h4 class="subgroup">{title}</h4>'
 
 
 # Manual ability-name → CDN-slug overrides for cases where naive transform is wrong.
@@ -568,7 +598,10 @@ def ability(title, slug=None):
                      f'data-slug="{slug}" '
                      f'onerror="{on_err}">')
         _State.ability_icons.add(f"{ABIL_CDN}{slug}.png")
-    return f'<h4 class="ability-title">{icon_html}{title}</h4>'
+    out = _close_ability_block()
+    _State.ability_block_open = True
+    return out + (f'<div class="ability-block">{icon_html}'
+                  f'<h4 class="ability-title">{title}</h4>')
 
 
 def ul_open():
@@ -1356,22 +1389,53 @@ h4.subgroup {
   border-bottom: 1px solid #21262d;
   padding-bottom: 4px;
 }
-h4.ability-title {
-  color: #d2a8ff;
-  font-size: 20px;
-  font-weight: 600;
-  margin: 16px 0 8px 0;     /* aligned with entity-block left edge (same as tags) */
-  display: flex;
-  align-items: center;
-  gap: 12px;
+/* ABILITY BLOCK — icon (left, full-height) + title (top-right) + changes (below title) */
+.ability-block {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  column-gap: 12px;
+  align-items: start;
+  margin: 14px 0 8px 0;
 }
-h4.ability-title .ability-icon-img {
+.ability-block > .ability-icon-img {
+  grid-column: 1;
+  grid-row: 1 / span 99;     /* span everything that follows the title */
   width: 48px;
   height: 48px;
   border-radius: 6px;
-  flex-shrink: 0;
+  align-self: start;          /* keep icon at top */
   object-fit: cover;
   box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.ability-block.talents-block > .ability-icon-img {
+  /* talents icon — slightly different framing to look "tree-ish" */
+  box-shadow: 0 0 0 1px rgba(121, 192, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.4);
+  background: rgba(121, 192, 255, 0.04);
+  padding: 4px;
+}
+.ability-block > .ability-title {
+  grid-column: 2;
+  margin: 0;
+  padding: 2px 0 4px 0;
+  color: #d2a8ff;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+  align-self: start;
+}
+.ability-block.talents-block > .ability-title {
+  color: #79c0ff;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.ability-block > ul.changes {
+  grid-column: 2;
+  margin-top: 0;
+}
+.ability-block > ul.subnotes {
+  grid-column: 2;
 }
 
 /* CHANGES LIST — grid layout: [tag] [text] [percentages] */
