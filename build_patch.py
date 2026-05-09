@@ -356,7 +356,7 @@ def ul_open():
 def ul_close():
     return '</ul>'
 
-
+import os
 import re
 
 def li(text, badge="", extra="", force_tag=None):
@@ -1432,9 +1432,9 @@ def W(s): H.append(s)
 # ============================================================
 
 PATCHES = [
-    {"version": "7.41c", "date": "06.05.2026", "filename": "7.41c.html"},
-    {"version": "7.41b", "date": "07.04.2026", "filename": "7.41b.html"},
-    {"version": "7.08",  "date": "01.02.2018", "filename": "7.08.html"},
+    {"version": "7.41c", "date": "06.05.2026", "filename": "patches/7.41c.html"},
+    {"version": "7.41b", "date": "07.04.2026", "filename": "patches/7.41b.html"},
+    {"version": "7.08",  "date": "01.02.2018", "filename": "patches/7.08.html"},
 ]
 
 # Includes patches without HTML (e.g. 7.41a) — used only for "days between" math.
@@ -1621,12 +1621,19 @@ def _patch_age_line(version):
     return ""
 
 
-def _dropdown_options_html(current_version):
-    """Render menu items list for the version dropdown."""
+def _dropdown_options_html(current_version, patch_context=False):
+    """Render menu items list for the version dropdown.
+    patch_context=True when rendered inside a patch page (patches/ folder) —
+    links use plain 'version.html' (same directory) instead of root-relative paths."""
     items = []
     for p in PATCHES:
         cls = "version-item current" if p["version"] == current_version else "version-item"
-        href = "#" if p["version"] == current_version else p["filename"]
+        if p["version"] == current_version:
+            href = "#"
+        elif patch_context:
+            href = p["version"] + ".html"
+        else:
+            href = p["filename"]
         items.append(
             f'<a class="{cls}" href="{href}">'
             f'<span class="vi-name">{p["version"]}</span>'
@@ -1636,15 +1643,21 @@ def _dropdown_options_html(current_version):
     return "".join(items)
 
 
-def _render_top_nav(active="changelogs", current_version=None, date=None):
+def _render_top_nav(active="changelogs", current_version=None, date=None, patch_context=False):
     """Render the top nav. active in ('changelogs', 'calendar').
-    If current_version is set, adds the right-side context (date + version dropdown)."""
-    latest = PATCHES[0]['filename'] if PATCHES else "#"
+    patch_context=True when rendering inside a patch page (patches/ folder) —
+    hrefs use ../ prefix for root files and plain filenames for sibling patches."""
+    if patch_context:
+        latest = PATCHES[0]['version'] + ".html" if PATCHES else "#"
+        calendar_href = "../calendar.html"
+    else:
+        latest = PATCHES[0]['filename'] if PATCHES else "#"
+        calendar_href = "calendar.html"
     cls_changelogs = "active" if active == "changelogs" else ""
     cls_calendar  = "active" if active == "calendar" else ""
 
     if current_version is not None and date is not None:
-        options = _dropdown_options_html(current_version)
+        options = _dropdown_options_html(current_version, patch_context=patch_context)
         age_line = _patch_age_line(current_version)
         age_html = f'<span class="patch-age">{age_line}</span>' if age_line else ''
         right_side = f'''
@@ -1669,7 +1682,7 @@ def _render_top_nav(active="changelogs", current_version=None, date=None):
   <div class="nav-inner">
     <div class="nav-tabs">
       <a class="nav-tab {cls_changelogs}" href="{latest}">Changelogs</a>
-      <a class="nav-tab {cls_calendar}" href="calendar.html">Calendar</a>
+      <a class="nav-tab {cls_calendar}" href="{calendar_href}">Calendar</a>
     </div>{right_side}
   </div>
 </nav>
@@ -1678,18 +1691,18 @@ def _render_top_nav(active="changelogs", current_version=None, date=None):
 
 def write_head(version, date):
     """Render head + top nav (Changelogs+Calendar tabs + version) + container + toolbar."""
-    nav = _render_top_nav(active="changelogs", current_version=version, date=date)
+    nav = _render_top_nav(active="changelogs", current_version=version, date=date, patch_context=True)
     W(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Dota Patch Notes - {version}</title>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 <body>
 
 {nav}
-<a class="nav-back-arrow" href="calendar.html" aria-label="Back to calendar" title="Back to calendar">←</a>
+<a class="nav-back-arrow" href="../calendar.html" aria-label="Back to calendar" title="Back to calendar">←</a>
 <div class="container">
 
 <div class="toolbar">
@@ -1976,6 +1989,7 @@ def save_html(filename):
     """Write current accumulator to ./{filename} and reset state."""
     out = "\n".join(H)
     path = filename
+    os.makedirs(os.path.dirname(path), exist_ok=True) if os.path.dirname(path) else None
     with open(path, "w", encoding="utf-8") as f:
         f.write(out)
     print(f"  → {filename}: {len(out):,} bytes")
@@ -2055,7 +2069,7 @@ def save_calendar_html():
 
     def chip_tag(v):
         if v in has_html:
-            return ('a', f' href="{v}.html?from=calendar"')
+            return ('a', f' href="patches/{v}.html?from=calendar"')
         return ('span', '')
 
     body = []
@@ -3450,7 +3464,7 @@ HANDCRAFTED_7_41C_BODY = '''<h2 class="section">General Updates</h2>
 W(HANDCRAFTED_7_41C_BODY)
 
 write_footer()
-save_html('7.41c.html')
+save_html('patches/7.41c.html')
 
 # ============================================================
 # 7.41b content
@@ -4231,7 +4245,7 @@ W(li("Cooldown decreased from 30s to 25s", b(30, 25, l=True)))
 W(ul_close())
 
 write_footer()
-save_html('7.41b.html')
+save_html('patches/7.41b.html')
 
 # ============================================================
 # 7.08 content
@@ -4522,6 +4536,6 @@ W(li("Level 25 Talent increased from +30% Ministun Focus Fire to +35%", b(30, 35
 W(ul_close())
 
 write_footer()
-save_html('7.08.html')
+save_html('patches/7.08.html')
 
 save_calendar_html()
