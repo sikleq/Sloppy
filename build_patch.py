@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """Generate annotated Dota 2 7.41c patch notes HTML."""
 
 import json as _json
@@ -33,19 +33,19 @@ _STATS_H, _STATS_I = _load_stats_db()
 
 def stat_h(hero_display: str, field: str, version: str):
     """
-    Возвращает числовое значение стата героя в указанном патче или None.
+    Р’РѕР·РІСЂР°С‰Р°РµС‚ С‡РёСЃР»РѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ СЃС‚Р°С‚Р° РіРµСЂРѕСЏ РІ СѓРєР°Р·Р°РЅРЅРѕРј РїР°С‚С‡Рµ РёР»Рё None.
 
-    hero_display — отображаемое имя (как в HERO_SLUG), например "Doom"
-    field        — ключ из npc_heroes.txt, например "ArmorPhysical",
+    hero_display вЂ” РѕС‚РѕР±СЂР°Р¶Р°РµРјРѕРµ РёРјСЏ (РєР°Рє РІ HERO_SLUG), РЅР°РїСЂРёРјРµСЂ "Doom"
+    field        вЂ” РєР»СЋС‡ РёР· npc_heroes.txt, РЅР°РїСЂРёРјРµСЂ "ArmorPhysical",
                    "AttackDamageMin", "MovementSpeed", "AttributeBaseStrength"
-    version      — патч, в котором ищем, например "7.41"
+    version      вЂ” РїР°С‚С‡, РІ РєРѕС‚РѕСЂРѕРј РёС‰РµРј, РЅР°РїСЂРёРјРµСЂ "7.41"
 
-    Пример:
-        # Doom Base Armor в патче 7.41 (ДО изменений 7.41a)
-        old = stat_h("Doom", "ArmorPhysical", "7.41")  # → 4
+    РџСЂРёРјРµСЂ:
+        # Doom Base Armor РІ РїР°С‚С‡Рµ 7.41 (Р”Рћ РёР·РјРµРЅРµРЅРёР№ 7.41a)
+        old = stat_h("Doom", "ArmorPhysical", "7.41")  # в†’ 4
         W(li("Base Armor decreased by 1", b(old, old - 1)))
     """
-    # Конвертируем имя → npc slug
+    # РљРѕРЅРІРµСЂС‚РёСЂСѓРµРј РёРјСЏ в†’ npc slug
     raw_slug = HERO_SLUG.get(hero_display,
                               hero_display.lower().replace(" ", "_").replace("'", ""))
     npc_key = "npc_dota_hero_" + raw_slug
@@ -54,11 +54,11 @@ def stat_h(hero_display: str, field: str, version: str):
 
 def stat_i(item_display: str, field: str, version: str):
     """
-    Возвращает числовое значение стата предмета в указанном патче или None.
+    Р’РѕР·РІСЂР°С‰Р°РµС‚ С‡РёСЃР»РѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ СЃС‚Р°С‚Р° РїСЂРµРґРјРµС‚Р° РІ СѓРєР°Р·Р°РЅРЅРѕРј РїР°С‚С‡Рµ РёР»Рё None.
 
-    item_display — отображаемое имя (как в ITEM_SLUG), например "Blink Dagger"
-    field        — ключ из items.txt, например "ItemCost", "ItemCooldown"
-    version      — патч, например "7.41"
+    item_display вЂ” РѕС‚РѕР±СЂР°Р¶Р°РµРјРѕРµ РёРјСЏ (РєР°Рє РІ ITEM_SLUG), РЅР°РїСЂРёРјРµСЂ "Blink Dagger"
+    field        вЂ” РєР»СЋС‡ РёР· items.txt, РЅР°РїСЂРёРјРµСЂ "ItemCost", "ItemCooldown"
+    version      вЂ” РїР°С‚С‡, РЅР°РїСЂРёРјРµСЂ "7.41"
     """
     raw_slug = ITEM_SLUG.get(item_display,
                               item_display.lower().replace(" ", "_").replace("'", ""))
@@ -69,13 +69,13 @@ def stat_i(item_display: str, field: str, version: str):
 def bstat_h(hero_display: str, field: str, patch_before: str, delta,
             l: bool = False):
     """
-    Бейдж для изменения стата героя на delta от патча patch_before.
+    Р‘РµР№РґР¶ РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ СЃС‚Р°С‚Р° РіРµСЂРѕСЏ РЅР° delta РѕС‚ РїР°С‚С‡Р° patch_before.
 
-    Автоматически берёт старое значение из БД и вычисляет новое.
-    delta — число: положительное = увеличение, отрицательное = уменьшение.
+    РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё Р±РµСЂС‘С‚ СЃС‚Р°СЂРѕРµ Р·РЅР°С‡РµРЅРёРµ РёР· Р‘Р” Рё РІС‹С‡РёСЃР»СЏРµС‚ РЅРѕРІРѕРµ.
+    delta вЂ” С‡РёСЃР»Рѕ: РїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕРµ = СѓРІРµР»РёС‡РµРЅРёРµ, РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕРµ = СѓРјРµРЅСЊС€РµРЅРёРµ.
 
-    Пример:
-        # "Base Armor decreased by 1" в 7.41a, до этого патча было 7.41
+    РџСЂРёРјРµСЂ:
+        # "Base Armor decreased by 1" РІ 7.41a, РґРѕ СЌС‚РѕРіРѕ РїР°С‚С‡Р° Р±С‹Р»Рѕ 7.41
         W(li("Base Armor decreased by 1", bstat_h("Doom", "ArmorPhysical", "7.41", -1)))
     """
     old = stat_h(hero_display, field, patch_before)
@@ -87,7 +87,7 @@ def bstat_h(hero_display: str, field: str, patch_before: str, delta,
 
 def bstat_i(item_display: str, field: str, patch_before: str, delta,
             l: bool = False):
-    """Аналог bstat_h для предметов."""
+    """РђРЅР°Р»РѕРі bstat_h РґР»СЏ РїСЂРµРґРјРµС‚РѕРІ."""
     old = stat_i(item_display, field, patch_before)
     if old is None:
         return t("NERF") if delta < 0 else t("BUFF")
@@ -218,7 +218,7 @@ def b(old, new, l=False):
     If all per-level badges turn out identical, collapses to a single badge.
     Determines OVERALL buff/nerf tag for filtering:
       - avg of signed per-level %s; sign decides
-      - if avg rounds to 0 → use last non-zero level"""
+      - if avg rounds to 0 в†’ use last non-zero level"""
     if not isinstance(old, (list, tuple)):
         old = [old]
     if not isinstance(new, (list, tuple)):
@@ -255,7 +255,7 @@ def b(old, new, l=False):
 
     # Determine overall tag.
     # Logic: avg of signed per-level %s; sign decides.
-    # If avg rounds to 0 → fall back to last non-zero level.
+    # If avg rounds to 0 в†’ fall back to last non-zero level.
     overall = ""
     if signed_pcts:
         avg = sum(signed_pcts) / len(signed_pcts)
@@ -317,16 +317,16 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
     The trigger wraps formula_text as a clickable pill that toggles the table.
     Tag is determined by `headline_level` (default L1).
     levels: list of int levels to show; defaults to L1-15 + L20, L25, L30.
-            Can also pass an int N → range(1, N+1).
+            Can also pass an int N в†’ range(1, N+1).
     value_fmt: format string for level values (e.g. '{:.2f}%' or '{:g}').
     level_prefix: prefix shown before each column header (default 'L').
                   Ignored when level_fmt is provided.
-    level_fmt: optional callable(L) → header label; lets the caller override
-               the default 'L1', 'L2'… formatting (e.g. '1:00', '2:00').
+    level_fmt: optional callable(L) в†’ header label; lets the caller override
+               the default 'L1', 'L2'вЂ¦ formatting (e.g. '1:00', '2:00').
     jump_at: level value that gets the visual gap class (default 20).
 
-    The Δ% row is dropped automatically when every level resolves to the same
-    delta — in that case the headline badge already conveys the full picture."""
+    The О”% row is dropped automatically when every level resolves to the same
+    delta вЂ” in that case the headline badge already conveys the full picture."""
     if levels is None:
         levels = list(range(1, 16)) + [20, 25, 30]
     elif isinstance(levels, int):
@@ -361,7 +361,7 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
     uniform_delta = len({(cls, disp) for cls, disp, _, _ in pct_data}) == 1
 
     pct_row = "" if uniform_delta else (
-        f'<tr><th>Δ %</th>{"".join(pct_cells)}</tr>'
+        f'<tr><th>О” %</th>{"".join(pct_cells)}</tr>'
     )
 
     table = (
@@ -381,7 +381,7 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
 def t(tag):
     """Text-only tag for non-numeric changes.
     NEW (mechanic/property the entity didn't have before) is treated as a buff
-    for filter purposes — data-overall='buff' so the BUFF filter also catches it."""
+    for filter purposes вЂ” data-overall='buff' so the BUFF filter also catches it."""
     cls_map = {
         "BUFF":   ("buff-text", "buff"),
         "NERF":   ("nerf-text", "nerf"),
@@ -485,7 +485,7 @@ def li(text, badge="", extra="", force_tag=None):
     """Generate <li>. Layout is: [left-tag] [description] [right percentages] [extra].
     The left tag is either:
       - Extracted from `badge` if it contains a text tag (BUFF/NERF/REWORK/MISC/QoL/NEW/DEL)
-      - OR derived from data-overall (numeric badges → BUFF or NERF text tag on left)
+      - OR derived from data-overall (numeric badges в†’ BUFF or NERF text tag on left)
       - OR an empty placeholder for visual alignment if neither.
     Auto-extracts data-tag from badges for filtering."""
     if force_tag is not None:
@@ -531,7 +531,7 @@ def subnote(text):
 def note_box(text):
     """Inline NOTE box for content NOT in the original patch (e.g. auto-derived
     base values like 'From 17 to 18'). Use as `extra=note_box(...)` of li()."""
-    return f'<div class="correction-note"><span class="correction-label">Note</span>— {text}</div>'
+    return f'<div class="correction-note"><span class="correction-label">Note</span>вЂ” {text}</div>'
 
 
 def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
@@ -541,7 +541,7 @@ def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
     prefix:        text BEFORE 'from' (e.g. 'Max Damage Increase decreased')
     old_formula:   human-readable old-formula string
     new_formula:   human-readable new-formula string
-    old_fn/new_fn: callable(level) → value, used to compute per-level table
+    old_fn/new_fn: callable(level) в†’ value, used to compute per-level table
     l:             lower-is-buff flag (passed through to bf gradient)
     rework_badge:  if True (default), prepend a REWORK text-tag to the badge group
     **bf_kwargs:   forwarded to bf() (e.g. levels, level_prefix, jump_at, value_fmt)
@@ -628,7 +628,7 @@ nav.top-nav {
 }
 .nav-tab.active {
   background: rgba(0, 0, 0, 0.22);
-  /* keep weight + transparent border identical to inactive — prevents header jump */
+  /* keep weight + transparent border identical to inactive вЂ” prevents header jump */
 }
 .nav-context {
   display: flex;
@@ -637,7 +637,7 @@ nav.top-nav {
   margin-bottom: 8px;
 }
 
-/* RELEASE INFO + VERSION — одна высота */
+/* RELEASE INFO + VERSION вЂ” РѕРґРЅР° РІС‹СЃРѕС‚Р° */
 .nav-context .release-info {
   display: flex;
   flex-direction: column;
@@ -753,7 +753,7 @@ nav.top-nav {
   color: rgba(88, 166, 255, 0.6);
 }
 
-/* NAV BACK ARROW — отдельная стрелка слева, как back-to-top, только в другую сторону */
+/* NAV BACK ARROW вЂ” РѕС‚РґРµР»СЊРЅР°СЏ СЃС‚СЂРµР»РєР° СЃР»РµРІР°, РєР°Рє back-to-top, С‚РѕР»СЊРєРѕ РІ РґСЂСѓРіСѓСЋ СЃС‚РѕСЂРѕРЅСѓ */
 .nav-back-arrow {
   position: fixed;
   top: 82px;
@@ -850,7 +850,7 @@ nav.top-nav {
   background: rgba(48, 54, 61, 0.25);
 }
 .cal-year-label::after {
-  content: '▾';
+  content: 'в–ѕ';
   color: #6e7681;
   font-size: 11px;
   display: inline-block;
@@ -934,7 +934,7 @@ nav.top-nav {
 .cal-patch.sub {
   background: rgba(110, 118, 129, 0.22);
 }
-/* Major patches — unified solid orange (compact) */
+/* Major patches вЂ” unified solid orange (compact) */
 .cal-patch.major {
   background: rgba(212, 138, 78, 0.60);
   border-color: rgba(212, 138, 78, 0.75);
@@ -950,7 +950,7 @@ nav.top-nav {
   text-decoration-color: rgba(255, 255, 255, 0.40);
 }
 
-/* CURRENT patch — заранее увеличена (compact mode) */
+/* CURRENT patch вЂ” Р·Р°СЂР°РЅРµРµ СѓРІРµР»РёС‡РµРЅР° (compact mode) */
 .cal-patch.current {
   transform: scale(1.10);
   filter: brightness(1.12);
@@ -1018,7 +1018,7 @@ span.cal-patch {
   background: rgba(110, 118, 129, 0.4);
   color: #c9d1d9;
 }
-/* Major patches — unified solid orange (full grid) */
+/* Major patches вЂ” unified solid orange (full grid) */
 .cal-full-day.has-patch.major {
   background: rgba(212, 138, 78, 0.80);
   color: #fff;
@@ -1026,7 +1026,7 @@ span.cal-patch {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
 }
 
-/* CURRENT patch — заранее увеличена (full mode) */
+/* CURRENT patch вЂ” Р·Р°СЂР°РЅРµРµ СѓРІРµР»РёС‡РµРЅР° (full mode) */
 .cal-full-day.has-patch.current {
   transform: scale(1.5);
   z-index: 4;
@@ -1250,7 +1250,7 @@ h4.ability-title {
 /* CHANGES LIST — grid layout: [tag] [text] [percentages] */
 ul.changes {
   list-style: none;
-  margin: 3px 0 3px 30px;
+  margin: 3px 0 3px 0;     /* no left indent — tags align with entity-block edge */
 }
 ul.changes li {
   display: grid;
@@ -1262,14 +1262,20 @@ ul.changes li {
   line-height: 1.5;
   color: #c9d1d9;
 }
-/* Left column: text-tag goes here */
+/* Left column: text-tag (or empty placeholder) — share box dimensions for alignment */
 ul.changes li > .badge:first-child,
 ul.changes li > .row-tag-empty {
   grid-column: 1;
   text-align: center;
   align-self: start;
+  display: inline-block;
+  min-width: 56px;
+  height: 18px;            /* fixed visual height */
+  line-height: 16px;       /* center text vertically */
+  box-sizing: border-box;
   margin-top: 2px;
 }
+ul.changes li > .row-tag-empty { visibility: hidden; }
 /* Middle column: description */
 ul.changes li > .row-text {
   grid-column: 2;
@@ -1284,7 +1290,7 @@ ul.changes li > .correction-note,
 ul.changes li > .formula-table {
   grid-column: 1 / -1;
 }
-/* Raw <li> without .row-text wrapper (rare special-case manual rows) — block layout
+/* Raw <li> without .row-text wrapper (rare special-case manual rows) вЂ” block layout
    with auto-generated left tag from data-tag attribute via ::before. */
 ul.changes li:not(:has(> .row-text)) {
   display: block;
@@ -1332,7 +1338,7 @@ ul.changes li:not(:has(> .row-text)) > .badge.nerf-text {
 
 ul.subnotes {
   list-style: none;
-  margin: -2px 0 4px 80px;
+  margin: -2px 0 4px 76px;   /* aligns with text column start (64px tag + 12px gap) */
 }
 ul.subnotes li {
   color: #8b949e;
@@ -1340,9 +1346,9 @@ ul.subnotes li {
   padding: 1px 0;
   line-height: 1.4;
 }
-ul.subnotes li::before { content: "↳ "; color: #6e7681; }
+ul.subnotes li::before { content: "в†і "; color: #6e7681; }
 
-/* BADGES — flat rectangular tag boxes */
+/* BADGES вЂ” flat rectangular tag boxes */
 .badge {
   display: inline-block;
   padding: 1px 6px;
@@ -1357,7 +1363,7 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   min-width: 56px;
   text-align: center;
 }
-/* When inside .badge-group → strip the box, become plain colored text */
+/* When inside .badge-group в†’ strip the box, become plain colored text */
 .badge-group {
   display: inline-flex;
   gap: 0;
@@ -1385,39 +1391,37 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   font-weight: 400;
 }
 
-/* NEUTRAL & TEXT TAGS */
+/* NEUTRAL & TEXT TAGS — dim/translucent flat boxes */
 .badge.neutral {
-  background: rgba(139, 148, 158, 0.12);
-  color: #8b949e;
-  border: 1px solid rgba(139, 148, 158, 0.3);
+  background: rgba(139, 148, 158, 0.06);
+  color: #6e7681;
+  border: 1px solid rgba(139, 148, 158, 0.18);
 }
 .badge.rework {
-  background: rgba(180, 145, 220, 0.07);
-  color: #9988aa;
-  border: 1px solid rgba(180, 145, 220, 0.22);
+  background: rgba(180, 145, 220, 0.05);
+  color: #7d6e93;
+  border: 1px solid rgba(180, 145, 220, 0.15);
 }
 .badge.misc {
-  background: rgba(139, 148, 158, 0.10);
-  color: #8b949e;
-  border: 1px solid rgba(139, 148, 158, 0.28);
+  background: rgba(139, 148, 158, 0.06);
+  color: #6e7681;
+  border: 1px solid rgba(139, 148, 158, 0.18);
 }
 .badge.qol {
-  background: rgba(121, 192, 255, 0.10);
-  color: #a8c0d8;
-  border: 1px solid rgba(121, 192, 255, 0.32);
+  background: rgba(121, 192, 255, 0.06);
+  color: #87a3bf;
+  border: 1px solid rgba(121, 192, 255, 0.20);
 }
 .badge.new {
-  background: rgba(220, 175, 95, 0.09);
-  color: #b8945a;
-  border: 1px solid rgba(220, 175, 95, 0.32);
-  font-weight: 700;
+  background: rgba(220, 175, 95, 0.06);
+  color: #9a7f4d;
+  border: 1px solid rgba(220, 175, 95, 0.22);
   letter-spacing: 0.5px;
 }
 .badge.del {
-  background: rgba(180, 70, 70, 0.10);
-  color: #c97070;
-  border: 1px solid rgba(180, 70, 70, 0.36);
-  font-weight: 700;
+  background: rgba(180, 70, 70, 0.07);
+  color: #a86060;
+  border: 1px solid rgba(180, 70, 70, 0.25);
   letter-spacing: 0.5px;
 }
 
@@ -1453,9 +1457,9 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
 }
 
-/* Text-tag versions of BUFF/NERF (used by t() for non-numeric changes; pick mid tier) */
-.badge.buff-text { background: rgba(85, 205, 115, 0.22); color: #74bd80; border: 1px solid rgba(85, 205, 115, 0.50); }
-.badge.nerf-text { background: rgba(225, 90, 75, 0.22);  color: #b87468; border: 1px solid rgba(225, 90, 75, 0.50); }
+/* Text-tag versions of BUFF/NERF — dim/translucent */
+.badge.buff-text { background: rgba(85, 205, 115, 0.10); color: #6da375; border: 1px solid rgba(85, 205, 115, 0.28); }
+.badge.nerf-text { background: rgba(225, 90, 75, 0.10);  color: #a86158; border: 1px solid rgba(225, 90, 75, 0.28); }
 
 /* TYPO NOTE */
 .typo-note {
@@ -1465,7 +1469,7 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   margin-left: 6px;
 }
 
-/* WRONG-CHANGE LINE + CORRECTION NOTE — subtle gray */
+/* WRONG-CHANGE LINE + CORRECTION NOTE вЂ” subtle gray */
 .wrong-line {
   text-decoration: line-through;
   text-decoration-color: rgba(201, 209, 217, 0.5);
@@ -1502,7 +1506,7 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
 .entity-icon img[alt]:not([src*="//"]) { background: #21262d; }
 img { max-width: 100%; }
 
-/* BACK TO TOP — fixed bottom-right */
+/* BACK TO TOP вЂ” fixed bottom-right */
 .back-to-top {
   position: fixed;
   bottom: 22px;
@@ -1536,7 +1540,7 @@ img { max-width: 100%; }
   display: flex;
 }
 
-/* WRONG-WORD HIGHLIGHT — subtle, neutral marker (no strikethrough) */
+/* WRONG-WORD HIGHLIGHT вЂ” subtle, neutral marker (no strikethrough) */
 .wrong-word {
   background: rgba(139, 148, 158, 0.08);
   color: #8b949e;
@@ -1544,7 +1548,7 @@ img { max-width: 100%; }
   border-radius: 3px;
 }
 
-/* FORMULA TRIGGER — same neutral, squared-off look as .wrong-word, clickable */
+/* FORMULA TRIGGER вЂ” same neutral, squared-off look as .wrong-word, clickable */
 .formula-trigger {
   display: inline-block;
   padding: 0 5px;
@@ -1568,7 +1572,7 @@ img { max-width: 100%; }
   border-color: rgba(139, 148, 158, 0.60);
   color: #c9d1d9;
 }
-/* OLD FORMULA — just a subtle dotted underline so it stands out as "the old one" */
+/* OLD FORMULA вЂ” just a subtle dotted underline so it stands out as "the old one" */
 .formula-old {
   text-decoration: underline dotted rgba(139, 148, 158, 0.45);
   text-underline-offset: 3px;
@@ -1577,13 +1581,12 @@ img { max-width: 100%; }
 
 /* FORMULA COMPARISON TABLE */
 .formula-table {
-  margin: 10px auto 6px;
+  margin: 8px 0 6px;
   border-collapse: separate;
   border-spacing: 2px;
   font-size: 11px;
   width: 100%;
-  max-width: 1020px;
-  table-layout: fixed;
+  table-layout: auto;        /* let cells size by content */
   font-variant-numeric: tabular-nums;
 }
 .formula-table[hidden] { display: none; }
@@ -1617,10 +1620,16 @@ img { max-width: 100%; }
 }
 .formula-table tbody td .badge {
   margin-left: 0;
-  padding: 1px 4px;
-  font-size: 10.5px;
-  border-radius: 8px;
-  display: inline-block;
+  padding: 0;
+  font-size: 11px;
+  border-radius: 0;
+  background: none !important;
+  border: none !important;
+  text-shadow: none !important;
+  display: inline;
+  min-width: 0;
+  text-transform: none;
+  letter-spacing: 0;
 }
 .formula-table .row-label-old { color: #ff9a8c; }
 .formula-table .row-label-new { color: #92c89e; }
@@ -1630,7 +1639,7 @@ img { max-width: 100%; }
   background-clip: padding-box !important;
 }
 
-/* FILTER BUTTONS in legend — make tags clickable */
+/* FILTER BUTTONS in legend вЂ” make tags clickable */
 .legend-tags .badge.filter-btn {
   cursor: pointer;
   user-select: none;
@@ -1695,7 +1704,7 @@ PATCHES = [
     {"version": "7.08",  "date": "01.02.2018", "filename": "patches/7.08.html"},
 ]
 
-# Includes patches without HTML (e.g. 7.41a) — used only for "days between" math.
+# Includes patches without HTML (e.g. 7.41a) вЂ” used only for "days between" math.
 # Major-patch dates from odota/dotaconstants. Sub-patches sourced from Liquipedia
 # and Fandom. Append new entries here when patches release; sorted internally.
 RELEASE_HISTORY = [
@@ -1842,7 +1851,7 @@ RELEASE_HISTORY = [
 
 
 def _parse_date(dmy):
-    """'06.05.2026' → date(2026, 5, 6)."""
+    """'06.05.2026' в†’ date(2026, 5, 6)."""
     from datetime import date as _D
     d, m, y = dmy.split('.')
     return _D(int(y), int(m), int(d))
@@ -1851,8 +1860,8 @@ def _parse_date(dmy):
 def _patch_age_line(version):
     """Build the small subtitle under the release date.
 
-    For latest patch:   "29 days after 7.41b · running for 2 days"
-    For older patches:  "10 days after 7.41a · ran for 29 days"
+    For latest patch:   "29 days after 7.41b В· running for 2 days"
+    For older patches:  "10 days after 7.41a В· ran for 29 days"
     Returns empty string if previous patch unknown.
     """
     from datetime import date as _D
@@ -1875,13 +1884,13 @@ def _patch_age_line(version):
             n = (today - cur_date).days
             unit = "day" if n == 1 else "days"
             tail = f"running for {n} {unit}" if n > 0 else "released today"
-        return f"{prev_part} · {tail}" if prev_part else tail
+        return f"{prev_part} В· {tail}" if prev_part else tail
     return ""
 
 
 def _dropdown_options_html(current_version, patch_context=False):
     """Render menu items list for the version dropdown.
-    patch_context=True when rendered inside a patch page (patches/ folder) —
+    patch_context=True when rendered inside a patch page (patches/ folder) вЂ”
     links use plain 'version.html' (same directory) instead of root-relative paths."""
     items = []
     for p in PATCHES:
@@ -1903,7 +1912,7 @@ def _dropdown_options_html(current_version, patch_context=False):
 
 def _render_top_nav(active="changelogs", current_version=None, date=None, patch_context=False):
     """Render the top nav. active in ('changelogs', 'calendar').
-    patch_context=True when rendering inside a patch page (patches/ folder) —
+    patch_context=True when rendering inside a patch page (patches/ folder) вЂ”
     hrefs use ../ prefix for root files and plain filenames for sibling patches."""
     if patch_context:
         latest = PATCHES[0]['version'] + ".html" if PATCHES else "#"
@@ -1926,7 +1935,7 @@ def _render_top_nav(active="changelogs", current_version=None, date=None, patch_
       </div>
       <div class="version-dropdown">
         <button class="version" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Select patch version">
-          {current_version} <span class="version-chev">▾</span>
+          {current_version} <span class="version-chev">в–ѕ</span>
         </button>
         <div class="version-menu" role="menu">
           {options}
@@ -1960,7 +1969,7 @@ def write_head(version, date):
 <body>
 
 {nav}
-<a class="nav-back-arrow" href="../calendar.html" aria-label="Back to calendar" title="Back to calendar">←</a>
+<a class="nav-back-arrow" href="../calendar.html" aria-label="Back to calendar" title="Back to calendar">в†ђ</a>
 <div class="container">
 
 <div class="toolbar">
@@ -1975,7 +1984,7 @@ def write_head(version, date):
     <button class="badge qol filter-btn" data-filter="qol">QoL</button>
   </div>
   <div class="search-box">
-    <input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">
+    <input type="text" id="entity-search" placeholder="Search heroes, items, abilitiesвЂ¦" autocomplete="off" spellcheck="false">
     <div class="search-results" id="search-results"></div>
   </div>
 </div>
@@ -2052,7 +2061,7 @@ JS_TEXT = '''
     const html = text
       .replace(/\b(\d+\.\d+[a-z]?)\b/g, '<strong>$1</strong>')   // version like 7.41b
       .replace(/\b(\d+)\b(?=\s+days?)/g, '<strong>$1</strong>')   // numbers before "days"
-      .replace(/·/g, '<span class="age-sep">·</span>');
+      .replace(/В·/g, '<span class="age-sep">В·</span>');
     ageEl.innerHTML = html;
   }
 
@@ -2229,7 +2238,7 @@ JS_TEXT = '''
 def write_footer():
     """Render close-block + back-to-top button + script tag + closing tags."""
     W(_close_block())
-    W('<button class="back-to-top" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})">↑</button>')
+    W('<button class="back-to-top" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})">в†‘</button>')
     W('<script src="../scripts.js"></script>')
     W('</div></body></html>')
 
@@ -2240,8 +2249,8 @@ def save_assets():
         f.write(CSS)
     with open('scripts.js', 'w', encoding='utf-8') as f:
         f.write(JS_TEXT)
-    print(f"  → styles.css: {len(CSS):,} bytes")
-    print(f"  → scripts.js: {len(JS_TEXT):,} bytes")
+    print(f"  в†’ styles.css: {len(CSS):,} bytes")
+    print(f"  в†’ scripts.js: {len(JS_TEXT):,} bytes")
 
 
 def save_html(filename):
@@ -2251,7 +2260,7 @@ def save_html(filename):
     os.makedirs(os.path.dirname(path), exist_ok=True) if os.path.dirname(path) else None
     with open(path, "w", encoding="utf-8") as f:
         f.write(out)
-    print(f"  → {filename}: {len(out):,} bytes")
+    print(f"  в†’ {filename}: {len(out):,} bytes")
     H.clear()
     _State.block_open = False
 
@@ -2295,7 +2304,7 @@ def _current_version():
 
 
 def save_calendar_html():
-    """Generate calendar.html — both modes inside a shared collapsible year block."""
+    """Generate calendar.html вЂ” both modes inside a shared collapsible year block."""
     from datetime import datetime
     from calendar import monthrange
     import re as _re
@@ -2431,7 +2440,7 @@ def save_calendar_html():
     )
     with open('calendar.html', 'w', encoding='utf-8') as f:
         f.write(html)
-    print(f"  → calendar.html: {len(html):,} bytes")
+    print(f"  в†’ calendar.html: {len(html):,} bytes")
 
 
 # ============================================================
@@ -2440,9 +2449,9 @@ def save_calendar_html():
 save_assets()
 write_head("7.41c", "06.05.2026")
 
-# 7.41c content is HANDCRAFTED — preserves manual corrections, formula tables,
+# 7.41c content is HANDCRAFTED вЂ” preserves manual corrections, formula tables,
 # wrong-line/wrong-word annotations and subnotes that auto-gen can't produce.
-# 7.41c content was originally raw HTML — converted to W() calls
+# 7.41c content was originally raw HTML вЂ” converted to W() calls
 # via _convert_handcrafted.py. Special inline HTML preserved as W('''...''').
 W(section("General Updates"))
 W(plain_header("Mechanics"))
@@ -2458,7 +2467,7 @@ W(ul_close())
 W(section("Item Updates"))
 W(item_header("Bloodstone"))
 W(ul_open())
-W('''<li data-tag="nerf"><span class="wrong-line">Health bonus increased from +600 to +625 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span></span> <div class="correction-note"><span class="correction-label">Note</span>— This change is wrongly stated. The real change is 650 → 625 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span></span></div></li>''')
+W('''<li data-tag="nerf"><span class="wrong-line">Health bonus increased from +600 to +625 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span></span> <div class="correction-note"><span class="correction-label">Note</span>вЂ” This change is wrongly stated. The real change is 650 в†’ 625 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span></span></div></li>''')
 W(li("Bloodpact cooldown increased from 30s to 35s", b(30, 35, l=True)))
 W(li("Spell Weakness Aura damage from spells taken decreased from 12% to 10%", b(12, 10)))
 W(ul_close())
@@ -2530,7 +2539,7 @@ W(ul_close())
 W(subnote("Damage at level 1 unchanged at 49-59"))
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 — Curse of Avernus DPS increased from +25 to +30", b(25, 30)))
+W(li("Level 10 вЂ” Curse of Avernus DPS increased from +25 to +30", b(25, 30)))
 W(ul_close())
 W(hero_header("Alchemist"))
 W(subgroup("Abilities"))
@@ -2555,7 +2564,7 @@ W(li("Base Area of Effect Radius increased from 275 to 300", b(275, 300)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 20 — Chilling Touch Damage increased from +80 to +100", b(80, 100)))
+W(li("Level 20 вЂ” Chilling Touch Damage increased from +80 to +100", b(80, 100)))
 W(ul_close())
 W(hero_header("Anti-Mage"))
 W(subgroup("Abilities"))
@@ -2642,7 +2651,7 @@ W(li("Cooldown increased from 13s to 15s", b(13, 15, l=True)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 25 — Bristleback Damage Threshold Reduction increased from 25 to 30", b(25, 30)))
+W(li("Level 25 вЂ” Bristleback Damage Threshold Reduction increased from 25 to 30", b(25, 30)))
 W(ul_close())
 W(hero_header("Broodmother"))
 W(subgroup("Abilities"))
@@ -2662,7 +2671,7 @@ W(li("Strength gain increased from 4.2 to 4.3", b(4.2, 4.3)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 25 — Hoof Stomp Duration increased from +0.8s to +1.0s", b(0.8, 1)))
+W(li("Level 25 вЂ” Hoof Stomp Duration increased from +0.8s to +1.0s", b(0.8, 1)))
 W(ul_close())
 W(hero_header("Chaos Knight"))
 W(subgroup("Abilities"))
@@ -2726,8 +2735,8 @@ W(ul_close())
 W(hero_header("Faceless Void"))
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 20 — Time Walk Cooldown Reduction decreased from 1.25s to 1s", b(1.25, 1)))
-W(li("Level 20 — Attack Speed during Chronosphere decreased from +100 to +80", b(100, 80)))
+W(li("Level 20 вЂ” Time Walk Cooldown Reduction decreased from 1.25s to 1s", b(1.25, 1)))
+W(li("Level 20 вЂ” Attack Speed during Chronosphere decreased from +100 to +80", b(100, 80)))
 W(ul_close())
 W(hero_header("Gyrocopter"))
 W(subgroup("Abilities"))
@@ -2787,13 +2796,13 @@ W(hero_header("Kunkka"))
 W(subgroup("Abilities"))
 W(ability("Admiral's Rum"))
 W(ul_open())
-W(li("Cooldown decreased from 60.5s − 0.5s per level to 50.5s − 0.5s per level", '<span class="badge-group" data-overall="buff"><span class="badge buff4">+17%</span></span>'))
+W(li("Cooldown decreased from 60.5s в€’ 0.5s per level to 50.5s в€’ 0.5s per level", '<span class="badge-group" data-overall="buff"><span class="badge buff4">+17%</span></span>'))
 W(ul_close())
 W(hero_header("Largo"))
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 20 — +200 Catchy Lick Damage replaced with 2× Catchy Lick Charges", '<span class="badge rework" data-tag="rework">REWORK</span>'))
-W(li("Level 25 — 2× Catchy Lick Charges replaced with 2× Frogstomp Stomps / Interval", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 20 вЂ” +200 Catchy Lick Damage replaced with 2Г— Catchy Lick Charges", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 25 вЂ” 2Г— Catchy Lick Charges replaced with 2Г— Frogstomp Stomps / Interval", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
 W(hero_header("Lich"))
 W(subgroup("Abilities"))
@@ -2830,15 +2839,15 @@ W(li("Aghanim's Shard bonus movement speed decreased from 15% to 10%", b(15, 10)
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 — −25s Summon Spirit Bear Cooldown replaced with +5s True Form Duration", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 10 вЂ” в€’25s Summon Spirit Bear Cooldown replaced with +5s True Form Duration", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
 W(unit_header("Spirit Bear", "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/lone_druid_spirit_bear.png"))
 W(ul_open())
-W('''<li data-tag="buff rework">Gold/Experience Bounty changed from <span class="formula-old">175 + 8 per Spirit Bear level</span> up to <span class="formula-trigger" data-formula="f1">165 + 10 per Spirit Bear level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><table class="formula-table" id="f1" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th><th class="lvl-jump">L20</th><th>L25</th><th>L30</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>183</td><td>191</td><td>199</td><td>207</td><td>215</td><td>223</td><td>231</td><td>239</td><td>247</td><td>255</td><td>263</td><td>271</td><td>279</td><td>287</td><td>295</td><td class="lvl-jump">335</td><td>375</td><td>415</td></tr><tr><th class="row-label-new">new</th><td>175</td><td>185</td><td>195</td><td>205</td><td>215</td><td>225</td><td>235</td><td>245</td><td>255</td><td>265</td><td>275</td><td>285</td><td>295</td><td>305</td><td>315</td><td class="lvl-jump">365</td><td>415</td><td>465</td></tr><tr><th>Δ %</th><td><span class="badge buff1">+4%</span></td><td><span class="badge buff1">+3%</span></td><td><span class="badge buff1">+2%</span></td><td><span class="badge buff1">+1%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf1">-1%</span></td><td><span class="badge nerf1">-2%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-4%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-7%</span></td><td class="lvl-jump"><span class="badge nerf2">-9%</span></td><td><span class="badge nerf3">-11%</span></td><td><span class="badge nerf3">-12%</span></td></tr></tbody></table></li>''')
+W('''<li data-tag="buff rework">Gold/Experience Bounty changed from <span class="formula-old">175 + 8 per Spirit Bear level</span> up to <span class="formula-trigger" data-formula="f1">165 + 10 per Spirit Bear level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><table class="formula-table" id="f1" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th><th class="lvl-jump">L20</th><th>L25</th><th>L30</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>183</td><td>191</td><td>199</td><td>207</td><td>215</td><td>223</td><td>231</td><td>239</td><td>247</td><td>255</td><td>263</td><td>271</td><td>279</td><td>287</td><td>295</td><td class="lvl-jump">335</td><td>375</td><td>415</td></tr><tr><th class="row-label-new">new</th><td>175</td><td>185</td><td>195</td><td>205</td><td>215</td><td>225</td><td>235</td><td>245</td><td>255</td><td>265</td><td>275</td><td>285</td><td>295</td><td>305</td><td>315</td><td class="lvl-jump">365</td><td>415</td><td>465</td></tr><tr><th>О” %</th><td><span class="badge buff1">+4%</span></td><td><span class="badge buff1">+3%</span></td><td><span class="badge buff1">+2%</span></td><td><span class="badge buff1">+1%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf1">-1%</span></td><td><span class="badge nerf1">-2%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-4%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-7%</span></td><td class="lvl-jump"><span class="badge nerf2">-9%</span></td><td><span class="badge nerf3">-11%</span></td><td><span class="badge nerf3">-12%</span></td></tr></tbody></table></li>''')
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 25 — Demolish Bonus Building Damage decreased from +20% to +15%", b(20, 15)))
+W(li("Level 25 вЂ” Demolish Bonus Building Damage decreased from +20% to +15%", b(20, 15)))
 W(ul_close())
 W(hero_header("Lycan"))
 W(subgroup("Abilities"))
@@ -2848,8 +2857,8 @@ W(li("Health Regen increased from 1/3/5/7 to 2/4/6/8", b([1, 3, 5, 7], [2, 4, 6,
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 — Wolves Damage increased from +10 to +14", b(10, 14)))
-W(li("Level 15 — Summon Wolves Health increased from +350 to +375", b(350, 375)))
+W(li("Level 10 вЂ” Wolves Damage increased from +10 to +14", b(10, 14)))
+W(li("Level 15 вЂ” Summon Wolves Health increased from +350 to +375", b(350, 375)))
 W(ul_close())
 W(hero_header("Magnus"))
 W(subgroup("Abilities"))
@@ -2859,7 +2868,7 @@ W(li("Slow Duration increased from 0.4/0.6/0.8/1.0s to 0.55/0.7/0.85/1.0s", b([0
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 — All Attributes per hero hit with Reverse Polarity increased from +12 to +14", b(12, 14)))
+W(li("Level 15 вЂ” All Attributes per hero hit with Reverse Polarity increased from +12 to +14", b(12, 14)))
 W(ul_close())
 W(hero_header("Marci"))
 W(subgroup("Abilities"))
@@ -2869,7 +2878,7 @@ W(li("Cast Range increased from 500 to 600", b(500, 600)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 — Dispose Damage increased from +100 to +115", b(100, 115)))
+W(li("Level 15 вЂ” Dispose Damage increased from +100 to +115", b(100, 115)))
 W(ul_close())
 W(hero_header("Mars"))
 W(subgroup("Abilities"))
@@ -2889,8 +2898,8 @@ W(li("Damage increased from 60/150/240/330 to 60/160/260/360", b([60, 150, 240, 
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 — Leap Attack Speed increased from +90 to +100", b(90, 100)))
-W(li("Level 20 — Celestial Quiver Damage increased from +40 to +50", b(40, 50)))
+W(li("Level 15 вЂ” Leap Attack Speed increased from +90 to +100", b(90, 100)))
+W(li("Level 20 вЂ” Celestial Quiver Damage increased from +40 to +50", b(40, 50)))
 W(ul_close())
 W(hero_header("Monkey King"))
 W(ul_open())
@@ -2926,8 +2935,8 @@ W(li("Treant Bonus Hero Damage increased from 4/8/12/16 to 6/10/14/18", b([4, 8,
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 20 — Sprout Damage increased from +170 to +220", b(170, 220)))
-W(li("Level 20 — Wrath of Nature Cooldown Reduction increased from 15s to 20s", b(15, 20)))
+W(li("Level 20 вЂ” Sprout Damage increased from +170 to +220", b(170, 220)))
+W(li("Level 20 вЂ” Wrath of Nature Cooldown Reduction increased from 15s to 20s", b(15, 20)))
 W(ul_close())
 W(hero_header("Ogre Magi"))
 W(ul_open())
@@ -2955,7 +2964,7 @@ W(li("Radius increased from 450/500/550 to 500/525/550", b([450, 500, 550], [500
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 20 — Astral Imprisonment Mana Capacity Steal increased from 10% to 12%", b(10, 12)))
+W(li("Level 20 вЂ” Astral Imprisonment Mana Capacity Steal increased from 10% to 12%", b(10, 12)))
 W(ul_close())
 W(hero_header("Pangolier"))
 W(ul_open())
@@ -2972,7 +2981,7 @@ W(li("Mana Cost increased from 50 to 75", b(50, 75, l=True)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 — Lucky Shot Armor Reduction decreased from +3 to +2", b(3, 2)))
+W(li("Level 10 вЂ” Lucky Shot Armor Reduction decreased from +3 to +2", b(3, 2)))
 W(ul_close())
 W(hero_header("Phantom Assassin"))
 W(ul_open())
@@ -2981,7 +2990,7 @@ W(li("Damage at level 1 increased from 56-58 to 57-59", '<span class="badge-grou
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 — Phantom Strike Duration increased from +0.6 to +0.8s", b(0.6, 0.8)))
+W(li("Level 10 вЂ” Phantom Strike Duration increased from +0.6 to +0.8s", b(0.6, 0.8)))
 W(ul_close())
 W(hero_header("Phantom Lancer"))
 W(subgroup("Abilities"))
@@ -3012,8 +3021,8 @@ W(ul_close())
 W(hero_header("Puck"))
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 — −15s Dream Coil Cooldown replaced with +2% Puckish Health and Mana Restoration", '<span class="badge rework" data-tag="rework">REWORK</span>'))
-W(li("Level 25 — Dream Coil Pierces Debuff Immunity replaced with −30s Dream Coil Cooldown", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 15 вЂ” в€’15s Dream Coil Cooldown replaced with +2% Puckish Health and Mana Restoration", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 25 вЂ” Dream Coil Pierces Debuff Immunity replaced with в€’30s Dream Coil Cooldown", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
 W(hero_header("Queen of Pain"))
 W(ul_open())
@@ -3028,8 +3037,8 @@ W(ul_close())
 W(hero_header("Razor"))
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 — Static Link Damage Steal increased from +5 to +6", b(5, 6)))
-W(li("Level 20 — Storm Surge Slow and Damage increased from +30% to +35%", b(30, 35)))
+W(li("Level 15 вЂ” Static Link Damage Steal increased from +5 to +6", b(5, 6)))
+W(li("Level 20 вЂ” Storm Surge Slow and Damage increased from +30% to +35%", b(30, 35)))
 W(ul_close())
 W(hero_header("Rubick"))
 W(ul_open())
@@ -3037,9 +3046,9 @@ W(li("Agility gain decreased from 2.5 to 2.2", b(2.5, 2.2)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 — Fade Bolt Cooldown Reduction increased from 3s to 4s", b(3, 4)))
-W(li("Level 15 — Stolen Spells Mana Cost Reduction decreased from 50% to 40%", b(50, 40)))
-W(li("Level 25 — Curiosity Bonuses decreased from 2× to 1.5×", '<span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span></span>'))
+W(li("Level 15 вЂ” Fade Bolt Cooldown Reduction increased from 3s to 4s", b(3, 4)))
+W(li("Level 15 вЂ” Stolen Spells Mana Cost Reduction decreased from 50% to 40%", b(50, 40)))
+W(li("Level 25 вЂ” Curiosity Bonuses decreased from 2Г— to 1.5Г—", '<span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span></span>'))
 W(ul_close())
 W(hero_header("Sand King"))
 W(ul_open())
@@ -3099,7 +3108,7 @@ W('''<li data-tag="buff new">Now gains a charge every 3 levels <span class="badg
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 — Overload Attack/Movement Speed Slow increased from +20/20% to +25/25%", b([20, 20], [25, 25])))
+W(li("Level 10 вЂ” Overload Attack/Movement Speed Slow increased from +20/20% to +25/25%", b([20, 20], [25, 25])))
 W(ul_close())
 W(hero_header("Sven"))
 W(subgroup("Abilities"))
@@ -3116,7 +3125,7 @@ W(ul_close())
 W(subgroup("Abilities"))
 W(ability("M.A.D."))
 W(ul_open())
-W('''<li data-tag="buff rework">Mana Pool as Regen rescaled from <span class="formula-old">0.08% + 0.02% per level</span> to <span class="formula-trigger" data-formula="f2">0.1% + 0.01% per level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span></span><table class="formula-table" id="f2" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th><th class="lvl-jump">L20</th><th>L25</th><th>L30</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>0.10%</td><td>0.12%</td><td>0.14%</td><td>0.16%</td><td>0.18%</td><td>0.20%</td><td>0.22%</td><td>0.24%</td><td>0.26%</td><td>0.28%</td><td>0.30%</td><td>0.32%</td><td>0.34%</td><td>0.36%</td><td>0.38%</td><td class="lvl-jump">0.48%</td><td>0.58%</td><td>0.68%</td></tr><tr><th class="row-label-new">new</th><td>0.11%</td><td>0.12%</td><td>0.13%</td><td>0.14%</td><td>0.15%</td><td>0.16%</td><td>0.17%</td><td>0.18%</td><td>0.19%</td><td>0.20%</td><td>0.21%</td><td>0.22%</td><td>0.23%</td><td>0.24%</td><td>0.25%</td><td class="lvl-jump">0.30%</td><td>0.35%</td><td>0.40%</td></tr><tr><th>Δ %</th><td><span class="badge buff2">+10%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf2">-7%</span></td><td><span class="badge nerf3">-12%</span></td><td><span class="badge nerf4">-17%</span></td><td><span class="badge nerf4">-20%</span></td><td><span class="badge nerf5">-23%</span></td><td><span class="badge nerf5">-25%</span></td><td><span class="badge nerf6">-27%</span></td><td><span class="badge nerf6">-29%</span></td><td><span class="badge nerf6">-30%</span></td><td><span class="badge nerf6">-31%</span></td><td><span class="badge nerf6">-32%</span></td><td><span class="badge nerf6">-33%</span></td><td><span class="badge nerf7">-34%</span></td><td class="lvl-jump"><span class="badge nerf7">-37%</span></td><td><span class="badge nerf7">-40%</span></td><td><span class="badge nerf7">-41%</span></td></tr></tbody></table></li>''')
+W('''<li data-tag="buff rework">Mana Pool as Regen rescaled from <span class="formula-old">0.08% + 0.02% per level</span> to <span class="formula-trigger" data-formula="f2">0.1% + 0.01% per level</span> <span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff2">+10%</span></span><table class="formula-table" id="f2" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th><th class="lvl-jump">L20</th><th>L25</th><th>L30</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>0.10%</td><td>0.12%</td><td>0.14%</td><td>0.16%</td><td>0.18%</td><td>0.20%</td><td>0.22%</td><td>0.24%</td><td>0.26%</td><td>0.28%</td><td>0.30%</td><td>0.32%</td><td>0.34%</td><td>0.36%</td><td>0.38%</td><td class="lvl-jump">0.48%</td><td>0.58%</td><td>0.68%</td></tr><tr><th class="row-label-new">new</th><td>0.11%</td><td>0.12%</td><td>0.13%</td><td>0.14%</td><td>0.15%</td><td>0.16%</td><td>0.17%</td><td>0.18%</td><td>0.19%</td><td>0.20%</td><td>0.21%</td><td>0.22%</td><td>0.23%</td><td>0.24%</td><td>0.25%</td><td class="lvl-jump">0.30%</td><td>0.35%</td><td>0.40%</td></tr><tr><th>О” %</th><td><span class="badge buff2">+10%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf2">-7%</span></td><td><span class="badge nerf3">-12%</span></td><td><span class="badge nerf4">-17%</span></td><td><span class="badge nerf4">-20%</span></td><td><span class="badge nerf5">-23%</span></td><td><span class="badge nerf5">-25%</span></td><td><span class="badge nerf6">-27%</span></td><td><span class="badge nerf6">-29%</span></td><td><span class="badge nerf6">-30%</span></td><td><span class="badge nerf6">-31%</span></td><td><span class="badge nerf6">-32%</span></td><td><span class="badge nerf6">-33%</span></td><td><span class="badge nerf7">-34%</span></td><td class="lvl-jump"><span class="badge nerf7">-37%</span></td><td><span class="badge nerf7">-40%</span></td><td><span class="badge nerf7">-41%</span></td></tr></tbody></table></li>''')
 W(ul_close())
 W(ability("Reactive Tazer"))
 W(ul_open())
@@ -3133,7 +3142,7 @@ W(ul_close())
 W(hero_header("Timbersaw"))
 W(ul_open())
 W(li("Base Damage increased by 2", bstat_h("Timbersaw", "AttackDamageMin", "7.41b", 2), extra=note_box("From 25 to 27")))
-W('''<li data-tag="buff">Damage at level 1 <span class="wrong-word">decreased</span> from 46-50 to 48-52 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><div class="correction-note"><span class="correction-label">Note</span>— The patch text says "decreased", but the values actually went up.</div></li>''')
+W('''<li data-tag="buff">Damage at level 1 <span class="wrong-word">decreased</span> from 46-50 to 48-52 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span><div class="correction-note"><span class="correction-label">Note</span>вЂ” The patch text says "decreased", but the values actually went up.</div></li>''')
 W(li("Base Intelligence increased from 23 to 24", b(23, 24)))
 W(ul_close())
 W(subgroup("Abilities"))
@@ -3158,8 +3167,8 @@ W(li("Toss Bonus Damage increased from 50/175/300 to 50/200/350", b([50, 175, 30
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 — +8 Strength replaced with +2 Tree Grab Attacks", '<span class="badge rework" data-tag="rework">REWORK</span>'))
-W(li("Level 15 — −8% Grow Attack Speed Reduction replaced with +10 Strength", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 10 вЂ” +8 Strength replaced with +2 Tree Grab Attacks", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 15 вЂ” в€’8% Grow Attack Speed Reduction replaced with +10 Strength", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
 W(hero_header("Treant Protector"))
 W(subgroup("Abilities"))
@@ -3169,7 +3178,7 @@ W(li("Added AoE indicator to cast", '<span class="badge qol" data-tag="qol">QoL<
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 — Living Armor Heal Per Second decreased from +4 to +3", b(4, 3)))
+W(li("Level 10 вЂ” Living Armor Heal Per Second decreased from +4 to +3", b(4, 3)))
 W(ul_close())
 W(hero_header("Troll Warlord"))
 W(subgroup("Abilities"))
@@ -3205,8 +3214,8 @@ W(li("Damage per second rescaled from 20/25/30/35 to 10/20/30/40", b([20, 25, 30
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 — Poison Sting Slow increased from +7% to +10%", b(7, 10)))
-W(li("Level 20 — +40% Snakebite Damage replaced with +100 Snakebite Initial Damage", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 15 вЂ” Poison Sting Slow increased from +7% to +10%", b(7, 10)))
+W(li("Level 20 вЂ” +40% Snakebite Damage replaced with +100 Snakebite Initial Damage", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
 W(hero_header("Viper"))
 W(subgroup("Abilities"))
@@ -3223,8 +3232,8 @@ W(ul_close())
 W(hero_header("Windranger"))
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 25 — Focus Fire Cooldown Advance on Kills decreased from 18s to 16s", b(18, 16)))
-W(li("Level 25 — Powershot Max HP Execution Threshold increased from 15% to 16%", b(15, 16)))
+W(li("Level 25 вЂ” Focus Fire Cooldown Advance on Kills decreased from 18s to 16s", b(18, 16)))
+W(li("Level 25 вЂ” Powershot Max HP Execution Threshold increased from 15% to 16%", b(15, 16)))
 W(ul_close())
 W(hero_header("Winter Wyvern"))
 W(subgroup("Abilities"))
@@ -3234,7 +3243,7 @@ W(li("Movement Slow decreased from 28/32/36/40% to 27/30/33/36%", b([28, 32, 36,
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 — Cold Embrace Base Heal per Second decreased from +20 to +15", b(20, 15)))
+W(li("Level 10 вЂ” Cold Embrace Base Heal per Second decreased from +20 to +15", b(20, 15)))
 W(ul_close())
 W(hero_header("Witch Doctor"))
 W(subgroup("Abilities"))
@@ -4100,7 +4109,7 @@ W(ul_close())
 W(hero_header("Chaos Knight"))
 W(ul_open())
 W(li("Base Damage increased by 3", bstat_h("Chaos Knight", "AttackDamageMin", "7.41", 3), extra=note_box("From 39 to 42")))
-W(li("Damage on level 1 increased from 53–73 to 56–76", t("BUFF")))
+W(li("Damage on level 1 increased from 53вЂ“73 to 56вЂ“76", t("BUFF")))
 W(ul_close())
 
 # Chen
@@ -4147,7 +4156,7 @@ W(ul_close())
 W(hero_header("Invoker"))
 W(ul_open())
 W(li("Base Intelligence increased from 20 to 22", b(20, 22)))
-W(li("Damage on level 1 increased from 39–45 to 41–47", t("BUFF")))
+W(li("Damage on level 1 increased from 39вЂ“45 to 41вЂ“47", t("BUFF")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -4213,7 +4222,7 @@ W(ul_close())
 W(hero_header("Lifestealer"))
 W(ul_open())
 W(li("Base Damage decreased by 3", bstat_h("Lifestealer", "AttackDamageMin", "7.41", -3), extra=note_box("From 19 to 16")))
-W(li("Damage on level 1 decreased from 49–55 to 46–52", t("NERF")))
+W(li("Damage on level 1 decreased from 49вЂ“55 to 46вЂ“52", t("NERF")))
 W(ul_close())
 W(ability("Ghoul Frenzy"))
 W(ul_open())
@@ -4395,7 +4404,7 @@ W(ul_close())
 W(hero_header("Windranger"))
 W(ul_open())
 W(li("Base Agility increased from 17 to 20", b(17, 20)))
-W(li("Damage on level 1 increased from 47–59 to 49–61", t("BUFF")))
+W(li("Damage on level 1 increased from 47вЂ“59 to 49вЂ“61", t("BUFF")))
 W(ul_close())
 W(ability("Tailwind"))
 W(ul_open())
@@ -4554,7 +4563,7 @@ W(subnote("* Eye of Skadi's Cold Attack<br>* Spirit Vessel's Soul Release<br>* O
 W(ul_open())
 W(li("As a result of the changes, spells that only modified Health Restoration will now additionally affect incoming heals", t("REWORK")))
 W(ul_close())
-W(subnote("* Sange<br>* Kaya and Sange<br>* Sange and Yasha<br>* Abyssal Blade<br>* Orb of Frost's Frost<br>* Orb of Corrosion's Corrosion<br>* Crippling Crossbow's Hobble<br>* Jidi Pollen Bag's Pollinate<br>* Item bonus from Crude enchantment<br>* Abaddon’s Withering Mist<br>* Drow Ranger’s Frost Arrows with Aghanim’s Scepter<br>* Slark's Saltwater Shiv"))
+W(subnote("* Sange<br>* Kaya and Sange<br>* Sange and Yasha<br>* Abyssal Blade<br>* Orb of Frost's Frost<br>* Orb of Corrosion's Corrosion<br>* Crippling Crossbow's Hobble<br>* Jidi Pollen Bag's Pollinate<br>* Item bonus from Crude enchantment<br>* AbaddonвЂ™s Withering Mist<br>* Drow RangerвЂ™s Frost Arrows with AghanimвЂ™s Scepter<br>* Slark's Saltwater Shiv"))
 
 W(subgroup("Lifesteal and Damage Manipulations"))
 W(ul_open())
@@ -5379,23 +5388,23 @@ W(li("Provides -18% Base Attack Time, +20% Cast Speed, <font color='#e03e2e'>-20
 W(ul_close())
 W(plain_header("Kobold Taskmaster"))
 W(ul_open())
-W(li("Damage increased from 22–24 to 24–26", t("BUFF")))
+W(li("Damage increased from 22вЂ“24 to 24вЂ“26", t("BUFF")))
 W(ul_close())
 W(plain_header("Kobold Tunneler"))
 W(ul_open())
-W(li("Damage increased from 20–21 to 22–23", t("BUFF")))
+W(li("Damage increased from 20вЂ“21 to 22вЂ“23", t("BUFF")))
 W(ul_close())
 W(plain_header("Kobold"))
 W(ul_open())
-W(li("Damage increased from 13–14 to 15–16", t("BUFF")))
+W(li("Damage increased from 13вЂ“14 to 15вЂ“16", t("BUFF")))
 W(ul_close())
 W(plain_header("Gnoll Assassin"))
 W(ul_open())
-W(li("Damage decreased from 30–32 to 25–27", t("NERF")))
+W(li("Damage decreased from 30вЂ“32 to 25вЂ“27", t("NERF")))
 W(ul_close())
 W(plain_header("Ghost"))
 W(ul_open())
-W(li("Damage decreased from 45–50 to 38–43", t("NERF")))
+W(li("Damage decreased from 45вЂ“50 to 38вЂ“43", t("NERF")))
 W(ul_close())
 W(plain_header("Harpy Storm"))
 W(ul_open())
@@ -5950,7 +5959,7 @@ W(ul_close())
 W(hero_header("Dawnbreaker"))
 W(ul_open())
 W(li("Base damage increased by 6", bstat_h("Dawnbreaker", "AttackDamageMin", "7.40c", 6), extra=note_box("From 27 to 33")))
-W(li("Damage at level 1 increased from 50–54 to 56–60", t("BUFF")))
+W(li("Damage at level 1 increased from 50вЂ“54 to 56вЂ“60", t("BUFF")))
 W(ul_close())
 W(ability("Break of Dawn"))
 W(ul_open())
@@ -6140,7 +6149,7 @@ W(ul_close())
 W(hero_header("Drow Ranger"))
 W(ul_open())
 W(li("Base Damage decreased by 2", bstat_h("Drow Ranger", "AttackDamageMin", "7.40c", -2), extra=note_box("From 32.5 to 30.5")))
-W(li("Damage at level 1 decreased from 51–58 to 49–56", t("NERF")))
+W(li("Damage at level 1 decreased from 51вЂ“58 to 49вЂ“56", t("NERF")))
 W(ul_close())
 W(ability("Trueshot"))
 W(ul_open())
@@ -6739,7 +6748,7 @@ W(ul_close())
 W(hero_header("Lifestealer"))
 W(ul_open())
 W(li("Base Damage increased by 10", bstat_h("Lifestealer", "AttackDamageMin", "7.40c", 10), extra=note_box("From 19 to 29")))
-W(li("Damage at level 1 increased from 39–45 to 49–55", t("BUFF")))
+W(li("Damage at level 1 increased from 39вЂ“45 to 49вЂ“55", t("BUFF")))
 W(li("Base Attack Speed increased from 100 to 120", b(100, 120)))
 W(li("Base Movement Speed increased from 315 to 320", b(315, 320)))
 W(ul_close())
@@ -6887,7 +6896,7 @@ W(ul_close())
 W(hero_header("Magnus"))
 W(ul_open())
 W(li("Base Agility increased from 12 to 14", b(12, 14)))
-W(li("Damage at level 1 increased from 55–63 to 56–64", t("BUFF")))
+W(li("Damage at level 1 increased from 55вЂ“63 to 56вЂ“64", t("BUFF")))
 W(ul_close())
 W(ability("Solid Core"))
 W(ul_open())
@@ -7146,7 +7155,7 @@ W(hero_header("Nature's Prophet"))
 W(ul_open())
 W(li("Minimum Base damage increased by 4 ", bstat_h("Nature's Prophet", "AttackDamageMin", "7.40c", 4), extra=note_box("From 21 to 25")))
 W(li("Damage spread decreased from 10 to 6", b(10, 6)))
-W(li("Damage at level 1 increased from 40–50 to 44–50", t("BUFF")))
+W(li("Damage at level 1 increased from 40вЂ“50 to 44вЂ“50", t("BUFF")))
 W(ul_close())
 W(ability("Spirit Of The Forest"))
 W(ul_open())
@@ -7583,7 +7592,7 @@ W(ul_close())
 W(hero_header("Rubick"))
 W(ul_open())
 W(li("Base Damage increased by 1", bstat_h("Rubick", "AttackDamageMin", "7.40c", 1), extra=note_box("From 29 to 30")))
-W(li("Damage at level 1 increased from 49–55 to 50–56", t("BUFF")))
+W(li("Damage at level 1 increased from 49вЂ“55 to 50вЂ“56", t("BUFF")))
 W(li("Removed Might and Magus innate ability", t("MISC")))
 W(ul_close())
 W(ability("Curiosity"))
@@ -7914,7 +7923,7 @@ W(ul_close())
 W(hero_header("Sven"))
 W(ul_open())
 W(li("Base strength increased from 23 to 24", b(23, 24)))
-W(li("Damage at level 1 increased from 60–62 to 61–63", t("BUFF")))
+W(li("Damage at level 1 increased from 60вЂ“62 to 61вЂ“63", t("BUFF")))
 W(li("Removed Vanquisher innate ability", t("MISC")))
 W(ul_close())
 W(ability("Wrath Of God"))
@@ -8373,9 +8382,9 @@ W(ul_open())
 W(li("Now also increases Void Spirit's attack damage per point of attribute by 15%", t("REWORK")))
 W(li("Increase is multiplicative, so it's increased from 0.45 to 0.5175", b(0.45, 0.5175)))
 W(li("The result of these changes:", t("MISC")))
-W(li("Damage at level 1 is unchanged at 52–56", t("MISC")))
+W(li("Damage at level 1 is unchanged at 52вЂ“56", t("MISC")))
 W(li("Damage gain per level increased from 3.6 to 4.1", b(3.6, 4.1)))
-W(li("Damage at level 30 increased from 174–178 to 192–196", t("BUFF")))
+W(li("Damage at level 30 increased from 174вЂ“178 to 192вЂ“196", t("BUFF")))
 W(li("Secondary bonuses increased from 25% to 30%", b(25, 30)))
 W(li("No longer provides increased Armor or Magic Resistance", t("NERF")))
 W(li("Now provides increased Attack Speed per point of Agility", t("REWORK")))
@@ -8534,9 +8543,9 @@ W(ul_close())
 W(hero_header("Zeus"))
 W(ul_open())
 W(li("Base Strength increased from 19 to 21", b(19, 21)))
-W(li("Base Damage increased by 1–3 ", bstat_h("Zeus", "AttackDamageMin", "7.40c", 1), extra=note_box("From 33 to 34")))
+W(li("Base Damage increased by 1вЂ“3 ", bstat_h("Zeus", "AttackDamageMin", "7.40c", 1), extra=note_box("From 33 to 34")))
 W(li("Damage spread increased from 8 to 10", b(8, 10)))
-W(li("Damage at level 1 increased from 52–60 to 53–63", t("BUFF")))
+W(li("Damage at level 1 increased from 52вЂ“60 to 53вЂ“63", t("BUFF")))
 W(li("Base Movement Speed decreased from 315 to 305", b(315, 305)))
 W(li("Base Armor decreased by 1", bstat_h("Zeus", "ArmorPhysical", "7.40c", -1), extra=note_box("From 2 to 1")))
 W(ul_close())
@@ -8718,7 +8727,7 @@ W(ul_open())
 W(li("Base intelligence increased by 3", t("BUFF")))
 W(li("Base damage random variance reduced from 18 to 12", t("BUFF")))
 W(ul_close())
-W(subnote("Lina's auto-attack damage rolls in a narrower min/max range now (spread 12 instead of 18). Average damage is unchanged — only the swing between hits is smaller, so attacks are more consistent."))
+W(subnote("Lina's auto-attack damage rolls in a narrower min/max range now (spread 12 instead of 18). Average damage is unchanged вЂ” only the swing between hits is smaller, so attacks are more consistent."))
 
 # Lion
 W(hero_header("Lion"))
@@ -8800,7 +8809,7 @@ W(ability("Rot"))
 W(ul_open())
 W(li("Slow rescaled from 30% to 20/24/28/32%", b(30, [20, 24, 28, 32])))
 W(ul_close())
-W(subnote("Effectively a nerf at levels 1–2 (20%, 24%) and a buff only at level 4 (32%)"))
+W(subnote("Effectively a nerf at levels 1вЂ“2 (20%, 24%) and a buff only at level 4 (32%)"))
 
 # Pugna
 W(hero_header("Pugna"))
@@ -8808,7 +8817,7 @@ W(ability("Life Drain"))
 W(ul_open())
 W(li("Damage increased from 150/200/250 to 150/225/300", b([150, 200, 250], [150, 225, 300])))
 W(ul_close())
-W(subnote("Aghanim's Scepter no longer increases Life Drain damage — it now only removes the cooldown"))
+W(subnote("Aghanim's Scepter no longer increases Life Drain damage вЂ” it now only removes the cooldown"))
 W(subgroup("Talents"))
 W(ul_open())
 W(li("Level 15 Talent increased from +1 Nether Ward Health to +2", b(1, 2)))
