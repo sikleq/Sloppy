@@ -2198,7 +2198,7 @@ ul.changes li.aghanim-shard {
   background: rgba(139, 148, 158, 0.08);
   color: #8b949e;
   border: 1px solid rgba(139, 148, 158, 0.30);
-  font-size: 13.5px;
+  font-size: inherit;
   cursor: pointer;
   transition: all 0.14s;
   font-variant-numeric: tabular-nums;
@@ -4969,7 +4969,7 @@ W(ul_close())
 W(hero_header("Meepo"))
 W(ability("Divided We Stand"))
 W(ul_open())
-W(li("Evasion no longer diminishes when shared between Meepos and has full strength on each", t("NERF")))
+W(li("Evasion no longer diminishes when shared between Meepos and has full strength on each", t("BUFF")))
 W(li("Clones can no longer copy Bottle", t("NERF")))
 W(ul_close())
 
