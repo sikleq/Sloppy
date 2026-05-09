@@ -556,6 +556,7 @@ OTHER_ICON_URL = "../icons/other.svg"
 STAT_ICONS = {
     "movement_speed": "../icons/move_speed.webp",
     "attack_speed":   "../icons/attack_speed.png",
+    "attack_time":    "../icons/attack_time.png",
     "damage":         "../icons/damage.webp",
     "armor":          "../icons/armor.webp",
     "attack_range":   "../icons/range.webp",
@@ -568,7 +569,8 @@ STAT_ICONS = {
 # inside "magic damage" before we get a chance to check more specific phrases.
 STAT_DETECT_RULES = [
     ("movement_speed", ("movement speed", "move speed")),
-    ("attack_speed",   ("base attack time", "attack speed")),
+    ("attack_time",    ("base attack time",)),
+    ("attack_speed",   ("attack speed",)),
     ("attack_range",   ("attack range",)),
     ("armor",          ("base armor", "armor",)),
     ("damage",         ("base damage", "damage",)),
@@ -2156,7 +2158,7 @@ ul.changes li.aghanim-shard {
      12px gap, col 2 starts at 76). Tag column AND the gap stay untinted.
      Colour is a saturated translucent blue so the row reads as a sub-
      category, not as the same neutral grey-blue as entity cards. */
-  background: linear-gradient(90deg, transparent 0 76px, rgba(72, 148, 255, 0.22) 76px, rgba(72, 148, 255, 0.10) 60%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.22) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%);
   border-radius: 3px;
 }
 /* Aghanim marker — inline icon appended to the change-text inside .row-text,
@@ -5027,7 +5029,7 @@ W(ul_close())
 W(hero_header("Primal Beast"))
 W(ability("Colossal"))
 W(ul_open())
-W(li("Now slightly grows in size when crossing an HP threshold", t("REWORK")))
+W(li("Now slightly grows in size when crossing an HP threshold", t("MISC")))
 W(ul_close())
 
 # Puck
