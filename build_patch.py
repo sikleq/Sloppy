@@ -621,6 +621,11 @@ ABILITY_DISPLAY_TO_SLUG = {
     ("hoodwink", "Hunter's Boomerang"): "hunters_boomerang",
     # Broodmother
     ("broodmother", "Spinner's Snare"): "sticky_snare",
+    # Viper
+    ("viper", "Nosedive"): "nose_dive",
+    # Troll Warlord
+    ("troll_warlord", "Whirling Axes (Ranged)"): "whirling_axes_ranged",
+    ("troll_warlord", "Whirling Axes (Melee)"): "whirling_axes_melee",
     # Pudge
     ("pudge", "Graft Flesh"): "innate_graft_flesh",
     # Storm Spirit
@@ -1567,21 +1572,22 @@ ul.changes li {
   line-height: 1.5;
   color: #c9d1d9;
 }
-/* Left column: text-tag goes here. Sizing inherits from .badge for visual consistency. */
+/* Left column: text-tag goes here. All variants (real .badge, placeholder, raw-row
+   ::before) share fixed dimensions so they line up perfectly across rows. */
 ul.changes li > .badge:first-child,
 ul.changes li > .row-tag-empty {
   grid-column: 1;
   align-self: start;
   margin-top: 2px;
+  width: 64px;
+  min-width: 64px;
 }
 ul.changes li > .row-tag-empty {
   visibility: hidden;
-  /* match .badge dimensions so empty placeholder reserves same space */
   display: inline-block;
   padding: 3px 7px;
   font-size: 11px;
   line-height: 1;
-  min-width: 56px;
   box-sizing: border-box;
   border: 1px solid transparent;
 }
@@ -1608,7 +1614,7 @@ ul.changes li:not(:has(> .row-text)) {
   min-height: 22px;
 }
 ul.changes li:not(:has(> .row-text))::before {
-  /* matches .badge dimensions exactly (same padding/line-height/font/min-width) */
+  /* matches .badge:first-child dimensions exactly (width: 64px) */
   position: absolute;
   left: 0;
   top: 2px;
@@ -1620,7 +1626,7 @@ ul.changes li:not(:has(> .row-text))::before {
   letter-spacing: 0.4px;
   text-transform: uppercase;
   line-height: 1;
-  min-width: 56px;
+  width: 64px;
   text-align: center;
   white-space: nowrap;
   box-sizing: border-box;
@@ -2423,6 +2429,14 @@ JS_TEXT = '''
       while (nx && nx.tagName !== 'UL') nx = nx.nextElementSibling;
       if (!nx || nx.classList.contains('f-hide')) h.classList.add('f-hide');
     });
+    // Hide the entire ability-block (icon + title + ul) if its ul is hidden,
+    // otherwise the floating icon stays visible without any text.
+    document.querySelectorAll('.ability-block').forEach(block => {
+      const ul = block.querySelector('ul.changes');
+      if (!ul || ul.classList.contains('f-hide')) {
+        block.classList.add('f-hide');
+      }
+    });
     document.querySelectorAll('.entity-block').forEach(block => {
       const visible = block.querySelectorAll('ul.changes > li:not(.f-hide)').length;
       if (!visible) block.classList.add('f-hide');
@@ -2477,12 +2491,15 @@ JS_TEXT = '''
       kind: kind
     });
   });
-  // Also index ability titles (h4.ability-title)
+  // Also index ability titles (h4.ability-title) — pull icon from the .ability-block
+  // wrapper so search results show the same picture as the ability heading.
   document.querySelectorAll('h4.ability-title').forEach(h => {
+    const block = h.closest('.ability-block');
+    const imgEl = block ? block.querySelector('.ability-icon-img') : null;
     entities.push({
       name: h.textContent.trim(),
       element: h,
-      icon: null,
+      icon: imgEl ? imgEl.src : null,
       kind: 'ability'
     });
   });
