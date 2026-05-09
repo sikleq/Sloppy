@@ -406,6 +406,7 @@ def t(tag):
 class _State:
     block_open = False
     current_hero = None  # internal slug of current hero block (for ability icon derivation)
+    ability_icons = set()  # all ability-icon URLs emitted during build (for icon-validator)
 
 def _open_block():
     s = ('</div>\n' if _State.block_open else '') + '<div class="entity-block">\n'
@@ -529,15 +530,21 @@ ABILITY_DISPLAY_TO_SLUG = {
 }
 
 
+HERO_TO_ABIL_PREFIX = {
+    # Some heroes use a non-snake_case prefix on ability internal names.
+    "sand_king": "sandking",
+}
+
 def ability(title, slug=None):
     """Ability heading. Adds an icon when we know the CDN slug.
     The slug is derived from the current hero context + ability title:
       - manual override in ABILITY_DISPLAY_TO_SLUG, OR
-      - naive: lowercased + spaces→underscores, with apostrophes/hyphens stripped.
-    Image hides itself on 404 via onerror."""
+      - naive: lowercased + spaces→underscores; strips ', -, ., (, ).
+    On 404 the icon swaps to the generic innate-icon (via onerror)."""
     icon_html = ''
     if slug is None and _State.current_hero:
         hero = _State.current_hero
+        prefix = HERO_TO_ABIL_PREFIX.get(hero, hero)
         key = (hero, title)
         if key in ABILITY_DISPLAY_TO_SLUG:
             ability_part = ABILITY_DISPLAY_TO_SLUG[key]
@@ -546,12 +553,21 @@ def ability(title, slug=None):
                             .replace("'", "")
                             .replace("-", "_")
                             .replace(" ", "_")
-                            .replace(".", ""))
-        slug = f"{hero}_{ability_part}"
+                            .replace(".", "")
+                            .replace("(", "")
+                            .replace(")", ""))
+        slug = f"{prefix}_{ability_part}"
     if slug:
+        # On 404 first try innate-icon fallback, then hide on 2nd failure.
+        on_err = (
+            "this.onerror=function(){this.style.display='none'};"
+            "this.src='https://cdn.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png';"
+        )
         icon_html = (f'<img src="{ABIL_CDN}{slug}.png" alt="" '
                      f'class="ability-icon-img" loading="lazy" '
-                     f'onerror="this.style.display=\'none\'">')
+                     f'data-slug="{slug}" '
+                     f'onerror="{on_err}">')
+        _State.ability_icons.add(f"{ABIL_CDN}{slug}.png")
     return f'<h4 class="ability-title">{icon_html}{title}</h4>'
 
 
@@ -1334,7 +1350,7 @@ h4.subgroup {
   color: #79c0ff;
   font-size: 14px;
   font-weight: 700;
-  margin: 16px 0 4px 14px;
+  margin: 16px 0 4px 0;      /* aligned with entity-block left edge */
   text-transform: uppercase;
   letter-spacing: 0.6px;
   border-bottom: 1px solid #21262d;
@@ -1342,16 +1358,16 @@ h4.subgroup {
 }
 h4.ability-title {
   color: #d2a8ff;
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 600;
-  margin: 16px 0 8px 14px;
+  margin: 16px 0 8px 0;     /* aligned with entity-block left edge (same as tags) */
   display: flex;
   align-items: center;
   gap: 12px;
 }
 h4.ability-title .ability-icon-img {
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   border-radius: 6px;
   flex-shrink: 0;
   object-fit: cover;
@@ -9024,3 +9040,10 @@ write_footer()
 save_html('patches/7.08.html')
 
 save_calendar_html()
+
+# Write ability-icon URL list for the validator (check_icons.py)
+import json as _json_dump
+with open('_ability_icons.txt', 'w', encoding='utf-8') as _f:
+    for _u in sorted(_State.ability_icons):
+        _f.write(_u + '\n')
+print(f"  → _ability_icons.txt: {len(_State.ability_icons)} unique URLs")

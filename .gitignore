@@ -5,3 +5,6 @@ __pycache__/
 # Промежуточные артефакты — воспроизводятся через generate_patch_code.py
 _generated_p_*.py
 _insert_patches.py
+
+# Список URL иконок — генерируется build_patch.py для check_icons.py
+_ability_icons.txt
