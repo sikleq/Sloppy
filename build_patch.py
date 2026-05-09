@@ -1404,7 +1404,7 @@ h2.section {
   gap: 14px;
   background: linear-gradient(90deg, #1a1f29 0%, #161b22 100%);
   border-radius: 4px;
-  padding: 8px 14px 8px 0;     /* no left padding — icon left-edge aligns with .entity-block edge (and ability icons below) */
+  padding: 8px 14px;
   margin: 20px 0 8px;
 }
 .entity-name {
@@ -1959,9 +1959,15 @@ img { max-width: 100%; }
 }
 
 /* ENTITY-BLOCK wrapper (used for filtering hide/show) */
-.entity-block {
-  margin-bottom: 6px;
-  padding-left: 16px;          /* small breathing room on the left, applies to icon + all rows */
+.entity-block { margin-bottom: 6px; }
+/* Everything inside entity-block EXCEPT the entity-card itself shifts right
+   by 14px so it aligns with the hero icon inside the card (which sits at +14
+   from the card's left edge, matching .entity padding-left). */
+.entity-block > h4.subgroup,
+.entity-block > ul.changes,
+.entity-block > ul.subnotes,
+.entity-block > .ability-block {
+  padding-left: 14px;
 }
 
 /* === FILTER MODE === */
