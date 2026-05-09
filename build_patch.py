@@ -510,15 +510,6 @@ def note_box(text):
     return f'<div class="correction-note"><span class="correction-label">Note</span>— {text}</div>'
 
 
-def cont(text):
-    """Continuation / sub-sentence visually attached to the main <li>.
-    For an additional sentence FROM THE SAME PATCH that extends/clarifies the
-    main change but isn't itself a separate change requiring a badge.
-    Difference from note_box (NOTE: ours) and subnote (separate ↳ block).
-    Use as extra=cont(...) of li()."""
-    return f'<div class="li-cont">{text}</div>'
-
-
 def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
                rework_badge=True, **bf_kwargs):
     """Convenience: emit <li> with formula table.
@@ -1384,13 +1375,6 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   text-transform: uppercase;
   color: #8b949e;
   margin-right: 4px;
-}
-.li-cont {
-  display: block;
-  margin: 3px 0 0 0;
-  color: #adb5bd;
-  font-size: 13.5px;
-  line-height: 1.45;
 }
 
 /* IMAGE FALLBACK STYLE */
@@ -4337,26 +4321,25 @@ W(plain_header("Global Changes"))
 W(ul_open())
 W(li("Facets removed from the game", t("DEL")))
 W(li("Innate abilities no longer scale with other abilities' level", t("NERF")))
-W(li("All innate abilities that used to scale with other abilities now either provide unchangeable bonuses or improve on 'per level' basis",
-     t("REWORK"),
-     extra=cont("Abilities that improve with hero level have base value and increment value. Some also have amount of levels required for increment")))
+W(li("All innate abilities that used to scale with other abilities now either provide unchangeable bonuses or improve on 'per level' basis. Abilities that improve with hero level have base value and increment value. Some also have amount of levels required for increment", t("REWORK")))
 W(ul_close())
 W(subnote("Abilities that improve each level provide their increment value at level 1"))
 W(ul_open())
-W(li("Added UI icon that shows you which parameters increase with hero level and what is the current value ", t("MISC")))
+W(li("Added UI icon that shows you which parameters increase with hero level and what is the current value. Some non-innate ability might have this per level UI as well", t("NEW")))
 W(ul_close())
 W(subnote("Pressing ALT key will show base value and increment of the ability"))
 W(ul_open())
-W(li("Some non-innate ability might have this per level UI as well", t("MISC")))
-W(li("Abilities that had 'per level up' scaling changed to be 'per level'", t("MISC")))
-W(li("This mostly affects heroes reworked in update 7.40 and Largo", t("MISC")))
+W(li("Abilities that had 'per level up' scaling changed to be 'per level'", t("REWORK")))
+W(ul_close())
+W(subnote("This mostly affects heroes reworked in update 7.40 and Largo"))
+W(ul_open())
 W(li("Flagbearer Creep Experience Bounty increased from 57 to 60", b(57, 60)))
-W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("NERF")))
-W(li("Second +1 siege creep timing now occurs at 60:00", t("REWORK")))
+W(li("First +1 siege creep timing decreased from 35:00 to 30:00", b(35, 30, l=True)))
+W(li("Second +1 siege creep timing now occurs at 60:00", t("NEW")))
 W(li("Adjusted the meeting point of the lane creeps toward the offlane", t("MISC")))
-W(li("Now offlane creeps are slightly slowed upon leaving the base for a couple of seconds", t("REWORK")))
-W(li("Safe lane creeps are slightly accelerated upon leaving the base for a couple of seconds", t("MISC")))
-W(li("Both of these changes are effective until the 7:30 mark", t("MISC")))
+W(ul_close())
+W(subnote("Now offlane creeps are slightly slowed upon leaving the base for a couple of seconds. Safe lane creeps are slightly accelerated upon leaving the base for a couple of seconds. Both of these changes are effective until the 7:30 mark."))
+W(ul_open())
 W(li("All sections of currents now give a max movement speed bonus of 150 ", t("REWORK")))
 W(ul_close())
 W(subnote("Previously was only provided by sections on the base and near it, while other sections provided max bonus of 100"))
