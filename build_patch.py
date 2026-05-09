@@ -812,7 +812,7 @@ def note_box(text=None, *, hero=None, item=None, field=None, before_patch=None):
             prev_val = stat_i(item, field, before_patch)
             prev_patch = prev_change_patch_i(item, field, before_patch) or before_patch
         return (f'<div class="correction-note">'
-                f'<span class="correction-label">Previously:</span> '
+                f'<span class="correction-label">Previously:</span>'
                 f'<b>{_fmt_val(prev_val)}</b>. Last change in <b>{prev_patch}</b>'
                 f'</div>')
     return (f'<div class="correction-note">'
@@ -1905,6 +1905,13 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
 }
 .correction-note .badge {
   font-style: normal;
+}
+/* Bold values inside the note (prev value, prev patch) — same size as surrounding
+   text, just bold; drop the inherited italic so they don't visually pop out. */
+.correction-note b {
+  font-size: inherit;
+  font-style: normal;
+  font-weight: 700;
 }
 /* Badge-group inside correction-note: float to the right edge of the note
    so it visually mirrors the row's main % (which sits in the right grid column). */
@@ -3751,7 +3758,7 @@ W(ul_close())
 # ===== NEUTRAL CREEP UPDATES =====
 W(section("Neutral Creep Updates"))
 W(unit_header("Frostbitten Golem", "https://cdn.steamstatic.com/apps/dota2/images/dota_react/units/npc_dota_neutral_frostbitten_golem.png"))
-W(ability("Time Warp Aura", icon_url="https://www.opendota.com/assets/images/dota2/neutral_abilities/frostbitten_golem_time_warp_aura.png"))
+W(ability("Time Warp Aura", icon_url="https://courier.spectral.gg/images/dota/spellicons/frostbitten_golem_time_warp_aura.png"))
 W(ul_open())
 W(li("Cooldown Reduction decreased from 10/11/12/14% to 8/9/10/11%", b([10, 11, 12, 14], [8, 9, 10, 11], l=True)))
 W(ul_close())
