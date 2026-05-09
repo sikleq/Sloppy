@@ -1,3 +1,7 @@
 __pycache__/
 *.pyc
 *.pyo
+
+# Промежуточные артефакты — воспроизводятся через generate_patch_code.py
+_generated_p_*.py
+_insert_patches.py
