@@ -90,8 +90,6 @@ def main():
     skipped_no_match = 0
     skipped_no_data = 0
     examples = []
-    # Накапливаем вставки info-строк и применяем в конце (чтобы не сбить индексы)
-    inserts = {}  # idx → list of lines to insert AFTER lines[idx]
 
     for i, line in enumerate(lines):
         stripped = line.strip()
@@ -150,11 +148,11 @@ def main():
                 ctx_label = current_item
 
         if new_call:
-            new_line = f'{indent}W(li("{desc}", {new_call}))'
+            # NOTE-бокс прямо внутри <li> с явными значениями (наш доп. контекст,
+            # которого в патчноуте нет): "From X to Y"
+            new_line = (f'{indent}W(li("{desc}", {new_call}, '
+                        f'extra=note_box("From {old_val} to {new_val}")))')
             lines[i] = new_line
-            # Доп. строка с явными значениями: "From X to Y"
-            info_line = f"{indent}W('''<li>From {old_val} to {new_val}</li>''')"
-            inserts.setdefault(i, []).append(info_line)
             replaced += 1
             if len(examples) < 10:
                 examples.append(f"  [{version}] {ctx_label}: {desc[:60]} -> from {old_val} to {new_val}")
@@ -173,12 +171,6 @@ def main():
         print(f"\nПримеры замен:")
         for e in examples:
             print(e)
-
-    # Применяем вставки (от конца к началу чтобы индексы не съезжали)
-    if inserts:
-        for idx in sorted(inserts.keys(), reverse=True):
-            for line_to_insert in reversed(inserts[idx]):
-                lines.insert(idx + 1, line_to_insert)
 
     if replaced:
         bp_path.write_text("\n".join(lines), encoding="utf-8")
