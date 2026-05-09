@@ -917,7 +917,10 @@ def li(text, badge="", extra="", force_tag=None):
         marker = '<span class="aghanim-marker shard"></span>'
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""
     attr = f' data-tag="{tag_str}"' if tag_str else ""
-    return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text}</span>{rest}{marker}{extra}</li>'
+    # Marker is appended INSIDE .row-text so it sits right after the change
+    # text (before the % badge column), matching Valve's visual order.
+    text_inner = f'{text}{marker}' if isinstance(text, str) else text
+    return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text_inner}</span>{rest}{extra}</li>'
 
 
 def subnote(text):
@@ -2149,37 +2152,31 @@ img { max-width: 100%; }
    with all other rows in the list). */
 ul.changes li.aghanim-scepter,
 ul.changes li.aghanim-shard {
-  /* Stripe starts at 64px (right after the tag column, which is 0..64).
-     Tag column stays untinted. */
-  background: linear-gradient(90deg, transparent 0 64px, rgba(121, 192, 255, 0.22) 64px, rgba(121, 192, 255, 0.10) 55%, transparent 100%);
+  /* Stripe begins at 76px = beginning of text column (col 1 ends at 64,
+     12px gap, col 2 starts at 76). Tag column AND the gap stay untinted.
+     Colour is a saturated translucent blue so the row reads as a sub-
+     category, not as the same neutral grey-blue as entity cards. */
+  background: linear-gradient(90deg, transparent 0 76px, rgba(72, 148, 255, 0.22) 76px, rgba(72, 148, 255, 0.10) 60%, transparent 100%);
   border-radius: 3px;
 }
-/* Aghanim marker — small icon pinned to the row's right edge. The <span>
-   takes its own grid cell when present (li becomes a 4-col grid), but the
-   element itself is absolutely positioned so it doesn't shift the badge
-   column or wrap to a second row. */
+/* Aghanim marker — inline icon appended to the change-text inside .row-text,
+   so it sits right after the last character of the change description and
+   before the % badge column. */
 .aghanim-marker {
-  position: absolute;
-  right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
+  display: inline-block;
   width: 14px;
   height: 14px;
+  margin-left: 6px;
+  vertical-align: -2px;
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
-  pointer-events: none;
 }
 .aghanim-marker.scepter {
   background-image: url('https://cdn.steamstatic.com/apps/dota2/images/dota_react/heroes/stats/aghs_scepter_icon.png');
 }
 .aghanim-marker.shard {
   background-image: url('https://cdn.steamstatic.com/apps/dota2/images/dota_react/heroes/stats/aghs_shard_icon.png');
-}
-/* Reserve room on the right so the % badge doesn't crash into the marker. */
-ul.changes li.aghanim-scepter,
-ul.changes li.aghanim-shard {
-  padding-right: 24px;
 }
 
 /* WRONG-WORD HIGHLIGHT — subtle, neutral marker (no strikethrough) */
