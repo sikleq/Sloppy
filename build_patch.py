@@ -811,10 +811,13 @@ def note_box(text=None, *, hero=None, item=None, field=None, before_patch=None):
         else:
             prev_val = stat_i(item, field, before_patch)
             prev_patch = prev_change_patch_i(item, field, before_patch) or before_patch
-        body = f'was <b>{_fmt_val(prev_val)}</b>. Previous change in <b>{prev_patch}</b>'
-    else:
-        body = text or ""
-    return f'<div class="correction-note"><span class="correction-label">Note</span>: {body}</div>'
+        return (f'<div class="correction-note">'
+                f'<span class="correction-label">Previously:</span> '
+                f'<b>{_fmt_val(prev_val)}</b>. Last change in <b>{prev_patch}</b>'
+                f'</div>')
+    return (f'<div class="correction-note">'
+            f'<span class="correction-label">Note:</span> {text or ""}'
+            f'</div>')
 
 
 def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
@@ -2923,7 +2926,7 @@ W(ul_open())
 W(li(
     '<span class="wrong-word">Health bonus increased from +600 to +625</span>',
     '<span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span>',
-    extra='<div class="correction-note"><span class="correction-label">Note</span>: This change is wrongly stated. The real change is 650 → 625 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span></span></div>',
+    extra='<div class="correction-note"><span class="correction-label">Note:</span> This change is wrongly stated. The real change is 650 → 625 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span></span></div>',
     force_tag="nerf"
 ))
 W(li("Bloodpact cooldown increased from 30s to 35s", b(30, 35, l=True)))
@@ -3616,7 +3619,7 @@ W(li("Base Damage increased by 2", bstat_h("Timbersaw", "AttackDamageMin", "7.41
 W(li(
     'Damage at level 1 <span class="wrong-word">decreased</span> from 46-50 to 48-52',
     '<span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span>',
-    extra='<div class="correction-note"><span class="correction-label">Note</span>: The patch text says "decreased", but the values actually went up.</div>',
+    extra='<div class="correction-note"><span class="correction-label">Note:</span> The patch text says "decreased", but the values actually went up.</div>',
     force_tag="buff"
 ))
 W(li("Base Intelligence increased from 23 to 24", b(23, 24)))
