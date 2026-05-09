@@ -4387,7 +4387,7 @@ W(ul_close())
 W(hero_header("Lina"))
 W(ul_open())
 W(li("Base intelligence increased by 3", t("BUFF")))
-W(li("Base damage random variance reduced from 18 to 12", t("MISC")))
+W(li("Base damage random variance reduced from 18 to 12", t("BUFF")))
 W(ul_close())
 W(subnote("Lina's auto-attack damage rolls in a narrower min/max range now (spread 12 instead of 18). Average damage is unchanged — only the swing between hits is smaller, so attacks are more consistent."))
 
