@@ -548,18 +548,25 @@ INNATE_ABILITIES = {
 
 def subgroup(title):
     """Subgroup heading (e.g., 'Stats', 'Abilities', 'Talents', 'Tier 1').
-    For 'Talents', adds a small SVG talents icon next to the label."""
+    For 'Talents', emits subgroup label + opens an .ability-block.talents-block
+    so subsequent ul.changes appears next to a large talents icon (like ability blocks)."""
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
+    if title.lower() == "abilities":
+        # Manual "Abilities" subgroup — mark flag so auto-emit in ability() doesn't duplicate
+        _State.seen_abilities_subgroup = True
     if title.lower() == "talents":
         on_err = (
             "this.onerror=function(){this.style.display='none'};"
             f"this.src='{INNATE_ICON_URL}';"
         )
         icon = (f'<img src="{TALENT_ICON_URL}" alt="" '
-                f'class="subgroup-icon" loading="lazy" onerror="{on_err}">')
+                f'class="ability-icon-img" loading="lazy" onerror="{on_err}">')
         _State.ability_icons.add(TALENT_ICON_URL)
-        return out + f'<h4 class="subgroup with-icon">{icon}{title}</h4>'
+        _State.ability_block_open = True
+        return out + (f'<h4 class="subgroup">{title}</h4>'
+                      f'<div class="ability-block talents-block">'
+                      f'<div class="ability-icon-wrap">{icon}</div>')
     return out + f'<h4 class="subgroup">{title}</h4>'
 
 
@@ -612,6 +619,8 @@ ABILITY_DISPLAY_TO_SLUG = {
     ("tidehunter", "Leviathan's Catch"): "leviathans_catch",
     # Hoodwink
     ("hoodwink", "Hunter's Boomerang"): "hunters_boomerang",
+    # Broodmother
+    ("broodmother", "Spinner's Snare"): "sticky_snare",
     # Pudge
     ("pudge", "Graft Flesh"): "innate_graft_flesh",
     # Storm Spirit
@@ -656,9 +665,13 @@ def ability(title, slug=None, innate=None):
         is_innate = bool(innate)
     icon_inner = ''
     if slug:
-        # On 404 first try innate-icon fallback, then hide on 2nd failure.
+        # On 404: hide the innate-marker overlay (would be redundant since main icon
+        # becomes the innate fallback), then swap src to innate icon. If THAT also
+        # fails, hide the entire image.
         on_err = (
             "this.onerror=function(){this.style.display='none'};"
+            "var m=this.parentElement.querySelector('.innate-marker');"
+            "if(m)m.style.display='none';"
             f"this.src='{INNATE_ICON_URL}';"
         )
         icon_inner = (f'<img src="{ABIL_CDN}{slug}.png" alt="" '
@@ -1526,17 +1539,17 @@ h4.subgroup {
 .ability-block > ul.subnotes {
   grid-column: 2;
 }
-/* Talents-subgroup icon (next to "Talents" label) */
-h4.subgroup.with-icon {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* Talents-block: same .ability-block layout, but talents.svg gets translucent framing */
+.ability-block.talents-block > .ability-icon-wrap > .ability-icon-img {
+  background: rgba(121, 192, 255, 0.05);
+  padding: 6px;
+  box-shadow: 0 0 0 1px rgba(121, 192, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.4);
 }
-h4.subgroup .subgroup-icon {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  opacity: 0.85;
+/* Formula tables INSIDE .ability-block — extend back to entity-block left edge,
+   not just within content column (else they look right-aligned past the icon). */
+.ability-block ul.changes li > .formula-table {
+  margin-left: -60px;          /* counter ability-block icon column (48 + 12 gap) */
+  width: calc(100% + 60px);
 }
 
 /* CHANGES LIST — grid layout: [tag] [text] [percentages] */
