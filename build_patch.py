@@ -1971,7 +1971,7 @@ def write_footer():
     """Render close-block + back-to-top button + script tag + closing tags."""
     W(_close_block())
     W('<button class="back-to-top" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})">↑</button>')
-    W('<script src="scripts.js"></script>')
+    W('<script src="../scripts.js"></script>')
     W('</div></body></html>')
 
 
