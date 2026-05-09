@@ -1284,6 +1284,51 @@ ul.changes li > .correction-note,
 ul.changes li > .formula-table {
   grid-column: 1 / -1;
 }
+/* Raw <li> without .row-text wrapper (rare special-case manual rows) — block layout
+   with auto-generated left tag from data-tag attribute via ::before. */
+ul.changes li:not(:has(> .row-text)) {
+  display: block;
+  padding-left: 76px;
+  position: relative;
+  min-height: 22px;
+}
+ul.changes li:not(:has(> .row-text))::before {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  min-width: 56px;
+  text-align: center;
+  white-space: nowrap;
+  /* default = nerf-text colors */
+  content: "";
+  background: rgba(225, 90, 75, 0.22);
+  color: #b87468;
+  border: 1px solid rgba(225, 90, 75, 0.50);
+}
+/* Tag content (most-specific wins by source order; rework beats buff/nerf for hybrid rows) */
+ul.changes li:not(:has(> .row-text))[data-tag*="buff"]::before  { content: "BUFF"; background: rgba(85,205,115,0.22); color: #74bd80; border-color: rgba(85,205,115,0.50); }
+ul.changes li:not(:has(> .row-text))[data-tag*="nerf"]::before  { content: "NERF"; }
+ul.changes li:not(:has(> .row-text))[data-tag*="qol"]::before   { content: "QoL"; background: rgba(121,192,255,0.10); color: #a8c0d8; border-color: rgba(121,192,255,0.32); }
+ul.changes li:not(:has(> .row-text))[data-tag*="misc"]::before  { content: "MISC"; background: rgba(139,148,158,0.10); color: #8b949e; border-color: rgba(139,148,158,0.28); }
+ul.changes li:not(:has(> .row-text))[data-tag*="new"]::before   { content: "NEW"; background: rgba(220,175,95,0.09); color: #b8945a; border-color: rgba(220,175,95,0.32); }
+ul.changes li:not(:has(> .row-text))[data-tag*="del"]::before   { content: "DEL"; background: rgba(180,70,70,0.10); color: #c97070; border-color: rgba(180,70,70,0.36); }
+ul.changes li:not(:has(> .row-text))[data-tag*="rework"]::before { content: "REWORK"; background: rgba(180,145,220,0.07); color: #9988aa; border-color: rgba(180,145,220,0.22); }
+/* Hide redundant inline tag spans (since ::before shows them) */
+ul.changes li:not(:has(> .row-text)) > .badge.rework,
+ul.changes li:not(:has(> .row-text)) > .badge.misc,
+ul.changes li:not(:has(> .row-text)) > .badge.qol,
+ul.changes li:not(:has(> .row-text)) > .badge.new,
+ul.changes li:not(:has(> .row-text)) > .badge.del,
+ul.changes li:not(:has(> .row-text)) > .badge.buff-text,
+ul.changes li:not(:has(> .row-text)) > .badge.nerf-text {
+  display: none;
+}
 
 ul.subnotes {
   list-style: none;
@@ -2521,7 +2566,7 @@ W(ul_close())
 W(hero_header("Arc Warden"))
 W(ul_open())
 W(li("Base Agility increased from 20 to 22", b(20, 22)))
-W('''<li data-tag="buff">Damage at level 1 increased from 51-57 to 52-58 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>''')
+W(li("Damage at level 1 increased from 51-57 to 52-58", '<span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span>'))
 W(ul_close())
 W(hero_header("Bane"))
 W(subgroup("Abilities"))
@@ -2549,7 +2594,7 @@ W(ul_close())
 W(hero_header("Beastmaster"))
 W(ul_open())
 W(li("Base Strength decreased from 25 to 24", b(25, 24)))
-W('''<li data-tag="nerf">Damage at level 1 decreased from 50-54 to 49-53 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span></li>''')
+W(li("Damage at level 1 decreased from 50-54 to 49-53", '<span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span>'))
 W(ul_close())
 W(subgroup("Abilities"))
 W(ability("Wild Axes"))
@@ -2583,7 +2628,7 @@ W(hero_header("Brewmaster"))
 W(subgroup("Abilities"))
 W(ability("Primal Split"))
 W(ul_open())
-W('''<li data-tag="qol">Cancel Split now has a 3s initial cooldown <span class="badge qol" data-tag="qol">QoL</span></li>''')
+W(li("Cancel Split now has a 3s initial cooldown", '<span class="badge qol" data-tag="qol">QoL</span>'))
 W(ul_close())
 W(hero_header("Bristleback"))
 W(subgroup("Abilities"))
@@ -2612,7 +2657,7 @@ W(ul_close())
 W(hero_header("Centaur Warrunner"))
 W(ul_open())
 W(li("Base Strength increased from 27 to 28", b(27, 28)))
-W('''<li data-tag="buff">Damage at level 1 increased from 63-65 to 64-66 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>''')
+W(li("Damage at level 1 increased from 63-65 to 64-66", '<span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span>'))
 W(li("Strength gain increased from 4.2 to 4.3", b(4.2, 4.3)))
 W(ul_close())
 W(subgroup("Talents"))
@@ -2628,7 +2673,7 @@ W(ul_close())
 W(hero_header("Dark Seer"))
 W(ul_open())
 W(li("Base Intelligence increased from 22 to 23", b(22, 23)))
-W('''<li data-tag="buff">Damage at level 1 increased from 53-59 to 54-60 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>''')
+W(li("Damage at level 1 increased from 53-59 to 54-60", '<span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span>'))
 W(ul_close())
 W(hero_header("Dark Willow"))
 W(subgroup("Abilities"))
@@ -2639,7 +2684,7 @@ W(ul_close())
 W(hero_header("Dawnbreaker"))
 W(ul_open())
 W(li("Base Damage decreased by 1", bstat_h("Dawnbreaker", "AttackDamageMin", "7.41b", -1), extra=note_box("From 33 to 32")))
-W('''<li data-tag="nerf">Damage at level 1 decreased from 56-60 to 55-59 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span></li>''')
+W(li("Damage at level 1 decreased from 56-60 to 55-59", '<span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span>'))
 W(ul_close())
 W(subgroup("Abilities"))
 W(ability("Solar Guardian"))
@@ -2665,7 +2710,7 @@ W(ul_close())
 W(hero_header("Earth Spirit"))
 W(ul_open())
 W(li("Base Strength increased from 22 to 23", b(22, 23)))
-W('''<li data-tag="buff">Damage at level 1 increased from 47-51 to 48-52 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>''')
+W(li("Damage at level 1 increased from 47-51 to 48-52", '<span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span>'))
 W(ul_close())
 W(hero_header("Elder Titan"))
 W(subgroup("Abilities"))
@@ -2717,7 +2762,7 @@ W(li("HP/Mana Transfer decreased from 60/80/100/120% to 55/75/95/115%", b([60, 8
 W(ul_close())
 W(ability("Spirits"))
 W(ul_open())
-W('''<li data-tag="qol">Now remembers the radius of the spirits between casts <span class="badge qol" data-tag="qol">QoL</span></li>''')
+W(li("Now remembers the radius of the spirits between casts", '<span class="badge qol" data-tag="qol">QoL</span>'))
 W(ul_close())
 W(hero_header("Jakiro"))
 W(ul_open())
@@ -2742,13 +2787,13 @@ W(hero_header("Kunkka"))
 W(subgroup("Abilities"))
 W(ability("Admiral's Rum"))
 W(ul_open())
-W('''<li data-tag="buff">Cooldown decreased from 60.5s − 0.5s per level to 50.5s − 0.5s per level <span class="badge-group" data-overall="buff"><span class="badge buff4">+17%</span></span></li>''')
+W(li("Cooldown decreased from 60.5s − 0.5s per level to 50.5s − 0.5s per level", '<span class="badge-group" data-overall="buff"><span class="badge buff4">+17%</span></span>'))
 W(ul_close())
 W(hero_header("Largo"))
 W(subgroup("Talents"))
 W(ul_open())
-W('''<li data-tag="rework">Level 20 — +200 Catchy Lick Damage replaced with 2× Catchy Lick Charges <span class="badge rework" data-tag="rework">REWORK</span></li>''')
-W('''<li data-tag="rework">Level 25 — 2× Catchy Lick Charges replaced with 2× Frogstomp Stomps / Interval <span class="badge rework" data-tag="rework">REWORK</span></li>''')
+W(li("Level 20 — +200 Catchy Lick Damage replaced with 2× Catchy Lick Charges", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 25 — 2× Catchy Lick Charges replaced with 2× Frogstomp Stomps / Interval", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
 W(hero_header("Lich"))
 W(subgroup("Abilities"))
@@ -2785,7 +2830,7 @@ W(li("Aghanim's Shard bonus movement speed decreased from 15% to 10%", b(15, 10)
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W('''<li data-tag="rework">Level 10 — −25s Summon Spirit Bear Cooldown replaced with +5s True Form Duration <span class="badge rework" data-tag="rework">REWORK</span></li>''')
+W(li("Level 10 — −25s Summon Spirit Bear Cooldown replaced with +5s True Form Duration", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
 W(unit_header("Spirit Bear", "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/lone_druid_spirit_bear.png"))
 W(ul_open())
@@ -2850,7 +2895,7 @@ W(ul_close())
 W(hero_header("Monkey King"))
 W(ul_open())
 W(li("Base Agility decreased from 24 to 23", b(24, 23)))
-W('''<li data-tag="nerf">Damage at level 1 decreased from 53-57 to 52-56 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span></li>''')
+W(li("Damage at level 1 decreased from 53-57 to 52-56", '<span class="badge-group" data-overall="nerf"><span class="badge nerf1">-2%</span></span>'))
 W(ul_close())
 W(subgroup("Abilities"))
 W(ability("Primal Spring"))
@@ -2861,7 +2906,7 @@ W(hero_header("Morphling"))
 W(subgroup("Abilities"))
 W(ability("Waveform"))
 W(ul_open())
-W('''<li data-tag="qol">Will now be cast in the desired direction, if the target location is further than the cast range <span class="badge qol" data-tag="qol">QoL</span></li>''')
+W(li("Will now be cast in the desired direction, if the target location is further than the cast range", '<span class="badge qol" data-tag="qol">QoL</span>'))
 W(ul_close())
 W(hero_header("Muerta"))
 W(ul_open())
@@ -2932,7 +2977,7 @@ W(ul_close())
 W(hero_header("Phantom Assassin"))
 W(ul_open())
 W(li("Base Agility increased from 21 to 22", b(21, 22)))
-W('''<li data-tag="buff">Damage at level 1 increased from 56-58 to 57-59 <span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span></li>''')
+W(li("Damage at level 1 increased from 56-58 to 57-59", '<span class="badge-group" data-overall="buff"><span class="badge buff1">+2%</span></span>'))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -2967,8 +3012,8 @@ W(ul_close())
 W(hero_header("Puck"))
 W(subgroup("Talents"))
 W(ul_open())
-W('''<li data-tag="rework">Level 15 — −15s Dream Coil Cooldown replaced with +2% Puckish Health and Mana Restoration <span class="badge rework" data-tag="rework">REWORK</span></li>''')
-W('''<li data-tag="rework">Level 25 — Dream Coil Pierces Debuff Immunity replaced with −30s Dream Coil Cooldown <span class="badge rework" data-tag="rework">REWORK</span></li>''')
+W(li("Level 15 — −15s Dream Coil Cooldown replaced with +2% Puckish Health and Mana Restoration", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 25 — Dream Coil Pierces Debuff Immunity replaced with −30s Dream Coil Cooldown", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
 W(hero_header("Queen of Pain"))
 W(ul_open())
@@ -2994,7 +3039,7 @@ W(subgroup("Talents"))
 W(ul_open())
 W(li("Level 15 — Fade Bolt Cooldown Reduction increased from 3s to 4s", b(3, 4)))
 W(li("Level 15 — Stolen Spells Mana Cost Reduction decreased from 50% to 40%", b(50, 40)))
-W('''<li data-tag="nerf">Level 25 — Curiosity Bonuses decreased from 2× to 1.5× <span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span></span></li>''')
+W(li("Level 25 — Curiosity Bonuses decreased from 2× to 1.5×", '<span class="badge-group" data-overall="nerf"><span class="badge nerf5">-25%</span></span>'))
 W(ul_close())
 W(hero_header("Sand King"))
 W(ul_open())
@@ -3034,12 +3079,12 @@ W(ul_close())
 W(hero_header("Snapfire"))
 W(ul_open())
 W(li("Base Damage increased by 2", bstat_h("Snapfire", "AttackDamageMin", "7.41b", 2), extra=note_box("From 28 to 30")))
-W('''<li data-tag="buff">Damage at level 1 increased from 51-57 to 53-59 <span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span></li>''')
+W(li("Damage at level 1 increased from 51-57 to 53-59", '<span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span>'))
 W(ul_close())
 W(hero_header("Spectre"))
 W(ul_open())
 W(li("Base Agility increased from 26 to 29", b(26, 29)))
-W('''<li data-tag="buff">Damage at level 1 increased from 49-53 to 52-56 <span class="badge-group" data-overall="buff"><span class="badge buff2">+6%</span></span></li>''')
+W(li("Damage at level 1 increased from 49-53 to 52-56", '<span class="badge-group" data-overall="buff"><span class="badge buff2">+6%</span></span>'))
 W(ul_close())
 W(subgroup("Abilities"))
 W(ability("Dispersion"))
@@ -3100,7 +3145,7 @@ W(hero_header("Tinker"))
 W(subgroup("Abilities"))
 W(ability("Deploy Turrets"))
 W(ul_open())
-W('''<li data-tag="misc">Updated sound effects <span class="badge misc" data-tag="misc">MISC</span></li>''')
+W(li("Updated sound effects", '<span class="badge misc" data-tag="misc">MISC</span>'))
 W(ul_close())
 W(hero_header("Tiny"))
 W(ul_open())
@@ -3113,14 +3158,14 @@ W(li("Toss Bonus Damage increased from 50/175/300 to 50/200/350", b([50, 175, 30
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W('''<li data-tag="rework">Level 10 — +8 Strength replaced with +2 Tree Grab Attacks <span class="badge rework" data-tag="rework">REWORK</span></li>''')
-W('''<li data-tag="rework">Level 15 — −8% Grow Attack Speed Reduction replaced with +10 Strength <span class="badge rework" data-tag="rework">REWORK</span></li>''')
+W(li("Level 10 — +8 Strength replaced with +2 Tree Grab Attacks", '<span class="badge rework" data-tag="rework">REWORK</span>'))
+W(li("Level 15 — −8% Grow Attack Speed Reduction replaced with +10 Strength", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
 W(hero_header("Treant Protector"))
 W(subgroup("Abilities"))
 W(ability("Eyes In The Forest"))
 W(ul_open())
-W('''<li data-tag="qol">Added AoE indicator to cast <span class="badge qol" data-tag="qol">QoL</span></li>''')
+W(li("Added AoE indicator to cast", '<span class="badge qol" data-tag="qol">QoL</span>'))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -3161,7 +3206,7 @@ W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
 W(li("Level 15 — Poison Sting Slow increased from +7% to +10%", b(7, 10)))
-W('''<li data-tag="rework">Level 20 — +40% Snakebite Damage replaced with +100 Snakebite Initial Damage <span class="badge rework" data-tag="rework">REWORK</span></li>''')
+W(li("Level 20 — +40% Snakebite Damage replaced with +100 Snakebite Initial Damage", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
 W(hero_header("Viper"))
 W(subgroup("Abilities"))
