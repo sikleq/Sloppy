@@ -495,55 +495,11 @@ INNATE_ICON_URL = "https://cdn.steamstatic.com/apps/dota2/images/dota_react/icon
 # Format: {(hero_internal_slug, ability_display_name), ...}
 # Source: 7.41+ patchnotes that introduced innate slots.
 INNATE_ABILITIES = {
+    # Conservative list — only abilities I'm highly confident are innate.
+    # Add more as user verifies (e.g. by checking dota2.com/patches/7.41c).
     ("alchemist", "Greevil's Greed"),
-    ("ancient_apparition", "Bone Chill"),
     ("antimage", "Mana Break"),
-    ("axe", "One Man Army"),
-    ("bristleback", "Prickly"),
-    ("bounty_hunter", "Big Game Hunter"),
-    ("centaur", "Horsepower"),
-    ("chaos_knight", "Fundamental Forging"),
-    ("dark_seer", "Aggrandize"),
-    ("dark_willow", "Pixie Dust"),
-    ("dawnbreaker", "Break of Dawn"),
-    ("doom_bringer", "Lvl Pain"),
-    ("earthshaker", "Slugger"),
-    ("elder_titan", "Momentum"),
-    ("ember_spirit", "Immolation"),
-    ("enchantress", "Rabblerouser"),
-    ("enigma", "Event Horizon"),
-    ("faceless_void", "Distortion Field"),
-    ("hoodwink", "Mistwood's Wayfarer"),
-    ("jakiro", "Double Trouble"),
-    ("juggernaut", "Bladeform"),
-    ("largo", "Encore"),
-    ("largo", "Fight Song"),
-    ("lina", "Slow Burn"),
-    ("lion", "To Hell and Back"),
-    ("lycan", "Apex Predator"),
-    ("mars", "Dauntless"),
-    ("meepo", "Geomancy"),
-    ("naga_siren", "Eelskin"),
-    ("oracle", "Prognosticate"),
-    ("pangolier", "Rolling Thunder"),
-    ("primal_beast", "Colossal"),
-    ("puck", "Puckish"),
-    ("pugna", "Oblivion Savant"),
-    ("rattletrap", "Armor Power"),
-    ("sand_king", "Epicenter"),
-    ("shredder", "Exposure Therapy"),
-    ("silencer", "Brain Drain"),
-    ("slardar", "Seaborn Sentinel"),
-    ("snapfire", "Boomstick"),
-    ("sniper", "Keen Scope"),
     ("storm_spirit", "Galvanized"),
-    ("troll_warlord", "Whirling Axes (Melee)"),
-    ("troll_warlord", "Whirling Axes (Ranged)"),
-    ("viper", "Nosedive"),
-    ("viper", "Predator"),
-    ("void_spirit", "Intrinsic Edge"),
-    ("warlock", "Eldritch Summoning"),
-    ("weaver", "Threads of Fate"),
 }
 
 def subgroup(title):
@@ -1531,7 +1487,7 @@ h4.subgroup {
   grid-column: 2;
   margin: 0;
   padding: 2px 0 4px 0;
-  color: #d2a8ff;
+  color: #c9d1d9;          /* same as body text — not coloured */
   font-size: 17px;
   font-weight: 600;
   line-height: 1.2;
@@ -1555,6 +1511,13 @@ h4.subgroup {
 .ability-block ul.changes li > .formula-table {
   margin-left: -60px;          /* counter ability-block icon column (48 + 12 gap) */
   width: calc(100% + 60px);
+}
+/* Raw <li> (no .row-text wrapper) inside ability-block — TWO offsets stack:
+   76px to cancel the raw-li padding, plus 60px to clear the ability-block icon. */
+.ability-block ul.changes li:not(:has(> .row-text)) > .formula-table,
+.ability-block ul.changes li:not(:has(> .row-text)) > .correction-note {
+  margin-left: -136px;
+  width: calc(100% + 136px);
 }
 
 /* CHANGES LIST — grid layout: [tag] [text] [percentages] */
@@ -1691,12 +1654,12 @@ ul.subnotes li::before { content: "↳ "; color: #6e7681; }
   text-align: center;
   box-sizing: border-box;
 }
-/* When inside .badge-group → strip the box, become plain colored text */
+/* When inside .badge-group → strip the box, become plain colored text.
+   `display: inline` ensures baseline-alignment with surrounding text (was inline-flex
+   which sat below the text baseline in raw rows like Bloodstone wrong-line). */
 .badge-group {
-  display: inline-flex;
-  gap: 0;
-  flex-wrap: wrap;
-  vertical-align: middle;
+  display: inline;
+  vertical-align: baseline;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   font-size: 13px;
@@ -2532,7 +2495,9 @@ JS_TEXT = '''
     }
     resultsBox.innerHTML = matches.map((m, i) =>
       `<div class="result-item" data-idx="${i}">${
-        m.icon ? `<img src="${m.icon}" alt="">` : '<span style="width:32px;display:inline-block"></span>'
+        m.icon
+          ? `<img src="${m.icon}" alt="" onerror="this.onerror=null;this.src='https://cdn.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png';">`
+          : '<span style="width:32px;display:inline-block"></span>'
       }<span>${highlight(m.name, query)}</span><span class="kind">${m.kind}</span></div>`
     ).join('');
     resultsBox.classList.add('show');
