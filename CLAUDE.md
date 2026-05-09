@@ -37,6 +37,30 @@ python generate_patch_code.py 7.42     # сгенерировать код из 
 - **entity-block** — каждый герой/предмет оборачивается в блок через `hero_header()` / `item_header()`
 - **ITEM_SLUG в build_patch.py** — также читается в `generate_patch_code.py` (line 81-87), добавлять новые предметы надо туда
 
+## База статов (stats DB)
+
+Файлы `data/stats/{version}/heroes.json` и `items.json` — распарсенные поля из npc_heroes.txt / items.txt за каждый патч. Скачиваются через `D:\Sloppy Patches\fetch_stats.py`.
+
+### Хелперы для авто-бейджей из БД
+
+```python
+# Получить значение стата напрямую
+old = stat_h("Doom", "ArmorPhysical", "7.41")        # → 4
+old = stat_i("Blink Dagger", "ItemCooldown", "7.41") # → 14
+
+# Авто-бейдж: delta = разница (new - old). patch_before = версия ДО патча
+W(li("Base Armor decreased by 1", bstat_h("Doom", "ArmorPhysical", "7.41", -1)))
+W(li("Cooldown decreased from 14 to 12", bstat_i("Blink Dagger", "ItemCooldown", "7.41b", -2, l=True)))
+```
+
+Ключи из npc_heroes.txt: `ArmorPhysical`, `AttackDamageMin/Max`, `AttackRate`, `MovementSpeed`,
+`AttributeBaseStrength/Agility/Intelligence`, `AttributeStrengthGain/AgilityGain/IntelligenceGain`,
+`StatusHealth`, `StatusMana`, `StatusHealthRegen`, `StatusManaRegen`.
+
+Ключи из items.txt: `ItemCost`, `ItemCooldown`, `AbilityManaCost`, `AbilityCooldown`.
+
+Если стат не найден (ещё нет файла за ту версию) — fallback на `t("BUFF")`/`t("NERF")`.
+
 ## Предупреждения
 
 - При добавлении нового героя: добавить в `HERO_SLUG` (build_patch.py) И в `load_hero_internal_to_display()` (generate_patch_code.py)
