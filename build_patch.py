@@ -1819,9 +1819,12 @@ h2.section {
    column; the original per-row tag is hidden. Subsequent rows show an empty
    placeholder so the text column stays aligned with the rest of the page.
    The tag text comes from data-new-tag on the .entity-block. */
+/* Hide the original first-child tag completely (not visibility:hidden) so
+   it doesn't occupy cell (1,1) of the grid — otherwise the ::before tag
+   gets auto-placed to row 2 and appears below the row content. */
 .entity-block.is-new ul.changes li > .badge:first-child,
 .entity-block.is-new ul.changes li > .row-tag-empty {
-  visibility: hidden;
+  display: none;
 }
 /* The pseudo lives on <li>; attr() can't read data-new-tag from .entity-block.
    Use explicit content per known tag value. */
@@ -5768,11 +5771,11 @@ W(li("Provides +125 Mana", t("MISC")))
 W(ul_close())
 W(item_header("Chainmail"))
 W(ul_open())
-W(li("Cost decreased from 550g to 500g", b(550, 500)))
+W(li("Cost decreased from 550g to 500g", b(550, 500, l=True)))
 W(ul_close())
 W(item_header("Cloak"))
 W(ul_open())
-W(li("Cost increased from 800g to 900g", b(800, 900)))
+W(li("Cost increased from 800g to 900g", b(800, 900, l=True)))
 W(li("Magic Resistance bonus decreased from +20% to +18%", b(20, 18)))
 W(ul_close())
 W(item_header("Cornucopia"))
@@ -5801,7 +5804,7 @@ W(ul_open())
 W(li("Spell Lifesteal bonus increased from +12% to +15%", b(12, 15)))
 W(ul_close())
 
-W(subgroup("Upgrades"))
+W(plain_header("Upgrades"))
 W(item_header("Consecrated Wraps", new="New Armor Item"))
 W(ul_open())
 W(li("Requires Vitality Booster (1000), Shawl (450), Crown (450), and a recipe (700). Total cost: 2600g", t("MISC")))
@@ -6084,7 +6087,7 @@ W(li("Health Regen bonus decreased from +6.5 to +5.5", b(6.5, 5.5)))
 W(ul_close())
 W(item_header("Phase Boots"))
 W(ul_open())
-W(li("Cost decreased from 1500g to 1450g (due to Chainmail cost decrease)", b(1500, 1450)))
+W(li("Cost decreased from 1500g to 1450g (due to Chainmail cost decrease)", b(1500, 1450, l=True)))
 W(ul_close())
 W(item_header("Phylactery"))
 W(ul_open())
