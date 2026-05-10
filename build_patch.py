@@ -471,11 +471,13 @@ class _State:
     # Auto-categorize hero block contents (Stats / Abilities / Talents subgroups):
     next_ul_is_hero_stats = False    # set by hero_header(), consumed by ul_open()
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup
+    current_sections = []            # per-patch list of {slug, label}; reset in save_html()
 
-def _open_block(extra_cls=''):
+def _open_block(extra_cls='', extra_attrs=''):
     pre = _close_ability_block()
     cls = 'entity-block' + ((' ' + extra_cls) if extra_cls else '')
-    s = pre + ('</div>\n' if _State.block_open else '') + f'<div class="{cls}">\n'
+    s = (pre + ('</div>\n' if _State.block_open else '')
+         + f'<div class="{cls}"{extra_attrs}>\n')
     _State.block_open = True
     return s
 
@@ -534,25 +536,25 @@ def item_header(name, new=False):
     _State.current_hero = None
     if new:
         if isinstance(new, str):
-            # 'New X Item' / 'Returning X Item' / 'New Tier N Artifact' →
-            # split first word into tag, rest into the inline type label.
             first, _, rest = new.partition(' ')
             tag_text = first.upper()
             type_text = rest.strip()
         else:
-            tag_text = 'NEW'
-            type_text = ''
-        new_tag = (f'<span class="badge new" data-tag="new" '
-                   f'data-overall="buff">{tag_text}</span> ')
+            tag_text = 'NEW'; type_text = ''
         type_label = (f' <span class="entity-new-type">{type_text}</span>'
                       if type_text else '')
+        # The NEW tag itself is emitted by CSS ::before on ul.changes
+        # (vertically centred on the rows it groups, joined by a left brace).
+        # We pass the tag text via data-new-tag on the entity-block.
+        extra_cls = 'is-new'
+        block_data_attr = f' data-new-tag="{tag_text}"'
     else:
-        new_tag = ''
         type_label = ''
-    extra_cls = 'is-new' if new else ''
-    return out + _open_block(extra_cls) + f'''<div class="entity item-entity">
+        extra_cls = ''
+        block_data_attr = ''
+    return out + _open_block(extra_cls, block_data_attr) + f'''<div class="entity item-entity">
   <div class="entity-icon item-icon"><img src="{item_img(name)}" alt="{name}" loading="lazy"></div>
-  <div class="entity-name">{new_tag}{name}{type_label}</div>
+  <div class="entity-name">{name}{type_label}</div>
 </div>'''
 
 
@@ -575,9 +577,23 @@ def enchant_header(name, slug=None):
 </div>'''
 
 
+def _section_slug(title):
+    """'Hero Updates' → 'heroes', 'Neutral Item Updates' → 'neutral-items', etc."""
+    t = re.sub(r'\s+Updates?$', '', title).strip()
+    # Pluralise single-word categories for nicer button labels (Hero → Heroes).
+    pluralise = {'Hero': 'Heroes', 'Item': 'Items',
+                 'Neutral Item': 'Neutral Items', 'Neutral Creep': 'Neutral Creeps'}
+    label = pluralise.get(t, t)
+    slug = label.lower().replace(' ', '-')
+    return slug, label
+
+
 def section(title):
     _State.current_hero = None
-    return _close_block() + f'<h2 class="section">{title}</h2>'
+    slug, label = _section_slug(title)
+    _State.current_sections.append({'slug': slug, 'label': label})
+    return (_close_block()
+            + f'<h2 class="section" data-section="{slug}">{title}</h2>')
 
 
 # Talent icon — Valve's official SVG used in www.dota2.com/patches/.
@@ -1407,7 +1423,9 @@ nav.top-nav {
   transform: rotate(-90deg);
 }
 .cal-year-summary {
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 8px 12px 0;
   margin-top: -8px;
   color: #8b949e;
@@ -1795,17 +1813,47 @@ h2.section {
   color: #79c0ff;
 }
 
-/* NEW-ITEM BLOCK — entity name carries a left-side NEW tag + a small type
-   label after the name ('Miscellaneous Item' / 'Tier 1 Artifact' / etc.).
-   The soft NEW-coloured outline wraps the ul.changes list (full width)
-   instead of the whole entity-block, so the entity card itself stays
-   visually identical to other items. */
-.entity-block.is-new ul.changes {
-  border: 1px solid rgba(220, 175, 95, 0.32);
-  border-radius: 6px;
-  background: rgba(220, 175, 95, 0.025);
-  padding: 6px 12px;
+/* NEW-ITEM BLOCK — entity row shows only the type label after the name.
+   The NEW tag itself sits to the LEFT of the changes list, vertically
+   centred over all rows; a thin NEW-coloured left rule visually groups
+   the rows it covers. Per-row BUFF/NERF tags are suppressed. */
+.entity-block.is-new {
+  position: relative;
+  padding-left: 64px;          /* room for the centred NEW tag */
 }
+.entity-block.is-new > .entity { margin-left: 0; }
+.entity-block.is-new ul.changes {
+  position: relative;
+  border-left: 2px solid rgba(220, 175, 95, 0.45);
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  padding-left: 14px;
+}
+.entity-block.is-new ul.changes::before {
+  /* NEW tag — content set via the parent's data-new-tag attribute. */
+  content: attr(data-new-tag);
+  position: absolute;
+  left: -64px;
+  top: 50%;
+  transform: translateY(-50%);
+  /* match .badge new visuals */
+  display: inline-block;
+  padding: 3px 7px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  background: rgba(220, 175, 95, 0.10);
+  color: #b08c5a;
+  border: 1px solid rgba(220, 175, 95, 0.30);
+  text-align: center;
+  min-width: 50px;
+}
+/* Bridge the data-new-tag attribute from the parent to the ::before content. */
+.entity-block.is-new[data-new-tag] ul.changes { /* anchor needed for selector */ }
+.entity-block.is-new[data-new-tag="NEW"] ul.changes::before { content: "NEW"; }
+.entity-block.is-new[data-new-tag="RETURNING"] ul.changes::before { content: "RETURNING"; }
+/* Hide per-row tags (the NEW signal is the block-level tag on the left). */
 .entity-block.is-new ul.changes li > .badge:first-child,
 .entity-block.is-new ul.changes li > .row-tag-empty {
   display: none;
@@ -1816,7 +1864,7 @@ h2.section {
 }
 .entity-block.is-new ul.changes li > .row-text { grid-column: 1; }
 .entity-block.is-new ul.changes li > .badge-group { grid-column: 2; }
-/* Type label after the item name — small, subdued, NEW colour family. */
+/* Type label after the item name — small, uppercased, NEW colour family. */
 .entity-name .entity-new-type {
   margin-left: 8px;
   font-size: 11.5px;
@@ -1825,11 +1873,6 @@ h2.section {
   text-transform: uppercase;
   color: #b08c5a;
   opacity: 0.85;
-}
-/* The leading NEW tag in the entity name reads same size as other badges. */
-.entity-name > .badge.new {
-  margin-right: 6px;
-  vertical-align: 2px;
 }
 
 /* SUBGROUPS — same colour as body text / ability titles, not blue.
@@ -2461,6 +2504,48 @@ ul.changes li.aghanim-shard {
   background-clip: padding-box !important;
 }
 
+/* CATEGORIES FILTER BAR — sits next to tag filters; same button style. */
+.legend-categories {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 18px;
+  flex-wrap: wrap;
+}
+.legend-categories strong {
+  color: #8b949e;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+.cat-filter-btn {
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 3px;
+  background: rgba(121, 192, 255, 0.05);
+  color: #87a3bf;
+  border: 1px solid rgba(121, 192, 255, 0.22);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  transition: filter 0.12s, background 0.12s, border-color 0.12s;
+}
+.cat-filter-btn:hover {
+  background: rgba(121, 192, 255, 0.10);
+  border-color: rgba(121, 192, 255, 0.40);
+  color: #c9d1d9;
+}
+.cat-filter-btn.active {
+  background: rgba(121, 192, 255, 0.22);
+  border-color: rgba(121, 192, 255, 0.60);
+  color: #c9d1d9;
+}
+body.cat-filter-active .cat-hide { display: none !important; }
+
 /* FILTER BUTTONS in legend — make tags clickable */
 .legend-tags .badge.filter-btn {
   cursor: pointer;
@@ -2758,9 +2843,11 @@ def _render_top_nav(active="changelogs", current_version=None, date=None, patch_
         age_line = _patch_age_line(current_version)
         age_html = f'<span class="patch-age">{age_line}</span>' if age_line else ''
         if active == "calendar":
-            # Calendar page — the calendar itself shows date+version, no need
-            # for a redundant release-info widget on the right.
-            right_side = ''
+            # Calendar page — no release-info widget (the calendar itself shows
+            # date+version), but we still emit an empty nav-context-calendar
+            # div so the toolbar reserves the same vertical space as on patch
+            # pages and the header doesn't jump on tab switch.
+            right_side = '\n    <div class="nav-context nav-context-calendar"></div>'
         else:
             options = _dropdown_options_html(current_version, patch_context=patch_context)
             right_side = f'''
@@ -2819,6 +2906,7 @@ def write_head(version, date):
     <button class="badge misc filter-btn" data-filter="misc">MISC</button>
     <button class="badge qol filter-btn" data-filter="qol">QoL</button>
   </div>
+  <div class="legend-categories"><!--CATEGORIES_BAR--></div>
   <div class="search-box">
     <input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">
     <div class="search-results" id="search-results"></div>
@@ -2947,6 +3035,39 @@ JS_TEXT = '''
         btn.classList.add('active');
       }
       applyFilter();
+    });
+  });
+
+  // ---- CATEGORIES FILTER ----
+  // Tag every element between adjacent <h2 class="section"> headers with the
+  // preceding section's slug so the buttons can hide non-matching siblings.
+  (function indexSections() {
+    const headers = document.querySelectorAll('h2.section[data-section]');
+    headers.forEach(h => {
+      const slug = h.dataset.section;
+      let nx = h.nextElementSibling;
+      while (nx && !(nx.tagName === 'H2' && nx.classList.contains('section'))) {
+        if (!nx.dataset.section) nx.dataset.section = slug;
+        nx = nx.nextElementSibling;
+      }
+    });
+  })();
+  const catButtons = document.querySelectorAll('.cat-filter-btn');
+  const activeCats = new Set();
+  function applyCatFilter() {
+    const on = activeCats.size > 0;
+    document.body.classList.toggle('cat-filter-active', on);
+    document.querySelectorAll('[data-section]').forEach(el => {
+      el.classList.remove('cat-hide');
+      if (on && !activeCats.has(el.dataset.section)) el.classList.add('cat-hide');
+    });
+  }
+  catButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cat = btn.dataset.category;
+      if (activeCats.has(cat)) { activeCats.delete(cat); btn.classList.remove('active'); }
+      else { activeCats.add(cat); btn.classList.add('active'); }
+      applyCatFilter();
     });
   });
 
@@ -3121,9 +3242,23 @@ def _swap_single_row_other_icons(html):
     return _OTHER_BLOCK_RE.sub(repl, html)
 
 
+def _categories_bar_html():
+    """Render the Categories filter buttons for the currently-accumulated patch."""
+    if not _State.current_sections:
+        return ''
+    btns = []
+    for s in _State.current_sections:
+        btns.append(
+            f'<button class="badge cat-filter-btn" data-category="{s["slug"]}">'
+            f'{s["label"]}</button>'
+        )
+    return '<strong>Categories:</strong>' + ''.join(btns)
+
+
 def save_html(filename):
     """Write current accumulator to ./{filename} and reset state."""
     out = "\n".join(H)
+    out = out.replace('<!--CATEGORIES_BAR-->', _categories_bar_html())
     out = _swap_single_row_other_icons(out)
     path = filename
     os.makedirs(os.path.dirname(path), exist_ok=True) if os.path.dirname(path) else None
@@ -3132,6 +3267,7 @@ def save_html(filename):
     print(f"  → {filename}: {len(out):,} bytes")
     H.clear()
     _State.block_open = False
+    _State.current_sections = []
 
 
 # Pre-computed KV-entry counts per patch (from patchnotes_english.txt analysis).
@@ -3298,9 +3434,11 @@ def save_calendar_html():
         if ys:
             body.append(
                 '<div class="cal-year-summary">'
+                '<div class="cal-year-summary-left">'
                 f'<span class="cal-year-summary-key">Total count:</span> '
                 f'<span class="cal-year-summary-val">{ys["total"]}</span>'
-                f' &middot; '
+                '</div>'
+                '<div class="cal-year-summary-right">'
                 f'<span class="cal-year-summary-key">Longest:</span> '
                 f'<span class="cal-year-summary-val">{ys["longest"][0]}</span>'
                 f' <span class="cal-year-summary-meta">({ys["longest"][1]} days)</span>'
@@ -3308,6 +3446,7 @@ def save_calendar_html():
                 f'<span class="cal-year-summary-key">Shortest:</span> '
                 f'<span class="cal-year-summary-val">{ys["shortest"][0]}</span>'
                 f' <span class="cal-year-summary-meta">({ys["shortest"][1]} days)</span>'
+                '</div>'
                 '</div>'
             )
 
@@ -5612,7 +5751,7 @@ W(li("Items in all shop categories except for Consumables have been rearranged t
 W(li("Consumables now includes Infused Raindrops", t("MISC")))
 W(ul_close())
 
-W(subgroup("Basic Items"))
+W(plain_header("Basic Items"))
 W(item_header("Chasm Stone", new="New Miscellaneous Item"))
 W(ul_open())
 W(li("Costs 800 gold", t("MISC")))
