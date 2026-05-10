@@ -1502,18 +1502,20 @@ span.cal-patch {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
 }
 
-/* CURRENT patch — заранее увеличена (full mode) */
+/* CURRENT patch — emphasised without scaling so text never overflows the cell. */
 .cal-full-day.has-patch.current {
-  transform: scale(1.5);
   z-index: 4;
-  filter: brightness(1.15);
+  filter: brightness(1.20);
   box-shadow:
-    0 0 0 1.5px rgba(121, 192, 255, 0.55),
+    0 0 0 2px rgba(121, 192, 255, 0.85),
     0 2px 8px rgba(0, 0, 0, 0.55);
 }
 .cal-full-day.has-patch.current:hover {
-  transform: scale(1.7);
   z-index: 6;
+  filter: brightness(1.35);
+  box-shadow:
+    0 0 0 2.5px rgba(121, 192, 255, 1),
+    0 4px 12px rgba(0, 0, 0, 0.65);
 }
 
 span.cal-full-day.has-patch {
