@@ -811,6 +811,12 @@ def ability(title, slug=None, innate=None, icon_url=None):
     elif innate is not None:
         is_innate = bool(innate)
     icon_inner = ''
+    # Fallback: if no source for the icon at all, show the missing-placeholder
+    # so the row is identifiable rather than text-only.
+    if not (icon_url or slug):
+        icon_inner = (f'<img src="{MISSING_ICON_URL}" alt="" '
+                      f'class="ability-icon-img" loading="lazy" '
+                      f'title="missing icon: {title}">')
     if icon_url or slug:
         src = icon_url if icon_url else f"{ABIL_CDN}{slug}.png"
         # On 404: swap to the "missing" placeholder (red ? on dark dashed
@@ -5394,12 +5400,6 @@ W(li("Units with free movement now can miss their attacks when attacking uphill 
 W(ul_close())
 W(subnote("Affected units:<br>* Batrider during Firefly<br>* Dragon Knight during Elder Dragon Form with Aghanim's Scepter<br>* Lina during Flame Cloak<br>* Terrorblade's Reflection illusions"))
 
-W(plain_header("Shop Reshuffle"))
-W(ul_open())
-W(li("Items in all shop categories except for Consumables have been rearranged to accommodate new items", t("MISC")))
-W(li("Consumables now includes Infused Raindrops", t("MISC")))
-W(ul_close())
-
 # ===== NEUTRAL CREEP UPDATES =====
 W(section("Neutral Creep Updates"))
 _NC_CDN = "../icons/units/npc_dota_neutral_"
@@ -5424,44 +5424,50 @@ W(ul_open())
 W(li("Damage decreased from 45–50 to 38–43", b(47.5, 40.5)))
 W(ul_close())
 W(unit_header("Harpy Stormcrafter", _NC_CDN + "harpy_storm.png"))
-W(ability("Chain Lightning"))
+W(ability("Chain Lightning", icon_url="../icons/abilities/harpy_storm_chain_lightning.png"))
 W(ul_open())
 W(li("Damage rescaled from 140/180/220/260 to 120/170/220/270", b([140, 180, 220, 260], [120, 170, 220, 270])))
 W(ul_close())
 W(unit_header("Satyr Tormenter", _NC_CDN + "satyr_hellcaller.png"))
-W(ability("Shockwave"))
+W(ability("Shockwave", icon_url="../icons/abilities/satyr_hellcaller_shockwave.png"))
 W(ul_open())
 W(li("Damage rescaled from 160 to 140/160/180/200", b(160, [140, 160, 180, 200])))
 W(ul_close())
 W(unit_header("Warpine Raider", _NC_CDN + "warpine_raider.png"))
-W(ability("Seed Shot"))
+W(ability("Seed Shot", icon_url="../icons/abilities/warpine_raider_seed_shot.png"))
 W(ul_open())
 W(li("Damage rescaled from 100 to 80/95/110/125", b(100, [80, 95, 110, 125])))
 W(ul_close())
 W(unit_header("Boglet", _NC_CDN + "froglet.png"))
-W(ability("Arm of the Deep"))
+W(ability("Arm of the Deep", icon_url="../icons/abilities/frogmen_arm_of_the_deep.png"))
 W(ul_open())
 W(li("After neutrals cast this ability, all copies of Arm of the Deep, Tendrils of the Deep, and Congregations of the Deep on other neutrals go on a brief cooldown", t("NERF")))
 W(ul_close())
 W(unit_header("Croaker", _NC_CDN + "grown_frog.png"))
-W(ability("Tendrils of the Deep"))
+W(ability("Tendrils of the Deep", icon_url="../icons/abilities/frogmen_tendrils_of_the_deep.png"))
 W(ul_open())
 W(li("After neutrals cast this ability, all copies of Arm of the Deep, Tendrils of the Deep, and Congregations of the Deep on other neutrals go on a brief cooldown", t("NERF")))
 W(ul_close())
 W(unit_header("Ancient Croaker", _NC_CDN + "ancient_frog.png"))
-W(ability("Congregations of the Deep"))
+W(ability("Congregations of the Deep", icon_url="../icons/abilities/frogmen_congregation_of_the_deep.png"))
 W(ul_open())
 W(li("After neutrals cast this ability, all copies of Arm of the Deep, Tendrils of the Deep, and Congregations of the Deep on other neutrals go on a brief cooldown", t("NERF")))
 W(li("Radius is now affected by Area of Effect bonuses", t("BUFF")))
 W(ul_close())
 W(unit_header("Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png"))
-W(ability("Water Bubble (Large)"))
+W(ability("Water Bubble (Large)", icon_url="../icons/abilities/frogmen_water_bubble_large.png"))
 W(ul_open())
 W(li("Radius is now affected by Area of Effect bonuses", t("BUFF")))
 W(ul_close())
 
 # ===== ITEM UPDATES =====
 W(section("Item Updates"))
+
+W(plain_header("Shop Reshuffle"))
+W(ul_open())
+W(li("Items in all shop categories except for Consumables have been rearranged to accommodate new items", t("MISC")))
+W(li("Consumables now includes Infused Raindrops", t("MISC")))
+W(ul_close())
 
 W(item_header("Chasm Stone", new=True))
 W(ul_open())
