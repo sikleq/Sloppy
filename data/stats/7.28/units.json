@@ -1,1 +1,2542 @@
-{"npc_dota_units_base":{"ArmorPhysical":0,"AttackDamageMin":1,"AttackDamageMax":1,"AttackRate":1.7,"AttackRange":600,"MovementSpeed":300,"StatusHealth":150,"StatusMana":0},"npc_dota_companion":{"MovementSpeed":325},"npc_dota_loadout_generic":{"MovementSpeed":325},"npc_dota_creep_badguys_ranged":{"ArmorPhysical":0,"AttackDamageMin":21,"AttackDamageMax":26,"AttackRate":1,"AttackRange":500,"MovementSpeed":325,"StatusHealth":300,"StatusMana":500},"npc_dota_creep_badguys_ranged_upgraded":{"ArmorPhysical":1,"AttackDamageMin":41,"AttackDamageMax":46,"AttackRate":1,"AttackRange":500,"MovementSpeed":325,"StatusHealth":475,"StatusMana":500},"npc_dota_creep_badguys_ranged_upgraded_mega":{"ArmorPhysical":1,"AttackDamageMin":41,"AttackDamageMax":46,"AttackRate":1,"AttackRange":500,"MovementSpeed":325,"StatusHealth":475,"StatusMana":500},"npc_dota_creep_goodguys_ranged":{"ArmorPhysical":0,"AttackDamageMin":21,"AttackDamageMax":26,"AttackRate":1,"AttackRange":500,"MovementSpeed":325,"StatusHealth":300,"StatusMana":500},"npc_dota_creep_goodguys_ranged_upgraded":{"ArmorPhysical":1,"AttackDamageMin":41,"AttackDamageMax":46,"AttackRate":1,"AttackRange":500,"MovementSpeed":325,"StatusHealth":475,"StatusMana":500},"npc_dota_creep_goodguys_ranged_upgraded_mega":{"ArmorPhysical":1,"AttackDamageMin":41,"AttackDamageMax":46,"AttackRate":1,"AttackRange":500,"MovementSpeed":325,"StatusHealth":475,"StatusMana":500},"npc_dota_creep_badguys_melee":{"ArmorPhysical":2,"AttackDamageMin":19,"AttackDamageMax":23,"AttackRate":1,"AttackRange":100,"MovementSpeed":325,"StatusHealth":550,"StatusMana":0},"npc_dota_creep_badguys_melee_upgraded":{"ArmorPhysical":3,"AttackDamageMin":36,"AttackDamageMax":44,"AttackRate":1,"AttackRange":100,"MovementSpeed":325,"StatusHealth":700,"StatusMana":0},"npc_dota_creep_badguys_melee_upgraded_mega":{"ArmorPhysical":3,"AttackDamageMin":36,"AttackDamageMax":44,"AttackRate":1,"AttackRange":100,"MovementSpeed":325,"StatusHealth":700,"StatusMana":0},"npc_dota_creep_goodguys_melee":{"ArmorPhysical":2,"AttackDamageMin":19,"AttackDamageMax":23,"AttackRate":1,"AttackRange":100,"MovementSpeed":325,"StatusHealth":550,"StatusMana":0},"npc_dota_creep_goodguys_melee_upgraded":{"ArmorPhysical":3,"AttackDamageMin":36,"AttackDamageMax":44,"AttackRate":1,"AttackRange":100,"MovementSpeed":325,"StatusHealth":700,"StatusMana":0},"npc_dota_creep_goodguys_melee_upgraded_mega":{"ArmorPhysical":3,"AttackDamageMin":36,"AttackDamageMax":44,"AttackRate":1,"AttackRange":100,"MovementSpeed":325,"StatusHealth":700,"StatusMana":0},"npc_dota_goodguys_tower1_top":{"ArmorPhysical":12,"AttackDamageMin":88,"AttackDamageMax":92,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":1800,"StatusMana":0},"npc_dota_goodguys_tower1_mid":{"ArmorPhysical":12,"AttackDamageMin":88,"AttackDamageMax":92,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":1800,"StatusMana":0},"npc_dota_goodguys_tower1_bot":{"ArmorPhysical":12,"AttackDamageMin":88,"AttackDamageMax":92,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":1800,"StatusMana":0},"npc_dota_goodguys_tower2_top":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_goodguys_tower2_mid":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_goodguys_tower2_bot":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_goodguys_tower3_top":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_goodguys_tower3_mid":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_goodguys_tower3_bot":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_goodguys_tower4":{"ArmorPhysical":21,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2600,"StatusMana":0},"npc_dota_badguys_tower1_top":{"ArmorPhysical":12,"AttackDamageMin":88,"AttackDamageMax":92,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":1800,"StatusMana":0},"npc_dota_badguys_tower1_mid":{"ArmorPhysical":12,"AttackDamageMin":88,"AttackDamageMax":92,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":1800,"StatusMana":0},"npc_dota_badguys_tower1_bot":{"ArmorPhysical":12,"AttackDamageMin":88,"AttackDamageMax":92,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":1800,"StatusMana":0},"npc_dota_badguys_tower2_top":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_badguys_tower2_mid":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_badguys_tower2_bot":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_badguys_tower3_top":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_badguys_tower3_mid":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_badguys_tower3_bot":{"ArmorPhysical":16,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2500,"StatusMana":0},"npc_dota_badguys_tower4":{"ArmorPhysical":21,"AttackDamageMin":170,"AttackDamageMax":174,"AttackRate":0.9,"AttackRange":700,"MovementSpeed":0,"StatusHealth":2600,"StatusMana":0},"npc_dota_watch_tower":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":450,"StatusMana":0},"npc_dota_goodguys_fillers":{"ArmorPhysical":10,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1000,"StatusMana":0},"npc_dota_goodguys_healers":{"ArmorPhysical":17,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1750,"StatusMana":0},"npc_dota_badguys_fillers":{"ArmorPhysical":10,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1000,"StatusMana":0},"npc_dota_badguys_healers":{"ArmorPhysical":17,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1750,"StatusMana":0},"npc_dota_goodguys_melee_rax_top":{"ArmorPhysical":15,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":2200,"StatusMana":0},"npc_dota_goodguys_melee_rax_mid":{"ArmorPhysical":15,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":2200,"StatusMana":0},"npc_dota_goodguys_melee_rax_bot":{"ArmorPhysical":15,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":2200,"StatusMana":0},"npc_dota_goodguys_range_rax_top":{"ArmorPhysical":9,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1300,"StatusMana":0},"npc_dota_goodguys_range_rax_mid":{"ArmorPhysical":9,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1300,"StatusMana":0},"npc_dota_goodguys_range_rax_bot":{"ArmorPhysical":9,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1300,"StatusMana":0},"npc_dota_badguys_melee_rax_top":{"ArmorPhysical":15,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":2200,"StatusMana":0},"npc_dota_badguys_melee_rax_mid":{"ArmorPhysical":15,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":2200,"StatusMana":0},"npc_dota_badguys_melee_rax_bot":{"ArmorPhysical":15,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":2200,"StatusMana":0},"npc_dota_badguys_range_rax_top":{"ArmorPhysical":9,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1300,"StatusMana":0},"npc_dota_badguys_range_rax_mid":{"ArmorPhysical":9,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1300,"StatusMana":0},"npc_dota_badguys_range_rax_bot":{"ArmorPhysical":9,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1300,"StatusMana":0},"npc_dota_goodguys_fort":{"ArmorPhysical":13,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":4500,"StatusMana":0},"npc_dota_badguys_fort":{"ArmorPhysical":13,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":4500,"StatusMana":0},"npc_dota_goodguys_siege":{"ArmorPhysical":0,"AttackDamageMin":35,"AttackDamageMax":46,"AttackRate":3.0,"AttackRange":690,"MovementSpeed":325,"StatusHealth":935,"StatusMana":0},"npc_dota_goodguys_siege_upgraded":{"ArmorPhysical":0,"AttackDamageMin":51,"AttackDamageMax":62,"AttackRate":3.0,"AttackRange":690,"MovementSpeed":325,"StatusHealth":935,"StatusMana":0},"npc_dota_goodguys_siege_upgraded_mega":{"ArmorPhysical":0,"AttackDamageMin":51,"AttackDamageMax":62,"AttackRate":3.0,"AttackRange":690,"MovementSpeed":325,"StatusHealth":935,"StatusMana":0},"npc_dota_badguys_siege":{"ArmorPhysical":0,"AttackDamageMin":35,"AttackDamageMax":46,"AttackRate":3.0,"AttackRange":690,"MovementSpeed":325,"StatusHealth":935,"StatusMana":0},"npc_dota_badguys_siege_upgraded":{"ArmorPhysical":0,"AttackDamageMin":51,"AttackDamageMax":62,"AttackRate":3.0,"AttackRange":690,"MovementSpeed":325,"StatusHealth":935,"StatusMana":0},"npc_dota_badguys_siege_upgraded_mega":{"ArmorPhysical":0,"AttackDamageMin":51,"AttackDamageMax":62,"AttackRate":3.0,"AttackRange":690,"MovementSpeed":325,"StatusHealth":935,"StatusMana":0},"npc_dota_juggernaut_healing_ward":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1,"AttackRange":500,"MovementSpeed":350,"StatusHealth":1,"StatusMana":0},"npc_dota_healing_campfire":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1,"AttackRange":500,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_zeus_cloud":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1,"AttackRange":500,"MovementSpeed":0,"StatusHealth":16,"StatusMana":0},"npc_dota_tusk_frozen_sigil1":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1,"AttackRange":500,"MovementSpeed":310,"StatusHealth":12,"StatusMana":0},"npc_dota_tusk_frozen_sigil2":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1,"AttackRange":500,"MovementSpeed":310,"StatusHealth":12,"StatusMana":0},"npc_dota_tusk_frozen_sigil3":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1,"AttackRange":500,"MovementSpeed":310,"StatusHealth":16,"StatusMana":0},"npc_dota_tusk_frozen_sigil4":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1,"AttackRange":500,"MovementSpeed":310,"StatusHealth":16,"StatusMana":0},"npc_dota_elder_titan_ancestral_spirit":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":315,"StatusHealth":100},"npc_dota_neutral_kobold":{"ArmorPhysical":0,"AttackDamageMin":10,"AttackDamageMax":11,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":270,"StatusHealth":240,"StatusMana":0},"npc_dota_neutral_kobold_tunneler":{"ArmorPhysical":1,"AttackDamageMin":14,"AttackDamageMax":15,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":270,"StatusHealth":325,"StatusMana":0},"npc_dota_neutral_kobold_taskmaster":{"ArmorPhysical":1,"AttackDamageMin":14,"AttackDamageMax":15,"AttackRate":1.35,"AttackRange":110,"MovementSpeed":330,"StatusHealth":400,"StatusMana":0},"npc_dota_neutral_centaur_outrunner":{"ArmorPhysical":1,"AttackDamageMin":18,"AttackDamageMax":21,"AttackRate":1.3,"AttackRange":100,"MovementSpeed":320,"StatusHealth":350,"StatusMana":0},"npc_dota_neutral_centaur_khan":{"ArmorPhysical":4,"AttackDamageMin":49,"AttackDamageMax":55,"AttackRate":1.5,"AttackRange":100,"MovementSpeed":320,"StatusHealth":1100,"StatusMana":200},"npc_dota_neutral_fel_beast":{"ArmorPhysical":1,"AttackDamageMin":14,"AttackDamageMax":15,"AttackRate":1.5,"AttackRange":100,"MovementSpeed":350,"StatusHealth":400,"StatusMana":0},"npc_dota_neutral_polar_furbolg_champion":{"ArmorPhysical":3,"AttackDamageMin":39,"AttackDamageMax":44,"AttackRate":1.5,"AttackRange":100,"MovementSpeed":320,"StatusHealth":700,"StatusMana":0},"npc_dota_neutral_polar_furbolg_ursa_warrior":{"ArmorPhysical":4,"AttackDamageMin":49,"AttackDamageMax":55,"AttackRate":1.55,"AttackRange":100,"MovementSpeed":320,"StatusHealth":950,"StatusMana":300},"npc_dota_neutral_mud_golem":{"ArmorPhysical":0,"AttackDamageMin":29,"AttackDamageMax":33,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":310,"StatusHealth":800,"StatusMana":400},"npc_dota_neutral_mud_golem_split":{"ArmorPhysical":0,"AttackDamageMin":9,"AttackDamageMax":10,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":310,"StatusHealth":240,"StatusMana":400},"npc_dota_neutral_mud_golem_split_doom":{"ArmorPhysical":0,"AttackDamageMin":9,"AttackDamageMax":10,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":310,"StatusHealth":240,"StatusMana":400},"npc_dota_neutral_ogre_mauler":{"ArmorPhysical":1,"AttackDamageMin":24,"AttackDamageMax":27,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":270,"StatusHealth":850,"StatusMana":0},"npc_dota_neutral_ogre_magi":{"ArmorPhysical":0,"AttackDamageMin":24,"AttackDamageMax":27,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":270,"StatusHealth":600,"StatusMana":400},"npc_dota_neutral_giant_wolf":{"ArmorPhysical":1,"AttackDamageMin":29,"AttackDamageMax":33,"AttackRate":1.45,"AttackRange":90,"MovementSpeed":350,"StatusHealth":500,"StatusMana":0},"npc_dota_neutral_alpha_wolf":{"ArmorPhysical":3,"AttackDamageMin":30,"AttackDamageMax":33,"AttackRate":1.35,"AttackRange":90,"MovementSpeed":350,"StatusHealth":600,"StatusMana":0},"npc_dota_neutral_wildkin":{"ArmorPhysical":2,"AttackDamageMin":20,"AttackDamageMax":25,"AttackRate":1.35,"AttackRange":128,"MovementSpeed":300,"StatusHealth":350,"StatusMana":0},"npc_dota_neutral_enraged_wildkin":{"ArmorPhysical":4,"AttackDamageMin":50,"AttackDamageMax":56,"AttackRate":1.35,"AttackRange":128,"MovementSpeed":320,"StatusHealth":950,"StatusMana":400},"npc_dota_neutral_satyr_soulstealer":{"ArmorPhysical":1,"AttackDamageMin":24,"AttackDamageMax":27,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":270,"StatusHealth":600,"StatusMana":600},"npc_dota_neutral_satyr_hellcaller":{"ArmorPhysical":0,"AttackDamageMin":49,"AttackDamageMax":55,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":290,"StatusHealth":1100,"StatusMana":400},"npc_dota_neutral_jungle_stalker":{"ArmorPhysical":2,"AttackDamageMin":46,"AttackDamageMax":64,"AttackRate":1.35,"AttackRange":128,"MovementSpeed":320,"StatusHealth":1600,"StatusMana":400},"npc_dota_neutral_elder_jungle_stalker":{"ArmorPhysical":4,"AttackDamageMin":56,"AttackDamageMax":78,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":320,"StatusHealth":2000,"StatusMana":0},"npc_dota_neutral_prowler_acolyte":{"ArmorPhysical":10,"AttackDamageMin":33,"AttackDamageMax":38,"AttackRate":1.5,"AttackRange":100,"MovementSpeed":270,"StatusHealth":600,"StatusMana":400},"npc_dota_neutral_prowler_shaman":{"ArmorPhysical":11,"AttackDamageMin":59,"AttackDamageMax":65,"AttackRate":1.5,"AttackRange":100,"MovementSpeed":300,"StatusHealth":1200,"StatusMana":400},"npc_dota_neutral_rock_golem":{"ArmorPhysical":4,"AttackDamageMin":29,"AttackDamageMax":33,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":270,"StatusHealth":800,"StatusMana":400},"npc_dota_neutral_granite_golem":{"ArmorPhysical":8,"AttackDamageMin":77,"AttackDamageMax":87,"AttackRate":1.35,"AttackRange":128,"MovementSpeed":270,"StatusHealth":1700,"StatusMana":600},"npc_dota_neutral_big_thunder_lizard":{"ArmorPhysical":2,"AttackDamageMin":60,"AttackDamageMax":65,"AttackRate":1.8,"AttackRange":300,"MovementSpeed":270,"StatusHealth":1400,"StatusMana":400},"npc_dota_neutral_small_thunder_lizard":{"ArmorPhysical":2,"AttackDamageMin":41,"AttackDamageMax":48,"AttackRate":1.8,"AttackRange":300,"MovementSpeed":270,"StatusHealth":800,"StatusMana":400},"npc_dota_neutral_gnoll_assassin":{"ArmorPhysical":1,"AttackDamageMin":30,"AttackDamageMax":36,"AttackRate":1.6,"AttackRange":500,"MovementSpeed":270,"StatusHealth":370,"StatusMana":0},"npc_dota_neutral_ghost":{"ArmorPhysical":1,"AttackDamageMin":45,"AttackDamageMax":50,"AttackRate":1.2,"AttackRange":400,"MovementSpeed":320,"StatusHealth":500,"StatusMana":400},"npc_dota_wraith_ghost":{"ArmorPhysical":1,"AttackDamageMin":45,"AttackDamageMax":50,"AttackRate":1.0,"AttackRange":400,"MovementSpeed":320,"StatusHealth":500,"StatusMana":400},"npc_dota_neutral_dark_troll":{"ArmorPhysical":0,"AttackDamageMin":24,"AttackDamageMax":27,"AttackRate":1.35,"AttackRange":250,"MovementSpeed":270,"StatusHealth":500,"StatusMana":0},"npc_dota_neutral_dark_troll_warlord":{"ArmorPhysical":1,"AttackDamageMin":40,"AttackDamageMax":45,"AttackRate":1.35,"AttackRange":250,"MovementSpeed":300,"StatusHealth":1100,"StatusMana":550},"npc_dota_neutral_satyr_trickster":{"ArmorPhysical":0,"AttackDamageMin":7,"AttackDamageMax":10,"AttackRate":1.7,"AttackRange":280,"MovementSpeed":300,"StatusHealth":300,"StatusMana":500},"npc_dota_neutral_forest_troll_berserker":{"ArmorPhysical":1,"AttackDamageMin":28,"AttackDamageMax":37,"AttackRate":1.6,"AttackRange":500,"MovementSpeed":270,"StatusHealth":500,"StatusMana":0},"npc_dota_neutral_forest_troll_high_priest":{"ArmorPhysical":0,"AttackDamageMin":25,"AttackDamageMax":32,"AttackRate":1.8,"AttackRange":600,"MovementSpeed":290,"StatusHealth":450,"StatusMana":500},"npc_dota_neutral_harpy_scout":{"ArmorPhysical":1,"AttackDamageMin":28,"AttackDamageMax":37,"AttackRate":1.6,"AttackRange":300,"MovementSpeed":280,"StatusHealth":400,"StatusMana":0},"npc_dota_neutral_harpy_storm":{"ArmorPhysical":2,"AttackDamageMin":30,"AttackDamageMax":37,"AttackRate":1.6,"AttackRange":450,"MovementSpeed":310,"StatusHealth":550,"StatusMana":125},"npc_dota_neutral_black_drake":{"ArmorPhysical":-1,"AttackDamageMin":34,"AttackDamageMax":45,"AttackRate":1.8,"AttackRange":300,"MovementSpeed":350,"StatusHealth":950,"StatusMana":0},"npc_dota_neutral_black_dragon":{"ArmorPhysical":3,"AttackDamageMin":48,"AttackDamageMax":81,"AttackRate":1.5,"AttackRange":300,"MovementSpeed":300,"StatusHealth":2000,"StatusMana":500},"npc_dota_necronomicon_warrior_1":{"ArmorPhysical":4,"AttackDamageMin":45,"AttackDamageMax":50,"AttackRate":0.75,"AttackRange":100,"MovementSpeed":370,"StatusHealth":700,"StatusMana":0},"npc_dota_necronomicon_warrior_2":{"ArmorPhysical":4,"AttackDamageMin":55,"AttackDamageMax":70,"AttackRate":0.75,"AttackRange":100,"MovementSpeed":375,"StatusHealth":800,"StatusMana":0},"npc_dota_necronomicon_warrior_3":{"ArmorPhysical":4,"AttackDamageMin":70,"AttackDamageMax":85,"AttackRate":0.75,"AttackRange":100,"MovementSpeed":380,"StatusHealth":900,"StatusMana":0},"npc_dota_necronomicon_archer_1":{"ArmorPhysical":4,"AttackDamageMin":35,"AttackDamageMax":40,"AttackRate":1,"AttackRange":450,"MovementSpeed":350,"StatusHealth":700,"StatusMana":0},"npc_dota_necronomicon_archer_2":{"ArmorPhysical":4,"AttackDamageMin":55,"AttackDamageMax":60,"AttackRate":1,"AttackRange":500,"MovementSpeed":385,"StatusHealth":800,"StatusMana":0},"npc_dota_necronomicon_archer_3":{"ArmorPhysical":4,"AttackDamageMin":70,"AttackDamageMax":80,"AttackRate":1,"AttackRange":550,"MovementSpeed":425,"StatusHealth":900,"StatusMana":0},"npc_dota_observer_wards":{"StatusHealth":100,"StatusMana":0},"npc_dota_sentry_wards":{"StatusHealth":100,"StatusMana":0},"npc_dota_courier":{"MovementSpeed":290,"StatusHealth":70,"StatusMana":0},"npc_dota_flying_courier":{"ArmorPhysical":10,"MovementSpeed":275,"StatusHealth":150,"StatusMana":0},"npc_dota_witch_doctor_death_ward":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":0.22,"AttackRange":700,"MovementSpeed":0,"StatusHealth":135,"StatusMana":0},"npc_dota_shadow_shaman_ward_1":{"ArmorPhysical":0,"AttackDamageMin":50,"AttackDamageMax":50,"AttackRate":1.5,"AttackRange":650,"MovementSpeed":0,"StatusHealth":2,"StatusMana":0},"npc_dota_shadow_shaman_ward_2":{"ArmorPhysical":0,"AttackDamageMin":85,"AttackDamageMax":85,"AttackRate":1.5,"AttackRange":650,"MovementSpeed":0,"StatusHealth":2,"StatusMana":0},"npc_dota_shadow_shaman_ward_3":{"ArmorPhysical":0,"AttackDamageMin":120,"AttackDamageMax":120,"AttackRate":1.5,"AttackRange":650,"MovementSpeed":0,"StatusHealth":2,"StatusMana":0},"npc_dota_venomancer_plague_ward_1":{"ArmorPhysical":0,"AttackDamageMin":12,"AttackDamageMax":14,"AttackRate":1.4,"AttackRange":600,"MovementSpeed":0,"StatusHealth":120,"StatusMana":0},"npc_dota_venomancer_plague_ward_2":{"ArmorPhysical":0,"AttackDamageMin":21,"AttackDamageMax":23,"AttackRate":1.4,"AttackRange":600,"MovementSpeed":0,"StatusHealth":230,"StatusMana":0},"npc_dota_venomancer_plague_ward_3":{"ArmorPhysical":0,"AttackDamageMin":30,"AttackDamageMax":32,"AttackRate":1.4,"AttackRange":600,"MovementSpeed":0,"StatusHealth":340,"StatusMana":0},"npc_dota_venomancer_plague_ward_4":{"ArmorPhysical":0,"AttackDamageMin":39,"AttackDamageMax":41,"AttackRate":1.4,"AttackRange":600,"MovementSpeed":0,"StatusHealth":450,"StatusMana":0},"npc_dota_lesser_eidolon":{"ArmorPhysical":2,"AttackDamageMin":16,"AttackDamageMax":24,"AttackRate":1.5,"AttackRange":450,"MovementSpeed":280,"StatusHealth":180,"StatusMana":0},"npc_dota_eidolon":{"ArmorPhysical":3,"AttackDamageMin":24,"AttackDamageMax":32,"AttackRate":1.5,"AttackRange":450,"MovementSpeed":310,"StatusHealth":200,"StatusMana":0},"npc_dota_greater_eidolon":{"ArmorPhysical":4,"AttackDamageMin":34,"AttackDamageMax":42,"AttackRate":1.5,"AttackRange":450,"MovementSpeed":340,"StatusHealth":220,"StatusMana":0},"npc_dota_dire_eidolon":{"ArmorPhysical":5,"AttackDamageMin":43,"AttackDamageMax":51,"AttackRate":1.5,"AttackRange":450,"MovementSpeed":370,"StatusHealth":240,"StatusMana":0},"npc_dota_furion_treant_1":{"ArmorPhysical":0,"AttackDamageMin":20,"AttackDamageMax":24,"AttackRate":1.6,"AttackRange":100,"MovementSpeed":300,"StatusHealth":550,"StatusMana":0},"npc_dota_furion_treant_2":{"ArmorPhysical":0,"AttackDamageMin":24,"AttackDamageMax":28,"AttackRate":1.6,"AttackRange":100,"MovementSpeed":320,"StatusHealth":550,"StatusMana":0},"npc_dota_furion_treant_3":{"ArmorPhysical":0,"AttackDamageMin":28,"AttackDamageMax":32,"AttackRate":1.6,"AttackRange":100,"MovementSpeed":340,"StatusHealth":550,"StatusMana":0},"npc_dota_furion_treant_4":{"ArmorPhysical":0,"AttackDamageMin":32,"AttackDamageMax":36,"AttackRate":1.6,"AttackRange":100,"MovementSpeed":360,"StatusHealth":550,"StatusMana":0},"npc_dota_furion_treant_large":{"ArmorPhysical":0,"AttackDamageMin":102,"AttackDamageMax":114,"AttackRate":1.0,"AttackRange":100,"MovementSpeed":360,"StatusHealth":1650,"StatusMana":0},"npc_dota_invoker_forged_spirit":{"ArmorPhysical":2,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.35,"AttackRange":0,"MovementSpeed":320,"StatusHealth":5,"StatusMana":5},"npc_dota_broodmother_spiderling":{"ArmorPhysical":0,"AttackDamageMin":14,"AttackDamageMax":16,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":350,"StatusHealth":320,"StatusMana":0},"npc_dota_broodmother_spiderite":{"ArmorPhysical":0,"AttackDamageMin":9,"AttackDamageMax":10,"AttackRate":1.35,"AttackRange":100,"MovementSpeed":350,"StatusHealth":120,"StatusMana":0},"npc_dota_dark_troll_warlord_skeleton_warrior":{"ArmorPhysical":1,"AttackDamageMin":24,"AttackDamageMax":25,"AttackRate":1.0,"AttackRange":90,"MovementSpeed":270,"StatusHealth":250,"StatusMana":0},"npc_dota_wraith_king_skeleton_warrior":{"ArmorPhysical":1,"AttackDamageMin":35,"AttackDamageMax":40,"AttackRate":1.2,"AttackRange":115,"MovementSpeed":350,"StatusHealth":175,"StatusMana":0},"npc_dota_clinkz_skeleton_archer":{"ArmorPhysical":0,"AttackDamageMin":5,"AttackDamageMax":5,"AttackRate":1.7,"AttackRange":500,"MovementSpeed":0,"StatusHealth":1000,"StatusMana":100},"npc_dota_enraged_wildkin_tornado":{"ArmorPhysical":0,"MovementSpeed":125,"StatusHealth":500,"StatusMana":0},"npc_dota_wind_waker_tornado":{"ArmorPhysical":0,"MovementSpeed":550,"StatusHealth":500,"StatusMana":0},"npc_dota_roshan":{"ArmorPhysical":20,"AttackDamageMin":75,"AttackDamageMax":75,"AttackRate":2.0,"AttackRange":150,"MovementSpeed":270,"StatusHealth":6000,"StatusMana":0},"npc_dota_roshan_halloween":{"ArmorPhysical":29,"AttackDamageMin":150,"AttackDamageMax":150,"AttackRate":1.0,"AttackRange":128,"MovementSpeed":295,"StatusHealth":100,"StatusMana":5000},"npc_dota_roshan_halloween_minion":{"ArmorPhysical":5,"AttackDamageMin":250,"AttackDamageMax":300,"AttackRate":1.0,"AttackRange":120,"MovementSpeed":300,"StatusHealth":800,"StatusMana":1000},"npc_dota_warlock_golem_1":{"ArmorPhysical":6,"AttackDamageMin":90,"AttackDamageMax":110,"AttackRate":1.2,"AttackRange":225,"MovementSpeed":320,"StatusHealth":1000,"StatusMana":0},"npc_dota_warlock_golem_2":{"ArmorPhysical":9,"AttackDamageMin":140,"AttackDamageMax":160,"AttackRate":1.2,"AttackRange":225,"MovementSpeed":340,"StatusHealth":2000,"StatusMana":0},"npc_dota_warlock_golem_3":{"ArmorPhysical":12,"AttackDamageMin":190,"AttackDamageMax":210,"AttackRate":1.2,"AttackRange":225,"MovementSpeed":360,"StatusHealth":3000,"StatusMana":0},"npc_dota_warlock_golem_scepter_1":{"ArmorPhysical":6,"AttackDamageMin":70,"AttackDamageMax":80,"AttackRate":1.2,"AttackRange":225,"MovementSpeed":320,"StatusHealth":750,"StatusMana":0},"npc_dota_warlock_golem_scepter_2":{"ArmorPhysical":9,"AttackDamageMin":105,"AttackDamageMax":115,"AttackRate":1.2,"AttackRange":225,"MovementSpeed":340,"StatusHealth":1500,"StatusMana":0},"npc_dota_warlock_golem_scepter_3":{"ArmorPhysical":12,"AttackDamageMin":140,"AttackDamageMax":160,"AttackRate":1.2,"AttackRange":225,"MovementSpeed":360,"StatusHealth":2250,"StatusMana":0},"npc_dota_scout_hawk":{"ArmorPhysical":0,"MovementSpeed":270,"StatusHealth":50},"npc_dota_greater_hawk":{"ArmorPhysical":5,"MovementSpeed":400,"StatusHealth":100},"npc_dota_beastmaster_hawk":{"ArmorPhysical":5,"MovementSpeed":430,"StatusHealth":350},"npc_dota_beastmaster_hawk_1":{"ArmorPhysical":5,"MovementSpeed":300,"StatusHealth":150},"npc_dota_beastmaster_hawk_2":{"ArmorPhysical":5,"MovementSpeed":340,"StatusHealth":200},"npc_dota_beastmaster_hawk_3":{"ArmorPhysical":5,"MovementSpeed":380,"StatusHealth":250},"npc_dota_beastmaster_hawk_4":{"ArmorPhysical":5,"MovementSpeed":420,"StatusHealth":300},"npc_dota_beastmaster_boar":{"ArmorPhysical":0,"AttackDamageMin":23,"AttackDamageMax":29,"AttackRate":1.5,"AttackRange":550,"MovementSpeed":350,"StatusHealth":400},"npc_dota_beastmaster_greater_boar":{"ArmorPhysical":0,"AttackDamageMin":43,"AttackDamageMax":49,"AttackRate":1.0,"AttackRange":550,"MovementSpeed":350,"StatusHealth":500},"npc_dota_beastmaster_boar_1":{"ArmorPhysical":0,"AttackDamageMin":16,"AttackDamageMax":16,"AttackRate":1.25,"AttackRange":550,"MovementSpeed":350,"StatusHealth":300},"npc_dota_beastmaster_boar_2":{"ArmorPhysical":0,"AttackDamageMin":32,"AttackDamageMax":32,"AttackRate":1.25,"AttackRange":550,"MovementSpeed":350,"StatusHealth":450},"npc_dota_beastmaster_boar_3":{"ArmorPhysical":0,"AttackDamageMin":48,"AttackDamageMax":48,"AttackRate":1.25,"AttackRange":550,"MovementSpeed":350,"StatusHealth":600},"npc_dota_beastmaster_boar_4":{"ArmorPhysical":0,"AttackDamageMin":64,"AttackDamageMax":64,"AttackRate":1.25,"AttackRange":550,"MovementSpeed":350,"StatusHealth":750},"npc_dota_brewmaster_earth_1":{"ArmorPhysical":3,"AttackDamageMin":25,"AttackDamageMax":35,"AttackRate":1.25,"AttackRange":150,"MovementSpeed":330,"StatusHealth":1400,"StatusMana":400},"npc_dota_brewmaster_earth_2":{"ArmorPhysical":5,"AttackDamageMin":55,"AttackDamageMax":65,"AttackRate":1.25,"AttackRange":150,"MovementSpeed":350,"StatusHealth":2200,"StatusMana":500},"npc_dota_brewmaster_earth_3":{"ArmorPhysical":7,"AttackDamageMin":85,"AttackDamageMax":95,"AttackRate":1.25,"AttackRange":150,"MovementSpeed":370,"StatusHealth":3000,"StatusMana":600},"npc_dota_brewmaster_storm_1":{"ArmorPhysical":2,"AttackDamageMin":25,"AttackDamageMax":35,"AttackRate":1.5,"AttackRange":600,"MovementSpeed":350,"StatusHealth":1000,"StatusMana":900},"npc_dota_brewmaster_storm_2":{"ArmorPhysical":2,"AttackDamageMin":45,"AttackDamageMax":55,"AttackRate":1.5,"AttackRange":600,"MovementSpeed":350,"StatusHealth":1400,"StatusMana":900},"npc_dota_brewmaster_storm_3":{"ArmorPhysical":2,"AttackDamageMin":65,"AttackDamageMax":75,"AttackRate":1.5,"AttackRange":600,"MovementSpeed":350,"StatusHealth":1800,"StatusMana":900},"npc_dota_brewmaster_fire_1":{"ArmorPhysical":0,"AttackDamageMin":75,"AttackDamageMax":85,"AttackRate":1.35,"AttackRange":150,"MovementSpeed":550,"StatusHealth":1300,"StatusMana":750},"npc_dota_brewmaster_fire_2":{"ArmorPhysical":4,"AttackDamageMin":125,"AttackDamageMax":135,"AttackRate":1.35,"AttackRange":150,"MovementSpeed":550,"StatusHealth":1300,"StatusMana":750},"npc_dota_brewmaster_fire_3":{"ArmorPhysical":8,"AttackDamageMin":175,"AttackDamageMax":185,"AttackRate":1.35,"AttackRange":150,"MovementSpeed":550,"StatusHealth":1300,"StatusMana":750},"npc_dota_brewmaster_void_1":{"ArmorPhysical":3,"AttackDamageMin":45,"AttackDamageMax":55,"AttackRate":1.35,"AttackRange":150,"MovementSpeed":450,"StatusHealth":1200,"StatusMana":750},"npc_dota_brewmaster_void_2":{"ArmorPhysical":4,"AttackDamageMin":65,"AttackDamageMax":75,"AttackRate":1.35,"AttackRange":150,"MovementSpeed":450,"StatusHealth":1400,"StatusMana":750},"npc_dota_brewmaster_void_3":{"ArmorPhysical":5,"AttackDamageMin":85,"AttackDamageMax":95,"AttackRate":1.35,"AttackRange":150,"MovementSpeed":450,"StatusHealth":1600,"StatusMana":750},"npc_dota_unit_tombstone1":{"ArmorPhysical":5,"MovementSpeed":0,"StatusHealth":16,"StatusMana":0},"npc_dota_unit_tombstone2":{"ArmorPhysical":5,"MovementSpeed":0,"StatusHealth":20,"StatusMana":0},"npc_dota_unit_tombstone3":{"ArmorPhysical":5,"MovementSpeed":0,"StatusHealth":24,"StatusMana":0},"npc_dota_unit_tombstone4":{"ArmorPhysical":5,"MovementSpeed":0,"StatusHealth":28,"StatusMana":0},"npc_dota_unit_undying_zombie":{"ArmorPhysical":0,"AttackDamageMin":44,"AttackDamageMax":48,"AttackRate":1.6,"AttackRange":128,"MovementSpeed":375,"StatusHealth":2,"StatusMana":0},"npc_dota_unit_undying_zombie_torso":{"ArmorPhysical":0,"AttackDamageMin":44,"AttackDamageMax":48,"AttackRate":1.6,"AttackRange":128,"MovementSpeed":375,"StatusHealth":2,"StatusMana":0},"npc_dota_pugna_nether_ward_1":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":16},"npc_dota_pugna_nether_ward_2":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":16},"npc_dota_pugna_nether_ward_3":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":16},"npc_dota_pugna_nether_ward_4":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":16},"npc_dota_templar_assassin_psionic_trap":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_rattletrap_cog":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_rattletrap_rocket":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":0},"npc_dota_broodmother_web":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_stormspirit_remnant":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_ember_spirit_remnant":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_earth_spirit_stone":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_slark_visual":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_weaver_swarm":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.35,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_death_prophet_torment":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.35,"AttackRange":0,"MovementSpeed":0,"StatusHealth":8},"npc_dota_gyrocopter_homing_missile":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_lycan_wolf1":{"ArmorPhysical":0,"AttackDamageMin":24,"AttackDamageMax":28,"AttackRate":1.2,"AttackRange":90,"MovementSpeed":400,"StatusHealth":300,"StatusMana":0},"npc_dota_lycan_wolf2":{"ArmorPhysical":0,"AttackDamageMin":32,"AttackDamageMax":36,"AttackRate":1.1,"AttackRange":90,"MovementSpeed":420,"StatusHealth":350,"StatusMana":0},"npc_dota_lycan_wolf3":{"ArmorPhysical":0,"AttackDamageMin":40,"AttackDamageMax":44,"AttackRate":1.0,"AttackRange":90,"MovementSpeed":440,"StatusHealth":400,"StatusMana":0},"npc_dota_lycan_wolf4":{"ArmorPhysical":0,"AttackDamageMin":48,"AttackDamageMax":52,"AttackRate":0.9,"AttackRange":90,"MovementSpeed":460,"StatusHealth":450,"StatusMana":0},"npc_dota_lycan_wolf_lane":{"ArmorPhysical":0,"AttackDamageMin":48,"AttackDamageMax":52,"AttackRate":0.9,"AttackRange":90,"MovementSpeed":325,"StatusHealth":450,"StatusMana":0},"npc_dota_lone_druid_bear1":{"ArmorPhysical":3,"AttackDamageMin":20,"AttackDamageMax":20,"AttackRate":1.75,"AttackRange":150,"MovementSpeed":340,"StatusHealth":1100,"StatusMana":300},"npc_dota_lone_druid_bear2":{"ArmorPhysical":4,"AttackDamageMin":20,"AttackDamageMax":20,"AttackRate":1.65,"AttackRange":150,"MovementSpeed":360,"StatusHealth":1400,"StatusMana":300},"npc_dota_lone_druid_bear3":{"ArmorPhysical":5,"AttackDamageMin":20,"AttackDamageMax":20,"AttackRate":1.55,"AttackRange":150,"MovementSpeed":380,"StatusHealth":1700,"StatusMana":300},"npc_dota_lone_druid_bear4":{"ArmorPhysical":6,"AttackDamageMin":20,"AttackDamageMax":20,"AttackRate":1.45,"AttackRange":150,"MovementSpeed":400,"StatusHealth":2000,"StatusMana":300},"npc_dota_visage_familiar1":{"ArmorPhysical":0,"AttackDamageMin":25,"AttackDamageMax":25,"AttackRate":0.5,"AttackRange":160,"MovementSpeed":430,"StatusHealth":500,"StatusMana":0},"npc_dota_visage_familiar2":{"ArmorPhysical":1,"AttackDamageMin":50,"AttackDamageMax":50,"AttackRate":0.5,"AttackRange":160,"MovementSpeed":430,"StatusHealth":600,"StatusMana":0},"npc_dota_visage_familiar3":{"ArmorPhysical":2,"AttackDamageMin":75,"AttackDamageMax":75,"AttackRate":0.5,"AttackRange":160,"MovementSpeed":430,"StatusHealth":700,"StatusMana":0},"npc_dota_wisp_spirit":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_beastmaster_axe":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_troll_warlord_axe":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_creep_goodguys_melee_diretide":{"ArmorPhysical":2,"AttackDamageMin":19,"AttackDamageMax":23,"AttackRate":1,"AttackRange":100,"MovementSpeed":325,"StatusHealth":550,"StatusMana":0},"npc_dota_creep_goodguys_ranged_diretide":{"ArmorPhysical":0,"AttackDamageMin":21,"AttackDamageMax":26,"AttackRate":1,"AttackRange":500,"MovementSpeed":325,"StatusHealth":300,"StatusMana":500},"npc_dota_creep_badguys_melee_diretide":{"ArmorPhysical":2,"AttackDamageMin":19,"AttackDamageMax":23,"AttackRate":1,"AttackRange":100,"MovementSpeed":325,"StatusHealth":550,"StatusMana":0},"npc_dota_creep_badguys_ranged_diretide":{"ArmorPhysical":0,"AttackDamageMin":21,"AttackDamageMax":26,"AttackRate":1,"AttackRange":500,"MovementSpeed":325,"StatusHealth":300,"StatusMana":500},"npc_dota_goodguys_siege_diretide":{"ArmorPhysical":5,"AttackDamageMin":100,"AttackDamageMax":125,"AttackRate":1.0,"AttackRange":120,"MovementSpeed":250,"StatusHealth":3000,"StatusMana":1000},"npc_dota_badguys_siege_diretide":{"ArmorPhysical":5,"AttackDamageMin":100,"AttackDamageMax":125,"AttackRate":1.0,"AttackRange":120,"MovementSpeed":250,"StatusHealth":3000,"StatusMana":1000},"npc_dota_halloween_chaos_unit":{"ArmorPhysical":5,"AttackDamageMin":37,"AttackDamageMax":45,"AttackRate":1.6,"AttackRange":128,"MovementSpeed":250,"StatusHealth":800,"StatusMana":0},"npc_dota_roquelaire":{"ArmorPhysical":0,"MovementSpeed":500,"StatusHealth":50},"npc_dota_greevil":{"ArmorPhysical":0,"AttackDamageMin":37,"AttackDamageMax":45,"AttackRate":1.6,"AttackRange":128,"MovementSpeed":360,"StatusHealth":800,"StatusMana":500},"npc_dota_loot_greevil":{"ArmorPhysical":0,"AttackDamageMin":37,"AttackDamageMax":45,"AttackRate":1.6,"AttackRange":128,"MovementSpeed":200,"StatusHealth":10000,"StatusMana":500},"npc_dota_greevil_miniboss_black":{"ArmorPhysical":25,"AttackDamageMin":71,"AttackDamageMax":78,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":1200,"StatusMana":500},"npc_dota_greevil_miniboss_blue":{"ArmorPhysical":25,"AttackDamageMin":71,"AttackDamageMax":78,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":1200,"StatusMana":500},"npc_dota_greevil_miniboss_red":{"ArmorPhysical":25,"AttackDamageMin":71,"AttackDamageMax":78,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":1200,"StatusMana":500},"npc_dota_greevil_miniboss_yellow":{"ArmorPhysical":25,"AttackDamageMin":71,"AttackDamageMax":78,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":1200,"StatusMana":500},"npc_dota_greevil_miniboss_white":{"ArmorPhysical":25,"AttackDamageMin":71,"AttackDamageMax":78,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":1200,"StatusMana":500},"npc_dota_greevil_minion_white":{"ArmorPhysical":15,"AttackDamageMin":31,"AttackDamageMax":34,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":600,"StatusMana":500},"npc_dota_greevil_minion_black":{"ArmorPhysical":15,"AttackDamageMin":31,"AttackDamageMax":34,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":600,"StatusMana":500},"npc_dota_greevil_minion_red":{"ArmorPhysical":15,"AttackDamageMin":31,"AttackDamageMax":34,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":600,"StatusMana":500},"npc_dota_greevil_minion_blue":{"ArmorPhysical":15,"AttackDamageMin":31,"AttackDamageMax":34,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":600,"StatusMana":500},"npc_dota_greevil_minion_yellow":{"ArmorPhysical":15,"AttackDamageMin":31,"AttackDamageMax":34,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":600,"StatusMana":500},"npc_dota_greevil_miniboss_green":{"ArmorPhysical":25,"AttackDamageMin":71,"AttackDamageMax":78,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":1200,"StatusMana":500},"npc_dota_greevil_miniboss_orange":{"ArmorPhysical":25,"AttackDamageMin":71,"AttackDamageMax":78,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":1200,"StatusMana":500},"npc_dota_greevil_miniboss_purple":{"ArmorPhysical":25,"AttackDamageMin":71,"AttackDamageMax":78,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":1200,"StatusMana":500},"npc_dota_greevil_minion_orange":{"ArmorPhysical":15,"AttackDamageMin":31,"AttackDamageMax":34,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":600,"StatusMana":500},"npc_dota_greevil_minion_purple":{"ArmorPhysical":15,"AttackDamageMin":31,"AttackDamageMax":34,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":600,"StatusMana":500},"npc_dota_greevil_minion_green":{"ArmorPhysical":15,"AttackDamageMin":31,"AttackDamageMax":34,"AttackRate":1.8,"AttackRange":128,"MovementSpeed":300,"StatusHealth":600,"StatusMana":500},"npc_dota_phoenix_sun":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_ignis_fatuus":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_target_dummy":{"MovementSpeed":350,"ArmorPhysical":0,"StatusHealth":5000,"StatusMana":0},"npc_dota_invisible_vision_source":{"MovementSpeed":0},"npc_dota_techies_land_mine":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1},"npc_dota_techies_stasis_trap":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_techies_remote_mine":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":200},"npc_dota_techies_minefield_sign":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_treant_eyes":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_lich_ice_spire":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":300},"npc_dota_phantomassassin_gravestone":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_phantom_assassin_ground_dagger":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_goodguys_cny_beast":{"ArmorPhysical":4,"AttackDamageMin":85,"AttackDamageMax":85,"AttackRate":1.0,"AttackRange":120,"MovementSpeed":250,"StatusHealth":2000,"StatusMana":500},"npc_dota_badguys_cny_beast":{"ArmorPhysical":4,"AttackDamageMin":85,"AttackDamageMax":85,"AttackRate":1.0,"AttackRange":120,"MovementSpeed":250,"StatusHealth":2000,"StatusMana":500},"npc_dota_dark_willow_creature":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_mutation_pocket_roshan":{"ArmorPhysical":18.0,"AttackDamageMin":75,"AttackDamageMax":75,"AttackRate":2.0,"AttackRange":150,"MovementSpeed":270,"StatusHealth":6000,"StatusMana":0},"npc_dota_grimstroke_ink_creature":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":100},"npc_dota_seasonal_snowman":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_frostivus2018_snowman":{"ArmorPhysical":12,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":2000,"StatusMana":0},"npc_dota_seasonal_dragon":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_seasonal_cny_balloon":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_seasonal_ti9_balloon":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_seasonal_ti9_drums":{"MovementSpeed":0,"ArmorPhysical":0,"StatusHealth":5000,"StatusMana":0},"npc_dota_seasonal_ti9_monkey":{"MovementSpeed":0,"ArmorPhysical":0,"StatusHealth":5000,"StatusMana":0},"npc_dota_seasonal_ti9_shovel_baby_roshan":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_seasonal_ti9_shovel_ghost":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":450,"StatusHealth":1,"StatusMana":0},"npc_dota_seasonal_ti9_shovel_stasis_trap":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":0,"StatusHealth":1,"StatusMana":0},"npc_dota_seasonal_ti9_shovel_pudgling":{"ArmorPhysical":0,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1.0,"AttackRange":0,"MovementSpeed":200,"StatusHealth":1,"StatusMana":0},"npc_dota_aether_remnant":{"ArmorPhysical":0,"AttackDamageMin":70,"AttackDamageMax":70,"AttackRate":1.5,"AttackRange":600,"MovementSpeed":0,"StatusHealth":100},"npc_dota_seasonal_penguin":{"ArmorPhysical":100,"AttackDamageMin":0,"AttackDamageMax":0,"AttackRate":1,"AttackRange":0,"MovementSpeed":200,"StatusHealth":100,"StatusMana":0},"npc_dota_seasonal_ti10_disco_ball":{"MovementSpeed":0,"ArmorPhysical":0,"StatusHealth":5000,"StatusMana":0},"npc_dota_seasonal_ti10_soccer_ball":{"MovementSpeed":600,"ArmorPhysical":0,"StatusHealth":1,"StatusMana":0}}
+{
+  "npc_dota_units_base": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 1,
+    "AttackDamageMax": 1,
+    "AttackRate": 1.7,
+    "AttackRange": 600,
+    "MovementSpeed": 300,
+    "StatusHealth": 150,
+    "StatusMana": 0
+  },
+  "npc_dota_companion": {
+    "MovementSpeed": 325
+  },
+  "npc_dota_loadout_generic": {
+    "MovementSpeed": 325
+  },
+  "npc_dota_creep_badguys_ranged": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 21,
+    "AttackDamageMax": 26,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 325,
+    "StatusHealth": 300,
+    "StatusMana": 500
+  },
+  "npc_dota_creep_badguys_ranged_upgraded": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 41,
+    "AttackDamageMax": 46,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 325,
+    "StatusHealth": 475,
+    "StatusMana": 500
+  },
+  "npc_dota_creep_badguys_ranged_upgraded_mega": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 41,
+    "AttackDamageMax": 46,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 325,
+    "StatusHealth": 475,
+    "StatusMana": 500
+  },
+  "npc_dota_creep_goodguys_ranged": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 21,
+    "AttackDamageMax": 26,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 325,
+    "StatusHealth": 300,
+    "StatusMana": 500
+  },
+  "npc_dota_creep_goodguys_ranged_upgraded": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 41,
+    "AttackDamageMax": 46,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 325,
+    "StatusHealth": 475,
+    "StatusMana": 500
+  },
+  "npc_dota_creep_goodguys_ranged_upgraded_mega": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 41,
+    "AttackDamageMax": 46,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 325,
+    "StatusHealth": 475,
+    "StatusMana": 500
+  },
+  "npc_dota_creep_badguys_melee": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 19,
+    "AttackDamageMax": 23,
+    "AttackRate": 1,
+    "AttackRange": 100,
+    "MovementSpeed": 325,
+    "StatusHealth": 550,
+    "StatusMana": 0
+  },
+  "npc_dota_creep_badguys_melee_upgraded": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 36,
+    "AttackDamageMax": 44,
+    "AttackRate": 1,
+    "AttackRange": 100,
+    "MovementSpeed": 325,
+    "StatusHealth": 700,
+    "StatusMana": 0
+  },
+  "npc_dota_creep_badguys_melee_upgraded_mega": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 36,
+    "AttackDamageMax": 44,
+    "AttackRate": 1,
+    "AttackRange": 100,
+    "MovementSpeed": 325,
+    "StatusHealth": 700,
+    "StatusMana": 0
+  },
+  "npc_dota_creep_goodguys_melee": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 19,
+    "AttackDamageMax": 23,
+    "AttackRate": 1,
+    "AttackRange": 100,
+    "MovementSpeed": 325,
+    "StatusHealth": 550,
+    "StatusMana": 0
+  },
+  "npc_dota_creep_goodguys_melee_upgraded": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 36,
+    "AttackDamageMax": 44,
+    "AttackRate": 1,
+    "AttackRange": 100,
+    "MovementSpeed": 325,
+    "StatusHealth": 700,
+    "StatusMana": 0
+  },
+  "npc_dota_creep_goodguys_melee_upgraded_mega": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 36,
+    "AttackDamageMax": 44,
+    "AttackRate": 1,
+    "AttackRange": 100,
+    "MovementSpeed": 325,
+    "StatusHealth": 700,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_tower1_top": {
+    "ArmorPhysical": 12,
+    "AttackDamageMin": 88,
+    "AttackDamageMax": 92,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 1800,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_tower1_mid": {
+    "ArmorPhysical": 12,
+    "AttackDamageMin": 88,
+    "AttackDamageMax": 92,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 1800,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_tower1_bot": {
+    "ArmorPhysical": 12,
+    "AttackDamageMin": 88,
+    "AttackDamageMax": 92,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 1800,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_tower2_top": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_tower2_mid": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_tower2_bot": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_tower3_top": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_tower3_mid": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_tower3_bot": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_tower4": {
+    "ArmorPhysical": 21,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2600,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_tower1_top": {
+    "ArmorPhysical": 12,
+    "AttackDamageMin": 88,
+    "AttackDamageMax": 92,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 1800,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_tower1_mid": {
+    "ArmorPhysical": 12,
+    "AttackDamageMin": 88,
+    "AttackDamageMax": 92,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 1800,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_tower1_bot": {
+    "ArmorPhysical": 12,
+    "AttackDamageMin": 88,
+    "AttackDamageMax": 92,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 1800,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_tower2_top": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_tower2_mid": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_tower2_bot": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_tower3_top": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_tower3_mid": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_tower3_bot": {
+    "ArmorPhysical": 16,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2500,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_tower4": {
+    "ArmorPhysical": 21,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 174,
+    "AttackRate": 0.9,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 2600,
+    "StatusMana": 0
+  },
+  "npc_dota_watch_tower": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 450,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_fillers": {
+    "ArmorPhysical": 10,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1000,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_healers": {
+    "ArmorPhysical": 17,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1750,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_fillers": {
+    "ArmorPhysical": 10,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1000,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_healers": {
+    "ArmorPhysical": 17,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1750,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_melee_rax_top": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 2200,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_melee_rax_mid": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 2200,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_melee_rax_bot": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 2200,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_range_rax_top": {
+    "ArmorPhysical": 9,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1300,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_range_rax_mid": {
+    "ArmorPhysical": 9,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1300,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_range_rax_bot": {
+    "ArmorPhysical": 9,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1300,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_melee_rax_top": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 2200,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_melee_rax_mid": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 2200,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_melee_rax_bot": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 2200,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_range_rax_top": {
+    "ArmorPhysical": 9,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1300,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_range_rax_mid": {
+    "ArmorPhysical": 9,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1300,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_range_rax_bot": {
+    "ArmorPhysical": 9,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1300,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_fort": {
+    "ArmorPhysical": 13,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 4500,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_fort": {
+    "ArmorPhysical": 13,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 4500,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_siege": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 35,
+    "AttackDamageMax": 46,
+    "AttackRate": 3.0,
+    "AttackRange": 690,
+    "MovementSpeed": 325,
+    "StatusHealth": 935,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_siege_upgraded": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 51,
+    "AttackDamageMax": 62,
+    "AttackRate": 3.0,
+    "AttackRange": 690,
+    "MovementSpeed": 325,
+    "StatusHealth": 935,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_siege_upgraded_mega": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 51,
+    "AttackDamageMax": 62,
+    "AttackRate": 3.0,
+    "AttackRange": 690,
+    "MovementSpeed": 325,
+    "StatusHealth": 935,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_siege": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 35,
+    "AttackDamageMax": 46,
+    "AttackRate": 3.0,
+    "AttackRange": 690,
+    "MovementSpeed": 325,
+    "StatusHealth": 935,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_siege_upgraded": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 51,
+    "AttackDamageMax": 62,
+    "AttackRate": 3.0,
+    "AttackRange": 690,
+    "MovementSpeed": 325,
+    "StatusHealth": 935,
+    "StatusMana": 0
+  },
+  "npc_dota_badguys_siege_upgraded_mega": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 51,
+    "AttackDamageMax": 62,
+    "AttackRate": 3.0,
+    "AttackRange": 690,
+    "MovementSpeed": 325,
+    "StatusHealth": 935,
+    "StatusMana": 0
+  },
+  "npc_dota_juggernaut_healing_ward": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 350,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_healing_campfire": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_zeus_cloud": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 0,
+    "StatusHealth": 16,
+    "StatusMana": 0
+  },
+  "npc_dota_tusk_frozen_sigil1": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 310,
+    "StatusHealth": 12,
+    "StatusMana": 0
+  },
+  "npc_dota_tusk_frozen_sigil2": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 310,
+    "StatusHealth": 12,
+    "StatusMana": 0
+  },
+  "npc_dota_tusk_frozen_sigil3": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 310,
+    "StatusHealth": 16,
+    "StatusMana": 0
+  },
+  "npc_dota_tusk_frozen_sigil4": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 310,
+    "StatusHealth": 16,
+    "StatusMana": 0
+  },
+  "npc_dota_elder_titan_ancestral_spirit": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 315,
+    "StatusHealth": 100
+  },
+  "npc_dota_neutral_kobold": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 10,
+    "AttackDamageMax": 11,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 270,
+    "StatusHealth": 240,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_kobold_tunneler": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 14,
+    "AttackDamageMax": 15,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 270,
+    "StatusHealth": 325,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_kobold_taskmaster": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 14,
+    "AttackDamageMax": 15,
+    "AttackRate": 1.35,
+    "AttackRange": 110,
+    "MovementSpeed": 330,
+    "StatusHealth": 400,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_centaur_outrunner": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 18,
+    "AttackDamageMax": 21,
+    "AttackRate": 1.3,
+    "AttackRange": 100,
+    "MovementSpeed": 320,
+    "StatusHealth": 350,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_centaur_khan": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 49,
+    "AttackDamageMax": 55,
+    "AttackRate": 1.5,
+    "AttackRange": 100,
+    "MovementSpeed": 320,
+    "StatusHealth": 1100,
+    "StatusMana": 200
+  },
+  "npc_dota_neutral_fel_beast": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 14,
+    "AttackDamageMax": 15,
+    "AttackRate": 1.5,
+    "AttackRange": 100,
+    "MovementSpeed": 350,
+    "StatusHealth": 400,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_polar_furbolg_champion": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 39,
+    "AttackDamageMax": 44,
+    "AttackRate": 1.5,
+    "AttackRange": 100,
+    "MovementSpeed": 320,
+    "StatusHealth": 700,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_polar_furbolg_ursa_warrior": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 49,
+    "AttackDamageMax": 55,
+    "AttackRate": 1.55,
+    "AttackRange": 100,
+    "MovementSpeed": 320,
+    "StatusHealth": 950,
+    "StatusMana": 300
+  },
+  "npc_dota_neutral_mud_golem": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 29,
+    "AttackDamageMax": 33,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 310,
+    "StatusHealth": 800,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_mud_golem_split": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 9,
+    "AttackDamageMax": 10,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 310,
+    "StatusHealth": 240,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_mud_golem_split_doom": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 9,
+    "AttackDamageMax": 10,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 310,
+    "StatusHealth": 240,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_ogre_mauler": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 24,
+    "AttackDamageMax": 27,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 270,
+    "StatusHealth": 850,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_ogre_magi": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 24,
+    "AttackDamageMax": 27,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 270,
+    "StatusHealth": 600,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_giant_wolf": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 29,
+    "AttackDamageMax": 33,
+    "AttackRate": 1.45,
+    "AttackRange": 90,
+    "MovementSpeed": 350,
+    "StatusHealth": 500,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_alpha_wolf": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 30,
+    "AttackDamageMax": 33,
+    "AttackRate": 1.35,
+    "AttackRange": 90,
+    "MovementSpeed": 350,
+    "StatusHealth": 600,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_wildkin": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 20,
+    "AttackDamageMax": 25,
+    "AttackRate": 1.35,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 350,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_enraged_wildkin": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 50,
+    "AttackDamageMax": 56,
+    "AttackRate": 1.35,
+    "AttackRange": 128,
+    "MovementSpeed": 320,
+    "StatusHealth": 950,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_satyr_soulstealer": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 24,
+    "AttackDamageMax": 27,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 270,
+    "StatusHealth": 600,
+    "StatusMana": 600
+  },
+  "npc_dota_neutral_satyr_hellcaller": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 49,
+    "AttackDamageMax": 55,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 290,
+    "StatusHealth": 1100,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_jungle_stalker": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 46,
+    "AttackDamageMax": 64,
+    "AttackRate": 1.35,
+    "AttackRange": 128,
+    "MovementSpeed": 320,
+    "StatusHealth": 1600,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_elder_jungle_stalker": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 56,
+    "AttackDamageMax": 78,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 320,
+    "StatusHealth": 2000,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_prowler_acolyte": {
+    "ArmorPhysical": 10,
+    "AttackDamageMin": 33,
+    "AttackDamageMax": 38,
+    "AttackRate": 1.5,
+    "AttackRange": 100,
+    "MovementSpeed": 270,
+    "StatusHealth": 600,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_prowler_shaman": {
+    "ArmorPhysical": 11,
+    "AttackDamageMin": 59,
+    "AttackDamageMax": 65,
+    "AttackRate": 1.5,
+    "AttackRange": 100,
+    "MovementSpeed": 300,
+    "StatusHealth": 1200,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_rock_golem": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 29,
+    "AttackDamageMax": 33,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 270,
+    "StatusHealth": 800,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_granite_golem": {
+    "ArmorPhysical": 8,
+    "AttackDamageMin": 77,
+    "AttackDamageMax": 87,
+    "AttackRate": 1.35,
+    "AttackRange": 128,
+    "MovementSpeed": 270,
+    "StatusHealth": 1700,
+    "StatusMana": 600
+  },
+  "npc_dota_neutral_big_thunder_lizard": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 60,
+    "AttackDamageMax": 65,
+    "AttackRate": 1.8,
+    "AttackRange": 300,
+    "MovementSpeed": 270,
+    "StatusHealth": 1400,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_small_thunder_lizard": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 41,
+    "AttackDamageMax": 48,
+    "AttackRate": 1.8,
+    "AttackRange": 300,
+    "MovementSpeed": 270,
+    "StatusHealth": 800,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_gnoll_assassin": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 30,
+    "AttackDamageMax": 36,
+    "AttackRate": 1.6,
+    "AttackRange": 500,
+    "MovementSpeed": 270,
+    "StatusHealth": 370,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_ghost": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 45,
+    "AttackDamageMax": 50,
+    "AttackRate": 1.2,
+    "AttackRange": 400,
+    "MovementSpeed": 320,
+    "StatusHealth": 500,
+    "StatusMana": 400
+  },
+  "npc_dota_wraith_ghost": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 45,
+    "AttackDamageMax": 50,
+    "AttackRate": 1.0,
+    "AttackRange": 400,
+    "MovementSpeed": 320,
+    "StatusHealth": 500,
+    "StatusMana": 400
+  },
+  "npc_dota_neutral_dark_troll": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 24,
+    "AttackDamageMax": 27,
+    "AttackRate": 1.35,
+    "AttackRange": 250,
+    "MovementSpeed": 270,
+    "StatusHealth": 500,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_dark_troll_warlord": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 40,
+    "AttackDamageMax": 45,
+    "AttackRate": 1.35,
+    "AttackRange": 250,
+    "MovementSpeed": 300,
+    "StatusHealth": 1100,
+    "StatusMana": 550
+  },
+  "npc_dota_neutral_satyr_trickster": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 7,
+    "AttackDamageMax": 10,
+    "AttackRate": 1.7,
+    "AttackRange": 280,
+    "MovementSpeed": 300,
+    "StatusHealth": 300,
+    "StatusMana": 500
+  },
+  "npc_dota_neutral_forest_troll_berserker": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 28,
+    "AttackDamageMax": 37,
+    "AttackRate": 1.6,
+    "AttackRange": 500,
+    "MovementSpeed": 270,
+    "StatusHealth": 500,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_forest_troll_high_priest": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 25,
+    "AttackDamageMax": 32,
+    "AttackRate": 1.8,
+    "AttackRange": 600,
+    "MovementSpeed": 290,
+    "StatusHealth": 450,
+    "StatusMana": 500
+  },
+  "npc_dota_neutral_harpy_scout": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 28,
+    "AttackDamageMax": 37,
+    "AttackRate": 1.6,
+    "AttackRange": 300,
+    "MovementSpeed": 280,
+    "StatusHealth": 400,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_harpy_storm": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 30,
+    "AttackDamageMax": 37,
+    "AttackRate": 1.6,
+    "AttackRange": 450,
+    "MovementSpeed": 310,
+    "StatusHealth": 550,
+    "StatusMana": 125
+  },
+  "npc_dota_neutral_black_drake": {
+    "ArmorPhysical": -1,
+    "AttackDamageMin": 34,
+    "AttackDamageMax": 45,
+    "AttackRate": 1.8,
+    "AttackRange": 300,
+    "MovementSpeed": 350,
+    "StatusHealth": 950,
+    "StatusMana": 0
+  },
+  "npc_dota_neutral_black_dragon": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 48,
+    "AttackDamageMax": 81,
+    "AttackRate": 1.5,
+    "AttackRange": 300,
+    "MovementSpeed": 300,
+    "StatusHealth": 2000,
+    "StatusMana": 500
+  },
+  "npc_dota_necronomicon_warrior_1": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 45,
+    "AttackDamageMax": 50,
+    "AttackRate": 0.75,
+    "AttackRange": 100,
+    "MovementSpeed": 370,
+    "StatusHealth": 700,
+    "StatusMana": 0
+  },
+  "npc_dota_necronomicon_warrior_2": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 55,
+    "AttackDamageMax": 70,
+    "AttackRate": 0.75,
+    "AttackRange": 100,
+    "MovementSpeed": 375,
+    "StatusHealth": 800,
+    "StatusMana": 0
+  },
+  "npc_dota_necronomicon_warrior_3": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 70,
+    "AttackDamageMax": 85,
+    "AttackRate": 0.75,
+    "AttackRange": 100,
+    "MovementSpeed": 380,
+    "StatusHealth": 900,
+    "StatusMana": 0
+  },
+  "npc_dota_necronomicon_archer_1": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 35,
+    "AttackDamageMax": 40,
+    "AttackRate": 1,
+    "AttackRange": 450,
+    "MovementSpeed": 350,
+    "StatusHealth": 700,
+    "StatusMana": 0
+  },
+  "npc_dota_necronomicon_archer_2": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 55,
+    "AttackDamageMax": 60,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 385,
+    "StatusHealth": 800,
+    "StatusMana": 0
+  },
+  "npc_dota_necronomicon_archer_3": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 70,
+    "AttackDamageMax": 80,
+    "AttackRate": 1,
+    "AttackRange": 550,
+    "MovementSpeed": 425,
+    "StatusHealth": 900,
+    "StatusMana": 0
+  },
+  "npc_dota_observer_wards": {
+    "StatusHealth": 100,
+    "StatusMana": 0
+  },
+  "npc_dota_sentry_wards": {
+    "StatusHealth": 100,
+    "StatusMana": 0
+  },
+  "npc_dota_courier": {
+    "MovementSpeed": 290,
+    "StatusHealth": 70,
+    "StatusMana": 0
+  },
+  "npc_dota_flying_courier": {
+    "ArmorPhysical": 10,
+    "MovementSpeed": 275,
+    "StatusHealth": 150,
+    "StatusMana": 0
+  },
+  "npc_dota_witch_doctor_death_ward": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 0.22,
+    "AttackRange": 700,
+    "MovementSpeed": 0,
+    "StatusHealth": 135,
+    "StatusMana": 0
+  },
+  "npc_dota_shadow_shaman_ward_1": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 50,
+    "AttackDamageMax": 50,
+    "AttackRate": 1.5,
+    "AttackRange": 650,
+    "MovementSpeed": 0,
+    "StatusHealth": 2,
+    "StatusMana": 0
+  },
+  "npc_dota_shadow_shaman_ward_2": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 85,
+    "AttackDamageMax": 85,
+    "AttackRate": 1.5,
+    "AttackRange": 650,
+    "MovementSpeed": 0,
+    "StatusHealth": 2,
+    "StatusMana": 0
+  },
+  "npc_dota_shadow_shaman_ward_3": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 120,
+    "AttackDamageMax": 120,
+    "AttackRate": 1.5,
+    "AttackRange": 650,
+    "MovementSpeed": 0,
+    "StatusHealth": 2,
+    "StatusMana": 0
+  },
+  "npc_dota_venomancer_plague_ward_1": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 12,
+    "AttackDamageMax": 14,
+    "AttackRate": 1.4,
+    "AttackRange": 600,
+    "MovementSpeed": 0,
+    "StatusHealth": 120,
+    "StatusMana": 0
+  },
+  "npc_dota_venomancer_plague_ward_2": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 21,
+    "AttackDamageMax": 23,
+    "AttackRate": 1.4,
+    "AttackRange": 600,
+    "MovementSpeed": 0,
+    "StatusHealth": 230,
+    "StatusMana": 0
+  },
+  "npc_dota_venomancer_plague_ward_3": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 30,
+    "AttackDamageMax": 32,
+    "AttackRate": 1.4,
+    "AttackRange": 600,
+    "MovementSpeed": 0,
+    "StatusHealth": 340,
+    "StatusMana": 0
+  },
+  "npc_dota_venomancer_plague_ward_4": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 39,
+    "AttackDamageMax": 41,
+    "AttackRate": 1.4,
+    "AttackRange": 600,
+    "MovementSpeed": 0,
+    "StatusHealth": 450,
+    "StatusMana": 0
+  },
+  "npc_dota_lesser_eidolon": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 16,
+    "AttackDamageMax": 24,
+    "AttackRate": 1.5,
+    "AttackRange": 450,
+    "MovementSpeed": 280,
+    "StatusHealth": 180,
+    "StatusMana": 0
+  },
+  "npc_dota_eidolon": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 24,
+    "AttackDamageMax": 32,
+    "AttackRate": 1.5,
+    "AttackRange": 450,
+    "MovementSpeed": 310,
+    "StatusHealth": 200,
+    "StatusMana": 0
+  },
+  "npc_dota_greater_eidolon": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 34,
+    "AttackDamageMax": 42,
+    "AttackRate": 1.5,
+    "AttackRange": 450,
+    "MovementSpeed": 340,
+    "StatusHealth": 220,
+    "StatusMana": 0
+  },
+  "npc_dota_dire_eidolon": {
+    "ArmorPhysical": 5,
+    "AttackDamageMin": 43,
+    "AttackDamageMax": 51,
+    "AttackRate": 1.5,
+    "AttackRange": 450,
+    "MovementSpeed": 370,
+    "StatusHealth": 240,
+    "StatusMana": 0
+  },
+  "npc_dota_furion_treant_1": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 20,
+    "AttackDamageMax": 24,
+    "AttackRate": 1.6,
+    "AttackRange": 100,
+    "MovementSpeed": 300,
+    "StatusHealth": 550,
+    "StatusMana": 0
+  },
+  "npc_dota_furion_treant_2": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 24,
+    "AttackDamageMax": 28,
+    "AttackRate": 1.6,
+    "AttackRange": 100,
+    "MovementSpeed": 320,
+    "StatusHealth": 550,
+    "StatusMana": 0
+  },
+  "npc_dota_furion_treant_3": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 28,
+    "AttackDamageMax": 32,
+    "AttackRate": 1.6,
+    "AttackRange": 100,
+    "MovementSpeed": 340,
+    "StatusHealth": 550,
+    "StatusMana": 0
+  },
+  "npc_dota_furion_treant_4": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 32,
+    "AttackDamageMax": 36,
+    "AttackRate": 1.6,
+    "AttackRange": 100,
+    "MovementSpeed": 360,
+    "StatusHealth": 550,
+    "StatusMana": 0
+  },
+  "npc_dota_furion_treant_large": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 102,
+    "AttackDamageMax": 114,
+    "AttackRate": 1.0,
+    "AttackRange": 100,
+    "MovementSpeed": 360,
+    "StatusHealth": 1650,
+    "StatusMana": 0
+  },
+  "npc_dota_invoker_forged_spirit": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.35,
+    "AttackRange": 0,
+    "MovementSpeed": 320,
+    "StatusHealth": 5,
+    "StatusMana": 5
+  },
+  "npc_dota_broodmother_spiderling": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 14,
+    "AttackDamageMax": 16,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 350,
+    "StatusHealth": 320,
+    "StatusMana": 0
+  },
+  "npc_dota_broodmother_spiderite": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 9,
+    "AttackDamageMax": 10,
+    "AttackRate": 1.35,
+    "AttackRange": 100,
+    "MovementSpeed": 350,
+    "StatusHealth": 120,
+    "StatusMana": 0
+  },
+  "npc_dota_dark_troll_warlord_skeleton_warrior": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 24,
+    "AttackDamageMax": 25,
+    "AttackRate": 1.0,
+    "AttackRange": 90,
+    "MovementSpeed": 270,
+    "StatusHealth": 250,
+    "StatusMana": 0
+  },
+  "npc_dota_wraith_king_skeleton_warrior": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 35,
+    "AttackDamageMax": 40,
+    "AttackRate": 1.2,
+    "AttackRange": 115,
+    "MovementSpeed": 350,
+    "StatusHealth": 175,
+    "StatusMana": 0
+  },
+  "npc_dota_clinkz_skeleton_archer": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 5,
+    "AttackDamageMax": 5,
+    "AttackRate": 1.7,
+    "AttackRange": 500,
+    "MovementSpeed": 0,
+    "StatusHealth": 1000,
+    "StatusMana": 100
+  },
+  "npc_dota_enraged_wildkin_tornado": {
+    "ArmorPhysical": 0,
+    "MovementSpeed": 125,
+    "StatusHealth": 500,
+    "StatusMana": 0
+  },
+  "npc_dota_wind_waker_tornado": {
+    "ArmorPhysical": 0,
+    "MovementSpeed": 550,
+    "StatusHealth": 500,
+    "StatusMana": 0
+  },
+  "npc_dota_roshan": {
+    "ArmorPhysical": 20,
+    "AttackDamageMin": 75,
+    "AttackDamageMax": 75,
+    "AttackRate": 2.0,
+    "AttackRange": 150,
+    "MovementSpeed": 270,
+    "StatusHealth": 6000,
+    "StatusMana": 0
+  },
+  "npc_dota_roshan_halloween": {
+    "ArmorPhysical": 29,
+    "AttackDamageMin": 150,
+    "AttackDamageMax": 150,
+    "AttackRate": 1.0,
+    "AttackRange": 128,
+    "MovementSpeed": 295,
+    "StatusHealth": 100,
+    "StatusMana": 5000
+  },
+  "npc_dota_roshan_halloween_minion": {
+    "ArmorPhysical": 5,
+    "AttackDamageMin": 250,
+    "AttackDamageMax": 300,
+    "AttackRate": 1.0,
+    "AttackRange": 120,
+    "MovementSpeed": 300,
+    "StatusHealth": 800,
+    "StatusMana": 1000
+  },
+  "npc_dota_warlock_golem_1": {
+    "ArmorPhysical": 6,
+    "AttackDamageMin": 90,
+    "AttackDamageMax": 110,
+    "AttackRate": 1.2,
+    "AttackRange": 225,
+    "MovementSpeed": 320,
+    "StatusHealth": 1000,
+    "StatusMana": 0
+  },
+  "npc_dota_warlock_golem_2": {
+    "ArmorPhysical": 9,
+    "AttackDamageMin": 140,
+    "AttackDamageMax": 160,
+    "AttackRate": 1.2,
+    "AttackRange": 225,
+    "MovementSpeed": 340,
+    "StatusHealth": 2000,
+    "StatusMana": 0
+  },
+  "npc_dota_warlock_golem_3": {
+    "ArmorPhysical": 12,
+    "AttackDamageMin": 190,
+    "AttackDamageMax": 210,
+    "AttackRate": 1.2,
+    "AttackRange": 225,
+    "MovementSpeed": 360,
+    "StatusHealth": 3000,
+    "StatusMana": 0
+  },
+  "npc_dota_warlock_golem_scepter_1": {
+    "ArmorPhysical": 6,
+    "AttackDamageMin": 70,
+    "AttackDamageMax": 80,
+    "AttackRate": 1.2,
+    "AttackRange": 225,
+    "MovementSpeed": 320,
+    "StatusHealth": 750,
+    "StatusMana": 0
+  },
+  "npc_dota_warlock_golem_scepter_2": {
+    "ArmorPhysical": 9,
+    "AttackDamageMin": 105,
+    "AttackDamageMax": 115,
+    "AttackRate": 1.2,
+    "AttackRange": 225,
+    "MovementSpeed": 340,
+    "StatusHealth": 1500,
+    "StatusMana": 0
+  },
+  "npc_dota_warlock_golem_scepter_3": {
+    "ArmorPhysical": 12,
+    "AttackDamageMin": 140,
+    "AttackDamageMax": 160,
+    "AttackRate": 1.2,
+    "AttackRange": 225,
+    "MovementSpeed": 360,
+    "StatusHealth": 2250,
+    "StatusMana": 0
+  },
+  "npc_dota_scout_hawk": {
+    "ArmorPhysical": 0,
+    "MovementSpeed": 270,
+    "StatusHealth": 50
+  },
+  "npc_dota_greater_hawk": {
+    "ArmorPhysical": 5,
+    "MovementSpeed": 400,
+    "StatusHealth": 100
+  },
+  "npc_dota_beastmaster_hawk": {
+    "ArmorPhysical": 5,
+    "MovementSpeed": 430,
+    "StatusHealth": 350
+  },
+  "npc_dota_beastmaster_hawk_1": {
+    "ArmorPhysical": 5,
+    "MovementSpeed": 300,
+    "StatusHealth": 150
+  },
+  "npc_dota_beastmaster_hawk_2": {
+    "ArmorPhysical": 5,
+    "MovementSpeed": 340,
+    "StatusHealth": 200
+  },
+  "npc_dota_beastmaster_hawk_3": {
+    "ArmorPhysical": 5,
+    "MovementSpeed": 380,
+    "StatusHealth": 250
+  },
+  "npc_dota_beastmaster_hawk_4": {
+    "ArmorPhysical": 5,
+    "MovementSpeed": 420,
+    "StatusHealth": 300
+  },
+  "npc_dota_beastmaster_boar": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 23,
+    "AttackDamageMax": 29,
+    "AttackRate": 1.5,
+    "AttackRange": 550,
+    "MovementSpeed": 350,
+    "StatusHealth": 400
+  },
+  "npc_dota_beastmaster_greater_boar": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 43,
+    "AttackDamageMax": 49,
+    "AttackRate": 1.0,
+    "AttackRange": 550,
+    "MovementSpeed": 350,
+    "StatusHealth": 500
+  },
+  "npc_dota_beastmaster_boar_1": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 16,
+    "AttackDamageMax": 16,
+    "AttackRate": 1.25,
+    "AttackRange": 550,
+    "MovementSpeed": 350,
+    "StatusHealth": 300
+  },
+  "npc_dota_beastmaster_boar_2": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 32,
+    "AttackDamageMax": 32,
+    "AttackRate": 1.25,
+    "AttackRange": 550,
+    "MovementSpeed": 350,
+    "StatusHealth": 450
+  },
+  "npc_dota_beastmaster_boar_3": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 48,
+    "AttackDamageMax": 48,
+    "AttackRate": 1.25,
+    "AttackRange": 550,
+    "MovementSpeed": 350,
+    "StatusHealth": 600
+  },
+  "npc_dota_beastmaster_boar_4": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 64,
+    "AttackDamageMax": 64,
+    "AttackRate": 1.25,
+    "AttackRange": 550,
+    "MovementSpeed": 350,
+    "StatusHealth": 750
+  },
+  "npc_dota_brewmaster_earth_1": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 25,
+    "AttackDamageMax": 35,
+    "AttackRate": 1.25,
+    "AttackRange": 150,
+    "MovementSpeed": 330,
+    "StatusHealth": 1400,
+    "StatusMana": 400
+  },
+  "npc_dota_brewmaster_earth_2": {
+    "ArmorPhysical": 5,
+    "AttackDamageMin": 55,
+    "AttackDamageMax": 65,
+    "AttackRate": 1.25,
+    "AttackRange": 150,
+    "MovementSpeed": 350,
+    "StatusHealth": 2200,
+    "StatusMana": 500
+  },
+  "npc_dota_brewmaster_earth_3": {
+    "ArmorPhysical": 7,
+    "AttackDamageMin": 85,
+    "AttackDamageMax": 95,
+    "AttackRate": 1.25,
+    "AttackRange": 150,
+    "MovementSpeed": 370,
+    "StatusHealth": 3000,
+    "StatusMana": 600
+  },
+  "npc_dota_brewmaster_storm_1": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 25,
+    "AttackDamageMax": 35,
+    "AttackRate": 1.5,
+    "AttackRange": 600,
+    "MovementSpeed": 350,
+    "StatusHealth": 1000,
+    "StatusMana": 900
+  },
+  "npc_dota_brewmaster_storm_2": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 45,
+    "AttackDamageMax": 55,
+    "AttackRate": 1.5,
+    "AttackRange": 600,
+    "MovementSpeed": 350,
+    "StatusHealth": 1400,
+    "StatusMana": 900
+  },
+  "npc_dota_brewmaster_storm_3": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 65,
+    "AttackDamageMax": 75,
+    "AttackRate": 1.5,
+    "AttackRange": 600,
+    "MovementSpeed": 350,
+    "StatusHealth": 1800,
+    "StatusMana": 900
+  },
+  "npc_dota_brewmaster_fire_1": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 75,
+    "AttackDamageMax": 85,
+    "AttackRate": 1.35,
+    "AttackRange": 150,
+    "MovementSpeed": 550,
+    "StatusHealth": 1300,
+    "StatusMana": 750
+  },
+  "npc_dota_brewmaster_fire_2": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 125,
+    "AttackDamageMax": 135,
+    "AttackRate": 1.35,
+    "AttackRange": 150,
+    "MovementSpeed": 550,
+    "StatusHealth": 1300,
+    "StatusMana": 750
+  },
+  "npc_dota_brewmaster_fire_3": {
+    "ArmorPhysical": 8,
+    "AttackDamageMin": 175,
+    "AttackDamageMax": 185,
+    "AttackRate": 1.35,
+    "AttackRange": 150,
+    "MovementSpeed": 550,
+    "StatusHealth": 1300,
+    "StatusMana": 750
+  },
+  "npc_dota_brewmaster_void_1": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 45,
+    "AttackDamageMax": 55,
+    "AttackRate": 1.35,
+    "AttackRange": 150,
+    "MovementSpeed": 450,
+    "StatusHealth": 1200,
+    "StatusMana": 750
+  },
+  "npc_dota_brewmaster_void_2": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 65,
+    "AttackDamageMax": 75,
+    "AttackRate": 1.35,
+    "AttackRange": 150,
+    "MovementSpeed": 450,
+    "StatusHealth": 1400,
+    "StatusMana": 750
+  },
+  "npc_dota_brewmaster_void_3": {
+    "ArmorPhysical": 5,
+    "AttackDamageMin": 85,
+    "AttackDamageMax": 95,
+    "AttackRate": 1.35,
+    "AttackRange": 150,
+    "MovementSpeed": 450,
+    "StatusHealth": 1600,
+    "StatusMana": 750
+  },
+  "npc_dota_unit_tombstone1": {
+    "ArmorPhysical": 5,
+    "MovementSpeed": 0,
+    "StatusHealth": 16,
+    "StatusMana": 0
+  },
+  "npc_dota_unit_tombstone2": {
+    "ArmorPhysical": 5,
+    "MovementSpeed": 0,
+    "StatusHealth": 20,
+    "StatusMana": 0
+  },
+  "npc_dota_unit_tombstone3": {
+    "ArmorPhysical": 5,
+    "MovementSpeed": 0,
+    "StatusHealth": 24,
+    "StatusMana": 0
+  },
+  "npc_dota_unit_tombstone4": {
+    "ArmorPhysical": 5,
+    "MovementSpeed": 0,
+    "StatusHealth": 28,
+    "StatusMana": 0
+  },
+  "npc_dota_unit_undying_zombie": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 44,
+    "AttackDamageMax": 48,
+    "AttackRate": 1.6,
+    "AttackRange": 128,
+    "MovementSpeed": 375,
+    "StatusHealth": 2,
+    "StatusMana": 0
+  },
+  "npc_dota_unit_undying_zombie_torso": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 44,
+    "AttackDamageMax": 48,
+    "AttackRate": 1.6,
+    "AttackRange": 128,
+    "MovementSpeed": 375,
+    "StatusHealth": 2,
+    "StatusMana": 0
+  },
+  "npc_dota_pugna_nether_ward_1": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 16
+  },
+  "npc_dota_pugna_nether_ward_2": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 16
+  },
+  "npc_dota_pugna_nether_ward_3": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 16
+  },
+  "npc_dota_pugna_nether_ward_4": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 16
+  },
+  "npc_dota_templar_assassin_psionic_trap": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_rattletrap_cog": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_rattletrap_rocket": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 0
+  },
+  "npc_dota_broodmother_web": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_stormspirit_remnant": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_ember_spirit_remnant": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_earth_spirit_stone": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_slark_visual": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_weaver_swarm": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.35,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_death_prophet_torment": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.35,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 8
+  },
+  "npc_dota_gyrocopter_homing_missile": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_lycan_wolf1": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 24,
+    "AttackDamageMax": 28,
+    "AttackRate": 1.2,
+    "AttackRange": 90,
+    "MovementSpeed": 400,
+    "StatusHealth": 300,
+    "StatusMana": 0
+  },
+  "npc_dota_lycan_wolf2": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 32,
+    "AttackDamageMax": 36,
+    "AttackRate": 1.1,
+    "AttackRange": 90,
+    "MovementSpeed": 420,
+    "StatusHealth": 350,
+    "StatusMana": 0
+  },
+  "npc_dota_lycan_wolf3": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 40,
+    "AttackDamageMax": 44,
+    "AttackRate": 1.0,
+    "AttackRange": 90,
+    "MovementSpeed": 440,
+    "StatusHealth": 400,
+    "StatusMana": 0
+  },
+  "npc_dota_lycan_wolf4": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 48,
+    "AttackDamageMax": 52,
+    "AttackRate": 0.9,
+    "AttackRange": 90,
+    "MovementSpeed": 460,
+    "StatusHealth": 450,
+    "StatusMana": 0
+  },
+  "npc_dota_lycan_wolf_lane": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 48,
+    "AttackDamageMax": 52,
+    "AttackRate": 0.9,
+    "AttackRange": 90,
+    "MovementSpeed": 325,
+    "StatusHealth": 450,
+    "StatusMana": 0
+  },
+  "npc_dota_lone_druid_bear1": {
+    "ArmorPhysical": 3,
+    "AttackDamageMin": 20,
+    "AttackDamageMax": 20,
+    "AttackRate": 1.75,
+    "AttackRange": 150,
+    "MovementSpeed": 340,
+    "StatusHealth": 1100,
+    "StatusMana": 300
+  },
+  "npc_dota_lone_druid_bear2": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 20,
+    "AttackDamageMax": 20,
+    "AttackRate": 1.65,
+    "AttackRange": 150,
+    "MovementSpeed": 360,
+    "StatusHealth": 1400,
+    "StatusMana": 300
+  },
+  "npc_dota_lone_druid_bear3": {
+    "ArmorPhysical": 5,
+    "AttackDamageMin": 20,
+    "AttackDamageMax": 20,
+    "AttackRate": 1.55,
+    "AttackRange": 150,
+    "MovementSpeed": 380,
+    "StatusHealth": 1700,
+    "StatusMana": 300
+  },
+  "npc_dota_lone_druid_bear4": {
+    "ArmorPhysical": 6,
+    "AttackDamageMin": 20,
+    "AttackDamageMax": 20,
+    "AttackRate": 1.45,
+    "AttackRange": 150,
+    "MovementSpeed": 400,
+    "StatusHealth": 2000,
+    "StatusMana": 300
+  },
+  "npc_dota_visage_familiar1": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 25,
+    "AttackDamageMax": 25,
+    "AttackRate": 0.5,
+    "AttackRange": 160,
+    "MovementSpeed": 430,
+    "StatusHealth": 500,
+    "StatusMana": 0
+  },
+  "npc_dota_visage_familiar2": {
+    "ArmorPhysical": 1,
+    "AttackDamageMin": 50,
+    "AttackDamageMax": 50,
+    "AttackRate": 0.5,
+    "AttackRange": 160,
+    "MovementSpeed": 430,
+    "StatusHealth": 600,
+    "StatusMana": 0
+  },
+  "npc_dota_visage_familiar3": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 75,
+    "AttackDamageMax": 75,
+    "AttackRate": 0.5,
+    "AttackRange": 160,
+    "MovementSpeed": 430,
+    "StatusHealth": 700,
+    "StatusMana": 0
+  },
+  "npc_dota_wisp_spirit": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_beastmaster_axe": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_troll_warlord_axe": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_creep_goodguys_melee_diretide": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 19,
+    "AttackDamageMax": 23,
+    "AttackRate": 1,
+    "AttackRange": 100,
+    "MovementSpeed": 325,
+    "StatusHealth": 550,
+    "StatusMana": 0
+  },
+  "npc_dota_creep_goodguys_ranged_diretide": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 21,
+    "AttackDamageMax": 26,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 325,
+    "StatusHealth": 300,
+    "StatusMana": 500
+  },
+  "npc_dota_creep_badguys_melee_diretide": {
+    "ArmorPhysical": 2,
+    "AttackDamageMin": 19,
+    "AttackDamageMax": 23,
+    "AttackRate": 1,
+    "AttackRange": 100,
+    "MovementSpeed": 325,
+    "StatusHealth": 550,
+    "StatusMana": 0
+  },
+  "npc_dota_creep_badguys_ranged_diretide": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 21,
+    "AttackDamageMax": 26,
+    "AttackRate": 1,
+    "AttackRange": 500,
+    "MovementSpeed": 325,
+    "StatusHealth": 300,
+    "StatusMana": 500
+  },
+  "npc_dota_goodguys_siege_diretide": {
+    "ArmorPhysical": 5,
+    "AttackDamageMin": 100,
+    "AttackDamageMax": 125,
+    "AttackRate": 1.0,
+    "AttackRange": 120,
+    "MovementSpeed": 250,
+    "StatusHealth": 3000,
+    "StatusMana": 1000
+  },
+  "npc_dota_badguys_siege_diretide": {
+    "ArmorPhysical": 5,
+    "AttackDamageMin": 100,
+    "AttackDamageMax": 125,
+    "AttackRate": 1.0,
+    "AttackRange": 120,
+    "MovementSpeed": 250,
+    "StatusHealth": 3000,
+    "StatusMana": 1000
+  },
+  "npc_dota_halloween_chaos_unit": {
+    "ArmorPhysical": 5,
+    "AttackDamageMin": 37,
+    "AttackDamageMax": 45,
+    "AttackRate": 1.6,
+    "AttackRange": 128,
+    "MovementSpeed": 250,
+    "StatusHealth": 800,
+    "StatusMana": 0
+  },
+  "npc_dota_roquelaire": {
+    "ArmorPhysical": 0,
+    "MovementSpeed": 500,
+    "StatusHealth": 50
+  },
+  "npc_dota_greevil": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 37,
+    "AttackDamageMax": 45,
+    "AttackRate": 1.6,
+    "AttackRange": 128,
+    "MovementSpeed": 360,
+    "StatusHealth": 800,
+    "StatusMana": 500
+  },
+  "npc_dota_loot_greevil": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 37,
+    "AttackDamageMax": 45,
+    "AttackRate": 1.6,
+    "AttackRange": 128,
+    "MovementSpeed": 200,
+    "StatusHealth": 10000,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_miniboss_black": {
+    "ArmorPhysical": 25,
+    "AttackDamageMin": 71,
+    "AttackDamageMax": 78,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 1200,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_miniboss_blue": {
+    "ArmorPhysical": 25,
+    "AttackDamageMin": 71,
+    "AttackDamageMax": 78,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 1200,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_miniboss_red": {
+    "ArmorPhysical": 25,
+    "AttackDamageMin": 71,
+    "AttackDamageMax": 78,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 1200,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_miniboss_yellow": {
+    "ArmorPhysical": 25,
+    "AttackDamageMin": 71,
+    "AttackDamageMax": 78,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 1200,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_miniboss_white": {
+    "ArmorPhysical": 25,
+    "AttackDamageMin": 71,
+    "AttackDamageMax": 78,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 1200,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_minion_white": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 31,
+    "AttackDamageMax": 34,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 600,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_minion_black": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 31,
+    "AttackDamageMax": 34,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 600,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_minion_red": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 31,
+    "AttackDamageMax": 34,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 600,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_minion_blue": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 31,
+    "AttackDamageMax": 34,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 600,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_minion_yellow": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 31,
+    "AttackDamageMax": 34,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 600,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_miniboss_green": {
+    "ArmorPhysical": 25,
+    "AttackDamageMin": 71,
+    "AttackDamageMax": 78,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 1200,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_miniboss_orange": {
+    "ArmorPhysical": 25,
+    "AttackDamageMin": 71,
+    "AttackDamageMax": 78,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 1200,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_miniboss_purple": {
+    "ArmorPhysical": 25,
+    "AttackDamageMin": 71,
+    "AttackDamageMax": 78,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 1200,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_minion_orange": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 31,
+    "AttackDamageMax": 34,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 600,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_minion_purple": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 31,
+    "AttackDamageMax": 34,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 600,
+    "StatusMana": 500
+  },
+  "npc_dota_greevil_minion_green": {
+    "ArmorPhysical": 15,
+    "AttackDamageMin": 31,
+    "AttackDamageMax": 34,
+    "AttackRate": 1.8,
+    "AttackRange": 128,
+    "MovementSpeed": 300,
+    "StatusHealth": 600,
+    "StatusMana": 500
+  },
+  "npc_dota_phoenix_sun": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_ignis_fatuus": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_target_dummy": {
+    "MovementSpeed": 350,
+    "ArmorPhysical": 0,
+    "StatusHealth": 5000,
+    "StatusMana": 0
+  },
+  "npc_dota_invisible_vision_source": {
+    "MovementSpeed": 0
+  },
+  "npc_dota_techies_land_mine": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1
+  },
+  "npc_dota_techies_stasis_trap": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_techies_remote_mine": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 200
+  },
+  "npc_dota_techies_minefield_sign": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_treant_eyes": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_lich_ice_spire": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 300
+  },
+  "npc_dota_phantomassassin_gravestone": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_phantom_assassin_ground_dagger": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_goodguys_cny_beast": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 85,
+    "AttackDamageMax": 85,
+    "AttackRate": 1.0,
+    "AttackRange": 120,
+    "MovementSpeed": 250,
+    "StatusHealth": 2000,
+    "StatusMana": 500
+  },
+  "npc_dota_badguys_cny_beast": {
+    "ArmorPhysical": 4,
+    "AttackDamageMin": 85,
+    "AttackDamageMax": 85,
+    "AttackRate": 1.0,
+    "AttackRange": 120,
+    "MovementSpeed": 250,
+    "StatusHealth": 2000,
+    "StatusMana": 500
+  },
+  "npc_dota_dark_willow_creature": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_mutation_pocket_roshan": {
+    "ArmorPhysical": 18.0,
+    "AttackDamageMin": 75,
+    "AttackDamageMax": 75,
+    "AttackRate": 2.0,
+    "AttackRange": 150,
+    "MovementSpeed": 270,
+    "StatusHealth": 6000,
+    "StatusMana": 0
+  },
+  "npc_dota_grimstroke_ink_creature": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_seasonal_snowman": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_frostivus2018_snowman": {
+    "ArmorPhysical": 12,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 2000,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_dragon": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_cny_balloon": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_ti9_balloon": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_ti9_drums": {
+    "MovementSpeed": 0,
+    "ArmorPhysical": 0,
+    "StatusHealth": 5000,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_ti9_monkey": {
+    "MovementSpeed": 0,
+    "ArmorPhysical": 0,
+    "StatusHealth": 5000,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_ti9_shovel_baby_roshan": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_ti9_shovel_ghost": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 450,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_ti9_shovel_stasis_trap": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_ti9_shovel_pudgling": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1.0,
+    "AttackRange": 0,
+    "MovementSpeed": 200,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  },
+  "npc_dota_aether_remnant": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 70,
+    "AttackDamageMax": 70,
+    "AttackRate": 1.5,
+    "AttackRange": 600,
+    "MovementSpeed": 0,
+    "StatusHealth": 100
+  },
+  "npc_dota_seasonal_penguin": {
+    "ArmorPhysical": 100,
+    "AttackDamageMin": 0,
+    "AttackDamageMax": 0,
+    "AttackRate": 1,
+    "AttackRange": 0,
+    "MovementSpeed": 200,
+    "StatusHealth": 100,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_ti10_disco_ball": {
+    "MovementSpeed": 0,
+    "ArmorPhysical": 0,
+    "StatusHealth": 5000,
+    "StatusMana": 0
+  },
+  "npc_dota_seasonal_ti10_soccer_ball": {
+    "MovementSpeed": 600,
+    "ArmorPhysical": 0,
+    "StatusHealth": 1,
+    "StatusMana": 0
+  }
+}

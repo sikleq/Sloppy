@@ -1,1 +1,984 @@
-{"item_blink":{"AbilityCooldown":15.0,"AbilityManaCost":0,"ItemCost":2250},"item_blades_of_attack":{"ItemCost":430},"item_broadsword":{"ItemCost":1200},"item_chainmail":{"ItemCost":550},"item_claymore":{"ItemCost":1400},"item_helm_of_iron_will":{"ItemCost":900},"item_javelin":{"ItemCost":1100},"item_mithril_hammer":{"ItemCost":1600},"item_platemail":{"ItemCost":1400},"item_quarterstaff":{"ItemCost":875},"item_quelling_blade":{"AbilityCooldown":4.0,"AbilityManaCost":0,"ItemCost":200},"item_faerie_fire":{"AbilityCooldown":5.0,"ItemCost":70},"item_infused_raindrop":{"AbilityCooldown":7.0,"ItemCost":225},"item_wind_lace":{"ItemCost":250},"item_ring_of_protection":{"ItemCost":175},"item_stout_shield":{"ItemCost":200},"item_recipe_moon_shard":{"ItemCost":0},"item_moon_shard":{"ItemCost":4000},"item_gauntlets":{"ItemCost":135},"item_slippers":{"ItemCost":135},"item_mantle":{"ItemCost":135},"item_branches":{"AbilityCooldown":0.0,"ItemCost":50},"item_belt_of_strength":{"ItemCost":450},"item_boots_of_elves":{"ItemCost":450},"item_robe":{"ItemCost":450},"item_circlet":{"ItemCost":165},"item_crown":{"ItemCost":450},"item_ogre_axe":{"ItemCost":1000},"item_blade_of_alacrity":{"ItemCost":1000},"item_staff_of_wizardry":{"ItemCost":1000},"item_ultimate_orb":{"ItemCost":2150},"item_gloves":{"ItemCost":500},"item_lifesteal":{"ItemCost":900},"item_ring_of_regen":{"ItemCost":300},"item_ring_of_tarrasque":{"ItemCost":700},"item_sobi_mask":{"ItemCost":325},"item_boots":{"ItemCost":500},"item_gem":{"ItemCost":900},"item_cloak":{"ItemCost":550},"item_talisman_of_evasion":{"ItemCost":1400},"item_cheese":{"AbilityCooldown":40.0,"ItemCost":1000},"item_magic_stick":{"AbilityCooldown":13.0,"ItemCost":200},"item_recipe_magic_wand":{"ItemCost":150},"item_magic_wand":{"AbilityCooldown":13.0,"ItemCost":450},"item_ghost":{"AbilityCooldown":20.0,"ItemCost":1500},"item_clarity":{"ItemCost":50},"item_enchanted_mango":{"ItemCost":70},"item_flask":{"ItemCost":110},"item_dust":{"AbilityCooldown":30.0,"AbilityManaCost":0,"ItemCost":180},"item_bottle":{"AbilityCooldown":0.5,"ItemCost":650},"item_ward_observer":{"AbilityCooldown":1.0,"ItemCost":75},"item_ward_sentry":{"AbilityCooldown":1.0,"ItemCost":100},"item_recipe_ward_dispenser":{"ItemCost":0},"item_ward_dispenser":{"ItemCost":175,"AbilityCooldown":0},"item_tango":{"ItemCost":90},"item_tango_single":{"AbilityCooldown":60.0,"ItemCost":30},"item_courier":{"ItemCost":50},"item_tpscroll":{"AbilityCooldown":80.0,"AbilityManaCost":75,"ItemCost":50},"item_recipe_travel_boots":{"ItemCost":2000},"item_recipe_travel_boots_2":{"ItemCost":0},"item_travel_boots":{"AbilityCooldown":45.0,"AbilityManaCost":75,"ItemCost":2500},"item_travel_boots_2":{"AbilityCooldown":45.0,"AbilityManaCost":75,"ItemCost":4500},"item_recipe_phase_boots":{"ItemCost":0},"item_phase_boots":{"AbilityCooldown":8.0,"ItemCost":1480},"item_demon_edge":{"ItemCost":2200},"item_eagle":{"ItemCost":3200},"item_reaver":{"ItemCost":3000},"item_relic":{"ItemCost":3800},"item_hyperstone":{"ItemCost":2000},"item_ring_of_health":{"ItemCost":850},"item_void_stone":{"ItemCost":850},"item_mystic_staff":{"ItemCost":2700},"item_energy_booster":{"ItemCost":900},"item_point_booster":{"ItemCost":1200},"item_vitality_booster":{"ItemCost":1100},"item_recipe_power_treads":{"ItemCost":0},"item_power_treads":{"ItemCost":1450},"item_recipe_hand_of_midas":{"ItemCost":1650},"item_hand_of_midas":{"AbilityCooldown":90.0,"AbilityManaCost":0,"ItemCost":2150},"item_recipe_oblivion_staff":{"ItemCost":0},"item_oblivion_staff":{"ItemCost":1650},"item_recipe_pers":{"ItemCost":0},"item_pers":{"ItemCost":1700},"item_recipe_poor_mans_shield":{"ItemCost":0},"item_poor_mans_shield":{"ItemCost":0,"AbilityCooldown":25.0},"item_recipe_bracer":{"ItemCost":215},"item_bracer":{"ItemCost":515},"item_recipe_wraith_band":{"ItemCost":215},"item_wraith_band":{"ItemCost":515},"item_recipe_null_talisman":{"ItemCost":215},"item_null_talisman":{"ItemCost":515},"item_recipe_mekansm":{"ItemCost":950},"item_mekansm":{"AbilityCooldown":65.0,"AbilityManaCost":225,"ItemCost":2275},"item_recipe_vladmir":{"ItemCost":525},"item_vladmir":{"ItemCost":1925},"item_recipe_buckler":{"ItemCost":200},"item_buckler":{"AbilityCooldown":25.0,"AbilityManaCost":10,"ItemCost":800},"item_recipe_ring_of_basilius":{"ItemCost":0},"item_ring_of_basilius":{"ItemCost":500},"item_recipe_holy_locket":{"ItemCost":550},"item_holy_locket":{"ItemCost":2700},"item_recipe_pipe":{"ItemCost":800},"item_pipe":{"AbilityCooldown":60.0,"AbilityManaCost":100,"ItemCost":3025},"item_recipe_urn_of_shadows":{"ItemCost":310},"item_urn_of_shadows":{"AbilityCooldown":7.0,"ItemCost":875},"item_recipe_headdress":{"ItemCost":175},"item_headdress":{"ItemCost":525},"item_recipe_sheepstick":{"ItemCost":0},"item_sheepstick":{"AbilityCooldown":22.0,"AbilityManaCost":250,"ItemCost":5700},"item_recipe_orchid":{"ItemCost":775},"item_orchid":{"AbilityCooldown":18.0,"AbilityManaCost":100,"ItemCost":4075},"item_recipe_bloodthorn":{"ItemCost":1000},"item_bloodthorn":{"AbilityCooldown":15.0,"AbilityManaCost":100,"ItemCost":7205},"item_recipe_echo_sabre":{"ItemCost":0},"item_echo_sabre":{"AbilityCooldown":5.0,"AbilityManaCost":0,"ItemCost":2650},"item_recipe_cyclone":{"ItemCost":650},"item_cyclone":{"AbilityCooldown":23.0,"AbilityManaCost":175,"ItemCost":2750},"item_recipe_aether_lens":{"ItemCost":600},"item_aether_lens":{"ItemCost":2350},"item_recipe_force_staff":{"ItemCost":950},"item_force_staff":{"AbilityCooldown":23.0,"AbilityManaCost":100,"ItemCost":2250},"item_recipe_hurricane_pike":{"ItemCost":450},"item_hurricane_pike":{"AbilityCooldown":23.0,"AbilityManaCost":100,"ItemCost":4600},"item_recipe_dagon":{"ItemCost":1250},"item_recipe_dagon_2":{"ItemCost":0},"item_recipe_dagon_3":{"ItemCost":0},"item_recipe_dagon_4":{"ItemCost":0},"item_recipe_dagon_5":{"ItemCost":0},"item_dagon":{"AbilityCooldown":"35.0 30.0 25.0 20.0 15.0","AbilityManaCost":"120 140 160 180 200","ItemCost":2700},"item_dagon_2":{"AbilityCooldown":"35.0 30.0 25.0 20.0 15.0","AbilityManaCost":"120 140 160 180 200","ItemCost":3950},"item_dagon_3":{"AbilityCooldown":"35.0 30.0 25.0 20.0 15.0","AbilityManaCost":"120 140 160 180 200","ItemCost":5200},"item_dagon_4":{"AbilityCooldown":"35.0 30.0 25.0 20.0 15.0","AbilityManaCost":"120 140 160 180 200","ItemCost":6450},"item_dagon_5":{"AbilityCooldown":"35.0 30.0 25.0 20.0 15.0","AbilityManaCost":"120 140 160 180 200","ItemCost":7700},"item_recipe_necronomicon":{"ItemCost":1300},"item_recipe_necronomicon_2":{"ItemCost":0},"item_recipe_necronomicon_3":{"ItemCost":0},"item_necronomicon":{"AbilityCooldown":90.0,"AbilityManaCost":50,"ItemCost":2400},"item_necronomicon_2":{"AbilityCooldown":90.0,"AbilityManaCost":50,"ItemCost":3700},"item_necronomicon_3":{"AbilityCooldown":90.0,"AbilityManaCost":50,"ItemCost":5000},"item_recipe_ultimate_scepter":{"ItemCost":0},"item_ultimate_scepter":{"ItemCost":4200},"item_recipe_refresher":{"ItemCost":1700},"item_refresher":{"AbilityCooldown":195.0,"AbilityManaCost":375,"ItemCost":5100},"item_recipe_assault":{"ItemCost":1300},"item_assault":{"ItemCost":5250},"item_recipe_heart":{"ItemCost":400},"item_heart":{"AbilityCooldown":7.0,"ItemCost":5200},"item_recipe_black_king_bar":{"ItemCost":1450},"item_black_king_bar":{"AbilityCooldown":70,"ItemCost":4050},"item_aegis":{"ItemCost":0},"item_recipe_shivas_guard":{"ItemCost":650},"item_shivas_guard":{"AbilityCooldown":30,"AbilityManaCost":100,"ItemCost":4750},"item_recipe_bloodstone":{"ItemCost":0},"item_bloodstone":{"AbilityCooldown":250.0,"ItemCost":4900},"item_recipe_sphere":{"ItemCost":1200},"item_sphere":{"AbilityCooldown":13.0,"ItemCost":5050},"item_recipe_lotus_orb":{"ItemCost":0},"item_lotus_orb":{"AbilityCooldown":15.0,"AbilityManaCost":75,"ItemCost":4000},"item_recipe_meteor_hammer":{"ItemCost":0},"item_meteor_hammer":{"AbilityCooldown":28,"AbilityManaCost":125,"ItemCost":2625},"item_recipe_nullifier":{"ItemCost":0},"item_nullifier":{"AbilityCooldown":13.0,"AbilityManaCost":75,"ItemCost":4700},"item_recipe_aeon_disk":{"ItemCost":1250},"item_aeon_disk":{"AbilityCooldown":115.0,"ItemCost":3250},"item_recipe_kaya":{"ItemCost":600},"item_kaya":{"ItemCost":2050},"item_refresher_shard":{"AbilityCooldown":200.0,"ItemCost":1000},"item_recipe_spirit_vessel":{"ItemCost":750},"item_spirit_vessel":{"AbilityCooldown":7.0,"ItemCost":2975},"item_recipe_vanguard":{"ItemCost":0},"item_vanguard":{"ItemCost":2150},"item_recipe_crimson_guard":{"ItemCost":750},"item_crimson_guard":{"AbilityCooldown":46.0,"ItemCost":3700},"item_recipe_blade_mail":{"ItemCost":0},"item_blade_mail":{"AbilityCooldown":25.0,"AbilityManaCost":25,"ItemCost":2200},"item_recipe_soul_booster":{"ItemCost":0},"item_soul_booster":{"ItemCost":3200},"item_recipe_hood_of_defiance":{"ItemCost":0},"item_hood_of_defiance":{"AbilityCooldown":60.0,"AbilityManaCost":75,"ItemCost":1700},"item_recipe_rapier":{"ItemCost":0},"item_rapier":{"ItemCost":6000},"item_recipe_monkey_king_bar":{"ItemCost":0},"item_monkey_king_bar":{"ItemCost":4175},"item_recipe_radiance":{"ItemCost":1350},"item_radiance":{"ItemCost":5150},"item_recipe_butterfly":{"ItemCost":0},"item_butterfly":{"ItemCost":5475},"item_recipe_greater_crit":{"ItemCost":1000},"item_greater_crit":{"ItemCost":5330},"item_recipe_basher":{"ItemCost":900},"item_basher":{"AbilityCooldown":2.3,"ItemCost":2950},"item_recipe_bfury":{"ItemCost":300},"item_bfury":{"AbilityCooldown":4.0,"ItemCost":4400},"item_recipe_manta":{"ItemCost":500},"item_manta":{"AbilityCooldown":45.0,"AbilityManaCost":125,"ItemCost":4700},"item_recipe_lesser_crit":{"ItemCost":500},"item_lesser_crit":{"ItemCost":2130},"item_recipe_dragon_lance":{"ItemCost":0},"item_dragon_lance":{"ItemCost":1900},"item_recipe_armlet":{"ItemCost":550},"item_armlet":{"AbilityCooldown":0.0,"ItemCost":2380},"item_recipe_invis_sword":{"ItemCost":0},"item_invis_sword":{"AbilityCooldown":28.0,"AbilityManaCost":75,"ItemCost":2800},"item_recipe_silver_edge":{"ItemCost":600},"item_silver_edge":{"AbilityCooldown":22.0,"AbilityManaCost":75,"ItemCost":5550},"item_recipe_sange_and_yasha":{"ItemCost":0},"item_sange_and_yasha":{"ItemCost":4100},"item_recipe_kaya_and_sange":{"ItemCost":0},"item_kaya_and_sange":{"ItemCost":4100},"item_recipe_yasha_and_kaya":{"ItemCost":0},"item_yasha_and_kaya":{"ItemCost":4100},"item_recipe_satanic":{"ItemCost":0},"item_satanic":{"AbilityCooldown":35.0,"ItemCost":5300},"item_recipe_mjollnir":{"ItemCost":900},"item_mjollnir":{"AbilityCooldown":35.0,"AbilityManaCost":50,"ItemCost":5600},"item_recipe_skadi":{"ItemCost":0},"item_skadi":{"ItemCost":5500},"item_recipe_sange":{"ItemCost":600},"item_sange":{"ItemCost":2050},"item_recipe_helm_of_the_dominator":{"ItemCost":0},"item_helm_of_the_dominator":{"AbilityCooldown":60.0,"AbilityManaCost":0,"ItemCost":1875},"item_recipe_maelstrom":{"ItemCost":0},"item_maelstrom":{"ItemCost":2700},"item_recipe_desolator":{"ItemCost":0},"item_desolator":{"ItemCost":3500},"item_recipe_yasha":{"ItemCost":600},"item_yasha":{"ItemCost":2050},"item_recipe_mask_of_madness":{"ItemCost":0},"item_mask_of_madness":{"AbilityCooldown":22.0,"AbilityManaCost":25,"ItemCost":1775},"item_recipe_diffusal_blade":{"ItemCost":700},"item_diffusal_blade":{"AbilityCooldown":15.0,"AbilityManaCost":0,"ItemCost":3150},"item_recipe_ethereal_blade":{"ItemCost":0},"item_ethereal_blade":{"AbilityCooldown":20.0,"AbilityManaCost":100,"ItemCost":4700},"item_recipe_soul_ring":{"ItemCost":200},"item_soul_ring":{"AbilityCooldown":25.0,"AbilityManaCost":0,"ItemCost":770},"item_recipe_arcane_boots":{"ItemCost":0},"item_arcane_boots":{"AbilityCooldown":55.0,"AbilityManaCost":0,"ItemCost":1400},"item_recipe_octarine_core":{"ItemCost":0},"item_octarine_core":{"ItemCost":5900},"item_orb_of_venom":{"ItemCost":275},"item_blight_stone":{"ItemCost":300},"item_recipe_ancient_janggo":{"ItemCost":600},"item_ancient_janggo":{"AbilityCooldown":30.0,"ItemCost":1625},"item_recipe_medallion_of_courage":{"ItemCost":0},"item_medallion_of_courage":{"AbilityCooldown":7.0,"ItemCost":1175},"item_recipe_solar_crest":{"ItemCost":300},"item_solar_crest":{"AbilityCooldown":7.0,"ItemCost":3875},"item_smoke_of_deceit":{"AbilityCooldown":1.0,"ItemCost":80},"item_tome_of_knowledge":{"AbilityCooldown":0.0,"ItemCost":150},"item_recipe_veil_of_discord":{"ItemCost":700},"item_veil_of_discord":{"AbilityCooldown":20,"AbilityManaCost":50,"ItemCost":2050},"item_recipe_guardian_greaves":{"ItemCost":1700},"item_guardian_greaves":{"AbilityCooldown":40,"AbilityManaCost":0,"ItemCost":5375},"item_recipe_rod_of_atos":{"ItemCost":850},"item_rod_of_atos":{"AbilityCooldown":16,"AbilityManaCost":50,"ItemCost":2750},"item_recipe_iron_talon":{"ItemCost":0},"item_iron_talon":{"AbilityCooldown":20.0,"AbilityManaCost":0,"ItemCost":0},"item_recipe_abyssal_blade":{"ItemCost":1550},"item_abyssal_blade":{"AbilityCooldown":35,"AbilityManaCost":75,"ItemCost":6650},"item_recipe_heavens_halberd":{"ItemCost":0},"item_heavens_halberd":{"AbilityCooldown":18,"AbilityManaCost":100,"ItemCost":3450},"item_recipe_ring_of_aquila":{"ItemCost":0},"item_ring_of_aquila":{"ItemCost":965},"item_recipe_tranquil_boots":{"ItemCost":0},"item_tranquil_boots":{"AbilityCooldown":13.0,"AbilityManaCost":0,"ItemCost":1050},"item_shadow_amulet":{"AbilityCooldown":7.0,"AbilityManaCost":0,"ItemCost":1400},"item_recipe_glimmer_cape":{"ItemCost":0},"item_glimmer_cape":{"AbilityCooldown":14.0,"AbilityManaCost":90,"ItemCost":1950},"item_river_painter":{"AbilityCooldown":0.0,"ItemCost":0},"item_river_painter2":{"AbilityCooldown":0.0,"ItemCost":0},"item_river_painter3":{"AbilityCooldown":0.0,"ItemCost":0},"item_river_painter4":{"AbilityCooldown":0.0,"ItemCost":0},"item_river_painter5":{"AbilityCooldown":0.0,"ItemCost":0},"item_river_painter6":{"AbilityCooldown":0.0,"ItemCost":0},"item_river_painter7":{"AbilityCooldown":0.0,"ItemCost":0},"item_mutation_tombstone":{"ItemCost":0},"item_super_blink":{"AbilityCooldown":15.0,"AbilityManaCost":0},"item_pocket_tower":{"AbilityCooldown":15.0,"AbilityManaCost":0},"item_pocket_roshan":{"AbilityCooldown":60.0,"AbilityManaCost":0,"ItemCost":1000}}
+{
+  "item_blink": {
+    "AbilityCooldown": 15.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 2250
+  },
+  "item_blades_of_attack": {
+    "ItemCost": 430
+  },
+  "item_broadsword": {
+    "ItemCost": 1200
+  },
+  "item_chainmail": {
+    "ItemCost": 550
+  },
+  "item_claymore": {
+    "ItemCost": 1400
+  },
+  "item_helm_of_iron_will": {
+    "ItemCost": 900
+  },
+  "item_javelin": {
+    "ItemCost": 1100
+  },
+  "item_mithril_hammer": {
+    "ItemCost": 1600
+  },
+  "item_platemail": {
+    "ItemCost": 1400
+  },
+  "item_quarterstaff": {
+    "ItemCost": 875
+  },
+  "item_quelling_blade": {
+    "AbilityCooldown": 4.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 200
+  },
+  "item_faerie_fire": {
+    "AbilityCooldown": 5.0,
+    "ItemCost": 70
+  },
+  "item_infused_raindrop": {
+    "AbilityCooldown": 7.0,
+    "ItemCost": 225
+  },
+  "item_wind_lace": {
+    "ItemCost": 250
+  },
+  "item_ring_of_protection": {
+    "ItemCost": 175
+  },
+  "item_stout_shield": {
+    "ItemCost": 200
+  },
+  "item_recipe_moon_shard": {
+    "ItemCost": 0
+  },
+  "item_moon_shard": {
+    "ItemCost": 4000
+  },
+  "item_gauntlets": {
+    "ItemCost": 135
+  },
+  "item_slippers": {
+    "ItemCost": 135
+  },
+  "item_mantle": {
+    "ItemCost": 135
+  },
+  "item_branches": {
+    "AbilityCooldown": 0.0,
+    "ItemCost": 50
+  },
+  "item_belt_of_strength": {
+    "ItemCost": 450
+  },
+  "item_boots_of_elves": {
+    "ItemCost": 450
+  },
+  "item_robe": {
+    "ItemCost": 450
+  },
+  "item_circlet": {
+    "ItemCost": 165
+  },
+  "item_crown": {
+    "ItemCost": 450
+  },
+  "item_ogre_axe": {
+    "ItemCost": 1000
+  },
+  "item_blade_of_alacrity": {
+    "ItemCost": 1000
+  },
+  "item_staff_of_wizardry": {
+    "ItemCost": 1000
+  },
+  "item_ultimate_orb": {
+    "ItemCost": 2150
+  },
+  "item_gloves": {
+    "ItemCost": 500
+  },
+  "item_lifesteal": {
+    "ItemCost": 900
+  },
+  "item_ring_of_regen": {
+    "ItemCost": 300
+  },
+  "item_ring_of_tarrasque": {
+    "ItemCost": 700
+  },
+  "item_sobi_mask": {
+    "ItemCost": 325
+  },
+  "item_boots": {
+    "ItemCost": 500
+  },
+  "item_gem": {
+    "ItemCost": 900
+  },
+  "item_cloak": {
+    "ItemCost": 550
+  },
+  "item_talisman_of_evasion": {
+    "ItemCost": 1400
+  },
+  "item_cheese": {
+    "AbilityCooldown": 40.0,
+    "ItemCost": 1000
+  },
+  "item_magic_stick": {
+    "AbilityCooldown": 13.0,
+    "ItemCost": 200
+  },
+  "item_recipe_magic_wand": {
+    "ItemCost": 150
+  },
+  "item_magic_wand": {
+    "AbilityCooldown": 13.0,
+    "ItemCost": 450
+  },
+  "item_ghost": {
+    "AbilityCooldown": 20.0,
+    "ItemCost": 1500
+  },
+  "item_clarity": {
+    "ItemCost": 50
+  },
+  "item_enchanted_mango": {
+    "ItemCost": 70
+  },
+  "item_flask": {
+    "ItemCost": 110
+  },
+  "item_dust": {
+    "AbilityCooldown": 30.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 180
+  },
+  "item_bottle": {
+    "AbilityCooldown": 0.5,
+    "ItemCost": 650
+  },
+  "item_ward_observer": {
+    "AbilityCooldown": 1.0,
+    "ItemCost": 75
+  },
+  "item_ward_sentry": {
+    "AbilityCooldown": 1.0,
+    "ItemCost": 100
+  },
+  "item_recipe_ward_dispenser": {
+    "ItemCost": 0
+  },
+  "item_ward_dispenser": {
+    "ItemCost": 175,
+    "AbilityCooldown": 0
+  },
+  "item_tango": {
+    "ItemCost": 90
+  },
+  "item_tango_single": {
+    "AbilityCooldown": 60.0,
+    "ItemCost": 30
+  },
+  "item_courier": {
+    "ItemCost": 50
+  },
+  "item_tpscroll": {
+    "AbilityCooldown": 80.0,
+    "AbilityManaCost": 75,
+    "ItemCost": 50
+  },
+  "item_recipe_travel_boots": {
+    "ItemCost": 2000
+  },
+  "item_recipe_travel_boots_2": {
+    "ItemCost": 0
+  },
+  "item_travel_boots": {
+    "AbilityCooldown": 45.0,
+    "AbilityManaCost": 75,
+    "ItemCost": 2500
+  },
+  "item_travel_boots_2": {
+    "AbilityCooldown": 45.0,
+    "AbilityManaCost": 75,
+    "ItemCost": 4500
+  },
+  "item_recipe_phase_boots": {
+    "ItemCost": 0
+  },
+  "item_phase_boots": {
+    "AbilityCooldown": 8.0,
+    "ItemCost": 1480
+  },
+  "item_demon_edge": {
+    "ItemCost": 2200
+  },
+  "item_eagle": {
+    "ItemCost": 3200
+  },
+  "item_reaver": {
+    "ItemCost": 3000
+  },
+  "item_relic": {
+    "ItemCost": 3800
+  },
+  "item_hyperstone": {
+    "ItemCost": 2000
+  },
+  "item_ring_of_health": {
+    "ItemCost": 850
+  },
+  "item_void_stone": {
+    "ItemCost": 850
+  },
+  "item_mystic_staff": {
+    "ItemCost": 2700
+  },
+  "item_energy_booster": {
+    "ItemCost": 900
+  },
+  "item_point_booster": {
+    "ItemCost": 1200
+  },
+  "item_vitality_booster": {
+    "ItemCost": 1100
+  },
+  "item_recipe_power_treads": {
+    "ItemCost": 0
+  },
+  "item_power_treads": {
+    "ItemCost": 1450
+  },
+  "item_recipe_hand_of_midas": {
+    "ItemCost": 1650
+  },
+  "item_hand_of_midas": {
+    "AbilityCooldown": 90.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 2150
+  },
+  "item_recipe_oblivion_staff": {
+    "ItemCost": 0
+  },
+  "item_oblivion_staff": {
+    "ItemCost": 1650
+  },
+  "item_recipe_pers": {
+    "ItemCost": 0
+  },
+  "item_pers": {
+    "ItemCost": 1700
+  },
+  "item_recipe_poor_mans_shield": {
+    "ItemCost": 0
+  },
+  "item_poor_mans_shield": {
+    "ItemCost": 0,
+    "AbilityCooldown": 25.0
+  },
+  "item_recipe_bracer": {
+    "ItemCost": 215
+  },
+  "item_bracer": {
+    "ItemCost": 515
+  },
+  "item_recipe_wraith_band": {
+    "ItemCost": 215
+  },
+  "item_wraith_band": {
+    "ItemCost": 515
+  },
+  "item_recipe_null_talisman": {
+    "ItemCost": 215
+  },
+  "item_null_talisman": {
+    "ItemCost": 515
+  },
+  "item_recipe_mekansm": {
+    "ItemCost": 950
+  },
+  "item_mekansm": {
+    "AbilityCooldown": 65.0,
+    "AbilityManaCost": 225,
+    "ItemCost": 2275
+  },
+  "item_recipe_vladmir": {
+    "ItemCost": 525
+  },
+  "item_vladmir": {
+    "ItemCost": 1925
+  },
+  "item_recipe_buckler": {
+    "ItemCost": 200
+  },
+  "item_buckler": {
+    "AbilityCooldown": 25.0,
+    "AbilityManaCost": 10,
+    "ItemCost": 800
+  },
+  "item_recipe_ring_of_basilius": {
+    "ItemCost": 0
+  },
+  "item_ring_of_basilius": {
+    "ItemCost": 500
+  },
+  "item_recipe_holy_locket": {
+    "ItemCost": 550
+  },
+  "item_holy_locket": {
+    "ItemCost": 2700
+  },
+  "item_recipe_pipe": {
+    "ItemCost": 800
+  },
+  "item_pipe": {
+    "AbilityCooldown": 60.0,
+    "AbilityManaCost": 100,
+    "ItemCost": 3025
+  },
+  "item_recipe_urn_of_shadows": {
+    "ItemCost": 310
+  },
+  "item_urn_of_shadows": {
+    "AbilityCooldown": 7.0,
+    "ItemCost": 875
+  },
+  "item_recipe_headdress": {
+    "ItemCost": 175
+  },
+  "item_headdress": {
+    "ItemCost": 525
+  },
+  "item_recipe_sheepstick": {
+    "ItemCost": 0
+  },
+  "item_sheepstick": {
+    "AbilityCooldown": 22.0,
+    "AbilityManaCost": 250,
+    "ItemCost": 5700
+  },
+  "item_recipe_orchid": {
+    "ItemCost": 775
+  },
+  "item_orchid": {
+    "AbilityCooldown": 18.0,
+    "AbilityManaCost": 100,
+    "ItemCost": 4075
+  },
+  "item_recipe_bloodthorn": {
+    "ItemCost": 1000
+  },
+  "item_bloodthorn": {
+    "AbilityCooldown": 15.0,
+    "AbilityManaCost": 100,
+    "ItemCost": 7205
+  },
+  "item_recipe_echo_sabre": {
+    "ItemCost": 0
+  },
+  "item_echo_sabre": {
+    "AbilityCooldown": 5.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 2650
+  },
+  "item_recipe_cyclone": {
+    "ItemCost": 650
+  },
+  "item_cyclone": {
+    "AbilityCooldown": 23.0,
+    "AbilityManaCost": 175,
+    "ItemCost": 2750
+  },
+  "item_recipe_aether_lens": {
+    "ItemCost": 600
+  },
+  "item_aether_lens": {
+    "ItemCost": 2350
+  },
+  "item_recipe_force_staff": {
+    "ItemCost": 950
+  },
+  "item_force_staff": {
+    "AbilityCooldown": 23.0,
+    "AbilityManaCost": 100,
+    "ItemCost": 2250
+  },
+  "item_recipe_hurricane_pike": {
+    "ItemCost": 450
+  },
+  "item_hurricane_pike": {
+    "AbilityCooldown": 23.0,
+    "AbilityManaCost": 100,
+    "ItemCost": 4600
+  },
+  "item_recipe_dagon": {
+    "ItemCost": 1250
+  },
+  "item_recipe_dagon_2": {
+    "ItemCost": 0
+  },
+  "item_recipe_dagon_3": {
+    "ItemCost": 0
+  },
+  "item_recipe_dagon_4": {
+    "ItemCost": 0
+  },
+  "item_recipe_dagon_5": {
+    "ItemCost": 0
+  },
+  "item_dagon": {
+    "AbilityCooldown": "35.0 30.0 25.0 20.0 15.0",
+    "AbilityManaCost": "120 140 160 180 200",
+    "ItemCost": 2700
+  },
+  "item_dagon_2": {
+    "AbilityCooldown": "35.0 30.0 25.0 20.0 15.0",
+    "AbilityManaCost": "120 140 160 180 200",
+    "ItemCost": 3950
+  },
+  "item_dagon_3": {
+    "AbilityCooldown": "35.0 30.0 25.0 20.0 15.0",
+    "AbilityManaCost": "120 140 160 180 200",
+    "ItemCost": 5200
+  },
+  "item_dagon_4": {
+    "AbilityCooldown": "35.0 30.0 25.0 20.0 15.0",
+    "AbilityManaCost": "120 140 160 180 200",
+    "ItemCost": 6450
+  },
+  "item_dagon_5": {
+    "AbilityCooldown": "35.0 30.0 25.0 20.0 15.0",
+    "AbilityManaCost": "120 140 160 180 200",
+    "ItemCost": 7700
+  },
+  "item_recipe_necronomicon": {
+    "ItemCost": 1300
+  },
+  "item_recipe_necronomicon_2": {
+    "ItemCost": 0
+  },
+  "item_recipe_necronomicon_3": {
+    "ItemCost": 0
+  },
+  "item_necronomicon": {
+    "AbilityCooldown": 90.0,
+    "AbilityManaCost": 50,
+    "ItemCost": 2400
+  },
+  "item_necronomicon_2": {
+    "AbilityCooldown": 90.0,
+    "AbilityManaCost": 50,
+    "ItemCost": 3700
+  },
+  "item_necronomicon_3": {
+    "AbilityCooldown": 90.0,
+    "AbilityManaCost": 50,
+    "ItemCost": 5000
+  },
+  "item_recipe_ultimate_scepter": {
+    "ItemCost": 0
+  },
+  "item_ultimate_scepter": {
+    "ItemCost": 4200
+  },
+  "item_recipe_refresher": {
+    "ItemCost": 1700
+  },
+  "item_refresher": {
+    "AbilityCooldown": 195.0,
+    "AbilityManaCost": 375,
+    "ItemCost": 5100
+  },
+  "item_recipe_assault": {
+    "ItemCost": 1300
+  },
+  "item_assault": {
+    "ItemCost": 5250
+  },
+  "item_recipe_heart": {
+    "ItemCost": 400
+  },
+  "item_heart": {
+    "AbilityCooldown": 7.0,
+    "ItemCost": 5200
+  },
+  "item_recipe_black_king_bar": {
+    "ItemCost": 1450
+  },
+  "item_black_king_bar": {
+    "AbilityCooldown": 70,
+    "ItemCost": 4050
+  },
+  "item_aegis": {
+    "ItemCost": 0
+  },
+  "item_recipe_shivas_guard": {
+    "ItemCost": 650
+  },
+  "item_shivas_guard": {
+    "AbilityCooldown": 30,
+    "AbilityManaCost": 100,
+    "ItemCost": 4750
+  },
+  "item_recipe_bloodstone": {
+    "ItemCost": 0
+  },
+  "item_bloodstone": {
+    "AbilityCooldown": 250.0,
+    "ItemCost": 4900
+  },
+  "item_recipe_sphere": {
+    "ItemCost": 1200
+  },
+  "item_sphere": {
+    "AbilityCooldown": 13.0,
+    "ItemCost": 5050
+  },
+  "item_recipe_lotus_orb": {
+    "ItemCost": 0
+  },
+  "item_lotus_orb": {
+    "AbilityCooldown": 15.0,
+    "AbilityManaCost": 75,
+    "ItemCost": 4000
+  },
+  "item_recipe_meteor_hammer": {
+    "ItemCost": 0
+  },
+  "item_meteor_hammer": {
+    "AbilityCooldown": 28,
+    "AbilityManaCost": 125,
+    "ItemCost": 2625
+  },
+  "item_recipe_nullifier": {
+    "ItemCost": 0
+  },
+  "item_nullifier": {
+    "AbilityCooldown": 13.0,
+    "AbilityManaCost": 75,
+    "ItemCost": 4700
+  },
+  "item_recipe_aeon_disk": {
+    "ItemCost": 1250
+  },
+  "item_aeon_disk": {
+    "AbilityCooldown": 115.0,
+    "ItemCost": 3250
+  },
+  "item_recipe_kaya": {
+    "ItemCost": 600
+  },
+  "item_kaya": {
+    "ItemCost": 2050
+  },
+  "item_refresher_shard": {
+    "AbilityCooldown": 200.0,
+    "ItemCost": 1000
+  },
+  "item_recipe_spirit_vessel": {
+    "ItemCost": 750
+  },
+  "item_spirit_vessel": {
+    "AbilityCooldown": 7.0,
+    "ItemCost": 2975
+  },
+  "item_recipe_vanguard": {
+    "ItemCost": 0
+  },
+  "item_vanguard": {
+    "ItemCost": 2150
+  },
+  "item_recipe_crimson_guard": {
+    "ItemCost": 750
+  },
+  "item_crimson_guard": {
+    "AbilityCooldown": 46.0,
+    "ItemCost": 3700
+  },
+  "item_recipe_blade_mail": {
+    "ItemCost": 0
+  },
+  "item_blade_mail": {
+    "AbilityCooldown": 25.0,
+    "AbilityManaCost": 25,
+    "ItemCost": 2200
+  },
+  "item_recipe_soul_booster": {
+    "ItemCost": 0
+  },
+  "item_soul_booster": {
+    "ItemCost": 3200
+  },
+  "item_recipe_hood_of_defiance": {
+    "ItemCost": 0
+  },
+  "item_hood_of_defiance": {
+    "AbilityCooldown": 60.0,
+    "AbilityManaCost": 75,
+    "ItemCost": 1700
+  },
+  "item_recipe_rapier": {
+    "ItemCost": 0
+  },
+  "item_rapier": {
+    "ItemCost": 6000
+  },
+  "item_recipe_monkey_king_bar": {
+    "ItemCost": 0
+  },
+  "item_monkey_king_bar": {
+    "ItemCost": 4175
+  },
+  "item_recipe_radiance": {
+    "ItemCost": 1350
+  },
+  "item_radiance": {
+    "ItemCost": 5150
+  },
+  "item_recipe_butterfly": {
+    "ItemCost": 0
+  },
+  "item_butterfly": {
+    "ItemCost": 5475
+  },
+  "item_recipe_greater_crit": {
+    "ItemCost": 1000
+  },
+  "item_greater_crit": {
+    "ItemCost": 5330
+  },
+  "item_recipe_basher": {
+    "ItemCost": 900
+  },
+  "item_basher": {
+    "AbilityCooldown": 2.3,
+    "ItemCost": 2950
+  },
+  "item_recipe_bfury": {
+    "ItemCost": 300
+  },
+  "item_bfury": {
+    "AbilityCooldown": 4.0,
+    "ItemCost": 4400
+  },
+  "item_recipe_manta": {
+    "ItemCost": 500
+  },
+  "item_manta": {
+    "AbilityCooldown": 45.0,
+    "AbilityManaCost": 125,
+    "ItemCost": 4700
+  },
+  "item_recipe_lesser_crit": {
+    "ItemCost": 500
+  },
+  "item_lesser_crit": {
+    "ItemCost": 2130
+  },
+  "item_recipe_dragon_lance": {
+    "ItemCost": 0
+  },
+  "item_dragon_lance": {
+    "ItemCost": 1900
+  },
+  "item_recipe_armlet": {
+    "ItemCost": 550
+  },
+  "item_armlet": {
+    "AbilityCooldown": 0.0,
+    "ItemCost": 2380
+  },
+  "item_recipe_invis_sword": {
+    "ItemCost": 0
+  },
+  "item_invis_sword": {
+    "AbilityCooldown": 28.0,
+    "AbilityManaCost": 75,
+    "ItemCost": 2800
+  },
+  "item_recipe_silver_edge": {
+    "ItemCost": 600
+  },
+  "item_silver_edge": {
+    "AbilityCooldown": 22.0,
+    "AbilityManaCost": 75,
+    "ItemCost": 5550
+  },
+  "item_recipe_sange_and_yasha": {
+    "ItemCost": 0
+  },
+  "item_sange_and_yasha": {
+    "ItemCost": 4100
+  },
+  "item_recipe_kaya_and_sange": {
+    "ItemCost": 0
+  },
+  "item_kaya_and_sange": {
+    "ItemCost": 4100
+  },
+  "item_recipe_yasha_and_kaya": {
+    "ItemCost": 0
+  },
+  "item_yasha_and_kaya": {
+    "ItemCost": 4100
+  },
+  "item_recipe_satanic": {
+    "ItemCost": 0
+  },
+  "item_satanic": {
+    "AbilityCooldown": 35.0,
+    "ItemCost": 5300
+  },
+  "item_recipe_mjollnir": {
+    "ItemCost": 900
+  },
+  "item_mjollnir": {
+    "AbilityCooldown": 35.0,
+    "AbilityManaCost": 50,
+    "ItemCost": 5600
+  },
+  "item_recipe_skadi": {
+    "ItemCost": 0
+  },
+  "item_skadi": {
+    "ItemCost": 5500
+  },
+  "item_recipe_sange": {
+    "ItemCost": 600
+  },
+  "item_sange": {
+    "ItemCost": 2050
+  },
+  "item_recipe_helm_of_the_dominator": {
+    "ItemCost": 0
+  },
+  "item_helm_of_the_dominator": {
+    "AbilityCooldown": 60.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 1875
+  },
+  "item_recipe_maelstrom": {
+    "ItemCost": 0
+  },
+  "item_maelstrom": {
+    "ItemCost": 2700
+  },
+  "item_recipe_desolator": {
+    "ItemCost": 0
+  },
+  "item_desolator": {
+    "ItemCost": 3500
+  },
+  "item_recipe_yasha": {
+    "ItemCost": 600
+  },
+  "item_yasha": {
+    "ItemCost": 2050
+  },
+  "item_recipe_mask_of_madness": {
+    "ItemCost": 0
+  },
+  "item_mask_of_madness": {
+    "AbilityCooldown": 22.0,
+    "AbilityManaCost": 25,
+    "ItemCost": 1775
+  },
+  "item_recipe_diffusal_blade": {
+    "ItemCost": 700
+  },
+  "item_diffusal_blade": {
+    "AbilityCooldown": 15.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 3150
+  },
+  "item_recipe_ethereal_blade": {
+    "ItemCost": 0
+  },
+  "item_ethereal_blade": {
+    "AbilityCooldown": 20.0,
+    "AbilityManaCost": 100,
+    "ItemCost": 4700
+  },
+  "item_recipe_soul_ring": {
+    "ItemCost": 200
+  },
+  "item_soul_ring": {
+    "AbilityCooldown": 25.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 770
+  },
+  "item_recipe_arcane_boots": {
+    "ItemCost": 0
+  },
+  "item_arcane_boots": {
+    "AbilityCooldown": 55.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 1400
+  },
+  "item_recipe_octarine_core": {
+    "ItemCost": 0
+  },
+  "item_octarine_core": {
+    "ItemCost": 5900
+  },
+  "item_orb_of_venom": {
+    "ItemCost": 275
+  },
+  "item_blight_stone": {
+    "ItemCost": 300
+  },
+  "item_recipe_ancient_janggo": {
+    "ItemCost": 600
+  },
+  "item_ancient_janggo": {
+    "AbilityCooldown": 30.0,
+    "ItemCost": 1625
+  },
+  "item_recipe_medallion_of_courage": {
+    "ItemCost": 0
+  },
+  "item_medallion_of_courage": {
+    "AbilityCooldown": 7.0,
+    "ItemCost": 1175
+  },
+  "item_recipe_solar_crest": {
+    "ItemCost": 300
+  },
+  "item_solar_crest": {
+    "AbilityCooldown": 7.0,
+    "ItemCost": 3875
+  },
+  "item_smoke_of_deceit": {
+    "AbilityCooldown": 1.0,
+    "ItemCost": 80
+  },
+  "item_tome_of_knowledge": {
+    "AbilityCooldown": 0.0,
+    "ItemCost": 150
+  },
+  "item_recipe_veil_of_discord": {
+    "ItemCost": 700
+  },
+  "item_veil_of_discord": {
+    "AbilityCooldown": 20,
+    "AbilityManaCost": 50,
+    "ItemCost": 2050
+  },
+  "item_recipe_guardian_greaves": {
+    "ItemCost": 1700
+  },
+  "item_guardian_greaves": {
+    "AbilityCooldown": 40,
+    "AbilityManaCost": 0,
+    "ItemCost": 5375
+  },
+  "item_recipe_rod_of_atos": {
+    "ItemCost": 850
+  },
+  "item_rod_of_atos": {
+    "AbilityCooldown": 16,
+    "AbilityManaCost": 50,
+    "ItemCost": 2750
+  },
+  "item_recipe_iron_talon": {
+    "ItemCost": 0
+  },
+  "item_iron_talon": {
+    "AbilityCooldown": 20.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 0
+  },
+  "item_recipe_abyssal_blade": {
+    "ItemCost": 1550
+  },
+  "item_abyssal_blade": {
+    "AbilityCooldown": 35,
+    "AbilityManaCost": 75,
+    "ItemCost": 6650
+  },
+  "item_recipe_heavens_halberd": {
+    "ItemCost": 0
+  },
+  "item_heavens_halberd": {
+    "AbilityCooldown": 18,
+    "AbilityManaCost": 100,
+    "ItemCost": 3450
+  },
+  "item_recipe_ring_of_aquila": {
+    "ItemCost": 0
+  },
+  "item_ring_of_aquila": {
+    "ItemCost": 965
+  },
+  "item_recipe_tranquil_boots": {
+    "ItemCost": 0
+  },
+  "item_tranquil_boots": {
+    "AbilityCooldown": 13.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 1050
+  },
+  "item_shadow_amulet": {
+    "AbilityCooldown": 7.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 1400
+  },
+  "item_recipe_glimmer_cape": {
+    "ItemCost": 0
+  },
+  "item_glimmer_cape": {
+    "AbilityCooldown": 14.0,
+    "AbilityManaCost": 90,
+    "ItemCost": 1950
+  },
+  "item_river_painter": {
+    "AbilityCooldown": 0.0,
+    "ItemCost": 0
+  },
+  "item_river_painter2": {
+    "AbilityCooldown": 0.0,
+    "ItemCost": 0
+  },
+  "item_river_painter3": {
+    "AbilityCooldown": 0.0,
+    "ItemCost": 0
+  },
+  "item_river_painter4": {
+    "AbilityCooldown": 0.0,
+    "ItemCost": 0
+  },
+  "item_river_painter5": {
+    "AbilityCooldown": 0.0,
+    "ItemCost": 0
+  },
+  "item_river_painter6": {
+    "AbilityCooldown": 0.0,
+    "ItemCost": 0
+  },
+  "item_river_painter7": {
+    "AbilityCooldown": 0.0,
+    "ItemCost": 0
+  },
+  "item_mutation_tombstone": {
+    "ItemCost": 0
+  },
+  "item_super_blink": {
+    "AbilityCooldown": 15.0,
+    "AbilityManaCost": 0
+  },
+  "item_pocket_tower": {
+    "AbilityCooldown": 15.0,
+    "AbilityManaCost": 0
+  },
+  "item_pocket_roshan": {
+    "AbilityCooldown": 60.0,
+    "AbilityManaCost": 0,
+    "ItemCost": 1000
+  }
+}
