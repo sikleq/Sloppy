@@ -559,6 +559,49 @@ def item_header(name, new=False):
 </div>'''
 
 
+def components(*parts, total, recipe=None):
+    """Visual components block — replaces the 'Requires X (a), Y (b), and a
+    recipe (c). Total cost: Ng' row for new items.
+
+    parts:  one or more (item_display_name, cost) tuples. Each part renders
+            as the item icon with its cost beneath; parts are separated by
+            visual '+' glyphs.
+    recipe: (label, cost) for the item's recipe — rendered with the generic
+            recipe.png icon. Pass None if the item has no recipe.
+    total:  total gold cost of the assembled item, rendered after '=' on the
+            right edge of the box.
+
+    Example for Consecrated Wraps:
+        W(components(('Vitality Booster', 1000), ('Shawl', 450),
+                     ('Crown', 450), recipe=('Recipe', 700), total=2600))
+    """
+    cells = []
+    def cell(slug, name, cost):
+        return (
+            f'<div class="component">'
+            f'<img src="{ITEM_CDN}{slug}.png" alt="{name}" title="{name}" loading="lazy">'
+            f'<div class="component-price">{cost}</div>'
+            f'</div>'
+        )
+    for name, cost in parts:
+        slug = ITEM_SLUG.get(name, name.lower().replace(' ', '_').replace("'", ''))
+        cells.append(cell(slug, name, cost))
+    if recipe:
+        rname, rcost = recipe
+        cells.append(cell('recipe', rname, rcost))
+    body = '<span class="components-plus">+</span>'.join(cells)
+    return (f'<div class="components-box">'
+            f'<div class="components-row">{body}</div>'
+            f'<div class="components-total">= <span>{total}</span></div>'
+            f'</div>')
+
+
+def provides(text):
+    """Visual properties block — replaces the 'Provides X, Y, and Z' row for
+    new items. One line, comma-separated, soft outlined box."""
+    return f'<div class="provides-box">{text}</div>'
+
+
 def plain_header(name):
     out = _close_ability_block()
     _State.current_hero = None
@@ -1843,36 +1886,16 @@ h2.section {
 .entity-block.is-new ul.changes li > .row-tag-empty {
   display: none;
 }
-/* The pseudo lives on <li>; attr() can't read data-new-tag from .entity-block.
-   Tag text is always 'NEW' (the item is new-in-this-patch regardless of
-   whether the concept is returning from older patches). */
-.entity-block.is-new[data-new-tag="NEW"] ul.changes li:first-child::before {
-  content: "NEW";
-  grid-column: 1;
-  align-self: start;
-  margin-top: 2px;
-  width: 64px;
-  min-width: 64px;
-  display: inline-block;
-  padding: 3px 7px;
-  border-radius: 2px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  line-height: 1;
-  text-align: center;
-  background: rgba(220, 175, 95, 0.10);
-  color: #b08c5a;
-  border: 1px solid rgba(220, 175, 95, 0.28);
-  box-sizing: border-box;
-}
+/* Per-row NEW tag was removed: the item is now signalled by the type label
+   after the name + the components/provides blocks below the header. The
+   block-level filter still works because each <li> inside .is-new carries
+   data-tag="new" (via t("NEW") on the original li()). */
 /* Ability description box — spans one Passive:/Active: starter row plus any
    continuation rows until the next ability starter or end of ul. Post-process
    classifies each li with one of -solo / -start / -cont / -cont-end. */
-/* Box is drawn with NEGATIVE horizontal margins matching its padding+border,
-   so the row text inside stays aligned with rows OUTSIDE the box. Otherwise
-   the 12px padding-left would push the tag/text columns rightward and break
-   vertical alignment across the patch. */
+/* Box hugs the existing row width (no negative margins → never overflows the
+   container). Horizontal padding is zero so the row's grid columns stay at
+   their normal positions; the border sits flush with the ul's edges. */
 ul.changes li.ability-row-solo,
 ul.changes li.ability-row-start,
 ul.changes li.ability-row-cont,
@@ -1880,10 +1903,6 @@ ul.changes li.ability-row-end {
   background: rgba(139, 148, 158, 0.04);
   border-left:  1px solid rgba(139, 148, 158, 0.18);
   border-right: 1px solid rgba(139, 148, 158, 0.18);
-  padding-left: 12px;
-  padding-right: 12px;
-  margin-left: -13px;    /* compensate 12px padding + 1px border */
-  margin-right: -13px;
 }
 ul.changes li.ability-row-solo,
 ul.changes li.ability-row-start {
@@ -1900,6 +1919,79 @@ ul.changes li.ability-row-end {
   border-bottom-right-radius: 6px;
   padding-bottom: 6px;
   margin-bottom: 4px;
+}
+
+/* COMPONENTS BOX — visual assembly recipe shown under a new item's header.
+   Layout: [icon1 + icon2 + icon3 + recipe-icon]  =  TOTAL */
+.components-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 6px 0 4px;
+  padding: 8px 12px;
+  background: rgba(139, 148, 158, 0.04);
+  border: 1px solid rgba(139, 148, 158, 0.18);
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.components-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.component {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.component img {
+  width: 48px;
+  height: 36px;
+  border-radius: 3px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(139, 148, 158, 0.25);
+}
+.component-price {
+  font-size: 11px;
+  color: #c9d1d9;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.30);
+  padding: 1px 6px;
+  border-radius: 2px;
+  min-width: 32px;
+  text-align: center;
+}
+.components-plus {
+  color: #6e7681;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 0 2px;
+}
+.components-total {
+  color: #c9d1d9;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.components-total span {
+  font-weight: 700;
+  color: #f0c674;
+}
+
+/* PROPERTIES BOX — single line of comma-separated attributes shown under the
+   components box for new items. Soft outlined to match other blocks. */
+.provides-box {
+  margin: 4px 0;
+  padding: 6px 12px;
+  background: rgba(139, 148, 158, 0.04);
+  border: 1px solid rgba(139, 148, 158, 0.18);
+  border-radius: 6px;
+  color: #c9d1d9;
+  font-size: 13.5px;
 }
 
 /* Type label after the item name — small, uppercased, NEW colour family. */
@@ -5943,17 +6035,19 @@ W(ul_close())
 
 W(plain_header("Upgrades"))
 W(item_header("Consecrated Wraps", new="New Armor Item"))
+W(components(('Vitality Booster', 1000), ('Shawl', 450), ('Crown', 450),
+             recipe=('Recipe', 700), total=2600))
+W(provides('+15% Magic Resistance, +250 Health, +6 All Attributes'))
 W(ul_open())
-W(li("Requires Vitality Booster (1000), Shawl (450), Crown (450), and a recipe (700). Total cost: 2600g", t("NEW")))
-W(li("Provides +15% Magic Resistance, +250 Health, and +6 All Attributes", t("NEW")))
 W(li("Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Whenever the wearer takes damage from a player-controlled unit or Roshan, all stacks are removed to create an all-damage barrier for 7s that absorbs 120 damage per removed stack (up to 360). If the wearer reached a max amount of stacks at least once in a game, regaining a stack provides a non-stacking buff that increases movespeed by 20% for 7s", t("NEW")))
 W(li("Has no damage threshold, but doesn't proc from Health Loss damage (like Heartstopper Aura)", t("NEW")))
 W(li("Can't gain stacks for 3s after taking damage from Roshan or player-controlled sources", t("NERF")))
 W(ul_close())
 W(item_header("Crella's Crozier", new="New Magical Item"))
+W(components(('Ghost Scepter', 1500), ('Soul Booster', 3000),
+             recipe=('Recipe', 300), total=4800))
+W(provides('+6 All Attributes, +450 Health, +450 Mana'))
 W(ul_open())
-W(li("Requires Ghost Scepter (1500), Soul Booster (3000), and a recipe (300). Total cost: 4800g", t("NEW")))
-W(li("Provides +6 All Attributes, +450 Health, +450 Mana", t("NEW")))
 W(li("Active: Rite of Rumusque. The wearer enters ghost form for 4 seconds, becoming immune to physical damage, but is unable to attack and 30% more vulnerable to magic damage. Steals 5% movement speed from enemy heroes in a 900 radius every second. Movement speed steal lasts 1.5s. Bonuses stack and have duration refreshed on gaining new stacks. No Mana Cost. Cooldown: 20s", t("NEW")))
 W(li("The ghost form and stolen speed can be dispelled off the wearer, but the stealing debuff that provides new stacks can't", t("NERF")))
 W(li("Passive: Putrefaction Aura. Reduces health restoration of nearby enemy heroes by 30%. While Rite of Rumusque is active, the effect is increased to 75% and all of the lost Health Restoration is redirected to the wearer every second. Radius: 900", t("BUFF")))
