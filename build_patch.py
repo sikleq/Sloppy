@@ -1766,6 +1766,7 @@ h4.subgroup {
 }
 .ability-block > ul.subnotes {
   grid-column: 2;
+  margin-left: 0;            /* grid-column already places it under the text */
 }
 /* Talents-block: same .ability-block layout, but talents.svg gets translucent framing */
 .ability-block.talents-block > .ability-icon-wrap > .ability-icon-img {
@@ -1915,7 +1916,7 @@ ul.changes li:not(:has(> .row-text)) > .badge.nerf-text {
 
 ul.subnotes {
   list-style: none;
-  margin: -2px 0 4px 0;        /* flush left — aligns with correction-note left edge */
+  margin: -2px 0 4px 76px;     /* indent under text column (tag col 64 + 12 gap) */
 }
 ul.subnotes li {
   color: #8b949e;
