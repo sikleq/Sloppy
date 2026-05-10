@@ -933,7 +933,25 @@ def li(text, badge="", extra="", force_tag=None):
     return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text_inner}</span>{rest}{extra}</li>'
 
 
+_BULLET_SPLIT = re.compile(r'(?:^|<br>)+\s*\*\s+', re.I)
+
 def subnote(text):
+    """Subnote (↳ small grey row). If `text` looks like a bullet list of
+    3+ '* item' entries, render it as a collapsible <details>: the optional
+    intro line is the summary, the bullets sit inside the closed panel."""
+    parts = _BULLET_SPLIT.split(text)
+    intro_raw = parts[0] if parts else ''
+    items = [p.strip() for p in parts[1:] if p.strip()]
+    if len(items) >= 3:
+        intro = re.sub(r'<br>+\s*$', '', intro_raw).rstrip(' :').strip()
+        items_html = ''.join(f'<li>{it}</li>' for it in items)
+        summary = (intro if intro else 'Show list') + \
+                  f' <span class="subnote-count">({len(items)})</span>'
+        return ('<ul class="subnotes"><li>'
+                f'<details class="subnote-collapse">'
+                f'<summary>{summary}</summary>'
+                f'<ul class="subnote-items">{items_html}</ul>'
+                '</details></li></ul>')
     return f'<ul class="subnotes"><li>{text}</li></ul>'
 
 
@@ -1941,6 +1959,46 @@ ul.subnotes li {
   line-height: 1.4;
 }
 ul.subnotes li::before { content: "↳ "; color: #6e7681; }
+
+/* Collapsible subnote — long bullet lists hidden behind a "▶ summary (N)"
+   click target. Native <details>/<summary> preserves keyboard and SR support. */
+.subnote-collapse > summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline;
+  user-select: none;
+}
+.subnote-collapse > summary::-webkit-details-marker { display: none; }
+.subnote-collapse > summary::before {
+  content: "▶";
+  display: inline-block;
+  width: 10px;
+  margin-right: 4px;
+  font-size: 9px;
+  color: #6e7681;
+  transition: transform 0.15s;
+}
+.subnote-collapse[open] > summary::before { transform: rotate(90deg); }
+.subnote-collapse > summary:hover { color: #c9d1d9; }
+.subnote-count {
+  color: #6e7681;
+  font-weight: 500;
+  font-size: 12px;
+}
+ul.subnote-items {
+  margin: 4px 0 4px 18px;
+  list-style: none;
+}
+ul.subnote-items > li {
+  padding: 1px 0;
+  line-height: 1.45;
+  color: #8b949e;
+  font-size: 13px;
+}
+ul.subnote-items > li::before {
+  content: "•  ";
+  color: #6e7681;
+}
 
 /* BADGES — flat rectangular tag boxes */
 .badge {
@@ -5210,7 +5268,7 @@ W(li("Adjusted the meeting point of the lane creeps toward the offlane", t("MISC
 W(ul_close())
 W(subnote("Now offlane creeps are slightly slowed upon leaving the base for a couple of seconds. Safe lane creeps are slightly accelerated upon leaving the base for a couple of seconds. Both of these changes are effective until the 7:30 mark."))
 W(ul_open())
-W(li("All sections of currents now give a max movement speed bonus of 150 ", t("REWORK")))
+W(li("All sections of currents now give a max movement speed bonus of 150 ", t("BUFF")))
 W(ul_close())
 W(subnote("Previously was only provided by sections on the base and near it, while other sections provided max bonus of 100"))
 W(plain_header("Map Objectives"))
@@ -5224,7 +5282,11 @@ W(ul_open())
 W(li("Unyielding Shield Base barrier increased from 2000 to 3000", b(2000, 3000)))
 W(li("Unyielding Shield Barrier upgrade per minute increased from 20 to 50", b(20, 50)))
 W(li("Unyielding Shield Base barrier regen decreased from 40 to 20", b(40, 20)))
-W(li("Unyielding Shield Barrier regen upgrade per minute increased from 3.5 to 5", b(3.5, 5)))
+W(li_formula("Unyielding Shield Barrier regen upgrade increased",
+             "3.5 per minute", "5 per minute",
+             lambda M: 3.5 * M, lambda M: 5.0 * M,
+             levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
+             level_prefix='M', rework_badge=False))
 W(li("Reflect Base damage reflection percentage decreased from 50% to 30%", b(50, 30)))
 W(li("Reflect radius can now be seen by holding ALT key", t("MISC")))
 W(li_formula("The Shining damage rescaled",
@@ -5276,15 +5338,15 @@ W(subnote("Tormentor is on the low ground which has three stairs: one leading to
 W(subnote("Twin Gate highground area is now smaller and has three stairs: one that leads to new Tormentor area, one that leads back to the lane, and one that goes two levels down straight to the end of the stream"))
 W(subnote("Watcher is now between two stairs: one that goes down to the Tormentor and one that goes up to the Twin Gate"))
 W(ul_open())
-W(li("Ancient neutral camps near stream ends demoted to medium camps and moved slightly towards bases", t("MISC")))
-W(li("Medium neutral camp near offlane defender's gate has been demoted to a small neutral camp", t("MISC")))
-W(li("The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet", t("MISC")))
+W(li("Ancient neutral camps near stream ends demoted to medium camps and moved slightly towards bases", t("NERF")))
+W(li("Medium neutral camp near offlane defender's gate has been demoted to a small neutral camp", t("NERF")))
+W(li("The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet", t("BUFF")))
 W(li("Radiant safe lane small camp has been slightly moved north away from the lane", t("MISC")))
 W(li("Radiant safe lane hard camp's spawn box has been moved towards the offlane to remove a bad ward location", t("MISC")))
-W(li("Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides of the tower", t("MISC")))
+W(li("Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides of the tower", t("BUFF")))
 W(li("The ramp leading from the Radiant tier 1 tower to the stream has been decreased in width and moved away from the tower", t("NERF")))
 W(li("The medium flooded camp near the safe lane tier 2 towers moved closer to the middle of the stream (substantially more for Dire than for Radiant)", t("MISC")))
-W(li("The medium flooded camp near the safe lane tier 2 towers can now only evolve once into a hard camp, rather than into an Ancient Camp", t("REWORK")))
+W(li("The medium flooded camp near the safe lane tier 2 towers can now only evolve once into a hard camp, rather than into an Ancient Camp", t("NERF")))
 W(li("The medium flooded camp near the bounty runes can now evolve twice into an Ancient Camp", t("REWORK")))
 W(li("Removed several trees from Dire Safelane easy pull camp and Radiant Safelane hard pull camp", t("DEL")))
 W(ul_close())
@@ -5311,9 +5373,9 @@ W(li("Physical and Magical Lifesteal will now take into account overall damage r
 W(ul_close())
 W(subnote("This affects the following:<br><br>* Aeon Disk<br>* Bloodstone<br>* Consecrated Wraps<br>* Veil of Discord<br>* Prophet's Pendulum<br>* Audacious Enchantment<br>* Abaddon's Borrowed Time with Aghanim's Scepter<br>* Beastmaster's Wild Axes<br>* Bounty Hunter's Shadow Walk with talent<br>* Bristleback's Bristleback<br>* Centaur Warrunner's Stampede<br>* Grimstroke's Ink Trail<br>* Grimstroke's Soulbind with talent<br>* Hoodwink's Hunter's Boomerang<br>* Leshrac's Pulse Nova with talent<br>* Lich's Frost Shield<br>* Luna's Lunar Orbit<br>* Kunkka's Admiral's Rum<br>* Mars' Bulwark<br>* Nyx Assassin's Burrow<br>* Ogre Magi's Fire Shield<br>* Oracle's False Promise<br>* Pudge's Flesh Heap<br>* Shadow Demon's Menace<br>* Spectre's Dispersion<br>* Treant Protector's Living Armor<br>* Underlord's Invading Force<br>* Undying's Flesh Golem<br>* Ursa's Enrage<br>* Visage's Gravekeeper's Cloak<br>* Warlock's Golem with talent"))
 W(ul_open())
-W(li("Historically, Lifesteal was calculated before some damage reductions or amplifications were applied. As a result, you could gain health from attacks that dealt no damage (like attacks against a hero affected by Aeon Disk's Combo Breaker). This will not happen anymore", t("MISC")))
-W(li("The only amplification that is not taken into account is increased damage against illusions", t("BUFF")))
+W(li("Historically, Lifesteal was calculated before some damage reductions or amplifications were applied. As a result, you could gain health from attacks that dealt no damage (like attacks against a hero affected by Aeon Disk's Combo Breaker). This will not happen anymore", t("REWORK")))
 W(ul_close())
+W(subnote("The only amplification that is not taken into account is increased damage against illusions"))
 
 W(subgroup("Miscellaneous"))
 W(ul_open())
@@ -5322,8 +5384,8 @@ W(ul_close())
 W(subnote("The following items and abilities deal reflected damage:<br>* Tormentor's Reflect ability<br>* Blade Mail (both active and passive)<br>* Chipped Vest<br>* Rattlecage<br>* Axe's Counter Helix<br>* Bristleback's Quill Spray triggered by Bristleback passive<br>* Centaur Warrunner's Retaliate<br>* Nyx Assassin's Spiked Carapace<br>* Queen of Pain's Scream of Pain<br>* Razor's Storm Surge<br>* Shadow Demon's Disseminate<br>* Spectre's Dispersion<br>* Tidehunter's Anchor Smash triggered by Kraken Shell passive<br>* Viper's Corrosive Skin<br>* Warlock's Fatal Bonds"))
 W(ul_open())
 W(li("Reflected damage cannot be reflected back", t("NERF")))
-W(li("Lifesteal and Spell Lifesteal don't apply to reflected damage", t("MISC")))
-W(li("Reflected damage doesn't affect Debuff Immune units", t("MISC")))
+W(li("Lifesteal and Spell Lifesteal don't apply to reflected damage", t("NERF")))
+W(li("Reflected damage doesn't affect Debuff Immune units", t("NERF")))
 W(li("Units with free movement now can miss their attacks when attacking uphill targets", t("REWORK")))
 W(ul_close())
 W(subnote("Affected units:<br>* Batrider during Firefly<br>* Dragon Knight during Elder Dragon Form with Aghanim's Scepter<br>* Lina during Flame Cloak<br>* Terrorblade's Reflection illusions"))
