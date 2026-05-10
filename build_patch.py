@@ -1133,12 +1133,15 @@ nav.top-nav {
   line-height: 1.1;
   margin-bottom: 2px;
 }
-/* Calendar variant — no dropdown; .release-info takes its place on the right. */
+/* Calendar variant — no dropdown; .release-info takes its place on the right.
+   Override the fixed 38px height (designed for version+date only) so the
+   3rd line (.patch-age) doesn't overflow above and below the box. */
 .nav-context-calendar { margin-left: auto; }
 .nav-context-calendar .release-info {
   align-items: center;
-  padding: 0 18px;
+  padding: 6px 18px;
   min-width: 110px;
+  height: auto;
 }
 .nav-context .patch-age {
   color: #a8b3bd;
