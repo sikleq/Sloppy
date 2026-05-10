@@ -1893,9 +1893,9 @@ h2.section {
 /* Ability description box — spans one Passive:/Active: starter row plus any
    continuation rows until the next ability starter or end of ul. Post-process
    classifies each li with one of -solo / -start / -cont / -cont-end. */
-/* Box hugs the existing row width (no negative margins → never overflows the
-   container). Horizontal padding is zero so the row's grid columns stay at
-   their normal positions; the border sits flush with the ul's edges. */
+/* Box hugs the ul width (no overflow). Inside a new-item block the tag column
+   is gone, so collapse the grid to [text 1fr][badge auto] and add left padding
+   so text sits a few px in from the box border. */
 ul.changes li.ability-row-solo,
 ul.changes li.ability-row-start,
 ul.changes li.ability-row-cont,
@@ -1904,13 +1904,28 @@ ul.changes li.ability-row-end {
   border-left:  1px solid rgba(139, 148, 158, 0.18);
   border-right: 1px solid rgba(139, 148, 158, 0.18);
 }
+.entity-block.is-new ul.changes li.ability-row-solo,
+.entity-block.is-new ul.changes li.ability-row-start,
+.entity-block.is-new ul.changes li.ability-row-cont,
+.entity-block.is-new ul.changes li.ability-row-end {
+  grid-template-columns: 1fr auto;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.entity-block.is-new ul.changes li.ability-row-solo > .row-text,
+.entity-block.is-new ul.changes li.ability-row-start > .row-text,
+.entity-block.is-new ul.changes li.ability-row-cont > .row-text,
+.entity-block.is-new ul.changes li.ability-row-end > .row-text {
+  grid-column: 1;
+  text-align: left;
+}
 ul.changes li.ability-row-solo,
 ul.changes li.ability-row-start {
   border-top: 1px solid rgba(139, 148, 158, 0.18);
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
   padding-top: 6px;
-  margin-top: 4px;
+  margin-top: 10px;          /* gap between adjacent ability boxes */
 }
 ul.changes li.ability-row-solo,
 ul.changes li.ability-row-end {
@@ -1922,12 +1937,13 @@ ul.changes li.ability-row-end {
 }
 
 /* COMPONENTS BOX — visual assembly recipe shown under a new item's header.
-   Layout: [icon1 + icon2 + icon3 + recipe-icon]  =  TOTAL */
+   Layout: [icon1 + icon2 + ... + recipe] = TOTAL — total sits IMMEDIATELY
+   after the last component (not pushed to the right edge). */
 .components-box {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: flex-start;
+  gap: 12px;
   margin: 6px 0 4px;
   padding: 8px 12px;
   background: rgba(139, 148, 158, 0.04);
@@ -6053,17 +6069,19 @@ W(li("The ghost form and stolen speed can be dispelled off the wearer, but the s
 W(li("Passive: Putrefaction Aura. Reduces health restoration of nearby enemy heroes by 30%. While Rite of Rumusque is active, the effect is increased to 75% and all of the lost Health Restoration is redirected to the wearer every second. Radius: 900", t("BUFF")))
 W(ul_close())
 W(item_header("Essence Distiller", new="New Support Item"))
+W(components(('Urn of Shadows', 825), ('Chainmail', 500), ('Wizard Hat', 250),
+             recipe=('Recipe', 200), total=1775))
+W(provides('+1.75 Mana Regen, +3 All Attributes, +6 Armor, +150 Mana'))
 W(ul_open())
-W(li("Requires Urn of Shadows (825), Chainmail (500), Wizard Hat (250), and a recipe (200). Total cost: 1775g", t("NEW")))
-W(li("Provides +1.75 Mana Regen, +3 All Attributes, +6 Armor, and +150 Mana", t("NEW")))
 W(li("Active: Soul Release. When cast on an ally, provides 40 health regeneration. If the ally is attacked by an enemy hero or Roshan, the effect is lost. When cast on an enemy, deals 25 damage per second, provides True Sight over them and shares their vision with the wearer's team. Both effects last 8 seconds. Can be cast on the ground to put a dormant effect that will latch to the first enemy hero that comes within 400 range from it. The effect waits for 15s and provides 400 vision until it disappears. Gains charges every time an enemy hero dies within 1500 units. Cast Range: 1000. No Mana Cost. Cooldown: 10s", t("NEW")))
 W(li("Gains one charge if the wearer dies with an empty Essence Distiller", t("NEW")))
 W(li("Gains two charges if Essence Distiller had no charges and an enemy hero dies within radius", t("NEW")))
 W(ul_close())
 W(item_header("Specialist's Array", new="Returning Armaments Item"))
+W(components(('Blade of Alacrity', 1000), ('Broadsword', 1000),
+             recipe=('Recipe', 550), total=2550))
+W(provides('+20 Damage, +12 Agility'))
 W(ul_open())
-W(li("Requires Blade of Alacrity (1000), Broadsword (1000), and a recipe (550). Total cost: 2550g", t("NEW")))
-W(li("Provides +20 Damage and +12 Agility", t("NEW")))
 W(li("Passive: Splitshot. Ranged Only. Ranged attacks have a 30% chance to fire additional projectiles at up to 2 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("NEW")))
 W(li("Doesn't work with other sources of secondary projectiles from hero abilities", t("NEW")))
 W(li("Gyrocopter's Flak Cannon", t("NEW")))
@@ -6071,9 +6089,10 @@ W(li("Medusa's Split Shot", t("NEW")))
 W(li("Muerta's Gunslinger", t("NEW")))
 W(ul_close())
 W(item_header("Hydras Breath", new="New Armaments Item"))
+W(components(("Specialist's Array", 2550), ('Dragon Lance', 1900), ('Orb of Venom', 350),
+             recipe=('Recipe', 1100), total=5900))
+W(provides('+25 Damage, +30 Agility, +15 Strength, +150 Attack Range (Ranged Only)'))
 W(ul_open())
-W(li("Requires Specialist's Array (2550), Dragon Lance (1900), Orb of Venom (350) and a recipe (1100). Total cost: 5900g", t("NEW")))
-W(li("Provides +25 Damage, +30 Agility, +15 Strength, and +150 Attack Range (Ranged Only)", t("NEW")))
 W(li("Passive: Miasma. Attacks poison the target for 3 seconds, dealing magical damage equal to 2.5% of the target's max health every second. If the debuff is reapplied, the duration is refreshed. Can't be applied by illusions or to Roshan", t("NEW")))
 W(li("Passive: Polycephaly. Ranged attacks have a 30% chance to fire at up to 3 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects except for Miasma. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("NEW")))
 W(li("Similarly to Specialist's Array, doesn't work with other sources of secondary projectiles from hero abilities", t("NEW")))
