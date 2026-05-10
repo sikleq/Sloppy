@@ -2597,16 +2597,9 @@ def _render_top_nav(active="changelogs", current_version=None, date=None, patch_
         age_line = _patch_age_line(current_version)
         age_html = f'<span class="patch-age">{age_line}</span>' if age_line else ''
         if active == "calendar":
-            # Calendar already lets you pick patches — no dropdown needed.
-            # Show only date+age, shifted to the right of where the dropdown would be.
-            right_side = f'''
-    <div class="nav-context nav-context-calendar">
-      <div class="release-info">
-        <span class="release-version">{current_version}</span>
-        <span class="release-date">{date}</span>
-        {age_html}
-      </div>
-    </div>'''
+            # Calendar page — the calendar itself shows date+version, no need
+            # for a redundant release-info widget on the right.
+            right_side = ''
         else:
             options = _dropdown_options_html(current_version, patch_context=patch_context)
             right_side = f'''
