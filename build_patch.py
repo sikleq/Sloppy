@@ -507,7 +507,7 @@ def unit_header(name, icon_url):
     """Header for a separate summoned unit (e.g. Spirit Bear) with custom icon URL."""
     _State.current_hero = None
     return _open_block() + f'''<div class="entity hero-entity">
-  <div class="entity-icon ability-icon"><img src="{icon_url}" alt="{name}" loading="lazy"></div>
+  <div class="entity-icon hero-icon"><img src="{icon_url}" alt="{name}" loading="lazy"></div>
   <div class="entity-name">{name}</div>
 </div>'''
 
@@ -1743,9 +1743,11 @@ h2.section {
   color: #79c0ff;
 }
 
-/* SUBGROUPS */
+/* SUBGROUPS — same colour as body text / ability titles, not blue.
+   Tormentor / Roshan / Wisdom Shrines / Health Restoration / Lifesteal /
+   Miscellaneous / Talents etc. all read as section dividers, not links. */
 h4.subgroup {
-  color: #79c0ff;
+  color: #c9d1d9;
   font-size: 14px;
   font-weight: 700;
   margin: 16px 0 4px 0;      /* aligned with entity-block left edge */
