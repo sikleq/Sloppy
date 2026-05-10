@@ -987,6 +987,11 @@ def li(text, badge="", extra="", force_tag=None):
     elif isinstance(text, str) and text.startswith("Aghanim's Shard"):
         classes.append("aghanim-shard")
         marker = '<span class="aghanim-marker shard"></span>'
+    # Item ability description rows (Passive: / Active: / Toggle:) get a soft
+    # bordered box treatment so they visually separate from cost / component
+    # description rows above.
+    if isinstance(text, str) and re.match(r'^\s*(Passive|Active|Toggle|Aura|Ability)\s*:', text):
+        classes.append("ability-row")
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""
     attr = f' data-tag="{tag_str}"' if tag_str else ""
     # Marker is appended INSIDE .row-text so it sits right after the change
@@ -1857,6 +1862,23 @@ h2.section {
 }
 .entity-block.is-new[data-new-tag="NEW"]       ul.changes li:first-child::before { content: "NEW"; }
 .entity-block.is-new[data-new-tag="RETURNING"] ul.changes li:first-child::before { content: "RETURNING"; }
+/* Ability description rows inside item blocks — Passive: / Active: / Toggle:
+   line gets a soft bordered box separating the spell description from the
+   plain cost/component rows above. Multiple abilities → multiple boxes. */
+ul.changes li.ability-row {
+  background: rgba(139, 148, 158, 0.04);
+  border: 1px solid rgba(139, 148, 158, 0.18);
+  border-radius: 6px;
+  padding: 6px 12px 6px 12px;
+  margin: 4px 0;
+}
+.entity-block.is-new ul.changes li.ability-row {
+  /* Inside an is-new block the row no longer carries the leading NEW tag
+     column visually (display:none on .badge:first-child), so the box keeps
+     its own padding without offset. */
+  grid-template-columns: 1fr auto;
+}
+
 /* Type label after the item name — small, uppercased, NEW colour family. */
 .entity-name .entity-new-type {
   margin-left: 8px;
@@ -5836,21 +5858,21 @@ W(li("Active: Soul Release. When cast on an ally, provides 40 health regeneratio
 W(li("Gains one charge if the wearer dies with an empty Essence Distiller", t("NEW")))
 W(li("Gains two charges if Essence Distiller had no charges and an enemy hero dies within radius", t("NEW")))
 W(ul_close())
-W(item_header("Specialist's Array"))
+W(item_header("Specialist's Array", new="Returning Armaments Item"))
 W(ul_open())
-W(li("Requires Blade of Alacrity (1000), Broadsword (1000), and a recipe (550). Total cost: 2550g", t("MISC")))
-W(li("Provides +20 Damage and +12 Agility", t("MISC")))
-W(li("Passive: Splitshot. Ranged Only. Ranged attacks have a 30% chance to fire additional projectiles at up to 2 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("MISC")))
-W(li("Doesn't work with other sources of secondary projectiles from hero abilities", t("MISC")))
-W(li("Gyrocopter's Flak Cannon", t("MISC")))
-W(li("Medusa's Split Shot", t("MISC")))
-W(li("Muerta's Gunslinger", t("MISC")))
+W(li("Requires Blade of Alacrity (1000), Broadsword (1000), and a recipe (550). Total cost: 2550g", t("NEW")))
+W(li("Provides +20 Damage and +12 Agility", t("NEW")))
+W(li("Passive: Splitshot. Ranged Only. Ranged attacks have a 30% chance to fire additional projectiles at up to 2 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("NEW")))
+W(li("Doesn't work with other sources of secondary projectiles from hero abilities", t("NEW")))
+W(li("Gyrocopter's Flak Cannon", t("NEW")))
+W(li("Medusa's Split Shot", t("NEW")))
+W(li("Muerta's Gunslinger", t("NEW")))
 W(ul_close())
-W(item_header("Hydras Breath", new="Returning Armaments Item"))
+W(item_header("Hydras Breath", new="New Armaments Item"))
 W(ul_open())
 W(li("Requires Specialist's Array (2550), Dragon Lance (1900), Orb of Venom (350) and a recipe (1100). Total cost: 5900g", t("NEW")))
 W(li("Provides +25 Damage, +30 Agility, +15 Strength, and +150 Attack Range (Ranged Only)", t("NEW")))
-W(li("Passive: Miasma. Attacks poison the target for 3 seconds, dealing magical damage equal to 2.5% of the target's max health every second. If the debuff is reapplied, the duration is refreshed. Can't be applied by illusions or to Roshan", t("NERF")))
+W(li("Passive: Miasma. Attacks poison the target for 3 seconds, dealing magical damage equal to 2.5% of the target's max health every second. If the debuff is reapplied, the duration is refreshed. Can't be applied by illusions or to Roshan", t("NEW")))
 W(li("Passive: Polycephaly. Ranged attacks have a 30% chance to fire at up to 3 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects except for Miasma. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("NEW")))
 W(li("Similarly to Specialist's Array, doesn't work with other sources of secondary projectiles from hero abilities", t("NEW")))
 W(ul_close())
@@ -6245,7 +6267,7 @@ W(li("Returning as a Tier 1 Neutral Artifact", t("MISC")))
 W(li("Passive: Lifesteal. Attacks heal for 5 health ", t("MISC")))
 W(ul_close())
 W(subnote("This counts as lifesteal and is manipulated by Health Restoration"))
-W(item_header("Stonefeather Satchel", new="New Armaments Item"))
+W(item_header("Stonefeather Satchel", new="New Tier 1 Artifact"))
 W(ul_open())
 W(li("Toggle: Transmogrify. Activate to switch the contents of the satchel between Feathers or Rocks. No Mana Cost. Cooldown: 6s.", t("NEW")))
 W(li("Pound of Feathers: Increases movement speed by 12 and distance of forced movement effects on yourself by 30%", t("NEW")))
