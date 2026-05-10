@@ -2734,13 +2734,11 @@ body.cat-filter-active .cat-hide { display: none !important; }
 .entity-block > .ability-block {
   padding-left: 14px;
 }
-/* components/provides are bordered boxes (not flow text), so use margin-left
-   instead of padding-left — the box's own padding stays its visual breathing
-   room and the BORDER aligns with the +14 indent applied to ul.changes /
-   subgroups. */
-.entity-block > .components-box,
-.entity-block > .provides-box {
-  margin-left: 14px;
+/* Inside an .is-new block the components / provides / ability-row boxes span
+   the full width of the entity-block (no +14 indent) so all three bordered
+   blocks share the same left edge as the entity card above them. */
+.entity-block.is-new > ul.changes {
+  padding-left: 0;
 }
 
 /* === FILTER MODE === */
