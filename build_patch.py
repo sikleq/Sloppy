@@ -533,15 +533,26 @@ def item_header(name, new=False):
     out = _close_ability_block()
     _State.current_hero = None
     if new:
-        label_text = (new if isinstance(new, str) else 'NEW').upper()
-        new_badge = (f' <span class="badge new" data-tag="new" data-overall="buff">'
-                     f'{label_text}</span>')
+        if isinstance(new, str):
+            # 'New X Item' / 'Returning X Item' / 'New Tier N Artifact' →
+            # split first word into tag, rest into the inline type label.
+            first, _, rest = new.partition(' ')
+            tag_text = first.upper()
+            type_text = rest.strip()
+        else:
+            tag_text = 'NEW'
+            type_text = ''
+        new_tag = (f'<span class="badge new" data-tag="new" '
+                   f'data-overall="buff">{tag_text}</span> ')
+        type_label = (f' <span class="entity-new-type">{type_text}</span>'
+                      if type_text else '')
     else:
-        new_badge = ''
+        new_tag = ''
+        type_label = ''
     extra_cls = 'is-new' if new else ''
     return out + _open_block(extra_cls) + f'''<div class="entity item-entity">
   <div class="entity-icon item-icon"><img src="{item_img(name)}" alt="{name}" loading="lazy"></div>
-  <div class="entity-name">{name}{new_badge}</div>
+  <div class="entity-name">{new_tag}{name}{type_label}</div>
 </div>'''
 
 
@@ -1182,7 +1193,12 @@ nav.top-nav {
 /* Calendar variant — no dropdown; .release-info takes its place on the right.
    Override the fixed 38px height (designed for version+date only) so the
    3rd line (.patch-age) doesn't overflow above and below the box. */
-.nav-context-calendar { margin-left: auto; }
+.nav-context-calendar {
+  margin-left: auto;
+  min-height: 38px;          /* match the version-dropdown height on patch pages
+                                so the toolbar doesn't shrink when you switch
+                                from a patch back to the calendar */
+}
 .nav-context-calendar .release-info {
   align-items: center;
   padding: 6px 18px;
@@ -1390,6 +1406,20 @@ nav.top-nav {
 .cal-year-block[data-collapsed="true"] .cal-year-label::after {
   transform: rotate(-90deg);
 }
+.cal-year-summary {
+  text-align: right;
+  padding: 8px 12px 0;
+  margin-top: -8px;
+  color: #8b949e;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  border-top: 1px solid #21262d;
+  margin-bottom: 8px;
+}
+.cal-year-summary-key { color: #6e7681; text-transform: uppercase; letter-spacing: 0.4px; font-size: 10.5px; }
+.cal-year-summary-val { color: #c9d1d9; font-weight: 600; }
+.cal-year-summary-meta { color: #6e7681; font-size: 11px; }
+.cal-year-block[data-collapsed="true"] .cal-year-summary { display: none; }
 .cal-year-block[data-collapsed="true"] .cal-mode-full,
 .cal-year-block[data-collapsed="true"] .cal-mode-compact {
   display: none;
@@ -1765,15 +1795,16 @@ h2.section {
   color: #79c0ff;
 }
 
-/* NEW-ITEM BLOCK — soft NEW-coloured outline that wraps both the entity
-   header AND its ul.changes. Per-row tags are suppressed inside since the
-   whole block already signals NEW; rows just show their description. */
-.entity-block.is-new {
-  border: 1px solid rgba(220, 175, 95, 0.30);
+/* NEW-ITEM BLOCK — entity name carries a left-side NEW tag + a small type
+   label after the name ('Miscellaneous Item' / 'Tier 1 Artifact' / etc.).
+   The soft NEW-coloured outline wraps the ul.changes list (full width)
+   instead of the whole entity-block, so the entity card itself stays
+   visually identical to other items. */
+.entity-block.is-new ul.changes {
+  border: 1px solid rgba(220, 175, 95, 0.32);
   border-radius: 6px;
   background: rgba(220, 175, 95, 0.025);
-  padding: 0 10px 6px;
-  margin-bottom: 14px;
+  padding: 6px 12px;
 }
 .entity-block.is-new ul.changes li > .badge:first-child,
 .entity-block.is-new ul.changes li > .row-tag-empty {
@@ -1785,11 +1816,20 @@ h2.section {
 }
 .entity-block.is-new ul.changes li > .row-text { grid-column: 1; }
 .entity-block.is-new ul.changes li > .badge-group { grid-column: 2; }
-/* Tag inside the entity-name itself (the 'New X Item' badge) keeps its colour
-   but reads slightly larger so the type label is the dominant signal. */
-.entity-block.is-new .entity-name .badge.new {
-  font-size: 11px;
-  letter-spacing: 0.6px;
+/* Type label after the item name — small, subdued, NEW colour family. */
+.entity-name .entity-new-type {
+  margin-left: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #b08c5a;
+  opacity: 0.85;
+}
+/* The leading NEW tag in the entity name reads same size as other badges. */
+.entity-name > .badge.new {
+  margin-right: 6px;
+  vertical-align: 2px;
 }
 
 /* SUBGROUPS — same colour as body text / ability titles, not blue.
@@ -3155,6 +3195,33 @@ def save_calendar_html():
     by_day = {(p['year'], p['month'], p['day']): p for p in patches}
     current_v = _current_version()
     years = sorted({p['year'] for p in patches}, reverse=True)
+
+    # Per-patch lifespan: days between this release and the next release in
+    # RELEASE_HISTORY (history is sorted newest-first there). Latest patch
+    # uses today as the right edge. Then per-year longest/shortest.
+    from datetime import datetime as _dt, date as _date
+    today = _date.today()
+    sorted_by_date = sorted(patches, key=lambda p: _dt.strptime(p['date'], '%d.%m.%Y').date())
+    spans = {}  # version → days_running
+    for i, p in enumerate(sorted_by_date):
+        d = _dt.strptime(p['date'], '%d.%m.%Y').date()
+        if i + 1 < len(sorted_by_date):
+            nd = _dt.strptime(sorted_by_date[i+1]['date'], '%d.%m.%Y').date()
+        else:
+            nd = today
+        spans[p['version']] = max(0, (nd - d).days)
+
+    def year_summary(year_patches):
+        if not year_patches:
+            return None
+        ranked = sorted(year_patches, key=lambda p: spans.get(p['version'], 0))
+        shortest = ranked[0]
+        longest = ranked[-1]
+        return {
+            'total': len(year_patches),
+            'shortest': (shortest['version'], spans[shortest['version']]),
+            'longest':  (longest['version'],  spans[longest['version']]),
+        }
     months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     has_html = {p['version'] for p in PATCHES}
     expanded_years = {years[0]} if years else set()  # only current (newest) year expanded by default
@@ -3225,6 +3292,24 @@ def save_calendar_html():
                 )
             body.append('</div></div>')
         body.append('</div></div>')
+
+        # ---- YEAR SUMMARY (Total / Longest / Shortest running patch) ----
+        ys = year_summary([p for p in patches if p['year'] == year])
+        if ys:
+            body.append(
+                '<div class="cal-year-summary">'
+                f'<span class="cal-year-summary-key">Total count:</span> '
+                f'<span class="cal-year-summary-val">{ys["total"]}</span>'
+                f' &middot; '
+                f'<span class="cal-year-summary-key">Longest:</span> '
+                f'<span class="cal-year-summary-val">{ys["longest"][0]}</span>'
+                f' <span class="cal-year-summary-meta">({ys["longest"][1]} days)</span>'
+                f' &middot; '
+                f'<span class="cal-year-summary-key">Shortest:</span> '
+                f'<span class="cal-year-summary-val">{ys["shortest"][0]}</span>'
+                f' <span class="cal-year-summary-meta">({ys["shortest"][1]} days)</span>'
+                '</div>'
+            )
 
         body.append('</div>')
 
@@ -5527,6 +5612,7 @@ W(li("Items in all shop categories except for Consumables have been rearranged t
 W(li("Consumables now includes Infused Raindrops", t("MISC")))
 W(ul_close())
 
+W(subgroup("Basic Items"))
 W(item_header("Chasm Stone", new="New Miscellaneous Item"))
 W(ul_open())
 W(li("Costs 800 gold", t("MISC")))
