@@ -550,6 +550,10 @@ def section(title):
 # Talent icon — Valve's official SVG used in www.dota2.com/patches/.
 TALENT_ICON_URL = "../icons/misc/talents.svg"
 INNATE_ICON_URL = "../icons/misc/innate_icon.png"
+# Visible "?" placeholder shown when an ability/icon URL 404s. NOT a substitute
+# for innate_icon — meant to make missing assets traceable so the slug can be
+# located and the icon added. Title attribute preserves the failed slug.
+MISSING_ICON_URL = "../icons/misc/missing.svg"
 # "Other" subgroup icon — neutral inline SVG (three sliders) for stat/misc changes.
 OTHER_ICON_URL = "../icons/other.svg"
 # Stat-specific icons used when an Other-block has exactly one row — in that
@@ -612,7 +616,7 @@ def subgroup(title):
     if title.lower() == "talents":
         on_err = (
             "this.onerror=function(){this.style.display='none'};"
-            f"this.src='{INNATE_ICON_URL}';"
+            f"this.src='{MISSING_ICON_URL}';"
         )
         icon = (f'<img src="{TALENT_ICON_URL}" alt="" '
                 f'class="ability-icon-img" loading="lazy" onerror="{on_err}">')
@@ -809,17 +813,19 @@ def ability(title, slug=None, innate=None, icon_url=None):
     icon_inner = ''
     if icon_url or slug:
         src = icon_url if icon_url else f"{ABIL_CDN}{slug}.png"
-        # On 404: hide the innate-marker overlay (would be redundant since main icon
-        # becomes the innate fallback), then swap src to innate icon. If THAT also
-        # fails, hide the entire image.
+        # On 404: swap to the "missing" placeholder (red ? on dark dashed
+        # square) so the absent slug is visible and traceable. Hide the
+        # innate-marker overlay since it'd no longer mean anything alongside
+        # the placeholder.
         on_err = (
             "this.onerror=function(){this.style.display='none'};"
             "var m=this.parentElement.querySelector('.innate-marker');"
             "if(m)m.style.display='none';"
-            f"this.src='{INNATE_ICON_URL}';"
+            f"this.src='{MISSING_ICON_URL}';"
         )
         slug_attr = f' data-slug="{slug}"' if slug else ''
-        icon_inner = (f'<img src="{src}" alt="" '
+        title_attr = f' title="missing icon: {slug}"' if slug else ''
+        icon_inner = (f'<img src="{src}" alt=""{title_attr} '
                       f'class="ability-icon-img" loading="lazy"{slug_attr} '
                       f'onerror="{on_err}">')
         if not icon_url:
@@ -1426,19 +1432,22 @@ nav.top-nav {
   text-decoration-color: rgba(255, 255, 255, 0.40);
 }
 
-/* CURRENT patch — заранее увеличена (compact mode) */
+/* CURRENT patch (compact mode) — emphasised via shadow only, no scale */
 .cal-patch.current {
-  transform: scale(1.10);
-  filter: brightness(1.12);
+  filter: brightness(1.20);
   z-index: 2;
   box-shadow:
     inset 0 1px 0 rgba(255, 235, 205, 0.35),
-    0 0 0 2px rgba(121, 192, 255, 0.65),
+    0 0 0 2px rgba(121, 192, 255, 0.85),
     0 2px 6px rgba(0, 0, 0, 0.4);
 }
 .cal-patch.current:hover {
-  transform: scale(1.18);
   z-index: 4;
+  filter: brightness(1.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 205, 0.50),
+    0 0 0 2.5px rgba(121, 192, 255, 1),
+    0 3px 10px rgba(0, 0, 0, 0.5);
 }
 span.cal-patch {
   cursor: default;
@@ -2861,7 +2870,7 @@ JS_TEXT = '''
     resultsBox.innerHTML = matches.map((m, i) =>
       `<div class="result-item" data-idx="${i}">${
         m.icon
-          ? `<img src="${m.icon}" alt="" onerror="this.onerror=null;this.src='../icons/misc/innate_icon.png';">`
+          ? `<img src="${m.icon}" alt="" onerror="this.onerror=null;this.src='../icons/misc/missing.svg';">`
           : '<span style="width:32px;display:inline-block"></span>'
       }<span>${highlight(m.name, query)}</span><span class="kind">${m.kind}</span></div>`
     ).join('');
