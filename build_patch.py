@@ -472,9 +472,10 @@ class _State:
     next_ul_is_hero_stats = False    # set by hero_header(), consumed by ul_open()
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup
 
-def _open_block():
+def _open_block(extra_cls=''):
     pre = _close_ability_block()
-    s = pre + ('</div>\n' if _State.block_open else '') + '<div class="entity-block">\n'
+    cls = 'entity-block' + ((' ' + extra_cls) if extra_cls else '')
+    s = pre + ('</div>\n' if _State.block_open else '') + f'<div class="{cls}">\n'
     _State.block_open = True
     return s
 
@@ -513,11 +514,32 @@ def unit_header(name, icon_url):
 
 
 def item_header(name, new=False):
-    """Item header. If new=True, appends a NEW badge to the entity name."""
+    """Item header.
+
+    new=True               → 'NEW' tag, block gets `.is-new` outline.
+    new='New X Item'       → tag renders verbatim uppercased ('NEW X ITEM').
+                             Use the exact datafeed label, e.g.:
+                                'New Miscellaneous Item', 'New Equipment Item',
+                                'New Magical Item', 'New Support Item',
+                                'New Armor Item', 'New Armaments Item',
+                                'Returning Armaments Item',
+                                'New Tier 1 Artifact', 'New Tier 5 Artifact',
+                                etc.
+    new=False (default)    → no tag, no outline.
+
+    Per-row BUFF/NERF tags inside an `.is-new` block are hidden by CSS — the
+    block-level NEW outline already signals everything new.
+    """
     out = _close_ability_block()
     _State.current_hero = None
-    new_badge = ' <span class="badge new" data-tag="new" data-overall="buff">NEW</span>' if new else ''
-    return out + _open_block() + f'''<div class="entity item-entity">
+    if new:
+        label_text = (new if isinstance(new, str) else 'NEW').upper()
+        new_badge = (f' <span class="badge new" data-tag="new" data-overall="buff">'
+                     f'{label_text}</span>')
+    else:
+        new_badge = ''
+    extra_cls = 'is-new' if new else ''
+    return out + _open_block(extra_cls) + f'''<div class="entity item-entity">
   <div class="entity-icon item-icon"><img src="{item_img(name)}" alt="{name}" loading="lazy"></div>
   <div class="entity-name">{name}{new_badge}</div>
 </div>'''
@@ -1741,6 +1763,33 @@ h2.section {
 }
 .plain-entity .entity-name {
   color: #79c0ff;
+}
+
+/* NEW-ITEM BLOCK — soft NEW-coloured outline that wraps both the entity
+   header AND its ul.changes. Per-row tags are suppressed inside since the
+   whole block already signals NEW; rows just show their description. */
+.entity-block.is-new {
+  border: 1px solid rgba(220, 175, 95, 0.30);
+  border-radius: 6px;
+  background: rgba(220, 175, 95, 0.025);
+  padding: 0 10px 6px;
+  margin-bottom: 14px;
+}
+.entity-block.is-new ul.changes li > .badge:first-child,
+.entity-block.is-new ul.changes li > .row-tag-empty {
+  display: none;
+}
+.entity-block.is-new ul.changes li {
+  grid-template-columns: 1fr auto;
+  column-gap: 12px;
+}
+.entity-block.is-new ul.changes li > .row-text { grid-column: 1; }
+.entity-block.is-new ul.changes li > .badge-group { grid-column: 2; }
+/* Tag inside the entity-name itself (the 'New X Item' badge) keeps its colour
+   but reads slightly larger so the type label is the dominant signal. */
+.entity-block.is-new .entity-name .badge.new {
+  font-size: 11px;
+  letter-spacing: 0.6px;
 }
 
 /* SUBGROUPS — same colour as body text / ability titles, not blue.
@@ -5362,7 +5411,7 @@ W(li("The ramp leading from the Radiant tier 1 tower to the stream has been decr
 W(li("The medium flooded camp near the safe lane tier 2 towers moved closer to the middle of the stream (substantially more for Dire than for Radiant)", t("MISC")))
 W(li("The medium flooded camp near the safe lane tier 2 towers can now only evolve once into a hard camp, rather than into an Ancient Camp", t("NERF")))
 W(li("The medium flooded camp near the bounty runes can now evolve twice into an Ancient Camp", t("REWORK")))
-W(li("Removed several trees from Dire Safelane easy pull camp and Radiant Safelane hard pull camp", t("DEL")))
+W(li("Removed several trees from Dire Safelane easy pull camp and Radiant Safelane hard pull camp", t("MISC")))
 W(ul_close())
 W(plain_header("Mechanics Changes"))
 
@@ -5478,23 +5527,23 @@ W(li("Items in all shop categories except for Consumables have been rearranged t
 W(li("Consumables now includes Infused Raindrops", t("MISC")))
 W(ul_close())
 
-W(item_header("Chasm Stone", new=True))
+W(item_header("Chasm Stone", new="New Miscellaneous Item"))
 W(ul_open())
 W(li("Costs 800 gold", t("MISC")))
 W(li("Provides +40 Area of Effect", t("MISC")))
 W(li("Area of Effect bonuses from multiple Chasm Stones or its upgrades do not stack", t("MISC")))
 W(ul_close())
-W(item_header("Shawl", new=True))
+W(item_header("Shawl", new="New Miscellaneous Item"))
 W(ul_open())
 W(li("Costs 450 gold", t("MISC")))
 W(li("Provides +10% Magic Resistance", t("MISC")))
 W(ul_close())
-W(item_header("Splintmail", new=True))
+W(item_header("Splintmail", new="New Equipment Item"))
 W(ul_open())
 W(li("Costs 950 gold", t("MISC")))
 W(li("Provides +7 Armor", t("MISC")))
 W(ul_close())
-W(item_header("Wizard Hat", new=True))
+W(item_header("Wizard Hat", new="New Miscellaneous Item"))
 W(ul_open())
 W(li("Costs 250 gold", t("MISC")))
 W(li("Provides +125 Mana", t("MISC")))
@@ -5535,7 +5584,7 @@ W(li("Spell Lifesteal bonus increased from +12% to +15%", b(12, 15)))
 W(ul_close())
 
 W(subgroup("Upgrades"))
-W(item_header("Consecrated Wraps", new=True))
+W(item_header("Consecrated Wraps", new="New Armor Item"))
 W(ul_open())
 W(li("Requires Vitality Booster (1000), Shawl (450), Crown (450), and a recipe (700). Total cost: 2600g", t("MISC")))
 W(li("Provides +15% Magic Resistance, +250 Health, and +6 All Attributes", t("MISC")))
@@ -5543,7 +5592,7 @@ W(li("Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Whe
 W(li("Has no damage threshold, but doesn't proc from Health Loss damage (like Heartstopper Aura)", t("MISC")))
 W(li("Can't gain stacks for 3s after taking damage from Roshan or player-controlled sources", t("NERF")))
 W(ul_close())
-W(item_header("Crella's Crozier", new=True))
+W(item_header("Crella's Crozier", new="New Magical Item"))
 W(ul_open())
 W(li("Requires Ghost Scepter (1500), Soul Booster (3000), and a recipe (300). Total cost: 4800g", t("MISC")))
 W(li("Provides +6 All Attributes, +450 Health, +450 Mana", t("MISC")))
@@ -5551,7 +5600,7 @@ W(li("Active: Rite of Rumusque. The wearer enters ghost form for 4 seconds, beco
 W(li("The ghost form and stolen speed can be dispelled off the wearer, but the stealing debuff that provides new stacks can't", t("NERF")))
 W(li("Passive: Putrefaction Aura. Reduces health restoration of nearby enemy heroes by 30%. While Rite of Rumusque is active, the effect is increased to 75% and all of the lost Health Restoration is redirected to the wearer every second. Radius: 900", t("BUFF")))
 W(ul_close())
-W(item_header("Essence Distiller", new=True))
+W(item_header("Essence Distiller", new="New Support Item"))
 W(ul_open())
 W(li("Requires Urn of Shadows (825), Chainmail (500), Wizard Hat (250), and a recipe (200). Total cost: 1775g", t("MISC")))
 W(li("Provides +1.75 Mana Regen, +3 All Attributes, +6 Armor, and +150 Mana", t("MISC")))
@@ -5569,7 +5618,7 @@ W(li("Gyrocopter's Flak Cannon", t("MISC")))
 W(li("Medusa's Split Shot", t("MISC")))
 W(li("Muerta's Gunslinger", t("MISC")))
 W(ul_close())
-W(item_header("Hydras Breath", new=True))
+W(item_header("Hydras Breath", new="Returning Armaments Item"))
 W(ul_open())
 W(li("Requires Specialist's Array (2550), Dragon Lance (1900), Orb of Venom (350) and a recipe (1100). Total cost: 5900g", t("MISC")))
 W(li("Provides +25 Damage, +30 Agility, +15 Strength, and +150 Attack Range (Ranged Only)", t("MISC")))
@@ -5952,7 +6001,7 @@ W(ul_open())
 W(li("Returning as a Tier 1 Neutral Artifact", t("MISC")))
 W(li("Active: Imbrue. Increase attack damage by 25 for 8s. Health Cost: 100. Cooldown: 30s", t("MISC")))
 W(ul_close())
-W(item_header("Foragers Kit", new=True))
+W(item_header("Foragers Kit", new="New Tier 1 Artifact"))
 W(ul_open())
 W(li("When this item is off cooldown, the wearer can see trees that can be foraged. Standing next to one of those trees for 1s will give the wearer one of the following items. Cooldown: 60s. Tree reveal radius: 1200", t("MISC")))
 W(li("All items except for bag of gold are placed in inventory (if there are slots available) and can stack up to 5 times per slot", t("MISC")))
@@ -5968,7 +6017,7 @@ W(li("Returning as a Tier 1 Neutral Artifact", t("MISC")))
 W(li("Passive: Lifesteal. Attacks heal for 5 health ", t("MISC")))
 W(ul_close())
 W(subnote("This counts as lifesteal and is manipulated by Health Restoration"))
-W(item_header("Stonefeather Satchel", new=True))
+W(item_header("Stonefeather Satchel", new="New Armaments Item"))
 W(ul_open())
 W(li("Toggle: Transmogrify. Activate to switch the contents of the satchel between Feathers or Rocks. No Mana Cost. Cooldown: 6s.", t("MISC")))
 W(li("Pound of Feathers: Increases movement speed by 12 and distance of forced movement effects on yourself by 30%", t("MISC")))
@@ -6027,7 +6076,7 @@ W(li("Pollinate health restoration loss increased from 30% to 50%", b(30, 50)))
 W(li("Pollinate now also modifies incoming healing ", t("REWORK")))
 W(ul_close())
 W(subnote("As a result of Health Restoration changes"))
-W(item_header("Partisans Brand", new=True))
+W(item_header("Partisans Brand", new="New Tier 3 Artifact"))
 W(ul_open())
 W(li("Passive: Brand. Increases spell damage against player controlled units by 9% ", t("MISC")))
 W(ul_close())
@@ -6039,7 +6088,7 @@ W(item_header("Serrated Shiv"))
 W(ul_open())
 W(li("Gut 'Em cooldown increased from 1s to 1.5s", b(1, 1.5, l=True)))
 W(ul_close())
-W(item_header("Spellslinger", new=True))
+W(item_header("Spellslinger", new="New Tier 3 Artifact"))
 W(ul_open())
 W(li("Passive: Salvo. Whenever you cast a spell, 20% of the spell's mana cost is restored over 10s. Tick rate: 2s ", t("MISC")))
 W(ul_close())
@@ -6080,7 +6129,7 @@ W(subnote("From 5.2s to 6.5s with Dormant Curio"))
 W(ul_open())
 W(li("Pupate bonus magic resistance increased from 35% to 50%", b(35, 50)))
 W(ul_close())
-W(item_header("Prophets Pendulum", new=True))
+W(item_header("Prophets Pendulum", new="New Tier 4 Artifact"))
 W(ul_open())
 W(li("Passive: Linger. 30% of damage taken is delayed over 5 seconds. Damage Ticks every 1 second and is lethal ", t("MISC")))
 W(ul_close())
@@ -6089,7 +6138,7 @@ W(item_header("Rattlecage"))
 W(ul_open())
 W(li("Reverberate damage threshold increased from 180 to 220", b(180, 220)))
 W(ul_close())
-W(item_header("Harmonizer", new=True))
+W(item_header("Harmonizer", new="New Tier 5 Artifact"))
 W(ul_open())
 W(li("Passive: Balance. Grants 5% mana cost reduction for every hero ability off cooldown and 6% spell amplification for every spell on cooldown ", t("MISC")))
 W(ul_close())
