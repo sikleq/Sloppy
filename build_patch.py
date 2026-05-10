@@ -1959,6 +1959,10 @@ ul.subnotes li {
   line-height: 1.4;
 }
 ul.subnotes li::before { content: "↳ "; color: #6e7681; }
+/* When the subnote is collapsible, drop the ↳ arrow — the rotating ▶ chevron
+   on <summary> already serves as the indicator, putting both side-by-side
+   reads as visual noise. */
+ul.subnotes li:has(> .subnote-collapse)::before { content: ""; }
 
 /* Collapsible subnote — long bullet lists hidden behind a "▶ summary (N)"
    click target. Native <details>/<summary> preserves keyboard and SR support. */
