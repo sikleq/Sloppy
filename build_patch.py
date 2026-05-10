@@ -1808,7 +1808,9 @@ h4.subgroup {
 }
 .ability-block > ul.subnotes {
   grid-column: 2;
-  margin-left: 0;            /* grid-column already places it under the text */
+  /* margin-left: 76px (inherited from base ul.subnotes) shifts it under the
+     row-text column inside ul.changes — same alignment as subnotes outside
+     ability-block. Do NOT override to 0; that puts the ↳ under the tag. */
 }
 /* Talents-block: same .ability-block layout, but talents.svg gets translucent framing */
 .ability-block.talents-block > .ability-icon-wrap > .ability-icon-img {
