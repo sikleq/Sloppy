@@ -551,12 +551,13 @@ def item_header(name, new=False):
     out = _close_ability_block()
     _State.current_hero = None
     if new:
-        if isinstance(new, str):
-            first, _, rest = new.partition(' ')
-            tag_text = first.upper()
-            type_text = rest.strip()
-        else:
-            tag_text = 'NEW'; type_text = ''
+        # Tag is always 'NEW' (the item is new-in-this-patch, even if the
+        # original concept is returning from old patches). The label after
+        # the name is the verbatim `new` string — Valve writes 'Returning
+        # Armaments Item' next to the item name, with the NEW tag still on
+        # the left, so we keep that wording in the label.
+        tag_text = 'NEW'
+        type_text = new if isinstance(new, str) else ''
         type_label = (f' <span class="entity-new-type">{type_text}</span>'
                       if type_text else '')
         # The NEW tag itself is emitted by CSS ::before on ul.changes
@@ -1859,9 +1860,10 @@ h2.section {
   display: none;
 }
 /* The pseudo lives on <li>; attr() can't read data-new-tag from .entity-block.
-   Use explicit content per known tag value. */
-.entity-block.is-new[data-new-tag="NEW"] ul.changes li:first-child::before,
-.entity-block.is-new[data-new-tag="RETURNING"] ul.changes li:first-child::before {
+   Tag text is always 'NEW' (the item is new-in-this-patch regardless of
+   whether the concept is returning from older patches). */
+.entity-block.is-new[data-new-tag="NEW"] ul.changes li:first-child::before {
+  content: "NEW";
   grid-column: 1;
   align-self: start;
   margin-top: 2px;
@@ -1880,11 +1882,13 @@ h2.section {
   border: 1px solid rgba(220, 175, 95, 0.28);
   box-sizing: border-box;
 }
-.entity-block.is-new[data-new-tag="NEW"]       ul.changes li:first-child::before { content: "NEW"; }
-.entity-block.is-new[data-new-tag="RETURNING"] ul.changes li:first-child::before { content: "RETURNING"; }
 /* Ability description box — spans one Passive:/Active: starter row plus any
    continuation rows until the next ability starter or end of ul. Post-process
    classifies each li with one of -solo / -start / -cont / -cont-end. */
+/* Box is drawn with NEGATIVE horizontal margins matching its padding+border,
+   so the row text inside stays aligned with rows OUTSIDE the box. Otherwise
+   the 12px padding-left would push the tag/text columns rightward and break
+   vertical alignment across the patch. */
 ul.changes li.ability-row-solo,
 ul.changes li.ability-row-start,
 ul.changes li.ability-row-cont,
@@ -1894,6 +1898,8 @@ ul.changes li.ability-row-end {
   border-right: 1px solid rgba(139, 148, 158, 0.18);
   padding-left: 12px;
   padding-right: 12px;
+  margin-left: -13px;    /* compensate 12px padding + 1px border */
+  margin-right: -13px;
 }
 ul.changes li.ability-row-solo,
 ul.changes li.ability-row-start {
