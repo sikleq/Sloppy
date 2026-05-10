@@ -272,6 +272,22 @@ def gradient_class(magnitude, is_buff):
     return f"{prefix}10"
 
 
+def b_inline(old, new, l=True):
+    """Compact percentage badge meant to be embedded INSIDE row text (e.g.
+    after 'Recipe cost decreased from A to B'). Default l=True since this is
+    primarily used for cost changes where lower=buff."""
+    if old == 0 or new == old:
+        return '<span class="badge neutral badge-inline">0%</span>'
+    pct = round((new - old) / old * 100)
+    if pct == 0:
+        return '<span class="badge neutral badge-inline">0%</span>'
+    is_buff = (new < old) if l else (new > old)
+    mag = abs(pct)
+    cls = gradient_class(mag, is_buff)
+    sign = '+' if is_buff else '-'
+    return f'<span class="badge {cls} badge-inline">{sign}{mag}%</span>'
+
+
 def b(old, new, l=False):
     """Generate per-level badges. old/new can be scalar or list.
     l=True means lower-is-buff (cooldowns, mana costs, penalties).
@@ -987,11 +1003,15 @@ def li(text, badge="", extra="", force_tag=None):
     elif isinstance(text, str) and text.startswith("Aghanim's Shard"):
         classes.append("aghanim-shard")
         marker = '<span class="aghanim-marker shard"></span>'
-    # Item ability description rows (Passive: / Active: / Toggle:) get a soft
-    # bordered box treatment so they visually separate from cost / component
-    # description rows above.
+    # Item ability description rows (Passive: / Active: / Toggle: / Aura:)
+    # open a soft bordered box. Continuation rows (rows BETWEEN two ability-
+    # rows or AFTER the final ability-row in the same ul) are tagged in
+    # save_html's post-processor so the box spans the entire description.
     if isinstance(text, str) and re.match(r'^\s*(Passive|Active|Toggle|Aura|Ability)\s*:', text):
         classes.append("ability-row")
+        # Bold the leading keyword + colon so 'Passive:' / 'Active:' jumps out.
+        text = re.sub(r'^(\s*)(Passive|Active|Toggle|Aura|Ability)(\s*:)',
+                      r'\1<b>\2\3</b>', text)
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""
     attr = f' data-tag="{tag_str}"' if tag_str else ""
     # Marker is appended INSIDE .row-text so it sits right after the change
@@ -1862,21 +1882,34 @@ h2.section {
 }
 .entity-block.is-new[data-new-tag="NEW"]       ul.changes li:first-child::before { content: "NEW"; }
 .entity-block.is-new[data-new-tag="RETURNING"] ul.changes li:first-child::before { content: "RETURNING"; }
-/* Ability description rows inside item blocks — Passive: / Active: / Toggle:
-   line gets a soft bordered box separating the spell description from the
-   plain cost/component rows above. Multiple abilities → multiple boxes. */
-ul.changes li.ability-row {
+/* Ability description box — spans one Passive:/Active: starter row plus any
+   continuation rows until the next ability starter or end of ul. Post-process
+   classifies each li with one of -solo / -start / -cont / -cont-end. */
+ul.changes li.ability-row-solo,
+ul.changes li.ability-row-start,
+ul.changes li.ability-row-cont,
+ul.changes li.ability-row-end {
   background: rgba(139, 148, 158, 0.04);
-  border: 1px solid rgba(139, 148, 158, 0.18);
-  border-radius: 6px;
-  padding: 6px 12px 6px 12px;
-  margin: 4px 0;
+  border-left:  1px solid rgba(139, 148, 158, 0.18);
+  border-right: 1px solid rgba(139, 148, 158, 0.18);
+  padding-left: 12px;
+  padding-right: 12px;
 }
-.entity-block.is-new ul.changes li.ability-row {
-  /* Inside an is-new block the row no longer carries the leading NEW tag
-     column visually (display:none on .badge:first-child), so the box keeps
-     its own padding without offset. */
-  grid-template-columns: 1fr auto;
+ul.changes li.ability-row-solo,
+ul.changes li.ability-row-start {
+  border-top: 1px solid rgba(139, 148, 158, 0.18);
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  padding-top: 6px;
+  margin-top: 4px;
+}
+ul.changes li.ability-row-solo,
+ul.changes li.ability-row-end {
+  border-bottom: 1px solid rgba(139, 148, 158, 0.18);
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 /* Type label after the item name — small, uppercased, NEW colour family. */
@@ -2162,6 +2195,15 @@ ul.subnote-items > li::before {
 }
 
 /* BADGES — flat rectangular tag boxes */
+/* Compact inline-flow % badge used inside row text (e.g. after 'Recipe cost
+   from A to B') — smaller padding so it doesn't push surrounding text. */
+.badge.badge-inline {
+  margin-left: 4px;
+  padding: 1px 5px;
+  font-size: 10.5px;
+  vertical-align: 1px;
+}
+
 .badge {
   display: inline-block;
   padding: 3px 7px;
@@ -3248,6 +3290,90 @@ def save_assets():
     print(f"  → scripts.js: {len(JS_TEXT):,} bytes")
 
 
+_LI_RE = re.compile(r'<li\b([^>]*)>(.*?)</li>', re.S)
+_UL_CHANGES_RE = re.compile(r'(<ul class="changes">)(.*?)(</ul>)', re.S)
+def _wrap_ability_boxes(html):
+    """For each <ul class="changes">, walk its <li> sequence and assign:
+      - ability-row-start  : first li of an ability description
+      - ability-row-cont   : continuation li (no Passive/Active keyword) that
+                              still belongs to the previous ability
+      - ability-row-end    : last li of an ability description (start+end on
+                              the same li if the box is one row only)
+    The CSS uses these classes to draw a soft box that spans the whole group.
+    """
+    def fix_ul(m):
+        head, body, tail = m.group(1), m.group(2), m.group(3)
+        parts = []
+        last_idx = 0
+        items = list(_LI_RE.finditer(body))
+        if not items:
+            return m.group(0)
+
+        # First pass: classify each li as "starter" (has ability-row class)
+        # or "continuation" while inside a box.
+        is_starter = []
+        for it in items:
+            is_starter.append(' ability-row' in it.group(1) or 'class="ability-row' in it.group(1))
+
+        # Determine grouping: a starter opens a box; following non-starters
+        # until next starter (or end of ul) are continuations.
+        # Each li gets one of: 'start', 'cont', 'end', 'solo', or None.
+        roles = [None] * len(items)
+        in_box = False
+        box_start_idx = None
+        for i, st in enumerate(is_starter):
+            if st:
+                # close previous box if any
+                if in_box:
+                    roles[i - 1] = 'cont-end' if roles[i - 1] == 'cont' else (
+                        'solo' if box_start_idx == i - 1 else 'cont-end')
+                roles[i] = 'start'
+                in_box = True
+                box_start_idx = i
+            elif in_box:
+                roles[i] = 'cont'
+        if in_box:
+            last = len(items) - 1
+            if roles[last] == 'start':
+                roles[last] = 'solo'
+            else:
+                roles[last] = 'cont-end'
+
+        # Rebuild body with augmented classes on each <li>
+        def aug_class(li_match, extra):
+            attrs = li_match.group(1)
+            if 'class="' in attrs:
+                attrs = re.sub(r'class="([^"]*)"', lambda mm: f'class="{mm.group(1)} {extra}"', attrs)
+            else:
+                attrs = ' class="' + extra + '"' + attrs
+            return f'<li{attrs}>{li_match.group(2)}</li>'
+
+        out_lis = []
+        for it, role in zip(items, roles):
+            if role is None:
+                out_lis.append(it.group(0))
+            elif role == 'solo':
+                out_lis.append(aug_class(it, 'ability-row-solo'))
+            elif role == 'start':
+                out_lis.append(aug_class(it, 'ability-row-start'))
+            elif role == 'cont':
+                out_lis.append(aug_class(it, 'ability-row-cont'))
+            elif role == 'cont-end':
+                out_lis.append(aug_class(it, 'ability-row-cont ability-row-end'))
+
+        # Reassemble: prefix (everything in body before first li) +
+        # interleaved lis + suffix (text after last li)
+        body_out = body[:items[0].start()]
+        for i, it in enumerate(items):
+            body_out += out_lis[i]
+            if i + 1 < len(items):
+                body_out += body[it.end():items[i + 1].start()]
+        body_out += body[items[-1].end():]
+        return head + body_out + tail
+
+    return _UL_CHANGES_RE.sub(fix_ul, html)
+
+
 _OTHER_BLOCK_RE = re.compile(
     r'(<div class="ability-block other-block">.*?<img\b[^>]*?\bsrc=")([^"]+)(".*?<ul class="changes">)(.*?)(</ul>)',
     re.S
@@ -3285,6 +3411,7 @@ def save_html(filename):
     out = "\n".join(H)
     out = out.replace('<!--CATEGORIES_BAR-->', _categories_bar_html())
     out = _swap_single_row_other_icons(out)
+    out = _wrap_ability_boxes(out)
     path = filename
     os.makedirs(os.path.dirname(path), exist_ok=True) if os.path.dirname(path) else None
     with open(path, "w", encoding="utf-8") as f:
@@ -5880,12 +6007,12 @@ W(item_header("Arcane Boots"))
 W(ul_open())
 W(li("Recipe changed", t("MISC")))
 W(li("Now also requires a Wizard Hat (250g)", t("REWORK")))
-W(li("Recipe cost decreased from 475 to 325. Total cost increased from 1400g to 1500g", b(475, 325, l=True)))
+W(li("Recipe cost decreased from 475 to 325 " + b_inline(475, 325) + ". Total cost increased from 1400g to 1500g", b(1400, 1500, l=True)))
 W(li("Now also provides +125 Mana", t("REWORK")))
 W(ul_close())
 W(item_header("Guardian Greaves"))
 W(ul_open())
-W(li("Recipe cost increased from 1125 to 1175. Total cost increased from 4300g to 4450g (due to Arcane Boots cost increase)", b(1125, 1175, l=True)))
+W(li("Recipe cost increased from 1125 to 1175 " + b_inline(1125, 1175) + ". Total cost increased from 4300g to 4450g (due to Arcane Boots cost increase)", b(4300, 4450, l=True)))
 W(li("Now also provides +150 Mana", t("REWORK")))
 W(li("Mana Regen bonus decreased from +1.5 to +1", b(1.5, 1)))
 W(ul_close())
@@ -5893,7 +6020,7 @@ W(item_header("Battle Fury"))
 W(ul_open())
 W(li("Recipe changed", t("MISC")))
 W(li("Now requires Perseverance (1400) instead of Cornucopia (1200)", t("REWORK")))
-W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))
+W(li("Recipe cost decreased from 600 to 400 " + b_inline(600, 400) + ". Total cost unchanged at 3900g", t("MISC")))
 W(ul_close())
 W(item_header("Black King Bar"))
 W(ul_open())
@@ -5903,7 +6030,7 @@ W(item_header("Blade Mail"))
 W(ul_open())
 W(li("Recipe changed", t("MISC")))
 W(li("Now requires Splintmail (950) instead of Chainmail (550)", t("REWORK")))
-W(li("Recipe cost decreased from 750 to 450. Total cost increased from 2300g to 2400g", b(750, 450, l=True)))
+W(li("Recipe cost decreased from 750 to 450 " + b_inline(750, 450) + ". Total cost increased from 2300g to 2400g", b(2300, 2400, l=True)))
 W(li("Armor bonus increased from +6 to +7", b(6, 7)))
 W(ul_close())
 W(item_header("Crimson Guard"))
@@ -5940,7 +6067,7 @@ W(item_header("Ancient Janggo"))
 W(ul_open())
 W(li("Recipe changed", t("MISC")))
 W(li("Now requires Headdress (425) instead of Robe of the Magi (450)", t("REWORK")))
-W(li("Recipe cost increased from 500 to 525. Total cost unchanged at 1625g", b(500, 525, l=True)))
+W(li("Recipe cost increased from 500 to 525 " + b_inline(500, 525) + ". Total cost unchanged at 1625g", t("MISC")))
 W(li("No longer provides +7 Intelligence", t("NERF")))
 W(li("Strength bonus increased from +7 to +8", b(7, 8)))
 W(li("Swiftness Aura now also provides +2.5 Health Regen", t("REWORK")))
@@ -5964,14 +6091,14 @@ W(item_header("Gungir"))
 W(ul_open())
 W(li("Recipe changed", t("MISC")))
 W(li("Now also requires Chasm Stone (800)", t("REWORK")))
-W(li("Recipe cost decreased from 1100 to 400. Total cost increased from 4550g to 4650g", b(1100, 400, l=True)))
+W(li("Recipe cost decreased from 1100 to 400 " + b_inline(1100, 400) + ". Total cost increased from 4550g to 4650g", b(4550, 4650, l=True)))
 W(li("Area of Effect bonuses from multiple Chasm Stones or its upgrades do not stack", t("MISC")))
 W(ul_close())
 W(item_header("Glimmer Cape"))
 W(ul_open())
 W(li("Recipe changed", t("MISC")))
 W(li("Now requires Shawl (450) instead of Cloak (800)", t("REWORK")))
-W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b(450, 800, l=True)))
+W(li("Recipe cost increased from 450 to 800 " + b_inline(450, 800) + ". Total cost unchanged at 2150g", t("MISC")))
 W(ul_close())
 W(item_header("Hand Of Midas"))
 W(ul_open())
@@ -6038,11 +6165,11 @@ W(li("Berserk armor reduction decreased from 8 to 7", b(8, 7)))
 W(ul_close())
 W(item_header("Mekansm"))
 W(ul_open())
-W(li("Recipe cost increased from 800 to 850. Total cost unchanged at 1775g (due to Chainmail cost decrease)", b(800, 850, l=True)))
+W(li("Recipe cost increased from 800 to 850 " + b_inline(800, 850) + ". Total cost unchanged at 1775g (due to Chainmail cost decrease)", t("MISC")))
 W(ul_close())
 W(item_header("Monkey King Bar"))
 W(ul_open())
-W(li("Recipe cost increased from 600 to 900. Total cost increased from 4700g to 5000g", b(600, 900, l=True)))
+W(li("Recipe cost increased from 600 to 900 " + b_inline(600, 900) + ". Total cost increased from 4700g to 5000g", b(4700, 5000, l=True)))
 W(li("Now also provides +50 Attack Range to melee heroes only", t("REWORK")))
 W(li("Damage bonus increased from +40 to +50", b(40, 50)))
 W(li("Attack Speed bonus increased from +45 to +50", b(45, 50)))
@@ -6062,7 +6189,7 @@ W(item_header("Orchid"))
 W(ul_open())
 W(li("Recipe changed", t("MISC")))
 W(li("Now requires Claymore (1350) instead of Cornucopia (1200)", t("REWORK")))
-W(li("Recipe cost decreased from 450 to 300. Total cost unchanged at 3275g", b(450, 300, l=True)))
+W(li("Recipe cost decreased from 450 to 300 " + b_inline(450, 300) + ". Total cost unchanged at 3275g", t("MISC")))
 W(li("No longer provides +6 Health Regen", t("NERF")))
 W(li("Damage bonus increased from +10 to +20", b(10, 20)))
 W(li("Mana Regen bonus decreased from +3 to +2.5", b(3, 2.5)))
@@ -6072,7 +6199,7 @@ W(item_header("Bloodthorn"))
 W(ul_open())
 W(li("Recipe changed", t("MISC")))
 W(li("Now requires Oblivion Staff (1625) instead of Hyperstone (2000)", t("REWORK")))
-W(li("Recipe cost increased from 450 to 600. Total cost decreased from 6625g to 6400g", b(450, 600, l=True)))
+W(li("Recipe cost increased from 450 to 600 " + b_inline(450, 600) + ". Total cost decreased from 6625g to 6400g", b(6625, 6400, l=True)))
 W(li("No longer provides +6.5 Health Regen", t("NERF")))
 W(li("Intelligence bonus increased from +10 to +25", b(10, 25)))
 W(li("Attack Speed bonus decreased from +95 to +70", b(95, 70)))
@@ -6097,7 +6224,7 @@ W(item_header("Pavise"))
 W(ul_open())
 W(li("Recipe changed", t("MISC")))
 W(li("Now requires Wizard Hat (250) instead of Energy Booster (800)", t("REWORK")))
-W(li("Recipe cost increased from 175 to 675. Total cost decreased from 1400g to 1350g", b(175, 675, l=True)))
+W(li("Recipe cost increased from 175 to 675 " + b_inline(175, 675) + ". Total cost decreased from 1400g to 1350g", b(1400, 1350, l=True)))
 W(li("Mana bonus decreased from +250 to +175", b(250, 175)))
 W(ul_close())
 W(item_header("Solar Crest"))
@@ -6172,7 +6299,7 @@ W(item_header("Shiva's Guard"))
 W(ul_open())
 W(li("Recipe changed", t("MISC")))
 W(li("Now requires Splintmail (950) and Chasm Stone (800) instead of Veil of Discord (1725)", t("REWORK")))
-W(li("Recipe cost decreased from 2050 to 1350. Total cost decreased from 5175g to 4500g", b(2050, 1350, l=True)))
+W(li("Recipe cost decreased from 2050 to 1350 " + b_inline(2050, 1350) + ". Total cost decreased from 5175g to 4500g", b(5175, 4500, l=True)))
 W(li("No longer provides +5 Strength, +5 Agility, +5 Intelligence, or +5 Health Regen", t("NERF")))
 W(li("Armor bonus increased from +15 to +17", b(15, 17)))
 W(li("Now also provides +75 Area of Effect", t("REWORK")))
@@ -6224,7 +6351,7 @@ W(li("Effect does not stack with Veil of Discord's Spell Weakness", t("MISC")))
 W(ul_close())
 W(item_header("Witch Blade"))
 W(ul_open())
-W(li("Recipe cost increased from 250 to 300. Total cost unchanged at 2775g (due to Chainmail cost decrease)", b(250, 300, l=True)))
+W(li("Recipe cost increased from 250 to 300 " + b_inline(250, 300) + ". Total cost unchanged at 2775g (due to Chainmail cost decrease)", t("MISC")))
 W(ul_close())
 # ===== NEUTRAL ITEM UPDATES =====
 W(section("Neutral Item Updates"))
