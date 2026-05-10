@@ -868,16 +868,23 @@ def ability(title, slug=None, innate=None, icon_url=None):
                       f'title="missing icon: {title}">')
     if icon_url or slug:
         src = icon_url if icon_url else f"{ABIL_CDN}{slug}.png"
-        # On 404: swap to the "missing" placeholder (red ? on dark dashed
-        # square) so the absent slug is visible and traceable. Hide the
-        # innate-marker overlay since it'd no longer mean anything alongside
-        # the placeholder.
-        on_err = (
-            "this.onerror=function(){this.style.display='none'};"
-            "var m=this.parentElement.querySelector('.innate-marker');"
-            "if(m)m.style.display='none';"
-            f"this.src='{MISSING_ICON_URL}';"
-        )
+        # On 404: innate abilities fall back to the innate icon (Valve doesn't
+        # expose innate-ability icons on the public CDN — the innate marker
+        # itself IS the canonical image). Everything else falls back to the
+        # "missing" placeholder so the absent slug remains traceable.
+        if is_innate:
+            fallback = INNATE_ICON_URL
+            on_err = (
+                "this.onerror=function(){this.style.display='none'};"
+                "var m=this.parentElement.querySelector('.innate-marker');"
+                "if(m)m.style.display='none';"
+                f"this.src='{INNATE_ICON_URL}';"
+            )
+        else:
+            on_err = (
+                "this.onerror=function(){this.style.display='none'};"
+                f"this.src='{MISSING_ICON_URL}';"
+            )
         slug_attr = f' data-slug="{slug}"' if slug else ''
         title_attr = f' title="missing icon: {slug}"' if slug else ''
         icon_inner = (f'<img src="{src}" alt=""{title_attr} '
@@ -2995,6 +3002,10 @@ JS_TEXT = '''
     if (!isActive) return;
     document.querySelectorAll('ul.changes > li').forEach(li => {
       const tags = (li.dataset.tag || '').split(' ').filter(Boolean);
+      // Rows inside a .entity-block.is-new inherit the 'new' tag — the
+      // block-level NEW badge applies to every row in the block, but per-row
+      // data-tag may be 'misc' (since the original li was tagged MISC).
+      if (li.closest('.entity-block.is-new')) tags.push('new');
       const matches = tags.some(t => activeFilters.has(t));
       if (!matches) li.classList.add('f-hide');
     });
