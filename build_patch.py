@@ -2381,14 +2381,6 @@ ul.changes li.ability-row-end {
   flex-direction: column;
   gap: 4px;
 }
-.properties-change .properties-pane.properties-old {
-  border-color: rgba(220, 80, 80, 0.35);
-  background: rgba(220, 80, 80, 0.05);
-}
-.properties-change .properties-pane.properties-new {
-  border-color: rgba(218, 165, 32, 0.45);
-  background: rgba(218, 165, 32, 0.05);
-}
 .properties-change .property-row {
   color: #c9d1d9;
   font-size: 13.5px;
@@ -6567,15 +6559,16 @@ W(ul_close())
 W(item_header("Dagon", changed=True))
 W(auto_components_change("Dagon", "7.41"))
 W(properties_change(
-    old=["+15/16/17/18/19% Spell Lifesteal"],
-    new=["+200/210/220/230/240 Health",
+    old=["+7/9/11/13/15 All Attributes",
+         "+15/16/17/18/19% Spell Lifesteal"],
+    new=["+6/7/8/9/10 All Attributes " + b([7, 9, 11, 13, 15], [6, 7, 8, 9, 10]),
+         "+200/210/220/230/240 Health",
          "+350/375/400/425/450 Mana",
          "+60/90/120/150/180 Cast Range"],
-    new_extras={2: show_list("Cast Range Bonus does not stack with Aether Lens or multiple Dagons",
-                              summary="Stacking")}))
+    new_extras={3: show_list("Cast Range Bonus does not stack with Aether Lens or multiple Dagons",
+                              summary="Stacking rules")}))
 W(ul_open())
 W(li("Recipe cost unchanged at 1150. Total cost increased from 2800/3950/5100/6250/7400g to 3050/4200/5350/6500/7650g", b([2800, 3950, 5100, 6250, 7400], [3050, 4200, 5350, 6500, 7650], l=True)))
-W(li("All Attributes bonus decreased from +7/9/11/13/15 to +6/7/8/9/10", b([7, 9, 11, 13, 15], [6, 7, 8, 9, 10])))
 W(li("Energy Burst cast range decreased from 700/750/800/850/900 to 640", b([700, 750, 800, 850, 900], 640)))
 W(li("Effective cast range with item's built-in Cast Range bonus decreased from 700/750/800/850/900 to 700/730/760/790/820", b([700, 750, 800, 850, 900], [700, 730, 760, 790, 820])))
 W(li("Energy Burst no longer instantly kills non-ancient creeps", t("DEL")))
