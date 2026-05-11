@@ -515,40 +515,31 @@ def unit_header(name, icon_url):
 </div>'''
 
 
-def item_header(name, new=False):
+def item_header(name, new=False, changed=False):
     """Item header.
 
     new=True               → 'NEW' tag, block gets `.is-new` outline.
     new='New X Item'       → tag renders verbatim uppercased ('NEW X ITEM').
-                             Use the exact datafeed label, e.g.:
-                                'New Miscellaneous Item', 'New Equipment Item',
-                                'New Magical Item', 'New Support Item',
-                                'New Armor Item', 'New Armaments Item',
-                                'Returning Armaments Item',
-                                'New Tier 1 Artifact', 'New Tier 5 Artifact',
-                                etc.
+    changed=True           → 'Recipe changed' label in neutral colour, same
+                             position/style as the new-item type label but no
+                             gold tint and no NEW outline.
+    changed='custom text'  → custom label in the same neutral style.
     new=False (default)    → no tag, no outline.
-
-    Per-row BUFF/NERF tags inside an `.is-new` block are hidden by CSS — the
-    block-level NEW outline already signals everything new.
     """
     out = _close_ability_block()
     _State.current_hero = None
     if new:
-        # Tag is always 'NEW' (the item is new-in-this-patch, even if the
-        # original concept is returning from old patches). The label after
-        # the name is the verbatim `new` string — Valve writes 'Returning
-        # Armaments Item' next to the item name, with the NEW tag still on
-        # the left, so we keep that wording in the label.
         tag_text = 'NEW'
         type_text = new if isinstance(new, str) else ''
         type_label = (f' <span class="entity-new-type">{type_text}</span>'
                       if type_text else '')
-        # The NEW tag itself is emitted by CSS ::before on ul.changes
-        # (vertically centred on the rows it groups, joined by a left brace).
-        # We pass the tag text via data-new-tag on the entity-block.
         extra_cls = 'is-new'
         block_data_attr = f' data-new-tag="{tag_text}"'
+    elif changed:
+        label_text = changed if isinstance(changed, str) else 'Recipe changed'
+        type_label = f' <span class="entity-changed-type">{label_text}</span>'
+        extra_cls = 'is-changed'
+        block_data_attr = ''
     else:
         type_label = ''
         extra_cls = ''
@@ -600,6 +591,41 @@ def provides(text):
     """Visual properties block — replaces the 'Provides X, Y, and Z' row for
     new items. One line, comma-separated, soft outlined box."""
     return f'<div class="provides-box">{text}</div>'
+
+
+def _component_cell(name, cost):
+    slug = ITEM_SLUG.get(name, name.lower().replace(' ', '_').replace("'", ''))
+    if name.lower() == 'recipe':
+        slug = 'recipe'
+    return (f'<div class="component">'
+            f'<img src="{ITEM_CDN}{slug}.png" alt="{name}" title="{name}" loading="lazy">'
+            f'<div class="component-price">{cost}</div></div>')
+
+
+def _components_side(parts, recipe, total):
+    cells = [_component_cell(n, c) for n, c in parts]
+    if recipe:
+        cells.append(_component_cell(recipe[0], recipe[1]))
+    body = '<span class="components-plus">+</span>'.join(cells)
+    return (f'<div class="components-row">{body}</div>'
+            f'<div class="components-total">= <span>{total}</span></div>')
+
+
+def components_change(old, new, total_old, total_new,
+                      recipe_old=None, recipe_new=None):
+    """Old → New components box for items whose recipe changed.
+
+    old/new:           list of (item_display_name, cost) tuples.
+    recipe_old/_new:   optional (label, cost) for the recipe component.
+    total_old/_new:    total gold cost on each side.
+
+    Renders two component rows separated by a right-pointing arrow.
+    """
+    return (f'<div class="components-box components-change">'
+            f'<div class="components-side">{_components_side(old, recipe_old, total_old)}</div>'
+            f'<span class="components-arrow">→</span>'
+            f'<div class="components-side">{_components_side(new, recipe_new, total_new)}</div>'
+            f'</div>')
 
 
 def plain_header(name):
@@ -2022,6 +2048,46 @@ ul.changes li.ability-row-end {
   color: #b08c5a;
   opacity: 0.85;
   vertical-align: middle;
+}
+
+/* Same position/style as new-type, but neutral colour — used for
+   'Recipe changed' on items whose components changed in this patch. */
+.entity-name .entity-changed-type {
+  margin-left: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #c9d1d9;
+  opacity: 0.65;
+  vertical-align: middle;
+}
+
+/* Recipe-changed visual: old build → new build, side by side. */
+.components-box.components-change {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.components-box.components-change .components-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.components-box.components-change .components-arrow {
+  font-size: 18px;
+  color: #8b949e;
+  opacity: 0.7;
+  padding: 0 2px;
+}
+.entity-block.is-changed > .components-box,
+.entity-block.is-changed > .provides-box {
+  margin-left: 0;
+}
+.entity-block.is-changed > ul.changes {
+  padding-left: 0;
 }
 
 /* SUBGROUPS — same colour as body text / ability titles, not blue.
@@ -6092,11 +6158,8 @@ W(components(('Blade of Alacrity', 1000), ('Broadsword', 1000),
 W(provides('+20 Damage, +12 Agility'))
 W(ul_open())
 W(li("Passive: Splitshot. Ranged Only. Ranged attacks have a 30% chance to fire additional projectiles at up to 2 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("NEW")))
-W(li("Doesn't work with other sources of secondary projectiles from hero abilities", t("NEW")))
-W(li("Gyrocopter's Flak Cannon", t("NEW")))
-W(li("Medusa's Split Shot", t("NEW")))
-W(li("Muerta's Gunslinger", t("NEW")))
 W(ul_close())
+W(subnote("Doesn't work with other sources of secondary projectiles from hero abilities<br>* Gyrocopter's Flak Cannon<br>* Medusa's Split Shot<br>* Muerta's Gunslinger"))
 W(item_header("Hydras Breath", new="New Armaments Item"))
 W(components(("Specialist's Array", 2550), ('Dragon Lance', 1900), ('Orb of Venom', 350),
              recipe=('Recipe', 1100), total=5900))
@@ -6106,9 +6169,13 @@ W(li("Passive: Miasma. Attacks poison the target for 3 seconds, dealing magical 
 W(li("Passive: Polycephaly. Ranged attacks have a 30% chance to fire at up to 3 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects except for Miasma. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("NEW")))
 W(li("Similarly to Specialist's Array, doesn't work with other sources of secondary projectiles from hero abilities", t("NEW")))
 W(ul_close())
-W(item_header("Arcane Boots"))
+W(item_header("Arcane Boots", changed=True))
+W(components_change(
+    old=[("Boots of Speed", 500), ("Energy Booster", 425)],
+    recipe_old=("Recipe", 475), total_old=1400,
+    new=[("Boots of Speed", 500), ("Energy Booster", 425), ("Wizard Hat", 250)],
+    recipe_new=("Recipe", 325), total_new=1500))
 W(ul_open())
-W(li("Recipe changed"))
 W(li("Now also requires a Wizard Hat (250g)", t("REWORK")))
 W(li("Recipe cost decreased from 475 to 325 " + b(475, 325, l=True) + ". Total cost increased from 1400g to 1500g", b(1400, 1500, l=True)))
 W(li("Now also provides +125 Mana", t("NEW")))
@@ -6129,9 +6196,13 @@ W(item_header("Black King Bar"))
 W(ul_open())
 W(li("Avatar duration changed from 9/8/7/6s to 9/8/7s", t("REWORK")))
 W(ul_close())
-W(item_header("Blade Mail"))
+W(item_header("Blade Mail", changed=True))
+W(components_change(
+    old=[("Chainmail", 550), ("Broadsword", 1000)],
+    recipe_old=("Recipe", 750), total_old=2300,
+    new=[("Splintmail", 950), ("Broadsword", 1000)],
+    recipe_new=("Recipe", 450), total_new=2400))
 W(ul_open())
-W(li("Recipe changed"))
 W(li("Now requires Splintmail (950) instead of Chainmail (550)", t("REWORK")))
 W(li("Recipe cost decreased from 750 to 450 " + b(750, 450, l=True) + ". Total cost increased from 2300g to 2400g", b(2300, 2400, l=True)))
 W(li("Armor bonus increased from +6 to +7", b(6, 7)))
