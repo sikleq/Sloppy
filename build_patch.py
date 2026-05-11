@@ -2079,14 +2079,14 @@ ul.changes li.ability-row-end {
 .components-change {
   display: flex;
   align-items: stretch;
-  justify-content: flex-start;
+  justify-content: stretch;
   gap: 12px;
   margin: 6px 0 4px;
-  flex-wrap: wrap;
 }
 .components-change .components-pane {
   margin: 0;
-  flex: 0 1 auto;
+  flex: 1 1 0;
+  min-width: 0;
 }
 .components-change .components-arrow {
   display: flex;
