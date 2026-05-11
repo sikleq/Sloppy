@@ -233,6 +233,20 @@ ITEM_SLUG = {
     "Silver Edge": "silver_edge",
     "Soul Ring": "soul_ring",
     "Specialist's Array": "specialists_array",
+    "Manta Style": "manta",
+    "Heaven's Halberd": "heavens_halberd",
+    "Glimmer Cape": "glimmer_cape",
+    "Spirit Vessel": "spirit_vessel",
+    "Witch Blade": "witch_blade",
+    "Vladmir's Offering": "vladmir",
+    "Aether Lens": "aether_lens",
+    "Octarine Core": "octarine_core",
+    "Helm of the Overlord": "helm_of_the_overlord",
+    "Rod of Atos": "rod_of_atos",
+    "Sange and Yasha": "sange_and_yasha",
+    "Sange": "sange",
+    "Meteor Hammer": "meteor_hammer",
+    "Mage Slayer": "mage_slayer",
 }
 
 
@@ -594,12 +608,16 @@ def provides(text):
 
 
 def show_list(*items, summary='Show list'):
-    """Inline collapsible attached to the end of a sentence. Renders a small
-    'Show list (N)' toggle that expands to a bulleted list. Uses <div>/<span>
-    instead of <ul>/<li> to avoid interfering with the ability-box wrapper
-    that augments top-level <li> elements inside ul.changes."""
+    """Collapsible info row attached AFTER a sentence li. Renders on a new
+    line below the row text with a rotating triangle arrow, matching the
+    style of subnote-collapse but staying inside the same ability box.
+
+    Pass via the `extra=` parameter of `li()` so the details element becomes
+    a sibling of .row-text inside the same <li> (not nested in row-text).
+    Uses <div>/<span> instead of <ul>/<li> to avoid interfering with the
+    ability-box wrapper that augments top-level <li> elements."""
     items_html = ''.join(f'<span class="show-list-item">{it}</span>' for it in items)
-    return (' <details class="show-list-inline">'
+    return (f'<details class="show-list-inline">'
             f'<summary>{summary} <span class="subnote-count">({len(items)})</span></summary>'
             f'<div class="show-list-body">{items_html}</div></details>')
 
@@ -625,6 +643,188 @@ def _components_side(parts, recipe, total, marks):
     body = '<span class="components-plus">+</span>'.join(cells)
     return (f'<div class="components-row">{body}</div>'
             f'<div class="components-total">= <span>{total}</span></div>')
+
+
+ITEM_DISPLAY_OVERRIDES = {
+    'item_bfury':           'Battle Fury',
+    'item_boots':           'Boots of Speed',
+    'item_recipe':          'Recipe',
+    'item_pers':            'Perseverance',
+    'item_lifesteal':       'Morbid Mask',
+    'item_buckler':         'Buckler',
+    'item_ogre_axe':        'Ogre Axe',
+    'item_belt_of_strength':'Belt of Strength',
+    'item_band_of_elvenskin':'Band of Elvenskin',
+    'item_robe':            'Robe of the Magi',
+    'item_diadem':          'Diadem',
+    'item_voodoo_mask':     'Voodoo Mask',
+    'item_helm_of_the_dominator': 'Helm of the Dominator',
+    'item_ultimate_orb':    'Ultimate Orb',
+    'item_tiara_of_selemene':'Tiara of Selemene',
+    'item_soul_booster':    'Soul Booster',
+    'item_kaya':            'Kaya',
+    'item_crown':           'Crown',
+    'item_yasha':           'Yasha',
+    'item_vanguard':        'Vanguard',
+    'item_ring_of_health':  'Ring of Health',
+    'item_void_stone':      'Void Stone',
+    'item_oblivion_staff':  'Oblivion Staff',
+    'item_hyperstone':      'Hyperstone',
+    'item_blades_of_attack':'Blades of Attack',
+    'item_gloves':          'Gloves of Haste',
+    'item_quelling_blade':  'Quelling Blade',
+    'item_orb_of_venom':    'Orb of Venom',
+    'item_blade_of_alacrity':'Blade of Alacrity',
+    'item_broadsword':      'Broadsword',
+    'item_claymore':        'Claymore',
+    'item_cornucopia':      'Cornucopia',
+    'item_chainmail':       'Chainmail',
+    'item_splintmail':      'Splintmail',
+    'item_helm_of_iron_will':'Helm of Iron Will',
+    'item_ring_of_basilius':'Ring of Basilius',
+    'item_ring_of_regen':   'Ring of Regen',
+    'item_wizard_hat':      'Wizard Hat',
+    'item_energy_booster':  'Energy Booster',
+    'item_point_booster':   'Point Booster',
+    'item_vitality_booster':'Vitality Booster',
+    'item_shawl':           'Shawl',
+    'item_cloak':           'Cloak',
+    'item_headdress':       'Headdress',
+    'item_fluffy_hat':      'Fluffy Hat',
+    'item_talisman_of_evasion':'Talisman of Evasion',
+    'item_staff_of_wizardry':'Staff of Wizardry',
+    'item_chasm_stone':     'Chasm Stone',
+    'item_urn_of_shadows':  'Urn of Shadows',
+    'item_veil_of_discord': 'Veil of Discord',
+    'item_blink':           'Blink Dagger',
+    'item_mask_of_madness': 'Mask of Madness',
+    'item_mask_of_death':   'Morbid Mask',
+}
+
+
+def _item_display_name(slug):
+    """Convert items.json slug ('item_chainmail' → 'Chainmail',
+    'item_bfury' → 'Battle Fury') for use in components rendering."""
+    if slug in ITEM_DISPLAY_OVERRIDES:
+        return ITEM_DISPLAY_OVERRIDES[slug]
+    s = slug[5:] if slug.startswith('item_') else slug
+    return s.replace('_', ' ').title()
+
+
+def _patch_index(version):
+    for i, p in enumerate(RELEASE_HISTORY):
+        if p['version'] == version:
+            return i
+    return None
+
+
+def _prev_patch_version(version):
+    """Return the version that came immediately BEFORE `version` (older).
+    RELEASE_HISTORY is newest-first, so prev = index + 1."""
+    idx = _patch_index(version)
+    if idx is None or idx + 1 >= len(RELEASE_HISTORY):
+        return None
+    return RELEASE_HISTORY[idx + 1]['version']
+
+
+def _get_recipe(item_display, version):
+    """Look up item_recipe_<slug> in items.json for `version`.
+    Returns {'components': [(display, cost), ...], 'recipe_cost': int,
+    'total': int, 'raw_slugs': [slug, ...]} or None if not present."""
+    raw_slug = ITEM_SLUG.get(item_display,
+                              item_display.lower().replace(' ', '_').replace("'", ''))
+    bucket = _STATS_I.get(version, {})
+    recipe_entry = bucket.get(f'item_recipe_{raw_slug}', {})
+    req = recipe_entry.get('ItemRequirements', {}).get('01') if recipe_entry else None
+    recipe_cost = recipe_entry.get('ItemCost', 0) if recipe_entry else 0
+    item_entry = bucket.get(f'item_{raw_slug}', {})
+    total = item_entry.get('ItemCost')
+    if not req or total is None:
+        return None
+    parts = []
+    raw_slugs = []
+    for part in req.split(';'):
+        part = part.strip().rstrip('*')
+        if not part:
+            continue
+        comp_cost = bucket.get(part, {}).get('ItemCost', 0)
+        parts.append((_item_display_name(part), comp_cost))
+        raw_slugs.append(part)
+    return {'components': parts, 'recipe_cost': recipe_cost,
+            'total': total, 'raw_slugs': raw_slugs}
+
+
+def _next_patch_version(version):
+    """Return the version that came immediately AFTER `version`, or None."""
+    idx = _patch_index(version)
+    if idx is None or idx == 0:
+        return None
+    return RELEASE_HISTORY[idx - 1]['version']
+
+
+def auto_components_change(item_display, this_version):
+    """Auto-derive old → new components_change(...) for `item_display`
+    whose recipe changed in patch `this_version`.
+
+    Uses the stats DB: old build from the previous patch, new build from
+    this patch. If `this_version`'s items.json still shows the same recipe
+    as the previous patch (data lag — muk-as commits sometimes capture the
+    state right before the patch propagated), falls back to the next-patch
+    data which captures the settled state.
+    """
+    prev_v = _prev_patch_version(this_version)
+    if not prev_v:
+        return f'<!-- auto_components_change: no prev for {this_version} -->'
+    old = _get_recipe(item_display, prev_v)
+    new = _get_recipe(item_display, this_version)
+    # Walk forward if 'new' equals 'old' (data lag)
+    if old and new and old['raw_slugs'] == new['raw_slugs'] \
+       and old['recipe_cost'] == new['recipe_cost'] \
+       and old['total'] == new['total']:
+        nxt = _next_patch_version(this_version)
+        while nxt:
+            candidate = _get_recipe(item_display, nxt)
+            if candidate and (candidate['raw_slugs'] != old['raw_slugs']
+                              or candidate['recipe_cost'] != old['recipe_cost']
+                              or candidate['total'] != old['total']):
+                new = candidate
+                break
+            nxt = _next_patch_version(nxt)
+    if not old or not new:
+        return (f'<!-- auto_components_change: recipe missing for '
+                f'{item_display} in {prev_v}/{this_version} -->')
+    # Multiset diff: components present in new but not in old → added,
+    # vice versa → removed. Duplicates are preserved (Battle Fury has two
+    # Broadswords; if neither is removed, neither is highlighted).
+    leftover_new = [n for n, _ in new['components']]
+    leftover_old = [n for n, _ in old['components']]
+    for n in list(leftover_new):
+        if n in leftover_old:
+            leftover_old.remove(n)
+            leftover_new.remove(n)
+    added = list(dict.fromkeys(leftover_new))
+    removed = list(dict.fromkeys(leftover_old))
+    # If absolutely nothing changed — components, recipe_cost, total all
+    # identical — refuse to emit a visually empty diff. Caller should not
+    # use `auto_components_change` here (the recipe change is in a sub-
+    # component, not visible at the top level), and should keep the regular
+    # text rows.
+    if (not added and not removed
+            and old['recipe_cost'] == new['recipe_cost']
+            and old['total'] == new['total']):
+        return (f'<!-- auto_components_change: no top-level diff for '
+                f'{item_display} between {prev_v}/{this_version} '
+                f'(sub-component change?) -->')
+    return components_change(
+        old=old['components'],
+        new=new['components'],
+        recipe_old=('Recipe', old['recipe_cost']) if old['recipe_cost'] else None,
+        recipe_new=('Recipe', new['recipe_cost']) if new['recipe_cost'] else None,
+        total_old=old['total'],
+        total_new=new['total'],
+        added=added or None,
+        removed=removed or None,
+    )
 
 
 def components_change(old, new, total_old, total_new,
@@ -2400,27 +2600,34 @@ ul.subnote-items > li::before {
   color: #6e7681;
 }
 
-/* Inline 'Show list (N)' toggle embedded at the end of a sentence inside an
-   ability-row li. Keeps the trigger compact and lets the expanded list sit
-   directly under the sentence, still inside the same ability box. */
+/* Block-level 'Show list (N)' info row that drops to a new line below the
+   sentence inside an ability box. Matches the visual language of
+   subnote-collapse (rotating triangle arrow) but lives inside the box. */
 .show-list-inline {
-  display: inline-block;
-  vertical-align: baseline;
-  margin-left: 4px;
+  display: block;
+  grid-column: 1 / -1;        /* span full li width inside the row grid */
+  margin-top: 6px;
 }
 .show-list-inline > summary {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   list-style: none;
   cursor: pointer;
   color: #8b949e;
   font-size: 12.5px;
-  padding: 1px 6px;
-  border: 1px solid rgba(139, 148, 158, 0.3);
-  border-radius: 4px;
   user-select: none;
 }
 .show-list-inline > summary::-webkit-details-marker { display: none; }
-.show-list-inline > summary:hover { color: #c9d1d9; border-color: rgba(139, 148, 158, 0.55); }
+.show-list-inline > summary::before {
+  content: '\\25B8';           /* ▸ */
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 11px;
+  color: #6e7681;
+  transition: transform 0.15s ease;
+}
+.show-list-inline[open] > summary::before { transform: rotate(90deg); }
+.show-list-inline > summary:hover { color: #c9d1d9; }
 .show-list-inline[open] > summary { color: #c9d1d9; }
 .show-list-inline > .show-list-body {
   display: block;
@@ -6236,9 +6443,9 @@ W(components(('Blade of Alacrity', 1000), ('Broadsword', 1000),
 W(provides('+20 Damage, +12 Agility'))
 W(ul_open())
 W(li("Passive: Splitshot. Ranged Only. Ranged attacks have a 30% chance to fire additional projectiles at up to 2 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("NEW")))
-W(li("Doesn't work with other sources of secondary projectiles from hero abilities"
-     + show_list("Gyrocopter's Flak Cannon", "Medusa's Split Shot", "Muerta's Gunslinger"),
-     t("NEW")))
+W(li("Doesn't work with other sources of secondary projectiles from hero abilities",
+     t("NEW"),
+     extra=show_list("Gyrocopter's Flak Cannon", "Medusa's Split Shot", "Muerta's Gunslinger")))
 W(ul_close())
 W(item_header("Hydras Breath", new="New Armaments Item"))
 W(components(("Specialist's Array", 2550), ('Dragon Lance', 1900), ('Orb of Venom', 350),
@@ -6250,12 +6457,7 @@ W(li("Passive: Polycephaly. Ranged attacks have a 30% chance to fire at up to 3 
 W(li("Similarly to Specialist's Array, doesn't work with other sources of secondary projectiles from hero abilities", t("NEW")))
 W(ul_close())
 W(item_header("Arcane Boots", changed=True))
-W(components_change(
-    old=[("Boots of Speed", 500), ("Ring of Basilius", 425)],
-    recipe_old=("Recipe", 475), total_old=1400,
-    new=[("Boots of Speed", 500), ("Ring of Basilius", 425), ("Wizard Hat", 250)],
-    recipe_new=("Recipe", 325), total_new=1500,
-    added=["Wizard Hat"]))
+W(auto_components_change("Arcane Boots", "7.41"))
 W(ul_open())
 W(li("Now also requires a Wizard Hat (250g)", t("REWORK")))
 W(li("Recipe cost decreased from 475 to 325 " + b(475, 325, l=True) + ". Total cost increased from 1400g to 1500g", b(1400, 1500, l=True)))
@@ -6267,9 +6469,9 @@ W(li("Recipe cost increased from 1125 to 1175 " + b(1125, 1175, l=True) + ". Tot
 W(li("Now also provides +150 Mana", t("NEW")))
 W(li("Mana Regen bonus decreased from +1.5 to +1", b(1.5, 1)))
 W(ul_close())
-W(item_header("Battle Fury"))
+W(item_header("Battle Fury", changed=True))
+W(auto_components_change("Battle Fury", "7.41"))
 W(ul_open())
-W(li("Recipe changed"))
 W(li("Now requires Perseverance (1400) instead of Cornucopia (1200)", t("REWORK")))
 W(li("Recipe cost decreased from 600 to 400 " + b(600, 400, l=True) + ". Total cost unchanged at 3900g", t("MISC")))
 W(ul_close())
@@ -6278,12 +6480,7 @@ W(ul_open())
 W(li("Avatar duration changed from 9/8/7/6s to 9/8/7s", t("REWORK")))
 W(ul_close())
 W(item_header("Blade Mail", changed=True))
-W(components_change(
-    old=[("Chainmail", 550), ("Broadsword", 1000)],
-    recipe_old=("Recipe", 750), total_old=2300,
-    new=[("Splintmail", 950), ("Broadsword", 1000)],
-    recipe_new=("Recipe", 450), total_new=2400,
-    added=["Splintmail"], removed=["Chainmail"]))
+W(auto_components_change("Blade Mail", "7.41"))
 W(ul_open())
 W(li("Now requires Splintmail (950) instead of Chainmail (550)", t("REWORK")))
 W(li("Recipe cost decreased from 750 to 450 " + b(750, 450, l=True) + ". Total cost increased from 2300g to 2400g", b(2300, 2400, l=True)))
@@ -6295,9 +6492,9 @@ W(li("Armor bonus decreased from +8 to +6", b(8, 6)))
 W(li("Guard base damage block rescaled from 70 for all units to 70 on melee heroes and buildings and 45 on ranged heroes", t("REWORK")))
 W(li("Guard max health damage block decreased from 2.2% to 2%", b(2.2, 2)))
 W(ul_close())
-W(item_header("Dagon"))
+W(item_header("Dagon", changed=True))
+W(auto_components_change("Dagon", "7.41"))
 W(ul_open())
-W(li("Recipe changed"))
 W(li("Now requires Point Booster (1200), Wizard Hat (250) and Crown (450) instead of Diadem (1000) and Voodoo Mask (650)", t("REWORK")))
 W(li("Recipe cost unchanged at 1150. Total cost increased from 2800/3950/5100/6250/7400g to 3050/4200/5350/6500/7650g", b([2800, 3950, 5100, 6250, 7400], [3050, 4200, 5350, 6500, 7650], l=True)))
 W(li("No longer provides +15/16/17/18/19% Spell Lifesteal", t("NERF")))
@@ -6350,9 +6547,9 @@ W(li("Now also requires Chasm Stone (800)", t("REWORK")))
 W(li("Recipe cost decreased from 1100 to 400 " + b(1100, 400, l=True) + ". Total cost increased from 4550g to 4650g", b(4550, 4650, l=True)))
 W(li("Area of Effect bonuses from multiple Chasm Stones or its upgrades do not stack", t("MISC")))
 W(ul_close())
-W(item_header("Glimmer Cape"))
+W(item_header("Glimmer Cape", changed=True))
+W(auto_components_change("Glimmer Cape", "7.41"))
 W(ul_open())
-W(li("Recipe changed"))
 W(li("Now requires Shawl (450) instead of Cloak (800)", t("REWORK")))
 W(li("Recipe cost increased from 450 to 800 " + b(450, 800, l=True) + ". Total cost unchanged at 2150g", t("MISC")))
 W(ul_close())
@@ -6365,11 +6562,10 @@ W(item_header("Harpoon"))
 W(ul_open())
 W(li("Draw Forth can now target trees and will pull the caster to it, destroying all trees on the way", t("REWORK")))
 W(ul_close())
-W(item_header("Heaven's Halberd"))
+W(item_header("Heaven's Halberd", changed=True))
+W(auto_components_change("Heaven's Halberd", "7.41"))
 W(ul_open())
-W(li("Recipe changed"))
 W(li("Now requires Talisman of Evasion (1300), Splintmail (950), Ring of Health (700), and a recipe (450). Total cost: 3400g", t("REWORK")))
-W(li("Used to require Vanguard (1700), Crown (450) and a recipe (450). Total cost: 2600g", t("MISC")))
 W(li("Can no longer be disassembled", t("NERF")))
 W(li("No longer provides +275 Health", t("NERF")))
 W(li("Now also provides +9 Armor and +25% Evasion", t("REWORK")))
@@ -6400,9 +6596,9 @@ W(item_header("Lotus Orb"))
 W(ul_open())
 W(li("Can no longer be disassembled", t("NERF")))
 W(ul_close())
-W(item_header("Mage Slayer"))
+W(item_header("Mage Slayer", changed=True))
+W(auto_components_change("Mage Slayer", "7.41"))
 W(ul_open())
-W(li("Recipe changed"))
 W(li("Now requires Perseverance (1400) instead of Cornucopia (1200)", t("REWORK")))
 W(li("Now requires Blades of Attack (450) instead of Gloves of Haste (450)", t("REWORK")))
 W(li("Total cost increased from 2800g to 3100g (change is bigger due to Cloak cost increase)", b(2800, 3100, l=True)))
