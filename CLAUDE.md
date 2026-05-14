@@ -160,6 +160,154 @@ W(ul_close())
 | attack range | AttackRange | False |
 | base damage | AttackDamageMin (avg с Max) | False, is_dmg=True |
 
+## Системные правила (не нарушать)
+
+### Порядок строк внутри `<ul class="changes">` (per-ability)
+
+Канонический порядок `<li>` строк внутри **каждого** `ul_open()`/`ul_close()` блока (= внутри одной способности / talents subgroup / hero-stat ul; сортировщик НЕ пересекает границы способностей):
+
+1. **NEW** (rank 1) — `t("NEW")`
+2. **REWORK** (rank 2) — `t("REWORK")` / raw `badge rework`
+3. **BUFF** (rank 3) — `b()` / `bf()` / `bstat_h()` / `li_formula` с overall=buff, или `t("BUFF")`
+4. **NERF** (rank 4) — numeric с overall=nerf, или `t("NERF")`
+5. **DEL** (rank 5) — `t("DEL")`
+6. **MISC / QoL** (rank 6) — `t("MISC")`, `t("QoL")`
+7. **Untagged** (rank 7) — структурные/описательные строки, остаются в хвосте
+
+**Применяется автоматически** через `_sort_changes_li(html)` (в `save_html()` post-processing) → `_li_rank(li_html)`. Stable sort: внутри одного rank'а порядок исходника сохраняется (обычно Valve KV order). **Вручную переставлять `W(li(...))` не нужно** — пиши в удобном порядке, билд нормализует. Применяется ко всем патчам автоматически (7.08 → текущий).
+
+Скипается для `<ul>` с `class="ability-row"` (Passive:/Active:/Toggle:/Aura: item-описания — там авторский визуальный порядок). `ability_change` panel получает `data-tag="new del rework"` отдельно (это `<div>`, не `<li>`).
+
+### `ability_change(old, new)` — что внутри / что снаружи блока
+
+**Внутри панелей (`old.desc`, `new.desc`)** — только официальное описание способности (как в игре / в KV патча). Без отсебятины типа «Self-buff values nerfed:», «Encouraged X», «Pre-7.41 …».
+
+**Снаружи swap-card** (через `W(ul_open()) / W(li(...)) / W(ul_close())` после `W(ability_change(...))`) — числовые изменения характеристик способности, которые «пережили» реворк: `Bonus Attack Speed decreased from X to Y`, `Cooldown changed from X to Y` и т.п.
+
+**Inline-note к новой механике** — встраивать через `inline_note("...")` прямо в `new.desc=[]` (не через `W(subnote(...))` после блока — это рендерится ВНЕ карточки). Рендерер `_side` детектит ведущий `<div` и вставляет его как есть.
+
+### `ability_change(old, new)` — выбор layout-режима
+
+Логика в `build_patch.py` `ability_change(...)` решает между тремя визуальными режимами по identity и количеству строк:
+
+1. **`is-in-place`** — `old.name == new.name` И иконки совпадают (`slug`/`innate=True` оба). Правая шапка скрывается — показываем только одну (левую). Пример: Lion's To Hell and Back.
+2. **`is-in-place is-new-taller`** — то же, но `len(new.desc) > len(old.desc)`. Правая панель `align-self: start`, без фейкового `padding-top` («много пустого пространства сверху» — баг, который мы зафиксили). Новый body начинается сразу с верха панели, параллельно старой шапке. Примеры: Primal Beast Colossal 7.41, Marci Special Delivery / Bodyguard 7.41.
+3. **`compact-old` / `compact-new`** — разные identity И разница в строках ≥ 2. Меньшая панель центрируется.
+4. **Plain symmetric** — всё остальное, обе шапки видны.
+
+**Правило:** одинаковое имя+иконка → **ВСЕГДА** одна шапка (левая). Не показывать обе. Это явная просьба пользователя.
+
+### `correction-note` фразировка (note_box со stats DB)
+
+- Текст: `"Before this patch it was changed in <PATCH_LINK> (age)"`. Без двоеточия после `in` — это предлог, не лейбл.
+- `<PATCH_LINK>` — клик ведёт на страницу патча (`{ver}.html`). Реализовано через хелпер `_patch_link(version)`. CSS-класс `.patch-link` (color inherit, dotted underline, hover синий).
+- Возраст рендерится через `_format_age(days)`:
+  - `< 365` дней → `"N days ago"`
+  - `>= 365` дней → `"Y years M months ago"` (months скрыт если 0; singular/plural корректно)
+- Лейбл `"Previously:"` — отдельный `<span class="correction-label">`.
+
+### «No longer has a X penalty» — это BUFF, не DEL
+
+Default-эвристика `no longer` → NERF/DEL **не работает** для строк, где удаляется **штраф** (penalty / downside / restriction / limitation). Удаление штрафа = бафф для героя.
+
+Триггер-существительные: `penalty`, `downside`, `restriction`, `limitation`, `damage penalty`, `cost penalty`, `cooldown penalty`. Эвристика в `generate_patch_code.py::_detect_text_tag` уже это спецкейсит.
+
+Контр-примеры (остаются NERF/DEL): «no longer applies slow», «no longer grants invisibility», «removed from the game».
+
+### KV-строки с суффиксом `_info` — это `inline_note`, не отдельный li
+
+В `data/patchnotes_english.txt` Valve явно помечает уточняющие строки суффиксом `_info` (например `_talent_2_info` поясняет содержимое `_talent_2`). Такие строки **никогда** не должны эмититься как отдельный `W(li(..., t("MISC")))` — только как `extra=inline_note(...)` к предыдущей строке.
+
+Реализовано в `generate_patch_code.py` через `_attach_inline_note(out, desc)` для всех hero-веток (`hero_base`, `hero_ability`, `hero_talent`, `spirit_bear`, `spirit_bear_talent`, `general`, `item`). Если у предыдущей li уже есть `extra=inline_note(...)`, новый текст дописывается через `<br>`.
+
+При написании руками: если две KV-строки идут подряд и вторая начинается с уточняющих оборотов («Same behavior as before», «1 X per Y», «Buff Duration: …», «Affects …», «Pressing ALT shows …», «Duration decreased as part of comprehensive Disables Reduction») — это `_info`, прицеплять `extra=inline_note(...)`.
+
+### Иконки-чипы → нужны hover-тултипы (если рядом нет пояснения)
+
+Когда строка показывает список иконок-чипов (предметы, способности, сувениры и т.п.), каждый чип должен нести `data-tooltip="..."` с описанием эффекта, **если** рядом с чипом нет inline-текста, объясняющего что он делает.
+
+- **Тултип нужен**: чип = иконка + имя (Ringmaster Dark Carnival souvenirs — игрок не знает, что делает «Funhouse Mirror»).
+- **Тултип НЕ нужен**: рядом уже есть текст эффекта (раздел **Enchantment Changes** — у каждой чары перечислены бонусы рядом с чипом).
+
+HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.enchant-chip[data-tooltip]::after` уже стилизует popup.
+
+### Pool-style строки («X now consists of A, B, C») → показать kept + removed
+
+Когда патч пишет «новый пул такой-то», текст скрывает что **удалили**. Перед написанием строки грепать прошлые патчи (facet-определения, прошлые пулы) и диффить — определить выпавшие элементы. Рендерить две группы chip'ов: в `inline_note` сначала «In pool:» с оставшимися, потом «Removed:» с выпавшими (с модификатором `.removed` — strike-through + красная рамка + grayscale иконки).
+
+Helper: `souvenir_chip(name, slug, removed=False, tooltip=None)` → `<span class="enchant-chip souvenir-chip">` (pill с рамкой). `removed=True` → opacity 0.55 + grayscale **только на `> img` и `> span`** (НЕ на самом чипе, иначе tooltip popup `::after` тоже затемняется и становится плохо читаемым; явное правило `.removed::after { opacity: 0 }` + `.removed:hover::after { opacity: 1 }` сохраняет видимость подсказки). **Никакого strike-through.** Группы `.souvenir-group` — горизонтальный flex-ряд, разные группы на разных строках (каждая group block-level). Иконки — из `OneDrive/Desktop/panorama/images/spellicons/<slug>_png.png` → копировать в `Sloppy/icons/abilities/<slug>.png`. Пример: Ringmaster Dark Carnival Barker 7.41 (выбросили Crystal Ball + Weighted Pie).
+
+**Фильтр:** если строка структурно REWORK, но содержит удаления (часть пула выпала), передавать `force_tag="rework del"` в `li(...)` — видимый бейдж остаётся REWORK, но строка попадает и в DEL фильтр для пользователей, отслеживающих удаления.
+
+Главный текст строки описывает структурную суть («Souvenir pool unified across both Dark Carnival facets»), не перечисляет имена — это работа `inline_note`.
+
+### Любой "per level" в строке → клик-формула обязательна
+
+Если в строке упоминается per-level scaling (`X + Y per level`, `Xs − Ys per level` и т.п.) — рендерить через `li_formula(...)` (diff old vs new) или `scale_pill(...)` (новая способность без сравнения). Простой `t("MISC")` с текстовой формулой = баг.
+
+```python
+# Diff (старое → новое):
+W(li_formula("Bonus Night Vision changed",
+             "250 + 25 per level up", "225 + 25 per level",
+             lambda L: 250 + 25*L, lambda L: 225 + 25*L,
+             effective_unchanged=True))
+
+# Новая способность (внутри ability_change new=dict(...)):
+_pill, _table = scale_pill("45.75s − 0.75s per level",
+                           lambda L: 45.75 - 0.75 * L,
+                           levels=[1, 5, 10, 15, 20, 25, 30],
+                           value_fmt="{:.2f}s")
+# В desc: "Cooldown: " + _pill + ".",  tables=[_table]
+```
+
+### li_formula с `effective_unchanged=True` → левый тег MISC
+
+`li_formula` авто-вешает REWORK слева по умолчанию. Когда `effective_unchanged=True` — переключается на MISC (семантически нейтральная переформулировка, не структурная переработка). Глобальная строка `"Abilities that had 'per level up' scaling changed to be 'per level'"` тоже MISC, не REWORK.
+
+### "per level up" ≠ "per level" (7.41 rename)
+
+7.41 переименовал механику: `"Abilities that had 'per level up' scaling changed to be 'per level'"`. В `li_formula(...)` для 7.41 изменений вида `"changed from X per level up to Y per level"` — **СТАРАЯ** строка обязана содержать `"per level up"` буквально:
+
+```python
+W(li_formula("Agility Multiplier changed",
+             "0.6 + 0.05 per level up",   # OLD — обязательно "up"
+             "0.55 + 0.05 per level",     # NEW — без "up"
+             lambda L: ..., lambda L: ...,
+             effective_unchanged=True))
+```
+
+Удаление `up` из OLD-строки = семантическая ошибка (переименование механики не отражено). Обычно сочетается с `effective_unchanged=True` + `subnote("Effective values are not changed")`.
+
+### "Effective values are not changed" → `effective_unchanged=True`
+
+Когда патчноут говорит `"Effective values are not changed"` рядом с формульным изменением, передавать в `li_formula(...)` флаг `effective_unchanged=True`. Это подавит вводящий в заблуждение Δ% (формула может буквально различаться по числам, но Valve её перепараметризировала так, что итоговое значение в игре то же).
+
+```python
+W(li_formula("Damage changed",
+             "25 + 2 per level", "23 + 2 per level",
+             lambda L: 25.0 + 2.0 * L, lambda L: 23.0 + 2.0 * L,
+             effective_unchanged=True))
+W(ul_close())
+W(subnote("Effective values are not changed"))
+```
+
+Если `old_fn(L) == new_fn(L)` буквально на всех уровнях (просто другая запись той же формулы), флаг не нужен — старый branch `values_unchanged` уже схлопывает в одну `value` строку автоматически.
+
+### "No longer has a separate value for incoming heal reduction" → MISC
+
+Когда патчноут говорит, что заклинание `no longer has a separate value for incoming heal reduction` — это **MISC**, не DEL. Эффект не удалён, просто переехал в общую Health Restoration систему. Канон (Cold Attack, Soul Release, Pudge Rot и т.д.):
+
+```python
+W(li("X no longer has a separate value for incoming heal reduction", t("MISC"),
+     extra=inline_note("Still reduces incoming heals due to Health Restoration changes")))
+```
+
+Использовать `inline_note` (на той же `<li>`), не отдельный `subnote`.
+
+### Innate ability reworked
+
+Когда патчноут говорит `"Innate ability reworked"` — это **обязательно** `ability_change(...)`, не две плоские `t("MISC")` строки. Старое описание лифтится из патча, который ввёл текущий innate (грепать `hero_innate_<entity>_<ability>` в `patchnotes_english.txt`). Генератор `generate_patch_code.py` теперь пишет `# TODO[innate-rework]:` маркер — никогда не оставлять его в коммите.
+
 ## Предупреждения и подводные камни
 
 - При добавлении нового героя: добавить в `HERO_SLUG` (build_patch.py) И в `load_hero_internal_to_display()` (generate_patch_code.py)

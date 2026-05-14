@@ -388,6 +388,13 @@ def _detect_text_tag(text):
         ' has been deleted', ' have been deleted',
     ]):
         return 'DEL'
+    # "No longer has ... penalty" / "no longer has ... downside" / similar:
+    # removing a downside is a BUFF, not a NERF/DEL. Detect explicit
+    # negative-noun cues near the "no longer" trigger.
+    NEG_REMOVED = ('penalty', 'downside', 'restriction', 'limitation',
+                   'damage penalty', 'cost penalty', 'cooldown penalty')
+    if 'no longer' in t and any(neg in t for neg in NEG_REMOVED):
+        return 'BUFF'
     if any(p in t for p in ['no longer', "can't", 'cannot', "won't be applied",
                              'will no longer']):
         return 'NERF'
@@ -681,6 +688,11 @@ ABILITY_OVERRIDES = {
     'lich_lich_sinister_gaze': 'Sinister Gaze',
     'lina_lina_light_strike_array': 'Light Strike Array',
     'lina_lina_laguna_blade': 'Laguna Blade',
+    # Silencer 7.41: KV slug 'silencer_brain_drain' is internal — in-game
+    # the new innate displays as 'Suffer In Silence' (the old Brain Drain
+    # ability was reworked into the new innate, keeping the engine slug
+    # but rebranding the display name).
+    'silencer_silencer_brain_drain': 'Suffer In Silence',
     'lone_druid_lone_druid_spirit_bear': 'Summon Spirit Bear',
     'lone_druid_lone_druid_spirit_link': 'Spirit Link',
     'lone_druid_lone_druid_savage_roar': 'Savage Roar',
@@ -1026,6 +1038,12 @@ def generate(version):
                         call = stat_call
                 _emit_li(out, desc, call)
             elif t == 'hero_talent':
+                # _info row → attach as inline_note to the previous talent li
+                # (the KV's `_talent_N_info` suffix is Valve's signal that the
+                # row clarifies the talent rather than being a standalone change).
+                if info['is_info']:
+                    _attach_inline_note(out, desc)
+                    continue
                 if last_ability != '__talent__':
                     end_ul()
                     out.append('W(subgroup("Talents"))')
@@ -1034,6 +1052,9 @@ def generate(version):
                 call = parse_value_change(desc)
                 _emit_li(out, desc, call)
             elif t == 'spirit_bear':
+                if info['is_info']:
+                    _attach_inline_note(out, desc)
+                    continue
                 if last_ability != '__spirit_bear__':
                     end_ul()
                     out.append('W(subgroup("Spirit Bear"))')
@@ -1042,6 +1063,9 @@ def generate(version):
                 call = parse_value_change(desc)
                 _emit_li(out, desc, call)
             elif t == 'spirit_bear_talent':
+                if info['is_info']:
+                    _attach_inline_note(out, desc)
+                    continue
                 if last_ability != '__spirit_bear_talent__':
                     end_ul()
                     out.append('W(subgroup("Spirit Bear Talents"))')
@@ -1067,9 +1091,24 @@ def generate(version):
                     out.append(f'W(ability("{_escape(name)}"))')
                     last_ability = ab
                 if info['is_info']:
-                    end_ul()
-                    out.append(f'W(subnote("{_escape(desc)}"))')
+                    _attach_inline_note(out, desc)
+                    continue
                 else:
+                    # Loud marker for innate-rework rows. The phrase
+                    # "Innate ability reworked" alone (no numbers, no
+                    # "replaced with") slips through parse_value_change as
+                    # plain MISC, which loses the swap-pane visual the site
+                    # uses for ability rework. Author must convert this
+                    # ability block to `ability_change(old=..., new=...)`,
+                    # sourcing `old.desc` from the patch where the innate
+                    # was introduced. See build_patch.py Primal Beast 7.41.
+                    if 'innate ability reworked' in desc.lower():
+                        out.append(
+                            '# TODO[innate-rework]: convert this ability to '
+                            'ability_change(old=..., new=...). '
+                            'Pull old.desc from the patch that introduced '
+                            f'{ab}; new.desc = follow-up _2 rows below.'
+                        )
                     start_ul()
                     call = parse_value_change(desc)
                     _emit_li(out, desc, call)
@@ -1090,6 +1129,44 @@ def _emit_li(out, desc, call):
         out.append(f'W({call[len("__FORMULA__:"):]})')
     else:
         out.append(f'W(li("{_escape(desc)}", {call}))')
+
+
+def _attach_inline_note(out, desc):
+    """Attach an `_info` KV row as `extra=inline_note(...)` to the most
+    recent W(li(...)) entry in `out`. Falls back to W(subnote(...)) if no
+    preceding li exists. The KV's `_info` suffix is Valve's explicit signal
+    that the row clarifies a previous change rather than being a standalone
+    one — never emit it as its own li with a tag (would surface as MISC
+    noise in filters)."""
+    note_text = _escape(desc.rstrip())
+    # Walk back to find the last W(li(...)) — skip subgroup() / ability() /
+    # ul_open() / etc. lines.
+    for i in range(len(out) - 1, -1, -1):
+        prev = out[i]
+        if not prev.startswith('W(li(') and not prev.startswith('W(li_formula('):
+            continue
+        # Insert `extra=inline_note("…")` before the closing `))`.
+        # Detect if `extra=` already present — append with <br> separator.
+        if 'extra=inline_note(' in prev:
+            # Splice the new sentence into the existing inline_note text.
+            out[i] = re.sub(
+                r'extra=inline_note\("([^"]*)"\)\)\)$',
+                lambda m: f'extra=inline_note("{m.group(1)}<br>{note_text}")))',
+                prev,
+            )
+        elif 'extra=' in prev:
+            # Existing extra of different kind — fall back to subnote.
+            out.append(f'W(subnote("{note_text}"))')
+        else:
+            # Inject `extra=inline_note(...)` before the outermost `))`.
+            out[i] = re.sub(
+                r'\)\)$',
+                f', extra=inline_note("{note_text}")))',
+                prev,
+            )
+        return
+    # No preceding li found — fall back to subnote.
+    out.append(f'W(subnote("{note_text}"))')
 
 
 def _try_merge_info(out, info_desc):
