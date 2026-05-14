@@ -12689,7 +12689,9 @@ W(ability_change(
 ))
 W(ul_open())
 W(li("Mana Cost decreased from 115 to 50", b(115, 50, l=True)))
-W(li("Cooldown changed from 45s to 45.75s − 0.75s per level", t("BUFF")))
+_, _visage_satg_cd_badge, _ = bf(lambda L: 45.0, lambda L: 45.75 - 0.75 * L,
+                                 "", l=True, value_fmt="{:.2f}s")
+W(li("Cooldown changed from 45s to 45.75s − 0.75s per level", _visage_satg_cd_badge))
 W(ul_close())
 W(ability("Summon Familiars"))
 W(ul_open())
