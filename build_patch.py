@@ -1861,7 +1861,27 @@ def _load_innate_slugs():
 _INNATE_SLUGS = _load_innate_slugs()
 
 # Manual fallback for innates not yet in dotaconstants (rare).
-INNATE_ABILITIES = set()
+# Manual innate-overrides for (hero_slug, ability_display_name) pairs whose
+# resolved CDN slug doesn't match the engine slug used in abilities_slim.json
+# (so the innate auto-detector via _INNATE_SLUGS misses them). Without this
+# the ability() helper renders the icon without the bottom-center innate
+# marker. Discovered via audit cross-referencing every ability() display
+# name against abilities_slim.json's is_innate flag.
+INNATE_ABILITIES = {
+    ("pudge", "Flesh Heap"),
+    ("tidehunter", "Leviathan's Catch"),
+    ("doom_bringer", "Lvl ? Pain"),
+    ("legion_commander", "Outfight Them!"),
+    ("dazzle", "Weave"),
+    ("drow_ranger", "Precision Aura"),
+    ("earth_spirit", "Stone Remnant"),
+    ("enchantress", "Rabble-Rouser"),
+    ("kez", "Switch Discipline"),
+    ("riki", "Backstab"),
+    ("ringmaster", "Dark Carnival Barker"),
+    ("troll_warlord", "Battle Stance"),
+    ("abyssal_underlord", "Invading Force"),
+}
 
 def subgroup(title):
     """Subgroup heading (e.g., 'Stats', 'Abilities', 'Talents', 'Tier 1').
