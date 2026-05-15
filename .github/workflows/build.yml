@@ -19,7 +19,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
 
       - name: Syntax check
         run: python -c "import ast; ast.parse(open('build_patch.py', encoding='utf-8').read())"
