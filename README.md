@@ -27,11 +27,14 @@ data/
   abilities_slim.json     ← ability slug → display name + innate flag
   stats/<version>/        ← npc_heroes.json + items.json + abilities.json per patch
 
-patches/                  ← generated HTML (output of build_patch.py)
 icons/                    ← local mirror of hero, item, ability icons
 docs/                     ← architecture, data format, contribution workflow
 
 index.html                ← landing redirect → latest patch
+
+# Built by build_patch.py and deployed to GitHub Pages by the build
+# workflow. NOT committed to keep .git lean — regenerated on every push:
+patches/*.html            ← per-patch site
 calendar.html             ← chronological patch list
 styles.css / scripts.js   ← standalone CSS/JS for index.html and calendar.html
 ```

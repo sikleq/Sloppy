@@ -8,6 +8,12 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -80,15 +86,31 @@ jobs:
               sys.exit(1)
           PY
 
-      - name: Upload artifacts
+      - name: Stage site for Pages
         if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp calendar.html _site/
+          cp styles.css _site/
+          cp scripts.js _site/
+          cp -r patches _site/
+          cp -r icons _site/
+
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: sloppy-site
-          path: |
-            patches/*.html
-            index.html
-            calendar.html
-            styles.css
-            scripts.js
-          retention-days: 7
+          path: _site
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
