@@ -1,85 +1,138 @@
-# Формат данных и API хелперов
+# Data format and helper API
 
-## Valve KV формат (patchnotes_english.txt)
+## Valve KV format (patchnotes_english.txt)
 
 ```
-"DOTA_Patch_7_41c_item_blink_1"    "Blink Dagger cooldown from 14 to 12"
-"DOTA_Patch_7_41c_axe_1"           "Base armor increased from 2 to 4"
+"DOTA_Patch_7_41c_item_blink_1"               "Blink Dagger cooldown from 14 to 12"
+"DOTA_Patch_7_41c_axe_1"                       "Base armor increased from 2 to 4"
 "DOTA_Patch_7_41c_axe_axe_berserkers_call_1"  "Duration from 2.6/2.8/3/3.2 to 3/3.1/3.2/3.3"
 "DOTA_Patch_7_41c_General_Roshan_Title"        "Roshan"
 ```
 
-Формат ключа: `DOTA_Patch_<ver>_<entity_key>_<index>`
+Key shape: `DOTA_Patch_<ver>_<entity_key>_<index>`.
 
-## Badge хелперы (build_patch.py)
+A few key conventions:
 
-### `b(old, new, l=False)` — числовой бейдж
+- `_info` suffix marks a clarifying row — emit as `inline_note(...)` attached to the previous row, never as a standalone `<li>`.
+- `_title` ends a section header.
+- `hero_innate_<entity>_<ability>` marks innate-ability content.
+
+## Badge helpers
+
+### `b(old, new, l=False)` — numeric badge
+
 ```python
-b(100, 80)           # simple: 80→100 = +25% buff
-b(100, 80, l=True)   # l=True = меньше лучше (cooldown): 80 это buff
-b([100, 110, 120], [110, 120, 130])  # per-level значения
+b(100, 80)              # 80 → 100 = +25% buff
+b(100, 80, l=True)      # lower-is-better (cooldown, mana cost, BAT): 80 = buff
+b([100, 110, 120],
+  [110, 120, 130])      # per-skill-level values
 ```
 
-### `br(old_min, old_max, new_min, new_max, l=False)` — range бейдж
+Overall direction is computed from the **max-rank** delta (last element of the list), which models the late-game state players settle into. Override with `force_tag="buff"` / `"nerf"` / `"rework"` if the heuristic disagrees with the actual gameplay impact.
+
+### `br(old_min, old_max, new_min, new_max, l=False)` — range badge
+
+Compares midpoints. Use for stats expressed as a range (e.g. damage `51-57` → `52-58`).
+
 ```python
-br(45, 51, 47, 53)   # range: midpoint comparison
+br(45, 51, 47, 53)      # midpoint comparison: 48 → 50
 ```
 
-### `bf(old_fn, new_fn, formula_text, levels=None, l=False, ...)` — формульный бейдж
-Возвращает `(trigger, badge, table)` — раскрывающаяся таблица по уровням.
+### `bf(old_fn, new_fn, formula_text, levels=None, l=False, …)` — formula badge
+
+Returns `(trigger_html, badge_html, table_html)`. Builds an expandable per-hero-level table.
+
 ```python
 trigger, badge, table = bf(
-    lambda L: 10 + 2*L,          # old formula
-    lambda L: 8 + 2*L,           # new formula
-    "8% + 2% per level"           # отображаемый текст
+    lambda L: 10 + 2*L,
+    lambda L: 8 + 2*L,
+    "8% + 2% per level",
 )
 W(li("Max damage decreased", badge, extra=table))
 ```
 
-### `t(tag)` — текстовый тег
-```python
-t("BUFF")    # зелёный
-t("NERF")    # красный
-t("REWORK")  # синий
-t("MISC")    # серый
-t("QoL")     # жёлтый
-t("NEW")     # фиолетовый (считается как buff для фильтра)
-```
-
-## HTML-хелперы
+For row-level convenience, use `li_formula(...)`:
 
 ```python
-section("Hero Updates")        # <h2> разделитель
-hero_header("Anti-Mage")       # блок с картинкой героя из CDN
-item_header("Blink Dagger")    # блок с картинкой предмета
-ability("Mana Void")           # <h4> название способности
-subgroup("Talents")            # <h4> подгруппа
-plain_header("Roshan")         # блок без картинки
-ul_open() / ul_close()         # обёртка списка изменений
-li("Mana cost", b(100, 80, l=True))   # строка изменения с бейджем
-subnote("Available at level 6")       # дополнительная заметка
-li_formula(prefix, old_formula, new_formula, old_fn, new_fn)  # формульная строка
+W(li_formula(
+    "Max damage decreased",
+    "10 + 2 per level", "8 + 2 per level",
+    lambda L: 10 + 2*L,
+    lambda L: 8 + 2*L,
+))
 ```
 
-## `l=True` — когда использовать
+### `t(tag)` — text-only tag
 
-| Всегда l=True | Никогда l=True |
+```python
+t("BUFF")    # green
+t("NERF")    # red
+t("REWORK")  # blue
+t("MISC")    # grey
+t("QoL")     # yellow
+t("NEW")     # purple (filters as buff)
+t("DEL")     # red strikethrough (filters as nerf)
+```
+
+## HTML helpers
+
+```python
+section("Hero Updates")                  # <h2> divider
+hero_header("Anti-Mage")                 # entity block with hero icon
+item_header("Blink Dagger")              # entity block with item icon
+ability("Mana Void")                     # <h4> ability heading
+subgroup("Talents")                      # <h4> subgroup
+plain_header("Roshan")                   # entity block without icon
+ul_open() / ul_close()                   # wrap a changes list
+li("Mana cost", b(100, 80, l=True))      # change row with badge
+subnote("Available at level 6")          # supplementary note
+li_formula(prefix, old_fmt, new_fmt,
+           old_fn, new_fn)               # formula row with expandable table
+scale_pill(text, fn, …)                  # standalone formula pill (no comparison)
+ability_change(old=…, new=…, summary=…,
+               tag=…)                    # 2-pane before/after swap
+aghs_line(text, kind="scepter"|"shard")  # Aghanim's upgrade row inside ability_change
+inline_note(text)                        # ↳ hanging note attached to a li / desc
+```
+
+## `l=True` cheat-sheet
+
+| Always `l=True` | Never `l=True` |
 |---|---|
 | cooldown | damage |
 | mana cost / manacost | heal |
 | cast point | range |
-| channel time | duration (обычно) |
+| channel time | duration (usually) |
 | gold cost | HP |
 | recharge time | move speed |
-| penalty | strength/agi/int |
+| penalty | strength / agility / intelligence |
+| Base Attack Time (BAT) | HP / mana / armor (as values) |
 
-## TAG_OVERRIDES (generate_patch_code.py)
+Exception: talent values like `X Cooldown Reduction`, `X Mana Cost Reduction`, `Cooldown Advance` — these are **benefit values** (bigger reduction = better) and must **not** carry `l=True`.
 
-Ручные переопределения автодетекта тегов:
+## `bstat_h(hero, field, before_patch, delta, l=False)`
+
+Resolves a hero base-stat change against the named patch's snapshot in `data/stats/<before_patch>/heroes.json`. Returns the actual `+N%` badge instead of a text tag. Falls back to `t("BUFF")` / `t("NERF")` if the stat isn't in the DB.
+
+```python
+W(li(
+    "Base Intelligence increased by 1",
+    bstat_h("Abaddon", "AttributeBaseIntelligence", "7.41b", 1),
+    extra=note_box(hero="Abaddon", field="AttributeBaseIntelligence", before_patch="7.41b"),
+))
+```
+
+`note_box(...)` renders the `Previously: <patch link> (age)` correction line.
+
+## `TAG_OVERRIDES` (generate_patch_code.py)
+
+Manual overrides for the autodetector's tag guesses:
+
 ```python
 TAG_OVERRIDES = {
     "Avatar now has a fixed duration": "NERF",
-    "Aghanim's Scepter no longer makes activation faster": None,  # без бейджа
+    "Aghanim's Scepter no longer makes activation faster": None,  # no badge
 }
 ```
-Добавлять когда `generate_patch_code.py` неверно угадывает тег.
+
+Add entries when the autodetector mislabels a row consistently across patches.

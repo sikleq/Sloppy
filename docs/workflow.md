@@ -1,72 +1,85 @@
-# Воркфлоу: добавить новый патч
+# Workflow: adding a new patch
 
-## Шаг 1 — Получить данные Valve
+## Step 1 — Pull Valve's data
 
-1. Скачать KV-файл патчноутов от Valve (обычно есть на GitHub или Dota 2 VPK)
-2. Положить в `data/patchnotes_english.txt` (заменив или добавив новую версию)
-3. При наличии русского перевода — в `data/patchnotes_russian.txt`
+1. Download the patch's KV file from Valve (usually surfaces on GitHub or via the Dota 2 VPK).
+2. Drop it into `data/patchnotes_english.txt` (replace existing or append new version).
+3. If there's a Russian translation, drop into `data/patchnotes_russian.txt`.
 
-## Шаг 2 — Сгенерировать шаблон кода
+## Step 2 — Generate the scaffold
 
 ```bash
 python generate_patch_code.py 7.42
 ```
 
-Создаст `_generated_p_7.42.py` — Python-код с вызовами `W(li(...))`, `W(hero_header(...))` и т.д.
+Writes `_generated_p_7.42.py` containing `W(li(...))`, `W(hero_header(...))`, etc. calls extracted from the KV.
 
-Что нужно проверить в сгенерированном файле:
-- Теги (BUFF/NERF/REWORK) — автодетект ошибается ~10-20% случаев
-- `l=True` флаги — проверить для cooldown/mana cost строк
-- Формульные изменения — `bf()` вызовы требуют правильных лямбд
-- Новые герои/предметы которых нет в словарях
+Manually review:
 
-## Шаг 3 — Интегрировать в build_patch.py
+- **Tag detection** is right ~80% of the time. Re-tag rows where the autodetector picked the wrong direction.
+- **`l=True` placement** on cooldown / mana cost / BAT / penalty rows.
+- **Formula rows** — `bf()` / `li_formula()` calls need accurate lambdas.
+- **New heroes / items / abilities** missing from `HERO_SLUG` / `ITEM_SLUG`.
 
-1. Открыть `build_patch.py`
-2. Найти секцию текущего патча (комментарий `# ===== PATCH 7.41c =====`)
-3. Добавить секцию нового патча, вставить код из `_generated_p_7.42.py`
-4. Поправить вручную ошибочные теги и флаги
+## Step 3 — Integrate into build_patch.py
 
-## Шаг 4 — Добавить новых героев/предметы (если есть)
+1. Open `build_patch.py`.
+2. Find the current-patch section (comment `# ===== PATCH 7.41c =====`).
+3. Add a new section for the next version, paste the reviewed code from `_generated_p_7.42.py`.
+4. Hand-fix any remaining tag / flag issues.
 
-Если в патче новый герой:
+## Step 4 — Register new entities
+
+New hero:
+
 ```python
-# В build_patch.py: HERO_SLUG
+# build_patch.py — HERO_SLUG
 "New Hero": "new_hero_slug",
 
-# В generate_patch_code.py: load_hero_internal_to_display()
+# generate_patch_code.py — load_hero_internal_to_display()
 'new_hero_slug': 'New Hero',
 ```
 
-Если новый предмет:
+New item:
+
 ```python
-# В build_patch.py: ITEM_SLUG
+# build_patch.py — ITEM_SLUG
 "New Item": "new_item_slug",
-# generate_patch_code.py читает ITEM_SLUG из build_patch.py автоматически
 ```
 
-## Шаг 5 — Собрать и проверить
+`generate_patch_code.py` reads `ITEM_SLUG` from `build_patch.py` automatically.
+
+## Step 5 — Build and verify
 
 ```bash
-python build_patch.py > 7.42.html
+python build_patch.py
 ```
 
-Открыть `7.42.html` в браузере и проверить:
-- Фильтры (BUFF / NERF / ALL) работают
-- Формульные таблицы раскрываются
-- Картинки героев/предметов загружаются (CDN URL)
-- Нет Python ошибок при запуске
+Open the regenerated `patches/7.42.html` and confirm:
 
-## Шаг 6 — Деплой
+- Filters (BUFF / NERF / NEW / DEL / REWORK / MISC / QoL) hide and show the right rows.
+- Per-level formula tables expand on click.
+- Hero / item / ability icons load (404s fall back to the generic innate marker via `onerror`).
+- No Python exceptions on the build run.
 
-Загрузить `7.42.html` туда где хостишь сайт.
-Обновить ссылку в `index.html` если нужно.
+## Step 6 — Audit
 
-## Типичные ошибки
+```bash
+python check_icons.py
+```
 
-| Ошибка | Причина |
+Walks `_ability_icons.txt` and reports any URLs that don't resolve on Valve CDN. Missing icons aren't fatal — they fall back gracefully — but the report tells you which slugs to monitor.
+
+## Step 7 — Deploy
+
+Push to `main`. GitHub Pages serves `https://sikleq.github.io/Sloppy/`. The `build` workflow (`.github/workflows/build.yml`) re-runs `python build_patch.py` on every push and fails the build if syntax / audits regress.
+
+## Common errors
+
+| Error | Cause |
 |---|---|
-| `KeyError` в `t()` | Неизвестный тег, проверь значение TAG_OVERRIDES |
-| Картинка 404 | Неверный slug в HERO_SLUG/ITEM_SLUG, проверь CDN |
-| Фильтр не работает | Забыл `data-tag` атрибут в `li()`, проверь бейдж |
-| Таблица не раскрывается | `bf()` не вернул table в `extra=table` |
+| `KeyError` in `t()` | Unknown tag — check the value against `TAG_OVERRIDES` |
+| Icon 404 (in the page) | Wrong slug in `HERO_SLUG` / `ITEM_SLUG`, or Valve hasn't added the icon yet |
+| Filter doesn't match the row | `data-tag` attribute missing or wrong — check the badge call |
+| Formula table doesn't expand | `bf()` didn't return the table to `extra=table` in `li()` |
+| BAT row shows wrong direction | Missing `l=True` on `b(old, new)` |

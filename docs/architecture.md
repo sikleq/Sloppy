@@ -1,47 +1,59 @@
-# Архитектура Sloppy
+# Architecture
 
-## Схема данных
+## Data flow
 
 ```
 data/patchnotes_english.txt   (Valve KV)
         ↓
-generate_patch_code.py        (парсер → Python-код)
+generate_patch_code.py        (parser → Python helper calls)
         ↓
-_generated_p_<version>.py     (промежуточный файл, ревьюится вручную)
+_generated_p_<version>.py     (intermediate, reviewed by hand)
         ↓
-build_patch.py                (интегрируется вручную + CSS + JS + хелперы)
+build_patch.py                (integrated by hand + CSS + JS + helpers)
         ↓
-7.41c.html                    (финальный сайт)
+patches/<version>.html        (final site output)
 ```
 
-## build_patch.py — содержимое
+## build_patch.py — top-to-bottom layout
 
-Файл построен по секциям сверху вниз:
-
-| Секция | Что делает |
+| Section | Purpose |
 |---|---|
-| CDN-константы | URL для картинок героев/предметов/способностей |
-| HERO_SLUG / ITEM_SLUG | Маппинг отображаемых имён → CDN-слаги |
-| Градиент-хелперы | `gradient_class()`, `b()`, `br()`, `bf()`, `t()` |
-| HTML-хелперы | `hero_header()`, `item_header()`, `section()`, `ability()`, `li()`, `subnote()` |
-| CSS (строка) | Весь CSS сайта в Python-строке `CSS = """..."""` |
-| JS (строка) | Весь JS сайта в Python-строке `SCRIPT = """..."""` |
-| Scaffold | `W()` writer, HTML-обёртка, nav, фильтры |
-| Контент патча | Секции General / Items / Heroes с вызовами хелперов |
+| CDN constants | URLs for hero / item / ability icons |
+| `HERO_SLUG` / `ITEM_SLUG` | Display-name → CDN-slug maps |
+| Gradient helpers | `gradient_class()`, `b()`, `br()`, `bf()`, `t()` |
+| HTML helpers | `hero_header()`, `item_header()`, `section()`, `ability()`, `li()`, `subnote()` |
+| `CSS` string | Entire site CSS embedded as a Python string |
+| `JS_TEXT` string | Entire site JS embedded as a Python string |
+| Scaffold | `W()` writer, HTML wrapper, top nav, filter chrome |
+| Patch content | One section per version with calls to the helpers |
 
-## generate_patch_code.py — как работает
+The result of running `python build_patch.py` is one HTML file per patch (under `patches/`) plus `styles.css`, `scripts.js`, `calendar.html`, and `_ability_icons.txt`.
 
-1. Читает `data/patchnotes_english.txt`
-2. Ищет строки вида `"DOTA_Patch_7_41c_<ключ>" "<значение>"`
-3. `parse_key()` — разбирает ключ на тип (герой/предмет/general/etc.) и entity
-4. `parse_value_change()` — пытается извлечь "from X to Y", формулу, range, или угадывает тег
-5. Выдаёт Python-строки типа `W(li("Mana cost reduced from 100 to 80", b(100, 80, l=True)))`
-6. Пишет в `_generated_p_<version>.py`
+## generate_patch_code.py
 
-## Как CSS и JS попадают в HTML
+1. Reads `data/patchnotes_english.txt`.
+2. Greps for `"DOTA_Patch_7_41c_<key>" "<value>"` lines.
+3. `parse_key()` decomposes the key into entity type (hero / item / general / etc.) and target entity.
+4. `parse_value_change()` tries to extract `from X to Y`, formula, range, or guesses the tag from text patterns.
+5. Emits Python lines like `W(li("Mana cost reduced from 100 to 80", b(100, 80, l=True)))`.
+6. Writes to `_generated_p_<version>.py`.
 
-В конце `build_patch.py` есть функция-scaffold которая:
-- пишет `<style>{CSS}</style>` напрямую в HTML
-- пишет `<script>{SCRIPT}</script>` напрямую в HTML
+The autodetector is right ~80% of the time. Tag classification, `l=True` placement, and per-level formula extraction need human review before integration.
 
-Поэтому `styles.css` и `scripts.js` в репо — **отдельные standalone файлы** (для других страниц типа index.html), не связаны с генерируемыми патч-страницами.
+## How CSS / JS reach the HTML
+
+Patch pages embed `<style>{CSS}</style>` and load `<script src="../scripts.js"></script>` from the standalone `scripts.js` file at the repo root.
+
+The standalone `styles.css` and `scripts.js` at the repo root serve `index.html` and `calendar.html` directly; the same JS source is written from the `JS_TEXT` Python string in `build_patch.py` so editing happens in one place.
+
+## Stats DB
+
+`data/stats/<version>/` holds the relevant subset of `npc_heroes.txt` and `items.txt` parsed into JSON. Coverage is from 7.33 onward (source: muk-as/DOTA2_CLIENT). Pre-7.33 patches fall back to text-tag rendering without a numeric badge.
+
+Key fields:
+
+- `heroes.json`: `ArmorPhysical`, `AttackDamageMin`/`Max`, `AttackRate`, `MovementSpeed`, `AttackRange`, `AttributeBaseStrength`/`Agility`/`Intelligence`, `Attribute*Gain`, `StatusHealth`/`Mana`/`HealthRegen`/`ManaRegen`.
+- `items.json`: `ItemCost`, `ItemCooldown`, `AbilityManaCost`, `ItemRequirements`, `ItemRecipe`, `ItemResult`.
+- `abilities.json`: neutral creep abilities only (hero abilities live elsewhere).
+
+`bstat_h(hero, field, before_patch, delta)` resolves a base-stat change against the named patch's snapshot and renders the actual `+N%` badge instead of a generic BUFF / NERF tag.
