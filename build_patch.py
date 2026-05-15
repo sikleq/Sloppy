@@ -272,7 +272,89 @@ ITEM_SLUG = {
     "Sange and Yasha": "sange_and_yasha",
     "Sange": "sange",
     "Meteor Hammer": "meteor_hammer",
-    "Mage Slayer": "mage_slayer",
+    "Abyssal Blade": "abyssal_blade",
+    "Aeon Disk": "aeon_disk",
+    "Arcane Boots": "arcane_boots",
+    "Ash Legion Shield": "ash_legion_shield",
+    "Black King Bar": "black_king_bar",
+    "Blade Mail": "blade_mail",
+    "Bloodthorn": "bloodthorn",
+    "Chainmail": "chainmail",
+    "Chasm Stone": "chasm_stone",
+    "Chipped Vest": "chipped_vest",
+    "Cloak": "cloak",
+    "Cloak of Flames": "cloak_of_flames",
+    "Conjurer's Catalyst": "conjurers_catalyst",
+    "Consecrated Wraps": "consecrated_wraps",
+    "Cornucopia": "cornucopia",
+    "Crimson Guard": "crimson_guard",
+    "Crippling Crossbow": "crippling_crossbow",
+    "Dagger of Ristul": "dagger_of_ristul",
+    "Dagon": "dagon",
+    "Dandelion Amulet": "dandelion_amulet",
+    "Demonicon": "demonicon",
+    "Dragon Lance": "dragon_lance",
+    "Enchanted Mango": "enchanted_mango",
+    "Enchanter's Bauble": "enchanters_bauble",
+    "Eternal Shroud": "eternal_shroud",
+    "Ethereal Blade": "ethereal_blade",
+    "Faerie Fire": "faerie_fire",
+    "Foragers Kit": "foragers_kit",
+    "Force Staff": "force_staff",
+    "Guardian Greaves": "guardian_greaves",
+    "Gunpowder Gauntlets": "gunpowder_gauntlets",
+    "Hand of Midas": "hand_of_midas",
+    "Harmonizer": "harmonizer",
+    "Heavy Blade": "heavy_blade",
+    "Holy Locket": "holy_locket",
+    "Hurricane Pike": "hurricane_pike",
+    "Hydras Breath": "hydras_breath",
+    "Idol of Screeauk": "idol_of_screeauk",
+    "Jidi Pollen Bag": "jidi_pollen_bag",
+    "Kaya": "kaya",
+    "Kaya and Sange": "kaya_and_sange",
+    "Lotus Orb": "lotus_orb",
+    "Mask of Madness": "mask_of_madness",
+    "Medallion of Courage": "medallion_of_courage",
+    "Mekansm": "mekansm",
+    "Metamorphic Mandible": "metamorphic_mandible",
+    "Minotaur Horn": "minotaur_horn",
+    "Monkey King Bar": "monkey_king_bar",
+    "Nullifier": "nullifier",
+    "Oblivion Staff": "oblivion_staff",
+    "Orb of Corrosion": "orb_of_corrosion",
+    "Orb of Frost": "orb_of_frost",
+    "Partisans Brand": "partisans_brand",
+    "Pavise": "pavise",
+    "Phase Boots": "phase_boots",
+    "Possessed Mask": "possessed_mask",
+    "Prophets Pendulum": "prophets_pendulum",
+    "Radiance": "radiance",
+    "Rattlecage": "rattlecage",
+    "Refresher": "refresher",
+    "Refresher Shard": "refresher_shard",
+    "Revenants Brooch": "revenants_brooch",
+    "Riftshadow Prism": "riftshadow_prism",
+    "Ring of Health": "ring_of_health",
+    "Searing Signet": "searing_signet",
+    "Seeds of Serenity": "seeds_of_serenity",
+    "Serrated Shiv": "serrated_shiv",
+    "Shawl": "shawl",
+    "Skadi": "skadi",
+    "Solar Crest": "solar_crest",
+    "Spellslinger": "spellslinger",
+    "Spider Legs": "spider_legs",
+    "Splintmail": "splintmail",
+    "Stonefeather Satchel": "stonefeather_satchel",
+    "Stormcrafter": "stormcrafter",
+    "Tranquil Boots": "tranquil_boots",
+    "Veil of Discord": "veil_of_discord",
+    "Void Stone": "void_stone",
+    "Voodoo Mask": "voodoo_mask",
+    "Weighted Dice": "weighted_dice",
+    "Whisper of the Dread": "whisper_of_the_dread",
+    "Wizard Hat": "wizard_hat",
+    "Yasha and Kaya": "yasha_and_kaya",
 }
 
 
@@ -1144,7 +1226,7 @@ def components_change(old, new, total_old, total_new,
             f'</div>')
 
 
-def aghs_line(text, kind="scepter"):
+def aghs_line(text, kind="scepter", inline_note_text=None):
     """Aghanim's Scepter/Shard upgrade row — full-width light-blue stripe
     with the canonical glyph from `icons/stats/aghs_<kind>_icon.png` prepended.
     Visually matches the existing `ul.changes li.aghanim-scepter/shard` rows
@@ -1152,9 +1234,16 @@ def aghs_line(text, kind="scepter"):
 
     `kind` is "scepter" (default) or "shard". Returns a full row div
     (`.ability-change-row.aghanim-<kind>`) — pass it as one of the `desc=[…]`
-    items in `ability_change(...)`."""
+    items in `ability_change(...)`.
+
+    `inline_note_text`: optional clarification rendered as a ↳ inline-note
+    inside the same row, below the main text. Use for edge-case semantics
+    that explain the upgrade (e.g. "Invisibility is not shared between
+    Visage and each familiar")."""
+    note = (f'<div class="inline-note">{inline_note_text}</div>'
+            if inline_note_text else '')
     return (f'<div class="ability-change-row aghanim-{kind}">'
-            f'<span class="aghanim-marker {kind}"></span>{text}</div>')
+            f'<span class="aghanim-marker {kind}"></span>{text}{note}</div>')
 
 
 def aghs_shard_line(text):
@@ -1191,7 +1280,7 @@ def scale_pill(formula_text, fn, levels=None, value_fmt="{:g}",
     return trigger, table
 
 
-def ability_change(old, new):
+def ability_change(old, new, summary=None, tag=None):
     """Two-pane ability swap visual (one ability removed, another added) —
     same visual idiom as components_change but for abilities. Each side is
     a dict:
@@ -1201,7 +1290,23 @@ def ability_change(old, new):
       innate   : optional bool — if no slug/url, falls back to INNATE_ICON_URL
       desc     : list of strings (HTML allowed); each rendered as one row
       tables   : optional list of table-HTML appended to the body (use
-                 scale_pill's `table` return value)"""
+                 scale_pill's `table` return value)
+
+    Optional unified-header mode:
+      summary : str — annotation rendered below the unified header title
+                (e.g. "New innate ability (now also has its own icon).").
+      tag     : "new" or "rework" — badge chip in the header.
+
+    When `summary` or `tag` is provided, switches to a unified layout:
+      [icon]  OldName → NewName            [NEW/REWORK]
+              "summary text"
+      ┌────────────────┬────────────────┐
+      │ old desc body  │ new desc body  │   (no per-pane heads)
+      └────────────────┴────────────────┘
+
+    The icon comes from `new` (or `old` if `new` has no real icon and
+    fallback would just be the generic innate marker). When `old.name ==
+    new.name`, the arrow is hidden and only one name is shown."""
     out = _close_ability_block()
     # Consume the "auto-emit Other header for the first ul after hero_header"
     # flag — ability_change IS the first ability content for this hero, so the
@@ -1257,7 +1362,9 @@ def ability_change(old, new):
     # mode — a 1-row difference (e.g. 2 vs 3) isn't enough empty space to
     # justify centering one pane and looks odd: the smaller pane appears
     # offset rightward from the subgroup header above.
-    if not in_place and abs(_old_rows - _new_rows) >= 2:
+    unified = (summary is not None) or (tag is not None)
+
+    if not in_place and not unified and abs(_old_rows - _new_rows) >= 2:
         compact_side = 'old' if _old_rows < _new_rows else 'new'
     else:
         compact_side = None
@@ -1287,9 +1394,11 @@ def ability_change(old, new):
         )
         # In-place rework: skip the right pane's redundant header so only
         # the description body shows on the new side.
+        # Unified mode: skip BOTH per-pane heads (names + icon live in the
+        # single top-level header above the panes).
         head_html = (
             ''
-            if in_place and kind == 'new'
+            if unified or (in_place and kind == 'new')
             else (
                 f'<div class="ability-change-head">'
                 f'<div class="ability-change-icon-wrap">'
@@ -1320,6 +1429,135 @@ def ability_change(old, new):
         extra_cls = ' compact-old'
     elif compact_side == 'new':
         extra_cls = ' compact-new'
+
+    # Unified-header layout: renders as a regular ability-block (icon, title,
+    # one tag+summary row) with the swap panes inside its body. Visually
+    # matches how a regular ability (e.g. March of the Machines) is structured
+    # — icon in the same place, tag in the same place, title in the same
+    # place (with `Old → New` instead of single name).
+    if unified:
+        # Auto-emit Abilities subgroup before the first ability content
+        # for this hero (mirrors the ability() helper).
+        _State.next_ul_is_hero_stats = False
+        if _State.current_hero and not _State.seen_abilities_subgroup:
+            # Override the earlier-emitted subgroup-header (we emitted one at
+            # the top of this function for the legacy layout — drop it here
+            # because the unified layout owns its own).
+            out = ''
+            out += '<h4 class="subgroup">Abilities</h4>'
+            _State.seen_abilities_subgroup = True
+        # Icon: prefer new side's (front). Old side becomes back-layer when
+        # icons differ; hover swaps z-index so the old icon flips to front.
+        unified_icon = _new_icon
+        is_innate = bool(new.get("innate"))
+        old_is_innate = bool(old.get("innate"))
+        has_old_underlay = (_old_icon != _new_icon)
+        # Innate marker on the NEW icon — visible by default, hidden on hover
+        # when an old underlay exists (so the old icon's own marker takes over).
+        # Skip the marker when the icon already IS the generic innate icon
+        # (would just stack the same image on itself).
+        new_marker_html = (
+            f'<img src="{INNATE_ICON_URL}" alt="" '
+            f'class="innate-marker innate-marker-new" title="Innate ability">'
+            if is_innate and _new_icon != INNATE_ICON_URL else ''
+        )
+        # Innate marker on the OLD icon — hidden by default, shown on hover.
+        # Only rendered when there's an underlay to swap with AND old is innate
+        # AND old has a real icon distinct from the generic innate icon.
+        old_marker_html = (
+            f'<img src="{INNATE_ICON_URL}" alt="" '
+            f'class="innate-marker innate-marker-old" title="Innate ability">'
+            if (has_old_underlay and old_is_innate
+                and _old_icon != INNATE_ICON_URL) else ''
+        )
+        on_err = (
+            "this.onerror=function(){this.style.display='none'};"
+            "var m=this.parentElement.querySelector('.innate-marker-new');"
+            "if(m)m.style.display='none';"
+            f"this.src='{INNATE_ICON_URL}';"
+        )
+        old_underlay_html = ''
+        if has_old_underlay:
+            old_on_err = (
+                "this.onerror=function(){this.style.display='none'};"
+                f"this.src='{INNATE_ICON_URL}';"
+            )
+            old_underlay_html = (
+                f'<img src="{_old_icon}" alt="" '
+                f'class="ability-icon-old-underlay" loading="lazy" '
+                f'onerror="{old_on_err}">'
+            )
+        wrap_cls = 'ability-icon-wrap'
+        if has_old_underlay:
+            wrap_cls += ' has-old-underlay'
+        icon_html = (
+            f'<div class="{wrap_cls}">'
+            f'{old_underlay_html}'
+            f'<img src="{unified_icon}" alt="{new["name"]}" '
+            f'class="ability-icon-img" loading="lazy" onerror="{on_err}">'
+            f'{new_marker_html}'
+            f'{old_marker_html}'
+            f'</div>'
+        )
+        same_name = old["name"] == new["name"]
+        if same_name:
+            title_inner = new["name"]
+        else:
+            title_inner = (
+                f'<span class="ability-title-old">{old["name"]}</span>'
+                f'<span class="ability-title-arrow">→</span>'
+                f'<span class="ability-title-new">{new["name"]}</span>'
+            )
+        title_html = f'<h4 class="ability-title">{title_inner}</h4>'
+        # Tag badge: NEW or REWORK row with the summary text.
+        tag_key = (tag or '').lower()
+        if tag_key not in ('new', 'rework'):
+            tag_key = 'new'
+        tag_label = tag_key.upper()
+        summary_row = (
+            f'<ul class="changes ability-change-summary-ul">'
+            f'<li data-tag="{tag_key}">'
+            f'<span class="badge {tag_key}" data-tag="{tag_key}">{tag_label}</span>'
+            f'<span class="row-text">{summary or ""}</span>'
+            f'</li>'
+            f'</ul>'
+        )
+        # Open the ability-block; leave it open so subsequent unrelated
+        # content (next W(ability(...)) or W(ul_open()) for outside-the-swap
+        # numeric rows) auto-closes it via _close_ability_block().
+        _State.ability_block_open = True
+        block_cls = 'ability-block ability-change-block'
+        if is_innate:
+            block_cls += ' is-innate'
+        # Visual connector: a thin curve from icon's bottom-center going
+        # down then right, landing near the horizontal center of the old
+        # pane. Hints that the swap panes are derived from the icon above.
+        connector_html = (
+            '<svg class="ability-change-connector" '
+            'viewBox="0 0 100 100" preserveAspectRatio="none" '
+            'aria-hidden="true">'
+            '<path d="M 0 0 Q 0 60 60 80" fill="none" '
+            'stroke="rgba(139, 148, 158, 0.45)" stroke-width="1.3" '
+            'stroke-dasharray="3 3" stroke-linecap="round" />'
+            '</svg>'
+        )
+        panes_html = (
+            f'<div class="ability-change unified-panes{extra_cls}" '
+            f'data-tag="new del rework">'
+            f'{_side(old, "old")}'
+            f'<span class="ability-change-arrow">→</span>'
+            f'{_side(new, "new")}'
+            f'</div>'
+        )
+        return out + (
+            f'<div class="{block_cls}">'
+            f'{icon_html}'
+            f'{title_html}'
+            f'{summary_row}'
+            f'{connector_html}'
+            f'{panes_html}'
+        )
+
     return out + (
         # data-tag="new del rework" — a swap represents simultaneously a
         # removal, an addition, and a structural rework, so all three filters
@@ -3346,6 +3584,131 @@ ul.changes li.ability-row-end {
   min-width: 0;
 }
 .ability-change-row { padding: 4px 0; line-height: 1.45; }
+/* Unified ability-change layout: renders as a regular ability-block (icon
+   + title + tag/summary row) with the swap panes inside the block body.
+   Title shows `Old → New` when names differ. The block visually matches
+   any other ability section on the page. */
+.ability-change-block .ability-title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.ability-change-block .ability-title-old {
+  opacity: 0.55;
+}
+.ability-change-block .ability-title-arrow {
+  font-weight: 700;
+  opacity: 0.7;
+  padding: 0 1px;
+}
+.ability-change-block .ability-title-new {
+  /* Inherits the normal title color/weight from .ability-title. */
+}
+.ability-change-summary-ul {
+  margin-bottom: 6px;
+}
+.ability-change-block {
+  position: relative;
+}
+/* Connector curve from the icon's bottom-center down-right toward the
+   centre of the old pane — visual cue that the swap panes belong to
+   the icon above. Sized to bridge the gap between the icon (col 1) and
+   the old pane (column 1 of the unified-panes sub-grid in col 2). */
+.ability-change-block > .ability-change-connector {
+  position: absolute;
+  /* Real position + size set by drawAbilityChangeConnectors() JS at load
+     and on resize so the curve tracks live layout. Defaults below cover
+     the whole block until JS fires; overflow:visible so any temporary
+     pre-JS render isn't clipped. */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+.ability-change-block .ability-change.unified-panes {
+  margin-top: 4px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+/* When one pane is meaningfully shorter than the other, vertically center
+   its content against the taller pane instead of stretching empty space
+   below it. `align-items: center` on the grid (above) achieves this by
+   default; the shorter pane sizes to its content. */
+.ability-change-block .ability-change.unified-panes > .ability-change-pane {
+  align-self: center;
+  padding: 0 4px;
+}
+/* Old-icon underlay: when an ability_change unified block has a different
+   icon for old vs new, both icons fully overlap inside the same 48px wrap.
+   New is on top by default. Hovering the wrap shuffles them — old comes
+   to front, new drops behind — solitaire-style. Innate-marker on each
+   side follows its own icon's z-order. */
+.ability-icon-wrap.has-old-underlay {
+  position: relative;
+  cursor: pointer;
+  perspective: 600px;
+}
+.ability-icon-wrap.has-old-underlay > .ability-icon-old-underlay,
+.ability-icon-wrap.has-old-underlay > .ability-icon-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  /* Solid backing so transparent PNGs (e.g. generic innate_icon.png used
+     as an underlay when the old ability had no real icon) still render as
+     a proper square with border instead of looking see-through. */
+  background: #0e1116;
+  box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.4);
+  display: block;
+  transition: transform 0.32s cubic-bezier(0.42, 0, 0.16, 1.1),
+              opacity 0.22s ease,
+              z-index 0s linear 0.16s;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+.ability-icon-wrap.has-old-underlay > .ability-icon-old-underlay {
+  z-index: 1;
+}
+.ability-icon-wrap.has-old-underlay > .ability-icon-img {
+  z-index: 2;
+}
+/* Solitaire shuffle on hover: front icon glides out to the right and tilts
+   slightly while the back icon emerges from the left, tilts the opposite
+   way, and lands on top. */
+.ability-icon-wrap.has-old-underlay:hover > .ability-icon-img {
+  transform: translateX(7px) rotate(6deg);
+  z-index: 1;
+}
+.ability-icon-wrap.has-old-underlay:hover > .ability-icon-old-underlay {
+  transform: translateX(-3px) rotate(-3deg);
+  z-index: 3;
+}
+/* Innate-marker swap: new's marker visible by default, hidden on hover;
+   old's marker hidden by default, visible on hover. Z-index pinned above
+   both icons so the golden marker never hides behind a card. */
+.ability-block > .ability-icon-wrap.has-old-underlay > .innate-marker {
+  z-index: 5;
+  transition: opacity 0.18s ease;
+}
+.ability-block > .ability-icon-wrap.has-old-underlay > .innate-marker-old {
+  opacity: 0;
+  pointer-events: none;
+}
+.ability-block > .ability-icon-wrap.has-old-underlay:hover > .innate-marker-new {
+  opacity: 0;
+}
+.ability-block > .ability-icon-wrap.has-old-underlay:hover > .innate-marker-old {
+  opacity: 1;
+}
 /* In-place rework (same name + icon on both sides): right pane skips the
    header and only shows the description body — so the box should also be
    visually smaller and centered (vertically + horizontally) relative to
@@ -5070,6 +5433,53 @@ JS_TEXT = '''
       resultsBox.classList.remove('show');
     }
   });
+
+  // ---- ABILITY-CHANGE CONNECTOR ----
+  // Draws a thin dashed curve from each ability-change-block's icon
+  // bottom-center down-right to the centre of the LEFT BORDER of the OLD
+  // pane. Recomputed on load and on resize so the line tracks the actual
+  // layout (icon position, pane geometry).
+  function drawAbilityChangeConnectors() {
+    const blocks = document.querySelectorAll('.ability-change-block');
+    blocks.forEach((block) => {
+      const svg = block.querySelector(':scope > .ability-change-connector');
+      const path = svg && svg.querySelector('path');
+      const icon = block.querySelector(':scope > .ability-icon-wrap');
+      const oldPane = block.querySelector(
+        ':scope > .ability-change > .ability-change-pane.ability-change-old'
+      );
+      if (!svg || !path || !icon || !oldPane) return;
+      const blockRect = block.getBoundingClientRect();
+      const iconRect = icon.getBoundingClientRect();
+      const paneRect = oldPane.getBoundingClientRect();
+      if (!blockRect.width || !paneRect.width) return;
+      // Cover the whole block so we have a global coordinate system for
+      // the path; absolute positioning relative to block (which is
+      // position: relative).
+      svg.setAttribute('width', blockRect.width);
+      svg.setAttribute('height', blockRect.height);
+      svg.setAttribute('viewBox', '0 0 ' + blockRect.width + ' ' + blockRect.height);
+      svg.style.left = '0px';
+      svg.style.top = '0px';
+      svg.style.width = blockRect.width + 'px';
+      svg.style.height = blockRect.height + 'px';
+      // Start: bottom-center of icon
+      const x1 = iconRect.left - blockRect.left + iconRect.width / 2;
+      const y1 = iconRect.bottom - blockRect.top;
+      // End: centre of left border of old pane
+      const x2 = paneRect.left - blockRect.left;
+      const y2 = paneRect.top - blockRect.top + paneRect.height / 2;
+      // L-shape with a right-angle elbow: vertical segment down from the
+      // icon, then horizontal segment right to the pane's left edge.
+      const d = 'M ' + x1 + ' ' + y1 + ' L ' + x1 + ' ' + y2 + ' L ' + x2 + ' ' + y2;
+      path.setAttribute('d', d);
+    });
+  }
+  drawAbilityChangeConnectors();
+  window.addEventListener('resize', drawAbilityChangeConnectors);
+  // Also re-run after fonts/images settle so the layout has its final
+  // dimensions (icon images may load late and shift the icon position).
+  window.addEventListener('load', drawAbilityChangeConnectors);
 })();
 
 '''
@@ -6492,16 +6902,16 @@ W(li("Pollinate radius increased from 700 to 900", b(700, 900)))
 W(ul_close())
 W(item_header("Conjurer's Catalyst"))
 W(ul_open())
-W(li("Spellover now has a 0.1s internal cooldown ", t("REWORK")))
+W(li("Spellover now has a 0.1s internal cooldown", t("REWORK")))
 W(ul_close())
 W(subnote("Still can proc multiple times from a single instance of high damage"))
 W(ul_open())
 W(li("Spellover damage threshold increased from 100 to 200", b(100, 200)))
-W(li("Spellover damage from hero targets increased from 40 to 80 ", b(40, 80)))
+W(li("Spellover damage from hero targets increased from 40 to 80", b(40, 80)))
 W(ul_close())
 W(subnote("From 52 to 104 with Dormant Curio"))
 W(ul_open())
-W(li("Spellover damage from creep targets increased from 15 to 30 ", b(15, 30)))
+W(li("Spellover damage from creep targets increased from 15 to 30", b(15, 30)))
 W(ul_close())
 W(subnote("From 19.5 to 39 with Dormant Curio"))
 W(item_header("Enchanter's Bauble"))
@@ -6510,7 +6920,7 @@ W(li("Enchant base Neutral Enchantment bonus decreased from 15% to 10%", b(15, 1
 W(ul_close())
 W(item_header("Idol of Screeauk"))
 W(ul_open())
-W(li("False Flight duration increased from 5s to 6.5s ", b(5, 6.5)))
+W(li("False Flight duration increased from 5s to 6.5s", b(5, 6.5)))
 W(ul_close())
 W(subnote("From 6.5s to 8.45s with Dormant Curio"))
 W(item_header("Metamorphic Mandible"))
@@ -6519,7 +6929,7 @@ W(li("Pupate movement speed bonus increased from 15% to 20%", b(15, 20)))
 W(ul_close())
 W(item_header("Rattlecage"))
 W(ul_open())
-W(li("Reverberate projectile physical damage decreased from 110 to 90 ", b(110, 90)))
+W(li("Reverberate projectile physical damage decreased from 110 to 90", b(110, 90)))
 W(ul_close())
 W(subnote("From 143 to 117 with Dormant Curio"))
 W(item_header("Demonicon"))
@@ -6671,7 +7081,7 @@ W(ul_close())
 W(hero_header("Death Prophet"))
 W(ability("Exorcism"))
 W(ul_open())
-W(li("Spirit Damage increased from 64 to 65/68/71 ", b(64, [65, 68, 71])))
+W(li("Spirit Damage increased from 64 to 65/68/71", b(64, [65, 68, 71])))
 W(ul_close())
 W(subnote("From 62-67 to 62-68/65-71/68-74"))
 
@@ -7576,7 +7986,7 @@ W(ul_close())
 # Wraith King
 W(hero_header("Wraith King"))
 W(ul_open())
-W(li("Base Attack Time worsened from 1.7s to 1.8s", b(1.7, 1.8)))
+W(li("Base Attack Time worsened from 1.7s to 1.8s", b(1.7, 1.8, l=True)))
 W(li("Intelligence gain decreased from 1.6 to 1.4", b(1.6, 1.4)))
 W(ul_close())
 W(ability("Bone Guard"))
@@ -7627,7 +8037,7 @@ W(li("Adjusted the meeting point of the lane creeps toward the offlane", t("MISC
 W(ul_close())
 W(subnote("Now offlane creeps are slightly slowed upon leaving the base for a couple of seconds. Safe lane creeps are slightly accelerated upon leaving the base for a couple of seconds. Both of these changes are effective until the 7:30 mark."))
 W(ul_open())
-W(li("All sections of currents now give a max movement speed bonus of 150 ", t("BUFF")))
+W(li("All sections of currents now give a max movement speed bonus of 150", t("BUFF")))
 W(ul_close())
 W(subnote("Previously was only provided by sections on the base and near it, while other sections provided max bonus of 100"))
 W(plain_header("Map Objectives"))
@@ -8367,7 +8777,7 @@ W(li("Active: Valor. If cast on an ally, increases their armor by 7 for 8s. If c
 W(ul_close())
 W(item_header("Searing Signet"))
 W(ul_open())
-W(li("Burn Through: Total Damage decreased from 90 to 80 ", b(90, 80)))
+W(li("Burn Through: Total Damage decreased from 90 to 80", b(90, 80)))
 W(ul_close())
 W(subnote("From 117 to 104 with Dormant Curio"))
 W(ul_open())
@@ -8436,7 +8846,7 @@ W(li("You can select any Enchantments during re-craft and bonus will still keep 
 W(ul_close())
 W(item_header("Metamorphic Mandible"))
 W(ul_open())
-W(li("Pupate duration increased from 4s to 5s ", b(4, 5)))
+W(li("Pupate duration increased from 4s to 5s", b(4, 5)))
 W(ul_close())
 W(subnote("From 5.2s to 6.5s with Dormant Curio"))
 W(ul_open())
@@ -9764,7 +10174,7 @@ W(li_formula("Damage per second changed",
              "10/18/26/34", "10 + 1 per level",
              lambda L: 34.0, lambda L: 10.0 + 1.0 * L))
 W(li("Radius increased from 175 to 200", b(175, 200)))
-W(li("Aghanim's Shard bonus radius decreased from 175 to 150 ", b(175, 150)))
+W(li("Aghanim's Shard bonus radius decreased from 175 to 150", b(175, 150)))
 W(ul_close())
 W(subnote("Total Shard radius unchanged with base radius increase"))
 W(ability("Searing Chains"))
@@ -10181,7 +10591,7 @@ W(ul_close())
 W(ability("Blinding Light"))
 W(ul_open())
 W(li("Cast Range increased from 400/500/600/700 to 500/575/650/725", b([400, 500, 600, 700], [500, 575, 650, 725])))
-W(li("Knockback distance changed from 400 to knocking back to the edges of the effect radius, but a minimum knockback distance is 175 ", t("MISC")))
+W(li("Knockback distance changed from 400 to knocking back to the edges of the effect radius, but a minimum knockback distance is 175", t("MISC")))
 W(ul_close())
 W(subnote("Min distance is used for enemies near the edge of AoE"))
 W(ability("Spirit Form"))
@@ -10220,7 +10630,7 @@ W(li("When targeting a tree, now always destroys the targeted tree and ends in t
 W(ul_close())
 W(ability("Talon Toss"))
 W(ul_open())
-W(li("Cast Range decreased from 1200 to 650/750/850/950 ", b(1200, [650, 750, 850, 950])))
+W(li("Cast Range decreased from 1200 to 650/750/850/950", b(1200, [650, 750, 850, 950])))
 W(ul_close())
 W(subnote("Now matches Grappling Claw"))
 W(ability("Shodo Sai"))
@@ -10381,7 +10791,7 @@ W(ul_close())
 W(hero_header("Leshrac"))
 W(ability("Diabolic Edict"))
 W(ul_open())
-W(li("Duration improved from 10s to 8s ", b(10, 8)))
+W(li("Duration improved from 10s to 8s", b(10, 8)))
 W(ul_close())
 W(subnote("Number of explosions (hence, total damage) is unchanged, explosion interval decreased from 0.25s to 0.225s"))
 
@@ -10486,7 +10896,7 @@ W(ul_open())
 W(li("Now is a basic ability", t("REWORK")))
 W(li("Heal From Target's Max Health rescaled from 2/2.25/2.5/2.75% to 1.45/2.05/2.65/3.25%", b([2, 2.25, 2.5, 2.75], [1.45, 2.05, 2.65, 3.25])))
 W(li("Max Health Damage rescaled from 2/2.25/2.5/2.75% to 1.45/2.05/2.65/3.25%", b([2, 2.25, 2.5, 2.75], [1.45, 2.05, 2.65, 3.25])))
-W(li("Max Health per Hero Kill increased from 10 to 10/15/20/25 ", b(10, [10, 15, 20, 25])))
+W(li("Max Health per Hero Kill increased from 10 to 10/15/20/25", b(10, [10, 15, 20, 25])))
 W(ul_close())
 W(subnote("Is not retroactive"))
 W(ul_open())
@@ -11023,7 +11433,7 @@ W(ul_close())
 # Nature's Prophet
 W(hero_header("Nature's Prophet"))
 W(ul_open())
-W(li("Minimum Base damage increased by 4 ", bstat_h("Nature's Prophet", "AttackDamageMin", "7.40c", 4), extra=note_box(hero="Nature's Prophet", field="AttackDamageMin", before_patch="7.40c")))
+W(li("Minimum Base damage increased by 4", bstat_h("Nature's Prophet", "AttackDamageMin", "7.40c", 4), extra=note_box(hero="Nature's Prophet", field="AttackDamageMin", before_patch="7.40c")))
 W(li("Damage spread decreased from 10 to 6", b(10, 6)))
 W(ul_close())
 W(subnote("Damage at level 1 increased from 40–50 to 44–50"))
@@ -11424,7 +11834,7 @@ W(ul_close())
 W(hero_header("Puck"))
 W(ability("Puckish"))
 W(ul_open())
-W(li("Health/Mana Restore rescaled from 10 + 2% to 3% ", t("REWORK")))
+W(li("Health/Mana Restore rescaled from 10 + 2% to 3%", t("REWORK")))
 W(ul_close())
 W(subnote("Also unified into a single value"))
 W(ul_open())
@@ -12280,6 +12690,8 @@ W(ability_change(
             ),
         ],
     ),
+    summary="New innate ability.",
+    tag="new",
 ))
 W(ability("Anchor Smash"))
 W(ul_open())
@@ -12320,6 +12732,8 @@ W(ul_open())
 W(li("Aghanim's Scepter: Robots apply a non-stacking heal over time of 35 health per second to allies they come through. Heal duration: 4 seconds", t("NEW")))
 W(ul_close())
 W(ability_change(
+    summary="New ability replacing Defense Matrix.",
+    tag="new",
     old=dict(
         name="Defense Matrix",
         slug="tinker_defense_matrix",
@@ -12682,16 +13096,18 @@ W(ability_change(
             "Innate. Active (promoted from the Aghanim's Scepter ability).",
             "Visage gains <b>flying movement and +12% movement speed for 20s</b>. Upon attacking or casting, he loses both effects, but he and his familiars gain <b>+10% attack damage for 2s</b>.",
             "<b>Mana Cost:</b> 50.  <b>Cooldown:</b> " + _visage_satg_pill + ".",
-            aghs_line("Increases bonus movement speed by +12%, bonus damage by +10%, bonus damage duration by +2s, and flight duration by +10s. While flight is active, Silent as the Grave grants <b>invisibility</b> to Visage and his familiars. Invisibility for Visage and each familiar are not connected."),
+            aghs_line("Increases bonus movement speed by +12%, bonus damage by +10%, bonus damage duration by +2s, and flight duration by +10s. While flight is active, Silent as the Grave grants <b>invisibility</b> to Visage and his familiars.",
+                      inline_note_text="Invisibility for Visage and each familiar are not connected."),
         ],
         tables=[_visage_satg_table],
     ),
 ))
 W(ul_open())
 W(li("Mana Cost decreased from 115 to 50", b(115, 50, l=True)))
-_, _visage_satg_cd_badge, _ = bf(lambda L: 45.0, lambda L: 45.75 - 0.75 * L,
-                                 "", l=True, value_fmt="{:.2f}s")
-W(li("Cooldown changed from 45s to 45.75s − 0.75s per level", _visage_satg_cd_badge))
+W(li_formula("Cooldown changed",
+             "45s", "45.75s − 0.75s per level",
+             lambda L: 45.0, lambda L: 45.75 - 0.75 * L,
+             l=True, value_fmt="{:.2f}s"))
 W(ul_close())
 W(ability("Summon Familiars"))
 W(ul_open())
@@ -12711,17 +13127,39 @@ W(ul_open())
 W(li("Base Damage decreased by 4", bstat_h("Void Spirit", "AttackDamageMin", "7.40c", -4), extra=note_box(hero="Void Spirit", field="AttackDamageMin", before_patch="7.40c")))
 W(ul_close())
 W(subnote("Damage at level 1 unchanged due to innate ability changes"))
-W(ability("Intrinsic Edge"))
+W(ability_change(
+    old=dict(
+        name="Intrinsic Edge",
+        slug="void_spirit_intrinsic_edge",
+        innate=True,
+        desc=[
+            # Source: data/patchnotes_english.txt → DOTA_Patch_7_36_void_spirit_hero_innate_void_spirit_intrinsic_edge_{1,2,2_info} + 7.36b tweak.
+            "Innate. Passive, can't be leveled up.",
+            "Void Spirit gains <b>25%</b> more secondary bonuses from Primary Attributes.",
+            inline_note("Health Regen from Strength, Armor from Agility, Mana Regen and Magic Resistance from Intelligence."),
+        ],
+    ),
+    new=dict(
+        name="Intrinsic Edge",
+        slug="void_spirit_intrinsic_edge",
+        innate=True,
+        desc=[
+            # Source: data/patchnotes_english.txt → DOTA_Patch_7_41_void_spirit_void_spirit_intrinsic_edge_{1,7,8,9} folded into a coherent description.
+            "Innate. Passive, can't be leveled up.",
+            "Void Spirit gains <b>30%</b> more secondary bonuses from Primary Attributes, and his attack damage per point of attribute is multiplicatively increased by <b>15%</b>.",
+            inline_note("Health Regen from Strength, Attack Speed from Agility, Mana Regen from Intelligence. No longer provides Armor or Magic Resistance."),
+        ],
+    ),
+))
 W(ul_open())
-W(li("Now also increases Void Spirit's attack damage per point of attribute by 15%", t("REWORK")))
-W(li("Increase is multiplicative, so it's increased from 0.45 to 0.5175", b(0.45, 0.5175)))
-W(li("The result of these changes:", t("MISC")))
-W(li("Damage at level 1 is unchanged at 52–56", t("MISC")))
-W(li("Damage gain per level increased from 3.6 to 4.1", b(3.6, 4.1)))
-W(li("Damage at level 30 increased from 174–178 to 192–196", t("BUFF")))
+W(li("Attack damage per attribute multiplier increased from 0.45 to 0.5175", b(0.45, 0.5175)))
 W(li("Secondary bonuses increased from 25% to 30%", b(25, 30)))
-W(li("No longer provides increased Armor or Magic Resistance", t("DEL")))
-W(li("Now provides increased Attack Speed per point of Agility", t("REWORK")))
+W(li("The result of these changes:", t("MISC"),
+     extra=inline_note(
+         "Damage at level 1 is unchanged at 52–56."
+         "<br>Damage gain per level increased from 3.6 to 4.1 — " + b(3.6, 4.1) +
+         "<br>Damage at level 30 increased from 174–178 to 192–196 — " + br(174, 178, 192, 196)
+     )))
 W(ul_close())
 W(ability("Aether Remnant"))
 W(ul_open())
@@ -12746,10 +13184,10 @@ W(li_formula("Minor Imp Explosion Damage rescaled",
 W(li_formula("Minor Imp movement speed rescaled",
              "300/315/330/345", "297 + 3 per level",
              lambda L: 345.0, lambda L: 297.0 + 3.0 * L))
-W(li("Minor Imp attack damage rescaled from 10-11/14-15/18-19/22-23/26-27 to 20-21", t("REWORK")))
-W(li("Aghanim's Shard now increases health of minor imps by 80 and explosion damage by 45 ", t("REWORK")))
+W(li("Minor Imp attack damage rescaled from 10-11/14-15/18-19/22-23/26-27 to 20-21", br(26, 27, 20, 21)))
+W(li("Aghanim's Shard now increases health of minor imps by 80 and explosion damage by 45", t("MISC"),
+     extra=inline_note("Same values as before, but explicitly stated now.")))
 W(ul_close())
-W(subnote("Same values as before, but explicitly stated now"))
 
 # Weaver
 W(hero_header("Weaver"))
@@ -12767,13 +13205,13 @@ W(ability_change(
         innate=True,
         desc=[
             "Innate. Passive.",
-            "After dealing damage to an enemy hero with an attack or ability, if Weaver remains within <b>700 range</b> of them for <b>1.5s</b>, he establishes a <b>Thread of Fate</b> that briefly slows the enemy's movement and ties them to Weaver.",
+            "After dealing damage to an enemy hero with an attack or ability, if Weaver remains within <b>700 range</b> of them for <b>1.5s</b>, he establishes a <b>Thread of Fate</b> that slows the enemy's movement by <b>100% for 0.2s</b> and ties them to Weaver.",
             "Each established thread grants <b>+10% bonus damage</b> to Weaver. Threads last up to <b>6s</b> and break if the distance becomes longer than <b>900</b>.",
             "If the enemy dies with a Thread of Fate established, the thread's bonuses linger for an additional <b>5s</b>.",
+            inline_note("Effects linger even if the enemy dies just as the thread is about to be established."),
         ],
     ),
 ))
-W(subnote("Effects linger even if the enemy dies just as the thread is about to be established. Movement slow is 100% for 0.2s."))
 W(subgroup("Talents"))
 W(ul_open())
 W(li("Level 10 Talent +60 Shukuchi Damage replaced with +50 Shukuchi Movement Speed", t("REWORK")))
@@ -12846,7 +13284,7 @@ W(ability_change(
 ))
 W(ability("Arctic Burn"))
 W(ul_open())
-W(li("No longer has a one debuff per cast restriction on enemy heroes", t("DEL")))
+W(li("No longer has a one debuff per cast restriction on enemy heroes", t("BUFF")))
 W(li("Burn Duration decreased from 5s to 3s", b(5, 3)))
 W(li("Movement Slow decreased from 16/24/32/40% to 15/20/25/30%", b([16, 24, 32, 40], [15, 20, 25, 30])))
 W(ul_close())
@@ -12859,7 +13297,7 @@ W(ul_open())
 W(li("Attack Speed rescaled from 65 to 50/65/80", b(65, [50, 65, 80])))
 W(li("Maximum Duration rescaled from 4/5.5/7s to 6s", b([4, 5.5, 7], 6)))
 W(li("Bonus Duration per hero decreased from 2s to 1.5s", b(2, 1.5)))
-W(li("Bonus duration per hero can now be applied after the cast if an enemy hero becomes affected ", t("REWORK")))
+W(li("Bonus duration per hero can now be applied after the cast if an enemy hero becomes affected", t("NEW")))
 W(ul_close())
 W(subnote("Still can't be longer than the maximum duration"))
 W(subgroup("Talents"))
@@ -12912,7 +13350,7 @@ W(ul_close())
 W(ability("Reincarnation"))
 W(ul_open())
 W(li("Mana Cost decreased from 225 to 220/110/0", b(225, [220, 110, 0], l=True)))
-W(li("Now spawns 2/3/4 per enemy hero within slow radius", t("REWORK")))
+W(li("Now spawns 2/3/4 per enemy hero within slow radius", t("NEW")))
 W(li("No longer upgraded with Aghanim's Shard", t("DEL")))
 W(ul_close())
 
@@ -12920,8 +13358,8 @@ W(ul_close())
 W(hero_header("Zeus"))
 W(ul_open())
 W(li("Base Strength increased from 19 to 21", b(19, 21)))
-W(li("Base Damage increased by 1–3 ", bstat_h("Zeus", "AttackDamageMin", "7.40c", 1), extra=note_box(hero="Zeus", field="AttackDamageMin", before_patch="7.40c")))
-W(li("Damage spread increased from 8 to 10", b(8, 10)))
+W(li("Base Damage increased by 1–3", bstat_h("Zeus", "AttackDamageMin", "7.40c", 1),
+     extra=note_box(hero="Zeus", field="AttackDamageMin", before_patch="7.40c") + inline_note("Damage spread increased from 8 to 10 — " + b(8, 10))))
 W(li("Damage at level 1 increased from 52–60 to 53–63", t("BUFF")))
 W(li("Base Movement Speed decreased from 315 to 305", b(315, 305)))
 W(li("Base Armor decreased by 1", bstat_h("Zeus", "ArmorPhysical", "7.40c", -1), extra=note_box(hero="Zeus", field="ArmorPhysical", before_patch="7.40c")))
@@ -12944,7 +13382,7 @@ W(li("Vision and True Sight radius increased from 500 to 600", b(500, 600)))
 W(ul_close())
 W(ability("Thundergod's Wrath"))
 W(ul_open())
-W(li("Now applies the True Sight before the damage and strikes even untargetable and still invisible enemies ", t("REWORK")))
+W(li("Now applies the True Sight before the damage and strikes even untargetable and still invisible enemies", t("NEW")))
 W(ul_close())
 W(subnote("It used to simply reveal invisible heroes without dealing damage to them. Now it will work similarly to Lightning Bolt, dealing damage even to units affected by Smoke of Deceit, Dark Willow's Shadow Realm, Phantom Assassin's Blur, Slark's Shadow Dance or Depth Shroud, etc."))
 W(ul_open())
@@ -12952,7 +13390,7 @@ W(li("Vision and True Sight radius increased from 500 to 600", b(500, 600)))
 W(ul_close())
 W(ability("Nimbus"))
 W(ul_open())
-W(li("Damage source changed from Nimbus to the caster", t("MISC")))
+W(li("Damage source changed from Nimbus to the caster", t("REWORK")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
