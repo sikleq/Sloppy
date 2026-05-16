@@ -755,6 +755,158 @@ h2.section {
   color: #79c0ff;
 }
 
+/* =====================================================================
+   PATCH DYNAMICS WIDGET
+   Right-aligned row of small diamond pills, one per recent patch. Each
+   pill is filled with a vertical linear-gradient whose segments are
+   proportional to the tag counts for this entity in that patch. Glassy
+   look via translucent borders + faint inner glow; subtle drop-shadow
+   gives a hint of color bleed between neighbors. Untouched patches show
+   a near-black translucent diamond, are non-clickable, and carry a
+   "not touched" tooltip.
+   ===================================================================== */
+.entity {
+  position: relative;
+}
+.entity-name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.patch-dynamics {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.018);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+/* Wrapper: a click-target / hover-anchor that contains the diamond shape
+   AND the absolutely-positioned tooltip. The wrapper itself has no
+   clip-path so the tooltip can render OUTSIDE the diamond bounds — only
+   .dyn-cell (the shape) is clipped to the rhombus. */
+.patch-dynamics .dyn-cell-wrap {
+  position: relative;
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.patch-dynamics .dyn-cell-wrap.empty,
+.patch-dynamics .dyn-cell-wrap.current {
+  cursor: default;
+}
+.patch-dynamics .dyn-cell {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  /* Fluid color layer — JS sets `--dyn-bg` to a proportional gradient with
+     ~7% bleed between bands. Sat starts more transparent than before so
+     the diamond reads as colored translucent water rather than paint. */
+  background: var(--dyn-bg, rgba(10, 11, 14, 0.78));
+  transition: transform 0.14s ease, filter 0.14s ease;
+  /* Outer "lip" cues — light catches the bottom edge, top edge sits in
+     shadow. Combined with the inset gradients below this reads as the
+     diamond being pressed INTO the surface plane. */
+  filter:
+    drop-shadow(0 0.5px 0 rgba(255, 255, 255, 0.08))
+    drop-shadow(0 -0.5px 0 rgba(0, 0, 0, 0.55));
+}
+/* Empty diamond — the patch was untouched. Render as nearly-black so it
+   reads as "switched off" rather than just a muted version of the fluid. */
+.patch-dynamics .dyn-cell-wrap.empty .dyn-cell {
+  background: radial-gradient(circle at 65% 65%,
+    rgba(18, 20, 25, 0.95) 0%,
+    rgba(6, 7, 10, 0.95) 70%);
+  opacity: 0.75;
+}
+.patch-dynamics .dyn-cell-wrap:not(.empty):not(.current):hover .dyn-cell {
+  transform: scale(1.08);
+  filter:
+    drop-shadow(0 0.5px 0 rgba(255, 255, 255, 0.18))
+    drop-shadow(0 -0.5px 0 rgba(0, 0, 0, 0.65))
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.18));
+  z-index: 2;
+}
+.patch-dynamics .dyn-cell-wrap.current .dyn-cell {
+  filter:
+    drop-shadow(0 0.5px 0 rgba(255, 255, 255, 0.10))
+    drop-shadow(0 -0.5px 0 rgba(0, 0, 0, 0.55))
+    drop-shadow(0 0 3px rgba(240, 198, 116, 0.55));
+}
+/* Inset/recess gradients — top-left in shadow (light from page surface
+   blocked by the lip above), bottom-right catches a soft bounce from the
+   back wall of the recess. Inverse of the lighting on a raised button. */
+.patch-dynamics .dyn-cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background:
+    radial-gradient(circle at 28% 26%,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0.18) 24%,
+      rgba(0, 0, 0, 0.0) 48%),
+    radial-gradient(circle at 75% 78%,
+      rgba(255, 255, 255, 0.20) 0%,
+      rgba(255, 255, 255, 0.06) 22%,
+      rgba(255, 255, 255, 0.0) 44%);
+  pointer-events: none;
+}
+/* Glass film on top — barely-there specular highlight at the top-left tip,
+   subtle diagonal sheen. Less matte than before: thinner, more selective. */
+.patch-dynamics .dyn-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background:
+    radial-gradient(ellipse 60% 40% at 42% 18%,
+      rgba(255, 255, 255, 0.32) 0%,
+      rgba(255, 255, 255, 0.08) 35%,
+      rgba(255, 255, 255, 0.0) 65%),
+    linear-gradient(155deg,
+      rgba(255, 255, 255, 0.10) 0%,
+      rgba(255, 255, 255, 0.0) 40%,
+      rgba(0, 0, 0, 0.0) 100%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+/* Tooltip popup — sibling of the diamond inside .dyn-cell-wrap. Lives
+   outside the clip-path, anchored above the diamond, fades in on hover. */
+.patch-dynamics .dyn-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: pre-line;
+  background: rgba(13, 17, 23, 0.97);
+  color: #c9d1d9;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 7px 11px;
+  border: 1px solid rgba(139, 148, 158, 0.35);
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+  min-width: 140px;
+  max-width: 240px;
+  text-align: left;
+  line-height: 1.45;
+  letter-spacing: 0.1px;
+  transition: opacity 0.12s 0.05s;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+.patch-dynamics .dyn-cell-wrap:hover .dyn-tip {
+  opacity: 1;
+}
+
 /* NEW-ITEM BLOCK — keeps the standard grid (tag column / text / %).
    Only the FIRST row of the block gets a NEW tag (or RETURNING) in the tag
    column; the original per-row tag is hidden. Subsequent rows show an empty

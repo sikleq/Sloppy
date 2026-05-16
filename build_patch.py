@@ -816,6 +816,13 @@ class _State:
     next_ul_is_hero_stats = False    # set by hero_header(), consumed by ul_open()
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup
     current_sections = []            # per-patch list of {slug, label}; reset in save_html()
+    # Patch-dynamics widget: tag tallies per (entity, patch). Populated by
+    # headers (set current entity key) + li() (increment tag count). Dumped
+    # as _dynamics.json at end of build for the JS widget to consume.
+    current_patch_version = None     # set by write_head()
+    current_entity_key = None        # "<kind>|<slug>" — set by hero/item/unit/plain_header
+    current_entity_display = None    # human name for hover tooltip
+    dynamics = {}                    # {entity_key: {"name":..., "kind":..., "patches":{ver:{tag:count}}}}
 
 def _open_block(extra_cls='', extra_attrs=''):
     pre = _close_ability_block()
@@ -840,22 +847,72 @@ def _close_ability_block():
     return ''
 
 
+# Tags we surface in the dynamics widget. "buff new"/"del nerf" composite
+# data-tag strings produce two counts (a NEW row that's also a buff is
+# tallied as both new AND buff so filter-relevant colors show up).
+_DYN_TAG_WHITELIST = {"buff", "nerf", "new", "del", "rework", "misc", "qol"}
+
+
+def _dyn_record_li(tags):
+    """Increment dynamics tag counts for the current entity/patch.
+    `tags` is a set of normalized tag ids (e.g. {'buff','new'})."""
+    ek = _State.current_entity_key
+    pv = _State.current_patch_version
+    if not ek or not pv:
+        return
+    rec = _State.dynamics.get(ek)
+    if rec is None:
+        return
+    patch_bucket = rec["patches"].setdefault(pv, {})
+    for tag in tags:
+        if tag in _DYN_TAG_WHITELIST:
+            patch_bucket[tag] = patch_bucket.get(tag, 0) + 1
+
+
+def _slugify(name):
+    """Lowercase, strip apostrophes/punct, spaces → '-'. Used for entity DOM
+    anchors and dynamics-manifest keys."""
+    s = name.lower().replace("'", "").replace("'", "")
+    s = re.sub(r'[^a-z0-9]+', '-', s).strip('-')
+    return s
+
+
+def _register_entity(kind, name):
+    """Set current entity (for the dynamics tallies) and return the DOM id
+    attribute string. Call from every header (hero/item/unit/plain)."""
+    slug = _slugify(name)
+    key = f"{kind}|{slug}"
+    _State.current_entity_key = key
+    _State.current_entity_display = name
+    rec = _State.dynamics.setdefault(key, {"name": name, "kind": kind, "patches": {}})
+    rec["name"] = name  # keep latest display
+    return f' id="dyn-{kind}-{slug}"'
+
+
 def hero_header(name):
     _State.current_hero = HERO_SLUG.get(name, name.lower().replace(" ", "_").replace("'", "").replace("-", ""))
     _State.next_ul_is_hero_stats = True
     _State.seen_abilities_subgroup = False
-    return _open_block() + f'''<div class="entity hero-entity">
+    eid = _register_entity("hero", name)
+    return _open_block() + f'''<div class="entity hero-entity"{eid}>
   <div class="entity-icon hero-icon"><img src="{hero_img(name)}" alt="{name}" loading="lazy"></div>
   <div class="entity-name">{name}</div>
 </div>'''
 
 
-def unit_header(name, icon_url):
+def unit_header(name, icon_url, kind=None):
     """Header for a separate summoned unit / neutral creep (e.g. Spirit Bear,
     Ancient Marshmage) with custom icon URL. Marked `.unit-entity` so the
-    search index labels it as a creep/unit, not a hero."""
+    search index labels it as a creep/unit, not a hero.
+
+    Pass kind='Creep-hero' (or any custom label) to override the default
+    'creep' kind chip in the search dropdown — used for hero-like creeps
+    that level/talent up such as Spirit Bear."""
     _State.current_hero = None
-    return _open_block() + f'''<div class="entity unit-entity">
+    kind_attr = f' data-kind="{kind}"' if kind else ''
+    entity_kind = "creep-hero" if (kind and kind.lower().startswith("creep-hero")) else "unit"
+    eid = _register_entity(entity_kind, name)
+    return _open_block() + f'''<div class="entity unit-entity"{kind_attr}{eid}>
   <div class="entity-icon hero-icon"><img src="{icon_url}" alt="{name}" loading="lazy"></div>
   <div class="entity-name">{name}</div>
 </div>'''
@@ -890,7 +947,8 @@ def item_header(name, new=False, changed=False):
         type_label = ''
         extra_cls = ''
         block_data_attr = ''
-    return out + _open_block(extra_cls, block_data_attr) + f'''<div class="entity item-entity">
+    eid = _register_entity("item", name)
+    return out + _open_block(extra_cls, block_data_attr) + f'''<div class="entity item-entity"{eid}>
   <div class="entity-icon item-icon"><img src="{item_img(name)}" alt="{name}" loading="lazy"></div>
   <div class="entity-name">{name}{type_label}</div>
 </div>'''
@@ -1673,7 +1731,8 @@ def ability_change(old, new, summary=None, tag=None):
 def plain_header(name):
     out = _close_ability_block()
     _State.current_hero = None
-    return out + _open_block() + f'<div class="entity plain-entity"><div class="entity-name">{name}</div></div>'
+    eid = _register_entity("plain", name)
+    return out + _open_block() + f'<div class="entity plain-entity"{eid}><div class="entity-name">{name}</div></div>'
 
 
 def enchant_header(name, slug=None, new=False):
@@ -1695,7 +1754,8 @@ def enchant_header(name, slug=None, new=False):
         type_label = ''
         extra_cls = ''
         block_data_attr = ''
-    return _open_block(extra_cls, block_data_attr) + f'''<div class="entity item-entity">
+    eid = _register_entity("enchant", name)
+    return _open_block(extra_cls, block_data_attr) + f'''<div class="entity item-entity"{eid}>
   <div class="entity-icon item-icon"><img src="{icon}" alt="{name}" loading="lazy"></div>
   <div class="entity-name">{name}{type_label}</div>
 </div>'''
@@ -2290,15 +2350,21 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False):
     Auto-inserts colon after 'Level N Talent ' prefix to match Valve's notation."""
     if isinstance(text, str):
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
+    tags = set()
     if force_tag is not None:
         tag_str = force_tag
+        for tok in force_tag.split():
+            tags.add(tok)
     else:
-        tags = set()
         overalls = re.findall(r'data-overall="(\w+)"', badge)
         for o in overalls:
             tags.add(o)
         for tag_id in re.findall(r'data-tag="(\w+)"', badge):
             tags.add(tag_id)
+    # Patch-dynamics tally: count this row's primary tags against the current
+    # entity/patch.
+    _dyn_record_li(tags)
+    if force_tag is None:
         if not overalls:
             for cls in re.findall(r'badge (buff|nerf)\d+', badge):
                 tags.add(cls)
@@ -2528,6 +2594,15 @@ CSS = (_os.path.join(_os.path.dirname(__file__), "styles.css"))
 with open(CSS, encoding="utf-8") as _f:
     CSS = _f.read()
 
+# Cache-busting query for styles.css / scripts.js — invalidates the browser
+# cache whenever either file changes. Short hash of their combined content.
+import hashlib as _hashlib
+_JS_PATH = _os.path.join(_os.path.dirname(__file__), "scripts.js")
+with open(_JS_PATH, encoding="utf-8") as _f:
+    _ASSET_VERSION = _hashlib.sha1(
+        (CSS + _f.read()).encode("utf-8")
+    ).hexdigest()[:10]
+
 # ---------- CONTENT ----------
 
 H = []
@@ -2545,6 +2620,7 @@ PATCHES = [
     {"version": "7.41",  "date": "24.03.2026", "filename": "patches/7.41.html"},
     {"version": "7.40c", "date": "21.01.2026", "filename": "patches/7.40c.html"},
     {"version": "7.40b", "date": "23.12.2025", "filename": "patches/7.40b.html"},
+    {"version": "7.40",  "date": "15.12.2025", "filename": "patches/7.40.html"},
     {"version": "7.08",  "date": "01.02.2018", "filename": "patches/7.08.html"},
 ]
 
@@ -2833,13 +2909,15 @@ def _render_top_nav(active="changelogs", current_version=None, date=None, patch_
 
 def write_head(version, date):
     """Render head + top nav (Changelogs+Calendar tabs + version) + container + toolbar."""
+    _State.current_patch_version = version
+    _State.current_entity_key = None
     nav = _render_top_nav(active="changelogs", current_version=version, date=date, patch_context=True)
     W(f'''<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Dota Patch Notes - {version}</title>
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../styles.css?v={_ASSET_VERSION}">
 </head>
 <body>
 
@@ -2877,7 +2955,7 @@ def write_footer():
     """Render close-block + back-to-top button + script tag + closing tags."""
     W(_close_block())
     W('<button class="back-to-top" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})">↑</button>')
-    W('<script src="../scripts.js"></script>')
+    W(f'<script src="../scripts.js?v={_ASSET_VERSION}"></script>')
     W('</div></body></html>')
 
 
@@ -3134,6 +3212,7 @@ def save_html(filename):
     H.clear()
     _State.block_open = False
     _State.current_sections = []
+    _State.current_entity_key = None
 
 
 # Pre-computed KV-entry counts per patch (from patchnotes_english.txt analysis).
@@ -3347,13 +3426,13 @@ def save_calendar_html():
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
         '<meta charset="UTF-8">\n'
         '<title>Dota Patch Calendar</title>\n'
-        '<link rel="stylesheet" href="styles.css">\n'
+        f'<link rel="stylesheet" href="styles.css?v={_ASSET_VERSION}">\n'
         '</head>\n<body>\n\n'
         + nav
         + '\n<div class="container">\n'
         + '\n'.join(body)
         + '\n</div>\n\n'
-        + '<script src="scripts.js"></script>\n'
+        + f'<script src="scripts.js?v={_ASSET_VERSION}"></script>\n'
         + toggle_script + '\n'
         + '</body>\n</html>\n'
     )
@@ -3766,13 +3845,15 @@ W(subgroup("Talents"))
 W(ul_open())
 W(li("Level 10: −25s Summon Spirit Bear Cooldown replaced with +5s True Form Duration", '<span class="badge rework" data-tag="rework">REWORK</span>'))
 W(ul_close())
-W(unit_header("Spirit Bear", "../icons/abilities/lone_druid_spirit_bear.png"))
+W(unit_header("Spirit Bear", "../icons/abilities/lone_druid_spirit_bear.png", kind="Creep-hero"))
 W(ul_open())
-W(li(
-    'Gold/Experience Bounty changed from <span class="formula-old">175 + 8 per Spirit Bear level</span> up to <span class="formula-trigger" data-formula="fsb">165 + 10 per Spirit Bear level</span>',
-    '<span class="badge rework" data-tag="rework">REWORK</span><span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span>',
-    extra='<table class="formula-table" id="fsb" hidden><thead><tr><th></th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th><th>L6</th><th>L7</th><th>L8</th><th>L9</th><th>L10</th><th>L11</th><th>L12</th><th>L13</th><th>L14</th><th>L15</th><th class="lvl-jump">L20</th><th>L25</th><th>L30</th></tr></thead><tbody><tr><th class="row-label-old">old</th><td>183</td><td>191</td><td>199</td><td>207</td><td>215</td><td>223</td><td>231</td><td>239</td><td>247</td><td>255</td><td>263</td><td>271</td><td>279</td><td>287</td><td>295</td><td class="lvl-jump">335</td><td>375</td><td>415</td></tr><tr><th class="row-label-new">new</th><td>175</td><td>185</td><td>195</td><td>205</td><td>215</td><td>225</td><td>235</td><td>245</td><td>255</td><td>265</td><td>275</td><td>285</td><td>295</td><td>305</td><td>315</td><td class="lvl-jump">365</td><td>415</td><td>465</td></tr><tr><th>Δ %</th><td><span class="badge buff1">+4%</span></td><td><span class="badge buff1">+3%</span></td><td><span class="badge buff1">+2%</span></td><td><span class="badge buff1">+1%</span></td><td><span class="badge neutral">0%</span></td><td><span class="badge nerf1">-1%</span></td><td><span class="badge nerf1">-2%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-3%</span></td><td><span class="badge nerf1">-4%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf1">-5%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-6%</span></td><td><span class="badge nerf2">-7%</span></td><td class="lvl-jump"><span class="badge nerf2">-9%</span></td><td><span class="badge nerf3">-11%</span></td><td><span class="badge nerf3">-12%</span></td></tr></tbody></table>'
-))
+W(li_formula("Gold/Experience Bounty changed",
+             "175 + 8 per Spirit Bear level", "165 + 10 per Spirit Bear level",
+             lambda L: 175 + 8 * L,
+             lambda L: 165 + 10 * L,
+             levels=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 25, 30],
+             l=True,
+             rework_badge=False))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -9784,7 +9865,6 @@ W(li("Aghanim's Scepter Bonus Armor decreased from +10 to +8", b(10, 8)))
 _sdr_pill, _sdr_table = scale_pill(
     "11.4% + 0.6% per level",
     lambda L: 11.4 + 0.6 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.1f}%",
 )
 W(li("Flat 8/16/24/32 bonus damage replaced with " + _sdr_pill + " bonus attack damage",
@@ -9879,7 +9959,6 @@ W(li("No longer increases attack range", t("DEL")))
 _sn_pill, _sn_table = scale_pill(
     "1.5% + 0.05% per level",
     lambda L: 1.5 + 0.05 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.2f}%",
 )
 W(li("Now increases damage from Sniper's attacks by " + _sn_pill + " for every 100 units of distance between him and the target",
@@ -11581,8 +11660,18 @@ W(ul_close())
 W(hero_header("Invoker"))
 W(ability("Tornado", slug="invoker_tornado"))
 W(ul_open())
-W(li(facet_badge("invoker_wex_focus") + " " + "Aghanim's Scepter Twister Duration decreased by 0.5s", t("NERF")))
-W(li(facet_badge("invoker_wex_focus") + " " + "From 3.2/3.4/3.6/3.8/4/4.2/4.4/4.6/4.8/5s to 2.7/2.9/3.1/3.3/3.5/3.7/3.9/4.1/4.3/4.5s", t("MISC")))
+_twister_old = [3.2, 3.4, 3.6, 3.8, 4.0, 4.2, 4.4, 4.6, 4.8, 5.0]
+_twister_new = [2.7, 2.9, 3.1, 3.3, 3.5, 3.7, 3.9, 4.1, 4.3, 4.5]
+W(li_formula(
+    facet_badge("invoker_wex_focus") + " " + "Aghanim's Scepter Twister Duration decreased by 0.5s",
+    "3.2-5.0s", "2.7-4.5s",
+    lambda L, o=_twister_old: o[L - 1],
+    lambda L, n=_twister_new: n[L - 1],
+    levels=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    level_prefix='W',
+    rework_badge=False,
+    value_fmt="{:.1f}s",
+))
 W(ul_close())
 W(ability("E.M.P.", slug="invoker_emp"))
 W(ul_open())
@@ -11608,7 +11697,7 @@ W(li("Duration decreased from 25s to 18/20/22/24s", b(25, [18, 20, 22, 24])))
 W(ul_close())
 W(ability("Omnislash", slug="juggernaut_omni_slash"))
 W(ul_open())
-W(li("Slashes Rate Multiplier decreased from 1.5 to 1.4", b(1.5, 1.4)))
+W(li("Slashes Rate Multiplier decreased from 1.5 to 1.4", b(1.5, 1.4, l=True)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -11619,9 +11708,9 @@ W(ul_close())
 W(hero_header("Kez"))
 W(ability("Switch Discipline", slug="kez_switch_weapons"))
 W(ul_open())
-W(li("Katana Base Attack Time worsened from 1.8s to 1.9s", t("MISC")))
+W(li("Katana Base Attack Time worsened from 1.8s to 1.9s", b(1.8, 1.9, l=True)))
 W(li("Katana Bonus Agility Base Damage increased from 12% to 16%", b(12, 16)))
-W(li("Can no longer be disabled by Silence", t("DEL")))
+W(li("Can no longer be disabled by Silence", t("MISC")))
 W(ul_close())
 W(ability("Falcon Rush", slug="kez_falcon_rush"))
 W(ul_open())
@@ -11649,8 +11738,8 @@ W(li("Bonus Health Regen increased from 4/6/8/10 to 4/7/10/13", b([4, 6, 8, 10],
 W(ul_close())
 W(ability("Croak of Genius", slug="largo_croak_of_genius"))
 W(ul_open())
-W(li("Reverberated damage is now only applied if the target is within 2000 range of the caster", t("MISC")))
-W(li("Duration is no longer decreased on Largo from his own abilities", t("NERF")))
+W(li("Reverberated damage is now only applied if the target is within 2000 range of the caster", t("REWORK")))
+W(li("Duration is no longer decreased on Largo from his own abilities", t("NEW")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -11703,13 +11792,14 @@ W(ul_close())
 # Spirit Bear (Lone Druid pet — unit, not a hero). Placed inside LD's
 # section, mirroring 7.41c convention. Gold + Experience bounty share
 # the same formula change, so they merge into one combined row.
-W(unit_header("Spirit Bear", "../icons/abilities/lone_druid_spirit_bear.png"))
+W(unit_header("Spirit Bear", "../icons/abilities/lone_druid_spirit_bear.png", kind="Creep-hero"))
 W(ul_open())
 W(li_formula("Gold/Experience Bounty changed",
              "300", "175 + 8 per Spirit Bear level up",
              lambda L: 300, lambda L: 175 + 8 * L,
              levels=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 25, 30],
-             l=True))
+             l=True,
+             rework_badge=False))
 W(ul_close())
 W(ability("Entangling Claws", slug="lone_druid_spirit_bear_entangle"))
 W(ul_open())
@@ -12158,6 +12248,219 @@ save_html('patches/7.40b.html')
 
 
 # ============================================================
+# 7.40 content
+# ============================================================
+write_head("7.40", "15.12.2025")
+
+# ===== GENERAL UPDATES =====
+W(section("General Updates"))
+
+# ---- Captains Mode ----
+W(plain_header("Captains Mode"))
+W(ul_open())
+W(li("Changed order of the first and the third ban phases", t("REWORK"),
+     extra=inline_note(
+         '<b>First Ban Phase</b>'
+         ' (<span style="color:#7CA1CC">First</span> = team with the first pick,'
+         ' <span style="color:#F05039">Second</span> = team with the second pick):'
+         '<br>OLD: <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#F05039">Second</span> - <span style="color:#7CA1CC">First</span>'
+         ' - <span style="color:#F05039">Second</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#7CA1CC">First</span>'
+         '<br>NEW: <span style="color:#7CA1CC">First</span> - <span style="color:#7CA1CC">First</span>'
+         ' - <span style="color:#F05039">Second</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#F05039">Second</span>'
+         '<br><br><b>Third Ban Phase</b>:'
+         '<br>OLD: <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#F05039">Second</span> - <span style="color:#7CA1CC">First</span>'
+         '<br>NEW: <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
+     )))
+W(ul_close())
+
+# ---- General Changes ----
+W(plain_header("General Changes"))
+
+W(subgroup("Talents"))
+W(ul_open())
+W(li("Talents no longer require a skill point to level", t("REWORK"),
+     extra=inline_note(
+         "Now talents are learned by using their own talent points available at levels 10, 15, 20, 25, 27, 28, 29, and 30."
+         "<br>This results in all +2 All Attributes bonuses skilled by level 22."
+     )))
+W(li("All Facets that used to have 6 All Attributes bonuses now have 7 bonuses again", b(6, 7),
+     extra=inline_note("Affects Batrider's Arsonist, Magnus' Diminishing Return, Meepo's More Meepo, Monkey King's Simian Stride, Night Stalker's Voidbringer, and Silencer's Synaptic Split.")))
+W(ul_close())
+
+W(subgroup("Towers"))
+W(ul_open())
+W(li("Tier 4 Towers now have a Barracks Reinforcement buff", t("NEW"),
+     extra=inline_note("Each allied barracks that has not been destroyed provides <b>+4 armor</b> to both Tier 4 towers. Bonus is per individual building, totaling in <b>+24 Armor</b> for 6 Barracks.")))
+W(ul_close())
+
+W(subgroup("Gold & Bounties"))
+W(ul_open())
+W(li("Assist Gold Formula reworked", t("REWORK"),
+     extra=inline_note(
+         "OLD: 60 + ( ( VictimNetworth × 0.037 ) / NumHeroes )"
+         "<br>NEW: 15 + ( ( 50 + ( VictimNetworth × 0.037 ) ) / NumHeroes )"
+     )))
+W(li("Melee Creep: Gold Bounty now increases by 1 per lane creep upgrade interval (every 7:30)", t("BUFF")))
+W(li("Flagbearer Creep: Gold Bounty now increases by 1 per lane creep upgrade interval", t("BUFF")))
+W(li("Flagbearer Creep: AoE Bounty Radius increased from 1200 to 1500", b(1200, 1500)))
+W(li("Flagbearer Creep: When killed by a player controlled unit, the Flagbearer Creep always grants Bonus Bounty to the killer's hero regardless of the hero's proximity to the Flagbearer Creep", t("BUFF")))
+W(li("Flagbearer Creep: Bonus Gold from killing Flagbearers is now classified as creep gold instead of ability gold", t("REWORK"),
+     extra=inline_note("Has no gameplay effect, but makes a post-game gold breakdown more accurate.")))
+W(ul_close())
+
+W(subgroup("Flagbearer Inspiration Aura"))
+W(ul_open())
+W(li("No longer affects heroes", t("DEL")))
+W(li_formula(
+    "Now also provides a magic resistance bonus to affected creeps",
+    "—",
+    "0% base, +4% per lane creep upgrade interval (cap 15 upgrades)",
+    lambda I: 0,
+    lambda I: min(I, 15) * 4,
+    levels=[0, 1, 3, 5, 7, 10, 15, 20],
+    level_fmt=lambda I: f"#{I}",
+    rework_badge=False,
+    headline_level=15,
+    value_fmt="{:g}%",
+))
+W(ul_close())
+
+W(subgroup("Courier"))
+W(ul_open())
+W(li("Respawn time decreased from 60s + 6s per Hero Level to 45s + 5s per Hero Level", t("BUFF"),
+     extra=inline_note(f'Base {b(60, 45, l=True)}, per-level {b(6, 5, l=True)}.')))
+W(li("Flying Courier no longer has a 15% movement speed penalty while carrying a Clarity, Enchanted Mango, Faerie Fire, Healing Salve, or Tango", t("BUFF")))
+W(li("Flying Courier will now go to a more obscure shopping area within range of the Secret Shop when using Go To Secret Shop", t("QoL")))
+W(ul_close())
+
+W(subgroup("Illusions"))
+W(ul_open())
+W(li("All illusions now have 800 daytime vision and 400 nighttime vision", t("REWORK"),
+     extra=inline_note("Standardized vision values across all illusion sources.")))
+W(ul_close())
+
+# ---- Map Objectives ----
+W(plain_header("Map Objectives"))
+
+W(subgroup("Roshan"))
+W(ul_open())
+W(li("Roshan is no longer considered a hero for Lifesteal mechanics", t("NERF"),
+     extra=inline_note(f'As a result, Physical Lifesteal from damage to Roshan is reduced by {b(100, 60)} (−40%), and Spell Lifesteal from damage to Roshan is reduced by {b(100, 20)} (−80%).')))
+W(li("Roar of Retribution: Disarm debuff is no longer dispellable", t("NERF")))
+W(li("Slam: No longer has double duration against creeps", t("NERF")))
+W(li("Slam: Now deals double damage to creeps", t("NEW")))
+W(ul_close())
+
+W(subgroup("Tormentor"))
+W(ul_open())
+W(li("Added a Tormentor Timer near the minimap", t("NEW"),
+     extra=inline_note("Functions similarly to the Roshan Timer. Can be pinged to communicate the current state of Tormentor.")))
+W(li("Pinging Tormentor's location in world will trigger the same ping as the timer", t("NEW"),
+     extra=inline_note("Same behavior the Roshan Timer has.")))
+W(li("The minimap now only has one Tormentor icon and reflects where Tormentor is or will spawn", t("QoL")))
+W(li("The Shining: Now only starts dealing damage to the surrounding enemies when attacked/damaged", t("NERF")))
+W(ul_close())
+
+W(subgroup("Runes"))
+W(ul_open())
+W(li("Bounty Rune: Now grants gold based on when it was created, not when it was activated", t("REWORK")))
+W(li("Haste Rune: Duration no longer increases by 3s per rune cycle, and is always 22s now", t("NERF"),
+     extra=inline_note("Previously each subsequent rune cycle granted +3s of Haste duration.")))
+W(li("Invisibility Rune: No longer grants incoming damage reduction", t("DEL")))
+W(ul_close())
+
+# ---- Terrain Changes ----
+W(plain_header("Terrain Changes"))
+
+W(subgroup("Streams & Defender's Gates"))
+W(ul_open())
+W(li("Extended the streams into both Radiant and Dire bases and added defender's gate to the outside of the respective safe lanes where the stream flows", t("NEW")))
+W(li("Removed some trees inside the base near the new safelane defender's gate positions", t("MISC")))
+W(li("The Hard camp nearest to Tier 3 towers where the streams used to start has been demoted to a 'medium' camp", t("NERF")))
+W(li("Moved the safelane medium amphibian neutral camp closest to the Tier 2 tower up the stream, slightly closer to the respective bases", t("MISC")))
+W(ul_close())
+
+W(subgroup("Wisdom Shrines & Watchers"))
+W(ul_open())
+W(li("Lowered the Wisdom Shrine areas to low ground, compared to the respective offlanes, filled them with water and connected to the water areas by the Tier 1 towers", t("REWORK")))
+W(li("Moved Wisdom Shrines and Watchers to the low ground and slightly closer to the Tier 1 towers", t("REWORK"),
+     extra=inline_note("These Watchers now have vision over the shrines at night.")))
+W(li("Hard camps nearest to Wisdom Shrines have been moved slightly back towards the bases", t("MISC")))
+W(li("Changed the 'bridges' to actual bridges", t("MISC")))
+W(li("Slightly expanded the entrance to the bridge by the Lotus pools and adjusted the area within the nearby water areas", t("MISC")))
+W(li("The Hard camp in the 'triangle' has been demoted to a 'medium' camp", t("NERF")))
+W(ul_close())
+
+W(subgroup("Twin Gates & Tormentor Area"))
+W(ul_open())
+W(li("Twin Gate mana cost decreased from 75 to 30", b(75, 30, l=True)))
+W(li("Twin Gates now refund the mana cost if the teleporting channel was interrupted", t("BUFF")))
+W(li("Cleared up some areas around the Tormentor locations", t("MISC")))
+W(li("The watchers nearest to the mid-lane and near the small water camps south/north of the tier 1 tower have been removed", t("DEL")))
+W(li("The watchers in the primary jungles have been repositioned from stairs near the small camp to the cliff above the bounty runes", t("MISC")))
+W(li("Added additional blocks preventing flying movement around the edges of the map", t("NEW"),
+     extra=inline_note("e.g. the highground areas behind the Tormentors will no longer be accessible by Batrider during Firefly.")))
+W(ul_close())
+
+W(subgroup("Watchers & Defender's Gate"))
+W(ul_open())
+W(li("Watcher night vision range decreased from 800 to 450", b(800, 450)))
+W(li("Watcher capture time decreased from 1.5s to 1s", b(1.5, 1, l=True)))
+W(li("Defender's Gate vision radius increased from 525 to 700", b(525, 700)))
+W(li("Defender's Gate will now show their vision radius when holding ALT (similarly to Wards, Watchers, etc.)", t("QoL")))
+W(ul_close())
+
+W(subgroup("Miscellaneous"))
+W(ul_open())
+W(li("Removed a tree between Dire Safelane Tier 1 tower and the small pull camp", t("MISC")))
+W(li("Very slightly adjusted the paths and spawn points of the Radiant Offlane lane creeps, and the position of the Radiant Offlane Tier 2 tower", t("MISC"),
+     extra=inline_note("This results in creeps pathing to the right of the tier 2 tower instead of sometimes splitting up to go around it.")))
+W(li("Radiant Secret Shop trigger area moved slightly towards the radiant Tier 1 tower and more centered around the shopkeeper", t("MISC")))
+W(ul_close())
+
+# ---- Invulnerability Targeting ----
+W(plain_header("Invulnerability Targeting"))
+W(ul_open())
+W(li("Invulnerability targeting rules of certain items and abilities have been updated", t("REWORK"),
+     extra=inline_note("Most items and abilities that previously could target and/or affect invulnerable units no longer do so.")))
+W(li("Nullifier's Nullify can no longer target invulnerable units", t("NERF"), ability_row=True))
+W(li("Satyr Banisher's Purge can no longer target invulnerable units", t("NERF"), ability_row=True))
+W(li("Dark Seer's Vacuum no longer affects invulnerable units", t("NERF"), ability_row=True))
+W(li("Naga Siren's Ensnare can no longer target invulnerable units", t("NERF"), ability_row=True,
+     extra=inline_note("Exception: still works if the invulnerability is provided by Song of the Siren.")))
+W(li("Ogre Magi's Bloodlust can no longer target invulnerable units", t("NERF"), ability_row=True,
+     extra=inline_note("Can still target invulnerable buildings (i.e. Tier 2-4 towers when the previous ones are not destroyed).")))
+W(li("Oracle's Fortune's End can no longer target invulnerable units, but does affect invulnerable units in the radius", t("NERF"), ability_row=True))
+W(li("Shadow Demon's Demonic Purge can no longer target invulnerable units", t("NERF"), ability_row=True))
+W(li("Shadow Demon's Demonic Cleanse can no longer target invulnerable units", t("NERF"), ability_row=True))
+W(li("Sniper's Assassinate can no longer target invulnerable units", t("NERF"), ability_row=True))
+W(li("Sven's Storm Hammer with Aghanim's Scepter can no longer target invulnerable units, but does affect invulnerable units in the radius", t("NERF"), ability_row=True))
+W(li("Vengeful Spirit's Nether Swap can no longer target invulnerable units", t("NERF"), ability_row=True))
+W(ul_close())
+
+W(subgroup("Cyclone Interactions"))
+W(ul_open())
+W(li("Since Cyclone effects also make the unit invulnerable, all changes above apply to them as well", t("MISC"),
+     extra=inline_note(
+         "Special cases:"
+         "<br>• Nullifier's Nullify will dispel Cyclone off the target immediately if Cyclone was cast on a unit already affected by the Nullify debuff."
+         "<br>• Oracle's Fortune's End cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target."
+         "<br>• Sven's Storm Hammer with Aghanim's Scepter cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target."
+         "<br>• All three of these will also dispel Cyclone if the spell projectile was launched (or started channeling) before the target got Cycloned."
+     )))
+W(ul_close())
+
+write_footer()
+save_html('patches/7.40.html')
+
+
+# ============================================================
 # 7.08 content
 # ============================================================
 write_head("7.08", "01.02.2018")
@@ -12456,3 +12759,18 @@ with open('_ability_icons.txt', 'w', encoding='utf-8') as _f:
     for _u in sorted(_State.ability_icons):
         _f.write(_u + '\n')
 print(f"  → _ability_icons.txt: {len(_State.ability_icons)} unique URLs")
+
+
+# Patch-dynamics manifest: per-entity tag tallies across every patch, plus the
+# patches list (newest-first per RELEASE_HISTORY) so the JS widget can window
+# the last 12 patches BACKWARD from whichever patch page the user is on.
+# Patches missing an HTML page (e.g. 7.39e — no rendered changelog yet) emit
+# filename=null; the widget renders them as non-clickable empty cells.
+_have_html = {p["version"]: p["filename"].split("/")[-1] for p in PATCHES}
+_dyn_patches = [{"version": r["version"],
+                 "filename": _have_html.get(r["version"]),
+                 "date": r["date"]} for r in RELEASE_HISTORY]
+_dyn_payload = {"patches": _dyn_patches, "entities": _State.dynamics}
+with open('_dynamics.json', 'w', encoding='utf-8') as _f:
+    _json_dump.dump(_dyn_payload, _f, separators=(',', ':'))
+print(f"  → _dynamics.json: {len(_State.dynamics)} entities × {len(_dyn_patches)} patches in RELEASE_HISTORY")

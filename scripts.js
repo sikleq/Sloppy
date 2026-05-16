@@ -208,6 +208,7 @@
     if (entity.classList.contains('hero-entity')) kind = 'hero';
     else if (entity.classList.contains('unit-entity')) kind = 'creep';
     else if (entity.classList.contains('item-entity')) kind = 'item';
+    if (entity.dataset && entity.dataset.kind) kind = entity.dataset.kind;
     entities.push({
       name: nameClone.textContent.trim().replace(/\s+/g, ' '),
       element: entity,
@@ -361,5 +362,161 @@
   // Also re-run after fonts/images settle so the layout has its final
   // dimensions (icon images may load late and shift the icon position).
   window.addEventListener('load', drawAbilityChangeConnectors);
+
+  // ---------------------------------------------------------------------
+  // PATCH DYNAMICS WIDGET
+  // ---------------------------------------------------------------------
+  // For every .entity on the page, fetch _dynamics.json once, derive the
+  // entity's (kind, slug) from its DOM id ("dyn-<kind>-<slug>"), and append
+  // a row of diamond pills — one per recent patch. Each pill shows a
+  // proportional gradient of tag colors; untouched pills are dark/glassy.
+  // Click on a touched pill navigates to that patch HTML, scrolling to the
+  // same entity anchor when present.
+  // Tag colors rendered with alpha so the fluid layer reads as translucent
+  // liquid sitting inside a recessed glass diamond rather than a solid pill.
+  const DYN_TAG_COLORS = {
+    buff:   'rgba(93, 177, 78, 0.78)',
+    nerf:   'rgba(209, 75, 75, 0.78)',
+    new:    'rgba(78, 201, 176, 0.78)',
+    del:    'rgba(177, 78, 107, 0.78)',
+    rework: 'rgba(164, 114, 207, 0.78)',
+    misc:   'rgba(139, 144, 153, 0.78)',
+    qol:    'rgba(108, 171, 240, 0.78)',
+  };
+  const DYN_TAG_LABEL = {
+    buff:'BUFF', nerf:'NERF', new:'NEW', del:'DEL',
+    rework:'REWORK', misc:'MISC', qol:'QoL',
+  };
+  const DYN_TAG_ORDER = ['buff','new','rework','qol','misc','del','nerf'];
+  const DYN_MAX_PATCHES = 12;
+
+  function dynBuildPill(patch, counts, entityId, isCurrent) {
+    const total = DYN_TAG_ORDER.reduce((s, t) => s + (counts[t] || 0), 0);
+    const clickable = total > 0 && patch.filename && !isCurrent;
+    // Wrapper holds the diamond (.dyn-cell) AND the tooltip (.dyn-tip) as
+    // siblings. The diamond uses clip-path which would clip any tooltip
+    // pseudo-element, so the tooltip must live outside that clipped subtree.
+    const wrap = document.createElement(clickable ? 'a' : 'span');
+    let wcls = 'dyn-cell-wrap';
+    if (!total) wcls += ' empty';
+    if (isCurrent) wcls += ' current';
+    if (total && !patch.filename) wcls += ' no-page';
+    wrap.className = wcls;
+    const cell = document.createElement('span');
+    cell.className = 'dyn-cell';
+    wrap.appendChild(cell);
+    if (total) {
+      // Build a vertical gradient where each tag occupies a band proportional
+      // to its share. Instead of hard color-stops at the band boundaries we
+      // leave a `bleed` zone on each side so adjacent colors interpolate
+      // across it — this produces the soft "liquid floating at different
+      // densities" look rather than crisp horizontal stripes. The bleed is
+      // capped to half the band width to stay within the segment.
+      const tags = DYN_TAG_ORDER.filter(t => counts[t] > 0);
+      const bleed = 7;  // % half-width of the smoothing zone between bands
+      let acc = 0;
+      const stops = [];
+      for (let i = 0; i < tags.length; i++) {
+        const t = tags[i];
+        const c = counts[t];
+        const start = (acc / total) * 100;
+        acc += c;
+        const end = (acc / total) * 100;
+        const halfBand = (end - start) / 2;
+        const localBleed = Math.min(bleed, halfBand);
+        const solidStart = i === 0 ? start : start + localBleed;
+        const solidEnd = i === tags.length - 1 ? end : end - localBleed;
+        stops.push(`${DYN_TAG_COLORS[t]} ${solidStart.toFixed(1)}%`);
+        stops.push(`${DYN_TAG_COLORS[t]} ${solidEnd.toFixed(1)}%`);
+      }
+      cell.style.setProperty('--dyn-bg', `linear-gradient(to bottom, ${stops.join(', ')})`);
+      if (clickable) {
+        wrap.href = patch.filename + (entityId ? '#' + entityId : '');
+      }
+      const lines = DYN_TAG_ORDER
+        .filter(t => counts[t])
+        .map(t => `${DYN_TAG_LABEL[t]}: ${counts[t]}`);
+      const suffix = isCurrent ? '\n(current patch)'
+                   : patch.filename ? ''
+                   : '\n(no patch page yet)';
+      wrap.appendChild(dynBuildTip(
+        `${patch.version} (${patch.date})\n${lines.join('  ·  ')}${suffix}`));
+    } else {
+      wrap.appendChild(dynBuildTip(
+        `${patch.version} (${patch.date})\nnot touched` + (isCurrent ? '\n(current patch)' : '')));
+    }
+    return wrap;
+  }
+
+  // Tooltip popup — a real DOM sibling of .dyn-cell (not a pseudo) so it
+  // escapes the diamond's clip-path. Multi-line text preserved via pre-line.
+  function dynBuildTip(text) {
+    const tip = document.createElement('span');
+    tip.className = 'dyn-tip';
+    tip.textContent = text;
+    return tip;
+  }
+
+  // Read current patch version from the version-picker button in the top nav.
+  // Falls back to the document title ("Dota Patch Notes - 7.41a") if needed.
+  function dynCurrentVersion() {
+    const btn = document.querySelector('.version-picker .version');
+    if (btn) {
+      const m = btn.textContent.match(/(\d+\.\d+[a-z]?)/);
+      if (m) return m[1];
+    }
+    const t = document.title.match(/(\d+\.\d+[a-z]?)\s*$/);
+    return t ? t[1] : null;
+  }
+
+  // Known entity kinds — must match the strings emitted by _register_entity()
+  // in build_patch.py. Ordered longest-first so "creep-hero" wins over "creep".
+  const DYN_KINDS = ['creep-hero', 'hero', 'item', 'unit', 'plain', 'enchant'];
+
+  // Cache the per-page patches window so we compute it once, not 250+ times.
+  // Pure function of manifest + current version → ordered patches array.
+  function dynWindow(manifest, currentVersion) {
+    // manifest.patches is newest-first per RELEASE_HISTORY. Find current
+    // patch index; window 12 entries starting AT it (current + 11 older).
+    // Then reverse so oldest is on the left in the rendered row.
+    const all = manifest.patches;
+    let idx = all.findIndex(p => p.version === currentVersion);
+    if (idx < 0) idx = 0;  // unknown version → start at newest
+    return all.slice(idx, idx + 12).reverse();
+  }
+
+  function dynRenderRow(entityDiv, manifest, windowed, currentVersion) {
+    const id = entityDiv.id || '';
+    if (!id.startsWith('dyn-')) return;
+    const rest = id.slice(4);
+    const kind = DYN_KINDS.find(k => rest === k || rest.startsWith(k + '-'));
+    if (!kind) return;
+    const slug = rest.slice(kind.length + 1);
+    const key = kind + '|' + slug;
+    const rec = manifest.entities[key];
+    const perPatch = (rec && rec.patches) || {};
+    const row = document.createElement('div');
+    row.className = 'patch-dynamics';
+    for (const p of windowed) {
+      const counts = perPatch[p.version] || {};
+      row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion));
+    }
+    entityDiv.appendChild(row);
+  }
+
+  function dynInit() {
+    const entities = document.querySelectorAll('.entity[id^="dyn-"]');
+    if (!entities.length) return;
+    const currentVersion = dynCurrentVersion();
+    fetch('../_dynamics.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(manifest => {
+        if (!manifest) return;
+        const windowed = dynWindow(manifest, currentVersion);
+        entities.forEach(e => dynRenderRow(e, manifest, windowed, currentVersion));
+      })
+      .catch(() => { /* silently fail — widget is an enhancement */ });
+  }
+  dynInit();
 })();
 

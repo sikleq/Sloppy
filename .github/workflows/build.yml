@@ -94,6 +94,7 @@ jobs:
           cp calendar.html _site/
           cp styles.css _site/
           cp scripts.js _site/
+          cp _dynamics.json _site/
           cp -r patches _site/
           cp -r icons _site/
 
