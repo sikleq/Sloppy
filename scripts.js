@@ -1,9 +1,26 @@
 
 (function() {
-  // ---- BACK-FROM-CALENDAR ----
+  // ---- BACK-FROM-CALENDAR / BACK-FROM-PATCH ----
+  // The back arrow normally points to the calendar (rendered in HTML).
+  // Two trigger paths:
+  //   ?from=calendar           → show arrow, default href is fine
+  //   ?from=<patch-version>    → user navigated here from another patch via
+  //                              the dynamics widget; rewrite the arrow's
+  //                              href + label to point back to that patch.
   const params = new URLSearchParams(window.location.search);
   const back = document.querySelector('.nav-back-arrow');
-  if (params.get('from') === 'calendar' && back) {
+  const fromParam = params.get('from');
+  if (back && fromParam === 'calendar') {
+    back.classList.add('visible');
+  } else if (back && fromParam && /^\d+\.\d+[a-z]?$/.test(fromParam)) {
+    // Came from another patch via the dynamics widget. The dyn-cell href
+    // also carries an entity anchor (#dyn-hero-...) so the destination page
+    // scrolls to that entity — the SAME entity was visible on the origin
+    // page, so reusing the current hash on the back-link restores the
+    // user's scroll position on return.
+    back.href = fromParam + '.html' + (window.location.hash || '');
+    back.title = 'Back to ' + fromParam;
+    back.setAttribute('aria-label', 'Back to patch ' + fromParam);
     back.classList.add('visible');
   }
   // Vertically center the back-arrow on the toolbar
@@ -374,33 +391,71 @@
   // same entity anchor when present.
   // Tag colors rendered with alpha so the fluid layer reads as translucent
   // liquid sitting inside a recessed glass diamond rather than a solid pill.
-  const DYN_TAG_COLORS = {
-    buff:   'rgba(93, 177, 78, 0.78)',
-    nerf:   'rgba(209, 75, 75, 0.78)',
-    new:    'rgba(78, 201, 176, 0.78)',
-    del:    'rgba(177, 78, 107, 0.78)',
-    rework: 'rgba(164, 114, 207, 0.78)',
-    misc:   'rgba(139, 144, 153, 0.78)',
-    qol:    'rgba(108, 171, 240, 0.78)',
+  // Hues chosen so adjacent bands in DYN_TAG_ORDER below contrast — NEW
+  // moves to gold (matching the .badge.new page color) so it stops getting
+  // visually swallowed when it sits next to BUFF (green).
+  // Stored as RGB tuples; alpha is computed at render time per band so
+  // bands with more hits look more saturated (see dynColorFor).
+  const DYN_TAG_RGB = {
+    buff:   [93, 177, 78],   // green
+    new:    [220, 175, 95],  // gold
+    rework: [164, 114, 207], // purple
+    misc:   [139, 144, 153], // grey
+    qol:    [108, 171, 240], // blue
+    del:    [177, 78, 107],  // pink
+    nerf:   [209, 75, 75],   // red
   };
+  // Map a tag's count → rgba alpha. Single-hit bands sit near the old
+  // baseline (~0.50), heavy bands push toward fully-saturated 0.90 so
+  // the visual difference between "1 buff" and "8 buffs" is obvious at
+  // a glance. Wider range than before for a more expressive ramp.
+  const DYN_ALPHA_BASE = 0.50;
+  const DYN_ALPHA_STEP = 0.08;
+  const DYN_ALPHA_MAX  = 0.90;
+  function dynColorFor(tag, count) {
+    const rgb = DYN_TAG_RGB[tag];
+    // count=1 → BASE, then each additional hit adds STEP, clamped at MAX.
+    const alpha = Math.min(
+      DYN_ALPHA_MAX,
+      DYN_ALPHA_BASE + Math.max(0, count - 1) * DYN_ALPHA_STEP
+    );
+    return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha.toFixed(2)})`;
+  }
   const DYN_TAG_LABEL = {
     buff:'BUFF', nerf:'NERF', new:'NEW', del:'DEL',
     rework:'REWORK', misc:'MISC', qol:'QoL',
   };
-  const DYN_TAG_ORDER = ['buff','new','rework','qol','misc','del','nerf'];
+  // Tag id → page-badge css class. Matches the styles in styles.css so
+  // tooltip badges look identical to the row badges everywhere else.
+  const DYN_TAG_BADGE_CLASS = {
+    buff:'buff-text', nerf:'nerf-text', new:'new', del:'del',
+    rework:'rework', misc:'misc', qol:'qol',
+  };
+  // Order is also the visual top→bottom band stack inside each pill, AND
+  // the row order in the tooltip grid. Sequenced so neighbouring bands
+  // change hue family (green → gold → purple → grey → blue → pink → red).
+  const DYN_TAG_ORDER = ['buff','new','rework','misc','qol','del','nerf'];
   const DYN_MAX_PATCHES = 12;
 
-  function dynBuildPill(patch, counts, entityId, isCurrent) {
+  function dynBuildPill(patch, counts, entityId, isCurrent, fromVersion) {
     const total = DYN_TAG_ORDER.reduce((s, t) => s + (counts[t] || 0), 0);
     const clickable = total > 0 && patch.filename && !isCurrent;
     // Wrapper holds the diamond (.dyn-cell) AND the tooltip (.dyn-tip) as
     // siblings. The diamond uses clip-path which would clip any tooltip
     // pseudo-element, so the tooltip must live outside that clipped subtree.
+    // misc-only patch: every count tag is MISC. The cell would otherwise
+    // render uncolored (we exclude misc from the gradient on purpose),
+    // so flag with a class for the dimmed "touched but only-misc" style.
+    const coloredTotal = DYN_TAG_ORDER
+      .filter(t => t !== 'misc')
+      .reduce((s, t) => s + (counts[t] || 0), 0);
+    const miscOnly = total > 0 && coloredTotal === 0;
     const wrap = document.createElement(clickable ? 'a' : 'span');
     let wcls = 'dyn-cell-wrap';
     if (!total) wcls += ' empty';
     if (isCurrent) wcls += ' current';
     if (total && !patch.filename) wcls += ' no-page';
+    if (miscOnly) wcls += ' misc-only';
     wrap.className = wcls;
     const cell = document.createElement('span');
     cell.className = 'dyn-cell';
@@ -412,8 +467,14 @@
       // across it — this produces the soft "liquid floating at different
       // densities" look rather than crisp horizontal stripes. The bleed is
       // capped to half the band width to stay within the segment.
-      const tags = DYN_TAG_ORDER.filter(t => counts[t] > 0);
-      const bleed = 7;  // % half-width of the smoothing zone between bands
+      //
+      // MISC is intentionally EXCLUDED from the gradient — neutral-grey
+      // bands dilute the pill's color signal without adding meaning. The
+      // tag still surfaces in the tooltip grid below.
+      const tags = DYN_TAG_ORDER.filter(t => t !== 'misc' && counts[t] > 0);
+      // Bleed: % half-width of the soft transition zone between adjacent
+      // bands. Zero = hard cuts between bands — no phantom mid-tones.
+      const bleed = 0;
       let acc = 0;
       const stops = [];
       for (let i = 0; i < tags.length; i++) {
@@ -426,34 +487,83 @@
         const localBleed = Math.min(bleed, halfBand);
         const solidStart = i === 0 ? start : start + localBleed;
         const solidEnd = i === tags.length - 1 ? end : end - localBleed;
-        stops.push(`${DYN_TAG_COLORS[t]} ${solidStart.toFixed(1)}%`);
-        stops.push(`${DYN_TAG_COLORS[t]} ${solidEnd.toFixed(1)}%`);
+        const color = dynColorFor(t, c);
+        stops.push(`${color} ${solidStart.toFixed(1)}%`);
+        stops.push(`${color} ${solidEnd.toFixed(1)}%`);
       }
-      cell.style.setProperty('--dyn-bg', `linear-gradient(to bottom, ${stops.join(', ')})`);
+      // If every tag was misc, the colored-tags `stops` array is empty;
+      // fall back to a solid misc fill so the cell still reads as "this
+      // patch touched the entity, just with no buff/nerf/etc." The CSS
+      // .misc-only class drops the cell to 50% opacity so it's visibly
+      // dimmed vs. a fully-colored cell.
+      if (stops.length) {
+        cell.style.setProperty('--dyn-bg', `linear-gradient(to bottom, ${stops.join(', ')})`);
+      } else if (miscOnly) {
+        // Flat-gradient wrapper instead of a raw color so the value always
+        // parses as `background-image` — keeps the bg-color slot free for
+        // the hover-time opaque backdrop layer. Alpha is halved here to
+        // preserve the dimmed-out misc-only look without applying CSS
+        // `opacity` to the cell (which would also dim the hover backdrop).
+        const m = dynColorFor('misc', counts.misc || 1)
+          .replace(/, ([\d.]+)\)$/, (_, a) => `, ${(parseFloat(a) * 0.5).toFixed(2)})`);
+        cell.style.setProperty('--dyn-bg', `linear-gradient(${m}, ${m})`);
+      }
       if (clickable) {
-        wrap.href = patch.filename + (entityId ? '#' + entityId : '');
+        // Append ?from=<currentVersion> so the destination patch page can
+        // show a back-arrow that returns here when the user clicks it.
+        const qs = fromVersion ? '?from=' + fromVersion : '';
+        wrap.href = patch.filename + qs + (entityId ? '#' + entityId : '');
       }
-      const lines = DYN_TAG_ORDER
-        .filter(t => counts[t])
-        .map(t => `${DYN_TAG_LABEL[t]}: ${counts[t]}`);
-      const suffix = isCurrent ? '\n(current patch)'
-                   : patch.filename ? ''
-                   : '\n(no patch page yet)';
-      wrap.appendChild(dynBuildTip(
-        `${patch.version} (${patch.date})\n${lines.join('  ·  ')}${suffix}`));
+      wrap.appendChild(dynBuildTip(patch, counts, patch.filename
+        ? null
+        : '(no patch page yet)'));
     } else {
-      wrap.appendChild(dynBuildTip(
-        `${patch.version} (${patch.date})\nnot touched` + (isCurrent ? '\n(current patch)' : '')));
+      // Empty patches: header only, no body — per spec, no "not touched"
+      // note line.
+      wrap.appendChild(dynBuildTip(patch, null, null));
     }
     return wrap;
   }
 
   // Tooltip popup — a real DOM sibling of .dyn-cell (not a pseudo) so it
-  // escapes the diamond's clip-path. Multi-line text preserved via pre-line.
-  function dynBuildTip(text) {
+  // escapes the diamond's clip-path. Content:
+  //   - Header: version + date.
+  //   - Body: 2-column grid of tag badges (page-style) each followed by
+  //           a small count chip, ordered by DYN_TAG_ORDER. When counts is
+  //           null (empty cell) the body holds a single `note` line.
+  function dynBuildTip(patch, counts, note) {
     const tip = document.createElement('span');
     tip.className = 'dyn-tip';
-    tip.textContent = text;
+    const header = document.createElement('span');
+    header.className = 'dyn-tip-header';
+    header.textContent = `${patch.version}`;
+    tip.appendChild(header);
+    if (counts) {
+      const grid = document.createElement('span');
+      grid.className = 'dyn-tip-grid';
+      for (const t of DYN_TAG_ORDER) {
+        const c = counts[t] || 0;
+        if (!c) continue;
+        const row = document.createElement('span');
+        row.className = 'dyn-tip-row';
+        const badge = document.createElement('span');
+        badge.className = `badge ${DYN_TAG_BADGE_CLASS[t]}`;
+        badge.textContent = DYN_TAG_LABEL[t];
+        const count = document.createElement('span');
+        count.className = 'dyn-tip-count';
+        count.textContent = '×' + c;
+        row.appendChild(badge);
+        row.appendChild(count);
+        grid.appendChild(row);
+      }
+      tip.appendChild(grid);
+    }
+    if (note) {
+      const noteEl = document.createElement('span');
+      noteEl.className = 'dyn-tip-note';
+      noteEl.textContent = note;
+      tip.appendChild(noteEl);
+    }
     return tip;
   }
 
@@ -474,15 +584,14 @@
   const DYN_KINDS = ['creep-hero', 'hero', 'item', 'unit', 'plain', 'enchant'];
 
   // Cache the per-page patches window so we compute it once, not 250+ times.
-  // Pure function of manifest + current version → ordered patches array.
-  function dynWindow(manifest, currentVersion) {
-    // manifest.patches is newest-first per RELEASE_HISTORY. Find current
-    // patch index; window 12 entries starting AT it (current + 11 older).
-    // Then reverse so oldest is on the left in the rendered row.
-    const all = manifest.patches;
-    let idx = all.findIndex(p => p.version === currentVersion);
-    if (idx < 0) idx = 0;  // unknown version → start at newest
-    return all.slice(idx, idx + 12).reverse();
+  // Pure function of manifest → ordered patches array.
+  function dynWindow(manifest) {
+    // Always show the 12 newest patches in RELEASE_HISTORY, regardless of
+    // which patch page the user is currently on. The .current class on the
+    // pill that matches the page version visually marks where they are.
+    // manifest.patches is newest-first → take first 12, reverse so oldest
+    // is on the left in the rendered row.
+    return manifest.patches.slice(0, 12).reverse();
   }
 
   function dynRenderRow(entityDiv, manifest, windowed, currentVersion) {
@@ -499,7 +608,7 @@
     row.className = 'patch-dynamics';
     for (const p of windowed) {
       const counts = perPatch[p.version] || {};
-      row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion));
+      row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion, currentVersion));
     }
     entityDiv.appendChild(row);
   }
@@ -512,7 +621,7 @@
       .then(r => r.ok ? r.json() : null)
       .then(manifest => {
         if (!manifest) return;
-        const windowed = dynWindow(manifest, currentVersion);
+        const windowed = dynWindow(manifest);
         entities.forEach(e => dynRenderRow(e, manifest, windowed, currentVersion));
       })
       .catch(() => { /* silently fail — widget is an enhancement */ });

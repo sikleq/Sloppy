@@ -433,8 +433,9 @@ def b(old, new, l=False):
             signed_pcts.append(0)
             continue
         if o == 0:
-            # Old value was 0 → % delta is undefined. Still definitely a
-            # buff or nerf — emit a plain text-tag instead of "0%".
+            # Old value was 0 → % delta is undefined (0 → X has no meaningful
+            # percentage). Emit a plain BUFF / NERF text-tag with no numeric
+            # chip; the row still classifies for filtering.
             is_buff = (n < o) if l else (n > o)
             if is_buff:
                 parts.append('<span class="badge buff-text" data-overall="buff">BUFF</span>')
@@ -823,6 +824,10 @@ class _State:
     current_entity_key = None        # "<kind>|<slug>" — set by hero/item/unit/plain_header
     current_entity_display = None    # human name for hover tooltip
     dynamics = {}                    # {entity_key: {"name":..., "kind":..., "patches":{ver:{tag:count}}}}
+    dyn_skip_li = False              # set by _open_block when block is .is-new —
+                                     # whole entity is conceptually a single NEW
+                                     # tally; per-li tags inside are stat/property
+                                     # rows that shouldn't inflate the dynamics.
 
 def _open_block(extra_cls='', extra_attrs=''):
     pre = _close_ability_block()
@@ -830,6 +835,26 @@ def _open_block(extra_cls='', extra_attrs=''):
     s = (pre + ('</div>\n' if _State.block_open else '')
          + f'<div class="{cls}"{extra_attrs}>\n')
     _State.block_open = True
+    # Dynamics — block-level tag injection:
+    #   .is-new      → entity is brand-new; record ONE `new` tally and
+    #                  silence subsequent li() tallies (per-row stat lines
+    #                  are part of "the entity is new", not separate events).
+    #   .is-changed  → recipe changed; record ONE `rework` tally so the
+    #                  REWORK filter surfaces the item and the dynamics
+    #                  square shows the rework color. Subsequent li()
+    #                  tallies still count — other changes inside the
+    #                  block remain independent events.
+    cls = extra_cls or ''
+    _State.dyn_skip_li = False
+    if (('is-new' in cls) or ('is-changed' in cls)) \
+            and _State.current_entity_key and _State.current_patch_version:
+        forced_tag = 'new' if 'is-new' in cls else 'rework'
+        rec = _State.dynamics.get(_State.current_entity_key)
+        if rec is not None:
+            bucket = rec["patches"].setdefault(_State.current_patch_version, {})
+            bucket[forced_tag] = bucket.get(forced_tag, 0) + 1
+        if forced_tag == 'new':
+            _State.dyn_skip_li = True
     return s
 
 def _close_block():
@@ -856,6 +881,11 @@ _DYN_TAG_WHITELIST = {"buff", "nerf", "new", "del", "rework", "misc", "qol"}
 def _dyn_record_li(tags):
     """Increment dynamics tag counts for the current entity/patch.
     `tags` is a set of normalized tag ids (e.g. {'buff','new'})."""
+    if _State.dyn_skip_li:
+        # NEW-item / NEW-enchantment block — the single `new` tally was
+        # recorded in _open_block; per-row stat/property tags inside the
+        # block are NOT independent changes and must not inflate counts.
+        return
     ek = _State.current_entity_key
     pv = _State.current_patch_version
     if not ek or not pv:
@@ -2351,6 +2381,23 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False):
     if isinstance(text, str):
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
     tags = set()
+    # Tags for the dynamics tally: only the row's PRIMARY tag(s). A
+    # `t("NEW")` badge carries both data-tag="new" and a filter-shadow
+    # data-overall="buff" (so the BUFF filter surfaces NEW rows). Counting
+    # both would double-tally each NEW as both new+buff in the dynamics
+    # square. data-tag wins when present; data-overall is only a fallback
+    # for numeric badges from b() that have no text-tag.
+    if force_tag is not None:
+        dyn_tags = set(force_tag.split())
+    else:
+        primary = re.findall(r'data-tag="(\w+)"', badge)
+        if primary:
+            dyn_tags = set(primary)
+        else:
+            dyn_tags = set(re.findall(r'data-overall="(\w+)"', badge))
+    _dyn_record_li(dyn_tags)
+    # Tags for the li's own data-tag attribute (page-side filtering). Keep
+    # the wider set so a NEW row still surfaces under the BUFF filter.
     if force_tag is not None:
         tag_str = force_tag
         for tok in force_tag.split():
@@ -2361,9 +2408,6 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False):
             tags.add(o)
         for tag_id in re.findall(r'data-tag="(\w+)"', badge):
             tags.add(tag_id)
-    # Patch-dynamics tally: count this row's primary tags against the current
-    # entity/patch.
-    _dyn_record_li(tags)
     if force_tag is None:
         if not overalls:
             for cls in re.findall(r'badge (buff|nerf)\d+', badge):
@@ -2862,17 +2906,21 @@ def _render_top_nav(active="changelogs", current_version=None, date=None, patch_
             older = PATCHES[idx + 1] if idx is not None and idx + 1 < len(PATCHES) else None
             newer = PATCHES[idx - 1] if idx is not None and idx - 1 >= 0 else None
 
-            def _nav_arrow(target, direction, glyph):
+            def _nav_arrow(target, direction):
+                # Direction-modifier class drives the clip-path arrow shape
+                # in CSS. The element renders without any text glyph — the
+                # block itself is the arrow.
+                dir_cls = 'is-prev' if direction == 'Older' else 'is-next'
                 if target:
-                    return (f'<a class="version-nav-arrow" '
+                    return (f'<a class="version-nav-arrow {dir_cls}" '
                             f'href="{target["filename"].split("/")[-1]}" '
                             f'title="{direction}: {target["version"]} ({target["date"]})" '
-                            f'aria-label="{direction} patch: {target["version"]}">{glyph}</a>')
-                return (f'<span class="version-nav-arrow is-disabled" '
-                        f'aria-hidden="true">{glyph}</span>')
+                            f'aria-label="{direction} patch: {target["version"]}"></a>')
+                return (f'<span class="version-nav-arrow {dir_cls} is-disabled" '
+                        f'aria-hidden="true"></span>')
 
-            prev_arrow = _nav_arrow(older, "Older", "‹")
-            next_arrow = _nav_arrow(newer, "Newer", "›")
+            prev_arrow = _nav_arrow(older, "Older")
+            next_arrow = _nav_arrow(newer, "Newer")
 
             right_side = f'''
     <div class="nav-context">
@@ -11114,7 +11162,7 @@ W(ul_open())
 W(li("Skeleton Building Damage penalty increased from 25% to 75%", b(25, 75, l=True),
      extra=inline_note("Also applies to Burning Army skeletons.")))
 W(li("No longer upgraded with Aghanim's Scepter", t("DEL")))
-W(li("Aghanim's Scepter now only provides Burning Army ability without increasing Skeleton Archer Hits to Kill by 1", t("REWORK")))
+W(li("Aghanim's Scepter now only provides Burning Army ability without increasing Skeleton Archer Hits to Kill by 1", t("DEL")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -11576,7 +11624,7 @@ W(li("Bonus Damage increased from 18/32/46/60 to 20/35/50/65", b([18, 32, 46, 60
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 Talent +1 Death Pact Charge replaced with -10s Death Pact Charge Restore Time", t("MISC")))
+W(li("Level 15 Talent +1 Death Pact Charge replaced with -10s Death Pact Charge Restore Time", t("REWORK")))
 W(ul_close())
 
 # Dazzle
@@ -11955,8 +12003,8 @@ W(li("Stun Duration rescaled from 0.8/1/1.2/1.4s to 0.7/1/1.3/1.6s", b([0.8, 1, 
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 Talent Basic Self-Dispel on Uproar Cast replaced with +6 Uproar Armor Per Stack", t("MISC")))
-W(li("Level 20 Talent +7 Uproar Armor Per Stack replaced with Basic Self-Dispel on Uproar Cast", t("MISC")))
+W(li("Level 15 Talent Basic Self-Dispel on Uproar Cast replaced with +6 Uproar Armor Per Stack", t("REWORK")))
+W(li("Level 20 Talent +7 Uproar Armor Per Stack replaced with Basic Self-Dispel on Uproar Cast", t("REWORK")))
 W(ul_close())
 
 # Pudge
@@ -12087,7 +12135,7 @@ W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
 W(li("Level 10 Talent Anchor Smash Damage Reduction decreased from +20% to +10%", b(20, 10)))
-W(li("Level 20 Talent Blubber effect triggers Anchor Smash now deals 50% less damage on the triggered Anchor Smash and is now considered reflection damage", t("MISC")))
+W(li("Level 20 Talent Blubber effect triggers Anchor Smash now deals 50% less damage on the triggered Anchor Smash and is now considered reflection damage", t("NERF")))
 W(ul_close())
 
 # Timbersaw
@@ -12153,8 +12201,8 @@ W(ul_close())
 W(hero_header("Ursa"))
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 Talent +5 Fury Swipes Damage replaced with +0.5% Maul Health as Damage", t("MISC")))
-W(li("Level 20 Talent +0.5% Maul Health as Damage replaced with +6 Fury Swipes Damage", t("MISC")))
+W(li("Level 15 Talent +5 Fury Swipes Damage replaced with +0.5% Maul Health as Damage", t("REWORK")))
+W(li("Level 20 Talent +0.5% Maul Health as Damage replaced with +6 Fury Swipes Damage", t("REWORK")))
 W(li("Level 20 Talent Earthshock Radius decreased from +400 to +300", b(400, 300)))
 W(ul_close())
 
@@ -12166,8 +12214,8 @@ W(li(facet_badge("viper_caustic_bath") + " " + "Max bonus effect decreased from 
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 Talent +20 Corrosive Skin Damage Per Second replaced with +10% Poison Attack Slow/Damage", t("MISC")))
-W(li("Level 15 Talent +15% Poison Attack Slow/Damage replaced with +20 Corrosive Skin Damage Per Second", t("MISC")))
+W(li("Level 10 Talent +20 Corrosive Skin Damage Per Second replaced with +10% Poison Attack Slow/Damage", t("REWORK")))
+W(li("Level 15 Talent +15% Poison Attack Slow/Damage replaced with +20 Corrosive Skin Damage Per Second", t("REWORK")))
 W(li("Level 15 Talent Nethertoxin Min/Max Damage decreased from +40 to +30", b(40, 30)))
 W(ul_close())
 

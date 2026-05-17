@@ -72,7 +72,7 @@ nav.top-nav {
 .nav-context {
   display: flex;
   align-items: center;
-  gap: 16px;                   /* extra gap between release-info and version-picker now that arrows flank the dropdown */
+  gap: 10px;                   /* gap between release-info and the version-picker control */
   margin-bottom: 8px;
 }
 /* Wraps the previous-arrow + version-dropdown + next-arrow into a single
@@ -83,29 +83,39 @@ nav.top-nav {
   align-items: center;
   gap: 4px;
 }
+/* Nav button: soft rounded-rect "tablet" with a thin SVG chevron drawn
+   precisely in the centre. No font glyph (font baselines vary across
+   systems) — the chevron is a CSS background-image data URI rendered
+   crisp at any size. Direction modifier class swaps the SVG. */
 .version-nav-arrow {
-  color: #a8b3bd;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 38px;
-  border-radius: 6px;
+  display: inline-block;
+  width: 24px;
+  height: 34px;
   background: rgba(0, 0, 0, 0.28);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 10px 14px;
+  border-radius: 5px;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
-  border: 1px solid transparent;
   text-decoration: none;
   cursor: pointer;
   user-select: none;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, filter 0.15s, transform 0.12s;
+}
+.version-nav-arrow.is-prev {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M10.5 3 L5 8 L10.5 13" stroke="%23c9d1d9" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+}
+.version-nav-arrow.is-next {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M5.5 3 L11 8 L5.5 13" stroke="%23c9d1d9" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
 }
 .version-nav-arrow:hover {
-  background: rgba(0, 0, 0, 0.4);
-  color: #c9d1d9;
+  background-color: rgba(0, 0, 0, 0.45);
+  filter: brightness(1.2);
 }
+/* Tactile nudge: the chevron drifts a hair in the arrow's own direction
+   on hover, suggesting where the click will take you. */
+.version-nav-arrow.is-prev:hover { background-position: 45% center; }
+.version-nav-arrow.is-next:hover { background-position: 55% center; }
 .version-nav-arrow.is-disabled {
   opacity: 0.3;
   cursor: default;
@@ -773,25 +783,24 @@ h2.section {
   min-width: 0;
 }
 .patch-dynamics {
+  /* Pulled close to the right edge of the entity-block (which carries
+     14px side padding) via negative right-margin. */
   margin-left: auto;
+  margin-right: -8px;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 6px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.018);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  gap: 4px;
+  padding: 2px 4px;
 }
-/* Wrapper: a click-target / hover-anchor that contains the diamond shape
-   AND the absolutely-positioned tooltip. The wrapper itself has no
-   clip-path so the tooltip can render OUTSIDE the diamond bounds — only
-   .dyn-cell (the shape) is clipped to the rhombus. */
+/* Wrapper holds the rounded-rectangle pill AND the absolutely-positioned
+   tooltip. The pill is clipped via overflow:hidden + border-radius so
+   pseudo highlights stay inside; the tooltip is a real DOM sibling that
+   lives outside the clip. */
 .patch-dynamics .dyn-cell-wrap {
   position: relative;
   display: inline-flex;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   text-decoration: none;
   cursor: pointer;
 }
@@ -804,104 +813,168 @@ h2.section {
   display: block;
   width: 100%;
   height: 100%;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  /* Fluid color layer — JS sets `--dyn-bg` to a proportional gradient with
-     ~7% bleed between bands. Sat starts more transparent than before so
-     the diamond reads as colored translucent water rather than paint. */
-  background: var(--dyn-bg, rgba(10, 11, 14, 0.78));
-  transition: transform 0.14s ease, filter 0.14s ease;
-  /* Outer "lip" cues — light catches the bottom edge, top edge sits in
-     shadow. Combined with the inset gradients below this reads as the
-     diamond being pressed INTO the surface plane. */
-  filter:
-    drop-shadow(0 0.5px 0 rgba(255, 255, 255, 0.08))
-    drop-shadow(0 -0.5px 0 rgba(0, 0, 0, 0.55));
+  border-radius: 4px;
+  /* Background is a multi-layer stack rendered in a SINGLE paint pass —
+     no mix-blend-mode pseudos. With ~3000 cells visible on the largest
+     patch page, every blend-mode pseudo would force its own compositing
+     layer (a known scroll-jank cause). Stack order, top → bottom:
+       1. Top-centre specular ellipse (highlight catching the light)
+       2. Vertical top sheen + bottom darken (convex shading)
+       3. Fluid color gradient driven by JS (--dyn-bg)
+     The opaque fallback color at the end ensures rendering even before
+     JS runs. */
+  background:
+    radial-gradient(ellipse 55% 30% at 50% 10%,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.04) 60%,
+      rgba(255, 255, 255, 0.0) 100%),
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.04) 32%,
+      rgba(255, 255, 255, 0.0) 55%,
+      rgba(0, 0, 0, 0.0) 65%,
+      rgba(0, 0, 0, 0.10) 100%),
+    var(--dyn-bg, rgba(10, 11, 14, 0.55));
+  transition: transform 0.14s ease, box-shadow 0.14s ease, background-color 0.14s ease;
+  box-shadow:
+    0 1px 1.5px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
-/* Empty diamond — the patch was untouched. Render as nearly-black so it
-   reads as "switched off" rather than just a muted version of the fluid. */
+/* Misc-only patch — every tag was MISC. The dimmed look is achieved by
+   halving the fluid alpha in JS (see scripts.js `miscOnly` branch); we
+   deliberately avoid CSS `opacity` here so the hover-time backdrop layer
+   can stay fully opaque and block neighbouring cells. */
+/* Empty patch — flat dark fill with a barely-there pressed-in inset:
+   1px darker line along the top edge (the "lip" of the recess casts a
+   shadow into it) + 1px faint highlight along the bottom edge (light
+   bouncing off the back of the recess). Together they read as a
+   shallow inset without competing with the painted cells. */
 .patch-dynamics .dyn-cell-wrap.empty .dyn-cell {
-  background: radial-gradient(circle at 65% 65%,
-    rgba(18, 20, 25, 0.95) 0%,
-    rgba(6, 7, 10, 0.95) 70%);
-  opacity: 0.75;
+  background: rgba(5, 6, 9, 0.92);
+  box-shadow:
+    inset 0  1px 0 rgba(0, 0, 0, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  opacity: 0.9;
 }
-.patch-dynamics .dyn-cell-wrap:not(.empty):not(.current):hover .dyn-cell {
-  transform: scale(1.08);
-  filter:
-    drop-shadow(0 0.5px 0 rgba(255, 255, 255, 0.18))
-    drop-shadow(0 -0.5px 0 rgba(0, 0, 0, 0.65))
-    drop-shadow(0 0 4px rgba(255, 255, 255, 0.18));
-  z-index: 2;
+.patch-dynamics .dyn-cell-wrap:not(.empty):hover .dyn-cell {
+  transform: scale(2);
+  /* Opaque backdrop under the translucent fluid: stops neighbouring cells
+     from showing through the scaled-up hovered cell. Matches the
+     entity-block gradient mid-tone (~#181b25). */
+  background-color: rgb(24, 27, 37);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0 8px rgba(255, 255, 255, 0.22);
+  z-index: 5;
 }
+/* Hover on the current patch — keep the same 2× pop + glow but layer the
+   blue+black outline back on top so the "you are here" marker stays
+   visible. Higher specificity than the generic hover rule above so this
+   wins for the current cell. */
+.patch-dynamics .dyn-cell-wrap.current:hover .dyn-cell {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0 8px rgba(255, 255, 255, 0.22),
+    0 0 0 1.5px rgba(121, 192, 255, 0.95),
+    0 0 0 2.5px rgba(0, 0, 0, 0.85);
+}
+/* Current patch (the page the user is on) — thin faint blue outline in
+   the same style as .cal-patch.current in the calendar, just slimmer
+   (1px instead of 2px, lower alpha) so it reads as a subtle "you are
+   here" marker without competing with the painted color band inside. */
 .patch-dynamics .dyn-cell-wrap.current .dyn-cell {
-  filter:
-    drop-shadow(0 0.5px 0 rgba(255, 255, 255, 0.10))
-    drop-shadow(0 -0.5px 0 rgba(0, 0, 0, 0.55))
-    drop-shadow(0 0 3px rgba(240, 198, 116, 0.55));
+  /* Two-layer outline: blue ring on top (1.5px) + a thin 1px black ring
+     beneath it, giving the marker a crisp dark edge against the page
+     background. box-shadow paints in source order top→bottom, so blue
+     covers the inner 1.5px of the wider 2.5px black layer and leaves
+     1px of black exposed as the outermost ring. */
+  box-shadow:
+    0 1px 1.5px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 0 0 1.5px rgba(121, 192, 255, 0.95),
+    0 0 0 2.5px rgba(0, 0, 0, 0.85);
 }
-/* Inset/recess gradients — top-left in shadow (light from page surface
-   blocked by the lip above), bottom-right catches a soft bounce from the
-   back wall of the recess. Inverse of the lighting on a raised button. */
-.patch-dynamics .dyn-cell::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  background:
-    radial-gradient(circle at 28% 26%,
-      rgba(0, 0, 0, 0.45) 0%,
-      rgba(0, 0, 0, 0.18) 24%,
-      rgba(0, 0, 0, 0.0) 48%),
-    radial-gradient(circle at 75% 78%,
-      rgba(255, 255, 255, 0.20) 0%,
-      rgba(255, 255, 255, 0.06) 22%,
-      rgba(255, 255, 255, 0.0) 44%);
-  pointer-events: none;
-}
-/* Glass film on top — barely-there specular highlight at the top-left tip,
-   subtle diagonal sheen. Less matte than before: thinner, more selective. */
-.patch-dynamics .dyn-cell::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  background:
-    radial-gradient(ellipse 60% 40% at 42% 18%,
-      rgba(255, 255, 255, 0.32) 0%,
-      rgba(255, 255, 255, 0.08) 35%,
-      rgba(255, 255, 255, 0.0) 65%),
-    linear-gradient(155deg,
-      rgba(255, 255, 255, 0.10) 0%,
-      rgba(255, 255, 255, 0.0) 40%,
-      rgba(0, 0, 0, 0.0) 100%);
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
+/* The convex highlight + specular layers used to live on ::before/::after
+   with mix-blend-mode: screen. They've been folded directly into
+   .dyn-cell's `background` stack above to eliminate ~6000 compositing
+   layers on the larger patch pages — fixes scroll jank. */
 /* Tooltip popup — sibling of the diamond inside .dyn-cell-wrap. Lives
-   outside the clip-path, anchored above the diamond, fades in on hover. */
+   outside the clip-path, anchored above the diamond, fades in on hover.
+   Body is a 2-column grid of tag badges, ordered by DYN_TAG_ORDER. */
 .patch-dynamics .dyn-tip {
   position: absolute;
-  bottom: calc(100% + 8px);
+  /* Clearance for the hover scale(2) — the cell grows 12px above the
+     wrap's top edge from its centre. 20px keeps a comfortable gap
+     between the scaled cell and the tooltip bottom. */
+  bottom: calc(100% + 20px);
   left: 50%;
   transform: translateX(-50%);
-  white-space: pre-line;
   background: rgba(13, 17, 23, 0.97);
   color: #c9d1d9;
-  font-size: 12px;
-  font-weight: 400;
-  padding: 7px 11px;
+  padding: 8px 10px;
   border: 1px solid rgba(139, 148, 158, 0.35);
   border-radius: 6px;
   opacity: 0;
   pointer-events: none;
   z-index: 100;
-  min-width: 140px;
-  max-width: 240px;
   text-align: left;
-  line-height: 1.45;
-  letter-spacing: 0.1px;
+  line-height: 1.3;
   transition: opacity 0.12s 0.05s;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.patch-dynamics .dyn-tip-header {
+  font-size: 12px;
+  color: #e6edf3;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.4px;
+  text-align: center;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(139, 148, 158, 0.28);
+}
+.patch-dynamics .dyn-tip-grid {
+  display: grid;
+  /* Two uniform-width columns. min-content with min-width on the badge
+     gives every pill the same horizontal footprint regardless of label
+     length, matching the .badge min-width:56px convention on the page. */
+  grid-template-columns: 1fr 1fr;
+  column-gap: 10px;
+  row-gap: 5px;
+  align-items: center;
+}
+.patch-dynamics .dyn-tip-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* Uniform tag-pill width inside the tooltip — fixed width so every label
+   (BUFF, REWORK, etc.) renders in the same horizontal footprint inside
+   the 2-column grid. Padding stays from .badge; only width is locked. */
+.patch-dynamics .dyn-tip-row > .badge {
+  width: 68px;
+  min-width: 68px;
+  padding-left: 4px;
+  padding-right: 4px;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+}
+.patch-dynamics .dyn-tip-count {
+  font-size: 11px;
+  color: #c9d1d9;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.patch-dynamics .dyn-tip-note {
+  font-size: 11px;
+  color: #8b9099;
+  font-style: italic;
 }
 .patch-dynamics .dyn-cell-wrap:hover .dyn-tip {
   opacity: 1;
@@ -1790,8 +1863,11 @@ ul.changes {
   margin: 3px 0 3px 0;
   padding-left: 0;          /* per-context indent applied via .entity-block,
                                .ability-block etc. (14px to align with icon) */
-  padding-right: 2px;       /* keep right-edge % bands 2px in from the
-                               container border (entity-block / ability-block) */
+  padding-right: 6px;       /* right-edge % bands sit 6px in from container
+                               border so their right edge lines up with the
+                               last cell of the .patch-dynamics row (which
+                               itself uses margin-right:-8px against the
+                               entity header's 14px padding → also 6px in). */
 }
 ul.changes li {
   display: grid;
@@ -2010,7 +2086,7 @@ ul.subnote-items > li::before {
    rotating ▸ chevron. Both rendered via a single ::before so they animate
    together. */
 .show-list-inline > summary::before {
-  content: '\\21B3';           /* ↳ */
+  content: '\21B3';           /* ↳ */
   display: inline-block;
   color: #6e7681;
   font-size: 12.5px;
