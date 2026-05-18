@@ -900,36 +900,34 @@ h2.section {
    with mix-blend-mode: screen. They've been folded directly into
    .dyn-cell's `background` stack above to eliminate ~6000 compositing
    layers on the larger patch pages — fixes scroll jank. */
-/* Tooltip popup — sibling of the diamond inside .dyn-cell-wrap. Lives
-   outside the clip-path, anchored above the diamond, fades in on hover.
-   Body is a 2-column grid of tag badges, ordered by DYN_TAG_ORDER. */
-.patch-dynamics .dyn-tip {
-  position: absolute;
-  /* Clearance for the hover scale(2) — the cell grows 12px above the
-     wrap's top edge from its centre. 20px keeps a comfortable gap
-     between the scaled cell and the tooltip bottom. */
-  bottom: calc(100% + 20px);
-  left: 50%;
-  transform: translateX(-50%);
+/* Shared tooltip popup — ONE element on document.body (not inside any
+   .dyn-cell-wrap), repositioned on hover. Lives outside .entity-block
+   so `contain: paint` from content-visibility:auto doesn't clip it.
+   Positioned via JS (position: fixed) — top/left set inline per show. */
+.dyn-tip {
+  position: fixed;
+  left: 0;
+  top: 0;
   background: rgba(13, 17, 23, 0.97);
   color: #c9d1d9;
   padding: 8px 10px;
   border: 1px solid rgba(139, 148, 158, 0.35);
   border-radius: 6px;
-  opacity: 0;
   pointer-events: none;
-  z-index: 100;
+  z-index: 1000;
   text-align: left;
   line-height: 1.3;
-  transition: opacity 0.12s 0.05s;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 6px;
   min-width: 0;
   white-space: nowrap;
 }
-.patch-dynamics .dyn-tip-header {
+.dyn-tip.is-visible {
+  display: flex;
+}
+.dyn-tip-header {
   font-size: 12px;
   color: #e6edf3;
   font-weight: 600;
@@ -939,25 +937,19 @@ h2.section {
   padding-bottom: 5px;
   border-bottom: 1px solid rgba(139, 148, 158, 0.28);
 }
-.patch-dynamics .dyn-tip-grid {
+.dyn-tip-grid {
   display: grid;
-  /* Two uniform-width columns. min-content with min-width on the badge
-     gives every pill the same horizontal footprint regardless of label
-     length, matching the .badge min-width:56px convention on the page. */
   grid-template-columns: 1fr 1fr;
   column-gap: 10px;
   row-gap: 5px;
   align-items: center;
 }
-.patch-dynamics .dyn-tip-row {
+.dyn-tip-row {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
-/* Uniform tag-pill width inside the tooltip — fixed width so every label
-   (BUFF, REWORK, etc.) renders in the same horizontal footprint inside
-   the 2-column grid. Padding stays from .badge; only width is locked. */
-.patch-dynamics .dyn-tip-row > .badge {
+.dyn-tip-row > .badge {
   width: 68px;
   min-width: 68px;
   padding-left: 4px;
@@ -965,20 +957,18 @@ h2.section {
   flex: 0 0 auto;
   box-sizing: border-box;
 }
-.patch-dynamics .dyn-tip-count {
+.dyn-tip-count {
   font-size: 11px;
   color: #c9d1d9;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.patch-dynamics .dyn-tip-note {
+.dyn-tip-note {
   font-size: 11px;
   color: #8b9099;
   font-style: italic;
 }
-.patch-dynamics .dyn-cell-wrap:hover .dyn-tip {
-  opacity: 1;
-}
+/* `.is-visible` toggle is handled higher up via display:flex. */
 
 /* NEW-ITEM BLOCK — keeps the standard grid (tag column / text / %).
    Only the FIRST row of the block gets a NEW tag (or RETURNING) in the tag
@@ -2668,7 +2658,13 @@ body.cat-filter-active .cat-hide { display: none !important; }
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4) inset;
 }
 
-/* ENTITY-BLOCK wrapper (used for filtering hide/show) */
+/* ENTITY-BLOCK wrapper (used for filtering hide/show). NOTE: we tried
+   `content-visibility: auto` here for scroll-perf, but its implicit
+   `contain: paint` clipped the hover-scaled dyn-cells at the block edge
+   (last cell on the right got sliced). The lazy-tooltip rebuild in
+   scripts.js already removed the bulk of the per-cell DOM weight, so
+   leaving CV off is the better trade — visual freedom > the last bit
+   of paint-skip. */
 .entity-block { margin-bottom: 6px; }
 /* All entity-block children flush against the entity-block left edge (margin
    not padding — padding-left controls INTERNAL content inset, which the

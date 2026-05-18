@@ -514,13 +514,13 @@
         const qs = fromVersion ? '?from=' + fromVersion : '';
         wrap.href = patch.filename + qs + (entityId ? '#' + entityId : '');
       }
-      wrap.appendChild(dynBuildTip(patch, counts, patch.filename
-        ? null
-        : '(no patch page yet)'));
+      // Lazy tooltip: defer DOM creation until first hover. On big patch
+      // pages there are 3000+ cells; pre-building all tooltips bloats the
+      // initial DOM (~50k extra nodes) and causes severe scroll jank.
+      // We stash the tooltip params on the wrap and build on demand below.
+      wrap._dynTipParams = [patch, counts, patch.filename ? null : '(no patch page yet)'];
     } else {
-      // Empty patches: header only, no body — per spec, no "not touched"
-      // note line.
-      wrap.appendChild(dynBuildTip(patch, null, null));
+      wrap._dynTipParams = [patch, null, null];
     }
     return wrap;
   }
@@ -623,9 +623,66 @@
         if (!manifest) return;
         const windowed = dynWindow(manifest);
         entities.forEach(e => dynRenderRow(e, manifest, windowed, currentVersion));
+        dynAttachTooltipDelegation();
       })
       .catch(() => { /* silently fail — widget is an enhancement */ });
   }
+
+  // Single shared tooltip lives on document.body (NOT inside any .dyn-cell-
+  // wrap). Two reasons:
+  //   1. Lazy: we only build the tooltip DOM once, then re-populate it on
+  //      each hover. With 3000+ cells on big patches, per-cell pre-built
+  //      tooltips were adding ~50k DOM nodes upfront.
+  //   2. content-visibility:auto on .entity-block implies `contain: paint`
+  //      which CLIPS any descendant — including tooltips that overflow
+  //      above the block. Living on body escapes that clip.
+  function dynAttachTooltipDelegation() {
+    const shared = document.createElement('span');
+    shared.className = 'dyn-tip dyn-tip-shared';
+    document.body.appendChild(shared);
+    let currentWrap = null;
+
+    function show(wrap) {
+      const params = wrap._dynTipParams;
+      if (!params) return;
+      // Rebuild children: clear previous and populate via the same helper.
+      while (shared.firstChild) shared.removeChild(shared.firstChild);
+      const built = dynBuildTip(params[0], params[1], params[2]);
+      while (built.firstChild) shared.appendChild(built.firstChild);
+      // Position-fix above the wrap. We avoid layout reads inside scroll
+      // listeners; reading getBoundingClientRect once on hover is cheap.
+      const r = wrap.getBoundingClientRect();
+      // Show first (to measure tooltip height), then place.
+      shared.style.left = '0px';
+      shared.style.top = '0px';
+      shared.classList.add('is-visible');
+      const tipRect = shared.getBoundingClientRect();
+      let left = r.left + r.width / 2 - tipRect.width / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - tipRect.width - 8));
+      const top = r.top - tipRect.height - 12;
+      shared.style.left = left + 'px';
+      shared.style.top = top + 'px';
+    }
+    function hide() {
+      shared.classList.remove('is-visible');
+      currentWrap = null;
+    }
+    document.addEventListener('mouseover', (e) => {
+      const wrap = e.target.closest && e.target.closest('.dyn-cell-wrap');
+      if (wrap === currentWrap) return;
+      if (wrap) { currentWrap = wrap; show(wrap); }
+      else { hide(); }
+    }, { capture: true, passive: true });
+    document.addEventListener('mouseout', (e) => {
+      // Only hide if the pointer left the wrap region entirely.
+      const wrap = e.target.closest && e.target.closest('.dyn-cell-wrap');
+      if (!wrap) return;
+      const to = e.relatedTarget;
+      if (!to || !wrap.contains(to)) hide();
+    }, { capture: true, passive: true });
+    window.addEventListener('scroll', hide, { passive: true });
+  }
+
   dynInit();
 })();
 
