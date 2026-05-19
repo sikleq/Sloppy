@@ -2814,15 +2814,14 @@ body.filter-active ul.subnotes { display: none; }
   line-height: 1.2;
 }
 .creeps-table tbody td {
-  padding: 5px 6px;
+  padding: 5px 8px;
   border-bottom: 1px solid rgba(139, 148, 158, 0.12);
-  /* white-space: pre-wrap preserves \n the sheet author put inside long
-     legend cells (separate paragraphs). overflow-wrap: anywhere lets
-     run-on tokens (URL-like) break mid-word if needed. */
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  vertical-align: top;
+  /* Single-line cells: every value is short (numbers, %, "Ближняя (100)",
+     ability dnames like "Envenomed Weapon"). nowrap lets table-layout:
+     auto size each column to the widest single-line content, so the
+     browser picks ideal widths and nothing wraps awkwardly. */
+  white-space: nowrap;
+  vertical-align: middle;
   line-height: 1.3;
 }
 .creeps-table tbody tr:hover td {
