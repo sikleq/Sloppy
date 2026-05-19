@@ -579,12 +579,22 @@ _REWORK_TRIGGERS = (
 # percent signs. Stat names are 1-4 words, may include "All Attributes".
 _STAT_TOKEN = r'\+([0-9./]+%?\s+[A-Z][a-zA-Z\' ]+?)(?=[.,]|\s+(?:increased|decreased|rescaled|changed|to|from|by)\b|$)'
 
-_PROP_ADD_RE = re.compile(
-    r'^Now also (?:provides?|grants?|gives?|deals?|fires?)\s+\+([\d./]+%?\s+[A-Z][a-zA-Z\'/ ]+?)$'
+_PROP_ADD_PREFIX_RE = re.compile(
+    r'^Now also (?:provides?|grants?|gives?|deals?|fires?)\s+'
 )
-_PROP_DEL_RE = re.compile(
-    r'^No longer (?:provides?|grants?|gives?)\s+\+([\d./]+%?\s+[A-Z][a-zA-Z\'/ ]+?)$'
+_PROP_DEL_PREFIX_RE = re.compile(
+    r'^No longer (?:provides?|grants?|gives?)\s+'
 )
+# Match one "+value stat" token. Stat name continues until next comma/and/end.
+_STAT_GRANT_RE = re.compile(
+    r'\+([\d./]+%?\s+[A-Z][a-zA-Z\'/ ]+?)(?=\s*(?:,|\sand\s|$))'
+)
+
+
+def _parse_stat_grants(text):
+    """Split "+X Stat, +Y Stat, and +Z Stat" into ["+X Stat","+Y Stat","+Z Stat"]."""
+    return [f'+{m.group(1).strip().rstrip(",.").strip()}'
+            for m in _STAT_GRANT_RE.finditer(text)]
 # "Bonus Armor decreased from +6 to +7" or "Mana Regen bonus increased from +1.5 to +1"
 # We allow the stat name to come BEFORE the verb ("Bonus Armor decreased")
 # OR AFTER ("Armor bonus decreased"); both forms appear in patchnotes.
@@ -665,18 +675,23 @@ def _postprocess_properties_change(lines):
                 kept_lines.append(ln)
                 continue
             txt = m_li.group(1)
-            # Try add pattern
-            ma = _PROP_ADD_RE.match(txt)
+            # Try add pattern — supports comma-separated multi-stat:
+            #   "Now also provides +200 Health, +350 Mana, and +60 Cast Range"
+            ma = _PROP_ADD_PREFIX_RE.match(txt)
             if ma:
-                stat = ma.group(1)
-                new_rows.append(('NEW', f'+{stat}'))
-                continue
+                grants = _parse_stat_grants(txt[ma.end():])
+                if grants:
+                    for stat in grants:
+                        new_rows.append(('NEW', stat))
+                    continue
             # Try remove
-            mr = _PROP_DEL_RE.match(txt)
+            mr = _PROP_DEL_PREFIX_RE.match(txt)
             if mr:
-                stat = mr.group(1)
-                old_rows.append(('DEL', f'+{stat}'))
-                continue
+                grants = _parse_stat_grants(txt[mr.end():])
+                if grants:
+                    for stat in grants:
+                        old_rows.append(('DEL', stat))
+                    continue
             # Try change "X increased/decreased from A to B"
             mc = _PROP_CHANGE_RE.match(txt)
             if mc:
