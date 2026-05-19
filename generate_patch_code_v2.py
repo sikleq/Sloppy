@@ -737,6 +737,48 @@ def _py_repr(v):
     return repr(v)
 
 
+_NOW_REQUIRES_RE = re.compile(
+    r'^(?:Now (?:also )?requires .+|No longer requires .+|'
+    r'Now requires .+ instead of .+)$'
+)
+
+
+def _postprocess_drop_now_requires(lines):
+    """When an item block emits auto_components_change(...), the OLD→NEW
+    components panel renders the recipe diff visually. The "Now requires
+    X" / "No longer requires X" / "Now also requires X" / "Now requires
+    X instead of Y" li rows become redundant text restatements. Drop
+    them. Cost-only summary rows ("Recipe cost ...", "Total cost ...")
+    stay — those are about amounts, not depicted in the panel.
+
+    Per memory rule sloppy_drop_now_requires_after_auto_components.
+    """
+    out = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        out.append(line)
+        if not line.startswith('W(auto_components_change('):
+            i += 1
+            continue
+        # Walk the item block — drop matching W(li(...)) rows until the
+        # next item_header / hero_header / section.
+        i += 1
+        while i < len(lines):
+            ln = lines[i]
+            if (ln.startswith('W(item_header(') or ln.startswith('W(hero_header(')
+                or ln.startswith('W(section(') or ln.startswith('W(plain_header(')
+                or ln.startswith('W(unit_header(')):
+                break
+            m_li = re.match(r'^W\(li\("(.+?)",\s*[bt]\(', ln)
+            if m_li and _NOW_REQUIRES_RE.match(m_li.group(1)):
+                i += 1
+                continue
+            out.append(ln)
+            i += 1
+    return out
+
+
 def _postprocess_rework_marker(lines):
     """Add a TODO breadcrumb above W(ability(...)) blocks whose first li
     matches an "Innate ability reworked" / "Ability reworked" trigger.
@@ -826,6 +868,7 @@ def generate(version):
     out = _postprocess_aghs_merge(out)
     out = _postprocess_scale_pill(out)
     out = _postprocess_properties_change(out)
+    out = _postprocess_drop_now_requires(out)
     out = _postprocess_rework_marker(out)
 
     return '\n'.join(out)
