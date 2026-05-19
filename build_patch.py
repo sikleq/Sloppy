@@ -3573,8 +3573,16 @@ def save_creeps_html():
     Preserves: header row exactly as authored, unicode tier dots
     (⬤⭘⭘⭘ etc.) in the first column, Cyrillic column names, and the
     trailing tier-key footer rows. Each row's first cell tier-dot value
-    decorates the <tr> with a class for theming (tier-1/2/3/4)."""
+    decorates the <tr> with a class for theming (tier-1/2/3/4).
+
+    Overlay: for each row whose `-createhero [имя]` column matches a
+    known neutral, pull HP/Mana/Armor/Damage/AS/BAT/MS/Range/Bounty/XP
+    /Vision from data/stats/<patch>/units.json + npc_units.txt and
+    overwrite the corresponding columns. The Крип column gets a 24px
+    icon from icons/units/<npc-key>.png so each creep is identifiable
+    at a glance."""
     import csv as _csv
+    import re as _re
 
     csv_path = _os.path.join(_os.path.dirname(__file__), 'data', 'creeps_raw.csv')
     if not _os.path.exists(csv_path):
@@ -3592,6 +3600,185 @@ def save_creeps_html():
     header = rows[0]
     body = rows[1:]
     nav = _render_top_nav(active="creeps", patch_context=False)
+
+    # ---- Stats overlay infrastructure ----
+    # createhero name → npc_dota_neutral_* key. Most entries match by
+    # direct prefix (e.g. kobold → npc_dota_neutral_kobold); these
+    # explicit overrides cover the ambiguous cases plus lane-creep names
+    # which have no neutral counterpart (mapped to None to skip overlay).
+    CREEP_NAME_TO_NPC = {
+        'harpy':            'npc_dota_neutral_harpy_scout',
+        'wolf':             'npc_dota_neutral_giant_wolf',
+        'mud':              'npc_dota_neutral_mud_golem',
+        'frog':             'npc_dota_neutral_froglet',
+        'lizard':           'npc_dota_neutral_big_thunder_lizard',
+        # Lane creeps — no neutral overlay available.
+        'skeleton_warrior': None,
+        'flag / melee':     None,
+        'ranged':           None,
+    }
+
+    UNITS_PATH = _os.path.join(_os.path.dirname(__file__),
+                                'data', 'stats', '7.41c', 'units.json')
+    NPC_KV_PATH = _os.path.join(_os.path.dirname(__file__),
+                                 'data', 'stats', '7.41c', 'npc_units.txt')
+    units = {}
+    if _os.path.exists(UNITS_PATH):
+        with open(UNITS_PATH, encoding='utf-8') as _f:
+            units = _json.load(_f)
+    # npc_units.txt has the regen/bounty/vision/aggro fields that
+    # units.json doesn't carry. Parse a minimal subset per neutral.
+    npc_extra = {}
+    if _os.path.exists(NPC_KV_PATH):
+        kv_text = open(NPC_KV_PATH, encoding='utf-8').read()
+        for npc_key in (k for k in units if k.startswith('npc_dota_neutral_')):
+            block_m = _re.search(
+                rf'"{_re.escape(npc_key)}"\s*\{{(.*?)\n\s*\}}',
+                kv_text, _re.S
+            )
+            if not block_m:
+                continue
+            block = block_m.group(1)
+            extras = {}
+            for field in ('StatusHealthRegen', 'StatusManaRegen',
+                          'BountyGoldMin', 'BountyGoldMax', 'BountyXP',
+                          'VisionDaytimeRange', 'VisionNighttimeRange'):
+                vm = _re.search(rf'"{field}"\s+"([^"]+)"', block)
+                if vm:
+                    extras[field] = vm.group(1)
+            npc_extra[npc_key] = extras
+
+    def _resolve_npc(createhero):
+        """Map -createhero [имя] cell to an npc_dota_neutral_* key, or
+        None if no overlay is available (lane creeps, unknown name)."""
+        n = (createhero or '').strip()
+        if not n:
+            return None
+        if n in CREEP_NAME_TO_NPC:
+            return CREEP_NAME_TO_NPC[n]
+        direct = f'npc_dota_neutral_{n}'
+        if direct in units:
+            return direct
+        # Fuzzy: prefer a key that contains the name as a token.
+        candidates = [k for k in units
+                       if k.startswith('npc_dota_neutral_') and n in k]
+        return candidates[0] if len(candidates) == 1 else None
+
+    def _fmt_num(x, suffix=''):
+        """Format an int as-is, a float as :g (drops trailing zeros).
+        Russian decimal separator (',') so it visually matches the sheet."""
+        if isinstance(x, str):
+            try:
+                x = float(x) if '.' in x else int(x)
+            except ValueError:
+                return f'{x}{suffix}'
+        if isinstance(x, float):
+            s = f'{x:g}'.replace('.', ',')
+        else:
+            s = str(x)
+        return s + suffix
+
+    def _stats_overlay(npc_key):
+        """Return dict mapping CSV column-index → overlay string. None
+        for columns we can't fill; caller keeps the CSV cell."""
+        if not npc_key or npc_key not in units:
+            return {}
+        s = units[npc_key]
+        ex = npc_extra.get(npc_key, {})
+        hp = s.get('StatusHealth')
+        mp = s.get('StatusMana') or 0
+        armor = s.get('ArmorPhysical', 0) or 0
+        dmin = s.get('AttackDamageMin')
+        dmax = s.get('AttackDamageMax')
+        rate = s.get('AttackRate')
+        rng = s.get('AttackRange')
+        ms = s.get('MovementSpeed')
+        hp_regen = ex.get('StatusHealthRegen')
+        mp_regen = ex.get('StatusManaRegen')
+        bounty_min = ex.get('BountyGoldMin')
+        bounty_max = ex.get('BountyGoldMax')
+        bounty_xp = ex.get('BountyXP')
+        vis_day = ex.get('VisionDaytimeRange')
+        vis_night = ex.get('VisionNighttimeRange')
+
+        overlay = {}
+        # col 4: ХП (ХП/сек) — "<hp> +<regen>"
+        if hp is not None:
+            cell = _fmt_num(hp)
+            if hp_regen:
+                cell += f' +{_fmt_num(hp_regen)}'
+            overlay[4] = cell
+        # col 5: МП (МП/сек)
+        if mp:
+            cell = _fmt_num(mp)
+            if mp_regen:
+                cell += f' +{_fmt_num(mp_regen)}'
+            overlay[5] = cell
+        elif mp == 0:
+            overlay[5] = '-'
+        # col 6: Броня
+        overlay[6] = _fmt_num(armor)
+        # col 7: Броня (%) — physical damage reduction percent
+        if armor is not None:
+            mult = 0.06 * armor / (1 + 0.06 * abs(armor)) if armor else 0
+            pct = round(mult * 100)
+            overlay[7] = f'{pct}%'
+        # col 8: EHP (Физ) — effective HP vs physical
+        if hp is not None and armor is not None:
+            mult = 0.06 * armor / (1 + 0.06 * abs(armor)) if armor else 0
+            ehp_phys = round(hp / max(0.01, 1 - mult))
+            overlay[8] = _fmt_num(ehp_phys)
+        # col 10: EHP (Маг) — magres assumed 0% if not in KV, so EHP=HP
+        # (Magres for neutrals defaults to 0 unless set explicitly.)
+        if hp is not None:
+            overlay[10] = _fmt_num(hp)
+            overlay[9] = '0%'
+        # cols 11/12/13: Урон min/max/avg
+        if dmin is not None:
+            overlay[11] = _fmt_num(dmin)
+        if dmax is not None:
+            overlay[12] = _fmt_num(dmax)
+        if dmin is not None and dmax is not None:
+            overlay[13] = _fmt_num((dmin + dmax) / 2)
+        # col 14: AS (base) — neutrals are 100 unless their KV says
+        # otherwise; left blank to inherit CSV when unknown.
+        # col 16: BAT
+        if rate is not None:
+            overlay[16] = _fmt_num(rate)
+        # col 15 (t/1 удар) and col 14 (АС) deliberately NOT overlaid:
+        # both depend on Attack Speed which we don't carry reliably for
+        # every neutral (units.json has only BAT, AS is encoded as a
+        # creature property elsewhere). Let the CSV pass through.
+        # col 17: МС
+        if ms is not None:
+            overlay[17] = _fmt_num(ms)
+        # cols 18/19: Золото / Ср. золото
+        if bounty_min is not None and bounty_max is not None:
+            overlay[18] = f'{bounty_min}-{bounty_max}'
+            overlay[19] = _fmt_num((int(bounty_min) + int(bounty_max)) / 2)
+        # col 20: Опыт
+        if bounty_xp is not None:
+            overlay[20] = _fmt_num(bounty_xp)
+        # col 21: Дальность атаки — keep CSV form ("Ближняя (128)" / "500")
+        # unless rng exists AND CSV cell is empty/numeric.
+        if rng is not None:
+            overlay[21] = (f'Ближняя ({rng})' if rng <= 150
+                           else _fmt_num(rng))
+        # col 23: Обзор — "day/night"
+        if vis_day and vis_night:
+            overlay[23] = f'{vis_day}/{vis_night}'
+        return overlay
+
+    def _icon_html(npc_key):
+        """Render <img> for the creep icon, with onerror fallback hidden."""
+        if not npc_key:
+            return ''
+        return (
+            f'<img class="creep-icon" '
+            f'src="icons/units/{npc_key}.png" '
+            f'alt="" loading="lazy" '
+            f'onerror="this.style.display=\'none\';">'
+        )
 
     def tier_class(dots):
         # ⬤ = filled, ⭘ = empty. Tier 1 = ⬤⭘⭘⭘ (top pick), Tier 4 = ⬤⬤⬤⬤ (worst).
@@ -3659,13 +3846,39 @@ def save_creeps_html():
         if row_stripped:
             continue
 
+        # Stat overlay: resolve createhero (col 3) to an npc key and
+        # overwrite the columns we have authoritative data for. The
+        # Крип cell (col 2) gets an inline icon prepended.
+        createhero = padded[3].strip() if len(padded) > 3 else ''
+        npc_key = _resolve_npc(createhero) if createhero else None
+        icon_html = _icon_html(npc_key) if npc_key else ''
+        overlay = _stats_overlay(npc_key) if npc_key else {}
+        for ci, val in overlay.items():
+            if ci < len(padded):
+                padded[ci] = val
+
         if is_footer:
             current_tier = ''  # legend rows reset tier propagation
             tr_cls = ' class="creeps-footer"'
         else:
             tr_cls = f' class="{current_tier}"' if current_tier else ''
-        cells = ''.join(render_cell(c) for c in padded)
-        body_html_parts.append(f'<tr{tr_cls}>{cells}</tr>')
+
+        cells_html_parts = []
+        for ci, c in enumerate(padded):
+            if ci == 2 and icon_html:
+                # Крип column: prepend icon. createhero name becomes the
+                # visible label if the CSV didn't fill the Крип cell.
+                label = c.strip() or createhero
+                esc = (label.replace('&', '&amp;')
+                              .replace('<', '&lt;')
+                              .replace('>', '&gt;'))
+                cells_html_parts.append(
+                    f'<td class="creep-name-cell">{icon_html}'
+                    f'<span class="creep-name-label">{esc}</span></td>'
+                )
+            else:
+                cells_html_parts.append(render_cell(c))
+        body_html_parts.append(f'<tr{tr_cls}>{"".join(cells_html_parts)}</tr>')
     body_html = '\n'.join(body_html_parts)
 
     # Build the Notes block (rendered AFTER the table). Each source row
@@ -3702,39 +3915,39 @@ def save_creeps_html():
         parts.append('</section>')
         notes_html = '\n'.join(parts)
 
-    # Explicit column widths (px) — keep narrow numeric columns tight and
-    # text columns wide enough for typical content, then let `table-layout:
-    # fixed` constrain prose cells to wrap inside their column instead of
-    # blowing the column up to thousands of px.
+    # Explicit column widths (px) — sized to fit each Cyrillic header on
+    # a single line, plus typical data-cell content. Sum exceeds viewport
+    # (~1280px) so the .creeps-scroll wrapper provides horizontal scroll
+    # exactly like the Google Sheet source does.
     col_widths = [
-        58,    # C (dots)
-        36,    # Ур.
-        160,   # Крип (creep name)
-        145,   # -createhero [имя]
-        110,   # ХП (ХП/сек)
-        100,   # МП (МП/сек)
-        60,    # Броня
-        62,    # Броня (%)
-        72,    # EHP (Физ)
-        62,    # Магрез
-        72,    # EHP (Маг)
-        62,    # Урон (мин)
-        68,    # Урон (макс)
-        62,    # Ср. урон
-        48,    # АС
-        62,    # t/1 удар
-        44,    # BAT
-        44,    # МС
+        38,    # C (dots)
+        38,    # Ур.
+        160,   # Крип (icon + name)
+        130,   # -createhero [имя]
+        96,    # ХП (ХП/сек)
+        92,    # МП (МП/сек)
+        58,    # Броня
+        72,    # Броня (%)
+        68,    # EHP (Физ)
+        58,    # Магрез
+        68,    # EHP (Маг)
+        76,    # Урон (мин)
+        84,    # Урон (макс)
+        68,    # Ср. урон
+        38,    # АС
+        66,    # t/1 удар
+        42,    # BAT
+        38,    # МС
         58,    # Золото
-        72,    # Ср. золото
+        76,    # Ср. золото
         50,    # Опыт
         118,   # Дальность атаки
-        118,   # Тип атаки
-        92,    # Обзор
-        92,    # Дальность агра
-        148,   # Способность 1
-        148,   # Способность 2
-        148,   # Способность 3
+        76,    # Тип атаки
+        72,    # Обзор
+        112,   # Дальность агра
+        140,   # Способность 1
+        140,   # Способность 2
+        140,   # Способность 3
     ]
     # Pad/trim to actual header count to stay safe if the sheet adds/removes a col.
     while len(col_widths) < len(header):

@@ -2732,15 +2732,37 @@ body.filter-active ul.subnotes { display: none; }
   overflow-x: auto;
 }
 .creeps-table {
-  /* table-layout: fixed respects the <colgroup> widths absolutely — long
-     prose cells wrap inside their column instead of stretching it to
-     >2000px (legend cells in the sheet have multi-paragraph explanations
-     dropped into random columns). */
+  /* table-layout: fixed respects the <colgroup> widths absolutely; the
+     extracted-prose post-process means there are no more 2000px-wide
+     legend cells. width: max-content stops the parent container from
+     squeezing the table back into its viewport width — the .creeps-scroll
+     wrapper provides horizontal scroll for the overflow. */
   table-layout: fixed;
+  width: max-content;
   border-collapse: collapse;
   font-size: 11.5px;
   color: #c9d1d9;
   font-variant-numeric: tabular-nums;
+}
+.creeps-table .creep-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: normal;
+  padding-left: 4px;
+}
+.creeps-table .creep-icon {
+  width: 28px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: rgba(139, 148, 158, 0.15);
+}
+.creeps-table .creep-name-label {
+  font-size: 11px;
+  color: #c9d1d9;
+  line-height: 1.2;
 }
 .creeps-table thead th {
   position: sticky;
@@ -2752,8 +2774,7 @@ body.filter-active ul.subnotes { display: none; }
   text-align: left;
   padding: 6px 6px;
   border-bottom: 1px solid rgba(139, 148, 158, 0.35);
-  /* Allow Cyrillic header text to wrap inside narrow numeric columns. */
-  word-break: break-word;
+  white-space: nowrap;
   line-height: 1.2;
 }
 .creeps-table tbody td {
