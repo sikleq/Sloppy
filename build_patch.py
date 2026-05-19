@@ -3615,11 +3615,19 @@ def save_creeps_html():
 
     header_html = '<tr>' + ''.join(render_cell(c, header_cell=True) for c in header) + '</tr>'
 
-    # Propagate tier from the explicit-dot row to subsequent rows in the
-    # same section (the sheet only marks the FIRST row of each tier block
-    # with dots; following rows inherit). Tracking lets row-level styling
-    # apply consistently across a tier even though the dot cell stays blank.
+    # Two concerns in one walk:
+    # (a) Propagate tier from explicit-dot rows to subsequent rows in
+    #     the same section. The sheet only marks the FIRST row of each
+    #     tier block with dots.
+    # (b) Pull prose cells (>150 chars) out of the table — the sheet
+    #     author parked long explanations in random narrow columns
+    #     (Броня, Дальность атаки, Способность 1). Inside table-layout:
+    #     fixed those produce 1700px-tall ribbons of broken Cyrillic.
+    #     Move them to a separate Notes block beneath the table, keyed
+    #     by the column header so context survives.
+    PROSE_THRESHOLD = 50
     body_html_parts = []
+    notes_blocks = []
     current_tier = ''
     for r in body:
         padded = r + [''] * (len(header) - len(r))
@@ -3628,14 +3636,113 @@ def save_creeps_html():
             current_tier = explicit_tier
         is_footer = (not padded[0].strip() and not padded[1].strip()
                      and padded[2].strip().startswith('ТИР'))
+
+        # Collect prose cells + blank them out in the row.
+        row_notes = []
+        for ci, cell in enumerate(padded):
+            if cell and len(cell) > PROSE_THRESHOLD:
+                row_notes.append(
+                    (header[ci] if ci < len(header) else '', cell)
+                )
+                padded[ci] = ''
+
+        # Drop the row from the table if extraction left it with <2 short
+        # surviving cells — the row was effectively all prose, and its
+        # meaning lives on in the notes block.
+        non_empty_short = sum(1 for c in padded if c.strip())
+        row_stripped = (row_notes and non_empty_short < 2)
+
+        if row_notes:
+            heading = padded[2].strip() or padded[3].strip() or ''
+            notes_blocks.append({'heading': heading, 'rows': row_notes})
+
+        if row_stripped:
+            continue
+
         if is_footer:
-            current_tier = ''  # legend rows reset propagation
+            current_tier = ''  # legend rows reset tier propagation
             tr_cls = ' class="creeps-footer"'
         else:
             tr_cls = f' class="{current_tier}"' if current_tier else ''
         cells = ''.join(render_cell(c) for c in padded)
         body_html_parts.append(f'<tr{tr_cls}>{cells}</tr>')
     body_html = '\n'.join(body_html_parts)
+
+    # Build the Notes block (rendered AFTER the table). Each source row
+    # becomes one <article>, with paragraph-per-cell labelled by the
+    # column header. Sheet-authored \n turn into <br>.
+    notes_html = ''
+    if notes_blocks:
+        parts = ['<section class="creeps-notes"><h2>Примечания</h2>']
+        for block in notes_blocks:
+            parts.append('<article class="creeps-note">')
+            heading_esc = (block['heading']
+                           .replace('&', '&amp;')
+                           .replace('<', '&lt;')
+                           .replace('>', '&gt;'))
+            if heading_esc:
+                parts.append(f'<h3>{heading_esc}</h3>')
+            for label, text in block['rows']:
+                esc_text = (text
+                            .replace('&', '&amp;')
+                            .replace('<', '&lt;')
+                            .replace('>', '&gt;')
+                            .replace('\n', '<br>'))
+                label_esc = (label
+                             .replace('&', '&amp;')
+                             .replace('<', '&lt;')
+                             .replace('>', '&gt;'))
+                if label_esc and label_esc not in ('Крип', 'C'):
+                    parts.append(
+                        f'<p><strong>{label_esc}:</strong> {esc_text}</p>'
+                    )
+                else:
+                    parts.append(f'<p>{esc_text}</p>')
+            parts.append('</article>')
+        parts.append('</section>')
+        notes_html = '\n'.join(parts)
+
+    # Explicit column widths (px) — keep narrow numeric columns tight and
+    # text columns wide enough for typical content, then let `table-layout:
+    # fixed` constrain prose cells to wrap inside their column instead of
+    # blowing the column up to thousands of px.
+    col_widths = [
+        58,    # C (dots)
+        36,    # Ур.
+        160,   # Крип (creep name)
+        145,   # -createhero [имя]
+        110,   # ХП (ХП/сек)
+        100,   # МП (МП/сек)
+        60,    # Броня
+        62,    # Броня (%)
+        72,    # EHP (Физ)
+        62,    # Магрез
+        72,    # EHP (Маг)
+        62,    # Урон (мин)
+        68,    # Урон (макс)
+        62,    # Ср. урон
+        48,    # АС
+        62,    # t/1 удар
+        44,    # BAT
+        44,    # МС
+        58,    # Золото
+        72,    # Ср. золото
+        50,    # Опыт
+        118,   # Дальность атаки
+        118,   # Тип атаки
+        92,    # Обзор
+        92,    # Дальность агра
+        148,   # Способность 1
+        148,   # Способность 2
+        148,   # Способность 3
+    ]
+    # Pad/trim to actual header count to stay safe if the sheet adds/removes a col.
+    while len(col_widths) < len(header):
+        col_widths.append(80)
+    col_widths = col_widths[:len(header)]
+    colgroup_html = '<colgroup>' + ''.join(
+        f'<col style="width:{w}px">' for w in col_widths
+    ) + '</colgroup>'
 
     html = (
         '<!DOCTYPE html>\n'
@@ -3648,10 +3755,14 @@ def save_creeps_html():
         '<body>\n'
         f'{nav}\n'
         '<div class="container creeps-page">\n'
+        '<div class="creeps-scroll">\n'
         '<table class="creeps-table">\n'
+        f'{colgroup_html}\n'
         f'<thead>{header_html}</thead>\n'
         f'<tbody>\n{body_html}\n</tbody>\n'
         '</table>\n'
+        '</div>\n'
+        f'{notes_html}\n'
         '</div>\n'
         f'<script src="scripts.js?v={_ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
