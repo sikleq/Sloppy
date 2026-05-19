@@ -12544,15 +12544,32 @@ W(li("Radiant Secret Shop trigger area moved slightly towards the radiant Tier 1
 W(ul_close())
 
 # ---- Invulnerability Targeting ----
+# Structure mirrors the datafeed's indent_level hierarchy (see
+# data/7.40_datafeed.json general_notes[4]): L1 intro rows → top-level
+# bullets in the section ul; L2 categories (Items / Neutral Creeps /
+# Heroes) → subgroup() headers; L3 rules → ability_row li()s;
+# L4 clarifications → inline_note() on the parent rule.
 W(plain_header("Invulnerability Targeting"))
 W(ul_open())
-W(li("Invulnerability targeting rules of certain items and abilities have been updated", t("REWORK"),
+W(li("Invulnerability targeting rules of certain items and abilities have been updated", t("MISC"),
      extra=inline_note("Most items and abilities that previously could target and/or affect invulnerable units no longer do so.")))
+W(li("The following spells have been changed:", t("MISC")))
+W(ul_close())
+
+W(subgroup("Items"))
+W(ul_open())
 W(li("Nullifier's Nullify can no longer target invulnerable units", t("NERF"), ability_row=True))
+W(ul_close())
+
+W(subgroup("Neutral Creeps"))
+W(ul_open())
 W(li("Satyr Banisher's Purge can no longer target invulnerable units", t("NERF"), ability_row=True))
+W(ul_close())
+
+W(subgroup("Heroes"))
+W(ul_open())
 W(li("Dark Seer's Vacuum no longer affects invulnerable units", t("NERF"), ability_row=True))
-W(li("Naga Siren's Ensnare can no longer target invulnerable units", t("NERF"), ability_row=True,
-     extra=inline_note("Exception: still works if the invulnerability is provided by Song of the Siren.")))
+W(li("Naga Siren's Ensnare can no longer target invulnerable units unless this invulnerability is provided by Song of the Siren", t("NERF"), ability_row=True))
 W(li("Ogre Magi's Bloodlust can no longer target invulnerable units", t("NERF"), ability_row=True,
      extra=inline_note("Can still target invulnerable buildings (i.e. Tier 2-4 towers when the previous ones are not destroyed).")))
 W(li("Oracle's Fortune's End can no longer target invulnerable units, but does affect invulnerable units in the radius", t("NERF"), ability_row=True))
@@ -12565,14 +12582,11 @@ W(ul_close())
 
 W(subgroup("Cyclone Interactions"))
 W(ul_open())
-W(li("Since Cyclone effects also make the unit invulnerable, all changes above apply to them as well", t("MISC"),
-     extra=inline_note(
-         "Special cases:"
-         "<br>• Nullifier's Nullify will dispel Cyclone off the target immediately if Cyclone was cast on a unit already affected by the Nullify debuff."
-         "<br>• Oracle's Fortune's End cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target."
-         "<br>• Sven's Storm Hammer with Aghanim's Scepter cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target."
-         "<br>• All three of these will also dispel Cyclone if the spell projectile was launched (or started channeling) before the target got Cycloned."
-     )))
+W(li("Since Cyclone effects also make the unit invulnerable, all changes above apply to them as well. As a result, there are these special cases:", t("MISC")))
+W(li("Nullifier's Nullify will dispel Cyclone off the target immediately if Cyclone was cast on a unit already affected by the Nullify debuff", t("MISC"), ability_row=True))
+W(li("Oracle's Fortune's End cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target", t("NERF"), ability_row=True))
+W(li("Sven's Storm Hammer with Aghanim's Scepter cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target", t("NERF"), ability_row=True,
+     extra=inline_note("All three of these will also dispel Cyclone if the spell projectile was launched (or started channeling) before the target got Cycloned.")))
 W(ul_close())
 
 

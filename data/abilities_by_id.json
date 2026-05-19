@@ -1,0 +1,2938 @@
+{
+"5003": {
+"dname": "Mana Break",
+"slug": "antimage_mana_break"
+},
+"5004": {
+"dname": "Blink",
+"slug": "antimage_blink"
+},
+"7314": {
+"dname": "Counterspell",
+"slug": "antimage_counterspell"
+},
+"1447": {
+"dname": "Persecutor",
+"slug": "antimage_persectur"
+},
+"5006": {
+"dname": "Mana Void",
+"slug": "antimage_mana_void"
+},
+"5007": {
+"dname": "Berserker's Call",
+"slug": "axe_berserkers_call"
+},
+"5008": {
+"dname": "Battle Hunger",
+"slug": "axe_battle_hunger"
+},
+"5009": {
+"dname": "Counter Helix",
+"slug": "axe_counter_helix"
+},
+"5010": {
+"dname": "Culling Blade",
+"slug": "axe_culling_blade"
+},
+"1166": {
+"dname": "One Man Army",
+"slug": "axe_one_man_army"
+},
+"5012": {
+"dname": "Enfeeble",
+"slug": "bane_enfeeble"
+},
+"5011": {
+"dname": "Brain Sap",
+"slug": "bane_brain_sap"
+},
+"5014": {
+"dname": "Nightmare",
+"slug": "bane_nightmare"
+},
+"5013": {
+"dname": "Fiend's Grip",
+"slug": "bane_fiends_grip"
+},
+"1202": {
+"dname": "Ichor of Nyctasha",
+"slug": "bane_ichor_of_nyctasha"
+},
+"5015": {
+"dname": "Bloodrage",
+"slug": "bloodseeker_bloodrage"
+},
+"5016": {
+"dname": "Blood Rite",
+"slug": "bloodseeker_blood_bath"
+},
+"5017": {
+"dname": "Thirst",
+"slug": "bloodseeker_thirst"
+},
+"1203": {
+"dname": "Sanguivore",
+"slug": "bloodseeker_sanguivore"
+},
+"5018": {
+"dname": "Rupture",
+"slug": "bloodseeker_rupture"
+},
+"5126": {
+"dname": "Crystal Nova",
+"slug": "crystal_maiden_crystal_nova"
+},
+"5127": {
+"dname": "Frostbite",
+"slug": "crystal_maiden_frostbite"
+},
+"5128": {
+"dname": "Arcane Aura",
+"slug": "crystal_maiden_brilliance_aura"
+},
+"953": {
+"dname": "Crystal Clone",
+"slug": "crystal_maiden_crystal_clone"
+},
+"1735": {
+"dname": "Glacial Guard",
+"slug": "crystal_maiden_glacial_guard"
+},
+"5129": {
+"dname": "Freezing Field",
+"slug": "crystal_maiden_freezing_field"
+},
+"5019": {
+"dname": "Frost Arrows",
+"slug": "drow_ranger_frost_arrows"
+},
+"5632": {
+"dname": "Gust",
+"slug": "drow_ranger_wave_of_silence"
+},
+"343": {
+"dname": "Multishot",
+"slug": "drow_ranger_multishot"
+},
+"1121": {
+"dname": "Glacier",
+"slug": "drow_ranger_glacier"
+},
+"1205": {
+"dname": "Precision Aura",
+"slug": "drow_ranger_trueshot"
+},
+"5022": {
+"dname": "Marksmanship",
+"slug": "drow_ranger_marksmanship"
+},
+"5023": {
+"dname": "Fissure",
+"slug": "earthshaker_fissure"
+},
+"5024": {
+"dname": "Enchant Totem",
+"slug": "earthshaker_enchant_totem"
+},
+"5025": {
+"dname": "Aftershock",
+"slug": "earthshaker_aftershock"
+},
+"5026": {
+"dname": "Echo Slam",
+"slug": "earthshaker_echo_slam"
+},
+"1494": {
+"dname": "Slugger",
+"slug": "earthshaker_slugger"
+},
+"5028": {
+"dname": "Blade Fury",
+"slug": "juggernaut_blade_fury"
+},
+"5029": {
+"dname": "Healing Ward",
+"slug": "juggernaut_healing_ward"
+},
+"5027": {
+"dname": "Blade Dance",
+"slug": "juggernaut_blade_dance"
+},
+"419": {
+"dname": "Swiftslash",
+"slug": "juggernaut_swift_slash"
+},
+"1210": {
+"dname": "Bladeform",
+"slug": "juggernaut_bladeform"
+},
+"5030": {
+"dname": "Omnislash",
+"slug": "juggernaut_omni_slash"
+},
+"5051": {
+"dname": "Starstorm",
+"slug": "mirana_starfall"
+},
+"5048": {
+"dname": "Sacred Arrow",
+"slug": "mirana_arrow"
+},
+"5050": {
+"dname": "Leap",
+"slug": "mirana_leap"
+},
+"1739": {
+"dname": "Celestial Quiver",
+"slug": "mirana_celestial_quiver"
+},
+"1213": {
+"dname": "Moonlight Shadow",
+"slug": "mirana_invis"
+},
+"5059": {
+"dname": "Shadowraze",
+"slug": "nevermore_shadowraze1"
+},
+"1216": {
+"dname": "Feast of Souls",
+"slug": "nevermore_frenzy"
+},
+"5063": {
+"dname": "Presence of the Dark Lord",
+"slug": "nevermore_dark_lord"
+},
+"5064": {
+"dname": "Requiem of Souls",
+"slug": "nevermore_requiem"
+},
+"5062": {
+"dname": "Necromastery",
+"slug": "nevermore_necromastery"
+},
+"5052": {
+"dname": "Waveform",
+"slug": "morphling_waveform"
+},
+"5053": {
+"dname": "Adaptive Strike",
+"slug": "morphling_adaptive_strike_agi"
+},
+"5055": {
+"dname": "Attribute Shift (Agility Gain)",
+"slug": "morphling_morph_agi"
+},
+"5056": {
+"dname": "Attribute Shift (Strength Gain)",
+"slug": "morphling_morph_str"
+},
+"5057": {
+"dname": "Morph",
+"slug": "morphling_replicate"
+},
+"1741": {
+"dname": "Ebb and Flow",
+"slug": "morphling_ebb_and_flow"
+},
+"5065": {
+"dname": "Spirit Lance",
+"slug": "phantom_lancer_spirit_lance"
+},
+"5066": {
+"dname": "Doppelganger",
+"slug": "phantom_lancer_doppelwalk"
+},
+"1221": {
+"dname": "Phantom Rush",
+"slug": "phantom_lancer_phantom_edge"
+},
+"1449": {
+"dname": "Illusory Armaments",
+"slug": "phantom_lancer_illusory_armaments"
+},
+"5067": {
+"dname": "Juxtapose",
+"slug": "phantom_lancer_juxtapose"
+},
+"5069": {
+"dname": "Illusory Orb",
+"slug": "puck_illusory_orb"
+},
+"5071": {
+"dname": "Waning Rift",
+"slug": "puck_waning_rift"
+},
+"5072": {
+"dname": "Phase Shift",
+"slug": "puck_phase_shift"
+},
+"1222": {
+"dname": "Puckish",
+"slug": "puck_puckish"
+},
+"5073": {
+"dname": "Dream Coil",
+"slug": "puck_dream_coil"
+},
+"5075": {
+"dname": "Meat Hook",
+"slug": "pudge_meat_hook"
+},
+"5076": {
+"dname": "Rot",
+"slug": "pudge_rot"
+},
+"5074": {
+"dname": "Meat Shield",
+"slug": "pudge_flesh_heap"
+},
+"1223": {
+"dname": "Flesh Heap",
+"slug": "pudge_innate_graft_flesh"
+},
+"5077": {
+"dname": "Dismember",
+"slug": "pudge_dismember"
+},
+"5082": {
+"dname": "Plasma Field",
+"slug": "razor_plasma_field"
+},
+"5083": {
+"dname": "Static Link",
+"slug": "razor_static_link"
+},
+"1224": {
+"dname": "Storm Surge",
+"slug": "razor_storm_surge"
+},
+"5084": {
+"dname": "Unstable Current",
+"slug": "razor_unstable_current"
+},
+"5085": {
+"dname": "Eye of the Storm",
+"slug": "razor_eye_of_the_storm"
+},
+"5102": {
+"dname": "Burrowstrike",
+"slug": "sandking_burrowstrike"
+},
+"5103": {
+"dname": "Sand Storm",
+"slug": "sandking_sand_storm"
+},
+"1229": {
+"dname": "Stinger",
+"slug": "sandking_scorpion_strike"
+},
+"1226": {
+"dname": "Caustic Finale",
+"slug": "sandking_caustic_finale"
+},
+"5105": {
+"dname": "Epicenter",
+"slug": "sandking_epicenter"
+},
+"5098": {
+"dname": "Static Remnant",
+"slug": "storm_spirit_static_remnant"
+},
+"5099": {
+"dname": "Electric Vortex",
+"slug": "storm_spirit_electric_vortex"
+},
+"5100": {
+"dname": "Overload",
+"slug": "storm_spirit_overload"
+},
+"5101": {
+"dname": "Ball Lightning",
+"slug": "storm_spirit_ball_lightning"
+},
+"1231": {
+"dname": "Galvanized",
+"slug": "storm_spirit_galvanized"
+},
+"5094": {
+"dname": "Storm Hammer",
+"slug": "sven_storm_bolt"
+},
+"5095": {
+"dname": "Great Cleave",
+"slug": "sven_great_cleave"
+},
+"5096": {
+"dname": "Warcry",
+"slug": "sven_warcry"
+},
+"5097": {
+"dname": "God's Strength",
+"slug": "sven_gods_strength"
+},
+"1234": {
+"dname": "Wrath of God",
+"slug": "sven_wrath_of_god"
+},
+"5106": {
+"dname": "Avalanche",
+"slug": "tiny_avalanche"
+},
+"5107": {
+"dname": "Toss",
+"slug": "tiny_toss"
+},
+"5108": {
+"dname": "Tree Grab",
+"slug": "tiny_tree_grab"
+},
+"7850": {
+"dname": "Tree Volley",
+"slug": "tiny_tree_channel"
+},
+"1236": {
+"dname": "Insurmountable",
+"slug": "tiny_insurmountable"
+},
+"5109": {
+"dname": "Grow",
+"slug": "tiny_grow"
+},
+"6937": {
+"dname": "Tree Throw",
+"slug": "tiny_toss_tree"
+},
+"5122": {
+"dname": "Magic Missile",
+"slug": "vengefulspirit_magic_missile"
+},
+"5124": {
+"dname": "Wave of Terror",
+"slug": "vengefulspirit_wave_of_terror"
+},
+"5123": {
+"dname": "Vengeance Aura",
+"slug": "vengefulspirit_command_aura"
+},
+"1238": {
+"dname": "Retribution",
+"slug": "vengefulspirit_retribution"
+},
+"5125": {
+"dname": "Nether Swap",
+"slug": "vengefulspirit_nether_swap"
+},
+"5130": {
+"dname": "Shackleshot",
+"slug": "windrunner_shackleshot"
+},
+"5131": {
+"dname": "Powershot",
+"slug": "windrunner_powershot"
+},
+"5132": {
+"dname": "Windrun",
+"slug": "windrunner_windrun"
+},
+"652": {
+"dname": "Gale Force",
+"slug": "windrunner_gale_force"
+},
+"5133": {
+"dname": "Focus Fire",
+"slug": "windrunner_focusfire"
+},
+"1742": {
+"dname": "Tailwind",
+"slug": "windrunner_tailwind"
+},
+"5110": {
+"dname": "Arc Lightning",
+"slug": "zuus_arc_lightning"
+},
+"5111": {
+"dname": "Lightning Bolt",
+"slug": "zuus_lightning_bolt"
+},
+"641": {
+"dname": "Heavenly Jump",
+"slug": "zuus_heavenly_jump"
+},
+"6325": {
+"dname": "Nimbus",
+"slug": "zuus_cloud"
+},
+"1110": {
+"dname": "Lightning Hands",
+"slug": "zuus_lightning_hands"
+},
+"5113": {
+"dname": "Thundergod's Wrath",
+"slug": "zuus_thundergods_wrath"
+},
+"5112": {
+"dname": "Static Field",
+"slug": "zuus_static_field"
+},
+"5031": {
+"dname": "Torrent",
+"slug": "kunkka_torrent"
+},
+"5032": {
+"dname": "Tidebringer",
+"slug": "kunkka_tidebringer"
+},
+"5033": {
+"dname": "X Marks the Spot",
+"slug": "kunkka_x_marks_the_spot"
+},
+"1452": {
+"dname": "Admiral's Rum",
+"slug": "kunkka_admirals_rum"
+},
+"605": {
+"dname": "Tidal Wave",
+"slug": "kunkka_tidal_wave"
+},
+"5035": {
+"dname": "Ghostship",
+"slug": "kunkka_ghostship"
+},
+"5040": {
+"dname": "Dragon Slave",
+"slug": "lina_dragon_slave"
+},
+"5041": {
+"dname": "Light Strike Array",
+"slug": "lina_light_strike_array"
+},
+"5042": {
+"dname": "Fiery Soul",
+"slug": "lina_fiery_soul"
+},
+"944": {
+"dname": "Flame Cloak",
+"slug": "lina_flame_cloak"
+},
+"1244": {
+"dname": "Slow Burn",
+"slug": "lina_slow_burn"
+},
+"5043": {
+"dname": "Laguna Blade",
+"slug": "lina_laguna_blade"
+},
+"5134": {
+"dname": "Frost Blast",
+"slug": "lich_frost_nova"
+},
+"5136": {
+"dname": "Frost Shield",
+"slug": "lich_frost_shield"
+},
+"7325": {
+"dname": "Sinister Gaze",
+"slug": "lich_sinister_gaze"
+},
+"8028": {
+"dname": "Ice Spire",
+"slug": "lich_ice_spire"
+},
+"1245": {
+"dname": "Sacrifice",
+"slug": "lich_death_charge"
+},
+"5137": {
+"dname": "Chain Frost",
+"slug": "lich_chain_frost"
+},
+"5044": {
+"dname": "Earth Spike",
+"slug": "lion_impale"
+},
+"5045": {
+"dname": "Hex",
+"slug": "lion_voodoo"
+},
+"5046": {
+"dname": "Mana Drain",
+"slug": "lion_mana_drain"
+},
+"1249": {
+"dname": "To Hell and Back",
+"slug": "lion_to_hell_and_back"
+},
+"5047": {
+"dname": "Finger of Death",
+"slug": "lion_finger_of_death"
+},
+"5078": {
+"dname": "Ether Shock",
+"slug": "shadow_shaman_ether_shock"
+},
+"5079": {
+"dname": "Hex",
+"slug": "shadow_shaman_voodoo"
+},
+"5080": {
+"dname": "Shackles",
+"slug": "shadow_shaman_shackles"
+},
+"1250": {
+"dname": "Fowl Play",
+"slug": "shadow_shaman_fowl_play"
+},
+"1743": {
+"dname": "Urnaconda",
+"slug": "shadow_shaman_urnaconda"
+},
+"5081": {
+"dname": "Mass Serpent Ward",
+"slug": "shadow_shaman_mass_serpent_ward"
+},
+"5114": {
+"dname": "Guardian Sprint",
+"slug": "slardar_sprint"
+},
+"5115": {
+"dname": "Slithereen Crush",
+"slug": "slardar_slithereen_crush"
+},
+"5116": {
+"dname": "Bash of the Deep",
+"slug": "slardar_bash"
+},
+"1253": {
+"dname": "Seaborn Sentinel",
+"slug": "slardar_seaborn_sentinel"
+},
+"5117": {
+"dname": "Corrosive Haze",
+"slug": "slardar_amplify_damage"
+},
+"5118": {
+"dname": "Gush",
+"slug": "tidehunter_gush"
+},
+"5119": {
+"dname": "Kraken Shell",
+"slug": "tidehunter_kraken_shell"
+},
+"5120": {
+"dname": "Anchor Smash",
+"slug": "tidehunter_anchor_smash"
+},
+"5407": {
+"dname": "Dead in the Water",
+"slug": "tidehunter_dead_in_the_water"
+},
+"5121": {
+"dname": "Ravage",
+"slug": "tidehunter_ravage"
+},
+"1746": {
+"dname": "Leviathan's Catch",
+"slug": "tidehunter_leviathans_catch"
+},
+"5138": {
+"dname": "Paralyzing Cask",
+"slug": "witch_doctor_paralyzing_cask"
+},
+"5139": {
+"dname": "Voodoo Restoration",
+"slug": "witch_doctor_voodoo_restoration"
+},
+"5140": {
+"dname": "Maledict",
+"slug": "witch_doctor_maledict"
+},
+"632": {
+"dname": "Voodoo Switcheroo",
+"slug": "witch_doctor_voodoo_switcheroo"
+},
+"1257": {
+"dname": "Gris-Gris",
+"slug": "witch_doctor_gris_gris"
+},
+"5141": {
+"dname": "Death Ward",
+"slug": "witch_doctor_death_ward"
+},
+"5142": {
+"dname": "Smoke Screen",
+"slug": "riki_smoke_screen"
+},
+"5143": {
+"dname": "Blink Strike",
+"slug": "riki_blink_strike"
+},
+"5145": {
+"dname": "Tricks of the Trade",
+"slug": "riki_tricks_of_the_trade"
+},
+"1258": {
+"dname": "Backstab",
+"slug": "riki_innate_backstab"
+},
+"5144": {
+"dname": "Cloak and Dagger",
+"slug": "riki_backstab"
+},
+"5146": {
+"dname": "Malefice",
+"slug": "enigma_malefice"
+},
+"5147": {
+"dname": "Demonic Summoning",
+"slug": "enigma_demonic_conversion"
+},
+"5148": {
+"dname": "Midnight Pulse",
+"slug": "enigma_midnight_pulse"
+},
+"1261": {
+"dname": "Event Horizon",
+"slug": "enigma_event_horizon"
+},
+"5149": {
+"dname": "Black Hole",
+"slug": "enigma_black_hole"
+},
+"5150": {
+"dname": "Laser",
+"slug": "tinker_laser"
+},
+"5152": {
+"dname": "March of the Machines",
+"slug": "tinker_march_of_the_machines"
+},
+"1744": {
+"dname": "Deploy Turrets",
+"slug": "tinker_deploy_turrets"
+},
+"909": {
+"dname": "Warp Flare",
+"slug": "tinker_warp_grenade"
+},
+"5153": {
+"dname": "Rearm",
+"slug": "tinker_rearm"
+},
+"1262": {
+"dname": "Eureka!",
+"slug": "tinker_eureka"
+},
+"5154": {
+"dname": "Shrapnel",
+"slug": "sniper_shrapnel"
+},
+"5155": {
+"dname": "Headshot",
+"slug": "sniper_headshot"
+},
+"5156": {
+"dname": "Take Aim",
+"slug": "sniper_take_aim"
+},
+"694": {
+"dname": "Concussive Grenade",
+"slug": "sniper_concussive_grenade"
+},
+"1268": {
+"dname": "Keen Scope",
+"slug": "sniper_keen_scope"
+},
+"5157": {
+"dname": "Assassinate",
+"slug": "sniper_assassinate"
+},
+"5158": {
+"dname": "Death Pulse",
+"slug": "necrolyte_death_pulse"
+},
+"1270": {
+"dname": "Ghost Shroud",
+"slug": "necrolyte_ghost_shroud"
+},
+"5159": {
+"dname": "Heartstopper Aura",
+"slug": "necrolyte_heartstopper_aura"
+},
+"661": {
+"dname": "Death Seeker",
+"slug": "necrolyte_death_seeker"
+},
+"5160": {
+"dname": "Sadist",
+"slug": "necrolyte_sadist"
+},
+"5161": {
+"dname": "Reaper's Scythe",
+"slug": "necrolyte_reapers_scythe"
+},
+"5162": {
+"dname": "Fatal Bonds",
+"slug": "warlock_fatal_bonds"
+},
+"5163": {
+"dname": "Shadow Word",
+"slug": "warlock_shadow_word"
+},
+"5164": {
+"dname": "Upheaval",
+"slug": "warlock_upheaval"
+},
+"1274": {
+"dname": "Eldritch Summoning",
+"slug": "warlock_eldritch_summoning"
+},
+"5165": {
+"dname": "Chaotic Offering",
+"slug": "warlock_rain_of_chaos"
+},
+"5168": {
+"dname": "Wild Axes",
+"slug": "beastmaster_wild_axes"
+},
+"7230": {
+"dname": "Summon Razorback",
+"slug": "beastmaster_summon_razorback"
+},
+"7231": {
+"dname": "Summon Raptors",
+"slug": "beastmaster_summon_raptor"
+},
+"5172": {
+"dname": "Inner Beast",
+"slug": "beastmaster_inner_beast"
+},
+"1005": {
+"dname": "Drums of Slom",
+"slug": "beastmaster_drums_of_slom"
+},
+"5177": {
+"dname": "Primal Roar",
+"slug": "beastmaster_primal_roar"
+},
+"5173": {
+"dname": "Shadow Strike",
+"slug": "queenofpain_shadow_strike"
+},
+"5174": {
+"dname": "Blink",
+"slug": "queenofpain_blink"
+},
+"5175": {
+"dname": "Scream Of Pain",
+"slug": "queenofpain_scream_of_pain"
+},
+"1277": {
+"dname": "Succubus",
+"slug": "queenofpain_succubus"
+},
+"5176": {
+"dname": "Sonic Wave",
+"slug": "queenofpain_sonic_wave"
+},
+"5178": {
+"dname": "Venomous Gale",
+"slug": "venomancer_venomous_gale"
+},
+"1749": {
+"dname": "Snakebite",
+"slug": "venomancer_snakebite"
+},
+"5180": {
+"dname": "Plague Ward",
+"slug": "venomancer_plague_ward"
+},
+"5179": {
+"dname": "Poison Sting",
+"slug": "venomancer_poison_sting"
+},
+"1105": {
+"dname": "Noxious Plague",
+"slug": "venomancer_noxious_plague"
+},
+"5182": {
+"dname": "Time Walk",
+"slug": "faceless_void_time_walk"
+},
+"5691": {
+"dname": "Time Dilation",
+"slug": "faceless_void_time_dilation"
+},
+"5184": {
+"dname": "Time Lock",
+"slug": "faceless_void_time_lock"
+},
+"8030": {
+"dname": "Reverse Time Walk",
+"slug": "faceless_void_time_walk_reverse"
+},
+"1280": {
+"dname": "Distortion Field",
+"slug": "faceless_void_distortion_field"
+},
+"5185": {
+"dname": "Chronosphere",
+"slug": "faceless_void_chronosphere"
+},
+"5086": {
+"dname": "Wraithfire Blast",
+"slug": "skeleton_king_hellfire_blast"
+},
+"5087": {
+"dname": "Bone Guard",
+"slug": "skeleton_king_bone_guard"
+},
+"5088": {
+"dname": "Mortal Strike",
+"slug": "skeleton_king_mortal_strike"
+},
+"1283": {
+"dname": "Vampiric Spirit",
+"slug": "skeleton_king_vampiric_spirit"
+},
+"5089": {
+"dname": "Reincarnation",
+"slug": "skeleton_king_reincarnation"
+},
+"5090": {
+"dname": "Crypt Swarm",
+"slug": "death_prophet_carrion_swarm"
+},
+"5091": {
+"dname": "Silence",
+"slug": "death_prophet_silence"
+},
+"5685": {
+"dname": "Spirit Siphon",
+"slug": "death_prophet_spirit_siphon"
+},
+"5092": {
+"dname": "Witchcraft",
+"slug": "death_prophet_witchcraft"
+},
+"5093": {
+"dname": "Exorcism",
+"slug": "death_prophet_exorcism"
+},
+"5190": {
+"dname": "Stifling Dagger",
+"slug": "phantom_assassin_stifling_dagger"
+},
+"5191": {
+"dname": "Phantom Strike",
+"slug": "phantom_assassin_phantom_strike"
+},
+"5192": {
+"dname": "Blur",
+"slug": "phantom_assassin_blur"
+},
+"662": {
+"dname": "Fan of Knives",
+"slug": "phantom_assassin_fan_of_knives"
+},
+"1287": {
+"dname": "Immaterial",
+"slug": "phantom_assassin_immaterial"
+},
+"5193": {
+"dname": "Coup de Grace",
+"slug": "phantom_assassin_coup_de_grace"
+},
+"5186": {
+"dname": "Nether Blast",
+"slug": "pugna_nether_blast"
+},
+"5187": {
+"dname": "Decrepify",
+"slug": "pugna_decrepify"
+},
+"5188": {
+"dname": "Nether Ward",
+"slug": "pugna_nether_ward"
+},
+"1288": {
+"dname": "Oblivion Savant",
+"slug": "pugna_oblivion_savant"
+},
+"5189": {
+"dname": "Life Drain",
+"slug": "pugna_life_drain"
+},
+"5194": {
+"dname": "Refraction",
+"slug": "templar_assassin_refraction"
+},
+"5195": {
+"dname": "Meld",
+"slug": "templar_assassin_meld"
+},
+"5196": {
+"dname": "Psi Blades",
+"slug": "templar_assassin_psi_blades"
+},
+"7853": {
+"dname": "Psionic Projection",
+"slug": "templar_assassin_trap_teleport"
+},
+"5197": {
+"dname": "Psionic Trap",
+"slug": "templar_assassin_psionic_trap"
+},
+"1750": {
+"dname": "Inner Peace",
+"slug": "templar_assassin_inner_peace"
+},
+"5218": {
+"dname": "Poison Attack",
+"slug": "viper_poison_attack"
+},
+"5219": {
+"dname": "Nethertoxin",
+"slug": "viper_nethertoxin"
+},
+"5220": {
+"dname": "Corrosive Skin",
+"slug": "viper_corrosive_skin"
+},
+"983": {
+"dname": "Nosedive",
+"slug": "viper_nose_dive"
+},
+"1461": {
+"dname": "Predator",
+"slug": "viper_predator"
+},
+"5221": {
+"dname": "Viper Strike",
+"slug": "viper_viper_strike"
+},
+"5222": {
+"dname": "Lucent Beam",
+"slug": "luna_lucent_beam"
+},
+"1462": {
+"dname": "Lunar Orbit",
+"slug": "luna_lunar_orbit"
+},
+"5223": {
+"dname": "Moon Glaives",
+"slug": "luna_moon_glaive"
+},
+"5224": {
+"dname": "Lunar Blessing",
+"slug": "luna_lunar_blessing"
+},
+"5225": {
+"dname": "Eclipse",
+"slug": "luna_eclipse"
+},
+"5226": {
+"dname": "Breathe Fire",
+"slug": "dragon_knight_breathe_fire"
+},
+"5227": {
+"dname": "Dragon Tail",
+"slug": "dragon_knight_dragon_tail"
+},
+"1752": {
+"dname": "Wyrm's Wrath",
+"slug": "dragon_knight_wyrms_wrath"
+},
+"660": {
+"dname": "Fireball",
+"slug": "dragon_knight_fireball"
+},
+"5228": {
+"dname": "Dragon Blood",
+"slug": "dragon_knight_dragon_blood"
+},
+"5229": {
+"dname": "Elder Dragon Form",
+"slug": "dragon_knight_elder_dragon_form"
+},
+"5233": {
+"dname": "Poison Touch",
+"slug": "dazzle_poison_touch"
+},
+"5234": {
+"dname": "Shallow Grave",
+"slug": "dazzle_shallow_grave"
+},
+"5235": {
+"dname": "Shadow Wave",
+"slug": "dazzle_shadow_wave"
+},
+"1293": {
+"dname": "Weave",
+"slug": "dazzle_innate_weave"
+},
+"1550": {
+"dname": "Nothl Projection",
+"slug": "dazzle_nothl_projection"
+},
+"5237": {
+"dname": "Battery Assault",
+"slug": "rattletrap_battery_assault"
+},
+"5238": {
+"dname": "Power Cogs",
+"slug": "rattletrap_power_cogs"
+},
+"5239": {
+"dname": "Rocket Flare",
+"slug": "rattletrap_rocket_flare"
+},
+"321": {
+"dname": "Overclocking",
+"slug": "rattletrap_overclocking"
+},
+"630": {
+"dname": "Jetpack",
+"slug": "rattletrap_jetpack"
+},
+"5240": {
+"dname": "Hookshot",
+"slug": "rattletrap_hookshot"
+},
+"1295": {
+"dname": "Armor Power",
+"slug": "rattletrap_armor_power"
+},
+"5241": {
+"dname": "Split Earth",
+"slug": "leshrac_split_earth"
+},
+"5242": {
+"dname": "Diabolic Edict",
+"slug": "leshrac_diabolic_edict"
+},
+"5243": {
+"dname": "Lightning Storm",
+"slug": "leshrac_lightning_storm"
+},
+"539": {
+"dname": "Nihilism",
+"slug": "leshrac_greater_lightning_storm"
+},
+"1297": {
+"dname": "Defilement",
+"slug": "leshrac_defilement"
+},
+"5244": {
+"dname": "Pulse Nova",
+"slug": "leshrac_pulse_nova"
+},
+"5245": {
+"dname": "Sprout",
+"slug": "furion_sprout"
+},
+"5246": {
+"dname": "Teleportation",
+"slug": "furion_teleportation"
+},
+"5247": {
+"dname": "Nature's Call",
+"slug": "furion_force_of_nature"
+},
+"997": {
+"dname": "Curse of the Oldgrowth",
+"slug": "furion_curse_of_the_forest"
+},
+"1298": {
+"dname": "Spirit of the Forest",
+"slug": "furion_spirit_of_the_forest"
+},
+"5248": {
+"dname": "Wrath of Nature",
+"slug": "furion_wrath_of_nature"
+},
+"5249": {
+"dname": "Rage",
+"slug": "life_stealer_rage"
+},
+"5251": {
+"dname": "Open Wounds",
+"slug": "life_stealer_open_wounds"
+},
+"5250": {
+"dname": "Feast",
+"slug": "life_stealer_feast"
+},
+"631": {
+"dname": "Ghoul Frenzy",
+"slug": "life_stealer_ghoul_frenzy"
+},
+"5252": {
+"dname": "Infest",
+"slug": "life_stealer_infest"
+},
+"5255": {
+"dname": "Vacuum",
+"slug": "dark_seer_vacuum"
+},
+"5256": {
+"dname": "Ion Shell",
+"slug": "dark_seer_ion_shell"
+},
+"5257": {
+"dname": "Surge",
+"slug": "dark_seer_surge"
+},
+"687": {
+"dname": "Normal Punch",
+"slug": "dark_seer_normal_punch"
+},
+"1553": {
+"dname": "Quick Wit",
+"slug": "dark_seer_aggrandize"
+},
+"5258": {
+"dname": "Wall of Replica",
+"slug": "dark_seer_wall_of_replica"
+},
+"1120": {
+"dname": "Strafe",
+"slug": "clinkz_strafe"
+},
+"5260": {
+"dname": "Searing Arrows",
+"slug": "clinkz_searing_arrows"
+},
+"5262": {
+"dname": "Death Pact",
+"slug": "clinkz_death_pact"
+},
+"5259": {
+"dname": "Burning Barrage",
+"slug": "clinkz_burning_barrage"
+},
+"7319": {
+"dname": "Burning Army",
+"slug": "clinkz_burning_army"
+},
+"5261": {
+"dname": "Skeleton Walk",
+"slug": "clinkz_wind_walk"
+},
+"1678": {
+"dname": "Infernal Shred",
+"slug": "clinkz_infernal_shred"
+},
+"5263": {
+"dname": "Purification",
+"slug": "omniknight_purification"
+},
+"895": {
+"dname": "Repel",
+"slug": "omniknight_martyr"
+},
+"656": {
+"dname": "Hammer of Purity",
+"slug": "omniknight_hammer_of_purity"
+},
+"5265": {
+"dname": "Degen Aura",
+"slug": "omniknight_degen_aura"
+},
+"5266": {
+"dname": "Guardian Angel",
+"slug": "omniknight_guardian_angel"
+},
+"5270": {
+"dname": "Impetus",
+"slug": "enchantress_impetus"
+},
+"5268": {
+"dname": "Enchant",
+"slug": "enchantress_enchant"
+},
+"5269": {
+"dname": "Nature's Attendants",
+"slug": "enchantress_natures_attendants"
+},
+"320": {
+"dname": "Sproink",
+"slug": "enchantress_bunny_hop"
+},
+"981": {
+"dname": "Little Friends",
+"slug": "enchantress_little_friends"
+},
+"5267": {
+"dname": "Untouchable",
+"slug": "enchantress_untouchable"
+},
+"1464": {
+"dname": "Rabble-Rouser",
+"slug": "enchantress_rabblerouser"
+},
+"7300": {
+"dname": "Inner Fire",
+"slug": "huskar_inner_fire"
+},
+"5272": {
+"dname": "Burning Spear",
+"slug": "huskar_burning_spear"
+},
+"5273": {
+"dname": "Berserker's Blood",
+"slug": "huskar_berserkers_blood"
+},
+"1309": {
+"dname": "Blood Magic",
+"slug": "huskar_blood_magic"
+},
+"5274": {
+"dname": "Life Break",
+"slug": "huskar_life_break"
+},
+"5275": {
+"dname": "Void",
+"slug": "night_stalker_void"
+},
+"5276": {
+"dname": "Crippling Fear",
+"slug": "night_stalker_crippling_fear"
+},
+"1753": {
+"dname": "Midnight Feast",
+"slug": "night_stalker_midnight_feast"
+},
+"5277": {
+"dname": "Hunter in the Night",
+"slug": "night_stalker_hunter_in_the_night"
+},
+"5278": {
+"dname": "Dark Ascension",
+"slug": "night_stalker_darkness"
+},
+"5282": {
+"dname": "Insatiable Hunger",
+"slug": "broodmother_insatiable_hunger"
+},
+"5280": {
+"dname": "Spin Web",
+"slug": "broodmother_spin_web"
+},
+"5281": {
+"dname": "Incapacitating Bite",
+"slug": "broodmother_incapacitating_bite"
+},
+"873": {
+"dname": "Spinner's Snare",
+"slug": "broodmother_sticky_snare"
+},
+"1313": {
+"dname": "Spider's Milk",
+"slug": "broodmother_spiders_milk"
+},
+"5279": {
+"dname": "Spawn Spiderlings",
+"slug": "broodmother_spawn_spiderlings"
+},
+"1314": {
+"dname": "Shuriken Toss",
+"slug": "bounty_hunter_shuriken_toss"
+},
+"5286": {
+"dname": "Jinada",
+"slug": "bounty_hunter_jinada"
+},
+"5287": {
+"dname": "Shadow Walk",
+"slug": "bounty_hunter_wind_walk"
+},
+"1136": {
+"dname": "Friendly Shadow",
+"slug": "bounty_hunter_wind_walk_ally"
+},
+"1316": {
+"dname": "Big Game Hunter",
+"slug": "bounty_hunter_big_game_hunter"
+},
+"5288": {
+"dname": "Track",
+"slug": "bounty_hunter_track"
+},
+"5289": {
+"dname": "The Swarm",
+"slug": "weaver_the_swarm"
+},
+"5290": {
+"dname": "Shukuchi",
+"slug": "weaver_shukuchi"
+},
+"5291": {
+"dname": "Geminate Attack",
+"slug": "weaver_geminate_attack"
+},
+"5292": {
+"dname": "Time Lapse",
+"slug": "weaver_time_lapse"
+},
+"1754": {
+"dname": "Threads of Fate",
+"slug": "weaver_threads_of_fate"
+},
+"5297": {
+"dname": "Dual Breath",
+"slug": "jakiro_dual_breath"
+},
+"5298": {
+"dname": "Ice Path",
+"slug": "jakiro_ice_path"
+},
+"5299": {
+"dname": "Liquid Fire",
+"slug": "jakiro_liquid_fire"
+},
+"1317": {
+"dname": "Liquid Frost",
+"slug": "jakiro_liquid_ice"
+},
+"1318": {
+"dname": "Double Trouble",
+"slug": "jakiro_double_trouble"
+},
+"5300": {
+"dname": "Macropyre",
+"slug": "jakiro_macropyre"
+},
+"5320": {
+"dname": "Sticky Napalm",
+"slug": "batrider_sticky_napalm"
+},
+"5321": {
+"dname": "Flamebreak",
+"slug": "batrider_flamebreak"
+},
+"5322": {
+"dname": "Firefly",
+"slug": "batrider_firefly"
+},
+"1319": {
+"dname": "Smoldering Resin",
+"slug": "batrider_smoldering_resin"
+},
+"5323": {
+"dname": "Flaming Lasso",
+"slug": "batrider_flaming_lasso"
+},
+"5328": {
+"dname": "Penitence",
+"slug": "chen_penitence"
+},
+"5330": {
+"dname": "Holy Persuasion",
+"slug": "chen_holy_persuasion"
+},
+"7306": {
+"dname": "Divine Favor",
+"slug": "chen_divine_favor"
+},
+"1755": {
+"dname": "Zealot",
+"slug": "chen_zealot"
+},
+"5331": {
+"dname": "Hand of God",
+"slug": "chen_hand_of_god"
+},
+"5334": {
+"dname": "Spectral Dagger",
+"slug": "spectre_spectral_dagger"
+},
+"1679": {
+"dname": "Shadow Step",
+"slug": "spectre_shadow_step"
+},
+"5336": {
+"dname": "Dispersion",
+"slug": "spectre_dispersion"
+},
+"5335": {
+"dname": "Desolate",
+"slug": "spectre_desolate"
+},
+"5337": {
+"dname": "Haunt",
+"slug": "spectre_haunt"
+},
+"5339": {
+"dname": "Devour",
+"slug": "doom_bringer_devour"
+},
+"5340": {
+"dname": "Scorched Earth",
+"slug": "doom_bringer_scorched_earth"
+},
+"5341": {
+"dname": "Infernal Blade",
+"slug": "doom_bringer_infernal_blade"
+},
+"5342": {
+"dname": "Doom",
+"slug": "doom_bringer_doom"
+},
+"1324": {
+"dname": "Lvl ? Pain",
+"slug": "doom_bringer_lvl_pain"
+},
+"5345": {
+"dname": "Cold Feet",
+"slug": "ancient_apparition_cold_feet"
+},
+"5346": {
+"dname": "Ice Vortex",
+"slug": "ancient_apparition_ice_vortex"
+},
+"5347": {
+"dname": "Chilling Touch",
+"slug": "ancient_apparition_chilling_touch"
+},
+"1756": {
+"dname": "Bone Chill",
+"slug": "ancient_apparition_bone_chill"
+},
+"5348": {
+"dname": "Ice Blast",
+"slug": "ancient_apparition_ice_blast"
+},
+"5357": {
+"dname": "Earthshock",
+"slug": "ursa_earthshock"
+},
+"5358": {
+"dname": "Overpower",
+"slug": "ursa_overpower"
+},
+"5359": {
+"dname": "Fury Swipes",
+"slug": "ursa_fury_swipes"
+},
+"1327": {
+"dname": "Maul",
+"slug": "ursa_maul"
+},
+"5360": {
+"dname": "Enrage",
+"slug": "ursa_enrage"
+},
+"5353": {
+"dname": "Charge of Darkness",
+"slug": "spirit_breaker_charge_of_darkness"
+},
+"7301": {
+"dname": "Bulldoze",
+"slug": "spirit_breaker_bulldoze"
+},
+"5355": {
+"dname": "Greater Bash",
+"slug": "spirit_breaker_greater_bash"
+},
+"987": {
+"dname": "Planar Pocket",
+"slug": "spirit_breaker_planar_pocket"
+},
+"1757": {
+"dname": "Empowering Haste",
+"slug": "spirit_breaker_bull_rush"
+},
+"5356": {
+"dname": "Nether Strike",
+"slug": "spirit_breaker_nether_strike"
+},
+"5361": {
+"dname": "Rocket Barrage",
+"slug": "gyrocopter_rocket_barrage"
+},
+"5362": {
+"dname": "Homing Missile",
+"slug": "gyrocopter_homing_missile"
+},
+"5363": {
+"dname": "Flak Cannon",
+"slug": "gyrocopter_flak_cannon"
+},
+"1759": {
+"dname": "Afterburner",
+"slug": "gyrocopter_afterburner"
+},
+"1758": {
+"dname": "Side Gunner",
+"slug": "gyrocopter_side_gunner_spawn_ability"
+},
+"5364": {
+"dname": "Call Down",
+"slug": "gyrocopter_call_down"
+},
+"5365": {
+"dname": "Acid Spray",
+"slug": "alchemist_acid_spray"
+},
+"5366": {
+"dname": "Unstable Concoction",
+"slug": "alchemist_unstable_concoction"
+},
+"1116": {
+"dname": "Corrosive Weaponry",
+"slug": "alchemist_corrosive_weaponry"
+},
+"642": {
+"dname": "Berserk Potion",
+"slug": "alchemist_berserk_potion"
+},
+"1333": {
+"dname": "Greevil's Greed",
+"slug": "alchemist_goblins_greed"
+},
+"5369": {
+"dname": "Chemical Rage",
+"slug": "alchemist_chemical_rage"
+},
+"5370": {
+"dname": "Quas",
+"slug": "invoker_quas"
+},
+"5371": {
+"dname": "Wex",
+"slug": "invoker_wex"
+},
+"5372": {
+"dname": "Exort",
+"slug": "invoker_exort"
+},
+"5375": {
+"dname": "Invoke",
+"slug": "invoker_invoke"
+},
+"5376": {
+"dname": "Cold Snap",
+"slug": "invoker_cold_snap"
+},
+"5381": {
+"dname": "Ghost Walk",
+"slug": "invoker_ghost_walk"
+},
+"5382": {
+"dname": "Tornado",
+"slug": "invoker_tornado"
+},
+"5383": {
+"dname": "E.M.P.",
+"slug": "invoker_emp"
+},
+"5384": {
+"dname": "Alacrity",
+"slug": "invoker_alacrity"
+},
+"5385": {
+"dname": "Chaos Meteor",
+"slug": "invoker_chaos_meteor"
+},
+"5386": {
+"dname": "Sun Strike",
+"slug": "invoker_sun_strike"
+},
+"5387": {
+"dname": "Forge Spirit",
+"slug": "invoker_forge_spirit"
+},
+"5389": {
+"dname": "Ice Wall",
+"slug": "invoker_ice_wall"
+},
+"5390": {
+"dname": "Deafening Blast",
+"slug": "invoker_deafening_blast"
+},
+"5377": {
+"dname": "Arcane Curse",
+"slug": "silencer_curse_of_the_silent"
+},
+"5378": {
+"dname": "Glaives of Wisdom",
+"slug": "silencer_glaives_of_wisdom"
+},
+"5379": {
+"dname": "Last Word",
+"slug": "silencer_last_word"
+},
+"1335": {
+"dname": "Suffer In Silence",
+"slug": "silencer_brain_drain"
+},
+"5380": {
+"dname": "Global Silence",
+"slug": "silencer_global_silence"
+},
+"5391": {
+"dname": "Arcane Orb",
+"slug": "obsidian_destroyer_arcane_orb"
+},
+"5392": {
+"dname": "Astral Imprisonment",
+"slug": "obsidian_destroyer_astral_imprisonment"
+},
+"1760": {
+"dname": "Objurgation",
+"slug": "obsidian_destroyer_objurgation"
+},
+"5684": {
+"dname": "Essence Flux",
+"slug": "obsidian_destroyer_equilibrium"
+},
+"5394": {
+"dname": "Sanity's Eclipse",
+"slug": "obsidian_destroyer_sanity_eclipse"
+},
+"5395": {
+"dname": "Summon Wolves",
+"slug": "lycan_summon_wolves"
+},
+"5396": {
+"dname": "Howl",
+"slug": "lycan_howl"
+},
+"5397": {
+"dname": "Feral Impulse",
+"slug": "lycan_feral_impulse"
+},
+"333": {
+"dname": "Wolf Bite",
+"slug": "lycan_wolf_bite"
+},
+"1339": {
+"dname": "Apex Predator",
+"slug": "lycan_apex_predator"
+},
+"5398": {
+"dname": "Shapeshift",
+"slug": "lycan_shapeshift"
+},
+"5400": {
+"dname": "Thunder Clap",
+"slug": "brewmaster_thunder_clap"
+},
+"7310": {
+"dname": "Cinder Brew",
+"slug": "brewmaster_cinder_brew"
+},
+"5402": {
+"dname": "Drunken Brawler",
+"slug": "brewmaster_drunken_brawler"
+},
+"1681": {
+"dname": "Liquid Courage",
+"slug": "brewmaster_liquid_courage"
+},
+"5403": {
+"dname": "Primal Split",
+"slug": "brewmaster_primal_split"
+},
+"5421": {
+"dname": "Disruption",
+"slug": "shadow_demon_disruption"
+},
+"1001": {
+"dname": "Disseminate",
+"slug": "shadow_demon_disseminate"
+},
+"5423": {
+"dname": "Shadow Poison",
+"slug": "shadow_demon_shadow_poison"
+},
+"916": {
+"dname": "Demonic Cleanse",
+"slug": "shadow_demon_demonic_cleanse"
+},
+"5425": {
+"dname": "Demonic Purge",
+"slug": "shadow_demon_demonic_purge"
+},
+"1341": {
+"dname": "Menace",
+"slug": "shadow_demon_menace"
+},
+"1684": {
+"dname": "Entangle",
+"slug": "lone_druid_entangle"
+},
+"7309": {
+"dname": "Spirit Link",
+"slug": "lone_druid_spirit_link"
+},
+"5414": {
+"dname": "Savage Roar",
+"slug": "lone_druid_savage_roar"
+},
+"1342": {
+"dname": "Summon Spirit Bear",
+"slug": "lone_druid_spirit_bear"
+},
+"5415": {
+"dname": "True Form",
+"slug": "lone_druid_true_form"
+},
+"5426": {
+"dname": "Chaos Bolt",
+"slug": "chaos_knight_chaos_bolt"
+},
+"5427": {
+"dname": "Reality Rift",
+"slug": "chaos_knight_reality_rift"
+},
+"5428": {
+"dname": "Chaos Strike",
+"slug": "chaos_knight_chaos_strike"
+},
+"1556": {
+"dname": "Fundamental Forging",
+"slug": "chaos_knight_fundamental_forging"
+},
+"5429": {
+"dname": "Phantasm",
+"slug": "chaos_knight_phantasm"
+},
+"5430": {
+"dname": "Earthbind",
+"slug": "meepo_earthbind"
+},
+"5431": {
+"dname": "Poof",
+"slug": "meepo_poof"
+},
+"7318": {
+"dname": "Ransack",
+"slug": "meepo_ransack"
+},
+"547": {
+"dname": "Dig",
+"slug": "meepo_petrify"
+},
+"1109": {
+"dname": "MegaMeepo",
+"slug": "meepo_megameepo"
+},
+"5433": {
+"dname": "Divided We Stand",
+"slug": "meepo_divided_we_stand"
+},
+"1763": {
+"dname": "Geomancy",
+"slug": "meepo_geomancy"
+},
+"329": {
+"dname": "MegaMeepo Fling",
+"slug": "meepo_megameepo_fling"
+},
+"338": {
+"dname": "Nature's Grasp",
+"slug": "treant_natures_grasp"
+},
+"5435": {
+"dname": "Leech Seed",
+"slug": "treant_leech_seed"
+},
+"5436": {
+"dname": "Living Armor",
+"slug": "treant_living_armor"
+},
+"5649": {
+"dname": "Eyes In The Forest",
+"slug": "treant_eyes_in_the_forest"
+},
+"5434": {
+"dname": "Nature's Guise",
+"slug": "treant_natures_guise"
+},
+"5437": {
+"dname": "Overgrowth",
+"slug": "treant_overgrowth"
+},
+"5438": {
+"dname": "Fireblast",
+"slug": "ogre_magi_fireblast"
+},
+"5439": {
+"dname": "Ignite",
+"slug": "ogre_magi_ignite"
+},
+"5440": {
+"dname": "Bloodlust",
+"slug": "ogre_magi_bloodlust"
+},
+"5466": {
+"dname": "Unrefined Fireblast",
+"slug": "ogre_magi_unrefined_fireblast"
+},
+"648": {
+"dname": "Fire Shield",
+"slug": "ogre_magi_smash"
+},
+"1115": {
+"dname": "Dumb Luck",
+"slug": "ogre_magi_dumb_luck"
+},
+"5441": {
+"dname": "Multicast",
+"slug": "ogre_magi_multicast"
+},
+"5442": {
+"dname": "Decay",
+"slug": "undying_decay"
+},
+"5443": {
+"dname": "Soul Rip",
+"slug": "undying_soul_rip"
+},
+"5444": {
+"dname": "Tombstone",
+"slug": "undying_tombstone"
+},
+"1360": {
+"dname": "Ceaseless Dirge",
+"slug": "undying_ceaseless_dirge"
+},
+"5447": {
+"dname": "Flesh Golem",
+"slug": "undying_flesh_golem"
+},
+"5448": {
+"dname": "Telekinesis",
+"slug": "rubick_telekinesis"
+},
+"5450": {
+"dname": "Fade Bolt",
+"slug": "rubick_fade_bolt"
+},
+"7320": {
+"dname": "Arcane Supremacy",
+"slug": "rubick_arcane_supremacy"
+},
+"5452": {
+"dname": "Spell Steal",
+"slug": "rubick_spell_steal"
+},
+"1765": {
+"dname": "Curiosity",
+"slug": "rubick_curiosity"
+},
+"5458": {
+"dname": "Thunder Strike",
+"slug": "disruptor_thunder_strike"
+},
+"5459": {
+"dname": "Glimpse",
+"slug": "disruptor_glimpse"
+},
+"5460": {
+"dname": "Kinetic Field",
+"slug": "disruptor_kinetic_field"
+},
+"1362": {
+"dname": "Kinetic Fence",
+"slug": "disruptor_kinetic_fence"
+},
+"1363": {
+"dname": "Electromagnetic Repulsion",
+"slug": "disruptor_electromagnetic_repulsion"
+},
+"5461": {
+"dname": "Static Storm",
+"slug": "disruptor_static_storm"
+},
+"5462": {
+"dname": "Impale",
+"slug": "nyx_assassin_impale"
+},
+"1104": {
+"dname": "Mind Flare",
+"slug": "nyx_assassin_jolt"
+},
+"5464": {
+"dname": "Spiked Carapace",
+"slug": "nyx_assassin_spiked_carapace"
+},
+"5666": {
+"dname": "Burrow",
+"slug": "nyx_assassin_burrow"
+},
+"1767": {
+"dname": "Mana Burn",
+"slug": "nyx_assassin_neuro_sting"
+},
+"5465": {
+"dname": "Vendetta",
+"slug": "nyx_assassin_vendetta"
+},
+"5467": {
+"dname": "Mirror Image",
+"slug": "naga_siren_mirror_image"
+},
+"5468": {
+"dname": "Ensnare",
+"slug": "naga_siren_ensnare"
+},
+"5469": {
+"dname": "Rip Tide",
+"slug": "naga_siren_rip_tide"
+},
+"1370": {
+"dname": "Eelskin",
+"slug": "naga_siren_eelskin"
+},
+"5470": {
+"dname": "Song of the Siren",
+"slug": "naga_siren_song_of_the_siren"
+},
+"5471": {
+"dname": "Illuminate",
+"slug": "keeper_of_the_light_illuminate"
+},
+"5476": {
+"dname": "Blinding Light",
+"slug": "keeper_of_the_light_blinding_light"
+},
+"5473": {
+"dname": "Chakra Magic",
+"slug": "keeper_of_the_light_chakra_magic"
+},
+"1372": {
+"dname": "Solar Bind",
+"slug": "keeper_of_the_light_radiant_bind"
+},
+"7316": {
+"dname": "Will-O-Wisp",
+"slug": "keeper_of_the_light_will_o_wisp"
+},
+"5474": {
+"dname": "Spirit Form",
+"slug": "keeper_of_the_light_spirit_form"
+},
+"1769": {
+"dname": "Bright Speed",
+"slug": "keeper_of_the_light_bright_speed"
+},
+"5485": {
+"dname": "Tether",
+"slug": "wisp_tether"
+},
+"5486": {
+"dname": "Spirits",
+"slug": "wisp_spirits"
+},
+"5487": {
+"dname": "Overcharge",
+"slug": "wisp_overcharge"
+},
+"5490": {
+"dname": "Spirits In",
+"slug": "wisp_spirits_in"
+},
+"5493": {
+"dname": "Spirits Out",
+"slug": "wisp_spirits_out"
+},
+"5488": {
+"dname": "Relocate",
+"slug": "wisp_relocate"
+},
+"1770": {
+"dname": "Equilibrium",
+"slug": "wisp_equilibrium"
+},
+"5480": {
+"dname": "Grave Chill",
+"slug": "visage_grave_chill"
+},
+"5481": {
+"dname": "Soul Assumption",
+"slug": "visage_soul_assumption"
+},
+"5482": {
+"dname": "Gravekeeper's Cloak",
+"slug": "visage_gravekeepers_cloak"
+},
+"683": {
+"dname": "Silent as the Grave",
+"slug": "visage_silent_as_the_grave"
+},
+"5483": {
+"dname": "Summon Familiars",
+"slug": "visage_summon_familiars"
+},
+"5494": {
+"dname": "Dark Pact",
+"slug": "slark_dark_pact"
+},
+"5495": {
+"dname": "Pounce",
+"slug": "slark_pounce"
+},
+"1693": {
+"dname": "Saltwater Shiv",
+"slug": "slark_saltwater_shiv"
+},
+"729": {
+"dname": "Depth Shroud",
+"slug": "slark_depth_shroud"
+},
+"5496": {
+"dname": "Essence Shift",
+"slug": "slark_essence_shift"
+},
+"5497": {
+"dname": "Shadow Dance",
+"slug": "slark_shadow_dance"
+},
+"5504": {
+"dname": "Split Shot",
+"slug": "medusa_split_shot"
+},
+"5505": {
+"dname": "Mystic Snake",
+"slug": "medusa_mystic_snake"
+},
+"1475": {
+"dname": "Gorgon's Grasp",
+"slug": "medusa_gorgon_grasp"
+},
+"701": {
+"dname": "Cold Blooded",
+"slug": "medusa_cold_blooded"
+},
+"5506": {
+"dname": "Mana Shield",
+"slug": "medusa_mana_shield"
+},
+"5507": {
+"dname": "Stone Gaze",
+"slug": "medusa_stone_gaze"
+},
+"1478": {
+"dname": "Battle Stance",
+"slug": "troll_warlord_switch_stance"
+},
+"5509": {
+"dname": "Whirling Axes (Ranged)",
+"slug": "troll_warlord_whirling_axes_ranged"
+},
+"5510": {
+"dname": "Whirling Axes (Melee)",
+"slug": "troll_warlord_whirling_axes_melee"
+},
+"5511": {
+"dname": "Fervor",
+"slug": "troll_warlord_fervor"
+},
+"5508": {
+"dname": "Berserker's Rage",
+"slug": "troll_warlord_berserkers_rage"
+},
+"5512": {
+"dname": "Battle Trance",
+"slug": "troll_warlord_battle_trance"
+},
+"5514": {
+"dname": "Hoof Stomp",
+"slug": "centaur_hoof_stomp"
+},
+"5515": {
+"dname": "Double Edge",
+"slug": "centaur_double_edge"
+},
+"5516": {
+"dname": "Retaliate",
+"slug": "centaur_return"
+},
+"1135": {
+"dname": "Work Horse",
+"slug": "centaur_work_horse"
+},
+"5517": {
+"dname": "Stampede",
+"slug": "centaur_stampede"
+},
+"1379": {
+"dname": "Horsepower",
+"slug": "centaur_horsepower"
+},
+"5518": {
+"dname": "Shockwave",
+"slug": "magnataur_shockwave"
+},
+"5519": {
+"dname": "Empower",
+"slug": "magnataur_empower"
+},
+"5520": {
+"dname": "Skewer",
+"slug": "magnataur_skewer"
+},
+"649": {
+"dname": "Horn Toss",
+"slug": "magnataur_horn_toss"
+},
+"1382": {
+"dname": "Solid Core",
+"slug": "magnataur_solid_core"
+},
+"5521": {
+"dname": "Reverse Polarity",
+"slug": "magnataur_reverse_polarity"
+},
+"5524": {
+"dname": "Whirling Death",
+"slug": "shredder_whirling_death"
+},
+"5525": {
+"dname": "Timber Chain",
+"slug": "shredder_timber_chain"
+},
+"5526": {
+"dname": "Reactive Armor",
+"slug": "shredder_reactive_armor"
+},
+"651": {
+"dname": "Flamethrower",
+"slug": "shredder_flamethrower"
+},
+"5527": {
+"dname": "Chakram",
+"slug": "shredder_chakram"
+},
+"1384": {
+"dname": "Exposure Therapy",
+"slug": "shredder_exposure_therapy"
+},
+"5548": {
+"dname": "Viscous Nasal Goo",
+"slug": "bristleback_viscous_nasal_goo"
+},
+"5549": {
+"dname": "Quill Spray",
+"slug": "bristleback_quill_spray"
+},
+"5550": {
+"dname": "Bristleback",
+"slug": "bristleback_bristleback"
+},
+"643": {
+"dname": "Hairball",
+"slug": "bristleback_hairball"
+},
+"5551": {
+"dname": "Warpath",
+"slug": "bristleback_warpath"
+},
+"1479": {
+"dname": "Prickly",
+"slug": "bristleback_prickly"
+},
+"5565": {
+"dname": "Ice Shards",
+"slug": "tusk_ice_shards"
+},
+"5566": {
+"dname": "Snowball",
+"slug": "tusk_snowball"
+},
+"7322": {
+"dname": "Tag Team",
+"slug": "tusk_tag_team"
+},
+"1385": {
+"dname": "Drinking Buddies",
+"slug": "tusk_drinking_buddies"
+},
+"5672": {
+"dname": "Walrus Kick",
+"slug": "tusk_walrus_kick"
+},
+"5568": {
+"dname": "Walrus PUNCH!",
+"slug": "tusk_walrus_punch"
+},
+"1386": {
+"dname": "Bitter Chill",
+"slug": "tusk_bitter_chill"
+},
+"5581": {
+"dname": "Arcane Bolt",
+"slug": "skywrath_mage_arcane_bolt"
+},
+"5582": {
+"dname": "Concussive Shot",
+"slug": "skywrath_mage_concussive_shot"
+},
+"5583": {
+"dname": "Ancient Seal",
+"slug": "skywrath_mage_ancient_seal"
+},
+"833": {
+"dname": "Shield of the Scion",
+"slug": "skywrath_mage_shield_of_the_scion"
+},
+"5584": {
+"dname": "Mystic Flare",
+"slug": "skywrath_mage_mystic_flare"
+},
+"5585": {
+"dname": "Mist Coil",
+"slug": "abaddon_death_coil"
+},
+"5586": {
+"dname": "Aphotic Shield",
+"slug": "abaddon_aphotic_shield"
+},
+"5587": {
+"dname": "Curse of Avernus",
+"slug": "abaddon_frostmourne"
+},
+"1481": {
+"dname": "Withering Mist",
+"slug": "abaddon_withering_mist"
+},
+"5588": {
+"dname": "Borrowed Time",
+"slug": "abaddon_borrowed_time"
+},
+"5589": {
+"dname": "Echo Stomp",
+"slug": "elder_titan_echo_stomp"
+},
+"1392": {
+"dname": "Astral Spirit",
+"slug": "elder_titan_ancestral_spirit"
+},
+"5593": {
+"dname": "Natural Order",
+"slug": "elder_titan_natural_order"
+},
+"1393": {
+"dname": "Momentum",
+"slug": "elder_titan_momentum"
+},
+"5594": {
+"dname": "Earth Splitter",
+"slug": "elder_titan_earth_splitter"
+},
+"5595": {
+"dname": "Overwhelming Odds",
+"slug": "legion_commander_overwhelming_odds"
+},
+"5596": {
+"dname": "Press The Attack",
+"slug": "legion_commander_press_the_attack"
+},
+"5597": {
+"dname": "Moment of Courage",
+"slug": "legion_commander_moment_of_courage"
+},
+"1483": {
+"dname": "Outfight Them!",
+"slug": "legion_commander_outfight_them"
+},
+"5598": {
+"dname": "Duel",
+"slug": "legion_commander_duel"
+},
+"5603": {
+"dname": "Searing Chains",
+"slug": "ember_spirit_searing_chains"
+},
+"5604": {
+"dname": "Sleight of Fist",
+"slug": "ember_spirit_sleight_of_fist"
+},
+"5605": {
+"dname": "Flame Guard",
+"slug": "ember_spirit_flame_guard"
+},
+"5607": {
+"dname": "Activate Fire Remnant",
+"slug": "ember_spirit_activate_fire_remnant"
+},
+"1484": {
+"dname": "Immolation",
+"slug": "ember_spirit_immolation"
+},
+"5606": {
+"dname": "Fire Remnant",
+"slug": "ember_spirit_fire_remnant"
+},
+"5608": {
+"dname": "Boulder Smash",
+"slug": "earth_spirit_boulder_smash"
+},
+"5609": {
+"dname": "Rolling Boulder",
+"slug": "earth_spirit_rolling_boulder"
+},
+"5610": {
+"dname": "Geomagnetic Grip",
+"slug": "earth_spirit_geomagnetic_grip"
+},
+"1395": {
+"dname": "Stone Remnant",
+"slug": "earth_spirit_stone_caller"
+},
+"5648": {
+"dname": "Enchant Remnant",
+"slug": "earth_spirit_petrify"
+},
+"5612": {
+"dname": "Magnetize",
+"slug": "earth_spirit_magnetize"
+},
+"5619": {
+"dname": "Reflection",
+"slug": "terrorblade_reflection"
+},
+"5620": {
+"dname": "Conjure Image",
+"slug": "terrorblade_conjure_image"
+},
+"5621": {
+"dname": "Metamorphosis",
+"slug": "terrorblade_metamorphosis"
+},
+"699": {
+"dname": "Demon Zeal",
+"slug": "terrorblade_demon_zeal"
+},
+"425": {
+"dname": "Terror Wave",
+"slug": "terrorblade_terror_wave"
+},
+"5622": {
+"dname": "Sunder",
+"slug": "terrorblade_sunder"
+},
+"1396": {
+"dname": "Dark Unity",
+"slug": "terrorblade_dark_unity"
+},
+"5623": {
+"dname": "Icarus Dive",
+"slug": "phoenix_icarus_dive"
+},
+"5625": {
+"dname": "Fire Spirits",
+"slug": "phoenix_fire_spirits"
+},
+"5626": {
+"dname": "Sun Ray",
+"slug": "phoenix_sun_ray"
+},
+"1397": {
+"dname": "Dying Light",
+"slug": "phoenix_dying_light"
+},
+"5630": {
+"dname": "Supernova",
+"slug": "phoenix_supernova"
+},
+"5637": {
+"dname": "Fortune's End",
+"slug": "oracle_fortunes_end"
+},
+"5638": {
+"dname": "Fate's Edict",
+"slug": "oracle_fates_edict"
+},
+"5639": {
+"dname": "Purifying Flames",
+"slug": "oracle_purifying_flames"
+},
+"932": {
+"dname": "Rain of Destiny",
+"slug": "oracle_rain_of_destiny"
+},
+"5640": {
+"dname": "False Promise",
+"slug": "oracle_false_promise"
+},
+"1401": {
+"dname": "Prognosticate",
+"slug": "oracle_prognosticate"
+},
+"879": {
+"dname": "Sticky Bomb",
+"slug": "techies_sticky_bomb"
+},
+"886": {
+"dname": "Reactive Tazer",
+"slug": "techies_reactive_tazer"
+},
+"5601": {
+"dname": "Blast Off!",
+"slug": "techies_suicide"
+},
+"1778": {
+"dname": "M.A.D.",
+"slug": "techies_mutually_assured_destruction"
+},
+"5644": {
+"dname": "Minefield Sign",
+"slug": "techies_minefield_sign"
+},
+"5599": {
+"dname": "Proximity Mines",
+"slug": "techies_land_mines"
+},
+"5651": {
+"dname": "Arctic Burn",
+"slug": "winter_wyvern_arctic_burn"
+},
+"5652": {
+"dname": "Splinter Blast",
+"slug": "winter_wyvern_splinter_blast"
+},
+"5653": {
+"dname": "Cold Embrace",
+"slug": "winter_wyvern_cold_embrace"
+},
+"1779": {
+"dname": "Eldwurm's Edda",
+"slug": "winter_wyvern_eldwurms_edda"
+},
+"5654": {
+"dname": "Winter's Curse",
+"slug": "winter_wyvern_winters_curse"
+},
+"5677": {
+"dname": "Flux",
+"slug": "arc_warden_flux"
+},
+"5678": {
+"dname": "Magnetic Field",
+"slug": "arc_warden_magnetic_field"
+},
+"5679": {
+"dname": "Spark Wraith",
+"slug": "arc_warden_spark_wraith"
+},
+"1407": {
+"dname": "Runic Infusion",
+"slug": "arc_warden_runic_infusion"
+},
+"5683": {
+"dname": "Tempest Double",
+"slug": "arc_warden_tempest_double"
+},
+"5613": {
+"dname": "Firestorm",
+"slug": "abyssal_underlord_firestorm"
+},
+"5614": {
+"dname": "Pit of Malice",
+"slug": "abyssal_underlord_pit_of_malice"
+},
+"5615": {
+"dname": "Atrophy Aura",
+"slug": "abyssal_underlord_atrophy_aura"
+},
+"1486": {
+"dname": "Invading Force",
+"slug": "abyssal_underlord_raid_boss"
+},
+"865": {
+"dname": "Fiend's Gate",
+"slug": "abyssal_underlord_dark_portal"
+},
+"5716": {
+"dname": "Boundless Strike",
+"slug": "monkey_king_boundless_strike"
+},
+"5721": {
+"dname": "Tree Dance",
+"slug": "monkey_king_tree_dance"
+},
+"5723": {
+"dname": "Jingu Mastery",
+"slug": "monkey_king_jingu_mastery"
+},
+"5719": {
+"dname": "Mischief",
+"slug": "monkey_king_mischief"
+},
+"5725": {
+"dname": "Wukong's Command",
+"slug": "monkey_king_wukongs_command"
+},
+"1627": {
+"dname": "Changing of the Guard",
+"slug": "monkey_king_transfiguration"
+},
+"6344": {
+"dname": "Swashbuckle",
+"slug": "pangolier_swashbuckle"
+},
+"6461": {
+"dname": "Shield Crash",
+"slug": "pangolier_shield_crash"
+},
+"7307": {
+"dname": "Lucky Shot",
+"slug": "pangolier_lucky_shot"
+},
+"8027": {
+"dname": "Roll Up",
+"slug": "pangolier_rollup"
+},
+"6343": {
+"dname": "Rolling Thunder",
+"slug": "pangolier_gyroshell"
+},
+"1412": {
+"dname": "Fortune Favors the Bold",
+"slug": "pangolier_fortune_favors_the_bold"
+},
+"6339": {
+"dname": "Bramble Maze",
+"slug": "dark_willow_bramble_maze"
+},
+"6341": {
+"dname": "Shadow Realm",
+"slug": "dark_willow_shadow_realm"
+},
+"6342": {
+"dname": "Cursed Crown",
+"slug": "dark_willow_cursed_crown"
+},
+"6340": {
+"dname": "Bedlam",
+"slug": "dark_willow_bedlam"
+},
+"1413": {
+"dname": "Pixie Dust",
+"slug": "dark_willow_pixie_dust"
+},
+"8340": {
+"dname": "Terrorize",
+"slug": "dark_willow_terrorize"
+},
+"8000": {
+"dname": "Stroke of Fate",
+"slug": "grimstroke_dark_artistry"
+},
+"8006": {
+"dname": "Phantom's Embrace",
+"slug": "grimstroke_ink_creature"
+},
+"8007": {
+"dname": "Ink Swell",
+"slug": "grimstroke_spirit_walk"
+},
+"7852": {
+"dname": "Dark Portrait",
+"slug": "grimstroke_dark_portrait"
+},
+"6491": {
+"dname": "Soulbind",
+"slug": "grimstroke_soul_chain"
+},
+"1414": {
+"dname": "Ink Trail",
+"slug": "grimstroke_ink_trail"
+},
+"6583": {
+"dname": "Spear of Mars",
+"slug": "mars_spear"
+},
+"6495": {
+"dname": "God's Rebuke",
+"slug": "mars_gods_rebuke"
+},
+"6582": {
+"dname": "Bulwark",
+"slug": "mars_bulwark"
+},
+"1415": {
+"dname": "Dauntless",
+"slug": "mars_dauntless"
+},
+"1416": {
+"dname": "Arena Of Blood",
+"slug": "mars_arena_of_blood"
+},
+"7701": {
+"dname": "Aether Remnant",
+"slug": "void_spirit_aether_remnant"
+},
+"6470": {
+"dname": "Dissimilate",
+"slug": "void_spirit_dissimilate"
+},
+"7710": {
+"dname": "Resonant Pulse",
+"slug": "void_spirit_resonant_pulse"
+},
+"1420": {
+"dname": "Intrinsic Edge",
+"slug": "void_spirit_intrinsic_edge"
+},
+"7705": {
+"dname": "Astral Step",
+"slug": "void_spirit_astral_step"
+},
+"6480": {
+"dname": "Scatterblast",
+"slug": "snapfire_scatterblast"
+},
+"6483": {
+"dname": "Firesnap Cookie",
+"slug": "snapfire_firesnap_cookie"
+},
+"6488": {
+"dname": "Lil' Shredder",
+"slug": "snapfire_lil_shredder"
+},
+"6484": {
+"dname": "Gobble Up",
+"slug": "snapfire_gobble_up"
+},
+"6486": {
+"dname": "Spit Out",
+"slug": "snapfire_spit_creep"
+},
+"6482": {
+"dname": "Mortimer Kisses",
+"slug": "snapfire_mortimer_kisses"
+},
+"1782": {
+"dname": "Boomstick",
+"slug": "snapfire_boomstick"
+},
+"8429": {
+"dname": "Acorn Shot",
+"slug": "hoodwink_acorn_shot"
+},
+"8158": {
+"dname": "Bushwhack",
+"slug": "hoodwink_bushwhack"
+},
+"9501": {
+"dname": "Scurry",
+"slug": "hoodwink_scurry"
+},
+"8107": {
+"dname": "Decoy",
+"slug": "hoodwink_decoy"
+},
+"1422": {
+"dname": "Hunter's Boomerang",
+"slug": "hoodwink_hunters_boomerang"
+},
+"8106": {
+"dname": "Sharpshooter",
+"slug": "hoodwink_sharpshooter"
+},
+"1423": {
+"dname": "Mistwoods Wayfarer",
+"slug": "hoodwink_mistwoods_wayfarer"
+},
+"7902": {
+"dname": "Starbreaker",
+"slug": "dawnbreaker_fire_wreath"
+},
+"7914": {
+"dname": "Celestial Hammer",
+"slug": "dawnbreaker_celestial_hammer"
+},
+"7918": {
+"dname": "Luminosity",
+"slug": "dawnbreaker_luminosity"
+},
+"1424": {
+"dname": "Break of Dawn",
+"slug": "dawnbreaker_break_of_dawn"
+},
+"7906": {
+"dname": "Solar Guardian",
+"slug": "dawnbreaker_solar_guardian"
+},
+"8192": {
+"dname": "Dispose",
+"slug": "marci_grapple"
+},
+"8235": {
+"dname": "Rebound",
+"slug": "marci_companion_run"
+},
+"1427": {
+"dname": "Bodyguard",
+"slug": "marci_bodyguard"
+},
+"1428": {
+"dname": "Special Delivery",
+"slug": "marci_special_delivery"
+},
+"8198": {
+"dname": "Unleash",
+"slug": "marci_unleash"
+},
+"992": {
+"dname": "Onslaught",
+"slug": "primal_beast_onslaught"
+},
+"994": {
+"dname": "Trample",
+"slug": "primal_beast_trample"
+},
+"995": {
+"dname": "Uproar",
+"slug": "primal_beast_uproar"
+},
+"7739": {
+"dname": "Rock Throw",
+"slug": "primal_beast_rock_throw"
+},
+"996": {
+"dname": "Pulverize",
+"slug": "primal_beast_pulverize"
+},
+"1432": {
+"dname": "Colossal",
+"slug": "primal_beast_colossal"
+},
+"5751": {
+"dname": "Dead Shot",
+"slug": "muerta_dead_shot"
+},
+"5752": {
+"dname": "The Calling",
+"slug": "muerta_the_calling"
+},
+"5753": {
+"dname": "Gunslinger",
+"slug": "muerta_gunslinger"
+},
+"1785": {
+"dname": "Spectral Slug",
+"slug": "muerta_spectral_slug"
+},
+"5754": {
+"dname": "Pierce the Veil",
+"slug": "muerta_pierce_the_veil"
+},
+"1436": {
+"dname": "Supernatural",
+"slug": "muerta_supernatural"
+},
+"352": {
+"dname": "Tame the Beasts",
+"slug": "ringmaster_tame_the_beasts"
+},
+"383": {
+"dname": "Escape Act",
+"slug": "ringmaster_the_box"
+},
+"386": {
+"dname": "Impalement Arts",
+"slug": "ringmaster_impalement"
+},
+"195": {
+"dname": "Spotlight",
+"slug": "ringmaster_spotlight"
+},
+"385": {
+"dname": "Wheel of Wonder",
+"slug": "ringmaster_wheel"
+},
+"388": {
+"dname": "Dark Carnival Barker",
+"slug": "ringmaster_dark_carnival_souvenirs"
+},
+"389": {
+"dname": "Funhouse Mirror",
+"slug": "ringmaster_funhouse_mirror"
+},
+"392": {
+"dname": "Strongman Tonic",
+"slug": "ringmaster_strongman_tonic"
+},
+"390": {
+"dname": "Whoopee Cushion",
+"slug": "ringmaster_whoopee_cushion"
+},
+"196": {
+"dname": "Unicycle",
+"slug": "ringmaster_summon_unicycle"
+},
+"1498": {
+"dname": "Echo Slash",
+"slug": "kez_echo_slash"
+},
+"1499": {
+"dname": "Grappling Claw",
+"slug": "kez_grappling_claw"
+},
+"1500": {
+"dname": "Kazurai Katana",
+"slug": "kez_kazurai_katana"
+},
+"1497": {
+"dname": "Switch Discipline",
+"slug": "kez_switch_weapons"
+},
+"1501": {
+"dname": "Raptor Dance",
+"slug": "kez_raptor_dance"
+},
+"1502": {
+"dname": "Falcon Rush",
+"slug": "kez_falcon_rush"
+},
+"1503": {
+"dname": "Talon Toss",
+"slug": "kez_talon_toss"
+},
+"1504": {
+"dname": "Shodo Sai",
+"slug": "kez_shodo_sai"
+},
+"1506": {
+"dname": "Raven's Veil",
+"slug": "kez_ravens_veil"
+},
+"1659": {
+"dname": "Catchy Lick",
+"slug": "largo_catchy_lick"
+},
+"1660": {
+"dname": "Frogstomp",
+"slug": "largo_frogstomp"
+},
+"1661": {
+"dname": "Croak of Genius",
+"slug": "largo_croak_of_genius"
+},
+"1666": {
+"dname": "Encore",
+"slug": "largo_encore"
+},
+"1662": {
+"dname": "Amphibian Rhapsody",
+"slug": "largo_amphibian_rhapsody"
+},
+"1663": {
+"dname": "Bullbelly Blitz",
+"slug": "largo_song_fight_song"
+},
+"1664": {
+"dname": "Hotfeet Hustle",
+"slug": "largo_song_double_time"
+},
+"1665": {
+"dname": "Island Elixir",
+"slug": "largo_song_good_vibrations"
+}
+}
