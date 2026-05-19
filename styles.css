@@ -2753,17 +2753,30 @@ body.filter-active ul.subnotes { display: none; }
   overflow-x: auto;
 }
 .creeps-table {
-  /* table-layout: fixed respects the <colgroup> widths absolutely; the
-     extracted-prose post-process means there are no more 2000px-wide
-     legend cells. width: max-content stops the parent container from
-     squeezing the table back into its viewport width — the .creeps-scroll
-     wrapper provides horizontal scroll for the overflow. */
-  table-layout: fixed;
-  width: max-content;
+  /* table-layout: auto lets the browser size each column to the widest
+     content (header or cell) — no manual width hints. Every cell is
+     centered horizontally, so visual alignment stays clean across the
+     auto-sized columns. */
+  table-layout: auto;
   border-collapse: collapse;
   font-size: 11.5px;
   color: #c9d1d9;
   font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.creeps-table th,
+.creeps-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+/* Merged Ур. cell — when a level spans multiple rows via rowspan, the
+   single cell shows the level number vertically centered against the
+   group's full height. */
+.creeps-table .lvl-cell {
+  font-weight: 600;
+  color: #79c0ff;
+  background: rgba(170, 220, 240, 0.05);
+  border-right: 1px solid rgba(170, 220, 240, 0.18);
 }
 /* Dedicated icon column — fixed-size portrait, centered. Vertical-align
    middle on the parent <td> keeps the image baseline-aligned with the

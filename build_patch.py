@@ -3657,7 +3657,9 @@ def save_creeps_html():
         # arbitrary depth.
         kv_lines = open(NPC_KV_PATH, encoding='utf-8').read().splitlines()
         n_lines = len(kv_lines)
-        head_re = _re.compile(r'^\s*"(npc_dota_neutral_[a-z0-9_]+)"\s*$')
+        # Capture both neutrals AND the hero-summoned units we surface
+        # in the table (e.g. Dark Troll Summoner's skeleton_warrior).
+        head_re = _re.compile(r'^\s*"(npc_dota_(?:neutral_[a-z0-9_]+|dark_troll_warlord_skeleton_warrior))"\s*$')
         field_re = _re.compile(r'^\s*"([A-Za-z_][A-Za-z0-9_]*)"\s+"([^"]+)"')
         i = 0
         while i < n_lines:
@@ -3738,15 +3740,20 @@ def save_creeps_html():
         'granite':            'npc_dota_neutral_granite_golem',
         'drake':              'npc_dota_neutral_black_drake',
         'black_dragon':       'npc_dota_neutral_black_dragon',
-        # Lane / summon entries with no neutral counterpart
-        'skeleton_warrior':   None,
-        'flag / melee':       None,
-        'ranged':             None,
+        # Hero-summoned unit surfaced in the table — Dark Troll
+        # Summoner's skeleton (data lives in the npc_dota_dark_troll_
+        # warlord_skeleton_warrior block, captured by the broadened
+        # head_re above).
+        'skeleton_warrior':   'npc_dota_dark_troll_warlord_skeleton_warrior',
     }
+
+    # CSV rows that should be HIDDEN from the table entirely (lane creeps
+    # belong to a different section that will be added later).
+    HIDDEN_CREATEHERO = {'flag / melee', 'ranged'}
 
     # Full display name (Russian/English) shown in the new Крип column.
     CREEP_DISPLAY_NAMES = {
-        'npc_dota_neutral_wildkin':              'Wildwing Ripper',
+        'npc_dota_neutral_wildkin':              'Wildwing',
         'npc_dota_neutral_kobold':               'Kobold',
         'npc_dota_neutral_kobold_tunneler':      'Kobold Tunneler',
         'npc_dota_neutral_kobold_taskmaster':    'Kobold Taskmaster',
@@ -3784,7 +3791,7 @@ def save_creeps_html():
         'npc_dota_neutral_prowler_shaman':       'Prowler Shaman',
         'npc_dota_neutral_frostbitten_golem':    'Frostbitten Golem',
         'npc_dota_neutral_rock_golem':           'Rock Golem',
-        'npc_dota_neutral_enraged_wildkin':      'Enraged Wildkin',
+        'npc_dota_neutral_enraged_wildkin':      'Wildwing Ripper',
         'npc_dota_neutral_big_thunder_lizard':   'Thunderhide',
         'npc_dota_neutral_small_thunder_lizard': 'Small Thunder Lizard',
         'npc_dota_neutral_jungle_stalker':       'Jungle Stalker',
@@ -3793,26 +3800,23 @@ def save_creeps_html():
         'npc_dota_neutral_granite_golem':        'Granite Golem',
         'npc_dota_neutral_black_drake':          'Black Drake',
         'npc_dota_neutral_black_dragon':         'Black Dragon',
+        # Hero-summoned units shown alongside neutrals
+        'npc_dota_dark_troll_warlord_skeleton_warrior': 'Skeleton Warrior',
     }
 
-    # Lane / summoned creeps that don't have a neutral npc but the user
-    # still wants represented in the table. Provides a custom icon path
-    # and display name only.
-    LANE_LIKE = {
-        'skeleton_warrior': {'name': 'Skeleton (summoned)', 'icon': None},
-        'flag / melee':     {'name': 'Lane Melee / Flagbearer',
-                              'icon': 'icons/units/npc_dota_creep_lane_melee.png'},
-        'ranged':           {'name': 'Lane Ranged',
-                              'icon': 'icons/units/npc_dota_creep_lane_ranged.png'},
-    }
+    # Hidden marker abilities — not real spells, suppressed from output.
+    # `neutral_upgrade`: every neutral has this; auto-buff tracker.
+    # `creep_piercing`: tags the unit with pierce attack-class. The info
+    # already lives in the Тип атаки column, so showing it as an ability
+    # is redundant.
+    ABILITY_SKIP = {'neutral_upgrade', 'creep_piercing'}
 
     def _ability_dname(slug):
-        if not slug or slug == 'neutral_upgrade':
+        if not slug or slug in ABILITY_SKIP:
             return ''
         entry = abil_slim.get(slug)
         if entry and entry.get('dname'):
             return entry['dname']
-        # Fallback to humanized slug
         return slug.replace('_', ' ').title()
 
     def _fmt_num(x):
@@ -3892,11 +3896,11 @@ def save_creeps_html():
         gold_avg = (gold_min + gold_max) / 2 if gold_min or gold_max else 0
         t_per_attack = bat * 100 / ats if ats else bat
 
-        # Ability dnames (skip neutral_upgrade auto-marker, skip blanks)
+        # Ability dnames (skip hidden marker abilities and blanks)
         abilities = []
         for i in range(1, 6):
             slug = npc.get(f'Ability{i}', '').strip()
-            if not slug or slug == 'neutral_upgrade':
+            if not slug or slug in ABILITY_SKIP:
                 continue
             abilities.append(_ability_dname(slug))
         abilities += [''] * (3 - len(abilities)) if len(abilities) < 3 else []
@@ -4008,15 +4012,16 @@ def save_creeps_html():
             continue
         if not createhero and not csv_lvl:
             continue
-        # Propagate level if CSV cell is empty (sheet only sets it on the
-        # first row of each level block).
+        # Skip hidden lane-creep rows (the user wants them in a separate
+        # section that will be added later).
+        if createhero in HIDDEN_CREATEHERO:
+            continue
         if csv_lvl:
             level_for_row = csv_lvl
         else:
             level_for_row = current_lvl
 
         npc_key = _resolve(createhero)
-        lane_meta = LANE_LIKE.get(createhero)
         if npc_key:
             display_name = CREEP_DISPLAY_NAMES.get(
                 npc_key,
@@ -4024,31 +4029,41 @@ def save_creeps_html():
             )
             icon_path = f'icons/units/{npc_key}.png'
             data = _row_data(npc_key, createhero)
-        elif lane_meta:
-            display_name = lane_meta['name']
-            icon_path = lane_meta['icon']
-            data = _row_data(None, createhero)  # all blanks
         else:
             display_name = createhero.replace('_', ' ').title()
             icon_path = None
             data = _row_data(None, createhero)
 
-        # Tier divider: row gets the "tier-break" class when the level
-        # changes from the previous emitted data row.
         is_break = (level_for_row != current_lvl)
         current_lvl = level_for_row
 
-        data['lvl'] = level_for_row if is_break else ''
+        data['lvl'] = level_for_row  # always set; rowspan handles merging
         data['createhero'] = createhero
         data['name'] = display_name
-        data['icon'] = icon_path  # path or None; rendered specially
-        rendered.append({'data': data, 'tier_break': is_break})
+        data['icon'] = icon_path
+        rendered.append({'data': data, 'tier_break': is_break,
+                          'level': level_for_row})
+
+    # Pass 2: assign rowspan counts to each level group. The FIRST row
+    # of each level group gets rowspan=N, the rest get span=0 (skipped
+    # in render).
+    i = 0
+    while i < len(rendered):
+        lvl = rendered[i]['level']
+        j = i + 1
+        while j < len(rendered) and rendered[j]['level'] == lvl:
+            j += 1
+        rendered[i]['lvl_rowspan'] = j - i
+        for k in range(i + 1, j):
+            rendered[k]['lvl_rowspan'] = 0
+        i = j
 
     # ---- HTML emission ----
     nav = _render_top_nav(active='creeps', patch_context=False)
-    colgroup_html = '<colgroup>' + ''.join(
-        f'<col style="width:{COL_WIDTHS[k]}px">' for k, _ in COLUMNS
-    ) + '</colgroup>'
+    # No colgroup: table-layout: auto lets the browser size each column
+    # to fit content (and each header) on one line. Headers and cells
+    # are explicitly centred via CSS so the auto-width math doesn't have
+    # to budget for tag-width differences across columns.
     thead_cells = ''.join(
         f'<th>{_esc(label)}</th>' if label else '<th></th>'
         for _, label in COLUMNS
@@ -4061,7 +4076,16 @@ def save_creeps_html():
         cells = []
         for k, _ in COLUMNS:
             v = d.get(k, '')
-            if k == 'icon':
+            if k == 'lvl':
+                # Vertical-merge level cells via rowspan. Only the first
+                # row of each level group emits a <td>; subsequent rows
+                # in the same level skip the cell entirely.
+                span = row.get('lvl_rowspan', 1)
+                if span == 0:
+                    continue
+                attr = f' rowspan="{span}"' if span > 1 else ''
+                cells.append(f'<td class="lvl-cell"{attr}>{_esc(v)}</td>')
+            elif k == 'icon':
                 if v:
                     cells.append(
                         f'<td class="creep-icon-cell">'
@@ -4087,7 +4111,6 @@ def save_creeps_html():
         '<div class="container creeps-page">\n'
         '<div class="creeps-scroll">\n'
         '<table class="creeps-table">\n'
-        f'{colgroup_html}\n'
         f'<thead><tr>{thead_cells}</tr></thead>\n'
         f'<tbody>\n{chr(10).join(body_parts)}\n</tbody>\n'
         '</table>\n'
