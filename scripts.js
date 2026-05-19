@@ -659,7 +659,11 @@
       const tipRect = shared.getBoundingClientRect();
       let left = r.left + r.width / 2 - tipRect.width / 2;
       left = Math.max(8, Math.min(left, window.innerWidth - tipRect.width - 8));
-      const top = r.top - tipRect.height - 12;
+      // Cell scales to 2.5× on hover from its centre, so it grows ~18px
+      // upward beyond the wrap's static bounding rect. Push the tooltip
+      // 24px above r.top (18 expansion + 6 clearance) so it never sits on
+      // the inflated cell.
+      const top = r.top - tipRect.height - 24;
       shared.style.left = left + 'px';
       shared.style.top = top + 'px';
     }
