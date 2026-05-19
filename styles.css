@@ -2765,25 +2765,27 @@ body.filter-active ul.subnotes { display: none; }
   color: #c9d1d9;
   font-variant-numeric: tabular-nums;
 }
-.creeps-table .creep-name-cell {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: normal;
-  padding-left: 4px;
+/* Dedicated icon column — fixed-size portrait, centered. Vertical-align
+   middle on the parent <td> keeps the image baseline-aligned with the
+   sibling cells without flexbox (which previously made the wildkin row
+   look "split" because flex baselines diverged from table baselines). */
+.creeps-table .creep-icon-cell {
+  text-align: center;
+  padding: 2px 4px;
+  vertical-align: middle;
 }
-.creeps-table .creep-icon {
-  width: 28px;
-  height: 16px;
+.creeps-table .creep-icon-cell img {
+  width: 44px;
+  height: 24px;
   object-fit: cover;
-  border-radius: 2px;
-  flex-shrink: 0;
+  border-radius: 3px;
   background: rgba(139, 148, 158, 0.15);
+  display: inline-block;
+  vertical-align: middle;
 }
-.creeps-table .creep-name-label {
-  font-size: 11px;
-  color: #c9d1d9;
-  line-height: 1.2;
+/* Tier-break: thicker top border between level groups (Ур. changes). */
+.creeps-table tr.tier-break td {
+  border-top: 2px solid rgba(170, 220, 240, 0.28);
 }
 .creeps-table thead th {
   position: sticky;
