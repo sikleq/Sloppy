@@ -475,61 +475,21 @@
       // Bleed: % half-width of the soft transition zone between adjacent
       // bands. Zero = hard cuts between bands — no phantom mid-tones.
       const bleed = 0;
-      // Minimum band height (% of cell) — guarantees that a tiny share
-      // (e.g. 1 NEW out of 12 tags total) still occupies a visible slice
-      // rather than getting crushed into a 1px sliver that disappears
-      // under the convex-shading and specular highlight overlays.
-      const minBand = tags.length > 1 ? 14 : 0;
-      const rawBands = tags.map(t => (counts[t] / total) * 100);
-      let bands = rawBands.slice();
-      const deficit = bands.reduce((s, b) => s + Math.max(0, minBand - b), 0);
-      if (deficit > 0) {
-        // Each band gets bumped to at least minBand; the over-quota mass
-        // is donated by bands that have spare room above the floor, in
-        // proportion to their excess. Preserves the relative ordering of
-        // shares while keeping every tag readable.
-        const excess = bands.map(b => Math.max(0, b - minBand));
-        const totalExcess = excess.reduce((s, e) => s + e, 0);
-        if (totalExcess >= deficit) {
-          bands = bands.map((b, i) =>
-            b < minBand ? minBand : b - (excess[i] / totalExcess) * deficit
-          );
-        } else {
-          // Not enough headroom anywhere — fall back to equal split so
-          // the visualization at least stays readable.
-          bands = bands.map(() => 100 / tags.length);
-        }
-      }
       let acc = 0;
       const stops = [];
-      const sepStops = [];
-      // Separator overlay: a 2% dark stripe at each interior band boundary,
-      // painted on a higher layer than the highlight/sheen so it survives
-      // the white specular at the top of the cell. Without this, a small
-      // NEW band sitting under the top highlight visually blends with the
-      // adjacent DEL band.
-      const sepHalf = 1.0;
       for (let i = 0; i < tags.length; i++) {
         const t = tags[i];
         const c = counts[t];
-        const start = acc;
-        acc += bands[i];
-        const end = acc;
+        const start = (acc / total) * 100;
+        acc += c;
+        const end = (acc / total) * 100;
         const halfBand = (end - start) / 2;
         const localBleed = Math.min(bleed, halfBand);
         const solidStart = i === 0 ? start : start + localBleed;
         const solidEnd = i === tags.length - 1 ? end : end - localBleed;
         const color = dynColorFor(t, c);
-        stops.push(`${color} ${solidStart.toFixed(2)}%`);
-        stops.push(`${color} ${solidEnd.toFixed(2)}%`);
-        if (i < tags.length - 1) {
-          const lo = Math.max(0, end - sepHalf).toFixed(2);
-          const hi = Math.min(100, end + sepHalf).toFixed(2);
-          sepStops.push(`transparent ${lo}%`);
-          sepStops.push(`rgba(0,0,0,0.85) ${lo}%`);
-          sepStops.push(`rgba(0,0,0,0.85) ${hi}%`);
-          sepStops.push(`transparent ${hi}%`);
-        }
+        stops.push(`${color} ${solidStart.toFixed(1)}%`);
+        stops.push(`${color} ${solidEnd.toFixed(1)}%`);
       }
       // If every tag was misc, the colored-tags `stops` array is empty;
       // fall back to a solid misc fill so the cell still reads as "this
@@ -538,10 +498,6 @@
       // dimmed vs. a fully-colored cell.
       if (stops.length) {
         cell.style.setProperty('--dyn-bg', `linear-gradient(to bottom, ${stops.join(', ')})`);
-        if (sepStops.length) {
-          cell.style.setProperty('--dyn-sep',
-            `linear-gradient(to bottom, transparent 0%, ${sepStops.join(', ')}, transparent 100%)`);
-        }
       } else if (miscOnly) {
         // Flat-gradient wrapper instead of a raw color so the value always
         // parses as `background-image` — keeps the bg-color slot free for

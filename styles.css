@@ -824,11 +824,6 @@ h2.section {
      The opaque fallback color at the end ensures rendering even before
      JS runs. */
   background:
-    /* Separator stripes for band boundaries — sits ABOVE the specular and
-       sheen layers so a tiny NEW band crammed under the top highlight
-       still shows a crisp dark edge against its neighbour. JS builds this
-       gradient with hard dark stops at each interior boundary. */
-    var(--dyn-sep, none),
     radial-gradient(ellipse 55% 30% at 50% 10%,
       rgba(255, 255, 255, 0.22) 0%,
       rgba(255, 255, 255, 0.04) 60%,
@@ -862,7 +857,7 @@ h2.section {
   opacity: 0.9;
 }
 .patch-dynamics .dyn-cell-wrap:not(.empty):hover .dyn-cell {
-  transform: scale(2);
+  transform: scale(2.5);
   /* Opaque backdrop under the translucent fluid: stops neighbouring cells
      from showing through the scaled-up hovered cell. Matches the
      entity-block gradient mid-tone (~#181b25). */
