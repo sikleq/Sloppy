@@ -366,8 +366,10 @@ def _render_general_note(note):
     return out
 
 
-def _render_item(item, neutral=False):
-    """One items[] / neutral_items[] entry."""
+def _render_item(item, version, neutral=False):
+    """One items[] / neutral_items[] entry. `version` is the current
+    patch (e.g. "7.40") — used to emit auto_components_change(item,
+    version) for recipe-changed items."""
     out = []
     aid = item.get('ability_id')
     if aid == -1:
@@ -380,12 +382,22 @@ def _render_item(item, neutral=False):
     name, slug = ITEMS.get(aid, (f'item_{aid}', f'item_{aid}'))
     deco = _entity_title_decoration(item)
     # Detect "Recipe changed" — first note with "Recipe changed" text →
-    # decorate item_header(changed=True) and drop that row.
+    # decorate item_header(changed=True), drop that row, and emit an
+    # auto_components_change(name, version) call right below the header
+    # so the OLD→NEW component diff renders automatically. items.json
+    # carries per-patch ItemRequirements + ItemCost, so this lookup is
+    # fully data-driven (no manual recipe lists needed).
     notes = list(item.get('ability_notes', []))
-    if notes and re.search(r'\brecipe changed\b', _strip_html(notes[0].get('note', '')), re.I):
+    is_recipe_changed = (
+        notes and re.search(r'\brecipe changed\b',
+                            _strip_html(notes[0].get('note', '')), re.I)
+    )
+    if is_recipe_changed:
         deco = deco + ', changed=True' if deco else ', changed=True'
         notes = notes[1:]
     out.append(f'W(item_header("{name}"{deco}))')
+    if is_recipe_changed:
+        out.append(f'W(auto_components_change("{name}", "{version}"))')
     body, _ = _emit_notes(notes)
     out.extend(body)
     return out
@@ -556,6 +568,160 @@ _REWORK_TRIGGERS = (
 )
 
 
+# Stat-grant patterns inside item ability_notes — detected per-item and
+# collapsed into properties_change(old=[...], new=[...]) after the
+# item_header. Each tuple: (regex, kind, builder).
+#   kind="add"     → ("NEW", "+stat") in new column only
+#   kind="remove"  → ("DEL", "+stat") in old column only
+#   kind="change"  → ("BUFF"/"NERF", "+old stat") in old + ("", "+new stat", b(a,b)) in new
+
+# Match "+stat" tokens. Tolerate slash-lists like "+7/9/11/13/15" and
+# percent signs. Stat names are 1-4 words, may include "All Attributes".
+_STAT_TOKEN = r'\+([0-9./]+%?\s+[A-Z][a-zA-Z\' ]+?)(?=[.,]|\s+(?:increased|decreased|rescaled|changed|to|from|by)\b|$)'
+
+_PROP_ADD_RE = re.compile(
+    r'^Now also (?:provides?|grants?|gives?|deals?|fires?)\s+\+([\d./]+%?\s+[A-Z][a-zA-Z\'/ ]+?)$'
+)
+_PROP_DEL_RE = re.compile(
+    r'^No longer (?:provides?|grants?|gives?)\s+\+([\d./]+%?\s+[A-Z][a-zA-Z\'/ ]+?)$'
+)
+# "Bonus Armor decreased from +6 to +7" or "Mana Regen bonus increased from +1.5 to +1"
+# We allow the stat name to come BEFORE the verb ("Bonus Armor decreased")
+# OR AFTER ("Armor bonus decreased"); both forms appear in patchnotes.
+_PROP_CHANGE_RE = re.compile(
+    r'^(?P<stat>[A-Z][a-zA-Z\'/ ]+?)\s+'
+    r'(?:bonus\s+)?(?P<verb>increased|decreased|rescaled|changed)\s+'
+    r'from\s+\+?(?P<old>[\d./]+%?)\s+to\s+\+?(?P<new>[\d./]+%?)\s*$'
+)
+
+
+def _parse_number_or_list(s):
+    """Convert "5", "5.5", "5/6/7", "5%" into a value passable to b()."""
+    s = s.rstrip('%').strip()
+    if '/' in s:
+        parts = []
+        for p in s.split('/'):
+            try:
+                parts.append(int(p) if '.' not in p else float(p))
+            except ValueError:
+                return None
+        return parts
+    try:
+        return int(s) if '.' not in s else float(s)
+    except ValueError:
+        return None
+
+
+def _postprocess_properties_change(lines):
+    """Collapse stat-grant note patterns inside item blocks into a single
+    properties_change(old=[...], new=[...]) call placed right after the
+    item_header. The original li rows that fed the diff are removed from
+    the regular ul.
+
+    Triggered when an item_header(name, changed=True) is followed by note
+    lines matching add/remove/change stat-grant patterns. Items without
+    properties-relevant rows pass through untouched.
+
+    Returns the rewritten line list. Does NOT touch hero/general blocks.
+    """
+    out = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        # Find item_header( ... changed=True) start
+        m_hdr = re.match(r'W\(item_header\("([^"]+)"[^)]*changed=True[^)]*\)\)', line)
+        if not m_hdr:
+            out.append(line)
+            i += 1
+            continue
+
+        item_name = m_hdr.group(1)
+        out.append(line)
+        i += 1
+        # Optionally an auto_components_change line follows the header
+        if i < len(lines) and lines[i].startswith('W(auto_components_change('):
+            out.append(lines[i])
+            i += 1
+
+        # Collect li rows of this item block. The block ends at the next
+        # W(item_header(...)) / W(hero_header(...)) / section header.
+        old_rows = []
+        new_rows = []
+        kept_lines = []
+        block_end = i
+        in_ul = False
+        while block_end < len(lines):
+            ln = lines[block_end]
+            if (ln.startswith('W(item_header(') or ln.startswith('W(hero_header(')
+                or ln.startswith('W(section(') or ln.startswith('W(plain_header(')
+                or ln.startswith('W(unit_header(')):
+                break
+            block_end += 1
+
+        for j in range(i, block_end):
+            ln = lines[j]
+            m_li = re.match(r'^W\(li\("(.+?)",\s*[bt]\(.*$', ln)
+            if not m_li:
+                kept_lines.append(ln)
+                continue
+            txt = m_li.group(1)
+            # Try add pattern
+            ma = _PROP_ADD_RE.match(txt)
+            if ma:
+                stat = ma.group(1)
+                new_rows.append(('NEW', f'+{stat}'))
+                continue
+            # Try remove
+            mr = _PROP_DEL_RE.match(txt)
+            if mr:
+                stat = mr.group(1)
+                old_rows.append(('DEL', f'+{stat}'))
+                continue
+            # Try change "X increased/decreased from A to B"
+            mc = _PROP_CHANGE_RE.match(txt)
+            if mc:
+                stat = mc.group('stat').replace(' bonus', '').strip()
+                old_v = mc.group('old')
+                new_v = mc.group('new')
+                verb = mc.group('verb')
+                old_n = _parse_number_or_list(old_v)
+                new_n = _parse_number_or_list(new_v)
+                tag = 'BUFF' if verb == 'increased' else ('NERF' if verb == 'decreased' else 'REWORK')
+                if old_n is not None and new_n is not None:
+                    old_rows.append((tag, f'+{old_v} {stat}'))
+                    new_rows.append((None, f'+{new_v} {stat}', (old_n, new_n)))
+                    continue
+            kept_lines.append(ln)
+
+        if old_rows or new_rows:
+            old_repr = ', '.join(
+                f'("{t}", "{s}")' for (t, s) in old_rows
+            ) or ''
+            def _fmt_new(row):
+                if len(row) == 3:
+                    tag, stat, (a, b) = row
+                    a_s = _py_repr(a)
+                    b_s = _py_repr(b)
+                    tag_s = f'"{tag}"' if tag else '""'
+                    return f'({tag_s}, "{stat}", b({a_s}, {b_s}))'
+                tag, stat = row
+                return f'("{tag}", "{stat}")'
+            new_repr = ', '.join(_fmt_new(r) for r in new_rows) or ''
+            out.append(
+                f'W(properties_change(old=[{old_repr}], new=[{new_repr}]))'
+            )
+        out.extend(kept_lines)
+        i = block_end
+    return out
+
+
+def _py_repr(v):
+    """Format a number or list-of-numbers for inline emission."""
+    if isinstance(v, list):
+        return '[' + ', '.join(_py_repr(x) for x in v) + ']'
+    return repr(v)
+
+
 def _postprocess_rework_marker(lines):
     """Add a TODO breadcrumb above W(ability(...)) blocks whose first li
     matches an "Innate ability reworked" / "Ability reworked" trigger.
@@ -615,14 +781,14 @@ def generate(version):
         out.append('\n# ===== ITEM UPDATES =====')
         out.append('W(section("Item Updates"))')
         for item in d['items']:
-            out.extend(_render_item(item))
+            out.extend(_render_item(item, version))
 
     # Neutral Items
     if d.get('neutral_items'):
         out.append('\n# ===== NEUTRAL ITEM UPDATES =====')
         out.append('W(section("Neutral Item Updates"))')
         for item in d['neutral_items']:
-            out.extend(_render_item(item, neutral=True))
+            out.extend(_render_item(item, version, neutral=True))
 
     # Neutral Creeps
     if d.get('neutral_creeps'):
@@ -644,6 +810,7 @@ def generate(version):
     # 3. Drop a v2-todo breadcrumb above ability blocks tagged "reworked".
     out = _postprocess_aghs_merge(out)
     out = _postprocess_scale_pill(out)
+    out = _postprocess_properties_change(out)
     out = _postprocess_rework_marker(out)
 
     return '\n'.join(out)
