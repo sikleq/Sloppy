@@ -2183,6 +2183,7 @@ ABILITY_DISPLAY_TO_SLUG = {
     ("drow_ranger", "Gust"): "wave_of_silence",
     # Skywrath Mage
     # Naga Siren
+    ("naga_siren", "Deluge"): "deluge",
     # Vengeful Spirit
     ("vengefulspirit", "Vengeance Aura"): "command_aura",
     # Nature's Prophet
@@ -12373,21 +12374,31 @@ save_html('patches/7.40b.html')
 # ============================================================
 write_head("7.40", "15.12.2025")
 
-# Auto-generated v2 scaffold for 7.40
-# Source: data/7.40_datafeed.json
-
 # ===== GENERAL UPDATES =====
 W(section("General Updates"))
 
+# ---- Captains Mode ----
 W(plain_header("Captains Mode"))
 W(ul_open())
-W(li("Changed order of the first and the third ban phases", t("MISC"), extra=inline_note("First Ban Phase (<font color=\"#7CA1CC\">First</font> = team with the first pick, <font color=\"#F05039\">Second</font> = team with the second pick)<br>OLD: <font color=\"#7CA1CC\">First</font> - <font color=\"#F05039\">Second</font> - <font color=\"#F05039\">Second</font> - <font color=\"#7CA1CC\">First</font> - <font color=\"#F05039\">Second</font> - <font color=\"#F05039\">Second</font> - <font color=\"#7CA1CC\">First</font>")))
-W(li("NEW: <font color=\"#7CA1CC\">First</font> - <font color=\"#7CA1CC\">First</font> - <font color=\"#F05039\">Second</font> - <font color=\"#F05039\">Second</font> - <font color=\"#7CA1CC\">First</font> - <font color=\"#F05039\">Second</font> - <font color=\"#F05039\">Second</font>", t("MISC")))
-W(ul_close())
-W(subgroup("Third Ban Phase"))
-W(ul_open())
-W(li("OLD: <font color=\"#7CA1CC\">First</font> - <font color=\"#F05039\">Second</font> - <font color=\"#F05039\">Second</font> - <font color=\"#7CA1CC\">First</font>", t("MISC")))
-W(li("NEW: <font color=\"#7CA1CC\">First</font> - <font color=\"#F05039\">Second</font> - <font color=\"#7CA1CC\">First</font> - <font color=\"#F05039\">Second</font>", t("MISC")))
+W(li("Changed order of the first and the third ban phases", t("REWORK"),
+     extra=inline_note(
+         '<b>First Ban Phase</b>'
+         ' (<span style="color:#7CA1CC">First</span> = team with the first pick,'
+         ' <span style="color:#F05039">Second</span> = team with the second pick):'
+         '<br>OLD: <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#F05039">Second</span> - <span style="color:#7CA1CC">First</span>'
+         ' - <span style="color:#F05039">Second</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#7CA1CC">First</span>'
+         '<br>NEW: <span style="color:#7CA1CC">First</span> - <span style="color:#7CA1CC">First</span>'
+         ' - <span style="color:#F05039">Second</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#F05039">Second</span>'
+         '<br><br><b>Third Ban Phase</b>:'
+         '<br>OLD: <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#F05039">Second</span> - <span style="color:#7CA1CC">First</span>'
+         '<br>NEW: <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
+         ' - <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
+     )))
 W(ul_close())
 
 W(plain_header("General Changes"))
@@ -12884,68 +12895,15 @@ W(ul_close())
 # ===== NEUTRAL CREEP UPDATES =====
 W(section("Neutral Creep Updates"))
 
-# creep_?
-W(unit_header("creep_?", ""))
+# Satyr Soulstealer
+W(unit_header("Satyr Soulstealer", "", kind="Creep"))
 
-# creep_?
-W(unit_header("creep_?", ""))
+# Satyr Trickster
+W(unit_header("Satyr Trickster", "", kind="Creep"))
 
 # ===== HERO UPDATES =====
 W(section("Hero Updates"))
 
-# hero_1961
-W(hero_header("hero_1961"))
-W(ul_open())
-W(li("Now counts as a Universal melee hero instead of a creep in the following cases", t("NEW"), extra=inline_note("Spirit Bear's attacks now count as melee hero attacks against:<br>Roshan's Banner, Clinkz' Skeleton Archers, Lich's Ice Spire, Phoenix's Supernova, Pugna's Nether Ward, Templar Assassin's Psionic Traps, and Undying's Tombstone<br>Spirit Bear already did hero damage to Shadow Shaman's Mass Serpent Wards, Couriers, Observer Wards and Sentry Wards")))
-W(li("Spirit Bear can now be targeted or affected as a hero by the following abilities:", t("MISC"), extra=inline_note("Axe's Culling Blade, Bounty Hunter's Track, Earth Spirit's Petrify, Legion Commander's Duel, Lion's Finger of Death, Mars' Spear of Mars, Necrophos' Reaper's Scythe, Slark's Pounce, Terrorblade's Reflection, Terrorblade's Sunder (only if the Bear is not Debuff Immune), and Underlord's Atrophy Aura")))
-W(li("At the same time, Bounty Hunter will not steal Lone Druid's gold anymore by hitting Spirit Bear with Jinada or by using skills with Cutpurse facet on it", t("MISC")))
-W(li("Now can also break enemy Smoke of Deceit", t("NEW")))
-W(li("Spirit Bear's death will not provide charges for these spells:", t("MISC"), extra=inline_note("Charges for Urn of Shadows and its upgrades, Pudge's permanent Strength from Flesh Heap, Silencer's permanent Int from Brain Drain, Slark's permanent Agility from Essence Shift, and Storm Spirit's stacks for Galvanized<br>Temporary attribute losses from Silencer's, Slark's and other similar spells still work")))
-W(li("Can now capture Watchers and Outposts", t("MISC")))
-W(li("Now starts with a Town Portal Scroll on cooldown the first time it is summoned", t("NEW")))
-W(li("Spirit Bear now receives a copy of Lone Druid's Neutral Item. This copy has an independent cooldown", t("MISC")))
-W(li("Ability order has been changed", t("MISC"), extra=inline_note("OLD: Return, Demolish, Savage Roar, Entangling Claws, Fetch")))
-W(li("NEW: Demolish (innate, hidden), Return, Entangling Claws, Savage Roar, Spirit Link, Fetch", t("MISC")))
-W(ul_close())
-W(ul_open())
-W(li("Base HP rescaled from 1100/1400/1700/2000 to 1500", b([1100, 1400, 1700, 2000], 1500)))
-W(li("Base HP Regen decreased from 5/6/7/8 to 3", b([5, 6, 7, 8], 3)))
-W(li("Base Attack Time rescaled from 1.75/1.65/1.55/1.45s to 1.5s", t("REWORK")))
-W(li("Base Attack Speed increased from 100 to 110", b(100, 110)))
-W(li("Base Armor decreased from 0/2/4/6 to 0", b([0, 2, 4, 6], 0)))
-W(li("Base Movement Speed rescaled from 300/330/360/390 to 310", b([300, 330, 360, 390], 310)))
-W(li("Base Magic Resistance increased from 0% to 25%", b(0, 25, l=True), extra=inline_note("Demolish ability no longer passively grants 33% magic resistance")))
-W(li("Daytime Vision Range increased from 1400 to 1800", b(1400, 1800)))
-W(li("No longer gains 100 health and 5 damage per level", t("MISC")))
-W(li("Now gains 4.5 Strength, 4.5 Agility and 0.5 Intelligence per level", t("NEW"), extra=inline_note("Still has no base attributes, so they are all zeroes at level 1")))
-W(li("The Spirit Bear now has a separate Talent Tree", t("MISC")))
-W(ul_close())
-W(ability("ability_1348", slug="ability_1348"))
-W(ul_open())
-W(li("Ability is now Innate to Spirit Bear", t("MISC")))
-W(li("Bonus Building Damage rescaled from 10/20/30/40% to 30%", b([10, 20, 30, 40], 30)))
-W(li("No longer passively grants 33% magic resistance", t("MISC")))
-W(ul_close())
-W(ability("ability_1343", slug="ability_1343"))
-W(ul_open())
-W(li("Now considered a Teleport for the \"Teleport Requires Hold/Cancel to Stop\" option", t("NEW")))
-W(ul_close())
-W(ability("ability_1344", slug="ability_1344"))
-W(ul_open())
-W(li("Ability reworked", t("REWORK"), extra=inline_note("Passive, pierces Debuff Immunity, levels up with Lone Druid's Entangle")))
-W(li("Allows Spirit Bear to Entangle enemies once they gain 5 stacks of this ability. Entangled enemies are unable to move for 1.2/1.6/2/2.4s and take 60/70/80/90 damage per second. Spirit Bear's attacks are permanently empowered, making it apply 1 stack with each attack on enemy heroes. Enemies are protected from gaining new stacks while they're already Entangled", t("MISC"), extra=inline_note("Stacks are applied only to heroes, creep heroes and Roshan")))
-W(ul_close())
-W(ability("ability_1347", slug="ability_1347"))
-W(ul_open())
-W(li("After fetching an enemy, Spirit Bear will now have an attack command issued towards the target", t("MISC")))
-W(ul_close())
-W(subgroup("Talents"))
-W(ul_open())
-W(li("Level 10 Talents: +10% Magic Resistance OR +20 Movement Speed", t("MISC")))
-W(li("Level 15 Talents: +4 Armor OR Return Has No Cooldown and -0.5s Channel Time", t("MISC")))
-W(li("Level 20 Talents: +500 Health OR +30 Damage", t("MISC")))
-W(li("Level 25 Talents: +15% Damage to Entangled Units OR +20% Demolish Bonus Building Damage", t("MISC")))
-W(ul_close())
 
 # Abaddon
 W(hero_header("Abaddon"))
@@ -13801,6 +13759,60 @@ W(li("Level 25 Talent +45 Spirit Link Attack Speed replaced with +0.6s Entangle 
 W(li("Level 25 Talent -50s True Form Cooldown replaced with True Form provides 60% Slow Resistance", t("REWORK")))
 W(ul_close())
 
+# Spirit Bear (Lone Druid pet)
+W(unit_header("Spirit Bear", "../icons/abilities/lone_druid_spirit_bear.png", kind="Creep-hero"))
+W(ul_open())
+W(li("Now counts as a Universal melee hero instead of a creep in the following cases", t("NEW"), extra=inline_note("Spirit Bear's attacks now count as melee hero attacks against:<br>Roshan's Banner, Clinkz' Skeleton Archers, Lich's Ice Spire, Phoenix's Supernova, Pugna's Nether Ward, Templar Assassin's Psionic Traps, and Undying's Tombstone<br>Spirit Bear already did hero damage to Shadow Shaman's Mass Serpent Wards, Couriers, Observer Wards and Sentry Wards")))
+W(li("Spirit Bear can now be targeted or affected as a hero by the following abilities:", t("MISC"), extra=inline_note("Axe's Culling Blade, Bounty Hunter's Track, Earth Spirit's Petrify, Legion Commander's Duel, Lion's Finger of Death, Mars' Spear of Mars, Necrophos' Reaper's Scythe, Slark's Pounce, Terrorblade's Reflection, Terrorblade's Sunder (only if the Bear is not Debuff Immune), and Underlord's Atrophy Aura")))
+W(li("At the same time, Bounty Hunter will not steal Lone Druid's gold anymore by hitting Spirit Bear with Jinada or by using skills with Cutpurse facet on it", t("MISC")))
+W(li("Now can also break enemy Smoke of Deceit", t("NEW")))
+W(li("Spirit Bear's death will not provide charges for these spells:", t("MISC"), extra=inline_note("Charges for Urn of Shadows and its upgrades, Pudge's permanent Strength from Flesh Heap, Silencer's permanent Int from Brain Drain, Slark's permanent Agility from Essence Shift, and Storm Spirit's stacks for Galvanized<br>Temporary attribute losses from Silencer's, Slark's and other similar spells still work")))
+W(li("Can now capture Watchers and Outposts", t("MISC")))
+W(li("Now starts with a Town Portal Scroll on cooldown the first time it is summoned", t("NEW")))
+W(li("Spirit Bear now receives a copy of Lone Druid's Neutral Item. This copy has an independent cooldown", t("MISC")))
+W(li("Ability order has been changed", t("MISC"), extra=inline_note("OLD: Return, Demolish, Savage Roar, Entangling Claws, Fetch")))
+W(li("NEW: Demolish (innate, hidden), Return, Entangling Claws, Savage Roar, Spirit Link, Fetch", t("MISC")))
+W(ul_close())
+W(ul_open())
+W(li("Base HP rescaled from 1100/1400/1700/2000 to 1500", b([1100, 1400, 1700, 2000], 1500)))
+W(li("Base HP Regen decreased from 5/6/7/8 to 3", b([5, 6, 7, 8], 3)))
+W(li("Base Attack Time rescaled from 1.75/1.65/1.55/1.45s to 1.5s", t("REWORK")))
+W(li("Base Attack Speed increased from 100 to 110", b(100, 110)))
+W(li("Base Armor decreased from 0/2/4/6 to 0", b([0, 2, 4, 6], 0)))
+W(li("Base Movement Speed rescaled from 300/330/360/390 to 310", b([300, 330, 360, 390], 310)))
+W(li("Base Magic Resistance increased from 0% to 25%", b(0, 25, l=True), extra=inline_note("Demolish ability no longer passively grants 33% magic resistance")))
+W(li("Daytime Vision Range increased from 1400 to 1800", b(1400, 1800)))
+W(li("No longer gains 100 health and 5 damage per level", t("MISC")))
+W(li("Now gains 4.5 Strength, 4.5 Agility and 0.5 Intelligence per level", t("NEW"), extra=inline_note("Still has no base attributes, so they are all zeroes at level 1")))
+W(li("The Spirit Bear now has a separate Talent Tree", t("MISC")))
+W(ul_close())
+W(ability("Demolish", slug="lone_druid_spirit_bear_demolish"))
+W(ul_open())
+W(li("Ability is now Innate to Spirit Bear", t("MISC")))
+W(li("Bonus Building Damage rescaled from 10/20/30/40% to 30%", b([10, 20, 30, 40], 30)))
+W(li("No longer passively grants 33% magic resistance", t("MISC")))
+W(ul_close())
+W(ability("Return", slug="lone_druid_spirit_bear_return"))
+W(ul_open())
+W(li("Now considered a Teleport for the \"Teleport Requires Hold/Cancel to Stop\" option", t("NEW")))
+W(ul_close())
+W(ability("Entangling Claws", slug="lone_druid_spirit_bear_entangle"))
+W(ul_open())
+W(li("Ability reworked", t("REWORK"), extra=inline_note("Passive, pierces Debuff Immunity, levels up with Lone Druid's Entangle")))
+W(li("Allows Spirit Bear to Entangle enemies once they gain 5 stacks of this ability. Entangled enemies are unable to move for 1.2/1.6/2/2.4s and take 60/70/80/90 damage per second. Spirit Bear's attacks are permanently empowered, making it apply 1 stack with each attack on enemy heroes. Enemies are protected from gaining new stacks while they're already Entangled", t("MISC"), extra=inline_note("Stacks are applied only to heroes, creep heroes and Roshan")))
+W(ul_close())
+W(ability("Fetch", slug="lone_druid_spirit_bear_fetch"))
+W(ul_open())
+W(li("After fetching an enemy, Spirit Bear will now have an attack command issued towards the target", t("MISC")))
+W(ul_close())
+W(subgroup("Talents"))
+W(ul_open())
+W(li("Level 10 Talents: +10% Magic Resistance OR +20 Movement Speed", t("MISC")))
+W(li("Level 15 Talents: +4 Armor OR Return Has No Cooldown and -0.5s Channel Time", t("MISC")))
+W(li("Level 20 Talents: +500 Health OR +30 Damage", t("MISC")))
+W(li("Level 25 Talents: +15% Damage to Entangled Units OR +20% Demolish Bonus Building Damage", t("MISC")))
+W(ul_close())
+
 # Luna
 W(hero_header("Luna"))
 W(ability("Lunar Orbit", slug="luna_lunar_orbit"))
@@ -13956,7 +13968,7 @@ W(ul_open())
 W(li(facet_badge("naga_siren_passive_riptide") + " " + "Damage increased from 25/35/45/55 to 30/40/50/60", b([25, 35, 45, 55], [30, 40, 50, 60])))
 W(ul_close())
 W(subgroup("Facet: Deluge"))
-W(ability("ability_1369", slug="ability_1369"))
+W(ability("Deluge", slug="naga_siren_deluge"))
 W(ul_open())
 W(li(facet_badge("naga_siren_active_riptide") + " " + "Cooldown increased from 10/9/8/7s to 13/11/9/7s", t("MISC")))
 W(ul_close())
@@ -14457,7 +14469,7 @@ W(ability("Dispersion", slug="spectre_dispersion"))
 W(ul_open())
 W(li("Min Radius increased from 300 to 350", b(300, 350)))
 W(ul_close())
-W(ability("ability_5338", slug="ability_5338"))
+W(ability("Reality", slug="spectre_reality"))
 W(ul_open())
 W(li("Can no longer be cast to no effect", t("NERF")))
 W(li("Now has a distinct sound between casts on Shadow Step and Haunt illusions", t("NEW")))
