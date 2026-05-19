@@ -155,12 +155,14 @@ nav.top-nav {
 /* Calendar variant — no dropdown; .release-info takes its place on the right.
    Override the fixed 38px height (designed for version+date only) so the
    3rd line (.patch-age) doesn't overflow above and below the box. */
-.nav-context-calendar,
-.nav-context-creeps {
+/* Universal rule: every non-patch tab (calendar, creeps, anything added
+   later) reserves the same vertical space as the patch-page version
+   picker via .nav-context-flat. New tabs only need to use this class —
+   no per-tab CSS — so the header height stays identical across pages
+   and switching tabs doesn't make the toolbar jump. */
+.nav-context-flat {
   margin-left: auto;
-  min-height: 38px;          /* match the version-dropdown height on patch pages
-                                so the toolbar doesn't shrink when you switch
-                                from a patch back to the calendar / creeps */
+  min-height: 38px;
 }
 .nav-context-calendar .release-info {
   align-items: center;

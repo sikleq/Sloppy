@@ -2964,42 +2964,49 @@ def _render_top_nav(active="changelogs", current_version=None, date=None, patch_
     cls_calendar  = "active" if active == "calendar" else ""
     cls_creeps    = "active" if active == "creeps" else ""
 
-    if current_version is not None and date is not None:
+    # The right-side nav-context block has two visual states:
+    #   - "picker"   — on changelogs/patch pages: prev/next arrows + version
+    #                  dropdown + release-info. Used when current_version
+    #                  AND date are both provided.
+    #   - "flat"     — every other tab (calendar, creeps, any future page).
+    #                  Empty placeholder that reserves the SAME vertical
+    #                  space as "picker" so the header height stays
+    #                  identical across tabs. The page-type modifier
+    #                  (.nav-context-{active}) is added so per-page hooks
+    #                  can target it (e.g. show a date widget on calendar)
+    #                  without breaking the universal min-height contract.
+    show_picker = (active == "changelogs"
+                   and current_version is not None and date is not None)
+    if show_picker:
         age_line = _patch_age_line(current_version)
         age_html = f'<span class="patch-age">{age_line}</span>' if age_line else ''
-        if active in ("calendar", "creeps"):
-            # Calendar / Creeps pages — no release-info widget. Empty nav-
-            # context div reserves the same vertical space as on patch pages
-            # so the header doesn't jump on tab switch.
-            right_side = f'\n    <div class="nav-context nav-context-{active}"></div>'
-        else:
-            options = _dropdown_options_html(current_version, patch_context=patch_context)
-            # Prev/Next arrows flanking the version button — let the user
-            # walk one step backward / forward through the patch list
-            # without opening the dropdown. PATCHES is sorted newest-first,
-            # so older = idx+1 (left arrow) and newer = idx-1 (right arrow).
-            idx = next((i for i, p in enumerate(PATCHES) if p["version"] == current_version), None)
-            older = PATCHES[idx + 1] if idx is not None and idx + 1 < len(PATCHES) else None
-            newer = PATCHES[idx - 1] if idx is not None and idx - 1 >= 0 else None
+        options = _dropdown_options_html(current_version, patch_context=patch_context)
+        # Prev/Next arrows flanking the version button — let the user
+        # walk one step backward / forward through the patch list
+        # without opening the dropdown. PATCHES is sorted newest-first,
+        # so older = idx+1 (left arrow) and newer = idx-1 (right arrow).
+        idx = next((i for i, p in enumerate(PATCHES) if p["version"] == current_version), None)
+        older = PATCHES[idx + 1] if idx is not None and idx + 1 < len(PATCHES) else None
+        newer = PATCHES[idx - 1] if idx is not None and idx - 1 >= 0 else None
 
-            def _nav_arrow(target, direction):
-                # Direction-modifier class drives the clip-path arrow shape
-                # in CSS. The element renders without any text glyph — the
-                # block itself is the arrow.
-                dir_cls = 'is-prev' if direction == 'Older' else 'is-next'
-                if target:
-                    return (f'<a class="version-nav-arrow {dir_cls}" '
-                            f'href="{target["filename"].split("/")[-1]}" '
-                            f'title="{direction}: {target["version"]} ({target["date"]})" '
-                            f'aria-label="{direction} patch: {target["version"]}"></a>')
-                return (f'<span class="version-nav-arrow {dir_cls} is-disabled" '
-                        f'aria-hidden="true"></span>')
+        def _nav_arrow(target, direction):
+            # Direction-modifier class drives the clip-path arrow shape
+            # in CSS. The element renders without any text glyph — the
+            # block itself is the arrow.
+            dir_cls = 'is-prev' if direction == 'Older' else 'is-next'
+            if target:
+                return (f'<a class="version-nav-arrow {dir_cls}" '
+                        f'href="{target["filename"].split("/")[-1]}" '
+                        f'title="{direction}: {target["version"]} ({target["date"]})" '
+                        f'aria-label="{direction} patch: {target["version"]}"></a>')
+            return (f'<span class="version-nav-arrow {dir_cls} is-disabled" '
+                    f'aria-hidden="true"></span>')
 
-            prev_arrow = _nav_arrow(older, "Older")
-            next_arrow = _nav_arrow(newer, "Newer")
+        prev_arrow = _nav_arrow(older, "Older")
+        next_arrow = _nav_arrow(newer, "Newer")
 
-            right_side = f'''
-    <div class="nav-context">
+        right_side = f'''
+    <div class="nav-context nav-context-picker">
       <div class="release-info">
         <span class="release-date">{date}</span>
         {age_html}
@@ -3018,7 +3025,14 @@ def _render_top_nav(active="changelogs", current_version=None, date=None, patch_
       </div>
     </div>'''
     else:
-        right_side = '<div class="nav-context"></div>'
+        # Every non-patch tab reserves nav-context space via the unified
+        # .nav-context-flat modifier. New tabs added in the future only
+        # need to call _render_top_nav(active="<name>") — no per-tab CSS
+        # is required to keep the header from jumping on switch.
+        right_side = (
+            f'\n    <div class="nav-context nav-context-flat '
+            f'nav-context-{active}"></div>'
+        )
 
     return f'''<nav class="top-nav">
   <div class="nav-inner">
