@@ -4002,10 +4002,18 @@ def save_creeps_html():
     # ---- Build rows ----
     rendered = []
     current_lvl = ''
+    csv_level_pointer = ''  # tracks the latest Ур. seen, INCLUDING on
+                              # rows we later skip (a hidden row can carry
+                              # a level marker that the next non-hidden
+                              # row inherits — e.g. the 'ranged' lane
+                              # creep sits on row '5', so we must record
+                              # level 5 even though we drop the row).
     for r in body_rows:
         padded = r + [''] * (max(0, 4 - len(r)))
         csv_lvl = padded[1].strip()
         createhero = padded[3].strip()
+        if csv_lvl:
+            csv_level_pointer = csv_lvl
         # Skip legend rows (start with "ТИР" in col 2) and fully-blank rows
         col_c_text = padded[2].strip()
         if col_c_text.startswith('ТИР') or col_c_text.startswith('Тир крипов'):
@@ -4013,13 +4021,11 @@ def save_creeps_html():
         if not createhero and not csv_lvl:
             continue
         # Skip hidden lane-creep rows (the user wants them in a separate
-        # section that will be added later).
+        # section that will be added later). Level pointer already updated
+        # above so the next non-hidden row inherits correctly.
         if createhero in HIDDEN_CREATEHERO:
             continue
-        if csv_lvl:
-            level_for_row = csv_lvl
-        else:
-            level_for_row = current_lvl
+        level_for_row = csv_level_pointer
 
         npc_key = _resolve(createhero)
         if npc_key:
