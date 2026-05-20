@@ -2887,6 +2887,12 @@ body.filter-active ul.subnotes { display: none; }
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+/* % delta at the end of each change line — green for an increase (HP up
+   = buff), red for a decrease, matching the changelog badge colors. */
+.hp-history-tip .hp-pct { font-weight: 600; }
+.hp-history-tip .hp-pct.up   { color: #56d364; }
+.hp-history-tip .hp-pct.down { color: #f85149; }
+.hp-history-tip .hp-pct.flat { color: #8b949e; }
 /* Per-column value tints. */
 .creeps-table td.col-hp_regen { color: #9ae66e; }   /* light green (салатовый) */
 .creeps-table td.col-gold     { color: #e3b341; }   /* gold (золотой) */

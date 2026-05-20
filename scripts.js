@@ -857,9 +857,18 @@
     const el = ensureTip();
     el.innerHTML = entries.map(e => {
       const [patch, date, ov, nv] = e.split('|');
+      const o = parseFloat(ov), n = parseFloat(nv);
+      let pctHtml = '';
+      if (isFinite(o) && isFinite(n) && o !== 0) {
+        const pct = (n - o) / o * 100;
+        const cls = pct > 0 ? 'up' : (pct < 0 ? 'down' : 'flat');
+        const sign = pct > 0 ? '+' : '';
+        const txt = sign + (Math.abs(pct % 1) < 0.05 ? pct.toFixed(0) : pct.toFixed(1)) + '%';
+        pctHtml = ' <span class="hp-pct ' + cls + '">' + txt + '</span>';
+      }
       return '<div class="hp-chg">'
            + '<div class="hp-chg-patch">' + patch + '</div>'
-           + '<div class="hp-chg-line">' + date + ': ' + ov + ' &gt; ' + nv + '</div>'
+           + '<div class="hp-chg-line">' + date + ': ' + ov + ' → ' + nv + pctHtml + '</div>'
            + '</div>';
     }).join('');
     el.classList.add('is-visible');
