@@ -836,23 +836,23 @@
   collapseLevels([...tbody.querySelectorAll('tr')]);
 })();
 
-// ---- CREEPS TABLE: HP-cell changelog tooltip ----
+// ---- CREEPS TABLE: per-stat changelog tooltip (HP / Armor / Mana / Magres) ----
 (function() {
-  const cells = document.querySelectorAll('td.col-hp[data-hp-history]');
+  const cells = document.querySelectorAll('td[data-hist]');
   if (!cells.length) return;
 
   let tip = null;
   function ensureTip() {
     if (!tip) {
       tip = document.createElement('div');
-      tip.className = 'hp-history-tip';
+      tip.className = 'stat-hist-tip';
       document.body.appendChild(tip);
     }
     return tip;
   }
 
   function show(td) {
-    const entries = (td.dataset.hpHistory || '').split(';').filter(Boolean);
+    const entries = (td.dataset.hist || '').split(';').filter(Boolean);
     if (!entries.length) return;
     const el = ensureTip();
     el.innerHTML = entries.map(e => {
@@ -864,11 +864,11 @@
         const cls = pct > 0 ? 'up' : (pct < 0 ? 'down' : 'flat');
         const sign = pct > 0 ? '+' : '';
         const txt = sign + (Math.abs(pct % 1) < 0.05 ? pct.toFixed(0) : pct.toFixed(1)) + '%';
-        pctHtml = ' <span class="hp-pct ' + cls + '">' + txt + '</span>';
+        pctHtml = ' <span class="stat-pct ' + cls + '">' + txt + '</span>';
       }
-      return '<div class="hp-chg">'
-           + '<div class="hp-chg-patch">' + patch + '</div>'
-           + '<div class="hp-chg-line">' + date + ': ' + ov + ' → ' + nv + pctHtml + '</div>'
+      return '<div class="stat-chg">'
+           + '<div class="stat-chg-patch">' + patch + '</div>'
+           + '<div class="stat-chg-line">' + date + ': ' + ov + ' → ' + nv + pctHtml + '</div>'
            + '</div>';
     }).join('');
     el.classList.add('is-visible');

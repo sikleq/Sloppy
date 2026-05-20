@@ -116,11 +116,16 @@ def save_creeps_html():
             npc_data[name] = entry
             i = j
 
-    # ---- HP history across all patches (7.08 → latest) ----
-    # Reads StatusHealth per neutral from every data/stats/<patch>/units.json,
-    # walks them chronologically, and records each change for the HP-cell
-    # changelog tooltip. Patch dates come from data/site_meta.json (written
-    # by build_patch.py).
+    # ---- Per-stat history across all patches (7.08 → latest) ----
+    # Reads tracked fields per neutral from every
+    # data/stats/<patch>/units.json, walks them chronologically, and
+    # records each change for the per-cell changelog tooltips. Patch dates
+    # come from data/site_meta.json (written by build_patch.py).
+    #   HP, Armor, Mana → present 115/115.
+    #   MagicalResistance → absent from units.json (neutrals default to 0),
+    #     so its history is always empty; wired up for completeness.
+    HIST_FIELDS = ('StatusHealth', 'ArmorPhysical', 'StatusMana',
+                   'MagicalResistance')
     import re as _re_hist
     STATS_DIR = _os.path.join(_HERE, "data", "stats")
     META_PATH = _os.path.join(_HERE, "data", "site_meta.json")
@@ -141,8 +146,8 @@ def save_creeps_html():
              if _os.path.isdir(_os.path.join(STATS_DIR, d))),
             key=_ver_key,
         )
-    # hp_by_patch[version] = {npc_key: StatusHealth int}
-    _hp_by_patch = {}
+    # _stat_by_patch[field][version] = {npc_key: value}
+    _stat_by_patch = {f: {} for f in HIST_FIELDS}
     for _v in _patches_chrono:
         _up = _os.path.join(STATS_DIR, _v, "units.json")
         if not _os.path.exists(_up):
@@ -151,27 +156,37 @@ def save_creeps_html():
             _u = _json.loads(open(_up, encoding="utf-8").read())
         except Exception:
             continue
-        _hp_by_patch[_v] = {
-            k: val.get("StatusHealth")
-            for k, val in _u.items()
-            if isinstance(val, dict) and val.get("StatusHealth") is not None
-        }
+        for _f in HIST_FIELDS:
+            _stat_by_patch[_f][_v] = {
+                k: val.get(_f)
+                for k, val in _u.items()
+                if isinstance(val, dict) and val.get(_f) is not None
+            }
 
-    def _hp_history(npc_key):
-        """List of (patch, date, old, new) HP changes for a neutral,
-        chronological. Empty if the unit has no recorded HP changes."""
+    def _stat_history(npc_key, field):
+        """List of (patch, date, old, new) changes of `field` for a
+        neutral, chronological. Empty if no recorded changes."""
         if not npc_key:
             return []
         changes = []
         prev = None
+        by_patch = _stat_by_patch.get(field, {})
         for _v in _patches_chrono:
-            cur = _hp_by_patch.get(_v, {}).get(npc_key)
+            cur = by_patch.get(_v, {}).get(npc_key)
             if cur is None:
                 continue
             if prev is not None and cur != prev:
                 changes.append((_v, PATCH_DATES.get(_v, ""), prev, cur))
             prev = cur
         return changes
+
+    # Column key → units.json field for the changelog tooltip.
+    HIST_COL_FIELD = {
+        'hp':     'StatusHealth',
+        'armor':  'ArmorPhysical',
+        'mp':     'StatusMana',
+        'magres': 'MagicalResistance',
+    }
 
     # ---- Mappings ----
     # createhero name (CSV col 3) → npc_dota_neutral_* key. None = no
@@ -620,19 +635,20 @@ def save_creeps_html():
                     )
                 else:
                     cells.append(f'<td class="creep-icon-cell {_col_cls(k)}"></td>')
-            elif k == 'hp':
-                # HP cell carries its full change history as a compact
-                # data attribute (patch|date|old|new;...) — scripts.js
-                # renders a changelog tooltip on hover. Only emitted when
-                # the unit actually has recorded HP changes.
-                hist = _hp_history(row.get('npc_key'))
+            elif k in HIST_COL_FIELD:
+                # Stat cell (HP / Armor / Mana / Magres) carries its full
+                # change history as a compact data attribute
+                # (patch|date|old|new;...) — scripts.js renders a changelog
+                # tooltip on hover. Only emitted when the unit actually has
+                # recorded changes for that field.
+                hist = _stat_history(row.get('npc_key'), HIST_COL_FIELD[k])
                 extra = ''
                 cls = _col_cls(k, v)
                 if hist:
                     payload = ';'.join(
                         f'{p}|{dt}|{ov}|{nv}' for (p, dt, ov, nv) in hist
                     )
-                    extra = f' data-hp-history="{_esc(payload)}"'
+                    extra = f' data-hist="{_esc(payload)}"'
                     cls += ' has-history'
                 cells.append(
                     f'<td class="{cls}"{extra}>{_esc(v) if v else "&nbsp;"}</td>'

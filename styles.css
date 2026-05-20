@@ -2847,16 +2847,18 @@ body.filter-active ul.subnotes { display: none; }
 .creeps-table th.sort-desc .sort-ind::after { content: '▼'; }
 .creeps-table th.sort-asc .sort-ind { opacity: 1; color: #79c0ff; }
 .creeps-table th.sort-asc .sort-ind::after { content: '▲'; }
-/* HP cells with a recorded change history get a dotted underline cue +
-   help cursor, hinting that hovering shows the changelog. */
-.creeps-table td.col-hp.has-history {
+/* Stat cells (HP/Armor/Mana/Magres) with a recorded change history get a
+   dotted underline cue + help cursor, hinting that hover shows the
+   changelog. */
+.creeps-table td.has-history {
   cursor: help;
   text-decoration: underline dotted rgba(170, 220, 240, 0.5);
   text-underline-offset: 3px;
 }
-/* HP changelog tooltip — body-level (escapes the .creeps-scroll overflow
-   clip), positioned by scripts.js above the hovered cell. */
-.hp-history-tip {
+/* Per-stat changelog tooltip — body-level (escapes the .creeps-scroll
+   overflow clip), positioned by scripts.js above the hovered cell.
+   font-size matches the table cells (11.5px). */
+.stat-hist-tip {
   position: fixed;
   z-index: 1100;
   pointer-events: none;
@@ -2867,32 +2869,33 @@ body.filter-active ul.subnotes { display: none; }
   border: 1px solid rgba(170, 220, 240, 0.35);
   border-radius: 6px;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
-  font-size: 11px;
+  font-size: 11.5px;
   color: #c9d1d9;
   text-align: center;
 }
-.hp-history-tip.is-visible { display: block; }
-.hp-history-tip .hp-chg { padding: 3px 0; }
-.hp-history-tip .hp-chg + .hp-chg {
+.stat-hist-tip.is-visible { display: block; }
+.stat-hist-tip .stat-chg { padding: 3px 0; }
+.stat-hist-tip .stat-chg + .stat-chg {
   border-top: 1px solid rgba(139, 148, 158, 0.18);
   margin-top: 3px;
 }
-.hp-history-tip .hp-chg-patch {
+.stat-hist-tip .stat-chg-patch {
   font-weight: 600;
   color: #79c0ff;
   text-decoration: underline;
   font-variant-numeric: tabular-nums;
 }
-.hp-history-tip .hp-chg-line {
+.stat-hist-tip .stat-chg-line {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-/* % delta at the end of each change line — green for an increase (HP up
-   = buff), red for a decrease, matching the changelog badge colors. */
-.hp-history-tip .hp-pct { font-weight: 600; }
-.hp-history-tip .hp-pct.up   { color: #56d364; }
-.hp-history-tip .hp-pct.down { color: #f85149; }
-.hp-history-tip .hp-pct.flat { color: #8b949e; }
+/* % delta — muted green for an increase (stat up = buff), muted red for
+   a decrease. Less saturated than the changelog badges to read softer in
+   the tooltip. */
+.stat-hist-tip .stat-pct { font-weight: 600; }
+.stat-hist-tip .stat-pct.up   { color: #7fb88c; }
+.stat-hist-tip .stat-pct.down { color: #cf8b8b; }
+.stat-hist-tip .stat-pct.flat { color: #8b949e; }
 /* Per-column value tints. */
 .creeps-table td.col-hp_regen { color: #9ae66e; }   /* light green (салатовый) */
 .creeps-table td.col-gold     { color: #e3b341; }   /* gold (золотой) */
