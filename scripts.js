@@ -764,9 +764,13 @@
   const headers = [...table.querySelectorAll('thead th.sortable')];
   if (!tbody || !headers.length) return;
 
-  const allTh = [...table.querySelectorAll('thead th')];
+  // Map column key → body-cell index. data-idx is authored server-side so
+  // it stays correct despite the colspan=2 on the Юнит header (which makes
+  // DOM th position diverge from cell index).
   const colIndex = {};
-  allTh.forEach((th, i) => { if (th.dataset.col) colIndex[th.dataset.col] = i; });
+  headers.forEach(th => {
+    if (th.dataset.col) colIndex[th.dataset.col] = parseInt(th.dataset.idx, 10);
+  });
 
   // Sort value for a cell: prefer the numeric data-lvl on the level
   // column (its text gets blanked by collapseLevels), else parse the
@@ -830,5 +834,48 @@
 
   // Initial pass: collapse the default (level-grouped) order.
   collapseLevels([...tbody.querySelectorAll('tr')]);
+})();
+
+// ---- CREEPS TABLE: HP-cell changelog tooltip ----
+(function() {
+  const cells = document.querySelectorAll('td.col-hp[data-hp-history]');
+  if (!cells.length) return;
+
+  let tip = null;
+  function ensureTip() {
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.className = 'hp-history-tip';
+      document.body.appendChild(tip);
+    }
+    return tip;
+  }
+
+  function show(td) {
+    const entries = (td.dataset.hpHistory || '').split(';').filter(Boolean);
+    if (!entries.length) return;
+    const el = ensureTip();
+    el.innerHTML = entries.map(e => {
+      const [patch, date, ov, nv] = e.split('|');
+      return '<div class="hp-chg">'
+           + '<div class="hp-chg-patch">' + patch + '</div>'
+           + '<div class="hp-chg-line">' + date + ': ' + ov + ' &gt; ' + nv + '</div>'
+           + '</div>';
+    }).join('');
+    el.classList.add('is-visible');
+    const r = td.getBoundingClientRect();
+    const tr = el.getBoundingClientRect();
+    let left = r.left + r.width / 2 - tr.width / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
+    el.style.left = left + 'px';
+    el.style.top = (r.top - tr.height - 8) + 'px';
+  }
+  function hide() { if (tip) tip.classList.remove('is-visible'); }
+
+  cells.forEach(td => {
+    td.addEventListener('mouseenter', () => show(td));
+    td.addEventListener('mouseleave', hide);
+  });
+  window.addEventListener('scroll', hide, { passive: true });
 })();
 

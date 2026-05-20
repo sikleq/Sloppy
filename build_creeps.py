@@ -116,6 +116,63 @@ def save_creeps_html():
             npc_data[name] = entry
             i = j
 
+    # ---- HP history across all patches (7.08 → latest) ----
+    # Reads StatusHealth per neutral from every data/stats/<patch>/units.json,
+    # walks them chronologically, and records each change for the HP-cell
+    # changelog tooltip. Patch dates come from data/site_meta.json (written
+    # by build_patch.py).
+    import re as _re_hist
+    STATS_DIR = _os.path.join(_HERE, "data", "stats")
+    META_PATH = _os.path.join(_HERE, "data", "site_meta.json")
+    try:
+        _meta = _json.loads(open(META_PATH, encoding="utf-8").read())
+        PATCH_DATES = _meta.get("patch_dates", {})
+    except Exception:
+        PATCH_DATES = {}
+
+    def _ver_key(v):
+        return tuple(int(p) if p.isdigit() else p
+                     for p in _re_hist.split(r'(\d+)', v))
+
+    _patches_chrono = []
+    if _os.path.isdir(STATS_DIR):
+        _patches_chrono = sorted(
+            (d for d in _os.listdir(STATS_DIR)
+             if _os.path.isdir(_os.path.join(STATS_DIR, d))),
+            key=_ver_key,
+        )
+    # hp_by_patch[version] = {npc_key: StatusHealth int}
+    _hp_by_patch = {}
+    for _v in _patches_chrono:
+        _up = _os.path.join(STATS_DIR, _v, "units.json")
+        if not _os.path.exists(_up):
+            continue
+        try:
+            _u = _json.loads(open(_up, encoding="utf-8").read())
+        except Exception:
+            continue
+        _hp_by_patch[_v] = {
+            k: val.get("StatusHealth")
+            for k, val in _u.items()
+            if isinstance(val, dict) and val.get("StatusHealth") is not None
+        }
+
+    def _hp_history(npc_key):
+        """List of (patch, date, old, new) HP changes for a neutral,
+        chronological. Empty if the unit has no recorded HP changes."""
+        if not npc_key:
+            return []
+        changes = []
+        prev = None
+        for _v in _patches_chrono:
+            cur = _hp_by_patch.get(_v, {}).get(npc_key)
+            if cur is None:
+                continue
+            if prev is not None and cur != prev:
+                changes.append((_v, PATCH_DATES.get(_v, ""), prev, cur))
+            prev = cur
+        return changes
+
     # ---- Mappings ----
     # createhero name (CSV col 3) → npc_dota_neutral_* key. None = no
     # overlay (lane creeps or unknown summons).
@@ -476,7 +533,7 @@ def save_creeps_html():
         data['name'] = display_name
         data['icon'] = icon_path
         rendered.append({'data': data, 'tier_break': is_break,
-                          'level': level_for_row})
+                          'level': level_for_row, 'npc_key': npc_key})
     # No rowspan merge: every row carries its own level cell so the table
     # can be re-sorted by any column. scripts.js collapses repeated level
     # numbers in the current row order (showing the number once per run +
@@ -491,7 +548,7 @@ def save_creeps_html():
     # Columns that get a vertical separator on their RIGHT edge — they
     # group the table into logical sections (identity | survivability |
     # offense | economy | utility | abilities).
-    SEP_AFTER = {'name', 'ehp_mag', 'bat', 'aggro'}
+    SEP_AFTER = {'lvl', 'name', 'ehp_mag', 'bat', 'aggro'}
 
     def _col_cls(k, value=''):
         cls = [f'col-{k}']
@@ -504,16 +561,34 @@ def save_creeps_html():
                 cls.append('atk-pierce')
         return ' '.join(cls)
 
-    # Header: each th is a sort button. data-col carries the column key,
-    # and a ▾ indicator span flips to ▲/▼ in scripts.js. The icon column
-    # (empty label) is not sortable.
-    thead_cells = ''.join(
-        (f'<th class="{_col_cls(k)}"></th>' if not label
-         else f'<th class="{_col_cls(k)} sortable" data-col="{k}">'
-              f'<span class="th-label">{_esc(label)}</span>'
-              f'<span class="sort-ind"></span></th>')
-        for k, label in COLUMNS
-    )
+    # Header: each sortable th carries data-col (key) and data-idx (its
+    # body-cell index, so the sort logic survives the colspan on Юнит).
+    # The "Юнит" header spans the icon + name columns (colspan=2) so it
+    # reads as centered over the whole unit-identity block; the separate
+    # icon <th> is dropped.
+    col_keys = [k for k, _ in COLUMNS]
+    name_idx = col_keys.index('name')
+    thead_list = []
+    for i, (k, label) in enumerate(COLUMNS):
+        if k == 'icon':
+            continue  # folded into the colspan=2 Юнит header
+        if k == 'name':
+            thead_list.append(
+                f'<th class="{_col_cls(k)} sortable" colspan="2" '
+                f'data-col="{k}" data-idx="{name_idx}">'
+                f'<span class="th-label">{_esc(label)}</span>'
+                f'<span class="sort-ind"></span></th>'
+            )
+        elif not label:
+            thead_list.append(f'<th class="{_col_cls(k)}"></th>')
+        else:
+            thead_list.append(
+                f'<th class="{_col_cls(k)} sortable" data-col="{k}" '
+                f'data-idx="{i}">'
+                f'<span class="th-label">{_esc(label)}</span>'
+                f'<span class="sort-ind"></span></th>'
+            )
+    thead_cells = ''.join(thead_list)
 
     body_parts = []
     for row in rendered:
@@ -545,6 +620,23 @@ def save_creeps_html():
                     )
                 else:
                     cells.append(f'<td class="creep-icon-cell {_col_cls(k)}"></td>')
+            elif k == 'hp':
+                # HP cell carries its full change history as a compact
+                # data attribute (patch|date|old|new;...) — scripts.js
+                # renders a changelog tooltip on hover. Only emitted when
+                # the unit actually has recorded HP changes.
+                hist = _hp_history(row.get('npc_key'))
+                extra = ''
+                cls = _col_cls(k, v)
+                if hist:
+                    payload = ';'.join(
+                        f'{p}|{dt}|{ov}|{nv}' for (p, dt, ov, nv) in hist
+                    )
+                    extra = f' data-hp-history="{_esc(payload)}"'
+                    cls += ' has-history'
+                cells.append(
+                    f'<td class="{cls}"{extra}>{_esc(v) if v else "&nbsp;"}</td>'
+                )
             else:
                 cells.append(f'<td class="{_col_cls(k, v)}">{_esc(v) if v else "&nbsp;"}</td>')
         body_parts.append(f'<tr{tr_cls}>{"".join(cells)}</tr>')

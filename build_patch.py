@@ -15253,6 +15253,9 @@ _site_meta = {
     "latest_patch_filename": PATCHES[0]["filename"] if PATCHES else "patches/7.41c.html",
     "latest_patch_version": PATCHES[0]["version"] if PATCHES else "",
     "asset_version": _ASSET_VERSION,
+    # version → release date (dd.mm.yyyy). build_creeps.py uses this to
+    # label per-unit stat changelogs (e.g. HP history tooltips).
+    "patch_dates": {r["version"]: r["date"] for r in RELEASE_HISTORY},
 }
 _os.makedirs("data", exist_ok=True)
 with open(_os.path.join("data", "site_meta.json"), "w", encoding="utf-8") as _f:

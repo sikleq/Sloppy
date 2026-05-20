@@ -2847,6 +2847,46 @@ body.filter-active ul.subnotes { display: none; }
 .creeps-table th.sort-desc .sort-ind::after { content: '▼'; }
 .creeps-table th.sort-asc .sort-ind { opacity: 1; color: #79c0ff; }
 .creeps-table th.sort-asc .sort-ind::after { content: '▲'; }
+/* HP cells with a recorded change history get a dotted underline cue +
+   help cursor, hinting that hovering shows the changelog. */
+.creeps-table td.col-hp.has-history {
+  cursor: help;
+  text-decoration: underline dotted rgba(170, 220, 240, 0.5);
+  text-underline-offset: 3px;
+}
+/* HP changelog tooltip — body-level (escapes the .creeps-scroll overflow
+   clip), positioned by scripts.js above the hovered cell. */
+.hp-history-tip {
+  position: fixed;
+  z-index: 1100;
+  pointer-events: none;
+  display: none;
+  min-width: 150px;
+  padding: 6px 8px;
+  background: rgba(13, 17, 23, 0.97);
+  border: 1px solid rgba(170, 220, 240, 0.35);
+  border-radius: 6px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+  font-size: 11px;
+  color: #c9d1d9;
+  text-align: center;
+}
+.hp-history-tip.is-visible { display: block; }
+.hp-history-tip .hp-chg { padding: 3px 0; }
+.hp-history-tip .hp-chg + .hp-chg {
+  border-top: 1px solid rgba(139, 148, 158, 0.18);
+  margin-top: 3px;
+}
+.hp-history-tip .hp-chg-patch {
+  font-weight: 600;
+  color: #79c0ff;
+  text-decoration: underline;
+  font-variant-numeric: tabular-nums;
+}
+.hp-history-tip .hp-chg-line {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 /* Per-column value tints. */
 .creeps-table td.col-hp_regen { color: #9ae66e; }   /* light green (салатовый) */
 .creeps-table td.col-gold     { color: #e3b341; }   /* gold (золотой) */
