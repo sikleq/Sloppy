@@ -2851,7 +2851,7 @@ body.filter-active ul.subnotes { display: none; }
   background: #161b22;
   color: #e6edf3;
   font-weight: 600;
-  text-align: left;
+  text-align: center;
   padding: 6px 6px;
   border-bottom: 1px solid rgba(139, 148, 158, 0.35);
   white-space: nowrap;

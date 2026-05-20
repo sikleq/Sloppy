@@ -37,12 +37,15 @@
   window.addEventListener('resize', alignBackArrow, { passive: true });
 
   // ---- BACK TO TOP visibility ----
+  // Guard for pages without the button (e.g. creeps.html). Without this
+  // null-guard, updateBtt() throws at load and halts the whole script —
+  // which silently broke the creep-icon copy handler below.
   const btt = document.querySelector('.back-to-top');
-  function updateBtt() {
-    btt.classList.toggle('visible', window.scrollY > 400);
+  if (btt) {
+    const updateBtt = () => btt.classList.toggle('visible', window.scrollY > 400);
+    window.addEventListener('scroll', updateBtt, { passive: true });
+    updateBtt();
   }
-  window.addEventListener('scroll', updateBtt, { passive: true });
-  updateBtt();
 
   // ---- VERSION DROPDOWN toggle ----
   const dropdownBtn = document.querySelector('.version-dropdown .version');
@@ -210,8 +213,12 @@
   });
 
   // ---- ENTITY SEARCH ----
+  // Guard: pages without the search box (e.g. creeps.html) skip this whole
+  // block. Without the guard, searchInput.addEventListener below throws on
+  // null and halts the script — which silently broke later handlers.
   const searchInput = document.getElementById('entity-search');
   const resultsBox = document.getElementById('search-results');
+  if (searchInput && resultsBox) {
   const entities = [];
   document.querySelectorAll('.entity').forEach(entity => {
     const nameEl = entity.querySelector('.entity-name');
@@ -332,6 +339,7 @@
       resultsBox.classList.remove('show');
     }
   });
+  } // end if (searchInput && resultsBox)
 
   // ---- ABILITY-CHANGE CONNECTOR ----
   // Draws a thin dashed curve from each ability-change-block's icon
