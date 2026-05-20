@@ -2812,11 +2812,29 @@ body.filter-active ul.subnotes { display: none; }
 }
 .creeps-table .creep-icon-cell img:hover {
   transform: scale(1.6);
+  /* Lift above the sticky thead (z-index:2) so the zoomed portrait sits
+     ON TOP of the header rather than sliding under it. position:relative
+     is required for z-index to take effect on the inline image. */
+  position: relative;
+  z-index: 5;
   box-shadow:
     0 3px 8px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
     0 0 0 1px rgba(170, 220, 240, 0.4);
 }
+/* Vertical section separators — a brighter right border grouping the
+   table into identity | survivability | offense | economy | utility. */
+.creeps-table th.col-sep,
+.creeps-table td.col-sep {
+  border-right: 2px solid rgba(170, 220, 240, 0.30);
+}
+/* Per-column value tints. */
+.creeps-table td.col-hp_regen { color: #9ae66e; }   /* light green (салатовый) */
+.creeps-table td.col-gold     { color: #e3b341; }   /* gold (золотой) */
+.creeps-table td.col-xp       { color: #8bb8d6; }   /* dusty blue (пыльно-голубой) */
+/* Attack-type value colors. */
+.creeps-table td.atk-basic    { color: #56d364; }   /* "Обычный" — green */
+.creeps-table td.atk-pierce   { color: #b18cd9; }   /* "Проникающий" — muted purple */
 /* Tier-break: thicker top border between level groups (Ур. changes). */
 .creeps-table tr.tier-break td {
   border-top: 2px solid rgba(170, 220, 240, 0.28);

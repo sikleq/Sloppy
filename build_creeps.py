@@ -332,7 +332,11 @@ def save_creeps_html():
 
         return {
             'hp':            _fmt_num(hp) if hp else '',
-            'hp_regen':      f'+{_fmt_num(hp_regen)}' if hp_regen else '',
+            # Resolved creeps always show a regen value; "0" when the KV
+            # has no StatusHealthRegen (e.g. Skeleton Warrior) instead of
+            # a blank cell.
+            'hp_regen':      (f'+{_fmt_num(hp_regen)}' if hp_regen
+                              else ('0' if npc else '')),
             'mp':            _fmt_num(mp) if mp else '-',
             'mp_regen':      f'+{_fmt_num(mp_regen)}' if mp_regen else '',
             'armor':         _fmt_num(armor) if armor or 'ArmorPhysical' in npc else '',
@@ -384,7 +388,7 @@ def save_creeps_html():
     COLUMNS = [
         ('lvl',          'Ур.'),
         ('icon',         ''),
-        ('name',         'Крип'),
+        ('name',         'Юнит'),
         ('hp',           'ХП'),
         ('hp_regen',     'ХП/сек'),
         ('mp',           'МП'),
@@ -494,9 +498,25 @@ def save_creeps_html():
     # to fit content (and each header) on one line. Headers and cells
     # are explicitly centred via CSS so the auto-width math doesn't have
     # to budget for tag-width differences across columns.
+    # Columns that get a vertical separator on their RIGHT edge — they
+    # group the table into logical sections (identity | survivability |
+    # offense | economy | utility | abilities).
+    SEP_AFTER = {'name', 'ehp_mag', 'bat', 'aggro'}
+
+    def _col_cls(k, value=''):
+        cls = [f'col-{k}']
+        if k in SEP_AFTER:
+            cls.append('col-sep')
+        if k == 'attack_type':
+            if value == 'Обычный':
+                cls.append('atk-basic')
+            elif value == 'Проникающий':
+                cls.append('atk-pierce')
+        return ' '.join(cls)
+
     thead_cells = ''.join(
-        f'<th>{_esc(label)}</th>' if label else '<th></th>'
-        for _, label in COLUMNS
+        f'<th class="{_col_cls(k)}">{_esc(label)}</th>'
+        for k, label in COLUMNS
     )
 
     body_parts = []
@@ -514,7 +534,7 @@ def save_creeps_html():
                 if span == 0:
                     continue
                 attr = f' rowspan="{span}"' if span > 1 else ''
-                cells.append(f'<td class="lvl-cell"{attr}>{_esc(v)}</td>')
+                cells.append(f'<td class="lvl-cell {_col_cls(k)}"{attr}>{_esc(v)}</td>')
             elif k == 'icon':
                 if v:
                     # Clicking the icon copies the dev-console spawn command
@@ -522,16 +542,16 @@ def save_creeps_html():
                     # in scripts.js via the data-cmd attribute).
                     cmd = f'-createhero {d.get("createhero", "")} neutral'
                     cells.append(
-                        f'<td class="creep-icon-cell">'
+                        f'<td class="creep-icon-cell {_col_cls(k)}">'
                         f'<img class="creep-copy" src="{_esc(v)}" alt="" '
                         f'loading="lazy" data-cmd="{_esc(cmd)}" '
                         f'title="{_esc(cmd)}" '
                         f'onerror="this.style.visibility=\'hidden\'"></td>'
                     )
                 else:
-                    cells.append('<td class="creep-icon-cell"></td>')
+                    cells.append(f'<td class="creep-icon-cell {_col_cls(k)}"></td>')
             else:
-                cells.append(f'<td>{_esc(v) if v else "&nbsp;"}</td>')
+                cells.append(f'<td class="{_col_cls(k, v)}">{_esc(v) if v else "&nbsp;"}</td>')
         body_parts.append(f'<tr{tr_cls}>{"".join(cells)}</tr>')
 
     html = (
