@@ -117,18 +117,18 @@ def save_creeps_html():
             i = j
 
     # ---- Per-stat history across all patches (7.08 → latest) ----
-    # Reads tracked fields per neutral from every
-    # data/stats/<patch>/units.json, walks them chronologically, and
-    # records each change for the per-cell changelog tooltips. Patch dates
-    # come from data/site_meta.json (written by build_patch.py).
-    #   HP, Armor, Mana → from units.json (present 115/115).
-    #   MagicalResistance → absent from units.json; backfilled from the
-    #     per-patch npc_units.json that scripts/fetch_npc_history.py writes
-    #     (sourced from dotabuff/d2vpkr). Falls back to empty if not fetched.
-    HIST_FIELDS = ('StatusHealth', 'ArmorPhysical', 'StatusMana',
-                   'MagicalResistance')
-    # Fields read from npc_units.json (not present in units.json).
-    NPC_HIST_FIELDS = ('MagicalResistance',)
+    # Walks data/stats/<patch>/npc_units.json chronologically and records each
+    # change per neutral for the per-cell changelog tooltips. npc_units.json
+    # (written by scripts/fetch_npc_history.py from dotabuff/d2vpkr) is the
+    # full Valve KV, present for all 115 patches — so EVERY stat column can
+    # carry history, raw or derived. Patch dates come from site_meta.json.
+    RAW_HIST_FIELDS = (
+        'StatusHealth', 'StatusHealthRegen', 'StatusMana', 'StatusManaRegen',
+        'ArmorPhysical', 'MagicalResistance', 'AttackRate', 'BaseAttackSpeed',
+        'MovementSpeed', 'BountyXP', 'AttackAcquisitionRange', 'AttackRange',
+        'AttackDamageMin', 'AttackDamageMax', 'BountyGoldMin', 'BountyGoldMax',
+        'VisionDaytimeRange', 'VisionNighttimeRange',
+    )
     import re as _re_hist
     STATS_DIR = _os.path.join(_HERE, "data", "stats")
     META_PATH = _os.path.join(_HERE, "data", "site_meta.json")
@@ -142,6 +142,14 @@ def save_creeps_html():
         return tuple(int(p) if p.isdigit() else p
                      for p in _re_hist.split(r'(\d+)', v))
 
+    def _num(x):
+        """Parse a KV value to int/float (integral floats → int), else str."""
+        try:
+            f = float(x)
+            return int(f) if f.is_integer() else f
+        except (TypeError, ValueError):
+            return x
+
     _patches_chrono = []
     if _os.path.isdir(STATS_DIR):
         _patches_chrono = sorted(
@@ -149,65 +157,45 @@ def save_creeps_html():
              if _os.path.isdir(_os.path.join(STATS_DIR, d))),
             key=_ver_key,
         )
-    # _stat_by_patch[field][version] = {npc_key: value}
-    _stat_by_patch = {f: {} for f in HIST_FIELDS}
+    # _raw_by_patch[field][version] = {npc_key: parsed_value}
+    _raw_by_patch = {f: {} for f in RAW_HIST_FIELDS}
     for _v in _patches_chrono:
-        _up = _os.path.join(STATS_DIR, _v, "units.json")
-        if not _os.path.exists(_up):
+        _np_path = _os.path.join(STATS_DIR, _v, "npc_units.json")
+        if not _os.path.exists(_np_path):
             continue
         try:
-            _u = _json.loads(open(_up, encoding="utf-8").read())
+            _npc = _json.loads(open(_np_path, encoding="utf-8").read())
         except Exception:
             continue
-        for _f in HIST_FIELDS:
-            _stat_by_patch[_f][_v] = {
-                k: val.get(_f)
-                for k, val in _u.items()
-                if isinstance(val, dict) and val.get(_f) is not None
-            }
-        # Backfill npc-only fields (e.g. MagicalResistance) from the
-        # per-patch npc_units.json owned by us (fetch_npc_history.py).
-        _np_path = _os.path.join(STATS_DIR, _v, "npc_units.json")
-        if _os.path.exists(_np_path):
-            try:
-                _npc = _json.loads(open(_np_path, encoding="utf-8").read())
-            except Exception:
-                _npc = {}
-            for _f in NPC_HIST_FIELDS:
-                _bucket = _stat_by_patch[_f].setdefault(_v, {})
-                for _k, _entry in _npc.items():
-                    _raw = _entry.get(_f) if isinstance(_entry, dict) else None
-                    if _raw is None:
-                        continue
-                    try:
-                        _bucket[_k] = int(float(_raw))
-                    except (TypeError, ValueError):
-                        _bucket[_k] = _raw
+        for _f in RAW_HIST_FIELDS:
+            _bucket = {}
+            for _k, _entry in _npc.items():
+                if not isinstance(_entry, dict):
+                    continue
+                _raw = _entry.get(_f)
+                if _raw is not None:
+                    _bucket[_k] = _num(_raw)
+            _raw_by_patch[_f][_v] = _bucket
 
-    def _stat_history(npc_key, field):
-        """List of (patch, date, old, new) changes of `field` for a
-        neutral, chronological. Empty if no recorded changes."""
+    def _raw_at(field, version, npc_key):
+        return _raw_by_patch.get(field, {}).get(version, {}).get(npc_key)
+
+    def _value_history(npc_key, valuefn):
+        """List of (patch, date, old, new) changes, chronological. `valuefn`
+        maps (version, npc_key) → display string for that patch (or None when
+        the stat is absent). Consecutive distinct values are recorded."""
         if not npc_key:
             return []
         changes = []
         prev = None
-        by_patch = _stat_by_patch.get(field, {})
         for _v in _patches_chrono:
-            cur = by_patch.get(_v, {}).get(npc_key)
-            if cur is None:
+            cur = valuefn(_v, npc_key)
+            if cur is None or cur == '':
                 continue
             if prev is not None and cur != prev:
                 changes.append((_v, PATCH_DATES.get(_v, ""), prev, cur))
             prev = cur
         return changes
-
-    # Column key → units.json field for the changelog tooltip.
-    HIST_COL_FIELD = {
-        'hp':     'StatusHealth',
-        'armor':  'ArmorPhysical',
-        'mp':     'StatusMana',
-        'magres': 'MagicalResistance',
-    }
 
     # ---- Mappings ----
     # createhero name (CSV col 3) → npc_dota_neutral_* key. None = no
@@ -359,6 +347,15 @@ def save_creeps_html():
         except (TypeError, ValueError):
             return default
 
+    def _armor_factor(a):
+        return (0.06 * a) / (1 + 0.06 * abs(a))
+
+    def _ehp_phys_val(hp, a):
+        return round(hp / max(0.01, 1 - _armor_factor(a))) if hp else 0
+
+    def _ehp_mag_val(hp, mr):
+        return round(hp / max(0.01, 1 - mr / 100)) if hp else 0
+
     def _attack_type(npc):
         """Heuristic: melee attack capability → "Обычный" (Hero), ranged
         → "Проникающий" (Pierce). Matches the CSV's authored values."""
@@ -444,8 +441,10 @@ def save_creeps_html():
             't_per_attack':  _fmt_num(round(t_per_attack, 2)) if t_per_attack else '',
             'bat':           _fmt_num(bat) if bat else '',
             'ms':            _fmt_num(ms) if ms else '',
-            'gold':          f'{gold_min}-{gold_max}' if (gold_min or gold_max) else '',
-            'gold_avg':      _fmt_num(gold_avg) if gold_avg else '',
+            # Золото = average; min/max kept (hidden) for the extended toggle.
+            'gold':          _fmt_num(gold_avg) if gold_avg else '',
+            'gold_min':      _fmt_num(gold_min) if gold_min else '',
+            'gold_max':      _fmt_num(gold_max) if gold_max else '',
             'xp':            _fmt_num(xp) if xp else '',
             'attack_range':  _attack_range_label(npc),
             'attack_type':   _attack_type(npc) if npc else '',
@@ -473,6 +472,88 @@ def save_creeps_html():
                        .replace('<', '&lt;')
                        .replace('>', '&gt;'))
 
+    # ---- Per-column changelog value functions ----
+    # Each maps (version, npc_key) → the column's display value for that patch
+    # (or None when absent). _value_history diffs consecutive distinct values.
+    # Raw columns read a single KV field; derived ones recompute from raw
+    # fields exactly as _row_data does for the current patch.
+    def _raw_vf(field):
+        def f(version, npc_key):
+            x = _raw_at(field, version, npc_key)
+            return _fmt_num(x) if x is not None else None
+        return f
+
+    def _dmg_avg_vf(version, npc_key):
+        mn = _raw_at('AttackDamageMin', version, npc_key)
+        mx = _raw_at('AttackDamageMax', version, npc_key)
+        if mn is None and mx is None:
+            return None
+        return _fmt_num(((mn or 0) + (mx or 0)) / 2)
+
+    def _gold_vf(version, npc_key):
+        gmn = _raw_at('BountyGoldMin', version, npc_key)
+        gmx = _raw_at('BountyGoldMax', version, npc_key)
+        if gmn is None and gmx is None:
+            return None
+        return _fmt_num(((gmn or 0) + (gmx or 0)) / 2)
+
+    def _ehp_phys_vf(version, npc_key):
+        hp = _raw_at('StatusHealth', version, npc_key)
+        a = _raw_at('ArmorPhysical', version, npc_key)
+        if not hp or a is None:
+            return None
+        return _fmt_num(_ehp_phys_val(hp, a))
+
+    def _ehp_mag_vf(version, npc_key):
+        hp = _raw_at('StatusHealth', version, npc_key)
+        if not hp:
+            return None
+        mr = _raw_at('MagicalResistance', version, npc_key) or 0
+        return _fmt_num(_ehp_mag_val(hp, mr))
+
+    def _armor_pct_vf(version, npc_key):
+        a = _raw_at('ArmorPhysical', version, npc_key)
+        if a is None:
+            return None
+        return f'{round(_armor_factor(a) * 100)}%'
+
+    def _t_per_attack_vf(version, npc_key):
+        bat = _raw_at('AttackRate', version, npc_key)
+        if not bat:
+            return None
+        ats = _raw_at('BaseAttackSpeed', version, npc_key) or 100
+        return _fmt_num(round(bat * 100 / ats, 2)) if ats else _fmt_num(bat)
+
+    def _vision_vf(version, npc_key):
+        d = _raw_at('VisionDaytimeRange', version, npc_key)
+        n = _raw_at('VisionNighttimeRange', version, npc_key)
+        if d is None and n is None:
+            return None
+        return '{}/{}'.format(_fmt_num(d) if d is not None else '?',
+                              _fmt_num(n) if n is not None else '?')
+
+    COL_HIST = {
+        'hp':            _raw_vf('StatusHealth'),
+        'hp_regen':      _raw_vf('StatusHealthRegen'),
+        'mp':            _raw_vf('StatusMana'),
+        'mp_regen':      _raw_vf('StatusManaRegen'),
+        'armor':         _raw_vf('ArmorPhysical'),
+        'magres':        _raw_vf('MagicalResistance'),
+        'as':            _raw_vf('BaseAttackSpeed'),
+        'bat':           _raw_vf('AttackRate'),
+        'ms':            _raw_vf('MovementSpeed'),
+        'xp':            _raw_vf('BountyXP'),
+        'aggro':         _raw_vf('AttackAcquisitionRange'),
+        'attack_range':  _raw_vf('AttackRange'),
+        'dmg_avg':       _dmg_avg_vf,
+        'gold':          _gold_vf,
+        'ehp_phys':      _ehp_phys_vf,
+        'ehp_mag':       _ehp_mag_vf,
+        'armor_pct':     _armor_pct_vf,
+        't_per_attack':  _t_per_attack_vf,
+        'vision':        _vision_vf,
+    }
+
     # ---- Read CSV ----
     csv_rows = list(_csv.reader(open(csv_path, encoding='utf-8')))
     body_rows = csv_rows[1:]
@@ -493,15 +574,16 @@ def save_creeps_html():
         ('armor',        'Броня'),
         ('armor_pct',    'Броня (%)'),
         ('magres',       'Магрез'),
-        ('dmg_min',      'Урон (мин)'),
-        ('dmg_max',      'Урон (макс)'),
+        # Урон (мин)/(макс) hidden — values still pulled into row data for the
+        # future extended-columns toggle. Only the computed average is shown.
         ('dmg_avg',      'Ср. урон'),
         ('as',           'АС'),
         ('t_per_attack', 't/1 удар'),
         ('bat',          'BAT'),
         ('ms',           'МС'),
+        # Золото shows the average; min/max stay in row data for the extended
+        # toggle (separate min/max gold columns later).
         ('gold',         'Золото'),
-        ('gold_avg',     'Ср. золото'),
         ('xp',           'Опыт'),
         ('attack_range', 'Дальность атаки'),
         ('attack_type',  'Тип атаки'),
@@ -515,9 +597,9 @@ def save_creeps_html():
         'lvl': 30, 'icon': 56, 'name': 170, 'createhero': 130,
         'hp': 50, 'hp_regen': 52, 'mp': 50, 'mp_regen': 52,
         'armor': 52, 'armor_pct': 64, 'ehp_phys': 64, 'magres': 56,
-        'ehp_mag': 64, 'dmg_min': 64, 'dmg_max': 70, 'dmg_avg': 60,
+        'ehp_mag': 64, 'dmg_avg': 60,
         'as': 38, 't_per_attack': 58, 'bat': 38, 'ms': 38,
-        'gold': 56, 'gold_avg': 64, 'xp': 42, 'attack_range': 110,
+        'gold': 56, 'xp': 42, 'attack_range': 110,
         'attack_type': 100, 'vision': 70, 'aggro': 70,
         'ability1': 150, 'ability2': 150, 'ability3': 150,
     }
@@ -689,13 +771,12 @@ def save_creeps_html():
                     )
                 else:
                     cells.append(f'<td class="creep-icon-cell {_col_cls(k)}"></td>')
-            elif k in HIST_COL_FIELD:
-                # Stat cell (HP / Armor / Mana / Magres) carries its full
-                # change history as a compact data attribute
-                # (patch|date|old|new;...) — scripts.js renders a changelog
-                # tooltip on hover. Only emitted when the unit actually has
-                # recorded changes for that field.
-                hist = _stat_history(row.get('npc_key'), HIST_COL_FIELD[k])
+            elif k in COL_HIST:
+                # Stat cell carries its full change history as a compact data
+                # attribute (patch|date|old|new;...) — scripts.js renders a
+                # changelog tooltip on hover. Only emitted when the unit
+                # actually has recorded changes for that column.
+                hist = _value_history(row.get('npc_key'), COL_HIST[k])
                 extra = ''
                 cls = _col_cls(k, v)
                 if hist:
