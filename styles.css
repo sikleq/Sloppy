@@ -2795,13 +2795,27 @@ body.filter-active ul.subnotes { display: none; }
 .creeps-table .lvl-cell.sticky-col {
   background: #11161d;   /* keep the level cell's faint blue-tint readable */
 }
-/* When scrolled sideways, cast a shadow off the right edge of the last
-   pinned column (Юнит) so it's clear the identity block stays fixed while
-   the rest of the table slides underneath. */
+/* When scrolled sideways, frame the pinned identity block with a bright
+   accent outline on every edge + a drop shadow off the right, so it
+   clearly reads as a fixed block the rest of the table slides under.
+   Right edge (Юнит) — border + shadow. */
 .creeps-scroll.scrolled .creeps-table td.col-name.sticky-col,
 .creeps-scroll.scrolled .creeps-table th.col-name.sticky-col {
-  box-shadow: 6px 0 8px -4px rgba(0, 0, 0, 0.6);
-  border-right: 2px solid rgba(170, 220, 240, 0.55);
+  box-shadow: 6px 0 10px -3px rgba(0, 0, 0, 0.65);
+  border-right: 2px solid rgba(120, 200, 235, 0.85);
+}
+/* Left edge (Ур.) */
+.creeps-scroll.scrolled .creeps-table td.col-lvl.sticky-col,
+.creeps-scroll.scrolled .creeps-table th.col-lvl.sticky-col {
+  border-left: 2px solid rgba(120, 200, 235, 0.85);
+}
+/* Top edge — the header row's pinned cells. */
+.creeps-scroll.scrolled .creeps-table thead .sticky-col {
+  border-top: 2px solid rgba(120, 200, 235, 0.85);
+}
+/* Bottom edge — the last body row's pinned cells. */
+.creeps-scroll.scrolled .creeps-table tbody tr:last-child .sticky-col {
+  border-bottom: 2px solid rgba(120, 200, 235, 0.85);
 }
 /* Dedicated icon column — fixed-size portrait, centered. Vertical-align
    middle on the parent <td> keeps the image baseline-aligned with the
@@ -2811,6 +2825,13 @@ body.filter-active ul.subnotes { display: none; }
   text-align: center;
   padding: 2px 4px;
   vertical-align: middle;
+}
+/* Raise the icon cell above the sticky header on hover so the zoomed
+   portrait sits on top (the cell is already position:sticky, which
+   establishes a stacking context — bump its z-index rather than the
+   inner <img>, avoiding any positioning side-effects on the image). */
+.creeps-table .creep-icon-cell:hover {
+  z-index: 9;
 }
 .creeps-table .creep-icon-cell img {
   width: 48px;
@@ -2833,15 +2854,13 @@ body.filter-active ul.subnotes { display: none; }
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  /* Scale symmetrically about the exact center so the zoomed portrait
+     stays vertically aligned with the unit name beside it. */
+  transform-origin: center center;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .creeps-table .creep-icon-cell img:hover {
   transform: scale(1.6);
-  /* Lift above the sticky thead (z-index:2) so the zoomed portrait sits
-     ON TOP of the header rather than sliding under it. position:relative
-     is required for z-index to take effect on the inline image. */
-  position: relative;
-  z-index: 5;
   box-shadow:
     0 3px 8px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
