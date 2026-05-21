@@ -784,7 +784,8 @@
       return parseFloat(td.dataset.lvl);
     }
     const t = td.textContent.trim();
-    if (!t || t === '-' || t === ' ') return null;
+    if (!t || t === ' ') return null;
+    if (t === '-') return 0;   // explicit "no mana" — sorts as the minimum, not last
     const m = t.replace(',', '.').match(/-?\d+(?:\.\d+)?/);
     return m ? parseFloat(m[0]) : t.toLowerCase();
   }
@@ -804,7 +805,8 @@
     });
   }
 
-  let sortCol = null, sortDir = -1;  // -1 = descending (largest first)
+  let sortCol = null, sortState = 0;  // 0 = neutral, 1 = descending, 2 = ascending
+  const originalOrder = [...tbody.querySelectorAll('tr')];
 
   function applySort(col, dir) {
     const idx = colIndex[col];
@@ -824,11 +826,20 @@
   headers.forEach(th => {
     th.addEventListener('click', () => {
       const col = th.dataset.col;
-      if (sortCol === col) sortDir = -sortDir;   // toggle on repeat click
-      else { sortCol = col; sortDir = -1; }      // first click = largest first
+      // 3-state cycle: neutral → descending → ascending → neutral.
+      if (sortCol === col) sortState = (sortState + 1) % 3;
+      else { sortCol = col; sortState = 1; }     // first click = descending (largest first)
       headers.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
-      th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
-      applySort(col, sortDir);
+      if (sortState === 0) {
+        // Back to neutral: restore the default level-grouped order, dim ↕ returns.
+        sortCol = null;
+        originalOrder.forEach(tr => tbody.appendChild(tr));
+        collapseLevels(originalOrder);
+      } else {
+        const dir = sortState === 1 ? -1 : 1;
+        th.classList.add(dir === 1 ? 'sort-asc' : 'sort-desc');
+        applySort(col, dir);
+      }
     });
   });
 
