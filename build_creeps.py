@@ -121,11 +121,14 @@ def save_creeps_html():
     # data/stats/<patch>/units.json, walks them chronologically, and
     # records each change for the per-cell changelog tooltips. Patch dates
     # come from data/site_meta.json (written by build_patch.py).
-    #   HP, Armor, Mana → present 115/115.
-    #   MagicalResistance → absent from units.json (neutrals default to 0),
-    #     so its history is always empty; wired up for completeness.
+    #   HP, Armor, Mana → from units.json (present 115/115).
+    #   MagicalResistance → absent from units.json; backfilled from the
+    #     per-patch npc_units.json that scripts/fetch_npc_history.py writes
+    #     (sourced from dotabuff/d2vpkr). Falls back to empty if not fetched.
     HIST_FIELDS = ('StatusHealth', 'ArmorPhysical', 'StatusMana',
                    'MagicalResistance')
+    # Fields read from npc_units.json (not present in units.json).
+    NPC_HIST_FIELDS = ('MagicalResistance',)
     import re as _re_hist
     STATS_DIR = _os.path.join(_HERE, "data", "stats")
     META_PATH = _os.path.join(_HERE, "data", "site_meta.json")
@@ -162,6 +165,24 @@ def save_creeps_html():
                 for k, val in _u.items()
                 if isinstance(val, dict) and val.get(_f) is not None
             }
+        # Backfill npc-only fields (e.g. MagicalResistance) from the
+        # per-patch npc_units.json owned by us (fetch_npc_history.py).
+        _np_path = _os.path.join(STATS_DIR, _v, "npc_units.json")
+        if _os.path.exists(_np_path):
+            try:
+                _npc = _json.loads(open(_np_path, encoding="utf-8").read())
+            except Exception:
+                _npc = {}
+            for _f in NPC_HIST_FIELDS:
+                _bucket = _stat_by_patch[_f].setdefault(_v, {})
+                for _k, _entry in _npc.items():
+                    _raw = _entry.get(_f) if isinstance(_entry, dict) else None
+                    if _raw is None:
+                        continue
+                    try:
+                        _bucket[_k] = int(float(_raw))
+                    except (TypeError, ValueError):
+                        _bucket[_k] = _raw
 
     def _stat_history(npc_key, field):
         """List of (patch, date, old, new) changes of `field` for a

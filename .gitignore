@@ -9,6 +9,11 @@ _insert_patches.py
 # Список URL иконок — генерируется build_patch.py для check_icons.py
 _ability_icons.txt
 
+# Raw npc_units.txt blobs cached by scripts/fetch_npc_history.py (keyed by
+# d2vpkr commit SHA). Large; the parsed data/stats/<patch>/npc_units.json is
+# what we commit and the build consumes.
+.cache/
+
 # IDE / editor local config
 .claude/
 .vscode/
