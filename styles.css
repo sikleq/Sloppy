@@ -2983,15 +2983,15 @@ body.filter-active ul.subnotes { display: none; }
   white-space: nowrap;
   line-height: 1.2;
 }
-/* Two-line header sub-label (EHP "физ"/"маг") — small, dim, on its own
-   line below the main word so the column stays narrow. */
+/* Subscript header sub-label (EHP "физ"/"маг") — small dim text set to
+   the bottom-right of the main word, like a formula subscript, so the
+   column stays narrow without a full second line. */
 .creeps-table thead th .th-sub {
-  display: block;
   font-size: 8.5px;
   font-weight: 400;
   color: #8b949e;
-  line-height: 1;
-  margin-top: 1px;
+  vertical-align: sub;
+  margin-left: 1px;
 }
 .creeps-table tbody td {
   padding: 5px 8px;
