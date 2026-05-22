@@ -513,7 +513,9 @@ def save_creeps_html():
             'hp_regen':      (f'+{_fmt_num(hp_regen)}' if hp_regen
                               else ('0' if npc else '')),
             'mp':            _fmt_num(mp) if mp else '-',
-            'mp_regen':      f'+{_fmt_num(mp_regen)}' if mp_regen else '',
+            # No mana → "-" (matches MP); mana but no regen → "0".
+            'mp_regen':      (f'+{_fmt_num(mp_regen)}' if mp_regen
+                              else ('-' if (npc and not mp) else ('0' if npc else ''))),
             'armor':         _fmt_num(armor) if armor or 'ArmorPhysical' in npc else '',
             'armor_pct':     armor_pct,
             'ehp_phys':      _fmt_num(ehp_phys) if ehp_phys else '',

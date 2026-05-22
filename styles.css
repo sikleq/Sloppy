@@ -2750,11 +2750,11 @@ body.filter-active ul.subnotes { display: none; }
 /* Horizontal-scroll wrapper so a narrow viewport scrolls within the
    table region instead of breaking page layout. */
 .creeps-scroll {
-  /* Bounded height makes this the scroll container (both axes), so the
-     column header can stick to its top on vertical scroll while horizontal
-     scroll still works. ~88px reserves the top nav + page padding. */
-  overflow: auto;
-  max-height: calc(100vh - 88px);
+  /* Horizontal scroll only — no bounded height, so the table flows at full
+     height and the PAGE scrolls vertically (no inner vertical scrollbar, no
+     abrupt bottom clip). overflow-x:auto implies overflow-y:auto, but with no
+     height limit nothing overflows vertically so no vertical bar appears. */
+  overflow-x: auto;
   /* Hug the table width (cap at the container) so a narrow Standard-view
      table doesn't leave a big empty strip / abrupt right edge on wide screens. */
   width: max-content;
