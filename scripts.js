@@ -870,14 +870,18 @@
   }
   // Mean of a slash/space value ("40/36/32/26" -> 33.5, "12.0" -> 12).
   function meanOf(s) {
-    const nums = String(s).split(/[\/\s]+/).map(parseFloat).filter(isFinite);
+    const nums = String(s).split(/[\/\s]+/)
+      .map(x => parseFloat(x.replace(',', '.'))).filter(isFinite);
     return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : NaN;
   }
-  function pctHtml(ov, nv) {
+  // Colour reflects buff/nerf, not raw direction: for lower-is-better stats
+  // (cooldown, mana, BAT) a DROP is the buff (green). The % keeps its real sign.
+  function pctHtml(ov, nv, lowerBetter) {
     const o = meanOf(ov), n = meanOf(nv);
     if (!isFinite(o) || !isFinite(n) || o === 0) return '';
     const pct = (n - o) / o * 100;
-    const cls = pct > 0 ? 'up' : (pct < 0 ? 'down' : 'flat');
+    const good = lowerBetter ? pct < 0 : pct > 0;
+    const cls = pct === 0 ? 'flat' : (good ? 'up' : 'down');
     const sign = pct > 0 ? '+' : '';
     const txt = sign + (Math.abs(pct % 1) < 0.05 ? pct.toFixed(0) : pct.toFixed(1)) + '%';
     return ' <span class="stat-pct ' + cls + '">' + txt + '</span>';
@@ -886,41 +890,51 @@
     return '<div class="stat-chg-head"><span class="chg-patch">' + patch
          + '</span><span class="chg-date">' + shortDate(date) + '</span></div>';
   }
-  // Render one changelog entry. Format: patch|date|kind|...parts
-  //   V old new            stat value change
-  //   F label old new      ability value change
-  //   A name               ability added
-  //   R name               ability removed
-  //   P old new            ability replaced
-  function renderEntry(e) {
+  // Parse one entry → { patch, date, line }. Format: patch|date|kind|...parts
+  //   V old new pol          stat value change
+  //   F label old new pol    ability value change
+  //   A name / R name / P old new  ability added / removed / replaced
+  function entryParts(e) {
     const p = e.split('|');
     const patch = p[0], date = p[1], kind = p[2];
-    let body;
+    let line;
     if (kind === 'A') {
-      body = p[3] + ' <span class="chg-tag added">ADDED</span>';
+      line = p[3] + ' <span class="chg-tag added">ADDED</span>';
     } else if (kind === 'R') {
-      body = p[3] + ' <span class="chg-tag removed">REMOVED</span>';
+      line = p[3] + ' <span class="chg-tag removed">REMOVED</span>';
     } else if (kind === 'P') {
-      body = p[3] + ' <span class="chg-cycle">⇄</span> ' + p[4]
+      line = p[3] + ' <span class="chg-cycle">⇄</span> ' + p[4]
            + ' <span class="chg-tag replaced">REPLACED</span>';
     } else if (kind === 'F') {
-      body = '<span class="chg-label">' + p[3] + '</span> ' + p[4] + ' → '
-           + p[5] + pctHtml(p[4], p[5]);
+      line = '<span class="chg-label">' + p[3] + '</span> ' + p[4] + ' → '
+           + p[5] + pctHtml(p[4], p[5], p[6] === 'lo');
     } else {
-      // 'V' stat value (patch|date|V|old|new), or legacy patch|date|old|new
-      const ov = kind === 'V' ? p[3] : p[2];
-      const nv = kind === 'V' ? p[4] : p[3];
-      body = ov + ' → ' + nv + pctHtml(ov, nv);
+      // 'V' stat value (patch|date|V|old|new|pol), or legacy patch|date|old|new
+      const isV = kind === 'V';
+      const ov = isV ? p[3] : p[2];
+      const nv = isV ? p[4] : p[3];
+      line = ov + ' → ' + nv + pctHtml(ov, nv, isV && p[5] === 'lo');
     }
-    return '<div class="stat-chg">' + chgHead(patch, date)
-         + '<div class="stat-chg-line">' + body + '</div></div>';
+    return { patch: patch, date: date, line: line };
   }
 
   function show(td) {
     const entries = (td.dataset.hist || '').split(';').filter(Boolean);
     if (!entries.length) return;
     const el = ensureTip();
-    el.innerHTML = entries.map(renderEntry).join('');
+    // Group changes from the same patch under one header.
+    const groups = [];
+    entries.forEach(e => {
+      const ep = entryParts(e);
+      const g = groups[groups.length - 1];
+      if (g && g.patch === ep.patch) g.lines.push(ep.line);
+      else groups.push({ patch: ep.patch, date: ep.date, lines: [ep.line] });
+    });
+    el.innerHTML = groups.map(g =>
+      '<div class="stat-chg">' + chgHead(g.patch, g.date)
+      + g.lines.map(l => '<div class="stat-chg-line">' + l + '</div>').join('')
+      + '</div>'
+    ).join('');
     el.classList.add('is-visible');
     const r = td.getBoundingClientRect();
     const tr = el.getBoundingClientRect();

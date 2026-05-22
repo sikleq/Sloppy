@@ -666,9 +666,24 @@ def save_creeps_html():
             return fld[3:].replace('_', ' ').capitalize()
         return fld
 
+    # Fields where a DECREASE is the buff (green), like the changelog l=True.
+    ABIL_LOWER_BETTER = {
+        'AbilityCooldown', 'AbilityManaCost', 'AbilityCastPoint',
+        'AbilityChannelTime',
+    }
+
+    def _abil_lower_better(fld):
+        if fld in ABIL_LOWER_BETTER:
+            return True
+        if fld.startswith('av_'):
+            n = fld[3:]
+            return 'cooldown' in n or 'manacost' in n or 'mana_cost' in n
+        return False
+
     def _slash(s):
-        """Per-level KV values are space-separated → show as 2/3/4/5."""
-        return ' '.join(str(s).split()).replace(' ', '/')
+        """Per-level KV values are space-separated → show as 2/3/4/5, with
+        each token trimmed (12.0 → 12) via _fmt_num."""
+        return '/'.join(_fmt_num(t) for t in str(s).split())
 
     _FIRST_PATCH = _patches_chrono[0] if _patches_chrono else None
 
@@ -713,8 +728,9 @@ def save_creeps_html():
                 for fld, val in cur_fields.items():
                     old = prev_fields.get(fld)
                     if old is not None and old != val:
+                        pol = 'lo' if _abil_lower_better(fld) else 'hi'
                         entries.append((v, dt, 'F', _abil_field_label(fld),
-                                        _slash(old), _slash(val)))
+                                        _slash(old), _slash(val), pol))
             prev_slug, prev_fields = cur, cur_fields
         return entries
 
@@ -988,9 +1004,11 @@ def save_creeps_html():
                     hist = COL_CHANGELOG[k](row.get('npc_key'))
                     payload = ';'.join('|'.join(str(x) for x in e) for e in hist)
                 else:
-                    # Stat value change → 'V' kind: patch|date|V|old|new
+                    # Stat value change → 'V' kind: patch|date|V|old|new|pol.
+                    # BAT / time-to-hit are buffs when they DROP (lower = better).
                     hist = _value_history(row.get('npc_key'), COL_HIST[k])
-                    payload = ';'.join(f'{p}|{dt}|V|{ov}|{nv}'
+                    pol = 'lo' if k in ('bat', 't_per_attack') else 'hi'
+                    payload = ';'.join(f'{p}|{dt}|V|{ov}|{nv}|{pol}'
                                        for (p, dt, ov, nv) in hist)
                 if hist:
                     extra = f' data-hist="{_esc(payload)}"'
