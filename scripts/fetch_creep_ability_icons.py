@@ -37,14 +37,12 @@ SPELLICONS_DIR = Path(os.environ.get(
     str(Path.home() / "OneDrive" / "Desktop" / "panorama" / "images" / "spellicons"),
 ))
 
-# Neutral abilities with no dedicated icon anywhere — reuse the hero icon the
-# game itself falls back to (matched by AbilitySound / shared name).
-ALIAS = {
-    "ogre_bruiser_ogre_smash": "ogre_magi_smash",
-    "ice_shaman_incendiary_bomb": "ogre_magi_ignite",
-    "giant_wolf_intimidate": "legion_commander_intimidate",
-    "fel_beast_haunt": "spectre_haunt",
-}
+# Optional slug→icon aliases for neutral abilities whose own icon isn't on the
+# CDN or in the spellicons dump. Empty by default: hero-icon guesses proved
+# wrong (Icefire Bomb / Ogre Smash / Intimidate are NOT Ogre Magi / Legion
+# Commander icons). Add an entry only when the real matching icon is known;
+# otherwise the build falls back to the ability name text.
+ALIAS = {}
 
 
 def neutral_ability_slugs():
