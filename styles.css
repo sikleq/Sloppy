@@ -2845,6 +2845,15 @@ body.filter-active ul.subnotes { display: none; }
 }
 /* Attack Range melee/ranged marker — a small frosted-glass rounded block
    holding the icon, to the right of the number. */
+/* Attack Range cell: number in a fixed-width box so the icon badge always
+   lands at the same x regardless of digit count. */
+.creeps-table .col-attack_range { white-space: nowrap; }
+.creeps-table .atk-num {
+  display: inline-block;
+  min-width: 30px;
+  text-align: right;
+  vertical-align: middle;
+}
 .creeps-table .atk-badge {
   display: inline-flex;
   align-items: center;
@@ -2854,10 +2863,10 @@ body.filter-active ul.subnotes { display: none; }
   box-sizing: border-box;
   margin-left: 6px;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  /* Frosted glass without backdrop-filter (blur is GPU-heavy ×40 cells and
+     caused scroll jank) — a soft translucent gradient instead. */
+  background: linear-gradient(rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.14);
   vertical-align: middle;
 }
 .creeps-table .atk-badge img {
@@ -2867,6 +2876,50 @@ body.filter-active ul.subnotes { display: none; }
   display: block;
   opacity: 0.9;
 }
+/* ---- View toggle (Standard / Expanded) ---- */
+.creeps-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.creeps-toolbar .view-label { color: #8b949e; font-size: 12px; }
+.view-toggle {
+  display: inline-flex;
+  border: 1px solid rgba(170, 220, 240, 0.22);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.view-toggle .view-btn {
+  background: transparent;
+  color: #adbac7;
+  border: 0;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.view-toggle .view-btn + .view-btn { border-left: 1px solid rgba(170, 220, 240, 0.18); }
+.view-toggle .view-btn:hover { background: rgba(170, 220, 240, 0.07); }
+.view-toggle .view-btn.is-active { background: rgba(120, 200, 235, 0.18); color: #e6edf3; }
+/* Standard view hides Expanded-only columns. Super-category headers span all
+   their columns; the colspan shrinks automatically as hidden cells collapse. */
+.creeps-table.mode-standard .col-exp { display: none; }
+/* Super-category header row. */
+.creeps-table thead tr.cat-row th.cat-head {
+  top: 0;
+  z-index: 6;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9fb0c0;
+  font-weight: 700;
+  background: #11161d;
+  padding: 3px 4px;
+  border-bottom: 1px solid rgba(139, 148, 158, 0.30);
+}
+/* Column-name row sits BELOW the category row when both stick. */
+.creeps-table thead tr.col-row th { top: 19px; }
+.creeps-table thead tr.cat-row .cat-head + .cat-head { border-left: 2px solid rgba(170, 220, 240, 0.22); }
 .creeps-table .creep-icon-cell img {
   width: 48px;
   height: 27px;
@@ -2902,9 +2955,11 @@ body.filter-active ul.subnotes { display: none; }
 }
 /* Vertical section separators — a brighter right border grouping the
    table into identity | survivability | offense | economy | utility. */
+/* Category boundary — left border on the first column of each super-category
+   (always a Standard column, so it shows in both views). */
 .creeps-table th.col-sep,
 .creeps-table td.col-sep {
-  border-right: 2px solid rgba(170, 220, 240, 0.30);
+  border-left: 2px solid rgba(170, 220, 240, 0.30);
 }
 /* Sortable headers — click to sort. The ▾ indicator brightens to ▲/▼ on
    the active column. */

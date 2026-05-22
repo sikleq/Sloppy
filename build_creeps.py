@@ -375,12 +375,9 @@ def save_creeps_html():
         return round(hp / max(0.01, 1 - mr / 100)) if hp else 0
 
     def _attack_type(npc):
-        """Heuristic: melee attack capability → "Обычный" (Hero), ranged
-        → "Проникающий" (Pierce). Matches the CSV's authored values."""
+        """Ranged attack capability → "Piercing", else "Default"."""
         cap = npc.get('AttackCapabilities', '')
-        if 'RANGED' in cap:
-            return 'Проникающий'
-        return 'Обычный'
+        return 'Piercing' if 'RANGED' in cap else 'Default'
 
     def _attack_range_label(npc):
         # Just the number — no "Ближняя", no parentheses. The melee/ranged
@@ -822,7 +819,11 @@ def save_creeps_html():
         'aggro':         _raw_vf('AttackAcquisitionRange'),
         'attack_range':  _raw_vf('AttackRange'),
         'dmg_avg':       _dmg_avg_vf,
+        'dmg_min':       _raw_vf('AttackDamageMin'),
+        'dmg_max':       _raw_vf('AttackDamageMax'),
         'gold':          _gold_vf,
+        'gold_min':      _raw_vf('BountyGoldMin'),
+        'gold_max':      _raw_vf('BountyGoldMax'),
         'ehp_phys':      _ehp_phys_vf,
         'ehp_mag':       _ehp_mag_vf,
         'armor_pct':     _armor_pct_vf,
@@ -848,44 +849,60 @@ def save_creeps_html():
     body_rows = csv_rows[1:]
 
     # ---- Column structure ----
-    COLUMNS = [
-        ('lvl',          'Lvl'),
-        ('icon',         ''),
-        ('name',         'Unit'),
-        ('hp',           'HP'),
-        ('hp_regen',     'HP/sec'),
-        # EHP физ/маг hidden — still computed into row data for the future
-        # extended-columns toggle.
-        ('mp',           'MP'),
-        ('mp_regen',     'MP/sec'),
-        ('armor',        'Armor'),
-        ('armor_pct',    'Armor (%)'),
-        ('magres',       'Mag. resist'),
-        # Урон (мин)/(макс) hidden — values still pulled into row data for the
-        # future extended-columns toggle. Only the computed average is shown.
-        ('dmg_avg',      'Attack Dmg'),
-        ('as',           'AS'),
-        ('t_per_attack', 'Time to hit'),
-        ('bat',          'BAT'),
-        ('ms',           'MS'),
-        # Золото shows the average; min/max stay in row data for the extended
-        # toggle (separate min/max gold columns later).
-        ('gold',         'Gold'),
-        ('xp',           'XP'),
-        ('attack_range', 'Attack Range'),
-        ('attack_type',  'Attack Type'),
-        ('vision',       'Vision'),
-        # «Дальность агра» (aggro) hidden — kept in row data for the extended
-        # toggle. New movement/projectile columns slot in after Обзор.
-        ('ap',             'AP'),
-        ('turn_rate',      'Turn Rate'),
-        ('collision_size', 'Collision Size'),
-        ('bound_radius',   'Bound Radius'),
-        ('projectile',     'Projectile Speed'),
-        ('ability1',     'Ability 1'),
-        ('ability2',     'Ability 2'),
-        ('ability3',     'Ability 3'),
+    # Super-categories → columns (key, label, mode). mode 'std' = visible in
+    # both Standard and Expanded; 'exp' = Expanded only. Render order follows
+    # this structure; the View toggle hides 'exp' columns in Standard mode.
+    CATEGORIES = [
+        ('Basic', [
+            ('lvl',          'Lvl',              'std'),
+            ('icon',         '',                 'std'),
+            ('name',         'Unit',             'std'),
+        ]),
+        ('Vitality', [
+            ('hp',           'HP',               'std'),
+            ('hp_regen',     'HP/sec',           'std'),
+            ('ehp_phys',     'EHP\nфиз',         'exp'),
+            ('ehp_mag',      'EHP\nмаг',         'exp'),
+            ('mp',           'MP',               'std'),
+            ('mp_regen',     'MP/sec',           'std'),
+            ('armor',        'Armor',            'std'),
+            ('armor_pct',    'Armor %',          'exp'),
+            ('magres',       'Mag. resist',      'std'),
+        ]),
+        ('Attack', [
+            ('dmg_avg',      'Damage',           'std'),
+            ('dmg_min',      'Dmg min',          'exp'),
+            ('dmg_max',      'Dmg max',          'exp'),
+            ('as',           'Speed',            'std'),
+            ('t_per_attack', 'Time to hit',      'std'),
+            ('bat',          'BAT',              'std'),
+            ('attack_range', 'Range',            'std'),
+            ('attack_type',  'Type',             'std'),
+            ('ap',           'Point',            'exp'),
+            ('projectile',   'Projectile Speed', 'exp'),
+        ]),
+        ('Bounty', [
+            ('gold',         'Gold',             'std'),
+            ('gold_min',     'Gold min',         'exp'),
+            ('gold_max',     'Gold max',         'exp'),
+            ('xp',           'XP',               'std'),
+        ]),
+        ('Other', [
+            ('ms',           'MS',               'std'),
+            ('vision',       'Vision',           'std'),
+            ('aggro',        'Acquisition Range', 'exp'),
+            ('turn_rate',    'Turn Rate',        'exp'),
+            ('collision_size', 'Collision Size', 'exp'),
+            ('bound_radius', 'Bound Radius',     'exp'),
+        ]),
+        ('Abilities', [
+            ('ability1',     'Ability 1',        'std'),
+            ('ability2',     'Ability 2',        'std'),
+            ('ability3',     'Ability 3',        'std'),
+        ]),
     ]
+    COLUMNS = [(k, label) for _cat, cols in CATEGORIES for (k, label, _m) in cols]
+    COL_MODE = {k: m for _cat, cols in CATEGORIES for (k, _l, m) in cols}
     COL_WIDTHS = {
         'lvl': 30, 'icon': 56, 'name': 170, 'createhero': 130,
         'hp': 50, 'hp_regen': 52, 'mp': 50, 'mp_regen': 52,
@@ -962,6 +979,8 @@ def save_creeps_html():
         # heuristic when the CSV cell is blank.
         if CSV_ATK_IDX is not None and CSV_ATK_IDX < len(padded):
             csv_atk = padded[CSV_ATK_IDX].strip().rstrip('*').strip()
+            csv_atk = {'Обычный': 'Default',
+                       'Проникающий': 'Piercing'}.get(csv_atk, csv_atk)
             if csv_atk:
                 data['attack_type'] = csv_atk
         rendered.append({'data': data, 'tier_break': is_break,
@@ -980,7 +999,8 @@ def save_creeps_html():
     # Columns that get a vertical separator on their RIGHT edge — they
     # group the table into logical sections (identity | survivability |
     # offense | economy | utility | abilities).
-    SEP_AFTER = {'lvl', 'name', 'mp_regen', 'bat', 'vision', 'projectile'}
+    # Left-border on the first (always-visible) column of each super-category.
+    SEP_AFTER = {'hp', 'dmg_avg', 'gold', 'ms', 'ability1'}
     # Identity columns pinned to the left edge during horizontal scroll
     # (scripts.js computes their cumulative left offsets after layout).
     STICKY_COLS = {'lvl', 'icon', 'name'}
@@ -991,10 +1011,12 @@ def save_creeps_html():
             cls.append('sticky-col')
         if k in SEP_AFTER:
             cls.append('col-sep')
+        if COL_MODE.get(k) == 'exp':
+            cls.append('col-exp')          # hidden in Standard view
         if k == 'attack_type':
-            if value == 'Обычный':
+            if value == 'Default':
                 cls.append('atk-basic')
-            elif value == 'Проникающий':
+            elif value == 'Piercing':
                 cls.append('atk-pierce')
         return ' '.join(cls)
 
@@ -1036,12 +1058,25 @@ def save_creeps_html():
             )
     thead_cells = ''.join(thead_list)
 
+    # Super-category row: one cell per category, colspan = its leaf columns.
+    # Each category has at least one Standard column, so the cell always shows;
+    # when Expanded columns under it are hidden, the cell shrinks naturally.
+    _cat_slug = {'Basic': 'basic', 'Vitality': 'vitality', 'Attack': 'attack',
+                 'Bounty': 'bounty', 'Other': 'other', 'Abilities': 'abilities'}
+    cat_cells = ''.join(
+        f'<th class="cat-head cat-{_cat_slug.get(cat, "x")}" '
+        f'colspan="{len(cols)}">{_esc(cat)}</th>'
+        for cat, cols in CATEGORIES
+    )
+
     def _cell_inner(k, v, d):
         """Inner HTML for a data cell. Attack Range gets a glass melee/ranged
         icon badge to the right of the number."""
         if k == 'attack_range' and v:
             typ = 'ranged' if d.get('attack_range_ranged') else 'melee'
-            return (f'{_esc(v)}<span class="atk-badge atk-{typ}">'
+            # Fixed-width number keeps every badge at the same x position.
+            return (f'<span class="atk-num">{_esc(v)}</span>'
+                    f'<span class="atk-badge atk-{typ}">'
                     f'<img src="icons/ui/atk_{typ}.png" alt="{typ}" '
                     f'loading="lazy"></span>')
         return _esc(v) if v else '&nbsp;'
@@ -1115,6 +1150,13 @@ def save_creeps_html():
         '<body>\n'
         f'{nav}\n'
         '<div class="container creeps-page">\n'
+        # View toggle: Standard (default) hides the Expanded-only columns.
+        '<div class="creeps-toolbar">'
+        '<span class="view-label">View:</span>'
+        '<div class="view-toggle" role="group">'
+        '<button type="button" class="view-btn is-active" data-view="standard">Standard</button>'
+        '<button type="button" class="view-btn" data-view="expanded">Expanded</button>'
+        '</div></div>\n'
         # Overlay frame outlining the pinned identity block during scroll.
         # Lives OUTSIDE .creeps-scroll (which scrolls) so it never hits the
         # Chrome bug where box-shadow/border on position:sticky cells fails
@@ -1122,8 +1164,9 @@ def save_creeps_html():
         '<div class="sticky-frame" aria-hidden="true"></div>\n'
         '<div class="sticky-frame-top" aria-hidden="true"></div>\n'
         '<div class="creeps-scroll">\n'
-        '<table class="creeps-table">\n'
-        f'<thead><tr>{thead_cells}</tr></thead>\n'
+        '<table class="creeps-table mode-standard">\n'
+        f'<thead><tr class="cat-row">{cat_cells}</tr>'
+        f'<tr class="col-row">{thead_cells}</tr></thead>\n'
         f'<tbody>\n{chr(10).join(body_parts)}\n</tbody>\n'
         '</table>\n'
         '</div>\n'

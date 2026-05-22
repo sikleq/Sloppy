@@ -1036,8 +1036,27 @@
       if (frame) frame.classList.toggle('visible', sx);
       if (frameTop) frameTop.classList.toggle('visible', sy);
     };
-    scroller.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    // rAF-throttle: positionFrames() reads layout (getBoundingClientRect),
+    // so running it on every raw scroll event caused jank.
+    let ticking = false;
+    const onScrollRaf = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { onScroll(); ticking = false; });
+    };
+    scroller.addEventListener('scroll', onScrollRaf, { passive: true });
+    window.addEventListener('resize', onScrollRaf, { passive: true });
+
+    // View toggle: Standard hides .col-exp columns, Expanded shows all.
+    const viewBtns = document.querySelectorAll('.view-btn');
+    viewBtns.forEach(btn => btn.addEventListener('click', () => {
+      const expanded = btn.dataset.view === 'expanded';
+      table.classList.toggle('mode-standard', !expanded);
+      table.classList.toggle('mode-expanded', expanded);
+      viewBtns.forEach(b => b.classList.toggle('is-active', b === btn));
+      applyLeftOffsets();   // column widths changed → recompute pinned offsets
+      onScroll();
+    }));
     onScroll();
   }
 })();
