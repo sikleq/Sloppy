@@ -805,10 +805,49 @@
     });
   }
 
+  // Merge consecutive identical ability cells into one rowspanned cell (only
+  // in the default order — sorting reads cells by column index, so we un-merge
+  // first). Process columns right-to-left so removals don't shift earlier idx.
+  let abilMerges = [];
+  function unmergeAbilityRuns() {
+    for (let i = abilMerges.length - 1; i >= 0; i--) {
+      abilMerges[i].tr.insertBefore(abilMerges[i].td, abilMerges[i].next);
+    }
+    abilMerges = [];
+    tbody.querySelectorAll('td').forEach(td => {
+      if (td.rowSpan > 1 && /\bcol-ability/.test(td.className)) td.rowSpan = 1;
+    });
+  }
+  function mergeAbilityRuns(rows) {
+    ['ability3', 'ability2', 'ability1'].forEach(col => {
+      const idx = colIndex[col];
+      if (idx == null) return;
+      let i = 0;
+      while (i < rows.length) {
+        const td = rows[i].children[idx];
+        const name = td && td.dataset.name;
+        if (!name) { i++; continue; }
+        let j = i + 1;
+        while (j < rows.length && rows[j].children[idx] &&
+               rows[j].children[idx].dataset.name === name) j++;
+        if (j - i > 1) {
+          td.rowSpan = j - i;
+          for (let k = i + 1; k < j; k++) {
+            const rm = rows[k].children[idx];
+            abilMerges.push({ tr: rows[k], td: rm, next: rm.nextSibling });
+            rm.remove();
+          }
+        }
+        i = j;
+      }
+    });
+  }
+
   let sortCol = null, sortState = 0;  // 0 = neutral, 1 = descending, 2 = ascending
   const originalOrder = [...tbody.querySelectorAll('tr')];
 
   function applySort(col, dir) {
+    unmergeAbilityRuns();             // restore full cells before index-based sort
     const idx = colIndex[col];
     const rows = [...tbody.querySelectorAll('tr')];
     rows.sort((a, b) => {
@@ -833,8 +872,10 @@
       if (sortState === 0) {
         // Back to neutral: restore the default level-grouped order, dim ↕ returns.
         sortCol = null;
+        unmergeAbilityRuns();
         originalOrder.forEach(tr => tbody.appendChild(tr));
         collapseLevels(originalOrder);
+        mergeAbilityRuns(originalOrder);   // re-merge in default order
       } else {
         const dir = sortState === 1 ? -1 : 1;
         th.classList.add(dir === 1 ? 'sort-asc' : 'sort-desc');
@@ -843,8 +884,9 @@
     });
   });
 
-  // Initial pass: collapse the default (level-grouped) order.
+  // Initial pass: collapse the default (level-grouped) order + merge ability runs.
   collapseLevels([...tbody.querySelectorAll('tr')]);
+  mergeAbilityRuns([...tbody.querySelectorAll('tr')]);
 })();
 
 // ---- CREEPS TABLE: per-stat changelog tooltip (HP / Armor / Mana / Magres) ----

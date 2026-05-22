@@ -890,7 +890,7 @@ def save_creeps_html():
             ('xp',           'XP',               'std'),
         ]),
         ('Other', [
-            ('ms',           'MS',               'std'),
+            ('ms',           'Movespeed',        'std'),
             ('vision',       'Vision',           'std'),
             ('aggro',        'Acquisition Range', 'exp'),
             ('turn_rate',    'Turn Rate',        'exp'),
