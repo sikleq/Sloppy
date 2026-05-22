@@ -383,11 +383,13 @@ def save_creeps_html():
         return 'Обычный'
 
     def _attack_range_label(npc):
+        # Just the number — no "Ближняя", no parentheses. The melee/ranged
+        # marker is rendered separately as a glass icon badge in the cell.
         rng = _safe_int(npc.get('AttackRange'), 0)
-        cap = npc.get('AttackCapabilities', '')
-        if 'RANGED' in cap or rng > 200:
-            return _fmt_num(rng)
-        return f'Ближняя ({rng})' if rng else ''
+        return _fmt_num(rng) if rng else ''
+
+    def _is_ranged(npc):
+        return 'RANGED' in npc.get('AttackCapabilities', '')
 
     # Hull → (collision size, bound radius). Values per Liquipedia/Unit_Size,
     # cross-checked in-game via cl_dumpentity (CCollisionProperty m_vecMaxs):
@@ -516,6 +518,7 @@ def save_creeps_html():
             'gold_max':      _fmt_num(gold_max) if gold_max else '',
             'xp':            _fmt_num(xp) if xp else '',
             'attack_range':  _attack_range_label(npc),
+            'attack_range_ranged': _is_ranged(npc) if npc else False,
             'attack_type':   _attack_type(npc) if npc else '',
             'vision':        f'{vis_day}/{vis_night}' if vis_day and vis_night else '',
             'aggro':         aggro,
@@ -740,15 +743,18 @@ def save_creeps_html():
             if cur and cur == prev_slug and prev_fields:
                 for fld, val in cur_fields.items():
                     old = prev_fields.get(fld)
-                    if old is not None and old != val:
-                        if fld in ABIL_ENUM_FIELDS:
-                            entries.append((v, dt, 'F', _abil_field_label(fld),
-                                            _humanize_enum(old),
-                                            _humanize_enum(val), 'hi'))
-                        else:
-                            pol = 'lo' if _abil_lower_better(fld) else 'hi'
-                            entries.append((v, dt, 'F', _abil_field_label(fld),
-                                            _slash(old), _slash(val), pol))
+                    if old is None or old == val:
+                        continue
+                    if fld in ABIL_ENUM_FIELDS:
+                        of_, nf_, pol = _humanize_enum(old), _humanize_enum(val), 'hi'
+                    else:
+                        of_, nf_ = _slash(old), _slash(val)
+                        pol = 'lo' if _abil_lower_better(fld) else 'hi'
+                    # Skip no-op diffs that only differ before formatting
+                    # (e.g. "6.0" → "6", or "6 6 6" → "6").
+                    if of_ == nf_:
+                        continue
+                    entries.append((v, dt, 'F', _abil_field_label(fld), of_, nf_, pol))
             prev_slug, prev_fields = cur, cur_fields
         return entries
 
@@ -980,6 +986,16 @@ def save_creeps_html():
             )
     thead_cells = ''.join(thead_list)
 
+    def _cell_inner(k, v, d):
+        """Inner HTML for a data cell. Attack Range gets a glass melee/ranged
+        icon badge to the right of the number."""
+        if k == 'attack_range' and v:
+            typ = 'ranged' if d.get('attack_range_ranged') else 'melee'
+            return (f'{_esc(v)}<span class="atk-badge atk-{typ}">'
+                    f'<img src="icons/ui/atk_{typ}.png" alt="{typ}" '
+                    f'loading="lazy"></span>')
+        return _esc(v) if v else '&nbsp;'
+
     body_parts = []
     for row in rendered:
         d = row['data']
@@ -1032,10 +1048,10 @@ def save_creeps_html():
                     extra = f' data-hist="{_esc(payload)}"'
                     cls += ' has-history'
                 cells.append(
-                    f'<td class="{cls}"{extra}>{_esc(v) if v else "&nbsp;"}</td>'
+                    f'<td class="{cls}"{extra}>{_cell_inner(k, v, d)}</td>'
                 )
             else:
-                cells.append(f'<td class="{_col_cls(k, v)}">{_esc(v) if v else "&nbsp;"}</td>')
+                cells.append(f'<td class="{_col_cls(k, v)}">{_cell_inner(k, v, d)}</td>')
         body_parts.append(f'<tr{tr_cls}>{"".join(cells)}</tr>')
 
     html = (
@@ -1054,6 +1070,7 @@ def save_creeps_html():
         # Chrome bug where box-shadow/border on position:sticky cells fails
         # to repaint mid-scroll. scripts.js positions + toggles it.
         '<div class="sticky-frame" aria-hidden="true"></div>\n'
+        '<div class="sticky-frame-top" aria-hidden="true"></div>\n'
         '<div class="creeps-scroll">\n'
         '<table class="creeps-table">\n'
         f'<thead><tr>{thead_cells}</tr></thead>\n'

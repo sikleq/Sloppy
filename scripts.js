@@ -907,7 +907,7 @@
       line = p[3] + ' <span class="chg-cycle">⇄</span> ' + p[4]
            + ' <span class="chg-tag replaced">REPLACED</span>';
     } else if (kind === 'F') {
-      line = '<span class="chg-label">' + p[3] + '</span> ' + p[4] + ' → '
+      line = '<span class="chg-label">' + p[3] + ':</span> ' + p[4] + ' → '
            + p[5] + pctHtml(p[4], p[5], p[6] === 'lo');
     } else {
       // 'V' stat value (patch|date|V|old|new|pol), or legacy patch|date|old|new
@@ -993,36 +993,46 @@
   // which Chrome drops mid-scroll.
   const scroller = table.closest('.creeps-scroll');
   const page = table.closest('.creeps-page');
-  const frame = page && page.querySelector('.sticky-frame');
+  const frame = page && page.querySelector('.sticky-frame');       // vertical
+  const frameTop = page && page.querySelector('.sticky-frame-top'); // horizontal
 
-  function positionFrame() {
-    if (!frame || !scroller) return;
+  function positionFrames() {
+    if (!scroller || !page) return;
     const firstTds = [...firstRow.children];
     if (firstTds.length < 3) return;
     const pageR  = page.getBoundingClientRect();
-    const tableR = table.getBoundingClientRect();
-    // The pinned cells sit at fixed screen x (left:0..). Measure the lvl
-    // cell's left and the name cell's right to span the whole block.
-    const lvlR  = firstTds[0].getBoundingClientRect();
-    const nameR = firstTds[2].getBoundingClientRect();
-    frame.style.left   = (lvlR.left  - pageR.left) + 'px';
-    frame.style.width  = (nameR.right - lvlR.left) + 'px';
-    frame.style.top    = (tableR.top - pageR.top) + 'px';
-    frame.style.height = tableR.height + 'px';
+    const scrR   = scroller.getBoundingClientRect();
+    const nameR  = firstTds[2].getBoundingClientRect();  // right edge of pinned block
+    const headR  = table.tHead.getBoundingClientRect();
+    // Vertical divider: at the right edge of the frozen lvl/unit columns,
+    // spanning the visible height. Does NOT enclose the pinned cells.
+    if (frame) {
+      frame.style.left   = (nameR.right - pageR.left) + 'px';
+      frame.style.top    = (scrR.top - pageR.top) + 'px';
+      frame.style.height = scroller.clientHeight + 'px';
+      frame.style.width  = '0px';
+    }
+    // Horizontal divider: just under the sticky header, across the visible
+    // width — the outline for the whole header during vertical scroll.
+    if (frameTop) {
+      frameTop.style.left   = (scrR.left - pageR.left) + 'px';
+      frameTop.style.top    = (scrR.top - pageR.top + headR.height) + 'px';
+      frameTop.style.width  = scroller.clientWidth + 'px';
+      frameTop.style.height = '0px';
+    }
   }
 
   if (scroller) {
     const onScroll = () => {
-      const scrolled = scroller.scrollLeft > 0;
-      scroller.classList.toggle('scrolled', scrolled);
-      if (frame) {
-        if (scrolled) { positionFrame(); frame.classList.add('visible'); }
-        else { frame.classList.remove('visible'); }
-      }
+      const sx = scroller.scrollLeft > 0;
+      const sy = scroller.scrollTop > 0;
+      scroller.classList.toggle('scrolled', sx);
+      positionFrames();
+      if (frame) frame.classList.toggle('visible', sx);
+      if (frameTop) frameTop.classList.toggle('visible', sy);
     };
     scroller.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', () => { positionFrame(); onScroll(); },
-                            { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
     onScroll();
   }
 })();
