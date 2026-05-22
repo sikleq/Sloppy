@@ -353,10 +353,11 @@ def save_creeps_html():
     # Autocast abilities — get the animated golden ring marker on their icon
     # (mirrors the in-game autocast toggle visual). The data feed carries no
     # AbilityBehavior/autocast flag, so this list is maintained by hand.
-    # PROTOTYPE: single icon for now. Full set:
-    #   forest_troll_high_priest_heal (Heal), ogre_magi_frost_armor (Ice Armor),
-    #   spawnlord_master_freeze (Petrify).
-    AUTOCAST_ABILITIES = {'forest_troll_high_priest_heal'}
+    AUTOCAST_ABILITIES = {
+        'forest_troll_high_priest_heal',   # Heal (Forest Troll High Priest)
+        'ogre_magi_frost_armor',           # Ice Armor (Ogre Frostmage)
+        'spawnlord_master_freeze',         # Petrify (Prowler Shaman)
+    }
 
     def _ability_dname(slug):
         if not slug or slug in ABILITY_SKIP:
@@ -1130,11 +1131,27 @@ def save_creeps_html():
                     # frame at constant speed (incl. corners) — SVG dash offset
                     # animation. pathLength=100 normalises the perimeter so the
                     # dash gap loops seamlessly.
+                    # Phase-locked strokes (shared offset animation) forming one
+                    # fuzzy comet: a wide blurred aura (fluff), a bright body,
+                    # stepped tail segments that fade toward the tail tip, and a
+                    # cluster of tiny dots riding along (pollen). Head leads at
+                    # the high end of the painted range; the tail (low end)
+                    # fades out near its tip.
+                    _r = ('<rect x="1.5" y="1.5" width="25" height="25" '
+                          'rx="4.5" ry="4.5" pathLength="100"')
                     snake = (
                         '<svg class="autocast-snake" viewBox="0 0 28 28" '
                         'preserveAspectRatio="none" aria-hidden="true">'
-                        '<rect x="1.5" y="1.5" width="25" height="25" '
-                        'rx="4.5" ry="4.5" pathLength="100"></rect></svg>'
+                        f'{_r} class="ac-ring"></rect>'
+                        f'{_r} class="ac-fluff"></rect>'
+                        f'{_r} class="ac-tail4"></rect>'
+                        f'{_r} class="ac-tail3"></rect>'
+                        f'{_r} class="ac-tail2"></rect>'
+                        f'{_r} class="ac-tail1"></rect>'
+                        f'{_r} class="ac-body"></rect>'
+                        f'{_r} class="ac-pollen"></rect>'
+                        f'{_r} class="ac-pollen2"></rect>'
+                        f'{_r} class="ac-pollen3"></rect></svg>'
                     )
                     return (f'<span class="abil-ico-wrap abil-autocast">'
                             f'{img}{snake}</span>')

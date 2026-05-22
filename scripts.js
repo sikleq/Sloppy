@@ -921,7 +921,9 @@
   function pctHtml(ov, nv, lowerBetter) {
     const o = meanOf(ov), n = meanOf(nv);
     if (!isFinite(o) || !isFinite(n) || o === 0) return '';
-    const pct = (n - o) / o * 100;
+    // Divide by |o| so a negative baseline keeps the real direction:
+    // armor -1 → 0 is a +100% gain (a buff), not -100%.
+    const pct = (n - o) / Math.abs(o) * 100;
     const good = lowerBetter ? pct < 0 : pct > 0;
     const cls = pct === 0 ? 'flat' : (good ? 'up' : 'down');
     const sign = pct > 0 ? '+' : '';

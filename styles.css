@@ -2755,12 +2755,14 @@ body.filter-active ul.subnotes { display: none; }
      abrupt bottom clip). overflow-x:auto implies overflow-y:auto, but with no
      height limit nothing overflows vertically so no vertical bar appears. */
   overflow-x: auto;
-  /* Hug the table width (cap at the container) so a narrow Standard-view
-     table doesn't leave a big empty strip / abrupt right edge on wide screens. */
-  width: max-content;
-  max-width: 100%;
+  width: 100%;
 }
 .creeps-table {
+  /* width:max-content + min-width:100% = stretch evenly to fill the container
+     when content is narrow (Standard view — no empty strip on the right), but
+     grow to content width and scroll horizontally when wide (Expanded view). */
+  width: max-content;
+  min-width: 100%;
   /* table-layout: auto lets the browser size each column to the widest
      content (header or cell) — no manual width hints. Every cell is
      centered horizontally, so visual alignment stays clean across the
@@ -2889,6 +2891,19 @@ body.filter-active ul.subnotes { display: none; }
   display: inline-block;
   vertical-align: middle;
   border: 1px solid rgba(170, 220, 240, 0.18);
+  transform-origin: center center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+/* Hover-zoom the ability icon, mirroring the unit-portrait pop-out. Bare
+   (non-autocast) icons scale directly; autocast icons scale via their wrapper
+   (below) so the snake ring zooms with the icon instead of doubling up. */
+.creeps-table .abil-ico:hover {
+  transform: scale(1.8);
+  position: relative;
+  z-index: 4;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(170, 220, 240, 0.4);
 }
 /* Autocast marker — animated golden ring + pulsing glow around the ability
    icon, mirroring the in-game autocast toggle. The wrapper is needed because
@@ -2898,6 +2913,19 @@ body.filter-active ul.subnotes { display: none; }
   display: inline-block;
   vertical-align: middle;
   line-height: 0;
+  transform-origin: center center;
+  transition: transform 0.12s ease;
+}
+/* Autocast icon zoom — scale the whole wrapper (icon + snake) as one, and
+   suppress the inner img's own :hover scale so it doesn't compound. */
+.creeps-table .abil-ico-wrap:hover {
+  transform: scale(1.8);
+  z-index: 4;
+}
+.creeps-table .abil-ico-wrap:hover .abil-ico {
+  transform: none;
+  z-index: auto;
+  box-shadow: none;
 }
 /* A thin golden "snake" — a short stroke segment that crawls along the icon's
    rounded-rect frame at constant speed, corners included. The SVG <rect> has
@@ -2914,13 +2942,104 @@ body.filter-active ul.subnotes { display: none; }
 }
 .creeps-table .autocast-snake rect {
   fill: none;
-  stroke: #ffe9a8;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-dasharray: 14 86;
+  stroke-linecap: butt;
   stroke-dashoffset: 0;
-  filter: drop-shadow(0 0 2px rgba(255, 190, 70, 0.95));
-  animation: autocast-snake 2s linear infinite;
+  /* Every stroke shares one phase-locked lap so the whole comet travels as a
+     unit. Painted range [a,b] is expressed as dasharray "0 a (b-a) (100-b)"
+     (leading 0-length dash + gap, then the painted dash). Head leads at the
+     high end; tail fades toward the low end. */
+  animation: autocast-snake 1.73s linear infinite;
+}
+/* Closed base ring — a continuous, static golden line around the whole frame.
+   The animated comet below sweeps around within it, so the snake reads as a
+   closed loop with the glow travelling inside itself. */
+.creeps-table .autocast-snake .ac-ring {
+  stroke: #ffce72;
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+  opacity: 0.34;
+  filter: drop-shadow(0 0 1.2px rgba(255, 190, 70, 0.6));
+  animation: none;
+}
+/* Wide, very soft, translucent aura spanning the whole comet — the "fluff". */
+.creeps-table .autocast-snake .ac-fluff {
+  stroke: #ffc964;
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-dasharray: 0 0 100 0;     /* [0, 100] — full ring */
+  opacity: 0.16;
+  filter: blur(3.6px);
+}
+/* Bright body — the leading, fully-opaque stretch. Head sits at 100, which on
+   the closed path coincides with position 0, so the head meets the tail's tip:
+   the comet wraps the entire perimeter and touches itself. */
+.creeps-table .autocast-snake .ac-body {
+  stroke: #fff3c8;
+  stroke-width: 1.8;
+  stroke-dasharray: 0 60 40 0;     /* [60, 100] */
+  filter: drop-shadow(0 0 1.8px rgba(255, 190, 70, 0.95));
+}
+/* Tail — 4 overlapping steps with a gentle opacity ramp (1 → .78 → .5 → .28
+   → .12), tapering width and rising blur toward the tip. The painted union
+   covers the whole [0,100] perimeter, so the faint tip (at 0) meets the bright
+   head (at 100) for a fully closed loop with no gap. */
+.creeps-table .autocast-snake .ac-tail1 {
+  stroke: #ffe9ad;
+  stroke-width: 1.55;
+  stroke-dasharray: 0 46 18 36;    /* [46, 64] */
+  opacity: 0.78;
+  filter: blur(0.6px) drop-shadow(0 0 1.5px rgba(255, 190, 70, 0.75));
+}
+.creeps-table .autocast-snake .ac-tail2 {
+  stroke: #ffe09a;
+  stroke-width: 1.2;
+  stroke-dasharray: 0 30 20 50;    /* [30, 50] */
+  opacity: 0.5;
+  filter: blur(1px);
+}
+.creeps-table .autocast-snake .ac-tail3 {
+  stroke: #ffd98e;
+  stroke-width: 0.85;
+  stroke-dasharray: 0 14 20 66;    /* [14, 34] */
+  opacity: 0.28;
+  filter: blur(1.5px);
+}
+.creeps-table .autocast-snake .ac-tail4 {
+  stroke: #ffd585;
+  stroke-width: 0.5;
+  stroke-dasharray: 0 0 18 82;     /* [0, 18] */
+  opacity: 0.12;
+  filter: blur(2px);
+}
+/* Pollen — two phase-locked layers of tiny, irregular, heavily-blurred specks
+   that ride with the comet. Small widths + strong blur + varied dash sizes
+   dissolve the dots into a soft golden dust cloud (scatter) instead of crisp
+   beads. Each dasharray sums to 100 for a seamless lap. */
+.creeps-table .autocast-snake .ac-pollen {
+  stroke: #fff3cf;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-dasharray: 0.5 4 0.4 5 0.6 3.5 0.3 5.5 0.5 4 0.4 4.5 0.5 5 0.3 4 0.6 4.5 0.4 5 0.5 4 0.3 45.7;
+  opacity: 0.5;
+  filter: blur(1.2px) drop-shadow(0 0 1.6px rgba(255, 205, 110, 0.85));
+}
+.creeps-table .autocast-snake .ac-pollen2 {
+  stroke: #ffeec2;
+  stroke-width: 0.6;
+  stroke-linecap: round;
+  stroke-dasharray: 0.3 6 0.4 5.5 0.3 6.5 0.4 5 0.3 7 0.4 6 0.3 6.5 0.4 6 0.3 48.4;
+  opacity: 0.4;
+  filter: blur(2.2px) drop-shadow(0 0 1.4px rgba(255, 210, 120, 0.8));
+}
+/* Sparse, bright, sharp twinkles with a strong glow — the "magic" sparkle on
+   top of the soft dust haze. */
+.creeps-table .autocast-snake .ac-pollen3 {
+  stroke: #fffdf2;
+  stroke-width: 0.5;
+  stroke-linecap: round;
+  stroke-dasharray: 0.4 9 0.3 11 0.4 8 0.3 12 0.4 10 0.3 47.9;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 2px rgba(255, 225, 150, 0.95));
 }
 @keyframes autocast-snake {
   to { stroke-dashoffset: -100; }
@@ -2988,6 +3107,15 @@ body.filter-active ul.subnotes { display: none; }
     0 3px 8px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
     0 0 0 1px rgba(170, 220, 240, 0.4);
+}
+/* Last row: grow the zoom UPWARD so the enlarged portrait isn't clipped by the
+   scroll box / hidden under the horizontal scrollbar at the bottom edge.
+   (The .creeps-scroll overflow context can't be widened without breaking the
+   sticky header, so we steer the transform instead.) */
+.creeps-table tbody tr:last-child .creep-icon-cell img,
+.creeps-table tbody tr:last-child .abil-ico,
+.creeps-table tbody tr:last-child .abil-ico-wrap {
+  transform-origin: center bottom;
 }
 /* Vertical section separators — a brighter right border grouping the
    table into identity | survivability | offense | economy | utility. */
