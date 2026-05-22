@@ -2920,15 +2920,39 @@ body.filter-active ul.subnotes { display: none; }
   border-top: 1px solid rgba(139, 148, 158, 0.18);
   margin-top: 3px;
 }
-.stat-hist-tip .stat-chg-patch {
-  font-weight: 600;
-  color: #79c0ff;
+/* Entry header: patch number top-left, date top-right (dd.mm.yy). */
+.stat-hist-tip .stat-chg-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
   font-variant-numeric: tabular-nums;
 }
+.stat-hist-tip .chg-patch { font-weight: 600; color: #79c0ff; }
+.stat-hist-tip .chg-date { color: #8b949e; font-size: 10px; }
 .stat-hist-tip .stat-chg-line {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  text-align: left;
+  margin-top: 1px;
 }
+.stat-hist-tip .chg-label { color: #adbac7; }
+.stat-hist-tip .chg-cycle { color: #c9d1d9; padding: 0 3px; }
+/* Ability tags — same palette as the changelog NEW/DEL badges. */
+.stat-hist-tip .chg-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid;
+  border-radius: 4px;
+  vertical-align: 1px;
+}
+.stat-hist-tip .chg-tag.added    { color: #9a7f4d; background: rgba(220,175,95,0.06); border-color: rgba(220,175,95,0.22); }
+.stat-hist-tip .chg-tag.removed  { color: #a86060; background: rgba(180,70,70,0.07); border-color: rgba(180,70,70,0.25); }
+.stat-hist-tip .chg-tag.replaced { color: #7f9cc4; background: rgba(120,150,200,0.07); border-color: rgba(120,150,200,0.25); }
 /* % delta — muted green for an increase (stat up = buff), muted red for
    a decrease. Less saturated than the changelog badges to read softer in
    the tooltip. */

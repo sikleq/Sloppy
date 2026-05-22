@@ -862,26 +862,65 @@
     return tip;
   }
 
+  // "23.02.2022" -> "23.02.22"
+  function shortDate(d) {
+    const p = (d || '').split('.');
+    if (p.length === 3 && p[2].length === 4) p[2] = p[2].slice(2);
+    return p.join('.');
+  }
+  // Mean of a slash/space value ("40/36/32/26" -> 33.5, "12.0" -> 12).
+  function meanOf(s) {
+    const nums = String(s).split(/[\/\s]+/).map(parseFloat).filter(isFinite);
+    return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : NaN;
+  }
+  function pctHtml(ov, nv) {
+    const o = meanOf(ov), n = meanOf(nv);
+    if (!isFinite(o) || !isFinite(n) || o === 0) return '';
+    const pct = (n - o) / o * 100;
+    const cls = pct > 0 ? 'up' : (pct < 0 ? 'down' : 'flat');
+    const sign = pct > 0 ? '+' : '';
+    const txt = sign + (Math.abs(pct % 1) < 0.05 ? pct.toFixed(0) : pct.toFixed(1)) + '%';
+    return ' <span class="stat-pct ' + cls + '">' + txt + '</span>';
+  }
+  function chgHead(patch, date) {
+    return '<div class="stat-chg-head"><span class="chg-patch">' + patch
+         + '</span><span class="chg-date">' + shortDate(date) + '</span></div>';
+  }
+  // Render one changelog entry. Format: patch|date|kind|...parts
+  //   V old new            stat value change
+  //   F label old new      ability value change
+  //   A name               ability added
+  //   R name               ability removed
+  //   P old new            ability replaced
+  function renderEntry(e) {
+    const p = e.split('|');
+    const patch = p[0], date = p[1], kind = p[2];
+    let body;
+    if (kind === 'A') {
+      body = p[3] + ' <span class="chg-tag added">ADDED</span>';
+    } else if (kind === 'R') {
+      body = p[3] + ' <span class="chg-tag removed">REMOVED</span>';
+    } else if (kind === 'P') {
+      body = p[3] + ' <span class="chg-cycle">⇄</span> ' + p[4]
+           + ' <span class="chg-tag replaced">REPLACED</span>';
+    } else if (kind === 'F') {
+      body = '<span class="chg-label">' + p[3] + '</span> ' + p[4] + ' → '
+           + p[5] + pctHtml(p[4], p[5]);
+    } else {
+      // 'V' stat value (patch|date|V|old|new), or legacy patch|date|old|new
+      const ov = kind === 'V' ? p[3] : p[2];
+      const nv = kind === 'V' ? p[4] : p[3];
+      body = ov + ' → ' + nv + pctHtml(ov, nv);
+    }
+    return '<div class="stat-chg">' + chgHead(patch, date)
+         + '<div class="stat-chg-line">' + body + '</div></div>';
+  }
+
   function show(td) {
     const entries = (td.dataset.hist || '').split(';').filter(Boolean);
     if (!entries.length) return;
     const el = ensureTip();
-    el.innerHTML = entries.map(e => {
-      const [patch, date, ov, nv] = e.split('|');
-      const o = parseFloat(ov), n = parseFloat(nv);
-      let pctHtml = '';
-      if (isFinite(o) && isFinite(n) && o !== 0) {
-        const pct = (n - o) / o * 100;
-        const cls = pct > 0 ? 'up' : (pct < 0 ? 'down' : 'flat');
-        const sign = pct > 0 ? '+' : '';
-        const txt = sign + (Math.abs(pct % 1) < 0.05 ? pct.toFixed(0) : pct.toFixed(1)) + '%';
-        pctHtml = ' <span class="stat-pct ' + cls + '">' + txt + '</span>';
-      }
-      return '<div class="stat-chg">'
-           + '<div class="stat-chg-patch">' + patch + '</div>'
-           + '<div class="stat-chg-line">' + date + ': ' + ov + ' → ' + nv + pctHtml + '</div>'
-           + '</div>';
-    }).join('');
+    el.innerHTML = entries.map(renderEntry).join('');
     el.classList.add('is-visible');
     const r = td.getBoundingClientRect();
     const tr = el.getBoundingClientRect();

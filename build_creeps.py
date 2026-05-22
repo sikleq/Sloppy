@@ -666,45 +666,56 @@ def save_creeps_html():
             return fld[3:].replace('_', ' ').capitalize()
         return fld
 
+    def _slash(s):
+        """Per-level KV values are space-separated → show as 2/3/4/5."""
+        return ' '.join(str(s).split()).replace(' ', '/')
+
+    _FIRST_PATCH = _patches_chrono[0] if _patches_chrono else None
+
     def _ability_changelog(npc_key, slot):
-        """Combined changelog for the ability cell at `slot`: presence
-        (added/removed/replaced) + value changes (cooldown, mana, AbilityValues
-        …) of the ability occupying that slot. Returns (patch, date, ov, nv)
-        entries, chronological — same shape scripts.js renders."""
+        """Combined changelog for the ability cell at `slot`. Returns typed
+        entries scripts.js renders:
+          (patch, date, 'A', name)            — ability added
+          (patch, date, 'R', name)            — ability removed
+          (patch, date, 'P', old, new)        — ability replaced
+          (patch, date, 'F', label, old, new) — value change (cooldown, …)
+        The baseline (ability present at the FIRST tracked patch, 7.08) emits
+        nothing; a unit introduced later (e.g. frogs in 7.38) shows ADDED."""
         if not npc_key:
             return []
         entries = []
         prev_slug = None
         prev_fields = None
-        seen = False  # baseline (first patch the unit exists) emits no entry
+        started = False
         for v in _patches_chrono:
             if _raw_at('StatusHealth', v, npc_key) is None:
                 continue  # unit absent this patch
             slugs = _ability_slugs_at(v, npc_key)
             cur = slugs[slot] if slot < len(slugs) else None
+            cur_fields = _abil_by_patch.get(v, {}).get(cur, {}) if cur else {}
             dt = PATCH_DATES.get(v, '')
-            if not seen:
-                seen = True
-                prev_slug = cur
-                prev_fields = _abil_by_patch.get(v, {}).get(cur, {}) if cur else {}
-                continue
+            if not started:
+                started = True
+                if v == _FIRST_PATCH:
+                    # data baseline (was already there at 7.08) — adopt silently
+                    prev_slug, prev_fields = cur, cur_fields
+                    continue
+                # unit introduced mid-history → prev_slug stays None → ADDED below
             if prev_slug != cur:
                 if not prev_slug and cur:
-                    entries.append((v, dt, '—', _ability_dname(cur)))
+                    entries.append((v, dt, 'A', _ability_dname(cur)))
                 elif prev_slug and not cur:
-                    entries.append((v, dt, _ability_dname(prev_slug), '—'))
+                    entries.append((v, dt, 'R', _ability_dname(prev_slug)))
                 else:
-                    entries.append((v, dt, _ability_dname(prev_slug),
+                    entries.append((v, dt, 'P', _ability_dname(prev_slug),
                                     _ability_dname(cur)))
-            cur_fields = _abil_by_patch.get(v, {}).get(cur, {}) if cur else {}
             if cur and cur == prev_slug and prev_fields:
                 for fld, val in cur_fields.items():
                     old = prev_fields.get(fld)
                     if old is not None and old != val:
-                        entries.append((v, dt, f'{_abil_field_label(fld)} {old}',
-                                        str(val)))
-            prev_slug = cur
-            prev_fields = cur_fields
+                        entries.append((v, dt, 'F', _abil_field_label(fld),
+                                        _slash(old), _slash(val)))
+            prev_slug, prev_fields = cur, cur_fields
         return entries
 
     COL_HIST = {
@@ -970,14 +981,18 @@ def save_creeps_html():
                 # compact data attribute (patch|date|old|new;...) — scripts.js
                 # renders a changelog tooltip on hover. Only emitted when the
                 # unit actually has recorded changes for that column.
-                hist = (COL_CHANGELOG[k](row.get('npc_key')) if k in COL_CHANGELOG
-                        else _value_history(row.get('npc_key'), COL_HIST[k]))
                 extra = ''
                 cls = _col_cls(k, v)
+                if k in COL_CHANGELOG:
+                    # Typed entries (variable length): patch|date|kind|...parts
+                    hist = COL_CHANGELOG[k](row.get('npc_key'))
+                    payload = ';'.join('|'.join(str(x) for x in e) for e in hist)
+                else:
+                    # Stat value change → 'V' kind: patch|date|V|old|new
+                    hist = _value_history(row.get('npc_key'), COL_HIST[k])
+                    payload = ';'.join(f'{p}|{dt}|V|{ov}|{nv}'
+                                       for (p, dt, ov, nv) in hist)
                 if hist:
-                    payload = ';'.join(
-                        f'{p}|{dt}|{ov}|{nv}' for (p, dt, ov, nv) in hist
-                    )
                     extra = f' data-hist="{_esc(payload)}"'
                     cls += ' has-history'
                 cells.append(
