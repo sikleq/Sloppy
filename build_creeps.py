@@ -182,6 +182,19 @@ def save_creeps_html():
                     _bucket[_k] = _num(_raw)
             _raw_by_patch[_f][_v] = _bucket
 
+    # Per-patch neutral ability balance data (from npc_abilities.json, written
+    # by scripts/fetch_ability_history.py). _abil_by_patch[version][slug] =
+    # {field: value} — used for the ability-cell value changelog.
+    _abil_by_patch = {}
+    for _v in _patches_chrono:
+        _ap_path = _os.path.join(STATS_DIR, _v, "npc_abilities.json")
+        if not _os.path.exists(_ap_path):
+            continue
+        try:
+            _abil_by_patch[_v] = _json.loads(open(_ap_path, encoding="utf-8").read())
+        except Exception:
+            _abil_by_patch[_v] = {}
+
     def _raw_at(field, version, npc_key):
         return _raw_by_patch.get(field, {}).get(version, {}).get(npc_key)
 
@@ -628,16 +641,71 @@ def save_creeps_html():
             out.append(_ability_dname(slug))
         return out
 
-    def _ability_slot_vf(slot):
-        """History valuefn for the displayed ability cell at `slot` (0-based).
-        Returns the dname occupying that slot at a patch, or None when the
-        unit doesn't exist / has no ability there."""
-        def f(version, npc_key):
-            if _raw_at('StatusHealth', version, npc_key) is None:
-                return None  # unit doesn't exist this patch
-            abils = _abilities_at(version, npc_key)
-            return abils[slot] if slot < len(abils) else None
-        return f
+    def _ability_slugs_at(version, npc_key):
+        """Filtered ability SLUGS for a neutral at a patch (slot order)."""
+        out = []
+        for i in range(1, 6):
+            slug = _raw_at(f'Ability{i}', version, npc_key)
+            if not slug or slug in ABILITY_SKIP:
+                continue
+            out.append(slug)
+        return out
+
+    # npc_abilities field → friendly label for the changelog tooltip.
+    ABIL_FIELD_LABEL = {
+        'AbilityCooldown': 'Cooldown', 'AbilityManaCost': 'Mana',
+        'AbilityCastRange': 'Cast range', 'AbilityCastPoint': 'Cast point',
+        'AbilityDamage': 'Damage', 'AbilityChannelTime': 'Channel',
+        'AbilityDuration': 'Duration',
+    }
+
+    def _abil_field_label(fld):
+        if fld in ABIL_FIELD_LABEL:
+            return ABIL_FIELD_LABEL[fld]
+        if fld.startswith('av_'):
+            return fld[3:].replace('_', ' ').capitalize()
+        return fld
+
+    def _ability_changelog(npc_key, slot):
+        """Combined changelog for the ability cell at `slot`: presence
+        (added/removed/replaced) + value changes (cooldown, mana, AbilityValues
+        …) of the ability occupying that slot. Returns (patch, date, ov, nv)
+        entries, chronological — same shape scripts.js renders."""
+        if not npc_key:
+            return []
+        entries = []
+        prev_slug = None
+        prev_fields = None
+        seen = False  # baseline (first patch the unit exists) emits no entry
+        for v in _patches_chrono:
+            if _raw_at('StatusHealth', v, npc_key) is None:
+                continue  # unit absent this patch
+            slugs = _ability_slugs_at(v, npc_key)
+            cur = slugs[slot] if slot < len(slugs) else None
+            dt = PATCH_DATES.get(v, '')
+            if not seen:
+                seen = True
+                prev_slug = cur
+                prev_fields = _abil_by_patch.get(v, {}).get(cur, {}) if cur else {}
+                continue
+            if prev_slug != cur:
+                if not prev_slug and cur:
+                    entries.append((v, dt, '—', _ability_dname(cur)))
+                elif prev_slug and not cur:
+                    entries.append((v, dt, _ability_dname(prev_slug), '—'))
+                else:
+                    entries.append((v, dt, _ability_dname(prev_slug),
+                                    _ability_dname(cur)))
+            cur_fields = _abil_by_patch.get(v, {}).get(cur, {}) if cur else {}
+            if cur and cur == prev_slug and prev_fields:
+                for fld, val in cur_fields.items():
+                    old = prev_fields.get(fld)
+                    if old is not None and old != val:
+                        entries.append((v, dt, f'{_abil_field_label(fld)} {old}',
+                                        str(val)))
+            prev_slug = cur
+            prev_fields = cur_fields
+        return entries
 
     COL_HIST = {
         'hp':            _raw_vf('StatusHealth'),
@@ -664,9 +732,14 @@ def save_creeps_html():
         'bound_radius':  _hull_vf(1),
         'projectile':    _projectile_vf,
         'collision_size': _hull_vf(0),
-        'ability1':      _ability_slot_vf(0),
-        'ability2':      _ability_slot_vf(1),
-        'ability3':      _ability_slot_vf(2),
+    }
+
+    # Ability cells use a richer changelog (presence + value changes) that
+    # returns (patch, date, ov, nv) entries directly, not a per-patch value.
+    COL_CHANGELOG = {
+        'ability1': lambda k: _ability_changelog(k, 0),
+        'ability2': lambda k: _ability_changelog(k, 1),
+        'ability3': lambda k: _ability_changelog(k, 2),
     }
 
     # ---- Read CSV ----
@@ -892,12 +965,13 @@ def save_creeps_html():
                     )
                 else:
                     cells.append(f'<td class="creep-icon-cell {_col_cls(k)}"></td>')
-            elif k in COL_HIST:
-                # Stat cell carries its full change history as a compact data
-                # attribute (patch|date|old|new;...) — scripts.js renders a
-                # changelog tooltip on hover. Only emitted when the unit
-                # actually has recorded changes for that column.
-                hist = _value_history(row.get('npc_key'), COL_HIST[k])
+            elif k in COL_HIST or k in COL_CHANGELOG:
+                # Stat / ability cell carries its full change history as a
+                # compact data attribute (patch|date|old|new;...) — scripts.js
+                # renders a changelog tooltip on hover. Only emitted when the
+                # unit actually has recorded changes for that column.
+                hist = (COL_CHANGELOG[k](row.get('npc_key')) if k in COL_CHANGELOG
+                        else _value_history(row.get('npc_key'), COL_HIST[k]))
                 extra = ''
                 cls = _col_cls(k, v)
                 if hist:
