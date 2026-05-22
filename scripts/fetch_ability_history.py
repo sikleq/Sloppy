@@ -43,6 +43,9 @@ ABILITY_SKIP = {"neutral_upgrade", "creep_piercing"}
 TOP_FIELDS = {
     "AbilityCooldown", "AbilityManaCost", "AbilityCastRange", "AbilityCastPoint",
     "AbilityDamage", "AbilityChannelTime", "AbilityDuration",
+    # Enum/string fields (no %, shown humanised): damage type, spell immunity,
+    # dispellability.
+    "AbilityUnitDamageType", "SpellImmunityType", "SpellDispellableType",
 }
 HEADER_RE = re.compile(r'^\s*"([a-z][a-z0-9_]+)"\s*$')
 KV_RE = re.compile(r'^\s*"([A-Za-z_][A-Za-z0-9_]*)"\s+"([^"]*)"')

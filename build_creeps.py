@@ -656,8 +656,21 @@ def save_creeps_html():
         'AbilityCooldown': 'Cooldown', 'AbilityManaCost': 'Mana',
         'AbilityCastRange': 'Cast range', 'AbilityCastPoint': 'Cast point',
         'AbilityDamage': 'Damage', 'AbilityChannelTime': 'Channel',
-        'AbilityDuration': 'Duration',
+        'AbilityDuration': 'Duration', 'AbilityUnitDamageType': 'Damage type',
+        'SpellImmunityType': 'Spell immunity', 'SpellDispellableType': 'Dispellable',
     }
+    # Enum/string fields — values are humanised (no slash/%, just "A → B").
+    ABIL_ENUM_FIELDS = {'AbilityUnitDamageType', 'SpellImmunityType',
+                        'SpellDispellableType'}
+    _ENUM_PREFIXES = ('DAMAGE_TYPE_', 'SPELL_IMMUNITY_', 'SPELL_DISPELLABLE_')
+
+    def _humanize_enum(val):
+        s = str(val)
+        for p in _ENUM_PREFIXES:
+            if s.startswith(p):
+                s = s[len(p):]
+                break
+        return s.replace('_', ' ').title()
 
     def _abil_field_label(fld):
         if fld in ABIL_FIELD_LABEL:
@@ -728,9 +741,14 @@ def save_creeps_html():
                 for fld, val in cur_fields.items():
                     old = prev_fields.get(fld)
                     if old is not None and old != val:
-                        pol = 'lo' if _abil_lower_better(fld) else 'hi'
-                        entries.append((v, dt, 'F', _abil_field_label(fld),
-                                        _slash(old), _slash(val), pol))
+                        if fld in ABIL_ENUM_FIELDS:
+                            entries.append((v, dt, 'F', _abil_field_label(fld),
+                                            _humanize_enum(old),
+                                            _humanize_enum(val), 'hi'))
+                        else:
+                            pol = 'lo' if _abil_lower_better(fld) else 'hi'
+                            entries.append((v, dt, 'F', _abil_field_label(fld),
+                                            _slash(old), _slash(val), pol))
             prev_slug, prev_fields = cur, cur_fields
         return entries
 
