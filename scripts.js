@@ -1007,21 +1007,23 @@
     const pageR  = page.getBoundingClientRect();
     const scrR   = scroller.getBoundingClientRect();
     const nameR  = firstTds[2].getBoundingClientRect();  // right edge of pinned block
-    const headR  = table.tHead.getBoundingClientRect();
+    // Only the column-name row is sticky now (the category row scrolls away),
+    // so dividers offset by the col-row height, not the whole thead.
+    const colRow = table.querySelector('.col-row');
+    const headH  = colRow ? colRow.getBoundingClientRect().height
+                          : table.tHead.getBoundingClientRect().height;
     // Vertical divider: at the right edge of the frozen lvl/unit columns,
-    // starting BELOW the header (so it doesn't cross the column-name row) and
-    // spanning the rest of the visible height.
+    // starting BELOW the sticky column header and spanning the rest of height.
     if (frame) {
       frame.style.left   = (nameR.right - pageR.left) + 'px';
-      frame.style.top    = (scrR.top - pageR.top + headR.height) + 'px';
-      frame.style.height = (scroller.clientHeight - headR.height) + 'px';
+      frame.style.top    = (scrR.top - pageR.top + headH) + 'px';
+      frame.style.height = (scroller.clientHeight - headH) + 'px';
       frame.style.width  = '0px';
     }
-    // Horizontal divider: just under the sticky header, across the visible
-    // width — the outline for the whole header during vertical scroll.
+    // Horizontal divider: just under the sticky column header, across width.
     if (frameTop) {
       frameTop.style.left   = (scrR.left - pageR.left) + 'px';
-      frameTop.style.top    = (scrR.top - pageR.top + headR.height) + 'px';
+      frameTop.style.top    = (scrR.top - pageR.top + headH) + 'px';
       frameTop.style.width  = scroller.clientWidth + 'px';
       frameTop.style.height = '0px';
     }
@@ -1042,7 +1044,9 @@
     const onScrollRaf = () => {
       if (ticking) return;
       ticking = true;
-      requestAnimationFrame(() => { onScroll(); ticking = false; });
+      requestAnimationFrame(() => {
+        try { onScroll(); } finally { ticking = false; }
+      });
     };
     scroller.addEventListener('scroll', onScrollRaf, { passive: true });
     window.addEventListener('resize', onScrollRaf, { passive: true });
