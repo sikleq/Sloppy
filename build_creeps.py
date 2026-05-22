@@ -71,6 +71,8 @@ def save_creeps_html():
                   'AttackDamageMin', 'AttackDamageMax', 'AttackRate',
                   'BaseAttackSpeed', 'AttackRange', 'AttackCapabilities',
                   'AttackAcquisitionRange', 'MovementSpeed',
+                  'AttackAnimationPoint', 'MovementTurnRate',
+                  'ProjectileSpeed', 'BoundsHullName', 'RingRadius',
                   'BountyGoldMin', 'BountyGoldMax', 'BountyXP',
                   'VisionDaytimeRange', 'VisionNighttimeRange',
                   'Ability1', 'Ability2', 'Ability3', 'Ability4', 'Ability5')
@@ -128,6 +130,8 @@ def save_creeps_html():
         'MovementSpeed', 'BountyXP', 'AttackAcquisitionRange', 'AttackRange',
         'AttackDamageMin', 'AttackDamageMax', 'BountyGoldMin', 'BountyGoldMax',
         'VisionDaytimeRange', 'VisionNighttimeRange',
+        'AttackAnimationPoint', 'MovementTurnRate', 'ProjectileSpeed',
+        'BoundsHullName', 'RingRadius',
     )
     import re as _re_hist
     STATS_DIR = _os.path.join(_HERE, "data", "stats")
@@ -371,6 +375,14 @@ def save_creeps_html():
             return _fmt_num(rng)
         return f'Ближняя ({rng})' if rng else ''
 
+    def _hull_label(s):
+        """DOTA_HULL_SIZE_HERO → "Hero". Collision-size category from the
+        BoundsHullName KV value."""
+        s = (s or '').strip()
+        if not s:
+            return ''
+        return s.replace('DOTA_HULL_SIZE_', '').replace('_', ' ').title()
+
     def _row_data(npc_key, createhero):
         """Compute the full set of overlay values for one creep. Returns
         a dict keyed by column id; missing keys render as blank."""
@@ -396,6 +408,11 @@ def save_creeps_html():
         vis_day = npc.get('VisionDaytimeRange', '')
         vis_night = npc.get('VisionNighttimeRange', '')
         aggro = npc.get('AttackAcquisitionRange', '')
+        ap = _safe_float(npc.get('AttackAnimationPoint'))
+        turn_rate = _safe_float(npc.get('MovementTurnRate'))
+        projectile = _safe_int(npc.get('ProjectileSpeed'))
+        bound_radius = _safe_int(npc.get('RingRadius'))
+        collision = _hull_label(npc.get('BoundsHullName', ''))
 
         # Derived
         # Damage Factor formula: (0.06 × armor) / (1 + 0.06 × |armor|).
@@ -450,6 +467,11 @@ def save_creeps_html():
             'attack_type':   _attack_type(npc) if npc else '',
             'vision':        f'{vis_day}/{vis_night}' if vis_day and vis_night else '',
             'aggro':         aggro,
+            'ap':            _fmt_num(ap) if ap else '',
+            'turn_rate':     _fmt_num(turn_rate) if turn_rate else '',
+            'collision_size': collision,
+            'bound_radius':  _fmt_num(bound_radius) if bound_radius else '',
+            'projectile':    _fmt_num(projectile) if projectile else '',
             'ability1':      abilities[0] if len(abilities) > 0 else '',
             'ability2':      abilities[1] if len(abilities) > 1 else '',
             'ability3':      abilities[2] if len(abilities) > 2 else '',
@@ -532,6 +554,12 @@ def save_creeps_html():
         return '{}/{}'.format(_fmt_num(d) if d is not None else '?',
                               _fmt_num(n) if n is not None else '?')
 
+    def _collision_vf(version, npc_key):
+        h = _raw_at('BoundsHullName', version, npc_key)
+        if h is None:
+            return None
+        return _hull_label(h) or None
+
     COL_HIST = {
         'hp':            _raw_vf('StatusHealth'),
         'hp_regen':      _raw_vf('StatusHealthRegen'),
@@ -552,6 +580,11 @@ def save_creeps_html():
         'armor_pct':     _armor_pct_vf,
         't_per_attack':  _t_per_attack_vf,
         'vision':        _vision_vf,
+        'ap':            _raw_vf('AttackAnimationPoint'),
+        'turn_rate':     _raw_vf('MovementTurnRate'),
+        'bound_radius':  _raw_vf('RingRadius'),
+        'projectile':    _raw_vf('ProjectileSpeed'),
+        'collision_size': _collision_vf,
     }
 
     # ---- Read CSV ----
@@ -565,10 +598,8 @@ def save_creeps_html():
         ('name',         'Юнит'),
         ('hp',           'HP'),
         ('hp_regen',     'HP/sec'),
-        # '\n' splits into a main line + a small sub-line in the header,
-        # shrinking these EHP columns (see _label_html).
-        ('ehp_phys',     'EHP\nфиз'),
-        ('ehp_mag',      'EHP\nмаг'),
+        # EHP физ/маг hidden — still computed into row data for the future
+        # extended-columns toggle.
         ('mp',           'MP'),
         ('mp_regen',     'MP/sec'),
         ('armor',        'Броня'),
@@ -577,10 +608,10 @@ def save_creeps_html():
         # Урон (мин)/(макс) hidden — values still pulled into row data for the
         # future extended-columns toggle. Only the computed average is shown.
         ('dmg_avg',      'Атака'),
-        ('as',           'АС'),
+        ('as',           'AS'),
         ('t_per_attack', 't/1 удар'),
         ('bat',          'BAT'),
-        ('ms',           'МС'),
+        ('ms',           'MS'),
         # Золото shows the average; min/max stay in row data for the extended
         # toggle (separate min/max gold columns later).
         ('gold',         'Золото'),
@@ -588,7 +619,13 @@ def save_creeps_html():
         ('attack_range', 'Дальность атаки'),
         ('attack_type',  'Тип атаки'),
         ('vision',       'Обзор'),
-        ('aggro',        'Дальность агра'),
+        # «Дальность агра» (aggro) hidden — kept in row data for the extended
+        # toggle. New movement/projectile columns slot in after Обзор.
+        ('ap',             'AP'),
+        ('turn_rate',      'Turn Rate'),
+        ('collision_size', 'Collision Size'),
+        ('bound_radius',   'Bound Radius'),
+        ('projectile',     'Projectile Speed'),
         ('ability1',     'Способность 1'),
         ('ability2',     'Способность 2'),
         ('ability3',     'Способность 3'),
@@ -601,6 +638,8 @@ def save_creeps_html():
         'as': 38, 't_per_attack': 58, 'bat': 38, 'ms': 38,
         'gold': 56, 'xp': 42, 'attack_range': 110,
         'attack_type': 100, 'vision': 70, 'aggro': 70,
+        'ap': 48, 'turn_rate': 64, 'collision_size': 96,
+        'bound_radius': 88, 'projectile': 100,
         'ability1': 150, 'ability2': 150, 'ability3': 150,
     }
 
@@ -685,7 +724,7 @@ def save_creeps_html():
     # Columns that get a vertical separator on their RIGHT edge — they
     # group the table into logical sections (identity | survivability |
     # offense | economy | utility | abilities).
-    SEP_AFTER = {'lvl', 'name', 'mp_regen', 'bat', 'aggro'}
+    SEP_AFTER = {'lvl', 'name', 'mp_regen', 'bat', 'vision', 'projectile'}
     # Identity columns pinned to the left edge during horizontal scroll
     # (scripts.js computes their cumulative left offsets after layout).
     STICKY_COLS = {'lvl', 'icon', 'name'}

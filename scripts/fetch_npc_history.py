@@ -53,6 +53,8 @@ NPC_FIELDS = (
     "AttackAcquisitionRange", "MovementSpeed", "BountyGoldMin", "BountyGoldMax",
     "BountyXP", "VisionDaytimeRange", "VisionNighttimeRange",
     "CombatClassAttack", "CombatClassDefend", "AttackCapabilities",
+    "AttackAnimationPoint", "MovementTurnRate", "ProjectileSpeed",
+    "BoundsHullName", "RingRadius",
 )
 HEAD_RE = re.compile(
     r'^\s*"(npc_dota_(?:neutral_[a-z0-9_]+'
