@@ -995,10 +995,24 @@
   }
   function hide() { if (tip) tip.classList.remove('is-visible'); }
 
-  cells.forEach(td => {
-    td.addEventListener('mouseenter', () => show(td));
-    td.addEventListener('mouseleave', hide);
-  });
+  // Event delegation (not per-cell binding): cells can be removed/re-inserted
+  // by the ability-merge logic, so listeners bound at load would be lost on
+  // the restored cells. Delegation on the table covers any current cell.
+  const SEL = 'td[data-hist], td[data-name]';
+  const tbl = document.querySelector('.creeps-table');
+  let curTd = null;
+  if (tbl) {
+    tbl.addEventListener('mouseover', e => {
+      const td = e.target.closest(SEL);
+      if (td && td !== curTd) { curTd = td; show(td); }
+    });
+    tbl.addEventListener('mouseout', e => {
+      const td = e.target.closest(SEL);
+      if (!td) return;
+      const to = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(SEL);
+      if (to !== td) { curTd = null; hide(); }
+    });
+  }
   window.addEventListener('scroll', hide, { passive: true });
 })();
 
