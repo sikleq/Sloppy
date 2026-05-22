@@ -656,11 +656,58 @@ def save_creeps_html():
 
     # npc_abilities field → friendly label for the changelog tooltip.
     ABIL_FIELD_LABEL = {
-        'AbilityCooldown': 'Cooldown', 'AbilityManaCost': 'Mana',
-        'AbilityCastRange': 'Cast range', 'AbilityCastPoint': 'Cast point',
-        'AbilityDamage': 'Damage', 'AbilityChannelTime': 'Channel',
-        'AbilityDuration': 'Duration', 'AbilityUnitDamageType': 'Damage type',
-        'SpellImmunityType': 'Spell immunity', 'SpellDispellableType': 'Dispellable',
+        'AbilityCooldown': 'Cooldown', 'AbilityManaCost': 'Manacost',
+        'AbilityCastRange': 'Cast Range', 'AbilityCastPoint': 'Cast Point',
+        'AbilityDamage': 'Damage', 'AbilityChannelTime': 'Channel Time',
+        'AbilityDuration': 'Duration', 'AbilityUnitDamageType': 'Damage Type',
+        'SpellImmunityType': 'Spell Immunity', 'SpellDispellableType': 'Dispellable',
+    }
+    # AbilityValues field (without the av_ prefix) → readable, semantic label.
+    AV_LABEL = {
+        'bonus_magical_armor': 'Magic Resistance',
+        'bonus_magical_armor_creeps': 'Magic Resistance (creeps)',
+        'attackspeed_slow': 'Attack Speed Slow', 'attack_slow_tooltip': 'Attack Speed Slow',
+        'attackspeed_bonus': 'Attack Speed Bonus', 'bonus_attack_speed': 'Attack Speed',
+        'bonus_aspd': 'Attack Speed', 'bonus_movement_speed': 'Move Speed',
+        'movespeed': 'Move Speed', 'movespeed_slow': 'Move Speed Slow',
+        'move_speed_penalty': 'Move Speed Penalty', 'net_speed': 'Net Speed',
+        'damage_per_second': 'Damage / sec', 'cost_per_second': 'Cost / sec',
+        'bonus_hp': 'Bonus HP', 'health': 'Health', 'hp_regen': 'HP Regen',
+        'health_regen': 'HP Regen', 'mana_regen': 'Mana Regen',
+        'armor_bonus': 'Bonus Armor', 'bonus_armor': 'Bonus Armor',
+        'armor_reduction': 'Armor Reduction', 'armor_reduction_pct': 'Armor Reduction %',
+        'crit_chance': 'Crit Chance', 'crit_mult': 'Crit Multiplier',
+        'damage_percent': 'Damage %', 'damage_pct': 'Damage %',
+        'bonus_damage_pct': 'Bonus Damage %', 'bonus_dmg_pct': 'Bonus Damage %',
+        'building_damage_pct': 'Building Damage %', 'damage_percent_loss': 'Damage Loss %',
+        'hero_stun_duration': 'Hero Stun Duration', 'non_hero_stun_duration': 'Creep Stun Duration',
+        'hero_duration': 'Hero Duration', 'non_hero_duration': 'Creep Duration',
+        'heal_amp': 'Heal Amplification', 'heal_pct': 'Heal %', 'lifesteal': 'Lifesteal',
+        'bonus_cdr': 'Cooldown Reduction', 'gpm_aura': 'GPM Aura',
+        'burn_damage': 'Burn Damage', 'burn_interval': 'Burn Interval', 'burn_amount': 'Burn Amount',
+        'regen_reduction': 'Regen Reduction', 'purge_rate': 'Purge Rate',
+        'bonus_outgoing_damage': 'Outgoing Damage', 'damage_absorb': 'Damage Absorb',
+        'damage_reduction': 'Damage Reduction', 'initial_damage': 'Initial Damage',
+        'damage_creeps': 'Damage (creeps)', 'projectile_speed': 'Projectile Speed',
+        'projectile_count': 'Projectile Count', 'projectile_width': 'Projectile Width',
+        'max_targets': 'Max Targets', 'bounces': 'Bounces', 'bounce_range': 'Bounce Range',
+        'bounce_delay': 'Bounce Delay', 'radius': 'Radius', 'radius_start': 'Start Radius',
+        'radius_end': 'End Radius', 'range': 'Range', 'distance': 'Distance',
+        'health_threshold_pct': 'Health Threshold %', 'tick_interval': 'Tick Interval',
+        'linger_duration': 'Linger Duration', 'int_multiplier': 'Int Multiplier',
+        'damage_percent_close': 'Damage % (close)', 'damage_percent_mid': 'Damage % (mid)',
+        'damage_percent_far': 'Damage % (far)', 'range_close': 'Range (close)',
+        'range_mid': 'Range (mid)', 'range_far': 'Range (far)', 'jump_range': 'Jump Range',
+        'jump_delay': 'Jump Delay', 'allow_multiple': 'Allow Multiple',
+        'affected_by_aoe_increase': 'Affected by AoE', 'neutral_shared_cooldown': 'Shared Cooldown',
+        'accuracy': 'Accuracy', 'distance': 'Distance', 'duration': 'Duration', 'damage': 'Damage',
+    }
+    # Token replacements for any av_ field not in AV_LABEL.
+    AV_TOKEN = {
+        'hp': 'HP', 'mp': 'Mana', 'aspd': 'Attack Speed', 'attackspeed': 'Attack Speed',
+        'movespeed': 'Move Speed', 'dmg': 'Damage', 'pct': '%', 'cdr': 'Cooldown Reduction',
+        'gpm': 'GPM', 'aoe': 'AoE', 'int': 'Int', 'str': 'Str', 'agi': 'Agi',
+        'regen': 'Regen', 'pct.': '%',
     }
     # Enum/string fields — values are humanised (no slash/%, just "A → B").
     ABIL_ENUM_FIELDS = {'AbilityUnitDamageType', 'SpellImmunityType',
@@ -679,7 +726,10 @@ def save_creeps_html():
         if fld in ABIL_FIELD_LABEL:
             return ABIL_FIELD_LABEL[fld]
         if fld.startswith('av_'):
-            return fld[3:].replace('_', ' ').capitalize()
+            key = fld[3:]
+            if key in AV_LABEL:
+                return AV_LABEL[key]
+            return ' '.join(AV_TOKEN.get(t, t.capitalize()) for t in key.split('_'))
         return fld
 
     # Fields where a DECREASE is the buff (green), like the changelog l=True.

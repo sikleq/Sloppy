@@ -931,6 +931,7 @@
       if (g && g.patch === ep.patch) g.lines.push(ep.line);
       else groups.push({ patch: ep.patch, date: ep.date, lines: [ep.line] });
     });
+    groups.reverse();  // newest patch on top, oldest at the bottom
     el.innerHTML = groups.map(g =>
       '<div class="stat-chg">' + chgHead(g.patch, g.date)
       + g.lines.map(l => '<div class="stat-chg-line">' + l + '</div>').join('')
@@ -942,7 +943,10 @@
     let left = r.left + r.width / 2 - tr.width / 2;
     left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
     el.style.left = left + 'px';
-    el.style.top = (r.top - tr.height - 8) + 'px';
+    // Prefer above the cell; flip below when it would clip the top of the view.
+    let top = r.top - tr.height - 8;
+    if (top < 8) top = r.bottom + 8;
+    el.style.top = top + 'px';
   }
   function hide() { if (tip) tip.classList.remove('is-visible'); }
 
@@ -1005,11 +1009,12 @@
     const nameR  = firstTds[2].getBoundingClientRect();  // right edge of pinned block
     const headR  = table.tHead.getBoundingClientRect();
     // Vertical divider: at the right edge of the frozen lvl/unit columns,
-    // spanning the visible height. Does NOT enclose the pinned cells.
+    // starting BELOW the header (so it doesn't cross the column-name row) and
+    // spanning the rest of the visible height.
     if (frame) {
       frame.style.left   = (nameR.right - pageR.left) + 'px';
-      frame.style.top    = (scrR.top - pageR.top) + 'px';
-      frame.style.height = scroller.clientHeight + 'px';
+      frame.style.top    = (scrR.top - pageR.top + headR.height) + 'px';
+      frame.style.height = (scroller.clientHeight - headR.height) + 'px';
       frame.style.width  = '0px';
     }
     // Horizontal divider: just under the sticky header, across the visible

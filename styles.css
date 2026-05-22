@@ -2819,12 +2819,12 @@ body.filter-active ul.subnotes { display: none; }
                             hover-zoomed icon (z-index: 9) */
 }
 .sticky-frame {
-  border-left: 1px solid rgba(120, 200, 235, 0.45);
-  box-shadow: 6px 0 12px -3px rgba(0, 0, 0, 0.7);
+  border-left: 2px solid rgba(120, 200, 235, 0.85);
+  box-shadow: 6px 0 12px -2px rgba(0, 0, 0, 0.7);
 }
 .sticky-frame-top {
-  border-top: 1px solid rgba(120, 200, 235, 0.45);
-  box-shadow: 0 6px 12px -3px rgba(0, 0, 0, 0.7);
+  border-top: 2px solid rgba(120, 200, 235, 0.85);
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.7);
 }
 .sticky-frame.visible, .sticky-frame-top.visible { display: block; }
 /* Dedicated icon column — fixed-size portrait, centered. Vertical-align
@@ -2849,8 +2849,10 @@ body.filter-active ul.subnotes { display: none; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 20px;             /* fixed block — every badge is identical size */
+  height: 18px;
+  box-sizing: border-box;
   margin-left: 6px;
-  padding: 1px 4px;
   border-radius: 5px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -2859,10 +2861,11 @@ body.filter-active ul.subnotes { display: none; }
   vertical-align: middle;
 }
 .creeps-table .atk-badge img {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
   display: block;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 .creeps-table .creep-icon-cell img {
   width: 48px;
