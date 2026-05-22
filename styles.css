@@ -2890,6 +2890,44 @@ body.filter-active ul.subnotes { display: none; }
   vertical-align: middle;
   border: 1px solid rgba(170, 220, 240, 0.18);
 }
+/* Autocast marker — animated golden ring + pulsing glow around the ability
+   icon, mirroring the in-game autocast toggle. The wrapper is needed because
+   <img> cannot host ::before / ::after pseudo-elements. */
+.creeps-table .abil-ico-wrap {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 0;
+}
+/* A thin golden "snake" — a short stroke segment that crawls along the icon's
+   rounded-rect frame at constant speed, corners included. The SVG <rect> has
+   pathLength=100, so the dash (snake) + gap sum to 100 and the dashoffset
+   animation loops seamlessly around the perimeter. */
+.creeps-table .autocast-snake {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+}
+.creeps-table .autocast-snake rect {
+  fill: none;
+  stroke: #ffe9a8;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 14 86;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 2px rgba(255, 190, 70, 0.95));
+  animation: autocast-snake 2s linear infinite;
+}
+@keyframes autocast-snake {
+  to { stroke-dashoffset: -100; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .creeps-table .autocast-snake rect { animation: none; }
+}
 /* Ability name header inside the changelog tooltip (centered). */
 .stat-hist-tip .abil-tip-name {
   text-align: center;

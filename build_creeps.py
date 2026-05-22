@@ -350,6 +350,14 @@ def save_creeps_html():
     # is redundant.
     ABILITY_SKIP = {'neutral_upgrade', 'creep_piercing'}
 
+    # Autocast abilities — get the animated golden ring marker on their icon
+    # (mirrors the in-game autocast toggle visual). The data feed carries no
+    # AbilityBehavior/autocast flag, so this list is maintained by hand.
+    # PROTOTYPE: single icon for now. Full set:
+    #   forest_troll_high_priest_heal (Heal), ogre_magi_frost_armor (Ice Armor),
+    #   spawnlord_master_freeze (Petrify).
+    AUTOCAST_ABILITIES = {'forest_troll_high_priest_heal'}
+
     def _ability_dname(slug):
         if not slug or slug in ABILITY_SKIP:
             return ''
@@ -1115,8 +1123,22 @@ def save_creeps_html():
                 return '&nbsp;'
             slug = d.get(k + '_slug', '')
             if _has_abil_icon(slug):
-                return (f'<img class="abil-ico" src="icons/abilities/{slug}.png" '
-                        f'alt="{_esc(v)}" loading="lazy">')
+                img = (f'<img class="abil-ico" src="icons/abilities/{slug}.png" '
+                       f'alt="{_esc(v)}" loading="lazy">')
+                if slug in AUTOCAST_ABILITIES:
+                    # Thin "snake" stroke that crawls along the icon's rounded
+                    # frame at constant speed (incl. corners) — SVG dash offset
+                    # animation. pathLength=100 normalises the perimeter so the
+                    # dash gap loops seamlessly.
+                    snake = (
+                        '<svg class="autocast-snake" viewBox="0 0 28 28" '
+                        'preserveAspectRatio="none" aria-hidden="true">'
+                        '<rect x="1.5" y="1.5" width="25" height="25" '
+                        'rx="4.5" ry="4.5" pathLength="100"></rect></svg>'
+                    )
+                    return (f'<span class="abil-ico-wrap abil-autocast">'
+                            f'{img}{snake}</span>')
+                return img
             return _esc(v)   # no icon on CDN → keep the name text
         return _esc(v) if v else '&nbsp;'
 
