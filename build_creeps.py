@@ -359,6 +359,80 @@ def save_creeps_html():
         'spawnlord_master_freeze',         # Petrify (Prowler Shaman)
     }
 
+    # Camp type(s) per neutral (small / mid / big / ancient) — the in-game
+    # minimap camp marker. Not present in npc_units.txt (it lives in the map's
+    # spawn data), so this mapping is maintained by hand. Keyed by the
+    # createhero shortname (same token as the "-createhero <name>" column).
+    # A creep that spawns in two camp sizes lists both → both icons render.
+    # (User roster terms: medium→mid, large/hard→big.)
+    CREEP_CAMP = {
+        'wildkin':              ['big'],
+        'kobold':               ['small'],
+        'tunneler':             ['small'],
+        'skeleton_warrior':     ['big'],
+        'berserker':            ['small'],
+        'gnoll':                ['small'],
+        'fel':                  ['small'],
+        'harpy':                ['small'],
+        'mauler':               ['mid'],
+        'taskmaster':           ['small'],
+        'priest':               ['small'],
+        'outrunner':            ['mid', 'big'],
+        'tad':                  ['small'],
+        'trickster':            ['mid', 'big'],
+        'wolf':                 ['mid'],
+        'dark_troll':           ['big'],
+        'ghost':                ['small'],
+        'harpy_storm':          ['small'],
+        'drake':                ['ancient'],
+        'prowler_acolyte':      ['ancient'],
+        'neutral_ogre_magi':    ['mid'],
+        'mud':                  ['mid'],
+        'frog':                 ['mid'],
+        'grown_frog':           ['big'],
+        'froglet_mage':         ['mid'],
+        'grown_frog_mage':      ['big'],
+        'champion':             ['big'],
+        'soulstealer':          ['mid', 'big'],
+        'alpha':                ['mid'],
+        'khan':                 ['mid', 'big'],
+        'warrior':              ['big'],
+        'enraged':              ['big'],
+        'pine':                 ['big'],
+        'ancient_frog':         ['ancient'],
+        'rock':                 ['ancient'],
+        'frost':                ['ancient'],
+        'small_thunder_lizard': ['ancient'],
+        'ancient_frog_mage':    ['ancient'],
+        'hellcaller':           ['big'],
+        'dark_troll_warlord':   ['big'],
+        'prowler_shaman':       ['ancient'],
+        'black_dragon':         ['ancient'],
+        'granite':              ['ancient'],
+        'lizard':               ['ancient'],
+        'ice':                  ['ancient'],
+    }
+    CAMP_LABEL = {'small': 'Small camp', 'mid': 'Medium camp',
+                  'big': 'Large camp', 'ancient': 'Ancient camp'}
+
+    # Auras that buff the caster's OWN stats — the creep benefits from its own
+    # aura, so the displayed stat shows "base (with-aura)". Level-1 aura values,
+    # from npc_abilities.json (av_* fields). Keyed by createhero shortname.
+    # op '+' = additive flat, '*' = multiplicative. 'dmg' covers min/max/avg.
+    AURA_SELF = {
+        'hellcaller':           {'hp_regen': ('+', 3)},      # Unholy Aura
+        'skeleton_warrior':     {'dmg': ('+', 2)},           # Rally
+        'taskmaster':           {'ms': ('+', 12)},           # Speed Aura
+        'priest':               {'mp_regen': ('+', 1.75)},   # Mana Aura
+        'outrunner':            {'magres': ('+', 20)},       # Cloak Aura (creep value)
+        'prowler_acolyte':      {'hp_regen': ('+', 9)},      # Spawnlord HP-reg aura
+        'alpha':                {'dmg': ('*', 1.2)},         # Command Aura +20%
+        'enraged':              {'armor': ('+', 3)},         # Toughness Aura
+        'small_thunder_lizard': {'as': ('+', 25)},           # War Drums (atk speed)
+        'black_dragon':         {'armor': ('+', 3)},         # Dragonhide Aura
+        'granite':              {'hp': ('+', 16)},           # Granite Aura
+    }
+
     def _ability_dname(slug):
         if not slug or slug in ABILITY_SKIP:
             return ''
@@ -514,7 +588,7 @@ def save_creeps_html():
             abilities.append((slug, _ability_dname(slug)))
         abilities += [('', '')] * (3 - len(abilities)) if len(abilities) < 3 else []
 
-        return {
+        result = {
             'hp':            _fmt_num(hp) if hp else '',
             # Resolved creeps always show a regen value; "0" when the KV
             # has no StatusHealthRegen (e.g. Skeleton Warrior) instead of
@@ -556,7 +630,35 @@ def save_creeps_html():
             'ability1':      abilities[0][1], 'ability1_slug': abilities[0][0],
             'ability2':      abilities[1][1], 'ability2_slug': abilities[1][0],
             'ability3':      abilities[2][1], 'ability3_slug': abilities[2][0],
+            'camp':          ','.join(CREEP_CAMP.get((createhero or '').strip(), [])),
         }
+
+        # Self-affecting auras: show "base (with-aura)" on the buffed stat.
+        aura = AURA_SELF.get((createhero or '').strip())
+        if aura:
+            def _tot(base, op, val):
+                return base + val if op == '+' else round(base * val)
+            for stat, (op, val) in aura.items():
+                if stat == 'dmg':
+                    for dk, dv in (('dmg_min', dmg_min), ('dmg_max', dmg_max),
+                                   ('dmg_avg', dmg_avg)):
+                        if dv:
+                            result[dk] = f'{_fmt_num(dv)} ({_fmt_num(_tot(dv, op, val))})'
+                elif stat == 'hp_regen' and hp_regen:
+                    result['hp_regen'] = f'+{_fmt_num(hp_regen)} ({_fmt_num(_tot(hp_regen, op, val))})'
+                elif stat == 'mp_regen' and mp_regen:
+                    result['mp_regen'] = f'+{_fmt_num(mp_regen)} ({_fmt_num(_tot(mp_regen, op, val))})'
+                elif stat == 'magres':
+                    result['magres'] = f'{int(magres)}% ({int(_tot(magres, op, val))}%)'
+                elif stat == 'armor':
+                    result['armor'] = f'{_fmt_num(armor)} ({_fmt_num(_tot(armor, op, val))})'
+                elif stat == 'as' and ats:
+                    result['as'] = f'{_fmt_num(ats)} ({_fmt_num(_tot(ats, op, val))})'
+                elif stat == 'ms' and ms:
+                    result['ms'] = f'{_fmt_num(ms)} ({_fmt_num(_tot(ms, op, val))})'
+                elif stat == 'hp' and hp:
+                    result['hp'] = f'{_fmt_num(hp)} ({_fmt_num(_tot(hp, op, val))})'
+        return result
 
     def _resolve(createhero):
         n = (createhero or '').strip()
@@ -919,6 +1021,7 @@ def save_creeps_html():
             ('xp',           'XP',               'std'),
         ]),
         ('Other', [
+            ('camp',         'Camp',             'std'),
             ('ms',           'Movespeed',        'std'),
             ('vision',       'Vision',           'std'),
             ('aggro',        'Acquisition Range', 'exp'),
@@ -1026,6 +1129,17 @@ def save_creeps_html():
 
     # ---- HTML emission ----
     nav = _site.render_top_nav('creeps', _latest_href(), patch_context=False)
+
+    def _subnav(active):
+        """Secondary tab strip under the main nav, switching between the
+        Creeps Table and its Unit Abilities companion page."""
+        items = [('creeps.html', 'Neutral Creeps', 'creeps'),
+                 ('unit_abilities.html', 'Unit Abilities', 'abilities')]
+        pills = ''.join(
+            f'<a class="creeps-subtab{" active" if active == key else ""}" '
+            f'href="{href}">{label}</a>'
+            for href, label, key in items)
+        return f'<div class="creeps-subnav">{pills}</div>'
     # No colgroup: table-layout: auto lets the browser size each column
     # to fit content (and each header) on one line. Headers and cells
     # are explicitly centred via CSS so the auto-width math doesn't have
@@ -1034,7 +1148,7 @@ def save_creeps_html():
     # group the table into logical sections (identity | survivability |
     # offense | economy | utility | abilities).
     # Left-border on the first (always-visible) column of each super-category.
-    SEP_AFTER = {'hp', 'dmg_avg', 'gold', 'ms', 'ability1'}
+    SEP_AFTER = {'hp', 'dmg_avg', 'gold', 'camp', 'ability1'}
     # Identity columns pinned to the left edge during horizontal scroll
     # (scripts.js computes their cumulative left offsets after layout).
     STICKY_COLS = {'lvl', 'icon', 'name'}
@@ -1112,13 +1226,24 @@ def save_creeps_html():
         """Inner HTML for a data cell. Attack Range → number + glass badge.
         Ability cells → the ability ICON (changelog style, smaller); the name
         is shown on hover. Falls back to the name text when no icon exists."""
+        if k == 'camp':
+            if not v:
+                return '&nbsp;'
+            imgs = []
+            for t in v.split(','):
+                label = CAMP_LABEL.get(t, t)
+                imgs.append(
+                    f'<img class="camp-ico" src="icons/camps/creepcamp_{t}.png" '
+                    f'alt="{_esc(label)}" title="{_esc(label)}" loading="lazy">')
+            return ''.join(imgs)
         if k == 'attack_range' and v:
             typ = 'ranged' if d.get('attack_range_ranged') else 'melee'
             # Fixed-width number keeps every badge at the same x position.
+            tip = 'Ranged' if typ == 'ranged' else 'Melee'
             return (f'<span class="atk-num">{_esc(v)}</span>'
-                    f'<span class="atk-badge atk-{typ}">'
-                    f'<img src="icons/ui/atk_{typ}.png" alt="{typ}" '
-                    f'loading="lazy"></span>')
+                    f'<span class="atk-badge atk-{typ}" title="{tip}">'
+                    f'<img src="icons/ui/atk_{typ}.png" alt="{tip}" '
+                    f'title="{tip}" loading="lazy"></span>')
         if k in ('ability1', 'ability2', 'ability3'):
             if not v:
                 return '&nbsp;'
@@ -1153,10 +1278,18 @@ def save_creeps_html():
                         f'{_r} class="ac-pollen2"></rect>'
                         f'{_r} class="ac-pollen3"></rect></svg>'
                     )
-                    return (f'<span class="abil-ico-wrap abil-autocast">'
-                            f'{img}{snake}</span>')
-                return img
-            return _esc(v)   # no icon on CDN → keep the name text
+                    inner = (f'<span class="abil-ico-wrap abil-autocast">'
+                             f'{img}{snake}</span>')
+                else:
+                    inner = img
+            else:
+                inner = _esc(v)   # no icon on CDN → keep the name text
+            # Clicking an ability jumps to its (unit, ability) row on the Unit
+            # Abilities page — anchor is createhero-slug for per-unit uniqueness.
+            ch = (d.get('createhero') or '').strip()
+            return (f'<a class="abil-link" '
+                    f'href="unit_abilities.html#{ch}-{slug}">{inner}</a>'
+                    if slug else inner)
         return _esc(v) if v else '&nbsp;'
 
     body_parts = []
@@ -1230,6 +1363,7 @@ def save_creeps_html():
         '</head>\n'
         '<body>\n'
         f'{nav}\n'
+        f'{_subnav("creeps")}\n'
         '<div class="container creeps-page">\n'
         # View toggle: Standard (default) hides the Expanded-only columns.
         # Styled like the calendar mode-select.
@@ -1258,7 +1392,325 @@ def save_creeps_html():
     )
     with open('creeps.html', 'w', encoding='utf-8') as f:
         f.write(html)
-    print(f"  → creeps.html: {len(html):,} bytes")
+    print(f"  -> creeps.html: {len(html):,} bytes")
+
+    # ---- Unit Abilities companion page ----
+    # One row per (creep, ability), mirroring the Creeps Table's Lvl + Unit
+    # identity columns (Unit shows just the hover-zoom icon). Property columns
+    # come from the CURRENT patch's npc_abilities.json (av_* + standard KV
+    # fields) so a patch that changes an ability updates here automatically.
+    # Effect / Effect 2 / Effect 3 and Stackable aren't present in our data
+    # files, so they render blank (would need a manual/external source).
+    CUR_VER = '7.41c'
+    cur_ab = _abil_by_patch.get(CUR_VER, {})
+    DMG_TYPE = {'DAMAGE_TYPE_MAGICAL': 'Magical', 'DAMAGE_TYPE_PHYSICAL': 'Physical',
+                'DAMAGE_TYPE_PURE': 'Pure', 'DAMAGE_TYPE_HP_REMOVAL': 'HP Removal'}
+    DISPEL = {'SPELL_DISPELLABLE_YES': 'Yes', 'SPELL_DISPELLABLE_YES_STRONG': 'Strong only',
+              'SPELL_DISPELLABLE_NO': 'No'}
+    # Aura Stack column: which auras stack with another copy of the same aura.
+    # Only these stack (green check); other auras don't (red x); non-auras get
+    # a dash. Rally has no 'aura' in its slug but behaves as a stacking aura.
+    AURA_STACK_YES = {'black_dragon_dragonhide_aura', 'hill_troll_rally'}
+    # Manual dispellable values for abilities whose KV lacks SpellDispellableType
+    # (dispellability lives in their modifier/code). User-supplied.
+    DISPEL_MANUAL = {
+        'berserker_troll_break': 'Yes',        # Break
+        'fel_beast_haunt': 'Yes',              # Vex
+        'dark_troll_warlord_ensnare': 'Yes',   # Ensnare
+        'ogre_magi_frost_armor': 'Yes',        # Ice Armor
+        'furbolg_enrage_attack_speed': 'Yes',  # Death Throe: Rush
+        'furbolg_enrage_damage': 'Yes',        # Death Throe: Power
+        'warpine_raider_seed_shot': 'Yes',     # Seed Shot
+        'spawnlord_master_freeze': 'Yes',      # Petrify
+        'kobold_disarm': 'Yes',                # Steal Weapon
+        'giant_wolf_intimidate': 'Yes',        # Intimidate
+        'harpy_scout_take_off': 'No',          # Take Off
+        'black_dragon_fireball': 'No',         # Fireball
+    }
+    # Single merged Type column — fully hand-curated (replaces the old Type +
+    # Damage Type pair). Keyed by ability slug; anything not listed → dash.
+    TYPE_MANUAL = {
+        'enraged_wildkin_tornado': 'Active, Magic Damage',
+        'kobold_tunneler_prospecting': 'Passive, Buff Aura',
+        'kobold_disarm': 'Passive, Debuff',
+        'hill_troll_rally': 'Passive, Buff Aura',
+        'berserker_troll_break': 'Passive, Debuff',
+        'gnoll_assassin_envenomed_weapon': 'Passive, HP Removal Damage',
+        'fel_beast_haunt': 'Active, Debuff',
+        'ogre_bruiser_ogre_smash': 'Active, Magic Damage',
+        'kobold_taskmaster_speed_aura': 'Passive, Buff Aura',
+        'forest_troll_high_priest_heal_amp_aura': 'Passive, Buff Aura',
+        'mudgolem_cloak_aura': 'Passive, Buff Aura',
+        'frogmen_riverborn_aura': 'Passive, Buff Aura',
+        'giant_wolf_intimidate': 'Active, Debuff',
+        'dark_troll_warlord_ensnare': 'Active, Debuff',
+        'ghost_frost_attack': 'Passive, Debuff',
+        'harpy_storm_chain_lightning': 'Active, Magic Damage',
+        'black_drake_magic_amplification_aura': 'Passive, Debuff Aura',
+        'spawnlord_aura': 'Passive, Buff Aura',
+        'ogre_magi_frost_armor': 'Active, Buff',
+        'mud_golem_hurl_boulder': 'Active, Magic Damage',
+        'frogmen_arm_of_the_deep': 'Active, Magic Damage',
+        'frogmen_tendrils_of_the_deep': 'Active, Magic Damage',
+        'frogmen_water_bubble_small': 'Active, Buff',
+        'frogmen_water_bubble_medium': 'Active, Buff',
+        'frogmen_water_bubble_large': 'Active, Buff',
+        'centaur_khan_endurance_aura': 'Passive, Buff Aura',
+        'furbolg_enrage_attack_speed': 'Passive, Buff',
+        'satyr_soulstealer_mana_burn': 'Active, Magic Damage',
+        'forest_troll_high_priest_mana_aura': 'Passive, Buff Aura',
+        'alpha_wolf_critical_strike': 'Passive, Physical Damage',
+        'alpha_wolf_command_aura': 'Passive, Buff Aura',
+        'centaur_khan_war_stomp': 'Active, Magic Damage',
+        'polar_furbolg_ursa_warrior_thunder_clap': 'Active, Magic Damage',
+        'furbolg_enrage_damage': 'Passive, Buff',
+        'enraged_wildkin_toughness_aura': 'Passive, Buff Aura',
+        'warpine_raider_seed_shot': 'Active, Magic Damage',
+        'frogmen_congregation_of_the_deep': 'Active, Magic Damage',
+        'ancient_rock_golem_weakening_aura': 'Passive, Debuff Aura',
+        'frostbitten_golem_time_warp_aura': 'Passive, Buff Aura',
+        'big_thunder_lizard_wardrums_aura': 'Passive, Buff Aura',
+        'satyr_hellcaller_shockwave': 'Active, Magic Damage',
+        'satyr_hellcaller_unholy_aura': 'Passive, Buff Aura',
+        'spawnlord_master_stomp': 'Active, Physical Damage',
+        'spawnlord_master_freeze': 'Active, Physical Damage',
+        'black_dragon_fireball': 'Active, Magic Damage',
+        'black_dragon_splash_attack': 'Passive, Physical Damage',
+        'black_dragon_dragonhide_aura': 'Passive, Buff Aura',
+        'granite_golem_hp_aura': 'Passive, Buff Aura',
+        'big_thunder_lizard_slam': 'Active, Magic Damage',
+        'big_thunder_lizard_frenzy': 'Active, Buff',
+        'ice_shaman_incendiary_bomb': 'Active, Magic Damage',
+    }
+    # (legacy) Damage Type curation — no longer rendered as its own column.
+    DMGTYPE_MANUAL = {
+        'gnoll_assassin_envenomed_weapon': 'HP Removal',
+        'spawnlord_master_stomp': 'Physical',      # Desecrate
+        'spawnlord_master_freeze': 'Physical',     # Petrify
+        'black_dragon_splash_attack': 'Physical',
+        'alpha_wolf_critical_strike': 'Physical',
+        'enraged_wildkin_tornado': 'Magical',
+        'ogre_bruiser_ogre_smash': 'Magical',
+        'harpy_storm_chain_lightning': 'Magical',
+        'mud_golem_hurl_boulder': 'Magical',
+        'frogmen_arm_of_the_deep': 'Magical',
+        'frogmen_tendrils_of_the_deep': 'Magical',
+        'satyr_soulstealer_mana_burn': 'Magical',
+        'centaur_khan_war_stomp': 'Magical',
+        'polar_furbolg_ursa_warrior_thunder_clap': 'Magical',
+        'warpine_raider_seed_shot': 'Magical',
+        'frogmen_congregation_of_the_deep': 'Magical',
+        'satyr_hellcaller_shockwave': 'Magical',
+        'black_dragon_fireball': 'Magical',
+        'big_thunder_lizard_slam': 'Magical',
+        'ice_shaman_incendiary_bomb': 'Magical',
+    }
+
+    def _f1(val):
+        s = str(val).strip()
+        return s.split()[0] if s else ''
+
+    def _prog(val):
+        """Full per-level progression as '40/36/32/26'; trims trailing .0."""
+        out = []
+        for t in str(val).split():
+            try:
+                f = float(t)
+                out.append(str(int(f)) if f == int(f) else str(f))
+            except ValueError:
+                out.append(t)
+        return '/'.join(out)
+
+    # Manual columns not present in our data files (effect text + aura
+    # stackability). Filled by hand; keyed by ability slug. Anything here
+    # overrides the auto-derived blanks.
+    ABIL_MANUAL = {
+        # 'satyr_hellcaller_unholy_aura': {
+        #     'effect': '...', 'effect2': '...', 'stackable': 'No'},
+    }
+
+    def _abil_props(slug):
+        a = cur_ab.get(slug, {})
+        g = lambda k: a.get(k, '')
+
+        def _posnum(x):
+            try:
+                return float(_f1(x)) > 0
+            except Exception:
+                return False
+        cd, mc = g('AbilityCooldown'), g('AbilityManaCost')
+        # "Aura" is pulled out of the Type text into its own column.
+        t_raw = TYPE_MANUAL.get(slug, '')
+        is_aura = 'Aura' in t_raw
+        typ = t_raw.replace(' Aura', '')
+        as_fields = (('av_speed_bonus', '+{}'), ('av_bonus_attack_speed', '+{}'),
+                     ('av_bonus_aspd', '+{}'), ('av_attackspeed_bonus', '+{}'),
+                     ('av_attackspeed_slow', '{}'))
+        ms_fields = (('av_bonus_movement_speed', '+{}'), ('av_movespeed_slow', '{}'),
+                     ('av_move_speed_penalty', '{}'))
+        as_eff = ' '.join(lbl.format(_prog(g(k))) for k, lbl in as_fields if g(k))
+        ms_eff = ' '.join(lbl.format(_prog(g(k))) for k, lbl in ms_fields if g(k))
+        leveled = any(len(str(v).split()) > 1 for v in a.values())
+        if slug in AURA_STACK_YES:
+            stack = 'Yes'
+        elif 'aura' in slug:
+            stack = 'No'
+        else:
+            stack = ''
+        props = {
+            'type': typ,
+            'aura': 'Yes' if is_aura else 'No',
+            'dmg_type': DMGTYPE_MANUAL.get(slug, ''),
+            'damage': _prog(g('av_damage') or g('AbilityDamage')),
+            'aoe': _prog(g('av_radius')),
+            'manacost': _prog(mc),
+            'cooldown': _prog(cd),
+            'duration': _prog(g('av_duration') or g('AbilityDuration')
+                              or g('av_hero_duration')),
+            'cast_range': _prog(g('AbilityCastRange')),
+            'as_effect': as_eff,
+            'ms_effect': ms_eff,
+            'effect': '', 'effect2': '', 'effect3': '',
+            'dispel': DISPEL_MANUAL.get(slug) or DISPEL.get(g('SpellDispellableType'), ''),
+            'stackable': stack,
+            'lvl_up': 'Yes' if leveled else 'No',
+        }
+        props.update(ABIL_MANUAL.get(slug, {}))
+        return props
+
+    UA_COLS = [
+        ('lvl', 'Lvl'), ('unit', 'Unit'), ('ability', 'Ability'),
+        ('type', 'Type'), ('aura', 'Aura'), ('damage', 'Damage'),
+        ('manacost', 'Manacost'), ('cooldown', 'Cooldown'),
+        ('duration', 'Duration'), ('cast_range', 'Cast Range'),
+        ('aoe', 'Radius'), ('stackable', 'Aura Stack'),
+        ('dispel', 'Dispellable'), ('as_effect', 'AS Effect'),
+        ('ms_effect', 'MS Effect'),
+    ]
+    UA_STICKY = {'lvl', 'unit', 'ability'}
+    # Vertical section dividers (left border) after Ability, Type and Damage.
+    UA_SEP = {'type', 'aura', 'manacost'}
+    PROP_COLS = [k for k, _ in UA_COLS
+                 if k not in ('lvl', 'unit', 'ability')]
+
+    ua_thead = []
+    for idx, (k, label) in enumerate(UA_COLS):
+        cls = (f'ua-{k}' + (' sticky-col' if k in UA_STICKY else '')
+               + (' col-sep' if k in UA_SEP else ''))
+        ua_thead.append(
+            f'<th class="{cls} sortable" data-col="{k}" data-idx="{idx}">'
+            f'<span class="th-label">{label}</span>'
+            f'<span class="sort-ind"></span></th>')
+    ua_head_html = ''.join(ua_thead)
+
+    DMG_TYPE_CLS = {'Magical': 'dt-magical', 'Physical': 'dt-physical',
+                    'HP Removal': 'dt-hpremoval', 'Pure': 'dt-pure'}
+
+    def _prop_cell(pk, val):
+        # Type → colour-coded text. Damage Type → tinted cell (dash if none).
+        # Stackable / Dispellable → glyph icons.
+        sep = ' col-sep' if pk in UA_SEP else ''
+        if pk == 'type':
+            if not val:
+                return f'<td class="ua-type{sep}"><span class="ua-dash">—</span></td>'
+            low = val.lower()
+            # Colour by effect: any Damage → red/bordeaux, Debuff → dim purple,
+            # Buff → green. (check 'debuff' before 'buff' — substring).
+            if 'damage' in low:
+                cat = 'ua-type-damage'
+            elif 'debuff' in low:
+                cat = 'ua-type-debuff'
+            elif 'buff' in low:
+                cat = 'ua-type-buff'
+            else:
+                cat = ''
+            return f'<td class="ua-type {cat}{sep}">{_esc(val)}</td>'
+        if pk == 'aura':
+            if val == 'Yes':
+                g, rank = '<span class="ua-yn ua-yn-yes">yes</span>', 2
+            else:
+                g, rank = '<span class="ua-yn ua-yn-no">no</span>', 1
+            return f'<td class="ua-aura{sep}" data-sort="{rank}">{g}</td>'
+        # Coloured yes/no text. Sort rank: dash (0) < no (1) < yes (2).
+        _YES = '<span class="ua-yn ua-yn-yes">yes</span>'
+        _NO = '<span class="ua-yn ua-yn-no">no</span>'
+        if pk == 'stackable':
+            if val == 'Yes':
+                g, rank = _YES, 2
+            elif val == 'No':
+                g, rank = _NO, 1
+            else:
+                g, rank = '<span class="ua-dash">—</span>', 0
+            return f'<td class="ua-stackable{sep}" data-sort="{rank}">{g}</td>'
+        if pk == 'dispel':
+            if val == 'Yes':
+                g, rank = '<span class="ua-yn ua-yn-yes" title="Any dispel">yes</span>', 2
+            elif val == 'Strong only':
+                g, rank = ('<span class="ua-yn ua-yn-strong" '
+                           'title="Strong Dispel only">yes</span>', 2)
+            elif val == 'No':
+                g, rank = _NO, 1
+            else:
+                g, rank = '<span class="ua-dash">—</span>', 0
+            return f'<td class="ua-dispel{sep}" data-sort="{rank}">{g}</td>'
+        return f'<td class="ua-{pk}{sep}">{_esc(val) or "&nbsp;"}</td>'
+
+    ua_rows = []
+    for row in rendered:
+        d = row['data']
+        lvl = row.get('level', '')
+        ch = (d.get('createhero') or '').strip()
+        icon = d.get('icon')
+        unit_img = (
+            f'<img class="creep-copy" src="{_esc(icon)}" alt="" loading="lazy" '
+            f'onerror="this.style.visibility=\'hidden\'">' if icon else '')
+        slugs = [(kk, d.get(kk + '_slug', ''), d.get(kk, ''))
+                 for kk in ('ability1', 'ability2', 'ability3')
+                 if d.get(kk + '_slug', '')]
+        for kk, slug, name in slugs:
+            p = _abil_props(slug)
+            aico = (f'<img class="abil-ico" src="icons/abilities/{slug}.png" '
+                    f'alt="{_esc(name)}" loading="lazy">'
+                    if _has_abil_icon(slug) else '')
+            # Every ability row carries its own Lvl + Unit cells (no rowspan):
+            # the table is sortable, and sorting reorders rows, which would
+            # tear a rowspanned group apart and dump continuation cells into
+            # the wrong columns. Self-contained rows always stay aligned.
+            cells = [
+                f'<td class="ua-lvl lvl-cell sticky-col" '
+                f'data-lvl="{_esc(lvl)}">{_esc(lvl)}</td>',
+                f'<td class="ua-unit creep-icon-cell sticky-col" '
+                f'data-sort="{_esc(d.get("name", ""))}">{unit_img}</td>',
+                f'<td class="ua-ability sticky-col"><span class="ua-ability-inner">'
+                f'{aico}<span class="ua-ability-name">{_esc(name)}</span></span></td>',
+            ]
+            for pk in PROP_COLS:
+                cells.append(_prop_cell(pk, p[pk]))
+            ua_rows.append(
+                f'<tr id="{_esc(ch)}-{slug}" data-unit="{_esc(ch)}">'
+                f'{"".join(cells)}</tr>')
+
+    ua_html = (
+        '<!DOCTYPE html>\n<html lang="ru">\n<head>\n<meta charset="UTF-8">\n'
+        '<title>Sloppy - Unit Abilities</title>\n'
+        f'<link rel="stylesheet" href="styles.css?v={ASSET_VERSION}">\n'
+        '</head>\n<body>\n'
+        f'{nav}\n'
+        f'{_subnav("abilities")}\n'
+        '<div class="container creeps-page">\n'
+        '<div class="sticky-frame" aria-hidden="true"></div>\n'
+        '<div class="sticky-frame-top" aria-hidden="true"></div>\n'
+        '<div class="creeps-scroll">\n'
+        '<table class="creeps-table unit-abilities-table">\n'
+        f'<thead><tr class="col-row">{ua_head_html}</tr></thead>\n'
+        f'<tbody>\n{chr(10).join(ua_rows)}\n</tbody>\n'
+        '</table>\n</div>\n</div>\n'
+        f'<script src="scripts.js?v={ASSET_VERSION}"></script>\n'
+        '</body>\n</html>\n'
+    )
+    with open('unit_abilities.html', 'w', encoding='utf-8') as f:
+        f.write(ua_html)
+    print(f"  -> unit_abilities.html: {len(ua_html):,} bytes")
 
 if __name__ == "__main__":
     save_creeps_html()

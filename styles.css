@@ -2754,8 +2754,15 @@ body.filter-active ul.subnotes { display: none; }
      height and the PAGE scrolls vertically (no inner vertical scrollbar, no
      abrupt bottom clip). overflow-x:auto implies overflow-y:auto, but with no
      height limit nothing overflows vertically so no vertical bar appears. */
-  overflow-x: auto;
+  /* The table is wider than the viewport (horizontal scroll needed), and a
+     horizontal-scroll container unavoidably becomes a vertical scroll
+     container too — which broke the page wheel and the sticky header. So make
+     THIS region the scroller: a capped height with its own scrollbars. The
+     sticky <thead> then pins reliably to the top of this box, horizontal
+     scroll is contained, and the mouse wheel scrolls the table vertically. */
+  overflow: auto;
   width: 100%;
+  max-height: calc(100vh - 150px);
 }
 .creeps-table {
   /* width:max-content + min-width:100% = stretch evenly to fill the container
@@ -2882,6 +2889,165 @@ body.filter-active ul.subnotes { display: none; }
   display: block;
   opacity: 0.9;
 }
+/* Secondary tab strip under the main nav (Creeps Table | Unit Abilities). */
+.creeps-subnav {
+  display: flex;
+  gap: 6px;
+  padding: 10px 20px 0;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.creeps-subnav .creeps-subtab {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9fb0c0;
+  text-decoration: none;
+  padding: 5px 12px;
+  border-radius: 6px 6px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.creeps-subnav .creeps-subtab:hover { color: #e6edf3; background: #1d2530; }
+.creeps-subnav .creeps-subtab.active {
+  color: #e6edf3;
+  background: #11161d;
+  border-color: rgba(170, 220, 240, 0.18);
+}
+/* Ability-icon link on the Creeps Table — no underline, inherits layout. */
+.creeps-table .abil-link {
+  text-decoration: none;
+  display: inline-block;
+  line-height: 0;
+}
+/* Unit Abilities page table — reuses .creeps-table sticky/scroll machinery. */
+.unit-abilities-table .ua-ability { text-align: left; }
+.unit-abilities-table .ua-ability-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;            /* room so the hover-zoomed icon doesn't cover the name */
+  white-space: nowrap;
+}
+.unit-abilities-table .ua-ability-name { font-weight: 600; color: #e6edf3; }
+/* Type — colour-coded text. */
+.unit-abilities-table .ua-type-active  { color: #6f9fd8; }   /* dim blue */
+.unit-abilities-table .ua-type-passive { color: #a98cd0; }   /* dim purple */
+.unit-abilities-table .ua-type-aura    { color: #c9a227; }   /* dark gold */
+/* Damage Type — tinted cell. */
+.unit-abilities-table td.dt-magical   { background: rgba(70, 130, 200, 0.20); }
+.unit-abilities-table td.dt-physical  { background: rgba(150, 45, 45, 0.22); }
+.unit-abilities-table td.dt-hpremoval { background: rgba(190, 160, 45, 0.20); }
+.unit-abilities-table td.dt-pure      { background: rgba(200, 200, 210, 0.10); }
+/* Flag glyphs (Stackable / Dispellable) — colours scoped to .ua-flag so the
+   column headers (th.ua-dispel etc.) stay default-coloured. */
+.unit-abilities-table .ua-flag { font-size: 15px; font-weight: 700; line-height: 1; display: inline-block; }
+.unit-abilities-table .ua-flag.ua-yes  { color: #56d364; }            /* green check */
+.unit-abilities-table .ua-flag.ua-no   { color: #f85149; }            /* red x */
+.unit-abilities-table .ua-flag.ua-dispel        { color: #e3c14a; text-shadow: 0 0 4px rgba(227,193,74,0.6); }  /* yellow star */
+.unit-abilities-table .ua-flag.ua-dispel-strong { color: #f85149; text-shadow: 0 0 4px rgba(248,81,73,0.55); } /* red star */
+/* Not-dispellable — hollow (outline) star, same shape/size as the others. */
+.unit-abilities-table .ua-flag.ua-dispel-no {
+  color: transparent;
+  -webkit-text-stroke: 1.1px #7d828b;
+  text-stroke: 1.1px #7d828b;
+}
+/* Aura Stack red-x glyph — small. */
+.unit-abilities-table .ua-stack-glyph { font-size: 8px; }
+/* Cell dashes — half size. */
+.unit-abilities-table .ua-dash { color: #6e7681; font-size: 0.5em; }
+/* "Ability" header centred; Type values left-aligned so the words line up. */
+.unit-abilities-table th.ua-ability { text-align: center; }
+.unit-abilities-table th.ua-type,
+.unit-abilities-table td.ua-type {
+  white-space: nowrap;
+  width: 130px;            /* even, consistent column width */
+}
+/* Type cell fill by effect: Damage → bordeaux/red, Buff → green, Debuff → dim purple. */
+.unit-abilities-table td.ua-type-damage { background: rgba(170, 55, 50, 0.22); }
+.unit-abilities-table td.ua-type-buff   { background: rgba(80, 175, 95, 0.20); }
+.unit-abilities-table td.ua-type-debuff { background: rgba(150, 95, 185, 0.18); }
+/* Coloured yes/no text for Aura, Aura Stack, Dispellable. */
+.unit-abilities-table .ua-yn { font-weight: 600; font-size: 11px; }
+.unit-abilities-table .ua-yn-yes    { color: #6aa775; }   /* muted green */
+.unit-abilities-table .ua-yn-no     { color: #c97f78; }   /* muted red */
+.unit-abilities-table .ua-yn-strong { color: #c4ad5e; }   /* muted yellow (strong dispel) */
+/* Continuation rows of a multi-ability unit: no top border so the Lvl + Unit
+   cells read as one merged cell (icon shown only on the first row). */
+.unit-abilities-table td.ua-merge { border-top: none; }
+/* Raise the hovered sticky identity cell above the sticky header so its
+   zoomed icon isn't covered/clipped by neighbouring rows or the header. */
+.creeps-table .creep-icon-cell:hover,
+.unit-abilities-table td.ua-ability:hover { z-index: 40; }
+.unit-abilities-table td.ua-effect,
+.unit-abilities-table td.ua-effect2,
+.unit-abilities-table td.ua-effect3,
+.unit-abilities-table td.ua-as_effect,
+.unit-abilities-table td.ua-ms_effect { white-space: nowrap; color: #9fb0c0; }
+/* Aura Stack "yes" — green rounded diamond made of stacked tiles. The wrapper
+   is NOT rotated and carries a screen-space top-fade mask, so the upper part
+   of the icon fades out (weaker colour). ::after = front tile, ::before =
+   tile behind/above (the "multiple levels" look). */
+.unit-abilities-table .ua-stack-yes {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 18px;
+  vertical-align: middle;
+  -webkit-mask: linear-gradient(to top, #000 70%, rgba(0, 0, 0, 0.55) 100%);
+          mask: linear-gradient(to top, #000 70%, rgba(0, 0, 0, 0.55) 100%);
+}
+.unit-abilities-table .ua-stack-yes::before,
+.unit-abilities-table .ua-stack-yes::after,
+.unit-abilities-table .ua-stack-yes > i {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  left: 3px;
+  border-radius: 3px;
+  transform: rotate(45deg);
+  /* dark outer outline separates the overlapping tiles clearly */
+  box-shadow: 0 0 0 1px rgba(8, 14, 10, 0.9);
+}
+/* Painting order: ::before (bottom) → <i> → ::after (top). So ::after is the
+   FRONT tile (lowest, brightest), <i> the middle, ::before the back (highest,
+   dimmest) — each tile sits behind and a little above the one in front. */
+.unit-abilities-table .ua-stack-yes::after {  /* front tile */
+  top: 6px;
+  background: #5fe06d;
+}
+.unit-abilities-table .ua-stack-yes > i {     /* middle tile */
+  top: 3px;
+  background: #45a851;
+}
+.unit-abilities-table .ua-stack-yes::before { /* back tile (dimmest) */
+  top: 0;
+  background: #2c6f3a;
+}
+/* Unit Abilities: duplicate (same-unit continuation) rows hide the repeated
+   icon and drop the top border so the unit's rows read as one block. */
+.unit-abilities-table tr.ua-dup .ua-unit img { visibility: hidden; }
+/* Highlight the row jumped to from an ability-icon link: a strong flash that
+   gradually fades and settles at 10% opacity (stays marked). */
+.unit-abilities-table tr:target { box-shadow: inset 3px 0 0 #d2af5f; }
+.unit-abilities-table tr:target td {
+  animation: ua-flash 2.6s ease-out forwards;
+}
+@keyframes ua-flash {
+  0%   { background: rgba(210, 175, 95, 0.5); }
+  100% { background: rgba(210, 175, 95, 0.1); }
+}
+/* Camp-type marker (minimap creep-camp glyph: small/mid/big/ancient). */
+.creeps-table .camp-ico {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  vertical-align: middle;
+  max-width: none;
+}
+/* Keep both glyphs of a dual-camp creep on one line. */
+.creeps-table td.col-camp { white-space: nowrap; }
+.creeps-table .camp-ico + .camp-ico { margin-left: 2px; }
 /* Ability cell icon — changelog style (45px there), smaller here. */
 .creeps-table .abil-ico {
   width: 26px;
@@ -2900,7 +3066,8 @@ body.filter-active ul.subnotes { display: none; }
 .creeps-table .abil-ico:hover {
   transform: scale(1.8);
   position: relative;
-  z-index: 4;
+  z-index: 30;            /* above the sticky header (z 5/6) and neighbours */
+  background: #0e1217;    /* opaque so underlying text doesn't show through */
   box-shadow:
     0 3px 8px rgba(0, 0, 0, 0.6),
     0 0 0 1px rgba(170, 220, 240, 0.4);
@@ -2920,7 +3087,7 @@ body.filter-active ul.subnotes { display: none; }
    suppress the inner img's own :hover scale so it doesn't compound. */
 .creeps-table .abil-ico-wrap:hover {
   transform: scale(1.8);
-  z-index: 4;
+  z-index: 30;
 }
 .creeps-table .abil-ico-wrap:hover .abil-ico {
   transform: none;
@@ -3103,6 +3270,9 @@ body.filter-active ul.subnotes { display: none; }
 }
 .creeps-table .creep-icon-cell img:hover {
   transform: scale(1.6);
+  position: relative;
+  z-index: 30;            /* above sticky header + neighbours */
+  background: #0e1217;    /* opaque under the portrait */
   box-shadow:
     0 3px 8px rgba(0, 0, 0, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
@@ -3222,6 +3392,7 @@ body.filter-active ul.subnotes { display: none; }
 .stat-hist-tip .stat-pct.flat { color: #8b949e; }
 /* Per-column value tints. */
 .creeps-table td.col-hp_regen { color: #9ae66e; }   /* light green (салатовый) */
+.creeps-table td.col-mp_regen { color: #6fc3ec; }   /* light blue (голубоватый) */
 .creeps-table td.col-gold     { color: #e3b341; }   /* gold (золотой) */
 .creeps-table td.col-xp       { color: #8bb8d6; }   /* dusty blue (пыльно-голубой) */
 /* Attack-type value colors. */
@@ -3295,9 +3466,28 @@ body.filter-active ul.subnotes { display: none; }
   vertical-align: middle;
   line-height: 1.3;
 }
-.creeps-table tbody tr:hover td {
+/* Row hover tint on the <tr> (not the <td>) so cell-specific colours — Damage
+   Type tints, etc. — paint on top and stay visible; the hover shows through
+   transparent cells and underneath the semi-transparent coloured ones. */
+.creeps-table tbody tr:hover {
   background: rgba(56, 139, 253, 0.08);
 }
+/* Click-toggled persistent row mark — soft mustard, same as the :target jump.
+   Also on the row so it sits below cell colours. */
+.creeps-table tbody tr.row-marked {
+  background: rgba(210, 175, 95, 0.1);   /* persistent, no animation */
+}
+/* One-shot flash on the click that marks the row (removed by JS after it
+   plays), so re-sorting the table doesn't replay it. */
+.creeps-table tbody tr.row-flash {
+  animation: ua-flash 2.6s ease-out;
+}
+.creeps-table tbody tr.row-marked:hover {
+  background: rgba(210, 175, 95, 0.16);
+}
+/* Marked-row sticky identity cells stay opaque, tinted to match the 10% mark. */
+.creeps-table tbody tr.row-marked .sticky-col { background: #1d1b14; }
+.creeps-table tbody tr.row-marked:hover .sticky-col { background: #242117; }
 /* First column (unicode tier dots) — centered glyph, smaller letter-spacing. */
 .creeps-table th:first-child,
 .creeps-table td:first-child {

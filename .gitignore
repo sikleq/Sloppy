@@ -24,6 +24,7 @@ _ability_icons.txt
 patches/*.html
 calendar.html
 creeps.html
+unit_abilities.html
 index.html
 _dynamics.json
 data/site_meta.json

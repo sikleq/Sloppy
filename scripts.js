@@ -783,6 +783,13 @@
     if (td.dataset.lvl !== undefined && td.dataset.lvl !== '') {
       return parseFloat(td.dataset.lvl);
     }
+    // Icon-only columns carry a data-sort value: a number (rank) for flag
+    // columns (dash 0 < No 1 < Yes 2), or a string (e.g. the Unit name).
+    if (td.dataset.sort !== undefined) {
+      const s = td.dataset.sort;
+      const n = parseFloat(s);
+      return isNaN(n) ? s.toLowerCase() : n;
+    }
     const t = td.textContent.trim();
     if (!t || t === ' ') return null;
     if (t === '-') return 0;   // explicit "no mana" — sorts as the minimum, not last
@@ -804,6 +811,33 @@
       prev = lvl;
     });
   }
+
+  // Unit Abilities: group consecutive rows of the SAME unit — show the Lvl +
+  // Unit icon only on the first row of each run, hide on the rest (cells stay
+  // for alignment). Recomputed after every sort so it works in any order.
+  const isUA = table.classList.contains('unit-abilities-table');
+  function groupByUnit(rows) {
+    let prevUnit = null, prevLvl = null;
+    rows.forEach(tr => {
+      const u = tr.dataset.unit;
+      const lvlCell = tr.querySelector('.ua-lvl');
+      const lvl = lvlCell ? lvlCell.dataset.lvl : null;
+      // Level grouping — show the number once per level run + the horizontal
+      // tier divider at each level change (mirrors the Neutral Creeps table).
+      if (lvl !== prevLvl) {
+        if (lvlCell) lvlCell.textContent = lvl;
+        tr.classList.add('tier-break');
+      } else {
+        if (lvlCell) lvlCell.textContent = '';
+        tr.classList.remove('tier-break');
+      }
+      // Unit-icon dedup — show the icon only on the first row of each unit run.
+      if (u !== prevUnit) tr.classList.remove('ua-dup');
+      else tr.classList.add('ua-dup');
+      prevUnit = u; prevLvl = lvl;
+    });
+  }
+  const groupRows = isUA ? groupByUnit : collapseLevels;
 
   // Merge consecutive identical ability cells into one rowspanned cell (only
   // in the default order — sorting reads cells by column index, so we un-merge
@@ -859,7 +893,7 @@
       return String(va).localeCompare(String(vb)) * dir;
     });
     rows.forEach(tr => tbody.appendChild(tr));
-    collapseLevels(rows);
+    groupRows(rows);
   }
 
   headers.forEach(th => {
@@ -874,7 +908,7 @@
         sortCol = null;
         unmergeAbilityRuns();
         originalOrder.forEach(tr => tbody.appendChild(tr));
-        collapseLevels(originalOrder);
+        groupRows(originalOrder);
         mergeAbilityRuns(originalOrder);   // re-merge in default order
       } else {
         const dir = sortState === 1 ? -1 : 1;
@@ -884,8 +918,8 @@
     });
   });
 
-  // Initial pass: collapse the default (level-grouped) order + merge ability runs.
-  collapseLevels([...tbody.querySelectorAll('tr')]);
+  // Initial pass: collapse/group the default order + merge ability runs.
+  groupRows([...tbody.querySelectorAll('tr')]);
   mergeAbilityRuns([...tbody.querySelectorAll('tr')]);
 })();
 
@@ -1036,12 +1070,15 @@
     const wIcon = tds[1].getBoundingClientRect().width;
     const lefts = [0, wLvl, wLvl + wIcon];           // lvl, icon, name
 
-    // Body rows
+    // Body rows. Most rows have all 3 sticky identity cells (lvl, icon, name).
+    // On the Unit Abilities page, a multi-ability unit rowspans its lvl+icon
+    // cells, so continuation rows carry ONLY the ability sticky cell — which
+    // belongs at the 3rd offset. Assign by how many sticky cells the row has.
     table.querySelectorAll('tbody tr').forEach(tr => {
-      const c = tr.children;
-      if (c[0]) c[0].style.left = lefts[0] + 'px';
-      if (c[1]) c[1].style.left = lefts[1] + 'px';
-      if (c[2]) c[2].style.left = lefts[2] + 'px';
+      const sc = [...tr.children].filter(c => c.classList.contains('sticky-col'));
+      // Creeps: 3 sticky cells (lvl, icon, name). Unit Abilities: 2 (lvl, unit).
+      // UA continuation rows (rowspanned lvl+unit) have 0 → nothing to pin.
+      sc.forEach((cell, i) => { cell.style.left = lefts[i] + 'px'; });
     });
     // Header: lvl th at 0, Юнит th (covers icon+name) at wLvl.
     const headStickies = table.querySelectorAll('thead th.sticky-col');
@@ -1051,6 +1088,28 @@
 
   applyLeftOffsets();
   window.addEventListener('resize', applyLeftOffsets, { passive: true });
+
+  // Click a cell to toggle a persistent highlight on its row (same soft
+  // mustard tint as the ability-link :target jump). Clicking an icon or link
+  // keeps its own behaviour. Click the row again to clear.
+  const tbody = table.querySelector('tbody');
+  if (tbody) {
+    tbody.addEventListener('click', e => {
+      if (e.target.closest('a, img')) return;
+      const tr = e.target.closest('tr');
+      if (!tr) return;
+      const on = tr.classList.toggle('row-marked');
+      // One-shot flash only on the click that turns it ON. The persistent
+      // .row-marked has no animation, so re-sorting (which moves the row in
+      // the DOM) won't replay the flash.
+      tr.classList.remove('row-flash');
+      if (on) {
+        void tr.offsetWidth;             // restart the animation cleanly
+        tr.classList.add('row-flash');
+        setTimeout(() => tr.classList.remove('row-flash'), 2700);
+      }
+    });
+  }
 
   // Overlay frame around the pinned identity block, shown while scrolled.
   // It lives in .creeps-page (non-scrolling), so its border + shadow keep
