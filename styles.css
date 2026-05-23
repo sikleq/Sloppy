@@ -355,6 +355,62 @@ nav.top-nav {
 .cal-mode-select:hover {
   border-color: #58a6ff;
 }
+/* Right-of-VIEW Upgrades toggle on the Unit Abilities page. Inert (no JS
+   handler yet) — visual placeholder for the per-7.5-min upgrade simulation. */
+.ua-upgrades-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  padding: 5px 10px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  font-size: 12.5px;
+  color: #c9d1d9;
+  cursor: pointer;
+  user-select: none;
+}
+.ua-upgrades-toggle:hover { border-color: #58a6ff; }
+/* iOS-style switch: hidden checkbox + visual <span> track-and-knob. */
+.ua-upgrades-toggle .ua-switch-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+.ua-upgrades-toggle .ua-switch {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 16px;
+  background: #30363d;
+  border-radius: 999px;
+  transition: background 150ms ease;
+  flex-shrink: 0;
+}
+.ua-upgrades-toggle .ua-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 12px;
+  height: 12px;
+  background: #c9d1d9;
+  border-radius: 50%;
+  transition: transform 150ms ease, background 150ms ease;
+}
+.ua-upgrades-toggle .ua-switch-input:checked + .ua-switch {
+  background: #2f81f7;
+}
+.ua-upgrades-toggle .ua-switch-input:checked + .ua-switch::after {
+  transform: translateX(14px);
+  background: #fff;
+}
+.ua-upgrades-toggle .ua-switch-input:focus-visible + .ua-switch {
+  outline: 2px solid #58a6ff;
+  outline-offset: 2px;
+}
 
 /* YEAR BLOCK (shared between modes, collapsible) */
 .cal-year-block {
@@ -2941,10 +2997,13 @@ body.filter-active ul.subnotes { display: none; }
 .unit-abilities-table td.ua-type-passive { background: rgba(170, 110, 215, 0.22); color: #e8d3f5; }
 .unit-abilities-table td.ua-type-aura    { background: rgba(225, 180, 80, 0.22); color: #f4e3b3; }
 /* Damage Type — colour-coded text. */
-.unit-abilities-table td.dt-magical   { color: #5fb1ff; }   /* brighter blue */
-.unit-abilities-table td.dt-physical  { color: #e1716a; }   /* brighter bordeaux */
-.unit-abilities-table td.dt-hpremoval { color: #c4c6cc; }   /* brighter grey */
-.unit-abilities-table td.dt-pure      { color: #ead992; }
+/* Damage-type colour paints ONLY the numeric runs (.dmg-num) inside the
+   Damage cell — words like "в сек." or "+ N% Int" keep the default text
+   colour. The standalone Damage Type column was replaced by this scheme. */
+.unit-abilities-table td.dt-magical   .dmg-num { color: #5fb1ff; }   /* blue */
+.unit-abilities-table td.dt-physical  .dmg-num { color: #e1716a; }   /* bordeaux */
+.unit-abilities-table td.dt-hpremoval .dmg-num { color: #8aab7a; }   /* dull green */
+.unit-abilities-table td.dt-pure      .dmg-num { color: #ead992; }
 /* "Only Auras" view filter — hide non-aura rows + irrelevant columns. */
 .unit-abilities-table.filter-auras tbody tr:not(.ua-row-aura) { display: none; }
 .unit-abilities-table.filter-auras th[data-col="dmg_type"],
@@ -3005,6 +3064,91 @@ body.filter-active ul.subnotes { display: none; }
 .unit-abilities-table td.ua-effect3,
 .unit-abilities-table td.ua-as_effect,
 .unit-abilities-table td.ua-ms_effect { white-space: nowrap; color: #9fb0c0; }
+/* Damage cell allows wrapping for long compound expressions (e.g. Mana Burn:
+   "20/25/30/35 + 200/250/350/400% Int"). */
+.unit-abilities-table td.ua-damage { white-space: normal; }
+.unit-abilities-table td.ua-damage .dmg-wrap,
+.unit-abilities-table .cell-wrap {
+  display: inline-flex; align-items: center; flex-wrap: wrap;
+  justify-content: center; gap: 2px; line-height: 1.2;
+}
+/* Multiline damage: stack the two halves vertically (Mana Burn's flat +
+   Int-multiplier tail) so the cell stays narrow. */
+.unit-abilities-table td.ua-damage .dmg-wrap.dmg-multiline {
+  flex-direction: column; gap: 1px;
+}
+.unit-abilities-table td.ua-damage .dmg-line2 {
+  display: inline-flex; align-items: center; gap: 2px;
+}
+.unit-abilities-table td.ua-damage .stat-ico {
+  height: 14px; width: 14px; vertical-align: -2px; margin-left: 2px;
+}
+/* Question-mark hint badge — appears inside a cell to surface an author note
+   without taking over the cell's hover (cell hover is reserved for patchnotes).
+   Used in the Damage cell ("от расстояния" for Tornado) and the Ability cell
+   ("identical for all frog units" for Riverborn Aura). */
+.qhint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  border: 1px solid #6b7682;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #b8c2cc;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+  user-select: none;
+  position: relative;
+  vertical-align: middle;
+}
+.qhint:hover,
+.qhint:focus-visible {
+  color: #fff;
+  border-color: #58a6ff;
+  background: rgba(88, 166, 255, 0.15);
+  outline: none;
+}
+/* Tooltip body for `.qhint` is rendered at <body> level (fixed-position) by
+   scripts.js so it escapes the .creeps-scroll overflow clip — a pure CSS
+   `::after` would be hidden behind the sticky header / scroll boundary. */
+.qhint-tip {
+  position: fixed;
+  z-index: 1100;
+  pointer-events: none;
+  display: none;
+  max-width: 320px;
+  padding: 5px 9px;
+  background: #1b212a;
+  color: #e6edf3;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  white-space: normal;
+  text-align: center;
+}
+.qhint-tip.is-visible { display: block; }
+.qhint-tip .qh-line {
+  padding: 2px 0;
+  /* Wrap long lines within the tooltip's max-width instead of overflowing. */
+  white-space: normal;
+  text-align: left;
+  line-height: 1.35;
+}
+/* Keep the colored Yes/No glyph + dash on the same line as the start of the
+   description — only the trailing words flow onto a new line if needed. */
+.qhint-tip .qh-line .ua-yn { white-space: nowrap; }
+.qhint-tip .qh-line + .qh-line { border-top: 1px solid rgba(139, 148, 158, 0.18); }
+.qhint-tip .ua-yn { font-weight: 600; font-size: 11px; }
+.qhint-tip .ua-yn-yes    { color: #6aa775; }
+.qhint-tip .ua-yn-no     { color: #c97f78; }
+.qhint-tip .ua-yn-strong { color: #c4ad5e; }
 /* Aura Stack "yes" — green rounded diamond made of stacked tiles. The wrapper
    is NOT rotated and carries a screen-space top-fade mask, so the upper part
    of the icon fades out (weaker colour). ::after = front tile, ::before =

@@ -16,6 +16,7 @@ file is missing the Changelogs nav link falls back to a sensible default.
 """
 import json as _json
 import os as _os
+import re
 import site_common as _site
 
 ASSET_VERSION = _site.compute_asset_version()
@@ -359,6 +360,24 @@ def save_creeps_html():
         'spawnlord_master_freeze',         # Petrify (Prowler Shaman)
     }
 
+    def _autocast_snake_svg() -> str:
+        """Animated golden ring used as the autocast marker on ability icons."""
+        _r = ('<rect x="1.5" y="1.5" width="25" height="25" '
+              'rx="4.5" ry="4.5" pathLength="100"')
+        return (
+            '<svg class="autocast-snake" viewBox="0 0 28 28" '
+            'preserveAspectRatio="none" aria-hidden="true">'
+            f'{_r} class="ac-ring"></rect>'
+            f'{_r} class="ac-fluff"></rect>'
+            f'{_r} class="ac-tail4"></rect>'
+            f'{_r} class="ac-tail3"></rect>'
+            f'{_r} class="ac-tail2"></rect>'
+            f'{_r} class="ac-tail1"></rect>'
+            f'{_r} class="ac-body"></rect>'
+            f'{_r} class="ac-pollen"></rect>'
+            f'{_r} class="ac-pollen2"></rect>'
+            f'{_r} class="ac-pollen3"></rect></svg>')
+
     # Camp type(s) per neutral (small / mid / big / ancient) — the in-game
     # minimap camp marker. Not present in npc_units.txt (it lives in the map's
     # spawn data), so this mapping is maintained by hand. Keyed by the
@@ -676,6 +695,10 @@ def save_creeps_html():
         return (str(s).replace('&', '&amp;')
                        .replace('<', '&lt;')
                        .replace('>', '&gt;'))
+
+    def _attr_esc(s):
+        """_esc + quote escape — safe to drop into a double-quoted attribute."""
+        return _esc(s).replace('"', '&quot;')
 
     # ---- Per-column changelog value functions ----
     # Each maps (version, npc_key) → the column's display value for that patch
@@ -1266,33 +1289,20 @@ def save_creeps_html():
                     # cluster of tiny dots riding along (pollen). Head leads at
                     # the high end of the painted range; the tail (low end)
                     # fades out near its tip.
-                    _r = ('<rect x="1.5" y="1.5" width="25" height="25" '
-                          'rx="4.5" ry="4.5" pathLength="100"')
-                    snake = (
-                        '<svg class="autocast-snake" viewBox="0 0 28 28" '
-                        'preserveAspectRatio="none" aria-hidden="true">'
-                        f'{_r} class="ac-ring"></rect>'
-                        f'{_r} class="ac-fluff"></rect>'
-                        f'{_r} class="ac-tail4"></rect>'
-                        f'{_r} class="ac-tail3"></rect>'
-                        f'{_r} class="ac-tail2"></rect>'
-                        f'{_r} class="ac-tail1"></rect>'
-                        f'{_r} class="ac-body"></rect>'
-                        f'{_r} class="ac-pollen"></rect>'
-                        f'{_r} class="ac-pollen2"></rect>'
-                        f'{_r} class="ac-pollen3"></rect></svg>'
-                    )
                     inner = (f'<span class="abil-ico-wrap abil-autocast">'
-                             f'{img}{snake}</span>')
+                             f'{img}{_autocast_snake_svg()}</span>')
                 else:
                     inner = img
             else:
                 inner = _esc(v)   # no icon on CDN → keep the name text
             # Clicking an ability jumps to its (unit, ability) row on the Unit
-            # Abilities page — anchor is createhero-slug for per-unit uniqueness.
+            # Abilities page. For abilities that share a single canonical row
+            # across units (e.g. Riverborn Aura), route to that canonical unit.
             ch = (d.get('createhero') or '').strip()
+            ua_canonical = {'frogmen_riverborn_aura': 'tad'}
+            target_ch = ua_canonical.get(slug, ch)
             return (f'<a class="abil-link" '
-                    f'href="unit_abilities.html#{ch}-{slug}">{inner}</a>'
+                    f'href="unit_abilities.html#{target_ch}-{slug}">{inner}</a>'
                     if slug else inner)
         return _esc(v) if v else '&nbsp;'
 
@@ -1486,6 +1496,7 @@ def save_creeps_html():
         'big_thunder_lizard_slam': 'Active, Magic Damage',
         'big_thunder_lizard_frenzy': 'Active, Buff',
         'ice_shaman_incendiary_bomb': 'Active, Magic Damage',
+        'dark_troll_warlord_raise_dead': 'Active, Summon',
     }
     # (legacy) Damage Type curation — no longer rendered as its own column.
     DMGTYPE_MANUAL = {
@@ -1527,11 +1538,196 @@ def save_creeps_html():
         return '/'.join(out)
 
     # Manual columns not present in our data files (effect text + aura
-    # stackability). Filled by hand; keyed by ability slug. Anything here
-    # overrides the auto-derived blanks.
+    # stackability). Filled by hand from the legacy creep-spreadsheet
+    # (Эффект / Второй эффект / Третий эффект columns); keyed by ability
+    # slug. Anything here overrides the auto-derived blanks.
+    _DMG_NUM_RE = re.compile(r'[\d./\-–]*\d+[\d./\-–]*')
+
+    def _dmg_color_html(text: str) -> str:
+        """Wrap numeric runs in `.dmg-num` so the damage-type colour paints
+        only the numbers, not the words ("per sec.", "(юниты)", "+ 250% Int")."""
+        return _DMG_NUM_RE.sub(
+            lambda m: f'<span class="dmg-num">{m.group()}</span>', text)
+
+    def _val_qhint(text: str, tip: str) -> str:
+        """Raw-HTML cell value: text + framed `?` badge with tooltip. Generic
+        version (no number-colour wrap) — for non-Damage columns like Duration."""
+        tip_esc = _esc(tip)
+        return ('\x01<span class="cell-wrap">' + _esc(text) +
+                f'<span class="qhint" tabindex="0" role="button" '
+                f'aria-label="{tip_esc}" data-tooltip="{tip_esc}">?</span>'
+                '</span>')
+
+    def _dmg_qhint(text: str, tip: str) -> str:
+        """Raw-HTML damage cell: value + framed `?` badge with tooltip."""
+        tip_esc = _esc(tip)
+        return ('\x01<span class="dmg-wrap">' + _dmg_color_html(text) +
+                f'<span class="qhint" tabindex="0" role="button" '
+                f'aria-label="{tip_esc}" data-tooltip="{tip_esc}">?</span>'
+                '</span>')
+
     ABIL_MANUAL = {
-        # 'satyr_hellcaller_unholy_aura': {
-        #     'effect': '...', 'effect2': '...', 'stackable': 'No'},
+        'enraged_wildkin_tornado': {
+            # Wildkin's `enraged_wildkin_tornado` is only the CAST. The actual
+            # tornado unit's damage/AoE live in `tornado_tempest`, which isn't
+            # in our extracted KV — fill from the legacy sheet by hand.
+            'damage': _dmg_qhint(
+                '15-45 per sec.',
+                "Depends on the proximity to the Tornado's epicenter"),
+            'aoe': '150–600',
+            'duration': _val_qhint(
+                '10 (15)',
+                "Channeling duration is 10 seconds + 5 if it's ended or cancelled"),
+            'through_bkb': 'no',
+            'as_effect': '-15', 'ms_effect': '-15',
+            'effect': 'Урон по области',
+            'effect2': '300/300 обзор',
+            'effect3': 'Замедление'},
+        'kobold_tunneler_prospecting': {
+            'effect': '+20/25/30/40 золота в минуту (аура)'},
+        'kobold_disarm': {
+            'effect': 'Дизарм 1 цели', 'effect2': 'Требует 3 удара'},
+        'hill_troll_rally': {
+            'effect': '+2 урона союзникам (аура)'},
+        'berserker_troll_break': {
+            'effect': 'Истощение 1 цели'},
+        'gnoll_assassin_envenomed_weapon': {
+            # HP Removal is rare enough on neutrals to flag in the cell itself
+            # (it bypasses magic immunity, ignores magic resist, can't kill etc).
+            'damage': _dmg_qhint('0/20/40/80 per sec.', 'HP Removal damage type'),
+            'effect': 'Периодический урон',
+            'effect2': 'Снижение регенерации на 75/80/85/90%'},
+        'fel_beast_haunt': {
+            'effect': 'Безмолвие 1 цели'},
+        'harpy_scout_take_off': {
+            'effect': 'Взлетает и даёт обзор 1200/800',
+            'effect2': 'Замедляет себя во время действия'},
+        'ogre_bruiser_ogre_smash': {
+            'effect': 'Урон по области', 'effect2': 'Оглушение'},
+        'kobold_taskmaster_speed_aura': {
+            'effect': 'Скорость передвижения (аура)'},
+        'forest_troll_high_priest_heal_amp_aura': {
+            'effect': 'Увеличение хила союзников на 15% (аура)'},
+        'forest_troll_high_priest_heal': {
+            'effect': 'Лечение +100 ХП'},
+        'mudgolem_cloak_aura': {
+            'effect': 'Маг. резист героям +10/12/14/16% (аура)',
+            'effect2': 'Маг. резист юнитам +20/24/28/32% (аура)'},
+        'frogmen_riverborn_aura': {
+            'effect': 'Исходящий урон +10/12/14/16%'},
+        'satyr_trickster_purge': {
+            'effect': 'Диспел', 'effect2': 'Замедление передвижения'},
+        'giant_wolf_intimidate': {
+            'effect': 'Снижение атаки на 60%'},
+        'dark_troll_warlord_ensnare': {
+            'effect': 'Накладывает корни', 'effect2': 'True Sight над целью'},
+        'ghost_frost_attack': {
+            'effect': 'Замедление атаки и МС'},
+        'harpy_storm_chain_lightning': {
+            'effect': 'Урон по нескольким целям'},
+        'black_drake_magic_amplification_aura': {
+            'effect': 'Увеличение урона от магии (любого) на врагах (аура)'},
+        'spawnlord_aura': {
+            'effect': '+9/10/11/12% к вампиризму',
+            'effect2': '+9/10/11/12 к регенерации здоровья'},
+        'ogre_magi_frost_armor': {
+            'effect': '+4/5/6/8 брони',
+            'effect2': 'Щит замедляет атакующих при атаке'},
+        'mud_golem_hurl_boulder': {
+            # 75 hero / 150 creep; pretty form with hint icon for the split.
+            'damage': _dmg_qhint('75 / 150', 'To creeps / heroes'),
+            'effect': 'Оглушение 1 цели'},
+        'mud_golem_rock_destroy': {
+            'effect': 'Создаёт големов при смерти',
+            'effect2': 'Големы имеют Hurl Boulder'},
+        'frogmen_arm_of_the_deep': {
+            'effect': 'Оглушение по области', 'effect2': 'Урон по области'},
+        'frogmen_tendrils_of_the_deep': {
+            'effect': 'Оглушение по области', 'effect2': 'Урон по области'},
+        'frogmen_water_bubble_small': {
+            'effect': '100/120/140/160 магического барьера'},
+        'frogmen_water_bubble_medium': {
+            'effect': '150/180/210/240 магического барьера'},
+        'centaur_khan_endurance_aura': {
+            'effect': 'Увеличение скорости атаки (аура)'},
+        'furbolg_enrage_attack_speed': {
+            'effect': 'Увеличение скорости атаки на время'},
+        'satyr_soulstealer_mana_burn': {
+            # Burn = flat + Int multiplier. Raw HTML so we can inline the
+            # intelligence icon; sentinel `\x01` lets _prop_cell skip _esc.
+            # Only the flat amount is coloured (it deals damage of the cell's
+            # type). The Int-multiplier tail stays default colour and sits on
+            # a second line so the cell can stay narrow.
+            'damage': ('\x01<span class="dmg-wrap dmg-multiline">'
+                       '<span class="dmg-num">20/25/30/35</span>'
+                       '<span class="dmg-line2">+ 200/250/350/400%'
+                       '<img class="stat-ico" src="icons/intelligence.webp" '
+                       'alt="Int"></span></span>'),
+            'effect': 'Сжигание маны', 'effect2': 'Урон за сожжённую ману'},
+        'forest_troll_high_priest_mana_aura': {
+            'effect': '2 МП per sec. реген (аура)'},
+        'alpha_wolf_command_aura': {
+            'effect': '+20% увеличение урона (аура)'},
+        'alpha_wolf_critical_strike': {
+            'effect': '20% шанс крита на 200/225/250/300%'},
+        'centaur_khan_war_stomp': {
+            'effect': 'Оглушение по области', 'effect2': 'Урон по области'},
+        'polar_furbolg_ursa_warrior_thunder_clap': {
+            'effect': 'Урон по области', 'effect2': 'Замедление по области'},
+        'furbolg_enrage_damage': {
+            'effect': '+60% увеличение урона на время'},
+        'enraged_wildkin_toughness_aura': {
+            'effect': '+3 брони (аура)'},
+        'enraged_wildkin_hurricane': {
+            'effect': 'Отталкивание цели в любую сторону'},
+        'warpine_raider_seed_shot': {
+            'effect': 'Урон по нескольким целям',
+            'effect2': 'Замедление передвижения'},
+        'frogmen_congregation_of_the_deep': {
+            'effect': 'Оглушение по области', 'effect2': 'Урон по области'},
+        'ancient_rock_golem_weakening_aura': {
+            'effect': '-3/4/5/6 брони (аура)'},
+        'frostbitten_golem_time_warp_aura': {
+            'effect': '8/9/10/11% перезарядки (аура)'},
+        'big_thunder_lizard_wardrums_aura': {
+            'effect': 'Увеличение скорости атаки (аура)',
+            'effect2': 'Точность (аура)'},
+        'frogmen_water_bubble_large': {
+            'effect': '210/240/270/300 магического барьера',
+            'effect2': '50% от взрыва барьера в лечение'},
+        'satyr_hellcaller_unholy_aura': {
+            'effect': '+3/5/7/11 ХП per sec. реген (аура)'},
+        'satyr_hellcaller_shockwave': {
+            'effect': 'Урон по области (снаряд)'},
+        'dark_troll_warlord_raise_dead': {
+            'effect': 'Призыв 3 скелетов', 'effect2': 'У скелетов аура'},
+        'spawnlord_master_stomp': {
+            'effect': 'Снижает базовую (белую) броню на 50%',
+            'effect2': 'Наносит урон'},
+        'spawnlord_master_freeze': {
+            # av_damage:"100" with av_tick_interval:"0.1" is mislabeled in KV —
+            # the in-game tooltip and old sheet both say 100/sec, so force it.
+            'damage': '100 per sec.',
+            'effect': 'Обездвиживает', 'effect2': 'Периодический урон'},
+        'black_dragon_dragonhide_aura': {
+            'effect': '+3 брони (аура)'},
+        'black_dragon_fireball': {
+            # av_damage:"85" is mislabeled — actual game effect is 85/sec
+            # (total 722.5 over 8s); av_damage path takes priority, so override.
+            'damage': '85 per sec.',
+            'effect': 'Урон по области', 'effect2': 'Летающий обзор 300/300'},
+        'black_dragon_splash_attack': {
+            'effect': 'Урон по области от атак'},
+        'granite_golem_hp_aura': {
+            'effect': '+16/17/18/19% увеличение макс. ХП (аура)'},
+        'big_thunder_lizard_slam': {
+            'effect': 'Урон по области', 'effect2': 'Замедление по области'},
+        'big_thunder_lizard_frenzy': {
+            'effect': 'Увеличение скорости атаки на 1 союзную цель'},
+        'ice_shaman_incendiary_bomb': {
+            # av_burn_damage = 50, av_building_damage_pct = 25 → 12.5 to buildings.
+            'damage': _dmg_qhint('50 per sec. / 12.5 per sec.', 'To units / structures'),
+            'effect': 'Периодический урон на 1 цель (включая здания)'},
     }
 
     def _abil_props(slug):
@@ -1544,12 +1740,69 @@ def save_creeps_html():
             except Exception:
                 return False
         cd, mc = g('AbilityCooldown'), g('AbilityManaCost')
-        # Type heuristic: aura by slug or manual override (e.g. Rally — slug
-        # has no "aura" token), active by cd/mc/cast-range presence, else passive.
-        MANUAL_AURAS = {'hill_troll_rally'}
-        typ = ('Aura' if ('aura' in slug or slug in MANUAL_AURAS)
-               else ('Active' if (_posnum(cd) or _posnum(mc) or g('AbilityCastRange'))
-                     else 'Passive'))
+        # Type resolution order:
+        #  1) Aura — by slug token OR a TYPE_MANUAL entry containing "Aura".
+        #  2) TYPE_MANUAL — first comma-separated word ("Active"/"Passive")
+        #     overrides the heuristic for abilities where cd/mc presence is
+        #     misleading (Break has a cd but is passive; Ice Armor lacks data).
+        #  3) Heuristic — active if cd/mc/cast-range present, else passive.
+        MANUAL_AURAS = {s for s, t in TYPE_MANUAL.items() if 'Aura' in t}
+        if 'aura' in slug or slug in MANUAL_AURAS:
+            typ = 'Aura'
+        elif slug in TYPE_MANUAL:
+            typ = TYPE_MANUAL[slug].split(',')[0].strip()
+        elif _posnum(cd) or _posnum(mc) or g('AbilityCastRange'):
+            typ = 'Active'
+        else:
+            typ = 'Passive'
+        # Damage cell. Priority:
+        #  1) hero/creep split when both av_damage and av_damage_creeps exist
+        #     ("75 (герои) / 150 (крипы)" mirrors the legacy sheet)
+        #  2) plain av_damage / AbilityDamage
+        #  3) av_damage_per_second → "<v> per sec."
+        #  4) av_burn_damage + av_burn_interval → "<v/interval> per sec."
+        dmg = g('av_damage') or g('AbilityDamage')
+        dmg_creeps = g('av_damage_creeps')
+        if dmg and dmg_creeps:
+            damage = f'{_prog(dmg)} (герои) / {_prog(dmg_creeps)} (крипы)'
+        elif dmg:
+            damage = _prog(dmg)
+        elif g('av_damage_per_second'):
+            damage = f'{_prog(g("av_damage_per_second"))} per sec.'
+        elif g('av_burn_damage'):
+            interval = g('av_burn_interval')
+            try:
+                burn = float(_f1(g('av_burn_damage')))
+                ivl = float(_f1(interval)) if interval else 1.0
+                dps = burn / ivl if ivl else burn
+                damage = f'{int(dps) if dps == int(dps) else dps} per sec.'
+            except (ValueError, ZeroDivisionError):
+                damage = _prog(g('av_burn_damage'))
+        else:
+            damage = ''
+
+        # Duration cell. Priority:
+        #  1) hero/non-hero duration split  (Slam, Envenomed Weapon)
+        #  2) hero/non-hero stun-duration split  (War Stomp)
+        #  3) plain av_duration / AbilityDuration / av_hero_*  (single value)
+        hd, nd = g('av_hero_duration'), g('av_non_hero_duration')
+        hsd, nsd = g('av_hero_stun_duration'), g('av_non_hero_stun_duration')
+        if hd and nd:
+            duration = f'{_prog(hd)} (герои) / {_prog(nd)} (крипы)'
+        elif hsd and nsd:
+            duration = f'{_prog(hsd)} (герои) / {_prog(nsd)} (крипы)'
+        else:
+            duration = _prog(g('av_duration') or g('AbilityDuration')
+                             or hd or hsd)
+
+        # Cast range cell — augment with jump/bounce range when present.
+        cr = _prog(g('AbilityCastRange'))
+        jr = g('av_jump_range') or g('av_bounce_range')
+        if cr and jr:
+            cast_range = f'{cr} ({_prog(jr)} у прыжков)'
+        else:
+            cast_range = cr
+
         as_fields = (('av_speed_bonus', '+{}'), ('av_bonus_attack_speed', '+{}'),
                      ('av_bonus_aspd', '+{}'), ('av_attackspeed_bonus', '+{}'),
                      ('av_attackspeed_slow', '{}'))
@@ -1560,43 +1813,63 @@ def save_creeps_html():
         leveled = any(len(str(v).split()) > 1 for v in a.values())
         if slug in AURA_STACK_YES:
             stack = 'Yes'
-        elif 'aura' in slug:
+        elif 'aura' in slug or slug in MANUAL_AURAS:
             stack = 'No'
         else:
             stack = ''
         props = {
             'type': typ,
             'dmg_type': DMGTYPE_MANUAL.get(slug, ''),
-            'damage': _prog(g('av_damage') or g('AbilityDamage')),
+            'damage': damage,
             'aoe': _prog(g('av_radius')),
             'manacost': _prog(mc),
             'cooldown': _prog(cd),
-            'duration': _prog(g('av_duration') or g('AbilityDuration')
-                              or g('av_hero_duration')),
-            'cast_range': _prog(g('AbilityCastRange')),
+            'duration': duration,
+            'cast_range': cast_range,
             'as_effect': as_eff,
             'ms_effect': ms_eff,
             'effect': '', 'effect2': '', 'effect3': '',
             'dispel': DISPEL_MANUAL.get(slug) or DISPEL.get(g('SpellDispellableType'), ''),
+            'through_bkb': '',  # manual-only column
             'stackable': stack,
             'lvl_up': 'Yes' if leveled else 'No',
         }
+        # Every aura updates on a 0.5s tick (Valve convention); show it in the
+        # Duration cell so it isn't confused with empty/instant abilities.
+        if typ == 'Aura' and not props['duration']:
+            props['duration'] = '0.5'
         props.update(ABIL_MANUAL.get(slug, {}))
         return props
 
     UA_COLS = [
         ('lvl', 'Lvl'), ('unit', 'Unit'), ('ability', 'Ability'),
-        ('type', 'Type'), ('dmg_type', 'Damage Type'), ('damage', 'Damage'),
+        ('type', 'Type'), ('damage', 'Damage'),
         ('manacost', 'Manacost'), ('cooldown', 'Cooldown'),
         ('duration', 'Duration'), ('cast_range', 'Cast Range'),
         ('aoe', 'Radius'), ('stackable', 'Aura Stack'),
-        ('dispel', 'Dispellable'),
+        ('dispel', 'Dispellable'), ('through_bkb', 'Through BKB'),
         ('as_effect', 'AS Effect'), ('ms_effect', 'MS Effect'),
         ('effect', 'Effect'), ('effect2', 'Effect 2'), ('effect3', 'Effect 3'),
     ]
     UA_STICKY = {'lvl', 'unit', 'ability'}
     # Vertical section dividers (left border) after Ability, Type and Damage.
-    UA_SEP = {'type', 'dmg_type', 'manacost'}
+    UA_SEP = {'type', 'damage', 'manacost'}
+    # Column-header tooltips surfaced via a `?` badge next to the header label.
+    # Values support inline HTML (rendered via innerHTML in scripts.js).
+    UA_HEAD_HINTS = {
+        'duration': 'All these auras have linger duration of 0.5 seconds',
+        'dispel': (
+            '<div class="qh-line">'
+            '<span class="ua-yn ua-yn-strong">Yes</span>'
+            ' — Strong Dispel only</div>'
+            '<div class="qh-line">'
+            '<span class="ua-yn ua-yn-yes">Yes</span>'
+            ' — Any dispel</div>'
+            '<div class="qh-line">'
+            '<span class="ua-yn ua-yn-no">No</span>'
+            ' — Not dispellable, mostly due to different kind of ability</div>'
+        ),
+    }
     PROP_COLS = [k for k, _ in UA_COLS
                  if k not in ('lvl', 'unit', 'ability')]
 
@@ -1604,31 +1877,43 @@ def save_creeps_html():
     for idx, (k, label) in enumerate(UA_COLS):
         cls = (f'ua-{k}' + (' sticky-col' if k in UA_STICKY else '')
                + (' col-sep' if k in UA_SEP else ''))
+        hint = ''
+        if k in UA_HEAD_HINTS:
+            # Tooltip value may contain inline HTML (rendered via innerHTML
+            # client-side) — escape quotes so the attribute survives.
+            tip = _attr_esc(UA_HEAD_HINTS[k])
+            hint = (f'<span class="qhint" tabindex="0" role="button" '
+                    f'aria-label="{tip}" data-tooltip="{tip}">?</span>')
         ua_thead.append(
             f'<th class="{cls} sortable" data-col="{k}" data-idx="{idx}">'
-            f'<span class="th-label">{label}</span>'
+            f'<span class="th-label">{label}</span>{hint}'
             f'<span class="sort-ind"></span></th>')
     ua_head_html = ''.join(ua_thead)
 
     DMG_TYPE_CLS = {'Magical': 'dt-magical', 'Physical': 'dt-physical',
                     'HP Removal': 'dt-hpremoval', 'Pure': 'dt-pure'}
 
-    def _prop_cell(pk, val):
-        # Type → colour-coded text. Damage Type → tinted cell (dash if none).
-        # Stackable / Dispellable → glyph icons. Every <td> carries data-col so
-        # the view-toggle JS can reorder columns by key.
+    def _prop_cell(pk, val, props=None):
+        # Type → colour-coded text. Damage cell carries the dt-* class so the
+        # value text inherits the damage-type colour (replaces the standalone
+        # Damage Type column). Stackable / Dispellable → glyph icons. Every
+        # <td> carries data-col so the view-toggle JS can reorder columns by key.
         sep = ' col-sep' if pk in UA_SEP else ''
         dc = f' data-col="{pk}"'
         if pk == 'type':
             if not val:
                 return f'<td class="ua-type{sep}"{dc}>&nbsp;</td>'
             return f'<td class="ua-type ua-type-{val.lower()}{sep}"{dc}>{_esc(val)}</td>'
-        if pk == 'dmg_type':
+        if pk == 'damage':
+            dt = (props or {}).get('dmg_type', '')
+            dt_cls = f' {DMG_TYPE_CLS[dt]}' if dt in DMG_TYPE_CLS else ''
+            if isinstance(val, str) and val.startswith('\x01'):
+                # Manual override already has .dmg-num spans where appropriate.
+                return f'<td class="ua-damage{dt_cls}{sep}"{dc}>{val[1:]}</td>'
             if not val:
-                return (f'<td class="ua-dmg_type{sep}"{dc}>'
-                        f'<span class="ua-dash">—</span></td>')
-            return (f'<td class="ua-dmg_type {DMG_TYPE_CLS.get(val, "")}{sep}"{dc}>'
-                    f'{_esc(val)}</td>')
+                return f'<td class="ua-damage{dt_cls}{sep}"{dc}>&nbsp;</td>'
+            return (f'<td class="ua-damage{dt_cls}{sep}"{dc}>'
+                    f'{_dmg_color_html(_esc(val))}</td>')
         # Coloured yes/no text. Sort rank: dash (0) < no (1) < yes (2).
         _YES = '<span class="ua-yn ua-yn-yes">yes</span>'
         _NO = '<span class="ua-yn ua-yn-no">no</span>'
@@ -1641,18 +1926,43 @@ def save_creeps_html():
                 g, rank = '<span class="ua-dash">—</span>', 0
             return f'<td class="ua-stackable{sep}"{dc} data-sort="{rank}">{g}</td>'
         if pk == 'dispel':
+            # Per-cell legend was moved to the column header's `?` badge —
+            # cells render just the colored yes/no glyph.
             if val == 'Yes':
-                g, rank = '<span class="ua-yn ua-yn-yes" title="Any dispel">yes</span>', 2
+                g, rank = _YES, 2
             elif val == 'Strong only':
-                g, rank = ('<span class="ua-yn ua-yn-strong" '
-                           'title="Strong Dispel only">yes</span>', 2)
+                g, rank = '<span class="ua-yn ua-yn-strong">yes</span>', 2
             elif val == 'No':
                 g, rank = _NO, 1
             else:
                 g, rank = '<span class="ua-dash">—</span>', 0
             return f'<td class="ua-dispel{sep}"{dc} data-sort="{rank}">{g}</td>'
+        # Through BKB: same yes/no glyphs as Dispellable. Sorted yes(2) > no(1) > —(0).
+        if pk == 'through_bkb':
+            v = (val or '').strip().lower()
+            if v == 'yes':
+                g, rank = _YES, 2
+            elif v == 'no':
+                g, rank = _NO, 1
+            else:
+                g, rank = '<span class="ua-dash">—</span>', 0
+            return f'<td class="ua-through_bkb{sep}"{dc} data-sort="{rank}">{g}</td>'
+        # Raw-HTML sentinel: ABIL_MANUAL values prefixed with \x01 bypass _esc
+        # so we can inline <img> / <span> markup (used for Mana Burn's Int icon).
+        if isinstance(val, str) and val.startswith('\x01'):
+            return f'<td class="ua-{pk}{sep}"{dc}>{val[1:]}</td>'
         return f'<td class="ua-{pk}{sep}"{dc}>{_esc(val) or "&nbsp;"}</td>'
 
+    # Abilities that are identical across multiple units (same slug, same
+    # values) get a single canonical row on the UA page — pinned to the listed
+    # createhero. Other units' rows are skipped, and creeps.html ability
+    # links route to the canonical row for that slug.
+    UA_CANONICAL_UNIT = {
+        'frogmen_riverborn_aura': 'tad',
+    }
+    UA_SHARED_TOOLTIP = {
+        'frogmen_riverborn_aura': 'This aura is identical for all frog units',
+    }
     ua_rows = []
     for row in rendered:
         d = row['data']
@@ -1667,10 +1977,29 @@ def save_creeps_html():
                  for kk in ('ability1', 'ability2', 'ability3')
                  if d.get(kk + '_slug', '')]
         for kk, slug, name in slugs:
+            # Skip duplicate canonical-aura rows.
+            if slug in UA_CANONICAL_UNIT and UA_CANONICAL_UNIT[slug] != ch:
+                continue
             p = _abil_props(slug)
-            aico = (f'<img class="abil-ico" src="icons/abilities/{slug}.png" '
-                    f'alt="{_esc(name)}" loading="lazy">'
-                    if _has_abil_icon(slug) else '')
+            if _has_abil_icon(slug):
+                img_tag = (f'<img class="abil-ico" src="icons/abilities/{slug}.png" '
+                           f'alt="{_esc(name)}" loading="lazy">')
+                if slug in AUTOCAST_ABILITIES:
+                    aico = (f'<span class="abil-ico-wrap abil-autocast">'
+                            f'{img_tag}{_autocast_snake_svg()}</span>')
+                else:
+                    aico = img_tag
+            else:
+                aico = ''
+            # Question-mark hint icon appended to the ability name when this
+            # row stands in for multiple units (Riverborn Aura). Hovering the
+            # rest of the cell will surface patchnotes later, so explicit
+            # author hints must come through a dedicated `?` badge.
+            qhint = ''
+            if slug in UA_SHARED_TOOLTIP:
+                tip = _esc(UA_SHARED_TOOLTIP[slug])
+                qhint = (f'<span class="qhint" tabindex="0" role="button" '
+                         f'aria-label="{tip}" data-tooltip="{tip}">?</span>')
             # Every ability row carries its own Lvl + Unit cells (no rowspan):
             # the table is sortable, and sorting reorders rows, which would
             # tear a rowspanned group apart and dump continuation cells into
@@ -1682,10 +2011,11 @@ def save_creeps_html():
                 f'data-sort="{_esc(d.get("name", ""))}">{unit_img}</td>',
                 f'<td class="ua-ability sticky-col" data-col="ability">'
                 f'<span class="ua-ability-inner">{aico}'
-                f'<span class="ua-ability-name">{_esc(name)}</span></span></td>',
+                f'<span class="ua-ability-name">{_esc(name)}</span>'
+                f'{qhint}</span></td>',
             ]
             for pk in PROP_COLS:
-                cells.append(_prop_cell(pk, p[pk]))
+                cells.append(_prop_cell(pk, p[pk], p))
             aura_cls = ' class="ua-row-aura"' if p['type'] == 'Aura' else ''
             ua_rows.append(
                 f'<tr id="{_esc(ch)}-{slug}" data-unit="{_esc(ch)}"{aura_cls}>'
@@ -1704,8 +2034,14 @@ def save_creeps_html():
         '<select class="cal-mode-select" id="ua-view-mode">'
         '<option value="standard">Standard</option>'
         '<option value="auras">Auras</option>'
-        '<option value="levelups">Level-Ups</option>'
-        '</select></div>\n'
+        '</select>'
+        # Upgrades switch (placeholder — not wired up yet).
+        '<label class="ua-upgrades-toggle" title="Apply per-7.5-min creep upgrades">'
+        '<span class="ua-upgrades-label">Upgrades</span>'
+        '<input type="checkbox" id="ua-upgrades-mode" class="ua-switch-input">'
+        '<span class="ua-switch" aria-hidden="true"></span>'
+        '</label>'
+        '</div>\n'
         '<div class="sticky-frame" aria-hidden="true"></div>\n'
         '<div class="sticky-frame-top" aria-hidden="true"></div>\n'
         '<div class="creeps-scroll">\n'

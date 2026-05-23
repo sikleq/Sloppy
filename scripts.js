@@ -928,14 +928,16 @@
   // rest (Type/AS Effect/MS Effect), then Effect 1-3.
   const uaView = document.getElementById('ua-view-mode');
   if (uaView) {
-    const STD_ORDER = ['lvl', 'unit', 'ability', 'type', 'dmg_type', 'damage',
+    const STD_ORDER = ['lvl', 'unit', 'ability', 'type', 'damage',
       'manacost', 'cooldown', 'duration', 'cast_range', 'aoe', 'stackable',
-      'dispel', 'as_effect', 'ms_effect', 'effect', 'effect2', 'effect3'];
+      'dispel', 'through_bkb', 'as_effect', 'ms_effect',
+      'effect', 'effect2', 'effect3'];
     // Auras view: visible columns first (their target order), then the
     // hidden-by-CSS columns at the end so DOM child count stays in sync.
     const AURA_ORDER = ['lvl', 'unit', 'ability', 'type', 'aoe', 'stackable',
-      'duration', 'as_effect', 'ms_effect', 'effect', 'effect2', 'effect3',
-      'dmg_type', 'damage', 'manacost', 'cooldown', 'cast_range', 'dispel'];
+      'through_bkb', 'duration', 'as_effect', 'ms_effect',
+      'effect', 'effect2', 'effect3',
+      'damage', 'manacost', 'cooldown', 'cast_range', 'dispel'];
     const headRow = table.querySelector('thead .col-row')
       || table.querySelector('thead tr');
 
@@ -1249,6 +1251,53 @@
   }
 })();
 
+
+// ---- Body-level tooltip for `.qhint` badges ----
+// CSS `::after` tooltips are clipped by .creeps-scroll's overflow:auto and by
+// the sticky header. Render a single shared <div> at <body> level, positioned
+// via fixed coordinates relative to the hovered badge.
+(function() {
+  const tip = document.createElement('div');
+  tip.className = 'qhint-tip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+
+  function show(target) {
+    const text = target.getAttribute('data-tooltip') || '';
+    if (!text) return;
+    // Tooltip content is author-written (UA_HEAD_HINTS / ABIL_MANUAL) — using
+    // innerHTML lets header tooltips include coloured legend spans.
+    tip.innerHTML = text;
+    tip.classList.add('is-visible');
+    // Position above the badge; flip below if it would overflow the viewport top.
+    const r = target.getBoundingClientRect();
+    const tipRect = tip.getBoundingClientRect();
+    let left = r.left + r.width / 2 - tipRect.width / 2;
+    left = Math.max(6, Math.min(left, window.innerWidth - tipRect.width - 6));
+    let top = r.top - tipRect.height - 8;
+    if (top < 6) top = r.bottom + 8;            // not enough room above → drop below
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+  function hide() { tip.classList.remove('is-visible'); }
+
+  document.addEventListener('mouseover', (e) => {
+    const t = e.target.closest('.qhint');
+    if (t) show(t);
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest('.qhint')) hide();
+  });
+  document.addEventListener('focusin', (e) => {
+    const t = e.target.closest('.qhint');
+    if (t) show(t);
+  });
+  document.addEventListener('focusout', (e) => {
+    if (e.target.closest('.qhint')) hide();
+  });
+  // Hide on any scroll (the badge's absolute coords change).
+  window.addEventListener('scroll', hide, true);
+})();
 
 // ---- Centre the row jumped to via #anchor (cross-page or same-page) ----
 // Default anchor behaviour scrolls the target to the top of the viewport,
