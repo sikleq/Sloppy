@@ -497,7 +497,7 @@ def save_creeps_html():
     AURA_SELF = {
         'hellcaller':           {'hp_regen': ('+', 3)},      # Unholy Aura
         'skeleton_warrior':     {'dmg': ('+', 2)},           # Rally
-        'taskmaster':           {'ms': ('+', 12)},           # Speed Aura
+        'taskmaster':           {'ms': ('*', 1.12)},         # Speed Aura +12%
         'soulstealer':          {'mp_regen': ('+', 1.75)},   # Mana Aura (Mindstealer)
         'outrunner':            {'magres': ('+', 20)},       # Cloak Aura (creep value)
         'prowler_acolyte':      {'hp_regen': ('+', 9)},      # Spawnlord HP-reg aura
@@ -505,7 +505,7 @@ def save_creeps_html():
         'enraged':              {'armor': ('+', 3)},         # Toughness Aura
         'small_thunder_lizard': {'as': ('+', 25)},           # War Drums (atk speed)
         'black_dragon':         {'armor': ('+', 3)},         # Dragonhide Aura
-        'granite':              {'hp': ('+', 16)},           # Granite Aura
+        'granite':              {'hp': ('*', 1.16)},         # Granite Aura +16%
     }
 
     # Display-name overrides — when Valve's canonical dname diverges from the
@@ -2201,6 +2201,28 @@ def save_creeps_html():
     UA_SHARED_TOOLTIP = {
         'frogmen_riverborn_aura': 'This aura is identical for all frog units',
     }
+    # ---- Ability descriptions parsed from data/abilities_english.txt ----
+    # Valve ships a single localization file with all ability tooltips, including
+    # neutral-creep abilities that don't appear in dota_english.txt. Build a
+    # `{slug: description}` dict once; render as a hover tooltip on each icon.
+    ABIL_DESC: dict[str, str] = {}
+    _ae_path = _os.path.join(_HERE, 'data', 'abilities_english.txt')
+    if _os.path.exists(_ae_path):
+        with open(_ae_path, encoding='utf-8-sig', errors='replace') as _f:
+            _ae_text = _f.read()
+        for _m in re.finditer(
+            r'"DOTA_Tooltip_ability_([a-z0-9_]+?)_Description"\s+"((?:[^"\\]|\\.)+)"',
+            _ae_text,
+        ):
+            _slug, _desc = _m.group(1), _m.group(2)
+            # Strip Valve's localization escapes / formatting macros that don't
+            # carry meaning in a plain tooltip (newlines kept as spaces).
+            _desc = (_desc.replace('\\n', ' ')
+                          .replace('<br>', ' ')
+                          .replace('  ', ' ')
+                          .strip())
+            if _slug not in ABIL_DESC:
+                ABIL_DESC[_slug] = _desc
     ua_rows = []
     for row in rendered:
         d = row['data']
@@ -2227,6 +2249,15 @@ def save_creeps_html():
                             f'{img_tag}{_autocast_snake_svg()}</span>')
                 else:
                     aico = img_tag
+                # Hover-tooltip with Valve's ability description (parsed from
+                # abilities_english.txt). Reuses the body-level qhint-tip JS via
+                # an `.abil-ico-hint` element carrying data-tooltip.
+                _desc = ABIL_DESC.get(slug)
+                if _desc:
+                    _t = _attr_esc(_desc)
+                    aico = (f'<span class="abil-ico-hint" tabindex="0" '
+                            f'role="button" aria-label="{_t}" '
+                            f'data-tooltip="{_t}">{aico}</span>')
             else:
                 aico = ''
             # Question-mark hint icon appended to the ability name when this

@@ -1290,19 +1290,23 @@
   }
   function hide() { tip.classList.remove('is-visible'); }
 
+  // Selector matches the original `?` badge plus any element that just opts
+  // into the body-level tooltip via `.abil-ico-hint` (currently used on
+  // ability icons in the Unit Abilities table).
+  const TIP_SEL = '.qhint, .abil-ico-hint';
   document.addEventListener('mouseover', (e) => {
-    const t = e.target.closest('.qhint');
+    const t = e.target.closest(TIP_SEL);
     if (t) show(t);
   });
   document.addEventListener('mouseout', (e) => {
-    if (e.target.closest('.qhint')) hide();
+    if (e.target.closest(TIP_SEL)) hide();
   });
   document.addEventListener('focusin', (e) => {
-    const t = e.target.closest('.qhint');
+    const t = e.target.closest(TIP_SEL);
     if (t) show(t);
   });
   document.addEventListener('focusout', (e) => {
-    if (e.target.closest('.qhint')) hide();
+    if (e.target.closest(TIP_SEL)) hide();
   });
   // Hide on any scroll (the badge's absolute coords change).
   window.addEventListener('scroll', hide, true);

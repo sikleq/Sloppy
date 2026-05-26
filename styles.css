@@ -3366,6 +3366,19 @@ body.filter-active ul.subnotes { display: none; }
    without taking over the cell's hover (cell hover is reserved for patchnotes).
    Used in the Damage cell ("от расстояния" for Tornado) and the Ability cell
    ("identical for all frog units" for Riverborn Aura). */
+/* Hover affordance for ability icons that carry a body-level tooltip via
+   data-tooltip. No visual badge — the icon itself is the trigger. */
+.abil-ico-hint {
+  display: inline-flex;
+  cursor: help;
+  outline: none;
+}
+.abil-ico-hint:focus-visible {
+  outline: 2px solid rgba(88, 166, 255, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .qhint {
   display: inline-flex;
   align-items: center;
