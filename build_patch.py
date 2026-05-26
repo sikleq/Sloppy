@@ -3018,7 +3018,7 @@ def write_head(version, date):
 <head>
 <meta charset="UTF-8">
 <title>Sloppy - {version} Changelog</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+{_site.favicon_links(prefix="../")}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&display=swap">
 <link rel="stylesheet" href="../styles.css?v={_ASSET_VERSION}">
@@ -3581,6 +3581,7 @@ def save_calendar_html():
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
         '<meta charset="UTF-8">\n'
         '<title>Sloppy - Calendar</title>\n'
+        + _site.favicon_links() +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         '<link rel="stylesheet" '
@@ -3634,6 +3635,7 @@ def save_index_html():
         '<head>\n'
         '<meta charset="UTF-8">\n'
         '<title>Sloppy</title>\n'
+        + _site.favicon_links() +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         '<link rel="stylesheet" '

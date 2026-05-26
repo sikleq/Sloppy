@@ -15,6 +15,18 @@ import os as _os
 _HERE = _os.path.dirname(_os.path.abspath(__file__))
 
 
+def favicon_links(prefix=""):
+    """Render the shared favicon <link> block. `prefix` is "" for root pages
+    and "../" for files under /patches/ so paths resolve correctly."""
+    return (
+        f'<link rel="icon" type="image/svg+xml" href="{prefix}icons/favicon/favicon.svg">\n'
+        f'<link rel="icon" type="image/png" sizes="96x96" href="{prefix}icons/favicon/favicon-96x96.png">\n'
+        f'<link rel="shortcut icon" href="{prefix}icons/favicon/favicon.ico">\n'
+        f'<link rel="apple-touch-icon" sizes="180x180" href="{prefix}icons/favicon/apple-touch-icon.png">\n'
+        f'<link rel="manifest" href="{prefix}icons/favicon/site.webmanifest">\n'
+    )
+
+
 def compute_asset_version():
     """Short SHA1 of styles.css + scripts.js combined content. Appended as
     ?v=<hash> to asset URLs so browsers re-fetch only when either changes."""

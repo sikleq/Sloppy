@@ -1439,6 +1439,7 @@ def save_creeps_html():
         '<head>\n'
         '<meta charset="UTF-8">\n'
         '<title>Sloppy - Creeps Table</title>\n'
+        + _site.favicon_links() +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         '<link rel="stylesheet" '
@@ -2261,6 +2262,7 @@ def save_creeps_html():
     ua_html = (
         '<!DOCTYPE html>\n<html lang="ru">\n<head>\n<meta charset="UTF-8">\n'
         '<title>Sloppy - Unit Abilities</title>\n'
+        + _site.favicon_links() +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         '<link rel="stylesheet" '
