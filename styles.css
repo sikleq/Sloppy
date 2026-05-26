@@ -23,6 +23,9 @@ body {
   margin: 0 auto;
   padding: 24px 28px 80px;
 }
+.container.calendar-page {
+  padding-top: 8px;
+}
 
 /* TOP NAV (full-width, sits above container)
    Dark-glass effect — translucent slab with cool-tinted backdrop blur,
@@ -53,10 +56,10 @@ nav.top-nav {
 }
 .nav-inner {
   width: 100%;
-  padding: 10px 24px 0;
+  padding: 6px 24px 0 10px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   gap: 20px;
 }
 .nav-tabs {
@@ -64,6 +67,87 @@ nav.top-nav {
   gap: 0;
   align-items: flex-end;
 }
+/* Header brand block (helmet logo + pixel-font title). Replaces the inline
+   nav tabs — the full nav list now lives on the main hub page. */
+.nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: #e6edf3;
+  padding: 6px 4px 10px;
+  margin-bottom: -2px;
+  transition: opacity 0.15s;
+}
+.nav-brand:hover { opacity: 0.85; }
+.nav-brand-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  /* Source PNG has a solid black background; `screen` blends black → fully
+     transparent against the dark nav bar, keeping the bright pixels intact. */
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+.nav-brand-text {
+  font-family: 'Jersey 10', 'Courier New', monospace;
+  font-size: 28px;
+  letter-spacing: 1px;
+  line-height: 1;
+  color: #d8e2ec;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+.nav-brand-sikle {
+  color: #e3c46a;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* Main hub tile grid — destinations that used to live in the header. */
+.hub-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  max-width: 960px;
+  margin: 56px auto;
+  padding: 0 24px;
+}
+.hub-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 22px 24px;
+  background: linear-gradient(180deg,
+    rgba(32, 42, 54, 0.85) 0%,
+    rgba(22, 30, 40, 0.92) 100%);
+  border: 1px solid rgba(170, 220, 240, 0.14);
+  border-radius: 10px;
+  text-decoration: none;
+  color: #e6edf3;
+  box-shadow:
+    inset 0 1px 0 rgba(190, 225, 240, 0.10),
+    0 3px 14px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.hub-tile:hover {
+  transform: translateY(-2px);
+  border-color: rgba(170, 220, 240, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(190, 225, 240, 0.18),
+    0 6px 22px rgba(0, 0, 0, 0.45);
+}
+.hub-tile-title {
+  font-family: 'Jersey 10', 'Courier New', monospace;
+  font-size: 26px;
+  color: #d8e2ec;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+.hub-tile-desc {
+  font-size: 13px;
+  color: #98a2b0;
+  line-height: 1.5;
+}
+
 .nav-tab {
   padding: 7px 14px 10px;
   color: #c9d1d9;
@@ -320,7 +404,7 @@ nav.top-nav {
 }
 
 /* CALENDAR PAGE */
-.calendar { margin: 24px 0; }
+.calendar { margin: 4px 0 24px; }
 .cal-toggle-bar {
   display: flex;
   align-items: center;
@@ -329,8 +413,8 @@ nav.top-nav {
      vertical slot on every page — even when one page (Unit Abilities) adds
      an extra control (the Upgrades switch) that's the same height but
      could otherwise cause a layout jiggle if its baseline differs by a px. */
-  min-height: 32px;
-  margin-bottom: 16px;
+  min-height: 28px;
+  margin-bottom: 8px;
   padding-left: 0;
   font-size: 13px;
   color: #8b949e;
@@ -487,6 +571,93 @@ nav.top-nav {
 .cal-year-block[data-collapsed="true"] .cal-year-label::after {
   transform: rotate(-90deg);
 }
+/* Current year breaks out of the .container width to give it visual prominence
+   over collapsed past years. Negative side margins extend it beyond the 1080px
+   cap; inner padding stays so contents don't hit the edge. */
+.cal-year-block.is-current {
+  margin-left: -140px;
+  margin-right: -140px;
+  border-color: rgba(170, 220, 240, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(190, 225, 240, 0.10),
+    0 4px 18px rgba(0, 0, 0, 0.35);
+}
+.cal-year-block.is-current .cal-year-label {
+  font-size: 20px;
+  padding: 14px 20px;
+}
+.cal-year-block.is-current .cal-mode-full,
+.cal-year-block.is-current .cal-mode-compact {
+  padding: 0 20px 18px;
+}
+/* Push the calendar toolbar left so it lines up with the breakout year block's
+   left edge (same -140px shift as .is-current). Scoped to .calendar so the
+   shared .cal-toggle-bar class on other pages (creeps / unit_abilities) stays
+   in place. */
+.calendar > .cal-toggle-bar { margin-left: -140px; }
+@media (max-width: 1400px) {
+  /* Stop the breakout when the viewport can't comfortably host it. */
+  .cal-year-block.is-current { margin-left: 0; margin-right: 0; }
+  .calendar > .cal-toggle-bar { margin-left: 0; }
+}
+
+/* Year selector — sits inside the year-block's label slot in place of the
+   former plain <h2> heading. Styled as a clear button: border, padding,
+   chevron, centered text inside the button and dropdown options. */
+.cal-year-select {
+  background:
+    linear-gradient(180deg, rgba(38, 46, 56, 0.95) 0%, rgba(26, 34, 42, 0.95) 100%);
+  border: 1px solid rgba(170, 220, 240, 0.35);
+  border-radius: 6px;
+  color: #e6edf3;
+  font: inherit;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  padding: 6px 22px;
+  text-align: center;
+  text-align-last: center;
+  direction: ltr;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image:
+    linear-gradient(180deg, rgba(38, 46, 56, 0.95) 0%, rgba(26, 34, 42, 0.95) 100%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 10'><path fill='%23ffffff' stroke='%23ffffff' stroke-width='1' d='M1 2l6 6 6-6z'/></svg>");
+  background-repeat: no-repeat, no-repeat;
+  background-position: 0 0, right 12px center;
+  background-size: 100% 100%, 14px 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(190, 225, 240, 0.10),
+    0 2px 6px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.cal-year-select:hover {
+  border-color: rgba(170, 220, 240, 0.6);
+}
+.cal-year-select:focus {
+  outline: none;
+  border-color: rgba(170, 220, 240, 0.75);
+  box-shadow:
+    inset 0 1px 0 rgba(190, 225, 240, 0.14),
+    0 0 0 3px rgba(121, 192, 255, 0.18);
+}
+.cal-year-select option {
+  background: #14191f;
+  color: #e6edf3;
+  font-size: 14px;
+  text-align: center;
+  text-align-last: center;
+  direction: ltr;
+  padding: 4px 12px;
+}
+.cal-year-block.is-current .cal-year-label {
+  cursor: default;
+}
+.cal-year-block.is-current .cal-year-label::after {
+  /* Drop the collapse chevron — block no longer collapses. */
+  content: none;
+}
 .cal-year-summary {
   display: flex;
   justify-content: space-between;
@@ -639,19 +810,50 @@ span.cal-patch {
   min-height: 22px;
   border-radius: 3px;
   background: rgba(110, 118, 129, 0.05);
-  font-size: 9.5px;
+  font-size: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4a5058;
+  color: #555c64;
   text-decoration: none;
   position: relative;
-  transition: transform 0.13s ease, filter 0.13s, z-index 0s;
+  transition: transform 0.13s ease, filter 0.13s, background 0.1s, z-index 0s;
 }
 .cal-full-day.no-day { background: transparent; }
+/* Cross-highlight: when hovering any day cell, JS marks all cells sharing the
+   same data-day (column) and data-month (row) so a vertical + horizontal band
+   lights up around the cursor. */
+.cal-full-grid .cross-row,
+.cal-full-grid .cross-col {
+  background: rgba(170, 220, 240, 0.07);
+}
+.cal-full-grid .cross-row.cross-col {
+  background: rgba(170, 220, 240, 0.16);
+}
+.cal-full-month-name.cross-row {
+  color: #e6edf3;
+}
+
+/* Universal table cross-highlight — applies to every <table> on every page.
+   On hover of any cell, the entire row + entire column get a soft tint; the
+   pivot cell (intersection) gets a brighter one. Background is a layered
+   "tint over whatever the cell already has" so coloured cells stay coloured.
+   Wired up in scripts.js → wireCrossHover(). */
+table tr.cross-row > td,
+table tr.cross-row > th,
+table td.cross-col,
+table th.cross-col {
+  background-image: linear-gradient(rgba(170, 220, 240, 0.08),
+                                    rgba(170, 220, 240, 0.08));
+}
+table tr.cross-row > td.cross-col,
+table tr.cross-row > th.cross-col {
+  background-image: linear-gradient(rgba(170, 220, 240, 0.18),
+                                    rgba(170, 220, 240, 0.18));
+}
 .cal-full-day.has-patch {
   font-weight: 700;
-  font-size: 8.5px;
+  font-size: 10px;
   letter-spacing: -0.2px;
   cursor: pointer;
 }
@@ -691,7 +893,6 @@ span.cal-patch {
 
 span.cal-full-day.has-patch {
   cursor: default;
-  opacity: 0.7;
 }
 
 /* Display toggling */
@@ -3099,7 +3300,8 @@ body.filter-active ul.subnotes { display: none; }
 /* Aura Stack red-x glyph — small. */
 .unit-abilities-table .ua-stack-glyph { font-size: 8px; }
 /* Cell dashes — half size. */
-.unit-abilities-table .ua-dash { color: #6e7681; font-size: 0.5em; }
+.unit-abilities-table .ua-dash,
+.creeps-table .ua-dash { color: #6e7681; font-size: 0.5em; }
 /* "Ability" header centred; Type values left-aligned so the words line up. */
 .unit-abilities-table th.ua-ability { text-align: center; }
 .unit-abilities-table th.ua-type,

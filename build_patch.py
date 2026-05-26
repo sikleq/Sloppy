@@ -3018,6 +3018,9 @@ def write_head(version, date):
 <head>
 <meta charset="UTF-8">
 <title>Sloppy - {version} Changelog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap">
 <link rel="stylesheet" href="../styles.css?v={_ASSET_VERSION}">
 </head>
 <body>
@@ -3419,39 +3422,64 @@ def save_calendar_html():
         return ('span', '')
 
     body = []
+    body.append('<div class="calendar mode-full">')
+
+    # Toggle bar — Compact switch only. Positioned outside the year block to
+    # the left so it lines up with (and sits above) the breakout block's
+    # left edge.
     body.append('<div class="cal-toggle-bar">')
-    body.append('<strong>View:</strong>')
-    body.append('<select class="cal-mode-select">')
-    body.append('<option value="full" selected>Expanded</option>')
-    body.append('<option value="compact">Compact</option>')
+    # Reuse the unit_abilities upgrades-toggle styling for visual consistency.
+    body.append(
+        '<label class="ua-upgrades-toggle cal-compact-toggle" '
+        'title="Compact view">'
+        '<span class="ua-upgrades-label">Compact</span>'
+        '<input type="checkbox" class="ua-switch-input cal-compact-input">'
+        '<span class="ua-switch"></span>'
+        '</label>'
+    )
+    body.append('</div>')
+
+    # Single year block. Year selector replaces per-year collapsible headers;
+    # all years' grids are rendered in panes and only the selected pane is
+    # visible at a time.
+    body.append('<div class="cal-year-block is-current" data-collapsed="false">')
+    body.append('<div class="cal-year-label">')
+    body.append('<select class="cal-year-select" aria-label="Select year">')
+    default_year = years[0] if years else None
+    for year in years:
+        sel = ' selected' if year == default_year else ''
+        body.append(f'<option value="{year}"{sel}>{year}</option>')
     body.append('</select>')
     body.append('</div>')
 
-    body.append('<div class="calendar mode-full">')
-
     for year in years:
-        collapsed = "false" if year in expanded_years else "true"
-        body.append(f'<div class="cal-year-block" data-collapsed="{collapsed}">')
-        body.append(f'<h2 class="cal-year-label">{year}</h2>')
+        hidden = '' if year == default_year else ' hidden'
+        body.append(f'<div class="cal-year-pane" data-year="{year}"{hidden}>')
 
         # ---- MODE FULL ----
         body.append('<div class="cal-mode-full">')
         body.append('<div class="cal-full-grid">')
         for month in range(1, 13):
-            body.append(f'<div class="cal-full-month-name">{months[month-1]}</div>')
+            body.append(
+                f'<div class="cal-full-month-name" data-month="{month}">'
+                f'{months[month-1]}</div>'
+            )
             days_in_m = monthrange(year, month)[1]
             for d in range(1, 32):
                 if d > days_in_m:
-                    body.append('<div class="cal-full-day no-day"></div>')
+                    body.append(
+                        f'<div class="cal-full-day no-day" '
+                        f'data-month="{month}" data-day="{d}"></div>')
                     continue
                 p = by_day.get((year, month, d))
+                attrs = f' data-month="{month}" data-day="{d}"'
                 if p:
                     cls = patch_class(p['version'])
                     tag, href = chip_tag(p['version'])
                     cur = " current" if p['version'] == current_v else ""
-                    body.append(f'<{tag} class="cal-full-day has-patch {cls}{cur}"{href}>{p["version"]}</{tag}>')
+                    body.append(f'<{tag} class="cal-full-day has-patch {cls}{cur}"{href}{attrs}>{p["version"]}</{tag}>')
                 else:
-                    body.append(f'<div class="cal-full-day">{d}</div>')
+                    body.append(f'<div class="cal-full-day"{attrs}>{d}</div>')
         body.append('</div></div>')
 
         # ---- MODE COMPACT ----
@@ -3475,7 +3503,7 @@ def save_calendar_html():
             body.append('</div></div>')
         body.append('</div></div>')
 
-        # ---- YEAR SUMMARY (Total / Longest / Shortest running patch) ----
+        # ---- YEAR SUMMARY ----
         ys = year_summary([p for p in patches if p['year'] == year])
         if ys:
             body.append(
@@ -3496,26 +3524,52 @@ def save_calendar_html():
                 '</div>'
             )
 
-        body.append('</div>')
+        body.append('</div>')  # cal-year-pane
 
-    body.append('</div>')
+    body.append('</div>')  # cal-year-block
+    body.append('</div>')  # .calendar
 
     toggle_script = '''<script>
 (function() {
   const cal = document.querySelector('.calendar');
-  const select = document.querySelector('.cal-mode-select');
-  if (select) {
-    select.addEventListener('change', () => {
+  const compact = document.querySelector('.cal-compact-input');
+  if (compact) {
+    compact.addEventListener('change', () => {
       cal.classList.remove('mode-full', 'mode-compact');
-      cal.classList.add('mode-' + select.value);
+      cal.classList.add(compact.checked ? 'mode-compact' : 'mode-full');
     });
   }
-  document.querySelectorAll('.cal-year-label').forEach(label => {
-    label.addEventListener('click', () => {
-      const block = label.parentElement;
-      const c = block.dataset.collapsed === 'true';
-      block.dataset.collapsed = c ? 'false' : 'true';
+  const ysel = document.querySelector('.cal-year-select');
+  if (ysel) {
+    ysel.addEventListener('change', () => {
+      document.querySelectorAll('.cal-year-pane').forEach(p => {
+        p.hidden = (p.dataset.year !== ysel.value);
+      });
     });
+  }
+  // Row + column cross-highlight on the Full grid. Event-delegated so it
+  // works across all year panes (only one is visible at a time).
+  document.querySelectorAll('.cal-full-grid').forEach(grid => {
+    let activeRow = null, activeCol = null;
+    const clear = () => {
+      grid.querySelectorAll('.cross-row,.cross-col').forEach(el => {
+        el.classList.remove('cross-row', 'cross-col');
+      });
+      activeRow = activeCol = null;
+    };
+    grid.addEventListener('mouseover', e => {
+      const cell = e.target.closest('[data-day],[data-month]');
+      if (!cell || !grid.contains(cell)) return;
+      const m = cell.dataset.month, d = cell.dataset.day;
+      if (m === activeRow && d === activeCol) return;
+      clear();
+      activeRow = m; activeCol = d;
+      if (m) grid.querySelectorAll(`[data-month="${m}"]`).forEach(
+        el => el.classList.add('cross-row'));
+      if (d) grid.querySelectorAll(`[data-day="${d}"]`).forEach(
+        el => el.classList.add('cross-col'));
+    });
+    grid.addEventListener('mouseleave', clear);
   });
 })();
 </script>'''
@@ -3527,10 +3581,14 @@ def save_calendar_html():
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
         '<meta charset="UTF-8">\n'
         '<title>Sloppy - Calendar</title>\n'
+        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+        '<link rel="stylesheet" '
+        'href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap">\n'
         f'<link rel="stylesheet" href="styles.css?v={_ASSET_VERSION}">\n'
         '</head>\n<body>\n\n'
         + nav
-        + '\n<div class="container">\n'
+        + '\n<div class="container calendar-page">\n'
         + '\n'.join(body)
         + '\n</div>\n\n'
         + f'<script src="scripts.js?v={_ASSET_VERSION}"></script>\n'
@@ -3548,17 +3606,40 @@ def save_index_html():
     later. Title and structure mirror the other tabs so the header stays
     in step."""
     nav = _render_top_nav(active="main", patch_context=False)
+    latest_href = PATCHES[0]['filename'] if PATCHES else "#"
+    # Tile grid replacing the old header nav buttons. Order mirrors the
+    # previous header (changelogs → calendar → materials); "Main" itself is
+    # excluded since we're already on it.
+    tiles = [
+        ('Advanced Patch Reader', latest_href,
+         'Patch-by-patch changelogs with dynamics tracking.'),
+        ('Calendar', 'calendar.html',
+         'Timeline of every Dota 2 patch release.'),
+        ('Materials', 'creeps.html',
+         'Neutral creeps, unit abilities, and other game data.'),
+    ]
+    tile_html = ''.join(
+        f'<a class="hub-tile" href="{href}">'
+        f'<span class="hub-tile-title">{label}</span>'
+        f'<span class="hub-tile-desc">{desc}</span>'
+        f'</a>'
+        for label, href, desc in tiles
+    )
     html = (
         '<!DOCTYPE html>\n'
         '<html lang="en">\n'
         '<head>\n'
         '<meta charset="UTF-8">\n'
         '<title>Sloppy</title>\n'
+        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+        '<link rel="stylesheet" '
+        'href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap">\n'
         f'<link rel="stylesheet" href="styles.css?v={_ASSET_VERSION}">\n'
         '</head>\n'
         '<body>\n'
         f'{nav}\n'
-        '<div class="container main-page"></div>\n'
+        f'<div class="container main-page"><div class="hub-tiles">{tile_html}</div></div>\n'
         f'<script src="scripts.js?v={_ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
     )

@@ -1320,7 +1320,7 @@ def save_creeps_html():
         is shown on hover. Falls back to the name text when no icon exists."""
         if k == 'camp':
             if not v:
-                return '&nbsp;'
+                return '<span class="ua-dash">—</span>'
             imgs = []
             for t in v.split(','):
                 label = CAMP_LABEL.get(t, t)
@@ -1338,7 +1338,7 @@ def save_creeps_html():
                     f'title="{tip}" loading="lazy"></span>')
         if k in ('ability1', 'ability2', 'ability3'):
             if not v:
-                return '&nbsp;'
+                return '<span class="ua-dash">—</span>'
             slug = d.get(k + '_slug', '')
             if _has_abil_icon(slug):
                 img = (f'<img class="abil-ico" src="icons/abilities/{slug}.png" '
@@ -1369,7 +1369,7 @@ def save_creeps_html():
             return (f'<a class="abil-link" '
                     f'href="unit_abilities.html#{target_ch}-{slug}">{inner}</a>'
                     if slug else inner)
-        return _esc(v) if v else '&nbsp;'
+        return _esc(v) if v else '<span class="ua-dash">—</span>'
 
     body_parts = []
     for row in rendered:
@@ -1439,6 +1439,10 @@ def save_creeps_html():
         '<head>\n'
         '<meta charset="UTF-8">\n'
         '<title>Sloppy - Creeps Table</title>\n'
+        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+        '<link rel="stylesheet" '
+        'href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap">\n'
         f'<link rel="stylesheet" href="styles.css?v={ASSET_VERSION}">\n'
         '</head>\n'
         '<body>\n'
@@ -1731,8 +1735,6 @@ def save_creeps_html():
             'cast_range': _val_qhint('900', 'Bounces range is 500'),
             'effect': 'Damage to multiple targets'},
         'black_drake_magic_amplification_aura': {
-            # KV has av_radius 1200, but in-game tooltip / user verifies 800.
-            'aoe': '800',
             'effect': _val_qhint(
                 'Increases all spell damage taken by enemies by 5/6/7/9%',
                 "Amplifies any damage type if it's spell damage")},
@@ -1827,10 +1829,11 @@ def save_creeps_html():
         'enraged_wildkin_hurricane': {
             # No av_duration in KV; the knockback travel time is fixed at 0.5s.
             'duration': '0.5',
-            'effect': 'Knockback in any direction'},
+            'effect': 'Pushes a unit in the vector-targeted direction'},
         'warpine_raider_seed_shot': {
             'cast_range': _val_qhint('575', 'Bounces range is 500'),
-            'effect': 'Damage to multiple targets',
+            'ms_effect': '-100%',
+            'effect': 'Damage to 4/6/8/12 targets',
             'effect2': 'Movement slow'},
         'frogmen_congregation_of_the_deep': {
             # AbilityCastRange=0 (self-cast); effective tentacle reach is the
@@ -1844,10 +1847,10 @@ def save_creeps_html():
             'effect': '8/9/10/11% cooldown reduction'},
         'big_thunder_lizard_wardrums_aura': {
             'effect': 'Attack speed bonus',
-            'effect2': 'Accuracy'},
+            'effect2': 'Accuracy 40/43/46/51%'},
         'frogmen_water_bubble_large': {
             'effect': '210/240/270/300 magic barrier',
-            'effect2': '50% of the barrier burst is healed'},
+            'effect2': '50% of the barrier burst heals the target'},
         'satyr_hellcaller_unholy_aura': {
             'effect': '+3/5/7/11 HP/sec regen'},
         'satyr_hellcaller_shockwave': {
@@ -1859,10 +1862,16 @@ def save_creeps_html():
                 '700', 'Max travel distance is 1580'),
             'effect': 'AoE damage with a projectile'},
         'dark_troll_warlord_raise_dead': {
+            'manacost': '50', 'cooldown': '20', 'duration': '35',
+            '_force_leveled': ('effect',),
             'effect': (
-                '\x01Summons 3 <a class="ua-inline-link" '
+                '\x01<span class="cell-wrap">Summons 3 <a class="ua-inline-link" '
                 'href="creeps.html#unit-skeleton_warrior">'
-                'Skeleton Warriors</a>'),
+                'Skeleton Warriors</a>'
+                '<span class="qhint" tabindex="0" role="button" '
+                'aria-label="HP = 250/275/300/375, attack damage = 12/15/18/21" '
+                'data-tooltip="HP = 250/275/300/375, attack damage = 12/15/18/21"'
+                '>?</span></span>'),
             'effect2': (
                 '\x01Skeletons have <a class="ua-inline-link" '
                 'href="unit_abilities.html#skeleton_warrior-hill_troll_rally">'
@@ -1895,6 +1904,7 @@ def save_creeps_html():
             'duration': _val_qhint(
                 '2/2.25/2.5/3 or 4',
                 'Scaling duration on heroes. Lasts longer on creeps (4)'),
+            'as_effect': '-60%',
             'effect': 'AoE damage', 'effect2': 'AoE slow'},
         'big_thunder_lizard_frenzy': {
             'effect': 'Attack speed bonus on 1 ally'},
@@ -2035,6 +2045,10 @@ def save_creeps_html():
                 _text = str(_v or '')
             if _LVL_RE.search(_text):
                 leveled.add(_k)
+        # Manual overrides can force cells to render as leveled even when the
+        # visible text doesn't carry a slash-progression (e.g. "Summons 3 …"
+        # with per-level HP/damage values surfaced via tooltip only).
+        leveled.update(props.pop('_force_leveled', ()))
         props['_leveled'] = leveled
         return props
 
@@ -2117,7 +2131,7 @@ def save_creeps_html():
         dc = f' data-col="{pk}"'
         if pk == 'type':
             if not val:
-                return f'<td class="ua-type{sep}"{dc}>&nbsp;</td>'
+                return f'<td class="ua-type{sep}"{dc}><span class="ua-dash">—</span></td>'
             return f'<td class="ua-type ua-type-{val.lower()}{sep}"{dc}>{_esc(val)}</td>'
         if pk == 'damage':
             dt = (props or {}).get('dmg_type', '')
@@ -2126,7 +2140,7 @@ def save_creeps_html():
                 # Manual override already has .dmg-num spans where appropriate.
                 return f'<td class="ua-damage{dt_cls}{sep}"{dc}>{val[1:]}</td>'
             if not val:
-                return f'<td class="ua-damage{dt_cls}{sep}"{dc}>&nbsp;</td>'
+                return f'<td class="ua-damage{dt_cls}{sep}"{dc}><span class="ua-dash">—</span></td>'
             return (f'<td class="ua-damage{dt_cls}{sep}"{dc}>'
                     f'{_dmg_color_html(_esc(val))}</td>')
         # Coloured yes/no text. Sort rank: dash (0) < no (1) < yes (2).
@@ -2173,7 +2187,8 @@ def save_creeps_html():
         # so we can inline <img> / <span> markup (used for Mana Burn's Int icon).
         if isinstance(val, str) and val.startswith('\x01'):
             return f'<td class="ua-{pk}{sep}"{dc}>{val[1:]}</td>'
-        return f'<td class="ua-{pk}{sep}"{dc}>{_esc(val) or "&nbsp;"}</td>'
+        inner = _esc(val) or '<span class="ua-dash">—</span>'
+        return f'<td class="ua-{pk}{sep}"{dc}>{inner}</td>'
 
     # Abilities that are identical across multiple units (same slug, same
     # values) get a single canonical row on the UA page — pinned to the listed
@@ -2246,6 +2261,10 @@ def save_creeps_html():
     ua_html = (
         '<!DOCTYPE html>\n<html lang="ru">\n<head>\n<meta charset="UTF-8">\n'
         '<title>Sloppy - Unit Abilities</title>\n'
+        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+        '<link rel="stylesheet" '
+        'href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap">\n'
         f'<link rel="stylesheet" href="styles.css?v={ASSET_VERSION}">\n'
         '</head>\n<body>\n'
         f'{nav}\n'

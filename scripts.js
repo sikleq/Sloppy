@@ -1353,4 +1353,51 @@
   } else {
     centerHash();
   }
+
+  // ---- CROSS-HIGHLIGHT FOR ALL <table> ELEMENTS ----
+  // On hover of any <td>, light up the entire row + the entire column the
+  // cell sits in (visual "+" through the table, like Liquipedia crosstable).
+  // Attaches to every <table> on the page after DOM ready.
+  function wireCrossHover(table) {
+    if (table.dataset.crossWired === '1') return;
+    table.dataset.crossWired = '1';
+    let activeRow = null;
+    const colCells = [];
+    const clear = () => {
+      if (activeRow) {
+        activeRow.classList.remove('cross-row');
+        activeRow = null;
+      }
+      colCells.forEach(c => c.classList.remove('cross-col'));
+      colCells.length = 0;
+    };
+    table.addEventListener('mouseover', e => {
+      const cell = e.target.closest('td,th');
+      if (!cell || !table.contains(cell)) return;
+      const row = cell.parentElement;
+      if (row.tagName !== 'TR') return;
+      const idx = cell.cellIndex;
+      if (row === activeRow &&
+          colCells.length && colCells[0].cellIndex === idx) return;
+      clear();
+      activeRow = row;
+      row.classList.add('cross-row');
+      table.querySelectorAll('tr').forEach(tr => {
+        const c = tr.cells && tr.cells[idx];
+        if (c) {
+          c.classList.add('cross-col');
+          colCells.push(c);
+        }
+      });
+    });
+    table.addEventListener('mouseleave', clear);
+  }
+  function wireAllTables() {
+    document.querySelectorAll('table').forEach(wireCrossHover);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireAllTables);
+  } else {
+    wireAllTables();
+  }
 })();

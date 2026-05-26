@@ -48,25 +48,28 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
                     doesn't jump between tabs.
     """
     prefix = "../" if patch_context else ""
-    tabs = []
-    for key, label, root_href in NAV_TABS:
-        cls = " active" if active == key else ""
-        target = latest_href if key == "changelogs" else (prefix + root_href)
-        tabs.append(f'<a class="nav-tab{cls}" href="{target}">{label}</a>')
+    # Header now carries a brand block (helmet logo + pixel-font title) instead
+    # of inline nav tabs. The full nav list lives on the main hub page.
+    brand = (
+        f'<a class="nav-brand" href="{prefix}index.html" aria-label="Home">'
+        f'<img class="nav-brand-logo" src="{prefix}icons/header-helmet.png" '
+        f'alt="" loading="eager">'
+        f'<span class="nav-brand-text">Dota-related stuff by '
+        f'<span class="nav-brand-sikle">sikle</span></span>'
+        f'</a>'
+    )
     if picker_html:
         right_side = picker_html
     else:
-        # Flat tabs (calendar, creeps, main, any future page) reserve the
-        # nav-context height via the unified .nav-context-flat modifier.
+        # Non-patch pages still reserve the nav-context height so the header
+        # doesn't jump between tabs.
         right_side = (
             f'\n    <div class="nav-context nav-context-flat '
             f'nav-context-{active}"></div>'
         )
     return f'''<nav class="top-nav">
   <div class="nav-inner">
-    <div class="nav-tabs">
-      {"".join(tabs)}
-    </div>{right_side}
+    {brand}{right_side}
   </div>
 </nav>
 '''
