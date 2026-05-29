@@ -86,7 +86,12 @@ Bug reports: include the patch version, the hero/item/ability, and what you expe
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+**PolyForm Noncommercial 1.0.0** — see [LICENSE](LICENSE).
+
+Source is open for reading, learning, hobby and educational use. **Commercial
+use is not permitted** without a separate license from the copyright holder.
+Open an issue or contact [@sikleq](https://github.com/sikleq) for commercial
+licensing inquiries.
 
 ## Acknowledgements
 

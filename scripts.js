@@ -242,17 +242,20 @@
   });
   // Also index ability titles (h4.ability-title) — pull icon from the .ability-block
   // wrapper so search results show the same picture as the ability heading.
-  // For innate abilities, Valve doesn't expose icons on the React CDN; the
-  // canonical image is the innate marker, so use that directly in search.
+  // Innate abilities that have their own icon (e.g. Invoker's Invoke =
+  // invoker_invoke.png + small innate marker overlay) should still use that
+  // icon in search results; only fall back to the generic innate marker when
+  // Valve doesn't expose a dedicated icon on the React CDN.
   document.querySelectorAll('h4.ability-title').forEach(h => {
     const block = h.closest('.ability-block');
     const imgEl = block ? block.querySelector('.ability-icon-img') : null;
     const isInnate = block ? block.classList.contains('is-innate') : false;
     const innateUrl = '../icons/misc/innate_icon.png';
+    const realIcon = imgEl ? imgEl.src : null;
     entities.push({
       name: h.textContent.trim(),
       element: h,
-      icon: isInnate ? innateUrl : (imgEl ? imgEl.src : null),
+      icon: realIcon || (isInnate ? innateUrl : null),
       kind: 'ability'
     });
   });
