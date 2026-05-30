@@ -1,0 +1,330 @@
+"DOTAAbilities"
+{
+    "Version"       "1"
+
+	//=================================================================================================================
+	// Ability: Pudge Flesh Heap
+	//=================================================================================================================
+	"pudge_flesh_heap"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"20 19 18 17"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"50 60 70 80"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"damage_block"					
+			{
+				"value"			"8 14 20 26"
+				"special_bonus_unique_pudge_1"	"x1.5"
+			}			
+			"duration"	"4 5 6 7"
+
+		}
+		
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_2"
+	}
+	
+	//=================================================================================================================
+	// Ability: Pudge Meat Hook
+	//=================================================================================================================
+	"pudge_meat_hook"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"FightRecapLevel"				"1"
+		"AbilitySound"					"Hero_Pudge.AttackHookExtend"
+		"HasShardUpgrade"			"1"
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.3 0.3 0.3 0.3"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"110"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"damage"
+			{
+				"value"									"150 220 290 360"
+				"special_bonus_facet_pudge_flayers_hook"	"=80 =120 =160 =200"
+				"special_bonus_unique_pudge_7"			"+150"
+			}
+			"hook_speed"								
+			{
+				"value"						"1600.0"
+				"special_bonus_facet_pudge_flayers_hook"	"+0"
+			}
+
+			"hook_width"								"100"
+			"AbilityCastRange"								
+			{
+				"value"						"1300"
+				"special_bonus_facet_pudge_flayers_hook"	"+15%"
+			}
+			
+			"vision_radius"		"500 500 500 500"
+			"vision_duration"	"4.0 4.0 4.0 4.0"
+			"reveal_duration"	"00"
+			"AbilityCooldown"				
+			{
+				"value"								"18 16 14 12"
+				"special_bonus_unique_pudge_5"		"-4"
+			}
+			"vector_target_distance"
+			{
+				"value"								"0"
+				
+			}
+
+			"distance_to_damage"
+			{
+				"special_bonus_shard"	 "20"				
+			}
+
+			"min_distance_damage"
+			{
+				"special_bonus_shard"	"10"
+			}
+			
+			"cooldown_reduction_pct_allied_hook"
+			{
+				"special_bonus_shard"	"50"
+			}
+
+			"self_stun_duration_percent"
+			{
+				"value"									"65"
+			}
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_1"
+	}
+	
+	//=================================================================================================================
+	// Ability: Pudge Rot
+	//=================================================================================================================
+	"pudge_rot"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"FightRecapLevel"				"1"
+		"HasScepterUpgrade"				"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0 0 0 0"
+
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+				"rot_radius"			
+				{
+					"value"	"250"
+					"special_bonus_scepter"			"+200"
+					"affected_by_aoe_increase"	"1"
+				}
+				"rot_tick"				"0.2"
+				"rot_slow"				
+				{
+					"value"				"-14 -20 -26 -32"
+					"special_bonus_unique_pudge_4" "+-10"
+				}
+				"rot_damage"			
+				{
+					"value"			"30 60 90 120"
+					"special_bonus_scepter"		"+90"
+				}
+				"scepter_rot_regen_reduction_pct"			
+				{
+					"special_bonus_scepter"			"20"
+				}
+				"attack_damage_per_stack"
+				{
+					"special_bonus_facet_pudge_rotten_core"	"0.8 1.6 2.4 3.2"
+				}
+				"max_total_stacks"
+				{
+					"special_bonus_facet_pudge_rotten_core"	"=25"
+				}
+				"stacks_decrement_per_rot_off_tick"
+				{
+					"special_bonus_facet_pudge_rotten_core"	"=5"
+				}
+				"attack_damage_per_second_tooltip"			// attack_damage_per_stack * time_for_max_stacks_tooltip
+				{
+					"special_bonus_facet_pudge_rotten_core"	"4 8 12 16"
+				}
+				"max_bonus_damage_tooltip"					// attack_damage_per_stack * max_total_stacks
+				{
+					"special_bonus_facet_pudge_rotten_core"	"20 40 60 80"
+					"CalculateSpellDamageTooltip"			"0"
+					"DamageTypeTooltip"						"DAMAGE_TYPE_PHYSICAL"
+				}
+				"time_for_max_stacks_tooltip"				// max_total_stacks * rot_tick
+				{
+					"special_bonus_facet_pudge_rotten_core"	"=5.0"
+				}
+				"time_for_decay_tooltip"					// max_total_stacks * rot_tick / stacks_decrement_per_rot_off_tick
+				{
+					"special_bonus_facet_pudge_rotten_core"	"=1.0"
+				}
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_2"
+	}
+	
+	//=================================================================================================================
+	// Pudge: Eject
+	//=================================================================================================================
+	"pudge_eject"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"MaxLevel"						"1"
+		"FightRecapLevel"				"1"
+		"AbilitySound"					"Hero_Enchantress.EnchantCreep"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
+	}
+	
+	//=================================================================================================================
+	// Ability: Pudge Dismember
+	//=================================================================================================================
+	"pudge_dismember"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"ABILITY_TYPE_ULTIMATE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES_STRONG"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"FightRecapLevel"				"2"
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"200"
+		"AbilityCastPoint"				"0.3 0.3 0.3"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_4"
+		"AbilityChannelAnimation"		"ACT_DOTA_CHANNEL_ABILITY_4"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 130 170"
+		
+		"AbilityValues"
+		{
+			"dismember_damage"		
+			{
+				"value"					"80 100 120"
+				"special_bonus_unique_pudge_3"	"x1.5"	
+				"CalculateSpellDamageTooltip"	"1"
+			}
+			"strength_damage"		
+			{
+				"value"				"0.3 0.6 0.9"
+				"special_bonus_unique_pudge_3"	"x1.8"
+				"CalculateSpellDamageTooltip"	"0"
+			}
+			"ticks"		
+			{
+				"value"						"6"
+				"special_bonus_unique_pudge_6"	"+2"
+			}
+			"pull_units_per_second"		"75"
+			"pull_distance_limit"		"125"
+			"animation_rate"		"1.5"
+			"AbilityChannelTime"			
+			{
+				"value"				"2.75 2.75 2.75"
+				"special_bonus_unique_pudge_6"	"+0.75"
+			}
+			
+			"AbilityCooldown"				
+			{
+				"value"							"30 25 20"
+			}
+			"shard_regen_pct"			
+			{
+				"special_bonus_shard"			"5"
+			}
+			"order_lock_duration"		
+			{
+				"special_bonus_shard"			"2.75"
+			}
+			"shard_cast_range"		
+			{
+				"special_bonus_shard"			"300"
+			}
+			"gluttony_strength_bonus"
+			{
+				"special_bonus_facet_pudge_fresh_meat"			"2 4 6"				
+			}
+			"glutton_strength_stack_duration"
+			{
+				"special_bonus_facet_pudge_fresh_meat"			"12"				
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Pudge: Graft Flesh (Innate)
+	//=================================================================================================================
+	"pudge_innate_graft_flesh"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
+		"MaxLevel"						"4"
+		"Innate"						"1"
+		"DependentOnAbility"			"pudge_dismember"
+
+		"AbilityValues"
+		{
+			"flesh_heap_strength_buff_amount"
+			{
+				"value"	"1.1 1.4 1.7 2.0"
+				"special_bonus_unique_pudge_1"	"x1.5"
+			}
+			"flesh_heap_range"		
+			{
+				"value"		"450"
+				"affected_by_aoe_increase"	"1"
+			}
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
+	}
+}
