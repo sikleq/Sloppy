@@ -296,10 +296,6 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE",
     "AbilityType": "ABILITY_TYPE_BASIC"
   },
-  "miniboss_fortification": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE",
-    "AbilityType": "ABILITY_TYPE_BASIC"
-  },
   "miniboss_inherent_buffs": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
@@ -1788,10 +1784,6 @@
     "AbilityType": "ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
-  "special_bonus_agility_81": {
-    "AbilityType": "ABILITY_TYPE_ATTRIBUTES",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-  },
   "special_bonus_agility_100": {
     "AbilityType": "ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -2061,10 +2053,6 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
   "special_bonus_attack_damage_252": {
-    "AbilityType": "ABILITY_TYPE_ATTRIBUTES",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-  },
-  "special_bonus_attack_damage_253": {
     "AbilityType": "ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
@@ -2758,41 +2746,5 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_ITEM",
     "AbilityCooldown": 0,
     "AbilityManaCost": 0
-  },
-  "deity_blessing_goddess_of_luck": {
-    "AbilityType": "ABILITY_TYPE_HIDDEN",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
-  },
-  "deity_blessing_spirit_of_nature": {
-    "AbilityType": "ABILITY_TYPE_HIDDEN",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
-  },
-  "deity_blessing_omniscience": {
-    "AbilityType": "ABILITY_TYPE_HIDDEN",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
-  },
-  "deity_blessing_imperator": {
-    "AbilityType": "ABILITY_TYPE_HIDDEN",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
-  },
-  "deity_blessing_seven_hells": {
-    "AbilityType": "ABILITY_TYPE_HIDDEN",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
-  },
-  "deity_blessing_aghanim": {
-    "AbilityType": "ABILITY_TYPE_HIDDEN",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
-  },
-  "deity_blessing_fundamentals": {
-    "AbilityType": "ABILITY_TYPE_HIDDEN",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
-  },
-  "deity_blessing_flayed_twins": {
-    "AbilityType": "ABILITY_TYPE_HIDDEN",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
-  },
-  "deity_blessing_deep_ones": {
-    "AbilityType": "ABILITY_TYPE_HIDDEN",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
   }
 }
