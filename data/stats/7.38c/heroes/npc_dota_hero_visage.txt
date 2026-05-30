@@ -1,0 +1,583 @@
+"DOTAAbilities"
+{
+    "Version"       "1"
+
+	//=================================================================================================================
+	// Visage: Grave Chill
+	//=================================================================================================================
+	"visage_grave_chill"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+		"FightRecapLevel"				"1"
+		"AbilitySound"					"Hero_Visage.GraveChill.Cast"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.2 0.2 0.2 0.2"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"90"		
+
+		// Cast Range
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"625"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"AbilityCooldown"				
+			{
+				"value"									"17 15 13 11"
+
+			}	
+			"chill_duration"
+			{
+				"value"					"5"
+				"special_bonus_unique_visage_grave_chill_duration"			"+2"
+			}
+			"movespeed_bonus"				"12 16 20 24"
+			"attackspeed_bonus"				"25 40 55 70"
+			"radius"
+			{
+				"value"			"900"
+				"affected_by_aoe_increase"	"1"
+			}
+			"target_radius"
+			{
+				"affected_by_aoe_increase"	"1"
+				"special_bonus_facet_visage_sepulchre"		"300"
+			}
+			"penalty"
+			{
+				"special_bonus_facet_visage_sepulchre"		"50"
+			}
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
+	}	
+
+	//=================================================================================================================
+	// Visage: Soul Assumption
+	//=================================================================================================================
+	"visage_soul_assumption"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"FightRecapLevel"				"1"
+		"AbilitySound"					"Hero_Visage.SoulAssumption.Cast"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.2 0.2 0.2 0.2"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"4"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"110"		
+
+		// Cast Range
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1000"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+				"bolt_speed"				"1000"
+				"soul_base_damage"			"20"
+				"soul_charge_damage"		
+				{
+					"value"			"70"
+				"special_bonus_unique_visage_4" "+25"
+				}
+				"soul_charge_gold"
+				{
+					"value"												"0"
+					"special_bonus_facet_visage_gold_assumption"		"30"	// if changing this, change gold_max_tooltip
+				}
+				"gold_creep_pct"
+				{
+					"value"												"0"
+					"special_bonus_facet_visage_gold_assumption"		"15"
+				}
+				"gold_grace_period_hero"
+				{
+					"value"												"0"
+					"special_bonus_facet_visage_gold_assumption"		"3.0"
+				}
+				"gold_max_tooltip"
+				{
+					"value"												"0"
+					"special_bonus_facet_visage_gold_assumption"		"90 120 150 180"		// TOOLTIP ONLY, if changing this, change soul_charge_gold
+				}
+				"stack_limit"				"3 4 5 6"
+				"stack_duration"			"6.0"
+				"damage_limit"				
+				{
+					"value"			"100"
+					"DamageTypeTooltip"			"DAMAGE_TYPE_NONE"
+				}
+				"radius"					
+				{
+					"value"			"1800"
+					"affected_by_aoe_increase"	"1"
+				}
+				"damage_min"				"2.0"
+				"damage_max"				"3000.0"
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_2"
+	}	
+
+	//=================================================================================================================
+	// Visage: Gravekeeper's Cloak
+	//=================================================================================================================
+	"visage_gravekeepers_cloak"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"HasShardUpgrade"             "1"
+		"AbilityDraftPreAbility"		"visage_summon_familiars_stone_form"
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
+		"IsBreakable"					"1"
+		"AbilityValues"
+		{
+			"max_layers"
+			{
+				"value" "4"
+			}
+			"damage_reduction"
+			{
+				"value" "8 12 16 20"
+			}
+			"recovery_time"
+			{
+				"value" "7 6 5 4"
+			}
+			"minimum_damage"
+			{
+				"value" "40"
+			}
+			"radius"
+			{
+				"affected_by_aoe_increase"	"1"
+				"value" "900"
+			}
+			"max_damage_reduction"
+			{
+				"value" "80"
+			}
+			"shard_hp_restoration_pct"
+			{
+				"special_bonus_shard" "25"
+			}
+			"shard_cooldown"
+			{
+				"special_bonus_shard" "65"
+			}
+			"shard_manacost"
+			{
+				"special_bonus_shard" "125"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Visage: Summon Familiars
+	//=================================================================================================================
+	"visage_summon_familiars"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"	
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+
+		"AbilityDraftUltScepterAbility"		"visage_silent_as_the_grave"
+
+		"AbilitySound"					"Hero_Visage.SummonFamiliars.Cast"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0 0 0"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_4"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"130 120 110"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"150 150 150"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"familiar_hp"				"500 600 700"
+			"familiar_armor"			"0 2 4"
+			"familiar_attack_range"		
+			{
+				"value"					"180"
+				"special_bonus_facet_visage_faithful_followers"			"+170"
+			}
+			"familiar_base_movespeed"		
+			{
+				"value"					"430"
+				"special_bonus_facet_visage_faithful_followers"			"+40"
+			}
+			"familiar_bounty"
+			{
+				"value"													"100"
+				"special_bonus_facet_visage_faithful_followers"			"=50"
+			}
+			"bonus_movement_speed"				
+			{
+				"value"						"0"
+			}
+			"familiar_attack_damage"		
+			{
+				"value"								"25 50 75"
+				"CalculateSpellDamageTooltip"		"0"
+			}	
+			"bonus_damage"
+			{
+				"value"								"0"
+				"special_bonus_unique_visage_7"		"+6"
+				"CalculateSpellDamageTooltip"		"0"
+			}
+			"familiar_count"
+			{
+				"value"						"2"
+				"special_bonus_unique_visage_6"		"+1"
+			}
+			"armor_reduction_per_hit"
+			{
+				"value"					"0"
+				"special_bonus_unique_visage_1"			"+1"
+			}
+			"armor_reduction_duration"
+			{
+				"value"					"0"
+				"special_bonus_unique_visage_1"			"+10"
+			}
+			// uncontrollable familiars info
+			"in_formation"
+			{
+				"value"					"0"
+				"special_bonus_facet_visage_faithful_followers"		"+1"
+			}
+			"back_distance"			"75"
+			"side_distance"			"75"
+			"return_distance"		
+			{
+				"value"		"1200"
+			}
+			"recall_duration"		"4"
+			"max_distance"			
+			{
+				"value"		"3500"
+				"affected_by_aoe_increase"	"1"
+			}
+			"attack_range_buffer"	"200"
+			"additional_target_search_radius"	
+			{
+				"value" "300"
+				"affected_by_aoe_increase"	"1"
+			}
+
+		}
+	}
+
+	//=================================================================================================================
+	// Visage: Silent as the Grave (scepter)
+	//=================================================================================================================
+	"visage_silent_as_the_grave"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		
+
+		"MaxLevel"						"1"
+
+		"IsGrantedByScepter"			"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.0"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_5"
+		"AbilityCastGestureSlot"		"DEFAULT"
+		
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"45.0"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"115"
+		"AbilityValues"
+		{
+			"bonus_duration"
+			{
+				"value" "4"
+			}
+			"bonus_damage"
+			{
+				"value" "20"
+			}
+			"invis_duration"
+			{
+				"value" "30"
+			}
+			"movespeed_bonus"
+			{
+				"value" "20"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Visage: Summon Familiars Stone Form Self Cast
+	//=================================================================================================================
+	"visage_stone_form_self_cast"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_IGNORE_PSEUDO_QUEUE | DOTA_ABILITY_BEHAVIOR_ALT_CASTABLE | DOTA_ABILITY_BEHAVIOR_IGNORE_SILENCE"
+
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"MaxLevel"						"3"
+		"DependentOnAbility"			"visage_summon_familiars"
+
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.0"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"0.0"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"0"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+				"stun_radius"						
+				{
+					"value"			"375"
+					"affected_by_aoe_increase"	"1"
+				}
+				"stun_delay"						"0.55"
+				"stun_damage"						"60 100 140"
+				"stun_duration"						"0.8 1.0 1.2"
+				"stone_duration"					"6.0"
+				"hp_regen"							"150 175 200"
+				"AbilityCastRange"
+				{
+					"value"						"0"
+					"special_bonus_facet_visage_faithful_followers"		"=1200"
+				}
+		}
+	}
+
+	//=================================================================================================================
+	// Visage: Summon Familiars Stone Form
+	//=================================================================================================================
+	"visage_summon_familiars_stone_form"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_IGNORE_PSEUDO_QUEUE | DOTA_ABILITY_BEHAVIOR_ALT_CASTABLE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES_STRONG"
+		"AbilityCastRange"				"50"
+		"AbilityCastPoint"				"0.0"
+		"MaxLevel"						"3"
+		"AbilitySound"					"Visage_Familiar.StoneForm.Cast"
+		"DependentOnAbility"			"visage_summon_familiars"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"11.0"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"stun_radius"
+			{
+				"value"						"375"
+				"affected_by_aoe_increase"	"1"		// stun_radius will pull from owner's visage_stone_form_self_cast
+			}
+			"stun_delay"						"0.55"		
+			"stun_damage"						"60 100 140"
+			"stun_duration"						"0.8 1.0 1.2"
+			"stone_duration"					"6.0"
+			"hp_regen"							"150.0 175.0 200.0"
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_5"
+	}
+	//=================================================================================================================
+	// Visage Biding Time
+	//=================================================================================================================
+	"visage_lurker"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_INNATE_UI"
+		"MaxLevel"						"1"
+		"Innate"						"1"
+		"IsBreakable"					"1"
+
+		"AbilityValues"
+		{
+			"max_stacks"				
+			{
+				"value"									"8"
+				"special_bonus_unique_visage_8"			"+4"
+			}
+			
+			"stack_gain_time"			"2.0"
+			"cooldown_speed_per_stack"	"2.0"
+			"linger_duration"			"2"
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_visage_1"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"						"special_bonus_base"
+	}
+
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_visage_3"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityValues"
+		{
+			"value"
+			{
+				"value" "3"
+				"ad_linked_abilities" "visage_soul_assumption"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_visage_4"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass" "special_bonus_base"
+	}
+
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_visage_5"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityValues"
+		{
+			"value"
+			{
+				"value" "10"
+				"ad_linked_abilities" "visage_gravekeepers_cloak"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_visage_6"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"						"special_bonus_base"
+	}
+
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_visage_7"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"						"special_bonus_base"
+	}
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_visage_8"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"						"special_bonus_base"
+	}
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_visage_grave_chill_duration"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"						"special_bonus_base"
+	}
+}
