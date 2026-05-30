@@ -1400,7 +1400,7 @@
     "StatusMana": 200
   },
   "npc_dota_wraith_king_skeleton_warrior": {
-    "ArmorPhysical": 2,
+    "ArmorPhysical": 3,
     "AttackDamageMin": 29,
     "AttackDamageMax": 34,
     "AttackRate": 1.2,
@@ -1857,7 +1857,7 @@
     "StatusMana": 300
   },
   "npc_dota_visage_familiar1": {
-    "ArmorPhysical": 2,
+    "ArmorPhysical": 0,
     "AttackDamageMin": 25,
     "AttackDamageMax": 25,
     "AttackRate": 0.5,
@@ -1867,7 +1867,7 @@
     "StatusMana": 0
   },
   "npc_dota_visage_familiar2": {
-    "ArmorPhysical": 3,
+    "ArmorPhysical": 2,
     "AttackDamageMin": 50,
     "AttackDamageMax": 50,
     "AttackRate": 0.5,
