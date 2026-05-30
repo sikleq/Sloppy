@@ -1147,10 +1147,6 @@
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
-  "special_bonus_hp_regen_3": {
-    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
-  },
   "special_bonus_hp_regen_4": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
