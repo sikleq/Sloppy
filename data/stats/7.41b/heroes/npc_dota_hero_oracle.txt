@@ -1,0 +1,376 @@
+"DOTAAbilities"
+{
+    "Version"       "1"
+
+	//=================================================================================================================
+	// Oracle: Fortune's End
+	//=================================================================================================================
+	"oracle_fortunes_end"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_DONT_CANCEL_CHANNEL"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_BOTH"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+		"FightRecapLevel"				"1"
+		"AbilitySound"					"Hero_Oracle.FortunesEnd.Target"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"850"
+		"AbilityCastPoint"				"0"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"18 14 10 6"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"80"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"channel_time"
+			{
+				"value"								"2.5"
+			}
+			"damage"
+			{
+				"value"					"100 160 220 280"
+			}
+			"bolt_speed"				"1200"
+			"minimum_purge_duration"
+			{
+				"value"								"0.75"
+				"special_bonus_unique_oracle_2"		"+0.5"
+			}
+			"maximum_purge_duration"
+			{
+				"value"								"2.75"
+				"special_bonus_unique_oracle_2"		"+0.5"
+			}
+			"radius"								
+			{
+				"value"							"350"
+				"affected_by_aoe_increase"		"1"
+				"special_bonus_unique_oracle_3"	"+100"
+			}
+			"damage_per_buff"				
+			{
+				"value"					"0"
+			}	
+			"heal_per_debuff"
+			{
+				"value"					"0"
+			}
+			"purge_constantly"
+			{
+				"special_bonus_unique_oracle_7"		"=1"
+			}
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_1"
+	}
+
+	//=================================================================================================================
+	// Oracle: Fate's Edict
+	//=================================================================================================================
+	"oracle_fates_edict"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY | DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_MAGIC_IMMUNE_ALLIES"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+		"AbilitySound"					"Hero_Oracle.FatesEdict.Cast"
+
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"700"
+		"AbilityCastPoint"				"0.3"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"17 14 11 8"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"70"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
+		"AbilityValues"
+		{
+			"duration"
+			{
+				"value" "3.5 4.0 4.5 5.0"
+			}
+			"magic_damage_resistance_pct_tooltip"
+			{
+				"value" "100"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Oracle: Purifying Flames
+	//=================================================================================================================
+	"oracle_purifying_flames"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY | DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"	
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_MAGIC_IMMUNE_ALLIES"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+		"FightRecapLevel"				"1"
+		"AbilitySound"					"Hero_Oracle.PurifyingFlames.Damage"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"850"
+		"AbilityCastPoint"				"0.10"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"75"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+				"damage"				"90 180 270 360"
+				"heal_per_second"		"15 25 35 45"
+				"total_heal_tooltip"	"150 250 350 450"
+				"duration"				"10"
+				"tick_rate"				"0.1"
+				"damage_modifier"
+				{
+					"value"				"1"
+					"special_bonus_unique_oracle_8"	"+25%"
+				}
+				"AbilityCooldown"
+				{
+					"value"							"2.5"
+					"special_bonus_unique_oracle_5"	"-1"
+				}
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
+	} 
+
+	//=================================================================================================================
+	// Oracle: False Promise
+	//=================================================================================================================
+	"oracle_false_promise"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"ABILITY_TYPE_ULTIMATE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_YES"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"AbilitySound"					"Hero_Oracle.FalsePromise.Cast"
+        
+		"AbilityDraftExtraAbilities"
+		{
+			"oracle_rain_of_destiny" "shard"
+		}
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"700 800 900"
+		"AbilityCastPoint"				"0.3"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_6"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 150 200"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"duration"
+			{
+				"value"				"7 8.5 10"
+				"special_bonus_unique_oracle"	"+1.5"
+			}
+			"radius"				
+			{
+				"value"	"400"
+				"affected_by_aoe_increase"	"1"		
+			}
+			"AbilityCooldown"
+			{
+				"value"								"110 85 60"
+				"special_bonus_unique_oracle_6"		"-20"
+			}			
+			"bonus_armor"
+			{
+				"special_bonus_unique_oracle_9"		"+8"
+			}	
+			"heal_amp_pct"
+			{
+				"value"							"100"
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Oracle: Rain of Destiny
+	//=================================================================================================================
+	"oracle_rain_of_destiny"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"IsGrantedByShard"				"1"
+		"MaxLevel"						"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.2"
+		"AbilityCastRange"				"650"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"40"
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"150"
+		
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+				"radius"				
+				{
+					"value"		"650"
+					"affected_by_aoe_increase"	"1"		
+				}
+				"duration"				"10"
+				"damage"				
+				{
+					"value"					"30"
+					"CalculateSpellDamageTooltip"	"1"
+				}
+				"tick_rate"				"1.0"
+				"heal_amp"				"15"
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_4"
+	}
+
+
+	//=================================================================================================================
+	// Oracle: Diviner's Deck
+	//=================================================================================================================
+	"oracle_diviners_deck"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"HasScepterUpgrade"				"1"
+		"MaxLevel"						"1"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"FakeSubAbilityNames"			"oracle_diviners_deck_death;oracle_diviners_deck_the_fool;oracle_diviners_deck_the_world;oracle_diviners_deck_the_lovers;oracle_diviners_deck_the_tower"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+
+		
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+				"enabled"
+				{
+					"value"							"0"
+					"special_bonus_scepter"			"+1"
+				}
+
+				"duration"				"90"
+				"spell_amplification"	"40"
+				"gold_bonus_pct"		"100"
+				"int_bonus_pct"			"150"
+				"heal_amplification"	"40"
+				"barrier_amount"		"400"
+				"barrier_restore_time"	"7.0"
+		}
+	}
+
+	//=================================================================================================================
+	//=================================================================================================================
+	// Oracle: Innate - Spell Amp
+	//=================================================================================================================
+	"oracle_clairvoyant_curse"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"MaxLevel"						"1"
+		"IsBreakable"					"1"
+
+		"AbilityValues"
+		{
+			"spell_amplification"		"1.0"
+		}
+	}
+
+	//=================================================================================================================
+	// Oracle: Innate - Heal Amp
+	//=================================================================================================================
+	"oracle_clairvoyant_cure"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"MaxLevel"						"1"
+		"IsBreakable"					"1"
+
+		"AbilityValues"
+		{
+			"heal_amplification"		"0.75"
+		}
+	}
+	//=================================================================================================================
+	// Oracle: Rune Prediction
+	//=================================================================================================================
+	"oracle_prognosticate"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_SKIP_FOR_KEYBINDS | DOTA_ABILITY_BEHAVIOR_INNATE_UI"		
+		"MaxLevel"						"1"
+		"Innate"						"1"
+	}
+}
