@@ -1,0 +1,356 @@
+"DOTAAbilities"
+{
+    "Version"       "1"
+
+	//=================================================================================================================
+	// Dark Willow: Bramble Maze
+	//=================================================================================================================
+	"dark_willow_bramble_maze"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"ABILITY_TYPE_BASIC"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"FightRecapLevel"				"1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1000 1100 1200 1300"
+		"AbilityCastPoint"				"0.3 0.3 0.3 0.3"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 120 140 160"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"placement_range"		
+			{
+				"value"		"500"
+			}
+			"placement_count"		
+			{
+				"value"				"8"
+				"special_bonus_facet_dark_willow_thorny_thicket"	"+4"
+			}
+			"placement_duration"		"12"
+			"extra_brambles_placement_duration"		"4.0"
+			"latch_duration"		"1.0 1.5 2.0 2.5"
+			"latch_range"		
+			{
+				"value"		"90"
+			}
+			"damage_per_tick"		"50 55 60 65"
+			"spell_amp"
+			{
+				"value"					"0"
+				"special_bonus_facet_dark_willow_thorny_thicket"	"0"				
+			}
+			"latch_creation_interval"		"0.075"
+			"latch_creation_delay"		"0.1"
+			"initial_creation_delay"		"0.3"
+
+			"AbilityCooldown"				
+			{
+				"value"					"22"
+				"special_bonus_unique_dark_willow_3"			"-7"
+			}
+
+				
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_1"
+	}
+
+	//=================================================================================================================
+	// Dark Willow: Bedlam
+	//=================================================================================================================
+	"dark_willow_bedlam"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"	
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"AbilityType"					"ABILITY_TYPE_ULTIMATE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"MaxLevel"						"3"
+		"FightRecapLevel"				"1"
+		"LinkedAbility"					"dark_willow_terrorize"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------		
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_4"
+		"AbilityCastGestureSlot"		"ABSOLUTE"
+		"AbilityCastRange"				"900"
+		"AbilityCooldown"				"30"
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 150 200"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"attack_damage"			
+			{
+				"value"						"70 120 170"
+				"special_bonus_unique_dark_willow_4"		"+30"
+			}
+			"attack_interval"		"0.25"
+			"attack_radius"			
+			{
+				"value"		"300"
+				"affected_by_aoe_increase"	"1"		
+			}
+			"attack_targets"			"1"
+			"roaming_radius"			
+			{
+				"value"		"200"
+				"affected_by_aoe_increase"	"1"		
+			}
+			"roaming_seconds_per_rotation"				"1.5"
+			"roaming_duration"	
+			{
+				"value"											"5.5"
+				"special_bonus_unique_dark_willow_6" 			"+1.0"
+
+			}
+			"target_count"
+			{
+				"value"		"1"
+				"special_bonus_unique_dark_willow_bedlam_targets" "+2"	
+			}
+			"travel_speed"		"1800"
+			"unit_targetable"
+			{
+				"value"							"0"
+			}
+			"damage_reduction_pct"
+			{
+				"value"							"0"				
+			}
+		}
+	}
+
+	//=================================================================================================================
+	// Dark Willow: Terrorize
+	//=================================================================================================================
+	"dark_willow_terrorize"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_NORMAL_WHEN_STOLEN"
+		"AbilityType"					"ABILITY_TYPE_ULTIMATE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+		"FightRecapLevel"				"1"
+		"LinkedAbility"					"dark_willow_bedlam"
+
+		"AbilityDraftExtraAbilities"
+		{
+			"dark_willow_bedlam" ""
+		}
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1200"
+		"AbilityCastPoint"				"1.0"
+		"AbilityCooldown"				"100 90 80"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_5"
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"150"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+				"destination_travel_speed"	"2000"
+				"destination_radius"		
+				{
+					"value"		"400 450 500"
+					"affected_by_aoe_increase"	"1"		
+				}
+				"destination_status_duration"	"2.8 3.0 3.2"
+				"return_travel_speed"	"600"
+				"starting_height"		"300"
+				"telegraph_to_enemies"		"0"
+				"impact_damage"
+				{
+					"special_bonus_unique_dark_willow_2"	"+500"
+				}
+		}
+	}
+
+	//=================================================================================================================
+	// Dark Willow: Shadow Realm
+	//=================================================================================================================
+	"dark_willow_shadow_realm"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_2"
+		"AbilityCastGestureSlot"		"ABSOLUTE"
+		"HasScepterUpgrade"			"1"
+	
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0"
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"80 90 100 110"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"AbilityCooldown"
+			{
+				"value"					"21 19 17 15"
+				"special_bonus_unique_dark_willow_5"		"-2"
+			}
+			
+			"duration"
+			{
+				"value"						"5"
+				"special_bonus_unique_dark_willow_1"			"+1.5"
+			}
+			"fade_time"					"0.3"			
+			"damage"						"120 200 280 360"
+			"attack_range_bonus"			"600"
+			"max_damage_duration"
+			{
+				"value"							"3.0"
+				"CalculateSpellDamageTooltip"	"0"
+				"DamageTypeTooltip"				"DAMAGE_TYPE_NONE"
+			}
+			"aura_radius"
+			{
+				"value"					"0"
+				"special_bonus_facet_dark_willow_throwing_shade"			"=700"
+				"affected_by_aoe_increase"	"1"
+			}
+			"aura_linger"
+			{
+				"value"					"0"
+				"special_bonus_facet_dark_willow_throwing_shade"			"=0.75"
+			}
+			"aura_damage_pct"
+			{
+				"value"					"0"
+				"special_bonus_facet_dark_willow_throwing_shade"			"=30"
+			}
+		}
+	}
+	//=================================================================================================================
+	// Dark Willow: Cursed Crown
+	//=================================================================================================================
+	"dark_willow_cursed_crown"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
+
+        "HasShardUpgrade"               "1"
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"600 625 650 675"
+		"AbilityCastPoint"				"0.2"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"80 90 100 110"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+				"delay"			"4"
+				"stun_duration"			
+				{
+					"value"			"1.2 1.6 2.0 2.4"
+				}
+				"stun_radius"			
+				{
+					"value"			"360"
+					"affected_by_aoe_increase"	"1"		
+				"special_bonus_unique_dark_willow_7" "+150"
+				}
+				"shard_delay_reduction"			
+				{
+					"special_bonus_shard"			"0"
+				}			
+				"shard_bramble_amount"			
+				{
+					"special_bonus_shard"			"4"
+				}
+				"shard_spawn_radius"
+				{
+					"special_bonus_shard"			"175"
+				}	
+				"accumulated_damage_pct"
+				{
+					"special_bonus_facet_dark_willow_shattering_crown"	"=35"
+				}
+				"accumulated_damage_pct_ally"
+				{
+					"special_bonus_facet_dark_willow_shattering_crown"	"=15"
+				}
+				"AbilityCooldown"
+				{
+					"value"				"17 15 13 11"
+					"special_bonus_shard"				"-1.5"
+				}
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
+	}
+
+	//=================================================================================================================
+	// Dark Willow: Cursed Crown
+	//=================================================================================================================
+	"dark_willow_pixie_dust"
+	{
+	// General
+		//-------------------------------------------------------------------------------------------------------------
+
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES | DOTA_ABILITY_BEHAVIOR_SKIP_FOR_KEYBINDS"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_NONE"	
+
+		"MaxLevel"						"1"
+		"Innate"						"1"
+		"IsBreakable"					"1"
+
+		"AbilityValues"
+		{
+			"hp_regen"	"150"
+			"mana_regen_amp"	"150"
+		}
+	}
+}
