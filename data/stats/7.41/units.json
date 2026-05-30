@@ -749,8 +749,8 @@
   },
   "npc_dota_neutral_kobold": {
     "ArmorPhysical": 0,
-    "AttackDamageMin": 15,
-    "AttackDamageMax": 16,
+    "AttackDamageMin": 13,
+    "AttackDamageMax": 14,
     "AttackRate": 2,
     "AttackRange": 100,
     "MovementSpeed": 290,
@@ -759,8 +759,8 @@
   },
   "npc_dota_neutral_kobold_tunneler": {
     "ArmorPhysical": 1,
-    "AttackDamageMin": 22,
-    "AttackDamageMax": 23,
+    "AttackDamageMin": 20,
+    "AttackDamageMax": 21,
     "AttackRate": 2,
     "AttackRange": 100,
     "MovementSpeed": 270,
@@ -769,8 +769,8 @@
   },
   "npc_dota_neutral_kobold_taskmaster": {
     "ArmorPhysical": 2,
-    "AttackDamageMin": 24,
-    "AttackDamageMax": 26,
+    "AttackDamageMin": 22,
+    "AttackDamageMax": 24,
     "AttackRate": 2,
     "AttackRange": 110,
     "MovementSpeed": 330,
@@ -1049,8 +1049,8 @@
   },
   "npc_dota_neutral_gnoll_assassin": {
     "ArmorPhysical": 1,
-    "AttackDamageMin": 25,
-    "AttackDamageMax": 27,
+    "AttackDamageMin": 30,
+    "AttackDamageMax": 32,
     "AttackRate": 2,
     "AttackRange": 500,
     "MovementSpeed": 270,
@@ -1059,8 +1059,8 @@
   },
   "npc_dota_neutral_ghost": {
     "ArmorPhysical": 2,
-    "AttackDamageMin": 38,
-    "AttackDamageMax": 43,
+    "AttackDamageMin": 45,
+    "AttackDamageMax": 50,
     "AttackRate": 2,
     "AttackRange": 400,
     "MovementSpeed": 320,
@@ -1290,11 +1290,6 @@
     "AttackDamageMax": 42,
     "StatusHealth": 450
   },
-  "npc_dota_venomancer_plague_ward_5": {
-    "AttackDamageMin": 44,
-    "AttackDamageMax": 48,
-    "StatusHealth": 550
-  },
   "npc_dota_lesser_eidolon": {
     "ArmorPhysical": 2,
     "AttackDamageMin": 14,
@@ -1328,14 +1323,6 @@
     "MovementSpeed": 370,
     "StatusHealth": 240,
     "AttackRange": 500
-  },
-  "npc_dota_dire_eidolon2": {
-    "ArmorPhysical": 6,
-    "AttackDamageMin": 54,
-    "AttackDamageMax": 60,
-    "MovementSpeed": 400,
-    "StatusHealth": 260,
-    "AttackRange": 525
   },
   "npc_dota_furion_treant": {
     "ArmorPhysical": 0,
@@ -1418,7 +1405,7 @@
     "AttackDamageMax": 34,
     "AttackRate": 1.2,
     "AttackRange": 115,
-    "MovementSpeed": 350,
+    "MovementSpeed": 340,
     "StatusHealth": 175,
     "StatusMana": 0
   },
@@ -1523,12 +1510,12 @@
     "StatusMana": 0
   },
   "npc_dota_beastmaster_hawk": {
-    "ArmorPhysical": 6,
+    "ArmorPhysical": 5,
     "MovementSpeed": 300,
     "StatusHealth": 150
   },
   "npc_dota_beastmaster_boar": {
-    "ArmorPhysical": 1,
+    "ArmorPhysical": 0,
     "AttackDamageMin": 20,
     "AttackDamageMax": 20,
     "AttackRate": 1.35,
@@ -1666,12 +1653,6 @@
     "ArmorPhysical": 5,
     "MovementSpeed": 0,
     "StatusHealth": 32,
-    "StatusMana": 0
-  },
-  "npc_dota_unit_tombstone5": {
-    "ArmorPhysical": 5,
-    "MovementSpeed": 0,
-    "StatusHealth": 36,
     "StatusMana": 0
   },
   "npc_dota_unit_undying_zombie": {
@@ -2226,15 +2207,6 @@
     "MovementSpeed": 0,
     "StatusHealth": 100
   },
-  "npc_dota_techies_snare_trap": {
-    "ArmorPhysical": 0,
-    "AttackDamageMin": 0,
-    "AttackDamageMax": 0,
-    "AttackRate": 1.0,
-    "AttackRange": 0,
-    "MovementSpeed": 0,
-    "StatusHealth": 100
-  },
   "npc_dota_bounty_hunter_bear_trap": {
     "ArmorPhysical": 0,
     "AttackDamageMin": 0,
@@ -2245,15 +2217,6 @@
     "StatusHealth": 100
   },
   "npc_dota_techies_remote_mine": {
-    "ArmorPhysical": 0,
-    "AttackDamageMin": 0,
-    "AttackDamageMax": 0,
-    "AttackRate": 1.0,
-    "AttackRange": 0,
-    "MovementSpeed": 0,
-    "StatusHealth": 200
-  },
-  "npc_dota_techies_innate_mine": {
     "ArmorPhysical": 0,
     "AttackDamageMin": 0,
     "AttackDamageMax": 0,
@@ -2762,41 +2725,6 @@
     "StatusHealth": 500,
     "StatusMana": 0
   },
-  "npc_dota_chen_zealot_goodguys": {
-    "ArmorPhysical": 2,
-    "AttackDamageMin": 21,
-    "AttackDamageMax": 25,
-    "AttackRate": 1,
-    "AttackRange": 125,
-    "MovementSpeed": 325,
-    "StatusHealth": 550,
-    "StatusMana": 0
-  },
-  "npc_dota_chen_zealot_badguys": {
-    "ArmorPhysical": 2,
-    "AttackDamageMin": 21,
-    "AttackDamageMax": 25,
-    "AttackRate": 1,
-    "AttackRange": 125,
-    "MovementSpeed": 325,
-    "StatusHealth": 550,
-    "StatusMana": 0
-  },
-  "npc_dota_ringmaster_unicycle": {
-    "ArmorPhysical": 0,
-    "AttackDamageMin": 0,
-    "AttackDamageMax": 0,
-    "AttackRate": 1.0,
-    "AttackRange": 0,
-    "MovementSpeed": 0,
-    "StatusHealth": 1,
-    "StatusMana": 0
-  },
-  "npc_dota_falconers_glove_hawk": {
-    "ArmorPhysical": 0,
-    "MovementSpeed": 300,
-    "StatusHealth": 100
-  },
   "npc_dota_bot_challenge_ancient_radiant": {
     "ArmorPhysical": 23,
     "AttackDamageMin": 100,
@@ -2817,16 +2745,6 @@
     "StatusHealth": 4500,
     "StatusMana": 0
   },
-  "npc_dota_unit_item_stone_of_recall": {
-    "ArmorPhysical": 0,
-    "AttackDamageMin": 0,
-    "AttackDamageMax": 0,
-    "AttackRate": 0,
-    "AttackRange": 0,
-    "MovementSpeed": 0,
-    "StatusHealth": 4,
-    "StatusMana": 0
-  },
   "npc_dota_frogling_event": {
     "ArmorPhysical": 0,
     "AttackDamageMin": 0,
@@ -2844,27 +2762,5 @@
     "AttackRange": 0,
     "MovementSpeed": 300,
     "StatusHealth": 100
-  },
-  "npc_dota_tinker_turret1": {
-    "ArmorPhysical": 0,
-    "AttackDamageMin": 50,
-    "AttackDamageMax": 50,
-    "AttackRate": 0.66,
-    "AttackRange": 1200,
-    "MovementSpeed": 0,
-    "StatusHealth": 100,
-    "StatusMana": 0
-  },
-  "npc_dota_tinker_turret2": {
-    "AttackDamageMin": 100,
-    "AttackDamageMax": 100
-  },
-  "npc_dota_tinker_turret3": {
-    "AttackDamageMin": 150,
-    "AttackDamageMax": 150
-  },
-  "npc_dota_tinker_turret4": {
-    "AttackDamageMin": 200,
-    "AttackDamageMax": 200
   }
 }
