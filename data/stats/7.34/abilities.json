@@ -34,6 +34,12 @@
     "AbilityCooldown": "15 11 7 3",
     "AbilityManaCost": 45
   },
+  "antimage_counterspell_ally": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE",
+    "AbilityCastRange": 600,
+    "AbilityCooldown": 3,
+    "AbilityManaCost": 45
+  },
   "antimage_mana_void": {
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE",
@@ -126,7 +132,6 @@
   },
   "drow_ranger_multishot": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_DIRECTIONAL | DOTA_ABILITY_BEHAVIOR_CHANNELLED",
-    "AbilityCooldown": "26 24 22 20",
     "AbilityManaCost": "50 70 90 110"
   },
   "drow_ranger_silence": {
@@ -138,7 +143,6 @@
   "drow_ranger_wave_of_silence": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT",
     "AbilityCastRange": 900,
-    "AbilityCooldown": "19 17 15 13",
     "AbilityManaCost": 70
   },
   "drow_ranger_trueshot": {
@@ -183,7 +187,6 @@
   "juggernaut_blade_fury": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL",
     "AbilityCastRange": 0,
-    "AbilityCooldown": "42 34 26 18",
     "AbilityManaCost": "120 110 100 90"
   },
   "juggernaut_healing_ward": {
@@ -252,7 +255,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE",
     "AbilityCastRange": 700,
     "AbilityCooldown": "13 11 9 7",
-    "AbilityManaCost": 115
+    "AbilityManaCost": "100 115 130 145"
   },
   "lina_fiery_soul": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -282,7 +285,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 850,
     "AbilityCooldown": "15 12 9 6",
-    "AbilityManaCost": "10 10 10 10"
+    "AbilityManaCost": 0
   },
   "lion_finger_of_death": {
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
@@ -321,13 +324,13 @@
   "morphling_adaptive_strike_agi": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": "600 700 800 900",
-    "AbilityCooldown": "16 14 12 10",
+    "AbilityCooldown": 10,
     "AbilityManaCost": "40 50 60 70"
   },
   "morphling_adaptive_strike_str": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": "600 700 800 900",
-    "AbilityCooldown": "16 14 12 10",
+    "AbilityCooldown": 10,
     "AbilityManaCost": "40 50 60 70"
   },
   "morphling_morph": {
@@ -460,13 +463,13 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": 600,
     "AbilityCooldown": "14 12 10 8",
-    "AbilityManaCost": "100 115 130 145"
+    "AbilityManaCost": "90 105 120 135"
   },
   "shadow_shaman_voodoo": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": 500,
-    "AbilityCooldown": 12,
-    "AbilityManaCost": "50 100 150 200"
+    "AbilityCooldown": "24 20 16 12",
+    "AbilityManaCost": "110 140 170 200"
   },
   "shadow_shaman_shackles": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED",
@@ -495,7 +498,6 @@
   },
   "razor_static_link": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
-    "AbilityCastRange": 550,
     "AbilityCooldown": "50 40 30 20",
     "AbilityManaCost": 65
   },
@@ -684,7 +686,7 @@
     "AbilityManaCost": "300 400 500"
   },
   "zuus_lightning_hands": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES ",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_TOGGLE | DOTA_ABILITY_BEHAVIOR_ATTACK | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES ",
     "AbilityCooldown": 0,
     "AbilityManaCost": 0
   },
@@ -743,6 +745,12 @@
     "AbilityCooldown": 20,
     "AbilityManaCost": 80
   },
+  "tidehunter_dead_in_the_water": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
+    "AbilityCastRange": 350,
+    "AbilityCooldown": 25,
+    "AbilityManaCost": 80
+  },
   "vengefulspirit_magic_missile": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCooldown": "12 11 10 9",
@@ -788,11 +796,10 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_IMMEDIATE",
     "AbilityCooldown": 1
   },
-  "crystal_maiden_ice_rink": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE",
-    "AbilityCastRange": 675,
-    "AbilityCooldown": 25,
-    "AbilityManaCost": 80
+  "crystal_maiden_crystal_clone": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_MOVEMENT | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
+    "AbilityCooldown": 12,
+    "AbilityManaCost": 50
   },
   "windrunner_gale_force": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT |  DOTA_ABILITY_BEHAVIOR_VECTOR_TARGETING | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
@@ -898,7 +905,7 @@
   "witch_doctor_voodoo_switcheroo": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
     "AbilityCooldown": 40,
-    "AbilityManaCost": 150
+    "AbilityManaCost": 200
   },
   "riki_poison_dart": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
@@ -939,8 +946,8 @@
     "AbilityManaCost": "100 110 120 130"
   },
   "enigma_demonic_conversion": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK",
-    "AbilityCastRange": 700,
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK",
+    "AbilityCastRange": 150,
     "AbilityCooldown": "60 52 44 36",
     "AbilityManaCost": "140 150 160 170"
   },
@@ -986,7 +993,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
     "AbilityCastRange": 2000,
     "AbilityCooldown": 18,
-    "AbilityManaCost": "95 105 115 125"
+    "AbilityManaCost": "105 115 125 135"
   },
   "tinker_march_of_the_machines": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_POINT",
@@ -998,7 +1005,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED",
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
     "AbilityCooldown": "8 7 6",
-    "AbilityManaCost": "130 185 240"
+    "AbilityManaCost": "140 195 250"
   },
   "tinker_warp_grenade": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_ALERT_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
@@ -1031,7 +1038,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_NORMAL_WHEN_STOLEN",
     "AbilityCastRange": 3000,
     "AbilityCooldown": "20 15 10",
-    "AbilityManaCost": "175 225 275"
+    "AbilityManaCost": 175
   },
   "necrolyte_death_seeker": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
@@ -1081,7 +1088,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE",
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
     "AbilityCooldown": 160,
-    "AbilityManaCost": "250 375 500",
+    "AbilityManaCost": "200 400 600",
     "AbilityCastRange": 1000
   },
   "warlock_golem_flaming_fists": {
@@ -1116,15 +1123,27 @@
     "AbilityManaCost": 60
   },
   "beastmaster_hawk_dive": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
-    "AbilityCastRange": 900,
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_IGNORE_SILENCE",
+    "AbilityCastRange": 99999,
     "AbilityCooldown": 0,
     "AbilityManaCost": 0
   },
+  "beastmaster_hawk_perch": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE",
+    "AbilityCastRange": 999999,
+    "AbilityCooldown": 1,
+    "AbilityManaCost": 0
+  },
   "beastmaster_call_of_the_wild_hawk": {
-    "AbilityBehavior": " DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
     "AbilityCastRange": 0,
     "AbilityManaCost": 30
+  },
+  "beastmaster_call_of_the_wild_hawk_attack": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE",
+    "AbilityCastRange": 1200,
+    "AbilityCooldown": 10,
+    "AbilityManaCost": 0
   },
   "beastmaster_hawk_invisibility": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -1147,15 +1166,10 @@
   "beastmaster_drums_of_slom": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
-  "beastmaster_drums_of_slom_stop": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_HIDDEN",
-    "AbilityCooldown": "0 0 0 0",
-    "AbilityManaCost": "0 0 0 0"
-  },
   "queenofpain_shadow_strike": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": "450 500 550 600",
-    "AbilityCooldown": "16.0 12.0 8.0 4.0",
+    "AbilityCooldown": "13 10 7 4",
     "AbilityManaCost": "125 135 145 155"
   },
   "queenofpain_blink": {
@@ -1248,7 +1262,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 600,
     "AbilityCooldown": 5,
-    "AbilityManaCost": "100 115 130 145"
+    "AbilityManaCost": "85 105 125 145"
   },
   "pugna_decrepify": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK |  DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL",
@@ -1314,7 +1328,7 @@
     "AbilityManaCost": "15 15 15"
   },
   "templar_assassin_trap": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_AUTOCAST",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_ALT_CASTABLE",
     "AbilityCooldown": 0.5,
     "AbilityManaCost": 0
   },
@@ -1350,7 +1364,7 @@
   },
   "viper_nose_dive": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES",
-    "AbilityCastRange": 375,
+    "AbilityCastRange": 475,
     "AbilityCooldown": 20.0,
     "AbilityManaCost": 75
   },
@@ -1419,13 +1433,12 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": "700 800 900 1000",
     "AbilityCooldown": "36 30 24 18",
-    "AbilityManaCost": "100 110 120 130"
+    "AbilityManaCost": "90 100 110 120"
   },
   "dazzle_shadow_wave": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK",
-    "AbilityCastRange": 800,
     "AbilityCooldown": "12 11 10 9",
-    "AbilityManaCost": 90
+    "AbilityManaCost": 75
   },
   "dazzle_weave": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE",
@@ -1484,7 +1497,7 @@
   "leshrac_diabolic_edict": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
     "AbilityCooldown": "22 21 20 19",
-    "AbilityManaCost": "95 120 135 155"
+    "AbilityManaCost": "90 110 130 150"
   },
   "leshrac_lightning_storm": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
@@ -1620,7 +1633,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": 600,
     "AbilityCooldown": "21 17 13 9",
-    "AbilityManaCost": "35 40 45 50"
+    "AbilityManaCost": 50
   },
   "dark_seer_wall_of_replica": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_VECTOR_TARGETING",
@@ -1653,7 +1666,7 @@
   "clinkz_burning_army": {
     "AbilityType": "DOTA_ABILITY_TYPE_BASIC",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_VECTOR_TARGETING | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
-    "AbilityCastRange": 1200,
+    "AbilityCastRange": 600,
     "AbilityCooldown": 80,
     "AbilityManaCost": 150
   },
@@ -1680,7 +1693,7 @@
   },
   "omniknight_purification": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE",
-    "AbilityCastRange": 550,
+    "AbilityCastRange": 600,
     "AbilityCooldown": "18 16 14 12",
     "AbilityManaCost": "80 95 110 125"
   },
@@ -1704,7 +1717,7 @@
   "omniknight_martyr": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": 700,
-    "AbilityCooldown": "26 22 18 14",
+    "AbilityCooldown": "60 55 50 45",
     "AbilityManaCost": "95 105 115 125"
   },
   "omniknight_guardian_angel": {
@@ -1725,7 +1738,7 @@
   },
   "enchantress_bunny_hop": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
-    "AbilityCooldown": 4,
+    "AbilityCooldown": 8,
     "AbilityManaCost": 50
   },
   "enchantress_little_friends": {
@@ -1828,8 +1841,8 @@
   },
   "broodmother_insatiable_hunger": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
-    "AbilityCooldown": "45 40 35 30",
-    "AbilityManaCost": 80
+    "AbilityCooldown": "40 35 30 25",
+    "AbilityManaCost": "50 60 70 80"
   },
   "broodmother_sticky_snare": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_VECTOR_TARGETING | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES | DOTA_ABILITY_BEHAVIOR_CHANNELLED ",
@@ -1851,6 +1864,12 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL",
     "AbilityCastRange": 650,
     "AbilityManaCost": 65
+  },
+  "bounty_hunter_wind_walk_ally": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE",
+    "AbilityCastRange": 650,
+    "AbilityManaCost": 65,
+    "AbilityCooldown": 15
   },
   "bounty_hunter_track": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
@@ -1911,7 +1930,6 @@
   "jakiro_macropyre": {
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT",
-    "AbilityCastRange": 1400,
     "AbilityCooldown": "80 70 60",
     "AbilityManaCost": "230 340 450"
   },
@@ -1971,7 +1989,7 @@
   "chen_martyrdom": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCooldown": 8,
-    "AbilityCastRange": 99999,
+    "AbilityCastRange": 1200,
     "AbilityManaCost": 0
   },
   "chen_hand_of_god": {
@@ -1994,24 +2012,24 @@
   },
   "spectre_haunt": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
-    "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
-    "AbilityCooldown": "180 160 140",
-    "AbilityManaCost": "150 175 200"
+    "AbilityCooldown": 180,
+    "AbilityManaCost": 150
   },
   "spectre_haunt_single": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE",
-    "AbilityCooldown": 40,
-    "AbilityManaCost": 180
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
+    "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
+    "AbilityCooldown": "80 60 40",
+    "AbilityManaCost": 150
   },
   "spectre_reality": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_POINT",
     "AbilityType": "DOTA_ABILITY_TYPE_BASIC",
-    "AbilityCooldown": 0
+    "AbilityCooldown": 3
   },
   "doom_bringer_devour": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_AUTOCAST",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_ALT_CASTABLE",
     "AbilityCastRange": "300 300 300 300",
-    "AbilityCooldown": 65,
+    "AbilityCooldown": 60,
     "AbilityManaCost": "40 50 60 70"
   },
   "doom_bringer_scorched_earth": {
@@ -2219,7 +2237,7 @@
   "invoker_cold_snap": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
     "AbilityCastRange": 1000,
-    "AbilityManaCost": 100
+    "AbilityManaCost": 90
   },
   "invoker_ghost_walk": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
@@ -2228,7 +2246,7 @@
   "invoker_tornado": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
     "AbilityCastRange": 2000,
-    "AbilityManaCost": 150
+    "AbilityManaCost": 140
   },
   "invoker_emp": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
@@ -2240,7 +2258,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
     "AbilityCastRange": 650,
     "AbilityCooldown": 17,
-    "AbilityManaCost": 100
+    "AbilityManaCost": 90
   },
   "invoker_chaos_meteor": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
@@ -2270,12 +2288,12 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
     "AbilityCastRange": 1000,
     "AbilityCooldown": 40,
-    "AbilityManaCost": 300
+    "AbilityManaCost": 250
   },
   "invoker_cold_snap_ad": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 1000,
-    "AbilityManaCost": 100
+    "AbilityManaCost": 90
   },
   "invoker_ghost_walk_ad": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL",
@@ -2284,7 +2302,7 @@
   "invoker_tornado_ad": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 2000,
-    "AbilityManaCost": 150
+    "AbilityManaCost": 140
   },
   "invoker_emp_ad": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
@@ -2296,7 +2314,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 650,
     "AbilityCooldown": 17,
-    "AbilityManaCost": 100
+    "AbilityManaCost": 90
   },
   "invoker_sun_strike_ad": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
@@ -2323,7 +2341,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 1000,
     "AbilityCooldown": 40,
-    "AbilityManaCost": 300
+    "AbilityManaCost": 250
   },
   "silencer_curse_of_the_silent": {
     "AbilityType": "DOTA_ABILITY_TYPE_BASIC",
@@ -2416,22 +2434,21 @@
     "AbilityManaCost": "50 50 50 50"
   },
   "lone_druid_spirit_link": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE",
+    "AbilityCastRange": 1200
   },
   "lone_druid_savage_roar": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
-    "AbilityCooldown": "38 32 26 20",
     "AbilityManaCost": 50
   },
   "lone_druid_savage_roar_bear": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | ABILITY_NOT_LEARNABLE",
     "AbilityCooldown": "38 32 26 20",
     "AbilityManaCost": 50
   },
   "lone_druid_true_form": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
-    "AbilityCooldown": 100,
     "AbilityManaCost": 200
   },
   "lone_druid_true_form_druid": {
@@ -2464,6 +2481,11 @@
   },
   "lone_druid_spirit_bear_defender": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "lone_druid_spirit_bear_fetch": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_RUNE_TARGET",
+    "AbilityCastRange": 200,
+    "AbilityManaCost": 75
   },
   "lone_druid_spirit_bear_demolish": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE",
@@ -2632,7 +2654,7 @@
     "AbilityManaCost": "70 80 90 100"
   },
   "meepo_poof": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_NORMAL_WHEN_STOLEN | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES | DOTA_ABILITY_BEHAVIOR_AUTOCAST",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_NORMAL_WHEN_STOLEN | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES | DOTA_ABILITY_BEHAVIOR_ALT_CASTABLE",
     "AbilityCooldown": "12 10 8 6",
     "AbilityManaCost": 80
   },
@@ -2693,7 +2715,6 @@
   "ogre_magi_fireblast": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": 475,
-    "AbilityCooldown": "11 10 9 8",
     "AbilityManaCost": "70 85 100 115"
   },
   "ogre_magi_smash": {
@@ -2705,7 +2726,6 @@
   "ogre_magi_unrefined_fireblast": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
     "AbilityCastRange": 475,
-    "AbilityCooldown": 6,
     "AbilityManaCost": 400
   },
   "ogre_magi_ignite": {
@@ -2727,14 +2747,14 @@
   "undying_decay": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 650,
-    "AbilityCooldown": "10 8 6 4",
+    "AbilityCooldown": "13 10 7 4",
     "AbilityManaCost": 100
   },
   "undying_soul_rip": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 750,
     "AbilityCooldown": "18 14 10 6",
-    "AbilityManaCost": 120
+    "AbilityManaCost": 110
   },
   "undying_tombstone": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
@@ -2853,7 +2873,7 @@
   },
   "nyx_assassin_spiked_carapace": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE",
-    "AbilityCooldown": "25 20 15 10",
+    "AbilityCooldown": "26 20 14 8",
     "AbilityManaCost": "40 40 40 40"
   },
   "nyx_assassin_vendetta": {
@@ -2928,7 +2948,6 @@
   "keeper_of_the_light_chakra_magic": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": "900 900 900 900",
-    "AbilityCooldown": "18 16 14 12",
     "AbilityManaCost": 0
   },
   "keeper_of_the_light_empty1": {
@@ -2968,7 +2987,6 @@
   },
   "visage_grave_chill": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
-    "AbilityCooldown": "17 15 13 11",
     "AbilityManaCost": 90,
     "AbilityCastRange": 625
   },
@@ -3111,13 +3129,13 @@
     "AbilityManaCost": 150
   },
   "centaur_hoof_stomp": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE",
     "AbilityCooldown": "18 16 14 12",
     "AbilityManaCost": "100 110 120 130"
   },
   "centaur_double_edge": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE",
-    "AbilityCooldown": 4.0,
+    "AbilityCooldown": 3.5,
     "AbilityCastRange": "150 150 150 150",
     "AbilityManaCost": "0 0 0 0"
   },
@@ -3129,8 +3147,13 @@
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
     "AbilityManaCost": "150 200 250"
   },
+  "centaur_work_horse": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET |  DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
+    "AbilityCooldown": 30,
+    "AbilityManaCost": 75
+  },
   "centaur_mount": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET |  DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET |  DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_HIDDEN",
     "AbilityCooldown": 30,
     "AbilityCastRange": 300,
     "AbilityManaCost": 75
@@ -3220,8 +3243,8 @@
   "bristleback_hairball": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
     "AbilityCastRange": 1500,
-    "AbilityCooldown": 20,
-    "AbilityManaCost": 75
+    "AbilityCooldown": 10,
+    "AbilityManaCost": 40
   },
   "bristleback_viscous_nasal_goo": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
@@ -3312,13 +3335,13 @@
   "abaddon_death_coil": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": 575,
-    "AbilityCooldown": 5.5,
+    "AbilityCooldown": "6.5 6.0 5.5 5.0",
     "AbilityManaCost": 50
   },
   "abaddon_aphotic_shield": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": 550,
-    "AbilityCooldown": "12.0 10.0 8.0 6.0",
+    "AbilityCooldown": "12 10 8 6",
     "AbilityManaCost": "95 110 125 140"
   },
   "abaddon_frostmourne": {
@@ -3518,7 +3541,7 @@
   },
   "terrorblade_demon_zeal": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN  | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
-    "AbilityCooldown": 14,
+    "AbilityCooldown": 60,
     "AbilityManaCost": 0
   },
   "terrorblade_sunder": {
@@ -3637,7 +3660,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_NORMAL_WHEN_STOLEN",
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
     "AbilityCastRange": 0,
-    "AbilityCooldown": "120 100 80",
+    "AbilityCooldown": "110 95 80",
     "AbilityManaCost": 100
   },
   "monkey_king_jingu_mastery": {
@@ -3690,8 +3713,9 @@
     "AbilityManaCost": "100 120 140 160"
   },
   "dark_willow_bedlam": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE",
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
+    "AbilityCastRange": 900,
     "AbilityCooldown": 30,
     "AbilityManaCost": "100 150 200"
   },
@@ -3715,7 +3739,6 @@
   },
   "grimstroke_dark_artistry": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT",
-    "AbilityCastRange": 1400,
     "AbilityCooldown": "11 9 7 5",
     "AbilityManaCost": "100 110 120 130"
   },
@@ -3740,8 +3763,13 @@
   "grimstroke_spirit_walk": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK",
     "AbilityCooldown": "27 24 21 18",
-    "AbilityCastRange": "400 525 650 775",
+    "AbilityCastRange": "500 600 700 800",
     "AbilityManaCost": "120 130 140 150"
+  },
+  "grimstroke_return": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
+    "AbilityCooldown": 1.0,
+    "AbilityManaCost": 0
   },
   "grimstroke_soul_chain": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE",
@@ -3827,7 +3855,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES",
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
     "AbilityCooldown": 0,
-    "AbilityManaCost": 100
+    "AbilityManaCost": 90
   },
   "void_spirit_resonant_pulse": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
@@ -3908,7 +3936,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 800,
     "AbilityCooldown": "24 20 16 12",
-    "AbilityManaCost": "50 65 80 95"
+    "AbilityManaCost": "70 80 90 100"
   },
   "special_bonus_unique_snapfire_1": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
@@ -3959,7 +3987,7 @@
     "AbilityCastRange": 0
   },
   "hoodwink_acorn_shot": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_AUTOCAST",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_ALT_CASTABLE",
     "AbilityCooldown": "16 14 12 10",
     "AbilityCastRange": 575,
     "AbilityManaCost": "70 75 80 85"
@@ -4001,6 +4029,10 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
   "special_bonus_unique_hoodwink_sharpshooter_pure_damage": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "special_bonus_unique_hoodwink_sharpshooter_damage": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
@@ -4129,7 +4161,7 @@
   "marci_guardian": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": 700,
-    "AbilityCooldown": "36 28 20 12",
+    "AbilityCooldown": 20,
     "AbilityManaCost": "45 40 35 30"
   },
   "special_bonus_unique_marci_lunge_ally_absorb": {
@@ -4181,6 +4213,14 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
   "special_bonus_unique_marci_dispose_range": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "special_bonus_unique_marci_lunge_movespeed": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "special_bonus_unique_marci_guardian_damage": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
@@ -4923,8 +4963,12 @@
   "techies_reactive_tazer": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
     "AbilityCastRange": 500,
-    "AbilityCooldown": "28 24 20 16",
+    "AbilityCooldown": "30 25 20 15",
     "AbilityManaCost": 60
+  },
+  "techies_reactive_tazer_stop": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_IMMEDIATE",
+    "AbilityCooldown": 0.5
   },
   "techies_remote_mines": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_NORMAL_WHEN_STOLEN",
@@ -4995,7 +5039,7 @@
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE",
     "AbilityCastRange": "700 750 800",
-    "AbilityCooldown": "90 85 80",
+    "AbilityCooldown": "85 80 75",
     "AbilityManaCost": 250
   },
   "cny_beast_teleport": {
@@ -5025,9 +5069,16 @@
     "AbilityManaCost": 80
   },
   "arc_warden_tempest_double": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT_TARGET",
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
-    "AbilityCooldown": "70 60 50"
+    "AbilityCooldown": "70 60 50",
+    "AbilityCastRange": 700
+  },
+  "arc_warden_tempest_recall": {
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN",
+    "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
+    "AbilityCooldown": 50,
+    "AbilityManaCost": 125
   },
   "primal_beast_onslaught": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES",
@@ -5106,7 +5157,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_CAN_SELF_CAST",
     "AbilityCastRange": 580,
     "AbilityCooldown": 30,
-    "AbilityManaCost": "150 175 200 225"
+    "AbilityManaCost": "145 160 175 190"
   },
   "muerta_gunslinger": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE",
@@ -7233,6 +7284,10 @@
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
+  "special_bonus_unique_razor_storm_surge_damage_and_slow": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
   "special_bonus_unique_visage_1": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -7262,6 +7317,10 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
   "special_bonus_unique_visage_8": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "special_bonus_unique_visage_grave_chill_duration": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
@@ -7470,6 +7529,10 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
   "special_bonus_unique_dazzle_poison_touch_attack_range_bonus": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "special_bonus_unique_dazzle_shadow_wave_cast_range": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
@@ -7706,6 +7769,10 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
   "special_bonus_unique_leshrac_7": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "special_bonus_unique_leshrac_pulse_nova_lightning": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
@@ -8545,6 +8612,10 @@
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
+  "special_bonus_unique_juggernaut_blade_fury_cooldown": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
   "special_bonus_unique_winter_wyvern_1": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -8846,6 +8917,10 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
   "special_bonus_unique_lycan_8": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "special_bonus_unique_lycan_howl_armor": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
@@ -9449,6 +9524,10 @@
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
+  "special_bonus_unique_skywrath_arcane_bolt_lifesteal": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
   "special_bonus_unique_medusa": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -9554,6 +9633,10 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
   "special_bonus_unique_death_prophet_5": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "special_bonus_unique_death_prophet_crypt_swarm_slow": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
@@ -10085,6 +10168,10 @@
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
+  "special_bonus_unique_ancient_apparition_ice_vortex_duration": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
   "special_bonus_unique_disruptor": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -10118,6 +10205,10 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
   "special_bonus_unique_disruptor_9": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "special_bonus_unique_disruptor_consecutive_strike_damage": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
@@ -10350,6 +10441,10 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
   "special_bonus_unique_timbersaw_4": {
+    "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+  },
+  "special_bonus_unique_timbersaw_5": {
     "AbilityType": "DOTA_ABILITY_TYPE_ATTRIBUTES",
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE"
   },
