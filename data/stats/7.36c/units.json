@@ -1289,8 +1289,8 @@
   },
   "npc_dota_lesser_eidolon": {
     "ArmorPhysical": 2,
-    "AttackDamageMin": 14,
-    "AttackDamageMax": 20,
+    "AttackDamageMin": 16,
+    "AttackDamageMax": 24,
     "AttackRate": 1.5,
     "AttackRange": 425,
     "MovementSpeed": 280,
@@ -1300,7 +1300,7 @@
   "npc_dota_eidolon": {
     "ArmorPhysical": 3,
     "AttackDamageMin": 24,
-    "AttackDamageMax": 30,
+    "AttackDamageMax": 32,
     "MovementSpeed": 310,
     "StatusHealth": 200,
     "AttackRange": 450
@@ -1308,15 +1308,15 @@
   "npc_dota_greater_eidolon": {
     "ArmorPhysical": 4,
     "AttackDamageMin": 34,
-    "AttackDamageMax": 40,
+    "AttackDamageMax": 42,
     "MovementSpeed": 340,
     "StatusHealth": 220,
     "AttackRange": 475
   },
   "npc_dota_dire_eidolon": {
     "ArmorPhysical": 5,
-    "AttackDamageMin": 44,
-    "AttackDamageMax": 50,
+    "AttackDamageMin": 43,
+    "AttackDamageMax": 51,
     "MovementSpeed": 370,
     "StatusHealth": 240,
     "AttackRange": 500
@@ -1485,7 +1485,7 @@
     "AttackRate": 1.2,
     "AttackRange": 225,
     "MovementSpeed": 320,
-    "StatusHealth": 1500,
+    "StatusHealth": 1400,
     "StatusMana": 0
   },
   "npc_dota_beastmaster_hawk": {
