@@ -1,0 +1,352 @@
+"DOTAAbilities"
+{
+    "Version"       "1"
+	
+	//=================================================================================================================
+	// Obsidian Destroyer: Arcane Orb
+	//=================================================================================================================
+	"obsidian_destroyer_arcane_orb"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilitySound"					"Hero_ObsidianDestroyer.ArcaneOrb"
+		
+		"AbilityCastRange"				"450"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"0"
+		"AbilityCooldown"				"6 4 2 0"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"mana_pool_damage_pct"	
+			{
+				"value"										"10 11 12 13"
+				"special_bonus_unique_outworld_devourer"	"+2"
+			}
+			"mana_cost_percentage"							"20"
+			"bounce_radius"
+			{
+				"value"										"0"			
+			}
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_1"
+	}	
+
+
+	//=================================================================================================================
+	// Skywrath: Innate Max Mana Per Int
+	//=================================================================================================================
+	"obsidian_destroyer_ominous_discernment"
+	{
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_SKIP_FOR_KEYBINDS"
+
+		"MaxLevel"						"1"
+		"Innate"						"1"
+
+		"AbilityValues"
+		{
+			"bonus_max_mana_per_int"			
+			{
+				"value"						"2"
+			}
+		}
+	}
+
+
+	//=================================================================================================================
+	// Obsidian Destroyer: Astral Imprisonment
+	//=================================================================================================================
+	"obsidian_destroyer_astral_imprisonment"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY | DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_MAGIC_IMMUNE_ALLIES"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"AbilitySound"					"Hero_ObsidianDestroyer.AstralImprisonment"
+        "HasShardUpgrade"               "1"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.3"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"150"
+
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityModifierSupportValue"	"0.5" // applies multiple modifiers
+
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"AbilityCooldown"
+			{
+				"value"				"18 16 14 12"				
+			}
+			"prison_duration"		
+			{
+				"value"				"1.75 2.5 3.25 4"				
+			}
+			"damage"				
+			{
+				"value"				"90 180 270 360"
+			}
+			"has_mana_steal"
+			{
+				"value"				"1"
+			}
+			"mana_capacity_steal"	
+			{
+				"value"										"16 19 22 25"				
+			}
+			
+			"mana_capacity_duration"	
+			{
+				"value"						"30 40 50 60"
+			}
+			
+			"allied_movement_speed_pct"
+			{
+				"value"						"0"
+				"special_bonus_shard"		"+70"
+			}								
+			"damage_radius"		
+			{
+				"value"						"0"
+				"affected_by_aoe_increase"	"1"
+				"special_bonus_shard"		"+300"
+				"RequiresShard"				"1"
+			}
+			"AbilityCastRange"
+			{
+				"value"						"650"
+				"special_bonus_unique_outworld_devourer_astral_castrange"	"+100"
+			}
+			"debuff_duration"	
+			{
+				"value"							"0"
+				"special_bonus_facet_obsidian_destroyer_overwhelming_devourer"		"+5"				
+			}
+			"percentage_damage"
+			{
+				"value"							"0"
+				"special_bonus_facet_obsidian_destroyer_overwhelming_devourer"		"0"				
+			}				
+			"percentage_heal"
+			{
+				"value"							"0"
+				"special_bonus_facet_obsidian_destroyer_overwhelming_devourer"		"+100"				
+			}				
+		}
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_2"
+	}	
+
+	//=================================================================================================================
+	// Obsidian Destroyer: Essence Aura
+	//=================================================================================================================
+	"obsidian_destroyer_essence_aura"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
+		"AbilitySound"					"Hero_ObsidianDestroyer.EssenceAura"
+
+		
+		"AbilityCastAnimation"		"ACT_DOTA_CAST_ABILITY_3"
+	}
+
+	//=================================================================================================================
+	// Obsidian Destroyer: Equilibrium (Essence Flux)
+	//=================================================================================================================
+	"obsidian_destroyer_equilibrium"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"		
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_5"
+		"HasScepterUpgrade"				"1"
+		
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.75"
+						
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+			"proc_chance"	"30"
+			"mana_restore"	"25 35 45 55"
+
+			"mana_increase"
+			{
+				"value"		"0"
+				"special_bonus_facet_obsidian_destroyer_obsidian_decimator"	"4"
+			}
+
+			"mana_increase_duration"
+			{
+				"value"		"0"
+				"special_bonus_facet_obsidian_destroyer_obsidian_decimator"	"7"
+			}
+			"mana_as_ms"
+			{
+				"special_bonus_unique_outworld_devourer_3"	"=1.5"
+			}
+			"scepter_barrier_threshold"	"20"
+			"scepter_barrier_duration"	"15"
+			"scepter_barrier_cooldown"	"80"
+			"scepter_max_mana_barrier_pct"	"70"		
+		}
+	}
+
+	//=================================================================================================================
+	// Obsidian Destroyer: Sanity's Eclipse
+	//=================================================================================================================
+	"obsidian_destroyer_sanity_eclipse"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityCastRange"				"700"
+		"AbilityCastPoint"				"0.25 0.25 0.25"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"FightRecapLevel"				"2"
+		"AbilitySound"					"Hero_ObsidianDestroyer.SanityEclipse"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_4"
+
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"150 135 120"
+
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"200 300 400"
+
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityValues"
+		{
+				"base_damage"				"200 300 400"
+				"radius"					
+				{
+					"value"			"450 525 600"
+					"affected_by_aoe_increase"	"1"
+				}
+				"cast_range"					"700"
+				"damage_multiplier"
+				{
+					"value"					"0.4"
+					"DamageTypeTooltip"		"DAMAGE_TYPE_NONE"
+				"special_bonus_unique_outworld_devourer_4" "+0.2"
+				}
+				"illusion_bonus_damage"	"200"
+				"debuff_duration"	
+				{
+					"value"				"0"
+					"special_bonus_facet_obsidian_destroyer_overwhelming_devourer"		"+7"					
+				}
+				"percentage_damage"
+				{
+					"value"							"0"
+					"special_bonus_facet_obsidian_destroyer_overwhelming_devourer"		"0"					
+				}				
+				"percentage_heal"
+				{
+					"value"				"0"
+					"special_bonus_facet_obsidian_destroyer_overwhelming_devourer"		"+100"					
+				}				
+		}
+	}
+
+	
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_outworld_devourer"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"						"special_bonus_base"
+	}
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_outworld_devourer_3"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"						"special_bonus_base"
+	}
+
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_outworld_devourer_4"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass" "special_bonus_base"
+	}
+
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_outworld_devourer_5"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityValues"
+		{
+			"value"
+			{
+				"value" "60"
+				"ad_linked_abilities" "obsidian_destroyer_sanity_eclipse"
+			}
+		}
+	}
+	//=================================================================================================================
+	// Ability: Special Bonus
+	//=================================================================================================================
+	"special_bonus_unique_outworld_devourer_astral_castrange"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityType"					"DOTA_ABILITY_TYPE_ATTRIBUTES"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"BaseClass"						"special_bonus_base"
+	}
+
+}
