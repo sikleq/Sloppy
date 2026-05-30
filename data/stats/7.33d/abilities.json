@@ -321,13 +321,13 @@
   "morphling_adaptive_strike_agi": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": "600 700 800 900",
-    "AbilityCooldown": "16 14 12 10",
+    "AbilityCooldown": 10,
     "AbilityManaCost": "40 50 60 70"
   },
   "morphling_adaptive_strike_str": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET",
     "AbilityCastRange": "600 700 800 900",
-    "AbilityCooldown": "16 14 12 10",
+    "AbilityCooldown": 10,
     "AbilityManaCost": "40 50 60 70"
   },
   "morphling_morph": {
@@ -1248,7 +1248,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 600,
     "AbilityCooldown": 5,
-    "AbilityManaCost": "100 115 130 145"
+    "AbilityManaCost": "85 105 125 145"
   },
   "pugna_decrepify": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK |  DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL",
@@ -1828,8 +1828,8 @@
   },
   "broodmother_insatiable_hunger": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET",
-    "AbilityCooldown": "45 40 35 30",
-    "AbilityManaCost": 80
+    "AbilityCooldown": "40 35 30 25",
+    "AbilityManaCost": "50 60 70 80"
   },
   "broodmother_sticky_snare": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_VECTOR_TARGETING | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES | DOTA_ABILITY_BEHAVIOR_CHANNELLED ",
@@ -2011,7 +2011,7 @@
   "doom_bringer_devour": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_AUTOCAST",
     "AbilityCastRange": "300 300 300 300",
-    "AbilityCooldown": 65,
+    "AbilityCooldown": 60,
     "AbilityManaCost": "40 50 60 70"
   },
   "doom_bringer_scorched_earth": {
@@ -2207,7 +2207,7 @@
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE"
   },
   "invoker_invoke": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
     "AbilityType": "DOTA_ABILITY_TYPE_ULTIMATE",
     "AbilityCooldown": 7,
     "AbilityManaCost": 0
@@ -2739,6 +2739,7 @@
   "undying_tombstone": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING",
     "AbilityCastRange": 500,
+    "AbilityCooldown": "90 85 80 75",
     "AbilityManaCost": "120 140 160 180"
   },
   "undying_tombstone_zombie_aura": {
@@ -2759,8 +2760,8 @@
     "AbilityCooldown": 10
   },
   "undying_tombstone_unit_grab": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_UNRESTRICTED | DOTA_ABILITY_BEHAVIOR_IGNORE_PSEUDO_QUEUE | DOTA_ABILITY_BEHAVIOR_IGNORE_SILENCE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_IMMEDIATE",
-    "AbilityCastRange": 1200,
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_UNRESTRICTED | DOTA_ABILITY_BEHAVIOR_IGNORE_PSEUDO_QUEUE | DOTA_ABILITY_BEHAVIOR_IGNORE_SILENCE | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL",
+    "AbilityCastRange": 400,
     "AbilityCooldown": 10
   },
   "rubick_telekinesis": {
@@ -4917,7 +4918,7 @@
   "techies_sticky_bomb": {
     "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE",
     "AbilityCastRange": 1000,
-    "AbilityCooldown": "13 11 9 7",
+    "AbilityCooldown": "12 10 8 6",
     "AbilityManaCost": "100 115 130 145"
   },
   "techies_reactive_tazer": {
@@ -4943,7 +4944,7 @@
     "AbilityCastRange": 0
   },
   "techies_minefield_sign": {
-    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE",
+    "AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_SHOW_IN_GUIDES",
     "AbilityCastRange": 10,
     "AbilityManaCost": 0
   },
