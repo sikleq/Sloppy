@@ -38,3 +38,16 @@ data/*_datafeed.json
 
 # Abandoned logo experiment — kept locally, not committed
 icons/Pixel Logo.gif
+
+# Telethon auth session for scripts/fetch_signatures.py — never commit
+*.session
+*.session-journal
+
+# Real channel member list — NOT committed for now (privacy + we deploy with
+# random placeholder names). When absent, build_patch.py falls back to random
+# placeholders, so CI builds the wall with fake names. Generated locally by
+# scripts/fetch_signatures.py / run_signatures.ps1.
+data/signatures.json
+
+# Local one-command refresh helper — contains the Telegram api_hash, never commit
+run_signatures.ps1
