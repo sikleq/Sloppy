@@ -59,6 +59,11 @@ inner scroll box anymore.
   `max-height`** (any of those would clip the wide table and re-introduce a second
   inner scrollbar). History: it used to be a height-capped `overflow:auto` box; we
   flipped to page-scroll on user request (2026-06-01).
+- **Wide text columns must wrap.** Page-scroll has no inner box to hide runaway
+  width, so columns holding long descriptive text — Unit Abilities **Property 1–3**
+  (`.ua-effect` / `.ua-effect2` / `.ua-effect3`) — use `white-space: normal` + a
+  `max-width` cap, otherwise the table runs far past the viewport (they were
+  `nowrap` under the old inner-box scroll).
 
 How the frozen pieces still work at page level:
 - **Identity columns** freeze via `position:sticky; left:<offset>` (JS sets per-cell

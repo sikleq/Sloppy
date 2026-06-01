@@ -36,6 +36,5 @@ data/site_meta.json
 # / one-off generation; not load-bearing for the build.
 data/*_datafeed.json
 
-# Source asset archive + abandoned logo experiment — kept locally, not committed
-icons/gothic_pixel_ui_free_v_1-0-2.zip
+# Abandoned logo experiment — kept locally, not committed
 icons/Pixel Logo.gif
