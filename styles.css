@@ -4,6 +4,16 @@
 
 /* Always reserve scrollbar space so content doesn't shift when filtering reduces page height */
 html { scrollbar-gutter: stable; }
+/* …except pages that don't scroll at the page level, where the reserved gutter
+   just looks like an empty gap on the right:
+   - .main-page    single-screen index
+   - .calendar-page calendar (fits the screen)
+   - .creeps-page   Neutral Creeps / Neutral Abilities — the page is locked
+                    (body:has(.creeps-scroll){overflow:hidden}); the real
+                    scrollbar lives INSIDE the .creeps-scroll box, not here. */
+html:has(.main-page),
+html:has(.calendar-page),
+html:has(.creeps-page) { scrollbar-gutter: auto; }
 
 body {
   background: #0a0e13;
@@ -190,6 +200,17 @@ body:has(.creeps-page) nav.top-nav {
 .inv-sig.is-lit {
   color: rgba(243, 220, 150, 0.72);
   text-shadow: 0 0 8px rgba(227, 196, 106, 0.45);
+}
+/* Collapsed sign for members without a public @username. */
+.inv-sig-hidden {
+  font-style: italic;
+  letter-spacing: 1px;
+  color: rgba(178, 186, 200, 0.13);   /* faint cool-grey, not gold */
+}
+.inv-sig-hidden:hover,
+.inv-sig-hidden.is-lit {
+  color: rgba(198, 206, 220, 0.6);
+  text-shadow: 0 0 8px rgba(150, 165, 190, 0.4);
 }
 .inv-divider {
   display: block;
@@ -3425,7 +3446,10 @@ body.filter-active ul.subnotes { display: none; }
    ============================================================ */
 .creeps-page {
   max-width: none;
-  padding: 16px 20px 40px;
+  /* Flush to the page's left edge — no left indent (user wants the
+     .creeps-scroll box to start at the very left). Right keeps a small gap.
+     (top/bottom are overridden to 12px below when a scroll box is present.) */
+  padding: 16px 20px 40px 0;
 }
 /* Pages with an inner scroller (Neutral Creeps / Unit Abilities) lock the
    document to the viewport so ONLY the inner .creeps-scroll box scrolls —
@@ -4587,11 +4611,11 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   cursor: pointer;
   user-select: none;
   position: sticky;
-  /* Page-level sticky stack: site nav → toolbar → these headers. The `top`
-     offset (nav height + toolbar height) is measured + set in scripts.js as
-     --mr-thead-top so it tracks the real rendered heights. Subnav and the
-     description above are left in normal flow, so they scroll away. */
-  top: var(--mr-thead-top, 130px);
+  /* Mana Items now lives in the same .creeps-scroll box as Neutral Creeps:
+     the box is the scroll container, so the header pins at the box's top.
+     The subnav, blurb and toolbar scroll away above it (they're in-flow /
+     sticky-left only). */
+  top: 0;
   z-index: 35;           /* above the hover-zoomed item icon (z 30) so a
                             top-row icon pop-out never paints over the header,
                             but below toolbar/subnav/nav (z 80/90/100) */

@@ -1445,7 +1445,7 @@ def save_creeps_html():
         '<html lang="ru">\n'
         '<head>\n'
         '<meta charset="UTF-8">\n'
-        '<title>Sloppy - Creeps Table</title>\n'
+        '<title>SIKLE\\Neutral Creeps</title>\n'
         + _site.favicon_links() +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
@@ -2322,7 +2322,7 @@ def save_creeps_html():
 
     ua_html = (
         '<!DOCTYPE html>\n<html lang="ru">\n<head>\n<meta charset="UTF-8">\n'
-        '<title>Sloppy - Neutral Abilities</title>\n'
+        '<title>SIKLE\\Neutral Abilities</title>\n'
         + _site.favicon_links() +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'

@@ -3112,7 +3112,7 @@ def write_head(version, date):
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sloppy - {version} Changelog</title>
+<title>SIKLE\\Changelogs {version}</title>
 {_site.favicon_links(prefix="../")}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&display=swap">
@@ -3844,7 +3844,7 @@ def save_calendar_html():
     html = (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
         '<meta charset="UTF-8">\n'
-        '<title>Sloppy - Calendar</title>\n'
+        '<title>SIKLE\\Calendar</title>\n'
         + _site.favicon_links() +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
@@ -3915,57 +3915,77 @@ def save_index_html():
     grid_html = (
         '<div class="inv-book">'
         '<div class="inv-head">'
-        '<h1 class="inv-title">Dota 2-related stuff</h1>'
+        '<h1 class="inv-title">Select Category</h1>'
         '</div>'
         '<img class="inv-divider" src="icons/ui/gothic/divider.png" alt="" aria-hidden="true">'
         f'<div class="inv-grid">{"".join(cells)}{empties}</div>'
         '</div>'
     )
 
-    # ---- WALL OF SIGNATURES (placeholder) ----
-    # Faint pixel-font "graffiti" of channel-member usernames scattered around
-    # the book. For now 100 random placeholders; a Telegram bot will later feed
-    # real usernames. scripts.js positions them (no overlap with book/nav/each
-    # other) on load + resize.
-    import random as _rnd
-    _rng = _rnd.Random(1337)
-    _A = ['shadow', 'frost', 'blood', 'iron', 'dire', 'arc', 'void', 'ember',
-          'storm', 'night', 'rune', 'grim', 'swift', 'mad', 'lone', 'dark',
-          'gold', 'silent', 'feral', 'toxic', 'salty', 'tilted', 'cheeky',
-          'turbo', 'mega', 'ultra', 'lil', 'big', 'old', 'crazy', 'sleepy']
-    _N = ['wolf', 'mage', 'blade', 'crit', 'ward', 'creep', 'mid', 'carry',
-          'pudge', 'invoker', 'meepo', 'wisp', 'goblin', 'knight', 'reaper',
-          'sniper', 'enjoyer', 'andy', 'chad', 'gamer', 'feeder', 'smurf',
-          'gosu', 'main', 'diff', 'simp', 'fan', 'boi', 'lord', 'btw']
-    _SUF = ['', '', '', '7', '42', '69', '99', '228', '322', '1337', 'xd', 'ttv']
+    # ---- WALL OF SIGNATURES ----
+    # Faint pixel-font "graffiti" of channel-member display names scattered
+    # around the book. Real names come from data/signatures.json, produced by
+    # scripts/fetch_signatures.py (run via run_signatures.ps1). We show display
+    # names, not @usernames, so a member can't be found/DMed from the wall.
+    # Members with an empty or punctuation-only name collapse into one
+    # "Hidden (xN)" sign. If the file is missing we fall back to random
+    # placeholders so the page still builds. scripts.js positions every sign
+    # (no overlap with book/nav/each other) on load + resize.
+    _names: list[str] = []
+    _hidden = 0
+    _sig_path = _os.path.join(_os.path.dirname(__file__), 'data', 'signatures.json')
+    try:
+        with open(_sig_path, encoding='utf-8') as _f:
+            _sig_data = _json.load(_f)
+        _names = [str(u).strip() for u in _sig_data.get('names', []) if str(u).strip()]
+        _hidden = int(_sig_data.get('hidden', 0) or 0)
+    except (FileNotFoundError, ValueError, OSError):
+        _names = []
 
-    def _uname():
-        a, n, s = _rng.choice(_A), _rng.choice(_N), _rng.choice(_SUF)
-        r = _rng.random()
-        if r < 0.22:
-            return f'xX_{a}{n}_Xx'
-        if r < 0.46:
-            return f'{a}_{n}{s}'
-        if r < 0.68:
-            return f'{a}{n}{s}'
-        if r < 0.85:
-            return f'{n}_{s or _rng.randint(10, 9999)}'
-        return f'{a}{_rng.randint(1, 999)}'
+    if not _names:
+        # Fallback: 100 random placeholder usernames (no real data yet).
+        import random as _rnd
+        _rng = _rnd.Random(1337)
+        _A = ['shadow', 'frost', 'blood', 'iron', 'dire', 'arc', 'void', 'ember',
+              'storm', 'night', 'rune', 'grim', 'swift', 'mad', 'lone', 'dark',
+              'gold', 'silent', 'feral', 'toxic', 'salty', 'tilted', 'cheeky',
+              'turbo', 'mega', 'ultra', 'lil', 'big', 'old', 'crazy', 'sleepy']
+        _N = ['wolf', 'mage', 'blade', 'crit', 'ward', 'creep', 'mid', 'carry',
+              'pudge', 'invoker', 'meepo', 'wisp', 'goblin', 'knight', 'reaper',
+              'sniper', 'enjoyer', 'andy', 'chad', 'gamer', 'feeder', 'smurf',
+              'gosu', 'main', 'diff', 'simp', 'fan', 'boi', 'lord', 'btw']
+        _SUF = ['', '', '', '7', '42', '69', '99', '228', '322', '1337', 'xd', 'ttv']
 
-    _names, _seen = [], set()
-    while len(_names) < 100:
-        u = _uname()
-        if u not in _seen:
-            _seen.add(u)
-            _names.append(u)
-    _sigs = ''.join(f'<span class="inv-sig">@{_html.escape(u)}</span>' for u in _names)
+        def _uname():
+            a, n, s = _rng.choice(_A), _rng.choice(_N), _rng.choice(_SUF)
+            r = _rng.random()
+            if r < 0.22:
+                return f'xX_{a}{n}_Xx'
+            if r < 0.46:
+                return f'{a}_{n}{s}'
+            if r < 0.68:
+                return f'{a}{n}{s}'
+            if r < 0.85:
+                return f'{n}_{s or _rng.randint(10, 9999)}'
+            return f'{a}{_rng.randint(1, 999)}'
+
+        _seen = set()
+        while len(_names) < 100:
+            u = _uname()
+            if u not in _seen:
+                _seen.add(u)
+                _names.append(u)
+
+    _sigs = ''.join(f'<span class="inv-sig">{_html.escape(u)}</span>' for u in _names)
+    if _hidden > 0:
+        _sigs += f'<span class="inv-sig inv-sig-hidden">Hidden (x{_hidden})</span>'
     sig_layer = f'<div class="inv-signatures" aria-hidden="true">{_sigs}</div>'
     html = (
         '<!DOCTYPE html>\n'
         '<html lang="en">\n'
         '<head>\n'
         '<meta charset="UTF-8">\n'
-        '<title>Sloppy</title>\n'
+        '<title>SIKLE\\dota.vpk</title>\n'
         + _site.favicon_links() +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'

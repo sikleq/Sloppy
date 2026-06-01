@@ -61,9 +61,31 @@ for the wide table. (History: we briefly tried page-level scroll for these two
 tables on 2026-06-01, but the wide Unit Abilities table overflowed/looked broken,
 so we reverted to this contained box.)
 
-**Mana Items** scrolls at the **page level** (no inner box). That's why its rows slide
-under the translucent glass nav and the table colours show through — an effect the other
-two pages can't get without giving up the frozen columns + overlays.
+**Mana Items** now uses the **same `.creeps-scroll` box** as the other two (since
+2026-06-02) so all three Materials pages share one shell: identical header, the
+Materials sub-nav INSIDE the box, blurb + toolbar as `inbox-bar` (sticky-left, scroll
+away), and the table header pinned at `top:0` of the box. It has no frozen identity
+columns, so it skips the `.sticky-frame` overlays (the creeps sticky-column JS no-ops on
+`.mr-table`). Earlier it page-scrolled (rows sliding under the glass nav) — that was the
+odd one out and was unified away. `.mr-table thead th` pins at `top:0` (was a page-level
+`top: var(--mr-thead-top)`).
+
+### scrollbar-gutter convention
+`html { scrollbar-gutter: stable }` is the **default** (styles.css top) — it reserves the
+scrollbar track so the layout doesn't jump horizontally when filtering changes a page's
+height (patch notes, silent changes). Pages that DON'T page-scroll opt out, otherwise the
+reserved track shows as an empty gap on the right:
+```css
+html:has(.main-page),      /* single-screen index            */
+html:has(.calendar-page),  /* calendar — fits the screen     */
+html:has(.creeps-page)     /* Neutral Creeps / Neutral Abilities / Mana Items */
+{ scrollbar-gutter: auto; }
+```
+Note `.creeps-page` is shared by **all three** Materials tables (materials.html,
+neutral_abilities.html, mana_items.html), and **all three now lock the page and scroll
+inside `.creeps-scroll`** (one scrollbar inside the box). **New page rule:** single-screen
+or self-scrolling → give it one of these classes (or add to the opt-out); long filterable
+page → leave the default `stable`.
 
 ### Two-row sticky header (Neutral Creeps)
 - `<tr class="cat-row">` (BASIC / VITALITY / …) sticks at `top: 0` (of the box).

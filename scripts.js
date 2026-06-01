@@ -1759,6 +1759,13 @@
     // Inter-name gap shrinks as the count grows, so more names pack in (the
     // Telegram bot can feed many without them feeling sparse).
     const M = Math.max(3, Math.round(14 - sigs.length * 0.05));
+    // Auto-shrink the font as the wall gets crowded so more names pack in, but
+    // never below FONT_MIN (stays legible). Full size up to ~120 names, easing
+    // down to the floor by ~360. The per-name random variation rides on top.
+    const FONT_MIN = 11, FONT_MAX = 22;
+    const crowd = Math.max(0, Math.min(1, (sigs.length - 120) / 240));
+    const fontTop = Math.round(FONT_MAX - (FONT_MAX - FONT_MIN) * crowd);
+    const fontBot = Math.max(FONT_MIN, fontTop - 6);
     // clientWidth/Height = the visible area WITHOUT the scrollbar (matches the
     // fixed signature layer), so a word never lands under the scrollbar.
     const W = document.documentElement.clientWidth;
@@ -1775,7 +1782,7 @@
       sig.style.visibility = 'hidden';
       sig.style.left = '0px'; sig.style.top = '0px';
       // slight organic variation
-      sig.style.fontSize = (16 + Math.floor(Math.random() * 8)) + 'px';
+      sig.style.fontSize = (fontBot + Math.floor(Math.random() * (fontTop - fontBot + 1))) + 'px';
       const rot = Math.random() * 14 - 7;
       sig.style.transform = 'rotate(' + rot.toFixed(1) + 'deg)';
       const w0 = sig.offsetWidth, h0 = sig.offsetHeight;   // unrotated box

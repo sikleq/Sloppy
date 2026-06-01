@@ -942,8 +942,13 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
     _load_item_descriptions({
         r["slug"].replace("item_", "").replace("__active", "") for r in rows
     })
+    # subnav_in_header=False: the Materials sub-tab bar is placed INSIDE the
+    # scroll box (below), exactly like Neutral Creeps / Neutral Abilities — not
+    # as a separate strip under the header. Keeps all three pages identical.
     nav = _site.render_top_nav('materials', _latest_href(),
-                               patch_context=False, subtabs_active='mana_items')
+                               patch_context=False, subtabs_active='mana_items',
+                               subnav_in_header=False)
+    subnav = _site.render_materials_subnav('mana_items')
 
     # `direction` drives per-column conditional formatting (scripts.js):
     # "higher" cells go green at top of range, red at bottom; "lower" cells
@@ -1017,7 +1022,7 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
 
     return (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-        '<title>Sloppy - Mana Regen Items</title>\n'
+        '<title>SIKLE\\Mana Items</title>\n'
         + _site.favicon_links() +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
@@ -1027,9 +1032,14 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
         '</head>\n<body>\n'
         f'{nav}\n'
         '<div class="container creeps-page">\n'
-        # Blurb first, then the toolbar. Mirrors the other tables' layout
-        # convention (description copy → controls → table).
-        '<p class="mr-blurb">Every purchasable item that contributes mana regen, '
+        '<div class="creeps-scroll">\n'
+        # Sub-tab bar + blurb + toolbar live INSIDE the scroll box (above the
+        # table) so they scroll away with it — identical to Neutral Creeps /
+        # Neutral Abilities. Only the site nav + the sticky table header stay
+        # pinned. `inbox-bar` makes them sticky-left so they don't slide off on
+        # horizontal scroll.
+        f'{subnav}'
+        '<p class="mr-blurb inbox-bar">Every purchasable item that contributes mana regen, '
         'sorted by total <em>Mana regen</em> by default. Intelligence contributes '
         f'{_int_const_chip("+12 max mana", _INT_MANA_HIST)} and '
         f'{_int_const_chip("+0.05 mana regen", _INT_REGEN_HIST)} per '
@@ -1041,7 +1051,7 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
         # Toolbar — Price min/max + Hide Active + Heatmap. Layout matches
         # the cal-toggle-bar / ua-upgrades-toggle convention used on the
         # Neutral Creeps & Unit Abilities pages.
-        '<div class="cal-toggle-bar mr-toolbar">'
+        '<div class="cal-toggle-bar mr-toolbar inbox-bar">'
         '<span class="view-group">'
         '<strong>Price</strong>'
         # Combo widget — both inputs and the clear-X share a single border
@@ -1076,7 +1086,8 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
         '</label>'
         '</div>\n'
         f'{table}\n'
-        '</div>\n'
+        '</div>\n'   # close .creeps-scroll
+        '</div>\n'   # close .creeps-page
         f'<script src="scripts.js?v={ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
     )
@@ -1084,15 +1095,16 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
 
 def _latest_href() -> str:
     """Read the latest patch HTML path from data/site_meta.json (written by
-    build_patch.py). Falls back to "#" if missing."""
+    build_patch.py). The key is `latest_patch_filename` (same one build_creeps
+    reads); falls back to the current newest patch if missing."""
     meta_path = _HERE / "data" / "site_meta.json"
     if not meta_path.exists():
-        return "#"
+        return "patches/7.41c.html"
     try:
         meta = _json.loads(meta_path.read_text(encoding="utf-8"))
-        return meta.get("latest", "#")
+        return meta.get("latest_patch_filename", "patches/7.41c.html")
     except Exception:
-        return "#"
+        return "patches/7.41c.html"
 
 
 def main() -> int:
