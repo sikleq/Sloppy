@@ -181,6 +181,23 @@ HERO_CDN = "../icons/heroes/"
 ITEM_CDN = "../icons/items/"
 ABIL_CDN = "../icons/abilities/"
 
+# Local ability-icon filenames (slug, no extension), loaded once. Used to
+# decide at build time whether an ability icon actually exists on disk — if not,
+# we render the fallback (innate marker / missing placeholder) DIRECTLY as the
+# <img src> instead of a broken path that only swaps via onerror. The broken
+# path leaked into the search index (which reads img.src at load time, before
+# the lazy onerror fired), so abilities like Timbersaw's innate "Exposure
+# Therapy" showed missing.svg in the search dropdown. ~28 innate abilities have
+# no public CDN icon and are affected identically.
+_ABIL_ICON_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "icons", "abilities")
+try:
+    _LOCAL_ABIL_ICONS = {
+        _os.path.splitext(f)[0] for f in _os.listdir(_ABIL_ICON_DIR)
+        if f.lower().endswith(".png")
+    }
+except OSError:
+    _LOCAL_ABIL_ICONS = set()
+
 HERO_SLUG = {
     "Abaddon": "abaddon", "Underlord": "abyssal_underlord", "Alchemist": "alchemist",
     "Ancient Apparition": "ancient_apparition", "Anti-Mage": "antimage",
@@ -2370,13 +2387,35 @@ def ability(title, slug=None, innate=None, icon_url=None):
     elif slug:
         is_innate = (slug in _INNATE_SLUGS) or (key is not None and key in INNATE_ABILITIES)
     icon_inner = ''
+    skip_marker = False
     # Fallback: if no source for the icon at all, show the missing-placeholder
     # so the row is identifiable rather than text-only.
     if not (icon_url or slug):
         icon_inner = (f'<img src="{MISSING_ICON_URL}" alt="" '
                       f'class="ability-icon-img" loading="lazy" '
                       f'title="missing icon: {title}">')
-    if icon_url or slug:
+    # Local icon file is absent (no public CDN icon — typical of the ~28 hero
+    # innate abilities). Render the correct fallback DIRECTLY as the src so the
+    # heading AND the search index (which reads img.src) get a real, loadable
+    # image instead of a broken path that only swaps via onerror. The broken
+    # path leaked into search (img.src read before the lazy onerror fired), so
+    # e.g. Timbersaw's innate "Exposure Therapy" showed missing.svg there.
+    elif slug and not icon_url and slug not in _LOCAL_ABIL_ICONS:
+        # Keep the CDN slug queued so fetch_icons can still pick it up if Valve
+        # ever publishes the art.
+        _State.ability_icons.add(f"{ABIL_CDN}{slug}.png")
+        if is_innate:
+            # The innate marker IS the canonical image — use it as the icon and
+            # skip the redundant separate marker overlay below.
+            icon_inner = (f'<img src="{INNATE_ICON_URL}" alt="{title}" '
+                          f'class="ability-icon-img" loading="lazy" '
+                          f'data-slug="{slug}" title="Innate ability">')
+            skip_marker = True
+        else:
+            icon_inner = (f'<img src="{MISSING_ICON_URL}" alt="{title}" '
+                          f'class="ability-icon-img" loading="lazy" '
+                          f'data-slug="{slug}" title="missing icon: {slug}">')
+    if (icon_url or slug) and not icon_inner:
         src = icon_url if icon_url else f"{ABIL_CDN}{slug}.png"
         # On 404: innate abilities fall back to the innate icon (Valve doesn't
         # expose innate-ability icons on the public CDN — the innate marker
@@ -2410,7 +2449,7 @@ def ability(title, slug=None, innate=None, icon_url=None):
                       f'onerror="{on_err}">')
         if not icon_url:
             _State.ability_icons.add(src)
-    if is_innate:
+    if is_innate and not skip_marker:
         # Innate marker overlays bottom-center of the ability icon.
         icon_inner += (f'<img src="{INNATE_ICON_URL}" alt="" '
                        f'class="innate-marker" title="Innate ability">')
@@ -3482,11 +3521,33 @@ def save_calendar_html():
     body = []
     body.append('<div class="calendar mode-full">')
 
-    # Toggle bar — Compact switch only. Positioned outside the year block to
-    # the left so it lines up with (and sits above) the breakout block's
-    # left edge.
-    body.append('<div class="cal-toggle-bar">')
-    # Reuse the unit_abilities upgrades-toggle styling for visual consistency.
+    # Single year block. Year selector replaces per-year collapsible headers;
+    # all years' grids are rendered in panes and only the selected pane is
+    # visible at a time. The Compact toggle lives in this block's top-right
+    # corner (added after the picker, below).
+    body.append('<div class="cal-year-block is-current" data-collapsed="false">')
+    body.append('<div class="cal-year-label">')
+    default_year = years[0] if years else None
+    body.append('<div class="cal-year-picker">')
+    body.append(
+        '<button type="button" class="cal-year-current" '
+        'aria-haspopup="listbox" aria-expanded="false">'
+        f'<span class="cal-year-current-val">{default_year}</span>'
+        '<span class="cal-year-caret" aria-hidden="true">▾</span>'
+        '</button>'
+    )
+    body.append('<ul class="cal-year-menu" role="listbox" hidden>')
+    for year in years:
+        sel = ' is-selected' if year == default_year else ''
+        asel = 'true' if year == default_year else 'false'
+        body.append(
+            f'<li class="cal-year-opt{sel}" role="option" '
+            f'data-year="{year}" aria-selected="{asel}">{year}</li>'
+        )
+    body.append('</ul>')
+    body.append('</div>')  # cal-year-picker
+    # Compact toggle — top-right corner of the calendar block, styled to match
+    # the year-picker button (see .cal-compact-toggle in styles.css).
     body.append(
         '<label class="ua-upgrades-toggle cal-compact-toggle" '
         'title="Compact view">'
@@ -3495,20 +3556,7 @@ def save_calendar_html():
         '<span class="ua-switch"></span>'
         '</label>'
     )
-    body.append('</div>')
-
-    # Single year block. Year selector replaces per-year collapsible headers;
-    # all years' grids are rendered in panes and only the selected pane is
-    # visible at a time.
-    body.append('<div class="cal-year-block is-current" data-collapsed="false">')
-    body.append('<div class="cal-year-label">')
-    body.append('<select class="cal-year-select" aria-label="Select year">')
-    default_year = years[0] if years else None
-    for year in years:
-        sel = ' selected' if year == default_year else ''
-        body.append(f'<option value="{year}"{sel}>{year}</option>')
-    body.append('</select>')
-    body.append('</div>')
+    body.append('</div>')  # cal-year-label
 
     for year in years:
         hidden = '' if year == default_year else ' hidden'
@@ -3585,6 +3633,148 @@ def save_calendar_html():
         body.append('</div>')  # cal-year-pane
 
     body.append('</div>')  # cal-year-block
+
+    # ---- INFOGRAPHIC: patch cadence (compact card under the calendar) ----
+    year_counts = {}
+    for p in patches:
+        year_counts[p['year']] = year_counts.get(p['year'], 0) + 1
+    month_counts = [0] * 12
+    for p in patches:
+        month_counts[p['month'] - 1] += 1
+    total_patches = len(patches)
+    years_tracked = len(year_counts)
+    avg_per_year = (total_patches / years_tracked) if years_tracked else 0
+    span_vals = sorted(spans.values())
+    if span_vals:
+        n = len(span_vals)
+        median_span = (span_vals[n // 2] if n % 2
+                       else (span_vals[n // 2 - 1] + span_vals[n // 2]) // 2)
+    else:
+        median_span = 0
+    max_year_count = max(year_counts.values()) if year_counts else 1
+    max_month_count = max(month_counts) if month_counts else 1
+
+    min_year = min(year_counts) if year_counts else None
+
+    def _spark_svg(values, labels, tips, uid):
+        """Smooth (Catmull-Rom) sparkline with: gradient area fill, faint
+        horizontal gridlines, a left y-axis (with min/max ticks), an x-axis
+        baseline separating the category labels from the plot, point dots and a
+        per-point value that appears on hover. Crisp SVG, scales via CSS."""
+        n = len(values)
+        maxv = max(values) if values and max(values) > 0 else 1
+        # "Nice" axis top: round the data max UP to a clean 5-step scale, so the
+        # axis reads e.g. 0..25 (step 5) when the real max is 21 — the peak sits
+        # below the top tick instead of pinned to it.
+        nice_step = next(st for st in (1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25, 50, 100, 200, 500)
+                         if st * 5 >= maxv)
+        nice_max = nice_step * 5
+        viewW, padL, padR, padTop, chartH, labelH = 520, 32, 14, 12, 86, 18
+        totalH = chartH + labelH
+        x0p, x1p = padL, viewW - padR
+        step = (x1p - x0p) / (n - 1) if n > 1 else 0
+        pts = [(x0p + i * step,
+                padTop + (1 - v / nice_max) * (chartH - padTop)) for i, v in enumerate(values)]
+
+        def pt(i):
+            return pts[min(max(i, 0), n - 1)]
+        d = f"M {pts[0][0]:.1f} {pts[0][1]:.1f}"
+        for i in range(1, n):
+            x0, y0 = pt(i - 2)
+            x1, y1 = pt(i - 1)
+            x2, y2 = pt(i)
+            x3, y3 = pt(i + 1)
+            c1x, c1y = x1 + (x2 - x0) / 6, y1 + (y2 - y0) / 6
+            c2x, c2y = x2 - (x3 - x1) / 6, y2 - (y3 - y1) / 6
+            d += f" C {c1x:.1f} {c1y:.1f} {c2x:.1f} {c2y:.1f} {x2:.1f} {y2:.1f}"
+        area = d + f" L {pts[-1][0]:.1f} {chartH} L {pts[0][0]:.1f} {chartH} Z"
+
+        s = [f'<svg class="cal-ig-spark" viewBox="0 0 {viewW} {totalH}" role="img">']
+        s.append(f'<defs><linearGradient id="sg-{uid}" x1="0" y1="0" x2="0" y2="1">'
+                 '<stop offset="0" stop-color="#79c0ff" stop-opacity="0.28"/>'
+                 '<stop offset="1" stop-color="#79c0ff" stop-opacity="0"/>'
+                 '</linearGradient></defs>')
+        # Horizontal gridlines + y-axis ticks on the 5-step nice scale.
+        for k in range(6):                       # 0,1,2,3,4,5 → 0..nice_max
+            gy = padTop + (1 - k / 5) * (chartH - padTop)
+            if 0 < k < 5:
+                s.append(f'<line class="cal-ig-grid" x1="{x0p}" y1="{gy:.1f}" x2="{x1p}" y2="{gy:.1f}"/>')
+            s.append(f'<text class="cal-ig-ytick" x="{x0p - 6}" y="{gy + 3:.1f}" '
+                     f'text-anchor="end">{nice_step * k}</text>')
+        # Vertical minor gridlines — one per category (skip the first, it sits on
+        # the y-axis).
+        for vx, _vy in pts[1:]:
+            s.append(f'<line class="cal-ig-grid cal-ig-grid-v" x1="{vx:.1f}" y1="{padTop}" '
+                     f'x2="{vx:.1f}" y2="{chartH}"/>')
+        # y-axis (left).
+        s.append(f'<line class="cal-ig-axis" x1="{x0p}" y1="{padTop}" x2="{x0p}" y2="{chartH}"/>')
+        # area + line.
+        s.append(f'<path d="{area}" fill="url(#sg-{uid})"/>')
+        s.append(f'<path d="{d}" fill="none" stroke="#58a6ff" stroke-width="2.4" '
+                 'stroke-linecap="round" stroke-linejoin="round"/>')
+        # x-axis baseline — separates the plot from the category labels below.
+        s.append(f'<line class="cal-ig-axis is-base" x1="{x0p}" y1="{chartH}" x2="{x1p}" y2="{chartH}"/>')
+        # Points: each in a hover group (wide invisible hit rect → value pops).
+        for i, (x, y) in enumerate(pts):
+            hx = x - (step / 2 if step else 14)
+            hw = step if step else 28
+            s.append(f'<g class="cal-ig-pt"><title>{_html.escape(tips[i])}</title>')
+            s.append(f'<rect class="cal-ig-hit" x="{hx:.1f}" y="{padTop}" '
+                     f'width="{hw:.1f}" height="{chartH - padTop:.1f}"/>')
+            s.append(f'<circle class="cal-ig-dot" cx="{x:.1f}" cy="{y:.1f}" '
+                     f'fill="#79c0ff" stroke="#0d1117" stroke-width="1.4"/>')
+            s.append(f'<text class="cal-ig-pt-val" x="{x:.1f}" y="{y - 8:.1f}" '
+                     f'text-anchor="middle">{values[i]}</text>')
+            s.append('</g>')
+            s.append(f'<text x="{x:.1f}" y="{chartH + 13}" text-anchor="middle" '
+                     f'class="cal-ig-spark-lbl">{labels[i]}</text>')
+        s.append('</svg>')
+        return ''.join(s)
+
+    # Whole (major, e.g. 7.41) vs lettered (sub, e.g. 7.41a) patch counts.
+    major_count = sum(1 for p in patches if not _re.search(r'[a-z]$', p['version']))
+    sub_count = total_patches - major_count
+
+    ig = ['<div class="cal-infographic">']
+
+    # Lead panel: title + inline key stats (compact, no big chips).
+    ig.append('<div class="cal-ig-panel cal-ig-lead">')
+    ig.append('<div class="cal-ig-title">Patch cadence</div>')
+    ig.append(f'<div class="cal-ig-sub">{min_year} – now</div>')
+    ig.append('<div class="cal-ig-statline">'
+              f'<span><b>{total_patches}</b> patches:</span>'
+              '<span class="cal-ig-rule"></span>'
+              f'<span><b class="cal-ig-major">{major_count}</b> major</span>'
+              f'<span><b>{sub_count}</b> letter</span>'
+              '<span class="cal-ig-rule"></span>'
+              f'<span><b>{avg_per_year:.1f}</b> / year</span>'
+              f'<span><b>{median_span}</b>d median life</span>'
+              '</div>')
+    ig.append('</div>')
+
+    # Per-year sparkline (chronological left→right).
+    yrs = sorted(year_counts)
+    ig.append('<div class="cal-ig-panel">')
+    ig.append('<div class="cal-ig-h">Per year</div>')
+    ig.append(_spark_svg(
+        [year_counts[y] for y in yrs],
+        [str(y)[2:] for y in yrs],
+        [f"{y}: {year_counts[y]} patch(es)" for y in yrs],
+        'yr'))
+    ig.append('</div>')
+
+    # Per-month sparkline (all years combined).
+    ig.append('<div class="cal-ig-panel">')
+    ig.append('<div class="cal-ig-h">Per month</div>')
+    ig.append(_spark_svg(
+        month_counts,
+        [months[mi][0] for mi in range(12)],
+        [f"{months[mi]}: {month_counts[mi]} patch(es)" for mi in range(12)],
+        'mo'))
+    ig.append('</div>')
+    ig.append('</div>')  # cal-infographic
+    body.append('\n'.join(ig))
+
     body.append('</div>')  # .calendar
 
     toggle_script = '''<script>
@@ -3597,13 +3787,29 @@ def save_calendar_html():
       cal.classList.add(compact.checked ? 'mode-compact' : 'mode-full');
     });
   }
-  const ysel = document.querySelector('.cal-year-select');
-  if (ysel) {
-    ysel.addEventListener('change', () => {
-      document.querySelectorAll('.cal-year-pane').forEach(p => {
-        p.hidden = (p.dataset.year !== ysel.value);
+  const picker = document.querySelector('.cal-year-picker');
+  if (picker) {
+    const btn  = picker.querySelector('.cal-year-current');
+    const menu = picker.querySelector('.cal-year-menu');
+    const valEl = picker.querySelector('.cal-year-current-val');
+    const opts = [...menu.querySelectorAll('.cal-year-opt')];
+    const open  = () => { menu.hidden = false; picker.classList.add('is-open'); btn.setAttribute('aria-expanded', 'true'); };
+    const close = () => { menu.hidden = true;  picker.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); };
+    const selectYear = (year) => {
+      valEl.textContent = year;
+      opts.forEach(o => {
+        const on = o.dataset.year === year;
+        o.classList.toggle('is-selected', on);
+        o.setAttribute('aria-selected', on ? 'true' : 'false');
       });
-    });
+      document.querySelectorAll('.cal-year-pane').forEach(p => {
+        p.hidden = (p.dataset.year !== year);
+      });
+    };
+    btn.addEventListener('click', e => { e.stopPropagation(); menu.hidden ? open() : close(); });
+    opts.forEach(o => o.addEventListener('click', () => { selectYear(o.dataset.year); close(); }));
+    document.addEventListener('click', e => { if (!picker.contains(e.target)) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
   }
   // Row + column cross-highlight on the Full grid. Event-delegated so it
   // works across all year panes (only one is visible at a time).
@@ -3665,26 +3871,57 @@ def save_index_html():
     later. Title and structure mirror the other tabs so the header stays
     in step."""
     nav = _render_top_nav(active="main", patch_context=False)
-    # 5×5 retro-RPG inventory icons: each tile is a round pastel "disc" with
-    # a pixel-art item drawn on top. Disc colour and item icon are paired in
-    # a hand-shuffled order to keep neighbouring tiles visually distinct.
-    _TILE_PLAN = [
-        ('pink',     'sword'),  ('mint',    'potion'), ('beige',    'heart'),
-            ('lavender', 'shield'), ('salmon', 'gem'),
-        ('beige',    'gem'),    ('salmon',  'sword'),  ('olive',    'potion'),
-            ('pink',     'heart'),  ('mint',   'coin'),
-        ('lavender', 'sword'),  ('beige',   'potion'), ('mint',     'shield'),
-            ('salmon',   'gem'),    ('olive',  'heart'),
-        ('mint',     'gem'),    ('pink',    'coin'),   ('salmon',   'shield'),
-            ('beige',    'sword'),  ('lavender','potion'),
-        ('olive',    'gem'),    ('lavender','heart'),  ('pink',     'potion'),
-            ('mint',     'sword'),  ('beige',  'coin'),
+    # Landing page styled as a game inventory opened in a leather-bound book:
+    # an ornate parchment panel with square slots; the filled slots are the
+    # site's sections (gothic pixel-art icons), the rest are empty inventory
+    # cells. Assets: icons/ui/gothic/ (Gothic Pixel UI FREE, gold variant).
+    latest = PATCHES[0]['version'] if PATCHES else None
+    # Captions are placeholder words for now (final wording TBD); the hrefs are
+    # the real destinations. Font matches the "sikle" wordmark (Jersey 10).
+    _INV_ITEMS = [
+        ('patch',     'Codex',    f'patches/{latest}.html' if latest else 'calendar.html'),
+        ('calendar',  'Almanac',  'calendar.html'),
+        ('creeps',    'Bestiary', 'materials.html'),
+        ('abilities', 'Arcana',   'neutral_abilities.html'),
+        ('mana',      'Elixir',   'mana_items.html'),
     ]
-    tiles_html = ''.join(
-        f'<div class="zuma-tile tile-{c} icon-{ic}" data-i="{i}"></div>'
-        for i, (c, ic) in enumerate(_TILE_PLAN)
+    # Placeholder slots — any icons, random words, non-clickable for now.
+    _INV_PLACEHOLDERS = [
+        ('materials',  'Satchel'),
+        ('hat',        'Wayfarer'),
+        ('teapot',     'Brew'),
+        ('typewriter', 'Press'),
+        ('creeps',     'Relic'),
+    ]
+    cells = []
+    for key, label, href in _INV_ITEMS:
+        cells.append(
+            f'<a class="inv-cell inv-filled" href="{href}" title="{label}">'
+            f'<span class="inv-slot">'
+            f'<img class="inv-icon" src="icons/ui/gothic/icon_{key}.png" alt="">'
+            f'</span>'
+            f'<span class="inv-cap">{label}</span>'
+            f'</a>'
+        )
+    empties = ''.join(
+        f'<span class="inv-cell inv-ph" title="placeholder">'
+        f'<span class="inv-slot">'
+        f'<img class="inv-icon" src="icons/ui/gothic/icon_{key}.png" alt="">'
+        f'</span>'
+        f'<span class="inv-cap">{label}</span>'
+        f'</span>'
+        for key, label in _INV_PLACEHOLDERS
     )
-    grid_html = f'<div class="zuma-grid">{tiles_html}</div>'
+    grid_html = (
+        '<div class="inv-book">'
+        '<div class="inv-head">'
+        '<h1 class="inv-title">Sloppy</h1>'
+        '<p class="inv-sub">Dota 2-related stuff</p>'
+        '</div>'
+        '<img class="inv-divider" src="icons/ui/gothic/divider.png" alt="" aria-hidden="true">'
+        f'<div class="inv-grid">{"".join(cells)}{empties}</div>'
+        '</div>'
+    )
     html = (
         '<!DOCTYPE html>\n'
         '<html lang="en">\n'

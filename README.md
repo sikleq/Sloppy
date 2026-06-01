@@ -97,4 +97,5 @@ licensing inquiries.
 
 - Game data extracted via [muk-as/DOTA2_CLIENT](https://github.com/muk-as/DOTA2_CLIENT) (npc_heroes.txt / items.txt history since 7.33).
 - Icons from Valve's official `cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/` CDN.
+- Landing-page inventory UI uses the [Gothic Pixel UI](https://abyssowl.itch.io/gothic-pixel-ui) pack by **abyssowl**.
 - Patch notes © Valve Corporation. This is an unofficial fan project, not affiliated with or endorsed by Valve.

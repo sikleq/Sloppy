@@ -35,3 +35,7 @@ data/site_meta.json
 # Raw Valve API dumps — fetched ad-hoc via scripts/fetch_*.py for inspection
 # / one-off generation; not load-bearing for the build.
 data/*_datafeed.json
+
+# Source asset archive + abandoned logo experiment — kept locally, not committed
+icons/gothic_pixel_ui_free_v_1-0-2.zip
+icons/Pixel Logo.gif

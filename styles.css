@@ -24,7 +24,10 @@ body {
   padding: 0 28px 80px;       /* flush top — content starts right under toolbar */
 }
 .container.calendar-page {
-  padding-top: 8px;
+  /* A clear gap below the nav, and a trimmed bottom padding so the calendar +
+     infographic still fit the viewport without a page scrollbar. */
+  padding-top: 20px;
+  padding-bottom: 12px;
 }
 
 /* TOP NAV (full-width, sits above container)
@@ -125,81 +128,114 @@ body:has(.creeps-page) nav.top-nav {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
 }
 
-/* Main page 5×5 grid — retro roguelike inventory icons. Each tile is a round
-   pastel "disc" with a thick dark pixel outline, soft inner highlight at the
-   top-left and a deeper shadow at the bottom-right, plus a chunky pixel-art
-   item drawn on top of the disc as an SVG background. Hover lifts the disc.
-   Disc colour palette and items inspired by the reference roguelike sprite
-   sheet provided. */
-.zuma-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 76px);
-  grid-template-rows: repeat(5, 76px);
-  gap: 10px;
+/* ---- MAIN PAGE: inventory book ----
+   Landing page styled as a game inventory opened in a leather-bound book. An
+   ornate parchment panel holds square slots; filled slots are the sections
+   (gothic pixel-art icons), the rest are empty inventory cells. Pixel art is
+   scaled up with image-rendering:pixelated so it stays crisp.
+   Assets: icons/ui/gothic/ (Gothic Pixel UI FREE). */
+.main-page {
+  display: flex;
   justify-content: center;
-  width: max-content;
-  margin: 48px auto;
+  align-items: flex-start;
+  padding-top: 46px;
 }
-.zuma-tile {
+.inv-book {
   position: relative;
+  padding: 26px 38px 36px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(120, 92, 48, 0.20), rgba(0, 0, 0, 0) 60%),
+    linear-gradient(180deg, #3b2e1d 0%, #2a2014 100%);
+  border: 3px solid #e3c46a;          /* "sikle" gold */
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 0 2px #7a5c28,
+    inset 0 0 40px rgba(0, 0, 0, 0.45),
+    0 12px 44px rgba(0, 0, 0, 0.55);
+}
+.inv-head { text-align: center; }
+.inv-title {
+  margin: 0;
+  font-family: "Jersey 25", monospace;
+  font-size: 58px;
+  line-height: 0.9;
+  letter-spacing: 3px;
+  color: #e3c46a;                     /* "sikle" gold */
+  text-shadow: 2px 2px 0 #1a1206, 0 0 14px rgba(227, 196, 106, 0.25);
+}
+.inv-sub {
+  margin: 4px 0 0;
+  font-family: "Jersey 10", monospace;
+  font-size: 17px;
+  letter-spacing: 1.5px;
+  color: #c2a063;
+  text-transform: uppercase;
+}
+.inv-divider {
+  display: block;
+  width: 76%;
+  height: auto;
+  margin: 14px auto 24px;
+  image-rendering: pixelated;
+  opacity: 0.9;
+}
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  gap: 18px 22px;
+  justify-content: center;
+}
+.inv-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+}
+.inv-slot {
   width: 76px;
   height: 76px;
-  cursor: pointer;
-  border-radius: 50%;
-  border: 3px solid #2a1410;            /* thick dark pixel outline */
-  /* Round-button bevel: top-left highlight + bottom-right shadow give the */
-  /* convex pressable look you see on the reference icons.                */
-  box-shadow:
-    inset 4px 4px 0 -1px rgba(255, 255, 255, 0.32),
-    inset -4px -4px 0 -1px rgba(0, 0, 0, 0.28),
-    0 3px 0 rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('icons/ui/gothic/slot.png');
+  background-size: 100% 100%;
   background-repeat: no-repeat;
-  background-position: center;
-  background-size: 60% 60%;
   image-rendering: pixelated;
-  transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1),
-              filter 0.18s ease,
-              box-shadow 0.18s ease;
 }
-.zuma-tile:hover {
-  transform: translateY(-4px);
-  filter: brightness(1.10) saturate(1.08);
-  z-index: 2;
-  box-shadow:
-    inset 4px 4px 0 -1px rgba(255, 255, 255, 0.4),
-    inset -4px -4px 0 -1px rgba(0, 0, 0, 0.22),
-    0 9px 0 rgba(0, 0, 0, 0.35),
-    0 12px 18px rgba(0, 0, 0, 0.45);
+.inv-slot.is-empty { background-image: url('icons/ui/gothic/slot_empty.png'); opacity: 0.65; }
+.inv-icon {
+  width: 50px;
+  height: 50px;
+  image-rendering: pixelated;
+  /* Warm the pack's gold toward the brighter "sikle" gold. */
+  filter: brightness(1.12) saturate(1.06);
 }
-
-/* Pastel disc backgrounds matched to the reference sheet's flat palette. */
-.tile-pink     { background-color: #e87d8a; }
-.tile-salmon   { background-color: #efa68d; }
-.tile-mint     { background-color: #aedcd2; }
-.tile-beige    { background-color: #ecd5a3; }
-.tile-lavender { background-color: #b9a8d4; }
-.tile-olive    { background-color: #b6c785; }
-
-/* Pixel-art item icons drawn as inline-SVG data URIs. Each icon is rendered
-   crisp-edges (no anti-aliasing) so the pixel-art quality survives any
-   scaling — fills are white so they stay readable on every disc colour. */
-.icon-sword {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges"><g fill="%23ffffff"><rect x="7" y="2" width="2" height="9"/><rect x="5" y="10" width="6" height="1"/></g><rect x="7" y="11" width="2" height="3" fill="%232a1410"/></svg>');
+.inv-cap {
+  max-width: 86px;
+  font-family: "Jersey 10", monospace;
+  font-size: 15px;
+  line-height: 1.05;
+  letter-spacing: 0.5px;
+  text-align: center;
+  color: #e3c46a;                     /* "sikle" gold */
 }
-.icon-potion {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="6" y="2" width="4" height="2" fill="%232a1410"/><rect x="5" y="4" width="6" height="1" fill="%23ffffff"/><rect x="4" y="5" width="8" height="8" fill="%23ffffff"/><rect x="5" y="13" width="6" height="1" fill="%23ffffff"/></svg>');
+/* Placeholder slots — filled for the inventory look but not links. */
+.inv-ph { cursor: default; }
+.inv-ph .inv-icon { filter: brightness(0.95) saturate(0.9); opacity: 0.7; }
+.inv-ph .inv-cap { color: #9c8550; }
+/* Filled cells are clickable; lift + brighten on hover. */
+.inv-filled .inv-slot,
+.inv-filled .inv-icon,
+.inv-filled .inv-cap {
+  transition: transform 0.13s ease, filter 0.13s ease, color 0.13s ease;
 }
-.icon-heart {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges"><g fill="%23ffffff"><rect x="3" y="4" width="3" height="1"/><rect x="10" y="4" width="3" height="1"/><rect x="2" y="5" width="5" height="2"/><rect x="9" y="5" width="5" height="2"/><rect x="2" y="7" width="12" height="2"/><rect x="3" y="9" width="10" height="1"/><rect x="4" y="10" width="8" height="1"/><rect x="5" y="11" width="6" height="1"/><rect x="6" y="12" width="4" height="1"/><rect x="7" y="13" width="2" height="1"/></g></svg>');
-}
-.icon-shield {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges"><g fill="%23ffffff"><rect x="4" y="3" width="8" height="1"/><rect x="3" y="4" width="10" height="6"/><rect x="4" y="10" width="8" height="2"/><rect x="6" y="12" width="4" height="1"/></g><rect x="7" y="6" width="2" height="4" fill="%232a1410"/><rect x="6" y="7" width="4" height="2" fill="%232a1410"/></svg>');
-}
-.icon-gem {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges"><g fill="%23ffffff"><rect x="6" y="3" width="4" height="1"/><rect x="4" y="4" width="8" height="2"/><rect x="3" y="6" width="10" height="2"/><rect x="4" y="8" width="8" height="1"/><rect x="5" y="9" width="6" height="1"/><rect x="6" y="10" width="4" height="1"/><rect x="7" y="11" width="2" height="1"/></g></svg>');
-}
-.icon-coin {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges"><g fill="%23ffffff"><rect x="5" y="3" width="6" height="1"/><rect x="4" y="4" width="8" height="1"/><rect x="3" y="5" width="10" height="6"/><rect x="4" y="11" width="8" height="1"/><rect x="5" y="12" width="6" height="1"/></g><rect x="7" y="6" width="2" height="4" fill="%232a1410"/></svg>');
+.inv-filled:hover .inv-slot { transform: translateY(-3px); filter: brightness(1.22); }
+.inv-filled:hover .inv-icon { transform: translateY(-3px) scale(1.06); }
+.inv-filled:hover .inv-cap { color: #fff5dc; }
+.inv-filled:focus-visible .inv-slot {
+  outline: 2px solid #eccb7e;
+  outline-offset: 3px;
 }
 
 .nav-tab {
@@ -654,7 +690,7 @@ body:has(.creeps-page) nav.top-nav {
 
 /* YEAR BLOCK (shared between modes, collapsible) */
 .cal-year-block {
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   background: #14191f;
   border: 1px solid #21262d;
   border-radius: 6px;
@@ -673,19 +709,9 @@ body:has(.creeps-page) nav.top-nav {
   gap: 8px;
   transition: background 0.12s;
 }
-.cal-year-label:hover {
-  background: rgba(48, 54, 61, 0.25);
-}
-.cal-year-label::after {
-  content: '▾';
-  color: #6e7681;
-  font-size: 11px;
-  display: inline-block;
-  transition: transform 0.15s;
-}
-.cal-year-block[data-collapsed="true"] .cal-year-label::after {
-  transform: rotate(-90deg);
-}
+/* The custom .cal-year-picker button carries its own caret now, so the label
+   wrapper no longer paints a chevron and isn't itself clickable. */
+.cal-year-label { cursor: default; }
 /* Current year breaks out of the .container width to give it visual prominence
    over collapsed past years. Negative side margins extend it beyond the 1080px
    cap; inner padding stays so contents don't hit the edge. */
@@ -699,100 +725,120 @@ body:has(.creeps-page) nav.top-nav {
 }
 .cal-year-block.is-current .cal-year-label {
   font-size: 20px;
-  padding: 14px 20px;
-}
-/* The select is the only child of the label inside the current-year block;
-   re-zero the inner padding so the chevron ::after, anchored at
-   "right: 14px" of the label, aligns with the select's own right padding. */
-.cal-year-block.is-current > .cal-year-label {
-  padding: 14px 0 14px 20px;
+  padding: 11px 20px;
+  /* Year picker on the left, Compact toggle on the right (top-right corner of
+     the calendar block). */
+  justify-content: space-between;
 }
 .cal-year-block.is-current .cal-mode-full,
 .cal-year-block.is-current .cal-mode-compact {
-  padding: 0 20px 18px;
+  padding: 0 20px 10px;
 }
-/* Push the calendar toolbar left so it lines up with the breakout year block's
-   left edge (same -140px shift as .is-current). Scoped to .calendar so the
-   shared .cal-toggle-bar class on other pages (creeps / unit_abilities) stays
-   in place. */
-.calendar > .cal-toggle-bar {
-  margin-left: -140px;
-  /* Same breathing room as the table pages: 28px above the Compact toggle,
-     14px below, content-box so the 32px control height isn't eaten. */
-  box-sizing: content-box;
-  padding-top: 28px;
-  padding-bottom: 14px;
-  margin-bottom: 0;
+/* Compact toggle restyled to match the year-picker button (gradient pill,
+   cool-blue border) instead of the default dark toolbar pill. It now lives in
+   the year block's header row (top-right), not a separate bar above. */
+.cal-compact-toggle.ua-upgrades-toggle {
+  background:
+    linear-gradient(180deg, rgba(38, 46, 56, 0.95) 0%, rgba(26, 34, 42, 0.95) 100%);
+  border: 1px solid rgba(170, 220, 240, 0.35);
+  border-radius: 6px;
+  color: #e6edf3;
+  padding: 6px 12px;
+  gap: 9px;
+  box-shadow:
+    inset 0 1px 0 rgba(190, 225, 240, 0.10),
+    0 2px 6px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.cal-compact-toggle.ua-upgrades-toggle:hover { border-color: rgba(170, 220, 240, 0.6); }
+.cal-compact-toggle .ua-upgrades-label {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.4px;
 }
 @media (max-width: 1400px) {
   /* Stop the breakout when the viewport can't comfortably host it. */
   .cal-year-block.is-current { margin-left: 0; margin-right: 0; }
-  .calendar > .cal-toggle-bar { margin-left: 0; }
 }
 
-/* Year selector — sits inside the year-block's label slot in place of the
-   former plain <h2> heading. Styled as a clear button: border, padding,
-   chevron, centered text inside the button and dropdown options. */
-.cal-year-select {
+/* Year selector — a fully custom dropdown (replaces the native <select> so
+   the value and every option are perfectly centred and themed; the native
+   popup left-aligned its numbers and reserved arrow space). */
+.cal-year-picker { position: relative; display: inline-block; }
+.cal-year-current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 90px;             /* symmetric slot keeps the value optically centred */
   background:
     linear-gradient(180deg, rgba(38, 46, 56, 0.95) 0%, rgba(26, 34, 42, 0.95) 100%);
   border: 1px solid rgba(170, 220, 240, 0.35);
   border-radius: 6px;
   color: #e6edf3;
   font: inherit;
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.5px;
   cursor: pointer;
-  padding: 6px 16px;
-  text-align: center;
-  text-align-last: center;
-  direction: ltr;
-  appearance: none;
-  -webkit-appearance: none;
+  padding: 5px 11px;
   box-shadow:
     inset 0 1px 0 rgba(190, 225, 240, 0.10),
     0 2px 6px rgba(0, 0, 0, 0.35);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
-.cal-year-select:hover {
-  border-color: rgba(170, 220, 240, 0.6);
+.cal-year-current-val { font-variant-numeric: tabular-nums; }
+.cal-year-caret {
+  font-size: 10px;
+  color: #a8b3bd;
+  line-height: 1;
+  transition: transform 0.15s;
 }
-.cal-year-select:focus {
+.cal-year-current:hover { border-color: rgba(170, 220, 240, 0.6); }
+.cal-year-picker.is-open .cal-year-current,
+.cal-year-current:focus-visible {
   outline: none;
   border-color: rgba(170, 220, 240, 0.75);
   box-shadow:
     inset 0 1px 0 rgba(190, 225, 240, 0.14),
     0 0 0 3px rgba(121, 192, 255, 0.18);
 }
-.cal-year-select option {
-  background: #14191f;
-  color: #e6edf3;
-  font-size: 14px;
-  text-align: center;
-  text-align-last: center;
-  direction: ltr;
-  padding: 4px 12px;
-}
-.cal-year-block.is-current .cal-year-label {
-  cursor: default;
-  position: relative;
-  display: inline-block;
-}
-/* Chevron painted as the wrapper's ::after — same `▾` unicode glyph as the
-   Changelogs version dropdown so the two controls look identical. Sits over
-   the right padding of the select; pointer-events:none lets clicks through. */
-.cal-year-block.is-current .cal-year-label::after {
-  content: '▾';
+.cal-year-picker.is-open .cal-year-caret { transform: rotate(180deg); }
+.cal-year-menu {
   position: absolute;
-  right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #a8b3bd;
-  font-size: 14px;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  min-width: 100%;
+  /* No max-height / overflow → the full year list shows without a scrollbar
+     (there are only ~9–15 years). */
+  background: #11161d;
+  border: 1px solid rgba(170, 220, 240, 0.30);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+}
+.cal-year-menu[hidden] { display: none; }
+.cal-year-opt {
+  text-align: center;
+  font-size: 15px;
   font-weight: 600;
-  line-height: 1;
-  pointer-events: none;
+  color: #c9d1d9;
+  padding: 7px 22px;
+  border-radius: 5px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.1s, color 0.1s;
+}
+.cal-year-opt:hover { background: rgba(121, 192, 255, 0.12); color: #fff; }
+.cal-year-opt.is-selected {
+  background: rgba(121, 192, 255, 0.18);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(121, 192, 255, 0.35);
 }
 .cal-year-summary {
   display: flex;
@@ -816,6 +862,106 @@ body:has(.creeps-page) nav.top-nav {
 }
 .cal-mode-full, .cal-mode-compact {
   padding: 0 16px 14px;
+}
+
+/* ---- INFOGRAPHIC: patch-cadence strip under the calendar ----
+   A short horizontal band (≈1/3 the calendar's height) of small charts, not a
+   full card. Breaks out to the current-year block's width (same -140px). */
+.cal-infographic {
+  margin: 10px -140px 6px;
+  display: flex;
+  align-items: stretch;
+  padding: 12px 6px;
+  background:
+    linear-gradient(180deg, rgba(28, 36, 46, 0.5) 0%, rgba(18, 24, 32, 0.5) 100%);
+  /* Border + shadow matched to .cal-year-block.is-current. */
+  border: 1px solid rgba(170, 220, 240, 0.28);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 1px 0 rgba(190, 225, 240, 0.10),
+    0 4px 18px rgba(0, 0, 0, 0.35);
+}
+@media (max-width: 1400px) {
+  .cal-infographic { margin-left: 0; margin-right: 0; }
+}
+.cal-ig-panel {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.cal-ig-panel + .cal-ig-panel { border-left: 1px solid #21262d; }
+.cal-ig-lead { flex: 0 0 auto; gap: 1px; }
+.cal-ig-title { font-size: 15px; font-weight: 700; color: #e6edf3; letter-spacing: 0.3px; }
+.cal-ig-sub {
+  font-size: 10.5px; color: #6e7681; text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 9px;
+}
+.cal-ig-statline { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #8b949e; }
+.cal-ig-statline b {
+  color: #79c0ff; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+/* Major-patch count in the calendar's orange (matches .cal-*.major cells). */
+.cal-ig-statline b.cal-ig-major { color: #e3a15d; }
+/* Faint horizontal divider between stat groups. */
+.cal-ig-rule {
+  height: 1px;
+  align-self: stretch;
+  margin: 4px 0;
+  background: rgba(170, 220, 240, 0.14);
+}
+.cal-ig-h {
+  font-size: 10.5px; font-weight: 600; color: #9fb0c0; text-transform: uppercase;
+  letter-spacing: 0.6px; margin-bottom: 8px; text-align: center;
+}
+/* Sparkline (SVG) — smooth line + gradient area + point dots. */
+.cal-ig-spark {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.cal-ig-spark-lbl {
+  fill: #6e7681;
+  font-size: 11px;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.cal-ig-grid { stroke: rgba(170, 220, 240, 0.07); stroke-width: 1; }
+.cal-ig-grid-v { stroke: rgba(170, 220, 240, 0.045); }   /* minor vertical lines */
+.cal-ig-axis { stroke: rgba(170, 220, 240, 0.18); stroke-width: 1; }
+.cal-ig-axis.is-base { stroke: rgba(170, 220, 240, 0.30); }
+.cal-ig-ytick {
+  fill: #6e7681;
+  font-size: 9px;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+/* Point dots + hover-revealed value. The wide invisible hit rect makes the
+   whole column hoverable so the value is easy to surface. */
+.cal-ig-hit { fill: transparent; pointer-events: all; cursor: default; }
+.cal-ig-dot { r: 2.1; transition: r 0.12s; }
+.cal-ig-pt:hover .cal-ig-dot { r: 4; }
+.cal-ig-pt-val {
+  fill: #e6edf3;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 0.12s;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: #0d1117;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.cal-ig-pt:hover .cal-ig-pt-val { opacity: 1; }
+@media (max-width: 760px) {
+  .cal-infographic { flex-direction: column; gap: 14px; }
+  .cal-ig-panel + .cal-ig-panel { border-left: none; border-top: 1px solid #21262d; padding-top: 12px; }
 }
 
 /* MODE 2: COMPACT */
@@ -944,6 +1090,7 @@ span.cal-patch {
 .cal-full-day {
   aspect-ratio: 1;
   min-height: 22px;
+  max-height: 33px;          /* cap the square so the full grid fits the viewport */
   border-radius: 3px;
   background: rgba(110, 118, 129, 0.05);
   font-size: 11px;
@@ -1060,20 +1207,31 @@ span.cal-full-day.has-patch {
   display: flex;
   align-items: center;
   gap: 16px;
+  row-gap: 8px;
+  /* Wrap (instead of overlapping) when zoomed in / narrow: the search box
+     shrinks first, then the columns drop to a second line. */
+  flex-wrap: wrap;
   padding: 8px 28px;
 }
-/* Collapsed search by default — the input shows as a 36px-wide pill with
-   just the magnifier glyph visible. Clicking / focusing expands it to a
-   usable width, then collapses back when focus leaves and it's empty. */
+/* Search sits in the MIDDLE column of the toolbar — always expanded (no
+   collapse/expand), a fixed-width pill centred between the legend (left)
+   and the patch info (right). The two side columns flex:1 so the middle
+   stays optically centred. */
 .toolbar .search-box {
-  flex: 0 0 auto;
+  /* Centred middle column. Shrinks first when the toolbar runs out of room
+     (zoom-in / narrow viewport) so it never overlaps the tag legend. */
+  flex: 0 1 320px;
+  width: 320px;
+  min-width: 0;
 }
 /* Patch info — three labelled facts on the right of the toolbar. No pill,
    no border: plain inline text with bullet separators between the parts. */
 .toolbar-patch-info {
-  margin-left: auto;
-  display: inline-flex;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
   align-items: baseline;
+  justify-content: flex-end;
   gap: 0;
   white-space: nowrap;
   line-height: 1.2;
@@ -1081,7 +1239,6 @@ span.cal-full-day.has-patch {
                "Helvetica Neue", Arial, sans-serif;
   font-size: 12.5px;
   color: #98a2b0;
-  flex-shrink: 0;
 }
 .toolbar-patch-info > span { padding: 0 10px; }
 .toolbar-patch-info > span:first-child { padding-left: 0; }
@@ -1123,6 +1280,11 @@ span.cal-full-day.has-patch {
   text-transform: uppercase;
   letter-spacing: 0.6px;
   margin-right: 4px;
+  /* Equal-width label column so the BUFF/NERF/… badges line up vertically
+     with the Group category badges in the row below (matched in
+     .legend-categories strong). */
+  flex: 0 0 auto;
+  width: 46px;
 }
 
 /* SEARCH BOX */
@@ -1148,34 +1310,22 @@ span.cal-full-day.has-patch {
   border-color: #58a6ff;
   box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
 }
-/* Inside the patch toolbar the search starts COLLAPSED: a 38px capsule
-   showing only the magnifier icon. Focus or hover expands it to a usable
-   width; the SVG icon shifts to keep it crisp on both sizes. */
+/* Inside the patch toolbar the search is ALWAYS expanded — a full-width
+   pill with the magnifier icon on the left and the placeholder visible. */
 .toolbar .search-box input {
-  width: 38px;
-  padding: 6px 0 6px 32px;
-  cursor: pointer;
-  color: transparent;
+  width: 100%;
+  padding: 6px 12px 6px 34px;
+  cursor: text;
+  color: #c9d1d9;
+  text-align: center;
   background-image:
     url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="%2398a2b0" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 L13.6 13.6" stroke-linecap="round"/></svg>');
   background-repeat: no-repeat;
-  background-position: 9px center;
-  background-size: 16px 16px;
-  transition: width 0.18s ease, padding 0.18s ease, color 0.15s ease,
-              border-color 0.15s, box-shadow 0.15s;
+  background-position: 11px center;
+  background-size: 15px 15px;
 }
-.toolbar .search-box input::placeholder { color: transparent; }
-.toolbar .search-box input:focus,
-.toolbar .search-box input:not(:placeholder-shown) {
-  width: 360px;
-  padding: 6px 12px 6px 32px;
-  cursor: text;
-  color: #c9d1d9;
-}
-.toolbar .search-box input:focus::placeholder,
-.toolbar .search-box input:not(:placeholder-shown)::placeholder {
-  color: #6e7681;
-}
+.toolbar .search-box input::placeholder { color: #6e7681; }
+.toolbar .search-box input:focus { text-align: left; }
 .search-results {
   display: none;
   position: absolute;
@@ -3128,8 +3278,11 @@ ul.changes li.aghanim-shard {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  flex: 1;
-  min-width: 0;
+  /* Symmetric with .toolbar-patch-info (both flex:1 1 0) so the search box in
+     the middle stays optically centred. NO min-width:0 → the implicit
+     min-width:auto floors the column at its badges' width, so the tag rows can
+     never be shrunk/overlapped by the search box when space gets tight. */
+  flex: 1 1 0;
 }
 .legend-categories {
   display: flex;
@@ -3145,6 +3298,9 @@ ul.changes li.aghanim-shard {
   text-transform: uppercase;
   letter-spacing: 0.6px;
   margin-right: 4px;
+  /* Matches .legend-tags strong so Group badges align with the Tags row. */
+  flex: 0 0 auto;
+  width: 46px;
 }
 .cat-filter-btn {
   cursor: pointer;
@@ -3259,28 +3415,26 @@ body.filter-active ul.subnotes { display: none; }
   max-width: none;
   padding: 16px 20px 40px;
 }
-/* Horizontal-scroll wrapper so a narrow viewport scrolls within the
-   table region instead of breaking page layout. */
+/* Pages with an inner scroller (Neutral Creeps / Unit Abilities) lock the
+   document to the viewport so ONLY the inner .creeps-scroll box scrolls —
+   no second, vestigial browser scrollbar. The box's max-height (below) is
+   sized to exactly fill the space, so nothing is clipped. Mana Items has no
+   .creeps-scroll, so it is untouched and keeps normal page scrolling.
+   Body-level tooltips/popups all use position:fixed, so overflow:hidden
+   here does not clip them. */
+/* PAGE-LEVEL SCROLL (like Mana Items). The .creeps-scroll wrapper is kept in
+   the DOM (scripts.js View toggle + overlay logic key off it) but it no longer
+   clips or scrolls: the whole PAGE scrolls vertically, and a wide table scrolls
+   horizontally at the page level. Rows slide under the glass nav. The table's
+   own sticky <thead> and sticky identity columns pin against the viewport
+   (their `top` offsets include --site-nav-h). The frozen-column divider is an
+   overlay that tracks window scroll (position:fixed) — see .sticky-frame — so
+   it sidesteps the Chrome bug where box-shadow on sticky cells stops repainting.
+   NOTE: must NOT set overflow / contain / max-height here — any of those would
+   turn this back into a clipping scroll container and re-introduce the inner
+   scrollbar. */
 .creeps-scroll {
-  /* The table is wider than the viewport (horizontal scroll needed), and a
-     horizontal-scroll container unavoidably becomes a vertical scroll
-     container too. So make THIS box the scroller: capped height + sticky
-     under the site nav. Once the user page-scrolls past the blurb/toolbar
-     above, the whole scroll box pins flush under the nav — there's no gap
-     between the nav and the table headers (no leftover toolbar/view bar
-     hanging between them). Inside the box the <thead> is still sticky at
-     top:0 of the box, so the column headers always sit just under the nav. */
-  overflow: auto;
   width: 100%;
-  position: sticky;
-  top: var(--site-nav-h, 96px);
-  max-height: calc(100vh - var(--site-nav-h, 96px) - 12px);
-  /* Paint containment only — `layout` and `style` containment can prevent
-     useful browser optimisations inside large tables. Adding
-     `will-change: scroll-position` hints the browser to GPU-accelerate the
-     scroll, drastically reducing repaints under heavy table content. */
-  contain: paint;
-  will-change: scroll-position;
 }
 .creeps-table {
   /* width:max-content + min-width:100% = stretch evenly to fill the container
@@ -3353,11 +3507,14 @@ body.filter-active ul.subnotes { display: none; }
    lvl/unit block (horizontal scroll); .sticky-frame-top = horizontal edge
    under the header (vertical scroll). Neither boxes the pinned cells. */
 .sticky-frame, .sticky-frame-top {
-  position: absolute;
+  /* position:fixed now that the PAGE scrolls (not an inner box): scripts.js
+     sets viewport-relative left/top/height so the frozen-column divider tracks
+     horizontal page scroll without the Chrome sticky-border repaint bug. */
+  position: fixed;
   display: none;
   pointer-events: none;
-  z-index: 7;            /* above body + header sticky cells, below the
-                            hover-zoomed icon (z-index: 9) */
+  z-index: 8;            /* above body + sticky identity cells (z 3); below the
+                            hover-zoomed icons (z 30/40) and body tooltips */
 }
 .sticky-frame {
   border-left: 2px solid rgba(120, 200, 235, 0.85);
@@ -3956,7 +4113,7 @@ body.filter-active ul.subnotes { display: none; }
    (set by scripts.js from the category row's rendered height). */
 .creeps-table thead tr.cat-row th.cat-head {
   position: sticky;
-  top: 0;
+  top: var(--site-nav-h, 96px);   /* page-level scroll: pin under the site nav */
   z-index: 52;           /* above the column row so the col-row's gap-fill
                             box-shadow tucks under it (see col-row below) */
   font-size: 10px;
@@ -3982,8 +4139,10 @@ body.filter-active ul.subnotes { display: none; }
 .creeps-table thead tr.col-row th {
   /* -2px pull-up paired with the JS Math.floor on --cat-row-h: guarantees the
      column row starts ≥2px BEFORE the category row's real bottom, so the two
-     pinned rows always overlap and nothing leaks through at scroll time. */
-  top: calc(var(--cat-row-h, 0px) - 2px);
+     pinned rows always overlap and nothing leaks through at scroll time.
+     Page-level scroll: offset by the nav height so it pins below the cat-row
+     which is itself pinned under the nav. */
+  top: calc(var(--site-nav-h, 96px) + var(--cat-row-h, 0px) - 2px);
   border-bottom: none;
   /* box-shadows, in order:
      1. blue scrolled-edge line, flush on the bottom (like Mana Items);
@@ -4201,7 +4360,7 @@ body.filter-active ul.subnotes { display: none; }
 }
 .creeps-table thead th {
   position: sticky;
-  top: 0;
+  top: var(--site-nav-h, 96px);   /* page-level scroll: pin under the site nav */
   z-index: 50;           /* above body cells AND the hover-zoomed icon/ability
                             (z 30/40 below), so a hovered row near the top never
                             paints over the pinned header */

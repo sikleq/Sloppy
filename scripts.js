@@ -446,6 +446,10 @@
   // the row order in the tooltip grid. Sequenced so neighbouring bands
   // change hue family (green → gold → purple → grey → blue → pink → red).
   const DYN_TAG_ORDER = ['buff','new','rework','misc','qol','del','nerf'];
+  // Balance-neutral tags kept OUT of the dyn-cell colored gradient (they
+  // only fill the cell when nothing else changed — the "misc-only" /
+  // "qol-only" dimmed fallback). They still appear in the tooltip grid.
+  const DYN_NEUTRAL_TAGS = ['misc','qol'];
   const DYN_MAX_PATCHES = 12;
 
   function dynBuildPill(patch, counts, entityId, isCurrent, fromVersion) {
@@ -454,11 +458,12 @@
     // Wrapper holds the diamond (.dyn-cell) AND the tooltip (.dyn-tip) as
     // siblings. The diamond uses clip-path which would clip any tooltip
     // pseudo-element, so the tooltip must live outside that clipped subtree.
-    // misc-only patch: every count tag is MISC. The cell would otherwise
-    // render uncolored (we exclude misc from the gradient on purpose),
-    // so flag with a class for the dimmed "touched but only-misc" style.
+    // NEUTRAL tags (MISC + QoL) are excluded from the colored gradient —
+    // they're balance-neutral and dilute the pill's signal. They still
+    // surface in the tooltip grid. A cell whose ONLY changes are neutral
+    // ("misc/qol-only") gets a dimmed fallback fill instead.
     const coloredTotal = DYN_TAG_ORDER
-      .filter(t => t !== 'misc')
+      .filter(t => !DYN_NEUTRAL_TAGS.includes(t))
       .reduce((s, t) => s + (counts[t] || 0), 0);
     const miscOnly = total > 0 && coloredTotal === 0;
     const wrap = document.createElement(clickable ? 'a' : 'span');
@@ -479,10 +484,10 @@
       // densities" look rather than crisp horizontal stripes. The bleed is
       // capped to half the band width to stay within the segment.
       //
-      // MISC is intentionally EXCLUDED from the gradient — neutral-grey
-      // bands dilute the pill's color signal without adding meaning. The
-      // tag still surfaces in the tooltip grid below.
-      const tags = DYN_TAG_ORDER.filter(t => t !== 'misc' && counts[t] > 0);
+      // MISC and QoL are intentionally EXCLUDED from the gradient — these
+      // neutral bands dilute the pill's color signal without adding meaning.
+      // The tags still surface in the tooltip grid below.
+      const tags = DYN_TAG_ORDER.filter(t => !DYN_NEUTRAL_TAGS.includes(t) && counts[t] > 0);
       // Bleed: % half-width of the soft transition zone between adjacent
       // bands. Zero = hard cuts between bands — no phantom mid-tones.
       const bleed = 0;
@@ -502,9 +507,9 @@
         stops.push(`${color} ${solidStart.toFixed(1)}%`);
         stops.push(`${color} ${solidEnd.toFixed(1)}%`);
       }
-      // If every tag was misc, the colored-tags `stops` array is empty;
-      // fall back to a solid misc fill so the cell still reads as "this
-      // patch touched the entity, just with no buff/nerf/etc." The CSS
+      // If every tag was neutral (misc/qol), the colored-tags `stops` array
+      // is empty; fall back to a solid dimmed fill so the cell still reads as
+      // "this patch touched the entity, just with no buff/nerf/etc." The CSS
       // .misc-only class drops the cell to 50% opacity so it's visibly
       // dimmed vs. a fully-colored cell.
       if (stops.length) {
@@ -513,9 +518,13 @@
         // Flat-gradient wrapper instead of a raw color so the value always
         // parses as `background-image` — keeps the bg-color slot free for
         // the hover-time opaque backdrop layer. Alpha is halved here to
-        // preserve the dimmed-out misc-only look without applying CSS
+        // preserve the dimmed-out neutral-only look without applying CSS
         // `opacity` to the cell (which would also dim the hover backdrop).
-        const m = dynColorFor('misc', counts.misc || 1)
+        // Color comes from the dominant neutral tag so a QoL-only cell reads
+        // blue, a MISC-only cell grey.
+        const domNeutral = DYN_NEUTRAL_TAGS
+          .reduce((a, b) => ((counts[b] || 0) > (counts[a] || 0) ? b : a));
+        const m = dynColorFor(domNeutral, counts[domNeutral] || 1)
           .replace(/, ([\d.]+)\)$/, (_, a) => `, ${(parseFloat(a) * 0.5).toFixed(2)})`);
         cell.style.setProperty('--dyn-bg', `linear-gradient(${m}, ${m})`);
       }
@@ -1149,12 +1158,10 @@
 })();
 
 // ---- CREEPS / UNIT ABILITIES: size the scroll box to fit the viewport ----
-// The table lives in a height-capped .creeps-scroll box (needed because a
-// wide table requires its own horizontal scroll, which inherently clips
-// vertically too). If the box is taller than the space below the toolbar,
-// the PAGE scrolls and drags the toolbar up — the float/overlap glitch.
-// Sizing the box so it ends at the viewport bottom keeps the page static:
-// nav + toolbar stay put, only the box scrolls internally (sticky thead).
+// Page-level scroll (like Mana Items): the .creeps-scroll wrapper no longer
+// caps height or scrolls. This only measures the category row's rendered
+// height into --cat-row-h, which the two-row sticky header offset (col-row top:
+// calc(--site-nav-h + --cat-row-h - 2px)) depends on — CSS calc can't read it.
 (function() {
   const box = document.querySelector('.creeps-page .creeps-scroll');
   if (!box) return;
@@ -1252,36 +1259,34 @@
   const frame = page && page.querySelector('.sticky-frame');       // vertical
 
   function positionFrames() {
-    if (!scroller || !page) return;
+    if (!page) return;
     const firstTds = [...firstRow.children];
     if (firstTds.length < 3) return;
-    const pageR  = page.getBoundingClientRect();
-    const scrR   = scroller.getBoundingClientRect();
-    const nameR  = firstTds[2].getBoundingClientRect();  // right edge of pinned block
-    // Anchor to the thead's LIVE bottom edge rather than a fixed header height:
-    // the blurb + toolbar now sit inside the scroll box above the table, so the
-    // thead isn't at the box top at rest — measuring its real bottom keeps the
-    // divider correct both at rest and once the header pins under the nav.
+    // Page-level scroll: .sticky-frame is position:fixed, so everything is in
+    // viewport coordinates. nameR.right is the right edge of the frozen
+    // identity block (the sticky cells pin to the viewport's left during
+    // horizontal page scroll, so this stays put). headBottom is the thead's
+    // live bottom edge (it pins under the nav on vertical scroll).
+    const nameR  = firstTds[2].getBoundingClientRect();
     const headBottom = table.tHead
       ? table.tHead.getBoundingClientRect().bottom
-      : scrR.top;
-    // Vertical divider: at the right edge of the frozen lvl/unit columns,
-    // starting BELOW the sticky column header and spanning the rest of height.
+      : 0;
+    // Vertical divider: at the right edge of the frozen columns, from just
+    // below the pinned header down to the bottom of the viewport.
     if (frame) {
-      frame.style.left   = (nameR.right - pageR.left) + 'px';
-      frame.style.top    = (headBottom - pageR.top) + 'px';
-      frame.style.height = (scrR.bottom - headBottom) + 'px';
+      frame.style.left   = nameR.right + 'px';
+      frame.style.top    = headBottom + 'px';
+      frame.style.height = Math.max(0, window.innerHeight - headBottom) + 'px';
       frame.style.width  = '0px';
     }
   }
 
   if (scroller) {
     const onScroll = () => {
-      const sx = scroller.scrollLeft > 0;
-      // Both header rows stay pinned. The blue scrolled-edge line is painted
-      // flush on the column-name row's bottom (box-shadow), so the horizontal
-      // overlay divider is no longer used (it sat a hair off → visible gap).
-      scroller.classList.toggle('scrolled', sx);
+      // Page-level scroll now: the frozen-column divider shows once the page is
+      // scrolled horizontally (there is content hidden to the left). The blue
+      // scrolled-edge line under the header is baked into the col-row box-shadow.
+      const sx = window.scrollX > 0;
       positionFrames();
       if (frame) frame.classList.toggle('visible', sx);
     };
@@ -1295,7 +1300,8 @@
         try { onScroll(); } finally { ticking = false; }
       });
     };
-    scroller.addEventListener('scroll', onScrollRaf, { passive: true });
+    // Page scrolls now (not the box) → listen on window for both axes.
+    window.addEventListener('scroll', onScrollRaf, { passive: true });
     window.addEventListener('resize', onScrollRaf, { passive: true });
 
     // Super-category header colspans must equal the number of CURRENTLY
