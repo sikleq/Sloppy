@@ -22,12 +22,27 @@ patches/<version>.html        (final site output)
 | `HERO_SLUG` / `ITEM_SLUG` | Display-name → CDN-slug maps |
 | Gradient helpers | `gradient_class()`, `b()`, `br()`, `bf()`, `t()` |
 | HTML helpers | `hero_header()`, `item_header()`, `section()`, `ability()`, `li()`, `subnote()` |
-| `CSS` string | Entire site CSS embedded as a Python string |
-| `JS_TEXT` string | Entire site JS embedded as a Python string |
+| CSS / JS load | `styles.css` and `JS_TEXT` are **read from the standalone `styles.css` / `scripts.js` files on disk** at module load — they are hand-edited **source files**, NOT generated. |
 | Scaffold | `W()` writer, HTML wrapper, top nav, filter chrome |
 | Patch content | One section per version with calls to the helpers |
+| `save_index_html` | Landing page — game "inventory book" (gothic pixel UI slots → section links). |
+| `save_calendar_html` | Calendar + custom year picker + "Patch cadence" SVG-sparkline infographic. |
 
-The result of running `python build_patch.py` is one HTML file per patch (under `patches/`) plus `styles.css`, `scripts.js`, `calendar.html`, and `_ability_icons.txt`.
+Running `python build_patch.py` writes: one HTML file per patch (under `patches/`),
+`index.html`, `calendar.html`, `_ability_icons.txt`, and `data/site_meta.json`.
+`styles.css` / `scripts.js` are **source files, not outputs** (they're read, not
+written). The tables — `materials.html`, `neutral_abilities.html`, `mana_items.html` —
+are built separately by `build_creeps.py` / `build_mana_items.py` (run AFTER
+`build_patch.py`; see [tables.md](tables.md)).
+
+### Ability icons — missing-file fallback
+
+`ABIL_CDN` points at the local mirror `../icons/abilities/`. When a slug's local PNG
+is absent (most innate abilities have no public CDN icon), `ability()` renders the
+fallback **directly as the `<img src>`** (innate → `innate_icon.png`, else
+`missing.svg`) instead of a broken path patched by `onerror` — otherwise the
+entity-search dropdown (which reads `img.src`) showed the wrong icon. The set of
+present files is cached in `_LOCAL_ABIL_ICONS` at module load.
 
 ## generate_patch_code.py
 
@@ -42,9 +57,12 @@ The autodetector is right ~80% of the time. Tag classification, `l=True` placeme
 
 ## How CSS / JS reach the HTML
 
-Patch pages embed `<style>{CSS}</style>` and load `<script src="../scripts.js"></script>` from the standalone `scripts.js` file at the repo root.
-
-The standalone `styles.css` and `scripts.js` at the repo root serve `index.html` and `calendar.html` directly; the same JS source is written from the `JS_TEXT` Python string in `build_patch.py` so editing happens in one place.
+`styles.css` and `scripts.js` at the repo root are **hand-edited source files**, shared
+by every page. They are **linked, not embedded**: patch pages reference
+`../styles.css?v=…` / `../scripts.js?v=…`, and root pages (`index.html`,
+`calendar.html`, `materials.html`, …) reference `styles.css?v=…` / `scripts.js?v=…`.
+`build_patch.py` reads them from disk at module load (e.g. into `JS_TEXT`) and stamps
+a cache-busting `?v=` asset version — editing happens in one place, no copy is embedded.
 
 ## Stats DB
 
