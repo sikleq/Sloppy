@@ -140,6 +140,7 @@ body:has(.creeps-page) nav.top-nav {
 }
 .inv-book {
   position: relative;
+  z-index: 2;                          /* above the signature wall (z 1) */
   padding: 26px 38px 36px;
   background:
     radial-gradient(120% 90% at 50% 0%, rgba(120, 92, 48, 0.20), rgba(0, 0, 0, 0) 60%),
@@ -155,19 +156,39 @@ body:has(.creeps-page) nav.top-nav {
 .inv-title {
   margin: 0;
   font-family: "Jersey 25", monospace;
-  font-size: 58px;
-  line-height: 0.9;
-  letter-spacing: 3px;
+  font-size: 38px;
+  line-height: 1;
+  letter-spacing: 2px;
   color: #e3c46a;                     /* "sikle" gold */
   text-shadow: 2px 2px 0 #1a1206, 0 0 14px rgba(227, 196, 106, 0.25);
 }
-.inv-sub {
-  margin: 4px 0 0;
+
+/* WALL OF SIGNATURES — faint pixel-font usernames scattered around the book,
+   like graffiti on a wall. Positioned by scripts.js (no overlap with book /
+   nav / each other). Fixed full-viewport layer behind the book. */
+.inv-signatures {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;          /* layer transparent to clicks… */
+}
+.inv-sig {
+  position: absolute;
+  visibility: hidden;            /* shown by JS once a clear spot is found */
+  white-space: nowrap;
   font-family: "Jersey 10", monospace;
-  font-size: 17px;
-  letter-spacing: 1.5px;
-  color: #c2a063;
-  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  color: rgba(227, 196, 106, 0.12);   /* faint "sikle" gold */
+  pointer-events: auto;          /* …but the words themselves are hoverable */
+  cursor: default;
+  user-select: none;
+  transition: color 0.15s ease, text-shadow 0.15s ease;
+}
+.inv-sig:hover {
+  color: rgba(243, 220, 150, 0.72);
+  text-shadow: 0 0 8px rgba(227, 196, 106, 0.45);
 }
 .inv-divider {
   display: block;

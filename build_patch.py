@@ -3915,13 +3915,51 @@ def save_index_html():
     grid_html = (
         '<div class="inv-book">'
         '<div class="inv-head">'
-        '<h1 class="inv-title">Sloppy</h1>'
-        '<p class="inv-sub">Dota 2-related stuff</p>'
+        '<h1 class="inv-title">Dota 2-related stuff</h1>'
         '</div>'
         '<img class="inv-divider" src="icons/ui/gothic/divider.png" alt="" aria-hidden="true">'
         f'<div class="inv-grid">{"".join(cells)}{empties}</div>'
         '</div>'
     )
+
+    # ---- WALL OF SIGNATURES (placeholder) ----
+    # Faint pixel-font "graffiti" of channel-member usernames scattered around
+    # the book. For now 100 random placeholders; a Telegram bot will later feed
+    # real usernames. scripts.js positions them (no overlap with book/nav/each
+    # other) on load + resize.
+    import random as _rnd
+    _rng = _rnd.Random(1337)
+    _A = ['shadow', 'frost', 'blood', 'iron', 'dire', 'arc', 'void', 'ember',
+          'storm', 'night', 'rune', 'grim', 'swift', 'mad', 'lone', 'dark',
+          'gold', 'silent', 'feral', 'toxic', 'salty', 'tilted', 'cheeky',
+          'turbo', 'mega', 'ultra', 'lil', 'big', 'old', 'crazy', 'sleepy']
+    _N = ['wolf', 'mage', 'blade', 'crit', 'ward', 'creep', 'mid', 'carry',
+          'pudge', 'invoker', 'meepo', 'wisp', 'goblin', 'knight', 'reaper',
+          'sniper', 'enjoyer', 'andy', 'chad', 'gamer', 'feeder', 'smurf',
+          'gosu', 'main', 'diff', 'simp', 'fan', 'boi', 'lord', 'btw']
+    _SUF = ['', '', '', '7', '42', '69', '99', '228', '322', '1337', 'xd', 'ttv']
+
+    def _uname():
+        a, n, s = _rng.choice(_A), _rng.choice(_N), _rng.choice(_SUF)
+        r = _rng.random()
+        if r < 0.22:
+            return f'xX_{a}{n}_Xx'
+        if r < 0.46:
+            return f'{a}_{n}{s}'
+        if r < 0.68:
+            return f'{a}{n}{s}'
+        if r < 0.85:
+            return f'{n}_{s or _rng.randint(10, 9999)}'
+        return f'{a}{_rng.randint(1, 999)}'
+
+    _names, _seen = [], set()
+    while len(_names) < 100:
+        u = _uname()
+        if u not in _seen:
+            _seen.add(u)
+            _names.append(u)
+    _sigs = ''.join(f'<span class="inv-sig">@{_html.escape(u)}</span>' for u in _names)
+    sig_layer = f'<div class="inv-signatures" aria-hidden="true">{_sigs}</div>'
     html = (
         '<!DOCTYPE html>\n'
         '<html lang="en">\n'
@@ -3937,6 +3975,7 @@ def save_index_html():
         '</head>\n'
         '<body>\n'
         f'{nav}\n'
+        f'{sig_layer}\n'
         f'<div class="container main-page">{grid_html}</div>\n'
         f'<script src="scripts.js?v={_ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'

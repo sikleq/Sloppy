@@ -1737,3 +1737,62 @@
   }
   toggle.addEventListener('change', applyOrClear);
 })();
+
+
+/* ---- WALL OF SIGNATURES (index) ----
+   Scatter the faint pixel-font usernames around the inventory book: random
+   spots that avoid the book, the nav, and every other signature. Re-runs on
+   resize. Index-only (guards on .inv-signatures). */
+(function () {
+  const layer = document.querySelector('.inv-signatures');
+  if (!layer) return;
+  const sigs = [...layer.querySelectorAll('.inv-sig')];
+  if (!sigs.length) return;
+
+  const overlap = (a, b) => !(a.r <= b.l || a.l >= b.r || a.b <= b.t || a.t >= b.b);
+
+  function place() {
+    const book = document.querySelector('.inv-book');
+    if (!book) return;
+    const nav = document.querySelector('nav.top-nav');
+    const M = 12;                                   // gap kept around everything
+    const W = window.innerWidth, H = window.innerHeight;
+    const br = book.getBoundingClientRect();
+    const forbidden = [{ l: br.left - M, t: br.top - M, r: br.right + M, b: br.bottom + M }];
+    if (nav) {
+      const nr = nav.getBoundingClientRect();
+      forbidden.push({ l: 0, t: 0, r: W, b: nr.bottom + M });
+    }
+    const placed = [];
+    sigs.forEach(sig => {
+      sig.style.display = '';
+      sig.style.visibility = 'hidden';
+      sig.style.left = '0px'; sig.style.top = '0px';
+      // slight organic variation
+      sig.style.fontSize = (11 + Math.floor(Math.random() * 5)) + 'px';
+      sig.style.transform = 'rotate(' + (Math.random() * 14 - 7).toFixed(1) + 'deg)';
+      const w = sig.offsetWidth, h = sig.offsetHeight;
+      if (!w || !h) return;
+      let done = false;
+      for (let i = 0; i < 80 && !done; i++) {
+        const x = 4 + Math.random() * Math.max(1, W - w - 8);
+        const y = 4 + Math.random() * Math.max(1, H - h - 8);
+        const r = { l: x - M, t: y - M, r: x + w + M, b: y + h + M };
+        if (forbidden.some(f => overlap(r, f))) continue;
+        if (placed.some(p => overlap(r, p))) continue;
+        sig.style.left = x + 'px'; sig.style.top = y + 'px';
+        sig.style.visibility = 'visible';
+        placed.push(r);
+        done = true;
+      }
+      if (!done) sig.style.display = 'none';        // no room — drop it
+    });
+  }
+
+  // Wait for the pixel font so widths are measured correctly.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+  else if (document.readyState === 'complete') place();
+  else window.addEventListener('load', place);
+  let t;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(place, 200); }, { passive: true });
+})();
