@@ -2215,8 +2215,15 @@ def save_creeps_html():
         # Raw-HTML sentinel: ABIL_MANUAL values prefixed with \x01 bypass _esc
         # so we can inline <img> / <span> markup (used for Mana Burn's Int icon).
         if isinstance(val, str) and val.startswith('\x01'):
-            return f'<td class="ua-{pk}{sep}"{dc}>{val[1:]}</td>'
-        inner = _esc(val) or '<span class="ua-dash">—</span>'
+            inner = val[1:]
+        else:
+            inner = _esc(val) or '<span class="ua-dash">—</span>'
+        # Property 1–3 hold long descriptive text. In a table-layout:auto table a
+        # `max-width` on the <td> is IGNORED (column sizes to its widest cell), so
+        # wrap the content in a block whose max-width the table DOES honour — keeps
+        # these columns from ballooning to the widest cell under page-level scroll.
+        if pk in ('effect', 'effect2', 'effect3'):
+            inner = f'<div class="ua-prop-clamp">{inner}</div>'
         return f'<td class="ua-{pk}{sep}"{dc}>{inner}</td>'
 
     # Abilities that are identical across multiple units (same slug, same

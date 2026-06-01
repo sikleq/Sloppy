@@ -3756,20 +3756,21 @@ body.filter-active ul.subnotes { display: none; }
 .unit-abilities-table td.ua-ability:hover { z-index: 40; }
 .unit-abilities-table td.ua-as_effect,
 .unit-abilities-table td.ua-ms_effect { white-space: nowrap; color: #9fb0c0; }
-/* Property 1–3 hold long descriptive text. Keeping them nowrap blew the table
-   far past the viewport once the tables moved to page-level scroll, so wrap
-   them and cap the column width — the table now fits the screen. */
 .unit-abilities-table td.ua-effect,
 .unit-abilities-table td.ua-effect2,
-.unit-abilities-table td.ua-effect3 {
+.unit-abilities-table td.ua-effect3 { color: #9fb0c0; }
+/* Property 1–3 hold long descriptive text. In a table-layout:auto table a
+   `max-width` on the <td> is IGNORED — the column sizes to its widest cell, so a
+   single 56-char cell ballooned the whole column. Cap the column by clamping a
+   BLOCK inside each cell (the table layout DOES honour a descendant's max-width),
+   which wraps the text instead. */
+.unit-abilities-table .ua-prop-clamp {
+  max-width: 200px;
+  margin: 0 auto;
   white-space: normal;
-  max-width: 230px;
   overflow-wrap: anywhere;
-  color: #9fb0c0;
+  line-height: 1.25;
 }
-.unit-abilities-table th[data-col="effect"],
-.unit-abilities-table th[data-col="effect2"],
-.unit-abilities-table th[data-col="effect3"] { max-width: 230px; }
 /* Damage cell allows wrapping for long compound expressions (e.g. Mana Burn:
    "20/25/30/35 + 200/250/350/400% Int"). */
 .unit-abilities-table td.ua-damage { white-space: normal; }

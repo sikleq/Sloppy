@@ -61,9 +61,12 @@ inner scroll box anymore.
   flipped to page-scroll on user request (2026-06-01).
 - **Wide text columns must wrap.** Page-scroll has no inner box to hide runaway
   width, so columns holding long descriptive text — Unit Abilities **Property 1–3**
-  (`.ua-effect` / `.ua-effect2` / `.ua-effect3`) — use `white-space: normal` + a
-  `max-width` cap, otherwise the table runs far past the viewport (they were
-  `nowrap` under the old inner-box scroll).
+  (`.ua-effect` / `.ua-effect2` / `.ua-effect3`) — would balloon to their widest
+  cell and run far past the viewport. ⚠ In `table-layout: auto` a `max-width` on
+  the `<td>` is **ignored** (the column sizes to its widest cell). Fix: wrap each
+  cell's content in a block `<div class="ua-prop-clamp">` (built in
+  `build_creeps.py::_prop_cell`) whose `max-width` the table layout **does** honour
+  → the text wraps and the column is capped.
 
 How the frozen pieces still work at page level:
 - **Identity columns** freeze via `position:sticky; left:<offset>` (JS sets per-cell
