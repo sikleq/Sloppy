@@ -91,8 +91,10 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
     # of inline nav tabs. The full nav list lives on the main hub page.
     brand = (
         f'<a class="nav-brand" href="{prefix}index.html" aria-label="Home">'
-        f'<img class="nav-brand-logo" src="{prefix}icons/header-helmet.png" '
-        f'alt="" loading="eager">'
+        f'<span class="nav-brand-logo" data-logo-src="{prefix}icons/header-helmet.png" '
+        f'data-glow-src="{prefix}icons/header-helmet-glow.png">'
+        f'<img src="{prefix}icons/header-helmet.png" alt="" loading="eager">'
+        f'</span>'
         f'<span class="nav-brand-text">'
         f'<span class="nav-brand-sikle">sikle</span>\\dota.vpk'
         f'</span>'
