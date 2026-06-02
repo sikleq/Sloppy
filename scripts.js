@@ -1,5 +1,4 @@
-
-(function() {
+(function () {
   // ---- BACK-FROM-CALENDAR / BACK-FROM-PATCH ----
   // The back arrow normally points to the calendar (rendered in HTML).
   // Two trigger paths:
@@ -8,20 +7,20 @@
   //                              the dynamics widget; rewrite the arrow's
   //                              href + label to point back to that patch.
   const params = new URLSearchParams(window.location.search);
-  const back = document.querySelector('.nav-back-arrow');
-  const fromParam = params.get('from');
-  if (back && fromParam === 'calendar') {
-    back.classList.add('visible');
+  const back = document.querySelector(".nav-back-arrow");
+  const fromParam = params.get("from");
+  if (back && fromParam === "calendar") {
+    back.classList.add("visible");
   } else if (back && fromParam && /^\d+\.\d+[a-z]?$/.test(fromParam)) {
     // Came from another patch via the dynamics widget. The dyn-cell href
     // also carries an entity anchor (#dyn-hero-...) so the destination page
     // scrolls to that entity — the SAME entity was visible on the origin
     // page, so reusing the current hash on the back-link restores the
     // user's scroll position on return.
-    back.href = fromParam + '.html' + (window.location.hash || '');
-    back.title = 'Back to ' + fromParam;
-    back.setAttribute('aria-label', 'Back to patch ' + fromParam);
-    back.classList.add('visible');
+    back.href = fromParam + ".html" + (window.location.hash || "");
+    back.title = "Back to " + fromParam;
+    back.setAttribute("aria-label", "Back to patch " + fromParam);
+    back.classList.add("visible");
   }
   // The back arrow is a fixed button in the BOTTOM-LEFT corner (CSS), so it no
   // longer needs JS to vertically align it on the toolbar (that inline top:
@@ -31,32 +30,35 @@
   // Guard for pages without the button (e.g. creeps.html). Without this
   // null-guard, updateBtt() throws at load and halts the whole script —
   // which silently broke the creep-icon copy handler below.
-  const btt = document.querySelector('.back-to-top');
+  const btt = document.querySelector(".back-to-top");
   if (btt) {
-    const updateBtt = () => btt.classList.toggle('visible', window.scrollY > 400);
-    window.addEventListener('scroll', updateBtt, { passive: true });
+    const updateBtt = () =>
+      btt.classList.toggle("visible", window.scrollY > 400);
+    window.addEventListener("scroll", updateBtt, { passive: true });
     updateBtt();
   }
 
   // ---- VERSION DROPDOWN toggle ----
-  const dropdownBtn = document.querySelector('.version-dropdown .version');
-  const dropdownMenu = document.querySelector('.version-dropdown .version-menu');
+  const dropdownBtn = document.querySelector(".version-dropdown .version");
+  const dropdownMenu = document.querySelector(
+    ".version-dropdown .version-menu",
+  );
   if (dropdownBtn && dropdownMenu) {
-    dropdownBtn.addEventListener('click', (e) => {
+    dropdownBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      const open = dropdownMenu.classList.toggle('open');
-      dropdownBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      const open = dropdownMenu.classList.toggle("open");
+      dropdownBtn.setAttribute("aria-expanded", open ? "true" : "false");
     });
-    document.addEventListener('click', (e) => {
+    document.addEventListener("click", (e) => {
       if (!dropdownMenu.contains(e.target) && !dropdownBtn.contains(e.target)) {
-        dropdownMenu.classList.remove('open');
-        dropdownBtn.setAttribute('aria-expanded', 'false');
+        dropdownMenu.classList.remove("open");
+        dropdownBtn.setAttribute("aria-expanded", "false");
       }
     });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        dropdownMenu.classList.remove('open');
-        dropdownBtn.setAttribute('aria-expanded', 'false');
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        dropdownMenu.classList.remove("open");
+        dropdownBtn.setAttribute("aria-expanded", "false");
       }
     });
   }
@@ -68,86 +70,99 @@
   // Ctrl+F5. We compute presence, hide the absent buttons, THEN flip the
   // container to visible — a single resolved render, no flash.
   const presentTags = new Set();
-  document.querySelectorAll('[data-tag]').forEach(el => {
-    (el.dataset.tag || '').split(' ').filter(Boolean).forEach(t => presentTags.add(t));
+  document.querySelectorAll("[data-tag]").forEach((el) => {
+    (el.dataset.tag || "")
+      .split(" ")
+      .filter(Boolean)
+      .forEach((t) => presentTags.add(t));
   });
   // Recipe-changed items count as REWORK even if none of their explicit rows
   // carry t("REWORK") — keep the filter button discoverable on those pages.
-  if (document.querySelector('.entity-block.is-changed')) presentTags.add('rework');
-  document.querySelectorAll('.filter-btn').forEach(btn => {
+  if (document.querySelector(".entity-block.is-changed"))
+    presentTags.add("rework");
+  document.querySelectorAll(".filter-btn").forEach((btn) => {
     if (!presentTags.has(btn.dataset.filter)) {
-      btn.style.display = 'none';
+      btn.style.display = "none";
     }
   });
-  document.querySelectorAll('.legend-tags').forEach(bar => {
-    bar.style.visibility = 'visible';
+  document.querySelectorAll(".legend-tags").forEach((bar) => {
+    bar.style.visibility = "visible";
   });
 
   // ---- BOLD NUMBERS AND VERSION IN PATCH-AGE ----
-  const ageEl = document.querySelector('.patch-age');
+  const ageEl = document.querySelector(".patch-age");
   if (ageEl) {
     const text = ageEl.textContent;
     const html = text
-      .replace(/\b(\d+\.\d+[a-z]?)\b/g, '<strong>$1</strong>')   // version like 7.41b
-      .replace(/\b(\d+)\b(?=\s+days?)/g, '<strong>$1</strong>')   // numbers before "days"
+      .replace(/\b(\d+\.\d+[a-z]?)\b/g, "<strong>$1</strong>") // version like 7.41b
+      .replace(/\b(\d+)\b(?=\s+days?)/g, "<strong>$1</strong>") // numbers before "days"
       .replace(/·/g, '<span class="age-sep">·</span>');
     ageEl.innerHTML = html;
   }
 
   // ---- TAG FILTERING (multi-select, OR semantics) ----
-  const buttons = document.querySelectorAll('.filter-btn');
+  const buttons = document.querySelectorAll(".filter-btn");
   const activeFilters = new Set();
   function applyFilter() {
     const isActive = activeFilters.size > 0;
-    document.body.classList.toggle('filter-active', isActive);
-    document.querySelectorAll('.f-hide').forEach(el => el.classList.remove('f-hide'));
+    document.body.classList.toggle("filter-active", isActive);
+    document
+      .querySelectorAll(".f-hide")
+      .forEach((el) => el.classList.remove("f-hide"));
     if (!isActive) return;
-    document.querySelectorAll('ul.changes > li').forEach(li => {
-      const tags = (li.dataset.tag || '').split(' ').filter(Boolean);
+    document.querySelectorAll("ul.changes > li").forEach((li) => {
+      const tags = (li.dataset.tag || "").split(" ").filter(Boolean);
       // Items whose recipe changed (entity-block.is-changed) count as REWORK
       // so the REWORK filter keeps their rows visible too.
-      if (li.closest('.entity-block.is-changed')) tags.push('rework');
-      const matches = tags.some(t => activeFilters.has(t));
-      if (!matches) li.classList.add('f-hide');
+      if (li.closest(".entity-block.is-changed")) tags.push("rework");
+      const matches = tags.some((t) => activeFilters.has(t));
+      if (!matches) li.classList.add("f-hide");
     });
     // Block-level swap visuals (ability_change) carry their own data-tag and
     // sit outside ul.changes — hide them when none of their tags is active.
-    document.querySelectorAll('.ability-change[data-tag]').forEach(block => {
-      const tags = (block.dataset.tag || '').split(' ').filter(Boolean);
-      if (!tags.some(t => activeFilters.has(t))) block.classList.add('f-hide');
+    document.querySelectorAll(".ability-change[data-tag]").forEach((block) => {
+      const tags = (block.dataset.tag || "").split(" ").filter(Boolean);
+      if (!tags.some((t) => activeFilters.has(t)))
+        block.classList.add("f-hide");
     });
-    document.querySelectorAll('ul.changes').forEach(ul => {
-      const hasVisible = Array.from(ul.children).some(c => !c.classList.contains('f-hide'));
-      if (!hasVisible) ul.classList.add('f-hide');
+    document.querySelectorAll("ul.changes").forEach((ul) => {
+      const hasVisible = Array.from(ul.children).some(
+        (c) => !c.classList.contains("f-hide"),
+      );
+      if (!hasVisible) ul.classList.add("f-hide");
     });
-    document.querySelectorAll('h4.ability-title').forEach(h => {
+    document.querySelectorAll("h4.ability-title").forEach((h) => {
       let nx = h.nextElementSibling;
-      while (nx && nx.tagName !== 'UL') nx = nx.nextElementSibling;
-      if (!nx || nx.classList.contains('f-hide')) h.classList.add('f-hide');
+      while (nx && nx.tagName !== "UL") nx = nx.nextElementSibling;
+      if (!nx || nx.classList.contains("f-hide")) h.classList.add("f-hide");
     });
     // Hide the entire ability-block (icon + title + ul) if its ul is hidden,
     // otherwise the floating icon stays visible without any text.
-    document.querySelectorAll('.ability-block').forEach(block => {
-      const ul = block.querySelector('ul.changes');
-      if (!ul || ul.classList.contains('f-hide')) {
-        block.classList.add('f-hide');
+    document.querySelectorAll(".ability-block").forEach((block) => {
+      const ul = block.querySelector("ul.changes");
+      if (!ul || ul.classList.contains("f-hide")) {
+        block.classList.add("f-hide");
       }
     });
-    document.querySelectorAll('.entity-block').forEach(block => {
-      const visibleLi    = block.querySelectorAll('ul.changes > li:not(.f-hide)').length;
-      const visibleSwaps = block.querySelectorAll('.ability-change:not(.f-hide)').length;
-      if (!visibleLi && !visibleSwaps) block.classList.add('f-hide');
+    document.querySelectorAll(".entity-block").forEach((block) => {
+      const visibleLi = block.querySelectorAll(
+        "ul.changes > li:not(.f-hide)",
+      ).length;
+      const visibleSwaps = block.querySelectorAll(
+        ".ability-change:not(.f-hide)",
+      ).length;
+      if (!visibleLi && !visibleSwaps) block.classList.add("f-hide");
     });
   }
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
       const tag = btn.dataset.filter;
       if (activeFilters.has(tag)) {
         activeFilters.delete(tag);
-        btn.classList.remove('active');
+        btn.classList.remove("active");
       } else {
         activeFilters.add(tag);
-        btn.classList.add('active');
+        btn.classList.add("active");
       }
       applyFilter();
     });
@@ -157,48 +172,54 @@
   // Tag every element between adjacent <h2 class="section"> headers with the
   // preceding section's slug so the buttons can hide non-matching siblings.
   (function indexSections() {
-    const headers = document.querySelectorAll('h2.section[data-section]');
-    headers.forEach(h => {
+    const headers = document.querySelectorAll("h2.section[data-section]");
+    headers.forEach((h) => {
       const slug = h.dataset.section;
       let nx = h.nextElementSibling;
-      while (nx && !(nx.tagName === 'H2' && nx.classList.contains('section'))) {
+      while (nx && !(nx.tagName === "H2" && nx.classList.contains("section"))) {
         if (!nx.dataset.section) nx.dataset.section = slug;
         nx = nx.nextElementSibling;
       }
     });
   })();
-  const catButtons = document.querySelectorAll('.cat-filter-btn');
+  const catButtons = document.querySelectorAll(".cat-filter-btn");
   const activeCats = new Set();
   function applyCatFilter() {
     const on = activeCats.size > 0;
-    document.body.classList.toggle('cat-filter-active', on);
-    document.querySelectorAll('[data-section]').forEach(el => {
-      el.classList.remove('cat-hide');
-      if (on && !activeCats.has(el.dataset.section)) el.classList.add('cat-hide');
+    document.body.classList.toggle("cat-filter-active", on);
+    document.querySelectorAll("[data-section]").forEach((el) => {
+      el.classList.remove("cat-hide");
+      if (on && !activeCats.has(el.dataset.section))
+        el.classList.add("cat-hide");
     });
   }
-  catButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
+  catButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
       const cat = btn.dataset.category;
-      if (activeCats.has(cat)) { activeCats.delete(cat); btn.classList.remove('active'); }
-      else { activeCats.add(cat); btn.classList.add('active'); }
+      if (activeCats.has(cat)) {
+        activeCats.delete(cat);
+        btn.classList.remove("active");
+      } else {
+        activeCats.add(cat);
+        btn.classList.add("active");
+      }
       applyCatFilter();
     });
   });
 
   // ---- FORMULA TABLES (click pill to toggle table) ----
-  document.querySelectorAll('.formula-trigger').forEach(trig => {
-    trig.addEventListener('click', () => {
+  document.querySelectorAll(".formula-trigger").forEach((trig) => {
+    trig.addEventListener("click", () => {
       const id = trig.dataset.formula;
       const table = document.getElementById(id);
       if (!table) return;
-      const wasHidden = table.hasAttribute('hidden');
+      const wasHidden = table.hasAttribute("hidden");
       if (wasHidden) {
-        table.removeAttribute('hidden');
-        trig.classList.add('active');
+        table.removeAttribute("hidden");
+        trig.classList.add("active");
       } else {
-        table.setAttribute('hidden', '');
-        trig.classList.remove('active');
+        table.setAttribute("hidden", "");
+        trig.classList.remove("active");
       }
     });
   });
@@ -207,132 +228,156 @@
   // Guard: pages without the search box (e.g. creeps.html) skip this whole
   // block. Without the guard, searchInput.addEventListener below throws on
   // null and halts the script — which silently broke later handlers.
-  const searchInput = document.getElementById('entity-search');
-  const resultsBox = document.getElementById('search-results');
+  const searchInput = document.getElementById("entity-search");
+  const resultsBox = document.getElementById("search-results");
   if (searchInput && resultsBox) {
-  const entities = [];
-  document.querySelectorAll('.entity').forEach(entity => {
-    const nameEl = entity.querySelector('.entity-name');
-    const imgEl = entity.querySelector('.entity-icon img');
-    if (!nameEl) return;
-    // Strip the "New X Item" / "Returning Tier N Artifact" / "Recipe changed"
-    // labels so the search index uses just the entity name itself.
-    const nameClone = nameEl.cloneNode(true);
-    nameClone.querySelectorAll('.entity-new-type, .entity-changed-type').forEach(n => n.remove());
-    let kind = 'mechanic';
-    if (entity.classList.contains('hero-entity')) kind = 'hero';
-    else if (entity.classList.contains('unit-entity')) kind = 'creep';
-    else if (entity.classList.contains('item-entity')) kind = 'item';
-    if (entity.dataset && entity.dataset.kind) kind = entity.dataset.kind;
-    entities.push({
-      name: nameClone.textContent.trim().replace(/\s+/g, ' '),
-      element: entity,
-      icon: imgEl ? imgEl.src : null,
-      kind: kind
+    const entities = [];
+    document.querySelectorAll(".entity").forEach((entity) => {
+      const nameEl = entity.querySelector(".entity-name");
+      const imgEl = entity.querySelector(".entity-icon img");
+      if (!nameEl) return;
+      // Strip the "New X Item" / "Returning Tier N Artifact" / "Recipe changed"
+      // labels so the search index uses just the entity name itself.
+      const nameClone = nameEl.cloneNode(true);
+      nameClone
+        .querySelectorAll(".entity-new-type, .entity-changed-type")
+        .forEach((n) => n.remove());
+      let kind = "mechanic";
+      if (entity.classList.contains("hero-entity")) kind = "hero";
+      else if (entity.classList.contains("unit-entity")) kind = "creep";
+      else if (entity.classList.contains("item-entity")) kind = "item";
+      if (entity.dataset && entity.dataset.kind) kind = entity.dataset.kind;
+      entities.push({
+        name: nameClone.textContent.trim().replace(/\s+/g, " "),
+        element: entity,
+        icon: imgEl ? imgEl.src : null,
+        kind: kind,
+      });
     });
-  });
-  // Also index ability titles (h4.ability-title) — pull icon from the .ability-block
-  // wrapper so search results show the same picture as the ability heading.
-  // Innate abilities that have their own icon (e.g. Invoker's Invoke =
-  // invoker_invoke.png + small innate marker overlay) should still use that
-  // icon in search results; only fall back to the generic innate marker when
-  // Valve doesn't expose a dedicated icon on the React CDN.
-  document.querySelectorAll('h4.ability-title').forEach(h => {
-    const block = h.closest('.ability-block');
-    const imgEl = block ? block.querySelector('.ability-icon-img') : null;
-    const isInnate = block ? block.classList.contains('is-innate') : false;
-    const innateUrl = '../icons/misc/innate_icon.png';
-    const realIcon = imgEl ? imgEl.src : null;
-    entities.push({
-      name: h.textContent.trim(),
-      element: h,
-      icon: realIcon || (isInnate ? innateUrl : null),
-      kind: 'ability'
+    // Also index ability titles (h4.ability-title) — pull icon from the .ability-block
+    // wrapper so search results show the same picture as the ability heading.
+    // Innate abilities that have their own icon (e.g. Invoker's Invoke =
+    // invoker_invoke.png + small innate marker overlay) should still use that
+    // icon in search results; only fall back to the generic innate marker when
+    // Valve doesn't expose a dedicated icon on the React CDN.
+    document.querySelectorAll("h4.ability-title").forEach((h) => {
+      const block = h.closest(".ability-block");
+      const imgEl = block ? block.querySelector(".ability-icon-img") : null;
+      const isInnate = block ? block.classList.contains("is-innate") : false;
+      const innateUrl = "../icons/misc/innate_icon.png";
+      const realIcon = imgEl ? imgEl.src : null;
+      entities.push({
+        name: h.textContent.trim(),
+        element: h,
+        icon: realIcon || (isInnate ? innateUrl : null),
+        kind: "ability",
+      });
     });
-  });
 
-  function escapeHtml(s) { return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
-  function highlight(name, q) {
-    const idx = name.toLowerCase().indexOf(q.toLowerCase());
-    if (idx === -1) return escapeHtml(name);
-    return escapeHtml(name.slice(0, idx)) +
-           '<mark>' + escapeHtml(name.slice(idx, idx + q.length)) + '</mark>' +
-           escapeHtml(name.slice(idx + q.length));
-  }
+    function escapeHtml(s) {
+      return s.replace(
+        /[&<>]/g,
+        (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c],
+      );
+    }
+    function highlight(name, q) {
+      const idx = name.toLowerCase().indexOf(q.toLowerCase());
+      if (idx === -1) return escapeHtml(name);
+      return (
+        escapeHtml(name.slice(0, idx)) +
+        "<mark>" +
+        escapeHtml(name.slice(idx, idx + q.length)) +
+        "</mark>" +
+        escapeHtml(name.slice(idx + q.length))
+      );
+    }
 
-  let activeIdx = -1;
+    let activeIdx = -1;
 
-  function render(query) {
-    if (!query) {
-      resultsBox.classList.remove('show');
-      resultsBox.innerHTML = '';
+    function render(query) {
+      if (!query) {
+        resultsBox.classList.remove("show");
+        resultsBox.innerHTML = "";
+        activeIdx = -1;
+        return;
+      }
+      const q = query.toLowerCase();
+      const matches = entities
+        .filter((e) => e.name.toLowerCase().includes(q))
+        .slice(0, 12);
+      if (matches.length === 0) {
+        resultsBox.innerHTML = '<div class="empty">no matches</div>';
+        resultsBox.classList.add("show");
+        activeIdx = -1;
+        return;
+      }
+      resultsBox.innerHTML = matches
+        .map(
+          (m, i) =>
+            `<div class="result-item" data-idx="${i}">${
+              m.icon
+                ? `<img src="${m.icon}" alt="" onerror="this.onerror=null;this.src='../icons/misc/missing.svg';">`
+                : '<span style="width:32px;display:inline-block"></span>'
+            }<span>${highlight(m.name, query)}</span><span class="kind">${m.kind}</span></div>`,
+        )
+        .join("");
+      resultsBox.classList.add("show");
       activeIdx = -1;
-      return;
-    }
-    const q = query.toLowerCase();
-    const matches = entities.filter(e => e.name.toLowerCase().includes(q)).slice(0, 12);
-    if (matches.length === 0) {
-      resultsBox.innerHTML = '<div class="empty">no matches</div>';
-      resultsBox.classList.add('show');
-      activeIdx = -1;
-      return;
-    }
-    resultsBox.innerHTML = matches.map((m, i) =>
-      `<div class="result-item" data-idx="${i}">${
-        m.icon
-          ? `<img src="${m.icon}" alt="" onerror="this.onerror=null;this.src='../icons/misc/missing.svg';">`
-          : '<span style="width:32px;display:inline-block"></span>'
-      }<span>${highlight(m.name, query)}</span><span class="kind">${m.kind}</span></div>`
-    ).join('');
-    resultsBox.classList.add('show');
-    activeIdx = -1;
 
-    resultsBox.querySelectorAll('.result-item').forEach((el, i) => {
-      el.addEventListener('mouseenter', () => { setActive(i); });
-      el.addEventListener('click', () => { jumpTo(matches[i]); });
+      resultsBox.querySelectorAll(".result-item").forEach((el, i) => {
+        el.addEventListener("mouseenter", () => {
+          setActive(i);
+        });
+        el.addEventListener("click", () => {
+          jumpTo(matches[i]);
+        });
+      });
+      window._currentMatches = matches;
+    }
+
+    function setActive(i) {
+      activeIdx = i;
+      resultsBox.querySelectorAll(".result-item").forEach((el, idx) => {
+        el.classList.toggle("active", idx === i);
+      });
+    }
+
+    function jumpTo(target) {
+      if (!target) return;
+      target.element.scrollIntoView({ behavior: "smooth", block: "start" });
+      target.element.style.transition = "box-shadow 0.4s";
+      target.element.style.boxShadow = "0 0 0 2px #58a6ff";
+      setTimeout(() => (target.element.style.boxShadow = ""), 1400);
+      searchInput.value = "";
+      resultsBox.classList.remove("show");
+      resultsBox.innerHTML = "";
+    }
+
+    searchInput.addEventListener("input", () => render(searchInput.value));
+    searchInput.addEventListener("keydown", (e) => {
+      const items = resultsBox.querySelectorAll(".result-item");
+      if (!items.length) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActive((activeIdx + 1) % items.length);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActive((activeIdx - 1 + items.length) % items.length);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        const idx = activeIdx >= 0 ? activeIdx : 0;
+        if (window._currentMatches && window._currentMatches[idx])
+          jumpTo(window._currentMatches[idx]);
+      } else if (e.key === "Escape") {
+        searchInput.value = "";
+        render("");
+      }
     });
-    window._currentMatches = matches;
-  }
-
-  function setActive(i) {
-    activeIdx = i;
-    resultsBox.querySelectorAll('.result-item').forEach((el, idx) => {
-      el.classList.toggle('active', idx === i);
+    document.addEventListener("click", (e) => {
+      if (!searchInput.contains(e.target) && !resultsBox.contains(e.target)) {
+        resultsBox.classList.remove("show");
+      }
     });
-  }
-
-  function jumpTo(target) {
-    if (!target) return;
-    target.element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    target.element.style.transition = 'box-shadow 0.4s';
-    target.element.style.boxShadow = '0 0 0 2px #58a6ff';
-    setTimeout(() => target.element.style.boxShadow = '', 1400);
-    searchInput.value = '';
-    resultsBox.classList.remove('show');
-    resultsBox.innerHTML = '';
-  }
-
-  searchInput.addEventListener('input', () => render(searchInput.value));
-  searchInput.addEventListener('keydown', (e) => {
-    const items = resultsBox.querySelectorAll('.result-item');
-    if (!items.length) return;
-    if (e.key === 'ArrowDown') { e.preventDefault(); setActive((activeIdx + 1) % items.length); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((activeIdx - 1 + items.length) % items.length); }
-    else if (e.key === 'Enter') {
-      e.preventDefault();
-      const idx = activeIdx >= 0 ? activeIdx : 0;
-      if (window._currentMatches && window._currentMatches[idx]) jumpTo(window._currentMatches[idx]);
-    }
-    else if (e.key === 'Escape') {
-      searchInput.value = '';
-      render('');
-    }
-  });
-  document.addEventListener('click', (e) => {
-    if (!searchInput.contains(e.target) && !resultsBox.contains(e.target)) {
-      resultsBox.classList.remove('show');
-    }
-  });
   } // end if (searchInput && resultsBox)
 
   // ---- ABILITY-CHANGE CONNECTOR ----
@@ -341,13 +386,13 @@
   // pane. Recomputed on load and on resize so the line tracks the actual
   // layout (icon position, pane geometry).
   function drawAbilityChangeConnectors() {
-    const blocks = document.querySelectorAll('.ability-change-block');
+    const blocks = document.querySelectorAll(".ability-change-block");
     blocks.forEach((block) => {
-      const svg = block.querySelector(':scope > .ability-change-connector');
-      const path = svg && svg.querySelector('path');
-      const icon = block.querySelector(':scope > .ability-icon-wrap');
+      const svg = block.querySelector(":scope > .ability-change-connector");
+      const path = svg && svg.querySelector("path");
+      const icon = block.querySelector(":scope > .ability-icon-wrap");
       const oldPane = block.querySelector(
-        ':scope > .ability-change > .ability-change-pane.ability-change-old'
+        ":scope > .ability-change > .ability-change-pane.ability-change-old",
       );
       if (!svg || !path || !icon || !oldPane) return;
       const blockRect = block.getBoundingClientRect();
@@ -357,13 +402,16 @@
       // Cover the whole block so we have a global coordinate system for
       // the path; absolute positioning relative to block (which is
       // position: relative).
-      svg.setAttribute('width', blockRect.width);
-      svg.setAttribute('height', blockRect.height);
-      svg.setAttribute('viewBox', '0 0 ' + blockRect.width + ' ' + blockRect.height);
-      svg.style.left = '0px';
-      svg.style.top = '0px';
-      svg.style.width = blockRect.width + 'px';
-      svg.style.height = blockRect.height + 'px';
+      svg.setAttribute("width", blockRect.width);
+      svg.setAttribute("height", blockRect.height);
+      svg.setAttribute(
+        "viewBox",
+        "0 0 " + blockRect.width + " " + blockRect.height,
+      );
+      svg.style.left = "0px";
+      svg.style.top = "0px";
+      svg.style.width = blockRect.width + "px";
+      svg.style.height = blockRect.height + "px";
       // Start: bottom-center of icon
       const x1 = iconRect.left - blockRect.left + iconRect.width / 2;
       const y1 = iconRect.bottom - blockRect.top;
@@ -372,15 +420,16 @@
       const y2 = paneRect.top - blockRect.top + paneRect.height / 2;
       // L-shape with a right-angle elbow: vertical segment down from the
       // icon, then horizontal segment right to the pane's left edge.
-      const d = 'M ' + x1 + ' ' + y1 + ' L ' + x1 + ' ' + y2 + ' L ' + x2 + ' ' + y2;
-      path.setAttribute('d', d);
+      const d =
+        "M " + x1 + " " + y1 + " L " + x1 + " " + y2 + " L " + x2 + " " + y2;
+      path.setAttribute("d", d);
     });
   }
   drawAbilityChangeConnectors();
-  window.addEventListener('resize', drawAbilityChangeConnectors);
+  window.addEventListener("resize", drawAbilityChangeConnectors);
   // Also re-run after fonts/images settle so the layout has its final
   // dimensions (icon images may load late and shift the icon position).
-  window.addEventListener('load', drawAbilityChangeConnectors);
+  window.addEventListener("load", drawAbilityChangeConnectors);
 
   // ---------------------------------------------------------------------
   // PATCH DYNAMICS WIDGET
@@ -399,48 +448,58 @@
   // Stored as RGB tuples; alpha is computed at render time per band so
   // bands with more hits look more saturated (see dynColorFor).
   const DYN_TAG_RGB = {
-    buff:   [93, 177, 78],   // green
-    new:    [220, 175, 95],  // gold
+    buff: [93, 177, 78], // green
+    new: [220, 175, 95], // gold
     rework: [164, 114, 207], // purple
-    misc:   [139, 144, 153], // grey
-    qol:    [108, 171, 240], // blue
-    del:    [177, 78, 107],  // pink
-    nerf:   [209, 75, 75],   // red
+    misc: [139, 144, 153], // grey
+    qol: [108, 171, 240], // blue
+    del: [177, 78, 107], // pink
+    nerf: [209, 75, 75], // red
   };
   // Map a tag's count → rgba alpha. Single-hit bands sit near the old
   // baseline (~0.50), heavy bands push toward fully-saturated 0.90 so
   // the visual difference between "1 buff" and "8 buffs" is obvious at
   // a glance. Wider range than before for a more expressive ramp.
-  const DYN_ALPHA_BASE = 0.50;
+  const DYN_ALPHA_BASE = 0.5;
   const DYN_ALPHA_STEP = 0.08;
-  const DYN_ALPHA_MAX  = 0.90;
+  const DYN_ALPHA_MAX = 0.9;
   function dynColorFor(tag, count) {
     const rgb = DYN_TAG_RGB[tag];
     // count=1 → BASE, then each additional hit adds STEP, clamped at MAX.
     const alpha = Math.min(
       DYN_ALPHA_MAX,
-      DYN_ALPHA_BASE + Math.max(0, count - 1) * DYN_ALPHA_STEP
+      DYN_ALPHA_BASE + Math.max(0, count - 1) * DYN_ALPHA_STEP,
     );
     return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha.toFixed(2)})`;
   }
   const DYN_TAG_LABEL = {
-    buff:'BUFF', nerf:'NERF', new:'NEW', del:'DEL',
-    rework:'REWORK', misc:'MISC', qol:'QoL',
+    buff: "BUFF",
+    nerf: "NERF",
+    new: "NEW",
+    del: "DEL",
+    rework: "REWORK",
+    misc: "MISC",
+    qol: "QoL",
   };
   // Tag id → page-badge css class. Matches the styles in styles.css so
   // tooltip badges look identical to the row badges everywhere else.
   const DYN_TAG_BADGE_CLASS = {
-    buff:'buff-text', nerf:'nerf-text', new:'new', del:'del',
-    rework:'rework', misc:'misc', qol:'qol',
+    buff: "buff-text",
+    nerf: "nerf-text",
+    new: "new",
+    del: "del",
+    rework: "rework",
+    misc: "misc",
+    qol: "qol",
   };
   // Order is also the visual top→bottom band stack inside each pill, AND
   // the row order in the tooltip grid. Sequenced so neighbouring bands
   // change hue family (green → gold → purple → grey → blue → pink → red).
-  const DYN_TAG_ORDER = ['buff','new','rework','misc','qol','del','nerf'];
+  const DYN_TAG_ORDER = ["buff", "new", "rework", "misc", "qol", "del", "nerf"];
   // Balance-neutral tags kept OUT of the dyn-cell colored gradient (they
   // only fill the cell when nothing else changed — the "misc-only" /
   // "qol-only" dimmed fallback). They still appear in the tooltip grid.
-  const DYN_NEUTRAL_TAGS = ['misc','qol'];
+  const DYN_NEUTRAL_TAGS = ["misc", "qol"];
   const DYN_MAX_PATCHES = 12;
 
   function dynBuildPill(patch, counts, entityId, isCurrent, fromVersion) {
@@ -453,19 +512,19 @@
     // they're balance-neutral and dilute the pill's signal. They still
     // surface in the tooltip grid. A cell whose ONLY changes are neutral
     // ("misc/qol-only") gets a dimmed fallback fill instead.
-    const coloredTotal = DYN_TAG_ORDER
-      .filter(t => !DYN_NEUTRAL_TAGS.includes(t))
-      .reduce((s, t) => s + (counts[t] || 0), 0);
+    const coloredTotal = DYN_TAG_ORDER.filter(
+      (t) => !DYN_NEUTRAL_TAGS.includes(t),
+    ).reduce((s, t) => s + (counts[t] || 0), 0);
     const miscOnly = total > 0 && coloredTotal === 0;
-    const wrap = document.createElement(clickable ? 'a' : 'span');
-    let wcls = 'dyn-cell-wrap';
-    if (!total) wcls += ' empty';
-    if (isCurrent) wcls += ' current';
-    if (total && !patch.filename) wcls += ' no-page';
-    if (miscOnly) wcls += ' misc-only';
+    const wrap = document.createElement(clickable ? "a" : "span");
+    let wcls = "dyn-cell-wrap";
+    if (!total) wcls += " empty";
+    if (isCurrent) wcls += " current";
+    if (total && !patch.filename) wcls += " no-page";
+    if (miscOnly) wcls += " misc-only";
     wrap.className = wcls;
-    const cell = document.createElement('span');
-    cell.className = 'dyn-cell';
+    const cell = document.createElement("span");
+    cell.className = "dyn-cell";
     wrap.appendChild(cell);
     if (total) {
       // Build a vertical gradient where each tag occupies a band proportional
@@ -478,7 +537,9 @@
       // MISC and QoL are intentionally EXCLUDED from the gradient — these
       // neutral bands dilute the pill's color signal without adding meaning.
       // The tags still surface in the tooltip grid below.
-      const tags = DYN_TAG_ORDER.filter(t => !DYN_NEUTRAL_TAGS.includes(t) && counts[t] > 0);
+      const tags = DYN_TAG_ORDER.filter(
+        (t) => !DYN_NEUTRAL_TAGS.includes(t) && counts[t] > 0,
+      );
       // Bleed: % half-width of the soft transition zone between adjacent
       // bands. Zero = hard cuts between bands — no phantom mid-tones.
       const bleed = 0;
@@ -504,7 +565,10 @@
       // .misc-only class drops the cell to 50% opacity so it's visibly
       // dimmed vs. a fully-colored cell.
       if (stops.length) {
-        cell.style.setProperty('--dyn-bg', `linear-gradient(to bottom, ${stops.join(', ')})`);
+        cell.style.setProperty(
+          "--dyn-bg",
+          `linear-gradient(to bottom, ${stops.join(", ")})`,
+        );
       } else if (miscOnly) {
         // Flat-gradient wrapper instead of a raw color so the value always
         // parses as `background-image` — keeps the bg-color slot free for
@@ -513,23 +577,30 @@
         // `opacity` to the cell (which would also dim the hover backdrop).
         // Color comes from the dominant neutral tag so a QoL-only cell reads
         // blue, a MISC-only cell grey.
-        const domNeutral = DYN_NEUTRAL_TAGS
-          .reduce((a, b) => ((counts[b] || 0) > (counts[a] || 0) ? b : a));
-        const m = dynColorFor(domNeutral, counts[domNeutral] || 1)
-          .replace(/, ([\d.]+)\)$/, (_, a) => `, ${(parseFloat(a) * 0.5).toFixed(2)})`);
-        cell.style.setProperty('--dyn-bg', `linear-gradient(${m}, ${m})`);
+        const domNeutral = DYN_NEUTRAL_TAGS.reduce((a, b) =>
+          (counts[b] || 0) > (counts[a] || 0) ? b : a,
+        );
+        const m = dynColorFor(domNeutral, counts[domNeutral] || 1).replace(
+          /, ([\d.]+)\)$/,
+          (_, a) => `, ${(parseFloat(a) * 0.5).toFixed(2)})`,
+        );
+        cell.style.setProperty("--dyn-bg", `linear-gradient(${m}, ${m})`);
       }
       if (clickable) {
         // Append ?from=<currentVersion> so the destination patch page can
         // show a back-arrow that returns here when the user clicks it.
-        const qs = fromVersion ? '?from=' + fromVersion : '';
-        wrap.href = patch.filename + qs + (entityId ? '#' + entityId : '');
+        const qs = fromVersion ? "?from=" + fromVersion : "";
+        wrap.href = patch.filename + qs + (entityId ? "#" + entityId : "");
       }
       // Lazy tooltip: defer DOM creation until first hover. On big patch
       // pages there are 3000+ cells; pre-building all tooltips bloats the
       // initial DOM (~50k extra nodes) and causes severe scroll jank.
       // We stash the tooltip params on the wrap and build on demand below.
-      wrap._dynTipParams = [patch, counts, patch.filename ? null : '(no patch page yet)'];
+      wrap._dynTipParams = [
+        patch,
+        counts,
+        patch.filename ? null : "(no patch page yet)",
+      ];
     } else {
       wrap._dynTipParams = [patch, null, null];
     }
@@ -543,26 +614,26 @@
   //           a small count chip, ordered by DYN_TAG_ORDER. When counts is
   //           null (empty cell) the body holds a single `note` line.
   function dynBuildTip(patch, counts, note) {
-    const tip = document.createElement('span');
-    tip.className = 'dyn-tip';
-    const header = document.createElement('span');
-    header.className = 'dyn-tip-header';
+    const tip = document.createElement("span");
+    tip.className = "dyn-tip";
+    const header = document.createElement("span");
+    header.className = "dyn-tip-header";
     header.textContent = `${patch.version}`;
     tip.appendChild(header);
     if (counts) {
-      const grid = document.createElement('span');
-      grid.className = 'dyn-tip-grid';
+      const grid = document.createElement("span");
+      grid.className = "dyn-tip-grid";
       for (const t of DYN_TAG_ORDER) {
         const c = counts[t] || 0;
         if (!c) continue;
-        const row = document.createElement('span');
-        row.className = 'dyn-tip-row';
-        const badge = document.createElement('span');
+        const row = document.createElement("span");
+        row.className = "dyn-tip-row";
+        const badge = document.createElement("span");
         badge.className = `badge ${DYN_TAG_BADGE_CLASS[t]}`;
         badge.textContent = DYN_TAG_LABEL[t];
-        const count = document.createElement('span');
-        count.className = 'dyn-tip-count';
-        count.textContent = '×' + c;
+        const count = document.createElement("span");
+        count.className = "dyn-tip-count";
+        count.textContent = "×" + c;
         row.appendChild(badge);
         row.appendChild(count);
         grid.appendChild(row);
@@ -570,8 +641,8 @@
       tip.appendChild(grid);
     }
     if (note) {
-      const noteEl = document.createElement('span');
-      noteEl.className = 'dyn-tip-note';
+      const noteEl = document.createElement("span");
+      noteEl.className = "dyn-tip-note";
       noteEl.textContent = note;
       tip.appendChild(noteEl);
     }
@@ -581,7 +652,7 @@
   // Read current patch version from the version-picker button in the top nav.
   // Falls back to the document title ("Dota Patch Notes - 7.41a") if needed.
   function dynCurrentVersion() {
-    const btn = document.querySelector('.version-picker .version');
+    const btn = document.querySelector(".version-picker .version");
     if (btn) {
       const m = btn.textContent.match(/(\d+\.\d+[a-z]?)/);
       if (m) return m[1];
@@ -592,7 +663,7 @@
 
   // Known entity kinds — must match the strings emitted by _register_entity()
   // in build_patch.py. Ordered longest-first so "creep-hero" wins over "creep".
-  const DYN_KINDS = ['creep-hero', 'hero', 'item', 'unit', 'plain', 'enchant'];
+  const DYN_KINDS = ["creep-hero", "hero", "item", "unit", "plain", "enchant"];
 
   // Cache the per-page patches window so we compute it once, not 250+ times.
   // Pure function of manifest → ordered patches array.
@@ -606,20 +677,28 @@
   }
 
   function dynRenderRow(entityDiv, manifest, windowed, currentVersion) {
-    const id = entityDiv.id || '';
-    if (!id.startsWith('dyn-')) return;
+    const id = entityDiv.id || "";
+    if (!id.startsWith("dyn-")) return;
     const rest = id.slice(4);
-    const kind = DYN_KINDS.find(k => rest === k || rest.startsWith(k + '-'));
+    const kind = DYN_KINDS.find((k) => rest === k || rest.startsWith(k + "-"));
     if (!kind) return;
     const slug = rest.slice(kind.length + 1);
-    const key = kind + '|' + slug;
+    const key = kind + "|" + slug;
     const rec = manifest.entities[key];
     const perPatch = (rec && rec.patches) || {};
-    const row = document.createElement('div');
-    row.className = 'patch-dynamics';
+    const row = document.createElement("div");
+    row.className = "patch-dynamics";
     for (const p of windowed) {
       const counts = perPatch[p.version] || {};
-      row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion, currentVersion));
+      row.appendChild(
+        dynBuildPill(
+          p,
+          counts,
+          id,
+          p.version === currentVersion,
+          currentVersion,
+        ),
+      );
     }
     entityDiv.appendChild(row);
   }
@@ -628,15 +707,19 @@
     const entities = document.querySelectorAll('.entity[id^="dyn-"]');
     if (!entities.length) return;
     const currentVersion = dynCurrentVersion();
-    fetch('../_dynamics.json', { cache: 'no-cache' })
-      .then(r => r.ok ? r.json() : null)
-      .then(manifest => {
+    fetch("../_dynamics.json", { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((manifest) => {
         if (!manifest) return;
         const windowed = dynWindow(manifest);
-        entities.forEach(e => dynRenderRow(e, manifest, windowed, currentVersion));
+        entities.forEach((e) =>
+          dynRenderRow(e, manifest, windowed, currentVersion),
+        );
         dynAttachTooltipDelegation();
       })
-      .catch(() => { /* silently fail — widget is an enhancement */ });
+      .catch(() => {
+        /* silently fail — widget is an enhancement */
+      });
   }
 
   // Single shared tooltip lives on document.body (NOT inside any .dyn-cell-
@@ -648,8 +731,8 @@
   //      which CLIPS any descendant — including tooltips that overflow
   //      above the block. Living on body escapes that clip.
   function dynAttachTooltipDelegation() {
-    const shared = document.createElement('span');
-    shared.className = 'dyn-tip dyn-tip-shared';
+    const shared = document.createElement("span");
+    shared.className = "dyn-tip dyn-tip-shared";
     document.body.appendChild(shared);
     let currentWrap = null;
 
@@ -664,9 +747,9 @@
       // listeners; reading getBoundingClientRect once on hover is cheap.
       const r = wrap.getBoundingClientRect();
       // Show first (to measure tooltip height), then place.
-      shared.style.left = '0px';
-      shared.style.top = '0px';
-      shared.classList.add('is-visible');
+      shared.style.left = "0px";
+      shared.style.top = "0px";
+      shared.classList.add("is-visible");
       const tipRect = shared.getBoundingClientRect();
       let left = r.left + r.width / 2 - tipRect.width / 2;
       left = Math.max(8, Math.min(left, window.innerWidth - tipRect.width - 8));
@@ -675,35 +758,47 @@
       // 24px above r.top (18 expansion + 6 clearance) so it never sits on
       // the inflated cell.
       const top = r.top - tipRect.height - 24;
-      shared.style.left = left + 'px';
-      shared.style.top = top + 'px';
+      shared.style.left = left + "px";
+      shared.style.top = top + "px";
     }
     function hide() {
-      shared.classList.remove('is-visible');
+      shared.classList.remove("is-visible");
       currentWrap = null;
     }
-    document.addEventListener('mouseover', (e) => {
-      const wrap = e.target.closest && e.target.closest('.dyn-cell-wrap');
-      if (wrap === currentWrap) return;
-      if (wrap) { currentWrap = wrap; show(wrap); }
-      else { hide(); }
-    }, { capture: true, passive: true });
-    document.addEventListener('mouseout', (e) => {
-      // Only hide if the pointer left the wrap region entirely.
-      const wrap = e.target.closest && e.target.closest('.dyn-cell-wrap');
-      if (!wrap) return;
-      const to = e.relatedTarget;
-      if (!to || !wrap.contains(to)) hide();
-    }, { capture: true, passive: true });
-    window.addEventListener('scroll', hide, { passive: true });
+    document.addEventListener(
+      "mouseover",
+      (e) => {
+        const wrap = e.target.closest && e.target.closest(".dyn-cell-wrap");
+        if (wrap === currentWrap) return;
+        if (wrap) {
+          currentWrap = wrap;
+          show(wrap);
+        } else {
+          hide();
+        }
+      },
+      { capture: true, passive: true },
+    );
+    document.addEventListener(
+      "mouseout",
+      (e) => {
+        // Only hide if the pointer left the wrap region entirely.
+        const wrap = e.target.closest && e.target.closest(".dyn-cell-wrap");
+        if (!wrap) return;
+        const to = e.relatedTarget;
+        if (!to || !wrap.contains(to)) hide();
+      },
+      { capture: true, passive: true },
+    );
+    window.addEventListener("scroll", hide, { passive: true });
   }
 
   dynInit();
 })();
 
 // ---- CREEPS TABLE: click icon → copy "-createhero <name> neutral" ----
-(function() {
-  const icons = document.querySelectorAll('.creep-copy[data-cmd]');
+(function () {
+  const icons = document.querySelectorAll(".creep-copy[data-cmd]");
   if (!icons.length) return;
 
   // One reusable toast element appended to body.
@@ -711,19 +806,19 @@
   let hideTimer = null;
   function showToast(x, y) {
     if (!toast) {
-      toast = document.createElement('div');
-      toast.className = 'copy-toast';
-      toast.textContent = 'Copied';
+      toast = document.createElement("div");
+      toast.className = "copy-toast";
+      toast.textContent = "Copied";
       document.body.appendChild(toast);
     }
-    toast.style.left = x + 'px';
-    toast.style.top = y + 'px';
+    toast.style.left = x + "px";
+    toast.style.top = y + "px";
     // restart the fade animation
-    toast.classList.remove('is-visible');
+    toast.classList.remove("is-visible");
     void toast.offsetWidth; // force reflow so re-adding the class re-triggers
-    toast.classList.add('is-visible');
+    toast.classList.add("is-visible");
     clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => toast.classList.remove('is-visible'), 900);
+    hideTimer = setTimeout(() => toast.classList.remove("is-visible"), 900);
   }
 
   async function copyCmd(text) {
@@ -732,23 +827,25 @@
       return true;
     } catch (e) {
       // Fallback for non-secure contexts (file://, http on some browsers)
-      const ta = document.createElement('textarea');
+      const ta = document.createElement("textarea");
       ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
       document.body.appendChild(ta);
       ta.select();
       let ok = false;
-      try { ok = document.execCommand('copy'); } catch (_) {}
+      try {
+        ok = document.execCommand("copy");
+      } catch (_) {}
       document.body.removeChild(ta);
       return ok;
     }
   }
 
-  icons.forEach(img => {
-    img.style.cursor = 'pointer';
-    img.addEventListener('click', async (e) => {
-      const cmd = img.getAttribute('data-cmd');
+  icons.forEach((img) => {
+    img.style.cursor = "pointer";
+    img.addEventListener("click", async (e) => {
+      const cmd = img.getAttribute("data-cmd");
       if (!cmd) return;
       const ok = await copyCmd(cmd);
       if (ok) {
@@ -760,18 +857,18 @@
 })();
 
 // ---- CREEPS TABLE: sortable columns ----
-(function() {
-  const table = document.querySelector('.creeps-table');
+(function () {
+  const table = document.querySelector(".creeps-table");
   if (!table) return;
-  const tbody = table.querySelector('tbody');
-  const headers = [...table.querySelectorAll('thead th.sortable')];
+  const tbody = table.querySelector("tbody");
+  const headers = [...table.querySelectorAll("thead th.sortable")];
   if (!tbody || !headers.length) return;
 
   // Map column key → body-cell index. data-idx is authored server-side so
   // it stays correct despite the colspan=2 on the Юнит header (which makes
   // DOM th position diverge from cell index).
   const colIndex = {};
-  headers.forEach(th => {
+  headers.forEach((th) => {
     if (th.dataset.col) colIndex[th.dataset.col] = parseInt(th.dataset.idx, 10);
   });
 
@@ -783,7 +880,7 @@
   function cellVal(tr, idx) {
     const td = tr.children[idx];
     if (!td) return null;
-    if (td.dataset.lvl !== undefined && td.dataset.lvl !== '') {
+    if (td.dataset.lvl !== undefined && td.dataset.lvl !== "") {
       return parseFloat(td.dataset.lvl);
     }
     // Icon-only columns carry a data-sort value: a number (rank) for flag
@@ -794,9 +891,9 @@
       return isNaN(n) ? s.toLowerCase() : n;
     }
     const t = td.textContent.trim();
-    if (!t || t === ' ') return null;
-    if (t === '-') return 0;   // explicit "no mana" — sorts as the minimum, not last
-    const m = t.replace(',', '.').match(/-?\d+(?:\.\d+)?/);
+    if (!t || t === " ") return null;
+    if (t === "-") return 0; // explicit "no mana" — sorts as the minimum, not last
+    const m = t.replace(",", ".").match(/-?\d+(?:\.\d+)?/);
     return m ? parseFloat(m[0]) : t.toLowerCase();
   }
 
@@ -805,12 +902,17 @@
   // row order, so the grouped look survives sorting by level.
   function collapseLevels(rows) {
     let prev = null;
-    rows.forEach(tr => {
-      const cell = tr.querySelector('.lvl-cell');
+    rows.forEach((tr) => {
+      const cell = tr.querySelector(".lvl-cell");
       if (!cell) return;
       const lvl = cell.dataset.lvl;
-      if (lvl !== prev) { cell.textContent = lvl; tr.classList.add('tier-break'); }
-      else { cell.textContent = ''; tr.classList.remove('tier-break'); }
+      if (lvl !== prev) {
+        cell.textContent = lvl;
+        tr.classList.add("tier-break");
+      } else {
+        cell.textContent = "";
+        tr.classList.remove("tier-break");
+      }
       prev = lvl;
     });
   }
@@ -818,26 +920,28 @@
   // Unit Abilities: group consecutive rows of the SAME unit — show the Lvl +
   // Unit icon only on the first row of each run, hide on the rest (cells stay
   // for alignment). Recomputed after every sort so it works in any order.
-  const isUA = table.classList.contains('unit-abilities-table');
+  const isUA = table.classList.contains("unit-abilities-table");
   function groupByUnit(rows) {
-    let prevUnit = null, prevLvl = null;
-    rows.forEach(tr => {
+    let prevUnit = null,
+      prevLvl = null;
+    rows.forEach((tr) => {
       const u = tr.dataset.unit;
-      const lvlCell = tr.querySelector('.ua-lvl');
+      const lvlCell = tr.querySelector(".ua-lvl");
       const lvl = lvlCell ? lvlCell.dataset.lvl : null;
       // Level grouping — show the number once per level run + the horizontal
       // tier divider at each level change (mirrors the Neutral Creeps table).
       if (lvl !== prevLvl) {
         if (lvlCell) lvlCell.textContent = lvl;
-        tr.classList.add('tier-break');
+        tr.classList.add("tier-break");
       } else {
-        if (lvlCell) lvlCell.textContent = '';
-        tr.classList.remove('tier-break');
+        if (lvlCell) lvlCell.textContent = "";
+        tr.classList.remove("tier-break");
       }
       // Unit-icon dedup — show the icon only on the first row of each unit run.
-      if (u !== prevUnit) tr.classList.remove('ua-dup');
-      else tr.classList.add('ua-dup');
-      prevUnit = u; prevLvl = lvl;
+      if (u !== prevUnit) tr.classList.remove("ua-dup");
+      else tr.classList.add("ua-dup");
+      prevUnit = u;
+      prevLvl = lvl;
     });
   }
   const groupRows = isUA ? groupByUnit : collapseLevels;
@@ -851,25 +955,35 @@
       abilMerges[i].tr.insertBefore(abilMerges[i].td, abilMerges[i].next);
     }
     abilMerges = [];
-    tbody.querySelectorAll('td').forEach(td => {
+    tbody.querySelectorAll("td").forEach((td) => {
       if (td.rowSpan > 1 && /\bcol-ability/.test(td.className)) td.rowSpan = 1;
     });
   }
   function mergeAbilityRuns(rows) {
-    ['ability3', 'ability2', 'ability1'].forEach(col => {
+    ["ability3", "ability2", "ability1"].forEach((col) => {
       const idx = colIndex[col];
       if (idx == null) return;
       let i = 0;
       while (i < rows.length) {
         const td = rows[i].children[idx];
         const name = td && td.dataset.name;
-        if (!name) { i++; continue; }
+        if (!name) {
+          i++;
+          continue;
+        }
         // Shared auras stay per-unit: each frog keeps its own cell so a row
         // click highlights it (merging would rowspan 4 frogs into one block).
-        if (name === 'Riverborn Aura') { i++; continue; }
+        if (name === "Riverborn Aura") {
+          i++;
+          continue;
+        }
         let j = i + 1;
-        while (j < rows.length && rows[j].children[idx] &&
-               rows[j].children[idx].dataset.name === name) j++;
+        while (
+          j < rows.length &&
+          rows[j].children[idx] &&
+          rows[j].children[idx].dataset.name === name
+        )
+          j++;
         if (j - i > 1) {
           td.rowSpan = j - i;
           for (let k = i + 1; k < j; k++) {
@@ -883,81 +997,119 @@
     });
   }
 
-  let sortCol = null, sortState = 0;  // 0 = neutral, 1 = descending, 2 = ascending
-  const originalOrder = [...tbody.querySelectorAll('tr')];
+  let sortCol = null,
+    sortState = 0; // 0 = neutral, 1 = descending, 2 = ascending
+  const originalOrder = [...tbody.querySelectorAll("tr")];
 
   function applySort(col, dir) {
-    unmergeAbilityRuns();             // restore full cells before index-based sort
+    unmergeAbilityRuns(); // restore full cells before index-based sort
     const idx = colIndex[col];
-    const rows = [...tbody.querySelectorAll('tr')];
+    const rows = [...tbody.querySelectorAll("tr")];
     rows.sort((a, b) => {
-      const va = cellVal(a, idx), vb = cellVal(b, idx);
+      const va = cellVal(a, idx),
+        vb = cellVal(b, idx);
       if (va === null && vb === null) return 0;
-      if (va === null) return 1;          // empties always last
+      if (va === null) return 1; // empties always last
       if (vb === null) return -1;
-      if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
+      if (typeof va === "number" && typeof vb === "number")
+        return (va - vb) * dir;
       return String(va).localeCompare(String(vb)) * dir;
     });
-    rows.forEach(tr => tbody.appendChild(tr));
+    rows.forEach((tr) => tbody.appendChild(tr));
     groupRows(rows);
   }
 
-  headers.forEach(th => {
-    th.addEventListener('click', () => {
+  headers.forEach((th) => {
+    th.addEventListener("click", () => {
       const col = th.dataset.col;
       // 3-state cycle: neutral → descending → ascending → neutral.
       if (sortCol === col) sortState = (sortState + 1) % 3;
-      else { sortCol = col; sortState = 1; }     // first click = descending (largest first)
-      headers.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+      else {
+        sortCol = col;
+        sortState = 1;
+      } // first click = descending (largest first)
+      headers.forEach((h) => h.classList.remove("sort-asc", "sort-desc"));
       if (sortState === 0) {
         // Back to neutral: restore the default level-grouped order, dim ↕ returns.
         sortCol = null;
         unmergeAbilityRuns();
-        originalOrder.forEach(tr => tbody.appendChild(tr));
+        originalOrder.forEach((tr) => tbody.appendChild(tr));
         groupRows(originalOrder);
-        mergeAbilityRuns(originalOrder);   // re-merge in default order
+        mergeAbilityRuns(originalOrder); // re-merge in default order
       } else {
         const dir = sortState === 1 ? -1 : 1;
-        th.classList.add(dir === 1 ? 'sort-asc' : 'sort-desc');
+        th.classList.add(dir === 1 ? "sort-asc" : "sort-desc");
         applySort(col, dir);
       }
     });
   });
 
   // Initial pass: collapse/group the default order + merge ability runs.
-  groupRows([...tbody.querySelectorAll('tr')]);
-  mergeAbilityRuns([...tbody.querySelectorAll('tr')]);
+  groupRows([...tbody.querySelectorAll("tr")]);
+  mergeAbilityRuns([...tbody.querySelectorAll("tr")]);
 
   // Unit Abilities VIEW filter (Standard | Only Auras). Toggles a class on
   // the table; CSS hides non-aura rows. Also reorders columns: in "Only Auras"
   // the order is Lvl/Unit/Ability, then Aura Stack/Radius/Duration, then the
   // rest (Type/AS Effect/MS Effect), then Effect 1-3.
-  const uaView = document.getElementById('ua-view-mode');
+  const uaView = document.getElementById("ua-view-mode");
   if (uaView) {
-    const STD_ORDER = ['lvl', 'unit', 'ability', 'type', 'damage',
-      'manacost', 'cooldown', 'duration', 'cast_range', 'aoe', 'stackable',
-      'dispel', 'through_bkb', 'as_effect', 'ms_effect',
-      'effect', 'effect2', 'effect3'];
+    const STD_ORDER = [
+      "lvl",
+      "unit",
+      "ability",
+      "type",
+      "damage",
+      "manacost",
+      "cooldown",
+      "duration",
+      "cast_range",
+      "aoe",
+      "stackable",
+      "dispel",
+      "through_bkb",
+      "as_effect",
+      "ms_effect",
+      "effect",
+      "effect2",
+      "effect3",
+    ];
     // Auras view: visible columns first (their target order), then the
     // hidden-by-CSS columns at the end so DOM child count stays in sync.
-    const AURA_ORDER = ['lvl', 'unit', 'ability', 'type', 'aoe', 'stackable',
-      'through_bkb', 'duration', 'as_effect', 'ms_effect',
-      'effect', 'effect2', 'effect3',
-      'damage', 'manacost', 'cooldown', 'cast_range', 'dispel'];
-    const headRow = table.querySelector('thead .col-row')
-      || table.querySelector('thead tr');
+    const AURA_ORDER = [
+      "lvl",
+      "unit",
+      "ability",
+      "type",
+      "aoe",
+      "stackable",
+      "through_bkb",
+      "duration",
+      "as_effect",
+      "ms_effect",
+      "effect",
+      "effect2",
+      "effect3",
+      "damage",
+      "manacost",
+      "cooldown",
+      "cast_range",
+      "dispel",
+    ];
+    const headRow =
+      table.querySelector("thead .col-row") || table.querySelector("thead tr");
 
     function reorderCells(order) {
       const reorderOne = (parent) => {
-        order.forEach(k => {
-          const cell = [...parent.children].find(c => c.dataset.col === k);
+        order.forEach((k) => {
+          const cell = [...parent.children].find((c) => c.dataset.col === k);
           if (cell) parent.appendChild(cell);
         });
       };
       if (headRow) reorderOne(headRow);
-      tbody.querySelectorAll('tr').forEach(reorderOne);
+      tbody.querySelectorAll("tr").forEach(reorderOne);
       // Refresh colIndex (used by cellVal) for the new column positions.
-      Object.keys(colIndex).forEach(k => delete colIndex[k]);
+      Object.keys(colIndex).forEach((k) => delete colIndex[k]);
       if (headRow) {
         [...headRow.children].forEach((th, i) => {
           if (th.dataset.col) colIndex[th.dataset.col] = i;
@@ -966,36 +1118,38 @@
     }
 
     const applyUaView = () => {
-      const auras = uaView.value === 'auras';
-      table.classList.toggle('filter-auras', auras);
+      const auras = uaView.value === "auras";
+      table.classList.toggle("filter-auras", auras);
       reorderCells(auras ? AURA_ORDER : STD_ORDER);
-      groupRows(auras
-        ? [...tbody.querySelectorAll('tr.ua-row-aura')]
-        : [...tbody.querySelectorAll('tr')]);
+      groupRows(
+        auras
+          ? [...tbody.querySelectorAll("tr.ua-row-aura")]
+          : [...tbody.querySelectorAll("tr")],
+      );
     };
-    uaView.addEventListener('change', applyUaView);
+    uaView.addEventListener("change", applyUaView);
   }
 
   // Upgrades — binary switch. Toggles `.show-upgrades` on the UA table;
   // CSS draws a soft rounded outline + faint fill on every `td.leveled`.
-  const uaUpg = document.getElementById('ua-upgrades-mode');
+  const uaUpg = document.getElementById("ua-upgrades-mode");
   if (uaUpg && table) {
-    const apply = () => table.classList.toggle('show-upgrades', uaUpg.checked);
-    uaUpg.addEventListener('change', apply);
+    const apply = () => table.classList.toggle("show-upgrades", uaUpg.checked);
+    uaUpg.addEventListener("change", apply);
     apply();
   }
 })();
 
 // ---- CREEPS TABLE: per-stat changelog tooltip (HP / Armor / Mana / Magres) ----
-(function() {
-  const cells = document.querySelectorAll('td[data-hist], td[data-name]');
+(function () {
+  const cells = document.querySelectorAll("td[data-hist], td[data-name]");
   if (!cells.length) return;
 
   let tip = null;
   function ensureTip() {
     if (!tip) {
-      tip = document.createElement('div');
-      tip.className = 'stat-hist-tip';
+      tip = document.createElement("div");
+      tip.className = "stat-hist-tip";
       document.body.appendChild(tip);
     }
     return tip;
@@ -1003,34 +1157,42 @@
 
   // "23.02.2022" -> "23.02.22"
   function shortDate(d) {
-    const p = (d || '').split('.');
+    const p = (d || "").split(".");
     if (p.length === 3 && p[2].length === 4) p[2] = p[2].slice(2);
-    return p.join('.');
+    return p.join(".");
   }
   // Mean of a slash/space value ("40/36/32/26" -> 33.5, "12.0" -> 12).
   function meanOf(s) {
-    const nums = String(s).split(/[\/\s]+/)
-      .map(x => parseFloat(x.replace(',', '.'))).filter(isFinite);
+    const nums = String(s)
+      .split(/[\/\s]+/)
+      .map((x) => parseFloat(x.replace(",", ".")))
+      .filter(isFinite);
     return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : NaN;
   }
   // Colour reflects buff/nerf, not raw direction: for lower-is-better stats
   // (cooldown, mana, BAT) a DROP is the buff (green). The % keeps its real sign.
   function pctHtml(ov, nv, lowerBetter) {
-    const o = meanOf(ov), n = meanOf(nv);
-    if (!isFinite(o) || !isFinite(n) || o === 0) return '';
+    const o = meanOf(ov),
+      n = meanOf(nv);
+    if (!isFinite(o) || !isFinite(n) || o === 0) return "";
     // Divide by |o| so a negative baseline keeps the real direction:
     // armor -1 → 0 is a +100% gain (a buff), not -100%.
-    const pct = (n - o) / Math.abs(o) * 100;
+    const pct = ((n - o) / Math.abs(o)) * 100;
     const good = lowerBetter ? pct < 0 : pct > 0;
-    const cls = pct === 0 ? 'flat' : (good ? 'up' : 'down');
-    const sign = pct > 0 ? '+' : '';
+    const cls = pct === 0 ? "flat" : good ? "up" : "down";
+    const sign = pct > 0 ? "+" : "";
     let num = pct.toFixed(1);
-    if (num.endsWith('.0')) num = num.slice(0, -2);  // 50.0 → 50, 1900.0 → 1900
-    return ' <span class="stat-pct ' + cls + '">' + sign + num + '%</span>';
+    if (num.endsWith(".0")) num = num.slice(0, -2); // 50.0 → 50, 1900.0 → 1900
+    return ' <span class="stat-pct ' + cls + '">' + sign + num + "%</span>";
   }
   function chgHead(patch, date) {
-    return '<div class="stat-chg-head"><span class="chg-patch">' + patch
-         + '</span><span class="chg-date">' + shortDate(date) + '</span></div>';
+    return (
+      '<div class="stat-chg-head"><span class="chg-patch">' +
+      patch +
+      '</span><span class="chg-date">' +
+      shortDate(date) +
+      "</span></div>"
+    );
   }
   // One history entry → its old/new values (display + numeric) + polarity, or
   // null for non-value markers (A added / R removed / P replaced) which carry
@@ -1038,95 +1200,157 @@
   // raw numerics (p5/p6) so the % isn't skewed by thousands formatting.
   function valEntry(p) {
     const k = p[2];
-    if (k === 'V') return { dispOld: p[3], dispNew: p[4], numOld: p[3], numNew: p[4], lb: p[5] === 'lo' };
-    if (k === 'F') return { dispOld: p[4], dispNew: p[5], numOld: p[4], numNew: p[5], lb: p[6] === 'lo' };
-    if (k === 'C') return { dispOld: p[3], dispNew: p[4], numOld: p[5], numNew: p[6], lb: p[7] === 'lo' };
-    if (k === 'N') return { dispOld: p[3], dispNew: p[4], numOld: p[3], numNew: p[4], lb: false };
+    if (k === "V")
+      return {
+        dispOld: p[3],
+        dispNew: p[4],
+        numOld: p[3],
+        numNew: p[4],
+        lb: p[5] === "lo",
+      };
+    if (k === "F")
+      return {
+        dispOld: p[4],
+        dispNew: p[5],
+        numOld: p[4],
+        numNew: p[5],
+        lb: p[6] === "lo",
+      };
+    if (k === "C")
+      return {
+        dispOld: p[3],
+        dispNew: p[4],
+        numOld: p[5],
+        numNew: p[6],
+        lb: p[7] === "lo",
+      };
+    if (k === "N")
+      return {
+        dispOld: p[3],
+        dispNew: p[4],
+        numOld: p[3],
+        numNew: p[4],
+        lb: false,
+      };
     return null;
   }
   // Overall first-observed → today summary, shown at the TOP of the tooltip
   // (above the newest patch) with a divider below. Needs >1 value change;
   // scans past A/R/P markers to the first & last real value entries.
   function netSummary(entries) {
-    const vals = entries.map(e => valEntry(e.split('|'))).filter(Boolean);
-    if (vals.length < 2) return '';
-    const first = vals[0], last = vals[vals.length - 1];
-    const o = meanOf(first.numOld), n = meanOf(last.numNew);
-    if (!isFinite(o) || !isFinite(n) || o === 0) return '';
-    const pct = (n - o) / Math.abs(o) * 100;
+    const vals = entries.map((e) => valEntry(e.split("|"))).filter(Boolean);
+    if (vals.length < 2) return "";
+    const first = vals[0],
+      last = vals[vals.length - 1];
+    const o = meanOf(first.numOld),
+      n = meanOf(last.numNew);
+    if (!isFinite(o) || !isFinite(n) || o === 0) return "";
+    const pct = ((n - o) / Math.abs(o)) * 100;
     // Net 0% (value drifted then returned to its start) is still shown — flat.
-    const cls = pct === 0 ? 'flat' : ((last.lb ? pct < 0 : pct > 0) ? 'up' : 'down');
-    const sign = pct > 0 ? '+' : '';
+    const cls =
+      pct === 0 ? "flat" : (last.lb ? pct < 0 : pct > 0) ? "up" : "down";
+    const sign = pct > 0 ? "+" : "";
     let num = pct.toFixed(1);
-    if (num.endsWith('.0')) num = num.slice(0, -2);
-    return '<div class="stat-net"><span class="stat-net-label">overall</span>'
-         + first.dispOld + ' → ' + last.dispNew
-         + ' <span class="stat-pct ' + cls + '">' + sign + num + '%</span></div>';
+    if (num.endsWith(".0")) num = num.slice(0, -2);
+    return (
+      '<div class="stat-net"><span class="stat-net-label">overall</span>' +
+      first.dispOld +
+      " → " +
+      last.dispNew +
+      ' <span class="stat-pct ' +
+      cls +
+      '">' +
+      sign +
+      num +
+      "%</span></div>"
+    );
   }
   // Parse one entry → { patch, date, line }. Format: patch|date|kind|...parts
   //   V old new pol          stat value change
   //   F label old new pol    ability value change
   //   A name / R name / P old new  ability added / removed / replaced
   function entryParts(e) {
-    const p = e.split('|');
-    const patch = p[0], date = p[1], kind = p[2];
+    const p = e.split("|");
+    const patch = p[0],
+      date = p[1],
+      kind = p[2];
     let line;
-    if (kind === 'A') {
+    if (kind === "A") {
       line = p[3] + ' <span class="chg-tag added">ADDED</span>';
-    } else if (kind === 'R') {
+    } else if (kind === "R") {
       line = p[3] + ' <span class="chg-tag removed">REMOVED</span>';
-    } else if (kind === 'P') {
-      line = p[3] + ' <span class="chg-cycle">⇄</span> ' + p[4]
-           + ' <span class="chg-tag replaced">REPLACED</span>';
-    } else if (kind === 'F') {
-      line = '<span class="chg-label">' + p[3] + ':</span> ' + p[4] + ' → '
-           + p[5] + pctHtml(p[4], p[5], p[6] === 'lo');
-    } else if (kind === 'N') {
+    } else if (kind === "P") {
+      line =
+        p[3] +
+        ' <span class="chg-cycle">⇄</span> ' +
+        p[4] +
+        ' <span class="chg-tag replaced">REPLACED</span>';
+    } else if (kind === "F") {
+      line =
+        '<span class="chg-label">' +
+        p[3] +
+        ":</span> " +
+        p[4] +
+        " → " +
+        p[5] +
+        pctHtml(p[4], p[5], p[6] === "lo");
+    } else if (kind === "N") {
       // No-percentage value change (computed columns): show old → new only.
-      line = p[3] + ' → ' + p[4];
-    } else if (kind === 'C') {
+      line = p[3] + " → " + p[4];
+    } else if (kind === "C") {
       // Computed column: pretty short display (p3→p4) with a % delta derived
       // from the raw values (p5, p6) so scaling never skews it. p7 = polarity.
-      line = p[3] + ' → ' + p[4] + pctHtml(p[5], p[6], p[7] === 'lo');
+      line = p[3] + " → " + p[4] + pctHtml(p[5], p[6], p[7] === "lo");
     } else {
       // 'V' stat value (patch|date|V|old|new|pol), or legacy patch|date|old|new
-      const isV = kind === 'V';
+      const isV = kind === "V";
       const ov = isV ? p[3] : p[2];
       const nv = isV ? p[4] : p[3];
-      line = ov + ' → ' + nv + pctHtml(ov, nv, isV && p[5] === 'lo');
+      line = ov + " → " + nv + pctHtml(ov, nv, isV && p[5] === "lo");
     }
     return { patch: patch, date: date, line: line };
   }
 
   function show(td) {
-    const entries = (td.dataset.hist || '').split(';').filter(Boolean);
-    const name = td.dataset.name || '';
+    const entries = (td.dataset.hist || "").split(";").filter(Boolean);
+    const name = td.dataset.name || "";
     if (!entries.length && !name) return;
     const el = ensureTip();
     // Group changes from the same patch under one header.
     const groups = [];
-    entries.forEach(e => {
+    entries.forEach((e) => {
       const ep = entryParts(e);
       const g = groups[groups.length - 1];
       if (g && g.patch === ep.patch) g.lines.push(ep.line);
       else groups.push({ patch: ep.patch, date: ep.date, lines: [ep.line] });
     });
-    groups.reverse();  // newest patch on top, oldest at the bottom
+    groups.reverse(); // newest patch on top, oldest at the bottom
     // Ability name as a centered header above the changelog (if any).
-    const nameHtml = name ? '<div class="abil-tip-name">' + name + '</div>' : '';
+    const nameHtml = name
+      ? '<div class="abil-tip-name">' + name + "</div>"
+      : "";
     // Net first→today summary at the very top (gold test: cells flagged data-net).
-    const netHtml = (td.dataset.net !== undefined) ? netSummary(entries) : '';
-    el.innerHTML = nameHtml + netHtml + groups.map(g =>
-      '<div class="stat-chg">' + chgHead(g.patch, g.date)
-      + g.lines.map(l => '<div class="stat-chg-line">' + l + '</div>').join('')
-      + '</div>'
-    ).join('');
-    el.classList.add('is-visible');
+    const netHtml = td.dataset.net !== undefined ? netSummary(entries) : "";
+    el.innerHTML =
+      nameHtml +
+      netHtml +
+      groups
+        .map(
+          (g) =>
+            '<div class="stat-chg">' +
+            chgHead(g.patch, g.date) +
+            g.lines
+              .map((l) => '<div class="stat-chg-line">' + l + "</div>")
+              .join("") +
+            "</div>",
+        )
+        .join("");
+    el.classList.add("is-visible");
     const r = td.getBoundingClientRect();
     const tr = el.getBoundingClientRect();
     let left = r.left + r.width / 2 - tr.width / 2;
     left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
-    el.style.left = left + 'px';
+    el.style.left = left + "px";
     // Vertical placement: prefer above the cell, flip below if it would clip
     // the top. For tall tooltips (taller than the space on either side —
     // e.g. Guardian Greaves' long changelog) clamp into the viewport so the
@@ -1137,48 +1361,68 @@
     const spaceBelow = window.innerHeight - r.bottom - margin;
     let top;
     if (tr.height <= spaceAbove) {
-      top = r.top - tr.height - margin;            // fits above
+      top = r.top - tr.height - margin; // fits above
     } else if (tr.height <= spaceBelow) {
-      top = r.bottom + margin;                     // fits below
+      top = r.bottom + margin; // fits below
     } else {
       // Doesn't fit either side — pin to whichever side has more room and
       // let it clamp to the viewport edge (CSS caps its height).
-      top = spaceAbove >= spaceBelow ? margin : (r.bottom + margin);
+      top = spaceAbove >= spaceBelow ? margin : r.bottom + margin;
     }
-    top = Math.max(margin, Math.min(top, window.innerHeight - tr.height - margin));
-    if (top < margin) top = margin;                // last-resort clamp
-    el.style.top = top + 'px';
+    top = Math.max(
+      margin,
+      Math.min(top, window.innerHeight - tr.height - margin),
+    );
+    if (top < margin) top = margin; // last-resort clamp
+    el.style.top = top + "px";
   }
-  function hide() { if (tip) tip.classList.remove('is-visible'); }
+  function hide() {
+    if (tip) tip.classList.remove("is-visible");
+  }
 
   // Event delegation (not per-cell binding): cells can be removed/re-inserted
   // by the ability-merge logic, so listeners bound at load would be lost on
   // the restored cells. Delegation on the table covers any current cell.
-  const SEL = 'td[data-hist], td[data-name], .mr-const[data-hist]';
+  const SEL = "td[data-hist], td[data-name], .mr-const[data-hist]";
   // Bind to every table OR standalone history-chip that may carry data-hist:
   // creeps-table (neutral creeps), mr-table (mana items), and the constants
   // chips in the page blurb.
   const targets = [
-    ...document.querySelectorAll('.creeps-table, .mr-table'),
-    ...document.querySelectorAll('.mr-const[data-hist]'),
+    ...document.querySelectorAll(".creeps-table, .mr-table"),
+    ...document.querySelectorAll(".mr-const[data-hist]"),
   ];
   let curTd = null;
-  targets.forEach(tbl => {
-    tbl.addEventListener('mouseover', e => {
+  targets.forEach((tbl) => {
+    tbl.addEventListener("mouseover", (e) => {
       // A `?` qhint badge inside a history cell has its own tooltip — let it
       // win and suppress the cell's changelog popup while hovering it.
-      if (e.target.closest('.qhint')) { if (curTd) { curTd = null; hide(); } return; }
+      if (e.target.closest(".qhint")) {
+        if (curTd) {
+          curTd = null;
+          hide();
+        }
+        return;
+      }
       const td = e.target.closest(SEL);
-      if (td && td !== curTd) { curTd = td; show(td); }
+      if (td && td !== curTd) {
+        curTd = td;
+        show(td);
+      }
     });
-    tbl.addEventListener('mouseout', e => {
+    tbl.addEventListener("mouseout", (e) => {
       const td = e.target.closest(SEL);
       if (!td) return;
-      const to = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(SEL);
-      if (to !== td) { curTd = null; hide(); }
+      const to =
+        e.relatedTarget &&
+        e.relatedTarget.closest &&
+        e.relatedTarget.closest(SEL);
+      if (to !== td) {
+        curTd = null;
+        hide();
+      }
     });
   });
-  window.addEventListener('scroll', hide, { passive: true });
+  window.addEventListener("scroll", hide, { passive: true });
 })();
 
 // ---- CREEPS / UNIT ABILITIES: size the scroll box to fit the viewport ----
@@ -1187,10 +1431,10 @@
 // measures the category row's rendered height into --cat-row-h, which the
 // two-row sticky header offset (col-row top: calc(--cat-row-h - 2px)) needs —
 // CSS calc can't read it.
-(function() {
-  const box = document.querySelector('.creeps-page .creeps-scroll');
+(function () {
+  const box = document.querySelector(".creeps-page .creeps-scroll");
   if (!box) return;
-  const catRow = box.querySelector('table thead tr.cat-row');
+  const catRow = box.querySelector("table thead tr.cat-row");
   function size() {
     // CSS handles the box's max-height now: `calc(100vh - var(--site-nav-h)
     // - 12px)` keeps it sized to fit the viewport regardless of scroll
@@ -1207,24 +1451,25 @@
     // guaranteeing the two sticky rows overlap regardless of fractional
     // heights — kills the scroll-time gap where body cells showed through.
     document.documentElement.style.setProperty(
-      '--cat-row-h',
-      (catRow ? Math.floor(catRow.getBoundingClientRect().height) : 0) + 'px');
+      "--cat-row-h",
+      (catRow ? Math.floor(catRow.getBoundingClientRect().height) : 0) + "px",
+    );
   }
   size();
-  window.addEventListener('resize', size, { passive: true });
+  window.addEventListener("resize", size, { passive: true });
   // Recompute after images (the helmet logo grows the nav) finish loading —
   // an early measurement underestimates the nav height and lets the box run
   // past the viewport, which makes the page scroll and the toolbar drift.
-  window.addEventListener('load', size);
-  const logo = document.querySelector('.nav-brand-logo');
-  if (logo && !logo.complete) logo.addEventListener('load', size);
+  window.addEventListener("load", size);
+  const logo = document.querySelector(".nav-brand-logo");
+  if (logo && !logo.complete) logo.addEventListener("load", size);
 })();
 
 // ---- CREEPS TABLE: pin identity columns on horizontal scroll ----
-(function() {
-  const table = document.querySelector('.creeps-table');
+(function () {
+  const table = document.querySelector(".creeps-table");
   if (!table) return;
-  const firstRow = table.querySelector('tbody tr');
+  const firstRow = table.querySelector("tbody tr");
   if (!firstRow) return;
 
   // Body identity cells are the first three: lvl(0), icon(1), name(2).
@@ -1234,44 +1479,49 @@
   function applyLeftOffsets() {
     const tds = [...firstRow.children];
     if (tds.length < 3) return;
-    const wLvl  = tds[0].getBoundingClientRect().width;
+    const wLvl = tds[0].getBoundingClientRect().width;
     const wIcon = tds[1].getBoundingClientRect().width;
-    const lefts = [0, wLvl, wLvl + wIcon];           // lvl, icon, name
+    const lefts = [0, wLvl, wLvl + wIcon]; // lvl, icon, name
 
     // Body rows. Most rows have all 3 sticky identity cells (lvl, icon, name).
     // On the Unit Abilities page, a multi-ability unit rowspans its lvl+icon
     // cells, so continuation rows carry ONLY the ability sticky cell — which
     // belongs at the 3rd offset. Assign by how many sticky cells the row has.
-    table.querySelectorAll('tbody tr').forEach(tr => {
-      const sc = [...tr.children].filter(c => c.classList.contains('sticky-col'));
+    table.querySelectorAll("tbody tr").forEach((tr) => {
+      const sc = [...tr.children].filter((c) =>
+        c.classList.contains("sticky-col"),
+      );
       // Creeps: 3 sticky cells (lvl, icon, name). Unit Abilities: 2 (lvl, unit).
       // UA continuation rows (rowspanned lvl+unit) have 0 → nothing to pin.
-      sc.forEach((cell, i) => { cell.style.left = lefts[i] + 'px'; });
+      sc.forEach((cell, i) => {
+        cell.style.left = lefts[i] + "px";
+      });
     });
     // Header: lvl th at 0, Юнит th (covers icon+name) at wLvl.
-    const headStickies = table.querySelectorAll('thead th.sticky-col');
-    if (headStickies[0]) headStickies[0].style.left = '0px';
-    if (headStickies[1]) headStickies[1].style.left = wLvl + 'px';
+    const headStickies = table.querySelectorAll("thead th.sticky-col");
+    if (headStickies[0]) headStickies[0].style.left = "0px";
+    if (headStickies[1]) headStickies[1].style.left = wLvl + "px";
   }
 
   applyLeftOffsets();
-  window.addEventListener('resize', applyLeftOffsets, { passive: true });
+  window.addEventListener("resize", applyLeftOffsets, { passive: true });
 
   // Click a cell to mark its row (single-select, no animation). Clicking
   // another row moves the mark; clicking the marked row again clears it.
   // Matches the simpler highlight behaviour used by the Mana Items table —
   // multi-select + fade-flash earlier here was hard to read once a few
   // rows were marked.
-  const tbody = table.querySelector('tbody');
+  const tbody = table.querySelector("tbody");
   if (tbody) {
-    tbody.addEventListener('click', e => {
-      if (e.target.closest('a, img')) return;
-      const tr = e.target.closest('tr');
+    tbody.addEventListener("click", (e) => {
+      if (e.target.closest("a, img")) return;
+      const tr = e.target.closest("tr");
       if (!tr) return;
-      const was = tr.classList.contains('row-marked');
-      tbody.querySelectorAll('tr.row-marked').forEach(r =>
-        r.classList.remove('row-marked', 'row-flash'));
-      if (!was) tr.classList.add('row-marked');
+      const was = tr.classList.contains("row-marked");
+      tbody
+        .querySelectorAll("tr.row-marked")
+        .forEach((r) => r.classList.remove("row-marked", "row-flash"));
+      if (!was) tr.classList.add("row-marked");
     });
   }
 
@@ -1279,17 +1529,17 @@
   // It lives in .creeps-page (non-scrolling), so its border + shadow keep
   // repainting during scroll — unlike box-shadow on the sticky cells,
   // which Chrome drops mid-scroll.
-  const scroller = table.closest('.creeps-scroll');
-  const page = table.closest('.creeps-page');
-  const frame = page && page.querySelector('.sticky-frame');       // vertical
+  const scroller = table.closest(".creeps-scroll");
+  const page = table.closest(".creeps-page");
+  const frame = page && page.querySelector(".sticky-frame"); // vertical
 
   function positionFrames() {
     if (!scroller || !page) return;
     const firstTds = [...firstRow.children];
     if (firstTds.length < 3) return;
-    const pageR  = page.getBoundingClientRect();
-    const scrR   = scroller.getBoundingClientRect();
-    const nameR  = firstTds[2].getBoundingClientRect();  // right edge of pinned block
+    const pageR = page.getBoundingClientRect();
+    const scrR = scroller.getBoundingClientRect();
+    const nameR = firstTds[2].getBoundingClientRect(); // right edge of pinned block
     // Anchor to the thead's LIVE bottom edge rather than a fixed header height:
     // the blurb + toolbar sit inside the scroll box above the table, so the
     // thead isn't at the box top at rest — measuring its real bottom keeps the
@@ -1300,19 +1550,19 @@
     // Vertical divider: at the right edge of the frozen lvl/unit columns,
     // starting BELOW the sticky column header and spanning the rest of height.
     if (frame) {
-      frame.style.left   = (nameR.right - pageR.left) + 'px';
-      frame.style.top    = (headBottom - pageR.top) + 'px';
-      frame.style.height = (scrR.bottom - headBottom) + 'px';
-      frame.style.width  = '0px';
+      frame.style.left = nameR.right - pageR.left + "px";
+      frame.style.top = headBottom - pageR.top + "px";
+      frame.style.height = scrR.bottom - headBottom + "px";
+      frame.style.width = "0px";
     }
   }
 
   if (scroller) {
     const onScroll = () => {
       const sx = scroller.scrollLeft > 0;
-      scroller.classList.toggle('scrolled', sx);
+      scroller.classList.toggle("scrolled", sx);
       positionFrames();
-      if (frame) frame.classList.toggle('visible', sx);
+      if (frame) frame.classList.toggle("visible", sx);
     };
     // rAF-throttle: positionFrames() reads layout (getBoundingClientRect),
     // so running it on every raw scroll event caused jank.
@@ -1321,37 +1571,44 @@
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        try { onScroll(); } finally { ticking = false; }
+        try {
+          onScroll();
+        } finally {
+          ticking = false;
+        }
       });
     };
-    scroller.addEventListener('scroll', onScrollRaf, { passive: true });
-    window.addEventListener('resize', onScrollRaf, { passive: true });
+    scroller.addEventListener("scroll", onScrollRaf, { passive: true });
+    window.addEventListener("resize", onScrollRaf, { passive: true });
 
     // Super-category header colspans must equal the number of CURRENTLY
     // visible leaf columns in each category — otherwise the static (Expanded)
     // colspans misalign with the collapsed columns in Standard view.
     function recomputeCatColspans() {
-      document.querySelectorAll('.cat-head[data-cat]').forEach(head => {
+      document.querySelectorAll(".cat-head[data-cat]").forEach((head) => {
         let span = 0;
-        document.querySelectorAll('.col-row th[data-cat="' + head.dataset.cat + '"]')
-          .forEach(th => { if (th.offsetParent !== null) span += th.colSpan || 1; });
+        document
+          .querySelectorAll('.col-row th[data-cat="' + head.dataset.cat + '"]')
+          .forEach((th) => {
+            if (th.offsetParent !== null) span += th.colSpan || 1;
+          });
         head.colSpan = span || 1;
       });
     }
 
     // View toggle (Standard / Expanded) via the calendar-style select.
-    const viewSel = document.getElementById('view-mode');
+    const viewSel = document.getElementById("view-mode");
     if (viewSel) {
       const applyView = () => {
-        const expanded = viewSel.value === 'expanded';
-        table.classList.toggle('mode-standard', !expanded);
-        table.classList.toggle('mode-expanded', expanded);
+        const expanded = viewSel.value === "expanded";
+        table.classList.toggle("mode-standard", !expanded);
+        table.classList.toggle("mode-expanded", expanded);
         recomputeCatColspans();
-        applyLeftOffsets();   // column widths changed → recompute pinned offsets
+        applyLeftOffsets(); // column widths changed → recompute pinned offsets
         onScroll();
       };
-      viewSel.addEventListener('change', applyView);
-      applyView();            // initial pass (Standard)
+      viewSel.addEventListener("change", applyView);
+      applyView(); // initial pass (Standard)
     } else {
       recomputeCatColspans();
     }
@@ -1359,19 +1616,18 @@
   }
 })();
 
-
 // ---- Body-level tooltip for `.qhint` badges ----
 // CSS `::after` tooltips are clipped by .creeps-scroll's overflow:auto and by
 // the sticky header. Render a single shared <div> at <body> level, positioned
 // via fixed coordinates relative to the hovered badge.
-(function() {
-  const tip = document.createElement('div');
-  tip.className = 'qhint-tip';
-  tip.setAttribute('role', 'tooltip');
+(function () {
+  const tip = document.createElement("div");
+  tip.className = "qhint-tip";
+  tip.setAttribute("role", "tooltip");
   document.body.appendChild(tip);
 
   function show(target) {
-    const text = target.getAttribute('data-tooltip') || '';
+    const text = target.getAttribute("data-tooltip") || "";
     if (!text) return;
     // Tooltip content is author-written (UA_HEAD_HINTS / ABIL_MANUAL) — using
     // innerHTML lets header tooltips include coloured legend spans.
@@ -1380,40 +1636,43 @@
     // name" rather than mystery raw text.
     tip.innerHTML = text.replace(
       /%([A-Za-z0-9_]+)%/g,
-      '<span class="abil-var">$1</span>');
-    tip.classList.add('is-visible');
+      '<span class="abil-var">$1</span>',
+    );
+    tip.classList.add("is-visible");
     // Position above the badge; flip below if it would overflow the viewport top.
     const r = target.getBoundingClientRect();
     const tipRect = tip.getBoundingClientRect();
     let left = r.left + r.width / 2 - tipRect.width / 2;
     left = Math.max(6, Math.min(left, window.innerWidth - tipRect.width - 6));
     let top = r.top - tipRect.height - 8;
-    if (top < 6) top = r.bottom + 8;            // not enough room above → drop below
-    tip.style.left = left + 'px';
-    tip.style.top = top + 'px';
+    if (top < 6) top = r.bottom + 8; // not enough room above → drop below
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
   }
-  function hide() { tip.classList.remove('is-visible'); }
+  function hide() {
+    tip.classList.remove("is-visible");
+  }
 
   // Selector matches the original `?` badge plus any element that just opts
   // into the body-level tooltip via `.abil-ico-hint` (currently used on
   // ability icons in the Unit Abilities table).
-  const TIP_SEL = '.qhint, .abil-ico-hint';
-  document.addEventListener('mouseover', (e) => {
+  const TIP_SEL = ".qhint, .abil-ico-hint";
+  document.addEventListener("mouseover", (e) => {
     const t = e.target.closest(TIP_SEL);
     if (t) show(t);
   });
-  document.addEventListener('mouseout', (e) => {
+  document.addEventListener("mouseout", (e) => {
     if (e.target.closest(TIP_SEL)) hide();
   });
-  document.addEventListener('focusin', (e) => {
+  document.addEventListener("focusin", (e) => {
     const t = e.target.closest(TIP_SEL);
     if (t) show(t);
   });
-  document.addEventListener('focusout', (e) => {
+  document.addEventListener("focusout", (e) => {
     if (e.target.closest(TIP_SEL)) hide();
   });
   // Hide on any scroll (the badge's absolute coords change).
-  window.addEventListener('scroll', hide, true);
+  window.addEventListener("scroll", hide, true);
 })();
 
 // ---- Centre the row jumped to via #anchor (cross-page or same-page) ----
@@ -1423,7 +1682,7 @@
 // the top of the viewport. Manually centre on BOTH axes: scroll the inner
 // container so the row is mid-box, then scroll the window so the box's
 // mid-point aligns with the viewport centre.
-(function() {
+(function () {
   function centerHash() {
     const h = location.hash.slice(1);
     if (!h) return;
@@ -1432,41 +1691,45 @@
     // Give the jumped-to row the SAME selected style as a manual row click
     // (gold frame), replacing the old yellow :target flash. Single-select:
     // clear any previously marked row in the same table first.
-    if (el.tagName === 'TR') {
-      const tb = el.closest('tbody');
-      if (tb) tb.querySelectorAll('tr.row-marked').forEach(r =>
-        r.classList.remove('row-marked', 'row-flash'));
-      el.classList.add('row-marked');
+    if (el.tagName === "TR") {
+      const tb = el.closest("tbody");
+      if (tb)
+        tb.querySelectorAll("tr.row-marked").forEach((r) =>
+          r.classList.remove("row-marked", "row-flash"),
+        );
+      el.classList.add("row-marked");
     }
     // Double rAF: lets table layout, sticky header, and any view-toggle
     // reorderings settle before measuring rects.
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const inner = el.closest('.creeps-scroll');
-      if (inner) {
-        const ir = inner.getBoundingClientRect();
-        const er = el.getBoundingClientRect();
-        // Account for the sticky <thead> overlapping the inner box's top —
-        // subtract its height so the row centres in the VISIBLE area below
-        // the frozen header, not in the raw box.
-        const thead = inner.querySelector('thead');
-        const headH = thead ? thead.getBoundingClientRect().height : 0;
-        const visibleTop = ir.top + headH;
-        const visibleCenter = visibleTop + (ir.bottom - visibleTop) / 2;
-        const elCenter = er.top + er.height / 2;
-        inner.scrollTop += (elCenter - visibleCenter);
-      }
-      // Now align the row with the window viewport centre (page-level scroll).
-      const er2 = el.getBoundingClientRect();
-      const targetY = er2.top + er2.height / 2;
-      window.scrollBy({
-        top: targetY - window.innerHeight / 2,
-        behavior: 'smooth',
-      });
-    }));
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        const inner = el.closest(".creeps-scroll");
+        if (inner) {
+          const ir = inner.getBoundingClientRect();
+          const er = el.getBoundingClientRect();
+          // Account for the sticky <thead> overlapping the inner box's top —
+          // subtract its height so the row centres in the VISIBLE area below
+          // the frozen header, not in the raw box.
+          const thead = inner.querySelector("thead");
+          const headH = thead ? thead.getBoundingClientRect().height : 0;
+          const visibleTop = ir.top + headH;
+          const visibleCenter = visibleTop + (ir.bottom - visibleTop) / 2;
+          const elCenter = er.top + er.height / 2;
+          inner.scrollTop += elCenter - visibleCenter;
+        }
+        // Now align the row with the window viewport centre (page-level scroll).
+        const er2 = el.getBoundingClientRect();
+        const targetY = er2.top + er2.height / 2;
+        window.scrollBy({
+          top: targetY - window.innerHeight / 2,
+          behavior: "smooth",
+        });
+      }),
+    );
   }
-  window.addEventListener('hashchange', centerHash);
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', centerHash);
+  window.addEventListener("hashchange", centerHash);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", centerHash);
   } else {
     centerHash();
   }
@@ -1476,49 +1739,49 @@
   // cell sits in (visual "+" through the table, like Liquipedia crosstable).
   // Attaches to every <table> on the page after DOM ready.
   function wireCrossHover(table) {
-    if (table.dataset.crossWired === '1') return;
-    table.dataset.crossWired = '1';
+    if (table.dataset.crossWired === "1") return;
+    table.dataset.crossWired = "1";
     let activeRow = null;
     const colCells = [];
     const clear = () => {
       if (activeRow) {
-        activeRow.classList.remove('cross-row');
+        activeRow.classList.remove("cross-row");
         activeRow = null;
       }
-      colCells.forEach(c => c.classList.remove('cross-col'));
+      colCells.forEach((c) => c.classList.remove("cross-col"));
       colCells.length = 0;
     };
-    table.addEventListener('mouseover', e => {
+    table.addEventListener("mouseover", (e) => {
       // Only TD cells trigger / receive the cross-highlight. Hovering a TH
       // (header) shouldn't sweep the row beneath it and shouldn't paint
       // the column band — the heatmap on data cells is the only visual
       // intent there.
-      const cell = e.target.closest('td');
+      const cell = e.target.closest("td");
       if (!cell || !table.contains(cell)) return;
       const row = cell.parentElement;
-      if (row.tagName !== 'TR') return;
+      if (row.tagName !== "TR") return;
       const idx = cell.cellIndex;
-      if (row === activeRow &&
-          colCells.length && colCells[0].cellIndex === idx) return;
+      if (row === activeRow && colCells.length && colCells[0].cellIndex === idx)
+        return;
       clear();
       activeRow = row;
-      row.classList.add('cross-row');
+      row.classList.add("cross-row");
       // Walk only TBODY rows — TH cells in thead never get cross-col.
-      table.querySelectorAll('tbody tr').forEach(tr => {
+      table.querySelectorAll("tbody tr").forEach((tr) => {
         const c = tr.cells && tr.cells[idx];
         if (c) {
-          c.classList.add('cross-col');
+          c.classList.add("cross-col");
           colCells.push(c);
         }
       });
     });
-    table.addEventListener('mouseleave', clear);
+    table.addEventListener("mouseleave", clear);
   }
   function wireAllTables() {
-    document.querySelectorAll('table').forEach(wireCrossHover);
+    document.querySelectorAll("table").forEach(wireCrossHover);
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', wireAllTables);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wireAllTables);
   } else {
     wireAllTables();
   }
@@ -1528,90 +1791,99 @@
 // The toolbar / view / blurb on table pages all scroll away with the page;
 // only the site nav + table category headers stay pinned. The thead pins
 // directly under the nav, so all we need to publish is its live height.
-(function() {
-  const nav = document.querySelector('nav.top-nav');
+(function () {
+  const nav = document.querySelector("nav.top-nav");
   if (!nav) return;
   function recalc() {
     const navH = nav.getBoundingClientRect().height;
     const root = document.documentElement.style;
-    root.setProperty('--site-nav-h', navH + 'px');
-    root.setProperty('--mr-thead-top', navH + 'px');
+    root.setProperty("--site-nav-h", navH + "px");
+    root.setProperty("--mr-thead-top", navH + "px");
   }
   recalc();
-  window.addEventListener('resize', recalc, { passive: true });
-  window.addEventListener('load', recalc);
+  window.addEventListener("resize", recalc, { passive: true });
+  window.addEventListener("load", recalc);
 })();
 
 // ---- MANA REGEN TABLE: simple sortable ----
 // Plain sort by data-sort attribute on each <td>. No row grouping / level
 // collapse / ability merging — the table is flat, so the existing creeps
 // sort would over-engineer it.
-(function() {
-  const tables = document.querySelectorAll('.mr-table');
-  tables.forEach(table => {
-    const tbody = table.querySelector('tbody');
-    const headers = [...table.querySelectorAll('thead th.sortable')];
+(function () {
+  const tables = document.querySelectorAll(".mr-table");
+  tables.forEach((table) => {
+    const tbody = table.querySelector("tbody");
+    const headers = [...table.querySelectorAll("thead th.sortable")];
     if (!tbody || !headers.length) return;
 
     function cellVal(tr, colIdx) {
       const td = tr.children[colIdx];
       if (!td) return null;
-      if (td.dataset.sort !== undefined && td.dataset.sort !== '') {
+      if (td.dataset.sort !== undefined && td.dataset.sort !== "") {
         const n = parseFloat(td.dataset.sort);
         return isNaN(n) ? td.dataset.sort.toLowerCase() : n;
       }
       const t = td.textContent.trim();
       if (!t) return null;
-      const m = t.replace(',', '.').match(/-?\d+(?:\.\d+)?/);
+      const m = t.replace(",", ".").match(/-?\d+(?:\.\d+)?/);
       return m ? parseFloat(m[0]) : t.toLowerCase();
     }
 
     // Snapshot the server-rendered order so the neutral state can restore it.
-    const originalOrder = [...tbody.querySelectorAll('tr')];
+    const originalOrder = [...tbody.querySelectorAll("tr")];
     // The default-sorted column is marked .sort-desc in the markup, so the
     // 3-state cycle starts already on that column at "descending".
-    let sortCol = headers.findIndex(th =>
-      th.classList.contains('sort-asc') || th.classList.contains('sort-desc'));
+    let sortCol = headers.findIndex(
+      (th) =>
+        th.classList.contains("sort-asc") || th.classList.contains("sort-desc"),
+    );
     if (sortCol === -1) sortCol = null;
     // sortState: 0 = neutral, 1 = descending, 2 = ascending.
-    let sortState = sortCol !== null
-      ? (headers[sortCol].classList.contains('sort-asc') ? 2 : 1)
-      : 0;
+    let sortState =
+      sortCol !== null
+        ? headers[sortCol].classList.contains("sort-asc")
+          ? 2
+          : 1
+        : 0;
 
     function sortBy(colIdx, dir) {
-      const rows = [...tbody.querySelectorAll('tr')];
+      const rows = [...tbody.querySelectorAll("tr")];
       rows.sort((a, b) => {
         const va = cellVal(a, colIdx);
         const vb = cellVal(b, colIdx);
         if (va == null && vb == null) return 0;
-        if (va == null) return 1;          // empties sink
+        if (va == null) return 1; // empties sink
         if (vb == null) return -1;
-        if (typeof va === 'number' && typeof vb === 'number') {
-          return dir === 'asc' ? va - vb : vb - va;
+        if (typeof va === "number" && typeof vb === "number") {
+          return dir === "asc" ? va - vb : vb - va;
         }
-        const sa = String(va), sb = String(vb);
-        return dir === 'asc' ? sa.localeCompare(sb) : sb.localeCompare(sa);
+        const sa = String(va),
+          sb = String(vb);
+        return dir === "asc" ? sa.localeCompare(sb) : sb.localeCompare(sa);
       });
-      rows.forEach(r => tbody.appendChild(r));
+      rows.forEach((r) => tbody.appendChild(r));
     }
 
     headers.forEach((th, i) => {
-      th.addEventListener('click', () => {
+      th.addEventListener("click", () => {
         // 3-state cycle per header: neutral → descending → ascending → neutral.
         if (sortCol === i) sortState = (sortState + 1) % 3;
-        else { sortCol = i; sortState = 1; }   // first click = descending
-        headers.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+        else {
+          sortCol = i;
+          sortState = 1;
+        } // first click = descending
+        headers.forEach((h) => h.classList.remove("sort-asc", "sort-desc"));
         if (sortState === 0) {
           // Neutral — restore the original server-rendered order.
           sortCol = null;
-          originalOrder.forEach(r => tbody.appendChild(r));
+          originalOrder.forEach((r) => tbody.appendChild(r));
         } else {
-          const dir = sortState === 1 ? 'desc' : 'asc';
-          th.classList.add(dir === 'asc' ? 'sort-asc' : 'sort-desc');
+          const dir = sortState === 1 ? "desc" : "asc";
+          th.classList.add(dir === "asc" ? "sort-asc" : "sort-desc");
           sortBy(i, dir);
         }
         // Heatmap follows the new row order / visible set.
-        window.dispatchEvent(new CustomEvent('mr:filter-changed'));
+        window.dispatchEvent(new CustomEvent("mr:filter-changed"));
       });
     });
   });
@@ -1621,33 +1893,33 @@
 // Hides every <tr.mr-active-row> when checked. Heatmap recomputes via the
 // shared `mr:filter-changed` channel so column gradients reflect the
 // currently-visible row set.
-(function() {
-  const toggle = document.getElementById('mr-hide-active');
+(function () {
+  const toggle = document.getElementById("mr-hide-active");
   if (!toggle) return;
   const apply = () => {
-    document.querySelectorAll('.mr-active-row').forEach(tr => {
-      tr.classList.toggle('mr-hide-active', toggle.checked);
+    document.querySelectorAll(".mr-active-row").forEach((tr) => {
+      tr.classList.toggle("mr-hide-active", toggle.checked);
     });
-    window.dispatchEvent(new CustomEvent('mr:filter-changed'));
+    window.dispatchEvent(new CustomEvent("mr:filter-changed"));
   };
-  toggle.addEventListener('change', apply);
+  toggle.addEventListener("change", apply);
 })();
 
 // ---- MANA ITEMS: per-column conditional formatting ----
 // For every column whose <th data-direction> is set, scan all visible cells
 // and paint a faint pastel gradient — green at the "good" end, red at the
 // "bad" end. Pure visual aid; doesn't alter values or sort order.
-(function() {
-  const table = document.querySelector('.mr-table');
+(function () {
+  const table = document.querySelector(".mr-table");
   if (!table) return;
-  const headers = [...table.querySelectorAll('thead th')];
+  const headers = [...table.querySelectorAll("thead th")];
 
   function applyHeatmap() {
     // Respect the on-page Heatmap switch — when off, all cells stay flat.
     // (The toggle IIFE separately strips any inline backgrounds we set.)
-    const toggle = document.getElementById('mr-heatmap-toggle');
+    const toggle = document.getElementById("mr-heatmap-toggle");
     if (toggle && !toggle.checked) return;
-    const rows = [...table.querySelectorAll('tbody tr')];
+    const rows = [...table.querySelectorAll("tbody tr")];
     headers.forEach((th, colIdx) => {
       const direction = th.dataset.direction;
       if (!direction) return;
@@ -1655,14 +1927,14 @@
       // hidden by the price filter (.mr-filtered-out) are also excluded so
       // colours always reflect the current visible set.
       const cells = [];
-      rows.forEach(tr => {
-        if (tr.hasAttribute('hidden')) return;
-        if (tr.classList.contains('mr-filtered-out')) return;
-        if (tr.classList.contains('mr-hide-active')) return;
+      rows.forEach((tr) => {
+        if (tr.hasAttribute("hidden")) return;
+        if (tr.classList.contains("mr-filtered-out")) return;
+        if (tr.classList.contains("mr-hide-active")) return;
         const td = tr.children[colIdx];
         if (!td) return;
-        td.style.backgroundColor = '';        // reset previous paint
-        if (td.querySelector('.ua-dash')) return;
+        td.style.backgroundColor = ""; // reset previous paint
+        if (td.querySelector(".ua-dash")) return;
         const v = parseFloat(td.dataset.sort);
         if (isNaN(v) || v === 0) return;
         cells.push({ td, v });
@@ -1677,47 +1949,47 @@
       const rankMap = new Map();
       sorted.forEach((c, i) => rankMap.set(c, i));
       const last = sorted.length - 1;
-      cells.forEach(c => {
-        let t = rankMap.get(c) / last;     // [0, 1] by rank
-        if (direction === 'lower') t = 1 - t;
+      cells.forEach((c) => {
+        let t = rankMap.get(c) / last; // [0, 1] by rank
+        if (direction === "lower") t = 1 - t;
         // 0 → red, 60 → amber, 120 → green. Keep saturation + alpha
         // moderate so cross-hover darkening still reads on top.
         const hue = Math.round(t * 120);
-        c.td.style.backgroundColor =
-          `hsla(${hue}, 60%, 50%, 0.22)`;
+        c.td.style.backgroundColor = `hsla(${hue}, 60%, 50%, 0.22)`;
       });
     });
   }
   applyHeatmap();
   // Filter / sort events from sibling IIFEs trigger a recompute.
-  window.addEventListener('mr:filter-changed', applyHeatmap);
+  window.addEventListener("mr:filter-changed", applyHeatmap);
 })();
 
 // ---- MANA ITEMS: click row to highlight (yellow). Click again to deselect. ----
-(function() {
-  const table = document.querySelector('.mr-table');
+(function () {
+  const table = document.querySelector(".mr-table");
   if (!table) return;
-  table.addEventListener('click', e => {
-    const tr = e.target.closest('tbody tr');
+  table.addEventListener("click", (e) => {
+    const tr = e.target.closest("tbody tr");
     if (!tr || !table.contains(tr)) return;
-    const was = tr.classList.contains('mr-row-selected');
-    table.querySelectorAll('tr.mr-row-selected').forEach(r =>
-      r.classList.remove('mr-row-selected'));
-    if (!was) tr.classList.add('mr-row-selected');
+    const was = tr.classList.contains("mr-row-selected");
+    table
+      .querySelectorAll("tr.mr-row-selected")
+      .forEach((r) => r.classList.remove("mr-row-selected"));
+    if (!was) tr.classList.add("mr-row-selected");
   });
 })();
 
 // ---- MANA ITEMS: Price min/max filter ----
-(function() {
-  const table = document.querySelector('.mr-table');
+(function () {
+  const table = document.querySelector(".mr-table");
   if (!table) return;
-  const minIn = document.getElementById('mr-price-min');
-  const maxIn = document.getElementById('mr-price-max');
-  const clear = document.getElementById('mr-price-clear');
+  const minIn = document.getElementById("mr-price-min");
+  const maxIn = document.getElementById("mr-price-max");
+  const clear = document.getElementById("mr-price-clear");
   if (!minIn || !maxIn) return;
   // Find the Price column index from the header (data-col="cost").
-  const headers = [...table.querySelectorAll('thead th')];
-  const priceIdx = headers.findIndex(th => th.dataset.col === 'cost');
+  const headers = [...table.querySelectorAll("thead th")];
+  const priceIdx = headers.findIndex((th) => th.dataset.col === "cost");
   if (priceIdx < 0) return;
 
   function applyFilter() {
@@ -1728,7 +2000,7 @@
     // Show the X only when at least one bound is set — otherwise the
     // combo widget reads as a simple "Price from–to" placeholder pair.
     clear.hidden = !(hasLo || hasHi);
-    table.querySelectorAll('tbody tr').forEach(tr => {
+    table.querySelectorAll("tbody tr").forEach((tr) => {
       const td = tr.children[priceIdx];
       const v = td ? parseFloat(td.dataset.sort) : NaN;
       let keep = true;
@@ -1736,201 +2008,445 @@
         if (hasLo && v < lo) keep = false;
         if (hasHi && v > hi) keep = false;
       }
-      tr.classList.toggle('mr-filtered-out', !keep);
+      tr.classList.toggle("mr-filtered-out", !keep);
     });
     // Heatmap re-applies over the new visible set.
-    window.dispatchEvent(new CustomEvent('mr:filter-changed'));
+    window.dispatchEvent(new CustomEvent("mr:filter-changed"));
   }
-  minIn.addEventListener('input', applyFilter);
-  maxIn.addEventListener('input', applyFilter);
-  clear.addEventListener('click', () => {
-    minIn.value = '';
-    maxIn.value = '';
+  minIn.addEventListener("input", applyFilter);
+  maxIn.addEventListener("input", applyFilter);
+  clear.addEventListener("click", () => {
+    minIn.value = "";
+    maxIn.value = "";
     applyFilter();
   });
 })();
 
 // ---- MANA ITEMS: Heatmap on/off toggle + recompute on filter change ----
-(function() {
-  const table = document.querySelector('.mr-table');
-  const toggle = document.getElementById('mr-heatmap-toggle');
+(function () {
+  const table = document.querySelector(".mr-table");
+  const toggle = document.getElementById("mr-heatmap-toggle");
   if (!table || !toggle) return;
   function applyOrClear() {
     if (toggle.checked) {
       // Recompute by dispatching a synthetic event the heatmap IIFE
       // listens to. (The heatmap IIFE re-runs its applyHeatmap each
       // time a filter/sort changes — we route through it here too.)
-      window.dispatchEvent(new CustomEvent('mr:filter-changed'));
+      window.dispatchEvent(new CustomEvent("mr:filter-changed"));
     } else {
       // Strip all backgroundColor inline styles set by the heatmap.
-      table.querySelectorAll('tbody td').forEach(td => {
-        td.style.backgroundColor = '';
+      table.querySelectorAll("tbody td").forEach((td) => {
+        td.style.backgroundColor = "";
       });
     }
   }
-  toggle.addEventListener('change', applyOrClear);
+  toggle.addEventListener("change", applyOrClear);
 })();
 
-
-/* ---- WALL OF SIGNATURES (index) ----
-   Scatter the faint pixel-font usernames around the inventory book: random
-   spots that avoid the book, the nav, and every other signature. Re-runs on
-   resize. Index-only (guards on .inv-signatures). */
+/* ---- WALL OF SIGNATURES (index) ---- */
 (function () {
-  const layer = document.querySelector('.inv-signatures');
+  const layer = document.querySelector(".inv-signatures");
   if (!layer) return;
-  const sigs = [...layer.querySelectorAll('.inv-sig')];
-  if (!sigs.length) return;
 
-  const overlap = (a, b) => !(a.r <= b.l || a.l >= b.r || a.b <= b.t || a.t >= b.b);
+  const sigEls = [...layer.querySelectorAll(".inv-sig, .inv-sig-hidden")];
+  if (!sigEls.length) return;
+
+  // ── Source data (read once from DOM spans, which stay hidden) ──────────────
+
+  const names = sigEls.map((el) => ({
+    text: el.textContent || "",
+    dim: el.classList.contains("inv-sig-hidden"),
+  }));
+
+  // ── Canvas setup ───────────────────────────────────────────────────────────
+
+  const canvas = document.createElement("canvas");
+  canvas.classList.add("ing-sig-canvas");
+  canvas.setAttribute("aria-hidden", "true");
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext("2d");
+  const measureCtx = document.createElement("canvas").getContext("2d");
+
+  // ── Animation state ────────────────────────────────────────────────────────
+
+  let placements = []; // array of placed names with position + current alpha
+  let hoveredIdx = -1; // index of name under mouse (-1 = none)
+  let spotlitIdx = -1; // index of auto-spotlighted name (-1 = none)
+  let rafId = 0; // current requestAnimationFrame handle
+  let lastFrameTs = 0; // timestamp of previous frame (for dt calculation)
+
+  // ── Constants ──────────────────────────────────────────────────────────────
+
+  const FADE_TAU = 50; // alpha decay (ms) — ~150ms to reach 95% of target
+  const MAX_FRAME_DT_MS = 100; // dt clamp — avoids huge jumps after tab switch
+  const ALPHA_SETTLE = 0.002; // stop animating when |target − current| < this
+  const GLOW_THRESHOLD = 0.01; // alpha above resting needed to activate glow
+  const GLOW_BLUR_PX = 14; // ctx.shadowBlur for highlighted names
+  const GLOW_ALPHA_MAX = 0.65; // max shadow opacity at full highlight
+
+  const FONT_MIN = 11; // smallest name font size (px)
+  const FONT_MAX = 22; // largest name font size (px)
+  const FONT_SPREAD = 6; // px below FONT_MAX where the random range starts
+  const FONT_HEIGHT_RATIO = 1.25; // fallback line-height multiplier when metrics unavailable
+
+  const CROWD_ONSET = 120; // name count at which crowding starts reducing font size
+  const CROWD_RANGE = 240; // name count range over which crowding reaches maximum
+
+  const ROT_MAX_DEG = 7; // max rotation of each name (±degrees)
+  const EDGE_MARGIN_PX = 10; // minimum gap between any name and the viewport edges
+  const GAP_BASE = 11; // base inter-name spacing (px)
+  const GAP_PER_NAME = 0.05; // gap reduction per additional name
+  const GAP_MIN = 2; // minimum inter-name gap (px)
+  const MAX_PLACE_ATTEMPTS = 90; // placement retries before a name is skipped
+  const HIT_PAD_PX = 4; // extra px added to each side for mouse hit testing
+
+  const SPOTLIGHT_DURATION_MS = 5000; // how long a spotlit name stays highlighted (ms)
+  const SPOTLIGHT_INITIAL_DELAY_MS = 2000; // delay before the first auto-spotlight (ms)
+  const SPOTLIGHT_INTERVAL_MS = 10000; // interval between subsequent spotlights (ms)
+
+  // ── Color helpers ─────────────────────────────────────────────────────────
+
+  const alphaResting = (dim) => (dim ? 0.13 : 0.12);
+  const alphaHighlight = (dim) => (dim ? 0.6 : 0.72);
+
+  function nameColor(dim, alpha) {
+    return dim
+      ? `rgba(198,206,220,${alpha.toFixed(3)})`
+      : `rgba(243,220,150,${alpha.toFixed(3)})`;
+  }
+
+  function glowColor(dim, alpha) {
+    const progress = Math.max(
+      0,
+      (alpha - alphaResting(dim)) / (alphaHighlight(dim) - alphaResting(dim)),
+    );
+    const glowAlpha = progress * GLOW_ALPHA_MAX;
+    return dim
+      ? `rgba(150,165,190,${glowAlpha.toFixed(3)})`
+      : `rgba(227,196,106,${glowAlpha.toFixed(3)})`;
+  }
+
+  // ── Rendering ──────────────────────────────────────────────────────────────
+
+  function drawFrame(ts) {
+    console.log("draw called?");
+    rafId = 0;
+
+    const dt = lastFrameTs ? Math.min(ts - lastFrameTs, MAX_FRAME_DT_MS) : 16;
+    lastFrameTs = ts;
+    const blendFactor = 1 - Math.exp(-dt / FADE_TAU);
+
+    let stillAnimating = false;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    placements.forEach((name, i) => {
+      const targetAlpha =
+        i === hoveredIdx || i === spotlitIdx
+          ? alphaHighlight(name.dim)
+          : alphaResting(name.dim);
+
+      const diff = targetAlpha - name.alpha;
+      if (Math.abs(diff) > ALPHA_SETTLE) {
+        name.alpha += diff * blendFactor;
+        stillAnimating = true;
+      } else {
+        name.alpha = targetAlpha;
+      }
+
+      const isGlowing = name.alpha > alphaResting(name.dim) + GLOW_THRESHOLD;
+
+      ctx.save();
+      ctx.translate(name.cx, name.cy);
+      ctx.rotate((name.rot * Math.PI) / 180);
+
+      ctx.font = `${name.fs}px "Handjet","Jersey 10",monospace`;
+      ctx.shadowBlur = isGlowing ? GLOW_BLUR_PX : 0;
+      ctx.shadowColor = isGlowing
+        ? glowColor(name.dim, name.alpha)
+        : "transparent";
+      ctx.fillStyle = nameColor(name.dim, name.alpha);
+      ctx.fillText(name.text, 0, 0);
+      ctx.restore();
+    });
+
+    if (stillAnimating) {
+      rafId = requestAnimationFrame(drawFrame);
+    } else {
+      lastFrameTs = 0;
+    }
+  }
+
+  function requestDraw() {
+    if (!rafId) rafId = requestAnimationFrame(drawFrame);
+  }
+
+  // ── Placement ──────────────────────────────────────────────────────────────
+
+  const rectsOverlap = (a, b) =>
+    !(a.r <= b.l || a.l >= b.r || a.b <= b.t || a.t >= b.b);
+
+  function computeFontRange(nameCount) {
+    const crowding = Math.max(
+      0,
+      Math.min(1, (nameCount - CROWD_ONSET) / CROWD_RANGE),
+    );
+    const top = Math.round(FONT_MAX - (FONT_MAX - FONT_MIN) * crowding);
+    return { min: Math.max(FONT_MIN, top - FONT_SPREAD), max: top };
+  }
+
+  function randomFontSize(fontRange) {
+    return (
+      fontRange.min +
+      Math.floor(Math.random() * (fontRange.max - fontRange.min + 1))
+    );
+  }
+
+  function measureName(text, fontSize, measureCtx) {
+    measureCtx.font = `${fontSize}px "Handjet","Jersey 10",monospace`;
+    const m = measureCtx.measureText(text);
+    const w = m.width;
+    const h =
+      m.actualBoundingBoxAscent != null
+        ? m.actualBoundingBoxAscent + m.actualBoundingBoxDescent + 2
+        : fontSize * FONT_HEIGHT_RATIO;
+    return { w, h };
+  }
+
+  function rotatedBoundingBox(w, h, rotDeg) {
+    const rad = (Math.abs(rotDeg) * Math.PI) / 180;
+    return {
+      bw: w * Math.cos(rad) + h * Math.sin(rad),
+      bh: w * Math.sin(rad) + h * Math.cos(rad),
+    };
+  }
+
+  function tryFindPosition(
+    bw,
+    bh,
+    viewportW,
+    viewportH,
+    gap,
+    forbidden,
+    placed,
+  ) {
+    const cxMin = EDGE_MARGIN_PX + bw / 2,
+      cxMax = viewportW - EDGE_MARGIN_PX - bw / 2;
+    const cyMin = EDGE_MARGIN_PX + bh / 2,
+      cyMax = viewportH - EDGE_MARGIN_PX - bh / 2;
+    if (cxMax <= cxMin || cyMax <= cyMin) return null;
+
+    for (let attempt = 0; attempt < MAX_PLACE_ATTEMPTS; attempt++) {
+      const cx = cxMin + Math.random() * (cxMax - cxMin);
+      const cy = cyMin + Math.random() * (cyMax - cyMin);
+      const rect = {
+        l: cx - bw / 2 - gap,
+        t: cy - bh / 2 - gap,
+        r: cx + bw / 2 + gap,
+        b: cy + bh / 2 + gap,
+      };
+      if (forbidden.some((f) => rectsOverlap(rect, f))) continue;
+      if (placed.some((p) => rectsOverlap(rect, p))) continue;
+      return { cx, cy, rect };
+    }
+    return null;
+  }
 
   function place() {
-    const book = document.querySelector('.inv-book');
+    const book = document.querySelector(".inv-book");
     if (!book) return;
-    const nav = document.querySelector('nav.top-nav');
-    const EDGE = 6;                                  // gap from the page edge
-    // Inter-name gap shrinks as the count grows, so more names pack in (the
-    // Telegram bot can feed many without them feeling sparse).
-    const M = Math.max(2, Math.round(11 - sigs.length * 0.05));
-    // Auto-shrink the font as the wall gets crowded so more names pack in, but
-    // never below FONT_MIN (stays legible). Full size up to ~120 names, easing
-    // down to the floor by ~360. The per-name random variation rides on top.
-    const FONT_MIN = 11, FONT_MAX = 22;
-    const crowd = Math.max(0, Math.min(1, (sigs.length - 120) / 240));
-    const fontTop = Math.round(FONT_MAX - (FONT_MAX - FONT_MIN) * crowd);
-    const fontBot = Math.max(FONT_MIN, fontTop - 6);
-    // clientWidth/Height = the visible area WITHOUT the scrollbar (matches the
-    // fixed signature layer), so a word never lands under the scrollbar.
+    const nav = document.querySelector("nav.top-nav");
+
     const W = document.documentElement.clientWidth;
     const H = document.documentElement.clientHeight;
-    const br = book.getBoundingClientRect();
-    const forbidden = [{ l: br.left - M, t: br.top - M, r: br.right + M, b: br.bottom + M }];
+    const gap = Math.max(
+      GAP_MIN,
+      Math.round(GAP_BASE - names.length * GAP_PER_NAME),
+    );
+
+    const bookRect = book.getBoundingClientRect();
+    const forbidden = [
+      {
+        l: bookRect.left - gap,
+        t: bookRect.top - gap,
+        r: bookRect.right + gap,
+        b: bookRect.bottom + gap,
+      },
+    ];
     if (nav) {
-      const nr = nav.getBoundingClientRect();
-      forbidden.push({ l: 0, t: 0, r: W, b: nr.bottom + M });
+      const navRect = nav.getBoundingClientRect();
+      forbidden.push({ l: 0, t: 0, r: W, b: navRect.bottom + gap });
     }
-    // PERF: the old code wrote left/top then read getBoundingClientRect() inside
-    // the 90-try loop for every name — forcing a synchronous reflow on each
-    // attempt (~names × tries layouts), which froze the main thread. We now do
-    // it in strict read/write phases so the browser lays out at most ~twice:
-    //   1) batch-write every font-size,
-    //   2) batch-read every box once,
-    //   3) compute all placements in pure JS (no DOM access → no reflow),
-    //   4) batch-write final positions via transform (compositor, not layout).
-    const n = sigs.length;
 
-    // (1) write-only: reset + assign each font size.
-    for (let i = 0; i < n; i++) {
-      const s = sigs[i];
-      s.style.display = '';
-      s.style.visibility = 'hidden';
-      s.style.fontSize = (fontBot + Math.floor(Math.random() * (fontTop - fontBot + 1))) + 'px';
-    }
-    // (2) read-only: measure every unrotated box in one pass (single reflow).
-    const ws = new Array(n), hs = new Array(n);
-    for (let i = 0; i < n; i++) { ws[i] = sigs[i].offsetWidth; hs[i] = sigs[i].offsetHeight; }
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // (3) pure-JS placement — no layout reads/writes here.
+    const fontRange = computeFontRange(names.length);
     const placed = [];
-    const pos = new Array(n);
-    for (let i = 0; i < n; i++) {
-      const w0 = ws[i], h0 = hs[i];
-      if (!w0 || !h0) { pos[i] = null; continue; }
-      const rot = Math.random() * 14 - 7;
-      // Rotated bounding box (transform-origin centre): place by it so a tilted
-      // word never spills past the viewport edge.
-      const rad = Math.abs(rot) * Math.PI / 180;
-      const bw = w0 * Math.cos(rad) + h0 * Math.sin(rad);
-      const bh = w0 * Math.sin(rad) + h0 * Math.cos(rad);
-      const cxMin = EDGE + bw / 2, cxMax = W - EDGE - bw / 2;
-      const cyMin = EDGE + bh / 2, cyMax = H - EDGE - bh / 2;
-      if (cxMax <= cxMin || cyMax <= cyMin) { pos[i] = null; continue; }
-      let done = false;
-      for (let k = 0; k < 90 && !done; k++) {
-        const cx = cxMin + Math.random() * (cxMax - cxMin);
-        const cy = cyMin + Math.random() * (cyMax - cyMin);
-        const r = { l: cx - bw / 2 - M, t: cy - bh / 2 - M, r: cx + bw / 2 + M, b: cy + bh / 2 + M };
-        let bad = false;
-        for (let f = 0; f < forbidden.length; f++) { if (overlap(r, forbidden[f])) { bad = true; break; } }
-        if (bad) continue;
-        for (let p = 0; p < placed.length; p++) { if (overlap(r, placed[p])) { bad = true; break; } }
-        if (bad) continue;
-        // Store the top-left offset from the centre; rotate about centre keeps
-        // the centre at (cx, cy).
-        pos[i] = { x: cx - w0 / 2, y: cy - h0 / 2, rot: rot };
-        placed.push(r);
-        done = true;
+    placements = [];
+
+    names.forEach(({ text, dim }) => {
+      const fs = randomFontSize(fontRange);
+      const rot = Math.random() * ROT_MAX_DEG * 2 - ROT_MAX_DEG;
+
+      const { w, h } = measureName(text, fs, measureCtx);
+      const { bw, bh } = rotatedBoundingBox(w, h, rot);
+      const pos = tryFindPosition(bw, bh, W, H, gap, forbidden, placed);
+      if (!pos) return;
+
+      placed.push(pos.rect);
+      placements.push({
+        text,
+        dim,
+        cx: pos.cx,
+        cy: pos.cy,
+        w,
+        h,
+        rot,
+        fs,
+        alpha: alphaResting(dim),
+      });
+    });
+
+    hoveredIdx = -1;
+    spotlitIdx = -1;
+    requestDraw();
+  }
+
+  // ── Mouse interaction ──────────────────────────────────────────────────────
+
+  function findNameUnderCursor(mouseX, mouseY) {
+    for (let i = 0; i < placements.length; i++) {
+      const name = placements[i];
+      const dx = mouseX - name.cx;
+      const dy = mouseY - name.cy;
+      const rad = (name.rot * Math.PI) / 180;
+      const localX = dx * Math.cos(rad) + dy * Math.sin(rad);
+      const localY = -dx * Math.sin(rad) + dy * Math.cos(rad);
+      if (
+        Math.abs(localX) <= name.w / 2 + HIT_PAD_PX &&
+        Math.abs(localY) <= name.h / 2 + HIT_PAD_PX
+      )
+        return i;
+    }
+    return -1;
+  }
+
+  window.addEventListener(
+    "mousemove",
+    (e) => {
+      if (!placements.length) return;
+      const found = findNameUnderCursor(e.clientX, e.clientY);
+      if (found !== hoveredIdx) {
+        hoveredIdx = found;
+        requestDraw();
       }
-      if (!done) pos[i] = null;
+    },
+    { passive: true },
+  );
+
+  document.addEventListener(
+    "mouseleave",
+    () => {
+      if (hoveredIdx !== -1) {
+        hoveredIdx = -1;
+        requestDraw();
+      }
+    },
+    { passive: true },
+  );
+
+  // ── Initialisation ─────────────────────────────────────────────────────────
+
+  async function waitForFontsThenPlace() {
+    if (document.fonts) {
+      try {
+        await Promise.all([
+          document.fonts.load('16px "Handjet"'),
+          document.fonts.load('16px "Jersey 10"'),
+          // Cyrillic subset is a separate font file — must be requested explicitly
+          document.fonts.load('16px "Handjet"', "А"),
+          document.fonts.load('16px "Jersey 10"', "А"),
+        ]);
+      } catch {}
+      await document.fonts.ready;
     }
-
-    // (4) write-only: position via transform (GPU/compositor, no reflow) or hide.
-    for (let i = 0; i < n; i++) {
-      const s = sigs[i], p = pos[i];
-      if (!p) { s.style.display = 'none'; continue; }
-      s.style.transform = 'translate(' + p.x.toFixed(1) + 'px,' + p.y.toFixed(1) + 'px) rotate(' + p.rot.toFixed(1) + 'deg)';
-      s.style.visibility = 'visible';
+    const warmFont = `${FONT_MAX}px "Handjet","Jersey 10",monospace`;
+    measureCtx.font = warmFont;
+    measureCtx.measureText("M");
+    measureCtx.measureText("А");
+    ctx.font = warmFont;
+    ctx.fillText("М", 0, 0);
+    place();
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
     }
-    // Reveal the whole wall at once now that every name is positioned (fade-in
-    // via CSS), instead of names popping in mid-layout.
-    layer.style.opacity = '1';
+    drawFrame(performance.now());
+    setTimeout(() => {
+      canvas.style.opacity = "1";
+    }, 500);
   }
 
-  // Make sure the pixel font is actually loaded before measuring widths —
-  // otherwise names get sized with the fallback font and render wider (which
-  // pushed near-edge names past the right side).
-  function run() {
-    // Wait for the ACTUAL wall font (Handjet) so widths measure right — but cap
-    // the wait at 300ms so names appear fast even on a cold load. If Handjet
-    // swaps in after, it only renders NARROWER than the fallback, so nothing
-    // clips and no re-layout is needed.
-    const fontReady = (document.fonts && document.fonts.load)
-      ? document.fonts.load('20px "Handjet"').catch(() => {})
-      : Promise.resolve();
-    Promise.race([
-      Promise.resolve(fontReady),
-      new Promise(r => setTimeout(r, 300)),
-    ]).then(place);
-  }
-  if (document.readyState === 'complete') run();
-  else window.addEventListener('load', run);
-  let t;
-  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(place, 200); }, { passive: true });
+  if (document.readyState === "complete") waitForFontsThenPlace();
+  else window.addEventListener("load", waitForFontsThenPlace);
 
-  // Auto-spotlight: light a random placed signature for 5s (same look as hover),
-  // only while the tab is visible. First highlight ~2s after load so it doesn't
-  // fire during the initial fade-in; then on the usual 10s cadence.
-  function spotlightOnce() {
-    if (document.hidden) return;
-    const lit = sigs.filter(s => s.style.display !== 'none' && s.style.visibility === 'visible');
-    if (!lit.length) return;
-    const s = lit[Math.floor(Math.random() * lit.length)];
-    s.classList.add('is-lit');
-    setTimeout(() => s.classList.remove('is-lit'), 5000);
+  let resizeTimer;
+  window.addEventListener(
+    "resize",
+    () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(place, 200);
+    },
+    { passive: true },
+  );
+
+  // ── Auto-spotlight ─────────────────────────────────────────────────────────
+
+  function spotlightRandom() {
+    if (document.hidden || !placements.length) return;
+    const idx = Math.floor(Math.random() * placements.length);
+    spotlitIdx = idx;
+    requestDraw();
+    setTimeout(() => {
+      if (spotlitIdx === idx) {
+        spotlitIdx = -1;
+        requestDraw();
+      }
+    }, SPOTLIGHT_DURATION_MS);
   }
-  setTimeout(spotlightOnce, 2000);
-  setInterval(spotlightOnce, 10000);
+
+  setTimeout(spotlightRandom, SPOTLIGHT_INITIAL_DELAY_MS);
+  setInterval(spotlightRandom, SPOTLIGHT_INTERVAL_MS);
 })();
 
 // ---- MANA ITEMS tile: hover plays a one-shot FILL (empty→half), then loops the
 // wave at that level. Two GIFs swapped via JS — a single GIF can't play an intro
 // once and then loop only its tail. Reverts to the static bottle on mouse-out.
 (function () {
-  const tile = document.querySelector('.inv-cell-mana');
+  const tile = document.querySelector(".inv-cell-mana");
   if (!tile) return;
-  const img = tile.querySelector('.inv-icon');
+  const img = tile.querySelector(".inv-icon");
   if (!img) return;
-  const PNG = img.getAttribute('src');
-  const FILL = 'icons/ui/gothic/icon_mana_fill.gif';
-  const WAVE = 'icons/ui/gothic/icon_mana.gif';
-  const FILL_MS = 11 * 150;            // fill GIF: 11 frames × 150ms
+  const PNG = img.getAttribute("src");
+  const FILL = "icons/ui/gothic/icon_mana_fill.gif";
+  const WAVE = "icons/ui/gothic/icon_mana.gif";
+  const FILL_MS = 11 * 150; // fill GIF: 11 frames × 150ms
   let timer = null;
-  tile.addEventListener('mouseenter', () => {
+  tile.addEventListener("mouseenter", () => {
     clearTimeout(timer);
-    img.src = FILL + '?' + Date.now();  // cache-bust forces the fill to replay
-    timer = setTimeout(() => { img.src = WAVE; }, FILL_MS);
+    img.src = FILL + "?" + Date.now(); // cache-bust forces the fill to replay
+    timer = setTimeout(() => {
+      img.src = WAVE;
+    }, FILL_MS);
   });
-  tile.addEventListener('mouseleave', () => {
+  tile.addEventListener("mouseleave", () => {
     clearTimeout(timer);
     img.src = PNG;
   });
