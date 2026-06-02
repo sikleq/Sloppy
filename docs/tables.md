@@ -132,6 +132,23 @@ patch's `items.json`; only patches whose JSON carries the **deep mana fields** c
 those exist from **7.33 onward** (older slim JSON has only `ItemCost`). So mana history
 starts at 7.33 and runs forward; a missing tail just means a stale rebuild.
 
+### Overall net-change summary (tooltip top line)
+Cells flagged `data-net=""` (a value cell that changed **>1 time**) get an extra line at the
+**TOP** of the hover tooltip, above the newest patch, with a divider:
+`overall <first observed> → <today> <pct>%`. Built by `netSummary()` in `scripts.js`:
+- scans past `A`/`R`/`P` markers to the **first and last real value entries** (`valEntry()`
+  handles `V`/`F`/`C`/`N`; `C` uses the raw numerics for the %, the pretty values for display);
+- needs ≥2 value entries; net **0%** (drifted then returned to start) is still shown (`flat`);
+- colour = buff/nerf via `.stat-pct up/down/flat`; label is "overall".
+
+Who flags `data-net`:
+- **Neutral Creeps** — every numeric `COL_HIST` cell (`build_creeps.py`), NOT ability cells.
+- **Mana Items** — every `_cost_cell`/`_metric_cell` (`build_mana_items.py`). These also
+  **dropped `data-name`** (the item-name tooltip header was a redundant duplicate; the row
+  already identifies the item). The blurb's `_int_const_chip` keeps its `data-name`.
+- **Neutral Abilities** — no per-patch history (current-patch snapshot) → no summary.
+CSS: `.stat-hist-tip .stat-net` (divider) + `.stat-net-label`.
+
 ## Mana Items specifics (`build_mana_items.py`)
 - Intelligence: +12 max mana, +0.05 regen per point (7.41c engine constants).
 - Items whose ACTIVE restores mana (Arcane Boots) are split into a base row + hidden
