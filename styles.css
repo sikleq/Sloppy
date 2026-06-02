@@ -3905,12 +3905,60 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 /* Damage-type colour paints ONLY the numeric runs (.dmg-num) inside the
    Damage cell — words like "в сек." or "+ N% Int" keep the default text
    colour. The standalone Damage Type column was replaced by this scheme. */
-.unit-abilities-table td.dt-magical   .dmg-num { color: #5fb1ff; }   /* blue */
-.unit-abilities-table td.dt-physical  .dmg-num { color: #e1716a; }   /* bordeaux */
-.unit-abilities-table td.dt-hpremoval .dmg-num { color: #8aab7a; }   /* dull green */
-.unit-abilities-table td.dt-pure      .dmg-num { color: #ead992; }
-/* "Only Auras" view filter — hide non-aura rows + irrelevant columns. */
+.unit-abilities-table td.dt-magical   .dmg-num,
+.unit-abilities-table td.dt-magical   .lvl-toggle { color: #5fb1ff; }   /* blue */
+.unit-abilities-table td.dt-physical  .dmg-num,
+.unit-abilities-table td.dt-physical  .lvl-toggle { color: #e1716a; }   /* bordeaux */
+.unit-abilities-table td.dt-hpremoval .dmg-num,
+.unit-abilities-table td.dt-hpremoval .lvl-toggle { color: #8aab7a; }   /* dull green */
+.unit-abilities-table td.dt-pure      .dmg-num,
+.unit-abilities-table td.dt-pure      .lvl-toggle { color: #ead992; }
+/* Collapsed upgrade value ("40…26"): a clickable button that keeps the column
+   narrow; the full per-tier list opens in a floating popover (scripts.js
+   positions it as `fixed`, so the column width never changes). */
+.lvl-toggle {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: underline dotted rgba(170, 220, 240, 0.45);
+  text-underline-offset: 2px;
+}
+.lvl-toggle:hover,
+.lvl-toggle[aria-expanded="true"] { color: #cde9f5; }
+.lvl-popover {
+  position: fixed;
+  z-index: 80;
+  display: none;
+  white-space: nowrap;
+  background: #0d1117;
+  border: 1px solid rgba(170, 220, 240, 0.4);
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: #e6edf3;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+.lvl-popover.show { display: block; }
+/* Vertical category dividers (like Neutral Creeps): a left border on the first
+   visible column of each super-category, set by scripts.js markCatEdges() so it
+   tracks the column reorder in Auras view. Runs the full column height (header
+   col-row + every body cell). */
+.unit-abilities-table th.cat-edge,
+.unit-abilities-table td.cat-edge {
+  border-left: 2px solid rgba(170, 220, 240, 0.30);
+}
+/* "Only Auras" view filter — hide non-aura rows + irrelevant columns. The
+   super-category header STAYS in Auras view (scripts.js reorders columns into
+   contiguous category groups + recomputes the cat colspans for what's visible). */
 .unit-abilities-table.filter-auras tbody tr:not(.ua-row-aura) { display: none; }
+.unit-abilities-table.filter-auras th[data-col="type"],
+.unit-abilities-table.filter-auras td[data-col="type"],
 .unit-abilities-table.filter-auras th[data-col="dmg_type"],
 .unit-abilities-table.filter-auras td[data-col="dmg_type"],
 .unit-abilities-table.filter-auras th[data-col="damage"],

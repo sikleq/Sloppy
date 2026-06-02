@@ -930,22 +930,35 @@
 
   // Unit Abilities VIEW filter (Standard | Only Auras). Toggles a class on
   // the table; CSS hides non-aura rows. Also reorders columns: in "Only Auras"
-  // the order is Lvl/Unit/Ability, then Aura Stack/Radius/Duration, then the
-  // rest (Type/AS Effect/MS Effect), then Effect 1-3.
+  // the visible order is Lvl/Unit/Ability | Radius/Duration | Aura Stack/Through
+  // BKB/AS Effect/MS Effect | Effect 1-3 — grouped so the category header (kept
+  // in Auras view too) spans contiguous columns.
   const uaView = document.getElementById('ua-view-mode');
   if (uaView) {
     const STD_ORDER = ['lvl', 'unit', 'ability', 'type', 'damage',
       'manacost', 'cooldown', 'duration', 'cast_range', 'aoe', 'stackable',
       'dispel', 'through_bkb', 'as_effect', 'ms_effect',
       'effect', 'effect2', 'effect3'];
-    // Auras view: visible columns first (their target order), then the
-    // hidden-by-CSS columns at the end so DOM child count stays in sync.
-    const AURA_ORDER = ['lvl', 'unit', 'ability', 'type', 'aoe', 'stackable',
-      'through_bkb', 'duration', 'as_effect', 'ms_effect',
+    // Auras view: VISIBLE columns first, grouped by category (Basic | Essentials
+    // = Radius,Duration | Extra | Effects), then the hidden-by-CSS columns
+    // (type/damage/manacost/cooldown/cast_range/dispel) at the end so the DOM
+    // child count stays in sync.
+    const AURA_ORDER = ['lvl', 'unit', 'ability', 'aoe', 'duration',
+      'stackable', 'through_bkb', 'as_effect', 'ms_effect',
       'effect', 'effect2', 'effect3',
-      'damage', 'manacost', 'cooldown', 'cast_range', 'dispel'];
+      'type', 'damage', 'manacost', 'cooldown', 'cast_range', 'dispel'];
     const headRow = table.querySelector('thead .col-row')
       || table.querySelector('thead tr');
+    // Resize each category cell to its currently-visible leaf columns (Auras
+    // hides some), so the category header lines up in both views.
+    function recomputeUaCats() {
+      table.querySelectorAll('thead tr.cat-row th.cat-head[data-cat]').forEach(head => {
+        let span = 0;
+        table.querySelectorAll('thead tr.col-row th[data-cat="' + head.dataset.cat + '"]')
+          .forEach(th => { if (th.offsetParent !== null) span += th.colSpan || 1; });
+        head.colSpan = span || 1;
+      });
+    }
 
     function reorderCells(order) {
       const reorderOne = (parent) => {
@@ -965,15 +978,39 @@
       }
     }
 
+    // Vertical category dividers: left border on the first VISIBLE column of each
+    // category (after the first), on the header col-row AND every body cell so the
+    // line runs the full height. Driven by data-cat so it tracks the Auras reorder.
+    // AURA_HIDDEN mirrors the columns hidden by .filter-auras in styles.css.
+    const AURA_HIDDEN = new Set(['type', 'damage', 'manacost', 'cooldown', 'cast_range', 'dispel']);
+    function markCatEdges(auras) {
+      const hidden = auras ? AURA_HIDDEN : null;
+      const rows = [headRow, ...tbody.querySelectorAll('tr')];
+      rows.forEach(row => {
+        if (!row) return;
+        let prevCat = null;
+        [...row.children].forEach(cell => {
+          cell.classList.remove('cat-edge');
+          const col = cell.dataset.col, cat = cell.dataset.cat;
+          if (!col || (hidden && hidden.has(col))) return;   // skip hidden columns
+          if (prevCat !== null && cat && cat !== prevCat) cell.classList.add('cat-edge');
+          if (cat) prevCat = cat;
+        });
+      });
+    }
+
     const applyUaView = () => {
       const auras = uaView.value === 'auras';
       table.classList.toggle('filter-auras', auras);
       reorderCells(auras ? AURA_ORDER : STD_ORDER);
+      recomputeUaCats();          // category header spans the now-visible columns
+      markCatEdges(auras);        // category dividers track the visible columns
       groupRows(auras
         ? [...tbody.querySelectorAll('tr.ua-row-aura')]
         : [...tbody.querySelectorAll('tr')]);
     };
     uaView.addEventListener('change', applyUaView);
+    markCatEdges(false);          // initial Standard-view dividers
   }
 
   // Upgrades — binary switch. Toggles `.show-upgrades` on the UA table;
@@ -984,6 +1021,57 @@
     uaUpg.addEventListener('change', apply);
     apply();
   }
+})();
+
+// ---- UNIT ABILITIES: collapsed upgrade cells ("40…26") expand on click into a
+// floating popover with the full per-tier list. Fixed-positioned, clamped to the
+// viewport, so the column width never changes. ----
+(function() {
+  const table = document.querySelector('.unit-abilities-table');
+  if (!table) return;
+  let pop = null, openBtn = null;
+  function ensurePop() {
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.className = 'lvl-popover';
+      pop.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(pop);
+    }
+    return pop;
+  }
+  function close() {
+    if (pop) pop.classList.remove('show');
+    if (openBtn) { openBtn.setAttribute('aria-expanded', 'false'); openBtn = null; }
+  }
+  function open(btn) {
+    const p = ensurePop();
+    p.textContent = btn.dataset.full || btn.textContent;
+    p.classList.add('show');
+    const r = btn.getBoundingClientRect();
+    const pr = p.getBoundingClientRect();
+    let left = r.left + r.width / 2 - pr.width / 2;
+    left = Math.max(6, Math.min(left, window.innerWidth - pr.width - 6));
+    let top = r.top - pr.height - 6;            // prefer above
+    if (top < 6) top = r.bottom + 6;            // flip below if no room
+    p.style.left = left + 'px';
+    p.style.top = top + 'px';
+    btn.setAttribute('aria-expanded', 'true');
+    openBtn = btn;
+  }
+  table.addEventListener('click', (e) => {
+    const btn = e.target.closest('.lvl-toggle');
+    if (!btn) return;
+    e.preventDefault();
+    if (openBtn === btn) close(); else { close(); open(btn); }
+  });
+  document.addEventListener('click', (e) => {
+    if (openBtn && !e.target.closest('.lvl-toggle')) close();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  // The table scrolls inside its own box → close on any scroll so the popover
+  // never detaches from its cell.
+  window.addEventListener('scroll', close, true);
+  window.addEventListener('resize', close);
 })();
 
 // ---- CREEPS TABLE: per-stat changelog tooltip (HP / Armor / Mana / Magres) ----

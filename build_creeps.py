@@ -2102,8 +2102,23 @@ def save_creeps_html():
         ('effect', 'Property'), ('effect2', 'Property 2'), ('effect3', 'Property 3'),
     ]
     UA_STICKY = {'lvl', 'unit', 'ability'}
-    # Vertical section dividers (left border) after Ability, Type and Damage.
-    UA_SEP = {'type', 'damage', 'manacost'}
+    # Vertical dividers are drawn at CATEGORY boundaries only (scripts.js
+    # markCatEdges, adapts to both views) — no manual per-column separators.
+    UA_SEP = set()
+    # Super-category grouping shown above the column headers (mirrors Neutral
+    # Creeps so both tables look symmetric). Order/colspans must match UA_COLS.
+    # Each column header carries data-cat so scripts.js recomputeCatColspans()
+    # can size each category cell — WITHOUT data-cat it counts 0 and collapses
+    # every category to colspan=1.
+    UA_CATEGORIES = [
+        ('Basic',      'basic',      ['lvl', 'unit', 'ability']),
+        ('Essentials', 'essentials', ['type', 'damage', 'manacost', 'cooldown',
+                                      'duration', 'cast_range', 'aoe']),
+        ('Extra',      'extra',      ['stackable', 'dispel', 'through_bkb',
+                                      'as_effect', 'ms_effect']),
+        ('Effects',    'effects',    ['effect', 'effect2', 'effect3']),
+    ]
+    UA_COL_CAT = {col: slug for _cat, slug, cols in UA_CATEGORIES for col in cols}
     # Column-header tooltips surfaced via a `?` badge next to the header label.
     # Values support inline HTML (rendered via innerHTML in scripts.js).
     UA_HEAD_HINTS = {
@@ -2149,13 +2164,53 @@ def save_creeps_html():
             hint = (f'<span class="qhint" tabindex="0" role="button" '
                     f'aria-label="{tip}" data-tooltip="{tip}">?</span>')
         ua_thead.append(
-            f'<th class="{cls} sortable" data-col="{k}" data-idx="{idx}">'
+            f'<th class="{cls} sortable" data-col="{k}" data-idx="{idx}" '
+            f'data-cat="{UA_COL_CAT.get(k, "")}">'
             f'<span class="th-label">{label}</span>{hint}'
             f'<span class="sort-ind"></span></th>')
     ua_head_html = ''.join(ua_thead)
 
+    # Super-category row above the column headers (one cell per category,
+    # colspan = its leaf columns). scripts.js recomputeCatColspans() then keeps
+    # the colspans in sync with the visible columns (via the data-cat above).
+    ua_cat_cells = ''.join(
+        f'<th class="cat-head cat-{slug}" data-cat="{slug}" '
+        f'colspan="{len(cols)}">{_esc(cat)}</th>'
+        for cat, slug, cols in UA_CATEGORIES
+    )
+
     DMG_TYPE_CLS = {'Magical': 'dt-magical', 'Physical': 'dt-physical',
                     'HP Removal': 'dt-hpremoval', 'Pure': 'dt-pure'}
+
+    # A run of >=3 slash-separated numbers ("75/80/85/90", "-15%/-18%/-21%/-25%",
+    # "+20/25/30/40"). Each value may carry a trailing %.
+    _RUN_RE = re.compile(r'[+-]?\d+(?:[.,]\d+)?%?(?:/[+-]?\d+(?:[.,]\d+)?%?){2,}')
+
+    def _run_button(run):
+        """A collapsed "first→last" button for a slash-run; full list in data-full."""
+        p = run.split('/')   # run is pure digits/slashes/%/+/- → safe unescaped
+        return (f'<button type="button" class="lvl-toggle" aria-expanded="false" '
+                f'title="Show per-tier values" data-full="{_attr_esc(" / ".join(p))}">'
+                f'{p[0]}→{p[-1]}</button>')
+
+    def _collapse_runs(text):
+        """Collapse every long slash-run in PLAIN `text` (escapes non-run text)."""
+        out, last = [], 0
+        for m in _RUN_RE.finditer(text):
+            out.append(_esc(text[last:m.start()]))
+            out.append(_run_button(m.group(0)))
+            last = m.end()
+        out.append(_esc(text[last:]))
+        return ''.join(out)
+
+    def _collapse_runs_html(s):
+        """Collapse runs in an already-built HTML fragment (\\x01 manual cells) —
+        only in text BETWEEN tags, so attribute tooltips (which also contain
+        slashed lists) are never touched."""
+        return ''.join(
+            tok if tok.startswith('<') else _RUN_RE.sub(lambda m: _run_button(m.group(0)), tok)
+            for tok in re.split(r'(<[^>]+>)', s)
+        )
 
     def _prop_cell(pk, val, props=None):
         # Type → colour-coded text. Damage cell carries the dt-* class so the
@@ -2167,7 +2222,7 @@ def save_creeps_html():
         # Upgrades view toggle (.show-upgrades) draws a blue outline on them.
         if pk in (props or {}).get('_leveled', ()):
             sep += ' leveled'
-        dc = f' data-col="{pk}"'
+        dc = f' data-col="{pk}" data-cat="{UA_COL_CAT.get(pk, "")}"'
         if pk == 'type':
             if not val:
                 return f'<td class="ua-type{sep}"{dc}><span class="ua-dash">—</span></td>'
@@ -2176,12 +2231,17 @@ def save_creeps_html():
             dt = (props or {}).get('dmg_type', '')
             dt_cls = f' {DMG_TYPE_CLS[dt]}' if dt in DMG_TYPE_CLS else ''
             if isinstance(val, str) and val.startswith('\x01'):
-                # Manual override already has .dmg-num spans where appropriate.
-                return f'<td class="ua-damage{dt_cls}{sep}"{dc}>{val[1:]}</td>'
+                # Manual override already has .dmg-num spans where appropriate;
+                # still collapse any long slash-run inside its text.
+                return (f'<td class="ua-damage{dt_cls}{sep}"{dc}>'
+                        f'{_collapse_runs_html(val[1:])}</td>')
             if not val:
                 return f'<td class="ua-damage{dt_cls}{sep}"{dc}><span class="ua-dash">—</span></td>'
-            return (f'<td class="ua-damage{dt_cls}{sep}"{dc}>'
-                    f'{_dmg_color_html(_esc(val))}</td>')
+            collapsed = _collapse_runs(str(val))
+            # If a run was collapsed the button carries the dt-* colour via CSS;
+            # otherwise keep the per-number .dmg-num colouring.
+            inner = collapsed if 'lvl-toggle' in collapsed else _dmg_color_html(_esc(val))
+            return f'<td class="ua-damage{dt_cls}{sep}"{dc}>{inner}</td>'
         # Coloured yes/no text. Sort rank: dash (0) < no (1) < yes (2).
         _YES = '<span class="ua-yn ua-yn-yes">yes</span>'
         _NO = '<span class="ua-yn ua-yn-no">no</span>'
@@ -2224,9 +2284,14 @@ def save_creeps_html():
             return f'<td class="ua-through_bkb{sep}"{dc} data-sort="{rank}">{g}</td>'
         # Raw-HTML sentinel: ABIL_MANUAL values prefixed with \x01 bypass _esc
         # so we can inline <img> / <span> markup (used for Mana Burn's Int icon).
+        # Still collapse long slash-runs in the inline text (between tags).
         if isinstance(val, str) and val.startswith('\x01'):
-            return f'<td class="ua-{pk}{sep}"{dc}>{val[1:]}</td>'
-        inner = _esc(val) or '<span class="ua-dash">—</span>'
+            return f'<td class="ua-{pk}{sep}"{dc}>{_collapse_runs_html(val[1:])}</td>'
+        sval = '' if val is None else str(val)
+        # Collapse any long per-tier run ("75/80/85/90") — even inside descriptive
+        # text — to "first→last"; surrounding text kept, full list in a click
+        # popover (scripts.js). Empty → dash.
+        inner = _collapse_runs(sval) if sval != '' else '<span class="ua-dash">—</span>'
         return f'<td class="ua-{pk}{sep}"{dc}>{inner}</td>'
 
     # Abilities that are identical across multiple units (same slug, same
@@ -2315,10 +2380,10 @@ def save_creeps_html():
             # the wrong columns. Self-contained rows always stay aligned.
             cells = [
                 f'<td class="ua-lvl lvl-cell sticky-col" data-col="lvl" '
-                f'data-lvl="{_esc(lvl)}">{_esc(lvl)}</td>',
+                f'data-cat="basic" data-lvl="{_esc(lvl)}">{_esc(lvl)}</td>',
                 f'<td class="ua-unit creep-icon-cell sticky-col" data-col="unit" '
-                f'data-sort="{_esc(d.get("name", ""))}">{unit_img}</td>',
-                f'<td class="ua-ability sticky-col" data-col="ability">'
+                f'data-cat="basic" data-sort="{_esc(d.get("name", ""))}">{unit_img}</td>',
+                f'<td class="ua-ability sticky-col" data-col="ability" data-cat="basic">'
                 f'<span class="ua-ability-inner">{aico}'
                 f'<span class="ua-ability-name">{_esc(name)}</span>'
                 f'{qhint}</span></td>',
@@ -2375,7 +2440,8 @@ def save_creeps_html():
         '</label>'
         '</div>\n'
         '<table class="creeps-table unit-abilities-table">\n'
-        f'<thead><tr class="col-row">{ua_head_html}</tr></thead>\n'
+        f'<thead><tr class="cat-row">{ua_cat_cells}</tr>'
+        f'<tr class="col-row">{ua_head_html}</tr></thead>\n'
         f'<tbody>\n{chr(10).join(ua_rows)}\n</tbody>\n'
         '</table>\n</div>\n</div>\n'
         f'<script src="scripts.js?v={ASSET_VERSION}"></script>\n'
