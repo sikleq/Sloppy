@@ -3075,6 +3075,214 @@ ul.subnote-items > li::before {
   top: 1px;
   color: #6e7681;
 }
+/* ---- Game-formula change (formula_change): old → new, ability_change-style ---- */
+.formula-change { margin: 10px 0 8px; }
+.formula-change-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 9px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #cdd6e3;
+}
+/* Number input — reader plugs in their own value; scripts.js recomputes rows. */
+.formula-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 11px;
+  font-size: 12px;
+}
+.formula-input-label { color: #9aa7b8; }   /* "Set" = normal text */
+.formula-input-label .fx-vname {            /* the variable name keeps the var colour */
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  color: #9fc1e3;
+}
+.formula-input {
+  width: 150px;
+  padding: 4px 9px;
+  background: rgba(13, 17, 23, 0.6);
+  border: 1px solid rgba(120, 140, 170, 0.30);
+  border-radius: 5px;
+  color: #e6edf3;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  appearance: textfield;
+  -moz-appearance: textfield;    /* no number spinner arrows */
+}
+.formula-input::-webkit-outer-spin-button,
+.formula-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.formula-input::placeholder { color: #5e6b7d; }
+.formula-input:focus { outline: none; border-color: rgba(160, 180, 210, 0.6); }
+.formula-change-panes {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  column-gap: 12px;
+  align-items: stretch;
+}
+.formula-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;           /* formula + table centred in the block */
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 14px;
+  background: rgba(139, 148, 158, 0.04);
+  border: 1px solid rgba(139, 148, 158, 0.18);
+  border-radius: 6px;
+}
+.formula-expr {
+  text-align: center;
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #8b98a8;               /* parentheses / operators — muted */
+  overflow-wrap: anywhere;
+}
+.formula-expr .f-var { color: #9fc1e3; }              /* variables  */
+.formula-expr .f-num { color: #e0b87a; font-weight: 600; }  /* numbers */
+/* Worked-example table — faint grid lines, offset below the formula. */
+.formula-ex {
+  border-collapse: collapse;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+.formula-ex th,
+.formula-ex td {
+  border: 1px solid rgba(120, 140, 170, 0.14);
+  padding: 3px 12px;
+}
+.formula-ex th {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #7e8a9b;
+  text-align: center;
+}
+.formula-ex .fx-k    { color: #c2ccd9; text-align: center; }
+.formula-ex .fx-gold { color: #e0b87a; font-weight: 600; text-align: right; }
+.formula-ex .fx-pct  { text-align: right; }
+
+/* ---- Captains Mode draft board (cm_draft) ----
+   The WHOLE draft as a VERTICAL in-game-style pick/ban screen: step numbers run
+   down the centre, the acting team's slot on the LEFT (Team 1) or RIGHT (Team 2).
+   The Old draft and the New draft sit side by side. No colours — slot SIZE marks
+   ban (small) vs pick (large). Compare the two boards directly. */
+/* No big outer box — just a margin wrapper. Each Old/New board is its own light
+   block instead (more concise). */
+.cm-draft { margin: 12px 0 8px; }
+.cm-scroll { overflow-x: auto; padding-bottom: 3px; }
+/* Old + New boards sit close together with the arrow centred between — like the
+   ability_change rework panes. */
+.cm-boards {
+  display: flex;
+  align-items: stretch;            /* Old & New blocks share one (taller) height */
+  justify-content: center;
+  gap: 12px;
+}
+/* Each draft (Old / New) in its own block — same look as the ability_change
+   rework panes (.ability-change-pane). */
+.cm-board {
+  padding: 10px 12px;
+  border: 1px solid rgba(139, 148, 158, 0.18);
+  border-radius: 6px;
+  background: rgba(139, 148, 158, 0.04);
+}
+/* Arrow between the Old and New blocks — same glyph/style as .ability-change-arrow. */
+.cm-arrow {
+  flex: none;
+  align-self: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #c9d1d9;
+  opacity: 0.85;
+  padding: 0 2px;
+}
+.cm-vgrid {
+  --cm-lane: 68px;
+  --cm-num: 18px;
+  --cm-row: 18px;
+  display: grid;
+  grid-template-columns: var(--cm-lane) var(--cm-num) var(--cm-lane);
+  grid-template-rows: auto;        /* header row natural height */
+  grid-auto-rows: var(--cm-row);   /* uniform row height → identical ban cells */
+  column-gap: 22px;                /* wide gap so the long number→slot dashes fit */
+  row-gap: 7px;                    /* more breathing room between slots */
+  align-items: center;
+}
+.cm-vhead {
+  text-align: center;
+  white-space: nowrap;           /* "Second pick" stays on one line */
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #aeb8c6;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(120, 140, 170, 0.22);
+}
+.cm-vnum {
+  position: relative;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7e8a9b;
+  font-variant-numeric: tabular-nums;
+}
+/* Thin connector from the number to its slot — starts right at the number (the
+   narrow num column keeps it almost touching the digits) and reaches the slot. */
+.cm-vnum.cm-to-left::before,
+.cm-vnum.cm-to-right::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 1px;
+  background: rgba(150, 160, 175, 0.4);
+}
+.cm-vnum.cm-to-left::before  { right: 100%; }
+.cm-vnum.cm-to-right::after  { left: 100%; }
+/* Neutral slots — dark fill + faint border, no team colour. Bans = narrow boxes
+   (1 row) hugging the centre; picks fill the lane and span a 2-row band so the
+   left & right pick of a pair sit FACING each other (like the in-game board). */
+.cm-token {
+  position: relative;
+  align-self: stretch;            /* fill the row(s) the slot spans */
+  border-radius: 4px;
+  border: 1.5px solid rgba(140, 152, 170, 0.42);
+  background: rgba(13, 17, 23, 0.85);
+}
+.cm-token.ban  { width: 42px; }
+.cm-token.ban.cm-left  { justify-self: end; }    /* left lane → inner (right) edge by the number */
+.cm-token.ban.cm-right { justify-self: start; }  /* right lane → inner (left) edge by the number */
+/* Faint bordeaux crosshair in the centre of ban slots (a "banned" mark). Barely
+   visible by design. */
+.cm-token.ban::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  transform: translate(-50%, -50%);
+  background-image:
+    linear-gradient(45deg,  transparent 42%, rgba(150, 46, 58, 0.5) 42%, rgba(150, 46, 58, 0.5) 58%, transparent 58%),
+    linear-gradient(-45deg, transparent 42%, rgba(150, 46, 58, 0.5) 42%, rgba(150, 46, 58, 0.5) 58%, transparent 58%);
+}
+.cm-token.pick {
+  border-color: rgba(160, 172, 190, 0.55);   /* picks span 2 rows → naturally taller than bans */
+  background: rgba(22, 28, 37, 0.92);
+}
+.cm-sw.changed-sw {
+  width: 12px;
+  height: 12px;
+  border-color: rgba(227, 196, 106, 0.5);
+  box-shadow: 0 0 0 1px rgba(227, 196, 106, 0.16);
+}
+
 /* Tarot-card sub-list entries (Oracle Diviner's Deck): small icon + bold card
    name + effect. Each entry is its own inline-flex row so wrapping reads as
    a checklist instead of a wall of text. */
@@ -3186,6 +3394,8 @@ ul.changes li > .badge-group {
   color: #6e7681;
   font-weight: 400;
 }
+/* Slash separator for paired dimensions (e.g. daytime / nighttime). */
+.badge-group.slash-sep .badge:not(:last-child)::after { content: " / "; }
 /* Extra leading space before 0% (neutral) — without +/- prefix it visually crowds the comma */
 .badge-group .badge.neutral:not(:first-child) {
   margin-left: 0.25em;

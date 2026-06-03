@@ -35,6 +35,18 @@ written). The tables — `neutral_creeps.html`, `neutral_abilities.html`, `mana_
 are built separately by `build_creeps.py` / `build_mana_items.py` (run AFTER
 `build_patch.py`; see [tables.md](tables.md)).
 
+### Patch-dynamics widget (dyn-cells)
+
+Each entity header (`hero_header`/`item_header`/`unit_header`/`plain_header`) calls
+`_register_entity()`, which emits an `id="dyn-<kind>-<slug>"` and feeds the per-patch
+tag tally (`_dynamics.json`); `scripts.js` then renders a diamond row on every
+`.entity[id^="dyn-"]`. **Exception:** everything under the big **"General Updates"**
+section (slug `general` — General Changes, Map Objectives, Terrain Changes, Captains
+Mode, …) gets **no dyn-cells**. `_register_entity()` short-circuits when
+`_State.current_section_slug == 'general'` (set by `section()`), so no id is emitted
+and nothing there is tallied. This is automatic — any `plain_header` placed in
+General Updates is covered without per-call flags.
+
 ### Ability icons — missing-file fallback
 
 `ABIL_CDN` points at the local mirror `../icons/abilities/`. When a slug's local PNG

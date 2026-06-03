@@ -8,6 +8,8 @@
 - `AGENTS.md` (этот файл) — общая структура, source of truth, запуск.
 - `docs/architecture.md`, `docs/workflow.md`, `docs/data-format.md` — конвейер **патч-страниц** (`build_patch.py`).
 - `docs/tables.md` — подсистема **таблиц** (Neutral Creeps + вложенная Neutral Abilities / Mana Items: `build_creeps.py`, `build_mana_items.py`, sticky/overlay-архитектура, история ячеек, грабли).
+- `docs/captains-mode.md` — правило оформления изменений **Captains Mode** (порядок драфта → визуальный токен-борд `cm_draft`, а не текст).
+- `docs/formula-change.md` — правило для важных **игровых формул** (Assist Gold, Experience…): блок old→new `formula_change`, а не два `li`.
 
 Сайт = две подсистемы: (1) аннотированные патчноуты и (2) сортируемые таблицы под разделом Materials. Общие `styles.css` / `scripts.js`.
 
@@ -145,6 +147,36 @@ W(ul_open())
 W(li(...))
 W(ul_close())
 ```
+
+### Captains Mode (порядок драфта) → `cm_draft`
+
+Изменения **порядка** банов/пиков в Captains Mode оформляются визуальным
+токен-бордом `cm_draft(...)`, а не текстом «First - Second - …». Передавать **весь
+драфт целиком** (все фазы, 24 шага) — шаги нумеруются сквозно 1..24 (как в игре).
+Текстовую строку `li(... t("REWORK"))` оставлять. Краткий канон:
+
+```python
+W(plain_header("Captains Mode"))
+W(ul_open())
+W(li("Changed order of the first and the third ban phases", t("REWORK")))
+W(ul_close())
+W(cm_draft(                          # F/S=бан first/second-pick team, f/s=пик; titles не рисуются
+    ("Ban 1",  "FSSFSSF", "FFSSFSS"),    # изменено в 7.40
+    ("Pick 1", "fs",      "fs"),
+    ("Ban 2",  "FFS",     "FFS"),
+    ("Pick 2", "sffssf",  "sffssf"),      # ЗМЕЙКА (не чередование!)
+    ("Ban 3",  "FSSF",    "FSFS"),        # изменено в 7.40
+    ("Pick 3", "fs",      "fs"),
+))
+```
+
+Борд = игровой экран пик/бана: вертикально, номера 1..24 по центру, слот действующей
+команды слева (first-pick team — пикает первой, шаг 8) или справа (second-pick team — шаг 9);
+доски Old и New рядом со стрелкой, БЕЗ цветов (команда — по стороне). Бан = узкий слот, пик =
+большой. Шаги, где сменилась команда, — тусклая золотая рамка. Дефолт заголовков First pick /
+Second pick. Структура 7.34+: Бан7·Пик2·Бан3·Пик6·Бан4·Пик2 (баны 3-2-2 / 4-1-2; пик-фаза 2 — змейка).
+Полное правило (когда применять, кодировка `F/S/f/s`, что НЕ оборачивать) —
+`docs/captains-mode.md`.
 
 ## База статов (stats DB)
 

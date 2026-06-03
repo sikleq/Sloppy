@@ -437,9 +437,11 @@ def gradient_class(magnitude, is_buff):
     return f"{prefix}10"
 
 
-def b(old, new, l=False):
+def b(old, new, l=False, slash=False):
     """Generate per-level badges. old/new can be scalar or list.
     l=True means lower-is-buff (cooldowns, mana costs, penalties).
+    slash=True separates the badges with " / " instead of ", " — use it for
+    PAIRED dimensions (e.g. daytime / nighttime vision), not level progressions.
     If all per-level badges turn out identical, collapses to a single badge.
     Determines OVERALL buff/nerf tag for filtering:
       - avg of signed per-level %s; sign decides
@@ -546,7 +548,8 @@ def b(old, new, l=False):
         parts = [parts[0]]
 
     overall_attr = f' data-overall="{overall}"' if overall else ""
-    return f'<span class="badge-group"{overall_attr}>' + "".join(parts) + "</span>"
+    grp_cls = "badge-group slash-sep" if slash else "badge-group"
+    return f'<span class="{grp_cls}"{overall_attr}>' + "".join(parts) + "</span>"
 
 
 def br(old_min, old_max, new_min, new_max, l=False):
@@ -883,6 +886,7 @@ class _State:
     next_ul_is_hero_stats = False    # set by hero_header(), consumed by ul_open()
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup
     current_sections = []            # per-patch list of {slug, label}; reset in save_html()
+    current_section_slug = None      # slug of the active section(); "general" suppresses dyn-cells
     # Patch-dynamics widget: tag tallies per (entity, patch). Populated by
     # headers (set current entity key) + li() (increment tag count). Dumped
     # as _dynamics.json at end of build for the JS widget to consume.
@@ -975,7 +979,14 @@ def _slugify(name):
 
 def _register_entity(kind, name):
     """Set current entity (for the dynamics tallies) and return the DOM id
-    attribute string. Call from every header (hero/item/unit/plain)."""
+    attribute string. Call from every header (hero/item/unit/plain).
+
+    Under the big "General Updates" tab nothing gets a dyn-cell — no entity is
+    registered and no id is emitted (single chokepoint for every header type)."""
+    if _State.current_section_slug == 'general':
+        _State.current_entity_key = None
+        _State.current_entity_display = None
+        return ''
     slug = _slugify(name)
     key = f"{kind}|{slug}"
     _State.current_entity_key = key
@@ -1264,6 +1275,229 @@ def show_list(*items, summary='Show list'):
             f'<summary><span class="show-list-chevron">▸</span>'
             f'{summary} <span class="subnote-count">({len(items)})</span></summary>'
             f'<div class="show-list-body">{items_html}</div></details>')
+
+
+def _fmt_formula(expr):
+    """Light syntax styling for a formula string: `*`→`×`, wrap identifiers as
+    `.f-var` and numbers as `.f-num`; parentheses/operators stay muted (base)."""
+    expr = expr.replace('*', '×')
+    return re.sub(
+        r'[A-Za-z_]\w*|\d+(?:\.\d+)?',
+        lambda m: (f'<span class="f-var">{m.group(0)}</span>'
+                   if m.group(0)[0].isalpha() or m.group(0)[0] == '_'
+                   else f'<span class="f-num">{m.group(0)}</span>'),
+        expr)
+
+
+def _eval_formula(expr, env):
+    """Evaluate a plain arithmetic formula string (author-controlled) with the
+    given variable bindings. Restricted namespace — no builtins. `^` is treated
+    as exponentiation (Valve writes `x^2`), NOT bitwise xor. Write implicit
+    products explicitly (`10 * (x-1)`, not `10(x-1)`)."""
+    return eval(expr.replace('^', '**'), {"__builtins__": {}}, dict(env))
+
+
+def _num_fmt(x):
+    """Format a computed number: round to 1 dp, drop a trailing .0."""
+    return f'{round(float(x), 1):g}'
+
+
+def _formula_pct_badge(o, n, lower=False):
+    """Old→new % for a formula row — wrapped in `.badge-group` so it renders as
+    plain coloured text (no pill box), exactly like the % at the end of patch rows."""
+    if o == 0 or n == o:
+        inner = '<span class="badge neutral">0%</span>'
+    else:
+        raw = (n - o) / o * 100
+        is_buff = (n < o) if lower else (n > o)
+        disp = ('+' if n > o else '-') + f'{round(abs(raw), 1):g}%'
+        inner = f'<span class="badge {gradient_class(abs(raw), is_buff)}">{disp}</span>'
+    return f'<span class="badge-group">{inner}</span>'
+
+
+def formula_change(name, old, new, *, tag="REWORK", vary=None, fixed=None,
+                   unit="", lower_better=False):
+    """Render an important game-formula change (Assist Gold, Experience, …) as an
+    old→new block — same pane + `→` styling as the ability_change rework swap, with
+    the formula CENTRED in each pane and variables/numbers lightly coloured. The
+    tag badge sits on the LEFT; panes carry NO "Old"/"New" labels (the `→` shows
+    direction).
+
+    Interactive worked examples (recommended for every formula): pass
+        vary  = (var_name, display_label, [values])   e.g. ("NumHeroes", "Heroes", [1,2,3,4,5])
+        fixed = {input_var: default}                   e.g. {"VictimNetworth": 10000}
+        unit  = result column header                   e.g. "Gold"
+        lower_better = True if a SMALLER result is the buff (default higher=buff)
+    Each pane then gets a small grid table (one row per `vary` value) showing that
+    formula's result + the old→new Δ% (coloured like b()). A number input lets the
+    reader change the `fixed` variable; scripts.js recomputes every row live
+    (default shown as the placeholder "By default: <value>"). If a formula has
+    `NumHeroes`, give up to 5 rows (1–5, the max team size).
+
+    Emit via ``W()`` — standalone block ``<div>`` carrying its own filter tag.
+    See docs/formula-change.md."""
+    # tag → (badge css class, filter key). BUFF/NERF use the *-text classes.
+    _TAG = {'NEW': ('new', 'new'), 'REWORK': ('rework', 'rework'),
+            'BUFF': ('buff-text', 'buff'), 'NERF': ('nerf-text', 'nerf'),
+            'DEL': ('del', 'del'), 'MISC': ('misc', 'misc'), 'QOL': ('qol', 'qol')}
+    badge_cls, tag_id = _TAG.get(tag.upper(), (tag.lower(), tag.lower()))
+    badge = f'<span class="badge {badge_cls}" data-tag="{tag_id}">{tag}</span>'
+    has_ex = bool(vary)                 # examples need a vary var
+    has_input = bool(vary and fixed)    # input only if there's a free (fixed) var to type
+
+    input_html = ''
+    data_attrs = ''
+    if has_input:
+        var_name, label, values = vary
+        in_var = next(iter(fixed))
+        in_def = fixed[in_var]
+        def_disp = f'{in_def:,}' if isinstance(in_def, int) else f'{in_def:g}'
+        input_html = (
+            '<div class="formula-input-row">'
+            f'<span class="formula-input-label">Set <span class="fx-vname">{in_var}</span>:</span>'
+            '<input type="number" class="formula-input" min="0" inputmode="numeric" '
+            f'placeholder="By default: {def_disp}"></div>')
+        data_attrs = (
+            f' data-fx-old="{_html.escape(old, quote=True)}"'
+            f' data-fx-new="{_html.escape(new, quote=True)}"'
+            f' data-fx-invar="{in_var}" data-fx-default="{in_def}"'
+            f' data-fx-varyvar="{var_name}" data-fx-lower="{1 if lower_better else 0}"')
+
+    def _ex_table(this_is_old):
+        if not has_ex:
+            return ''
+        var_name, label, values = vary
+        # Δ% column exists only in the NEW table.
+        th_pct = '' if this_is_old else '<th class="fx-pct-h">Δ%</th>'
+        head = f'<thead><tr><th>{label}</th><th>{unit}</th>{th_pct}</tr></thead>'
+        body = ''
+        for v in values:
+            env = dict(fixed or {})
+            env[var_name] = v
+            oval = _eval_formula(old, env)
+            nval = _eval_formula(new, env)
+            if this_is_old:
+                body += (f'<tr data-h="{v}"><td class="fx-k">{v}</td>'
+                         f'<td class="fx-gold">{_num_fmt(oval)}</td></tr>')
+            else:
+                body += (f'<tr data-h="{v}"><td class="fx-k">{v}</td>'
+                         f'<td class="fx-gold">{_num_fmt(nval)}</td>'
+                         f'<td class="fx-pct">{_formula_pct_badge(oval, nval, lower_better)}</td></tr>')
+        return f'<table class="formula-ex">{head}<tbody>{body}</tbody></table>'
+
+    def _pane(expr, cls, is_old):
+        return (f'<div class="formula-pane formula-pane-{cls}">'
+                f'<code class="formula-expr">{_fmt_formula(expr)}</code>'
+                f'{_ex_table(is_old)}</div>')
+
+    return (f'<div class="formula-change" data-tag="{tag_id}"{data_attrs}>'
+            f'<div class="formula-change-title">{badge}'
+            f'<span class="formula-change-name">{name}</span></div>'
+            f'{input_html}'
+            f'<div class="formula-change-panes">'
+            f'{_pane(old, "old", True)}'
+            f'<span class="ability-change-arrow">→</span>'
+            f'{_pane(new, "new", False)}'
+            f'</div></div>')
+
+
+def cm_draft(*phases, first_label="First pick", second_label="Second pick"):
+    """Render the WHOLE Captains Mode draft like the in-game pick/ban screen:
+    VERTICAL, step numbers running down the centre, the acting team's slot on the
+    LEFT (Team 1 / first pick) or RIGHT (Team 2 / second pick). The Old draft and
+    the New draft are shown as two side-by-side vertical boards. Keep the plain
+    summary ``li(... t("REWORK"))`` above it; emit via ``W()`` after ``ul_close()``.
+
+    Pass the ENTIRE draft as consecutive phases — each a 3-tuple
+    ``(phase_title, old_subseq, new_subseq)`` covering that phase's actions, in
+    order. Concatenated they form the full draft; steps are numbered continuously
+    1..N (the in-game step numbers, e.g. 1–24). Each seq char encodes one action:
+
+        'F' = BAN  by the first-pick team    'S' = BAN  by the second-pick team
+        'f' = PICK by the first-pick team    's' = PICK by the second-pick team
+
+    Side (left = first pick, right = second pick) encodes the team — no colours.
+    Layout is symmetric between Old and New (each step sits at the SAME row in
+    both boards, so only the patch's side changes stand out): BANS are one fixed
+    1-row slot each (all identical size); PICKS pair up — two consecutive picks
+    (one per side) share a 2-row band so they sit FACING each other and read
+    taller, like the in-game board. (Picks are identical in Old/New, so pairing
+    them keeps the boards aligned.) Bans are narrow boxes, picks fill the lane. A
+    long connector ties each number to its slot. Phase
+    titles are required in the tuples (document the structure) but not drawn; there
+    is no legend and no change-highlight.
+
+    See docs/captains-mode.md for the authoring rule (when/how to use this)."""
+    if not phases:
+        return ''
+    full_old = ''.join(o for _, o, _ in phases)
+    full_new = ''.join(n for _, _, n in phases)
+    if len(full_new) != len(full_old):
+        raise ValueError('cm_draft: old and new draft sequences differ in length')
+
+    def _num(step, team, gr):
+        side = 'cm-to-left' if team == 'first' else 'cm-to-right'
+        return (f'<span class="cm-vnum {side}" '
+                f'style="grid-column:2;grid-row:{gr}">{step}</span>')
+
+    def _slot(team, kind, gr, span):
+        col = 1 if team == 'first' else 3
+        side = 'cm-left' if team == 'first' else 'cm-right'
+        gr_v = f'{gr}/span {span}' if span > 1 else f'{gr}'
+        return (f'<span class="cm-token {kind} {side}" '
+                f'style="grid-column:{col};grid-row:{gr_v}"></span>')
+
+    def _board(which):
+        seq = full_old if which == 'Old' else full_new
+        cells = [
+            f'<span class="cm-vhead" style="grid-column:1;grid-row:1">{first_label}</span>',
+            '<span class="cm-vnum cm-vnum-head" style="grid-column:2;grid-row:1"></span>',
+            f'<span class="cm-vhead" style="grid-column:3;grid-row:1">{second_label}</span>',
+        ]
+        def _team(ch):
+            return 'first' if ch in 'Ff' else 'second'
+
+        row = 2
+        i = 0
+        n = len(seq)
+        while i < n:
+            a = seq[i]
+            if a in 'fs':
+                # PICKS pair up (consecutive opposite-side picks) into a 2-row band
+                # so they sit FACING each other. The pick structure is identical in
+                # Old and New, so this keeps the two boards perfectly aligned.
+                if (i + 1 < n and seq[i + 1] in 'fs'
+                        and _team(seq[i + 1]) != _team(a)):
+                    b = seq[i + 1]
+                    cells.append(_num(i + 1, _team(a), row))
+                    cells.append(_num(i + 2, _team(b), row + 1))
+                    cells.append(_slot(_team(a), 'pick', row, 2))
+                    cells.append(_slot(_team(b), 'pick', row, 2))
+                    row += 2
+                    i += 2
+                else:
+                    cells.append(_num(i + 1, _team(a), f'{row}/span 2'))
+                    cells.append(_slot(_team(a), 'pick', row, 2))
+                    row += 2
+                    i += 1
+            else:
+                # Each BAN is its own single row at a FIXED position: every ban is
+                # the same size, and step N sits at the same row in BOTH boards —
+                # only the side changes for the bans the patch reordered, so Old
+                # and New stay symmetric.
+                cells.append(_num(i + 1, _team(a), row))
+                cells.append(_slot(_team(a), 'ban', row, 1))
+                row += 1
+                i += 1
+        grid = f'<div class="cm-vgrid">{"".join(cells)}</div>'
+        return f'<div class="cm-board">{grid}</div>'
+
+    # Old on the left, New on the right (implied by the arrow — no Old/New labels).
+    # Same arrow glyph as the ability_change rework panes.
+    boards = (f'<div class="cm-boards">{_board("Old")}'
+              f'<span class="cm-arrow">→</span>'
+              f'{_board("New")}</div>')
+    return f'<div class="cm-draft"><div class="cm-scroll">{boards}</div></div>'
 
 
 def _component_cell(name, cost, mark=None):
@@ -1860,11 +2094,15 @@ def plain_header(name, dynamics=True):
                       "Upgrades" where each contained item already has
                       its own widget, so the category-level dyn-cell row
                       would be redundant noise.
+
+    Everything under the big "General Updates" tab (General Changes, Map
+    Objectives, Terrain Changes, Captains Mode, …) NEVER shows a dyn-cell row —
+    dynamics is forced off there regardless of the argument.
     """
     out = _close_ability_block()
     _State.current_hero = None
     if dynamics:
-        eid = _register_entity("plain", name)
+        eid = _register_entity("plain", name)   # returns '' under General Updates
     else:
         _State.current_entity_key = None
         eid = ''
@@ -2089,6 +2327,7 @@ def _section_slug(title):
 def section(title):
     _State.current_hero = None
     slug, label = _section_slug(title)
+    _State.current_section_slug = slug
     _State.current_sections.append({'slug': slug, 'label': label})
     return (_close_block()
             + f'<h2 class="section" data-section="{slug}">{title}</h2>')
@@ -3100,6 +3339,7 @@ def write_head(version, date):
     """Render head + top nav (Changelogs+Calendar tabs + version) + container + toolbar."""
     _State.current_patch_version = version
     _State.current_entity_key = None
+    _State.current_section_slug = None
     nav = _render_top_nav(active="changelogs", current_version=version, date=date, patch_context=True)
     # Patch info block in the toolbar — three discrete labelled facts on a
     # single right-aligned row: release date, gap from the previous patch,
@@ -12872,110 +13112,105 @@ W(section("General Updates"))
 # ---- Captains Mode ----
 W(plain_header("Captains Mode"))
 W(ul_open())
-W(li("Changed order of the first and the third ban phases", t("REWORK"),
-     extra=inline_note(
-         '<b>First Ban Phase</b>'
-         ' (<span style="color:#7CA1CC">First</span> = team with the first pick,'
-         ' <span style="color:#F05039">Second</span> = team with the second pick):'
-         '<br>OLD: <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
-         ' - <span style="color:#F05039">Second</span> - <span style="color:#7CA1CC">First</span>'
-         ' - <span style="color:#F05039">Second</span> - <span style="color:#F05039">Second</span>'
-         ' - <span style="color:#7CA1CC">First</span>'
-         '<br>NEW: <span style="color:#7CA1CC">First</span> - <span style="color:#7CA1CC">First</span>'
-         ' - <span style="color:#F05039">Second</span> - <span style="color:#F05039">Second</span>'
-         ' - <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
-         ' - <span style="color:#F05039">Second</span>'
-         '<br><br><b>Third Ban Phase</b>:'
-         '<br>OLD: <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
-         ' - <span style="color:#F05039">Second</span> - <span style="color:#7CA1CC">First</span>'
-         '<br>NEW: <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
-         ' - <span style="color:#7CA1CC">First</span> - <span style="color:#F05039">Second</span>'
-     )))
+W(li("Changed order of the first and the third ban phases", t("REWORK")))
 W(ul_close())
+# Full Captains Mode draft (24 steps), Old over New, rendered as a token board
+# (see cm_draft / docs/captains-mode.md). Structure Ban7-Pick2-Ban3-Pick6-Ban4-Pick2
+# (esports.gg/gosugamers, 7.34). Only the 1st + 3rd ban phases changed in 7.40;
+# bans 3-2-2 / 4-1-2 first/second-pick team, picks alternate 1-3-1.
+# F/S = ban by first/second-pick team; f/s = pick by first/second-pick team.
+W(cm_draft(
+    ("Ban 1",  "FSSFSSF", "FFSSFSS"),   # CHANGED in 7.40
+    ("Pick 1", "fs",      "fs"),
+    ("Ban 2",  "FFS",     "FFS"),
+    ("Pick 2", "sffssf",  "sffssf"),     # snake: 2nd,1st,1st,2nd,2nd,1st pick team
+    ("Ban 3",  "FSSF",    "FSFS"),       # CHANGED in 7.40
+    ("Pick 3", "fs",      "fs"),
+))
 
 W(plain_header("General Changes"))
+# One ul so the tag-order sorter ranks across all three (NEW → NEW → REWORK);
+# they were split across two uls before, which left REWORK between the two NEWs.
 W(ul_open())
-W(li("Talents no longer require a skill point to level", t("MISC"), extra=inline_note("Now talents are learned by using their own talent points available at levels 10, 15, 20, 25, 27, 28, 29, and 30")))
-W(li("This results in all +2 All Attributes bonuses skilled by level 22", t("MISC")))
-W(li("All Facets that used to have 6 All Attributes bonuses now have 7 bonuses again", t("MISC"), extra=inline_note("Batrider's Arsonist, Magnus' Diminishing Return, Meepo's More Meepo, Monkey King's Simian Stride, Night Stalker's Voidbringer, and Silencer's Synaptic Split")))
+W(li("All Facets that used to have 6 All Attributes bonuses now have 7 bonuses again", t("NEW"), extra=show_list("Batrider's Arsonist", "Magnus' Diminishing Return", "Meepo's More Meepo", "Monkey King's Simian Stride", "Night Stalker's Voidbringer", "Silencer's Synaptic Split")))
+W(li("Tier 4 Towers now have a Barracks Reinforcement buff. Each allied barracks that has not been destroyed provides +4 armor to both Tier 4 towers", t("NEW"), extra=inline_note("Bonus is for each individual building, totaling in +24 Armor for 6 Barracks")))
+W(li("Talents no longer require a skill point to level", t("REWORK"), extra=inline_note("Now talents are learned by using their own talent points available at levels 10, 15, 20, 25, 27, 28, 29, and 30. This results in all +2 All Attributes bonuses skilled by level 22")))
 W(ul_close())
+W(formula_change(
+    "Assist Gold Formula",
+    "60 + ( ( VictimNetworth * 0.037 ) / NumHeroes )",
+    "15 + ( ( 50 + ( VictimNetworth * 0.037 ) ) / NumHeroes )",
+    vary=("NumHeroes", "Heroes", [1, 2, 3, 4, 5]),
+    fixed={"VictimNetworth": 10000},
+    unit="Gold",
+))
 W(ul_open())
-W(li("Tier 4 Towers now have a Barracks Reinforcement buff. Each allied barracks that has not been destroyed provides +4 armor to both Tier 4 towers", t("MISC"), extra=inline_note("Bonus is for each individual building, totaling in +24 Armor for 6 Barracks")))
-W(ul_close())
-W(ul_open())
-W(li("Assist Gold Formula Reworked", t("REWORK"), extra=inline_note("OLD: 60 + ( ( VictimNetworth * 0.037 ) / NumHeroes )")))
-W(li("NEW: 15 + ( ( 50 + ( VictimNetworth * 0.037 ) ) / NumHeroes )", t("MISC")))
-W(ul_close())
-W(ul_open())
-W(li("Melee Creep: Gold Bounty now increases by 1 per lane creep upgrade interval (every 7:30)", t("MISC")))
-W(li("Flagbearer Creep: Gold Bounty now increases by 1 per lane creep upgrade interval", t("MISC")))
+W(li("Melee Creep: Gold Bounty now increases by 1 per lane creep upgrade interval (every 7:30)", t("NEW")))
+W(li("Flagbearer Creep: Gold Bounty now increases by 1 per lane creep upgrade interval", t("NEW")))
 W(li("Flagbearer Creep: AoE Bounty Radius increased from 1200 to 1500", b(1200, 1500)))
-W(li("Flagbearer Creep: When killed by a player controlled unit, the Flagbearer Creep always grants Bonus Bounty to the killer's hero regardless of the hero's proximity to the Flagbearer Creep", t("MISC")))
+W(li("Flagbearer Creep: When killed by a player controlled unit, the Flagbearer Creep always grants Bonus Bounty to the killer's hero regardless of the hero's proximity to the Flagbearer Creep", t("REWORK")))
 W(li("Flagbearer Creep: Bonus Gold from killing Flagbearers is now classified as creep gold instead of ability gold", t("MISC"), extra=inline_note("Has no gameplay effect, but makes a post game gold breakdown more accurate")))
 W(li("Flagbearer Creep: Inspiration Aura no longer affects heroes", t("DEL")))
-W(li("Flagbearer Creep: Inspiration Aura now also provides a magic resistance bonus to affected creeps starting with 0% and improving by 4% with every lane creep upgrade interval, up to a maximum of 15 upgrades", t("MISC")))
+W(li("Flagbearer Creep: Inspiration Aura now also provides a magic resistance bonus to affected creeps starting with 0% and improving by 4% with every lane creep upgrade interval, up to a maximum of 15 upgrades", t("NEW")))
 W(ul_close())
 W(ul_open())
-W(li("Courier respawn time decreased from (60s + 6s per Hero Level) to (45s + 5s per Hero Level)", t("MISC")))
-W(li("Courier no longer has a 15% movement speed penalty while carrying a Clarity, Enchanted Mango, Faerie Fire, Healing Salve, or Tango", t("MISC")))
+W(li_formula("Courier respawn time decreased",
+             "60s + 6s per Hero Level", "45s + 5s per Hero Level",
+             lambda L: 60 + 6 * L, lambda L: 45 + 5 * L, l=True))
+W(li("Courier no longer has a 15% movement speed penalty while carrying a Clarity, Enchanted Mango, Faerie Fire, Healing Salve, or Tango", t("BUFF")))
 W(li("Flying Courier will now go to a more obscure shopping area within range of the Secret Shop when using Go To Secret Shop", t("MISC")))
 W(ul_close())
 W(ul_open())
-W(li("All illusions now have 800 daytime vision and 400 nighttime vision", t("MISC")))
+W(li("All illusions now have 800 daytime vision and 400 nighttime vision", b([1800, 800], [800, 400], slash=True),
+     extra=inline_note("Previously inherited the hero's full vision (typically 1800 daytime / 800 nighttime)")))
 W(ul_close())
 
 W(plain_header("Map Objectives"))
 W(subgroup("Roshan"))
 W(ul_open())
-W(li("Roshan is no longer considered a hero for Lifesteal mechanics. As a result, Physical Lifesteal from damage to Roshan is reduced by 40%, and Spell Lifesteal from damage to Roshan is reduced by 80%", t("DEL")))
-W(li("Roar of Retribution: Disarm debuff is no longer dispellable", t("MISC")))
-W(li("Slam: No longer has double duration against creeps", t("MISC")))
-W(li("Slam: Now deals double damage to creeps", t("MISC")))
+W(li("Roshan is no longer considered a hero for Lifesteal mechanics. As a result, Physical Lifesteal from damage to Roshan is reduced by 40%, and Spell Lifesteal from damage to Roshan is reduced by 80%", t("NEW")))
+W(li("Roar of Retribution: Disarm debuff is no longer dispellable", t("NEW")))
+W(li("Slam: No longer has double duration against creeps", t("DEL")))
+W(li("Slam: Now deals double damage to creeps", t("NEW")))
 W(ul_close())
 W(subgroup("Tormentor"))
 W(ul_open())
-W(li("Added a Tormentor Timer near the minimap. Functions similarly to the Roshan Timer. Can be pinged to communicate the current state of Tormentor", t("NEW")))
+W(li("Added a Tormentor Timer near the minimap. Functions similarly to the Roshan Timer. Can be pinged to communicate the current state of Tormentor", t("MISC")))
 W(li("Pinging Tormentor's location in world will trigger the same ping as the timer (same behavior the Roshan Timer has)", t("MISC")))
 W(li("The minimap now only has one Tormentor icon and reflects where Tormentor is or will spawn", t("MISC")))
-W(li("The Shining: Now only starts dealing damage to the surrounding enemies when attacked/damaged", t("MISC")))
+W(li("The Shining: Now only starts dealing damage to the surrounding enemies when attacked/damaged", t("REWORK")))
 W(ul_close())
 W(subgroup("Runes"))
 W(ul_open())
-W(li("Bounty Rune: Now grants gold based on when it was created, not when it was activated", t("MISC")))
+W(li("Bounty Rune: Now grants gold based on when it was created, not when it was activated", t("REWORK")))
 W(li("Haste Rune: Duration no longer increases by 3s per rune cycle, and is always 22s now", t("DEL")))
 W(li("Invisibility Rune: No longer grants incoming damage reduction", t("DEL")))
 W(ul_close())
 
 W(plain_header("Terrain Changes"))
+# One ul for the whole category so the tag-order sorter ranks across all rows
+# (NEW → BUFF → NERF → DEL → MISC); the source paragraph splits were arbitrary.
 W(ul_open())
 W(li("Extended the streams into both Radiant and Dire bases and added defender's gate to the outside of the respective safe lanes where the stream flows", t("MISC")))
 W(li("Removed some trees inside the base near the new safelane defender's gate positions", t("DEL")))
 W(li("The Hard camp nearest to Tier 3 towers where the streams used to start has been demoted to a 'medium' camp", t("MISC")))
 W(li("Moved the safelane medium amphibian neutral camp closest to the Tier 2 tower up the stream, slightly closer to the respective bases", t("MISC")))
-W(ul_close())
-W(ul_open())
 W(li("Lowered the Wisdom Shrine areas to low ground, compared to the respective offlanes, filled them with water and connected to the water areas by the Tier 1 towers", t("MISC")))
 W(li("Moved Wisdom Shrines and Watchers to the low ground and slightly closer to the Tier 1 towers. These Watchers now have vision over the shrines at night", t("MISC")))
 W(li("Hard camps nearest to Wisdom Shrines have been moved slightly back towards the bases", t("MISC")))
 W(li("Changed the 'bridges' to actual bridges", t("MISC")))
 W(li("Slightly expanded the entrance to the bridge by the Lotus pools and adjusted the area within the nearby water areas", t("MISC")))
 W(li("The Hard camp in the 'triangle' has been demoted to a 'medium' camp", t("MISC")))
-W(ul_close())
-W(ul_open())
 W(li("Twin Gate mana cost decreased from 75 to 30", b(75, 30, l=True)))
 W(li("Twin Gates now refund the mana cost if the teleporting channel was interrupted", t("MISC")))
 W(li("Cleared up some areas around the Tormentor locations", t("MISC")))
 W(li("The watchers nearest to the mid-lane and near the small water camps south/north of the tier 1 tower have been removed", t("DEL")))
 W(li("The watchers in the primary jungles have been repositioned from stairs near the small camp to the cliff above the bounty runes", t("MISC")))
 W(li("Added additional blocks preventing flying movement around the edges of the map (e.g. the highground areas behind the Tormentors will no longer be accessible by Batrider during Firefly)", t("NEW")))
-W(ul_close())
-W(ul_open())
 W(li("Watcher night vision range decreased from 800 to 450", b(800, 450)))
 W(li("Watcher capture time decreased from 1.5s to 1s", t("MISC")))
 W(li("Defender's Gate vision radius increased from 525 to 700", b(525, 700)))
 W(li("Defender's Gate will now show their vision radius when holding ALT (similarly to Wards, Watchers, etc.)", t("MISC")))
-W(ul_close())
-W(ul_open())
 W(li("Removed a tree between Dire Safelane Tier 1 tower and the small pull camp", t("DEL")))
 W(li("Very slightly adjusted the paths and spawn points of the Radiant Offlane lane creeps, and the position of the Radiant Offlane Tier 2 tower. This results in creeps pathing to the right of the tier 2 tower instead of sometimes splitting up to go around it", t("MISC")))
 W(li("Radiant Secret Shop trigger area moved slightly towards the radiant Tier 1 tower and more centered around the shopkeeper", t("MISC")))
@@ -13127,7 +13362,7 @@ W(li("Guardian Aura no longer provides increased armor and increased mana regene
 W(ul_close())
 W(item_header("Hand of Midas"))
 W(ul_open())
-W(li("Transmute no longer has an experience multiplier", t("MISC")))
+W(li("Transmute no longer has an experience multiplier", t("NERF")))
 W(li("Transmute charge restore time decreased from 110s to 90s", t("MISC")))
 W(ul_close())
 W(item_header("Heart of Tarrasque"))
@@ -13139,7 +13374,7 @@ W(ul_close())
 W(item_header("Heaven's Halberd"))
 W(ul_open())
 W(li("Disarm is now only dispellable by strong dispels", t("MISC"), extra=inline_note("Still does not pierce debuff immunity")))
-W(li("Disarm no longer has separate disarm durations for melee and ranged targets. Duration is always 3 seconds", t("MISC")))
+W(li("Disarm no longer has separate disarm durations for melee and ranged targets. Duration is always 3 seconds", t("NERF")))
 W(li("Disarm cooldown increased from 18s to 20s", t("MISC")))
 W(ul_close())
 W(item_header("Helm of the Dominator"))
@@ -15063,7 +15298,7 @@ W(ul_close())
 W(hero_header("Terrorblade"))
 W(ability("Dark Unity", slug="terrorblade_dark_unity"))
 W(ul_open())
-W(li("Illusions that are outside 1200 radius no longer have a damage penalty", t("MISC")))
+W(li("Illusions that are outside 1200 radius no longer have a damage penalty", t("BUFF")))
 W(li("Damage increase for illusions within 1200 radius increased from 25% to 60%", b(25, 60)))
 W(ul_close())
 W(ability("Reflection", slug="terrorblade_reflection"))
