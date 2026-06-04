@@ -4151,7 +4151,7 @@ def save_index_html():
                 '<span class="inv-slot">'
                 '<img class="inv-icon" src="icons/ui/gothic/icon_terrain.png" alt="">'
                 '<span class="terrain-dirt" aria-hidden="true">'
-                + '<i class="dirt"></i>' * 7 +
+                + '<i class="dirt"></i>' * 5 +
                 '</span>'
                 '</span>'
                 f'<span class="inv-cap">{label}</span>'
@@ -4168,12 +4168,13 @@ def save_index_html():
         )
     # Special "star" tile — the slot emits a faint pixel-gold glow (hinting it's
     # special); on hover the star pulses (grows/shrinks) and throws off a burst
-    # of magic dust (CSS). Links to the Tribute bot that handles the paid
-    # Telegram-group subscription (opens externally).
+    # of magic dust (CSS). Instead of redirecting, clicking it opens the Support
+    # SUB-PANEL in place (the grid hides, two ways to support appear). See the
+    # `.support-panel` below + the toggle handler in scripts.js.
     cells.append(
         '<a class="inv-cell inv-filled inv-cell-star inv-special" '
-        'href="https://t.me/tribute/app?startapp=so4y" '
-        'target="_blank" rel="noopener noreferrer">'
+        'href="#support" data-support-open '
+        'role="button" aria-expanded="false">'
         '<span class="inv-slot">'
         '<img class="inv-icon" src="icons/ui/gothic/icon_star.png" alt="">'
         # Magic dust: 6 base sparks drift faintly at rest; 8 burst sparks ignite
@@ -4195,13 +4196,64 @@ def save_index_html():
         f'</span>'
         for key, label in _INV_PLACEHOLDERS
     )
+    # Support sub-panel — hidden until the Support tile is clicked, then it
+    # replaces the grid (the book heading + divider stay). Two ways to support:
+    # Telegram (the previous Tribute link) and Donation (link TBD). A back arrow
+    # returns to the inventory grid. Icons are gothic-gold pixel art.
+    TRIBUTE = 'https://t.me/tribute/app?startapp=so4y'
+    # Support sub-panel: two tiles the SAME size as the grid tiles, centred.
+    #  - Telegram = a crumpled envelope that beats like a heart on hover and
+    #    sheds faint hollow hearts that linger then fade (like the star's dust).
+    #  - Donation = a glass jar of coins; on hover a coin keeps dropping in (loop).
+    #    Link not wired yet → inert "soon" tile (hover animation still plays).
+    support_panel = (
+        '<div class="support-panel" aria-hidden="true">'
+        '<div class="support-options">'
+        f'<a class="support-btn support-telegram" href="{TRIBUTE}" '
+        'target="_blank" rel="noopener noreferrer">'
+        '<span class="inv-slot">'
+        '<img class="inv-icon" src="icons/ui/gothic/icon_telegram.png" alt="">'
+        '<span class="tg-hearts" aria-hidden="true">'
+        + '<i class="tg-heart"></i>' * 8 +
+        '</span>'
+        '</span>'
+        '<span class="inv-cap">Telegram</span></a>'
+        '<span class="support-btn support-donation support-soon" '
+        'aria-disabled="true" title="Coming soon">'
+        '<span class="inv-slot">'
+        '<img class="inv-icon" src="icons/ui/gothic/icon_donation.png" alt="">'
+        '<span class="don-coin" aria-hidden="true"></span>'
+        '<span class="support-soon-tag">soon</span></span>'
+        '<span class="inv-cap">Donation</span></span>'
+        '</div>'
+        '</div>'
+    )
+    # The divider keeps its place under the title; when the Support panel is
+    # open a gothic left-arrow ornament appears to its left as the "back" control
+    # (styled like the divider, signalling it's clickable).
+    divider_row = (
+        '<div class="inv-divider-row">'
+        '<button type="button" class="support-back" data-support-close '
+        'aria-label="Back to menu" title="Back">'
+        '<img class="support-back-orn" src="icons/ui/gothic/divider_arrow_left.png" alt="">'
+        '</button>'
+        '<img class="inv-divider" src="icons/ui/gothic/divider.png" alt="" aria-hidden="true">'
+        '</div>'
+    )
+    # The grid + support panel share one fixed-height stage: the grid stays in
+    # flow (defines the height) and only goes invisible when Support opens, while
+    # the panel is absolutely centred over it. So the book never changes size and
+    # the divider above it never moves.
     grid_html = (
         '<div class="inv-book">'
         '<div class="inv-head">'
         '<h1 class="inv-title">What does a hero truly need?</h1>'
         '</div>'
-        '<img class="inv-divider" src="icons/ui/gothic/divider.png" alt="" aria-hidden="true">'
+        f'{divider_row}'
+        '<div class="inv-stage">'
         f'<div class="inv-grid">{"".join(cells)}{empties}</div>'
+        f'{support_panel}'
+        '</div>'
         '</div>'
     )
 

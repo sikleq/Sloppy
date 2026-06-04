@@ -109,6 +109,29 @@ _CAMP_ICON = {0: "creepcamp_small", 1: "creepcamp_mid",
               2: "creepcamp_big", 3: "creepcamp_ancient"}
 _TREE_SIDE = 6.4    # tree square side, viewBox units
 _CAMP_SIDE = 30     # camp icon size, viewBox units
+_ENT_ICON = 26      # entity marker icon size, viewBox units
+_ENT_DISC = 17      # marker disc radius, viewBox units
+_MARKER_GOLD = "#e3c46a"
+
+# Toggleable point-entity layers, in toolbar order. Each: (key in
+# terrain_diff.json["entities"], full label/tooltip, icon slug, type colour). The
+# icon (icons/ui/gothic/tc_<key>.png, baked in the type colour by
+# scripts/gen_terrain_layer_icons.py) is the toolbar button; on the MAP it sits
+# in a light-gold ring over a faint disc of the same colour. Colour must match
+# the generator's COLORS. Watchers == the capturable lookout structures (the old
+# "Outpost"); Roshan == the two pits.
+_ENTITY_LAYERS = [
+    ("towers",     "Towers",         "tc_towers",      "#4a90e2"),
+    ("lotus",      "Lotus Pools",    "tc_lotus",       "#ff7ab5"),
+    ("twinGates",  "Twin Gates",     "tc_twingates",   "#7ec8ff"),
+    ("tormentors", "Tormentors",     "tc_tormentors",  "#ff6a4a"),
+    ("bounty",     "Bounty Runes",   "tc_bounty",      "#f4c63a"),
+    ("power",      "Power Up Runes", "tc_power",       "#5fd06a"),
+    ("wisdom",     "Wisdom Shrines", "tc_wisdom",      "#9b7fc7"),
+    ("outposts",   "Outposts",       "tc_outposts",    "#ff9a3c"),
+    ("watchers",   "Watchers",       "tc_watchers",    "#56d6d0"),
+    ("roshan",     "Roshan",         "tc_roshan",      "#d24a5a"),
+]
 
 
 def _markers_svg(diff):
@@ -170,6 +193,41 @@ def _markers_svg(diff):
     camps_old = camp_layer("tc-camps-old", diff.get("camps40", []))
     camps_new = camp_layer("tc-camps-new", diff.get("camps41", []))
 
+    # ---- point-entity layers (towers / lotus / gates / … ) — each marker is the
+    # type's pixel icon sitting in a light-gold ring over a faint disc of the
+    # type colour. Full old+new sets, split by the slider. ----
+    def marker_g(coords, icon, color):
+        z, r = _ENT_ICON, _ENT_DISC
+        cells = []
+        for x, y in coords:
+            px, py = proj(x, y)
+            cells.append(
+                # clean dark backing (so the busy map doesn't show through and
+                # read as "muddy"), a faint colour tint over it for identity, then
+                # the gold ring + the light icon on top.
+                f'<circle cx="{px}" cy="{py}" r="{r}" fill="#0d100b" '
+                f'fill-opacity="0.66"/>'
+                f'<circle cx="{px}" cy="{py}" r="{r}" fill="{color}" '
+                f'fill-opacity="0.34" stroke="{_MARKER_GOLD}" stroke-width="2"/>'
+                f'<image href="icons/ui/gothic/{icon}.png" '
+                f'x="{round(px - z / 2, 1)}" y="{round(py - z / 2, 1)}" '
+                f'width="{z}" height="{z}"/>')
+        return f'<g class="tm-ent-g">{"".join(cells)}</g>'
+
+    def ent_layer(key, side, coords, icon, color):
+        return (f'<svg class="tc-markers tm-layer tm-layer-{key} tm-{side}" '
+                f'viewBox="0 0 {MAP_VB} {MAP_VB}" preserveAspectRatio="none" '
+                f'aria-hidden="true">{marker_g(coords, icon, color)}</svg>')
+
+    entities = diff.get("entities", {})
+    ent_svgs = []
+    for key, _label, icon, color in _ENTITY_LAYERS:
+        ed = entities.get(key)
+        if not ed:
+            continue
+        ent_svgs.append(ent_layer(key, "old", ed.get("old", []), icon, color))
+        ent_svgs.append(ent_layer(key, "new", ed.get("new", []), icon, color))
+
     old_t = tier_counts(diff.get("camps40", []))
     new_t = tier_counts(diff.get("camps41", []))
     counts = {
@@ -177,7 +235,8 @@ def _markers_svg(diff):
         "treesNew": len(diff.get("treesNew", [])),
         "campsOld": old_t, "campsNew": new_t,
     }
-    return trees_old + trees_new + camps_old + camps_new, counts
+    return (trees_old + trees_new + camps_old + camps_new
+            + "".join(ent_svgs), counts)
 
 
 def _latest_href():
@@ -191,32 +250,77 @@ def _latest_href():
 
 
 # ---- terrain change list -----------------------------------------------------
-# SOURCE OF TRUTH: build_patch.py 7.41 "Terrain Changes" section (search
-# write_head("7.41") then plain_header("Terrain Changes"), ~line 6416). These
-# are the changes introduced IN 7.41 (the 7.40 map rework is a DIFFERENT, much
-# larger list — do not use it here). They line up with the leamare 7.40->7.41
-# data diff: tormentor/lotus/twin-gate moves, camp demotions+moves, tower
-# nudges, tree removals. (text, TAG); sorted by canonical tag order on render.
-# TODO(terrain): when the patch picker lands, make this per-patch instead of a
-# single hardcoded list (see docs/terrain.md).
-_TERRAIN_CHANGES = [
-    ("Tormentor spawns have been positioned closer towards Lotus Pools", "MISC"),
-    ("Tormentor spawn areas have been reduced to low ground relative to the lane's level", "MISC"),
-    ("Lotus Pools have been moved slightly closer to their respective offlane tower", "MISC"),
-    ("Twin Gates slightly moved away from the stairs towards the map border", "MISC"),
-    ("The watcher between the safe lane tier 1 tower and the tormentor has been repositioned", "MISC"),
-    ("Ancient neutral camps near stream ends demoted to medium camps and moved slightly towards bases", "NERF"),
-    ("Medium neutral camp near offlane defender's gate has been demoted to a small neutral camp", "NERF"),
-    ("The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet", "BUFF"),
-    ("Radiant safe lane small camp has been slightly moved north away from the lane", "MISC"),
-    ("Radiant safe lane hard camp's spawn box has been moved towards the offlane to remove a bad ward location", "MISC"),
-    ("Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides of the tower", "BUFF"),
-    ("The ramp leading from the Radiant tier 1 tower to the stream has been decreased in width and moved away from the tower", "NERF"),
-    ("The medium flooded camp near the safe lane tier 2 towers moved closer to the middle of the stream (substantially more for Dire than for Radiant)", "MISC"),
-    ("The medium flooded camp near the safe lane tier 2 towers can now only evolve once into a hard camp, rather than into an Ancient Camp", "NERF"),
-    ("The medium flooded camp near the bounty runes can now evolve twice into an Ancient Camp", "REWORK"),
-    ("Removed several trees from Dire Safelane easy pull camp and Radiant Safelane hard pull camp", "MISC"),
-]
+# SOURCE OF TRUTH: the "Terrain Changes" sections in build_patch.py. Rather than
+# duplicate them (and risk drift), we PARSE them straight out of build_patch.py
+# at build time — one list per patch that has a terrain section. Today that's
+# 7.41 (the moves that line up with our 7.40->7.41 map diff) and 7.40 (the big
+# stream/Wisdom-Shrine/bridge rework). The patch picker shows every patch found.
+#
+# Patches we hold a matched OLD->NEW map pair for (so the swipe slider works);
+# any other patch with terrain changes still lists its changes but shows a
+# "comparison not available yet" fallback in place of the slider.
+_MAP_PAIRS = {
+    "7.41": (OLD_VER, NEW_VER),   # icons/maps/map_7.40.webp + map_7.41.webp
+}
+# The patch whose change set matches the committed terrain_diff.json markers +
+# tree/camp counts (the swipe + Trees/Camps overlays only make sense here).
+_DIFF_PATCH = "7.41"
+
+
+def _terrain_changes_by_patch():
+    """Parse every ``plain_header("Terrain Changes")`` block out of
+    build_patch.py → ``{version: [(text, TAG), ...]}`` in newest-first source
+    order. Each block is a single ``ul_open()…ul_close()`` of ``W(li("text",
+    …))`` rows; we read the row text + its tag (``t("TAG")`` or a ``b(...)``
+    badge inferred BUFF/NERF). Falls back to an empty dict if the source can't
+    be read so the page still builds."""
+    import re
+    path = _os.path.join(_HERE, "build_patch.py")
+    try:
+        src = open(path, encoding="utf-8").read()
+    except OSError:
+        return {}
+    heads = [(m.start(), m.group(1))
+             for m in re.finditer(r'write_head\("([^"]+)"', src)]
+
+    def patch_for(off):
+        prev = [h for h in heads if h[0] < off]
+        return prev[-1][1] if prev else "?"
+
+    out = {}
+    for hm in re.finditer(r'plain_header\("Terrain Changes"\)', src):
+        i = hm.start()
+        j = src.index("ul_close()", i)
+        block = src[i:j]
+        rows = []
+        for seg in block.split("W(li(")[1:]:
+            m = re.match(r'\s*"([^"]*)"', seg)
+            if not m:
+                continue
+            text = m.group(1)
+            rest = seg[m.end():m.end() + 300]
+            tm = re.search(r't\("(\w+)"\)', rest)
+            if tm:
+                tag = tm.group(1)
+            elif re.match(r"\s*,\s*b\(", rest):
+                # Numeric badge → BUFF/NERF by direction, honouring l=True
+                # (lower-is-better: cheaper mana cost = buff).
+                lower_better = "l=True" in rest
+                low = text.lower()
+                if "decreased" in low or "reduced" in low:
+                    good = lower_better
+                else:                       # increased / default
+                    good = not lower_better
+                tag = "BUFF" if good else "NERF"
+            else:
+                tag = "MISC"
+            rows.append((text, tag))
+        if rows:
+            # Collapse a patch letter (7.41c) to its base (7.41) — the terrain
+            # block lives under the base patch's write_head.
+            out.setdefault(patch_for(i), rows)
+    return out
+
 
 # Canonical tag order (same as the site convention): NEW → REWORK → BUFF →
 # NERF → DEL → MISC/QoL. Stable within a rank.
@@ -252,38 +356,39 @@ def _change_li(text, tag):
             f'<span class="row-text">{text}</span></li>')
 
 
-def _changes_html():
+def _changes_html(changes):
     rows = sorted(
-        enumerate(_TERRAIN_CHANGES),
+        enumerate(changes),
         key=lambda it: (_TAG_RANK.get(it[1][1], 9), it[0]),
     )
     return "\n".join(_change_li(text, tag) for _i, (text, tag) in rows)
 
 
-def _topbar_html():
-    """The control strip overlaid on the map's top edge (non-playable space):
-    the Zoom / Trees / Camps toggle buttons, with the NEW version label pinned
-    to the right. (The OLD label sits in the bottom-left map corner instead.)"""
-    def btn(cls, icon, label, title):
-        return (f'        <button type="button" class="tc-btn {cls}" '
-                f'aria-pressed="false" title="{_esc(title)}">'
-                f'<img src="{icon}" alt="" width="15" height="15">{label}</button>\n')
-    return (
-        '    <div class="tc-topbar">\n'
-        '      <span class="tc-controls">\n'
-        + btn("tc-btn-zoom", "icons/ui/gothic/icon_loupe.png", "Zoom",
-              "Magnifier: hover to zoom, click to pin a spot, then sweep the "
-              "handle to compare it across versions")
-        + btn("tc-btn-trees", "icons/ui/gothic/icon_tree.png", "Trees",
-              "Show the tree layout — 7.40 on the old side, 7.41 on the new "
-              "side; sweep the handle to see the forest move")
-        + btn("tc-btn-camps", "icons/camps/creepcamp_mid.png", "Camps",
-              "Show neutral camps by tier (small / medium / large / ancient); "
-              "camps whose tier changed are ringed")
-        + '      </span>\n'
-        f'      <span class="tc-ver tc-ver-new">{NEW_VER}</span>\n'
-        '    </div>\n'
-    )
+def _controls_html():
+    """The control bar ABOVE the map (not overlaid, so it never covers the now
+    edge-to-edge map): the Zoom mode button + every overlay-layer toggle (Trees,
+    Camps, and the eight point-entity layers). Icon-only square buttons with
+    tooltips + a colour dot matching each layer's map markers, wrapping as the
+    width allows."""
+    def layer_btn(key, label, icon, icon_dir="ui/gothic"):
+        return (f'<button type="button" class="tc-btn tc-btn-icon tc-layer-btn" '
+                f'data-layer="{key}" aria-pressed="false" '
+                f'title="{_esc(label)}" aria-label="{_esc(label)}">'
+                f'<img src="icons/{icon_dir}/{icon}.png" alt="" '
+                f'width="16" height="16"></button>')
+    parts = [
+        # No long tooltip — the "Zoom" label already says what it is.
+        '<button type="button" class="tc-btn tc-btn-zoom" aria-pressed="false">'
+        '<img src="icons/ui/gothic/icon_loupe.png" alt="" width="15" height="15">'
+        'Zoom</button>',
+        '<span class="tc-sep" aria-hidden="true"></span>',
+        layer_btn("trees", "Trees", "icon_tree"),
+        layer_btn("camps", "Neutral Camps", "creepcamp_mid", icon_dir="camps"),
+    ]
+    for key, label, icon, _color in _ENTITY_LAYERS:
+        parts.append(layer_btn(key, label, icon))
+    return ('    <div class="tc-controls-bar">\n      '
+            + "".join(parts) + '\n    </div>\n')
 
 
 def _compare_html(markers_svg=""):
@@ -297,6 +402,7 @@ def _compare_html(markers_svg=""):
     mode a plain click on the map pins/unpins the lens."""
     return (
         '<div class="terrain-compare" data-pos="50" data-zoom="1.9" data-lens="184">\n'
+        f'{_controls_html()}'
         '  <div class="tc-stage">\n'
         f'    <img class="tc-img tc-old" src="{OLD_MAP}?v={ASSET_VERSION}" '
         f'width="1536" height="1536" alt="Dota 2 map terrain in patch {OLD_VER}" '
@@ -307,7 +413,7 @@ def _compare_html(markers_svg=""):
         f'draggable="false" loading="eager">\n'
         '    </div>\n'
         f'    {markers_svg}\n'
-        f'{_topbar_html()}'
+        f'    <span class="tc-ver tc-ver-new">{NEW_VER}</span>\n'
         f'    <span class="tc-ver tc-ver-old">{OLD_VER}</span>\n'
         '    <div class="tc-handle" role="slider" tabindex="0" '
         f'aria-label="Reveal {OLD_VER} versus {NEW_VER} terrain" '
@@ -360,12 +466,61 @@ def _counts_html(counts):
 
 
 def _source_html():
-    """Data-source credit shown under the slider — where the map renders and the
-    entity coordinates (used for the tree diff) come from."""
+    """Data-source credit shown under the slider — the map renders come from one
+    leamare repo, the entity coordinates (tree/camp diff) from another."""
+    def link(repo):
+        return (f'<a href="https://github.com/leamare/{repo}" target="_blank" '
+                f'rel="noopener noreferrer">leamare/{repo}</a>')
     return (
-        '<p class="tc-source">Map renders &amp; entity coordinates from '
-        '<a href="https://github.com/leamare/dota-interactive-map" target="_blank" '
-        'rel="noopener noreferrer">leamare/dota-interactive-map</a>.</p>\n'
+        '<p class="tc-source">Map renders from '
+        f'{link("dota-interactive-map")}; entity coordinates from '
+        f'{link("dota-map-coordinates")}.</p>\n'
+    )
+
+
+def _picker_html(patches, default):
+    """Gold dropdown (calendar year-picker structure, gold `.tc-picker` skin)
+    listing every patch that has terrain changes — newest first. It sits in the
+    change-list heading AS the version (e.g. "[7.41 ▾] Terrain Changes");
+    switching it swaps the visible map pane + change list (scripts.js
+    initTerrainPicker)."""
+    opts = []
+    for ver in patches:
+        sel = " is-selected" if ver == default else ""
+        asel = "true" if ver == default else "false"
+        opts.append(
+            f'<li class="cal-year-opt{sel}" role="option" '
+            f'data-patch="{ver}" aria-selected="{asel}">{ver}</li>')
+    return (
+        '<div class="cal-year-picker tc-picker">'
+        '<button type="button" class="cal-year-current" '
+        'aria-haspopup="listbox" aria-expanded="false">'
+        f'<span class="cal-year-current-val">{default}</span>'
+        '<span class="cal-year-caret" aria-hidden="true">▾</span>'
+        '</button>'
+        '<ul class="cal-year-menu" role="listbox" hidden>'
+        + "".join(opts) +
+        '</ul>'
+        '</div>'
+    )
+
+
+def _fallback_html(ver):
+    """Shown in place of the swipe slider for a patch we don't yet hold a matched
+    OLD->NEW map pair for: the latest map we DO have, blurred, with a centered
+    "not available yet" overlay. The textual change list still renders beside it
+    so the page stays useful before the art lands."""
+    return (
+        '<div class="terrain-fallback">\n'
+        f'  <img class="tc-fallback-img" src="{NEW_MAP}?v={ASSET_VERSION}" '
+        'alt="" draggable="false" loading="lazy">\n'
+        '  <div class="tc-fallback-veil"></div>\n'
+        '  <div class="tc-fallback-msg">\n'
+        f'    <span class="tc-fallback-title">Map comparison for {ver}</span>\n'
+        '    <span class="tc-fallback-sub">isn’t available yet</span>\n'
+        '    <span class="tc-fallback-note">The change list is on the right.</span>\n'
+        '  </div>\n'
+        '</div>\n'
     )
 
 
@@ -375,6 +530,47 @@ def save_terrain_html():
                                subnav_in_header=False)
     subnav = _site.render_materials_subnav('terrain')
     markers_svg, counts = _markers_svg(_load_diff()) if SHOW_MARKERS else ("", {})
+
+    by_patch = _terrain_changes_by_patch()
+    # Newest-first; the parser yields source order (7.41 before 7.40) already.
+    patches = list(by_patch.keys())
+    if not patches:                       # parser failed → degrade gracefully
+        patches = [_DIFF_PATCH]
+        by_patch = {_DIFF_PATCH: []}
+    default = patches[0]
+
+    # ---- map panes (one per patch): the swipe slider where we have a map pair,
+    # the "not available yet" fallback otherwise. ----
+    map_panes = []
+    for ver in patches:
+        hidden = "" if ver == default else " hidden"
+        if ver in _MAP_PAIRS:
+            inner = _compare_html(markers_svg if ver == _DIFF_PATCH else "")
+        else:
+            inner = _fallback_html(ver)
+        map_panes.append(
+            f'<div class="terrain-map-pane" data-patch="{ver}"{hidden}>\n'
+            f'{inner}</div>\n')
+
+    # ---- change-list panes (one per patch): list + counts (counts only for the
+    # patch whose map diff we have). The single heading (with the patch picker)
+    # sits above all panes. ----
+    list_panes = []
+    for ver in patches:
+        hidden = "" if ver == default else " hidden"
+        counts_html = _counts_html(counts) if ver == _DIFF_PATCH else ""
+        list_panes.append(
+            f'<div class="terrain-list-pane" data-patch="{ver}"{hidden}>\n'
+            f'<ul class="changes terrain-list">\n{_changes_html(by_patch[ver])}\n</ul>\n'
+            f'{counts_html}'
+            '</div>\n')
+    # Heading = the picker AS the version + "Terrain Changes" label. (A <div>,
+    # not <h2> — it holds interactive controls, which can't live inside a heading.)
+    list_head = (
+        '<div class="terrain-list-head">'
+        f'{_picker_html(patches, default)}'
+        '<span class="terrain-list-head-label">Terrain Changes</span>'
+        '</div>\n')
 
     page = (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
@@ -394,20 +590,21 @@ def save_terrain_html():
         '<p class="mr-blurb inbox-bar">Drag the <strong>handle</strong> to wipe between '
         'the old and new map. Turn on '
         '<img class="tc-inline-loupe" src="icons/ui/gothic/icon_loupe.png" alt="" '
-        'width="16" height="16"><strong>Zoom</strong> (top bar) to magnify on hover — '
+        'width="16" height="16"><strong>Zoom</strong> (above the map) to magnify on hover — '
         '<strong>click</strong> pins a spot so you can sweep the handle and compare it '
-        'across versions. <strong>Trees</strong> overlays the forest layout for both '
-        'patches (sweep to see it shift); <strong>Camps</strong> shows the neutral camps '
-        'by tier. Full change list on the right.</p>\n'
+        'across versions. The toggle buttons above the map overlay objects — '
+        '<strong>Trees</strong>, <strong>Camps</strong>, towers, runes, lotus pools, '
+        'gates, tormentors, shrines, outposts, watchers and Roshan — each split old/new by the slider, so '
+        'sweeping shows what moved. Pick a <strong>patch</strong> from the heading on the '
+        'right.</p>\n'
         '<div class="terrain-wrap">\n'
         '<div class="terrain-compare-col">\n'
-        f'{_compare_html(markers_svg)}'
+        f'{"".join(map_panes)}'
         f'{_source_html()}'
         '</div>\n'
         '<div class="terrain-list-box">\n'
-        f'<h2 class="terrain-list-head">{NEW_VER} Terrain Changes</h2>\n'
-        f'<ul class="changes terrain-list">\n{_changes_html()}\n</ul>\n'
-        f'{_counts_html(counts)}'
+        f'{list_head}'
+        f'{"".join(list_panes)}'
         '</div>\n'
         '</div>\n'
         '</div>\n'   # close .creeps-scroll
@@ -418,8 +615,10 @@ def save_terrain_html():
     out = _os.path.join(_HERE, "terrain.html")
     with open(out, "w", encoding="utf-8") as f:
         f.write(page)
+    total = sum(len(v) for v in by_patch.values())
     print(f"  -> terrain.html: {len(page):,} bytes "
-          f"({len(_TERRAIN_CHANGES)} terrain changes, {OLD_VER}->{NEW_VER})")
+          f"({len(patches)} patches, {total} terrain changes; "
+          f"default {default})")
 
 
 if __name__ == "__main__":

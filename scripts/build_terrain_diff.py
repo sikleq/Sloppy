@@ -126,6 +126,30 @@ def main():
     camps40 = camp_list(A["npc_dota_neutral_spawner"])
     camps41 = camp_list(B["npc_dota_neutral_spawner"])
 
+    # ---- point-entity layers (towers / lotus / twin gates / tormentors / bounty
+    # + power runes / wisdom shrines / watchers / roshan) — FULL old+new sets so each
+    # is a toggleable map layer split by the slider (old layout on the old side,
+    # new on the new side), exactly like trees/camps. leamare keys: ----
+    _ENTITY_KEYS = {
+        "towers": "npc_dota_tower",
+        "lotus": "npc_dota_lotus_pool",
+        "twinGates": "npc_dota_unit_twin_gate",
+        "tormentors": "npc_dota_miniboss_spawner",
+        "bounty": "dota_item_rune_spawner_bounty",
+        "power": "dota_item_rune_spawner_powerup",
+        "wisdom": "npc_dota_xp_fountain",       # Shrine of Wisdom
+        # Per leamare's layerDefinitions.js: Outpost == npc_dota_watch_tower (2),
+        # Watcher == npc_dota_lantern (10) — they are SEPARATE layers.
+        "outposts": "npc_dota_watch_tower",
+        "watchers": "npc_dota_lantern",
+        "roshan": "npc_dota_roshan_spawner",
+    }
+
+    def coords(src, key):
+        return [[e["x"], e["y"]] for e in src.get(key, [])]
+    entities = {name: {"old": coords(A, key), "new": coords(B, key)}
+                for name, key in _ENTITY_KEYS.items()}
+
     diff = {
         "oldVer": "7.40", "newVer": "7.41",
         "world": {"minX": -10464, "maxX": 10400, "minY": -10464, "maxY": 10400},
@@ -133,6 +157,8 @@ def main():
         "treesNew": [[x, y] for x, y in trees_new],
         "camps40": camps40,
         "camps41": camps41,
+        # toggleable point-entity layers (full old+new sets, split by slider)
+        "entities": entities,
         # move data kept for reference (not drawn): camps/towers/objectives
         "camps": camps,
         "towers": towers,
@@ -144,11 +170,12 @@ def main():
         json.dump(diff, f, separators=(",", ":"))
     from collections import Counter
     tiers = Counter(c["tier"] for c in camps41)
+    ent_summary = ", ".join(f"{k} {len(v['new'])}" for k, v in entities.items())
     print(f"  -> {os.path.relpath(OUT, _ROOT)}: "
           f"trees {len(trees_old)}->{len(trees_new)} "
           f"({len(trees_new) - len(trees_old):+d}), "
           f"camps {len(camps40)}/{len(camps41)} tiers={dict(tiers)}, "
-          f"{len(towers)} towers")
+          f"{len(towers)} towers\n     entities: {ent_summary}")
 
 
 if __name__ == "__main__":

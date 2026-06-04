@@ -490,10 +490,10 @@ body:has(.creeps-page) nav.top-nav {
 .inv-cell-terrain:hover .terrain-dirt { animation: terrainBob 2.1s ease-in-out infinite; }
 .dirt {
   position: absolute;
-  width: 3px;
-  height: 4px;
+  width: 2px;                               /* half the old 3x4 footprint */
+  height: 2px;
   background: #d8a850;                       /* warm soil — bright enough to read */
-  box-shadow: 0 0 0 1px rgba(34, 20, 9, 0.9);
+  box-shadow: 0 0 0 0.5px rgba(34, 20, 9, 0.9);
   image-rendering: pixelated;
   opacity: 0;
 }
@@ -507,21 +507,219 @@ body:has(.creeps-page) nav.top-nav {
 @keyframes dirtFall {
   0%   { transform: translateY(-1px); opacity: 0; }
   14%  { opacity: 1; }
-  85%  { opacity: 0.95; }
-  100% { transform: translateY(15px); opacity: 0; }
+  90%  { opacity: 0.95; }
+  100% { transform: translateY(28px); opacity: 0; }   /* falls almost to the tile's bottom edge */
 }
-/* origins hug the narrow block's V-shaped underside: vertex ~(38,55), corners
-   ~(27,47)/(49,47). */
-.dirt:nth-child(1) { left: 38px; top: 54px; animation-duration: 2.4s; animation-delay: 0s;   }
-.dirt:nth-child(2) { left: 34px; top: 52px; animation-duration: 3.1s; animation-delay: 0.9s; }
-.dirt:nth-child(3) { left: 42px; top: 52px; animation-duration: 2.8s; animation-delay: 1.7s; }
-.dirt:nth-child(4) { left: 31px; top: 50px; animation-duration: 3.6s; animation-delay: 0.5s; }
-.dirt:nth-child(5) { left: 45px; top: 50px; animation-duration: 2.6s; animation-delay: 2.2s; }
-.dirt:nth-child(6) { left: 36px; top: 55px; animation-duration: 3.9s; animation-delay: 1.3s; }
-.dirt:nth-child(7) { left: 40px; top: 53px; animation-duration: 3.3s; animation-delay: 2.8s; }
+/* Five particles (was ten) spread sparsely along the flat tile's underside
+   (slot coords ~x 20–56) with long, staggered cycles → the soil sheds
+   occasionally and is never clustered. */
+.dirt:nth-child(1) { left: 22px; top: 48px; animation-duration: 4.2s; animation-delay: 0s;   }
+.dirt:nth-child(2) { left: 31px; top: 52px; animation-duration: 4.8s; animation-delay: 2.3s; }
+.dirt:nth-child(3) { left: 39px; top: 47px; animation-duration: 4.5s; animation-delay: 1.2s; }
+.dirt:nth-child(4) { left: 47px; top: 53px; animation-duration: 5.1s; animation-delay: 3.4s; }
+.dirt:nth-child(5) { left: 54px; top: 49px; animation-duration: 4.6s; animation-delay: 1.9s; }
 .inv-filled:focus-visible .inv-slot {
   outline: 2px solid #eccb7e;
   outline-offset: 3px;
+}
+
+/* ---- SUPPORT sub-panel ----
+   Clicking the Support tile opens this in place of the grid (the book heading +
+   divider stay). The grid hides; two tiles the SAME size as the grid tiles
+   appear, centred: Telegram (envelope) and Donation (coin jar). A gothic
+   left-arrow ornament next to the divider acts as "back". */
+/* Grid + panel share one stage. The grid stays in flow (it sets the height) and
+   only turns INVISIBLE when Support opens — it keeps its space, so the book
+   never resizes and the divider above never shifts. The panel is centred over
+   that exact area. */
+.inv-stage { position: relative; }
+.support-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+}
+.inv-book.support-open .inv-grid { visibility: hidden; }
+.inv-book.support-open .support-panel {
+  opacity: 1;
+  pointer-events: auto;
+  animation: supportIn 0.28s ease both;
+}
+@keyframes supportIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Same gap as the inventory grid (12px), centred. */
+.support-options {
+  display: flex;
+  justify-content: center;
+  gap: 9px 12px;
+  flex-wrap: wrap;
+}
+/* Identical to a grid tile (.inv-cell): same slot/icon/caption sizes + the same
+   lift-on-hover. So .support-btn reuses the base .inv-slot / .inv-icon / .inv-cap
+   sizing — we only add positioning context for the hover particles. */
+.support-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.support-btn .inv-slot { position: relative; overflow: visible; }
+.support-btn .inv-cap {
+  font-family: 'Jersey 10', monospace;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: #e3c46a;
+  transition: color 0.15s ease;
+}
+.support-btn:hover .inv-slot { transform: translateY(-3px); filter: brightness(1.22); }
+.support-btn:hover .inv-icon { transform: translateY(-3px) scale(1.06); }
+.support-btn:hover .inv-cap { color: #fff5dc; }
+.support-btn:focus-visible { outline: none; }
+.support-btn:focus-visible .inv-slot { outline: 2px solid #eccb7e; outline-offset: 3px; }
+/* Donation isn't wired up yet — keep it full-colour + alive (the jar animates),
+   just non-clickable with a "soon" ribbon. */
+.support-soon { cursor: default; }
+.support-soon-tag {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  padding: 0 5px;
+  font-family: 'Jersey 10', monospace;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: #14100a;
+  background: #e3c46a;
+  border-radius: 3px;
+  text-transform: lowercase;
+}
+
+/* ---- TELEGRAM envelope: heart-beat pulse + faint hollow hearts that drift out
+   and linger, then fade when the cursor leaves (like the star's magic dust). */
+.support-telegram:hover .inv-icon { animation: tgBeat 0.85s ease-in-out infinite; }
+@keyframes tgBeat {
+  0%, 100% { transform: translateY(-3px) scale(1.06); }
+  15%      { transform: translateY(-3px) scale(1.2); }
+  30%      { transform: translateY(-3px) scale(1.06); }
+  45%      { transform: translateY(-3px) scale(1.14); }
+  60%      { transform: translateY(-3px) scale(1.06); }
+}
+.tg-hearts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  /* The whole layer lingers, then dissolves, after the cursor leaves. The hearts
+     keep growing + drifting underneath (their own animation never stops), so on
+     mouse-out they float on, swelling and fading, beyond the button edges. */
+  transition: opacity 0.9s ease;
+}
+.support-telegram:hover .tg-hearts { opacity: 1; }
+.tg-heart {
+  position: absolute;
+  width: 12px;            /* thin-walled 9x8 source; starts tiny, swells as it flies */
+  height: 11px;
+  background: url('icons/ui/gothic/heart_hollow.png') no-repeat center / contain;
+  image-rendering: pixelated;
+  opacity: 0;
+  animation: heartFloat 3.4s ease-out infinite;   /* slow, long swell */
+}
+@keyframes heartFloat {
+  0%   { transform: translate(0, 0) scale(0.28); opacity: 0; }
+  20%  { opacity: 0.9; }
+  72%  { opacity: 0.7; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1.9); opacity: 0; }
+}
+/* Emit from around the envelope and travel WELL past the 76px slot edges. */
+.tg-heart:nth-child(1) { top: 30px; left: 33px; --tx: -42px; --ty: -46px; animation-duration: 3.2s; animation-delay: 0s;   }
+.tg-heart:nth-child(2) { top: 28px; left: 40px; --tx: 40px;  --ty: -50px; animation-duration: 3.8s; animation-delay: 0.4s; }
+.tg-heart:nth-child(3) { top: 35px; left: 29px; --tx: -54px; --ty: -16px; animation-duration: 3.5s; animation-delay: 0.9s; }
+.tg-heart:nth-child(4) { top: 35px; left: 45px; --tx: 52px;  --ty: -22px; animation-duration: 3.1s; animation-delay: 1.3s; }
+.tg-heart:nth-child(5) { top: 32px; left: 37px; --tx: -12px; --ty: -58px; animation-duration: 4.0s; animation-delay: 0.6s; }
+.tg-heart:nth-child(6) { top: 36px; left: 39px; --tx: 18px;  --ty: -54px; animation-duration: 3.6s; animation-delay: 1.7s; }
+.tg-heart:nth-child(7) { top: 31px; left: 31px; --tx: -34px; --ty: -34px; animation-duration: 4.1s; animation-delay: 1.0s; }
+.tg-heart:nth-child(8) { top: 31px; left: 43px; --tx: 34px;  --ty: -34px; animation-duration: 3.4s; animation-delay: 2.1s; }
+
+/* ---- DONATION jar: a coin keeps dropping in on hover (looped). The jar itself
+   stays put so the coin lands on the pile consistently. */
+.support-donation:hover .inv-icon { transform: none; }   /* jar holds still */
+.don-coin {
+  position: absolute;
+  left: 50%;
+  top: 4px;                 /* starts above the open mouth → falls in, lands on pile */
+  width: 11px;
+  height: 11px;
+  margin-left: -5px;
+  background: url('icons/ui/gothic/coin.png') no-repeat center / contain;
+  image-rendering: pixelated;
+  opacity: 0;
+  pointer-events: none;
+}
+.support-donation:hover .don-coin { animation: coinDrop 1.5s cubic-bezier(0.5, 0, 0.85, 1) infinite; }
+@keyframes coinDrop {
+  0%   { transform: translateY(0);    opacity: 0; }
+  12%  { opacity: 1; }
+  55%  { transform: translateY(37px); opacity: 1; }   /* lands on the pile */
+  63%  { transform: translateY(33px); }                /* tiny bounce */
+  70%  { transform: translateY(37px); opacity: 1; }
+  88%  { transform: translateY(37px); opacity: 0.9; }
+  100% { transform: translateY(37px); opacity: 0; }    /* settles in → loop */
+}
+
+/* ---- BACK control: a gothic left-arrow ornament beside the title divider,
+   only while the Support panel is open. */
+.inv-divider-row {
+  position: relative;
+  text-align: center;          /* divider centres on its own — unaffected by the
+                                  arrow, so the arrow can never shift it */
+  margin: 14px 0 24px;
+  line-height: 0;
+}
+.inv-divider-row .inv-divider {
+  display: inline-block;
+  margin: 0;
+  vertical-align: middle;
+}
+.support-back {
+  position: absolute;          /* out of flow → the divider stays put */
+  top: 50%;
+  right: 89%;                  /* right edge just left of the divider's left end */
+  transform: translateY(-50%);
+  display: none;
+  padding: 5px 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 0;
+}
+.inv-book.support-open .support-back { display: inline-flex; }
+.support-back-orn {
+  height: 20px;
+  image-rendering: pixelated;
+  opacity: 0.85;
+  transition: opacity 0.15s ease, transform 0.15s ease, filter 0.15s ease;
+}
+.support-back:hover .support-back-orn {
+  opacity: 1;
+  filter: brightness(1.18);
+  transform: translateX(-3px);
+}
+.support-back:focus-visible { outline: none; }
+.support-back:focus-visible .support-back-orn {
+  opacity: 1;
+  filter: drop-shadow(0 0 2px #e3c46a);
+}
+@media (prefers-reduced-motion: reduce) {
+  .inv-book.support-open .support-panel { animation: none; }
+  .support-telegram:hover .inv-icon { animation: none; }
+  .tg-heart { display: none; }
+  .support-donation:hover .don-coin { animation: none; }
 }
 
 .nav-tab {
@@ -5543,7 +5741,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   flex-wrap: wrap;
   gap: 24px;
   align-items: flex-start;
-  padding: 6px 14px 30px;
+  padding: 16px 28px 30px;
 }
 .terrain-compare-col {
   flex: 1 1 540px;
@@ -5682,17 +5880,21 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   flex: 1 1 360px;
   min-width: 290px;
 }
+/* Heading row = the patch picker (as the version) + "Terrain Changes" label,
+   aligned with the top of the map block. */
 .terrain-list-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  line-height: 1;
+}
+.terrain-list-head-label {
   font-family: 'Jersey 25', 'Jersey 10', sans-serif;
   font-weight: 400;
   font-size: 24px;
   letter-spacing: 0.5px;
   color: #e3c46a;
-  /* Sit the heading at the top edge of the map BLOCK (the bordered .tc-stage,
-     whose top is the column top). line-height:1 + 0 top margin keeps the text
-     at the block's top border level. */
-  line-height: 1;
-  margin: 0 0 14px;
 }
 .terrain-list { padding-left: 4px; }
 .terrain-list li { padding: 3px 0; }
@@ -5710,8 +5912,18 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   pointer-events: none;
 }
 .tm-layer { opacity: 0; transition: opacity 0.15s ease; }
-.terrain-compare.show-trees .tm-layer-trees { opacity: 1; }
-.terrain-compare.show-camps .tm-layer-camps { opacity: 1; }
+.terrain-compare.show-trees .tm-layer-trees,
+.terrain-compare.show-camps .tm-layer-camps,
+.terrain-compare.show-towers .tm-layer-towers,
+.terrain-compare.show-lotus .tm-layer-lotus,
+.terrain-compare.show-twinGates .tm-layer-twinGates,
+.terrain-compare.show-tormentors .tm-layer-tormentors,
+.terrain-compare.show-bounty .tm-layer-bounty,
+.terrain-compare.show-power .tm-layer-power,
+.terrain-compare.show-wisdom .tm-layer-wisdom,
+.terrain-compare.show-outposts .tm-layer-outposts,
+.terrain-compare.show-watchers .tm-layer-watchers,
+.terrain-compare.show-roshan .tm-layer-roshan { opacity: 1; }
 /* trees — ONE colour everywhere. The 7.40 layout (old side) and 7.41 layout
    (new side) are split by the slider, so sweeping reveals how the forest moved. */
 /* match the spectral/leamare tree style (styleDefinitions tree.alive) */
@@ -5720,64 +5932,64 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   stroke: rgba(0, 255, 0, 0.85);
   stroke-width: 0.8;
 }
-/* both trees AND camps split old/new by the slider (old = right, new = left) */
+/* point-entity markers — recoloured GAME icons (32–40px), shown small + smooth
+   so they read like the real minimap icons (not hard-pixelated). */
+.tm-ent-g image { image-rendering: auto; }
+/* every old/new layer splits at the slider (old = right of handle, new = left) */
 .tc-trees-old,
-.tc-camps-old { clip-path: inset(0 0 0 var(--pos)); }
+.tc-camps-old,
+.tm-old { clip-path: inset(0 0 0 var(--pos)); }
 .tc-trees-new,
-.tc-camps-new { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+.tc-camps-new,
+.tm-new { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
 
-/* ---- top control bar (thin toolbar on the map's top edge — height == one
-   version chip) ---- */
-.tc-topbar {
-  position: absolute;
-  top: 8px;            /* inset from the frame, same as 7.40 (bottom: 8px) */
-  left: 8px;
-  right: 8px;
-  z-index: 7;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  pointer-events: none;       /* only the chips/buttons are interactive */
-}
-.tc-controls {
+/* ---- control bar ABOVE the map (no longer overlaid — the map is now
+   edge-to-edge, so the toggles live in their own gold bar that wraps). ---- */
+.tc-controls-bar {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  pointer-events: auto;
+  padding: 0 0 10px;
 }
-.tc-ver { pointer-events: auto; }
-/* version chips + control buttons share the same gold-bordered block look */
-.tc-ver,
+.tc-sep {
+  width: 1px;
+  align-self: stretch;
+  min-height: 22px;
+  margin: 0 3px;
+  background: rgba(227, 196, 106, 0.35);
+}
 .tc-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 24px;
+  height: 28px;
   box-sizing: border-box;
-  padding: 0 9px;
-  border-radius: 4px;
+  padding: 0 10px;
+  border-radius: 5px;
   border: 1px solid rgba(227, 196, 106, 0.55);
   background: rgba(20, 16, 9, 0.72);
-  color: #f4e6bf;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-}
-.tc-ver {
-  font-family: 'Jersey 10', monospace;
-  font-size: 17px;
-  letter-spacing: 0.5px;
-}
-.tc-btn {
-  font-size: 13px;
   color: #e6edf3;
+  font-size: 13px;
   cursor: pointer;
   user-select: none;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
   transition: filter 0.12s ease, background 0.12s ease;
 }
+/* icon-only square buttons (the layer toggles) */
+.tc-btn-icon {
+  position: relative;
+  width: 30px;
+  padding: 0;
+  justify-content: center;
+}
+/* Bigger icons INSIDE the toolbar buttons (button size itself unchanged). */
+.tc-btn-icon img { width: 22px; height: 22px; }
+.tc-btn-zoom img { width: 18px; height: 18px; }
 .tc-btn img { image-rendering: pixelated; }
-.tc-btn:hover { filter: brightness(1.12); }
+/* layer-toggle icons are the recoloured game icons → smooth, not pixelated */
+.tc-layer-btn img { image-rendering: auto; }
+.tc-btn:hover { filter: brightness(1.14); }
 /* ON = lit gold chip; OFF (default) = greyed + pressed-in */
 .tc-btn[aria-pressed="true"] {
   background: rgba(227, 196, 106, 0.22);
@@ -5793,16 +6005,29 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 .tc-btn[aria-pressed="false"] img { filter: grayscale(0.85) brightness(0.85); }
 .tc-inline-loupe { image-rendering: pixelated; vertical-align: -3px; margin: 0 3px 0 1px; }
 
-/* OLD label → bottom-left map corner; NEW stays top-right inside the bar */
-.tc-ver-old {
+/* version chips → map corners (OLD bottom-left, NEW top-right) */
+.tc-ver {
   position: absolute;
-  left: 8px;
-  bottom: 8px;
   z-index: 7;
+  padding: 1px 9px;
+  border-radius: 4px;
+  border: 1px solid rgba(227, 196, 106, 0.6);
+  background: rgba(20, 16, 9, 0.78);
+  color: #f4e6bf;
+  font-family: 'Jersey 10', monospace;
+  font-size: 17px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
 }
+.tc-ver-new { right: 8px; top: 8px; }
+.tc-ver-old { left: 8px; bottom: 8px; }
 
 /* ---- tree tally + camp note under the change list ---- */
 .terrain-counts { margin: 14px 4px 2px; font-size: 13px; color: #8b949e; line-height: 1.55; }
+/* Trees + Neutral-camps lines are one logical block — keep them tight (the
+   default 14px top would read as an empty line between them). */
+.terrain-counts + .terrain-counts { margin-top: 1px; }
 .terrain-counts b { color: #e6edf3; }
 .tm-add-text { color: #6fe089; font-weight: 600; }
 .tm-rem-text { color: #ff7a7a; font-weight: 600; }
@@ -5821,6 +6046,96 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   border-bottom: 1px dotted rgba(227, 196, 106, 0.45);
 }
 .tc-source a:hover { border-bottom-color: #e3c46a; }
+
+/* ---- patch picker (lives in the change-list heading) + per-patch panes ---- */
+/* The picker reuses the calendar year-picker structure but in the terrain
+   page's GOLD theme (the calendar's is blue). It sits inline in the heading as
+   the version, so the heading reads "[7.41 ▾] Terrain Changes". */
+.tc-picker .cal-year-current {
+  background: linear-gradient(180deg, #3b2e1d 0%, #2a2014 100%);
+  border: 1px solid #e3c46a;
+  color: #f4e6bf;
+}
+.tc-picker .cal-year-caret { color: #e3c46a; }
+.tc-picker .cal-year-current:hover { border-color: #f0d896; }
+.tc-picker.is-open .cal-year-current,
+.tc-picker .cal-year-current:focus-visible {
+  border-color: #f0d896;
+  box-shadow: inset 0 1px 0 rgba(190, 225, 240, 0.12),
+              0 0 0 3px rgba(227, 196, 106, 0.28);
+}
+.tc-picker .cal-year-menu {
+  background: #15110a;
+  border: 1px solid rgba(227, 196, 106, 0.4);
+}
+.tc-picker .cal-year-opt { color: #d8c79a; }
+.tc-picker .cal-year-opt:hover { background: rgba(227, 196, 106, 0.14); color: #fff5dc; }
+.tc-picker .cal-year-opt.is-selected {
+  background: rgba(227, 196, 106, 0.2);
+  color: #fff5dc;
+  box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.45);
+}
+.terrain-map-pane[hidden],
+.terrain-list-pane[hidden] { display: none; }
+
+/* ---- "comparison not available yet" fallback (patch with changes but no map
+   pair): the latest map, blurred + dimmed, with a centred overlay. ---- */
+.terrain-fallback {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 2px solid #e3c46a;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #11140f;
+  box-shadow: inset 0 1px 0 rgba(190, 225, 240, 0.08),
+              0 6px 22px rgba(0, 0, 0, 0.5);
+}
+.tc-fallback-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  filter: blur(5px) grayscale(0.4) brightness(0.5);
+  transform: scale(1.06);     /* hide the blur's soft edges */
+}
+.tc-fallback-veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%,
+              rgba(17, 20, 15, 0.35), rgba(8, 8, 8, 0.78));
+}
+.tc-fallback-msg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  padding: 16px;
+}
+.tc-fallback-title {
+  font-family: 'Jersey 25', 'Jersey 10', sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.5px;
+  color: #f4e6bf;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+}
+.tc-fallback-sub {
+  font-family: 'Jersey 25', 'Jersey 10', sans-serif;
+  font-size: 20px;
+  color: #e3c46a;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+}
+.tc-fallback-note {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #b9c0c8;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
 
 /* ---- magnifier lens (Loupe MODE) ---- */
 /* Loupe is a mode toggled by the top-bar button (adds .loupe-on). Only then

@@ -2452,6 +2452,34 @@
   });
 })();
 
+// ---- SUPPORT tile: clicking it opens the Support sub-panel in place of the
+// inventory grid (Telegram + Donation), instead of redirecting. The back arrow
+// (or Escape) returns to the grid. ----
+(function () {
+  const book = document.querySelector('.inv-book');
+  if (!book) return;
+  const opener = book.querySelector('[data-support-open]');
+  const panel = book.querySelector('.support-panel');
+  if (!opener || !panel) return;
+  const setOpen = (on) => {
+    book.classList.toggle('support-open', on);
+    opener.setAttribute('aria-expanded', on ? 'true' : 'false');
+    panel.setAttribute('aria-hidden', on ? 'false' : 'true');
+    if (on) {
+      const back = book.querySelector('.support-back');
+      if (back) back.focus();
+    } else {
+      opener.focus();
+    }
+  };
+  opener.addEventListener('click', (e) => { e.preventDefault(); setOpen(true); });
+  book.querySelectorAll('[data-support-close]').forEach(
+    (b) => b.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && book.classList.contains('support-open')) setOpen(false);
+  });
+})();
+
 // ---- CALENDAR tile: hover burns the date page (gold pixel fire) and loops 1→31.
 // JS src-swap (not CSS content:url) with a one-time cache-bust, because the
 // calendar GIF filename predates the other tile GIFs and browsers/CDN cached the
@@ -2662,10 +2690,10 @@
       const r = stage.getBoundingClientRect();
       return [e.clientX - r.left, e.clientY - r.top];
     }
-    // Over the handle or the top-bar controls → no lens (so you can grab the
-    // handle / click controls with a normal cursor).
+    // Over the handle → no lens (so you can grab it with a normal cursor). The
+    // layer toggles now live ABOVE the stage, so they never overlap the map.
     function overControls(e) {
-      return !!(e.target.closest && e.target.closest('.tc-handle, .tc-topbar'));
+      return !!(e.target.closest && e.target.closest('.tc-handle'));
     }
     function hideLens() { if (lensOk) lens.classList.remove('visible'); }
 
@@ -2711,23 +2739,79 @@
       });
     }
 
-    // Trees / Camps layer buttons
-    function layerBtn(sel, cls) {
-      const btn = root.querySelector(sel);
-      if (!btn) return;
+    // ---- POWER RUNE cycling: a power-rune spot can roll any of the 7 runes, so
+    // while the Power layer is ON its map markers cycle through tc_rune_0..6
+    // every 3s. The toolbar button shows a random rune on load. ----
+    const RUNE_BASE = 'icons/ui/gothic/tc_rune_';
+    const RUNE_COUNT = 7;
+    let powerTimer = null, powerIdx = 0;
+    function setRune(i) {
+      const src = RUNE_BASE + i + '.png';
+      root.querySelectorAll('.tm-layer-power image').forEach(function(im) {
+        im.setAttribute('href', src);
+        im.setAttribute('xlink:href', src);   // older SVG href
+      });
+    }
+    function togglePowerCycle(on) {
+      if (powerTimer) { clearInterval(powerTimer); powerTimer = null; }
+      if (!on) return;
+      setRune(powerIdx);
+      powerTimer = setInterval(function() {
+        powerIdx = (powerIdx + 1) % RUNE_COUNT;
+        setRune(powerIdx);
+      }, 3000);
+    }
+    const powerBtnImg = root.querySelector('.tc-layer-btn[data-layer="power"] img');
+    if (powerBtnImg) powerBtnImg.src = RUNE_BASE + Math.floor(Math.random() * RUNE_COUNT) + '.png';
+
+    // Layer toggles (Trees / Camps + the point-entity layers). Each carries
+    // data-layer="<key>"; clicking flips root .show-<key>, which the CSS uses to
+    // reveal that layer's SVG markers (split old/new by the slider).
+    root.querySelectorAll('.tc-layer-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const on = !pressed(btn);
         setPressed(btn, on);
-        root.classList.toggle(cls, on);
+        root.classList.toggle('show-' + btn.dataset.layer, on);
+        if (btn.dataset.layer === 'power') togglePowerCycle(on);
       });
-    }
-    layerBtn('.tc-btn-trees', 'show-trees');
-    layerBtn('.tc-btn-camps', 'show-camps');
+    });
+  }
+
+  // ---- PATCH PICKER (terrain.html) — gold dropdown; switching it swaps the
+  // visible map pane (slider or fallback) + the matching change-list pane. Same
+  // structure as the calendar year-picker. ----
+  function initTerrainPicker() {
+    const picker = document.querySelector('.tc-picker');
+    if (!picker) return;
+    const btn = picker.querySelector('.cal-year-current');
+    const menu = picker.querySelector('.cal-year-menu');
+    const valEl = picker.querySelector('.cal-year-current-val');
+    const opts = [...menu.querySelectorAll('.cal-year-opt')];
+    const open = () => { menu.hidden = false; picker.classList.add('is-open'); btn.setAttribute('aria-expanded', 'true'); };
+    const close = () => { menu.hidden = true; picker.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); };
+    const select = (ver) => {
+      valEl.textContent = ver;
+      opts.forEach(o => {
+        const on = o.dataset.patch === ver;
+        o.classList.toggle('is-selected', on);
+        o.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      document.querySelectorAll('.terrain-map-pane, .terrain-list-pane')
+        .forEach(p => { p.hidden = (p.dataset.patch !== ver); });
+    };
+    btn.addEventListener('click', e => { e.stopPropagation(); menu.hidden ? open() : close(); });
+    opts.forEach(o => o.addEventListener('click', () => { select(o.dataset.patch); close(); }));
+    document.addEventListener('click', e => { if (!picker.contains(e.target)) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTerrainCompare);
+    document.addEventListener('DOMContentLoaded', function() {
+      initTerrainCompare();
+      initTerrainPicker();
+    });
   } else {
     initTerrainCompare();
+    initTerrainPicker();
   }
 })();

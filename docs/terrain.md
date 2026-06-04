@@ -8,9 +8,10 @@ slider, plus that patch's *Terrain Changes* list. Built by `build_terrain.py`
 
 - ✅ **Swipe slider** — divider moves ONLY by dragging the handle (or arrow
   keys). Handle uses the pixel-arrow nav design.
-- ✅ **Top control bar** (`.tc-topbar`) overlaid on the map's non-playable top
-  edge: version labels (7.40 left / 7.41 right) + **Trees** / **Camps** layer
-  checkboxes + **Loupe** mode button.
+- ✅ **Control bar** (`.tc-controls-bar`) now sits ABOVE the map (not overlaid —
+  the map is edge-to-edge after the tight crop): **Zoom** mode button + **Trees**
+  / **Camps** + 8 point-entity layer toggles. Version labels (7.40 bottom-left /
+  7.41 top-right) stay as map-corner chips.
 - ✅ **Loupe is a MODE** — the top-bar button toggles `.loupe-on`. Only then
   does hovering the MAP (not the handle / top-bar — those keep normal/resize
   cursor, no lens) show the gold magnifier following the cursor; **click pins**
@@ -50,9 +51,10 @@ placeholder padding (`rgb 56,57,49`) on top + a little left; the map is flush
 bottom/right. Out-of-range requests return that grey tile with **HTTP 200**
 (and truly-missing margin tiles 404) — so detect content by colour distance,
 not status. At **zoom 2** the whole map fits a 24×24 grid (content ≈ 19×19
-tiles ≈ 4864px). We stitch z2, crop to the shared content bbox
-`(152,183)-(4943,5120)` (≈4791×4937, same for 7.40 & 7.41 so the swipe stays
-aligned), resize to **1280²** webp. Re-run: `python scripts/build_terrain_maps.py 7.40 7.41`.
+tiles ≈ 4864px). We stitch z2, crop to the shared **tight** content bbox (now
+`(186,287)-(4783,5082)` ≈4597×4795 — `_content_bbox` strips the flat-grey
+placeholder, so no fat grey borders; same box for 7.40 & 7.41 so the swipe stays
+aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.py 7.40 7.41`.
 
 ## Data sources (primary)
 
@@ -85,17 +87,74 @@ aligned), resize to **1280²** webp. Re-run: `python scripts/build_terrain_maps.
   has BOTH that patch and its predecessor (to diff/compare) AND it has terrain
   changes.
 
+## Entity layers + tight crop (added 2026-06-04)
+
+- **10 point-entity toggle layers** beyond Trees/Camps: towers, lotus pools, twin
+  gates, tormentors, bounty runes, power runes, wisdom shrines, **outposts**,
+  **watchers**, **roshan** (`_ENTITY_LAYERS` in build_terrain.py). Data = full
+  old+new coord sets in `terrain_diff.json["entities"]` (built by
+  build_terrain_diff.py). **leamare keys (`layerDefinitions.js`):** `npc_dota_tower`,
+  `npc_dota_lotus_pool`, `npc_dota_unit_twin_gate`, `npc_dota_miniboss_spawner`,
+  `dota_item_rune_spawner_bounty` / `_powerup`, `npc_dota_xp_fountain`,
+  **Outpost = `npc_dota_watch_tower` (2)**, **Watcher = `npc_dota_lantern` (10)**
+  (SEPARATE layers!), `npc_dota_roshan_spawner` (2). Split old/new by the slider.
+- **Map marker** (`marker_g`) = a **dark backing circle** (`#0d100b` @0.66, so the
+  busy map doesn't show through and read as "muddy") + a faint type-colour tint
+  (@0.34) + a light-gold ring + the icon on top. The icon is the LIGHTENED type
+  colour so it pops on its own disc.
+- **Icons** (`scripts/gen_terrain_layer_icons.py`) — GAME map icons from
+  `icons/ref/` (`REFS`): towers.svg, roashan.svg, tormentor_png.png,
+  watcher_lantern.png, Bounty_Rune_…png, and **lotus_pool/twin_gate/outpost
+  cells cut from `minimap_sheet_psd_*.png`** (the 11×11 64px sheet — split into
+  `icons/ref/sheet_cells/r{row}_c{col}.png` by hand-picked cell). SVGs rasterised
+  via ImageMagick `magick`. Tinted to the type colour (`COLORS`, brightness from
+  the ref's luminance) **except `NATURAL` icons (bounty + the power runes) which
+  keep their real colours** — the dark marker backing gives contrast, so no
+  lightening needed. **Wisdom** has no game icon → `wisdom_icon()` draws a dense
+  bright-purple inner ring + inward glow (the shrine's capture glow). All 48px,
+  canvas FILLED + UnsharpMask, shown SMOOTH (`image-rendering: auto`). Same PNG is
+  the button AND the marker; `COLORS` ↔ `_ENTITY_LAYERS` colours stay in sync.
+- **Power-rune cycling** — a power-rune spot can roll any of the 7 runes, so the
+  Power layer is special: its 7 icons (`tc_rune_0..6.png`, downloaded from
+  liquipedia into `icons/ref/runes/`, kept in their NATURAL colours + soft
+  outline) cycle on the MAP every 3 s while the layer is ON (scripts.js
+  `togglePowerCycle` / `setRune`, sets `<image>` `href`/`xlink:href`). The toolbar
+  button shows a RANDOM rune on load. `tc_power.png` (button + initial marker
+  default) = the regeneration rune. Markers still sit in the faint-green power
+  disc. Order: amplify, arcane, haste, illusion, invisibility, regeneration, shield.
+- **Controls ABOVE the map** (`.tc-controls-bar`) — icon-only toggle buttons with
+  tooltips. Generic JS handler over `.tc-layer-btn[data-layer]` flips
+  root `.show-<key>`.
+- **Patch picker** lives in the change-list heading as the version
+  (`[7.41 ▾] Terrain Changes`), not a toolbar.
+- **Maps cropped tight** — `_content_bbox` now strips the flat-grey placeholder
+  (per-row/col ≥10% real content), not "any non-grey pixel" (that left fat grey
+  borders: L11 R54 T32 B13). Margins ≈0 now. The projection auto-follows via the
+  updated `data/terrain_map_meta.json` crop box (re-verified: trees still land
+  exactly on the forest).
+
+## Patch picker + per-patch data (added 2026-06-04)
+
+- **Picker** (`_picker_html`) — gold-skinned calendar year-picker in a
+  `.cal-toggle-bar` toolbar, lists every patch with terrain changes (newest
+  first). `scripts.js initTerrainPicker` toggles `.terrain-map-pane` +
+  `.terrain-list-pane` by `data-patch`.
+- **Change lists are PARSED from build_patch.py** (`_terrain_changes_by_patch`)
+  → no drift. One `(text, TAG)` list per `plain_header("Terrain Changes")`
+  section. `b(...)` rows → BUFF/NERF by direction honouring `l=True`.
+- **Map pairs** — `_MAP_PAIRS` lists patches we hold matched old→new webp for
+  (today `7.41`→ the swipe slider). Markers/counts gate on `_DIFF_PATCH`
+  (`7.41`, matches `terrain_diff.json`).
+- **No-map fallback (`_fallback_html`)** — for a patch with changes but no map
+  pair (7.40): the latest map blurred + dimmed with a centred "Map comparison
+  for X isn't available yet" overlay; the textual change list still renders.
+
 ## TODO / action items
 
-1. **No-map fallback.** When a patch *has* terrain changes but we don't have a
-   map yet: show the previous patch's map **blurred** with a centered English
-   overlay (e.g. "Map changes for X.YZ are not available yet"), but STILL render
-   the textual terrain-change list. So the page is useful before the art lands.
-2. **Patch picker.** A dropdown to choose the patch — but list **only patches
-   that have terrain changes**. Implies per-patch terrain data: each entry needs
-   its own change-list + (old,new) maps + diff. Today the list is a single
-   hardcoded `_TERRAIN_CHANGES`; generalize to per-patch (ideally sourced from
-   the build_patch.py terrain section so it can't drift).
+1. ✅ **No-map fallback** — done (`_fallback_html`).
+2. ✅ **Patch picker** — done; lists only patches with terrain changes, sourced
+   from build_patch.py so it can't drift. Next: when a NEW patch gets a real
+   old→new map pair, add it to `_MAP_PAIRS` + drop its maps in `icons/maps/`.
 3. ✅ **Marker redesign — done.** Toggleable tree + camp layers, both split
    old/new by the slider; magnifier lens. **Projection is now EXACT** — uses the
    real leamare transform (`src/js/conversion.js worldToLatLon` + mapConstants

@@ -100,9 +100,20 @@ def _stitch(cache):
 
 
 def _content_bbox(cv):
+    """Tight bounding box of the REAL (colourful) map, excluding the flat-grey
+    placeholder padding. A pixel is placeholder iff it is both near the EMPTY
+    grey AND low-saturation; everything else is content. We then require a
+    column/row to be ≥10% content before counting it as part of the map, so
+    stray JPEG noise in the grey margin can't inflate the box (that was the old
+    `dist > 22`-on-any-pixel bug → fat grey borders left on every edge)."""
     a = np.asarray(cv).astype(int)
-    dist = np.sqrt(((a - EMPTY) ** 2).sum(2))
-    ys, xs = np.where(dist > 22)
+    greydist = np.sqrt(((a - EMPTY) ** 2).sum(2))
+    sat = a.max(2) - a.min(2)
+    content = ~((greydist < 26) & (sat < 16))
+    colfrac = content.mean(0)
+    rowfrac = content.mean(1)
+    xs = np.where(colfrac > 0.10)[0]
+    ys = np.where(rowfrac > 0.10)[0]
     return xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
 
 
