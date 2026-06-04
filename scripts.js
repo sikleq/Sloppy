@@ -2559,3 +2559,175 @@
     input.addEventListener('input', recalc);
   });
 })();
+
+(function() {
+  // ---- TERRAIN COMPARE (terrain.html) — swipe slider + Loupe magnifier ----
+  //  - Divider moves ONLY by dragging the handle (or arrow keys).
+  //  - Trees / Camps top-bar checkboxes toggle the SVG overlay layers.
+  //  - "Loupe" is a MODE (top-bar button). When on, hovering the MAP (not the
+  //    handle or top-bar) shows a gold magnifier following the cursor; click
+  //    pins it, then sweeping the handle compares that spot old↔new inside the
+  //    circle (the toggled tree/camp markers are cloned into the lens too).
+  function initTerrainCompare() {
+    const root = document.querySelector('.terrain-compare');
+    if (!root) return;
+    const stage = root.querySelector('.tc-stage');
+    const handle = root.querySelector('.tc-handle');
+    if (!stage || !handle) return;
+
+    const ZOOM = parseFloat(root.dataset.zoom) || 1.9;
+    const lens = root.querySelector('.tc-lens');
+    const lensOld = root.querySelector('.tc-lens-old');
+    const lensNew = root.querySelector('.tc-lens-new');
+    const lensRim = root.querySelector('.tc-lens-rim');
+    const markerSvgs = stage.querySelectorAll('.tc-markers');
+    const lensOk = !!(lens && lensOld && lensNew);
+    if (root.dataset.lens) stage.style.setProperty('--lens', root.dataset.lens + 'px');
+
+    let pos = parseFloat(root.dataset.pos);
+    if (!isFinite(pos)) pos = 50;
+    function apply(p) {
+      pos = Math.max(0, Math.min(100, p));
+      stage.style.setProperty('--pos', pos + '%');
+      handle.setAttribute('aria-valuenow', Math.round(pos));
+    }
+    apply(pos);
+
+    // ---- divider drag: HANDLE ONLY (pointer capture isolates it) ----
+    let dragging = false;
+    function posFromX(clientX) {
+      const r = stage.getBoundingClientRect();
+      if (r.width <= 0) return pos;
+      return ((clientX - r.left) / r.width) * 100;
+    }
+    handle.addEventListener('pointerdown', function(e) {
+      dragging = true;
+      if (e.pointerId != null && handle.setPointerCapture) {
+        try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    handle.addEventListener('pointermove', function(e) {
+      if (dragging) apply(posFromX(e.clientX));
+    });
+    handle.addEventListener('pointerup', function() { dragging = false; });
+    handle.addEventListener('pointercancel', function() { dragging = false; });
+    handle.addEventListener('keydown', function(e) {
+      let step = 0;
+      switch (e.key) {
+        case 'ArrowLeft': case 'ArrowDown': step = -2; break;
+        case 'ArrowRight': case 'ArrowUp': step = 2; break;
+        case 'PageDown': step = -10; break;
+        case 'PageUp': step = 10; break;
+        case 'Home': apply(0); e.preventDefault(); return;
+        case 'End': apply(100); e.preventDefault(); return;
+        default: return;
+      }
+      apply(pos + step);
+      e.preventDefault();
+    });
+
+    // ---- magnifier lens (Zoom mode) ----
+    let loupeMode = false;
+    let pinned = false;
+    let lensMarkers = [];          // cloned marker SVGs (trees-old/new, camps)
+    function buildLensMarkers() {
+      if (!lensOk || lensMarkers.length || !markerSvgs.length) return;
+      markerSvgs.forEach(function(svg) {
+        const clone = svg.cloneNode(true);   // keeps its clip + toggle classes
+        clone.classList.add('tc-lens-markers');
+        clone.removeAttribute('aria-hidden');
+        lens.insertBefore(clone, lensRim || null);
+        lensMarkers.push(clone);
+      });
+    }
+    function sizeLens() {
+      if (!lensOk) return;
+      const w = stage.getBoundingClientRect().width * ZOOM;
+      [lensOld, lensNew].concat(lensMarkers).forEach(function(el) {
+        if (el) { el.style.width = w + 'px'; el.style.height = w + 'px'; }
+      });
+    }
+    function placeLens(cx, cy) {
+      if (!lensOk) return;
+      const R = lens.offsetWidth / 2;
+      lens.style.transform = 'translate(' + (cx - R) + 'px,' + (cy - R) + 'px)';
+      const tf = 'translate(' + (R - cx * ZOOM) + 'px,' + (R - cy * ZOOM) + 'px)';
+      lensOld.style.transform = tf;
+      lensNew.style.transform = tf;
+      lensMarkers.forEach(function(el) { el.style.transform = tf; });
+    }
+    function localXY(e) {
+      const r = stage.getBoundingClientRect();
+      return [e.clientX - r.left, e.clientY - r.top];
+    }
+    // Over the handle or the top-bar controls → no lens (so you can grab the
+    // handle / click controls with a normal cursor).
+    function overControls(e) {
+      return !!(e.target.closest && e.target.closest('.tc-handle, .tc-topbar'));
+    }
+    function hideLens() { if (lensOk) lens.classList.remove('visible'); }
+
+    if (lensOk) {
+      stage.addEventListener('pointermove', function(e) {
+        if (!loupeMode || pinned || dragging || e.pointerType === 'touch') return;
+        if (overControls(e)) { hideLens(); return; }
+        const xy = localXY(e);
+        lens.classList.add('visible');
+        placeLens(xy[0], xy[1]);
+      });
+      stage.addEventListener('pointerleave', function() { if (!pinned) hideLens(); });
+      stage.addEventListener('click', function(e) {
+        if (!loupeMode || dragging || overControls(e)) return;
+        const xy = localXY(e);
+        pinned = !pinned;
+        stage.classList.toggle('lens-pinned', pinned);
+        lens.classList.add('visible');
+        placeLens(xy[0], xy[1]);
+      });
+      window.addEventListener('resize', sizeLens);
+    }
+
+    // ---- top-bar toggle buttons (aria-pressed) ----
+    function pressed(btn) { return btn.getAttribute('aria-pressed') === 'true'; }
+    function setPressed(btn, on) { btn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+
+    // Zoom (magnifier mode)
+    const zoomBtn = root.querySelector('.tc-btn-zoom');
+    if (zoomBtn && lensOk) {
+      zoomBtn.addEventListener('click', function() {
+        loupeMode = !loupeMode;
+        root.classList.toggle('loupe-on', loupeMode);
+        setPressed(zoomBtn, loupeMode);
+        if (loupeMode) {
+          buildLensMarkers();
+          sizeLens();
+        } else {
+          pinned = false;
+          stage.classList.remove('lens-pinned');
+          hideLens();
+        }
+      });
+    }
+
+    // Trees / Camps layer buttons
+    function layerBtn(sel, cls) {
+      const btn = root.querySelector(sel);
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        const on = !pressed(btn);
+        setPressed(btn, on);
+        root.classList.toggle(cls, on);
+      });
+    }
+    layerBtn('.tc-btn-trees', 'show-trees');
+    layerBtn('.tc-btn-camps', 'show-camps');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTerrainCompare);
+  } else {
+    initTerrainCompare();
+  }
+})();

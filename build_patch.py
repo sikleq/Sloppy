@@ -4131,6 +4131,7 @@ def save_index_html():
         ('creeps',    'Creeps',     'neutral_creeps.html'),
         ('mana',      'Mana Items', 'mana_items.html'),
         ('dynamics',  'Dynamics',   'heroes_dyn.html'),
+        ('terrain',   'Terrain',    'terrain.html'),
     ]
     # No placeholder tiles for now — future sections TBD (Mana Items sits right
     # after Creeps). Arcana (Neutral Abilities) lives under the Materials
@@ -4140,7 +4141,23 @@ def save_index_html():
     for key, label, href in _INV_ITEMS:
         # Every tile shows a static PNG and swaps to an animated GIF only on
         # hover: calendar (date 1→31, CSS), creeps (crawling legs, CSS), patch
-        # (page-flip, CSS), mana (fill-then-waves, JS).
+        # (page-flip, CSS), mana (fill-then-waves, JS), dynamics (bars grow/
+        # shrink GIF, CSS).
+        if key == "terrain":
+            # Terrain = a floating earth block: on hover it levitates + bobs and
+            # sheds occasional pixel "dirt" from its underside (CSS particles).
+            cells.append(
+                f'<a class="inv-cell inv-filled inv-cell-terrain" href="{href}">'
+                '<span class="inv-slot">'
+                '<img class="inv-icon" src="icons/ui/gothic/icon_terrain.png" alt="">'
+                '<span class="terrain-dirt" aria-hidden="true">'
+                + '<i class="dirt"></i>' * 7 +
+                '</span>'
+                '</span>'
+                f'<span class="inv-cap">{label}</span>'
+                '</a>'
+            )
+            continue
         cells.append(
             f'<a class="inv-cell inv-filled inv-cell-{key}" href="{href}">'
             f'<span class="inv-slot">'
@@ -4168,13 +4185,6 @@ def save_index_html():
         '</span>'
         '<span class="inv-cap">Support</span>'
         '</a>'
-    )
-    # Plain placeholder tile — no icon, just text. Marks a future section.
-    cells.append(
-        '<span class="inv-cell inv-ph inv-cell-test" title="placeholder">'
-        '<span class="inv-slot is-empty"></span>'
-        '<span class="inv-cap">test</span>'
-        '</span>'
     )
     empties = ''.join(
         f'<span class="inv-cell inv-ph" title="placeholder">'

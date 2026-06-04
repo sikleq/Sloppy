@@ -351,6 +351,10 @@ body:has(.creeps-page) nav.top-nav {
 .inv-cell-patch:hover .inv-icon {
   content: url('icons/ui/gothic/icon_patch.gif');
 }
+/* Dynamics: on hover the bar-chart bars grow/shrink in random order (GIF). */
+.inv-cell-dynamics:hover .inv-icon {
+  content: url('icons/ui/gothic/icon_dynamics.gif');
+}
 /* Calendar: on hover the date page burns away (gold pixel fire) and a new date
    appears, looping 1→31. Driven from scripts.js (JS src-swap with a cache-bust)
    instead of `content: url()` — the calendar GIF filename predates the others, so
@@ -441,6 +445,8 @@ body:has(.creeps-page) nav.top-nav {
   .inv-special .inv-slot { animation: none; }
   .inv-cell-star:hover .inv-icon { animation: none; }
   .spark { display: none; }
+  .inv-cell-terrain:hover .inv-icon { animation: none; }
+  .dirt { display: none; }
 }
 .inv-cap {
   max-width: 86px;
@@ -464,6 +470,55 @@ body:has(.creeps-page) nav.top-nav {
 .inv-filled:hover .inv-slot { transform: translateY(-3px); filter: brightness(1.22); }
 .inv-filled:hover .inv-icon { transform: translateY(-3px) scale(1.06); }
 .inv-filled:hover .inv-cap { color: #fff5dc; }
+
+/* TERRAIN tile: the earth block levitates + bobs on hover and sheds occasional
+   pixel "dirt" from its underside (rare, uneven). */
+.inv-cell-terrain .inv-slot { overflow: visible; }
+.inv-cell-terrain:hover .inv-icon { animation: terrainBob 2.1s ease-in-out infinite; }
+@keyframes terrainBob {
+  0%, 100% { transform: translateY(-5px) scale(1.06); }
+  50%      { transform: translateY(-9px) scale(1.06); }
+}
+.terrain-dirt {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+/* The dirt LAYER bobs in lock-step with the block (same animation) so particles
+   shed from the block's CURRENT (floating) underside — not mid-air below it. */
+.inv-cell-terrain:hover .terrain-dirt { animation: terrainBob 2.1s ease-in-out infinite; }
+.dirt {
+  position: absolute;
+  width: 3px;
+  height: 4px;
+  background: #d8a850;                       /* warm soil — bright enough to read */
+  box-shadow: 0 0 0 1px rgba(34, 20, 9, 0.9);
+  image-rendering: pixelated;
+  opacity: 0;
+}
+/* particles fall while hovering; staggered cycles → sparse but clearly visible.
+   They pop in right at the block's bottom edge, then fall + fade. */
+.inv-cell-terrain:hover .dirt {
+  animation-name: dirtFall;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+}
+@keyframes dirtFall {
+  0%   { transform: translateY(-1px); opacity: 0; }
+  14%  { opacity: 1; }
+  85%  { opacity: 0.95; }
+  100% { transform: translateY(15px); opacity: 0; }
+}
+/* origins hug the narrow block's V-shaped underside: vertex ~(38,55), corners
+   ~(27,47)/(49,47). */
+.dirt:nth-child(1) { left: 38px; top: 54px; animation-duration: 2.4s; animation-delay: 0s;   }
+.dirt:nth-child(2) { left: 34px; top: 52px; animation-duration: 3.1s; animation-delay: 0.9s; }
+.dirt:nth-child(3) { left: 42px; top: 52px; animation-duration: 2.8s; animation-delay: 1.7s; }
+.dirt:nth-child(4) { left: 31px; top: 50px; animation-duration: 3.6s; animation-delay: 0.5s; }
+.dirt:nth-child(5) { left: 45px; top: 50px; animation-duration: 2.6s; animation-delay: 2.2s; }
+.dirt:nth-child(6) { left: 36px; top: 55px; animation-duration: 3.9s; animation-delay: 1.3s; }
+.dirt:nth-child(7) { left: 40px; top: 53px; animation-duration: 3.3s; animation-delay: 2.8s; }
 .inv-filled:focus-visible .inv-slot {
   outline: 2px solid #eccb7e;
   outline-offset: 3px;
@@ -5475,3 +5530,349 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
     inset  0   -2px 0 rgba(231, 196, 106, 0.95);
 }
 .mr-table tbody tr.mr-row-selected .mr-name-text { color: #fff8e0; }
+
+/* ============================================================================
+   TERRAIN COMPARE  (terrain.html — Materials » Terrain)
+   A before/after swipe slider over two pixel-aligned map renders + the patch's
+   Terrain Changes list. The NEW map overlays the OLD one and is revealed
+   left-to-right via clip-path up to --pos (set on .tc-stage by scripts.js
+   terrainCompareInit). Gold/leather handle matches the index + nav buttons.
+   ========================================================================= */
+.terrain-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+  padding: 6px 14px 30px;
+}
+.terrain-compare-col {
+  flex: 1 1 540px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.terrain-compare { width: 100%; }
+.tc-stage {
+  --pos: 50%;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 2px solid #e3c46a;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #11140f;
+  box-shadow:
+    inset 0 1px 0 rgba(190, 225, 240, 0.08),
+    0 6px 22px rgba(0, 0, 0, 0.5);
+  cursor: ew-resize;
+  touch-action: none;          /* JS owns the pointer drag — no scroll hijack */
+  user-select: none;
+  -webkit-user-select: none;
+}
+.tc-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* fill (not cover) so the map stretches to the stage box exactly like the
+     SVG overlay (preserveAspectRatio="none") — keeps tree/camp markers aligned
+     even if the stage isn't a perfect square. */
+  object-fit: fill;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* NEW map + its change markers revealed from the left edge up to the handle.
+   clip-path is compositor-friendly so the wipe stays smooth while dragging.
+   Clipping the whole layer (not just the img) means the markers reveal together
+   with the new terrain. */
+.tc-new-layer {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+  will-change: clip-path;
+}
+.tc-tag {
+  position: absolute;
+  top: 10px;
+  z-index: 3;
+  padding: 1px 9px;
+  font-family: 'Jersey 10', monospace;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: #f4e6bf;
+  background: rgba(20, 16, 9, 0.78);
+  border: 1px solid rgba(227, 196, 106, 0.6);
+  border-radius: 4px;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+.tc-tag-old { left: 10px; }
+.tc-tag-new { right: 10px; }
+.tc-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pos);
+  width: 44px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.tc-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: #e3c46a;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.65);
+}
+.tc-grip {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid #e3c46a;
+  background: linear-gradient(180deg, #3b2e1d 0%, #2a2014 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(190, 225, 240, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+/* Slider arrows use the shared pixel-triangle nav-arrow design (same chunky
+   gold triangle as .back-to-top / .version-nav-arrow). See the "Navigation
+   arrows" rule in AGENTS.md. */
+.tc-chev {
+  width: 10px;
+  height: 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: auto 13px;
+  image-rendering: pixelated;
+}
+.tc-chev-l {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="10" y="0" width="2" height="2"/><rect x="8" y="2" width="4" height="2"/><rect x="6" y="4" width="6" height="2"/><rect x="4" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="4" y="10" width="8" height="2"/><rect x="6" y="12" width="6" height="2"/><rect x="8" y="14" width="4" height="2"/><rect x="10" y="16" width="2" height="2"/></g></svg>');
+}
+.tc-chev-r {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="2" y="0" width="2" height="2"/><rect x="2" y="2" width="4" height="2"/><rect x="2" y="4" width="6" height="2"/><rect x="2" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="2" y="10" width="8" height="2"/><rect x="2" y="12" width="6" height="2"/><rect x="2" y="14" width="4" height="2"/><rect x="2" y="16" width="2" height="2"/></g></svg>');
+}
+.tc-handle:hover .tc-grip { filter: brightness(1.16); }
+.tc-handle:focus-visible { outline: none; }
+.tc-handle:focus-visible .tc-grip {
+  box-shadow:
+    0 0 0 3px rgba(227, 196, 106, 0.45),
+    inset 0 1px 0 rgba(190, 225, 240, 0.12);
+}
+/* While actively dragging, hide the I-beam everywhere + brighten the grip. */
+.tc-stage.is-dragging { cursor: ew-resize; }
+.tc-stage.is-dragging .tc-grip { filter: brightness(1.22); }
+
+/* ---- change list beside / below the slider ---- */
+.terrain-list-box {
+  flex: 1 1 360px;
+  min-width: 290px;
+}
+.terrain-list-head {
+  font-family: 'Jersey 25', 'Jersey 10', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  letter-spacing: 0.5px;
+  color: #e3c46a;
+  /* Sit the heading at the top edge of the map BLOCK (the bordered .tc-stage,
+     whose top is the column top). line-height:1 + 0 top margin keeps the text
+     at the block's top border level. */
+  line-height: 1;
+  margin: 0 0 14px;
+}
+.terrain-list { padding-left: 4px; }
+.terrain-list li { padding: 3px 0; }
+
+/* ---- tree + camp overlays (SVG), toggled by the top-bar buttons ---- */
+/* Each SVG fills the stage; viewBox 0..1280 == map native px. pointer-events
+   off so hover/click reach the stage. Hidden until .show-trees / .show-camps
+   are set on .terrain-compare. */
+.tc-markers {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.tm-layer { opacity: 0; transition: opacity 0.15s ease; }
+.terrain-compare.show-trees .tm-layer-trees { opacity: 1; }
+.terrain-compare.show-camps .tm-layer-camps { opacity: 1; }
+/* trees — ONE colour everywhere. The 7.40 layout (old side) and 7.41 layout
+   (new side) are split by the slider, so sweeping reveals how the forest moved. */
+/* match the spectral/leamare tree style (styleDefinitions tree.alive) */
+.tm-trees-g rect {
+  fill: rgba(0, 255, 0, 0.3);
+  stroke: rgba(0, 255, 0, 0.85);
+  stroke-width: 0.8;
+}
+/* both trees AND camps split old/new by the slider (old = right, new = left) */
+.tc-trees-old,
+.tc-camps-old { clip-path: inset(0 0 0 var(--pos)); }
+.tc-trees-new,
+.tc-camps-new { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+
+/* ---- top control bar (thin toolbar on the map's top edge — height == one
+   version chip) ---- */
+.tc-topbar {
+  position: absolute;
+  top: 8px;            /* inset from the frame, same as 7.40 (bottom: 8px) */
+  left: 8px;
+  right: 8px;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;       /* only the chips/buttons are interactive */
+}
+.tc-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  pointer-events: auto;
+}
+.tc-ver { pointer-events: auto; }
+/* version chips + control buttons share the same gold-bordered block look */
+.tc-ver,
+.tc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  box-sizing: border-box;
+  padding: 0 9px;
+  border-radius: 4px;
+  border: 1px solid rgba(227, 196, 106, 0.55);
+  background: rgba(20, 16, 9, 0.72);
+  color: #f4e6bf;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+.tc-ver {
+  font-family: 'Jersey 10', monospace;
+  font-size: 17px;
+  letter-spacing: 0.5px;
+}
+.tc-btn {
+  font-size: 13px;
+  color: #e6edf3;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+  transition: filter 0.12s ease, background 0.12s ease;
+}
+.tc-btn img { image-rendering: pixelated; }
+.tc-btn:hover { filter: brightness(1.12); }
+/* ON = lit gold chip; OFF (default) = greyed + pressed-in */
+.tc-btn[aria-pressed="true"] {
+  background: rgba(227, 196, 106, 0.22);
+  border-color: #e3c46a;
+  color: #fff8e0;
+}
+.tc-btn[aria-pressed="false"] {
+  background: rgba(28, 28, 28, 0.66);
+  border-color: rgba(120, 120, 120, 0.5);
+  color: #9aa0a6;
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.55);
+}
+.tc-btn[aria-pressed="false"] img { filter: grayscale(0.85) brightness(0.85); }
+.tc-inline-loupe { image-rendering: pixelated; vertical-align: -3px; margin: 0 3px 0 1px; }
+
+/* OLD label → bottom-left map corner; NEW stays top-right inside the bar */
+.tc-ver-old {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 7;
+}
+
+/* ---- tree tally + camp note under the change list ---- */
+.terrain-counts { margin: 14px 4px 2px; font-size: 13px; color: #8b949e; line-height: 1.55; }
+.terrain-counts b { color: #e6edf3; }
+.tm-add-text { color: #6fe089; font-weight: 600; }
+.tm-rem-text { color: #ff7a7a; font-weight: 600; }
+
+/* ---- data-source credit under the slider (centred on the map) ---- */
+.tc-source {
+  margin: 12px 2px 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #6e7681;
+  text-align: center;
+}
+.tc-source a {
+  color: #e3c46a;
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(227, 196, 106, 0.45);
+}
+.tc-source a:hover { border-bottom-color: #e3c46a; }
+
+/* ---- magnifier lens (Loupe MODE) ---- */
+/* Loupe is a mode toggled by the top-bar button (adds .loupe-on). Only then
+   does hovering show the pixel-loupe cursor + a gold magnifier circle that
+   follows the pointer over the MAP (not the handle / top-bar). Click pins it
+   (cursor back to normal); sweeping the handle then compares that spot old↔new
+   inside the circle, which also carries the toggled tree/camp markers (cloned
+   by scripts.js). */
+.tc-stage { cursor: default; }
+.terrain-compare.loupe-on .tc-stage {
+  cursor: url('icons/ui/gothic/icon_loupe.png') 11 11, zoom-in;
+}
+.terrain-compare.loupe-on .tc-stage.lens-pinned { cursor: default; }
+.tc-lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--lens, 184px);
+  height: var(--lens, 184px);
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #e3c46a;
+  box-shadow:
+    0 0 0 2px rgba(8, 8, 8, 0.7),
+    0 6px 18px rgba(0, 0, 0, 0.6);
+  pointer-events: none;        /* clicks pass through to the stage */
+  display: none;
+  will-change: transform;
+  z-index: 8;
+}
+.tc-lens.visible { display: block; }
+.tc-stage.lens-pinned .tc-lens {
+  box-shadow:
+    0 0 0 2px rgba(8, 8, 8, 0.7),
+    0 8px 24px rgba(0, 0, 0, 0.72);
+}
+.tc-lens-img,
+.tc-lens-markers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;             /* override the global img max-width */
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: transform;
+}
+.tc-lens-new { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+.tc-lens-markers { pointer-events: none; overflow: visible; }
+.tc-lens-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.55);
+}

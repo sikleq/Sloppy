@@ -365,6 +365,15 @@ W(li("X no longer has a separate value for incoming heal reduction", t("MISC"),
 `build_patch.py` также генерирует:
 - **`index.html`** (`save_index_html`) — лендинг в виде игрового «инвентаря-книги»: орнаментальная панель `.inv-book` с квадратными слотами (`icons/ui/gothic/`, пак [Gothic Pixel UI](https://abyssowl.itch.io/gothic-pixel-ui)). Верхний ряд `.inv-filled` = ссылки на разделы, нижний `.inv-ph` = плейсхолдеры. Золото подогнано под бренд-слово `sikle` (`#e3c46a`). Подписи — временные плейсхолдеры (шрифт Jersey 10). Старая `.zuma-*` сетка удалена.
 - **`calendar.html`** (`save_calendar_html`) — календарь патчей + кастомный год-пикер (`.cal-year-picker`, не нативный `<select>`) + полоса-инфографика «Patch cadence» внизу (`_spark_svg`: SVG-sparkline, «красивая» 5-ступенчатая ось Y, gridlines/оси, hover-значения). Переключатель Compact живёт в шапке блока года.
+- **`terrain.html`** (`build_terrain.py`, 5-я вкладка Materials) — сравнение рельефа old→new через **шторку-слайдер** (две карты `icons/maps/map_<ver>.webp`, попиксельно совмещённые, клип через `clip-path` по `--pos`) + список Terrain Changes этого патча. Разметка изменений (точки деревьев / кольца кэмпов-башен) сейчас **выключена** (`SHOW_MARKERS=False`) — на редизайне. Полный план и TODO — `docs/terrain.md`. **Источник списка изменений = build_patch.py секция этого патча**, не 7.40 (легко перепутать — у 7.40 свой большой ремап-список).
+
+### Источники данных по рельефу (terrain)
+Главные источники координат карты (деревья/кэмпы/башни/тормент/гейты/лотосы по версиям):
+- **Интерактивная карта**: https://tools.spectral.gg/interactive-map
+- **GitHub с координатами**: `leamare/dota-interactive-map` — `assets/data/<ver>/mapdata.json` (per-version coords) + корневой `worlddata.json` (мировые границы для проекции). Дифф считает `scripts/build_terrain_diff.py` → `data/terrain_diff.json`. Проекция: мир ∈ [−10464, 10400] → 1280px (проверено наложением всех деревьев на рендер карты).
+
+### Навигационные стрелки (ПРАВИЛО)
+Все **навигационные / направленные стрелки** на сайте должны использовать единый дизайн: сплошной **пиксельный SVG-треугольник** (`shape-rendering=crispEdges`, золото `#e3c46a`) на золото-кожаном кружке (`linear-gradient(180deg,#3b2e1d,#2a2014)`, рамка `2px solid #e3c46a`). Эталон — `.back-to-top` / `.nav-back-arrow` / `.version-nav-arrow` (`is-prev`/`is-next`). Это касается и стрелок слайдера terrain (`.tc-chev-l/.tc-chev-r` переиспользуют те же data-URI пиксель-треугольники). НЕ использовать CSS-border-треугольники, юникод-стрелки (▲◄►) или эмодзи для навигации.
 
 ### Глобальные UI-элементы (во всех страницах через `site_common.py` / `scripts.js`)
 - **Лого** — простой `<img class="nav-brand-logo" src="…/icons/logo_knight.png">` (пиксельный рыцарский шлем, прозрачный фон). Раньше был шлем `header-helmet.png` с canvas-эффектом EyeFire — удалён целиком (файлы + код).
