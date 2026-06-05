@@ -36,7 +36,7 @@ def save_items_dyn_html():
             "balance-change summary for that patch — hover it for the "
             "buff/nerf/rework breakdown, click to jump to the item on that patch "
             "page. Hover a patch column for its release date. Empty diamonds mean "
-            "the item was untouched. <strong>Show deleted</strong> reveals items "
+            "the item was untouched. <strong>Deleted</strong> reveals items "
             "removed from the game; <strong>Show</strong> toggles item classes; "
             "<strong>Price</strong> filters by gold cost (neutrals + enchantments "
             "are free, so they ignore it); <strong>Remove</strong> drops any tag "

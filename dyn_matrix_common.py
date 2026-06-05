@@ -225,7 +225,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     # only): OFF by default → items removed from the game are hidden; ON reveals
     # them (their post-removal columns are blanked anyway).
     current_block = _switch(
-        'hd-show-deleted', 'Show deleted',
+        'hd-show-deleted', 'Deleted',
         'Show items that were removed from the game (hidden by default)', False
     ) if current_toggle else ''
     # Class filter group (sits right of Remove): toggle item classes on/off.
@@ -274,9 +274,9 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         + _switch('hd-bn-only', 'Buff/nerf only',
                   'Fill cells with buff/nerf colours only — NEW counts as buff, '
                   'DEL as nerf (hover still shows every tag)', False)
+        + price_block
         + remove_block
         + class_block
-        + price_block
         + search_block
         + '</div></div>\n')
 

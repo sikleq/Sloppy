@@ -5047,7 +5047,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 .hd-page .cal-toggle-bar.hd-toolbar { flex-wrap: wrap; row-gap: 8px; }
 .hd-tb-inner {
   display: flex; flex-wrap: wrap; align-items: center;
-  gap: 6px 10px; width: 100%; box-sizing: border-box;
+  gap: 6px 6px; width: 100%; box-sizing: border-box;
   background: #11161d; border: 1px solid #30363d; border-radius: 8px;
   padding: 7px 12px;
 }
@@ -5060,6 +5060,8 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   background: transparent; border-color: transparent;
 }
 .hd-tb-inner .ua-upgrades-toggle:hover { border-color: transparent; }
+/* Switches sit tight together (they were too far apart). */
+.hd-tb-inner .ua-upgrades-toggle { padding: 4px 4px; gap: 5px; }
 /* Thin vertical divider before each filter section (switches | Remove | Show |
    Price), so the groups read as one panel with sections. */
 .hd-tb-inner > .hd-remove-group,
@@ -5073,8 +5075,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
   width: 1px; height: 20px; background: #30363d;
 }
-/* Search sits flush at the panel's right edge. */
-.hd-tb-inner > .hd-search { margin-left: auto; }
+/* Search grows to fill the row's remaining width (so it isn't a narrow box
+   stranded far to the right) — it trails the filter groups and stretches. */
+.hd-tb-inner > .hd-search { flex: 1 1 220px; min-width: 160px; }
+.hd-tb-inner > .hd-search input { width: 100%; box-sizing: border-box; }
 /* "Remove" group + search wrapped in the SAME 32px bordered pill-block as the
    switches, so all toolbar controls share one height/baseline. */
 .hd-remove-group {
@@ -5102,19 +5106,24 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   height: 32px; box-sizing: border-box; padding: 0 10px;
   background: #161b22; border: 1px solid #30363d; border-radius: 5px;
 }
+/* Flat rectangular toggle buttons (NOT gold rounded pills) — ON uses the same
+   blue accent as the switches, OFF is muted + sunken. */
 .hd-class-chip {
   cursor: pointer; user-select: none; font-family: inherit; font-size: 11px;
-  font-weight: 700; letter-spacing: 0.3px;
-  padding: 3px 10px; border-radius: 999px;
-  color: #1a1206; background: #e3c46a; border: 1px solid #f0d68a;
-  transition: filter 0.12s, transform 0.12s, opacity 0.12s, box-shadow 0.12s;
+  font-weight: 600; letter-spacing: 0.2px;
+  padding: 4px 10px; border-radius: 4px;
+  color: #c9d1d9; background: #1c222c; border: 1px solid #30363d;
+  transition: color 0.12s, background 0.12s, border-color 0.12s, box-shadow 0.12s;
 }
-.hd-class-chip:hover { filter: brightness(1.12); transform: translateY(-1px); }
-/* aria-pressed="false" → class hidden: sink in + grey out (like a removed tag). */
+.hd-class-chip:hover { border-color: #58a6ff; color: #fff; }
+/* ON: blue-tinted, matching the iOS-style switches' active colour. */
+.hd-class-chip[aria-pressed="true"] {
+  color: #fff; background: rgba(47, 129, 247, 0.20); border-color: #2f81f7;
+}
+/* OFF: muted + slightly sunken so "hidden class" reads at a glance. */
 .hd-class-chip[aria-pressed="false"] {
-  color: #8b949e; background: #20262e; border-color: #30363d;
-  opacity: 0.6; transform: translateY(1px);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  color: #6e7681; background: #161b22; border-color: #2a2f37;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 /* Full-height vertical divider separating super-category (base-version) groups —
    same idea as Neutral Creeps' .col-sep category dividers. On the first column
