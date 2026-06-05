@@ -76,7 +76,7 @@ def _roster(manifest, roster_key, kind):
 
 def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                     icon_dir, from_token, search_ph, blurb,
-                    current_toggle=False, class_filter=False):
+                    current_toggle=False, class_filter=False, price_filter=False):
     """Render a Dynamics matrix page. See module docstring for the params.
 
     current_toggle — add an "In game" switch (left of Buff/nerf only) that hides
@@ -191,6 +191,8 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
             tr_attr += f' data-class="{_esc(h["class"])}"'
         if "current" in h:
             tr_attr += f' data-current="{1 if h["current"] else 0}"'
+        if h.get("price"):
+            tr_attr += f' data-price="{int(h["price"])}"'
         rows.append(f'<tr{tr_attr}>{"".join(cells)}</tr>')
 
     # Toggles — styled like the Neutral Creeps / Unit Abilities switches.
@@ -240,8 +242,31 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
             '<strong>Show</strong>' + class_chips + '</span>')
     else:
         class_block = ''
+    # Price-range filter (copied from mana_items): two bound inputs + a clear-X
+    # sharing one border. Items priced 0 (neutrals/enchants) are exempt — see JS.
+    if price_filter:
+        price_block = (
+            '<span class="view-group hd-price-group"><strong>Price</strong>'
+            '<span class="mr-price-range">'
+            '<input type="number" class="mr-price-input" id="hd-price-min" '
+            'placeholder="from" min="0" step="50" inputmode="numeric">'
+            '<span class="mr-price-sep" aria-hidden="true">–</span>'
+            '<input type="number" class="mr-price-input" id="hd-price-max" '
+            'placeholder="to" min="0" step="50" inputmode="numeric">'
+            '<button type="button" class="mr-price-clear" id="hd-price-clear" '
+            'aria-label="Clear price range" title="Clear price range" hidden>'
+            '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">'
+            '<path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" '
+            'stroke-width="2" stroke-linecap="round" fill="none"/>'
+            '</svg></button></span></span>')
+    else:
+        price_block = ''
+    # All controls live inside ONE bordered surface (.hd-tb-inner) — a single
+    # unified panel rather than a row of separate floating pills. The switches +
+    # filter groups go borderless inside it (CSS), separated by thin dividers;
+    # the tag/class chips keep their own (universal) design.
     toolbar = (
-        '<div class="cal-toggle-bar inbox-bar hd-toolbar">'
+        '<div class="cal-toggle-bar inbox-bar hd-toolbar"><div class="hd-tb-inner">'
         + _switch('hd-hide-old', 'Hide old',
                   'Show only the most recent patches that fit the width '
                   '(latest at the right edge); off shows every patch', True)
@@ -251,8 +276,9 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                   'DEL as nerf (hover still shows every tag)', False)
         + remove_block
         + class_block
+        + price_block
         + search_block
-        + '</div>\n')
+        + '</div></div>\n')
 
     page = (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'

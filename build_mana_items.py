@@ -692,128 +692,15 @@ def _has_icon(slug: str) -> bool:
     return (_HERE / "icons" / "items" / f"{short}.png").exists()
 
 
-def _clean_seg(s: str) -> str:
-    """Strip a tooltip segment to plain prose: drop tags and tidy whitespace.
-    %placeholder% tokens are KEPT — `scripts.js` colours them blue in the
-    tooltip so the reader sees "this slot would be a value at runtime"."""
-    s = re.sub(r"<[^>]+>", "", s)         # drop any tags
-    s = re.sub(r"\s+", " ", s)            # collapse whitespace
-    s = re.sub(r"\s+([:,.;])", r"\1", s)  # tidy spaces before punctuation
-    return s.strip()
-
-
-def _item_tooltip_html(raw: str) -> str:
-    """Build the icon hover-tip innerHTML from a Valve item description. Each
-    <h1>Active:/Passive:</h1> header starts its OWN line (bold label), so an
-    item with both passive and active effects shows them on separate rows."""
-    raw = raw.replace("\\n", " ").replace("<br>", " ")
-    # re.split with a captured group yields [pre, label, body, label, body, …].
-    segs = re.split(r"<h1>(.*?)</h1>", raw)
-    lines: list[str] = []
-    pre = _clean_seg(segs[0])
-    if pre:
-        lines.append(_esc(pre))
-    for i in range(1, len(segs), 2):
-        label = _clean_seg(segs[i]).rstrip(":")
-        body = _clean_seg(segs[i + 1]) if i + 1 < len(segs) else ""
-        if not (label or body):
-            continue
-        label_html = f"<b>{_esc(label)}:</b> " if label else ""
-        lines.append(label_html + _esc(body))
-    return "<br>".join(lines)
-
-
-_ITEM_DESC_CACHE: dict[str, str] | None = None
-
-
-def _load_item_descriptions(item_slugs: set[str] | None = None) -> dict[str, str]:
-    """Parse item effect descriptions from Valve's localization file once,
-    keyed by short slug (e.g. 'sheepstick') → ready tooltip innerHTML. Used for
-    the icon hover tooltip, mirroring the ability-icon hints on Neutral Creeps.
-
-    `item_slugs` (optional) — pass the set of short slugs we'll need tooltips
-    for, so items that have NO `_Description` key in Valve's loc (Khanda,
-    Phylactery, Aether Lens, Hurricane Pike, …) can have one synthesised from
-    their per-modifier effect descriptions and numbered Notes."""
-    global _ITEM_DESC_CACHE
-    if _ITEM_DESC_CACHE is not None:
-        return _ITEM_DESC_CACHE
-    out: dict[str, str] = {}
-    path = _HERE / "data" / "abilities_english.txt"
-    if path.exists():
-        text = path.read_text(encoding="utf-8-sig", errors="replace")
-        # Primary: items with a full `_Description`. Case-insensitive — Valve
-        # ships about a third of these keys with capital "Ability" (Khanda /
-        # Echo Sabre / Phylactery / Harpoon / Falcon Blade / Hurricane Pike).
-        for m in re.finditer(
-            r'"DOTA_Tooltip_[Aa]bility_item_([a-z0-9_]+?)_Description"\s+'
-            r'"((?:[^"\\]|\\.)+)"',
-            text,
-        ):
-            html = _item_tooltip_html(m.group(2))
-            if html and m.group(1) not in out:
-                out[m.group(1)] = html
-
-        # Fallback: items WITHOUT `_Description`. Synthesize from per-modifier
-        # `_Description` keys (real in-game effect text — e.g. for Khanda:
-        # "Movement slowed by …" + "Passives disabled.") plus any numbered
-        # Notes ("The slow debuff is dispellable."). Lore is intentionally
-        # ignored — it's flavor text, not mechanics.
-        if item_slugs:
-            # Longest slug first so 'angels_demise' claims modifier
-            # 'angels_demise_slow' before any shorter prefix could.
-            sorted_slugs = sorted(item_slugs, key=len, reverse=True)
-            synth: dict[str, list[str]] = {}
-            for m in re.finditer(
-                r'"DOTA_Tooltip_modifier_item_([a-z0-9_]+)_Description"\s+'
-                r'"((?:[^"\\]|\\.)+)"',
-                text, re.IGNORECASE,
-            ):
-                full = m.group(1)
-                for s in sorted_slugs:
-                    if s in out:
-                        continue
-                    if full == s or full.startswith(s + "_"):
-                        cleaned = _clean_seg(m.group(2))
-                        if cleaned:
-                            synth.setdefault(s, []).append(cleaned)
-                        break
-            for m in re.finditer(
-                r'"DOTA_Tooltip_[Aa]bility_item_([a-z0-9_]+?)_Note\d+"\s+'
-                r'"((?:[^"\\]|\\.)+)"',
-                text,
-            ):
-                slug = m.group(1)
-                if slug in item_slugs and slug not in out:
-                    cleaned = _clean_seg(m.group(2))
-                    if cleaned:
-                        synth.setdefault(slug, []).append(cleaned)
-            for slug, parts in synth.items():
-                if parts:
-                    out[slug] = "<br>".join(_esc(p) for p in parts)
-    _ITEM_DESC_CACHE = out
-    return out
-
-
 def _icon_html(slug: str) -> str:
     short = slug.replace("item_", "")
     if _has_icon(slug):
-        img = (f'<img class="mr-ico" src="icons/items/{short}.png" '
-               f'alt="" loading="lazy">')
-    else:
-        img = '<span class="mr-ico mr-ico-blank"></span>'
-    # Hover tooltip with the item's effect description (reuses the global
-    # .abil-ico-hint → qhint-tip JS handler, which renders data-tooltip as HTML
-    # so the <b>/<br> line breaks survive). aria-label gets a flat-text variant.
-    html = _load_item_descriptions().get(short)
-    if html:
-        tip = html.replace('"', "&quot;")
-        plain = (html.replace("<br>", " · ")
-                     .replace("<b>", "").replace("</b>", "")
-                     .replace('"', "&quot;"))
-        return (f'<span class="abil-ico-hint" tabindex="0" role="button" '
-                f'aria-label="{plain}" data-tooltip="{tip}">{img}</span>')
-    return img
+        # Plain icon — no hover description tooltip. The effect popups were
+        # redundant (the page is about mana metrics, not item descriptions) and
+        # added a tooltip payload + JS hint handler to every row.
+        return (f'<img class="mr-ico" src="icons/items/{short}.png" '
+                f'alt="" loading="lazy">')
+    return '<span class="mr-ico mr-ico-blank"></span>'
 
 
 # Intelligence engine-constant history (hardcoded in the Source 2 engine,
@@ -938,12 +825,6 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
     cpr_hist = cpr_hist or {}
     rpg_hist = rpg_hist or {}
     m60_hist = m60_hist or {}
-    # Prime the tooltip cache with the actual set of item slugs in this run, so
-    # items missing Valve's `_Description` (Khanda, Phylactery, …) can fall back
-    # to per-modifier descriptions + Notes.
-    _load_item_descriptions({
-        r["slug"].replace("item_", "").replace("__active", "") for r in rows
-    })
     # subnav_in_header=False: the Materials sub-tab bar is placed INSIDE the
     # scroll box (below), exactly like Neutral Creeps / Neutral Abilities — not
     # as a separate strip under the header. Keeps all three pages identical.

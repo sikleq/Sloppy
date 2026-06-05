@@ -17232,10 +17232,15 @@ for _k, _r in _State.dynamics.items():
     # (not current), also blank patches after `removed` (the "removed from the
     # game" patch). Re-added items stay current → `removed` stays None.
     _removed = _r.get("removed_in") if not _current else None
+    # Gold cost (latest items.json) for the items_dyn price filter. Neutrals +
+    # enchantments are 0 (not purchasable) → store None so they're EXEMPT from the
+    # range filter rather than treated as "free" and hidden when a min is set.
+    _cost = _STATS_I.get(_latest_stats_ver, {}).get("item_" + _icon, {}).get("ItemCost", 0)
     _item_roster.append({
         "name": _r["name"], "icon": _icon, "key": _k,
         "class": _cls, "current": _current,
-        "added": _added_version(_icon), "removed": _removed})
+        "added": _added_version(_icon), "removed": _removed,
+        "price": _cost if (_cost and _cost > 0) else None})
 _item_roster.sort(key=lambda _d: _d["name"].lower())
 _dyn_payload = {"patches": _dyn_patches, "entities": _State.dynamics,
                 "heroes": _hero_roster, "items": _item_roster}

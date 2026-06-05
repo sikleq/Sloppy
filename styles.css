@@ -5040,9 +5040,41 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   transform: scale(1.5); position: relative; z-index: 41;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(170, 220, 240, 0.4);
 }
-/* Toolbar wraps onto extra rows (switches + Remove chips + search don't fit on
-   one line). */
+/* UNIFIED CONTROL PANEL (dynamics pages): every control lives inside ONE bordered
+   surface (.hd-tb-inner) instead of a row of separate floating pills. The outer
+   .hd-toolbar keeps the Materials vertical rhythm (28px side inset + top/bottom
+   gaps); the inner panel is the raised surface. */
 .hd-page .cal-toggle-bar.hd-toolbar { flex-wrap: wrap; row-gap: 8px; }
+.hd-tb-inner {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 6px 10px; width: 100%; box-sizing: border-box;
+  background: #11161d; border: 1px solid #30363d; border-radius: 8px;
+  padding: 7px 12px;
+}
+/* Inside the panel the switches + filter groups go FLAT (transparent) — the panel
+   border replaces their individual pill borders. Chips keep their own design. */
+.hd-tb-inner .ua-upgrades-toggle,
+.hd-tb-inner .hd-remove-group,
+.hd-tb-inner .hd-class-group,
+.hd-tb-inner .view-group {
+  background: transparent; border-color: transparent;
+}
+.hd-tb-inner .ua-upgrades-toggle:hover { border-color: transparent; }
+/* Thin vertical divider before each filter section (switches | Remove | Show |
+   Price), so the groups read as one panel with sections. */
+.hd-tb-inner > .hd-remove-group,
+.hd-tb-inner > .hd-class-group,
+.hd-tb-inner > .view-group {
+  position: relative; margin-left: 4px; padding-left: 14px;
+}
+.hd-tb-inner > .hd-remove-group::before,
+.hd-tb-inner > .hd-class-group::before,
+.hd-tb-inner > .view-group::before {
+  content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 20px; background: #30363d;
+}
+/* Search sits flush at the panel's right edge. */
+.hd-tb-inner > .hd-search { margin-left: auto; }
 /* "Remove" group + search wrapped in the SAME 32px bordered pill-block as the
    switches, so all toolbar controls share one height/baseline. */
 .hd-remove-group {

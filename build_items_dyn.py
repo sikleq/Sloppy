@@ -29,17 +29,19 @@ def save_items_dyn_html():
         search_ph="Search items — blink, dagon, aghs…",
         current_toggle=True,
         class_filter=True,
+        price_filter=True,
         blurb=(
             "Every item down the side, every patch across the top — regular items, "
             "neutral items and enchantments together. Each diamond is that item’s "
             "balance-change summary for that patch — hover it for the "
             "buff/nerf/rework breakdown, click to jump to the item on that patch "
             "page. Hover a patch column for its release date. Empty diamonds mean "
-            "the item was untouched. <strong>In game</strong> hides items removed "
-            "from the game; <strong>Show</strong> toggles item classes; "
-            "<strong>Remove</strong> drops any tag from the diamonds (it still "
-            "shows on hover); the <strong>search</strong> box filters by name "
-            "(comma-separate for several: <em>blink, dagon, aghs</em>)."),
+            "the item was untouched. <strong>Show deleted</strong> reveals items "
+            "removed from the game; <strong>Show</strong> toggles item classes; "
+            "<strong>Price</strong> filters by gold cost (neutrals + enchantments "
+            "are free, so they ignore it); <strong>Remove</strong> drops any tag "
+            "from the diamonds (it still shows on hover); the <strong>search</strong> "
+            "box filters by name (comma-separate: <em>blink, dagon, aghs</em>)."),
     )
 
 

@@ -65,10 +65,20 @@ enriched **items roster** into `_dynamics.json` — each entry has `class`
 section-based method and the game-file method agree 100% (cross-checked: 49/49
 neutral, 0 false pos/neg).
 
-The two items_dyn controls (`current_toggle` / `class_filter` params of
-`save_dyn_matrix`) put `data-class` + `data-current` on each `<tr>`; `scripts.js
-dynSetupMatrix` combines name-search + class chips + In-game toggle into ONE
-visibility pass (no-ops on heroes_dyn, whose roster lacks those fields).
+The items_dyn controls (`current_toggle` / `class_filter` / `price_filter` params
+of `save_dyn_matrix`) put `data-class` + `data-current` + `data-price` on each
+`<tr>`; `scripts.js dynSetupMatrix` combines name-search + class chips + "Show
+deleted" toggle + price min/max into ONE visibility pass (no-ops on heroes_dyn,
+whose roster lacks those fields). **Price** = latest items.json `ItemCost`; items
+with no cost (neutrals/enchants = 0 → roster `price=None`, no `data-price`) are
+EXEMPT from the range filter. The price widget reuses mana_items' `.mr-price-range`
+markup/CSS with `hd-price-*` ids.
+
+**Unified toolbar panel:** all dynamics controls live inside ONE bordered surface
+`.hd-tb-inner` (not separate floating pills). Inside it the switches + filter
+groups go flat (transparent), separated by thin dividers (switches | Remove |
+Show | Price), search flush right. Tag/class chips keep their own design. The
+outer `.hd-toolbar` keeps the 28px Materials side inset + top/bottom rhythm gaps.
 
 ### Item lifespan — blanked cells outside [added … removed]
 Each items roster entry also carries `added` + `removed` patch versions so the

@@ -840,6 +840,9 @@
     const page = table.closest('.creeps-page');
     const classChips = page ? [...page.querySelectorAll('.hd-class-chip[data-class]')] : [];
     const delToggle = document.getElementById('hd-show-deleted');
+    const priceMin = document.getElementById('hd-price-min');
+    const priceMax = document.getElementById('hd-price-max');
+    const priceClear = document.getElementById('hd-price-clear');
     const rows = [...table.querySelectorAll('tbody tr')];
     const applyRowFilters = () => {
       const terms = search
@@ -850,13 +853,26 @@
                             .map(c => c.dataset.class))
         : null;
       const showDeleted = !!(delToggle && delToggle.checked);
+      const lo = priceMin ? parseFloat(priceMin.value) : NaN;
+      const hi = priceMax ? parseFloat(priceMax.value) : NaN;
+      const hasLo = !isNaN(lo), hasHi = !isNaN(hi);
+      // Clear-X visible only when a bound is set.
+      if (priceClear) priceClear.hidden = !(hasLo || hasHi);
       rows.forEach(tr => {
         const name = (tr.querySelector('td.hd-hero')?.dataset.sort || '').toLowerCase();
         const okSearch = !terms.length || terms.some(t => name.includes(t));
         const okClass = !enabled || enabled.has(tr.dataset.class);
         // data-current="0" = removed from the game → shown only when "Show deleted".
         const okDel = showDeleted || tr.dataset.current !== '0';
-        tr.style.display = (okSearch && okClass && okDel) ? '' : 'none';
+        // Price: items without data-price (neutrals/enchants = free) are EXEMPT.
+        let okPrice = true;
+        const p = tr.dataset.price;
+        if ((hasLo || hasHi) && p !== undefined) {
+          const v = parseFloat(p);
+          if (hasLo && v < lo) okPrice = false;
+          if (hasHi && v > hi) okPrice = false;
+        }
+        tr.style.display = (okSearch && okClass && okDel && okPrice) ? '' : 'none';
       });
     };
     if (search) search.addEventListener('input', applyRowFilters);
@@ -866,6 +882,13 @@
       applyRowFilters();
     }));
     if (delToggle) delToggle.addEventListener('change', applyRowFilters);
+    if (priceMin) priceMin.addEventListener('input', applyRowFilters);
+    if (priceMax) priceMax.addEventListener('input', applyRowFilters);
+    if (priceClear) priceClear.addEventListener('click', () => {
+      if (priceMin) priceMin.value = '';
+      if (priceMax) priceMax.value = '';
+      applyRowFilters();
+    });
     applyRowFilters();   // initial pass (deleted hidden + only Items class by default)
 
     window.addEventListener('resize', layout, { passive: true });
