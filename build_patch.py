@@ -2924,16 +2924,21 @@ def _fmt_val(v):
     return str(v)
 
 
-def note_box(text=None, *, hero=None, item=None, unit=None, field=None, before_patch=None):
+def note_box(text=None, *, hero=None, item=None, unit=None, field=None, before_patch=None,
+             prev_val=None, prev_patch=None):
     """Inline NOTE box rendered after a row.
 
-    Three usage modes:
+    Usage modes:
       - Legacy free-form:  note_box("any text")
       - Auto-derived from stats DB: provide hero=/item=/unit= + field= +
-        before_patch= → emits "was <b>X</b>. Previous change in <b>PATCH</b>".
+        before_patch= → emits "Previously: <b>X</b>. … changed in <b>PATCH</b>".
         `unit` takes the full npc key, e.g. 'npc_dota_beastmaster_boar'.
+      - Manual "Previously" override: pass prev_val= + prev_patch= directly.
+        Use when the value isn't in the parsed DB — e.g. a summon whose stat
+        lives on an un-parsed base unit (Spirit Bear's regen inherits from
+        npc_dota_lone_druid_bear, so units.json carries None).
     """
-    if hero or item or unit:
+    if prev_val is None and (hero or item or unit):
         if hero:
             prev_val = stat_h(hero, field, before_patch)
             prev_patch = prev_change_patch_h(hero, field, before_patch) or before_patch
@@ -2943,6 +2948,7 @@ def note_box(text=None, *, hero=None, item=None, unit=None, field=None, before_p
         else:
             prev_val = stat_u(unit, field, before_patch)
             prev_patch = prev_change_patch_u(unit, field, before_patch) or before_patch
+    if prev_val is not None and prev_patch is not None:
         if isinstance(prev_patch, str) and prev_patch.startswith("<"):
             ver = prev_patch[1:]
             # The stat held its value for every patch we have on record (DB
@@ -4865,7 +4871,7 @@ W(li("Level 10 Talent Movement Speed decreased from +20 to +15", b(20, 15)))
 W(ul_close())
 W(unit_header("Spirit Bear", "../icons/abilities/lone_druid_spirit_bear.png", kind="Creep-hero"))
 W(ul_open())
-W(li("Base Health Regen decreased by 1.5", b(3, 1.5), extra=note_box("From 3 to 1.5")))
+W(li("Base Health Regen decreased by 1.5", b(3, 1.5), extra=note_box(prev_val=3, prev_patch="7.40")))
 W(ul_close())
 
 # Marci
