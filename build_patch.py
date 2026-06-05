@@ -2866,18 +2866,15 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False):
     # (items: Cornucopia). NOT "Facets removed from the game" (Crude keeps living)
     # nor "Removed <facet/ability>" (a sub-feature, not the entity). setdefault
     # keeps the NEWEST removal (newer patch blocks appear earlier in this file).
-    if isinstance(text, str):
+    if isinstance(text, str) and 'del' in dyn_tags:
+        # Entity removal/pool-exit phrasings (all carry the DEL tag): "Removed"
+        # (enchants), "Item removed from the game" (items), "Item cycled out"
+        # (neutrals rotated out of the pool). Matched PRECISELY so a descriptive
+        # "Removed <facet>" or "Facets removed from the game" can't trigger it.
+        # setdefault keeps the NEWEST event (newer patch blocks appear earlier).
         _low = text.strip().rstrip('.').lower()
-        # "Item cycled out" = a neutral item rotated OUT of the pool (its tag is
-        # inconsistent — DEL or MISC — so don't gate on it; the phrase is exact).
-        # "Removed" / "Item removed from the game" = a genuine removal (gated on DEL
-        # so a descriptive "Removed <facet>" / non-DEL row can't trigger it). Both
-        # mean "not in the game now"; setdefault keeps the NEWEST event.
-        _is_removal = _low == 'item cycled out' or (
-            'del' in dyn_tags and _low in (
-                'removed', 'item removed from the game',
-                'enchantment removed from the game'))
-        if _is_removal:
+        if _low in ('removed', 'item removed from the game',
+                    'enchantment removed from the game', 'item cycled out'):
             _ek = _State.current_entity_key
             _pv = _State.current_patch_version
             if _ek and _pv:
@@ -14696,15 +14693,15 @@ W(section("Neutral Item Updates"))
 W(plain_header("Artifact changes"))
 W(item_header("Ripper's Lash"))
 W(ul_open())
-W(li("Item cycled out", t("MISC")))
+W(li("Item cycled out", t("DEL")))
 W(ul_close())
 W(item_header("Sister's Shroud"))
 W(ul_open())
-W(li("Item cycled out", t("MISC")))
+W(li("Item cycled out", t("DEL")))
 W(ul_close())
 W(item_header("Spark of Courage"))
 W(ul_open())
-W(li("Item cycled out", t("MISC")))
+W(li("Item cycled out", t("DEL")))
 W(ul_close())
 W(item_header("Ash Legion Shield", new="Tier 1 Artifact"))
 W(ul_open())
@@ -14720,7 +14717,7 @@ W(li("Passive: Loaded. When calculating wearer's base damage or creep bounty fro
 W(ul_close())
 W(item_header("Brigand's Blade"))
 W(ul_open())
-W(li("Item cycled out", t("MISC")))
+W(li("Item cycled out", t("DEL")))
 W(ul_close())
 W(item_header("Defiant Shell"))
 W(ul_open())
@@ -14734,7 +14731,7 @@ W(li("Burn Through now does 50% less damage to non-hero targets", t("MISC")))
 W(ul_close())
 W(item_header("Gale Guard"))
 W(ul_open())
-W(li("Item cycled out", t("MISC")))
+W(li("Item cycled out", t("DEL")))
 W(ul_close())
 W(item_header("Jidi Pollen Bag"))
 W(ul_open())
@@ -14756,15 +14753,15 @@ W(li("Relentless search radius changed from 600 to the hero's attack range", t("
 W(ul_close())
 W(item_header("Magnifying Monocle"))
 W(ul_open())
-W(li("Item cycled out", t("MISC")))
+W(li("Item cycled out", t("DEL")))
 W(ul_close())
 W(item_header("Outworld Staff"))
 W(ul_open())
-W(li("Item cycled out", t("MISC")))
+W(li("Item cycled out", t("DEL")))
 W(ul_close())
 W(item_header("Pyrrhic Cloak"))
 W(ul_open())
-W(li("Item cycled out", t("MISC")))
+W(li("Item cycled out", t("DEL")))
 W(ul_close())
 W(item_header("Flayer's Bota", new="Tier 4 Artifact"))
 W(ul_open())
@@ -14793,7 +14790,7 @@ W(li("Dormant Curio increases damage from 110 to 143", b(110, 143)))
 W(ul_close())
 W(item_header("Helm of the Undying"))
 W(ul_open())
-W(li("Item cycled out", t("MISC")))
+W(li("Item cycled out", t("DEL")))
 W(ul_close())
 W(item_header("Dezun Bloodrite"))
 W(ul_open())

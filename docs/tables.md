@@ -91,13 +91,14 @@ matrix only draws the item's slots WITHIN its life:
   → `rec["removed_in"]`. This is the AUTHORITATIVE removal signal and overrides the
   game-file `current` (`current = game-file-current AND removed_in is None`).
   Columns after `removed` are blanked; the row is `data-current="0"` (hidden unless
-  the **Deleted** toggle is on). Detection matches the entity phrasings PRECISELY:
-  - bare `"Removed"` (enchants — **Wise / Boundless / Vast**, removed 7.41) or
-    `"Item removed from the game"` (items — Cornucopia / Eternal Shroud) — gated on
-    the DEL tag;
-  - `"Item cycled out"` (neutrals rotated OUT of the pool — Spark of Courage,
-    Ripper's Lash, Gale Guard … 9 in 7.40 + Whisper of the Dread 7.41) — NOT gated
-    on a tag (its tag is inconsistent DEL/MISC; the phrase is exact).
+  the **Deleted** toggle is on). Detection is gated on the **DEL** tag (all entity
+  removal/pool-exit rows carry it) and matches the phrasings PRECISELY:
+  - bare `"Removed"` (enchants — **Wise / Boundless / Vast**, removed 7.41),
+    `"Item removed from the game"` (items — Cornucopia / Eternal Shroud), and
+    `"Item cycled out"` (neutrals rotated OUT of the pool — Spark of Courage,
+    Ripper's Lash, Gale Guard … 9 in 7.40 + Whisper of the Dread 7.41).
+  - ⚠ The cycle-out rows are authored as `t("DEL")` (a pool exit IS a removal) —
+    don't tag them MISC.
   A **returned guard**: if the entity is touched in a patch strictly NEWER than its
   removal/cycle-out patch, it came back → `removed` cleared, current again.
   ⚠ NEITHER game file detects these: items.json keeps obsolete items as keys
