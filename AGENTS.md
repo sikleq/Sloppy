@@ -55,6 +55,7 @@ python scripts/apply_stats.py          # упгрейдит t() → bstat_h() г
 ### Хелперы для строк изменений
 - `b(old, new, l=False)` — числовой бейдж в %. `l=True`: меньше = лучше (cooldown, mana cost, BAT, gold cost, penalty, channel time, recharge, cast point)
   - **Исключение**: «X Cooldown Reduction», «X Mana Cost Reduction», «Cooldown Advance» — это **значения талантов**, НЕ применять l=True
+  - **Общий тег — по МАКС-уровню** (последний ранг), не по среднему. Если ранний уровень забаффлен, а макс слегка занёрфлен (рескейл), а импакт — бафф, передавай `force_overall="buff"` (или `"nerf"`). Пер-уровневые проценты при этом не меняются. Пример: Visage Grave Chill 7.41d.
 - `br(old_min, old_max, new_min, new_max)` — для range-значений (по midpoint)
 - `bf(old_fn, new_fn, formula_text)` — формульные изменения, возвращает `(trigger, badge, table)`
 - `t("BUFF/NERF/REWORK/MISC/QoL/NEW/DEL")` — текстовые теги
@@ -133,6 +134,7 @@ W(subnote("Abilities that improve each level provide their increment value at le
 - `plain_header(name)` — без иконки (Mechanics, Tormentor, Roshan, Map Objectives и т.п.)
 - `ability(name)` — `<h4>` название способности. **БЕЗ префикса героя** в имени! «Penitence», не «Chen Penitence». Generate_patch_code.py делает это автоматически — fallback titlecase берёт только bare ability name (после `entity_` префикса)
 - `subgroup(name)` — `<h4>` подгруппа («Talents», «Abilities», «Spirit Bear»)
+- **Категория «Other»** — первый `ul_open()` сразу после `hero_header` авто-оборачивается в подгруппу «Other» (базовые/прочие статы героя, как Base Intelligence у Jakiro). Если в блоке ровно одна строка, общая иконка меняется на иконку под стат (`STAT_ICONS`/`STAT_DETECT_RULES`). **Изменения обзора героя (day/night vision) → иконка `icons/vision.png`** (детект по «night vision»/«day vision»/«vision»). Не делать vision/прочие статы отдельной `ability(...)` — это категория Other.
 
 ### Структура changes-блока
 ```python
