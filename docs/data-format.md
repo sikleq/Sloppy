@@ -28,7 +28,12 @@ b([100, 110, 120],
   [110, 120, 130])      # per-skill-level values
 ```
 
-Overall direction is computed from the **max-rank** delta (last element of the list), which models the late-game state players settle into. Override with `force_tag="buff"` / `"nerf"` / `"rework"` if the heuristic disagrees with the actual gameplay impact.
+Overall direction (the left BUFF/NERF tag + filter) is computed from the **max-rank** delta (last non-zero per-level value) — the late-game state players settle into — with two automatic refinements:
+
+- **Front-loaded rescale:** if max-rank is a *small* nerf (≤12%) but the per-level deltas average to a buff, it flips to **buff** (early-level buffs outweigh an insignificant late dip). E.g. `b([15,30,45,60],[25,35,45,55])` (+67/+17/0/-8) → buff.
+- **Flatten** (`b([a,b,c,d], X)` — per-level scaling collapsed to one flat value): tagged by comparing the flat value to the **old average** — **buff if `new ≥ avg(old)`** (ties → buff, since early levels still rose), nerf otherwise; `l=True` inverts. E.g. `b([4,8,12,16], 10)` (avg 10 = 10) → buff; `b([1100,1400,1700,2000], 1500)` (1500 < 1550) → nerf.
+
+Override the result outright with `force_overall="buff"` / `"nerf"`. (Per-level % badges are never affected by the overall tag.) See `b()`'s docstring / AGENTS.md for the full rationale.
 
 ### `br(old_min, old_max, new_min, new_max, l=False)` — range badge
 
