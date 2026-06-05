@@ -11,7 +11,7 @@ This covers the sortable data tables under the **Materials** section.
 | `neutral_abilities.html` | Per-unit-ability table (one row per unit×ability). The Materials sub-nav presents it as a child of Neutral Creeps. `unit_abilities.html` is now a small meta-redirect for backwards compatibility. | `build_creeps.py` (same run) |
 | `mana_items.html` | Mana / mana-regen items + gold-efficiency metrics. | `build_mana_items.py` |
 | `heroes_dyn.html` | **Hero Dynamics matrix** — rows = every hero (icon+name, alphabetical), columns = every patch (version + release date oldest→newest), each cell = that hero's patch-dynamics **dyn-cell** for that patch. Same diamond-pill widget as patch pages. | `build_heroes_dyn.py` |
-| `items_dyn.html` | **Item Dynamics matrix** — identical to heroes_dyn but rows = every item touched across tracked patches (`item|<slug>` entities, alphabetical). | `build_items_dyn.py` |
+| `items_dyn.html` | **Item Dynamics matrix** — like heroes_dyn but rows = every item/enchantment touched across tracked patches (172: 101 regular + 49 neutral + 22 enchant). Adds an **In game** toggle (hide removed/obsolete items, ON by default) + a **Show** class filter (Items / Neutral Items / Enchantments). | `build_items_dyn.py` |
 | nav / asset version / `data/site_meta.json` | Shared header, sub-tabs, cache-busting. | `site_common.py` |
 
 Header sub-tabs (under the logo) switch between Neutral Creeps / Unit Abilities / Mana Items.
@@ -44,6 +44,31 @@ renderer is **entity-agnostic**. `build_heroes_dyn.py` passes the hero config
 - **index Dynamics tile** opens an in-place sub-panel (same generic mechanism as
   Support: `data-panel-open`/`data-panel-close`, `.<name>-open` book class) with
   Heroes → heroes_dyn and Items → items_dyn.
+
+### Item classification (items_dyn) — from the GAME FILES, not patch notes
+`build_patch.py::_load_item_classes(version)` parses the latest
+`data/stats/<ver>/items.txt` (authoritative Valve KV):
+- **neutral item** — block has `"ItemIsNeutralActiveDrop" "1"`.
+- **enchantment** — slug prefix `item_enhancement_` (these are NOT neutral-flagged).
+- **removed/obsolete** — `"IsObsolete" "1"` (still in the file for old replays, but
+  out of the game, e.g. Cornucopia / Eternal Shroud).
+- **regular** — present, not neutral, not obsolete.
+- ⚠ Neutral items also carry `ItemPurchasable "0"` — do NOT use purchasable as the
+  removed signal; use `IsObsolete`.
+
+`_register_entity` stamps each item/enchant entity's `icon` slug (item → ITEM_SLUG;
+enchant → `enhancement_<slug>`; game slug for both = `item_<icon>`) plus a
+`neutral_section` fallback (set under `section("Neutral Item Updates")`) for the
+rare neutral that's been fully removed from the game file. `build_patch` writes the
+enriched **items roster** into `_dynamics.json` — each entry has `class`
+(`regular`/`neutral`/`enchant`) and `current` (in game vs removed). The
+section-based method and the game-file method agree 100% (cross-checked: 49/49
+neutral, 0 false pos/neg).
+
+The two items_dyn controls (`current_toggle` / `class_filter` params of
+`save_dyn_matrix`) put `data-class` + `data-current` on each `<tr>`; `scripts.js
+dynSetupMatrix` combines name-search + class chips + In-game toggle into ONE
+visibility pass (no-ops on heroes_dyn, whose roster lacks those fields).
 
 ### Hero Dynamics matrix (`build_heroes_dyn.py`)
 - Reads **`_dynamics.json`** (written by build_patch): `patches` (newest-first), `entities`
