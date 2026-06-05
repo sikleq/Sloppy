@@ -892,20 +892,16 @@
     applyRowFilters();   // initial pass (deleted hidden + only Items class by default)
 
     window.addEventListener('resize', layout, { passive: true });
-    // Re-measure once fonts/icons settle (first paint can under-measure names).
-    // Guard against shrink: rows hidden by the default filters (neutral/enchant)
-    // report scrollWidth 0, so a naive re-measure could narrow the column and clip
-    // those names when later shown. Keep the larger of the setup measure (taken
-    // with ALL rows visible) and the post-font re-measure.
-    window.addEventListener('load', () => {
-      const prev = table._hdHeroW || 0;
-      table._hdHeroW = null;
-      layout();
-      if ((table._hdHeroW || 0) < prev) {
-        table._hdHeroW = prev;
-        table.style.setProperty('--hd-hero-w', prev + 'px');
-      }
-    });
+    // On load, ONLY re-fit the columns to the (settled) box width — reuse the
+    // cached identity-column width from setup. Do NOT re-measure it here: setup
+    // measured it over ALL rows (before the default class/Deleted filters hid
+    // some), so it's already complete + correct. Re-measuring now would see only
+    // the VISIBLE rows (shorter names) → a smaller heroW → the column fit
+    // (computed from it) would mismatch the real heroW and overflow the box with a
+    // horizontal scrollbar (the items_dyn bug — heroes_dyn has no default filter so
+    // it never showed). Names use the system font (no web-font reflow), so the
+    // setup measure needs no font-settle correction.
+    window.addEventListener('load', layout);
   }
 
   function dynInit() {

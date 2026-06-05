@@ -187,6 +187,16 @@ matrix only draws the item's slots WITHIN its life:
     equal grid; recompute the category colspans to the VISIBLE leaf columns after any column-hide
     (see `dynRecomputeSupercats`, keyed by `data-base`/`data-cat`). Don't put `overflow:hidden` on a
     cell whose content hover-pops (clips the pop) — clip the header label cell only.
+11. **Measure the frozen identity-column width ONCE over ALL rows, then cache it — never re-measure
+    over a filtered subset.** The column-fit (`dynLayoutMatrix`) derives the patch-column count/width
+    from `avail = boxWidth − heroW − gutter`, so `heroW` (the longest name + icon + gap) MUST be
+    consistent with the fit. Measure it at setup BEFORE any default filter hides rows (items_dyn hides
+    Neutral/Enchant/Deleted by default), cache on the table, and reuse on resize/load. If you re-measure
+    after rows are hidden, hidden rows report `scrollWidth 0` → a SMALLER `heroW`; the fit gets computed
+    from the small value while the real `--hd-hero-w` is the larger cached one → the table is wider than
+    the box → a phantom **horizontal scrollbar** (this bit items_dyn but not heroes_dyn, which has no
+    default filter). Names use the system font (no web-font reflow), so the setup measure needs no
+    font-settle re-measure; `load`/`resize` should only re-FIT columns, not re-measure the name width.
 
 `site_common.py` reads `data/site_meta.json`, so `build_patch.py` must run first.
 Generated HTML is **gitignored** and rebuilt by CI; only the `.py` / `styles.css` /
