@@ -91,14 +91,23 @@ matrix only draws the item's slots WITHIN its life:
   → `rec["removed_in"]`. This is the AUTHORITATIVE removal signal and overrides the
   game-file `current` (`current = game-file-current AND removed_in is None`).
   Columns after `removed` are blanked; the row is `data-current="0"` (hidden unless
-  the **Deleted** toggle is on). Detection is gated on the DEL tag and matched
-  PRECISELY: bare `"Removed"` (enchants — **Wise / Boundless / Vast**, removed in
-  7.41) or `"Item removed from the game"` (items — Cornucopia / Eternal Shroud).
-  ⚠ Two traps this avoids: items.json keeps obsolete items as keys (Cornucopia is
-  still a 7.41d key) AND items.txt keeps removed ENCHANT definitions WITHOUT
-  `IsObsolete` — so neither game file detects enchant removal; only the patch note
-  does. ⚠ Must NOT match `"Facets removed from the game"` (Crude keeps living) nor
+  the **Deleted** toggle is on). Detection matches the entity phrasings PRECISELY:
+  - bare `"Removed"` (enchants — **Wise / Boundless / Vast**, removed 7.41) or
+    `"Item removed from the game"` (items — Cornucopia / Eternal Shroud) — gated on
+    the DEL tag;
+  - `"Item cycled out"` (neutrals rotated OUT of the pool — Spark of Courage,
+    Ripper's Lash, Gale Guard … 9 in 7.40 + Whisper of the Dread 7.41) — NOT gated
+    on a tag (its tag is inconsistent DEL/MISC; the phrase is exact).
+  A **returned guard**: if the entity is touched in a patch strictly NEWER than its
+  removal/cycle-out patch, it came back → `removed` cleared, current again.
+  ⚠ NEITHER game file detects these: items.json keeps obsolete items as keys
+  (Cornucopia is still a 7.41d key); items.txt keeps removed ENCHANT + cycled-out
+  NEUTRAL definitions WITHOUT `IsObsolete`. Only the patch note does. ⚠ Must NOT
+  match `"Facets removed from the game"` (Crude keeps living) nor
   `"Removed <facet/ability>"` (a sub-feature, e.g. Riftshadow Prism's facet list).
+  Currently 15 not-current: 3 enchants + 2 items removed + 10 cycled-out neutrals.
+  (NB: Liquipedia's changelog summary disagreed — it's stale on the 7.41 enchant
+  removals and the cycle-outs; the Valve patch notes in build_patch.py are truth.)
 - A touched cell (has a tag tally) ALWAYS renders its pill, even if the lifespan
   math would blank it (a touch means it existed). heroes_dyn rows have no
   added/removed → nothing is blanked there (could be wired later via heroes.json).

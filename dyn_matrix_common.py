@@ -226,7 +226,8 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     # them (their post-removal columns are blanked anyway).
     current_block = _switch(
         'hd-show-deleted', 'Deleted',
-        'Show items that were removed from the game (hidden by default)', False
+        'Show items no longer in the game — removed or cycled out of the pool '
+        '(hidden by default)', False
     ) if current_toggle else ''
     # Class filter group (sits right of Remove): toggle item classes on/off.
     # Default: only regular Items on; Neutral Items + Enchantments start OFF.

@@ -2866,10 +2866,18 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False):
     # (items: Cornucopia). NOT "Facets removed from the game" (Crude keeps living)
     # nor "Removed <facet/ability>" (a sub-feature, not the entity). setdefault
     # keeps the NEWEST removal (newer patch blocks appear earlier in this file).
-    if isinstance(text, str) and 'del' in dyn_tags:
+    if isinstance(text, str):
         _low = text.strip().rstrip('.').lower()
-        if _low in ('removed', 'item removed from the game',
-                    'enchantment removed from the game'):
+        # "Item cycled out" = a neutral item rotated OUT of the pool (its tag is
+        # inconsistent — DEL or MISC — so don't gate on it; the phrase is exact).
+        # "Removed" / "Item removed from the game" = a genuine removal (gated on DEL
+        # so a descriptive "Removed <facet>" / non-DEL row can't trigger it). Both
+        # mean "not in the game now"; setdefault keeps the NEWEST event.
+        _is_removal = _low == 'item cycled out' or (
+            'del' in dyn_tags and _low in (
+                'removed', 'item removed from the game',
+                'enchantment removed from the game'))
+        if _is_removal:
             _ek = _State.current_entity_key
             _pv = _State.current_patch_version
             if _ek and _pv:
@@ -17214,6 +17222,7 @@ def _item_class_and_current(rec):
 
 # Chronological patch order (oldest → newest) for item lifespan windows.
 _CHRON = [_r["version"] for _r in reversed(RELEASE_HISTORY)]
+_CHRON_IDX = {_v: _i for _i, _v in enumerate(_CHRON)}
 
 
 def _added_version(icon):
@@ -17233,11 +17242,17 @@ for _k, _r in _State.dynamics.items():
         continue
     _cls, _current_gf = _item_class_and_current(_r)
     _icon = _r.get("icon", _r["name"].lower().replace(" ", "_").replace("'", ""))
-    # Removal: a patch-note "Removed" (item or enchant) is AUTHORITATIVE — Valve
-    # keeps obsolete enchant definitions in items.txt WITHOUT IsObsolete (Wise /
-    # Boundless / Vast), so the game-file `current` alone misses them. If the
-    # patch notes removed it, it's not current regardless of the game file.
+    # Removal: a patch-note "Removed" / "Item cycled out" (item or enchant) is
+    # AUTHORITATIVE — Valve keeps obsolete enchant + cycled-out neutral definitions
+    # in items.txt WITHOUT IsObsolete, so the game-file `current` alone misses them
+    # (Wise/Boundless/Vast removed 7.41; Spark of Courage etc. cycled out 7.40).
     _removed = _r.get("removed_in")
+    # Returned guard: if the item was touched in a patch strictly NEWER than its
+    # removal patch, it came back into the game/pool → no longer removed.
+    if _removed:
+        _touch = [_CHRON_IDX[_p] for _p in _r.get("patches", {}) if _p in _CHRON_IDX]
+        if _touch and max(_touch) > _CHRON_IDX.get(_removed, -1):
+            _removed = None
     _current = _current_gf and (_removed is None)
     # Lifespan: blank patches before `added`; if removed, also blank after `removed`.
     # Gold cost (latest items.json) for the items_dyn price filter. Neutrals +
