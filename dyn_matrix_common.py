@@ -75,8 +75,16 @@ def _roster(manifest, roster_key, kind):
 
 
 def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
-                    icon_dir, from_token, search_ph, blurb):
-    """Render a Dynamics matrix page. See module docstring for the params."""
+                    icon_dir, from_token, search_ph, blurb,
+                    current_toggle=False, class_filter=False):
+    """Render a Dynamics matrix page. See module docstring for the params.
+
+    current_toggle — add an "In game" switch (left of Buff/nerf only) that hides
+                     rows whose roster entry has current=False (removed/obsolete).
+                     Default ON. Needs roster entries to carry `current`.
+    class_filter   — add a Show group (right of Remove) with Items / Neutral Items
+                     / Enchantments toggles. Needs roster entries to carry `class`.
+    Both are no-ops on pages whose roster lacks those fields (heroes_dyn)."""
     manifest = _load_manifest()
     # Columns: every patch, OLDEST on the left → NEWEST on the right (so the
     # latest patch is the rightmost column; scripts.js keeps it flush right).
@@ -162,7 +170,13 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                 # Untouched → static empty diamond (CSS ::after).
                 cells.append(f'<td class="hd-cell hd-empty{sep}"></td>')
         cells.append('<td class="hd-cell hd-empty hd-spacer"></td>')
-        rows.append(f'<tr>{"".join(cells)}</tr>')
+        # Row metadata for the items_dyn filters (absent on heroes_dyn).
+        tr_attr = ""
+        if "class" in h:
+            tr_attr += f' data-class="{_esc(h["class"])}"'
+        if "current" in h:
+            tr_attr += f' data-current="{1 if h["current"] else 0}"'
+        rows.append(f'<tr{tr_attr}>{"".join(cells)}</tr>')
 
     # Toggles — styled like the Neutral Creeps / Unit Abilities switches.
     def _switch(sw_id, label, title, checked):
@@ -190,15 +204,35 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         '<input type="text" id="hd-hero-search" autocomplete="off" spellcheck="false" '
         f'placeholder="{_esc(search_ph)}">'
         '</span>')
+    # Optional items_dyn controls. "In game" switch (sits left of Buff/nerf only):
+    # hide rows whose item was removed from the game. Default ON.
+    current_block = _switch(
+        'hd-current-only', 'In game',
+        'Show only items still in the game; hide removed/obsolete ones', True
+    ) if current_toggle else ''
+    # Class filter group (sits right of Remove): toggle item classes on/off.
+    if class_filter:
+        _CLASS_CHIPS = [('regular', 'Items'), ('neutral', 'Neutral Items'),
+                        ('enchant', 'Enchantments')]
+        class_chips = ''.join(
+            f'<button type="button" class="hd-class-chip" data-class="{c}" '
+            f'aria-pressed="true">{lbl}</button>' for c, lbl in _CLASS_CHIPS)
+        class_block = (
+            '<span class="hd-class-group" title="Show or hide item classes">'
+            '<strong>Show</strong>' + class_chips + '</span>')
+    else:
+        class_block = ''
     toolbar = (
         '<div class="cal-toggle-bar inbox-bar hd-toolbar">'
         + _switch('hd-hide-old', 'Hide old',
                   'Show only the most recent patches that fit the width '
                   '(latest at the right edge); off shows every patch', True)
+        + current_block
         + _switch('hd-bn-only', 'Buff/nerf only',
                   'Fill cells with buff/nerf colours only — NEW counts as buff, '
                   'DEL as nerf (hover still shows every tag)', False)
         + remove_block
+        + class_block
         + search_block
         + '</div>\n')
 

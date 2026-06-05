@@ -31,6 +31,41 @@ def _load_stats_db():
 _STATS_H, _STATS_I, _STATS_U = _load_stats_db()
 
 
+def _load_item_classes(version):
+    """Parse data/stats/<version>/items.txt → (neutral, obsolete, present) sets of
+    game slugs ('item_<x>'). Authoritative item classification for items_dyn,
+    straight from Valve's KV (no patch-note dependency):
+      - neutral item     : "ItemIsNeutralActiveDrop" "1"
+      - removed/obsolete  : "IsObsolete" "1"  (kept in the file for old replays,
+                            but no longer in the game — e.g. Cornucopia)
+      - enchantments are detected by the item_enhancement_ prefix (caller side).
+      - regular item      : present, not neutral, not obsolete.
+    'current' (still in the game) = present AND not obsolete. NOTE: neutral items
+    carry ItemPurchasable "0" too, so DON'T use purchasable as the removed signal.
+    Returns empty sets if the file is absent (degrade gracefully)."""
+    path = _os.path.join(_os.path.dirname(__file__), "data", "stats", version, "items.txt")
+    present, neutral, obsolete = set(), set(), set()
+    try:
+        lines = open(path, encoding="utf-8").read().splitlines()
+    except OSError:
+        return neutral, obsolete, present
+    cur = None
+    name_re = re.compile(r'^\s*"(item_[a-z0-9_]+)"\s*$')
+    for ln in lines:
+        m = name_re.match(ln)
+        if m:
+            cur = m.group(1)
+            present.add(cur)
+            continue
+        if not cur:
+            continue
+        if 'ItemIsNeutralActiveDrop' in ln and '"1"' in ln:
+            neutral.add(cur)
+        if 'IsObsolete' in ln and '"1"' in ln:
+            obsolete.add(cur)
+    return neutral, obsolete, present
+
+
 def _stat_h_raw(npc_key: str, field: str, version: str):
     """Look up `field` for `npc_key` at `version`; fall back to npc_dota_hero_base
     when the hero doesn't override (Valve KV inheritance)."""
@@ -1033,6 +1068,17 @@ def _register_entity(kind, name):
     elif kind == "item":
         rec["icon"] = ITEM_SLUG.get(
             name, name.lower().replace(" ", "_").replace("'", ""))
+        # Neutral-item section fallback (for the items_dyn class filter): true when
+        # this item_header sits under "Neutral Item Updates". Used only when the
+        # game file can't classify it (e.g. a fully-removed neutral). Monotonic —
+        # once neutral, stays neutral across patches.
+        if _State.current_section_slug == 'neutral-items':
+            rec["neutral_section"] = True
+    elif kind == "enchant":
+        # Neutral enchantment icon: icons/items/enhancement_<slug>.png (same dir as
+        # items, 'enhancement_' prefix) → game slug item_enhancement_<slug>.
+        rec["icon"] = "enhancement_" + name.lower().replace(
+            " ", "_").replace("-", "_").replace("'", "")
     return f' id="dyn-{kind}-{slug}"'
 
 
@@ -17120,18 +17166,53 @@ _dyn_patches = [{"version": r["version"],
 # + dynamics key. build_heroes_dyn.py reads this without importing this module.
 _hero_roster = [{"name": _n, "icon": _s, "key": "hero|" + _slugify(_n)}
                 for _n, _s in sorted(HERO_SLUG.items())]
-# Item roster for the items_dyn matrix: every item that appears in the dynamics
-# (there's no fixed "all items" master list like heroes, so the roster is the
-# items actually touched across tracked patches). Each carries its icon slug
-# (stamped in _register_entity) for icons/items/<slug>.png.
-_item_roster = sorted(
-    ({"name": _r["name"],
-      "icon": _r.get("icon", _r["name"].lower().replace(" ", "_").replace("'", "")),
-      "key": _k}
-     for _k, _r in _State.dynamics.items() if _r.get("kind") == "item"),
-    key=lambda _d: _d["name"].lower())
+# Item roster for the items_dyn matrix: every item/enchantment that appears in the
+# dynamics (touched across tracked patches). Each entry carries its icon slug
+# (icons/items/<icon>.png) plus two game-file-derived fields used by the page's
+# filters: `class` (regular item / neutral item / enchantment) and `current`
+# (still in the game vs removed/obsolete). Classification reads the LATEST patch's
+# items.txt — authoritative, no patch-note dependency.
+_latest_stats_ver = next(
+    (_r["version"] for _r in RELEASE_HISTORY
+     if _os.path.exists(_os.path.join(_os.path.dirname(__file__), "data", "stats",
+                                      _r["version"], "items.txt"))),
+    RELEASE_HISTORY[0]["version"])
+_NEUTRAL_SLUGS, _OBSOLETE_SLUGS, _PRESENT_SLUGS = _load_item_classes(_latest_stats_ver)
+
+
+def _item_class_and_current(rec):
+    """(class, current) for an item/enchant dynamics record. class ∈ {regular,
+    neutral, enchant}; current = in the latest items.txt and not IsObsolete."""
+    icon = rec.get("icon", rec["name"].lower().replace(" ", "_").replace("'", ""))
+    gslug = "item_" + icon
+    if rec.get("kind") == "enchant":
+        cls = "enchant"
+    elif gslug in _NEUTRAL_SLUGS or rec.get("neutral_section"):
+        cls = "neutral"
+    else:
+        cls = "regular"
+    current = (gslug in _PRESENT_SLUGS) and (gslug not in _OBSOLETE_SLUGS)
+    return cls, current
+
+
+_item_roster = []
+for _k, _r in _State.dynamics.items():
+    if _r.get("kind") not in ("item", "enchant"):
+        continue
+    _cls, _current = _item_class_and_current(_r)
+    _item_roster.append({
+        "name": _r["name"],
+        "icon": _r.get("icon", _r["name"].lower().replace(" ", "_").replace("'", "")),
+        "key": _k, "class": _cls, "current": _current})
+_item_roster.sort(key=lambda _d: _d["name"].lower())
 _dyn_payload = {"patches": _dyn_patches, "entities": _State.dynamics,
                 "heroes": _hero_roster, "items": _item_roster}
 with open('_dynamics.json', 'w', encoding='utf-8') as _f:
     _json_dump.dump(_dyn_payload, _f, separators=(',', ':'))
 print(f"  → _dynamics.json: {len(_State.dynamics)} entities × {len(_dyn_patches)} patches in RELEASE_HISTORY")
+_cls_counts = {}
+for _d in _item_roster:
+    _cls_counts[_d["class"]] = _cls_counts.get(_d["class"], 0) + 1
+_n_removed = sum(1 for _d in _item_roster if not _d["current"])
+print(f"     items_dyn roster: {len(_item_roster)} ({_cls_counts}); "
+      f"{_n_removed} not current (class source: {_latest_stats_ver}/items.txt)")

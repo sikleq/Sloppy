@@ -824,22 +824,41 @@
       });
     });
 
-    // Hero search — comma-separated, partial, space-insensitive: "anci,aba,brood"
-    // shows Ancient Apparition + Abaddon + Broodmother. Toggles row display only
-    // (independent of the column layout, so it never re-measures the hero width).
+    // Row filters — name search + (items_dyn only) item-class chips + "In game"
+    // toggle, all combined into ONE visibility pass so they don't fight over
+    // tr.style.display. Search: comma-separated, partial ("anci,aba,brood").
+    // Class chips / current toggle are absent on heroes_dyn → their predicates
+    // are no-ops there. Row display only (never re-measures the hero width).
     const search = document.getElementById('hd-hero-search');
-    if (search) {
-      const rows = [...table.querySelectorAll('tbody tr')];
-      const apply = () => {
-        const terms = search.value.toLowerCase().split(',')
-          .map(s => s.trim()).filter(Boolean);
-        rows.forEach(tr => {
-          const name = (tr.querySelector('td.hd-hero')?.dataset.sort || '').toLowerCase();
-          tr.style.display = (!terms.length || terms.some(t => name.includes(t))) ? '' : 'none';
-        });
-      };
-      search.addEventListener('input', apply);
-    }
+    const page = table.closest('.creeps-page');
+    const classChips = page ? [...page.querySelectorAll('.hd-class-chip[data-class]')] : [];
+    const curToggle = document.getElementById('hd-current-only');
+    const rows = [...table.querySelectorAll('tbody tr')];
+    const applyRowFilters = () => {
+      const terms = search
+        ? search.value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean)
+        : [];
+      const enabled = classChips.length
+        ? new Set(classChips.filter(c => c.getAttribute('aria-pressed') !== 'false')
+                            .map(c => c.dataset.class))
+        : null;
+      const curOnly = !!(curToggle && curToggle.checked);
+      rows.forEach(tr => {
+        const name = (tr.querySelector('td.hd-hero')?.dataset.sort || '').toLowerCase();
+        const okSearch = !terms.length || terms.some(t => name.includes(t));
+        const okClass = !enabled || enabled.has(tr.dataset.class);
+        const okCur = !curOnly || tr.dataset.current === '1';
+        tr.style.display = (okSearch && okClass && okCur) ? '' : 'none';
+      });
+    };
+    if (search) search.addEventListener('input', applyRowFilters);
+    classChips.forEach(chip => chip.addEventListener('click', () => {
+      chip.setAttribute('aria-pressed',
+        chip.getAttribute('aria-pressed') === 'false' ? 'true' : 'false');
+      applyRowFilters();
+    }));
+    if (curToggle) curToggle.addEventListener('change', applyRowFilters);
+    applyRowFilters();   // initial pass (current-only ON by default)
 
     window.addEventListener('resize', layout, { passive: true });
     // Re-measure once fonts/icons settle (first paint can under-measure names).
