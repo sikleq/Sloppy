@@ -550,13 +550,23 @@ def b(old, new, l=False, slash=False, force_overall=None):
         # Front-loaded rescale: max-rank is a SMALL nerf (≤12%) but the per-level
         # deltas AVERAGE to a buff — the early-level buffs outweigh an
         # insignificant late dip → BUFF (Riki Blink Strike 15/30/45/60→25/35/45/55
-        # = +67/+17/0/-8). The ≤12% cap keeps "flattening" rescales (X/Y/Z/W → one
-        # value: big max-rank nerf, e.g. Drow Agility 4/8/12/16→10 = +150/+25/-17/-38)
-        # as a max-rank nerf. Inverse case (early nerf, late buff — Disseminate) is
+        # = +67/+17/0/-8). Inverse case (early nerf, late buff — Disseminate) is
         # already buff via max-rank, untouched.
         if (overall == "nerf" and abs(max_rank) <= 12
                 and sum(signed_pcts) / len(signed_pcts) > 0):
             overall = "buff"
+        # "Flatten" rescale (X/Y/Z/W → ONE flat value): level-scaling removed.
+        # Classify by whether the flat value beats the old AVERAGE — ties (mean
+        # unchanged) go to BUFF, since the early levels still rose even when the
+        # average nets even (Drow Agility 4/8/12/16→10: mean 10=10, but L1/L2
+        # jumped up). l=True flips the compare. Supersedes the max-rank tag for
+        # flattens (the maxed level isn't the whole story when every other level
+        # shifted the other way).
+        if len(set(new)) == 1 and len(set(old)) > 1:
+            old_mean = sum(old) / len(old)
+            flat_v = new[0]
+            better = (flat_v <= old_mean) if l else (flat_v >= old_mean)
+            overall = "buff" if better else "nerf"
     # Per-row override: when the max-rank heuristic disagrees with the real
     # gameplay impact (e.g. a rescale that buffs early levels and only slightly
     # nerfs max rank), pass force_overall="buff"/"nerf" to set the left tag
