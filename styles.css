@@ -5088,6 +5088,13 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
    header (z:50) inside the .creeps-scroll stacking context lifts the 2.5× pop and
    its tooltip clear of the pinned header for top rows. */
 .heroes-dyn-table .dyn-cell-wrap:hover { z-index: 60; }
+/* Reserve room below the grid for the bottom row's 2.5× hover-pop. A scaled
+   element's box counts toward the scroll container's scrollable overflow, so
+   when the list is filtered short (no scrollbar) the bottom-row pop extends
+   past the content and spawns a spurious vertical scrollbar on hover. The pop
+   grows into this padding instead of past the scrollable edge. (~21px pop
+   overflow for the 28px→70px cell.) */
+.creeps-scroll:has(.heroes-dyn-table) { padding-bottom: 24px; }
 /* RULE (all tables): use the shared .creeps-scroll shell AS-IS — NO per-page
    left gutter. The subnav (10px), blurb/toolbar (28px) and table (flush) keep
    the SAME left positions as Neutral Creeps / Abilities so every Materials page
