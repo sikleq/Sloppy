@@ -1024,11 +1024,15 @@ def _register_entity(kind, name):
     _State.current_entity_display = name
     rec = _State.dynamics.setdefault(key, {"name": name, "kind": kind, "patches": {}})
     rec["name"] = name  # keep latest display
-    # Heroes carry their icon slug so the heroes_dyn matrix page can render the
-    # portrait without importing this module (build_patch has no __main__ guard).
+    # Heroes/items carry their icon slug so the dynamics matrix pages can render
+    # the portrait/icon without importing this module (build_patch has no
+    # __main__ guard). icons/heroes/<slug>.png and icons/items/<slug>.png.
     if kind == "hero":
         rec["icon"] = HERO_SLUG.get(
             name, name.lower().replace(" ", "_").replace("'", "").replace("-", ""))
+    elif kind == "item":
+        rec["icon"] = ITEM_SLUG.get(
+            name, name.lower().replace(" ", "_").replace("'", ""))
     return f' id="dyn-{kind}-{slug}"'
 
 
@@ -4215,6 +4219,19 @@ def save_index_html():
                 '</a>'
             )
             continue
+        if key == "dynamics":
+            # Dynamics = an opener tile (like Support): clicking opens a sub-panel
+            # with Heroes / Items instead of redirecting. Keeps its bars-GIF hover.
+            cells.append(
+                '<a class="inv-cell inv-filled inv-cell-dynamics" href="#dynamics" '
+                'data-panel-open="dynamics" role="button" aria-expanded="false">'
+                '<span class="inv-slot">'
+                '<img class="inv-icon" src="icons/ui/gothic/icon_dynamics.png" alt="">'
+                '</span>'
+                f'<span class="inv-cap">{label}</span>'
+                '</a>'
+            )
+            continue
         cells.append(
             f'<a class="inv-cell inv-filled inv-cell-{key}" href="{href}">'
             f'<span class="inv-slot">'
@@ -4230,7 +4247,7 @@ def save_index_html():
     # `.support-panel` below + the toggle handler in scripts.js.
     cells.append(
         '<a class="inv-cell inv-filled inv-cell-star inv-special" '
-        'href="#support" data-support-open '
+        'href="#support" data-panel-open="support" '
         'role="button" aria-expanded="false">'
         '<span class="inv-slot">'
         '<img class="inv-icon" src="icons/ui/gothic/icon_star.png" alt="">'
@@ -4264,7 +4281,7 @@ def save_index_html():
     #  - Donation = a glass jar of coins; on hover a coin keeps dropping in (loop).
     #    Link not wired yet → inert "soon" tile (hover animation still plays).
     support_panel = (
-        '<div class="support-panel" aria-hidden="true">'
+        '<div class="inv-panel support-panel" data-panel="support" aria-hidden="true">'
         '<div class="support-options">'
         f'<a class="support-btn support-telegram" href="{TRIBUTE}" '
         'target="_blank" rel="noopener noreferrer">'
@@ -4285,12 +4302,31 @@ def save_index_html():
         '</div>'
         '</div>'
     )
+    # Dynamics sub-panel — opened by the Dynamics tile (same mechanism as Support).
+    # Two real links: Heroes (heroes_dyn) and Items (items_dyn). Placeholder gothic
+    # icons for now (icon_hat = Heroes, icon_materials = Items) — TBD final art.
+    dynamics_panel = (
+        '<div class="inv-panel dynamics-panel" data-panel="dynamics" aria-hidden="true">'
+        '<div class="support-options">'
+        '<a class="support-btn dyn-heroes" href="heroes_dyn.html">'
+        '<span class="inv-slot">'
+        '<img class="inv-icon" src="icons/ui/gothic/icon_hat.png" alt="">'
+        '</span>'
+        '<span class="inv-cap">Heroes</span></a>'
+        '<a class="support-btn dyn-items" href="items_dyn.html">'
+        '<span class="inv-slot">'
+        '<img class="inv-icon" src="icons/ui/gothic/icon_materials.png" alt="">'
+        '</span>'
+        '<span class="inv-cap">Items</span></a>'
+        '</div>'
+        '</div>'
+    )
     # The divider keeps its place under the title; when the Support panel is
     # open a gothic left-arrow ornament appears to its left as the "back" control
     # (styled like the divider, signalling it's clickable).
     divider_row = (
         '<div class="inv-divider-row">'
-        '<button type="button" class="support-back" data-support-close '
+        '<button type="button" class="support-back" data-panel-close '
         'aria-label="Back to menu" title="Back">'
         '<img class="support-back-orn" src="icons/ui/gothic/divider_arrow_left.png" alt="">'
         '</button>'
@@ -4310,6 +4346,7 @@ def save_index_html():
         '<div class="inv-stage">'
         f'<div class="inv-grid">{"".join(cells)}{empties}</div>'
         f'{support_panel}'
+        f'{dynamics_panel}'
         '</div>'
         '</div>'
     )
@@ -17083,8 +17120,18 @@ _dyn_patches = [{"version": r["version"],
 # + dynamics key. build_heroes_dyn.py reads this without importing this module.
 _hero_roster = [{"name": _n, "icon": _s, "key": "hero|" + _slugify(_n)}
                 for _n, _s in sorted(HERO_SLUG.items())]
+# Item roster for the items_dyn matrix: every item that appears in the dynamics
+# (there's no fixed "all items" master list like heroes, so the roster is the
+# items actually touched across tracked patches). Each carries its icon slug
+# (stamped in _register_entity) for icons/items/<slug>.png.
+_item_roster = sorted(
+    ({"name": _r["name"],
+      "icon": _r.get("icon", _r["name"].lower().replace(" ", "_").replace("'", "")),
+      "key": _k}
+     for _k, _r in _State.dynamics.items() if _r.get("kind") == "item"),
+    key=lambda _d: _d["name"].lower())
 _dyn_payload = {"patches": _dyn_patches, "entities": _State.dynamics,
-                "heroes": _hero_roster}
+                "heroes": _hero_roster, "items": _item_roster}
 with open('_dynamics.json', 'w', encoding='utf-8') as _f:
     _json_dump.dump(_dyn_payload, _f, separators=(',', ':'))
 print(f"  → _dynamics.json: {len(_State.dynamics)} entities × {len(_dyn_patches)} patches in RELEASE_HISTORY")

@@ -49,6 +49,11 @@ jobs:
           PYTHONIOENCODING: utf-8
         run: python build_heroes_dyn.py
 
+      - name: Build item dynamics matrix
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python build_items_dyn.py
+
       - name: Build terrain comparison
         env:
           PYTHONIOENCODING: utf-8
@@ -119,6 +124,7 @@ jobs:
           cp unit_abilities.html _site/
           cp neutral_abilities.html _site/
           cp heroes_dyn.html _site/
+          cp items_dyn.html _site/
           cp terrain.html _site/
           cp styles.css _site/
           cp scripts.js _site/

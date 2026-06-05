@@ -533,7 +533,9 @@ body:has(.creeps-page) nav.top-nav {
    never resizes and the divider above never shifts. The panel is centred over
    that exact area. */
 .inv-stage { position: relative; }
-.support-panel {
+/* A sub-panel (Support / Dynamics) overlays the grid, centred, hidden until its
+   tile opens it. Shared base; each shows via its own .<name>-open book class. */
+.inv-panel {
   position: absolute;
   inset: 0;
   display: flex;
@@ -542,8 +544,10 @@ body:has(.creeps-page) nav.top-nav {
   opacity: 0;
   pointer-events: none;
 }
-.inv-book.support-open .inv-grid { visibility: hidden; }
-.inv-book.support-open .support-panel {
+.inv-book.support-open .inv-grid,
+.inv-book.dynamics-open .inv-grid { visibility: hidden; }
+.inv-book.support-open .support-panel,
+.inv-book.dynamics-open .dynamics-panel {
   opacity: 1;
   pointer-events: auto;
   animation: supportIn 0.28s ease both;
@@ -698,7 +702,8 @@ body:has(.creeps-page) nav.top-nav {
   cursor: pointer;
   line-height: 0;
 }
-.inv-book.support-open .support-back { display: inline-flex; }
+.inv-book.support-open .support-back,
+.inv-book.dynamics-open .support-back { display: inline-flex; }
 .support-back-orn {
   height: 20px;
   image-rendering: pixelated;
@@ -716,7 +721,8 @@ body:has(.creeps-page) nav.top-nav {
   filter: drop-shadow(0 0 2px #e3c46a);
 }
 @media (prefers-reduced-motion: reduce) {
-  .inv-book.support-open .support-panel { animation: none; }
+  .inv-book.support-open .support-panel,
+  .inv-book.dynamics-open .dynamics-panel { animation: none; }
   .support-telegram:hover .inv-icon { animation: none; }
   .tg-heart { display: none; }
   .support-donation:hover .don-coin { animation: none; }

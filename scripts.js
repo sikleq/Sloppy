@@ -12,13 +12,14 @@
   const fromParam = params.get('from');
   if (back && fromParam === 'calendar') {
     back.classList.add('visible');
-  } else if (back && fromParam === 'heroes_dyn') {
-    // Arrived from the Hero Dynamics matrix (root page) via a dyn-cell. Point
-    // the back arrow at it. Same fixed bottom-left button + styling as the
-    // calendar/patch back-arrow; patch pages live under /patches/ so ../.
-    back.href = '../heroes_dyn.html';
-    back.title = 'Back to Hero Dynamics';
-    back.setAttribute('aria-label', 'Back to Hero Dynamics');
+  } else if (back && (fromParam === 'heroes_dyn' || fromParam === 'items_dyn')) {
+    // Arrived from a Dynamics matrix (root page) via a dyn-cell. Point the back
+    // arrow at it. Same fixed bottom-left button + styling as the calendar/patch
+    // back-arrow; patch pages live under /patches/ so ../.
+    const label = fromParam === 'items_dyn' ? 'Item Dynamics' : 'Hero Dynamics';
+    back.href = '../' + fromParam + '.html';
+    back.title = 'Back to ' + label;
+    back.setAttribute('aria-label', 'Back to ' + label);
     back.classList.add('visible');
   } else if (back && fromParam && /^\d+\.\d+[a-z]?$/.test(fromParam)) {
     // Came from another patch via the dynamics widget. The dyn-cell href
@@ -685,6 +686,9 @@
   function dynFillMatrix(table, manifest, bnOnly, removed) {
     const byVer = {};
     manifest.patches.forEach(p => { byVer[p.version] = p; });
+    // Back-arrow token: 'heroes_dyn' or 'items_dyn' (set on <body data-dyn-from>),
+    // so the destination patch page returns to the right matrix.
+    const fromTok = (document.body && document.body.dataset.dynFrom) || 'heroes_dyn';
     table.querySelectorAll('td.hd-cell[data-ver]').forEach(td => {
       const prev = td.querySelector('.dyn-cell-wrap');
       if (prev) prev.remove();
@@ -693,10 +697,10 @@
       const rec = manifest.entities[td.dataset.hkey];
       const counts = (rec && rec.patches && rec.patches[td.dataset.ver]) || {};
       if (!Object.keys(counts).length) return;
-      // entityId anchors the click to the hero on the patch page; fromVersion
-      // 'heroes_dyn' makes that page show a back-arrow returning here; filePrefix
-      // 'patches/' because the matrix lives at site root, patch pages under /patches.
-      td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, 'heroes_dyn', 'patches/', bnOnly, removed));
+      // entityId anchors the click to the entity on the patch page; fromTok makes
+      // that page show a back-arrow returning here; filePrefix 'patches/' because
+      // the matrix lives at site root, patch pages under /patches.
+      td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed));
     });
   }
 
@@ -2459,31 +2463,40 @@
   });
 })();
 
-// ---- SUPPORT tile: clicking it opens the Support sub-panel in place of the
-// inventory grid (Telegram + Donation), instead of redirecting. The back arrow
-// (or Escape) returns to the grid. ----
+// ---- INVENTORY SUB-PANELS: a tile with [data-panel-open="<name>"] opens its
+// sub-panel ([data-panel="<name>"]) IN PLACE of the inventory grid instead of
+// redirecting (Support → Telegram/Donation; Dynamics → Heroes/Items). The back
+// arrow (or Escape) returns to the grid. Generic over any number of panels. ----
 (function () {
   const book = document.querySelector('.inv-book');
   if (!book) return;
-  const opener = book.querySelector('[data-support-open]');
-  const panel = book.querySelector('.support-panel');
-  if (!opener || !panel) return;
-  const setOpen = (on) => {
-    book.classList.toggle('support-open', on);
-    opener.setAttribute('aria-expanded', on ? 'true' : 'false');
-    panel.setAttribute('aria-hidden', on ? 'false' : 'true');
-    if (on) {
+  const openers = [...book.querySelectorAll('[data-panel-open]')];
+  const panels = [...book.querySelectorAll('[data-panel]')];
+  if (!openers.length || !panels.length) return;
+  const names = panels.map(p => p.dataset.panel);
+  let lastOpener = null;
+  const setOpen = (name) => {
+    names.forEach(n => book.classList.toggle(n + '-open', n === name));
+    panels.forEach(p => p.setAttribute('aria-hidden', p.dataset.panel === name ? 'false' : 'true'));
+    openers.forEach(o => o.setAttribute('aria-expanded', o.dataset.panelOpen === name ? 'true' : 'false'));
+    if (name) {
       const back = book.querySelector('.support-back');
       if (back) back.focus();
-    } else {
-      opener.focus();
+    } else if (lastOpener) {
+      lastOpener.focus();
     }
   };
-  opener.addEventListener('click', (e) => { e.preventDefault(); setOpen(true); });
-  book.querySelectorAll('[data-support-close]').forEach(
-    (b) => b.addEventListener('click', () => setOpen(false)));
+  openers.forEach(o => o.addEventListener('click', (e) => {
+    e.preventDefault();
+    lastOpener = o;
+    setOpen(o.dataset.panelOpen);
+  }));
+  book.querySelectorAll('[data-panel-close]').forEach(
+    (b) => b.addEventListener('click', () => setOpen(null)));
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && book.classList.contains('support-open')) setOpen(false);
+    if (e.key === 'Escape' && names.some(n => book.classList.contains(n + '-open'))) {
+      setOpen(null);
+    }
   });
 })();
 
