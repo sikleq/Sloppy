@@ -5106,21 +5106,69 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   filter: grayscale(1) brightness(0.62); opacity: 0.5; transform: translateY(1px);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.55);
 }
-/* Item-class filter (items_dyn): plain text labels (Items / Neutral Items /
-   Enchantments) — NOT boxed pills. The active one turns gold (the site accent),
-   the inactive ones are muted; like the "sikle" wordmark. */
-.hd-class-group {
-  display: inline-flex; align-items: center; gap: 12px;
+/* Multi-select dropdown (items_dyn Type / Category): the button is FLAT inside the
+   panel — no own box/border, just text + caret like the switches, so every control
+   shares one height and the panel is the only border. The gold badge shows the
+   selected count (blank when all are selected = no active filter). Only the popover
+   itself is a floating box. */
+.hd-dd { position: relative; display: inline-flex; }
+.hd-dd-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; box-sizing: border-box; padding: 0 2px;
+  background: transparent; border: none; border-radius: 0;
+  color: #c9d1d9; font-family: inherit; font-size: 12.5px;
+  cursor: pointer; user-select: none; transition: color 0.12s;
 }
-.hd-class-chip {
-  cursor: pointer; user-select: none; font-family: inherit; font-size: 12.5px;
-  font-weight: 400; letter-spacing: normal;
-  padding: 0; border: none; background: none;
-  color: #6e7681;                 /* OFF: muted (class hidden) */
-  transition: color 0.12s;
+.hd-dd-btn:hover .hd-dd-label,
+.hd-dd-btn[aria-expanded="true"] .hd-dd-label { color: #fff; }
+.hd-dd-caret { color: #8b949e; flex: none; transition: transform 0.12s; }
+.hd-dd-btn[aria-expanded="true"] .hd-dd-caret { transform: rotate(180deg); color: #c9d1d9; }
+.hd-dd-badge { color: #e3c46a; font-weight: 700; font-variant-numeric: tabular-nums; }
+.hd-dd-badge:empty { display: none; }
+/* Popover is PORTALED to <body> + positioned `fixed` by JS (top/left), so it escapes
+   .creeps-scroll's contain:paint clip and never pushes a scrollbar on an empty table. */
+.hd-dd-menu {
+  position: fixed; z-index: 1000;
+  min-width: 150px; white-space: nowrap; max-height: 70vh; overflow: auto;
+  background: #0d1117; border: 1px solid #30363d; border-radius: 6px;
+  padding: 5px; box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
+  display: flex; flex-direction: column; gap: 1px;
 }
-.hd-class-chip:hover { color: #c9d1d9; }
-.hd-class-chip[aria-pressed="true"] { color: #e3c46a; }   /* ON: gold (class shown) */
+.hd-dd-menu[hidden] { display: none; }
+.hd-dd-opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: 4px;
+  font-size: 12.5px; color: #c9d1d9; cursor: pointer; user-select: none;
+}
+.hd-dd-opt:hover { background: #161b22; }
+.hd-dd-opt input { accent-color: #e3c46a; width: 14px; height: 14px; cursor: pointer; flex: none; }
+.hd-dd-all { font-weight: 700; color: #e3c46a; }   /* the "All" master row */
+.hd-dd-sep { height: 1px; background: #30363d; margin: 3px 2px; }
+/* The dynamics toolbar must out-stack the table's sticky header/corner cells
+   (z up to 52, hover-zoom 60) so an open dropdown popover isn't hidden under them.
+   Overrides the z-index:6 from `.creeps-scroll > .inbox-bar`. */
+.creeps-scroll > .cal-toggle-bar.hd-toolbar { z-index: 62; }
+/* Price filter (items_dyn + mana_items, both use .toolbar-panel): FLAT — the range
+   has no box, inputs read as underlined fields, label is muted. Same height as the
+   rest. The 12px inner left padding keeps the "Price" label off the focus-ring border
+   even when the control is the panel's FIRST child (mana_items, where the divider's
+   left gap doesn't apply). */
+.toolbar-panel .mr-price-range {
+  height: 32px; box-sizing: border-box; padding-left: 12px;
+  background: transparent; border-color: transparent;
+}
+.mr-price-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;
+  color: #8b949e; padding-right: 4px; user-select: none;
+}
+.toolbar-panel .mr-price-input {
+  width: 44px; padding: 3px 2px;
+  border-bottom: 1px solid #30363d; border-radius: 0; transition: border-color 0.12s;
+}
+.toolbar-panel .mr-price-input:focus { border-bottom-color: #e3c46a; }
+.toolbar-panel .mr-price-clear { border-left: none; }
+/* Uniform 32px height for the flat switches too, so every panel control lines up. */
+.toolbar-panel .ua-upgrades-toggle { height: 32px; }
 /* Full-height vertical divider separating super-category (base-version) groups —
    same idea as Neutral Creeps' .col-sep category dividers. On the first column
    of each group (except the first); aligns with the cat-row's group border. */
@@ -5160,6 +5208,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   overflow: hidden;
   text-align: left;
 }
+/* The trailing spacer is pure hover-pop room for the last patch column — render
+   NOTHING in it (no empty diamond). A faded square still read as "the grid continues
+   past the last patch"; an invisible gutter just lets the grid end cleanly. */
+.creeps-table.heroes-dyn-table td.hd-spacer::after { display: none; }
 /* Bigger pill in the matrix than on patch pages (28px vs 24px) — more legible
    in a dense grid; scoped so patch pages keep their size. */
 .heroes-dyn-table .dyn-cell-wrap { width: 28px; height: 28px; }

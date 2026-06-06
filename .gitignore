@@ -6,6 +6,9 @@ __pycache__/
 _generated_p_*.py
 _insert_patches.py
 
+# Scratch-выгрузка shop-файлов из VPK (scripts/extract_shops.py, разведка формата)
+data/_vpk_shops/
+
 # Список URL иконок — генерируется build_patch.py для check_icons.py
 _ability_icons.txt
 

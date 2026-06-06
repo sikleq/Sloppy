@@ -17201,19 +17201,189 @@ _latest_stats_ver = next(
     RELEASE_HISTORY[0]["version"])
 _NEUTRAL_SLUGS, _OBSOLETE_SLUGS, _PRESENT_SLUGS = _load_item_classes(_latest_stats_ver)
 
+# Current neutral pool — AUTO-DERIVED from Valve's datafeed (data/itemlist.json),
+# field `neutral_item_tier` (>= 0 means it's in the live droppable pool; -1 means
+# not / cycled out). This is authoritative and self-updating: refresh itemlist.json
+# (`python scripts/fetch_itemlist.py`) when a new patch lands and the added/removed/
+# cycled neutrals are picked up automatically — no hand-maintained list.
+# Why the datafeed and not items.txt: items.txt keeps every dropped neutral flagged
+# `ItemIsNeutralActiveDrop "1"` forever (never IsObsolete), so it can't tell active
+# from cycled-out; the datafeed tier can. (Earlier a hand-written Liquipedia list was
+# used but it silently missed Cloak of Flames / Dandelion Amulet / Medallion of
+# Courage — all re-added as neutrals in 7.41 — which the datafeed has correctly.)
+def _load_neutral_pool_current():
+    """Set of game slugs currently in the neutral drop pool, from the datafeed's
+    `neutral_item_tier` (>= 0). Empty set (with a warning) if the file is missing —
+    callers then treat all neutrals as cycled-out, which is visible-wrong but safe."""
+    path = _os.path.join(_os.path.dirname(__file__), "data", "itemlist.json")
+    try:
+        data = _json.load(open(path, encoding="utf-8"))
+        items = data["result"]["data"]["itemabilities"]
+    except (OSError, KeyError, ValueError) as exc:
+        print(f"  ! itemlist.json unreadable ({exc}) — neutral pool empty")
+        return set()
+    return {it["name"] for it in items
+            if it.get("neutral_item_tier", -1) >= 0
+            and not it["name"].startswith("item_recipe_")}
+
+
+_NEUTRAL_POOL_CURRENT = _load_neutral_pool_current()
+# Items that never shipped — excluded from the matrix entirely:
+#  • vestigial neutrals flagged BOTH neutral AND SpeciallyBannedFromNeutralSlot
+#    (Greater Mango / Greater Faerie Fire);
+#  • neutrals "Added to game files, unreleased item" per Liquipedia (Bottomless
+#    Chalice / Horizon / Mechanical Arm — never released, no removal patch);
+#  • unreleased neutral-item ENCHANTMENTS — the 5 that never appeared in any patch
+#    note (Unleashed/curious, Dominant, Fierce, Restorative, Thick; Liquipedia has
+#    no page for them → 404). Released-then-removed enchants (Wise/Boundless/Vast)
+#    are NOT here — they stay as removed.
+_PHANTOM_ITEMS = {
+    "item_greater_mango", "item_greater_faerie_fire",
+    "item_bottomless_chalice", "item_horizon", "item_mechanical_arm",
+    "item_enhancement_curious", "item_enhancement_dominant",
+    "item_enhancement_fierce", "item_enhancement_restorative",
+    "item_enhancement_thick",
+}
+
+
+def _load_neutral_cycled_versions():
+    """icon-slug -> patch version where a neutral was "cycled out" of the pool,
+    scraped from the historical patch notes. Dates the lifespan end of cycled-out
+    neutrals. Only ~7.33+ used this phrasing; older cycle-outs have no dated event
+    (those rows stay hidden with an open-ended lifespan)."""
+    out = {}
+    path = _os.path.join(_os.path.dirname(__file__), "data", "patchnotes_english.txt")
+    try:
+        for ln in open(path, encoding="utf-8").read().splitlines():
+            if "cycled out" in ln.lower():
+                mk = re.search(r'_item_([a-z0-9_]+)"', ln)
+                mv = re.search(r'DOTA_Patch_(\d+_\d+[a-z]?)_', ln)
+                if mk and mv:
+                    out[mk.group(1)] = mv.group(1).replace("_", ".")
+    except OSError:
+        pass
+    return out
+
+
+_NEUTRAL_CYCLED = _load_neutral_cycled_versions()
+
+# Cycle-out versions for older neutrals (pre-7.33, before the "Item cycled out" wording
+# existed) — sourced from each item's Liquipedia /Changelogs page (the latest REMOVED
+# entry). Keyed by icon slug. Merged into _NEUTRAL_CYCLED so the matrix blanks their
+# cells (n/a) after removal. The big 7.38 cluster = that patch's neutral overhaul.
+_NEUTRAL_REMOVED_MANUAL = {
+    "ancient_guardian": "7.38", "arcane_ring": "7.38", "force_field": "7.38",
+    "ascetic_cap": "7.38", "avianas_feather": "7.38", "ballista": "7.30",
+    "book_of_shadows": "7.38", "broom_handle": "7.38", "bullwhip": "7.38",
+    "clumsy_net": "7.28", "craggy_coat": "7.38", "doubloon": "7.38",
+    "dragon_scale": "7.38", "elixer": "7.23d", "elven_tunic": "7.38",
+    "enchanted_quiver": "7.38", "faded_broach": "7.38", "paintball": "7.32",
+    "force_boots": "7.38", "fusion_rune": "7.24", "giants_ring": "7.38",
+    "grove_bow": "7.38", "havoc_hammer": "7.38", "illusionsts_cape": "7.30",
+    "imp_claw": "7.30", "ironwood_tree": "7.30", "keen_optic": "7.32",
+    "lance_of_pursuit": "7.38", "light_collector": "7.38", "mirror_shield": "7.38",
+    "ocean_heart": "7.32", "phoenix_ash": "7.24", "princes_knife": "7.28",
+    "quicksilver_amulet": "7.32", "repair_kit": "7.28", "royal_jelly": "7.38",
+    "safety_bubble": "7.38", "seer_stone": "7.38", "spy_gadget": "7.38",
+    "the_leveller": "7.32", "third_eye": "7.23c", "tome_of_aghanim": "7.23a",
+    "trickster_cloak": "7.38", "trident": "7.28", "unwavering_condition": "7.38",
+    "vambrace": "7.38", "vindicators_axe": "7.38", "witless_shako": "7.28",
+    "woodland_striders": "7.28",
+}
+_NEUTRAL_CYCLED.update(_NEUTRAL_REMOVED_MANUAL)   # manual (Liquipedia) wins on conflict
+
+# Shop categories (the player-facing shop tabs) for the items_dyn Category filter.
+# Internal section keys from the game's shop layout (data/shops.txt) → display name,
+# in shop order. sideshop/pregame/event sections are intentionally excluded (they
+# duplicate items). Valve reshuffles these between patches (7.41 "Shop Reshuffle"),
+# so refreshing data/shops.txt (scripts/extract_shops.py) updates the filter.
+_SHOP_CATEGORY_ORDER = [
+    ("consumables", "Consumables"), ("attributes", "Attributes"),
+    ("weapons_armor", "Equipment"), ("misc", "Miscellaneous"),
+    ("basics", "Accessories"), ("support", "Support"), ("magics", "Magical"),
+    ("defense", "Armor"), ("weapons", "Weapons"), ("artifacts", "Armaments"),
+    ("secretshop", "Secret Shop"),
+]
+_SHOP_CATEGORY_OTHER = "Other"  # regular items not in any shop tab (boss rewards,
+#                                 collectibles, Aghanim's Blessing, removed items)
+
+
+def _load_shop_categories():
+    """{game_slug: category_display} from data/shops.txt. Each item gets the FIRST
+    included section it appears in (sections = shop tabs; an item is normally in
+    exactly one). {} if the file is absent — then every regular item is 'Other'."""
+    path = _os.path.join(_os.path.dirname(__file__), "data", "shops.txt")
+    try:
+        lines = open(path, encoding="utf-8").read().splitlines()
+    except OSError:
+        return {}
+    want = dict(_SHOP_CATEGORY_ORDER)
+    # Section header = a lone quoted key on its own line. Allow a trailing // comment
+    # (shops.txt has `"magics" // Magical`) — without this the section is missed and
+    # its items fall through to the previous section.
+    sec_re = re.compile(r'^\s*"([a-z0-9_]+)"\s*(?://.*)?$')
+    item_re = re.compile(r'^\s*"item"\s*"(item_[a-z0-9_]+)"')
+    per_cat = {}
+    sections_with_items = set()
+    cur = None
+    for ln in lines:
+        mi = item_re.match(ln)
+        if mi:
+            if cur:
+                sections_with_items.add(cur)
+            if cur in want:
+                per_cat.setdefault(cur, []).append(mi.group(1))
+            continue
+        ms = sec_re.match(ln)
+        if ms:
+            cur = ms.group(1)
+    # Self-flag a NEW shop tab Valve might add: a section with items that we don't map
+    # AND isn't an intentionally-excluded duplicate (root / sideshop* / *pregame*).
+    # Such items silently fall to "Other" until added to _SHOP_CATEGORY_ORDER — warn so
+    # we notice instead of mislabelling them.
+    def _ignored(s):
+        return s == "dota_shops" or s.startswith("sideshop") or "pregame" in s
+    unknown = sorted(s for s in sections_with_items
+                     if s not in want and not _ignored(s))
+    if unknown:
+        print(f"  ! shops.txt has UNMAPPED shop section(s): {unknown} — items there "
+              f"fall to 'Other'. Add them to _SHOP_CATEGORY_ORDER in build_patch.py.")
+    out = {}
+    for key, _disp in _SHOP_CATEGORY_ORDER:   # priority = shop order, first wins
+        for slug in per_cat.get(key, []):
+            out.setdefault(slug, want[key])
+    return out
+
+
+_SHOP_CATEGORIES = _load_shop_categories()
+
+
+def _item_category(gslug, cls):
+    """Display category for the items_dyn filter — only regular items get one
+    (neutrals/enchantments aren't shop items → None → exempt from the filter)."""
+    if cls != "regular":
+        return None
+    return _SHOP_CATEGORIES.get(gslug, _SHOP_CATEGORY_OTHER)
+
 
 def _item_class_and_current(rec):
     """(class, current) for an item/enchant dynamics record. class ∈ {regular,
-    neutral, enchant}; current = in the latest items.txt and not IsObsolete."""
+    neutral, enchant}. current: regular/enchant = in latest items.txt and not
+    IsObsolete; neutral = in the live pool (`_NEUTRAL_POOL_CURRENT`) — a cycled-out
+    neutral is still flagged in the files but is NOT current."""
     icon = rec.get("icon", rec["name"].lower().replace(" ", "_").replace("'", ""))
     gslug = "item_" + icon
     if rec.get("kind") == "enchant":
         cls = "enchant"
-    elif gslug in _NEUTRAL_SLUGS or rec.get("neutral_section"):
+    elif (gslug in _NEUTRAL_SLUGS or rec.get("neutral_section")
+          or gslug in _NEUTRAL_POOL_CURRENT):
         cls = "neutral"
     else:
         cls = "regular"
-    current = (gslug in _PRESENT_SLUGS) and (gslug not in _OBSOLETE_SLUGS)
+    if cls == "neutral":
+        current = gslug in _NEUTRAL_POOL_CURRENT
+    else:
+        current = (gslug in _PRESENT_SLUGS) and (gslug not in _OBSOLETE_SLUGS)
     return cls, current
 
 
@@ -17233,6 +17403,155 @@ def _added_version(icon):
     return None
 
 
+def _presence_window(icon):
+    """(first_present_version, last_present_version_if_gone_else_None) by scanning
+    every patch's items.json for `item_<icon>`. Blanks the matrix outside an item's
+    real lifespan: columns before it first appears render as faint "n/a" dots, and —
+    if it has disappeared from the game files — columns after its last appearance do
+    too. If it's still in the latest patch, the second value is None (no after-blank
+    from files; a patch-note removal is handled separately for touched items)."""
+    gslug = "item_" + icon
+    pres = [_v for _v in _CHRON if gslug in _STATS_I.get(_v, {})]
+    if not pres:
+        return None, None
+    removed = None if pres[-1] == _CHRON[-1] else pres[-1]
+    return pres[0], removed
+
+
+# ---- Full game-item roster (parity with heroes_dyn listing every hero) -------
+# items_dyn lists EVERY real item, not just the ones touched in tracked patches —
+# untouched items render as empty rows, exactly like untouched heroes on heroes_dyn.
+# Source = the latest items.txt + datafeed display names (data/itemlist.json; slugs
+# are often legacy joke names — item_angels_demise = "Khanda", item_gungir =
+# "Gleipnir" — so the datafeed name_english_loc is authoritative, titlecased-slug
+# fallback otherwise). Inclusion mirrors Liquipedia's Portal:Items (the reference
+# the user gave):
+#   • neutral items + enchantments — all of them;
+#   • regular shop items with a gold cost (purchasable);
+#   • a small allowlist of FREE / boss-reward / collectible items worth tracking
+#     (Aegis, Cheese, Refresher Shard, Roshan's Banner, Healing Lotus x3, Block of
+#     Cheese, Madstone, Observer Ward, Aghanim's Blessing);
+#   • removed items (IsObsolete) — kept too, marked current=False (Deleted toggle).
+# Dropped: recipes; numbered/level VARIANTS (Dagon 2-5, Bracer 2, Boots of Travel 2,
+#   *_2/_3…, *_roshan, *_broken, tango_single) EXCEPT the distinct named
+#   item_ultimate_scepter_2 (Aghanim's Blessing); a blocklist of junk/event dummies
+#   (Bag of Gold, River Vials, caster_rapier, pocket_roshan); unreleased FREE items
+#   (apex, ofrenda*, grisgris … auto-dropped — free and not in the allowlist); and
+#   anything without an icon. Per the user: "all items, no variants / event pickups".
+_FREE_ALLOW = {
+    "item_aegis", "item_cheese", "item_refresher_shard", "item_roshans_banner",
+    "item_famango", "item_great_famango", "item_greater_famango",
+    "item_royale_with_cheese", "item_ward_observer",
+    # NB: Madstone Bundle is intentionally NOT here — it's a currency, never
+    # buffed/nerfed, so it has no place in a balance-change matrix.
+    # Aghanim's Blessing — a distinct named item (Roshan drop / hidden shop), NOT a
+    # mere level variant, so it's exempt from both the variant and the cost filters.
+    "item_ultimate_scepter_2",
+}
+_ITEM_BLOCK = {"item_furion_gold_bag", "item_caster_rapier", "item_pocket_roshan"}
+# Removal patch for obsolete items that items.json keeps keyed forever (so the
+# per-patch presence scan can't date the removal). Confirmed from the historical
+# patch notes (data/patchnotes_english.txt: "Item removed from the game" /
+# "Item cycled out" / Eternal Shroud "No longer requires Hood of Defiance") and
+# Liquipedia (Stout Shield 7.23). Used to blank the matrix AFTER the item left the
+# game (n/a dots). Touched obsolete items (Cornucopia / Eternal Shroud) already get
+# their removal from the patch-note DEL row (`removed_in`), so they're not here.
+_OBSOLETE_REMOVED = {
+    "item_necronomicon": "7.29",        # "Removed Item"
+    "item_hood_of_defiance": "7.33",    # folded into Eternal Shroud
+    "item_flicker": "7.33",             # "Item cycled out" (neutral)
+    "item_nether_shawl": "7.33",        # "Item cycled out" (neutral)
+    "item_wraith_pact": "7.33",         # "Item removed from the game"
+    "item_tome_of_knowledge": "7.33",   # "Item removed from the game"
+    "item_quarterstaff": "7.35",        # "Item removed from the game"
+    "item_stout_shield": "7.23",        # Liquipedia: removed 7.23 (Outlanders)
+}
+
+
+def _load_full_game_items():
+    """[(game_slug, icon, display_name, cls, is_removed), ...] for every real item."""
+    txt_path = _os.path.join(_os.path.dirname(__file__), "data", "stats",
+                             _latest_stats_ver, "items.txt")
+    purch, cost = {}, {}
+    cur = None
+    name_re = re.compile(r'^\s*"(item_[a-z0-9_]+)"\s*$')
+    cost_re = re.compile(r'^\s*"ItemCost"\s*"(\d+)"')
+    try:
+        for ln in open(txt_path, encoding="utf-8").read().splitlines():
+            m = name_re.match(ln)
+            if m:
+                cur = m.group(1)
+                purch[cur] = True
+                continue
+            if not cur:
+                continue
+            if 'ItemPurchasable' in ln and '"0"' in ln:
+                purch[cur] = False
+            mc = cost_re.match(ln)
+            if mc:
+                cost[cur] = int(mc.group(1))
+    except OSError:
+        return []
+    names = {}
+    try:
+        _il = _json.load(open(_os.path.join(_os.path.dirname(__file__),
+                              "data", "itemlist.json"), encoding="utf-8"))
+        for _it in _il["result"]["data"]["itemabilities"]:
+            names[_it["name"]] = _it.get("name_english_loc")
+    except (OSError, KeyError, ValueError):
+        pass
+    icons_dir = _os.path.join(_os.path.dirname(__file__), "icons", "items")
+    try:
+        icon_files = set(_os.listdir(icons_dir))
+    except OSError:
+        icon_files = set()
+    variant_re = re.compile(r'(_\d+|_roshan|_broken)$')
+    out = []
+    for gslug in _PRESENT_SLUGS:
+        if gslug.startswith("item_recipe_") or gslug in _PHANTOM_ITEMS:
+            continue
+        icon = gslug[len("item_"):]
+        if icon + ".png" not in icon_files:
+            continue
+        if gslug in _ITEM_BLOCK or gslug.startswith("item_river_painter"):
+            continue
+        # Drop numbered/level variants — but keep the ones that are a real distinct
+        # item (Aghanim's Blessing) or a current neutral (Stygian Desolator =
+        # desolator_2).
+        if (variant_re.search(gslug) or gslug == "item_tango_single") \
+                and gslug not in _FREE_ALLOW and gslug not in _NEUTRAL_POOL_CURRENT:
+            continue
+        is_obsolete = gslug in _OBSOLETE_SLUGS
+        added, gone = _presence_window(icon)
+        if gslug.startswith("item_enhancement_"):
+            cls, current, removed = "enchant", True, gone
+        elif gslug in _NEUTRAL_SLUGS or gslug in _NEUTRAL_POOL_CURRENT:
+            cls = "neutral"
+            current = gslug in _NEUTRAL_POOL_CURRENT
+            # cycled-out neutral → end its lifespan at the cycle-out patch (n/a after)
+            removed = None if current else (_NEUTRAL_CYCLED.get(icon) or gone)
+        else:
+            cls = "regular"
+            # regular: keep purchasable shop items with a gold cost, the free-item
+            # allowlist, and removed items; drop free unreleased / event dummies.
+            if not (gslug in _FREE_ALLOW or is_obsolete
+                    or (purch.get(gslug, True) and (cost.get(gslug) or 0) > 0)):
+                continue
+            current = not is_obsolete
+            removed = (_OBSOLETE_REMOVED.get(gslug) or gone) if is_obsolete else gone
+        nm = names.get(gslug) or icon.replace("_", " ").title()
+        cost_v = _STATS_I.get(_latest_stats_ver, {}).get(gslug, {}).get("ItemCost", 0)
+        # Neutrals / enchantments aren't purchasable → no price (exempt from the
+        # price-range filter) even if a residual ItemCost lingers in the files.
+        price = None if cls in ("neutral", "enchant") else (
+            cost_v if (cost_v and cost_v > 0) else None)
+        out.append({"_gslug": gslug, "name": nm, "icon": icon, "class": cls,
+                    "current": current, "added": added, "removed": removed,
+                    "category": _item_category(gslug, cls),
+                    "price": price})
+    return out
+
+
 _item_roster = []
 for _k, _r in _State.dynamics.items():
     if _r.get("kind") not in ("item", "enchant"):
@@ -17250,6 +17569,15 @@ for _k, _r in _State.dynamics.items():
         _touch = [_CHRON_IDX[_p] for _p in _r.get("patches", {}) if _p in _CHRON_IDX]
         if _touch and max(_touch) > _CHRON_IDX.get(_removed, -1):
             _removed = None
+    # Neutral pool membership is authoritative: a neutral in the live pool is current
+    # (clear any stale removal); a cycled-out one is NOT current — date its lifespan
+    # end from the "cycled out" patch-note event when we have one (else open-ended,
+    # but hidden anyway since current=False).
+    if _cls == "neutral":
+        if _current_gf:
+            _removed = None
+        elif _removed is None:
+            _removed = _NEUTRAL_CYCLED.get(_icon)
     _current = _current_gf and (_removed is None)
     # Lifespan: blank patches before `added`; if removed, also blank after `removed`.
     # Gold cost (latest items.json) for the items_dyn price filter. Neutrals +
@@ -17260,10 +17588,28 @@ for _k, _r in _State.dynamics.items():
         "name": _r["name"], "icon": _icon, "key": _k,
         "class": _cls, "current": _current,
         "added": _added_version(_icon), "removed": _removed,
+        "category": _item_category("item_" + _icon, _cls),
         "price": _cost if (_cost and _cost > 0) else None})
+# Add every real game item NOT touched in any tracked patch, so the matrix lists
+# ALL items (parity with heroes_dyn). Dedup by the icon's game slug — a touched item
+# already carries the richer entry (tallies, removed_in, lifespan). `_load_full_game_items`
+# returns ready-made roster dicts (class / current / lifespan already resolved per the
+# game files + Liquipedia pool); we only drop the dedup key and add the matrix key.
+_touched_gslugs = {"item_" + _d["icon"] for _d in _item_roster}
+for _e in _load_full_game_items():
+    if _e.pop("_gslug") in _touched_gslugs:
+        continue
+    _e["key"] = "item|" + _e["icon"]
+    _item_roster.append(_e)
 _item_roster.sort(key=lambda _d: _d["name"].lower())
+# Ordered list of categories actually present (for the items_dyn Category dropdown).
+_present_cats = {_d.get("category") for _d in _item_roster if _d.get("category")}
+_item_cat_list = [_disp for _k, _disp in _SHOP_CATEGORY_ORDER if _disp in _present_cats]
+if _SHOP_CATEGORY_OTHER in _present_cats:
+    _item_cat_list.append(_SHOP_CATEGORY_OTHER)
 _dyn_payload = {"patches": _dyn_patches, "entities": _State.dynamics,
-                "heroes": _hero_roster, "items": _item_roster}
+                "heroes": _hero_roster, "items": _item_roster,
+                "item_categories": _item_cat_list}
 with open('_dynamics.json', 'w', encoding='utf-8') as _f:
     _json_dump.dump(_dyn_payload, _f, separators=(',', ':'))
 print(f"  → _dynamics.json: {len(_State.dynamics)} entities × {len(_dyn_patches)} patches in RELEASE_HISTORY")

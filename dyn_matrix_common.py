@@ -31,9 +31,77 @@ import site_common as _site
 
 _HERE = _os.path.dirname(_os.path.abspath(__file__))
 
+# Common Dota item abbreviations the search box should resolve (keyed by icon
+# slug). The search placeholder promises "aghs" etc., so each row carries a
+# data-alias with these + an auto acronym so "aghs"→Aghanim's Scepter, "bkb"→
+# Black King Bar, "pa"→Phantom Assassin all work.
+_ITEM_SEARCH_ALIASES = {
+    "ultimate_scepter": "aghs ags scepter", "ultimate_scepter_2": "aghs blessing",
+    "aghanims_shard": "shard", "black_king_bar": "bkb", "monkey_king_bar": "mkb",
+    "bfury": "bf battlefury", "desolator": "deso", "assault": "ac cuirass",
+    "sange_and_yasha": "sny", "kaya_and_sange": "kya", "yasha_and_kaya": "yk",
+    "cyclone": "euls eul", "vladmir": "vlads vlad", "poor_mans_shield": "pms",
+    "helm_of_the_dominator": "hotd", "helm_of_the_overlord": "overlord",
+    "mask_of_madness": "mom", "hand_of_midas": "midas", "hurricane_pike": "pike",
+    "shivas_guard": "shiva", "abyssal_blade": "abyssal", "sheepstick": "hex scythe vyse",
+    "invis_sword": "shadow blade", "silver_edge": "silver", "heart": "tarrasque",
+    "blade_mail": "blademail", "guardian_greaves": "greaves",
+    "boots_of_bearing": "bearing", "ancient_janggo": "drum janggo endurance",
+    "ethereal_blade": "eblade", "rod_of_atos": "atos", "dragon_lance": "dlance",
+    "power_treads": "treads", "travel_boots": "bots", "octarine_core": "octarine",
+    "aeon_disk": "aeon", "crimson_guard": "cg", "pipe": "insight",
+    "diffusal_blade": "diffusal", "manta": "style", "demonicon": "book of the dead",
+    "desolator_2": "stygian", "heavy_blade": "witchbane", "pogo_stick": "tumbler",
+    "angels_demise": "khanda", "gungir": "gleipnir", "royale_with_cheese": "block",
+}
+
+
+def _search_alias(name, icon, kind):
+    """Extra search keywords for a row: manual abbreviations (items) + an acronym of
+    the words (Black King Bar→bkb, Phantom Assassin→pa). Possessive 's is stripped so
+    'Aghanim's Scepter'→'as' not 'ass'."""
+    parts = []
+    if kind == "item":
+        a = _ITEM_SEARCH_ALIASES.get(icon)
+        if a:
+            parts.append(a)
+    words = _re.findall(r"[a-z0-9]+",
+                        name.lower().replace("’s", "").replace("'s", ""))
+    if len(words) > 1:
+        parts.append("".join(w[0] for w in words))
+    return " ".join(parts)
+
 
 def _esc(s):
     return _html.escape(str(s), quote=True)
+
+
+def _multiselect_dropdown(dd_id, label, options):
+    """A single toolbar control = a button that opens a checkbox popover for
+    multi-select filtering. `options` = [(value, label, checked), ...]. Each option
+    checkbox carries data-<dd_id>="<value>"; a top "All" checkbox (data-dd-all) toggles
+    them all at once. The menu carries data-dd="<dd_id>" too, so it can be portaled to
+    <body> (escaping .creeps-scroll's contain:paint clip) and still be found by
+    applyRowFilters. scripts.js `initHdDropdowns` wires open/close + the badge
+    ("all"/count); `applyRowFilters` reads checked option values vs each row's
+    data-<dd_id>. Used for Type (class) and Category."""
+    opts = ''.join(
+        f'<label class="hd-dd-opt"><input type="checkbox" '
+        f'data-{_esc(dd_id)}="{_esc(v)}"{" checked" if ck else ""}>'
+        f'<span>{_esc(lbl)}</span></label>'
+        for v, lbl, ck in options)
+    all_row = ('<label class="hd-dd-opt hd-dd-all"><input type="checkbox" data-dd-all>'
+               '<span>All</span></label><div class="hd-dd-sep" aria-hidden="true"></div>')
+    return (
+        f'<div class="hd-dd" data-dd="{_esc(dd_id)}">'
+        f'<button type="button" class="hd-dd-btn" aria-expanded="false" '
+        f'aria-haspopup="true"><span class="hd-dd-label">{_esc(label)}</span>'
+        f'<span class="hd-dd-badge" aria-hidden="true"></span>'
+        f'<svg class="hd-dd-caret" viewBox="0 0 10 6" width="10" height="6" '
+        f'aria-hidden="true"><path d="M0 0l5 6 5-6z" fill="currentColor"/></svg>'
+        f'</button>'
+        f'<div class="hd-dd-menu" data-dd="{_esc(dd_id)}" role="group" hidden>'
+        f'{all_row}{opts}</div></div>')
 
 
 def _base_version(ver):
@@ -76,15 +144,20 @@ def _roster(manifest, roster_key, kind):
 
 def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                     icon_dir, from_token, search_ph, blurb,
-                    current_toggle=False, class_filter=False, price_filter=False):
+                    current_toggle=False, class_filter=False, price_filter=False,
+                    category_filter=False):
     """Render a Dynamics matrix page. See module docstring for the params.
 
     current_toggle — add an "In game" switch (left of Buff/nerf only) that hides
                      rows whose roster entry has current=False (removed/obsolete).
                      Default ON. Needs roster entries to carry `current`.
-    class_filter   — add a Show group (right of Remove) with Items / Neutral Items
-                     / Enchantments toggles. Needs roster entries to carry `class`.
-    Both are no-ops on pages whose roster lacks those fields (heroes_dyn)."""
+    class_filter   — add a Type multi-select dropdown (Items / Neutral Items /
+                     Enchantments). Needs roster entries to carry `class`.
+    category_filter — add a Category multi-select dropdown (Consumables / Attributes
+                     / … from the game's shop layout). Needs roster `category` +
+                     manifest['item_categories']. Items without a category (neutrals/
+                     enchants) are exempt from it.
+    All are no-ops on pages whose roster lacks those fields (heroes_dyn)."""
     manifest = _load_manifest()
     # Columns: every patch, OLDEST on the left → NEWEST on the right (so the
     # latest patch is the rightmost column; scripts.js keeps it flush right).
@@ -160,9 +233,11 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         r_idx = ver_index.get(removed) if removed else None
         img = (f'<img src="{_esc(icon_dir)}/{_esc(h["icon"])}.png" '
                f'alt="{_esc(h["name"])}" loading="lazy">')
+        alias = _search_alias(h["name"], h["icon"], kind)
+        alias_attr = f' data-alias="{_esc(alias)}"' if alias else ''
         cells = [
             f'<td class="hd-hero sticky-col" data-col="name" '
-            f'data-sort="{_esc(h["name"])}">'
+            f'data-sort="{_esc(h["name"])}"{alias_attr}>'
             f'<span class="hd-hero-inner">{img}'
             f'<span class="hd-hero-name">{_esc(h["name"])}</span></span></td>'
         ]
@@ -191,6 +266,8 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
             tr_attr += f' data-class="{_esc(h["class"])}"'
         if "current" in h:
             tr_attr += f' data-current="{1 if h["current"] else 0}"'
+        if h.get("category"):
+            tr_attr += f' data-category="{_esc(h["category"])}"'
         if h.get("price"):
             tr_attr += f' data-price="{int(h["price"])}"'
         rows.append(f'<tr{tr_attr}>{"".join(cells)}</tr>')
@@ -230,44 +307,58 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         'Show items no longer in the game — removed or cycled out of the pool '
         '(hidden by default)', False
     ) if current_toggle else ''
-    # Class filter group (sits right of Remove): toggle item classes on/off.
-    # Default: only regular Items on; Neutral Items + Enchantments start OFF.
+    # Class filter (sits right of Remove): ONE multi-select dropdown (Type) — pick
+    # any combination of Items / Neutral Items / Enchantments. Default: Items only.
     if class_filter:
-        _CLASS_CHIPS = [('regular', 'Items', True), ('neutral', 'Neutral Items', False),
-                        ('enchant', 'Enchantments', False)]
-        class_chips = ''.join(
-            f'<button type="button" class="hd-class-chip" data-class="{c}" '
-            f'aria-pressed="{"true" if on else "false"}">{lbl}</button>'
-            for c, lbl, on in _CLASS_CHIPS)
-        # No "Show" label — the labelled class chips speak for themselves.
-        class_block = '<span class="hd-class-group">' + class_chips + '</span>'
+        class_block = _multiselect_dropdown('class', 'Type', [
+            ('regular', 'Items', True),
+            ('neutral', 'Neutral Items', False),
+            ('enchant', 'Enchantments', False),
+        ])
     else:
         class_block = ''
     # Price-range filter (copied from mana_items): two bound inputs + a clear-X
-    # sharing one border. Items priced 0 (neutrals/enchants) are exempt — see JS.
+    # sharing one border, as ONE compact pill that matches the panel control height
+    # (the label lives INSIDE the pill, so it no longer towers over the switches).
+    # Items priced 0 (neutrals/enchants) are exempt — see JS.
     if price_filter:
         price_block = (
-            '<span class="view-group hd-price-group"><strong>Price</strong>'
-            '<span class="mr-price-range">'
+            '<span class="mr-price-range hd-price-range">'
+            '<span class="mr-price-label" aria-hidden="true">Price</span>'
             '<input type="number" class="mr-price-input" id="hd-price-min" '
-            'placeholder="from" min="0" step="50" inputmode="numeric">'
+            'placeholder="min" min="0" step="50" inputmode="numeric" '
+            'aria-label="Minimum price">'
             '<span class="mr-price-sep" aria-hidden="true">–</span>'
             '<input type="number" class="mr-price-input" id="hd-price-max" '
-            'placeholder="to" min="0" step="50" inputmode="numeric">'
+            'placeholder="max" min="0" step="50" inputmode="numeric" '
+            'aria-label="Maximum price">'
             '<button type="button" class="mr-price-clear" id="hd-price-clear" '
             'aria-label="Clear price range" hidden>'
             '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">'
             '<path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" '
             'stroke-width="2" stroke-linecap="round" fill="none"/>'
-            '</svg></button></span></span>')
+            '</svg></button></span>')
     else:
         price_block = ''
+    # Category filter: ONE multi-select dropdown built from the game's shop tabs
+    # (manifest['item_categories'], from data/shops.txt). Default: all selected (=
+    # no filtering). Items without a category (neutrals/enchants) are exempt — JS.
+    if category_filter:
+        _cats = manifest.get('item_categories', [])
+        category_block = _multiselect_dropdown(
+            'category', 'Category', [(c, c, True) for c in _cats]) if _cats else ''
+    else:
+        category_block = ''
     # All controls live inside ONE bordered surface (.toolbar-panel, the site
     # standard) — a single unified panel rather than a row of separate floating
     # pills. The switches + filter groups go borderless inside it (CSS), separated
     # by thin dividers; the tag/class chips keep their own (universal) design.
     toolbar = (
         '<div class="cal-toggle-bar inbox-bar hd-toolbar"><div class="toolbar-panel">'
+        # Type + Category filters lead the panel (per request), then the switches,
+        # price, tag chips, and the full-width search on its own bottom row.
+        + class_block
+        + category_block
         + _switch('hd-hide-old', 'Hide old',
                   'Show only the most recent patches that fit the width '
                   '(latest at the right edge); off shows every patch', True)
@@ -277,7 +368,6 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                   'DEL as nerf (hover still shows every tag)', False)
         + price_block
         + remove_block
-        + class_block
         + search_block
         + '</div></div>\n')
 

@@ -48,6 +48,15 @@ docs/
 python build_patch.py        # пересобирает все patches/*.html и calendar.html
 python generate_patch_code.py 7.42   # → _generated_p_7.42.py (вставлять в build_patch.py)
 python scripts/apply_stats.py          # упгрейдит t() → bstat_h() где можем
+python scripts/fetch_itemlist.py       # обновляет data/itemlist.json из датафида Valve
+                                        # (имена предметов + ТЕКУЩИЙ ПУЛ НЕЙТРАЛОВ для items_dyn).
+                                        # Запускать с выходом нового патча, затем build_patch.py —
+                                        # добавленные/выведенные нейтралы подхватятся автоматически.
+python scripts/extract_shops.py        # извлекает scripts/shops.txt из VPK → data/shops.txt
+                                        # (КАТЕГОРИИ магазина для фильтра items_dyn: Consumables/
+                                        # Attributes/Weapons…). Локально (нужен `pip install vpk`).
+                                        # Запускать с выходом патча (Valve тасует категории), затем
+                                        # build_patch.py — перемещения категорий подхватятся сами.
 ```
 
 ## Ключевые концепции

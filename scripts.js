@@ -790,6 +790,65 @@
 
   // Wire the heroes_dyn toolbar: Hide old (fit-to-width), Buff/nerf only,
   // the "Remove" tag chips, and the hero search box.
+  // Multi-select dropdown controls (.hd-dd): a flat button opens a checkbox popover.
+  // The popover is PORTALED to <body> (so .creeps-scroll's contain:paint doesn't clip
+  // it and an empty table can't push a scrollbar) and positioned fixed under the
+  // button. A top "All" checkbox toggles every option; the gold badge shows "all" when
+  // all are selected, else the count. `onChange` re-runs the row filter.
+  function initHdDropdowns(scope, onChange) {
+    const dds = [...scope.querySelectorAll('.hd-dd')];
+    if (!dds.length) return;
+    const closeAll = (except) => dds.forEach(dd => {
+      if (dd === except) return;
+      if (dd._menu) dd._menu.hidden = true;
+      dd.querySelector('.hd-dd-btn').setAttribute('aria-expanded', 'false');
+    });
+    dds.forEach(dd => {
+      const btn = dd.querySelector('.hd-dd-btn');
+      const menu = dd.querySelector('.hd-dd-menu');
+      const badge = dd.querySelector('.hd-dd-badge');
+      const allBox = menu.querySelector('input[data-dd-all]');
+      const boxes = [...menu.querySelectorAll('input[type="checkbox"]')]
+        .filter(b => b !== allBox);
+      dd._menu = menu;
+      // Portal the menu out to <body> once (escapes the scroll box's paint clip).
+      document.body.appendChild(menu);
+      menu.style.position = 'fixed';
+      const place = () => {
+        const r = btn.getBoundingClientRect();
+        menu.style.top = (r.bottom + 6) + 'px';
+        menu.style.left = r.left + 'px';
+      };
+      const sync = () => {
+        const n = boxes.filter(b => b.checked).length;
+        if (badge) badge.textContent = (n === boxes.length) ? 'all' : String(n);
+        if (allBox) {
+          allBox.checked = (n === boxes.length);
+          allBox.indeterminate = (n > 0 && n < boxes.length);
+        }
+      };
+      sync();
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const willOpen = menu.hidden;
+        closeAll(dd);
+        if (willOpen) place();
+        menu.hidden = !willOpen;
+        btn.setAttribute('aria-expanded', String(willOpen));
+      });
+      menu.addEventListener('click', (e) => e.stopPropagation());
+      if (allBox) allBox.addEventListener('change', () => {
+        boxes.forEach(b => { b.checked = allBox.checked; });
+        sync(); onChange();
+      });
+      boxes.forEach(b => b.addEventListener('change', () => { sync(); onChange(); }));
+    });
+    document.addEventListener('click', () => closeAll(null));
+    // Button moves with the page but a fixed menu doesn't — close on scroll/resize.
+    window.addEventListener('scroll', () => closeAll(null), true);
+    window.addEventListener('resize', () => closeAll(null));
+  }
+
   function dynSetupMatrix(table, manifest) {
     const elOld = document.getElementById('hd-hide-old');
     const elBn = document.getElementById('hd-bn-only');
@@ -838,7 +897,6 @@
     // are no-ops there. Row display only (never re-measures the hero width).
     const search = document.getElementById('hd-hero-search');
     const page = table.closest('.creeps-page');
-    const classChips = page ? [...page.querySelectorAll('.hd-class-chip[data-class]')] : [];
     const delToggle = document.getElementById('hd-show-deleted');
     const priceMin = document.getElementById('hd-price-min');
     const priceMax = document.getElementById('hd-price-max');
@@ -848,10 +906,20 @@
       const terms = search
         ? search.value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean)
         : [];
-      const enabled = classChips.length
-        ? new Set(classChips.filter(c => c.getAttribute('aria-pressed') !== 'false')
-                            .map(c => c.dataset.class))
-        : null;
+      // Multi-select dropdowns (Type=class, Category): a row must satisfy EVERY
+      // active dropdown — its data-<dd> value among that dropdown's checked options.
+      // Menus are portaled to <body>, so find each by its data-dd (not by containment).
+      const ddFilters = page
+        ? [...page.querySelectorAll('.hd-dd[data-dd]')].map(dd => {
+            const key = dd.dataset.dd;
+            const menu = document.querySelector('.hd-dd-menu[data-dd="' + key + '"]');
+            const checked = new Set(menu
+              ? [...menu.querySelectorAll('input[data-' + key + ']:checked')]
+                  .map(i => i.dataset[key])
+              : []);
+            return { key, checked };
+          })
+        : [];
       const showDeleted = !!(delToggle && delToggle.checked);
       const lo = priceMin ? parseFloat(priceMin.value) : NaN;
       const hi = priceMax ? parseFloat(priceMax.value) : NaN;
@@ -859,9 +927,18 @@
       // Clear-X visible only when a bound is set.
       if (priceClear) priceClear.hidden = !(hasLo || hasHi);
       rows.forEach(tr => {
-        const name = (tr.querySelector('td.hd-hero')?.dataset.sort || '').toLowerCase();
-        const okSearch = !terms.length || terms.some(t => name.includes(t));
-        const okClass = !enabled || enabled.has(tr.dataset.class);
+        const cell = tr.querySelector('td.hd-hero');
+        const name = (cell?.dataset.sort || '').toLowerCase();
+        // data-alias = abbreviations + acronym (aghs→Aghanim's Scepter, bkb→…).
+        const alias = (cell?.dataset.alias || '').toLowerCase();
+        const okSearch = !terms.length
+          || terms.some(t => name.includes(t) || alias.includes(t));
+        // A row with no data-<dd> value is EXEMPT from that dropdown (e.g. neutrals/
+        // enchants have no shop category → the Category filter never hides them).
+        const okDd = ddFilters.every(f => {
+          const v = tr.dataset[f.key];
+          return v === undefined || f.checked.has(v);
+        });
         // data-current="0" = removed from the game → shown only when "Show deleted".
         const okDel = showDeleted || tr.dataset.current !== '0';
         // Price: items without data-price (neutrals/enchants = free) are EXEMPT.
@@ -872,15 +949,11 @@
           if (hasLo && v < lo) okPrice = false;
           if (hasHi && v > hi) okPrice = false;
         }
-        tr.style.display = (okSearch && okClass && okDel && okPrice) ? '' : 'none';
+        tr.style.display = (okSearch && okDd && okDel && okPrice) ? '' : 'none';
       });
     };
     if (search) search.addEventListener('input', applyRowFilters);
-    classChips.forEach(chip => chip.addEventListener('click', () => {
-      chip.setAttribute('aria-pressed',
-        chip.getAttribute('aria-pressed') === 'false' ? 'true' : 'false');
-      applyRowFilters();
-    }));
+    if (page) initHdDropdowns(page, applyRowFilters);
     if (delToggle) delToggle.addEventListener('change', applyRowFilters);
     if (priceMin) priceMin.addEventListener('input', applyRowFilters);
     if (priceMax) priceMax.addEventListener('input', applyRowFilters);

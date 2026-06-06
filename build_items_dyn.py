@@ -5,9 +5,10 @@ COLUMNS = every patch; CELL = that item's patch-dynamics dyn-cell), reusing the
 shared renderer in `dyn_matrix_common.save_dyn_matrix`. Only the config differs:
 item roster + icons/items/ portraits + an items back-arrow token.
 
-The item roster is every item that appears in the dynamics (`item|<slug>`
-entities) — there's no fixed "all items" master list like the hero roster, so the
-rows are the items actually touched across tracked patches.
+The item roster is EVERY real game item (parity with heroes_dyn listing every
+hero), not just touched ones — untouched items render as empty rows. build_patch.py
+builds it: touched items (from the dynamics) merged with every other real item from
+items.txt + datafeed names (see `_load_full_game_items`), deduped by icon game slug.
 
 Run AFTER build_patch.py (it needs the fresh _dynamics.json + site_meta.json):
     python build_patch.py
@@ -30,6 +31,7 @@ def save_items_dyn_html():
         current_toggle=True,
         class_filter=True,
         price_filter=True,
+        category_filter=True,
         blurb=(
             "Every item down the side, every patch across the top — regular items, "
             "neutral items and enchantments together. Each diamond is that item’s "

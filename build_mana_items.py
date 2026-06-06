@@ -948,24 +948,23 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
         # the cal-toggle-bar / ua-upgrades-toggle convention used on the
         # Neutral Creeps & Unit Abilities pages.
         '<div class="cal-toggle-bar mr-toolbar inbox-bar"><div class="toolbar-panel">'
-        '<span class="view-group">'
-        '<strong>Price</strong>'
-        # Combo widget — both inputs and the clear-X share a single border
-        # so they read as one control. X-button sits flush against the
-        # right input's edge; visible only when at least one bound is set.
-        '<span class="mr-price-range">'
+        # Flat price pill matching items_dyn: "Price" label inside, underlined inputs,
+        # no nested box — same height as the rest of the panel. X visible when a bound set.
+        '<span class="mr-price-range hd-price-range">'
+        '<span class="mr-price-label" aria-hidden="true">Price</span>'
         '<input type="number" class="mr-price-input" id="mr-price-min" '
-        'placeholder="from" min="0" step="50" inputmode="numeric">'
+        'placeholder="min" min="0" step="50" inputmode="numeric" '
+        'aria-label="Minimum price">'
         '<span class="mr-price-sep" aria-hidden="true">–</span>'
         '<input type="number" class="mr-price-input" id="mr-price-max" '
-        'placeholder="to" min="0" step="50" inputmode="numeric">'
+        'placeholder="max" min="0" step="50" inputmode="numeric" '
+        'aria-label="Maximum price">'
         '<button type="button" class="mr-price-clear" id="mr-price-clear" '
         'aria-label="Clear price range" hidden>'
         '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">'
         '<path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" '
         'stroke-width="2" stroke-linecap="round" fill="none"/>'
         '</svg></button>'
-        '</span>'
         '</span>'
         '<label class="ua-upgrades-toggle">'
         '<span class="ua-upgrades-label">Hide Active</span>'

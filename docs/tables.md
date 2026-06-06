@@ -11,7 +11,7 @@ This covers the sortable data tables under the **Materials** section.
 | `neutral_abilities.html` | Per-unit-ability table (one row per unit×ability). The Materials sub-nav presents it as a child of Neutral Creeps. `unit_abilities.html` is now a small meta-redirect for backwards compatibility. | `build_creeps.py` (same run) |
 | `mana_items.html` | Mana / mana-regen items + gold-efficiency metrics. | `build_mana_items.py` |
 | `heroes_dyn.html` | **Hero Dynamics matrix** — rows = every hero (icon+name, alphabetical), columns = every patch (version + release date oldest→newest), each cell = that hero's patch-dynamics **dyn-cell** for that patch. Same diamond-pill widget as patch pages. | `build_heroes_dyn.py` |
-| `items_dyn.html` | **Item Dynamics matrix** — like heroes_dyn but rows = every item/enchantment touched across tracked patches (172: 101 regular + 49 neutral + 22 enchant). Adds an **In game** toggle (hide removed/obsolete items, ON by default) + a **Show** class filter (Items / Neutral Items / Enchantments). | `build_items_dyn.py` |
+| `items_dyn.html` | **Item Dynamics matrix** — like heroes_dyn, rows = **every real game item** (parity with heroes_dyn listing every hero), columns = every patch. Untouched items render as empty rows. Currently **350** (199 regular + 129 neutral + 22 enchant); 91 not-current (incl. 80 cycled-out neutrals — only the live pool of 49 shows by default), every one with an accurate removal patch. Adds an **In game** toggle (hide removed items, ON) + Type & Category multi-select dropdowns. | `build_items_dyn.py` |
 | nav / asset version / `data/site_meta.json` | Shared header, sub-tabs, cache-busting. | `site_common.py` |
 
 Header sub-tabs (under the logo) switch between Neutral Creeps / Unit Abilities / Mana Items.
@@ -65,20 +65,111 @@ enriched **items roster** into `_dynamics.json` — each entry has `class`
 section-based method and the game-file method agree 100% (cross-checked: 49/49
 neutral, 0 false pos/neg).
 
-The items_dyn controls (`current_toggle` / `class_filter` / `price_filter` params
-of `save_dyn_matrix`) put `data-class` + `data-current` + `data-price` on each
-`<tr>`; `scripts.js dynSetupMatrix` combines name-search + class chips + "Show
-deleted" toggle + price min/max into ONE visibility pass (no-ops on heroes_dyn,
-whose roster lacks those fields). **Price** = latest items.json `ItemCost`; items
-with no cost (neutrals/enchants = 0 → roster `price=None`, no `data-price`) are
-EXEMPT from the range filter. The price widget reuses mana_items' `.mr-price-range`
-markup/CSS with `hd-price-*` ids.
+### Full item roster (`build_patch.py::_load_full_game_items`) — list EVERY item
+The roster is NOT just touched items — it lists every real game item so the matrix
+matches heroes_dyn (which lists every hero). Untouched items render as empty rows.
+Inclusion mirrors **Liquipedia's Portal:Items** (the reference the user gave).
+- **Touched items** come from the dynamics (`_State.dynamics`, kind `item`/`enchant`)
+  with the full lifespan/removal data (`removed_in`, tallies). Built first.
+- **`_load_full_game_items()`** then adds every other real item from the latest
+  `items.txt` + display names from `data/itemlist.json` (slugs are often legacy joke
+  names — `item_angels_demise` = "Khanda", `item_gungir` = "Gleipnir", `item_royale_with_cheese`
+  = "Block of Cheese" — so the datafeed `name_english_loc` is authoritative; titlecased-slug
+  fallback for the few missing). **Kept:** has `icons/items/<icon>.png`, not `item_recipe_*`;
+  all neutrals + enchantments; regular shop items with `ItemPurchasable != 0` AND `ItemCost > 0`;
+  a small `_FREE_ALLOW` allowlist of free / boss-reward / collectible items (Aegis, Cheese,
+  Refresher Shard, Roshan's Banner, Healing Lotus ×3, Block of Cheese, Madstone, Observer Ward,
+  Aghanim's Blessing); and **removed items** (`IsObsolete`) — kept too, `current=False`.
+  **Dropped:** numbered / level VARIANTS (`_2..9`, `_roshan`, `_broken`, `tango_single`) EXCEPT
+  the distinct named `item_ultimate_scepter_2` (Aghanim's Blessing); a blocklist `_ITEM_BLOCK`
+  + River Vials (Bag of Gold, caster_rapier, pocket_roshan, `item_river_painter*`); and
+  **unreleased FREE items** (apex, ofrenda*, grisgris, philosophers_stone … — auto-dropped:
+  free and not in `_FREE_ALLOW`, which is exactly why the cost filter on regulars is kept).
+- **Lifespan / n/a dots** (`_presence_window`): scans every patch's `items.json` for the item
+  → `added` = first appearance (columns before render faint "n/a" dots), and if it has left the
+  files, `removed` = last appearance. ⚠ `items.json` keeps OBSOLETE item keys forever (Necronomicon
+  is still a 7.41d key), so presence can't date those removals → `_OBSOLETE_REMOVED` hardcodes the
+  patch-note-confirmed removal version for the 8 untouched classics (Necronomicon 7.29, Hood of
+  Defiance / Flicker / Nether Shawl / Wraith Pact / Tome of Knowledge 7.33, Stout Shield 7.23
+  [Liquipedia], Quarterstaff 7.35). Touched removals come from the patch-note DEL row (`removed_in`).
+- **Dedup** is by the icon's game slug (`item_<icon>`): a touched item already has the richer entry,
+  so its game-file twin is skipped. (User's choice: "all items, no variants / event-only pickups";
+  removed items kept with correct lifespans.) Current total: **350** (199 reg + 129 neut + 22 ench);
+  91 not-current. **Class of an item that changed type over time = its LATEST class** — e.g.
+  Specialist's Array was a neutral, now a purchasable regular → classified `regular`; its n/a dots
+  correctly precede 7.32 (its first appearance), no mid-life gap (it stayed in the files throughout).
+
+#### Neutral pool — current vs cycled-out (`_NEUTRAL_POOL_CURRENT`, AUTO-DERIVED)
+The game files CANNOT tell an active neutral from a cycled-out one: items.txt keeps every dropped
+neutral flagged `ItemIsNeutralActiveDrop "1"` forever and never marks it `IsObsolete`. The **live
+pool is auto-derived from Valve's datafeed** (`data/itemlist.json`, field `neutral_item_tier >= 0`)
+by `_load_neutral_pool_current()` — no hand-maintained list. ✅ **Self-updating:** when a new patch
+lands, run `python scripts/fetch_itemlist.py` to refresh `itemlist.json`, then rebuild; added /
+removed / cycled neutrals are picked up automatically (currently **49** in pool). The datafeed is
+authoritative — a hand-written Liquipedia list was tried first but silently missed Cloak of Flames /
+Dandelion Amulet / Medallion of Courage (all re-added as neutrals in 7.41), which the datafeed has.
+A neutral's `current` = membership in that set (applied in BOTH `_item_class_and_current` for touched
+neutrals AND `_load_full_game_items` for untouched ones; an item in the datafeed pool is also forced
+to `class=neutral`, e.g. Medallion of Courage which left the shop). Pool membership overrides any
+stale `removed_in`. Everything else flagged-neutral = cycled out → `current=False` (hidden under the
+Deleted toggle). Cycle-out **version** for the lifespan tail comes from `_NEUTRAL_CYCLED`: patch-note
+"cycled out" events (~7.33+) merged with `_NEUTRAL_REMOVED_MANUAL` (49 older neutrals dated from their
+Liquipedia /Changelogs pages — mostly the 7.38 neutral overhaul), so every cycled-out neutral has an
+accurate n/a tail. Never-released entries are excluded entirely via `_PHANTOM_ITEMS`: 3 neutrals
+(Bottomless Chalice / Horizon / Mechanical Arm — "Added to game files, unreleased") + 5 enchantments
+that never appeared in any patch note and have no Liquipedia page (Unleashed/curious, Dominant, Fierce,
+Restorative, Thick). Released-then-removed enchants (Wise / Boundless / Vast) stay as removed.
+⚠ Legacy joke slugs: Stygian Desolator = `desolator_2` (a current tier-5 neutral, so it's exempt
+from the `_2` variant drop), Book of the Dead = `demonicon`, Witchbane = `heavy_blade`, Tumbler's
+Toy = `pogo_stick`. **Phantom neutrals** flagged BOTH neutral AND `SpeciallyBannedFromNeutralSlot`
+(Greater Mango, Greater Faerie Fire — never shipped) are in `_PHANTOM_ITEMS` → excluded entirely.
+
+#### Search aliases (`dyn_matrix_common._search_alias`)
+Each row's identity `<td>` carries a `data-alias` of extra search keywords so the placeholder's
+promise ("aghs") works: a manual abbreviation map (`_ITEM_SEARCH_ALIASES`: aghs→Aghanim's Scepter,
+bkb, mkb, deso, euls, pms, sny, hotd, midas …) plus an auto **acronym** of the words (Black King
+Bar→bkb; on heroes_dyn this also gives cm→Crystal Maiden, pa→Phantom Assassin). `scripts.js`
+`applyRowFilters` matches each search term against `data-sort` (name) OR `data-alias`.
+
+The items_dyn controls (`current_toggle` / `class_filter` / `price_filter` /
+`category_filter` params of `save_dyn_matrix`) put `data-class` + `data-current` +
+`data-price` + `data-category` on each `<tr>`; `scripts.js dynSetupMatrix` combines
+name-search + the dropdowns + "Show deleted" toggle + price min/max into ONE
+visibility pass (no-ops on heroes_dyn, whose roster lacks those fields). **Price** =
+latest items.json `ItemCost`; items with no cost (neutrals/enchants = 0 → roster
+`price=None`, no `data-price`) are EXEMPT from the range filter.
+
+#### Multi-select dropdowns (`dyn_matrix_common._multiselect_dropdown` + `initHdDropdowns`)
+**Type** and **Category** lead the toolbar — each ONE control = a flat button that
+opens a checkbox popover (not a row of loose chips). The builder emits
+`.hd-dd[data-dd="<key>"]` with a button (`.hd-dd-btn` + gold `.hd-dd-badge`) and a
+`.hd-dd-menu[data-dd="<key>"]` holding a top **"All"** checkbox (`data-dd-all`, toggles
+every option) + option `<input data-<key>="<value>">`. `initHdDropdowns`:
+- **portals each menu to `<body>`** and positions it `fixed` under the button — so
+  `.creeps-scroll`'s `contain:paint` can't clip it and an empty table can't push a
+  scrollbar (the earlier bug). Closes on outside-click / scroll / resize.
+- badge shows **"all"** when every option is checked, else the count (`applyRowFilters`
+  finds each menu by `data-dd` since it now lives on `<body>`, not inside `.hd-dd`).
+- a row with **no** `data-<key>` is EXEMPT (so Category never hides neutrals/enchants).
+- **Type** (`class`): Items / Neutral Items / Enchantments. Default: Items only.
+- **Category** (`category`): the shop tabs (Consumables / Attributes / Equipment /
+  Miscellaneous / Accessories / Support / Magical / Armor / Weapons / **Armaments** /
+  Secret Shop / Other). Default: all selected. Source = `data/shops.txt` (the game's
+  shop layout, extracted by `scripts/extract_shops.py`); `build_patch._load_shop_categories`
+  maps each item to its FIRST shop section (sideshop/pregame/event sections excluded;
+  the `"magics" // Magical` inline comment must be tolerated by the section regex; an
+  UNMAPPED section with items prints a build warning), uncategorized regular items (boss
+  rewards, collectibles, Aghanim's Blessing, removed items) → "Other". `artifacts` is
+  shown as **Armaments** (its in-game name). The ordered list ships in
+  `_dynamics.json["item_categories"]`. ⚠ Refresh `data/shops.txt` per patch.
 
 **Unified toolbar panel:** all dynamics controls live inside ONE bordered surface
-`.hd-tb-inner` (not separate floating pills). Inside it the switches + filter
-groups go flat (transparent), separated by thin dividers (switches | Remove |
-Show | Price), search flush right. Tag/class chips keep their own design. The
-outer `.hd-toolbar` keeps the 28px Materials side inset + top/bottom rhythm gaps.
+`.toolbar-panel` (not separate floating pills). EVERYTHING inside goes FLAT —
+switches, the Type/Category dropdown buttons AND the price control are all
+transparent (no nested box), uniform 32px height, separated by thin dividers; only
+the panel has a border (+ the search box on its own bottom row). The dropdown popovers
+are portaled to `<body>` (`position:fixed`, `z-index:1000`). The same flat price pill
+is reused on **mana_items** (`hd-price-range` + `.mr-price-label`).
 
 ### Item lifespan — blanked cells outside [added … removed]
 Each items roster entry also carries `added` + `removed` patch versions so the
@@ -106,7 +197,9 @@ matrix only draws the item's slots WITHIN its life:
   NEUTRAL definitions WITHOUT `IsObsolete`. Only the patch note does. ⚠ Must NOT
   match `"Facets removed from the game"` (Crude keeps living) nor
   `"Removed <facet/ability>"` (a sub-feature, e.g. Riftshadow Prism's facet list).
-  Currently 15 not-current: 3 enchants + 2 items removed + 10 cycled-out neutrals.
+  Now 91 not-current (3 removed enchants + ~10 removed items + ~80 cycled-out neutrals —
+  see the neutral-pool note below; the live pool of 49 neutrals shows by default). EVERY
+  one has an accurate removal patch now (see `_NEUTRAL_REMOVED_MANUAL`).
   (NB: Liquipedia's changelog summary disagreed — it's stale on the 7.41 enchant
   removals and the cycle-outs; the Valve patch notes in build_patch.py are truth.)
 - A touched cell (has a tag tally) ALWAYS renders its pill, even if the lifespan
