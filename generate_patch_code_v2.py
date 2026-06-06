@@ -565,6 +565,16 @@ def _postprocess_scale_pill(lines):
 _REWORK_TRIGGERS = (
     'Innate ability reworked',
     'Ability reworked',
+    'Reworked into',          # "Reworked into a basic ability" (Spectre Shadow Step)
+)
+
+# A brand-new / introduced ability — needs an ability_change(..., tag="new")
+# card whose OLD pane is the ability it replaces (lifted from prior patchnotes).
+_NEW_ABILITY_TRIGGERS = (
+    'New innate ability',
+    'New basic ability',
+    'New ability',
+    'New Point Targeted',     # "New Point Targeted basic ability"
 )
 
 
@@ -826,11 +836,14 @@ def _postprocess_drop_now_requires(lines):
 
 def _postprocess_rework_marker(lines):
     """Add a TODO breadcrumb above W(ability(...)) blocks whose first li
-    matches an "Innate ability reworked" / "Ability reworked" trigger.
-    Building the full ability_change() swap card from the datafeed alone
-    is unsafe (OLD-pane desc lives in the previous patch's tooltip, not
-    in this patch's notes), so we mark the spot for manual conversion
-    per memory rule sloppy_innate_rework_pattern.
+    announces a REWORKED ability ("Innate ability reworked" / "Ability
+    reworked" / "Reworked into …") OR a brand-NEW ability ("New innate/
+    basic/Point Targeted ability"). Building the full ability_change() swap
+    card from the datafeed alone is unsafe — the OLD-pane desc lives in the
+    PREVIOUS patch's tooltip (for reworks) or in the REPLACED ability (for
+    new ones), neither of which is in this patch's notes. So we mark the
+    spot for manual conversion per memory rules sloppy_innate_rework_pattern
+    / sloppy_ability_change_pattern.
     """
     out = []
     pending_ability_idx = None
@@ -847,6 +860,13 @@ def _postprocess_rework_marker(lines):
                     '# v2-todo: convert to ability_change(old=..., new=..., '
                     'summary="Innate reworked." / "Ability reworked.", tag="rework") '
                     '— lift OLD desc from prior patchnotes'
+                )
+            elif any(trig in line for trig in _NEW_ABILITY_TRIGGERS):
+                out.insert(
+                    pending_ability_idx,
+                    '# v2-todo: convert to ability_change(old=<replaced ability>, new=..., '
+                    'summary="New innate ability." / "New ability.", tag="new") '
+                    '— OLD pane = the ability this replaces (lift its desc from prior patchnotes)'
                 )
             pending_ability_idx = None
         elif pending_ability_idx is not None and (

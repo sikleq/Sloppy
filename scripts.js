@@ -488,7 +488,7 @@
   const DYN_NEUTRAL_TAGS = [];
   const DYN_MAX_PATCHES = 12;
 
-  function dynBuildPill(patch, counts, entityId, isCurrent, fromVersion, filePrefix, bnOnly, removed) {
+  function dynBuildPill(patch, counts, entityId, isCurrent, fromVersion, filePrefix, bnOnly, removed, debut) {
     // "Remove" tag filter (toolbar chips): zero out user-removed tags for the
     // CELL colouring. The hover tooltip below still uses the ORIGINAL counts, so
     // a removed tag stays visible on hover — it's only dropped from the diamond.
@@ -501,8 +501,10 @@
     // Gradient source (over EFFECTIVE counts). Default = non-neutral tags vs the
     // full effective total (MISC/QoL leave a gap — patch-page look). "Buff/nerf
     // only" (bnOnly) collapses to TWO bands: buff+NEW (green), nerf+DEL (red).
+    // `debut` = the item's introduction cell (data-debut): its NEW rows mean
+    // "item now exists", so they must NOT fold into buff (items_dyn only).
     const gradCounts = bnOnly
-      ? { buff: (eff.buff || 0) + (eff.new || 0),
+      ? { buff: (eff.buff || 0) + (debut ? 0 : (eff.new || 0)),
           nerf: (eff.nerf || 0) + (eff.del || 0) }
       : eff;
     const gradTagSet = bnOnly
@@ -682,7 +684,7 @@
   // cells the builder marked with data-ver/data-hkey (the hero actually changed
   // that patch) are filled — untouched cells stay as the CSS empty diamond, so
   // runtime work scales with real data, not the full N×M grid. Re-runnable: it
-  // clears any existing pill first, so the "Buff/nerf only" toggle can rebuild.
+  // clears any existing pill first, so the "Buff vs nerf" toggle can rebuild.
   function dynFillMatrix(table, manifest, bnOnly, removed) {
     const byVer = {};
     manifest.patches.forEach(p => { byVer[p.version] = p; });
@@ -700,7 +702,8 @@
       // entityId anchors the click to the entity on the patch page; fromTok makes
       // that page show a back-arrow returning here; filePrefix 'patches/' because
       // the matrix lives at site root, patch pages under /patches.
-      td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed));
+      const debut = td.dataset.debut === '1';
+      td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed, debut));
     });
   }
 
@@ -788,7 +791,7 @@
     });
   }
 
-  // Wire the heroes_dyn toolbar: Hide old (fit-to-width), Buff/nerf only,
+  // Wire the heroes_dyn toolbar: Hide old (fit-to-width), Buff vs nerf,
   // the "Remove" tag chips, and the hero search box.
   // Multi-select dropdown controls (.hd-dd): a flat button opens a checkbox popover.
   // The popover is PORTALED to <body> (so .creeps-scroll's contain:paint doesn't clip
@@ -852,32 +855,20 @@
   function dynSetupMatrix(table, manifest) {
     const elOld = document.getElementById('hd-hide-old');
     const elBn = document.getElementById('hd-bn-only');
-    const removed = new Set();                 // tags the user toggled off
+    const removed = new Set();                 // tags the user toggled off (Remove chips)
     const chips = [...table.closest('.creeps-page').querySelectorAll('.hd-tag[data-tag]')];
-    const syncChips = () => chips.forEach(c => c.classList.toggle('removed', removed.has(c.dataset.tag)));
     const layout = () => dynLayoutMatrix(table, !elOld || elOld.checked);
     const refill = () => dynFillMatrix(table, manifest, !!(elBn && elBn.checked), removed);
     refill();
     layout();
     if (elOld) elOld.addEventListener('change', layout);
 
-    // "Buff/nerf only": besides the two-band colouring, it auto-removes every
-    // tag except buff/nerf from the chips (more logical — the cell then shows
-    // ONLY buff vs nerf, matching the toggle's name). We snapshot the user's
-    // own Remove selection on the way in and restore it when they switch off.
-    let bnSnapshot = null;
-    if (elBn) elBn.addEventListener('change', () => {
-      if (elBn.checked) {
-        bnSnapshot = new Set(removed);
-        DYN_TAG_ORDER.forEach(t => { if (t !== 'buff' && t !== 'nerf') removed.add(t); });
-      } else {
-        removed.clear();
-        if (bnSnapshot) bnSnapshot.forEach(t => removed.add(t));
-        bnSnapshot = null;
-      }
-      syncChips();
-      refill();
-    });
+    // "Buff vs nerf": collapse each cell to two bands — buff + NEW (green) vs
+    // nerf + DEL (red); rework/misc/qol drop out of the colour (the hover tooltip
+    // still lists every tag). dynBuildPill does the buff←NEW / nerf←DEL fold, so
+    // this switch ONLY flips the bnOnly flag — the Remove chips stay an entirely
+    // INDEPENDENT control (no longer auto-toggled by this switch).
+    if (elBn) elBn.addEventListener('change', refill);
 
     // "Remove" tag chips — clicking toggles a tag off (sunken + grey) and drops
     // it from every dyn-cell's colouring (hover tooltip still lists it).

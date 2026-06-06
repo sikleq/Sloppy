@@ -2734,6 +2734,27 @@ ul.changes li.ability-row-end {
   align-self: center;
   padding: 0 4px;
 }
+/* When a pane carries an expandable formula table (scale_pill), TOP-anchor
+   both panes. Otherwise `align-items: center` re-centers the shorter pane
+   every time the <details> table toggles open — visibly shoving the old
+   ability block down. Top-anchoring makes the table grow downward only. */
+.ability-change-block .ability-change.unified-panes:has(.formula-table-wrap) {
+  align-items: start;
+}
+.ability-change-block .ability-change.unified-panes:has(.formula-table-wrap) > .ability-change-pane {
+  align-self: start;
+}
+/* Single-pane "New ability" card (ability_change old=None): one full-width,
+   top-anchored pane — no old side, no arrow. */
+.ability-change.unified-panes.is-single-new {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+.ability-change.unified-panes.is-single-new > .ability-change-pane {
+  align-self: start;
+  justify-self: stretch;
+  padding: 0 4px;
+}
 /* Old-icon underlay: when an ability_change unified block has a different
    icon for old vs new, both icons fully overlap inside the same 48px wrap.
    New is on top by default. Hovering the wrap shuffles them — old comes
@@ -3365,6 +3386,21 @@ ul.subnote-items > li::before {
   left: 0;
   top: 1px;
   color: #6e7681;
+}
+/* ---- Section intro (section_intro): descriptive lead-in under a header ----
+   Frames a category in prose; deliberately NOT a tagged change row (no badge,
+   no bullet). Muted + italic + a thin gold-tinted rail so it reads as context,
+   visually distinct from the BUFF/NERF/MISC rows that follow. */
+.section-intro {
+  margin: 2px 0 14px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.5;
+  color: #9aa4b1;
+  border-left: 2px solid rgba(227, 196, 106, 0.45);
+  background: rgba(227, 196, 106, 0.05);
+  border-radius: 0 5px 5px 0;
 }
 /* ---- Game-formula change (formula_change): old → new, ability_change-style ---- */
 .formula-change { margin: 10px 0 8px; }
@@ -5230,7 +5266,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%;
   background: rgba(125, 135, 155, 0.16);
 }
-.heroes-dyn-table tbody tr.row-marked td.hd-cell.hd-absent::after { background: transparent; }
+/* In a marked row the n/a dots STAY visible — they carry meaning (the item
+   didn't exist in those patches), unlike the decorative empty diamonds (below)
+   which drop out. Bump the alpha a touch so the faint dot reads on the gold band. */
+.heroes-dyn-table tbody tr.row-marked td.hd-cell.hd-absent::after { background: rgba(150, 160, 180, 0.42); }
 /* Buff/nerf-only: a touched cell with no buff/nerf reads as an EMPTY cell —
    flat fill, no glassy pill, no hover pop. Hover still fires the tooltip. */
 .heroes-dyn-table .dyn-cell-wrap.bn-empty .dyn-cell,
@@ -6061,13 +6100,20 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   flex: 1 1 360px;
   min-width: 290px;
 }
-/* Heading row = the patch picker (as the version) + "Terrain Changes" label,
-   aligned with the top of the map block. */
+/* Heading row = the patch picker (as the version) + "Terrain Changes" label.
+   Sized to the map toolbar's footprint so the heading sits on the toolbar's
+   horizontal line and the first change row lines up with the map's top edge:
+   28px control height (matches .tc-controls-bar's 28px buttons) + 10px bottom
+   gap (matches the toolbar's 10px bottom padding). */
 .terrain-list-head {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 14px;
+  height: 28px;            /* HARD-capped to the toolbar's control height — the
+                             Jersey label's tall line-box must not grow the row
+                             (it just centers/overflows), so the first change row
+                             stays at 28px + 10px = the map's top edge. */
+  margin: 0 0 10px;
   line-height: 1;
 }
 .terrain-list-head-label {
@@ -6079,6 +6125,13 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 }
 .terrain-list { padding-left: 4px; }
 .terrain-list li { padding: 3px 0; }
+/* First change row meets the map's TOP edge: drop the list's 3px top margin
+   (from ul.changes) and the first row's 3px top padding — together they pushed
+   the first tag ~6px below the map's top border. Specificity beats ul.changes. */
+.terrain-list.changes { margin-top: 0; }
+.terrain-list > li:first-child { padding-top: 0; }
+/* Nudge the first change row up so it sits flush with the map's top edge. */
+.terrain-list-pane { margin-top: -2px; }
 
 /* ---- tree + camp overlays (SVG), toggled by the top-bar buttons ---- */
 /* Each SVG fills the stage; viewBox 0..1280 == map native px. pointer-events
@@ -6232,10 +6285,17 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 /* The picker reuses the calendar year-picker structure but in the terrain
    page's GOLD theme (the calendar's is blue). It sits inline in the heading as
    the version, so the heading reads "[7.41 ▾] Terrain Changes". */
+/* Nudge the patch picker down 1px (the "Terrain Changes" label stays put). */
+.tc-picker { transform: translateY(1px); }
 .tc-picker .cal-year-current {
   background: linear-gradient(180deg, #3b2e1d 0%, #2a2014 100%);
   border: 1px solid #e3c46a;
   color: #f4e6bf;
+  /* Match the map toolbar's 28px control height so the heading row lines up
+     with the toolbar and the first change row meets the map's top edge. */
+  height: 28px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 .tc-picker .cal-year-caret { color: #e3c46a; }
 .tc-picker .cal-year-current:hover { border-color: #f0d896; }

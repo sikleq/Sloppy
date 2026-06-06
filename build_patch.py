@@ -857,6 +857,32 @@ FACETS = {
     "viper_caustic_bath":            ("Caustic Bath",     "Yellow2"),
     "windrunner_tangled":            ("Tangled",          "Yellow2"),
     "witch_doctor_cleft_death":      ("Cleft Death",      "Purple0"),
+    # --- Removed in 7.40 — colours lifted from the pre-7.40 datafeed
+    #     (scripts/fetch_facets.py over 7.36..7.39e). Kept here manually so a
+    #     future fetch_facets regen for a current patch doesn't drop them. ---
+    "brewmaster_roll_out_the_barrel":   ("Roll Out the Barrel", "Red1"),
+    "brewmaster_drunken_master":        ("Drunken Master",      "Yellow1"),
+    "clinkz_suppressive_fire":          ("Suppressive Fire",    "Gray3"),
+    "clinkz_engulfing_step":            ("Engulfing Step",      "Yellow0"),
+    "doom_bringer_boost_selling":       ("Devil's Bargain",     "Yellow0"),
+    "earth_spirit_resonance":           ("Resonance",           "Green0"),
+    "earth_spirit_stepping_stone":      ("Stepping Stone",      "Gray2"),
+    "earth_spirit_ready_to_roll":       ("Ready to Roll",       "Yellow1"),
+    "lone_druid_bear_with_me":          ("Bear with Me",        "Green1"),
+    "lone_druid_bear_necessities":      ("Bear Necessities",    "Gray1"),
+    "pangolier_double_jump":            ("Double Jump",         "Red1"),
+    "pangolier_thunderbolt":            ("Thunderbolt",         "Yellow1"),
+    "phantom_lancer_divergence":        ("Divergence",          "Blue2"),
+    "phantom_lancer_lancelot":          ("Lancelot",            "Yellow0"),   # = renamed Convergence
+    "riki_contract_killer":             ("Contract Killer",     "Gray3"),
+    "riki_exterminator":                ("Exterminator",        "Purple2"),
+    "slark_leeching_leash":             ("Leeching Leash",      "Green2"),
+    "slark_dark_reef_renegade":         ("Dark Reef Renegade",  "Blue2"),
+    "spectre_forsaken":                 ("Forsaken",            "Gray0"),
+    "spectre_twist_the_knife":          ("Twist the Knife",     "Purple2"),
+    "treant_primeval_power":            ("Primeval Power",      "Yellow2"),
+    "treant_sapling":                   ("Sapling",             "Green2"),
+    "marci_fleeting_fury":              ("Fleeting Fury",       "Red1"),      # COLOUR GUESSED
 }
 
 # Mapping from Valve's facet_color name → CSS gradient that EXACTLY matches
@@ -1935,18 +1961,28 @@ def ability_change(old, new, summary=None, tag=None):
     # first row at the Y-level of old's HEADER (not old's body), producing a
     # visibly off-axis layout. In that case, fall back to the full
     # symmetrical render (both heads shown) so the bodies top-align naturally.
-    _old_icon, _ = _resolve_icon(old)
+    # old=None → a single-pane "New ability" card: the same block visual
+    # (icon + name + NEW badge + summary) but ONLY the new pane, no old/arrow/
+    # connector. For genuinely-new abilities that don't replace or rework an
+    # existing one (NOT for Aghanim's Shard/Scepter sub-abilities — those stay
+    # inline). Neutralise every old-pane reference below.
+    single_new = old is None
     _new_icon, _ = _resolve_icon(new)
-    _old_rows = len(old.get("desc", []))
     _new_rows = len(new.get("desc", []))
-    in_place = (old["name"] == new["name"]) and (_old_icon == _new_icon)
-    # When the two sides share identity AND new has more rows than old, the
-    # default `is-in-place` CSS (center new pane vertically) puts new's first
-    # row at the Y-level of old's HEADER instead of old's body — visibly
-    # off-axis. Mark the block with `is-new-taller` so CSS can switch to
-    # top-anchored, full-width layout for the new pane while still hiding
-    # the duplicate header.
-    new_taller_inplace = in_place and (_new_rows > _old_rows)
+    if single_new:
+        _old_icon, _old_rows = _new_icon, 0
+        in_place = new_taller_inplace = False
+    else:
+        _old_icon, _ = _resolve_icon(old)
+        _old_rows = len(old.get("desc", []))
+        in_place = (old["name"] == new["name"]) and (_old_icon == _new_icon)
+        # When the two sides share identity AND new has more rows than old, the
+        # default `is-in-place` CSS (center new pane vertically) puts new's first
+        # row at the Y-level of old's HEADER instead of old's body — visibly
+        # off-axis. Mark the block with `is-new-taller` so CSS can switch to
+        # top-anchored, full-width layout for the new pane while still hiding
+        # the duplicate header.
+        new_taller_inplace = in_place and (_new_rows > _old_rows)
     # Asymmetric content: whichever side has fewer description rows gets
     # the compact-and-centered treatment so the shorter pane doesn't show
     # a sea of empty space next to the taller one. Skipped in `in_place`
@@ -1956,7 +1992,7 @@ def ability_change(old, new, summary=None, tag=None):
     # mode — a 1-row difference (e.g. 2 vs 3) isn't enough empty space to
     # justify centering one pane and looks odd: the smaller pane appears
     # offset rightward from the subgroup header above.
-    unified = (summary is not None) or (tag is not None)
+    unified = (summary is not None) or (tag is not None) or single_new
 
     if not in_place and not unified and abs(_old_rows - _new_rows) >= 2:
         compact_side = 'old' if _old_rows < _new_rows else 'new'
@@ -2044,8 +2080,8 @@ def ability_change(old, new, summary=None, tag=None):
         # icons differ; hover swaps z-index so the old icon flips to front.
         unified_icon = _new_icon
         is_innate = bool(new.get("innate"))
-        old_is_innate = bool(old.get("innate"))
-        has_old_underlay = (_old_icon != _new_icon)
+        old_is_innate = (not single_new) and bool(old.get("innate"))
+        has_old_underlay = (not single_new) and (_old_icon != _new_icon)
         # Innate marker on the NEW icon — visible by default, hidden on hover
         # when an old underlay exists (so the old icon's own marker takes over).
         # Skip the marker when the icon already IS the generic innate icon
@@ -2093,7 +2129,7 @@ def ability_change(old, new, summary=None, tag=None):
             f'{old_marker_html}'
             f'</div>'
         )
-        same_name = old["name"] == new["name"]
+        same_name = single_new or (old["name"] == new["name"])
         if same_name:
             title_inner = new["name"]
         else:
@@ -2129,7 +2165,7 @@ def ability_change(old, new, summary=None, tag=None):
         # Initial `d=""` so nothing renders pre-JS. drawAbilityChangeConnectors()
         # sets the real path after measuring layout — prevents a brief flash of
         # the placeholder curve at load time.
-        connector_html = (
+        connector_html = '' if single_new else (
             '<svg class="ability-change-connector" '
             'viewBox="0 0 100 100" preserveAspectRatio="none" '
             'aria-hidden="true">'
@@ -2138,14 +2174,23 @@ def ability_change(old, new, summary=None, tag=None):
             'stroke-dasharray="3 3" stroke-linecap="round" />'
             '</svg>'
         )
-        panes_html = (
-            f'<div class="ability-change unified-panes{extra_cls}" '
-            f'data-tag="new del rework">'
-            f'{_side(old, "old")}'
-            f'<span class="ability-change-arrow">→</span>'
-            f'{_side(new, "new")}'
-            f'</div>'
-        )
+        if single_new:
+            # One pane, full width — no old side, no arrow.
+            panes_html = (
+                f'<div class="ability-change unified-panes is-single-new" '
+                f'data-tag="new">'
+                f'{_side(new, "new")}'
+                f'</div>'
+            )
+        else:
+            panes_html = (
+                f'<div class="ability-change unified-panes{extra_cls}" '
+                f'data-tag="new del rework">'
+                f'{_side(old, "old")}'
+                f'<span class="ability-change-arrow">→</span>'
+                f'{_side(new, "new")}'
+                f'</div>'
+            )
         return out + (
             f'<div class="{block_cls}">'
             f'{icon_html}'
@@ -2817,7 +2862,7 @@ def ul_open():
         )
         icon = (f'<img src="{OTHER_ICON_URL}" alt="" '
                 f'class="ability-icon-img" loading="lazy" onerror="{on_err}">')
-        out += ('<h4 class="subgroup">Other</h4>'
+        out += ('<h4 class="subgroup">STATS</h4>'
                 '<div class="ability-block other-block">'
                 f'<div class="ability-icon-wrap">{icon}</div>')
         _State.ability_block_open = True
@@ -2969,6 +3014,16 @@ def subnote(text):
                 f'<ul class="subnote-items">{items_html}</ul>'
                 '</details></li></ul>')
     return f'<ul class="subnotes"><li>{text}</li></ul>'
+
+
+def section_intro(text):
+    """Descriptive lead-in under a plain_header that FRAMES a category without
+    being a tagged change row — no badge, no bullet, no dynamics tally. Use for
+    section preambles (e.g. the Invulnerability Targeting summary) where the
+    sentence only sets up the per-spell rows below; a change-tag (MISC/etc.)
+    would wrongly read as "a miscellaneous change". Emit right after the
+    plain_header(), before the first subgroup()/ul_open()."""
+    return f'<p class="section-intro">{text}</p>'
 
 
 def _days_ago(version):
@@ -4557,7 +4612,7 @@ W(li("Damage bonus decreased from +15 to +12", b(15, 12)))
 W(ul_close())
 W(item_header("Smoke of Deceit"))
 W(ul_open())
-W(li("Using Smoke of Deceit now broadcasts a chat message in allied chat", t("MISC")))
+W(li("Using Smoke of Deceit now broadcasts a chat message in allied chat", t("QoL")))
 W(ul_close())
 
 # ===== NEUTRAL ITEM UPDATES =====
@@ -4682,7 +4737,7 @@ W(ul_close())
 W(hero_header("Bloodseeker"))
 W(ability("Bloodrage", slug="bloodseeker_bloodrage"))
 W(ul_open())
-W(li("No longer procs Magic Stick or its upgrades", t("MISC")))
+W(li("No longer procs Magic Stick or its upgrades", t("BUFF")))
 W(ul_close())
 W(ability("Rupture", slug="bloodseeker_rupture"))
 W(ul_open())
@@ -4737,7 +4792,7 @@ W(ul_close())
 W(hero_header("Clockwerk"))
 W(ability("Power Cogs", slug="rattletrap_power_cogs"))
 W(ul_open())
-W(li("Pushback and damage now apply against heroes with no mana", t("MISC")))
+W(li("Pushback and damage now apply against heroes with no mana", t("BUFF"), extra=inline_note("Targets Huskar in particular — previously Power Cogs had no effect on him at all, as he has no mana to drain.")))
 W(li("Mana Cost increased from 60/65/70/75 to 75", b([60, 65, 70, 75], 75, l=True)))
 W(li("Damage rescaled from 50/125/200/275 to 55/110/165/220", b([50, 125, 200, 275], [55, 110, 165, 220])))
 W(ul_close())
@@ -14318,7 +14373,7 @@ W(plain_header("General Changes"))
 # One ul so the tag-order sorter ranks across all three (NEW → NEW → REWORK);
 # they were split across two uls before, which left REWORK between the two NEWs.
 W(ul_open())
-W(li("All Facets that used to have 6 All Attributes bonuses now have 7 bonuses again", t("NEW"), extra=show_list("Batrider's Arsonist", "Magnus' Diminishing Return", "Meepo's More Meepo", "Monkey King's Simian Stride", "Night Stalker's Voidbringer", "Silencer's Synaptic Split")))
+W(li("All Facets that used to have 6 All Attributes bonuses now have 7 bonuses again", t("BUFF"), extra=show_list("Batrider's Arsonist", "Magnus' Diminishing Return", "Meepo's More Meepo", "Monkey King's Simian Stride", "Night Stalker's Voidbringer", "Silencer's Synaptic Split")))
 W(li("Tier 4 Towers now have a Barracks Reinforcement buff. Each allied barracks that has not been destroyed provides +4 armor to both Tier 4 towers", t("NEW"), extra=inline_note("Bonus is for each individual building, totaling in +24 Armor for 6 Barracks")))
 W(li("Talents no longer require a skill point to level", t("REWORK"), extra=inline_note("Now talents are learned by using their own talent points available at levels 10, 15, 20, 25, 27, 28, 29, and 30. This results in all +2 All Attributes bonuses skilled by level 22")))
 W(ul_close())
@@ -14403,36 +14458,35 @@ W(li("Radiant Secret Shop trigger area moved slightly towards the radiant Tier 1
 W(ul_close())
 
 W(plain_header("Invulnerability Targeting"))
-W(ul_open())
-W(li("Invulnerability targeting rules of certain items and abilities have been updated", t("MISC")))
-W(li("Most items and abilities that previously could target and/or affect invulnerable units no longer do so", t("MISC")))
-W(li("The following spells have been changed:", t("MISC")))
-W(ul_close())
+W(section_intro("Invulnerability targeting rules have been updated — most items and abilities that previously could target and/or affect invulnerable units no longer do so."))
 W(subgroup("Items"))
 W(ul_open())
-W(li("Nullifier's Nullify can no longer target invulnerable units", t("NERF")))
+W(li("Nullifier's Nullify can no longer target invulnerable units", t("DEL")))
 W(ul_close())
 W(subgroup("Neutral Creeps"))
 W(ul_open())
-W(li("Satyr Banisher's Purge can no longer target invulnerable units", t("NERF")))
+W(li("Satyr Banisher's Purge can no longer target invulnerable units", t("DEL")))
 W(ul_close())
 W(subgroup("Heroes"))
 W(ul_open())
 W(li("Dark Seer's Vacuum no longer affects invulnerable units", t("DEL")))
-W(li("Naga Siren's Ensnare can no longer target invulnerable units unless this invulnerability is provided by Song of the Siren", t("NERF")))
-W(li("Ogre Magi's Bloodlust can no longer target invulnerable units", t("NERF"), extra=inline_note("Can still target invulnerable buildings (i.e. Tier 2-4 towers when the previous ones are not destroyed)")))
-W(li("Oracle's Fortune's End can no longer target invulnerable units, but does affect invulnerable units in the radius", t("NERF")))
-W(li("Shadow Demon's Demonic Purge can no longer target invulnerable units", t("NERF")))
-W(li("Shadow Demon's Demonic Cleanse can no longer target invulnerable units", t("NERF")))
-W(li("Sniper's Assassinate can no longer target invulnerable units", t("NERF")))
-W(li("Sven's Storm Hammer with Aghanim's Scepter can no longer target invulnerable units, but does affect invulnerable units in the radius", t("NERF")))
-W(li("Vengeful Spirit's Nether Swap can no longer target invulnerable units", t("NERF")))
+W(li("Naga Siren's Ensnare can no longer target invulnerable units unless this invulnerability is provided by Song of the Siren", t("DEL")))
+W(li("Ogre Magi's Bloodlust can no longer target invulnerable units", t("DEL"), extra=inline_note("Can still target invulnerable buildings (i.e. Tier 2-4 towers when the previous ones are not destroyed)")))
+W(li("Oracle's Fortune's End can no longer target invulnerable units, but does affect invulnerable units in the radius", t("DEL")))
+W(li("Shadow Demon's Demonic Purge can no longer target invulnerable units", t("DEL")))
+W(li("Shadow Demon's Demonic Cleanse can no longer target invulnerable units", t("DEL")))
+W(li("Sniper's Assassinate can no longer target invulnerable units", t("DEL")))
+W(li("Sven's Storm Hammer with Aghanim's Scepter can no longer target invulnerable units, but does affect invulnerable units in the radius", t("DEL")))
+W(li("Vengeful Spirit's Nether Swap can no longer target invulnerable units", t("DEL")))
 W(ul_close())
+W(subgroup("Cyclone"))
+W(section_intro("Since Cyclone effects also make the unit invulnerable, all changes above apply to them as well — these are the special cases:"))
 W(ul_open())
-W(li("Since Cyclone effects also make the unit invulnerable, all changes mentioned above apply to them as well. As a result, there are these special cases:", t("MISC"), extra=inline_note("Nullifier's Nullify will dispel Cyclone off the target immediately if Cyclone was cast on a unit already affected by the Nullify debuff")))
+W(li("Nullifier's Nullify will dispel Cyclone off the target immediately if Cyclone was cast on a unit already affected by the Nullify debuff", t("MISC")))
 W(li("Oracle's Fortune's End cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target", t("MISC")))
-W(li("Sven's Storm Hammer with Aghanim's Scepter cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target", t("MISC"), extra=inline_note("All three of these will also dispel Cyclone if the spell projectile was launched (or started channeling) before the target got Cycloned")))
+W(li("Sven's Storm Hammer with Aghanim's Scepter cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target", t("MISC")))
 W(ul_close())
+W(subnote("All three of these will also dispel Cyclone if the spell projectile was launched (or started channeling) before the target got Cycloned"))
 
 # ===== ITEM UPDATES =====
 W(section("Item Updates"))
@@ -14453,32 +14507,32 @@ W(li("Cost increased from 50 to 55", b(50, 55, l=True)))
 W(ul_close())
 W(item_header("Observer Ward"))
 W(ul_open())
-W(li("Observer Wards cannot be planted within 300 units of another Observer Ward from the same team that has been planted within the last second", t("MISC")))
-W(li("Plant no longer increased by cast range increases", t("MISC")))
+W(li("Observer Wards cannot be planted within 300 units of another Observer Ward from the same team that has been planted within the last second", t("QoL")))
+W(li("Plant no longer increased by cast range increases", t("DEL")))
 W(ul_close())
 W(item_header("Sentry Ward"))
 W(ul_open())
-W(li("Sentry Wards cannot be planted within 300 units of another Sentry Ward from the same team that has been planted within the last second", t("MISC")))
-W(li("Plant no longer increased by cast range increases", t("MISC")))
+W(li("Sentry Wards cannot be planted within 300 units of another Sentry Ward from the same team that has been planted within the last second", t("QoL")))
+W(li("Plant no longer increased by cast range increases", t("DEL")))
 W(ul_close())
 W(item_header("Smoke of Deceit"))
 W(ul_open())
-W(li("Can be used directly from the backpack", t("MISC")))
-W(li("Has no cooldown when entering the main inventory from the backpack", t("MISC")))
+W(li("Can be used directly from the backpack", t("QoL")))
+W(li("Has no cooldown when entering the main inventory from the backpack", t("QoL")))
 W(ul_close())
 W(item_header("Tango"))
 W(ul_open())
 W(li("Initial and maximum stock increased from 8 to 10", b(8, 10)))
-W(li("Shared Tango now heals for half the amount per second", t("MISC")))
+W(li("Shared Tango now heals for half the amount per second", t("NEW")))
 W(ul_close())
 W(item_header("Roshan's Banner"))
 W(ul_open())
-W(li("Now upgrades with each subsequent drop", t("NEW"), extra=inline_note("Effect radius rescaled from 650 to 600/900/1200")))
+W(li("Now upgrades with each subsequent drop", t("NEW"), extra=inline_note("Effect radius rescaled from 650 to 600/900/1200 " + b(650, [600, 900, 1200]))))
 W(li("Hits to kill increased from 6 to 6/8/10", b(6, [6, 8, 10])))
 W(ul_close())
 W(item_header("Ghost Scepter"))
 W(ul_open())
-W(li("Ghost Form magic damage vulnerability decreased from 40% to 30%", b(40, 30)))
+W(li("Ghost Form magic damage vulnerability decreased from 40% to 30%", b(40, 30, l=True)))
 W(ul_close())
 W(item_header("Ring of Tarrasque"))
 W(ul_open())
@@ -14500,7 +14554,7 @@ W(item_header("Bloodstone"))
 W(ul_open())
 W(li("Total cost decreased from 4400 to 4350 due to Voodoo Mask cost decrease", b(4400, 4350, l=True)))
 W(li("Spell Lifesteal bonus increased from +20% to +25%", b(20, 25)))
-W(li("Bloodpact spell lifesteal multiplier decreased from 4x to 3x", t("MISC")))
+W(li("Bloodpact spell lifesteal multiplier decreased from 4x to 3x", b(4, 3)))
 W(ul_close())
 W(item_header("Boots of Bearing", changed=True))
 W(auto_components_change("Boots of Bearing", "7.40"))
@@ -14509,7 +14563,7 @@ W(li("Health Regen bonus increased from +15 to +18", b(15, 18)))
 W(ul_close())
 W(item_header("Crimson Guard"))
 W(ul_open())
-W(li("Guard buff is no longer dispellable", t("MISC")))
+W(li("Guard buff is no longer dispellable", t("NEW")))
 W(ul_close())
 W(item_header("Dagon"))
 W(ul_open())
@@ -14549,19 +14603,19 @@ W(ul_close())
 W(item_header("Hand of Midas"))
 W(ul_open())
 W(li("Transmute no longer has an experience multiplier", t("NERF")))
-W(li("Transmute charge restore time decreased from 110s to 90s", t("MISC")))
+W(li("Transmute charge restore time decreased from 110s to 90s", b(110, 90, l=True)))
 W(ul_close())
 W(item_header("Heart of Tarrasque"))
 W(ul_open())
 W(li("Total cost decreased from 5200 to 5100 due to Ring of Tarrasque cost decrease", b(5200, 5100, l=True)))
 W(li("Max Health Regen bonus decreased from +1.4% to +1%", b(1.4, 1)))
-W(li("Behemoth's Blood: New Passive Ability", t("MISC"), extra=inline_note("Wearer's health regen is increased by 1.5% of missing health<br>Multiple instances of Behemoth's Blood don't stack")))
+W(li("Behemoth's Blood: New Passive Ability", t("NEW"), extra=inline_note("Wearer's health regen is increased by 1.5% of missing health<br>Multiple instances of Behemoth's Blood don't stack")))
 W(ul_close())
 W(item_header("Heaven's Halberd"))
 W(ul_open())
-W(li("Disarm is now only dispellable by strong dispels", t("MISC"), extra=inline_note("Still does not pierce debuff immunity")))
+W(li("Disarm is now only dispellable by strong dispels", t("BUFF"), extra=inline_note("Still does not pierce debuff immunity")))
 W(li("Disarm no longer has separate disarm durations for melee and ranged targets. Duration is always 3 seconds", t("NERF")))
-W(li("Disarm cooldown increased from 18s to 20s", t("MISC")))
+W(li("Disarm cooldown increased from 18s to 20s", b(18, 20, l=True)))
 W(ul_close())
 W(item_header("Helm of the Dominator"))
 W(ul_open())
@@ -14572,7 +14626,7 @@ W(auto_components_change("Holy Locket", "7.40"))
 W(ul_open())
 W(li("Recipe cost increased from 800 to 1340 " + b(800, 1340, l=True) + ". Total cost unchanged at 2250 due to Iron Branch cost increase", t("MISC")))
 W(li("All Attributes bonus decreased from +9 to +7", b(9, 7)))
-W(li("Energy Charge automatic charge gain time increased from 8s to 10s", t("MISC")))
+W(li("Energy Charge automatic charge gain time increased from 8s to 10s", b(8, 10, l=True)))
 W(li("Energy Charge max charges increased from 20 to 25", b(20, 25)))
 W(li("Energy Charge cast range increased from 500 to 600", b(500, 600)))
 W(li("Energy Charge mana restore per charge decreased from 17 to 15", b(17, 15)))
@@ -14596,11 +14650,11 @@ W(li("Armor bonus increased from +4 to +5", b(4, 5)))
 W(ul_close())
 W(item_header("Meteor Hammer"))
 W(ul_open())
-W(li("Meteor Hammer stun duration increased from 0.5s to 0.75s", t("MISC")))
+W(li("Meteor Hammer stun duration increased from 0.5s to 0.75s", b(0.5, 0.75)))
 W(ul_close())
 W(item_header("Nullifier"))
 W(ul_open())
-W(li("Nullify can no longer target invulnerable units", t("NERF")))
+W(li("Nullify can no longer target invulnerable units", t("DEL")))
 W(ul_close())
 W(item_header("Octarine Core"))
 W(ul_open())
@@ -14659,7 +14713,7 @@ W(ul_close())
 W(item_header("Silver Edge"))
 W(ul_open())
 W(li("Total cost decreased from 5800 to 5700 due to Shadow Amulet cost decrease", b(5800, 5700, l=True)))
-W(li("Shadow Walk debuff now caps the target's movement speed to 200. This debuff is not dispellable and does not pierce debuff immunity", t("MISC")))
+W(li("Shadow Walk debuff now caps the target's movement speed to 200. This debuff is not dispellable and does not pierce debuff immunity", t("NEW")))
 W(ul_close())
 W(item_header("Urn of Shadows"))
 W(ul_open())
@@ -14680,7 +14734,7 @@ W(li("Health Regen bonus increased from +4 to +4.5", b(4, 4.5)))
 W(ul_close())
 W(item_header("Wind Waker"))
 W(ul_open())
-W(li("Cyclone cooldown increased from 16s to 19s", t("MISC")))
+W(li("Cyclone cooldown increased from 16s to 19s", b(16, 19, l=True)))
 W(ul_close())
 W(item_header("Wraith Band"))
 W(ul_open())
@@ -14735,9 +14789,9 @@ W(li("Item cycled out", t("DEL")))
 W(ul_close())
 W(item_header("Jidi Pollen Bag"))
 W(ul_open())
-W(li("Pollinate Duration decreased from 12s to 9s", t("MISC")))
+W(li("Pollinate Duration decreased from 12s to 9s", b(12, 9)))
 W(li("Pollinate Max Health Damage decreased from 12% to 9%", b(12, 9), extra=inline_note("Dormant Curio Max Health Damage decreased from 15.6% to 11.7%")))
-W(li("Pollinate Cooldown decreased from 45s to 25s", t("MISC")))
+W(li("Pollinate Cooldown decreased from 45s to 25s", b(45, 25, l=True)))
 W(ul_close())
 W(item_header("Psychic Headband"))
 W(ul_open())
@@ -14776,12 +14830,12 @@ W(ul_close())
 W(item_header("Idol of Scree'auk", new="Tier 4 Artifact"))
 W(ul_open())
 W(li("Active: False Flight. Grants phased movement, 50% slow resistance, and 25% evasion for 5s. No Mana Cost. Cooldown: 30s", t("MISC")))
-W(li("Dormant Curio increases duration from 5s to 6.5s", t("MISC")))
+W(li("Dormant Curio increases duration from 5s to 6.5s", b(5, 6.5)))
 W(ul_close())
 W(item_header("Metamorphic Mandible", new="Tier 4 Artifact"))
 W(ul_open())
 W(li("Active: Pupate. The wearer enters an insect form for 4 seconds, increasing magic resistance by 35% and movement speed by 15%, but decreasing size by 20% and armor by 45%. No Mana Cost. Cooldown: 30s. Can be dispelled. Can't be cast while channeling", t("MISC")))
-W(li("Dormant Curio increases duration from 4s to 5.2s", t("MISC")))
+W(li("Dormant Curio increases duration from 4s to 5.2s", b(4, 5.2)))
 W(ul_close())
 W(item_header("Rattlecage"))
 W(ul_open())
@@ -14822,11 +14876,11 @@ W(ul_open())
 W(li("Base Strength decreased from 22 to 21", b(22, 21)))
 W(li("Base Agility decreased from 23 to 22", b(23, 22)))
 W(li("Damage at level 1 decreased by 1 (from 50–60 to 49–59)", t("MISC")))
-W(li("The Quickening: Cooldown reduction on hero death decreased from 6s to 5s", t("MISC")))
+W(li("The Quickening: Cooldown reduction on hero death decreased from 6s to 5s", b(6, 5)))
 W(ul_close())
 W(ability("Mist Coil", slug="abaddon_death_coil"))
 W(ul_open())
-W(li("Cooldown increased from 6.5/6/5.5/5s to 8/7/6/5s", t("MISC")))
+W(li("Cooldown increased from 6.5/6/5.5/5s to 8/7/6/5s", b([6.5, 6, 5.5, 5], [8, 7, 6, 5], l=True)))
 W(li("Damage/Heal increased from 80/150/220/290 to 95/160/225/290", b([80, 150, 220, 290], [95, 160, 225, 290])))
 W(ul_close())
 
@@ -14870,8 +14924,8 @@ W(ul_close())
 W(hero_header("Axe"))
 W(ability("Berserker's Call", slug="axe_berserkers_call"))
 W(ul_open())
-W(li("Duration increased from 1.8/2.2/2.6/3s to 2.1/2.4/2.7/3s", t("MISC")))
-W(li("Cooldown increased from 17/15/13/11s to 18/16/14/12s", t("MISC")))
+W(li("Duration increased from 1.8/2.2/2.6/3s to 2.1/2.4/2.7/3s", b([1.8, 2.2, 2.6, 3], [2.1, 2.4, 2.7, 3])))
+W(li("Cooldown increased from 17/15/13/11s to 18/16/14/12s", b([17, 15, 13, 11], [18, 16, 14, 12], l=True)))
 W(ul_close())
 W(ability("Battle Hunger", slug="axe_battle_hunger"))
 W(ul_open())
@@ -14891,7 +14945,7 @@ W(ul_close())
 W(hero_header("Bane"))
 W(ability("Nightmare", slug="bane_nightmare"))
 W(ul_open())
-W(li("Cooldown increased from 24/21/18/15s to 25/22/19/16s", t("MISC")))
+W(li("Cooldown increased from 24/21/18/15s to 25/22/19/16s", b([24, 21, 18, 15], [25, 22, 19, 16], l=True)))
 W(ul_close())
 W(ability("Fiend's Grip", slug="bane_fiends_grip"))
 W(ul_open())
@@ -14909,14 +14963,14 @@ W(li("Movement Slow decreased from 8/16/24/32% to 6/12/18/24%", b([8, 16, 24, 32
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 Talent Flaming Lasso Cooldown Reduction increased from 7s to 8s", t("MISC")))
+W(li("Level 15 Talent Flaming Lasso Cooldown Reduction increased from 7s to 8s", b(7, 8)))
 W(ul_close())
 W(subgroup("Facet: Arsonist"))
 
 # Beastmaster
 W(hero_header("Beastmaster"))
 W(ul_open())
-W(li("Call of the Wild Boar: Boar's Base Attack Time worsened from 1.25s to 1.35s", t("MISC")))
+W(li("Call of the Wild Boar: Boar's Base Attack Time worsened from 1.25s to 1.35s", b(1.25, 1.35, l=True)))
 W(ul_close())
 W(ability("Wild Axes", slug="beastmaster_wild_axes"))
 W(ul_open())
@@ -14932,7 +14986,7 @@ W(hero_header("Bloodseeker"))
 W(ability("Sanguivore", slug="bloodseeker_sanguivore"))
 W(ul_open())
 W(li("Base heal increased from 25 to 30", b(25, 30)))
-W(li("No longer upgraded with neither Aghanim's Shard or Aghanim's Scepter", t("MISC")))
+W(li("No longer upgraded with Aghanim's Shard or Aghanim's Scepter", t("DEL")))
 W(ul_close())
 W(ability("Bloodrage", slug="bloodseeker_bloodrage"))
 W(ul_open())
@@ -14955,7 +15009,7 @@ W(ul_close())
 W(hero_header("Bounty Hunter"))
 W(ability("Shadow Walk", slug="bounty_hunter_wind_walk"))
 W(ul_open())
-W(li("Stun Duration increased from 0.8/1/1.2/1.4s to 1/1.2/1.4/1.6s", t("MISC")))
+W(li("Stun Duration increased from 0.8/1/1.2/1.4s to 1/1.2/1.4/1.6s", b([0.8, 1, 1.2, 1.4], [1, 1.2, 1.4, 1.6])))
 W(ul_close())
 W(subgroup("Facet: Cutpurse"))
 
@@ -14964,18 +15018,43 @@ W(hero_header("Brewmaster"))
 W(ul_open())
 W(li("Strength gain decreased from 3.7 to 3.2", b(3.7, 3.2)))
 W(li("Intelligence gain increased from 1.6 to 1.9", b(1.6, 1.9)))
-W(li("Removed Roll Out The Barrel and Drunken Master facets", t("DEL")))
+W(ul_close())
+W(subgroup("Abilities"))
+W(ul_open())
+W(li(facet_badge("brewmaster_roll_out_the_barrel") + " " + facet_badge("brewmaster_drunken_master"), t("DEL")))
 W(li("Removed Primal Companion ability", t("DEL")))
 W(li("Removed Belligerent innate ability", t("DEL")))
 W(ul_close())
-W(ability("Liquid Courage", slug="brewmaster_liquid_courage"))
-W(ul_open())
-W(li("New innate ability. Passive, improves with Brewmaster's level", t("MISC"), extra=inline_note("When Brewmaster drops below 50% Health he gains a Status Resistance buff and his movement speed alternates every 1 second between being faster and being slower. The effect becomes stronger at lower health, scaling from 0 up to max values at 20% Health. Max Status Resistance is 10.5% + 0.5% per Brewmaster's level up, Max Speed Increase is 25%, Max Speed Slow is 10%")))
-W(li("Upgraded with Aghanim's Shard", t("MISC"), extra=inline_note("Brewmaster may activate the ability to toss a strong drink to himself or a teammate, granting the max effects of his innate for 5 seconds, and also providing 2% Max HP Regen per second. Cast Range: 800. Mana Cost: 50. Cooldown: 20s")))
-W(ul_close())
+_lc_pill, _lc_table = scale_pill("10.5% + 0.5% per level up",
+                                 lambda L: 10.5 + 0.5 * L,
+                                 levels=[1, 5, 10, 15, 20, 25, 30], value_fmt="{:.1f}%")
+W(ability_change(
+    old=dict(
+        name="Belligerent",
+        innate=True,
+        desc=[
+            "Passive.",
+            "Whenever Brewmaster respawns or comes out of Primal Split, he gains <b>25%</b> bonus attack damage. Duration on respawn: 45s. Duration after Primal Split: 15s.",
+        ],
+    ),
+    new=dict(
+        name="Liquid Courage",
+        slug="brewmaster_liquid_courage",
+        innate=True,
+        desc=[
+            "Passive. Improves with Brewmaster's level.",
+            "When Brewmaster drops below 50% Health he gains a Status Resistance buff, and his movement speed alternates every 1 second between faster and slower. The effect grows stronger at lower health, scaling from 0 up to max values at 20% Health.",
+            "Max Status Resistance is " + _lc_pill + ", Max Speed Increase is <b>25%</b>, Max Speed Slow is <b>10%</b>.",
+            aghs_shard_line("Brewmaster may activate the ability to toss a strong drink to himself or a teammate, granting the max effects of his innate for 5 seconds plus 2% Max HP Regen per second. Cast Range: 800. Mana Cost: 50. Cooldown: 20s."),
+        ],
+        tables=[_lc_table],
+    ),
+    summary="New innate ability.",
+    tag="new",
+))
 W(ability("Thunder Clap", slug="brewmaster_thunder_clap"))
 W(ul_open())
-W(li("Cast point improved from 0.35s to 0.3s", t("MISC")))
+W(li("Cast point improved from 0.35s to 0.3s", b(0.35, 0.3, l=True)))
 W(li("Mana Cost rescaled from 90/100/110/120 to 100", b([90, 100, 110, 120], 100, l=True)))
 W(li("Radius rescaled from 325/350/375/400 to 375", b([325, 350, 375, 400], 375)))
 W(ul_close())
@@ -14986,7 +15065,7 @@ W(ul_close())
 W(ability("Drunken Brawler", slug="brewmaster_drunken_brawler"))
 W(ul_open())
 W(li("Moved Brewed Up effect from Cinder Brew to Drunken Brawler", t("MISC"), extra=inline_note("When Brewmaster casts any ability, he becomes Brewed Up for 5 seconds, gaining +150% to his stance bonuses. If he is already Brewed Up, the duration is extended by 1s. After Brewed Up ends, Brewmaster is hungover and cannot become Brewed Up again for 9 seconds")))
-W(li("Earth Stance Magic Resistance increased from 5/10/15/20% to 8/12/16/20%", b([5, 10, 15, 20], [8, 12, 16, 20], l=True)))
+W(li("Earth Stance Magic Resistance increased from 5/10/15/20% to 8/12/16/20%", b([5, 10, 15, 20], [8, 12, 16, 20])))
 W(li("Fire Stance Attack Speed increased from 10/15/20/25 to 10/20/30/40", b([10, 15, 20, 25], [10, 20, 30, 40])))
 W(li("Void Stance removed", t("DEL")))
 W(li("Stance visual indicator is now always present around Brewmaster", t("QoL")))
@@ -14995,7 +15074,7 @@ W(ul_close())
 W(ability("Primal Split", slug="brewmaster_primal_split"))
 W(ul_open())
 W(li("Void Brewling removed", t("DEL")))
-W(li("Duration increased from 16/18/20s to 16/20/24s", t("MISC")))
+W(li("Duration increased from 16/18/20s to 16/20/24s", b([16, 18, 20], [16, 20, 24])))
 W(li("All Brewlings now receive their respective Drunken Brawler stances", t("MISC")))
 W(li("Earth Brewling's Debuff Immunity ability renamed to Earth Element as it no longer grants Debuff Immunity. Now it provides 80% Status Resistance and 60% Magic Resistance instead", t("DEL")))
 W(li("Earth Brewling's Demolish Bonus Building Damage decreased from 50/100/150 to 40/80/120", b([50, 100, 150], [40, 80, 120])))
@@ -15064,15 +15143,15 @@ W(li("Rawhide: Bonus Max Health decreased from 30 to 25", b(30, 25)))
 W(ul_close())
 W(ability("Work Horse", slug="centaur_work_horse"))
 W(ul_open())
-W(li("Cooldown increased from 24s to 35s", t("MISC")))
-W(li("Duration decreased from 8s to 7s", t("MISC")))
+W(li("Cooldown increased from 24s to 35s", b(24, 35, l=True)))
+W(li("Duration decreased from 8s to 7s", b(8, 7)))
 W(ul_close())
 
 # Chaos Knight
 W(hero_header("Chaos Knight"))
 W(ul_open())
-W(li("Min Base Damage increased by 5", t("MISC")))
-W(li("Max Base Damage decreased by 5", t("MISC")))
+W(li("Min Base Damage increased by 5", bstat_h("Chaos Knight", "AttackDamageMin", "7.39e", 5), extra=note_box(hero="Chaos Knight", field="AttackDamageMin", before_patch="7.39e")))
+W(li("Max Base Damage decreased by 5", bstat_h("Chaos Knight", "AttackDamageMax", "7.39e", -5), extra=note_box(hero="Chaos Knight", field="AttackDamageMax", before_patch="7.39e")))
 W(li("Damage at level 1 changed from 48–78 to 53–73", t("REWORK"), extra=inline_note("Damage spread decreased from 30 to 20")))
 W(ul_close())
 W(subgroup("Talents"))
@@ -15085,7 +15164,7 @@ W(hero_header("Chen"))
 W(ability("Penitence", slug="chen_penitence"))
 W(ul_open())
 W(li("Mana Cost increased from 70/75/80/85 to 80/90/100/110", b([70, 75, 80, 85], [80, 90, 100, 110], l=True)))
-W(li("Cooldown increased from 14/13/12/11s to 20/17/14/11s", t("MISC")))
+W(li("Cooldown increased from 14/13/12/11s to 20/17/14/11s", b([14, 13, 12, 11], [20, 17, 14, 11], l=True)))
 W(li("No longer grants bonus attack range", t("DEL")))
 W(li("Now deals 50/75/100/125 pure damage by default", t("NEW")))
 W(ul_close())
@@ -15097,15 +15176,34 @@ W(ul_close())
 
 # Clinkz
 W(hero_header("Clinkz"))
+W(subgroup("Abilities"))
 W(ul_open())
-W(li("Removed Suppressive Fire and Engulfing Step facets", t("DEL")))
+W(li(facet_badge("clinkz_suppressive_fire") + " " + facet_badge("clinkz_engulfing_step"), t("DEL")))
 W(li("Removed Tar Bomb ability", t("DEL")))
 W(li("Removed Bone and Arrow innate ability", t("DEL")))
 W(ul_close())
-W(ability("Infernal Shred", slug="clinkz_infernal_shred"))
-W(ul_open())
-W(li("New innate ability. Passive, can't be leveled up", t("MISC"), extra=inline_note("Clinkz and his skeletons apply a stacking debuff that causes their attacks to pierce up to 20% of the target's armor. Clinkz applies 2% per attack, and skeletons apply 1%. Debuff lasts 5 seconds")))
-W(ul_close())
+W(ability_change(
+    old=dict(
+        name="Bone and Arrow",
+        innate=True,
+        desc=[
+            "Passive.",
+            "Clinkz summons a Skeleton Archer when he dies. Tower hits on the archers count as hero hits.",
+        ],
+    ),
+    new=dict(
+        name="Infernal Shred",
+        slug="clinkz_infernal_shred",
+        innate=True,
+        desc=[
+            "Passive.",
+            "Clinkz and his skeletons apply a stacking debuff that causes their attacks to pierce up to <b>20%</b> of the target's armor. Clinkz applies 2% per attack, his skeletons apply 1%. Debuff lasts 5 seconds.",
+            inline_note("Doesn't affect the target's armor directly — it simply improves attacks for Clinkz and his skeletons."),
+        ],
+    ),
+    summary="New innate ability.",
+    tag="new",
+))
 W(ability("Strafe", slug="clinkz_strafe"))
 W(ul_open())
 W(li("Skeleton Archers attack speed factor decreased from 60% to 50%", b(60, 50)))
@@ -15130,7 +15228,7 @@ W(li("No longer slows the targets", t("MISC")))
 W(ul_close())
 W(ability("Burning Army", slug="clinkz_burning_army"))
 W(ul_open())
-W(li("Spawn Interval improved from 0.15s to 0.1s", t("MISC")))
+W(li("Spawn Interval improved from 0.15s to 0.1s", b(0.15, 0.1, l=True)))
 W(li("Skeleton count increased from 5 to 6", b(5, 6)))
 W(ul_close())
 W(subgroup("Talents"))
@@ -15146,13 +15244,13 @@ W(li("Now can be toggled on and off for the duration of the buff. Toggle cooldow
 W(ul_close())
 W(ability("Overclocking", slug="rattletrap_overclocking"))
 W(ul_open())
-W(li("Rocket Flare cooldown increased from 3s to 3.5s", t("MISC")))
+W(li("Rocket Flare cooldown increased from 3s to 3.5s", b(3, 3.5, l=True)))
 W(ul_close())
 
 # Crystal Maiden
 W(hero_header("Crystal Maiden"))
 W(ul_open())
-W(li("Base Damage decreased by 2", t("MISC")))
+W(li("Base Damage decreased by 2", bstat_h("Crystal Maiden", "AttackDamageMin", "7.39e", -2), extra=note_box(hero="Crystal Maiden", field="AttackDamageMin", before_patch="7.39e")))
 W(li("Base Intelligence increased from 18 to 20", b(18, 20)))
 W(li("Damage at level 1 unchanged at 48–54", t("MISC")))
 W(ul_close())
@@ -15172,7 +15270,7 @@ W(ul_close())
 W(hero_header("Dark Willow"))
 W(ability("Cursed Crown", slug="dark_willow_cursed_crown"))
 W(ul_open())
-W(li("Stun Duration increased from 1.2/1.6/2/2.4s to 1.5/1.8/2.1/2.4s", t("MISC")))
+W(li("Stun Duration increased from 1.2/1.6/2/2.4s to 1.5/1.8/2.1/2.4s", b([1.2, 1.6, 2, 2.4], [1.5, 1.8, 2.1, 2.4])))
 W(ul_close())
 W(ability("Terrorize", slug="dark_willow_terrorize"))
 W(ul_open())
@@ -15186,7 +15284,7 @@ W(ul_close())
 # Dawnbreaker
 W(hero_header("Dawnbreaker"))
 W(ul_open())
-W(li("Base Damage increased by 1", t("MISC")))
+W(li("Base Damage increased by 1", bstat_h("Dawnbreaker", "AttackDamageMin", "7.39e", 1), extra=note_box(hero="Dawnbreaker", field="AttackDamageMin", before_patch="7.39e")))
 W(li("Damage at level 1 increased from 49–53 to 50–54", t("MISC")))
 W(ul_close())
 W(ability("Solar Guardian", slug="dawnbreaker_solar_guardian"))
@@ -15229,7 +15327,10 @@ W(ul_close())
 W(hero_header("Doom"))
 W(ul_open())
 W(li("Intelligence gain increased from 1.7 to 1.9", b(1.7, 1.9)))
-W(li("Removed Devil's Bargain facet", t("DEL")))
+W(ul_close())
+W(subgroup("Abilities"))
+W(ul_open())
+W(li(facet_badge("doom_bringer_boost_selling"), t("DEL")))
 W(ul_close())
 W(ability("Doom", slug="doom_bringer_doom"))
 W(ul_open())
@@ -15269,9 +15370,12 @@ W(ul_close())
 # Earth Spirit
 W(hero_header("Earth Spirit"))
 W(ul_open())
-W(li("Base Damage decreased by 6", t("MISC")))
+W(li("Base Damage decreased by 6", bstat_h("Earth Spirit", "AttackDamageMin", "7.39e", -6), extra=note_box(hero="Earth Spirit", field="AttackDamageMin", before_patch="7.39e")))
 W(li("Damage at level 1 decreased from 53–57 to 47–51", t("MISC")))
-W(li("Removed Resonance, Stepping Stone, and Ready to Roll facets", t("DEL")))
+W(ul_close())
+W(subgroup("Abilities"))
+W(ul_open())
+W(li(facet_badge("earth_spirit_resonance") + " " + facet_badge("earth_spirit_stepping_stone") + " " + facet_badge("earth_spirit_ready_to_roll"), t("DEL")))
 W(ul_close())
 W(ability("Stone Remnant", slug="earth_spirit_stone_caller"))
 W(ul_open())
@@ -15328,11 +15432,11 @@ W(ul_close())
 W(hero_header("Ember Spirit"))
 W(ability("Flame Guard", slug="ember_spirit_flame_guard"))
 W(ul_open())
-W(li("Cooldown decreased from 35s to 32s", t("MISC")))
+W(li("Cooldown decreased from 35s to 32s", b(35, 32, l=True)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 Talent Searing Chains Duration decreased from +1s to +0.8s", t("MISC")))
+W(li("Level 15 Talent Searing Chains Duration decreased from +1s to +0.8s", b(1, 0.8)))
 W(li("Level 20 Talent Searing Chains Damage decreased from +60 to +50", b(60, 50)))
 W(ul_close())
 
@@ -15383,7 +15487,7 @@ W(ul_open())
 W(li("Now always applies one instance of damage and slow in addition to the per cooldown instances", t("NEW")))
 W(li("Slow per cooldown decreased from 7/8/9/10% to 4/5/6/7%", b([7, 8, 9, 10], [4, 5, 6, 7], l=True)))
 W(li("DPS per cooldown decreased from 7/9/11/13 to 4/6/8/10", b([7, 9, 11, 13], [4, 6, 8, 10], l=True)))
-W(li("Duration decreased from 8/9/10/11s to 7/8/9/10s", t("MISC")))
+W(li("Duration decreased from 8/9/10/11s to 7/8/9/10s", b([8, 9, 10, 11], [7, 8, 9, 10])))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -15417,7 +15521,7 @@ W(ul_close())
 W(subgroup("Facet: Afterburner"))
 W(ability("Rocket Barrage", slug="gyrocopter_rocket_barrage"))
 W(ul_open())
-W(li(facet_badge("gyrocopter_afterburner") + " " + "Movespeed Duration decreased from 4.5s to 4s", t("MISC")))
+W(li(facet_badge("gyrocopter_afterburner") + " " + "Movespeed Duration decreased from 4.5s to 4s", b(4.5, 4)))
 W(ul_close())
 
 # Hoodwink
@@ -15452,7 +15556,7 @@ W(li("Damage increased from [25 + 5 * Exort] to [24 + 6 * Exort]", t("MISC"), ex
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 Talent Cold Snap Cooldown Reduction increased from 5s to 6s", t("MISC")))
+W(li("Level 15 Talent Cold Snap Cooldown Reduction increased from 5s to 6s", b(5, 6)))
 W(li("Level 20 Talent +35 Alacrity Damage/Speed changed to +50", t("MISC")))
 W(ul_close())
 W(subgroup("Facet: Mind of Tornarus"))
@@ -15471,8 +15575,8 @@ W(ul_close())
 W(ability("Spirits", slug="wisp_spirits"))
 W(ul_open())
 W(li("Mana Cost decreased from 100/110/120/130 to 90/100/110/120", b([100, 110, 120, 130], [90, 100, 110, 120], l=True)))
-W(li("Cooldown decreased from 22/21/20/19s to 15s", t("MISC")))
-W(li("Duration decreased from 19s to 15s", t("MISC")))
+W(li("Cooldown decreased from 22/21/20/19s to 15s", b([22, 21, 20, 19], 15, l=True)))
+W(li("Duration decreased from 19s to 15s", b(19, 15)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -15537,9 +15641,9 @@ W(li("Base Strength increased from 19 to 20", b(19, 20)))
 W(ul_close())
 W(ability("Switch Discipline", slug="kez_switch_weapons"))
 W(ul_open())
-W(li("Cooldown reduction per level increased from 0.2s to 0.25s", t("MISC"), extra=inline_note("Cooldown on level 1 decreased from 7.8s to 7.75s")))
-W(li("Cooldown on level 30 decreased from 2s to 0.5s", t("MISC")))
-W(li("Katana Base Attack Time improved from 2.0s to 1.8s", t("MISC")))
+W(li("Cooldown reduction per level increased from 0.2s to 0.25s", b(0.2, 0.25), extra=inline_note("Cooldown on level 1 decreased from 7.8s to 7.75s")))
+W(li("Cooldown on level 30 decreased from 2s to 0.5s", b(2, 0.5, l=True)))
+W(li("Katana Base Attack Time improved from 2.0s to 1.8s", b(2.0, 1.8, l=True)))
 W(li("Katana Bonus Agility Base Damage decreased from 20% to 12%", b(20, 12)))
 W(ul_close())
 W(ability("Kazurai Katana", slug="kez_kazurai_katana"))
@@ -15558,8 +15662,8 @@ W(li("Rush Speed decreased from 1000 to 850", b(1000, 850)))
 W(ul_close())
 W(ability("Shodo Sai", slug="kez_shodo_sai"))
 W(ul_open())
-W(li("Marked Stun Duration decreased from 0.5s to 0.4s", t("MISC")))
-W(li("Parry Stun Duration decreased from 0.5s to 0.4s", t("MISC")))
+W(li("Marked Stun Duration decreased from 0.5s to 0.4s", b(0.5, 0.4)))
+W(li("Parry Stun Duration decreased from 0.5s to 0.4s", b(0.5, 0.4)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -15574,7 +15678,7 @@ W(li("Damage increased from 80/160/240/320 to 110/180/250/320", b([80, 160, 240,
 W(ul_close())
 W(ability("X Marks the Spot", slug="kunkka_x_marks_the_spot"))
 W(ul_open())
-W(li("Cooldown decreased from 30/24/18/12s to 24/20/16/12s", t("MISC")))
+W(li("Cooldown decreased from 30/24/18/12s to 24/20/16/12s", b([30, 24, 18, 12], [24, 20, 16, 12], l=True)))
 W(ul_close())
 
 # Legion Commander
@@ -15597,7 +15701,7 @@ W(ul_close())
 W(subgroup("Facet: Misanthropy"))
 W(ability("Diabolic Edict", slug="leshrac_diabolic_edict"))
 W(ul_open())
-W(li(facet_badge("leshrac_misanthropy") + " " + "Duration increased from 6s to 7.5s", t("MISC")))
+W(li(facet_badge("leshrac_misanthropy") + " " + "Duration increased from 6s to 7.5s", b(6, 7.5)))
 W(ul_close())
 
 # Lina
@@ -15618,16 +15722,19 @@ W(li("Mana Cost decreased from 125/150/175/200 to 110/140/170/200", b([125, 150,
 W(ul_close())
 W(ability("Finger of Death", slug="lion_finger_of_death"))
 W(ul_open())
-W(li("Cooldown decreased from 130/85/40s to 120/80/40s", t("MISC")))
+W(li("Cooldown decreased from 130/85/40s to 120/80/40s", b([130, 85, 40], [120, 80, 40], l=True)))
 W(ul_close())
 
 # Lone Druid
 W(hero_header("Lone Druid"))
 W(ul_open())
 W(li("Base Movement Speed decreased from 325 to 295", b(325, 295)))
-W(li("Base Damage increased by 4", t("MISC")))
+W(li("Base Damage increased by 4", bstat_h("Lone Druid", "AttackDamageMin", "7.39e", 4), extra=note_box(hero="Lone Druid", field="AttackDamageMin", before_patch="7.39e")))
 W(li("Damage at level 1 increased from 38–42 to 42–46", t("MISC")))
-W(li("Removed Bear With Me and Bear Necessities facets", t("DEL")))
+W(ul_close())
+W(subgroup("Abilities"))
+W(ul_open())
+W(li(facet_badge("lone_druid_bear_with_me") + " " + facet_badge("lone_druid_bear_necessities"), t("DEL")))
 W(li("Removed Gift Bearer innate ability. Its effect is now a part of Summon Spirit Bear ability", t("DEL")))
 W(ul_close())
 W(ability("Summon Spirit Bear", slug="lone_druid_spirit_bear"))
@@ -15635,16 +15742,24 @@ W(ul_open())
 W(li("Moved to an innate ability. Cannot be leveled up", t("MISC")))
 W(li("Ability is moved to the 4th ability slot", t("MISC"), extra=inline_note("D key by default")))
 W(li("Spirit Bear now counts as a melee hero for most spells", t("MISC"), extra=inline_note("Since the bear is now a hero, all unit-related changes moved to a separate Spirit Bear section below. This section is for the summon ability changes only")))
-W(li("Cooldown decreased from 150/140/130/120s to 120s", t("MISC")))
+W(li("Cooldown decreased from 150/140/130/120s to 120s", b([150, 140, 130, 120], 120, l=True)))
 W(ul_close())
-W(ability("Entangle", slug="lone_druid_entangle"))
-W(ul_open())
-W(li("New Point Targeted basic ability", t("MISC"), extra=inline_note("Allows Lone Druid to Entangle enemies once they gain 5 stacks of this ability. Entangled enemies are unable to move for 1.2/1.6/2/2.4s and take 60/70/80/90 damage per second. When cast, applies 2 stacks to each enemy hero in the area and 5 stacks to enemy creeps, and also empowers Lone Druid for 10 seconds, making him apply 1 stack with each attack on enemy heroes. Enemies are protected from gaining new stacks while they're already Entangled. Radius: 350. Stack Duration: 10s. Cast Range: 700. Mana Cost: 60. Cooldown: 24/22/20/18s<br>Pierces Debuff Immunity")))
-W(li("Lone Druid's Empowered Buff and enemy stack counter debuff are undispellable, Entangled debuff is dispellable", t("MISC")))
-W(li("Creeps can't gain stacks from either Lone Druid's and Spirit Bear's attacks, and are Entangled only on cast", t("MISC"), extra=inline_note("Roshan is affected as if he were a hero")))
-W(li("Spirit Bear's Entangling Claws reworked. Now it levels up with this ability and passively provides empowered attacks at all times", t("REWORK")))
-W(li("Upgraded with Aghanim's Scepter", t("MISC"), extra=inline_note("Increases radius to 450 and hero stacks on cast to 5, instantly Entangling them. Also removes stack protection from Entangled enemies")))
-W(ul_close())
+W(ability_change(
+    old=None,
+    new=dict(
+        name="Entangle",
+        slug="lone_druid_entangle",
+        desc=[
+            "New Point Targeted basic ability. Pierces Debuff Immunity.",
+            "Allows Lone Druid to Entangle enemies once they gain 5 stacks of this ability. Entangled enemies are unable to move for <b>1.2/1.6/2/2.4s</b> and take <b>60/70/80/90</b> damage per second. On cast, applies 2 stacks to each enemy hero and 5 stacks to enemy creeps in the area, and empowers Lone Druid for 10s (1 stack per attack on enemy heroes). Enemies are protected from gaining new stacks while already Entangled. Radius: 350. Stack Duration: 10s. Cast Range: 700. Mana Cost: 60. Cooldown: 24/22/20/18s.",
+            "Spirit Bear's Entangling Claws now levels up with this ability and is permanently empowered.",
+            inline_note("The Empowered Buff and the enemy stack-counter debuff are undispellable; the Entangled debuff is dispellable. Creeps gain stacks only on cast (not from attacks); Roshan is affected as a hero."),
+            aghs_line("Increases radius to 450 and hero stacks on cast to 5, instantly Entangling them. Also removes stack protection from Entangled enemies."),
+        ],
+    ),
+    summary="New ability.",
+    tag="new",
+))
 W(ability("Spirit Link", slug="lone_druid_spirit_link"))
 W(ul_open())
 W(li("No longer grants attack speed or shared armor", t("DEL")))
@@ -15655,8 +15770,8 @@ W(ul_close())
 W(ability("True Form", slug="lone_druid_true_form"))
 W(ul_open())
 W(li("Mana Cost decreased from 200 to 80", b(200, 80, l=True)))
-W(li("Duration decreased from 40s to 25s", t("MISC")))
-W(li("Cooldown decreased from 100s to 60/55/50s", t("MISC")))
+W(li("Duration decreased from 40s to 25s", b(40, 25)))
+W(li("Cooldown decreased from 100s to 60/55/50s", b(100, [60, 55, 50], l=True)))
 W(li("No longer grants Entangling Claws and Demolish to Lone Druid", t("DEL")))
 W(li("Now also provides 50/90/130 bonus attack damage", t("NEW")))
 W(li("Bonus Armor increased from 8/10/12 to 10/15/20", b([8, 10, 12], [10, 15, 20])))
@@ -15692,7 +15807,7 @@ W(li("Base Attack Time rescaled from 1.75/1.65/1.55/1.45s to 1.5s", t("REWORK"))
 W(li("Base Attack Speed increased from 100 to 110", b(100, 110)))
 W(li("Base Armor decreased from 0/2/4/6 to 0", b([0, 2, 4, 6], 0)))
 W(li("Base Movement Speed rescaled from 300/330/360/390 to 310", b([300, 330, 360, 390], 310)))
-W(li("Base Magic Resistance increased from 0% to 25%", b(0, 25, l=True), extra=inline_note("Demolish ability no longer passively grants 33% magic resistance")))
+W(li("Base Magic Resistance increased from 0% to 25%", b(0, 25), extra=inline_note("Demolish ability no longer passively grants 33% magic resistance")))
 W(li("Daytime Vision Range increased from 1400 to 1800", b(1400, 1800)))
 W(li("No longer gains 100 health and 5 damage per level", t("MISC")))
 W(li("Now gains 4.5 Strength, 4.5 Agility and 0.5 Intelligence per level", t("NEW"), extra=inline_note("Still has no base attributes, so they are all zeroes at level 1")))
@@ -15708,12 +15823,27 @@ W(ability("Return", slug="lone_druid_spirit_bear_return"))
 W(ul_open())
 W(li("Now considered a Teleport for the \"Teleport Requires Hold/Cancel to Stop\" option", t("NEW")))
 W(ul_close())
-# v2-todo: convert to ability_change(old=..., new=..., summary="Innate reworked." / "Ability reworked.", tag="rework") — lift OLD desc from prior patchnotes
-W(ability("Entangling Claws", slug="lone_druid_spirit_bear_entangle"))
-W(ul_open())
-W(li("Ability reworked", t("REWORK"), extra=inline_note("Passive, pierces Debuff Immunity, levels up with Lone Druid's Entangle")))
-W(li("Allows Spirit Bear to Entangle enemies once they gain 5 stacks of this ability. Entangled enemies are unable to move for 1.2/1.6/2/2.4s and take 60/70/80/90 damage per second. Spirit Bear's attacks are permanently empowered, making it apply 1 stack with each attack on enemy heroes. Enemies are protected from gaining new stacks while they're already Entangled", t("MISC"), extra=inline_note("Stacks are applied only to heroes, creep heroes and Roshan")))
-W(ul_close())
+W(ability_change(
+    old=dict(
+        name="Entangling Claws",
+        slug="lone_druid_spirit_bear_entangle",
+        desc=[
+            "Passive.",
+            "Spirit Bear's attacks have a chance to root the target (Entangle), preventing movement for <b>1/1.6/2.2/2.8s</b> and dealing damage over the duration.",
+        ],
+    ),
+    new=dict(
+        name="Entangling Claws",
+        slug="lone_druid_spirit_bear_entangle",
+        desc=[
+            "Passive. Pierces Debuff Immunity. Levels up with Lone Druid's Entangle.",
+            "Allows Spirit Bear to Entangle enemies once they gain 5 stacks of this ability. Entangled enemies are unable to move for <b>1.2/1.6/2/2.4s</b> and take <b>60/70/80/90</b> damage per second. Spirit Bear's attacks are permanently empowered, applying 1 stack with each attack on enemy heroes. Enemies are protected from gaining new stacks while already Entangled.",
+            inline_note("Stacks are applied only to heroes, creep heroes and Roshan."),
+        ],
+    ),
+    summary="Ability reworked.",
+    tag="rework",
+))
 W(ability("Fetch", slug="lone_druid_spirit_bear_fetch"))
 W(ul_open())
 W(li("After fetching an enemy, Spirit Bear will now have an attack command issued towards the target", t("MISC")))
@@ -15731,7 +15861,7 @@ W(hero_header("Luna"))
 W(ability("Lunar Orbit", slug="luna_lunar_orbit"))
 W(ul_open())
 W(li("Collision Damage increased from 22/28/34/40% to 28/32/36/40%", b([22, 28, 34, 40], [28, 32, 36, 40])))
-W(li("Formation time decreased from 1.2s to 0.9s", t("MISC")))
+W(li("Formation time decreased from 1.2s to 0.9s", b(1.2, 0.9, l=True)))
 W(li("Rotation Radius decreased from 250 to 225", b(250, 225)))
 W(li("Collision Radius increased from 175 to 200", b(175, 200)))
 W(ul_close())
@@ -15756,19 +15886,20 @@ W(ul_close())
 # Magnus
 W(hero_header("Magnus"))
 W(ul_open())
-W(li("Base Damage increased by 1", t("MISC")))
+W(li("Base Damage increased by 1", bstat_h("Magnus", "AttackDamageMin", "7.39e", 1), extra=note_box(hero="Magnus", field="AttackDamageMin", before_patch="7.39e")))
 W(li("Damage at level 1 increased from 54–62 to 55–63", t("MISC")))
 W(ul_close())
 W(ability("Reverse Polarity", slug="magnataur_reverse_polarity"))
 W(ul_open())
-W(li("Cooldown decreased from 120s to 115s", t("MISC")))
+W(li("Cooldown decreased from 120s to 115s", b(120, 115, l=True)))
 W(ul_close())
 W(subgroup("Facet: Diminishing Return"))
 
 # Marci
 W(hero_header("Marci"))
+W(subgroup("Abilities"))
 W(ul_open())
-W(li("Removed Fleeting Fury facet", t("DEL")))
+W(li(facet_badge("marci_fleeting_fury"), t("DEL")))
 W(ul_close())
 
 # Mars
@@ -15779,14 +15910,14 @@ W(li("Bonus Damage vs Heroes decreased from 10/15/20/25 to 5/10/15/20", b([10, 1
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 20 Talent Arena of Blood Cooldown Reduction decreased from 20s to 16s", t("MISC")))
+W(li("Level 20 Talent Arena of Blood Cooldown Reduction decreased from 20s to 16s", b(20, 16)))
 W(ul_close())
 
 # Medusa
 W(hero_header("Medusa"))
 W(ability("Mana Shield", slug="medusa_mana_shield"))
 W(ul_open())
-W(li("No longer benefits from mana cost reduction effects", t("MISC")))
+W(li("No longer benefits from mana cost reduction effects", t("NERF")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -15806,7 +15937,7 @@ W(li("Second Meteor Damage increased from 60% to 70%", b(60, 70)))
 W(ul_close())
 W(ability("Moonlight Shadow", slug="mirana_invis"))
 W(ul_open())
-W(li("Cooldown decreased from 140/120/100s to 120/110/100s", t("MISC")))
+W(li("Cooldown decreased from 140/120/100s to 120/110/100s", b([140, 120, 100], [120, 110, 100], l=True)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -15822,13 +15953,13 @@ W(ul_close())
 # Monkey King
 W(hero_header("Monkey King"))
 W(ul_open())
-W(li("Base Armor decreased by 1", t("MISC")))
-W(li("Base Attack Time improved from 1.7s to 1.6s", t("MISC")))
+W(li("Base Armor decreased by 1", bstat_h("Monkey King", "ArmorPhysical", "7.39e", -1), extra=note_box(hero="Monkey King", field="ArmorPhysical", before_patch="7.39e")))
+W(li("Base Attack Time improved from 1.7s to 1.6s", b(1.7, 1.6, l=True)))
 W(li("Base Attack Speed decreased from 100 to 95", b(100, 95)))
 W(ul_close())
 W(ability("Tree Dance", slug="monkey_king_tree_dance"))
 W(ul_open())
-W(li("Stun duration from falling off the cut tree decreased from 4s to 3s", t("MISC")))
+W(li("Stun duration from falling off the cut tree decreased from 4s to 3s", b(4, 3)))
 W(ul_close())
 W(subgroup("Facet: Simian Stride"))
 
@@ -15868,7 +15999,7 @@ W(li("Agility gain increased from 3.3 to 3.4", b(3.3, 3.4)))
 W(ul_close())
 W(ability("Ensnare", slug="naga_siren_ensnare"))
 W(ul_open())
-W(li("Can no longer target invulnerable units unless this invulnerability is provided by Song of the Siren", t("NERF")))
+W(li("Can no longer target invulnerable units unless this invulnerability is provided by Song of the Siren", t("DEL")))
 W(ul_close())
 W(ability("Song of the Siren", slug="naga_siren_song_of_the_siren"))
 W(ul_open())
@@ -15882,7 +16013,7 @@ W(li(facet_badge("naga_siren_passive_riptide") + " " + "Damage increased from 25
 W(ul_close())
 W(subgroup("Facet: Deluge"))
 W(ul_open())
-W(li(facet_badge("naga_siren_active_riptide") + " " + "Cooldown increased from 10/9/8/7s to 13/11/9/7s", t("MISC")))
+W(li(facet_badge("naga_siren_active_riptide") + " " + "Cooldown increased from 10/9/8/7s to 13/11/9/7s", b([10, 9, 8, 7], [13, 11, 9, 7], l=True)))
 W(ul_close())
 
 # Nature's Prophet
@@ -15944,19 +16075,19 @@ W(li("Bonus Damage decreased from 20% to 15%", b(20, 15)))
 W(ul_close())
 W(ability("Spiked Carapace", slug="nyx_assassin_spiked_carapace"))
 W(ul_open())
-W(li("Stun Duration increased from 0.4/0.8/1.2/1.6s to 0.7/1.0/1.3/1.6s", t("MISC")))
+W(li("Stun Duration increased from 0.4/0.8/1.2/1.6s to 0.7/1.0/1.3/1.6s", b([0.4, 0.8, 1.2, 1.6], [0.7, 1.0, 1.3, 1.6])))
 W(ul_close())
 
 # Ogre Magi
 W(hero_header("Ogre Magi"))
 W(ul_open())
-W(li("Base Damage increased by 1", t("MISC")))
+W(li("Base Damage increased by 1", bstat_h("Ogre Magi", "AttackDamageMin", "7.39e", 1), extra=note_box(hero="Ogre Magi", field="AttackDamageMin", before_patch="7.39e")))
 W(li("Damage at level 1 increased from 69–75 to 70–76", t("MISC")))
 W(ul_close())
 W(ability("Bloodlust", slug="ogre_magi_bloodlust"))
 W(ul_open())
 W(li("Cast range increased from 600 to 650", b(600, 650)))
-W(li("Can no longer target invulnerable units", t("NERF"), extra=inline_note("Can still target invulnerable buildings (i.e. Tier 2-4 towers when the previous ones are not destroyed)")))
+W(li("Can no longer target invulnerable units", t("DEL"), extra=inline_note("Can still target invulnerable buildings (i.e. Tier 2-4 towers when the previous ones are not destroyed)")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -15966,11 +16097,11 @@ W(ul_close())
 # Omniknight
 W(hero_header("Omniknight"))
 W(ul_open())
-W(li("Base Armor increased by 1", t("MISC")))
+W(li("Base Armor increased by 1", bstat_h("Omniknight", "ArmorPhysical", "7.39e", 1), extra=note_box(hero="Omniknight", field="ArmorPhysical", before_patch="7.39e")))
 W(ul_close())
 W(ability("Repel", slug="omniknight_martyr"))
 W(ul_open())
-W(li("Cooldown decreased from 55/50/45/40s to 50/45/40/35s", t("MISC")))
+W(li("Cooldown decreased from 55/50/45/40s to 50/45/40/35s", b([55, 50, 45, 40], [50, 45, 40, 35], l=True)))
 W(ul_close())
 W(ability("Hammer of Purity", slug="omniknight_hammer_of_purity"))
 W(ul_open())
@@ -15978,38 +16109,39 @@ W(li("No longer disabled by Silence", t("MISC")))
 W(ul_close())
 W(ability("Guardian Angel", slug="omniknight_guardian_angel"))
 W(ul_open())
-W(li("Cooldown decreased from 110/100/90s to 100/90/80s", t("MISC")))
+W(li("Cooldown decreased from 110/100/90s to 100/90/80s", b([110, 100, 90], [100, 90, 80], l=True)))
 W(ul_close())
 
 # Oracle
 W(hero_header("Oracle"))
 W(ability("Fortune's End", slug="oracle_fortunes_end"))
 W(ul_open())
-W(li("Can no longer target invulnerable units, but does affect invulnerable units in the AoE", t("NERF")))
+W(li("Can no longer target invulnerable units, but does affect invulnerable units in the AoE", t("DEL")))
 W(ul_close())
 W(ability("Fate's Edict", slug="oracle_fates_edict"))
 W(ul_open())
 W(li("No longer has separate effects for allies and enemies", t("DEL"), extra=inline_note("Always disarms the target and grants them 100% magic damage resistance")))
 W(li("Mana Cost decreased from 95/100/105/110 to 70", b([95, 100, 105, 110], 70, l=True)))
-W(li("Cooldown decreased from 20/17/14/11s to 17/14/11/8s", t("MISC")))
+W(li("Cooldown decreased from 20/17/14/11s to 17/14/11/8s", b([20, 17, 14, 11], [17, 14, 11, 8], l=True)))
 W(ul_close())
 
 # Pangolier
 W(hero_header("Pangolier"))
+W(subgroup("Abilities"))
 W(ul_open())
-W(li("Removed Double Jump and Thunderbolt facets", t("DEL")))
+W(li(facet_badge("pangolier_double_jump") + " " + facet_badge("pangolier_thunderbolt"), t("DEL")))
 W(ul_close())
 W(ability("Swashbuckle", slug="pangolier_swashbuckle"))
 W(ul_open())
-W(li("Cooldown decreased from 21/18/15/12s to 20/17/14/11s", t("MISC")))
+W(li("Cooldown decreased from 21/18/15/12s to 20/17/14/11s", b([21, 18, 15, 12], [20, 17, 14, 11], l=True)))
 W(li("Now briefly slows enemies movespeed on hit by 100% for 0.4s", t("NEW")))
 W(ul_close())
 W(ability("Shield Crash", slug="pangolier_shield_crash"))
 W(ul_open())
-W(li("Cooldown decreased from 18/16/14/12s to 16/13/10/7s", t("MISC")))
+W(li("Cooldown decreased from 18/16/14/12s to 16/13/10/7s", b([18, 16, 14, 12], [16, 13, 10, 7], l=True)))
 W(li("Mana Cost rescaled from 70/80/90/100 to 75", b([70, 80, 90, 100], 75, l=True)))
 W(li("Barrier changed from 50/100/150/200 per enemy hero hit to 60/120/180/240 if any enemy hero is hit", t("REWORK"), extra=inline_note("If no enemy hero was hit, barrier is not provided")))
-W(li("Barrier Duration decreased from 10s to 6s", t("MISC")))
+W(li("Barrier Duration decreased from 10s to 6s", b(10, 6)))
 W(li("Damage decreased from 70/130/190/250 to 50/100/150/200", b([70, 130, 190, 250], [50, 100, 150, 200])))
 W(li("No longer slows enemies", t("MISC")))
 W(li("Aghanim's Scepter Swashbuckle damage decreased from 100% to 75%", b(100, 75)))
@@ -16043,12 +16175,37 @@ W(ul_close())
 W(hero_header("Phantom Lancer"))
 W(ul_open())
 W(li("Agility gain increased from 2.8 to 3.4", b(2.8, 3.4)))
-W(li("Removed Divergence and Lancelot facets", t("DEL")))
 W(ul_close())
-W(ability("Illusory Armaments", slug="phantom_lancer_illusory_armaments"))
+W(subgroup("Abilities"))
 W(ul_open())
-W(li("Ability Reworked", t("REWORK"), extra=inline_note("Whenever an illusion of Phantom Lancer is created, it can't have less than 18% of Phantom Lancer's damage for 3s. Damage increases by 2% with every 3 Phantom Lancer's level ups")))
+W(li(facet_badge("phantom_lancer_divergence") + " " + facet_badge("phantom_lancer_lancelot"), t("DEL")))
 W(ul_close())
+_ia_pill, _ia_table = scale_pill("18% + 2% per 3 level ups",
+                                 lambda L: 18 + 2 * ((L - 1) // 3),
+                                 levels=[1, 5, 10, 15, 20, 25, 30], value_fmt="{:.0f}%")
+W(ability_change(
+    old=dict(
+        name="Illusory Armaments",
+        slug="phantom_lancer_illusory_armaments",
+        innate=True,
+        desc=[
+            "Passive.",
+            "Bonus attack damage from items is converted into base damage — <b>100%</b> for Phantom Lancer and <b>65%</b> for his illusions — so his illusions benefit from his damage items.",
+        ],
+    ),
+    new=dict(
+        name="Illusory Armaments",
+        slug="phantom_lancer_illusory_armaments",
+        innate=True,
+        desc=[
+            "Passive.",
+            "Whenever an illusion of Phantom Lancer is created, it can't have less than " + _ia_pill + " of Phantom Lancer's damage for 3s.",
+        ],
+        tables=[_ia_table],
+    ),
+    summary="Innate reworked.",
+    tag="rework",
+))
 W(ability("Phantom Rush", slug="phantom_lancer_phantom_edge"))
 W(ul_open())
 W(li("No Longer provides bonus Agility while active", t("DEL")))
@@ -16099,7 +16256,7 @@ W(li("No longer applies when disjointing attacks from buildings", t("DEL")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 20 Talent Waning Rift Cooldown Reduction decreased from 3s to 2.5s", t("MISC")))
+W(li("Level 20 Talent Waning Rift Cooldown Reduction decreased from 3s to 2.5s", b(3, 2.5)))
 W(ul_close())
 
 # Pugna
@@ -16126,18 +16283,19 @@ W(hero_header("Razor"))
 W(ability("Storm Surge", slug="razor_storm_surge"))
 W(ul_open())
 W(li("Chance to Strike increased from 18% to 20%", b(18, 20)))
-W(li("Strike Cooldown decreased from 3s to 2.5s", t("MISC")))
+W(li("Strike Cooldown decreased from 3s to 2.5s", b(3, 2.5, l=True)))
 W(ul_close())
 W(subgroup("Facet: Thunderhead"))
 W(ability("Eye of the Storm", slug="razor_eye_of_the_storm"))
 W(ul_open())
-W(li(facet_badge("razor_thunderhead") + " " + "Storm Surge Cooldown Reduction decreased from 2.5s to 2s", t("MISC")))
+W(li(facet_badge("razor_thunderhead") + " " + "Storm Surge Cooldown Reduction decreased from 2.5s to 2s", b(2.5, 2)))
 W(ul_close())
 
 # Riki
 W(hero_header("Riki"))
+W(subgroup("Abilities"))
 W(ul_open())
-W(li("Removed Contract Killer and Exterminator facets", t("DEL")))
+W(li(facet_badge("riki_contract_killer") + " " + facet_badge("riki_exterminator"), t("DEL")))
 W(ul_close())
 W(ability("Backstab", slug="riki_innate_backstab"))
 W(ul_open())
@@ -16154,7 +16312,7 @@ W(ul_close())
 W(ability("Tricks of the Trade", slug="riki_tricks_of_the_trade"))
 W(ul_open())
 W(li("Mana Cost rescaled from 45/55/65/75 to 65", b([45, 55, 65, 75], 65, l=True)))
-W(li("Cooldown increased from 18/16/14/12s to 21/18/15/12s", t("MISC")))
+W(li("Cooldown increased from 18/16/14/12s to 21/18/15/12s", b([18, 16, 14, 12], [21, 18, 15, 12], l=True)))
 W(li("Radius decreased from 450 to 425", b(450, 425)))
 W(li("40% Attack Damage replaced with 30/50/70/90 flat damage", t("REWORK"), extra=inline_note("Still applies bonus damage from Backstab, but as a separate instance of damage now")))
 W(li("No longer provides bonus Agility", t("DEL")))
@@ -16185,7 +16343,7 @@ W(ul_close())
 # Rubick
 W(hero_header("Rubick"))
 W(ul_open())
-W(li("Base damage increased by 1", t("MISC")))
+W(li("Base damage increased by 1", bstat_h("Rubick", "AttackDamageMin", "7.39e", 1), extra=note_box(hero="Rubick", field="AttackDamageMin", before_patch="7.39e")))
 W(li("Damage at level 1 increased from 49–55 to 50–56", t("MISC")))
 W(ul_close())
 W(ability("Telekinesis", slug="rubick_telekinesis"))
@@ -16201,7 +16359,7 @@ W(ul_close())
 W(hero_header("Sand King"))
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 20 Talent Burrowstrike Cooldown Reduction increased from 2s to 3s", t("MISC")))
+W(li("Level 20 Talent Burrowstrike Cooldown Reduction increased from 2s to 3s", b(2, 3)))
 W(li("Level 25 Talent Epicenter Pulses decreased from +10 to +8", b(10, 8)))
 W(ul_close())
 
@@ -16213,11 +16371,11 @@ W(li("Bonus Base Damage decreased from 25/40/55/70 to 20/35/50/65", b([25, 40, 5
 W(ul_close())
 W(ability("Demonic Purge", slug="shadow_demon_demonic_purge"))
 W(ul_open())
-W(li("Can no longer target invulnerable units", t("NERF")))
+W(li("Can no longer target invulnerable units", t("DEL")))
 W(ul_close())
 W(ability("Demonic Cleanse", slug="shadow_demon_demonic_cleanse"))
 W(ul_open())
-W(li("Can no longer target invulnerable units", t("NERF")))
+W(li("Can no longer target invulnerable units", t("DEL")))
 W(ul_close())
 
 # Shadow Fiend
@@ -16238,12 +16396,12 @@ W(li("Total Damage/Heal increased from 70/140/210/280 to 100/160/220/280", b([70
 W(ul_close())
 W(ability("Mass Serpent Ward", slug="shadow_shaman_mass_serpent_ward"))
 W(ul_open())
-W(li("Cooldown decreased from 110s to 110/105/100s", t("MISC")))
+W(li("Cooldown decreased from 110s to 110/105/100s", b(110, [110, 105, 100], l=True)))
 W(ul_close())
 W(subgroup("Facet: Massive Serpent Ward"))
 W(ability("Mass Serpent Ward", slug="shadow_shaman_mass_serpent_ward"))
 W(ul_open())
-W(li(facet_badge("shadow_shaman_massive_serpent_ward") + " " + "Health and Bounty multiplier decreased from 10x to 9x", t("MISC"), extra=inline_note(" Hits to destroy decreased from 20 to 18, Gold Bounty decreased from 220–300 to 198–270, XP Bounty decreased from 310 to 279")))
+W(li(facet_badge("shadow_shaman_massive_serpent_ward") + " " + "Health and Bounty multiplier decreased from 10x to 9x", b(10, 9), extra=inline_note(" Hits to destroy decreased from 20 to 18, Gold Bounty decreased from 220–300 to 198–270, XP Bounty decreased from 310 to 279")))
 W(ul_close())
 
 # Silencer
@@ -16267,7 +16425,7 @@ W(subgroup("Facet: Synaptic Split"))
 W(hero_header("Skywrath Mage"))
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 15 Talent Ancient Seal Cooldown Reduction decreased from 7s to 6s", t("MISC")))
+W(li("Level 15 Talent Ancient Seal Cooldown Reduction decreased from 7s to 6s", b(7, 6)))
 W(li("Level 15 Talent Concussive Shot Slow increased from +15% to +20%", b(15, 20)))
 W(ul_close())
 
@@ -16280,7 +16438,7 @@ W(li("Aghanim's Scepter Crush puddle radius decreased from 450 to 400", b(450, 4
 W(ul_close())
 W(ability("Bash of the Deep", slug="slardar_bash"))
 W(ul_open())
-W(li("Bash Duration decreased from 1.1s to 1s", t("MISC")))
+W(li("Bash Duration decreased from 1.1s to 1s", b(1.1, 1)))
 W(li("Bonus Damage decreased from 50/100/150/200 to 35/90/145/200", b([50, 100, 150, 200], [35, 90, 145, 200])))
 W(ul_close())
 W(subgroup("Talents"))
@@ -16290,8 +16448,9 @@ W(ul_close())
 
 # Slark
 W(hero_header("Slark"))
+W(subgroup("Abilities"))
 W(ul_open())
-W(li("Removed Leeching Leash and Dark Reef Renegade facets", t("DEL")))
+W(li(facet_badge("slark_leeching_leash") + " " + facet_badge("slark_dark_reef_renegade"), t("DEL")))
 W(li("Removed Barracuda innate ability (effect moved to the Ultimate)", t("DEL")))
 W(ul_close())
 W(ability("Essence Shift", slug="slark_essence_shift"))
@@ -16303,28 +16462,38 @@ W(ability("Pounce", slug="slark_pounce"))
 W(ul_open())
 W(li("Now applies 1/2/3/4 Essence Shift stacks when leashing an enemy hero", t("NEW")))
 W(ul_close())
-W(ability("Saltwater Shiv", slug="slark_saltwater_shiv"))
-W(ul_open())
-W(li("New basic ability. Passive, auto-cast attack modifier", t("MISC"), extra=inline_note("Slark slices the target with his salty shiv, stealing 3 Movement Speed, 3 Health Regen and 3/4/5/6% Health Restoration from them with each attack. Subsequent use of Saltwater Shiv refreshes the duration of all shiv stacks. Steal duration: 6/8/10/12s. Mana Cost: 20. Cooldown: 10/8/6/4s<br>Not Breakable. Disabled by Silence. Has no stack limit. Ignores attack backswing")))
-W(li("Enemies with Health Restoration below -100% will not lose health from health restoration sources", t("MISC")))
-W(ul_close())
+W(ability_change(
+    old=None,
+    new=dict(
+        name="Saltwater Shiv",
+        slug="slark_saltwater_shiv",
+        desc=[
+            "New basic ability — passive, auto-cast attack modifier.",
+            "Slark slices the target with his salty shiv, stealing <b>3 Movement Speed</b>, <b>3 Health Regen</b> and <b>3/4/5/6% Health Restoration</b> from them with each attack. Subsequent uses refresh the duration of all shiv stacks. Steal duration: 6/8/10/12s. Mana Cost: 20. Cooldown: 10/8/6/4s.",
+            inline_note("Not Breakable. Disabled by Silence. Has no stack limit. Ignores attack backswing. Enemies with Health Restoration below −100% will not lose health from health-restoration sources."),
+        ],
+    ),
+    summary="New ability.",
+    tag="new",
+))
 W(ability("Shadow Dance", slug="slark_shadow_dance"))
 W(ul_open())
 W(li("Now passively grants 24/36/48% movement speed and 60/90/120 health regen when unseen", t("NEW"), extra=inline_note("Previous Barracuda rules and mechanics unchanged")))
 W(ul_close())
 W(ability("Depth Shroud", slug="slark_depth_shroud"))
 W(ul_open())
-W(li("Duration decreased from 3s to 2s", t("MISC")))
+W(li("Duration decreased from 3s to 2s", b(3, 2)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 Talent Dark Pact Cooldown Reduction increased from 0.5s to 0.75s", t("MISC")))
+W(li("Level 10 Talent Dark Pact Cooldown Reduction increased from 0.5s to 0.75s", b(0.5, 0.75)))
 W(li("Level 15 Talent +50 Barracuda Regen replaced with +30 Shadow Dance Regen", t("REWORK")))
-W(li("Level 25 Talent Shadow Dance Duration increased from +1.25s to +1.5s", t("MISC")))
+W(li("Level 25 Talent Shadow Dance Duration increased from +1.25s to +1.5s", b(1.25, 1.5)))
 W(ul_close())
 
 # Snapfire
 W(hero_header("Snapfire"))
+W(subgroup("Abilities"))
 W(ul_open())
 W(li("Buckshot: Now affects only attacks made on enemy heroes", t("MISC"), extra=inline_note("Attacks on non-heroes can still ricochet on miss, but they won't have extra damage or glance chance")))
 W(ul_close())
@@ -16342,7 +16511,7 @@ W(ul_close())
 W(hero_header("Sniper"))
 W(ability("Assassinate", slug="sniper_assassinate"))
 W(ul_open())
-W(li("Can no longer target invulnerable units", t("NERF")))
+W(li("Can no longer target invulnerable units", t("DEL")))
 W(li("Attack Damage increased from 100% to 100/110/120%", b(100, [100, 110, 120])))
 W(ul_close())
 
@@ -16350,15 +16519,18 @@ W(ul_close())
 W(hero_header("Spectre"))
 W(ul_open())
 W(li("Now an Agility Hero", t("NEW")))
-W(li("Base Damage increased by 2", t("MISC")))
+W(li("Base Damage increased by 2", bstat_h("Spectre", "AttackDamageMin", "7.39e", 2), extra=note_box(hero="Spectre", field="AttackDamageMin", before_patch="7.39e")))
 W(li("Base attributes unchanged", t("MISC")))
 W(li("Damage at level 1 unchanged (48–52)", t("MISC")))
 W(li("Attribute gains unchanged", t("MISC")))
 W(li("Damage gain per level decreased from +2.8 to +2.1", b(2.8, 2.1)))
 W(li("Damage at level 30 decreased by 27 (from 149–153 to 122–126)", t("MISC")))
-W(li("Base Attack Time worsened from 1.7s to 1.8s", t("MISC")))
+W(li("Base Attack Time worsened from 1.7s to 1.8s", b(1.7, 1.8, l=True)))
 W(li("Base Attack Speed increased from 90 to 110", b(90, 110)))
-W(li("Removed Forsaken and Twist the Knife facets", t("DEL")))
+W(ul_close())
+W(subgroup("Abilities"))
+W(ul_open())
+W(li(facet_badge("spectre_forsaken") + " " + facet_badge("spectre_twist_the_knife"), t("DEL")))
 W(li("Removed Spectral innate ability", t("DEL")))
 W(ul_close())
 W(ability("Desolate", slug="spectre_desolate"))
@@ -16371,12 +16543,28 @@ W(ul_open())
 W(li("Mana Cost decreased from 110/120/130/140 to 100/110/120/130", b([110, 120, 130, 140], [100, 110, 120, 130], l=True)))
 W(li("Spectre's illusions now also benefit from the Shadow Path", t("MISC")))
 W(ul_close())
-W(ability("Shadow Step", slug="spectre_shadow_step"))
-W(ul_open())
-W(li("Reworked into a basic ability", t("REWORK"), extra=inline_note("Thrusts an uncontrollable illusion, which follows the target and attacks it for 20/30/40/50% of Spectre's damage. The illusion exists for 3.5/4/4.5/5 seconds, and takes 200% damage. Cast Range: 700/850/1000/1150. Mana Cost: 60/65/70/75. Cooldown: 32/28/24/20s")))
-W(li("On cast the illusion moves at the speed of 900, then it has 135% of Spectre's movement speed after reaching the target", t("MISC")))
-W(li("The Reality sub-ability may be used to teleport to the illusion, destroying it", t("MISC")))
-W(ul_close())
+W(ability_change(
+    old=dict(
+        name="Shadow Step",
+        slug="spectre_shadow_step",
+        desc=[
+            "Ultimate.",
+            "Spectre performs a single-target Haunt, creating an uncontrollable illusion that attacks the target for <b>40/60/80%</b> of her damage and takes 200% damage. Duration: 5/6/7s. Mana Cost: 150. Cooldown: 80/60/40s.",
+            "The Reality sub-ability teleports Spectre to the illusion.",
+        ],
+    ),
+    new=dict(
+        name="Shadow Step",
+        slug="spectre_shadow_step",
+        desc=[
+            "Basic ability.",
+            "Thrusts an uncontrollable illusion that follows the target and attacks it for <b>20/30/40/50%</b> of Spectre's damage. The illusion exists for <b>3.5/4/4.5/5s</b> and takes 200% damage. On cast it moves at 900 speed, then at 135% of Spectre's movement speed after reaching the target. Cast Range: 700/850/1000/1150. Mana Cost: 60/65/70/75. Cooldown: 32/28/24/20s.",
+            "The Reality sub-ability may be used to teleport to the illusion, destroying it.",
+        ],
+    ),
+    summary="Ability reworked.",
+    tag="rework",
+))
 W(ability("Dispersion", slug="spectre_dispersion"))
 W(ul_open())
 W(li("Min Radius increased from 300 to 350", b(300, 350)))
@@ -16412,7 +16600,7 @@ W(ul_close())
 W(hero_header("Spirit Breaker"))
 W(ability("Charge of Darkness", slug="spirit_breaker_charge_of_darkness"))
 W(ul_open())
-W(li("Stun Duration increased from 1.2/1.5/1.8/2.1s to 1.3/1.6/1.9/2.2s", t("MISC")))
+W(li("Stun Duration increased from 1.2/1.5/1.8/2.1s to 1.3/1.6/1.9/2.2s", b([1.2, 1.5, 1.8, 2.1], [1.3, 1.6, 1.9, 2.2])))
 W(li("Aghanim's Shard bonus speed decreased from +100 to +85", b(100, 85)))
 W(ul_close())
 W(subgroup("Talents"))
@@ -16435,8 +16623,8 @@ W(ul_close())
 W(hero_header("Sven"))
 W(ability("Storm Hammer", slug="sven_storm_bolt"))
 W(ul_open())
-W(li("Aghanim's Scepter no longer allows targeting invulnerable units, but still affects invulnerable units in the radius", t("MISC")))
-W(li("Aghanim's Scepter cast range bonus changed from +350 to +25%", b(350, 25), extra=inline_note("Decreased from +350 to +150")))
+W(li("Aghanim's Scepter no longer allows targeting invulnerable units, but still affects invulnerable units in the radius", t("DEL")))
+W(li("Aghanim's Scepter cast range bonus changed from +350 to +25%", b(350, 150), extra=inline_note("Decreased from +350 to +150")))
 W(li("Aghanim's Scepter now also increases projectile speed by 25%", t("MISC"), extra=inline_note("From 1000 to 1250")))
 W(ul_close())
 W(ability("Great Cleave", slug="sven_great_cleave"))
@@ -16476,7 +16664,7 @@ W(li("Damage increased from 375 to 400", b(375, 400)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
-W(li("Level 10 Talent Meld Debuff Duration decreased from +2s to +1.5s", t("MISC")))
+W(li("Level 10 Talent Meld Debuff Duration decreased from +2s to +1.5s", b(2, 1.5)))
 W(li("Level 10 Talent Psionic Trap Slow increased from +5% to +10%", b(5, 10)))
 W(ul_close())
 
@@ -16513,7 +16701,7 @@ W(li("Level 10 Talent +40 Anchor Smash Damage replaced with +20% Anchor Smash Da
 W(li("Level 15 Talent +30% Anchor Smash Damage Reduction replaced with -15s Ravage Cooldown", t("REWORK")))
 W(li("Level 20 Talent Anchor Smash affects buildings replaced with Blubber effect triggers Anchor Smash", t("REWORK")))
 W(li("Level 25 Talent 50% chance of Anchor Smash on attack replaced with Anchor Smash affects buildings", t("REWORK")))
-W(li("Level 25 Talent Ravage Stun Duration increased from +0.8s to +1s", t("MISC")))
+W(li("Level 25 Talent Ravage Stun Duration increased from +0.8s to +1s", b(0.8, 1)))
 W(ul_close())
 
 # Timbersaw
@@ -16550,7 +16738,7 @@ W(li("Stun duration now applies its stun as an aura in the area", t("MISC"), ext
 W(ul_close())
 W(ability("Tree Throw", slug="tiny_toss_tree"))
 W(ul_open())
-W(li("No longer has separate damage bonus, uses Tree Grab's value instead", t("DEL"), extra=inline_note("Bonus damage rescaled from 20 to 10/20/30/40")))
+W(li("No longer has separate damage bonus, uses Tree Grab's value instead", t("DEL"), extra=inline_note("Bonus damage rescaled from 20 to 10/20/30/40 " + b(20, [10, 20, 30, 40]))))
 W(ul_close())
 W(ability("Grow", slug="tiny_grow"))
 W(ul_open())
@@ -16559,8 +16747,9 @@ W(ul_close())
 
 # Treant Protector
 W(hero_header("Treant Protector"))
+W(subgroup("Abilities"))
 W(ul_open())
-W(li("Removed Primeval Power and Sapling facets", t("DEL")))
+W(li(facet_badge("treant_primeval_power") + " " + facet_badge("treant_sapling"), t("DEL")))
 W(ul_close())
 W(ability("Nature's Guise", slug="treant_natures_guise"))
 W(ul_open())
@@ -16575,10 +16764,28 @@ W(li("Damage per second increased from 30/40/50/60 to 35/50/65/80", b([30, 40, 5
 W(li("Movement Slow increased from 20/25/30/35% to 25/30/35/40%", b([20, 25, 30, 35], [25, 30, 35, 40])))
 W(li("Creep penalty decreased from 50% to 35%", b(50, 35)))
 W(ul_close())
-W(ability("Leech Seed", slug="treant_leech_seed"))
+W(ability_change(
+    old=dict(
+        name="Leech Seed",
+        slug="treant_leech_seed",
+        desc=[
+            "Active.",
+            "Plants a leeching seed in an enemy unit, slowing it (decaying over the duration) and dealing <b>15/30/45/60</b> damage per second for 6 seconds. The leeched life heals nearby allied units (50% effectiveness on creeps).",
+        ],
+    ),
+    new=dict(
+        name="Leech Seed",
+        slug="treant_leech_seed",
+        desc=[
+            "Passive, auto-cast attack modifier.",
+            "Treant Protector's attack plants a life-sapping seed in an enemy unit, dealing an extra <b>20/40/60/80</b> magic damage. The enemy is bound for <b>0.9/1.1/1.3/1.5s</b> and emits two healing pulses — one upon application and one upon expiration — healing up to 5 allies within 650 units for <b>15/25/35/45</b> + 20% of the damage dealt by the attack. No Mana Cost. Cooldown: 15/12/9/6s. Breakable.",
+            inline_note("Now only sends out a maximum of 5 heals per pulse, prioritizing heroes."),
+        ],
+    ),
+    summary="Ability reworked.",
+    tag="rework",
+))
 W(ul_open())
-W(li("Ability Reworked", t("REWORK"), extra=inline_note("Passive, auto-cast attack modifier")))
-W(li("Treant Protector's attack plants a life-sapping seed in an enemy unit, dealing an extra 20/40/60/80 magic damage. The enemy is bound for 0.9/1.1/1.3/1.5s and emits two healing pulses, one upon application and one upon expiration, healing up to 5 allies within 650 units for 15/25/35/45 + 20% of the damage dealt by the attack. No Mana Cost. Cooldown: 15/12/9/6s. Breakable", t("MISC"), extra=inline_note("Now only sends out a maximum of 5 heals per pulse, prioritizing heroes")))
 W(li("No longer has a creep penalty for healing", t("BUFF")))
 W(ul_close())
 W(ability("Living Armor", slug="treant_living_armor"))
@@ -16587,7 +16794,7 @@ W(li("No longer grants bonus armor", t("DEL")))
 W(li("Now grants 100 damage block from player-controlled sources. Each time this spell blocks damage the effect is decreased by 35/30/25/20", t("NEW"), extra=inline_note("Damage block affects any types of damage")))
 W(li("The heal ends earlier if the damage block is reduced to 0", t("MISC")))
 W(li("Instances of less than 20 damage are ignored by Living Armor. They are neither blocked nor counted towards block decrease", t("MISC")))
-W(li("Duration decreased from 18/22/26/30s to 12s", t("MISC")))
+W(li("Duration decreased from 18/22/26/30s to 12s", b([18, 22, 26, 30], 12)))
 W(li("Heal per second increased from 3/4/5/6 to 4/7/10/13", b([3, 4, 5, 6], [4, 7, 10, 13])))
 W(ul_close())
 W(ability("Overgrowth", slug="treant_overgrowth"))
@@ -16601,7 +16808,7 @@ W(li("Mana Cost decreased from 100 to 30", b(100, 30, l=True)))
 W(li("Cast Range increased from 160 to 350", b(160, 350)))
 W(li("Overgrowth is no longer applied around enchanted trees", t("MISC")))
 W(li("Enchanted trees now have the same health as Observer Wards, and they expire after 5 minutes", t("MISC"), extra=inline_note("Trees can be attacked when revealed by True Sight. Attacks will remove the ability effect from the tree without destroying the tree itself")))
-W(li("Charge Restore Time increased from 40s to 55s", t("MISC")))
+W(li("Charge Restore Time increased from 40s to 55s", b(40, 55, l=True)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -16656,7 +16863,7 @@ W(ul_close())
 W(hero_header("Undying"))
 W(ability("Soul Rip", slug="undying_soul_rip"))
 W(ul_open())
-W(li("Cooldown decreased from 18/14/10/6s to 15/12/9/6s", t("MISC")))
+W(li("Cooldown decreased from 18/14/10/6s to 15/12/9/6s", b([18, 14, 10, 6], [15, 12, 9, 6], l=True)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -16671,7 +16878,7 @@ W(li("Aghanim's Shard Reworked", t("REWORK"), extra=inline_note("Applies 3 Fury 
 W(ul_close())
 W(ability("Enrage", slug="ursa_enrage"))
 W(ul_open())
-W(li("Cooldown decreased from 70/50/30s to 60/45/30s", t("MISC")))
+W(li("Cooldown decreased from 70/50/30s to 60/45/30s", b([70, 50, 30], [60, 45, 30], l=True)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -16686,7 +16893,7 @@ W(li("Cooldown rescaled from 16/14/12/10s to 14/13/12/11s", t("REWORK")))
 W(ul_close())
 W(ability("Nether Swap", slug="vengefulspirit_nether_swap"))
 W(ul_open())
-W(li("Can no longer target invulnerable units", t("NERF")))
+W(li("Can no longer target invulnerable units", t("DEL")))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -16717,7 +16924,7 @@ W(ul_close())
 W(subgroup("Facet: Caustic Bath"))
 W(ability("Corrosive Skin", slug="viper_corrosive_skin"))
 W(ul_open())
-W(li(facet_badge("viper_caustic_bath") + " " + "Time to max effect increased from 4s to 5s", t("MISC")))
+W(li(facet_badge("viper_caustic_bath") + " " + "Time to max effect increased from 4s to 5s", b(4, 5, l=True)))
 W(ul_close())
 
 # Visage
@@ -16755,7 +16962,7 @@ W(ul_close())
 W(hero_header("Warlock"))
 W(ability("Chaotic Offering", slug="warlock_rain_of_chaos"))
 W(ul_open())
-W(li("Cooldown increased from 160s to 165s", t("MISC")))
+W(li("Cooldown increased from 160s to 165s", b(160, 165, l=True)))
 W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
@@ -16784,7 +16991,7 @@ W(li("Damage gain per level increased from 3.5 to 3.6", b(3.5, 3.6)))
 W(ul_close())
 W(ability("Gale Force", slug="windrunner_gale_force"))
 W(ul_open())
-W(li("Duration decreased from 3.5s to 3s", t("MISC")))
+W(li("Duration decreased from 3.5s to 3s", b(3.5, 3)))
 W(ul_close())
 
 # Winter Wyvern

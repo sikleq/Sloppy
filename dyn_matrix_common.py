@@ -148,7 +148,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                     category_filter=False):
     """Render a Dynamics matrix page. See module docstring for the params.
 
-    current_toggle — add an "In game" switch (left of Buff/nerf only) that hides
+    current_toggle — add an "In game" switch (left of Buff vs nerf) that hides
                      rows whose roster entry has current=False (removed/obsolete).
                      Default ON. Needs roster entries to carry `current`.
     class_filter   — add a Type multi-select dropdown (Items / Neutral Items /
@@ -249,9 +249,13 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
             if counts:
                 # Touched this patch → JS fills a coloured pill (always wins, even
                 # if the lifespan math would blank it — a touch means it existed).
+                # data-debut marks the item's introduction patch (ver == added):
+                # its NEW rows describe "item now exists", so the Buff-vs-nerf fold
+                # must NOT count them as a buff (items_dyn only; heroes have no `added`).
+                debut_attr = ' data-debut="1"' if (added and ver == added) else ''
                 cells.append(
                     f'<td class="hd-cell{sep}" data-ver="{_esc(ver)}" '
-                    f'data-hkey="{_esc(key)}" data-eid="{_esc(eid)}"></td>')
+                    f'data-hkey="{_esc(key)}" data-eid="{_esc(eid)}"{debut_attr}></td>')
             elif absent:
                 # Outside the item's lifespan (not added yet / already removed) →
                 # faint "n/a" dot, NOT the empty-slot square.
@@ -299,8 +303,8 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         '<input type="text" id="hd-hero-search" autocomplete="off" spellcheck="false" '
         f'placeholder="{_esc(search_ph)}">'
         '</span>')
-    # Optional items_dyn controls. "Show deleted" switch (sits left of Buff/nerf
-    # only): OFF by default → items removed from the game are hidden; ON reveals
+    # Optional items_dyn controls. "Show deleted" switch (sits left of Buff vs
+    # nerf): OFF by default → items removed from the game are hidden; ON reveals
     # them (their post-removal columns are blanked anyway).
     current_block = _switch(
         'hd-show-deleted', 'Deleted',
@@ -363,9 +367,10 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                   'Show only the most recent patches that fit the width '
                   '(latest at the right edge); off shows every patch', True)
         + current_block
-        + _switch('hd-bn-only', 'Buff/nerf only',
-                  'Fill cells with buff/nerf colours only — NEW counts as buff, '
-                  'DEL as nerf (hover still shows every tag)', False)
+        + _switch('hd-bn-only', 'Buff vs nerf',
+                  'Collapse each cell to two bands — buff + NEW (green) vs nerf + '
+                  'DEL (red); rework/misc/qol drop out of the colour (hover still '
+                  'shows every tag)', False)
         + price_block
         + remove_block
         + search_block
