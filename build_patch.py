@@ -14763,7 +14763,7 @@ W(ul_close())
 # ===== NEUTRAL ITEM UPDATES =====
 W(section("Neutral Item Updates"))
 
-W(plain_header("Artifact changes"))
+W(subgroup("Artifact changes"))
 W(item_header("Ripper's Lash"))
 W(ul_open())
 W(li("Item cycled out", t("DEL")))
