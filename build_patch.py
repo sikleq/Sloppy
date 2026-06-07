@@ -982,6 +982,7 @@ class _State:
     # Auto-categorize hero block contents (Stats / Abilities / Talents subgroups):
     next_ul_is_hero_stats = False    # set by hero_header(), consumed by ul_open()
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup
+    seen_facets_subgroup = False     # set when first facet_header() emits "Facets" subgroup
     current_sections = []            # per-patch list of {slug, label}; reset in save_html()
     current_section_slug = None      # slug of the active section(); "general" suppresses dyn-cells
     # Patch-dynamics widget: tag tallies per (entity, patch). Populated by
@@ -1117,6 +1118,7 @@ def hero_header(name):
     _State.current_hero = HERO_SLUG.get(name, name.lower().replace(" ", "_").replace("'", "").replace("-", ""))
     _State.next_ul_is_hero_stats = True
     _State.seen_abilities_subgroup = False
+    _State.seen_facets_subgroup = False
     eid = _register_entity("hero", name)
     return _open_block() + f'''<div class="entity hero-entity"{eid}>
   <div class="entity-icon hero-icon"><img src="{hero_img(name)}" alt="{name}" loading="lazy"></div>
@@ -2854,6 +2856,31 @@ def ability(title, slug=None, innate=None, icon_url=None):
     return out + (f'<div class="ability-block{" is-innate" if is_innate else ""}">'
                   f'{icon_html}'
                   f'<h4 class="ability-title">{title}</h4>')
+
+
+def facet_header(slug):
+    """Facet heading — same geometry as ability(): 40px square + h4 title.
+    Instead of a CDN icon, the square is the facet's gradient color block
+    (no icon: Valve doesn't publish facet icons on the public CDN).
+
+    Auto-emits a "Facets" subgroup before the first facet of the current
+    hero — parallel to `ability()` auto-emitting "Abilities".
+    """
+    if slug not in FACETS:
+        return f'<!-- facet_header: unknown slug {slug} -->'
+    name, color = FACETS[slug]
+    gradient = _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"])
+    out = _close_ability_block()
+    _State.next_ul_is_hero_stats = False
+    if _State.current_hero and not _State.seen_facets_subgroup:
+        out += '<h4 class="subgroup">Facets</h4>'
+        _State.seen_facets_subgroup = True
+    _State.ability_block_open = True
+    icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
+                 f'style="background-image:{gradient}"></div>')
+    return out + (f'<div class="ability-block facet-block">'
+                  f'{icon_html}'
+                  f'<h4 class="ability-title">{name}</h4>')
 
 
 def ul_open():
@@ -15045,9 +15072,9 @@ W(ability("Shadow Walk", slug="bounty_hunter_wind_walk"))
 W(ul_open())
 W(li("Stun Duration increased from 0.8/1/1.2/1.4s to 1/1.2/1.4/1.6s", b([0.8, 1, 1.2, 1.4], [1, 1.2, 1.4, 1.6])))
 W(ul_close())
-W(subgroup("Facet: Cutpurse"))
+W(facet_header("bounty_hunter_mugging"))
 W(ul_open())
-W(li(facet_badge("bounty_hunter_mugging") + " " + "Visual effect of gold flying towards Bounty Hunter is no longer visible to enemies if Bounty Hunter is invisible", t("QoL")))
+W(li("Visual effect of gold flying towards Bounty Hunter is no longer visible to enemies if Bounty Hunter is invisible", t("QoL")))
 W(ul_close())
 
 # Brewmaster
