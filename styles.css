@@ -2744,6 +2744,14 @@ ul.changes li.ability-row-end {
 .ability-change-block .ability-change.unified-panes:has(.formula-table-wrap) > .ability-change-pane {
   align-self: start;
 }
+/* Arrow also top-anchored when a formula table can expand — otherwise
+   `align-self: center` re-aligns to the grid-row centre, which moves
+   downward as the table grows, visibly drifting the arrow below the
+   old pane's body. */
+.ability-change-block .ability-change.unified-panes:has(.formula-table-wrap) > .ability-change-arrow {
+  align-self: start;
+  padding-top: 6px;
+}
 /* Single-pane "New ability" card (ability_change old=None): one full-width,
    top-anchored pane — no old side, no arrow. */
 .ability-change.unified-panes.is-single-new {

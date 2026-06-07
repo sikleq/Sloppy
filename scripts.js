@@ -424,6 +424,14 @@
   // Also re-run after fonts/images settle so the layout has its final
   // dimensions (icon images may load late and shift the icon position).
   window.addEventListener('load', drawAbilityChangeConnectors);
+  // Re-run when an inline formula table toggles open/closed inside an
+  // ability_change block — the block's height changes, so the SVG canvas
+  // dimensions (which cover blockRect.height) must be recalculated.
+  document.addEventListener('toggle', (e) => {
+    if (e.target && e.target.closest && e.target.closest('.ability-change-block')) {
+      drawAbilityChangeConnectors();
+    }
+  }, true);
 
   // ---------------------------------------------------------------------
   // PATCH DYNAMICS WIDGET
