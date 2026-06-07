@@ -883,6 +883,11 @@ FACETS = {
     "treant_primeval_power":            ("Primeval Power",      "Yellow2"),
     "treant_sapling":                   ("Sapling",             "Green2"),
     "marci_fleeting_fury":              ("Fleeting Fury",       "Red1"),      # COLOUR GUESSED
+    # --- Other current facets referenced in patch text but never emitted as a
+    #     standalone hero_facet subsection in the datafeed (so fetch_facets
+    #     can't see them). Colours pulled from prior-name datafeed snapshots
+    #     when the slug was renamed. ---
+    "abaddon_the_quickening":           ("The Quickening",      "Gray0"),     # = renamed abaddon_death_dude (7.36 datafeed Gray0)
 }
 
 # Mapping from Valve's facet_color name → CSS gradient that EXACTLY matches
@@ -14902,7 +14907,7 @@ W(ul_open())
 W(li("Base Strength decreased from 22 to 21", b(22, 21)))
 W(li("Base Agility decreased from 23 to 22", b(23, 22)))
 W(li("Damage at level 1 decreased by 1 (from 50–60 to 49–59)", t("MISC")))
-W(li("The Quickening: Cooldown reduction on hero death decreased from 6s to 5s", b(6, 5)))
+W(li(facet_badge("abaddon_the_quickening") + " " + "Cooldown reduction on hero death decreased from 6s to 5s", b(6, 5)))
 W(ul_close())
 W(ability("Mist Coil", slug="abaddon_death_coil"))
 W(ul_open())
