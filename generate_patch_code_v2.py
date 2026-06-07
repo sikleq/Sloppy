@@ -18,10 +18,12 @@ Pipeline:
 2. Walk each top-level section:
    - general_notes[]      → section("General Updates") + plain_header per note
    - items[]              → section("Item Updates")     + item_header per item
+   - neutral_creeps[]     → section("Neutral Creep Updates") + per creep
    - neutral_items[]      → section("Neutral Item Updates") + per artifact
    - heroes[]             → section("Hero Updates") + hero_header +
                             abilities + facet subsections
-   - neutral_creeps[]     → section("Neutral Creep Updates") + per creep
+   (Section order matches the official patch page: General → Items →
+    Neutral Creeps → Neutral Items → Heroes.)
 3. For each entity, walk notes tree:
    - indent_level == 1 → top-level li
    - indent_level == N+1 immediately after N → inline_note on parent
@@ -460,14 +462,39 @@ def _render_hero(hero):
 
 
 def _render_neutral_creep(creep):
-    """One neutral_creeps[] entry."""
+    """One neutral_creeps[] entry.
+
+    Datafeed shape:
+        {"name": "npc_dota_neutral_satyr_soulstealer",
+         "localized_name": "Satyr Mindstealer",
+         "neutral_creep_notes": [{"indent_level": 1, "note": "..."}, ...]}
+
+    Renders:
+        W(unit_header("<display_name>", _NC_CDN + "<slug>.png"))
+        W(ul_open())
+        <notes>
+        W(ul_close())
+
+    Per-ability splitting (ability("Mana Burn", icon_url=...) blocks) is
+    NOT done here — the datafeed flattens all notes under the unit. After
+    generation, manually lift each note into its own ability(...) +
+    ul_open/ul_close pair (match 7.41 Satyr Tormenter / Harpy Stormcrafter
+    canon).
+    """
     out = []
-    # Creep id maps to a unit, not in herolist/itemlist. Skip slug lookup.
-    cid = creep.get('npc_name') or f'creep_{creep.get("ability_id", "?")}'
-    out.append(f'\n# {cid}')
-    out.append(f'W(unit_header("{cid}", ""))')
-    body, _ = _emit_notes(creep.get('notes', []))
-    out.extend(body)
+    name = creep.get('name', '') or ''
+    display = creep.get('localized_name') or name or 'Unknown Creep'
+    # Strip the npc_dota_neutral_ prefix to get the icon slug.
+    slug = name.replace('npc_dota_neutral_', '', 1) if name else ''
+    icon = f'_NC_CDN + "{slug}.png"' if slug else '""'
+    out.append(f'\n# {display}')
+    out.append(f'W(unit_header("{display}", {icon}))')
+    notes = creep.get('neutral_creep_notes') or creep.get('notes') or []
+    if notes:
+        out.append('W(ul_open())')
+        body, _ = _emit_notes(notes)
+        out.extend(body)
+        out.append('W(ul_close())')
     return out
 
 
@@ -905,19 +932,20 @@ def generate(version):
         for item in d['items']:
             out.extend(_render_item(item, version))
 
+    # Neutral Creeps — per official patch page ordering, Creep Updates
+    # come BEFORE Neutral Item Updates (see https://www.dota2.com/patches).
+    if d.get('neutral_creeps'):
+        out.append('\n# ===== NEUTRAL CREEP UPDATES =====')
+        out.append('W(section("Neutral Creep Updates"))')
+        for creep in d['neutral_creeps']:
+            out.extend(_render_neutral_creep(creep))
+
     # Neutral Items
     if d.get('neutral_items'):
         out.append('\n# ===== NEUTRAL ITEM UPDATES =====')
         out.append('W(section("Neutral Item Updates"))')
         for item in d['neutral_items']:
             out.extend(_render_item(item, version, neutral=True))
-
-    # Neutral Creeps
-    if d.get('neutral_creeps'):
-        out.append('\n# ===== NEUTRAL CREEP UPDATES =====')
-        out.append('W(section("Neutral Creep Updates"))')
-        for creep in d['neutral_creeps']:
-            out.extend(_render_neutral_creep(creep))
 
     # Hero Updates
     if d.get('heroes'):

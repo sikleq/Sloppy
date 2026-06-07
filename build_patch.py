@@ -14760,6 +14760,22 @@ W(ul_open())
 W(li("Attack Speed bonus increased from +5 to +6", b(5, 6)))
 W(ul_close())
 
+# ===== NEUTRAL CREEP UPDATES =====
+W(section("Neutral Creep Updates"))
+
+W(unit_header("Satyr Mindstealer", _NC_CDN + "satyr_soulstealer.png"))
+W(ability("Mana Burn", icon_url="../icons/abilities/satyr_soulstealer_mana_burn.png"))
+W(ul_open())
+W(li("Mana Burn target's intelligence multiplier decreased from 2/2.5/3/4x to 1/1.5/2/2.5x",
+     b([2, 2.5, 3, 4], [1, 1.5, 2, 2.5])))
+W(ul_close())
+
+W(unit_header("Satyr Banisher", _NC_CDN + "satyr_trickster.png"))
+W(ability("Purge", icon_url="../icons/abilities/satyr_trickster_purge.png"))
+W(ul_open())
+W(li("Purge can no longer target invulnerable units", t("DEL")))
+W(ul_close())
+
 # ===== NEUTRAL ITEM UPDATES =====
 W(section("Neutral Item Updates"))
 
@@ -14875,15 +14891,6 @@ W(ul_open())
 W(li("Active: Refract. Spends 10% of the wearer's current health to create a full health illusion that lasts for 20s. The illusion has 50% outgoing damage and 240% incoming damage. No Mana Cost. Cooldown: 30s", t("NEW"),
      extra=inline_note("Dormant Curio increases illusion outgoing damage from 50% to 65%")))
 W(ul_close())
-
-# ===== NEUTRAL CREEP UPDATES =====
-W(section("Neutral Creep Updates"))
-
-# Satyr Soulstealer
-W(unit_header("Satyr Soulstealer", "", kind="Creep"))
-
-# Satyr Trickster
-W(unit_header("Satyr Trickster", "", kind="Creep"))
 
 # ===== HERO UPDATES =====
 W(section("Hero Updates"))
