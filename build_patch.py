@@ -15181,26 +15181,33 @@ W(ul_close())
 
 # Each brewling rendered as an ability_change comparison card. Same
 # name on both sides → "in-place" mode hides the duplicate header.
+def _sv(v):  # scepter-colored value (Aghs rank 4)
+    return f'<span class="scepter-val">{v}</span>'
+
 W(ability_change(
     old=dict(
         name="Earth Brewling",
         slug="brewmaster_drunken_brawler_earth",
         desc=[
+            "<b>Health:</b> 1400 / 2300 / 3200",
+            "<b>Regen:</b> 2 / 4 / 6",
+            "<b>Armor:</b> 3 / 5 / 7",
             "<b>Damage:</b> 20–30 / 55–65 / 90–100",
             "<b>Movement Speed:</b> 330 / 350 / 370",
-            "<b>Passive:</b> Debuff Immunity",
-            "<b>Demolish:</b> 50 / 100 / 150 bonus building damage",
+            "<b>Demolish:</b> 50 / 100 / 150",
         ],
     ),
     new=dict(
         name="Earth Brewling",
         slug="brewmaster_drunken_brawler_earth",
         desc=[
-            "<b>Damage:</b> 30–40 / 65–75 / 100–110 " + b([25, 60, 95], [35, 70, 105]),
+            f"<b>Health:</b> 1400 / 2300 / 3200 / {_sv('4100')}",
+            f"<b>Regen:</b> 2 / 4 / 6 / {_sv('8')}",
+            f"<b>Armor:</b> 3 / 5 / 7 / {_sv('9')}",
+            f"<b>Damage:</b> 30–40 / 65–75 / 100–110 / {_sv('135–145')} " + b([25, 60, 95], [35, 70, 105]),
             "<b>Movement Speed:</b> 330 / 355 / 380 " + b([330, 350, 370], [330, 355, 380]),
-            "<b>Passive:</b> Earth Element — 80% Status Resistance, 60% Magic Resistance",
-            "<b>Demolish:</b> 40 / 80 / 120 bonus building damage " + b([50, 100, 150], [40, 80, 120]),
-            aghs_line("Rank 4: <b>4100</b> HP, <b>8</b> Regen, <b>135–145</b> Damage, <b>9</b> Armor. Hurl Boulder: 200 dmg, 2s Stun. Demolish: 160."),
+            f"<b>Demolish:</b> 40 / 80 / 120 / {_sv('160')} " + b([50, 100, 150], [40, 80, 120]),
+            aghs_line(f"Hurl Boulder: {_sv('200')} dmg, {_sv('2s')} Stun. (Rank 4 values shown after each slash.)"),
         ],
     ),
 ))
@@ -15209,6 +15216,8 @@ W(ability_change(
         name="Storm Brewling",
         slug="brewmaster_drunken_brawler_storm",
         desc=[
+            "<b>Health:</b> 1000 / 1500 / 2000",
+            "<b>Regen:</b> 2 / 4 / 6",
             "<b>Damage:</b> 15–25 / 35–45 / 55–65",
         ],
     ),
@@ -15216,16 +15225,36 @@ W(ability_change(
         name="Storm Brewling",
         slug="brewmaster_drunken_brawler_storm",
         desc=[
-            "<b>Damage:</b> 25–35 / 45–55 / 65–75 " + b([20, 40, 60], [30, 50, 70]),
-            aghs_line("Rank 4: <b>2500</b> HP, <b>8</b> Regen, <b>85–95</b> Damage. Other base stats unchanged."),
+            f"<b>Health:</b> 1000 / 1500 / 2000 / {_sv('2500')}",
+            f"<b>Regen:</b> 2 / 4 / 6 / {_sv('8')}",
+            f"<b>Damage:</b> 25–35 / 45–55 / 65–75 / {_sv('85–95')} " + b([20, 40, 60], [30, 50, 70]),
+            aghs_line(f"Wind Walk: {_sv('320')} bonus dmg, {_sv('55%')} bonus MS. Cyclone: {_sv('6s')} hero duration, {_sv('100')} dmg on landing. (Rank 4 values.)"),
         ],
     ),
 ))
-W(ability("Fire Brewling", slug="brewmaster_drunken_brawler_fire"))
-W(ul_open())
-W(li("Aghanim's Scepter (rank 4): 1750 HP, 8 Health Regen, 215–225 Damage, 24 Armor", t("NEW"),
-     extra=inline_note("Permanent Immolation: 100 damage per second. Other base stats are unchanged.")))
-W(ul_close())
+W(ability_change(
+    old=dict(
+        name="Fire Brewling",
+        slug="brewmaster_drunken_brawler_fire",
+        desc=[
+            "<b>Health:</b> 1300 / 1450 / 1600",
+            "<b>Regen:</b> 2 / 4 / 6",
+            "<b>Armor:</b> 0 / 8 / 16",
+            "<b>Damage:</b> 65–75 / 115–125 / 165–175",
+        ],
+    ),
+    new=dict(
+        name="Fire Brewling",
+        slug="brewmaster_drunken_brawler_fire",
+        desc=[
+            f"<b>Health:</b> 1300 / 1450 / 1600 / {_sv('1750')}",
+            f"<b>Regen:</b> 2 / 4 / 6 / {_sv('8')}",
+            f"<b>Armor:</b> 0 / 8 / 16 / {_sv('24')}",
+            f"<b>Damage:</b> 65–75 / 115–125 / 165–175 / {_sv('215–225')}",
+            aghs_line(f"Permanent Immolation: {_sv('100')} damage per second. (Rank 4 values shown after each slash.)"),
+        ],
+    ),
+))
 W(ability("Void Brewling", slug="brewmaster_drunken_brawler_void"))
 W(ul_open())
 W(li("Brewling removed", t("DEL")))
