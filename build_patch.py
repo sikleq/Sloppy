@@ -14727,7 +14727,7 @@ W(li("Total cost decreased from 3350 to 3250 due to Shadow Amulet cost decrease"
 W(ul_close())
 W(item_header("Shiva's Guard"))
 W(ul_open())
-W(li("Arctic Blast no longer does extra damage to illusions", t("MISC")))
+W(li("Arctic Blast no longer does extra damage to illusions", t("DEL")))
 W(ul_close())
 W(item_header("Silver Edge"))
 W(ul_open())
