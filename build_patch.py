@@ -890,6 +890,21 @@ FACETS = {
     "abaddon_the_quickening":           ("The Quickening",      "Gray0"),     # = renamed abaddon_death_dude (7.36 datafeed Gray0)
 }
 
+# Slug → (color, icon_name) — collected from patchnotes datafeeds 7.34..7.41d
+# (scripts: see prompt that built data/facets_icons.json). Provides the
+# generic facet-icon name (e.g. "cooldown", "gold", "snake") for every
+# facet that ever appeared as a `hero_facet` subsection. PNGs extracted
+# from pak01_dir.vpk live in icons/facets/<icon>.png (white silhouette
+# on transparent — designed to overlay on the colored facet block).
+def _load_facet_icons():
+    import json as _json2
+    p = _os.path.join(_os.path.dirname(__file__), "data", "facets_icons.json")
+    if not _os.path.exists(p):
+        return {}
+    with open(p, encoding="utf-8") as f:
+        return _json2.load(f)
+_FACET_ICONS = _load_facet_icons()
+
 # Mapping from Valve's facet_color name → CSS gradient that EXACTLY matches
 # the in-game / dota2.com patch-page facet pill. Each pill is a simple
 # 2-stop `linear-gradient(to right, light, dark)` — the LEFT end is the
@@ -2859,9 +2874,10 @@ def ability(title, slug=None, innate=None, icon_url=None):
 
 
 def facet_header(slug):
-    """Facet heading — same geometry as ability(): 40px square + h4 title.
-    Instead of a CDN icon, the square is the facet's gradient color block
-    (no icon: Valve doesn't publish facet icons on the public CDN).
+    """Facet heading — same geometry as ability(): 48px square + h4 title.
+    The square shows the facet's gradient color (from FACETS / datafeed)
+    with the generic facet icon (extracted from pak01_dir.vpk) overlaid
+    on top — matches dota2.com's facet pill styling.
 
     Auto-emits a "Facets" subgroup before the first facet of the current
     hero — parallel to `ability()` auto-emitting "Abilities".
@@ -2869,6 +2885,12 @@ def facet_header(slug):
     if slug not in FACETS:
         return f'<!-- facet_header: unknown slug {slug} -->'
     name, color = FACETS[slug]
+    # Prefer the datafeed-derived icon (covers all facets); fall back to
+    # nothing if unknown (renders as plain color block).
+    icon_name = None
+    fi = _FACET_ICONS.get(slug)
+    if isinstance(fi, list) and len(fi) > 1:
+        icon_name = fi[1]
     gradient = _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"])
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
@@ -2876,8 +2898,10 @@ def facet_header(slug):
         out += '<h4 class="subgroup">Facets</h4>'
         _State.seen_facets_subgroup = True
     _State.ability_block_open = True
+    icon_overlay = (f'<img src="../icons/facets/{icon_name}.png" alt="" '
+                    f'class="facet-icon-overlay" loading="lazy">') if icon_name else ''
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
-                 f'style="background-image:{gradient}"></div>')
+                 f'style="background-image:{gradient}">{icon_overlay}</div>')
     return out + (f'<div class="ability-block facet-block">'
                   f'{icon_html}'
                   f'<h4 class="ability-title">{name}</h4>')

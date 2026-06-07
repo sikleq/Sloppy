@@ -3051,8 +3051,10 @@ h4.subgroup {
   box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 /* Facet block — same 48px geometry as ability(), but the icon-wrap renders
-   the facet's gradient color directly (no image). Hero h4 column is shared
-   with .ability-title so facet names align with ability names. */
+   the facet's gradient color + the generic facet icon (extracted from
+   pak01_dir.vpk, white silhouette on transparent) overlaid on top.
+   Hero h4 column is shared with .ability-title so facet names align with
+   ability names. */
 .ability-block.facet-block > .facet-icon-wrap {
   width: 48px;
   height: 48px;
@@ -3060,6 +3062,17 @@ h4.subgroup {
   background-size: cover;
   background-repeat: no-repeat;
   box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.4);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.facet-icon-overlay {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
+  opacity: 0.95;
 }
 /* Innate-icon overlay: bottom-center of the ability icon */
 .ability-block > .ability-icon-wrap > .innate-marker {
