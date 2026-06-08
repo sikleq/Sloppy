@@ -15183,93 +15183,31 @@ W(ul_close())
 
 # Each brewling rendered as an ability_change comparison card. Same
 # name on both sides → "in-place" mode hides the duplicate header.
-def _sv(v):  # scepter-stripe value (Aghs rank 4) — blue background pill
-    return f'<span class="scepter-val">{v}</span>'
-
-W(ability_change(
-    old=dict(
-        name="Earth Brewling",
-        slug="brewmaster_drunken_brawler_earth",
-        desc=[
-            "<b>Health:</b> 1400 / 2300 / 3200",
-            "<b>Regen:</b> 2 / 4 / 6",
-            "<b>Armor:</b> 3 / 5 / 7",
-            "<b>Damage:</b> 20–30 / 55–65 / 90–100",
-            "<b>Movement Speed:</b> 330 / 350 / 370",
-            "<b>Passive:</b> Debuff Immunity",
-            "<b>Demolish:</b> 50 / 100 / 150 bonus building damage",
-            "<b>Hurl Boulder dmg:</b> 50 / 100 / 150",
-            "<b>Hurl Boulder stun:</b> 1.6 / 1.6 / 1.6s",
-        ],
-    ),
-    new=dict(
-        name="Earth Brewling",
-        slug="brewmaster_drunken_brawler_earth",
-        desc=[
-            f"<b>Health:</b> 1400 / 2300 / 3200 / {_sv('4100')}",
-            f"<b>Regen:</b> 2 / 4 / 6 / {_sv('8')}",
-            f"<b>Armor:</b> 3 / 5 / 7 / {_sv('9')}",
-            f"<b>Damage:</b> 30–40 / 65–75 / 100–110 / {_sv('135–145')} " + b([25, 60, 95], [35, 70, 105]),
-            "<b>Movement Speed:</b> 330 / 355 / 380 " + b([330, 350, 370], [330, 355, 380]),
-            "<b>Passive:</b> Earth Element — 80% Status Resistance, 60% Magic Resistance",
-            f"<b>Demolish:</b> 40 / 80 / 120 / {_sv('160')} bonus building damage " + b([50, 100, 150], [40, 80, 120]),
-            f"<b>Hurl Boulder dmg:</b> 50 / 100 / 150 / {_sv('200')}",
-            f"<b>Hurl Boulder stun:</b> 1.6 / 1.6 / 1.6 / {_sv('1.8s')}",
-        ],
-    ),
-))
-W(ability_change(
-    old=dict(
-        name="Storm Brewling",
-        slug="brewmaster_drunken_brawler_storm",
-        desc=[
-            "<b>Health:</b> 1000 / 1500 / 2000",
-            "<b>Regen:</b> 2 / 4 / 6",
-            "<b>Damage:</b> 15–25 / 35–45 / 55–65",
-            "<b>Wind Walk bonus dmg:</b> 140 / 200 / 260",
-            "<b>Wind Walk bonus MS:</b> 25 / 35 / 45%",
-            "<b>Cyclone hero duration:</b> 3 / 3.75 / 4.5s",
-            "<b>Cyclone landing dmg:</b> 75",
-        ],
-    ),
-    new=dict(
-        name="Storm Brewling",
-        slug="brewmaster_drunken_brawler_storm",
-        desc=[
-            f"<b>Health:</b> 1000 / 1500 / 2000 / {_sv('2500')}",
-            f"<b>Regen:</b> 2 / 4 / 6 / {_sv('8')}",
-            f"<b>Damage:</b> 25–35 / 45–55 / 65–75 / {_sv('85–95')} " + b([20, 40, 60], [30, 50, 70]),
-            f"<b>Wind Walk bonus dmg:</b> 140 / 200 / 260 / {_sv('320')}",
-            f"<b>Wind Walk bonus MS:</b> 25 / 35 / 45 / {_sv('55%')}",
-            f"<b>Cyclone hero duration:</b> 3 / 3.75 / 4.5 / {_sv('5.25s')}",
-            f"<b>Cyclone landing dmg:</b> 75 / 75 / 75 / {_sv('100')}",
-        ],
-    ),
-))
-W(ability_change(
-    old=dict(
-        name="Fire Brewling",
-        slug="brewmaster_drunken_brawler_fire",
-        desc=[
-            "<b>Health:</b> 1300 / 1450 / 1600",
-            "<b>Regen:</b> 2 / 4 / 6",
-            "<b>Armor:</b> 0 / 8 / 16",
-            "<b>Damage:</b> 65–75 / 115–125 / 165–175",
-            "<b>Permanent Immolation:</b> 25 / 50 / 75 dmg per second",
-        ],
-    ),
-    new=dict(
-        name="Fire Brewling",
-        slug="brewmaster_drunken_brawler_fire",
-        desc=[
-            f"<b>Health:</b> 1300 / 1450 / 1600 / {_sv('1750')}",
-            f"<b>Regen:</b> 2 / 4 / 6 / {_sv('8')}",
-            f"<b>Armor:</b> 0 / 8 / 16 / {_sv('24')}",
-            f"<b>Damage:</b> 65–75 / 115–125 / 165–175 / {_sv('215–225')}",
-            f"<b>Permanent Immolation:</b> 25 / 50 / 75 / {_sv('100')} dmg per second",
-        ],
-    ),
-))
+# Each brewling is a standalone ability block. A dashed connector
+# (drawn by drawBrewlingConnectors() in scripts.js) visually anchors
+# them as children of Primal Split above.
+W(ability("Earth Brewling", slug="brewmaster_drunken_brawler_earth"))
+W(ul_open())
+W(li("Debuff Immunity ability renamed to Earth Element. No longer grants Debuff Immunity; now provides 80% Status Resistance and 60% Magic Resistance instead", t("REWORK")))
+W(li("Damage increased from 25/60/95 to 35/70/105", b([25, 60, 95], [35, 70, 105]),
+     extra=inline_note("From 20–30/55–65/90–100 to 30–40/65–75/100–110")))
+W(li("Movement Speed increased from 330/350/370 to 330/355/380", b([330, 350, 370], [330, 355, 380])))
+W(li("Demolish Bonus Building Damage decreased from 50/100/150 to 40/80/120", b([50, 100, 150], [40, 80, 120])))
+W(li("Aghanim's Scepter (rank 4): 4100 HP, 8 Regen, 135–145 Damage, 9 Armor", t("NEW"),
+     extra=inline_note("Hurl Boulder: 200 Damage, 2s Stun.<br>Demolish: 160 bonus building damage.")))
+W(ul_close())
+W(ability("Storm Brewling", slug="brewmaster_drunken_brawler_storm"))
+W(ul_open())
+W(li("Damage increased from 20/40/60 to 30/50/70", b([20, 40, 60], [30, 50, 70]),
+     extra=inline_note("From 15–25/35–45/55–65 to 25–35/45–55/65–75")))
+W(li("Aghanim's Scepter (rank 4): 2500 HP, 8 Regen, 85–95 Damage", t("NEW"),
+     extra=inline_note("Wind Walk: 320 bonus damage, 55% bonus movement speed.<br>Cyclone: 6s hero duration, 100 damage on landing.")))
+W(ul_close())
+W(ability("Fire Brewling", slug="brewmaster_drunken_brawler_fire"))
+W(ul_open())
+W(li("Aghanim's Scepter (rank 4): 1750 HP, 8 Regen, 215–225 Damage, 24 Armor", t("NEW"),
+     extra=inline_note("Permanent Immolation: 100 damage per second.")))
+W(ul_close())
 W(ability("Void Brewling", slug="brewmaster_drunken_brawler_void"))
 W(ul_open())
 W(li("Brewling removed", t("DEL")))

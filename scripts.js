@@ -434,6 +434,83 @@
   }, true);
 
   // ---------------------------------------------------------------------
+  // Brewling connector — dashed lines from Primal Split icon down to each
+  // of the four brewling ability blocks (Earth / Storm / Fire / Void).
+  // Same dashed style as the ability_change-connector (.ability-change-
+  // connector path), but a single SVG attached to <body> overlays multiple
+  // ability blocks via document-level coordinates.
+  // ---------------------------------------------------------------------
+  function drawBrewlingConnectors() {
+    // Remove any existing SVG so we can redraw fresh on each call.
+    document.querySelectorAll('svg.brewling-connector').forEach((s) => s.remove());
+    const parentImg = document.querySelector('img[data-slug="brewmaster_primal_split"]');
+    if (!parentImg) return;
+    const brewlingSlugs = [
+      'brewmaster_drunken_brawler_earth',
+      'brewmaster_drunken_brawler_storm',
+      'brewmaster_drunken_brawler_fire',
+      'brewmaster_drunken_brawler_void',
+    ];
+    const childImgs = brewlingSlugs
+      .map((s) => document.querySelector('img[data-slug="' + s + '"]'))
+      .filter(Boolean);
+    if (!childImgs.length) return;
+
+    // Use document-level coordinates so the SVG can span multiple
+    // ability-blocks regardless of their containing scrollable parents.
+    const docY = (rect) => rect.top + window.scrollY;
+    const docX = (rect) => rect.left + window.scrollX;
+    const parentRect = parentImg.getBoundingClientRect();
+    const childRects = childImgs.map((i) => i.getBoundingClientRect());
+
+    // Trunk: vertical line in the left gutter just outside the parent icon's
+    // left edge — visually "comes out" of the Primal Split icon.
+    const trunkX = docX(parentRect) - 12;
+    const startY = docY(parentRect) + parentRect.height / 2;
+    const lastChild = childRects[childRects.length - 1];
+    const endY = docY(lastChild) + lastChild.height / 2;
+    const minX = Math.min(trunkX, ...childRects.map(docX));
+    const maxX = Math.max(docX(parentRect) + parentRect.width / 2,
+                          ...childRects.map((r) => docX(r) + r.width));
+    const top = Math.min(startY, ...childRects.map(docY));
+    const bottom = endY + 4;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'brewling-connector');
+    svg.style.left = minX - 4 + 'px';
+    svg.style.top = top + 'px';
+    svg.style.width = (maxX - minX + 8) + 'px';
+    svg.style.height = (bottom - top + 4) + 'px';
+    svg.setAttribute('viewBox',
+      '0 0 ' + (maxX - minX + 8) + ' ' + (bottom - top + 4));
+
+    // Coordinate transform: subtract (minX-4, top) from each point.
+    const tx = (x) => x - (minX - 4);
+    const ty = (y) => y - top;
+
+    // Parent icon bottom-center connects via short stub down to the trunk.
+    const parentBottomX = docX(parentRect) + parentRect.width / 2;
+    const parentBottomY = docY(parentRect) + parentRect.height;
+    let d = 'M ' + tx(parentBottomX) + ' ' + ty(parentBottomY)
+          + ' L ' + tx(parentBottomX) + ' ' + ty(startY + 6)
+          + ' L ' + tx(trunkX) + ' ' + ty(startY + 6)
+          + ' L ' + tx(trunkX) + ' ' + ty(endY);
+    // Branch from trunk to each brewling icon's left-center.
+    for (const r of childRects) {
+      const cy = docY(r) + r.height / 2;
+      const cx = docX(r);
+      d += ' M ' + tx(trunkX) + ' ' + ty(cy)
+         + ' L ' + tx(cx) + ' ' + ty(cy);
+    }
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    svg.appendChild(path);
+    document.body.appendChild(svg);
+  }
+  drawBrewlingConnectors();
+  window.addEventListener('resize', drawBrewlingConnectors);
+  window.addEventListener('load', drawBrewlingConnectors);
+
+  // ---------------------------------------------------------------------
   // PATCH DYNAMICS WIDGET
   // ---------------------------------------------------------------------
   // For every .entity on the page, fetch _dynamics.json once, derive the

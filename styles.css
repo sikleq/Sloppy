@@ -2683,47 +2683,25 @@ ul.changes li.ability-row-end {
 /* Dense stat-list mode — used by per-unit comparison cards (e.g. Brewmaster
    brewlings) where each row is a single short stat line. Tightens vertical
    rhythm so the panes don't tower over the rest of the hero block. */
-.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-body { gap: 0; }
-.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-row {
-  padding: 0;
-  line-height: 1.15;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
+/* Brewling parent-child connector — dashed line from Primal Split's ability
+   icon down to each Brewling block's icon. Same visual idiom as the dashed
+   ability_change-connector (e.g. Belligerent → Liquid Courage). The SVG is
+   injected by drawBrewlingConnectors() in scripts.js and lives in the
+   document body with position:absolute so it can overlay multiple ability
+   blocks. */
+.brewling-connector {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
 }
-/* Top-anchor brewling panes so corresponding stat rows line up. */
-.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-pane { align-self: start; }
-.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change.unified-panes { align-items: start; }
-/* Brewling comparison panes — equal width, both stretched to fill the
-   ability-block content area, with a tight gap around the arrow. */
-.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change.is-in-place {
-  grid-template-columns: 1fr auto 1fr;
-  column-gap: 6px;
+.brewling-connector path {
+  fill: none;
+  stroke: rgba(139, 148, 158, 0.55);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  stroke-linecap: round;
 }
-.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change.is-in-place > .ability-change-pane {
-  justify-self: stretch;
-  width: auto;
-  max-width: none;
-}
-/* Scepter-stripe rank-4 value (the slot after the trailing slash). Wraps the
-   value in a blue background pill — matches the aghs-scepter visual identity
-   used in the full-width aghs row backgrounds elsewhere on the page. */
-.scepter-val {
-  display: inline-block;
-  background: linear-gradient(90deg,
-    rgba(72, 148, 255, 0.55) 0,
-    rgba(72, 148, 255, 0.35) 100%);
-  padding: 1px 6px;
-  border-radius: 3px;
-  font-weight: 600;
-  color: #ffffff;
-  box-shadow: 0 0 0 1px rgba(72, 148, 255, 0.45);
-}
-/* Badge group inside brewling rows uses the same right-aligned ladder as a
-   regular `<li class="changes">` row — explicit margin-left:auto pushes the
-   `b()` group to the right edge of the pane regardless of how long the text is. */
-.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-row > .badge-group { margin-left: auto; flex-shrink: 0; }
 /* Unified ability-change layout: renders as a regular ability-block (icon
    + title + tag/summary row) with the swap panes inside the block body.
    Title shows `Old → New` when names differ. The block visually matches
