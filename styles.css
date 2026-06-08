@@ -2695,11 +2695,16 @@ ul.changes li.ability-row-end {
 /* Top-anchor brewling panes so corresponding stat rows line up. */
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-pane { align-self: start; }
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change.unified-panes { align-items: start; }
-/* New pane wider than old — brewling new rows carry an extra slash-separated
-   Aghs value + a trailing %-badge ladder; cramming both into a 1fr column
-   forced everything tight against the right edge. Give new ~40% more space. */
+/* Brewling comparison panes — equal width, both stretched to fill the
+   ability-block content area, with a tight gap around the arrow. */
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change.is-in-place {
-  grid-template-columns: 1fr auto 1.4fr;
+  grid-template-columns: 1fr auto 1fr;
+  column-gap: 6px;
+}
+.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change.is-in-place > .ability-change-pane {
+  justify-self: stretch;
+  width: auto;
+  max-width: none;
 }
 /* Scepter-stripe rank-4 value (the slot after the trailing slash). Wraps the
    value in a blue background pill — matches the aghs-scepter visual identity

@@ -15123,10 +15123,6 @@ W(facet_header("brewmaster_drunken_master"))
 W(ul_open())
 W(li("Facet removed", t("DEL")))
 W(ul_close())
-W(ability("Primal Companion", slug="brewmaster_primal_companion"))
-W(ul_open())
-W(li("Ability removed", t("DEL")))
-W(ul_close())
 _lc_pill, _lc_table = scale_pill("10.5% + 0.5% per level up",
                                  lambda L: 10.5 + 0.5 * L,
                                  levels=[1, 5, 10, 15, 20, 25, 30], value_fmt="{:.1f}%")
@@ -15173,6 +15169,10 @@ W(li("Void Stance removed", t("DEL")))
 W(li("Stance visual indicator is now always present around Brewmaster", t("QoL")))
 W(li("Stances can now be switched without cancelling channeling or invisibility", t("MISC")))
 W(ul_close())
+W(ability("Primal Companion", slug="brewmaster_primal_companion"))
+W(ul_open())
+W(li("Ability removed", t("DEL")))
+W(ul_close())
 W(ability("Primal Split", slug="brewmaster_primal_split"))
 W(ul_open())
 W(li("Duration increased from 16/18/20s to 16/20/24s", b([16, 18, 20], [16, 20, 24])))
@@ -15196,6 +15196,7 @@ W(ability_change(
             "<b>Armor:</b> 3 / 5 / 7",
             "<b>Damage:</b> 20–30 / 55–65 / 90–100",
             "<b>Movement Speed:</b> 330 / 350 / 370",
+            "<b>Passive:</b> Debuff Immunity",
             "<b>Demolish:</b> 50 / 100 / 150 bonus building damage",
             "<b>Hurl Boulder dmg:</b> 50 / 100 / 150",
             "<b>Hurl Boulder stun:</b> 1.6 / 1.6 / 1.6s",
@@ -15210,7 +15211,8 @@ W(ability_change(
             f"<b>Armor:</b> 3 / 5 / 7 / {_sv('9')}",
             f"<b>Damage:</b> 30–40 / 65–75 / 100–110 / {_sv('135–145')} " + b([25, 60, 95], [35, 70, 105]),
             "<b>Movement Speed:</b> 330 / 355 / 380 " + b([330, 350, 370], [330, 355, 380]),
-            f"<b>Demolish:</b> 40 / 80 / 120 / {_sv('160')} bonus building damage",
+            "<b>Passive:</b> Earth Element — 80% Status Resistance, 60% Magic Resistance",
+            f"<b>Demolish:</b> 40 / 80 / 120 / {_sv('160')} bonus building damage " + b([50, 100, 150], [40, 80, 120]),
             f"<b>Hurl Boulder dmg:</b> 50 / 100 / 150 / {_sv('200')}",
             f"<b>Hurl Boulder stun:</b> 1.6 / 1.6 / 1.6 / {_sv('1.8s')}",
         ],
@@ -15304,7 +15306,7 @@ W(li("Aghanim's Shard no longer increases duration", t("DEL")))
 W(ul_close())
 W(ability("Spin Web", slug="broodmother_spin_web"))
 W(ul_open())
-W(li("Broodmother's illusions now also benefit from the web", t("MISC")))
+W(li("Broodmother's illusions now also benefit from the web", t("BUFF")))
 W(ul_close())
 W(ability("Incapacitating Bite", slug="broodmother_incapacitating_bite"))
 W(ul_open())
