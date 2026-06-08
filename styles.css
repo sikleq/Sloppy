@@ -2680,15 +2680,13 @@ ul.changes li.ability-row-end {
    rhythm so the panes don't tower over the rest of the hero block. */
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-body { gap: 0; }
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-row {
-  padding: 0;
-  line-height: 1.4;
+  padding: 1px 0;
+  line-height: 1.25;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 8px;
 }
-.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-row.aghanim-scepter,
-.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-row.aghanim-shard { margin-top: 4px; }
 /* Top-anchor brewling panes so corresponding stat rows line up. */
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-pane { align-self: start; }
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change.unified-panes { align-items: start; }
@@ -2696,13 +2694,24 @@ ul.changes li.ability-row-end {
    top padding so its first body row lines up with the left pane's first
    body row (which sits below the 40px icon + 6px pad + 1px border = 47px). */
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-pane.ability-change-new > .ability-change-body { padding-top: 47px; }
-/* Scepter-colored rank-4 value (the slot after the trailing slash). Matches
-   the blue tint Valve uses on Aghs Scepter values throughout the UI. */
+/* Scepter-stripe rank-4 value (the slot after the trailing slash). Wraps the
+   value in a blue background pill — matches the aghs-scepter visual identity
+   used in the full-width aghs row backgrounds elsewhere on the page. */
 .scepter-val {
-  color: #4894ff;
+  display: inline-block;
+  background: linear-gradient(90deg,
+    rgba(72, 148, 255, 0.55) 0,
+    rgba(72, 148, 255, 0.35) 100%);
+  padding: 1px 6px;
+  border-radius: 3px;
   font-weight: 600;
-  text-shadow: 0 0 8px rgba(72, 148, 255, 0.25);
+  color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(72, 148, 255, 0.45);
 }
+/* Badge group inside brewling rows uses the same right-aligned ladder as a
+   regular `<li class="changes">` row — explicit margin-left:auto pushes the
+   `b()` group to the right edge of the pane regardless of how long the text is. */
+.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-row > .badge-group { margin-left: auto; flex-shrink: 0; }
 /* Unified ability-change layout: renders as a regular ability-block (icon
    + title + tag/summary row) with the swap panes inside the block body.
    Title shows `Old → New` when names differ. The block visually matches

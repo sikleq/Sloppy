@@ -15181,7 +15181,7 @@ W(ul_close())
 
 # Each brewling rendered as an ability_change comparison card. Same
 # name on both sides → "in-place" mode hides the duplicate header.
-def _sv(v):  # scepter-colored value (Aghs rank 4)
+def _sv(v):  # scepter-stripe value (Aghs rank 4) — blue background pill
     return f'<span class="scepter-val">{v}</span>'
 
 W(ability_change(
@@ -15194,7 +15194,8 @@ W(ability_change(
             "<b>Armor:</b> 3 / 5 / 7",
             "<b>Damage:</b> 20–30 / 55–65 / 90–100",
             "<b>Movement Speed:</b> 330 / 350 / 370",
-            "<b>Demolish:</b> 50 / 100 / 150",
+            "<b>Demolish:</b> 50 / 100 / 150 bonus building damage",
+            "<b>Hurl Boulder:</b> 50 / 100 / 150 dmg, 1.6s stun",
         ],
     ),
     new=dict(
@@ -15206,8 +15207,8 @@ W(ability_change(
             f"<b>Armor:</b> 3 / 5 / 7 / {_sv('9')}",
             f"<b>Damage:</b> 30–40 / 65–75 / 100–110 / {_sv('135–145')} " + b([25, 60, 95], [35, 70, 105]),
             "<b>Movement Speed:</b> 330 / 355 / 380 " + b([330, 350, 370], [330, 355, 380]),
-            f"<b>Demolish:</b> 40 / 80 / 120 / {_sv('160')} " + b([50, 100, 150], [40, 80, 120]),
-            aghs_line(f"Hurl Boulder: {_sv('200')} dmg, {_sv('2s')} Stun. (Rank 4 values shown after each slash.)"),
+            f"<b>Demolish:</b> 40 / 80 / 120 / {_sv('160')} bonus building damage",
+            f"<b>Hurl Boulder:</b> 50 / 100 / 150 / {_sv('200')} dmg, 1.6 / 1.6 / 1.6 / {_sv('1.8s')} stun",
         ],
     ),
 ))
@@ -15219,6 +15220,8 @@ W(ability_change(
             "<b>Health:</b> 1000 / 1500 / 2000",
             "<b>Regen:</b> 2 / 4 / 6",
             "<b>Damage:</b> 15–25 / 35–45 / 55–65",
+            "<b>Wind Walk:</b> 140 / 200 / 260 bonus dmg, 25 / 35 / 45% bonus MS",
+            "<b>Cyclone:</b> 3 / 3.75 / 4.5s hero duration, 75 dmg on landing",
         ],
     ),
     new=dict(
@@ -15228,7 +15231,8 @@ W(ability_change(
             f"<b>Health:</b> 1000 / 1500 / 2000 / {_sv('2500')}",
             f"<b>Regen:</b> 2 / 4 / 6 / {_sv('8')}",
             f"<b>Damage:</b> 25–35 / 45–55 / 65–75 / {_sv('85–95')} " + b([20, 40, 60], [30, 50, 70]),
-            aghs_line(f"Wind Walk: {_sv('320')} bonus dmg, {_sv('55%')} bonus MS. Cyclone: {_sv('6s')} hero duration, {_sv('100')} dmg on landing. (Rank 4 values.)"),
+            f"<b>Wind Walk:</b> 140 / 200 / 260 / {_sv('320')} bonus dmg, 25 / 35 / 45 / {_sv('55%')} bonus MS",
+            f"<b>Cyclone:</b> 3 / 3.75 / 4.5 / {_sv('5.25s')} hero duration, 75 / 75 / 75 / {_sv('100')} dmg on landing",
         ],
     ),
 ))
@@ -15241,6 +15245,7 @@ W(ability_change(
             "<b>Regen:</b> 2 / 4 / 6",
             "<b>Armor:</b> 0 / 8 / 16",
             "<b>Damage:</b> 65–75 / 115–125 / 165–175",
+            "<b>Permanent Immolation:</b> 25 / 50 / 75 dmg per second",
         ],
     ),
     new=dict(
@@ -15251,7 +15256,7 @@ W(ability_change(
             f"<b>Regen:</b> 2 / 4 / 6 / {_sv('8')}",
             f"<b>Armor:</b> 0 / 8 / 16 / {_sv('24')}",
             f"<b>Damage:</b> 65–75 / 115–125 / 165–175 / {_sv('215–225')}",
-            aghs_line(f"Permanent Immolation: {_sv('100')} damage per second. (Rank 4 values shown after each slash.)"),
+            f"<b>Permanent Immolation:</b> 25 / 50 / 75 / {_sv('100')} dmg per second",
         ],
     ),
 ))
