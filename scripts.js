@@ -440,18 +440,39 @@
   // connector path), but a single SVG attached to <body> overlays multiple
   // ability blocks via document-level coordinates.
   // ---------------------------------------------------------------------
+  // Ability-tree groups: a parent ability icon dashed-linked down to its
+  // child blocks. Used for Brewmaster's Primal Split → brewlings and
+  // Drunken Brawler → stances (same visual concept).
+  const ABILITY_TREES = [
+    {
+      parent: 'brewmaster_primal_split',
+      children: [
+        'brewmaster_earth_unit',
+        'brewmaster_storm_unit',
+        'brewmaster_fire_unit',
+        'brewmaster_void_unit',
+      ],
+    },
+    {
+      parent: 'brewmaster_drunken_brawler',
+      children: [
+        'brewmaster_drunken_brawler_earth',
+        'brewmaster_drunken_brawler_fire',
+        'brewmaster_drunken_brawler_void',
+      ],
+    },
+  ];
+
   function drawBrewlingConnectors() {
-    // Remove any existing SVG so we can redraw fresh on each call.
+    // Remove any existing SVGs so we can redraw fresh on each call.
     document.querySelectorAll('svg.brewling-connector').forEach((s) => s.remove());
-    const parentImg = document.querySelector('img[data-slug="brewmaster_primal_split"]');
+    ABILITY_TREES.forEach((tree) => drawAbilityTree(tree.parent, tree.children));
+  }
+
+  function drawAbilityTree(parentSlug, childSlugs) {
+    const parentImg = document.querySelector('img[data-slug="' + parentSlug + '"]');
     if (!parentImg) return;
-    const brewlingSlugs = [
-      'brewmaster_drunken_brawler_earth',
-      'brewmaster_drunken_brawler_storm',
-      'brewmaster_drunken_brawler_fire',
-      'brewmaster_drunken_brawler_void',
-    ];
-    const childImgs = brewlingSlugs
+    const childImgs = childSlugs
       .map((s) => document.querySelector('img[data-slug="' + s + '"]'))
       .filter(Boolean);
     if (!childImgs.length) return;

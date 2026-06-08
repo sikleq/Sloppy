@@ -1383,11 +1383,29 @@ def properties_change(old, new, old_extras=None, new_extras=None):
 
 
 def inline_note(text):
-    """Small ↳ note that hangs off the end of a li (pass via `extra=`).
-    Renders below the row text inside the same li, indented to match the
-    subnote visual style. Use for one-liner info that belongs to a single
-    change row (e.g. 'As a result of Health Restoration changes')."""
-    return f'<div class="inline-note">{text}</div>'
+    """Clarifying note for a single change row (pass via `extra=`).
+
+    Renders as a circled-'i' info marker (see `info_tip`) that `li()`
+    relocates INLINE right after the row text — matching the (i) bubbles in
+    the official Dota patchnotes. The note body (which may contain rich HTML
+    badges / <br>) shows in a hover/focus popup. Wrapped in sentinel comments
+    so `li()` can lift it out of `extra` into the row text; in any other
+    context the comments are inert and the (i) still works in place."""
+    return f'<!--INLINETIP-->{info_tip(text)}<!--/INLINETIP-->'
+
+
+def info_tip(*lines, header=None):
+    """Small circled-'i' marker with a hover/focus popup, mirroring the (i)
+    info bubbles in the official Dota patchnotes. Place INLINE inside a li's
+    text (or let `inline_note` route it there automatically).
+
+    `lines` are popup body lines (joined with <br>; pass '' for a blank
+    separator line). Each line may contain rich HTML (badges, <b>, <br>).
+    Optional `header` is shown bold at the top of the popup."""
+    body = '<br>'.join(lines)
+    head = f'<span class="info-pop-h">{header}</span>' if header else ''
+    return ('<span class="info-tip" tabindex="0">i'
+            f'<span class="info-pop">{head}{body}</span></span>')
 
 
 def show_list(*items, summary='Show list'):
@@ -3046,9 +3064,24 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False):
         classes.append("ability-row")
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""
     attr = f' data-tag="{tag_str}"' if tag_str else ""
-    # Marker is appended INSIDE .row-text so it sits right after the change
-    # text (before the % badge column), matching Valve's visual order.
-    text_inner = f'{text}{marker}' if isinstance(text, str) else text
+    # Marker is appended INSIDE .row-text so the Aghanim's Scepter/Shard
+    # glyph trails the change text (before the % badge column). If the text
+    # ends with an inline (i)-tip span, the marker goes BEFORE it so order is
+    # [text] [Aghanim glyph] [(i)] — never (i) then glyph.
+    if isinstance(text, str) and marker and 'class="info-tip"' in text \
+            and text.rstrip().endswith('</span>'):
+        _tip_idx = text.rfind('<span class="info-tip"')
+        text_inner = text[:_tip_idx] + marker + text[_tip_idx:]
+    else:
+        text_inner = f'{text}{marker}' if isinstance(text, str) else text
+    # Lift any inline_note (i)-tips out of `extra` and append them INSIDE
+    # .row-text so the info bubble sits right after the description text
+    # (Valve-style), leaving block extras (note_box / show_list) below.
+    if isinstance(extra, str) and '<!--INLINETIP-->' in extra:
+        tips = re.findall(r'<!--INLINETIP-->(.*?)<!--/INLINETIP-->', extra, re.S)
+        extra = re.sub(r'<!--INLINETIP-->.*?<!--/INLINETIP-->', '', extra, flags=re.S)
+        if isinstance(text_inner, str) and tips:
+            text_inner = text_inner + ' ' + ' '.join(tips)
     return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text_inner}</span>{rest}{extra}</li>'
 
 
@@ -3893,6 +3926,10 @@ def save_html(filename):
     out = _swap_single_row_other_icons(out)
     out = _sort_changes_li(out)
     out = _wrap_ability_boxes(out)
+    # Safety net: any inline_note (i)-tip sentinel that wasn't lifted into a
+    # row by li() (e.g. used outside an `extra=`) ships without its markers —
+    # the (i) bubble still renders in place; only the comments are stripped.
+    out = out.replace('<!--INLINETIP-->', '').replace('<!--/INLINETIP-->', '')
     path = filename
     os.makedirs(os.path.dirname(path), exist_ok=True) if os.path.dirname(path) else None
     with open(path, "w", encoding="utf-8") as f:
@@ -7942,9 +7979,10 @@ W(components(('Blade of Alacrity', 1000), ('Broadsword', 1000),
 W(provides('+20 Damage, +12 Agility'))
 W(ul_open())
 W(li("Passive: Splitshot. Ranged Only. Ranged attacks have a 30% chance to fire additional projectiles at up to 2 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("NEW")))
-W(li("Doesn't work with other sources of secondary projectiles from hero abilities",
-     t("NEW"),
-     extra=show_list("Gyrocopter's Flak Cannon", "Medusa's Split Shot", "Muerta's Gunslinger")))
+W(li("Doesn't work with other sources of secondary projectiles from hero abilities " + info_tip(
+        "Gyrocopter's Flak Cannon", "Medusa's Split Shot", "Muerta's Gunslinger",
+        header="Affected abilities:"),
+     t("NEW")))
 W(ul_close())
 W(item_header("Hydra's Breath", new="New Armaments Item"))
 W(components(("Specialist's Array", 2550), ('Dragon Lance', 1900), ('Orb of Venom', 350),
@@ -8000,9 +8038,9 @@ W(properties_change(
     new=[("",    "+6/7/8/9/10 All Attributes", b([7, 9, 11, 13, 15], [6, 7, 8, 9, 10])),
          ("NEW", "+200/210/220/230/240 Health"),
          ("NEW", "+350/375/400/425/450 Mana"),
-         ("NEW", "+60/90/120/150/180 Cast Range")],
-    new_extras={3: show_list("Cast Range Bonus does not stack with Aether Lens or multiple Dagons",
-                              summary="Stacking rules")}))
+         ("NEW", "+60/90/120/150/180 Cast Range " + info_tip(
+             "Cast Range Bonus does not stack with Aether Lens or multiple Dagons",
+             header="Stacking rules"))]))
 W(ul_open())
 W(li("Recipe cost unchanged at 1150. Total cost increased from 2800/3950/5100/6250/7400g to 3050/4200/5350/6500/7650g", b([2800, 3950, 5100, 6250, 7400], [3050, 4200, 5350, 6500, 7650], l=True)))
 W(li("Energy Burst cast range decreased from 700/750/800/850/900 to 640", b([700, 750, 800, 850, 900], 640)))
@@ -14433,7 +14471,10 @@ W(plain_header("General Changes"))
 # One ul so the tag-order sorter ranks across all three (NEW → NEW → REWORK);
 # they were split across two uls before, which left REWORK between the two NEWs.
 W(ul_open())
-W(li("All Facets that used to have 6 All Attributes bonuses now have 7 bonuses again", t("BUFF"), extra=show_list("Batrider's Arsonist", "Magnus' Diminishing Return", "Meepo's More Meepo", "Monkey King's Simian Stride", "Night Stalker's Voidbringer", "Silencer's Synaptic Split")))
+W(li("All Facets that used to have 6 All Attributes bonuses now have 7 bonuses again " + info_tip(
+        "Batrider's Arsonist", "Magnus' Diminishing Return", "Meepo's More Meepo",
+        "Monkey King's Simian Stride", "Night Stalker's Voidbringer", "Silencer's Synaptic Split",
+        header="Affected facets:"), t("BUFF")))
 W(li("Tier 4 Towers now have a Barracks Reinforcement buff. Each allied barracks that has not been destroyed provides +4 armor to both Tier 4 towers", t("NEW"), extra=inline_note("Bonus is for each individual building, totaling in +24 Armor for 6 Barracks")))
 W(li("Talents no longer require a skill point to level", t("REWORK"), extra=inline_note("Now talents are learned by using their own talent points available at levels 10, 15, 20, 25, 27, 28, 29, and 30. This results in all +2 All Attributes bonuses skilled by level 22")))
 W(ul_close())
@@ -14542,11 +14583,11 @@ W(ul_close())
 W(subgroup("Cyclone"))
 W(section_intro("Since Cyclone effects also make the unit invulnerable, all changes above apply to them as well — these are the special cases:"))
 W(ul_open())
-W(li("Nullifier's Nullify will dispel Cyclone off the target immediately if Cyclone was cast on a unit already affected by the Nullify debuff", t("MISC")))
-W(li("Oracle's Fortune's End cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target", t("MISC")))
-W(li("Sven's Storm Hammer with Aghanim's Scepter cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target", t("MISC")))
+_cyclone_proj_note = "Also dispels Cyclone if the spell projectile was launched (or started channeling) before the target got Cycloned"
+W(li("Nullifier's Nullify will dispel Cyclone off the target immediately if Cyclone was cast on a unit already affected by the Nullify debuff", t("MISC"), extra=inline_note(_cyclone_proj_note)))
+W(li("Oracle's Fortune's End cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target", t("MISC"), extra=inline_note(_cyclone_proj_note)))
+W(li("Sven's Storm Hammer with Aghanim's Scepter cannot target Cycloned units, but will dispel Cyclone off the units in AoE around the target", t("MISC"), extra=inline_note(_cyclone_proj_note)))
 W(ul_close())
-W(subnote("All three of these will also dispel Cyclone if the spell projectile was launched (or started channeling) before the target got Cycloned"))
 
 # ===== ITEM UPDATES =====
 W(section("Item Updates"))
@@ -15163,11 +15204,25 @@ W(ul_close())
 W(ability("Drunken Brawler", slug="brewmaster_drunken_brawler"))
 W(ul_open())
 W(li("Moved Brewed Up effect from Cinder Brew to Drunken Brawler", t("MISC"), extra=inline_note("When Brewmaster casts any ability, he becomes Brewed Up for 5 seconds, gaining +150% to his stance bonuses. If he is already Brewed Up, the duration is extended by 1s. After Brewed Up ends, Brewmaster is hungover and cannot become Brewed Up again for 9 seconds")))
-W(li("Earth Stance Magic Resistance increased from 5/10/15/20% to 8/12/16/20%", b([5, 10, 15, 20], [8, 12, 16, 20])))
-W(li("Fire Stance Attack Speed increased from 10/15/20/25 to 10/20/30/40", b([10, 15, 20, 25], [10, 20, 30, 40])))
-W(li("Void Stance removed", t("DEL")))
 W(li("Stance visual indicator is now always present around Brewmaster", t("QoL")))
 W(li("Stances can now be switched without cancelling channeling or invisibility", t("MISC")))
+W(ul_close())
+
+# Each Drunken Brawler stance rendered as a standalone ability block using
+# the stance spellicons. A dashed connector (drawStanceConnectors() in
+# scripts.js) anchors them as children of Drunken Brawler above — same
+# concept as Primal Split → brewlings.
+W(ability("Earth Stance", slug="brewmaster_drunken_brawler_earth"))
+W(ul_open())
+W(li("Magic Resistance increased from 5/10/15/20% to 8/12/16/20%", b([5, 10, 15, 20], [8, 12, 16, 20])))
+W(ul_close())
+W(ability("Fire Stance", slug="brewmaster_drunken_brawler_fire"))
+W(ul_open())
+W(li("Attack Speed increased from 10/15/20/25 to 10/20/30/40", b([10, 15, 20, 25], [10, 20, 30, 40])))
+W(ul_close())
+W(ability("Void Stance", slug="brewmaster_drunken_brawler_void"))
+W(ul_open())
+W(li("Stance removed", t("DEL")))
 W(ul_close())
 W(ability("Primal Companion", slug="brewmaster_primal_companion"))
 W(ul_open())
@@ -15186,29 +15241,36 @@ W(ul_close())
 # Each brewling is a standalone ability block. A dashed connector
 # (drawn by drawBrewlingConnectors() in scripts.js) visually anchors
 # them as children of Primal Split above.
-W(ability("Earth Brewling", slug="brewmaster_drunken_brawler_earth"))
+W(ability("Earth Brewling", slug="brewmaster_earth_unit", icon_url="../icons/units/brewmaster_earth_unit.png"))
 W(ul_open())
 W(li("Debuff Immunity ability renamed to Earth Element. No longer grants Debuff Immunity; now provides 80% Status Resistance and 60% Magic Resistance instead", t("REWORK")))
 W(li("Damage increased from 25/60/95 to 35/70/105", b([25, 60, 95], [35, 70, 105]),
      extra=inline_note("From 20–30/55–65/90–100 to 30–40/65–75/100–110")))
 W(li("Movement Speed increased from 330/350/370 to 330/355/380", b([330, 350, 370], [330, 355, 380])))
 W(li("Demolish Bonus Building Damage decreased from 50/100/150 to 40/80/120", b([50, 100, 150], [40, 80, 120])))
-W(li("Aghanim's Scepter (level 4): 4100 HP, 8 Regen, 135–145 Damage, 9 Armor", t("NEW"),
-     extra=inline_note("Hurl Boulder: 200 Damage, 2s Stun.<br>Demolish: 160 bonus building damage.")))
+W(li("Aghanim's Scepter improves the unit by 1 level. " + info_tip(
+        "4100 HP.", "8 HP Regen.", "135–145 Damage.", "9 Armor.", "",
+        "Hurl Boulder: 200 Damage, 2s Stun.", "Demolish: 160 bonus building damage.",
+        header="Level 4 stats are:"), t("NEW")))
 W(ul_close())
-W(ability("Storm Brewling", slug="brewmaster_drunken_brawler_storm"))
+W(ability("Storm Brewling", slug="brewmaster_storm_unit", icon_url="../icons/units/brewmaster_storm_unit.png"))
 W(ul_open())
 W(li("Damage increased from 20/40/60 to 30/50/70", b([20, 40, 60], [30, 50, 70]),
      extra=inline_note("From 15–25/35–45/55–65 to 25–35/45–55/65–75")))
-W(li("Aghanim's Scepter (level 4): 2500 HP, 8 Regen, 85–95 Damage", t("NEW"),
-     extra=inline_note("Wind Walk: 320 bonus damage, 55% bonus movement speed.<br>Cyclone: 6s hero duration, 100 damage on landing.")))
+W(li("Aghanim's Scepter improves the unit by 1 level. " + info_tip(
+        "2500 HP.", "8 HP Regen.", "85–95 Damage.", "",
+        "Wind Walk: 320 bonus damage, 55% bonus movement speed.",
+        "Cyclone: 6s hero duration, 100 damage on landing.",
+        header="Level 4 stats are:"), t("NEW")))
 W(ul_close())
-W(ability("Fire Brewling", slug="brewmaster_drunken_brawler_fire"))
+W(ability("Fire Brewling", slug="brewmaster_fire_unit", icon_url="../icons/units/brewmaster_fire_unit.png"))
 W(ul_open())
-W(li("Aghanim's Scepter (level 4): 1750 HP, 8 Regen, 215–225 Damage, 24 Armor", t("NEW"),
-     extra=inline_note("Permanent Immolation: 100 damage per second.")))
+W(li("Aghanim's Scepter improves the unit by 1 level. " + info_tip(
+        "1750 HP.", "8 HP Regen.", "215–225 Damage.", "24 Armor.", "",
+        "Permanent Immolation: 100 damage per second.",
+        header="Level 4 stats are:"), t("NEW")))
 W(ul_close())
-W(ability("Void Brewling", slug="brewmaster_drunken_brawler_void"))
+W(ability("Void Brewling", slug="brewmaster_void_unit", icon_url="../icons/units/brewmaster_void_unit.png"))
 W(ul_open())
 W(li("Brewling removed", t("DEL")))
 W(ul_close())

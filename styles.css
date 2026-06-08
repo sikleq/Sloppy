@@ -2487,6 +2487,82 @@ ul.changes li.ability-row-end {
 .enchant-chip.souvenir-chip.removed:hover::after {
   opacity: 1;
 }
+/* Circled-'i' info marker — inline hover bubble like the official Dota
+   patchnotes (i) icons. Trigger is a small gold-ringed circle; popup uses
+   pre-line for one-stat-per-line bodies. */
+.info-tip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  margin-left: 4px;
+  border-radius: 50%;
+  border: 1px solid rgba(227, 196, 106, 0.6);
+  background: rgba(227, 196, 106, 0.12);
+  color: #e3c46a;
+  font-size: 10.5px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+  font-family: Georgia, 'Times New Roman', serif;
+  cursor: help;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.info-tip:hover,
+.info-tip:focus {
+  background: rgba(227, 196, 106, 0.25);
+  border-color: rgba(227, 196, 106, 0.9);
+  outline: none;
+}
+/* HTML popup child — supports rich content (badges, <br>) + a bold header,
+   unlike a pure attr() tooltip. Hidden until hover/focus. */
+.info-tip .info-pop {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(13, 17, 23, 0.98);
+  color: #c9d1d9;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  padding: 8px 12px;
+  border: 1px solid rgba(227, 196, 106, 0.35);
+  border-radius: 6px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 100;
+  width: max-content;
+  min-width: 150px;
+  max-width: 340px;
+  text-align: left;
+  line-height: 1.55;
+  letter-spacing: 0.1px;
+  /* Avoid orphan words/numbers on a line of their own — keeps stat ranges
+     like "…100–110" intact rather than dropping "110" to the next line. */
+  text-wrap: pretty;
+  transition: opacity 0.12s, transform 0.12s;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+.info-tip:hover .info-pop,
+.info-tip:focus .info-pop {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.info-pop-h {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 700;
+  color: #e3c46a;
+}
 /* Group wrapper: label + chips on a single horizontal row, wrapping if
    needed. "In pool:" and "Removed:" are separate groups on their own
    lines (each `.souvenir-group` is a block-level flex row). */
@@ -3951,11 +4027,11 @@ img { max-width: 100%; }
    with all other rows in the list). */
 ul.changes li.aghanim-scepter,
 ul.changes li.aghanim-shard {
-  /* Stripe begins ~70px from li edge (just before the text column starts at
-     76, leaves a small breathing-room before the first letter). Height is
-     constrained to the tag-block height (~19px from top:3px) so the stripe
-     never grows with multi-line rows or correction-notes below. */
-  background: linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.22) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% 19px;
+  /* Stripe starts at the left edge so it covers wrapped lines too (they flow
+     full-width under the tag, left of the first line's text-indent). Height
+     spans the full row (minus 6px top/bottom inset) so a multi-line change is
+     evenly covered, not just its first line. */
+  background: linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% calc(100% - 6px);
   border-radius: 3px;
 }
 /* Aghanim marker — inline icon appended to the change-text inside .row-text,
