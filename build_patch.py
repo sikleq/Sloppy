@@ -2044,15 +2044,18 @@ def ability_change(old, new, summary=None, tag=None):
             f'<div class="formula-table-wrap">{tbl}</div>'
             for tbl in (spec.get("tables", []) or [])
         )
-        # In-place rework: skip the right pane's redundant header so only
-        # the description body shows on the new side.
         # Unified mode: skip BOTH per-pane heads (names + icon live in the
         # single top-level header above the panes).
-        head_html = (
-            ''
-            if unified or (in_place and kind == 'new')
-            else (
-                f'<div class="ability-change-head">'
+        # In-place rework: emit the right pane's head as an invisible
+        # placeholder — keeps the layout footprint (~47px) so the new pane's
+        # body top-aligns with the old pane's body, but hides the duplicate
+        # name/icon visually. CSS `.is-placeholder { visibility: hidden }`.
+        if unified:
+            head_html = ''
+        else:
+            placeholder_cls = ' is-placeholder' if (in_place and kind == 'new') else ''
+            head_html = (
+                f'<div class="ability-change-head{placeholder_cls}">'
                 f'<div class="ability-change-icon-wrap">'
                 f'<img class="ability-change-icon" src="{icon_url}" alt="{name}" '
                 f'loading="lazy" onerror="this.onerror=null;'
@@ -2064,7 +2067,6 @@ def ability_change(old, new, summary=None, tag=None):
                 f'<div class="ability-change-name">{name}</div>'
                 f'</div>'
             )
-        )
         return (
             f'<div class="ability-change-pane ability-change-{kind}{innate_cls}">'
             f'{head_html}'
@@ -15195,7 +15197,8 @@ W(ability_change(
             "<b>Damage:</b> 20–30 / 55–65 / 90–100",
             "<b>Movement Speed:</b> 330 / 350 / 370",
             "<b>Demolish:</b> 50 / 100 / 150 bonus building damage",
-            "<b>Hurl Boulder:</b> 50 / 100 / 150 dmg, 1.6s stun",
+            "<b>Hurl Boulder dmg:</b> 50 / 100 / 150",
+            "<b>Hurl Boulder stun:</b> 1.6 / 1.6 / 1.6s",
         ],
     ),
     new=dict(
@@ -15208,7 +15211,8 @@ W(ability_change(
             f"<b>Damage:</b> 30–40 / 65–75 / 100–110 / {_sv('135–145')} " + b([25, 60, 95], [35, 70, 105]),
             "<b>Movement Speed:</b> 330 / 355 / 380 " + b([330, 350, 370], [330, 355, 380]),
             f"<b>Demolish:</b> 40 / 80 / 120 / {_sv('160')} bonus building damage",
-            f"<b>Hurl Boulder:</b> 50 / 100 / 150 / {_sv('200')} dmg, 1.6 / 1.6 / 1.6 / {_sv('1.8s')} stun",
+            f"<b>Hurl Boulder dmg:</b> 50 / 100 / 150 / {_sv('200')}",
+            f"<b>Hurl Boulder stun:</b> 1.6 / 1.6 / 1.6 / {_sv('1.8s')}",
         ],
     ),
 ))
@@ -15220,8 +15224,10 @@ W(ability_change(
             "<b>Health:</b> 1000 / 1500 / 2000",
             "<b>Regen:</b> 2 / 4 / 6",
             "<b>Damage:</b> 15–25 / 35–45 / 55–65",
-            "<b>Wind Walk:</b> 140 / 200 / 260 bonus dmg, 25 / 35 / 45% bonus MS",
-            "<b>Cyclone:</b> 3 / 3.75 / 4.5s hero duration, 75 dmg on landing",
+            "<b>Wind Walk bonus dmg:</b> 140 / 200 / 260",
+            "<b>Wind Walk bonus MS:</b> 25 / 35 / 45%",
+            "<b>Cyclone hero duration:</b> 3 / 3.75 / 4.5s",
+            "<b>Cyclone landing dmg:</b> 75",
         ],
     ),
     new=dict(
@@ -15231,8 +15237,10 @@ W(ability_change(
             f"<b>Health:</b> 1000 / 1500 / 2000 / {_sv('2500')}",
             f"<b>Regen:</b> 2 / 4 / 6 / {_sv('8')}",
             f"<b>Damage:</b> 25–35 / 45–55 / 65–75 / {_sv('85–95')} " + b([20, 40, 60], [30, 50, 70]),
-            f"<b>Wind Walk:</b> 140 / 200 / 260 / {_sv('320')} bonus dmg, 25 / 35 / 45 / {_sv('55%')} bonus MS",
-            f"<b>Cyclone:</b> 3 / 3.75 / 4.5 / {_sv('5.25s')} hero duration, 75 / 75 / 75 / {_sv('100')} dmg on landing",
+            f"<b>Wind Walk bonus dmg:</b> 140 / 200 / 260 / {_sv('320')}",
+            f"<b>Wind Walk bonus MS:</b> 25 / 35 / 45 / {_sv('55%')}",
+            f"<b>Cyclone hero duration:</b> 3 / 3.75 / 4.5 / {_sv('5.25s')}",
+            f"<b>Cyclone landing dmg:</b> 75 / 75 / 75 / {_sv('100')}",
         ],
     ),
 ))

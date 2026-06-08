@@ -2629,6 +2629,11 @@ ul.changes li.ability-row-end {
   padding-bottom: 6px;
   border-bottom: 1px dashed rgba(139, 148, 158, 0.22);
 }
+/* Placeholder head — same layout footprint (~47px) as a real head, but
+   visually hidden. Used in is-in-place mode on the new pane so the new
+   pane's body top-aligns with the old pane's body (which sits below
+   the real head) without needing a per-pane padding-top hack. */
+.ability-change-head.is-placeholder { visibility: hidden; }
 .ability-change-icon-wrap {
   position: relative;
   width: 40px;
@@ -2680,8 +2685,8 @@ ul.changes li.ability-row-end {
    rhythm so the panes don't tower over the rest of the hero block. */
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-body { gap: 0; }
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-row {
-  padding: 1px 0;
-  line-height: 1.25;
+  padding: 0;
+  line-height: 1.15;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -2690,10 +2695,12 @@ ul.changes li.ability-row-end {
 /* Top-anchor brewling panes so corresponding stat rows line up. */
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-pane { align-self: start; }
 .ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change.unified-panes { align-items: start; }
-/* In is-in-place mode the right pane has no head (icon+name); add equivalent
-   top padding so its first body row lines up with the left pane's first
-   body row (which sits below the 40px icon + 6px pad + 1px border = 47px). */
-.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change-pane.ability-change-new > .ability-change-body { padding-top: 47px; }
+/* New pane wider than old — brewling new rows carry an extra slash-separated
+   Aghs value + a trailing %-badge ladder; cramming both into a 1fr column
+   forced everything tight against the right edge. Give new ~40% more space. */
+.ability-change-block:has(.ability-change-icon[src*="drunken_brawler"]) .ability-change.is-in-place {
+  grid-template-columns: 1fr auto 1.4fr;
+}
 /* Scepter-stripe rank-4 value (the slot after the trailing slash). Wraps the
    value in a blue background pill — matches the aghs-scepter visual identity
    used in the full-width aghs row backgrounds elsewhere on the page. */
