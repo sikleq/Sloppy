@@ -4,6 +4,7 @@
 import json as _json
 import os as _os
 import html as _html
+import re
 
 # ---------- STATS DATABASE ----------
 # Loads data/stats/{version}/heroes.json + items.json into memory at build time.
@@ -996,6 +997,7 @@ class _State:
     ability_block_open = False  # tracks <div class="ability-block"> wrapper
     # Auto-categorize hero block contents (Stats / Abilities / Talents subgroups):
     next_ul_is_hero_stats = False    # set by hero_header(), consumed by ul_open()
+    in_stats_ul = False              # True while inside the auto-"STATS" ul (sanity-check facet/innate rows)
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup
     seen_facets_subgroup = False     # set when first facet_header() emits "Facets" subgroup
     current_sections = []            # per-patch list of {slug, label}; reset in save_html()
@@ -1404,8 +1406,11 @@ def info_tip(*lines, header=None):
     Optional `header` is shown bold at the top of the popup."""
     body = '<br>'.join(lines)
     head = f'<span class="info-pop-h">{header}</span>' if header else ''
-    return ('<span class="info-tip" tabindex="0">i'
-            f'<span class="info-pop">{head}{body}</span></span>')
+    # Wrapped in <!--TIP--> sentinels so li()'s auto-classifier can exclude the
+    # popup text (e.g. a list item mentioning "Aghanim's Scepter" must NOT make
+    # the whole row an Aghanim stripe). save_html strips the sentinel comments.
+    return ('<!--TIP--><span class="info-tip" tabindex="0">i'
+            f'<span class="info-pop">{head}{body}</span></span><!--/TIP-->')
 
 
 def show_list(*items, summary='Show list'):
@@ -2577,6 +2582,22 @@ def _load_innate_slugs():
 
 _INNATE_SLUGS = _load_innate_slugs()
 
+# Display names of every facet (FACETS) and innate ability (abilities_slim) —
+# used by li()'s sanity check to flag a stats row that's really a facet/innate
+# change miscategorised under "STATS" (e.g. "Rawhide: Bonus Max Health ...").
+def _load_facet_innate_names():
+    names = {nm for (nm, _color) in FACETS.values()}
+    p = _os.path.join(_os.path.dirname(__file__), "data", "abilities_slim.json")
+    if _os.path.exists(p):
+        with open(p, encoding="utf-8") as f:
+            for v in _json.load(f).values():
+                if isinstance(v, dict) and v.get("is_innate") and v.get("dname"):
+                    names.add(v["dname"])
+    return names
+
+_FACET_INNATE_NAMES = _load_facet_innate_names()
+_FACET_INNATE_PREFIX_RE = re.compile(r"^\s*([A-Z][A-Za-z0-9'’.\- ]+?):\s")
+
 # Manual fallback for innates not yet in dotaconstants (rare).
 # Manual innate-overrides for (hero_slug, ability_display_name) pairs whose
 # resolved CDN slug doesn't match the engine slug used in abilities_slim.json
@@ -2943,10 +2964,12 @@ def ul_open():
                 f'<div class="ability-icon-wrap">{icon}</div>')
         _State.ability_block_open = True
         _State.next_ul_is_hero_stats = False
+        _State.in_stats_ul = True
     return out + '<ul class="changes">'
 
 
 def ul_close():
+    _State.in_stats_ul = False
     return '</ul>'
 
 import os
@@ -2964,6 +2987,15 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False):
     Auto-inserts colon after 'Level N Talent ' prefix to match Valve's notation."""
     if isinstance(text, str):
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
+        # Sanity check: a row inside the auto-"STATS" group that starts with a
+        # known facet/innate name ("Rawhide: ...", "Voidbringer: ...") is almost
+        # certainly miscategorised — it belongs in a facet_header() / ability()
+        # block, not STATS. Warn at build time so it gets fixed.
+        if _State.in_stats_ul:
+            _m = _FACET_INNATE_PREFIX_RE.match(text)
+            if _m and _m.group(1) in _FACET_INNATE_NAMES:
+                print(f"  [warn] '{_m.group(1)}' is a known facet/innate but sits in "
+                      f"STATS ({_State.current_hero}) — use facet_header()/ability() instead")
     tags = set()
     # Tags for the dynamics tally: only the row's PRIMARY tag(s). A
     # `t("NEW")` badge carries both data-tag="new" and a filter-shadow
@@ -3043,10 +3075,14 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False):
     # Auto-classify any line that prominently references Aghanim's Scepter /
     # Shard — covers both "Aghanim's Scepter: ..." starters and phrasings like
     # "No longer upgraded with Aghanim's Shard" / "Aghanim's Scepter upgrade reworked".
-    if isinstance(text, str) and "Aghanim's Scepter" in text:
+    # Exclude info_tip popup text (a list item may mention Aghanim's Scepter
+    # without the ROW being an Aghanim change).
+    text_noclass = (re.sub(r'<!--TIP-->.*?<!--/TIP-->', '', text, flags=re.S)
+                    if isinstance(text, str) else text)
+    if isinstance(text, str) and "Aghanim's Scepter" in text_noclass:
         classes.append("aghanim-scepter")
         marker = '<span class="aghanim-marker scepter"></span>'
-    elif isinstance(text, str) and "Aghanim's Shard" in text:
+    elif isinstance(text, str) and "Aghanim's Shard" in text_noclass:
         classes.append("aghanim-shard")
         marker = '<span class="aghanim-marker shard"></span>'
     # Item ability description rows (Passive: / Active: / Toggle: / Aura:)
@@ -3064,24 +3100,43 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False):
         classes.append("ability-row")
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""
     attr = f' data-tag="{tag_str}"' if tag_str else ""
-    # Marker is appended INSIDE .row-text so the Aghanim's Scepter/Shard
-    # glyph trails the change text (before the % badge column). If the text
-    # ends with an inline (i)-tip span, the marker goes BEFORE it so order is
-    # [text] [Aghanim glyph] [(i)] — never (i) then glyph.
-    if isinstance(text, str) and marker and 'class="info-tip"' in text \
-            and text.rstrip().endswith('</span>'):
-        _tip_idx = text.rfind('<span class="info-tip"')
-        text_inner = text[:_tip_idx] + marker + text[_tip_idx:]
+    # Assemble the trailing cluster — [Aghanim glyph][(i) tip…] — that follows
+    # the change text. The (i) tips come from two places:
+    #   1. an inline info_tip baked into `text` (e.g. brewling rows), delimited
+    #      by <!--TIP-->…<!--/TIP--> — peeled off the end here;
+    #   2. inline_note tips lifted out of `extra` (<!--INLINETIP-->…).
+    # Order is always [text] [Aghanim glyph] [(i)] — never (i) then glyph.
+    trailing_tips = []
+    if isinstance(text, str):
+        text_base = text
+        while text_base.rstrip().endswith('<!--/TIP-->'):
+            _i = text_base.rfind('<!--TIP-->')
+            if _i < 0:
+                break
+            trailing_tips.insert(0, text_base[_i:])
+            text_base = text_base[:_i].rstrip()
     else:
-        text_inner = f'{text}{marker}' if isinstance(text, str) else text
-    # Lift any inline_note (i)-tips out of `extra` and append them INSIDE
-    # .row-text so the info bubble sits right after the description text
-    # (Valve-style), leaving block extras (note_box / show_list) below.
+        text_base = text
     if isinstance(extra, str) and '<!--INLINETIP-->' in extra:
-        tips = re.findall(r'<!--INLINETIP-->(.*?)<!--/INLINETIP-->', extra, re.S)
+        _lifted = re.findall(r'<!--INLINETIP-->(.*?)<!--/INLINETIP-->', extra, re.S)
         extra = re.sub(r'<!--INLINETIP-->.*?<!--/INLINETIP-->', '', extra, flags=re.S)
-        if isinstance(text_inner, str) and tips:
-            text_inner = text_inner + ' ' + ' '.join(tips)
+        trailing_tips.extend(_lifted)
+    if not isinstance(text_base, str):
+        text_inner = text_base
+    elif trailing_tips:
+        # Glyph + (i)s kept on one line. Pull the last plain-text word INTO the
+        # nowrap tail so [word][Aghanim glyph][(i)] are one unbreakable unit — the
+        # (i) can never orphan onto its own (otherwise-empty) wrapped line (which
+        # would also show a blank Aghanim stripe).
+        cluster = marker + ''.join(trailing_tips)
+        _mw = re.search(r'(\S+)\s*$', text_base)
+        if _mw and '<' not in _mw.group(1) and '>' not in _mw.group(1):
+            text_inner = (text_base[:_mw.start(1)]
+                          + f'<span class="li-tail">{_mw.group(1)}{cluster}</span>')
+        else:
+            text_inner = f'{text_base} <span class="li-tail">{cluster}</span>' 
+    else:
+        text_inner = f'{text_base}{marker}'
     return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text_inner}</span>{rest}{extra}</li>'
 
 
@@ -3930,6 +3985,7 @@ def save_html(filename):
     # row by li() (e.g. used outside an `extra=`) ships without its markers —
     # the (i) bubble still renders in place; only the comments are stripped.
     out = out.replace('<!--INLINETIP-->', '').replace('<!--/INLINETIP-->', '')
+    out = out.replace('<!--TIP-->', '').replace('<!--/TIP-->', '')
     path = filename
     os.makedirs(os.path.dirname(path), exist_ok=True) if os.path.dirname(path) else None
     with open(path, "w", encoding="utf-8") as f:
@@ -7778,41 +7834,60 @@ W(plain_header("Mechanics Changes"))
 
 W(subgroup("Health Restoration"))
 W(ul_open())
-W(li("Health Restoration now applies to all forms of life gain", t("REWORK")))
+W(li("Health Restoration now applies to all forms of life gain", t("REWORK"), extra=inline_note("Previously, it did not apply to incoming heals")))
 W(ul_close())
-W(subnote("Previously, it did not apply to incoming heals"))
 W(ul_open())
 W(li("Incoming Heal Amplification now stacks diminishingly with Health Restoration instead of additively with Outgoing Heal Amplification", t("REWORK")))
-W(li("Spells that previously had a separate value for incoming heal reduction now only modify Health Restoration", t("REWORK")))
+W(li("Spells that previously had a separate value for incoming heal reduction now only modify Health Restoration " + info_tip(
+        "Eye of Skadi's Cold Attack", "Spirit Vessel's Soul Release",
+        "Omniknight's Guardian Angel with Aghanim's Scepter", "Pudge's Rot with Aghanim's Scepter",
+        header="Affected spells:"), t("REWORK")))
 W(ul_close())
-W(subnote("* Eye of Skadi's Cold Attack<br>* Spirit Vessel's Soul Release<br>* Omniknight's Guardian Angel with Aghanim's Scepter<br>* Pudge's Rot with Aghanim's Scepter"))
 W(ul_open())
-W(li("As a result of the changes, spells that only modified Health Restoration will now additionally affect incoming heals", t("REWORK")))
+W(li("As a result of the changes, spells that only modified Health Restoration will now additionally affect incoming heals " + info_tip(
+        "Sange", "Kaya and Sange", "Sange and Yasha", "Abyssal Blade", "Orb of Frost's Frost",
+        "Orb of Corrosion's Corrosion", "Crippling Crossbow's Hobble", "Jidi Pollen Bag's Pollinate",
+        "Item bonus from Crude enchantment", "Abaddon’s Withering Mist",
+        "Drow Ranger’s Frost Arrows with Aghanim’s Scepter", "Slark's Saltwater Shiv",
+        header="Affected spells:"), t("REWORK")))
 W(ul_close())
-W(subnote("* Sange<br>* Kaya and Sange<br>* Sange and Yasha<br>* Abyssal Blade<br>* Orb of Frost's Frost<br>* Orb of Corrosion's Corrosion<br>* Crippling Crossbow's Hobble<br>* Jidi Pollen Bag's Pollinate<br>* Item bonus from Crude enchantment<br>* Abaddon’s Withering Mist<br>* Drow Ranger’s Frost Arrows with Aghanim’s Scepter<br>* Slark's Saltwater Shiv"))
 
 W(subgroup("Lifesteal and Damage Manipulations"))
 W(ul_open())
-W(li("Physical and Magical Lifesteal will now take into account overall damage reductions/amplifications when computing how much to lifesteal", t("REWORK")))
+W(li("Physical and Magical Lifesteal will now take into account overall damage reductions/amplifications when computing how much to lifesteal " + info_tip(
+        "Aeon Disk", "Bloodstone", "Consecrated Wraps", "Veil of Discord", "Prophet's Pendulum",
+        "Audacious Enchantment", "Abaddon's Borrowed Time with Aghanim's Scepter", "Beastmaster's Wild Axes",
+        "Bounty Hunter's Shadow Walk with talent", "Bristleback's Bristleback", "Centaur Warrunner's Stampede",
+        "Grimstroke's Ink Trail", "Grimstroke's Soulbind with talent", "Hoodwink's Hunter's Boomerang",
+        "Leshrac's Pulse Nova with talent", "Lich's Frost Shield", "Luna's Lunar Orbit",
+        "Kunkka's Admiral's Rum", "Mars' Bulwark", "Nyx Assassin's Burrow", "Ogre Magi's Fire Shield",
+        "Oracle's False Promise", "Pudge's Flesh Heap", "Shadow Demon's Menace", "Spectre's Dispersion",
+        "Treant Protector's Living Armor", "Underlord's Invading Force", "Undying's Flesh Golem",
+        "Ursa's Enrage", "Visage's Gravekeeper's Cloak", "Warlock's Golem with talent",
+        header="This affects the following:"), t("REWORK")))
 W(ul_close())
-W(subnote("This affects the following:<br><br>* Aeon Disk<br>* Bloodstone<br>* Consecrated Wraps<br>* Veil of Discord<br>* Prophet's Pendulum<br>* Audacious Enchantment<br>* Abaddon's Borrowed Time with Aghanim's Scepter<br>* Beastmaster's Wild Axes<br>* Bounty Hunter's Shadow Walk with talent<br>* Bristleback's Bristleback<br>* Centaur Warrunner's Stampede<br>* Grimstroke's Ink Trail<br>* Grimstroke's Soulbind with talent<br>* Hoodwink's Hunter's Boomerang<br>* Leshrac's Pulse Nova with talent<br>* Lich's Frost Shield<br>* Luna's Lunar Orbit<br>* Kunkka's Admiral's Rum<br>* Mars' Bulwark<br>* Nyx Assassin's Burrow<br>* Ogre Magi's Fire Shield<br>* Oracle's False Promise<br>* Pudge's Flesh Heap<br>* Shadow Demon's Menace<br>* Spectre's Dispersion<br>* Treant Protector's Living Armor<br>* Underlord's Invading Force<br>* Undying's Flesh Golem<br>* Ursa's Enrage<br>* Visage's Gravekeeper's Cloak<br>* Warlock's Golem with talent"))
 W(ul_open())
-W(li("Historically, Lifesteal was calculated before some damage reductions or amplifications were applied. As a result, you could gain health from attacks that dealt no damage (like attacks against a hero affected by Aeon Disk's Combo Breaker). This will not happen anymore", t("REWORK")))
+W(li("Historically, Lifesteal was calculated before some damage reductions or amplifications were applied. As a result, you could gain health from attacks that dealt no damage (like attacks against a hero affected by Aeon Disk's Combo Breaker). This will not happen anymore", t("REWORK"), extra=inline_note("The only amplification that is not taken into account is increased damage against illusions")))
 W(ul_close())
-W(subnote("The only amplification that is not taken into account is increased damage against illusions"))
 
 W(subgroup("Miscellaneous"))
 W(ul_open())
 W(li("Reflected damage cannot be reflected back", t("NERF")))
 W(li("Lifesteal and Spell Lifesteal don't apply to reflected damage", t("NERF")))
 W(li("Reflected damage doesn't affect Debuff Immune units", t("NERF")))
-W(li("Units with free movement now can miss their attacks when attacking uphill targets", t("NERF"),
-     extra=inline_note(
-         "Affected units:<br>* Batrider during Firefly<br>* Dragon Knight during Elder Dragon Form with Aghanim's Scepter<br>* Lina during Flame Cloak<br>* Terrorblade's Reflection illusions"
-     )))
-W(li("All sources of reflection damage now have an ALT-note detailing mechanics of reflected damage", t("QoL")))
+W(li("Units with free movement now can miss their attacks when attacking uphill targets " + info_tip(
+        "Batrider during Firefly", "Dragon Knight during Elder Dragon Form with Aghanim's Scepter",
+        "Lina during Flame Cloak", "Terrorblade's Reflection illusions",
+        header="Affected units:"), t("NERF")))
+W(li("All sources of reflection damage now have an ALT-note detailing mechanics of reflected damage " + info_tip(
+        "Tormentor's Reflect ability", "Blade Mail (both active and passive)", "Chipped Vest", "Rattlecage",
+        "Axe's Counter Helix", "Bristleback's Quill Spray triggered by Bristleback passive",
+        "Centaur Warrunner's Retaliate", "Nyx Assassin's Spiked Carapace", "Queen of Pain's Scream of Pain",
+        "Razor's Storm Surge", "Shadow Demon's Disseminate", "Spectre's Dispersion",
+        "Tidehunter's Anchor Smash triggered by Kraken Shell passive", "Viper's Corrosive Skin",
+        "Warlock's Fatal Bonds",
+        header="The following items and abilities deal reflected damage:"), t("QoL")))
 W(ul_close())
-W(subnote("The following items and abilities deal reflected damage:<br>* Tormentor's Reflect ability<br>* Blade Mail (both active and passive)<br>* Chipped Vest<br>* Rattlecage<br>* Axe's Counter Helix<br>* Bristleback's Quill Spray triggered by Bristleback passive<br>* Centaur Warrunner's Retaliate<br>* Nyx Assassin's Spiked Carapace<br>* Queen of Pain's Scream of Pain<br>* Razor's Storm Surge<br>* Shadow Demon's Disseminate<br>* Spectre's Dispersion<br>* Tidehunter's Anchor Smash triggered by Kraken Shell passive<br>* Viper's Corrosive Skin<br>* Warlock's Fatal Bonds"))
 
 # ===== NEUTRAL CREEP UPDATES =====
 W(section("Neutral Creep Updates"))
@@ -15248,7 +15323,7 @@ W(li("Damage increased from 25/60/95 to 35/70/105", b([25, 60, 95], [35, 70, 105
      extra=inline_note("From 20–30/55–65/90–100 to 30–40/65–75/100–110")))
 W(li("Movement Speed increased from 330/350/370 to 330/355/380", b([330, 350, 370], [330, 355, 380])))
 W(li("Demolish Bonus Building Damage decreased from 50/100/150 to 40/80/120", b([50, 100, 150], [40, 80, 120])))
-W(li("Aghanim's Scepter improves the unit by 1 level. " + info_tip(
+W(li("Aghanim's Scepter increases Brewling level by 1. " + info_tip(
         "4100 HP.", "8 HP Regen.", "135–145 Damage.", "9 Armor.", "",
         "Hurl Boulder: 200 Damage, 2s Stun.", "Demolish: 160 bonus building damage.",
         header="Level 4 stats are:"), t("NEW")))
@@ -15257,7 +15332,7 @@ W(ability("Storm Brewling", slug="brewmaster_storm_unit", icon_url="../icons/uni
 W(ul_open())
 W(li("Damage increased from 20/40/60 to 30/50/70", b([20, 40, 60], [30, 50, 70]),
      extra=inline_note("From 15–25/35–45/55–65 to 25–35/45–55/65–75")))
-W(li("Aghanim's Scepter improves the unit by 1 level. " + info_tip(
+W(li("Aghanim's Scepter increases Brewling level by 1. " + info_tip(
         "2500 HP.", "8 HP Regen.", "85–95 Damage.", "",
         "Wind Walk: 320 bonus damage, 55% bonus movement speed.",
         "Cyclone: 6s hero duration, 100 damage on landing.",
@@ -15265,7 +15340,7 @@ W(li("Aghanim's Scepter improves the unit by 1 level. " + info_tip(
 W(ul_close())
 W(ability("Fire Brewling", slug="brewmaster_fire_unit", icon_url="../icons/units/brewmaster_fire_unit.png"))
 W(ul_open())
-W(li("Aghanim's Scepter improves the unit by 1 level. " + info_tip(
+W(li("Aghanim's Scepter increases Brewling level by 1. " + info_tip(
         "1750 HP.", "8 HP Regen.", "215–225 Damage.", "24 Armor.", "",
         "Permanent Immolation: 100 damage per second.",
         header="Level 4 stats are:"), t("NEW")))
@@ -15306,7 +15381,7 @@ W(li("Aghanim's Shard no longer increases duration", t("DEL")))
 W(ul_close())
 W(ability("Spin Web", slug="broodmother_spin_web"))
 W(ul_open())
-W(li("Broodmother's illusions now also benefit from the web", t("BUFF")))
+W(li("Broodmother's illusions now also benefit from the web", t("NEW")))
 W(ul_close())
 W(ability("Incapacitating Bite", slug="broodmother_incapacitating_bite"))
 W(ul_open())
@@ -15323,8 +15398,9 @@ W(ul_close())
 
 # Centaur Warrunner
 W(hero_header("Centaur Warrunner"))
+W(ability("Rawhide", slug="centaur_rawhide"))  # innate (auto-detected)
 W(ul_open())
-W(li("Rawhide: Bonus Max Health decreased from 30 to 25", b(30, 25)))
+W(li("Bonus Max Health decreased from 30 to 25", b(30, 25)))
 W(ul_close())
 W(ability("Work Horse", slug="centaur_work_horse"))
 W(ul_open())
@@ -16264,8 +16340,9 @@ W(ul_close())
 
 # Night Stalker
 W(hero_header("Night Stalker"))
+W(ability("Heart of Darkness", slug="night_stalker_heart_of_darkness"))  # innate
 W(ul_open())
-W(li("Heart of Darkness: No longer reduces Night Stalker's health regeneration by 20% during the day", t("BUFF")))
+W(li("No longer reduces Night Stalker's health regeneration by 20% during the day", t("BUFF")))
 W(ul_close())
 W(facet_header("night_stalker_voidbringer"))
 W(ul_open())
@@ -17143,8 +17220,9 @@ W(ul_close())
 
 # Venomancer
 W(hero_header("Venomancer"))
+W(ability("Septic Shock", slug="venomancer_sepsis"))  # innate
 W(ul_open())
-W(li("Septic Shock: Base Damage per Debuff decreased from 10% to 8%", b(10, 8)))
+W(li("Base Damage per Debuff decreased from 10% to 8%", b(10, 8)))
 W(ul_close())
 W(facet_header("venomancer_plague_carrier"))
 W(ul_open())
