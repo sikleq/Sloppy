@@ -5792,8 +5792,8 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   vertical-align: middle;
   line-height: 1;
   position: relative;
-  /* Lift onto the UPPERCASE caps midline (labels are uppercase). */
-  top: -0.1em;
+  /* Nudged down 4px from the caps midline (user request). */
+  top: 4px;
   width: 11px;
   height: 11px;
   /* Coloured via background-color through a PNG mask — neutral default

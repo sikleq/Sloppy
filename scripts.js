@@ -2423,6 +2423,54 @@
   apply();
 })();
 
+// ---- HERO STATS: vertical frozen-pane divider after the pinned Hero column ----
+// The hs-table is mr-table-based (not creeps-table), so it doesn't get the
+// creeps sticky-frame overlay. This positions a thin vertical line at the
+// right edge of the sticky Hero column, drawn in the non-scrolling
+// .creeps-page so it keeps repainting during horizontal scroll, shown only
+// once the box is scrolled sideways (same convention as Neutral Creeps).
+(function() {
+  const table = document.querySelector('.hs-table');
+  if (!table) return;
+  const scroller = table.closest('.creeps-scroll');
+  const page = table.closest('.creeps-page');
+  const frame = page && page.querySelector('.hs-sticky-frame');
+  if (!scroller || !page || !frame) return;
+
+  function position() {
+    const nameCell = table.querySelector('thead th.hs-name')
+      || table.querySelector('tbody td.hs-name');
+    if (!nameCell) return;
+    const pageR = page.getBoundingClientRect();
+    const scrR = scroller.getBoundingClientRect();
+    const nameR = nameCell.getBoundingClientRect();
+    // Anchor the divider top to the pinned header's bottom (thead th is
+    // sticky:top, so its rect tracks the visible pinned position).
+    const headCell = table.querySelector('thead th.hs-name') || nameCell;
+    const headBottom = headCell.getBoundingClientRect().bottom;
+    frame.style.left = (nameR.right - pageR.left) + 'px';
+    frame.style.top = (headBottom - pageR.top) + 'px';
+    frame.style.height = (scrR.bottom - headBottom) + 'px';
+    frame.style.width = '0px';
+  }
+
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      position();
+      frame.classList.toggle('visible', scroller.scrollLeft > 0);
+      ticking = false;
+    });
+  };
+  scroller.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  // Reposition after a View-mode change (column count / widths change).
+  window.addEventListener('mr:filter-changed', () => requestAnimationFrame(position));
+  position();
+})();
+
 // ---- MANA ITEMS: Heatmap on/off toggle + recompute on filter change ----
 (function() {
   const table = document.querySelector('.mr-table');

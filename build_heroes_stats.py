@@ -57,10 +57,12 @@ ARMOR_PER_AGI     = 1 / 6  # 0.1667 armor per Agility
 MR_PER_INT        = 0.1    # +0.1 % magic resistance per Intelligence
 AS_PER_AGI        = 1.0    # +1 attack speed per Agility
 DMG_PER_PRIMARY   = 1.0    # Str/Agi/Int hero gains +1 damage per primary point
-UNIVERSAL_DMG_MULT = 0.45  # Universal: +0.45 damage per attribute (sum of all 3)
-                           # The attribute bonus is FLOORED before being added
-                           # to base damage (e.g. Abaddon 0.45×62 = 27.9 → 27,
-                           # so 22-32 base → 49-59 in-game).
+# Universal heroes get a multiplier on the SUM of all three attributes, FLOORED
+# before adding to base damage (Abaddon 0.45×62 = 27.9 → 27 → 22-32 base = 49-59).
+# The multiplier has changed over time — patch-gated in _universal_dmg_mult():
+#   7.33  → 0.6 (introduced with Universal heroes)
+#   7.33c → 0.7
+#   7.38  → 0.45 (current)
 
 # Ogre Magi innate — mana / mana regen scale with Strength (he has 0 base Int).
 OGRE_MANA_PER_STR    = 6.0
@@ -252,6 +254,84 @@ def _g1pct(v: float) -> str:
     return f'{_g1(v)}%'
 
 
+# ---------- per-hero innate attribute-conversion modifiers ----------
+# A handful of heroes have an ALWAYS-ON innate that converts a primary
+# attribute into a secondary stat we display (attack range, move speed,
+# armor, regens, magic resist). These bonuses are patch-gated and their
+# factors change over time. They affect the "Starting"/"Expanded" computed
+# values only — never the raw "Base" values. To stay accurate per patch,
+# the value functions need to know WHICH patch they're computing; we thread
+# the version through a module-global set by the history loop and render.
+_CTX_VERSION = ["7.41d"]
+
+
+def _set_ctx_version(v: str) -> None:
+    _CTX_VERSION[0] = v
+
+
+def _ge(patch: str, ref: str) -> bool:
+    return _patch_sort_key(patch) >= _patch_sort_key(ref)
+
+
+def _innate_bonus(col_key: str, s: dict, h: str) -> float:
+    """Extra (additive) bonus to a computed Starting column from a hero's
+    innate attribute-conversion ability, gated by the current patch.
+    Returns 0 for every hero/column without such an innate.
+
+    Extend this for more heroes — each is one `if slug == … and _ge(...)`
+    block. Currently covered:
+      • Morphling   — Ebb and Flow (innate 7.41+): Agi→Attack Range,
+                      Agi→Move Speed.
+      • Void Spirit — Intrinsic Edge (innate 7.36+): +33%/25% MORE of the
+                      secondary bonuses Armor(Agi)/HP regen(Str)/Mana
+                      regen(Int)/Magic resist(Int).
+      • Centaur     — Horsepower (innate 7.36+): Str→Move Speed (capped).
+    Known but NOT yet modelled (don't map to a single displayed column or
+    need dynamic state): Dark Seer (Int floor = max of Str/Agi), Tiny /
+    Morphling-facet (slow/status/cooldown), Elder Titan Momentum, Silencer
+    Glaives, Drow Trueshot aura."""
+    slug = h.replace("npc_dota_hero_", "")
+    ver = _CTX_VERSION[0]
+
+    if slug == "morphling" and _ge(ver, "7.41"):
+        agi = _field(s, h, "AttributeBaseAgility")
+        if col_key == "range":
+            # Agi→Ranged Attack Range: 20% (7.41) → 25% (7.41d). Morphling
+            # is ranged, so it always applies.
+            return agi * (0.25 if _ge(ver, "7.41d") else 0.20)
+        if col_key == "ms":
+            return agi * 0.15            # Agi→Move Speed: 15% (since 7.41)
+
+    if slug == "void_spirit" and _ge(ver, "7.36"):
+        # Intrinsic Edge: +33% (7.36–7.36a) / +25% (7.36b+) MORE of the
+        # secondary bonuses that the attributes already provide.
+        pct = 0.25 if _ge(ver, "7.36b") else 0.33
+        if col_key == "armor":
+            return ARMOR_PER_AGI * _field(s, h, "AttributeBaseAgility") * pct
+        if col_key == "hpr":
+            return HPREG_PER_STR * _field(s, h, "AttributeBaseStrength") * pct
+        if col_key == "mpr":
+            return MANAREG_PER_INT * _field(s, h, "AttributeBaseIntelligence") * pct
+        if col_key == "mr":
+            return MR_PER_INT * _field(s, h, "AttributeBaseIntelligence") * pct
+
+    if slug == "centaur" and _ge(ver, "7.36"):
+        if col_key == "ms":
+            # Str→Move Speed factor over time: 40% (7.36) → 35% (7.36b) →
+            # 30% (7.37b) → 30% (7.41 rework) → 40% (7.41a+).
+            if _ge(ver, "7.41a"):
+                f = 0.40
+            elif _ge(ver, "7.37b"):
+                f = 0.30
+            elif _ge(ver, "7.36b"):
+                f = 0.35
+            else:
+                f = 0.40
+            return _field(s, h, "AttributeBaseStrength") * f
+
+    return 0.0
+
+
 # ---------- value functions ----------
 
 def _f(field):
@@ -259,11 +339,23 @@ def _f(field):
     return lambda s, h, r: _field(s, h, field)
 
 
+def _universal_dmg_mult() -> float:
+    """Damage-per-attribute multiplier for Universal heroes at the current
+    context patch. 0.6 (7.33) → 0.7 (7.33c) → 0.45 (7.38+)."""
+    ver = _CTX_VERSION[0]
+    if _ge(ver, "7.38"):
+        return 0.45
+    if _ge(ver, "7.33c"):
+        return 0.7
+    return 0.6   # 7.33–7.33b (and the floor for any earlier ctx; pre-7.33 no
+    #              hero is Universal so this branch isn't reached for them)
+
+
 def _primary_dmg(s, h):
     """Bonus attack damage from primary attribute(s) at level 1, FLOORED
     (in-game truncates the attribute bonus before adding it to base damage).
     Str/Agi/Int heroes: +1 per primary attribute point.
-    Universal: +0.45 per attribute, on the SUM of Str + Agi + Int.
+    Universal: multiplier (patch-gated) on the SUM of Str + Agi + Int.
     See https://liquipedia.net/dota2/Attributes."""
     meta = _attr_of(s, h)
     if meta is None:
@@ -279,7 +371,7 @@ def _primary_dmg(s, h):
         total = (_field(s, h, "AttributeBaseStrength")
                  + _field(s, h, "AttributeBaseAgility")
                  + _field(s, h, "AttributeBaseIntelligence"))
-        bonus = UNIVERSAL_DMG_MULT * total
+        bonus = _universal_dmg_mult() * total
     return float(_math.floor(bonus))
 
 
@@ -326,7 +418,8 @@ def _hp_l1(s, h, r):
 
 def _hpreg_l1(s, h, r):
     return round(_field(s, h, "StatusHealthRegen")
-                 + HPREG_PER_STR * _field(s, h, "AttributeBaseStrength"), 2)
+                 + HPREG_PER_STR * _field(s, h, "AttributeBaseStrength")
+                 + _innate_bonus("hpr", s, h), 2)
 
 
 def _mp_base_raw(s, h, r):
@@ -363,7 +456,8 @@ def _mpreg_l1(s, h, r):
                      + OGRE_MANAREG_PER_STR * _field(s, h, "AttributeBaseStrength")
                      + MANAREG_PER_INT * _field(s, h, "AttributeBaseIntelligence"), 2)
     return round(_field(s, h, "StatusManaRegen")
-                 + MANAREG_PER_INT * _field(s, h, "AttributeBaseIntelligence"), 2)
+                 + MANAREG_PER_INT * _field(s, h, "AttributeBaseIntelligence")
+                 + _innate_bonus("mpr", s, h), 2)
 
 
 # Armor / MR / Attack speed --------------------------------------------------
@@ -374,7 +468,8 @@ def _armor_base(s, h, r):
 
 def _armor_l1(s, h, r):
     return round(_field(s, h, "ArmorPhysical")
-                 + ARMOR_PER_AGI * _field(s, h, "AttributeBaseAgility"), 1)
+                 + ARMOR_PER_AGI * _field(s, h, "AttributeBaseAgility")
+                 + _innate_bonus("armor", s, h), 1)
 
 
 def _mr_base(s, h, r):
@@ -383,7 +478,8 @@ def _mr_base(s, h, r):
 
 def _mr_l1(s, h, r):
     return round(_field(s, h, "MagicalResistance")
-                 + MR_PER_INT * _field(s, h, "AttributeBaseIntelligence"), 1)
+                 + MR_PER_INT * _field(s, h, "AttributeBaseIntelligence")
+                 + _innate_bonus("mr", s, h), 1)
 
 
 def _aspd_base(s, h, r):
@@ -391,7 +487,27 @@ def _aspd_base(s, h, r):
 
 
 def _aspd_l1(s, h, r):
-    return _raw_num(r, h, "BaseAttackSpeed") + AS_PER_AGI * _field(s, h, "AttributeBaseAgility")
+    return (_raw_num(r, h, "BaseAttackSpeed")
+            + AS_PER_AGI * _field(s, h, "AttributeBaseAgility")
+            + _innate_bonus("aspd", s, h))
+
+
+# Attack range / Move speed (Starting may add an innate attribute factor) -----
+
+def _range_base(s, h, r):
+    return _field(s, h, "AttackRange")
+
+
+def _range_l1(s, h, r):
+    return round(_field(s, h, "AttackRange") + _innate_bonus("range", s, h))
+
+
+def _ms_base(s, h, r):
+    return _field(s, h, "MovementSpeed")
+
+
+def _ms_l1(s, h, r):
+    return round(_field(s, h, "MovementSpeed") + _innate_bonus("ms", s, h))
 
 
 # Expanded extras — STR/AGI/INT at L30 + sums ---------------------------------
@@ -499,7 +615,7 @@ COLUMNS = [
     # ── Attack mechanics ──────────────────────────────────────────────
     _col("aspd", "Attack Speed", fmt=_g0,
          fn_base=_aspd_base, fn_starting=_aspd_l1, raw=True),
-    _col("ms",   "Move Speed",   fn_base=_f("MovementSpeed")),
+    _col("ms",   "Move Speed",   fn_base=_ms_base, fn_starting=_ms_l1),
     _col("bat",  "BAT", pol="lo", fn_base=_f("AttackRate")),
 
     # ── Vision ────────────────────────────────────────────────────────
@@ -508,7 +624,7 @@ COLUMNS = [
     _col("nvision", "Night Vision", fmt=_g0,
          fn_base=lambda s, h, r: _raw_num(r, h, "VisionNighttimeRange"), raw=True),
 
-    _col("range", "Attack Range", fmt=_g0, fn_base=_f("AttackRange")),
+    _col("range", "Attack Range", fmt=_g0, fn_base=_range_base, fn_starting=_range_l1),
 
     # ── Expanded extras (raw-only fields) ─────────────────────────────
     _col("proj",      "Projectile", mode="extra", fmt=_g0,
@@ -829,6 +945,9 @@ def _history_for(snaps, versions, dates, hero, col, raws, *, mode: str) -> str:
         if hero not in snap:
             continue
         rw = raws.get(ver, {})
+        # Innate attribute-conversion modifiers are patch-gated — tell the
+        # value functions which patch this is.
+        _set_ctx_version(ver)
         if not seen:
             seen = True
             if ver != first_ver:
@@ -915,6 +1034,9 @@ def render_html() -> str:
     thead = "".join(head)
 
     # ---- body ----
+    # Displayed cell values are the LATEST patch's — set the modifier context
+    # accordingly (history loop overrides per-version inside _history_for).
+    _set_ctx_version(latest)
     body = []
     for hero in heroes:
         slug = hero.replace("npc_dota_hero_", "")
@@ -937,12 +1059,16 @@ def render_html() -> str:
             f'title="{meta[1]}" width="20" height="20"></td>')
         for col in COLUMNS:
             cls = f"hs-col-{col['key']}{_mode_cls(col)} has-history"
+            # Displayed values use the LATEST patch's modifier context;
+            # _history_for mutates the context, so reset it each cell.
+            _set_ctx_version(latest)
             # Starting values are the DEFAULT (data-sort / data-hist).
             v_start = col["fn_starting"](cur, hero, raw)
             disp_start = (col["disp_starting"](cur, hero, raw)
                           if col["disp_starting"] else col["fmt"](v_start))
             hist_start = _history_for(snaps, versions, dates, hero, col, raws,
                                       mode="starting")
+            _set_ctx_version(latest)
             # Base values — only stash on the cell when they differ.
             v_base = col["fn_base"](cur, hero, raw)
             disp_base = (col["disp_base"](cur, hero, raw)
@@ -985,6 +1111,9 @@ def render_html() -> str:
         'adds attribute totals/level-30 columns, Min/Max damage, projectile speed, '
         'turn rate, collision, bound radius. Huskar has no mana pool ever; '
         'Ogre Magi’s mana / mana regen scale with Strength instead of Intelligence. '
+        'Hero innates that convert attributes are also applied (Morphling’s '
+        'Agility→Attack&nbsp;Range / Move&nbsp;Speed since 7.41, Void Spirit’s '
+        '+25% secondary bonuses, Centaur’s Strength→Move&nbsp;Speed). '
         'Click a column header to sort.</p>\n'
     )
     toolbar = (
@@ -1021,6 +1150,12 @@ def render_html() -> str:
         '</head>\n<body>\n'
         f'{nav}\n'
         '<div class="container creeps-page">\n'
+        # Vertical frozen-pane divider — drawn in the non-scrolling page so its
+        # line keeps repainting during horizontal scroll (Chrome drops
+        # box-shadow/border on sticky cells mid-scroll). scripts.js
+        # `initHsStickyFrame` positions it at the right edge of the pinned Hero
+        # column and shows it once scrolled sideways.
+        '<div class="sticky-frame hs-sticky-frame"></div>\n'
         '<div class="creeps-scroll">\n'
         f'{subnav}'
         f'{blurb}'
