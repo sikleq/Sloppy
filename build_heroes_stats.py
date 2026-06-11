@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import html as _html
 import json as _json
+import math as _math
 import re as _re
 from pathlib import Path
 
@@ -56,7 +57,10 @@ ARMOR_PER_AGI     = 1 / 6  # 0.1667 armor per Agility
 MR_PER_INT        = 0.1    # +0.1 % magic resistance per Intelligence
 AS_PER_AGI        = 1.0    # +1 attack speed per Agility
 DMG_PER_PRIMARY   = 1.0    # Str/Agi/Int hero gains +1 damage per primary point
-UNIVERSAL_DMG_MULT = 0.7   # Universal: +0.7 damage per EACH attribute point
+UNIVERSAL_DMG_MULT = 0.45  # Universal: +0.45 damage per attribute (sum of all 3)
+                           # The attribute bonus is FLOORED before being added
+                           # to base damage (e.g. Abaddon 0.45×62 = 27.9 → 27,
+                           # so 22-32 base → 49-59 in-game).
 
 # Ogre Magi innate — mana / mana regen scale with Strength (he has 0 base Int).
 OGRE_MANA_PER_STR    = 6.0
@@ -256,25 +260,27 @@ def _f(field):
 
 
 def _primary_dmg(s, h):
-    """Bonus attack damage from primary attribute(s) at level 1.
+    """Bonus attack damage from primary attribute(s) at level 1, FLOORED
+    (in-game truncates the attribute bonus before adding it to base damage).
     Str/Agi/Int heroes: +1 per primary attribute point.
-    Universal: +0.7 per EACH of Str + Agi + Int.
+    Universal: +0.45 per attribute, on the SUM of Str + Agi + Int.
     See https://liquipedia.net/dota2/Attributes."""
     meta = _attr_of(s, h)
     if meta is None:
         return 0.0
     kind = meta[0]
     if kind == "str":
-        return DMG_PER_PRIMARY * _field(s, h, "AttributeBaseStrength")
-    if kind == "agi":
-        return DMG_PER_PRIMARY * _field(s, h, "AttributeBaseAgility")
-    if kind == "int":
-        return DMG_PER_PRIMARY * _field(s, h, "AttributeBaseIntelligence")
-    # Universal — multiplier on the SUM of all three attributes.
-    total = (_field(s, h, "AttributeBaseStrength")
-             + _field(s, h, "AttributeBaseAgility")
-             + _field(s, h, "AttributeBaseIntelligence"))
-    return UNIVERSAL_DMG_MULT * total
+        bonus = DMG_PER_PRIMARY * _field(s, h, "AttributeBaseStrength")
+    elif kind == "agi":
+        bonus = DMG_PER_PRIMARY * _field(s, h, "AttributeBaseAgility")
+    elif kind == "int":
+        bonus = DMG_PER_PRIMARY * _field(s, h, "AttributeBaseIntelligence")
+    else:  # Universal — multiplier on the SUM of all three attributes
+        total = (_field(s, h, "AttributeBaseStrength")
+                 + _field(s, h, "AttributeBaseAgility")
+                 + _field(s, h, "AttributeBaseIntelligence"))
+        bonus = UNIVERSAL_DMG_MULT * total
+    return float(_math.floor(bonus))
 
 
 # Damage ---------------------------------------------------------------------
