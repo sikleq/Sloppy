@@ -697,27 +697,29 @@ _BASE_COL_BY_KEY.update(_EXTRA_COLS)
 _LABEL_OVERRIDES = {
     "hpr": "HP/sec",
     "mpr": "MP/sec",
-    "dmin": "Dmg\nmin",
-    "dmax": "Dmg\nmax",
+    "dmin": "Dmg min",
+    "dmax": "Dmg max",
     "aspd": "Speed",
     "range": "Range",
     "proj": "Projectile Speed",
     "collision": "Collision Size",
     "ms": "Movespeed",
+    "dvision": "Day",
+    "nvision": "Night",
 }
 for _key, _label in _LABEL_OVERRIDES.items():
     _BASE_COL_BY_KEY[_key]["label"] = _label
 
 CATEGORIES = [
     ("Basic", "basic", []),
-    ("Vitality", "vitality", ["hp", "hpr", "mp", "mpr"]),
+    ("Essentials", "vitality", ["hp", "hpr", "mp", "mpr"]),
     ("Attributes", "attributes", ["str", "str_gain", "agi", "agi_gain",
                                    "int", "int_gain", "gper"]),
     ("Defense", "defense", ["armor", "armor_pct", "mr"]),
     ("Attack", "attack", ["dmg", "dmin", "dmax", "aspd", "t_per_attack",
                            "bat", "range", "proj"]),
     ("Vision", "vision", ["dvision", "nvision"]),
-    ("Other", "other", ["ms", "turn", "collision", "bound"]),
+    ("Mobility", "mobility", ["ms", "turn", "collision", "bound"]),
 ]
 
 for _cat_name, _cat_slug, _keys in CATEGORIES:
@@ -1241,23 +1243,12 @@ def render_html() -> str:
     )
 
     blurb = (
-        '<p class="mr-blurb inbox-bar">Every hero with their base stats from the '
-        f'game files (current patch <strong>{latest}</strong>). Hover any cell for '
-        'its full change history since 7.08 — patch by patch, with the overall '
-        'first&#8201;→&#8201;today delta on top. '
-        '<br>The <strong>View</strong> dropdown switches between three modes: '
-        '<em>Base</em> shows raw KV values; <em>Starting</em> (default) applies '
-        'level-1 attribute bonuses (HP = base + 22×Str, MP = base + 12×Int, '
-        'Armor = base + Agi/6, Mag.&nbsp;resist = base + 0.1×Int, Damage = base + '
-        'primary-attribute bonus, Attack Speed = base + Agi); <em>Expanded</em> '
-        'adds extra inspection columns: Gains/lvl, Armor %, Min/Max damage, '
-        'Time to hit, projectile speed, turn rate, collision size, bound radius. '
-        'Huskar has no mana pool ever; '
-        'Ogre Magi’s mana / mana regen scale with Strength instead of Intelligence. '
-        'Hero innates that convert attributes are also applied (Morphling’s '
-        'Agility→Attack&nbsp;Range / Move&nbsp;Speed since 7.41, Void Spirit’s '
-        'Intrinsic Edge, Centaur’s Strength→Move&nbsp;Speed). '
-        'Click a column header to sort.</p>\n'
+        '<p class="mr-blurb inbox-bar">Compare hero stats across three views: '
+        '<em>Base</em> shows raw game-file values, <em>Starting</em> shows level-1 '
+        'practical values with attribute bonuses and supported innate conversions, '
+        'and <em>Expanded</em> adds detailed combat, armor, projectile, mobility '
+        'and size columns. Hover any stat for its full patch history since 7.08, '
+        'then use search, sorting and heatmap to find outliers quickly.</p>\n'
     )
     toolbar = (
         '<div class="cal-toggle-bar mr-toolbar inbox-bar"><div class="toolbar-panel">'

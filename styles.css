@@ -6422,6 +6422,14 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 .mr-table.hs-table td.col-sep {
   border-left: 2px solid rgba(170, 220, 240, 0.30);
 }
+.mr-table.hs-table thead th .th-sub {
+  display: block;
+  font-size: 9px;
+  line-height: 1;
+  color: #8b98a8;
+  font-weight: 600;
+  margin-top: 1px;
+}
 /* Sticky hero column (single frozen column → plain CSS sticky, no JS lefts).
    Solid backgrounds so scrolled columns disappear under it; header corner
    sits above both axes' pinned bars (z 51 > th 50). */

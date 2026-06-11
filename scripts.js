@@ -2403,6 +2403,15 @@
     td.dataset.startHist = td.dataset.hist || '';
     td.dataset.startHtml = td.innerHTML;
   });
+  function recomputeCats() {
+    table.querySelectorAll('thead tr.cat-row th.cat-head[data-cat]').forEach(head => {
+      let span = 0;
+      table.querySelectorAll('thead tr.col-row th[data-cat="' + head.dataset.cat + '"]')
+        .forEach(th => { if (th.offsetParent !== null) span += th.colSpan || 1; });
+      head.colSpan = span || 1;
+      head.style.display = span ? '' : 'none';
+    });
+  }
   const apply = () => {
     const mode = viewSel.value;
     table.classList.remove('hs-mode-base', 'hs-mode-starting', 'hs-mode-expanded');
@@ -2418,9 +2427,11 @@
         td.innerHTML = td.dataset.startHtml;
       }
     });
+    recomputeCats();
     window.dispatchEvent(new CustomEvent('mr:filter-changed'));  // heatmap re-scan
   };
   viewSel.addEventListener('change', apply);
+  window.addEventListener('resize', recomputeCats, { passive: true });
   apply();
 })();
 
