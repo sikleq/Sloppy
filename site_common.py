@@ -68,9 +68,7 @@ MATERIALS_SUBTABS = [
     ("creeps",     "Neutral Creeps",    "neutral_creeps.html"),
     ("abilities",  "Neutral Abilities", "neutral_abilities.html"),
     ("mana_items", "Mana Items",        "mana_items.html"),
-    # Hero Stats tab intentionally hidden from the nav for now (page + builder
-    # exist, just not surfaced/deployed yet — re-add this entry to enable).
-    # ("heroes_stats", "Hero Stats",     "heroes_stats.html"),
+    ("heroes_stats", "Hero Stats",      "heroes_stats.html"),
     ("heroes_dyn", "Hero Dynamics",     "heroes_dyn.html"),
     ("items_dyn",  "Item Dynamics",     "items_dyn.html"),
     ("terrain",    "Terrain",           "terrain.html"),

@@ -44,12 +44,10 @@ jobs:
           PYTHONIOENCODING: utf-8
         run: python build_mana_items.py
 
-      # Hero Stats page not deployed yet (tab hidden in site_common). Re-enable
-      # this step when the tab is surfaced.
-      # - name: Build hero stats table
-      #   env:
-      #     PYTHONIOENCODING: utf-8
-      #   run: python build_heroes_stats.py
+      - name: Build hero stats table
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python build_heroes_stats.py
 
       - name: Build hero dynamics matrix
         env:

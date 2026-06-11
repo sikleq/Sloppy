@@ -36,12 +36,26 @@ REPO = "dotabuff/d2vpkr"
 FILE_PATH = "dota/scripts/npc/npc_heroes.txt"
 RAW_TMPL = "https://raw.githubusercontent.com/" + REPO + "/{sha}/" + FILE_PATH
 
-# Raw-only hero fields (NOT in our slim heroes.json). Store a superset so new
-# columns can be added later without a re-fetch.
+# Hero fields to extract. We carry the FULL stat set (not just raw-only
+# fields) so build_heroes_stats can use d2vpkr as the AUTHORITATIVE history
+# source — the muk-as/DOTA2_CLIENT slim scrape (heroes.json) was found to
+# be one-patch-late for some balance changes (e.g. Treant 7.34d Base
+# Damage decrease shows up at 7.34e in muk-as data, but at 7.34d in
+# d2vpkr, which matches the Valve patch notes).
 HERO_FIELDS = (
+    # Raw-only (not in heroes.json):
     "VisionDaytimeRange", "VisionNighttimeRange", "ProjectileSpeed",
     "BaseAttackSpeed", "MovementTurnRate", "BoundsHullName", "RingRadius",
     "AttackAcquisitionRange", "AttackAnimationPoint",
+    # Core stats — d2vpkr is the authoritative timing source.
+    "StatusHealth", "StatusMana", "StatusHealthRegen", "StatusManaRegen",
+    "ArmorPhysical", "MagicalResistance",
+    "AttackDamageMin", "AttackDamageMax", "AttackRate", "AttackRange",
+    "MovementSpeed",
+    "AttributePrimary",
+    "AttributeBaseStrength", "AttributeStrengthGain",
+    "AttributeBaseAgility", "AttributeAgilityGain",
+    "AttributeBaseIntelligence", "AttributeIntelligenceGain",
 )
 FIELD_RE = re.compile(r'^\s*"([A-Za-z_][A-Za-z0-9_]*)"\s+"([^"]*)"')
 KEY_RE = re.compile(r'^\s*"([A-Za-z_][A-Za-z0-9_]*)"\s*$')
@@ -70,9 +84,14 @@ def parse_npc_heroes(text):
                 cur = km.group(1)
                 out.setdefault(cur, {})
             continue
-        # brace-only (or brace-containing) line
-        depth += st.count("{") - st.count("}")
-        if depth < 2:
+        # brace-only (or brace-containing) line. ONLY reset cur on a closing
+        # brace that exits the hero block — every empty/comment line between
+        # a hero NAME line (depth 1) and its opening `{` would otherwise null
+        # out cur, dropping every field in that hero. (Buggy before — caused
+        # `heroes_raw.json` to be entirely empty for every hero, every patch.)
+        delta = st.count("{") - st.count("}")
+        depth += delta
+        if delta < 0 and depth < 2:
             cur = None
     return out
 

@@ -1,26 +1,29 @@
 """Build heroes_stats.html — the Hero Stats table (Materials sub-tab).
 
-One row per hero, columns = base stats. Two view modes (the same View
-dropdown as Neutral Creeps):
-  * Standard — HP, MP, attributes (base + gain), armor, magic resistance,
-    average damage, projectile speed, attack range, attack speed, BAT,
-    move speed, turn rate, vision, collision size, bound radius.
-  * Advanced — adds the COMPUTED level-1 columns (HP with Strength, MP with
-    Intelligence, armor with Agility, magic resistance with Intelligence),
-    the min–max damage column, and per-attribute "level 30" expanders
-    (base + 29×gain — the flat +2-all level bonuses are NOT included).
+One row per hero, columns = base stats. Three view modes via the View
+dropdown (mirrors Neutral Creeps):
+  * Base     — bare values from the game files (StatusHealth = 120 etc).
+  * Starting — level-1 values WITH attribute bonuses (HP = 120 + 22×Str,
+               MP = base + 12×Int, Armor = base + Agi/6, Mag.resist = base +
+               0.1×Int, Damage = base + primary-attr bonus, Attack Speed =
+               base + 1×Agi). DEFAULT mode.
+  * Expanded — everything in Starting + extra columns (per-attribute level
+               30, sum of attributes at L1/L30, sum of gains, Min/Max damage
+               split, projectile, turn rate, collision, bound radius).
 
-Numeric cells backed by the per-patch scrape (data/stats/<patch>/heroes.json,
-7.08 → today) carry the full change history as a `data-hist` hover tooltip
-(same stat-hist-tip payload as Neutral Creeps / Mana Items, incl. the
-overall first→today summary). Fields only present in the raw KV
-(projectile speed, attack speed, turn rate, vision, collision, bound) come
-from the LATEST data/stats/<ver>/npc_heroes.txt — snapshot only, no history.
+Each "computed" column carries both Base and Starting values; the View
+dropdown swaps them in via JS (data-base-* attrs on the td). Per-patch
+change history (`data-hist` tooltip with overall first→today summary)
+follows the current mode — base values get base history, starting values
+get starting history.
 
-Front-end is the mr-table stack reused wholesale (flat data-sort sorting,
-heatmap via th[data-direction] + #mr-heatmap-toggle, #mr-search name filter,
-stat-hist tooltips); page-specific JS = the View mode + expanders IIFE in
-scripts.js ("HERO STATS").
+Data sources:
+  * data/stats/<patch>/heroes.json — slim scrape (attributes, base HP/mana,
+    armor, damage, BAT, MS, range, magic resistance). All 116 patches.
+  * data/stats/<patch>/heroes_raw.json — raw-only fields (vision day/night,
+    projectile speed, base attack speed, turn rate, collision hull, bound
+    radius). Built by scripts/fetch_hero_history.py from d2vpkr's historical
+    npc_heroes.txt. All 116 patches.
 
 Run AFTER build_patch.py (needs data/site_meta.json):
     python build_patch.py
@@ -41,14 +44,23 @@ ASSET_VERSION = _site.compute_asset_version()
 
 _esc = lambda s: _html.escape(str(s), quote=True)
 
-# ---- engine constants for the computed (Advanced) columns -----------------
-# User-correctable. Current-patch values; the computed columns' HISTORY also
-# uses these constants for past patches (the historical constants differed —
-# noted in the page blurb).
-HP_PER_STR = 22.0
-MANA_PER_INT = 12.0
-ARMOR_PER_AGI = 1 / 6          # 0.1667 armor per Agility point
-MR_PER_INT = 0.1               # % magic resistance per Intelligence point
+# ---- engine constants for "Starting" mode (level-1 with attribute bonuses) ---
+# Current-patch values. User-correctable — adjust here when Valve tweaks any
+# of these and rerun the build. The computed columns' HISTORY uses these
+# constants for past patches too (the historical constants did differ).
+HP_PER_STR        = 22.0   # +22 max HP per Strength
+HPREG_PER_STR     = 0.1    # +0.1 HP regen per Strength
+MANA_PER_INT      = 12.0   # +12 max mana per Intelligence
+MANAREG_PER_INT   = 0.05   # +0.05 mana regen per Intelligence
+ARMOR_PER_AGI     = 1 / 6  # 0.1667 armor per Agility
+MR_PER_INT        = 0.1    # +0.1 % magic resistance per Intelligence
+AS_PER_AGI        = 1.0    # +1 attack speed per Agility
+DMG_PER_PRIMARY   = 1.0    # Str/Agi/Int hero gains +1 damage per primary point
+UNIVERSAL_DMG_MULT = 0.7   # Universal: +0.7 damage per EACH attribute point
+
+# Ogre Magi innate — mana / mana regen scale with Strength (he has 0 base Int).
+OGRE_MANA_PER_STR    = 6.0
+OGRE_MANAREG_PER_STR = 0.02
 
 
 # ---------- patch ordering / dates ----------
@@ -156,10 +168,10 @@ def _field(snap: dict, hero: str, f: str):
 
 
 _ATTR_META = {
-    "DOTA_ATTRIBUTE_STRENGTH": ("str", "Strength", "strength.webp", 0),
-    "DOTA_ATTRIBUTE_AGILITY":  ("agi", "Agility", "agility.webp", 1),
+    "DOTA_ATTRIBUTE_STRENGTH":  ("str", "Strength",     "strength.webp",     0),
+    "DOTA_ATTRIBUTE_AGILITY":   ("agi", "Agility",      "agility.webp",      1),
     "DOTA_ATTRIBUTE_INTELLECT": ("int", "Intelligence", "intelligence.webp", 2),
-    "DOTA_ATTRIBUTE_ALL":      ("uni", "Universal", "universal.webp", 3),
+    "DOTA_ATTRIBUTE_ALL":       ("uni", "Universal",    "universal.webp",    3),
 }
 
 
@@ -168,7 +180,7 @@ def _attr_of(snap: dict, hero: str):
     return _ATTR_META.get(raw)
 
 
-# ---------- raw KV (npc_heroes.txt, LATEST patch only — no history) ----------
+# ---------- raw KV (npc_heroes.txt → heroes_raw.json per patch) ----------
 
 # Hull name → collision radius (engine table; heroes are all _HERO = 24).
 _HULL_RADIUS = {
@@ -179,14 +191,14 @@ _HULL_RADIUS = {
 _RAW_DEFAULTS = {
     "ProjectileSpeed": 900, "BaseAttackSpeed": 100, "MovementTurnRate": 0.6,
     "VisionDaytimeRange": 1800, "VisionNighttimeRange": 800, "RingRadius": 70,
-    "BoundsHullName": "DOTA_HULL_SIZE_HERO", "MagicalResistance": 25,
+    "BoundsHullName": "DOTA_HULL_SIZE_HERO",
 }
+
 
 def _load_raw_heroes(version: str) -> dict[str, dict]:
     """Raw-only hero fields for one patch, from the pre-parsed
     data/stats/<version>/heroes_raw.json (produced by
-    scripts/fetch_hero_history.py from d2vpkr's historical npc_heroes.txt).
-    Empty dict if that patch wasn't fetched yet."""
+    scripts/fetch_hero_history.py from d2vpkr's historical npc_heroes.txt)."""
     path = STATS_DIR / version / "heroes_raw.json"
     if not path.exists():
         return {}
@@ -224,118 +236,584 @@ def _g1(v: float) -> str:
     return s if s else "0"
 
 
-# ---------- column model ----------
-# (key, label, mode, pol, fmt, value_fn, display_fn, hist, raw)
-#   mode:  'std' (always shown) | 'adv' (Expanded only)
-#   value_fn(snap, hero, raw) -> float; display_fn(snap, hero, raw) -> HTML.
-#   hist:  True → emit a per-patch change-history tooltip for the cell.
-#   raw:   True → value comes from heroes_raw.json (vision/projectile/…), so
-#          history iterates only the patches that carry it; False → from the
-#          per-patch heroes.json (full 7.08→today coverage).
+def _g0(v: float) -> str:
+    return f"{round(v)}"
+
+
+def _gpct(v: float) -> str:
+    return f'{_g(v)}%'
+
+
+def _g1pct(v: float) -> str:
+    return f'{_g1(v)}%'
+
+
+# ---------- value functions ----------
 
 def _f(field):
+    """Convenience: return value_fn that reads `field` directly from snap."""
     return lambda s, h, r: _field(s, h, field)
 
 
-def _mk_attr_cols(short: str, label: str, base_f: str, gain_f: str):
-    return [
-        (f"{short}_base", label, "std", "hi", _g, _f(base_f), None, True, False),
-        (f"{short}_gain", f"{label}/lvl", "std", "hi", _g, _f(gain_f), None, True, False),
-        # Level-30 column — a plain Expanded column (revealed with the View
-        # dropdown alongside the other Expanded columns).
-        (f"{short}30", f"{label} 30", "adv", "hi", _g1,
-         lambda s, h, r, b=base_f, g=gain_f:
-             round(_field(s, h, b) + 29 * _field(s, h, g), 1),
-         None, True, False),
-    ]
+def _primary_dmg(s, h):
+    """Bonus attack damage from primary attribute(s) at level 1.
+    Str/Agi/Int heroes: +1 per primary attribute point.
+    Universal: +0.7 per EACH of Str + Agi + Int.
+    See https://liquipedia.net/dota2/Attributes."""
+    meta = _attr_of(s, h)
+    if meta is None:
+        return 0.0
+    kind = meta[0]
+    if kind == "str":
+        return DMG_PER_PRIMARY * _field(s, h, "AttributeBaseStrength")
+    if kind == "agi":
+        return DMG_PER_PRIMARY * _field(s, h, "AttributeBaseAgility")
+    if kind == "int":
+        return DMG_PER_PRIMARY * _field(s, h, "AttributeBaseIntelligence")
+    # Universal — multiplier on the SUM of all three attributes.
+    total = (_field(s, h, "AttributeBaseStrength")
+             + _field(s, h, "AttributeBaseAgility")
+             + _field(s, h, "AttributeBaseIntelligence"))
+    return UNIVERSAL_DMG_MULT * total
 
 
-def _dmg_avg(s, h, r):
+# Damage ---------------------------------------------------------------------
+
+def _dmg_min_base(s, h, r):
+    return _field(s, h, "AttackDamageMin")
+
+
+def _dmg_max_base(s, h, r):
+    return _field(s, h, "AttackDamageMax")
+
+
+def _dmg_avg_base(s, h, r):
     return (_field(s, h, "AttackDamageMin") + _field(s, h, "AttackDamageMax")) / 2
 
 
-def _dmg_range(s, h, r):
-    return f'{_g(_field(s, h, "AttackDamageMin"))}–{_g(_field(s, h, "AttackDamageMax"))}'
+def _dmg_min_start(s, h, r):
+    return _dmg_min_base(s, h, r) + _primary_dmg(s, h)
 
 
-def _vision_disp(s, h, r):
-    return (f'{_g(_raw_num(r, h, "VisionDaytimeRange"))}'
-            f'<span class="hs-dim">/</span>'
-            f'{_g(_raw_num(r, h, "VisionNighttimeRange"))}')
+def _dmg_max_start(s, h, r):
+    return _dmg_max_base(s, h, r) + _primary_dmg(s, h)
 
+
+def _dmg_avg_start(s, h, r):
+    return _dmg_avg_base(s, h, r) + _primary_dmg(s, h)
+
+
+def _dmg_range_base(s, h, r):
+    return f'{_g0(_dmg_min_base(s, h, r))}–{_g0(_dmg_max_base(s, h, r))}'
+
+
+def _dmg_range_start(s, h, r):
+    return f'{_g0(_dmg_min_start(s, h, r))}–{_g0(_dmg_max_start(s, h, r))}'
+
+
+# HP / MP / regens -----------------------------------------------------------
 
 def _hp_l1(s, h, r):
     return round(_field(s, h, "StatusHealth")
                  + HP_PER_STR * _field(s, h, "AttributeBaseStrength"))
 
 
+def _hpreg_l1(s, h, r):
+    return round(_field(s, h, "StatusHealthRegen")
+                 + HPREG_PER_STR * _field(s, h, "AttributeBaseStrength"), 2)
+
+
+def _mp_base_raw(s, h, r):
+    """Base mode raw mana — Huskar still forced to 0 (no mana pool ever)."""
+    if h.endswith("_huskar"):
+        return 0.0
+    return _field(s, h, "StatusMana")
+
+
 def _mp_l1(s, h, r):
+    slug = h.replace("npc_dota_hero_", "")
+    if slug == "huskar":
+        return 0.0
+    if slug == "ogre_magi":
+        return round(_field(s, h, "StatusMana")
+                     + OGRE_MANA_PER_STR * _field(s, h, "AttributeBaseStrength")
+                     + MANA_PER_INT * _field(s, h, "AttributeBaseIntelligence"))
     return round(_field(s, h, "StatusMana")
                  + MANA_PER_INT * _field(s, h, "AttributeBaseIntelligence"))
+
+
+def _mpreg_base_raw(s, h, r):
+    if h.endswith("_huskar"):
+        return 0.0
+    return _field(s, h, "StatusManaRegen")
+
+
+def _mpreg_l1(s, h, r):
+    slug = h.replace("npc_dota_hero_", "")
+    if slug == "huskar":
+        return 0.0
+    if slug == "ogre_magi":
+        return round(_field(s, h, "StatusManaRegen")
+                     + OGRE_MANAREG_PER_STR * _field(s, h, "AttributeBaseStrength")
+                     + MANAREG_PER_INT * _field(s, h, "AttributeBaseIntelligence"), 2)
+    return round(_field(s, h, "StatusManaRegen")
+                 + MANAREG_PER_INT * _field(s, h, "AttributeBaseIntelligence"), 2)
+
+
+# Armor / MR / Attack speed --------------------------------------------------
+
+def _armor_base(s, h, r):
+    return _field(s, h, "ArmorPhysical")
+
+
+def _armor_l1(s, h, r):
+    return round(_field(s, h, "ArmorPhysical")
+                 + ARMOR_PER_AGI * _field(s, h, "AttributeBaseAgility"), 1)
+
+
+def _mr_base(s, h, r):
+    return _field(s, h, "MagicalResistance")
+
+
+def _mr_l1(s, h, r):
+    return round(_field(s, h, "MagicalResistance")
+                 + MR_PER_INT * _field(s, h, "AttributeBaseIntelligence"), 1)
+
+
+def _aspd_base(s, h, r):
+    return _raw_num(r, h, "BaseAttackSpeed")
+
+
+def _aspd_l1(s, h, r):
+    return _raw_num(r, h, "BaseAttackSpeed") + AS_PER_AGI * _field(s, h, "AttributeBaseAgility")
+
+
+# Expanded extras — STR/AGI/INT at L30 + sums ---------------------------------
+
+def _attr30(base_f: str, gain_f: str):
+    return lambda s, h, r: round(_field(s, h, base_f) + 29 * _field(s, h, gain_f), 1)
+
+
+def _total_l1(s, h, r):
+    return round(_field(s, h, "AttributeBaseStrength")
+                 + _field(s, h, "AttributeBaseAgility")
+                 + _field(s, h, "AttributeBaseIntelligence"), 1)
+
+
+def _total_l30(s, h, r):
+    return round(
+        (_field(s, h, "AttributeBaseStrength") + 29 * _field(s, h, "AttributeStrengthGain"))
+        + (_field(s, h, "AttributeBaseAgility") + 29 * _field(s, h, "AttributeAgilityGain"))
+        + (_field(s, h, "AttributeBaseIntelligence")
+           + 29 * _field(s, h, "AttributeIntelligenceGain")),
+        1)
+
+
+def _gains_per_level(s, h, r):
+    return round(_field(s, h, "AttributeStrengthGain")
+                 + _field(s, h, "AttributeAgilityGain")
+                 + _field(s, h, "AttributeIntelligenceGain"), 1)
+
+
+def _gains_total_l30(s, h, r):
+    return round(29 * _gains_per_level(s, h, r), 1)
 
 
 def _collision(s, h, r):
     return float(_HULL_RADIUS.get(str(_raw_field(r, h, "BoundsHullName")), 24))
 
 
-COLUMNS = (
-    [
-        # HP/MP show the LEVEL-1 value directly (base 120 + Strength, base
-        # mana + Intelligence) — every hero starts at 120 base HP so the bare
-        # base is uninformative; the L1 value is what players read. History
-        # still tracks every patch (it captures base-str / base-int changes).
-        ("hp",   "HP",  "std", "hi", _g, _hp_l1, None, True, False),
-        ("mana", "MP",  "std", "hi", _g, _mp_l1, None, True, False),
-    ]
-    + _mk_attr_cols("str", "STR", "AttributeBaseStrength", "AttributeStrengthGain")
-    + _mk_attr_cols("agi", "AGI", "AttributeBaseAgility", "AttributeAgilityGain")
-    + _mk_attr_cols("int", "INT", "AttributeBaseIntelligence", "AttributeIntelligenceGain")
-    + [
-        ("armor",    "Armor",       "std", "hi", _g, _f("ArmorPhysical"), None, True, False),
-        ("armor_l1", "Armor lvl 1", "adv", "hi", _g1,
-         lambda s, h, r: round(_field(s, h, "ArmorPhysical")
-                               + ARMOR_PER_AGI * _field(s, h, "AttributeBaseAgility"), 1),
-         None, True, False),
-        ("mr",      "Magic Res %",  "std", "hi", _g, _f("MagicalResistance"), None, True, False),
-        ("mr_l1",   "MR lvl 1 %",   "adv", "hi", _g1,
-         lambda s, h, r: round(_field(s, h, "MagicalResistance")
-                               + MR_PER_INT * _field(s, h, "AttributeBaseIntelligence"), 1),
-         None, True, False),
-        ("dmg",     "Damage",       "std", "hi", _g, _dmg_avg, None, True, False),
-        ("dmg_mm",  "Min–Max",      "adv", "hi", _g, _dmg_avg, _dmg_range, True, False),
-        ("ms",      "Move Speed",   "std", "hi", _g, _f("MovementSpeed"), None, True, False),
-        ("aspd",    "Attack Speed", "std", "hi", _g,
-         lambda s, h, r: _raw_num(r, h, "BaseAttackSpeed"), None, True, True),
-        ("bat",     "BAT",          "std", "lo", _g, _f("AttackRate"), None, True, False),
-        ("vision",  "Vision",       "std", "hi", _g,
-         lambda s, h, r: _raw_num(r, h, "VisionDaytimeRange"), _vision_disp, True, True),
-        ("proj",    "Projectile",   "std", "hi", _g,
-         lambda s, h, r: _raw_num(r, h, "ProjectileSpeed"), None, True, True),
-        ("range",   "Attack Range", "std", "hi", _g, _f("AttackRange"), None, True, False),
-        ("turn",    "Turn Rate",    "std", "hi", _g,
-         lambda s, h, r: _raw_num(r, h, "MovementTurnRate"), None, True, True),
-        ("collision", "Collision",  "std", "lo", _g, _collision, None, True, True),
-        ("bound",   "Bound Radius", "std", "lo", _g,
-         lambda s, h, r: _raw_num(r, h, "RingRadius"), None, True, True),
-    ]
+# ---------- column model ----------
+# Each entry describes one logical column. Cells track BOTH a Base value and a
+# Starting value (some columns differ between modes, e.g. HP = 120 raw vs
+# 120+22×Str at L1); the View dropdown swaps them on the client via JS.
+#   key       — data-col + CSS class hs-col-<key>.
+#   label     — header text.
+#   mode      — 'core'  always visible | 'extra' visible only in Expanded.
+#   pol       — 'hi' / 'lo' heatmap polarity.
+#   fmt       — value → string (used when disp_* are None).
+#   fn_base / fn_starting — value functions per mode.
+#   disp_base / disp_starting — optional HTML producers (e.g. damage range
+#                               "21–28", magic-res "26%").
+#   hist      — True → emit per-patch change-history tooltip.
+#   raw       — True → value uses heroes_raw.json (raw-only field).
+
+def _col(key, label, *, mode="core", pol="hi", fmt=_g,
+         fn_base, fn_starting=None,
+         disp_base=None, disp_starting=None,
+         hist=True, raw=False):
+    return {
+        "key": key, "label": label, "mode": mode, "pol": pol, "fmt": fmt,
+        "fn_base": fn_base, "fn_starting": fn_starting or fn_base,
+        "disp_base": disp_base, "disp_starting": disp_starting,
+        "hist": hist, "raw": raw,
+    }
+
+
+COLUMNS = [
+    # ── HP / MP / regens ────────────────────────────────────────────────
+    _col("hp",  "HP", fmt=_g0, fn_base=_f("StatusHealth"), fn_starting=_hp_l1),
+    _col("mp",  "MP", fmt=_g0, fn_base=_mp_base_raw,        fn_starting=_mp_l1),
+    _col("hpr", "HP regen",  fn_base=_f("StatusHealthRegen"), fn_starting=_hpreg_l1),
+    _col("mpr", "MP regen",  fn_base=_mpreg_base_raw,         fn_starting=_mpreg_l1),
+
+    # ── Attributes ─────────────────────────────────────────────────────
+    _col("str",      "STR",      fn_base=_f("AttributeBaseStrength")),
+    _col("str_gain", "STR/lvl",  fn_base=_f("AttributeStrengthGain")),
+    _col("str30",    "STR 30",   mode="extra", fmt=_g1,
+         fn_base=_attr30("AttributeBaseStrength", "AttributeStrengthGain")),
+    _col("agi",      "AGI",      fn_base=_f("AttributeBaseAgility")),
+    _col("agi_gain", "AGI/lvl",  fn_base=_f("AttributeAgilityGain")),
+    _col("agi30",    "AGI 30",   mode="extra", fmt=_g1,
+         fn_base=_attr30("AttributeBaseAgility", "AttributeAgilityGain")),
+    _col("int",      "INT",      fn_base=_f("AttributeBaseIntelligence")),
+    _col("int_gain", "INT/lvl",  fn_base=_f("AttributeIntelligenceGain")),
+    _col("int30",    "INT 30",   mode="extra", fmt=_g1,
+         fn_base=_attr30("AttributeBaseIntelligence", "AttributeIntelligenceGain")),
+    _col("totl1",    "Total lvl 1",     mode="extra", fmt=_g1, fn_base=_total_l1),
+    _col("totl30",   "Total lvl 30",    mode="extra", fmt=_g1, fn_base=_total_l30),
+    _col("gper",     "Gains/lvl",       mode="extra", fmt=_g1, fn_base=_gains_per_level),
+    _col("gtotl30",  "Gains by lvl 30", mode="extra", fmt=_g1, fn_base=_gains_total_l30),
+
+    # ── Defenses ──────────────────────────────────────────────────────
+    _col("armor", "Armor", fmt=_g1, fn_base=_armor_base, fn_starting=_armor_l1),
+    _col("mr",    "Mag. resist", fn_base=_mr_base, fn_starting=_mr_l1,
+         disp_base=lambda s, h, r: _gpct(_mr_base(s, h, r)),
+         disp_starting=lambda s, h, r: _g1pct(_mr_l1(s, h, r))),
+
+    # ── Damage ────────────────────────────────────────────────────────
+    _col("dmg",  "Damage", fmt=_g0,
+         fn_base=_dmg_avg_base, fn_starting=_dmg_avg_start,
+         disp_base=_dmg_range_base, disp_starting=_dmg_range_start),
+    _col("dmin", "Min Dmg", mode="extra", fmt=_g0,
+         fn_base=_dmg_min_base, fn_starting=_dmg_min_start),
+    _col("dmax", "Max Dmg", mode="extra", fmt=_g0,
+         fn_base=_dmg_max_base, fn_starting=_dmg_max_start),
+
+    # ── Attack mechanics ──────────────────────────────────────────────
+    _col("aspd", "Attack Speed", fmt=_g0,
+         fn_base=_aspd_base, fn_starting=_aspd_l1, raw=True),
+    _col("ms",   "Move Speed",   fn_base=_f("MovementSpeed")),
+    _col("bat",  "BAT", pol="lo", fn_base=_f("AttackRate")),
+
+    # ── Vision ────────────────────────────────────────────────────────
+    _col("dvision", "Day Vision", fmt=_g0,
+         fn_base=lambda s, h, r: _raw_num(r, h, "VisionDaytimeRange"), raw=True),
+    _col("nvision", "Night Vision", fmt=_g0,
+         fn_base=lambda s, h, r: _raw_num(r, h, "VisionNighttimeRange"), raw=True),
+
+    _col("range", "Attack Range", fmt=_g0, fn_base=_f("AttackRange")),
+
+    # ── Expanded extras (raw-only fields) ─────────────────────────────
+    _col("proj",      "Projectile", mode="extra", fmt=_g0,
+         fn_base=lambda s, h, r: _raw_num(r, h, "ProjectileSpeed"), raw=True),
+    _col("turn",      "Turn Rate",  mode="extra",
+         fn_base=lambda s, h, r: _raw_num(r, h, "MovementTurnRate"), raw=True),
+    _col("collision", "Collision",  mode="extra", pol="lo",
+         fn_base=_collision, raw=True),
+    _col("bound",     "Bound Radius", mode="extra", pol="lo",
+         fn_base=lambda s, h, r: _raw_num(r, h, "RingRadius"), raw=True),
+]
+
+
+# ---------- patch-note → field event index ----------
+# The KV scrape (and d2vpkr's npc_heroes.txt) sometimes captures a balance
+# change ONE PATCH LATE — Valve's server-side balance updates can ship in
+# patch X but the public KV file only reflects them in X+1 (e.g. Treant
+# 7.34d "Base Damage decreased by 2" → KV shows the new value at 7.34e).
+# To restore accuracy we parse data/patchnotes_english.txt and shift each
+# KV-detected change to the patch where the corresponding patch note
+# announces it. The mapping is from `(hero_slug, field)` → ordered list of
+# patches in which a base-stat note for that field appears.
+
+_PATCH_KEY_RE = _re.compile(
+    r'^\s*"DOTA_Patch_(?P<patch>\d+_\d+(?:_?[a-z])?)_(?P<rest>[a-zA-Z0-9_]+)"'
+    r'\s+"(?P<text>.*?)"\s*$'
 )
+
+# Patch-note text → list of heroes.json field names it announces.
+# Each pattern is a substring (case-insensitive, lowercase form). Order
+# matters: the more specific phrases are checked before the generic ones.
+_NOTE_FIELD_PATTERNS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    # Regen first (catches "base health regen" before "base health")
+    ("base health regen",        ("StatusHealthRegen",)),
+    ("base hp regen",            ("StatusHealthRegen",)),
+    ("base mana regen",          ("StatusManaRegen",)),
+    ("base mp regen",            ("StatusManaRegen",)),
+    # HP / mana
+    ("base health",              ("StatusHealth",)),
+    ("base hp",                  ("StatusHealth",)),
+    ("base mana",                ("StatusMana",)),
+    ("base mp",                  ("StatusMana",)),
+    # Defense
+    ("base armor",               ("ArmorPhysical",)),
+    ("magic resistance",         ("MagicalResistance",)),
+    ("magical resistance",       ("MagicalResistance",)),
+    # Attributes
+    ("strength gain",            ("AttributeStrengthGain",)),
+    ("agility gain",             ("AttributeAgilityGain",)),
+    ("intelligence gain",        ("AttributeIntelligenceGain",)),
+    ("base strength",            ("AttributeBaseStrength",)),
+    ("base agility",             ("AttributeBaseAgility",)),
+    ("base intelligence",        ("AttributeBaseIntelligence",)),
+    # Damage  (covers "base damage", "base attack damage")
+    ("base damage",              ("AttackDamageMin", "AttackDamageMax")),
+    ("base attack damage",       ("AttackDamageMin", "AttackDamageMax")),
+    # Movement / attack mechanics
+    ("base movement speed",      ("MovementSpeed",)),
+    ("base move speed",          ("MovementSpeed",)),
+    ("base attack time",         ("AttackRate",)),
+    ("attack range",             ("AttackRange",)),
+    ("base attack speed",        ("BaseAttackSpeed",)),
+    # Vision
+    ("day vision",               ("VisionDaytimeRange",)),
+    ("night vision",             ("VisionNighttimeRange",)),
+    # Turn rate / projectile / collision
+    ("turn rate",                ("MovementTurnRate",)),
+    ("projectile speed",         ("ProjectileSpeed",)),
+    ("collision",                ("BoundsHullName",)),
+    ("bound radius",             ("RingRadius",)),
+)
+
+
+def _patchnotes_path() -> Path:
+    return _HERE / "data" / "patchnotes_english.txt"
+
+
+def _norm_patch(raw: str) -> str:
+    """'7_34d' → '7.34d', '7_40' → '7.40'."""
+    parts = raw.split("_", 1)
+    return f"{parts[0]}.{parts[1] if len(parts) > 1 else '0'}".replace("_", "")
+
+
+def _hero_slug_aliases() -> dict[str, str]:
+    """Patch-note hero slugs sometimes differ from npc_dota_hero_X.
+    Build alias map: patch-note slug → canonical heroes.json key. Includes
+    a handful of well-known renames the engine kept under legacy slugs."""
+    aliases = {
+        # engine-name → patch-note-slug shortcut (a few engine names start
+        # with a different prefix in patch notes)
+        "obsidian_destroyer": "obsidian_destroyer",
+        "outworld_destroyer": "obsidian_destroyer",
+        "zuus":               "zuus",
+        "zeus":               "zuus",
+        "wisp":               "wisp",
+        "io":                 "wisp",
+        "windrunner":         "windrunner",
+        "windranger":         "windrunner",
+        "skeleton_king":      "skeleton_king",
+        "wraith_king":        "skeleton_king",
+        "nevermore":          "nevermore",
+        "shadow_fiend":       "nevermore",
+        "necrolyte":          "necrolyte",
+        "necrophos":          "necrolyte",
+        "doom_bringer":       "doom_bringer",
+        "doom":               "doom_bringer",
+        "magnataur":          "magnataur",
+        "magnus":             "magnataur",
+        "rattletrap":         "rattletrap",
+        "clockwerk":          "rattletrap",
+        "shredder":           "shredder",
+        "timbersaw":          "shredder",
+        "furion":             "furion",
+        "natures_prophet":    "furion",
+    }
+    return aliases
+
+
+def _load_patchnote_events() -> dict[tuple[str, str], list[str]]:
+    """Parse patchnotes_english.txt → {(hero_slug, field): [patch, ...]}.
+    `hero_slug` is the bare slug WITHOUT the 'npc_dota_hero_' prefix; field
+    matches the npc_heroes.txt KV key (StatusHealth, AttackDamageMin, …).
+    Patch values are normalized to '7.34d' / '7.41' form so they line up
+    with the rest of the build."""
+    path = _patchnotes_path()
+    if not path.exists():
+        return {}
+    # Map from patch-note slug → engine canonical slug (some keys we want
+    # to translate, others stay as-is — pass-through default).
+    alias = _hero_slug_aliases()
+    # First pass: collect raw key→text rows.
+    events: dict[tuple[str, str], list[str]] = {}
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        m = _PATCH_KEY_RE.match(line)
+        if not m:
+            continue
+        patch = _norm_patch(m.group("patch"))
+        rest = m.group("rest")
+        text_low = m.group("text").lower()
+        # rest = hero_slug + optional `_N` numeric suffix + optional ability
+        # suffix. Hero-base-stat notes look like "treant" or "treant_2" — NO
+        # second hero-name-prefixed component. Filter those: strip a trailing
+        # numeric suffix, then make sure no underscore-separated `npc`-style
+        # ability suffix follows.
+        rest_no_num = _re.sub(r"_\d+$", "", rest)
+        # Heuristic: a base-stat note has hero_slug == rest_no_num OR
+        # rest_no_num is a known hero slug (no extra ability path).
+        # Reject talent / ability / facet / innate keys (suffix carries
+        # those words). They reference SKILL stats, not base stats.
+        if any(tok in rest_no_num for tok in
+               ("_talent", "_ability", "_facet", "_innate", "_aghs", "_shard",
+                "_scepter")):
+            continue
+        # Map to canonical slug. If the rest_no_num contains underscores that
+        # don't look like a single hero name, skip (likely an ability/facet
+        # key we didn't filter above). Allow names with up to 3 underscores
+        # like "outworld_destroyer", "obsidian_destroyer", "skeleton_king".
+        if rest_no_num.count("_") > 3:
+            continue
+        slug = alias.get(rest_no_num, rest_no_num)
+        # Match text against field-naming substrings.
+        for needle, fields in _NOTE_FIELD_PATTERNS:
+            if needle in text_low:
+                for f in fields:
+                    events.setdefault((slug, f), []).append(patch)
+                break
+    # Dedupe + sort each list by patch order.
+    for key, ps in events.items():
+        events[key] = sorted(set(ps), key=_patch_sort_key)
+    return events
+
+
+_PATCHNOTE_EVENTS: dict[tuple[str, str], list[str]] | None = None
+
+
+def _patchnote_events() -> dict[tuple[str, str], list[str]]:
+    global _PATCHNOTE_EVENTS
+    if _PATCHNOTE_EVENTS is None:
+        _PATCHNOTE_EVENTS = _load_patchnote_events()
+    return _PATCHNOTE_EVENTS
+
+
+def _shift_to_patchnote(hero: str, field: str, ver: str, used: set[str]) -> str:
+    """If a patch note announces a `field` change for this hero at a patch
+    <= ver that hasn't been consumed by a previous change, return that
+    patch. Otherwise return `ver` unchanged.
+    `used` tracks patches already assigned to earlier changes of this
+    (hero, field) so we don't reassign one note to two KV changes."""
+    slug = hero.replace("npc_dota_hero_", "")
+    events = _patchnote_events().get((slug, field), [])
+    if not events:
+        return ver
+    # Walk events newest→oldest; pick the latest event that is <= ver and
+    # not used yet.
+    for p in reversed(events):
+        if _patch_sort_key(p) > _patch_sort_key(ver):
+            continue
+        if p in used:
+            continue
+        used.add(p)
+        return p
+    return ver
 
 
 # ---------- history ----------
 
-def _col_history(snaps, versions, dates, hero, col, raws) -> str:
-    """Per-patch change history for one hero×column. `raws` maps ver→raw
-    dict; for `raw` columns the iteration restricts to versions that have
-    raw data (the rest are heroes.json-backed and span every patch). The
-    very first observed patch where the column has data and the hero exists
-    is marked ADDED unless it's the earliest tracked patch."""
-    key, label, mode, pol, fmt, value_fn, display_fn, hist, is_raw = col
-    if not hist:
+def _col_fields(col) -> tuple[str, ...]:
+    """The KV field names whose patch-note events justify shifting this
+    column's KV-detected changes. Returns () for synthetic/computed columns
+    that don't correspond to a single KV field."""
+    return _COL_TO_FIELDS.get(col["key"], ())
+
+
+_COL_TO_FIELDS: dict[str, tuple[str, ...]] = {
+    "hp": ("StatusHealth", "AttributeBaseStrength"),
+    "mp": ("StatusMana", "AttributeBaseIntelligence"),
+    "hpr": ("StatusHealthRegen", "AttributeBaseStrength"),
+    "mpr": ("StatusManaRegen", "AttributeBaseIntelligence"),
+    "str": ("AttributeBaseStrength",),
+    "str_gain": ("AttributeStrengthGain",),
+    "agi": ("AttributeBaseAgility",),
+    "agi_gain": ("AttributeAgilityGain",),
+    "int": ("AttributeBaseIntelligence",),
+    "int_gain": ("AttributeIntelligenceGain",),
+    "armor": ("ArmorPhysical", "AttributeBaseAgility"),
+    "mr": ("MagicalResistance", "AttributeBaseIntelligence"),
+    "dmg": ("AttackDamageMin", "AttackDamageMax",
+            "AttributeBaseStrength", "AttributeBaseAgility",
+            "AttributeBaseIntelligence"),
+    "dmin": ("AttackDamageMin",),
+    "dmax": ("AttackDamageMax",),
+    "aspd": ("BaseAttackSpeed", "AttributeBaseAgility"),
+    "ms": ("MovementSpeed",),
+    "bat": ("AttackRate",),
+    "dvision": ("VisionDaytimeRange",),
+    "nvision": ("VisionNighttimeRange",),
+    "range": ("AttackRange",),
+    "proj": ("ProjectileSpeed",),
+    "turn": ("MovementTurnRate",),
+    "collision": ("BoundsHullName",),
+    "bound": ("RingRadius",),
+}
+
+
+def _history_for(snaps, versions, dates, hero, col, raws, *, mode: str) -> str:
+    """Per-patch change history for one hero × column in `mode` (base or
+    starting). For `raw` columns the iteration restricts to versions whose
+    heroes_raw.json carries data. When a patch note announces the
+    corresponding field change one or more patches BEFORE the KV-detected
+    change, the change is shifted to the patch note's patch (KV scrape is
+    often one sub-patch late — see Treant 7.34d "Base Damage decreased by 2")."""
+    if not col["hist"]:
         return ""
-    iter_versions = ([v for v in versions if raws.get(v)] if is_raw else versions)
+    fn_key = "fn_base" if mode == "base" else "fn_starting"
+    disp_key = "disp_base" if mode == "base" else "disp_starting"
+    value_fn = col[fn_key]
+    display_fn = col[disp_key]
+    fmt = col["fmt"]
+    pol = col["pol"]
+    iter_versions = ([v for v in versions if raws.get(v)] if col["raw"] else versions)
     if not iter_versions:
         return ""
-    parts = []
+    # Patch-note shift map. Per (hero, field): which patch-note patches
+    # we've already consumed (so multiple KV changes don't collide on the
+    # same note). The lookback window is intentionally narrow (≤1 sub-
+    # patch) — the KV scrape is at most one sub-patch late in observed
+    # cases; widening risks reattributing unrelated long-ago notes.
+    fields = _col_fields(col)
+    used_per_field: dict[str, set[str]] = {f: set() for f in fields}
+    LOOKBACK_PATCHES = 1
+
+    def _adjacent_prior_patches(ver: str, n: int) -> list[str]:
+        """Up to `n` versions immediately preceding `ver` in the master
+        patch list — i.e. {ver-1, ver-2, …, ver-n} restricted to existing
+        sub-patches."""
+        try:
+            idx = versions.index(ver)
+        except ValueError:
+            return []
+        return versions[max(0, idx - n): idx]
+
+    def shifted_patch(kv_ver: str) -> str:
+        """If any of this column's fields has an unused patch-note event
+        in the patch immediately before `kv_ver` (within LOOKBACK_PATCHES),
+        shift the change there. Otherwise return `kv_ver` unchanged."""
+        if not fields:
+            return kv_ver
+        slug = hero.replace("npc_dota_hero_", "")
+        window = set(_adjacent_prior_patches(kv_ver, LOOKBACK_PATCHES))
+        if not window:
+            return kv_ver
+        # Per field, find any unused event whose patch lies in `window`.
+        # Prefer the MOST RECENT one (closer to kv_ver) — this lines up
+        # with how Valve typically lags KV updates by 1 patch.
+        candidates: list[tuple[str, str]] = []   # (patch, field)
+        for f in fields:
+            events = _patchnote_events().get((slug, f), [])
+            used = used_per_field[f]
+            for p in reversed(events):
+                if p in window and p not in used:
+                    candidates.append((p, f))
+                    break
+        if not candidates:
+            return kv_ver
+        # Pick the LATEST candidate patch — the closest preceding sub-patch.
+        candidates.sort(key=lambda pf: _patch_sort_key(pf[0]), reverse=True)
+        chosen_patch, chosen_field = candidates[0]
+        used_per_field[chosen_field].add(chosen_patch)
+        return chosen_patch
+
+    parts: list[tuple[str, str]] = []  # (patch, payload-without-patch-prefix)
     prev_val = None
     prev_disp = None
     seen = False
@@ -345,32 +823,31 @@ def _col_history(snaps, versions, dates, hero, col, raws) -> str:
         if hero not in snap:
             continue
         rw = raws.get(ver, {})
-        date = dates.get(ver, "")
         if not seen:
             seen = True
             if ver != first_ver:
-                parts.append(f"{ver}|{date}|A|New hero")
+                d0 = dates.get(ver, "")
+                parts.append((ver, f"|{d0}|A|New hero"))
             prev_val = value_fn(snap, hero, rw)
             prev_disp = display_fn(snap, hero, rw) if display_fn else None
             continue
         v = value_fn(snap, hero, rw)
         d = display_fn(snap, hero, rw) if display_fn else None
         if abs(v - prev_val) > 1e-9 or (d is not None and d != prev_disp):
-            if display_fn and key == "vision":
-                # Vision packs day/night; the sort value is daytime only, so a
-                # % would be wrong (night-only changes show 0%). Show the
-                # combined old → new with no percentage (kind N).
+            shifted = shifted_patch(ver)
+            shifted_date = dates.get(shifted, "")
+            if display_fn:
                 po = _re.sub(r"<[^>]+>", "", prev_disp)
                 dn = _re.sub(r"<[^>]+>", "", d)
-                parts.append(f"{ver}|{date}|N|{po}|{dn}")
-            elif display_fn:
-                po = _re.sub(r"<[^>]+>", "", prev_disp)
-                dn = _re.sub(r"<[^>]+>", "", d)
-                parts.append(f"{ver}|{date}|C|{po}|{dn}|{prev_val:g}|{v:g}|{pol}")
+                parts.append((shifted,
+                              f"|{shifted_date}|C|{po}|{dn}|{prev_val:g}|{v:g}|{pol}"))
             else:
-                parts.append(f"{ver}|{date}|V|{fmt(prev_val)}|{fmt(v)}|{pol}")
+                parts.append((shifted,
+                              f"|{shifted_date}|V|{fmt(prev_val)}|{fmt(v)}|{pol}"))
             prev_val, prev_disp = v, d
-    return ";".join(parts)
+    # Re-sort by shifted patch so the tooltip lists oldest→newest after shifts.
+    parts.sort(key=lambda p: _patch_sort_key(p[0]))
+    return ";".join(p[0] + p[1] for p in parts)
 
 
 def _attr_history(snaps, versions, dates, hero) -> str:
@@ -391,8 +868,8 @@ def _attr_history(snaps, versions, dates, hero) -> str:
 
 # ---------- render ----------
 
-def _mode_cls(mode) -> str:
-    return " hs-adv" if mode == "adv" else ""
+def _mode_cls(col) -> str:
+    return " hs-extra" if col["mode"] == "extra" else ""
 
 
 def render_html() -> str:
@@ -417,18 +894,17 @@ def render_html() -> str:
 
     # ---- header ----
     head = [
-        f'<th class="mr-th hs-th hs-name sortable" data-col="name">'
-        f'<span class="th-label">Hero</span><span class="sort-ind"></span></th>',
-        f'<th class="mr-th hs-th hs-col-attr sortable" data-col="attr">'
-        f'<span class="th-label">Attr</span><span class="sort-ind"></span></th>',
+        '<th class="mr-th hs-th hs-name sortable" data-col="name">'
+        '<span class="th-label">Hero</span><span class="sort-ind"></span></th>',
+        '<th class="mr-th hs-th hs-col-attr sortable" data-col="attr">'
+        '<span class="th-label">Attr</span><span class="sort-ind"></span></th>',
     ]
     for col in COLUMNS:
-        key, label, mode, pol, *_rest = col
-        direction = "lower" if pol == "lo" else "higher"
+        direction = "lower" if col["pol"] == "lo" else "higher"
         head.append(
-            f'<th class="mr-th hs-th hs-col-{key}{_mode_cls(mode)} sortable" '
-            f'data-col="{key}" data-direction={direction}>'
-            f'<span class="th-label">{label}</span>'
+            f'<th class="mr-th hs-th hs-col-{col["key"]}{_mode_cls(col)} sortable" '
+            f'data-col="{col["key"]}" data-direction={direction}>'
+            f'<span class="th-label">{col["label"]}</span>'
             f'<span class="sort-ind"></span></th>')
     thead = "".join(head)
 
@@ -454,17 +930,33 @@ def render_html() -> str:
             f'<img class="hs-attr-ico" src="icons/{meta[2]}" alt="{meta[1]}" '
             f'title="{meta[1]}" width="20" height="20"></td>')
         for col in COLUMNS:
-            key, label, mode, pol, fmt, value_fn, display_fn, hist, is_raw = col
-            v = value_fn(cur, hero, raw)
-            disp = display_fn(cur, hero, raw) if display_fn else fmt(v)
-            payload = _col_history(snaps, versions, dates, hero, col, raws)
-            cls = f"hs-col-{key}{_mode_cls(mode)}"
-            if payload:
-                cells.append(
-                    f'<td class="{cls} has-history" data-sort="{v}" '
-                    f'data-net="" data-hist="{_esc(payload)}">{disp}</td>')
-            else:
-                cells.append(f'<td class="{cls}" data-sort="{v}">{disp}</td>')
+            cls = f"hs-col-{col['key']}{_mode_cls(col)} has-history"
+            # Starting values are the DEFAULT (data-sort / data-hist).
+            v_start = col["fn_starting"](cur, hero, raw)
+            disp_start = (col["disp_starting"](cur, hero, raw)
+                          if col["disp_starting"] else col["fmt"](v_start))
+            hist_start = _history_for(snaps, versions, dates, hero, col, raws,
+                                      mode="starting")
+            # Base values — only stash on the cell when they differ.
+            v_base = col["fn_base"](cur, hero, raw)
+            disp_base = (col["disp_base"](cur, hero, raw)
+                         if col["disp_base"] else col["fmt"](v_base))
+            differ = (abs(v_base - v_start) > 1e-9) or (disp_base != disp_start)
+            extra_attrs = ""
+            if differ:
+                hist_base = _history_for(snaps, versions, dates, hero, col, raws,
+                                         mode="base")
+                extra_attrs = (
+                    f' data-base-sort="{v_base}" '
+                    f'data-base-html="{_esc(disp_base)}" '
+                    f'data-base-hist="{_esc(hist_base)}"'
+                )
+            hist_attr = f' data-hist="{_esc(hist_start)}"' if hist_start else ""
+            net_attr = ' data-net=""' if hist_start else ""
+            cls_final = (cls if hist_start else cls.replace(" has-history", ""))
+            cells.append(
+                f'<td class="{cls_final}" data-sort="{v_start}"{net_attr}{hist_attr}'
+                f'{extra_attrs}>{disp_start}</td>')
         body.append(f'<tr data-slug="{slug}">{"".join(cells)}</tr>')
 
     table = (
@@ -476,24 +968,26 @@ def render_html() -> str:
 
     blurb = (
         '<p class="mr-blurb inbox-bar">Every hero with their base stats from the '
-        f'game files (current patch <strong>{latest}</strong>). Hover any value for '
+        f'game files (current patch <strong>{latest}</strong>). Hover any cell for '
         'its full change history since 7.08 — patch by patch, with the overall '
-        'first&#8201;→&#8201;today delta on top. The <strong>View</strong> dropdown '
-        'switches to <em>Expanded</em>: computed level-1 columns (HP with Strength, '
-        'MP with Intelligence, armor with Agility, magic resistance with '
-        'Intelligence — today’s engine constants), the min–max damage spread, and '
-        'the level-30 attribute columns (base + 29&nbsp;×&nbsp;gain; flat +2-all '
-        'level bonuses not included). Vision / projectile / attack speed / '
-        'turn rate / collision history goes back to 7.36 (when that data was '
-        'first captured); everything else to 7.08. Click a column header to '
-        'sort.</p>\n'
+        'first&#8201;→&#8201;today delta on top. '
+        '<br>The <strong>View</strong> dropdown switches between three modes: '
+        '<em>Base</em> shows raw KV values; <em>Starting</em> (default) applies '
+        'level-1 attribute bonuses (HP = base + 22×Str, MP = base + 12×Int, '
+        'Armor = base + Agi/6, Mag.&nbsp;resist = base + 0.1×Int, Damage = base + '
+        'primary-attribute bonus, Attack Speed = base + Agi); <em>Expanded</em> '
+        'adds attribute totals/level-30 columns, Min/Max damage, projectile speed, '
+        'turn rate, collision, bound radius. Huskar has no mana pool ever; '
+        'Ogre Magi’s mana / mana regen scale with Strength instead of Intelligence. '
+        'Click a column header to sort.</p>\n'
     )
     toolbar = (
         '<div class="cal-toggle-bar mr-toolbar inbox-bar"><div class="toolbar-panel">'
         '<span class="view-group">'
         '<strong>View</strong>'
         '<select class="cal-mode-select" id="hs-view-mode">'
-        '<option value="standard">Standard</option>'
+        '<option value="base">Base</option>'
+        '<option value="starting" selected>Starting</option>'
         '<option value="expanded">Expanded</option>'
         '</select>'
         '</span>'

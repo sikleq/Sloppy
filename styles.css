@@ -4593,6 +4593,29 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   max-height: calc(100vh - var(--site-nav-h, 96px) - 24px);
   contain: paint;
   will-change: scroll-position;
+  /* Always-visible scrollbars across every Materials table (Neutral Creeps,
+     Mana Items, Hero Stats, etc). Without this, Hero Stats' Expanded view
+     overflows horizontally but the native scrollbar can be hidden on
+     overlay-scroll setups (macOS, some Linux/Win configurations) — the
+     scroll line is then invisible. Custom thin scrollbar keeps the line
+     visible everywhere and matches the site's dark theme. */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 148, 158, 0.45) rgba(13, 17, 23, 0.6);
+}
+.creeps-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+.creeps-scroll::-webkit-scrollbar-track {
+  background: rgba(13, 17, 23, 0.6);
+}
+.creeps-scroll::-webkit-scrollbar-thumb {
+  background: rgba(139, 148, 158, 0.45);
+  border-radius: 5px;
+  border: 2px solid rgba(13, 17, 23, 0.6);
+}
+.creeps-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(227, 196, 106, 0.7);
+}
+.creeps-scroll::-webkit-scrollbar-corner {
+  background: rgba(13, 17, 23, 0.6);
 }
 .creeps-table {
   /* width:max-content + min-width:100% = stretch evenly to fill the container
@@ -5764,23 +5787,39 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 }
 .creeps-table th.sortable .sort-ind,
 .mr-table thead th.sortable .sort-ind {
-  margin-left: 3px;
-  font-size: 10px;
-  opacity: 0.4;
+  margin-left: 4px;
   display: inline-block;
   vertical-align: middle;
   line-height: 1;
   position: relative;
-  /* Lift onto the UPPERCASE caps midline: vertical-align:middle centres on
-     x-height, which sits below the caps centre, and the arrow glyph renders
-     low in its own box — so nudge up a touch. */
-  top: -0.18em;
+  /* Lift onto the UPPERCASE caps midline (labels are uppercase). */
+  top: -0.1em;
+  width: 11px;
+  height: 11px;
+  /* Coloured via background-color through a PNG mask — neutral default
+     greyish, gold when the column is actively sorted (site accent #e3c46a). */
+  background-color: rgba(201, 209, 217, 0.55);
+  -webkit-mask: url('icons/sort/sort.png') center / contain no-repeat;
+  mask: url('icons/sort/sort.png') center / contain no-repeat;
 }
-.creeps-table th.sortable .sort-ind::after { content: '↕'; }
+.creeps-table th.sortable .sort-ind::after,
+.mr-table thead th.sortable .sort-ind::after { content: none; }
 .creeps-table th.sort-desc .sort-ind,
-.creeps-table th.sort-asc .sort-ind { opacity: 1; color: #79c0ff; }
-.creeps-table th.sort-desc .sort-ind::after { content: '↓'; }
-.creeps-table th.sort-asc .sort-ind::after { content: '↑'; }
+.creeps-table th.sort-asc .sort-ind,
+.mr-table thead th.sort-desc .sort-ind,
+.mr-table thead th.sort-asc .sort-ind {
+  background-color: #e3c46a;
+}
+.creeps-table th.sort-desc .sort-ind,
+.mr-table thead th.sort-desc .sort-ind {
+  -webkit-mask-image: url('icons/sort/sort-down.png');
+  mask-image: url('icons/sort/sort-down.png');
+}
+.creeps-table th.sort-asc .sort-ind,
+.mr-table thead th.sort-asc .sort-ind {
+  -webkit-mask-image: url('icons/sort/sort-up.png');
+  mask-image: url('icons/sort/sort-up.png');
+}
 /* Stat cells with a recorded change history get a dotted underline cue +
    help cursor, hinting that hover shows the changelog. */
 .creeps-table td.has-history,
@@ -6171,11 +6210,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 .mr-table tbody td.mr-sep {
   border-left: 2px solid rgba(170, 220, 240, 0.40);
 }
-.mr-table thead th.sortable .sort-ind::after { content: '↕'; }
-.mr-table thead th.sort-desc .sort-ind,
-.mr-table thead th.sort-asc  .sort-ind { opacity: 1; color: #79c0ff; }
-.mr-table thead th.sort-desc .sort-ind::after { content: '↓'; }
-.mr-table thead th.sort-asc  .sort-ind::after { content: '↑'; }
+/* sort-ind look (mask + colour) is defined once in the shared rule above. */
 .mr-table tbody td {
   padding: 6px 10px;
   border-bottom: 1px solid rgba(48, 54, 61, 0.5);
@@ -6349,12 +6384,11 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
    mr-table skin (flat sort / heatmap / search / stat-hist tooltips reused
    via the shared classes+ids) + hero-specific bits: sticky hero column,
    Standard/Advanced column modes, per-attribute level-30 expanders. */
-/* Mode visibility. Advanced-only columns hide until the table gets
-   .show-adv; the level-30 columns additionally need their attribute's
-   expander class (source order: the .hs-x30 hide rule must follow the
-   .hs-adv show rule, the per-attribute show rules follow both). */
-.hs-table .hs-adv { display: none; }
-.hs-table.show-adv .hs-adv { display: table-cell; }
+/* Mode visibility. Expanded-only columns hide until the View dropdown adds
+   .show-adv to the table. */
+/* Extras hidden in Base & Starting; visible only in Expanded. */
+.hs-table .hs-extra { display: none; }
+.hs-table.hs-mode-expanded .hs-extra { display: table-cell; }
 /* Sticky hero column (single frozen column → plain CSS sticky, no JS lefts).
    Solid backgrounds so scrolled columns disappear under it; header corner
    sits above both axes' pinned bars (z 51 > th 50). */
@@ -6369,8 +6403,6 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
    Hero HEADER was narrower than the hero column. */
 .mr-table.hs-table th.hs-name { width: 230px; }
 .mr-table.hs-table th.hs-col-attr { width: 56px; }
-/* Dim separator in combined values (vision "1800/800"). */
-.hs-table .hs-dim { color: #6e7681; padding: 0 2px; }
 .mr-table.hs-table thead th.hs-name {
   position: sticky;
   left: 0;

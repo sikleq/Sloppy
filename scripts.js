@@ -2378,23 +2378,49 @@
   search.addEventListener('input', apply);
 })();
 
-// ---- HERO STATS (heroes_stats.html): Standard / Expanded view ----
-// The table reuses the whole mr-table front-end (sort / heatmap / search /
-// stat-hist tooltips); the only page-specific behavior is the View dropdown
-// (same control as Neutral Creeps): 'expanded' → .show-adv on the table,
-// revealing the computed level-1 / min–max / level-30 columns.
+// ---- HERO STATS (heroes_stats.html): Base / Starting / Expanded view ----
+// Reuses the mr-table front-end (sort / heatmap / search / stat-hist tooltips).
+// Three modes via the View dropdown (mirrors Neutral Creeps):
+//   base     — bare values from the game files
+//   starting — DEFAULT, level-1 values with attribute bonuses
+//   expanded — Starting + extra columns (.hs-extra)
+// Some columns (HP, MP, regens, armor, magic resist, damage, attack speed)
+// have DIFFERENT values per mode. The build emits the Starting value as the
+// default cell content; cells that differ from Base carry data-base-sort /
+// data-base-html / data-base-hist. We stash the Starting values on first
+// load, then swap on every mode change. data-hist drives the hover tooltip
+// (existing stat-hist code reads it live), data-sort drives sorting.
 (function() {
   const table = document.querySelector('.hs-table');
   if (!table) return;
   const viewSel = document.getElementById('hs-view-mode');
-  if (viewSel) {
-    const apply = () => {
-      table.classList.toggle('show-adv', viewSel.value === 'expanded');
-      window.dispatchEvent(new CustomEvent('mr:filter-changed'));  // heatmap re-scan
-    };
-    viewSel.addEventListener('change', apply);
-    apply();
-  }
+  if (!viewSel) return;
+  const cells = [...table.querySelectorAll('td[data-base-sort]')];
+  // Stash Starting values once — those are the cell's INITIAL data.
+  cells.forEach(td => {
+    td.dataset.startSort = td.dataset.sort;
+    td.dataset.startHist = td.dataset.hist || '';
+    td.dataset.startHtml = td.innerHTML;
+  });
+  const apply = () => {
+    const mode = viewSel.value;
+    table.classList.remove('hs-mode-base', 'hs-mode-starting', 'hs-mode-expanded');
+    table.classList.add('hs-mode-' + mode);
+    cells.forEach(td => {
+      if (mode === 'base') {
+        td.dataset.sort = td.dataset.baseSort;
+        td.dataset.hist = td.dataset.baseHist;
+        td.innerHTML = td.dataset.baseHtml;
+      } else {
+        td.dataset.sort = td.dataset.startSort;
+        td.dataset.hist = td.dataset.startHist;
+        td.innerHTML = td.dataset.startHtml;
+      }
+    });
+    window.dispatchEvent(new CustomEvent('mr:filter-changed'));  // heatmap re-scan
+  };
+  viewSel.addEventListener('change', apply);
+  apply();
 })();
 
 // ---- MANA ITEMS: Heatmap on/off toggle + recompute on filter change ----
