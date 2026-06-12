@@ -372,6 +372,10 @@ def _g1pct(v: float) -> str:
     return f'{_g1(v)}%'
 
 
+def _gregen(v: float) -> str:
+    return "0" if abs(v) < 1e-9 else f"{v:.2f}"
+
+
 # ---------- per-hero innate attribute-conversion modifiers ----------
 # A handful of heroes have an ALWAYS-ON innate that converts a primary
 # attribute into a secondary stat we display (attack range, move speed,
@@ -736,8 +740,10 @@ COLUMNS = [
     # ── HP / MP / regens ────────────────────────────────────────────────
     _col("hp",  "HP", fmt=_g0, fn_base=_f("StatusHealth"), fn_starting=_hp_l1),
     _col("mp",  "MP", fmt=_g0, fn_base=_mp_base_raw,        fn_starting=_mp_l1),
-    _col("hpr", "HP regen",  fn_base=_f("StatusHealthRegen"), fn_starting=_hpreg_l1),
-    _col("mpr", "MP regen",  fn_base=_mpreg_base_raw,         fn_starting=_mpreg_l1),
+    _col("hpr", "HP regen", fmt=_gregen,
+         fn_base=_f("StatusHealthRegen"), fn_starting=_hpreg_l1),
+    _col("mpr", "MP regen", fmt=_gregen,
+         fn_base=_mpreg_base_raw, fn_starting=_mpreg_l1),
 
     # ── Attributes ─────────────────────────────────────────────────────
     _col("str",      "STR",      fn_base=_f("AttributeBaseStrength")),
@@ -1385,6 +1391,8 @@ def render_html() -> str:
             if col["key"] == "range":
                 disp_start = _attack_range_html(disp_start, attack_type)
                 disp_base = _attack_range_html(disp_base, attack_type)
+            if col["key"] in ("hpr", "mpr") and abs(v_start) < 1e-9:
+                cls += " regen-zero"
             hist_base = _history_for(snaps, versions, dates, hero, col, raws,
                                      mode="base")
             extra_attrs = (

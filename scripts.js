@@ -1909,24 +1909,28 @@
   }
 
   if (scroller) {
-    const onScroll = () => {
+    const syncFrameVisibility = () => {
       const sx = scroller.scrollLeft > 0;
       scroller.classList.toggle('scrolled', sx);
-      positionFrames();
       if (frame) frame.classList.toggle('visible', sx);
     };
-    // rAF-throttle: positionFrames() reads layout (getBoundingClientRect),
-    // so running it on every raw scroll event caused jank.
+    // The frozen-pane divider's geometry depends on layout, not on the scroll
+    // position inside the box: sticky columns and sticky headers keep the same
+    // screen-space edges while the tbody scrolls underneath. Re-reading layout
+    // on every scroll frame was wasted work on the widest tables.
     let ticking = false;
-    const onScrollRaf = () => {
+    const positionFramesRaf = () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        try { onScroll(); } finally { ticking = false; }
+        try {
+          positionFrames();
+          syncFrameVisibility();
+        } finally { ticking = false; }
       });
     };
-    scroller.addEventListener('scroll', onScrollRaf, { passive: true });
-    window.addEventListener('resize', onScrollRaf, { passive: true });
+    scroller.addEventListener('scroll', syncFrameVisibility, { passive: true });
+    window.addEventListener('resize', positionFramesRaf, { passive: true });
 
     // Super-category header colspans must equal the number of CURRENTLY
     // visible leaf columns in each category — otherwise the static (Expanded)
@@ -1949,7 +1953,7 @@
         table.classList.toggle('mode-expanded', expanded);
         recomputeCatColspans();
         applyLeftOffsets();   // column widths changed → recompute pinned offsets
-        onScroll();
+        positionFramesRaf();
       };
       viewSel.addEventListener('change', applyView);
       applyView();            // initial pass (Standard)
@@ -1985,7 +1989,7 @@
       });
       applyAttackFilter();
     }
-    onScroll();
+    positionFramesRaf();
   }
 })();
 
@@ -2460,6 +2464,7 @@
   const g0 = v => String(Math.round(Number(v) || 0));
   const pct = v => g(v) + '%';
   const pct1 = v => g1(v) + '%';
+  const regen = v => Math.abs(Number(v) || 0) < 1e-9 ? '0' : Number(v).toFixed(2);
   const armorFactor = a => (0.06 * a) / (1 + 0.06 * Math.abs(a));
   const armorPct = a => Math.round(armorFactor(a) * 100);
   const ehpPhys = (hp, armor) => Math.round(hp / Math.max(0.01, 1 - armorFactor(armor)));
@@ -2523,9 +2528,9 @@
       case 'hp': return [start ? startHp : rawHp, g0];
       case 'ehp_phys': return [ehpPhys(start ? startHp : rawHp, start ? startArmor : num(s.armor)), g0];
       case 'ehp_mag': return [ehpMag(start ? startHp : rawHp, start ? startMr : num(s.mr)), g0];
-      case 'hpr': return [start ? num(s.hpr) + a.str * 0.1 + innate('hpr', s, a) : num(s.hpr), g];
+      case 'hpr': return [start ? num(s.hpr) + a.str * 0.1 + innate('hpr', s, a) : num(s.hpr), regen];
       case 'mp': return [start ? startMana : rawMana, g0];
-      case 'mpr': return [start ? startManaRegen : rawManaRegen, g];
+      case 'mpr': return [start ? startManaRegen : rawManaRegen, regen];
       case 'str': return [a.str, g];
       case 'str_gain': return [num(s.strGain), g];
       case 'agi': return [a.agi, g];
@@ -2609,6 +2614,9 @@
         td.dataset.hist = td.dataset.startHist;
         td.innerHTML = html;
       }
+      if (col === 'hpr' || col === 'mpr') {
+        td.classList.toggle('regen-zero', Math.abs(Number(sortVal) || 0) < 1e-9);
+      }
       td.classList.toggle('has-history', !!td.dataset.hist);
     });
     recomputeCats();
@@ -2683,13 +2691,12 @@
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      position();
       frame.classList.toggle('visible', scroller.scrollLeft > 0);
       ticking = false;
     });
   };
   scroller.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll, { passive: true });
+  window.addEventListener('resize', () => requestAnimationFrame(position), { passive: true });
   // Reposition after a View-mode change (column count / widths change).
   window.addEventListener('mr:filter-changed', () => requestAnimationFrame(position));
   position();

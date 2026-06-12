@@ -535,6 +535,10 @@ def save_creeps_html():
             return f'{x:g}'.replace('.', ',')
         return str(x)
 
+    def _fmt_regen(x):
+        x = float(x or 0)
+        return '0' if abs(x) < 1e-9 else f'{x:.2f}'.replace('.', ',')
+
     def _safe_int(v, default=0):
         try:
             return int(float(v))
@@ -682,11 +686,11 @@ def save_creeps_html():
             # Resolved creeps always show a regen value; "0" when the KV
             # has no StatusHealthRegen (e.g. Skeleton Warrior) instead of
             # a blank cell.
-            'hp_regen':      (f'+{_fmt_num(hp_regen)}' if hp_regen
+            'hp_regen':      (_fmt_regen(hp_regen) if hp_regen
                               else ('0' if npc else '')),
             'mp':            _fmt_num(mp) if mp else '-',
             # No mana → "-" (matches MP); mana but no regen → "0".
-            'mp_regen':      (f'+{_fmt_num(mp_regen)}' if mp_regen
+            'mp_regen':      (_fmt_regen(mp_regen) if mp_regen
                               else ('-' if (npc and not mp) else ('0' if npc else ''))),
             'armor':         _fmt_num(armor) if armor or 'ArmorPhysical' in npc else '',
             'armor_pct':     armor_pct,
@@ -734,9 +738,9 @@ def save_creeps_html():
                         if dv:
                             result[dk] = f'{_fmt_num(dv)} ({_fmt_num(_tot(dv, op, val))})'
                 elif stat == 'hp_regen' and hp_regen:
-                    result['hp_regen'] = f'+{_fmt_num(hp_regen)} ({_fmt_num(_tot(hp_regen, op, val))})'
+                    result['hp_regen'] = f'{_fmt_regen(hp_regen)} ({_fmt_regen(_tot(hp_regen, op, val))})'
                 elif stat == 'mp_regen' and mp_regen:
-                    result['mp_regen'] = f'+{_fmt_num(mp_regen)} ({_fmt_num(_tot(mp_regen, op, val))})'
+                    result['mp_regen'] = f'{_fmt_regen(mp_regen)} ({_fmt_regen(_tot(mp_regen, op, val))})'
                 elif stat == 'magres':
                     result['magres'] = f'{int(magres)}% ({int(_tot(magres, op, val))}%)'
                 elif stat == 'armor':
@@ -1265,7 +1269,18 @@ def save_creeps_html():
                 cls.append('atk-basic')
             elif value == 'Piercing':
                 cls.append('atk-pierce')
+        if k in ('hp_regen', 'mp_regen') and value == '0':
+            cls.append('regen-zero')
         return ' '.join(cls)
+
+    def _sort_attr(k, value):
+        if k not in ('hp_regen', 'mp_regen') or value in ('', '-'):
+            return ''
+        first = str(value).split(' ', 1)[0].replace(',', '.')
+        try:
+            return f' data-sort="{float(first):g}"'
+        except ValueError:
+            return ''
 
     def _label_html(label):
         """Header label HTML. A '\\n' splits it into a main line + a small
@@ -1439,10 +1454,10 @@ def save_creeps_html():
                 if k in COL_CHANGELOG and v:
                     extra += f' data-name="{_esc(v)}"'
                 cells.append(
-                    f'<td class="{cls}"{extra}>{_cell_inner(k, v, d)}</td>'
+                    f'<td class="{cls}"{_sort_attr(k, v)}{extra}>{_cell_inner(k, v, d)}</td>'
                 )
             else:
-                cells.append(f'<td class="{_col_cls(k, v)}">{_cell_inner(k, v, d)}</td>')
+                cells.append(f'<td class="{_col_cls(k, v)}"{_sort_attr(k, v)}>{_cell_inner(k, v, d)}</td>')
         rid = f' id="unit-{_esc((d.get("createhero") or "").strip())}"'
         attack_type = 'ranged' if d.get('attack_range_ranged') else 'melee'
         body_parts.append(

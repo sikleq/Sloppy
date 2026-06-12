@@ -3,7 +3,20 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* Always reserve scrollbar space so content doesn't shift when filtering reduces page height */
-html { scrollbar-gutter: stable; }
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 148, 158, 0.45) rgba(13, 17, 23, 0.6);
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(13, 17, 23, 0.6); }
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 148, 158, 0.45);
+  border-radius: 5px;
+  border: 2px solid rgba(13, 17, 23, 0.6);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(227, 196, 106, 0.7); }
+::-webkit-scrollbar-corner { background: rgba(13, 17, 23, 0.6); }
 /* …except pages that don't scroll at the page level, where the reserved gutter
    just looks like an empty gap on the right:
    - .main-page    single-screen index
@@ -145,28 +158,24 @@ body.patch-page ul.changes {
 }
 
 /* TOP NAV (full-width, sits above container)
-   Dark-glass effect — translucent slab with cool-tinted backdrop blur,
-   a faint cyan rim at the top edge (condensation catching light) and a
-   subtle drop shadow below so the bar reads as a thin sheet floating
-   over the page rather than a flat band. */
+   Dark archive strip: keep the header in the same metallic family as the site,
+   then add pixel character through seams instead of broad gold glow. */
 nav.top-nav {
   background:
-    /* freshness — soft cool highlight along the top 30%, fades to nothing */
     linear-gradient(180deg,
-      rgba(170, 220, 240, 0.07) 0%,
-      rgba(170, 220, 240, 0.0)  32%),
-    /* main glass body — translucent dark with a hint of blue */
+      rgba(255, 244, 209, 0.035) 0%,
+      rgba(255, 244, 209, 0.0) 12%),
     linear-gradient(180deg,
-      rgba(28, 36, 46, 0.78) 0%,
-      rgba(18, 24, 32, 0.86) 100%);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  border-bottom: 1px solid rgba(170, 220, 240, 0.12);
+      #191b1f 0%,
+      #13151a 58%,
+      #101216 100%);
+  backdrop-filter: blur(8px) saturate(104%);
+  -webkit-backdrop-filter: blur(8px) saturate(104%);
+  border-bottom: 1px solid rgba(163, 135, 73, 0.16);
   box-shadow:
-    /* 1px crisp inner highlight at the very top edge — the glass rim */
-    inset 0 1px 0 rgba(190, 225, 240, 0.14),
-    /* gentle ambient drop below the bar */
-    0 4px 18px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(255, 244, 209, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.44),
+    0 5px 16px rgba(0, 0, 0, 0.24);
   width: 100%;
   /* Pin to the viewport top so the brand + version picker stay visible
      while the page (and sticky table headers below) scroll. Stack-order:
@@ -174,6 +183,38 @@ nav.top-nav {
   position: sticky;
   top: 0;
   z-index: 100;
+  overflow: visible;
+}
+nav.top-nav::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+    rgba(227, 196, 106, 0) 0%,
+    rgba(227, 196, 106, 0.08) 20%,
+    rgba(227, 196, 106, 0.12) 50%,
+    rgba(227, 196, 106, 0.08) 80%,
+    rgba(227, 196, 106, 0) 100%);
+}
+nav.top-nav::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+    rgba(227, 196, 106, 0) 0%,
+    rgba(227, 196, 106, 0.10) 12%,
+    rgba(227, 196, 106, 0.14) 50%,
+    rgba(227, 196, 106, 0.10) 88%,
+    rgba(227, 196, 106, 0) 100%);
+  opacity: 0.88;
 }
 /* Table pages (Neutral Creeps / Unit Abilities / Mana Items, all wrap their
    content in .creeps-page) keep the glass LOOK (cool top rim + gradient body)
@@ -182,15 +223,15 @@ nav.top-nav {
 body:has(.creeps-page) nav.top-nav {
   background:
     linear-gradient(180deg,
-      rgba(170, 220, 240, 0.07) 0%,
-      rgba(170, 220, 240, 0.0)  32%),
-    linear-gradient(180deg, #1c242e 0%, #121820 100%);
+      rgba(255, 244, 209, 0.035) 0%,
+      rgba(255, 244, 209, 0.0) 12%),
+    linear-gradient(180deg, #191b1f 0%, #101216 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 .nav-inner {
   width: 100%;
-  padding: 6px 24px 0 10px;
+  padding: 7px 24px 3px 10px;
   /* Three-column grid: brand left, tabs centred in the middle column, picker
      right. Symmetric 1fr/auto/1fr columns put the tab row at the geometric
      centre of the header WITHOUT overlapping the brand or the version picker
@@ -200,6 +241,9 @@ body:has(.creeps-page) nav.top-nav {
   align-items: center;
   gap: 16px;
   position: relative;
+}
+.nav-inner::after {
+  content: none;
 }
 .nav-tabs {
   display: flex;
@@ -211,33 +255,52 @@ body:has(.creeps-page) nav.top-nav {
 .nav-brand {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   text-decoration: none;
   color: #e6edf3;
-  padding: 2px 4px 4px;
-  margin-bottom: -2px;
+  padding: 5px 10px 7px 4px;
+  margin-bottom: -1px;
   justify-self: start;
-  transition: opacity 0.15s;
+  border-radius: 0;
+  position: relative;
+  transition: opacity 0.15s, background 0.15s, box-shadow 0.15s;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
 }
-.nav-brand:hover { opacity: 0.85; }
+.nav-brand:hover {
+  opacity: 1;
+  background:
+    linear-gradient(180deg,
+      rgba(227, 196, 106, 0.035) 0%,
+      rgba(227, 196, 106, 0.015) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 244, 209, 0.04),
+    inset 0 0 0 1px rgba(163, 135, 73, 0.14);
+}
 .nav-brand-logo {
   width: 54px;
   height: 54px;
   object-fit: contain;
   flex-shrink: 0;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  filter:
+    drop-shadow(0 1px 1px rgba(0, 0, 0, 0.62))
+    drop-shadow(0 0 3px rgba(227, 196, 106, 0.05));
 }
 .nav-brand-text {
   font-family: 'Jersey 10', 'Courier New', monospace;
   font-size: 22px;
   letter-spacing: 1px;
   line-height: 1;
-  color: #d8e2ec;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  color: #ccd2d9;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.68);
 }
 .nav-brand-sikle {
-  color: #e3c46a;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  color: #d6b764;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.72),
+    0 0 4px rgba(227, 196, 106, 0.05);
 }
 
 /* ---- MAIN PAGE: inventory book ----
@@ -891,12 +954,15 @@ body:has(.creeps-page) nav.top-nav {
   background-position: center;
   background-size: 14px 18px;
   image-rendering: pixelated;
-  border-radius: 5px;
+  border-radius: 0;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
   text-decoration: none;
   cursor: pointer;
   user-select: none;
   transition: background 0.15s, filter 0.15s, transform 0.12s;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
 }
 /* Pixel-art chunky arrows — drawn as a staircase of 2×2 cells (shape-rendering
    keeps the edges crisp at any scale). Yellow accent matches the "sikle" tag
@@ -933,7 +999,10 @@ body:has(.creeps-page) nav.top-nav {
   border: 1px solid transparent;
   padding: 0 12px;
   height: 38px;
-  border-radius: 6px;
+  border-radius: 0;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
 }
 .nav-context .release-date {
   color: #c9d1d9;
@@ -996,7 +1065,7 @@ body:has(.creeps-page) nav.top-nav {
   border: 1px solid transparent;
   padding: 0 14px;
   height: 38px;
-  border-radius: 6px;
+  border-radius: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1004,6 +1073,9 @@ body:has(.creeps-page) nav.top-nav {
   cursor: pointer;
   line-height: 1;
   transition: background 0.15s;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
 }
 .nav-context .version:hover {
   background: rgba(0, 0, 0, 0.4);
@@ -1015,6 +1087,11 @@ body:has(.creeps-page) nav.top-nav {
 }
 .nav-context .version.version-static:hover {
   background: rgba(0, 0, 0, 0.28);
+}
+.nav-context .version.version-materials {
+  color: #d8e2ec;
+  font-size: 21px;
+  padding: 0 16px;
 }
 .nav-context .version-chev {
   font-size: 14px;
@@ -4618,7 +4695,7 @@ body.filter-active ul.subnotes { display: none; }
    keeps repainting it (box-shadow on position:sticky cells drops mid-scroll).
    Mana Items has no .creeps-scroll → it page-scrolls normally. */
 body:has(.creeps-scroll) { overflow: hidden; }
-body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px; }
+body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .creeps-scroll {
   overflow: auto;
   width: 100%;
@@ -4811,33 +4888,52 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   font-size: 18px;
   letter-spacing: 1px;
   line-height: 1;
-  color: #d8e2ec;
+  color: #d2d9e0;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
   text-decoration: none;
   height: 38px;                 /* matches the version picker on patch pages */
   padding: 0 14px;
   display: inline-flex;
   align-items: center;
-  border-radius: 6px;
-  background: rgba(170, 220, 240, 0.06);
-  border: 1px solid rgba(170, 220, 240, 0.14);
+  border-radius: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 244, 209, 0.025) 0%,
+      rgba(255, 244, 209, 0.0) 100%),
+    rgba(28, 32, 38, 0.84);
+  border: 1px solid rgba(122, 131, 144, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.38);
   transition: background 0.15s ease, color 0.15s ease,
               border-color 0.15s ease, box-shadow 0.15s ease;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
 }
 .nav-tab:hover {
   color: #ffffff;
-  background: rgba(170, 220, 240, 0.13);
-  border-color: rgba(170, 220, 240, 0.28);
+  background:
+    linear-gradient(180deg,
+      rgba(227, 196, 106, 0.05) 0%,
+      rgba(227, 196, 106, 0.015) 100%),
+    rgba(32, 36, 43, 0.96);
+  border-color: rgba(163, 135, 73, 0.24);
 }
 /* Active tab — gold "sikle" text colour + a pressed-into-the-header look via
    a darker recessed background and an inset top shadow. */
 .nav-tab.active {
   color: #e3c46a;
-  background: rgba(0, 0, 0, 0.32);
-  border-color: rgba(227, 196, 106, 0.32);
+  background:
+    linear-gradient(180deg,
+      rgba(227, 196, 106, 0.065) 0%,
+      rgba(227, 196, 106, 0.018) 100%),
+    rgba(17, 20, 25, 0.98);
+  border-color: rgba(227, 196, 106, 0.28);
   box-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.55),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+    inset 0 1px 0 rgba(255, 244, 209, 0.05),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
 }
 
@@ -4851,9 +4947,15 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 .materials-subnav-inner {
   padding: 0 10px;        /* flush-left, same left padding as the brand block */
   display: flex;
-  gap: 4px;
+  justify-content: flex-start;
   align-items: flex-end;
   min-height: 36px;
+}
+.materials-subnav-links {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  min-width: 0;
 }
 /* When the sub-tab bar sits INSIDE the table scroll box (Neutral Creeps /
    Neutral Abilities), it scrolls away vertically with the table but stays
@@ -4863,11 +4965,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 .creeps-scroll > .materials-subnav {
   position: sticky;
   left: 0;
-  /* Above the sticky table header (z 50/52) so the grouped sub-nav's hover
-     dropdowns render OVER the table/header instead of behind it. The bar
-     scrolls up out of view before the header pins, so the higher z doesn't
-     cause a lasting overlap. */
-  z-index: 55;
+  /* Above sticky headers and hovered dynamics cells. The bar scrolls up out of
+     view before the header pins, so the higher z doesn't cause lasting overlap. */
+  z-index: 120;
 }
 .nav-subtab {
   font-size: 13px;
@@ -4880,13 +4980,17 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   border-radius: 7px 7px 0 0;   /* rounded top — sits on the subnav's bottom border */
   margin-bottom: -1px;          /* overlap the 1px bottom border */
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
 }
 .nav-subtab:hover { color: #e6edf3; background: rgba(48, 54, 61, 0.45); }
 .nav-subtab.active {
-  color: #e6edf3;
+  color: #e3c46a;
   background: #0a0e13;          /* matches the page background → tab merges into page */
   border-color: rgba(170, 220, 240, 0.18);
 }
+.nav-subtab-label { color: inherit; }
 /* ---- Grouped sub-nav dropdowns (Creeps ▾ / Items ▾ / Heroes ▾) ---- */
 .nav-subgroup { position: relative; display: inline-flex; align-items: flex-end; }
 .nav-subtab-group { cursor: pointer; }
@@ -4903,9 +5007,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  /* Above the submenu's own stacking context; the bar is lifted to z55 so this
-     paints over the table + its sticky header. */
-  z-index: 60;
+  /* Above the submenu's own stacking context; the bar is lifted so this paints
+     over the table, sticky header and dynamics cells. */
+  z-index: 125;
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.55);
   opacity: 0;
   visibility: hidden;
@@ -6129,6 +6233,12 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 /* Per-column value tints. */
 .creeps-table td.col-hp_regen { color: #9ae66e; }   /* light green (салатовый) */
 .creeps-table td.col-mp_regen { color: #6fc3ec; }   /* light blue (голубоватый) */
+.mr-table.hs-table td.hs-col-hpr { color: #9ae66e; }
+.mr-table.hs-table td.hs-col-mpr { color: #6fc3ec; }
+.creeps-table td.col-hp_regen.regen-zero,
+.mr-table.hs-table td.hs-col-hpr.regen-zero { color: rgba(154, 230, 110, 0.42); }
+.creeps-table td.col-mp_regen.regen-zero,
+.mr-table.hs-table td.hs-col-mpr.regen-zero { color: rgba(111, 195, 236, 0.42); }
 .creeps-table td.col-gold     { color: #e3b341; }   /* gold (золотой) */
 .creeps-table td.col-xp       { color: #8bb8d6; }   /* dusty blue (пыльно-голубой) */
 /* Attack-type value colors. */

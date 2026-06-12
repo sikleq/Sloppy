@@ -90,6 +90,28 @@ MATERIALS_GROUPS = [
 ]
 
 
+def get_materials_label(active_key):
+    """Return the visible label for a Materials page key."""
+    def _walk(nodes):
+        for node in nodes:
+            if node[0] == active_key:
+                return node[1]
+            if len(node) > 3 and node[3]:
+                found = _walk(node[3])
+                if found:
+                    return found
+        return None
+
+    for gkey, glabel, _ghref, children in MATERIALS_GROUPS:
+        if gkey == active_key:
+            return glabel
+        if children:
+            found = _walk(children)
+            if found:
+                return found
+    return ""
+
+
 def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None,
                    subtabs_active=None, subnav_in_header=True, centre_tabs=True):
     """Render the shared top nav.
@@ -141,11 +163,17 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
         right_side = picker_html
     else:
         # Non-patch pages: show the latest patch version as a NON-clickable
-        # display, styled like the dropdown button on patch pages so the
-        # right-side block looks consistent across the site.
-        latest_ver = get_latest_version()
-        ver_html = (f'<span class="version version-static">{latest_ver}</span>'
-                    if latest_ver else '')
+        # display, except Materials pages which show the current table/page
+        # label there instead.
+        materials_label = (get_materials_label(subtabs_active)
+                           if active == "materials" and subtabs_active else "")
+        if materials_label:
+            ver_html = (f'<span class="version version-static version-materials">'
+                        f'{materials_label}</span>')
+        else:
+            latest_ver = get_latest_version()
+            ver_html = (f'<span class="version version-static">{latest_ver}</span>'
+                        if latest_ver else '')
         right_side = (
             f'<div class="nav-context nav-context-flat '
             f'nav-context-{active}">{ver_html}</div>'
@@ -176,6 +204,16 @@ def render_materials_subnav(active, prefix=""):
     inside that box. Each group is a trigger linking to its primary page with a
     hover dropdown of its children; the active child highlights both itself and
     its group trigger. `active` is one of the child/terrain keys."""
+    def _find_active_label(nodes, active_key):
+        for node in nodes:
+            if node[0] == active_key:
+                return node[1]
+            if len(node) > 3 and node[3]:
+                found = _find_active_label(node[3], active_key)
+                if found:
+                    return found
+        return None
+
     parts = []
     for gkey, glabel, ghref, children in MATERIALS_GROUPS:
         if children is None:
@@ -223,8 +261,10 @@ def render_materials_subnav(active, prefix=""):
             else:
                 items.append(_item(node))
         trigger = (f'<a class="{trig_cls}" href="{prefix}{ghref}">'
-                   f'{glabel}<span class="nav-caret" aria-hidden="true">▾</span></a>')
+                   f'<span class="nav-subtab-label">{glabel}</span>'
+                   f'<span class="nav-caret" aria-hidden="true">▾</span></a>')
         menu = f'<div class="nav-submenu">{"".join(items)}</div>'
         parts.append(f'<div class="nav-subgroup">{trigger}{menu}</div>')
     return (f'<div class="materials-subnav"><div class="materials-subnav-inner">'
-            f'{"".join(parts)}</div></div>\n')
+            f'<div class="materials-subnav-links">{"".join(parts)}</div>'
+            f'</div></div>\n')
