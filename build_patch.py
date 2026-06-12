@@ -8875,7 +8875,7 @@ W(hero_header("Ancient Apparition"))
 _bc_pill, _bc_table = scale_pill(
     "0.1 + 0.1 per 3 levels",
     lambda L: 0.1 + 0.1 * (L // 3),
-    levels=[1, 3, 6, 9, 12, 15, 20, 25, 30],
+    levels=[1, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30],
     value_fmt="{:.2f}",
 )
 W(ability_change(
@@ -9117,7 +9117,6 @@ W(hero_header("Beastmaster"))
 _ib_pill, _ib_table = scale_pill(
     "7 + 3 per level",
     lambda L: 7.0 + 3.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
 )
 W(ability_change(
     old=dict(
@@ -9533,7 +9532,6 @@ W(hero_header("Crystal Maiden"))
 _cm_pill, _cm_table = scale_pill(
     "30% + 2% per level",
     lambda L: 30.0 + 2.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
 )
 W(ability_change(
     old=dict(
@@ -9898,7 +9896,7 @@ W(ul_open())
 W(li_formula("Max Charges changed",
              "7 + 1 per 4 level ups", "7 + 1 per 4 levels",
              lambda L: 7 + (L - 1) // 4, lambda L: 7 + L // 4,
-             levels=[1, 4, 5, 8, 12, 16, 20, 25, 30],
+             levels=[1, 4, 8, 12, 16, 20, 24, 28, 30],
              value_fmt="{:.0f}"))
 W(ul_close())
 W(subnote("Bonus charges are gained 1 level earlier (on levels 4/8/12... instead of 5/9/13...)"))
@@ -9949,7 +9947,6 @@ W(hero_header("Elder Titan"))
 _et_pill, _et_table = scale_pill(
     "3.6% + 0.4% per level",
     lambda L: 3.6 + 0.4 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.1f}",
 )
 W(ability_change(
@@ -10042,7 +10039,6 @@ W(hero_header("Enigma"))
 _en_pill, _en_table = scale_pill(
     "4% + 1% per level",
     lambda L: 4 + 1 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
 )
 W(ability_change(
     old=dict(
@@ -10149,7 +10145,6 @@ W(ul_close())
 _gy_pill, _gy_table = scale_pill(
     "3.9s + 0.1s per level",
     lambda L: 3.9 + 0.1 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.1f}",
 )
 W(ability_change(
@@ -10288,7 +10283,6 @@ W(hero_header("Io"))
 _io_pill, _io_table = scale_pill(
     "5% + 0.5% per level",
     lambda L: 5 + 0.5 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.1f}",
 )
 W(ability_change(
@@ -10355,7 +10349,6 @@ W(hero_header("Juggernaut"))
 _jg_pill, _jg_table = scale_pill(
     "2.5% + 0.05% per level",
     lambda L: 2.5 + 0.05 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.2f}",
 )
 W(ability_change(
@@ -10568,7 +10561,6 @@ W(ul_close())
 _lc_pill, _lc_table = scale_pill(
     "1 + 0.1 per level",
     lambda L: 1.0 + 0.1 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.1f}",
 )
 W(ability_change(
@@ -10646,13 +10638,11 @@ W(ul_close())
 _lich_mana_pill, _lich_mana_table = scale_pill(
     "42% + 3% per level",
     lambda L: 42.0 + 3.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.0f}%",
 )
 _lich_xp_pill, _lich_xp_table = scale_pill(
     "69% + 6% per level",
     lambda L: 69.0 + 6.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.0f}%",
 )
 W(ability_change(
@@ -10701,7 +10691,6 @@ W(ul_close())
 _lsf_pill, _lsf_table = scale_pill(
     "5 per level",
     lambda L: 5.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.0f}",
 )
 W(ability_change(
@@ -10926,7 +10915,6 @@ W(hero_header("Marci"))
 _marci_cd_pill, _marci_cd_table = scale_pill(
     "245s − 5s per level",
     lambda L: 245.0 - 5.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.0f}s",
 )
 W(ability_change(
@@ -11116,7 +11104,6 @@ W(hero_header("Mirana"))
 _mira_pill, _mira_table = scale_pill(
     "3 per level",
     lambda L: 3.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.0f}",
 )
 W(ability_change(
@@ -11373,13 +11360,12 @@ W(hero_header("Night Stalker"))
 _ns_ms_pill, _ns_ms_table = scale_pill(
     "24% + 2% per 3 levels",
     lambda L: 24.0 + 2.0 * (L // 3),
-    levels=[1, 5, 10, 15, 20, 25, 30],
+    levels=[1, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30],
     value_fmt="{:.0f}%",
 )
 _ns_as_pill, _ns_as_table = scale_pill(
     "38 + 2 per level",
     lambda L: 38.0 + 2.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.0f}",
 )
 W(ability_change(
@@ -12088,7 +12074,6 @@ W(ul_close())
 _sil_pill, _sil_table = scale_pill(
     "5% + 0.5% per level",
     lambda L: 5.0 + 0.5 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.1f}%",
 )
 W(ability_change(
@@ -12138,7 +12123,6 @@ W(hero_header("Skywrath Mage"))
 _sw_pill, _sw_table = scale_pill(
     "13.5 + 1.5 per level",
     lambda L: 13.5 + 1.5 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.1f}",
 )
 W(ability_change(
@@ -12230,13 +12214,11 @@ W(hero_header("Snapfire"))
 _boomstick_min_pill, _boomstick_min_table = scale_pill(
     "495 + 5 per level",
     lambda L: 495.0 + 5.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.0f}",
 )
 _boomstick_max_pill, _boomstick_max_table = scale_pill(
     "50 + 5 per level",
     lambda L: 50.0 + 5.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.0f}",
 )
 W(ability_change(
@@ -12400,7 +12382,6 @@ W(ul_close())
 _sv_pill, _sv_table = scale_pill(
     "0.08 + 0.02 per level",
     lambda L: 0.08 + 0.02 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.2f}",
 )
 W(ability_change(
@@ -12444,7 +12425,6 @@ W(hero_header("Techies"))
 _tch_pill, _tch_table = scale_pill(
     "0.08% + 0.02% per level",
     lambda L: 0.08 + 0.02 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.2f}%",
 )
 W(ability_change(
@@ -12507,19 +12487,16 @@ W(ul_close())
 _ta_ramp_pill, _ta_ramp_table = scale_pill(
     "2.05s − 0.05s per level",
     lambda L: 2.05 - 0.05 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.2f}s",
 )
 _ta_hp_pill, _ta_hp_table = scale_pill(
     "2.7 + 0.3 per level",
     lambda L: 2.7 + 0.3 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.1f}",
 )
 _ta_mp_pill, _ta_mp_table = scale_pill(
     "2.2 + 0.2 per level",
     lambda L: 2.2 + 0.2 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.1f}",
 )
 W(ability_change(
@@ -12892,13 +12869,11 @@ W(hero_header("Venomancer"))
 _ven_dps_pill, _ven_dps_table = scale_pill(
     "9 + 1 per level",
     lambda L: 9.0 + 1.0 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.0f}",
 )
 _ven_dur_pill, _ven_dur_table = scale_pill(
     "4.5s + 0.5s per level",
     lambda L: 4.5 + 0.5 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.1f}s",
 )
 W(ability_change(
@@ -13005,7 +12980,6 @@ W(hero_header("Visage"))
 _visage_satg_pill, _visage_satg_table = scale_pill(
     "45.75s − 0.75s per level",
     lambda L: 45.75 - 0.75 * L,
-    levels=[1, 5, 10, 15, 20, 25, 30],
     value_fmt="{:.2f}s",
 )
 W(ability_change(

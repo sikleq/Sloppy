@@ -51,51 +51,77 @@ body.patch-page::before {
   z-index: -1;
   background: #0e1015 url('https://cdn.steamstatic.com/apps/dota2/images/dota_react/backgrounds/featured.jpg') center top / cover no-repeat;
 }
-/* Container is transparent now — each category is its own opaque panel
-   (.cat-panel) so categories break apart with the textured background showing
-   in the gaps between them. */
+/* Container is transparent; patch-page depth comes from Valve-style section
+   bars and per-entity changelog slabs rather than one large outer card. */
 body.patch-page .container {
   background: none;
   padding-left: 0;
   padding-right: 0;
   padding-top: 4px;
 }
-/* Per-category panel = opaque dark stage (no texture bleed through content).
-   Rounded + soft shadow + bottom gap = a smooth break before the next
-   category. Right edge lifts a touch lighter (neutral grey, no blue tint). */
+/* Category wrapper = one continuous Valve-style changelog slab below the
+   section title. This avoids "gaps" between neighbouring items/entities while
+   still letting the orange section bar sit on its own seam. */
 body.patch-page .cat-panel {
-  /* Slightly translucent so the FIXED page texture shows through the panel,
-     continuous with the margins (Valve-style — one harmonious texture across
-     the whole page, just dimmed behind content). Flat colour (a gradient would
-     band). Tune the alpha to taste: lower = more texture through the panel. */
-  background: rgba(17, 20, 26, 0.86);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
-  padding: 0 28px 20px;
-  margin: 0 0 26px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.38) 3.07%, rgba(6, 37, 65, 0.35) 88.06%);
+  border: 0;
+  border-left: 2px solid rgba(255, 255, 255, 0.065);
+  border-radius: 0;
+  box-shadow: 0 0 50px #000;
+  padding: 0 18px 20px;
+  margin: 0 0 34px;
 }
-/* Category (section) + sub-category (entity) header bars span the full stage
-   width — they set the "shelf" edges (Valve-style). Their text/icon padding
-   aligns with the content-left line (= container padding, 28px). */
+/* Category header: flat orange-to-transparent strip, like Valve's section
+   title layer. No rounded card edge; the strip floats over the page texture. */
 body.patch-page h2.section {
-  margin: 0 -28px 20px;          /* flush to panel top + sides; gap below */
-  padding-left: 28px;
-  padding-right: 28px;
-  border-radius: 7px 7px 0 0;    /* match the panel's rounded top corners */
+  margin: 0 -18px 12px;
+  padding: 12px 20px;
+  border-radius: 0;
+  border-left: 2px solid #ff5005;
+  background: linear-gradient(to right, #833312, rgba(131, 51, 18, 0));
+  box-shadow: 0 0 30px #000;
+  font-family: 'Jersey 25', 'Courier New', monospace;
+  font-size: 28px;
+  letter-spacing: 1.5px;
+}
+/* Entity blocks are rows inside the continuous category slab: no separate
+   background, only a very faint top seam like Valve's entity rows. */
+body.patch-page .entity-block {
+  background: none;
+  border-left: 0;
+  box-shadow: none;
+  padding: 0 22px 16px;
+  margin: 0;
+  border-top: 1px solid;
+  border-image: linear-gradient(to right, rgba(238, 250, 255, 0.14), rgba(238, 250, 255, 0.09) 62%, rgba(238, 250, 255, 0.055)) 1;
+}
+body.patch-page h2.section + .entity-block {
+  border-top: 0;
 }
 body.patch-page .entity {
-  margin-left: -28px;
-  margin-right: -28px;
-  padding-left: 28px;
-  padding-right: 28px;
+  margin: 0 -22px 10px;
+  padding: 10px 22px 9px;
   border-radius: 0;
+  background: transparent;
+  border-top: 0;
+  border-image: none;
+}
+body.patch-page .entity-block > h4.subgroup,
+body.patch-page .entity-block > ul.changes,
+body.patch-page .entity-block > .ability-block,
+body.patch-page .entity-block > .components-box,
+body.patch-page .entity-block > .components-change,
+body.patch-page .entity-block > .provides-box,
+body.patch-page .entity-block > .properties-change {
+  margin-left: 0;
+  margin-right: 0;
 }
 /* Align the dynamics-cell row's right edge to the content edge (no overhang),
    so the cells, the change-row %s, and every bordered block (build / cost /
    provides / properties / ability-change) all share one right edge — uniform
    widths, no per-box nudge needed. */
 body.patch-page .patch-dynamics {
+  margin-left: 0;
   margin-right: 0;
 }
 /* ul.changes carried a 6px right padding to compensate the old cell-row
@@ -6060,7 +6086,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   white-space: nowrap;
   line-height: 1.2;
 }
-/* Subscript header sub-label (EHP "физ"/"маг") — small dim text set to
+/* Subscript header sub-label (EHP "phys"/"mag") — small dim text set to
    the bottom-right of the main word, like a formula subscript, so the
    column stays narrow without a full second line. */
 .creeps-table thead th .th-sub {

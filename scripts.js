@@ -2460,7 +2460,10 @@
   const g0 = v => String(Math.round(Number(v) || 0));
   const pct = v => g(v) + '%';
   const pct1 = v => g1(v) + '%';
-  const armorPct = a => Math.round(((0.06 * a) / (1 + 0.06 * Math.abs(a))) * 100);
+  const armorFactor = a => (0.06 * a) / (1 + 0.06 * Math.abs(a));
+  const armorPct = a => Math.round(armorFactor(a) * 100);
+  const ehpPhys = (hp, armor) => Math.round(hp / Math.max(0.01, 1 - armorFactor(armor)));
+  const ehpMag = (hp, mr) => Math.round(hp / Math.max(0.01, 1 - mr / 100));
   const attrsAt = (s, level) => ({
     str: num(s.str) + (level - 1) * num(s.strGain),
     agi: num(s.agi) + (level - 1) * num(s.agiGain),
@@ -2501,6 +2504,8 @@
     const startAs = baseAs + a.agi + innate('aspd', s, a);
     const startArmor = num(s.armor) + a.agi / 6;
     const startMr = num(s.mr) + a.int * 0.1;
+    const rawHp = num(s.hp);
+    const startHp = Math.round(rawHp + a.str * 22);
     const rawMana = s.slug === 'huskar' ? 0 : num(s.mp);
     const rawManaRegen = s.slug === 'huskar' ? 0 : num(s.mpr);
     const startMana = (() => {
@@ -2515,7 +2520,9 @@
     })();
     const start = mode !== 'base';
     switch (col) {
-      case 'hp': return [start ? Math.round(num(s.hp) + a.str * 22) : num(s.hp), g0];
+      case 'hp': return [start ? startHp : rawHp, g0];
+      case 'ehp_phys': return [ehpPhys(start ? startHp : rawHp, start ? startArmor : num(s.armor)), g0];
+      case 'ehp_mag': return [ehpMag(start ? startHp : rawHp, start ? startMr : num(s.mr)), g0];
       case 'hpr': return [start ? num(s.hpr) + a.str * 0.1 + innate('hpr', s, a) : num(s.hpr), g];
       case 'mp': return [start ? startMana : rawMana, g0];
       case 'mpr': return [start ? startManaRegen : rawManaRegen, g];

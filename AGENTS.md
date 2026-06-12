@@ -20,6 +20,15 @@
 - Сгенерированные HTML (`patches/7.41c.html` и т.д.) — результат запуска `python build_patch.py`, не редактируй вручную.
 - Все патч-файлы лежат в `patches/` (не в корне), поэтому их CSS/JS подключаются через `../styles.css`, `../scripts.js`.
 
+### Patch-page visual layering
+
+Патч-страницы должны использовать Valve-style continuous slab layout:
+- `body.patch-page::before` держит общий `featured.jpg` фон.
+- `.cat-panel` — один непрерывный content slab под заголовком категории: blue/black translucent gradient + broad black glow. Не возвращать старую модель большой скруглённой карточки с opaque фоном.
+- `h2.section` — отдельная orange-to-transparent полоса с left orange border и glow; после неё нужен явный шов перед content slab.
+- `.entity-block` внутри `.cat-panel` не должен быть отдельной карточкой/slab. Между героями/предметами/сущностями не должно быть “пропастей”; только тонкая full-width hairline, которая доходит до dyn-cells справа, чтобы было понятно, к какой сущности они относятся.
+- Внутренние `item-cost-box`, `provides-box`, `properties-change`, `components-change`, `ability-block`, `patch-dynamics` должны оставаться одной ширины внутри entity-block. Если меняешь отступы, обязательно проверить Chasm Stone и соседние items в `patches/7.41.html`.
+
 ## Структура проекта
 
 ```

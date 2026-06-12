@@ -1091,8 +1091,8 @@ def save_creeps_html():
         ('Vitality', [
             ('hp',           'HP',               'std'),
             ('hp_regen',     'HP/sec',           'std'),
-            ('ehp_phys',     'EHP\nфиз',         'exp'),
-            ('ehp_mag',      'EHP\nмаг',         'exp'),
+            ('ehp_phys',     'EHP\nphys',        'exp'),
+            ('ehp_mag',      'EHP\nmag',         'exp'),
             ('mp',           'MP',               'std'),
             ('mp_regen',     'MP/sec',           'std'),
             ('armor',        'Armor',            'std'),
@@ -1269,7 +1269,7 @@ def save_creeps_html():
 
     def _label_html(label):
         """Header label HTML. A '\\n' splits it into a main line + a small
-        sub-line below (used by EHP columns: "EHP" over a tiny "физ"/"маг"
+        sub-line below (used by EHP columns: "EHP" over a tiny "phys"/"mag"
         so the column stays narrow)."""
         if '\n' in label:
             main, sub = label.split('\n', 1)

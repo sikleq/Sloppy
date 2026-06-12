@@ -661,6 +661,26 @@ def _armor_factor(a):
     return (0.06 * a) / (1 + 0.06 * abs(a))
 
 
+def _ehp_phys_base(s, h, r):
+    hp = _field(s, h, "StatusHealth")
+    return round(hp / max(0.01, 1 - _armor_factor(_armor_base(s, h, r)))) if hp else 0
+
+
+def _ehp_phys_l1(s, h, r):
+    hp = _hp_l1(s, h, r)
+    return round(hp / max(0.01, 1 - _armor_factor(_armor_l1(s, h, r)))) if hp else 0
+
+
+def _ehp_mag_base(s, h, r):
+    hp = _field(s, h, "StatusHealth")
+    return round(hp / max(0.01, 1 - _mr_base(s, h, r) / 100)) if hp else 0
+
+
+def _ehp_mag_l1(s, h, r):
+    hp = _hp_l1(s, h, r)
+    return round(hp / max(0.01, 1 - _mr_l1(s, h, r) / 100)) if hp else 0
+
+
 def _armor_pct_base(s, h, r):
     return round(_armor_factor(_armor_base(s, h, r)) * 100)
 
@@ -770,6 +790,10 @@ COLUMNS = [
 
 _BASE_COL_BY_KEY = {col["key"]: col for col in COLUMNS}
 _EXTRA_COLS = {
+    "ehp_phys": _col("ehp_phys", "EHP\nphys", mode="extra", fmt=_g0,
+                     fn_base=_ehp_phys_base, fn_starting=_ehp_phys_l1),
+    "ehp_mag": _col("ehp_mag", "EHP\nmag", mode="extra", fmt=_g0,
+                    fn_base=_ehp_mag_base, fn_starting=_ehp_mag_l1),
     "armor_pct": _col("armor_pct", "Armor %", mode="extra", fmt=_gpct,
                       fn_base=_armor_pct_base, fn_starting=_armor_pct_l1,
                       disp_base=lambda s, h, r: _gpct(_armor_pct_base(s, h, r)),
@@ -798,7 +822,7 @@ for _key, _label in _LABEL_OVERRIDES.items():
 
 CATEGORIES = [
     ("Basic", "basic", []),
-    ("Essentials", "vitality", ["hp", "hpr", "mp", "mpr"]),
+    ("Essentials", "vitality", ["hp", "ehp_phys", "ehp_mag", "hpr", "mp", "mpr"]),
     ("Attributes", "attributes", ["str", "str_gain", "agi", "agi_gain",
                                    "int", "int_gain", "gper"]),
     ("Defense", "defense", ["armor", "armor_pct", "mr"]),
@@ -1021,6 +1045,10 @@ def _col_fields(col) -> tuple[str, ...]:
 
 _COL_TO_FIELDS: dict[str, tuple[str, ...]] = {
     "hp": ("StatusHealth", "AttributeBaseStrength"),
+    "ehp_phys": ("StatusHealth", "AttributeBaseStrength",
+                 "ArmorPhysical", "AttributeBaseAgility"),
+    "ehp_mag": ("StatusHealth", "AttributeBaseStrength",
+                "MagicalResistance", "AttributeBaseIntelligence"),
     "mp": ("StatusMana", "AttributeBaseIntelligence"),
     "hpr": ("StatusHealthRegen", "AttributeBaseStrength"),
     "mpr": ("StatusManaRegen", "AttributeBaseIntelligence"),
