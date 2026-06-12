@@ -1956,6 +1956,35 @@
     } else {
       recomputeCatColspans();
     }
+
+    // Attack-type filters on Neutral Stats. Uses the same toolbar button
+    // markup/style as Hero Stats, but operates on the creeps-table rows.
+    const attackBtns = [...document.querySelectorAll('.hs-attack-filter')];
+    if (attackBtns.length && table.querySelector('tbody tr[data-attack-type]')) {
+      let attackFilter = '';
+      const applyAttackFilter = () => {
+        table.querySelectorAll('tbody tr[data-attack-type]').forEach(tr => {
+          tr.classList.toggle(
+            'mr-attack-out',
+            !!attackFilter && tr.dataset.attackType !== attackFilter
+          );
+        });
+        attackBtns.forEach(btn => {
+          const active = btn.dataset.attackFilter === attackFilter;
+          btn.classList.toggle('active', active);
+          btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        applyLeftOffsets();
+      };
+      attackBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const next = btn.dataset.attackFilter || '';
+          attackFilter = attackFilter === next ? '' : next;
+          applyAttackFilter();
+        });
+      });
+      applyAttackFilter();
+    }
     onScroll();
   }
 })();
@@ -2078,6 +2107,11 @@
   // Attaches to every <table> on the page after DOM ready.
   function wireCrossHover(table) {
     if (table.dataset.crossWired === '1') return;
+    // Dynamics matrices can be 350 rows x 116 patch columns. Column cross-hover
+    // mutates one cell per row on every mouse move, which is cheap for normal
+    // tables but makes items_dyn heavy when "Hide old" is off. Row click,
+    // dyn-cell hover tooltips, sorting and filters stay intact without it.
+    if (table.classList.contains('heroes-dyn-table')) return;
     table.dataset.crossWired = '1';
     let activeRow = null;
     const colCells = [];
@@ -2260,6 +2294,8 @@
       rows.forEach(tr => {
         if (tr.hasAttribute('hidden')) return;
         if (tr.classList.contains('mr-filtered-out')) return;
+        if (tr.classList.contains('mr-search-out')) return;
+        if (tr.classList.contains('mr-attack-out')) return;
         if (tr.classList.contains('mr-hide-active')) return;
         const td = tr.children[colIdx];
         if (!td) return;
@@ -2396,12 +2432,133 @@
   if (!table) return;
   const viewSel = document.getElementById('hs-view-mode');
   if (!viewSel) return;
-  const cells = [...table.querySelectorAll('td[data-base-sort]')];
+  const levelInput = document.getElementById('hs-level-input');
+  const attackBtns = [...document.querySelectorAll('.hs-attack-filter')];
+  const cells = [...table.querySelectorAll('tbody td[data-col]')];
+  let attackFilter = '';
+
+  const clampLevel = () => {
+    if (!levelInput) return 1;
+    const raw = parseInt(levelInput.value, 10);
+    const next = Math.max(1, Math.min(30, Number.isFinite(raw) ? raw : 1));
+    if (String(next) !== levelInput.value) levelInput.value = String(next);
+    return next;
+  };
+
+  const num = v => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+  const g = v => {
+    const s = Number(v).toFixed(2).replace(/\.?0+$/, '');
+    return s || '0';
+  };
+  const g1 = v => {
+    const s = Number(v).toFixed(1).replace(/\.?0+$/, '');
+    return s || '0';
+  };
+  const g0 = v => String(Math.round(Number(v) || 0));
+  const pct = v => g(v) + '%';
+  const pct1 = v => g1(v) + '%';
+  const armorPct = a => Math.round(((0.06 * a) / (1 + 0.06 * Math.abs(a))) * 100);
+  const attrsAt = (s, level) => ({
+    str: num(s.str) + (level - 1) * num(s.strGain),
+    agi: num(s.agi) + (level - 1) * num(s.agiGain),
+    int: num(s.int) + (level - 1) * num(s.intGain),
+  });
+  const rowStats = tr => {
+    if (!tr._hsStats) {
+      try { tr._hsStats = JSON.parse(tr.dataset.hsStats || '{}'); }
+      catch { tr._hsStats = {}; }
+    }
+    return tr._hsStats;
+  };
+  const innate = (key, s, a) => {
+    if (s.slug === 'morphling') {
+      if (key === 'range') return a.agi * 0.25;
+      if (key === 'ms') return a.agi * 0.15;
+    }
+    if (s.slug === 'void_spirit') {
+      if (key === 'hpr') return 0.1 * a.str * 0.30;
+      if (key === 'mpr') return 0.05 * a.int * 0.30;
+      if (key === 'aspd') return a.agi * 0.30;
+    }
+    if (s.slug === 'centaur' && key === 'ms') return a.str * 0.40;
+    return 0;
+  };
+  const primaryDmg = (s, a) => {
+    if (s.attr === 'str') return Math.floor(a.str);
+    if (s.attr === 'agi') return Math.floor(a.agi);
+    if (s.attr === 'int') return Math.floor(a.int);
+    const mult = s.slug === 'void_spirit' ? 0.45 * 1.15 : 0.45;
+    return Math.floor((a.str + a.agi + a.int) * mult);
+  };
+  const valueFor = (s, col, mode, level) => {
+    const effectiveLevel = mode === 'base' ? 1 : level;
+    const a = attrsAt(s, effectiveLevel);
+    const bonusDmg = primaryDmg(s, a);
+    const baseAs = num(s.bas);
+    const startAs = baseAs + a.agi + innate('aspd', s, a);
+    const startArmor = num(s.armor) + a.agi / 6;
+    const startMr = num(s.mr) + a.int * 0.1;
+    const rawMana = s.slug === 'huskar' ? 0 : num(s.mp);
+    const rawManaRegen = s.slug === 'huskar' ? 0 : num(s.mpr);
+    const startMana = (() => {
+      if (s.slug === 'huskar') return 0;
+      if (s.slug === 'ogre_magi') return Math.round(num(s.mp) + a.str * 6 + a.int * 12);
+      return Math.round(num(s.mp) + a.int * 12);
+    })();
+    const startManaRegen = (() => {
+      if (s.slug === 'huskar') return 0;
+      if (s.slug === 'ogre_magi') return num(s.mpr) + a.str * 0.02 + a.int * 0.05;
+      return num(s.mpr) + a.int * 0.05 + innate('mpr', s, a);
+    })();
+    const start = mode !== 'base';
+    switch (col) {
+      case 'hp': return [start ? Math.round(num(s.hp) + a.str * 22) : num(s.hp), g0];
+      case 'hpr': return [start ? num(s.hpr) + a.str * 0.1 + innate('hpr', s, a) : num(s.hpr), g];
+      case 'mp': return [start ? startMana : rawMana, g0];
+      case 'mpr': return [start ? startManaRegen : rawManaRegen, g];
+      case 'str': return [a.str, g];
+      case 'str_gain': return [num(s.strGain), g];
+      case 'agi': return [a.agi, g];
+      case 'agi_gain': return [num(s.agiGain), g];
+      case 'int': return [a.int, g];
+      case 'int_gain': return [num(s.intGain), g];
+      case 'gper': return [num(s.strGain) + num(s.agiGain) + num(s.intGain), g1];
+      case 'armor': return [start ? startArmor : num(s.armor), g1];
+      case 'armor_pct': return [armorPct(start ? startArmor : num(s.armor)), pct];
+      case 'mr': return [start ? startMr : num(s.mr), pct1];
+      case 'dmg': {
+        const min = num(s.dmin) + (start ? bonusDmg : 0);
+        const max = num(s.dmax) + (start ? bonusDmg : 0);
+        return [(min + max) / 2, () => `${g0(min)}–${g0(max)}`];
+      }
+      case 'dmin': return [num(s.dmin) + (start ? bonusDmg : 0), g0];
+      case 'dmax': return [num(s.dmax) + (start ? bonusDmg : 0), g0];
+      case 'aspd': return [start ? startAs : baseAs, g0];
+      case 't_per_attack': {
+        const ats = start ? startAs : baseAs || 100;
+        return [ats ? num(s.bat) * 100 / ats : num(s.bat), g];
+      }
+      case 'bat': return [num(s.bat), g];
+      case 'range': return [start ? num(s.range) + innate('range', s, a) : num(s.range), g0];
+      case 'proj': return [num(s.proj), g0];
+      case 'dvision': return [num(s.dvision), g0];
+      case 'nvision': return [num(s.nvision), g0];
+      case 'ms': return [start ? num(s.ms) + innate('ms', s, a) : num(s.ms), g0];
+      case 'turn': return [num(s.turn), g];
+      case 'collision': return [num(s.collision), g0];
+      case 'bound': return [num(s.bound), g0];
+      default: return [parseFloat(s[col]) || 0, g];
+    }
+  };
+
   // Stash Starting values once — those are the cell's INITIAL data.
   cells.forEach(td => {
-    td.dataset.startSort = td.dataset.sort;
-    td.dataset.startHist = td.dataset.hist || '';
-    td.dataset.startHtml = td.innerHTML;
+    if (!td.dataset.startSort) td.dataset.startSort = td.dataset.sort;
+    if (!td.dataset.startHist) td.dataset.startHist = td.dataset.hist || '';
+    if (!td.dataset.startHtml) td.dataset.startHtml = td.innerHTML;
   });
   function recomputeCats() {
     table.querySelectorAll('thead tr.cat-row th.cat-head[data-cat]').forEach(head => {
@@ -2414,25 +2571,73 @@
   }
   const apply = () => {
     const mode = viewSel.value;
+    const level = clampLevel();
+    if (levelInput) {
+      const baseMode = mode === 'base';
+      levelInput.disabled = baseMode;
+      levelInput.title = baseMode
+        ? 'Base view uses raw level-1 game-file values'
+        : 'Hero level';
+    }
     table.classList.remove('hs-mode-base', 'hs-mode-starting', 'hs-mode-expanded');
     table.classList.add('hs-mode-' + mode);
     cells.forEach(td => {
+      const tr = td.closest('tr[data-hs-stats]');
+      const col = td.dataset.col;
+      const stats = tr ? rowStats(tr) : {};
+      const [sortVal, formatter] = valueFor(stats, col, mode, level);
+      const attackType = tr?.dataset.attackType || '';
+      const html = col === 'range' && attackType
+        ? `<span class="atk-num">${formatter(sortVal)}</span>` +
+          `<span class="atk-badge atk-${attackType}" title="${attackType === 'ranged' ? 'Ranged' : 'Melee'}">` +
+          `<img src="icons/ui/atk_${attackType}.png" alt="${attackType === 'ranged' ? 'Ranged' : 'Melee'}" ` +
+          `title="${attackType === 'ranged' ? 'Ranged' : 'Melee'}" loading="lazy"></span>`
+        : formatter(sortVal);
       if (mode === 'base') {
-        td.dataset.sort = td.dataset.baseSort;
+        td.dataset.sort = sortVal;
         td.dataset.hist = td.dataset.baseHist;
-        td.innerHTML = td.dataset.baseHtml;
+        td.innerHTML = html;
       } else {
-        td.dataset.sort = td.dataset.startSort;
+        td.dataset.sort = sortVal;
         td.dataset.hist = td.dataset.startHist;
-        td.innerHTML = td.dataset.startHtml;
+        td.innerHTML = html;
       }
+      td.classList.toggle('has-history', !!td.dataset.hist);
     });
     recomputeCats();
     window.dispatchEvent(new CustomEvent('mr:filter-changed'));  // heatmap re-scan
   };
+
+  const applyAttackFilter = () => {
+    table.querySelectorAll('tbody tr[data-attack-type]').forEach(tr => {
+      tr.classList.toggle(
+        'mr-attack-out',
+        !!attackFilter && tr.dataset.attackType !== attackFilter
+      );
+    });
+    attackBtns.forEach(btn => {
+      const active = btn.dataset.attackFilter === attackFilter;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    window.dispatchEvent(new CustomEvent('mr:filter-changed'));
+  };
+
   viewSel.addEventListener('change', apply);
+  if (levelInput) {
+    levelInput.addEventListener('input', apply);
+    levelInput.addEventListener('change', apply);
+  }
+  attackBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const next = btn.dataset.attackFilter || '';
+      attackFilter = attackFilter === next ? '' : next;
+      applyAttackFilter();
+    });
+  });
   window.addEventListener('resize', recomputeCats, { passive: true });
   apply();
+  applyAttackFilter();
 })();
 
 // ---- HERO STATS: vertical frozen-pane divider after the pinned Hero column ----

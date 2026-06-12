@@ -41,7 +41,7 @@ build_patch.py                (интегрируется вручную + CSS +
 
 ## Как CSS и JS попадают в HTML
 
-`styles.css` и `scripts.js` в корне репо — **редактируемые вручную source-файлы**, общие для всех страниц. Они **линкуются, а не встраиваются**: патч-страницы ссылаются на `../styles.css?v=…` / `../scripts.js?v=…`, корневые страницы (`index.html`, `calendar.html`, `neutral_creeps.html`, …) — на `styles.css?v=…` / `scripts.js?v=…`. `build_patch.py` читает их с диска при загрузке (например в `JS_TEXT`) и проставляет cache-busting `?v=` — правка в одном месте, копия никуда не встраивается.
+`styles.css` и `scripts.js` в корне репо — **редактируемые вручную source-файлы**, общие для всех страниц. Они **линкуются, а не встраиваются**: патч-страницы ссылаются на `../styles.css?v=…` / `../scripts.js?v=…`, корневые страницы (`index.html`, `calendar.html`, `neutral_stats.html`, …) — на `styles.css?v=…` / `scripts.js?v=…`. `build_patch.py` читает их с диска при загрузке (например в `JS_TEXT`) и проставляет cache-busting `?v=` — правка в одном месте, копия никуда не встраивается.
 
 ## Иконки способностей — fallback при отсутствии файла
 
@@ -49,4 +49,4 @@ build_patch.py                (интегрируется вручную + CSS +
 
 ## Прочие генерируемые страницы
 
-`build_patch.py` также пишет `index.html` (инвентарь-лендинг) и `calendar.html` (календарь + инфографика). Таблицы (`neutral_creeps.html`, `neutral_abilities.html`, `mana_items.html`) собирают отдельно `build_creeps.py` / `build_mana_items.py` — запускать ПОСЛЕ `build_patch.py` (см. [tables.md](../tables.md)).
+`build_patch.py` также пишет `index.html` (инвентарь-лендинг) и `calendar.html` (календарь + инфографика). Таблицы (`neutral_stats.html`, `neutral_abilities.html`, `mana_items.html`) собирают отдельно `build_creeps.py` / `build_mana_items.py` — запускать ПОСЛЕ `build_patch.py` (см. [tables.md](../tables.md)).

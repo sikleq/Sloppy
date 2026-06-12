@@ -4726,14 +4726,19 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
    holding the icon, to the right of the number. */
 /* Attack Range cell: number in a fixed-width box so the icon badge always
    lands at the same x regardless of digit count. */
-.creeps-table .col-attack_range { white-space: nowrap; }
-.creeps-table .atk-num {
+.creeps-table .col-attack_range,
+.mr-table.hs-table .hs-col-range {
+  white-space: nowrap;
+}
+.creeps-table .atk-num,
+.mr-table.hs-table .atk-num {
   display: inline-block;
   min-width: 30px;
   text-align: right;
   vertical-align: middle;
 }
-.creeps-table .atk-badge {
+.creeps-table .atk-badge,
+.mr-table.hs-table .atk-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -4748,7 +4753,8 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   vertical-align: middle;
 }
-.creeps-table .atk-badge img {
+.creeps-table .atk-badge img,
+.mr-table.hs-table .atk-badge img {
   width: 12px;
   height: 12px;
   object-fit: contain;
@@ -5507,6 +5513,8 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 .toolbar-panel .ua-upgrades-toggle,
 .toolbar-panel .hd-remove-group,
 .toolbar-panel .hd-class-group,
+.toolbar-panel .hs-attack-filter-group,
+.toolbar-panel .hs-level-group,
 .toolbar-panel .view-group {
   background: transparent; border-color: transparent;
 }
@@ -5522,6 +5530,90 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 }
 .toolbar-panel > .ua-upgrades-toggle + .ua-upgrades-toggle { padding-left: 4px; }
 .toolbar-panel > .ua-upgrades-toggle + .ua-upgrades-toggle::before { content: none; }
+.hs-attack-filter-group,
+.hs-level-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  box-sizing: border-box;
+}
+.hs-attack-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px 0 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #c9d1d9;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease, filter 0.12s ease;
+}
+.hs-attack-filter:hover {
+  color: #fff;
+  border-color: rgba(227, 196, 106, 0.45);
+  filter: brightness(1.12);
+}
+.hs-attack-filter.active,
+.hs-attack-filter[aria-pressed="true"] {
+  color: #fff8d6;
+  border-color: rgba(227, 196, 106, 0.82);
+  background: rgba(227, 196, 106, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.12);
+}
+.hs-attack-filter .atk-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 18px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  background: linear-gradient(rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.hs-attack-filter .atk-badge img {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+  display: block;
+  opacity: 0.9;
+}
+.hs-level-group {
+  color: #c9d1d9;
+  font-size: 12px;
+}
+.hs-level-group span {
+  color: #8b949e;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.hs-level-group input {
+  width: 44px;
+  height: 28px;
+  box-sizing: border-box;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  background: #0d1117;
+  color: #e6edf3;
+  font: inherit;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.hs-level-group input:focus {
+  outline: none;
+  border-color: #e3c46a;
+  box-shadow: 0 0 0 1px rgba(227, 196, 106, 0.22);
+}
+.hs-level-group input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 /* A toolbar search box always sits on its OWN full-width row at the bottom of the
    panel (flex-basis 100% forces a wrap) — even when there are few other controls.
    No leading divider/indent since it owns its row. */
@@ -6354,6 +6446,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
 .mr-price-clear[hidden] { display: none; }
 .mr-table tbody tr.mr-filtered-out { display: none; }
 .mr-table tbody tr.mr-search-out { display: none; }
+.mr-table tbody tr.mr-attack-out,
+.creeps-table tbody tr.mr-attack-out {
+  display: none;
+}
 
 /* Clicked-row highlight — yellow outline around the ENTIRE row, not each
    cell. Achieved with inset box-shadows on the TDs: top / bottom on all
@@ -6423,12 +6519,14 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 12px; padding-bottom: 12px;
   border-left: 2px solid rgba(170, 220, 240, 0.30);
 }
 .mr-table.hs-table thead th .th-sub {
-  display: block;
-  font-size: 9px;
-  line-height: 1;
-  color: #8b98a8;
-  font-weight: 600;
-  margin-top: 1px;
+  display: inline-block;
+  position: relative;
+  top: 2px;
+  margin-left: 1px;
+  font-size: 8.5px;
+  line-height: 0;
+  color: #8b949e;
+  font-weight: 400;
 }
 /* Sticky hero column (single frozen column → plain CSS sticky, no JS lefts).
    Solid backgrounds so scrolled columns disappear under it; header corner

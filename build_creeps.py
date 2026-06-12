@@ -1,4 +1,4 @@
-"""build_creeps.py — generates creeps.html, the neutral-creeps stats
+"""build_creeps.py — generates neutral_stats.html, the neutral stats
 table. This is a standalone side-project, decoupled from the patch
 changelog generator (build_patch.py). Both share the site chrome via
 site_common.py.
@@ -36,7 +36,7 @@ def _latest_href():
 
 
 def save_creeps_html():
-    """Generate creeps.html — neutral-creeps stats table. CSV provides the
+    """Generate neutral_stats.html — neutral stats table. CSV provides the
     ordering, level (Ур.) and createhero name; every other column is
     auto-pulled from data/stats/7.41c/units.json + npc_units.txt and
     abilities_slim.json. Derived columns (Armor %, EHP Phys/Mag, Avg dmg,
@@ -51,7 +51,7 @@ def save_creeps_html():
     csv_path = _os.path.join(_os.path.dirname(__file__),
                               'data', 'creeps_raw.csv')
     if not _os.path.exists(csv_path):
-        print(f"  ! creeps_raw.csv not found, skipping creeps.html")
+        print(f"  ! creeps_raw.csv not found, skipping neutral_stats.html")
         return
 
     # ---- Source files ----
@@ -1444,14 +1444,18 @@ def save_creeps_html():
             else:
                 cells.append(f'<td class="{_col_cls(k, v)}">{_cell_inner(k, v, d)}</td>')
         rid = f' id="unit-{_esc((d.get("createhero") or "").strip())}"'
-        body_parts.append(f'<tr{rid}{tr_cls}>{"".join(cells)}</tr>')
+        attack_type = 'ranged' if d.get('attack_range_ranged') else 'melee'
+        body_parts.append(
+            f'<tr{rid} data-attack-type="{attack_type}"{tr_cls}>'
+            f'{"".join(cells)}</tr>'
+        )
 
     html = (
         '<!DOCTYPE html>\n'
         '<html lang="ru">\n'
         '<head>\n'
         '<meta charset="UTF-8">\n'
-        '<title>SIKLE | Neutral Creeps</title>\n'
+        '<title>SIKLE | Neutral Stats</title>\n'
         + _site.favicon_links() +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
@@ -1491,6 +1495,16 @@ def save_creeps_html():
         '<option value="expanded">Expanded</option>'
         '</select>'
         '</span>'
+        '<span class="hs-attack-filter-group" aria-label="Attack type filter">'
+        '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
+        'aria-pressed="false" title="Show melee units">'
+        '<span class="atk-badge" aria-hidden="true">'
+        '<img src="icons/ui/atk_melee.png" alt=""></span><span>Melee</span></button>'
+        '<button type="button" class="hs-attack-filter" data-attack-filter="ranged" '
+        'aria-pressed="false" title="Show ranged units">'
+        '<span class="atk-badge" aria-hidden="true">'
+        '<img src="icons/ui/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
+        '</span>'
         '</div></div>\n'
         '<table class="creeps-table mode-standard">\n'
         f'<thead><tr class="cat-row">{cat_cells}</tr>'
@@ -1502,21 +1516,22 @@ def save_creeps_html():
         f'<script src="scripts.js?v={ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
     )
-    with open('neutral_creeps.html', 'w', encoding='utf-8') as f:
+    with open('neutral_stats.html', 'w', encoding='utf-8') as f:
         f.write(html)
-    print(f"  -> neutral_creeps.html: {len(html):,} bytes")
+    print(f"  -> neutral_stats.html: {len(html):,} bytes")
     # Backward-compat redirects: any old bookmark / external link to the former
-    # /creeps.html or /materials.html bounces to /neutral_creeps.html. Removed
+    # /neutral_creeps.html, /creeps.html or /materials.html bounces to
+    # /neutral_stats.html. Removed
     # once we're confident no traffic references the old URLs.
-    for _old in ('creeps.html', 'materials.html'):
+    for _old in ('neutral_creeps.html', 'creeps.html', 'materials.html'):
         with open(_old, 'w', encoding='utf-8') as f:
             f.write(
                 '<!DOCTYPE html><html><head><meta charset="UTF-8">'
-                '<meta http-equiv="refresh" content="0; url=neutral_creeps.html">'
-                '<link rel="canonical" href="neutral_creeps.html">'
+                '<meta http-equiv="refresh" content="0; url=neutral_stats.html">'
+                '<link rel="canonical" href="neutral_stats.html">'
                 '<title>Sloppy — moved</title></head><body>'
                 '<p>This page moved to '
-                '<a href="neutral_creeps.html">neutral_creeps.html</a>.</p>'
+                '<a href="neutral_stats.html">neutral_stats.html</a>.</p>'
                 '</body></html>'
             )
 
@@ -1905,7 +1920,7 @@ def save_creeps_html():
             '_force_leveled': ('effect',),
             'effect': (
                 '\x01<span class="cell-wrap">Summons 3 <a class="ua-inline-link" '
-                'href="neutral_creeps.html#unit-skeleton_warrior">'
+                'href="neutral_stats.html#unit-skeleton_warrior">'
                 'Skeleton Warriors</a>'
                 '<span class="qhint" tabindex="0" role="button" '
                 'aria-label="HP = 250/275/300/375, attack damage = 12/15/18/21" '
@@ -2335,7 +2350,7 @@ def save_creeps_html():
         ch = (d.get('createhero') or '').strip()
         icon = d.get('icon')
         unit_img = (
-            f'<a class="unit-link" href="neutral_creeps.html#unit-{_esc(ch)}">'
+            f'<a class="unit-link" href="neutral_stats.html#unit-{_esc(ch)}">'
             f'<img class="creep-copy" src="{_esc(icon)}" alt="" loading="lazy" '
             f'onerror="this.style.visibility=\'hidden\'"></a>' if icon else '')
         slugs = [(kk, d.get(kk + '_slug', ''), d.get(kk, ''))

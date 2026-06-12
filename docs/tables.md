@@ -7,29 +7,29 @@ This covers the sortable data tables under the **Materials** section.
 
 | Page | Content | Builder |
 |---|---|---|
-| `neutral_creeps.html` | **Neutral Creeps** table (stats + abilities). `creeps.html` and `materials.html` are now redirects → `neutral_creeps.html`. | `build_creeps.py` |
-| `neutral_abilities.html` | Per-unit-ability table (one row per unit×ability). The Materials sub-nav presents it as a child of Neutral Creeps. `unit_abilities.html` is now a small meta-redirect for backwards compatibility. | `build_creeps.py` (same run) |
+| `neutral_stats.html` | **Neutral Stats** table (neutral creep stats + abilities). Attack range cells render the same number + melee/ranged icon badge pattern used by Hero Stats, and toolbar Melee/Ranged buttons filter rows by current `AttackCapabilities`. `neutral_creeps.html`, `creeps.html` and `materials.html` are redirects → `neutral_stats.html`. | `build_creeps.py` |
+| `neutral_abilities.html` | Per-unit-ability table (one row per unit×ability). The Materials sub-nav presents it as a child of Neutral Stats. `unit_abilities.html` is now a small meta-redirect for backwards compatibility. | `build_creeps.py` (same run) |
 | `mana_items.html` | Mana / mana-regen items + gold-efficiency metrics. | `build_mana_items.py` |
-| `heroes_stats.html` | **Hero Stats** — one row per hero (127), every base stat. Three View modes (`#hs-view-mode`): **Base** = raw KV values; **Starting** (default) = level-1 values WITH attribute bonuses; **Expanded** = Starting + extra inspection columns (`Gains/lvl`, `Armor %`, `Dmg min/max`, `Time to hit`, projectile speed, turn rate, collision size, bound radius). Header groups mirror Neutral Creeps: Basic / Essentials / Attributes / Defense / Attack / Vision / Mobility. Cells whose value differs between Base & Starting carry `data-base-sort/-html/-hist`; the View IIFE swaps them. **Per-hero special cases:** Huskar MP/regen forced to 0; Ogre Magi mana/regen scale with Str. **Innate attribute-conversion modifiers** (`_innate_bonus`, patch-gated): Morphling Ebb&Flow Agi→Range/MoveSpeed (7.41+, 0.2→0.25 range @7.41d), Void Spirit Intrinsic Edge (+33% secondary bonuses in 7.36, +25% in 7.36b–7.40, then 7.41+ = Universal damage multiplier ×1.15 plus +30% HP regen / mana regen / attack speed from Str/Int/Agi, no armor/MR), Centaur Horsepower Str→MoveSpeed (7.36+). Every numeric cell carries full 7.08→today change history (`data-hist`+`data-net`); attribute cell logs primary-attr swaps. **Patch-note shift layer** shifts KV-detected changes back to the patch that `patchnotes_english.txt` announces. Reuses mr-table front-end (`mr-table hs-table`) with its own Neutral-Creeps-style two-row header. | `build_heroes_stats.py` |
+| `heroes_stats.html` | **Hero Stats** — one row per hero (128 incl. Spirit Bear), every base stat. Three View modes (`#hs-view-mode`): **Base** = raw level-1 KV values and ignores the level control; **Starting** (default) = practical values WITH attribute bonuses; **Expanded** = Starting + extra inspection columns (`Gains/lvl`, `Armor %`, `Dmg min/max`, `Time to hit`, projectile speed, turn rate, collision size, bound radius). The `Lvl` input clamps to 1–30 and recomputes Starting/Expanded values from compact row JSON (`data-hs-stats`) instead of emitting 30 copies of every cell. Melee/Ranged toolbar buttons filter rows by latest-patch `AttackCapabilities` and fire the shared heatmap refresh. Attack range cells render as number + melee/ranged icon badge, matching Neutral Stats. Header groups mirror Neutral Stats: Basic / Essentials / Attributes / Defense / Attack / Vision / Mobility. Spirit Bear is injected from `units.json` + its `npc_units.txt` block because it is a `ConsideredHero` unit, not a normal `npc_dota_hero_*` record. Cells whose value differs between Base & Starting carry `data-base-sort/-html/-hist`; the View IIFE swaps/recomputes them. **Per-hero special cases:** Huskar MP/regen forced to 0; Ogre Magi mana/regen scale with Str. **Innate attribute-conversion modifiers** (`_innate_bonus`, patch-gated): Morphling Ebb&Flow Agi→Range/MoveSpeed (7.41+, 0.2→0.25 range @7.41d), Void Spirit Intrinsic Edge (+33% secondary bonuses in 7.36, +25% in 7.36b–7.40, then 7.41+ = Universal damage multiplier ×1.15 plus +30% HP regen / mana regen / attack speed from Str/Int/Agi, no armor/MR), Centaur Horsepower Str→MoveSpeed (7.36+). Every numeric cell carries full 7.08→today change history (`data-hist`+`data-net`); attribute cell logs primary-attr swaps. **Patch-note shift layer** shifts KV-detected changes back to the patch that `patchnotes_english.txt` announces. Reuses mr-table front-end (`mr-table hs-table`) with its own Neutral-Stats-style two-row header. | `build_heroes_stats.py` |
 | `heroes_dyn.html` | **Hero Dynamics matrix** — rows = every hero (icon+name, alphabetical), columns = every patch (version + release date oldest→newest), each cell = that hero's patch-dynamics **dyn-cell** for that patch. Same diamond-pill widget as patch pages. | `build_heroes_dyn.py` |
 | `items_dyn.html` | **Item Dynamics matrix** — like heroes_dyn, rows = **every real game item** (parity with heroes_dyn listing every hero), columns = every patch. Untouched items render as empty rows. Currently **350** (199 regular + 129 neutral + 22 enchant); 91 not-current (incl. 80 cycled-out neutrals — only the live pool of 49 shows by default), every one with an accurate removal patch. Adds an **In game** toggle (hide removed items, ON) + Type & Category multi-select dropdowns. | `build_items_dyn.py` |
 | nav / asset version / `data/site_meta.json` | Shared header, sub-tabs, cache-busting. | `site_common.py` |
 
-Hero Stats current layout note: `heroes_stats.html` uses a Neutral-Creeps-style
+Hero Stats current layout note: `heroes_stats.html` uses a Neutral-Stats-style
 two-row header with Basic / Essentials / Attributes / Defense / Attack / Vision /
 Mobility groups. Expanded mode no longer shows STR30/AGI30/INT30, Total lvl 1,
 Total lvl 30, or Gains by lvl 30. Expanded-only columns are `Gains/lvl`,
 `Armor %`, `Dmg min`, `Dmg max`, `Time to hit`, projectile speed, turn rate,
 collision size, and bound radius.
 
-Header sub-tabs (under the logo) switch between Neutral Creeps / Unit Abilities / Mana Items.
+Header sub-tabs (under the logo) switch between Neutral Stats / Unit Abilities / Mana Items.
 
 ## Build order (IMPORTANT)
 
 ```bash
 # On Windows always:  PYTHONIOENCODING=utf-8
 python build_patch.py        # 1. writes data/site_meta.json (asset version, patch list)
-python build_creeps.py       # 2. -> neutral_creeps.html + neutral_abilities.html (+ creeps/materials/unit_abilities redirects)
+python build_creeps.py       # 2. -> neutral_stats.html + neutral_abilities.html (+ neutral_creeps/creeps/materials/unit_abilities redirects)
 python build_mana_items.py   # 3. -> mana_items.html  (run AFTER build_patch)
 python build_heroes_stats.py # 3b. -> heroes_stats.html (run AFTER build_patch — needs site_meta dates)
 python build_heroes_dyn.py   # 4. -> heroes_dyn.html  (run AFTER build_patch — reads _dynamics.json)
@@ -360,7 +360,7 @@ html:has(.calendar-page),  /* calendar — fits the screen     */
 html:has(.creeps-page)     /* Neutral Creeps / Neutral Abilities / Mana Items */
 { scrollbar-gutter: auto; }
 ```
-Note `.creeps-page` is shared by **all three** Materials tables (neutral_creeps.html,
+Note `.creeps-page` is shared by **all three** Materials tables (neutral_stats.html,
 neutral_abilities.html, mana_items.html), and **all three now lock the page and scroll
 inside `.creeps-scroll`** (one scrollbar inside the box). **New page rule:** single-screen
 or self-scrolling → give it one of these classes (or add to the opt-out); long filterable

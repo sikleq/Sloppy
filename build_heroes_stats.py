@@ -1,15 +1,15 @@
 """Build heroes_stats.html — the Hero Stats table (Materials sub-tab).
 
 One row per hero, columns = base stats. Three view modes via the View
-dropdown (mirrors Neutral Creeps):
+dropdown (mirrors Neutral Stats):
   * Base     — bare values from the game files (StatusHealth = 120 etc).
   * Starting — level-1 values WITH attribute bonuses (HP = 120 + 22×Str,
                MP = base + 12×Int, Armor = base + Agi/6, Mag.resist = base +
                0.1×Int, Damage = base + primary-attr bonus, Attack Speed =
                base + 1×Agi). DEFAULT mode.
-  * Expanded — everything in Starting + extra columns (per-attribute level
-               30, sum of attributes at L1/L30, sum of gains, Min/Max damage
-               split, projectile, turn rate, collision, bound radius).
+  * Expanded — everything in Starting + extra inspection columns (Gains/lvl,
+               Armor %, Dmg min/max, Time to hit, projectile, turn rate,
+               collision, bound radius).
 
 Each "computed" column carries both Base and Starting values; the View
 dropdown swaps them in via JS (data-base-* attrs on the td). Per-patch
@@ -24,6 +24,9 @@ Data sources:
     projectile speed, base attack speed, turn rate, collision hull, bound
     radius). Built by scripts/fetch_hero_history.py from d2vpkr's historical
     npc_heroes.txt. All 116 patches.
+  * Spirit Bear is injected from data/stats/<patch>/units.json plus its
+    npc_units.txt block, because it is a ConsideredHero unit rather than a
+    normal npc_dota_hero_* entry.
 
 Run AFTER build_patch.py (needs data/site_meta.json):
     python build_patch.py
@@ -104,6 +107,9 @@ _NAME_OVERRIDES = {
     "largo": "Largo",
 }
 _EXCLUDE = {"npc_dota_hero_base", "npc_dota_hero_target_dummy"}
+SPIRIT_BEAR_HERO = "npc_dota_hero_spirit_bear"
+SPIRIT_BEAR_UNIT = "npc_dota_lone_druid_bear1"
+SPIRIT_BEAR_NAME = "Spirit Bear"
 
 
 def _load_display_names() -> dict[str, str]:
@@ -118,6 +124,8 @@ def _load_display_names() -> dict[str, str]:
 
 
 def _display_name(internal: str, names: dict[str, str]) -> str:
+    if internal == SPIRIT_BEAR_HERO:
+        return SPIRIT_BEAR_NAME
     if internal in names:
         return names[internal]
     slug = internal.replace("npc_dota_hero_", "")
@@ -198,6 +206,7 @@ _RAW_DEFAULTS = {
     "ProjectileSpeed": 900, "BaseAttackSpeed": 100, "MovementTurnRate": 0.6,
     "VisionDaytimeRange": 1800, "VisionNighttimeRange": 800, "RingRadius": 70,
     "BoundsHullName": "DOTA_HULL_SIZE_HERO",
+    "AttackCapabilities": "DOTA_UNIT_CAP_MELEE_ATTACK",
 }
 
 
@@ -213,6 +222,115 @@ def _load_raw_heroes(version: str) -> dict[str, dict]:
     except Exception as exc:
         print(f"  ! {path} unreadable ({exc})")
         return {}
+
+
+def _load_units(version: str) -> dict[str, dict]:
+    path = STATS_DIR / version / "units.json"
+    if not path.exists():
+        return {}
+    try:
+        return _json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        print(f"  ! {path} unreadable ({exc})")
+        return {}
+
+
+_KV_BLOCK_CACHE: dict[tuple[str, str], str] = {}
+
+
+def _extract_kv_block(version: str, filename: str, key: str) -> dict[str, str]:
+    path = STATS_DIR / version / filename
+    if not path.exists():
+        return {}
+    try:
+        cache_key = (version, filename)
+        text = _KV_BLOCK_CACHE.get(cache_key)
+        if text is None:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            _KV_BLOCK_CACHE[cache_key] = text
+    except Exception as exc:
+        print(f"  ! {path} unreadable ({exc})")
+        return {}
+    marker = f'"{key}"'
+    start = text.find(marker)
+    if start < 0:
+        return {}
+    brace = text.find("{", start + len(marker))
+    if brace < 0:
+        return {}
+    depth = 0
+    end = brace
+    for idx in range(brace, len(text)):
+        ch = text[idx]
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                end = idx
+                break
+    block = text[brace + 1:end]
+    return dict(_re.findall(r'"([^"]+)"\s+"([^"]*)"', block))
+
+
+def _extract_unit_block(version: str, unit: str) -> dict[str, str]:
+    return _extract_kv_block(version, "npc_units.txt", unit)
+
+
+def _extract_hero_block(version: str, hero: str) -> dict[str, str]:
+    return _extract_kv_block(version, "npc_heroes.txt", hero)
+
+
+def _inject_spirit_bear(snaps: dict[str, dict], raws: dict[str, dict]) -> None:
+    """Expose Spirit Bear in Hero Stats without pretending it is in heroes.json.
+
+    The current game treats it as a hero-like unit (`ConsideredHero`), while
+    the extracted hero tables only include `npc_dota_hero_*` entries. We map
+    the bear's unit stats onto the same fields Hero Stats already understands.
+    """
+    hero_fields = (
+        "ArmorPhysical", "AttackDamageMin", "AttackDamageMax", "AttackRate",
+        "AttackRange", "MovementSpeed", "StatusHealth", "StatusHealthRegen",
+        "StatusMana", "StatusManaRegen", "MagicalResistance",
+        "AttributePrimary", "AttributeBaseStrength", "AttributeStrengthGain",
+        "AttributeBaseAgility", "AttributeAgilityGain",
+        "AttributeBaseIntelligence", "AttributeIntelligenceGain",
+    )
+    raw_fields = (
+        "ProjectileSpeed", "BaseAttackSpeed", "MovementTurnRate",
+        "VisionDaytimeRange", "VisionNighttimeRange", "RingRadius",
+        "BoundsHullName", "AttackCapabilities",
+    )
+    defaults = {
+        "AttributePrimary": "DOTA_ATTRIBUTE_ALL",
+        "AttributeBaseStrength": 0,
+        "AttributeBaseAgility": 0,
+        "AttributeBaseIntelligence": 0,
+        "AttributeStrengthGain": 0,
+        "AttributeAgilityGain": 0,
+        "AttributeIntelligenceGain": 0,
+        "MagicalResistance": 25,
+        "BaseAttackSpeed": 100,
+        "ProjectileSpeed": 0,
+        "MovementTurnRate": 0.6,
+        "VisionDaytimeRange": 1800,
+        "VisionNighttimeRange": 800,
+        "RingRadius": 70,
+        "BoundsHullName": "DOTA_HULL_SIZE_HERO",
+        "AttackCapabilities": "DOTA_UNIT_CAP_MELEE_ATTACK",
+    }
+    for version, snap in snaps.items():
+        merged = {}
+        merged.update(_load_units(version).get(SPIRIT_BEAR_UNIT, {}))
+        merged.update(_extract_unit_block(version, SPIRIT_BEAR_UNIT))
+        if not merged:
+            continue
+        hero = {k: (merged[k] if k in merged else defaults[k]) for k in hero_fields
+                if k in merged or k in defaults}
+        raw = {k: (merged[k] if k in merged else defaults[k]) for k in raw_fields
+               if k in merged or k in defaults}
+        snap[SPIRIT_BEAR_HERO] = hero
+        raws.setdefault(version, {})[SPIRIT_BEAR_HERO] = raw
 
 
 def _raw_field(raw: dict, hero: str, key: str):
@@ -531,35 +649,12 @@ def _ms_l1(s, h, r):
     return round(_field(s, h, "MovementSpeed") + _innate_bonus("ms", s, h))
 
 
-# Expanded extras — STR/AGI/INT at L30 + sums ---------------------------------
-
-def _attr30(base_f: str, gain_f: str):
-    return lambda s, h, r: round(_field(s, h, base_f) + 29 * _field(s, h, gain_f), 1)
-
-
-def _total_l1(s, h, r):
-    return round(_field(s, h, "AttributeBaseStrength")
-                 + _field(s, h, "AttributeBaseAgility")
-                 + _field(s, h, "AttributeBaseIntelligence"), 1)
-
-
-def _total_l30(s, h, r):
-    return round(
-        (_field(s, h, "AttributeBaseStrength") + 29 * _field(s, h, "AttributeStrengthGain"))
-        + (_field(s, h, "AttributeBaseAgility") + 29 * _field(s, h, "AttributeAgilityGain"))
-        + (_field(s, h, "AttributeBaseIntelligence")
-           + 29 * _field(s, h, "AttributeIntelligenceGain")),
-        1)
-
+# Expanded helper values ------------------------------------------------------
 
 def _gains_per_level(s, h, r):
     return round(_field(s, h, "AttributeStrengthGain")
                  + _field(s, h, "AttributeAgilityGain")
                  + _field(s, h, "AttributeIntelligenceGain"), 1)
-
-
-def _gains_total_l30(s, h, r):
-    return round(29 * _gains_per_level(s, h, r), 1)
 
 
 def _armor_factor(a):
@@ -627,20 +722,11 @@ COLUMNS = [
     # ── Attributes ─────────────────────────────────────────────────────
     _col("str",      "STR",      fn_base=_f("AttributeBaseStrength")),
     _col("str_gain", "STR/lvl",  fn_base=_f("AttributeStrengthGain")),
-    _col("str30",    "STR 30",   mode="extra", fmt=_g1,
-         fn_base=_attr30("AttributeBaseStrength", "AttributeStrengthGain")),
     _col("agi",      "AGI",      fn_base=_f("AttributeBaseAgility")),
     _col("agi_gain", "AGI/lvl",  fn_base=_f("AttributeAgilityGain")),
-    _col("agi30",    "AGI 30",   mode="extra", fmt=_g1,
-         fn_base=_attr30("AttributeBaseAgility", "AttributeAgilityGain")),
     _col("int",      "INT",      fn_base=_f("AttributeBaseIntelligence")),
     _col("int_gain", "INT/lvl",  fn_base=_f("AttributeIntelligenceGain")),
-    _col("int30",    "INT 30",   mode="extra", fmt=_g1,
-         fn_base=_attr30("AttributeBaseIntelligence", "AttributeIntelligenceGain")),
-    _col("totl1",    "Total lvl 1",     mode="extra", fmt=_g1, fn_base=_total_l1),
-    _col("totl30",   "Total lvl 30",    mode="extra", fmt=_g1, fn_base=_total_l30),
     _col("gper",     "Gains/lvl",       mode="extra", fmt=_g1, fn_base=_gains_per_level),
-    _col("gtotl30",  "Gains by lvl 30", mode="extra", fmt=_g1, fn_base=_gains_total_l30),
 
     # ── Defenses ──────────────────────────────────────────────────────
     _col("armor", "Armor", fmt=_g1, fn_base=_armor_base, fn_starting=_armor_l1),
@@ -671,7 +757,7 @@ COLUMNS = [
 
     _col("range", "Attack Range", fmt=_g0, fn_base=_range_base, fn_starting=_range_l1),
 
-    # ── Expanded extras (raw-only fields) ─────────────────────────────
+    # Expanded extras ---------------------------------------------------------
     _col("proj",      "Projectile", mode="extra", fmt=_g0,
          fn_base=lambda s, h, r: _raw_num(r, h, "ProjectileSpeed"), raw=True),
     _col("turn",      "Turn Rate",  mode="extra",
@@ -697,8 +783,8 @@ _BASE_COL_BY_KEY.update(_EXTRA_COLS)
 _LABEL_OVERRIDES = {
     "hpr": "HP/sec",
     "mpr": "MP/sec",
-    "dmin": "Dmg min",
-    "dmax": "Dmg max",
+    "dmin": "Dmg\nmin",
+    "dmax": "Dmg\nmax",
     "aspd": "Speed",
     "range": "Range",
     "proj": "Projectile Speed",
@@ -1129,12 +1215,64 @@ def _label_html(label: str) -> str:
     return _esc(label)
 
 
+def _attack_range_html(value: str, attack_type: str) -> str:
+    tip = "Ranged" if attack_type == "ranged" else "Melee"
+    return (
+        f'<span class="atk-num">{_esc(value)}</span>'
+        f'<span class="atk-badge atk-{attack_type}" title="{tip}">'
+        f'<img src="icons/ui/atk_{attack_type}.png" alt="{tip}" '
+        f'title="{tip}" loading="lazy"></span>'
+    )
+
+
+def _attack_type(version: str, hero: str, raw: dict) -> str:
+    cap = str(_raw_field(raw, hero, "AttackCapabilities") or "")
+    if not cap or cap == str(_RAW_DEFAULTS["AttackCapabilities"]):
+        cap = _extract_hero_block(version, hero).get("AttackCapabilities", cap)
+    return "ranged" if "RANGED" in cap else "melee"
+
+
+def _row_stats(hero: str, snap: dict, raw: dict) -> str:
+    meta = _attr_of(snap, hero) or ("uni", "Universal", "universal.webp", 3)
+    slug = hero.replace("npc_dota_hero_", "")
+    data = {
+        "slug": slug,
+        "attr": meta[0],
+        "str": _field(snap, hero, "AttributeBaseStrength"),
+        "strGain": _field(snap, hero, "AttributeStrengthGain"),
+        "agi": _field(snap, hero, "AttributeBaseAgility"),
+        "agiGain": _field(snap, hero, "AttributeAgilityGain"),
+        "int": _field(snap, hero, "AttributeBaseIntelligence"),
+        "intGain": _field(snap, hero, "AttributeIntelligenceGain"),
+        "hp": _field(snap, hero, "StatusHealth"),
+        "hpr": _field(snap, hero, "StatusHealthRegen"),
+        "mp": _mp_base_raw(snap, hero, raw),
+        "mpr": _mpreg_base_raw(snap, hero, raw),
+        "armor": _armor_base(snap, hero, raw),
+        "mr": _mr_base(snap, hero, raw),
+        "dmin": _dmg_min_base(snap, hero, raw),
+        "dmax": _dmg_max_base(snap, hero, raw),
+        "bas": _aspd_base(snap, hero, raw),
+        "bat": _field(snap, hero, "AttackRate"),
+        "range": _range_base(snap, hero, raw),
+        "ms": _ms_base(snap, hero, raw),
+        "dvision": _raw_num(raw, hero, "VisionDaytimeRange"),
+        "nvision": _raw_num(raw, hero, "VisionNighttimeRange"),
+        "proj": _raw_num(raw, hero, "ProjectileSpeed"),
+        "turn": _raw_num(raw, hero, "MovementTurnRate"),
+        "collision": _collision(snap, hero, raw),
+        "bound": _raw_num(raw, hero, "RingRadius"),
+    }
+    return _esc(_json.dumps(data, separators=(",", ":")))
+
+
 def render_html() -> str:
     versions = _versions()
     dates = _load_patch_dates()
     snaps = {v: _json.loads((STATS_DIR / v / "heroes.json").read_text(encoding="utf-8"))
              for v in versions}
     raws = {v: _load_raw_heroes(v) for v in versions}
+    _inject_spirit_bear(snaps, raws)
     latest = versions[-1]
     cur = snaps[latest]
     raw = raws[latest]
@@ -1183,6 +1321,7 @@ def render_html() -> str:
     for hero in heroes:
         slug = hero.replace("npc_dota_hero_", "")
         name = _display_name(hero, names)
+        attack_type = _attack_type(latest, hero, raw)
         icon = (f'<img class="mr-ico hs-ico" src="icons/heroes/{slug}.png" '
                 f'alt="" loading="lazy">'
                 if (_HERE / "icons" / "heroes" / f"{slug}.png").exists()
@@ -1215,24 +1354,31 @@ def render_html() -> str:
             v_base = col["fn_base"](cur, hero, raw)
             disp_base = (col["disp_base"](cur, hero, raw)
                          if col["disp_base"] else col["fmt"](v_base))
-            differ = (abs(v_base - v_start) > 1e-9) or (disp_base != disp_start)
-            extra_attrs = ""
-            if differ:
-                hist_base = _history_for(snaps, versions, dates, hero, col, raws,
-                                         mode="base")
-                extra_attrs = (
-                    f' data-base-sort="{v_base}" '
-                    f'data-base-html="{_esc(disp_base)}" '
-                    f'data-base-hist="{_esc(hist_base)}"'
-                )
+            if col["key"] == "range":
+                disp_start = _attack_range_html(disp_start, attack_type)
+                disp_base = _attack_range_html(disp_base, attack_type)
+            hist_base = _history_for(snaps, versions, dates, hero, col, raws,
+                                     mode="base")
+            extra_attrs = (
+                f' data-base-sort="{v_base}" '
+                f'data-base-html="{_esc(disp_base)}" '
+                f'data-base-hist="{_esc(hist_base)}"'
+                f' data-start-sort="{v_start}" '
+                f'data-start-html="{_esc(disp_start)}" '
+                f'data-start-hist="{_esc(hist_start)}"'
+            )
             hist_attr = f' data-hist="{_esc(hist_start)}"' if hist_start else ""
             net_attr = ' data-net=""' if hist_start else ""
             cls_final = (cls if hist_start else cls.replace(" has-history", ""))
             cells.append(
                 f'<td class="{cls_final}" data-cat="{col.get("cat", "other")}" '
-                f'data-sort="{v_start}"{net_attr}{hist_attr}'
+                f'data-col="{col["key"]}" data-sort="{v_start}"{net_attr}{hist_attr}'
                 f'{extra_attrs}>{disp_start}</td>')
-        body.append(f'<tr data-slug="{slug}">{"".join(cells)}</tr>')
+        body.append(
+            f'<tr data-slug="{slug}" data-attack-type="{attack_type}" '
+            f'data-hs-stats="{_row_stats(hero, cur, raw)}">'
+            f'{"".join(cells)}</tr>'
+        )
 
     table = (
         '<table class="mr-table hs-table sortable-table">'
@@ -1243,12 +1389,13 @@ def render_html() -> str:
     )
 
     blurb = (
-        '<p class="mr-blurb inbox-bar">Compare hero stats across three views: '
-        '<em>Base</em> shows raw game-file values, <em>Starting</em> shows level-1 '
-        'practical values with attribute bonuses and supported innate conversions, '
-        'and <em>Expanded</em> adds detailed combat, armor, projectile, mobility '
-        'and size columns. Hover any stat for its full patch history since 7.08, '
-        'then use search, sorting and heatmap to find outliers quickly.</p>\n'
+        '<p class="mr-blurb inbox-bar">Compare hero stats across three views. '
+        '<em>Base</em> shows raw level-1 game-file values and ignores the level '
+        'control; <em>Starting</em> shows practical values with attribute bonuses '
+        'and supported innate conversions; '
+        '<em>Expanded</em> adds detailed combat, armor, projectile, mobility and '
+        'size columns. Hover any stat for its full patch history since 7.08, then '
+        'use search, sorting and heatmap to find outliers quickly.</p>\n'
     )
     toolbar = (
         '<div class="cal-toggle-bar mr-toolbar inbox-bar"><div class="toolbar-panel">'
@@ -1260,6 +1407,21 @@ def render_html() -> str:
         '<option value="expanded">Expanded</option>'
         '</select>'
         '</span>'
+        '<span class="hs-attack-filter-group" aria-label="Attack type filter">'
+        '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
+        'aria-pressed="false" title="Show melee heroes">'
+        '<span class="atk-badge" aria-hidden="true">'
+        '<img src="icons/ui/atk_melee.png" alt=""></span><span>Melee</span></button>'
+        '<button type="button" class="hs-attack-filter" data-attack-filter="ranged" '
+        'aria-pressed="false" title="Show ranged heroes">'
+        '<span class="atk-badge" aria-hidden="true">'
+        '<img src="icons/ui/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
+        '</span>'
+        '<label class="hs-level-group">'
+        '<span>Lvl</span>'
+        '<input type="number" id="hs-level-input" min="1" max="30" value="1" '
+        'inputmode="numeric" aria-label="Hero level">'
+        '</label>'
         '<label class="ua-upgrades-toggle">'
         '<span class="ua-upgrades-label">Heatmap</span>'
         '<input type="checkbox" id="mr-heatmap-toggle" class="ua-switch-input">'

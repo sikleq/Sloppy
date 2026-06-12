@@ -58,14 +58,14 @@ NAV_TABS = [
     ("main",       "Main",         "index.html"),
     ("changelogs", "Changelogs",   None),
     ("calendar",   "Calendar",     "calendar.html"),
-    ("materials",  "Materials",    "neutral_creeps.html"),
+    ("materials",  "Materials",    "neutral_stats.html"),
 ]
 
 
 # Materials sub-tabs — flat row rendered as a thin bar BELOW the main header
 # (so the header itself stays compact). Single source of truth.
 MATERIALS_SUBTABS = [
-    ("creeps",     "Neutral Creeps",    "neutral_creeps.html"),
+    ("creeps",     "Neutral Stats",     "neutral_stats.html"),
     ("abilities",  "Neutral Abilities", "neutral_abilities.html"),
     ("mana_items", "Mana Items",        "mana_items.html"),
     ("heroes_stats", "Hero Stats",      "heroes_stats.html"),
@@ -156,7 +156,7 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
 
 
 def render_materials_subnav(active, prefix=""):
-    """The Materials sub-tab bar (Neutral Creeps | Neutral Abilities | Mana
+    """The Materials sub-tab bar (Neutral Stats | Neutral Abilities | Mana
     Items) as a standalone strip — so pages with an inner scroll box can drop
     it inside that box rather than in the page header."""
     subpills = ''.join(

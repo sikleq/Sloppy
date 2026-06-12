@@ -4520,7 +4520,7 @@ def save_index_html():
     _INV_ITEMS = [
         ('patch',     'Changelogs', f'patches/{latest}.html' if latest else 'calendar.html'),
         ('calendar',  'Calendar',   'calendar.html'),
-        ('creeps',    'Creeps',     'neutral_creeps.html'),
+        ('creeps',    'Neutral Stats', 'neutral_stats.html'),
         ('mana',      'Mana Items', 'mana_items.html'),
         ('dynamics',  'Dynamics',   'heroes_dyn.html'),
         ('terrain',   'Terrain',    'terrain.html'),

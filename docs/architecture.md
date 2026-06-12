@@ -31,7 +31,7 @@ patches/<version>.html        (final site output)
 Running `python build_patch.py` writes: one HTML file per patch (under `patches/`),
 `index.html`, `calendar.html`, `_ability_icons.txt`, and `data/site_meta.json`.
 `styles.css` / `scripts.js` are **source files, not outputs** (they're read, not
-written). The tables — `neutral_creeps.html`, `neutral_abilities.html`, `mana_items.html` —
+written). The tables — `neutral_stats.html`, `neutral_abilities.html`, `mana_items.html` —
 are built separately by `build_creeps.py` / `build_mana_items.py` (run AFTER
 `build_patch.py`; see [tables.md](tables.md)).
 
@@ -72,7 +72,7 @@ The autodetector is right ~80% of the time. Tag classification, `l=True` placeme
 `styles.css` and `scripts.js` at the repo root are **hand-edited source files**, shared
 by every page. They are **linked, not embedded**: patch pages reference
 `../styles.css?v=…` / `../scripts.js?v=…`, and root pages (`index.html`,
-`calendar.html`, `neutral_creeps.html`, …) reference `styles.css?v=…` / `scripts.js?v=…`.
+`calendar.html`, `neutral_stats.html`, …) reference `styles.css?v=…` / `scripts.js?v=…`.
 `build_patch.py` reads them from disk at module load (e.g. into `JS_TEXT`) and stamps
 a cache-busting `?v=` asset version — editing happens in one place, no copy is embedded.
 
