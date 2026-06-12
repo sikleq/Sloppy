@@ -5952,7 +5952,12 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   border-right: 2px solid rgba(170, 220, 240, 0.30);
 }
 /* Cell holding one dyn-cell pill (or the empty-diamond pseudo). */
-.heroes-dyn-table td.hd-cell { text-align: center; vertical-align: middle; padding: 2px; }
+.heroes-dyn-table td.hd-cell {
+  text-align: center;
+  vertical-align: middle;
+  padding: 2px;
+  line-height: 0;
+}
 /* Trailing spacer column: fills the reserved right-edge gutter (where the last
    patch column's 2.5× hover-pop overflows) with a clipped slice of an empty
    column, so the grid reaches the box edge instead of ending in blank space.

@@ -133,11 +133,53 @@
   // ---- TAG FILTERING (multi-select, OR semantics) ----
   const buttons = document.querySelectorAll('.filter-btn');
   const activeFilters = new Set();
+  function elementVisible(el) {
+    return !!el && !el.classList.contains('f-hide') && !el.classList.contains('cat-hide');
+  }
+  function refreshPatchFilterLayout() {
+    document.querySelectorAll('ul.changes').forEach(ul => {
+      const hasVisible = Array.from(ul.children).some(elementVisible);
+      ul.classList.toggle('f-hide', !hasVisible);
+    });
+    document.querySelectorAll('h4.ability-title').forEach(h => {
+      let nx = h.nextElementSibling;
+      while (nx && nx.tagName !== 'UL') nx = nx.nextElementSibling;
+      h.classList.toggle('f-hide', !elementVisible(nx));
+    });
+    document.querySelectorAll('.ability-block').forEach(block => {
+      const ul = block.querySelector('ul.changes');
+      block.classList.toggle('f-hide', !elementVisible(ul));
+    });
+    document.querySelectorAll('.entity-block').forEach(block => {
+      const visibleLi = block.querySelectorAll('ul.changes > li:not(.f-hide):not(.cat-hide)').length;
+      const visibleSwaps = block.querySelectorAll('.ability-change:not(.f-hide):not(.cat-hide)').length;
+      const visiblePanels = Array.from(block.children).some(child =>
+        child.matches('.components-box, .components-change, .provides-box, .properties-change') &&
+        elementVisible(child)
+      );
+      block.classList.toggle('f-hide', !visibleLi && !visibleSwaps && !visiblePanels);
+    });
+    document.querySelectorAll('h4.subgroup').forEach(h => {
+      let nx = h.nextElementSibling;
+      let hasVisibleContent = false;
+      while (nx && !nx.matches('h4.subgroup')) {
+        if (elementVisible(nx)) {
+          hasVisibleContent = true;
+          break;
+        }
+        nx = nx.nextElementSibling;
+      }
+      h.classList.toggle('f-hide', !hasVisibleContent);
+    });
+  }
   function applyFilter() {
     const isActive = activeFilters.size > 0;
     document.body.classList.toggle('filter-active', isActive);
     document.querySelectorAll('.f-hide').forEach(el => el.classList.remove('f-hide'));
-    if (!isActive) return;
+    if (!isActive) {
+      refreshPatchFilterLayout();
+      return;
+    }
     document.querySelectorAll('ul.changes > li').forEach(li => {
       const tags = (li.dataset.tag || '').split(' ').filter(Boolean);
       // Items whose recipe changed (entity-block.is-changed) count as REWORK
@@ -152,28 +194,7 @@
       const tags = (block.dataset.tag || '').split(' ').filter(Boolean);
       if (!tags.some(t => activeFilters.has(t))) block.classList.add('f-hide');
     });
-    document.querySelectorAll('ul.changes').forEach(ul => {
-      const hasVisible = Array.from(ul.children).some(c => !c.classList.contains('f-hide'));
-      if (!hasVisible) ul.classList.add('f-hide');
-    });
-    document.querySelectorAll('h4.ability-title').forEach(h => {
-      let nx = h.nextElementSibling;
-      while (nx && nx.tagName !== 'UL') nx = nx.nextElementSibling;
-      if (!nx || nx.classList.contains('f-hide')) h.classList.add('f-hide');
-    });
-    // Hide the entire ability-block (icon + title + ul) if its ul is hidden,
-    // otherwise the floating icon stays visible without any text.
-    document.querySelectorAll('.ability-block').forEach(block => {
-      const ul = block.querySelector('ul.changes');
-      if (!ul || ul.classList.contains('f-hide')) {
-        block.classList.add('f-hide');
-      }
-    });
-    document.querySelectorAll('.entity-block').forEach(block => {
-      const visibleLi    = block.querySelectorAll('ul.changes > li:not(.f-hide)').length;
-      const visibleSwaps = block.querySelectorAll('.ability-change:not(.f-hide)').length;
-      if (!visibleLi && !visibleSwaps) block.classList.add('f-hide');
-    });
+    refreshPatchFilterLayout();
   }
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -212,6 +233,7 @@
       el.classList.remove('cat-hide');
       if (on && !activeCats.has(el.dataset.section)) el.classList.add('cat-hide');
     });
+    refreshPatchFilterLayout();
   }
   catButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -995,10 +1017,12 @@
     const search = document.getElementById('hd-hero-search');
     const page = table.closest('.creeps-page');
     const delToggle = document.getElementById('hd-show-deleted');
+    const attackBtns = [...document.querySelectorAll('.hs-attack-filter')];
     const priceMin = document.getElementById('hd-price-min');
     const priceMax = document.getElementById('hd-price-max');
     const priceClear = document.getElementById('hd-price-clear');
     const rows = [...table.querySelectorAll('tbody tr')];
+    let attackFilter = '';
     const applyRowFilters = () => {
       const terms = search
         ? search.value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean)
@@ -1038,6 +1062,7 @@
         });
         // data-current="0" = removed from the game → shown only when "Show deleted".
         const okDel = showDeleted || tr.dataset.current !== '0';
+        const okAttack = !attackFilter || tr.dataset.attackType === attackFilter;
         // Price: items without data-price (neutrals/enchants = free) are EXEMPT.
         let okPrice = true;
         const p = tr.dataset.price;
@@ -1046,12 +1071,24 @@
           if (hasLo && v < lo) okPrice = false;
           if (hasHi && v > hi) okPrice = false;
         }
-        tr.style.display = (okSearch && okDd && okDel && okPrice) ? '' : 'none';
+        tr.style.display = (okSearch && okDd && okDel && okAttack && okPrice) ? '' : 'none';
+      });
+      attackBtns.forEach(btn => {
+        const active = btn.dataset.attackFilter === attackFilter;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
       });
     };
     if (search) search.addEventListener('input', applyRowFilters);
     if (page) initHdDropdowns(page, applyRowFilters);
     if (delToggle) delToggle.addEventListener('change', applyRowFilters);
+    attackBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const next = btn.dataset.attackFilter || '';
+        attackFilter = attackFilter === next ? '' : next;
+        applyRowFilters();
+      });
+    });
     if (priceMin) priceMin.addEventListener('input', applyRowFilters);
     if (priceMax) priceMax.addEventListener('input', applyRowFilters);
     if (priceClear) priceClear.addEventListener('click', () => {

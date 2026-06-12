@@ -145,7 +145,8 @@ def _roster(manifest, roster_key, kind):
 def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                     icon_dir, from_token, search_ph, blurb,
                     current_toggle=False, class_filter=False, price_filter=False,
-                    category_filter=False):
+                    category_filter=False, attack_filter=False,
+                    row_meta_by_slug=None):
     """Render a Dynamics matrix page. See module docstring for the params.
 
     current_toggle — add an "In game" switch (left of Buff vs nerf) that hides
@@ -164,6 +165,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     patches = list(reversed(manifest.get("patches", [])))
     entities = manifest.get("entities", {})
     rows_data = _roster(manifest, roster_key, kind)
+    row_meta_by_slug = row_meta_by_slug or {}
 
     nav = _site.render_top_nav('materials', _latest_href(),
                                patch_context=False, subtabs_active=subtab,
@@ -270,6 +272,9 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         cells.append('<td class="hd-cell hd-empty hd-spacer"></td>')
         # Row metadata for the items_dyn filters (absent on heroes_dyn).
         tr_attr = ""
+        row_meta = row_meta_by_slug.get(slug) or {}
+        if row_meta.get("attack_type"):
+            tr_attr += f' data-attack-type="{_esc(row_meta["attack_type"])}"'
         if "class" in h:
             tr_attr += f' data-class="{_esc(h["class"])}"'
         if "current" in h:
@@ -315,6 +320,18 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         'Show items no longer in the game — removed or cycled out of the pool '
         '(hidden by default)', False
     ) if current_toggle else ''
+    attack_block = (
+        '<span class="hs-attack-filter-group" aria-label="Attack type filter">'
+        '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
+        'aria-pressed="false" title="Show melee heroes">'
+        '<span class="atk-badge" aria-hidden="true">'
+        '<img src="icons/ui/atk_melee.png" alt=""></span><span>Melee</span></button>'
+        '<button type="button" class="hs-attack-filter" data-attack-filter="ranged" '
+        'aria-pressed="false" title="Show ranged heroes">'
+        '<span class="atk-badge" aria-hidden="true">'
+        '<img src="icons/ui/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
+        '</span>'
+    ) if attack_filter else ''
     # Class filter (sits right of Remove): ONE multi-select dropdown (Type) — pick
     # any combination of Items / Neutral Items / Enchantments. Default: Items only.
     if class_filter:
@@ -367,6 +384,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         # price, tag chips, and the full-width search on its own bottom row.
         + class_block
         + category_block
+        + attack_block
         + _switch('hd-hide-old', 'Hide old',
                   'Show only the most recent patches that fit the width '
                   '(latest at the right edge); off shows every patch', True)
