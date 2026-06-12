@@ -747,11 +747,11 @@ COLUMNS = [
 
     # ── Attributes ─────────────────────────────────────────────────────
     _col("str",      "STR",      fn_base=_f("AttributeBaseStrength")),
-    _col("str_gain", "STR/lvl",  fn_base=_f("AttributeStrengthGain")),
+    _col("str_gain", "STR+",     fn_base=_f("AttributeStrengthGain")),
     _col("agi",      "AGI",      fn_base=_f("AttributeBaseAgility")),
-    _col("agi_gain", "AGI/lvl",  fn_base=_f("AttributeAgilityGain")),
+    _col("agi_gain", "AGI+",     fn_base=_f("AttributeAgilityGain")),
     _col("int",      "INT",      fn_base=_f("AttributeBaseIntelligence")),
-    _col("int_gain", "INT/lvl",  fn_base=_f("AttributeIntelligenceGain")),
+    _col("int_gain", "INT+",     fn_base=_f("AttributeIntelligenceGain")),
     _col("gper",     "Gains/lvl",       mode="extra", fmt=_g1, fn_base=_gains_per_level),
 
     # ── Defenses ──────────────────────────────────────────────────────
@@ -804,7 +804,7 @@ _EXTRA_COLS = {
                       fn_base=_armor_pct_base, fn_starting=_armor_pct_l1,
                       disp_base=lambda s, h, r: _gpct(_armor_pct_base(s, h, r)),
                       disp_starting=lambda s, h, r: _gpct(_armor_pct_l1(s, h, r))),
-    "t_per_attack": _col("t_per_attack", "Time to hit", mode="extra", pol="lo",
+    "t_per_attack": _col("t_per_attack", "Time to hit", pol="lo",
                          fn_base=_t_per_attack_base,
                          fn_starting=_t_per_attack_l1),
 }

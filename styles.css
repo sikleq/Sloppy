@@ -111,6 +111,12 @@ body.patch-page .entity-block {
 body.patch-page h2.section + .entity-block {
   border-top: 0;
 }
+/* While filtering, the first SURVIVING block in a section (marked by
+   refreshPatchFilterLayout) drops its top hairline too, so no orphan line sits
+   between the category header and the first kept entry. */
+body.patch-page .entity-block.first-visible {
+  border-top: 0;
+}
 body.patch-page .entity {
   margin: 0 -22px 10px;
   padding: 10px 22px 9px;
@@ -377,6 +383,20 @@ body:has(.creeps-page) nav.top-nav {
   opacity: 1;
   text-shadow: 0 0 8px rgba(227, 196, 106, 0.45);
 }
+/* Colour emoji inside a signature (Telegram names sometimes carry a gold star,
+   blue check, party popper, etc.) → flatten to the sig's own colour. Classic
+   transparent-text + zero-offset text-shadow trick: the glyph silhouette is
+   painted in the shadow colour, which we tie to currentColor so VIP/regular/
+   lit/hidden variants all inherit the right tone. Wider 0-radius shadows
+   sharpen the silhouette without bleeding into surrounding text. */
+.inv-emo {
+  color: transparent !important;
+  text-shadow: 0 0 0 currentColor;
+}
+/* The .is-lit gold glow above sets a non-zero text-shadow on the whole sig —
+   override on the emoji wrapper so its silhouette stays sharp and the glow
+   doesn't double up around the emoji shape. */
+.inv-sig.is-lit .inv-emo { text-shadow: 0 0 0 currentColor; }
 /* Laser the Premium star fires at a name as it lights up (JS positions/animates
    each beam). Thin gold ray with a soft glow, drawn over everything. */
 .sig-beam-layer {
@@ -522,6 +542,12 @@ body:has(.creeps-page) nav.top-nav {
 .inv-cell-dynamics:hover .inv-icon {
   content: url('icons/ui/gothic/icon_dynamics.gif');
 }
+/* Items: closed chest at rest; on hover a chest-open APNG plays once — a key
+   flies in, inserts and turns, the lid pops open (chest squashes wider) and a
+   gold light beam + treasure spill out. Driven from scripts.js (JS src-swap
+   with a ?v= cache-bust) — NOT CSS content:url — so the APNG replays from the
+   first frame on EVERY hover instead of holding its last frame. Reverts to the
+   closed PNG on mouse-out. APNG (not GIF) for the translucent beam glow. */
 /* Calendar: on hover the date page burns away (gold pixel fire) and a new date
    appears, looping 1→31. Driven from scripts.js (JS src-swap with a cache-bust)
    instead of `content: url()` — the calendar GIF filename predates the others, so
@@ -614,6 +640,8 @@ body:has(.creeps-page) nav.top-nav {
   .spark { display: none; }
   .inv-cell-terrain:hover .inv-icon { animation: none; }
   .dirt { display: none; }
+  /* (Chest APNG swap is JS-driven and already guarded by the same media query
+     in scripts.js, so no rule is needed here.) */
 }
 .inv-cap {
   max-width: 86px;
@@ -1093,6 +1121,12 @@ body:has(.creeps-page) nav.top-nav {
   font-size: 21px;
   padding: 0 16px;
 }
+/* Materials sub-nav context: the nav-inner grid is align-items:center, but
+   .nav-context carries margin-bottom:8px to nudge the patch-page picker up
+   against the tab row. On Materials (and other flat pages) that margin
+   shifts the static label ABOVE the main-nav buttons' baseline. Cancel it
+   so the version-static box sits at the same vertical centre as .nav-tab. */
+.nav-context.nav-context-materials { margin-bottom: 0; }
 .nav-context .version-chev {
   font-size: 14px;
   color: #a8b3bd;
@@ -4645,7 +4679,10 @@ body.cat-filter-active .cat-hide { display: none !important; }
 }
 
 /* === FILTER MODE === */
-body.filter-active h2.section { display: none; }
+/* Keep the category header (h2.section: General/Item/Neutral Item/Hero Updates)
+   VISIBLE while filtering so each surviving group is labelled with its category.
+   Empty sections are collapsed wholesale by refreshPatchFilterLayout()
+   (section.cat-panel → f-hide), so only non-empty sections keep their header. */
 body.filter-active h4.subgroup { display: none; }
 body.filter-active ul.subnotes { display: none; }
 /* Hide filtered elements via .f-hide class set by JS */
@@ -5824,6 +5861,15 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   font: inherit;
   text-align: center;
   font-variant-numeric: tabular-nums;
+  /* Hide native number-spinner controls — easy to misclick when aiming at
+     the field itself. Keyboard +/- + scroll-wheel still work. */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.hs-level-group input::-webkit-outer-spin-button,
+.hs-level-group input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 .hs-level-group input:focus {
   outline: none;

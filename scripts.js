@@ -171,6 +171,28 @@
       }
       h.classList.toggle('f-hide', !hasVisibleContent);
     });
+    // Collapse a whole category section (section.cat-panel, incl. its h2.section
+    // header + slab) when every entity inside it was filtered out — otherwise an
+    // emptied section leaves a bare slab strip between two visible sections.
+    // Runs AFTER the entity-block pass above so each block's f-hide is settled.
+    document.querySelectorAll('section.cat-panel').forEach(panel => {
+      const hasVisible = panel.querySelector(
+        '.entity-block:not(.f-hide):not(.cat-hide), ' +
+        '.ability-change:not(.f-hide):not(.cat-hide)'
+      );
+      panel.classList.toggle('f-hide', !hasVisible);
+    });
+    // The entity-block top hairline is suppressed on the section's FIRST block
+    // (`h2.section + .entity-block`), but once filtering hides earlier blocks the
+    // first SURVIVING block isn't that one anymore → an orphan line appears under
+    // the category header. Re-mark the first visible block per section so CSS can
+    // drop its top border.
+    document.querySelectorAll('.entity-block.first-visible')
+      .forEach(b => b.classList.remove('first-visible'));
+    document.querySelectorAll('section.cat-panel:not(.f-hide)').forEach(panel => {
+      const first = panel.querySelector('.entity-block:not(.f-hide):not(.cat-hide)');
+      if (first) first.classList.add('first-visible');
+    });
   }
   function applyFilter() {
     const isActive = activeFilters.size > 0;
@@ -1330,12 +1352,19 @@
 
   // Show the level number once per consecutive run; blank the repeats and
   // draw the group divider (tier-break) at each run start. Works in any
-  // row order, so the grouped look survives sorting by level.
+  // row order, so the grouped look survives sorting by level. Visibility-
+  // aware: rows hidden by filter (mr-attack-out / mr-filtered-out /
+  // mr-search-out → display:none) don't participate in run tracking — else
+  // a hidden "first of group" row would leave the next visible row blank
+  // (the bug behind the ranged filter losing all level labels).
   function collapseLevels(rows) {
     let prev = null;
     rows.forEach(tr => {
       const cell = tr.querySelector('.lvl-cell');
       if (!cell) return;
+      if (tr.classList.contains('mr-attack-out')
+          || tr.classList.contains('mr-filtered-out')
+          || tr.classList.contains('mr-search-out')) return;
       const lvl = cell.dataset.lvl;
       if (lvl !== prev) { cell.textContent = lvl; tr.classList.add('tier-break'); }
       else { cell.textContent = ''; tr.classList.remove('tier-break'); }
@@ -1369,6 +1398,10 @@
     });
   }
   const groupRows = isUA ? groupByUnit : collapseLevels;
+  // Expose to the attack-type filter (lives in a sibling IIFE) so it can
+  // re-run grouping after hiding rows — else hidden "first of run" rows
+  // leave the next visible row with a blank lvl cell.
+  table._groupRows = groupRows;
 
   // Merge consecutive identical ability cells into one rowspanned cell (only
   // in the default order — sorting reads cells by column index, so we un-merge
@@ -1843,12 +1876,68 @@
   const firstRow = table.querySelector('tbody tr');
   if (!firstRow) return;
 
+  // Pin sticky-column widths to their FULL-roster initial measurement so the
+  // attack-type filter (display:none on hidden rows) can't reshape the lvl /
+  // icon / name columns when the visible roster changes. With table-layout:
+  // auto, min-width alone only sets a floor — the browser can still GROW
+  // pinned columns when other (non-sticky) columns shrink and the table's
+  // `min-width:100%` forces it back to container width. Pin min + max + width
+  // on the col-row sticky <th>s, AND pin icon col individually via every
+  // body row's .creep-icon-cell (the Юнит th's colspan=2 only pins the
+  // icon+name SUM, not their internal ratio). Run once on init, before any
+  // filter has a chance to fire.
+  (function pinStickyCols() {
+    if (table.classList.contains('heroes-dyn-table')) return;
+    const tds = [...firstRow.children];
+    if (tds.length < 3) return;
+    const wLvl  = Math.ceil(tds[0].getBoundingClientRect().width);
+    const wIcon = Math.ceil(tds[1].getBoundingClientRect().width);
+    const wName = Math.ceil(tds[2].getBoundingClientRect().width);
+    const pin = (el, w) => {
+      el.style.minWidth = w + 'px';
+      el.style.maxWidth = w + 'px';
+      el.style.width    = w + 'px';
+    };
+    const headStickies = table.querySelectorAll('thead tr.col-row th.sticky-col');
+    // Two head shapes share this IIFE:
+    //   • Neutral Stats (.creeps-table.mode-standard): 2 sticky <th>s — lvl
+    //     and "Юнит" (colspan=2 over icon+name). Second th gets wIcon+wName.
+    //   • Unit Abilities (.unit-abilities-table): 3 sticky <th>s — lvl, unit,
+    //     ability, all individual. Each th gets its own body-cell width.
+    // Differentiator = sticky-th count, not table class — keeps the code
+    // ready for any future creeps-table variant.
+    if (headStickies.length === 2) {
+      pin(headStickies[0], wLvl);
+      pin(headStickies[1], wIcon + wName);   // colspan'd Юнит
+    } else if (headStickies.length >= 3) {
+      pin(headStickies[0], wLvl);
+      pin(headStickies[1], wIcon);
+      pin(headStickies[2], wName);
+    }
+    // Pin icon AND name cols individually on every body row. The Юнит th's
+    // colspan=2 only pins the icon+name SUM — max-width on a colspan'd cell
+    // doesn't enforce per-column limits in auto layout, so the name col can
+    // still grow/shrink with its widest visible content (Forest Troll
+    // Berserker disappearing on melee filter was the trigger). Pinning both
+    // body cols freezes the internal split. Covers both tables — the
+    // selectors match Neutral Stats (.col-name) and UA (.ua-ability) cells.
+    table.querySelectorAll('tbody tr > td.creep-icon-cell.sticky-col')
+      .forEach(td => pin(td, wIcon));
+    table.querySelectorAll('tbody tr > td.col-name.sticky-col, tbody tr > td.ua-ability.sticky-col')
+      .forEach(td => pin(td, wName));
+  })();
+
   // Body identity cells are the first three: lvl(0), icon(1), name(2).
   // The header has only two cells over them: lvl th(0) + Юнит th(1,
   // colspan=2). Compute cumulative left offsets from the body widths and
   // apply them to both the body sticky cells and the header sticky cells.
   function applyLeftOffsets() {
-    const tds = [...firstRow.children];
+    // Use the first VISIBLE row — once attack-type filter is applied, the
+    // cached firstRow may be display:none, making its getBoundingClientRect
+    // collapse to zero and breaking sticky lefts.
+    const measureRow = [...table.querySelectorAll('tbody tr')]
+      .find(tr => tr.offsetParent !== null) || firstRow;
+    const tds = [...measureRow.children];
     if (tds.length < 3) return;
     const wLvl  = tds[0].getBoundingClientRect().width;
     const wIcon = tds[1].getBoundingClientRect().width;
@@ -2015,6 +2104,11 @@
           btn.classList.toggle('active', active);
           btn.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
+        // Re-collapse level labels over the now-visible row subset (else
+        // hidden "first of group" rows blank the next visible row's lvl).
+        if (table._groupRows) {
+          table._groupRows([...table.querySelectorAll('tbody tr')]);
+        }
         applyLeftOffsets();
       };
       attackBtns.forEach(btn => {
@@ -3149,6 +3243,39 @@
   const GIF = 'icons/ui/gothic/icon_calendar.gif?v=' + Date.now();
   tile.addEventListener('mouseenter', () => { img.src = GIF; });
   tile.addEventListener('mouseleave', () => { img.src = PNG; });
+})();
+
+// ---- ITEMS tile: hover plays a one-shot chest-OPEN intro (key flies in → lid
+// opens → gold beam + treasure), then LOOPS the open chest with the beam + gold
+// glints twinkling for as long as it's hovered. Two APNGs swapped via JS (a
+// single animation can't play an intro once then loop only its tail — same
+// pattern as the mana fill+wave). The ?v= cache-bust forces each to restart
+// from frame 0. Reverts to the closed PNG on mouse-out. Skipped under
+// prefers-reduced-motion (stays closed). INTRO_MS must match the generator's
+// printed intro duration (scripts/gen_chest_icon.py).
+(function () {
+  const tile = document.querySelector('.inv-cell-items');
+  if (!tile) return;
+  const img = tile.querySelector('.inv-icon');
+  if (!img) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const PNG = img.getAttribute('src');
+  const OPEN = 'icons/ui/gothic/icon_chest_open.png';   // intro, plays once
+  const LOOP = 'icons/ui/gothic/icon_chest_loop.png';   // open + glints, loops
+  const INTRO_MS = 1060;
+  // Preload + decode both APNGs so swapping src mid-hover is instant — without
+  // this the browser fetches the loop on first swap and the beam visibly stalls.
+  [OPEN, LOOP].forEach(s => { const p = new Image(); p.src = s; });
+  let timer = null;
+  tile.addEventListener('mouseenter', () => {
+    clearTimeout(timer);
+    img.src = OPEN + '?v=' + Date.now();
+    timer = setTimeout(() => { img.src = LOOP + '?v=' + Date.now(); }, INTRO_MS);
+  });
+  tile.addEventListener('mouseleave', () => {
+    clearTimeout(timer);
+    img.src = PNG;
+  });
 })();
 
 // ---- MANA ITEMS tile: hover plays a one-shot FILL (empty→half), then loops the

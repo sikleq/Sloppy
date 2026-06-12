@@ -32,6 +32,7 @@ def save_items_dyn_html():
         class_filter=True,
         price_filter=True,
         category_filter=True,
+        preserve_roster_order=True,
         blurb=(
             "Every item down the side, every patch across the top — regular items, "
             "neutral items and enchantments together. Each diamond is that item’s "

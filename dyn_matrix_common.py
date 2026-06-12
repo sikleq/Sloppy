@@ -124,12 +124,18 @@ def _load_manifest():
         return _json.load(f)
 
 
-def _roster(manifest, roster_key, kind):
-    """Full alphabetical roster as [{name, icon, key}]. Prefer the explicit
-    roster build_patch.py writes (manifest[roster_key]); fall back to deriving it
-    from the entities of this kind if an older _dynamics.json is in place."""
+def _roster(manifest, roster_key, kind, *, preserve_order=False):
+    """Full roster as [{name, icon, key}]. Prefer the explicit roster
+    build_patch.py writes (manifest[roster_key]); fall back to deriving it from
+    the entities of this kind if an older _dynamics.json is in place.
+
+    preserve_order=True keeps the order from the manifest verbatim (items_dyn
+    uses this to get its category-grouped default — build_patch.py already
+    sorted by class → category → tier → name). Otherwise alpha-by-name."""
     roster = manifest.get(roster_key)
     if roster:
+        if preserve_order:
+            return list(roster)
         return sorted(roster, key=lambda h: h["name"].lower())
     derived = []
     for key, rec in manifest.get("entities", {}).items():
@@ -146,7 +152,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                     icon_dir, from_token, search_ph, blurb,
                     current_toggle=False, class_filter=False, price_filter=False,
                     category_filter=False, attack_filter=False,
-                    row_meta_by_slug=None):
+                    row_meta_by_slug=None, preserve_roster_order=False):
     """Render a Dynamics matrix page. See module docstring for the params.
 
     current_toggle — add an "In game" switch (left of Buff vs nerf) that hides
@@ -164,7 +170,8 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     # latest patch is the rightmost column; scripts.js keeps it flush right).
     patches = list(reversed(manifest.get("patches", [])))
     entities = manifest.get("entities", {})
-    rows_data = _roster(manifest, roster_key, kind)
+    rows_data = _roster(manifest, roster_key, kind,
+                        preserve_order=preserve_roster_order)
     row_meta_by_slug = row_meta_by_slug or {}
 
     nav = _site.render_top_nav('materials', _latest_href(),

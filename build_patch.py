@@ -4575,8 +4575,9 @@ def save_index_html():
         _link_tile('calendar'),
         # Creeps opener keeps the beetle-crawl hover (.inv-cell-creeps).
         _opener_tile('creeps', 'Creeps', 'creeps', 'icon_creeps.png'),
-        # Items / Heroes openers use placeholder gothic icons (no hover anim).
-        _opener_tile('items', 'Items', 'items', 'icon_materials.png'),
+        # Items opener: closed treasure chest at rest; hover plays the chest-open
+        # APNG (key → lid opens → gold beam + treasure). See .inv-cell-items CSS.
+        _opener_tile('items', 'Items', 'items', 'icon_chest.png'),
         _opener_tile('heroes', 'Heroes', 'heroes', 'icon_hat.png'),
         _link_tile('terrain'),
     ]
@@ -4782,9 +4783,40 @@ def save_index_html():
     _vip_lower = {v.lower() for v in _VIP_NAMES}
     _names = [u for u in _names if u.lower() not in _vip_lower]
 
+    # Telegram display names sometimes contain colour emoji — gold star, blue
+    # check, party popper, etc. Rendered raw they break the signature wall's
+    # uniform palette (the sigs are supposed to read as a single monochrome
+    # crowd). Wrap each emoji run in <span class="inv-emo"> so CSS can flatten
+    # it to the current text colour via the classic transparent-text + 0,0,0
+    # text-shadow trick (works on colour-emoji glyphs cross-browser).
+    _EMO_RE = re.compile(
+        '['
+        '\U0001F1E6-\U0001F1FF'   # regional indicators (flags)
+        '\U0001F300-\U0001F5FF'   # symbols & pictographs
+        '\U0001F600-\U0001F64F'   # emoticons
+        '\U0001F680-\U0001F6FF'   # transport & map
+        '\U0001F700-\U0001F77F'
+        '\U0001F780-\U0001F7FF'
+        '\U0001F800-\U0001F8FF'
+        '\U0001F900-\U0001F9FF'   # supplemental symbols
+        '\U0001FA00-\U0001FA6F'
+        '\U0001FA70-\U0001FAFF'   # symbols extended-A
+        '☀-➿'            # misc symbols + dingbats (star, check, etc.)
+        '⌀-⏿'            # misc technical (gear, hourglass)
+        '⬀-⯿'            # arrows extended
+        ']+'
+    )
+
+    def _wrap_emoji(s: str) -> str:
+        # Escape HTML first so user-supplied < > & stay safe, then wrap any
+        # emoji runs (which html.escape passes through verbatim).
+        return _EMO_RE.sub(
+            lambda m: f'<span class="inv-emo">{m.group(0)}</span>',
+            _html.escape(s))
+
     _sigs = ''.join(
-        f'<span class="inv-sig inv-sig-vip">{_html.escape(v)}</span>' for v in _VIP_NAMES)
-    _sigs += ''.join(f'<span class="inv-sig">{_html.escape(u)}</span>' for u in _names)
+        f'<span class="inv-sig inv-sig-vip">{_wrap_emoji(v)}</span>' for v in _VIP_NAMES)
+    _sigs += ''.join(f'<span class="inv-sig">{_wrap_emoji(u)}</span>' for u in _names)
     if _hidden > 0:
         _sigs += f'<span class="inv-sig inv-sig-hidden">Hidden (x{_hidden})</span>'
     sig_layer = f'<div class="inv-signatures" aria-hidden="true">{_sigs}</div>'
@@ -17896,6 +17928,27 @@ def _load_neutral_pool_current():
 
 
 _NEUTRAL_POOL_CURRENT = _load_neutral_pool_current()
+
+
+def _load_neutral_tier_map():
+    """{game slug → tier int} from data/itemlist.json. Used to sort neutrals by
+    tier 1-5 in the items_dyn default order. Cycled-out neutrals have
+    `neutral_item_tier` = -1; we keep them but bucket as tier 99 so they sort
+    after the live pool (still ahead of enchants). Empty dict if itemlist is
+    missing — neutrals then fall back to alpha within the neutral block."""
+    path = _os.path.join(_os.path.dirname(__file__), "data", "itemlist.json")
+    try:
+        data = _json.load(open(path, encoding="utf-8"))
+        items = data["result"]["data"]["itemabilities"]
+    except (OSError, KeyError, ValueError):
+        return {}
+    return {it["name"]: (it.get("neutral_item_tier") if it.get("neutral_item_tier", -1) >= 0
+                          else 99)
+            for it in items
+            if not it["name"].startswith("item_recipe_")}
+
+
+_NEUTRAL_TIER_BY_SLUG = _load_neutral_tier_map()
 # Items that never shipped — excluded from the matrix entirely:
 #  • vestigial neutrals flagged BOTH neutral AND SpeciallyBannedFromNeutralSlot
 #    (Greater Mango / Greater Faerie Fire);
@@ -17968,9 +18021,9 @@ _NEUTRAL_CYCLED.update(_NEUTRAL_REMOVED_MANUAL)   # manual (Liquipedia) wins on 
 _SHOP_CATEGORY_ORDER = [
     ("consumables", "Consumables"), ("attributes", "Attributes"),
     ("weapons_armor", "Equipment"), ("misc", "Miscellaneous"),
+    ("secretshop", "Secret Shop"),
     ("basics", "Accessories"), ("support", "Support"), ("magics", "Magical"),
     ("defense", "Armor"), ("weapons", "Weapons"), ("artifacts", "Armaments"),
-    ("secretshop", "Secret Shop"),
 ]
 _SHOP_CATEGORY_OTHER = "Other"  # regular items not in any shop tab (boss rewards,
 #                                 collectibles, Aghanim's Blessing, removed items)
@@ -18216,6 +18269,7 @@ def _load_full_game_items():
         out.append({"_gslug": gslug, "name": nm, "icon": icon, "class": cls,
                     "current": current, "added": added, "removed": removed,
                     "category": _item_category(gslug, cls),
+                    "tier": _NEUTRAL_TIER_BY_SLUG.get(gslug) if cls == "neutral" else None,
                     "price": price})
     return out
 
@@ -18257,6 +18311,7 @@ for _k, _r in _State.dynamics.items():
         "class": _cls, "current": _current,
         "added": _added_version(_icon), "removed": _removed,
         "category": _item_category("item_" + _icon, _cls),
+        "tier": _NEUTRAL_TIER_BY_SLUG.get("item_" + _icon) if _cls == "neutral" else None,
         "price": _cost if (_cost and _cost > 0) else None})
 # Add every real game item NOT touched in any tracked patch, so the matrix lists
 # ALL items (parity with heroes_dyn). Dedup by the icon's game slug — a touched item
@@ -18269,7 +18324,31 @@ for _e in _load_full_game_items():
         continue
     _e["key"] = "item|" + _e["icon"]
     _item_roster.append(_e)
-_item_roster.sort(key=lambda _d: _d["name"].lower())
+# Default (neutral-sort) row order in items_dyn:
+#  • regular items first, grouped by category in _SHOP_CATEGORY_ORDER (Consumables,
+#    Attributes, Equipment, Miscellaneous, Secret Shop, Accessories, Support, Magical,
+#    Armor, Weapons, Armaments), alpha within each category;
+#  • neutral items next, by tier 1→5 (then 99 = cycled-out), alpha within each tier;
+#  • enchantments last, alpha.
+# Clicking the Item header in the UI cycles through name-desc / name-asc; clicking
+# back to neutral state restores THIS order via the originalOrder snapshot in
+# scripts.js, so the user always returns to a category-grouped view.
+_CLASS_ORDER = {"regular": 0, "neutral": 1, "enchant": 2}
+_CAT_INDEX = {_disp: _i for _i, (_, _disp) in enumerate(_SHOP_CATEGORY_ORDER)}
+_CAT_INDEX[_SHOP_CATEGORY_OTHER] = len(_SHOP_CATEGORY_ORDER)  # Other after the named cats
+
+
+def _item_default_sort_key(_d):
+    _cls_rank = _CLASS_ORDER.get(_d.get("class"), 99)
+    _cat_rank = _CAT_INDEX.get(_d.get("category"), len(_CAT_INDEX)) \
+        if _d.get("class") == "regular" else 0
+    _tier_rank = _d.get("tier") if _d.get("class") == "neutral" else 0
+    if _tier_rank is None:
+        _tier_rank = 99
+    return (_cls_rank, _cat_rank, _tier_rank, _d["name"].lower())
+
+
+_item_roster.sort(key=_item_default_sort_key)
 # Ordered list of categories actually present (for the items_dyn Category dropdown).
 _present_cats = {_d.get("category") for _d in _item_roster if _d.get("category")}
 _item_cat_list = [_disp for _k, _disp in _SHOP_CATEGORY_ORDER if _disp in _present_cats]
