@@ -468,8 +468,17 @@ For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `neutral_stats
 - This applies even when the innate is conditional or unusual (example: Axe gaining Strength from armor while alone). If the site chooses to model that condition in Hero Stats, it must be expressed as an explicit toggle/assumption, not silently baked into raw values.
 - Current project rule: for Axe in Hero Stats, ignore the nearby-allies condition and model One Man Army as always active when `Innates` is enabled. That Strength bonus must flow through displayed STR and every derived stat it affects (HP, HP regen, damage, etc.).
 - For hero-level formulas phrased as `X + Y per level up`, the increment starts after level 1. In Hero Stats this means `(level - 1)`, not `level`. This matters for innate-derived computations too (example: Techies mana-pool regen).
+- Distinguish `per level up` from `per level`. `per level` includes level 1 immediately; do not silently convert it to `(level - 1)`. Techies mana-pool regen is the canonical example.
 - Derived stats in Hero Stats use whole attributes where the game truncates before applying conversions (example: Medusa mana at high levels). Do not use fractional attributes directly for HP / mana / primary-attribute damage when the in-game stat is based on floored attributes.
 - If an innate changes in a later patch (numbers changed, formula changed, reworked, or removed), Hero Stats must respect the patch-gated version of that innate for the selected patch history / latest snapshot logic. Do not assume innate formulas are timeless.
+- The main `Damage` column in Hero Stats shows average damage only. `Dmg min` / `Dmg max` belong to `Expanded` as separate columns.
+- If a hero has a stat-affecting innate that is actually modeled in Hero Stats, show the mini innate icon next to the hero name. The icon must disappear when the `Innates` toggle is off, and stay on the same line as the hero name.
+
+### Sticky divider overlays
+
+- The vertical blue sticky-divider line must clamp to the real visible table bottom, not the full scroll-box bottom. This prevents the line from hanging below short filtered result sets.
+- Divider visibility must depend on real horizontal overflow plus `scrollLeft > 0`, not just `scrollLeft > 0` in isolation.
+- In `heroes_dyn.html`, turning `Hide old` on resets `scrollLeft` to `0` before re-anchoring the divider. Anchor the divider from the sticky `Hero` header cell, not from a body row.
 
 ### Источники данных по рельефу (terrain)
 Главные источники координат карты (деревья/кэмпы/башни/тормент/гейты/лотосы по версиям):
