@@ -5036,62 +5036,72 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    so the row sits on one baseline. Font matches the brand block. */
 .nav-tabs {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   align-items: center;
   justify-self: center;
 }
+/* Game-panel nav buttons: warm dark background, 2px gold inset frame that follows
+   the chamfered clip-path, strong bevel, 3-tier colour system (dim→lit→pressed). */
 .nav-tab {
   font-family: 'Jersey 10', 'Courier New', monospace;
   font-size: 18px;
   letter-spacing: 1px;
   line-height: 1;
-  color: #d2d9e0;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  color: #756646;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.98);
   text-decoration: none;
-  height: 38px;                 /* matches the version picker on patch pages */
-  padding: 0 14px;
+  height: 36px;
+  padding: 0 16px;
   display: inline-flex;
   align-items: center;
-  border-radius: 0;
+  border: none;
   background:
     linear-gradient(180deg,
-      rgba(255, 244, 209, 0.025) 0%,
-      rgba(255, 244, 209, 0.0) 100%),
-    rgba(28, 32, 38, 0.84);
-  border: 1px solid rgba(122, 131, 144, 0.22);
+      rgba(70, 55, 18, 0.55) 0%,
+      rgba(12, 10, 4, 1.00) 100%),
+    #0d0b07;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.035),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.38);
-  transition: background 0.15s ease, color 0.15s ease,
-              border-color 0.15s ease, box-shadow 0.15s ease;
-  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
-    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
-    0 calc(100% - 2px), 0 2px);
+    inset 0 0 0 2px rgba(120, 98, 28, 0.50),   /* 2px gold frame */
+    inset 0 2px 0 rgba(255, 235, 140, 0.08),    /* top bevel */
+    inset 0 -2px 0 rgba(0, 0, 0, 0.92),         /* bottom shadow */
+    inset 2px 0 0 rgba(255, 235, 140, 0.04),    /* left bevel */
+    inset -2px 0 0 rgba(0, 0, 0, 0.70);         /* right shadow */
+  clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 5px,
+    100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%,
+    0 calc(100% - 5px), 0 5px);
+  transition: background 0.11s ease, color 0.11s ease, box-shadow 0.11s ease;
 }
 .nav-tab:hover {
-  color: #ffffff;
+  color: #c8a040;
   background:
     linear-gradient(180deg,
-      rgba(227, 196, 106, 0.05) 0%,
-      rgba(227, 196, 106, 0.015) 100%),
-    rgba(32, 36, 43, 0.96);
-  border-color: rgba(163, 135, 73, 0.24);
+      rgba(95, 74, 22, 0.70) 0%,
+      rgba(18, 14, 5, 1.00) 100%),
+    #131008;
+  box-shadow:
+    inset 0 0 0 2px rgba(195, 158, 48, 0.80),
+    inset 0 2px 0 rgba(255, 240, 145, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.92),
+    inset 2px 0 0 rgba(255, 240, 145, 0.09),
+    inset -2px 0 0 rgba(0, 0, 0, 0.70);
 }
-/* Active tab — gold "sikle" text colour + a pressed-into-the-header look via
-   a darker recessed background and an inset top shadow. */
+/* Active — pressed inward: deepest shadow up top, full gold frame, gold glow on text. */
 .nav-tab.active {
   color: #e3c46a;
   background:
     linear-gradient(180deg,
-      rgba(227, 196, 106, 0.065) 0%,
-      rgba(227, 196, 106, 0.018) 100%),
-    rgba(17, 20, 25, 0.98);
-  border-color: rgba(227, 196, 106, 0.28);
+      rgba(0, 0, 0, 0.65) 0%,
+      rgba(30, 22, 7, 0.98) 100%),
+    #090806;
   box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 244, 209, 0.05),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+    inset 0 0 0 2px rgba(227, 196, 106, 0.92),
+    inset 0 5px 12px rgba(0, 0, 0, 0.92),
+    inset 0 2px 0 rgba(0, 0, 0, 0.85),
+    inset 0 -1px 0 rgba(255, 230, 120, 0.06);
+  text-shadow:
+    0 0 14px rgba(227, 196, 106, 0.60),
+    0 0  5px rgba(227, 196, 106, 0.30),
+    0 1px 0  rgba(0, 0, 0, 0.98);
 }
 
 /* Materials sub-tabs — flat row of three browser-tab pills, hung BELOW the
