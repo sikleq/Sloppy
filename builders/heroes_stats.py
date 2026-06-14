@@ -1351,9 +1351,7 @@ def _attack_range_html(value: str, attack_type: str) -> str:
 
 
 def _attack_type(version: str, hero: str, raw: dict) -> str:
-    cap = str(_raw_field(raw, hero, "AttackCapabilities") or "")
-    if not cap or cap == str(_RAW_DEFAULTS["AttackCapabilities"]):
-        cap = _extract_hero_block(version, hero).get("AttackCapabilities", cap)
+    cap = _raw_field(raw, hero, "AttackCapabilities") or ""
     return "ranged" if "RANGED" in cap else "melee"
 
 

@@ -1277,7 +1277,16 @@ def save_creeps_html():
             cls.append('regen-zero')
         return ' '.join(cls)
 
+    CAMP_RANK = {'small': 1, 'mid': 2, 'big': 3, 'ancient': 4}
+
     def _sort_attr(k, value):
+        if k == 'camp' and value:
+            # Use the lowest rank present (single-camp creeps are common;
+            # multi-camp creeps get ranked by their primary/smallest camp).
+            ranks = [CAMP_RANK[t] for t in str(value).split(',') if t in CAMP_RANK]
+            if ranks:
+                return f' data-sort="{min(ranks)}"'
+            return ''
         if k not in ('hp_regen', 'mp_regen') or value in ('', '-'):
             return ''
         first = str(value).split(' ', 1)[0].replace(',', '.')

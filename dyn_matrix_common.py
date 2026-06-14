@@ -458,7 +458,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         f'<tr class="col-row">{head_html}</tr></thead>\n'
         f'<tbody>\n{chr(10).join(rows)}\n</tbody>\n'
         '</table>\n</div>\n</div>\n'
-        f'<script src="scripts.js?v={_site.compute_asset_version()}"></script>\n'
+        f'<script src="src/scripts.js?v={_site.compute_asset_version()}"></script>\n'
         '</body>\n</html>\n'
     )
     out = _os.path.join(_HERE, out_file)

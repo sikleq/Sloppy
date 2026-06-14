@@ -51,6 +51,7 @@ HERO_FIELDS = (
     "StatusHealth", "StatusMana", "StatusHealthRegen", "StatusManaRegen",
     "ArmorPhysical", "MagicalResistance",
     "AttackDamageMin", "AttackDamageMax", "AttackRate", "AttackRange",
+    "AttackCapabilities",
     "MovementSpeed",
     "AttributePrimary",
     "AttributeBaseStrength", "AttributeStrengthGain",

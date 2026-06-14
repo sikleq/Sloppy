@@ -139,7 +139,7 @@ body.patch-page .entity-block > .properties-change {
    so the cells, the change-row %s, and every bordered block (build / cost /
    provides / properties / ability-change) all share one right edge — uniform
    widths, no per-box nudge needed. */
-body.patch-page .patch-dynamics {
+body.patch-page .dyn-row-wrap {
   margin-left: 0;
   margin-right: 0;
 }
@@ -2263,15 +2263,71 @@ h2.section {
   flex: 1 1 auto;
   min-width: 0;
 }
-.patch-dynamics {
-  /* Pulled close to the right edge of the entity-block (which carries
-     14px side padding) via negative right-margin. */
+/* Outer wrapper: positions the cell row and provides an anchor for the
+   absolutely-placed nav arrows. The ::before pseudo extends the hover zone
+   so the cursor can slide from a cell onto an arrow without a gap. */
+.dyn-row-wrap {
+  position: relative;
   margin-left: auto;
   margin-right: -8px;
+}
+.dyn-row-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  left: -18px;
+  right: -18px;
+}
+.patch-dynamics {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 2px 4px;
+  position: relative;
+}
+/* Pixel-art navigation arrows — same visual language as .version-nav-arrow
+   (gold staircase SVG, octagonal clip, dark glass background).
+   Arrows are flex siblings of .patch-dynamics inside .dyn-row-wrap, so the
+   hover zone is continuous: cursor slides from a cell onto an arrow without
+   losing the hover state and the arrow stays visible and clickable. */
+.dyn-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.28);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 6px 10px;
+  image-rendering: pixelated;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s, filter 0.15s;
+}
+.dyn-nav-left {
+  right: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 10" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="4" y="0" width="2" height="2"/><rect x="2" y="2" width="4" height="2"/><rect x="0" y="4" width="6" height="2"/><rect x="2" y="6" width="4" height="2"/><rect x="4" y="8" width="2" height="2"/></g></svg>');
+}
+.dyn-nav-right {
+  left: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 10" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="0" y="0" width="2" height="2"/><rect x="0" y="2" width="4" height="2"/><rect x="0" y="4" width="6" height="2"/><rect x="0" y="6" width="4" height="2"/><rect x="0" y="8" width="2" height="2"/></g></svg>');
+}
+.dyn-row-wrap:hover .dyn-nav-arrow,
+.dyn-nav-arrow:hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+.dyn-nav-arrow:hover {
+  background-color: rgba(0, 0, 0, 0.45);
+  filter: brightness(1.2);
 }
 /* Wrapper holds the rounded-rectangle pill AND the absolutely-positioned
    tooltip. The pill is clipped via overflow:hidden + border-radius so
@@ -3327,20 +3383,20 @@ ul.changes li.ability-row-end {
    overflows the pane width. */
 .ability-change-body .formula-table-wrap {
   margin-top: 6px;
-  overflow-x: auto;
-  max-width: 100%;
-  -webkit-overflow-scrolling: touch;
 }
-/* Formula tables embedded inside an ability_change new-pane must fit the
-   half-width pane without a horizontal scroll bar. Fixed layout shrinks
-   columns to the available width; tabular-nums keeps digits aligned even
-   when each column is barely wider than a 3-char value like "11.5". */
+/* Formula tables inside ability_change panes show only 7 key levels
+   (L1/5/10/15/20/25/30) — columns 3-5, 7-10, 12-15 are the intermediate
+   L2-L4, L6-L9, L11-L14 columns (col 1 = label, col 2 = L1, col 6 = L5…). */
 .ability-change-body .formula-table {
   font-size: 10.5px;
   margin: 0;
   width: 100%;
   table-layout: fixed;
   font-variant-numeric: tabular-nums;
+}
+.ability-change-body .formula-table th:is(:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(7),:nth-child(8),:nth-child(9),:nth-child(10),:nth-child(12),:nth-child(13),:nth-child(14),:nth-child(15)),
+.ability-change-body .formula-table td:is(:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(7),:nth-child(8),:nth-child(9),:nth-child(10),:nth-child(12),:nth-child(13),:nth-child(14),:nth-child(15)) {
+  display: none;
 }
 .ability-change-body .formula-table th,
 .ability-change-body .formula-table td {
@@ -3545,7 +3601,8 @@ h4.subgroup {
   margin: 16px 0 4px 0;      /* aligned with entity-block left edge */
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  border-bottom: 1px solid #21262d;
+  border-bottom: 1px solid;
+  border-image: linear-gradient(to right, #21262d 0%, #21262d 61%, transparent 71%) 1;
   padding-bottom: 4px;
 }
 /* ABILITY BLOCK — icon (left, full-height) + title (top-right) + changes (below title) */
@@ -4458,7 +4515,7 @@ ul.changes li.aghanim-shard {
      For single-line rows layer 2 collapses to zero height (nothing below). */
   background:
     linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.20) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% 22px,
-    linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0 70px, rgba(72, 148, 255, 0.20) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 22px / 100% calc(100% - 25px);
+    linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 25px / 100% calc(100% - 28px);
   border-radius: 3px;
 }
 /* Aghanim marker — inline icon appended to the change-text inside .row-text,
@@ -5559,8 +5616,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   stroke-width: 9;
   stroke-linecap: round;
   stroke-dasharray: 0 0 100 0;     /* [0, 100] — full ring */
-  opacity: 0.16;
-  filter: blur(3.6px);
+  opacity: 0.10;
 }
 /* Bright body — the leading, fully-opaque stretch. Head sits at 100, which on
    the closed path coincides with position 0, so the head meets the tail's tip:
@@ -5580,28 +5636,25 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   stroke-width: 1.55;
   stroke-dasharray: 0 46 18 36;    /* [46, 64] */
   opacity: 0.78;
-  filter: blur(0.6px) drop-shadow(0 0 1.5px rgba(255, 190, 70, 0.75));
+  filter: drop-shadow(0 0 1.5px rgba(255, 190, 70, 0.75));
 }
 .creeps-table .autocast-snake .ac-tail2 {
   stroke: #ffe09a;
   stroke-width: 1.2;
   stroke-dasharray: 0 30 20 50;    /* [30, 50] */
   opacity: 0.5;
-  filter: blur(1px);
 }
 .creeps-table .autocast-snake .ac-tail3 {
   stroke: #ffd98e;
   stroke-width: 0.85;
   stroke-dasharray: 0 14 20 66;    /* [14, 34] */
-  opacity: 0.28;
-  filter: blur(1.5px);
+  opacity: 0.24;
 }
 .creeps-table .autocast-snake .ac-tail4 {
   stroke: #ffd585;
   stroke-width: 0.5;
   stroke-dasharray: 0 0 18 82;     /* [0, 18] */
-  opacity: 0.12;
-  filter: blur(2px);
+  opacity: 0.10;
 }
 /* Pollen — two phase-locked layers of tiny, irregular, heavily-blurred specks
    that ride with the comet. Small widths + strong blur + varied dash sizes
@@ -5613,7 +5666,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   stroke-linecap: round;
   stroke-dasharray: 0.5 4 0.4 5 0.6 3.5 0.3 5.5 0.5 4 0.4 4.5 0.5 5 0.3 4 0.6 4.5 0.4 5 0.5 4 0.3 45.7;
   opacity: 0.5;
-  filter: blur(1.2px) drop-shadow(0 0 1.6px rgba(255, 205, 110, 0.85));
+  filter: drop-shadow(0 0 1.6px rgba(255, 205, 110, 0.85));
 }
 .creeps-table .autocast-snake .ac-pollen2 {
   stroke: #ffeec2;
@@ -5621,7 +5674,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   stroke-linecap: round;
   stroke-dasharray: 0.3 6 0.4 5.5 0.3 6.5 0.4 5 0.3 7 0.4 6 0.3 6.5 0.4 6 0.3 48.4;
   opacity: 0.4;
-  filter: blur(2.2px) drop-shadow(0 0 1.4px rgba(255, 210, 120, 0.8));
+  filter: drop-shadow(0 0 1.4px rgba(255, 210, 120, 0.8));
 }
 /* Sparse, bright, sharp twinkles with a strong glow — the "magic" sparkle on
    top of the soft dust haze. */
@@ -5878,7 +5931,6 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .hs-attack-filter.active,
 .hs-attack-filter[aria-pressed="true"] {
-  color: #fff8d6;
   border-color: rgba(227, 196, 106, 0.82);
   background: rgba(227, 196, 106, 0.14);
   box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.12);
@@ -8154,7 +8206,6 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .tc-picker .cal-year-opt:hover { background: rgba(227, 196, 106, 0.14); color: #fff5dc; }
 .tc-picker .cal-year-opt.is-selected {
   background: rgba(227, 196, 106, 0.2);
-  color: #fff5dc;
   box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.45);
 }
 .terrain-map-pane[hidden],

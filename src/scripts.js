@@ -863,15 +863,14 @@
   // in build_patch.py. Ordered longest-first so "creep-hero" wins over "creep".
   const DYN_KINDS = ['creep-hero', 'hero', 'item', 'unit', 'plain', 'enchant'];
 
-  // Cache the per-page patches window so we compute it once, not 250+ times.
-  // Pure function of manifest → ordered patches array.
+  // Offset into manifest.patches (newest-first). 0 = show 12 newest on the
+  // right; N = shift window N steps toward older patches.
+  let _dynOffset = 0;
+
   function dynWindow(manifest) {
-    // Always show the 12 newest patches in RELEASE_HISTORY, regardless of
-    // which patch page the user is currently on. The .current class on the
-    // pill that matches the page version visually marks where they are.
-    // manifest.patches is newest-first → take first 12, reverse so oldest
-    // is on the left in the rendered row.
-    return manifest.patches.slice(0, 12).reverse();
+    // manifest.patches is newest-first → slice from offset, reverse so the
+    // oldest of the window is on the left in the rendered row.
+    return manifest.patches.slice(_dynOffset, _dynOffset + 12).reverse();
   }
 
   function dynRenderRow(entityDiv, manifest, windowed, currentVersion) {
@@ -884,13 +883,30 @@
     const key = kind + '|' + slug;
     const rec = manifest.entities[key];
     const perPatch = (rec && rec.patches) || {};
+    const wrap = document.createElement('div');
+    wrap.className = 'dyn-row-wrap';
+    const canLeft  = _dynOffset + 12 < manifest.patches.length;
+    const canRight = _dynOffset > 0;
+    if (canLeft) {
+      const btn = document.createElement('button');
+      btn.className = 'dyn-nav-arrow dyn-nav-left';
+      btn.setAttribute('aria-label', 'Show older patches');
+      wrap.appendChild(btn);
+    }
     const row = document.createElement('div');
     row.className = 'patch-dynamics';
     for (const p of windowed) {
       const counts = perPatch[p.version] || {};
       row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion, currentVersion));
     }
-    entityDiv.appendChild(row);
+    wrap.appendChild(row);
+    if (canRight) {
+      const btn = document.createElement('button');
+      btn.className = 'dyn-nav-arrow dyn-nav-right';
+      btn.setAttribute('aria-label', 'Show newer patches');
+      wrap.appendChild(btn);
+    }
+    entityDiv.appendChild(wrap);
   }
 
   // Fill / refill the heroes_dyn matrix's data cells with one pill each. Only
@@ -1230,12 +1246,29 @@
       .then(manifest => {
         if (!manifest) return;
         if (entities.length) {
-          const windowed = dynWindow(manifest);
           const buildRow = (e) => {
             if (e.dataset.dynBuilt) return;
             e.dataset.dynBuilt = '1';
-            dynRenderRow(e, manifest, windowed, currentVersion);
+            dynRenderRow(e, manifest, dynWindow(manifest), currentVersion);
           };
+          // Arrow navigation: one delegate on the page, shifts the patch
+          // window for ALL already-built rows. No extra fetches.
+          document.addEventListener('click', (ev) => {
+            const arrow = ev.target.closest('.dyn-nav-arrow');
+            if (!arrow) return;
+            const delta = arrow.classList.contains('dyn-nav-left') ? 1 : -1;
+            const newOff = _dynOffset + delta;
+            if (newOff < 0 || newOff + 12 > manifest.patches.length) return;
+            _dynOffset = newOff;
+            const cv = dynCurrentVersion();
+            const wnd = dynWindow(manifest);
+            entities.forEach(e => {
+              if (!e.dataset.dynBuilt) return;
+              const old = e.querySelector('.dyn-row-wrap');
+              if (old) old.remove();
+              dynRenderRow(e, manifest, wnd, cv);
+            });
+          });
           // Build each entity's cell row LAZILY as it nears the viewport — on a
           // 1800-change patch that's ~3200 gradient cells; creating them all on
           // load is the page's biggest cost. IntersectionObserver builds only
@@ -1533,6 +1566,25 @@
   let sortCol = null, sortState = 0;  // 0 = neutral, 1 = descending, 2 = ascending
   const originalOrder = [...tbody.querySelectorAll('tr')];
 
+  // Moving rows in the DOM resets CSS animations to t=0. Snapshot currentTime
+  // for every animated element before the move, restore it after so the
+  // autocast-snake comet continues without restarting.
+  function snapAnims(rows) {
+    const map = new Map();
+    rows.forEach(tr => {
+      tr.querySelectorAll('[style*="animation"], .autocast-snake rect').forEach(el => {
+        const anims = el.getAnimations();
+        if (anims.length) map.set(el, anims.map(a => a.currentTime));
+      });
+    });
+    return map;
+  }
+  function restoreAnims(map) {
+    map.forEach((times, el) => {
+      el.getAnimations().forEach((a, i) => { if (times[i] != null) a.currentTime = times[i]; });
+    });
+  }
+
   function applySort(col, dir) {
     unmergeAbilityRuns();             // restore full cells before index-based sort
     const idx = colIndex[col];
@@ -1545,7 +1597,9 @@
       if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
       return String(va).localeCompare(String(vb)) * dir;
     });
+    const snap = snapAnims(rows);
     rows.forEach(tr => tbody.appendChild(tr));
+    restoreAnims(snap);
     groupRows(rows);
   }
 
@@ -1560,7 +1614,9 @@
         // Back to neutral: restore the default level-grouped order, dim ↕ returns.
         sortCol = null;
         unmergeAbilityRuns();
+        const snap0 = snapAnims(originalOrder);
         originalOrder.forEach(tr => tbody.appendChild(tr));
+        restoreAnims(snap0);
         groupRows(originalOrder);
         mergeAbilityRuns(originalOrder);   // re-merge in default order
       } else {
@@ -2708,10 +2764,10 @@
 // load, then swap on every mode change. data-hist drives the hover tooltip
 // (existing stat-hist code reads it live), data-sort drives sorting.
 (function() {
-  const table = document.querySelector('.hs-table');
-  if (!table) return;
   const viewSel = document.getElementById('hs-view-mode');
   if (!viewSel) return;
+  const table = document.querySelector('.mr-table');
+  if (!table) return;
   const levelInput = document.getElementById('hs-level-input');
   const plus2Toggle = document.getElementById('hs-plus2-toggle');
   const innatesToggle = document.getElementById('hs-innates-toggle');
@@ -4234,8 +4290,11 @@
       dragRect = stage.getBoundingClientRect();
       dragHalfW = handle.offsetWidth / 2;
       stage.classList.add('is-dragging');
-      // Disable CSS left:var(--pos) so transform owns positioning during drag.
+      // Switch from CSS left:var(--pos) to transform-based positioning.
+      // Read current position first so the handle doesn't jump on click.
+      var curPos = parseFloat(stage.style.getPropertyValue('--pos')) || 50;
       handle.style.left = '0';
+      handle.style.transform = 'translateX(' + (dragRect.width * curPos / 100 - dragHalfW) + 'px)';
       if (e.pointerId != null && handle.setPointerCapture) {
         try { handle.setPointerCapture(e.pointerId); } catch (_) {}
       }
