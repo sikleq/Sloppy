@@ -9,6 +9,46 @@ import site_common as _site
 from .meta import PATCHES, RELEASE_HISTORY, _render_top_nav
 from .page import _ASSET_VERSION
 
+# What's new entries: (tag_type, label, date, href)
+# tag_type: "page" | "patch" | "hero"
+_WHATSNEW = [
+    ("page",  "Hero Lab",       "Jun 13", "hero_lab.html"),
+    ("page",  "Item Dynamics",  "Jun 5",  "items_dyn.html"),
+    ("patch", "7.41d",          "Jun 5",  "patches/7.41d.html"),
+    ("page",  "Hero Dynamics",  "Jun 3",  "heroes_dyn.html"),
+    ("page",  "Neutral Creeps", "May 19", "neutral_stats.html"),
+]
+
+# Pixel "!" SVG (crispEdges rects, same style as nav-back-arrow).
+# ViewBox 4x12: body 4×8, gap 2, dot 4×2.
+_WN_EXCL_SVG = (
+    "data:image/svg+xml;utf8,"
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 12' shape-rendering='crispEdges'>"
+    "<rect x='0' y='0' width='4' height='8' fill='%23e3c46a'/>"
+    "<rect x='0' y='10' width='4' height='2' fill='%23e3c46a'/>"
+    "</svg>"
+)
+
+
+def _whatsnew_html():
+    rows = []
+    for kind, label, date, href in _WHATSNEW:
+        tag = f'<span class="whatsnew-tag whatsnew-tag-{kind}">{kind}</span>'
+        date_span = f'<span class="whatsnew-date">{date}</span>'
+        rows.append(
+            f'<a class="whatsnew-row" href="{href}">'
+            f'{tag}{_html.escape(label)}{date_span}</a>'
+        )
+    items = '\n'.join(rows)
+    # The badge sits inside .version-beta-wrap (in site_common.py) so it's
+    # positioned at the bottom-right corner of the BETA label.
+    # The popup is body-level so it isn't clipped by the nav overflow.
+    return (
+        '<div class="whatsnew-popup" role="dialog" aria-label="What\'s new">\n'
+        f'  <div class="whatsnew-list">{items}</div>\n'
+        '</div>'
+    )
+
 
 def save_index_html():
     """Generate index.html — the Main landing tab. Currently a placeholder
@@ -347,6 +387,7 @@ def save_index_html():
         f'{nav}\n'
         f'{sig_layer}\n'
         f'<div class="container main-page">{grid_html}</div>\n'
+        f'{_whatsnew_html()}\n'
         f'<script src="src/scripts.js?v={_ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
     )

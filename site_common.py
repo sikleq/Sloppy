@@ -168,7 +168,14 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
         # label there instead.
         materials_label = (get_materials_label(subtabs_active)
                            if active == "materials" and subtabs_active else "")
-        if materials_label:
+        if active == "main":
+            ver_html = (
+                '<span class="version-beta-wrap" role="button" tabindex="0"'
+                ' aria-label="What\'s new" aria-expanded="false">'
+                '<span class="version version-static version-beta"><span class="version-beta-text">NEW</span></span>'
+                '</span>'
+            )
+        elif materials_label:
             ver_html = (f'<span class="version version-static version-materials">'
                         f'{materials_label}</span>')
         else:

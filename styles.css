@@ -8324,3 +8324,81 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   pointer-events: none;
   box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.55);
 }
+
+/* ---- What's New badge (index.html, anchored to BETA label) ---- */
+.version-beta-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+/* Seen state = BETA stays at its default colour, no animation */
+
+/* Unseen state = BETA pulses between its base colour and the sikle gold */
+.version-beta-wrap:not(.wn-seen) .version-beta-text {
+  display: inline-block;
+  animation: whatsnew-breathe 2s ease-in-out infinite;
+}
+.version-beta-wrap { cursor: pointer; }
+.version-beta-wrap .version.version-beta { cursor: pointer; }
+@keyframes whatsnew-breathe {
+  0%   { color: #c9d1d9; transform: scale(1);    }
+  50%  { color: #d6b764; transform: scale(1.12); }
+  100% { color: #c9d1d9; transform: scale(1);    }
+}
+
+.whatsnew-popup {
+  position: fixed;
+  z-index: 200;
+  background: #0d1117;
+  border: 1px solid rgba(170, 220, 240, 0.35);
+  border-radius: 7px;
+  min-width: 240px;
+  max-width: 310px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+  display: none;
+  overflow: hidden;
+}
+.whatsnew-popup.wn-open { display: block; }
+.whatsnew-popup-head {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(139, 148, 158, 0.18);
+  font-family: 'Jersey 10', monospace;
+  font-size: 15px;
+  color: #e3c46a;
+  letter-spacing: 0.4px;
+}
+.whatsnew-list { padding: 5px 0; }
+.whatsnew-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: #c9d1d9;
+  text-decoration: none;
+  transition: background 0.12s;
+}
+a.whatsnew-row:hover {
+  background: rgba(139, 148, 158, 0.1);
+  color: #e6edf3;
+}
+.whatsnew-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  border-radius: 2px;
+  text-align: center;
+  box-sizing: border-box;
+}
+.whatsnew-tag-page  { background: rgba(88, 166, 255, 0.10); color: #79afd1; border: 1px solid rgba(88, 166, 255, 0.26); }
+.whatsnew-tag-patch { background: rgba(227, 196, 106, 0.10); color: #b89d5a; border: 1px solid rgba(227, 196, 106, 0.26); }
+.whatsnew-tag-hero  { background: rgba(120, 215, 145, 0.10); color: #7aaa84; border: 1px solid rgba(120, 215, 145, 0.24); }
+.whatsnew-date {
+  font-size: 10px;
+  color: #6b7280;
+  white-space: nowrap;
+  justify-self: end;
+}
