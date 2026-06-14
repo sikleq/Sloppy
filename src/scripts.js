@@ -147,6 +147,9 @@
         dropdownBtn.setAttribute('aria-expanded', 'false');
       }
     });
+    // Prevent scroll propagation to the page on Safari (overscroll-behavior
+    // alone isn't enough on older WebKit builds).
+    dropdownMenu.addEventListener('touchmove', (e) => { e.stopPropagation(); }, { passive: true });
   }
 
   // ---- HIDE ABSENT TAGS from toolbar ----
@@ -481,6 +484,10 @@
       resultsBox.classList.remove('show');
     }
   });
+  // Prevent scroll propagation to the page on Safari.
+  if (resultsBox) {
+    resultsBox.addEventListener('touchmove', (e) => { e.stopPropagation(); }, { passive: true });
+  }
   } // end if (searchInput && resultsBox)
 
   // ---- ABILITY-CHANGE CONNECTOR ----

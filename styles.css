@@ -1169,6 +1169,7 @@ body:has(.creeps-page) nav.top-nav {
   z-index: 100;
   max-height: 320px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: #30363d transparent;
 }
@@ -2114,6 +2115,7 @@ span.cal-full-day.has-patch {
   margin-top: 4px;
   max-height: 320px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   z-index: 50;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
 }
@@ -7046,6 +7048,12 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .mr-table thead th.sort-desc .sort-ind,
 .mr-table thead th.sort-asc .sort-ind {
   background-color: #e3c46a;
+}
+.creeps-table th.sort-desc .th-label,
+.creeps-table th.sort-asc .th-label,
+.mr-table thead th.sort-desc .th-label,
+.mr-table thead th.sort-asc .th-label {
+  color: #e3c46a;
 }
 .creeps-table th.sort-desc .sort-ind,
 .mr-table thead th.sort-desc .sort-ind {
