@@ -23,11 +23,13 @@ from __future__ import annotations
 import json as _json
 import os as _os
 import re
+import sys as _sys
 from pathlib import Path
 
-import site_common as _site
+_HERE = Path(_os.path.dirname(_os.path.abspath(__file__))).parent
+_sys.path.insert(0, str(_HERE))
 
-_HERE = Path(_os.path.dirname(_os.path.abspath(__file__)))
+import site_common as _site
 ASSET_VERSION = _site.compute_asset_version()
 
 # ── Engine constants ───────────────────────────────────────────────────────
@@ -44,7 +46,7 @@ def _load_release_history() -> list[tuple[str, str]]:
     inline list (newest only) if build_patch.py is unreachable. Returns
     newest-first list of (version, date)."""
     out: list[tuple[str, str]] = []
-    bp = _HERE / "build_patch.py"
+    bp = _HERE / "builders" / "patch.py"
     if bp.exists():
         src = bp.read_text(encoding="utf-8")
         # Anchor on the RELEASE_HISTORY assignment to avoid duplicating

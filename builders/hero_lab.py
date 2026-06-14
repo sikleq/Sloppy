@@ -10,10 +10,16 @@ from __future__ import annotations
 import html as _html
 import json as _json
 import re as _re
+import sys as _sys
+from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parent.parent
+_sys.path.insert(0, str(_ROOT))
+_sys.path.insert(0, str(_ROOT / "builders"))
 
 import site_common as _site
-from build_mana_items import parse_kv
-from build_heroes_stats import (
+from mana_items import parse_kv
+from heroes_stats import (
     _HERE,
     STATS_DIR,
     _versions,

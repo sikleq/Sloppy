@@ -35,7 +35,7 @@ jobs:
       - name: Build patch pages
         env:
           PYTHONIOENCODING: utf-8
-        run: python build_patch.py
+        run: python builders/patch.py
 
       - name: Build silent changes pages
         env:
@@ -45,32 +45,32 @@ jobs:
       - name: Build creeps table
         env:
           PYTHONIOENCODING: utf-8
-        run: python build_creeps.py
+        run: python builders/creeps.py
 
       - name: Build mana items table
         env:
           PYTHONIOENCODING: utf-8
-        run: python build_mana_items.py
+        run: python builders/mana_items.py
 
       - name: Build hero stats table
         env:
           PYTHONIOENCODING: utf-8
-        run: python build_heroes_stats.py
+        run: python builders/heroes_stats.py
 
       - name: Build hero lab calculator
         env:
           PYTHONIOENCODING: utf-8
-        run: python build_hero_lab.py
+        run: python builders/hero_lab.py
 
       - name: Build hero dynamics matrix
         env:
           PYTHONIOENCODING: utf-8
-        run: python build_heroes_dyn.py
+        run: python builders/heroes_dyn.py
 
       - name: Build item dynamics matrix
         env:
           PYTHONIOENCODING: utf-8
-        run: python build_items_dyn.py
+        run: python builders/items_dyn.py
 
       - name: Build terrain comparison
         env:

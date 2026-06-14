@@ -17,10 +17,14 @@ file is missing the Changelogs nav link falls back to a sensible default.
 import json as _json
 import os as _os
 import re
+import sys as _sys
+
+_HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+_sys.path.insert(0, _HERE)
+
 import site_common as _site
 
 ASSET_VERSION = _site.compute_asset_version()
-_HERE = _os.path.dirname(_os.path.abspath(__file__))
 
 
 def _latest_href():
@@ -48,18 +52,18 @@ def save_creeps_html():
     import csv as _csv
     import re as _re
 
-    csv_path = _os.path.join(_os.path.dirname(__file__),
+    csv_path = _os.path.join(_HERE,
                               'data', 'creeps_raw.csv')
     if not _os.path.exists(csv_path):
         print(f"  ! creeps_raw.csv not found, skipping neutral_stats.html")
         return
 
     # ---- Source files ----
-    UNITS_PATH = _os.path.join(_os.path.dirname(__file__),
+    UNITS_PATH = _os.path.join(_HERE,
                                 'data', 'stats', '7.41c', 'units.json')
-    NPC_KV_PATH = _os.path.join(_os.path.dirname(__file__),
+    NPC_KV_PATH = _os.path.join(_HERE,
                                  'data', 'stats', '7.41c', 'npc_units.txt')
-    ABIL_SLIM_PATH = _os.path.join(_os.path.dirname(__file__),
+    ABIL_SLIM_PATH = _os.path.join(_HERE,
                                     'data', 'abilities_slim.json')
     units = _json.loads(open(UNITS_PATH, encoding='utf-8').read()) \
             if _os.path.exists(UNITS_PATH) else {}

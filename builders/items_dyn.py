@@ -14,6 +14,12 @@ Run AFTER build_patch.py (it needs the fresh _dynamics.json + site_meta.json):
     python build_patch.py
     python build_items_dyn.py
 """
+import sys as _sys
+from pathlib import Path
+
+_HERE = Path(__file__).resolve().parent.parent
+_sys.path.insert(0, str(_HERE))
+
 from dyn_matrix_common import save_dyn_matrix
 
 

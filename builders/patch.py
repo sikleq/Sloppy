@@ -3,6 +3,10 @@ Main build orchestrator — runs all patch + support page generators.
 Split into modules under patch/ and content/. See patch/ directory.
 """
 import sys, io
+from pathlib import Path
+
+_HERE = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_HERE))
 
 import content.p708
 import content.p740

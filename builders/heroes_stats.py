@@ -40,9 +40,13 @@ import math as _math
 import re as _re
 from pathlib import Path
 
+import sys as _sys
+
+_HERE = Path(__file__).resolve().parent.parent
+_sys.path.insert(0, str(_HERE))
+
 import site_common as _site
 
-_HERE = Path(__file__).resolve().parent
 STATS_DIR = _HERE / "data" / "stats"
 ASSET_VERSION = _site.compute_asset_version()
 
