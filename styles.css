@@ -247,12 +247,14 @@ body:has(.creeps-page) nav.top-nav {
 .nav-inner {
   width: 100%;
   padding: 7px 24px 3px 10px;
-  /* Flex row: brand left, picker right (space-between). Nav-tabs are
-     absolutely centred so they don't depend on either side's width and
-     never shift between pages with different right-side content widths. */
-  display: flex;
-  justify-content: space-between;
+  /* 1fr / auto / 1fr grid: auto column (nav-tabs) is always at the true
+     geometric centre. min-width:0 on the outer columns lets both 1fr be
+     strictly equal regardless of brand or picker content width, so the tabs
+     never shift between pages with different right-side content. */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
+  gap: 16px;
   position: relative;
 }
 .nav-inner::after {
@@ -261,6 +263,7 @@ body:has(.creeps-page) nav.top-nav {
 /* Header brand block (helmet logo + pixel-font title). Replaces the inline
    nav tabs — the full nav list now lives on the main hub page. */
 .nav-brand {
+  min-width: 0;
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -974,10 +977,12 @@ body:has(.creeps-page) nav.top-nav {
   /* keep weight + transparent border identical to inactive — prevents header jump */
 }
 .nav-context {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;                   /* gap between release-info and the version-picker control */
   margin-bottom: 8px;
+  justify-self: end;
 }
 /* Wraps the previous-arrow + version-dropdown + next-arrow into a single
    horizontal control so all three sit on one baseline and the arrows
@@ -5032,9 +5037,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   display: flex;
   gap: 4px;
   align-items: center;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  justify-self: center;
   margin-bottom: 8px;
 }
 /* Nav tabs — same block style as the version picker button. */
