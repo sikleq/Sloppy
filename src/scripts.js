@@ -4156,6 +4156,20 @@
   });
 })();
 
+// ---- Ko-Fi gold stack: hover plays the sparkle APNG, reverts on mouse-out.
+//      Skipped under prefers-reduced-motion.
+(function () {
+  const btn = document.querySelector('.support-kofi');
+  if (!btn) return;
+  const img = btn.querySelector('.inv-icon');
+  if (!img) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const PNG      = img.getAttribute('src');
+  const SPARKLE  = 'icons/ui/gothic/gold_stack_sparkle.png';
+  btn.addEventListener('mouseenter', () => { img.src = SPARKLE + '?' + Date.now(); });
+  btn.addEventListener('mouseleave', () => { img.src = PNG; });
+})();
+
 
 /* ---- Formula calculator (formula_change) ----
    Each `.formula-change[data-fx-old]` has a number input; on change we re-evaluate
