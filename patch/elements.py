@@ -772,8 +772,15 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False):
                           + f'<span class="li-tail">{_mw.group(1)}{cluster}</span>')
         else:
             text_inner = f'{text_base} <span class="li-tail">{cluster}</span>'
+    elif marker:
+        _mw = re.search(r'(\S+)\s*$', text_base)
+        if _mw and '<' not in _mw.group(1) and '>' not in _mw.group(1):
+            text_inner = (text_base[:_mw.start(1)]
+                          + f'<span class="li-tail">{_mw.group(1)}{marker}</span>')
+        else:
+            text_inner = f'{text_base}{marker}'
     else:
-        text_inner = f'{text_base}{marker}'
+        text_inner = text_base
     return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text_inner}</span>{rest}{extra}</li>'
 
 
