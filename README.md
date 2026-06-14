@@ -6,37 +6,67 @@ A static site that turns Valve's raw Dota 2 patch notes into a readable, filtera
 
 ## What it does differently from dota2.com/patches
 
-- **Direction at a glance.** Each row shows a coloured `+12% BUFF` / `-9% NERF` badge derived from the underlying numbers — no need to do arithmetic in your head.
-- **Per-level scaling unfolded.** Formula rows (`14% + 1% per level`) expand into a per-hero-level table with the delta at L1 … L30, instead of leaving the reader to compute.
-- **Stat changes verified against game data.** Base stat deltas (HP, damage, armor, etc.) auto-cross-reference `data/stats/<patch>/heroes.json` extracted from Valve's KV files — never trust the patchnote text alone.
-- **Ability reworks rendered as before/after panes** with the icons stacked and shuffleable, so you can see the swap at a glance.
-- **Aghanim's Scepter / Shard upgrades** get their own visual stripe and are always merged with their description.
-- **Filter by tag.** Click a filter chip to surface only BUFF, NERF, DEL, etc. rows across the page.
+- **Direction at a glance.** Each row shows a coloured `+12% BUFF` / `-9% NERF` badge derived from the underlying numbers — no arithmetic required.
+- **Per-level scaling unfolded.** Formula rows (`14% + 1% per level`) expand into a full L1–L30 table.
+- **Stat changes verified against game data.** Base stat deltas auto-cross-reference `data/stats/<patch>/heroes.json` extracted from Valve's KV files.
+- **Ability reworks as before/after panes** with icons stacked side-by-side.
+- **Filter by tag.** Click a chip to surface only BUFF, NERF, DEL, etc. rows across the page.
+- **Calendar view.** Chronological patch list with lifespans, sparklines, and yearly stats.
+- **Terrain comparison.** Side-by-side map diff slider for 7.40 layout changes.
+- **Hero/item dynamics matrix.** Tag breakdown per entity across all patches.
 
 ## Repository layout
 
 ```
-build_patch.py            ← generator. Contains HTML helpers, CSS, JS, and patch content
-generate_patch_code.py    ← KV → Python codegen. Run before integrating a new patch
-scripts/apply_stats.py    ← post-processor: t() → bstat_h() where stats DB knows the value
-scripts/check_icons.py    ← validates every ability icon URL against Valve CDN
+build_patch.py              ← thin orchestrator (~35 lines); calls content/ modules in order
+build_creeps.py             ← generates creeps.html
+build_heroes_stats.py       ← generates heroes_stats.html
+build_heroes_dyn.py         ← generates heroes_dyn.html
+build_items_dyn.py          ← generates items_dyn.html
+build_hero_lab.py           ← generates hero_lab.html
+build_mana_items.py         ← generates mana_items.html
+build_terrain.py            ← generates terrain.html
+build_silent_changes.py     ← generates patches/silent/{version}.html (KV-level diffs)
+generate_patch_code_v2.py   ← KV → Python codegen; run before integrating a new patch
+
+patch/                      ← build infrastructure (imported by content/ and build_*.py)
+  output.py                 ← HTML accumulator: H list + W()
+  state.py                  ← global build state singleton
+  images.py                 ← HERO_SLUG, ITEM_SLUG, CDN URL helpers
+  stats.py                  ← stat DB loaders, stat_h/i/u(), bstat_*()
+  badges.py                 ← b(), br(), bf(), t(), facet_badge(), scale_pill()
+  elements.py               ← all HTML builders: li(), section(), ability(), headers…
+  meta.py                   ← PATCHES list, RELEASE_HISTORY, nav/date helpers
+  page.py                   ← write_head(), write_footer(), save_html(), post-processing
+  calendar.py               ← save_calendar_html()
+  index_page.py             ← save_index_html()
+  rosters.py                ← hero/item roster lists, _dynamics.json writer
+
+content/                    ← per-patch note content (one file per version)
+  p708.py                   ← 7.08
+  p740.py  p740b.py  p740c.py
+  p741.py  p741a.py  p741b.py  p741c.py  p741d.py
+
+tests/                      ← pytest unit tests (166 tests, run in CI)
+  test_badges.py            ← gradient_class, b, t, br, facet_badge, scale_pill
+  test_elements.py          ← li, section, inline_note, item_cost, aghs_line…
+  test_stats.py             ← stat_h, bstat_h, prev_change_patch_h…
 
 data/
-  patchnotes_english.txt  ← raw Valve KV
-  patchnotes_russian.txt  ← raw Valve KV (Russian)
-  abilities_slim.json     ← ability slug → display name + innate flag
-  stats/<version>/        ← npc_heroes.json + items.json + abilities.json per patch
+  patchnotes_english.txt    ← raw Valve KV patch notes
+  patchnotes_russian.txt    ← Russian KV
+  abilities_slim.json       ← ability slug → display name + innate flag
+  stats/<version>/          ← heroes.json + items.json + abilities.json per patch
 
-icons/                    ← local mirror of hero, item, ability icons
-docs/                     ← architecture, data format, contribution workflow
+icons/                      ← local mirror of hero, item, ability icons
+scripts/                    ← one-off helpers: fetch_icons.py, audit_*.py, apply_stats.py…
+docs/                       ← architecture, data format, contribution workflow
 
-index.html                ← landing redirect → latest patch
-styles.css / scripts.js   ← source CSS / JS, loaded at build time by build_patch.py
-
-# Generated by build_patch.py — produced fresh by CI and deployed to
-# GitHub Pages. NOT committed to keep .git lean:
-patches/*.html            ← per-patch HTML
-calendar.html             ← chronological patch list
+# Generated by CI — NOT committed:
+patches/*.html              ← per-patch HTML pages
+patches/silent/*.html       ← silent KV-diff pages
+calendar.html, index.html   ← support pages
+_dynamics.json              ← patch-dynamics widget payload
 ```
 
 ## Quick start
@@ -45,57 +75,69 @@ calendar.html             ← chronological patch list
 git clone https://github.com/sikleq/Sloppy.git
 cd Sloppy
 
-# Re-render every patch HTML
-python build_patch.py
-```
+# Run tests
+python -m pytest tests/ -v
 
-This regenerates `patches/*.html`, `calendar.html`, `styles.css`, `scripts.js`, and the `_ability_icons.txt` audit list. Open `patches/7.41c.html` (or any other version) to view.
+# Build all patch pages + support pages
+python build_patch.py
+
+# View any patch
+open patches/7.41d.html
+```
 
 ## Adding a new patch
 
 1. Drop the new patch's KV file into `data/patchnotes_english.txt`.
 2. Generate a Python scaffold:
    ```bash
-   python generate_patch_code.py 7.42
+   python generate_patch_code_v2.py 7.42
    ```
-   produces `_generated_p_7.42.py` — review and edit it (the autodetector gets tags right ~80% of the time).
-3. Integrate the reviewed code into `build_patch.py` under the appropriate version section.
-4. If new heroes / items appeared, register their slugs in `HERO_SLUG` / `ITEM_SLUG` at the top of `build_patch.py`.
-5. Rebuild:
-   ```bash
-   python build_patch.py
+   Produces `_generated_p_7.42.py` — review and edit (autodetector gets tags right ~80% of the time).
+3. Save the reviewed content as `content/p742.py`, wrapping the block in `def build():`.
+4. Add the import and call in `build_patch.py`:
+   ```python
+   import content.p742
+   # in __main__:
+   content.p742.build()
    ```
-6. Open `patches/7.42.html` in a browser. Verify filters, formula tables, icons.
+5. If new heroes/items appeared, register their slugs in `patch/images.py` (`HERO_SLUG` / `ITEM_SLUG`).
+6. Run `python build_patch.py` and open `patches/7.42.html` to verify.
 
-Full step-by-step guide: [docs/workflow.md](docs/workflow.md).
+Full workflow: [docs/workflow.md](docs/workflow.md).
 
 ## Architecture & data format
 
-- [docs/architecture.md](docs/architecture.md) — how `generate_patch_code.py` and `build_patch.py` fit together.
+- [docs/architecture.md](docs/architecture.md) — how the modules fit together.
 - [docs/data-format.md](docs/data-format.md) — Valve KV format, the `b()` / `bf()` / `t()` helper API, the `l=True` flag rules.
+
+## CI
+
+GitHub Actions runs on every push:
+1. **pytest** — 166 unit tests for `patch/badges`, `patch/elements`, `patch/stats`
+2. **Full build** — all `build_*.py` scripts in sequence
+3. **Audits** — BAT `l=True` check, trailing-whitespace lint, ul-balance check across all content files
+4. **Deploy** — generated `_site/` published to GitHub Pages
 
 ## Contributing
 
-Pull requests welcome. The most useful contributions:
+Pull requests welcome. Most useful:
 
-- **Patch ports** for older versions (anything pre-7.33 currently lacks the stats DB layer).
-- **Tag corrections** when the autodetector mislabels a change (e.g. a `no longer has a penalty` row that should be BUFF, not DEL).
-- **Icon mirror updates** if Valve adds an innate ability icon that we still fall back to the generic marker for.
+- **Patch ports** for older versions (anything pre-7.33 lacks the stats DB layer).
+- **Tag corrections** when the autodetector mislabels a change.
+- **Icon mirror updates** for new innate ability icons.
 
-Bug reports: include the patch version, the hero/item/ability, and what you expected the row to show vs what's rendered.
+Bug reports: include the patch version, hero/item/ability, and expected vs rendered output.
 
 ## License
 
 **PolyForm Noncommercial 1.0.0** — see [LICENSE](LICENSE).
 
-Source is open for reading, learning, hobby and educational use. **Commercial
-use is not permitted** without a separate license from the copyright holder.
-Open an issue or contact [@sikleq](https://github.com/sikleq) for commercial
-licensing inquiries.
+Source is open for reading, learning, hobby and educational use. **Commercial use is not permitted** without a separate license.
+Contact [@sikleq](https://github.com/sikleq) for commercial licensing inquiries.
 
 ## Acknowledgements
 
 - Game data extracted via [muk-as/DOTA2_CLIENT](https://github.com/muk-as/DOTA2_CLIENT) (npc_heroes.txt / items.txt history since 7.33).
 - Icons from Valve's official `cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/` CDN.
 - Landing-page inventory UI uses the [Gothic Pixel UI](https://abyssowl.itch.io/gothic-pixel-ui) pack by **abyssowl**.
-- Patch notes © Valve Corporation. This is an unofficial fan project, not affiliated with or endorsed by Valve.
+- Patch notes © Valve Corporation. Unofficial fan project, not affiliated with or endorsed by Valve.

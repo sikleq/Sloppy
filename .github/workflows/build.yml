@@ -26,13 +26,21 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Syntax check
-        run: python -c "import ast; ast.parse(open('build_patch.py', encoding='utf-8').read())"
+      - name: Install test dependencies
+        run: pip install pytest
+
+      - name: Run unit tests
+        run: python -m pytest tests/ -v
 
       - name: Build patch pages
         env:
           PYTHONIOENCODING: utf-8
         run: python build_patch.py
+
+      - name: Build silent changes pages
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python build_silent_changes.py
 
       - name: Build creeps table
         env:
@@ -72,8 +80,9 @@ jobs:
       - name: Audit — BAT rows must use l=True
         run: |
           python - <<'PY'
-          import re, sys
-          src = open('build_patch.py', encoding='utf-8').read()
+          import re, sys, pathlib
+          src = '\n'.join(p.read_text(encoding='utf-8')
+                         for p in pathlib.Path('content').glob('*.py'))
           hits = re.findall(r'"Base Attack Time[^"]*",\s*b\([^)]*\)', src)
           bad = [h for h in hits if 'Reduction' not in h and 'l=True' not in h]
           if bad:
@@ -85,8 +94,9 @@ jobs:
       - name: Audit — trailing whitespace inside li() text
         run: |
           python - <<'PY'
-          import re, sys
-          src = open('build_patch.py', encoding='utf-8').read()
+          import re, sys, pathlib
+          src = '\n'.join(p.read_text(encoding='utf-8')
+                         for p in pathlib.Path('content').glob('*.py'))
           hits = re.findall(r'W\(li\("([^"]*\s)",', src)
           if hits:
               print(f'Found {len(hits)} li texts with trailing whitespace')
@@ -97,15 +107,13 @@ jobs:
       - name: Audit — per-hero ul balance
         run: |
           python - <<'PY'
-          import re, sys
-          src = open('build_patch.py', encoding='utf-8').read().splitlines()
+          import re, sys, pathlib
+          lines = []
+          for p in sorted(pathlib.Path('content').glob('*.py')):
+              lines.extend(p.read_text(encoding='utf-8').splitlines())
           depth, last_hero, problems = 0, None, []
-          for i, line in enumerate(src, 1):
+          for i, line in enumerate(lines, 1):
               if re.search(r'W\((hero|item|unit|plain|enchant)_header\(', line):
-                  # Only report imbalances between two headers — a ul open
-                  # before the first header (General / Map Objectives /
-                  # Mechanics section) is auto-closed by hero_header()'s
-                  # _close_ability_block().
                   if depth > 0 and last_hero is not None:
                       problems.append((last_hero, f'depth={depth} at next header'))
                   depth = 0
