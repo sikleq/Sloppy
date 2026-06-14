@@ -4457,11 +4457,8 @@ ul.changes li.aghanim-shard {
        2) lines 2+ (from 22px down): blue starts at the left edge.
      For single-line rows layer 2 collapses to zero height (nothing below). */
   background:
-    linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.20) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% 19px,
-    /* Wrapped-lines layer starts 3px lower and ends 3px earlier than before —
-       its top edge was hugging the first line's text (visually touching the
-       tag). The slimmer band stays centred on the wrapped lines. */
-    linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 25px / 100% calc(100% - 28px);
+    linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.20) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% 22px,
+    linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 22px / 100% calc(100% - 25px);
   border-radius: 3px;
 }
 /* Aghanim marker — inline icon appended to the change-text inside .row-text,
