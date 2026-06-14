@@ -18,18 +18,23 @@ A static site that turns Valve's raw Dota 2 patch notes into a readable, filtera
 ## Repository layout
 
 ```
-build_patch.py              ← thin orchestrator (~35 lines); calls content/ modules in order
-build_creeps.py             ← generates creeps.html
-build_heroes_stats.py       ← generates heroes_stats.html
-build_heroes_dyn.py         ← generates heroes_dyn.html
-build_items_dyn.py          ← generates items_dyn.html
-build_hero_lab.py           ← generates hero_lab.html
-build_mana_items.py         ← generates mana_items.html
-build_terrain.py            ← generates terrain.html
-build_silent_changes.py     ← generates patches/silent/{version}.html (KV-level diffs)
-generate_patch_code_v2.py   ← KV → Python codegen; run before integrating a new patch
+builders/                   ← all build entry points (run from repo root)
+  patch.py                  ← thin orchestrator; calls content/ modules in order
+  creeps.py                 ← generates creeps.html
+  heroes_stats.py           ← generates heroes_stats.html
+  heroes_dyn.py             ← generates heroes_dyn.html
+  items_dyn.py              ← generates items_dyn.html
+  hero_lab.py               ← generates hero_lab.html
+  mana_items.py             ← generates mana_items.html
+  terrain.py                ← generates terrain.html
+  silent.py                 ← generates patches/silent/{version}.html (KV-level diffs)
 
-patch/                      ← build infrastructure (imported by content/ and build_*.py)
+generate_patch_code_v2.py   ← KV → Python codegen; run before integrating a new patch
+styles.css                  ← site stylesheet (url() paths relative to repo root)
+src/
+  scripts.js                ← site JavaScript
+
+patch/                      ← build infrastructure (imported by content/ and builders/)
   output.py                 ← HTML accumulator: H list + W()
   state.py                  ← global build state singleton
   images.py                 ← HERO_SLUG, ITEM_SLUG, CDN URL helpers
@@ -79,7 +84,7 @@ cd Sloppy
 python -m pytest tests/ -v
 
 # Build all patch pages + support pages
-python build_patch.py
+python builders/patch.py
 
 # View any patch
 open patches/7.41d.html
@@ -94,14 +99,14 @@ open patches/7.41d.html
    ```
    Produces `_generated_p_7.42.py` — review and edit (autodetector gets tags right ~80% of the time).
 3. Save the reviewed content as `content/p742.py`, wrapping the block in `def build():`.
-4. Add the import and call in `build_patch.py`:
+4. Add the import and call in `builders/patch.py`:
    ```python
    import content.p742
    # in __main__:
    content.p742.build()
    ```
 5. If new heroes/items appeared, register their slugs in `patch/images.py` (`HERO_SLUG` / `ITEM_SLUG`).
-6. Run `python build_patch.py` and open `patches/7.42.html` to verify.
+6. Run `python builders/patch.py` and open `patches/7.42.html` to verify.
 
 Full workflow: [docs/workflow.md](docs/workflow.md).
 
@@ -114,7 +119,7 @@ Full workflow: [docs/workflow.md](docs/workflow.md).
 
 GitHub Actions runs on every push:
 1. **pytest** — 166 unit tests for `patch/badges`, `patch/elements`, `patch/stats`
-2. **Full build** — all `build_*.py` scripts in sequence
+2. **Full build** — all `builders/*.py` scripts in sequence
 3. **Audits** — BAT `l=True` check, trailing-whitespace lint, ul-balance check across all content files
 4. **Deploy** — generated `_site/` published to GitHub Pages
 
