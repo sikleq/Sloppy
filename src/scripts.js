@@ -96,7 +96,9 @@
       if (!el) return;
       const navH = parseFloat(getComputedStyle(document.documentElement)
         .getPropertyValue('--site-nav-h')) || 70;
-      const y = el.getBoundingClientRect().top + window.scrollY - navH - 8;
+      const toolbarEl = document.querySelector('.toolbar');
+      const toolbarH = toolbarEl ? toolbarEl.getBoundingClientRect().height : 0;
+      const y = el.getBoundingClientRect().top + window.scrollY - navH - toolbarH - 8;
       window.scrollTo(0, Math.max(0, y));
     };
     // Several passes: the browser re-applies its own (nav-ignoring) hash scroll
@@ -448,7 +450,9 @@
     // past / below the result". Mirror the re-anchor offset used on load.
     const navH = parseFloat(getComputedStyle(document.documentElement)
       .getPropertyValue('--site-nav-h')) || 70;
-    const y = target.element.getBoundingClientRect().top + window.scrollY - navH - 8;
+    const toolbarEl = document.querySelector('.toolbar');
+    const toolbarH = toolbarEl ? toolbarEl.getBoundingClientRect().height : 0;
+    const y = target.element.getBoundingClientRect().top + window.scrollY - navH - toolbarH - 8;
     window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
     target.element.style.transition = 'box-shadow 0.4s';
     target.element.style.boxShadow = '0 0 0 2px #58a6ff';
@@ -1258,7 +1262,9 @@
             if (el) {
               const navH = parseFloat(getComputedStyle(document.documentElement)
                 .getPropertyValue('--site-nav-h')) || 70;
-              const y = el.getBoundingClientRect().top + window.scrollY - navH - 8;
+              const toolbarEl = document.querySelector('.toolbar');
+              const toolbarH = toolbarEl ? toolbarEl.getBoundingClientRect().height : 0;
+              const y = el.getBoundingClientRect().top + window.scrollY - navH - toolbarH - 8;
               window.scrollTo(0, Math.max(0, y));
             }
           }
