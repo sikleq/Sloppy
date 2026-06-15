@@ -1,4 +1,4 @@
-"""audit_abilities.py — Verify every ability() call in build_patch.py
+"""audit_abilities.py — Verify every ability() call in content/p<version>.py
 resolves to a valid engine slug whose live Valve in-game name matches
 the display name used in code.
 
@@ -37,24 +37,14 @@ herolist = fetch_json(HEROLIST)["result"]["data"]["heroes"]
 # Map: localized hero name -> id
 hero_id_for_loc = {h["name_loc"]: h["id"] for h in herolist}
 
-src = (ROOT / "build_patch.py").read_text(encoding="utf-8")
+# Slug maps live in the patch/ package; the ability()/hero_header() calls being
+# audited live in content/p<version>.py.
+sys.path.insert(0, str(ROOT))
+from patch.images import HERO_SLUG
+from patch.elements import HERO_TO_ABIL_PREFIX, ABILITY_DISPLAY_TO_SLUG as abi_disp_to_slug
 
-# Pull HERO_SLUG / ABILITY_DISPLAY_TO_SLUG / HERO_TO_ABIL_PREFIX
-def pull_dict(varname):
-    m = re.search(rf"{varname}\s*=\s*\{{(.*?)\n\}}", src, re.S)
-    if not m:
-        return {}
-    return dict(re.findall(r'"([^"]+)"\s*:\s*"([^"]+)"', m.group(1)))
-
-HERO_SLUG = pull_dict("HERO_SLUG")
-HERO_TO_ABIL_PREFIX = pull_dict("HERO_TO_ABIL_PREFIX")
-
-# ABILITY_DISPLAY_TO_SLUG uses tuple keys: ("hero", "display"): "ability_part"
-m = re.search(r"ABILITY_DISPLAY_TO_SLUG\s*=\s*\{(.*?)\n\}", src, re.S)
-abi_disp_to_slug = {}
-if m:
-    for mm in re.finditer(r'\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\)\s*:\s*"([^"]+)"', m.group(1)):
-        abi_disp_to_slug[(mm.group(1), mm.group(2))] = mm.group(3)
+src = "\n".join(p.read_text(encoding="utf-8")
+                for p in sorted((ROOT / "content").glob("*.py")))
 
 
 def derive_ability_part(title):
@@ -92,7 +82,7 @@ for m in re.finditer(
         if current_hero:
             calls.append((current_hero, m.group(2), m.group(3) or None, "ability"))
     elif m.group(0).startswith(('unit_header', 'plain_header', 'item_header', 'enchant_header')):
-        # These reset the hero context (mirror build_patch.py's
+        # These reset the hero context (mirror patch/elements.py's
         # _State.current_hero = None behavior inside those header
         # functions). Without this, neutral-creep / item abilities
         # right after a hero block get misattributed to the previous
@@ -173,7 +163,7 @@ for hero, display, explicit_slug, kind in calls:
 
     abis = valve_abilities[hero]  # {engine_slug: name_loc}
 
-    # Resolve slug (engine name) the same way build_patch.py does
+    # Resolve slug (engine name) the same way patch/elements.py does
     if explicit_slug:
         resolved = explicit_slug
     else:

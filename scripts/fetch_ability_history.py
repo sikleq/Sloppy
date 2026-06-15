@@ -3,7 +3,7 @@ dotabuff/d2vpkr и сохраняет компактные per-patch JSON
 `data/stats/<patch>/npc_abilities.json` с балансными полями способностей
 нейтралов (cooldown, manacost, damage, cast range + все AbilityValues).
 
-Нужно для полноценного чейнджлога способностей: build_creeps.py показывает в
+Нужно для полноценного чейнджлога способностей: builders/creeps.py показывает в
 ячейке Ability N не только смену самой способности, но и изменения её
 значений (перезарядка, манакост, длительности и т.д.) за 7.08→7.41c.
 
@@ -219,7 +219,7 @@ def commit_for_window(commit_idx, win_end):
 def main():
     force = "--force" in sys.argv
     if not META_PATH.exists():
-        print("X site_meta.json не найден — сначала build_patch.py")
+        print("X site_meta.json не найден — сначала builders/patch.py")
         return 1
     patch_dates = load_patch_dates()
     patches = sorted((v for v in patch_dates if (STATS_DIR / v).is_dir()),

@@ -3,7 +3,7 @@
 Each icon is a smooth adaptation of the GAME map icon in icons/ref/, fit + tinted
 to its layer's type colour (or kept NATURAL for bounty + the power runes) with a
 soft dark outline. The same PNG is the toolbar button AND the map marker
-(build_terrain.py wraps the map one in a gold ring over a dark/colour disc).
+(builders/terrain.py wraps the map one in a gold ring over a dark/colour disc).
 
 Refs (icons/ref/): towers.svg, roashan.svg, tormentor_png.png,
 Bounty_Rune_mapicon_dota2_gameasset.png, watcher_lantern.png, and

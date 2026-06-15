@@ -107,8 +107,8 @@ def save_calendar_html():
     # the year-picker button (see .cal-compact-toggle in styles.css).
     body.append(
         '<label class="ua-upgrades-toggle cal-compact-toggle" '
-        'title="Compact view">'
-        '<span class="ua-upgrades-label">Compact</span>'
+        'title="Compact view" data-i18n-title="cal.compact_view">'
+        '<span class="ua-upgrades-label" data-i18n="cal.compact">Compact</span>'
         '<input type="checkbox" class="ua-switch-input cal-compact-input">'
         '<span class="ua-switch"></span>'
         '</label>'
@@ -124,7 +124,8 @@ def save_calendar_html():
         body.append('<div class="cal-full-grid">')
         for month in range(1, 13):
             body.append(
-                f'<div class="cal-full-month-name" data-month="{month}">'
+                f'<div class="cal-full-month-name" data-month="{month}" '
+                f'data-i18n="cal.month.{month}">'
                 f'{months[month-1]}</div>'
             )
             days_in_m = monthrange(year, month)[1]
@@ -150,7 +151,7 @@ def save_calendar_html():
         body.append('<div class="cal-grid">')
         for mi, mname in enumerate(months, 1):
             body.append('<div class="cal-month">')
-            body.append(f'<div class="cal-month-name">{mname}</div>')
+            body.append(f'<div class="cal-month-name" data-i18n="cal.month.{mi}">{mname}</div>')
             body.append('<div class="cal-month-cells">')
             for p in by_month.get((year, mi), []):
                 v = p['version']
@@ -172,17 +173,17 @@ def save_calendar_html():
             body.append(
                 '<div class="cal-year-summary">'
                 '<div class="cal-year-summary-left">'
-                f'<span class="cal-year-summary-key">Total count:</span> '
+                f'<span class="cal-year-summary-key" data-i18n="cal.total_count">Total count:</span> '
                 f'<span class="cal-year-summary-val">{ys["total"]}</span>'
                 '</div>'
                 '<div class="cal-year-summary-right">'
-                f'<span class="cal-year-summary-key">Longest:</span> '
+                f'<span class="cal-year-summary-key" data-i18n="cal.longest">Longest:</span> '
                 f'<span class="cal-year-summary-val">{" &amp; ".join(ys["longest"][0])}</span>'
-                f' <span class="cal-year-summary-meta">({ys["longest"][1]} days)</span>'
+                f' <span class="cal-year-summary-meta">({ys["longest"][1]} <span data-i18n="cal.days">days</span>)</span>'
                 f' &middot; '
-                f'<span class="cal-year-summary-key">Shortest:</span> '
+                f'<span class="cal-year-summary-key" data-i18n="cal.shortest">Shortest:</span> '
                 f'<span class="cal-year-summary-val">{" &amp; ".join(ys["shortest"][0])}</span>'
-                f' <span class="cal-year-summary-meta">({ys["shortest"][1]} days)</span>'
+                f' <span class="cal-year-summary-meta">({ys["shortest"][1]} <span data-i18n="cal.days">days</span>)</span>'
                 '</div>'
                 '</div>'
             )
@@ -296,23 +297,23 @@ def save_calendar_html():
 
     # Lead panel: title + inline key stats (compact, no big chips).
     ig.append('<div class="cal-ig-panel cal-ig-lead">')
-    ig.append('<div class="cal-ig-title">Patch cadence</div>')
-    ig.append(f'<div class="cal-ig-sub">{min_year} – now</div>')
+    ig.append('<div class="cal-ig-title" data-i18n="cal.cadence">Patch cadence</div>')
+    ig.append(f'<div class="cal-ig-sub">{min_year} – <span data-i18n="cal.now">now</span></div>')
     ig.append('<div class="cal-ig-statline">'
-              f'<span><b>{total_patches}</b> patches:</span>'
+              f'<span><b>{total_patches}</b> <span data-i18n="cal.patches_label">patches:</span></span>'
               '<span class="cal-ig-rule"></span>'
-              f'<span><b class="cal-ig-major">{major_count}</b> major</span>'
-              f'<span><b>{sub_count}</b> letter</span>'
+              f'<span><b class="cal-ig-major">{major_count}</b> <span data-i18n="cal.major">major</span></span>'
+              f'<span><b>{sub_count}</b> <span data-i18n="cal.letter">letter</span></span>'
               '<span class="cal-ig-rule"></span>'
-              f'<span><b>{avg_per_year:.1f}</b> / year</span>'
-              f'<span><b>{median_span}</b>d median life</span>'
+              f'<span><b>{avg_per_year:.1f}</b> <span data-i18n="cal.per_year">/ year</span></span>'
+              f'<span><b>{median_span}</b>d <span data-i18n="cal.median_life">median life</span></span>'
               '</div>')
     ig.append('</div>')
 
     # Per-year sparkline (chronological left→right).
     yrs = sorted(year_counts)
     ig.append('<div class="cal-ig-panel">')
-    ig.append('<div class="cal-ig-h">Per year</div>')
+    ig.append('<div class="cal-ig-h" data-i18n="cal.per_year_h">Per year</div>')
     ig.append(_spark_svg(
         [year_counts[y] for y in yrs],
         [str(y)[2:] for y in yrs],
@@ -322,7 +323,7 @@ def save_calendar_html():
 
     # Per-month sparkline (all years combined).
     ig.append('<div class="cal-ig-panel">')
-    ig.append('<div class="cal-ig-h">Per month</div>')
+    ig.append('<div class="cal-ig-h" data-i18n="cal.per_month_h">Per month</div>')
     ig.append(_spark_svg(
         month_counts,
         [months[mi][0] for mi in range(12)],

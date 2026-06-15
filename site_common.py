@@ -1,10 +1,10 @@
 """Shared site chrome for the Sloppy static site.
 
-Used by both build_patch.py (patch changelogs + calendar + main hub) and
-build_creeps.py (the neutral-creeps table side-project). Owns the single
+Used by both builders/patch.py (patch changelogs + calendar + main hub) and
+builders/creeps.py (the neutral-creeps table side-project). Owns the single
 source of truth for:
   - the top-nav tab list (so adding a tab is a one-file change)
-  - the asset-version cache-bust hash (styles.css + scripts.js)
+  - the asset-version cache-bust hash (styles.css + src/scripts.js)
 
 Keeping these here means the two builders stay decoupled — neither has to
 import the other — while the header stays identical across every page.
@@ -39,7 +39,7 @@ def compute_asset_version():
 
 def get_latest_version():
     """Return the latest patch version string (e.g. '7.41c') from site_meta.json,
-    written by build_patch.py. Empty string if the meta hasn't been written yet."""
+    written during builders/patch.py. Empty string if the meta hasn't been written yet."""
     import json as _json
     meta_path = _os.path.join(_HERE, "data", "site_meta.json")
     try:
@@ -161,7 +161,7 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
         return prefix + href
     centre = ''.join(
         f'<a class="nav-tab{" active" if active == key else ""}" '
-        f'href="{_tab_href(key, href)}">{label}</a>'
+        f'href="{_tab_href(key, href)}" data-i18n="nav.{key}">{label}</a>'
         for key, label, href in NAV_TABS)
     # On the index hub the centre tabs are omitted — they'd just duplicate the
     # inventory-tile grid below. Other pages keep them. Keep an EMPTY centre
@@ -187,8 +187,8 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
                 '</span>'
             )
         elif materials_label:
-            ver_html = (f'<span class="version version-static version-materials">'
-                        f'{materials_label}</span>')
+            ver_html = (f'<span class="version version-static version-materials" '
+                        f'data-i18n="mat.{subtabs_active}">{materials_label}</span>')
         elif active == "calendar":
             ver_html = ''
         else:
@@ -199,11 +199,25 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
             f'<div class="nav-context nav-context-flat '
             f'nav-context-{active}">{ver_html}</div>'
         )
+    # EN/RU language switcher — UI chrome only (see i18n module in scripts.js).
+    # Lives in the shared nav so it appears on every page from one definition.
+    # Default-active is EN; scripts.js reflects the saved choice on load.
+    lang_switch = (
+        '<div class="lang-switch" role="group" aria-label="Language">'
+        '<button type="button" class="lang-btn active" data-lang="en" '
+        'aria-pressed="true">EN</button>'
+        '<button type="button" class="lang-btn" data-lang="ru" '
+        'aria-pressed="false">RU</button>'
+        '</div>'
+    )
+    # Wrap the picker/version block together with the switcher so the nav-inner
+    # grid keeps exactly three columns (brand · tabs · right).
+    right_col = f'<div class="nav-right">{right_side}{lang_switch}</div>'
     header = f'''<nav class="top-nav">
   <div class="nav-inner">
     {brand}
     {centre_html}
-    {right_side}
+    {right_col}
   </div>
 </nav>
 '''
@@ -240,7 +254,8 @@ def render_materials_subnav(active, prefix=""):
         if children is None:
             # Plain link (Terrain — no children).
             cls = "nav-subtab" + (" active" if active == gkey else "")
-            parts.append(f'<a class="{cls}" href="{prefix}{ghref}">{glabel}</a>')
+            parts.append(f'<a class="{cls}" href="{prefix}{ghref}" '
+                         f'data-i18n="mat.{gkey}">{glabel}</a>')
             continue
         # Flatten child + grandchild keys so the group highlights when any
         # descendant page is active.
@@ -258,9 +273,11 @@ def render_materials_subnav(active, prefix=""):
             ckey, clabel, chref = node[0], node[1], node[2]
             if chref is None:
                 return (f'<span class="nav-subitem nav-subitem-soon" aria-disabled="true">'
-                        f'{clabel}<span class="nav-soon-tag">soon</span></span>')
+                        f'<span data-i18n="mat.{ckey}">{clabel}</span>'
+                        f'<span class="nav-soon-tag" data-i18n="ui.soon">soon</span></span>')
             icls = "nav-subitem" + (" active" if active == ckey else "")
-            return f'<a class="{icls}" href="{prefix}{chref}">{clabel}</a>'
+            return (f'<a class="{icls}" href="{prefix}{chref}" '
+                    f'data-i18n="mat.{ckey}">{clabel}</a>')
 
         items = []
         for node in children:
@@ -271,7 +288,8 @@ def render_materials_subnav(active, prefix=""):
                 pcls = "nav-subitem nav-subitem-parent" + (
                     " active" if active == node[0] else "")
                 trigger = (
-                    f'<a class="{pcls}" href="{prefix}{node[2]}">{node[1]}'
+                    f'<a class="{pcls}" href="{prefix}{node[2]}">'
+                    f'<span data-i18n="mat.{node[0]}">{node[1]}</span>'
                     f'<span class="nav-caret nav-caret-side" aria-hidden="true">'
                     f'▸</span></a>')
                 flyout = ('<div class="nav-submenu nav-submenu-flyout">'
@@ -282,7 +300,7 @@ def render_materials_subnav(active, prefix=""):
             else:
                 items.append(_item(node))
         trigger = (f'<a class="{trig_cls}" href="{prefix}{ghref}">'
-                   f'<span class="nav-subtab-label">{glabel}</span>'
+                   f'<span class="nav-subtab-label" data-i18n="mat.{gkey}">{glabel}</span>'
                    f'<span class="nav-caret" aria-hidden="true">▾</span></a>')
         menu = f'<div class="nav-submenu">{"".join(items)}</div>'
         parts.append(f'<div class="nav-subgroup">{trigger}{menu}</div>')

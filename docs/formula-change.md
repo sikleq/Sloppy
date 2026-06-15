@@ -76,8 +76,8 @@ Pass `vary=(var, label, [values])` + `fixed={input_var: default}` + `unit="…"`
   `*-text` badge classes); set `lower_better=True` for timers (faster = buff).
 
 Helpers (`_fmt_formula`, `_eval_formula`, `_formula_pct_badge`) live in
-`build_patch.py`; styles in `styles.css` under "Game-formula change"; the live
-recompute is in `scripts.js` ("Formula calculator").
+`patch/elements.py`; styles in `styles.css` under "Game-formula change"; the live
+recompute is in `src/scripts.js` ("Formula calculator").
 
 First used in **7.40** General Changes (Assist Gold, higher gold = buff) — at
 VictimNetworth 10,000: Old `430→134`, New `435→99` gold for 1→5 heroes

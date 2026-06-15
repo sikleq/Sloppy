@@ -200,11 +200,13 @@ def _attr_filter_buttons() -> str:
         ("int", "Intelligence", "icons/intelligence.webp"),
         ("uni", "Universal", "icons/universal.webp"),
     ]
-    html = ['<span class="hs-attr-filter-group" aria-label="Primary attribute filter">']
+    html = ['<span class="hs-attr-filter-group" aria-label="Primary attribute filter" '
+            'data-i18n-aria-label="dyn.attr_filter">']
     for key, label, icon in buttons:
         html.append(
             '<button type="button" class="hs-attr-filter" '
-            f'data-attr-filter="{key}" aria-pressed="false" title="Show {label} heroes">'
+            f'data-attr-filter="{key}" aria-pressed="false" title="Show {label} heroes" '
+            f'data-i18n-title="dyn.attr_title.{key}">'
             f'<img src="{icon}" alt="{label}" loading="lazy"></button>'
         )
     html.append('</span>')
@@ -1414,27 +1416,31 @@ def render_html() -> str:
     # ---- header ----
     head = [
         '<th class="mr-th hs-th hs-name sortable" data-col="name" data-cat="basic">'
-        '<span class="th-label">Hero</span><span class="sort-ind"></span></th>',
+        '<span class="th-label" data-i18n="hs.name">Hero</span><span class="sort-ind"></span></th>',
         '<th class="mr-th hs-th hs-col-attr sortable" data-col="attr" data-cat="basic">'
-        '<span class="th-label">Attr</span><span class="sort-ind"></span></th>',
+        '<span class="th-label" data-i18n="hs.attr">Attr</span><span class="sort-ind"></span></th>',
     ]
     for col in COLUMNS:
         direction = "lower" if col["pol"] == "lo" else "higher"
+        # Single-line labels translate safely; multi-line (EHP phys, Dmg min …)
+        # keep their English abbreviation so the th-sub structure survives.
+        i18n = f' data-i18n="hs.col.{col["key"]}"' if '\n' not in col["label"] else ''
         head.append(
             f'<th class="mr-th hs-th hs-col-{col["key"]}{_mode_cls(col)}'
             f'{_sep_cls(col)} sortable" '
             f'data-col="{col["key"]}" data-direction={direction} '
             f'data-cat="{col.get("cat", "other")}">'
-            f'<span class="th-label">{_label_html(col["label"])}</span>'
+            f'<span class="th-label"{i18n}>{_label_html(col["label"])}</span>'
             f'<span class="sort-ind"></span></th>')
     thead = "".join(head)
-    cat_cells = ['<th class="cat-head cat-basic" data-cat="basic" colspan="2">Basic</th>']
+    cat_cells = ['<th class="cat-head cat-basic" data-cat="basic" colspan="2" '
+                 'data-i18n="hs.cat.basic">Basic</th>']
     for cat_name, cat_slug, keys in CATEGORIES:
         if cat_slug == "basic":
             continue
         cat_cells.append(
             f'<th class="cat-head cat-{cat_slug}" data-cat="{cat_slug}" '
-            f'colspan="{len(keys)}">{_esc(cat_name)}</th>')
+            f'colspan="{len(keys)}" data-i18n="hs.cat.{cat_slug}">{_esc(cat_name)}</th>')
     cat_row = "".join(cat_cells)
 
     # ---- body ----
@@ -1522,7 +1528,7 @@ def render_html() -> str:
     )
 
     blurb = (
-        '<p class="mr-blurb inbox-bar">Compare hero stats across three views. '
+        '<p class="mr-blurb inbox-bar" data-i18n-html="hs.blurb">Compare hero stats across three views. '
         '<em>Base</em> shows raw level-1 game-file values and ignores the level '
         'control; <em>Starting</em> shows practical values with attribute bonuses '
         'and supported innate conversions; the <em>+2 stats</em> toggle applies '
@@ -1536,47 +1542,47 @@ def render_html() -> str:
     toolbar = (
         '<div class="cal-toggle-bar mr-toolbar inbox-bar"><div class="toolbar-panel">'
         '<span class="view-group">'
-        '<strong>View</strong>'
+        '<strong data-i18n="cr.view">View</strong>'
         '<select class="cal-mode-select" id="hs-view-mode">'
-        '<option value="base">Base</option>'
-        '<option value="starting" selected>Starting</option>'
-        '<option value="expanded">Expanded</option>'
+        '<option value="base" data-i18n="hs.view.base">Base</option>'
+        '<option value="starting" selected data-i18n="hs.view.starting">Starting</option>'
+        '<option value="expanded" data-i18n="cr.view.expanded">Expanded</option>'
         '</select>'
         '</span>'
-        '<span class="hs-attack-filter-group" aria-label="Attack type filter">'
+        '<span class="hs-attack-filter-group" aria-label="Attack type filter" data-i18n-aria-label="dyn.attack_filter">'
         '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
-        'aria-pressed="false" title="Show melee heroes">'
+        'aria-pressed="false" title="Show melee heroes" data-i18n-title="dyn.atk_title.melee">'
         '<span class="atk-badge" aria-hidden="true">'
-        '<img src="icons/ui/atk_melee.png" alt=""></span><span>Melee</span></button>'
+        '<img src="icons/ui/atk_melee.png" alt=""></span><span data-i18n="dyn.melee">Melee</span></button>'
         '<button type="button" class="hs-attack-filter" data-attack-filter="ranged" '
-        'aria-pressed="false" title="Show ranged heroes">'
+        'aria-pressed="false" title="Show ranged heroes" data-i18n-title="dyn.atk_title.ranged">'
         '<span class="atk-badge" aria-hidden="true">'
-        '<img src="icons/ui/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
+        '<img src="icons/ui/atk_ranged.png" alt=""></span><span data-i18n="dyn.ranged">Ranged</span></button>'
         '</span>'
         + _attr_filter_buttons() +
         '<label class="hs-level-group">'
-        '<span>Lvl</span>'
+        '<span data-i18n="hs.lvl">Lvl</span>'
         '<input type="number" id="hs-level-input" min="1" max="30" value="1" '
-        'inputmode="numeric" aria-label="Hero level">'
+        'inputmode="numeric" aria-label="Hero level" data-i18n-aria-label="hs.hero_level">'
         '</label>'
         '<label class="ua-upgrades-toggle hs-plus2-toggle">'
-        '<span class="ua-upgrades-label">+2 stats</span>'
+        '<span class="ua-upgrades-label" data-i18n="hs.plus2">+2 stats</span>'
         '<input type="checkbox" id="hs-plus2-toggle" class="ua-switch-input" checked>'
         '<span class="ua-switch" aria-hidden="true"></span>'
         '</label>'
         '<label class="ua-upgrades-toggle hs-innates-toggle">'
-        '<span class="ua-upgrades-label">Innates</span>'
+        '<span class="ua-upgrades-label" data-i18n="hs.innates">Innates</span>'
         '<input type="checkbox" id="hs-innates-toggle" class="ua-switch-input" checked>'
         '<span class="ua-switch" aria-hidden="true"></span>'
         '</label>'
         '<label class="ua-upgrades-toggle">'
-        '<span class="ua-upgrades-label">Heatmap</span>'
+        '<span class="ua-upgrades-label" data-i18n="mi.heatmap">Heatmap</span>'
         '<input type="checkbox" id="mr-heatmap-toggle" class="ua-switch-input">'
         '<span class="ua-switch" aria-hidden="true"></span>'
         '</label>'
         '<span class="search-box hd-search">'
         '<input type="text" id="mr-search" autocomplete="off" spellcheck="false" '
-        'placeholder="Search heroes — axe, crystal, wisp…">'
+        'placeholder="Search heroes — axe, crystal, wisp…" data-i18n-placeholder="hs.search_ph">'
         '</span>'
         '</div></div>\n'
     )

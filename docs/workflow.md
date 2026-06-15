@@ -9,10 +9,12 @@
 ## Step 2 — Generate the scaffold
 
 ```bash
-python generate_patch_code.py 7.42
+python generate_patch_code_v2.py 7.42
 ```
 
-Writes `_generated_p_7.42.py` containing `W(li(...))`, `W(hero_header(...))`, etc. calls extracted from the KV.
+Reads the cached datafeed JSON (`data/7.42_datafeed.json`) and writes
+`_generated_p_7.42_v2.py` containing `W(li(...))`, `W(hero_header(...))`, etc.
+calls built on the `patch/` helper API.
 
 Manually review:
 
@@ -21,38 +23,36 @@ Manually review:
 - **Formula rows** — `bf()` / `li_formula()` calls need accurate lambdas.
 - **New heroes / items / abilities** missing from `HERO_SLUG` / `ITEM_SLUG`.
 
-## Step 3 — Integrate into build_patch.py
+## Step 3 — Save as a content module
 
-1. Open `build_patch.py`.
-2. Find the current-patch section (comment `# ===== PATCH 7.41c =====`).
-3. Add a new section for the next version, paste the reviewed code from `_generated_p_7.42.py`.
-4. Hand-fix any remaining tag / flag issues.
+1. Review and hand-fix `_generated_p_7.42_v2.py`.
+2. Save the reviewed body as `content/p742.py`, wrapping it in `def build():`.
+3. Register it in `builders/patch.py`:
+   ```python
+   import content.p742
+   # in __main__ (oldest → newest):
+   content.p742.build()
+   ```
 
 ## Step 4 — Register new entities
 
-New hero:
+New hero / item — add the display-name → engine-slug mapping in `patch/images.py`:
 
 ```python
-# build_patch.py — HERO_SLUG
+# patch/images.py — HERO_SLUG
 "New Hero": "new_hero_slug",
 
-# generate_patch_code.py — load_hero_internal_to_display()
-'new_hero_slug': 'New Hero',
-```
-
-New item:
-
-```python
-# build_patch.py — ITEM_SLUG
+# patch/images.py — ITEM_SLUG
 "New Item": "new_item_slug",
 ```
 
-`generate_patch_code.py` reads `ITEM_SLUG` from `build_patch.py` automatically.
+(`generate_patch_code_v2.py` resolves names from the cached `data/herolist.json`
+/ `data/itemlist.json` datafeeds, so the generator itself needs no manual map.)
 
 ## Step 5 — Build and verify
 
 ```bash
-python build_patch.py
+python builders/patch.py
 ```
 
 Open the regenerated `patches/7.42.html` and confirm:
@@ -72,13 +72,13 @@ Walks `_ability_icons.txt` and reports any URLs that don't resolve on Valve CDN.
 
 ## Step 7 — Deploy
 
-Push to `main`. GitHub Pages serves `https://sikleq.github.io/Sloppy/`. The `build` workflow (`.github/workflows/build.yml`) re-runs `python build_patch.py` on every push and fails the build if syntax / audits regress.
+Push to `main`. GitHub Pages serves `https://sikleq.github.io/Sloppy/`. The `build` workflow (`.github/workflows/build.yml`) runs the tests, then `python builders/patch.py` (+ the other builders) on every push and fails the build if tests / audits regress.
 
 ## Common errors
 
 | Error | Cause |
 |---|---|
-| `KeyError` in `t()` | Unknown tag — check the value against `TAG_OVERRIDES` |
+| `KeyError` in `t()` | Unknown tag — check the value passed to `t(...)` (BUFF/NERF/REWORK/MISC/QoL/NEW/DEL) |
 | Icon 404 (in the page) | Wrong slug in `HERO_SLUG` / `ITEM_SLUG`, or Valve hasn't added the icon yet |
 | Filter doesn't match the row | `data-tag` attribute missing or wrong — check the badge call |
 | Formula table doesn't expand | `bf()` didn't return the table to `extra=table` in `li()` |

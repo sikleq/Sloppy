@@ -1,8 +1,8 @@
 # Terrain page (`terrain.html`)
 
 5th tab under **Materials**. Compares the Dota map **old → new** with a swipe
-slider, plus that patch's *Terrain Changes* list. Built by `build_terrain.py`
-(standalone, like `build_heroes_dyn.py`); CI runs it after `build_patch.py`.
+slider, plus that patch's *Terrain Changes* list. Built by `builders/terrain.py`
+(standalone, like `builders/heroes_dyn.py`); CI runs it after `builders/patch.py`.
 
 ## Status (2026-06-04)
 
@@ -91,7 +91,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.
 
 - **10 point-entity toggle layers** beyond Trees/Camps: towers, lotus pools, twin
   gates, tormentors, bounty runes, power runes, wisdom shrines, **outposts**,
-  **watchers**, **roshan** (`_ENTITY_LAYERS` in build_terrain.py). Data = full
+  **watchers**, **roshan** (`_ENTITY_LAYERS` in builders/terrain.py). Data = full
   old+new coord sets in `terrain_diff.json["entities"]` (built by
   build_terrain_diff.py). **leamare keys (`layerDefinitions.js`):** `npc_dota_tower`,
   `npc_dota_lotus_pool`, `npc_dota_unit_twin_gate`, `npc_dota_miniboss_spawner`,
@@ -139,7 +139,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.
   `.cal-toggle-bar` toolbar, lists every patch with terrain changes (newest
   first). `scripts.js initTerrainPicker` toggles `.terrain-map-pane` +
   `.terrain-list-pane` by `data-patch`.
-- **Change lists are PARSED from build_patch.py** (`_terrain_changes_by_patch`)
+- **Change lists are PARSED from `content/` patch files** (`builders/terrain.py::_terrain_changes_by_patch`)
   → no drift. One `(text, TAG)` list per `plain_header("Terrain Changes")`
   section. `b(...)` rows → BUFF/NERF by direction honouring `l=True`.
 - **Map pairs** — `_MAP_PAIRS` maps `patch → (old_ver, new_ver)` for every patch
@@ -164,7 +164,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.
   pair: the latest map blurred + dimmed with a centred "Map comparison for X
   isn't available yet" overlay; the textual change list still renders.
 - **Deep-link from patch pages** — `plain_header("Terrain Changes",
-  terrain_link="<base_ver>")` (build_patch.py) renders a gold `.terrain-jump-btn`
+  terrain_link="<base_ver>")` (`patch/elements.py`) renders a gold `.terrain-jump-btn`
   "View on map" link in the section header → `../terrain.html?patch=<base_ver>`.
   `initTerrainPicker` reads `?patch=` on load and preselects that pane via the
   existing picker. ONE shared page — no per-patch `terrain_<ver>.html`.
@@ -175,7 +175,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.
 
 1. ✅ **No-map fallback** — done (`_fallback_html`).
 2. ✅ **Patch picker** — done; lists only patches with terrain changes, sourced
-   from build_patch.py so it can't drift. Next: when a NEW patch gets a real
+   from `content/` so it can't drift. Next: when a NEW patch gets a real
    old→new map pair, add it to `_MAP_PAIRS` + drop its maps in `icons/maps/`.
 3. ✅ **Marker redesign — done.** Toggleable tree + camp layers, both split
    old/new by the slider; magnifier lens. **Projection is now EXACT** — uses the
@@ -183,7 +183,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.
    `map_x_boundaries [-10829.42, 11487.75]`, `map_y_boundaries [11351.48,
    -10939.96]`, MAP_W 20480; zoom-2 tile = 1024 map-px → ÷4 canvas). The crop
    box + bounds are written to `data/terrain_map_meta.json` by
-   build_terrain_maps.py and read by build_terrain.py's `_projector`. (Earlier
+   build_terrain_maps.py and read by builders/terrain.py's `_projector`. (Earlier
    it wrongly used worlddata.json bounds → trees were misplaced.)
 4. ✅ **Map source — done.** Stitched from spectral tiles
    (`scripts/build_terrain_maps.py`, zoom 2 → 1280²).
@@ -192,7 +192,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.
 
 ## Gotchas
 
-- **Right patch section.** `build_patch.py` has multiple `Terrain Changes`
+- **Right patch section.** The `content/` files have multiple `Terrain Changes`
   blocks (one per patch). Use the one under the matching `write_head("X.YZ")`.
   The 7.40 list (streams into bases, Wisdom Shrines to low ground, defender's
   gates, bridges) is the big rework and is NOT the 7.41 list.

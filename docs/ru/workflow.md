@@ -9,10 +9,10 @@
 ## Шаг 2 — Сгенерировать шаблон кода
 
 ```bash
-python generate_patch_code.py 7.42
+python generate_patch_code_v2.py 7.42
 ```
 
-Создаст `_generated_p_7.42.py` — Python-код с вызовами `W(li(...))`, `W(hero_header(...))` и т.д.
+Читает кэш датафида (`data/7.42_datafeed.json`) и создаёт `_generated_p_7.42_v2.py` — Python-код с вызовами `W(li(...))`, `W(hero_header(...))` и т.д. на хелперах `patch/`.
 
 Что нужно проверить в сгенерированном файле:
 - Теги (BUFF/NERF/REWORK) — автодетект ошибается ~10-20% случаев
@@ -20,38 +20,36 @@ python generate_patch_code.py 7.42
 - Формульные изменения — `bf()` вызовы требуют правильных лямбд
 - Новые герои/предметы которых нет в словарях
 
-## Шаг 3 — Интегрировать в build_patch.py
+## Шаг 3 — Сохранить как content-модуль
 
-1. Открыть `build_patch.py`
-2. Найти секцию текущего патча (комментарий `# ===== PATCH 7.41c =====`)
-3. Добавить секцию нового патча, вставить код из `_generated_p_7.42.py`
-4. Поправить вручную ошибочные теги и флаги
+1. Отревьюить и поправить `_generated_p_7.42_v2.py`
+2. Сохранить тело как `content/p742.py`, обернув в `def build():`
+3. Зарегистрировать в `builders/patch.py`:
+   ```python
+   import content.p742
+   # в __main__ (от старых к новым):
+   content.p742.build()
+   ```
 
 ## Шаг 4 — Добавить новых героев/предметы (если есть)
 
-Если в патче новый герой:
+Новый герой / предмет — добавить маппинг имя → engine-слаг в `patch/images.py`:
 ```python
-# В build_patch.py: HERO_SLUG
+# patch/images.py: HERO_SLUG
 "New Hero": "new_hero_slug",
 
-# В generate_patch_code.py: load_hero_internal_to_display()
-'new_hero_slug': 'New Hero',
-```
-
-Если новый предмет:
-```python
-# В build_patch.py: ITEM_SLUG
+# patch/images.py: ITEM_SLUG
 "New Item": "new_item_slug",
-# generate_patch_code.py читает ITEM_SLUG из build_patch.py автоматически
 ```
+(`generate_patch_code_v2.py` резолвит имена из `data/herolist.json` / `data/itemlist.json` — отдельный маппинг генератору не нужен.)
 
 ## Шаг 5 — Собрать и проверить
 
 ```bash
-python build_patch.py > 7.42.html
+python builders/patch.py
 ```
 
-Открыть `7.42.html` в браузере и проверить:
+Открыть `patches/7.42.html` в браузере и проверить:
 - Фильтры (BUFF / NERF / ALL) работают
 - Формульные таблицы раскрываются
 - Картинки героев/предметов загружаются (CDN URL)
@@ -59,14 +57,13 @@ python build_patch.py > 7.42.html
 
 ## Шаг 6 — Деплой
 
-Загрузить `7.42.html` туда где хостишь сайт.
-Обновить ссылку в `index.html` если нужно.
+Запушить в `main` — CI (`.github/workflows/build.yml`) прогонит тесты и `builders/patch.py` (+ остальные билдеры) и задеплоит на GitHub Pages.
 
 ## Типичные ошибки
 
 | Ошибка | Причина |
 |---|---|
-| `KeyError` в `t()` | Неизвестный тег, проверь значение TAG_OVERRIDES |
+| `KeyError` в `t()` | Неизвестный тег — проверь значение, переданное в `t(...)` (BUFF/NERF/REWORK/MISC/QoL/NEW/DEL) |
 | Картинка 404 | Неверный slug в HERO_SLUG/ITEM_SLUG, проверь CDN |
 | Фильтр не работает | Забыл `data-tag` атрибут в `li()`, проверь бейдж |
 | Таблица не раскрывается | `bf()` не вернул table в `extra=table` |

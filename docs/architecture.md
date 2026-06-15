@@ -3,37 +3,45 @@
 ## Data flow
 
 ```
-data/patchnotes_english.txt   (Valve KV)
+data/<version>_datafeed.json   (Valve datafeed JSON, cached)
         ↓
-generate_patch_code.py        (parser → Python helper calls)
+generate_patch_code_v2.py      (parser → patch/ helper calls)
         ↓
-_generated_p_<version>.py     (intermediate, reviewed by hand)
+_generated_p_<version>_v2.py   (intermediate, reviewed by hand)
         ↓
-build_patch.py                (integrated by hand + CSS + JS + helpers)
+content/p<version>.py          (reviewed def build(); registered in builders/patch.py)
         ↓
-patches/<version>.html        (final site output)
+builders/patch.py + patch/     (orchestrator runs every content.build())
+        ↓
+patches/<version>.html         (final site output)
 ```
 
-## build_patch.py — top-to-bottom layout
+## The `patch/` package
 
-| Section | Purpose |
+The old monolith `build_patch.py` was split into a package; patch content moved
+into one file per version under `content/`. Helpers are imported via
+`from patch.api import *`.
+
+| Module | Purpose |
 |---|---|
-| CDN constants | URLs for hero / item / ability icons |
-| `HERO_SLUG` / `ITEM_SLUG` | Display-name → CDN-slug maps |
-| Gradient helpers | `gradient_class()`, `b()`, `br()`, `bf()`, `t()` |
-| HTML helpers | `hero_header()`, `item_header()`, `section()`, `ability()`, `li()`, `subnote()` |
-| CSS / JS load | `styles.css` and `JS_TEXT` are **read from the standalone `styles.css` / `scripts.js` files on disk** at module load — they are hand-edited **source files**, NOT generated. |
-| Scaffold | `W()` writer, HTML wrapper, top nav, filter chrome |
-| Patch content | One section per version with calls to the helpers |
-| `save_index_html` | Landing page — game "inventory book" (gothic pixel UI slots → section links). |
-| `save_calendar_html` | Calendar + custom year picker + "Patch cadence" SVG-sparkline infographic. |
+| `patch/images.py` | CDN constants, `HERO_SLUG` / `ITEM_SLUG` display-name → slug maps |
+| `patch/badges.py` | `gradient_class()`, `b()`, `br()`, `bf()`, `t()`, `scale_pill()` |
+| `patch/elements.py` | HTML helpers: `hero_header()`, `item_header()`, `section()`, `ability()`, `li()`, `subnote()`, … |
+| `patch/output.py` / `patch/state.py` | `W()` writer accumulator + `_State` build singleton |
+| `patch/page.py` | `write_head()` / `write_footer()` / `save_html()`; reads `styles.css` + `src/scripts.js` from disk and stamps a cache-busting `?v=` |
+| `patch/meta.py` | `PATCHES`, `RELEASE_HISTORY`, nav / date helpers |
+| `patch/rosters.py` | hero/item rosters, writes `_dynamics.json` |
+| `patch/index_page.py` / `patch/calendar.py` | landing "inventory book" + calendar/cadence infographic |
+| `content/p<version>.py` | per-patch `def build()` — the patch content |
+| `builders/patch.py` | orchestrator: imports every `content` module and runs `build()` oldest → newest |
 
-Running `python build_patch.py` writes: one HTML file per patch (under `patches/`),
-`index.html`, `calendar.html`, `_ability_icons.txt`, and `data/site_meta.json`.
-`styles.css` / `scripts.js` are **source files, not outputs** (they're read, not
-written). The tables — `neutral_stats.html`, `neutral_abilities.html`, `mana_items.html` —
-are built separately by `build_creeps.py` / `build_mana_items.py` (run AFTER
-`build_patch.py`; see [tables.md](tables.md)).
+Running `python builders/patch.py` writes: one HTML file per patch (under
+`patches/`), `index.html`, `calendar.html`, `_ability_icons.txt`,
+`_dynamics.json`, and `data/site_meta.json`. `styles.css` (repo root) and
+`src/scripts.js` are **source files, not outputs**. The tables —
+`neutral_stats.html`, `neutral_abilities.html`, `mana_items.html` — are built
+separately by `builders/creeps.py` / `builders/mana_items.py` (run AFTER
+`builders/patch.py`; see [tables.md](tables.md)).
 
 ### Patch-dynamics widget (dyn-cells)
 
@@ -56,25 +64,25 @@ fallback **directly as the `<img src>`** (innate → `innate_icon.png`, else
 entity-search dropdown (which reads `img.src`) showed the wrong icon. The set of
 present files is cached in `_LOCAL_ABIL_ICONS` at module load.
 
-## generate_patch_code.py
+## generate_patch_code_v2.py
 
-1. Reads `data/patchnotes_english.txt`.
-2. Greps for `"DOTA_Patch_7_41c_<key>" "<value>"` lines.
-3. `parse_key()` decomposes the key into entity type (hero / item / general / etc.) and target entity.
-4. `parse_value_change()` tries to extract `from X to Y`, formula, range, or guesses the tag from text patterns.
-5. Emits Python lines like `W(li("Mana cost reduced from 100 to 80", b(100, 80, l=True)))`.
-6. Writes to `_generated_p_<version>.py`.
+The canonical scaffold generator (datafeed-aware):
 
-The autodetector is right ~80% of the time. Tag classification, `l=True` placement, and per-level formula extraction need human review before integration.
+1. Loads the cached datafeed JSON (`data/<version>_datafeed.json`) + `itemlist.json` / `herolist.json`.
+2. Walks each top-level section (General → Items → Neutral Creeps → Neutral Items → Heroes) and each entity's note tree, preserving the `indent_level` hierarchy, facet subsections, aghanims markers, and info clarifications.
+3. Applies text-heuristic tag inference (BUFF / NERF / REWORK / MISC / QoL / NEW / DEL) + `l=True` for cost / BAT / cooldown / manacost / cast-point keywords + canonical-phrase tags.
+4. Emits Python lines like `W(li("Mana cost reduced from 100 to 80", b(100, 80, l=True)))` and writes `_generated_p_<version>_v2.py`.
+
+The autodetector is right ~80% of the time. Tag classification, `l=True` placement, and per-level formula extraction need human review before saving as `content/p<version>.py`.
 
 ## How CSS / JS reach the HTML
 
-`styles.css` and `scripts.js` at the repo root are **hand-edited source files**, shared
+`styles.css` (repo root) and `src/scripts.js` are **hand-edited source files**, shared
 by every page. They are **linked, not embedded**: patch pages reference
-`../styles.css?v=…` / `../scripts.js?v=…`, and root pages (`index.html`,
-`calendar.html`, `neutral_stats.html`, …) reference `styles.css?v=…` / `scripts.js?v=…`.
-`build_patch.py` reads them from disk at module load (e.g. into `JS_TEXT`) and stamps
-a cache-busting `?v=` asset version — editing happens in one place, no copy is embedded.
+`../styles.css?v=…` / `../src/scripts.js?v=…`, and root pages (`index.html`,
+`calendar.html`, `neutral_stats.html`, …) reference them relative to root.
+`patch/page.py` reads them from disk and stamps a cache-busting `?v=` asset
+version — editing happens in one place, no copy is embedded.
 
 ## Stats DB
 

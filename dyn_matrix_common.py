@@ -4,8 +4,8 @@ A matrix table: ROWS = every entity (icon + name, alphabetical), COLUMNS = every
 patch (version + release date), each CELL = that entity's patch-dynamics
 "dyn-cell" for that patch (the same diamond-pill widget used on patch pages).
 
-`save_dyn_matrix(...)` is entity-agnostic — `build_heroes_dyn.py` calls it with
-the hero config, `build_items_dyn.py` with the item config. Everything below
+`save_dyn_matrix(...)` is entity-agnostic — `builders/heroes_dyn.py` calls it with
+the hero config, `builders/items_dyn.py` with the item config. Everything below
 (super-category row, group dividers, sticky identity column, fit-to-width, the
 spacer gutter column, the Remove chips + search toolbar) is identical for both;
 only the roster, icon directory, column noun, eid prefix and the back-arrow
@@ -17,7 +17,7 @@ only emits the table skeleton: marked data cells (entity changed that patch) and
 static empty diamonds (everything else). The same `.heroes-dyn-table` class is
 reused for BOTH pages so the shared CSS + JS apply unchanged.
 
-Data: `_dynamics.json` (written by build_patch.py) —
+Data: `_dynamics.json` (written by patch/rosters.py) —
   - `patches`  : ordered newest-first list of {version, filename, date}
   - `entities` : per-entity tag tallies, keyed "<kind>|<slug>"
   - `heroes` / `items` : full alphabetical roster [{name, icon, key}]
@@ -76,7 +76,7 @@ def _esc(s):
     return _html.escape(str(s), quote=True)
 
 
-def _multiselect_dropdown(dd_id, label, options):
+def _multiselect_dropdown(dd_id, label, options, *, label_key=None):
     """A single toolbar control = a button that opens a checkbox popover for
     multi-select filtering. `options` = [(value, label, checked), ...]. Each option
     checkbox carries data-<dd_id>="<value>"; a top "All" checkbox (data-dd-all) toggles
@@ -85,17 +85,22 @@ def _multiselect_dropdown(dd_id, label, options):
     applyRowFilters. scripts.js `initHdDropdowns` wires open/close + the badge
     ("all"/count); `applyRowFilters` reads checked option values vs each row's
     data-<dd_id>. Used for Type (class) and Category."""
+    def _opt_i18n(opt):
+        # Options are (value, label, checked) or (value, label, checked, i18n_key).
+        return f' data-i18n="{_esc(opt[3])}"' if len(opt) > 3 and opt[3] else ''
     opts = ''.join(
         f'<label class="hd-dd-opt"><input type="checkbox" '
-        f'data-{_esc(dd_id)}="{_esc(v)}"{" checked" if ck else ""}>'
-        f'<span>{_esc(lbl)}</span></label>'
-        for v, lbl, ck in options)
+        f'data-{_esc(dd_id)}="{_esc(opt[0])}"{" checked" if opt[2] else ""}>'
+        f'<span{_opt_i18n(opt)}>{_esc(opt[1])}</span></label>'
+        for opt in options)
     all_row = ('<label class="hd-dd-opt hd-dd-all"><input type="checkbox" data-dd-all>'
-               '<span>All</span></label><div class="hd-dd-sep" aria-hidden="true"></div>')
+               '<span data-i18n="dyn.all">All</span></label>'
+               '<div class="hd-dd-sep" aria-hidden="true"></div>')
+    label_attr = f' data-i18n="{_esc(label_key)}"' if label_key else ''
     return (
         f'<div class="hd-dd" data-dd="{_esc(dd_id)}">'
         f'<button type="button" class="hd-dd-btn" aria-expanded="false" '
-        f'aria-haspopup="true"><span class="hd-dd-label">{_esc(label)}</span>'
+        f'aria-haspopup="true"><span class="hd-dd-label"{label_attr}>{_esc(label)}</span>'
         f'<span class="hd-dd-badge" aria-hidden="true"></span>'
         f'<svg class="hd-dd-caret" viewBox="0 0 10 6" width="10" height="6" '
         f'aria-hidden="true"><path d="M0 0l5 6 5-6z" fill="currentColor"/></svg>'
@@ -111,11 +116,13 @@ def _attr_filter_buttons() -> str:
         ("int", "Intelligence", "icons/intelligence.webp"),
         ("uni", "Universal", "icons/universal.webp"),
     ]
-    html = ['<span class="hs-attr-filter-group" aria-label="Primary attribute filter">']
+    html = ['<span class="hs-attr-filter-group" aria-label="Primary attribute filter" '
+            'data-i18n-aria-label="dyn.attr_filter">']
     for key, label, icon in buttons:
         html.append(
             '<button type="button" class="hs-attr-filter" '
-            f'data-attr-filter="{key}" aria-pressed="false" title="Show {label} heroes">'
+            f'data-attr-filter="{key}" aria-pressed="false" title="Show {label} heroes" '
+            f'data-i18n-title="dyn.attr_title.{key}">'
             f'<img src="{icon}" alt="{label}" loading="lazy"></button>'
         )
     html.append('</span>')
@@ -144,11 +151,11 @@ def _load_manifest():
 
 def _roster(manifest, roster_key, kind, *, preserve_order=False):
     """Full roster as [{name, icon, key}]. Prefer the explicit roster
-    build_patch.py writes (manifest[roster_key]); fall back to deriving it from
+    patch/rosters.py writes (manifest[roster_key]); fall back to deriving it from
     the entities of this kind if an older _dynamics.json is in place.
 
     preserve_order=True keeps the order from the manifest verbatim (items_dyn
-    uses this to get its category-grouped default — build_patch.py already
+    uses this to get its category-grouped default — patch/rosters.py already
     sorted by class → category → tier → name). Otherwise alpha-by-name."""
     roster = manifest.get(roster_key)
     if roster:
@@ -232,7 +239,8 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
 
     # ---- column row: <noun> | <version> per patch (release date on hover) ----
     head_cells = [f'<th class="hd-hero sortable sticky-col" data-col="name" '
-                  f'data-idx="0">{_esc(noun)}<span class="sort-ind"></span></th>']
+                  f'data-idx="0"><span data-i18n="dyn.noun.{kind}">{_esc(noun)}</span>'
+                  f'<span class="sort-ind"></span></th>']
     for p in patches:
         sep = ' hd-gsep' if p["version"] in gsep_vers else ''
         head_cells.append(
@@ -315,10 +323,11 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     # Toggles — styled like the Neutral Creeps / Unit Abilities switches. No hover
     # title (the visible label already says what it does). `title` kept in the
     # signature for caller clarity but not rendered.
-    def _switch(sw_id, label, title, checked):
+    def _switch(sw_id, label, title, checked, i18n_key=None):
         ck = ' checked' if checked else ''
+        key_attr = f' data-i18n="{_esc(i18n_key)}"' if i18n_key else ''
         return (f'<label class="ua-upgrades-toggle">'
-                f'<span class="ua-upgrades-label">{label}</span>'
+                f'<span class="ua-upgrades-label"{key_attr}>{label}</span>'
                 f'<input type="checkbox" id="{sw_id}" class="ua-switch-input"{ck}>'
                 f'<span class="ua-switch" aria-hidden="true"></span></label>')
     # "Remove" tag chips — click a tag to drop it from the diamonds.
@@ -337,7 +346,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     search_block = (
         '<span class="search-box hd-search">'
         '<input type="text" id="hd-hero-search" autocomplete="off" spellcheck="false" '
-        f'placeholder="{_esc(search_ph)}">'
+        f'placeholder="{_esc(search_ph)}" data-i18n-placeholder="dyn.search_ph.{kind}">'
         '</span>')
     # Optional items_dyn controls. "Show deleted" switch (sits left of Buff vs
     # nerf): OFF by default → items removed from the game are hidden; ON reveals
@@ -345,18 +354,19 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     current_block = _switch(
         'hd-show-deleted', 'Deleted',
         'Show items no longer in the game — removed or cycled out of the pool '
-        '(hidden by default)', False
+        '(hidden by default)', False, i18n_key='dyn.sw.deleted'
     ) if current_toggle else ''
     attack_block = (
-        '<span class="hs-attack-filter-group" aria-label="Attack type filter">'
+        '<span class="hs-attack-filter-group" aria-label="Attack type filter" '
+        'data-i18n-aria-label="dyn.attack_filter">'
         '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
-        'aria-pressed="false" title="Show melee heroes">'
+        'aria-pressed="false" title="Show melee heroes" data-i18n-title="dyn.atk_title.melee">'
         '<span class="atk-badge" aria-hidden="true">'
-        '<img src="icons/ui/atk_melee.png" alt=""></span><span>Melee</span></button>'
+        '<img src="icons/ui/atk_melee.png" alt=""></span><span data-i18n="dyn.melee">Melee</span></button>'
         '<button type="button" class="hs-attack-filter" data-attack-filter="ranged" '
-        'aria-pressed="false" title="Show ranged heroes">'
+        'aria-pressed="false" title="Show ranged heroes" data-i18n-title="dyn.atk_title.ranged">'
         '<span class="atk-badge" aria-hidden="true">'
-        '<img src="icons/ui/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
+        '<img src="icons/ui/atk_ranged.png" alt=""></span><span data-i18n="dyn.ranged">Ranged</span></button>'
         '</span>'
     ) if attack_filter else ''
     attr_block = _attr_filter_buttons() if attr_filter else ''
@@ -364,10 +374,10 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     # any combination of Items / Neutral Items / Enchantments. Default: Items only.
     if class_filter:
         class_block = _multiselect_dropdown('class', 'Type', [
-            ('regular', 'Items', True),
-            ('neutral', 'Neutral Items', False),
-            ('enchant', 'Enchantments', False),
-        ])
+            ('regular', 'Items', True, 'dyn.class.regular'),
+            ('neutral', 'Neutral Items', False, 'dyn.class.neutral'),
+            ('enchant', 'Enchantments', False, 'dyn.class.enchant'),
+        ], label_key='dyn.type')
     else:
         class_block = ''
     # Price-range filter (copied from mana_items): two bound inputs + a clear-X
@@ -377,16 +387,16 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     if price_filter:
         price_block = (
             '<span class="mr-price-range hd-price-range">'
-            '<span class="mr-price-label" aria-hidden="true">Price</span>'
+            '<span class="mr-price-label" aria-hidden="true" data-i18n="dyn.price">Price</span>'
             '<input type="number" class="mr-price-input" id="hd-price-min" '
             'placeholder="min" min="0" step="50" inputmode="numeric" '
-            'aria-label="Minimum price">'
+            'aria-label="Minimum price" data-i18n-placeholder="dyn.min" data-i18n-aria-label="dyn.price_min">'
             '<span class="mr-price-sep" aria-hidden="true">–</span>'
             '<input type="number" class="mr-price-input" id="hd-price-max" '
             'placeholder="max" min="0" step="50" inputmode="numeric" '
-            'aria-label="Maximum price">'
+            'aria-label="Maximum price" data-i18n-placeholder="dyn.max" data-i18n-aria-label="dyn.price_max">'
             '<button type="button" class="mr-price-clear" id="hd-price-clear" '
-            'aria-label="Clear price range" hidden>'
+            'aria-label="Clear price range" data-i18n-aria-label="dyn.price_clear" hidden>'
             '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">'
             '<path d="M2 2 L10 10 M10 2 L2 10" stroke="currentColor" '
             'stroke-width="2" stroke-linecap="round" fill="none"/>'
@@ -399,7 +409,8 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     if category_filter:
         _cats = manifest.get('item_categories', [])
         category_block = _multiselect_dropdown(
-            'category', 'Category', [(c, c, True) for c in _cats]) if _cats else ''
+            'category', 'Category', [(c, c, True) for c in _cats],
+            label_key='dyn.category') if _cats else ''
     else:
         category_block = ''
     # All controls live inside ONE bordered surface (.toolbar-panel, the site
@@ -416,12 +427,13 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         + attr_block
         + _switch('hd-hide-old', 'Hide old',
                   'Show only the most recent patches that fit the width '
-                  '(latest at the right edge); off shows every patch', True)
+                  '(latest at the right edge); off shows every patch', True,
+                  i18n_key='dyn.sw.hide_old')
         + current_block
         + _switch('hd-bn-only', 'Buff vs nerf',
                   'Collapse each cell to two bands — buff + NEW (green) vs nerf + '
                   'DEL (red); rework/misc/qol drop out of the colour (hover still '
-                  'shows every tag)', False)
+                  'shows every tag)', False, i18n_key='dyn.sw.bn_only')
         + price_block
         + remove_block
         + search_block
@@ -447,7 +459,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         '<div class="sticky-frame-top" aria-hidden="true"></div>\n'
         '<div class="creeps-scroll">\n'
         f'{subnav}'
-        f'<p class="mr-blurb inbox-bar">{blurb}</p>\n'
+        f'<p class="mr-blurb inbox-bar" data-i18n-html="dyn.blurb.{kind}">{blurb}</p>\n'
         f'{toolbar}'
         # Column visibility + fit-to-width is set by scripts.js dynLayoutMatrix().
         # items pages get an extra hook class so item-shaped icons (88×64) aren't

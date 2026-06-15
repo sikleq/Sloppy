@@ -186,19 +186,24 @@ def _patch_meta_parts(version):
             continue
         cur_date = _parse_date(p["date"])
         prev_part = ""
+        # Static words carry data-i18n so the client toggle can translate them;
+        # the RU "дн." abbreviation sidesteps the 3-way Russian day plural.
         if i > 0:
             prev = sorted_releases[i - 1]
             n = (cur_date - _parse_date(prev["date"])).days
-            prev_part = f'<b>{n}</b> days after <b>{prev["version"]}</b>'
+            prev_part = (f'<b>{n}</b> <span data-i18n="patch.days_after">days after</span> '
+                         f'<b>{prev["version"]}</b>')
         if i < len(sorted_releases) - 1:
             nxt = sorted_releases[i + 1]
             n = (_parse_date(nxt["date"]) - cur_date).days
-            age_part = f'Ran: <b>{n}</b> days'
+            age_part = (f'<span data-i18n="patch.ran">Ran:</span> <b>{n}</b> '
+                        f'<span data-i18n="patch.days">days</span>')
         else:
             n = (today - cur_date).days
             unit = "day" if n == 1 else "days"
-            age_part = (f'Live: <b>{n}</b> {unit}' if n > 0
-                        else 'Released today')
+            age_part = (f'<span data-i18n="patch.live">Live:</span> <b>{n}</b> '
+                        f'<span data-i18n="patch.days">{unit}</span>' if n > 0
+                        else '<span data-i18n="patch.released_today">Released today</span>')
         return prev_part, age_part
     return "", ""
 
@@ -303,7 +308,7 @@ def _render_top_nav(active="changelogs", current_version=None, date=None, patch_
       <div class="version-picker">
         {prev_arrow}
         <div class="version-dropdown">
-          <button class="version" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Select patch version">
+          <button class="version" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Select patch version" data-i18n-aria-label="patch.select_version">
             {current_version} <span class="version-chev">▾</span>
           </button>
           <div class="version-menu" role="menu">

@@ -33,7 +33,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / 'data'
 STATS = DATA / 'stats'
 
-# Patch chronology — match RELEASE_HISTORY order in build_patch.py.
+# Patch chronology — match RELEASE_HISTORY order in patch/meta.py.
 # Loaded lazily from stats/ subdirs.
 def _patch_chronology():
     return sorted([p.name for p in STATS.iterdir() if p.is_dir()],

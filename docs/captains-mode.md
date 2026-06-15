@@ -145,7 +145,7 @@ Steps to author a new one:
 - New action kinds (a neutral/extra step) would need a new char + a `.cm-token.*`
   style.
 
-Helper lives in `build_patch.py` (`def cm_draft`); styles in `styles.css` under
+Helper lives in `patch/elements.py` (`def cm_draft`); styles in `styles.css` under
 "Captains Mode draft board".
 
 ## Historical draft-order changes (reference)

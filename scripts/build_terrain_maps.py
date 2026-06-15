@@ -137,7 +137,7 @@ def main(versions):
             out, "WEBP", quality=OUT_QUALITY, method=6)
         print(f"  -> {os.path.relpath(out, _ROOT)} "
               f"({os.path.getsize(out) // 1024} KB)")
-    # Projection meta so build_terrain.py can place markers exactly on the crop:
+    # Projection meta so builders/terrain.py can place markers exactly on the crop:
     # world -> canvas px (MAP_W/CANVAS_SCALE) -> minus crop origin -> /crop size.
     import json as _json
     meta = {

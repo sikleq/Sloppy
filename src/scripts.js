@@ -1,4 +1,529 @@
 
+// ============================================================================
+// i18n — client-side UI translation (EN default, RU optional). UI CHROME ONLY:
+// nav, buttons, tooltips, column/section headers, toolbar labels. The patch-note
+// BODY (hero/item names + Valve balance text) stays in its original English.
+//
+// How it works:
+//   * Every translatable element carries data-i18n="key" (textContent),
+//     data-i18n-html="key" (innerHTML), or an attribute variant
+//     data-i18n-title / data-i18n-placeholder / data-i18n-aria-label="key".
+//   * The English text the builders emit IS the source of truth for 'en' — we
+//     capture it as the baseline on first apply, so the dictionary only needs to
+//     carry the NON-default languages (ru, ...). Switching back to en restores
+//     the captured baseline.
+//   * JS-built strings (toasts, dynamically created nodes) call t(key, fallback)
+//     at build time using the current language; nodes they create can also carry
+//     data-i18n so a later applyLang() pass keeps them correct after a toggle.
+//   * Choice persists in localStorage('sloppy_lang'); a 'sloppy:langchange'
+//     event lets dynamic modules re-render.
+// The dictionary lives inline (not fetched) so the toggle is instant and works
+// even before any network/_dynamics fetch resolves.
+// ============================================================================
+window.I18N = (function() {
+  const STORAGE_KEY = 'sloppy_lang';
+  const DEFAULT_LANG = 'en';
+  const SUPPORTED = ['en', 'ru'];
+
+  // key -> { ru: "...", <lang>: "..." }. 'en' is omitted: the DOM/baseline IS en.
+  // Grouped by area. Keep keys stable; derive them from existing element keys
+  // where possible (nav.<key>, mat.<key>, ...).
+  const DICT = {
+    // --- shared nav chrome ---
+    'nav.main':         { ru: 'Главная' },
+    'nav.changelogs':   { ru: 'Патчи' },
+    'nav.calendar':     { ru: 'Календарь' },
+    'nav.materials':    { ru: 'Материалы' },
+    // --- materials sub-nav (groups + items), keyed by their element key ---
+    'mat.creeps_grp':   { ru: 'Крипы' },
+    'mat.creeps':       { ru: 'Нейтралы' },
+    'mat.abilities':    { ru: 'Способности нейтралов' },
+    'mat.summons':      { ru: 'Призываемые' },
+    'mat.lane':         { ru: 'Лайновые крипы' },
+    'mat.items_grp':    { ru: 'Предметы' },
+    'mat.mana_items':   { ru: 'Предметы на ману' },
+    'mat.items_dyn':    { ru: 'Динамика предметов' },
+    'mat.heroes_grp':   { ru: 'Герои' },
+    'mat.heroes_stats': { ru: 'Статы героев' },
+    'mat.hero_lab':     { ru: 'Лаборатория героев' },
+    'mat.heroes_dyn':   { ru: 'Динамика героев' },
+    'mat.terrain':      { ru: 'Местность' },
+    // --- misc shared UI ---
+    'ui.soon':          { ru: 'скоро' },
+    'ui.back':          { ru: 'Назад' },
+    'ui.coming_soon':   { ru: 'Скоро' },
+    // --- index hub (idx.*) ---
+    'idx.title':        { ru: 'Что на самом деле нужно герою?' },
+    'idx.support':      { ru: 'Поддержать' },
+    'idx.donation':     { ru: 'Пожертвование' },
+    'idx.dynamics':     { ru: 'Динамика' },
+    'idx.stats':        { ru: 'Статы' },
+    'idx.mana':         { ru: 'Мана' },
+    'idx.back_menu':    { ru: 'Назад в меню' },
+    // --- patch page (patch.*) ---
+    'patch.tags_label':    { ru: 'Теги:' },
+    'patch.group_label':   { ru: 'Группа:' },
+    'patch.search_ph':     { ru: 'Поиск героев, предметов, способностей…' },
+    'patch.released':      { ru: 'Вышел:' },
+    'patch.back_calendar': { ru: 'Назад к календарю' },
+    'patch.select_version':{ ru: 'Выбрать версию патча' },
+    'patch.days_after':    { ru: 'дн. после' },
+    'patch.ran':           { ru: 'Активен:' },
+    'patch.live':          { ru: 'В сети:' },
+    'patch.days':          { ru: 'дн.' },
+    'patch.released_today':{ ru: 'Вышел сегодня' },
+    'ui.back_to_top':      { ru: 'Наверх' },
+    // --- calendar (cal.*) ---
+    'cal.compact':       { ru: 'Компактно' },
+    'cal.compact_view':  { ru: 'Компактный вид' },
+    'cal.total_count':   { ru: 'Всего:' },
+    'cal.longest':       { ru: 'Дольше всех:' },
+    'cal.shortest':      { ru: 'Короче всех:' },
+    'cal.days':          { ru: 'дн.' },
+    'cal.cadence':       { ru: 'Частота патчей' },
+    'cal.now':           { ru: 'сейчас' },
+    'cal.patches_label': { ru: 'патчей:' },
+    'cal.major':         { ru: 'крупных' },
+    'cal.letter':        { ru: 'буквенных' },
+    'cal.per_year':      { ru: '/ год' },
+    'cal.median_life':   { ru: 'медианный срок жизни' },
+    'cal.per_year_h':    { ru: 'По годам' },
+    'cal.per_month_h':   { ru: 'По месяцам' },
+    'cal.month.1':  { ru: 'Янв' },
+    'cal.month.2':  { ru: 'Фев' },
+    'cal.month.3':  { ru: 'Мар' },
+    'cal.month.4':  { ru: 'Апр' },
+    'cal.month.5':  { ru: 'Май' },
+    'cal.month.6':  { ru: 'Июн' },
+    'cal.month.7':  { ru: 'Июл' },
+    'cal.month.8':  { ru: 'Авг' },
+    'cal.month.9':  { ru: 'Сен' },
+    'cal.month.10': { ru: 'Окт' },
+    'cal.month.11': { ru: 'Ноя' },
+    'cal.month.12': { ru: 'Дек' },
+    // --- dynamics matrix (dyn.*), shared by Hero + Item Dynamics ---
+    'dyn.noun.hero':       { ru: 'Герой' },
+    'dyn.noun.item':       { ru: 'Предмет' },
+    'dyn.all':             { ru: 'Все' },
+    'dyn.melee':           { ru: 'Ближний' },
+    'dyn.ranged':          { ru: 'Дальний' },
+    'dyn.type':            { ru: 'Тип' },
+    'dyn.category':        { ru: 'Категория' },
+    'dyn.price':           { ru: 'Цена' },
+    'dyn.min':             { ru: 'мин' },
+    'dyn.max':             { ru: 'макс' },
+    'dyn.class.regular':   { ru: 'Предметы' },
+    'dyn.class.neutral':   { ru: 'Нейтральные' },
+    'dyn.class.enchant':   { ru: 'Зачарования' },
+    'dyn.sw.deleted':      { ru: 'Удалённые' },
+    'dyn.sw.hide_old':     { ru: 'Скрыть старые' },
+    'dyn.sw.bn_only':      { ru: 'Бафф/нерф' },
+    'dyn.attr_filter':     { ru: 'Фильтр по основному атрибуту' },
+    'dyn.attr_title.str':  { ru: 'Показать героев Силы' },
+    'dyn.attr_title.agi':  { ru: 'Показать героев Ловкости' },
+    'dyn.attr_title.int':  { ru: 'Показать героев Интеллекта' },
+    'dyn.attr_title.uni':  { ru: 'Показать универсальных героев' },
+    'dyn.attack_filter':   { ru: 'Фильтр по типу атаки' },
+    'dyn.atk_title.melee': { ru: 'Показать героев ближнего боя' },
+    'dyn.atk_title.ranged':{ ru: 'Показать героев дальнего боя' },
+    'dyn.price_min':       { ru: 'Минимальная цена' },
+    'dyn.price_max':       { ru: 'Максимальная цена' },
+    'dyn.price_clear':     { ru: 'Очистить диапазон цены' },
+    'dyn.search_ph.hero':  { ru: 'Поиск героев — anci, aba, brood…' },
+    'dyn.search_ph.item':  { ru: 'Поиск предметов — blink, dagon, aghs…' },
+    'dyn.blurb.hero': { ru:
+      'Каждый герой — по вертикали, каждый патч — по горизонтали. Каждый ромб — '
+      + 'сводка изменений баланса этого героя в этом патче: наведите для разбивки '
+      + 'бафф/нерф/переработка, кликните, чтобы перейти к герою на странице патча. '
+      + 'Наведите на колонку патча, чтобы увидеть дату выхода. Пустые ромбы означают, '
+      + 'что героя не трогали. Цветные <strong>чипы тегов</strong> убирают тег из '
+      + 'ромбов (он всё ещё виден при наведении); поле <strong>поиска</strong> '
+      + 'фильтрует героев по имени — через запятую для нескольких (частичные имена '
+      + 'работают: <em>anci, aba, brood</em>).' },
+    'dyn.blurb.item': { ru:
+      'Каждый предмет — по вертикали, каждый патч — по горизонтали: обычные предметы, '
+      + 'нейтральные предметы и зачарования вместе. Каждый ромб — сводка изменений '
+      + 'баланса этого предмета в этом патче: наведите для разбивки бафф/нерф/'
+      + 'переработка, кликните, чтобы перейти к предмету на странице патча. Наведите '
+      + 'на колонку патча, чтобы увидеть дату выхода. Пустые ромбы означают, что '
+      + 'предмет не трогали. <strong>Удалённые</strong> показывает предметы, удалённые '
+      + 'из игры; <strong>чипы классов</strong> (Предметы / Нейтральные / Зачарования) '
+      + 'переключают, какие типы показаны; <strong>Цена</strong> фильтрует по цене в '
+      + 'золоте (нейтралы и зачарования бесплатны, поэтому игнорируют его); цветные '
+      + '<strong>чипы тегов</strong> убирают тег из ромбов (он всё ещё виден при '
+      + 'наведении); поле <strong>поиска</strong> фильтрует по имени (через запятую: '
+      + '<em>blink, dagon, aghs</em>).' },
+    // --- terrain (terr.*) ---
+    'terr.new':            { ru: 'НОВ' },
+    'terr.old':            { ru: 'СТАР' },
+    'terr.fallback_title': { ru: 'Сравнение карты для' },
+    'terr.fallback_sub':   { ru: 'пока недоступно' },
+    'terr.fallback_note':  { ru: 'Список изменений — справа.' },
+    'terr.changes_head':   { ru: 'Изменения местности' },
+    'terr.zoom':           { ru: 'Зум' },
+    'terr.layer.trees':     { ru: 'Деревья' },
+    'terr.layer.camps':     { ru: 'Нейтральные лагеря' },
+    'terr.layer.towers':    { ru: 'Башни' },
+    'terr.layer.lotus':     { ru: 'Лотосы' },
+    'terr.layer.twinGates': { ru: 'Парные врата' },
+    'terr.layer.tormentors':{ ru: 'Торменторы' },
+    'terr.layer.bounty':    { ru: 'Руны награды' },
+    'terr.layer.power':     { ru: 'Руны усиления' },
+    'terr.layer.wisdom':    { ru: 'Святилища мудрости' },
+    'terr.layer.outposts':  { ru: 'Аванпосты' },
+    'terr.layer.watchers':  { ru: 'Наблюдатели' },
+    'terr.layer.roshan':    { ru: 'Рошан' },
+    'terr.blurb': { ru:
+      'Тяните <strong>ползунок</strong>, чтобы стереть переход между старой и новой '
+      + 'картой. Включите <img class="tc-inline-loupe" src="icons/ui/gothic/icon_loupe.png" '
+      + 'alt="" width="16" height="16"><strong>Зум</strong> (над картой), чтобы увеличивать '
+      + 'при наведении — <strong>клик</strong> закрепляет точку, чтобы можно было двигать '
+      + 'ползунок и сравнивать её между версиями. Кнопки-переключатели над картой '
+      + 'накладывают объекты — <strong>Деревья</strong>, <strong>Лагеря</strong>, башни, '
+      + 'руны, лотосы, врата, торменторы, святилища, аванпосты, наблюдатели и Рошан — '
+      + 'каждый разделён на старое/новое ползунком, так что движение показывает, что '
+      + 'изменилось. Выберите <strong>патч</strong> в заголовке справа.' },
+    // --- mana items (mi.*) ---
+    'mi.col.name':           { ru: 'Предмет' },
+    'mi.col.cost':           { ru: 'Цена' },
+    'mi.col.intel':          { ru: 'Интеллект' },
+    'mi.col.max_mana':       { ru: 'Мана' },
+    'mi.col.regen':          { ru: 'Реген маны' },
+    'mi.col.cost_per_regen': { ru: 'Цена за 1 реген маны' },
+    'mi.col.regen_per_gold': { ru: 'Реген маны на 1 золото' },
+    'mi.col.mana_per_60s':   { ru: 'Мана за 60 сек' },
+    'mi.hide_active':        { ru: 'Скрыть активные' },
+    'mi.heatmap':            { ru: 'Тепловая карта' },
+    'mi.search_ph':          { ru: 'Поиск предметов — blink, kaya, arcane…' },
+    'mi.blurb_and':          { ru: 'и' },
+    'mi.blurb1': { ru:
+      'Каждый покупаемый предмет, дающий реген маны, по умолчанию отсортирован по '
+      + 'суммарному <em>регену маны</em>. Интеллект даёт' },
+    'mi.blurb2': { ru:
+      'за очко. Активные предметы, которые буквально восстанавливают ману кастеру '
+      + '(Soul Ring, восполнение Arcane Boots), амортизируются как '
+      + '<code>active_mana / cooldown</code> и добавляются к пассивному регену. '
+      + '<em>Реген маны на 1 золото</em> умножен на ×1000 для читаемости. '
+      + 'Кликните по любому заголовку колонки для пересортировки.' },
+    // --- hero lab (hl.*) ---
+    'hl.blurb': { ru:
+      'Сравните двух героев бок о бок — уровень, шесть слотов инвентаря, '
+      + 'нейтральный предмет, зачарование и свои переопределения статов. Центральная '
+      + 'колонка показывает живую разницу между обеими сборками.' },
+    // --- neutral stats table (cr.*) ---
+    'cr.col.lvl':            { ru: 'Ур.' },
+    'cr.col.name':          { ru: 'Юнит' },
+    // HP/MP/BAT are universal abbreviations — same in RU, listed so the key
+    // audit stays clean and the intent is explicit.
+    'cr.col.hp':            { ru: 'HP' },
+    'cr.col.mp':            { ru: 'MP' },
+    'cr.col.bat':           { ru: 'BAT' },
+    'cr.col.hp_regen':      { ru: 'HP/сек' },
+    'cr.col.mp_regen':      { ru: 'MP/сек' },
+    'cr.col.armor':         { ru: 'Броня' },
+    'cr.col.armor_pct':     { ru: 'Броня %' },
+    'cr.col.magres':        { ru: 'Маг. сопр.' },
+    'cr.col.dmg_avg':       { ru: 'Урон' },
+    'cr.col.as':            { ru: 'Скор. атаки' },
+    'cr.col.t_per_attack':  { ru: 'Время удара' },
+    'cr.col.attack_range':  { ru: 'Дальность' },
+    'cr.col.attack_type':   { ru: 'Тип' },
+    'cr.col.ap':            { ru: 'Точка' },
+    'cr.col.projectile':    { ru: 'Скор. снаряда' },
+    'cr.col.gold':          { ru: 'Золото' },
+    'cr.col.xp':            { ru: 'Опыт' },
+    'cr.col.camp':          { ru: 'Лагерь' },
+    'cr.col.ms':            { ru: 'Скор. движ.' },
+    'cr.col.vision':        { ru: 'Обзор' },
+    'cr.col.aggro':         { ru: 'Дальность агро' },
+    'cr.col.turn_rate':     { ru: 'Поворот' },
+    'cr.col.collision_size':{ ru: 'Размер коллизии' },
+    'cr.col.bound_radius':  { ru: 'Радиус' },
+    'cr.col.ability1':      { ru: 'Способность 1' },
+    'cr.col.ability2':      { ru: 'Способность 2' },
+    'cr.col.ability3':      { ru: 'Способность 3' },
+    'cr.cat.basic':         { ru: 'Основное' },
+    'cr.cat.vitality':      { ru: 'Живучесть' },
+    'cr.cat.attack':        { ru: 'Атака' },
+    'cr.cat.bounty':        { ru: 'Награда' },
+    'cr.cat.other':         { ru: 'Прочее' },
+    'cr.cat.abilities':     { ru: 'Способности' },
+    'cr.view':              { ru: 'Вид' },
+    'cr.view.standard':     { ru: 'Стандарт' },
+    'cr.view.expanded':     { ru: 'Расширенный' },
+    'cr.atk_title.melee':   { ru: 'Показать юнитов ближнего боя' },
+    'cr.atk_title.ranged':  { ru: 'Показать юнитов дальнего боя' },
+    'cr.blurb': { ru:
+      'Статы и способности каждого нейтрального крипа в Dota 2 — взяты из KV-файлов '
+      + 'текущего патча. Наведите на любую ячейку с пунктирным подчёркиванием, чтобы '
+      + 'увидеть историю её изменений по патчам. Кликните по иконке юнита, чтобы '
+      + 'скопировать команду спавна в демо-режиме (например, <code>-createhero '
+      + 'tunneler neutral</code>) в буфер обмена. Кликните по заголовку колонки для '
+      + 'сортировки. Переключатель <strong>Вид</strong> переключает между '
+      + '<em>Стандарт</em> (только основное) и <em>Расширенный</em> (все числовые '
+      + 'колонки — EHP, броня %, диапазон золота, коллизия, скорость снаряда и т.д.).' },
+    // --- neutral abilities table (ua.*) ---
+    'ua.col.lvl':         { ru: 'Ур.' },
+    'ua.col.unit':        { ru: 'Юнит' },
+    'ua.col.ability':     { ru: 'Способность' },
+    'ua.col.type':        { ru: 'Тип' },
+    'ua.col.damage':      { ru: 'Урон' },
+    'ua.col.manacost':    { ru: 'Мана' },
+    'ua.col.cooldown':    { ru: 'Перезарядка' },
+    'ua.col.duration':    { ru: 'Длительность' },
+    'ua.col.cast_range':  { ru: 'Дальность' },
+    'ua.col.aoe':         { ru: 'Радиус' },
+    'ua.col.stackable':   { ru: 'Стак ауры' },
+    'ua.col.dispel':      { ru: 'Развеивается' },
+    'ua.col.through_bkb': { ru: 'Сквозь BKB' },
+    'ua.col.as_effect':   { ru: 'Эффект СА' },
+    'ua.col.ms_effect':   { ru: 'Эффект СД' },
+    'ua.col.effect':      { ru: 'Свойство' },
+    'ua.col.effect2':     { ru: 'Свойство 2' },
+    'ua.col.effect3':     { ru: 'Свойство 3' },
+    'ua.cat.basic':       { ru: 'Основное' },
+    'ua.cat.essentials':  { ru: 'Основные' },
+    'ua.cat.extra':       { ru: 'Доп.' },
+    'ua.cat.effects':     { ru: 'Эффекты' },
+    'ua.view.auras':      { ru: 'Ауры' },
+    'ua.upgrades':        { ru: 'Прокачка' },
+    'ua.blurb': { ru:
+      'Каждая способность нейтрального крипа — одна строка на пару (крип, '
+      + 'способность). Наведите на любую ячейку с пунктирным подчёркиванием, чтобы '
+      + 'увидеть, как её значение менялось по патчам. Выпадающий список '
+      + '<strong>Вид</strong> фильтрует таблицу: <em>Стандарт</em> показывает все '
+      + 'способности, <em>Ауры</em> — только ауры. Переключатель '
+      + '<strong>Прокачка</strong> отмечает числа, растущие по тиру нейтралов '
+      + '(например, 40/36/32/26).' },
+    // --- hero stats table (hs.*) ---
+    'hs.name':            { ru: 'Герой' },
+    'hs.attr':            { ru: 'Атр.' },
+    'hs.col.hp':          { ru: 'HP' },
+    'hs.col.mp':          { ru: 'MP' },
+    'hs.col.bat':         { ru: 'BAT' },
+    'hs.col.hpr':         { ru: 'HP/сек' },
+    'hs.col.mpr':         { ru: 'MP/сек' },
+    'hs.col.str':         { ru: 'СИЛ' },
+    'hs.col.str_gain':    { ru: 'СИЛ+' },
+    'hs.col.agi':         { ru: 'ЛОВ' },
+    'hs.col.agi_gain':    { ru: 'ЛОВ+' },
+    'hs.col.int':         { ru: 'ИНТ' },
+    'hs.col.int_gain':    { ru: 'ИНТ+' },
+    'hs.col.gper':        { ru: 'Прирост/ур.' },
+    'hs.col.armor':       { ru: 'Броня' },
+    'hs.col.armor_pct':   { ru: 'Броня %' },
+    'hs.col.mr':          { ru: 'Маг. сопр.' },
+    'hs.col.dmg':         { ru: 'Урон' },
+    'hs.col.aspd':        { ru: 'Скор. атаки' },
+    'hs.col.t_per_attack':{ ru: 'Время удара' },
+    'hs.col.range':       { ru: 'Дальность' },
+    'hs.col.proj':        { ru: 'Скор. снаряда' },
+    'hs.col.dvision':     { ru: 'День' },
+    'hs.col.nvision':     { ru: 'Ночь' },
+    'hs.col.ms':          { ru: 'Скор. движ.' },
+    'hs.col.turn':        { ru: 'Поворот' },
+    'hs.col.collision':   { ru: 'Размер коллизии' },
+    'hs.col.bound':       { ru: 'Радиус' },
+    'hs.cat.basic':       { ru: 'Основное' },
+    'hs.cat.vitality':    { ru: 'Основные' },
+    'hs.cat.attributes':  { ru: 'Атрибуты' },
+    'hs.cat.defense':     { ru: 'Защита' },
+    'hs.cat.attack':      { ru: 'Атака' },
+    'hs.cat.vision':      { ru: 'Обзор' },
+    'hs.cat.mobility':    { ru: 'Мобильность' },
+    'hs.view.base':       { ru: 'База' },
+    'hs.view.starting':   { ru: 'Стартовые' },
+    'hs.lvl':             { ru: 'Ур.' },
+    'hs.hero_level':      { ru: 'Уровень героя' },
+    'hs.plus2':           { ru: '+2 стата' },
+    'hs.innates':         { ru: 'Врождённые' },
+    'hs.search_ph':       { ru: 'Поиск героев — axe, crystal, wisp…' },
+    'hs.blurb': { ru:
+      'Сравните статы героев в трёх режимах. <em>База</em> показывает сырые значения '
+      + '1-го уровня из игровых файлов и игнорирует контроль уровня; <em>Стартовые</em> '
+      + 'показывает практические значения с бонусами атрибутов и поддерживаемыми '
+      + 'врождёнными преобразованиями; переключатель <em>+2 стата</em> применяет '
+      + 'автоматические повышения всех атрибутов на 15/16/17/19/20/21/22; переключатель '
+      + '<em>Врождённые</em> применяет всегда активные бонусы от врождённых способностей, '
+      + 'например реген пула маны Void Spirit, Centaur, Morphling и Techies; '
+      + '<em>Расширенный</em> добавляет подробные колонки боя, брони, снаряда, '
+      + 'мобильности и размера. Наведите на любой стат, чтобы увидеть его полную историю '
+      + 'патчей с 7.08, затем используйте поиск, сортировку и тепловую карту, чтобы '
+      + 'быстро находить выбросы.' },
+    // --- JS-built shared strings (js.*) ---
+    'js.back_to':       { ru: 'Назад к ' },
+    'js.back_to_patch': { ru: 'Назад к патчу ' },
+    'js.copied':        { ru: 'Скопировано' },
+    'js.show_older':    { ru: 'Показать старые патчи' },
+    'js.show_newer':    { ru: 'Показать новые патчи' },
+    // --- hero lab interactive UI (hl.*) ---
+    'hl.choose_hero':      { ru: 'Выбрать героя' },
+    'hl.choose_neutral':   { ru: 'Выбрать нейтральный предмет' },
+    'hl.choose_enchant':   { ru: 'Выбрать зачарование' },
+    'hl.custom_stats':     { ru: 'Свои статы' },
+    'hl.items_cost':       { ru: 'Цена предметов' },
+    'hl.empty_neutral':    { ru: 'Пустой слот нейтрала' },
+    'hl.empty_enchant':    { ru: 'Пустой слот зачарования' },
+    'hl.empty_slot':       { ru: 'Пустой слот' },
+    'hl.choose_hero_head': { ru: 'Выбрать героя' },
+    'hl.choose_item_head': { ru: 'Выбрать предмет' },
+    'hl.close':            { ru: 'Закрыть' },
+    'hl.empty':            { ru: 'Пусто' },
+    'hl.none':             { ru: 'нет' },
+    'hl.vs':               { ru: 'против' },
+    'hl.tab.basics':       { ru: 'Базовые' },
+    'hl.tab.upgrades':     { ru: 'Улучшения' },
+    'hl.tab.neutrals':     { ru: 'Нейтралы' },
+    'hl.tab.enchants':     { ru: 'Зачарования' },
+    'hl.attr.str':         { ru: 'Сила' },
+    'hl.attr.agi':         { ru: 'Ловкость' },
+    'hl.attr.int':         { ru: 'Интеллект' },
+    'hl.attr.uni':         { ru: 'Универсал' },
+    'hl.metric.hp':       { ru: 'HP' },
+    'hl.metric.mp':       { ru: 'MP' },
+    'hl.metric.hpr':      { ru: 'HP/сек' },
+    'hl.metric.mpr':      { ru: 'MP/сек' },
+    'hl.metric.str':      { ru: 'СИЛ' },
+    'hl.metric.agi':      { ru: 'ЛОВ' },
+    'hl.metric.int':      { ru: 'ИНТ' },
+    'hl.metric.armor':    { ru: 'Броня' },
+    'hl.metric.armorPct': { ru: 'Броня %' },
+    'hl.metric.mr':       { ru: 'Маг. сопр.' },
+    'hl.metric.evasion':  { ru: 'Уклонение' },
+    'hl.metric.dmg':      { ru: 'Урон' },
+    'hl.metric.dmin':     { ru: 'Урон мин' },
+    'hl.metric.dmax':     { ru: 'Урон макс' },
+    'hl.metric.aspd':     { ru: 'Скор. атаки' },
+    'hl.metric.tHit':     { ru: 'Время удара' },
+    'hl.metric.ms':       { ru: 'Скор. движ.' },
+    'hl.metric.range':    { ru: 'Дальность атаки' },
+    'hl.metric.ehpPhys':  { ru: 'EHP физ' },
+    'hl.metric.ehpMag':   { ru: 'EHP маг' },
+  };
+
+  let current = DEFAULT_LANG;
+  // Per-(element, slot) baseline of the original English text/markup, captured
+  // lazily on first apply. slot is '' for textContent or the attribute name.
+  const baselines = new WeakMap(); // el -> { [slot]: original }
+
+  function normLang(l) {
+    return SUPPORTED.indexOf(l) >= 0 ? l : DEFAULT_LANG;
+  }
+
+  function translate(key, lang) {
+    if (lang === DEFAULT_LANG) return undefined; // use baseline
+    const entry = DICT[key];
+    return entry ? entry[lang] : undefined;
+  }
+
+  // t(): for JS-built strings. Returns the translation for the current language,
+  // or the supplied English fallback (or the key itself) when none exists.
+  function t(key, fallback) {
+    const v = translate(key, current);
+    return (v !== undefined) ? v : (fallback !== undefined ? fallback : key);
+  }
+
+  function baselineFor(el, slot) {
+    let rec = baselines.get(el);
+    if (!rec) { rec = {}; baselines.set(el, rec); }
+    if (!(slot in rec)) {
+      rec[slot] = (slot === '') ? el.textContent
+                : (slot === 'html') ? el.innerHTML
+                : el.getAttribute(slot);
+    }
+    return rec[slot];
+  }
+
+  function applyOne(el, lang) {
+    // textContent
+    const k = el.getAttribute('data-i18n');
+    if (k) {
+      const base = baselineFor(el, '');
+      const v = translate(k, lang);
+      el.textContent = (v !== undefined) ? v : base;
+    }
+    // innerHTML
+    const kh = el.getAttribute('data-i18n-html');
+    if (kh) {
+      const base = baselineFor(el, 'html');
+      const v = translate(kh, lang);
+      el.innerHTML = (v !== undefined) ? v : base;
+    }
+    // attributes
+    ['title', 'placeholder', 'aria-label'].forEach(attr => {
+      const ka = el.getAttribute('data-i18n-' + attr);
+      if (ka) {
+        const base = baselineFor(el, attr);
+        const v = translate(ka, lang);
+        if (v !== undefined) el.setAttribute(attr, v);
+        else if (base != null) el.setAttribute(attr, base);
+      }
+    });
+    // Element-local Russian for patch-note body text. data-i18n-ru carries the
+    // official translation INLINE (built from data/patchnotes_*.txt) rather than
+    // via the shared DICT — the patch body is far too large for a central map.
+    // RU swaps in the plain translation (badges live in sibling nodes, so they
+    // survive); any other language restores the captured English markup.
+    const ru = el.getAttribute('data-i18n-ru');
+    if (ru !== null) {
+      const base = baselineFor(el, 'html');
+      if (lang === 'ru') el.textContent = ru;
+      else el.innerHTML = base;
+    }
+  }
+
+  function applyLang(lang, root) {
+    lang = normLang(lang);
+    current = lang;
+    const scope = root || document;
+    const sel = '[data-i18n],[data-i18n-html],[data-i18n-title],[data-i18n-placeholder],[data-i18n-aria-label],[data-i18n-ru]';
+    const nodes = scope.querySelectorAll(sel);
+    for (let i = 0; i < nodes.length; i++) applyOne(nodes[i], lang);
+    if (!root) {
+      try { document.documentElement.setAttribute('lang', lang); } catch (e) {}
+      // Reflect active state on any language switchers.
+      document.querySelectorAll('.lang-switch [data-lang]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+        btn.setAttribute('aria-pressed', btn.getAttribute('data-lang') === lang ? 'true' : 'false');
+      });
+    }
+  }
+
+  function setLang(lang) {
+    lang = normLang(lang);
+    if (lang === current) return;
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) {}
+    applyLang(lang);
+    try {
+      document.dispatchEvent(new CustomEvent('sloppy:langchange', { detail: { lang } }));
+    } catch (e) {}
+  }
+
+  function saved() {
+    try { return normLang(localStorage.getItem(STORAGE_KEY)); } catch (e) { return DEFAULT_LANG; }
+  }
+
+  function init() {
+    applyLang(saved());
+    // Delegate clicks on any .lang-switch control.
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest && e.target.closest('.lang-switch [data-lang]');
+      if (btn) { e.preventDefault(); setLang(btn.getAttribute('data-lang')); }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  return { t, setLang, applyLang, get lang() { return current; }, DICT };
+})();
+// Short alias for JS-built strings elsewhere in this file.
+function t(key, fallback) { return window.I18N.t(key, fallback); }
+
+
 // ---- MATERIALS SUB-NAV: tap-to-open submenu on touch devices ----
 // On hover-capable devices (mouse) the .nav-submenu opens on hover — fine. On
 // touch devices the group trigger is an <a href=...> so the first tap fires
@@ -60,10 +585,11 @@
     // Arrived from a Dynamics matrix (root page) via a dyn-cell. Point the back
     // arrow at it. Same fixed bottom-left button + styling as the calendar/patch
     // back-arrow; patch pages live under /patches/ so ../.
-    const label = fromParam === 'items_dyn' ? 'Item Dynamics' : 'Hero Dynamics';
+    const label = fromParam === 'items_dyn'
+      ? t('mat.items_dyn', 'Item Dynamics') : t('mat.heroes_dyn', 'Hero Dynamics');
     back.href = '../' + fromParam + '.html';
-    back.title = 'Back to ' + label;
-    back.setAttribute('aria-label', 'Back to ' + label);
+    back.title = t('js.back_to', 'Back to ') + label;
+    back.setAttribute('aria-label', t('js.back_to', 'Back to ') + label);
     back.classList.add('visible');
   } else if (back && fromParam && /^\d+\.\d+[a-z]?$/.test(fromParam)) {
     // Came from another patch via the dynamics widget. The dyn-cell href
@@ -72,8 +598,8 @@
     // page, so reusing the current hash on the back-link restores the
     // user's scroll position on return.
     back.href = fromParam + '.html' + (window.location.hash || '');
-    back.title = 'Back to ' + fromParam;
-    back.setAttribute('aria-label', 'Back to patch ' + fromParam);
+    back.title = t('js.back_to', 'Back to ') + fromParam;
+    back.setAttribute('aria-label', t('js.back_to_patch', 'Back to patch ') + fromParam);
     back.classList.add('visible');
   }
   // The back arrow is a fixed button in the BOTTOM-LEFT corner (CSS), so it no
@@ -892,7 +1418,7 @@
     if (canLeft) {
       const btn = document.createElement('button');
       btn.className = 'dyn-nav-arrow dyn-nav-left';
-      btn.setAttribute('aria-label', 'Show older patches');
+      btn.setAttribute('aria-label', t('js.show_older', 'Show older patches'));
       wrap.appendChild(btn);
     }
     const row = document.createElement('div');
@@ -905,7 +1431,7 @@
     if (canRight) {
       const btn = document.createElement('button');
       btn.className = 'dyn-nav-arrow dyn-nav-right';
-      btn.setAttribute('aria-label', 'Show newer patches');
+      btn.setAttribute('aria-label', t('js.show_newer', 'Show newer patches'));
       wrap.appendChild(btn);
     }
     entityDiv.appendChild(wrap);
@@ -1385,7 +1911,7 @@
     if (!toast) {
       toast = document.createElement('div');
       toast.className = 'copy-toast';
-      toast.textContent = 'Copied';
+      toast.textContent = t('js.copied', 'Copied');
       document.body.appendChild(toast);
     }
     toast.style.left = x + 'px';
@@ -3255,11 +3781,11 @@
       <div class="hl-hud">
         <div class="hl-identity">
           <div class="hl-portrait-wrap">
-            <button type="button" class="hl-hero-trigger" data-open-hero-picker aria-label="Choose hero">
+            <button type="button" class="hl-hero-trigger" data-open-hero-picker aria-label="Choose hero" data-i18n-aria-label="hl.choose_hero">
               ${iconHtml(hero.icon, hero.name, 'hl-hero-icon')}
             </button>
             <span class="hl-level-corner">
-              <input class="hl-level-input" type="number" min="1" max="30" value="1" data-field="level" aria-label="Hero level">
+              <input class="hl-level-input" type="number" min="1" max="30" value="1" data-field="level" aria-label="Hero level" data-i18n-aria-label="hs.hero_level">
             </span>
           </div>
           <div class="hl-identity-main"></div>
@@ -3273,12 +3799,12 @@
               </button>`).join('')}
           </div>
           <div class="hl-neutral-stack">
-            <button type="button" class="hl-inv-slot hl-neutral-slot is-empty" data-open-item-picker data-slot="neutral" aria-label="Choose neutral item">
+            <button type="button" class="hl-inv-slot hl-neutral-slot is-empty" data-open-item-picker data-slot="neutral" aria-label="Choose neutral item" data-i18n-aria-label="hl.choose_neutral">
               <span class="hl-neutral-mark">N</span>
               <span class="hl-slot-bevel"></span>
               <span class="hl-slot-glow"></span>
             </button>
-            <button type="button" class="hl-inv-slot hl-enchant-slot is-empty" data-open-item-picker data-slot="enchant" aria-label="Choose enchantment">
+            <button type="button" class="hl-inv-slot hl-enchant-slot is-empty" data-open-item-picker data-slot="enchant" aria-label="Choose enchantment" data-i18n-aria-label="hl.choose_enchant">
               <span class="hl-enchant-mark">E</span>
               <span class="hl-slot-bevel"></span>
               <span class="hl-slot-glow"></span>
@@ -3299,10 +3825,10 @@
         </div>
       </div>
       <details class="hl-custom">
-        <summary>Custom stats</summary>
+        <summary data-i18n="hl.custom_stats">Custom stats</summary>
         <div class="hl-custom-grid">
           ${CUSTOM.map(([key, label]) => `
-            <label>${label}<input type="number" step="0.1" placeholder="auto" data-custom="${key}"></label>`).join('')}
+            <label><span data-i18n="hl.metric.${key}">${label}</span><input type="number" step="0.1" placeholder="auto" data-custom="${key}"></label>`).join('')}
         </div>
       </details>
       <div class="hl-total-list" data-total-list></div>
@@ -3431,7 +3957,7 @@
       slotEl.innerHTML = item
         ? `<img src="${item.icon}" alt="${item.name}" loading="lazy"><span class="hl-slot-bevel"></span><span class="hl-slot-glow"></span>`
         : `${isNeutral ? '<span class="hl-neutral-mark">N</span>' : isEnchant ? '<span class="hl-enchant-mark">E</span>' : ''}<span class="hl-slot-bevel"></span><span class="hl-slot-glow"></span>`;
-      slotEl.title = item ? item.name : (isNeutral ? 'Empty neutral slot' : isEnchant ? 'Empty enchantment slot' : 'Empty slot');
+      slotEl.title = item ? item.name : (isNeutral ? t('hl.empty_neutral', 'Empty neutral slot') : isEnchant ? t('hl.empty_enchant', 'Empty enchantment slot') : t('hl.empty_slot', 'Empty slot'));
     });
   }
 
@@ -3439,23 +3965,23 @@
     const list = panel.querySelector('[data-total-list]');
     if (!list) return;
     list.innerHTML = METRICS.map(([key, label]) => `
-      <div class="hl-stat-row"><span>${label}</span><strong>${fmtMetric(key, vals[key])}</strong></div>
-    `).join('') + `<div class="hl-stat-row hl-cost"><span>Items cost</span><strong>${fmt(vals.cost)}g</strong></div>`;
+      <div class="hl-stat-row"><span>${t('hl.metric.' + key, label)}</span><strong>${fmtMetric(key, vals[key])}</strong></div>
+    `).join('') + `<div class="hl-stat-row hl-cost"><span>${t('hl.items_cost', 'Items cost')}</span><strong>${fmt(vals.cost)}g</strong></div>`;
   }
 
   function heroPickerMarkup(selectedId) {
     return `
       <div class="hl-picker-card hl-hero-picker-card" role="dialog" aria-modal="true" aria-label="Choose hero">
         <div class="hl-picker-head">
-          <strong>Choose Hero</strong>
-          <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">x</button>
+          <strong>${t('hl.choose_hero_head', 'Choose Hero')}</strong>
+          <button type="button" class="hl-picker-close" data-picker-close aria-label="${t('hl.close', 'Close')}">x</button>
         </div>
         <div class="hl-hero-grid-wrap">
           ${['str', 'agi', 'int', 'uni'].map(key => `
             <section class="hl-hero-group hl-hero-group-${key}">
               <header>
                 ${iconHtml(ATTR_META[key].icon, ATTR_META[key].label, 'hl-hero-group-icon')}
-                <span>${ATTR_META[key].label}</span>
+                <span>${t('hl.attr.' + key, ATTR_META[key].label)}</span>
               </header>
               <div class="hl-hero-grid">
                 ${heroGroups[key].map(hero => `
@@ -3492,15 +4018,15 @@
     return `
       <div class="hl-picker-card hl-item-picker-card" role="dialog" aria-modal="true" aria-label="Choose item">
         <div class="hl-picker-head">
-          <strong>Choose Item</strong>
+          <strong>${t('hl.choose_item_head', 'Choose Item')}</strong>
           <div class="hl-picker-actions">
-            <button type="button" class="hl-picker-clear" data-item-id="">Empty</button>
-            <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">x</button>
+            <button type="button" class="hl-picker-clear" data-item-id="">${t('hl.empty', 'Empty')}</button>
+            <button type="button" class="hl-picker-close" data-picker-close aria-label="${t('hl.close', 'Close')}">x</button>
           </div>
         </div>
         <div class="hl-shop-tabs">
           ${((neutralOnly || enchantOnly) ? [[currentTab, neutralOnly ? 'Neutrals' : 'Enchants']] : [['basics', 'Basics'], ['upgrades', 'Upgrades']]).map(([id, label]) => `
-            <button type="button" class="hl-shop-tab${currentTab === id ? ' is-active' : ''}" data-shop-tab="${id}">${label}</button>`).join('')}
+            <button type="button" class="hl-shop-tab${currentTab === id ? ' is-active' : ''}" data-shop-tab="${id}">${t('hl.tab.' + id, label)}</button>`).join('')}
         </div>
         <div class="hl-shop-body">
           ${currentTab === 'basics' ? itemGroups.basics.map(([name, list]) => itemSectionMarkup(name, list, selectedId)).join('') : ''}
@@ -3561,19 +4087,24 @@
     renderTotals(panels[1], b);
     const diffTitle = document.getElementById('hl-diff-title');
     if (diffTitle) {
-      diffTitle.textContent = `${aState.hero?.name || 'none'} vs ${bState.hero?.name || 'none'}`;
+      const none = t('hl.none', 'none');
+      diffTitle.textContent = `${aState.hero?.name || none} ${t('hl.vs', 'vs')} ${bState.hero?.name || none}`;
     }
     const diff = document.getElementById('hl-diff-list');
     diff.innerHTML = METRICS.map(([key, label]) => {
       const delta = (a[key] || 0) - (b[key] || 0);
       const cls = delta > 0 ? 'pos' : delta < 0 ? 'neg' : 'zero';
-      return `<div class="hl-diff-row"><span>${label}</span><strong class="${cls}">${delta > 0 ? '+' : ''}${fmtMetric(key, delta)}</strong></div>`;
+      return `<div class="hl-diff-row"><span>${t('hl.metric.' + key, label)}</span><strong class="${cls}">${delta > 0 ? '+' : ''}${fmtMetric(key, delta)}</strong></div>`;
     }).join('');
   }
 
   const panels = [...root.querySelectorAll('.hl-panel')];
   renderPanel(panels[0], 'a', heroes[0].id);
   renderPanel(panels[1], 'b', heroes[Math.min(1, heroes.length - 1)].id);
+  // Re-run the dynamic render when the language toggles. The static shell
+  // (data-i18n) is handled by the global applyLang; update() refreshes the
+  // t()-built totals/diff/title without touching panel state.
+  document.addEventListener('sloppy:langchange', update);
   root.addEventListener('input', (e) => {
     if (e.target.matches('[data-field="level"], [data-custom]')) update();
   });

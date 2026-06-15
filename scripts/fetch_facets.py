@@ -1,6 +1,6 @@
 """fetch_facets.py — Extract facet metadata for a given patch from
 Valve's live patchnotes datafeed and emit a Python dict snippet ready
-to paste into build_patch.py's FACETS table.
+to paste into patch/badges.py's FACETS table.
 
 Usage:
     python scripts/fetch_facets.py 7.40c

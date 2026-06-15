@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install test dependencies
-        run: pip install pytest
+        run: pip install -r requirements-dev.txt
 
       - name: Run unit tests
         run: python -m pytest tests/ -v
@@ -133,25 +133,13 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           mkdir -p _site
-          cp index.html _site/
-          cp calendar.html _site/
-          cp neutral_stats.html _site/
-          cp neutral_creeps.html _site/
-          cp creeps.html _site/
-          cp materials.html _site/
-          cp mana_items.html _site/
-          cp heroes_stats.html _site/
-          cp hero_lab.html _site/
-          cp unit_abilities.html _site/
-          cp neutral_abilities.html _site/
-          cp heroes_dyn.html _site/
-          cp items_dyn.html _site/
-          cp terrain.html _site/
+          # Все сгенерированные корневые страницы одним глобом — новые страницы
+          # подхватываются автоматически, не нужно дописывать cp на каждую
+          # (раньше было ~14 строк).
+          cp *.html _site/
           cp styles.css _site/
-          cp -r src _site/
           cp _dynamics.json _site/
-          cp -r patches _site/
-          cp -r icons _site/
+          cp -r src patches icons _site/
 
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'

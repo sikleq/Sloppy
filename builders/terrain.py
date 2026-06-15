@@ -393,14 +393,15 @@ def _controls_html(layers=True):
     def layer_btn(key, label, icon, icon_dir="ui/gothic"):
         return (f'<button type="button" class="tc-btn tc-btn-icon tc-layer-btn" '
                 f'data-layer="{key}" aria-pressed="false" '
-                f'title="{_esc(label)}" aria-label="{_esc(label)}">'
+                f'title="{_esc(label)}" aria-label="{_esc(label)}" '
+                f'data-i18n-title="terr.layer.{key}" data-i18n-aria-label="terr.layer.{key}">'
                 f'<img src="icons/{icon_dir}/{icon}.png" alt="" '
                 f'width="16" height="16"></button>')
     parts = [
         # No long tooltip — the "Zoom" label already says what it is.
         '<button type="button" class="tc-btn tc-btn-zoom" aria-pressed="false">'
         '<img src="icons/ui/gothic/icon_loupe.png" alt="" width="15" height="15">'
-        'Zoom</button>',
+        '<span data-i18n="terr.zoom">Zoom</span></button>',
     ]
     if layers:
         parts.append('<span class="tc-sep" aria-hidden="true"></span>')
@@ -439,8 +440,8 @@ def _compare_html(old_ver, new_ver, markers_svg=""):
         f'draggable="false" loading="eager">\n'
         '    </div>\n'
         f'    {markers_svg}\n'
-        f'    <span class="tc-ver tc-ver-new">NEW &nbsp;{new_ver} →</span>\n'
-        f'    <span class="tc-ver tc-ver-old">← {old_ver}&nbsp; OLD</span>\n'
+        f'    <span class="tc-ver tc-ver-new"><span data-i18n="terr.new">NEW</span> &nbsp;{new_ver} →</span>\n'
+        f'    <span class="tc-ver tc-ver-old">← {old_ver}&nbsp; <span data-i18n="terr.old">OLD</span></span>\n'
         '    <div class="tc-handle" role="slider" tabindex="0" '
         f'aria-label="Reveal {old_ver} versus {new_ver} terrain" '
         'aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">\n'
@@ -542,9 +543,9 @@ def _fallback_html(ver):
         'alt="" draggable="false" loading="lazy">\n'
         '  <div class="tc-fallback-veil"></div>\n'
         '  <div class="tc-fallback-msg">\n'
-        f'    <span class="tc-fallback-title">Map comparison for {ver}</span>\n'
-        '    <span class="tc-fallback-sub">isn’t available yet</span>\n'
-        '    <span class="tc-fallback-note">The change list is on the right.</span>\n'
+        f'    <span class="tc-fallback-title"><span data-i18n="terr.fallback_title">Map comparison for</span> {ver}</span>\n'
+        '    <span class="tc-fallback-sub" data-i18n="terr.fallback_sub">isn’t available yet</span>\n'
+        '    <span class="tc-fallback-note" data-i18n="terr.fallback_note">The change list is on the right.</span>\n'
         '  </div>\n'
         '</div>\n'
     )
@@ -608,7 +609,7 @@ def save_terrain_html():
     list_head = (
         '<div class="terrain-list-head">'
         f'{_picker_html(patches, default)}'
-        '<span class="terrain-list-head-label">Terrain Changes</span>'
+        '<span class="terrain-list-head-label" data-i18n="terr.changes_head">Terrain Changes</span>'
         '</div>\n')
 
     page = (
@@ -626,7 +627,7 @@ def save_terrain_html():
         '<div class="container creeps-page terrain-page">\n'
         '<div class="creeps-scroll">\n'
         f'{subnav}'
-        '<p class="mr-blurb inbox-bar">Drag the <strong>handle</strong> to wipe between '
+        '<p class="mr-blurb inbox-bar" data-i18n-html="terr.blurb">Drag the <strong>handle</strong> to wipe between '
         'the old and new map. Turn on '
         '<img class="tc-inline-loupe" src="icons/ui/gothic/icon_loupe.png" alt="" '
         'width="16" height="16"><strong>Zoom</strong> (above the map) to magnify on hover — '

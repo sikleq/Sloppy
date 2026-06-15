@@ -1,5 +1,5 @@
 """audit_heroes.py — Verify every hero_header() display name in
-build_patch.py matches the live Valve in-game hero name, and that the
+content/p<version>.py matches the live Valve in-game hero name, and that the
 HERO_SLUG-resolved icon file exists locally.
 
 Flags:
@@ -36,14 +36,15 @@ for h in data["result"]["data"]["heroes"]:
     valve_names.add(loc)
     engine_for_loc[loc] = eng
 
-src = (ROOT / "build_patch.py").read_text(encoding="utf-8")
+# HERO_SLUG lives in the patch/ package; hero_header() calls live in content/.
+sys.path.insert(0, str(ROOT))
+from patch.images import HERO_SLUG as hero_slug_map
 
-# Pull HERO_SLUG mapping (entries may share a line, so findall every "k": "v")
-m = re.search(r"HERO_SLUG\s*=\s*\{(.*?)\n\}", src, re.S)
-hero_slug_map = dict(re.findall(r'"([^"]+)"\s*:\s*"([^"]+)"', m.group(1)))
+content_src = "\n".join(p.read_text(encoding="utf-8")
+                        for p in sorted((ROOT / "content").glob("*.py")))
 
 # Pull every hero_header("...") display name
-calls = sorted(set(re.findall(r'hero_header\("([^"]+)"', src)))
+calls = sorted(set(re.findall(r'hero_header\("([^"]+)"', content_src)))
 print(f"hero_header() calls referencing {len(calls)} unique display names")
 print(f"HERO_SLUG overrides: {len(hero_slug_map)}\n")
 
@@ -55,7 +56,7 @@ for display in calls:
     if display in hero_slug_map:
         resolved_slug = hero_slug_map[display]
     else:
-        # build_patch.py's naive derivation
+        # patch/images.py's naive derivation
         resolved_slug = display.lower().replace(" ", "_").replace("'", "").replace("-", "")
 
     icon_present = (icons_dir / f"{resolved_slug}.png").exists()
@@ -81,7 +82,7 @@ if not problems:
 print(f"{len(problems)} problems:\n")
 for display, slug, valve_eng, icon, note in problems:
     print(f"  [{note}]")
-    print(f"    display in build_patch.py : {display}")
+    print(f"    display in content/        : {display}")
     print(f"    resolved icon slug        : {slug}")
     print(f"    valve engine name         : {valve_eng}")
     print(f"    icon present              : {icon}")

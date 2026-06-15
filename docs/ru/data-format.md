@@ -11,7 +11,7 @@
 
 Формат ключа: `DOTA_Patch_<ver>_<entity_key>_<index>`
 
-## Badge хелперы (build_patch.py)
+## Badge хелперы (patch/badges.py)
 
 ### `b(old, new, l=False)` — числовой бейдж
 ```python
@@ -73,13 +73,10 @@ li_formula(prefix, old_formula, new_formula, old_fn, new_fn)  # формульн
 | recharge time | move speed |
 | penalty | strength/agi/int |
 
-## TAG_OVERRIDES (generate_patch_code.py)
+## Исправление неверных тегов
 
-Ручные переопределения автодетекта тегов:
-```python
-TAG_OVERRIDES = {
-    "Avatar now has a fixed duration": "NERF",
-    "Aghanim's Scepter no longer makes activation faster": None,  # без бейджа
-}
-```
-Добавлять когда `generate_patch_code.py` неверно угадывает тег.
+`generate_patch_code_v2.py` угадывает тег по тексту и прав ~80% времени.
+Отдельной таблицы переопределений нет — правки вносятся руками в
+сгенерированном `content/p<version>.py`: меняешь вызов `t(...)` / `b(...)` прямо в
+строке (например `t("BUFF")` → `t("NERF")`, убрать бейдж у нейтрального
+уточнения, или добавить `l=True` cost-строке). Ревьюь скаффолд перед сохранением.

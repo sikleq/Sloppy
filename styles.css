@@ -1140,6 +1140,51 @@ body:has(.creeps-page) nav.top-nav {
    shifts the static label ABOVE the main-nav buttons' baseline. Cancel it
    so the version-static box sits at the same vertical centre as .nav-tab. */
 .nav-context.nav-context-materials { }
+
+/* ---- Language switcher (EN/RU) — shared nav, UI-chrome i18n ----
+   Wraps the version/picker block together with the EN|RU toggle so the
+   nav-inner grid keeps three columns (brand · tabs · right). */
+.nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+}
+.lang-switch {
+  display: inline-flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+  height: 30px;
+  border: 1px solid rgba(227, 196, 106, 0.28);
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.lang-switch .lang-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  color: #9aa6b2;
+  font-family: 'Jersey 10', 'Courier New', monospace;
+  font-size: 18px;
+  letter-spacing: 0.6px;
+  padding: 0 11px;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+.lang-switch .lang-btn + .lang-btn {
+  border-left: 1px solid rgba(227, 196, 106, 0.22);
+}
+.lang-switch .lang-btn:hover {
+  color: #e6edf3;
+  background: rgba(255, 255, 255, 0.06);
+}
+.lang-switch .lang-btn.active {
+  color: #1a1206;
+  background: #e3c46a;                 /* "sikle" gold — matches nav accent */
+}
 .nav-context .version-chev {
   font-size: 14px;
   color: #a8b3bd;

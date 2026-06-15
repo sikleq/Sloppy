@@ -4,12 +4,12 @@ The shop CATEGORIES shown on Liquipedia's Portal:Items (Consumables, Attributes,
 Equipment, Support, Magical, Armor, Weapons, Artifacts, Secret Shop, …) are NOT in
 items.txt or the web datafeed — they live in scripts/shops.txt inside pak01_dir.vpk.
 Valve reshuffles them between patches (e.g. 7.41 "Shop Reshuffle"), so we extract the
-file per patch; build_patch.py then derives the items_dyn Category filter from it.
+file per patch; patch/rosters.py then derives the items_dyn Category filter from it.
 
 Run after a patch (needs the game installed + `pip install vpk`), then rebuild:
 
     python scripts/extract_shops.py
-    python build_patch.py
+    python builders/patch.py
     # optional: non-default install path
     python scripts/extract_shops.py "D:\\Steam\\steamapps\\common\\dota 2 beta\\game\\dota"
 """
@@ -73,7 +73,7 @@ def main() -> int:
     items = re.findall(r'^\s*"item"\s*"item_[a-z0-9_]+"', text, re.M)
     print(f"-> {src}  ->  {OUT.relative_to(ROOT)}")
     print(f"   {len(sections)} sections, {len(items)} item entries. "
-          f"Now run:  python build_patch.py")
+          f"Now run:  python builders/patch.py")
     return 0
 
 

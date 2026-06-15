@@ -2,6 +2,7 @@
 
 import os
 import re
+import html as _html
 
 import site_common as _site
 
@@ -25,7 +26,7 @@ def write_head(version, date):
     # how long this version has been live (or how long it ran). Plain text,
     # no pill / no border.
     prev_part, age_part = _patch_meta_parts(version)
-    parts = [f'<span class="ti-released">Released: <b>{date}</b></span>']
+    parts = [f'<span class="ti-released"><span data-i18n="patch.released">Released:</span> <b>{date}</b></span>']
     if prev_part:
         parts.append(f'<span class="ti-after">{prev_part}</span>')
     if age_part:
@@ -46,12 +47,12 @@ def write_head(version, date):
 <body class="patch-page">
 
 {nav}
-<a class="nav-back-arrow" href="../calendar.html" aria-label="Back to calendar" title="Back to calendar"></a>
+<a class="nav-back-arrow" href="../calendar.html" aria-label="Back to calendar" title="Back to calendar" data-i18n-aria-label="patch.back_calendar" data-i18n-title="patch.back_calendar"></a>
 <div class="toolbar">
   <div class="toolbar-inner">
     <div class="legend-stack">
       <div class="legend-tags">
-        <strong>Tags:</strong>
+        <strong data-i18n="patch.tags_label">Tags:</strong>
         <button class="badge buff-text filter-btn" data-filter="buff">BUFF</button>
         <button class="badge nerf-text filter-btn" data-filter="nerf">NERF</button>
         <button class="badge new filter-btn" data-filter="new">NEW</button>
@@ -63,7 +64,7 @@ def write_head(version, date):
       <div class="legend-categories"><!--CATEGORIES_BAR--></div>
     </div>
     <div class="search-box">
-      <input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">
+      <input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" data-i18n-placeholder="patch.search_ph" autocomplete="off" spellcheck="false">
       <div class="search-results" id="search-results"></div>
     </div>
     {patch_info_html}
@@ -79,7 +80,7 @@ def write_footer():
     if _State.section_panel_open:
         W('</section>')
         _State.section_panel_open = False
-    W('<button class="back-to-top" aria-label="Back to top" title="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>')
+    W('<button class="back-to-top" aria-label="Back to top" title="Back to top" data-i18n-aria-label="ui.back_to_top" data-i18n-title="ui.back_to_top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>')
     W(f'<script src="../src/scripts.js?v={_ASSET_VERSION}"></script>')
     W('</div></body></html>')
 
@@ -319,13 +320,16 @@ def _categories_bar_html():
     """Render the Categories filter buttons for the currently-accumulated patch."""
     if not _State.current_sections:
         return ''
+    from .patch_i18n import ru_for_header as _ru_hdr
     btns = []
     for s in _State.current_sections:
+        _ru = _ru_hdr(s["label"])
+        ru_attr = f' data-i18n-ru="{_html.escape(_ru, quote=True)}"' if _ru else ""
         btns.append(
-            f'<button class="badge cat-filter-btn" data-category="{s["slug"]}">'
+            f'<button class="badge cat-filter-btn" data-category="{s["slug"]}"{ru_attr}>'
             f'{s["label"]}</button>'
         )
-    return '<strong>Group:</strong>' + ''.join(btns)
+    return '<strong data-i18n="patch.group_label">Group:</strong>' + ''.join(btns)
 
 
 def save_html(filename):

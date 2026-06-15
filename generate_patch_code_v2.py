@@ -1,17 +1,20 @@
 """
-Datafeed-aware patch-scaffold generator (v2).
+Datafeed-aware patch-scaffold generator (the canonical generator).
 
 Reads `/datafeed/patchnotes?version=X` JSON (cached under data/) and emits
-Python source compatible with build_patch.py — preserving the full
-indent_level hierarchy, facet subsections, entity titles ("New Tier 1
-Artifact"), aghanims markers, and info clarifications that v1 dropped.
+Python source built on the `patch/` helper API (`b()`, `li()`, `hero_header()`,
+…) — the same calls used by `content/pXXX.py`. Preserves the full indent_level
+hierarchy, facet subsections, entity titles ("New Tier 1 Artifact"), aghanims
+markers, and info clarifications.
 
 Usage:
-    python3 generate_patch_code_v2.py <version>
+    python generate_patch_code_v2.py <version>
 
-E.g.: python3 generate_patch_code_v2.py 7.40
+E.g.: python generate_patch_code_v2.py 7.40
 
-Output: /tmp/p_<version>_v2.py (or _generated_p_<version>_v2.py in repo).
+Output: `_generated_p_<version>_v2.py` in the repo root — review it, then save the
+reviewed block as `content/p<version>.py` wrapped in `def build():` and register
+it in `builders/patch.py`.
 
 Pipeline:
 1. Load datafeed JSON (data/<version>_datafeed.json) + itemlist + herolist
@@ -30,7 +33,7 @@ Pipeline:
    - hide_dot:true row → subgroup() or <br> spacer
    - info field → inline_note attached to current row
    - aghanims field → ensure text mentions "Aghanim's Scepter"/"Aghanim's Shard"
-                      so build_patch.py's li() auto-tags the aghs marker
+                      so patch/elements.li() auto-tags the aghs marker
 4. Apply text-heuristic tag inference (BUFF/NERF/REWORK/MISC/QoL/NEW/DEL)
    + l=True for cost/BAT/cooldown/manacost/cast-point keywords
    + canonical-phrase tags (Added to CM=NEW, No longer applied by

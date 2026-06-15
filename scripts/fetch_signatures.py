@@ -37,7 +37,7 @@ member the way a public @handle can, so it leaks less. Members whose name is
 empty or just punctuation (".", "...", emoji-only) are not shown — they're
 counted into the single "Hidden (xN)" sign instead.
 
-build_patch.py reads this file at build time. If it is absent the wall falls
+builders/patch.py reads this file at build time. If it is absent the wall falls
 back to random placeholder usernames, so the site still builds without it.
 """
 

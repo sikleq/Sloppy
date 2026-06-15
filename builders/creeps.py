@@ -1316,11 +1316,14 @@ def save_creeps_html():
         if k == 'icon':
             continue  # folded into the colspan=2 Юнит header
         cat = COL_CAT.get(k, '')
+        # Single-line labels carry data-i18n (textContent swap is safe); multi-line
+        # abbreviations (EHP phys / Dmg min …) keep their English form.
+        i18n = f' data-i18n="cr.col.{k}"' if '\n' not in label else ''
         if k == 'name':
             thead_list.append(
                 f'<th class="{_col_cls(k)} sortable" colspan="2" '
                 f'data-col="{k}" data-idx="{name_idx}" data-cat="{cat}">'
-                f'<span class="th-label">{_label_html(label)}</span>'
+                f'<span class="th-label"{i18n}>{_label_html(label)}</span>'
                 f'<span class="sort-ind"></span></th>'
             )
         elif not label:
@@ -1329,7 +1332,7 @@ def save_creeps_html():
             thead_list.append(
                 f'<th class="{_col_cls(k)} sortable" data-col="{k}" '
                 f'data-idx="{i}" data-cat="{cat}">'
-                f'<span class="th-label">{_label_html(label)}</span>'
+                f'<span class="th-label"{i18n}>{_label_html(label)}</span>'
                 f'<span class="sort-ind"></span></th>'
             )
     thead_cells = ''.join(thead_list)
@@ -1339,7 +1342,8 @@ def save_creeps_html():
     # when Expanded columns under it are hidden, the cell shrinks naturally.
     cat_cells = ''.join(
         f'<th class="cat-head cat-{_CAT_SLUG.get(cat, "x")}" '
-        f'data-cat="{_CAT_SLUG.get(cat, "x")}" colspan="{len(cols)}">{_esc(cat)}</th>'
+        f'data-cat="{_CAT_SLUG.get(cat, "x")}" colspan="{len(cols)}" '
+        f'data-i18n="cr.cat.{_CAT_SLUG.get(cat, "x")}">{_esc(cat)}</th>'
         for cat, cols in CATEGORIES
     )
 
@@ -1506,7 +1510,7 @@ def save_creeps_html():
         # layout — only the site nav and the sticky table headers remain pinned.
         # They're sticky-left so they stay put during horizontal scroll.
         f'{subnav_creeps}'
-        '<p class="mr-blurb inbox-bar">Stats and abilities of every neutral '
+        '<p class="mr-blurb inbox-bar" data-i18n-html="cr.blurb">Stats and abilities of every neutral '
         'camp creep in Dota 2 — pulled from the current patch\'s KV files. '
         'Hover any cell with the dotted underline to see its change history '
         'across patches. Click a unit icon to copy its demo-mode spawn command '
@@ -1517,21 +1521,21 @@ def save_creeps_html():
         'armour %, gold range, collision, projectile speed, etc.).</p>\n'
         '<div class="cal-toggle-bar inbox-bar"><div class="toolbar-panel">'
         '<span class="view-group">'
-        '<strong>View</strong>'
+        '<strong data-i18n="cr.view">View</strong>'
         '<select class="cal-mode-select" id="view-mode">'
-        '<option value="standard">Standard</option>'
-        '<option value="expanded">Expanded</option>'
+        '<option value="standard" data-i18n="cr.view.standard">Standard</option>'
+        '<option value="expanded" data-i18n="cr.view.expanded">Expanded</option>'
         '</select>'
         '</span>'
-        '<span class="hs-attack-filter-group" aria-label="Attack type filter">'
+        '<span class="hs-attack-filter-group" aria-label="Attack type filter" data-i18n-aria-label="dyn.attack_filter">'
         '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
-        'aria-pressed="false" title="Show melee units">'
+        'aria-pressed="false" title="Show melee units" data-i18n-title="cr.atk_title.melee">'
         '<span class="atk-badge" aria-hidden="true">'
-        '<img src="icons/ui/atk_melee.png" alt=""></span><span>Melee</span></button>'
+        '<img src="icons/ui/atk_melee.png" alt=""></span><span data-i18n="dyn.melee">Melee</span></button>'
         '<button type="button" class="hs-attack-filter" data-attack-filter="ranged" '
-        'aria-pressed="false" title="Show ranged units">'
+        'aria-pressed="false" title="Show ranged units" data-i18n-title="cr.atk_title.ranged">'
         '<span class="atk-badge" aria-hidden="true">'
-        '<img src="icons/ui/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
+        '<img src="icons/ui/atk_ranged.png" alt=""></span><span data-i18n="dyn.ranged">Ranged</span></button>'
         '</span>'
         '</div></div>\n'
         '<table class="creeps-table mode-standard">\n'
@@ -2209,7 +2213,7 @@ def save_creeps_html():
         ua_thead.append(
             f'<th class="{cls} sortable" data-col="{k}" data-idx="{idx}" '
             f'data-cat="{UA_COL_CAT.get(k, "")}">'
-            f'<span class="th-label">{label}</span>{hint}'
+            f'<span class="th-label" data-i18n="ua.col.{k}">{label}</span>{hint}'
             f'<span class="sort-ind"></span></th>')
     ua_head_html = ''.join(ua_thead)
 
@@ -2218,7 +2222,7 @@ def save_creeps_html():
     # the colspans in sync with the visible columns (via the data-cat above).
     ua_cat_cells = ''.join(
         f'<th class="cat-head cat-{slug}" data-cat="{slug}" '
-        f'colspan="{len(cols)}">{_esc(cat)}</th>'
+        f'colspan="{len(cols)}" data-i18n="ua.cat.{slug}">{_esc(cat)}</th>'
         for cat, slug, cols in UA_CATEGORIES
     )
 
@@ -2457,7 +2461,7 @@ def save_creeps_html():
         # scroll away with the table (Mana Items behaviour); sticky-left keeps
         # them put during horizontal scroll.
         f'{subnav_abilities}'
-        '<p class="mr-blurb inbox-bar">Every ability owned by a neutral camp '
+        '<p class="mr-blurb inbox-bar" data-i18n-html="ua.blurb">Every ability owned by a neutral camp '
         'creep — one row per (creep, ability). Hover any cell with the dotted '
         'underline to see how its value changed across patches. The '
         '<strong>View</strong> dropdown filters the table: <em>Standard</em> '
@@ -2466,10 +2470,10 @@ def save_creeps_html():
         'neutral tier (e.g. 40/36/32/26).</p>\n'
         '<div class="cal-toggle-bar inbox-bar"><div class="toolbar-panel">'
         '<span class="view-group">'
-        '<strong>View</strong>'
+        '<strong data-i18n="cr.view">View</strong>'
         '<select class="cal-mode-select" id="ua-view-mode">'
-        '<option value="standard">Standard</option>'
-        '<option value="auras">Auras</option>'
+        '<option value="standard" data-i18n="cr.view.standard">Standard</option>'
+        '<option value="auras" data-i18n="ua.view.auras">Auras</option>'
         '</select>'
         '</span>'
         # Upgrades — binary switch. ON marks every per-level progression
@@ -2477,7 +2481,7 @@ def save_creeps_html():
         # number gets the marker), so leveled cells self-identify through
         # their own content rather than via an Excel-style outline.
         '<label class="ua-upgrades-toggle">'
-        '<span class="ua-upgrades-label">Upgrades</span>'
+        '<span class="ua-upgrades-label" data-i18n="ua.upgrades">Upgrades</span>'
         '<input type="checkbox" id="ua-upgrades-mode" class="ua-switch-input" checked>'
         '<span class="ua-switch" aria-hidden="true"></span>'
         '</label>'

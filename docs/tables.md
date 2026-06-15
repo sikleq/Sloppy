@@ -1,19 +1,19 @@
 # Tables subsystem (Creeps / Unit Abilities / Mana Items)
 
-Separate from the patch-notes pipeline (`build_patch.py`, see [architecture.md](architecture.md)).
+Separate from the patch-notes pipeline (`builders/patch.py`, see [architecture.md](architecture.md)).
 This covers the sortable data tables under the **Materials** section.
 
 ## Pages & builders
 
 | Page | Content | Builder |
 |---|---|---|
-| `neutral_stats.html` | **Neutral Stats** table (neutral creep stats + abilities). Attack range cells render the same number + melee/ranged icon badge pattern used by Hero Stats, and toolbar Melee/Ranged buttons filter rows by current `AttackCapabilities`. `neutral_creeps.html`, `creeps.html` and `materials.html` are redirects → `neutral_stats.html`. | `build_creeps.py` |
-| `neutral_abilities.html` | Per-unit-ability table (one row per unit×ability). The Materials sub-nav presents it as a child of Neutral Stats. `unit_abilities.html` is now a small meta-redirect for backwards compatibility. | `build_creeps.py` (same run) |
-| `mana_items.html` | Mana / mana-regen items + gold-efficiency metrics. | `build_mana_items.py` |
-| `heroes_stats.html` | **Hero Stats** — one row per hero (128 incl. Spirit Bear), every base stat. Three View modes (`#hs-view-mode`): **Base** = raw level-1 KV values and ignores the level control; **Starting** (default) = practical values WITH attribute bonuses; **Expanded** = Starting + extra inspection columns (`EHP phys/mag`, `Gains/lvl`, `Armor %`, `Dmg min/max`, `Time to hit`, projectile speed, turn rate, collision size, bound radius). The `Lvl` input clamps to 1–30 and recomputes Starting/Expanded values from compact row JSON (`data-hs-stats`) instead of emitting 30 copies of every cell. Melee/Ranged toolbar buttons filter rows by latest-patch `AttackCapabilities` and fire the shared heatmap refresh. Attack range cells render as number + melee/ranged icon badge, matching Neutral Stats. Header groups mirror Neutral Stats: Basic / Essentials / Attributes / Defense / Attack / Vision / Mobility. Spirit Bear is injected from `units.json` + its `npc_units.txt` block because it is a `ConsideredHero` unit, not a normal `npc_dota_hero_*` record. Cells whose value differs between Base & Starting carry `data-base-sort/-html/-hist`; the View IIFE swaps/recomputes them. **Per-hero special cases:** Huskar MP/regen forced to 0; Ogre Magi mana/regen scale with Str. **Innate attribute-conversion modifiers** (`_innate_bonus`, patch-gated): Morphling Ebb&Flow Agi→Range/MoveSpeed (7.41+, 0.2→0.25 range @7.41d), Void Spirit Intrinsic Edge (+33% secondary bonuses in 7.36, +25% in 7.36b–7.40, then 7.41+ = Universal damage multiplier ×1.15 plus +30% HP regen / mana regen / attack speed from Str/Int/Agi, no armor/MR), Centaur Horsepower Str→MoveSpeed (7.36+). Every numeric cell carries full 7.08→today change history (`data-hist`+`data-net`); attribute cell logs primary-attr swaps. **Patch-note shift layer** shifts KV-detected changes back to the patch that `patchnotes_english.txt` announces. Reuses mr-table front-end (`mr-table hs-table`) with its own Neutral-Stats-style two-row header. | `build_heroes_stats.py` |
-| `hero_lab.html` | **Hero Lab** — current-patch side-by-side hero calculator under the Heroes materials tab. Each side selects a hero, level, six item slots and custom stat overrides (`HP`, `MP`, regen, armor, magic resist, evasion); the center panel shows metric differences. Hero base values reuse Hero Stats data; item passive bonuses are parsed from current `items.txt` `AbilityValues` / `AbilitySpecial` blocks with `items.json` as cost fallback. Melee/ranged-specific item bonuses are applied only to matching attack types. | `build_hero_lab.py` |
-| `heroes_dyn.html` | **Hero Dynamics matrix** — rows = every hero (icon+name, alphabetical), columns = every patch (version + release date oldest→newest), each cell = that hero's patch-dynamics **dyn-cell** for that patch. Same diamond-pill widget as patch pages. | `build_heroes_dyn.py` |
-| `items_dyn.html` | **Item Dynamics matrix** — like heroes_dyn, rows = **every real game item** (parity with heroes_dyn listing every hero), columns = every patch. Untouched items render as empty rows. Currently **350** (199 regular + 129 neutral + 22 enchant); 91 not-current (incl. 80 cycled-out neutrals — only the live pool of 49 shows by default), every one with an accurate removal patch. Adds an **In game** toggle (hide removed items, ON) + Type & Category multi-select dropdowns. | `build_items_dyn.py` |
+| `neutral_stats.html` | **Neutral Stats** table (neutral creep stats + abilities). Attack range cells render the same number + melee/ranged icon badge pattern used by Hero Stats, and toolbar Melee/Ranged buttons filter rows by current `AttackCapabilities`. `neutral_creeps.html`, `creeps.html` and `materials.html` are redirects → `neutral_stats.html`. | `builders/creeps.py` |
+| `neutral_abilities.html` | Per-unit-ability table (one row per unit×ability). The Materials sub-nav presents it as a child of Neutral Stats. `unit_abilities.html` is now a small meta-redirect for backwards compatibility. | `builders/creeps.py` (same run) |
+| `mana_items.html` | Mana / mana-regen items + gold-efficiency metrics. | `builders/mana_items.py` |
+| `heroes_stats.html` | **Hero Stats** — one row per hero (128 incl. Spirit Bear), every base stat. Three View modes (`#hs-view-mode`): **Base** = raw level-1 KV values and ignores the level control; **Starting** (default) = practical values WITH attribute bonuses; **Expanded** = Starting + extra inspection columns (`EHP phys/mag`, `Gains/lvl`, `Armor %`, `Dmg min/max`, `Time to hit`, projectile speed, turn rate, collision size, bound radius). The `Lvl` input clamps to 1–30 and recomputes Starting/Expanded values from compact row JSON (`data-hs-stats`) instead of emitting 30 copies of every cell. Melee/Ranged toolbar buttons filter rows by latest-patch `AttackCapabilities` and fire the shared heatmap refresh. Attack range cells render as number + melee/ranged icon badge, matching Neutral Stats. Header groups mirror Neutral Stats: Basic / Essentials / Attributes / Defense / Attack / Vision / Mobility. Spirit Bear is injected from `units.json` + its `npc_units.txt` block because it is a `ConsideredHero` unit, not a normal `npc_dota_hero_*` record. Cells whose value differs between Base & Starting carry `data-base-sort/-html/-hist`; the View IIFE swaps/recomputes them. **Per-hero special cases:** Huskar MP/regen forced to 0; Ogre Magi mana/regen scale with Str. **Innate attribute-conversion modifiers** (`_innate_bonus`, patch-gated): Morphling Ebb&Flow Agi→Range/MoveSpeed (7.41+, 0.2→0.25 range @7.41d), Void Spirit Intrinsic Edge (+33% secondary bonuses in 7.36, +25% in 7.36b–7.40, then 7.41+ = Universal damage multiplier ×1.15 plus +30% HP regen / mana regen / attack speed from Str/Int/Agi, no armor/MR), Centaur Horsepower Str→MoveSpeed (7.36+). Every numeric cell carries full 7.08→today change history (`data-hist`+`data-net`); attribute cell logs primary-attr swaps. **Patch-note shift layer** shifts KV-detected changes back to the patch that `patchnotes_english.txt` announces. Reuses mr-table front-end (`mr-table hs-table`) with its own Neutral-Stats-style two-row header. | `builders/heroes_stats.py` |
+| `hero_lab.html` | **Hero Lab** — current-patch side-by-side hero calculator under the Heroes materials tab. Each side selects a hero, level, six item slots and custom stat overrides (`HP`, `MP`, regen, armor, magic resist, evasion); the center panel shows metric differences. Hero base values reuse Hero Stats data; item passive bonuses are parsed from current `items.txt` `AbilityValues` / `AbilitySpecial` blocks with `items.json` as cost fallback. Melee/ranged-specific item bonuses are applied only to matching attack types. | `builders/hero_lab.py` |
+| `heroes_dyn.html` | **Hero Dynamics matrix** — rows = every hero (icon+name, alphabetical), columns = every patch (version + release date oldest→newest), each cell = that hero's patch-dynamics **dyn-cell** for that patch. Same diamond-pill widget as patch pages. | `builders/heroes_dyn.py` |
+| `items_dyn.html` | **Item Dynamics matrix** — like heroes_dyn, rows = **every real game item** (parity with heroes_dyn listing every hero), columns = every patch. Untouched items render as empty rows. Currently **350** (199 regular + 129 neutral + 22 enchant); 91 not-current (incl. 80 cycled-out neutrals — only the live pool of 49 shows by default), every one with an accurate removal patch. Adds an **In game** toggle (hide removed items, ON) + Type & Category multi-select dropdowns. | `builders/items_dyn.py` |
 | nav / asset version / `data/site_meta.json` | Shared header, sub-tabs, cache-busting. | `site_common.py` |
 
 Hero Stats current layout note: `heroes_stats.html` uses a Neutral-Stats-style
@@ -29,24 +29,24 @@ Header sub-tabs (under the logo) switch between Neutral Stats / Unit Abilities /
 
 ```bash
 # On Windows always:  PYTHONIOENCODING=utf-8
-python build_patch.py        # 1. writes data/site_meta.json (asset version, patch list)
-python build_creeps.py       # 2. -> neutral_stats.html + neutral_abilities.html (+ neutral_creeps/creeps/materials/unit_abilities redirects)
-python build_mana_items.py   # 3. -> mana_items.html  (run AFTER build_patch)
-python build_heroes_stats.py # 3b. -> heroes_stats.html (run AFTER build_patch — needs site_meta dates)
-python build_hero_lab.py     # 3c. -> hero_lab.html
-python build_heroes_dyn.py   # 4. -> heroes_dyn.html  (run AFTER build_patch — reads _dynamics.json)
-python build_items_dyn.py    # 5. -> items_dyn.html   (run AFTER build_patch — reads _dynamics.json)
+python builders/patch.py       # 1. writes data/site_meta.json (asset version, patch list)
+python builders/creeps.py      # 2. -> neutral_stats.html + neutral_abilities.html (+ neutral_creeps/creeps/materials/unit_abilities redirects)
+python builders/mana_items.py  # 3. -> mana_items.html  (run AFTER builders/patch.py)
+python builders/heroes_stats.py # 3b. -> heroes_stats.html (run AFTER build_patch — needs site_meta dates)
+python builders/hero_lab.py     # 3c. -> hero_lab.html
+python builders/heroes_dyn.py   # 4. -> heroes_dyn.html  (run AFTER build_patch — reads _dynamics.json)
+python builders/items_dyn.py    # 5. -> items_dyn.html   (run AFTER build_patch — reads _dynamics.json)
 ```
 
 ### Shared dynamics renderer (`dyn_matrix_common.py`)
 Both dynamics pages call `dyn_matrix_common.save_dyn_matrix(...)` — the matrix
-renderer is **entity-agnostic**. `build_heroes_dyn.py` passes the hero config
+renderer is **entity-agnostic**. `builders/heroes_dyn.py` passes the hero config
 (`kind="hero"`, `roster_key="heroes"`, `icon_dir="icons/heroes"`, …),
-`build_items_dyn.py` the item config (`kind="item"`, `roster_key="items"`,
+`builders/items_dyn.py` the item config (`kind="item"`, `roster_key="items"`,
 `icon_dir="icons/items"`, `from_token="items_dyn"`, …). Both emit the SAME
 `class="creeps-table heroes-dyn-table"` so the shared CSS + `scripts.js`
 (`dynBuildMatrix`/`dynLayoutMatrix`/`dynSetupMatrix`) apply unchanged.
-- `build_patch.py` writes BOTH rosters into `_dynamics.json` (`heroes` = full
+- `patch/rosters.py` writes BOTH rosters into `_dynamics.json` (`heroes` = full
   HERO_SLUG roster; `items` = every `item|<slug>` entity touched in any tracked
   patch, with its icon slug stamped in `_register_entity`).
 - **Back-arrow token is data-driven:** each page sets `<body data-dyn-from=...>`;
@@ -57,7 +57,7 @@ renderer is **entity-agnostic**. `build_heroes_dyn.py` passes the hero config
   Heroes → heroes_dyn and Items → items_dyn.
 
 ### Item classification (items_dyn) — from the GAME FILES, not patch notes
-`build_patch.py::_load_item_classes(version)` parses the latest
+`patch/rosters.py::_load_item_classes(version)` parses the latest
 `data/stats/<ver>/items.txt` (authoritative Valve KV):
 - **neutral item** — block has `"ItemIsNeutralActiveDrop" "1"`.
 - **enchantment** — slug prefix `item_enhancement_` (these are NOT neutral-flagged).
@@ -70,13 +70,13 @@ renderer is **entity-agnostic**. `build_heroes_dyn.py` passes the hero config
 `_register_entity` stamps each item/enchant entity's `icon` slug (item → ITEM_SLUG;
 enchant → `enhancement_<slug>`; game slug for both = `item_<icon>`) plus a
 `neutral_section` fallback (set under `section("Neutral Item Updates")`) for the
-rare neutral that's been fully removed from the game file. `build_patch` writes the
+rare neutral that's been fully removed from the game file. `patch/rosters.py` writes the
 enriched **items roster** into `_dynamics.json` — each entry has `class`
 (`regular`/`neutral`/`enchant`) and `current` (in game vs removed). The
 section-based method and the game-file method agree 100% (cross-checked: 49/49
 neutral, 0 false pos/neg).
 
-### Full item roster (`build_patch.py::_load_full_game_items`) — list EVERY item
+### Full item roster (`patch/rosters.py::_load_full_game_items`) — list EVERY item
 The roster is NOT just touched items — it lists every real game item so the matrix
 matches heroes_dyn (which lists every hero). Untouched items render as empty rows.
 Inclusion mirrors **Liquipedia's Portal:Items** (the reference the user gave).
@@ -166,7 +166,7 @@ every option) + option `<input data-<key>="<value>">`. `initHdDropdowns`:
 - **Category** (`category`): the shop tabs (Consumables / Attributes / Equipment /
   Miscellaneous / Accessories / Support / Magical / Armor / Weapons / **Armaments** /
   Secret Shop / Other). Default: all selected. Source = `data/shops.txt` (the game's
-  shop layout, extracted by `scripts/extract_shops.py`); `build_patch._load_shop_categories`
+  shop layout, extracted by `scripts/extract_shops.py`); `patch/rosters.py::_load_shop_categories`
   maps each item to its FIRST shop section (sideshop/pregame/event sections excluded;
   the `"magics" // Magical` inline comment must be tolerated by the section regex; an
   UNMAPPED section with items prints a build warning), uncategorized regular items (boss
@@ -212,17 +212,17 @@ matrix only draws the item's slots WITHIN its life:
   see the neutral-pool note below; the live pool of 49 neutrals shows by default). EVERY
   one has an accurate removal patch now (see `_NEUTRAL_REMOVED_MANUAL`).
   (NB: Liquipedia's changelog summary disagreed — it's stale on the 7.41 enchant
-  removals and the cycle-outs; the Valve patch notes in build_patch.py are truth.)
+  removals and the cycle-outs; the Valve patch notes in `content/` are truth.)
 - A touched cell (has a tag tally) ALWAYS renders its pill, even if the lifespan
   math would blank it (a touch means it existed). heroes_dyn rows have no
   added/removed → nothing is blanked there (could be wired later via heroes.json).
 
-### Hero Dynamics matrix (`build_heroes_dyn.py`)
-- Reads **`_dynamics.json`** (written by build_patch): `patches` (newest-first), `entities`
+### Hero Dynamics matrix (`builders/heroes_dyn.py`)
+- Reads **`_dynamics.json`** (written by `patch/rosters.py`): `patches` (newest-first), `entities`
   (`hero|<slug>` → per-patch tag tallies), and **`heroes`** (full roster `[{name, icon, key}]`,
-  added so every hero lists even if untouched in a rendered patch). build_patch also stamps an
-  `icon` field on each hero entity. build_heroes_dyn does **not** import build_patch (no `__main__`
-  guard there).
+  added so every hero lists even if untouched in a rendered patch). `patch/rosters.py` also stamps an
+  `icon` field on each hero entity. `builders/heroes_dyn.py` does **not** import `builders/patch.py` —
+  it just consumes the JSON.
 - Table = `creeps-table heroes-dyn-table`, ONE sticky-col (hero icon+name), single `col-row`
   header (no cat-row), 115 patch columns oldest→newest. `<body data-dyn-path="_dynamics.json">`
   tells `scripts.js` where to fetch the manifest (patch pages use the default `../_dynamics.json`).
@@ -302,7 +302,7 @@ matrix only draws the item's slots WITHIN its life:
     default filter). Names use the system font (no web-font reflow), so the setup measure needs no
     font-settle re-measure; `load`/`resize` should only re-FIT columns, not re-measure the name width.
 
-`site_common.py` reads `data/site_meta.json`, so `build_patch.py` must run first.
+`site_common.py` reads `data/site_meta.json`, so `builders/patch.py` must run first.
 Generated HTML is **gitignored** and rebuilt by CI; only the `.py` / `styles.css` /
 `scripts.js` sources are committed.
 
@@ -395,7 +395,7 @@ page → leave the default `stable`.
 - **Cross-hover** lights the hovered row + column by `cellIndex`.
   ⚠ Because it's positional, a semantically-shared ability must sit in the SAME column
   across rows to co-highlight — e.g. **Riverborn Aura is pinned to Ability 1 for every
-  frog unit** (see `build_creeps.py`, the `abilities.sort(...)` on the riverborn slug).
+  frog unit** (see `builders/creeps.py`, the `abilities.sort(...)` on the riverborn slug).
 
 ## Cell change-history tooltips (`data-hist`)
 Payload: `patch|date|KIND|…` segments joined by `;`. Decoded in `scripts.js` `entryParts()`.
@@ -408,7 +408,7 @@ Payload: `patch|date|KIND|…` segments joined by `;`. Decoded in `scripts.js` `
 | `N` | value change, **no %** |
 | `C` | **computed column**: pretty short display + % computed from RAW values carried alongside (`…|disp_old|disp_new|raw_old|raw_new|pol`). Needed because `_short_plain` renders ≥1000 as thousands "5,0" but <1000 as "714" — different scales would skew a %. |
 
-Mana-metric history (`build_mana_items.py load_metric_history`) is built by diffing each
+Mana-metric history (`builders/mana_items.py load_metric_history`) is built by diffing each
 patch's `items.json`; only patches whose JSON carries the **deep mana fields** count —
 those exist from **7.33 onward** (older slim JSON has only `ItemCost`). So mana history
 starts at 7.33 and runs forward; a missing tail just means a stale rebuild.
@@ -423,14 +423,14 @@ Cells flagged `data-net=""` (a value cell that changed **>1 time**) get an extra
 - colour = buff/nerf via `.stat-pct up/down/flat`; label is "overall".
 
 Who flags `data-net`:
-- **Neutral Creeps** — every numeric `COL_HIST` cell (`build_creeps.py`), NOT ability cells.
-- **Mana Items** — every `_cost_cell`/`_metric_cell` (`build_mana_items.py`). These also
+- **Neutral Creeps** — every numeric `COL_HIST` cell (`builders/creeps.py`), NOT ability cells.
+- **Mana Items** — every `_cost_cell`/`_metric_cell` (`builders/mana_items.py`). These also
   **dropped `data-name`** (the item-name tooltip header was a redundant duplicate; the row
   already identifies the item). The blurb's `_int_const_chip` keeps its `data-name`.
 - **Neutral Abilities** — no per-patch history (current-patch snapshot) → no summary.
 CSS: `.stat-hist-tip .stat-net` (divider) + `.stat-net-label`.
 
-## Mana Items specifics (`build_mana_items.py`)
+## Mana Items specifics (`builders/mana_items.py`)
 - Intelligence: +12 max mana, +0.05 regen per point (7.41c engine constants).
 - Items whose ACTIVE restores mana (Arcane Boots) are split into a base row + hidden
   `(Active)` sub-row (`mr-active-row`, toggled by "Hide Active").

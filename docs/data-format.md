@@ -129,15 +129,11 @@ W(li(
 
 `note_box(...)` renders the `Previously: <patch link> (age)` correction line.
 
-## `TAG_OVERRIDES` (generate_patch_code.py)
+## Fixing mislabeled tags
 
-Manual overrides for the autodetector's tag guesses:
-
-```python
-TAG_OVERRIDES = {
-    "Avatar now has a fixed duration": "NERF",
-    "Aghanim's Scepter no longer makes activation faster": None,  # no badge
-}
-```
-
-Add entries when the autodetector mislabels a row consistently across patches.
+`generate_patch_code_v2.py` infers a tag for every row by text heuristics and is
+right ~80% of the time. There is **no override table** — corrections are made by
+hand in the generated `content/p<version>.py`: edit the `t(...)` / `b(...)` call
+on the row directly (e.g. flip `t("BUFF")` → `t("NERF")`, drop the badge for a
+neutral clarification, or add `l=True` to a cost row). Review the scaffold before
+saving it as a content module.

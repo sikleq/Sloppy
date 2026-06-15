@@ -1,11 +1,11 @@
 """fetch_icons.py — Скачивает все недостающие иконки абилок из Valve CDN.
 
-После `python build_patch.py` файл `_ability_icons.txt` содержит относительные
+После `python builders/patch.py` файл `_ability_icons.txt` содержит относительные
 пути ко всем иконкам, на которые ссылаются собранные патч-страницы. Этот
 скрипт идёт по списку, проверяет какие файлы локально отсутствуют, и
 качает их с `https://cdn.steamstatic.com/apps/dota2/images/dota_react/abilities/`.
 
-Запускать ПОСЛЕ build_patch.py — добавление нового slug в build_patch.py
+Запускать ПОСЛЕ builders/patch.py — добавление нового slug в builders/patch.py
 автоматически попадёт в _ability_icons.txt, и следующий запуск этого
 скрипта добьёт недостающие PNG-ки.
 
@@ -29,7 +29,7 @@ ICONS_DIR = ROOT / "icons" / "abilities"
 CDN_BASE = "https://cdn.steamstatic.com/apps/dota2/images/dota_react/abilities/"
 
 if not URLS_FILE.exists():
-    print(f"X {URLS_FILE} not found. Run python build_patch.py first.")
+    print(f"X {URLS_FILE} not found. Run python builders/patch.py first.")
     sys.exit(1)
 
 ICONS_DIR.mkdir(parents=True, exist_ok=True)

@@ -4,7 +4,7 @@
    3. audit_abilities.py  — ability() / ability_change() slugs + names
    4. fetch_icons.py      — auto-download any missing ability PNGs
 
-Run after build_patch.py before publishing a patch.
+Run after builders/patch.py before publishing a patch.
 """
 import subprocess
 import sys

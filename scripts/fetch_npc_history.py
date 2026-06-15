@@ -8,7 +8,7 @@
 ("Client NNNN"), а не версией патча, поэтому сопоставление патч↔коммит идёт
 ПО ДАТЕ: для каждого нашего патча берётся последний d2vpkr-коммит, попавший
 в окно жизни патча (до даты следующего патча). Даты патчей — из
-`data/site_meta.json` (patch_dates), который пишет build_patch.py.
+`data/site_meta.json` (patch_dates), который пишет builders/patch.py.
 
 Мы сохраняем СВОЮ копию данных (распарсенный JSON), чтобы не зависеть от
 d2vpkr в момент сборки. Сырые .txt кэшируются по SHA в `.cache/d2vpkr/`,
@@ -44,7 +44,7 @@ FILE_PATH = "dota/scripts/npc/npc_units.txt"
 RAW_TMPL = "https://raw.githubusercontent.com/" + REPO + "/{sha}/" + FILE_PATH
 
 # Поля, которые вынимаем из каждого npc-блока (надмножество того, что
-# использует build_creeps.py — храним с запасом, чтобы потом можно было
+# использует builders/creeps.py — храним с запасом, чтобы потом можно было
 # завести историю и по другим статам без повторной перекачки).
 NPC_FIELDS = (
     "StatusHealth", "StatusHealthRegen", "StatusMana", "StatusManaRegen",
@@ -66,7 +66,7 @@ FIELD_RE = re.compile(r'^\s*"([A-Za-z_][A-Za-z0-9_]*)"\s+"([^"]+)"')
 
 def parse_npc_units(text):
     """Распарсить npc_units.txt → {npc_key: {field: value}} для нейтралов
-    и surfaced summoned-юнитов. Зеркалит парсер из build_creeps.py."""
+    и surfaced summoned-юнитов. Зеркалит парсер из builders/creeps.py."""
     lines = text.splitlines()
     n = len(lines)
     out = {}
@@ -179,7 +179,7 @@ def commit_for_window(commit_idx, win_end):
 def main():
     force = "--force" in sys.argv
     if not META_PATH.exists():
-        print("X data/site_meta.json не найден — сначала запусти build_patch.py")
+        print("X data/site_meta.json не найден — сначала запусти builders/patch.py")
         return 1
     patch_dates = load_patch_dates()
     # Только патчи, для которых у нас есть папка в data/stats/.

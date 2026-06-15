@@ -8,7 +8,7 @@ Primary terrain-data sources:
 For each old->new patch pair we read the two `mapdata.json` exports from
 leamare/dota-interactive-map (cached under .cache/leamare/mapdata_<code>.json —
 NOT committed; this is a regeneration helper, like scripts/fetch_*.py) and emit a
-small, committed diff per NEW patch that the site build (build_terrain.py)
+small, committed diff per NEW patch that the site build (builders/terrain.py)
 projects onto that patch's terrain map:
 
   - treesOld / treesNew     : full tree coord sets (forest layout each side)
@@ -18,7 +18,7 @@ projects onto that patch's terrain map:
                                wisdom / outposts / watchers / roshan)
   - camps / towers / …       : move/relocate/demote records (kept for reference)
 
-World coords are kept as-is; build_terrain.py projects them with the shared crop
+World coords are kept as-is; builders/terrain.py projects them with the shared crop
 meta (data/terrain_map_meta.json), which lines up pixel-accurately with our
 cropped map renders (verified by overlaying all trees on the map image). The crop
 box is shared across every version, so the same projector places any patch's

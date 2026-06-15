@@ -1,5 +1,5 @@
 """check_icons.py — Проверяет что каждый URL иконки в _ability_icons.txt
-действительно существует на CDN. Запускать ПОСЛЕ build_patch.py.
+действительно существует на CDN. Запускать ПОСЛЕ builders/patch.py.
 
 Печатает только проблемные (404, network errors). Для каждой такой иконки
 соответствующая <img> в HTML автоматически свапнет на innate_icon.png через
@@ -18,7 +18,7 @@ URLS_FILE = Path(__file__).resolve().parent.parent / "_ability_icons.txt"
 INNATE_ICON = "https://cdn.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png"
 
 if not URLS_FILE.exists():
-    print(f"❌ {URLS_FILE} not found. Run python build_patch.py first.")
+    print(f"❌ {URLS_FILE} not found. Run python builders/patch.py first.")
     sys.exit(1)
 
 urls = [line.strip() for line in URLS_FILE.read_text(encoding="utf-8").splitlines() if line.strip()]

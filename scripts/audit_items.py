@@ -1,5 +1,5 @@
 """audit_items.py — Verify every item_header() display name in
-build_patch.py matches the live Valve in-game name.
+content/p<version>.py matches the live Valve in-game name.
 
 Flags items where:
   - display name doesn't match Valve's name_loc for the corresponding engine slug
@@ -42,18 +42,15 @@ for slug, name in valve.items():
         continue
     display_to_slug.setdefault(name, slug)
 
-src = (ROOT / "build_patch.py").read_text(encoding="utf-8")
+# ITEM_SLUG lives in the patch/ package; item_header() calls live in content/.
+sys.path.insert(0, str(ROOT))
+from patch.images import ITEM_SLUG as item_slug_map
 
-# Pull ITEM_SLUG mapping
-m = re.search(r"ITEM_SLUG\s*=\s*\{(.*?)\n\}", src, re.S)
-item_slug_map = {}
-for ln in m.group(1).splitlines():
-    mm = re.match(r'\s*"([^"]+)"\s*:\s*"([^"]+)"', ln)
-    if mm:
-        item_slug_map[mm.group(1)] = mm.group(2)
+content_src = "\n".join(p.read_text(encoding="utf-8")
+                        for p in sorted((ROOT / "content").glob("*.py")))
 
 # Pull every item_header("...") call
-calls = sorted(set(re.findall(r'item_header\("([^"]+)"', src)))
+calls = sorted(set(re.findall(r'item_header\("([^"]+)"', content_src)))
 print(f"item_header() calls referencing {len(calls)} unique display names")
 print(f"ITEM_SLUG overrides: {len(item_slug_map)}\n")
 
@@ -87,7 +84,7 @@ if not problems:
 print(f"{len(problems)} problems:\n")
 for display, slug, valve_d, icon, note in problems:
     print(f"  [{note}]")
-    print(f"    display in build_patch.py : {display}")
+    print(f"    display in content/        : {display}")
     print(f"    resolved engine slug      : {slug}")
     print(f"    valve live name           : {valve_d}")
     print(f"    icon present              : {icon}")

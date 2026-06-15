@@ -9,6 +9,14 @@ from .images import (HERO_CDN, ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG,
                      hero_img, item_img, abil_img, _LOCAL_ABIL_ICONS)
 from .output import H, W
 from .state import _State
+from .patch_i18n import ru_for as _patch_ru, ru_for_header as _patch_ru_header
+
+
+def _ru_attr(text):
+    """Build a ` data-i18n-ru="…"` attribute for a structural header, or '' when
+    there's no translation (the title then stays English)."""
+    ru = _patch_ru_header(text)
+    return f' data-i18n-ru="{_html.escape(ru, quote=True)}"' if ru else ""
 
 # ---- Icon / placeholder URLs ----
 TALENT_ICON_URL  = "../icons/misc/talents.svg"
@@ -493,7 +501,7 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False):
             f'<img src="../icons/ui/gothic/icon_terrain.png" alt="" width="16" height="16">'
             f'<span>View on map</span></a>')
     extra_cls = ' label-only' if sublabel else ''
-    return out + _open_block(extra_cls) + f'<div class="entity plain-entity"{eid}><div class="entity-name">{name}</div>{link_html}</div>'
+    return out + _open_block(extra_cls) + f'<div class="entity plain-entity"{eid}><div class="entity-name"{_ru_attr(name)}>{name}</div>{link_html}</div>'
 
 
 def enchant_header(name, slug=None, new=False):
@@ -526,7 +534,7 @@ def section(title):
     if _State.section_panel_open:
         out += '</section>'
     out += (f'<section class="cat-panel">'
-            f'<h2 class="section" data-section="{slug}">{title}</h2>')
+            f'<h2 class="section" data-section="{slug}"{_ru_attr(title)}>{title}</h2>')
     _State.section_panel_open = True
     return out
 
@@ -683,6 +691,9 @@ _TALENT_PREFIX_RE = re.compile(r'^(Level \d+ Talent) (?!:)')
 
 
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None):
+    # Capture the raw source text BEFORE any transformation — it's the lookup
+    # key into the official EN→RU patch-note map (data/patchnotes_*.txt).
+    _orig_text = text
     if isinstance(text, str):
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
         if _State.in_stats_ul:
@@ -795,7 +806,12 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             text_inner = f'{text_base}{marker}'
     else:
         text_inner = text_base
-    return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text_inner}</span>{rest}{extra}</li>'
+    # Official Russian translation for the body text, emitted inline on the
+    # row-text span (badges live in `rest`, outside it, so they're untouched).
+    # The client i18n toggle swaps it in for RU; no match ⇒ stays English.
+    _ru = _patch_ru(_orig_text)
+    ru_attr = f' data-i18n-ru="{_html.escape(_ru, quote=True)}"' if _ru else ""
+    return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text"{ru_attr}>{text_inner}</span>{rest}{extra}</li>'
 
 
 def inline_note(text):

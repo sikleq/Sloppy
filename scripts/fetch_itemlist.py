@@ -1,17 +1,18 @@
 """fetch_itemlist.py — Refresh data/itemlist.json from Valve's live datafeed.
 
-This file is the source of truth for two things in build_patch.py:
+This file is the source of truth for two things in the build:
   1. Item display names (slugs are legacy joke names: item_angels_demise = "Khanda",
-     item_gungir = "Gleipnir", …) → used for the items_dyn roster labels.
+     item_gungir = "Gleipnir", …) → used by generate_patch_code_v2.py + the items_dyn
+     roster labels.
   2. The CURRENT neutral pool — field `neutral_item_tier` (>= 0 = in the live drop
-     pool). build_patch.py derives `_NEUTRAL_POOL_CURRENT` from it, so the items_dyn
+     pool). patch/rosters.py derives `_NEUTRAL_POOL_CURRENT` from it, so the items_dyn
      matrix auto-knows which neutrals are active vs cycled-out.
 
 Run this whenever a new patch lands (it changes the neutral pool / adds items), then
 rebuild:
 
     python scripts/fetch_itemlist.py
-    python build_patch.py
+    python builders/patch.py
 
 No hand-maintained neutral list — refreshing this file is the whole update.
 """

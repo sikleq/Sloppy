@@ -5,7 +5,7 @@ speed, base attack speed, turn rate, collision hull, bound radius).
 
 Mirrors scripts/fetch_npc_history.py exactly (same d2vpkr commit-by-date
 matching, same SHA disk cache), just a different file + parser. Needed so
-the Hero Stats table (build_heroes_stats.py) can show per-patch change
+the Hero Stats table (builders/heroes_stats.py) can show per-patch change
 history for those raw-only fields (e.g. Gyrocopter night vision 7.41d).
 
     python scripts/fetch_hero_history.py           # backfill missing + refresh latest
@@ -168,7 +168,7 @@ def commit_for_window(commit_idx, win_end):
 def main():
     force = "--force" in sys.argv
     if not META_PATH.exists():
-        print("X data/site_meta.json не найден — сначала запусти build_patch.py")
+        print("X data/site_meta.json не найден — сначала запусти builders/patch.py")
         return 1
     patch_dates = load_patch_dates()
     patches = sorted((v for v in patch_dates if (STATS_DIR / v).is_dir()),
