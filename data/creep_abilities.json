@@ -1,0 +1,163 @@
+{
+  "npc_dota_neutral_kobold": [
+    "kobold_tunneler_prospecting"
+  ],
+  "npc_dota_neutral_kobold_tunneler": [
+    "kobold_disarm"
+  ],
+  "npc_dota_neutral_kobold_taskmaster": [
+    "kobold_taskmaster_speed_aura"
+  ],
+  "npc_dota_neutral_centaur_outrunner": [
+    "mudgolem_cloak_aura"
+  ],
+  "npc_dota_neutral_centaur_khan": [
+    "centaur_khan_war_stomp"
+  ],
+  "npc_dota_neutral_fel_beast": [
+    "fel_beast_haunt"
+  ],
+  "npc_dota_neutral_polar_furbolg_champion": [
+    "centaur_khan_endurance_aura",
+    "furbolg_enrage_attack_speed"
+  ],
+  "npc_dota_neutral_polar_furbolg_ursa_warrior": [
+    "polar_furbolg_ursa_warrior_thunder_clap",
+    "furbolg_enrage_damage"
+  ],
+  "npc_dota_neutral_warpine_raider": [
+    "warpine_raider_seed_shot"
+  ],
+  "npc_dota_neutral_mud_golem": [
+    "mud_golem_hurl_boulder",
+    "mud_golem_rock_destroy"
+  ],
+  "npc_dota_neutral_mud_golem_split": [
+    "mud_golem_hurl_boulder"
+  ],
+  "npc_dota_neutral_mud_golem_split_doom": [
+    "mud_golem_hurl_boulder"
+  ],
+  "npc_dota_neutral_ogre_mauler": [
+    "ogre_bruiser_ogre_smash"
+  ],
+  "npc_dota_neutral_ogre_magi": [
+    "ogre_magi_frost_armor"
+  ],
+  "npc_dota_neutral_giant_wolf": [
+    "giant_wolf_intimidate"
+  ],
+  "npc_dota_neutral_alpha_wolf": [
+    "alpha_wolf_critical_strike",
+    "alpha_wolf_command_aura"
+  ],
+  "npc_dota_neutral_wildkin": [
+    "enraged_wildkin_tornado"
+  ],
+  "npc_dota_neutral_enraged_wildkin": [
+    "enraged_wildkin_hurricane",
+    "enraged_wildkin_toughness_aura"
+  ],
+  "npc_dota_neutral_satyr_soulstealer": [
+    "satyr_soulstealer_mana_burn",
+    "forest_troll_high_priest_mana_aura"
+  ],
+  "npc_dota_neutral_satyr_hellcaller": [
+    "satyr_hellcaller_shockwave",
+    "satyr_hellcaller_unholy_aura"
+  ],
+  "npc_dota_neutral_jungle_stalker": [],
+  "npc_dota_neutral_elder_jungle_stalker": [],
+  "npc_dota_neutral_prowler_acolyte": [
+    "spawnlord_aura"
+  ],
+  "npc_dota_neutral_prowler_shaman": [
+    "spawnlord_master_stomp",
+    "spawnlord_master_freeze"
+  ],
+  "npc_dota_neutral_rock_golem": [
+    "ancient_rock_golem_weakening_aura"
+  ],
+  "npc_dota_neutral_granite_golem": [
+    "granite_golem_hp_aura"
+  ],
+  "npc_dota_neutral_ice_shaman": [
+    "ice_shaman_incendiary_bomb"
+  ],
+  "npc_dota_neutral_frostbitten_golem": [
+    "frostbitten_golem_time_warp_aura"
+  ],
+  "npc_dota_neutral_big_thunder_lizard": [
+    "big_thunder_lizard_slam",
+    "big_thunder_lizard_frenzy"
+  ],
+  "npc_dota_neutral_small_thunder_lizard": [
+    "big_thunder_lizard_wardrums_aura"
+  ],
+  "npc_dota_neutral_gnoll_assassin": [
+    "gnoll_assassin_envenomed_weapon"
+  ],
+  "npc_dota_neutral_ghost": [
+    "ghost_frost_attack"
+  ],
+  "npc_dota_neutral_dark_troll": [
+    "dark_troll_warlord_ensnare"
+  ],
+  "npc_dota_neutral_dark_troll_warlord": [
+    "dark_troll_warlord_raise_dead"
+  ],
+  "npc_dota_neutral_satyr_trickster": [
+    "satyr_trickster_purge"
+  ],
+  "npc_dota_neutral_forest_troll_berserker": [
+    "berserker_troll_break"
+  ],
+  "npc_dota_neutral_forest_troll_high_priest": [
+    "forest_troll_high_priest_heal",
+    "forest_troll_high_priest_heal_amp_aura"
+  ],
+  "npc_dota_neutral_harpy_scout": [
+    "harpy_scout_take_off"
+  ],
+  "npc_dota_neutral_harpy_storm": [
+    "harpy_storm_chain_lightning"
+  ],
+  "npc_dota_neutral_black_drake": [
+    "black_drake_magic_amplification_aura"
+  ],
+  "npc_dota_neutral_black_dragon": [
+    "black_dragon_fireball",
+    "black_dragon_splash_attack",
+    "black_dragon_dragonhide_aura"
+  ],
+  "npc_dota_dark_troll_warlord_skeleton_warrior": [
+    "hill_troll_rally"
+  ],
+  "npc_dota_neutral_tadpole": [
+    "frogmen_riverborn_aura"
+  ],
+  "npc_dota_neutral_froglet": [
+    "frogmen_arm_of_the_deep",
+    "frogmen_riverborn_aura"
+  ],
+  "npc_dota_neutral_grown_frog": [
+    "frogmen_tendrils_of_the_deep",
+    "frogmen_riverborn_aura"
+  ],
+  "npc_dota_neutral_ancient_frog": [
+    "frogmen_congregation_of_the_deep",
+    "frogmen_riverborn_aura"
+  ],
+  "npc_dota_neutral_froglet_mage": [
+    "frogmen_water_bubble_small",
+    "frogmen_riverborn_aura"
+  ],
+  "npc_dota_neutral_grown_frog_mage": [
+    "frogmen_water_bubble_medium",
+    "frogmen_riverborn_aura"
+  ],
+  "npc_dota_neutral_ancient_frog_mage": [
+    "frogmen_water_bubble_large",
+    "frogmen_riverborn_aura"
+  ]
+}

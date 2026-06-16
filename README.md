@@ -1,4 +1,4 @@
-# Sloppy — Dota 2 Patch Notes, Reorganized
+# Dota 2 Enhanced Patch Reader and Materials
 
 A static site that turns Valve's raw Dota 2 patch notes into a readable, filterable changelog. Every change is tagged (BUFF / NERF / REWORK / NEW / DEL / MISC / QoL), every numeric delta is computed as a percentage, every per-level formula is expandable into a per-hero-level table.
 

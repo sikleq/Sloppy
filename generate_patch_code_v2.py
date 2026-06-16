@@ -103,6 +103,26 @@ ITEMS = _load_itemlist()
 HEROES = _load_herolist()
 ABILS = _load_abilities()
 
+
+def _load_creep_abilities():
+    """npc slug → [ability slugs] (from data/creep_abilities.json)."""
+    p = os.path.join(_HERE, 'data', 'creep_abilities.json')
+    if not os.path.exists(p):
+        return {}
+    return json.load(open(p, encoding='utf-8'))
+
+
+def _load_abilities_slim():
+    """ability slug → {'dname': ...} (from data/abilities_slim.json)."""
+    p = os.path.join(_HERE, 'data', 'abilities_slim.json')
+    if not os.path.exists(p):
+        return {}
+    return json.load(open(p, encoding='utf-8'))
+
+
+CREEP_ABILS = _load_creep_abilities()
+ABILS_SLIM = _load_abilities_slim()
+
 # Section order used when emitting the scaffold.
 # Neither the datafeed JSON key order nor patchnotes_english.txt reliably
 # encodes the official patch-page ordering — Valve's internal order can differ
@@ -526,17 +546,37 @@ def _render_hero(hero, version=None):
         # Partition notes: bucket by facet name prefix, or keep as general
         _general_notes = []
         _facet_buckets = {}   # facet_slug -> [notes]
+        _facet_removed = []   # (slug, display_name) for "Removed X facet" notes
         _FACET_PREFIX_RE = re.compile(r'^([^:]{2,40}):\s+(.+)$', re.DOTALL)
+        # "Removed X[, Y] and Z facets" — captures comma/and-separated list
+        _REMOVED_FACETS_RE = re.compile(
+            r'^Removed\s+(.+?)\s+facets?$', re.IGNORECASE
+        )
         for n in hero_notes:
             raw = (n.get('note') or '').strip()
-            m = _FACET_PREFIX_RE.match(_strip_html(raw))
+            clean = _strip_html(raw).strip()
+            # Check for "Removed X and Y facets" pattern first
+            rm = _REMOVED_FACETS_RE.match(clean)
+            if rm:
+                names_str = rm.group(1)
+                # Split on ", " and " and " to get individual facet names
+                parts = re.split(r',\s*|\s+and\s+', names_str)
+                matched_any = False
+                for part in parts:
+                    part = part.strip()
+                    facet_slug = _facet_name_to_slug.get(part.lower())
+                    if facet_slug:
+                        _facet_removed.append((facet_slug, part))
+                        matched_any = True
+                if matched_any:
+                    continue  # consumed — don't add to _general_notes
+            # Check for "FacetName: change text" prefix
+            m = _FACET_PREFIX_RE.match(clean)
             if m:
                 prefix = m.group(1).strip()
                 facet_slug = _facet_name_to_slug.get(prefix.lower())
                 if facet_slug:
-                    # Strip the "FacetName: " prefix from the note text
                     stripped_note = dict(n)
-                    rest = m.group(2).strip()
                     stripped_note['note'] = re.sub(
                         re.escape(prefix) + r':\s*', '', n.get('note', ''), count=1, flags=re.I
                     )
@@ -546,7 +586,13 @@ def _render_hero(hero, version=None):
         if _general_notes:
             body, _ = _emit_notes(_general_notes, hero_name=name, version=version)
             out.extend(body)
-        # Emit inline facet sections from hero_notes
+        # Emit "Facet removed" blocks (one facet_header per removed facet)
+        for facet_slug, _dname in _facet_removed:
+            out.append(f'W(facet_header("{facet_slug}"))')
+            out.append('W(ul_open())')
+            out.append('W(li("Facet removed", t("DEL")))')
+            out.append('W(ul_close())')
+        # Emit inline facet sections from "FacetName: ..." hero_notes
         for facet_slug, fnotes in _facet_buckets.items():
             out.append(f'W(facet_header("{facet_slug}"))')
             body, _ = _emit_notes(fnotes)
@@ -584,17 +630,11 @@ def _render_neutral_creep(creep):
          "localized_name": "Satyr Mindstealer",
          "neutral_creep_notes": [{"indent_level": 1, "note": "..."}, ...]}
 
-    Renders:
-        W(unit_header("<display_name>", _NC_CDN + "<slug>.png"))
-        W(ul_open())
-        <notes>
-        W(ul_close())
-
-    Per-ability splitting (ability("Mana Burn", icon_url=...) blocks) is
-    NOT done here — the datafeed flattens all notes under the unit. After
-    generation, manually lift each note into its own ability(...) +
-    ul_open/ul_close pair (match 7.41 Satyr Tormenter / Harpy Stormcrafter
-    canon).
+    Renders unit_header followed by per-ability ability() blocks when the
+    creep has known abilities in CREEP_ABILS. Notes are matched to abilities
+    by checking if the ability's display name appears in the note text
+    (case-insensitive). Unmatched notes go into a general bucket emitted
+    first as a flat ul.
     """
     out = []
     name = creep.get('name', '') or ''
@@ -617,9 +657,55 @@ def _render_neutral_creep(creep):
     icon = f'_NC_CDN + "{slug}.png"' if slug else '""'
     out.append(f'\n# {display}')
     out.append(f'W(unit_header("{display}", {icon}))')
-    if notes:
-        body, _ = _emit_notes(notes)  # _emit_notes owns ul_open + ul_close
+
+    if not notes:
+        return out
+
+    # Build (ability_slug, display_name) pairs for this creep.
+    abil_slugs = CREEP_ABILS.get(name, [])
+    abil_pairs = []
+    for a_slug in abil_slugs:
+        dname = (ABILS_SLIM.get(a_slug) or {}).get('dname') or ''
+        if dname:
+            abil_pairs.append((a_slug, dname))
+
+    if not abil_pairs:
+        # No known abilities — emit all notes flat.
+        body, _ = _emit_notes(notes)
         out.extend(body)
+        return out
+
+    # Match each note to an ability by display-name substring (case-insensitive).
+    buckets = {a_slug: [] for a_slug, _ in abil_pairs}
+    general = []
+    for n in notes:
+        txt = _strip_html(n.get('note') or '').lower()
+        matched = None
+        for a_slug, dname in abil_pairs:
+            if dname.lower() in txt:
+                matched = a_slug
+                break
+        if matched:
+            buckets[matched].append(n)
+        else:
+            general.append(n)
+
+    # General (unmatched) notes first.
+    if general:
+        body, _ = _emit_notes(general)
+        out.extend(body)
+
+    # Per-ability blocks — only emit ability() when there are notes for it.
+    for a_slug, dname in abil_pairs:
+        bucket = buckets[a_slug]
+        if not bucket:
+            continue
+        a_icon = f'"../icons/abilities/{a_slug}.png"'
+        dname_esc = dname.replace('"', '\\"')
+        out.append(f'W(ability("{dname_esc}", icon_url={a_icon}))')
+        body, _ = _emit_notes(bucket)
+        out.extend(body)
+
     return out
 
 
@@ -1061,12 +1147,282 @@ def _postprocess_rework_marker(lines):
 
 # ---------- TOP-LEVEL ----------
 
-def generate(version):
+def fetch_datafeed(version):
+    """Download /datafeed/patchnotes?version=X from Valve and cache it under
+    data/<version>_datafeed.json. Returns the parsed dict.
+    Safe to call multiple times — skips the download if the cache already exists.
+    Cache miss triggers a live HTTP request to dota2.com; ensure network access
+    or pre-populate data/<version>_datafeed.json manually."""
+    import urllib.request
     p = os.path.join(_HERE, 'data', f'{version}_datafeed.json')
-    if not os.path.exists(p):
-        print(f'No cached datafeed at {p}. Fetch first.', file=sys.stderr)
-        sys.exit(2)
-    d = json.load(open(p, encoding='utf-8'))
+    if os.path.exists(p):
+        print(f'Using cached datafeed: {p}')
+        return json.load(open(p, encoding='utf-8'))
+    url = f'https://www.dota2.com/datafeed/patchnotes?version={version}&language=english'
+    print(f'Fetching {url} ...')
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        raw = r.read()
+    d = json.loads(raw)
+    # Valve wraps in {"success": true, "result": {...}} — unwrap if needed
+    if 'result' in d and 'patch_notes' in d.get('result', {}):
+        d = d['result']['patch_notes']
+    os.makedirs(os.path.join(_HERE, 'data'), exist_ok=True)
+    with open(p, 'w', encoding='utf-8') as f:
+        json.dump(d, f, ensure_ascii=False, indent=2)
+    print(f'Saved → {p} ({len(raw):,} bytes)')
+    return d
+
+
+# ---------- NORMALIZED JSON LAYER ----------
+# Parallel output to the W()-scaffold: walks the same datafeed and emits a
+# structured JSON artifact (data/normalized/patches/<version>.json). This is
+# the "data as source of truth" layer — pages/validators read it instead of
+# re-deriving meaning from the generated Python/HTML. Built only going forward
+# (current patch onward); legacy content/p*.py files are NOT back-converted.
+
+
+def _mean(v):
+    """Mean of a level-list, or the scalar itself."""
+    if isinstance(v, list):
+        return sum(v) / len(v) if v else 0
+    return v
+
+
+def _numeric_direction(old, new, lower_is_better):
+    """buff/nerf/misc from old→new means, respecting lower_is_better."""
+    if old is None or new is None:
+        return None
+    o, n = _mean(old), _mean(new)
+    if n == o:
+        return 'misc'
+    better = n > o
+    if lower_is_better:
+        better = not better
+    return 'buff' if better else 'nerf'
+
+
+def _resolve_tag(text, old, new, lower):
+    """Final tag for a note, mirroring the scaffold's precedence:
+    1. Canonical phrase tags (rescaled→rework, added→new, removed→del, …).
+    2. Numeric change → direction from old/new values (the b() badge drives it).
+    3. Text-heuristic fallback (increased→buff / decreased→nerf).
+
+    This deliberately puts numeric direction ABOVE the increased/decreased word
+    heuristic: a "Cooldown increased from 70 to 100/85/70" row reads as a buff
+    by wording but is a nerf by value (longer cooldown), and the values are the
+    ground truth — same call the generated b() makes.
+    """
+    clean = _strip_html(text or '')
+    for rx, tag in CANONICAL_TAGS:
+        if rx.search(clean):
+            return tag.lower()
+    # "improved"/"worsened" are authoritative direction words Valve uses
+    # precisely when the raw value direction is counterintuitive (faster spawn
+    # rate, shorter penalty duration, smaller "decrease" penalty). Trust the
+    # word over the value comparison — otherwise e.g. "spawn rate improved from
+    # 0.35s to 0.25s" reads as a nerf by value.
+    if re.search(r'\bimproved\b', clean, re.I):
+        return 'buff'
+    if re.search(r'\bworsened\b', clean, re.I):
+        return 'nerf'
+    if old is not None and new is not None:
+        direction = _numeric_direction(old, new, lower)
+        if direction:
+            return direction
+    guessed = _guess_tag(text or '')
+    return (guessed or 'misc').lower()
+
+
+# "A–B to C–D" min–max ranges (en-dash/em-dash/hyphen). Used for damage rows
+# like "Damage increased from 22–24 to 24–26" which _FROM_TO_RE/_split_levels
+# intentionally reject (ranges aren't level progressions). Captured as
+# old=[min,max], new=[min,max] with range=True so consumers can disambiguate
+# from level-lists; direction still derives from the midpoint via _mean.
+_RANGE_TO_RE = re.compile(
+    r'\bfrom\s+([-+]?\d+(?:\.\d+)?)[–—-]([-+]?\d+(?:\.\d+)?)\s+'
+    r'to\s+([-+]?\d+(?:\.\d+)?)[–—-]([-+]?\d+(?:\.\d+)?)'
+)
+
+
+def _num(x):
+    f = float(x)
+    return int(f) if f == int(f) else f
+
+
+def _normalize_note_text(text):
+    """One note → structured change dict.
+
+    Returns {text, tag, old, new, lower_is_better, range}. `old`/`new` are
+    scalars or level-lists when a parseable "from X to Y" is present, min–max
+    pairs when a range is present (with range=True), else absent. `tag` is
+    lowercase (buff/nerf/rework/new/del/misc/qol).
+
+    Numeric extraction runs on the HTML-stripped text — Valve wraps changed
+    numbers in <font color=…> tags ("from <font>10%</font> to …"), which would
+    otherwise defeat the from-to regex.
+    """
+    clean = _strip_html(text or '').strip()
+    lower = _is_lower_better(clean)
+    old = new = None
+    is_range = False
+    m = _FROM_TO_RE.search(clean)
+    if m:
+        po, pn = _split_levels(m.group(1)), _split_levels(m.group(2))
+        if po is not None and pn is not None:
+            old, new = po, pn
+    if old is None:
+        rm = _RANGE_TO_RE.search(clean)
+        if rm:
+            old = [_num(rm.group(1)), _num(rm.group(2))]
+            new = [_num(rm.group(3)), _num(rm.group(4))]
+            is_range = True
+
+    rec = {'text': clean, 'tag': _resolve_tag(clean, old, new, lower)}
+    if old is not None:
+        rec['old'] = old
+        rec['new'] = new
+        if is_range:
+            rec['range'] = True
+        if lower:
+            rec['lower_is_better'] = True
+    return rec
+
+
+def _normalize_notes(notes, scope):
+    """List of datafeed notes → list of change dicts with a `scope` label.
+    Skips hide_dot separators and empty rows."""
+    out = []
+    for n in notes or []:
+        if n.get('hide_dot'):
+            continue
+        txt = (n.get('note') or '').strip()
+        if not txt:
+            continue
+        rec = _normalize_note_text(txt)
+        rec['scope'] = scope
+        info = n.get('info')
+        if info:
+            rec['info'] = _strip_html(info).strip()
+        out.append(rec)
+    return out
+
+
+def _normalize_hero(hero):
+    """heroes[] entry → {entity_type, id, name, changes[]}."""
+    hid = hero.get('hero_id')
+    name, slug = HEROES.get(hid, (f'hero_{hid}', f'hero_{hid}'))
+    changes = []
+    changes += _normalize_notes(hero.get('hero_notes'), 'base')
+    for a in hero.get('abilities', []):
+        aid = a.get('ability_id')
+        aname, _aslug = ABILS.get(aid, (f'ability_{aid}', f'ability_{aid}'))
+        changes += _normalize_notes(a.get('ability_notes'), aname)
+    changes += _normalize_notes(hero.get('talent_notes'), 'talent')
+    for s in hero.get('subsections', []):
+        if s.get('style') == 'hero_facet':
+            fslug = s.get('facet')
+            for a in s.get('abilities', []):
+                changes += _normalize_notes(a.get('ability_notes'), f'facet:{fslug}')
+    return {'entity_type': 'hero', 'id': slug, 'name': name, 'changes': changes}
+
+
+def _normalize_item(item, neutral=False):
+    aid = item.get('ability_id')
+    if aid == -1:
+        # Section-header pseudo-entry (e.g. "Artifact Changes"). Skip entirely
+        # if it carries no notes of its own — these are pure layout labels
+        # ("Basic Items", "Upgrades"), not data.
+        changes = _normalize_notes(item.get('ability_notes'), 'base')
+        if not changes:
+            return None
+        title = _strip_html(item.get('title') or '').strip()
+        return {
+            'entity_type': 'neutral_item' if neutral else 'item',
+            'id': None, 'name': title or 'Section',
+            'changes': changes,
+        }
+    name, slug = ITEMS.get(aid, (f'item_{aid}', f'item_{aid}'))
+    return {
+        'entity_type': 'neutral_item' if neutral else 'item',
+        'id': slug, 'name': name,
+        'changes': _normalize_notes(item.get('ability_notes'), 'base'),
+    }
+
+
+def _normalize_neutral_creep(creep):
+    name = creep.get('name', '') or ''
+    display = creep.get('localized_name') or name or 'Unknown Creep'
+    if creep.get('is_general_note'):
+        return None
+    notes = creep.get('neutral_creep_notes') or creep.get('notes') or []
+    # Reuse the same ability-name substring matching as _render_neutral_creep
+    # so JSON scopes line up with the generated ability() blocks.
+    abil_pairs = []
+    for a_slug in CREEP_ABILS.get(name, []):
+        dname = (ABILS_SLIM.get(a_slug) or {}).get('dname') or ''
+        if dname:
+            abil_pairs.append(dname)
+    changes = []
+    for n in notes:
+        if n.get('hide_dot'):
+            continue
+        txt = (n.get('note') or '').strip()
+        if not txt:
+            continue
+        low = _strip_html(txt).lower()
+        scope = 'base'
+        for dname in abil_pairs:
+            if dname.lower() in low:
+                scope = dname
+                break
+        rec = _normalize_note_text(txt)
+        rec['scope'] = scope
+        changes.append(rec)
+    slug = name.replace('npc_dota_neutral_', '', 1) if name else name
+    return {'entity_type': 'neutral_creep', 'id': slug, 'name': display, 'changes': changes}
+
+
+def _normalize_general(note):
+    title = _strip_html(note.get('title') or '').strip()
+    return {
+        'entity_type': 'general', 'id': None, 'name': title or 'General',
+        'changes': _normalize_notes(note.get('generic'), 'base'),
+    }
+
+
+def normalize(version, d=None):
+    """Build the normalized JSON dict for a patch (data-as-source-of-truth).
+    `d` may be passed to reuse an already-fetched datafeed."""
+    if d is None:
+        d = fetch_datafeed(version)
+    entities = []
+    for note in d.get('general_notes', []) or []:
+        entities.append(_normalize_general(note))
+    for creep in d.get('neutral_creeps', []) or []:
+        ent = _normalize_neutral_creep(creep)
+        if ent:
+            entities.append(ent)
+    for item in d.get('items', []) or []:
+        ent = _normalize_item(item)
+        if ent:
+            entities.append(ent)
+    for item in d.get('neutral_items', []) or []:
+        ent = _normalize_item(item, neutral=True)
+        if ent:
+            entities.append(ent)
+    for hero in sorted(d.get('heroes', []) or [],
+                       key=lambda h: HEROES.get(h['hero_id'], ('', ''))[0]):
+        entities.append(_normalize_hero(hero))
+    return {
+        'patch': version,
+        'generated_from': f'data/{version}_datafeed.json',
+        'entities': entities,
+    }
+
+
+def generate(version):
+    d = fetch_datafeed(version)
 
     out = [f'# Auto-generated v2 scaffold for {version}',
            f'# Source: data/{version}_datafeed.json',
@@ -1132,7 +1488,29 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('Usage: python generate_patch_code_v2.py <version>', file=sys.stderr)
         sys.exit(1)
-    src = generate(sys.argv[1])
-    out_path = os.path.join(_HERE, f'_generated_p_{sys.argv[1]}_v2.py')
+    version = sys.argv[1]
+    d = fetch_datafeed(version)
+
+    # 1. W()-scaffold (existing primary output).
+    src = generate(version)
+    out_path = os.path.join(_HERE, f'_generated_p_{version}_v2.py')
     open(out_path, 'w', encoding='utf-8').write(src)
     print(f'Wrote {out_path} ({len(src):,} chars, {src.count(chr(10)):,} lines)')
+
+    # 2. Normalized JSON (parallel data-as-source-of-truth artifact).
+    norm = normalize(version, d)
+    json_dir = os.path.join(_HERE, 'data', 'normalized', 'patches')
+    os.makedirs(json_dir, exist_ok=True)
+    json_path = os.path.join(json_dir, f'{version}.json')
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(norm, f, ensure_ascii=False, indent=2)
+    n_changes = sum(len(e['changes']) for e in norm['entities'])
+    print(f'Wrote {json_path} ({len(norm["entities"])} entities, {n_changes} changes)')
+
+    # 3. Auto-validate the JSON we just wrote (no separate command needed).
+    try:
+        from tools.validate_data import validate_patch, _report
+        print('\n--- validating normalized data ---')
+        _report(version, validate_patch(version))
+    except Exception as e:
+        print(f'(validation skipped: {e})')
