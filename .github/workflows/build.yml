@@ -32,50 +32,10 @@ jobs:
       - name: Run unit tests
         run: python -m pytest tests/ -v
 
-      - name: Build patch pages
+      - name: Build site
         env:
           PYTHONIOENCODING: utf-8
-        run: python builders/patch.py
-
-      - name: Build silent changes pages
-        env:
-          PYTHONIOENCODING: utf-8
-        run: python builders/silent.py
-
-      - name: Build creeps table
-        env:
-          PYTHONIOENCODING: utf-8
-        run: python builders/creeps.py
-
-      - name: Build mana items table
-        env:
-          PYTHONIOENCODING: utf-8
-        run: python builders/mana_items.py
-
-      - name: Build hero stats table
-        env:
-          PYTHONIOENCODING: utf-8
-        run: python builders/heroes_stats.py
-
-      - name: Build hero lab calculator
-        env:
-          PYTHONIOENCODING: utf-8
-        run: python builders/hero_lab.py
-
-      - name: Build hero dynamics matrix
-        env:
-          PYTHONIOENCODING: utf-8
-        run: python builders/heroes_dyn.py
-
-      - name: Build item dynamics matrix
-        env:
-          PYTHONIOENCODING: utf-8
-        run: python builders/items_dyn.py
-
-      - name: Build terrain comparison
-        env:
-          PYTHONIOENCODING: utf-8
-        run: python builders/terrain.py
+        run: python build_site.py
 
       - name: Audit — BAT rows must use l=True
         run: |
