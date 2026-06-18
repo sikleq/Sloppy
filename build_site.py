@@ -37,13 +37,18 @@ SEP  = "-" * 60
 SEP2 = "=" * 60
 
 def main() -> int:
-    filter_keys = set(sys.argv[1:])
+    args = sys.argv[1:]
+    latest = "--latest" in args
+    filter_keys = set(a for a in args if not a.startswith("-"))
     steps = [(k, s, d) for k, s, d in STEPS if not filter_keys or k in filter_keys]
 
     if not steps:
         known = ", ".join(k for k, _, _ in STEPS)
         print(f"Unknown page key(s). Known: {known}", file=sys.stderr)
         return 1
+
+    if latest:
+        print(f"  [--latest] building only the newest patch page")
 
     t0 = time.monotonic()
     failed = []
@@ -53,7 +58,10 @@ def main() -> int:
         print(f"  {desc}")
         print(SEP)
         t = time.monotonic()
-        result = subprocess.run([sys.executable, script])
+        cmd = [sys.executable, script]
+        if latest and key == "patch":
+            cmd.append("--latest")
+        result = subprocess.run(cmd)
         elapsed = time.monotonic() - t
         status = "OK" if result.returncode == 0 else "FAIL"
         print(f"  [{status}] {elapsed:.1f}s")
