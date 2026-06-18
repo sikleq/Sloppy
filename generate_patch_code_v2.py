@@ -167,7 +167,7 @@ CANONICAL_TAGS = [
     (re.compile(r'^\s*Fixed\b', re.I),                              'MISC'),  # "Fixed X" — gameplay bug fix
     (re.compile(r'\bunchanged\b', re.I),                            'MISC'),  # "X is unchanged"
     # DEL — explicit removal / no-longer-targets / no-longer-applies
-    (re.compile(r'\bcan no longer (?:target|be cast|be used|trigger)', re.I), 'NERF'),
+    (re.compile(r'\bcan no longer (?:target|be cast|be used|trigger|attack|move|stack|proc|crit|bash|leap|fly|deny|sell|disassemble)', re.I), 'DEL'),
     (re.compile(r'\bno longer applied by illusions\b', re.I),       'DEL'),
     (re.compile(r'\bno longer (?:applies?|affects?) ', re.I),       'DEL'),
     (re.compile(r'\bis not applied if\b', re.I),                    'DEL'),   # "X is not applied if Debuff Immune"

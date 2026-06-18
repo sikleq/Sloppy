@@ -49,7 +49,7 @@ def build():
 
     W(item_header("Mjollnir"))
     W(ul_open())
-    W(li("Fixed item description stating that Chain Lightning deals bonus damage to illusions", t("MISC")))
+    W(li("Fixed item description stating that Chain Lightning deals bonus damage to illusions", t("QoL")))
     W(ul_close())
 
     W(item_header("Mask of Madness"))
@@ -107,7 +107,7 @@ def build():
     W(item_header("Helm of the Undying"))
     W(ul_open())
     W(li("Death Delay base duration increased from 5s to 6s", b(5, 6)))
-    W(li("Units can no longer attack buildings while under the effect of Death Delay", t("MISC")))
+    W(li("Units can no longer attack buildings while under the effect of Death Delay", t("DEL")))
     W(ul_close())
 
     W(item_header("Psychic Headband"))
@@ -198,7 +198,7 @@ def build():
     W(hero_header("Dark Willow"))
     W(ability("Shadow Realm", slug="dark_willow_shadow_realm"))
     W(ul_open())
-    W(li("Allies can no longer target Dark Willow while active (Dark Willow can still target herself)", t("NERF")))
+    W(li("Allies can no longer target Dark Willow while active (Dark Willow can still target herself)", t("DEL")))
     W(ul_close())
 
     # Dawnbreaker
