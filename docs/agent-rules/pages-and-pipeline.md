@@ -8,7 +8,6 @@ generate_patch_code.py    ← KV → Python-код. Запускать пере�
 scripts/apply_stats.py    ← Постпроцессор: t("BUFF")→bstat_h() где есть БД
 data/
   patchnotes_english.txt  ← Сырые патчноуты Valve (KV формат)
-  patchnotes_russian.txt  ← Русский перевод
   stats/{version}/
     heroes.json           ← Стоты героев (npc_heroes.txt → нужные поля)
     items.json            ← Стоты предметов (items.txt → нужные поля)

@@ -29,7 +29,6 @@
 | Заголовки сущностей, структура changes-блока, `ability_change` (внутри/снаружи + layout), `cm_draft`, `correction-note` | [docs/agent-rules/entity-rendering.md](docs/agent-rules/entity-rendering.md) |
 | База статов (`stats DB`) + маппинг описаний → поля БД (`HERO_STAT_MAP`) | [docs/agent-rules/stats-db.md](docs/agent-rules/stats-db.md) |
 | Вёрстка/стили: patch-page layering, toolbar-panel, Materials rhythm, regen columns, фильтры, Hero Stats, sticky dividers, навигационные стрелки, глобальный UI | [docs/agent-rules/ui-style.md](docs/agent-rules/ui-style.md) |
-| Переводы интерфейса EN/RU: `data-i18n`/`DICT`, `applyLang`, `t()`, тело патч-нотов через `patch_i18n.py` + `data-i18n-ru` | [docs/agent-rules/i18n.md](docs/agent-rules/i18n.md) |
 | Структура проекта, как запустить, прочие страницы (index/calendar/terrain), грабли | [docs/agent-rules/pages-and-pipeline.md](docs/agent-rules/pages-and-pipeline.md) |
 
 Узкоспециальные правила:

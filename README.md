@@ -59,7 +59,6 @@ tests/                      ← pytest unit tests (166 tests, run in CI)
 
 data/
   patchnotes_english.txt    ← raw Valve KV patch notes
-  patchnotes_russian.txt    ← Russian KV
   abilities_slim.json       ← ability slug → display name + innate flag
   stats/<version>/          ← heroes.json + items.json + abilities.json per patch
 

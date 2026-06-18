@@ -4,7 +4,6 @@
 
 1. Download the patch's KV file from Valve (usually surfaces on GitHub or via the Dota 2 VPK).
 2. Drop it into `data/patchnotes_english.txt` (replace existing or append new version).
-3. If there's a Russian translation, drop into `data/patchnotes_russian.txt`.
 
 ## Step 2 — Generate the scaffold
 
