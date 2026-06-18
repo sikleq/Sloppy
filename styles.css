@@ -229,9 +229,14 @@ body.patch-page .entity-block.first-visible {
 }
 /* Sub-section label (e.g. "Artifact Changes", "Enchantment Changes") inside
    an item/neutral section. Keeps the top hairline but removes the bottom gap
-   so the first item under it isn't pushed far down. */
+   so the first item under it isn't pushed far down. The first item block under
+   the sublabel also drops its hairline (mirrors the h2.section + .entity-block
+   rule so there's no orphan separator between the label and first entry). */
 body.patch-page .entity-block.label-only {
   padding-bottom: 0;
+}
+body.patch-page .entity-block.label-only + .entity-block {
+  border-top: 0;
 }
 body.patch-page .entity-block.label-only .plain-entity {
   margin-bottom: 0;
