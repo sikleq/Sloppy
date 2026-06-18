@@ -3,52 +3,127 @@
 ## Структура проекта
 
 ```
-builders/patch.py            ← ГЛАВНЫЙ. CSS, JS, HTML-хелперы, данные всех патчей
-generate_patch_code.py    ← KV → Python-код. Запускать перед добавлением нового патча
-scripts/apply_stats.py    ← Постпроцессор: t("BUFF")→bstat_h() где есть БД
+build_site.py                ← ЕДИНЫЙ entrypoint. python build_site.py [steps] [--latest]
+builders/
+  patch.py                   ← Запускает все content/p*.py + calendar + index
+  silent.py                  ← Дифф KV-файлов → patches/silent/*.html (скрытые изменения)
+  terrain.py                 ← terrain.html (сравнение карт)
+  creeps.py, heroes_stats.py, hero_lab.py, mana_items.py, heroes_dyn.py, items_dyn.py
+  site_common.py             ← Общий HTML-обвёртка (head/nav/foot)
+  dyn_matrix_common.py       ← Общий код для динамических матриц
+content/
+  p739d.py, p739e.py, ...    ← Один файл на патч. def build() → save_html()
+patch/
+  api.py                     ← from patch.api import * — публичный API для content/*.py
+  elements.py                ← Все хелперы: W(), li(), hero_header(), ability(), ...
+  images.py                  ← ITEM_SLUG, HERO_SLUG, item_img(), abil_img()
+  meta.py                    ← PATCHES список, RELEASE_HISTORY
+  index_page.py              ← index.html + What's New popup
+generate_patch_code_v2.py    ← Datafeed → Python scaffold. Канонический генератор.
 data/
-  patchnotes_english.txt  ← Сырые патчноуты Valve (KV формат)
-  stats/{version}/
-    heroes.json           ← Стоты героев (npc_heroes.txt → нужные поля)
-    items.json            ← Стоты предметов (items.txt → нужные поля)
-patches/                  ← Финальные HTML, генерируются builders/patch.py
-docs/
-  architecture.md, data-format.md, workflow.md
+  normalized/patches/*.json  ← JSON-артефакты (генерятся параллельно со scaffold)
+  stats/{version}/           ← KV-файлы героев/предметов (для silent changes)
+  itemlist.json              ← Имена + engine slug всех предметов (Valve datafeed)
+  abilities_by_id.json       ← ability_id → (dname, slug) для ability()
+dist/                        ← Финальный сайт (в .gitignore, кроме dist/patches/)
 ```
 
-Внешние скрипты (в `D:\Sloppy Patches`):
-- `extract_patchnotes.py` — выкачивает свежие patchnotes_*.txt и npc_*.txt из локального VPK + заливает в репо
-- `fetch_stats.py` — скачивает npc_heroes/items.txt из muk-as/DOTA2_CLIENT за каждый патч (с 7.33), парсит → JSON
-- `upload_stats.py` — заливает JSON-файлы в репо
-
-## Как запустить
+## Добавление нового патча — полный workflow
 
 ```bash
-python builders/patch.py        # пересобирает все patches/*.html и calendar.html
-python builders/heroes_stats.py # heroes_stats.html — таблица статов героев (после build_patch)
-python builders/hero_lab.py     # hero_lab.html — калькулятор сравнения героев с предметами
-python generate_patch_code.py 7.42   # → _generated_p_7.42.py (вставлять в builders/patch.py)
-python scripts/apply_stats.py          # упгрейдит t() → bstat_h() где можем
-python scripts/fetch/fetch_itemlist.py       # обновляет data/itemlist.json из датафида Valve
-                                        # (имена предметов + ТЕКУЩИЙ ПУЛ НЕЙТРАЛОВ для items_dyn).
-                                        # Запускать с выходом нового патча, затем builders/patch.py —
-                                        # добавленные/выведенные нейтралы подхватятся автоматически.
-python scripts/fetch/extract_shops.py        # извлекает scripts/shops.txt из VPK → data/shops.txt
-                                        # (КАТЕГОРИИ магазина для фильтра items_dyn: Consumables/
-                                        # Attributes/Weapons…). Локально (нужен `pip install vpk`).
-                                        # Запускать с выходом патча (Valve тасует категории), затем
-                                        # builders/patch.py — перемещения категорий подхватятся сами.
+# 1. Обновить itemlist (engine slugs предметов, нейтрал-пул)
+python scripts/fetch/fetch_itemlist.py
+
+# 2. Сгенерировать scaffold
+python generate_patch_code_v2.py 7.42
+# → _generated_p_7.42_v2.py + data/normalized/patches/7.42.json
+
+# 3. Сохранить scaffold как content/p742.py:
+#    - добавить в начало: from patch.api import *
+#    - обернуть в: def build():
+#    - добавить в конец: write_footer(); save_html('patches/7.42.html')
+#    ⚠ генератор НЕ добавляет эти три обёртки — нужно вручную
+
+# 4. Зарегистрировать патч
+#    - builders/patch.py: import content.p742 + content.p742.build() в нужном месте
+#    - patch/meta.py: добавить в PATCHES (для nav dropdown)
+#    - patch/index_page.py: добавить в _PATCH_SITE_DATES (для What's New popup)
+
+# 5. Собрать + проверить иконки
+python build_site.py --latest      # только новый патч, ~3-4s
+python scripts/fetch/fetch_icons.py  # скачать недостающие иконки способностей
+python build_site.py --latest      # пересобрать чтобы пересчитать _LOCAL_ABIL_ICONS
+
+# 6. Полная сборка перед коммитом
+python build_site.py
+git add content/p742.py icons/abilities/*.png ...
+git commit -m "feat: add 7.42 patch page"
+```
+
+## Известные ловушки генератора (generate_patch_code_v2.py)
+
+### Enchantment items → enchant_header, не item_header
+Генератор автоматически использует `enchant_header()` когда engine slug начинается с `enhancement_`.
+Если в старом scaffold стоит `item_header("Brawny")` — заменить на `enchant_header("Brawny")`.
+Иконка: `icons/items/enhancement_brawny.png` (не `brawny.png`).
+
+### Предметы с несовпадающим display name и engine slug
+`item_img("Parasma")` ищет `parasma.png`, но Valve хранит как `devastator.png`.
+Генератор печатает `[WARN]` при таких случаях.
+**Фикс:** добавить в `ITEM_SLUG` в `patch/images.py`: `"Parasma": "devastator"`.
+Примеры уже в ITEM_SLUG: Khanda→angels_demise, Book of the Dead→demonicon, Parasma→devastator.
+
+### Иконки способностей не скачиваются автоматически
+`fetch_icons.py` нужно запускать вручную после каждой новой сборки патча.
+Иконки innate/facet (404 на CDN) — нормально, браузер использует fallback `innate_icon.png`.
+`_LOCAL_ABIL_ICONS` в `patch/images.py` строится при загрузке модуля — пересборка нужна после скачивания.
+
+### Ability slug неправильный
+Генератор берёт slug из `data/abilities_by_id.json`. Если способность переименована в новом патче,
+нужно обновить `abilities_by_id.json`: `python -c "from generate_patch_code_v2 import _refresh_abilities; _refresh_abilities()"`.
+
+### Scaffold не включает write_head/write_footer/save_html
+Генератор выдаёт только тело `build()`. Нужно вручную добавить:
+```python
+from patch.api import *
+
+def build():
+    write_head("7.42", "DD.MM.YYYY")
+    # ... сгенерированный код ...
+    write_footer()
+    save_html('patches/7.42.html')
+```
+
+### terrain_link в plain_header("Terrain Changes")
+Каждый патч с изменениями рельефа должен иметь `terrain_link=` в заголовке:
+```python
+W(plain_header("Terrain Changes", terrain_link="7.42"))
+```
+Иначе кнопка "View on Map" не появится на странице патча.
+
+## Прочие команды
+
+```bash
+python build_site.py --latest      # только последний патч (patch step), ~3-4s
+python build_site.py patch         # все патчи + calendar + index, ~6s
+python build_site.py               # полная сборка всех страниц, ~60s
+python scripts/fetch/fetch_itemlist.py  # обновить itemlist.json (с выходом патча)
+python scripts/fetch/fetch_icons.py     # скачать недостающие иконки способностей
+```
+
+Локальный сервер (запустить один раз в отдельном окне или через Start-Process):
+```powershell
+Start-Process python -ArgumentList "-m http.server 8765 --directory dist"
 ```
 
 ## Предупреждения и подводные камни
 
-- При добавлении нового героя: добавить в `HERO_SLUG` (builders/patch.py) И в `load_hero_internal_to_display()` (generate_patch_code.py)
-- При добавлении нового предмета: только в `ITEM_SLUG` (builders/patch.py); generate_patch_code.py читает оттуда
-- 7.41c в HANDCRAFTED раньше был сырой HTML — теперь конвертирован в W() вызовы; следующие патчи делать только через W()
 - `_formula_id_counter` — глобальный счётчик для table-id, сбрасывается при каждом запуске
-- `.gitignore` исключает `__pycache__/`, `_generated_p_*.py`, `_insert_patches.py`. Одноразовые скрипты `_*.py` после использования можно удалять
+- `.gitignore` исключает `__pycache__/`, `_generated_p_*.py`. Одноразовые скрипты `_*.py` после использования можно удалять
 - 7.08 — патч слишком старый для stats DB (muk-as начался с 7.33), он остаётся с t() fallback
-- **Иконки способностей: fallback пишется в `src` напрямую.** Если локального файла `icons/abilities/<slug>.png` нет (множество innate-способностей не имеют публичной CDN-иконки), `ability()` рендерит fallback СРАЗУ как `src` (innate → `innate_icon.png`, иначе → `missing.svg`), а не «битый путь, который меняется через onerror». Иначе поиск (читает `img.src` при загрузке, до срабатывания ленивого onerror) показывал не ту иконку. Набор существующих файлов — `_LOCAL_ABIL_ICONS` (строится при загрузке модуля). Пример-каноник: Timbersaw «Exposure Therapy» (+ ещё 27 innate)
+- При добавлении нового героя: добавить в `HERO_SLUG` (`patch/images.py`)
+- При добавлении предмета с нестандартным slug: добавить в `ITEM_SLUG` (`patch/images.py`)
+- **Иконки способностей: fallback пишется в `src` напрямую.** Если локального файла `icons/abilities/<slug>.png` нет (множество innate-способностей не имеют публичной CDN-иконки), `ability()` рендерит fallback СРАЗУ как `src` (innate → `innate_icon.png`, иначе → `missing.svg`), а не «битый путь, который меняется через onerror». Набор существующих файлов — `_LOCAL_ABIL_ICONS` (строится при загрузке модуля). Пример-каноник: Timbersaw «Exposure Therapy» (+ ещё 27 innate)
 
 ## Прочие генерируемые страницы (не патчи)
 
