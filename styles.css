@@ -1,5 +1,93 @@
 
 
+/* ==========================================================================
+   SLOPPY — Global stylesheet
+   ==========================================================================
+
+   01. Design tokens  (:root)
+   02. Reset / Base   (*, html, body, scrollbars, @font-face)
+   03. Navigation     (top nav, tabs, version picker, subnav dropdowns)
+   04. Patch pages    (page shell, toolbar, category panels, entity blocks,
+                       tags/badges, ability-change, formula, cm_draft,
+                       dynamics pills, filter mode, section-intro)
+   05. Index / Hub    (inventory grid, sub-panels, support, telegram,
+                       donation, back control, what's-new badge)
+   06. Calendar       (calendar grid, mode toggle, infographic strip)
+   07. Tables shared  (toolbar-panel, creeps-scroll shell, sticky headers,
+                       sort indicators, highlight, heatmap, history tooltip,
+                       category separators)
+   08. Neutral Stats / Abilities  (.creeps-page, .creeps-table, UA table)
+   09. Mana Items     (.mr-table.mi-table)
+   10. Hero Stats     (.mr-table.hs-table)
+   11. Hero Dynamics  (.heroes-dyn-table, .items-dyn-table)
+   12. Hero Lab       (.hl-*)
+   13. Terrain        (.terrain-*, .tc-*)
+   14. Utilities / overrides / legacy
+
+   ========================================================================== */
+
+/* ==========================================================================
+   01. DESIGN TOKENS
+   ========================================================================== */
+
+:root {
+  /* -- Backgrounds -- */
+  --bg-page:          #0a0e13;
+  --bg-body:          #0d1117;
+  --bg-panel:         #0d1117;
+  --bg-panel-2:       #11161d;
+  --bg-panel-3:       #161b22;
+  --bg-panel-4:       #21262d;
+
+  /* -- Text -- */
+  --text-main:        #c9d1d9;
+  --text-bright:      #e6edf3;
+  --text-dim:         #8b949e;
+  --text-dimmer:      #6e7681;
+
+  /* -- Accent gold -- */
+  --gold:             #e3c46a;
+  --gold-strong:      #f0d896;
+  --gold-dim:         #d6b764;
+  --gold-line:        rgba(227, 196, 106, 0.45);
+  --gold-line-soft:   rgba(227, 196, 106, 0.28);
+  --gold-glow:        rgba(227, 196, 106, 0.35);
+
+  /* -- Accent blue -- */
+  --blue:             #79c0ff;
+  --blue-bright:      #58a6ff;
+
+  /* -- Borders / lines -- */
+  --line:             #30363d;
+  --line-soft:        rgba(139, 148, 158, 0.18);
+  --line-bright:      rgba(238, 250, 255, 0.14);
+
+  /* -- Shadows -- */
+  --shadow-deep:      0 8px 28px rgba(0, 0, 0, 0.65);
+  --shadow-card:      0 4px 12px rgba(0, 0, 0, 0.45);
+
+  /* -- Typography -- */
+  --font-ui:          'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-j25:         'Jersey 25', 'Courier New', monospace;
+  --font-j10:         'Jersey 10', 'Courier New', monospace;
+  --font-pixel:       'Handjet', 'Jersey 10', monospace;
+
+  /* -- Z-index ladder --
+     Keep every z-index in the file anchored to one of these layers.     */
+  --z-content:        1;      /* regular stacked content                 */
+  --z-tooltip:        30;     /* floating tooltips, history popups       */
+  --z-subnav:         50;     /* subnav dropdown panels                  */
+  --z-picker:         60;     /* version/date pickers                    */
+  --z-toolbar:        80;     /* sticky toolbars, .tc-picker.is-open     */
+  --z-nav:            100;    /* top nav bar                             */
+  --z-modal:          1000;   /* modal overlays                          */
+  --z-modal-top:      1100;   /* above modal (e.g. inner dropdowns)      */
+}
+
+/* ==========================================================================
+   02. RESET / BASE
+   ========================================================================== */
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* Always reserve scrollbar space so content doesn't shift when filtering reduces page height */
@@ -170,6 +258,10 @@ body.patch-page ul.changes {
   padding-bottom: 12px;
 }
 
+/* ==========================================================================
+   03. NAVIGATION
+   ========================================================================== */
+
 /* TOP NAV (full-width, sits above container)
    Dark archive strip: keep the header in the same metallic family as the site,
    then add pixel character through seams instead of broad gold glow. */
@@ -303,6 +395,10 @@ body:has(.creeps-page) nav.top-nav {
     0 1px 0 rgba(0, 0, 0, 0.72),
     0 0 4px rgba(227, 196, 106, 0.05);
 }
+
+/* ==========================================================================
+   05. INDEX / HUB
+   ========================================================================== */
 
 /* ---- MAIN PAGE: inventory book ----
    Landing page styled as a game inventory opened in a leather-bound book. An
@@ -1310,6 +1406,10 @@ body:has(.creeps-page) nav.top-nav {
     0 8px 20px rgba(0, 0, 0, 0.6);
 }
 
+/* ==========================================================================
+   06. CALENDAR
+   ========================================================================== */
+
 /* CALENDAR PAGE */
 .calendar { margin: 4px 0 24px; }
 .cal-toggle-bar {
@@ -2000,6 +2100,10 @@ span.cal-full-day.has-patch {
 /* Display toggling */
 .calendar.mode-compact .cal-mode-full { display: none; }
 .calendar.mode-full .cal-mode-compact { display: none; }
+
+/* ==========================================================================
+   04. PATCH PAGES
+   ========================================================================== */
 
 /* TOOLBAR — full viewport-width strip below the site header. Holds the tag
    filter row + categories + search box + patch-info block (date + age). */
@@ -4806,6 +4910,10 @@ body.filter-active ul.subnotes { display: none; }
 }
 
 
+/* ==========================================================================
+   08. NEUTRAL STATS / ABILITIES
+   ========================================================================== */
+
 /* ============================================================
    CREEPS TABLE PAGE — verbatim render of the team's neutral-creep
    stats sheet. Single wide table, sticky header, monospace numbers,
@@ -5748,6 +5856,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   z-index: 53;          /* above sibling cat-heads (52) so they pass beneath it */
   border-right: 2px solid rgba(170, 220, 240, 0.22);
 }
+/* ==========================================================================
+   11. HERO DYNAMICS
+   ========================================================================== */
+
 /* ===================== Hero Dynamics matrix (heroes_dyn.html) =====================
    Reuses the .creeps-table shell (sticky header + sticky-col + sticky-frame) and
    the global .dyn-cell pill. ROWS = heroes (frozen icon+name column on the left),
@@ -5829,6 +5941,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   transform: scale(1.5); position: relative; z-index: 41;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(170, 220, 240, 0.4);
 }
+/* ==========================================================================
+   07. TABLES SHARED
+   ========================================================================== */
+
 /* ============================================================================
    UNIFIED TOOLBAR PANEL — SITE STANDARD (every Materials toolbar).
    All controls live inside ONE bordered surface (.toolbar-panel) instead of a row
@@ -5950,6 +6066,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   object-fit: contain;
   display: block;
 }
+
+/* ==========================================================================
+   12. HERO LAB
+   ========================================================================== */
 
 /* ===================== Hero Lab calculator ===================== */
 .hero-lab-page {
@@ -7316,6 +7436,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   padding-left: 16px;
 }
 
+/* ==========================================================================
+   09. MANA ITEMS
+   ========================================================================== */
+
 /* Notes section below the creeps table — long prose cells the spreadsheet
 /* ───────────────────────── MANA REGEN TABLE ───────────────────────────── */
 .mr-blurb {
@@ -7587,6 +7711,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .mr-table tbody tr.mr-row-selected .mr-name-text { color: #fff8e0; }
 
+/* ==========================================================================
+   10. HERO STATS
+   ========================================================================== */
+
 /* ───────────────────────── HERO STATS TABLE (heroes_stats.html) ───────────
    mr-table skin (flat sort / heatmap / search / stat-hist tooltips reused
    via the shared classes+ids) + hero-specific bits: sticky hero column,
@@ -7761,6 +7889,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .mr-table.hs-table tbody td {
   white-space: nowrap;
 }
+
+/* ==========================================================================
+   13. TERRAIN
+   ========================================================================== */
 
 /* ============================================================================
    TERRAIN COMPARE  (terrain.html — Materials » Terrain)
@@ -8312,3 +8444,8 @@ a.whatsnew-row:hover {
   white-space: nowrap;
   justify-self: end;
 }
+
+/* ==========================================================================
+   14. UTILITIES / OVERRIDES / LEGACY
+   (Nothing yet — overrides and one-off fixes will migrate here)
+   ========================================================================== */
