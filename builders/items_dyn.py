@@ -20,7 +20,7 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent.parent
 _sys.path.insert(0, str(_HERE))
 
-from dyn_matrix_common import save_dyn_matrix
+from builders.dyn_matrix_common import save_dyn_matrix
 
 
 def save_items_dyn_html():

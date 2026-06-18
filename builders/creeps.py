@@ -22,7 +22,7 @@ import sys as _sys
 _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 _sys.path.insert(0, _HERE)
 
-import site_common as _site
+import builders.site_common as _site
 
 ASSET_VERSION = _site.compute_asset_version()
 

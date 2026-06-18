@@ -29,7 +29,7 @@ from pathlib import Path
 _HERE = Path(_os.path.dirname(_os.path.abspath(__file__))).parent
 _sys.path.insert(0, str(_HERE))
 
-import site_common as _site
+import builders.site_common as _site
 ASSET_VERSION = _site.compute_asset_version()
 
 # ── Engine constants ───────────────────────────────────────────────────────

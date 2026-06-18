@@ -4,7 +4,7 @@ import os as _os
 import html as _html
 import re
 
-import site_common as _site
+import builders.site_common as _site
 
 from .meta import PATCHES, RELEASE_HISTORY, _render_top_nav
 from .page import _ASSET_VERSION

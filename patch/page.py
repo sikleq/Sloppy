@@ -3,7 +3,7 @@
 import os
 import re
 
-import site_common as _site
+import builders.site_common as _site
 
 from .output import H, W, reset_output, get_output
 from .state import _State

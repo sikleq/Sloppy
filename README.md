@@ -85,16 +85,15 @@ The build itself has **no third-party dependencies** — only the test suite doe
 git clone https://github.com/sikleq/Sloppy.git
 cd Sloppy
 
-# Build all patch pages + support pages (stdlib only, no install needed)
-python builders/patch.py
+# Build everything — output goes to dist/
+python build_site.py
+
+# Serve locally
+python -m http.server 8765 --directory dist
 
 # Run tests (needs pytest)
 pip install -r requirements-dev.txt
 python -m pytest tests/ -v
-
-# View any patch — use your platform's opener:
-#   macOS: open  ·  Linux: xdg-open  ·  Windows: start
-open patches/7.41d.html
 ```
 
 ## Adding a new patch

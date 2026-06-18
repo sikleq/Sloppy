@@ -26,7 +26,7 @@ _HERE = Path(__file__).resolve().parent.parent
 _sys.path.insert(0, str(_HERE))
 _sys.path.insert(0, str(_HERE / "builders"))
 
-from dyn_matrix_common import save_dyn_matrix
+from builders.dyn_matrix_common import save_dyn_matrix
 from heroes_stats import _load_raw_heroes, _extract_hero_block, _RAW_DEFAULTS, _raw_field, _attr_of
 import json as _json
 

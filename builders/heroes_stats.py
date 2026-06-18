@@ -45,7 +45,7 @@ import sys as _sys
 _HERE = Path(__file__).resolve().parent.parent
 _sys.path.insert(0, str(_HERE))
 
-import site_common as _site
+import builders.site_common as _site
 
 STATS_DIR = _HERE / "data" / "stats"
 ASSET_VERSION = _site.compute_asset_version()

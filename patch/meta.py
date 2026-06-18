@@ -1,7 +1,7 @@
 """Patch metadata: PATCHES list, RELEASE_HISTORY, date helpers, nav rendering."""
 
 import datetime
-import site_common as _site
+import builders.site_common as _site
 
 PATCHES = [
     {"version": "7.41d", "date": "04.06.2026", "filename": "patches/7.41d.html"},
