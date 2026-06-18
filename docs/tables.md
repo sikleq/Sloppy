@@ -115,7 +115,7 @@ The game files CANNOT tell an active neutral from a cycled-out one: items.txt ke
 neutral flagged `ItemIsNeutralActiveDrop "1"` forever and never marks it `IsObsolete`. The **live
 pool is auto-derived from Valve's datafeed** (`data/itemlist.json`, field `neutral_item_tier >= 0`)
 by `_load_neutral_pool_current()` — no hand-maintained list. ✅ **Self-updating:** when a new patch
-lands, run `python scripts/fetch_itemlist.py` to refresh `itemlist.json`, then rebuild; added /
+lands, run `python scripts/fetch/fetch_itemlist.py` to refresh `itemlist.json`, then rebuild; added /
 removed / cycled neutrals are picked up automatically (currently **49** in pool). The datafeed is
 authoritative — a hand-written Liquipedia list was tried first but silently missed Cloak of Flames /
 Dandelion Amulet / Medallion of Courage (all re-added as neutrals in 7.41), which the datafeed has.
@@ -166,7 +166,7 @@ every option) + option `<input data-<key>="<value>">`. `initHdDropdowns`:
 - **Category** (`category`): the shop tabs (Consumables / Attributes / Equipment /
   Miscellaneous / Accessories / Support / Magical / Armor / Weapons / **Armaments** /
   Secret Shop / Other). Default: all selected. Source = `data/shops.txt` (the game's
-  shop layout, extracted by `scripts/extract_shops.py`); `patch/rosters.py::_load_shop_categories`
+  shop layout, extracted by `scripts/fetch/extract_shops.py`); `patch/rosters.py::_load_shop_categories`
   maps each item to its FIRST shop section (sideshop/pregame/event sections excluded;
   the `"magics" // Magical` inline comment must be tolerated by the section regex; an
   UNMAPPED section with items prints a build warning), uncategorized regular items (boss
@@ -317,7 +317,7 @@ every page including the patch notes.
 | `data/stats/<patch>/items.json` | per-patch item stats (cost, mana, regen…) → cell history |
 | `data/stats/<patch>/units.json` | per-patch unit stats (HP, armor, mana, dmg) |
 | `data/stats/<patch>/heroes.json` | per-patch HERO stats (attributes, armor, dmg, BAT, MS, range, HP/mana base, magic res, regen) → Hero Stats cells + history. All 116 patches. |
-| `data/stats/<patch>/heroes_raw.json` | per-patch HERO raw-only fields (vision day/night, projectile speed, base attack speed, turn rate, collision hull, bound radius) — NOT in heroes.json. Built by `scripts/fetch_hero_history.py` from dotabuff/d2vpkr's historical `npc_heroes.txt` (same commit-by-date matching as `fetch_npc_history.py`). Coverage 7.36→today (d2vpkr's window for this file). Run after a new patch lands to backfill. |
+| `data/stats/<patch>/heroes_raw.json` | per-patch HERO raw-only fields (vision day/night, projectile speed, base attack speed, turn rate, collision hull, bound radius) — NOT in heroes.json. Built by `scripts/fetch/fetch_hero_history.py` from dotabuff/d2vpkr's historical `npc_heroes.txt` (same commit-by-date matching as `fetch_npc_history.py`). Coverage 7.36→today (d2vpkr's window for this file). Run after a new patch lands to backfill. |
 | `data/stats/<patch>/npc_units.txt` | 7.41c-only: regen, bounty, vision, magres, abilities |
 | `data/stats/<patch>/npc_abilities.json` | per-patch neutral ability balance (`av_*`) |
 | `data/abilities_english.txt` | ability + **item** tooltip descriptions (icon hover) |

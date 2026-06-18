@@ -8,7 +8,7 @@ marker toolbar (Trees / Camps / point-entities) from its committed
 
 Maps live in ``icons/maps/`` as ``map_<ver>.webp`` — all stitched from the
 spectral courier tile server and cropped to ONE shared content box
-(``scripts/build_terrain_maps.py 7.39 7.40 7.41``) so every pair is pixel-aligned
+(``scripts/gen/build_terrain_maps.py 7.39 7.40 7.41``) so every pair is pixel-aligned
 and the swipe handle lines up exactly. The same shared crop meta
 (``data/terrain_map_meta.json``) projects every patch's markers onto its own map.
 
@@ -61,7 +61,7 @@ def _esc(s):
 
 def _load_diff(patch):
     """The committed per-patch terrain diff (data/terrain_diff_<patch>.json,
-    written by scripts/build_terrain_diff.py). Returns None if absent so the page
+    written by scripts/gen/build_terrain_diff.py). Returns None if absent so the page
     still builds (maps only, no markers) for a patch without a diff."""
     path = _os.path.join(_HERE, "data", f"terrain_diff_{patch}.json")
     try:
@@ -72,7 +72,7 @@ def _load_diff(patch):
 
 
 def _load_map_meta():
-    """Projection meta written by scripts/build_terrain_maps.py — the leamare
+    """Projection meta written by scripts/gen/build_terrain_maps.py — the leamare
     map boundaries + the crop box used for our map images. Without it the
     markers can't be placed accurately."""
     path = _os.path.join(_HERE, "data", "terrain_map_meta.json")
@@ -120,7 +120,7 @@ _MARKER_GOLD = "#e3c46a"
 # Toggleable point-entity layers, in toolbar order. Each: (key in
 # terrain_diff_<ver>.json["entities"], full label/tooltip, icon slug, type colour). The
 # icon (icons/ui/gothic/tc_<key>.png, baked in the type colour by
-# scripts/gen_terrain_layer_icons.py) is the toolbar button; on the MAP it sits
+# scripts/gen/gen_terrain_layer_icons.py) is the toolbar button; on the MAP it sits
 # in a light-gold ring over a faint disc of the same colour. Colour must match
 # the generator's COLORS. Watchers == the capturable lookout structures (the old
 # "Outpost"); Roshan == the two pits.

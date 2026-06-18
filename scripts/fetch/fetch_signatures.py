@@ -18,7 +18,7 @@ USAGE (manual, for now):
     set TG_API_HASH=0123456789abcdef...
     set TG_CHANNEL=@your_channel         # @username, t.me link, or numeric id
     # Private group/supergroup: use the -100 form, e.g.  set TG_CHANNEL=-1002279897249
-    python scripts/fetch_signatures.py
+    python scripts/fetch/fetch_signatures.py
     # First run asks for your phone + login code (saved to .tg_signatures.session,
     # which is gitignored). Later runs are non-interactive.
 

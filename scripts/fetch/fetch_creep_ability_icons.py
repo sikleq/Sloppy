@@ -10,8 +10,8 @@ icons/abilities/<slug>.png. Источники, по порядку:
      иконку (своей нет даже в VPK); берём её по слагу из тех же двух источников.
 
 Запуск:
-    python scripts/fetch_creep_ability_icons.py
-    CREEP_SPELLICONS_DIR="D:/dump/panorama/images/spellicons" python scripts/fetch_creep_ability_icons.py
+    python scripts/fetch/fetch_creep_ability_icons.py
+    CREEP_SPELLICONS_DIR="D:/dump/panorama/images/spellicons" python scripts/fetch/fetch_creep_ability_icons.py
 """
 import json
 import os

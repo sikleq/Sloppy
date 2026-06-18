@@ -11,7 +11,7 @@ This file is the source of truth for two things in the build:
 Run this whenever a new patch lands (it changes the neutral pool / adds items), then
 rebuild:
 
-    python scripts/fetch_itemlist.py
+    python scripts/fetch/fetch_itemlist.py
     python builders/patch.py
 
 No hand-maintained neutral list — refreshing this file is the whole update.

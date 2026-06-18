@@ -12,7 +12,7 @@ optional explicit slug).
 
 Run before publishing:
 
-    python scripts/audit_abilities.py
+    python scripts/audit/audit_abilities.py
 """
 import json
 import re

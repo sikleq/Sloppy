@@ -15,8 +15,8 @@ d2vpkr в момент сборки. Сырые .txt кэшируются по S
 чтобы не качать один и тот же блоб дважды (соседние патчи часто делят коммит).
 
 Запуск:
-    python scripts/fetch_npc_history.py           # добить недостающие + обновить свежий
-    python scripts/fetch_npc_history.py --force    # перекачать все патчи
+    python scripts/fetch/fetch_npc_history.py           # добить недостающие + обновить свежий
+    python scripts/fetch/fetch_npc_history.py --force    # перекачать все патчи
 
 После выхода нового патча: создай `data/stats/<patch>/` (с units.json от
 build-пайплайна) и запусти скрипт — он добьёт npc_units.json для новинки.

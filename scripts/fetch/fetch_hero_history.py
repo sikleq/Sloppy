@@ -3,13 +3,13 @@ compact per-patch `data/stats/<patch>/heroes_raw.json` carrying the hero
 stats that the slim heroes.json scrape DOESN'T have (vision, projectile
 speed, base attack speed, turn rate, collision hull, bound radius).
 
-Mirrors scripts/fetch_npc_history.py exactly (same d2vpkr commit-by-date
+Mirrors scripts/fetch/fetch_npc_history.py exactly (same d2vpkr commit-by-date
 matching, same SHA disk cache), just a different file + parser. Needed so
 the Hero Stats table (builders/heroes_stats.py) can show per-patch change
 history for those raw-only fields (e.g. Gyrocopter night vision 7.41d).
 
-    python scripts/fetch_hero_history.py           # backfill missing + refresh latest
-    python scripts/fetch_hero_history.py --force    # re-fetch every patch
+    python scripts/fetch/fetch_hero_history.py           # backfill missing + refresh latest
+    python scripts/fetch/fetch_hero_history.py --force    # re-fetch every patch
 
 After a new patch ships: create data/stats/<patch>/ and run — it fills in
 heroes_raw.json for the newcomer.

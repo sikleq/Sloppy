@@ -22,7 +22,7 @@ Data sources:
     armor, damage, BAT, MS, range, magic resistance). All 116 patches.
   * data/stats/<patch>/heroes_raw.json — raw-only fields (vision day/night,
     projectile speed, base attack speed, turn rate, collision hull, bound
-    radius). Built by scripts/fetch_hero_history.py from d2vpkr's historical
+    radius). Built by scripts/fetch/fetch_hero_history.py from d2vpkr's historical
     npc_heroes.txt. All 116 patches.
   * Spirit Bear is injected from data/stats/<patch>/units.json plus its
     npc_units.txt block, because it is a ConsideredHero unit rather than a
@@ -235,7 +235,7 @@ _RAW_DEFAULTS = {
 def _load_raw_heroes(version: str) -> dict[str, dict]:
     """Raw-only hero fields for one patch, from the pre-parsed
     data/stats/<version>/heroes_raw.json (produced by
-    scripts/fetch_hero_history.py from d2vpkr's historical npc_heroes.txt)."""
+    scripts/fetch/fetch_hero_history.py from d2vpkr's historical npc_heroes.txt)."""
     path = STATS_DIR / version / "heroes_raw.json"
     if not path.exists():
         return {}

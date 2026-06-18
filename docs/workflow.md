@@ -65,7 +65,7 @@ Open the regenerated `patches/7.42.html` and confirm:
 ## Step 6 — Audit
 
 ```bash
-python scripts/check_icons.py
+python scripts/audit/check_icons.py
 ```
 
 Walks `_ability_icons.txt` and reports any URLs that don't resolve on Valve CDN. Missing icons aren't fatal — they fall back gracefully — but the report tells you which slugs to monitor.

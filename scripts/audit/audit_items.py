@@ -9,7 +9,7 @@ Flags items where:
 Fetches the live datafeed automatically. Run after editing item_header()
 calls or before publishing a new patch:
 
-    python scripts/audit_items.py
+    python scripts/audit/audit_items.py
 """
 import json
 import re

@@ -16,7 +16,7 @@ The source clip is colourful pixel art on a green background. We:
      (plays once, holds open while hovered; reverts to the PNG on mouse-out).
 
 Run once after dropping a new chest.mp4:
-    python scripts/gen_chest_icon.py
+    python scripts/gen/gen_chest_icon.py
 Needs ffmpeg on PATH (frame extraction) + Pillow.
 """
 import os

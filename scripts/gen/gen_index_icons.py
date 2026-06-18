@@ -5,7 +5,7 @@
   - icon_donation.png : coin stack with a heart (Support sub-panel).
 All 32x32 RGBA, gothic-gold palette (CSS warms them toward #e3c46a).
 
-Run from anywhere::  python scripts/gen_index_icons.py
+Run from anywhere::  python scripts/gen/gen_index_icons.py
 Outputs straight into icons/ui/gothic/.
 """
 import os

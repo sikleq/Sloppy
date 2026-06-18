@@ -2,11 +2,11 @@
 
 Run after a new patch drops (once fetch_npc_history.py has updated the stats):
 
-    python scripts/build_creep_abilities.py
+    python scripts/gen/build_creep_abilities.py
 
 Or specify a patch explicitly:
 
-    python scripts/build_creep_abilities.py 7.42
+    python scripts/gen/build_creep_abilities.py 7.42
 
 Reads:  data/stats/<patch>/npc_units.txt
 Writes: data/creep_abilities.json

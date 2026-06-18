@@ -372,7 +372,7 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
 # Sourced from Valve's live patchnotes datafeed:
 #   /datafeed/patchnotes?version=<X>&language=english -> heroes[].subsections[]
 #     {title, facet, facet_color, facet_icon, abilities: [...]}
-# Run scripts/fetch_facets.py to regenerate this dict for a given patch.
+# Run scripts/fetch/fetch_facets.py to regenerate this dict for a given patch.
 # Value tuple: (display_title, valve_color_key).
 FACETS = {
     # 7.39e — fetched 2026-06-14 from /datafeed/patchnotes?version=7.39e
@@ -428,7 +428,7 @@ FACETS = {
     "windrunner_tangled":            ("Tangled",          "Yellow2"),
     "witch_doctor_cleft_death":      ("Cleft Death",      "Purple0"),
     # --- Removed in 7.40 — colours lifted from the pre-7.40 datafeed
-    #     (scripts/fetch_facets.py over 7.36..7.39e). Kept here manually so a
+    #     (scripts/fetch/fetch_facets.py over 7.36..7.39e). Kept here manually so a
     #     future fetch_facets regen for a current patch doesn't drop them. ---
     "brewmaster_roll_out_the_barrel":   ("Roll Out the Barrel", "Red1"),
     "brewmaster_drunken_master":        ("Drunken Master",      "Yellow1"),
@@ -511,7 +511,7 @@ def facet_badge(facet_slug):
     if facet_slug not in FACETS:
         raise KeyError(
             f"Unknown facet slug {facet_slug!r}. Add it to FACETS — "
-            f"run scripts/fetch_facets.py <patch> to grab the live data."
+            f"run scripts/fetch/fetch_facets.py <patch> to grab the live data."
         )
     name, color = FACETS[facet_slug]
     grad = _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray1"])

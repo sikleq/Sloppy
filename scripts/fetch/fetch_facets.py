@@ -3,8 +3,8 @@ Valve's live patchnotes datafeed and emit a Python dict snippet ready
 to paste into patch/badges.py's FACETS table.
 
 Usage:
-    python scripts/fetch_facets.py 7.40c
-    python scripts/fetch_facets.py 7.39b 7.39c 7.39d
+    python scripts/fetch/fetch_facets.py 7.40c
+    python scripts/fetch/fetch_facets.py 7.39b 7.39c 7.39d
 """
 import json
 import sys
@@ -13,7 +13,7 @@ from urllib.request import urlopen
 ENDPOINT = "https://www.dota2.com/datafeed/patchnotes?version={}&language=english"
 
 if len(sys.argv) < 2:
-    print("Usage: python scripts/fetch_facets.py <version> [<version> ...]")
+    print("Usage: python scripts/fetch/fetch_facets.py <version> [<version> ...]")
     sys.exit(1)
 
 seen = {}

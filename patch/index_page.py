@@ -315,7 +315,7 @@ def save_index_html():
     # ---- WALL OF SIGNATURES ----
     # Faint pixel-font "graffiti" of channel-member display names scattered
     # around the book. Real names come from data/signatures.json, produced by
-    # scripts/fetch_signatures.py (run via run_signatures.ps1). We show display
+    # scripts/fetch/fetch_signatures.py (run via run_signatures.ps1). We show display
     # names, not @usernames, so a member can't be found/DMed from the wall.
     # Members with an empty or punctuation-only name collapse into one
     # "Hidden (xN)" sign. If the file is missing we fall back to random

@@ -12,7 +12,7 @@ minimap_sheet). Power = 7 runes in runes/ (cycled by scripts.js). Wisdom has no
 game icon → drawn custom (wisdom_icon: a dense purple inner ring + glow).
 
 SVGs are rasterised with ImageMagick (`magick`). Run::
-    python scripts/gen_terrain_layer_icons.py
+    python scripts/gen/gen_terrain_layer_icons.py
 """
 import os
 import shutil

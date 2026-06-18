@@ -8,10 +8,10 @@ file per patch; patch/rosters.py then derives the items_dyn Category filter from
 
 Run after a patch (needs the game installed + `pip install vpk`), then rebuild:
 
-    python scripts/extract_shops.py
+    python scripts/fetch/extract_shops.py
     python builders/patch.py
     # optional: non-default install path
-    python scripts/extract_shops.py "D:\\Steam\\steamapps\\common\\dota 2 beta\\game\\dota"
+    python scripts/fetch/extract_shops.py "D:\\Steam\\steamapps\\common\\dota 2 beta\\game\\dota"
 """
 import os
 import re
@@ -39,7 +39,7 @@ def main() -> int:
     vpk_file = Path(dota_path) / "pak01_dir.vpk"
     if not vpk_file.exists():
         print(f"X pak01_dir.vpk not found at {vpk_file}\n"
-              f"  Pass your dota path: python scripts/extract_shops.py <path-to>/game/dota")
+              f"  Pass your dota path: python scripts/fetch/extract_shops.py <path-to>/game/dota")
         return 1
     try:
         import vpk

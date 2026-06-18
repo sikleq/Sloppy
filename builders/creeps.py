@@ -126,7 +126,7 @@ def save_creeps_html():
     # ---- Per-stat history across all patches (7.08 → latest) ----
     # Walks data/stats/<patch>/npc_units.json chronologically and records each
     # change per neutral for the per-cell changelog tooltips. npc_units.json
-    # (written by scripts/fetch_npc_history.py from dotabuff/d2vpkr) is the
+    # (written by scripts/fetch/fetch_npc_history.py from dotabuff/d2vpkr) is the
     # full Valve KV, present for all 115 patches — so EVERY stat column can
     # carry history, raw or derived. Patch dates come from site_meta.json.
     RAW_HIST_FIELDS = (
@@ -188,7 +188,7 @@ def save_creeps_html():
             _raw_by_patch[_f][_v] = _bucket
 
     # Per-patch neutral ability balance data (from npc_abilities.json, written
-    # by scripts/fetch_ability_history.py). _abil_by_patch[version][slug] =
+    # by scripts/fetch/fetch_ability_history.py). _abil_by_patch[version][slug] =
     # {field: value} — used for the ability-cell value changelog.
     def _norm_abil_fields(fields):
         """Collapse `av_X_tooltip` (display-only mirror) onto `av_X` so a value

@@ -31,8 +31,8 @@ Refresh the cached inputs + rebuild ALL pairs with::
       curl -s "https://raw.githubusercontent.com/leamare/dota-interactive-map/master/assets/data/$v/mapdata.json" \
         -o ".cache/leamare/mapdata_$v.json"
     done
-    python scripts/build_terrain_diff.py            # default pairs below
-    python scripts/build_terrain_diff.py 739:740    # or a single pair
+    python scripts/gen/build_terrain_diff.py            # default pairs below
+    python scripts/gen/build_terrain_diff.py 739:740    # or a single pair
 """
 import json
 import os

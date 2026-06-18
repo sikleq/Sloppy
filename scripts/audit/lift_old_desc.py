@@ -1,7 +1,7 @@
 """lift_old_desc.py — dump historical context for one ability slug.
 
 Workflow:
-    python scripts/lift_old_desc.py <ability_slug> [--before <patch>]
+    python scripts/audit/lift_old_desc.py <ability_slug> [--before <patch>]
 
 Prints (to stdout):
   1. All patchnotes_english.txt deltas for this slug, in chronological order.
@@ -194,7 +194,7 @@ def main():
             print("# ---- NO DIRECT HISTORY — related slugs (likely pre-rename) ----")
             for r in related:
                 print(f"  {r}")
-            print(f"\n  Re-run with one of these: python scripts/lift_old_desc.py <slug> --before {args.before or '<patch>'}")
+            print(f"\n  Re-run with one of these: python scripts/audit/lift_old_desc.py <slug> --before {args.before or '<patch>'}")
 
     print()
     print("# ---- SLOT HISTORY (hero + Ability slot per patch range) ----")

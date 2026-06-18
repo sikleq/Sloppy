@@ -8,7 +8,7 @@ Flags:
 
 Fetches the live Valve hero list automatically. Run before publishing:
 
-    python scripts/audit_heroes.py
+    python scripts/audit/audit_heroes.py
 """
 import json
 import re

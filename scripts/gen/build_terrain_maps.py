@@ -25,7 +25,7 @@ slider stays pixel-aligned.
 
 Tiles cache under .cache/tiles/<code>z2full/ (gitignored). Run::
 
-    python scripts/build_terrain_maps.py 740 741
+    python scripts/gen/build_terrain_maps.py 740 741
 """
 import os
 import sys

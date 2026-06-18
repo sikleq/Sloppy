@@ -38,9 +38,9 @@ slider, plus that patch's *Terrain Changes* list. Built by `builders/terrain.py`
 - ✅ Move objects (Lotus/Tormentor/Twin Gate) NOT marked — seen via lens+list.
 - ✅ Correct **7.41** Terrain Changes list (was mistakenly the 7.40 rework list).
 - ✅ **Map quality** — stitched from the spectral courier **tile server** at
-  **1536²** (sharp under the lens), via `scripts/build_terrain_maps.py`.
+  **1536²** (sharp under the lens), via `scripts/gen/build_terrain_maps.py`.
 
-## Maps — `scripts/build_terrain_maps.py`
+## Maps — `scripts/gen/build_terrain_maps.py`
 
 Tile server (same render as <https://tools.spectral.gg/interactive-map>):
 `https://courier.spectral.gg/images/dota/maps/tiles/<code>/<skin>/<z>/tile_<col>_<row>.jpg`
@@ -54,7 +54,7 @@ not status. At **zoom 2** the whole map fits a 24×24 grid (content ≈ 19×19
 tiles ≈ 4864px). We stitch z2, crop to the shared **tight** content bbox (now
 `(186,287)-(4783,5082)` ≈4597×4795 — `_content_bbox` strips the flat-grey
 placeholder, so no fat grey borders; same box for 7.40 & 7.41 so the swipe stays
-aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.py 7.40 7.41`.
+aligned), resize to **1536²** webp. Re-run: `python scripts/gen/build_terrain_maps.py 7.40 7.41`.
 
 ## Data sources (primary)
 
@@ -63,7 +63,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.
   - `assets/data/<ver>/mapdata.json` — per-version entity coords (trees, neutral
     camps, towers, watchers, twin gates, lotus pools, tormentor/miniboss, …).
   - root `worlddata.json` — world bounds (`minX -10464 .. maxX 10400`, same Y).
-- Diff: `scripts/build_terrain_diff.py` reads the two cached `mapdata.json`
+- Diff: `scripts/gen/build_terrain_diff.py` reads the two cached `mapdata.json`
   (under `.cache/leamare/`, not committed) → `data/terrain_diff.json` (committed).
 - Projection: world `[-10464, 10400]` → `1280px`. Verified pixel-accurate by
   overlaying all 7.41 trees on the map render (they land exactly on the forest).
@@ -102,7 +102,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.
   busy map doesn't show through and read as "muddy") + a faint type-colour tint
   (@0.34) + a light-gold ring + the icon on top. The icon is the LIGHTENED type
   colour so it pops on its own disc.
-- **Icons** (`scripts/gen_terrain_layer_icons.py`) — GAME map icons from
+- **Icons** (`scripts/gen/gen_terrain_layer_icons.py`) — GAME map icons from
   `icons/ref/` (`REFS`): towers.svg, roashan.svg, tormentor_png.png,
   watcher_lantern.png, Bounty_Rune_…png, and **lotus_pool/twin_gate/outpost
   cells cut from `minimap_sheet_psd_*.png`** (the 11×11 64px sheet — split into
@@ -147,7 +147,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.
   `7.40`→(7.39,7.40). `_compare_html(old_ver, new_ver, markers_svg)` builds the
   swipe slider for any pair (map URLs derived from the versions).
 - **Markers + layer toolbar are PER-PATCH** — each patch ships its own
-  `data/terrain_diff_<ver>.json` (`scripts/build_terrain_diff.py <prev>:<new>`,
+  `data/terrain_diff_<ver>.json` (`scripts/gen/build_terrain_diff.py <prev>:<new>`,
   generic keys `treesOld/New`, `campsOld/New`, `entities`). `save_terrain_html`
   builds `markers_by_patch` / `counts_by_patch` via `_load_diff(ver)` and renders
   each pane's overlays. The SHARED crop meta (`terrain_map_meta.json`) projects
@@ -186,7 +186,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/build_terrain_maps.
    build_terrain_maps.py and read by builders/terrain.py's `_projector`. (Earlier
    it wrongly used worlddata.json bounds → trees were misplaced.)
 4. ✅ **Map source — done.** Stitched from spectral tiles
-   (`scripts/build_terrain_maps.py`, zoom 2 → 1280²).
+   (`scripts/gen/build_terrain_maps.py`, zoom 2 → 1280²).
 5. **Lens polish (optional):** show tree dots inside the lens too; clamp the
    lens at map edges; touch support (tap-to-pin).
 
