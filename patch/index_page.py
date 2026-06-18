@@ -70,8 +70,9 @@ _WN_EXCL_SVG = (
 
 
 def _whatsnew_html():
+    entries = _build_whatsnew()
     rows = []
-    for kind, label, date, href in _build_whatsnew():
+    for kind, label, date, href in entries:
         tag = f'<span class="whatsnew-tag whatsnew-tag-{kind}">{kind}</span>'
         date_span = f'<span class="whatsnew-date">{date}</span>'
         rows.append(
@@ -79,11 +80,14 @@ def _whatsnew_html():
             f'{tag}{_html.escape(label)}{date_span}</a>'
         )
     items = '\n'.join(rows)
+    # data-wn-sig = date of newest entry; JS uses it to build a versioned
+    # localStorage key so the NEW animation re-fires when a new entry appears.
+    sig = entries[0][2].replace(' ', '') if entries else ''
     # The badge sits inside .version-beta-wrap (in site_common.py) so it's
     # positioned at the bottom-right corner of the BETA label.
     # The popup is body-level so it isn't clipped by the nav overflow.
     return (
-        '<div class="whatsnew-popup" role="dialog" aria-label="What\'s new">\n'
+        f'<div class="whatsnew-popup" data-wn-sig="{sig}" role="dialog" aria-label="What\'s new">\n'
         f'  <div class="whatsnew-list">{items}</div>\n'
         '</div>'
     )

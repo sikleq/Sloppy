@@ -4589,7 +4589,8 @@
   const btn = document.querySelector('.version-beta-wrap');
   const popup = document.querySelector('.whatsnew-popup');
   if (!btn || !popup) return;
-  const LS_KEY = 'wn_seen_v1';
+  const sig = popup.dataset.wnSig || 'v1';
+  const LS_KEY = 'wn_seen_' + sig;
   if (localStorage.getItem(LS_KEY)) btn.classList.add('wn-seen');
 
   function place() {
