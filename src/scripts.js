@@ -205,10 +205,17 @@
       const ul = block.querySelector('ul.changes');
       block.classList.toggle('f-hide', !elementVisible(ul));
     });
+    // Component/stat panels (.properties-change, .components-change, etc.) only
+    // belong to the REWORK filter. Hide them under any other active filter so
+    // items with recipe changes don't bleed through QoL/BUFF/etc. filters.
+    const reworkOnly = activeFilters.size > 0 && !activeFilters.has('rework');
+    document.querySelectorAll('.components-box, .components-change, .provides-box, .properties-change').forEach(el => {
+      if (reworkOnly) el.classList.add('f-hide');
+    });
     document.querySelectorAll('.entity-block').forEach(block => {
       const visibleLi = block.querySelectorAll('ul.changes > li:not(.f-hide):not(.cat-hide)').length;
       const visibleSwaps = block.querySelectorAll('.ability-change:not(.f-hide):not(.cat-hide)').length;
-      const visiblePanels = Array.from(block.children).some(child =>
+      const visiblePanels = !reworkOnly && Array.from(block.children).some(child =>
         child.matches('.components-box, .components-change, .provides-box, .properties-change') &&
         elementVisible(child)
       );
@@ -587,7 +594,8 @@
     if (parentImg.closest('.f-hide, .cat-hide')) return;
     const childImgs = childSlugs
       .map((s) => document.querySelector('img[data-slug="' + s + '"]'))
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter(img => !img.closest('.f-hide, .cat-hide'));
     if (!childImgs.length) return;
 
     // Use document-level coordinates so the SVG can span multiple
