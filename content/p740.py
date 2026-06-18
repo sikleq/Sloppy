@@ -727,7 +727,7 @@ def build():
     W(ul_close())
     _lc_pill, _lc_table = scale_pill("10.5% + 0.5% per level up",
                                      lambda L: 10.5 + 0.5 * L,
-                                     levels=[1, 5, 10, 15, 20, 25, 30], value_fmt="{:.1f}%")
+                                     value_fmt="{:.1f}%")
     W(ability_change(
         old=dict(
             name="Belligerent",
@@ -2026,7 +2026,7 @@ def build():
     W(ul_close())
     _ia_pill, _ia_table = scale_pill("18% + 2% per 3 level ups",
                                      lambda L: 18 + 2 * ((L - 1) // 3),
-                                     levels=[1, 5, 10, 15, 20, 25, 30], value_fmt="{:.0f}%")
+                                     value_fmt="{:.0f}%")
     W(ability_change(
         old=dict(
             name="Illusory Armaments",

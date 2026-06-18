@@ -1089,7 +1089,6 @@ def build():
     _bc_pill, _bc_table = scale_pill(
         "0.1 + 0.1 per 3 levels",
         lambda L: 0.1 + 0.1 * (L // 3),
-        levels=[1, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30],
         value_fmt="{:.2f}",
     )
     W(ability_change(
@@ -3574,7 +3573,6 @@ def build():
     _ns_ms_pill, _ns_ms_table = scale_pill(
         "24% + 2% per 3 levels",
         lambda L: 24.0 + 2.0 * (L // 3),
-        levels=[1, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30],
         value_fmt="{:.0f}%",
     )
     _ns_as_pill, _ns_as_table = scale_pill(
