@@ -138,7 +138,7 @@ _ENTITY_LAYERS = [
 ]
 
 
-def _markers_svg(diff):
+def _markers_svg(diff, pair_id="default"):
     """Build the SVG overlays. Returns (svg_html, counts). Three layers, all the
     SAME colour for trees:
       • .tc-trees-old — the 7.40 tree layout, clipped to the OLD side of the
@@ -232,6 +232,27 @@ def _markers_svg(diff):
         ent_svgs.append(ent_layer(key, "old", ed.get("old", []), icon, color))
         ent_svgs.append(ent_layer(key, "new", ed.get("new", []), icon, color))
 
+    # ---- spawnboxes — 4-point world-coord polygons ----
+    # Both old and new boxes shown simultaneously (no slider clip).
+    # Old = red dashed, New = teal solid. This matches how spectral.gg
+    # renders them and avoids all clipping artifacts on rectangle strokes.
+    def _box_poly(points, cls):
+        pts_str = " ".join(
+            f"{proj(p['x'], p['y'])[0]:.1f},{proj(p['x'], p['y'])[1]:.1f}"
+            for p in points)
+        return f'<polygon class="tc-spawnbox {cls}" points="{pts_str}"/>'
+
+    boxes_old = "".join(_box_poly(box, "tc-sb-old")
+                        for box in diff.get("spawnboxesOld", []))
+    boxes_new = "".join(_box_poly(box, "tc-sb-new")
+                        for box in diff.get("spawnboxesNew", []))
+
+    sb_svg = (
+        f'<svg class="tc-markers tm-layer tm-layer-spawnboxes" '
+        f'viewBox="0 0 {MAP_VB} {MAP_VB}" preserveAspectRatio="none" '
+        f'aria-hidden="true">{boxes_old}{boxes_new}</svg>'
+    )
+
     old_t = tier_counts(diff.get("campsOld", []))
     new_t = tier_counts(diff.get("campsNew", []))
     counts = {
@@ -240,7 +261,7 @@ def _markers_svg(diff):
         "campsOld": old_t, "campsNew": new_t,
     }
     return (trees_old + trees_new + camps_old + camps_new
-            + "".join(ent_svgs), counts)
+            + "".join(ent_svgs) + sb_svg, counts)
 
 
 def _latest_href():
@@ -267,22 +288,44 @@ _MAP_PAIRS = {
     "7.41": ("7.40", "7.41"),   # icons/maps/map_7.40.webp + map_7.41.webp
     "7.40": ("7.39", "7.40"),   # icons/maps/map_7.39.webp + map_7.40.webp
 }
+# Picker shows only major versions (spectral only renders maps for major patches).
+# Letter patches (7.39b, 7.39d …) are grouped under the next major version that
+# has a map pair — their changes appear in that major version's change list with
+# a sub-patch header ("7.39d") so it's clear when each change landed.
 # Marker overlays + tree/camp counts come from a committed per-patch diff
 # (data/terrain_diff_<patch>.json). Any patch with one gets the full layer toolbar
 # (Trees / Camps / point-entities); patches without a diff show the slider + Zoom
 # only. The shared crop meta projects every patch's markers identically.
 
 
+def _ver_key(v):
+    """Sort key for version strings: '7.40' < '7.40b' < '7.41'."""
+    import re
+    def _part(s):
+        m = re.match(r'^(\d+)([a-z]*)$', s)
+        return (int(m.group(1)), m.group(2)) if m else (0, s)
+    return tuple(_part(x) for x in v.split("."))
+
+
+def _major(ver):
+    """'7.39d' -> '7.39',  '7.40' -> '7.40'."""
+    import re
+    return re.sub(r'[a-z]+$', '', ver)
+
+
 def _terrain_changes_by_patch():
-    """Parse every ``plain_header("Terrain Changes")`` block out of
-    build_patch.py → ``{version: [(text, TAG), ...]}`` in newest-first source
-    order. Each block is a single ``ul_open()…ul_close()`` of ``W(li("text",
-    …))`` rows; we read the row text + its tag (``t("TAG")`` or a ``b(...)``
-    badge inferred BUFF/NERF). Falls back to an empty dict if the source can't
-    be read so the page still builds."""
+    """Parse every ``plain_header("Terrain Changes")`` block from content/*.py.
+
+    Returns ``{major_ver: [(sub_patch, [(text, TAG), ...]), ...]}`` sorted
+    oldest-first within each major bucket so the subpatch headers appear in
+    chronological order in the change list.
+
+    Letter patches (7.39b, 7.39d …) are grouped under the next major version
+    that has a map pair in ``_MAP_PAIRS``.  A patch with no known major bucket
+    falls back to its own major version string so nothing is silently dropped.
+    """
     import re, glob as _glob
     here = _HERE
-    # Scan content/*.py (modular build) then fall back to build_patch.py (legacy).
     content_files = sorted(_glob.glob(_os.path.join(here, "content", "*.py")))
     if not content_files:
         content_files = [_os.path.join(here, "build_patch.py")]
@@ -302,7 +345,8 @@ def _terrain_changes_by_patch():
         prev = [h for h in heads if h[0] < off]
         return prev[-1][1] if prev else "?"
 
-    out = {}
+    # raw: {patch_ver: [(text, tag), ...]}
+    raw = {}
     for hm in re.finditer(r'plain_header\("Terrain Changes"', src):
         i = hm.start()
         j = src.index("ul_close()", i)
@@ -318,23 +362,38 @@ def _terrain_changes_by_patch():
             if tm:
                 tag = tm.group(1)
             elif re.match(r"\s*,\s*b\(", rest):
-                # Numeric badge → BUFF/NERF by direction, honouring l=True
-                # (lower-is-better: cheaper mana cost = buff).
                 lower_better = "l=True" in rest
                 low = text.lower()
-                if "decreased" in low or "reduced" in low:
-                    good = lower_better
-                else:                       # increased / default
-                    good = not lower_better
+                good = lower_better if ("decreased" in low or "reduced" in low) else not lower_better
                 tag = "BUFF" if good else "NERF"
             else:
                 tag = "MISC"
             rows.append((text, tag))
         if rows:
-            # Collapse a patch letter (7.41c) to its base (7.41) — the terrain
-            # block lives under the base patch's write_head.
-            out.setdefault(patch_for(i), rows)
-    return out
+            raw.setdefault(patch_for(i), rows)
+
+    # Build sorted list of major versions from _MAP_PAIRS (newest-first for picker,
+    # but we need oldest-first to assign letter patches to the NEXT major bucket).
+    majors_asc = sorted(_MAP_PAIRS.keys(), key=_ver_key)
+
+    def _bucket(ver):
+        """Assign ver to the smallest major >= ver that is in _MAP_PAIRS."""
+        maj = _major(ver)
+        # If ver itself is major and in _MAP_PAIRS, use it directly.
+        if ver in _MAP_PAIRS:
+            return ver
+        # Otherwise find the next major version with a map pair.
+        for m in majors_asc:
+            if _ver_key(m) >= _ver_key(maj):
+                return m
+        return maj  # fallback: no map pair but still show
+
+    # Group into {major: [(subpatch, rows), ...]} oldest-first within each bucket.
+    grouped = {}
+    for ver in sorted(raw.keys(), key=_ver_key, reverse=True):
+        bucket = _bucket(ver)
+        grouped.setdefault(bucket, []).append((ver, raw[ver]))
+    return grouped
 
 
 # Canonical tag order (same as the site convention): NEW → REWORK → BUFF →
@@ -372,12 +431,20 @@ def _change_li(text, tag):
             f'<span class="row-text">{text}</span></li>')
 
 
-def _changes_html(changes):
-    rows = sorted(
-        enumerate(changes),
-        key=lambda it: (_TAG_RANK.get(it[1][1], 9), it[0]),
-    )
-    return "\n".join(_change_li(text, tag) for _i, (text, tag) in rows)
+def _changes_html(subpatches):
+    """Render change list for one major-version bucket.
+
+    subpatches: [(sub_ver, [(text, tag), ...]), ...]  oldest-first.
+    If there's only one sub-patch and it equals the major, skip the subheader.
+    """
+    parts = []
+    for sub_ver, rows in subpatches:
+        sorted_rows = sorted(enumerate(rows),
+                             key=lambda it: (_TAG_RANK.get(it[1][1], 9), it[0]))
+        items = "\n".join(_change_li(text, tag) for _i, (text, tag) in sorted_rows)
+        # Always show subpatch header so it's clear when each change landed.
+        parts.append(f'<li class="terrain-subpatch-head">{sub_ver}</li>\n{items}')
+    return "\n".join(parts)
 
 
 def _controls_html(layers=True):
@@ -390,26 +457,59 @@ def _controls_html(layers=True):
     layers=False  — only the Zoom button (no layer toggles). Used for map pairs
                     that ship no terrain_diff_<ver>.json (no marker data), so the
                     toggles would be dead buttons."""
+    _FS_ENTER_ICON = (
+        '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" '
+        'aria-hidden="true" focusable="false">'
+        '<path d="M1 5V1h4M13 5V1H9M1 9v4h4M13 9v4H9" '
+        'stroke="currentColor" stroke-width="1.5" '
+        'stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    )
+    _FS_EXIT_ICON = (
+        '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" '
+        'aria-hidden="true" focusable="false">'
+        '<path d="M5 1v4H1M9 1v4h4M1 9h4v4M9 9h4v4" '
+        'stroke="currentColor" stroke-width="1.5" '
+        'stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    )
+
     def layer_btn(key, label, icon, icon_dir="ui/gothic"):
         return (f'<button type="button" class="tc-btn tc-btn-icon tc-layer-btn" '
                 f'data-layer="{key}" aria-pressed="false" '
                 f'title="{_esc(label)}" aria-label="{_esc(label)}">'
                 f'<img src="icons/{icon_dir}/{icon}.png" alt="" '
                 f'width="16" height="16"></button>')
-    parts = [
-        # No long tooltip — the "Zoom" label already says what it is.
+
+    layer_parts = []
+    if layers:
+        layer_parts.append('<span class="tc-sep" aria-hidden="true"></span>')
+        layer_parts.append(layer_btn("trees", "Trees", "tc_trees"))
+        layer_parts.append(layer_btn("camps", "Neutral Camps", "creepcamp_mid", icon_dir="camps"))
+        layer_parts.append(layer_btn("spawnboxes", "Spawn Boxes", "icon_spawnbox"))
+        for key, label, icon, _color in _ENTITY_LAYERS:
+            layer_parts.append(layer_btn(key, label, icon))
+
+    # Top bar: Zoom + Fullscreen + layer toggles
+    top_parts = [
         '<button type="button" class="tc-btn tc-btn-zoom" aria-pressed="false">'
         '<img src="icons/ui/gothic/icon_loupe.png" alt="" width="15" height="15">'
         'Zoom</button>',
-    ]
-    if layers:
-        parts.append('<span class="tc-sep" aria-hidden="true"></span>')
-        parts.append(layer_btn("trees", "Trees", "tc_trees"))
-        parts.append(layer_btn("camps", "Neutral Camps", "creepcamp_mid", icon_dir="camps"))
-        for key, label, icon, _color in _ENTITY_LAYERS:
-            parts.append(layer_btn(key, label, icon))
-    return ('    <div class="tc-controls-bar">\n      '
-            + "".join(parts) + '\n    </div>\n')
+        f'<button type="button" class="tc-btn tc-btn-fs" aria-pressed="false" '
+        f'aria-label="Fullscreen" title="Fullscreen">'
+        f'{_FS_ENTER_ICON}Fullscreen</button>',
+    ] + layer_parts
+
+    # Bottom fullscreen bar: Exit + same layer toggles (no Zoom)
+    fs_parts = [
+        f'<button type="button" class="tc-btn tc-btn-fs-exit" '
+        f'aria-label="Exit fullscreen" title="Exit fullscreen (Esc)">'
+        f'{_FS_EXIT_ICON}Exit</button>',
+    ] + (layer_parts if layers else [])
+
+    top_html = ('    <div class="tc-controls-bar">\n      '
+                 + "".join(top_parts) + '\n    </div>\n')
+    fs_html = ('    <div class="tc-fs-bar">\n      '
+               + "".join(fs_parts) + '\n    </div>\n')
+    return top_html, fs_html
 
 
 def _compare_html(old_ver, new_ver, markers_svg=""):
@@ -426,35 +526,39 @@ def _compare_html(old_ver, new_ver, markers_svg=""):
     empty, the layer-toggle buttons are dropped (Zoom stays)."""
     old_map = f"icons/maps/map_{old_ver}.webp"
     new_map = f"icons/maps/map_{new_ver}.webp"
+    top_bar, fs_bar = _controls_html(layers=bool(markers_svg))
     return (
         '<div class="terrain-compare" data-pos="50" data-zoom="1.9" data-lens="184">\n'
-        f'{_controls_html(layers=bool(markers_svg))}'
-        '  <div class="tc-stage">\n'
-        f'    <img class="tc-img tc-old" src="{old_map}?v={ASSET_VERSION}" '
-        f'width="1536" height="1536" alt="Dota 2 map terrain in patch {old_ver}" '
+        f'{top_bar}'
+        '  <div class="tc-fs-canvas">\n'
+        '    <div class="tc-stage">\n'
+        f'      <img class="tc-img tc-old" src="{old_map}?v={ASSET_VERSION}" '
+        f'width="4096" height="4096" alt="Dota 2 map terrain in patch {old_ver}" '
         f'draggable="false" loading="eager" fetchpriority="high">\n'
-        '    <div class="tc-new-layer">\n'
-        f'      <img class="tc-img tc-new" src="{new_map}?v={ASSET_VERSION}" '
-        f'width="1536" height="1536" alt="Dota 2 map terrain in patch {new_ver}" '
+        '      <div class="tc-new-layer">\n'
+        f'        <img class="tc-img tc-new" src="{new_map}?v={ASSET_VERSION}" '
+        f'width="4096" height="4096" alt="Dota 2 map terrain in patch {new_ver}" '
         f'draggable="false" loading="eager">\n'
-        '    </div>\n'
-        f'    {markers_svg}\n'
-        f'    <span class="tc-ver tc-ver-new">NEW &nbsp;{new_ver} →</span>\n'
-        f'    <span class="tc-ver tc-ver-old">← {old_ver}&nbsp; OLD</span>\n'
-        '    <div class="tc-handle" role="slider" tabindex="0" '
+        '      </div>\n'
+        f'      {markers_svg}\n'
+        f'      <span class="tc-ver tc-ver-new">NEW &nbsp;{new_ver} →</span>\n'
+        f'      <span class="tc-ver tc-ver-old">← {old_ver}&nbsp; OLD</span>\n'
+        '      <div class="tc-handle" role="slider" tabindex="0" '
         f'aria-label="Reveal {old_ver} versus {new_ver} terrain" '
         'aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">\n'
-        '      <span class="tc-line" aria-hidden="true"></span>\n'
-        '      <span class="tc-grip" aria-hidden="true">'
+        '        <span class="tc-line" aria-hidden="true"></span>\n'
+        '        <span class="tc-grip" aria-hidden="true">'
         '<span class="tc-chev tc-chev-l"></span>'
         '<span class="tc-chev tc-chev-r"></span></span>\n'
-        '    </div>\n'
-        '    <div class="tc-lens" aria-hidden="true">\n'
-        f'      <img class="tc-lens-img tc-lens-old" src="{old_map}?v={ASSET_VERSION}" alt="" draggable="false">\n'
-        f'      <img class="tc-lens-img tc-lens-new" src="{new_map}?v={ASSET_VERSION}" alt="" draggable="false">\n'
-        '      <span class="tc-lens-rim" aria-hidden="true"></span>\n'
+        '      </div>\n'
+        '      <div class="tc-lens" aria-hidden="true">\n'
+        f'        <img class="tc-lens-img tc-lens-old" src="{old_map}?v={ASSET_VERSION}" alt="" draggable="false">\n'
+        f'        <img class="tc-lens-img tc-lens-new" src="{new_map}?v={ASSET_VERSION}" alt="" draggable="false">\n'
+        '        <span class="tc-lens-rim" aria-hidden="true"></span>\n'
+        '      </div>\n'
         '    </div>\n'
         '  </div>\n'
+        f'{fs_bar}'
         '</div>\n'
     )
 
@@ -505,28 +609,30 @@ def _source_html():
 
 
 def _picker_html(patches, default):
-    """Gold dropdown (calendar year-picker structure, gold `.tc-picker` skin)
-    listing every patch that has terrain changes — newest first. It sits in the
-    change-list heading AS the version (e.g. "[7.41 ▾] Terrain Changes");
-    switching it swaps the visible map pane + change list (scripts.js
-    initTerrainPicker)."""
-    opts = []
+    """Version-picker dropdown styled as nav-context-flat nav-context-materials,
+    matching the aesthetic of non-patch pages while keeping dropdown switching."""
+    items = []
     for ver in patches:
-        sel = " is-selected" if ver == default else ""
-        asel = "true" if ver == default else "false"
-        opts.append(
-            f'<li class="cal-year-opt{sel}" role="option" '
-            f'data-patch="{ver}" aria-selected="{asel}">{ver}</li>')
+        cls = "version-item current" if ver == default else "version-item"
+        items.append(
+            f'<a class="{cls}" href="#" data-patch="{ver}" role="menuitem">'
+            f'<span class="vi-name">{ver}</span>'
+            f'</a>')
+    label = _site.get_materials_label('terrain') or 'Terrain'
     return (
-        '<div class="cal-year-picker tc-picker">'
-        '<button type="button" class="cal-year-current" '
-        'aria-haspopup="listbox" aria-expanded="false">'
-        f'<span class="cal-year-current-val">{default}</span>'
-        '<span class="cal-year-caret" aria-hidden="true">▾</span>'
+        '<div class="nav-context nav-context-flat nav-context-materials nav-context-picker nav-context-terrain">'
+        f'<span class="version version-static version-materials">{label}</span>'
+        '<div class="version-picker">'
+        '<div class="version-dropdown">'
+        '<button class="version version-materials" type="button" '
+        'aria-haspopup="true" aria-expanded="false">'
+        f'{default} <span class="version-chev">▾</span>'
         '</button>'
-        '<ul class="cal-year-menu" role="listbox" hidden>'
-        + "".join(opts) +
-        '</ul>'
+        '<div class="version-menu" role="menu">'
+        + "".join(items) +
+        '</div>'
+        '</div>'
+        '</div>'
         '</div>'
     )
 
@@ -551,24 +657,22 @@ def _fallback_html(ver):
 
 
 def save_terrain_html():
-    nav = _site.render_top_nav('materials', _latest_href(),
-                               patch_context=False, subtabs_active='terrain',
-                               subnav_in_header=False)
     subnav = _site.render_materials_subnav('terrain')
 
     by_patch = _terrain_changes_by_patch()
-    # Sort newest-first by version tuple so default is always the latest patch.
-    def _ver_key(v):
-        import re
-        def _part(s):
-            m = re.match(r'^(\d+)([a-z]*)$', s)
-            return (int(m.group(1)), m.group(2)) if m else (0, s)
-        return tuple(_part(x) for x in v.split("."))
+    # by_patch: {major_ver: [(sub_ver, rows), ...]}
     patches = sorted(by_patch.keys(), key=_ver_key, reverse=True)
-    if not patches:                       # parser failed → degrade gracefully
+    if not patches:
         patches = sorted(_MAP_PAIRS, key=_ver_key, reverse=True) or ["7.41"]
         by_patch = {p: [] for p in patches}
     default = patches[0]
+
+    # Patch picker lives in the main nav header (same position as /patches/)
+    nav = _site.render_top_nav('materials', _latest_href(),
+                               patch_context=False,
+                               subtabs_active='terrain',
+                               picker_html=_picker_html(patches, default),
+                               subnav_in_header=False)
 
     # ---- per-patch marker overlays + tree/camp counts: every patch that ships a
     # committed terrain_diff_<ver>.json gets the full layer toolbar; the shared
@@ -578,7 +682,7 @@ def save_terrain_html():
         for ver in _MAP_PAIRS:
             diff = _load_diff(ver)
             if diff:
-                markers_by_patch[ver], counts_by_patch[ver] = _markers_svg(diff)
+                markers_by_patch[ver], counts_by_patch[ver] = _markers_svg(diff, ver.replace(".", ""))
 
     # ---- map panes (one per patch): the swipe slider where we have a map pair,
     # the "not available yet" fallback otherwise. ----
@@ -610,7 +714,6 @@ def save_terrain_html():
     # not <h2> — it holds interactive controls, which can't live inside a heading.)
     list_head = (
         '<div class="terrain-list-head">'
-        f'{_picker_html(patches, default)}'
         '<span class="terrain-list-head-label">Terrain Changes</span>'
         '</div>\n')
 
@@ -658,7 +761,7 @@ def save_terrain_html():
     out = _os.path.join(_site.DIST_DIR, "terrain.html")
     with open(out, "w", encoding="utf-8") as f:
         f.write(page)
-    total = sum(len(v) for v in by_patch.values())
+    total = sum(len(rows) for subs in by_patch.values() for _, rows in subs)
     print(f"  -> dist/terrain.html: {len(page):,} bytes "
           f"({len(patches)} patches, {total} terrain changes; "
           f"default {default})")

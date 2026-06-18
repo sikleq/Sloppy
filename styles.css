@@ -1221,7 +1221,7 @@ body:has(.creeps-page) nav.top-nav {
 .nav-context .version {
   color: var(--text-main);
   font-family: var(--font-j10);
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.8px;
@@ -8046,6 +8046,22 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .terrain-list { padding-left: 4px; }
 .terrain-list li { padding: 3px 0; }
+.terrain-subpatch-head {
+  display: block !important;
+  font-family: 'Jersey 25', monospace;
+  font-size: 1rem;
+  color: #e3c46a;
+  letter-spacing: .06em;
+  padding: 10px 0 4px !important;
+  margin: 0 !important;
+  list-style: none;
+  border: none !important;
+  border-bottom: 1px solid rgba(227,196,106,.2) !important;
+  background: none !important;
+}
+.terrain-subpatch-head:first-child { padding-top: 2px !important; }
+.terrain-subpatch-head::before,
+.terrain-subpatch-head::after { display: none !important; content: none !important; }
 /* First change row meets the map's TOP edge: drop the list's 3px top margin
    (from ul.changes) and the first row's 3px top padding — together they pushed
    the first tag ~6px below the map's top border. Specificity beats ul.changes. */
@@ -8078,7 +8094,8 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .terrain-compare.show-wisdom .tm-layer-wisdom,
 .terrain-compare.show-outposts .tm-layer-outposts,
 .terrain-compare.show-watchers .tm-layer-watchers,
-.terrain-compare.show-roshan .tm-layer-roshan { opacity: 1; }
+.terrain-compare.show-roshan .tm-layer-roshan,
+.terrain-compare.show-spawnboxes .tm-layer-spawnboxes { opacity: 1; }
 /* trees — ONE colour everywhere. The 7.40 layout (old side) and 7.41 layout
    (new side) are split by the slider, so sweeping reveals how the forest moved. */
 /* match the spectral/leamare tree style (styleDefinitions tree.alive) */
@@ -8097,6 +8114,54 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .tc-trees-new,
 .tc-camps-new,
 .tm-new { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+/* spawnboxes — always-visible overlay (no slider clip) to avoid open-rectangle
+   artifacts. Old boxes = dashed red; new boxes = solid teal. */
+.tc-sb-old { fill: rgba(255,80,80,.12); stroke: #ff5555; stroke-width: 1.5px; stroke-dasharray: 5 3; }
+.tc-sb-new { fill: rgba(77,212,172,.15); stroke: #4dd4ac; stroke-width: 1.5px; }
+
+/* ---- Fullscreen (native browser API — requestFullscreen) ---- */
+.tc-fs-canvas { width: 100%; }
+.tc-fs-bar { display: none; }
+
+/* JS adds .tc-fs-active on the pane when entering fullscreen */
+.terrain-map-pane.tc-fs-active {
+  background: #080b06;
+}
+.tc-fs-active .terrain-compare {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+.tc-fs-active .tc-controls-bar { display: none !important; }
+.tc-fs-active .tc-fs-canvas {
+  flex: 1 1 0%;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.tc-fs-active .tc-fs-canvas.is-panning { cursor: grabbing; }
+.tc-fs-active .tc-stage {
+  position: absolute !important;
+  width: 100%;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+  border-width: 0 !important;
+}
+.tc-fs-active .tc-fs-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(6, 8, 5, 0.96);
+  border-top: 1px solid rgba(227,196,106,.18);
+  flex-shrink: 0;
+}
 
 /* ---- control bar ABOVE the map (no longer overlaid — the map is now
    edge-to-edge, so the toggles live in their own gold bar that wraps). ---- */

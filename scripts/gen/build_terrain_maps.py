@@ -35,7 +35,7 @@ from PIL import Image
 import numpy as np
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_ROOT = os.path.dirname(_HERE)
+_ROOT = os.path.dirname(os.path.dirname(_HERE))
 
 # leamare/spectral map projection (src/js/mapConstants.js + conversion.js):
 # the full map is MAP_W px; world coords map onto it via these boundaries
@@ -43,17 +43,17 @@ _ROOT = os.path.dirname(_HERE)
 MAP_W = MAP_H = 20480
 X_BOUNDS = [-10829.42, 11487.75]      # world x at pixel x=0 .. MAP_W
 Y_BOUNDS = [11351.48, -10939.96]      # world y at pixel y=0 .. MAP_H (y flips)
-# zoom-2 tiles: each 256px tile covers 1024 map-px, so our stitched canvas
-# (256px per tile) is the map at MAP_W/4 — i.e. 4 map-px per canvas-px.
-CANVAS_SCALE = 4
+# zoom-3 tiles: each 256px tile covers 512 map-px, so our stitched canvas
+# is the map at MAP_W/2 — i.e. 2 map-px per canvas-px.
+CANVAS_SCALE = 2
 TILE_BASE = "https://courier.spectral.gg/images/dota/maps/tiles"
 SKIN = "default"
-ZOOM = 2
-GRID = 24                 # 24x24 fully contains the zoom-2 map
+ZOOM = 3
+GRID = 48                 # 48x48 fully contains the zoom-3 map
 T = 256                   # tile px
 EMPTY = np.array([56, 57, 49])   # grey placeholder colour
-OUT_SIZE = 1536           # bigger than display (≈700px) so the lens stays crisp
-OUT_QUALITY = 84
+OUT_SIZE = 4096           # crisp fullscreen on 1440p/4K
+OUT_QUALITY = 88
 UA = {"User-Agent": "Mozilla/5.0 (sikle terrain map builder)"}
 
 
@@ -63,7 +63,7 @@ def _code(ver):
 
 def _fetch(ver):
     code = _code(ver)
-    cache = os.path.join(_ROOT, ".cache", "tiles", f"{code}z2full")
+    cache = os.path.join(_ROOT, ".cache", "tiles", f"{code}z{ZOOM}")
     os.makedirs(cache, exist_ok=True)
     for c in range(GRID):
         for r in range(GRID):

@@ -4285,6 +4285,7 @@
 
     let pos = parseFloat(root.dataset.pos);
     if (!isFinite(pos)) pos = 50;
+
     function apply(p) {
       pos = Math.max(0, Math.min(100, p));
       stage.style.setProperty('--pos', pos + '%');
@@ -4306,20 +4307,10 @@
     }
     // During drag, position the handle via transform (compositor) so the
     // browser never triggers layout for the handle's left property.
-    function applyHandleTransform(p) {
-      if (!dragRect) return;
-      handle.style.transform = 'translateX(' + (dragRect.width * p / 100 - dragHalfW) + 'px)';
-    }
     handle.addEventListener('pointerdown', function(e) {
       dragging = true;
       dragRect = stage.getBoundingClientRect();
-      dragHalfW = handle.offsetWidth / 2;
       stage.classList.add('is-dragging');
-      // Switch from CSS left:var(--pos) to transform-based positioning.
-      // Read current position first so the handle doesn't jump on click.
-      var curPos = parseFloat(stage.style.getPropertyValue('--pos')) || 50;
-      handle.style.left = '0';
-      handle.style.transform = 'translateX(' + (dragRect.width * curPos / 100 - dragHalfW) + 'px)';
       if (e.pointerId != null && handle.setPointerCapture) {
         try { handle.setPointerCapture(e.pointerId); } catch (_) {}
       }
@@ -4332,9 +4323,7 @@
       if (sliderRaf !== null) return;
       sliderRaf = requestAnimationFrame(function() {
         sliderRaf = null;
-        const p = posFromX(pendingX);
-        apply(p);
-        applyHandleTransform(pos);
+        apply(posFromX(pendingX));
       });
     });
     function endDrag() {
@@ -4342,9 +4331,6 @@
       dragging = false;
       dragRect = null;
       stage.classList.remove('is-dragging');
-      // Revert handle to CSS-driven left: var(--pos) for arrow keys / resize.
-      handle.style.left = '';
-      handle.style.transform = '';
     }
     handle.addEventListener('pointerup', endDrag);
     handle.addEventListener('pointercancel', endDrag);
@@ -4485,48 +4471,148 @@
     const powerBtnImg = root.querySelector('.tc-layer-btn[data-layer="power"] img');
     if (powerBtnImg) powerBtnImg.src = RUNE_BASE + Math.floor(Math.random() * RUNE_COUNT) + '.png';
 
-    // Layer toggles (Trees / Camps + the point-entity layers). Each carries
-    // data-layer="<key>"; clicking flips root .show-<key>, which the CSS uses to
-    // reveal that layer's SVG markers (split old/new by the slider).
+    // Layer toggles — both in .tc-controls-bar and .tc-fs-bar; keep in sync.
     root.querySelectorAll('.tc-layer-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const on = !pressed(btn);
-        setPressed(btn, on);
+        root.querySelectorAll('.tc-layer-btn[data-layer="' + btn.dataset.layer + '"]')
+          .forEach(function(b) { setPressed(b, on); });
         root.classList.toggle('show-' + btn.dataset.layer, on);
         if (btn.dataset.layer === 'power') togglePowerCycle(on);
       });
     });
+
+    // ---- Fullscreen: pan (right-drag) + zoom (wheel) ----
+    // Zoom changes stage CSS width (aspect-ratio 1:1 sets height) so the
+    // browser rasterises at full res — no blurry GPU scale().
+    // Pan uses absolute left/top on the stage.
+    var fsBtn = root.querySelector('.tc-btn-fs');
+    var fsExitBtn = root.querySelector('.tc-btn-fs-exit');
+    var fsCanvas = root.querySelector('.tc-fs-canvas');
+    var pane = root.closest('.terrain-map-pane');
+    var fsActive = false;
+    var fsPanning = false, fsPanStartX = 0, fsPanStartY = 0;
+    var fsPanBaseL = 0, fsPanBaseT = 0;
+    var fsBaseW = 0;
+    var fsRaf = null;
+
+    function fsGetL() { return parseFloat(stage.style.left) || 0; }
+    function fsGetT() { return parseFloat(stage.style.top)  || 0; }
+
+    function fsEnter() {
+      if (!pane) return;
+      var req = pane.requestFullscreen || pane.webkitRequestFullscreen;
+      if (req) req.call(pane);
+    }
+    function fsExit() {
+      var ex = document.exitFullscreen || document.webkitExitFullscreen;
+      if (ex) ex.call(document);
+    }
+    function onFullscreenChange() {
+      var el = document.fullscreenElement || document.webkitFullscreenElement;
+      if (el === pane) {
+        if (loupeMode && zoomBtn) {
+          loupeMode = false;
+          root.classList.remove('loupe-on');
+          setPressed(zoomBtn, false);
+          pinned = false;
+          stage.classList.remove('lens-pinned');
+          hideLens();
+        }
+        pane.classList.add('tc-fs-active');
+        fsActive = true;
+        stage.style.transform = '';
+        setTimeout(function() {
+          var cr = fsCanvas.getBoundingClientRect();
+          fsBaseW = cr.width;
+          stage.style.width = fsBaseW + 'px';
+          stage.style.left = '0px';
+          stage.style.top = ((cr.height - fsBaseW) / 2) + 'px';
+        }, 60);
+      } else if (fsActive) {
+        pane.classList.remove('tc-fs-active');
+        stage.style.width = '';
+        stage.style.left = '';
+        stage.style.top = '';
+        stage.style.transform = '';
+        fsActive = false;
+      }
+    }
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+
+    if (fsBtn) fsBtn.addEventListener('click', fsEnter);
+    if (fsExitBtn) fsExitBtn.addEventListener('click', fsExit);
+
+    if (fsCanvas) {
+      fsCanvas.addEventListener('contextmenu', function(e) {
+        if (fsActive) e.preventDefault();
+      });
+      fsCanvas.addEventListener('mousedown', function(e) {
+        if (e.button !== 2 || !fsActive) return;
+        fsPanning = true;
+        fsPanStartX = e.clientX; fsPanStartY = e.clientY;
+        fsPanBaseL = fsGetL(); fsPanBaseT = fsGetT();
+        fsCanvas.classList.add('is-panning');
+        e.preventDefault();
+      });
+      window.addEventListener('mousemove', function(e) {
+        if (!fsPanning) return;
+        var nl = fsPanBaseL + (e.clientX - fsPanStartX);
+        var nt = fsPanBaseT + (e.clientY - fsPanStartY);
+        if (fsRaf) return;
+        fsRaf = requestAnimationFrame(function() {
+          fsRaf = null;
+          stage.style.left = nl + 'px';
+          stage.style.top  = nt + 'px';
+        });
+      });
+      window.addEventListener('mouseup', function(e) {
+        if (e.button === 2 && fsPanning) {
+          fsPanning = false;
+          fsCanvas.classList.remove('is-panning');
+        }
+      });
+      fsCanvas.addEventListener('wheel', function(e) {
+        if (!fsActive) return;
+        e.preventDefault();
+        var curW = parseFloat(stage.style.width) || fsBaseW;
+        var factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+        var newW = Math.max(fsBaseW * 0.5, Math.min(fsBaseW * 8, curW * factor));
+        var ratio = newW / curW;
+        var cr = fsCanvas.getBoundingClientRect();
+        var mx = e.clientX - cr.left;
+        var my = e.clientY - cr.top;
+        var oldL = fsGetL(), oldT = fsGetT();
+        stage.style.width = newW + 'px';
+        stage.style.left = (mx - ratio * (mx - oldL)) + 'px';
+        stage.style.top  = (my - ratio * (my - oldT)) + 'px';
+      }, { passive: false });
+    }
   }
 
-  // ---- PATCH PICKER (terrain.html) — gold dropdown; switching it swaps the
-  // visible map pane (slider or fallback) + the matching change-list pane. Same
-  // structure as the calendar year-picker. ----
+  // ---- PATCH PICKER (terrain.html) — version-dropdown structure matching
+  // patch pages; switching it swaps the visible map pane + change-list pane. ----
   function initTerrainPicker() {
-    const picker = document.querySelector('.tc-picker');
-    if (!picker) return;
-    const btn = picker.querySelector('.cal-year-current');
-    const menu = picker.querySelector('.cal-year-menu');
-    const valEl = picker.querySelector('.cal-year-current-val');
-    const opts = [...menu.querySelectorAll('.cal-year-opt')];
-    const open = () => { menu.hidden = false; picker.classList.add('is-open'); btn.setAttribute('aria-expanded', 'true'); };
-    const close = () => { menu.hidden = true; picker.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); };
+    const dropdown = document.querySelector('.nav-context-terrain .version-dropdown');
+    if (!dropdown) return;
+    const btn = dropdown.querySelector('button.version');
+    const menu = dropdown.querySelector('.version-menu');
+    const opts = [...menu.querySelectorAll('.version-item')];
+    const open = () => { dropdown.classList.add('is-open'); btn.setAttribute('aria-expanded', 'true'); };
+    const close = () => { dropdown.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); };
     const select = (ver) => {
-      valEl.textContent = ver;
-      opts.forEach(o => {
-        const on = o.dataset.patch === ver;
-        o.classList.toggle('is-selected', on);
-        o.setAttribute('aria-selected', on ? 'true' : 'false');
-      });
+      btn.childNodes[0].textContent = ver + ' ';
+      opts.forEach(o => { o.classList.toggle('current', o.dataset.patch === ver); });
       document.querySelectorAll('.terrain-map-pane, .terrain-list-pane')
         .forEach(p => { p.hidden = (p.dataset.patch !== ver); });
     };
-    btn.addEventListener('click', e => { e.stopPropagation(); menu.hidden ? open() : close(); });
-    opts.forEach(o => o.addEventListener('click', () => { select(o.dataset.patch); close(); }));
-    document.addEventListener('click', e => { if (!picker.contains(e.target)) close(); });
+    btn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.contains('is-open') ? close() : open(); });
+    opts.forEach(o => o.addEventListener('click', e => { e.preventDefault(); select(o.dataset.patch); close(); }));
+    document.addEventListener('click', e => { if (!dropdown.contains(e.target)) close(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
     // Deep-link: ?patch=<ver> (from a patch page's "View on map" button)
-    // preselects that patch if it has a terrain pane.
     const wanted = new URLSearchParams(location.search).get('patch');
     if (wanted && opts.some(o => o.dataset.patch === wanted)) select(wanted);
   }
