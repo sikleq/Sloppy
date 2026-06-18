@@ -24,6 +24,7 @@ _WHATSNEW_PAGES = [
 _PATCH_SITE_DATES = {
     "7.41d": "Jun 5",
     "7.39e": "Jun 14",
+    "7.39d": "Jun 18",
 }
 
 _WHATSNEW_MAX = 10

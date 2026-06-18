@@ -6,7 +6,7 @@ def build():
     # ===== GENERAL UPDATES =====
     W(section("General Updates"))
 
-    W(plain_header("Terrain Changes"))
+    W(plain_header("Terrain Changes", terrain_link="7.39d"))
     W(ul_open())
     W(li("Increased spawnboxes of Triangle Ancient camps", t("BUFF")))
     W(li("Fixed a ward spot in Radiant safe lane hard camp", t("MISC")))
