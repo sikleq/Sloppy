@@ -40,6 +40,9 @@ def main() -> int:
     args = sys.argv[1:]
     latest = "--latest" in args
     filter_keys = set(a for a in args if not a.startswith("-"))
+    # --latest with no explicit keys: only the patch step (skips creeps/terrain/etc.)
+    if latest and not filter_keys:
+        filter_keys = {"patch"}
     steps = [(k, s, d) for k, s, d in STEPS if not filter_keys or k in filter_keys]
 
     if not steps:
@@ -48,7 +51,7 @@ def main() -> int:
         return 1
 
     if latest:
-        print(f"  [--latest] building only the newest patch page")
+        print(f"  [--latest] building only the newest patch page (patch step only)")
 
     t0 = time.monotonic()
     failed = []
