@@ -219,7 +219,7 @@ _NOT_LOWER_IS_BUFF = re.compile(
 # Add here when a generated scaffold consistently gets the wrong tag.
 TAG_OVERRIDES = {
     "starts with all":          "MISC",   # "Hallowed now starts with all 3 charges" — REWORK heuristic fires on "now"
-    "no longer separate":       "MISC",   # "No longer has a separate heal reduction" — consolidation, not removal
+    "separate heal reduction":  "MISC",   # "No longer has a separate heal reduction" — consolidation, not removal
     "health restoration":       "MISC",   # health restore consolidation entries
     "now shares cooldown":      "MISC",   # shared cooldown = mechanic change, not pure NERF
     "now has a shared cooldown":"MISC",
