@@ -499,11 +499,13 @@ def _render_item(item, version, neutral=False):
         out.extend(body)
         return out
     name, slug = ITEMS.get(aid, (f'item_{aid}', f'item_{aid}'))
+    is_enchantment = slug.startswith("enhancement_")
     # Warn if the engine slug won't be found by item_img's naive derivation
     # (lowercase + spaces→underscores). If so, ITEM_SLUG needs an entry.
-    naive = name.lower().replace(" ", "_").replace("'", "")
-    if slug and naive != slug and name not in _KNOWN_ITEM_SLUGS:
-        print(f"  [WARN] item_img(\"{name}\") uses \"{naive}.png\" but engine slug is \"{slug}.png\" -- add to ITEM_SLUG in patch/images.py")
+    if not is_enchantment:
+        naive = name.lower().replace(" ", "_").replace("'", "")
+        if slug and naive != slug and name not in _KNOWN_ITEM_SLUGS:
+            print(f"  [WARN] item_img(\"{name}\") uses \"{naive}.png\" but engine slug is \"{slug}.png\" -- add to ITEM_SLUG in patch/images.py")
     deco = _entity_title_decoration(item)
     # Detect "Recipe changed" — first note with "Recipe changed" text →
     # decorate item_header(changed=True), drop that row, and emit an
@@ -513,13 +515,17 @@ def _render_item(item, version, neutral=False):
     # fully data-driven (no manual recipe lists needed).
     notes = list(item.get('ability_notes', []))
     is_recipe_changed = (
+        not is_enchantment and
         notes and re.search(r'\brecipe changed\b',
                             _strip_html(notes[0].get('note', '')), re.I)
     )
     if is_recipe_changed:
         deco = deco + ', changed=True' if deco else ', changed=True'
         notes = notes[1:]
-    out.append(f'W(item_header("{name}"{deco}))')
+    if is_enchantment:
+        out.append(f'W(enchant_header("{name}"))')
+    else:
+        out.append(f'W(item_header("{name}"{deco}))')
     if is_recipe_changed:
         out.append(f'W(auto_components_change("{name}", "{version}"))')
     body, _ = _emit_notes(notes)

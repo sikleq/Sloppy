@@ -23,7 +23,7 @@ try:
 except ImportError:
     print("pip install requests"); sys.exit(1)
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 URLS_FILE = ROOT / "_ability_icons.txt"
 ICONS_DIR = ROOT / "icons" / "abilities"
 CDN_BASE = "https://cdn.steamstatic.com/apps/dota2/images/dota_react/abilities/"

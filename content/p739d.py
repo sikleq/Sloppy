@@ -127,12 +127,12 @@ def build():
 
     W(plain_header("Enchantment Changes", dynamics=False, sublabel=True))
 
-    W(item_header("Brawny"))
+    W(enchant_header("Brawny"))
     W(ul_open())
     W(li("Health Regen bonus decreased from +0/4/8/12 to +0/3/6/9", b([0, 4, 8, 12], [0, 3, 6, 9])))
     W(ul_close())
 
-    W(item_header("Mystical"))
+    W(enchant_header("Mystical"))
     W(ul_open())
     W(li("Mana Regen bonus decreased from +1/1.75/2.5/3.25 to +0.8/1.6/2.4/3.2", b([1, 1.75, 2.5, 3.25], [0.8, 1.6, 2.4, 3.2])))
     W(ul_close())
