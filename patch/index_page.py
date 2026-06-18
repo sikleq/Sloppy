@@ -41,9 +41,9 @@ def _build_whatsnew():
         _, _, date_str, _ = entry
         try:
             dt = datetime.datetime.strptime(f"{date_str} 2026", "%b %d %Y")
-            ref = datetime.datetime(2026, 6, 14)
+            ref = datetime.datetime.now()
             if dt > ref:
-                dt = dt.replace(year=2025)
+                dt = dt.replace(year=dt.year - 1)
             return dt
         except ValueError:
             return datetime.datetime.min
