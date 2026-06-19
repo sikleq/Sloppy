@@ -78,7 +78,7 @@ def build():
     W(hero_header("Bloodseeker"))
     W(facet_header("bloodseeker_old_blood"))
     W(ul_open())
-    W(li("Bloodrage: Now has a 0.3s cast point when cast on units other than Bloodseeker himself", t("MISC")))
+    W(li("Bloodrage: Now has a 0.3s cast point when cast on units other than Bloodseeker himself", t("NERF")))
     W(li("Bonus Base damage increased from 10/15/20/25% to 15/20/25/30%", b([10, 15, 20, 25], [15, 20, 25, 30])))
     W(ul_close())
 
