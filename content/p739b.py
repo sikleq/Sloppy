@@ -338,7 +338,7 @@ def build():
     W(hero_header("Warlock"))
     W(ability("Chaotic Offering", slug="warlock_rain_of_chaos"))
     W(ul_open())
-    W(li("Golem's Permanent Immolation is now affected by Warlock's AoE increases", t("MISC")))
+    W(li("Golem's Permanent Immolation is now affected by Warlock's AoE increases", t("NEW")))
     W(ul_close())
 
     write_footer()
