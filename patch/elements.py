@@ -343,6 +343,7 @@ def _close_block():
 def _close_ability_block():
     if _State.ability_block_open:
         _State.ability_block_open = False
+        _State.current_block_is_facet = False
         return '</div>\n'
     return ''
 
@@ -619,12 +620,19 @@ def ability(title, slug=None, innate=None, icon_url=None):
         icon_inner += (f'<img src="{INNATE_ICON_URL}" alt="" '
                        f'class="innate-marker">')
     icon_html = f'<div class="ability-icon-wrap">{icon_inner}</div>' if icon_inner else ''
+    if _State.current_block_is_facet:
+        import sys
+        print(f'[WARN] ability("{title}") called directly inside a facet block — '
+              f'this closes the facet before any content. '
+              f'Put li() items inside the facet block instead, prefixed with the ability name.',
+              file=sys.stderr)
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
     if not _State.seen_abilities_subgroup and _State.current_hero:
         out += '<h4 class="subgroup">Abilities</h4>'
         _State.seen_abilities_subgroup = True
     _State.ability_block_open = True
+    _State.current_block_is_facet = False
     return out + (f'<div class="ability-block{" is-innate" if is_innate else ""}">'
                   f'{icon_html}'
                   f'<h4 class="ability-title">{title}</h4>')
@@ -647,6 +655,7 @@ def facet_header(slug):
         out += '<h4 class="subgroup">Facets</h4>'
         _State.seen_facets_subgroup = True
     _State.ability_block_open = True
+    _State.current_block_is_facet = True
     icon_overlay = (f'<img src="../icons/facets/{icon_name}.png" alt="" '
                     f'class="facet-icon-overlay" loading="lazy">') if icon_name else ''
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '

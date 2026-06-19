@@ -199,9 +199,8 @@ def build():
     W(li("Sprout: Tree enchant radius decreased from 1200 to 900", b(1200, 900)))
     W(ul_close())
     W(facet_header("furion_natures_profit"))
-    W(ability("Wrath of Nature", slug="furion_wrath_of_nature"))
     W(ul_open())
-    W(li("Base Damage decreased from 100/140/180 to 90/130/170", b([100, 140, 180], [90, 130, 170])))
+    W(li("Wrath of Nature Base Damage decreased from 100/140/180 to 90/130/170", b([100, 140, 180], [90, 130, 170])))
     W(ul_close())
 
     # Night Stalker
