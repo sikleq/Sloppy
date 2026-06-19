@@ -69,8 +69,9 @@ def build():
 
     # Beastmaster
     W(hero_header("Beastmaster"))
+    W(ability("Rugged", slug="beastmaster_rugged", innate=True))
     W(ul_open())
-    W(li("Rugged: No longer increases block chance against towers", t("DEL")))
+    W(li("No longer increases block chance against towers", t("DEL")))
     W(ul_close())
 
     # Bloodseeker
