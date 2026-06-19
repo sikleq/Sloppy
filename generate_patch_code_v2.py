@@ -683,10 +683,10 @@ def _render_hero(hero, version=None):
                     all_facet_notes.extend(notes)
             body, _ = _emit_notes(all_facet_notes)
             out.extend(body)
-            # talent_notes inside facet subsection (e.g. NP Soothing Saplings)
+            # talent_notes inside facet subsection (e.g. NP Soothing Saplings).
+            # Emit directly (no subgroup call) so notes land inside the facet block.
             facet_talents = s.get('talent_notes', [])
             if facet_talents:
-                out.append('W(subgroup("Talents"))')
                 tbody, _ = _emit_notes(facet_talents)
                 out.extend(tbody)
     # Abilities

@@ -463,6 +463,8 @@ FACETS = {
     #     can't see them). Colours pulled from prior-name datafeed snapshots
     #     when the slug was renamed. ---
     "abaddon_the_quickening":           ("The Quickening",      "Gray0"),     # = renamed abaddon_death_dude (7.36 datafeed Gray0)
+    "lich_cryophobia":                  ("Evil Eye",            "Red0"),
+    "primal_beast_provoke_the_beast":   ("Provoke the Beast",   "Red0"),
 }
 
 # Mapping from Valve's facet_color name -> CSS gradient that EXACTLY matches
@@ -500,9 +502,6 @@ _FACET_COLOR_GRADIENT = {
     "Purple0": "linear-gradient(to right, #B57789, #412755)",
     "Purple1": "linear-gradient(to right, #9C70A4, #282752)",
     "Purple2": "linear-gradient(to right, #675CAE, #261C44)",
-    # 7.39c — auto-registered by generate_patch_code_v2.py
-    "lich_cryophobia": ("Evil Eye", "Red0"),
-    "primal_beast_provoke_the_beast": ("Provoke the Beast", "Red0"),
 }
 
 

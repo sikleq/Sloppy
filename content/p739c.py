@@ -311,7 +311,6 @@ def build():
     # Nature's Prophet
     W(hero_header("Nature's Prophet"))
     W(facet_header("furion_soothing_saplings"))
-    W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 15 Talent Sprout Heal Per Second decreased from +30% to +20%", b(30, 20)))
     W(ul_close())
