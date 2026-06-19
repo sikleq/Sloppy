@@ -2,6 +2,8 @@ from patch.api import *
 
 
 def build():
+    write_head("7.39b", "29.05.2025")
+
     # ===== GENERAL UPDATES =====
     W(section("General Updates"))
 
@@ -336,3 +338,6 @@ def build():
     W(ul_open())
     W(li("Golem's Permanent Immolation is now affected by Warlock's AoE increases", t("MISC")))
     W(ul_close())
+
+    write_footer()
+    save_html('patches/7.39b.html')
