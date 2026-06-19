@@ -38,7 +38,7 @@ RELEASE_HISTORY = [
     {"version": "7.39d", "date": "05.08.2025"},
     {"version": "7.39c", "date": "24.06.2025"},
     {"version": "7.39b", "date": "29.05.2025"},
-    {"version": "7.39",  "date": "21.05.2025"},
+    {"version": "7.39",  "date": "21.05.2025", "filename": "patches/7.39.html"},
     # 7.38 cycle
     {"version": "7.38c", "date": "27.03.2025"},
     {"version": "7.38b", "date": "05.03.2025"},
