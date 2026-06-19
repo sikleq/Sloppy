@@ -151,7 +151,7 @@ def build():
     W(hero_header("Enigma"))
     W(ability("Demonic Summoning", slug="enigma_demonic_conversion"))
     W(ul_open())
-    W(li("Eidolons created from multiplying will now automatically attack the same target as their parent", t("QOL")))
+    W(li("Eidolons created from multiplying will now automatically attack the same target as their parent", t("QoL")))
     W(ul_close())
 
     # Kez
