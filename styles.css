@@ -8055,6 +8055,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   font-size: 1rem;
   color: #e3c46a;
   letter-spacing: .06em;
+  text-align: center;
   padding: 10px 0 4px !important;
   margin: 0 !important;
   list-style: none;
@@ -8062,7 +8063,17 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   border-bottom: 1px solid rgba(227,196,106,.2) !important;
   background: none !important;
 }
-.terrain-subpatch-head:first-child { padding-top: 2px !important; }
+.terrain-subpatch-head:first-child { padding-top: 10px !important; }
+.terrain-subpatch-top.terrain-subpatch-head {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  margin: 0 0 10px !important;
+  padding: 0 0 4px !important;
+  color: var(--text-bright);
+  border-bottom: 1px solid rgba(227,196,106,.2) !important;
+}
 .terrain-subpatch-head::before,
 .terrain-subpatch-head::after { display: none !important; content: none !important; }
 /* First change row meets the map's TOP edge: drop the list's 3px top margin
@@ -8164,6 +8175,16 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   background: rgba(6, 8, 5, 0.96);
   border-top: 1px solid rgba(227,196,106,.18);
   flex-shrink: 0;
+}
+.tc-fs-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  font-size: 13px;
+  color: var(--text-dimmer);
+  pointer-events: none;
+  user-select: none;
 }
 
 /* ---- control bar ABOVE the map (no longer overlaid — the map is now

@@ -4602,7 +4602,8 @@
     const open = () => { dropdown.classList.add('is-open'); btn.setAttribute('aria-expanded', 'true'); };
     const close = () => { dropdown.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); };
     const select = (ver) => {
-      btn.childNodes[0].textContent = ver + ' ';
+      var picked = opts.find(function(o) { return o.dataset.patch === ver; });
+      btn.childNodes[0].textContent = (picked ? picked.textContent.trim() : ver) + ' ';
       opts.forEach(o => { o.classList.toggle('current', o.dataset.patch === ver); });
       document.querySelectorAll('.terrain-map-pane, .terrain-list-pane')
         .forEach(p => { p.hidden = (p.dataset.patch !== ver); });

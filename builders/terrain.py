@@ -288,6 +288,10 @@ _MAP_PAIRS = {
     "7.41": ("7.40", "7.41"),   # icons/maps/map_7.40.webp + map_7.41.webp
     "7.40": ("7.39", "7.40"),   # icons/maps/map_7.39.webp + map_7.40.webp
 }
+_RANGE_LABELS = {
+    "7.41": "7.40b – 7.41",
+    "7.40": "7.39b – 7.40",
+}
 # Picker shows only major versions (spectral only renders maps for major patches).
 # Letter patches (7.39b, 7.39d …) are grouped under the next major version that
 # has a map pair — their changes appear in that major version's change list with
@@ -431,19 +435,20 @@ def _change_li(text, tag):
             f'<span class="row-text">{text}</span></li>')
 
 
-def _changes_html(subpatches):
+def _changes_html(subpatches, skip_first_head=False):
     """Render change list for one major-version bucket.
 
     subpatches: [(sub_ver, [(text, tag), ...]), ...]  oldest-first.
-    If there's only one sub-patch and it equals the major, skip the subheader.
     """
     parts = []
-    for sub_ver, rows in subpatches:
+    for idx, (sub_ver, rows) in enumerate(subpatches):
         sorted_rows = sorted(enumerate(rows),
                              key=lambda it: (_TAG_RANK.get(it[1][1], 9), it[0]))
         items = "\n".join(_change_li(text, tag) for _i, (text, tag) in sorted_rows)
-        # Always show subpatch header so it's clear when each change landed.
-        parts.append(f'<li class="terrain-subpatch-head">{sub_ver}</li>\n{items}')
+        if idx == 0 and skip_first_head:
+            parts.append(items)
+        else:
+            parts.append(f'<li class="terrain-subpatch-head">{sub_ver}</li>\n{items}')
     return "\n".join(parts)
 
 
@@ -467,7 +472,7 @@ def _controls_html(layers=True):
     _FS_EXIT_ICON = (
         '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" '
         'aria-hidden="true" focusable="false">'
-        '<path d="M5 1v4H1M9 1v4h4M1 9h4v4M9 9h4v4" '
+        '<path d="M5 5V1M5 5H1M9 5V1M9 5h4M5 9v4M5 9H1M9 9v4M9 9h4" '
         'stroke="currentColor" stroke-width="1.5" '
         'stroke-linecap="round" stroke-linejoin="round"/></svg>'
     )
@@ -498,12 +503,37 @@ def _controls_html(layers=True):
         f'{_FS_ENTER_ICON}Fullscreen</button>',
     ] + layer_parts
 
-    # Bottom fullscreen bar: Exit + same layer toggles (no Zoom)
+    _RMB_ICON = (
+        '<svg width="16" height="16" viewBox="-3 -1 16 16" fill="none" '
+        'aria-hidden="true" focusable="false">'
+        '<rect x=".7" y=".7" width="8.6" height="12.6" rx="4.3" '
+        'stroke="currentColor" stroke-width="1.2"/>'
+        '<line x1="5" y1=".7" x2="5" y2="6.3" stroke="currentColor" stroke-width="1.2"/>'
+        '<line x1=".7" y1="6.3" x2="9.3" y2="6.3" stroke="currentColor" stroke-width="1.2"/>'
+        '<rect x="5.4" y="1.8" width="2.8" height="3.5" rx="1.4" '
+        'fill="currentColor" opacity="0.5"/>'
+        '</svg>'
+    )
+    _MMB_ICON = (
+        '<svg width="16" height="16" viewBox="-3 -1 16 16" fill="none" '
+        'aria-hidden="true" focusable="false">'
+        '<rect x=".7" y=".7" width="8.6" height="12.6" rx="4.3" '
+        'stroke="currentColor" stroke-width="1.2"/>'
+        '<rect x="3.5" y="2" width="3" height="3.5" rx="1.5" '
+        'stroke="currentColor" stroke-width="1.2"/>'
+        '</svg>'
+    )
+    fs_hints = (
+        '<span class="tc-sep" aria-hidden="true"></span>'
+        f'<span class="tc-fs-hint">{_RMB_ICON}Drag</span>'
+        f'<span class="tc-fs-hint">{_MMB_ICON}Zoom</span>'
+    )
+    # Bottom fullscreen bar: Exit + same layer toggles (no Zoom) + hints
     fs_parts = [
-        f'<button type="button" class="tc-btn tc-btn-fs-exit" '
+        f'<button type="button" class="tc-btn tc-btn-fs-exit" aria-pressed="false" '
         f'aria-label="Exit fullscreen" title="Exit fullscreen (Esc)">'
         f'{_FS_EXIT_ICON}Exit</button>',
-    ] + (layer_parts if layers else [])
+    ] + (layer_parts if layers else []) + [fs_hints]
 
     top_html = ('    <div class="tc-controls-bar">\n      '
                  + "".join(top_parts) + '\n    </div>\n')
@@ -611,14 +641,18 @@ def _source_html():
 def _picker_html(patches, default):
     """Version-picker dropdown styled as nav-context-flat nav-context-materials,
     matching the aesthetic of non-patch pages while keeping dropdown switching."""
+    def _range_label(ver):
+        return _RANGE_LABELS.get(ver, ver)
+
     items = []
     for ver in patches:
         cls = "version-item current" if ver == default else "version-item"
         items.append(
             f'<a class="{cls}" href="#" data-patch="{ver}" role="menuitem">'
-            f'<span class="vi-name">{ver}</span>'
+            f'<span class="vi-name">{_esc(_range_label(ver))}</span>'
             f'</a>')
     label = _site.get_materials_label('terrain') or 'Terrain'
+    default_label = _range_label(default)
     return (
         '<div class="nav-context nav-context-flat nav-context-materials nav-context-picker nav-context-terrain">'
         f'<span class="version version-static version-materials">{label}</span>'
@@ -626,7 +660,7 @@ def _picker_html(patches, default):
         '<div class="version-dropdown">'
         '<button class="version version-materials" type="button" '
         'aria-haspopup="true" aria-expanded="false">'
-        f'{default} <span class="version-chev">▾</span>'
+        f'{default_label} <span class="version-chev">▾</span>'
         '</button>'
         '<div class="version-menu" role="menu">'
         + "".join(items) +
@@ -705,17 +739,14 @@ def save_terrain_html():
     for ver in patches:
         hidden = "" if ver == default else " hidden"
         counts_html = _counts_html(counts_by_patch.get(ver, {}))
+        subs = by_patch[ver]
+        first_ver = subs[0][0] if subs else ver
         list_panes.append(
             f'<div class="terrain-list-pane" data-patch="{ver}"{hidden}>\n'
-            f'<ul class="changes terrain-list">\n{_changes_html(by_patch[ver])}\n</ul>\n'
+            f'<div class="terrain-subpatch-head terrain-subpatch-top">{_esc(first_ver)}</div>\n'
+            f'<ul class="changes terrain-list">\n{_changes_html(subs, skip_first_head=True)}\n</ul>\n'
             f'{counts_html}'
             '</div>\n')
-    # Heading = the picker AS the version + "Terrain Changes" label. (A <div>,
-    # not <h2> — it holds interactive controls, which can't live inside a heading.)
-    list_head = (
-        '<div class="terrain-list-head">'
-        '<span class="terrain-list-head-label">Terrain Changes</span>'
-        '</div>\n')
 
     page = (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
@@ -748,7 +779,6 @@ def save_terrain_html():
         f'{_source_html()}'
         '</div>\n'
         '<div class="terrain-list-box">\n'
-        f'{list_head}'
         f'{"".join(list_panes)}'
         '</div>\n'
         '</div>\n'
