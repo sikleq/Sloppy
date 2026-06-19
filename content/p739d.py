@@ -268,9 +268,8 @@ def build():
     W(ul_open())
     W(li("Cooldown decreased from 130/125/120s to 125/120/115s", b([130, 125, 120], [125, 120, 115], l=True)))
     W(ul_close())
-    W(ability("Time Lock", slug="faceless_void_time_lock"))
     W(ul_open())
-    W(li("Bonus Damage increased from 12/18/24/30 to 18/22/26/30", b([12, 18, 24, 30], [18, 22, 26, 30])))
+    W(li("Time Lock: Bonus Damage increased from 12/18/24/30 to 18/22/26/30", b([12, 18, 24, 30], [18, 22, 26, 30])))
     W(ul_close())
 
     # Grimstroke
@@ -322,9 +321,8 @@ def build():
     W(ul_open())
     W(li("Initial cooldown increased from 0.5s to 1s", b(0.5, 1, l=True)))
     W(ul_close())
-    W(ability("Boundless Strike", slug="monkey_king_boundless_strike"))
     W(ul_open())
-    W(li("Aghanim's Shard portion of Primal Spring's max power decreased from 60% to 40%", b(60, 40)))
+    W(li("Boundless Strike: Aghanim's Shard portion of Primal Spring's max power decreased from 60% to 40%", b(60, 40)))
     W(ul_close())
 
     # Naga Siren
@@ -333,9 +331,8 @@ def build():
     W(ul_open())
     W(li("Rip Tide: Duration decreased from 3.5s to 2.6/2.9/3.2/3.5s", b(3.5, [2.6, 2.9, 3.2, 3.5])))
     W(ul_close())
-    W(ability("Song of the Siren", slug="naga_siren_song_of_the_siren"))
     W(ul_open())
-    W(li("Radius decreased from 1000/1200/1400 to 900/1150/1400", b([1000, 1200, 1400], [900, 1150, 1400])))
+    W(li("Song of the Siren: Radius decreased from 1000/1200/1400 to 900/1150/1400", b([1000, 1200, 1400], [900, 1150, 1400])))
     W(ul_close())
 
     # Nature's Prophet
@@ -347,9 +344,8 @@ def build():
     W(ul_open())
     W(li("Sprout: Heal per second decreased from 14/26/38/50 to 10/15/20/25", b([14, 26, 38, 50], [10, 15, 20, 25])))
     W(ul_close())
-    W(ability("Sprout", slug="furion_sprout"))
     W(ul_open())
-    W(li("Damage decreased from 70/135/200/265 to 70/130/190/250", b([70, 135, 200, 265], [70, 130, 190, 250])))
+    W(li("Sprout: Damage decreased from 70/135/200/265 to 70/130/190/250", b([70, 135, 200, 265], [70, 130, 190, 250])))
     W(ul_close())
 
     # Necrophos
@@ -510,9 +506,8 @@ def build():
     W(ul_open())
     W(li("Flesh Golem: Zombies summoned by the facet effect now die when Undying dies", t("MISC")))
     W(ul_close())
-    W(ability("Tombstone", slug="undying_tombstone"))
     W(ul_open())
-    W(li("Zombie vision range decreased from 900/900 to 800/800", b([900, 900], [800, 800])))
+    W(li("Tombstone: Zombie vision range decreased from 900/900 to 800/800", b([900, 900], [800, 800])))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

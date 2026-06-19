@@ -2679,9 +2679,8 @@ def build():
     W(li("Cast Range decreased from 1200 to 650/750/850/950", b(1200, [650, 750, 850, 950])))
     W(ul_close())
     W(subnote("Now matches Grappling Claw"))
-    W(ability("Shodo Sai"))
     W(ul_open())
-    W(li("The proc effect now triggers a critical strike only instead of creating a Mark", t("REWORK")))
+    W(li("Shodo Sai: The proc effect now triggers a critical strike only instead of creating a Mark", t("REWORK")))
     W(li("18% Chance to Mark replaced with 20% Critical Strike Chance", t("REWORK"),
          extra=inline_note("As a result, marks are applied only by parrying and casting Raven's Veil")))
     W(li("No longer restricts Kez from proccing passive Bash spells of Skull Basher and Abyssal Blade", t("BUFF")))

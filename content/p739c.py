@@ -154,9 +154,8 @@ def build():
     W(ul_open())
     W(li("Viscous Nasal Goo: Armor Loss per stack decreased from 2.5/3/3.5/4 to 2/2.5/3/3.5", b([2.5, 3, 3.5, 4], [2, 2.5, 3, 3.5])))
     W(ul_close())
-    W(ability("Viscous Nasal Goo", slug="bristleback_viscous_nasal_goo"))
     W(ul_open())
-    W(li("Duration decreased from 6s to 5s", b(6, 5)))
+    W(li("Viscous Nasal Goo: Duration decreased from 6s to 5s", b(6, 5)))
     W(ul_close())
 
     # Chaos Knight
@@ -235,9 +234,8 @@ def build():
     W(ul_open())
     W(li("Rolling Boulder: Allied heroes that are affected by Enchant Remnant ability are now considered a hero instead of a Stone Remnant", t("MISC")))
     W(ul_close())
-    W(ability("Rolling Boulder", slug="earth_spirit_rolling_boulder"))
     W(ul_open())
-    W(li("Distance increased from 750 to 800", b(750, 800)))
+    W(li("Rolling Boulder: Distance increased from 750 to 800", b(750, 800)))
     W(ul_close())
 
     # Enchantress
@@ -324,9 +322,8 @@ def build():
     W(ul_open())
     W(li("Level 15 Talent Sprout Heal Per Second decreased from +30% to +20%", b(30, 20)))
     W(ul_close())
-    W(ability("Curse of the Oldgrowth", slug="furion_curse_of_the_forest"))
     W(ul_open())
-    W(li("DPS per Tree decreased from 20 to 15", b(20, 15)))
+    W(li("Curse of the Oldgrowth: DPS per Tree decreased from 20 to 15", b(20, 15)))
     W(ul_close())
 
     # Nyx Assassin
@@ -368,9 +365,8 @@ def build():
     W(ul_open())
     W(li("Uproar: Now also provides stacks upon being leashed", t("NEW")))
     W(ul_close())
-    W(ability("Rock Throw", slug="primal_beast_rock_throw"))
     W(ul_open())
-    W(li("Cooldown decreased from 25s to 20s", b(25, 20, l=True)))
+    W(li("Rock Throw: Cooldown decreased from 25s to 20s", b(25, 20, l=True)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -531,9 +527,8 @@ def build():
     W(ul_open())
     W(li("Skeleton Armor decreased from 3 to 2", b(3, 2)))
     W(ul_close())
-    W(ability("Reincarnation", slug="skeleton_king_reincarnation"))
     W(ul_open())
-    W(li("Slow Radius decreased from 900 to 600", b(900, 600), extra=inline_note("Also affects Wraithfire Blast cast range from level 25 talent")))
+    W(li("Reincarnation: Slow Radius decreased from 900 to 600", b(900, 600), extra=inline_note("Also affects Wraithfire Blast cast range from level 25 talent")))
     W(ul_close())
 
     # Zeus
