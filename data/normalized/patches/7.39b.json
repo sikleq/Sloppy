@@ -1,0 +1,941 @@
+{
+  "patch": "7.39b",
+  "generated_from": "data/7.39b_datafeed.json",
+  "entities": [
+    {
+      "entity_type": "general",
+      "id": null,
+      "name": "Terrain Changes",
+      "changes": [
+        {
+          "text": "The Bottom Radiant Tier 1 tower has been moved slightly to the south",
+          "tag": "misc",
+          "scope": "base"
+        },
+        {
+          "text": "Several trees have been added and adjusted above the Bottom Radiant Tier 1 tower and on the west side of the lane",
+          "tag": "misc",
+          "scope": "base"
+        },
+        {
+          "text": "Adjusted a juke path to the east of the Mid Radiant Tier 2 tower",
+          "tag": "misc",
+          "scope": "base"
+        },
+        {
+          "text": "A tree has been removed to the south of the Top Dire Tier 1 tower",
+          "tag": "del",
+          "scope": "base"
+        },
+        {
+          "text": "Fixed some locations that were incorrectly blocked for warding",
+          "tag": "misc",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "jidi_pollen_bag",
+      "name": "Jidi Pollen Bag",
+      "changes": [
+        {
+          "text": "Pollinate health restoration loss increased from 20% to 30%",
+          "tag": "buff",
+          "old": 20,
+          "new": 30,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "dezun_bloodrite",
+      "name": "Dezun Bloodrite",
+      "changes": [
+        {
+          "text": "Abilities that are considered attacks are no longer impacted by Dezun Bloodrite (Including Outworld Destroyer's Arcane Orb, Viper's Poison Attack, etc.)",
+          "tag": "misc",
+          "scope": "base"
+        },
+        {
+          "text": "Blood Invocation AoE bonus decreased from 15% to 12%",
+          "tag": "nerf",
+          "old": 15,
+          "new": 12,
+          "scope": "base",
+          "info": "Dormant Curio AoE bonus decreased from 19.5% to 15.6%"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "giant_maul",
+      "name": "Giant's Maul",
+      "changes": [
+        {
+          "text": "Crushing Blow debuff duration decreased from 4s to 3s",
+          "tag": "nerf",
+          "old": 4,
+          "new": 3,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "magnifying_monocle",
+      "name": "Magnifying Monocle",
+      "changes": [
+        {
+          "text": "Keen Eye bonus cast range decreased from 125 to 100",
+          "tag": "nerf",
+          "old": 125,
+          "new": 100,
+          "scope": "base",
+          "info": "Dormant Curio cast range bonus decreased from 162.5 to 130"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "helm_of_the_undying",
+      "name": "Helm of the Undying",
+      "changes": [
+        {
+          "text": "Death Delay cooldown increased from 50s to 100s",
+          "tag": "nerf",
+          "old": 50,
+          "new": 100,
+          "lower_is_better": true,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "enhancement_crude",
+      "name": "Crude",
+      "changes": [
+        {
+          "text": "Health Restoration bonus increased from +20/30% to +30/40%",
+          "tag": "buff",
+          "old": [
+            20,
+            30
+          ],
+          "new": [
+            30,
+            40
+          ],
+          "scope": "base"
+        },
+        {
+          "text": "Intelligence reduction decreased from 8% to 5%",
+          "tag": "nerf",
+          "old": 8,
+          "new": 5,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "antimage",
+      "name": "Anti-Mage",
+      "changes": [
+        {
+          "text": "Mana Burn Percentage increased from 150/190/230/270% to 150/200/250/300%",
+          "tag": "buff",
+          "old": [
+            150,
+            190,
+            230,
+            270
+          ],
+          "new": [
+            150,
+            200,
+            250,
+            300
+          ],
+          "scope": "facet:antimage_magebanes_mirror"
+        },
+        {
+          "text": "Ally: Mana Burn Percentage increased from 270% to 300%",
+          "tag": "buff",
+          "old": 270,
+          "new": 300,
+          "scope": "facet:antimage_magebanes_mirror"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "axe",
+      "name": "Axe",
+      "changes": [
+        {
+          "text": "Aghanim's Scepter Attack Damage Reduction decreased from 15% to 12%",
+          "tag": "nerf",
+          "old": 15,
+          "new": 12,
+          "scope": "Counter Helix"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "beastmaster",
+      "name": "Beastmaster",
+      "changes": [
+        {
+          "text": "Rugged: No longer increases block chance against towers",
+          "tag": "del",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "bloodseeker",
+      "name": "Bloodseeker",
+      "changes": [
+        {
+          "text": "Now has a 0.3s cast point when cast on units other than Bloodseeker himself",
+          "tag": "new",
+          "scope": "facet:bloodseeker_old_blood"
+        },
+        {
+          "text": "Bonus Base damage increased from 10/15/20/25% to 15/20/25/30%",
+          "tag": "buff",
+          "old": [
+            10,
+            15,
+            20,
+            25
+          ],
+          "new": [
+            15,
+            20,
+            25,
+            30
+          ],
+          "scope": "facet:bloodseeker_old_blood"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "bristleback",
+      "name": "Bristleback",
+      "changes": [
+        {
+          "text": "Nasal Goo Radius decreased from 900 to 750",
+          "tag": "nerf",
+          "old": 900,
+          "new": 750,
+          "scope": "facet:bristleback_snot_rocket"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "broodmother",
+      "name": "Broodmother",
+      "changes": [
+        {
+          "text": "Health Regeneration Reduction now affects Health Restoration instead",
+          "tag": "misc",
+          "scope": "facet:broodmother_necrotic_webs"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "centaur",
+      "name": "Centaur Warrunner",
+      "changes": [
+        {
+          "text": "Max Movement Speed decreased from 600 to 575",
+          "tag": "nerf",
+          "old": 600,
+          "new": 575,
+          "scope": "Horsepower"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "dark_seer",
+      "name": "Dark Seer",
+      "changes": [
+        {
+          "text": "Duration decreased from 21/24/27/30s to 20/22/24/26s",
+          "tag": "nerf",
+          "old": [
+            21,
+            24,
+            27,
+            30
+          ],
+          "new": [
+            20,
+            22,
+            24,
+            26
+          ],
+          "scope": "Ion Shell"
+        },
+        {
+          "text": "Cast Range decreased from 1300 to 1000",
+          "tag": "nerf",
+          "old": 1300,
+          "new": 1000,
+          "scope": "Wall of Replica"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "dazzle",
+      "name": "Dazzle",
+      "changes": [
+        {
+          "text": "Heal amplification from Dazzle increased from 5% to 7.5%",
+          "tag": "buff",
+          "old": 5,
+          "new": 7.5,
+          "scope": "facet:dazzle_facet_nothl_boon"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "disruptor",
+      "name": "Disruptor",
+      "changes": [
+        {
+          "text": "Slow duration decreased from 0.4s to 0.3s",
+          "tag": "nerf",
+          "old": 0.4,
+          "new": 0.3,
+          "scope": "Thunder Strike",
+          "info": "Slow duration with Thunderstorm facet decreased from 0.8s to 0.6s"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "doom_bringer",
+      "name": "Doom",
+      "changes": [
+        {
+          "text": "Base Health Regen decreased from 1.25 to 0.66",
+          "tag": "nerf",
+          "old": 1.25,
+          "new": 0.66,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "elder_titan",
+      "name": "Elder Titan",
+      "changes": [
+        {
+          "text": "Base movement speed decreased from 310 to 305",
+          "tag": "nerf",
+          "old": 310,
+          "new": 305,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "enchantress",
+      "name": "Enchantress",
+      "changes": [
+        {
+          "text": "Wisp count increased from 8 to 9",
+          "tag": "buff",
+          "old": 8,
+          "new": 9,
+          "scope": "Nature's Attendants"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "enigma",
+      "name": "Enigma",
+      "changes": [
+        {
+          "text": "Eidolons created from multiplying will now automatically attack the same target as their parent",
+          "tag": "misc",
+          "scope": "Demonic Summoning"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "kez",
+      "name": "Kez",
+      "changes": [
+        {
+          "text": "Abilities that are unit targeted attacks now allow Kez to rush to the target",
+          "tag": "misc",
+          "scope": "Falcon Rush",
+          "info": "As a result, Kazurai Katana's active will now cause Kez to rush if he is within rush range"
+        },
+        {
+          "text": "Duration increased from 3/4/5/6s to 3.75/4.5/5.25/6s",
+          "tag": "buff",
+          "old": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "new": [
+            3.75,
+            4.5,
+            5.25,
+            6
+          ],
+          "scope": "Falcon Rush"
+        },
+        {
+          "text": "Mana Cost decreased from 75 to 60/65/70/75",
+          "tag": "buff",
+          "old": 75,
+          "new": [
+            60,
+            65,
+            70,
+            75
+          ],
+          "lower_is_better": true,
+          "scope": "Talon Toss"
+        },
+        {
+          "text": "Once again grants bonus stun and critical strike from marks generated by parrying an enemy Hero",
+          "tag": "misc",
+          "scope": "Shodo Sai"
+        },
+        {
+          "text": "Parry Bonus Critical Strike rescaled from 25/50/75/100% to 4% * Enemy Level",
+          "tag": "rework",
+          "old": [
+            25,
+            50,
+            75,
+            100
+          ],
+          "new": 4,
+          "scope": "Shodo Sai"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "lich",
+      "name": "Lich",
+      "changes": [
+        {
+          "text": "Death Charge: Mana restored on Hero Death increased from 15% to 25%",
+          "tag": "buff",
+          "old": 15,
+          "new": 25,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "life_stealer",
+      "name": "Lifestealer",
+      "changes": [
+        {
+          "text": "Remaining Health as Gorestorm Damage increased from 25% to 30%",
+          "tag": "buff",
+          "old": 25,
+          "new": 30,
+          "scope": "facet:life_stealer_gorestorm"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "lina",
+      "name": "Lina",
+      "changes": []
+    },
+    {
+      "entity_type": "hero",
+      "id": "morphling",
+      "name": "Morphling",
+      "changes": [
+        {
+          "text": "Health change is now affected by negative Health Restoration effects",
+          "tag": "misc",
+          "scope": "Attribute Shift (Strength Gain)"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "furion",
+      "name": "Nature's Prophet",
+      "changes": [
+        {
+          "text": "Base Damage decreased from 100/140/180 to 90/130/170",
+          "tag": "nerf",
+          "old": [
+            100,
+            140,
+            180
+          ],
+          "new": [
+            90,
+            130,
+            170
+          ],
+          "scope": "Wrath of Nature"
+        },
+        {
+          "text": "Tree enchant radius decreased from 1200 to 900",
+          "tag": "nerf",
+          "old": 1200,
+          "new": 900,
+          "scope": "facet:furion_soothing_saplings"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "night_stalker",
+      "name": "Night Stalker",
+      "changes": [
+        {
+          "text": "Night Duration decreased from 2/2.5/3/3.5/4s to 1.6/2.2/2.8/3.4/4s",
+          "tag": "nerf",
+          "old": [
+            2,
+            2.5,
+            3,
+            3.5,
+            4
+          ],
+          "new": [
+            1.6,
+            2.2,
+            2.8,
+            3.4,
+            4
+          ],
+          "scope": "Void"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "omniknight",
+      "name": "Omniknight",
+      "changes": [
+        {
+          "text": "Cooldown increased from 16/12/8/4s to 20/15/10/5s",
+          "tag": "nerf",
+          "old": [
+            16,
+            12,
+            8,
+            4
+          ],
+          "new": [
+            20,
+            15,
+            10,
+            5
+          ],
+          "lower_is_better": true,
+          "scope": "Hammer of Purity"
+        },
+        {
+          "text": "Damage decreased from 40/60/80/100 to 25/50/75/100",
+          "tag": "nerf",
+          "old": [
+            40,
+            60,
+            80,
+            100
+          ],
+          "new": [
+            25,
+            50,
+            75,
+            100
+          ],
+          "scope": "Hammer of Purity"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "oracle",
+      "name": "Oracle",
+      "changes": [
+        {
+          "text": "Strength gain decreased from 2.4 to 2.2",
+          "tag": "nerf",
+          "old": 2.4,
+          "new": 2.2,
+          "scope": "base"
+        },
+        {
+          "text": "Heal amplification decreased from 20% to 15%",
+          "tag": "nerf",
+          "old": 20,
+          "new": 15,
+          "scope": "Rain of Destiny"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "ringmaster",
+      "name": "Ringmaster",
+      "changes": [
+        {
+          "text": "Clairvoyance Scan duration increased from 4s to 5s",
+          "tag": "buff",
+          "old": 4,
+          "new": 5,
+          "scope": "facet:ringmaster_sideshow_secrets"
+        },
+        {
+          "text": "Pie Toss vision recovery time increased from 2s to 3s",
+          "tag": "buff",
+          "old": 2,
+          "new": 3,
+          "scope": "facet:ringmaster_sideshow_secrets"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "sand_king",
+      "name": "Sand King",
+      "changes": [
+        {
+          "text": "Mana Cost decreased from 110/120/130/140 to 100/110/120/130",
+          "tag": "buff",
+          "old": [
+            110,
+            120,
+            130,
+            140
+          ],
+          "new": [
+            100,
+            110,
+            120,
+            130
+          ],
+          "lower_is_better": true,
+          "scope": "Burrowstrike"
+        },
+        {
+          "text": "Level 10 Talent Stinger Slow increased from +8% to +12%",
+          "tag": "buff",
+          "old": 8,
+          "new": 12,
+          "scope": "talent"
+        },
+        {
+          "text": "Level 15 Talent Burrowstrike Cast Range increased from +150 to +200",
+          "tag": "buff",
+          "old": 150,
+          "new": 200,
+          "scope": "talent"
+        },
+        {
+          "text": "Level 15 Talent Sand Storm Damage Per Second increased from +20 to +25",
+          "tag": "buff",
+          "old": 20,
+          "new": 25,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "shadow_shaman",
+      "name": "Shadow Shaman",
+      "changes": [
+        {
+          "text": "Damage decreased from 140/200/260/320 to 125/190/255/320",
+          "tag": "nerf",
+          "old": [
+            140,
+            200,
+            260,
+            320
+          ],
+          "new": [
+            125,
+            190,
+            255,
+            320
+          ],
+          "scope": "Ether Shock"
+        },
+        {
+          "text": "Cooldown increased from 13/12/11/10s to 14/13/12/11s",
+          "tag": "nerf",
+          "old": [
+            13,
+            12,
+            11,
+            10
+          ],
+          "new": [
+            14,
+            13,
+            12,
+            11
+          ],
+          "lower_is_better": true,
+          "scope": "Shackles"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "silencer",
+      "name": "Silencer",
+      "changes": []
+    },
+    {
+      "entity_type": "hero",
+      "id": "skywrath_mage",
+      "name": "Skywrath Mage",
+      "changes": [
+        {
+          "text": "Base Damage increased from 60/85/110/135 to 60/90/120/150",
+          "tag": "buff",
+          "old": [
+            60,
+            85,
+            110,
+            135
+          ],
+          "new": [
+            60,
+            90,
+            120,
+            150
+          ],
+          "scope": "Arcane Bolt"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "slark",
+      "name": "Slark",
+      "changes": [
+        {
+          "text": "Barracuda: Health Gained per second decreased from 10/70/100/130 to 5/70/100/130",
+          "tag": "nerf",
+          "old": [
+            10,
+            70,
+            100,
+            130
+          ],
+          "new": [
+            5,
+            70,
+            100,
+            130
+          ],
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "sniper",
+      "name": "Sniper",
+      "changes": [
+        {
+          "text": "Base armor increased by 1",
+          "tag": "buff",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "techies",
+      "name": "Techies",
+      "changes": [
+        {
+          "text": "Damage increased from 80/160/240/320 to 95/170/245/320",
+          "tag": "buff",
+          "old": [
+            80,
+            160,
+            240,
+            320
+          ],
+          "new": [
+            95,
+            170,
+            245,
+            320
+          ],
+          "scope": "Sticky Bomb"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "templar_assassin",
+      "name": "Templar Assassin",
+      "changes": [
+        {
+          "text": "Mana Cost increased from 85 to 95",
+          "tag": "nerf",
+          "old": 85,
+          "new": 95,
+          "lower_is_better": true,
+          "scope": "Refraction"
+        },
+        {
+          "text": "Bonus Damage decreased from 20/40/60/80 to 15/30/45/60",
+          "tag": "nerf",
+          "old": [
+            20,
+            40,
+            60,
+            80
+          ],
+          "new": [
+            15,
+            30,
+            45,
+            60
+          ],
+          "scope": "Refraction"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "terrorblade",
+      "name": "Terrorblade",
+      "changes": [
+        {
+          "text": "Damage Penalty increased from 50% to 60%",
+          "tag": "nerf",
+          "old": 50,
+          "new": 60,
+          "lower_is_better": true,
+          "scope": "Dark Unity"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "tinker",
+      "name": "Tinker",
+      "changes": []
+    },
+    {
+      "entity_type": "hero",
+      "id": "troll_warlord",
+      "name": "Troll Warlord",
+      "changes": [
+        {
+          "text": "Battle Trance Max Fervor Stacks decreased from 15 to 12",
+          "tag": "nerf",
+          "old": 15,
+          "new": 12,
+          "scope": "facet:troll_warlord_bad_influence"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "abyssal_underlord",
+      "name": "Underlord",
+      "changes": [
+        {
+          "text": "Mana Cost decreased from 200 to 175",
+          "tag": "buff",
+          "old": 200,
+          "new": 175,
+          "lower_is_better": true,
+          "scope": "Fiend's Gate"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "ursa",
+      "name": "Ursa",
+      "changes": [
+        {
+          "text": "Slow Resistance rescaled from 10/20/30/40% to 25%",
+          "tag": "rework",
+          "old": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "new": 25,
+          "scope": "Overpower"
+        },
+        {
+          "text": "Reset Time (Roshan) decreased from 10s to 8s",
+          "tag": "nerf",
+          "old": 10,
+          "new": 8,
+          "scope": "Fury Swipes"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "visage",
+      "name": "Visage",
+      "changes": [
+        {
+          "text": "Secondary Target Penalty increased from 50% to 70%",
+          "tag": "nerf",
+          "old": 50,
+          "new": 70,
+          "lower_is_better": true,
+          "scope": "facet:visage_sepulchre"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "warlock",
+      "name": "Warlock",
+      "changes": [
+        {
+          "text": "Golem's Permanent Immolation is now affected by Warlock's AoE increases",
+          "tag": "misc",
+          "scope": "Chaotic Offering"
+        }
+      ]
+    }
+  ]
+}

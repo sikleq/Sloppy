@@ -503,6 +503,19 @@ _FACET_COLOR_GRADIENT = {
     "Purple0": "linear-gradient(to right, #B57789, #412755)",
     "Purple1": "linear-gradient(to right, #9C70A4, #282752)",
     "Purple2": "linear-gradient(to right, #675CAE, #261C44)",
+    # 7.39b — auto-registered by generate_patch_code_v2.py
+    "antimage_magebanes_mirror": ("Magebane's Mirror", "Purple1"),
+    "bloodseeker_old_blood": ("Old Blood", "Gray1"),
+    "lina_dot": ("Slow Burn", "Red0"),
+    "enigma_fragment": ("Splitting Image", "Purple0"),
+    "tinker_translocator": ("Translocator", "Yellow2"),
+    "dazzle_facet_nothl_boon": ("Nothl Boon", "Red1"),
+    "furion_natures_profit": ("Nature's Profit", "Yellow2"),
+    "life_stealer_gorestorm": ("Gorestorm", "Red0"),
+    "silencer_oppressive_silence": ("Suffer In Silence", "Gray3"),
+    "visage_sepulchre": ("Sepulchre", "Gray0"),
+    "troll_warlord_bad_influence": ("Bad Influence", "Red1"),
+    "ringmaster_sideshow_secrets": ("Sideshow Secrets", "Red0"),
 }
 
 
