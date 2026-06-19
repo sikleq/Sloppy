@@ -189,7 +189,7 @@ def build():
     W(hero_header("Morphling"))
     W(ability("Attribute Shift (Strength Gain)", slug="morphling_morph_str"))
     W(ul_open())
-    W(li("Health change is now affected by negative Health Restoration effects", t("MISC")))
+    W(li("Health change is now affected by negative Health Restoration effects", t("REWORK")))
     W(ul_close())
 
     # Nature's Prophet
