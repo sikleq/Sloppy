@@ -1551,7 +1551,8 @@ def note_box(text=None, *, hero=None, item=None, unit=None, field=None, before_p
 
 
 def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
-               rework_badge=True, inline_note_text=None, label=None, **bf_kwargs):
+               rework_badge=True, inline_note_text=None, label=None,
+               force_rework=False, **bf_kwargs):
     from .badges import bf
     if label:
         bf_kwargs.setdefault('axis_label', label)
@@ -1564,7 +1565,7 @@ def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
     kind = (force_match.group(1) if force_match
             else overall_match.group(1) if overall_match
             else None)
-    if kind:
+    if kind and not force_rework:
         cls = "buff-text" if kind == "buff" else "nerf-text"
         label = "BUFF" if kind == "buff" else "NERF"
         full_badge = (f'<span class="badge {cls}" data-tag="{kind}" '

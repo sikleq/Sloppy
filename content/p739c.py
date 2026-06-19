@@ -97,6 +97,7 @@ def build():
         levels=[300, 500, 750, 1000, 1500, 2000],
         label="Max Mana",
         headline_level=750,
+        force_rework=True,
         inline_note_text="Dormant Curio Max Mana Restoration decreased from 5.2% to 3.9% — " + b(5.2, 3.9),
     ))
     W(ul_close())
