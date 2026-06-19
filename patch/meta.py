@@ -3,42 +3,26 @@
 import datetime
 import builders.site_common as _site
 
-PATCHES = [
+# Single source of truth. Add "filename" when a patch page exists.
+# PATCHES is derived automatically — do NOT maintain it separately.
+# Major-patch dates from odota/dotaconstants. Sub-patches sourced from Liquipedia
+# and Fandom. Append new entries here when patches release; sorted internally.
+RELEASE_HISTORY = [
+    # 7.41 cycle
     {"version": "7.41d", "date": "04.06.2026", "filename": "patches/7.41d.html"},
     {"version": "7.41c", "date": "06.05.2026", "filename": "patches/7.41c.html"},
     {"version": "7.41b", "date": "07.04.2026", "filename": "patches/7.41b.html"},
     {"version": "7.41a", "date": "28.03.2026", "filename": "patches/7.41a.html"},
     {"version": "7.41",  "date": "24.03.2026", "filename": "patches/7.41.html"},
+    # 7.40 cycle
     {"version": "7.40c", "date": "21.01.2026", "filename": "patches/7.40c.html"},
     {"version": "7.40b", "date": "23.12.2025", "filename": "patches/7.40b.html"},
     {"version": "7.40",  "date": "15.12.2025", "filename": "patches/7.40.html"},
+    # 7.39 cycle
     {"version": "7.39e", "date": "02.10.2025", "filename": "patches/7.39e.html"},
     {"version": "7.39d", "date": "05.08.2025", "filename": "patches/7.39d.html"},
     {"version": "7.39c", "date": "24.06.2025", "filename": "patches/7.39c.html"},
     {"version": "7.39b", "date": "29.05.2025", "filename": "patches/7.39b.html"},
-    {"version": "7.39",  "date": "21.05.2025", "filename": "patches/7.39.html"},
-    {"version": "7.08",  "date": "01.02.2018", "filename": "patches/7.08.html"},
-]
-
-# Includes patches without HTML (e.g. 7.41a) — used only for "days between" math.
-# Major-patch dates from odota/dotaconstants. Sub-patches sourced from Liquipedia
-# and Fandom. Append new entries here when patches release; sorted internally.
-RELEASE_HISTORY = [
-    # 7.41 cycle
-    {"version": "7.41d", "date": "04.06.2026"},
-    {"version": "7.41c", "date": "06.05.2026"},
-    {"version": "7.41b", "date": "07.04.2026"},
-    {"version": "7.41a", "date": "28.03.2026"},
-    {"version": "7.41",  "date": "24.03.2026"},
-    # 7.40 cycle
-    {"version": "7.40c", "date": "21.01.2026"},
-    {"version": "7.40b", "date": "23.12.2025"},
-    {"version": "7.40",  "date": "15.12.2025"},
-    # 7.39 cycle
-    {"version": "7.39e", "date": "02.10.2025"},
-    {"version": "7.39d", "date": "05.08.2025"},
-    {"version": "7.39c", "date": "24.06.2025"},
-    {"version": "7.39b", "date": "29.05.2025"},
     {"version": "7.39",  "date": "21.05.2025", "filename": "patches/7.39.html"},
     # 7.38 cycle
     {"version": "7.38c", "date": "27.03.2025"},
@@ -163,8 +147,11 @@ RELEASE_HISTORY = [
     {"version": "7.11",  "date": "15.03.2018"},
     {"version": "7.10",  "date": "01.03.2018"},
     {"version": "7.09",  "date": "15.02.2018"},
-    {"version": "7.08",  "date": "01.02.2018"},
+    {"version": "7.08",  "date": "01.02.2018", "filename": "patches/7.08.html"},
 ]
+
+# Auto-derived: all RELEASE_HISTORY entries that have a patch page.
+PATCHES = [p for p in RELEASE_HISTORY if "filename" in p]
 
 
 def _parse_date(dmy):
