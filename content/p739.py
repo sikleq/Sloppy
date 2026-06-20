@@ -15,19 +15,31 @@ def build():
     W(ul_open())
     W(li("First Spawn Time increased from 15:00 to 20:00", t("BUFF")))
     W(li("Tormentor: Unyielding Shield: Base barrier decreased from 2100 to 2000", b(2100, 2000)))
-    W(li("Tormentor: Unyielding Shield: Barrier regeneration gain per minute of game time decreased from 5 to 3.5", b(5, 3.5), extra=inline_note("At 20 minutes: barrier decreased from 2500 + 140 regen to 2400 + 110 regen. At 40 minutes: barrier decreased from 2900 + 240 regen to 2800 + 180 regen")))
+    W(li_formula("Tormentor: Unyielding Shield: Barrier regeneration gain per minute decreased",
+                 "40 + 3.5 per minute", "40 + 5 per minute",
+                 lambda M: 40 + 3.5 * M, lambda M: 40 + 5.0 * M,
+                 levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
+                 level_prefix='M', rework_badge=False))
     W(ul_close())
     W(subgroup("Roshan"))
     W(ul_open())
     W(li("Slam: Hero Duration increased from 2s to 4s", b(2, 4)))
     W(li("Slam: Non-Hero Duration increased from 4s to 8s", b(4, 8)))
-    W(li("Roar of Retribution: Incoming Damage Buff Duration increased from 8s to 12s", b(8, 12, l=True)))
+    W(li("Roar of Retribution: Incoming Damage Buff Duration increased from 8s to 12s", b(8, 12)))
     W(li("Roar of Retribution: Health Trigger threshold increased from 80% to 85%", b(80, 85)))
     W(li("Roar of Retribution: Now cast even if Roshan is Silenced or Stunned", t("MISC")))
-    W(li("Roar of Retribution: Now gives Roshan a strong dispel on cast", t("MISC")))
-    W(li("Roar of Retribution: Now triggers a message visible to everyone (similar to when Roshan's Banner is planted)", t("MISC")))
-    W(li("Strength of the Immortal: Armor Bonus per minute increased from 0.375 to 0.4", b(0.375, 0.4)))
-    W(li("Strength of the Immortal: Attack Damage Bonus per minute increased from 6 to 7", b(6, 7)))
+    W(li("Roar of Retribution: Now gives Roshan a strong dispel on cast", t("NEW")))
+    W(li("Roar of Retribution: Now triggers a message visible to everyone (similar to when Roshan's Banner is planted)", t("QoL")))
+    W(li_formula("Strength of the Immortal: Armor Bonus per minute increased",
+                 "0.4 per minute", "0.375 per minute",
+                 lambda M: 0.4 * M, lambda M: 0.375 * M,
+                 levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
+                 level_prefix='M', rework_badge=False))
+    W(li_formula("Strength of the Immortal: Attack Damage Bonus per minute increased",
+                 "7 per minute", "6 per minute",
+                 lambda M: 7 * M, lambda M: 6 * M,
+                 levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
+                 level_prefix='M', rework_badge=False))
     W(ul_close())
 
     W(plain_header("Terrain Changes", terrain_link="7.39"))
