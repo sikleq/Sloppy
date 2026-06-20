@@ -53,7 +53,7 @@ def build():
     W(li("The mid Radiant Tier 2 tower has been shifted away from the Triangle, and trees around it have been adjusted", t("MISC")))
     W(li("A juke path has been added to the trees east of the Radiant mid tier 2 tower", t("MISC")))
     W(li("The northern cliff edge, ramps and Hard / Ancient camps of the Radiant triangle have been moved slightly southwest", t("MISC")))
-    W(li("The cliff to the southwest near the ramp to Radiant midlane and the river has been slightly reduced in size", t("NERF")))
+    W(li("The cliff to the southwest near the ramp to Radiant midlane and the river has been slightly reduced in size", t("MISC")))
     W(li("The ramp directly south of the bottom Roshan Pit has been moved north slightly", t("MISC")))
     W(ul_close())
     W(ul_open())
@@ -80,7 +80,7 @@ def build():
     W(ul_open())
     W(li("Watchers now can't be activated before the start of the game", t("MISC")))
     W(li("Watchers no longer display the green AoE ring/potential vision when hovering sentry and observer wards", t("MISC")))
-    W(li("Watchers now only display their potential vision areas when holding Alt", t("MISC")))
+    W(li("Watchers now only display their potential vision areas when holding Alt", t("QoL")))
     W(ul_close())
 
     W(plain_header("General Changes"))
