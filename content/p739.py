@@ -16,8 +16,8 @@ def build():
     W(li("First Spawn Time increased from 15:00 to 20:00", t("BUFF")))
     W(li("Tormentor: Unyielding Shield: Base barrier decreased from 2100 to 2000", b(2100, 2000)))
     W(li_formula("Tormentor: Unyielding Shield: Barrier regeneration gain per minute decreased",
-                 "40 + 3.5 per minute", "40 + 5 per minute",
-                 lambda M: 40 + 3.5 * M, lambda M: 40 + 5.0 * M,
+                 "40 + 5 per minute", "40 + 3.5 per minute",
+                 lambda M: 40 + 5.0 * M, lambda M: 40 + 3.5 * M,
                  levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
                  level_prefix='M', rework_badge=False))
     W(ul_close())
@@ -31,13 +31,13 @@ def build():
     W(li("Roar of Retribution: Now gives Roshan a strong dispel on cast", t("NEW")))
     W(li("Roar of Retribution: Now triggers a message visible to everyone (similar to when Roshan's Banner is planted)", t("QoL")))
     W(li_formula("Strength of the Immortal: Armor Bonus per minute increased",
-                 "0.4 per minute", "0.375 per minute",
-                 lambda M: 0.4 * M, lambda M: 0.375 * M,
+                 "0.375 per minute", "0.4 per minute",
+                 lambda M: 0.375 * M, lambda M: 0.4 * M,
                  levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
                  level_prefix='M', rework_badge=False))
     W(li_formula("Strength of the Immortal: Attack Damage Bonus per minute increased",
-                 "7 per minute", "6 per minute",
-                 lambda M: 7 * M, lambda M: 6 * M,
+                 "6 per minute", "7 per minute",
+                 lambda M: 6 * M, lambda M: 7 * M,
                  levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
                  level_prefix='M', rework_badge=False))
     W(ul_close())
