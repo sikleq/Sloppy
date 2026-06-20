@@ -27,7 +27,7 @@ def build():
     W(li("Slam: Non-Hero Duration increased from 4s to 8s", b(4, 8)))
     W(li("Roar of Retribution: Incoming Damage Buff Duration increased from 8s to 12s", b(8, 12)))
     W(li("Roar of Retribution: Health Trigger threshold increased from 80% to 85%", b(80, 85)))
-    W(li("Roar of Retribution: Now cast even if Roshan is Silenced or Stunned", t("MISC")))
+    W(li("Roar of Retribution: Now cast even if Roshan is Silenced or Stunned", t("NEW")))
     W(li("Roar of Retribution: Now gives Roshan a strong dispel on cast", t("NEW")))
     W(li("Roar of Retribution: Now triggers a message visible to everyone (similar to when Roshan's Banner is planted)", t("QoL")))
     W(li_formula("Strength of the Immortal: Armor Bonus per minute increased",
