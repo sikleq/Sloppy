@@ -7,10 +7,14 @@ def build():
     W(section("General Updates"))
 
     W(plain_header("Terrain Changes", terrain_link="7.39d"))
+    W(subgroup("Trees"))
+    W(ul_open())
+    W(li("Removed several trees from the inside corner of the Dire Safelane small camp", t("DEL")))
+    W(ul_close())
+    W(subgroup("Camps"))
     W(ul_open())
     W(li("Increased spawnboxes of Triangle Ancient camps", t("BUFF")))
     W(li("Fixed a ward spot in Radiant safe lane hard camp", t("MISC")))
-    W(li("Removed several trees from the inside corner of the Dire Safelane small camp", t("DEL")))
     W(ul_close())
 
     # ===== ITEM UPDATES =====

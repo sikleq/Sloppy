@@ -8082,6 +8082,67 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .terrain-subpatch-head::before,
 .terrain-subpatch-head::after { display: none !important; content: none !important; }
+.terrain-list .tsp-hidden,
+li.tsp-hidden { display: none !important; }
+
+/* subpatch arrows (terrain.html) */
+.terrain-subpatch-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 28px;
+  margin: 0 0 10px;
+  padding: 0 0 4px;
+  border-bottom: 1px solid rgba(227,196,106,.2);
+}
+.terrain-subpatch-nav .tsp-label {
+  font-family: 'Jersey 25', monospace;
+  font-size: 1.15rem;
+  color: var(--text-bright);
+  min-width: 48px;
+  text-align: center;
+}
+.tsp-arrow {
+  width: 16px; height: 24px; padding: 0; border: none;
+  background: var(--shadow-28);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 6px 10px;
+  image-rendering: pixelated;
+  box-shadow: inset 0 1px 2px var(--shadow-50);
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
+    0 calc(100% - 2px), 0 2px);
+  cursor: pointer;
+  transition: opacity .15s, filter .15s;
+}
+.tsp-arrow:hover { background-color: var(--shadow-45); filter: brightness(1.2); }
+.tsp-arrow:disabled { opacity: .25; pointer-events: none; }
+.tsp-arrow-left {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 10" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="4" y="0" width="2" height="2"/><rect x="2" y="2" width="4" height="2"/><rect x="0" y="4" width="6" height="2"/><rect x="2" y="6" width="4" height="2"/><rect x="4" y="8" width="2" height="2"/></g></svg>');
+}
+.tsp-arrow-right {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 10" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="0" y="0" width="2" height="2"/><rect x="0" y="2" width="4" height="2"/><rect x="0" y="4" width="6" height="2"/><rect x="0" y="6" width="4" height="2"/><rect x="0" y="8" width="2" height="2"/></g></svg>');
+}
+.terrain-subgroup-head {
+  display: block !important;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 10px 0 4px 0 !important;
+  margin: 0 !important;
+  list-style: none;
+  border: none !important;
+  border-bottom: 1px solid !important;
+  border-image: linear-gradient(to right, var(--bg-panel-4) 0%, var(--bg-panel-4) 61%, transparent 71%) 1 !important;
+  background: none !important;
+}
+.terrain-subgroup-head::before,
+.terrain-subgroup-head::after { display: none !important; content: none !important; }
 /* First change row meets the map's TOP edge: drop the list's 3px top margin
    (from ul.changes) and the first row's 3px top padding — together they pushed
    the first tag ~6px below the map's top border. Specificity beats ul.changes. */

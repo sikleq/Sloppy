@@ -349,19 +349,26 @@ def _terrain_changes_by_patch():
         prev = [h for h in heads if h[0] < off]
         return prev[-1][1] if prev else "?"
 
-    # raw: {patch_ver: [(text, tag), ...]}
+    # raw: {patch_ver: [(text, tag, subgroup), ...]}
     raw = {}
     for hm in re.finditer(r'plain_header\("Terrain Changes"', src):
         i = hm.start()
-        j = src.index("ul_close()", i)
+        # Find end of terrain section: next plain_header, section(), or write_footer
+        end_m = re.search(r'(?:plain_header|section|write_footer)\(', src[i + 1:])
+        j = (i + 1 + end_m.start()) if end_m else len(src)
         block = src[i:j]
         rows = []
-        for seg in block.split("W(li(")[1:]:
-            m = re.match(r'\s*"([^"]*)"', seg)
-            if not m:
+        cur_subgroup = None
+        for line in block.split("\n"):
+            sg = re.search(r'subgroup\("([^"]+)"\)', line)
+            if sg:
+                cur_subgroup = sg.group(1)
                 continue
-            text = m.group(1)
-            rest = seg[m.end():m.end() + 300]
+            li_m = re.search(r'W\(li\(\s*"([^"]*)"', line)
+            if not li_m:
+                continue
+            text = li_m.group(1)
+            rest = line[li_m.end():li_m.end() + 300]
             tm = re.search(r't\("(\w+)"\)', rest)
             if tm:
                 tag = tm.group(1)
@@ -372,7 +379,7 @@ def _terrain_changes_by_patch():
                 tag = "BUFF" if good else "NERF"
             else:
                 tag = "MISC"
-            rows.append((text, tag))
+            rows.append((text, tag, cur_subgroup))
         if rows:
             raw.setdefault(patch_for(i), rows)
 
@@ -438,17 +445,26 @@ def _change_li(text, tag):
 def _changes_html(subpatches, skip_first_head=False):
     """Render change list for one major-version bucket.
 
-    subpatches: [(sub_ver, [(text, tag), ...]), ...]  oldest-first.
+    subpatches: [(sub_ver, [(text, tag, subgroup), ...]), ...]  oldest-first.
+    Rows are 3-tuples (text, tag, subgroup) where subgroup may be None.
     """
     parts = []
     for idx, (sub_ver, rows) in enumerate(subpatches):
-        sorted_rows = sorted(enumerate(rows),
-                             key=lambda it: (_TAG_RANK.get(it[1][1], 9), it[0]))
-        items = "\n".join(_change_li(text, tag) for _i, (text, tag) in sorted_rows)
-        if idx == 0 and skip_first_head:
-            parts.append(items)
-        else:
-            parts.append(f'<li class="terrain-subpatch-head">{sub_ver}</li>\n{items}')
+        if idx > 0 or not skip_first_head:
+            parts.append(f'<li class="terrain-subpatch-head">{sub_ver}</li>')
+        # Group rows by subgroup, preserving order of first appearance
+        from collections import OrderedDict
+        groups = OrderedDict()
+        for i, row in enumerate(rows):
+            text, tag = row[0], row[1]
+            sg = row[2] if len(row) > 2 else None
+            groups.setdefault(sg, []).append((i, text, tag))
+        for sg, sg_rows in groups.items():
+            if sg:
+                parts.append(f'<li class="terrain-subgroup-head">{sg}</li>')
+            sorted_rows = sorted(sg_rows,
+                                 key=lambda it: (_TAG_RANK.get(it[2], 9), it[0]))
+            parts.extend(_change_li(text, tag) for _, text, tag in sorted_rows)
     return "\n".join(parts)
 
 
@@ -638,21 +654,27 @@ def _source_html():
     )
 
 
-def _picker_html(patches, default):
+def _terrain_filename(ver, patches=None):
+    """terrain_<ver_slug>.html for every version."""
+    return f"terrain_{ver.replace('.', '')}.html"
+
+
+def _picker_html(patches, current):
     """Version-picker dropdown styled as nav-context-flat nav-context-materials,
-    matching the aesthetic of non-patch pages while keeping dropdown switching."""
+    matching the aesthetic of non-patch pages while using href links."""
     def _range_label(ver):
         return _RANGE_LABELS.get(ver, ver)
 
     items = []
     for ver in patches:
-        cls = "version-item current" if ver == default else "version-item"
+        cls = "version-item current" if ver == current else "version-item"
+        href = _terrain_filename(ver, patches)
         items.append(
-            f'<a class="{cls}" href="#" data-patch="{ver}" role="menuitem">'
+            f'<a class="{cls}" href="{href}" role="menuitem">'
             f'<span class="vi-name">{_esc(_range_label(ver))}</span>'
             f'</a>')
     label = _site.get_materials_label('terrain') or 'Terrain'
-    default_label = _range_label(default)
+    current_label = _range_label(current)
     return (
         '<div class="nav-context nav-context-flat nav-context-materials nav-context-picker nav-context-terrain">'
         f'<span class="version version-static version-materials">{label}</span>'
@@ -660,7 +682,7 @@ def _picker_html(patches, default):
         '<div class="version-dropdown">'
         '<button class="version version-materials" type="button" '
         'aria-haspopup="true" aria-expanded="false">'
-        f'{default_label} <span class="version-chev">▾</span>'
+        f'{current_label} <span class="version-chev">▾</span>'
         '</button>'
         '<div class="version-menu" role="menu">'
         + "".join(items) +
@@ -690,65 +712,25 @@ def _fallback_html(ver):
     )
 
 
-def save_terrain_html():
-    subnav = _site.render_materials_subnav('terrain')
-
-    by_patch = _terrain_changes_by_patch()
-    # by_patch: {major_ver: [(sub_ver, rows), ...]}
-    patches = sorted(by_patch.keys(), key=_ver_key, reverse=True)
-    if not patches:
-        patches = sorted(_MAP_PAIRS, key=_ver_key, reverse=True) or ["7.41"]
-        by_patch = {p: [] for p in patches}
-    default = patches[0]
-
-    # Patch picker lives in the main nav header (same position as /patches/)
+def _build_terrain_page(ver, patches, by_patch, markers_by_patch, counts_by_patch, subnav):
+    """Build one terrain HTML page for a single map-pair version."""
     nav = _site.render_top_nav('materials', _latest_href(),
                                patch_context=False,
                                subtabs_active='terrain',
-                               picker_html=_picker_html(patches, default),
+                               picker_html=_picker_html(patches, ver),
                                subnav_in_header=False)
 
-    # ---- per-patch marker overlays + tree/camp counts: every patch that ships a
-    # committed terrain_diff_<ver>.json gets the full layer toolbar; the shared
-    # crop meta projects each patch's markers onto its own map identically. ----
-    markers_by_patch, counts_by_patch = {}, {}
-    if SHOW_MARKERS:
-        for ver in _MAP_PAIRS:
-            diff = _load_diff(ver)
-            if diff:
-                markers_by_patch[ver], counts_by_patch[ver] = _markers_svg(diff, ver.replace(".", ""))
+    if ver in _MAP_PAIRS:
+        ov, nv = _MAP_PAIRS[ver]
+        map_inner = _compare_html(ov, nv, markers_by_patch.get(ver, ""))
+    else:
+        map_inner = _fallback_html(ver)
 
-    # ---- map panes (one per patch): the swipe slider where we have a map pair,
-    # the "not available yet" fallback otherwise. ----
-    map_panes = []
-    for ver in patches:
-        hidden = "" if ver == default else " hidden"
-        if ver in _MAP_PAIRS:
-            ov, nv = _MAP_PAIRS[ver]
-            inner = _compare_html(ov, nv, markers_by_patch.get(ver, ""))
-        else:
-            inner = _fallback_html(ver)
-        map_panes.append(
-            f'<div class="terrain-map-pane" data-patch="{ver}"{hidden}>\n'
-            f'{inner}</div>\n')
+    counts_html = _counts_html(counts_by_patch.get(ver, {}))
+    subs = by_patch.get(ver, [])
+    first_ver = subs[0][0] if subs else ver
 
-    # ---- change-list panes (one per patch): list + counts (counts only for the
-    # patch whose map diff we have). The single heading (with the patch picker)
-    # sits above all panes. ----
-    list_panes = []
-    for ver in patches:
-        hidden = "" if ver == default else " hidden"
-        counts_html = _counts_html(counts_by_patch.get(ver, {}))
-        subs = by_patch[ver]
-        first_ver = subs[0][0] if subs else ver
-        list_panes.append(
-            f'<div class="terrain-list-pane" data-patch="{ver}"{hidden}>\n'
-            f'<div class="terrain-subpatch-head terrain-subpatch-top">{_esc(first_ver)}</div>\n'
-            f'<ul class="changes terrain-list">\n{_changes_html(subs, skip_first_head=True)}\n</ul>\n'
-            f'{counts_html}'
-            '</div>\n')
-
-    page = (
+    return (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         '<title>SIKLE | Terrain</title>\n'
@@ -775,26 +757,52 @@ def save_terrain_html():
         'right.</p>\n'
         '<div class="terrain-wrap">\n'
         '<div class="terrain-compare-col">\n'
-        f'{"".join(map_panes)}'
+        f'<div class="terrain-map-pane" data-patch="{ver}">\n'
+        f'{map_inner}</div>\n'
         f'{_source_html()}'
         '</div>\n'
         '<div class="terrain-list-box">\n'
-        f'{"".join(list_panes)}'
+        f'<div class="terrain-list-pane" data-patch="{ver}">\n'
+        f'<div class="terrain-subpatch-head terrain-subpatch-top">{_esc(first_ver)}</div>\n'
+        f'<ul class="changes terrain-list">\n{_changes_html(subs, skip_first_head=True)}\n</ul>\n'
+        f'{counts_html}'
         '</div>\n'
         '</div>\n'
-        '</div>\n'   # close .creeps-scroll
-        '</div>\n'   # close .creeps-page
+        '</div>\n'
+        '</div>\n'
+        '</div>\n'
         f'<script src="src/scripts.js?v={ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
     )
+
+
+def save_terrain_html():
+    subnav = _site.render_materials_subnav('terrain')
+
+    by_patch = _terrain_changes_by_patch()
+    patches = sorted(by_patch.keys(), key=_ver_key, reverse=True)
+    if not patches:
+        patches = sorted(_MAP_PAIRS, key=_ver_key, reverse=True) or ["7.41"]
+        by_patch = {p: [] for p in patches}
+
+    markers_by_patch, counts_by_patch = {}, {}
+    if SHOW_MARKERS:
+        for ver in _MAP_PAIRS:
+            diff = _load_diff(ver)
+            if diff:
+                markers_by_patch[ver], counts_by_patch[ver] = _markers_svg(diff, ver.replace(".", ""))
+
     _os.makedirs(_site.DIST_DIR, exist_ok=True)
-    out = _os.path.join(_site.DIST_DIR, "terrain.html")
-    with open(out, "w", encoding="utf-8") as f:
-        f.write(page)
     total = sum(len(rows) for subs in by_patch.values() for _, rows in subs)
-    print(f"  -> dist/terrain.html: {len(page):,} bytes "
-          f"({len(patches)} patches, {total} terrain changes; "
-          f"default {default})")
+    for ver in patches:
+        page = _build_terrain_page(ver, patches, by_patch,
+                                   markers_by_patch, counts_by_patch, subnav)
+        fname = _terrain_filename(ver, patches)
+        out = _os.path.join(_site.DIST_DIR, fname)
+        with open(out, "w", encoding="utf-8") as f:
+            f.write(page)
+        print(f"  -> dist/{fname}: {len(page):,} bytes")
+    print(f"     ({len(patches)} terrain pages, {total} total changes)")
 
 
 if __name__ == "__main__":

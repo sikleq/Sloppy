@@ -488,8 +488,19 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False):
         eid = ''
     link_html = ''
     if terrain_link:
+        _TERRAIN_BUCKETS = {"7.41": "terrain_741.html", "7.40": "terrain_740.html"}
+        import re as _re
+        _maj = _re.match(r'(\d+\.\d+)', terrain_link)
+        _maj_ver = _maj.group(1) if _maj else terrain_link
+        _sorted_buckets = sorted(_TERRAIN_BUCKETS.keys(),
+                                 key=lambda v: [int(x) for x in v.split(".")])
+        _tfile = "terrain.html"
+        for _bk in _sorted_buckets:
+            if [int(x) for x in _bk.split(".")] >= [int(x) for x in _maj_ver.split(".")]:
+                _tfile = _TERRAIN_BUCKETS[_bk]
+                break
         link_html = (
-            f'<a class="terrain-jump-btn" href="../terrain.html?patch={terrain_link}" '
+            f'<a class="terrain-jump-btn" href="../{_tfile}" '
             f'title="See these changes on the map">'
             f'<img src="../icons/ui/gothic/icon_terrain.png" alt="" width="16" height="16">'
             f'<span>View on map</span></a>')

@@ -89,7 +89,7 @@ MATERIALS_GROUPS = [
         ("hero_lab",     "Hero Lab",      "hero_lab.html"),
         ("heroes_dyn",   "Hero Dynamics", "heroes_dyn.html"),
     ]),
-    ("terrain", "Terrain", "terrain.html", None),
+    ("terrain", "Terrain", "terrain_741.html", None),
 ]
 
 

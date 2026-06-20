@@ -4591,41 +4591,69 @@
     }
   }
 
-  // ---- PATCH PICKER (terrain.html) — version-dropdown structure matching
-  // patch pages; switching it swaps the visible map pane + change-list pane. ----
-  function initTerrainPicker() {
-    const dropdown = document.querySelector('.nav-context-terrain .version-dropdown');
-    if (!dropdown) return;
-    const btn = dropdown.querySelector('button.version');
-    const menu = dropdown.querySelector('.version-menu');
-    const opts = [...menu.querySelectorAll('.version-item')];
-    const open = () => { dropdown.classList.add('is-open'); btn.setAttribute('aria-expanded', 'true'); };
-    const close = () => { dropdown.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); };
-    const select = (ver) => {
-      var picked = opts.find(function(o) { return o.dataset.patch === ver; });
-      btn.childNodes[0].textContent = (picked ? picked.textContent.trim() : ver) + ' ';
-      opts.forEach(o => { o.classList.toggle('current', o.dataset.patch === ver); });
-      document.querySelectorAll('.terrain-map-pane, .terrain-list-pane')
-        .forEach(p => { p.hidden = (p.dataset.patch !== ver); });
-    };
-    btn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.contains('is-open') ? close() : open(); });
-    opts.forEach(o => o.addEventListener('click', e => { e.preventDefault(); select(o.dataset.patch); close(); }));
-    document.addEventListener('click', e => { if (!dropdown.contains(e.target)) close(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
-
-    // Deep-link: ?patch=<ver> (from a patch page's "View on map" button)
-    const wanted = new URLSearchParams(location.search).get('patch');
-    if (wanted && opts.some(o => o.dataset.patch === wanted)) select(wanted);
+  function initSubpatchPicker() {
+    document.querySelectorAll('.terrain-list-pane').forEach(function(pane) {
+      var ul = pane.querySelector('.terrain-list');
+      if (!ul) return;
+      var items = [].slice.call(ul.children);
+      var topHead = pane.querySelector('.terrain-subpatch-top');
+      if (!topHead) return;
+      var topVer = topHead.textContent.trim();
+      var groups = [];
+      var cur = { ver: topVer, items: [] };
+      items.forEach(function(li) {
+        if (li.classList.contains('terrain-subpatch-head') && !li.classList.contains('terrain-subpatch-top')) {
+          groups.push(cur);
+          cur = { ver: li.textContent.trim(), items: [] };
+          li.classList.add('tsp-hidden');
+        } else if (!li.classList.contains('terrain-subpatch-top')) {
+          cur.items.push(li);
+        }
+      });
+      groups.push(cur);
+      var idx = 0;
+      var nav = document.createElement('div');
+      nav.className = 'terrain-subpatch-nav';
+      var btnL = document.createElement('button');
+      btnL.className = 'tsp-arrow tsp-arrow-left';
+      btnL.setAttribute('aria-label', 'Newer subpatch');
+      var label = document.createElement('span');
+      label.className = 'tsp-label';
+      label.textContent = topVer;
+      var btnR = document.createElement('button');
+      btnR.className = 'tsp-arrow tsp-arrow-right';
+      btnR.setAttribute('aria-label', 'Older subpatch');
+      nav.appendChild(btnL);
+      nav.appendChild(label);
+      nav.appendChild(btnR);
+      topHead.replaceWith(nav);
+      function show(i) {
+        idx = i;
+        groups.forEach(function(g, gi) {
+          var vis = (gi === i);
+          g.items.forEach(function(li) {
+            if (vis) li.classList.remove('tsp-hidden');
+            else li.classList.add('tsp-hidden');
+          });
+        });
+        label.textContent = groups[i].ver;
+        btnL.disabled = (i === 0);
+        btnR.disabled = (i === groups.length - 1);
+      }
+      show(0);
+      btnL.addEventListener('click', function() { if (idx > 0) show(idx - 1); });
+      btnR.addEventListener('click', function() { if (idx < groups.length - 1) show(idx + 1); });
+    });
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       initTerrainCompare();
-      initTerrainPicker();
+      initSubpatchPicker();
     });
   } else {
     initTerrainCompare();
-    initTerrainPicker();
+    initSubpatchPicker();
   }
 })();
 
