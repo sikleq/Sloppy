@@ -100,7 +100,7 @@ def main() -> int:
         cmd = [sys.executable, script]
         if latest and key == "patch":
             cmd.append("--latest")
-        result = subprocess.run(cmd)
+        result = subprocess.run(cmd, cwd=Path(__file__).parent)
         elapsed = time.monotonic() - t
         status = "OK" if result.returncode == 0 else "FAIL"
         print(f"  [{status}] {elapsed:.1f}s")

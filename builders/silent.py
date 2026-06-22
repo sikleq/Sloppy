@@ -21,9 +21,14 @@ import os
 import sys
 from pathlib import Path
 
-_HERE = Path(__file__).parent.parent
+_HERE = Path(__file__).resolve().parent.parent
 DATA_DIR = _HERE / "data" / "stats"
 OUT_DIR = _HERE / "dist" / "patches" / "silent"
+
+# When this file is executed as `python builders/silent.py`, Python puts the
+# `builders/` directory first on sys.path. That shadows the real `patch/`
+# package with `builders/patch.py`, so force the repo root to the front.
+sys.path.insert(0, str(_HERE))
 
 # Import from canonical source instead of maintaining a duplicate list.
 from patch.meta import RELEASE_HISTORY as _RH
