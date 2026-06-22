@@ -59,10 +59,10 @@ def save_creeps_html():
         return
 
     # ---- Source files ----
-    UNITS_PATH = _os.path.join(_HERE,
-                                'data', 'stats', '7.41c', 'units.json')
-    NPC_KV_PATH = _os.path.join(_HERE,
-                                 'data', 'stats', '7.41c', 'npc_units.txt')
+    from patch.meta import latest_stats_version as _lsv
+    _ver = _lsv()
+    UNITS_PATH = _os.path.join(_HERE, 'data', 'stats', _ver, 'units.json')
+    NPC_KV_PATH = _os.path.join(_HERE, 'data', 'stats', _ver, 'npc_units.txt')
     ABIL_SLIM_PATH = _os.path.join(_HERE,
                                     'data', 'abilities_slim.json')
     units = _json.loads(open(UNITS_PATH, encoding='utf-8').read()) \

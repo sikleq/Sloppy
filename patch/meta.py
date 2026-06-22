@@ -318,6 +318,34 @@ def _current_version():
     return sorted(RELEASE_HISTORY, key=lambda p: _parse_date(p["date"]))[-1]["version"]
 
 
+import pathlib as _pathlib
+
+_STATS_DIR = _pathlib.Path(__file__).resolve().parent.parent / "data" / "stats"
+
+
+def latest_stats_version() -> str:
+    """Return the newest version that has a data/stats/<ver>/ folder."""
+    if not _STATS_DIR.is_dir():
+        return _current_version()
+    folders = [d.name for d in _STATS_DIR.iterdir() if d.is_dir()]
+    if not folders:
+        return _current_version()
+    by_date = {p["version"]: _parse_date(p["date"]) for p in RELEASE_HISTORY}
+    known = [f for f in folders if f in by_date]
+    if not known:
+        return folders[-1]
+    return max(known, key=lambda v: by_date[v])
+
+
+def latest_patch_filename() -> str:
+    """Return the filename of the latest patch page (e.g. 'patches/7.41d.html')."""
+    v = _current_version()
+    for p in RELEASE_HISTORY:
+        if p["version"] == v and "filename" in p:
+            return p["filename"]
+    return f"patches/{v}.html"
+
+
 def _prev_patch_version(version):
     """Return the version string of the patch before `version` in RELEASE_HISTORY,
     or None if `version` is the oldest."""

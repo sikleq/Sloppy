@@ -266,12 +266,14 @@ def _markers_svg(diff, pair_id="default"):
 
 def _latest_href():
     """Latest patch page href for the Changelogs nav tab (from site_meta.json)."""
+    from patch.meta import latest_patch_filename as _lpf
+    _fallback = _lpf()
     meta_path = _os.path.join(_HERE, "data", "site_meta.json")
     try:
         meta = _json.loads(open(meta_path, encoding="utf-8").read())
-        return meta.get("latest_patch_filename", "patches/7.41c.html")
+        return meta.get("latest_patch_filename", _fallback)
     except Exception:
-        return "patches/7.41c.html"
+        return _fallback
 
 
 # ---- terrain change list -----------------------------------------------------

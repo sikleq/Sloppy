@@ -25,19 +25,9 @@ _HERE = Path(__file__).parent.parent
 DATA_DIR = _HERE / "data" / "stats"
 OUT_DIR = _HERE / "dist" / "patches" / "silent"
 
-# Newest-first. Mirrors RELEASE_HISTORY in fetch_stats.py; kept inline so this
-# script has no cross-file dependency.
-RELEASE_HISTORY = [
-    "7.41c", "7.41b", "7.41a", "7.41",
-    "7.40c", "7.40b", "7.40",
-    "7.39e", "7.39d", "7.39c", "7.39b", "7.39",
-    "7.38c", "7.38b", "7.38",
-    "7.37e", "7.37d", "7.37c", "7.37b", "7.37",
-    "7.36c", "7.36b", "7.36a", "7.36",
-    "7.35d", "7.35c", "7.35b", "7.35",
-    "7.34e", "7.34d", "7.34c", "7.34b", "7.34",
-    "7.33e", "7.33d", "7.33c", "7.33b", "7.33",
-]
+# Import from canonical source instead of maintaining a duplicate list.
+from patch.meta import RELEASE_HISTORY as _RH
+RELEASE_HISTORY = [p["version"] for p in _RH]
 
 # Field-path patterns we suppress as engine-noise: visual FX, sound events,
 # animation hooks, particle resource paths. Matched case-insensitively against

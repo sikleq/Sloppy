@@ -1,54 +1,64 @@
 """
 Main build orchestrator — runs all patch + support page generators.
-Split into modules under patch/ and content/. See patch/ directory.
+Auto-discovers content/p*.py modules and builds them in chronological order
+derived from patch/meta.py RELEASE_HISTORY.
 """
-import sys, io
+import importlib
+import re
+import sys
+import io
 from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_HERE))
 
-import content.p708
-import content.p739
-import content.p739b
-import content.p739c
-import content.p739d
-import content.p739e
-import content.p740
-import content.p740b
-import content.p740c
-import content.p741
-import content.p741a
-import content.p741b
-import content.p741c
-import content.p741d
-
+from patch.meta import RELEASE_HISTORY, _parse_date
 from patch.rosters import build_rosters
 from patch.calendar import save_calendar_html
 from patch.index_page import save_index_html
 
+_STEM_RE = re.compile(r'^p(\d)(\d{2})([a-z]?)$')
+
+
+def _stem_to_version(stem):
+    """p741d → '7.41d', p708 → '7.08'."""
+    m = _STEM_RE.match(stem)
+    if not m:
+        return None
+    major, minor, letter = m.group(1), m.group(2), m.group(3)
+    return f"{major}.{minor}{letter}"
+
+
+def _discover_modules():
+    """Return content modules sorted oldest-first by RELEASE_HISTORY date."""
+    by_date = {p["version"]: _parse_date(p["date"]) for p in RELEASE_HISTORY}
+    modules = []
+    for path in sorted(Path(_HERE / "content").glob("p*.py")):
+        stem = path.stem
+        ver = _stem_to_version(stem)
+        if ver is None:
+            continue
+        mod = importlib.import_module(f"content.{stem}")
+        if not hasattr(mod, "build"):
+            continue
+        date = by_date.get(ver)
+        modules.append((date, ver, mod))
+    modules.sort(key=lambda x: (x[0] or __import__("datetime").date.min, x[1]))
+    return modules
+
+
 if __name__ == '__main__':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
+    all_modules = _discover_modules()
+
     if "--latest" in sys.argv:
-        # Local dev shortcut: only the newest patch, skip calendar/index/rosters
-        content.p741d.build()
+        if all_modules:
+            _, ver, mod = all_modules[-1]
+            mod.build()
     else:
-        # Build oldest-first (dynamics accumulate chronologically)
-        content.p708.build()
-        content.p739.build()
-        content.p739b.build()
-        content.p739c.build()
-        content.p739d.build()
-        content.p739e.build()
-        content.p740.build()
-        content.p740b.build()
-        content.p740c.build()
-        content.p741.build()
-        content.p741a.build()
-        content.p741b.build()
-        content.p741c.build()
-        content.p741d.build()
+        for _, ver, mod in all_modules:
+            mod.build()
 
         build_rosters()
         save_calendar_html()

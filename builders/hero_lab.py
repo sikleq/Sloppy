@@ -35,13 +35,94 @@ from heroes_stats import (
 
 _esc = lambda s: _html.escape(str(s), quote=True)
 
+_LOC_RE = _re.compile(r'"([^"]+)"\s+"((?:[^"\\]|\\.)*)"')
+
+
+def _load_item_tooltips() -> dict[str, dict]:
+    """Parse abilities_english.txt for item tooltip data (desc, lore, stat labels)."""
+    path = _HERE / "data" / "abilities_english.txt"
+    if not path.exists():
+        return {}
+    text = path.read_text(encoding="utf-8")
+    entries: dict[str, str] = {}
+    for m in _LOC_RE.finditer(text):
+        k, v = m.group(1), m.group(2).replace('\\"', '"')
+        entries[k.lower()] = v
+    out: dict[str, dict] = {}
+    prefix = "dota_tooltip_ability_"
+    for key, val in entries.items():
+        if not key.startswith(prefix + "item_"):
+            continue
+        rest = key[len(prefix):]  # e.g. "item_cyclone_description"
+        if rest.endswith("_description"):
+            item_id = rest[:-len("_description")]
+            out.setdefault(item_id, {})["desc"] = val
+        elif rest.endswith("_lore"):
+            pass
+    # Collect stat labels — match attr keys to known item ids
+    attr_keys: list[tuple[str, str]] = []  # (rest, val)
+    for key, val in entries.items():
+        if not key.startswith(prefix + "item_"):
+            continue
+        rest = key[len(prefix):]
+        if rest.endswith("_description") or rest.endswith("_lore"):
+            continue
+        if "_note" in rest or "_searchalias" in rest or ":f" in rest or "_bound" in rest:
+            continue
+        attr_keys.append((rest, val))
+    # Build a set of all known item ids from the first pass
+    all_item_ids = set(out.keys())
+    # Also discover enchantment items from name keys
+    name_prefix = "dota_tooltip_ability_"
+    for key in entries:
+        if key.startswith(name_prefix + "item_enhancement_") and "_" not in key[len(name_prefix) + len("item_enhancement_"):].lstrip("abcdefghijklmnopqrstuvwxyz0123456789_"):
+            rest = key[len(name_prefix):]
+            if not rest.endswith("_description") and not rest.endswith("_lore") and "_note" not in rest and ":f" not in rest:
+                all_item_ids.add(rest)
+    # Match item names exactly from the Tooltip_Ability entries (the name-only keys)
+    for key, val in entries.items():
+        if key.startswith(name_prefix + "item_") and val and "_" not in key[len(name_prefix):].replace("item_", "", 1).replace("enhancement_", "").replace("_", "X", 0):
+            pass
+    # Simple approach: for each attr key, find the longest known item_id prefix
+    for rest, val in attr_keys:
+        best = ""
+        for item_id in all_item_ids:
+            if rest.startswith(item_id + "_") and len(item_id) > len(best):
+                best = item_id
+        if not best:
+            # Try to match as item_enhancement_X_statname
+            parts = rest.split("_")
+            if len(parts) >= 4 and parts[0] == "item" and parts[1] == "enhancement":
+                candidate = "_".join(parts[:3])
+                best = candidate
+                all_item_ids.add(candidate)
+        if best:
+            out.setdefault(best, {}).setdefault("attribs", []).append(val)
+    return out
+
+
+def _load_item_npedesc() -> dict[str, str]:
+    """Parse dota_english.txt for item short descriptions (npedesc)."""
+    path = _HERE / "data" / "dota_english.txt"
+    if not path.exists():
+        return {}
+    text = path.read_text(encoding="utf-8")
+    out: dict[str, str] = {}
+    for m in _LOC_RE.finditer(text):
+        k, v = m.group(1), m.group(2)
+        if k.endswith("_npedesc") and k.startswith("item_"):
+            out["item_" + k.removesuffix("_npedesc").removeprefix("item_")] = v
+    return out
+
 
 def _latest_href() -> str:
+    from patch.meta import latest_patch_filename as _lpf
+    _fallback = _lpf()
     try:
         meta = _json.loads((_HERE / "data" / "site_meta.json").read_text(encoding="utf-8"))
-        return meta.get("latest_patch_filename", "patches/7.41d.html")
+        return meta.get("latest_patch_filename", _fallback)
     except Exception:
-        return "patches/7.41d.html"
+        return _fallback
 
 
 def _num(v) -> float:
@@ -93,12 +174,14 @@ def _load_item_meta() -> dict[str, dict]:
 def _flatten_special(d: dict) -> dict[str, object]:
     out: dict[str, object] = {}
 
-    def walk(node):
+    def walk(node, parent_key: str = ""):
         if not isinstance(node, dict):
             return
         for k, v in node.items():
             if isinstance(v, dict):
-                walk(v)
+                if "value" in v and parent_key == "":
+                    out.setdefault(k, v["value"])
+                walk(v, k)
             elif k not in out:
                 out[k] = v
 
@@ -145,9 +228,29 @@ def _item_bonus(fields: dict) -> dict[str, float]:
     }
 
 
+def _resolve_pct(desc: str, fields: dict) -> str:
+    """Replace %var% placeholders in tooltip descriptions with actual values."""
+    def _repl(m):
+        key = m.group(1)
+        if key.startswith("d") and key[1:] in fields:
+            key = key[1:]
+        val = fields.get(key)
+        if val is None:
+            return m.group(0)
+        s = str(val).split(" ")[0]
+        try:
+            n = float(s)
+            return str(int(n)) if n == int(n) else s
+        except (ValueError, TypeError):
+            return s
+    return _re.sub(r"%([a-zA-Z_][a-zA-Z0-9_]*)%", _repl, desc)
+
+
 def _load_items(version: str) -> list[dict]:
     names = _load_item_names()
     meta_by_id = _load_item_meta()
+    tooltips = _load_item_tooltips()
+    npedesc = _load_item_npedesc()
     items_json_path = STATS_DIR / version / "items.json"
     costs = _json.loads(items_json_path.read_text(encoding="utf-8")) if items_json_path.exists() else {}
     root = parse_kv((STATS_DIR / version / "items.txt").read_text(encoding="utf-8"))
@@ -177,7 +280,7 @@ def _load_items(version: str) -> list[dict]:
         icon = f"icons/items/{slug}.png"
         if not (_HERE / icon).exists():
             icon = f"icons/items/{item}.png"
-        out.append({
+        rec: dict = {
             "id": item,
             "slug": slug,
             "name": label,
@@ -187,7 +290,132 @@ def _load_items(version: str) -> list[dict]:
             "category": meta.get("category"),
             "tier": meta.get("tier"),
             "bonus": bonus,
-        })
+        }
+        tt = tooltips.get(item, {})
+        cd = _num(fields.get("AbilityCooldown", 0))
+        mc = _num(fields.get("AbilityManaCost", 0))
+        cr = _num(fields.get("AbilityCastRange", 0))
+        disp = fields.get("SpellDispellableType", "")
+        disp_map = {
+            "SPELL_DISPELLABLE_YES": "Yes",
+            "SPELL_DISPELLABLE_YES_STRONG": "Strong Dispels Only",
+            "SPELL_DISPELLABLE_NO": "No",
+        }
+        tip: dict = {}
+        raw_desc = tt.get("desc", "")
+        if raw_desc:
+            resolved = _resolve_pct(raw_desc, fields)
+            resolved = resolved.replace("%%", "%")
+            tip["desc"] = resolved
+        if cd > 0:
+            tip["cd"] = cd if cd != int(cd) else int(cd)
+        if mc > 0:
+            tip["mc"] = mc if mc != int(mc) else int(mc)
+        if cr > 0:
+            tip["cr"] = cr if cr != int(cr) else int(cr)
+        d = disp_map.get(disp, "")
+        if d:
+            tip["disp"] = d
+        beh = str(fields.get("AbilityBehavior", ""))
+        if "UNIT_TARGET" in beh:
+            tip["target"] = "Unit Target"
+        elif "POINT" in beh:
+            tip["target"] = "Point Target"
+        elif "NO_TARGET" in beh:
+            tip["target"] = "No Target"
+        elif "TOGGLE" in beh:
+            tip["target"] = "Toggle"
+        short = npedesc.get(item, "")
+        if short:
+            tip["short"] = short
+        raw_attribs = tt.get("attribs", [])
+        if raw_attribs:
+            _STAT_NAMES = {
+                "move_speed": "Movement Speed", "movespeed": "Movement Speed",
+                "attack_lifesteal": "Lifesteal", "lifesteal": "Lifesteal",
+                "spell_lifesteal": "Spell Lifesteal",
+                "bonus_night_vision": "Night Vision",
+                "debuff_amp": "Debuff Duration",
+                "spell_amp": "Spell Amplification",
+                "int": "Intelligence", "str": "Strength", "agi": "Agility",
+                "mana_regen": "Mana Regeneration", "move_speed": "Movement Speed",
+            }
+            resolved: list[str] = []
+            for a in raw_attribs:
+                m2 = _re.search(r"\$([a-zA-Z_][a-zA-Z0-9_]*)", a)
+                if m2:
+                    vname = m2.group(1)
+                    # Try exact key, then without underscores, then common alternates
+                    val = fields.get(vname)
+                    if val is None:
+                        val = fields.get(vname.replace("_", ""))
+                    if val is None and vname == "lifesteal":
+                        val = fields.get("attack_lifesteal")
+                    label = _STAT_NAMES.get(vname, vname.replace("_", " ").title())
+                    prefix = a[:m2.start()].replace("%", "").strip()
+                    if val is not None:
+                        s = str(val).split(" ")[0]  # first level value
+                        try:
+                            n = float(s)
+                            ns = str(int(n)) if n == int(n) else s
+                        except (ValueError, TypeError):
+                            ns = s
+                        pct = "%" if "%" in a[:m2.start()] else ""
+                        resolved.append(f"{prefix}{ns}{pct} {label}")
+                    else:
+                        resolved.append(a.replace("$" + vname, label).replace("%", "").strip())
+                elif not a.endswith(":") and "DURATION" not in a.upper():
+                    cleaned = a.replace("%", "").strip()
+                    if cleaned:
+                        # Try to find value for known plain-text attribs
+                        _PLAIN_MAP = {
+                            "+Night Vision": ("bonus_night_vision", "Night Vision", ""),
+                            "+Spell Amplification": ("spell_amp", "Spell Amplification", "%"),
+                        }
+                        pm = _PLAIN_MAP.get(cleaned)
+                        if pm:
+                            fval = fields.get(pm[0])
+                            if fval is not None:
+                                s = str(fval).split(" ")[0]
+                                try:
+                                    n = float(s)
+                                    ns = str(int(n)) if n == int(n) else s
+                                except (ValueError, TypeError):
+                                    ns = s
+                                cleaned = f"+{ns}{pm[2]} {pm[1]}"
+                        resolved.append(cleaned)
+            if resolved:
+                tip["attribs"] = resolved
+        # Fallback: generate attribs from known fields if loc had nothing
+        if "attribs" not in tip:
+            _FIELD_ATTRIBS = {
+                "aoe_bonus": ("Area of Effect", ""),
+                "spell_lifesteal": ("Spell Lifesteal", "%"),
+                "slow_resist": ("Slow Resistance", "%"),
+                "status_resist": ("Status Resistance", "%"),
+                "magic_resist": ("Magic Resistance", "%"),
+                "spell_amp": ("Spell Amplification", "%"),
+                "mana_regen_multiplier": ("Mana Regeneration", "%"),
+                "hp_regen_amplify_percentage": ("HP Regeneration", "%"),
+                "heal_amplify_percentage": ("Heal Amplification", "%"),
+                "attack_lifesteal": ("Lifesteal", "%"),
+            }
+            fallback = []
+            for fk, (flabel, fpct) in _FIELD_ATTRIBS.items():
+                fv = fields.get(fk)
+                if fv is not None:
+                    try:
+                        n = float(str(fv).split(" ")[0])
+                        if abs(n) > 0.001:
+                            ns = str(int(n)) if n == int(n) else str(n)
+                            fallback.append(f"+{ns}{fpct} {flabel}")
+                    except (ValueError, TypeError):
+                        pass
+            if fallback:
+                tip["attribs"] = fallback
+        if tip:
+            rec["tip"] = tip
+        out.append(rec)
     cls_rank = {"regular": 0, "neutral": 1, "enchant": 2}
     cat_rank = {
         "Consumables": 0, "Attributes": 1, "Equipment": 2, "Miscellaneous": 3, "Secret Shop": 4,

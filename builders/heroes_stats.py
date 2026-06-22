@@ -406,7 +406,8 @@ def _gregen(v: float) -> str:
 # values only — never the raw "Base" values. To stay accurate per patch,
 # the value functions need to know WHICH patch they're computing; we thread
 # the version through a module-global set by the history loop and render.
-_CTX_VERSION = ["7.41d"]
+from patch.meta import latest_stats_version as _lsv
+_CTX_VERSION = [_lsv()]
 
 
 def _set_ctx_version(v: str) -> None:
@@ -1612,12 +1613,14 @@ def render_html() -> str:
 
 
 def _latest_href() -> str:
+    from patch.meta import latest_patch_filename as _lpf
+    _fallback = _lpf()
     meta_path = _HERE / "data" / "site_meta.json"
     try:
         meta = _json.loads(meta_path.read_text(encoding="utf-8"))
-        return meta.get("latest_patch_filename", "patches/7.41d.html")
+        return meta.get("latest_patch_filename", _fallback)
     except Exception:
-        return "patches/7.41d.html"
+        return _fallback
 
 
 def main() -> int:

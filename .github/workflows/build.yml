@@ -37,6 +37,54 @@ jobs:
           PYTHONIOENCODING: utf-8
         run: python build_site.py
 
+      - name: Validate normalized patch data
+        run: python tools/validate_data.py
+
+      - name: Audit — content/*.py tag direction
+        run: |
+          python - <<'PY'
+          """Scan content/*.py for b(old,new) where direction word contradicts badge."""
+          import re, sys, pathlib
+
+          # b(old, new) where old < new = increase, old > new = decrease
+          B_RE = re.compile(
+              r'b\(\s*([\d.]+)\s*,\s*([\d.]+)'
+              r'(?:\s*,\s*l\s*=\s*(True|False))?\s*\)'
+          )
+          INCREASED_RE = re.compile(r'\b(increased|raised)\b', re.I)
+          DECREASED_RE = re.compile(r'\b(decreased|lowered)\b', re.I)
+
+          issues = []
+          for p in sorted(pathlib.Path('content').glob('*.py')):
+              for i, line in enumerate(p.read_text(encoding='utf-8').splitlines(), 1):
+                  m = B_RE.search(line)
+                  if not m:
+                      continue
+                  old, new = float(m.group(1)), float(m.group(2))
+                  l_true = m.group(3) == 'True'
+                  if old == new:
+                      continue
+                  went_up = new > old
+                  has_inc = INCREASED_RE.search(line)
+                  has_dec = DECREASED_RE.search(line)
+                  if has_inc and has_dec:
+                      continue
+                  # Word "increased" means value went up. With l=True that's
+                  # a nerf (higher cost=worse); without l=True that's a buff.
+                  # Contradiction: word says up but values went down, or vice versa.
+                  if has_inc and not went_up:
+                      issues.append(f'{p.name}:{i}: "increased" but old > new: {line.strip()[:120]}')
+                  if has_dec and went_up:
+                      issues.append(f'{p.name}:{i}: "decreased" but new > old: {line.strip()[:120]}')
+
+          if issues:
+              print(f'Found {len(issues)} direction contradiction(s):')
+              for iss in issues[:20]:
+                  print(f'  {iss}')
+              sys.exit(1)
+          print(f'OK — no direction contradictions in content/*.py')
+          PY
+
       - name: Audit — BAT rows must use l=True
         run: |
           python - <<'PY'
@@ -87,6 +135,48 @@ jobs:
           if problems:
               for p in problems[:10]: print(' ', p)
               sys.exit(1)
+          PY
+
+      - name: Audit — latest patch coverage across all categories
+        run: |
+          python - <<'PY'
+          import sys, pathlib, re
+
+          sys.path.insert(0, '.')
+          from patch.meta import latest_stats_version, _current_version
+          from builders.patch import _stem_to_version, _STEM_RE
+
+          ver = _current_version()
+          stats_ver = latest_stats_version()
+          problems = []
+
+          # 1. content/p*.py exists for latest version
+          stem_map = {}
+          for p in pathlib.Path('content').glob('p*.py'):
+              v = _stem_to_version(p.stem)
+              if v:
+                  stem_map[v] = p
+          if ver not in stem_map:
+              problems.append(f'Missing content/p*.py for latest patch {ver}')
+
+          # 2. data/stats/<ver>/ has required files
+          stats_dir = pathlib.Path('data/stats') / stats_ver
+          for fn in ('items.txt', 'units.json', 'npc_units.txt'):
+              if not (stats_dir / fn).exists():
+                  problems.append(f'Missing data/stats/{stats_ver}/{fn}')
+
+          # 3. RELEASE_HISTORY entry has filename (patch page will be built)
+          from patch.meta import RELEASE_HISTORY
+          entry = next((p for p in RELEASE_HISTORY if p['version'] == ver), None)
+          if not entry or 'filename' not in entry:
+              problems.append(f'RELEASE_HISTORY entry for {ver} has no "filename"')
+
+          if problems:
+              print(f'Latest patch coverage FAILED for {ver}:')
+              for p in problems:
+                  print(f'  - {p}')
+              sys.exit(1)
+          print(f'OK — latest patch {ver} covered in all categories (stats={stats_ver})')
           PY
 
       - name: Copy static assets into dist

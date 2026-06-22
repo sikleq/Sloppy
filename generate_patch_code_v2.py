@@ -48,7 +48,8 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _HERE)
 try:
     from patch.images import ITEM_SLUG as _KNOWN_ITEM_SLUGS
-except Exception:
+except Exception as _e:
+    print(f'[WARN] patch.images.ITEM_SLUG unavailable: {_e}', file=sys.stderr)
     _KNOWN_ITEM_SLUGS = {}
 
 
@@ -152,7 +153,7 @@ CANONICAL_TAGS = [
     # BUFF first — removing a penalty / restriction is positive (memory rule
     # sloppy_no_longer_penalty_is_buff). Tightly anchored so legitimate DEL
     # phrasings don't accidentally match.
-    (re.compile(r'\bno longer has (?:an? |the )?\w+ (?:penalty|restriction|drawback|downside|debuff slow)\b', re.I), 'BUFF'),
+    (re.compile(r'\bno longer has (?:an? |the )?(?:\w+ ){1,3}(?:penalty|restriction|drawback|downside|debuff slow)\b', re.I), 'BUFF'),
     (re.compile(r'\bno longer (?:reduces|decreases) ', re.I),       'BUFF'),
     (re.compile(r'\bno longer requires (?:a |an )?(?:skill point|mana|charge)', re.I), 'BUFF'),
     # NEW — new mechanic / capability added
@@ -202,21 +203,24 @@ LOWER_IS_BUFF = re.compile(
     r'cooldown|mana ?cost|mana cost|cast (?:point|time)|cast point|cast time'
     r'|gold cost|item cost|recipe cost|total cost|cost'
     r'|base attack time|\bBAT\b'
-    r'|incoming damage|damage taken|status duration|stun resistance'
+    r'|incoming damage|damage taken|damage vulnerability|building damage penalty'
+    r'|status duration|stun resistance'
     r'|magic resistance|attack point|projectile speed.*incoming'
-    r'|penalty'  # higher penalty value = worse for player (memory: sloppy_b_l_flag_direction_audit)
-    r'|(?:intelligence|agility|strength)\s+required'  # attribute requirements on items
-    r'|recharge\s+(?:time|cooldown)'   # charge-based item recharge
-    r'|channel\s+time'                 # channeling cast time
-    r'|activation\s+time'             # activation delay
-    r'|restore\s+time'                # restore/respawn time
+    r'|penalty'
+    r'|(?:intelligence|agility|strength)\s+required'
+    r'|recharge\s+(?:time|cooldown)'
+    r'|channel\s+time'
+    r'|activation\s+time'
+    r'|restore\s+time'
+    r'|respawn\s+time'
     r')\b',
     re.I,
 )
-# Stats that CONTAIN a lower-is-buff keyword but are actually higher=better
 _NOT_LOWER_IS_BUFF = re.compile(
-    r'\bcooldown\s+reduction\b'   # CDR: higher = faster cooldowns = better
-    r'|\bpenalty\s+reduction\b',  # reducing a penalty = good, but the VALUE is still directional
+    r'\bcooldown\s+reduction\b'
+    r'|\bcooldown\s+advance\b'
+    r'|\bmana\s+cost\s+reduction\b'
+    r'|\bpenalty\s+reduction\b',
     re.I,
 )
 
@@ -225,11 +229,15 @@ _NOT_LOWER_IS_BUFF = re.compile(
 # Key = substring to look for (case-insensitive), Value = forced tag.
 # Add here when a generated scaffold consistently gets the wrong tag.
 TAG_OVERRIDES = {
-    "starts with all":          "MISC",   # "Hallowed now starts with all 3 charges" — REWORK heuristic fires on "now"
-    "separate heal reduction":  "MISC",   # "No longer has a separate heal reduction" — consolidation, not removal
-    "health restoration":       "MISC",   # health restore consolidation entries
-    "now shares cooldown":      "MISC",   # shared cooldown = mechanic change, not pure NERF
-    "now has a shared cooldown":"MISC",
+    "starts with all":              "MISC",
+    "separate heal reduction":      "MISC",
+    "health restoration":           "MISC",
+    "now shares cooldown":          "MISC",
+    "now has a shared cooldown":    "MISC",
+    "now requires":                 "REWORK",  # "Now requires X instead of Y"
+    "instead of":                   "REWORK",  # component/requirement swap
+    "respawn time increased":       "NERF",    # "increased" heuristic gives BUFF, but higher respawn = worse
+    "respawn time decreased":       "BUFF",
 }
 
 
@@ -478,20 +486,20 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None):
             last_idx = li_indices[-1]
             old_line = lines[last_idx]
             if 'extra=inline_note' in old_line:
-                # Already has inline_note — append <br> to the existing text.
+                # Already has inline_note — append <br> before closing quote.
                 lines[last_idx] = re.sub(
-                    r'(extra=inline_note\(")(.+?)(")(\)+)(\)+)$',
-                    lambda m: f'{m.group(1)}{m.group(2)}<br>{esc}{m.group(3)}{m.group(4)}{m.group(5)}',
+                    r'(extra=inline_note\(")(.*?)("\)+)$',
+                    lambda m: f'{m.group(1)}{m.group(2)}<br>{esc}{m.group(3)}',
                     old_line, count=1,
                 )
             else:
-                # Insert `, extra=inline_note("text")` BEFORE the final )) of W(li(...)).
-                # Match line tail: `\)\)$` (the closing of inner badge/t() and outer li).
-                lines[last_idx] = re.sub(
-                    r'\)\)$',
-                    lambda m: f', extra=inline_note("{esc}")))',
-                    old_line, count=1,
-                )
+                # Insert `, extra=inline_note("text")` before the W(li(…))
+                # closing parens — match the rightmost "))".
+                i = old_line.rfind('))')
+                if i >= 0:
+                    lines[last_idx] = (
+                        old_line[:i] + f', extra=inline_note("{esc}")))'
+                    )
             last_indent = lvl
             continue
 
@@ -1121,6 +1129,7 @@ _NOW_REQUIRES_RE = re.compile(
 )
 
 
+# NOTE: These regexes are tightly coupled to _emit_li() output format.
 # Two emission shapes for the same semantic case (net cost zero):
 #   A) "Recipe cost X from A to B. Total cost unchanged at C ..." — single string
 #   B) "Recipe cost X from A to B"  +  inline_note("Total cost unchanged ...")
@@ -1660,4 +1669,4 @@ if __name__ == '__main__':
         print('\n--- validating normalized data ---')
         _report(version, validate_patch(version))
     except Exception as e:
-        print(f'(validation skipped: {e})')
+        print(f'[WARN] validation skipped: {e}', file=sys.stderr)

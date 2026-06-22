@@ -3201,6 +3201,19 @@
   };
   const BASIC_SECTIONS = ['Consumables', 'Attributes', 'Equipment', 'Miscellaneous', 'Secret Shop'];
   const UPGRADE_SECTIONS = ['Accessories', 'Support', 'Magical', 'Armor', 'Weapons', 'Armaments'];
+  var SHOP_ORDER = {
+    Consumables: ['clarity','tango','flask','bottle','enchanted_mango','faerie_fire','smoke_of_deceit','tpscroll','ward_sentry','dust','infused_raindrop','blood_grenade','aghanims_shard'],
+    Attributes: ['branches','gauntlets','slippers','mantle','circlet','crown','boots_of_elves','belt_of_strength','ogre_axe','blade_of_alacrity','staff_of_wizardry','robe','ghost','diadem'],
+    Equipment: ['blades_of_attack','broadsword','claymore','javelin','mithril_hammer','orb_of_venom','blight_stone','orb_of_frost','quelling_blade','ring_of_protection','splintmill','chainmail','helm_of_iron_will','blitz_knuckles','gloves','splintmail'],
+    Miscellaneous: ['magic_stick','wind_lace','ring_of_regen','sobi_mask','boots','cloak','fluffy_hat','gem','blink','shadow_amulet','lifesteal','shawl','voodoo_mask','wizard_hat','chasm_stone'],
+    'Secret Shop': ['ring_of_health','void_stone','energy_booster','vitality_booster','point_booster','platemail','talisman_of_evasion','hyperstone','ultimate_orb','demon_edge','mystic_staff','reaver','eagle','relic','tiara_of_selemene','ring_of_tarrasque'],
+    Accessories: ['magic_wand','null_talisman','wraith_band','bracer','soul_ring','orb_of_corrosion','falcon_blade','power_treads','phase_boots','oblivion_staff','pers','mask_of_madness','hand_of_midas','travel_boots','moon_shard','soul_booster'],
+    Support: ['ring_of_basilius','headdress','buckler','urn_of_shadows','tranquil_boots','arcane_boots','pavise','mekansm','spirit_vessel','ancient_janggo','glimmer_cape','holy_locket','solar_crest','pipe','guardian_greaves','boots_of_bearing','essence_distiller'],
+    Magical: ['veil_of_discord','aether_lens','force_staff','rod_of_atos','cyclone','meteor_hammer','ultimate_scepter','orchid','dagon','phylactery','ethereal_blade','octarine_core','refresher','sheepstick','gungir','wind_waker','bloodstone','bloodthorn','angels_demise','crellas_crozier'],
+    Armor: ['buckler','blade_mail','vanguard','helm_of_the_dominator','vladmir','armlet','crimson_guard','black_king_bar','consecrated_wraps','lotus_orb','aeon_disk','shivas_guard','assault','heart','helm_of_the_overlord','sphere'],
+    Weapons: ['lesser_crit','maelstrom','invis_sword','desolator','basher','mage_slayer','bfury','monkey_king_bar','manta','heavens_halberd','radiance','greater_crit','butterfly','silver_edge','satanic','abyssal_blade','mjollnir','rapier','revenants_brooch','nullifier'],
+    Armaments: ['sange','yasha','kaya','witch_blade','diffusal_blade','dragon_lance','echo_sabre','devastator','sange_and_yasha','kaya_and_sange','yasha_and_kaya','harpoon','hurricane_pike','disperser','specialists_array','hydras_breath','skadi','arcane_blink','swift_blink','overwhelming_blink'],
+  };
   const C = {
     hpStr: 22, hprStr: 0.1, mpInt: 12, mprInt: 0.05,
     armorAgi: 1 / 6, mrInt: 0.1, asAgi: 1, uniDmg: 0.45,
@@ -3226,9 +3239,19 @@
     int: heroes.filter(h => h.stats?.attr === 'int'),
     uni: heroes.filter(h => h.stats?.attr === 'uni'),
   };
+  function shopSort(list, cat) {
+    var order = SHOP_ORDER[cat];
+    if (!order) return list;
+    return list.slice().sort(function(a, b) {
+      var ai = order.indexOf(a.slug), bi = order.indexOf(b.slug);
+      if (ai === -1) ai = 9999;
+      if (bi === -1) bi = 9999;
+      return ai - bi;
+    });
+  }
   const itemGroups = {
-    basics: BASIC_SECTIONS.map(name => [name, items.filter(i => i.class === 'regular' && i.category === name)]),
-    upgrades: UPGRADE_SECTIONS.map(name => [name, items.filter(i => i.class === 'regular' && i.category === name)]),
+    basics: BASIC_SECTIONS.map(name => [name, shopSort(items.filter(i => i.class === 'regular' && i.category === name), name)]),
+    upgrades: UPGRADE_SECTIONS.map(name => [name, shopSort(items.filter(i => i.class === 'regular' && i.category === name), name)]),
     neutrals: {
       tiers: [0, 1, 2, 3, 4].map(tier => [tier, items.filter(i => i.class === 'neutral' && i.tier === tier)]),
       enchants: items.filter(i => i.class === 'enchant'),
@@ -3255,7 +3278,9 @@
   const combinePct = vals => (1 - vals.reduce((acc, v) => acc * (1 - Math.max(0, v) / 100), 1)) * 100;
   const iconHtml = (src, name, cls) => `<img class="${cls}" src="${src}" alt="${name}" loading="lazy">`;
   const quickFmt = v => Number(v || 0).toFixed(2).replace(/\.00$/, '');
+  var TIER_TIMES = ['0:00+', '15:00+', '25:00+', '35:00+', '60:00+'];
   const tierLabel = tier => `Tier ${Number(tier) + 1}`;
+  const tierHead = tier => `<span class="hl-tier-label">Tier ${Number(tier) + 1} <span class="hl-tier-time">${TIER_TIMES[tier] || ''}</span></span>`;
 
   function renderPanel(panel, side, heroId) {
     const hero = byHero.get(heroId) || heroes[0];
@@ -3271,6 +3296,7 @@
             </span>
           </div>
           <div class="hl-identity-main"></div>
+          <span class="hl-cost-badge" data-cost-badge title="Total items cost"></span>
         </div>
         <div class="hl-inventory">
           <div class="hl-inv-grid">
@@ -3423,6 +3449,8 @@
     if (hpRegen) hpRegen.textContent = `${vals.hpr >= 0 ? '+' : ''}${quickFmt(vals.hpr)}`;
     if (mpValue) mpValue.textContent = `${fmt(vals.mp)} / ${fmt(vals.mp)}`;
     if (mpRegen) mpRegen.textContent = `${vals.mpr >= 0 ? '+' : ''}${quickFmt(vals.mpr)}`;
+    var costBadge = panel.querySelector('[data-cost-badge]');
+    if (costBadge) { costBadge.textContent = vals.cost ? fmt(vals.cost) + 'g' : ''; }
 
     const slots = JSON.parse(panel.dataset.items || '["","","","","",""]');
     panel.querySelectorAll('.hl-inv-slot').forEach((slotEl, idx) => {
@@ -3437,7 +3465,7 @@
       slotEl.dataset.itemId = itemId;
       slotEl.classList.toggle('is-empty', !item);
       slotEl.innerHTML = item
-        ? `<img src="${item.icon}" alt="${item.name}" loading="lazy"><span class="hl-slot-bevel"></span><span class="hl-slot-glow"></span>`
+        ? `<img src="${item.icon}" alt="${item.name}" loading="lazy"><span class="hl-slot-bevel"></span><span class="hl-slot-glow"></span><button type="button" class="hl-slot-clear" data-clear-slot aria-label="Remove item">×</button>`
         : `${isNeutral ? '<span class="hl-neutral-mark">N</span>' : isEnchant ? '<span class="hl-enchant-mark">E</span>' : ''}<span class="hl-slot-bevel"></span><span class="hl-slot-glow"></span>`;
       slotEl.title = item ? item.name : (isNeutral ? 'Empty neutral slot' : isEnchant ? 'Empty enchantment slot' : 'Empty slot');
     });
@@ -3492,38 +3520,77 @@
     `;
   }
 
+  function neutralSectionMarkup(tier, list, selectedId) {
+    if (!list.length) return '';
+    return `
+      <section class="hl-item-section hl-tier-section">
+        <header>${tierHead(tier)}</header>
+        <div class="hl-item-grid">
+          ${list.map(item => `
+            <button type="button" class="hl-item-tile${item.id === selectedId ? ' is-selected' : ''}" data-item-id="${item.id}" aria-label="${item.name}">
+              <img src="${item.icon}" alt="${item.name}" loading="lazy">
+            </button>`).join('')}
+        </div>
+      </section>
+    `;
+  }
+
   function itemPickerMarkup(selectedId, tab, mode) {
     const neutralOnly = mode === 'neutral';
     const enchantOnly = mode === 'enchant';
-    const currentTab = neutralOnly ? 'neutrals' : enchantOnly ? 'enchants' : (tab || 'basics');
     const neutral = itemGroups.neutrals;
+    if (neutralOnly) {
+      return `
+        <div class="hl-picker-card hl-item-picker-card" role="dialog" aria-modal="true" aria-label="Choose neutral item">
+          <div class="hl-picker-head">
+            <strong>Neutral Items</strong>
+            <div class="hl-picker-actions">
+              <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">×</button>
+            </div>
+          </div>
+          <div class="hl-shop-body hl-neutral-cols">
+            ${neutral.tiers.map(([tier, list]) => '<div class="hl-shop-col">' + neutralSectionMarkup(tier, list, selectedId) + '</div>').join('')}
+          </div>
+        </div>
+      `;
+    }
+    if (enchantOnly) {
+      return `
+        <div class="hl-picker-card hl-item-picker-card hl-enchant-picker" role="dialog" aria-modal="true" aria-label="Choose enchantment">
+          <div class="hl-picker-head">
+            <strong>Enchantments</strong>
+            <div class="hl-picker-actions">
+              <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">×</button>
+            </div>
+          </div>
+          <div class="hl-shop-body hl-enchant-body">
+            ${itemSectionMarkup('Enchantment', neutral.enchants, selectedId)}
+          </div>
+        </div>
+      `;
+    }
+    var curTab = tab || 'basics';
     return `
       <div class="hl-picker-card hl-item-picker-card" role="dialog" aria-modal="true" aria-label="Choose item">
         <div class="hl-picker-head">
-          <strong>Choose Item</strong>
+          <strong>Shop</strong>
           <div class="hl-picker-actions">
-            <button type="button" class="hl-picker-clear" data-item-id="">Empty</button>
-            <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">x</button>
+            <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">×</button>
           </div>
         </div>
-        <div class="hl-shop-tabs">
-          ${((neutralOnly || enchantOnly) ? [[currentTab, neutralOnly ? 'Neutrals' : 'Enchants']] : [['basics', 'Basics'], ['upgrades', 'Upgrades']]).map(([id, label]) => `
-            <button type="button" class="hl-shop-tab${currentTab === id ? ' is-active' : ''}" data-shop-tab="${id}">${label}</button>`).join('')}
-        </div>
-        <div class="hl-shop-body">
-          ${currentTab === 'basics' ? itemGroups.basics.map(([name, list]) => itemSectionMarkup(name, list, selectedId)).join('') : ''}
-          ${currentTab === 'upgrades' ? itemGroups.upgrades.map(([name, list]) => itemSectionMarkup(name, list, selectedId)).join('') : ''}
-          ${currentTab === 'neutrals' ? `
-            <div class="hl-neutrals-layout">
-              <div class="hl-neutrals-tiers">
-                ${neutral.tiers.map(([tier, list]) => itemSectionMarkup(tierLabel(tier), list, selectedId)).join('')}
-              </div>
-              <div class="hl-neutrals-enchants">
-                ${itemSectionMarkup('Enchantment', neutral.enchants, selectedId)}
-              </div>
-            </div>
-          ` : ''}
-          ${currentTab === 'enchants' ? itemSectionMarkup('Enchantment', neutral.enchants, selectedId) : ''}
+        <div class="hl-shop-body hl-shop-4col">
+          <div class="hl-shop-col">
+            ${['Consumables','Equipment','Secret Shop'].map(function(n){ var p=itemGroups.basics.find(function(x){return x[0]===n}); return p?itemSectionMarkup(p[0],p[1],selectedId):''; }).join('')}
+          </div>
+          <div class="hl-shop-col">
+            ${['Attributes','Miscellaneous'].map(function(n){ var p=itemGroups.basics.find(function(x){return x[0]===n}); return p?itemSectionMarkup(p[0],p[1],selectedId):''; }).join('')}
+          </div>
+          <div class="hl-shop-col">
+            ${['Accessories','Magical','Weapons'].map(function(n){ var p=itemGroups.upgrades.find(function(x){return x[0]===n}); return p?itemSectionMarkup(p[0],p[1],selectedId):''; }).join('')}
+          </div>
+          <div class="hl-shop-col">
+            ${['Support','Armor','Armaments'].map(function(n){ var p=itemGroups.upgrades.find(function(x){return x[0]===n}); return p?itemSectionMarkup(p[0],p[1],selectedId):''; }).join('')}
+          </div>
         </div>
       </div>
     `;
@@ -3534,6 +3601,7 @@
     overlay.hidden = true;
     overlay.classList.remove('is-open');
     overlay.innerHTML = '';
+    hideTooltip();
   }
 
   function openHeroPicker(panel) {
@@ -3543,16 +3611,16 @@
     overlay.classList.add('is-open');
   }
 
-  function openItemPicker(panel, slot, tab) {
+  function openItemPicker(panel, slot) {
     const itemsState = JSON.parse(panel.dataset.items || '["","","","","",""]');
     const mode = slot === 'neutral' ? 'neutral' : slot === 'enchant' ? 'enchant' : 'normal';
-    activePicker = { kind: 'item', panel, slot, tab: mode === 'normal' ? (tab || 'basics') : mode, mode };
+    activePicker = { kind: 'item', panel, slot, mode, tab: 'basics' };
     const selectedId = mode === 'neutral'
       ? (panel.dataset.neutralItem || '')
       : mode === 'enchant'
         ? (panel.dataset.enchantItem || '')
         : (itemsState[slot] || '');
-    overlay.innerHTML = itemPickerMarkup(selectedId, activePicker.tab, mode);
+    overlay.innerHTML = itemPickerMarkup(selectedId, null, mode);
     overlay.hidden = false;
     overlay.classList.add('is-open');
   }
@@ -3592,6 +3660,20 @@
       openHeroPicker(heroBtn.closest('.hl-panel'));
       return;
     }
+    const clearBtn = e.target.closest('[data-clear-slot]');
+    if (clearBtn) {
+      e.stopPropagation();
+      var slotEl = clearBtn.closest('.hl-inv-slot');
+      var panel = clearBtn.closest('.hl-panel');
+      if (slotEl && panel) {
+        var sl = slotEl.dataset.slot;
+        if (sl === 'neutral') { panel.dataset.neutralItem = ''; }
+        else if (sl === 'enchant') { panel.dataset.enchantItem = ''; }
+        else { var its = JSON.parse(panel.dataset.items || '["","","","","",""]'); its[Number(sl)] = ''; panel.dataset.items = JSON.stringify(its); }
+        update();
+      }
+      return;
+    }
     const itemBtn = e.target.closest('[data-open-item-picker]');
     if (itemBtn) {
       if (itemBtn.dataset.slot === 'enchant') {
@@ -3615,11 +3697,6 @@
       update();
       return;
     }
-    const tabBtn = e.target.closest('[data-shop-tab]');
-    if (tabBtn && activePicker?.kind === 'item') {
-      openItemPicker(activePicker.panel, activePicker.slot, tabBtn.dataset.shopTab);
-      return;
-    }
     const itemTile = e.target.closest('[data-item-id]');
     if (itemTile && activePicker?.kind === 'item') {
       if (activePicker.slot === 'neutral') {
@@ -3638,6 +3715,156 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !overlay.hidden) closePicker();
   });
+
+  // ---- Item tooltip ----
+  const BONUS_LABELS = {
+    str: 'Strength', agi: 'Agility', int: 'Intelligence',
+    hp: 'Health', mp: 'Mana', hpr: 'Health Regeneration', mpr: 'Mana Regeneration',
+    armor: 'Armor', mr: 'Magic Resistance', evasion: 'Evasion',
+    damage: 'Damage', damageMelee: 'Damage (Melee)', damageRanged: 'Damage (Ranged)',
+    aspd: 'Attack Speed', ms: 'Movement Speed', msMelee: 'Movement Speed (Melee)',
+    msRanged: 'Movement Speed (Ranged)', range: 'Attack Range',
+  };
+  const BONUS_PCT = new Set(['mr', 'evasion']);
+
+  var tipEl = document.createElement('div');
+  tipEl.className = 'hl-tooltip';
+  tipEl.hidden = true;
+  document.body.appendChild(tipEl);
+  var tipCurrentTile = null;
+
+  function cleanDesc(html) {
+    return html
+      .replace(/\\n/g, '<br>')
+      .replace(/\n/g, '<br>')
+      .replace(/<br\s*\/?>\s*<br\s*\/?>/g, '<br>');
+  }
+
+  function buildTooltip(item) {
+    var tip = item.tip || {};
+    var b = item.bonus || {};
+    var lines = [];
+    // Header
+    lines.push('<div class="hlt-head">');
+    lines.push('<img class="hlt-icon" src="' + item.icon + '" alt="">');
+    lines.push('<div class="hlt-title">');
+    lines.push('<span class="hlt-name">' + item.name + '</span>');
+    if (item.cost > 0) lines.push('<span class="hlt-cost"><img class="hlt-gold-icon" src="icons/misc/gold.png" alt=""> ' + item.cost + '</span>');
+    lines.push('</div></div>');
+    // Ability info line
+    var infoLine = [];
+    if (tip.target) infoLine.push('ABILITY: ' + tip.target);
+    if (tip.disp) infoLine.push('DISPELLABLE: ' + tip.disp);
+    if (infoLine.length) lines.push('<div class="hlt-info">' + infoLine.join('<br>') + '</div>');
+    // Bonus stats
+    var stats = [];
+    for (var k in BONUS_LABELS) {
+      var v = b[k];
+      if (v && Math.abs(v) > 0.001) {
+        var formatted = BONUS_PCT.has(k) ? (v > 0 ? '+ ' : '') + v + '%' : (v > 0 ? '+ ' : '') + (v === Math.floor(v) ? v : v.toFixed(1));
+        stats.push('<span class="hlt-stat"><b>' + formatted + '</b> ' + BONUS_LABELS[k] + '</span>');
+      }
+    }
+    if (!stats.length && tip.attribs) {
+      tip.attribs.forEach(function(a) {
+        var m = a.match(/^([+\-]?\s*[\d.]+%?)\s+(.*)/);
+        if (m) stats.push('<span class="hlt-stat"><b>' + m[1] + '</b> ' + m[2] + '</span>');
+        else stats.push('<span class="hlt-stat">' + a + '</span>');
+      });
+    }
+    if (stats.length) lines.push('<div class="hlt-stats">' + stats.join('') + '</div>');
+    // Active/Passive bar + cost icons
+    var costBar = [];
+    if (tip.cr) costBar.push('<span class="hlt-cost-icon hlt-cast-range" title="Cast Range">' + tip.cr + '</span>');
+    if (tip.mc) costBar.push('<span class="hlt-cost-icon hlt-mana-cost" title="Mana Cost">' + tip.mc + '</span>');
+    if (tip.cd) costBar.push('<span class="hlt-cost-icon hlt-cooldown" title="Cooldown">' + tip.cd + '</span>');
+    // Description
+    if (tip.desc) {
+      var desc = cleanDesc(tip.desc);
+      // Extract <h1> headers — there can be multiple (Active + Passive sections)
+      var sections = [];
+      var remaining = desc;
+      var hRe = /<h1>(.*?)<\/h1>/g;
+      var lastIdx = 0;
+      var match;
+      while ((match = hRe.exec(desc)) !== null) {
+        var before = desc.substring(lastIdx, match.index).trim();
+        if (before && sections.length > 0) {
+          sections[sections.length - 1].body = before;
+        }
+        sections.push({ header: match[1], body: '' });
+        lastIdx = match.index + match[0].length;
+      }
+      var tail = desc.substring(lastIdx).trim();
+      if (sections.length > 0) {
+        sections[sections.length - 1].body = tail;
+      }
+      if (sections.length > 0) {
+        var first = true;
+        sections.forEach(function(sec) {
+          var isActive = sec.header.toLowerCase().startsWith('active');
+          lines.push('<div class="hlt-ability-bar' + (isActive ? ' is-active' : ' is-passive') + '">' +
+            '<span class="hlt-ability-name">' + sec.header + '</span>' +
+            (first && costBar.length ? '<span class="hlt-ability-costs">' + costBar.join('') + '</span>' : '') +
+            '</div>');
+          if (sec.body) lines.push('<div class="hlt-desc">' + sec.body + '</div>');
+          first = false;
+        });
+      } else {
+        if (costBar.length) {
+          lines.push('<div class="hlt-ability-bar is-passive"><span class="hlt-ability-costs">' + costBar.join('') + '</span></div>');
+        }
+        lines.push('<div class="hlt-desc">' + remaining + '</div>');
+      }
+    } else if (tip.short && !stats.length) {
+      if (costBar.length) {
+        lines.push('<div class="hlt-ability-bar is-passive"><span class="hlt-ability-costs">' + costBar.join('') + '</span></div>');
+      }
+      lines.push('<div class="hlt-desc">' + tip.short + '</div>');
+    }
+    return lines.join('');
+  }
+
+  function showTooltip(tileEl) {
+    var itemId = tileEl.dataset.itemId;
+    var item = byItem.get(itemId);
+    if (!item) return;
+    tipEl.innerHTML = buildTooltip(item);
+    tipEl.hidden = false;
+    positionTooltip(tileEl);
+  }
+
+  function positionTooltip(anchor) {
+    var r = anchor.getBoundingClientRect();
+    var tw = tipEl.offsetWidth;
+    var th = tipEl.offsetHeight;
+    var left = r.right + 10;
+    var top = r.top;
+    if (left + tw > window.innerWidth - 8) left = r.left - tw - 10;
+    if (top + th > window.innerHeight - 8) top = window.innerHeight - 8 - th;
+    if (top < 8) top = 8;
+    tipEl.style.left = left + 'px';
+    tipEl.style.top = top + 'px';
+  }
+
+  function hideTooltip() { tipEl.hidden = true; tipCurrentTile = null; }
+
+  overlay.addEventListener('pointerover', function(e) {
+    var tile = e.target.closest('.hl-item-tile');
+    if (!tile) return;
+    if (tile !== tipCurrentTile) {
+      tipCurrentTile = tile;
+      showTooltip(tile);
+    }
+  }, true);
+  overlay.addEventListener('pointerout', function(e) {
+    var tile = e.target.closest('.hl-item-tile');
+    if (!tile) return;
+    var related = e.relatedTarget;
+    if (related && tile.contains(related)) return;
+    hideTooltip();
+  }, true);
+
   update();
 })();
 

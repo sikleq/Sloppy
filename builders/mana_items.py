@@ -37,7 +37,8 @@ INT_TO_MAX_MANA = 12.0   # +12 max mana per Int point
 INT_TO_REGEN    = 0.05   # +0.05 mana regen per Int point
 
 # ── Source data ────────────────────────────────────────────────────────────
-ITEMS_TXT = _HERE / "data" / "stats" / "7.41c" / "items.txt"
+from patch.meta import latest_stats_version as _lsv
+ITEMS_TXT = _HERE / "data" / "stats" / _lsv() / "items.txt"
 STATS_ROOT = _HERE / "data" / "stats"
 
 def _load_release_history() -> list[tuple[str, str]]:
@@ -997,13 +998,15 @@ def _latest_href() -> str:
     build_patch.py). The key is `latest_patch_filename` (same one build_creeps
     reads); falls back to the current newest patch if missing."""
     meta_path = _HERE / "data" / "site_meta.json"
+    from patch.meta import latest_patch_filename as _lpf
+    _fallback = _lpf()
     if not meta_path.exists():
-        return "patches/7.41c.html"
+        return _fallback
     try:
         meta = _json.loads(meta_path.read_text(encoding="utf-8"))
-        return meta.get("latest_patch_filename", "patches/7.41c.html")
+        return meta.get("latest_patch_filename", _fallback)
     except Exception:
-        return "patches/7.41c.html"
+        return _fallback
 
 
 def main() -> int:

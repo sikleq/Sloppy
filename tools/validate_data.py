@@ -60,11 +60,17 @@ def _check_change(entity, change, issues):
 
     # HIGH — word/value direction contradiction (only when not explained by
     # lower_is_better or a canonical rework/del/new override).
+    # Skip when BOTH increased AND decreased words appear (ability name
+    # contains a direction word, e.g. "Reduced Damage ... increased").
     if canon is None:
-        if _INCREASED_RE.search(text) and tag == 'nerf' and not lower:
+        has_inc = _INCREASED_RE.search(text)
+        has_dec = _DECREASED_RE.search(text)
+        if has_inc and has_dec:
+            pass  # ambiguous — ability name likely contains a direction word
+        elif has_inc and tag == 'nerf' and not lower:
             issues.append(('HIGH', where,
                            f'"increased" wording but tagged NERF (no lower_is_better): {text}'))
-        if _DECREASED_RE.search(text) and tag == 'buff' and not lower:
+        elif has_dec and tag == 'buff' and not lower:
             issues.append(('HIGH', where,
                            f'"decreased" wording but tagged BUFF (no lower_is_better): {text}'))
 
