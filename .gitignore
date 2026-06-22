@@ -49,7 +49,7 @@ terrain.html
 hero_lab.html
 index.html
 _dynamics.json
-data/site_meta.json
+
 
 # Raw Valve API dumps — fetched ad-hoc via scripts/fetch_*.py for inspection
 # / one-off generation; not load-bearing for the build.
