@@ -5077,6 +5077,11 @@
       });
     });
     // Hero rows are always visible — empty/filter-hidden slots show dashes.
+
+    // Ability divs changing display causes row-height changes; the sticky hero
+    // column repaints at the old height in Chrome's composited layer.
+    // offsetHeight read forces a synchronous layout flush + full repaint.
+    requestAnimationFrame(() => { void table.offsetHeight; });
   }
 
   itemBtns.forEach(btn => btn.addEventListener('click', () => {

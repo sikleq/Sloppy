@@ -8145,12 +8145,12 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   background: rgba(0, 0, 0, 0.12);
   text-align: center;
 }
-/* border-collapse:collapse + position:sticky = Chrome repaint bug (borders vanish
-   when filter toggles hide/show content). Switching to separate+spacing:0 gives
-   each sticky cell its own independent border that always repaints correctly. */
-.mr-table.aoe-table {
-  border-collapse: separate;
-  border-spacing: 0;
+/* Chrome drops border-bottom on sticky cells whenever layout changes (filter
+   toggles, ability div show/hide). box-shadow inset repaints as part of the
+   cell's own layer and is never dropped. Same pattern as .mr-table thead th. */
+.mr-table.aoe-table td.aoe-name {
+  border-bottom: none;
+  box-shadow: inset 0 -1px 0 rgba(48, 54, 61, 0.5);
 }
 .aoe-ability {
   display: grid;

@@ -12,6 +12,7 @@ from .page import _ASSET_VERSION
 # Manual "page" entries in the What's New popup.
 # Date = when the page was added to the site (not Valve's release date).
 _WHATSNEW_PAGES = [
+    ("page",  "AoE Increase",   "Jun 24", "aoe_increase.html"),
     ("page",  "Hero Lab",       "Jun 13", "hero_lab.html"),
     ("page",  "Item Dynamics",  "Jun 5",  "items_dyn.html"),
     ("page",  "Hero Dynamics",  "Jun 3",  "heroes_dyn.html"),
