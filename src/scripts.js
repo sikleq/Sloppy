@@ -5087,7 +5087,9 @@
         const td = tr.querySelector('td.aoe-name');
         if (!td) return;
         td.style.height = '';
+        td.style.width = '';
         td.style.height = tr.offsetHeight + 'px';
+        td.style.width = td.offsetWidth + 'px';
       });
     });
   }
