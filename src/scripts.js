@@ -3372,9 +3372,11 @@
       const it = byItem.get(id);
       if (!it) return;
       const b = it.bonus || {};
-      out.str += Number(b.str) || 0;
-      out.agi += Number(b.agi) || 0;
-      out.int += Number(b.int) || 0;
+      // "All Attributes" feeds every stat; per-attribute bonuses stack on top.
+      const allAttr = Number(b.all) || 0;
+      out.str += (Number(b.str) || 0) + allAttr;
+      out.agi += (Number(b.agi) || 0) + allAttr;
+      out.int += (Number(b.int) || 0) + allAttr;
       out.hp += Number(b.hp) || 0;
       out.mp += Number(b.mp) || 0;
       out.hpr += Number(b.hpr) || 0;
@@ -3718,6 +3720,7 @@
 
   // ---- Item tooltip ----
   const BONUS_LABELS = {
+    all: 'All Attributes',
     str: 'Strength', agi: 'Agility', int: 'Intelligence',
     hp: 'Health', mp: 'Mana', hpr: 'Health Regeneration', mpr: 'Mana Regeneration',
     armor: 'Armor', mr: 'Magic Resistance', evasion: 'Evasion',
@@ -3754,25 +3757,27 @@
     // Ability info line
     var infoLine = [];
     if (tip.target) infoLine.push('ABILITY: ' + tip.target);
+    if (tip.affects) infoLine.push('AFFECTS: ' + tip.affects);
     if (tip.disp) infoLine.push('DISPELLABLE: ' + tip.disp);
     if (infoLine.length) lines.push('<div class="hlt-info">' + infoLine.join('<br>') + '</div>');
-    // Bonus stats
-    var stats = [];
-    for (var k in BONUS_LABELS) {
-      var v = b[k];
-      if (v && Math.abs(v) > 0.001) {
-        var formatted = BONUS_PCT.has(k) ? (v > 0 ? '+ ' : '') + v + '%' : (v > 0 ? '+ ' : '') + (v === Math.floor(v) ? v : v.toFixed(1));
-        stats.push('<span class="hlt-stat"><b>' + formatted + '</b> ' + BONUS_LABELS[k] + '</span>');
+    if (item['class'] !== 'neutral') {
+      var stats = [];
+      for (var k in BONUS_LABELS) {
+        var v = b[k];
+        if (v && Math.abs(v) > 0.001) {
+          var formatted = BONUS_PCT.has(k) ? (v > 0 ? '+ ' : '') + v + '%' : (v > 0 ? '+ ' : '') + (v === Math.floor(v) ? v : v.toFixed(1));
+          stats.push('<span class="hlt-stat"><b>' + formatted + '</b> ' + BONUS_LABELS[k] + '</span>');
+        }
       }
+      if (!stats.length && tip.attribs) {
+        tip.attribs.forEach(function(a) {
+          var m = a.match(/^([+\-]?\s*[\d.]+%?)\s+(.*)/);
+          if (m) stats.push('<span class="hlt-stat"><b>' + m[1] + '</b> ' + m[2] + '</span>');
+          else stats.push('<span class="hlt-stat">' + a + '</span>');
+        });
+      }
+      if (stats.length) lines.push('<div class="hlt-stats">' + stats.join('') + '</div>');
     }
-    if (!stats.length && tip.attribs) {
-      tip.attribs.forEach(function(a) {
-        var m = a.match(/^([+\-]?\s*[\d.]+%?)\s+(.*)/);
-        if (m) stats.push('<span class="hlt-stat"><b>' + m[1] + '</b> ' + m[2] + '</span>');
-        else stats.push('<span class="hlt-stat">' + a + '</span>');
-      });
-    }
-    if (stats.length) lines.push('<div class="hlt-stats">' + stats.join('') + '</div>');
     // Active/Passive bar + cost icons
     var costBar = [];
     if (tip.cr) costBar.push('<span class="hlt-cost-icon hlt-cast-range" title="Cast Range">' + tip.cr + '</span>');
@@ -3802,12 +3807,15 @@
       if (sections.length > 0) {
         var first = true;
         sections.forEach(function(sec) {
-          var isActive = sec.header.toLowerCase().startsWith('active');
-          lines.push('<div class="hlt-ability-bar' + (isActive ? ' is-active' : ' is-passive') + '">' +
+          var h = sec.header.toLowerCase();
+          var isActive = h.startsWith('active') || h.startsWith('use');
+          // Consumables (Tango/Salve) use the green "Use" header in-game.
+          var barType = (item.consumable && isActive) ? 'is-use' : (isActive ? 'is-active' : 'is-passive');
+          lines.push('<div class="hlt-ability-bar ' + barType + '">' +
             '<span class="hlt-ability-name">' + sec.header + '</span>' +
             (first && costBar.length ? '<span class="hlt-ability-costs">' + costBar.join('') + '</span>' : '') +
             '</div>');
-          if (sec.body) lines.push('<div class="hlt-desc">' + sec.body + '</div>');
+          if (sec.body) lines.push('<div class="hlt-desc ' + barType + '">' + sec.body + '</div>');
           first = false;
         });
       } else {
@@ -3829,6 +3837,13 @@
     var itemId = tileEl.dataset.itemId;
     var item = byItem.get(itemId);
     if (!item) return;
+    // Reset class each time, then tag neutral items with their tier so the
+    // header gets the tier colour (game tiers are 1–5; data tier is 0-indexed).
+    var cls = 'hl-tooltip';
+    if (item['class'] === 'neutral' && item.tier != null) {
+      cls += ' neutral-tier-' + (item.tier + 1);
+    }
+    tipEl.className = cls;
     tipEl.innerHTML = buildTooltip(item);
     tipEl.hidden = false;
     positionTooltip(tileEl);

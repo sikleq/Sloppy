@@ -190,6 +190,69 @@ def _flatten_special(d: dict) -> dict[str, object]:
     return out
 
 
+# Neutral-item primary stats — variable name → (display label, is-percent).
+# In-game the tooltip shows these as "+N <Label>" rows above the ability bar.
+# Sourced from AbilityValues flagged `apply_curio_bonus: 1`, which is Valve's
+# marker for "this value is the headline scalable bonus".
+_NEUTRAL_STAT_LABELS = {
+    "spell_amp":           ("Spell Amplification",   True),
+    "manacost_reduction":  ("Mana Cost Reduction",   True),
+    "heal_reduce":         ("Heal Reduction",        True),
+    "damage":              ("Damage",                False),
+    "damage_illusions":    ("Damage vs Illusions",   False),
+    "damage_creep":        ("Damage vs Creeps",      False),
+    "summon_duration":     ("Summon Duration",       False),
+    "bonus_damage":        ("Damage",                False),
+    "bonus_armor":         ("Armor",                 False),
+    "bonus_attack_speed":  ("Attack Speed",          False),
+    "bonus_movement_speed":("Movement Speed",        False),
+    "bonus_strength":      ("Strength",              False),
+    "bonus_agility":       ("Agility",               False),
+    "bonus_intellect":     ("Intelligence",          False),
+    "bonus_all_stats":     ("All Attributes",        False),
+    "bonus_health":        ("Health",                False),
+    "bonus_mana":          ("Mana",                  False),
+    "bonus_mp_regen":      ("Mana Regeneration",     False),
+    "bonus_hp_regen":      ("Health Regeneration",   False),
+    "magic_resistance":    ("Magic Resistance",      True),
+    "evasion":             ("Evasion",               True),
+    "lifesteal":           ("Lifesteal",             True),
+    "spell_lifesteal":     ("Spell Lifesteal",       True),
+    "status_resist":       ("Status Resistance",     True),
+    "cooldown_reduction":  ("Cooldown Reduction",    True),
+    "debuff_amp":          ("Debuff Amplification",  True),
+}
+
+
+def _neutral_curio_bonuses(data: dict) -> list[dict]:
+    """Return AbilityValues flagged apply_curio_bonus=1 as headline stat rows
+    (the "+6% Spell Amplification" lines you see above the ability bar in-game
+    on neutrals). Falls back to a Title-Cased label when the variable name
+    isn't in _NEUTRAL_STAT_LABELS."""
+    out: list[dict] = []
+    av = data.get("AbilityValues") or {}
+    for varname, node in av.items():
+        if not isinstance(node, dict):
+            continue
+        if str(node.get("apply_curio_bonus", "")) != "1":
+            continue
+        raw = node.get("value")
+        if raw is None:
+            continue
+        # Take the first level only (curio values are typically single-level).
+        s = str(raw).split(" ")[0]
+        try:
+            n = float(s)
+            val_str = str(int(n)) if n == int(n) else s
+        except ValueError:
+            val_str = s
+        label, is_pct = _NEUTRAL_STAT_LABELS.get(
+            varname, (varname.replace("_", " ").title(), False)
+        )
+        out.append({"value": val_str, "label": label, "pct": is_pct})
+    return out
+
+
 def _first(fields: dict, *keys: str) -> float:
     for k in keys:
         if k in fields:
@@ -202,11 +265,15 @@ def _sum(fields: dict, *keys: str) -> float:
 
 
 def _item_bonus(fields: dict) -> dict[str, float]:
+    # "+N All Attributes" is a single line in the in-game tooltip — don't split
+    # it into Strength/Agility/Intellect rows. Per-attribute fields stay
+    # separate so items can mix (e.g. +6 All + extra Strength).
     all_stats = _first(fields, "bonus_all_stats", "bonus_stats", "all_stats")
-    str_bonus = all_stats + _sum(fields, "bonus_strength", "bonus_str")
-    agi_bonus = all_stats + _sum(fields, "bonus_agility", "bonus_agi")
-    int_bonus = all_stats + _sum(fields, "bonus_intellect", "bonus_int", "bonus_intelligence")
+    str_bonus = _sum(fields, "bonus_strength", "bonus_str")
+    agi_bonus = _sum(fields, "bonus_agility", "bonus_agi")
+    int_bonus = _sum(fields, "bonus_intellect", "bonus_int", "bonus_intelligence")
     return {
+        "all": all_stats,
         "str": str_bonus,
         "agi": agi_bonus,
         "int": int_bonus,
@@ -229,7 +296,11 @@ def _item_bonus(fields: dict) -> dict[str, float]:
 
 
 def _resolve_pct(desc: str, fields: dict) -> str:
-    """Replace %var% placeholders in tooltip descriptions with actual values."""
+    """Replace %var% placeholders in tooltip descriptions with actual values.
+
+    Substituted values are wrapped in <span class="GameplayVariable"> so the
+    tooltip CSS can highlight them brighter than the body text — matching the
+    in-game Dota tooltip, where resolved numbers stand out from the prose."""
     def _repl(m):
         key = m.group(1)
         if key.startswith("d") and key[1:] in fields:
@@ -240,9 +311,10 @@ def _resolve_pct(desc: str, fields: dict) -> str:
         s = str(val).split(" ")[0]
         try:
             n = float(s)
-            return str(int(n)) if n == int(n) else s
+            s = str(int(n)) if n == int(n) else s
         except (ValueError, TypeError):
-            return s
+            pass
+        return f'<span class="GameplayVariable">{s}</span>'
     return _re.sub(r"%([a-zA-Z_][a-zA-Z0-9_]*)%", _repl, desc)
 
 
@@ -289,6 +361,9 @@ def _load_items(version: str) -> list[dict]:
             "class": cls,
             "category": meta.get("category"),
             "tier": meta.get("tier"),
+            # Consumables (Tango, Salve, …) get the green "Use" ability header
+            # in-game; ItemQuality flags them. Drives the green bar in the tooltip.
+            "consumable": str(fields.get("ItemQuality", "")).lower() == "consumable",
             "bonus": bonus,
         }
         tt = tooltips.get(item, {})
@@ -325,6 +400,43 @@ def _load_items(version: str) -> list[dict]:
             tip["target"] = "No Target"
         elif "TOGGLE" in beh:
             tip["target"] = "Toggle"
+        elif "PASSIVE" in beh:
+            # Every item flagged DOTA_ABILITY_BEHAVIOR_PASSIVE shows
+            # "ABILITY: Passive" in-game — that's true even for pure-stat items
+            # like Blades of Attack and Bracer, which still carry the row.
+            tip["target"] = "Passive"
+        # AFFECTS: team + unit type (e.g. "Allied Heroes", "Enemy Units"),
+        # mirroring the in-game tooltip. From AbilityUnitTargetTeam/Type.
+        team = str(fields.get("AbilityUnitTargetTeam", ""))
+        typ = str(fields.get("AbilityUnitTargetType", ""))
+        if "FRIENDLY" in team:
+            team_word = "Allied"
+        elif "ENEMY" in team:
+            team_word = "Enemy"
+        elif "BOTH" in team or "CUSTOM" in team:
+            team_word = ""
+        else:
+            team_word = ""
+        type_words = []
+        if "HERO" in typ:
+            type_words.append("Heroes")
+        if "BASIC" in typ:
+            type_words.append("Units")
+        if "BUILDING" in typ:
+            type_words.append("Buildings")
+        if "CREEP" in typ and "Units" not in type_words:
+            type_words.append("Creeps")
+        type_word = " / ".join(type_words) if type_words else ("Units" if typ else "")
+        affects = " ".join(w for w in (team_word, type_word) if w).strip()
+        if affects:
+            tip["affects"] = affects
+        # Neutral items: headline "+N <Stat>" rows from AbilityValues with
+        # apply_curio_bonus=1 (e.g. Harmonizer's "+6% Spell Amplification").
+        # Regular items don't use this convention — bonus_* fields cover them.
+        if cls == "neutral":
+            neutrals = _neutral_curio_bonuses(data)
+            if neutrals:
+                tip["neutralBonuses"] = neutrals
         short = npedesc.get(item, "")
         if short:
             tip["short"] = short
