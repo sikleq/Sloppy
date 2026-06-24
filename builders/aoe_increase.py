@@ -449,8 +449,7 @@ def _item_filter_bar(items: list[tuple]) -> str:
     def _up_btn(key, label, icon):
         return (
             f'<button type="button" class="hs-attr-filter aoe-up-btn" '
-            f'data-aoe-upgrade="{key}" aria-pressed="true" '
-            f'title="Show radii gained from {_esc(label)}">'
+            f'data-aoe-upgrade="{key}" aria-pressed="false">'
             f'<img src="{icon}" alt="{_esc(label)}" loading="lazy"></button>'
         )
 
@@ -686,7 +685,7 @@ def render_html() -> str:
                     # Always show label when it carries real context (not just
                     # generic "Radius"). For multi-radius cells labels are always
                     # shown so values can be told apart.
-                    label = lbl if (multi or lbl.lower() not in {"", "radius", "area of effect"}) else ""
+                    label = lbl if (multi or lbl.lower() not in {"", "radius", "area of effect", "scepter radius", "shard radius", "talent radius"}) else ""
                     lines.append(_line(_val_span(r), label))
             granted_by = ab.get("granted_by", "")
             data_has = (f' data-has-talent="{1 if has["talent"] else 0}"'

@@ -5024,7 +5024,7 @@
   const abilities = [...table.querySelectorAll('.aoe-ability')];
 
   let flat = 0, pct = 0;
-  const up = { talent: true, scepter: true, shard: true };
+  const up = { talent: false, scepter: false, shard: false };
 
   // base[] + delta[] elementwise (delta broadcasts a single value over levels).
   function add(arr, delta) {
@@ -5122,7 +5122,7 @@
     recompute();
   }));
 
-  recompute();   // initial render: upgrades ON by default
+  recompute();   // initial render: upgrades OFF by default
   // Freeze column widths after first render so ability cells appearing/disappearing
   // (shard/scepter/talent toggle) cannot cause horizontal layout shift.
   requestAnimationFrame(() => {

@@ -8200,13 +8200,15 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   box-shadow: 0 0 0 1px var(--blue-18);
   transition: box-shadow 0.12s ease;
 }
-/* Hover: pop exactly like a hero icon (.mr-ico) — scale 1.8, lift, same ring. */
+/* Hover: pop exactly like a hero icon (.mr-ico) — scale 1.8, lift, same ring.
+   z-index: 36 puts the zoomed icon above the sticky header (z 35) so that edge
+   rows (first / last / when search leaves just one row) don't clip behind it. */
 .aoe-ico-wrap:hover {
   transform: scale(1.8);
   position: relative;
-  z-index: 30;
+  z-index: 36;
 }
-/* First row: zoom down so icon doesn't clip under the header. */
+/* First row: zoom down so icon doesn't pop above the header. */
 .mr-table.aoe-table tbody tr:first-child .aoe-ico-wrap {
   transform-origin: center top;
 }

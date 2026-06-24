@@ -23,26 +23,33 @@ try:
 except ImportError:
     print("pip install requests"); sys.exit(1)
 
+import re
+
 ROOT = Path(__file__).resolve().parent.parent.parent
 URLS_FILE = ROOT / "_ability_icons.txt"
 ICONS_DIR = ROOT / "icons" / "abilities"
 CDN_BASE = "https://cdn.steamstatic.com/apps/dota2/images/dota_react/abilities/"
 
-if not URLS_FILE.exists():
-    print(f"X {URLS_FILE} not found. Run python builders/patch.py first.")
-    sys.exit(1)
-
 ICONS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Parse local paths from _ability_icons.txt (relative like ../icons/abilities/<slug>.png)
+# Parse local paths from _ability_icons.txt (patch builder output)
 slugs = []
-for line in URLS_FILE.read_text(encoding="utf-8").splitlines():
-    line = line.strip()
-    if not line:
-        continue
-    name = line.rsplit("/", 1)[-1]
-    if name.endswith(".png"):
-        slugs.append(name[:-4])
+if URLS_FILE.exists():
+    for line in URLS_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        name = line.rsplit("/", 1)[-1]
+        if name.endswith(".png"):
+            slugs.append(name[:-4])
+
+# Also scan all built HTML pages for ability icon references so that tables
+# like aoe_increase (which don't use _ability_icons.txt) are covered.
+DIST = ROOT / "dist"
+if DIST.is_dir():
+    for html_file in DIST.glob("*.html"):
+        for m in re.finditer(r'icons/abilities/([^"\']+)\.png', html_file.read_text(encoding="utf-8", errors="ignore")):
+            slugs.append(m.group(1))
 
 slugs = sorted(set(slugs))
 missing_local = [s for s in slugs if not (ICONS_DIR / f"{s}.png").exists()]
