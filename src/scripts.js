@@ -1171,8 +1171,10 @@
         const name = (cell?.dataset.sort || '').toLowerCase();
         // data-alias = abbreviations + acronym (aghs→Aghanim's Scepter, bkb→…).
         const alias = (cell?.dataset.alias || '').toLowerCase();
+        // data-slug = engine slug (e.g. "wisp" for Io, "furion" for Nature's Prophet).
+        const slug = (cell?.dataset.slug || '').toLowerCase();
         const okSearch = !terms.length
-          || terms.some(t => name.includes(t) || alias.includes(t));
+          || terms.some(t => name.includes(t) || alias.includes(t) || slug.includes(t));
         // A row with no data-<dd> value is EXEMPT from that dropdown (e.g. neutrals/
         // enchants have no shop category → the Category filter never hides them).
         const okDd = ddFilters.every(f => {

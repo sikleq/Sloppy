@@ -271,7 +271,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         alias_attr = f' data-alias="{_esc(alias)}"' if alias else ''
         cells = [
             f'<td class="hd-hero sticky-col" data-col="name" '
-            f'data-sort="{_esc(h["name"])}"{alias_attr}>'
+            f'data-sort="{_esc(h["name"])}" data-slug="{_esc(h["icon"])}"{alias_attr}>'
             f'<span class="hd-hero-inner">{img}'
             f'<span class="hd-hero-name">{_esc(h["name"])}</span></span></td>'
         ]
