@@ -5082,18 +5082,18 @@
     });
     // Hero rows are always visible — empty/filter-hidden slots show dashes.
 
-    // When ability divs show/hide, row heights change. Chrome's compositor
-    // caches the sticky cell's bottom edge and doesn't repaint the border there.
-    // Fix: after layout settles, explicitly set each sticky cell's height to
-    // match its row — this tells Chrome the exact border-bottom position.
+    // After show/hide, force Chrome to repaint sticky cell borders at new position.
+    // translateZ(0) promotes the cell to a GPU compositing layer for one frame,
+    // then the rAF clears it — this is cheaper than explicit height sync and avoids
+    // the height-mismatch bug it caused.
     requestAnimationFrame(() => {
-      table.querySelectorAll('tbody tr').forEach(tr => {
-        const td = tr.querySelector('td.aoe-name');
-        if (!td) return;
-        td.style.height = '';
-        td.style.width = '';
-        td.style.height = tr.offsetHeight + 'px';
-        td.style.width = td.offsetWidth + 'px';
+      table.querySelectorAll('td.aoe-name').forEach(td => {
+        td.style.transform = 'translateZ(0)';
+      });
+      requestAnimationFrame(() => {
+        table.querySelectorAll('td.aoe-name').forEach(td => {
+          td.style.transform = '';
+        });
       });
     });
   }
