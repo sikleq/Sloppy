@@ -298,20 +298,33 @@ def _find_aoe_radii(block: dict) -> list[dict]:
                 row = {"key": k, "base": vals,
                        "talent": [], "scepter": [], "shard": [],
                        "talent_set": [], "scepter_set": [], "shard_set": []}
+                def _add_bonus(row_: dict, bk: str, bv) -> None:
+                    d, ovr = _delta_for(bv)
+                    if not d:
+                        return
+                    if bk == "special_bonus_scepter" or bk.startswith("special_bonus_scepter_"):
+                        bucket_ = "scepter"
+                    elif bk == "special_bonus_shard" or bk.startswith("special_bonus_shard_"):
+                        bucket_ = "shard"
+                    else:
+                        bucket_ = "talent"
+                    if ovr:
+                        row_[bucket_ + "_set"] = d
+                    else:
+                        row_[bucket_] = _sum_levels(row_[bucket_], d)
+
                 for mk, mv in v.items():
                     if not mk.startswith("special_bonus_"):
                         continue
-                    delta, is_override = _delta_for(mv)
-                    if mk == "special_bonus_scepter":
-                        bucket = "scepter"
-                    elif mk == "special_bonus_shard":
-                        bucket = "shard"
+                    if isinstance(mv, dict):
+                        # Conditional bonus block (e.g. special_bonus_facet_*):
+                        # the nested special_bonus_scepter/shard keys are the
+                        # real upgrade buckets; the outer facet key itself is not.
+                        for inner_mk, inner_mv in mv.items():
+                            if inner_mk.startswith("special_bonus_"):
+                                _add_bonus(row, inner_mk, inner_mv)
                     else:
-                        bucket = "talent"
-                    if is_override:
-                        row[bucket + "_set"] = delta
-                    else:
-                        row[bucket] = _sum_levels(row[bucket], delta)
+                        _add_bonus(row, mk, mv)
                 found.append(row)
             else:
                 walk(v)
