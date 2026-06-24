@@ -88,6 +88,9 @@ STALE_RADIUS_ROWS: set[tuple[str, str]] = {
     # Dawnbreaker: hammer_solar_guardian_radius with no bonus left after the
     # gleaming_hammer stale suppression above — drop the bare base=0 row too.
     ("dawnbreaker_celestial_hammer", "hammer_solar_guardian_radius"),
+    # Oracle False Promise: radius=400 is a leftover from unreleased changes;
+    # the ability is single-target and has no AoE in-game.
+    ("oracle_false_promise", "radius"),
 }
 
 # Sub-abilities folded into their parent that DON'T share a slug prefix.

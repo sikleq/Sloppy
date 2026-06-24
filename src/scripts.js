@@ -2754,7 +2754,8 @@
     const terms = search.value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
     rows.forEach(tr => {
       const name = (tr.querySelector('.mr-name-text')?.textContent || '').toLowerCase();
-      const hit = !terms.length || terms.some(t => name.includes(t));
+      const slug = (tr.dataset.slug || '').toLowerCase();
+      const hit = !terms.length || terms.some(t => name.includes(t) || slug.includes(t));
       tr.classList.toggle('mr-search-out', !hit);
     });
     window.dispatchEvent(new CustomEvent('mr:filter-changed'));
