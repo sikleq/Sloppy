@@ -109,17 +109,21 @@ FORCE_INCLUDE_RADIUS_KEYS: set[tuple[str, str]] = {
 # Upgrade values that the KV encodes as a multiplier or percentage that
 # _delta_for cannot parse (e.g. "x1.8", "+75%", or a per-tick growth that
 # should be shown as a final-state maximum).
-# (ability_slug, key) -> (bucket_set, computed_value, label_override_or_None)
+# (ability_slug, key) -> (bucket_set, computed_value, label_override_or_None, zero_base)
 #   bucket_set — one of "talent_set", "scepter_set", "shard_set"
-COMPUTED_UPGRADE: dict[tuple[str, str], tuple[str, float, str | None]] = {
+#   zero_base  — True when the radius is meaningless without the upgrade (show base=0)
+COMPUTED_UPGRADE: dict[tuple[str, str], tuple[str, float, str | None, bool]] = {
     # Viper Nethertoxin: talent adds +25 per 0.5 s tick; 8 s duration = 16 ticks.
     # Max radius = 400 (base) + 16×25 = 800.
-    ("viper_nethertoxin", "radius_increase"):        ("talent_set",  800.0,  "Max talent radius"),
+    ("viper_nethertoxin", "radius_increase"):        ("talent_set",  800.0,  "Max talent radius", False),
     # Slardar Slithereen Crush: scepter "+75" is actually +75% of base 325.
     # 325 × 1.75 = 568.75.
-    ("slardar_slithereen_crush", "puddle_radius"):   ("scepter_set", 568.75, None),
+    ("slardar_slithereen_crush", "puddle_radius"):   ("scepter_set", 568.75, None, False),
     # Slardar Corrosive Haze: scepter "x1.8" → 100 × 1.8 = 180.
-    ("slardar_amplify_damage", "puddle_radius"):     ("scepter_set", 180.0,  None),
+    ("slardar_amplify_damage", "puddle_radius"):     ("scepter_set", 180.0,  None, False),
+    # Centaur Return (Retaliate): aura is only enabled by talent centaur_1.
+    # Without the talent the aura does not exist; base shows 0.
+    ("centaur_return", "aura_radius"):               ("talent_set",  1200.0, None, True),
 }
 
 MANUAL_CANON = {
@@ -366,11 +370,13 @@ def _find_aoe_radii(block: dict, ability_slug: str) -> list[dict]:
                     # Apply COMPUTED_UPGRADE: inject a manually computed value
                     # when KV uses a multiplier/percentage the parser can't handle.
                     if (ability_slug, k) in COMPUTED_UPGRADE:
-                        bucket, val, lbl_ovr = COMPUTED_UPGRADE[(ability_slug, k)]
+                        bucket, val, lbl_ovr, zero_base = COMPUTED_UPGRADE[(ability_slug, k)]
                         # Clear any raw delta that may have been parsed incorrectly.
                         base_bucket = bucket.removesuffix("_set")
                         row[base_bucket] = []
                         row[bucket] = [val]
+                        if zero_base:
+                            row["base"] = [0.0]
                         if lbl_ovr:
                             row["label_override"] = lbl_ovr
                     found.append(row)
