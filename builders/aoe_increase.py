@@ -88,10 +88,6 @@ STALE_RADIUS_ROWS: set[tuple[str, str]] = {
     # Dawnbreaker: hammer_solar_guardian_radius with no bonus left after the
     # gleaming_hammer stale suppression above — drop the bare base=0 row too.
     ("dawnbreaker_celestial_hammer", "hammer_solar_guardian_radius"),
-    # Slardar Slithereen Crush: puddle only exists when scepter is purchased; the
-    # base value "325" does not represent an always-present AoE, and the scepter
-    # bonus is a percentage which the builder cannot display correctly.
-    ("slardar_slithereen_crush", "puddle_radius"),
 }
 
 # Sub-abilities folded into their parent that DON'T share a slug prefix.
