@@ -5081,11 +5081,14 @@
       if (!visible) return;
       const shown = (flat || pct) ? radius.map(r => (r + flat) * (1 + pct / 100)) : radius;
       V.el.textContent = fmt(shown);
-      // Gold when any active upgrade or item boost changes this value from base.
-      const upgradedUp =
+      // Gold means a visible value changed. A zero-base line revealed by a
+      // Talent/Scepter/Shard is a newly enabled AoE mode, not a changed value.
+      const baseVisible = Math.max(...V.base) > 0;
+      const upgradedUp = baseVisible && (
         (up.talent  && (V.talent.some(n => n)  || V.talentSet.length))  ||
         (up.scepter && (V.scepter.some(n => n) || V.scepterSet.length)) ||
-        (up.shard   && (V.shard.some(n => n)   || V.shardSet.length));
+        (up.shard   && (V.shard.some(n => n)   || V.shardSet.length))
+      );
       V.el.classList.toggle('aoe-val-up', !!(flat || pct || upgradedUp));
     });
     // Hide a line whose every value is hidden, then an ability with no visible
