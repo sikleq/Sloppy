@@ -8145,12 +8145,33 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   background: rgba(0, 0, 0, 0.12);
   text-align: center;
 }
-/* Chrome drops border-bottom on sticky cells whenever layout changes (filter
-   toggles, ability div show/hide). box-shadow inset repaints as part of the
-   cell's own layer and is never dropped. Same pattern as .mr-table thead th. */
+/* Sticky hero cell: opaque background fills the full row height so the column
+   doesn't look shorter than the ability columns (Chrome only paints a
+   transparent cell to content-height in the compositing layer). The 9999px
+   inset shadow is the same "fill the box" trick used in .creeps-table
+   .sticky-col — it covers any collapsed-border seam that bleeds through on
+   horizontal scroll.  The -1px inset draws the row separator at the bottom of
+   the FULL row (same as the non-sticky cells' border-bottom). */
 .mr-table.aoe-table td.aoe-name {
   border-bottom: none;
-  box-shadow: inset 0 -1px 0 rgba(48, 54, 61, 0.5);
+  background: var(--bg-panel-2);
+  box-shadow:
+    inset 0 -1px 0 rgba(48, 54, 61, 0.5),
+    inset 0 0 0 9999px var(--bg-panel-2);
+}
+/* Row-selection gold frame: Chromium renders box-shadow OFFSET incorrectly on
+   position:sticky cells (same quirk documented on .hs-name). Use background
+   gradients to draw the top/bottom/left gold lines — backgrounds paint
+   correctly on sticky cells. */
+.mr-table.aoe-table tbody tr.mr-row-selected td.aoe-name {
+  box-shadow: none;
+  background:
+    linear-gradient(var(--gold-95), var(--gold-95)) left   / 2px 100% no-repeat,
+    linear-gradient(var(--gold-95), var(--gold-95)) top    / 100% 2px no-repeat,
+    linear-gradient(var(--gold-95), var(--gold-95)) bottom / 100% 2px no-repeat,
+    linear-gradient(rgba(231, 196, 106, 0.10), rgba(231, 196, 106, 0.10)),
+    var(--bg-panel-2);
+  background-origin: border-box;
 }
 .aoe-ability {
   display: grid;
@@ -8201,10 +8222,11 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    the innate markers on /patches/. */
 .aoe-marks {
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: -5px;
-  transform: translateX(-50%);
   display: flex;
+  justify-content: center;
   gap: 1px;
   pointer-events: none;
 }
