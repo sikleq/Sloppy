@@ -68,10 +68,45 @@ KV_GRANTED_OVERRIDE: dict[str, str] = {
 STALE_AOE_BONUSES: set[tuple[str, str, str]] = {
     ("silencer_curse_of_the_silent", "radius", "special_bonus_unique_silencer_arcane_curse_radius"),
     ("snapfire_scatterblast", "shard_knockback_distance", "special_bonus_shard"),
+    # Luna: glaives_attack_radius uses luna_8 which is no longer in the talent tree.
+    ("luna_lucent_beam", "glaives_attack_radius", "special_bonus_unique_luna_8"),
+    # Invoker: chaos_meteor_size talent is not in Invoker's current talent tree.
+    ("invoker_chaos_meteor", "area_of_effect", "special_bonus_unique_invoker_chaos_meteor_size"),
+    # Dawnbreaker: gleaming_hammer was a removed aspect; the radius row is vestigial.
+    ("dawnbreaker_celestial_hammer", "hammer_solar_guardian_radius", "special_bonus_unique_dawnbreaker_gleaming_hammer"),
+    # Slardar: puddle_radius scepter bonus is a percentage, not flat — the builder
+    # treats all bonuses as flat, so showing "+75" would mislead.
+    ("slardar_slithereen_crush", "puddle_radius", "special_bonus_scepter"),
+}
+
+# Entire radius rows to suppress even if the base value is non-zero.
+# Keyed by (ability_slug, radius_key).
+STALE_RADIUS_ROWS: set[tuple[str, str]] = {
+    # Marci Unleash shard_push_length: flagged affected_by_aoe_increase but the
+    # push mechanic is not actually used in-game.
+    ("marci_unleash", "shard_push_length"),
+    # Dawnbreaker: hammer_solar_guardian_radius with no bonus left after the
+    # gleaming_hammer stale suppression above — drop the bare base=0 row too.
+    ("dawnbreaker_celestial_hammer", "hammer_solar_guardian_radius"),
+    # Slardar Slithereen Crush: puddle only exists when scepter is purchased; the
+    # base value "325" does not represent an always-present AoE, and the scepter
+    # bonus is a percentage which the builder cannot display correctly.
+    ("slardar_slithereen_crush", "puddle_radius"),
 }
 
 # Sub-abilities folded into their parent that DON'T share a slug prefix.
 # Slug → canonical slug.
+# Radius fields that lack affected_by_aoe_increase (AoE items won't change them)
+# but are still worth showing in the table for informational context.
+# Keyed by (ability_slug, radius_key) → bonus_key that controls the column.
+# These are injected into _find_aoe_radii as if the flag were present; AoE
+# item columns will stay at their base value since the engine doesn't scale them.
+FORCE_INCLUDE_RADIUS_KEYS: set[tuple[str, str]] = {
+    # Viper Nethertoxin: each tick the radius grows by +25 (base=0, talent upgrades
+    # the per-tick growth). Shown under the Talent filter column.
+    ("viper_nethertoxin", "radius_increase"),
+}
+
 MANUAL_CANON = {
     "phoenix_launch_fire_spirit": "phoenix_fire_spirits",
     # Largo's three song forms are sub-abilities of Amphibian Rhapsody; all share
@@ -252,7 +287,9 @@ def _find_aoe_radii(block: dict, ability_slug: str) -> list[dict]:
         for k, v in d.items():
             if not isinstance(v, dict):
                 continue
-            if str(v.get("affected_by_aoe_increase", "")).strip() == "1":
+            flagged = str(v.get("affected_by_aoe_increase", "")).strip() == "1"
+            forced  = (ability_slug, k) in FORCE_INCLUDE_RADIUS_KEYS
+            if flagged or forced:
                 vals = _level_values(v.get("value", ""))
                 if not vals:
                     # No baseline value — keep the entry as base 0 so any
@@ -462,7 +499,8 @@ def _hero_abilities(version: str, hero_slug: str, kit: set[str] | None) -> list[
             continue
         radii = _find_aoe_radii(block, slug)
         radii = [r for r in radii
-                 if not _is_junk_key(r["key"])]
+                 if not _is_junk_key(r["key"])
+                 and (slug, r["key"]) not in STALE_RADIUS_ROWS]
         if radii:
             granted_by = ""
             if str(block.get("IsGrantedByScepter", "")).strip() == "1":
