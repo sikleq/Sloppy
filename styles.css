@@ -7231,6 +7231,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    grows into this padding instead of past the scrollable edge. (~21px pop
    overflow for the 28px→70px cell.) */
 .creeps-scroll:has(.heroes-dyn-table) { padding-bottom: 24px; }
+/* Same hover-pop room for AoE Increase: with a short filtered roster the last
+   visible ability icon must grow upward inside the scroll box instead of into
+   the horizontal scrollbar / bottom clip edge. */
+.creeps-scroll:has(.aoe-table) { padding-bottom: 24px; }
 /* RULE (all tables): use the shared .creeps-scroll shell AS-IS — NO per-page
    left gutter. The subnav (10px), blurb/toolbar (28px) and table (flush) keep
    the SAME left positions as Neutral Creeps / Abilities so every Materials page
@@ -8134,30 +8138,60 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   text-align: center;
   color: var(--text-muted, #8698b0);
 }
+.mr-table.aoe-table tbody td {
+  vertical-align: middle;
+}
 .mr-table.aoe-table td.aoe-cell {
   /* table-cell keeps this TD in the browser's automatic row-height equalisation.
      display:grid/flex on a <td> drops it out of that algorithm (same caveat as
      .hs-name — see the hs-table comment at line ~7966). */
   display: table-cell;
+  position: relative;
   vertical-align: middle;
-  padding: 4px 10px;
+  padding: 6px 10px;
   border-left: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: none;
+  box-shadow: inset 0 -1px 0 rgba(48, 54, 61, 0.5);
   white-space: normal;
   text-align: left;   /* icons hug the left edge so they line up vertically */
-  /* position:relative lets this TD become a stacking-context root when its
-     icon is hovered (z-index set via :has below). Mirrors dyn-cell-wrap where
-     z-index goes on the CONTAINER, not the scaling element. */
-  position: relative;
 }
 /* Elevate the whole cell when its ability icon is hovered — same pattern as
    dyn-cell-wrap:hover { z-index:7 }. The z-index on the TD's stacking context
    beats the sticky header (z:35) so the scaled icon paints above it. */
 .mr-table.aoe-table td.aoe-cell:has(.aoe-ico-wrap:hover) {
-  z-index: 36;
+  position: relative;
+  z-index: 60;
+}
+/* On edge cases like a single filtered hero row, raising only the hovered TD is
+   not enough: neighbouring cells / the row painting order can still cover the
+   zoomed icon. Raise the whole row as one stacking context, then the wrapper
+   itself above that row. */
+.mr-table.aoe-table tbody tr:has(.aoe-ico-wrap:hover) {
+  position: relative;
+  z-index: 61;
 }
 .mr-table.aoe-table td.aoe-cell-empty {
   background: rgba(0, 0, 0, 0.12);
   text-align: center;
+}
+.mr-table.aoe-table td.aoe-cell .aoe-cell-dash {
+  position: absolute;
+  inset: 50% 10px auto 10px;
+  transform: translateY(-50%);
+  display: inline-block;
+  text-align: center;
+  z-index: 2;
+  pointer-events: none;
+}
+.mr-table.aoe-table td.aoe-cell.aoe-cell-placeholder .aoe-cell-dash {
+  display: block;
+}
+.mr-table.aoe-table td.aoe-cell:not(.aoe-cell-placeholder) .aoe-cell-dash {
+  display: none;
+}
+.mr-table.aoe-table td.aoe-cell.aoe-cell-placeholder .aoe-ability {
+  visibility: hidden;
+  pointer-events: none;
 }
 /* Sticky hero cell: opaque background fills the full row height so the column
    doesn't look shorter than the ability columns (Chrome only paints a
@@ -8197,6 +8231,25 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
     var(--bg-panel-2);
   background-origin: border-box;
 }
+.mr-table.aoe-table tbody tr.mr-row-selected > td {
+  box-shadow:
+    inset 0  2px 0 var(--gold-95),
+    inset 0 -2px 0 var(--gold-95);
+  background-image: linear-gradient(rgba(231, 196, 106, 0.10),
+                                    rgba(231, 196, 106, 0.10));
+}
+.mr-table.aoe-table tbody tr.mr-row-selected > td:first-child {
+  box-shadow:
+    inset  2px  0  0 var(--gold-95),
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95);
+}
+.mr-table.aoe-table tbody tr.mr-row-selected > td:last-child {
+  box-shadow:
+    inset -2px  0  0 var(--gold-95),
+    inset  0    2px 0 var(--gold-95),
+    inset  0   -2px 0 var(--gold-95);
+}
 .aoe-ability {
   /* inline-grid (not block grid) so the element participates in the inline
      formatting context of its table cell. The TD uses vertical-align:middle,
@@ -8233,13 +8286,16 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    via :has(.aoe-ico-wrap:hover) — the TD's stacking context beats the header. */
 .aoe-ico-wrap:hover {
   transform: scale(1.8);
+  z-index: 62;
 }
-/* First row: zoom down so icon doesn't pop above the header. */
-.mr-table.aoe-table tbody tr:first-child .aoe-ico-wrap {
+/* Top/bottom edge steering is assigned from JS based on the VISIBLE rows after
+   search/filter, not raw DOM order. A single visible row gets both classes; the
+   bottom rule below wins, so the icon grows upward away from the scrollbar. */
+.mr-table.aoe-table tbody tr.aoe-visible-first .aoe-ico-wrap {
   transform-origin: center top;
 }
-/* Last two rows: zoom up so icon doesn't clip below the table edge. */
-.mr-table.aoe-table tbody tr:nth-last-child(-n+2) .aoe-ico-wrap {
+/* Last visible rows: zoom up so icon doesn't clip below the table edge. */
+.mr-table.aoe-table tbody tr.aoe-visible-last .aoe-ico-wrap {
   transform-origin: center bottom;
 }
 .aoe-ico-wrap:hover .aoe-ico {
@@ -8261,16 +8317,25 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .aoe-mark {
   width: 14px;
   height: 14px;
+  display: block;
   object-fit: contain;
   border-radius: 3px;
   background: var(--bg-panel-2, #161c24);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
 }
+.aoe-mark-talent { background-image: url('icons/misc/talents.svg'); }
+.aoe-mark-scepter { background-image: url('icons/items/ultimate_scepter.png'); }
+.aoe-mark-shard { background-image: url('icons/items/aghanims_shard.png'); }
 .aoe-radii {
   display: flex;
   flex-direction: column;   /* one radius per line */
+  justify-content: center;
   gap: 1px;
   min-width: 0;
+  min-height: var(--aoe-radii-min, 16.25px);
 }
 .aoe-line {
   font-size: 13px;

@@ -74,36 +74,6 @@ MANUAL_CANON = {
     "largo_song_good_vibrations":  "largo_amphibian_rhapsody",
 }
 
-# Radii that exist in KV but are no longer active (removed facets / aspects).
-# Set of (ability_slug, radius_key).
-EXCLUDE_RADII = {
-    ("bounty_hunter_shuriken_toss", "passthrough_width"),
-    # Open Wounds targets a single unit; spread_radius is a secondary mechanic
-    # radius (other heroes "spread" the debuff), not the ability's own AoE.
-    ("life_stealer_open_wounds", "spread_radius"),
-    # Stroke of Fate's vector_reticle_radius is a UI targeting overlay, not AoE.
-    ("grimstroke_dark_artistry", "vector_reticle_radius"),
-    # Abyssal Horde summons use search_radius for pathfinding, not spell AoE.
-    ("abyssal_underlord_abyssal_horde", "underling_search_radius"),
-    # Mana Void thirst_range is a passive attack-range modifier (base 0), not AoE.
-    ("antimage_mana_void", "thirst_range"),
-    # Nether Ward's self_restoration_range is a heal aura, not a spell AoE.
-    ("pugna_nether_ward", "self_restoration_range"),
-    # Kill-steal ranges (steal on kill), not the ability's damaging AoE.
-    ("silencer_last_word", "permanent_int_steal_range"),
-    ("muerta_pierce_the_veil", "spell_amp_steal_range"),
-    # Remnant watch distance is the trigger detection line, not the AoE.
-    ("void_spirit_aether_remnant", "remnant_watch_distance"),
-    # Chakram break_distance is a linear leash, not a radial AoE.
-    ("shredder_chakram", "break_distance"),
-    ("shredder_return_chakram", "break_distance"),
-    # Static Field thresholds are attack-range modifiers (base 0), not AoE.
-    ("zuus_static_field", "distance_threshold_min"),
-    ("zuus_static_field", "distance_threshold_max"),
-    # Torrent max_distance is a cast-range cap, not a radius of effect.
-    ("kunkka_torrent_storm", "torrent_max_distance"),
-}
-
 # AoE-bonus item filters. The bonus amount is read live from items.txt (key
 # below) so a balance change updates the page automatically; the number here is
 # only a fallback if the parse fails.
@@ -145,24 +115,13 @@ def _resolve_items(version: str) -> list[tuple]:
 
 
 def _is_junk_key(key: str) -> bool:
-    """True for keys that carry non-AoE values even though they have
-    affected_by_aoe_increase "1": vision/sight ranges, AI search radii,
-    knockback/push distances."""
+    """True for display-only duplicate keys.
+
+    AoE Increase deliberately shows every current-kit AbilityValues field marked
+    affected_by_aoe_increase. Do not hide vision/search/knockback/etc here: if
+    the engine flag says the AoE item changes it, the table should surface it.
+    """
     words = set(key.split("_"))
-    # Vision and sight ranges are detection/Ward vision, not spell AoE.
-    if words & {"vision", "sight"}:
-        return True
-    # *_search_radius = AI search range, not the ability's effect radius.
-    if "search" in words and "radius" in words:
-        return True
-    # Linear knockback / push distances — not radial AoE.
-    if "knockback" in words:
-        return True
-    if "push" in words and "distance" in words:
-        return True
-    # Distortion Field's slow_distance_max is a line length, not a radius.
-    if words >= {"slow", "distance"}:
-        return True
     # Keys with "tooltip" are display-only duplicates of a real radius key.
     if "tooltip" in words:
         return True
@@ -437,8 +396,7 @@ def _hero_abilities(version: str, hero_slug: str, kit: set[str] | None) -> list[
         if kit and slug not in kit:
             continue
         radii = _find_aoe_radii(block)
-        radii = [r for r in radii if (slug, r["key"]) not in EXCLUDE_RADII
-                 and not _is_junk_key(r["key"])]
+        radii = [r for r in radii if not _is_junk_key(r["key"])]
         if radii:
             granted_by = ""
             if str(block.get("IsGrantedByScepter", "")).strip() == "1":
@@ -582,7 +540,7 @@ def render_html() -> str:
             # innate markers on /patches/. Name shows via the hover title; the
             # icon pops on hover exactly like a hero icon.
             marks = "".join(
-                f'<img class="aoe-mark aoe-mark-{u[0]}" src="{u[2]}" alt="" hidden>'
+                f'<span class="aoe-mark aoe-mark-{u[0]}" hidden></span>'
                 for u in UPGRADE_FILTERS if has[u[0]])
             # Innate marker — but only if the ability has its OWN icon. When the
             # ability has no PNG, the onerror handler already shows the generic
@@ -613,6 +571,12 @@ def render_html() -> str:
                     f' data-scepter-set="{_attr(r["scepter_set"])}"'
                     f' data-shard-set="{_attr(r["shard_set"])}">'
                     f'{_base_display(r["base"])}</span>')
+
+            def _same_radius_payload(a, b):
+                return all(a[k] == b[k] for k in (
+                    "base", "talent", "scepter", "shard",
+                    "talent_set", "scepter_set", "shard_set",
+                ))
 
             def _line(inner, label=""):
                 lbl = (f'<span class="aoe-sep">-</span>'
@@ -661,6 +625,18 @@ def render_html() -> str:
             radii = ab["radii"]
             handled: set[int] = set()
             pair_lines: list[tuple[int, str]] = []
+
+            # Day/night sight plus true sight commonly repeat the same payload
+            # (e.g. Zeus Lightning Bolt). Keep the information, but render one
+            # compact line instead of three identical 600 rows.
+            sight_keys = {"sight_radius_day", "sight_radius_night", "true_sight_radius"}
+            sight_idxs = [i for i, r in enumerate(radii) if r["key"] in sight_keys]
+            if len(sight_idxs) == 3:
+                first = radii[sight_idxs[0]]
+                if all(_same_radius_payload(first, radii[i]) for i in sight_idxs[1:]):
+                    pair_lines.append((sight_idxs[0], _line(_val_span(first), "Vision radius (with True Sight)")))
+                    handled.update(sight_idxs)
+
             for i_a, ra in enumerate(radii):
                 if i_a in handled:
                     continue
@@ -681,9 +657,12 @@ def render_html() -> str:
                         rest_words = [w for w in ra["key"].split("_")
                                       if w not in (L, R) and w not in slug_words and w != "aoe"]
                         label_tail = " ".join(rest_words).strip() or "radius"
-                        lines_html = (
-                            f'{_val_span(left)}<span class="aoe-slash">/</span>'
-                            f'{_val_span(right)}')
+                        if _same_radius_payload(left, right):
+                            lines_html = _val_span(left)
+                        else:
+                            lines_html = (
+                                f'{_val_span(left)}<span class="aoe-slash">/</span>'
+                                f'{_val_span(right)}')
                         merged_label = f"{L}/{R} {label_tail}".strip()
                         pair_lines.append((i_a, _line(lines_html, merged_label)))
                         handled.update({i_a, i_b})
@@ -710,11 +689,13 @@ def render_html() -> str:
                         f' data-has-scepter="{1 if has["scepter"] else 0}"'
                         f' data-has-shard="{1 if has["shard"] else 0}"'
                         + (f' data-granted-by="{granted_by}"' if granted_by else ''))
+            radii_min_h = max(0, len(lines) * 16.25 + max(0, len(lines) - 1))
             cells.append(
                 f'<td class="aoe-cell">'
+                f'<span class="ua-dash aoe-cell-dash" hidden>—</span>'
                 f'<div class="aoe-ability"{data_has}>'
                 f'{ab_icon}'
-                f'<div class="aoe-radii">{"".join(lines)}</div>'
+                f'<div class="aoe-radii" style="--aoe-radii-min:{radii_min_h:.2f}px">{"".join(lines)}</div>'
                 f'</div></td>')
         body.append(
             f'<tr data-slug="{slug}" data-name="{_esc(name.lower())}">'

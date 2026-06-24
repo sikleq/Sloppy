@@ -5005,6 +5005,7 @@
   const itemBtns = [...document.querySelectorAll('.aoe-item-btn')];
   const upBtns = [...document.querySelectorAll('.aoe-up-btn')];
   if (!itemBtns.length && !upBtns.length) return;
+  const rows = [...table.querySelectorAll('tbody tr')];
 
   const nums = s => { const t = (s || '').trim(); return t ? t.split(/\s+/).map(Number).filter(n => !isNaN(n)) : []; };
   // Per-value (not per-line) so a line can hold two radii (AA Ice Blast min/max).
@@ -5020,8 +5021,21 @@
     scepterSet: nums(el.dataset.scepterSet),
     shardSet: nums(el.dataset.shardSet),
   }));
-  const linesSet = [...table.querySelectorAll('.aoe-line')];
-  const abilities = [...table.querySelectorAll('.aoe-ability')];
+  const linesSet = [...table.querySelectorAll('.aoe-line')].map(line => ({
+    line,
+    vals: [...line.querySelectorAll('.aoe-val')],
+  }));
+  const abilities = [...table.querySelectorAll('.aoe-ability')].map(ab => ({
+    ab,
+    cell: ab.closest('td.aoe-cell'),
+    dash: ab.closest('td.aoe-cell')?.querySelector('.aoe-cell-dash') || null,
+    lines: [...ab.querySelectorAll('.aoe-line')],
+    marks: {
+      talent: ab.querySelector('.aoe-mark-talent'),
+      scepter: ab.querySelector('.aoe-mark-scepter'),
+      shard: ab.querySelector('.aoe-mark-shard'),
+    },
+  }));
 
   let flat = 0, pct = 0;
   const up = { talent: false, scepter: false, shard: false };
@@ -5043,7 +5057,17 @@
     return r.every(n => n === r[0]) ? String(r[0]) : r.join('/');
   }
 
-  function recompute() {
+  function markVisibleEdgeRows() {
+    rows.forEach(tr => {
+      tr.classList.remove('aoe-visible-first', 'aoe-visible-last');
+    });
+    const visible = rows.filter(tr => !tr.classList.contains('mr-search-out'));
+    if (!visible.length) return;
+    visible[0].classList.add('aoe-visible-first');
+    visible[visible.length - 1].classList.add('aoe-visible-last');
+  }
+
+  function recompute(opts = {}) {
     vals.forEach(V => {
       if (!V.base.length) return;
       // An upgrade with an absolute override ("=N") REPLACES the radius;
@@ -5066,17 +5090,21 @@
     });
     // Hide a line whose every value is hidden, then an ability with no visible
     // line; surface the active-upgrade mini-markers the ability carries.
-    linesSet.forEach(ln => {
-      const anyVal = [...ln.querySelectorAll('.aoe-val')].some(v => !v.hidden);
-      ln.hidden = !anyVal;
+    linesSet.forEach(L => {
+      const anyVal = L.vals.some(v => !v.hidden);
+      L.line.hidden = !anyVal;
     });
-    abilities.forEach(ab => {
+    abilities.forEach(A => {
+      const ab = A.ab;
+      const cell = A.cell;
+      const dash = A.dash;
       const granted = ab.dataset.grantedBy;
       const grantedHidden = granted && !up[granted];
-      const anyVisible = !grantedHidden && [...ab.querySelectorAll('.aoe-line')].some(l => !l.hidden);
-      ab.style.display = anyVisible ? '' : 'none';
+      const anyVisible = !grantedHidden && A.lines.some(l => !l.hidden);
+      if (cell && !opts.measure) cell.classList.toggle('aoe-cell-placeholder', !anyVisible);
+      if (dash) dash.hidden = anyVisible;
       ['talent', 'scepter', 'shard'].forEach(t => {
-        const mark = ab.querySelector('.aoe-mark-' + t);
+        const mark = A.marks[t];
         if (mark) mark.hidden = !(up[t] && ab.dataset['has' + t[0].toUpperCase() + t.slice(1)] === '1' && anyVisible);
       });
     });
@@ -5086,7 +5114,7 @@
     // translateZ(0) promotes the cell to a GPU compositing layer for one frame,
     // then the rAF clears it — this is cheaper than explicit height sync and avoids
     // the height-mismatch bug it caused.
-    requestAnimationFrame(() => {
+    if (!opts.measure) requestAnimationFrame(() => {
       table.querySelectorAll('td.aoe-name').forEach(td => {
         td.style.transform = 'translateZ(0)';
       });
@@ -5096,6 +5124,7 @@
         });
       });
     });
+    if (!opts.measure) markVisibleEdgeRows();
   }
 
   itemBtns.forEach(btn => btn.addEventListener('click', () => {
@@ -5123,13 +5152,20 @@
   }));
 
   recompute();   // initial render: upgrades OFF by default
+  window.addEventListener('mr:filter-changed', markVisibleEdgeRows);
   // Freeze column widths after first render so ability cells appearing/disappearing
   // (shard/scepter/talent toggle) cannot cause horizontal layout shift.
   requestAnimationFrame(() => {
+    let total = 0;
     table.querySelectorAll('thead th').forEach(th => {
-      th.style.minWidth = th.offsetWidth + 'px';
-      th.style.maxWidth = th.offsetWidth + 'px';
+      const w = th.offsetWidth;
+      total += w;
+      th.style.width = w + 'px';
+      th.style.minWidth = w + 'px';
+      th.style.maxWidth = w + 'px';
     });
+    table.style.width = total + 'px';
+    table.style.tableLayout = 'fixed';
   });
 
   // Pin the filter toolbar at the top of the scroll box and drop the table
