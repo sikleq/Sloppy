@@ -73,6 +73,30 @@ MANUAL_CANON = {
 # Set of (ability_slug, radius_key).
 EXCLUDE_RADII = {
     ("bounty_hunter_shuriken_toss", "passthrough_width"),
+    # Open Wounds targets a single unit; spread_radius is a secondary mechanic
+    # radius (other heroes "spread" the debuff), not the ability's own AoE.
+    ("life_stealer_open_wounds", "spread_radius"),
+    # Stroke of Fate's vector_reticle_radius is a UI targeting overlay, not AoE.
+    ("grimstroke_dark_artistry", "vector_reticle_radius"),
+    # Abyssal Horde summons use search_radius for pathfinding, not spell AoE.
+    ("abyssal_underlord_abyssal_horde", "underling_search_radius"),
+    # Mana Void thirst_range is a passive attack-range modifier (base 0), not AoE.
+    ("antimage_mana_void", "thirst_range"),
+    # Nether Ward's self_restoration_range is a heal aura, not a spell AoE.
+    ("pugna_nether_ward", "self_restoration_range"),
+    # Kill-steal ranges (steal on kill), not the ability's damaging AoE.
+    ("silencer_last_word", "permanent_int_steal_range"),
+    ("muerta_pierce_the_veil", "spell_amp_steal_range"),
+    # Remnant watch distance is the trigger detection line, not the AoE.
+    ("void_spirit_aether_remnant", "remnant_watch_distance"),
+    # Chakram break_distance is a linear leash, not a radial AoE.
+    ("shredder_chakram", "break_distance"),
+    ("shredder_return_chakram", "break_distance"),
+    # Static Field thresholds are attack-range modifiers (base 0), not AoE.
+    ("zuus_static_field", "distance_threshold_min"),
+    ("zuus_static_field", "distance_threshold_max"),
+    # Torrent max_distance is a cast-range cap, not a radius of effect.
+    ("kunkka_torrent_storm", "torrent_max_distance"),
 }
 
 # AoE-bonus item filters. The bonus amount is read live from items.txt (key
@@ -113,6 +137,31 @@ def _resolve_items(version: str) -> list[tuple]:
         amt = amounts.get(item_id, fb)
         out.append((key, label, icon, kind, int(round(amt))))
     return out
+
+
+def _is_junk_key(key: str) -> bool:
+    """True for keys that carry non-AoE values even though they have
+    affected_by_aoe_increase "1": vision/sight ranges, AI search radii,
+    knockback/push distances."""
+    words = set(key.split("_"))
+    # Vision and sight ranges are detection/Ward vision, not spell AoE.
+    if words & {"vision", "sight"}:
+        return True
+    # *_search_radius = AI search range, not the ability's effect radius.
+    if "search" in words and "radius" in words:
+        return True
+    # Linear knockback / push distances — not radial AoE.
+    if "knockback" in words:
+        return True
+    if "push" in words and "distance" in words:
+        return True
+    # Distortion Field's slow_distance_max is a line length, not a radius.
+    if words >= {"slow", "distance"}:
+        return True
+    # Keys with "tooltip" are display-only duplicates of a real radius key.
+    if "tooltip" in words:
+        return True
+    return False
 
 
 def _humanize(key: str) -> str:
@@ -370,7 +419,8 @@ def _hero_abilities(version: str, hero_slug: str, kit: set[str] | None) -> list[
         if kit and slug not in kit:
             continue
         radii = _find_aoe_radii(block)
-        radii = [r for r in radii if (slug, r["key"]) not in EXCLUDE_RADII]
+        radii = [r for r in radii if (slug, r["key"]) not in EXCLUDE_RADII
+                 and not _is_junk_key(r["key"])]
         if radii:
             granted_by = ""
             if str(block.get("IsGrantedByScepter", "")).strip() == "1":
@@ -565,9 +615,8 @@ def render_html() -> str:
 
             def _clean_label(key: str) -> str:
                 parts = [w for w in key.split("_") if w and w not in slug_words]
-                # "aoe" and a trailing "radius" are filler — keep "radius" only
-                # if it carries meaning (paired with a qualifier like "start").
-                filler = {"aoe"}
+                # Generic AoE-description words add no info ("area of effect" = radius).
+                filler = {"aoe", "area", "of", "effect"}
                 parts = [w for w in parts if w not in filler]
                 if not parts:
                     return ""
@@ -637,7 +686,7 @@ def render_html() -> str:
                     # Always show label when it carries real context (not just
                     # generic "Radius"). For multi-radius cells labels are always
                     # shown so values can be told apart.
-                    label = lbl if (multi or lbl.lower() not in {"", "radius"}) else ""
+                    label = lbl if (multi or lbl.lower() not in {"", "radius", "area of effect"}) else ""
                     lines.append(_line(_val_span(r), label))
             granted_by = ab.get("granted_by", "")
             data_has = (f' data-has-talent="{1 if has["talent"] else 0}"'
