@@ -8135,7 +8135,11 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   color: var(--text-muted, #8698b0);
 }
 .mr-table.aoe-table td.aoe-cell {
-  vertical-align: middle;
+  /* Grid on the TD itself so items center the same way the hero cell does
+     (hero uses .mr-name {display:grid; align-items:center} on its TD).
+     vertical-align:middle is unreliable for block children across browsers. */
+  display: grid;
+  align-items: center;
   padding: 4px 10px;
   border-left: 1px solid rgba(255, 255, 255, 0.04);
   white-space: normal;

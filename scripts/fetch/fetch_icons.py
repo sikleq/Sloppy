@@ -63,12 +63,17 @@ if not missing_local:
     sys.exit(0)
 
 
+_PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+
+
 def fetch(slug):
     url = f"{CDN_BASE}{slug}.png"
     out = ICONS_DIR / f"{slug}.png"
     try:
         r = requests.get(url, timeout=15, allow_redirects=True)
         if r.status_code == 200 and r.content:
+            if not r.content.startswith(_PNG_MAGIC):
+                return slug, "not-png", 0
             out.write_bytes(r.content)
             return slug, "OK", len(r.content)
         return slug, str(r.status_code), 0

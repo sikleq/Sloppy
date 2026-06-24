@@ -67,6 +67,11 @@ KV_GRANTED_OVERRIDE: dict[str, str] = {
 # Slug → canonical slug.
 MANUAL_CANON = {
     "phoenix_launch_fire_spirit": "phoenix_fire_spirits",
+    # Largo's three song forms are sub-abilities of Amphibian Rhapsody; all share
+    # the same radius so they fold into one cell.
+    "largo_song_fight_song":       "largo_amphibian_rhapsody",
+    "largo_song_double_time":      "largo_amphibian_rhapsody",
+    "largo_song_good_vibrations":  "largo_amphibian_rhapsody",
 }
 
 # Radii that exist in KV but are no longer active (removed facets / aspects).
