@@ -103,13 +103,20 @@ FORCE_INCLUDE_RADIUS_KEYS: set[tuple[str, str]] = {
     ("viper_nethertoxin", "radius_increase"),
 }
 
-# For abilities where the talent changes a dynamic/per-tick parameter, show the
-# final-state maximum rather than the raw per-tick value.
-# (ability_slug, key) -> (forced_talent_set_value, label_override)
-TALENT_MAX_OVERRIDE: dict[tuple[str, str], tuple[float, str]] = {
-    # Viper Nethertoxin: talent adds +25 per 0.5 s tick; duration 8 s = 16 ticks.
-    # Max radius = 400 (base) + 16*25 = 800. Show as "Max talent radius".
-    ("viper_nethertoxin", "radius_increase"): (800.0, "Max talent radius"),
+# Upgrade values that the KV encodes as a multiplier or percentage that
+# _delta_for cannot parse (e.g. "x1.8", "+75%", or a per-tick growth that
+# should be shown as a final-state maximum).
+# (ability_slug, key) -> (bucket_set, computed_value, label_override_or_None)
+#   bucket_set — one of "talent_set", "scepter_set", "shard_set"
+COMPUTED_UPGRADE: dict[tuple[str, str], tuple[str, float, str | None]] = {
+    # Viper Nethertoxin: talent adds +25 per 0.5 s tick; 8 s duration = 16 ticks.
+    # Max radius = 400 (base) + 16×25 = 800.
+    ("viper_nethertoxin", "radius_increase"):        ("talent_set",  800.0,  "Max talent radius"),
+    # Slardar Slithereen Crush: scepter "+75" is actually +75% of base 325.
+    # 325 × 1.75 = 568.75.
+    ("slardar_slithereen_crush", "puddle_radius"):   ("scepter_set", 568.75, None),
+    # Slardar Corrosive Haze: scepter "x1.8" → 100 × 1.8 = 180.
+    ("slardar_amplify_damage", "puddle_radius"):     ("scepter_set", 180.0,  None),
 }
 
 MANUAL_CANON = {
@@ -353,13 +360,16 @@ def _find_aoe_radii(block: dict, ability_slug: str) -> list[dict]:
                 if not (_has_nonzero(row["base"]) or _has_nonzero(upgrade_buckets)):
                     pass  # drop silently
                 else:
-                    # Apply TALENT_MAX_OVERRIDE: replace per-tick talent delta with
-                    # the final-state maximum value and attach a custom label.
-                    if (ability_slug, k) in TALENT_MAX_OVERRIDE:
-                        max_val, lbl_ovr = TALENT_MAX_OVERRIDE[(ability_slug, k)]
-                        row["talent"] = []
-                        row["talent_set"] = [max_val]
-                        row["label_override"] = lbl_ovr
+                    # Apply COMPUTED_UPGRADE: inject a manually computed value
+                    # when KV uses a multiplier/percentage the parser can't handle.
+                    if (ability_slug, k) in COMPUTED_UPGRADE:
+                        bucket, val, lbl_ovr = COMPUTED_UPGRADE[(ability_slug, k)]
+                        # Clear any raw delta that may have been parsed incorrectly.
+                        base_bucket = bucket.removesuffix("_set")
+                        row[base_bucket] = []
+                        row[bucket] = [val]
+                        if lbl_ovr:
+                            row["label_override"] = lbl_ovr
                     found.append(row)
             else:
                 walk(v)
