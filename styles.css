@@ -5025,17 +5025,6 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .creeps-scroll::-webkit-scrollbar-corner {
   background: var(--bg-deep-60);
 }
-/* While any zoomable icon inside the scroll box is hovered, drop paint
-   containment so the 1.8× scaled icon can paint outside the box bounds.
-   overflow:visible disables clipping for that frame; scrolling still works
-   because nobody scrolls while hovering an icon. */
-.creeps-scroll:has(.aoe-ico-wrap:hover),
-.creeps-scroll:has(.abil-ico-wrap:hover),
-.creeps-scroll:has(.abil-ico:hover),
-.creeps-scroll:has(.mr-ico:hover) {
-  contain: style layout;
-  overflow: visible;
-}
 .creeps-table {
   /* width:max-content + min-width:100% = stretch evenly to fill the container
      when content is narrow (Standard view — no empty strip on the right), but
