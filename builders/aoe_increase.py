@@ -103,6 +103,15 @@ FORCE_INCLUDE_RADIUS_KEYS: set[tuple[str, str]] = {
     ("viper_nethertoxin", "radius_increase"),
 }
 
+# For abilities where the talent changes a dynamic/per-tick parameter, show the
+# final-state maximum rather than the raw per-tick value.
+# (ability_slug, key) -> (forced_talent_set_value, label_override)
+TALENT_MAX_OVERRIDE: dict[tuple[str, str], tuple[float, str]] = {
+    # Viper Nethertoxin: talent adds +25 per 0.5 s tick; duration 8 s = 16 ticks.
+    # Max radius = 400 (base) + 16*25 = 800. Show as "Max talent radius".
+    ("viper_nethertoxin", "radius_increase"): (800.0, "Max talent radius"),
+}
+
 MANUAL_CANON = {
     "phoenix_launch_fire_spirit": "phoenix_fire_spirits",
     # Largo's three song forms are sub-abilities of Amphibian Rhapsody; all share
@@ -344,6 +353,13 @@ def _find_aoe_radii(block: dict, ability_slug: str) -> list[dict]:
                 if not (_has_nonzero(row["base"]) or _has_nonzero(upgrade_buckets)):
                     pass  # drop silently
                 else:
+                    # Apply TALENT_MAX_OVERRIDE: replace per-tick talent delta with
+                    # the final-state maximum value and attach a custom label.
+                    if (ability_slug, k) in TALENT_MAX_OVERRIDE:
+                        max_val, lbl_ovr = TALENT_MAX_OVERRIDE[(ability_slug, k)]
+                        row["talent"] = []
+                        row["talent_set"] = [max_val]
+                        row["label_override"] = lbl_ovr
                     found.append(row)
             else:
                 walk(v)
@@ -790,7 +806,7 @@ def render_html() -> str:
                 if i in merged_map:
                     lines.append(merged_map[i])
                 elif i not in handled:
-                    lbl = _clean_label(r["key"])
+                    lbl = r.get("label_override") or _clean_label(r["key"])
                     # Always show label when it carries real context (not just
                     # generic "Radius"). For multi-radius cells labels are always
                     # shown so values can be told apart.
