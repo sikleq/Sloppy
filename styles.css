@@ -8144,6 +8144,16 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   border-left: 1px solid rgba(255, 255, 255, 0.04);
   white-space: normal;
   text-align: left;   /* icons hug the left edge so they line up vertically */
+  /* position:relative lets this TD become a stacking-context root when its
+     icon is hovered (z-index set via :has below). Mirrors dyn-cell-wrap where
+     z-index goes on the CONTAINER, not the scaling element. */
+  position: relative;
+}
+/* Elevate the whole cell when its ability icon is hovered — same pattern as
+   dyn-cell-wrap:hover { z-index:7 }. The z-index on the TD's stacking context
+   beats the sticky header (z:35) so the scaled icon paints above it. */
+.mr-table.aoe-table td.aoe-cell:has(.aoe-ico-wrap:hover) {
+  z-index: 36;
 }
 .mr-table.aoe-table td.aoe-cell-empty {
   background: rgba(0, 0, 0, 0.12);
@@ -8219,13 +8229,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   box-shadow: 0 0 0 1px var(--blue-18);
   transition: box-shadow 0.12s ease;
 }
-/* Hover: pop exactly like a hero icon (.mr-ico) — scale 1.8, lift, same ring.
-   z-index: 36 puts the zoomed icon above the sticky header (z 35) so that edge
-   rows (first / last / when search leaves just one row) don't clip behind it. */
+/* Hover: scale the icon. z-index is handled by the parent td.aoe-cell
+   via :has(.aoe-ico-wrap:hover) — the TD's stacking context beats the header. */
 .aoe-ico-wrap:hover {
   transform: scale(1.8);
-  position: relative;
-  z-index: 36;
 }
 /* First row: zoom down so icon doesn't pop above the header. */
 .mr-table.aoe-table tbody tr:first-child .aoe-ico-wrap {
