@@ -169,7 +169,7 @@ def build():
     W(ul_close())
     W(item_header("Eye of Skadi", changed=True))
     W(auto_components_change("Eye of Skadi", "7.39"))
-    W(properties_change(old=[("DEL", "+250 Health"), ("DEL", "+250 Mana"), ("BUFF", "+22 All Attributes")], new=[("", "+35 All Attributes", b(22, 35))]))
+    W(properties_change(old=[("DEL", "+250 Health"), ("DEL", "+250 Mana"), ("BUFF", "+22 All Attributes")], new=[None, None, ("", "+35 All Attributes", b(22, 35))]))
     W(ul_open())
     W(li("Cold Attack instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 40%, now reduces Health Restoration and Heal Amplification by 40%", t("REWORK")))
     W(li("Cold Attack's slow and health restoration reduction no longer stack with Orb of Frost and Orb of Corrosion", t("DEL")))
