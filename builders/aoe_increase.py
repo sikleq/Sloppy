@@ -111,16 +111,6 @@ FORCE_INCLUDE_RADIUS_KEYS: set[tuple[str, str]] = {
     ("viper_nethertoxin", "radius_increase"),
 }
 
-# Custom display labels for radius rows whose auto-generated label is unclear.
-# Does NOT change the underlying values — use COMPUTED_UPGRADE for that.
-# (ability_slug, radius_key) -> label string
-# NOTE: Underlord Dark Portal "radius" is the Fiend's Gate damage AoE introduced
-# by talent special_bonus_unique_underlord_9 (+160 dps +700 radius). Update this
-# label if the talent or ability changes.
-LABEL_OVERRIDE: dict[tuple[str, str], str] = {
-    ("abyssal_underlord_dark_portal", "radius"): "Damage radius",
-}
-
 # Upgrade values that the KV encodes as a multiplier or percentage that
 # _delta_for cannot parse (e.g. "x1.8", "+75%", or a per-tick growth that
 # should be shown as a final-state maximum).
@@ -394,9 +384,6 @@ def _find_aoe_radii(block: dict, ability_slug: str) -> list[dict]:
                             row["base"] = [0.0]
                         if lbl_ovr:
                             row["label_override"] = lbl_ovr
-                    # Apply standalone label overrides (value unchanged).
-                    if (ability_slug, k) in LABEL_OVERRIDE:
-                        row["label_override"] = LABEL_OVERRIDE[(ability_slug, k)]
                     found.append(row)
             else:
                 walk(v)
