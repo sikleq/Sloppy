@@ -91,6 +91,9 @@ STALE_RADIUS_ROWS: set[tuple[str, str]] = {
     # Oracle False Promise: radius=400 is a leftover from unreleased changes;
     # the ability is single-target and has no AoE in-game.
     ("oracle_false_promise", "radius"),
+    # Abaddon Borrowed Time: redirect_range_scepter was changed in 7.38b from a
+    # flat 900 to "Mist Coil cast range × 1" (dynamic, not a true AoE radius).
+    ("abaddon_borrowed_time", "redirect_range_scepter"),
     # Spirit Breaker Greater Bash: projectile_body_vision is a leftover; removed.
     ("spirit_breaker_greater_bash", "projectile_body_vision"),
 }
