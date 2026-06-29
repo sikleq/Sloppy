@@ -129,6 +129,8 @@ COMPUTED_UPGRADE: dict[tuple[str, str], tuple[str, float, str | None, bool]] = {
     # Centaur Return (Retaliate): aura is only enabled by talent centaur_1.
     # Without the talent the aura does not exist; base shows 0.
     ("centaur_return", "aura_radius"):               ("talent_set",  1200.0, None, True),
+    # Medusa Gorgon's Grasp: talent "+20%" means 150 × 1.20 = 180.
+    ("medusa_gorgon_grasp", "radius"):               ("talent_set",  180.0,  None, False),
 }
 
 MANUAL_CANON = {
