@@ -1134,6 +1134,14 @@ _NOW_REQUIRES_RE = re.compile(
 #   A) "Recipe cost X from A to B. Total cost unchanged at C ..." — single string
 #   B) "Recipe cost X from A to B"  +  inline_note("Total cost unchanged ...")
 # Both should become t("MISC") + inline badge.
+# "Recipe cost X→Y. Total cost decreased/increased X→Y" — both changed.
+# Badge by total cost; recipe % goes inline in the text.
+_RECIPE_COST_BOTH_CHANGED_RE = re.compile(
+    r'^W\(li\("(Recipe cost (?:increased|decreased) from )(\d+)( to )(\d+)'
+    r'(\. Total [Cc]ost (?:increased|decreased) from )(\d+)( to )(\d+)",\s*'
+    r'b\(\d+,\s*\d+,\s*l=True\)\)\)$'
+)
+
 _RECIPE_COST_UNCHANGED_INLINE_RE = re.compile(
     r'^W\(li\("(Recipe cost (?:increased|decreased) from )(\d+)( to )(\d+)'
     r'(\. Total cost unchanged[^"]*)",\s*'
@@ -1147,14 +1155,22 @@ _RECIPE_COST_UNCHANGED_SPLIT_RE = re.compile(
 
 
 def _postprocess_recipe_cost_zero_net(lines):
-    """Rewrite recipe-cost-changed-but-total-unchanged rows from badge-
-    as-tag form to t("MISC") + inline badge form. Net cost to the player
-    is zero (sub-component shift cancels), so the row shouldn't tally as
-    BUFF/NERF in the entity's dyn-cell. Per memory rule
-    sloppy_recipe_cost_zero_net_is_misc.
+    """Rewrite recipe-cost rows to the correct badge form:
+    - Both recipe and total changed: recipe % inline, total badge as main.
+    - Recipe changed, total unchanged: t("MISC") + inline recipe badge.
+    Per content-rules: tag follows total cost, recipe % always inline.
     """
     out = []
     for line in lines:
+        m = _RECIPE_COST_BOTH_CHANGED_RE.match(line)
+        if m:
+            rpre, ra, rmid, rb, tpre, ta, tmid, tb = m.groups()
+            # Total cost direction determines l=True (lower=buff for costs)
+            out.append(
+                f'W(li("{rpre}{ra}{rmid}{rb} " + b({ra}, {rb}, l=True)'
+                f' + "{tpre}{ta}{tmid}{tb}", b({ta}, {tb}, l=True)))'
+            )
+            continue
         m = _RECIPE_COST_UNCHANGED_INLINE_RE.match(line)
         if m:
             prefix, a, mid, b_val, tail = m.groups()
