@@ -648,6 +648,9 @@ def _render_hero(hero, version=None):
                     if facet_slug:
                         _facet_removed.append((facet_slug, part))
                         matched_any = True
+                    else:
+                        print(f'[WARN] Removed facet "{part}" not in FACETS — '
+                              f'add slug to badges.py, then re-generate')
                 if matched_any:
                     continue  # consumed — don't add to _general_notes
             # Check for "FacetName: change text" prefix
