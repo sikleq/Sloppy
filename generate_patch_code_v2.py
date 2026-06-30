@@ -220,7 +220,9 @@ _NOT_LOWER_IS_BUFF = re.compile(
     r'\bcooldown\s+reduction\b'
     r'|\bcooldown\s+advance\b'
     r'|\bmana\s+cost\s+reduction\b'
-    r'|\bpenalty\s+reduction\b',
+    r'|\bpenalty\s+reduction\b'
+    # "Magic Resistance bonus" is higher-is-better (item stat), not incoming damage
+    r'|\bmagic\s+resistance\s+bonus\b',
     re.I,
 )
 
