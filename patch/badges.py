@@ -487,6 +487,10 @@ FACETS = {
     "sand_king_sandshroud":             ("Sandshroud",           "Gray3"),
     "sand_king_dust_devil":             ("Dust Devil",           "Yellow1"),
     "witch_doctor_headhunter":          ("Headhunter",           "Gray3"),
+    "furion_ironwood_treant":           ("Ironwood Treant",       "Blue2"),
+    "monkey_king_wukongs_faithful":     ("Wukong's Faithful",    "Red2"),
+    "silencer_irrepressible":           ("Irrepressible",         "Purple1"),
+    "silencer_reverberating_silence":   ("Reverberating Silence", "Gray3"),
     # 7.39 — auto-registered by generate_patch_code_v2.py
     "axe_call_out": ("Call Out", "Red2"),
     "mirana_leaps_and_bounds": ("Leaps and Bounds", "Gray3"),
