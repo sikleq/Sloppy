@@ -487,6 +487,7 @@ FACETS = {
     "sand_king_sandshroud":             ("Sandshroud",           "Gray3"),
     "sand_king_dust_devil":             ("Dust Devil",           "Yellow1"),
     "witch_doctor_headhunter":          ("Headhunter",           "Gray3"),
+    "batrider_buff_on_displacement":    ("Stoked",               "Red0"),
     "furion_ironwood_treant":           ("Ironwood Treant",       "Blue2"),
     "monkey_king_wukongs_faithful":     ("Wukong's Faithful",    "Red2"),
     "silencer_irrepressible":           ("Irrepressible",         "Purple1"),
