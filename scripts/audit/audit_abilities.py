@@ -21,7 +21,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.request import urlopen
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 HEROLIST = "https://www.dota2.com/datafeed/herolist?language=english"
 HERODATA = "https://www.dota2.com/datafeed/herodata?language=english&hero_id={}"
 

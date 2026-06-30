@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 from urllib.request import urlopen
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 DATAFEED = "https://www.dota2.com/datafeed/itemlist?language=english"
 
 print("Fetching live Valve item datafeed...")
@@ -73,7 +73,7 @@ for display in calls:
         problems.append((display, resolved_slug, valve_display, icon_present, "slug NOT in Valve data"))
     elif valve_display != display:
         # Slug exists but live name differs
-        problems.append((display, resolved_slug, valve_display, icon_present, f"renamed → '{valve_display}'"))
+        problems.append((display, resolved_slug, valve_display, icon_present, f"renamed -> '{valve_display}'"))
     elif not icon_present:
         problems.append((display, resolved_slug, valve_display, icon_present, "icon missing locally"))
 

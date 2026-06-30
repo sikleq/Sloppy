@@ -342,7 +342,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
 <div class="sc-page">
-<a class="sc-back" href="../{version}.html">← Back to {version} changelog</a>
+{back_link}
 <h1>Silent Changes</h1>
 <p class="sc-sub">Raw KV-field deltas between <strong>{prev}</strong> → <strong>{version}</strong>, parsed
 from <code>data/stats/{{ver}}/heroes/*.txt</code>. These may overlap with the
@@ -380,7 +380,17 @@ def build_page(version: str) -> str | None:
     n_heroes = len(diff)
     n_changes = sum(len(f) for ab in diff.values() for f in ab.values())
     print(f"  -> silent/{version}.html  ({n_heroes} heroes, {n_changes} field deltas)")
-    return PAGE_TEMPLATE.format(version=version, prev=prev, body=body)
+    # Only show back-link when the annotated patch page actually exists
+    has_content = any(
+        p.stem == f"p{version.replace('.', '')}"
+        for p in Path("content").glob("p*.py")
+    )
+    back_link = (
+        f'<a class="sc-back" href="../{version}.html">← Back to {version} changelog</a>'
+        if has_content else
+        '<a class="sc-back" href="../../">← All Patches</a>'
+    )
+    return PAGE_TEMPLATE.format(version=version, prev=prev, body=body, back_link=back_link)
 
 
 def main() -> int:

@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 from urllib.request import urlopen
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 DATAFEED = "https://www.dota2.com/datafeed/herolist?language=english"
 
 print("Fetching live Valve hero list...")

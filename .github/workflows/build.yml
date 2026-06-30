@@ -37,6 +37,27 @@ jobs:
           PYTHONIOENCODING: utf-8
         run: python build_site.py
 
+      - name: Verify minification
+        run: |
+          python - <<'PY'
+          import pathlib, sys
+          src_css = pathlib.Path('styles.css').stat().st_size
+          dist_css = pathlib.Path('dist/styles.css').stat().st_size
+          src_js = pathlib.Path('src/scripts.js').stat().st_size
+          dist_js = pathlib.Path('dist/src/scripts.js').stat().st_size
+          ok = True
+          if dist_css >= src_css:
+              print(f'FAIL: dist/styles.css ({dist_css}) not smaller than source ({src_css})')
+              ok = False
+          if dist_js >= src_js:
+              print(f'FAIL: dist/src/scripts.js ({dist_js}) not smaller than source ({src_js})')
+              ok = False
+          if ok:
+              print(f'OK — CSS {src_css}→{dist_css}, JS {src_js}→{dist_js}')
+          else:
+              sys.exit(1)
+          PY
+
       - name: Validate normalized patch data
         run: python tools/validate_data.py
 
@@ -182,9 +203,7 @@ jobs:
       - name: Copy static assets into dist
         if: github.ref == 'refs/heads/main'
         run: |
-          cp styles.css dist/
           cp _dynamics.json dist/
-          cp -r src dist/
           cp -r icons dist/
 
       - name: Stage site for Pages
