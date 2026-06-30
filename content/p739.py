@@ -826,7 +826,6 @@ def build():
     W(ul_open())
     W(li("Starbreaker: Now will grant the attack speed buff even if Starbreaker was interrupted", t("BUFF")))
     W(ul_close())
-    W(ul_close())
     # v2-todo: convert to ability_change(old=..., new=..., summary="Innate reworked." / "Ability reworked.", tag="rework") — lift OLD desc from prior patchnotes
     W(ul_open())
     W(li("Break of Dawn: Ability reworked", t("REWORK"), extra=inline_note("Passive, can't be leveled up")))
