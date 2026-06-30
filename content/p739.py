@@ -191,7 +191,7 @@ def build():
     W(item_header("Helm of the Dominator", changed=True))
     W(auto_components_change("Helm of the Dominator", "7.39"))
     W(ul_open())
-    W(li("Recipe cost increased from 650 to 1125. Total Cost decreased from 2625 to 2550", b(650, 1125, l=True)))
+    W(li("Recipe cost increased from 650 to 1125. Total Cost decreased from 2625 to 2550", b(2625, 2550, l=True)))
     W(li("Stats unchanged", t("MISC")))
     W(ul_close())
     W(item_header("Helm of the Overlord"))
