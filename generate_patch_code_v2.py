@@ -526,8 +526,8 @@ def _entity_title_decoration(entity):
     if not title:
         return ''
     txt = _strip_html(title).strip()
-    if 'New' in txt:
-        return f', new="{txt.replace("New ", "")}"' if 'New ' in txt else ', new=True'
+    if 'New' in txt or 'Returning' in txt:
+        return f', new="{txt}"'
     return ''
 
 
@@ -579,6 +579,21 @@ def _render_item(item, version, neutral=False):
     if is_recipe_changed:
         deco = deco + ', changed=True' if deco else ', changed=True'
         notes = notes[1:]
+    # Detect "New Tier N Artifact" / "Returning as a Tier N Neutral Artifact" as
+    # the first note in neutral items — convert to item_header(new="...") and drop.
+    _NEW_RET_RE = re.compile(
+        r'^(New|Returning(?:\s+as\s+a))\s+Tier\s+\d+\s+(?:Neutral\s+)?Artifact$',
+        re.I,
+    )
+    if neutral and not deco and notes:
+        first_txt = _strip_html(notes[0].get('note', '')).strip()
+        m = _NEW_RET_RE.match(first_txt)
+        if m:
+            # Normalise: "Returning as a Tier 2 Neutral Artifact" → "Returning Tier 2 Artifact"
+            norm = re.sub(r'\s+as\s+a\b', '', first_txt, flags=re.I)
+            norm = re.sub(r'\s+Neutral\b', '', norm, flags=re.I)
+            deco = f', new="{norm}"'
+            notes = notes[1:]
     if is_enchantment:
         out.append(f'W(enchant_header("{name}"))')
     else:
