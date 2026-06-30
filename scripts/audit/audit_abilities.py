@@ -86,13 +86,32 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     ("Lone Druid", "lone_druid_spirit_bear_return"),    # confirmed KV: "Return" (Spirit Bear sub-ability)
     ("Lone Druid", "lone_druid_spirit_bear_entangle"),  # confirmed KV: "Entangling Claws" (Spirit Bear sub-ability)
     ("Oracle", "oracle_diviners_deck"),                 # confirmed KV: "Diviner's Deck" (Aghs upgrade)
-    # Drunken Brawler stance sub-abilities — not separate datafeed entries,
-    # but a documented real Brewmaster mechanic (stance bonuses), confirmed
-    # against local icon art that predates this audit (icons/abilities/
-    # brewmaster_drunken_brawler_{earth,fire,void}.png).
-    ("Brewmaster", "brewmaster_drunken_brawler_earth"),
-    ("Brewmaster", "brewmaster_drunken_brawler_fire"),
-    ("Brewmaster", "brewmaster_drunken_brawler_void"),
+}
+
+# Synthetic visual sub-blocks of a real parent ability that do NOT exist
+# as standalone engine slugs in abilities_slim.json. Treated like
+# KNOWN_ICON_URL_PSEUDO_SLUGS: bypass datafeed validation entirely, since
+# the slug was never intended to resolve to a real Valve ability — it's a
+# layout convention to render the parent ability's per-stance bonuses
+# under their own visual heading. Each entry must document the parent
+# engine ability it visually decomposes.
+KNOWN_SYNTHETIC_SUBBLOCKS = {
+    # Brewmaster Drunken Brawler renders three per-element stance bonus
+    # blocks (Earth/Fire/Void); parent ability is brewmaster_drunken_brawler.
+    "brewmaster_drunken_brawler_earth",
+    "brewmaster_drunken_brawler_fire",
+    "brewmaster_drunken_brawler_void",
+}
+
+# Innate slugs whose engine entry exists (confirmed via abilities_slim.json
+# with is_innate=True) but for which Valve publishes no public CDN icon
+# under that slug. Rendered via the elements.py innate-icon fallback path
+# (data-slug attr + INNATE_ICON_URL) rather than a duplicated PNG file.
+# Listed here so check_icons.py can confirm the fallback is intentional,
+# not an accidental missing file.
+KNOWN_INNATE_NO_CDN_ICON = {
+    "queenofpain_succubus",   # Succubus innate
+    "terrorblade_dark_unity", # Dark Unity innate
 }
 
 # Display names that intentionally differ from Valve's base ability name_loc
@@ -279,7 +298,9 @@ for hero, display, explicit_slug, kind, has_icon_url, fname in calls:
     # Calls that supply their own icon_url= (e.g. synthetic pseudo-unit
     # slugs) or are explicitly listed as such bypass datafeed validation
     # entirely — they were never meant to resolve to a real ability slug.
-    if has_icon_url or resolved in KNOWN_ICON_URL_PSEUDO_SLUGS:
+    if (has_icon_url
+            or resolved in KNOWN_ICON_URL_PSEUDO_SLUGS
+            or resolved in KNOWN_SYNTHETIC_SUBBLOCKS):
         continue
 
     if resolved not in abis:

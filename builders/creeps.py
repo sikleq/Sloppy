@@ -5,8 +5,8 @@ site_common.py.
 
 Data sources (read-only):
   data/creeps_raw.csv               — ordering, level, createhero names
-  data/stats/7.41c/units.json       — base neutral stats
-  data/stats/7.41c/npc_units.txt    — full KV (regen, bounty, vision, abilities)
+  data/stats/<latest>/units.json       — base neutral stats
+  data/stats/<latest>/npc_units.txt    — full KV (regen, bounty, vision, abilities)
   data/abilities_slim.json          — ability slug → display name
   data/site_meta.json               — latest patch href (written by build_patch.py)
   icons/units/*.png                 — creep portraits
@@ -44,7 +44,7 @@ def _latest_href():
 def save_creeps_html():
     """Generate neutral_stats.html — neutral stats table. CSV provides the
     ordering, level (Ур.) and createhero name; every other column is
-    auto-pulled from data/stats/7.41c/units.json + npc_units.txt and
+    auto-pulled from data/stats/<latest>/units.json (latest_stats_version()) + npc_units.txt and
     abilities_slim.json. Derived columns (Armor %, EHP Phys/Mag, Avg dmg,
     Avg gold, t/1 attack) are computed from formulas. Tier-level rows are
     separated with a horizontal divider when Ур. changes.
@@ -1805,7 +1805,7 @@ def save_creeps_html():
         'giant_wolf_intimidate': {
             'effect': 'Reduces attack damage by 60%'},
         'dark_troll_warlord_ensnare': {
-            # No entry in 7.41c npc_abilities.json — fill from in-game tooltip.
+            # No entry in <latest>/npc_abilities.json — fill from in-game tooltip.
             'manacost': '75', 'cooldown': '15', 'duration': '1.75',
             'cast_range': '550/625/700/825',
             'effect': 'Roots the target', 'effect2': 'True Sight on the target'},
@@ -1829,7 +1829,7 @@ def save_creeps_html():
             'effect': '+9/10/11/12% lifesteal',
             'effect2': '+9/10/11/12 HP regen'},
         'ogre_magi_frost_armor': {
-            # Slug missing from 7.41c npc_abilities.json — fill from in-game.
+            # Slug missing from <latest>/npc_abilities.json — fill from in-game.
             'manacost': '40', 'cooldown': '5', 'duration': '45',
             'cast_range': '800',
             'as_effect': '-22/24/26/30%', 'ms_effect': '-22/24/26/30%',

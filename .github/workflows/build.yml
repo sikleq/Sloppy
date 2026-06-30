@@ -180,11 +180,35 @@ jobs:
           if ver not in stem_map:
               problems.append(f'Missing content/p*.py for latest patch {ver}')
 
-          # 2. data/stats/<ver>/ has required files
-          stats_dir = pathlib.Path('data/stats') / stats_ver
-          for fn in ('items.txt', 'units.json', 'npc_units.txt'):
+          # 2. data/stats/<ver>/ must EXACTLY match the current patch — no
+          # silent fallback to an older stats dir. Required: every JSON+TXT
+          # input that builders/audits consume for hero stats, neutral
+          # abilities, and hero ability metadata.
+          if stats_ver != ver:
+              problems.append(
+                  f'Stats binding mismatch: current patch is {ver} but '
+                  f'latest_stats_version() resolved to {stats_ver}. '
+                  f'Create data/stats/{ver}/ with the full file set or '
+                  f'remove the partial dir.')
+          stats_dir = pathlib.Path('data/stats') / ver
+          required = (
+              'items.txt', 'items.json',
+              'units.json',
+              'npc_units.txt', 'npc_units.json',
+              'npc_abilities.txt', 'npc_abilities.json',
+              'heroes.json', 'heroes_raw.json',
+              'abilities.json', 'ability_ids.json',
+          )
+          for fn in required:
               if not (stats_dir / fn).exists():
-                  problems.append(f'Missing data/stats/{stats_ver}/{fn}')
+                  problems.append(f'Missing data/stats/{ver}/{fn}')
+
+          # 2a. Normalized JSON artifact must exist for the current patch
+          norm_path = pathlib.Path('data/normalized/patches') / f'{ver}.json'
+          if not norm_path.exists():
+              problems.append(
+                  f'Missing {norm_path} — regenerate via '
+                  f'generate_patch_code_v2.py for patch {ver}.')
 
           # 3. RELEASE_HISTORY entry has filename (patch page will be built)
           from patch.meta import RELEASE_HISTORY

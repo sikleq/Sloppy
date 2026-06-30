@@ -29,7 +29,7 @@ try:
 except Exception:
     pass
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 STATS_DIR = ROOT / "data" / "stats"
 META_PATH = ROOT / "data" / "site_meta.json"
 CACHE_DIR = ROOT / ".cache" / "d2vpkr_abilities"

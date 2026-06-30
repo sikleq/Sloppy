@@ -1,0 +1,2646 @@
+{
+  "patch": "7.41d",
+  "generated_from": "data/7.41d_datafeed.json",
+  "entities": [
+    {
+      "entity_type": "general",
+      "id": null,
+      "name": "Mechanics",
+      "changes": [
+        {
+          "text": "Dire Fountain: Rejuvenation Aura radius has been slightly increased",
+          "tag": "buff",
+          "scope": "base"
+        },
+        {
+          "text": "Self-Cast on Town Portal Scroll's Teleport and other similar abilities now place the hero slightly closer to the Ancient",
+          "tag": "misc",
+          "scope": "base"
+        },
+        {
+          "text": "Town Portal Scroll's Teleport and other similar ability effects now partially follow the channeling unit even if they move after starting their teleport.",
+          "tag": "misc",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "item",
+      "id": "dagon",
+      "name": "Dagon",
+      "changes": [
+        {
+          "text": "Recipe cost decreased from 1150 to 1100",
+          "tag": "buff",
+          "old": 1150,
+          "new": 1100,
+          "lower_is_better": true,
+          "scope": "base"
+        },
+        {
+          "text": "Total cost decreased from 3050/4200/5350/6500/7650g to 3000/4100/5200/6300/7400g",
+          "tag": "nerf",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "item",
+      "id": "mage_slayer",
+      "name": "Mage Slayer",
+      "changes": [
+        {
+          "text": "Damage bonus decreased from +15 to +12",
+          "tag": "nerf",
+          "old": 15,
+          "new": 12,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "item",
+      "id": "smoke_of_deceit",
+      "name": "Smoke of Deceit",
+      "changes": [
+        {
+          "text": "Using Smoke of Deceit now broadcasts a chat message in allied chat",
+          "tag": "misc",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "flayers_bota",
+      "name": "Flayer's Bota",
+      "changes": [
+        {
+          "text": "Bloodrush range increased from 1200 to 1500",
+          "tag": "buff",
+          "old": 1200,
+          "new": 1500,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "idol_of_screeauk",
+      "name": "Idol of Scree'auk",
+      "changes": [
+        {
+          "text": "False Flight bonus evasion increased from 25% to 35%",
+          "tag": "buff",
+          "old": 25,
+          "new": 35,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "prophets_pendulum",
+      "name": "Prophet's Pendulum",
+      "changes": [
+        {
+          "text": "Linger delayed damage is now non-lethal if the incoming damage source was non-lethal",
+          "tag": "misc",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "dezun_bloodrite",
+      "name": "Dezun Bloodrite",
+      "changes": [
+        {
+          "text": "Blood Invocation bonus AoE increased from 16% to 20%",
+          "tag": "buff",
+          "old": 16,
+          "new": 20,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "fallen_sky",
+      "name": "Fallen Sky",
+      "changes": [
+        {
+          "text": "Fallen Sky building impact damage increased from 75 to 110",
+          "tag": "buff",
+          "old": 75,
+          "new": 110,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "harmonizer",
+      "name": "Harmonizer",
+      "changes": [
+        {
+          "text": "Balance mana cost reduction per ability off cooldown increased from 5% to 7%",
+          "tag": "buff",
+          "old": 5,
+          "new": 7,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "riftshadow_prism",
+      "name": "Riftshadow Prism",
+      "changes": [
+        {
+          "text": "Refract illusion's outgoing damage increased from 50% to 60%",
+          "tag": "buff",
+          "old": 50,
+          "new": 60,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "spider_legs",
+      "name": "Spider Legs",
+      "changes": [
+        {
+          "text": "Skitter cooldown decreased from 20s to 15s",
+          "tag": "buff",
+          "old": 20,
+          "new": 15,
+          "lower_is_better": true,
+          "scope": "base"
+        },
+        {
+          "text": "Skitter duration decreased from 14s to 12s",
+          "tag": "nerf",
+          "old": 14,
+          "new": 12,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "heavy_blade",
+      "name": "Witchbane",
+      "changes": [
+        {
+          "text": "Cleanse cast range increased from 500 to 700",
+          "tag": "buff",
+          "old": 500,
+          "new": 700,
+          "scope": "base"
+        },
+        {
+          "text": "Cleanse: Mana Cost decreased from 150 to 50",
+          "tag": "buff",
+          "old": 150,
+          "new": 50,
+          "lower_is_better": true,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "enhancement_alert",
+      "name": "Alert",
+      "changes": [
+        {
+          "text": "Night Vision bonus decreased from +0/150/225/300 to +0/125/175/225",
+          "tag": "nerf",
+          "old": [
+            0,
+            150,
+            225,
+            300
+          ],
+          "new": [
+            0,
+            125,
+            175,
+            225
+          ],
+          "scope": "base"
+        },
+        {
+          "text": "Attack Range bonus decreased from +0/0/0/100 to +0/0/0/80",
+          "tag": "nerf",
+          "old": [
+            0,
+            0,
+            0,
+            100
+          ],
+          "new": [
+            0,
+            0,
+            0,
+            80
+          ],
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "enhancement_timeless",
+      "name": "Timeless",
+      "changes": [
+        {
+          "text": "Spell Amplification bonus decreased from +6/16% to +5/12%",
+          "tag": "nerf",
+          "old": [
+            6,
+            16
+          ],
+          "new": [
+            5,
+            12
+          ],
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "enhancement_titanic",
+      "name": "Titanic",
+      "changes": [
+        {
+          "text": "Attack Speed penalty decreased from 10/12/14% to 9%",
+          "tag": "buff",
+          "old": [
+            10,
+            12,
+            14
+          ],
+          "new": 9,
+          "lower_is_better": true,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "neutral_item",
+      "id": "enhancement_vital",
+      "name": "Vital",
+      "changes": [
+        {
+          "text": "Health Regen bonus increased from +2 to +2.25",
+          "tag": "buff",
+          "old": 2,
+          "new": 2.25,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "hero_1961",
+      "name": "hero_1961",
+      "changes": [
+        {
+          "text": "Base Health Regen decreased by 1.5",
+          "tag": "nerf",
+          "scope": "base"
+        },
+        {
+          "text": "Level 10 Talent Movement Speed decreased from +20 to +15",
+          "tag": "nerf",
+          "old": 20,
+          "new": 15,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "abaddon",
+      "name": "Abaddon",
+      "changes": [
+        {
+          "text": "Base Attack Speed increased from 95 to 100",
+          "tag": "buff",
+          "old": 95,
+          "new": 100,
+          "scope": "base"
+        },
+        {
+          "text": "Heal Reduction increased from 24.5% + 0.5% per level to 29.5% + 0.5% per level",
+          "tag": "buff",
+          "scope": "Withering Mist"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "ancient_apparition",
+      "name": "Ancient Apparition",
+      "changes": [
+        {
+          "text": "Damage per second increased from 20/40/60/80 to 25/45/65/85",
+          "tag": "buff",
+          "old": [
+            20,
+            40,
+            60,
+            80
+          ],
+          "new": [
+            25,
+            45,
+            65,
+            85
+          ],
+          "scope": "Cold Feet"
+        },
+        {
+          "text": "Cooldown decreased from 12/9/6/3s to 10/7.5/5/2.5s",
+          "tag": "buff",
+          "old": [
+            12,
+            9,
+            6,
+            3
+          ],
+          "new": [
+            10,
+            7.5,
+            5,
+            2.5
+          ],
+          "lower_is_better": true,
+          "scope": "Chilling Touch"
+        },
+        {
+          "text": "Damage increased from 30/60/90/120 to 35/65/95/125",
+          "tag": "buff",
+          "old": [
+            30,
+            60,
+            90,
+            120
+          ],
+          "new": [
+            35,
+            65,
+            95,
+            125
+          ],
+          "scope": "Chilling Touch"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "antimage",
+      "name": "Anti-Mage",
+      "changes": [
+        {
+          "text": "Base Agility increased from 24 to 25",
+          "tag": "buff",
+          "old": 24,
+          "new": 25,
+          "scope": "base"
+        },
+        {
+          "text": "Damage at level 1 increased by 1 (from 53-57 to 54-58)",
+          "tag": "buff",
+          "old": [
+            53,
+            57
+          ],
+          "new": [
+            54,
+            58
+          ],
+          "range": true,
+          "scope": "base"
+        },
+        {
+          "text": "Mana Cost decreased from 65/60/55/50 to 60/55/50/45",
+          "tag": "buff",
+          "old": [
+            65,
+            60,
+            55,
+            50
+          ],
+          "new": [
+            60,
+            55,
+            50,
+            45
+          ],
+          "lower_is_better": true,
+          "scope": "Blink"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "arc_warden",
+      "name": "Arc Warden",
+      "changes": [
+        {
+          "text": "Cast Range increased from 500/600/700/800 to 625/700/775/850",
+          "tag": "buff",
+          "old": [
+            500,
+            600,
+            700,
+            800
+          ],
+          "new": [
+            625,
+            700,
+            775,
+            850
+          ],
+          "scope": "Flux"
+        },
+        {
+          "text": "Movement Speed Slow increased from 14/21/28/35% to 20/25/30/35%",
+          "tag": "buff",
+          "old": [
+            14,
+            21,
+            28,
+            35
+          ],
+          "new": [
+            20,
+            25,
+            30,
+            35
+          ],
+          "scope": "Flux"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "axe",
+      "name": "Axe",
+      "changes": [
+        {
+          "text": "Base Health Regen decreased by 0.5",
+          "tag": "nerf",
+          "scope": "base",
+          "info": "Sense of Foreboding increased from 0 to 0.5"
+        },
+        {
+          "text": "Cast Range decreased from 700/775/850/925 to 600/700/800/900",
+          "tag": "nerf",
+          "old": [
+            700,
+            775,
+            850,
+            925
+          ],
+          "new": [
+            600,
+            700,
+            800,
+            900
+          ],
+          "scope": "Battle Hunger"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "bloodseeker",
+      "name": "Bloodseeker",
+      "changes": [
+        {
+          "text": "No longer procs Magic Stick or its upgrades",
+          "tag": "misc",
+          "scope": "Bloodrage"
+        },
+        {
+          "text": "Aghanim's Scepter health damage increased from 13% to 15%",
+          "tag": "buff",
+          "old": 13,
+          "new": 15,
+          "scope": "Rupture"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "bounty_hunter",
+      "name": "Bounty Hunter",
+      "changes": [
+        {
+          "text": "Bonus gold increased from 15% to 20%",
+          "tag": "buff",
+          "old": 15,
+          "new": 20,
+          "scope": "Big Game Hunter"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "brewmaster",
+      "name": "Brewmaster",
+      "changes": [
+        {
+          "text": "Aghanim's Shard max HP regen per second increased from 2.5% to 3%",
+          "tag": "buff",
+          "old": 2.5,
+          "new": 3,
+          "scope": "Liquid Courage"
+        },
+        {
+          "text": "Slow duration increased from 4s to 4/4.25/4.5/4.75s",
+          "tag": "buff",
+          "old": 4,
+          "new": [
+            4,
+            4.25,
+            4.5,
+            4.75
+          ],
+          "scope": "Thunder Clap"
+        },
+        {
+          "text": "Level 10 Talent Brewlings Base Damage decreased from +14 to +13",
+          "tag": "nerf",
+          "old": 14,
+          "new": 13,
+          "scope": "talent"
+        },
+        {
+          "text": "Level 20 Talent Primal Split Cooldown Reduction decreased from 15s to 12s",
+          "tag": "nerf",
+          "old": 15,
+          "new": 12,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "broodmother",
+      "name": "Broodmother",
+      "changes": [
+        {
+          "text": "Spiderlings HP increased from 300 to 325",
+          "tag": "buff",
+          "old": 300,
+          "new": 325,
+          "scope": "Spawn Spiderlings"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "chaos_knight",
+      "name": "Chaos Knight",
+      "changes": [
+        {
+          "text": "Phantasm Damage increased from 50/75/100% to 60/80/100%",
+          "tag": "buff",
+          "old": [
+            50,
+            75,
+            100
+          ],
+          "new": [
+            60,
+            80,
+            100
+          ],
+          "scope": "Phantasm"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "clinkz",
+      "name": "Clinkz",
+      "changes": [
+        {
+          "text": "Mana Cost decreased from 60 to 50",
+          "tag": "buff",
+          "old": 60,
+          "new": 50,
+          "lower_is_better": true,
+          "scope": "Death Pact"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "rattletrap",
+      "name": "Clockwerk",
+      "changes": [
+        {
+          "text": "Mana Cost increased from 60/65/70/75 to 75",
+          "tag": "nerf",
+          "old": [
+            60,
+            65,
+            70,
+            75
+          ],
+          "new": 75,
+          "lower_is_better": true,
+          "scope": "Power Cogs"
+        },
+        {
+          "text": "Pushback and damage now apply against heroes with no mana",
+          "tag": "misc",
+          "scope": "Power Cogs"
+        },
+        {
+          "text": "Damage rescaled from 50/125/200/275 to 55/110/165/220",
+          "tag": "rework",
+          "old": [
+            50,
+            125,
+            200,
+            275
+          ],
+          "new": [
+            55,
+            110,
+            165,
+            220
+          ],
+          "scope": "Power Cogs"
+        },
+        {
+          "text": "Level 15 Talent Hookshot Cooldown Reduction decreased from 10s to 8s",
+          "tag": "nerf",
+          "old": 10,
+          "new": 8,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "dark_seer",
+      "name": "Dark Seer",
+      "changes": [
+        {
+          "text": "Base Health Regen increased by 0.5",
+          "tag": "buff",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "dark_willow",
+      "name": "Dark Willow",
+      "changes": [
+        {
+          "text": "Base Intelligence increased from 21 to 22",
+          "tag": "buff",
+          "old": 21,
+          "new": 22,
+          "scope": "base"
+        },
+        {
+          "text": "Damage at level 1 increased by 1 (from 48-56 to 49-57)",
+          "tag": "buff",
+          "old": [
+            48,
+            56
+          ],
+          "new": [
+            49,
+            57
+          ],
+          "range": true,
+          "scope": "base"
+        },
+        {
+          "text": "Cast Range increased from 600/625/650/675 to 700",
+          "tag": "buff",
+          "old": [
+            600,
+            625,
+            650,
+            675
+          ],
+          "new": 700,
+          "scope": "Cursed Crown"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "dawnbreaker",
+      "name": "Dawnbreaker",
+      "changes": [
+        {
+          "text": "Mana Cost increased from 100 to 110",
+          "tag": "nerf",
+          "old": 100,
+          "new": 110,
+          "lower_is_better": true,
+          "scope": "Starbreaker"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "dazzle",
+      "name": "Dazzle",
+      "changes": [
+        {
+          "text": "Bonus Slow Per Hit increased from 2/2.5/3/3.5% to 2.5/3/3.5/4%",
+          "tag": "buff",
+          "old": [
+            2,
+            2.5,
+            3,
+            3.5
+          ],
+          "new": [
+            2.5,
+            3,
+            3.5,
+            4
+          ],
+          "scope": "Poison Touch"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "disruptor",
+      "name": "Disruptor",
+      "changes": [
+        {
+          "text": "Base Movement Speed increased from 295 to 300",
+          "tag": "buff",
+          "old": 295,
+          "new": 300,
+          "scope": "base"
+        },
+        {
+          "text": "Mana Cost decreased from 125/130/135/140 to 115/120/125/130",
+          "tag": "buff",
+          "old": [
+            125,
+            130,
+            135,
+            140
+          ],
+          "new": [
+            115,
+            120,
+            125,
+            130
+          ],
+          "lower_is_better": true,
+          "scope": "Thunder Strike"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "doom_bringer",
+      "name": "Doom",
+      "changes": [
+        {
+          "text": "Intelligence gain increased from 1.9 to 2.1",
+          "tag": "buff",
+          "old": 1.9,
+          "new": 2.1,
+          "scope": "base"
+        },
+        {
+          "text": "Aghanim's Shard bonus AoE decreased from 20% to 15%",
+          "tag": "nerf",
+          "old": 20,
+          "new": 15,
+          "scope": "Devour"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "dragon_knight",
+      "name": "Dragon Knight",
+      "changes": [
+        {
+          "text": "AoE increased from 25 to 50",
+          "tag": "buff",
+          "old": 25,
+          "new": 50,
+          "scope": "Dragon Tail"
+        },
+        {
+          "text": "Level 20 Talent Breathe Fire Damage increased from +200 to +220",
+          "tag": "buff",
+          "old": 200,
+          "new": 220,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "earth_spirit",
+      "name": "Earth Spirit",
+      "changes": [
+        {
+          "text": "Passive bonus damage per unused charge increased from 2.5% to 3%",
+          "tag": "buff",
+          "old": 2.5,
+          "new": 3,
+          "scope": "Stone Remnant"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "earthshaker",
+      "name": "Earthshaker",
+      "changes": [
+        {
+          "text": "Base Mana Regen increased by 0.25",
+          "tag": "buff",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "elder_titan",
+      "name": "Elder Titan",
+      "changes": [
+        {
+          "text": "Radius increased from 350 to 375",
+          "tag": "buff",
+          "old": 350,
+          "new": 375,
+          "scope": "Natural Order"
+        },
+        {
+          "text": "Movement Slow increased from 30/40/50% to 40/45/50%",
+          "tag": "buff",
+          "old": [
+            30,
+            40,
+            50
+          ],
+          "new": [
+            40,
+            45,
+            50
+          ],
+          "scope": "Earth Splitter"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "ember_spirit",
+      "name": "Ember Spirit",
+      "changes": [
+        {
+          "text": "Bonus Hero Damage decreased from 50/90/130/170 to 40/80/120/160",
+          "tag": "nerf",
+          "old": [
+            50,
+            90,
+            130,
+            170
+          ],
+          "new": [
+            40,
+            80,
+            120,
+            160
+          ],
+          "scope": "Sleight of Fist"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "enigma",
+      "name": "Enigma",
+      "changes": [
+        {
+          "text": "Cooldown rescaled from 40/38/36/34s to 45/40/35/30s",
+          "tag": "rework",
+          "old": [
+            40,
+            38,
+            36,
+            34
+          ],
+          "new": [
+            45,
+            40,
+            35,
+            30
+          ],
+          "lower_is_better": true,
+          "scope": "Demonic Summoning"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "faceless_void",
+      "name": "Faceless Void",
+      "changes": [
+        {
+          "text": "Aghanim's Scepter Time Lock radius decreased from 400 to 325",
+          "tag": "nerf",
+          "old": 400,
+          "new": 325,
+          "scope": "Time Walk"
+        },
+        {
+          "text": "Radius decreased from 775 to 700",
+          "tag": "nerf",
+          "old": 775,
+          "new": 700,
+          "scope": "Time Dilation"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "grimstroke",
+      "name": "Grimstroke",
+      "changes": [
+        {
+          "text": "Magic Resistance decreased from 95% to 90%",
+          "tag": "buff",
+          "old": 95,
+          "new": 90,
+          "lower_is_better": true,
+          "scope": "Dark Portrait"
+        },
+        {
+          "text": "Level 20 Talent Attacks to Destroy Phantom decreased from +3 to +2",
+          "tag": "nerf",
+          "old": 3,
+          "new": 2,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "gyrocopter",
+      "name": "Gyrocopter",
+      "changes": [
+        {
+          "text": "Night Vision increased from 800 to 1000",
+          "tag": "buff",
+          "old": 800,
+          "new": 1000,
+          "scope": "base"
+        },
+        {
+          "text": "No longer provides 200 Bonus Night Vision",
+          "tag": "del",
+          "scope": "Flak Cannon"
+        },
+        {
+          "text": "Missile Slow increased from 50% to 60%",
+          "tag": "buff",
+          "old": 50,
+          "new": 60,
+          "scope": "Call Down"
+        },
+        {
+          "text": "No longer attacks 2 units at a time while Flak Cannon is active",
+          "tag": "misc",
+          "scope": "Side Gunner"
+        },
+        {
+          "text": "Level 25 Talent Flak Cannon Cooldown Reduction increased from 4s to 6s",
+          "tag": "buff",
+          "old": 4,
+          "new": 6,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "hoodwink",
+      "name": "Hoodwink",
+      "changes": [
+        {
+          "text": "Cooldown increased from 16/14/12/10s to 19/16/13/10s",
+          "tag": "nerf",
+          "old": [
+            16,
+            14,
+            12,
+            10
+          ],
+          "new": [
+            19,
+            16,
+            13,
+            10
+          ],
+          "lower_is_better": true,
+          "scope": "Acorn Shot"
+        },
+        {
+          "text": "Bonus Movement Speed decreased from 20/25/30/35% to 15/20/25/30%",
+          "tag": "nerf",
+          "old": [
+            20,
+            25,
+            30,
+            35
+          ],
+          "new": [
+            15,
+            20,
+            25,
+            30
+          ],
+          "scope": "Scurry"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "huskar",
+      "name": "Huskar",
+      "changes": [
+        {
+          "text": "Burn Damage decreased from 5/10/15/20 to 4/8/12/16",
+          "tag": "nerf",
+          "old": [
+            5,
+            10,
+            15,
+            20
+          ],
+          "new": [
+            4,
+            8,
+            12,
+            16
+          ],
+          "scope": "Burning Spear"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "invoker",
+      "name": "Invoker",
+      "changes": [
+        {
+          "text": "Cooldown increased from 32s to 40s",
+          "tag": "nerf",
+          "old": 32,
+          "new": 40,
+          "lower_is_better": true,
+          "scope": "Ghost Walk"
+        },
+        {
+          "text": "Contact Damage decreased from 55/80/105/130/155/180/205/220/235 to 55/75/95/115/135/155/175/195/215",
+          "tag": "nerf",
+          "old": [
+            55,
+            80,
+            105,
+            130,
+            155,
+            180,
+            205,
+            220,
+            235
+          ],
+          "new": [
+            55,
+            75,
+            95,
+            115,
+            135,
+            155,
+            175,
+            195,
+            215
+          ],
+          "scope": "Chaos Meteor"
+        },
+        {
+          "text": "Movement Slow rescaled from 20/40/60/80/100/120/140/160/180% to 30/45/60/75/90/105/120/135/150%",
+          "tag": "rework",
+          "old": [
+            20,
+            40,
+            60,
+            80,
+            100,
+            120,
+            140,
+            160,
+            180
+          ],
+          "new": [
+            30,
+            45,
+            60,
+            75,
+            90,
+            105,
+            120,
+            135,
+            150
+          ],
+          "scope": "Ice Wall"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "jakiro",
+      "name": "Jakiro",
+      "changes": [
+        {
+          "text": "Base Intelligence increased from 25 to 26",
+          "tag": "buff",
+          "old": 25,
+          "new": 26,
+          "scope": "base"
+        },
+        {
+          "text": "Damage at level 1 increased by 1 (from 52-60 to 53-61)",
+          "tag": "buff",
+          "old": [
+            52,
+            60
+          ],
+          "new": [
+            53,
+            61
+          ],
+          "range": true,
+          "scope": "base"
+        },
+        {
+          "text": "Level 10 Talent Ice Path Damage increased from +75 to +100",
+          "tag": "buff",
+          "old": 75,
+          "new": 100,
+          "scope": "talent"
+        },
+        {
+          "text": "Level 25 Talent Liquid Frost and Fire Max Health Damage increased from +3% to +3.5%",
+          "tag": "buff",
+          "old": 3,
+          "new": 3.5,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "juggernaut",
+      "name": "Juggernaut",
+      "changes": [
+        {
+          "text": "Mana Cost decreased from 120 to 110",
+          "tag": "buff",
+          "old": 120,
+          "new": 110,
+          "lower_is_better": true,
+          "scope": "Blade Fury"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "kez",
+      "name": "Kez",
+      "changes": [
+        {
+          "text": "Katana Bonus Agility Base Damage decreased from 16% to 12%",
+          "tag": "nerf",
+          "old": 16,
+          "new": 12,
+          "scope": "Switch Discipline"
+        },
+        {
+          "text": "Cooldown increased from 20/15/10/5s to 24/18/12/6s",
+          "tag": "nerf",
+          "old": [
+            20,
+            15,
+            10,
+            5
+          ],
+          "new": [
+            24,
+            18,
+            12,
+            6
+          ],
+          "lower_is_better": true,
+          "scope": "Kazurai Katana"
+        },
+        {
+          "text": "Cooldown increased from 20/15/10/5s to 24/18/12/6s",
+          "tag": "nerf",
+          "old": [
+            20,
+            15,
+            10,
+            5
+          ],
+          "new": [
+            24,
+            18,
+            12,
+            6
+          ],
+          "lower_is_better": true,
+          "scope": "Shodo Sai"
+        },
+        {
+          "text": "Parry Duration decreased from 2s to 1.5s",
+          "tag": "nerf",
+          "old": 2,
+          "new": 1.5,
+          "scope": "Shodo Sai"
+        },
+        {
+          "text": "Level 10 Talent +12% Magic Resistance replaced with +6% Switch Discipline Swap Bonuses",
+          "tag": "rework",
+          "scope": "talent",
+          "info": "Katana Swap Bonus Damage from 12% to 18%. Sai Swap Movement Speed from 12% to 18%"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "largo",
+      "name": "Largo",
+      "changes": [
+        {
+          "text": "Bonus Duration increased from 10% + 1% per level to 15% + 1% per level",
+          "tag": "buff",
+          "scope": "Encore"
+        },
+        {
+          "text": "Song Mana Costs increased from 20/32/44 to 25/35/45",
+          "tag": "buff",
+          "old": [
+            20,
+            32,
+            44
+          ],
+          "new": [
+            25,
+            35,
+            45
+          ],
+          "scope": "Amphibian Rhapsody"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "legion_commander",
+      "name": "Legion Commander",
+      "changes": [
+        {
+          "text": "Mana Cost increased from 75 to 80/100/120",
+          "tag": "nerf",
+          "old": 75,
+          "new": [
+            80,
+            100,
+            120
+          ],
+          "lower_is_better": true,
+          "scope": "Duel"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "leshrac",
+      "name": "Leshrac",
+      "changes": [
+        {
+          "text": "Mana/Sec decreased from 25/45/65 to 20/40/60",
+          "tag": "nerf",
+          "old": [
+            25,
+            45,
+            65
+          ],
+          "new": [
+            20,
+            40,
+            60
+          ],
+          "scope": "Pulse Nova"
+        },
+        {
+          "text": "Slow increased from 30% to 40%",
+          "tag": "buff",
+          "old": 30,
+          "new": 40,
+          "scope": "Nihilism"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "lina",
+      "name": "Lina",
+      "changes": [
+        {
+          "text": "Mana Cost decreased from 100/110/120/130 to 90/100/110/120",
+          "tag": "buff",
+          "old": [
+            100,
+            110,
+            120,
+            130
+          ],
+          "new": [
+            90,
+            100,
+            110,
+            120
+          ],
+          "lower_is_better": true,
+          "scope": "Dragon Slave"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "lion",
+      "name": "Lion",
+      "changes": [
+        {
+          "text": "Damage per kill decreased from 30 to 25",
+          "tag": "nerf",
+          "old": 30,
+          "new": 25,
+          "scope": "Finger of Death"
+        },
+        {
+          "text": "Level 15 Talent Hex Cooldown Reduction decreased from 2.5s to 2s",
+          "tag": "nerf",
+          "old": 2.5,
+          "new": 2,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "marci",
+      "name": "Marci",
+      "changes": [
+        {
+          "text": "Cooldown decreased from 245s - 5s per level to 215s - 5s per level",
+          "tag": "nerf",
+          "scope": "Special Delivery"
+        },
+        {
+          "text": "Mana Cost decreased from 60/65/70/75 to 60",
+          "tag": "buff",
+          "old": [
+            60,
+            65,
+            70,
+            75
+          ],
+          "new": 60,
+          "lower_is_better": true,
+          "scope": "Bodyguard"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "mars",
+      "name": "Mars",
+      "changes": [
+        {
+          "text": "Radius increased from 700 to 900",
+          "tag": "buff",
+          "old": 700,
+          "new": 900,
+          "scope": "Dauntless"
+        },
+        {
+          "text": "Now turns Mars in the cast direction when cast with Bulwark toggled on",
+          "tag": "new",
+          "scope": "God's Rebuke"
+        },
+        {
+          "text": "Spear Damage increased from 80/160/240 to 80/170/260",
+          "tag": "buff",
+          "old": [
+            80,
+            160,
+            240
+          ],
+          "new": [
+            80,
+            170,
+            260
+          ],
+          "scope": "Arena Of Blood"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "mirana",
+      "name": "Mirana",
+      "changes": [
+        {
+          "text": "Max Charges increased from 2 + 1 per 7 levels to 2 + 1 per 6 levels",
+          "tag": "buff",
+          "scope": "Celestial Quiver"
+        },
+        {
+          "text": "Second Meteor Damage increased from 70% to 80%",
+          "tag": "buff",
+          "old": 70,
+          "new": 80,
+          "scope": "Starstorm"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "morphling",
+      "name": "Morphling",
+      "changes": [
+        {
+          "text": "Base Strength decreased from 23 to 16",
+          "tag": "nerf",
+          "old": 23,
+          "new": 16,
+          "scope": "base"
+        },
+        {
+          "text": "Base Agility increased from 24 to 33",
+          "tag": "buff",
+          "old": 24,
+          "new": 33,
+          "scope": "base"
+        },
+        {
+          "text": "Damage at level 1 increased by 9 (from 36-45 to 45-54)",
+          "tag": "buff",
+          "old": [
+            36,
+            45
+          ],
+          "new": [
+            45,
+            54
+          ],
+          "range": true,
+          "scope": "base"
+        },
+        {
+          "text": "Agility to Attack Range increased from 20% to 25%",
+          "tag": "buff",
+          "old": 20,
+          "new": 25,
+          "scope": "Ebb and Flow"
+        },
+        {
+          "text": "Strength to Cast Range increased from 20% to 25%",
+          "tag": "buff",
+          "old": 20,
+          "new": 25,
+          "scope": "Ebb and Flow"
+        },
+        {
+          "text": "Strength to Slow Resistance increased from 20% to 25%",
+          "tag": "buff",
+          "old": 20,
+          "new": 25,
+          "scope": "Ebb and Flow"
+        },
+        {
+          "text": "Aghanim's Scepter illusion incoming damage decreased from 300% to 200%",
+          "tag": "buff",
+          "old": 300,
+          "new": 200,
+          "lower_is_better": true,
+          "scope": "Morph"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "furion",
+      "name": "Nature's Prophet",
+      "changes": [
+        {
+          "text": "Treants that are alive now always contribute to the bonus damage, even if they are out of range",
+          "tag": "misc",
+          "scope": "Spirit of the Forest"
+        },
+        {
+          "text": "Level 20 Talent Sprout Damage increased from +220 to +240",
+          "tag": "buff",
+          "old": 220,
+          "new": 240,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "night_stalker",
+      "name": "Night Stalker",
+      "changes": [
+        {
+          "text": "Level 25 Talent Dark Ascension Cooldown Reduction decreased from 40s to 35s",
+          "tag": "nerf",
+          "old": 40,
+          "new": 35,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "ogre_magi",
+      "name": "Ogre Magi",
+      "changes": [
+        {
+          "text": "Base Strength increased from 25 to 26",
+          "tag": "buff",
+          "old": 25,
+          "new": 26,
+          "scope": "base"
+        },
+        {
+          "text": "Damage at level 1 increased by 1 (from 70-76 to 71-77)",
+          "tag": "buff",
+          "old": [
+            70,
+            76
+          ],
+          "new": [
+            71,
+            77
+          ],
+          "range": true,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "omniknight",
+      "name": "Omniknight",
+      "changes": [
+        {
+          "text": "Base Intelligence increased from 16 to 18",
+          "tag": "buff",
+          "old": 16,
+          "new": 18,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "obsidian_destroyer",
+      "name": "Outworld Destroyer",
+      "changes": [
+        {
+          "text": "Min Base damage increased by 4",
+          "tag": "buff",
+          "scope": "base"
+        },
+        {
+          "text": "Max Base damage increased by 1",
+          "tag": "buff",
+          "scope": "base"
+        },
+        {
+          "text": "Damage at level 1 increased from 49-61 to 53-62",
+          "tag": "buff",
+          "old": [
+            49,
+            61
+          ],
+          "new": [
+            53,
+            62
+          ],
+          "range": true,
+          "scope": "base",
+          "info": "Damage spread decreased from 12 to 9"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "pangolier",
+      "name": "Pangolier",
+      "changes": [
+        {
+          "text": "Base Agility decreased from 18 to 17",
+          "tag": "nerf",
+          "old": 18,
+          "new": 17,
+          "scope": "base"
+        },
+        {
+          "text": "Damage at level 1 decreased from 50-56 to 49-55",
+          "tag": "nerf",
+          "old": [
+            50,
+            56
+          ],
+          "new": [
+            49,
+            55
+          ],
+          "range": true,
+          "scope": "base"
+        },
+        {
+          "text": "Base Armor decreased by 1",
+          "tag": "nerf",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "phoenix",
+      "name": "Phoenix",
+      "changes": [
+        {
+          "text": "Attack Speed Slow decreased from 50/80/110/140 to 35/70/105/140",
+          "tag": "nerf",
+          "old": [
+            50,
+            80,
+            110,
+            140
+          ],
+          "new": [
+            35,
+            70,
+            105,
+            140
+          ],
+          "scope": "Fire Spirits"
+        },
+        {
+          "text": "Level 20 Talent Max Health Sun Ray Damage decreased from +1.5% to +1.25%",
+          "tag": "nerf",
+          "old": 1.5,
+          "new": 1.25,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "puck",
+      "name": "Puck",
+      "changes": [
+        {
+          "text": "Agility gain decreased from 2.3 to 2.1",
+          "tag": "nerf",
+          "old": 2.3,
+          "new": 2.1,
+          "scope": "base"
+        },
+        {
+          "text": "Level 10 Talent Illusory Orb Damage decreased from +40 to +35",
+          "tag": "nerf",
+          "old": 40,
+          "new": 35,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "pudge",
+      "name": "Pudge",
+      "changes": [
+        {
+          "text": "Base Agility increased from 11 to 13",
+          "tag": "buff",
+          "old": 11,
+          "new": 13,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "pugna",
+      "name": "Pugna",
+      "changes": [
+        {
+          "text": "Base Mana Regen increased by 0.25",
+          "tag": "buff",
+          "scope": "base"
+        },
+        {
+          "text": "Cast Range increased from 150 to 175",
+          "tag": "buff",
+          "old": 150,
+          "new": 175,
+          "scope": "Nether Ward"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "razor",
+      "name": "Razor",
+      "changes": [
+        {
+          "text": "Base attack speed increased from 100 to 110",
+          "tag": "buff",
+          "old": 100,
+          "new": 110,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "riki",
+      "name": "Riki",
+      "changes": [
+        {
+          "text": "Effectiveness on allies increased from 25% to 30%",
+          "tag": "buff",
+          "old": 25,
+          "new": 30,
+          "scope": "Backstab"
+        },
+        {
+          "text": "Cooldown rescaled from 17/15/13/11s to 15/14/13/12s",
+          "tag": "rework",
+          "old": [
+            17,
+            15,
+            13,
+            11
+          ],
+          "new": [
+            15,
+            14,
+            13,
+            12
+          ],
+          "lower_is_better": true,
+          "scope": "Smoke Screen"
+        },
+        {
+          "text": "Bonus Damage rescaled from 15/30/45/60 to 25/35/45/55",
+          "tag": "rework",
+          "old": [
+            15,
+            30,
+            45,
+            60
+          ],
+          "new": [
+            25,
+            35,
+            45,
+            55
+          ],
+          "scope": "Blink Strike"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "ringmaster",
+      "name": "Ringmaster",
+      "changes": [
+        {
+          "text": "Proportion Distortion Illusion damage increased from 28% to 100%",
+          "tag": "buff",
+          "old": 28,
+          "new": 100,
+          "scope": "Funhouse Mirror"
+        },
+        {
+          "text": "Level 25 Talent Wheel of Wonder Radius and Range increased from +100 to +150",
+          "tag": "buff",
+          "old": 100,
+          "new": 150,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "rubick",
+      "name": "Rubick",
+      "changes": [
+        {
+          "text": "Damage decreased from 100/175/250/325 to 85/165/245/325",
+          "tag": "nerf",
+          "old": [
+            100,
+            175,
+            250,
+            325
+          ],
+          "new": [
+            85,
+            165,
+            245,
+            325
+          ],
+          "scope": "Fade Bolt"
+        },
+        {
+          "text": "Debuff Duration decreased from 10s to 9s",
+          "tag": "nerf",
+          "old": 10,
+          "new": 9,
+          "scope": "Fade Bolt"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "sand_king",
+      "name": "Sand King",
+      "changes": [
+        {
+          "text": "Strength gain increased from 2.3 to 2.5",
+          "tag": "buff",
+          "old": 2.3,
+          "new": 2.5,
+          "scope": "base"
+        },
+        {
+          "text": "Damage gain per level increased from 2.8 to 2.9",
+          "tag": "buff",
+          "old": 2.8,
+          "new": 2.9,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "shadow_demon",
+      "name": "Shadow Demon",
+      "changes": [
+        {
+          "text": "Mana Cost decreased from 45 to 40",
+          "tag": "buff",
+          "old": 45,
+          "new": 40,
+          "lower_is_better": true,
+          "scope": "Shadow Poison"
+        },
+        {
+          "text": "Damage per additional stack over 5 stacks increased from 50 to 60",
+          "tag": "buff",
+          "old": 50,
+          "new": 60,
+          "scope": "Shadow Poison"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "shadow_shaman",
+      "name": "Shadow Shaman",
+      "changes": [
+        {
+          "text": "Gold Bounty decreased from 22-30 to 20-26",
+          "tag": "nerf",
+          "old": [
+            22,
+            30
+          ],
+          "new": [
+            20,
+            26
+          ],
+          "range": true,
+          "scope": "Mass Serpent Ward"
+        },
+        {
+          "text": "Mana Cost increased from 115 to 140",
+          "tag": "nerf",
+          "old": 115,
+          "new": 140,
+          "lower_is_better": true,
+          "scope": "Urnaconda"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "skywrath_mage",
+      "name": "Skywrath Mage",
+      "changes": [
+        {
+          "text": "Base Strength increased from 21 to 22",
+          "tag": "buff",
+          "old": 21,
+          "new": 22,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "slardar",
+      "name": "Slardar",
+      "changes": [
+        {
+          "text": "Armor Reduction decreased from 10/15/20 to 8/14/20",
+          "tag": "nerf",
+          "old": [
+            10,
+            15,
+            20
+          ],
+          "new": [
+            8,
+            14,
+            20
+          ],
+          "scope": "Corrosive Haze"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "slark",
+      "name": "Slark",
+      "changes": [
+        {
+          "text": "Cooldown decreased from 14/12/10/8s to 12/10.5/9/7.5s",
+          "tag": "buff",
+          "old": [
+            14,
+            12,
+            10,
+            8
+          ],
+          "new": [
+            12,
+            10.5,
+            9,
+            7.5
+          ],
+          "lower_is_better": true,
+          "scope": "Saltwater Shiv"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "snapfire",
+      "name": "Snapfire",
+      "changes": [
+        {
+          "text": "No longer applies on denies or buildings",
+          "tag": "del",
+          "scope": "Boomstick"
+        },
+        {
+          "text": "Aghanim's Shard heal amount decreased from 200 to 175",
+          "tag": "nerf",
+          "old": 200,
+          "new": 175,
+          "scope": "Firesnap Cookie"
+        },
+        {
+          "text": "Level 15 Talent Firesnap Cookie Cooldown Reduction decreased from 4s to 3s",
+          "tag": "nerf",
+          "old": 4,
+          "new": 3,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "sniper",
+      "name": "Sniper",
+      "changes": [
+        {
+          "text": "No longer applies on denies or buildings",
+          "tag": "del",
+          "scope": "Keen Scope"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "spectre",
+      "name": "Spectre",
+      "changes": [
+        {
+          "text": "Base Strength increased from 21 to 22",
+          "tag": "buff",
+          "old": 21,
+          "new": 22,
+          "scope": "base"
+        },
+        {
+          "text": "Agility gain decreased from 2.4 to 2.3",
+          "tag": "nerf",
+          "old": 2.4,
+          "new": 2.3,
+          "scope": "base"
+        },
+        {
+          "text": "Movement Speed Change rescaled from 10/14/18/22% to 14/16/18/20%",
+          "tag": "rework",
+          "old": [
+            10,
+            14,
+            18,
+            22
+          ],
+          "new": [
+            14,
+            16,
+            18,
+            20
+          ],
+          "scope": "Spectral Dagger"
+        },
+        {
+          "text": "Illusion Damage Taken rescaled from 200/185/170/155% to 175%",
+          "tag": "rework",
+          "old": [
+            200,
+            185,
+            170,
+            155
+          ],
+          "new": 175,
+          "lower_is_better": true,
+          "scope": "Shadow Step"
+        },
+        {
+          "text": "Cast Range rescaled from 825/950/1075/1200 to 1000",
+          "tag": "rework",
+          "old": [
+            825,
+            950,
+            1075,
+            1200
+          ],
+          "new": 1000,
+          "scope": "Shadow Step"
+        },
+        {
+          "text": "Mana Cost increased from 125/150/175 to 125/175/225",
+          "tag": "nerf",
+          "old": [
+            125,
+            150,
+            175
+          ],
+          "new": [
+            125,
+            175,
+            225
+          ],
+          "lower_is_better": true,
+          "scope": "Haunt"
+        },
+        {
+          "text": "Aghanim's Scepter fear duration increased from 1.5s to 2s",
+          "tag": "buff",
+          "old": 1.5,
+          "new": 2,
+          "scope": "Haunt"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "spirit_breaker",
+      "name": "Spirit Breaker",
+      "changes": [
+        {
+          "text": "Mana Cost decreased from 90/100/110/120 to 80/90/100/110",
+          "tag": "buff",
+          "old": [
+            90,
+            100,
+            110,
+            120
+          ],
+          "new": [
+            80,
+            90,
+            100,
+            110
+          ],
+          "lower_is_better": true,
+          "scope": "Charge of Darkness"
+        },
+        {
+          "text": "Aghanim's Scepter creep damage decreased from 25% to 20%",
+          "tag": "nerf",
+          "old": 25,
+          "new": 20,
+          "scope": "Greater Bash"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "storm_spirit",
+      "name": "Storm Spirit",
+      "changes": [
+        {
+          "text": "Base Attack Speed decreased from 115 to 110",
+          "tag": "nerf",
+          "old": 115,
+          "new": 110,
+          "scope": "base"
+        },
+        {
+          "text": "Level 25 Talent 2x Overload Attack Bounce damage decreased from 65% to 50%",
+          "tag": "nerf",
+          "old": 65,
+          "new": 50,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "sven",
+      "name": "Sven",
+      "changes": [
+        {
+          "text": "Stun Duration increased from 1/1.2/1.4/1.6s to 1/1.25/1.5/1.75s",
+          "tag": "buff",
+          "old": [
+            1,
+            1.2,
+            1.4,
+            1.6
+          ],
+          "new": [
+            1,
+            1.25,
+            1.5,
+            1.75
+          ],
+          "scope": "Storm Hammer"
+        },
+        {
+          "text": "Slow Resistance increased from 30% to 40%",
+          "tag": "buff",
+          "old": 30,
+          "new": 40,
+          "scope": "God's Strength"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "techies",
+      "name": "Techies",
+      "changes": [
+        {
+          "text": "Disarm duration decreased from 2.4/2.7/3/3.3s to 2.25/2.5/2.75/3s",
+          "tag": "nerf",
+          "old": [
+            2.4,
+            2.7,
+            3,
+            3.3
+          ],
+          "new": [
+            2.25,
+            2.5,
+            2.75,
+            3
+          ],
+          "scope": "Reactive Tazer"
+        },
+        {
+          "text": "Debuff Duration decreased from 5s to 4s",
+          "tag": "nerf",
+          "old": 5,
+          "new": 4,
+          "scope": "Proximity Mines"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "templar_assassin",
+      "name": "Templar Assassin",
+      "changes": [
+        {
+          "text": "Time until meditation starts decreased from 0.25s to 0.2s",
+          "tag": "nerf",
+          "old": 0.25,
+          "new": 0.2,
+          "scope": "Inner Peace"
+        },
+        {
+          "text": "Meditation Time Until Max Bonus decreased from 2.05s - 0.05s per level to 1.85s - 0.05s per level",
+          "tag": "nerf",
+          "scope": "Inner Peace"
+        },
+        {
+          "text": "Level 10 Talent Psionic Trap Slow increased from +10% to +15%",
+          "tag": "buff",
+          "old": 10,
+          "new": 15,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "shredder",
+      "name": "Timbersaw",
+      "changes": [
+        {
+          "text": "Base Attack Speed decreased from 100 to 90",
+          "tag": "nerf",
+          "old": 100,
+          "new": 90,
+          "scope": "base"
+        },
+        {
+          "text": "Stat Loss Duration decreased from 11/12/13/14s to 7/9/11/13s",
+          "tag": "nerf",
+          "old": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "new": [
+            7,
+            9,
+            11,
+            13
+          ],
+          "scope": "Whirling Death"
+        },
+        {
+          "text": "Move Slow increased from 30% to 40%",
+          "tag": "buff",
+          "old": 30,
+          "new": 40,
+          "scope": "Flamethrower"
+        },
+        {
+          "text": "Level 20 Talent Chakram Slow increased from +5% to +6%",
+          "tag": "buff",
+          "old": 5,
+          "new": 6,
+          "scope": "talent"
+        },
+        {
+          "text": "Level 20 Talent Exposure Therapy Heals Per Tree Destroyed increased from 10 to 12",
+          "tag": "buff",
+          "old": 10,
+          "new": 12,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "tiny",
+      "name": "Tiny",
+      "changes": [
+        {
+          "text": "Strength to Slow Resist decreased from 20% to 15%",
+          "tag": "nerf",
+          "old": 20,
+          "new": 15,
+          "scope": "Insurmountable"
+        },
+        {
+          "text": "Flight time decreased from 1.25s to 1.1s",
+          "tag": "nerf",
+          "old": 1.25,
+          "new": 1.1,
+          "scope": "Toss"
+        },
+        {
+          "text": "Cooldown increased from 15/12/9/6s to 16/13/10/7s",
+          "tag": "nerf",
+          "old": [
+            15,
+            12,
+            9,
+            6
+          ],
+          "new": [
+            16,
+            13,
+            10,
+            7
+          ],
+          "lower_is_better": true,
+          "scope": "Tree Grab"
+        },
+        {
+          "text": "Cast Range decreased from 1200 to 1000",
+          "tag": "nerf",
+          "old": 1200,
+          "new": 1000,
+          "scope": "Tree Throw"
+        },
+        {
+          "text": "Aghanim's Shard movement slow increased from 25% to 35%",
+          "tag": "buff",
+          "old": 25,
+          "new": 35,
+          "scope": "Grow"
+        },
+        {
+          "text": "Aghanim's Shard slow duration increased from 2.5s to 3s",
+          "tag": "buff",
+          "old": 2.5,
+          "new": 3,
+          "scope": "Grow"
+        },
+        {
+          "text": "Mana Cost decreased from 200 to 150",
+          "tag": "buff",
+          "old": 200,
+          "new": 150,
+          "lower_is_better": true,
+          "scope": "Tree Volley"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "troll_warlord",
+      "name": "Troll Warlord",
+      "changes": [
+        {
+          "text": "Movement Speed increased from 25/30/35% to 35%",
+          "tag": "buff",
+          "old": [
+            25,
+            30,
+            35
+          ],
+          "new": 35,
+          "scope": "Battle Trance"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "undying",
+      "name": "Undying",
+      "changes": [
+        {
+          "text": "Base Mana Regen increased by 0.25",
+          "tag": "buff",
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "vengefulspirit",
+      "name": "Vengeful Spirit",
+      "changes": [
+        {
+          "text": "Base Health Regen increased by 0.5",
+          "tag": "buff",
+          "scope": "base"
+        },
+        {
+          "text": "Damage increased from 85/170/255/340 to 100/180/260/340",
+          "tag": "buff",
+          "old": [
+            85,
+            170,
+            255,
+            340
+          ],
+          "new": [
+            100,
+            180,
+            260,
+            340
+          ],
+          "scope": "Magic Missile"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "venomancer",
+      "name": "Venomancer",
+      "changes": [
+        {
+          "text": "Intelligence gain increased from 1.8 to 1.9",
+          "tag": "buff",
+          "old": 1.8,
+          "new": 1.9,
+          "scope": "base"
+        },
+        {
+          "text": "Damage gain per level increased from 3.0 to 3.1",
+          "tag": "buff",
+          "old": 3,
+          "new": 3.1,
+          "scope": "base"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "visage",
+      "name": "Visage",
+      "changes": [
+        {
+          "text": "Attack Speed Drain rescaled from 25/40/55/70 to 35/45/55/65",
+          "tag": "rework",
+          "old": [
+            25,
+            40,
+            55,
+            70
+          ],
+          "new": [
+            35,
+            45,
+            55,
+            65
+          ],
+          "scope": "Grave Chill"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "warlock",
+      "name": "Warlock",
+      "changes": [
+        {
+          "text": "Cooldown decreased from 60/50/40/30s to 45/40/35/30s",
+          "tag": "buff",
+          "old": [
+            60,
+            50,
+            40,
+            30
+          ],
+          "new": [
+            45,
+            40,
+            35,
+            30
+          ],
+          "lower_is_better": true,
+          "scope": "Upheaval"
+        },
+        {
+          "text": "Level 25 Talent Fatal Bonds Targets increased from +4 to +5",
+          "tag": "buff",
+          "old": 4,
+          "new": 5,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "weaver",
+      "name": "Weaver",
+      "changes": [
+        {
+          "text": "Slow Duration increased from 0.2s to 0.4s",
+          "tag": "buff",
+          "old": 0.2,
+          "new": 0.4,
+          "scope": "Threads of Fate"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "winter_wyvern",
+      "name": "Winter Wyvern",
+      "changes": [
+        {
+          "text": "Level 10 Talent Damage decreased from +35 to +30",
+          "tag": "nerf",
+          "old": 35,
+          "new": 30,
+          "scope": "talent"
+        },
+        {
+          "text": "Level 20 Talent Arctic Burn Slow decreased from +15% to +10%",
+          "tag": "nerf",
+          "old": 15,
+          "new": 10,
+          "scope": "talent"
+        }
+      ]
+    },
+    {
+      "entity_type": "hero",
+      "id": "skeleton_king",
+      "name": "Wraith King",
+      "changes": [
+        {
+          "text": "Base Damage increased by 2",
+          "tag": "buff",
+          "scope": "base"
+        },
+        {
+          "text": "Damage at level 1 increased from 60-62 to 62-64",
+          "tag": "buff",
+          "old": [
+            60,
+            62
+          ],
+          "new": [
+            62,
+            64
+          ],
+          "range": true,
+          "scope": "base"
+        },
+        {
+          "text": "Lifesteal rescaled from 14% + 1% per level to 20% + 0.5% per level",
+          "tag": "rework",
+          "scope": "Vampiric Spirit"
+        },
+        {
+          "text": "Aghanim's Scepter cooldown increased from 165/135/105s to 170/140/110s",
+          "tag": "nerf",
+          "old": [
+            165,
+            135,
+            105
+          ],
+          "new": [
+            170,
+            140,
+            110
+          ],
+          "lower_is_better": true,
+          "scope": "Reincarnation"
+        },
+        {
+          "text": "Level 10 Talent Vampiric Spirit Lifesteal decreased from +10% to +8%",
+          "tag": "nerf",
+          "old": 10,
+          "new": 8,
+          "scope": "talent"
+        }
+      ]
+    }
+  ]
+}
