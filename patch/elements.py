@@ -693,7 +693,7 @@ def new_facet(slug, desc, summary=None):
         out += '<h4 class="subgroup">Facets</h4>'
         _State.seen_facets_subgroup = True
     _State.ability_block_open = True
-    _State.current_block_is_facet = True
+    _State.current_block_is_facet = False  # content already in panes — suppress ability() warning
     icon_overlay = (f'<img src="../icons/facets/{icon_name}.png" alt="" '
                     f'class="facet-icon-overlay" loading="lazy" width="72" height="72">') if icon_name else ''
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
