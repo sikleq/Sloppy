@@ -258,7 +258,7 @@
         },
         {
           "text": "Sources of Heal Amplification now stack additively with each other instead of diminishingly",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base",
           "info": "This includes both Incoming Heal Amplification and Outgoing Heal Amplification"
         },
@@ -443,7 +443,7 @@
         },
         {
           "text": "Frost instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 13%, now reduces Health Restoration by 13%",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -468,7 +468,7 @@
         },
         {
           "text": "Corrosion instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 16%, now reduces Health Restoration by 16%",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -515,7 +515,7 @@
         },
         {
           "text": "Cold Attack instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 40%, now reduces Health Restoration and Heal Amplification by 40%",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -532,7 +532,7 @@
       "changes": [
         {
           "text": "Freezing Aura instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 25%, now reduces Health Restoration and Heal Amplification by 25%",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -618,10 +618,9 @@
       "changes": [
         {
           "text": "Magic Resistance bonus decreased from +25% to +20%",
-          "tag": "buff",
+          "tag": "nerf",
           "old": 25,
           "new": 20,
-          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -833,7 +832,7 @@
         },
         {
           "text": "Soul Release when cast on enemy, instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 70%, now reduces Health Restoration and Heal Amplification by 70%",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         }
       ]
@@ -859,7 +858,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -871,7 +870,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -883,7 +882,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -984,7 +983,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -996,7 +995,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -1036,7 +1035,7 @@
       "changes": [
         {
           "text": "Moved from Tier 1 to Tier 2",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -1120,7 +1119,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -1132,7 +1131,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -1256,7 +1255,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -1268,7 +1267,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -1280,7 +1279,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -1412,7 +1411,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -1424,7 +1423,7 @@
       "changes": [
         {
           "text": "Item Cycled Out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -1693,7 +1692,7 @@
       "changes": [
         {
           "text": "Magic Resistance bonus decreased from +0/10/14/18% to +0/10/13/16%",
-          "tag": "buff",
+          "tag": "nerf",
           "old": [
             0,
             10,
@@ -1706,7 +1705,6 @@
             13,
             16
           ],
-          "lower_is_better": true,
           "scope": "base"
         },
         {
@@ -1828,7 +1826,7 @@
         },
         {
           "text": "Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 35%, now reduces Health Restoration by 35%",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Withering Mist"
         },
         {
@@ -1995,7 +1993,7 @@
         },
         {
           "text": "Level 1 now grants Arcane Rune instead of Invisibility Rune",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "facet:arc_warden_runed_replica",
           "info": "All other levels are unchanged"
         }
@@ -2907,6 +2905,13 @@
           "old": 300,
           "new": 350,
           "scope": "Doom"
+        },
+        {
+          "text": "Item sell back percentage decreased from 90% to 85%",
+          "tag": "nerf",
+          "old": 90,
+          "new": 85,
+          "scope": "facet:doom_bringer_boost_selling"
         }
       ]
     },
@@ -2917,7 +2922,7 @@
       "changes": [
         {
           "text": "Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 14/21/28/35%, now reduces Health Restoration by 14/21/28/35%",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "facet:dragon_knight_frost_dragon"
         }
       ]
@@ -2929,7 +2934,7 @@
       "changes": [
         {
           "text": "Aghanim's Scepter instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 10% per stack, now reduces Health Restoration by 10% per stack",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Frost Arrows"
         },
         {
@@ -3010,7 +3015,7 @@
       "changes": [
         {
           "text": "Astral Spirit no longer automatically rejoins Elder Titan on collision with him. Now requires the duration to run out or the Return ability to be cast",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Astral Spirit"
         },
         {
@@ -3421,7 +3426,7 @@
         },
         {
           "text": "Aghanim's Scepter makes the skill vector-targeted to create a moving Ice Floe instead of Ice Wall. After 1.3s delay, the Ice Floe forms from the center of the targeted area, creating a 150 width Ice Floe in its wake. Enemies that stay in it for longer than 2.5 seconds freeze, becoming rooted for 1.5 + (0.1 * Quas) seconds and take an instance of (75 + 25 * Quas) magical damage",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "facet:invoker_quas_focus",
           "info": "1.6/1.7/1.8/1.9/2.0/2.1/2.2/2.3/2.4/2.5s root duration and 100/125/150/175/200/225/250/275/300/325 damage"
         },
@@ -3805,7 +3810,7 @@
         },
         {
           "text": "Slow now lasts a fixed 0.7/0.8/0.9/1s instead of Kez's travel time",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Grappling Claw"
         },
         {
@@ -4081,7 +4086,7 @@
         },
         {
           "text": "Instead of increasing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 50%, now increases Health Restoration by 30/40/50/60%",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Outfight Them!"
         },
         {
@@ -4102,6 +4107,23 @@
           "old": 3,
           "new": 2,
           "scope": "Split Earth"
+        },
+        {
+          "text": "No longer improves with Pulse Nova's level",
+          "tag": "misc",
+          "scope": "facet:leshrac_attacks_mana"
+        },
+        {
+          "text": "Damage as mana restore rescaled from 14/21/28/35% to 25%",
+          "tag": "rework",
+          "old": [
+            14,
+            21,
+            28,
+            35
+          ],
+          "new": 25,
+          "scope": "facet:leshrac_attacks_mana"
         }
       ]
     },
@@ -4569,7 +4591,25 @@
       "entity_type": "hero",
       "id": "mirana",
       "name": "Mirana",
-      "changes": []
+      "changes": [
+        {
+          "text": "Root Duration increased from 1.1/1.4/1.7/2.0s to 1.5/1.75/2.0/2.25s",
+          "tag": "buff",
+          "old": [
+            1.1,
+            1.4,
+            1.7,
+            2
+          ],
+          "new": [
+            1.5,
+            1.75,
+            2,
+            2.25
+          ],
+          "scope": "facet:mirana_leaps_and_bounds"
+        }
+      ]
     },
     {
       "entity_type": "hero",
@@ -5276,7 +5316,7 @@
       "changes": [
         {
           "text": "Aghanim's Scepter instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 20%, now reduces Health Restoration by 20%",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Rot"
         }
       ]
@@ -5302,6 +5342,13 @@
             700
           ],
           "scope": "Decrepify"
+        },
+        {
+          "text": "Spell amplification per destroyed tower increased from 1.25% to 1.5%",
+          "tag": "buff",
+          "old": 1.25,
+          "new": 1.5,
+          "scope": "facet:pugna_rewards_of_ruin"
         }
       ]
     },
@@ -5326,6 +5373,13 @@
             55
           ],
           "scope": "Shadow Strike"
+        },
+        {
+          "text": "Returning spell damage increased from 15% to 20%",
+          "tag": "buff",
+          "old": 15,
+          "new": 20,
+          "scope": "facet:queenofpain_facet_bondage"
         }
       ]
     },
@@ -5333,7 +5387,15 @@
       "entity_type": "hero",
       "id": "razor",
       "name": "Razor",
-      "changes": []
+      "changes": [
+        {
+          "text": "Spell Amp per bonus attack damage increased from 1% to 1.25%",
+          "tag": "buff",
+          "old": 1,
+          "new": 1.25,
+          "scope": "facet:razor_spellamp"
+        }
+      ]
     },
     {
       "entity_type": "hero",
@@ -5363,7 +5425,7 @@
       "changes": [
         {
           "text": "If Ringmaster does not have a Souvenir, he will be granted one upon death (instead of upon respawn)",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Dark Carnival Barker"
         },
         {
@@ -6274,6 +6336,18 @@
           "text": "No longer loses cleave on death",
           "tag": "misc",
           "scope": "facet:abyssal_underlord_demons_reach"
+        },
+        {
+          "text": "Demonic Warrior damage type changed from Default to Runty",
+          "tag": "rework",
+          "scope": "facet:abyssal_underlord_summons",
+          "info": "Runty units deal 25% less attack damage against heroes"
+        },
+        {
+          "text": "Demonic Archer damage type changed from Default to Piercing",
+          "tag": "rework",
+          "scope": "facet:abyssal_underlord_summons",
+          "info": "Piercing units deal 50% more attack damage against non-hero units, but also deal 50% less damage to heroes and heavy units (buildings and siege creeps)"
         }
       ]
     },

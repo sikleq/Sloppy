@@ -186,7 +186,7 @@
         },
         {
           "text": "Wisdom Shrines and Lotus Pools now reverse their countdowns if heroes from opposing teams enter the area, instead of pausing the countdown",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -316,7 +316,7 @@
         },
         {
           "text": "Incoming Heal Amplification now stacks diminishingly with Health Restoration instead of additively with Outgoing Heal Amplification",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -710,10 +710,9 @@
         },
         {
           "text": "Magic Resistance bonus decreased from +20% to +18%",
-          "tag": "buff",
+          "tag": "nerf",
           "old": 20,
           "new": 18,
-          "lower_is_better": true,
           "scope": "base"
         }
       ]
@@ -1037,7 +1036,7 @@
         },
         {
           "text": "Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g",
-          "tag": "buff",
+          "tag": "misc",
           "old": 600,
           "new": 400,
           "lower_is_better": true,
@@ -1143,7 +1142,7 @@
         },
         {
           "text": "Recipe cost unchanged at 1150. Total cost increased from 2800/3950/5100/6250/7400g to 3050/4200/5350/6500/7650g",
-          "tag": "buff",
+          "tag": "misc",
           "scope": "base"
         },
         {
@@ -1283,7 +1282,7 @@
         },
         {
           "text": "Recipe cost increased from 500 to 525. Total cost unchanged at 1625g",
-          "tag": "nerf",
+          "tag": "misc",
           "old": 500,
           "new": 525,
           "lower_is_better": true,
@@ -1406,7 +1405,7 @@
         },
         {
           "text": "Recipe cost increased from 450 to 800. Total cost unchanged at 2150g",
-          "tag": "nerf",
+          "tag": "misc",
           "old": 450,
           "new": 800,
           "lower_is_better": true,
@@ -1677,7 +1676,7 @@
       "changes": [
         {
           "text": "Recipe cost increased from 800 to 850. Total cost unchanged at 1775g (due to Chainmail cost decrease)",
-          "tag": "nerf",
+          "tag": "misc",
           "old": 800,
           "new": 850,
           "lower_is_better": true,
@@ -1777,7 +1776,7 @@
         },
         {
           "text": "Recipe cost decreased from 450 to 300. Total cost unchanged at 3275g",
-          "tag": "buff",
+          "tag": "misc",
           "old": 450,
           "new": 300,
           "lower_is_better": true,
@@ -2047,7 +2046,7 @@
         },
         {
           "text": "Recipe Cost decreased from 800 to 675. Total cost unchanged at 3725g (due to Cloak cost increase)",
-          "tag": "buff",
+          "tag": "misc",
           "old": 800,
           "new": 675,
           "lower_is_better": true,
@@ -2397,7 +2396,7 @@
         },
         {
           "text": "Bloodpact no longer has a 30s self debuff preventing repeated usage of Bloodpact",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         },
         {
@@ -2424,7 +2423,7 @@
       "changes": [
         {
           "text": "Recipe cost increased from 250 to 300. Total cost unchanged at 2775g (due to Chainmail cost decrease)",
-          "tag": "nerf",
+          "tag": "misc",
           "old": 250,
           "new": 300,
           "lower_is_better": true,
@@ -2619,7 +2618,7 @@
       "changes": [
         {
           "text": "Moved from Tier 4 to Tier 2",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
@@ -2716,7 +2715,7 @@
       "changes": [
         {
           "text": "Item cycled out",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -6518,7 +6517,7 @@
         },
         {
           "text": "Now whenever Invoker gets Aghanim's Scepter or Aghanim's Shard, these items are inert in the inventory until Invoker activates them manually. Upon activation, he will be presented with three upgrades to choose from. Upgrades themselves for both Aghanim's Scepter and Aghanim's Shard are unchanged",
-          "tag": "new",
+          "tag": "misc",
           "scope": "Invoke"
         },
         {
@@ -6868,7 +6867,7 @@
         },
         {
           "text": "The proc effect now triggers a critical strike only instead of creating a Mark",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Shodo Sai"
         },
         {
@@ -7873,7 +7872,7 @@
       "changes": [
         {
           "text": "No longer considers Mars's allies when determining if Mars is outnumbered",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Dauntless"
         },
         {
@@ -8028,7 +8027,7 @@
         },
         {
           "text": "No longer has separate creep values. Follows global lifesteal rules instead",
-          "tag": "del",
+          "tag": "misc",
           "scope": "Ransack",
           "info": "Has a 40% penalty against creeps"
         },
@@ -9481,7 +9480,7 @@
         },
         {
           "text": "No longer has a separate value for incoming heal reduction",
-          "tag": "del",
+          "tag": "misc",
           "scope": "Rot",
           "info": "Still reduces incoming heals due to Health Restoration changes"
         }
@@ -10935,7 +10934,7 @@
         },
         {
           "text": "Techies are now rooted and disarmed instead of self-stunned during Blast Off's leap animation",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "Blast Off!"
         },
         {
@@ -11528,9 +11527,10 @@
         },
         {
           "text": "Charge Restore Time increased from 55s to 135s",
-          "tag": "buff",
+          "tag": "nerf",
           "old": 55,
           "new": 135,
+          "lower_is_better": true,
           "scope": "Eyes In The Forest"
         },
         {

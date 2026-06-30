@@ -376,6 +376,13 @@
           "text": "Eidolons created from multiplying will now automatically attack the same target as their parent",
           "tag": "misc",
           "scope": "Demonic Summoning"
+        },
+        {
+          "text": "Damage threshold increased from 350 to 375",
+          "tag": "buff",
+          "old": 350,
+          "new": 375,
+          "scope": "facet:enigma_fragment"
         }
       ]
     },
@@ -471,7 +478,14 @@
       "entity_type": "hero",
       "id": "lina",
       "name": "Lina",
-      "changes": []
+      "changes": [
+        {
+          "text": "Spell Amplification now affects only the total spell damage before the burn damage is calculated",
+          "tag": "misc",
+          "scope": "facet:lina_dot",
+          "info": "It increases the total damage and then splits it into burn damage without further amplifying the burn damage"
+        }
+      ]
     },
     {
       "entity_type": "hero",
@@ -511,6 +525,13 @@
           "old": 1200,
           "new": 900,
           "scope": "facet:furion_soothing_saplings"
+        },
+        {
+          "text": "Gold Per Hero Level increased from 1.5 to 2",
+          "tag": "buff",
+          "old": 1.5,
+          "new": 2,
+          "scope": "facet:furion_natures_profit"
         }
       ]
     },
@@ -716,7 +737,25 @@
       "entity_type": "hero",
       "id": "silencer",
       "name": "Silencer",
-      "changes": []
+      "changes": [
+        {
+          "text": "Damage percentage decreased from 10/15/20/25% to 8/12/16/20%",
+          "tag": "nerf",
+          "old": [
+            10,
+            15,
+            20,
+            25
+          ],
+          "new": [
+            8,
+            12,
+            16,
+            20
+          ],
+          "scope": "facet:silencer_oppressive_silence"
+        }
+      ]
     },
     {
       "entity_type": "hero",
@@ -853,7 +892,14 @@
       "entity_type": "hero",
       "id": "tinker",
       "name": "Tinker",
-      "changes": []
+      "changes": [
+        {
+          "text": "Defense Matrix: No longer blinks Tinker if he is rooted or leashed",
+          "tag": "misc",
+          "scope": "facet:tinker_translocator",
+          "info": "This only occurs when affected by roots or leashes that cannot be dispelled by Basic Dispels"
+        }
+      ]
     },
     {
       "entity_type": "hero",

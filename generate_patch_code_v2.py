@@ -1471,6 +1471,12 @@ def _normalize_hero(hero):
     for s in hero.get('subsections', []):
         if s.get('style') == 'hero_facet':
             fslug = s.get('facet')
+            # A facet subsection can carry its own general_notes (facet-level
+            # tweaks like "Spell Amp now affects only total spell damage")
+            # AND/OR per-ability changes nested under that facet. Skipping
+            # general_notes was the cause of the empty-entity false-positive
+            # for Mirana/Razor (7.39) and Lina/Silencer/Tinker (7.39b).
+            changes += _normalize_notes(s.get('general_notes'), f'facet:{fslug}')
             for a in s.get('abilities', []):
                 changes += _normalize_notes(a.get('ability_notes'), f'facet:{fslug}')
     return {'entity_type': 'hero', 'id': slug, 'name': name, 'changes': changes}

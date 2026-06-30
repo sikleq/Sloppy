@@ -9,12 +9,12 @@
       "changes": [
         {
           "text": "Roshan: Melee attacks against couriers are now treated as melee hero attacks",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base"
         },
         {
           "text": "Tormentor: Reflect no longer considers creep-heroes for the damage reflected",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "base",
           "info": "Lone Druid's Spirit Bear is an exception for this"
         }
@@ -91,7 +91,7 @@
       "changes": [
         {
           "text": "Petrify: No longer has a health threshold restriction when the Shaman is controlled by a player",
-          "tag": "misc",
+          "tag": "buff",
           "scope": "Petrify"
         }
       ]
@@ -103,7 +103,7 @@
       "changes": [
         {
           "text": "Poison Attack no longer has True Strike on the attack",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -129,7 +129,7 @@
       "changes": [
         {
           "text": "Hurricane Thrust buff provided to the wearer when targeting an enemy is now dispellable",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -141,7 +141,7 @@
       "changes": [
         {
           "text": "Draw Forth initial projectile is now disjointable",
-          "tag": "misc",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -176,7 +176,7 @@
         },
         {
           "text": "Empower Spell Break debuff no longer dispellable",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base",
           "info": "Slow debuff applied by Empower Spell is still dispellable"
         }
@@ -240,7 +240,7 @@
       "changes": [
         {
           "text": "Crushing Blow can no longer be applied by illusions",
-          "tag": "misc",
+          "tag": "del",
           "scope": "base"
         }
       ]
@@ -522,7 +522,7 @@
         },
         {
           "text": "Allied heroes that are affected by Enchant Remnant ability are now considered a hero instead of a Stone Remnant",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "facet:earth_spirit_ready_to_roll"
         }
       ]
@@ -822,7 +822,7 @@
         },
         {
           "text": "Break debuff is no longer dispellable",
-          "tag": "misc",
+          "tag": "del",
           "scope": "Fan of Knives"
         }
       ]
