@@ -648,10 +648,8 @@ def build():
     W(li("Facet Removed", t("DEL")))
     W(ul_close())
     W(new_facet("bloodseeker_old_blood",
-        desc="Bloodrage silences the target and can be applied to enemies. Bloodrage increases base attack damage instead of spell damage."))
+        desc=f"Replaces 15/20/25/30% Spell Amplification with 10/15/20/25% base damage amplification. The ability now also silences the target and can be cast on enemies. Decreases Cast Range from 800 to 400. Increases Mana Cost from 0 to 60. {inline_note('Level 20 Talent that reduces Bloodrage\'s Max Health damage doesn\'t affect enemy casts. Aghanim\'s Scepter upgrade also affects only Bloodseeker and doesn\'t provide bonus damage to enemies')}"))
     W(ul_open())
-    W(li("Bloodrage: Base damage amplification rescaled from 15/20/25/30% (spell amp) to 10/15/20/25%", t("MISC"),
-         extra=inline_note("Level 20 Talent that reduces Bloodrage's Max Health damage doesn't affect enemy hero's base damage amplification")))
     W(li("Level 10 Talent +15% Bloodrage Spell Amplification replaced with +15% Bloodrage Base Damage Amplification", t("REWORK")))
     W(ul_close())
     W(subgroup("Talents"))
