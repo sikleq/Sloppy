@@ -233,7 +233,7 @@ _NOT_LOWER_IS_BUFF = re.compile(
 TAG_OVERRIDES = {
     "starts with all":              "MISC",
     "separate heal reduction":      "MISC",
-    "health restoration":           "MISC",
+    "health restoration consolidat": "MISC",  # "consolidated Health Restoration" = structural
     "now shares cooldown":          "MISC",
     "now has a shared cooldown":    "MISC",
     "now requires":                 "REWORK",  # "Now requires X instead of Y"

@@ -488,7 +488,7 @@ def build():
     W(enchant_header("Crude"))
     W(ul_open())
     W(li("No longer provides +20/30% Slow Resistance", t("DEL")))
-    W(li("Now provides +20/30% Health Restoration", t("MISC")))
+    W(li("Now provides +20/30% Health Restoration", t("NEW")))
     W(ul_close())
     W(enchant_header("Wise"))
     W(ul_open())
