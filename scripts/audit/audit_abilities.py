@@ -43,6 +43,14 @@ sys.path.insert(0, str(ROOT))
 from patch.images import HERO_SLUG
 from patch.elements import HERO_TO_ABIL_PREFIX, ABILITY_DISPLAY_TO_SLUG as abi_disp_to_slug
 
+# Abilities that were legitimately renamed in a later patch but are still
+# referenced correctly by historical content modules (older patch pages).
+# These are suppressed from exit(1) — they represent correct names at time of
+# that patch, not typos. Extend this list when a rename is confirmed historical.
+KNOWN_HISTORICAL_RENAMES = {
+    ("Lich", "Death Charge"),  # renamed to Sacrifice in 7.41; correct in 7.39b content
+}
+
 src = "\n".join(p.read_text(encoding="utf-8")
                 for p in sorted((ROOT / "content").glob("*.py")))
 
@@ -206,13 +214,18 @@ current = [p for p in problems if p[2] != "ach.old"]
 renamed = [p for p in current if p[6].startswith("renamed")]
 slug_miss = [p for p in current if not p[6].startswith("renamed")]
 
+# Renames in KNOWN_HISTORICAL_RENAMES are correct names in older patch content.
+renamed_actionable = [p for p in renamed if (p[0], p[1]) not in KNOWN_HISTORICAL_RENAMES]
+renamed_suppressed = [p for p in renamed if (p[0], p[1]) in KNOWN_HISTORICAL_RENAMES]
+
 print(f"== CURRENT-STATE ISSUES (action required) ==")
-print(f"Renamed abilities (display name out of date): {len(renamed)}")
+suppressed_note = f"  ({len(renamed_suppressed)} suppressed as known historical)" if renamed_suppressed else ""
+print(f"Renamed abilities (display name out of date): {len(renamed_actionable)}{suppressed_note}")
 print(f"Slug mismatches (icon won't load): {len(slug_miss)}\n")
 
-if renamed:
+if renamed_actionable:
     print("--- RENAMED ---")
-    for hero, display, kind, slug, suggest, valve_name, note in renamed:
+    for hero, display, kind, slug, suggest, valve_name, note in renamed_actionable:
         print(f"  [{hero}] '{display}' -> '{valve_name}'  (slug={slug})")
     print()
 
@@ -220,7 +233,7 @@ if slug_miss:
     print("--- SLUG MISMATCH (suggest explicit slug= or ABILITY_DISPLAY_TO_SLUG entry) ---")
     for hero, display, kind, slug, suggest, valve_name, note in slug_miss:
         suggestion = f"slug=\"{suggest}\"" if suggest else "?? (no Valve ability with this display name)"
-        print(f"  [{hero}] '{display}' resolved to '{slug}' — fix: {suggestion}")
+        print(f"  [{hero}] '{display}' resolved to '{slug}' -- fix: {suggestion}")
     print()
 
 if historical:
@@ -229,4 +242,7 @@ if historical:
     print("Run with --include-historical to inspect them.\n")
     if "--include-historical" in sys.argv:
         for hero, display, kind, slug, suggest, valve_name, note in historical:
-            print(f"  [{hero}] OLD-pane references '{display}' (was renamed/removed in 7.41) — {note}")
+            print(f"  [{hero}] OLD-pane references '{display}' (was renamed/removed in 7.41) -- {note}")
+
+if renamed_actionable or slug_miss:
+    sys.exit(1)

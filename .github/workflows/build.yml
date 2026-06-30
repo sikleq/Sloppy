@@ -200,6 +200,14 @@ jobs:
           print(f'OK — latest patch {ver} covered in all categories (stats={stats_ver})')
           PY
 
+      - name: Audit — heroes, items, abilities (live Valve names)
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python scripts/audit/audit_all.py
+
+      - name: Audit — local ability icon coverage
+        run: python scripts/audit/check_icons.py
+
       - name: Copy static assets into dist
         if: github.ref == 'refs/heads/main'
         run: |

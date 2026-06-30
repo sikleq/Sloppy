@@ -1,61 +1,42 @@
-"""check_icons.py — Проверяет что каждый URL иконки в _ability_icons.txt
-действительно существует на CDN. Запускать ПОСЛЕ builders/patch.py.
+"""check_icons.py — Verify every ability icon referenced in built HTML exists
+as a local file under icons/abilities/. Run after build_site.py.
 
-Печатает только проблемные (404, network errors). Для каждой такой иконки
-соответствующая <img> в HTML автоматически свапнет на innate_icon.png через
-onerror handler.
+Scans dist/ HTML for <img src="...icons/abilities/..."> references and checks
+that each corresponding file exists in the repo's icons/abilities/ directory.
+Exits with code 1 if any icons are missing.
 """
+import re
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-try:
-    import requests
-except ImportError:
-    print("pip install requests"); sys.exit(1)
+ROOT = Path(__file__).resolve().parents[2]
+DIST_DIR = ROOT / "dist"
+ICONS_DIR = ROOT / "icons" / "abilities"
 
-URLS_FILE = Path(__file__).resolve().parent.parent / "_ability_icons.txt"
-INNATE_ICON = "https://cdn.steamstatic.com/apps/dota2/images/dota_react/icons/innate_icon.png"
-
-if not URLS_FILE.exists():
-    print(f"❌ {URLS_FILE} not found. Run python builders/patch.py first.")
+if not DIST_DIR.exists():
+    print("dist/ not found. Run python build_site.py first.")
     sys.exit(1)
 
-urls = [line.strip() for line in URLS_FILE.read_text(encoding="utf-8").splitlines() if line.strip()]
-print(f"Checking {len(urls)} ability-icon URLs...")
+# Collect all ability icon slugs referenced in built HTML
+slug_re = re.compile(r'icons/abilities/([^"\']+\.png)')
+referenced = set()
+for html_file in DIST_DIR.rglob("*.html"):
+    text = html_file.read_text(encoding="utf-8", errors="replace")
+    for m in slug_re.finditer(text):
+        referenced.add(m.group(1))
 
-def check(url):
-    try:
-        r = requests.head(url, timeout=8, allow_redirects=True)
-        return url, r.status_code
-    except Exception as e:
-        return url, str(e)
+print(f"Ability icon references found in dist/: {len(referenced)}")
 
-missing = []
-ok_count = 0
-with ThreadPoolExecutor(max_workers=16) as ex:
-    futures = {ex.submit(check, u): u for u in urls}
-    for fut in as_completed(futures):
-        url, status = fut.result()
-        if isinstance(status, int) and status == 200:
-            ok_count += 1
-        else:
-            missing.append((url, status))
+missing = sorted(s for s in referenced if not (ICONS_DIR / s).exists())
+ok_count = len(referenced) - len(missing)
 
-print(f"\nOK:      {ok_count}")
+print(f"OK:      {ok_count}")
 print(f"Missing: {len(missing)}")
-if missing:
-    print("\nMissing icons (will fall back to innate_icon.png in browser):")
-    for url, status in sorted(missing):
-        slug = url.rsplit("/", 1)[-1].replace(".png", "")
-        print(f"  {status:>3}  {slug}")
 
-# Verify innate fallback itself loads
-try:
-    r = requests.head(INNATE_ICON, timeout=8, allow_redirects=True)
-    if r.status_code != 200:
-        print(f"\n⚠ Innate fallback icon also fails: {r.status_code} {INNATE_ICON}")
-    else:
-        print(f"\nFallback ({INNATE_ICON.rsplit('/',1)[-1]}) — OK")
-except Exception as e:
-    print(f"\n⚠ Cannot reach innate fallback: {e}")
+if missing:
+    print("\nMissing local icon files (will show missing.svg fallback in browser):")
+    for fname in missing:
+        print(f"  MISSING  {fname}")
+    sys.exit(1)
+
+print("All referenced ability icons present locally.")

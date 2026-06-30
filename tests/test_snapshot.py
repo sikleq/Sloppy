@@ -42,12 +42,14 @@ def _extract_metrics(html):
     }
 
 
+@pytest.fixture(scope="class")
+def metrics():
+    html = PATCH_FILE.read_text(encoding="utf-8")
+    return _extract_metrics(html)
+
+
 @pytest.mark.skipif(not PATCH_FILE.exists(), reason="dist/patches/7.41d.html not built")
 class TestSnapshot:
-    @pytest.fixture(scope="class")
-    def metrics(self):
-        html = PATCH_FILE.read_text(encoding="utf-8")
-        return _extract_metrics(html)
 
     @pytest.mark.parametrize("key", EXPECTED.keys())
     def test_metric(self, metrics, key):
