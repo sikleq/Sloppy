@@ -500,11 +500,9 @@ def build():
 
     # Abaddon
     W(hero_header("Abaddon"))
-    W(ul_open())
     W(facet_header("abaddon_mephitic_shroud"))
     W(ul_open())
     W(li("Facet Removed", t("DEL")))
-    W(ul_close())
     W(ul_close())
     W(ability("Withering Mist", slug="abaddon_withering_mist"))
     W(ul_open())
