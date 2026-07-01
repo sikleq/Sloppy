@@ -152,26 +152,41 @@ Change: emit `<td class="he">` / `<td class="ha">` (with optional
 so the visual output is identical. `scripts.js`'s "Hide old" style rule
 was widened to match `td.he` / `td.ha` alongside `td.hd-cell`.
 
-Instrumented via `preview_eval` against a local `python -m http.server`.
-Measurements are noisy inside the preview sandbox (frame times are inflated
-by eval serialization) — before/after deltas are meaningful, absolute
-numbers are not representative of a real desktop Chrome session.
+The same builder change (`builders/dyn_matrix_common.py`) also applies
+to `heroes_dyn.html`, since both matrices go through the shared
+`save_dyn_matrix()` renderer.
 
-| Metric | Before | After | Delta |
+### Confirmed wins (file-size — measured on disk after build)
+
+| Page | Before | After | Delta |
 |---|---:|---:|---:|
-| HTML file size | 1,691,348 B | 1,107,202 B | **-584 KB (-34.5%)** |
-| decoded body size | 1,691,348 B | 1,107,202 B | -34.5% |
-| DOMContentLoaded | 1,457 ms | 1,178 ms | **-19%** |
-| load event end | 1,859 ms | 1,541 ms | **-17%** |
+| `items_dyn.html` | 1,691,348 B | 1,107,202 B | **-584 KB (-34.5%)** |
+| `heroes_dyn.html` | ~662 KB | ~467 KB | **-195 KB (-29.5%)** |
+
+These are objective disk-size deltas independent of any browser
+sandbox.
+
+### Preliminary runtime metrics (preview MCP — noisy)
+
+Instrumented via `preview_eval` against `python -m http.server`. The
+preview sandbox has heavy per-frame serialization overhead, so absolute
+numbers are not representative of a real desktop Chrome session and
+before/after deltas should be treated as **preliminary** until a real
+Chrome DevTools trace confirms them.
+
+| Metric | Before | After | Delta (preliminary) |
+|---|---:|---:|---:|
+| DOMContentLoaded | 1,457 ms | 1,178 ms | -19% |
+| load event end | 1,859 ms | 1,541 ms | -17% |
 | total DOM nodes | 44,190 | 44,190 | 0% (unchanged by design) |
 | `<td>` count | 41,654 | 41,654 | 0% |
 | `td.hd-cell` count | 41,301 | 746 | -98% (filled + spacer only) |
 | `td.he` + `td.ha` count | 0 | 40,555 | new placeholder markers |
 | filled pills (`.dyn-cell-wrap`) | 393 | 393 | 0% |
 | Hide-old toggle (median of 5) | ~4,005 ms | ~4,000 ms | 0% (within noise) |
-| Search filter (first + cached) | 2,290 ms → n/a | 986 ms → 22 ms | comparable |
+| Search filter (first + cached) | ~2,290 ms → n/a | ~986 ms → 22 ms | comparable |
 | Hover setup | 2,000 ms | 1,722 ms | -14% (within noise) |
-| JS heap | 2.2 MB | 1.7 MB | -23% |
+| JS heap | 2.2 MB | 1.7 MB | -23% (preliminary) |
 
 Zero console errors after the change. All 254 pytest tests still pass.
 `check_icons.py` still exits 0. Visual layout (screenshot + `preview_inspect`
@@ -181,11 +196,31 @@ rgba fill on empty cells and 5×5 dot on absent cells.
 Notes on interpretation:
 - Load-time wins (parse + DCL) are the reliable improvements — they scale
   directly with the transferred/decoded bytes and are consistent across
-  environments.
+  environments — but the specific `-19% / -17%` numbers above still need
+  a real Chrome confirmation before we quote them as canonical.
 - Runtime deltas (Hide-old, hover, scroll) are all inside the sandbox's
-  noise floor. A definitive runtime comparison would need real Chrome
-  profiling. The change is not expected to hurt runtime because the same
-  DOM tree is present — only the character count of `class=` strings
-  changed, and CSS specificity/rule count barely moved.
-- JS heap dropped ~500 KB, consistent with fewer characters in class
-  strings that Chrome interns.
+  noise floor. A definitive comparison needs a real Chrome profile.
+- JS heap dropped ~500 KB, plausibly from fewer characters in class
+  strings that Chrome interns — needs a real heap snapshot to confirm.
+
+### Recommended follow-up: real Chrome DevTools profile
+
+The preview_eval numbers above are enough to justify shipping the size
+reduction, but not enough to make definitive claims about runtime. A
+proper follow-up run in real Chrome should collect:
+
+1. **Performance trace** of a cold reload of `items_dyn.html`: HTML
+   parse, style, layout, paint, scripting split.
+2. **Scroll FPS + long-tasks** during a 5-second horizontal scroll pass
+   at the far-right end of the matrix (where the hover-pop is tightest).
+3. **Hide-old latency**: click, measure to first paint after
+   invalidation. 5–10 samples.
+4. **Filter / search latency**: type "blink" / "dagon" / "aghs"; measure
+   time to filtered paint. 5–10 samples.
+5. **Heap snapshot** before + after Hide-old toggle to catch any leak.
+6. **A/B baseline**: run each of the above against the commit BEFORE
+   the class-shortening change (checkout `9c035999`) so the deltas
+   are apples-to-apples on the same hardware.
+
+Only after that trace should the "-19% DCL / -23% heap" numbers move
+from "preliminary" to canonical.
