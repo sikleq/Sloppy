@@ -3885,6 +3885,14 @@ h4.subgroup {
   line-height: 1;
   align-self: start;
 }
+/* Header-only block (empty changes ul, no li) — center title vertically against the icon */
+.ability-block:not(:has(> ul.changes > li)) {
+  grid-template-rows: minmax(48px, auto);
+}
+.ability-block:not(:has(> ul.changes > li)) > .ability-title {
+  align-self: center;
+  margin: 0;
+}
 .ability-block > ul.changes {
   grid-column: 2;
   margin-top: 0;
@@ -4679,6 +4687,13 @@ ul.changes li.aghanim-shard {
     linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.20) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% 22px,
     linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 25px / 100% calc(100% - 28px);
   border-radius: 3px;
+}
+/* When a formula table is inside the li, strip the second gradient layer so it
+   doesn't bleed over the table rows. The first-line stripe is kept. */
+ul.changes li.aghanim-scepter:has(> .formula-table),
+ul.changes li.aghanim-shard:has(> .formula-table) {
+  background:
+    linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.20) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% 22px;
 }
 /* Aghanim marker — inline icon appended to the change-text inside .row-text,
    so it sits right after the last character of the change description and

@@ -374,6 +374,18 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
 # Run scripts/fetch/fetch_facets.py to regenerate this dict for a given patch.
 # Value tuple: (display_title, valve_color_key).
 FACETS = {
+    # 7.39 NewFacets — introduced mid-patch, style="hero_facet NewFacet" in datafeed
+    "abaddon_mists_of_fate":             ("Malignant Mist",         "Blue1"),
+    "bloodseeker_old_blood":             ("Old Blood",              "Gray1"),
+    "disruptor_conduit":                 ("Transference",           "Gray0"),
+    "earthshaker_reverberating_ridge":   ("Resonating Ridge",       "Gray2"),
+    "lich_cryophobia":                   ("Evil Eye",               "Red0"),
+    "muerta_slingshot":                  ("Quickdraw",              "Red1"),
+    "rattletrap_junk_mail":              ("Chainmeal",              "Yellow1"),
+    "sand_king_obscurity":               ("Sandblast",              "Yellow3"),
+    "sand_king_pinpoint":                ("Final Sting",            "Red1"),
+    "silencer_spread_the_knowledge":     ("Synaptic Split",         "Purple1"),
+    "witch_doctor_malpractice":          ("Malpractice",            "Red2"),
     # 7.39d — names from abilities_english.txt, colours from facets_icons.json
     "dawnbreaker_solar_charged":      ("Solar Charged",        "Gray3"),
     "faceless_void_chronosphere":     ("Chronosphere",         "Green0"),
@@ -381,6 +393,8 @@ FACETS = {
     "furion_soothing_saplings":       ("Soothing Saplings",    "Green0"),
     "monkey_king_transfiguration":    ("Changing of the Guard","Red2"),
     "undying_rotting_mitts":          ("Rotting Mitts",        "Green4"),
+    # 7.39 existing facets with changes
+    "grimstroke_fine_art":            ("Fine Art",            "Red1"),
     # 7.39e — fetched 2026-06-14 from /datafeed/patchnotes?version=7.39e
     "crystal_maiden_arcane_overflow": ("Arcane Overflow", "Blue2"),
     "disruptor_thunderstorm":         ("Thunderstorm",    "Red1"),

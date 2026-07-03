@@ -340,6 +340,7 @@
         table.setAttribute('hidden', '');
         trig.classList.remove('active');
       }
+      requestAnimationFrame(drawBrewlingConnectors);
     });
   });
 
@@ -580,12 +581,46 @@
         'brewmaster_drunken_brawler_void',
       ],
     },
+    {
+      parent: 'invoker_quas_focus',
+      children: [
+        'invoker_quas',
+        'invoker_cold_snap',
+        'invoker_ice_wall',
+        'invoker_ghost_walk',
+      ],
+    },
+    {
+      parent: 'invoker_wex_focus',
+      children: [
+        'invoker_wex',
+        'invoker_alacrity',
+        'invoker_tornado',
+      ],
+    },
+    {
+      parent: 'invoker_exort_focus',
+      children: [
+        'invoker_exort',
+        'invoker_chaos_meteor',
+        'invoker_sun_strike',
+      ],
+    },
   ];
 
   function drawBrewlingConnectors() {
     // Remove any existing SVGs so we can redraw fresh on each call.
     document.querySelectorAll('svg.brewling-connector').forEach((s) => s.remove());
     ABILITY_TREES.forEach((tree) => drawAbilityTree(tree.parent, tree.children));
+  }
+
+  // Resolve the anchor element for connector lines: always use the
+  // .ability-icon-wrap (48×48 column) rather than the img itself, so
+  // ability_change children (which have 128×128 icons in a different layout)
+  // are anchored at the same position as regular ability blocks.
+  function resolveAnchor(img) {
+    const wrap = img.closest('.ability-icon-wrap, .facet-icon-wrap');
+    return wrap || img;
   }
 
   function drawAbilityTree(parentSlug, childSlugs) {
@@ -602,40 +637,39 @@
     // ability-blocks regardless of their containing scrollable parents.
     const docY = (rect) => rect.top + window.scrollY;
     const docX = (rect) => rect.left + window.scrollX;
-    const parentRect = parentImg.getBoundingClientRect();
-    const childRects = childImgs.map((i) => i.getBoundingClientRect());
+    const parentRect = resolveAnchor(parentImg).getBoundingClientRect();
+    const childRects = childImgs.map((i) => resolveAnchor(i).getBoundingClientRect());
 
     // Trunk: vertical line in the left gutter just outside the parent icon's
     // left edge — visually "comes out" of the Primal Split icon.
-    const trunkX = docX(parentRect) - 12;
-    const startY = docY(parentRect) + parentRect.height / 2;
+    // Trunk runs in the left gutter; parent connects from its left-center.
+    const parentLeftX = docX(parentRect);
+    const parentMidY  = docY(parentRect) + parentRect.height / 2;
+    const trunkX = parentLeftX - 12;
     const lastChild = childRects[childRects.length - 1];
     const endY = docY(lastChild) + lastChild.height / 2;
     const minX = Math.min(trunkX, ...childRects.map(docX));
-    const maxX = Math.max(docX(parentRect) + parentRect.width / 2,
-                          ...childRects.map((r) => docX(r) + r.width));
-    const top = Math.min(startY, ...childRects.map(docY));
+    const maxX = Math.max(parentLeftX, ...childRects.map((r) => docX(r) + r.width));
+
+    const top    = Math.min(parentMidY, ...childRects.map(docY));
     const bottom = endY + 4;
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'brewling-connector');
     svg.style.left = minX - 4 + 'px';
-    svg.style.top = top + 'px';
-    svg.style.width = (maxX - minX + 8) + 'px';
+    svg.style.top  = top + 'px';
+    svg.style.width  = (maxX - minX + 8) + 'px';
     svg.style.height = (bottom - top + 4) + 'px';
     svg.setAttribute('viewBox',
       '0 0 ' + (maxX - minX + 8) + ' ' + (bottom - top + 4));
 
-    // Coordinate transform: subtract (minX-4, top) from each point.
+    // Coordinate transform: subtract SVG origin from each point.
     const tx = (x) => x - (minX - 4);
     const ty = (y) => y - top;
 
-    // Parent icon bottom-center connects via short stub down to the trunk.
-    const parentBottomX = docX(parentRect) + parentRect.width / 2;
-    const parentBottomY = docY(parentRect) + parentRect.height;
-    let d = 'M ' + tx(parentBottomX) + ' ' + ty(parentBottomY)
-          + ' L ' + tx(parentBottomX) + ' ' + ty(startY + 6)
-          + ' L ' + tx(trunkX) + ' ' + ty(startY + 6)
-          + ' L ' + tx(trunkX) + ' ' + ty(endY);
+    // Left-center of parent → horizontal stub to trunk → down to last child.
+    let d = 'M ' + tx(parentLeftX) + ' ' + ty(parentMidY)
+          + ' L ' + tx(trunkX)     + ' ' + ty(parentMidY)
+          + ' L ' + tx(trunkX)     + ' ' + ty(endY);
     // Branch from trunk to each brewling icon's left-center.
     for (const r of childRects) {
       const cy = docY(r) + r.height / 2;

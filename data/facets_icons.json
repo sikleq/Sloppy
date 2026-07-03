@@ -1210,5 +1210,29 @@
   "kez_shadowhawk": [
     "Blue2",
     "kez_shadowhawk"
+  ],
+  "rattletrap_junk_mail": [
+    "Yellow1",
+    "armor"
+  ],
+  "abaddon_mists_of_fate": [
+    "Blue1",
+    "phantom_ass_dagger"
+  ],
+  "disruptor_conduit": [
+    "Gray0",
+    "vortex_out"
+  ],
+  "earthshaker_reverberating_ridge": [
+    "Gray2",
+    "ricochet"
+  ],
+  "muerta_slingshot": [
+    "Red1",
+    "ricochet"
+  ],
+  "sand_king_pinpoint": [
+    "Red1",
+    "area_of_effect"
   ]
 }

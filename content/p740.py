@@ -692,7 +692,7 @@ def build():
     W(ul_close())
     W(ability("Inner Beast", slug="beastmaster_inner_beast", innate=False))
     W(ul_open())
-    W(li("Bonus Attack Speed rescaled from 15/30/45/60 to 10/30/50/70", b([15, 30, 45, 60], [10, 30, 50, 70])))
+    W(li("Bonus Attack Speed rescaled from 15/30/45/60 to 10/30/50/70", b([15, 30, 45, 60], [10, 30, 50, 70], force_overall="buff")))
     W(ul_close())
 
     # Bloodseeker
@@ -2507,7 +2507,7 @@ def build():
     W(ul_close())
     W(ability("Psionic Trap", slug="templar_assassin_psionic_trap"))
     W(ul_open())
-    W(li("Damage rescaled from 225/300/375 to 200/300/400", b([225, 300, 375], [200, 300, 400])))
+    W(li("Damage rescaled from 225/300/375 to 200/300/400", b([225, 300, 375], [200, 300, 400], force_overall="buff")))
     W(ul_close())
     W(ability("Psionic Projection", slug="templar_assassin_trap_teleport"))
     W(ul_open())

@@ -721,7 +721,7 @@ def build():
     W(ul_close())
     W(ability("Chakram"))
     W(ul_open())
-    W(li("Pass Damage rescaled from 100/150/200 to 75/150/225", b([100, 150, 200], [75, 150, 225])))
+    W(li("Pass Damage rescaled from 100/150/200 to 75/150/225", b([100, 150, 200], [75, 150, 225], force_overall="buff")))
     W(ul_close())
 
     # Tinker
