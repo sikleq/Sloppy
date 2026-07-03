@@ -53,6 +53,74 @@ except Exception as _e:
     _KNOWN_ITEM_SLUGS = {}
 
 
+# ---------- PATCHNOTES LOC LOADER ----------
+
+def _load_patchnotes_loc(version):
+    """Parse data/patchnotes_english.txt and return a per-hero lookup.
+
+    Returns dict: hero_slug → {normalized_text → ability_slug}
+    where ability_slug is the slug extracted from the key, or None for
+    hero-level (stat) notes.
+
+    Key format: DOTA_Patch_{ver}_{hero}[_{ability_slug}[_{N}[_info]]]
+    Example: DOTA_Patch_7_39_kez_kez_kazurai_katana_4
+    """
+    p = os.path.join(_HERE, 'data', 'patchnotes_english.txt')
+    if not os.path.exists(p):
+        return {}
+    ver_key = version.replace('.', '_')
+    prefix = f'DOTA_Patch_{ver_key}_'
+    result = {}  # hero_slug -> {text_norm -> ability_slug or None}
+    # Regex to parse KV lines: "KEY"\t\t"VALUE"
+    _KV = re.compile(r'^"([^"]+)"\s+"([^"]*)"')
+    with open(p, encoding='utf-8') as f:
+        for line in f:
+            m = _KV.match(line.strip())
+            if not m:
+                continue
+            key, text = m.group(1), m.group(2).strip()
+            if not key.startswith(prefix):
+                continue
+            rest = key[len(prefix):]  # e.g. "kez_kez_kazurai_katana_4" or "kez_3"
+            # Split to identify hero slug (first token) vs ability slug
+            parts = rest.split('_')
+            if not parts:
+                continue
+            hero_slug = parts[0]
+            # The ability slug follows the hero slug. Hero slugs can be
+            # multi-word (e.g. "ancient_apparition"), so we match greedily:
+            # look for the longest prefix of parts that is a known hero slug,
+            # then the next segment(s) before a trailing _N or _info form the
+            # ability slug.  We approximate: if parts[1] == hero_slug_part[0]
+            # (i.e. the ability slug also starts with the hero slug), then the
+            # ability slug starts at parts[0] and extends until we hit a
+            # pure-numeric suffix or "_info".
+            # Simpler heuristic: strip trailing _N and _info suffixes, then
+            # if what remains has more tokens than the hero part, the extras
+            # are the ability slug.
+            tail = parts[1:]  # everything after hero_slug
+            # Strip trailing _info
+            if tail and tail[-1] == 'info':
+                tail = tail[:-1]
+            # Strip trailing pure-numeric token
+            if tail and tail[-1].isdigit():
+                tail = tail[:-1]
+            # Remaining tail: if non-empty AND starts with hero_slug (ability
+            # slugs typically start with hero slug, e.g. kez_kazurai_katana),
+            # reconstruct ability slug as hero_slug + _ + '_'.join(tail).
+            if tail and tail[0] == hero_slug:
+                ability_slug = '_'.join([hero_slug] + tail[1:]) if len(tail) > 1 else None
+            elif tail:
+                # ability slug doesn't share hero prefix (rare) — use as-is
+                ability_slug = '_'.join([hero_slug] + tail)
+            else:
+                ability_slug = None  # hero-level note
+            text_norm = re.sub(r'\s+', ' ', text).lower().strip()
+            if text_norm:
+                result.setdefault(hero_slug, {})[text_norm] = ability_slug
+    return result
+
+
 # ---------- LOOKUP TABLES ----------
 
 def _load_itemlist():
@@ -156,18 +224,26 @@ CANONICAL_TAGS = [
     (re.compile(r'\bno longer has (?:an? |the )?(?:\w+ ){1,3}(?:penalty|restriction|drawback|downside|debuff slow)\b', re.I), 'BUFF'),
     (re.compile(r'\bno longer (?:reduces|decreases) ', re.I),       'BUFF'),
     (re.compile(r'\bno longer requires (?:a |an )?(?:skill point|mana|charge)', re.I), 'BUFF'),
+    # NERF — adding a penalty/restriction is negative (inverse of no-longer-has-penalty)
+    (re.compile(r'\bnow has (?:an? |the )?(?:\w+ ){0,3}(?:penalty|restriction|drawback|downside)\b', re.I), 'NERF'),
     # NEW — new mechanic / capability added
     (re.compile(r'\bAdded to Captains Mode\b', re.I),               'NEW'),
     (re.compile(r'\bCan now be disassembled\b', re.I),              'NEW'),
     (re.compile(r'\bis now dispellable\b', re.I),                   'NEW'),   # adding dispel-ability to a buff/debuff
-    (re.compile(r'\bno longer dispellable\b', re.I),                'DEL'),   # removing dispel-ability from a buff/debuff
+    (re.compile(r'\bno longer dispellable\b', re.I),                'NEW'),   # gaining undispellable property — new capability
     (re.compile(r'\bis now disjointable\b', re.I),                  'NEW'),   # adding disjoint-ability to a projectile
     (re.compile(r'\bno longer disjointable\b', re.I),               'DEL'),
     (re.compile(r'^Now (?:also )?(?:passively |actively )?(?:grants|provides|gains?|adds?|applies?|deals?|increases|fires?|spawns?|summons?)', re.I), 'NEW'),
+    (re.compile(r"\bAghanim's (?:Scepter|Shard) now (?:also )?(?:grants|provides|applies?|adds?|deals?|allows?|gives?|causes?)", re.I), 'NEW'),
     (re.compile(r'^Added\b', re.I),                                 'NEW'),
+    # QoL — UI / display / convenience, no gameplay change
+    (re.compile(r'\bpressing (?:and holding )?alt\b', re.I),        'QoL'),
+    (re.compile(r'\bholding (?:and pressing )?alt\b', re.I),        'QoL'),
+    (re.compile(r'\balt[\s-]clicking?\b', re.I),                    'QoL'),
     # MISC — mechanic toggle, classification change, polish, fix, no effective change
     (re.compile(r'\bNow can be toggled while silenced\b', re.I),    'MISC'),
     (re.compile(r'\bClassified as\b', re.I),                        'MISC'),
+    (re.compile(r'\btooltip now (?:shows?|displays?|reflects?)\b', re.I), 'QoL'),  # "The tooltip now shows..." — display-only improvement
     (re.compile(r'^\s*Fixed\s+(?:item\s+|ability\s+|spell\s+)?(?:description|tooltip|text)\b', re.I), 'QoL'),  # "Fixed description stating..." — tooltip fix
     (re.compile(r'^\s*Fixed\b', re.I),                              'MISC'),  # "Fixed X" — gameplay bug fix
     (re.compile(r'\bunchanged\b', re.I),                            'MISC'),  # "X is unchanged"
@@ -310,6 +386,35 @@ def _split_levels(s):
     return nums[0] if len(nums) == 1 else nums
 
 
+def _l1_only_dip(old, new, l=False):
+    """Return True if only L1 dropped (or rose for l=True), L2 is equal,
+    and all later levels moved in the buff direction — the 'L1-only-dip' pattern
+    (memory rule: sloppy_backloaded_rescale_nerf borderline refinement).
+    b() avg-signed-pct would call this NERF, but it should be force_overall='buff'."""
+    if not isinstance(old, list) or not isinstance(new, list) or len(old) != len(new) or len(old) < 3:
+        return False
+    # L1: worse for the player
+    l1_worse = (new[0] > old[0]) if l else (new[0] < old[0])
+    if not l1_worse:
+        return False
+    # L2: unchanged
+    if old[1] != new[1]:
+        return False
+    # L3+: better for the player
+    if not all((new[i] < old[i]) if l else (new[i] > old[i]) for i in range(2, len(old))):
+        return False
+    # Confirm avg signed pct is negative (would show NERF without override)
+    signed = []
+    for o, n in zip(old, new):
+        if o == n or o == 0:
+            signed.append(0.0)
+        else:
+            pct = (n - o) / o * 100
+            is_buff = (n < o) if l else (n > o)
+            signed.append(abs(pct) if is_buff else -abs(pct))
+    return (sum(signed) / len(signed)) < 0
+
+
 def _emit_badge(text):
     """Try to extract from-N-to-M and emit b(...). Returns badge code str
     (e.g. 'b([5,7,9,15], [5,7,9,11])') or None if no numeric change."""
@@ -320,8 +425,10 @@ def _emit_badge(text):
     new = _split_levels(m.group(2))
     if old is None or new is None:
         return None
-    l_arg = ', l=True' if _is_lower_better(text) else ''
-    return f'b({old!r}, {new!r}{l_arg})'
+    l = _is_lower_better(text)
+    l_arg = ', l=True' if l else ''
+    force_arg = ', force_overall="buff"' if _l1_only_dip(old, new, l) else ''
+    return f'b({old!r}, {new!r}{l_arg}{force_arg})'
 
 
 # "Damage at level 1 increased/decreased from X–Y to A–B"
@@ -392,6 +499,16 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
         return (f'W(li("{txt_esc}", bstat_h("{h}", "{field}", "{prev_v}", {delta_repr}),'
                 f' extra=note_box(hero="{h}", field="{field}", before_patch="{prev_v}")))')
 
+    # Aghs reworked: merge description into main text instead of inline_note
+    # (memory rule: sloppy_aghs_reworked_no_hidden_info)
+    _aghs_rework_re = re.compile(
+        r"^(?:Reworked\s+)?Aghanim'?s\s+(?:Shard|Scepter)\s+(?:upgrade\s+)?reworked?$", re.I)
+    if info and _aghs_rework_re.match(clean):
+        aghs_type = 'Shard' if 'shard' in clean.lower() else 'Scepter'
+        merged = f"Aghanim's {aghs_type} reworked: {info}"
+        merged_esc = merged.replace('"', '\\"')
+        return f'W(li("{merged_esc}", t("REWORK")))'
+
     badge_call = _emit_badge(txt)
     tag = tag_override or _guess_tag(txt)
     if badge_call:
@@ -413,9 +530,68 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
     return f'W(li("{txt_esc}", {badge_str}{extras_str}))'
 
 
+# ---------- SOURCE TAG-ORDER SORT ----------
+
+def _source_li_rank(line):
+    """Rank a W(li(...)) source line for tag-order sorting (lower = first).
+    Mirrors the HTML-level _li_rank() in patch/page.py:
+      1 NEW  2 REWORK  3 BUFF/numeric  4 NERF  5 DEL  6 QoL  7 MISC  8 untagged
+    Numeric b()/br()/bf() calls default to rank 3 (buff position) because
+    buff/nerf can't be determined reliably without evaluating the arguments;
+    the HTML post-pass in page.py will refine these at render time."""
+    if 't("NEW")' in line:    return 1
+    if 't("REWORK")' in line: return 2
+    if 't("BUFF")' in line:   return 3
+    if 't("NERF")' in line:   return 4
+    if 't("DEL")' in line:    return 5
+    if 't("QoL")' in line:    return 6
+    if 't("MISC")' in line:   return 7
+    if re.search(r'\bb\s*\(|\bbr\s*\(|\bbf\s*\(|\bli_formula\s*\(|\bbstat_[hi]\s*\(', line):
+        return 3
+    return 8
+
+
+def _sort_source_ul_blocks(lines):
+    """Sort W(li(...)) lines within each ul_open/ul_close block by tag rank.
+    Stable sort: lines of equal rank keep their authored order.
+    Patchnotes-warning comments (# [patchnotes: ...]) stay attached to their li."""
+    result = []
+    i = 0
+    while i < len(lines):
+        if lines[i] != 'W(ul_open())':
+            result.append(lines[i])
+            i += 1
+            continue
+        result.append(lines[i])
+        i += 1
+        # Collect block until matching ul_close
+        items = []   # list of (rank, original_idx, [lines])
+        while i < len(lines) and lines[i] != 'W(ul_close())':
+            item_lines = []
+            # Gather any preceding patchnotes-warning comments
+            while i < len(lines) and lines[i].startswith('#') and lines[i] != 'W(ul_close())':
+                item_lines.append(lines[i])
+                i += 1
+            if i < len(lines) and lines[i] != 'W(ul_close())':
+                item_lines.append(lines[i])
+                rank = _source_li_rank(lines[i]) if lines[i].startswith('W(li(') else 0
+                items.append((rank, len(items), item_lines))
+                i += 1
+            elif item_lines:
+                items.append((0, len(items), item_lines))
+        items_sorted = sorted(items, key=lambda x: (x[0], x[1]))
+        for _, _, item_lines in items_sorted:
+            result.extend(item_lines)
+        if i < len(lines):  # W(ul_close())
+            result.append(lines[i])
+            i += 1
+    return result
+
+
 # ---------- INDENT-TREE WALKER ----------
 
-def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None):
+def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
+                loc_map=None, current_ability_slug=None):
     """Walk notes array, respecting indent_level hierarchy and special
     fields (hide_dot, info, aghanims). Returns list of source lines.
 
@@ -509,6 +685,12 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None):
             continue
 
         open_ul_if_needed()
+        # Check patchnotes_english: warn if this text belongs to a different ability.
+        if loc_map is not None and current_ability_slug is not None:
+            txt_norm = re.sub(r'\s+', ' ', _strip_html(txt)).lower().strip()
+            expected_slug = loc_map.get(txt_norm)
+            if expected_slug is not None and expected_slug != current_ability_slug:
+                lines.append(f'# [patchnotes: belongs to {expected_slug}]')
         lines.append(_emit_li(txt, info=info, aghs=aghs, hero_name=hero_name, version=version))
         pending_parent_text = txt
         last_indent = lvl
@@ -516,6 +698,7 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None):
 
     if open_ul:
         lines.append('W(ul_close())')
+    lines = _sort_source_ul_blocks(lines)
     return lines, has_content
 
 
@@ -607,11 +790,13 @@ def _render_item(item, version, neutral=False):
     return out
 
 
-def _render_hero(hero, version=None):
+def _render_hero(hero, version=None, patchnotes_loc=None):
     """One heroes[] entry: hero_header + hero_notes + abilities + subsections."""
     out = []
     hid = hero.get('hero_id')
     name, slug = HEROES.get(hid, (f'hero_{hid}', f'hero_{hid}'))
+    # Per-hero loc_map from patchnotes_english (text_norm → ability_slug).
+    hero_loc = (patchnotes_loc or {}).get(slug, {})
     out.append(f'\n# {name}')
     out.append(f'W(hero_header("{name}"))')
     # Top-level hero notes (stat changes etc.) — pass hero_name+version for bstat_h.
@@ -683,7 +868,7 @@ def _render_hero(hero, version=None):
     # Facet subsections — before Abilities (order: stats > innates > facets > abilities > talents)
     from patch.badges import FACETS as _FACETS
     for s in hero.get('subsections', []):
-        if s.get('style') == 'hero_facet':
+        if s.get('style', '').startswith('hero_facet'):
             facet_slug = s.get('facet')
             facet_title = s.get('title', '')
             facet_color = s.get('facet_color', '')
@@ -735,7 +920,7 @@ def _render_hero(hero, version=None):
             if ni == 0 and aname and txt.lower().startswith(aname.lower() + ': '):
                 n2['note'] = txt[len(aname) + 2:]
             stripped.append(n2)
-        body, _ = _emit_notes(stripped)
+        body, _ = _emit_notes(stripped, loc_map=hero_loc, current_ability_slug=aslug)
         out.extend(body)
     # Talents — always last
     talents = hero.get('talent_notes', [])
@@ -1263,9 +1448,16 @@ def _postprocess_rework_marker(lines):
     """
     out = []
     pending_ability_idx = None
+    pending_facet_idx = None
     for line in lines:
         if line.startswith('W(ability('):
             pending_ability_idx = len(out)
+            pending_facet_idx = None
+            out.append(line)
+            continue
+        if line.startswith('W(facet_header('):
+            pending_facet_idx = len(out)
+            pending_ability_idx = None
             out.append(line)
             continue
         if pending_ability_idx is not None and line.startswith('W(li("'):
@@ -1285,6 +1477,14 @@ def _postprocess_rework_marker(lines):
                     '— OLD pane = the ability this replaces (lift its desc from prior patchnotes)'
                 )
             pending_ability_idx = None
+        elif pending_facet_idx is not None and line.startswith('W(li("'):
+            if any(trig in line for trig in _REWORK_TRIGGERS):
+                out.insert(
+                    pending_facet_idx,
+                    '# v2-todo: facet reworked — convert to facet_change(slug, old_desc=[...], new_desc=[...]) '
+                    '— verify "Reworked" badge on dota2.com/patches, lift OLD desc from prior patchnotes'
+                )
+            pending_facet_idx = None
         elif pending_ability_idx is not None and (
             line.startswith('W(ability(') or line.startswith('W(hero_header(')
             or line.startswith('# ')
@@ -1469,7 +1669,7 @@ def _normalize_hero(hero):
         changes += _normalize_notes(a.get('ability_notes'), aname)
     changes += _normalize_notes(hero.get('talent_notes'), 'talent')
     for s in hero.get('subsections', []):
-        if s.get('style') == 'hero_facet':
+        if s.get('style', '').startswith('hero_facet'):
             fslug = s.get('facet')
             # A facet subsection can carry its own general_notes (facet-level
             # tweaks like "Spell Amp now affects only total spell damage")
@@ -1578,6 +1778,7 @@ def normalize(version, d=None):
 
 def generate(version):
     d = fetch_datafeed(version)
+    patchnotes_loc = _load_patchnotes_loc(version)
 
     out = [f'# Auto-generated v2 scaffold for {version}',
            f'# Source: data/{version}_datafeed.json',
@@ -1623,7 +1824,7 @@ def generate(version):
                 out.extend(_render_item(item, version, neutral=True))
         elif key == 'heroes':
             for hero in sorted(d['heroes'], key=lambda h: HEROES.get(h['hero_id'], ('', ''))[0]):
-                out.extend(_render_hero(hero, version=version))
+                out.extend(_render_hero(hero, version=version, patchnotes_loc=patchnotes_loc))
 
     # Post-process passes that operate on the full emitted line list:
     # 1. Collapse aghs upgrade-row + description into canonical merged li.
@@ -1652,7 +1853,7 @@ def _auto_register_facets(version, datafeed):
     missing = {}
     for hero in datafeed.get('heroes', []):
         for s in hero.get('subsections', []):
-            if s.get('style') == 'hero_facet':
+            if s.get('style', '').startswith('hero_facet'):
                 slug = s.get('facet', '')
                 if slug and slug not in FACETS and slug not in missing:
                     missing[slug] = (s.get('title', slug), s.get('facet_color', 'Gray3'))

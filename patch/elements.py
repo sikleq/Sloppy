@@ -572,7 +572,7 @@ def subgroup(title):
     return out + f'<h4 class="subgroup">{title}</h4>'
 
 
-def ability(title, slug=None, innate=None, icon_url=None):
+def ability(title, slug=None, innate=None, icon_url=None, sub=False):
     icon_html = ''
     is_innate = False
     key = None
@@ -640,7 +640,7 @@ def ability(title, slug=None, innate=None, icon_url=None):
         icon_inner += (f'<img src="{INNATE_ICON_URL}" alt="" '
                        f'class="innate-marker">')
     icon_html = f'<div class="ability-icon-wrap">{icon_inner}</div>' if icon_inner else ''
-    if _State.current_block_is_facet and not _State.facet_block_had_ul:
+    if not sub and _State.current_block_is_facet and not _State.facet_block_had_ul:
         import sys
         print(f'[WARN] ability("{title}") called directly inside a facet block — '
               f'this closes the facet before any content. '
@@ -648,7 +648,7 @@ def ability(title, slug=None, innate=None, icon_url=None):
               file=sys.stderr)
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
-    if not _State.seen_abilities_subgroup and _State.current_hero:
+    if not sub and not _State.seen_abilities_subgroup and _State.current_hero:
         out += '<h4 class="subgroup">Abilities</h4>'
         _State.seen_abilities_subgroup = True
     _State.ability_block_open = True
@@ -677,7 +677,8 @@ def facet_header(slug):
     _State.ability_block_open = True
     _State.current_block_is_facet = True
     icon_overlay = (f'<img src="../icons/facets/{icon_name}.png" alt="" '
-                    f'class="facet-icon-overlay" loading="lazy" width="72" height="72">') if icon_name else ''
+                    f'class="facet-icon-overlay" loading="lazy" width="72" height="72" '
+                    f'data-slug="{slug}">') if icon_name else ''
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
                  f'style="background-image:{gradient}">{icon_overlay}</div>')
     return out + (f'<div class="ability-block facet-block">'
@@ -714,7 +715,7 @@ def new_facet(slug, desc, summary=None, tag="new"):
          else f'<div class="ability-change-row">{d}</div>')
         for d in desc_items
     )
-    default_summary = "New facet." if tag_key == "new" else "Reworked facet."
+    default_summary = "New facet" if tag_key == "new" else "Reworked facet"
     summary_text = summary or default_summary
     tag_label = tag_key.upper()
     summary_row = (
@@ -841,7 +842,7 @@ def ul_open():
         )
         icon = (f'<img src="{OTHER_ICON_URL}" alt="" '
                 f'class="ability-icon-img" loading="lazy" width="128" height="128" onerror="{on_err}">')
-        out += ('<h4 class="subgroup">STATS</h4>'
+        out += ('<h4 class="subgroup">GENERAL</h4>'
                 '<div class="ability-block other-block">'
                 f'<div class="ability-icon-wrap">{icon}</div>')
         _State.ability_block_open = True
@@ -1345,7 +1346,7 @@ def aghs_shard_line(text):
     return aghs_line(text, kind="shard")
 
 
-def ability_change(old, new, summary=None, tag=None):
+def ability_change(old, new, summary=None, tag=None, sub=False):
     if tag == 'new':
         _dyn_record_li({'new'})
     elif tag == 'rework':
@@ -1354,7 +1355,7 @@ def ability_change(old, new, summary=None, tag=None):
         _dyn_record_li({'new', 'del', 'rework'})
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
-    if _State.current_hero and not _State.seen_abilities_subgroup:
+    if not sub and _State.current_hero and not _State.seen_abilities_subgroup:
         out += '<h4 class="subgroup">Abilities</h4>'
         _State.seen_abilities_subgroup = True
 
@@ -1443,7 +1444,7 @@ def ability_change(old, new, summary=None, tag=None):
 
     if unified:
         _State.next_ul_is_hero_stats = False
-        if _State.current_hero and not _State.seen_abilities_subgroup:
+        if not sub and _State.current_hero and not _State.seen_abilities_subgroup:
             out = ''
             out += '<h4 class="subgroup">Abilities</h4>'
             _State.seen_abilities_subgroup = True
@@ -1482,11 +1483,13 @@ def ability_change(old, new, summary=None, tag=None):
         wrap_cls = 'ability-icon-wrap'
         if has_old_underlay:
             wrap_cls += ' has-old-underlay'
+        _new_slug = new.get("slug", "")
+        _slug_attr = f' data-slug="{_new_slug}"' if _new_slug else ''
         icon_html = (
             f'<div class="{wrap_cls}">'
             f'{old_underlay_html}'
             f'<img src="{unified_icon}" alt="{new["name"]}" '
-            f'class="ability-icon-img" loading="lazy" width="128" height="128" onerror="{on_err}">'
+            f'class="ability-icon-img" loading="lazy" width="128" height="128"{_slug_attr} onerror="{on_err}">'
             f'{new_marker_html}'
             f'{old_marker_html}'
             f'</div>'
