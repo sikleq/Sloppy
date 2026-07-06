@@ -96,6 +96,11 @@ EXCLUDE_PREFIXES = (
     "item_greater_clarity",
 )
 
+# Aura mana-regen bonuses not present in KV top-level fields.
+# Valve stores these inside the item's ability block; we add them manually.
+AURA_REGEN_EXTRA: dict[str, float] = {
+}
+
 # ── Manual display-name overrides for items where the auto-pretty-print
 #    diverges from Valve's canonical in-game name. ─────────────────────────
 ITEM_DISPLAY_OVERRIDES = {
@@ -259,7 +264,7 @@ def _patches_with_items() -> list[tuple[str, str]]:
     ]
 
 
-def _flat_metric(d: dict, kind: str) -> float:
+def _flat_metric(d: dict, kind: str, slug: str = "") -> float:
     """Compute a single Mana-Items column metric from a FLAT items.json item
     dict (the slim per-patch JSON has one flat level per slug after the
     DEEP_ITEM_FIELDS flattening in fetch_stats.py). Mirrors load_items()."""
@@ -271,7 +276,7 @@ def _flat_metric(d: dict, kind: str) -> float:
     if kind == "mana":
         return g(*MAX_MANA_FIELDS) + intel * INT_TO_MAX_MANA
     if kind == "regen":
-        passive = g(*PASSIVE_REGEN_FIELDS) + intel * INT_TO_REGEN
+        passive = g(*PASSIVE_REGEN_FIELDS) + intel * INT_TO_REGEN + AURA_REGEN_EXTRA.get(slug, 0.0)
         active_mana = max(
             (_to_float(str(d.get(k, 0))) for k in ACTIVE_MANA_FIELDS),
             default=0.0,
@@ -282,7 +287,7 @@ def _flat_metric(d: dict, kind: str) -> float:
         return (passive + active) * mult
     # Computed columns — derived from regen + cost, matching load_items().
     if kind in ("cost_per_regen", "regen_per_gold", "mana_per_60s"):
-        regen = _flat_metric(d, "regen")
+        regen = _flat_metric(d, "regen", slug)
         cost = _to_float(str(d.get("ItemCost", 0)))
         if kind == "mana_per_60s":
             return regen * 60
@@ -335,7 +340,7 @@ def load_metric_history(kind: str) -> dict[str, list[tuple[str, str, float, floa
         for slug, fields in data.items():
             if not isinstance(fields, dict):
                 continue
-            val = _flat_metric(fields, kind)
+            val = _flat_metric(fields, kind, slug)
             prev = last.get(slug)
             if prev is not None and round(prev, 3) != round(val, 3):
                 # ('V', ...) shape so _encode_hist treats it like a value change.
@@ -535,8 +540,9 @@ def load_items() -> list[dict]:
             sum(_to_float(fields.get(k, "0")) for k in ALL_STATS_FIELDS)
         )
         max_mana = sum(_to_float(fields.get(k, "0")) for k in MAX_MANA_FIELDS)
-        passive_regen = sum(
-            _to_float(fields.get(k, "0")) for k in PASSIVE_REGEN_FIELDS
+        passive_regen = (
+            sum(_to_float(fields.get(k, "0")) for k in PASSIVE_REGEN_FIELDS)
+            + AURA_REGEN_EXTRA.get(slug, 0.0)
         )
         active_mana = max(
             (_to_float(fields.get(k, "0")) for k in ACTIVE_MANA_FIELDS),

@@ -1,7 +1,7 @@
 
 
 /* ==========================================================================
-   SLOPPY вЂ” Global stylesheet
+   SLOPPY — Global stylesheet
    ==========================================================================
 
    01. Design tokens  (:root)
@@ -27,7 +27,7 @@
    ========================================================================== */
 
 /* ==========================================================================
-   00. FONTS вЂ” Radiance (Dota 2 UI font, for the in-game-style item tooltip)
+   00. FONTS — Radiance (Dota 2 UI font, for the in-game-style item tooltip)
    ========================================================================== */
 
 @font-face {
@@ -112,7 +112,7 @@
   --font-ui:          'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-j25:         'Jersey 25', 'Courier New', monospace;
   --font-j10:         'Jersey 10', 'Courier New', monospace;
-  /* Dota 2 UI font (Radiance) вЂ” used by the in-game-style item tooltip. */
+  /* Dota 2 UI font (Radiance) — used by the in-game-style item tooltip. */
   --font-dota:        'Radiance', 'Segoe UI', sans-serif;
 
   /* -- Z-index ladder --
@@ -178,11 +178,11 @@ html {
 }
 ::-webkit-scrollbar-thumb:hover { background: rgba(227, 196, 106, 0.7); }
 ::-webkit-scrollbar-corner { background: var(--bg-deep-60); }
-/* вЂ¦except pages that don't scroll at the page level, where the reserved gutter
+/* …except pages that don't scroll at the page level, where the reserved gutter
    just looks like an empty gap on the right:
    - .main-page    single-screen index
    - .calendar-page calendar (fits the screen)
-   - .creeps-page   Neutral Creeps / Neutral Abilities вЂ” the page is locked
+   - .creeps-page   Neutral Creeps / Neutral Abilities — the page is locked
                     (body:has(.creeps-scroll){overflow:hidden}); the real
                     scrollbar lives INSIDE the .creeps-scroll box, not here. */
 html:has(.main-page) { scrollbar-gutter: auto; }
@@ -200,10 +200,10 @@ body {
   min-height: 100vh;
 }
 
-/* в”Ђв”Ђ Patch pages: Valve-style featured.jpg texture behind a translucent
+/* ── Patch pages: Valve-style featured.jpg texture behind a translucent
    content "stage". The faceted texture shows at the page margins; the
    centered content column sits on a dimmed dark panel so text stays readable.
-   (First pass вЂ” tune the alpha / borders / margin reveal to taste.) в”Ђв”Ђ */
+   (First pass — tune the alpha / borders / margin reveal to taste.) ── */
 body.patch-page {
   /* Shorthand on purpose: also WIPES the base body rule's radial gradients
      and their background-attachment:fixed (same repaint-on-scroll issue). */
@@ -211,7 +211,7 @@ body.patch-page {
 }
 /* Valve's patch-page texture (featured.jpg) as a FIXED UNDERLAY element, not
    `background-attachment: fixed` on body. A fixed-attachment background can't
-   be scroll-blitted вЂ” with the translucent .cat-panels above it the browser
+   be scroll-blitted — with the translucent .cat-panels above it the browser
    repainted the ENTIRE viewport every scroll frame (the "heavy scroll" on the
    huge 7.41 page). A position:fixed pseudo gets its own compositor layer:
    scrolling just re-composites on the GPU, zero repaints. Visual result is
@@ -310,14 +310,14 @@ body.patch-page .entity-block > .properties-change {
 }
 /* Align the dynamics-cell row's right edge to the content edge (no overhang),
    so the cells, the change-row %s, and every bordered block (build / cost /
-   provides / properties / ability-change) all share one right edge вЂ” uniform
+   provides / properties / ability-change) all share one right edge — uniform
    widths, no per-box nudge needed. */
 body.patch-page .dyn-row-wrap {
   margin-left: 0;
   margin-right: 0;
 }
 /* ul.changes carried a 6px right padding to compensate the old cell-row
-   overhang. The row now ends at the content edge, so drop it вЂ” otherwise the
+   overhang. The row now ends at the content edge, so drop it — otherwise the
    change rows and the ability-row boxes (inside ul.changes) sit 6px narrower
    than the components / provides / cost boxes. */
 body.patch-page ul.changes {
@@ -327,7 +327,7 @@ body.patch-page ul.changes {
 .container {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 0 28px 80px;       /* flush top вЂ” content starts right under toolbar */
+  padding: 0 28px 80px;       /* flush top — content starts right under toolbar */
 }
 .container.calendar-page {
   /* A clear gap below the nav, and a trimmed bottom padding so the calendar +
@@ -362,7 +362,7 @@ nav.top-nav {
   width: 100%;
   /* Pin to the viewport top so the brand + version picker stay visible
      while the page (and sticky table headers below) scroll. Stack-order:
-     site nav (z 100) в†’ subnav (z 90) в†’ toolbar (z 80) в†’ table thead. */
+     site nav (z 100) → subnav (z 90) → toolbar (z 80) → table thead. */
   position: sticky;
   top: 0;
   z-index: 100;
@@ -401,7 +401,7 @@ nav.top-nav::after {
 }
 /* Table pages (Neutral Creeps / Unit Abilities / Mana Items, all wrap their
    content in .creeps-page) keep the glass LOOK (cool top rim + gradient body)
-   but make it fully OPAQUE вЂ” same gradient with alpha forced to 1 вЂ” so a
+   but make it fully OPAQUE — same gradient with alpha forced to 1 — so a
    scrolling table never shows through. Unified across all three tables. */
 body:has(.creeps-page) nav.top-nav {
   background:
@@ -429,7 +429,7 @@ body:has(.creeps-page) nav.top-nav {
   content: none;
 }
 /* Header brand block (helmet logo + pixel-font title). Replaces the inline
-   nav tabs вЂ” the full nav list now lives on the main hub page. */
+   nav tabs — the full nav list now lives on the main hub page. */
 .nav-brand {
   min-width: 0;
   display: inline-flex;
@@ -515,7 +515,7 @@ body:has(.creeps-page) nav.top-nav {
   text-shadow: 2px 2px 0 #1a1206, 0 0 14px rgba(227, 196, 106, 0.25);
 }
 
-/* WALL OF SIGNATURES вЂ” faint pixel-font usernames scattered around the book,
+/* WALL OF SIGNATURES — faint pixel-font usernames scattered around the book,
    like graffiti on a wall. Positioned by scripts.js (no overlap with book /
    nav / each other). Fixed full-viewport layer behind the book. */
 .inv-signatures {
@@ -523,7 +523,7 @@ body:has(.creeps-page) nav.top-nav {
   inset: 0;
   z-index: 1;
   overflow: visible;
-  pointer-events: none;          /* layer transparent to clicksвЂ¦ */
+  pointer-events: none;          /* layer transparent to clicks… */
   /* The whole wall fades in once scripts.js has positioned every name, so it
      never flashes in "from emptiness" mid-layout. JS flips opacity to 1. */
   opacity: 0;
@@ -537,23 +537,23 @@ body:has(.creeps-page) nav.top-nav {
   opacity: 0;
   white-space: nowrap;
   /* Handjet first: a pixel/dot-matrix font WITH Cyrillic, so Russian member
-     names render in-style (Jersey 10 has no Cyrillic в†’ it falls through). */
+     names render in-style (Jersey 10 has no Cyrillic → it falls through). */
   font-family: "Handjet", var(--font-j10);
   font-size: 18px;
   letter-spacing: 0.5px;
-  color: rgba(243, 220, 150, 0.72);   /* glowing gold вЂ” only seen once revealed */
+  color: rgba(243, 220, 150, 0.72);   /* glowing gold — only seen once revealed */
   pointer-events: auto;
   cursor: default;
   user-select: none;
   transition: opacity 0.7s ease, color 0.15s ease, text-shadow 0.15s ease;
 }
-.inv-sig.is-lit {                /* revealed by the laser вЂ” fades in and stays */
+.inv-sig.is-lit {                /* revealed by the laser — fades in and stays */
   visibility: visible;
   opacity: 1;
   text-shadow: 0 0 8px var(--gold-line);
 }
 /* Colour emoji inside a signature (Telegram names sometimes carry a gold star,
-   blue check, party popper, etc.) в†’ flatten to the sig's own colour. Classic
+   blue check, party popper, etc.) → flatten to the sig's own colour. Classic
    transparent-text + zero-offset text-shadow trick: the glyph silhouette is
    painted in the shadow colour, which we tie to currentColor so VIP/regular/
    lit/hidden variants all inherit the right tone. Wider 0-radius shadows
@@ -562,7 +562,7 @@ body:has(.creeps-page) nav.top-nav {
   color: transparent !important;
   text-shadow: 0 0 0 currentColor;
 }
-/* The .is-lit gold glow above sets a non-zero text-shadow on the whole sig вЂ”
+/* The .is-lit gold glow above sets a non-zero text-shadow on the whole sig —
    override on the emoji wrapper so its silhouette stays sharp and the glow
    doesn't double up around the emoji shape. */
 .inv-sig.is-lit .inv-emo { text-shadow: 0 0 0 currentColor; }
@@ -589,7 +589,7 @@ body:has(.creeps-page) nav.top-nav {
   will-change: transform, opacity;
 }
 @media (prefers-reduced-motion: reduce) { .sig-beam-layer { display: none; } }
-/* Pixel gold dust a name bursts into when clicked вЂ” crisp 1вЂ“2px squares (like the
+/* Pixel gold dust a name bursts into when clicked — crisp 1–2px squares (like the
    stars), no blur. JS sets size/position and animates each speck. */
 .sig-dust {
   position: absolute;
@@ -599,7 +599,7 @@ body:has(.creeps-page) nav.top-nav {
   image-rendering: pixelated;
   will-change: transform, opacity;
 }
-/* VIP names вЂ” azure instead of gold, with a touch more weight + a stronger glow
+/* VIP names — azure instead of gold, with a touch more weight + a stronger glow
    once lit, so they read as "special / legendary" against the gold wall. */
 .inv-sig-vip {
   color: rgba(140, 224, 255, 0.85);   /* azure */
@@ -610,7 +610,7 @@ body:has(.creeps-page) nav.top-nav {
     0 0 8px rgba(120, 214, 255, 0.6),
     0 0 16px rgba(90, 190, 255, 0.35);
 }
-/* Pixel "forge spark" thrown off a VIP name as a beam lights it вЂ” same azure as
+/* Pixel "forge spark" thrown off a VIP name as a beam lights it — same azure as
    the name, crisp little squares like the stars/dust. JS sizes/positions/animates. */
 .sig-spark {
   position: absolute;
@@ -712,17 +712,17 @@ body:has(.creeps-page) nav.top-nav {
 .inv-cell-dynamics:hover .inv-icon {
   content: url('icons/ui/gothic/icon_dynamics.gif');
 }
-/* Items: closed chest at rest; on hover a chest-open APNG plays once вЂ” a key
+/* Items: closed chest at rest; on hover a chest-open APNG plays once — a key
    flies in, inserts and turns, the lid pops open (chest squashes wider) and a
    gold light beam + treasure spill out. Driven from scripts.js (JS src-swap
-   with a ?v= cache-bust) вЂ” NOT CSS content:url вЂ” so the APNG replays from the
+   with a ?v= cache-bust) — NOT CSS content:url — so the APNG replays from the
    first frame on EVERY hover instead of holding its last frame. Reverts to the
    closed PNG on mouse-out. APNG (not GIF) for the translucent beam glow. */
 /* Calendar: on hover the date page burns away (gold pixel fire) and a new date
-   appears, looping 1в†’31. Driven from scripts.js (JS src-swap with a cache-bust)
-   instead of `content: url()` вЂ” the calendar GIF filename predates the others, so
+   appears, looping 1→31. Driven from scripts.js (JS src-swap with a cache-bust)
+   instead of `content: url()` — the calendar GIF filename predates the others, so
    browsers had a stale copy cached; the cache-bust forces the new burning GIF. */
-/* Special star: no spin вЂ” on hover it gently PULSES (grows/shrinks) and the
+/* Special star: no spin — on hover it gently PULSES (grows/shrinks) and the
    tile throws off a lot more magic dust. */
 .inv-cell-star:hover .inv-icon {
   animation: starPulse 0.85s ease-in-out infinite;
@@ -754,9 +754,9 @@ body:has(.creeps-page) nav.top-nav {
 .inv-special .inv-slot { position: relative; overflow: visible; }
 /* Magic dust: small pale (low-saturation, "magical" not colourful) pixel sparks.
    Two groups so mouse-out fades cleanly:
-     .dust-base  вЂ” 6 always drift, slow & sparse (independent of hover, so the
+     .dust-base  — 6 always drift, slow & sparse (independent of hover, so the
                    resting animation never jumps or breaks);
-     .dust-burst вЂ” 8 extras that ignite on hover. The whole burst LAYER fades its
+     .dust-burst — 8 extras that ignite on hover. The whole burst LAYER fades its
                    opacity out on mouse-out, so residual particles drift-fade away
                    gradually instead of snapping off. */
 .inv-sparks, .dust-base, .dust-burst {
@@ -771,7 +771,7 @@ body:has(.creeps-page) nav.top-nav {
   position: absolute;
   width: 2px;
   height: 2px;
-  background: #e8e0cc;                 /* pale warm white вЂ” soft, not bright/colourful */
+  background: #e8e0cc;                 /* pale warm white — soft, not bright/colourful */
   box-shadow: 0 0 3px 1px rgba(232, 224, 200, 0.6);
   opacity: 0;
   animation-name: sparkDrift;
@@ -785,14 +785,14 @@ body:has(.creeps-page) nav.top-nav {
   42%  { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.4); }
   100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.4); }
 }
-/* Ambient base вЂ” always drifting, slow & sparse. */
+/* Ambient base — always drifting, slow & sparse. */
 .dust-base .spark:nth-child(1) { top: 14px; left: 22px; --tx: -10px; --ty: -12px; animation-delay: 0s;   animation-duration: 8.5s; }
 .dust-base .spark:nth-child(2) { top: 9px;  left: 48px; --tx: 8px;   --ty: -14px; animation-delay: 1.1s; animation-duration: 9.2s; }
 .dust-base .spark:nth-child(3) { top: 30px; left: 60px; --tx: 14px;  --ty: -6px;  animation-delay: 2.2s; animation-duration: 8.0s; }
 .dust-base .spark:nth-child(4) { top: 52px; left: 50px; --tx: 9px;   --ty: 11px;  animation-delay: 0.6s; animation-duration: 9.6s; }
 .dust-base .spark:nth-child(5) { top: 50px; left: 16px; --tx: -11px; --ty: 9px;   animation-delay: 1.7s; animation-duration: 8.3s; }
 .dust-base .spark:nth-child(6) { top: 26px; left: 8px;  --tx: -13px; --ty: -4px;  animation-delay: 2.6s; animation-duration: 9.0s; }
-/* Burst extras вЂ” paused at rest, run fast on hover. The group opacity fade above
+/* Burst extras — paused at rest, run fast on hover. The group opacity fade above
    handles the graceful disappear, so a frozen particle is never seen mid-air. */
 .dust-burst .spark { animation-duration: 1.35s; animation-play-state: paused; }
 .inv-cell-star:hover .dust-burst .spark { animation-play-state: running; }
@@ -822,7 +822,7 @@ body:has(.creeps-page) nav.top-nav {
   text-align: center;
   color: var(--gold);                     /* "sikle" gold */
 }
-/* Placeholder slots вЂ” filled for the inventory look but not links. */
+/* Placeholder slots — filled for the inventory look but not links. */
 .inv-ph { cursor: default; }
 .inv-ph .inv-icon { filter: brightness(0.95) saturate(0.9); opacity: 0.7; }
 .inv-ph .inv-cap { color: #9c8550; }
@@ -851,18 +851,18 @@ body:has(.creeps-page) nav.top-nav {
   z-index: 1;
 }
 /* The dirt LAYER bobs in lock-step with the block (same animation) so particles
-   shed from the block's CURRENT (floating) underside вЂ” not mid-air below it. */
+   shed from the block's CURRENT (floating) underside — not mid-air below it. */
 .inv-cell-terrain:hover .terrain-dirt { animation: terrainBob 2.1s ease-in-out infinite; }
 .dirt {
   position: absolute;
   width: 2px;                               /* half the old 3x4 footprint */
   height: 2px;
-  background: #d8a850;                       /* warm soil вЂ” bright enough to read */
+  background: #d8a850;                       /* warm soil — bright enough to read */
   box-shadow: 0 0 0 0.5px rgba(34, 20, 9, 0.9);
   image-rendering: pixelated;
   opacity: 0;
 }
-/* particles fall while hovering; staggered cycles в†’ sparse but clearly visible.
+/* particles fall while hovering; staggered cycles → sparse but clearly visible.
    They pop in right at the block's bottom edge, then fall + fade. */
 .inv-cell-terrain:hover .dirt {
   animation-name: dirtFall;
@@ -876,7 +876,7 @@ body:has(.creeps-page) nav.top-nav {
   100% { transform: translateY(28px); opacity: 0; }   /* falls almost to the tile's bottom edge */
 }
 /* Five particles (was ten) spread sparsely along the flat tile's underside
-   (slot coords ~x 20вЂ“56) with long, staggered cycles в†’ the soil sheds
+   (slot coords ~x 20–56) with long, staggered cycles → the soil sheds
    occasionally and is never clustered. */
 .dirt:nth-child(1) { left: 22px; top: 48px; animation-duration: 4.2s; animation-delay: 0s;   }
 .dirt:nth-child(2) { left: 31px; top: 52px; animation-duration: 4.8s; animation-delay: 2.3s; }
@@ -894,7 +894,7 @@ body:has(.creeps-page) nav.top-nav {
    appear, centred: Telegram (envelope) and Donation (coin jar). A gothic
    left-arrow ornament next to the divider acts as "back". */
 /* Grid + panel share one stage. The grid stays in flow (it sets the height) and
-   only turns INVISIBLE when Support opens вЂ” it keeps its space, so the book
+   only turns INVISIBLE when Support opens — it keeps its space, so the book
    never resizes and the divider above never shifts. The panel is centred over
    that exact area. */
 .inv-stage { position: relative; }
@@ -934,7 +934,7 @@ body:has(.creeps-page) nav.top-nav {
 }
 /* Identical to a grid tile (.inv-cell): same slot/icon/caption sizes + the same
    lift-on-hover. So .support-btn reuses the base .inv-slot / .inv-icon / .inv-cap
-   sizing вЂ” we only add positioning context for the hover particles. */
+   sizing — we only add positioning context for the hover particles. */
 .support-btn {
   display: flex;
   flex-direction: column;
@@ -956,7 +956,7 @@ body:has(.creeps-page) nav.top-nav {
 .support-btn:hover .inv-cap { color: #fff5dc; }
 .support-btn:focus-visible { outline: none; }
 .support-btn:focus-visible .inv-slot { outline: 2px solid #eccb7e; outline-offset: 3px; }
-/* Donation isn't wired up yet вЂ” keep it full-colour + alive (the jar animates),
+/* Donation isn't wired up yet — keep it full-colour + alive (the jar animates),
    just non-clickable with a "soon" ribbon. */
 .support-soon { cursor: default; }
 .support-soon-tag {
@@ -1040,7 +1040,7 @@ body:has(.creeps-page) nav.top-nav {
 .don-coin {
   position: absolute;
   left: 50%;
-  top: 4px;                 /* starts above the open mouth в†’ falls in, lands on pile */
+  top: 4px;                 /* starts above the open mouth → falls in, lands on pile */
   width: 11px;
   height: 11px;
   margin-left: -5px;
@@ -1057,14 +1057,14 @@ body:has(.creeps-page) nav.top-nav {
   63%  { transform: translateY(33px); }                /* tiny bounce */
   70%  { transform: translateY(37px); opacity: 1; }
   88%  { transform: translateY(37px); opacity: 0.9; }
-  100% { transform: translateY(37px); opacity: 0; }    /* settles in в†’ loop */
+  100% { transform: translateY(37px); opacity: 0; }    /* settles in → loop */
 }
 
 /* ---- BACK control: a gothic left-arrow ornament beside the title divider,
    only while the Support panel is open. */
 .inv-divider-row {
   position: relative;
-  text-align: center;          /* divider centres on its own вЂ” unaffected by the
+  text-align: center;          /* divider centres on its own — unaffected by the
                                   arrow, so the arrow can never shift it */
   margin: 14px 0 24px;
   line-height: 0;
@@ -1075,7 +1075,7 @@ body:has(.creeps-page) nav.top-nav {
   vertical-align: middle;
 }
 .support-back {
-  position: absolute;          /* out of flow в†’ the divider stays put */
+  position: absolute;          /* out of flow → the divider stays put */
   top: 50%;
   right: 89%;                  /* right edge just left of the divider's left end */
   transform: translateY(-50%);
@@ -1138,7 +1138,7 @@ body:has(.creeps-page) nav.top-nav {
 }
 .nav-tab.active {
   background: rgba(0, 0, 0, 0.22);
-  /* keep weight + transparent border identical to inactive вЂ” prevents header jump */
+  /* keep weight + transparent border identical to inactive — prevents header jump */
 }
 .nav-context {
   min-width: 0;
@@ -1157,7 +1157,7 @@ body:has(.creeps-page) nav.top-nav {
 }
 /* Nav button: soft rounded-rect "tablet" with a thin SVG chevron drawn
    precisely in the centre. No font glyph (font baselines vary across
-   systems) вЂ” the chevron is a CSS background-image data URI rendered
+   systems) — the chevron is a CSS background-image data URI rendered
    crisp at any size. Direction modifier class swaps the SVG. */
 .version-nav-arrow {
   display: inline-block;
@@ -1178,7 +1178,7 @@ body:has(.creeps-page) nav.top-nav {
     100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
     0 calc(100% - 2px), 0 2px);
 }
-/* Pixel-art chunky arrows вЂ” drawn as a staircase of 2Г—2 cells (shape-rendering
+/* Pixel-art chunky arrows — drawn as a staircase of 2×2 cells (shape-rendering
    keeps the edges crisp at any scale). Yellow accent matches the "sikle" tag
    in the header brand. */
 .version-nav-arrow.is-prev {
@@ -1201,7 +1201,7 @@ body:has(.creeps-page) nav.top-nav {
   pointer-events: none;
 }
 
-/* RELEASE INFO + VERSION вЂ” РѕРґРЅР° РІС‹СЃРѕС‚Р° */
+/* RELEASE INFO + VERSION — одна высота */
 .nav-context .release-info {
   display: flex;
   flex-direction: column;
@@ -1236,18 +1236,18 @@ body:has(.creeps-page) nav.top-nav {
   line-height: 1.1;
   margin-bottom: 1px;
 }
-/* Calendar variant вЂ” no dropdown; .release-info takes its place on the right.
+/* Calendar variant — no dropdown; .release-info takes its place on the right.
    Override the fixed 38px height (designed for version+date only) so the
    3rd line (.patch-age) doesn't overflow above and below the box. */
 /* Universal rule: every non-patch tab (calendar, creeps, anything added
    later) reserves the same vertical space as the patch-page version
-   picker via .nav-context-flat. New tabs only need to use this class вЂ”
-   no per-tab CSS вЂ” so the header height stays identical across pages
+   picker via .nav-context-flat. New tabs only need to use this class —
+   no per-tab CSS — so the header height stays identical across pages
    and switching tabs doesn't make the toolbar jump. */
 .nav-context-flat {
   /* Reserve picker height on non-patch pages so all tabs sit on one baseline,
      even when the right side has no content. Grid layout handles horizontal
-     placement вЂ” no `margin-left: auto` needed. */
+     placement — no `margin-left: auto` needed. */
   justify-self: end;
   min-height: 38px;
 }
@@ -1393,11 +1393,11 @@ body:has(.creeps-page) nav.top-nav {
   min-width: auto;
 }
 
-/* NAV BACK ARROW + BACK-TO-TOP вЂ” pixel-art chevrons on an index-style gold /
+/* NAV BACK ARROW + BACK-TO-TOP — pixel-art chevrons on an index-style gold /
    leather circle (matches the inventory landing page). Arrows are gold (var(--gold))
    PNGs at icons/ui/gothic/arrow_left|up.png. Both float in the BOTTOM corners so
    neither overlaps the toolbar tags (the back arrow used to sit at top-left, over
-   the tag block). url() is relative to styles.css (repo root) в†’ works on every
+   the tag block). url() is relative to styles.css (repo root) → works on every
    page regardless of depth. */
 .nav-back-arrow,
 .back-to-top {
@@ -1479,7 +1479,7 @@ body:has(.creeps-page) nav.top-nav {
   box-sizing: border-box;
 }
 /* Blurb + toolbar now live INSIDE the .creeps-scroll box (above the table) so
-   they scroll away with it, exactly like the Mana Items page вЂ” only the site
+   they scroll away with it, exactly like the Mana Items page — only the site
    nav + sticky table headers stay pinned. They're sticky-left so they don't
    slide off when the table scrolls horizontally, with an opaque background so
    the table never shows through them. */
@@ -1504,7 +1504,7 @@ body:has(.creeps-page) nav.top-nav {
 }
 /* The View group (label + select) is wrapped in its own inline-flex so its
    width is independent of whatever follows in the toolbar. Same width on
-   every page в†’ the "View" label sits at the same X regardless of context. */
+   every page → the "View" label sits at the same X regardless of context. */
 .cal-toggle-bar .view-group {
   display: inline-flex;
   align-items: center;
@@ -1538,7 +1538,7 @@ body:has(.creeps-page) nav.top-nav {
 .cal-mode-select:hover {
   border-color: var(--blue-bright);
 }
-/* "Upgrades" binary switch вЂ” iOS-style toggle, defaults ON. When ON, the
+/* "Upgrades" binary switch — iOS-style toggle, defaults ON. When ON, the
    table gains .show-upgrades and each <span class="upg-val"> inside a
    leveled cell renders with a subtle dotted underline so the per-tier
    numbers self-identify without an outline around the cell. */
@@ -1583,7 +1583,7 @@ body:has(.creeps-page) nav.top-nav {
   border-radius: 50%;
   transition: transform 150ms ease, background 150ms ease;
 }
-/* ON state = the site-wide gold accent (var(--gold) вЂ” the "sikle" wordmark gold, same
+/* ON state = the site-wide gold accent (var(--gold) — the "sikle" wordmark gold, same
    as the active terrain-toolbar buttons). Unifies every toggle's on-colour. */
 .ua-upgrades-toggle .ua-switch-input:checked + .ua-switch { background: var(--gold); }
 .ua-upgrades-toggle .ua-switch-input:checked + .ua-switch::after {
@@ -1594,8 +1594,8 @@ body:has(.creeps-page) nav.top-nav {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
-/* Inline link inside an Effect cell вЂ” used when an effect mentions another
-   ability or unit by name (Hurl Boulder, Rally, Skeleton Warrior, вЂ¦) and
+/* Inline link inside an Effect cell — used when an effect mentions another
+   ability or unit by name (Hurl Boulder, Rally, Skeleton Warrior, …) and
    should jump to its row. Subtle cyan tone + dotted underline so it reads
    as interactive without screaming. */
 .unit-abilities-table .ua-inline-link {
@@ -1613,7 +1613,7 @@ body:has(.creeps-page) nav.top-nav {
    - faint sky-blue fill (almost translucent) so the cell stands out from the
      row without looking heavy;
    - soft rounded outline (1.5px) inset so the corners pull in slightly from
-     the cell edge вЂ” reads as a "highlighted" tile rather than a hard frame.
+     the cell edge — reads as a "highlighted" tile rather than a hard frame.
    The native `border-left` from the column divider stays underneath; the
    inset shadow sits on top and visually "owns" the cell. */
 .unit-abilities-table.show-upgrades td.leveled {
@@ -1642,7 +1642,7 @@ body:has(.creeps-page) nav.top-nav {
 }
 /* While the year dropdown is open, let it escape the block's overflow:hidden
    (which is there to clip the grid to the rounded corners). Without this the
-   menu is cut off below the block вЂ” most visibly in COMPACT mode, where the
+   menu is cut off below the block — most visibly in COMPACT mode, where the
    block is only as tall as its header so the dropdown has nowhere to show. */
 .cal-year-block:has(.cal-year-picker.is-open) { overflow: visible; }
 .cal-year-label {
@@ -1710,7 +1710,7 @@ body:has(.creeps-page) nav.top-nav {
   .cal-year-block.is-current { margin-left: 0; margin-right: 0; }
 }
 
-/* Year selector вЂ” a fully custom dropdown (replaces the native <select> so
+/* Year selector — a fully custom dropdown (replaces the native <select> so
    the value and every option are perfectly centred and themed; the native
    popup left-aligned its numbers and reserved arrow space). */
 .cal-year-picker { position: relative; display: inline-block; }
@@ -1763,8 +1763,8 @@ body:has(.creeps-page) nav.top-nav {
   padding: 5px;
   list-style: none;
   min-width: 100%;
-  /* No max-height / overflow в†’ the full year list shows without a scrollbar
-     (there are only ~9вЂ“15 years). */
+  /* No max-height / overflow → the full year list shows without a scrollbar
+     (there are only ~9–15 years). */
   background: var(--bg-panel-2);
   border: 1px solid var(--blue-30);
   border-radius: 8px;
@@ -1814,7 +1814,7 @@ body:has(.creeps-page) nav.top-nav {
 }
 
 /* ---- INFOGRAPHIC: patch-cadence strip under the calendar ----
-   A short horizontal band (в‰€1/3 the calendar's height) of small charts, not a
+   A short horizontal band (≈1/3 the calendar's height) of small charts, not a
    full card. Breaks out to the current-year block's width (same -140px). */
 .cal-infographic {
   margin: 10px -140px 6px;
@@ -1865,7 +1865,7 @@ body:has(.creeps-page) nav.top-nav {
   font-size: 10.5px; font-weight: 600; color: var(--text-muted-blue); text-transform: uppercase;
   letter-spacing: 0.6px; margin-bottom: 8px; text-align: center;
 }
-/* Sparkline (SVG) вЂ” smooth line + gradient area + point dots. */
+/* Sparkline (SVG) — smooth line + gradient area + point dots. */
 .cal-ig-spark {
   display: block;
   width: 100%;
@@ -1980,7 +1980,7 @@ body:has(.creeps-page) nav.top-nav {
 .cal-patch.sub {
   background: rgba(110, 118, 129, 0.22);
 }
-/* Major patches вЂ” unified solid blue (compact), matches the cadence chart */
+/* Major patches — unified solid blue (compact), matches the cadence chart */
 .cal-patch.major {
   background: rgba(88, 166, 255, 0.50);
   border-color: rgba(88, 166, 255, 0.65);
@@ -1996,7 +1996,7 @@ body:has(.creeps-page) nav.top-nav {
   text-decoration-color: rgba(255, 255, 255, 0.40);
 }
 
-/* CURRENT patch (compact mode) вЂ” emphasised via shadow only, no scale */
+/* CURRENT patch (compact mode) — emphasised via shadow only, no scale */
 .cal-patch.current {
   filter: brightness(1.20);
   z-index: 2;
@@ -2012,7 +2012,7 @@ body:has(.creeps-page) nav.top-nav {
   filter: brightness(1.35);
   box-shadow:
     inset 0 1px 0 rgba(255, 235, 205, 0.50),
-    /* pre-divided by brightness(1.35) вЂ” renders as var(--gold) */
+    /* pre-divided by brightness(1.35) — renders as var(--gold) */
     0 0 0 2.5px rgba(168, 145, 79, 1),
     0 3px 10px var(--shadow-50);
 }
@@ -2069,10 +2069,10 @@ span.cal-patch {
   color: var(--text-bright);
 }
 
-/* Universal table cross-highlight вЂ” applies to every <table> on every page.
+/* Universal table cross-highlight — applies to every <table> on every page.
    On hover of any cell, the entire row + entire column get an equal DARK
    tint; the pivot cell (intersection) is darker still with a cyan rim.
-   Wired up in scripts.js в†’ wireCrossHover(). TH cells are never tagged by
+   Wired up in scripts.js → wireCrossHover(). TH cells are never tagged by
    the JS so header rows stay clean.
 
    IMPORTANT: the hovered row is BOTH .cross-row AND the :hover target, so a
@@ -2111,7 +2111,7 @@ table tr.cross-row > td.cross-col {
   background: rgba(110, 118, 129, 0.4);
   color: var(--text-main);
 }
-/* Major patches вЂ” unified solid blue (full grid), matches the cadence chart */
+/* Major patches — unified solid blue (full grid), matches the cadence chart */
 .cal-full-day.has-patch.major {
   background: rgba(88, 166, 255, 0.70);
   color: #fff;
@@ -2119,12 +2119,12 @@ table tr.cross-row > td.cross-col {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
 }
 
-/* CURRENT patch вЂ” emphasised without scaling so text never overflows the cell. */
+/* CURRENT patch — emphasised without scaling so text never overflows the cell. */
 .cal-full-day.has-patch.current {
   z-index: 4;
   filter: brightness(1.20);
   box-shadow:
-    /* pre-divided by brightness(1.2) вЂ” renders as var(--gold) */
+    /* pre-divided by brightness(1.2) — renders as var(--gold) */
     0 0 0 2px rgba(189, 163, 88, 0.90),
     0 2px 8px var(--shadow-55);
 }
@@ -2132,7 +2132,7 @@ table tr.cross-row > td.cross-col {
   z-index: 6;
   filter: brightness(1.35);
   box-shadow:
-    /* pre-divided by brightness(1.35) вЂ” renders as var(--gold) */
+    /* pre-divided by brightness(1.35) — renders as var(--gold) */
     0 0 0 2.5px rgba(168, 145, 79, 1),
     0 4px 12px var(--shadow-65);
 }
@@ -2149,7 +2149,7 @@ span.cal-full-day.has-patch {
    04. PATCH PAGES
    ========================================================================== */
 
-/* TOOLBAR вЂ” full viewport-width strip below the site header. Holds the tag
+/* TOOLBAR — full viewport-width strip below the site header. Holds the tag
    filter row + categories + search box + patch-info block (date + age). */
 .toolbar {
   width: 100%;
@@ -2174,7 +2174,7 @@ span.cal-full-day.has-patch {
   flex-wrap: wrap;
   padding: 8px 28px;
 }
-/* Search sits in the MIDDLE column of the toolbar вЂ” always expanded (no
+/* Search sits in the MIDDLE column of the toolbar — always expanded (no
    collapse/expand), a fixed-width pill centred between the legend (left)
    and the patch info (right). The two side columns flex:1 so the middle
    stays optically centred. */
@@ -2185,7 +2185,7 @@ span.cal-full-day.has-patch {
   width: 320px;
   min-width: 0;
 }
-/* Patch info вЂ” three labelled facts on the right of the toolbar. No pill,
+/* Patch info — three labelled facts on the right of the toolbar. No pill,
    no border: plain inline text with bullet separators between the parts. */
 .toolbar-patch-info {
   flex: 1 1 0;
@@ -2222,7 +2222,7 @@ span.cal-full-day.has-patch {
   font-weight: 300;
 }
 /* On narrow viewports the patch meta-info (date / days live) competes with
-   the search box. Hide it below 640px вЂ” filters and search are the primary
+   the search box. Hide it below 640px — filters and search are the primary
    tools; the date facts are secondary. */
 @media (max-width: 640px) {
   .toolbar-patch-info { display: none; }
@@ -2248,7 +2248,7 @@ span.cal-full-day.has-patch {
   text-transform: uppercase;
   letter-spacing: 0.6px;
   margin-right: 4px;
-  /* Equal-width label column so the BUFF/NERF/вЂ¦ badges line up vertically
+  /* Equal-width label column so the BUFF/NERF/… badges line up vertically
      with the Group category badges in the row below (matched in
      .legend-categories strong). */
   flex: 0 0 auto;
@@ -2278,7 +2278,7 @@ span.cal-full-day.has-patch {
   border-color: var(--blue-bright);
   box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
 }
-/* Inside the patch toolbar the search is ALWAYS expanded вЂ” a full-width
+/* Inside the patch toolbar the search is ALWAYS expanded — a full-width
    pill with the magnifier icon on the left and the placeholder visible. */
 .toolbar .search-box input {
   width: 100%;
@@ -2393,7 +2393,7 @@ h2.section {
 .entity-name {
   color: #f0c674;
   /* Site pixel font (same family as the brand/nav). Jersey renders narrow
-     and has a single weight вЂ” bigger size + slight tracking compensate. */
+     and has a single weight — bigger size + slight tracking compensate. */
   font-family: var(--font-j25);
   font-size: 22px;
   font-weight: 400;
@@ -2422,7 +2422,7 @@ h2.section {
 .plain-entity .entity-name {
   color: var(--blue);
 }
-/* "View on map" jump button on the Terrain Changes header в†’ terrain.html with
+/* "View on map" jump button on the Terrain Changes header → terrain.html with
    this patch preselected. Gold-leather pill matching the site nav-arrow skin. */
 .terrain-jump-btn {
   margin-left: auto;
@@ -2492,7 +2492,7 @@ h2.section {
   padding: 2px 4px;
   position: relative;
 }
-/* Pixel-art navigation arrows вЂ” same visual language as .version-nav-arrow
+/* Pixel-art navigation arrows — same visual language as .version-nav-arrow
    (gold staircase SVG, octagonal clip, dark glass background).
    Arrows are flex siblings of .patch-dynamics inside .dyn-row-wrap, so the
    hover zone is continuous: cursor slides from a cell onto an arrow without
@@ -2554,7 +2554,7 @@ h2.section {
 }
 /* Raise the WHOLE wrap of the hovered cell above a just-left neighbour: the
    leaving cell keeps its hover z for 0.14s (delayed z revert) while it
-   shrinks, and both cells' z values tie вЂ” so without this the leaving cell
+   shrinks, and both cells' z values tie — so without this the leaving cell
    can paint over the newly hovered one mid-descent. The wrap's z (7) beats
    the leaving cell's held z (6); its own cell isn't isolated (wrap z:auto),
    so the comparison happens in the same stacking context. */
@@ -2568,17 +2568,17 @@ h2.section {
   width: 100%;
   height: 100%;
   border-radius: 4px;
-  /* Background is a multi-layer stack rendered in a SINGLE paint pass вЂ”
+  /* Background is a multi-layer stack rendered in a SINGLE paint pass —
      no mix-blend-mode pseudos. With ~3000 cells visible on the largest
      patch page, every blend-mode pseudo would force its own compositing
-     layer (a known scroll-jank cause). Stack order, top в†’ bottom:
+     layer (a known scroll-jank cause). Stack order, top → bottom:
        1. Top-centre specular ellipse (highlight catching the light)
        2. Vertical top sheen + bottom darken (convex shading)
        3. Fluid color gradient driven by JS (--dyn-bg)
      The opaque fallback color at the end ensures rendering even before
      JS runs. */
   /* Glassy pill: thin top light edge + soft diagonal sheen + dark bottom
-     edge over the fluid tag gradient вЂ” single paint pass, no pseudos
+     edge over the fluid tag gradient — single paint pass, no pseudos
      (~3000 cells on the largest pages; extra layers cause scroll jank). */
   background:
     linear-gradient(160deg,
@@ -2588,7 +2588,7 @@ h2.section {
       rgba(0, 0, 0, 0.10) 100%),
     var(--dyn-bg, rgba(10, 11, 14, 0.55));
   /* z-index reverts 0.14s AFTER un-hover (matches the scale duration) so the
-     cell stays on top while it shrinks back вЂ” otherwise the right-hand
+     cell stays on top while it shrinks back — otherwise the right-hand
      neighbour (later in DOM) paints over it mid-descent. */
   transition: transform 0.14s ease, box-shadow 0.14s ease, background-color 0.14s ease, z-index 0s linear 0.14s;
   box-shadow:
@@ -2597,11 +2597,11 @@ h2.section {
     inset 0 -1px 0 var(--shadow-35),
     inset 0 0 0 1px rgba(255, 255, 255, 0.07);
 }
-/* Misc-only patch вЂ” every tag was MISC. The dimmed look is achieved by
+/* Misc-only patch — every tag was MISC. The dimmed look is achieved by
    halving the fluid alpha in JS (see scripts.js `miscOnly` branch); we
    deliberately avoid CSS `opacity` here so the hover-time backdrop layer
    can stay fully opaque and block neighbouring cells. */
-/* Empty patch вЂ” flat dark fill with a barely-there pressed-in inset:
+/* Empty patch — flat dark fill with a barely-there pressed-in inset:
    1px darker line along the top edge (the "lip" of the recess casts a
    shadow into it) + 1px faint highlight along the bottom edge (light
    bouncing off the back of the recess). Together they read as a
@@ -2626,12 +2626,12 @@ h2.section {
     0 2px 4px var(--shadow-60),
     inset 0 0 0 1px var(--white-12),
     0 0 8px var(--white-22);
-  /* 6 вЂ” strictly ABOVE a just-left neighbour, which keeps its hover z (5,
+  /* 6 — strictly ABOVE a just-left neighbour, which keeps its hover z (5,
      via the delayed z-index revert) for 0.14s while it shrinks back.
      Without this, the descending cell paints OVER the newly hovered one. */
   z-index: 6;
 }
-/* Hover on the current patch вЂ” keep the same 2Г— pop + glow but layer the
+/* Hover on the current patch — keep the same 2× pop + glow but layer the
    blue+black outline back on top so the "you are here" marker stays
    visible. Higher specificity than the generic hover rule above so this
    wins for the current cell. */
@@ -2643,14 +2643,14 @@ h2.section {
     0 0 0 1.5px rgba(227, 196, 106, 0.95),
     0 0 0 2.5px rgba(0, 0, 0, 0.85);
 }
-/* Current patch (the page the user is on) вЂ” thin faint blue outline in
+/* Current patch (the page the user is on) — thin faint blue outline in
    the same style as .cal-patch.current in the calendar, just slimmer
    (1px instead of 2px, lower alpha) so it reads as a subtle "you are
    here" marker without competing with the painted color band inside. */
 .dyn-cell-wrap.current .dyn-cell {
   /* Gold "you are here" ring: gold on top (1.5px) + a thin black ring
      beneath, giving the marker a crisp dark edge against the page
-     background. box-shadow paints in source order topв†’bottom, so gold
+     background. box-shadow paints in source order top→bottom, so gold
      covers the inner 1.5px of the wider 2.5px black layer and leaves
      1px of black exposed as the outermost ring. */
   box-shadow:
@@ -2662,11 +2662,11 @@ h2.section {
 /* The convex highlight + specular layers used to live on ::before/::after
    with mix-blend-mode: screen. They've been folded directly into
    .dyn-cell's `background` stack above to eliminate ~6000 compositing
-   layers on the larger patch pages вЂ” fixes scroll jank. */
-/* Shared tooltip popup вЂ” ONE element on document.body (not inside any
+   layers on the larger patch pages — fixes scroll jank. */
+/* Shared tooltip popup — ONE element on document.body (not inside any
    .dyn-cell-wrap), repositioned on hover. Lives outside .entity-block
    so `contain: paint` from content-visibility:auto doesn't clip it.
-   Positioned via JS (position: fixed) вЂ” top/left set inline per show. */
+   Positioned via JS (position: fixed) — top/left set inline per show. */
 .dyn-tip {
   position: fixed;
   left: 0;
@@ -2733,13 +2733,13 @@ h2.section {
 }
 /* `.is-visible` toggle is handled higher up via display:flex. */
 
-/* NEW-ITEM BLOCK вЂ” keeps the standard grid (tag column / text / %).
+/* NEW-ITEM BLOCK — keeps the standard grid (tag column / text / %).
    Only the FIRST row of the block gets a NEW tag (or RETURNING) in the tag
    column; the original per-row tag is hidden. Subsequent rows show an empty
    placeholder so the text column stays aligned with the rest of the page.
    The tag text comes from data-new-tag on the .entity-block. */
 /* Hide the original first-child tag completely (not visibility:hidden) so
-   it doesn't occupy cell (1,1) of the grid вЂ” otherwise the ::before tag
+   it doesn't occupy cell (1,1) of the grid — otherwise the ::before tag
    gets auto-placed to row 2 and appears below the row content. */
 .entity-block.is-new ul.changes li > .badge:first-child,
 .entity-block.is-new ul.changes li > .row-tag-empty {
@@ -2749,7 +2749,7 @@ h2.section {
    after the name + the components/provides blocks below the header. The
    block-level filter still works because each <li> inside .is-new carries
    data-tag="new" (via t("NEW") on the original li()). */
-/* Ability description box вЂ” spans one Passive:/Active: starter row plus any
+/* Ability description box — spans one Passive:/Active: starter row plus any
    continuation rows until the next ability starter or end of ul. Post-process
    classifies each li with one of -solo / -start / -cont / -cont-end. */
 /* Box hugs the ul width (no overflow). Inside a new-item block the tag column
@@ -2788,7 +2788,7 @@ ul.changes li.ability-row-end > .row-text {
   grid-column: 1;
   text-align: left;
 }
-/* Ability-row layout has no left tag вЂ” suppress the float-pseudo that
+/* Ability-row layout has no left tag — suppress the float-pseudo that
    reserves the tag column. */
 ul.changes li.ability-row-solo > .row-text::before,
 ul.changes li.ability-row-start > .row-text::before,
@@ -2813,8 +2813,8 @@ ul.changes li.ability-row-end {
   margin-bottom: 4px;
 }
 
-/* COMPONENTS BOX вЂ” visual assembly recipe shown under a new item's header.
-   Layout: [icon1 + icon2 + ... + recipe] = TOTAL вЂ” total sits IMMEDIATELY
+/* COMPONENTS BOX — visual assembly recipe shown under a new item's header.
+   Layout: [icon1 + icon2 + ... + recipe] = TOTAL — total sits IMMEDIATELY
    after the last component (not pushed to the right edge). */
 .components-box {
   display: flex;
@@ -2875,7 +2875,7 @@ ul.changes li.ability-row-end {
   color: #f0c674;
 }
 
-/* ENCHANT-BY-ATTRIBUTE GRID вЂ” 7.41 Tier-X enchantment selection box.
+/* ENCHANT-BY-ATTRIBUTE GRID — 7.41 Tier-X enchantment selection box.
    Layout: rows of [attr icon][attr name] | [enchant chip] [enchant chip]...
    Shares the muted bordered look of components-box / provides-box. */
 .enchant-attr-grid {
@@ -2911,8 +2911,8 @@ ul.changes li.ability-row-end {
   object-fit: contain;
   flex-shrink: 0;
 }
-/* All-Heroes badge: 4 attribute icons packed into a 2Г—2 mini-grid that
-   fills the same 22Г—22 footprint as a single attribute icon вЂ” so the
+/* All-Heroes badge: 4 attribute icons packed into a 2×2 mini-grid that
+   fills the same 22×22 footprint as a single attribute icon — so the
    "All Heroes" text aligns horizontally with "Strength" / "Agility" /
    etc. on the rows beneath. */
 .enchant-attr-icons.all-attrs {
@@ -2968,7 +2968,7 @@ ul.changes li.ability-row-end {
   box-shadow: 0 0 0 1px var(--shadow-40);
   flex-shrink: 0;
 }
-/* Tooltip вЂ” appears above the chip on hover. Multi-line via pre-line. */
+/* Tooltip — appears above the chip on hover. Multi-line via pre-line. */
 .enchant-chip[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -2999,8 +2999,8 @@ ul.changes li.ability-row-end {
 }
 /* Souvenir pills (Ringmaster Dark Carnival pool change). Reuse the
    `.enchant-chip` box style (border + background + tooltip on hover);
-   `removed` modifier dims souvenirs no longer in the pool вЂ” no strike.
-   Dim the icon + label only, NOT the hover tooltip popup вЂ” readability
+   `removed` modifier dims souvenirs no longer in the pool — no strike.
+   Dim the icon + label only, NOT the hover tooltip popup — readability
    of the description text must stay full-strength. */
 .enchant-chip.souvenir-chip.removed > img,
 .enchant-chip.souvenir-chip.removed > span {
@@ -3010,14 +3010,14 @@ ul.changes li.ability-row-end {
   filter: grayscale(0.85);
 }
 .enchant-chip.souvenir-chip.removed::after {
-  /* explicit reset вЂ” tooltip popup must NOT inherit the dim */
+  /* explicit reset — tooltip popup must NOT inherit the dim */
   opacity: 0;
   filter: none;
 }
 .enchant-chip.souvenir-chip.removed:hover::after {
   opacity: 1;
 }
-/* Info marker вЂ” matches the `.qhint` "?" badge (rounded square), with the
+/* Info marker — matches the `.qhint` "?" badge (rounded square), with the
    question mark in our gold. Popup body is the .info-pop child below. */
 .info-tip {
   display: inline-flex;
@@ -3049,7 +3049,7 @@ ul.changes li.ability-row-end {
   background: rgba(227, 196, 106, 0.15);
   outline: none;
 }
-/* HTML popup child вЂ” supports rich content (badges, <br>) + a bold header,
+/* HTML popup child — supports rich content (badges, <br>) + a bold header,
    unlike a pure attr() tooltip. Hidden until hover/focus. */
 .info-tip .info-pop {
   position: absolute;
@@ -3075,20 +3075,20 @@ ul.changes li.ability-row-end {
   text-align: left;
   line-height: 1.55;
   letter-spacing: 0.1px;
-  /* Avoid orphan words/numbers on a line of their own вЂ” keeps stat ranges
-     like "вЂ¦100вЂ“110" intact rather than dropping "110" to the next line. */
+  /* Avoid orphan words/numbers on a line of their own — keeps stat ranges
+     like "…100–110" intact rather than dropping "110" to the next line. */
   text-wrap: pretty;
-  /* No slide вЂ” the popup just appears on hover/focus (no transform anim). */
+  /* No slide — the popup just appears on hover/focus (no transform anim). */
   transition: none;
   box-shadow: 0 4px 18px var(--shadow-45);
 }
-/* Hover/focus handled by JS body-level popup вЂ” suppress CSS-driven version. */
+/* Hover/focus handled by JS body-level popup — suppress CSS-driven version. */
 .info-tip:hover .info-pop,
 .info-tip:focus .info-pop {
   opacity: 0;
   visibility: hidden;
 }
-/* Body-level shared popup for .info-tip вЂ” positioned by scripts.js so it
+/* Body-level shared popup for .info-tip — positioned by scripts.js so it
    stays inside the viewport even when the badge is near an edge. */
 .info-pop-body {
   position: fixed;
@@ -3120,7 +3120,7 @@ ul.changes li.ability-row-end {
   font-weight: 700;
   color: var(--gold);
 }
-/* Trailing cluster (Aghanim glyph + (i) tip) вЂ” kept on one line and bound to
+/* Trailing cluster (Aghanim glyph + (i) tip) — kept on one line and bound to
    the preceding word (via a leading nbsp) so it never orphans onto an
    otherwise-empty wrapped line. */
 .li-tail {
@@ -3150,7 +3150,7 @@ ul.changes li.ability-row-end {
   }
 }
 
-/* PROPERTIES BOX вЂ” single line of comma-separated attributes shown under the
+/* PROPERTIES BOX — single line of comma-separated attributes shown under the
    components box for new items. Soft outlined to match other blocks. */
 .provides-box {
   margin: 4px 0;
@@ -3161,7 +3161,7 @@ ul.changes li.ability-row-end {
   color: var(--text-main);
   font-size: 13.5px;
 }
-/* Flat purchase price for a basic (no-recipe) new item вЂ” same bordered box as
+/* Flat purchase price for a basic (no-recipe) new item — same bordered box as
    the components() build, with the gold value on the right like a recipe total. */
 .item-cost-box {
   display: flex;
@@ -3190,7 +3190,7 @@ ul.changes li.ability-row-end {
   line-height: 1.5;
 }
 
-/* Type label after the item name вЂ” small, uppercased, NEW colour family.
+/* Type label after the item name — small, uppercased, NEW colour family.
    vertical-align: middle so it sits on the item name's optical mid-line
    instead of dropping to the baseline of the larger heading text. */
 .entity-name .entity-new-type {
@@ -3207,7 +3207,7 @@ ul.changes li.ability-row-end {
   vertical-align: middle;
 }
 
-/* Same position/style as new-type, but neutral colour вЂ” used for
+/* Same position/style as new-type, but neutral colour — used for
    'Recipe changed' on items whose components changed in this patch. */
 .entity-name .entity-changed-type {
   margin-left: 8px;
@@ -3259,7 +3259,7 @@ ul.changes li.ability-row-end {
   opacity: 0.85;
 }
 
-/* ABILITY-CHANGE вЂ” two-pane swap visual (old ability removed в†’ new ability
+/* ABILITY-CHANGE — two-pane swap visual (old ability removed → new ability
    added). Same 1fr/auto/1fr grid + arrow as components-change, but each
    pane is a card with [icon + name] header on top and a description body
    below (multiple rows + optional scale_pill table). */
@@ -3296,7 +3296,7 @@ ul.changes li.ability-row-end {
   padding-bottom: 6px;
   border-bottom: 1px dashed rgba(139, 148, 158, 0.22);
 }
-/* Placeholder head вЂ” same layout footprint (~47px) as a real head, but
+/* Placeholder head — same layout footprint (~47px) as a real head, but
    visually hidden. Used in is-in-place mode on the new pane so the new
    pane's body top-aligns with the old pane's body (which sits below
    the real head) without needing a per-pane padding-top hack. */
@@ -3315,7 +3315,7 @@ ul.changes li.ability-row-end {
   box-shadow: 0 0 0 1px var(--shadow-50);
   display: block;
 }
-/* Innate marker вЂ” matches `.ability-block > .ability-icon-wrap > .innate-marker`
+/* Innate marker — matches `.ability-block > .ability-icon-wrap > .innate-marker`
    style (dark circular pad + golden ring), scaled to the 40-px swap-pane icon. */
 .ability-change-icon-wrap .innate-marker {
   position: absolute;
@@ -3347,12 +3347,12 @@ ul.changes li.ability-row-end {
   min-width: 0;
 }
 .ability-change-row { padding: 4px 0; line-height: 1.45; }
-/* Dense stat-list mode вЂ” used by per-unit comparison cards (e.g. Brewmaster
+/* Dense stat-list mode — used by per-unit comparison cards (e.g. Brewmaster
    brewlings) where each row is a single short stat line. Tightens vertical
    rhythm so the panes don't tower over the rest of the hero block. */
-/* Brewling parent-child connector вЂ” dashed line from Primal Split's ability
+/* Brewling parent-child connector — dashed line from Primal Split's ability
    icon down to each Brewling block's icon. Same visual idiom as the dashed
-   ability_change-connector (e.g. Belligerent в†’ Liquid Courage). The SVG is
+   ability_change-connector (e.g. Belligerent → Liquid Courage). The SVG is
    injected by drawBrewlingConnectors() in scripts.js and lives in the
    document body with position:absolute so it can overlay multiple ability
    blocks. */
@@ -3371,7 +3371,7 @@ ul.changes li.ability-row-end {
 }
 /* Unified ability-change layout: renders as a regular ability-block (icon
    + title + tag/summary row) with the swap panes inside the block body.
-   Title shows `Old в†’ New` when names differ. The block visually matches
+   Title shows `Old → New` when names differ. The block visually matches
    any other ability section on the page. */
 .ability-change-block .ability-title {
   display: inline-flex;
@@ -3397,7 +3397,7 @@ ul.changes li.ability-row-end {
   position: relative;
 }
 /* Connector curve from the icon's bottom-center down-right toward the
-   centre of the old pane вЂ” visual cue that the swap panes belong to
+   centre of the old pane — visual cue that the swap panes belong to
    the icon above. Sized to bridge the gap between the icon (col 1) and
    the old pane (column 1 of the unified-panes sub-grid in col 2). */
 .ability-change-block > .ability-change-connector {
@@ -3433,7 +3433,7 @@ ul.changes li.ability-row-end {
 }
 /* When a pane carries an expandable formula table (scale_pill), TOP-anchor
    both panes. Otherwise `align-items: center` re-centers the shorter pane
-   every time the <details> table toggles open вЂ” visibly shoving the old
+   every time the <details> table toggles open — visibly shoving the old
    ability block down. Top-anchoring makes the table grow downward only. */
 .ability-change-block .ability-change.unified-panes:has(.formula-table-wrap) {
   align-items: start;
@@ -3441,7 +3441,7 @@ ul.changes li.ability-row-end {
 .ability-change-block .ability-change.unified-panes:has(.formula-table-wrap) > .ability-change-pane {
   align-self: start;
 }
-/* Arrow also top-anchored when a formula table can expand вЂ” otherwise
+/* Arrow also top-anchored when a formula table can expand — otherwise
    `align-self: center` re-aligns to the grid-row centre, which moves
    downward as the table grows, visibly drifting the arrow below the
    old pane's body. */
@@ -3450,7 +3450,7 @@ ul.changes li.ability-row-end {
   padding-top: 6px;
 }
 /* Single-pane "New ability" card (ability_change old=None): one full-width,
-   top-anchored pane вЂ” no old side, no arrow. */
+   top-anchored pane — no old side, no arrow. */
 .ability-change.unified-panes.is-single-new {
   grid-template-columns: 1fr;
   align-items: start;
@@ -3462,8 +3462,8 @@ ul.changes li.ability-row-end {
 }
 /* Old-icon underlay: when an ability_change unified block has a different
    icon for old vs new, both icons fully overlap inside the same 48px wrap.
-   New is on top by default. Hovering the wrap shuffles them вЂ” old comes
-   to front, new drops behind вЂ” solitaire-style. Innate-marker on each
+   New is on top by default. Hovering the wrap shuffles them — old comes
+   to front, new drops behind — solitaire-style. Innate-marker on each
    side follows its own icon's z-order. */
 .ability-icon-wrap.has-old-underlay {
   position: relative;
@@ -3527,7 +3527,7 @@ ul.changes li.ability-row-end {
   opacity: 1;
 }
 /* In-place rework (same name + icon on both sides): right pane skips the
-   header and only shows the description body вЂ” so the box should also be
+   header and only shows the description body — so the box should also be
    visually smaller and centered (vertically + horizontally) relative to
    the full-height left card, not stretched to match it. */
 .ability-change.is-in-place {
@@ -3565,7 +3565,7 @@ ul.changes li.ability-row-end {
   max-width: 100%;
   padding: 8px 14px;
 }
-/* Aghanim's Scepter upgrade row inside an ability-change pane вЂ” same blue
+/* Aghanim's Scepter upgrade row inside an ability-change pane — same blue
    gradient stripe + scepter glyph as the canonical `ul.changes li.aghanim-
    scepter` rows, but stretched edge-to-edge of the pane (no tag column to
    skip past inside a swap card). */
@@ -3573,7 +3573,7 @@ ul.changes li.ability-row-end {
 .ability-change-row.aghanim-shard {
   position: relative;
   /* Stripe is narrower than its `ul.changes li.aghanim-*` cousin (no tag
-     column to skip), so the fade starts earlier вЂ” solid head, decays by
+     column to skip), so the fade starts earlier — solid head, decays by
      30% across, fully transparent before the right edge. */
   background: linear-gradient(90deg,
     rgba(72, 148, 255, 0.26) 0,
@@ -3595,8 +3595,8 @@ ul.changes li.ability-row-end {
   margin-top: 6px;
 }
 /* Formula tables inside ability_change panes show only 7 key levels
-   (L1/5/10/15/20/25/30) вЂ” columns 3-5, 7-10, 12-15 are the intermediate
-   L2-L4, L6-L9, L11-L14 columns (col 1 = label, col 2 = L1, col 6 = L5вЂ¦). */
+   (L1/5/10/15/20/25/30) — columns 3-5, 7-10, 12-15 are the intermediate
+   L2-L4, L6-L9, L11-L14 columns (col 1 = label, col 2 = L1, col 6 = L5…). */
 .ability-change-body .formula-table {
   font-size: 10.5px;
   margin: 0;
@@ -3615,8 +3615,8 @@ ul.changes li.ability-row-end {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* Row labels (first column: "old" / "new" / "О” %" / "value") still need
-   room for the text вЂ” force them just-wide-enough so the level cells share
+/* Row labels (first column: "old" / "new" / "Δ %" / "value") still need
+   room for the text — force them just-wide-enough so the level cells share
    the rest. 44px fits "value" without ellipsis truncation. Centered to
    match the level cells' centered alignment (was right-aligned, which
    looked off-axis next to the centered numbers). */
@@ -3632,7 +3632,7 @@ ul.changes li.ability-row-end {
 }
 /* When discrete change rows follow an ability_change card (numerical
    tweaks that complement the prose swap), give the ul.changes the same
-   left indent the ability-block's content column would have вЂ” otherwise
+   left indent the ability-block's content column would have — otherwise
    its tag column sits flush with the entity-block edge, visually
    detached from the swap card above. Higher specificity than the generic
    `.entity-block > ul.changes { padding-left: 0 }` rule. */
@@ -3640,19 +3640,19 @@ ul.changes li.ability-row-end {
   padding-left: 60px;
 }
 /* (is-changed visual blocks inherit the +14px indent from the generic
-   .entity-block > * rules above вЂ” no special override needed.) */
-/* (removed: is-changed ul.changes padding-left: 0 вЂ” that made the tag column
+   .entity-block > * rules above — no special override needed.) */
+/* (removed: is-changed ul.changes padding-left: 0 — that made the tag column
    shift 40px left of the default ul padding, misaligning is-changed item tags
    relative to regular items below them. Now is-changed inherits default
    ul.changes padding so tags line up vertically across the whole page.) */
 
-/* Two-pane property diff (old grant set в†’ new grant set).
+/* Two-pane property diff (old grant set → new grant set).
    ONE grid for both panes so row N on the left lines up with row N on the
    right. Pane "boxes" are drawn by two background divs that span cols 1-3
    and 5-7 respectively, sitting behind content via z-index. */
 /* Two equal-width panes joined by a centred bold arrow. Each pane is a
    subgrid for ROWS, so row N on the left vertically aligns with row N on
-   the right вЂ” no matter which side has taller cells. Each pane has its own
+   the right — no matter which side has taller cells. Each pane has its own
    3-col grid inside (tag | text 1fr | badge auto-pinned right). */
 .properties-change {
   display: grid;
@@ -3679,7 +3679,7 @@ ul.changes li.ability-row-end {
   grid-column: 2;
   grid-row: 1 / -1;
 }
-/* Single-pane mode: only one side changed в†’ render just that pane in its
+/* Single-pane mode: only one side changed → render just that pane in its
    column position from the 2-pane layout (left = col 1, right = col 3) so
    the visible pane lands in the same horizontal area as it would when both
    panes are present. */
@@ -3697,7 +3697,7 @@ ul.changes li.ability-row-end {
   line-height: 1.5;
 }
 /* ABILITY ORDER FLOW (Spirit Bear 7.40): bare square ability icons in one
-   horizontal row, old group в†’ arrow в†’ new group. Hover an icon for its name
+   horizontal row, old group → arrow → new group. Hover an icon for its name
    (data-tooltip popup shared with .enchant-chip). Spans the full li width
    below the row text (extras grid-column 1/-1). */
 .ability-order-flow {
@@ -3708,7 +3708,7 @@ ul.changes li.ability-row-end {
   column-gap: 12px;
   align-items: center;
   margin-top: 8px;
-  /* full li width вЂ” same lane as correction-note/formula-table extras,
+  /* full li width — same lane as correction-note/formula-table extras,
      otherwise the row auto-places into the badge column (right edge)
      and shoves the left tag off its row */
   grid-column: 1 / -1;
@@ -3716,7 +3716,7 @@ ul.changes li.ability-row-end {
 .ability-order-flow .ao-arrow {
   justify-self: center;
 }
-/* Each order group (old set / new set) sits in its own pane box вЂ”
+/* Each order group (old set / new set) sits in its own pane box —
    same skin as .properties-pane. */
 .ability-order-flow .ao-group {
   display: flex;
@@ -3746,12 +3746,12 @@ ul.changes li.ability-row-end {
   display: block;
   object-fit: cover;
 }
-/* New-in-this-patch ability вЂ” purple NEW ring */
+/* New-in-this-patch ability — purple NEW ring */
 .ability-order-flow .ao-icon.is-new {
   border-color: rgba(184, 127, 255, 0.85);
   box-shadow: 0 0 6px rgba(184, 127, 255, 0.35);
 }
-/* Hidden/innate slot вЂ” dimmed icon, tooltip stays full-strength */
+/* Hidden/innate slot — dimmed icon, tooltip stays full-strength */
 .ability-order-flow .ao-icon.is-dim img {
   opacity: 0.5;
   filter: grayscale(0.5);
@@ -3762,7 +3762,7 @@ ul.changes li.ability-row-end {
   margin: 0 4px;
   flex: 0 0 auto;
 }
-/* Tooltip popup вЂ” same recipe as .enchant-chip[data-tooltip] */
+/* Tooltip popup — same recipe as .enchant-chip[data-tooltip] */
 .ao-icon[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -3801,7 +3801,7 @@ ul.changes li.ability-row-end {
                                    already provides a small natural separation */
 }
 
-/* SUBGROUPS вЂ” same colour as body text / ability titles, not blue.
+/* SUBGROUPS — same colour as body text / ability titles, not blue.
    Tormentor / Roshan / Wisdom Shrines / Health Restoration / Lifesteal /
    Miscellaneous / Talents etc. all read as section dividers, not links. */
 h4.subgroup {
@@ -3815,7 +3815,7 @@ h4.subgroup {
   border-image: linear-gradient(to right, var(--bg-panel-4) 0%, var(--bg-panel-4) 61%, transparent 71%) 1;
   padding-bottom: 4px;
 }
-/* ABILITY BLOCK вЂ” icon (left, full-height) + title (top-right) + changes (below title) */
+/* ABILITY BLOCK — icon (left, full-height) + title (top-right) + changes (below title) */
 .ability-block {
   display: grid;
   grid-template-columns: 48px 1fr;
@@ -3838,7 +3838,7 @@ h4.subgroup {
   object-fit: cover;
   box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px var(--shadow-40);
 }
-/* Facet block вЂ” same 48px geometry as ability(), but the icon-wrap renders
+/* Facet block — same 48px geometry as ability(), but the icon-wrap renders
    the facet's gradient color + the generic facet icon (extracted from
    pak01_dir.vpk, white silhouette on transparent) overlaid on top.
    Hero h4 column is shared with .ability-title so facet names align with
@@ -3879,13 +3879,13 @@ h4.subgroup {
   grid-column: 2;
   margin: -3px 0 0 0;        /* compensate for font cap-height offset (~3px below box top) */
   padding: 0 0 4px 0;
-  color: var(--text-main);            /* same as body text вЂ” not coloured */
+  color: var(--text-main);            /* same as body text — not coloured */
   font-size: 17px;
   font-weight: 600;
   line-height: 1;
   align-self: start;
 }
-/* Header-only block (empty changes ul, no li) вЂ” center title vertically against the icon */
+/* Header-only block (empty changes ul, no li) — center title vertically against the icon */
 .ability-block:not(:has(> ul.changes > li)) {
   grid-template-rows: minmax(48px, auto);
 }
@@ -3900,8 +3900,8 @@ h4.subgroup {
 .ability-block > ul.subnotes {
   grid-column: 2;
   /* margin-left: 76px (inherited from base ul.subnotes) shifts it under the
-     row-text column inside ul.changes вЂ” same alignment as subnotes outside
-     ability-block. Do NOT override to 0; that puts the в†і under the tag. */
+     row-text column inside ul.changes — same alignment as subnotes outside
+     ability-block. Do NOT override to 0; that puts the ↳ under the tag. */
 }
 /* Talents-block: same .ability-block layout, but talents.svg gets translucent framing */
 .ability-block.talents-block > .ability-icon-wrap > .ability-icon-img {
@@ -3915,13 +3915,13 @@ h4.subgroup {
   padding: 6px;
   box-shadow: 0 0 0 1px var(--line-soft), 0 2px 6px var(--shadow-40);
 }
-/* Formula tables INSIDE .ability-block вЂ” extend back to entity-block left edge,
+/* Formula tables INSIDE .ability-block — extend back to entity-block left edge,
    not just within content column (else they look right-aligned past the icon). */
 .ability-block ul.changes li > .formula-table {
   margin-left: -60px;          /* counter ability-block icon column (48 + 12 gap) */
   width: calc(100% + 60px);
 }
-/* Raw <li> (no .row-text wrapper) inside ability-block вЂ” TWO offsets stack:
+/* Raw <li> (no .row-text wrapper) inside ability-block — TWO offsets stack:
    76px to cancel the raw-li padding, plus 60px to clear the ability-block icon. */
 .ability-block ul.changes li:not(:has(> .row-text)) > .formula-table,
 .ability-block ul.changes li:not(:has(> .row-text)) > .correction-note {
@@ -3929,7 +3929,7 @@ h4.subgroup {
   width: calc(100% + 136px);
 }
 
-/* CHANGES LIST вЂ” grid layout: [tag] [text] [percentages] */
+/* CHANGES LIST — grid layout: [tag] [text] [percentages] */
 ul.changes {
   list-style: none;
   margin: 3px 0 3px 0;
@@ -3939,14 +3939,14 @@ ul.changes {
                                border so their right edge lines up with the
                                last cell of the .patch-dynamics row (which
                                itself uses margin-right:-8px against the
-                               entity header's 14px padding в†’ also 6px in). */
+                               entity header's 14px padding → also 6px in). */
 }
 ul.changes li {
   display: grid;
   /* 2-column grid (text | badge). The text-tag is absolutely positioned over
      the top-left of the text area, with row-text using text-indent to push
      the first line past the tag. When the text wraps, subsequent lines flow
-     full-width вЂ” reusing the empty space below the tag instead of leaving an
+     full-width — reusing the empty space below the tag instead of leaving an
      awkward visual gap on the left. */
   grid-template-columns: 1fr auto;
   column-gap: 12px;
@@ -3959,7 +3959,7 @@ ul.changes li {
 }
 /* Hover ruler: dashed line spanning from text toward the % so the eye can
    trace the row. Anchored at the bottom of the FIRST grid row (i.e. just
-   under the change-text baseline), not at the bottom of the whole li вЂ”
+   under the change-text baseline), not at the bottom of the whole li —
    that way it stays put even when correction-notes/formula-tables span
    full-width below. */
 ul.changes li:has(> .badge-group):hover::after {
@@ -4004,14 +4004,14 @@ ul.changes li > .row-text::before {
   width: 76px;
   height: 1.4em;
 }
-/* Right column: numeric percentages вЂ” sits in the second grid column. */
+/* Right column: numeric percentages — sits in the second grid column. */
 ul.changes li > .badge-group {
   grid-column: 2;
   margin-left: 0;
 }
 /* extras (correction-note, formula-table, NOTE box) span all columns */
 /* correction-note + formula-table span the full li width (under the tag
-   column too) вЂ” for hero-stat rows there's a lot of empty space on the
+   column too) — for hero-stat rows there's a lot of empty space on the
    left, and stretching the note across uses it instead of leaving an
    awkward gap. The note's own padding-left (12px) keeps the text from
    running flush against the entity-block edge. */
@@ -4019,7 +4019,7 @@ ul.changes li > .correction-note,
 ul.changes li > .formula-table {
   grid-column: 1 / -1;
 }
-/* Raw <li> without .row-text wrapper (rare special-case manual rows) вЂ” block layout
+/* Raw <li> without .row-text wrapper (rare special-case manual rows) — block layout
    with auto-generated left tag from data-tag attribute via ::before. */
 ul.changes li:not(:has(> .row-text)) {
   display: block;
@@ -4051,7 +4051,7 @@ ul.changes li:not(:has(> .row-text))::before {
   color: #a86158;
   border: 1px solid rgba(225, 90, 75, 0.28);
 }
-/* Extras inside raw rows (formula-table, correction-note) вЂ” extend to left edge */
+/* Extras inside raw rows (formula-table, correction-note) — extend to left edge */
 ul.changes li:not(:has(> .row-text)) > .formula-table,
 ul.changes li:not(:has(> .row-text)) > .correction-note {
   margin-left: -76px;
@@ -4079,7 +4079,7 @@ ul.changes li:not(:has(> .row-text)) > .badge.nerf-text {
 ul.subnotes {
   list-style: none;
   margin: -2px 0 4px 0;        /* flush with parent left edge (was 76px under
-                                  text column вЂ” but pairs better with the
+                                  text column — but pairs better with the
                                   full-width correction-note that lives just
                                   above it in the same hero row). */
 }
@@ -4089,13 +4089,13 @@ ul.subnotes li {
   padding: 1px 0;
   line-height: 1.4;
 }
-ul.subnotes li::before { content: "в†і "; color: var(--text-dimmer); }
-/* When the subnote is collapsible, drop the в†і arrow вЂ” the rotating в–¶ chevron
+ul.subnotes li::before { content: "↳ "; color: var(--text-dimmer); }
+/* When the subnote is collapsible, drop the ↳ arrow — the rotating ▶ chevron
    on <summary> already serves as the indicator, putting both side-by-side
    reads as visual noise. */
 ul.subnotes li:has(> .subnote-collapse)::before { content: ""; }
 
-/* Collapsible subnote вЂ” long bullet lists hidden behind a "в–¶ summary (N)"
+/* Collapsible subnote — long bullet lists hidden behind a "▶ summary (N)"
    click target. Native <details>/<summary> preserves keyboard and SR support. */
 .subnote-collapse > summary {
   cursor: pointer;
@@ -4105,7 +4105,7 @@ ul.subnotes li:has(> .subnote-collapse)::before { content: ""; }
 }
 .subnote-collapse > summary::-webkit-details-marker { display: none; }
 .subnote-collapse > summary::before {
-  content: "в–¶";
+  content: "▶";
   display: inline-block;
   width: 10px;
   margin-right: 4px;
@@ -4131,7 +4131,7 @@ ul.subnote-items > li {
   font-size: 13px;
 }
 ul.subnote-items > li::before {
-  content: "вЂў  ";
+  content: "•  ";
   color: var(--text-dimmer);
 }
 
@@ -4154,11 +4154,11 @@ ul.subnote-items > li::before {
   user-select: none;
 }
 .show-list-inline > summary::-webkit-details-marker { display: none; }
-/* в†і corner arrow (matches the subnote-style indent marker) followed by the
-   rotating в–ё chevron. Both rendered via a single ::before so they animate
+/* ↳ corner arrow (matches the subnote-style indent marker) followed by the
+   rotating ▸ chevron. Both rendered via a single ::before so they animate
    together. */
 .show-list-inline > summary::before {
-  content: '\21B3';           /* в†і */
+  content: '\21B3';           /* ↳ */
   display: inline-block;
   color: var(--text-dimmer);
   font-size: 12.5px;
@@ -4186,14 +4186,14 @@ ul.subnote-items > li::before {
   line-height: 1.45;
 }
 .show-list-inline > .show-list-body > .show-list-item::before {
-  content: "вЂў  ";
+  content: "•  ";
   color: var(--text-dimmer);
 }
 
-/* One-liner в†і note hanging off a li (passed via extra= on li()). Drops to a
+/* One-liner ↳ note hanging off a li (passed via extra= on li()). Drops to a
    new visual line below the row text. Spans the FULL li width (col 1 / -1)
-   like correction-note, formula-table, subnote вЂ” using the tag column's
-   empty space below the tag rather than leaving it blank. The в†і glyph
+   like correction-note, formula-table, subnote — using the tag column's
+   empty space below the tag rather than leaving it blank. The ↳ glyph
    provides the visual indent so the note still reads as a child of the row. */
 .inline-note {
   display: block;
@@ -4202,14 +4202,14 @@ ul.subnote-items > li::before {
   font-size: 12.5px;
   color: var(--text-dim);
   line-height: 1.45;
-  /* в†і pseudo is absolute-positioned so the note's body content (including
+  /* ↳ pseudo is absolute-positioned so the note's body content (including
      wrapping lines and <br>-separated entries) all share the same left
-     indent вЂ” first line isn't offset by the arrow's inline width. */
+     indent — first line isn't offset by the arrow's inline width. */
   position: relative;
   padding-left: 16px;
 }
 .inline-note::before {
-  content: "в†і";
+  content: "↳";
   position: absolute;
   left: 0;
   top: 1px;
@@ -4230,7 +4230,7 @@ ul.subnote-items > li::before {
   background: rgba(227, 196, 106, 0.05);
   border-radius: 0 5px 5px 0;
 }
-/* ---- Game-formula change (formula_change): old в†’ new, ability_change-style ---- */
+/* ---- Game-formula change (formula_change): old → new, ability_change-style ---- */
 .formula-change { margin: 10px 0 8px; }
 .formula-change-title {
   display: flex;
@@ -4241,7 +4241,7 @@ ul.subnote-items > li::before {
   font-weight: 600;
   color: #cdd6e3;
 }
-/* Number input вЂ” reader plugs in their own value; scripts.js recomputes rows. */
+/* Number input — reader plugs in their own value; scripts.js recomputes rows. */
 .formula-input-row {
   display: flex;
   align-items: center;
@@ -4293,12 +4293,12 @@ ul.subnote-items > li::before {
   font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.6;
-  color: #8b98a8;               /* parentheses / operators вЂ” muted */
+  color: #8b98a8;               /* parentheses / operators — muted */
   overflow-wrap: anywhere;
 }
 .formula-expr .f-var { color: #9fc1e3; }              /* variables  */
 .formula-expr .f-num { color: #e0b87a; font-weight: 600; }  /* numbers */
-/* Worked-example table вЂ” faint grid lines, offset below the formula. */
+/* Worked-example table — faint grid lines, offset below the formula. */
 .formula-ex {
   border-collapse: collapse;
   font-size: 11.5px;
@@ -4324,13 +4324,13 @@ ul.subnote-items > li::before {
 /* ---- Captains Mode draft board (cm_draft) ----
    The WHOLE draft as a VERTICAL in-game-style pick/ban screen: step numbers run
    down the centre, the acting team's slot on the LEFT (Team 1) or RIGHT (Team 2).
-   The Old draft and the New draft sit side by side. No colours вЂ” slot SIZE marks
+   The Old draft and the New draft sit side by side. No colours — slot SIZE marks
    ban (small) vs pick (large). Compare the two boards directly. */
-/* No big outer box вЂ” just a margin wrapper. Each Old/New board is its own light
+/* No big outer box — just a margin wrapper. Each Old/New board is its own light
    block instead (more concise). */
 .cm-draft { margin: 12px 0 8px; }
 .cm-scroll { overflow-x: auto; padding-bottom: 3px; }
-/* Old + New boards sit close together with the arrow centred between вЂ” like the
+/* Old + New boards sit close together with the arrow centred between — like the
    ability_change rework panes. */
 .cm-boards {
   display: flex;
@@ -4338,7 +4338,7 @@ ul.subnote-items > li::before {
   justify-content: center;
   gap: 12px;
 }
-/* Each draft (Old / New) in its own block вЂ” same look as the ability_change
+/* Each draft (Old / New) in its own block — same look as the ability_change
    rework panes (.ability-change-pane). */
 .cm-board {
   padding: 10px 12px;
@@ -4346,7 +4346,7 @@ ul.subnote-items > li::before {
   border-radius: 6px;
   background: var(--muted-04);
 }
-/* Arrow between the Old and New blocks вЂ” same glyph/style as .ability-change-arrow. */
+/* Arrow between the Old and New blocks — same glyph/style as .ability-change-arrow. */
 .cm-arrow {
   flex: none;
   align-self: center;
@@ -4363,8 +4363,8 @@ ul.subnote-items > li::before {
   display: grid;
   grid-template-columns: var(--cm-lane) var(--cm-num) var(--cm-lane);
   grid-template-rows: auto;        /* header row natural height */
-  grid-auto-rows: var(--cm-row);   /* uniform row height в†’ identical ban cells */
-  column-gap: 22px;                /* wide gap so the long numberв†’slot dashes fit */
+  grid-auto-rows: var(--cm-row);   /* uniform row height → identical ban cells */
+  column-gap: 22px;                /* wide gap so the long number→slot dashes fit */
   row-gap: 7px;                    /* more breathing room between slots */
   align-items: center;
 }
@@ -4387,7 +4387,7 @@ ul.subnote-items > li::before {
   color: #7e8a9b;
   font-variant-numeric: tabular-nums;
 }
-/* Thin connector from the number to its slot вЂ” starts right at the number (the
+/* Thin connector from the number to its slot — starts right at the number (the
    narrow num column keeps it almost touching the digits) and reaches the slot. */
 .cm-vnum.cm-to-left::before,
 .cm-vnum.cm-to-right::after {
@@ -4400,7 +4400,7 @@ ul.subnote-items > li::before {
 }
 .cm-vnum.cm-to-left::before  { right: 100%; }
 .cm-vnum.cm-to-right::after  { left: 100%; }
-/* Neutral slots вЂ” dark fill + faint border, no team colour. Bans = narrow boxes
+/* Neutral slots — dark fill + faint border, no team colour. Bans = narrow boxes
    (1 row) hugging the centre; picks fill the lane and span a 2-row band so the
    left & right pick of a pair sit FACING each other (like the in-game board). */
 .cm-token {
@@ -4411,8 +4411,8 @@ ul.subnote-items > li::before {
   background: rgba(13, 17, 23, 0.85);
 }
 .cm-token.ban  { width: 42px; }
-.cm-token.ban.cm-left  { justify-self: end; }    /* left lane в†’ inner (right) edge by the number */
-.cm-token.ban.cm-right { justify-self: start; }  /* right lane в†’ inner (left) edge by the number */
+.cm-token.ban.cm-left  { justify-self: end; }    /* left lane → inner (right) edge by the number */
+.cm-token.ban.cm-right { justify-self: start; }  /* right lane → inner (left) edge by the number */
 /* Faint bordeaux crosshair in the centre of ban slots (a "banned" mark). Barely
    visible by design. */
 .cm-token.ban::before {
@@ -4428,7 +4428,7 @@ ul.subnote-items > li::before {
     linear-gradient(-45deg, transparent 42%, rgba(150, 46, 58, 0.5) 42%, rgba(150, 46, 58, 0.5) 58%, transparent 58%);
 }
 .cm-token.pick {
-  border-color: rgba(160, 172, 190, 0.55);   /* picks span 2 rows в†’ naturally taller than bans */
+  border-color: rgba(160, 172, 190, 0.55);   /* picks span 2 rows → naturally taller than bans */
   background: rgba(22, 28, 37, 0.92);
 }
 .cm-sw.changed-sw {
@@ -4453,10 +4453,10 @@ ul.subnote-items > li::before {
   vertical-align: middle;
   flex-shrink: 0;
 }
-/* (ability-row li no longer needs a special override вЂ” base rule already
+/* (ability-row li no longer needs a special override — base rule already
    spans col 1 / -1, which is the full width in both layouts.) */
 
-/* BADGES вЂ” flat rectangular tag boxes */
+/* BADGES — flat rectangular tag boxes */
 .badge {
   display: inline-block;
   padding: 3px 7px;
@@ -4473,13 +4473,13 @@ ul.subnote-items > li::before {
   text-align: center;
   box-sizing: border-box;
 }
-/* Facet pill вЂ” replicates the dota2.com patch-page facet header:
+/* Facet pill — replicates the dota2.com patch-page facet header:
      - Background: 2-stop linear-gradient(to right, light, dark) in the
        facet's themed color (injected inline from FACETS table).
      - Text placement: right-aligned with extra LEFT padding, so the
        facet name lands on the DARK end of the gradient where white text
        reads cleanly even when the light end is bright (Yellow1, etc).
-   No overlay needed вЂ” Valve's gradient already does the contrast work. */
+   No overlay needed — Valve's gradient already does the contrast work. */
 .badge.facet-badge {
   position: relative;
   display: inline-block;
@@ -4499,7 +4499,7 @@ ul.subnote-items > li::before {
   /* Transparent 1px border keeps total height (19px) matching the
      adjacent tag-badges which carry their own 1px colored border.
      `background-origin: border-box` makes the gradient span the FULL
-     box including the border area вЂ” without this default would be
+     box including the border area — without this default would be
      `padding-box`, and the gradient would end 1px short of the right
      edge, exposing a thin strip of the LIGHT (left) end of the gradient
      via the default `background-repeat: repeat` wrap. */
@@ -4513,7 +4513,7 @@ ul.subnote-items > li::before {
      baseline vs li-grid centering yields a 2px offset otherwise. */
   top: -2px;
 }
-/* When inside .badge-group в†’ strip the box, become plain colored text.
+/* When inside .badge-group → strip the box, become plain colored text.
    `display: inline` ensures baseline-alignment with surrounding text (was inline-flex
    which sat below the text baseline in raw rows like Bloodstone wrong-line). */
 .badge-group {
@@ -4540,7 +4540,7 @@ ul.changes li > .badge-group {
   text-transform: none;
   letter-spacing: 0;
   font-size: inherit;
-  display: inline;            /* override .badge's inline-block вЂ” proper baseline align */
+  display: inline;            /* override .badge's inline-block — proper baseline align */
   vertical-align: baseline;   /* override .badge's middle */
 }
 /* Comma separator between multi-level badges */
@@ -4551,7 +4551,7 @@ ul.changes li > .badge-group {
 }
 /* Slash separator for paired dimensions (e.g. daytime / nighttime). */
 .badge-group.slash-sep .badge:not(:last-child)::after { content: " / "; }
-/* Extra leading space before 0% (neutral) вЂ” without +/- prefix it visually crowds the comma */
+/* Extra leading space before 0% (neutral) — without +/- prefix it visually crowds the comma */
 .badge-group .badge.neutral:not(:first-child) {
   margin-left: 0.25em;
 }
@@ -4629,7 +4629,7 @@ ul.changes li > .badge-group {
 .badge.nerf-text { background: rgba(225, 90, 75, 0.10);  color: #a86158; border: 1px solid rgba(225, 90, 75, 0.28); }
 
 /* TYPO NOTE */
-/* WRONG-CHANGE LINE + CORRECTION NOTE вЂ” subtle gray */
+/* WRONG-CHANGE LINE + CORRECTION NOTE — subtle gray */
 .wrong-line {
   text-decoration: line-through;
   text-decoration-color: rgba(201, 209, 217, 0.5);
@@ -4639,8 +4639,8 @@ ul.changes li > .badge-group {
 .correction-note .badge {
   font-style: normal;
 }
-/* Bold values inside the note (prev value, prev patch) вЂ” same size as surrounding
-/* "(N days ago)" annotation вЂ” fainter so it reads as a side-note. */
+/* Bold values inside the note (prev value, prev patch) — same size as surrounding
+/* "(N days ago)" annotation — fainter so it reads as a side-note. */
 .correction-note .days-ago {
   font-style: normal;
   color: var(--text-dimmer);
@@ -4648,7 +4648,7 @@ ul.changes li > .badge-group {
   font-weight: 500;
 }
 /* Patch version chip-link inside correction-note ("changed in <ver>"). */
-/* Patch version reference inside a note_box (i)-popup вЂ” plain solid underline,
+/* Patch version reference inside a note_box (i)-popup — plain solid underline,
    not a link (popups aren't clickable). */
 .patch-ref {
   text-decoration: underline;
@@ -4659,7 +4659,7 @@ ul.changes li > .badge-group {
 .correction-note > .badge-group {
   float: right;
   /* Negative right margin compensates the .correction-note padding-right (12px)
-     so the badge sits flush with the right edge вЂ” aligns with the row's main %
+     so the badge sits flush with the right edge — aligns with the row's main %
      above/below the note. */
   margin: 0 -12px 0 12px;
   font-style: normal;
@@ -4668,11 +4668,11 @@ ul.changes li > .badge-group {
 .entity-icon img[alt]:not([src*="//"]) { background: var(--bg-panel-4); }
 img { max-width: 100%; }
 
-/* BACK TO TOP вЂ” fixed bottom-right */
+/* BACK TO TOP — fixed bottom-right */
 /* .back-to-top is styled together with .nav-back-arrow near the top of this file
    (shared pixel-chevron gold/leather buttons). */
 
-/* AGHANIM'S SCEPTER / SHARD ROWS вЂ” light blue stripe (begins AT the icon, never
+/* AGHANIM'S SCEPTER / SHARD ROWS — light blue stripe (begins AT the icon, never
    covers the tag column) + small icon prefix sitting in the gap between tag
    and text columns (absolutely positioned so the row's text stays aligned
    with all other rows in the list). */
@@ -4695,7 +4695,7 @@ ul.changes li.aghanim-shard:has(> .formula-table) {
   background:
     linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.20) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% 22px;
 }
-/* Aghanim marker вЂ” inline icon appended to the change-text inside .row-text,
+/* Aghanim marker — inline icon appended to the change-text inside .row-text,
    so it sits right after the last character of the change description and
    before the % badge column. */
 .aghanim-marker {
@@ -4715,7 +4715,7 @@ ul.changes li.aghanim-shard:has(> .formula-table) {
   background-image: url('icons/stats/aghs_shard_icon.png');
 }
 
-/* WRONG-WORD HIGHLIGHT вЂ” subtle, neutral marker (no strikethrough) */
+/* WRONG-WORD HIGHLIGHT — subtle, neutral marker (no strikethrough) */
 .wrong-word {
   background: rgba(139, 148, 158, 0.08);
   color: var(--text-dim);
@@ -4723,7 +4723,7 @@ ul.changes li.aghanim-shard:has(> .formula-table) {
   border-radius: 3px;
 }
 
-/* FORMULA TRIGGER вЂ” same neutral, squared-off look as .wrong-word, clickable */
+/* FORMULA TRIGGER — same neutral, squared-off look as .wrong-word, clickable */
 .formula-trigger {
   display: inline-block;
   white-space: nowrap;
@@ -4739,7 +4739,7 @@ ul.changes li.aghanim-shard:has(> .formula-table) {
   user-select: none;
 }
 /* Small "start" / "end" labels next to per-level formula badges
-   (О”% at L1 vs О”% at L30) вЂ” visually subtle, sits inline after each
+   (Δ% at L1 vs Δ% at L30) — visually subtle, sits inline after each
    badge to clarify which hero-level its number represents. */
 .formula-endpoint-label {
   display: inline-block;
@@ -4750,7 +4750,7 @@ ul.changes li.aghanim-shard:has(> .formula-table) {
   margin: 0 4px 0 -2px;
   font-weight: 500;
 }
-/* Trailing 'end' label sits flush with the right edge of the badge column вЂ”
+/* Trailing 'end' label sits flush with the right edge of the badge column —
    the inherited 4px right margin would otherwise push the whole start/end
    pair leftward and visually misalign with adjacent single-badge rows. */
 .badge-group .formula-endpoint-label:last-child {
@@ -4766,7 +4766,7 @@ ul.changes li.aghanim-shard:has(> .formula-table) {
   border-color: rgba(139, 148, 158, 0.60);
   color: var(--text-main);
 }
-/* OLD FORMULA вЂ” just a subtle dotted underline so it stands out as "the old one" */
+/* OLD FORMULA — just a subtle dotted underline so it stands out as "the old one" */
 .formula-old {
   text-decoration: underline dotted var(--muted-45);
   text-underline-offset: 3px;
@@ -4780,7 +4780,7 @@ ul.changes li.aghanim-shard:has(> .formula-table) {
   border-spacing: 2px;
   font-size: 11px;
   width: 100%;
-  /* fixed в†’ every level column is the SAME width (auto sized each cell to its
+  /* fixed → every level column is the SAME width (auto sized each cell to its
      own content, making short labels like "L7" narrow). */
   table-layout: fixed;
   font-variant-numeric: tabular-nums;
@@ -4853,7 +4853,7 @@ ul.changes li.aghanim-shard:has(> .formula-table) {
   flex-direction: column;
   gap: 4px;
   /* Symmetric with .toolbar-patch-info (both flex:1 1 0) so the search box in
-     the middle stays optically centred. NO min-width:0 в†’ the implicit
+     the middle stays optically centred. NO min-width:0 → the implicit
      min-width:auto floors the column at its badges' width, so the tag rows can
      never be shrunk/overlapped by the search box when space gets tight. */
   flex: 1 1 0;
@@ -4902,7 +4902,7 @@ ul.changes li.aghanim-shard:has(> .formula-table) {
 }
 body.cat-filter-active .cat-hide { display: none !important; }
 
-/* FILTER BUTTONS in legend вЂ” make tags clickable */
+/* FILTER BUTTONS in legend — make tags clickable */
 .legend-tags .badge.filter-btn {
   cursor: pointer;
   user-select: none;
@@ -4927,11 +4927,11 @@ body.cat-filter-active .cat-hide { display: none !important; }
    `contain: paint` clipped the hover-scaled dyn-cells at the block edge
    (last cell on the right got sliced). The lazy-tooltip rebuild in
    scripts.js already removed the bulk of the per-cell DOM weight, so
-   leaving CV off is the better trade вЂ” visual freedom > the last bit
+   leaving CV off is the better trade — visual freedom > the last bit
    of paint-skip. */
 .entity-block { margin-bottom: 6px; }
 /* All entity-block children flush against the entity-block left edge (margin
-   not padding вЂ” padding-left controls INTERNAL content inset, which the
+   not padding — padding-left controls INTERNAL content inset, which the
    visual boxes need to keep at 14px so their content aligns with the entity
    icon above). */
 .entity-block > h4.subgroup,
@@ -4943,14 +4943,14 @@ body.cat-filter-active .cat-hide { display: none !important; }
 .entity-block > .properties-change {
   margin-left: 0;
 }
-/* Tag column inside ul.changes also flush at entity-block left edge вЂ” these
+/* Tag column inside ul.changes also flush at entity-block left edge — these
    lists have no inner box border to inset from. */
 .entity-block > ul.changes,
 .entity-block > .ability-block {
   padding-left: 0;
 }
-/* ul.subnotes is NOT touched here вЂ” it keeps its base margin-left: 76px so
-   the в†і arrow lines up under the row text column (after the 64px tag column
+/* ul.subnotes is NOT touched here — it keeps its base margin-left: 76px so
+   the ↳ arrow lines up under the row text column (after the 64px tag column
    + 12px gap). Resetting it to 0 here would flush subnotes against the
    entity-block left edge, misaligning every "Damage at level 1 ..." note. */
 .entity-block.is-new > ul.changes {
@@ -4961,7 +4961,7 @@ body.cat-filter-active .cat-hide { display: none !important; }
 /* Keep the category header (h2.section: General/Item/Neutral Item/Hero Updates)
    VISIBLE while filtering so each surviving group is labelled with its category.
    Empty sections are collapsed wholesale by refreshPatchFilterLayout()
-   (section.cat-panel в†’ f-hide), so only non-empty sections keep their header. */
+   (section.cat-panel → f-hide), so only non-empty sections keep their header. */
 body.filter-active h4.subgroup { display: none; }
 body.filter-active ul.subnotes { display: none; }
 /* Hide filtered elements via .f-hide class set by JS */
@@ -4983,19 +4983,19 @@ body.filter-active ul.subnotes { display: none; }
    ========================================================================== */
 
 /* ============================================================
-   CREEPS TABLE PAGE вЂ” verbatim render of the team's neutral-creep
+   CREEPS TABLE PAGE — verbatim render of the team's neutral-creep
    stats sheet. Single wide table, sticky header, monospace numbers,
    tier-row tinting from the unicode dot indicator in column 1.
    ============================================================ */
 .creeps-page {
   max-width: none;
-  /* Flush to BOTH page edges вЂ” no left/right indent; the .creeps-scroll box
+  /* Flush to BOTH page edges — no left/right indent; the .creeps-scroll box
      spans the full width and its vertical scrollbar sits at the window's right
      edge. (top/bottom are overridden to 12px below when a scroll box present.) */
   padding: 16px 0 40px;
 }
 /* Pages with an inner scroller (Neutral Creeps / Unit Abilities) lock the
-   document to the viewport so ONLY the inner .creeps-scroll box scrolls вЂ”
+   document to the viewport so ONLY the inner .creeps-scroll box scrolls —
    no second, vestigial browser scrollbar. The box's max-height (below) is
    sized to exactly fill the space, so nothing is clipped. Mana Items has no
    .creeps-scroll, so it is untouched and keeps normal page scrolling.
@@ -5003,12 +5003,12 @@ body.filter-active ul.subnotes { display: none; }
    here does not clip them. */
 /* CONTAINED SCROLL BOX. The Neutral Creeps / Unit Abilities tables are wide, so
    THIS box is the scroller (capped height + sticky under the nav). The PAGE is
-   locked (body:has(.creeps-scroll){overflow:hidden}) so ONLY this box scrolls вЂ”
+   locked (body:has(.creeps-scroll){overflow:hidden}) so ONLY this box scrolls —
    one vertical scrollbar, plus a horizontal one for the wide table. The <thead>
    and identity columns stay sticky inside the box; the frozen-column divider is
    an overlay (.sticky-frame) drawn in the non-scrolling .creeps-page so Chrome
    keeps repainting it (box-shadow on position:sticky cells drops mid-scroll).
-   Mana Items has no .creeps-scroll в†’ it page-scrolls normally. */
+   Mana Items has no .creeps-scroll → it page-scrolls normally. */
 body:has(.creeps-scroll) { overflow: hidden; }
 body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .creeps-scroll {
@@ -5022,7 +5022,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   /* Always-visible scrollbars across every Materials table (Neutral Creeps,
      Mana Items, Hero Stats, etc). Without this, Hero Stats' Expanded view
      overflows horizontally but the native scrollbar can be hidden on
-     overlay-scroll setups (macOS, some Linux/Win configurations) вЂ” the
+     overlay-scroll setups (macOS, some Linux/Win configurations) — the
      scroll line is then invisible. Custom thin scrollbar keeps the line
      visible everywhere and matches the site's dark theme. */
   scrollbar-width: thin;
@@ -5045,16 +5045,16 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .creeps-table {
   /* width:max-content + min-width:100% = stretch evenly to fill the container
-     when content is narrow (Standard view вЂ” no empty strip on the right), but
+     when content is narrow (Standard view — no empty strip on the right), but
      grow to content width and scroll horizontally when wide (Expanded view). */
   width: max-content;
   min-width: 100%;
   /* table-layout: auto lets the browser size each column to the widest
-     content (header or cell) вЂ” no manual width hints. Every cell is
+     content (header or cell) — no manual width hints. Every cell is
      centered horizontally, so visual alignment stays clean across the
      auto-sized columns. */
   table-layout: auto;
-  /* `collapse` вЂ” significantly faster than `separate` on a wide table
+  /* `collapse` — significantly faster than `separate` on a wide table
      (~1600 cells on Creeps page). The sticky-bleed regression `separate`
      was meant to fix is handled below via a full-area `box-shadow: inset
      0 0 0 9999px var(--sticky-bg)` on sticky cells: the inset draws on
@@ -5071,7 +5071,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   text-align: center;
   vertical-align: middle;
 }
-/* Merged РЈСЂ. cell вЂ” when a level spans multiple rows via rowspan, the
+/* Merged Ур. cell — when a level spans multiple rows via rowspan, the
    single cell shows the level number vertically centered against the
    group's full height. */
 .creeps-table .lvl-cell {
@@ -5080,7 +5080,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   background: rgba(170, 220, 240, 0.05);
   border-right: 1px solid var(--blue-18);
 }
-/* Identity columns (РЈСЂ. / icon / Р®РЅРёС‚) pinned to the left on horizontal
+/* Identity columns (Ур. / icon / Юнит) pinned to the left on horizontal
    scroll. scripts.js sets per-cell `left`; we provide position:sticky +
    an opaque background so scrolled cells pass underneath cleanly. */
 .creeps-table .sticky-col {
@@ -5109,7 +5109,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    .visible based on the scroll container's scrollLeft. */
 .creeps-page { position: relative; }
 /* Frozen-pane dividers (overlays in the non-scrolling .creeps-page so their
-   shadows keep repainting вЂ” Chrome drops box-shadow on position:sticky cells
+   shadows keep repainting — Chrome drops box-shadow on position:sticky cells
    mid-scroll). .sticky-frame = vertical edge at the RIGHT of the pinned
    lvl/unit block (horizontal scroll); .sticky-frame-top = horizontal edge
    under the header (vertical scroll). Neither boxes the pinned cells. */
@@ -5132,7 +5132,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.7);
 }
 .sticky-frame.visible, .sticky-frame-top.visible { display: block; }
-/* Dedicated icon column вЂ” fixed-size portrait, centered. Vertical-align
+/* Dedicated icon column — fixed-size portrait, centered. Vertical-align
    middle on the parent <td> keeps the image baseline-aligned with the
    sibling cells without flexbox (which previously made the wildkin row
    look "split" because flex baselines diverged from table baselines). */
@@ -5143,12 +5143,12 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 /* Raise the icon cell on hover so the zoomed portrait sits above the other
    body cells (the cell is already position:sticky, which establishes a
-   stacking context вЂ” bump its z-index rather than the inner <img>). Stays
+   stacking context — bump its z-index rather than the inner <img>). Stays
    BELOW the pinned header (z 10/11) so a hovered top row never covers it. */
 .creeps-table .creep-icon-cell:hover {
   z-index: 9;
 }
-/* Attack Range melee/ranged marker вЂ” a small frosted-glass rounded block
+/* Attack Range melee/ranged marker — a small frosted-glass rounded block
    holding the icon, to the right of the number. */
 /* Attack Range cell: number in a fixed-width box so the icon badge always
    lands at the same x regardless of digit count. */
@@ -5168,13 +5168,13 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;             /* fixed block вЂ” every badge is identical size */
+  width: 20px;             /* fixed block — every badge is identical size */
   height: 18px;
   box-sizing: border-box;
   margin-left: 6px;
   border-radius: 5px;
-  /* Frosted glass without backdrop-filter (blur is GPU-heavy Г—40 cells and
-     caused scroll jank) вЂ” a soft translucent gradient instead. */
+  /* Frosted glass without backdrop-filter (blur is GPU-heavy ×40 cells and
+     caused scroll jank) — a soft translucent gradient instead. */
   background: linear-gradient(rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04));
   border: 1px solid rgba(255, 255, 255, 0.14);
   vertical-align: middle;
@@ -5187,7 +5187,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   display: block;
   opacity: 0.9;
 }
-/* Header centre tabs (Main / Patch Reader / Calendar / Materials) вЂ” laid out
+/* Header centre tabs (Main / Patch Reader / Calendar / Materials) — laid out
    in the middle grid column of .nav-inner, so they're always centred between
    brand (left) and the picker / context block (right) without overlapping
    either. Each tab is a 48px-tall pill matching the version picker height,
@@ -5198,7 +5198,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   align-items: center;
   justify-self: center;
 }
-/* Nav tabs вЂ” same block style as the version picker button. */
+/* Nav tabs — same block style as the version picker button. */
 .nav-tab {
   font-family: var(--font-j10);
   font-size: 18px;
@@ -5231,7 +5231,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
     0 0  3px rgba(227, 196, 106, 0.25);
 }
 
-/* Materials sub-tabs вЂ” flat row of three browser-tab pills, hung BELOW the
+/* Materials sub-tabs — flat row of three browser-tab pills, hung BELOW the
    main header on a thin bar (so the header itself stays compact). */
 .materials-subnav {
   background: var(--bg-panel-2);
@@ -5253,7 +5253,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 /* When the sub-tab bar sits INSIDE the table scroll box (Neutral Creeps /
    Neutral Abilities), it scrolls away vertically with the table but stays
-   pinned to the left edge during horizontal scroll вЂ” same treatment as the
+   pinned to the left edge during horizontal scroll — same treatment as the
    blurb + toolbar. On Mana Items it stays in the page header and scrolls away
    via the page itself. */
 .creeps-scroll > .materials-subnav {
@@ -5271,7 +5271,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   padding: 7px 16px;
   border: 1px solid transparent;
   border-bottom: none;
-  border-radius: 7px 7px 0 0;   /* rounded top вЂ” sits on the subnav's bottom border */
+  border-radius: 7px 7px 0 0;   /* rounded top — sits on the subnav's bottom border */
   margin-bottom: -1px;          /* overlap the 1px bottom border */
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   display: inline-flex;
@@ -5281,11 +5281,11 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .nav-subtab:hover { color: var(--text-bright); background: rgba(48, 54, 61, 0.45); }
 .nav-subtab.active {
   color: var(--gold);
-  background: var(--bg-page);          /* matches the page background в†’ tab merges into page */
+  background: var(--bg-page);          /* matches the page background → tab merges into page */
   border-color: var(--blue-18);
 }
 .nav-subtab-label { color: inherit; }
-/* ---- Grouped sub-nav dropdowns (Creeps в–ѕ / Items в–ѕ / Heroes в–ѕ) ---- */
+/* ---- Grouped sub-nav dropdowns (Creeps ▾ / Items ▾ / Heroes ▾) ---- */
 .nav-subgroup { position: relative; display: inline-flex; align-items: flex-end; }
 .nav-subtab-group { cursor: pointer; }
 .nav-caret { margin-left: 6px; font-size: 9px; opacity: 0.75; }
@@ -5311,7 +5311,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
 }
 /* Child combinator `>` so a nested flyout (a .nav-submenu deeper inside) does
-   NOT open just because the outer group is hovered вЂ” only its OWN nested
+   NOT open just because the outer group is hovered — only its OWN nested
    subgroup hover opens it. `.is-open` is the touch-device tap-toggle class
    that scripts.js adds when the user taps a group trigger (first tap = open,
    second tap = follow link). */
@@ -5344,7 +5344,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .nav-subitem-soon { color: #5b6672; cursor: default; }
 .nav-subitem-soon:hover { background: none; }
 /* Nested flyout (Neutral Abilities under Neutral Stats): the parent item opens
-   a second menu to its RIGHT on hover вЂ” a classic cascading menu. */
+   a second menu to its RIGHT on hover — a classic cascading menu. */
 .nav-subgroup-nested { position: relative; display: block; }
 .nav-subitem-parent { cursor: pointer; }
 .nav-caret-side { font-size: 9px; opacity: 0.7; margin-left: 8px; }
@@ -5366,20 +5366,20 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   padding: 0 4px;
   line-height: 1.4;
 }
-/* Ability-icon link on the Creeps Table вЂ” no underline, inherits layout. */
+/* Ability-icon link on the Creeps Table — no underline, inherits layout. */
 .creeps-table .abil-link {
   text-decoration: none;
   display: inline-block;
   line-height: 0;
 }
-/* Vertical divider after every column (both Tables вЂ” Neutral Creeps + Unit
+/* Vertical divider after every column (both Tables — Neutral Creeps + Unit
    Abilities). The heavier col-sep dividers (set on category starts) stay
    visible over this lighter base. */
 .creeps-table th,
 .creeps-table td { border-left: 1px solid rgba(170, 220, 240, 0.12); }
 .creeps-table th:first-child,
 .creeps-table td:first-child { border-left: none; }
-/* Unit Abilities page table вЂ” reuses .creeps-table sticky/scroll machinery. */
+/* Unit Abilities page table — reuses .creeps-table sticky/scroll machinery. */
 .unit-abilities-table .ua-ability { text-align: left; }
 .unit-abilities-table .ua-ability-inner {
   display: inline-flex;
@@ -5389,7 +5389,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .unit-abilities-table .ua-ability-name { font-weight: 600; color: var(--text-bright); }
 /* Neutral Creeps "Unit" name cell matches the Neutral Abilities ability-name:
-   left-aligned, semibold, same colour, single line вЂ” so both Materials tables
+   left-aligned, semibold, same colour, single line — so both Materials tables
    share one look AND the same row height (no wrap-induced tall creep rows). */
 .creeps-table td.col-name {
   text-align: left;
@@ -5397,13 +5397,13 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   color: var(--text-bright);
   white-space: nowrap;
 }
-/* Type вЂ” plain coloured fills (no glass effect). */
+/* Type — plain coloured fills (no glass effect). */
 .unit-abilities-table td.ua-type-active  { background: rgba(80, 155, 230, 0.22); color: #d2e6ff; }
 .unit-abilities-table td.ua-type-passive { background: rgba(170, 110, 215, 0.22); color: #e8d3f5; }
 .unit-abilities-table td.ua-type-aura    { background: rgba(225, 180, 80, 0.22); color: #f4e3b3; }
-/* Damage Type вЂ” colour-coded text. */
+/* Damage Type — colour-coded text. */
 /* Damage-type colour paints ONLY the numeric runs (.dmg-num) inside the
-   Damage cell вЂ” words like "РІ СЃРµРє." or "+ N% Int" keep the default text
+   Damage cell — words like "в сек." or "+ N% Int" keep the default text
    colour. The standalone Damage Type column was replaced by this scheme. */
 .unit-abilities-table td.dt-magical   .dmg-num,
 .unit-abilities-table td.dt-magical   .lvl-toggle { color: #5fb1ff; }   /* blue */
@@ -5413,7 +5413,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .unit-abilities-table td.dt-hpremoval .lvl-toggle { color: #8aab7a; }   /* dull green */
 .unit-abilities-table td.dt-pure      .dmg-num,
 .unit-abilities-table td.dt-pure      .lvl-toggle { color: #ead992; }
-/* Collapsed upgrade value ("40вЂ¦26"): a clickable button that keeps the column
+/* Collapsed upgrade value ("40…26"): a clickable button that keeps the column
    narrow; the full per-tier list opens in a floating popover (scripts.js
    positions it as `fixed`, so the column width never changes). */
 .lvl-toggle {
@@ -5453,7 +5453,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .unit-abilities-table td.cat-edge {
   border-left: 2px solid var(--blue-30);
 }
-/* "Only Auras" view filter вЂ” hide non-aura rows + irrelevant columns. The
+/* "Only Auras" view filter — hide non-aura rows + irrelevant columns. The
    super-category header STAYS in Auras view (scripts.js reorders columns into
    contiguous category groups + recomputes the cat colspans for what's visible). */
 .unit-abilities-table.filter-auras tbody tr:not(.ua-row-aura) { display: none; }
@@ -5479,22 +5479,22 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .unit-abilities-table.filter-auras td[data-col="effect2"],
 .unit-abilities-table.filter-auras th[data-col="effect3"],
 .unit-abilities-table.filter-auras td[data-col="effect3"] { min-width: 180px; }
-/* Flag glyphs (Stackable / Dispellable) вЂ” colours scoped to .ua-flag so the
+/* Flag glyphs (Stackable / Dispellable) — colours scoped to .ua-flag so the
    column headers (th.ua-dispel etc.) stay default-coloured. */
 .unit-abilities-table .ua-flag { font-size: 15px; font-weight: 700; line-height: 1; display: inline-block; }
 .unit-abilities-table .ua-flag.ua-yes  { color: #56d364; }            /* green check */
 .unit-abilities-table .ua-flag.ua-no   { color: #f85149; }            /* red x */
 .unit-abilities-table .ua-flag.ua-dispel        { color: #e3c14a; text-shadow: 0 0 4px rgba(227,193,74,0.6); }  /* yellow star */
 .unit-abilities-table .ua-flag.ua-dispel-strong { color: #f85149; text-shadow: 0 0 4px rgba(248,81,73,0.55); } /* red star */
-/* Not-dispellable вЂ” hollow (outline) star, same shape/size as the others. */
+/* Not-dispellable — hollow (outline) star, same shape/size as the others. */
 .unit-abilities-table .ua-flag.ua-dispel-no {
   color: transparent;
   -webkit-text-stroke: 1.1px #7d828b;
   text-stroke: 1.1px #7d828b;
 }
-/* Aura Stack red-x glyph вЂ” small. */
+/* Aura Stack red-x glyph — small. */
 .unit-abilities-table .ua-stack-glyph { font-size: 8px; }
-/* Cell dashes вЂ” half size. */
+/* Cell dashes — half size. */
 .unit-abilities-table .ua-dash,
 .creeps-table .ua-dash,
 .mr-table .ua-dash { color: var(--text-dimmer); font-size: 0.4em; }
@@ -5539,12 +5539,12 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .unit-abilities-table td.ua-damage .stat-ico {
   height: 14px; width: 14px; vertical-align: -2px; margin-left: 2px;
 }
-/* Question-mark hint badge вЂ” appears inside a cell to surface an author note
+/* Question-mark hint badge — appears inside a cell to surface an author note
    without taking over the cell's hover (cell hover is reserved for patchnotes).
-   Used in the Damage cell ("РѕС‚ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ" for Tornado) and the Ability cell
+   Used in the Damage cell ("от расстояния" for Tornado) and the Ability cell
    ("identical for all frog units" for Riverborn Aura). */
 /* Hover affordance for ability icons that carry a body-level tooltip via
-   data-tooltip. No visual badge вЂ” the icon itself is the trigger. */
+   data-tooltip. No visual badge — the icon itself is the trigger. */
 .abil-ico-hint {
   display: inline-flex;
   cursor: help;
@@ -5583,7 +5583,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   outline: none;
 }
 /* Tooltip body for `.qhint` is rendered at <body> level (fixed-position) by
-   scripts.js so it escapes the .creeps-scroll overflow clip вЂ” a pure CSS
+   scripts.js so it escapes the .creeps-scroll overflow clip — a pure CSS
    `::after` would be hidden behind the sticky header / scroll boundary. */
 .qhint-tip {
   position: fixed;
@@ -5611,28 +5611,28 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   line-height: 1.35;
 }
 /* Keep the colored Yes/No glyph + dash on the same line as the start of the
-   description вЂ” only the trailing words flow onto a new line if needed. */
+   description — only the trailing words flow onto a new line if needed. */
 .qhint-tip .qh-line .ua-yn { white-space: nowrap; }
 .qhint-tip .qh-line + .qh-line { border-top: 1px solid var(--line-soft); }
 .qhint-tip .ua-yn { font-weight: 600; font-size: 11px; }
 .qhint-tip .ua-yn-yes    { color: #6aa775; }
 .qhint-tip .ua-yn-no     { color: #c97f78; }
 .qhint-tip .ua-yn-strong { color: #c4ad5e; }
-/* Valve description variables (%hero_stun_duration% etc.) вЂ” values aren't
+/* Valve description variables (%hero_stun_duration% etc.) — values aren't
    resolved here, so just colour the placeholder name to mark it as "variable". */
 .qhint-tip .abil-var { color: var(--blue); }
-/* Damage-type colour swatches inside the Damage header tooltip вЂ” mirror the
+/* Damage-type colour swatches inside the Damage header tooltip — mirror the
    in-table `td.dt-*` palette so the words match the actual cell numbers. */
 .qhint-tip .dt-magical   { color: #5fb1ff; font-weight: 600; }
 .qhint-tip .dt-physical  { color: #e1716a; font-weight: 600; }
 .qhint-tip .dt-hpremoval { color: #8aab7a; font-weight: 600; }
 .qhint-tip .dt-pure      { color: #ead992; font-weight: 600; }
-/* "Aura" word inside the Through BKB header tooltip вЂ” same warm-yellow tone
+/* "Aura" word inside the Through BKB header tooltip — same warm-yellow tone
    as the Aura cell type tag (.ua-type-aura) so the legend reads at a glance. */
 .qhint-tip .hint-aura { color: #f4e3b3; font-weight: 600; }
-/* (Legacy `.show-upgrades` rule lived here вЂ” replaced by the segmented
+/* (Legacy `.show-upgrades` rule lived here — replaced by the segmented
     tier control + table[data-tier="all"] selector further below.) */
-/* Aura Stack "yes" вЂ” green rounded diamond made of stacked tiles. The wrapper
+/* Aura Stack "yes" — green rounded diamond made of stacked tiles. The wrapper
    is NOT rotated and carries a screen-space top-fade mask, so the upper part
    of the icon fades out (weaker colour). ::after = front tile, ::before =
    tile behind/above (the "multiple levels" look). */
@@ -5658,9 +5658,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   /* dark outer outline separates the overlapping tiles clearly */
   box-shadow: 0 0 0 1px rgba(8, 14, 10, 0.9);
 }
-/* Painting order: ::before (bottom) в†’ <i> в†’ ::after (top). So ::after is the
+/* Painting order: ::before (bottom) → <i> → ::after (top). So ::after is the
    FRONT tile (lowest, brightest), <i> the middle, ::before the back (highest,
-   dimmest) вЂ” each tile sits behind and a little above the one in front. */
+   dimmest) — each tile sits behind and a little above the one in front. */
 .unit-abilities-table .ua-stack-yes::after {  /* front tile */
   top: 6px;
   background: #5fe06d;
@@ -5677,7 +5677,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    icon and drop the top border so the unit's rows read as one block. */
 .unit-abilities-table tr.ua-dup .ua-unit img { visibility: hidden; }
 /* The row jumped to from an ability link is marked via scripts.js with the
-   same `.row-marked` class as a manual click (gold frame) вЂ” see centerHash().
+   same `.row-marked` class as a manual click (gold frame) — see centerHash().
    The old yellow `:target` flash was replaced so navigation and clicking
    share one consistent selected style. */
 /* Camp-type marker (minimap creep-camp glyph: small/mid/big/ancient). */
@@ -5691,7 +5691,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 /* Keep both glyphs of a dual-camp creep on one line. */
 .creeps-table td.col-camp { white-space: nowrap; }
 .creeps-table .camp-ico + .camp-ico { margin-left: 2px; }
-/* Ability cell icon вЂ” changelog style (45px there), smaller here. */
+/* Ability cell icon — changelog style (45px there), smaller here. */
 .creeps-table .abil-ico {
   width: 26px;
   height: 26px;
@@ -5715,7 +5715,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
     0 3px 8px var(--shadow-60),
     0 0 0 1px var(--blue-40);
 }
-/* Autocast marker вЂ” animated golden ring + pulsing glow around the ability
+/* Autocast marker — animated golden ring + pulsing glow around the ability
    icon, mirroring the in-game autocast toggle. The wrapper is needed because
    <img> cannot host ::before / ::after pseudo-elements. */
 .creeps-table .abil-ico-wrap {
@@ -5726,7 +5726,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   transform-origin: center center;
   transition: transform 0.12s ease;
 }
-/* Autocast icon zoom вЂ” scale the whole wrapper (icon + snake) as one, and
+/* Autocast icon zoom — scale the whole wrapper (icon + snake) as one, and
    suppress the inner img's own :hover scale so it doesn't compound. */
 .creeps-table .abil-ico-wrap:hover {
   transform: scale(1.8);
@@ -5737,7 +5737,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   z-index: auto;
   box-shadow: none;
 }
-/* A thin golden "snake" вЂ” a short stroke segment that crawls along the icon's
+/* A thin golden "snake" — a short stroke segment that crawls along the icon's
    rounded-rect frame at constant speed, corners included. The SVG <rect> has
    pathLength=100, so the dash (snake) + gap sum to 100 and the dashoffset
    animation loops seamlessly around the perimeter. */
@@ -5760,7 +5760,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
      high end; tail fades toward the low end. */
   animation: autocast-snake 1.73s linear infinite;
 }
-/* Closed base ring вЂ” a continuous, static golden line around the whole frame.
+/* Closed base ring — a continuous, static golden line around the whole frame.
    The animated comet below sweeps around within it, so the snake reads as a
    closed loop with the glow travelling inside itself. */
 .creeps-table .autocast-snake .ac-ring {
@@ -5771,15 +5771,15 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   filter: drop-shadow(0 0 1.2px rgba(255, 190, 70, 0.6));
   animation: none;
 }
-/* Wide, very soft, translucent aura spanning the whole comet вЂ” the "fluff". */
+/* Wide, very soft, translucent aura spanning the whole comet — the "fluff". */
 .creeps-table .autocast-snake .ac-fluff {
   stroke: #ffc964;
   stroke-width: 9;
   stroke-linecap: round;
-  stroke-dasharray: 0 0 100 0;     /* [0, 100] вЂ” full ring */
+  stroke-dasharray: 0 0 100 0;     /* [0, 100] — full ring */
   opacity: 0.10;
 }
-/* Bright body вЂ” the leading, fully-opaque stretch. Head sits at 100, which on
+/* Bright body — the leading, fully-opaque stretch. Head sits at 100, which on
    the closed path coincides with position 0, so the head meets the tail's tip:
    the comet wraps the entire perimeter and touches itself. */
 .creeps-table .autocast-snake .ac-body {
@@ -5788,8 +5788,8 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   stroke-dasharray: 0 60 40 0;     /* [60, 100] */
   filter: drop-shadow(0 0 1.8px rgba(255, 190, 70, 0.95));
 }
-/* Tail вЂ” 4 overlapping steps with a gentle opacity ramp (1 в†’ .78 в†’ .5 в†’ .28
-   в†’ .12), tapering width and rising blur toward the tip. The painted union
+/* Tail — 4 overlapping steps with a gentle opacity ramp (1 → .78 → .5 → .28
+   → .12), tapering width and rising blur toward the tip. The painted union
    covers the whole [0,100] perimeter, so the faint tip (at 0) meets the bright
    head (at 100) for a fully closed loop with no gap. */
 .creeps-table .autocast-snake .ac-tail1 {
@@ -5817,7 +5817,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   stroke-dasharray: 0 0 18 82;     /* [0, 18] */
   opacity: 0.10;
 }
-/* Pollen вЂ” two phase-locked layers of tiny, irregular, heavily-blurred specks
+/* Pollen — two phase-locked layers of tiny, irregular, heavily-blurred specks
    that ride with the comet. Small widths + strong blur + varied dash sizes
    dissolve the dots into a soft golden dust cloud (scatter) instead of crisp
    beads. Each dasharray sums to 100 for a seamless lap. */
@@ -5837,7 +5837,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   opacity: 0.4;
   filter: drop-shadow(0 0 1.4px rgba(255, 210, 120, 0.8));
 }
-/* Sparse, bright, sharp twinkles with a strong glow вЂ” the "magic" sparkle on
+/* Sparse, bright, sharp twinkles with a strong glow — the "magic" sparkle on
    top of the soft dust haze. */
 .creeps-table .autocast-snake .ac-pollen3 {
   stroke: #fffdf2;
@@ -5865,7 +5865,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 /* Standard view hides Expanded-only columns. Super-category headers span all
    their columns; the colspan shrinks automatically as hidden cells collapse. */
 .creeps-table.mode-standard .col-exp { display: none; }
-/* BOTH header rows stay pinned: the category row (Basic/Vitality/вЂ¦) sticks at
+/* BOTH header rows stay pinned: the category row (Basic/Vitality/…) sticks at
    top:0, and the column-name row pins directly beneath it at --cat-row-h
    (set by scripts.js from the category row's rendered height). */
 .creeps-table thead tr.cat-row th.cat-head {
@@ -5889,20 +5889,20 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
      scroll time regardless of zoom level. */
   box-shadow: 0 6px 0 0 var(--bg-panel-3);
 }
-/* Column-name row вЂ” pinned under the category row. The blue scrolled-edge line
+/* Column-name row — pinned under the category row. The blue scrolled-edge line
    is painted flush on this row's bottom via box-shadow (matches the Mana Items
    table; no separate overlay, so no gap). border-bottom is dropped because
    Chrome drops collapsed borders on sticky cells mid-scroll. */
 .creeps-table thead tr.col-row th {
   /* -2px pull-up paired with the JS Math.floor on --cat-row-h: guarantees the
-     column row starts в‰Ґ2px BEFORE the category row's real bottom, so the two
+     column row starts ≥2px BEFORE the category row's real bottom, so the two
      pinned rows always overlap and nothing leaks through at scroll time. */
   top: calc(var(--cat-row-h, 0px) - 2px);
   border-bottom: none;
   /* box-shadows, in order:
      1. blue scrolled-edge line, flush on the bottom (like Mana Items);
      2. soft drop shadow onto the body below;
-     3. a 14px-tall OPAQUE block extending UPWARD in the header colour вЂ” fills
+     3. a 14px-tall OPAQUE block extending UPWARD in the header colour — fills
         any sub-pixel/rounding gap between this row and the category row above
         (which sits at z-index 52 and paints over the overlapping part). This
         kills the band where body content showed through, regardless of how
@@ -5934,14 +5934,14 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    COLUMNS = patches (version; release date on hover), CELLS = the hero's dyn-cell
    that patch. Untouched cells render a static glassy diamond via ::after (keeps the
    ~14k-cell grid's HTML light); touched cells get a JS-built coloured pill.
-   Fixed table layout в†’ every patch column is the SAME width so diamonds line up in
+   Fixed table layout → every patch column is the SAME width so diamonds line up in
    a clean vertical grid. Column widths (--hd-col-w) and the hero column width
    (--hd-hero-w, sized to the longest name + icon + zoom clearance) are set live by
    scripts.js dynLayoutMatrix(), which also keeps the latest patch flush right.
    max-content width (NOT .creeps-table's min-width:100%, which would stretch the
    columns unequally). */
 /* AUTO layout (not fixed): a fixed-layout table derives column widths from the
-   FIRST row, which here is the colspan'd super-category row вЂ” that would ignore
+   FIRST row, which here is the colspan'd super-category row — that would ignore
    the per-column widths. Auto layout (like Neutral Creeps) honours the explicit
    width + min/max-width on the leaf columns below AND lets the super-category
    colspans span correctly. width:max-content + min-width:0 stops the inherited
@@ -5950,7 +5950,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 /* Hero identity column. The `.creeps-table` prefix raises specificity ABOVE the
    shared `.creeps-table td:first-child` tier-dots rule (equal-specificity, later
    in the file) which would otherwise force center-align + a symbol font +
-   white-space:normal onto this cell вЂ” making each row's icon+name land at a
+   white-space:normal onto this cell — making each row's icon+name land at a
    different x (centred by name length) instead of one clean vertical line. */
 .creeps-table.heroes-dyn-table th.hd-hero,
 .creeps-table.heroes-dyn-table td.hd-hero {
@@ -5972,7 +5972,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .heroes-dyn-table td.hd-hero { padding: 2px 12px 2px 6px; }
 /* Equal patch columns under auto layout: pin width + min + max so every column
    is exactly --hd-col-w (the dyn-cell pill 28px sits centred inside). No
-   overflow:hidden on the cell вЂ” the 2.5Г— hover-pop must overflow it (the header
+   overflow:hidden on the cell — the 2.5× hover-pop must overflow it (the header
    th below clips its own label separately). */
 .heroes-dyn-table th.hd-patch,
 .heroes-dyn-table td.hd-cell {
@@ -5989,22 +5989,22 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .hd-hero-inner img {
   width: 40px; height: 23px; object-fit: cover; border-radius: 3px;
   border: 1px solid var(--blue-18); flex: 0 0 auto;
-  /* Anchor the zoom at the LEFT edge so it grows rightward only вЂ” never past the
+  /* Anchor the zoom at the LEFT edge so it grows rightward only — never past the
      box's left edge (which would clip it behind the frozen-column boundary). */
   transform-origin: left center;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-/* items_dyn: item/enchant icons are 88Г—64 (aspect 1.375), NOT the hero 16:9 вЂ” the
-   hero box (40Г—23) crops them top/bottom. Size the box to the item aspect (40Г—29)
+/* items_dyn: item/enchant icons are 88×64 (aspect 1.375), NOT the hero 16:9 — the
+   hero box (40×23) crops them top/bottom. Size the box to the item aspect (40×29)
    so cover fills it without cropping (mirrors mana_items' .mr-ico approach). */
 .items-dyn-table .hd-hero-inner img { height: 29px; }
 .hd-hero-name { font-weight: 600; color: var(--text-bright); }
-/* RULE (all tables): hovering a hero/unit portrait pops it out вЂ” like Neutral
-   Creeps. The 18px gap + name-fitted column width keep the 1.8Г— zoom from ever
+/* RULE (all tables): hovering a hero/unit portrait pops it out — like Neutral
+   Creeps. The 18px gap + name-fitted column width keep the 1.8× zoom from ever
    covering the name. The icon's stacking sits under the sticky header (sticky-col
    z:3 < header), so a top-row zoom slides BEHIND the header (matches creeps). */
 .heroes-dyn-table td.hd-hero:hover .hd-hero-inner img {
-  /* 1.5Г— from the left edge в†’ grows 20px right, clearing the 22px gap so it
+  /* 1.5× from the left edge → grows 20px right, clearing the 22px gap so it
      stops short of the name; z-index lifts it ABOVE the name text. */
   transform: scale(1.5); position: relative; z-index: 41;
   box-shadow: 0 3px 8px var(--shadow-60), 0 0 0 1px var(--blue-40);
@@ -6014,12 +6014,12 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    ========================================================================== */
 
 /* ============================================================================
-   UNIFIED TOOLBAR PANEL вЂ” SITE STANDARD (every Materials toolbar).
+   UNIFIED TOOLBAR PANEL — SITE STANDARD (every Materials toolbar).
    All controls live inside ONE bordered surface (.toolbar-panel) instead of a row
    of separate floating pills. The outer .cal-toggle-bar.inbox-bar keeps the
    Materials rhythm (28px side inset + top/bottom gaps); .toolbar-panel is the
    raised surface. RULE: wrap any new page's toolbar controls in
-   <div class="toolbar-panel">вЂ¦</div>.
+   <div class="toolbar-panel">…</div>.
    ============================================================================ */
 .hd-page .cal-toggle-bar.hd-toolbar { flex-wrap: wrap; row-gap: 8px; }
 .toolbar-panel {
@@ -6028,7 +6028,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   background: var(--bg-panel-2); border: 1px solid var(--line); border-radius: 8px;
   padding: 7px 12px;
 }
-/* Switches + chip/label groups go FLAT (transparent) вЂ” the panel border replaces
+/* Switches + chip/label groups go FLAT (transparent) — the panel border replaces
    their individual pill borders. Inputs/selects (search, price combo, View select)
    keep their own field border. Chips keep their own design. */
 .toolbar-panel .ua-upgrades-toggle,
@@ -6042,7 +6042,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .toolbar-panel .ua-upgrades-toggle:hover { border-color: transparent; }
 .toolbar-panel .ua-upgrades-toggle { padding: 4px 4px; gap: 5px; }
-/* Thin divider before every control except the first вЂ” so the panel reads as one
+/* Thin divider before every control except the first — so the panel reads as one
    surface with sections. EXCEPT between two consecutive switches (they group
    tightly, no divider). */
 .toolbar-panel > *:not(:first-child) { position: relative; padding-left: 12px; }
@@ -6171,8 +6171,8 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .hl-hud {
   display: grid;
-  /* Wide portrait column matches the hero-art asset's native aspect (в‰€ 16:9),
-     same approach as heroes_stats `.mr-ico` (36Г—26 = 1.38:1). 124Г—72 keeps the
+  /* Wide portrait column matches the hero-art asset's native aspect (≈ 16:9),
+     same approach as heroes_stats `.mr-ico` (36×26 = 1.38:1). 124×72 keeps the
      portrait readable without forcing it into a square. */
   grid-template-columns: auto minmax(0, 1fr);
   gap: 14px;
@@ -6231,7 +6231,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   cursor: pointer;
 }
 .hl-hero-icon {
-  /* Same pattern as heroes_stats `.mr-ico` вЂ” wide rect, cover-fit so the hero
+  /* Same pattern as heroes_stats `.mr-ico` — wide rect, cover-fit so the hero
      art fills the box without letterboxing. Codex noted: `icons/heroes/*.png`
      is a wide art asset, not square. */
   width: 124px;
@@ -6294,40 +6294,40 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   -webkit-appearance: none;
   margin: 0;
 }
-/* Dota 2 Reborn HUD inventory вЂ” visual model from the actual HUD screenshot:
-     вЂў the 3Г—2 main grid is a single piece вЂ” slots are very dark almost-black
+/* Dota 2 Reborn HUD inventory — visual model from the actual HUD screenshot:
+     • the 3×2 main grid is a single piece — slots are very dark almost-black
        wells separated by thin light-gray dividers, achieved with the classic
        "container with a light bg + dark slots + gap" trick (the bg shows
-       through the gaps as the dividers вЂ” no per-slot borders needed);
-     вЂў the round neutral slot sits on its OWN dark backdrop outside the main
-       grid, with just a thin dark ring border вЂ” NOT the silver `circle_frame`
+       through the gaps as the dividers — no per-slot borders needed);
+     • the round neutral slot sits on its OWN dark backdrop outside the main
+       grid, with just a thin dark ring border — NOT the silver `circle_frame`
        texture (that one has a decorative right-side tab and is used elsewhere
        in the HUD, not for inventory slots);
-     вЂў backpack/courier slots (the 3 angled ones in Valve's screenshot) are
-       NOT modelled вЂ” Hero Lab has only 6 + 1 neutral.
+     • backpack/courier slots (the 3 angled ones in Valve's screenshot) are
+       NOT modelled — Hero Lab has only 6 + 1 neutral.
    Why I dropped the extracted plate texture (`inventory_bg.png`): on close
    inspection its diagonal lines are random stone scratches, not the slot grid,
    so using it as a background under CSS slots gave a noisy look that didn't
    match the screenshot's clean grid. The HUD's actual visible "slot well"
-   look IS the CSS gap/divider trick вЂ” Valve's panorama renderer composites a
+   look IS the CSS gap/divider trick — Valve's panorama renderer composites a
    subtle slate onto the page behind the slots, then draws the slots as flat
    colour boxes; here we just use the page's own dark colour for the divider
    tone and skip the texture entirely. */
 /* Authoritative values from Valve's HUD_Inventory.res + HUD_InventoryStash.res:
-   вЂў InventoryButton wide=48 tall=36 в†’ slot is 48Г—36 px (native).
-   вЂў InventoryBackground1 fillcolor "0 0 0"   в†’ outer plate fill = pure black.
-   вЂў InventoryBackground2 fillcolor "36 36 36" в†’ inner panel fill = #242424
+   • InventoryButton wide=48 tall=36 → slot is 48×36 px (native).
+   • InventoryBackground1 fillcolor "0 0 0"   → outer plate fill = pure black.
+   • InventoryBackground2 fillcolor "36 36 36" → inner panel fill = #242424
      (this is what shows through the gaps between slots as the "divider"
-     colour вЂ” NOT the light gray I had before).
-   вЂў Each slot also gets `materials/vgui/hud/item_bg.vmat` as its own image
+     colour — NOT the light gray I had before).
+   • Each slot also gets `materials/vgui/hud/item_bg.vmat` as its own image
      (per-slot texture). When the user provides the extracted item_bg PNG it
      will become each slot's background; until then we approximate with a flat
      near-black fill that matches the slot interior in the HUD screenshot. */
-/* в”Ђв”Ђ Hero Lab inventory вЂ” Valve Reborn HUD accurate в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
-   Layout: [ 3Г—2 slot grid ] [ neutral circle ]
+/* ── Hero Lab inventory — Valve Reborn HUD accurate ──────────────────────
+   Layout: [ 3×2 slot grid ] [ neutral circle ]
                               [ enchant circle ]
    Source assets: icons/inventory/
-   в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+   ──────────────────────────────────────────────────────────────────────── */
 .hl-inventory {
   display: flex;
   align-items: flex-start;
@@ -6335,10 +6335,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   justify-self: end;
   margin-left: auto;
 }
-/* 6-slot grid вЂ” inventory_bg_bg_psd.png clipped to exact slot area.
-   The source PNG is 296Г—216 (includes backpack region below).
-   Slots: 60Г—45. Margins 3px each side H, 2px each side V в†’ column-gap 6px,
-   row-gap 4px. Fixed height = 2Г—45 + 1Г—4 + 2Г—2 = 98px. */
+/* 6-slot grid — inventory_bg_bg_psd.png clipped to exact slot area.
+   The source PNG is 296×216 (includes backpack region below).
+   Slots: 60×45. Margins 3px each side H, 2px each side V → column-gap 6px,
+   row-gap 4px. Fixed height = 2×45 + 1×4 + 2×2 = 98px. */
 .hl-inv-grid {
   display: grid;
   grid-template-columns: repeat(3, 60px);
@@ -6354,7 +6354,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   background-position: top left;
   background-repeat: no-repeat;
 }
-/* Each slot: 60Г—45, inventory_item_well_psd.png well texture over dark bg */
+/* Each slot: 60×45, inventory_item_well_psd.png well texture over dark bg */
 .hl-inv-grid .hl-inv-slot {
   position: relative;
   width: 60px;
@@ -6395,7 +6395,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 /* No connector pseudo-element */
 .hl-neutral-stack::after { content: none; }
-/* Neutral slot вЂ” 56Г—56 circle with Valve bg_neutral_slot_png.png texture */
+/* Neutral slot — 56×56 circle with Valve bg_neutral_slot_png.png texture */
 .hl-neutral-slot {
   position: relative;
   width: 56px;
@@ -6419,7 +6419,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   border-radius: 50%;
 }
 .hl-neutral-slot:hover { filter: brightness(1.5); z-index: 2; }
-/* Enchant slot вЂ” 34Г—34 circle, metallic, no bg_neutral texture */
+/* Enchant slot — 34×34 circle, metallic, no bg_neutral texture */
 .hl-enchant-slot {
   position: relative;
   width: 34px;
@@ -6450,17 +6450,17 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   cursor: default;
   filter: none;
 }
-/* Hide N/E labels вЂ” no text markers */
+/* Hide N/E labels — no text markers */
 .hl-neutral-mark,
 .hl-enchant-mark {
   display: none;
 }
-/* Bevel/glow spans вЂ” make invisible */
+/* Bevel/glow spans — make invisible */
 .hl-slot-bevel,
 .hl-slot-glow {
   display: none;
 }
-/* Remove-item Г— button */
+/* Remove-item × button */
 .hl-slot-clear {
   position: absolute; top: -5px; right: -5px;
   width: 16px; height: 16px; border-radius: 50%;
@@ -6850,7 +6850,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .hl-diff-row strong.neg { color: #ff7b72; }
 .hl-diff-row strong.zero { color: var(--text-dimmer); }
 
-/* в”Ђв”Ђ Hero Lab: Dota-style stats UI в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* ── Hero Lab: Dota-style stats UI ─────────────────────────────────────── */
 .hl-dota-stats {
   margin-top: 10px;
   font-family: Radiance, sans-serif;
@@ -7263,7 +7263,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   color: rgba(255,255,255,0.4);
   margin-left: 4px;
 }
-/* ---- Item tooltip вЂ” 1:1 port of the in-game Dota 2 Panorama tooltip ----
+/* ---- Item tooltip — 1:1 port of the in-game Dota 2 Panorama tooltip ----
    Values lifted from the decompiled game CSS (tooltip_ability.css +
    ability_details_v2.css): colors are the Valve @define constants, the
    container is the AbilityContents shell, typography is Radiance.
@@ -7293,9 +7293,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   align-items: center;
   padding: 11px 12px 9px;
 }
-/* Neutral items вЂ” tier-coloured header (game NeutralTier1..5 palette):
+/* Neutral items — tier-coloured header (game NeutralTier1..5 palette):
      T1 #BEBEBE  T2 #92E47E  T3 #7F93FC  T4 #D57BFF  T5 #FFE195
-   Header gets the tier tint (col@~20% в†’ ~2%); name takes the tier colour. */
+   Header gets the tier tint (col@~20% → ~2%); name takes the tier colour. */
 .hl-tooltip.neutral-tier-1 .hlt-head { background: linear-gradient(to right, #BEBEBE33, #BEBEBE05); }
 .hl-tooltip.neutral-tier-2 .hlt-head { background: linear-gradient(to right, #92E47E33, #92E47E05); }
 .hl-tooltip.neutral-tier-3 .hlt-head { background: linear-gradient(to right, #7F93FC33, #7F93FC05); }
@@ -7320,7 +7320,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   font-size: 18px;
   font-weight: 600;            /* Radiance SemiBold */
   text-transform: uppercase;
-  letter-spacing: 0.5px;       /* TitleFont (game uses 2px panorama-units в†’ ~0.5px web) */
+  letter-spacing: 0.5px;       /* TitleFont (game uses 2px panorama-units → ~0.5px web) */
   text-shadow: 2px 2px 0 #000;
 }
 .hlt-cost {
@@ -7354,8 +7354,11 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   color: #8698B0;             /* TextColorDark */
 }
 .hlt-stat b {
-  color: #CEDDF0;             /* TextColorLight вЂ” the bonus number */
+  color: #CEDDF0;             /* TextColorLight — the bonus number */
   font-weight: 600;
+}
+.hlt-penalty, .hlt-penalty b {
+  color: #F44336;
 }
 .hlt-ability-bar {
   display: flex;
@@ -7367,10 +7370,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-/* Ability header bar вЂ” tinted by type, matching the in-game item tooltip:
-     passive  bg #1c262fв†’#1b262f  text #626d7b
-     active   bg #171d2fв†’#1b2437  h1   #b0b0ff
-     use      bg #15221fв†’#1a2926  text #95c07a  (consumables: Tango, Salve) */
+/* Ability header bar — tinted by type, matching the in-game item tooltip:
+     passive  bg #1c262f→#1b262f  text #626d7b
+     active   bg #171d2f→#1b2437  h1   #b0b0ff
+     use      bg #15221f→#1a2926  text #95c07a  (consumables: Tango, Salve) */
 .hlt-ability-bar.is-passive {
   background: linear-gradient(to bottom, #1c262f, #1b262f);
   color: #b8c2cf;
@@ -7400,7 +7403,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   background-repeat: no-repeat;
 }
 /* In-game the cost VALUES are all one color (TextColorLight); only the
-   icons are colored вЂ” so don't tint the text per type. */
+   icons are colored — so don't tint the text per type. */
 .hlt-cost-icon { color: #CEDDF0; }
 .hlt-cast-range::before { background-image: url('icons/misc/tt_castrange.png'); }
 .hlt-mana-cost::before { background-image: url('icons/misc/tt_manacost.png'); }
@@ -7512,7 +7515,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .hs-level-group span {
   color: var(--text-dim);
   /* Match the "View" label spec (the toolbar-label standard): 600 / 11px /
-     0.6px tracking вЂ” was 700 / 12px, which read taller than its neighbours. */
+     0.6px tracking — was 700 / 12px, which read taller than its neighbours. */
   font-weight: 600;
   font-size: 11px;
   text-transform: uppercase;
@@ -7529,7 +7532,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   font: inherit;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  /* Hide native number-spinner controls вЂ” easy to misclick when aiming at
+  /* Hide native number-spinner controls — easy to misclick when aiming at
      the field itself. Keyboard +/- + scroll-wheel still work. */
   -moz-appearance: textfield;
   appearance: textfield;
@@ -7549,7 +7552,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   cursor: not-allowed;
 }
 /* A toolbar search box always sits on its OWN full-width row at the bottom of the
-   panel (flex-basis 100% forces a wrap) вЂ” even when there are few other controls.
+   panel (flex-basis 100% forces a wrap) — even when there are few other controls.
    No leading divider/indent since it owns its row. */
 .toolbar-panel > .hd-search {
   flex: 1 1 100%; min-width: 0; padding-left: 0; margin-top: 2px;
@@ -7566,7 +7569,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .hd-search { flex: 0 1 240px; min-width: 150px; }
 .hd-search input { height: 32px; box-sizing: border-box; }
 /* "Remove" tag chips: the patch-page badges, clickable. A removed tag sinks in
-   (inset shadow + nudge) and greys out вЂ” visibly "off". */
+   (inset shadow + nudge) and greys out — visibly "off". */
 .hd-tag {
   cursor: pointer; user-select: none; font-family: inherit; font-size: 11px;
   padding: 2px 9px; transition: filter 0.12s, transform 0.12s, opacity 0.12s, box-shadow 0.12s;
@@ -7577,7 +7580,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   box-shadow: inset 0 2px 4px var(--shadow-55);
 }
 /* Multi-select dropdown (items_dyn Type / Category): the button is FLAT inside the
-   panel вЂ” no own box/border, just text + caret like the switches, so every control
+   panel — no own box/border, just text + caret like the switches, so every control
    shares one height and the panel is the only border. The gold badge shows the
    selected count (blank when all are selected = no active filter). Only the popover
    itself is a floating box. */
@@ -7618,7 +7621,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    (z up to 52, hover-zoom 60) so an open dropdown popover isn't hidden under them.
    Overrides the z-index:6 from `.creeps-scroll > .inbox-bar`. */
 .creeps-scroll > .cal-toggle-bar.hd-toolbar { z-index: 62; }
-/* Price filter (items_dyn + mana_items, both use .toolbar-panel): FLAT вЂ” the range
+/* Price filter (items_dyn + mana_items, both use .toolbar-panel): FLAT — the range
    has no box, inputs read as underlined fields, label is muted. Same height as the
    rest. The 12px inner left padding keeps the "Price" label off the focus-ring border
    even when the control is the panel's FIRST child (mana_items, where the divider's
@@ -7639,7 +7642,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .toolbar-panel .mr-price-clear { border-left: none; }
 /* Uniform 32px height for the flat switches too, so every panel control lines up. */
 .toolbar-panel .ua-upgrades-toggle { height: 32px; }
-/* Full-height vertical divider separating super-category (base-version) groups вЂ”
+/* Full-height vertical divider separating super-category (base-version) groups —
    same idea as Neutral Creeps' .col-sep category dividers. On the first column
    of each group (except the first); aligns with the cat-row's group border. */
 .heroes-dyn-table th.hd-gsep,
@@ -7653,7 +7656,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 /* Super-category row: base version (e.g. 7.41) spanning its lettered variants
    (7.41/a/b/c). Reuses the shared .cat-head sticky/layout infrastructure;
    overrides the dim-uppercase look for a centred version number. Solo bases
-   (single patch, no letters) render an empty cell вЂ” no label. JS
+   (single patch, no letters) render an empty cell — no label. JS
    dynRecomputeSupercats() re-spans these to the visible columns after fit. */
 .heroes-dyn-table thead tr.cat-row th.hd-supercat {
   font-size: 12px; text-transform: none; letter-spacing: 0.02em;
@@ -7673,33 +7676,33 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   line-height: 0;
 }
 /* Trailing spacer column: fills the reserved right-edge gutter (where the last
-   patch column's 2.5Г— hover-pop overflows) with a clipped slice of an empty
+   patch column's 2.5× hover-pop overflows) with a clipped slice of an empty
    column, so the grid reaches the box edge instead of ending in blank space.
    Fixed 24px (= HD_RIGHT_GUTTER in scripts.js); the 28px empty diamond is
-   left-aligned and clipped by the cell в†’ reads as a column cut off at the edge. */
+   left-aligned and clipped by the cell → reads as a column cut off at the edge. */
 .creeps-table.heroes-dyn-table th.hd-spacer,
 .creeps-table.heroes-dyn-table td.hd-spacer {
   width: 24px; min-width: 24px; max-width: 24px;
   overflow: hidden;
   text-align: left;
 }
-/* The trailing spacer is pure hover-pop room for the last patch column вЂ” render
+/* The trailing spacer is pure hover-pop room for the last patch column — render
    NOTHING in it (no empty diamond). A faded square still read as "the grid continues
    past the last patch"; an invisible gutter just lets the grid end cleanly. */
 .creeps-table.heroes-dyn-table td.hd-spacer::after { display: none; }
-/* Bigger pill in the matrix than on patch pages (28px vs 24px) вЂ” more legible
+/* Bigger pill in the matrix than on patch pages (28px vs 24px) — more legible
    in a dense grid; scoped so patch pages keep their size. */
 .heroes-dyn-table .dyn-cell-wrap { width: 28px; height: 28px; }
 /* PERF: empty cells are the bulk of the ~14k-cell grid. A flat fill (NO
    box-shadow, no opacity layer) paints far cheaper than thousands of inset
-   shadows вЂ” the main scroll-jank source on this page. */
+   shadows — the main scroll-jank source on this page. */
 .heroes-dyn-table td.hd-cell.hd-empty::after,
 .heroes-dyn-table td.he::after {
   content: ''; display: inline-block; width: 28px; height: 28px; border-radius: 4px;
   background: rgba(12, 14, 19, 0.72);
 }
 /* Outside the item's lifespan (items_dyn): the item wasn't in the game in this
-   patch вЂ” either not added yet, or already removed. NO empty-slot square; just a
+   patch — either not added yet, or already removed. NO empty-slot square; just a
    tiny faint dot so the live span reads as a clear band of slots flanked by
    "n/a" gaps. Flat fill (no shadow) keeps the big grid cheap to paint. */
 .heroes-dyn-table td.hd-cell.hd-absent::after,
@@ -7707,7 +7710,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%;
   background: rgba(125, 135, 155, 0.16);
 }
-/* In a marked row the n/a dots STAY visible вЂ” they carry meaning (the item
+/* In a marked row the n/a dots STAY visible — they carry meaning (the item
    didn't exist in those patches), unlike the decorative empty diamonds (below)
    which drop out. Bump the alpha a touch so the faint dot reads on the gold band. */
 .heroes-dyn-table tbody tr.row-marked td.hd-cell.hd-absent::after,
@@ -7724,7 +7727,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .heroes-dyn-table td.he,
 .heroes-dyn-table td.ha { text-align: center; vertical-align: middle; padding: 2px; line-height: 0; }
-/* Buff/nerf-only: a touched cell with no buff/nerf reads as an EMPTY cell вЂ”
+/* Buff/nerf-only: a touched cell with no buff/nerf reads as an EMPTY cell —
    flat fill, no glassy pill, no hover pop. Hover still fires the tooltip. */
 .heroes-dyn-table .dyn-cell-wrap.bn-empty .dyn-cell,
 .heroes-dyn-table .dyn-cell-wrap.bn-empty:hover .dyn-cell {
@@ -7735,36 +7738,36 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 /* RULE (all tables): the gold row-mark must read as ONE uniform band + frame
    (like Neutral Creeps / Abilities), not per-cell boxes. The decorative empty
-   diamonds otherwise sit on the gold tint as separate squares вЂ” drop their fill
+   diamonds otherwise sit on the gold tint as separate squares — drop their fill
    inside a marked row so the tint shows through uniformly (coloured pills stay,
    like icons do on the creeps marked row). */
 .heroes-dyn-table tbody tr.row-marked td.hd-cell.hd-empty::after,
 .heroes-dyn-table tbody tr.row-marked td.he::after { background: transparent; }
 /* RULE (all tables): a hovered/zoomed dyn-cell must sit ABOVE the sticky header,
    never behind it. The wrap is position:relative; bumping its z-index over the
-   header (z:50) inside the .creeps-scroll stacking context lifts the 2.5Г— pop and
+   header (z:50) inside the .creeps-scroll stacking context lifts the 2.5× pop and
    its tooltip clear of the pinned header for top rows. */
 .heroes-dyn-table .dyn-cell-wrap:hover { z-index: 60; }
-/* Reserve room below the grid for the bottom row's 2.5Г— hover-pop. A scaled
+/* Reserve room below the grid for the bottom row's 2.5× hover-pop. A scaled
    element's box counts toward the scroll container's scrollable overflow, so
    when the list is filtered short (no scrollbar) the bottom-row pop extends
    past the content and spawns a spurious vertical scrollbar on hover. The pop
    grows into this padding instead of past the scrollable edge. (~21px pop
-   overflow for the 28pxв†’70px cell.) */
+   overflow for the 28px→70px cell.) */
 .creeps-scroll:has(.heroes-dyn-table) { padding-bottom: 24px; }
 /* Same hover-pop room for AoE Increase: with a short filtered roster the last
    visible ability icon must grow upward inside the scroll box instead of into
    the horizontal scrollbar / bottom clip edge. */
 .creeps-scroll:has(.aoe-table) { padding-bottom: 24px; }
-/* RULE (all tables): use the shared .creeps-scroll shell AS-IS вЂ” NO per-page
+/* RULE (all tables): use the shared .creeps-scroll shell AS-IS — NO per-page
    left gutter. The subnav (10px), blurb/toolbar (28px) and table (flush) keep
    the SAME left positions as Neutral Creeps / Abilities so every Materials page
    lines up identically. (An earlier .hd-page padding-left shifted this page's
-   subnav + table right of the others вЂ” removed.) */
+   subnav + table right of the others — removed.) */
 .creeps-table .creep-icon-cell img {
   width: 48px;
   height: 27px;
-  /* Override the global `img { max-width: 100% }` rule вЂ” otherwise the
+  /* Override the global `img { max-width: 100% }` rule — otherwise the
      auto-sized icon column (its <th> is empty, so it starts ~0px wide)
      caps the image width to the collapsed cell, leaving a 3px-wide
      vertical sliver. max-width: none lets the explicit 48px win and the
@@ -7775,7 +7778,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   background: rgba(139, 148, 158, 0.15);
   display: inline-block;
   vertical-align: middle;
-  /* Depth treatment вЂ” the bare crops read as flat rectangles otherwise.
+  /* Depth treatment — the bare crops read as flat rectangles otherwise.
      A 1px cool rim + soft drop shadow + inner top highlight give the
      portrait a "card" dimensionality matching the dark-glass nav. */
   border: 1px solid var(--blue-18);
@@ -7806,15 +7809,15 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .creeps-table tbody tr:last-child .abil-ico-wrap {
   transform-origin: center bottom;
 }
-/* Vertical section separators вЂ” a brighter right border grouping the
+/* Vertical section separators — a brighter right border grouping the
    table into identity | survivability | offense | economy | utility. */
-/* Category boundary вЂ” left border on the first column of each super-category
+/* Category boundary — left border on the first column of each super-category
    (always a Standard column, so it shows in both views). */
 .creeps-table th.col-sep,
 .creeps-table td.col-sep {
   border-left: 2px solid var(--blue-30);
 }
-/* Sortable headers вЂ” click to sort. The в–ѕ indicator brightens to в–І/в–ј on
+/* Sortable headers — click to sort. The ▾ indicator brightens to ▲/▼ on
    the active column. */
 .creeps-table th.sortable {
   cursor: pointer;
@@ -7823,13 +7826,13 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .creeps-table th.sortable:hover {
   background: #1d2530;
 }
-/* Sort indicator вЂ” thin line arrows (в†• / в†‘ / в†“) instead of heavy filled
+/* Sort indicator — thin line arrows (↕ / ↑ / ↓) instead of heavy filled
    triangles, for a more refined look. Dim until the column is active. */
-/* Sort indicator centering вЂ” shared by Neutral Creeps, Unit Abilities and
-   Mana Items so all three behave identically. The bare в†•/в†‘/в†“ glyphs hang
+/* Sort indicator centering — shared by Neutral Creeps, Unit Abilities and
+   Mana Items so all three behave identically. The bare ↕/↑/↓ glyphs hang
    low on the baseline; vertical-align: middle + a small upward nudge pulls
    them onto the header text's optical centre. */
-/* Label + arrow both vertical-align:middle so they share ONE midline вЂ”
+/* Label + arrow both vertical-align:middle so they share ONE midline —
    otherwise the uppercase label aligns to its baseline while the arrow
    centres on x-height, dropping it below the letters. */
 .creeps-table th.sortable .th-label,
@@ -7847,7 +7850,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   top: -0.04em;
   width: 11px;
   height: 11px;
-  /* Coloured via background-color through a PNG mask вЂ” neutral default
+  /* Coloured via background-color through a PNG mask — neutral default
      greyish, gold when the column is actively sorted (site accent var(--gold)). */
   background-color: rgba(201, 209, 217, 0.55);
   -webkit-mask: url('icons/sort/sort.png') center / contain no-repeat;
@@ -7885,7 +7888,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   text-decoration: underline dotted rgba(170, 220, 240, 0.5);
   text-underline-offset: 3px;
 }
-/* Per-stat changelog tooltip вЂ” body-level (escapes the .creeps-scroll
+/* Per-stat changelog tooltip — body-level (escapes the .creeps-scroll
    overflow clip), positioned by scripts.js above the hovered cell.
    font-size matches the table cells (11.5px). */
 .stat-hist-tip {
@@ -7905,7 +7908,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   /* Tall histories (e.g. Guardian Greaves) would overflow the viewport.
      Cap height and let the tooltip scroll internally; JS clamps the top so
      the box never runs off-screen. pointer-events stays none so the wheel
-     scrolls the page, not the tip вЂ” fine, the cap keeps it readable. */
+     scrolls the page, not the tip — fine, the cap keeps it readable. */
   max-height: calc(100vh - 24px);
   overflow-y: auto;
 }
@@ -7915,7 +7918,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   border-top: 1px solid var(--line-soft);
   margin-top: 3px;
 }
-/* Net firstв†’today summary pinned at the top of the tooltip, divider below. */
+/* Net first→today summary pinned at the top of the tooltip, divider below. */
 .stat-hist-tip .stat-net {
   padding: 1px 0 6px;
   margin-bottom: 5px;
@@ -7953,7 +7956,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .stat-hist-tip .chg-label { color: #adbac7; }
 .stat-hist-tip .chg-cycle { color: var(--text-main); padding: 0 3px; }
-/* Ability tags вЂ” same palette as the changelog NEW/DEL badges. */
+/* Ability tags — same palette as the changelog NEW/DEL badges. */
 .stat-hist-tip .chg-tag {
   display: inline-block;
   margin-left: 6px;
@@ -7968,7 +7971,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .stat-hist-tip .chg-tag.added    { color: #9a7f4d; background: rgba(220,175,95,0.06); border-color: rgba(220,175,95,0.22); }
 .stat-hist-tip .chg-tag.removed  { color: #a86060; background: rgba(180,70,70,0.07); border-color: rgba(180,70,70,0.25); }
 .stat-hist-tip .chg-tag.replaced { color: #7f9cc4; background: rgba(120,150,200,0.07); border-color: rgba(120,150,200,0.25); }
-/* % delta вЂ” muted green for an increase (stat up = buff), muted red for
+/* % delta — muted green for an increase (stat up = buff), muted red for
    a decrease. Less saturated than the changelog badges to read softer in
    the tooltip. */
 .stat-hist-tip .stat-pct { font-weight: 600; margin-left: 7px; }
@@ -7976,24 +7979,24 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .stat-hist-tip .stat-pct.down { color: #cf8b8b; }
 .stat-hist-tip .stat-pct.flat { color: var(--text-dim); }
 /* Per-column value tints. */
-.creeps-table td.col-hp_regen { color: #9ae66e; }   /* light green (СЃР°Р»Р°С‚РѕРІС‹Р№) */
-.creeps-table td.col-mp_regen { color: #6fc3ec; }   /* light blue (РіРѕР»СѓР±РѕРІР°С‚С‹Р№) */
+.creeps-table td.col-hp_regen { color: #9ae66e; }   /* light green (салатовый) */
+.creeps-table td.col-mp_regen { color: #6fc3ec; }   /* light blue (голубоватый) */
 .mr-table.hs-table td.hs-col-hpr { color: #9ae66e; }
 .mr-table.hs-table td.hs-col-mpr { color: #6fc3ec; }
 .creeps-table td.col-hp_regen.regen-zero,
 .mr-table.hs-table td.hs-col-hpr.regen-zero { color: rgba(154, 230, 110, 0.42); }
 .creeps-table td.col-mp_regen.regen-zero,
 .mr-table.hs-table td.hs-col-mpr.regen-zero { color: rgba(111, 195, 236, 0.42); }
-.creeps-table td.col-gold     { color: #e3b341; }   /* gold (Р·РѕР»РѕС‚РѕР№) */
-.creeps-table td.col-xp       { color: #8bb8d6; }   /* dusty blue (РїС‹Р»СЊРЅРѕ-РіРѕР»СѓР±РѕР№) */
+.creeps-table td.col-gold     { color: #e3b341; }   /* gold (золотой) */
+.creeps-table td.col-xp       { color: #8bb8d6; }   /* dusty blue (пыльно-голубой) */
 /* Attack-type value colors. */
-.creeps-table td.atk-basic    { color: #56d364; }   /* "РћР±С‹С‡РЅС‹Р№" вЂ” green */
-.creeps-table td.atk-pierce   { color: #b18cd9; }   /* "РџСЂРѕРЅРёРєР°СЋС‰РёР№" вЂ” muted purple */
-/* Tier-break: thicker top border between level groups (РЈСЂ. changes). */
+.creeps-table td.atk-basic    { color: #56d364; }   /* "Обычный" — green */
+.creeps-table td.atk-pierce   { color: #b18cd9; }   /* "Проникающий" — muted purple */
+/* Tier-break: thicker top border between level groups (Ур. changes). */
 .creeps-table tr.tier-break td {
   border-top: 2px solid rgba(170, 220, 240, 0.55);
 }
-/* "Copied" toast вЂ” fixed-positioned near the clicked icon, fades in
+/* "Copied" toast — fixed-positioned near the clicked icon, fades in
    quickly then drifts up and out. JS positions it and toggles
    .is-visible; the transition handles the fade + lift. */
 .copy-toast {
@@ -8031,7 +8034,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   white-space: nowrap;
   line-height: 1.2;
 }
-/* Subscript header sub-label (EHP "phys"/"mag") вЂ” small dim text set to
+/* Subscript header sub-label (EHP "phys"/"mag") — small dim text set to
    the bottom-right of the main word, like a formula subscript, so the
    column stays narrow without a full second line. */
 .creeps-table thead th .th-sub {
@@ -8042,7 +8045,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   /* Nudge down like a subscript via relative offset + zero line-height so the
      sub-label does NOT grow the header's line box. vertical-align:sub would
      enlarge the row only where EHP columns appear (Expanded), making the whole
-     header taller than in Standard вЂ” the cause of the height "jump" on toggle. */
+     header taller than in Standard — the cause of the height "jump" on toggle. */
   display: inline-block;
   position: relative;
   top: 2px;
@@ -8051,7 +8054,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .creeps-table tbody td {
   padding: 5px 8px;
   border-bottom: 1px solid rgba(139, 148, 158, 0.12);
-  /* Single-line cells: every value is short (numbers, %, "Р‘Р»РёР¶РЅСЏСЏ (100)",
+  /* Single-line cells: every value is short (numbers, %, "Ближняя (100)",
      ability dnames like "Envenomed Weapon"). nowrap lets table-layout:
      auto size each column to the widest single-line content, so the
      browser picks ideal widths and nothing wraps awkwardly. */
@@ -8059,13 +8062,13 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   vertical-align: middle;
   line-height: 1.3;
 }
-/* Row hover tint on the <tr> (not the <td>) so cell-specific colours вЂ” Damage
-   Type tints, etc. вЂ” paint on top and stay visible; the hover shows through
+/* Row hover tint on the <tr> (not the <td>) so cell-specific colours — Damage
+   Type tints, etc. — paint on top and stay visible; the hover shows through
    transparent cells and underneath the semi-transparent coloured ones. */
 .creeps-table tbody tr:hover {
   background: rgba(56, 139, 253, 0.08);
 }
-/* Click-toggled row mark вЂ” matches the Mana Items style: gold inset frame
+/* Click-toggled row mark — matches the Mana Items style: gold inset frame
    around the whole row + soft tint, no fade animation. Single-select
    (clicking another row moves the mark). */
 .creeps-table tbody tr.row-marked > td {
@@ -8093,7 +8096,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .creeps-table tbody tr.row-marked:hover .sticky-col { --sticky-bg: #34291e; }
 /* A marked row's sticky identity cell must keep its opaque fill UNDERNEATH the
    gold frame. The generic `.row-marked > td:first-child/:last-child` frame is a
-   box-shadow, and box-shadow is a single property вЂ” so it REPLACES the sticky
+   box-shadow, and box-shadow is a single property — so it REPLACES the sticky
    cell's `inset 0 0 0 9999px var(--sticky-bg)` fill that normally covers the
    collapsed-border seam. Without the fill, the seam bled at the column junction
    (looked like a small gap between Hero and the next column). Re-add the fill as
@@ -8119,9 +8122,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
     inset  0    0   0 9999px var(--sticky-bg);
 }
 /* Legacy .row-flash class (one-shot fade) is no longer applied by JS but
-   the keyframes still live below вЂ” harmless dead CSS, retained so any
+   the keyframes still live below — harmless dead CSS, retained so any
    third-party styling doesn't break. */
-/* First column (unicode tier dots) вЂ” centered glyph, smaller letter-spacing. */
+/* First column (unicode tier dots) — centered glyph, smaller letter-spacing. */
 .creeps-table th:first-child,
 .creeps-table td:first-child {
   text-align: center;
@@ -8129,11 +8132,11 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   letter-spacing: 1px;
   white-space: normal;
 }
-/* Per-tier row tint вЂ” lighter for top picks, darker for fallback. */
-.creeps-table tr.tier-1 td:first-child { color: #56d364; }   /* best pick вЂ” green */
-.creeps-table tr.tier-2 td:first-child { color: #d29922; }   /* situational вЂ” amber */
-.creeps-table tr.tier-3 td:first-child { color: #db6d28; }   /* rare/early вЂ” orange */
-.creeps-table tr.tier-4 td:first-child { color: #f85149; }   /* worst вЂ” red */
+/* Per-tier row tint — lighter for top picks, darker for fallback. */
+.creeps-table tr.tier-1 td:first-child { color: #56d364; }   /* best pick — green */
+.creeps-table tr.tier-2 td:first-child { color: #d29922; }   /* situational — amber */
+.creeps-table tr.tier-3 td:first-child { color: #db6d28; }   /* rare/early — orange */
+.creeps-table tr.tier-4 td:first-child { color: #f85149; }   /* worst — red */
 /* Tier legend footer rows (no data, just label in column 3). */
 .creeps-table tr.creeps-footer td {
   background: rgba(139, 148, 158, 0.06);
@@ -8152,11 +8155,11 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    09. MANA ITEMS
    ========================================================================== */
 
-/* Notes section below the creeps table вЂ” long prose cells the spreadsheet
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ MANA REGEN TABLE в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+/* Notes section below the creeps table — long prose cells the spreadsheet
+/* ───────────────────────── MANA REGEN TABLE ───────────────────────────── */
 .mr-blurb {
   /* Spans the full page width on every table page (Neutral Creeps /
-     Neutral Abilities / Mana Items) вЂ” no max-width clamp. The toolbar's
+     Neutral Abilities / Mana Items) — no max-width clamp. The toolbar's
      padding-top below handles the gap to the View / Price controls. */
   margin: 4px 0 0;
   font-size: 13px;
@@ -8181,7 +8184,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
      splits the remaining page width EQUALLY (no auto-sized narrow/wide mix). */
   table-layout: fixed;
 }
-/* Item column вЂ” wide enough for the icon + longest item name. */
+/* Item column — wide enough for the icon + longest item name. */
 .mr-table .mr-col-name,
 .mr-table .mr-name {
   width: 230px;
@@ -8195,7 +8198,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .mr-table thead th,
 .mr-table tbody td {
-  /* Faint vertical separator on the left edge вЂ” matches Neutral Creeps /
+  /* Faint vertical separator on the left edge — matches Neutral Creeps /
      Unit Abilities table convention. Skipped on the first column below. */
   border-left: 1px solid rgba(170, 220, 240, 0.12);
 }
@@ -8204,7 +8207,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   border-left: none;
 }
 .mr-table thead th {
-  /* Typography matched 1:1 to .creeps-table thead th вЂ” inherits the 11.5px
+  /* Typography matched 1:1 to .creeps-table thead th — inherits the 11.5px
      table font size (no override), same weight, colour, padding, casing,
      line-height so all three tables share one header design. */
   background: var(--bg-panel-3);
@@ -8234,11 +8237,11 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 /* Toolbar pins right under the site nav. The painted background extends a
    bit BELOW the buttons (padding-bottom) so that when the headers pin under
-   it there's a visible gap вЂ” not the buttons sitting flush on the table.
+   it there's a visible gap — not the buttons sitting flush on the table.
    JS measures the toolbar's full height (incl. this padding) into
    --mr-thead-top, so the headers pin exactly at the painted bottom edge. */
 .mr-toolbar {
-  /* Was position:sticky вЂ” user wants only the site nav and the table category
+  /* Was position:sticky — user wants only the site nav and the table category
      headers to stay pinned while scrolling. The Price filter + Hide Active
      toggle now scroll away with the page. The table thead still sticks at
      var(--mr-thead-top) so column names remain visible. */
@@ -8252,14 +8255,14 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   margin-bottom: 0;
   padding: 28px 0 14px;
 }
-/* OPAQUE hover background вЂ” a translucent one let table rows scrolling
+/* OPAQUE hover background — a translucent one let table rows scrolling
    beneath the sticky header bleed through. This is the var(--bg-panel-3) base blended
    with the old rgba(48,54,61,0.5) tint, fully opaque. */
 .mr-table thead th:hover { background: #232930; }
-/* Sort indicator вЂ” identical glyph + dim/active logic to the creeps-table
-   convention: в†• (neutral, dim), в†“ (desc, active), в†‘ (asc, active). */
+/* Sort indicator — identical glyph + dim/active logic to the creeps-table
+   convention: ↕ (neutral, dim), ↓ (desc, active), ↑ (asc, active). */
 /* (sort-ind centering is defined once in the shared rule above.) */
-/* Denser divider splitting raw stats (PriceвЂ¦Mana regen) from the computed
+/* Denser divider splitting raw stats (Price…Mana regen) from the computed
    columns (Cost per regen onward). */
 .mr-table thead th.mr-col-cost_per_regen,
 .mr-table tbody td.mr-sep {
@@ -8275,14 +8278,14 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .mr-table tbody tr:hover { background: rgba(48, 54, 61, 0.3); }
 /* Item-name cell: icon stays in a fixed-width left column so every icon
    lines up vertically. Name + dropdown arrow share the right region as
-   an inline flex group вЂ” the arrow sits flush against the name so it
+   an inline flex group — the arrow sits flush against the name so it
    reads as "expand THIS item" rather than floating at the cell edge. */
 .mr-table .mr-name {
   display: grid;
   grid-template-columns: 40px 1fr;
   align-items: center;
   /* Room so the hover-zoomed icon (.mr-ico scales 1.8) doesn't cover the name
-     вЂ” same fix as Neutral Abilities' .ua-ability-inner gap. */
+     — same fix as Neutral Abilities' .ua-ability-inner gap. */
   gap: 16px;
   text-align: left;
   min-width: 230px;
@@ -8300,7 +8303,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 
 /* Engine-constant inline chip (+12 max mana, +0.05 mana regen per Int).
    Visually it's just a bold value with the same dotted-underline cue used
-   by `.has-history` table cells вЂ” hover triggers the stat-hist-tip popup
+   by `.has-history` table cells — hover triggers the stat-hist-tip popup
    driven by data-hist. Per-patch source: Liquipedia's
    /Intelligence/Changelogs (hardcoded engine constants are not in our
    scraped patchnotes_english.txt). */
@@ -8313,7 +8316,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   text-decoration: underline dotted rgba(170, 220, 240, 0.5);
   text-underline-offset: 3px;
 }
-/* Match the patch-page convention for item icons (rectangular 50Г—36 cover) */
+/* Match the patch-page convention for item icons (rectangular 50×36 cover) */
 .mr-ico {
   width: 36px;
   height: 26px;
@@ -8325,7 +8328,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 /* Hover-zoom the item icon, mirroring the ability-icon pop-out (same scale +
-   centre origin as .abil-ico in the other tables) вЂ” symmetric expansion so it
+   centre origin as .abil-ico in the other tables) — symmetric expansion so it
    doesn't dump itself onto the item name to the right. */
 .mr-ico:hover {
   transform: scale(1.8);
@@ -8346,7 +8349,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .mr-table tbody tr.mr-active-row.mr-hide-active { display: none; }
 .mr-active-row .mr-name-text { color: var(--text-muted-blue-2); font-style: italic; }
 
-/* Price range combo вЂ” one bordered container holds both inputs + the
+/* Price range combo — one bordered container holds both inputs + the
    clear-X so they read as a single control. Inputs are borderless inside
    (focus ring is drawn on the parent). */
 .mr-price-range {
@@ -8374,7 +8377,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .mr-price-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .mr-price-input { -moz-appearance: textfield; }
 .mr-price-sep { color: var(--text-dimmer); font-size: 12px; padding: 0 2px; user-select: none; }
-/* X button вЂ” flush against the right edge of the combo, no own border.
+/* X button — flush against the right edge of the combo, no own border.
    `hidden` attr on render hides it until at least one bound is set; JS
    un-hides on input. */
 .mr-price-clear {
@@ -8398,9 +8401,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   display: none;
 }
 
-/* Clicked-row highlight вЂ” yellow outline around the ENTIRE row, not each
+/* Clicked-row highlight — yellow outline around the ENTIRE row, not each
    cell. Achieved with inset box-shadows on the TDs: top / bottom on all
-   cells, left edge on the first cell, right edge on the last cell вЂ”
+   cells, left edge on the first cell, right edge on the last cell —
    together they form one continuous gold frame around the row. */
 .mr-table tbody tr.mr-row-selected > td {
   box-shadow:
@@ -8427,7 +8430,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    10. HERO STATS
    ========================================================================== */
 
-/* в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ HERO STATS TABLE (heroes_stats.html) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+/* ───────────────────────── HERO STATS TABLE (heroes_stats.html) ───────────
    mr-table skin (flat sort / heatmap / search / stat-hist tooltips reused
    via the shared classes+ids) + hero-specific bits: sticky hero column,
    Standard/Advanced column modes, per-attribute level-30 expanders. */
@@ -8479,7 +8482,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   color: var(--text-dim);
   font-weight: 400;
 }
-/* Sticky hero column (single frozen column в†’ plain CSS sticky, no JS lefts).
+/* Sticky hero column (single frozen column → plain CSS sticky, no JS lefts).
    Solid backgrounds so scrolled columns disappear under it; header corner
    sits above both axes' pinned bars (z 51 > th 50). */
 .mr-table.hs-table td.hs-name {
@@ -8506,7 +8509,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .mr-table.hs-table td.hs-name .mr-name-body { vertical-align: middle; }
 .mr-table.hs-table tbody td { vertical-align: middle; }
-/* table-layout:fixed derives column widths from the FIRST row (the thead) вЂ”
+/* table-layout:fixed derives column widths from the FIRST row (the thead) —
    the body's .mr-name width rule doesn't reach the th, so without this the
    Hero HEADER was narrower than the hero column. */
 .mr-table.hs-table th.hs-name { width: 230px; }
@@ -8523,8 +8526,8 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 /* Selected-row gold frame on the STICKY Hero cell.
    The generic `.mr-row-selected > td(:first-child)` frame is an inset box-shadow,
    and Chromium renders box-shadow OFFSET on `position:sticky` cells (the same
-   quirk the `.sticky-frame` overlay exists for) вЂ” so the gold top/bottom lines
-   stepped down at the Heroв†”Attr seam. Draw the frame as background-gradient
+   quirk the `.sticky-frame` overlay exists for) — so the gold top/bottom lines
+   stepped down at the Hero↔Attr seam. Draw the frame as background-gradient
    layers instead (left + top + bottom bars + gold tint over the sticky base);
    backgrounds paint correctly on sticky cells, so the lines align with the
    non-sticky cells' box-shadow frame. The base `td.hs-name` background rule wins
@@ -8541,7 +8544,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   /* MUST come AFTER the `background` shorthand (which resets origin to its
      padding-box default). border-box origin puts the top/bottom bars on the
      cell's full-height edges, matching the box-shadow frame on the other
-     columns вЂ” padding-box would inset them by the cell's vertical padding and
+     columns — padding-box would inset them by the cell's vertical padding and
      draw a SHORTER gold box than the rest of the row. */
   background-origin: border-box;
 }
@@ -8554,7 +8557,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
     #1a212b;
   background-origin: border-box;
 }
-/* Hero portrait (16:9) in the name cell вЂ” same slot the item icon uses. */
+/* Hero portrait (16:9) in the name cell — same slot the item icon uses. */
 .hs-ico {
   width: 40px;
   height: 23px;
@@ -8581,7 +8584,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   display: block;
   margin: 0 auto;
 }
-/* Expanded layout grows the table HORIZONTALLY (Neutral Creeps convention) вЂ”
+/* Expanded layout grows the table HORIZONTALLY (Neutral Creeps convention) —
    auto layout + max-content width so extra columns add width and the
    .creeps-scroll box scrolls sideways, instead of fixed-layout squeezing
    every column narrower until headers clip. */
@@ -8591,7 +8594,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   min-width: 100%;
 }
 /* Even grid: every numeric column shares one width floor; headers never
-   wrap or clip вЂ” a longer header (Attack Range) widens its own column. */
+   wrap or clip — a longer header (Attack Range) widens its own column. */
 .mr-table.hs-table thead th {
   white-space: nowrap;
 }
@@ -8603,7 +8606,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 
 /* ============================================================================
-   AOE INCREASE  (aoe_increase.html вЂ” Heroes В» AoE Increase)
+   AOE INCREASE  (aoe_increase.html — Heroes » AoE Increase)
    One row per hero; each slot column = an ability whose radius is flagged
    affected_by_aoe_increase. The item filter bar rewrites every .aoe-val to
    "base > increased" live (see scripts.js AOE IIFE).
@@ -8645,7 +8648,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   object-fit: cover;
   border-radius: 4px;
 }
-/* The talent icon is a thin tree silhouette вЂ” `cover` would crop it. Keep it
+/* The talent icon is a thin tree silhouette — `cover` would crop it. Keep it
    centred and only as tall as the box allows. */
 .aoe-up-btn[data-aoe-upgrade="talent"] img {
   object-fit: contain;
@@ -8665,7 +8668,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .mr-table.aoe-table td.aoe-cell {
   /* table-cell keeps this TD in the browser's automatic row-height equalisation.
      display:grid/flex on a <td> drops it out of that algorithm (same caveat as
-     .hs-name вЂ” see the hs-table comment at line ~7966). */
+     .hs-name — see the hs-table comment at line ~7966). */
   display: table-cell;
   position: relative;
   vertical-align: middle;
@@ -8676,7 +8679,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   white-space: normal;
   text-align: left;   /* icons hug the left edge so they line up vertically */
 }
-/* Elevate the whole cell when its ability icon is hovered вЂ” same pattern as
+/* Elevate the whole cell when its ability icon is hovered — same pattern as
    dyn-cell-wrap:hover { z-index:7 }. The z-index on the TD's stacking context
    beats the sticky header (z:35) so the scaled icon paints above it. */
 .mr-table.aoe-table td.aoe-cell:has(.aoe-ico-wrap:hover) {
@@ -8718,7 +8721,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    doesn't look shorter than the ability columns (Chrome only paints a
    transparent cell to content-height in the compositing layer). The 9999px
    inset shadow is the same "fill the box" trick used in .creeps-table
-   .sticky-col вЂ” it covers any collapsed-border seam that bleeds through on
+   .sticky-col — it covers any collapsed-border seam that bleeds through on
    horizontal scroll.  The -1px inset draws the row separator at the bottom of
    the FULL row (same as the non-sticky cells' border-bottom). */
 .mr-table.aoe-table td.aoe-name .hs-ico {
@@ -8728,7 +8731,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .mr-table.aoe-table td.aoe-name .mr-name-body { vertical-align: middle; }
 .mr-table.aoe-table td.aoe-name {
-  /* Override .mr-table .mr-name {display:grid} вЂ” grid on a <td> drops it out
+  /* Override .mr-table .mr-name {display:grid} — grid on a <td> drops it out
      of the table's automatic row-height equalisation (same fix as td.hs-name). */
   display: table-cell;
   vertical-align: middle;
@@ -8740,7 +8743,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 /* Row-selection gold frame: Chromium renders box-shadow OFFSET incorrectly on
    position:sticky cells (same quirk documented on .hs-name). Use background
-   gradients to draw the top/bottom/left gold lines вЂ” backgrounds paint
+   gradients to draw the top/bottom/left gold lines — backgrounds paint
    correctly on sticky cells. */
 .mr-table.aoe-table tbody tr.mr-row-selected td.aoe-name {
   box-shadow: none;
@@ -8774,14 +8777,14 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .aoe-ability {
   /* inline-grid (not block grid) so the element participates in the inline
      formatting context of its table cell. The TD uses vertical-align:middle,
-     which only centres INLINE content вЂ” a block-display child would start at
+     which only centres INLINE content — a block-display child would start at
      the content-area top regardless, misaligning the icon by 1-2px. */
   display: inline-grid;
   vertical-align: middle;
   grid-template-columns: 30px auto;
   align-items: center;
-  /* Wide gap so the hover-zoomed icon (scale 1.8 в‰€ +12px each side) never
-     reaches the radius text вЂ” same room the hero-icon column leaves. */
+  /* Wide gap so the hover-zoomed icon (scale 1.8 ≈ +12px each side) never
+     reaches the radius text — same room the hero-icon column leaves. */
   column-gap: 18px;
 }
 /* Wrapper anchors the upgrade mini-markers AND is what scales on hover, so the
@@ -8804,7 +8807,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   transition: box-shadow 0.12s ease;
 }
 /* Hover: scale the icon. z-index is handled by the parent td.aoe-cell
-   via :has(.aoe-ico-wrap:hover) вЂ” the TD's stacking context beats the header. */
+   via :has(.aoe-ico-wrap:hover) — the TD's stacking context beats the header. */
 .aoe-ico-wrap:hover {
   transform: scale(1.8);
   z-index: 62;
@@ -8872,7 +8875,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   font-weight: 600;
   margin-right: 4px;
 }
-.aoe-val.aoe-val-up { color: #e3c46a; }        /* boosted by any item вЂ” gold */
+.aoe-val.aoe-val-up { color: #e3c46a; }        /* boosted by any item — gold */
 .aoe-val[hidden] { display: none; }
 .aoe-slash { color: var(--text-muted, #8698b0); margin: 0 1px; }
 .aoe-sep { color: var(--text-muted, #8698b0); margin-right: 4px; }
@@ -8886,7 +8889,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    ========================================================================== */
 
 /* ============================================================================
-   TERRAIN COMPARE  (terrain.html вЂ” Materials В» Terrain)
+   TERRAIN COMPARE  (terrain.html — Materials » Terrain)
    A before/after swipe slider over two pixel-aligned map renders + the patch's
    Terrain Changes list. The NEW map overlays the OLD one and is revealed
    left-to-right via clip-path up to --pos (set on .tc-stage by scripts.js
@@ -8918,7 +8921,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
     inset 0 1px 0 rgba(190, 225, 240, 0.08),
     0 6px 22px var(--shadow-50);
   cursor: grab;
-  touch-action: none;          /* JS owns the pointer drag вЂ” no scroll hijack */
+  touch-action: none;          /* JS owns the pointer drag — no scroll hijack */
   user-select: none;
   -webkit-user-select: none;
 }
@@ -8928,7 +8931,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   width: 100%;
   height: 100%;
   /* fill (not cover) so the map stretches to the stage box exactly like the
-     SVG overlay (preserveAspectRatio="none") вЂ” keeps tree/camp markers aligned
+     SVG overlay (preserveAspectRatio="none") — keeps tree/camp markers aligned
      even if the stage isn't a perfect square. */
   object-fit: fill;
   display: block;
@@ -9029,7 +9032,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 28px;            /* HARD-capped to the toolbar's control height вЂ” the
+  height: 28px;            /* HARD-capped to the toolbar's control height — the
                              Jersey label's tall line-box must not grow the row
                              (it just centers/overflows), so the first change row
                              stays at 28px + 10px = the map's top edge. */
@@ -9134,7 +9137,7 @@ li.tsp-hidden { display: none !important; }
 .terrain-subgroup-head::before,
 .terrain-subgroup-head::after { display: none !important; content: none !important; }
 /* First change row meets the map's TOP edge: drop the list's 3px top margin
-   (from ul.changes) and the first row's 3px top padding вЂ” together they pushed
+   (from ul.changes) and the first row's 3px top padding — together they pushed
    the first tag ~6px below the map's top border. Specificity beats ul.changes. */
 .terrain-list.changes { margin-top: 0; }
 .terrain-list > li:first-child { padding-top: 0; }
@@ -9167,7 +9170,7 @@ li.tsp-hidden { display: none !important; }
 .terrain-compare.show-watchers .tm-layer-watchers,
 .terrain-compare.show-roshan .tm-layer-roshan,
 .terrain-compare.show-spawnboxes .tm-layer-spawnboxes { opacity: 1; }
-/* trees вЂ” ONE colour everywhere. The 7.40 layout (old side) and 7.41 layout
+/* trees — ONE colour everywhere. The 7.40 layout (old side) and 7.41 layout
    (new side) are split by the slider, so sweeping reveals how the forest moved. */
 /* match the spectral/leamare tree style (styleDefinitions tree.alive) */
 .tm-trees-g rect {
@@ -9175,7 +9178,7 @@ li.tsp-hidden { display: none !important; }
   stroke: rgba(0, 255, 0, 0.85);
   stroke-width: 0.8;
 }
-/* point-entity markers вЂ” recoloured GAME icons (32вЂ“40px), shown small + smooth
+/* point-entity markers — recoloured GAME icons (32–40px), shown small + smooth
    so they read like the real minimap icons (not hard-pixelated). */
 .tm-ent-g image { image-rendering: auto; }
 /* every old/new layer splits at the slider (old = right of handle, new = left) */
@@ -9185,12 +9188,12 @@ li.tsp-hidden { display: none !important; }
 .tc-trees-new,
 .tc-camps-new,
 .tm-new { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
-/* spawnboxes вЂ” always-visible overlay (no slider clip) to avoid open-rectangle
+/* spawnboxes — always-visible overlay (no slider clip) to avoid open-rectangle
    artifacts. Old boxes = dashed red; new boxes = solid teal. */
 .tc-sb-old { fill: rgba(255,80,80,.12); stroke: #ff5555; stroke-width: 1.5px; stroke-dasharray: 5 3; }
 .tc-sb-new { fill: rgba(77,212,172,.15); stroke: #4dd4ac; stroke-width: 1.5px; }
 
-/* ---- Fullscreen (native browser API вЂ” requestFullscreen) ---- */
+/* ---- Fullscreen (native browser API — requestFullscreen) ---- */
 .tc-fs-canvas { width: 100%; }
 .tc-fs-bar { display: none; }
 
@@ -9244,7 +9247,7 @@ li.tsp-hidden { display: none !important; }
   user-select: none;
 }
 
-/* ---- control bar ABOVE the map (no longer overlaid вЂ” the map is now
+/* ---- control bar ABOVE the map (no longer overlaid — the map is now
    edge-to-edge, so the toggles live in their own gold bar that wraps). ---- */
 .tc-controls-bar {
   display: flex;
@@ -9288,7 +9291,7 @@ li.tsp-hidden { display: none !important; }
 .tc-btn-icon img { width: 22px; height: 22px; }
 .tc-btn-zoom img { width: 18px; height: 18px; }
 .tc-btn img { image-rendering: pixelated; }
-/* layer-toggle icons are the recoloured game icons в†’ smooth, not pixelated */
+/* layer-toggle icons are the recoloured game icons → smooth, not pixelated */
 .tc-layer-btn img { image-rendering: auto; }
 .tc-btn:hover { filter: brightness(1.14); }
 /* ON = lit gold chip; OFF (default) = greyed + pressed-in */
@@ -9306,7 +9309,7 @@ li.tsp-hidden { display: none !important; }
 .tc-btn[aria-pressed="false"] img { filter: grayscale(0.85) brightness(0.85); }
 .tc-inline-loupe { image-rendering: pixelated; vertical-align: -3px; margin: 0 3px 0 1px; }
 
-/* version chips в†’ map corners (OLD bottom-left, NEW top-right) */
+/* version chips → map corners (OLD bottom-left, NEW top-right) */
 .tc-ver {
   position: absolute;
   z-index: 7;
@@ -9326,7 +9329,7 @@ li.tsp-hidden { display: none !important; }
 
 /* ---- tree tally + camp note under the change list ---- */
 .terrain-counts { margin: 14px 4px 2px; font-size: 13px; color: var(--text-dim); line-height: 1.55; }
-/* Trees + Neutral-camps lines are one logical block вЂ” keep them tight (the
+/* Trees + Neutral-camps lines are one logical block — keep them tight (the
    default 14px top would read as an empty line between them). */
 .terrain-counts + .terrain-counts { margin-top: 1px; }
 .terrain-counts b { color: var(--text-bright); }
@@ -9351,11 +9354,11 @@ li.tsp-hidden { display: none !important; }
 /* ---- patch picker (lives in the change-list heading) + per-patch panes ---- */
 /* The picker reuses the calendar year-picker structure but in the terrain
    page's GOLD theme (the calendar's is blue). It sits inline in the heading as
-   the version, so the heading reads "[7.41 в–ѕ] Terrain Changes". */
+   the version, so the heading reads "[7.41 ▾] Terrain Changes". */
 /* Nudge the patch picker down 1px (the "Terrain Changes" label stays put). */
 .tc-picker { transform: translateY(1px); position: relative; }
 /* `transform` above turns .tc-picker into a stacking context that TRAPS the
-   menu's z-index:60 inside it вЂ” and since the change-list pane comes LATER in
+   menu's z-index:60 inside it — and since the change-list pane comes LATER in
    the DOM than this heading, those rows painted OVER the (trapped) menu, making
    the open dropdown look transparent. Lift the whole picker above the rows
    while it's open so its menu paints on top. */
@@ -9454,7 +9457,7 @@ li.tsp-hidden { display: none !important; }
 /* Loupe is a mode toggled by the top-bar button (adds .loupe-on). Only then
    does hovering show the pixel-loupe cursor + a gold magnifier circle that
    follows the pointer over the MAP (not the handle / top-bar). Click pins it
-   (cursor back to normal); sweeping the handle then compares that spot oldв†”new
+   (cursor back to normal); sweeping the handle then compares that spot old↔new
    inside the circle, which also carries the toggled tree/camp markers (cloned
    by scripts.js). */
 .tc-stage { cursor: default; }
@@ -9585,6 +9588,6 @@ a.whatsnew-row:hover {
 
 /* ==========================================================================
    14. UTILITIES / OVERRIDES / LEGACY
-   (Nothing yet вЂ” overrides and one-off fixes will migrate here)
+   (Nothing yet — overrides and one-off fixes will migrate here)
    ========================================================================== */
 
