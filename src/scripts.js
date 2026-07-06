@@ -4072,9 +4072,10 @@
     const mrFromInt = Number(vals.int * C.mrInt).toFixed(1);
     const intDetail = `= ${fmt(vals.int * C.mpInt)} Mana, ${Number(vals.int * C.mprInt).toFixed(2)} Mana Regen and ${mrFromInt}% Base Magic Resistance`;
 
-    const strRow = attrRow('str', base.str, vals.str, strGain, primaryDmgStr, strDetail, attr === 'str');
-    const agiRow = attrRow('agi', base.agi, vals.agi, agiGain, primaryDmgAgi, agiDetail, attr === 'agi');
-    const intRow = attrRow('int', base.int, vals.int, intGain, primaryDmgInt, intDetail, attr === 'int');
+    const plus2 = plus2At(st.level);
+    const strRow = attrRow('str', base.str - plus2, vals.str, strGain, primaryDmgStr, strDetail, attr === 'str');
+    const agiRow = attrRow('agi', base.agi - plus2, vals.agi, agiGain, primaryDmgAgi, agiDetail, attr === 'agi');
+    const intRow = attrRow('int', base.int - plus2, vals.int, intGain, primaryDmgInt, intDetail, attr === 'int');
     let uniRow = '';
     if (attr === 'uni') {
       const uniBase = base.str + base.agi + base.int;
