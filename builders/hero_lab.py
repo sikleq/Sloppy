@@ -36,7 +36,7 @@ from heroes_stats import (
 
 _esc = lambda s: _html.escape(str(s), quote=True)
 
-_LOC_RE = _re.compile(r'"([^"]+)"\s+"((?:[^"\\]|\\.)*)"')
+_LOC_RE = _re.compile(r'"(DOTA_[^"]+)"\s+"((?:[^"\\]|\\.)*)"', _re.IGNORECASE)
 
 
 def _load_item_tooltips() -> dict[str, dict]:
@@ -48,6 +48,8 @@ def _load_item_tooltips() -> dict[str, dict]:
     entries: dict[str, str] = {}
     for m in _LOC_RE.finditer(text):
         k, v = m.group(1), m.group(2).replace('\\"', '"')
+        if " " in k:
+            continue
         entries[k.lower()] = v
     out: dict[str, dict] = {}
     prefix = "dota_tooltip_ability_"
@@ -68,7 +70,7 @@ def _load_item_tooltips() -> dict[str, dict]:
         rest = key[len(prefix):]
         if rest.endswith("_description") or rest.endswith("_lore"):
             continue
-        if "_note" in rest or "_searchalias" in rest or ":f" in rest or "_bound" in rest:
+        if "_note" in rest or "_searchalias" in rest or ":f" in rest or ":n" in rest or "_bound" in rest:
             continue
         attr_keys.append((rest, val))
     # Build a set of all known item ids.  Description-only discovery misses
@@ -324,8 +326,8 @@ def _sum_at(fields: dict, idx: int, *keys: str) -> float:
 def _item_bonus_at(fields: dict, idx: int) -> dict[str, float]:
     return {
         "all": _num_at(fields.get("bonus_all_stats", fields.get("bonus_stats", fields.get("all_stats", 0))), idx),
-        "str": _sum_at(fields, idx, "bonus_strength", "bonus_str"),
-        "agi": _sum_at(fields, idx, "bonus_agility", "bonus_agi"),
+        "str": _sum_at(fields, idx, "bonus_strength", "bonus_str", "strength"),
+        "agi": _sum_at(fields, idx, "bonus_agility", "bonus_agi", "agility"),
         "int": _sum_at(fields, idx, "bonus_intellect", "bonus_int", "bonus_intelligence"),
         "hp": _sum_at(fields, idx, "bonus_health", "bonus_hp", "bonus_max_health", "health_bonus"),
         "mp": _sum_at(fields, idx, "bonus_mana", "max_mana", "bonus_max_mana"),
@@ -334,10 +336,12 @@ def _item_bonus_at(fields: dict, idx: int) -> dict[str, float]:
         "armor": _sum_at(fields, idx, "bonus_armor", "aura_bonus_armor", "armor", "armor_aura", "bonus_aoe_armor"),
         "mr": _sum_at(fields, idx, "bonus_magic_resistance", "bonus_magical_armor", "bonus_spell_resist", "magic_resistance", "magic_resist", "magic_resistance_aura", "magic_res"),
         "evasion": _sum_at(fields, idx, "bonus_evasion", "evasion"),
-        "damage": _sum_at(fields, idx, "bonus_damage", "damage_aura", "base_attack_damage"),
+        "damage": _sum_at(fields, idx, "bonus_damage", "damage_aura", "base_attack_damage", "damage"),
         "aspd": _sum_at(fields, idx, "bonus_attack_speed", "attack_speed"),
         "ms": _sum_at(fields, idx, "bonus_movement_speed", "bonus_move_speed", "movement_speed", "aura_movement_speed", "bonus_movement", "movespeed"),
         "range": _sum_at(fields, idx, "bonus_attack_range", "attack_range_bonus", "attack_range"),
+        "rangeUniqueAll": _sum_at(fields, idx, "melee_attack_range"),
+        "rangeUniqueRanged": _sum_at(fields, idx, "base_attack_range"),
         "dvision": _sum_at(fields, idx, "bonus_day_vision", "bonus_vision"),
         "nvision": _sum_at(fields, idx, "bonus_night_vision", "night_vision_bonus"),
         "spellAmp": _sum_at(fields, idx, "spell_amp", "bonus_spell_amp"),
@@ -351,7 +355,7 @@ def _item_bonus_at(fields: dict, idx: int) -> dict[str, float]:
         "mpPct": _sum_at(fields, idx, "bonus_max_mana_percentage", "max_mana_pct"),
         "batReduce": _sum_at(fields, idx, "bat_reduce"),
         "healthRestoration": _sum_at(fields, idx, "health_restoration", "hp_regen_amp", "heal_amp"),
-        "cooldownReduction": _sum_at(fields, idx, "cooldown_reduction"),
+        "cooldownReduction": _sum_at(fields, idx, "cooldown_reduction", "bonus_cooldown"),
         "incomingDamage": _sum_at(fields, idx, "incoming_damage"),
         "magicDamage": _sum_at(fields, idx, "magic_damage"),
         "castSpeed": _sum_at(fields, idx, "cast_speed"),
@@ -362,12 +366,13 @@ def _item_bonus_at(fields: dict, idx: int) -> dict[str, float]:
         "maxHpRegen": _sum_at(fields, idx, "max_health_regen"),
         "hpRegenReduce": _sum_at(fields, idx, "hp_regen_reduce"),
         "knockbackResist": _sum_at(fields, idx, "knockback_resist"),
-        "msPct": _sum_at(fields, idx, "movespeed_pct"),
+        "msPct": _sum_at(fields, idx, "movespeed_pct", "movement_speed_percent_bonus"),
         "manacostReduction": _sum_at(fields, idx, "manacost_reduction"),
         "debuffAmp": _sum_at(fields, idx, "debuff_amp"),
         "gpm": _sum_at(fields, idx, "bonus_gpm"),
         "xpm": _sum_at(fields, idx, "bonus_xpm"),
         "manaReductionPct": _sum_at(fields, idx, "mana_reduction_pct"),
+        "projSpeed": _sum_at(fields, idx, "projectile_speed"),
     }
 
 
@@ -376,8 +381,8 @@ def _item_bonus(fields: dict, *, consumable: bool = False) -> dict[str, float]:
     # it into Strength/Agility/Intellect rows. Per-attribute fields stay
     # separate so items can mix (e.g. +6 All + extra Strength).
     all_stats = _first(fields, "bonus_all_stats", "bonus_stats", "all_stats")
-    str_bonus = _sum(fields, "bonus_strength", "bonus_str")
-    agi_bonus = _sum(fields, "bonus_agility", "bonus_agi")
+    str_bonus = _sum(fields, "bonus_strength", "bonus_str", "strength")
+    agi_bonus = _sum(fields, "bonus_agility", "bonus_agi", "agility")
     int_bonus = _sum(fields, "bonus_intellect", "bonus_int", "bonus_intelligence")
     # Bare `health_regen` / `mana_regen` keys are overloaded in Valve KV: on
     # equipment they are passive stats, while on Tango/Salve/Clarity they are
@@ -401,7 +406,7 @@ def _item_bonus(fields: dict, *, consumable: bool = False) -> dict[str, float]:
         "armor": _sum(fields, "bonus_armor", "aura_bonus_armor", "armor", "armor_aura", "bonus_aoe_armor"),
         "mr": _sum(fields, "bonus_magic_resistance", "bonus_magical_armor", "bonus_spell_resist", "magic_resistance", "magic_resistance_aura", "magic_res", "magic_resist"),
         "evasion": _sum(fields, "bonus_evasion", "evasion"),
-        "damage": _sum(fields, "bonus_damage", "base_attack_damage"),
+        "damage": _sum(fields, "bonus_damage", "base_attack_damage", "damage"),
         "damagePct": _sum(fields, "damage_aura"),
         "damageMelee": _sum(fields, "bonus_damage_melee"),
         "damageRanged": _sum(fields, "bonus_damage_range", "bonus_damage_ranged"),
@@ -409,7 +414,9 @@ def _item_bonus(fields: dict, *, consumable: bool = False) -> dict[str, float]:
         "ms": _sum(fields, "bonus_movement_speed", "bonus_move_speed", "movement_speed", "aura_movement_speed", "bonus_movement", "movespeed"),
         "msMelee": _sum(fields, "bonus_movement_speed_melee", "bonus_move_speed_melee"),
         "msRanged": _sum(fields, "bonus_movement_speed_ranged", "bonus_move_speed_ranged"),
-        "range": _sum(fields, "bonus_attack_range", "attack_range_bonus", "base_attack_range", "attack_range"),
+        "range": _sum(fields, "bonus_attack_range", "attack_range_bonus", "attack_range"),
+        "rangeUniqueAll": _sum(fields, "melee_attack_range"),
+        "rangeUniqueRanged": _sum(fields, "base_attack_range"),
         "dvision": _sum(fields, "bonus_day_vision", "bonus_vision", "bonus_daytime_vision"),
         "nvision": _sum(fields, "bonus_night_vision", "night_vision_bonus", "bonus_nighttime_vision"),
         "spellAmp": _sum(fields, "spell_amp", "bonus_spell_amp"),
@@ -427,7 +434,7 @@ def _item_bonus(fields: dict, *, consumable: bool = False) -> dict[str, float]:
         "primaryStatUni": _sum(fields, "primary_stat_universal"),
         "batReduce": _sum(fields, "bat_reduce"),
         "healthRestoration": _sum(fields, "health_restoration", "hp_regen_amp", "heal_amp"),
-        "cooldownReduction": _sum(fields, "cooldown_reduction"),
+        "cooldownReduction": _sum(fields, "cooldown_reduction", "bonus_cooldown"),
         "incomingDamage": _sum(fields, "incoming_damage"),
         "magicDamage": _sum(fields, "magic_damage"),
         "castSpeed": _sum(fields, "cast_speed"),
@@ -438,12 +445,13 @@ def _item_bonus(fields: dict, *, consumable: bool = False) -> dict[str, float]:
         "maxHpRegen": _sum(fields, "max_health_regen"),
         "hpRegenReduce": _sum(fields, "hp_regen_reduce"),
         "knockbackResist": _sum(fields, "knockback_resist"),
-        "msPct": _sum(fields, "movespeed_pct"),
+        "msPct": _sum(fields, "movespeed_pct", "movement_speed_percent_bonus"),
         "manacostReduction": _sum(fields, "manacost_reduction"),
         "debuffAmp": _sum(fields, "debuff_amp"),
         "gpm": _sum(fields, "bonus_gpm"),
         "xpm": _sum(fields, "bonus_xpm"),
         "manaReductionPct": _sum(fields, "mana_reduction_pct"),
+        "projSpeed": _sum(fields, "projectile_speed"),
     }
 
 
@@ -462,7 +470,7 @@ _ENCHANT_TIER_LABELS = {
     "item_enhancement_titanic":     ("", 10, [2, 3, 4]),
     "item_enhancement_vast":        ("", 11, [2, 3, 4]),
     "item_enhancement_timeless":    ("", 12, [4, 5]),
-    "item_enhancement_feverish":    ("", 13, [4, 5]),
+    "item_enhancement_feverish":    ("", 13, [5]),
     "item_enhancement_audacious":   ("", 14, [5]),
     "item_enhancement_evolved":     ("", 15, [5]),
     "item_enhancement_fleetfooted": ("", 16, [5]),
@@ -502,13 +510,13 @@ _ENCHANT_ATTRS: dict[str, set[str]] = {
 
 
 _ITEM_VALUE_ALIASES = {
-    "agi": ("bonus_agility", "bonus_agi"),
+    "agi": ("bonus_agility", "bonus_agi", "agility"),
     "all": ("bonus_all_stats", "bonus_attributes", "bonus_stats"),
     "aoe_bonus": ("bonus_aoe", "aoe_bonus"),
     "abilitycastrange": ("AbilityCastRange",),
     "attack": ("bonus_attack_speed", "attack_speed"),
     "attack_pct": ("bonus_attack_speed_pct",),
-    "attack_range": ("bonus_attack_range", "attack_range_bonus"),
+    "attack_range": ("bonus_attack_range", "attack_range_bonus", "base_attack_range"),
     "attack_range_all": ("bonus_attack_range", "attack_range", "base_attack_range"),
     "attack_range_melee": ("melee_attack_range", "bonus_attack_range_melee"),
     "armor": ("bonus_armor", "armor"),
@@ -517,20 +525,21 @@ _ITEM_VALUE_ALIASES = {
     "damage": ("bonus_damage", "damage"),
     "debuff_amp": ("debuff_amp",),
     "evasion": ("bonus_evasion", "evasion"),
-    "health": ("bonus_health", "bonus_max_health", "max_health", "health", "health_bonus"),
+    "health": ("bonus_health", "bonus_max_health", "max_health", "health", "health_bonus", "bonus_hp"),
     "hp_regen": ("bonus_health_regen", "bonus_hp_regen", "bonus_regen", "hp_regen", "health_regen", "health_regen_bonus"),
     "int": ("bonus_intellect", "bonus_intelligence", "bonus_int"),
     "lifesteal": ("attack_lifesteal", "lifesteal", "lifesteal_percent"),
     "mana": ("bonus_mana", "max_mana", "mana"),
     "mana_regen": ("bonus_mana_regen", "bonus_mp_regen", "mp_regen", "mana_regen"),
     "max_mana_percentage": ("bonus_max_mana_percentage",),
-    "move_speed": ("bonus_movement_speed", "bonus_movement", "bonus_move_speed", "movement_speed", "move_speed"),
+    "move_speed": ("bonus_movement_speed", "bonus_movement", "bonus_move_speed", "movement_speed", "move_speed", "movement_speed_percent_bonus"),
     "restoration_amp": ("hp_regen_amp", "restoration_amp"),
     "selected_attrib": ("bonus_stat", "selected_attrib"),
-    "str": ("bonus_strength", "bonus_str"),
+    "str": ("bonus_strength", "bonus_str", "strength"),
     "primary_attribute": ("primary_stat",),
     "slow_resistance": ("slow_resistance", "slow_resist", "bonus_slow_resist"),
     "spell_amp": ("spell_amp", "bonus_spell_amp"),
+    "projectile_speed": ("projectile_speed",),
     "spell_lifesteal": ("spell_lifesteal", "bonus_spell_lifesteal"),
     "spell_resist": ("bonus_magic_resistance", "bonus_magical_armor", "bonus_spell_resist", "magic_resistance", "magic_resist"),
     "status_resist": ("status_resistance", "status_resist"),
@@ -544,7 +553,7 @@ _ITEM_ATTR_LABELS = {
     "attack": "Attack Speed",
     "attack_pct": "Attack Speed",
     "attack_range": "Attack Range",
-    "attack_range_melee": "Melee Attack Range",
+    "attack_range_melee": "Attack Range",
     "attack_range_all": "Attack Range",
     "cast_range": "Cast Range",
     "cooldown_reduction": "Cooldown Reduction",
@@ -565,6 +574,7 @@ _ITEM_ATTR_LABELS = {
     "slow_resistance": "Slow Resistance",
     "spell_amp": "Spell Amplification",
     "spell_lifesteal": "Spell Lifesteal",
+    "projectile_speed": "Projectile Speed",
     "spell_resist": "Magic Resistance",
     "status_resist": "Status Resistance",
     "str": "Strength",
@@ -692,6 +702,8 @@ def _is_noise_attribute(text: str) -> bool:
     if plain.startswith("Rune:"):
         return True
     if plain == "Tango (Shared)":
+        return True
+    if _re.match(r"^%[+\-]", plain):
         return True
     return False
 
@@ -840,9 +852,16 @@ def _load_items(version: str) -> list[dict]:
             bonus["spellAmp"] = 0
         if item == "item_swift_blink" and bonus:
             bonus["ms"] = 0
+        if item == "item_manta" and bonus:
+            bonus["msPct"] = bonus.get("msPct", 0) + bonus.get("ms", 0)
+            bonus["ms"] = 0
         if item == "item_enhancement_hulking" and bonus:
             bonus["aspdPct"] = bonus.get("aspd", 0)
             bonus["aspd"] = 0
+        if item == "item_enhancement_titanic":
+            if bonus:
+                bonus["aspdPct"] = bonus.get("aspd", 0)
+                bonus["aspd"] = 0
         if cls == "neutral":
             bonus = {key: 0 for key in _item_bonus({}, consumable=False)}
         if cls == "regular" and not any(abs(v) > 1e-9 for v in bonus.values()) and cost <= 0:
@@ -865,17 +884,35 @@ def _load_items(version: str) -> list[dict]:
             "consumable": consumable,
             "bonus": bonus,
         }
+        _BOOT_ITEMS = {
+            "item_boots", "item_tranquil_boots", "item_arcane_boots",
+            "item_guardian_greaves", "item_travel_boots", "item_travel_boots_2",
+            "item_phase_boots", "item_power_treads",
+        }
+        if item in _BOOT_ITEMS:
+            rec["isBoot"] = True
         if cls == "enchant":
             tier_label, tier_sort, tier_list = _ENCHANT_TIER_LABELS.get(item, ("", 99, []))
             rec["tierSort"] = tier_sort
             rec["enchantAttr"] = sorted(_ENCHANT_ATTRS.get(item, {"all"}))
+            rec["tiersAvailable"] = tier_list
             if len(tier_list) > 1:
                 modes: dict = {"default": f"t{tier_list[0]}"}
                 for level_idx, tier_num in enumerate(tier_list):
                     modes[f"t{tier_num}"] = _item_bonus_at(fields, level_idx)
+                if item in ("item_enhancement_titanic", "item_enhancement_hulking"):
+                    for mk, mv in modes.items():
+                        if isinstance(mv, dict) and mv.get("aspd"):
+                            mv["aspdPct"] = mv.pop("aspd")
                 rec["modes"] = modes
                 rec["bonus"] = {k: 0 for k in rec["bonus"]}
-                rec["tiersAvailable"] = tier_list
+        if item == "item_desolator":
+            step = int(_sum(fields, "bonus_damage_per_kill") or 2)
+            max_stacks = int(_sum(fields, "max_damage") or 30)
+            deso_modes: dict = {"default": "none", "none": {"damage": 0}}
+            for n in range(step, max_stacks + 1, step):
+                deso_modes[str(n)] = {"damage": n}
+            rec["modes"] = deso_modes
         if item == "item_rapier":
             rec["bonus"]["damage"] = _sum(fields, "bonus_damage_base")
             rec["bonus"]["spellAmp"] = 0
@@ -883,7 +920,30 @@ def _load_items(version: str) -> list[dict]:
                 "default": "damage",
                 "base": {"damage": _sum(fields, "bonus_damage_base")},
                 "damage": {"damage": _sum(fields, "bonus_damage")},
-                "spell": {"spellAmp": _sum(fields, "bonus_spell_amp")},
+                "spell": {"spellAmp": _sum(fields, "bonus_spell_amp"), "icon": "icons/items/rapier_alt.png"},
+            }
+        if item == "item_tranquil_boots":
+            broken_ms = _sum(fields, "broken_movement_speed") or 40
+            active_ms = _sum(fields, "bonus_movement_speed") or 65
+            active_hpr = _sum(fields, "bonus_health_regen") or 14
+            if rec.get("bonus"):
+                rec["bonus"]["ms"] = 0
+                rec["bonus"]["hpr"] = 0
+            rec["modes"] = {
+                "default": "active",
+                "active": {"ms": active_ms, "hpr": active_hpr},
+                "broken": {"ms": broken_ms, "hpr": 0, "icon": "icons/items/tranquil_boots_active.png"},
+            }
+        if item == "item_octarine_core" and bonus:
+            bonus["cdrUnique"] = bonus.get("cooldownReduction", 0)
+            bonus["cooldownReduction"] = 0
+        if item == "item_power_treads":
+            stat_val = _sum(fields, "bonus_stat", "selected_attrib")
+            rec["modes"] = {
+                "default": "str",
+                "str": {"str": stat_val, "icon": "icons/items/power_treads_str.png"},
+                "agi": {"agi": stat_val, "icon": "icons/items/power_treads_agi.png"},
+                "int": {"int": stat_val, "icon": "icons/items/power_treads_int.png"},
             }
         if item == "item_dagon":
             level_items = ["item_dagon", "item_dagon_2", "item_dagon_3", "item_dagon_4", "item_dagon_5"]
@@ -1035,6 +1095,9 @@ def _load_items(version: str) -> list[dict]:
         raw_attribs = [
             _resolve_attribute_entry(a, fields) for a in tt.get("attribs", [])
         ]
+        has_cast_range_bonus = any(
+            fields.get(k) for k in ("bonus_cast_range", "cast_range_bonus", "cast_range")
+        )
         if raw_attribs:
             resolved = [
                 a.strip() for a in raw_attribs
@@ -1044,9 +1107,18 @@ def _load_items(version: str) -> list[dict]:
                 and not _is_zero_attribute(a)
                 and not _is_noise_attribute(a)
                 and "$" not in a
+                and not (not has_cast_range_bonus and "Cast Range" in a)
             ]
             if resolved:
                 tip["attribs"] = resolved
+        if item == "item_power_treads" and "attribs" in tip:
+            _PT_NOISE = {"strength", "agility", "intelligence"}
+            tip["attribs"] = [a for a in tip["attribs"]
+                              if a.strip().lower() not in _PT_NOISE
+                              and "selected attribute" not in a.lower()]
+        if item == "item_desolator" and "attribs" in tip:
+            item_name = (names.get(item) or "").lower()
+            tip["attribs"] = [a for a in tip["attribs"] if a.strip().lower() != item_name]
         if item == "item_rapier":
             tip["attribs"] = [f"+{int(_sum(fields, 'bonus_damage_base'))} Damage"]
         # Fallback: generate attribs from known fields if loc had nothing

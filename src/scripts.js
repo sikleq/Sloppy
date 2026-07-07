@@ -3488,6 +3488,10 @@
                 <img class="hl-innate-chip-icon" data-innate-icon alt="" loading="lazy">
               </button>
               <span class="hl-level-corner">
+                <svg class="hl-level-ring" viewBox="0 0 44 44" aria-hidden="true">
+                  <circle class="hl-level-ring-bg" cx="22" cy="22" r="18"/>
+                  <circle class="hl-level-ring-fg" cx="22" cy="22" r="18" data-ring/>
+                </svg>
                 <input class="hl-level-input" type="text" inputmode="numeric" maxlength="2" value="1" data-field="level" aria-label="Hero level" autocomplete="off">
               </span>
             </div>
@@ -3530,6 +3534,15 @@
               <span class="hl-slot-bevel"></span>
               <span class="hl-slot-glow"></span>
             </button>
+            <div class="hl-bauble-connector"></div>
+            <div class="hl-bauble-wrap">
+              <button type="button" class="hl-bauble-slot" data-slot="bauble" aria-label="Enchanter's Bauble">
+                <img src="icons/items/enchanters_bauble.png" alt="Enchanter's Bauble" loading="lazy">
+                <span class="hl-slot-bevel"></span>
+                <span class="hl-slot-glow"></span>
+              </button>
+              <input type="number" class="hl-bauble-level" data-field="bauble-level" min="0" max="100" value="0" placeholder="0">
+            </div>
           </div>
         </div>
       </div>
@@ -3560,16 +3573,18 @@
     let level = parseInt(panel.querySelector('[data-field="level"]')?.value || '1', 10);
     level = Math.max(1, Math.min(30, Number.isFinite(level) ? level : 1));
     panel.querySelector('[data-field="level"]').value = String(level);
-    const itemIds = JSON.parse(panel.dataset.items || '["","","","","",""]').filter(Boolean);
     const itemModes = JSON.parse(panel.dataset.itemModes || '{}');
-    const itemEntries = itemIds.map((id, idx) => ({ id, mode: itemModes[String(idx)] || null, slot: idx }));
+    const itemEntries = JSON.parse(panel.dataset.items || '["","","","","",""]')
+      .map((id, idx) => id ? { id, mode: itemModes[String(idx)] || null, slot: idx } : null)
+      .filter(Boolean);
     const enchantItem = panel.dataset.enchantItem || '';
     if (enchantItem) itemEntries.push({ id: enchantItem, mode: itemModes.enchant || null, slot: 'enchant' });
+    const baubleLevel = Math.max(0, Math.min(100, parseInt(panel.querySelector('[data-field="bauble-level"]')?.value || '0', 10) || 0));
     const custom = { hp: null, mp: null, hpr: null, mpr: null, armor: null, mr: null, evasion: null };
     panel.querySelectorAll('[data-custom]').forEach(inp => {
       custom[inp.dataset.custom] = inp.value === '' ? null : (Number(inp.value) || 0);
     });
-    return { hero: byHero.get(heroId) || heroes[0], level, itemEntries, custom };
+    return { hero: byHero.get(heroId) || heroes[0], level, itemEntries, baubleLevel, custom };
   }
 
   function slotAcceptsItem(slot, item) {
@@ -3649,6 +3664,9 @@
       const mode = activeItemMode(item, modeKey);
       return 'L' + String((mode && mode.level) || 1);
     }
+    if (item.id === 'item_power_treads') return (modeKey || 'str').toUpperCase();
+    if (item.id === 'item_desolator') return (modeKey && modeKey !== 'none') ? '+' + modeKey : '0';
+    if (item.id === 'item_tranquil_boots') return modeKey === 'broken' ? 'OFF' : 'ON';
     if (item.tiersAvailable && modeKey && modeKey.startsWith('t')) return '';
     return 'ALT';
   }
@@ -3657,6 +3675,7 @@
     if (!item || !item.modes) return '';
     if (item.id === 'item_rapier') return modeKey === 'spell' ? 'arcane' : 'damage';
     if (item.id === 'item_dagon') return 'damage';
+    if (item.id === 'item_power_treads') return modeKey || 'str';
     return '';
   }
 
@@ -3669,15 +3688,21 @@
     };
   }
 
-  function itemTotals(entries, attackType) {
+  function itemTotals(entries, attackType, baubleLevel) {
     const isRanged = String(attackType || '').toLowerCase() === 'ranged';
-    const out = { str: 0, agi: 0, int: 0, hp: 0, mp: 0, hpr: 0, mpr: 0, mprAmp: 0, armor: 0, mrVals: [], evVals: [], statusResVals: [], slowResVals: [], spellAmp: 0, damage: 0, damagePct: 0, aspd: 0, ms: 0, range: 0, dvision: 0, nvision: 0, cost: 0, hprPct: 0, missingHprPct: 0, mpPct: 0, lifesteal: 0, spellLifesteal: 0, castRange: 0, primaryStat: 0, primaryStatUni: 0, batReduce: 0, healthRestoration: 0, cooldownReduction: 0, debuffAmp: 0, hpPct: 0, msPct: 0, knockbackResist: 0, maxHpRegen: 0, incomingDamage: 0, magicDamage: 0, castSpeed: 0, visionReduce: 0, manacostIncrease: 0, intelligencePct: 0, hpRegenReduce: 0, manacostReduction: 0, gpm: 0, xpm: 0, aspdPct: 0, manaReductionPct: 0 };
+    const baubleScale = baubleLevel > 0 ? (0.7 + baubleLevel * 0.4) : 1;
+    const out = { str: 0, agi: 0, int: 0, hp: 0, mp: 0, hpr: 0, mpr: 0, mprAmp: 0, _mprAmpVals: [], armor: 0, _rangeUniqueAllVals: [], _rangeUniqueRangedVals: [], _msBootVals: [], _cdrUniqVals: [], _cdrStackVals: [], projSpeed: 0, mrVals: [], evVals: [], statusResVals: [], slowResVals: [], spellAmp: 0, damage: 0, damagePct: 0, aspd: 0, ms: 0, range: 0, dvision: 0, nvision: 0, cost: 0, hprPct: 0, missingHprPct: 0, mpPct: 0, lifesteal: 0, spellLifesteal: 0, castRange: 0, primaryStat: 0, primaryStatUni: 0, batReduce: 0, healthRestoration: 0, cooldownReduction: 0, debuffAmp: 0, hpPct: 0, msPct: 0, _msPctVals: [], knockbackResist: 0, maxHpRegen: 0, incomingDamage: 0, magicDamage: 0, castSpeed: 0, visionReduce: 0, manacostIncrease: 0, intelligencePct: 0, hpRegenReduce: 0, manacostReduction: 0, gpm: 0, xpm: 0, aspdPct: 0, manaReductionPct: 0 };
+    const visionSeen = new Set();
     entries.forEach(entry => {
       const id = typeof entry === 'string' ? entry : entry.id;
       const mode = typeof entry === 'string' ? null : entry.mode;
       const it = byItem.get(id);
       if (!it) return;
-      const b = it.bonus || {};
+      if (it.class === 'enchant' && baubleLevel > 0 && mode !== 't5') return;
+      const _entryScale = (it.class === 'enchant' && baubleScale !== 1 && mode === 't5') ? baubleScale : 1;
+      // CDR is excluded from linear scaling — it gets two separate multiplicative stacks below.
+      const _bs = _entryScale !== 1 ? Object.fromEntries(Object.entries(it.bonus || {}).map(([k,v]) => [k, typeof v === 'number' && k !== 'cooldownReduction' && k !== 'cdrUnique' ? v * _entryScale : v])) : (it.bonus || {});
+      const b = _bs;
       // "All Attributes" feeds every stat; per-attribute bonuses stack on top.
       const allAttr = Number(b.all) || 0;
       out.str += (Number(b.str) || 0) + allAttr;
@@ -3687,8 +3712,9 @@
       out.mp += Number(b.mp) || 0;
       out.hpr += Number(b.hpr) || 0;
       out.mpr += Number(b.mpr) || 0;
-      out.mprAmp += Number(b.mprAmp) || 0;
-      out.hprPct = Math.max(out.hprPct, Number(b.hprPct) || 0);
+      if (b.mprAmp) out._mprAmpVals.push(Number(b.mprAmp) || 0);
+      if (b.msPct) out._msPctVals.push(Number(b.msPct) || 0);
+      out.hprPct += Number(b.hprPct) || 0;
       out.missingHprPct += Number(b.missingHprPct) || 0;
       out.mpPct += Number(b.mpPct) || 0;
       out.armor += Number(b.armor) || 0;
@@ -3706,10 +3732,14 @@
       out.primaryStatUni += Number(b.primaryStatUni) || 0;
       out.batReduce += Number(b.batReduce) || 0;
       out.healthRestoration += Number(b.healthRestoration) || 0;
-      out.cooldownReduction += Number(b.cooldownReduction) || 0;
+      if (b.cdrUnique) out._cdrUniqVals.push(Number(b.cdrUnique));
+      else if (b.cooldownReduction) {
+        out._cdrStackVals.push(Number(b.cooldownReduction));
+        if (_entryScale !== 1) { const _cb = Number(b.cooldownReduction) * (_entryScale - 1); if (_cb > 0.001) out._cdrStackVals.push(_cb); }
+      }
       out.debuffAmp += Number(b.debuffAmp) || 0;
       out.hpPct += Number(b.hpPct) || 0;
-      out.msPct += Number(b.msPct) || 0;
+
       out.knockbackResist += Number(b.knockbackResist) || 0;
       out.maxHpRegen += Number(b.maxHpRegen) || 0;
       out.incomingDamage += Number(b.incomingDamage) || 0;
@@ -3725,13 +3755,17 @@
       out.aspdPct += Number(b.aspdPct) || 0;
       out.manaReductionPct += Number(b.manaReductionPct) || 0;
       out.aspd += Number(b.aspd) || 0;
-      out.ms += (Number(b.ms) || 0) + (isRanged ? (Number(b.msRanged) || 0) : (Number(b.msMelee) || 0));
-      if (isRanged) out.range += Number(b.range) || 0;
-      out.dvision += Number(b.dvision) || 0;
-      out.nvision += Number(b.nvision) || 0;
+      { const _bms = (Number(b.ms) || 0) + (isRanged ? (Number(b.msRanged) || 0) : (Number(b.msMelee) || 0));
+        if (it.isBoot) { if (_bms) out._msBootVals.push(_bms); } else out.ms += _bms; }
+      out.range += Number(b.range) || 0;
+      if (b.rangeUniqueAll) out._rangeUniqueAllVals.push(Number(b.rangeUniqueAll));
+      if (b.rangeUniqueRanged) out._rangeUniqueRangedVals.push(Number(b.rangeUniqueRanged));
+      if (isRanged) out.projSpeed += Number(b.projSpeed) || 0;
+      if (!visionSeen.has(id)) { out.dvision += Number(b.dvision) || 0; out.nvision += Number(b.nvision) || 0; }
       if (it.modes) {
         const activeMode = mode || it.modes.default || 'damage';
-        const mb = it.modes[activeMode] || {};
+        const _rawMb = it.modes[activeMode] || {};
+        const mb = _entryScale !== 1 ? Object.fromEntries(Object.entries(_rawMb).map(([k,v]) => [k, typeof v === 'number' && k !== 'cooldownReduction' && k !== 'cdrUnique' ? v * _entryScale : v])) : _rawMb;
         const allAttrMode = Number(mb.all) || 0;
         out.str += (Number(mb.str) || 0) + allAttrMode;
         out.agi += (Number(mb.agi) || 0) + allAttrMode;
@@ -3743,13 +3777,23 @@
         out.armor += Number(mb.armor) || 0;
         if (mb.mr) out.mrVals.push(Number(mb.mr) || 0);
         if (mb.evasion) out.evVals.push(Number(mb.evasion) || 0);
+        if (mb.statusRes) out.statusResVals.push(Number(mb.statusRes) || 0);
+        if (mb.slowRes) out.slowResVals.push(Number(mb.slowRes) || 0);
         out.spellAmp += Number(mb.spellAmp) || 0;
+        out.damagePct += Number(mb.damagePct) || 0;
+        if (mb.mprAmp) out._mprAmpVals.push(Number(mb.mprAmp) || 0);
+        if (mb.msPct) out._msPctVals.push(Number(mb.msPct) || 0);
+        out.hprPct += Number(mb.hprPct) || 0;
+        out.missingHprPct += Number(mb.missingHprPct) || 0;
         out.damage += (Number(mb.damage) || 0) + (isRanged ? (Number(mb.damageRanged) || 0) : (Number(mb.damageMelee) || 0));
         out.aspd += Number(mb.aspd) || 0;
-        out.ms += (Number(mb.ms) || 0) + (isRanged ? (Number(mb.msRanged) || 0) : (Number(mb.msMelee) || 0));
-        if (isRanged) out.range += Number(mb.range) || 0;
-        out.dvision += Number(mb.dvision) || 0;
-        out.nvision += Number(mb.nvision) || 0;
+        { const _mms = (Number(mb.ms) || 0) + (isRanged ? (Number(mb.msRanged) || 0) : (Number(mb.msMelee) || 0));
+          if (it.isBoot) { if (_mms) out._msBootVals.push(_mms); } else out.ms += _mms; }
+        out.range += Number(mb.range) || 0;
+        if (mb.rangeUniqueAll) out._rangeUniqueAllVals.push(Number(mb.rangeUniqueAll));
+        if (mb.rangeUniqueRanged) out._rangeUniqueRangedVals.push(Number(mb.rangeUniqueRanged));
+        if (isRanged) out.projSpeed += Number(mb.projSpeed) || 0;
+        if (!visionSeen.has(id)) { out.dvision += Number(mb.dvision) || 0; out.nvision += Number(mb.nvision) || 0; }
         out.lifesteal += Number(mb.lifesteal) || 0;
         out.spellLifesteal += Number(mb.spellLifesteal) || 0;
         out.castRange += Number(mb.castRange) || 0;
@@ -3758,10 +3802,13 @@
         out.primaryStatUni += Number(mb.primaryStatUni) || 0;
         out.batReduce += Number(mb.batReduce) || 0;
         out.healthRestoration += Number(mb.healthRestoration) || 0;
-        out.cooldownReduction += Number(mb.cooldownReduction) || 0;
+        if (mb.cdrUnique) out._cdrUniqVals.push(Number(mb.cdrUnique));
+        else if (mb.cooldownReduction) {
+          out._cdrStackVals.push(Number(mb.cooldownReduction));
+          if (_entryScale !== 1) { const _cb = Number(mb.cooldownReduction) * (_entryScale - 1); if (_cb > 0.001) out._cdrStackVals.push(_cb); }
+        }
         out.debuffAmp += Number(mb.debuffAmp) || 0;
         out.hpPct += Number(mb.hpPct) || 0;
-        out.msPct += Number(mb.msPct) || 0;
         out.knockbackResist += Number(mb.knockbackResist) || 0;
         out.maxHpRegen += Number(mb.maxHpRegen) || 0;
         out.incomingDamage += Number(mb.incomingDamage) || 0;
@@ -3780,7 +3827,17 @@
       } else {
         out.cost += Number(it.cost) || 0;
       }
+      visionSeen.add(id);
     });
+    out.mprAmp = out._mprAmpVals.length ? Math.max(...out._mprAmpVals) : 0;
+    out.msPct = out._msPctVals.length ? Math.max(...out._msPctVals) : 0;
+    out.ms += out._msBootVals.length ? Math.max(...out._msBootVals) : 0;
+    { const _uniq = Math.min(out._cdrUniqVals.length ? Math.max(...out._cdrUniqVals) : 0, 99.9);
+      let _mult = 1; for (const v of out._cdrStackVals) _mult *= (1 - v / 100);
+      out.cooldownReduction = Math.min(Math.round((1 - (1 - _uniq / 100) * _mult) * 1000) / 10, 99.9); }
+    const _allMax = out._rangeUniqueAllVals.length ? Math.max(...out._rangeUniqueAllVals) : 0;
+    const _rangedMax = out._rangeUniqueRangedVals.length ? Math.max(...out._rangeUniqueRangedVals) : 0;
+    out.range += isRanged ? Math.max(_allMax, _rangedMax) : _allMax;
     return out;
   }
 
@@ -3790,7 +3847,7 @@
     const lvl = st.level;
     const plus = plus2At(lvl);
     const includeInnates = opts.includeInnates == null ? heroLabInnatesOn() : !!opts.includeInnates;
-    const itemsTotal = itemTotals(st.itemEntries, st.hero.attackType);
+    const itemsTotal = itemTotals(st.itemEntries, st.hero.attackType, st.baubleLevel);
     const attr = s.attr;
     if (attr === 'uni') {
       const psu = itemsTotal.primaryStatUni;
@@ -3819,15 +3876,15 @@
     const mpFromAttr = isHuskar ? 0 : (isOgre ? str * 6 : int * C.mpInt);
     const mprFromAttr = isHuskar ? 0 : (isOgre ? str * 0.02 : int * C.mprInt);
     const baseMr = (Number(s.mr) || 25) + int * C.mrInt + heroLabInnate('mr', s, a, lvl, 0, includeInnates);
-    let mr = combinePct([baseMr, ...itemsTotal.mrVals]);
-    let evasion = combinePct([heroLabInnate('evasion', s, a, lvl, 0, includeInnates), ...itemsTotal.evVals]);
+    let mr = Math.min(combinePct([baseMr, ...itemsTotal.mrVals]), 99.9);
+    let evasion = Math.min(combinePct([heroLabInnate('evasion', s, a, lvl, 0, includeInnates), ...itemsTotal.evVals]), 99.9);
     const spellAmp = itemsTotal.spellAmp;
     let armor = (Number(s.armor) || 0) + agi * C.armorAgi + heroLabInnate('armor', s, a, lvl, 0, includeInnates) + itemsTotal.armor;
     let hp = Math.round(((Number(s.hp) || 120) + str * C.hpStr + itemsTotal.hp) * (1 + itemsTotal.hpPct / 100));
     let mp = isHuskar ? 0 : Math.round(((Number(s.mp) || 75) + mpFromAttr + itemsTotal.mp) * (1 + itemsTotal.mpPct / 100) * (1 - itemsTotal.manaReductionPct / 100));
     a._manaPool = mp;
-    const statusRes = combinePct([...itemsTotal.statusResVals, heroLabInnate('statusRes', s, a, lvl, hp, includeInnates)]);
-    const slowRes = combinePct([...itemsTotal.slowResVals, heroLabInnate('slowRes', s, a, lvl, hp, includeInnates)]);
+    const statusRes = Math.min(combinePct([...itemsTotal.statusResVals, heroLabInnate('statusRes', s, a, lvl, hp, includeInnates)]), 99.9);
+    const slowRes = Math.min(combinePct([...itemsTotal.slowResVals, heroLabInnate('slowRes', s, a, lvl, hp, includeInnates)]), 99.9);
     let hpr = ((Number(s.hpr) || 0) + str * C.hprStr + heroLabInnate('hpr', s, a, lvl, hp, includeInnates) + itemsTotal.hpr - itemsTotal.hpRegenReduce) * (1 + itemsTotal.healthRestoration / 100)
       + hp * (itemsTotal.hprPct + itemsTotal.maxHpRegen) / 100;
     let mpr = isHuskar ? 0 : ((Number(s.mpr) || 0) + mprFromAttr + heroLabInnate('mpr', s, a, lvl, hp, includeInnates) + itemsTotal.mpr) * (1 + itemsTotal.mprAmp / 100);
@@ -3853,7 +3910,7 @@
     const msFlat = (Number(s.ms) || 0) + heroLabInnate('ms', s, a, lvl, hp, includeInnates);
     const ms = Math.round((msFlat * dpWitchcraftMsMult(s, lvl, includeInnates) + itemsTotal.ms) * (1 + itemsTotal.msPct / 100));
     const range = (Number(s.range) || 0) + heroLabInnate('range', s, a, lvl, hp, includeInnates) + itemsTotal.range;
-    const proj = Number(s.proj) || 0;
+    const proj = (Number(s.proj) || 0) + itemsTotal.projSpeed;
     const dvision = Math.round(((Number(s.dvision) || 0) + itemsTotal.dvision) * (1 - itemsTotal.visionReduce / 100));
     const nvision = Math.round(((Number(s.nvision) || 0) + itemsTotal.nvision + heroLabInnate('nvision', s, a, lvl, hp, includeInnates)) * (1 - itemsTotal.visionReduce / 100));
     const armorPct = armorFactor(armor) * 100;
@@ -3863,9 +3920,10 @@
     const lifesteal = itemsTotal.lifesteal;
     const spellLifesteal = itemsTotal.spellLifesteal;
     const castRange = itemsTotal.castRange;
+    const cooldownReduction = itemsTotal.cooldownReduction;
     const dps = tHit > 0 ? dmg / tHit : 0;
     const healthRestoration = itemsTotal.healthRestoration;
-    return { hp, mp, hpr, mpr, str, agi, int, armor, armorPct, mr, evasion, statusRes, slowRes, spellAmp, dmg, dmin, dmax, whiteDmin, whiteDmax, aspd, tHit, ms, range, proj, dvision, nvision, ehpPhys, ehpMag, lifesteal, spellLifesteal, castRange, healthRestoration, dps, cost: itemsTotal.cost };
+    return { hp, mp, hpr, mpr, str, agi, int, armor, armorPct, mr, evasion, statusRes, slowRes, spellAmp, dmg, dmin, dmax, whiteDmin, whiteDmax, aspd, tHit, ms, range, proj, dvision, nvision, ehpPhys, ehpMag, lifesteal, spellLifesteal, castRange, cooldownReduction, healthRestoration, dps, cost: itemsTotal.cost };
   }
 
   function renderHeroHud(panel, st, vals) {
@@ -4035,7 +4093,8 @@
       statRow('Attack Speed', mergeDisplay(base.aspd, vals.aspd, vals.aspd - base.aspd, fmt), mergePositive && (vals.aspd - base.aspd) > 0 ? '' : aspdBonus),
       statRow('Attack Interval', `${mergeDisplay(base.tHit, vals.tHit, tHitDiff, v => Number(v || 0).toFixed(2) + 's', false)}`, mergePositive && tHitDiff < 0 ? '' : tHitBon),
       statRow('Attack Range', mergeDisplay(base.range, vals.range, vals.range - base.range, fmt), mergePositive && (vals.range - base.range) > 0 ? '' : rangeBonus),
-      statRow('Projectile', fmt(base.proj || 0)),
+      statRow('Projectile', mergeDisplay(base.proj || 0, vals.proj || 0, (vals.proj || 0) - (base.proj || 0), fmt), mergePositive && ((vals.proj || 0) - (base.proj || 0)) > 0 ? '' : bonusInt((vals.proj || 0) - (base.proj || 0))),
+      statRow('Cast Range', mergeDisplay(base.castRange || 0, vals.castRange || 0, (vals.castRange || 0) - (base.castRange || 0), fmt), mergePositive && ((vals.castRange || 0) - (base.castRange || 0)) > 0 ? '' : bonusInt(vals.castRange - base.castRange)),
       statRow('Move Speed', mergeDisplay(base.ms, vals.ms, vals.ms - base.ms, fmt), mergePositive && (vals.ms - base.ms) > 0 ? '' : msBonus),
       statRow('Spell Amp', mergeDisplay(base.spellAmp, vals.spellAmp, vals.spellAmp - base.spellAmp, fmtPct), mergePositive && (vals.spellAmp - base.spellAmp) > 0 ? '' : spellAmpBonus),
       statRow('Lifesteal', mergeDisplay(base.lifesteal, vals.lifesteal, vals.lifesteal - base.lifesteal, fmtPct), mergePositive && (vals.lifesteal - base.lifesteal) > 0 ? '' : lifestealBonus),
@@ -4063,7 +4122,7 @@
       statRow('Health Restoration', mergeDisplay(base.healthRestoration || 0, vals.healthRestoration || 0, (vals.healthRestoration || 0) - (base.healthRestoration || 0), fmtPct), mergePositive && ((vals.healthRestoration || 0) - (base.healthRestoration || 0)) > 0 ? '' : bonusPct1((vals.healthRestoration || 0) - (base.healthRestoration || 0))),
       statRow('Day Vision', mergeDisplay(base.dvision || 0, vals.dvision || 0, (vals.dvision || 0) - (base.dvision || 0), fmt), mergePositive && ((vals.dvision || 0) - (base.dvision || 0)) > 0 ? '' : bonusInt(vals.dvision - base.dvision)),
       statRow('Night Vision', mergeDisplay(base.nvision || 0, vals.nvision || 0, (vals.nvision || 0) - (base.nvision || 0), fmt), mergePositive && ((vals.nvision || 0) - (base.nvision || 0)) > 0 ? '' : bonusInt(vals.nvision - base.nvision)),
-      statRow('Cast Range', mergeDisplay(base.castRange || 0, vals.castRange || 0, (vals.castRange || 0) - (base.castRange || 0), fmt), mergePositive && ((vals.castRange || 0) - (base.castRange || 0)) > 0 ? '' : bonusInt(vals.castRange - base.castRange)),
+      statRow('Cooldown Reduction', mergeDisplay(base.cooldownReduction || 0, vals.cooldownReduction || 0, (vals.cooldownReduction || 0) - (base.cooldownReduction || 0), fmtPct), mergePositive && ((vals.cooldownReduction || 0) - (base.cooldownReduction || 0)) > 0 ? '' : bonusPct1((vals.cooldownReduction || 0) - (base.cooldownReduction || 0))),
     ].join('');
 
     // Attribute rows builder — shows base attr + item bonus on the number
@@ -4219,7 +4278,7 @@
     `;
   }
 
-  function itemPickerMarkup(selectedId, tab, mode, heroAttr) {
+  function itemPickerMarkup(selectedId, tab, mode, heroAttr, baubleActive) {
     const enchantOnly = mode === 'enchant';
     if (enchantOnly) {
       return `
@@ -4232,10 +4291,13 @@
           </div>
           <div class="hl-shop-body hl-enchant-body">
             <div class="hl-item-grid">
-              ${filteredEnchants(heroAttr).map(item => `
-                <button type="button" class="hl-item-tile${item.id === selectedId ? ' is-selected' : ''}" data-item-id="${item.id}" aria-label="${item.name}">
+              ${filteredEnchants(heroAttr).map(item => {
+                var isT5 = item.tiersAvailable && item.tiersAvailable.indexOf(5) >= 0;
+                var dimmed = baubleActive && !isT5;
+                return `<button type="button" class="hl-item-tile${item.id === selectedId ? ' is-selected' : ''}${dimmed ? ' hl-enchant-bauble-dim' : ''}" data-item-id="${item.id}" aria-label="${item.name}"${dimmed ? ' title="Enchanter\'s Bauble only works with Tier 5 enchants"' : ''}>
                   <img src="${item.icon}" alt="${item.name}" loading="lazy">
-                </button>`).join('')}
+                </button>`;
+              }).join('')}
             </div>
           </div>
         </div>
@@ -4318,11 +4380,13 @@
     const heroId = panel.dataset.hero || '';
     const heroObj = byHero.get(heroId);
     const heroAttr = heroObj ? (heroObj.stats || {}).attr : null;
-    activePicker = { kind: 'item', panel, slot, mode, tab: 'basics', heroAttr };
+    const bl = Math.max(0, Math.min(100, parseInt((panel.querySelector('[data-field="bauble-level"]') || {}).value || '0', 10) || 0));
+    const baubleActive = bl > 0;
+    activePicker = { kind: 'item', panel, slot, mode, tab: 'basics', heroAttr, baubleActive };
     const selectedId = mode === 'enchant'
       ? (panel.dataset.enchantItem || '')
       : (itemsState[slot] || '');
-    overlay.innerHTML = itemPickerMarkup(selectedId, null, mode, heroAttr);
+    overlay.innerHTML = itemPickerMarkup(selectedId, null, mode, heroAttr, baubleActive);
     overlay.hidden = false;
     overlay.classList.add('is-open');
   }
@@ -4331,10 +4395,28 @@
 
   function update() {
     const panels = [...root.querySelectorAll('.hl-panel')];
+    panels.forEach(p => updateLevelRing(p));
     const aState = state(panels[0]);
     const bState = state(panels[1]);
     const a = calc(aState);
     const b = calc(bState);
+    panels[0].dataset.cdr = String(a.cooldownReduction || 0);
+    panels[1].dataset.cdr = String(b.cooldownReduction || 0);
+    panels.forEach(panel => {
+      var _modes = {};
+      try { _modes = JSON.parse(panel.dataset.itemModes || '{}'); } catch(e) {}
+      var _enchantMode = _modes.enchant || null;
+      var _enchantId = panel.dataset.enchantItem || '';
+      var _bl = Math.max(0, Math.min(100, parseInt((panel.querySelector('[data-field="bauble-level"]') || {}).value || '0', 10) || 0));
+      var _baubleActive = _bl > 0;
+      var _enchantIsT5 = _enchantMode === 't5';
+      var _enchantSlot = panel.querySelector('[data-slot="enchant"]');
+      // Enchant slot: dimmed when bauble>0 and enchant equipped but not t5
+      if (_enchantSlot) _enchantSlot.classList.toggle('hl-enchant-bauble-mismatch', _baubleActive && !!_enchantId && !_enchantIsT5);
+      // Bauble slot: never disabled by itself — remove old class if present
+      var _bSlot = panel.querySelector('.hl-bauble-slot');
+      if (_bSlot) _bSlot.classList.remove('hl-bauble-disabled');
+    });
     renderHeroHud(panels[0], aState, a);
     renderHeroHud(panels[1], bState, b);
     renderTotals(panels[0], a, aState);
@@ -4365,11 +4447,36 @@
   const panels = [...root.querySelectorAll('.hl-panel')];
   renderPanel(panels[0], 'a', heroes[0].id);
   renderPanel(panels[1], 'b', heroes[Math.min(1, heroes.length - 1)].id);
+  panels.forEach(p => updateLevelRing(p));
+  function updateLevelRing(panel) {
+    const lvl = Math.max(1, Math.min(30, parseInt(panel.querySelector('[data-field="level"]')?.value || '1', 10) || 1));
+    const ring = panel.querySelector('[data-ring]');
+    if (!ring) return;
+    const circ = 2 * Math.PI * 18;
+    const fill = (lvl / 30) * circ;
+    ring.style.strokeDasharray = fill + ' ' + circ;
+    ring.style.stroke = lvl >= 30 ? '#ffcc44' : '#E7D291';
+  }
+
   root.addEventListener('input', (e) => {
     if (e.target.matches('[data-field="level"]')) {
       const clean = String(e.target.value || '').replace(/[^\d]/g, '').slice(0, 2);
       e.target.value = clean || '';
+      const panel = e.target.closest('.hl-panel');
+      if (panel) updateLevelRing(panel);
       update();
+      return;
+    }
+    if (e.target.matches('[data-field="bauble-level"]')) {
+      const raw = parseInt(e.target.value || '0', 10) || 0;
+      const clamped = Math.max(0, Math.min(100, raw));
+      if (raw !== clamped) e.target.value = clamped || '';
+      update();
+      const panel = e.target.closest('.hl-panel');
+      if (panel) {
+        const slot = panel.querySelector('.hl-bauble-slot');
+        if (slot) slot.classList.toggle('is-active', clamped > 0);
+      }
       return;
     }
     if (e.target.matches('[data-custom]')) update();
@@ -4533,13 +4640,19 @@
           return;
         }
         activePicker.panel.dataset.enchantItem = itemTile.dataset.itemId || '';
-        itemModes.enchant = item && item.modes ? (item.modes.default || 'damage') : undefined;
+        itemModes.enchant = item?.tiersAvailable?.length ? 't' + item.tiersAvailable[0] : (item?.modes ? (Object.keys(item.modes)[0] || 'damage') : 'damage');
       } else {
 
         const slots = JSON.parse(activePicker.panel.dataset.items || '["","","","","",""]');
         slots[activePicker.slot] = itemTile.dataset.itemId || '';
         activePicker.panel.dataset.items = JSON.stringify(slots);
-        itemModes[String(activePicker.slot)] = item && item.modes ? (item.modes.default || 'damage') : undefined;
+        let initialMode = item && item.modes ? (item.modes.default || 'damage') : undefined;
+        if (item && item.id === 'item_power_treads') {
+          const panelHero = byHero.get(activePicker.panel.dataset.hero || '') || heroes[0];
+          const pAttr = panelHero && panelHero.stats && panelHero.stats.attr;
+          initialMode = (pAttr === 'agi' || pAttr === 'int') ? pAttr : 'str';
+        }
+        itemModes[String(activePicker.slot)] = initialMode;
       }
       Object.keys(itemModes).forEach(key => itemModes[key] === undefined && delete itemModes[key]);
       activePicker.panel.dataset.itemModes = JSON.stringify(itemModes);
@@ -4587,19 +4700,19 @@
     cooldownReduction: 'Cooldown Reduction', debuffAmp: 'Debuff Amplification',
     hpPct: 'Max Health %', msPct: 'Movement Speed %', knockbackResist: 'Knockback Resistance',
     incomingDamage: 'Incoming Damage', magicDamage: 'Magic Damage',
-    castSpeed: 'Cast Speed', visionReduce: 'Vision Reduction',
-    manacostIncrease: 'Manacost Increase', intelligencePct: 'Intelligence %',
-    maxHpRegen: 'Max Health Regen', hpRegenReduce: 'HP Regen Reduction',
+    castSpeed: 'Cast Speed', visionReduce: 'Vision',
+    manacostIncrease: 'Manacost / Mana Loss Increase', intelligencePct: 'Intelligence %',
+    maxHpRegen: 'Max Health Regen', hpRegenReduce: 'Health Regeneration',
     manacostReduction: 'Manacost Reduction',
     gpm: 'Gold Per Minute', xpm: 'XP Per Minute',
     aspdPct: 'Attack Speed',
     manaReductionPct: 'Max Mana',
   };
   const BONUS_PCT = new Set(['mr', 'evasion', 'spellAmp', 'statusRes', 'slowRes', 'mprAmp', 'hprPct', 'mpPct', 'lifesteal', 'spellLifesteal', 'damagePct', 'batReduce', 'cooldownReduction', 'debuffAmp', 'hpPct', 'msPct', 'knockbackResist', 'incomingDamage', 'magicDamage', 'castSpeed', 'visionReduce', 'manacostIncrease', 'intelligencePct', 'manacostReduction', 'maxHpRegen', 'aspdPct', 'manaReductionPct', 'healthRestoration']);
-  function fmtNum(v) { var n = Math.abs(v); return n === Math.floor(n) ? String(n) : n % 1 === 0 ? String(n) : Number(n.toFixed(1)).toString(); }
+  function fmtNum(v) { var n = Math.abs(v); return n === Math.floor(n) ? String(n) : n % 1 === 0 ? String(n) : n.toFixed(2).replace(/0+$/, '').replace(/\.$/, ''); }
   function fmtBonusVal(k, v, flip) { var dv = flip ? -v : v; var av = fmtNum(dv); var sign = dv >= 0 ? '+' : '-'; return BONUS_PCT.has(k) ? sign + av + '%' : sign + av; }
-  const BONUS_FLIP_NEG = new Set(['hpRegenReduce', 'manaReductionPct']);
-  const BONUS_RED_POS = new Set(['incomingDamage', 'visionReduce', 'manacostIncrease']);
+  const BONUS_FLIP_NEG = new Set(['hpRegenReduce', 'manaReductionPct', 'visionReduce']);
+  const BONUS_RED_POS = new Set(['incomingDamage', 'manacostIncrease']);
 
   var tipEl = document.createElement('div');
   tipEl.className = 'hl-tooltip';
@@ -4624,7 +4737,9 @@
     return levels.map(l => String(l[key]).replace(/\.0$/, '') + suffix).join(' / ') + ' ' + label;
   }
 
-  function buildTooltip(item, modeKey, showSeries, showEnchantSeries) {
+  function buildTooltip(item, modeKey, showSeries, showEnchantSeries, baubleScale, heroCdr) {
+    baubleScale = baubleScale || 1;
+    heroCdr = heroCdr || 0;
     var tip = item.tip || {};
     var b = item.bonus || {};
     var visual = itemVisual(item, modeKey);
@@ -4646,7 +4761,7 @@
     var infoLine = [];
     if (tip.target) infoLine.push('ABILITY: ' + tip.target);
     if (tip.affects) infoLine.push('AFFECTS: ' + tip.affects);
-    if (tip.disp) infoLine.push('DISPELLABLE: ' + tip.disp);
+    if (tip.disp) { const _d = tip.disp; infoLine.push('DISPELLABLE: ' + (/strong/i.test(_d) ? `<span style="color:#e05050">${_d}</span>` : _d)); }
     if (infoLine.length) lines.push('<div class="hlt-info">' + infoLine.join('<br>') + '</div>');
     var stats = [];
     // Neutral artifacts do not grant direct hero stats. Their AbilityValues
@@ -4696,10 +4811,14 @@
       for (var k in BONUS_LABELS) {
         var v = mode[k];
         if (v && Math.abs(v) > 0.001) {
+          var sv = (item['class'] === 'enchant' && baubleScale !== 1)
+            ? ((k === 'cooldownReduction' || k === 'cdrUnique')
+                ? 100 * (1 - (1 - v/100) * (1 - v*(baubleScale-1)/100))
+                : v * baubleScale)
+            : v;
           var flip = BONUS_FLIP_NEG.has(k);
-          var dv = flip ? -v : v;
-          var formatted = fmtBonusVal(k, v, flip);
-          var pen = flip ? v > 0 : (BONUS_RED_POS.has(k) ? v > 0 : v < 0);
+          var formatted = fmtBonusVal(k, sv, flip);
+          var pen = flip ? sv > 0 : (BONUS_RED_POS.has(k) ? sv > 0 : sv < 0);
           var row = '<span class="hlt-stat' + (pen ? ' hlt-penalty' : '') + '"><b>' + formatted + '</b> ' + BONUS_LABELS[k] + '</span>';
           if (pen) penaltyRows.push(row); else bonusRows.push(row);
         }
@@ -4710,10 +4829,14 @@
       for (var k in BONUS_LABELS) {
         var v = b[k];
         if (v && Math.abs(v) > 0.001) {
+          var sv = baubleScale !== 1
+            ? ((k === 'cooldownReduction' || k === 'cdrUnique')
+                ? (function(){ var _s1 = Math.min(v, 99.9), _s2 = Math.min(v*(baubleScale-1), 99.9); return Math.min(Math.round((1-(1-_s1/100)*(1-_s2/100))*1000)/10, 99.9); })()
+                : v * baubleScale)
+            : v;
           var flip = BONUS_FLIP_NEG.has(k);
-          var dv = flip ? -v : v;
-          var formatted = fmtBonusVal(k, v, flip);
-          var pen = flip ? v > 0 : (BONUS_RED_POS.has(k) ? v > 0 : v < 0);
+          var formatted = fmtBonusVal(k, sv, flip);
+          var pen = flip ? sv > 0 : (BONUS_RED_POS.has(k) ? sv > 0 : sv < 0);
           var row = '<span class="hlt-stat' + (pen ? ' hlt-penalty' : '') + '"><b>' + formatted + '</b> ' + BONUS_LABELS[k] + '</span>';
           if (pen) penaltyRows.push(row); else bonusRows.push(row);
         }
@@ -4742,7 +4865,15 @@
     var cooldownVal = mode && mode.cd != null ? mode.cd : tip.cd;
     if (castRangeVal) costBar.push('<span class="hlt-cost-icon hlt-cast-range" title="Cast Range">' + castRangeVal + '</span>');
     if (manaCostVal) costBar.push('<span class="hlt-cost-icon hlt-mana-cost" title="Mana Cost">' + manaCostVal + '</span>');
-    if (cooldownVal) costBar.push('<span class="hlt-cost-icon hlt-cooldown" title="Cooldown">' + cooldownVal + '</span>');
+    if (cooldownVal) {
+      var cdNum = parseFloat(cooldownVal);
+      if (heroCdr > 0 && !isNaN(cdNum)) {
+        var cdReduced = +(cdNum * (1 - heroCdr / 100)).toFixed(1);
+        costBar.push('<span class="hlt-cost-icon hlt-cooldown" title="Cooldown (with ' + heroCdr + '% CDR)">' + cdReduced + ' <s style="opacity:.45;font-size:.85em">' + cooldownVal + '</s></span>');
+      } else {
+        costBar.push('<span class="hlt-cost-icon hlt-cooldown" title="Cooldown">' + cooldownVal + '</span>');
+      }
+    }
     // Description
     if (tip.desc) {
       var desc = cleanDesc(tip.desc);
@@ -4813,14 +4944,26 @@
     var inPicker = !tileEl.closest('.hl-panel');
     var showSeries = item.id === 'item_dagon' && inPicker;
     var showEnchantSeries = item.tiersAvailable && item.tiersAvailable.length > 1 && inPicker;
-    // Reset class each time, then tag neutral items with their tier so the
-    // header gets the tier colour (game tiers are 1–5; data tier is 0-indexed).
+    var baubleScale = 1;
+    var heroCdr = 0;
+    var _panel = tileEl.closest('.hl-panel');
+    if (_panel) {
+      if (item['class'] === 'enchant') {
+        var _bl = parseInt((_panel.querySelector('[data-field="bauble-level"]') || {}).value || '0', 10) || 0;
+        if (_bl > 0) {
+          var _modes = {};
+          try { _modes = JSON.parse(_panel.dataset.itemModes || '{}'); } catch(e) {}
+          if ((_modes.enchant || null) === 't5') baubleScale = 0.7 + _bl * 0.4;
+        }
+      }
+      heroCdr = parseFloat(_panel.dataset.cdr || '0') || 0;
+    }
     var cls = 'hl-tooltip';
     if (item['class'] === 'neutral' && item.tier != null) {
       cls += ' neutral-tier-' + (item.tier + 1);
     }
     tipEl.className = cls;
-    tipEl.innerHTML = buildTooltip(item, modeKey, showSeries, showEnchantSeries);
+    tipEl.innerHTML = buildTooltip(item, modeKey, showSeries, showEnchantSeries, baubleScale, heroCdr);
     tipEl.hidden = false;
     positionTooltip(tileEl);
   }
@@ -4909,6 +5052,29 @@
     hideTooltip();
   }, true);
 
+  root.addEventListener('pointerover', function(e) {
+    var bslot = e.target.closest('.hl-bauble-slot');
+    if (bslot && bslot !== tipCurrentTile) {
+      tipCurrentTile = bslot;
+      var panel = bslot.closest('.hl-panel');
+      var bl = panel ? (parseInt((panel.querySelector('[data-field="bauble-level"]') || {}).value || '0', 10) || 0) : 0;
+      var bonusPct = bl > 0 ? '+' + (bl * 40 - 30) + '%' : '—';
+      tipEl.className = 'hl-tooltip';
+      tipEl.innerHTML = '<div class="hlt-head"><img class="hlt-icon" src="icons/items/enchanters_bauble.png" alt=""><div class="hlt-title"><span class="hlt-name">Enchanter\'s Bauble</span></div></div>'
+        + (bl > 0 ? '<div class="hlt-stats"><span class="hlt-stat"><b>' + bonusPct + '</b> Enchantment Bonus</span></div>' : '')
+        + '<div class="hlt-info">ABILITY: Passive</div>'
+        + '<div class="hlt-desc">Increases the bonuses of the item\'s Neutral Enchantment by <span style="color:#9cf">10%</span>. Every time this item is crafted again the bonus is increased by <span style="color:#9cf">40%</span>.</div>';
+      tipEl.hidden = false;
+      positionTooltip(bslot);
+    }
+  }, true);
+  root.addEventListener('pointerout', function(e) {
+    var bslot = e.target.closest('.hl-bauble-slot');
+    if (!bslot) return;
+    var related = e.relatedTarget;
+    if (related && bslot.contains(related)) return;
+    hideTooltip();
+  }, true);
   root.addEventListener('pointerover', function(e) {
     var chip = e.target.closest('[data-innate-chip]');
     if (!chip || chip.classList.contains('is-hidden')) return;
