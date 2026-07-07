@@ -3241,7 +3241,7 @@
   const BASIC_SECTIONS = ['Consumables', 'Attributes', 'Equipment', 'Miscellaneous', 'Secret Shop'];
   const UPGRADE_SECTIONS = ['Accessories', 'Support', 'Magical', 'Armor', 'Weapons', 'Armaments'];
   var SHOP_ORDER = {
-    Consumables: ['clarity','tango','flask','bottle','enchanted_mango','faerie_fire','smoke_of_deceit','ward_sentry','dust','infused_raindrop','blood_grenade','aghanims_shard'],
+    Consumables: ['clarity','tango','flask','bottle','enchanted_mango','faerie_fire','smoke_of_deceit','ward_sentry','dust','infused_raindrop','blood_grenade'],
     Attributes: ['branches','gauntlets','slippers','mantle','circlet','crown','boots_of_elves','belt_of_strength','ogre_axe','blade_of_alacrity','staff_of_wizardry','robe','ghost','diadem'],
     Equipment: ['blades_of_attack','broadsword','claymore','javelin','mithril_hammer','orb_of_venom','blight_stone','orb_of_frost','quelling_blade','ring_of_protection','splintmill','chainmail','helm_of_iron_will','blitz_knuckles','gloves','splintmail'],
     Miscellaneous: ['magic_stick','wind_lace','ring_of_regen','sobi_mask','boots','cloak','fluffy_hat','gem','blink','shadow_amulet','lifesteal','shawl','voodoo_mask','wizard_hat','chasm_stone'],
@@ -3259,7 +3259,7 @@
   };
   const METRICS = [
     ['hp', 'HP'], ['mp', 'MP'], ['hpr', 'HP/sec'], ['mpr', 'MP/sec'],
-    ['str', 'STR'], ['agi', 'AGI'], ['int', 'INT'],
+    ['str', 'Strength'], ['agi', 'Agility'], ['int', 'Intelligence'],
     ['armor', 'Armor'], ['armorPct', 'Armor %'], ['mr', 'Mag. resist'],
     ['statusRes', 'Status resist'], ['slowRes', 'Slow resist'], ['spellAmp', 'Spell amp'],
     ['evasion', 'Evasion'], ['dmg', 'Damage'], ['aspd', 'Attack speed'], ['tHit', 'Attack Interval'],
@@ -3292,7 +3292,7 @@
     });
   }
   const itemGroups = {
-    basics: BASIC_SECTIONS.map(name => [name, shopSort(items.filter(i => i.class === 'regular' && i.category === name && i.id !== 'item_tpscroll'), name)]),
+    basics: BASIC_SECTIONS.map(name => [name, shopSort(items.filter(i => i.class === 'regular' && i.category === name && i.id !== 'item_tpscroll' && i.slug !== 'aghanims_shard'), name)]),
     upgrades: UPGRADE_SECTIONS.map(name => [name, shopSort(items.filter(i => i.class === 'regular' && i.category === name && i.id !== 'item_tpscroll'), name)]),
     neutrals: {
       tiers: [0, 1, 2, 3, 4].map(tier => [tier, items.filter(i => i.class === 'neutral' && i.tier === tier)]),
@@ -3903,12 +3903,13 @@
     const dmax = whiteDmax + Math.floor(whiteDmax * itemsTotal.damagePct / 100) + itemsTotal.damage;
     const dmg = (dmin + dmax) / 2;
     const aspdRaw = (Number(s.bas) || 100) + agi * C.asAgi + heroLabInnate('aspd', s, a, lvl, hp, includeInnates) + itemsTotal.aspd;
-    const aspd = aspdRaw * (1 + itemsTotal.aspdPct / 100);
+    const aspd = Math.min(Math.max(aspdRaw * (1 + itemsTotal.aspdPct / 100), 20), 700);
     const batBase = Number(s.bat) || 1.7;
     const bat = batBase * (1 - itemsTotal.batReduce / 100);
     const tHit = bat * 100 / Math.max(1, aspd);
     const msFlat = (Number(s.ms) || 0) + heroLabInnate('ms', s, a, lvl, hp, includeInnates);
-    const ms = Math.round((msFlat * dpWitchcraftMsMult(s, lvl, includeInnates) + itemsTotal.ms) * (1 + itemsTotal.msPct / 100));
+    const msMax = s.slug === 'windrunner' ? 600 : 550;
+    const ms = Math.min(Math.round((msFlat * dpWitchcraftMsMult(s, lvl, includeInnates) + itemsTotal.ms) * (1 + itemsTotal.msPct / 100)), msMax);
     const range = (Number(s.range) || 0) + heroLabInnate('range', s, a, lvl, hp, includeInnates) + itemsTotal.range;
     const proj = (Number(s.proj) || 0) + itemsTotal.projSpeed;
     const dvision = Math.round(((Number(s.dvision) || 0) + itemsTotal.dvision) * (1 - itemsTotal.visionReduce / 100));
@@ -4286,7 +4287,7 @@
           <div class="hl-picker-head">
             <strong>Enchantments</strong>
             <div class="hl-picker-actions">
-              <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">x</button>
+              <button type="button" class="hl-picker-close" data-picker-close aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
             </div>
           </div>
           <div class="hl-shop-body hl-enchant-body">
@@ -4309,7 +4310,7 @@
         <div class="hl-picker-head">
           <strong>Shop</strong>
           <div class="hl-picker-actions">
-            <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">x</button>
+            <button type="button" class="hl-picker-close" data-picker-close aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
           </div>
         </div>
         <div class="hl-shop-body hl-shop-4col">
@@ -4359,10 +4360,11 @@
     overlay.innerHTML = `
       <div class="hl-picker-card hl-tier-picker" role="dialog" aria-modal="true">
         <div class="hl-picker-head">
+          <button type="button" class="hl-picker-back" data-picker-back aria-label="Back"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="9,2 4,7 9,12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <img src="${item.icon}" style="width:28px;height:28px;border-radius:3px;margin-right:6px">
           <strong>${item.name}</strong>
           <div class="hl-picker-actions">
-            <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">x</button>
+            <button type="button" class="hl-picker-close" data-picker-close aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
           </div>
         </div>
         <div class="hl-tier-list">
@@ -4433,7 +4435,7 @@
       const diffValue = diffPctOn ? (delta === 0 ? 0 : (delta > 0 ? pctAbs : -pctAbs)) : delta;
       const cls = delta > 0 ? 'pos' : delta < 0 ? 'neg' : 'zero';
       const side = delta > 0 ? 'left' : delta < 0 ? 'right' : 'none';
-      return `<div class="hl-diff-row ${cls}" data-adv="${side}">
+      return `<div class="hl-diff-row ${cls}" data-adv="${side}" data-diff-key="${key}"
         <strong class="hl-diff-side hl-diff-left">${fmtMetric(key, leftVal)}</strong>
         <span class="hl-diff-center">
           <span class="hl-diff-label">${label}</span>
@@ -4442,12 +4444,51 @@
         <strong class="hl-diff-side hl-diff-right">${fmtMetric(key, rightVal)}</strong>
       </div>`;
     }).join('');
+    applyDiffCatFilter();
+  }
+  function applyDiffCatFilter() {
+    const menu = document.querySelector('.hd-dd-menu[data-dd="diffstat"]');
+    if (!menu) return;
+    const checked = new Set([...menu.querySelectorAll('input[data-diffstat]:checked')].map(i => i.dataset.diffstat));
+    document.querySelectorAll('#hl-diff-list .hl-diff-row').forEach(row => {
+      row.classList.toggle('diff-cat-hidden', !checked.has(row.dataset.diffKey));
+    });
   }
 
   const panels = [...root.querySelectorAll('.hl-panel')];
   renderPanel(panels[0], 'a', heroes[0].id);
   renderPanel(panels[1], 'b', heroes[Math.min(1, heroes.length - 1)].id);
   panels.forEach(p => updateLevelRing(p));
+  (function() {
+    const dd = document.querySelector('.hero-lab-toolbar .hd-dd[data-dd="diffstat"]');
+    if (!dd) return;
+    const btn = dd.querySelector('.hd-dd-btn');
+    const menu = dd.querySelector('.hd-dd-menu');
+    const badge = dd.querySelector('.hd-dd-badge');
+    menu.innerHTML =
+      '<label class="hd-dd-opt hd-dd-all"><input type="checkbox" data-dd-all><span>All</span></label>' +
+      '<div class="hd-dd-sep" aria-hidden="true"></div>' +
+      METRICS.map(([key, label]) =>
+        `<label class="hd-dd-opt"><input type="checkbox" data-diffstat="${key}" checked><span>${label}</span></label>`
+      ).join('');
+    const allBox = menu.querySelector('input[data-dd-all]');
+    const boxes = [...menu.querySelectorAll('input[data-diffstat]')];
+    document.body.appendChild(menu);
+    menu.style.position = 'fixed';
+    const place = () => { const r = btn.getBoundingClientRect(); menu.style.top = (r.bottom + 6) + 'px'; menu.style.left = r.left + 'px'; };
+    const sync = () => {
+      const n = boxes.filter(b => b.checked).length;
+      if (badge) badge.textContent = n === boxes.length ? 'all' : String(n);
+      if (allBox) { allBox.checked = n === boxes.length; allBox.indeterminate = n > 0 && n < boxes.length; }
+    };
+    sync();
+    btn.addEventListener('click', (e) => { e.stopPropagation(); const open = menu.hidden; menu.hidden = !open; btn.setAttribute('aria-expanded', String(open)); if (open) place(); });
+    menu.addEventListener('click', (e) => e.stopPropagation());
+    if (allBox) allBox.addEventListener('change', () => { boxes.forEach(b => { b.checked = allBox.checked; }); sync(); applyDiffCatFilter(); });
+    boxes.forEach(b => b.addEventListener('change', () => { sync(); applyDiffCatFilter(); }));
+    document.addEventListener('click', () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); });
+    window.addEventListener('scroll', (e) => { if (!menu.contains(e.target)) { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); } }, true);
+  })();
   function updateLevelRing(panel) {
     const lvl = Math.max(1, Math.min(30, parseInt(panel.querySelector('[data-field="level"]')?.value || '1', 10) || 1));
     const ring = panel.querySelector('[data-ring]');
@@ -4611,6 +4652,10 @@
       closePicker();
       return;
     }
+    if (e.target.closest('[data-picker-back]')) {
+      if (activePicker && activePicker.panel) openItemPicker(activePicker.panel, 'enchant');
+      return;
+    }
     const heroTile = e.target.closest('[data-hero-id]');
     if (heroTile && activePicker?.kind === 'hero') {
       activePicker.panel.dataset.hero = heroTile.dataset.heroId;
@@ -4708,7 +4753,7 @@
     aspdPct: 'Attack Speed',
     manaReductionPct: 'Max Mana',
   };
-  const BONUS_PCT = new Set(['mr', 'evasion', 'spellAmp', 'statusRes', 'slowRes', 'mprAmp', 'hprPct', 'mpPct', 'lifesteal', 'spellLifesteal', 'damagePct', 'batReduce', 'cooldownReduction', 'debuffAmp', 'hpPct', 'msPct', 'knockbackResist', 'incomingDamage', 'magicDamage', 'castSpeed', 'visionReduce', 'manacostIncrease', 'intelligencePct', 'manacostReduction', 'maxHpRegen', 'aspdPct', 'manaReductionPct', 'healthRestoration']);
+  const BONUS_PCT = new Set(['mr', 'evasion', 'spellAmp', 'statusRes', 'slowRes', 'mprAmp', 'hprPct', 'mpPct', 'lifesteal', 'spellLifesteal', 'damagePct', 'batReduce', 'cooldownReduction', 'debuffAmp', 'hpPct', 'msPct', 'knockbackResist', 'incomingDamage', 'castSpeed', 'visionReduce', 'manacostIncrease', 'intelligencePct', 'manacostReduction', 'maxHpRegen', 'aspdPct', 'manaReductionPct', 'healthRestoration']);
   function fmtNum(v) { var n = Math.abs(v); return n === Math.floor(n) ? String(n) : n % 1 === 0 ? String(n) : n.toFixed(2).replace(/0+$/, '').replace(/\.$/, ''); }
   function fmtBonusVal(k, v, flip) { var dv = flip ? -v : v; var av = fmtNum(dv); var sign = dv >= 0 ? '+' : '-'; return BONUS_PCT.has(k) ? sign + av + '%' : sign + av; }
   const BONUS_FLIP_NEG = new Set(['hpRegenReduce', 'manaReductionPct', 'visionReduce']);

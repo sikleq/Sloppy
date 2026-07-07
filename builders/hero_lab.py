@@ -1264,13 +1264,17 @@ def render_html() -> str:
 <p class="mr-blurb inbox-bar">Compare two heroes side by side with level, six inventory slots, neutral item, enchantment and custom stat overrides. The center column shows the live difference between both builds.</p>
 <div class="cal-toggle-bar inbox-bar hero-lab-toolbar">
   <div class="toolbar-panel">
+    <div class="hd-dd" data-dd="diffstat" id="hl-diff-dd">
+      <button type="button" class="hd-dd-btn" aria-expanded="false" aria-haspopup="true"><span class="hd-dd-label">Difference</span><span class="hd-dd-badge" aria-hidden="true"></span><svg class="hd-dd-caret" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M0 0l5 6 5-6z" fill="currentColor"/></svg></button>
+      <div class="hd-dd-menu" data-dd="diffstat" role="group" hidden></div>
+    </div>
     <label class="ua-upgrades-toggle">
       <span class="ua-upgrades-label">Innates</span>
       <input type="checkbox" class="ua-switch-input" data-innates-toggle checked>
       <span class="ua-switch" aria-hidden="true"></span>
     </label>
     <label class="ua-upgrades-toggle">
-      <span class="ua-upgrades-label">Merge positive bonuses</span>
+      <span class="ua-upgrades-label">Show totals</span>
       <input type="checkbox" class="ua-switch-input" data-hl-merge-positive-toggle>
       <span class="ua-switch" aria-hidden="true"></span>
     </label>

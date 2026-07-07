@@ -6870,6 +6870,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .hl-diff-head {
   margin: 0 0 5px;
 }
+.hl-diff-row.diff-cat-hidden {
+  display: none;
+}
 .hl-diff-head strong {
   display: block;
   color: #656565;
@@ -7134,7 +7137,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .hl-picker-card {
   width: min(1180px, calc(100vw - 56px));
   max-height: min(820px, calc(100vh - 56px));
-  overflow: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   border: 1px solid rgba(114, 103, 75, 0.92);
   border-radius: 4px;
   background:
@@ -7163,22 +7168,39 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   align-items: center;
   gap: 8px;
 }
-.hl-picker-close {
-  border: 1px solid rgba(121, 109, 81, 0.75);
-  background:
-    linear-gradient(180deg, rgba(41, 44, 49, 0.96), rgba(15, 18, 22, 0.98)),
-    #12161b;
-  color: #e6e0d1;
+.hl-picker-close,
+.hl-picker-back {
+  border: 1px solid rgba(121, 109, 81, 0.6);
+  background: linear-gradient(180deg, rgba(46, 48, 54, 0.9), rgba(18, 20, 25, 0.95));
+  color: rgba(210, 200, 175, 0.8);
   border-radius: 4px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
   width: 28px;
   height: 28px;
   padding: 0;
-  font-size: 14px;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.hl-picker-close:hover {
+  color: #e8d8a0;
+  border-color: rgba(200, 70, 70, 0.7);
+  background: linear-gradient(180deg, rgba(80, 30, 30, 0.85), rgba(40, 10, 10, 0.95));
+}
+.hl-picker-back {
+  margin-right: 4px;
+}
+.hl-picker-back:hover {
+  color: #e3c46a;
+  border-color: rgba(227, 196, 106, 0.6);
+  background: linear-gradient(180deg, rgba(50, 45, 20, 0.9), rgba(25, 22, 10, 0.95));
 }
 .hl-hero-grid-wrap {
   padding: 14px 16px 16px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 .hl-picker-searchbar {
   padding: 10px 16px 0;
@@ -7206,6 +7228,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .hl-shop-body {
   padding: 8px 12px 10px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 .hl-hero-grid-wrap {
   display: grid;
