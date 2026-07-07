@@ -4335,12 +4335,12 @@
     activePicker = null;
     overlay.hidden = true;
     overlay.classList.remove('is-open');
-    overlay.innerHTML = '';
     hideTooltip();
   }
 
   function openHeroPicker(panel) {
     activePicker = { kind: 'hero', panel };
+    _itemPickerCacheKey = null;
     overlay.innerHTML = heroPickerMarkup(panel.dataset.hero || heroes[0].id);
     overlay.hidden = false;
     overlay.classList.add('is-open');
@@ -4357,6 +4357,7 @@
       return Object.entries(mode).filter(([k,v]) => k !== 'level' && Math.abs(v) > 0.001)
         .map(([k,v]) => `${BONUS_LABELS[k] || k}: ${BONUS_PCT.has(k) ? fmtNum(v) + '%' : fmtNum(v)}`).join(', ');
     });
+    _itemPickerCacheKey = null;
     overlay.innerHTML = `
       <div class="hl-picker-card hl-tier-picker" role="dialog" aria-modal="true">
         <div class="hl-picker-head">
@@ -4376,6 +4377,8 @@
       </div>`;
   }
 
+  var _itemPickerCacheKey = null;
+
   function openItemPicker(panel, slot) {
     const itemsState = JSON.parse(panel.dataset.items || '["","","","","",""]');
     const mode = slot === 'enchant' ? 'enchant' : 'normal';
@@ -4388,7 +4391,17 @@
     const selectedId = mode === 'enchant'
       ? (panel.dataset.enchantItem || '')
       : (itemsState[slot] || '');
-    overlay.innerHTML = itemPickerMarkup(selectedId, null, mode, heroAttr, baubleActive);
+    const cacheKey = mode + '|' + heroAttr + '|' + baubleActive;
+    if (_itemPickerCacheKey !== cacheKey) {
+      overlay.innerHTML = itemPickerMarkup(selectedId, null, mode, heroAttr, baubleActive);
+      _itemPickerCacheKey = cacheKey;
+    } else {
+      overlay.querySelectorAll('.hl-item-slot.is-selected').forEach(el => el.classList.remove('is-selected'));
+      if (selectedId) {
+        const sel = overlay.querySelector(`.hl-item-slot[data-id="${selectedId}"]`);
+        if (sel) sel.classList.add('is-selected');
+      }
+    }
     overlay.hidden = false;
     overlay.classList.add('is-open');
   }
