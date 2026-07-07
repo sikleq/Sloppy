@@ -124,17 +124,17 @@ _ATTR_LABEL = {
 }
 
 _ENCHANT_DESC = {
-    "Alert":      {1: ["+7 Attack Speed"], 2: ["+15 Attack Speed", "+150 Bonus Night Vision"], 3: ["+23 Attack Speed", "+225 Bonus Night Vision"], 4: ["+31 Attack Speed", "+300 Bonus Night Vision", "+100 Attack Range"]},
+    "Alert":      {1: ["+7 Attack Speed"], 2: ["+15 Attack Speed", "+125 Bonus Night Vision"], 3: ["+23 Attack Speed", "+175 Bonus Night Vision"], 4: ["+31 Attack Speed", "+225 Bonus Night Vision", "+80 Attack Range"]},
     "Brawny":     {1: ["+110 Health"], 2: ["+150 Health", "+3 Health Regen"], 3: ["+190 Health", "+6 Health Regen"], 4: ["+230 Health", "+9 Health Regen", "+25% Slow Resistance"]},
     "Tough":      {1: ["+7 Damage"], 2: ["+10 Damage", "+4 Armor"], 3: ["+13 Damage", "+6 Armor"], 4: ["+16 Damage", "+8 Armor", "+40% Knockback Resistance"]},
     "Mystical":   {1: ["+1 Mana Regen"], 2: ["+1.75 Mana Regen", "+10% Magic Resistance"], 3: ["+2.5 Mana Regen", "+13% Magic Resistance"], 4: ["+3.25 Mana Regen", "+16% Magic Resistance", "+15% Mana Cost/Loss Reduction"]},
     "Quickened":  {1: ["+15 Movement Speed"], 2: ["+20 Movement Speed", "+100 Mana"], 3: ["+25 Movement Speed", "+160 Mana"], 4: ["+30 Movement Speed", "+220 Mana", "+15% Evasion"]},
-    "Vital":      {1: ["+2 Health Regen"]},
+    "Vital":      {1: ["+2.25 Health Regen"]},
     "Greedy":     {2: ["+75 GPM", "+200 Mana", "−30 Attack Damage"], 3: ["+100 GPM", "+250 Mana", "−60 Attack Damage"]},
     "Crude":      {2: ["+10% Health Restoration", "+8% BAT Reduction", "−6% Intelligence"], 3: ["+15% Health Restoration", "+12% BAT Reduction", "−6% Intelligence"], 4: ["+20% Health Restoration", "+16% BAT Reduction", "−6% Intelligence", "Also modifies incoming healing"]},
     "Nimble":     {2: ["+6% Movement Speed", "+10 Damage", "−1.5 Health Regen"], 3: ["+8% Movement Speed", "+15 Damage", "−2.25 Health Regen"], 4: ["+10% Movement Speed", "+20 Damage", "−3 Health Regen"]},
     "Keen-Eyed":  {2: ["+125 Cast Range", "+1 Mana Regen", "−10% Max Mana"], 3: ["+135 Cast Range", "+1.5 Mana Regen", "−12% Max Mana"], 4: ["+145 Cast Range", "+2 Mana Regen", "−14% Max Mana"]},
-    "Titanic":    {2: ["+8% Attack Damage", "+10% Status Resistance", "−10% Attack Speed"], 3: ["+12% Attack Damage", "+12% Status Resistance", "−12% Attack Speed"], 4: ["+16% Attack Damage", "+14% Status Resistance", "−14% Attack Speed"]},
+    "Titanic":    {2: ["+8% Attack Damage", "+10% Status Resistance", "−9% Attack Speed"], 3: ["+12% Attack Damage", "+12% Status Resistance", "−9% Attack Speed"], 4: ["+16% Attack Damage", "+14% Status Resistance", "−9% Attack Speed"]},
     "Timeless":   {4: ["+10% Debuff Amplification", "+8% Spell Amplification"], 5: ["+15% Debuff Amplification", "+16% Spell Amplification"]},
     "Vampiric":   {5: ["+30% Lifesteal", "+20% Spell Lifesteal", "+300 Bonus Night Vision"]},
     "Evolved":    {5: ["+40 Primary Stat", "(+24 All Attributes for Universal heroes)"]},
