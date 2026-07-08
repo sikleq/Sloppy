@@ -3925,7 +3925,10 @@
     const spellLifesteal = itemsTotal.spellLifesteal;
     const castRange = itemsTotal.castRange;
     const cooldownReduction = itemsTotal.cooldownReduction || 0;
-    const itemCdr = heroLabInnate('itemCdr', s, { str, agi, int }, lvl, hp, includeInnates);
+    const innateItemCdr = heroLabInnate('itemCdr', s, { str, agi, int }, lvl, hp, includeInnates);
+    const itemCdr = innateItemCdr > 0
+      ? Math.min(Math.round((1 - (1 - innateItemCdr / 100) * (1 - cooldownReduction / 100)) * 1000) / 10, 99.9)
+      : 0;
     const dps = tHit > 0 ? dmg / tHit : 0;
     const healthRestoration = itemsTotal.healthRestoration;
     return { hp, mp, hpr, mpr, str, agi, int, armor, armorPct, mr, evasion, statusRes, slowRes, spellAmp, dmg, dmin, dmax, whiteDmin, whiteDmax, aspd, tHit, ms, range, proj, dvision, nvision, ehpPhys, ehpMag, lifesteal, spellLifesteal, castRange, cooldownReduction, itemCdr, healthRestoration, dps, cost: itemsTotal.cost };
