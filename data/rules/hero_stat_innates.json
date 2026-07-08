@@ -59,10 +59,25 @@
           "formula": "attr_factor",
           "source": "str",
           "history": [
-            { "since": "7.36",  "until": "7.36a", "factor": 0.40 },
-            { "since": "7.36b", "until": "7.37a", "factor": 0.35 },
-            { "since": "7.37b", "until": "7.41",  "factor": 0.30 },
-            { "since": "7.41a",                   "factor": 0.40 }
+            {
+              "since": "7.36",
+              "until": "7.36a",
+              "factor": 0.4
+            },
+            {
+              "since": "7.36b",
+              "until": "7.37a",
+              "factor": 0.35
+            },
+            {
+              "since": "7.37b",
+              "until": "7.41",
+              "factor": 0.3
+            },
+            {
+              "since": "7.41a",
+              "factor": 0.4
+            }
           ]
         }
       ]
@@ -76,8 +91,15 @@
           "formula": "attr_factor",
           "source": "int",
           "history": [
-            { "since": "7.36", "until": "7.37e", "factor": 0.5 },
-            { "since": "7.38",                   "factor": 1.0 }
+            {
+              "since": "7.36",
+              "until": "7.37e",
+              "factor": 0.5
+            },
+            {
+              "since": "7.38",
+              "factor": 1.0
+            }
           ]
         }
       ]
@@ -91,8 +113,17 @@
           "formula": "ms_multiplier",
           "note": "KV value=base_pct, hero_levelup=per_level_pct. Python cannot return a multiplier via _innate_bonus(); this is handled directly in the MS computation path.",
           "history": [
-            { "since": "7.40",  "until": "7.40c", "base_pct": 0.75, "per_level_pct": 0.75 },
-            { "since": "7.41a",                   "base_pct": 0.50, "per_level_pct": 0.75 }
+            {
+              "since": "7.40",
+              "until": "7.40c",
+              "base_pct": 0.75,
+              "per_level_pct": 0.75
+            },
+            {
+              "since": "7.41a",
+              "base_pct": 0.5,
+              "per_level_pct": 0.75
+            }
           ]
         }
       ]
@@ -122,7 +153,7 @@
         {
           "target": "agi",
           "formula": "self_attr_pct_per_level",
-          "base_pct": 0.10,
+          "base_pct": 0.1,
           "per_level_pct": 0.01,
           "note": "Self-referential: bonus agi is folded into her agi so all agi-derived stats (dmg, armor, aspd) pick it up. KV value=10, hero_levelup=+1 (both in percent /100)."
         }
@@ -138,8 +169,15 @@
           "source": "int",
           "note": "KV intelligence_per_speed=N; factor = 1/N.",
           "history": [
-            { "since": "7.41a", "until": "7.41b", "factor": 0.4 },
-            { "since": "7.41c",                   "factor": 0.33333 }
+            {
+              "since": "7.41a",
+              "until": "7.41b",
+              "factor": 0.4
+            },
+            {
+              "since": "7.41c",
+              "factor": 0.33333
+            }
           ]
         }
       ]
@@ -185,11 +223,30 @@
           "absorb_pct": 0.98,
           "note": "98% of incoming damage is absorbed by mana at a cost of damage_per_mana. KV absorption_pct=98, damage_per_mana=2 + hero_levelup=+0.1 (since 7.41a). Handled in JS manaShieldEhp() and medusaDpm(); already added to ehpPhys in calc().",
           "history": [
-            { "since": "7.36",  "until": "7.36c", "dpm": "leveled: 2/2/2.4/2.8/3.2/3.6 per rank" },
-            { "since": "7.37",  "until": "7.37e", "dpm": "leveled: 2.4/2.4/2.8/3.2/3.6" },
-            { "since": "7.38",  "until": "7.39d", "dpm": 2.2 },
-            { "since": "7.39e", "until": "7.40c", "dpm": 2.0 },
-            { "since": "7.41a",                   "dpm": "2 + 0.1 * level" }
+            {
+              "since": "7.36",
+              "until": "7.36c",
+              "dpm": "leveled: 2/2/2.4/2.8/3.2/3.6 per rank"
+            },
+            {
+              "since": "7.37",
+              "until": "7.37e",
+              "dpm": "leveled: 2.4/2.4/2.8/3.2/3.6"
+            },
+            {
+              "since": "7.38",
+              "until": "7.39d",
+              "dpm": 2.2
+            },
+            {
+              "since": "7.39e",
+              "until": "7.40c",
+              "dpm": 2.0
+            },
+            {
+              "since": "7.41a",
+              "dpm": "2 + 0.1 * level"
+            }
           ]
         }
       ]
@@ -204,8 +261,15 @@
           "source": "agi",
           "note": "KV attack_range_per_agi (percent /100).",
           "history": [
-            { "since": "7.41",  "until": "7.41c", "factor": 0.20 },
-            { "since": "7.41d",                   "factor": 0.25 }
+            {
+              "since": "7.41",
+              "until": "7.41c",
+              "factor": 0.2
+            },
+            {
+              "since": "7.41d",
+              "factor": 0.25
+            }
           ]
         },
         {
@@ -287,8 +351,17 @@
           "formula": "mana_pool_pct_per_level",
           "note": "KV bonus_mana_as_mana_regen: value in percent /100, hero_levelup in percent /100. Handled in Python via _techies_pool_regen_l1(); not in the standard _innate_bonus() dispatch.",
           "history": [
-            { "since": "7.41a", "until": "7.41b", "base_pct": 0.0008, "per_level_pct": 0.0002 },
-            { "since": "7.41c",                   "base_pct": 0.001,  "per_level_pct": 0.0001 }
+            {
+              "since": "7.41a",
+              "until": "7.41b",
+              "base_pct": 0.0008,
+              "per_level_pct": 0.0002
+            },
+            {
+              "since": "7.41c",
+              "base_pct": 0.001,
+              "per_level_pct": 0.0001
+            }
           ]
         }
       ]
@@ -302,9 +375,21 @@
           "formula": "hp_pct",
           "note": "KV value=1.25 (percent). Leveled phase 7.37b-7.39c: 1.2/1.3/1.4/1.5 per rank — Python/JS both use max rank (1.5) for that window. Handled in JS innateDmg(); Python uses _innate_bonus() with StatusHealth base.",
           "history": [
-            { "since": "7.36",  "until": "7.37a", "factor": 1.5  },
-            { "since": "7.37b", "until": "7.39c", "factor": 1.5,  "note": "Leveled: 1.2/1.3/1.4/1.5; Python/JS use max rank." },
-            { "since": "7.39d",                   "factor": 1.25 }
+            {
+              "since": "7.36",
+              "until": "7.37a",
+              "factor": 1.5
+            },
+            {
+              "since": "7.37b",
+              "until": "7.39c",
+              "factor": 1.5,
+              "note": "Leveled: 1.2/1.3/1.4/1.5; Python/JS use max rank."
+            },
+            {
+              "since": "7.39d",
+              "factor": 1.25
+            }
           ]
         }
       ]
@@ -319,9 +404,20 @@
           "source": "str",
           "note": "bonus_hpr = STR * HPREG_PER_STR * factor",
           "history": [
-            { "since": "7.36",  "until": "7.36a", "factor": 0.33 },
-            { "since": "7.36b", "until": "7.40c", "factor": 0.25 },
-            { "since": "7.41",                    "factor": 0.30 }
+            {
+              "since": "7.36",
+              "until": "7.36a",
+              "factor": 0.33
+            },
+            {
+              "since": "7.36b",
+              "until": "7.40c",
+              "factor": 0.25
+            },
+            {
+              "since": "7.41",
+              "factor": 0.3
+            }
           ]
         },
         {
@@ -330,9 +426,20 @@
           "source": "int",
           "note": "bonus_mpr = INT * MANAREG_PER_INT * factor",
           "history": [
-            { "since": "7.36",  "until": "7.36a", "factor": 0.33 },
-            { "since": "7.36b", "until": "7.40c", "factor": 0.25 },
-            { "since": "7.41",                    "factor": 0.30 }
+            {
+              "since": "7.36",
+              "until": "7.36a",
+              "factor": 0.33
+            },
+            {
+              "since": "7.36b",
+              "until": "7.40c",
+              "factor": 0.25
+            },
+            {
+              "since": "7.41",
+              "factor": 0.3
+            }
           ]
         },
         {
@@ -341,9 +448,20 @@
           "source": "agi",
           "note": "bonus_aspd = AGI * AS_PER_AGI * factor",
           "history": [
-            { "since": "7.36",  "until": "7.36a", "factor": 0.33 },
-            { "since": "7.36b", "until": "7.40c", "factor": 0.25 },
-            { "since": "7.41",                    "factor": 0.30 }
+            {
+              "since": "7.36",
+              "until": "7.36a",
+              "factor": 0.33
+            },
+            {
+              "since": "7.36b",
+              "until": "7.40c",
+              "factor": 0.25
+            },
+            {
+              "since": "7.41",
+              "factor": 0.3
+            }
           ]
         },
         {
@@ -352,8 +470,16 @@
           "source": "agi",
           "note": "bonus_armor = AGI * ARMOR_PER_AGI * factor. Removed in 7.41.",
           "history": [
-            { "since": "7.36",  "until": "7.36a", "factor": 0.33 },
-            { "since": "7.36b", "until": "7.40c", "factor": 0.25 }
+            {
+              "since": "7.36",
+              "until": "7.36a",
+              "factor": 0.33
+            },
+            {
+              "since": "7.36b",
+              "until": "7.40c",
+              "factor": 0.25
+            }
           ]
         },
         {
@@ -362,8 +488,16 @@
           "source": "int",
           "note": "bonus_mr = INT * MR_PER_INT * factor. Removed in 7.41.",
           "history": [
-            { "since": "7.36",  "until": "7.36a", "factor": 0.33 },
-            { "since": "7.36b", "until": "7.40c", "factor": 0.25 }
+            {
+              "since": "7.36",
+              "until": "7.36a",
+              "factor": 0.33
+            },
+            {
+              "since": "7.36b",
+              "until": "7.40c",
+              "factor": 0.25
+            }
           ]
         },
         {
@@ -389,7 +523,20 @@
           "target": "statusRes",
           "formula": "attr_factor",
           "source": "str",
-          "factor": 0.10
+          "factor": 0.1
+        }
+      ]
+    },
+    "tinker": {
+      "innate": "tinker_eureka",
+      "since": "7.36",
+      "effects": [
+        {
+          "target": "itemCdr",
+          "formula": "attr_floor_capped",
+          "source": "int",
+          "divisor": 3,
+          "cap": 60
         }
       ]
     }

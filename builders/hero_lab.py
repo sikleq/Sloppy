@@ -753,6 +753,7 @@ def _innate_summary(rule: dict, version: str) -> str:
         "nvision": "Night Vision",
         "slowRes": "Slow Resistance",
         "statusRes": "Status Resistance",
+        "itemCdr": "Item Cooldown Reduction",
     }
     source_label = {
         "str": "Strength",
@@ -806,6 +807,10 @@ def _innate_summary(rule: dict, version: str) -> str:
         elif formula == "attr_substitution":
             sub = source_label.get(active.get("sub_attr"), active.get("sub_attr", ""))
             parts.append(f"{target} scales from {sub} instead of Intelligence")
+        elif formula == "attr_floor_capped":
+            divisor = active.get("divisor", 1)
+            cap = active.get("cap", 0)
+            parts.append(f"1% {target.lower()} per {divisor} {source}, up to {cap}%")
     return "; ".join(parts)
 
 
