@@ -3823,7 +3823,7 @@
         out.xpm += Number(mb.xpm) || 0;
         out.aspdPct += Number(mb.aspdPct) || 0;
         out.manaReductionPct += Number(mb.manaReductionPct) || 0;
-        out.cost += Number(mb.costOverride != null ? mb.costOverride : 0) || 0;
+        out.cost += Number(mb.costOverride != null ? mb.costOverride : it.cost) || 0;
       } else {
         out.cost += Number(it.cost) || 0;
       }
