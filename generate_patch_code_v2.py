@@ -945,10 +945,9 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
                 notes = a.get('ability_notes', [])
                 if prefix and notes:
                     prefixed = []
-                    for ni, note in enumerate(notes):
+                    for note in notes:
                         n2 = dict(note)
-                        if ni == 0:
-                            n2['note'] = prefix + n2.get('note', '')
+                        n2['note'] = prefix + n2.get('note', '')
                         prefixed.append(n2)
                     all_facet_notes.extend(prefixed)
                 else:
