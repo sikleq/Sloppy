@@ -790,8 +790,13 @@ def _render_item(item, version, neutral=False):
     return out
 
 
-def _render_hero(hero, version=None, patchnotes_loc=None):
-    """One heroes[] entry: hero_header + hero_notes + abilities + subsections."""
+def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
+    """One heroes[] entry: hero_header + hero_notes + abilities + subsections.
+
+    prev_hero_abils: {hero_id: {ability_slug: {'dname': str, 'is_innate': bool}}}
+    Built from the previous patch datafeed in generate() to detect renamed/removed
+    abilities and correctly attribute hero_notes with "AbilityName: ..." prefixes.
+    """
     out = []
     hid = hero.get('hero_id')
     name, slug = HEROES.get(hid, (f'hero_{hid}', f'hero_{hid}'))
@@ -808,21 +813,28 @@ def _render_hero(hero, version=None, patchnotes_loc=None):
         # Build display-name → slug reverse map for all known facets
         from patch.badges import FACETS
         _facet_name_to_slug = {n.lower(): s for s, (n, _) in FACETS.items()}
-        # Build display-name → slug reverse map for abilities (from slim cache)
-        _abil_name_to_slug = {
+        # Build display-name → slug reverse map for ALL currently-existing abilities
+        # (from abilities_slim.json, which reflects current KV files).
+        # A prefix present here belongs to a CURRENT ability — don't wrap it.
+        # A prefix absent here means the ability no longer exists in the game
+        # (renamed/removed in this or an earlier patch) — it's a previous-patch
+        # ability and should be emitted under an ability() block.
+        _current_abil_dname_to_slug = {
             v.get('dname', '').lower(): k
             for k, v in ABILS_SLIM.items()
             if v.get('dname')
         }
-        # Whether this hero has any innate ability in the slim cache
-        _hero_has_known_innate = any(
-            v.get('is_innate') for k, v in ABILS_SLIM.items()
+        # Whether this hero currently has a known innate in abilities_slim.
+        # Used to infer innate status for old (now-renamed) innate abilities.
+        _hero_has_current_innate = any(
+            v.get('is_innate')
+            for k, v in ABILS_SLIM.items()
             if k.startswith(slug + '_')
         )
         # Partition notes: bucket by facet name prefix, or keep as general
         _general_notes = []
         _facet_buckets = {}   # facet_slug -> [notes]
-        _abil_buckets = {}    # abil_slug -> {'name': str, 'notes': [...]}
+        _abil_buckets = {}    # abil_slug -> {'name': str, 'is_innate': bool, 'notes': [...]}
         _facet_removed = []   # (slug, display_name) for "Removed X facet" notes
         _FACET_PREFIX_RE = re.compile(r'^([^:]{2,40}):\s+(.+)$', re.DOTALL)
         # "Removed X[, Y] and Z facets" — captures comma/and-separated list
@@ -862,21 +874,25 @@ def _render_hero(hero, version=None, patchnotes_loc=None):
                     )
                     _facet_buckets.setdefault(facet_slug, []).append(stripped_note)
                     continue
-                # Check for "AbilityName: change text" prefix (ability not a facet)
-                abil_slug = _abil_name_to_slug.get(prefix.lower())
-                if not abil_slug:
-                    # Derive slug from hero slug + display name
-                    derived = slug + '_' + re.sub(r"[^a-z0-9]+", '_', prefix.lower()).strip('_')
-                    # Only treat as ability prefix if derived slug looks plausible
-                    # (starts with hero slug and has at least one word after it)
-                    if derived != slug + '_' and len(prefix.split()) >= 1:
-                        abil_slug = derived
-                if abil_slug:
+                # Check for "AbilityName: change text" where AbilityName refers to
+                # an ability that no longer exists in the current game (renamed or
+                # removed in this or a prior patch). If the prefix IS a current
+                # ability (found in abilities_slim by dname), it's not a routing
+                # signal — fall through to _general_notes.
+                if prefix.lower() not in _current_abil_dname_to_slug:
+                    # Derive slug: hero_slug + "_" + display name words
+                    derived_slug = slug + '_' + re.sub(r"[^a-z0-9]+", '_', prefix.lower()).strip('_')
+                    # Innate status: check if the hero currently has a known innate
+                    # (abilities_slim). If yes, the old ability being discussed was
+                    # likely the previous innate — mark innate=True.
+                    is_innate_flag = _hero_has_current_innate
                     stripped_note = dict(n)
                     stripped_note['note'] = re.sub(
                         re.escape(prefix) + r':\s*', '', n.get('note', ''), count=1, flags=re.I
                     )
-                    entry = _abil_buckets.setdefault(abil_slug, {'name': prefix, 'notes': []})
+                    entry = _abil_buckets.setdefault(
+                        derived_slug, {'name': prefix, 'is_innate': is_innate_flag, 'notes': []}
+                    )
                     entry['notes'].append(stripped_note)
                     continue
             _general_notes.append(n)
@@ -894,17 +910,11 @@ def _render_hero(hero, version=None, patchnotes_loc=None):
             out.append(f'W(facet_header("{facet_slug}"))')
             body, _ = _emit_notes(fnotes)
             out.extend(body)
-        # Emit ability blocks from "AbilityName: ..." hero_notes
+        # Emit ability blocks from "AbilityName: ..." hero_notes (removed/renamed abilities)
         for abil_slug, entry in _abil_buckets.items():
-            abil_name = entry['name']
-            anotes = entry['notes']
-            # Determine innate flag: use slim cache; if slug unknown but hero has
-            # a known innate (e.g. newly renamed), assume this is the old innate.
-            slim_entry = ABILS_SLIM.get(abil_slug, {})
-            is_innate = slim_entry.get('is_innate', False) or _hero_has_known_innate
-            innate_kwarg = ', innate=True' if is_innate else ''
-            out.append(f'W(ability("{abil_name}", slug="{abil_slug}"{innate_kwarg}))')
-            body, _ = _emit_notes(anotes)
+            innate_kwarg = ', innate=True' if entry.get('is_innate') else ''
+            out.append(f'W(ability("{entry["name"]}", slug="{abil_slug}"{innate_kwarg}))')
+            body, _ = _emit_notes(entry['notes'])
             out.extend(body)
     # Facet subsections — before Abilities (order: stats > innates > facets > abilities > talents)
     from patch.badges import FACETS as _FACETS
@@ -1822,9 +1832,44 @@ def normalize(version, d=None):
     }
 
 
+def _build_prev_hero_abils(version):
+    """Load the previous patch's datafeed and return a per-hero ability snapshot.
+
+    Returns {hero_id: {slug: {'dname': str, 'is_innate': bool}}} so that
+    _render_hero() can diff current vs previous abilities and correctly route
+    hero_notes with "AbilityName: ..." prefixes to the right ability() block.
+    """
+    from patch.meta import _prev_patch_version
+    prev_ver = _prev_patch_version(version)
+    if not prev_ver:
+        return {}
+    prev_path = os.path.join(_HERE, 'data', f'{prev_ver}_datafeed.json')
+    try:
+        prev_d = fetch_datafeed(prev_ver)
+    except Exception:
+        return {}
+    result = {}
+    for hero in prev_d.get('heroes', []):
+        hid = hero.get('hero_id')
+        abils = {}
+        for a in hero.get('abilities', []):
+            aid = a.get('ability_id')
+            resolved = ABILS.get(aid)
+            if not resolved:
+                continue
+            aname, aslug = resolved
+            abils[aslug] = {
+                'dname': aname,
+                'is_innate': ABILS_SLIM.get(aslug, {}).get('is_innate', False),
+            }
+        result[hid] = abils
+    return result
+
+
 def generate(version):
     d = fetch_datafeed(version)
     patchnotes_loc = _load_patchnotes_loc(version)
+    prev_hero_abils = _build_prev_hero_abils(version)
 
     out = [f'# Auto-generated v2 scaffold for {version}',
            f'# Source: data/{version}_datafeed.json',
@@ -1870,7 +1915,7 @@ def generate(version):
                 out.extend(_render_item(item, version, neutral=True))
         elif key == 'heroes':
             for hero in sorted(d['heroes'], key=lambda h: HEROES.get(h['hero_id'], ('', ''))[0]):
-                out.extend(_render_hero(hero, version=version, patchnotes_loc=patchnotes_loc))
+                out.extend(_render_hero(hero, version=version, patchnotes_loc=patchnotes_loc, prev_hero_abils=prev_hero_abils))
 
     # Post-process passes that operate on the full emitted line list:
     # 1. Collapse aghs upgrade-row + description into canonical merged li.
