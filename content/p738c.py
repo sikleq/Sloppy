@@ -412,7 +412,7 @@ def build():
     W(hero_header("Luna"))
     W(ability("Moon Glaives", slug="luna_moon_glaive"))
     W(ul_open())
-    W(li("No longer bounce to attack-immune targets", t("MISC")))
+    W(li("No longer bounce to attack-immune targets", t("DEL")))
     W(ul_close())
     
     # Lycan
@@ -450,8 +450,9 @@ def build():
     
     # Medusa
     W(hero_header("Medusa"))
+    W(ability("Venomous Volley", slug="medusa_venomed_volley"))
     W(ul_open())
-    W(li("Venomous Volley: No longer slows cast speed", t("MISC")))
+    W(li("No longer slows cast speed", t("DEL")))
     W(ul_close())
     
     # Meepo
@@ -499,6 +500,9 @@ def build():
     # Omniknight
     W(hero_header("Omniknight"))
     W(facet_header("omniknight_omnipresent"))
+    W(ul_open())
+    W(li("Damage increase interval decreased from 0.3s to 0.25s", b(0.3, 0.25, l=True), extra=inline_note("Time for maximum effect decreased from 6s to 5s")))
+    W(ul_close())
     W(ability("Purification", slug="omniknight_purification"))
     W(ul_open())
     W(li("Cooldown decreased from 18/16/14/12s to 15/14/13/12s", b([18, 16, 14, 12], [15, 14, 13, 12], l=True)))
@@ -527,7 +531,7 @@ def build():
     W(hero_header("Primal Beast"))
     W(facet_header("primal_beast_provoke_the_beast"))
     W(ul_open())
-    W(li("Uproar: Now also provides stacks upon being Silenced", t("MISC")))
+    W(li("Uproar: Now also provides stacks upon being Silenced", t("BUFF")))
     W(ul_close())
     W(ability("Uproar", slug="primal_beast_uproar"))
     W(ul_open())
@@ -537,18 +541,26 @@ def build():
     # Ringmaster
     W(hero_header("Ringmaster"))
     W(facet_header("ringmaster_sideshow_secrets"))
+    W(ability("Crystal Ball", slug="ringmaster_crystal_ball", sub=True))
     W(ul_open())
-    W(li("Crystal Ball: Now indicates the exact position of each enemy hero in the area without revealing their identity", t("MISC")))
-    W(li("Unicycle: No longer gets knocked off if the damage taken is below 20", t("MISC")))
+    W(li("Now indicates the exact position of each enemy hero in the area without revealing their identity", t("MISC")))
+    W(ul_close())
+    W(ability("Unicycle", slug="ringmaster_summon_unicycle", sub=True))
+    W(ul_open())
+    W(li("No longer gets knocked off if the damage taken is below 20", t("MISC")))
     W(li("No longer gets knocked off from any damage for 1.5s after mounting the unicycle", t("MISC")))
     W(li("Can now cast non-channeling spells and pick up runes without dismounting the unicycle", t("MISC"), extra=inline_note("Still requires Ringmaster to be facing in the spell direction")))
-    W(li("Weighted Pie: Now also slows movement of the affected enemy by 45%. Similarly to vision, movement speed is recovering over the debuff time", t("MISC")))
+    W(ul_close())
+    W(ability("Weighted Pie", slug="ringmaster_weighted_pie", sub=True))
+    W(ul_open())
+    W(li("Now also slows movement of the affected enemy by 45%", t("BUFF"), extra=inline_note("Similarly to vision, movement speed is recovering over the debuff time")))
     W(ul_close())
     
     # Silencer
     W(hero_header("Silencer"))
+    W(ability("Brain Drain", slug="silencer_brain_drain", innate=True))
     W(ul_open())
-    W(li("Brain Drain: If Silencer is out of range, Intelligence will now be stolen only if the dying enemy is debuffed by Silencer the moment they die", t("MISC"), extra=inline_note("This effect used to have a grace period equal to the full Assist-gaining duration even when the debuff was removed")))
+    W(li("If Silencer is out of range, Intelligence will now be stolen only if the dying enemy is debuffed by Silencer the moment they die", t("MISC"), extra=inline_note("This effect used to have a grace period equal to the full Assist-gaining duration even when the debuff was removed")))
     W(ul_close())
     
     # Skywrath Mage

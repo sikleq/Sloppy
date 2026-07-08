@@ -232,8 +232,9 @@ W(ul_close())
 
 # Chen
 W(hero_header("Chen"))
+W(ability("Summon Convert", slug="chen_summon_convert", innate=True))
 W(ul_open())
-W(li("Summon Convert: Convert is now considered a creep-hero", t("MISC"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
+W(li("Convert is now considered a creep-hero", t("MISC"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
 W(ul_close())
 
 # Dark Seer
@@ -243,6 +244,9 @@ W(li("Base Damage decreased by 2", bstat_h("Dark Seer", "AttackDamageMin", "7.38
 W(li("Damage at level 1 decreased from 54–60 to 52–58", br(54, 60, 52, 58)))
 W(ul_close())
 W(facet_header("dark_seer_movespd"))
+W(ul_open())
+W(li("Radius increased from 900 to 1200", b(900, 1200)))
+W(ul_close())
 W(subgroup("Talents"))
 W(ul_open())
 W(li("Level 10 Talent Wall of Replica Illusion Damage decreased from +20% to +15%", b(20, 15)))
@@ -428,8 +432,9 @@ W(ul_close())
 
 # Medusa
 W(hero_header("Medusa"))
+W(ability("Venomous Volley", slug="medusa_venomous_volley", innate=True))
 W(ul_open())
-W(li("Venomous Volley: No longer slows cast speed", t("MISC")))
+W(li("No longer slows cast speed", t("MISC")))
 W(ul_close())
 
 # Meepo
@@ -477,6 +482,9 @@ W(ul_close())
 # Omniknight
 W(hero_header("Omniknight"))
 W(facet_header("omniknight_omnipresent"))
+W(ul_open())
+W(li("Damage increase interval decreased from 0.3s to 0.25s", b(0.3, 0.25), extra=inline_note("Time for maximum effect decreased from 6s to 5s — " + b(6, 5))))
+W(ul_close())
 W(ability("Purification", slug="omniknight_purification"))
 W(ul_open())
 W(li("Cooldown decreased from 18/16/14/12s to 15/14/13/12s", b([18, 16, 14, 12], [15, 14, 13, 12], l=True)))
@@ -525,8 +533,9 @@ W(ul_close())
 
 # Silencer
 W(hero_header("Silencer"))
+W(ability("Brain Drain", slug="silencer_brain_drain", innate=True))
 W(ul_open())
-W(li("Brain Drain: If Silencer is out of range, Intelligence will now be stolen only if the dying enemy is debuffed by Silencer the moment they die", t("MISC"), extra=inline_note("This effect used to have a grace period equal to the full Assist-gaining duration even when the debuff was removed")))
+W(li("If Silencer is out of range, Intelligence will now be stolen only if the dying enemy is debuffed by Silencer the moment they die", t("MISC"), extra=inline_note("This effect used to have a grace period equal to the full Assist-gaining duration even when the debuff was removed")))
 W(ul_close())
 
 # Skywrath Mage
@@ -573,6 +582,9 @@ W(ul_close())
 # Tidehunter
 W(hero_header("Tidehunter"))
 W(facet_header("tidehunter_sizescale"))
+W(ul_open())
+W(li("Starting attack range and Anchor Smash penalties increased from 50 to 60", b(50, 60)))
+W(ul_close())
 W(ability("Dead in the Water", slug="tidehunter_dead_in_the_water"))
 W(ul_open())
 W(li("Cooldown increased from 25s to 35s", b(25, 35, l=True)))
