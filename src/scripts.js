@@ -3571,13 +3571,17 @@
     panel.dataset.enchantItem = '';
   }
 
+  function safeJsonParse(str, fallback) {
+    try { return JSON.parse(str); } catch { return fallback; }
+  }
+
   function state(panel) {
     const heroId = panel.dataset.hero || heroes[0].id;
     let level = parseInt(panel.querySelector('[data-field="level"]')?.value || '1', 10);
     level = Math.max(1, Math.min(30, Number.isFinite(level) ? level : 1));
     panel.querySelector('[data-field="level"]').value = String(level);
-    const itemModes = JSON.parse(panel.dataset.itemModes || '{}');
-    const itemEntries = JSON.parse(panel.dataset.items || '["","","","","",""]')
+    const itemModes = safeJsonParse(panel.dataset.itemModes, {});
+    const itemEntries = safeJsonParse(panel.dataset.items, ["","","","","",""])
       .map((id, idx) => id ? { id, mode: itemModes[String(idx)] || null, slot: idx } : null)
       .filter(Boolean);
     const enchantItem = panel.dataset.enchantItem || '';
@@ -3597,8 +3601,8 @@
   }
 
   function getSlotState(panel, slot) {
-    const items = JSON.parse(panel.dataset.items || '["","","","","",""]');
-    const itemModes = JSON.parse(panel.dataset.itemModes || '{}');
+    const items = safeJsonParse(panel.dataset.items, ["","","","","",""]);
+    const itemModes = safeJsonParse(panel.dataset.itemModes, {});
     if (slot === 'enchant') {
       return { id: panel.dataset.enchantItem || '', mode: itemModes.enchant || null };
     }
@@ -3607,8 +3611,8 @@
   }
 
   function setSlotState(panel, slot, next) {
-    const items = JSON.parse(panel.dataset.items || '["","","","","",""]');
-    const itemModes = JSON.parse(panel.dataset.itemModes || '{}');
+    const items = safeJsonParse(panel.dataset.items, ["","","","","",""]);
+    const itemModes = safeJsonParse(panel.dataset.itemModes, {});
     const id = next && next.id ? next.id : '';
     const mode = next && next.mode ? next.mode : null;
     if (slot === 'enchant') {
@@ -3649,7 +3653,7 @@
     if (!enchItem || !enchItem.tiersAvailable) return;
     const tiers = enchItem.tiersAvailable;
     const best = tiers[tiers.length - 1];
-    const itemModes = JSON.parse(panel.dataset.itemModes || '{}');
+    const itemModes = safeJsonParse(panel.dataset.itemModes, {});
     itemModes.enchant = 't' + best;
     panel.dataset.itemModes = JSON.stringify(itemModes);
   }
@@ -3701,6 +3705,10 @@
       const mode = typeof entry === 'string' ? null : entry.mode;
       const it = byItem.get(id);
       if (!it) return;
+      // Enchanter's Bauble only amplifies Tier 5 enchants. The item picker dims
+      // non-T5 enchants when a bauble is active, so in normal use this branch is
+      // never reached. If it is (e.g. bauble added after enchant selection),
+      // we skip the enchant rather than showing unscaled T<5 stats.
       if (it.class === 'enchant' && baubleLevel > 0 && mode !== 't5') return;
       const _entryScale = (it.class === 'enchant' && baubleScale !== 1 && mode === 't5') ? baubleScale : 1;
       // CDR is excluded from linear scaling — it gets two separate multiplicative stacks below.
@@ -3888,6 +3896,9 @@
     a._manaPool = mp;
     const statusRes = Math.min(combinePct([...itemsTotal.statusResVals, heroLabInnate('statusRes', s, a, lvl, hp, includeInnates)]), 99.9);
     const slowRes = Math.min(combinePct([...itemsTotal.slowResVals, heroLabInnate('slowRes', s, a, lvl, hp, includeInnates)]), 99.9);
+    // missingHprPct (e.g. Heart of Tarrasque) requires knowing current HP at
+    // runtime and is intentionally excluded from the static calc display.
+    // It is shown as a separate stat row ("Missing HP Regen") instead.
     let hpr = ((Number(s.hpr) || 0) + str * C.hprStr + heroLabInnate('hpr', s, a, lvl, hp, includeInnates) + itemsTotal.hpr - itemsTotal.hpRegenReduce) * (1 + itemsTotal.healthRestoration / 100)
       + hp * (itemsTotal.hprPct + itemsTotal.maxHpRegen) / 100;
     let mpr = isHuskar ? 0 : ((Number(s.mpr) || 0) + mprFromAttr + heroLabInnate('mpr', s, a, lvl, hp, includeInnates) + itemsTotal.mpr) * (1 + itemsTotal.mprAmp / 100);
@@ -3982,8 +3993,8 @@
       costValue.textContent = hasCost ? fmt(vals.cost) : '0';
     }
 
-    const slots = JSON.parse(panel.dataset.items || '["","","","","",""]');
-    const itemModes = JSON.parse(panel.dataset.itemModes || '{}');
+    const slots = safeJsonParse(panel.dataset.items, ["","","","","",""]);
+    const itemModes = safeJsonParse(panel.dataset.itemModes, {});
     panel.querySelectorAll('.hl-inv-slot').forEach((slotEl, idx) => {
       const isEnchant = slotEl.dataset.slot === 'enchant';
       const itemId = isEnchant
@@ -4388,7 +4399,7 @@
   var _itemPickerCacheKey = null;
 
   function openItemPicker(panel, slot) {
-    const itemsState = JSON.parse(panel.dataset.items || '["","","","","",""]');
+    const itemsState = safeJsonParse(panel.dataset.items, ["","","","","",""]);
     const mode = slot === 'enchant' ? 'enchant' : 'normal';
     const heroId = panel.dataset.hero || '';
     const heroObj = byHero.get(heroId);
@@ -4427,7 +4438,7 @@
     panels[1].dataset.cdr = String(b.cooldownReduction || 0);
     panels.forEach(panel => {
       var _modes = {};
-      try { _modes = JSON.parse(panel.dataset.itemModes || '{}'); } catch(e) {}
+      _modes = safeJsonParse(panel.dataset.itemModes, {});
       var _enchantMode = _modes.enchant || null;
       var _enchantId = panel.dataset.enchantItem || '';
       var _bl = Math.max(0, Math.min(100, parseInt((panel.querySelector('[data-field="bauble-level"]') || {}).value || '0', 10) || 0));
@@ -4630,7 +4641,7 @@
         if (item && item.modes) {
           const modes = Object.keys(item.modes).filter(k => k !== 'default' && k !== 'base');
           const modeKey = String(slotEl.dataset.slot);
-          const itemModes = JSON.parse(panel.dataset.itemModes || '{}');
+          const itemModes = safeJsonParse(panel.dataset.itemModes, {});
           const current = itemModes[modeKey] || item.modes.default || modes[0] || 'damage';
           const idx = Math.max(0, modes.indexOf(current));
           itemModes[modeKey] = modes[(idx + 1) % modes.length] || current;
@@ -4647,9 +4658,9 @@
       var panel = clearBtn.closest('.hl-panel');
       if (slotEl && panel) {
         var sl = slotEl.dataset.slot;
-        var itemModes = JSON.parse(panel.dataset.itemModes || '{}');
+        var itemModes = safeJsonParse(panel.dataset.itemModes, {});
         if (sl === 'enchant') { panel.dataset.enchantItem = ''; }
-        else { var its = JSON.parse(panel.dataset.items || '["","","","","",""]'); its[Number(sl)] = ''; panel.dataset.items = JSON.stringify(its); }
+        else { var its = safeJsonParse(panel.dataset.items, ["","","","","",""]); its[Number(sl)] = ''; panel.dataset.items = JSON.stringify(its); }
         delete itemModes[String(sl)];
         panel.dataset.itemModes = JSON.stringify(itemModes);
         update();

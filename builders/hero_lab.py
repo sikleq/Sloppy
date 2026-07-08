@@ -337,8 +337,13 @@ def _item_bonus_at(fields: dict, idx: int) -> dict[str, float]:
         "mr": _sum_at(fields, idx, "bonus_magic_resistance", "bonus_magical_armor", "bonus_spell_resist", "magic_resistance", "magic_resist", "magic_resistance_aura", "magic_res"),
         "evasion": _sum_at(fields, idx, "bonus_evasion", "evasion"),
         "damage": _sum_at(fields, idx, "bonus_damage", "damage_aura", "base_attack_damage", "damage"),
+        "damagePct": _sum_at(fields, idx, "damage_aura"),
+        "damageMelee": _sum_at(fields, idx, "bonus_damage_melee"),
+        "damageRanged": _sum_at(fields, idx, "bonus_damage_range", "bonus_damage_ranged"),
         "aspd": _sum_at(fields, idx, "bonus_attack_speed", "attack_speed"),
         "ms": _sum_at(fields, idx, "bonus_movement_speed", "bonus_move_speed", "movement_speed", "aura_movement_speed", "bonus_movement", "movespeed"),
+        "msMelee": _sum_at(fields, idx, "bonus_movement_speed_melee", "bonus_move_speed_melee"),
+        "msRanged": _sum_at(fields, idx, "bonus_movement_speed_ranged", "bonus_move_speed_ranged"),
         "range": _sum_at(fields, idx, "bonus_attack_range", "attack_range_bonus", "attack_range"),
         "rangeUniqueAll": _sum_at(fields, idx, "melee_attack_range"),
         "rangeUniqueRanged": _sum_at(fields, idx, "base_attack_range"),
@@ -349,10 +354,14 @@ def _item_bonus_at(fields: dict, idx: int) -> dict[str, float]:
         "slowRes": _sum_at(fields, idx, "slow_resistance", "slow_resist", "bonus_slow_resist"),
         "hprAmp": 0,
         "mprAmp": _sum_at(fields, idx, "mana_regen_multiplier"),
+        "hprPct": _sum_at(fields, idx, "hp_regen_pct"),
+        "missingHprPct": _sum_at(fields, idx, "missing_health_regen"),
         "castRange": _sum_at(fields, idx, "bonus_cast_range", "cast_range_bonus", "cast_range"),
         "lifesteal": _sum_at(fields, idx, "attack_lifesteal", "lifesteal", "lifesteal_percent"),
         "spellLifesteal": _sum_at(fields, idx, "spell_lifesteal", "bonus_spell_lifesteal"),
         "mpPct": _sum_at(fields, idx, "bonus_max_mana_percentage", "max_mana_pct"),
+        "primaryStat": _sum_at(fields, idx, "primary_stat"),
+        "primaryStatUni": _sum_at(fields, idx, "primary_stat_universal"),
         "batReduce": _sum_at(fields, idx, "bat_reduce"),
         "healthRestoration": _sum_at(fields, idx, "health_restoration", "hp_regen_amp", "heal_amp"),
         "cooldownReduction": _sum_at(fields, idx, "cooldown_reduction", "bonus_cooldown"),
@@ -455,6 +464,12 @@ def _item_bonus(fields: dict, *, consumable: bool = False) -> dict[str, float]:
     }
 
 
+
+_BOOT_ITEMS = {
+    "item_boots", "item_tranquil_boots", "item_arcane_boots",
+    "item_guardian_greaves", "item_travel_boots", "item_travel_boots_2",
+    "item_phase_boots", "item_power_treads",
+}
 
 _ENCHANT_TIER_LABELS = {
     "item_enhancement_vital":       ("", 0, [1]),
@@ -578,6 +593,41 @@ _ITEM_ATTR_LABELS = {
     "spell_resist": "Magic Resistance",
     "status_resist": "Status Resistance",
     "str": "Strength",
+}
+
+# Fallback tooltip attrib mapping for items whose loc provides no attribs block.
+# Tuple: (display_label, pct_suffix, flip_sign).
+# flip_sign=True negates the KV value before display (e.g. bat_reduce: 6 → -6%).
+# Keep one canonical key per label — no duplicate labels.
+_FALLBACK_FIELD_ATTRIBS: dict[str, tuple[str, str, bool]] = {
+    "aoe_bonus":                    ("Area of Effect", "", False),
+    "spell_lifesteal":              ("Spell Lifesteal", "%", False),
+    "slow_resist":                  ("Slow Resistance", "%", False),
+    "status_resist":                ("Status Resistance", "%", False),
+    "magic_resist":                 ("Magic Resistance", "%", False),
+    "spell_amp":                    ("Spell Amplification", "%", False),
+    "mana_regen_multiplier":        ("Mana Regeneration", "%", False),
+    "hp_regen_amplify_percentage":  ("HP Regeneration", "%", False),
+    "heal_amplify_percentage":      ("Heal Amplification", "%", False),
+    "attack_lifesteal":             ("Lifesteal", "%", False),
+    # enchantment-specific
+    "health_restoration":           ("Health Restoration", "%", False),
+    "bat_reduce":                   ("Base Attack Time", "%", True),
+    "intelligence_pct":             ("Intelligence", "%", False),
+    "primary_stat":                 ("Primary Attribute", "", False),
+    "primary_stat_universal":       ("Primary Attribute (Universal)", "", False),
+    "cost_increase":                ("Mana Cost/Mana Loss Increase", "%", False),
+    "incoming_damage":              ("Incoming Damage", "%", False),
+    "manacost_reduction":           ("Mana Cost Reduction", "%", False),
+    "cooldown_reduction":           ("Cooldown Reduction", "%", False),
+    "debuff_amp":                   ("Debuff Amplification", "%", False),
+    "heal_amp":                     ("Heal Amplification", "%", False),
+    "item_potency":                 ("Item Potency", "%", False),
+    "knockback_resist":             ("Knockback Resistance", "%", False),
+    "cast_speed":                   ("Cast Speed", "%", False),
+    "bonus_xpm":                    ("Experience per Minute", "", False),
+    "bonus_gpm":                    ("Gold per Minute", "", False),
+    "max_mana_pct":                 ("Max Mana", "%", False),
 }
 
 
@@ -889,11 +939,6 @@ def _load_items(version: str) -> list[dict]:
             "consumable": consumable,
             "bonus": bonus,
         }
-        _BOOT_ITEMS = {
-            "item_boots", "item_tranquil_boots", "item_arcane_boots",
-            "item_guardian_greaves", "item_travel_boots", "item_travel_boots_2",
-            "item_phase_boots", "item_power_treads",
-        }
         if item in _BOOT_ITEMS:
             rec["isBoot"] = True
         if cls == "enchant":
@@ -1131,29 +1176,21 @@ def _load_items(version: str) -> list[dict]:
             tip["attribs"] = [a for a in tip["attribs"] if a.strip().lower() != item_name]
         if item == "item_rapier":
             tip["attribs"] = [f"+{int(_sum(fields, 'bonus_damage_base'))} Damage"]
-        # Fallback: generate attribs from known fields if loc had nothing
+        # Fallback: generate attribs from known fields if loc had nothing.
+        # Tuple: (label, pct_suffix, flip_sign) — flip_sign negates the value for display.
         if "attribs" not in tip:
-            _FIELD_ATTRIBS = {
-                "aoe_bonus": ("Area of Effect", ""),
-                "spell_lifesteal": ("Spell Lifesteal", "%"),
-                "slow_resist": ("Slow Resistance", "%"),
-                "status_resist": ("Status Resistance", "%"),
-                "magic_resist": ("Magic Resistance", "%"),
-                "spell_amp": ("Spell Amplification", "%"),
-                "mana_regen_multiplier": ("Mana Regeneration", "%"),
-                "hp_regen_amplify_percentage": ("HP Regeneration", "%"),
-                "heal_amplify_percentage": ("Heal Amplification", "%"),
-                "attack_lifesteal": ("Lifesteal", "%"),
-            }
             fallback = []
-            for fk, (flabel, fpct) in _FIELD_ATTRIBS.items():
+            for fk, (flabel, fpct, flip) in _FALLBACK_FIELD_ATTRIBS.items():
                 fv = fields.get(fk)
                 if fv is not None:
                     try:
                         n = float(str(fv).split(" ")[0])
+                        if flip:
+                            n = -n
                         if abs(n) > 0.001:
+                            plus_prefix = "+" if n > 0 else ""
                             ns = str(int(n)) if n == int(n) else str(n)
-                            fallback.append(f"+{ns}{fpct} {flabel}")
+                            fallback.append(f"{plus_prefix}{ns}{fpct} {flabel}")
                     except (ValueError, TypeError):
                         pass
             if fallback:
