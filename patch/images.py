@@ -226,6 +226,8 @@ ITEM_SLUG = {
     "Whisper of the Dread": "whisper_of_the_dread",
     "Wizard Hat": "wizard_hat",
     "Yasha and Kaya": "yasha_and_kaya",
+    # 7.38c items with non-obvious engine slugs
+    "Pollywog Charm": "polliwog_charm",
     # 7.39 neutral items with non-obvious engine slugs
     "Pig Pole": "unstable_wand",
     "Magic Lamp": "panic_button",

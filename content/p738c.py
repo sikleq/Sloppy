@@ -7,7 +7,7 @@ def build():
     
     W(plain_header("Dire Safe Lane Jungle"))
     W(ul_open())
-    W(li("The tree lines above and below the tower have been reworked", t("REWORK")))
+    W(li("The tree lines above and below the tower have been reworked", t("MISC")))
     W(li("The Dire Safe Lane hard camp has been moved away from the Dire Safe Lane Tier 1 tower, and had its tree line reduced and rotated to face the river", t("NERF")))
     W(li("The Dire Safe Lane Tier 1 tower has been moved forward, away from the Dire base and closer to where the creeps initially meet", t("MISC")))
     W(li("The Top Lane creep paths have been slightly adjusted so the creeps meet closer to the Dire tower", t("MISC")))
@@ -40,11 +40,11 @@ def build():
     W(ul_close())
     W(item_header("Helm of the Dominator"))
     W(ul_open())
-    W(li("Dominated creep is now considered a creep-hero", t("MISC"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
+    W(li("Dominated creep is now considered a creep-hero", t("NEW"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
     W(ul_close())
     W(item_header("Helm of the Overlord"))
     W(ul_open())
-    W(li("Dominated creep is now considered a creep-hero", t("MISC"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
+    W(li("Dominated creep is now considered a creep-hero", t("NEW"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
     W(ul_close())
     W(item_header("Mage Slayer"))
     W(ul_open())
@@ -88,11 +88,11 @@ def build():
     W(ul_open())
     W(li("Burn Through duration increased from 5s to 6s", b(5, 6)))
     W(li("Burn Through total damage decreased from 75 to 72", b(75, 72), extra=inline_note("Damage per second decreased from 15 to 12 — " + b(15, 12))))
-    W(li("Burn Through damage is now classified as Health Removal", t("MISC"), extra=inline_note("It no longer will trigger on hit effects or cancel Blink Daggers")))
+    W(li("Burn Through damage is now classified as Health Removal", t("REWORK"), extra=inline_note("It no longer will trigger on hit effects or cancel Blink Daggers")))
     W(ul_close())
     W(item_header("Nemesis Curse"))
     W(ul_open())
-    W(li("Glass Cannon self damage amp decreased from 8% to 6%", b(8, 6)))
+    W(li("Glass Cannon self damage amp decreased from 8% to 6%", b(8, 6, l=True)))
     W(ul_close())
     W(item_header("Crippling Crossbow"))
     W(ul_open())
@@ -108,7 +108,7 @@ def build():
     W(ul_close())
     W(item_header("Unrelenting Eye"))
     W(ul_open())
-    W(li("Relentless enemy search radius increased from 300 to 600", b(300, 600)))
+    W(li("Relentless enemy search radius increased from 300 to 600", b(300, 600, l=True)))
     W(ul_close())
     
     W(plain_header("Enchantment changes", dynamics=False, sublabel=True))
@@ -126,7 +126,7 @@ def build():
     W(ul_close())
     W(enchant_header("Keen-eyed"))
     W(ul_open())
-    W(li("Max Mana reduction decreased from 15% to 10%", b(15, 10)))
+    W(li("Max Mana reduction decreased from 15% to 10%", b(15, 10, l=True)))
     W(ul_close())
     W(enchant_header("Vast"))
     W(ul_open())
@@ -134,7 +134,7 @@ def build():
     W(ul_close())
     W(enchant_header("Crude"))
     W(ul_open())
-    W(li("Intelligence reduction decreased from 15% to 8%", b(15, 8)))
+    W(li("Intelligence reduction decreased from 15% to 8%", b(15, 8, l=True)))
     W(ul_close())
     W(enchant_header("Timeless"))
     W(ul_open())
@@ -159,7 +159,7 @@ def build():
     # Abaddon
     W(hero_header("Abaddon"))
     W(ul_open())
-    W(li("Base Armor decreased by 1", bstat_h("Abaddon", "ArmorPhysical", "7.38b", -1), extra=note_box(hero="Abaddon", field="ArmorPhysical", before_patch="7.38b")))
+    W(li("Base Armor decreased by 1", t("NERF"), extra=note_box(hero="Abaddon", field="ArmorPhysical", before_patch="7.38b")))
     W(ul_close())
     W(facet_header("abaddon_mephitic_shroud"))
     W(ul_open())
@@ -201,19 +201,23 @@ def build():
     W(ul_close())
     W(ability("Flaming Lasso", slug="batrider_flaming_lasso"))
     W(ul_open())
-    W(li("Forced movement applied by Batrider's allies to the lassoed target from certain abilities no longer cancel lasso", t("MISC"), extra=inline_note("Dark Willow's Terrorize")))
-    W(li("Death Prophet's Spirit Siphon (Fear from Aghanim's Shard)", t("MISC")))
-    W(li("Keeper of the Light's Will-o-Wisp", t("MISC")))
-    W(li("Lich's Sinister Gaze", t("MISC")))
-    W(li("Lone Druid's (and Spirit Bear's) Savage Roar", t("MISC")))
-    W(li("Muerta's Dead Shot", t("MISC")))
-    W(li("Pudge's Dismember", t("MISC")))
-    W(li("Ringmaster's Wheel of Wonder", t("MISC")))
-    W(li("Shadow Fiend's Requiem of Souls", t("MISC")))
-    W(li("Terrorblade's Terror Wave", t("MISC")))
-    W(li("Tinker's Defense Matrix (blink with Translocator facet)", t("MISC")))
-    W(li("Tinker's Warp Flare (still applies damage, but does not move the target)", t("MISC")))
-    W(li("Tusk's Walrus Kick (still applies damage, but does not move the target)", t("MISC"), extra=inline_note("The following abilities continue to break the lasso: Centaur Warrunner's Hitch a Ride, Chaos Knight's Reality Rift, Disruptor's Glimpse, Kunkka's X Marks the Spot, Magnus' Reverse Polarity, Mars' Arena of Blood (created by an ally) and Vengeful Spirit's Nether Swap")))
+    W(li("Forced movement applied by Batrider's allies to the lassoed target from certain abilities no longer cancel lasso", t("MISC"),
+        extra=show_list([
+            "Dark Willow's Terrorize",
+            "Death Prophet's Spirit Siphon (Fear from Aghanim's Shard)",
+            "Keeper of the Light's Will-o-Wisp",
+            "Lich's Sinister Gaze",
+            "Lone Druid's (and Spirit Bear's) Savage Roar",
+            "Muerta's Dead Shot",
+            "Pudge's Dismember",
+            "Ringmaster's Wheel of Wonder",
+            "Shadow Fiend's Requiem of Souls",
+            "Terrorblade's Terror Wave",
+            "Tinker's Defense Matrix (blink with Translocator facet)",
+            "Tinker's Warp Flare (still applies damage, but does not move the target)",
+            "Tusk's Walrus Kick (still applies damage, but does not move the target)",
+        ])))
+    W(li("The following abilities continue to break the lasso: Centaur Warrunner's Hitch a Ride, Chaos Knight's Reality Rift, Disruptor's Glimpse, Kunkka's X Marks the Spot, Magnus' Reverse Polarity, Mars' Arena of Blood (created by an ally) and Vengeful Spirit's Nether Swap", t("MISC")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -234,7 +238,7 @@ def build():
     # Chen
     W(hero_header("Chen"))
     W(ul_open())
-    W(li("Summon Convert: Convert is now considered a creep-hero", t("MISC"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
+    W(li("Summon Convert: Convert is now considered a creep-hero", t("NEW"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
     W(ul_close())
     
     # Dark Seer
