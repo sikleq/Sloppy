@@ -202,30 +202,30 @@ def build():
     W(ability("Flaming Lasso", slug="batrider_flaming_lasso"))
     W(ul_open())
     W(li("Forced movement applied by Batrider's allies to the lassoed target from certain abilities no longer cancel lasso", t("MISC"),
-        extra=show_list(
-            "Dark Willow's Terrorize",
-            "Death Prophet's Spirit Siphon (Fear from Aghanim's Shard)",
-            "Keeper of the Light's Will-o-Wisp",
-            "Lich's Sinister Gaze",
-            "Lone Druid's (and Spirit Bear's) Savage Roar",
-            "Muerta's Dead Shot",
-            "Pudge's Dismember",
-            "Ringmaster's Wheel of Wonder",
-            "Shadow Fiend's Requiem of Souls",
-            "Terrorblade's Terror Wave",
-            "Tinker's Defense Matrix (blink with Translocator facet)",
-            "Tinker's Warp Flare (still applies damage, but does not move the target)",
-            "Tusk's Walrus Kick (still applies damage, but does not move the target)",
+        extra=inline_note(
+            "Dark Willow's Terrorize<br>"
+            "Death Prophet's Spirit Siphon (Fear from Aghanim's Shard)<br>"
+            "Keeper of the Light's Will-o-Wisp<br>"
+            "Lich's Sinister Gaze<br>"
+            "Lone Druid's (and Spirit Bear's) Savage Roar<br>"
+            "Muerta's Dead Shot<br>"
+            "Pudge's Dismember<br>"
+            "Ringmaster's Wheel of Wonder<br>"
+            "Shadow Fiend's Requiem of Souls<br>"
+            "Terrorblade's Terror Wave<br>"
+            "Tinker's Defense Matrix (blink with Translocator facet)<br>"
+            "Tinker's Warp Flare (still applies damage, but does not move the target)<br>"
+            "Tusk's Walrus Kick (still applies damage, but does not move the target)"
         )))
     W(li("The following abilities continue to break the lasso", t("MISC"),
-        extra=show_list(
-            "Centaur Warrunner's Hitch a Ride",
-            "Chaos Knight's Reality Rift",
-            "Disruptor's Glimpse",
-            "Kunkka's X Marks the Spot",
-            "Magnus' Reverse Polarity",
-            "Mars' Arena of Blood (created by an ally)",
-            "Vengeful Spirit's Nether Swap",
+        extra=inline_note(
+            "Centaur Warrunner's Hitch a Ride<br>"
+            "Chaos Knight's Reality Rift<br>"
+            "Disruptor's Glimpse<br>"
+            "Kunkka's X Marks the Spot<br>"
+            "Magnus' Reverse Polarity<br>"
+            "Mars' Arena of Blood (created by an ally)<br>"
+            "Vengeful Spirit's Nether Swap"
         )))
     W(ul_close())
     W(subgroup("Talents"))
