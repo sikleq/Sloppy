@@ -202,21 +202,7 @@ def build():
     W(ability("Flaming Lasso", slug="batrider_flaming_lasso"))
     W(ul_open())
     W(li("Forced movement applied by Batrider's allies to the lassoed target from certain abilities no longer cancel lasso", t("MISC"),
-        extra=show_list([
-            "Dark Willow's Terrorize",
-            "Death Prophet's Spirit Siphon (Fear from Aghanim's Shard)",
-            "Keeper of the Light's Will-o-Wisp",
-            "Lich's Sinister Gaze",
-            "Lone Druid's (and Spirit Bear's) Savage Roar",
-            "Muerta's Dead Shot",
-            "Pudge's Dismember",
-            "Ringmaster's Wheel of Wonder",
-            "Shadow Fiend's Requiem of Souls",
-            "Terrorblade's Terror Wave",
-            "Tinker's Defense Matrix (blink with Translocator facet)",
-            "Tinker's Warp Flare (still applies damage, but does not move the target)",
-            "Tusk's Walrus Kick (still applies damage, but does not move the target)",
-        ])))
+        extra=inline_note("Dark Willow's Terrorize, Death Prophet's Spirit Siphon (Fear from Aghanim's Shard), Keeper of the Light's Will-o-Wisp, Lich's Sinister Gaze, Lone Druid's (and Spirit Bear's) Savage Roar, Muerta's Dead Shot, Pudge's Dismember, Ringmaster's Wheel of Wonder, Shadow Fiend's Requiem of Souls, Terrorblade's Terror Wave, Tinker's Defense Matrix (blink with Translocator facet), Tinker's Warp Flare (still applies damage, but does not move the target), Tusk's Walrus Kick (still applies damage, but does not move the target)")))
     W(li("The following abilities continue to break the lasso: Centaur Warrunner's Hitch a Ride, Chaos Knight's Reality Rift, Disruptor's Glimpse, Kunkka's X Marks the Spot, Magnus' Reverse Polarity, Mars' Arena of Blood (created by an ally) and Vengeful Spirit's Nether Swap", t("MISC")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -241,6 +227,7 @@ def build():
     
     # Chen
     W(hero_header("Chen"))
+    W(ability("Zealot", slug="chen_zealot", innate=True))
     W(ul_open())
     W(li("Summon Convert: Convert is now considered a creep-hero", t("NEW"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
     W(ul_close())
@@ -250,6 +237,10 @@ def build():
     W(ul_open())
     W(li("Base Damage decreased by 2", bstat_h("Dark Seer", "AttackDamageMin", "7.38b", -2), extra=note_box(hero="Dark Seer", field="AttackDamageMin", before_patch="7.38b")))
     W(li("Damage at level 1 decreased from 54–60 to 52–58", br(54, 60, 52, 58)))
+    W(ul_close())
+    W(facet_header("dark_seer_movespd"))
+    W(ul_open())
+    W(li("Radius increased from 900 to 1200", b(900, 1200)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -265,7 +256,7 @@ def build():
     W(ability("Nothl Projection", slug="dazzle_nothl_projection"))
     W(ul_open())
     W(li("Cast Range decreased from 600 to 450", b(600, 450)))
-    W(li("Leash pull strength growth increased from 0.5 to 1.5", b(0.5, 1.5), extra=inline_note("This means for every 1 unit past 1600, the strength of the pull will increase by 1.5 unit/s instead of 0.5")))
+    W(li("Leash pull strength growth increased from 0.5 to 1.5", b(0.5, 1.5, l=True), extra=inline_note("This means for every 1 unit past 1600, the strength of the pull will increase by 1.5 unit/s instead of 0.5")))
     W(li("Max Duration decreased from 15s to 12s", b(15, 12)))
     W(ul_close())
     W(subgroup("Talents"))
@@ -311,7 +302,7 @@ def build():
     W(facet_header("faceless_void_time_zone"))
     W(ul_open())
     W(li("Movement, Cast and Turn Speed manipulation decreased from 60% to 50%", b(60, 50)))
-    W(li("No longer leashes enemies", t("MISC")))
+    W(li("No longer leashes enemies", t("DEL")))
     W(ul_close())
     
     # Hoodwink
@@ -345,7 +336,7 @@ def build():
     W(hero_header("Juggernaut"))
     W(ability("Omnislash", slug="juggernaut_omni_slash"))
     W(ul_open())
-    W(li("Slash Jump Radius is no longer increased by AoE bonuses", t("BUFF")))
+    W(li("Slash Jump Radius is no longer increased by AoE bonuses", t("DEL")))
     W(ul_close())
     
     # Keeper of the Light
