@@ -227,7 +227,7 @@ def build():
     
     # Chen
     W(hero_header("Chen"))
-    W(ability("Zealot", slug="chen_zealot", innate=True))
+    W(ability("Summon Convert", slug="chen_summon_convert", innate=True))
     W(ul_open())
     W(li("Summon Convert: Convert is now considered a creep-hero", t("NEW"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
     W(ul_close())
