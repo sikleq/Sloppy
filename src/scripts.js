@@ -3268,6 +3268,7 @@
     ['dvision', 'Day Vision'], ['nvision', 'Night Vision'], ['castRange', 'Cast Range'],
     ['dps', 'Dummy DPS'],
     ['ehpPhys', 'EHP phys'], ['ehpMag', 'EHP mag'],
+    ['itemCdr', 'Item CDR'],
   ];
   const CUSTOM = [
     ['hp', 'HP'], ['mp', 'MP'], ['hpr', 'HP/sec'], ['mpr', 'MP/sec'],
@@ -3324,7 +3325,7 @@
     if (key === 'hpr' || key === 'mpr' || key === 'tHit') return Number(v || 0).toFixed(2);
     if (key === 'dps') return Number(v || 0).toFixed(1);
     if (key === 'armor') return fmt(v, 1);
-    if (key === 'mr' || key === 'evasion' || key === 'armorPct' || key === 'statusRes' || key === 'slowRes' || key === 'spellAmp' || key === 'lifesteal' || key === 'spellLifesteal') return fmt(v, 1) + '%';
+    if (key === 'mr' || key === 'evasion' || key === 'armorPct' || key === 'statusRes' || key === 'slowRes' || key === 'spellAmp' || key === 'lifesteal' || key === 'spellLifesteal' || key === 'itemCdr') return fmt(v, 1) + '%';
     return fmt(v);
   };
   const fmtDiffMetric = (key, v) => {
@@ -3335,7 +3336,7 @@
     if (key === 'tHit') return sign + abs.toFixed(2) + 's';
     if (key === 'dps') return sign + abs.toFixed(1);
     if (key === 'armor') return sign + fmt(abs, 1);
-    if (key === 'mr' || key === 'evasion' || key === 'armorPct' || key === 'statusRes' || key === 'slowRes' || key === 'spellAmp' || key === 'lifesteal' || key === 'spellLifesteal') return sign + fmt(abs, 1) + '%';
+    if (key === 'mr' || key === 'evasion' || key === 'armorPct' || key === 'statusRes' || key === 'slowRes' || key === 'spellAmp' || key === 'lifesteal' || key === 'spellLifesteal' || key === 'itemCdr') return sign + fmt(abs, 1) + '%';
     return sign + fmt(abs);
   };
   const armorFactor = a => (0.06 * a) / (1 + 0.06 * Math.abs(a));
@@ -3923,13 +3924,11 @@
     const lifesteal = itemsTotal.lifesteal;
     const spellLifesteal = itemsTotal.spellLifesteal;
     const castRange = itemsTotal.castRange;
-    const tinkerItemCdr = heroLabInnate('itemCdr', s, { str, agi, int }, lvl, hp, includeInnates);
-    const cooldownReduction = tinkerItemCdr > 0
-      ? Math.min(Math.round((1 - (1 - (itemsTotal.cooldownReduction || 0) / 100) * (1 - tinkerItemCdr / 100)) * 1000) / 10, 99.9)
-      : (itemsTotal.cooldownReduction || 0);
+    const cooldownReduction = itemsTotal.cooldownReduction || 0;
+    const itemCdr = heroLabInnate('itemCdr', s, { str, agi, int }, lvl, hp, includeInnates);
     const dps = tHit > 0 ? dmg / tHit : 0;
     const healthRestoration = itemsTotal.healthRestoration;
-    return { hp, mp, hpr, mpr, str, agi, int, armor, armorPct, mr, evasion, statusRes, slowRes, spellAmp, dmg, dmin, dmax, whiteDmin, whiteDmax, aspd, tHit, ms, range, proj, dvision, nvision, ehpPhys, ehpMag, lifesteal, spellLifesteal, castRange, cooldownReduction, healthRestoration, dps, cost: itemsTotal.cost };
+    return { hp, mp, hpr, mpr, str, agi, int, armor, armorPct, mr, evasion, statusRes, slowRes, spellAmp, dmg, dmin, dmax, whiteDmin, whiteDmax, aspd, tHit, ms, range, proj, dvision, nvision, ehpPhys, ehpMag, lifesteal, spellLifesteal, castRange, cooldownReduction, itemCdr, healthRestoration, dps, cost: itemsTotal.cost };
   }
 
   function renderHeroHud(panel, st, vals) {
@@ -4129,6 +4128,7 @@
       statRow('Day Vision', mergeDisplay(base.dvision || 0, vals.dvision || 0, (vals.dvision || 0) - (base.dvision || 0), fmt), mergePositive && ((vals.dvision || 0) - (base.dvision || 0)) > 0 ? '' : bonusInt(vals.dvision - base.dvision)),
       statRow('Night Vision', mergeDisplay(base.nvision || 0, vals.nvision || 0, (vals.nvision || 0) - (base.nvision || 0), fmt), mergePositive && ((vals.nvision || 0) - (base.nvision || 0)) > 0 ? '' : bonusInt(vals.nvision - base.nvision)),
       statRow('Cooldown Reduction', mergeDisplay(base.cooldownReduction || 0, vals.cooldownReduction || 0, (vals.cooldownReduction || 0) - (base.cooldownReduction || 0), fmtPct), mergePositive && ((vals.cooldownReduction || 0) - (base.cooldownReduction || 0)) > 0 ? '' : bonusPct1((vals.cooldownReduction || 0) - (base.cooldownReduction || 0))),
+      (vals.itemCdr || base.itemCdr) ? statRow('Item CDR', mergeDisplay(base.itemCdr || 0, vals.itemCdr || 0, (vals.itemCdr || 0) - (base.itemCdr || 0), fmtPct), mergePositive && ((vals.itemCdr || 0) - (base.itemCdr || 0)) > 0 ? '' : bonusPct1((vals.itemCdr || 0) - (base.itemCdr || 0))) : '',
     ].join('');
 
     // Attribute rows builder — shows base attr + item bonus on the number
@@ -4771,7 +4771,7 @@
     aspdPct: 'Attack Speed',
     manaReductionPct: 'Max Mana',
   };
-  const BONUS_PCT = new Set(['mr', 'evasion', 'spellAmp', 'statusRes', 'slowRes', 'mprAmp', 'hprPct', 'mpPct', 'lifesteal', 'spellLifesteal', 'damagePct', 'batReduce', 'cooldownReduction', 'debuffAmp', 'hpPct', 'msPct', 'knockbackResist', 'incomingDamage', 'castSpeed', 'visionReduce', 'manacostIncrease', 'intelligencePct', 'manacostReduction', 'maxHpRegen', 'aspdPct', 'manaReductionPct', 'healthRestoration']);
+  const BONUS_PCT = new Set(['mr', 'evasion', 'spellAmp', 'statusRes', 'slowRes', 'mprAmp', 'hprPct', 'mpPct', 'lifesteal', 'spellLifesteal', 'damagePct', 'batReduce', 'cooldownReduction', 'debuffAmp', 'hpPct', 'msPct', 'knockbackResist', 'incomingDamage', 'castSpeed', 'visionReduce', 'manacostIncrease', 'intelligencePct', 'manacostReduction', 'maxHpRegen', 'aspdPct', 'manaReductionPct', 'healthRestoration', 'itemCdr']);
   function fmtNum(v) { var n = Math.abs(v); return n === Math.floor(n) ? String(n) : n % 1 === 0 ? String(n) : n.toFixed(2).replace(/0+$/, '').replace(/\.$/, ''); }
   function fmtBonusVal(k, v, flip) { var dv = flip ? -v : v; var av = fmtNum(dv); var sign = dv >= 0 ? '+' : '-'; return BONUS_PCT.has(k) ? sign + av + '%' : sign + av; }
   const BONUS_FLIP_NEG = new Set(['hpRegenReduce', 'manaReductionPct', 'visionReduce']);
