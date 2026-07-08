@@ -660,3 +660,6 @@ def build():
     W(ul_open())
     W(li("Mana Cost increased from 200 to 225", b(200, 225, l=True)))
     W(ul_close())
+
+    write_footer()
+    save_html('patches/7.38c.html')
