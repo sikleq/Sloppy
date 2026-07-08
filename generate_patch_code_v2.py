@@ -808,9 +808,21 @@ def _render_hero(hero, version=None, patchnotes_loc=None):
         # Build display-name → slug reverse map for all known facets
         from patch.badges import FACETS
         _facet_name_to_slug = {n.lower(): s for s, (n, _) in FACETS.items()}
+        # Build display-name → slug reverse map for abilities (from slim cache)
+        _abil_name_to_slug = {
+            v.get('dname', '').lower(): k
+            for k, v in ABILS_SLIM.items()
+            if v.get('dname')
+        }
+        # Whether this hero has any innate ability in the slim cache
+        _hero_has_known_innate = any(
+            v.get('is_innate') for k, v in ABILS_SLIM.items()
+            if k.startswith(slug + '_')
+        )
         # Partition notes: bucket by facet name prefix, or keep as general
         _general_notes = []
         _facet_buckets = {}   # facet_slug -> [notes]
+        _abil_buckets = {}    # abil_slug -> {'name': str, 'notes': [...]}
         _facet_removed = []   # (slug, display_name) for "Removed X facet" notes
         _FACET_PREFIX_RE = re.compile(r'^([^:]{2,40}):\s+(.+)$', re.DOTALL)
         # "Removed X[, Y] and Z facets" — captures comma/and-separated list
@@ -850,6 +862,23 @@ def _render_hero(hero, version=None, patchnotes_loc=None):
                     )
                     _facet_buckets.setdefault(facet_slug, []).append(stripped_note)
                     continue
+                # Check for "AbilityName: change text" prefix (ability not a facet)
+                abil_slug = _abil_name_to_slug.get(prefix.lower())
+                if not abil_slug:
+                    # Derive slug from hero slug + display name
+                    derived = slug + '_' + re.sub(r"[^a-z0-9]+", '_', prefix.lower()).strip('_')
+                    # Only treat as ability prefix if derived slug looks plausible
+                    # (starts with hero slug and has at least one word after it)
+                    if derived != slug + '_' and len(prefix.split()) >= 1:
+                        abil_slug = derived
+                if abil_slug:
+                    stripped_note = dict(n)
+                    stripped_note['note'] = re.sub(
+                        re.escape(prefix) + r':\s*', '', n.get('note', ''), count=1, flags=re.I
+                    )
+                    entry = _abil_buckets.setdefault(abil_slug, {'name': prefix, 'notes': []})
+                    entry['notes'].append(stripped_note)
+                    continue
             _general_notes.append(n)
         if _general_notes:
             body, _ = _emit_notes(_general_notes, hero_name=name, version=version)
@@ -864,6 +893,18 @@ def _render_hero(hero, version=None, patchnotes_loc=None):
         for facet_slug, fnotes in _facet_buckets.items():
             out.append(f'W(facet_header("{facet_slug}"))')
             body, _ = _emit_notes(fnotes)
+            out.extend(body)
+        # Emit ability blocks from "AbilityName: ..." hero_notes
+        for abil_slug, entry in _abil_buckets.items():
+            abil_name = entry['name']
+            anotes = entry['notes']
+            # Determine innate flag: use slim cache; if slug unknown but hero has
+            # a known innate (e.g. newly renamed), assume this is the old innate.
+            slim_entry = ABILS_SLIM.get(abil_slug, {})
+            is_innate = slim_entry.get('is_innate', False) or _hero_has_known_innate
+            innate_kwarg = ', innate=True' if is_innate else ''
+            out.append(f'W(ability("{abil_name}", slug="{abil_slug}"{innate_kwarg}))')
+            body, _ = _emit_notes(anotes)
             out.extend(body)
     # Facet subsections — before Abilities (order: stats > innates > facets > abilities > talents)
     from patch.badges import FACETS as _FACETS
