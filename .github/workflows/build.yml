@@ -250,6 +250,48 @@ jobs:
       - name: Audit — local ability icon coverage
         run: python scripts/audit/check_icons.py
 
+      - name: Audit — ability slugs registered in known_exceptions (no live requests)
+        run: |
+          python - <<'PY'
+          """Check every ability(slug=) in content/*.py against abilities_slim.json.
+          Slugs absent from slim AND not in KNOWN_NON_DATAFEED_ABILITIES or other
+          exception lists must be registered before the live audit catches them."""
+          import re, sys, json, pathlib
+
+          ROOT = pathlib.Path('.')
+          sys.path.insert(0, str(ROOT))
+          from patch.known_exceptions import (
+              KNOWN_NON_DATAFEED_ABILITIES,
+              KNOWN_ICON_URL_PSEUDO_SLUGS,
+              KNOWN_SYNTHETIC_SUBBLOCKS,
+          )
+          slim = json.loads((ROOT / 'data' / 'abilities_slim.json').read_text(encoding='utf-8'))
+
+          # All slugs that are exempt from live validation
+          exempt_slugs = (
+              {s for _, s in KNOWN_NON_DATAFEED_ABILITIES}
+              | KNOWN_ICON_URL_PSEUDO_SLUGS
+              | KNOWN_SYNTHETIC_SUBBLOCKS
+          )
+
+          SLUG_RE = re.compile(r'ability\([^)]*slug\s*=\s*"([^"]+)"')
+          issues = []
+          for p in sorted(pathlib.Path('content').glob('*.py')):
+              for m in SLUG_RE.finditer(p.read_text(encoding='utf-8')):
+                  slug = m.group(1)
+                  if slug not in slim and slug not in exempt_slugs:
+                      issues.append(f'{p.name}: slug "{slug}" not in abilities_slim.json and not in KNOWN_NON_DATAFEED_ABILITIES')
+
+          if issues:
+              print(f'Found {len(issues)} unregistered ability slug(s):')
+              for iss in issues:
+                  print(f'  {iss}')
+              print()
+              print('Fix: add (HeroName, slug) to KNOWN_NON_DATAFEED_ABILITIES in patch/known_exceptions.py')
+              sys.exit(1)
+          print(f'OK — all ability slugs are in abilities_slim.json or registered in known_exceptions')
+          PY
+
       - name: Copy static assets into dist
         if: github.ref == 'refs/heads/main'
         run: |
