@@ -9866,6 +9866,25 @@ a.whatsnew-row:hover {
   color: var(--text-dimmer);
 }
 
+/* Ability blocks inside hero changelog — same grid as patch pages but compact */
+.hc-abil-block {
+  margin: 6px 0;
+}
+.hc-abil-block > .ability-icon-wrap {
+  width: 36px;
+  height: 36px;
+}
+.hc-abil-block > .ability-icon-wrap > .ability-icon-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+}
+.hc-abil-block > .ability-title {
+  font-family: var(--font-j25);
+  font-size: 17px;
+  margin-top: -1px;
+}
+
 /* Hero header */
 .hc-hero-header {
   display: flex;
@@ -9884,10 +9903,11 @@ a.whatsnew-row:hover {
 }
 .hc-hero-name {
   font-family: var(--font-j25);
-  font-size: 20px;
+  font-size: 22px;
   color: var(--gold-strong);
   margin: 0;
   line-height: 1.2;
+  letter-spacing: 0.5px;
 }
 .hc-hero-summary {
   font-size: 12px;
@@ -9913,9 +9933,10 @@ a.whatsnew-row:hover {
 }
 .hc-patch-version {
   font-family: var(--font-j25);
-  font-size: 14px;
+  font-size: 15px;
   color: var(--gold);
-  font-weight: 700;
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 .hc-patch-date {
   font-size: 11px;
@@ -9947,8 +9968,8 @@ a.whatsnew-row:hover {
   align-items: baseline;
   gap: 8px;
   padding: 3px 0;
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 15px;
+  line-height: 1.5;
   color: var(--text-main);
   border-bottom: 1px solid transparent;
 }

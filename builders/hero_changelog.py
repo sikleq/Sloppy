@@ -25,10 +25,14 @@ _sys.path.insert(0, str(_HERE))
 _sys.path.insert(0, str(_HERE / "builders"))
 
 import builders.site_common as _site
+from patch.elements import ABILITY_DISPLAY_TO_SLUG, HERO_TO_ABIL_PREFIX
 
 _esc = lambda s: _html.escape(str(s), quote=True)
 
 NORM_DIR = _HERE / "data" / "normalized" / "patches"
+
+# Scopes that are NOT ability names
+_NON_ABILITY_SCOPES = {"talent", "base"}
 
 
 def _ver_key(version_str: str) -> tuple:
@@ -105,6 +109,26 @@ def _load_patch_dates() -> dict[str, str]:
     return dates
 
 
+def _ability_slug(hero_icon: str, scope: str) -> str | None:
+    """Resolve an ability display name to its CDN icon slug, mirroring
+    patch/elements.py ability() logic. Returns None for non-ability scopes."""
+    if not scope or scope in _NON_ABILITY_SCOPES or scope.startswith("facet:"):
+        return None
+    prefix = HERO_TO_ABIL_PREFIX.get(hero_icon, hero_icon)
+    key = (hero_icon, scope)
+    if key in ABILITY_DISPLAY_TO_SLUG:
+        part = ABILITY_DISPLAY_TO_SLUG[key]
+    else:
+        part = (scope.lower()
+                .replace("'", "")
+                .replace("-", "_")
+                .replace(" ", "_")
+                .replace(".", "")
+                .replace("(", "")
+                .replace(")", ""))
+    return f"{prefix}_{part}"
+
+
 def _build_hero_data(patches: list[dict], roster: dict[str, dict],
                       icon_to_slug: dict[str, str]) -> dict:
     """Build the per-hero data structure:
@@ -131,13 +155,22 @@ def _build_hero_data(patches: list[dict], roster: dict[str, dict],
             changes = entity.get("changes", [])
             if not changes:
                 continue
+            # Enrich changes with ability_slug for icon rendering
+            enriched = []
+            for ch in changes:
+                sc = ch.get("scope", "")
+                aslug = _ability_slug(raw_id, sc)
+                entry = dict(ch)
+                if aslug:
+                    entry["ability_slug"] = aslug
+                enriched.append(entry)
             all_patches_seen.add(ver)
             if slug not in hero_patches:
                 hero_patches[slug] = []
             hero_patches[slug].append({
                 "patch": ver,
                 "date": dates.get(ver, ""),
-                "changes": changes,
+                "changes": enriched,
             })
 
     # Build hero list, using roster for name/icon when available
