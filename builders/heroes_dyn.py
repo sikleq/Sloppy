@@ -72,6 +72,7 @@ def save_heroes_dyn_html():
         attr_filter=True,
         row_meta_by_slug=_hero_attack_types(),
         search_ph="Search heroes — anci, aba, brood…",
+        row_link_tpl="hero_changelog.html#{slug}",
         blurb=(
             "Every hero down the side, every patch across the top. Each diamond "
             "is that hero’s balance-change summary for that patch — hover it for "

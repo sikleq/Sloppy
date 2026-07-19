@@ -6000,6 +6000,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    so cover fills it without cropping (mirrors mana_items' .mr-ico approach). */
 .items-dyn-table .hd-hero-inner img { height: 29px; }
 .hd-hero-name { font-weight: 600; color: var(--text-bright); }
+.hd-hero-link { color: inherit; text-decoration: none; display: contents; }
 /* RULE (all tables): hovering a hero/unit portrait pops it out — like Neutral
    Creeps. The 18px gap + name-fitted column width keep the 1.8× zoom from ever
    covering the name. The icon's stacking sits under the sticky header (sticky-col
