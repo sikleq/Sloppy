@@ -44,6 +44,13 @@ def _minify_assets(dist: Path):
             js.write_text(mini, encoding="utf-8")
             pct = (1 - len(mini) / len(raw)) * 100 if raw else 0
             print(f"  minified scripts.js: {len(raw):,} -> {len(mini):,} ({pct:.0f}% smaller)")
+        hcl = dist / "src" / "hero_changelog.js"
+        if hcl.exists():
+            raw = hcl.read_text(encoding="utf-8")
+            mini = rjsmin.jsmin(raw)
+            hcl.write_text(mini, encoding="utf-8")
+            pct = (1 - len(mini) / len(raw)) * 100 if raw else 0
+            print(f"  minified hero_changelog.js: {len(raw):,} -> {len(mini):,} ({pct:.0f}% smaller)")
     except ImportError:
         print("  [skip] rjsmin not installed -- JS not minified")
 
@@ -57,6 +64,7 @@ STEPS = [
     ("lab",     "builders/hero_lab.py",     "Hero Lab calculator"),
     ("hdyn",    "builders/heroes_dyn.py",   "Hero Dynamics matrix"),
     ("idyn",    "builders/items_dyn.py",    "Item Dynamics matrix"),
+    ("hcl",     "builders/hero_changelog.py", "Hero Changelog"),
     ("terrain", "builders/terrain.py",      "Terrain comparison"),
 ]
 

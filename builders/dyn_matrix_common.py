@@ -173,7 +173,8 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                     icon_dir, from_token, search_ph, blurb,
                     current_toggle=False, class_filter=False, price_filter=False,
                     category_filter=False, attack_filter=False, attr_filter=False,
-                    row_meta_by_slug=None, preserve_roster_order=False):
+                    row_meta_by_slug=None, preserve_roster_order=False,
+                    row_link_tpl=None):
     """Render a Dynamics matrix page. See module docstring for the params.
 
     current_toggle — add an "In game" switch (left of Buff vs nerf) that hides
@@ -267,13 +268,16 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         r_idx = ver_index.get(removed) if removed else None
         img = (f'<img src="{_esc(icon_dir)}/{_esc(h["icon"])}.png" '
                f'alt="{_esc(h["name"])}" loading="lazy">')
+        inner_content = f'{img}<span class="hd-hero-name">{_esc(h["name"])}</span>'
+        if row_link_tpl:
+            href = row_link_tpl.replace("{slug}", _esc(h["icon"]))
+            inner_content = f'<a href="{href}" class="hd-hero-link">{inner_content}</a>'
         alias = _search_alias(h["name"], h["icon"], kind)
         alias_attr = f' data-alias="{_esc(alias)}"' if alias else ''
         cells = [
             f'<td class="hd-hero sticky-col" data-col="name" '
             f'data-sort="{_esc(h["name"])}" data-slug="{_esc(h["icon"])}"{alias_attr}>'
-            f'<span class="hd-hero-inner">{img}'
-            f'<span class="hd-hero-name">{_esc(h["name"])}</span></span></td>'
+            f'<span class="hd-hero-inner">{inner_content}</span></td>'
         ]
         for i, p in enumerate(patches):
             ver = p["version"]

@@ -43,7 +43,13 @@ def compute_asset_version():
             battle = _f.read()
     else:
         battle = ""
-    return _hashlib.sha1((css + js + battle).encode("utf-8")).hexdigest()[:10]
+    hcl_path = _os.path.join(_HERE, "src", "hero_changelog.js")
+    if _os.path.exists(hcl_path):
+        with open(hcl_path, encoding="utf-8") as _f:
+            hcl = _f.read()
+    else:
+        hcl = ""
+    return _hashlib.sha1((css + js + battle + hcl).encode("utf-8")).hexdigest()[:10]
 
 
 def get_latest_version():
@@ -95,6 +101,7 @@ MATERIALS_GROUPS = [
         ("hero_lab",     "Hero Lab",      "hero_lab.html"),
         ("aoe_increase", "AoE Increase",  "aoe_increase.html"),
         ("heroes_dyn",   "Hero Dynamics", "heroes_dyn.html"),
+        ("hero_changelog", "Hero Changelog", "hero_changelog.html"),
     ]),
     ("terrain", "Terrain", "terrain_741.html", None),
 ]
