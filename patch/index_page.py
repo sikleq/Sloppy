@@ -288,6 +288,7 @@ def save_index_html():
         + _panel_link_btn('', 'heroes_stats.html', 'icon_typewriter.png', 'Stats')
         + _panel_link_btn('', 'hero_lab.html', 'icon_teapot.png', 'Hero Lab')
         + _panel_link_btn('', 'aoe_increase.html', 'icon_abilities.png', 'AoE')
+        + _panel_link_btn('', 'hero_changelog.html', 'icon_patch.png', 'Changelog')
         + '</div></div>'
     )
     items_panel = (
