@@ -48,10 +48,12 @@ def _ver_key(version_str: str) -> tuple:
     return tuple(nums) + (suffix_ord,)
 
 
-def _load_hero_roster() -> dict[str, dict]:
+def _load_hero_roster() -> tuple[dict[str, dict], dict[str, str]]:
     """Build hero lookup: slug → {name, icon, key} from _dynamics.json.
-    Falls back to normalized-JSON-only if dynamics isn't available."""
+    Also returns icon_to_slug: normalized-JSON id → roster slug.
+    Falls back to empty dicts if dynamics isn't available."""
     roster = {}
+    icon_to_slug = {}
     dyn_path = _HERE / "_dynamics.json"
     if dyn_path.exists():
         dyn = _json.loads(dyn_path.read_text(encoding="utf-8"))
@@ -60,12 +62,14 @@ def _load_hero_roster() -> dict[str, dict]:
             if not key.startswith("hero|"):
                 continue
             slug = key.split("|", 1)[-1]
+            icon = rec.get("icon", slug)
             roster[slug] = {
                 "name": rec["name"],
-                "icon": rec.get("icon", slug),
+                "icon": icon,
                 "key": key,
             }
-    return roster
+            icon_to_slug[icon] = slug
+    return roster, icon_to_slug
 
 
 def _load_all_patches() -> list[dict]:
@@ -101,7 +105,8 @@ def _load_patch_dates() -> dict[str, str]:
     return dates
 
 
-def _build_hero_data(patches: list[dict], roster: dict[str, dict]) -> dict:
+def _build_hero_data(patches: list[dict], roster: dict[str, dict],
+                      icon_to_slug: dict[str, str]) -> dict:
     """Build the per-hero data structure:
     {
       heroes: [{slug, name, icon, patches: [{patch, date, changes: [...]}]}],
@@ -110,7 +115,7 @@ def _build_hero_data(patches: list[dict], roster: dict[str, dict]) -> dict:
     }
     """
     dates = _load_patch_dates()
-    hero_patches: dict[str, list[dict]] = {}  # slug → [{patch, changes}]
+    hero_patches: dict[str, list[dict]] = {}  # roster slug → [{patch, changes}]
     all_patches_seen = set()
 
     for pdata in patches:
@@ -118,9 +123,11 @@ def _build_hero_data(patches: list[dict], roster: dict[str, dict]) -> dict:
         for entity in pdata["entities"]:
             if entity.get("entity_type") != "hero":
                 continue
-            slug = entity.get("id", "")
-            if not slug:
+            raw_id = entity.get("id", "")
+            if not raw_id:
                 continue
+            # Resolve engine slug → roster slug via icon mapping
+            slug = icon_to_slug.get(raw_id, raw_id)
             changes = entity.get("changes", [])
             if not changes:
                 continue
@@ -142,11 +149,14 @@ def _build_hero_data(patches: list[dict], roster: dict[str, dict]) -> dict:
     for slug in all_slugs:
         info = roster.get(slug, {})
         name = info.get("name", slug.replace("_", " ").replace("-", " ").title())
+        # Use icon (engine name) as canonical slug — matches dyn-matrix links
+        # (hero_changelog.html#doom_bringer) and JS deep-links.
         icon = info.get("icon", slug)
+        canonical = icon
         patches_for_hero = hero_patches.get(slug, [])
         patches_for_hero.sort(key=lambda p: _ver_key(p["patch"]))
         heroes.append({
-            "slug": slug,
+            "slug": canonical,
             "name": name,
             "icon": icon,
             "patches": patches_for_hero,
@@ -169,9 +179,9 @@ def _build_hero_data(patches: list[dict], roster: dict[str, dict]) -> dict:
 
 
 def render_html() -> str:
-    roster = _load_hero_roster()
+    roster, icon_to_slug = _load_hero_roster()
     patches = _load_all_patches()
-    hero_data = _build_hero_data(patches, roster)
+    hero_data = _build_hero_data(patches, roster, icon_to_slug)
 
     nav = _site.render_top_nav(
         "materials", _site.get_latest_version(),
