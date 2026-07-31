@@ -176,7 +176,8 @@ def build():
     W(hero_header("Ancient Apparition"))
     W(ability("Ice Blast", slug="ancient_apparition_ice_blast"))
     W(ul_open())
-    W(li("Cooldown decreased from 60/50/40s to 50/45/40s", b([60, 50, 40], [50, 45, 40], l=True)))
+    W(li("Cooldown decreased from 60/50/40s to 50/45/40s", b([60, 50, 40], [50, 45, 40], l=True),
+         extra=inline_note("The 7.41e game files list the level 2 cooldown as 55s — a Valve typo, since a cooldown does not rise with level. The patch-notes value of 45s is shown here")))
     W(ul_close())
 
     # Axe
