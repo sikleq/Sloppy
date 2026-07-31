@@ -69,6 +69,9 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     ("Ringmaster", "ringmaster_crystal_ball"),   # Sideshow Secrets sub-ability, not surfaced in live API
     ("Ringmaster", "ringmaster_weighted_pie"),   # Sideshow Secrets sub-ability, not surfaced in live API
     ("Tinker", "tinker_defense_matrix"),    # not surfaced in live herodata API
+    # Familiar's self-cast Stone Form (7.41e). Exists in abilities_slim.json as
+    # "Stone Form"; live herodata only lists the Familiars' own entry.
+    ("Visage", "visage_stone_form_self_cast"),
 }
 
 KNOWN_DISPLAY_NAME_OVERRIDES = {

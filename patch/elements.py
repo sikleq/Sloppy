@@ -439,6 +439,7 @@ def _item_display_name(slug):
 
 def hero_header(name):
     _State.current_hero = HERO_SLUG.get(name, name.lower().replace(" ", "_").replace("'", "").replace("-", ""))
+    _State.current_unit = None
     _State.next_ul_is_hero_stats = True
     _State.seen_abilities_subgroup = False
     _State.seen_facets_subgroup = False
@@ -451,6 +452,10 @@ def hero_header(name):
 
 def unit_header(name, icon_url, kind=None):
     _State.current_hero = None
+    # A unit's own base-stat ul is rendered exactly like a hero's: the first ul
+    # after the header becomes the GENERAL block (Spirit Bear 7.41e).
+    _State.current_unit = name
+    _State.next_ul_is_hero_stats = True
     kind_attr = f' data-kind="{kind}"' if kind else ''
     entity_kind = "creep-hero" if (kind and kind.lower().startswith("creep-hero")) else "unit"
     eid = _register_entity(entity_kind, name)
@@ -463,6 +468,7 @@ def unit_header(name, icon_url, kind=None):
 def item_header(name, new=False, changed=False):
     out = _close_ability_block()
     _State.current_hero = None
+    _State.current_unit = None
     if new:
         tag_text = 'NEW'
         type_text = new if isinstance(new, str) else ''
@@ -489,6 +495,7 @@ def item_header(name, new=False, changed=False):
 def plain_header(name, dynamics=True, terrain_link=None, sublabel=False):
     out = _close_ability_block()
     _State.current_hero = None
+    _State.current_unit = None
     if dynamics:
         eid = _register_entity("plain", name)
     else:
@@ -539,6 +546,7 @@ def enchant_header(name, slug=None, new=False):
 
 def section(title):
     _State.current_hero = None
+    _State.current_unit = None
     slug, label = _section_slug(title)
     _State.current_section_slug = slug
     _State.current_sections.append({'slug': slug, 'label': label})
@@ -836,7 +844,7 @@ def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_a
 
 def ul_open():
     out = ''
-    if _State.next_ul_is_hero_stats and _State.current_hero:
+    if _State.next_ul_is_hero_stats and (_State.current_hero or _State.current_unit):
         on_err = (
             "this.onerror=function(){this.style.display='none'};"
             f"this.src='{OTHER_ICON_URL}';"

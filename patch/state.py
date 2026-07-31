@@ -9,7 +9,10 @@ class _State:
     current_block_is_facet = False  # True when ability_block_open was set by facet_header()
     facet_block_had_ul = False      # True once ul_open() was called inside a facet block
     # Auto-categorize hero block contents (Stats / Abilities / Talents subgroups):
-    next_ul_is_hero_stats = False    # set by hero_header(), consumed by ul_open()
+    next_ul_is_hero_stats = False    # set by hero_header()/unit_header(), consumed by ul_open()
+    current_unit = None              # display name of the current unit_header() block
+                                     # (units have no HERO_SLUG, but their base-stat
+                                     # ul must still get the GENERAL block)
     in_stats_ul = False              # True while inside the auto-"STATS" ul (sanity-check facet/innate rows)
     section_panel_open = False       # True while inside a <section class="cat-panel"> wrapper
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup

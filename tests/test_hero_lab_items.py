@@ -79,8 +79,13 @@ def test_enchantment_attribute_values_are_resolved(items):
     evolved = items["item_enhancement_evolved"]["tip"]["attribs"]
     assert "+40 Primary Attribute" in evolved
 
+    # 7.41e replaced Feverish's mana-cost penalty with a max-mana penalty.
+    # Valve encodes it as a bare `max_mana` KV value — it must render as a
+    # percentage penalty, not as a flat mana bonus.
     feverish = items["item_enhancement_feverish"]["tip"]["attribs"]
-    assert "+7% Mana Cost/Mana Loss Increase" in feverish
+    assert "-20% Max Mana" in feverish
+    assert items["item_enhancement_feverish"]["bonus"]["mpPct"] == -20
+    assert items["item_enhancement_feverish"]["bonus"]["mp"] == 0
 
     audacious = items["item_enhancement_audacious"]["tip"]["attribs"]
     assert "+10% Incoming Damage" in audacious

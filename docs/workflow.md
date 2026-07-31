@@ -49,6 +49,30 @@ heroes/             ← npc_dota_hero_<slug>.txt per hero entry in heroes.json
 The per-hero KV files in `heroes/` are checked against the hero list in
 `heroes.json`; a single missing hero fails the build.
 
+The four scripts above only *top up* an existing `data/stats/<version>/`
+directory — they never create it. The base of the snapshot (the raw Valve KV
+`.txt` files, their slim JSON parses, and the `heroes/` dir) comes from
+**dotabuff/d2vpkr**, whose `Client NNNN` commits land within a day of a patch:
+
+1. Pick the first `dota/scripts/npc/npc_heroes.txt` commit dated **after** the
+   patch release (GitHub API `…/commits?path=…&per_page=1` right after a patch).
+2. From that SHA download `items.txt`, `npc_units.txt`, `npc_heroes.txt`,
+   `npc_abilities.txt`, `npc_ability_ids.txt` and every file in
+   `dota/scripts/npc/heroes/`; write them into `data/stats/<version>/` verbatim.
+3. Parse each root KV into its slim JSON with the extractors in
+   `D:\Sloppy Patches\fetch_stats.py` (`extract_heroes` → `heroes.json`,
+   `extract_items` → `items.json`, `extract_units` → `units.json`,
+   `extract_abilities` → `abilities.json`, `extract_ability_ids` →
+   `ability_ids.json`) — same parsers that produced every historical snapshot,
+   so the JSON shape stays stable.
+4. Only then run the four `scripts/fetch/*.py` scripts; they read
+   `data/site_meta.json` patch dates and fill in `npc_units.json`,
+   `npc_abilities.json`, `heroes_raw.json`.
+
+Sanity-check the snapshot against the patch notes before trusting it — a
+couple of "decreased by N" rows (e.g. a base-armor or base-regen change)
+should match the KV diff between the previous version and the new one.
+
 ## Step 3 — Generate the scaffold + normalized JSON
 
 ```powershell
@@ -115,6 +139,24 @@ Fetch any new icons that *do* exist on the CDN:
 ```powershell
 python scripts/fetch/fetch_icons.py
 ```
+
+### "Updated item icons for …" rows
+
+When the patch notes announce redrawn item art, the web CDN is **not** a usable
+source for days — it keeps serving the previous art (7.41e: patch on 30.07, CDN
+files still stamped 25.03). The game client has the new art immediately, so pull
+it out of the VPK instead:
+
+```powershell
+python scripts/fetch/extract_vpk_icons.py splintmail hydras_breath
+python scripts/fetch/extract_vpk_icons.py --check          # сверить все 459 иконок
+python scripts/fetch/extract_vpk_icons.py --check --write  # и записать расхождения
+```
+
+The script reads `panorama/images/items/<slug>_png.vtex_c` out of
+`pak01_dir.vpk` and decodes both variants Valve uses (DXT5+YCoCg and BGRA8888).
+`--check` is also the audit: it reports every local icon whose art drifted from
+the client.
 
 ## Step 6 — Build and run the gates
 

@@ -6,7 +6,7 @@
 - `hero_header(name)` — `/heroes/{slug}.png`. Slug из `HERO_SLUG` или fallback titlecase
 - `item_header(name)` — `/items/{slug}.png`. Slug из `ITEM_SLUG`
 - `enchant_header(name, slug)` — для нейтральных enchantments. URL = `/items/enhancement_{slug}.png`. Использовать вместо `plain_header` для Crude/Greedy/Tough и т.д.
-- `unit_header(name, icon_url)` — отдельный юнит (Spirit Bear) с кастомным URL
+- `unit_header(name, icon_url)` — отдельный юнит (Spirit Bear) с кастомным URL. **Первый `ul_open()` после него оформляется как у героя** — блок `<h4 class="subgroup">GENERAL</h4>` с иконкой стата (`unit_header` ставит те же флаги, что и `hero_header`). Базовые статы юнита (Base Armor у Spirit Bear в 7.41e) не должны висеть голым списком без заголовка
 - `plain_header(name)` — без иконки (Mechanics, Tormentor, Roshan, Map Objectives и т.п.)
 - `ability(name)` — `<h4>` название способности. **БЕЗ префикса героя** в имени! «Penitence», не «Chen Penitence». Generate_patch_code.py делает это автоматически — fallback titlecase берёт только bare ability name (после `entity_` префикса)
 - `subgroup(name)` — `<h4>` подгруппа («Talents», «Abilities», «Spirit Bear»)

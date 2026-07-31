@@ -125,6 +125,7 @@ ITEM_SLUG = {
     "Soul Ring": "soul_ring",
     "Specialist's Array": "specialists_array",
     "Manta Style": "manta",
+    "Divine Rapier": "rapier",
     "Drum of Endurance": "ancient_janggo",
     "Gleipnir": "gungir",
     "Orchid Malevolence": "orchid",

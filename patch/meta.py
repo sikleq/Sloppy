@@ -9,6 +9,7 @@ import builders.site_common as _site
 # and Fandom. Append new entries here when patches release; sorted internally.
 RELEASE_HISTORY = [
     # 7.41 cycle
+    {"version": "7.41e", "date": "30.07.2026", "filename": "patches/7.41e.html"},
     {"version": "7.41d", "date": "04.06.2026", "filename": "patches/7.41d.html"},
     {"version": "7.41c", "date": "06.05.2026", "filename": "patches/7.41c.html"},
     {"version": "7.41b", "date": "07.04.2026", "filename": "patches/7.41b.html"},

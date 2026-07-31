@@ -630,6 +630,14 @@ _FALLBACK_FIELD_ATTRIBS: dict[str, tuple[str, str, bool]] = {
     "max_mana_pct":                 ("Max Mana", "%", False),
 }
 
+# Per-item additions to _FALLBACK_FIELD_ATTRIBS (same tuple shape). Needed when
+# Valve reuses a generic KV key with an item-specific meaning: Feverish's
+# `max_mana` is a PERCENTAGE penalty (7.41e: "Now decreases maximum mana by
+# 20%"), while `max_mana` on Witless Shako / Quickened is a flat mana bonus.
+_ITEM_FIELD_ATTRIBS: dict[str, dict[str, tuple[str, str, bool]]] = {
+    "item_enhancement_feverish": {"max_mana": ("Max Mana", "%", True)},
+}
+
 
 def _field_value(fields: dict, key: str):
     """Resolve localization variables against KV fields case-insensitively."""
@@ -956,6 +964,12 @@ def _load_items(version: str) -> list[dict]:
                             mv["aspdPct"] = mv.pop("aspd")
                 rec["modes"] = modes
                 rec["bonus"] = {k: 0 for k in rec["bonus"]}
+        if item == "item_enhancement_feverish" and rec.get("bonus"):
+            # 7.41e reworked the downside into "decreases maximum mana by 20%".
+            # Valve stores it as a bare `max_mana`, which the generic mapping
+            # would otherwise read as +20 flat mana instead of a -20% penalty.
+            rec["bonus"]["mp"] = 0
+            rec["bonus"]["mpPct"] = -_sum(fields, "max_mana")
         if item in ("item_dust", "item_smoke_of_deceit"):
             # enemy/active-only effects — not passive hero bonuses
             if rec.get("bonus"):
@@ -1180,7 +1194,9 @@ def _load_items(version: str) -> list[dict]:
         # Tuple: (label, pct_suffix, flip_sign) — flip_sign negates the value for display.
         if "attribs" not in tip:
             fallback = []
-            for fk, (flabel, fpct, flip) in _FALLBACK_FIELD_ATTRIBS.items():
+            field_attribs = {**_FALLBACK_FIELD_ATTRIBS,
+                             **_ITEM_FIELD_ATTRIBS.get(item, {})}
+            for fk, (flabel, fpct, flip) in field_attribs.items():
                 fv = fields.get(fk)
                 if fv is not None:
                     try:
