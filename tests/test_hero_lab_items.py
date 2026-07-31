@@ -36,6 +36,14 @@ def test_passive_and_aura_mana_regen_remain_available(items):
     assert items["item_arcane_boots"]["bonus"]["mpr"] == pytest.approx(1.25)
 
 
+def test_bauble_enchant_scale_comes_from_kv(items):
+    """scripts.js multiplies tier-5 enchantments by these values instead of
+    hardcoding them — 7.41e moved the recraft bonus from 40% to 35%."""
+    scale = items["item_enchanters_bauble"]["enchantScale"]
+    assert scale["base"] == pytest.approx(0.10)
+    assert scale["growth"] == pytest.approx(0.35)
+
+
 def test_neutral_headline_bonuses_are_extracted(items):
     bonuses = items["item_harmonizer"]["tip"]["neutralBonuses"]
     assert bonuses == [

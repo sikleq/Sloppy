@@ -3284,6 +3284,17 @@
   ];
   const byHero = new Map(heroes.map(h => [h.id, h]));
   const byItem = new Map(items.map(i => [i.id, i]));
+  // Enchanter's Bauble multiplier for tier-5 enchantments. Values come from the
+  // item's own KV (builders/hero_lab.py → enchantScale): first craft adds
+  // `base`, every recraft after it adds `growth`. Never hardcode them — 7.41e
+  // moved the recraft bonus from 40% to 35%.
+  function baubleScaleFor(level) {
+    if (!level || level < 1) return 1;
+    const sc = (byItem.get('item_enchanters_bauble') || {}).enchantScale || {};
+    const base = typeof sc.base === 'number' ? sc.base : 0.10;
+    const growth = typeof sc.growth === 'number' ? sc.growth : 0.35;
+    return 1 + base + (level - 1) * growth;
+  }
   const heroGroups = {
     str: heroes.filter(h => h.stats?.attr === 'str'),
     agi: heroes.filter(h => h.stats?.attr === 'agi'),
@@ -3705,7 +3716,7 @@
 
   function itemTotals(entries, attackType, baubleLevel) {
     const isRanged = String(attackType || '').toLowerCase() === 'ranged';
-    const baubleScale = baubleLevel > 0 ? (0.7 + baubleLevel * 0.4) : 1;
+    const baubleScale = baubleScaleFor(baubleLevel);
     const out = { str: 0, agi: 0, int: 0, hp: 0, mp: 0, hpr: 0, mpr: 0, mprAmp: 0, _mprAmpVals: [], armor: 0, _rangeUniqueAllVals: [], _rangeUniqueRangedVals: [], _msBootVals: [], _cdrUniqVals: [], _cdrStackVals: [], projSpeed: 0, mrVals: [], evVals: [], statusResVals: [], slowResVals: [], spellAmp: 0, damage: 0, damagePct: 0, aspd: 0, ms: 0, range: 0, dvision: 0, nvision: 0, cost: 0, hprPct: 0, missingHprPct: 0, mpPct: 0, lifesteal: 0, spellLifesteal: 0, castRange: 0, primaryStat: 0, primaryStatUni: 0, batReduce: 0, healthRestoration: 0, cooldownReduction: 0, debuffAmp: 0, hpPct: 0, msPct: 0, _msPctVals: [], knockbackResist: 0, maxHpRegen: 0, incomingDamage: 0, magicDamage: 0, castSpeed: 0, visionReduce: 0, manacostIncrease: 0, intelligencePct: 0, hpRegenReduce: 0, manacostReduction: 0, gpm: 0, xpm: 0, aspdPct: 0, manaReductionPct: 0 };
     const visionSeen = new Set();
     entries.forEach(entry => {
@@ -5038,7 +5049,7 @@
         if (_bl > 0) {
           var _modes = {};
           try { _modes = JSON.parse(_panel.dataset.itemModes || '{}'); } catch(e) {}
-          if ((_modes.enchant || null) === 't5') baubleScale = 0.7 + _bl * 0.4;
+          if ((_modes.enchant || null) === 't5') baubleScale = baubleScaleFor(_bl);
         }
       }
       heroCdr = parseFloat(_panel.dataset.cdr || '0') || 0;

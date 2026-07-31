@@ -964,6 +964,14 @@ def _load_items(version: str) -> list[dict]:
                             mv["aspdPct"] = mv.pop("aspd")
                 rec["modes"] = modes
                 rec["bonus"] = {k: 0 for k in rec["bonus"]}
+        if item == "item_enchanters_bauble":
+            # The calculator scales tier-5 enchantments by the Bauble's own KV
+            # values. They move between patches (7.41e: recraft growth 40% ->
+            # 35%), so scripts.js must read them from here, never hardcode them.
+            rec["enchantScale"] = {
+                "base": _sum(fields, "enchantment_bonus_base") / 100.0,
+                "growth": _sum(fields, "enchantment_bonus_growth") / 100.0,
+            }
         if item == "item_enhancement_feverish" and rec.get("bonus"):
             # 7.41e reworked the downside into "decreases maximum mana by 20%".
             # Valve stores it as a bare `max_mana`, which the generic mapping
