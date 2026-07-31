@@ -5154,12 +5154,17 @@
       tipCurrentTile = bslot;
       var panel = bslot.closest('.hl-panel');
       var bl = panel ? (parseInt((panel.querySelector('[data-field="bauble-level"]') || {}).value || '0', 10) || 0) : 0;
-      var bonusPct = bl > 0 ? '+' + (bl * 40 - 30) + '%' : '—';
+      // Base/growth come from the item's KV (enchantScale), never hardcoded —
+      // 7.41e moved the recraft bonus from 40% to 35%.
+      var _bsc = (byItem.get('item_enchanters_bauble') || {}).enchantScale || { base: 0.10, growth: 0.35 };
+      var basePct = Math.round(_bsc.base * 100);
+      var growthPct = Math.round(_bsc.growth * 100);
+      var bonusPct = bl > 0 ? '+' + (basePct + (bl - 1) * growthPct) + '%' : '—';
       tipEl.className = 'hl-tooltip';
       tipEl.innerHTML = '<div class="hlt-head"><img class="hlt-icon" src="icons/items/enchanters_bauble.png" alt=""><div class="hlt-title"><span class="hlt-name">Enchanter\'s Bauble</span></div></div>'
         + (bl > 0 ? '<div class="hlt-stats"><span class="hlt-stat"><b>' + bonusPct + '</b> Enchantment Bonus</span></div>' : '')
         + '<div class="hlt-info">ABILITY: Passive</div>'
-        + '<div class="hlt-desc">Increases the bonuses of the item\'s Neutral Enchantment by <span style="color:#9cf">10%</span>. Every time this item is crafted again the bonus is increased by <span style="color:#9cf">40%</span>.</div>';
+        + '<div class="hlt-desc">Increases the bonuses of the item\'s Neutral Enchantment by <span style="color:#9cf">' + basePct + '%</span>. Every time this item is crafted again the bonus is increased by <span style="color:#9cf">' + growthPct + '%</span>.</div>';
       tipEl.hidden = false;
       positionTooltip(bslot);
     }
