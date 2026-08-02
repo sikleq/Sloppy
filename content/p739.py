@@ -628,8 +628,7 @@ def build():
     # Beastmaster
     W(hero_header("Beastmaster"))
     W(ul_open())
-    W(li("Base Agility decreased from 22 to 19", b(22, 19)))
-    W(li("Damage at level 1 decreased by 1 (from 53–57 to 52–56)", br(53, 57, 52, 56)))
+    W(li("Base Agility decreased from 22 to 19", b(22, 19), extra=inline_note("Damage at level 1 decreased by 1 (from 53–57 to 52–56)")))
     W(ul_close())
     W(ability("Drums of Slom", slug="beastmaster_drums_of_slom"))
     W(ul_open())
@@ -657,7 +656,7 @@ def build():
     W(hero_header("Bounty Hunter"))
     W(ability("Friendly Shadow", slug="bounty_hunter_wind_walk_ally"))
     W(ul_open())
-    W(li("Ally Fade Time decreased from 1.0s to 0.5s", b(1, 0.5)))
+    W(li("Ally Fade Time decreased from 1.0s to 0.5s", b(1, 0.5, l=True)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -750,8 +749,8 @@ def build():
     # Chen
     W(hero_header("Chen"))
     W(ul_open())
-    W(li("Damage at level 1 increased from 46–56 to 48–58", br(46, 56, 48, 58)))
     W(li("Base damage increased by 2", bstat_h("Chen", "AttackDamageMin", "7.38c", 2), extra=note_box(hero="Chen", field="AttackDamageMin", before_patch="7.38c")))
+    W(li("Damage at level 1 increased from 46–56 to 48–58", br(46, 56, 48, 58)))
     W(ul_close())
     W(ability("Holy Persuasion", slug="chen_holy_persuasion"))
     W(ul_open())
@@ -828,8 +827,8 @@ def build():
     # Dawnbreaker
     W(hero_header("Dawnbreaker"))
     W(ul_open())
-    W(li("Damage at level 1 decreased from 54–58 to 49–53", br(54, 58, 49, 53)))
     W(li("Base damage decreased by 5", bstat_h("Dawnbreaker", "AttackDamageMin", "7.38c", -5), extra=note_box(hero="Dawnbreaker", field="AttackDamageMin", before_patch="7.38c")))
+    W(li("Damage at level 1 decreased from 54–58 to 49–53", br(54, 58, 49, 53)))
     W(ul_close())
     W(facet_header("dawnbreaker_blaze"))
     W(ul_open())
@@ -1371,8 +1370,7 @@ def build():
     # Lifestealer
     W(hero_header("Lifestealer"))
     W(ul_open())
-    W(li("Base Strength decreased from 25 to 23", b(25, 23)))
-    W(li("Damage at level 1 decreased by 2 (from 41–47 to 39–45)", br(41, 47, 39, 45)))
+    W(li("Base Strength decreased from 25 to 23", b(25, 23), extra=inline_note("Damage at level 1 decreased by 2 (from 41–47 to 39–45)")))
     W(ul_close())
     W(facet_header("life_stealer_gorestorm"))
     W(ul_open())
@@ -1444,8 +1442,7 @@ def build():
     # Marci
     W(hero_header("Marci"))
     W(ul_open())
-    W(li("Agility gain increased from 1.8 to 2.2", b(1.8, 2.2)))
-    W(li("Damage gain per level increased from +3.0 to +3.2", b(3, 3.2)))
+    W(li("Agility gain increased from 1.8 to 2.2", b(1.8, 2.2), extra=inline_note("Damage gain per level increased from +3.0 to +3.2")))
     W(ul_close())
     W(ability("Dispose", slug="marci_grapple"))
     W(ul_open())
@@ -1558,8 +1555,7 @@ def build():
     # Naga Siren
     W(hero_header("Naga Siren"))
     W(ul_open())
-    W(li("Base Agility increased from 21 to 22", b(21, 22)))
-    W(li("Damage at level 1 increased by 1 (from 44–46 to 45–47)", br(44, 46, 45, 47)))
+    W(li("Base Agility increased from 21 to 22", b(21, 22), extra=inline_note("Damage at level 1 increased by 1 (from 44–46 to 45–47)")))
     W(ul_close())
     W(facet_header("naga_siren_active_riptide"))
     W(ul_open())
@@ -1650,8 +1646,7 @@ def build():
     # Ogre Magi
     W(hero_header("Ogre Magi"))
     W(ul_open())
-    W(li("Base Strength increased from 23 to 25", b(23, 25)))
-    W(li("Damage at level 1 increased by 2 (from 67–73 to 69–75)", br(67, 73, 69, 75)))
+    W(li("Base Strength increased from 23 to 25", b(23, 25), extra=inline_note("Damage at level 1 increased by 2 (from 67–73 to 69–75)")))
     W(ul_close())
     W(ability("Ignite", slug="ogre_magi_ignite"))
     W(ul_open())
@@ -1945,8 +1940,7 @@ def build():
     # Skywrath Mage
     W(hero_header("Skywrath Mage"))
     W(ul_open())
-    W(li("Base Intelligence increased from 23 to 25", b(23, 25)))
-    W(li("Damage at level 1 increased by 2 (from 39–49 to 41–51)", br(39, 49, 41, 51)))
+    W(li("Base Intelligence increased from 23 to 25", b(23, 25), extra=inline_note("Damage at level 1 increased by 2 (from 39–49 to 41–51)")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -2167,8 +2161,8 @@ def build():
     # Undying
     W(hero_header("Undying"))
     W(ul_open())
-    W(li("Damage at level 1 increased from 53–61 to 55–63", br(53, 61, 55, 63)))
     W(li("Base Damage increased by 2", bstat_h("Undying", "AttackDamageMin", "7.38c", 2), extra=note_box(hero="Undying", field="AttackDamageMin", before_patch="7.38c")))
+    W(li("Damage at level 1 increased from 53–61 to 55–63", br(53, 61, 55, 63)))
     W(ul_close())
     W(ability("Soul Rip", slug="undying_soul_rip"))
     W(ul_open())
@@ -2185,8 +2179,7 @@ def build():
     # Vengeful Spirit
     W(hero_header("Vengeful Spirit"))
     W(ul_open())
-    W(li("Base Agility increased from 21 to 23", b(21, 23)))
-    W(li("Damage at level 1 increased by 2 (from 47–53 to 49–55)", br(47, 53, 49, 55)))
+    W(li("Base Agility increased from 21 to 23", b(21, 23), extra=inline_note("Damage at level 1 increased by 2 (from 47–53 to 49–55)")))
     W(ul_close())
     W(ability("Magic Missile", slug="vengefulspirit_magic_missile"))
     W(ul_open())
@@ -2244,8 +2237,7 @@ def build():
     # Void Spirit
     W(hero_header("Void Spirit"))
     W(ul_open())
-    W(li("Base Agility increased from 19 to 21", b(19, 21)))
-    W(li("Damage at level 1 increased by 1 (51–55 to 52–56)", t("BUFF")))
+    W(li("Base Agility increased from 19 to 21", b(19, 21), extra=inline_note("Damage at level 1 increased by 1 (51–55 to 52–56)")))
     W(ul_close())
     W(ability("Intrinsic Edge", slug="void_spirit_intrinsic_edge"))
     W(ul_open())

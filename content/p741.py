@@ -1169,12 +1169,18 @@ def build():
     W(ability("Persecutor", slug="antimage_persectur"))
     W(ul_open())
     W(li("No longer levels with Mana Void", t("REWORK")))
+    # Persecutor used to scale with Mana Void's rank (ultimate: hero levels
+    # 6/12/18, with the pre-ultimate value at 1-5). Compare the new per-hero-level
+    # values against the OLD value at the corresponding rank-upgrade level, not
+    # against the old max — otherwise the table falsely reads as a nerf.
     W(li_formula("Min Movement Slow rescaled",
                  "12.5/15/17.5/20%", "12% + 0.5% per level",
-                 lambda L: 20.0, lambda L: 12.0 + 0.5 * L))
+                 lambda L: 12.5 if L < 6 else 15.0 if L < 12 else 17.5 if L < 18 else 20.0,
+                 lambda L: 12.0 + 0.5 * L, value_fmt="{:g}%"))
     W(li_formula("Max Movement Slow rescaled",
                  "25/30/35/40%", "24% + 1% per level",
-                 lambda L: 40.0, lambda L: 24.0 + 1.0 * L))
+                 lambda L: 25.0 if L < 6 else 30.0 if L < 12 else 35.0 if L < 18 else 40.0,
+                 lambda L: 24.0 + 1.0 * L, value_fmt="{:g}%"))
     W(ul_close())
     W(ability("Mana Break"))
     W(ul_open())
@@ -1210,8 +1216,7 @@ def build():
     W(hero_header("Arc Warden"))
     W(ul_open())
     W(li("Strength gain decreased from 2.4 to 2.2", b(2.4, 2.2)))
-    W(li("Agility gain decreased from 3.0 to 2.7", b(3.0, 2.7)))
-    W(li("Damage gain per level decreased from 3.6 to 3.4 as a result", b(3.6, 3.4)))
+    W(li("Agility gain decreased from 3.0 to 2.7", b(3.0, 2.7), extra=inline_note("Damage gain per level decreased from 3.6 to 3.4 as a result")))
     W(li("Base Movement Speed increased from 285 to 300", b(285, 300)))
     W(ul_close())
     W(ability_change(
@@ -1292,9 +1297,8 @@ def build():
     W(ul_open())
     W(li("Strength gain decreased from 2.7 to 2.5", b(2.7, 2.5)))
     W(li("Agility gain decreased from 2.7 to 2.5", b(2.7, 2.5)))
-    W(li("Intelligence gain decreased from 2.7 to 2.5", b(2.7, 2.5)))
-    W(li("Damage gain per level decreased from 3.6 to 3.4 as a result", b(3.6, 3.4),
-         extra=inline_note("Bane is Universal — all three attribute decreases contribute")))
+    W(li("Intelligence gain decreased from 2.7 to 2.5", b(2.7, 2.5),
+         extra=inline_note("Damage gain per level decreased from 3.6 to 3.4 as a result. Bane is Universal — all three attribute decreases contribute")))
     W(li("Attack Range increased from 400 to 425", b(400, 425)))
     W(ul_close())
     W(ability_change(
@@ -1916,7 +1920,8 @@ def build():
     W(ul_open())
     W(li_formula("Movement speed bonus changed",
                  "0.75% + 0.75% per level up", "0.5% + 0.75% per level",
-                 lambda L: 0.5 + 0.75 * L, lambda L: 0.5 + 0.75 * L))
+                 lambda L: 0.75 + 0.75 * (L - 1), lambda L: 0.5 + 0.75 * L,
+                 value_fmt="{:g}%"))
     W(li_formula("Cooldown Reduction changed",
                  "0.75% + 0.75% per level up", "0.75% per level",
                  lambda L: 0.75 * L, lambda L: 0.75 * L,
@@ -1929,7 +1934,7 @@ def build():
     W(ul_close())
     W(ability("Exorcism"))
     W(ul_open())
-    W(li("Ghost spawn rate improved from 0.35s to 0.25s", b(0.35, 0.25)))
+    W(li("Ghost spawn rate improved from 0.35s to 0.25s", b(0.35, 0.25, l=True)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -2159,10 +2164,10 @@ def build():
     W(li("No longer levels with Echo Slam", t("REWORK")))
     W(li_formula("Damage (Creep Death) changed",
                  "30/45/60/75", "27 + 3 per level",
-                 lambda L: 75.0, lambda L: 27.0 + 3.0 * L))
+                 rank_step([30.0, 45.0, 60.0, 75.0], ultimate=True), lambda L: 27.0 + 3.0 * L))
     W(li_formula("Damage (Hero Death) changed",
                  "150/250/350/450", "135 + 15 per level",
-                 lambda L: 450.0, lambda L: 135.0 + 15.0 * L))
+                 rank_step([150.0, 250.0, 350.0, 450.0], ultimate=True), lambda L: 135.0 + 15.0 * L))
     W(ul_close())
     W(ability("Fissure"))
     W(ul_open())
@@ -2190,16 +2195,16 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "(7.37 introduction did not include a mechanic line in the patchnote — needs canonical in-game text.)",
+                "Allied creeps and buildings affected by Glyph of Fortification or Roshan's Banner deal 100% bonus damage.",
             ],
         ),
         new=dict(
             name="Momentum",        innate=True,
             desc=[
                 "Passive.",
-                "Elder Titan's armor increases by " + _et_pill + " of his bonus movement speed."
-                '<div class="inline-note">Only counts movement speed he has above his base (305) value. '
-                'Cannot reduce armor when he is slowed below base movement speed.</div>',
+                "Elder Titan's armor increases by " + _et_pill + " of his bonus movement speed. "
+                + inline_note("Only counts movement speed he has above his base (305) value. "
+                              "Cannot reduce armor when he is slowed below base movement speed."),
             ],
             tables=[_et_table],
         ),
@@ -2232,11 +2237,11 @@ def build():
     W(li("No longer levels with Fire Remnant", t("REWORK")))
     W(li_formula("Damage per second changed",
                  "10/18/26/34", "10 + 1 per level",
-                 lambda L: 34.0, lambda L: 10.0 + 1.0 * L))
+                 rank_step([10.0, 18.0, 26.0, 34.0], ultimate=True), lambda L: 10.0 + 1.0 * L))
     W(li("Radius increased from 175 to 200", b(175, 200)))
-    W(li("Aghanim's Shard bonus radius decreased from 175 to 150", b(175, 150)))
+    W(li("Aghanim's Shard bonus radius decreased from 175 to 150", b(175, 150),
+         extra=inline_note("Total Shard radius unchanged with base radius increase")))
     W(ul_close())
-    W(subnote("Total Shard radius unchanged with base radius increase"))
     W(ability("Searing Chains"))
     W(ul_open())
     W(li("Mana Cost decreased from 95/105/115/125 to 80/90/100/110", b([95, 105, 115, 125], [80, 90, 100, 110], l=True)))
@@ -2413,7 +2418,7 @@ def build():
     W(ul_close())
     W(ability("Side Gunner", slug="gyrocopter_side_gunner_spawn_ability"))
     W(ul_open())
-    W(li("Aghanim's Scepter: Side Gunner is now a separate ability granted by Scepter (effect is unchanged)", t("NEW")))
+    W(li("Aghanim's Scepter: Side Gunner is now a separate ability granted by Scepter (effect is unchanged)", t("MISC")))
     W(ul_close())
 
     # Hoodwink
@@ -2423,7 +2428,7 @@ def build():
     W(li("No longer levels with Sharpshooter", t("REWORK")))
     W(li_formula("Redirect Chance changed",
                  "14/21/28/35%", "14% + 1% per level",
-                 lambda L: 35.0, lambda L: 14.0 + 1.0 * L))
+                 rank_step([14.0, 21.0, 28.0, 35.0], ultimate=True), lambda L: 14.0 + 1.0 * L))
     W(ul_close())
     W(ability("Acorn Shot"))
     W(ul_open())
@@ -3083,7 +3088,7 @@ def build():
     W(li("Damage for Allies/Self changed from 1/2 + 1/2 per level up to 1/2 per level", t("MISC")))
     W(li_formula("Bonus Night Vision changed",
                  "250 + 25 per level up", "225 + 25 per level",
-                 lambda L: 250.0 + 25.0 * L, lambda L: 225.0 + 25.0 * L,
+                 lambda L: 250.0 + 25.0 * (L - 1), lambda L: 225.0 + 25.0 * L,
                  effective_unchanged=True,
                  inline_note_text="Effective values are not changed (formulas re-parametrized with a 1-level shift)"))
     W(ul_close())
@@ -3124,15 +3129,14 @@ def build():
     # Magnus
     W(hero_header("Magnus"))
     W(ul_open())
-    W(li("Base Agility increased from 12 to 14", b(12, 14)))
-    W(li("Damage at level 1 increased from 55–63 to 56–64", br(55, 63, 56, 64)))
+    W(li("Base Agility increased from 12 to 14", b(12, 14), extra=inline_note("Damage at level 1 increased from 55–63 to 56–64")))
     W(ul_close())
     W(ability("Solid Core"))
     W(ul_open())
     W(li("No longer levels with Reverse Polarity", t("REWORK")))
     W(li_formula("Slow Resistance rescaled",
                  "20/30/40/50%", "24% + 1% per level",
-                 lambda L: 50.0, lambda L: 24.0 + 1.0 * L))
+                 rank_step([20.0, 30.0, 40.0, 50.0], ultimate=True), lambda L: 24.0 + 1.0 * L))
     W(ul_close())
     W(ability("Empower"))
     W(ul_open())
@@ -3279,9 +3283,9 @@ def build():
                 "Each Meepo (main + clones) grants stacking bonuses to <b>all</b> Meepos based on the terrain it stands on:",
                 "<b>Tree within 250 range</b> → +1 Health Regen.",
                 "<b>On solid ground</b> → +2% bonus movement speed.",
-                "<b>In water</b> → attacks slow the target by 2% for 2s.",
-                '<div class="inline-note">Each Meepo can provide only one tree bonus regardless of how many trees are in range. '
-                "If there's a tree in the water, that Meepo provides both the water and tree bonuses.</div>",
+                "<b>In water</b> → attacks slow the target by 2% for 2s. "
+                + inline_note("Each Meepo can provide only one tree bonus regardless of how many trees are in range. "
+                              "If there's a tree in the water, that Meepo provides both the water and tree bonuses."),
             ],
         ),
         summary="New innate ability.",
@@ -3387,7 +3391,7 @@ def build():
     W(li("No longer levels with Wukong's Command", t("REWORK")))
     W(li_formula("Cooldown changed",
                  "24/20/16/12s", "24.5s - 0.5s per level",
-                 lambda L: 12.0, lambda L: 24.5 - 0.5 * L, l=True))
+                 rank_step([24.0, 20.0, 16.0, 12.0], ultimate=True), lambda L: 24.5 - 0.5 * L, l=True))
     W(ul_close())
     W(ability("Tree Dance"))
     W(ul_open())
@@ -3550,7 +3554,7 @@ def build():
     W(li("No longer levels with Wrath of Nature", t("REWORK")))
     W(li_formula("Tree Radius rescaled",
                  "300/400/500/600", "300 + 10 per level",
-                 lambda L: 600.0, lambda L: 300.0 + 10.0 * L))
+                 rank_step([300.0, 400.0, 500.0, 600.0], ultimate=True), lambda L: 300.0 + 10.0 * L))
     W(li("Multiplier per treant increased from 1x to 2x", b(1, 2)))
     W(li("Treants also have Spirit of the Forest and gain bonus damage for each nearby tree and treant", t("NEW")))
     W(ul_close())
@@ -3580,7 +3584,7 @@ def build():
     W(li("No longer levels with Reaper's Scythe", t("REWORK")))
     W(li_formula("Health and Mana regen rescaled",
                  "3.5/5/6.5/8", "3.7 + 0.3 per level",
-                 lambda L: 8.0, lambda L: 3.7 + 0.3 * L))
+                 rank_step([3.5, 5.0, 6.5, 8.0], ultimate=True), lambda L: 3.7 + 0.3 * L))
     W(ul_close())
     W(ability("Ghost Shroud"))
     W(ul_open())
@@ -3728,7 +3732,7 @@ def build():
     W(li("No longer levels with Guardian Angel", t("REWORK")))
     W(li_formula("Movement Slow changed",
                  "10/20/30/40%", "11% + 1% per level",
-                 lambda L: 40.0, lambda L: 11.0 + 1.0 * L))
+                 rank_step([10.0, 20.0, 30.0, 40.0], ultimate=True), lambda L: 11.0 + 1.0 * L))
     W(ul_close())
     W(ability("Purification"))
     W(ul_open())
@@ -3881,7 +3885,7 @@ def build():
     W(li("Vanish Buffer rescaled from 0.4/0.6/0.8/1s to 0.8s", b([0.4, 0.6, 0.8, 1], 0.8)))
     W(li_formula("Active Movement Speed changed",
                  "6/9/12/15%", "9.5% + 0.5% per level",
-                 lambda L: 15.0, lambda L: 9.5 + 0.5 * L))
+                 rank_step([6.0, 9.0, 12.0, 15.0], ultimate=True), lambda L: 9.5 + 0.5 * L))
     W(ul_close())
 
     # Phantom Lancer
@@ -4043,7 +4047,7 @@ def build():
     W(ul_open())
     W(li_formula("Agility Multiplier changed",
                  "0.6 + 0.05 per level up", "0.55 + 0.05 per level",
-                 lambda L: 0.6 + (0.05) * L, lambda L: 0.55 + (0.05) * L,
+                 lambda L: 0.6 + (0.05) * (L - 1), lambda L: 0.55 + (0.05) * L,
                  effective_unchanged=True,
                  inline_note_text="Effective values are not changed"))
     W(ul_close())
@@ -4187,10 +4191,10 @@ def build():
     W(li("No longer levels with Epicenter", t("REWORK")))
     W(li_formula("Base Damage rescaled",
                  "20/40/60/80", "17 + 3 per level",
-                 lambda L: 80.0, lambda L: 17.0 + 3.0 * L))
+                 rank_step([20.0, 40.0, 60.0, 80.0], ultimate=True), lambda L: 17.0 + 3.0 * L))
     W(li_formula("Max Health Damage rescaled",
                  "3/7/11/15%", "2.5% + 0.5% per level",
-                 lambda L: 15.0, lambda L: 2.5 + 0.5 * L))
+                 rank_step([3.0, 7.0, 11.0, 15.0], ultimate=True), lambda L: 2.5 + 0.5 * L))
     W(li("Duration decreased from 4.5/5/5.5/6s to 4.5s", b([4.5, 5, 5.5, 6], 4.5)))
     W(ul_close())
     W(ability("Burrowstrike", slug="sandking_burrowstrike"))
@@ -4235,7 +4239,7 @@ def build():
     W(li("No longer levels with Requiem of Souls", t("REWORK")))
     W(li_formula("Damage per soul rescaled",
                  "1/2/3/4", "1.35 + 0.15 per level",
-                 lambda L: 4.0, lambda L: 1.35 + 0.15 * L))
+                 rank_step([1.0, 2.0, 3.0, 4.0], ultimate=True), lambda L: 1.35 + 0.15 * L))
     W(li("Base Max Souls decreased from 20/22/24/26 to 20", b([20, 22, 24, 26], 20)))
     W(ul_close())
     W(ability("Shadowraze", slug="nevermore_shadowraze1"))
@@ -4397,11 +4401,11 @@ def build():
     W(li("No longer levels with Corrosive Haze", t("REWORK")))
     W(li_formula("Bonus HP Regen changed",
                  "2.5/5/7.5/10", "1.75 + 0.25 per level",
-                 lambda L: 10.0, lambda L: 1.75 + 0.25 * L))
+                 rank_step([2.5, 5.0, 7.5, 10.0], ultimate=True), lambda L: 1.75 + 0.25 * L))
     W(li("Aghanim's Scepter Bonus HP Regen decreased from +22 to +20", b(22, 20)))
     W(li_formula("Bonus Armor changed",
                  "3/4/5/6", "1.8 + 0.2 per level",
-                 lambda L: 6.0, lambda L: 1.8 + 0.2 * L))
+                 rank_step([3.0, 4.0, 5.0, 6.0], ultimate=True), lambda L: 1.8 + 0.2 * L))
     W(li("Aghanim's Scepter Bonus Armor decreased from +10 to +8", b(10, 8)))
     _sdr_pill, _sdr_table = scale_pill(
         "11.4% + 0.6% per level",
@@ -4428,7 +4432,7 @@ def build():
     W(ul_open())
     W(li_formula("Duration changed",
                  "15s + 2.5s per level up", "12.5s + 2.5s per level",
-                 lambda L: 15.0 + (2.5) * L, lambda L: 12.5 + (2.5) * L,
+                 lambda L: 15.0 + (2.5) * (L - 1), lambda L: 12.5 + (2.5) * L,
                  effective_unchanged=True,
                  inline_note_text="Effective values are not changed"))
     W(ul_close())
@@ -4528,7 +4532,7 @@ def build():
     W(ul_open())
     W(li_formula("Damage changed",
                  "25 + 2 per level up", "23 + 2 per level",
-                 lambda L: 25.0 + (2.0) * L, lambda L: 23.0 + (2.0) * L,
+                 lambda L: 25.0 + (2.0) * (L - 1), lambda L: 23.0 + (2.0) * L,
                  effective_unchanged=True,
                  inline_note_text="Effective values are not changed"))
     W(ul_close())
@@ -4612,8 +4616,7 @@ def build():
     # Sven
     W(hero_header("Sven"))
     W(ul_open())
-    W(li("Base strength increased from 23 to 24", b(23, 24)))
-    W(li("Damage at level 1 increased from 60–62 to 61–63", br(60, 62, 61, 63)))
+    W(li("Base strength increased from 23 to 24", b(23, 24), extra=inline_note("Damage at level 1 increased from 60–62 to 61–63")))
     W(ul_close())
     _sv_pill, _sv_table = scale_pill(
         "0.08 + 0.02 per level",
@@ -4850,7 +4853,7 @@ def build():
     W(li("No longer levels with Chakram", t("REWORK")))
     W(li_formula("Mana gain per tree destroyed changed",
                  "4/6/8/10", "3.75 + 0.25 per level",
-                 lambda L: 10.0, lambda L: 3.75 + 0.25 * L))
+                 rank_step([4.0, 6.0, 8.0, 10.0], ultimate=True), lambda L: 3.75 + 0.25 * L))
     W(ul_close())
 
     # Tinker
@@ -4978,7 +4981,7 @@ def build():
     W(ul_open())
     W(li_formula("Cooldown changed",
                  "35s - 1s per level up", "36s - 1s per level",
-                 lambda L: 35.0 + (-1.0) * L, lambda L: 36.0 + (-1.0) * L, l=True,
+                 lambda L: 35.0 + (-1.0) * (L - 1), lambda L: 36.0 + (-1.0) * L, l=True,
                  effective_unchanged=True,
                  inline_note_text="Effective values are not changed"))
     W(ul_close())
@@ -5019,7 +5022,7 @@ def build():
     W(li("No longer levels with Walrus Punch!", t("REWORK")))
     W(li_formula("Attack Speed Slow rescaled",
                  "20/40/60/80", "17 + 3 per level",
-                 lambda L: 80.0, lambda L: 17.0 + 3.0 * L))
+                 rank_step([20.0, 40.0, 60.0, 80.0], ultimate=True), lambda L: 17.0 + 3.0 * L))
     W(li("Now only affects enemy heroes", t("REWORK")))
     W(ul_close())
     W(ability("Tag Team"))
@@ -5048,10 +5051,10 @@ def build():
     W(li("No longer levels with Fiend's Gate", t("REWORK")))
     W(li_formula("Damage Reduction rescaled",
                  "4/6/8/10%", "3.7% + 0.3% per level",
-                 lambda L: 10.0, lambda L: 3.7 + 0.3 * L))
+                 rank_step([4.0, 6.0, 8.0, 10.0], ultimate=True), lambda L: 3.7 + 0.3 * L))
     W(li_formula("Movement Speed bonus rescaled",
                  "11/14/17/20%", "9.5% + 0.5% per level",
-                 lambda L: 20.0, lambda L: 9.5 + 0.5 * L))
+                 rank_step([11.0, 14.0, 17.0, 20.0], ultimate=True), lambda L: 9.5 + 0.5 * L))
     W(ul_close())
     W(ability("Firestorm"))
     W(ul_open())
@@ -5235,8 +5238,8 @@ def build():
                 "Active.",
                 "Visage gains <b>flying movement and +12% movement speed for 20s</b>. Upon attacking or casting, he loses both effects, but he and his familiars gain <b>+10% attack damage for 2s</b>.",
                 "<b>Mana Cost:</b> 50.  <b>Cooldown:</b> " + _visage_satg_pill + ".",
-                aghs_line("Increases bonus movement speed by +12%, bonus damage by +10%, bonus damage duration by +2s, and flight duration by +10s. While flight is active, Silent as the Grave grants <b>invisibility</b> to Visage and his familiars.",
-                          inline_note_text="Invisibility for Visage and each familiar are not connected."),
+                aghs_line("Increases bonus movement speed by +12%, bonus damage by +10%, bonus damage duration by +2s, and flight duration by +10s. While flight is active, Silent as the Grave grants <b>invisibility</b> to Visage and his familiars. "
+                          + inline_note("Invisibility for Visage and each familiar are not connected.")),
             ],
             tables=[_visage_satg_table],
         ),
@@ -5319,13 +5322,13 @@ def build():
     W(li("No longer levels with Chaotic Offering", t("REWORK")))
     W(li_formula("Minor Imp Health rescaled",
                  "50/130/210/290", "5 + 15 per level",
-                 lambda L: 290.0, lambda L: 5.0 + 15.0 * L))
+                 rank_step([50.0, 130.0, 210.0, 290.0], ultimate=True), lambda L: 5.0 + 15.0 * L))
     W(li_formula("Minor Imp Explosion Damage rescaled",
                  "25/70/115/160", "20 + 20 per 3 hero levels",
-                 lambda L: 160.0, lambda L: 20.0 + 20.0 * (L // 3)))
+                 rank_step([25.0, 70.0, 115.0, 160.0], ultimate=True), lambda L: 20.0 + 20.0 * (L // 3)))
     W(li_formula("Minor Imp movement speed rescaled",
                  "300/315/330/345", "297 + 3 per level",
-                 lambda L: 345.0, lambda L: 297.0 + 3.0 * L))
+                 rank_step([300.0, 315.0, 330.0, 345.0], ultimate=True), lambda L: 297.0 + 3.0 * L))
     W(li("Minor Imp attack damage rescaled from 10-11/14-15/18-19/22-23/26-27 to 20-21", br(26, 27, 20, 21)))
     W(li("Aghanim's Shard now increases health of minor imps by 80 and explosion damage by 45", t("MISC"),
          extra=inline_note("Same values as before, but explicitly stated now.")))
@@ -5477,10 +5480,10 @@ def build():
     W(li("No longer levels with Reincarnation", t("REWORK")))
     W(li_formula("Lifesteal changed",
                  "10/20/30/40%", "14% + 1% per level",
-                 lambda L: 40.0, lambda L: 14.0 + 1.0 * L))
+                 rank_step([10.0, 20.0, 30.0, 40.0], ultimate=True), lambda L: 14.0 + 1.0 * L))
     W(li_formula("Wraith Duration changed",
                  "3.5/4/4.5/5s", "4.25s + 0.25s per 6 levels",
-                 lambda L: 5.0, lambda L: 4.25 + 0.25 * (L // 6),
+                 rank_step([3.5, 4.0, 4.5, 5.0], ultimate=True), lambda L: 4.25 + 0.25 * (L // 6),
                  value_fmt="{:.2f}s",
                  inline_note_text="Up to 5.5s at level 30. Also increased by 1s with Aghanim's Scepter."))
     W(li("Bonus Attack Speed rescaled from 30/45/60/75 to 55", b([30, 45, 60, 75], 55)))
@@ -5517,7 +5520,7 @@ def build():
     W(li("No longer levels with Thundergod's Wrath", t("REWORK")))
     W(li_formula("Damage changed",
                  "2.5/3/3.5/4%", "3.45% + 0.05% per level",
-                 lambda L: 4.0, lambda L: 3.45 + 0.05 * L))
+                 rank_step([2.5, 3.0, 3.5, 4.0], ultimate=True), lambda L: 3.45 + 0.05 * L))
     W(ul_close())
     W(ability("Arc Lightning"))
     W(ul_open())

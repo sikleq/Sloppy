@@ -583,8 +583,7 @@ def build():
     W(hero_header("Abaddon"))
     W(ul_open())
     W(li("Base Strength decreased from 22 to 21", b(22, 21)))
-    W(li("Base Agility decreased from 23 to 22", b(23, 22)))
-    W(li("Damage at level 1 decreased by 1 (from 50–60 to 49–59)", br(50, 60, 49, 59)))
+    W(li("Base Agility decreased from 23 to 22", b(23, 22), extra=inline_note("Damage at level 1 decreased by 1 (from 50–60 to 49–59)")))
     W(ul_close())
     W(facet_header("abaddon_the_quickening"))
     W(ul_open())
@@ -744,7 +743,7 @@ def build():
     W(li("Drunken Master: Facet removed", t("DEL")))
     W(ul_close())
     _lc_pill, _lc_table = scale_pill("10.5% + 0.5% per level up",
-                                     lambda L: 10.5 + 0.5 * L,
+                                     lambda L: 10.5 + 0.5 * (L - 1),
                                      value_fmt="{:.1f}%")
     W(ability_change(
         old=dict(
@@ -1025,8 +1024,7 @@ def build():
     # Dark Seer
     W(hero_header("Dark Seer"))
     W(ul_open())
-    W(li("Base Intelligence increased from 21 to 22", b(21, 22)))
-    W(li("Damage at level 1 increased by 1 (from 52–58 to 53–59)", br(52, 58, 53, 59)))
+    W(li("Base Intelligence increased from 21 to 22", b(21, 22), extra=inline_note("Damage at level 1 increased by 1 (from 52–58 to 53–59)")))
     W(ul_close())
     W(ability("Vacuum", slug="dark_seer_vacuum"))
     W(ul_open())
@@ -1068,8 +1066,7 @@ def build():
     W(hero_header("Dazzle"))
     W(ul_open())
     W(li("Base Strength increased from 18 to 19", b(18, 19), extra=inline_note("Damage at level 1 unchanged")))
-    W(li("Intelligence gain decreased from 3.7 to 3.5", b(3.7, 3.5)))
-    W(li("Damage gain per level decreased from 3.5 to 3.4", b(3.5, 3.4)))
+    W(li("Intelligence gain decreased from 3.7 to 3.5", b(3.7, 3.5), extra=inline_note("Damage gain per level decreased from 3.5 to 3.4")))
     W(ul_close())
     W(ability("Nothl Projection", slug="dazzle_nothl_projection"))
     W(ul_open())
@@ -1080,9 +1077,10 @@ def build():
     W(hero_header("Death Prophet"))
     W(ability("Witchcraft", slug="death_prophet_witchcraft"))
     W(ul_open())
-    _pill1 = scale_pill("0.75% + 0.75% per level up", lambda L: 0.75 + 0.75*L,
-                        levels=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 25, 30])
-    W(li("Movement speed bonus changed from 0.5% per hero level to " + _pill1[0] + "", t("REWORK"), extra=_pill1[1]))
+    W(li_formula("Movement speed bonus changed",
+                 "0.5% per hero level", "0.75% + 0.75% per level up",
+                 lambda L: 0.5 * L, lambda L: 0.75 + 0.75 * (L - 1),
+                 value_fmt="{:g}%"))
     W(ul_close())
     W(ability("Exorcism", slug="death_prophet_exorcism"))
     W(ul_open())
@@ -1224,7 +1222,7 @@ def build():
     W(ul_open())
     W(li_formula("Rabble-Rouser: Damage amplification changed",
                  "10% + 4% per Enchantress level", "4% + 4% per Enchantress level up",
-                 lambda L: 10 + 4 * L, lambda L: 4 + 4 * L,
+                 lambda L: 10 + 4 * L, lambda L: 4 + 4 * (L - 1),
                  value_fmt="{:g}%"))
     W(li("Now also affects units that come under Enchantress' control", t("NEW")))
     W(ul_close())
@@ -1369,8 +1367,7 @@ def build():
     # Juggernaut
     W(hero_header("Juggernaut"))
     W(ul_open())
-    W(li("Base Agility decreased from 34 to 32", b(34, 32)))
-    W(li("Damage at level 1 decreased from 56–58 to 54–56", br(56, 58, 54, 56)))
+    W(li("Base Agility decreased from 34 to 32", b(34, 32), extra=inline_note("Damage at level 1 decreased from 56–58 to 54–56")))
     W(ul_close())
     W(ability("Blade Fury", slug="juggernaut_blade_fury"))
     W(ul_open())
@@ -1384,8 +1381,7 @@ def build():
     # Keeper of the Light
     W(hero_header("Keeper of the Light"))
     W(ul_open())
-    W(li("Base Intelligence increased from 23 to 24", b(23, 24)))
-    W(li("Damage at level 1 increased from 43–50 to 44–51", br(43, 50, 44, 51)))
+    W(li("Base Intelligence increased from 23 to 24", b(23, 24), extra=inline_note("Damage at level 1 increased from 43–50 to 44–51")))
     W(ul_close())
     W(ability("Blinding Light", slug="keeper_of_the_light_blinding_light"))
     W(ul_open())
@@ -1846,8 +1842,7 @@ def build():
     # Nature's Prophet
     W(hero_header("Nature's Prophet"))
     W(ul_open())
-    W(li("Agility gain decreased from 3 to 2.6", b(3, 2.6)))
-    W(li("Damage gain per level decreased from 4.1 to 3.9", b(4.1, 3.9)))
+    W(li("Agility gain decreased from 3 to 2.6", b(3, 2.6), extra=inline_note("Damage gain per level decreased from 4.1 to 3.9")))
     W(ul_close())
     W(ability("Spirit of the Forest", slug="furion_spirit_of_the_forest"))
     W(ul_open())
@@ -2140,7 +2135,7 @@ def build():
     W(li("Backstab: No longer levels with Cloak and Dagger", t("REWORK")))
     W(li_formula("Agility Damage Multiplier rescaled",
                  "0.55/0.9/1.25/1.6", "0.6 + 0.05 per Riki's level up",
-                 lambda L: 1.6, lambda L: 0.6 + 0.05 * L,
+                 rank_step([0.55, 0.9, 1.25, 1.6], ultimate=True), lambda L: 0.6 + 0.05 * (L - 1),
                  value_fmt="{:g}"))
     W(li("Backstab: Now works on allied units at 25% effectiveness", t("NEW")))
     W(li("Backstab: Damage is now done as a separate instance of damage instead of a part of the attack damage", t("REWORK")))
@@ -2490,8 +2485,7 @@ def build():
     # Techies
     W(hero_header("Techies"))
     W(ul_open())
-    W(li("Base Agility increased from 14 to 16", b(14, 16)))
-    W(li("Damage at level 1 increased by 1 (from 46–48 to 47–49)", br(46, 48, 47, 49)))
+    W(li("Base Agility increased from 14 to 16", b(14, 16), extra=inline_note("Damage at level 1 increased by 1 (from 46–48 to 47–49)")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -2833,8 +2827,7 @@ def build():
     # Windranger
     W(hero_header("Windranger"))
     W(ul_open())
-    W(li("Agility gain increased from 1.9 to 2.1", b(1.9, 2.1)))
-    W(li("Damage gain per level increased from 3.5 to 3.6", b(3.5, 3.6)))
+    W(li("Agility gain increased from 1.9 to 2.1", b(1.9, 2.1), extra=inline_note("Damage gain per level increased from 3.5 to 3.6")))
     W(ul_close())
     W(ability("Gale Force", slug="windrunner_gale_force"))
     W(ul_open())

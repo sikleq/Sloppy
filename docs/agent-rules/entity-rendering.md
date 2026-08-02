@@ -95,7 +95,7 @@ Field map: Base Armor → `ArmorPhysical`; Base Damage → `AttackDamageMin`; Mi
 
 **Снаружи swap-card** (через `W(ul_open()) / W(li(...)) / W(ul_close())` после `W(ability_change(...))`) — числовые изменения характеристик способности, которые «пережили» реворк: `Bonus Attack Speed decreased from X to Y`, `Cooldown changed from X to Y` и т.п.
 
-**Inline-note к новой механике** — встраивать через `inline_note("...")` прямо в `new.desc=[]` (не через `W(subnote(...))` после блока — это рендерится ВНЕ карточки). Рендерер `_side` детектит ведущий `<div` и вставляет его как есть.
+**Inline-note к новой механике** — ВСЕГДА через `inline_note("...")` (знак `?` → `span.info-tip` с popup), встраивать прямо в `new.desc=[]` конкатенацией: `"...текст. " + inline_note("...")`. НЕ через `W(subnote(...))` после блока (рендерится ВНЕ карточки) и НЕ через сырой `<div class="inline-note">…</div>` (старый формат — не использовать). Пример каноничного места: у одного героя строка с `?` внутри карточки и рядом `extra=inline_note(...)` на обычной `li` — оба дают одинаковый `?`-popup.
 
 ## `ability_change(old, new)` — выбор layout-режима
 

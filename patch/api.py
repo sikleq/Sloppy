@@ -1,7 +1,7 @@
 """Public API re-exported for content modules — from patch.api import *"""
 from .output import W
 from .state import _State
-from .badges import b, br, bf, t, gradient_class, facet_badge, scale_pill
+from .badges import b, br, bf, t, gradient_class, facet_badge, scale_pill, rank_step
 from .elements import (
     hero_header, item_header, unit_header, ability, facet_header, new_facet, facet_change,
     section, subgroup, li, ul_open, ul_close, li_formula, enchant_header,

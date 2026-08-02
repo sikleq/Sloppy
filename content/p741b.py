@@ -221,8 +221,7 @@ def build():
     # Broodmother
     W(hero_header("Broodmother"))
     W(ul_open())
-    W(li("Base agility increased from 18 to 20", b(18, 20)))
-    W(li("Damage at level 1 increased from 45-51 to 47-53", br(45, 51, 47, 53)))
+    W(li("Base agility increased from 18 to 20", b(18, 20), extra=inline_note("Damage at level 1 increased from 45-51 to 47-53")))
     W(ul_close())
 
     # Chaos Knight
@@ -266,9 +265,9 @@ def build():
     W(hero_header("Death Prophet"))
     W(ability("Exorcism"))
     W(ul_open())
-    W(li("Spirit Damage increased from 64 to 65/68/71", b(64, [65, 68, 71])))
+    W(li("Spirit Damage increased from 64 to 65/68/71", b(64, [65, 68, 71]),
+         extra=inline_note("Damage range increased from 62-67 to 62-68 / 65-71 / 68-74")))
     W(ul_close())
-    W(subnote("From 62-67 to 62-68/65-71/68-74"))
 
     # Doom
     W(hero_header("Doom"))
@@ -290,8 +289,7 @@ def build():
     # Drow Ranger
     W(hero_header("Drow Ranger"))
     W(ul_open())
-    W(li("Base Agility increased from 22 to 24", b(22, 24)))
-    W(li("Damage at level 1 increased from 49-56 to 51-58", br(49, 56, 51, 58)))
+    W(li("Base Agility increased from 22 to 24", b(22, 24), extra=inline_note("Damage at level 1 increased from 49-56 to 51-58")))
     W(ul_close())
     W(ability("Marksmanship"))
     W(ul_open())
@@ -444,8 +442,7 @@ def build():
     # Magnus
     W(hero_header("Magnus"))
     W(ul_open())
-    W(li("Agility gain increased from 2.0 to 2.2", b(2.0, 2.2)))
-    W(li("Damage gain per level increased from 3.2 to 3.3 as a result", b(3.2, 3.3)))
+    W(li("Agility gain increased from 2.0 to 2.2", b(2.0, 2.2), extra=inline_note("Damage gain per level increased from 3.2 to 3.3 as a result")))
     W(ul_close())
 
     # Meepo
@@ -696,8 +693,7 @@ def build():
     # Tidehunter
     W(hero_header("Tidehunter"))
     W(ul_open())
-    W(li("Base Strength decreased from 26 to 25", b(26, 25)))
-    W(li("Damage at level 1 decreased from 51-57 to 50-56", br(51, 57, 50, 56)))
+    W(li("Base Strength decreased from 26 to 25", b(26, 25), extra=inline_note("Damage at level 1 decreased from 51-57 to 50-56")))
     W(ul_close())
     W(ability("Leviathan's Catch"))
     W(ul_open())
