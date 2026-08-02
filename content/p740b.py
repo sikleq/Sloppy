@@ -145,7 +145,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent Shallow Grave Cooldown Reduction decreased from 4s to 3s", b(4, 3, l=True)))
+    W(li("Level 20 Talent Shallow Grave Cooldown Reduction decreased from 4s to 3s", b(4, 3)))
     W(ul_close())
 
     # Death Prophet
@@ -179,7 +179,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Frost Arrows Mana Cost Reduction decreased from 25% to 18%", b(25, 18, l=True)))
+    W(li("Level 10 Talent Frost Arrows Mana Cost Reduction decreased from 25% to 18%", b(25, 18)))
     W(ul_close())
 
     # Enigma
@@ -381,7 +381,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent God's Rebuke Cooldown Reduction increased from 2s to 2.5s", b(2, 2.5, l=True)))
+    W(li("Level 15 Talent God's Rebuke Cooldown Reduction increased from 2s to 2.5s", b(2, 2.5)))
     W(li("Level 20 Talent Spear of Mars Stun increased from +0.4 to +0.5s", b(0.4, 0.5)))
     W(ul_close())
 
@@ -620,7 +620,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent Metamorphosis Cooldown Reduction decreased from 20s to 10s", b(20, 10, l=True)))
+    W(li("Level 15 Talent Metamorphosis Cooldown Reduction decreased from 20s to 10s", b(20, 10)))
     W(ul_close())
 
     # Tidehunter
@@ -694,7 +694,7 @@ def build():
     W(hero_header("Underlord"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent Firestorm Cooldown Reduction increased from 3s to 4s", b(3, 4, l=True)))
+    W(li("Level 15 Talent Firestorm Cooldown Reduction increased from 3s to 4s", b(3, 4)))
     W(ul_close())
 
     # Ursa

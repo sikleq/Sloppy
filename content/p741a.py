@@ -123,7 +123,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Tornado Cooldown Reduction increased from 4s to 5s", b(4, 5, l=True)))
+    W(li("Level 10 Talent Tornado Cooldown Reduction increased from 4s to 5s", b(4, 5)))
     W(ul_close())
 
     # Io
@@ -316,7 +316,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Proximity Mines Cooldown Reduction decreased from 3s to 2s", b(3, 2, l=True)))
+    W(li("Level 10 Talent Proximity Mines Cooldown Reduction decreased from 3s to 2s", b(3, 2)))
     W(ul_close())
 
     # Tidehunter

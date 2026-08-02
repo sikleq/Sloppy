@@ -1864,7 +1864,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent Intelligence increased from +10 to +12", b(10, 12)))
-    W(li("Level 15 Talent Terrorize Cooldown Reduction increased from 15s to 20s", b(15, 20, l=True)))
+    W(li("Level 15 Talent Terrorize Cooldown Reduction increased from 15s to 20s", b(15, 20)))
     W(ul_close())
 
     # Dawnbreaker
@@ -2582,7 +2582,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent Ice Path Damage increased +60 to +75", t("BUFF")))
-    W(li("Level 15 Talent Dual Breath Cooldown Reduction increased from 3s to 3.5s", b(3, 3.5, l=True)))
+    W(li("Level 15 Talent Dual Breath Cooldown Reduction increased from 3s to 3.5s", b(3, 3.5)))
     W(ul_close())
 
     # Juggernaut
@@ -3254,7 +3254,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent Stone Gaze Bonus Physical Damage increased from +10% to +12%", b(10, 12)))
-    W(li("Level 15 Talent Mystic Snake Cooldown Reduction increased from 3s to 4s", b(3, 4, l=True)))
+    W(li("Level 15 Talent Mystic Snake Cooldown Reduction increased from 3s to 4s", b(3, 4)))
     W(li("Level 15 Talent +8% Split Shot Outgoing Damage replaced with +1 Gorgon's Grasp Volley", t("REWORK")))
     W(li("Level 20 Talent +1 Gorgon's Grasp Volley replaced with +12% Split Shot Outgoing Damage", t("REWORK")))
     W(li("Level 20 Talent +3 Mystic Snake Bounces replaced with +40% Mystic Snake Damage / Mana Gain", t("REWORK")))
@@ -3539,7 +3539,7 @@ def build():
     W(ul_open())
     W(li("Level 10 Talent Reel In Pull Speed increased from +100 to +125", b(100, 125)))
     W(li("Level 15 Talent Mirror Image Illusion Damage Taken Reduction increased from 50% to 75%", b(50, 75)))
-    W(li("Level 20 Talent Song of the Siren Cooldown Reduction increased from 20s to 25s", b(20, 25, l=True)))
+    W(li("Level 20 Talent Song of the Siren Cooldown Reduction increased from 20s to 25s", b(20, 25)))
     W(ul_close())
 
     # Nature's Prophet

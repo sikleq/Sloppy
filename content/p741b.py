@@ -17,7 +17,7 @@ def build():
     W(unit_header("Frostbitten Golem", "../icons/units/npc_dota_neutral_frostbitten_golem.png"))
     W(ability("Time Warp Aura", icon_url="../icons/abilities/frostbitten_golem_time_warp_aura.png"))
     W(ul_open())
-    W(li("Cooldown Reduction decreased from 10/11/12/14% to 8/9/10/11%", b([10, 11, 12, 14], [8, 9, 10, 11], l=True)))
+    W(li("Cooldown Reduction decreased from 10/11/12/14% to 8/9/10/11%", b([10, 11, 12, 14], [8, 9, 10, 11])))
     W(ul_close())
 
     # ===== ITEM UPDATES =====
@@ -172,7 +172,7 @@ def build():
     W(hero_header("Arc Warden"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent Magnetic Field Cooldown Reduction decreased from 5s to 4s", b(5, 4, l=True)))
+    W(li("Level 20 Talent Magnetic Field Cooldown Reduction decreased from 5s to 4s", b(5, 4)))
     W(li("Level 20 Talent +200 Spark Wraith Damage replaced with +30s Spark Wraith Duration", t("REWORK")))
     W(li("Level 25 Talent +30s Spark Wraith Duration replaced with +240 Spark Wraith Damage", t("REWORK")))
     W(li("Level 25 Talent Runic Infusion All Attributes Bonus decreased from +1.5 to +1", b(1.5, 1)))
@@ -626,7 +626,7 @@ def build():
     W(hero_header("Silencer"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent Global Silence Cooldown Reduction decreased from 20s to 15s", b(20, 15, l=True)))
+    W(li("Level 15 Talent Global Silence Cooldown Reduction decreased from 20s to 15s", b(20, 15)))
     W(ul_close())
 
     # Skywrath Mage
@@ -672,7 +672,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Spectral Dagger Cooldown Reduction decreased from 4s to 3s", b(4, 3, l=True)))
+    W(li("Level 10 Talent Spectral Dagger Cooldown Reduction decreased from 4s to 3s", b(4, 3)))
     W(ul_close())
 
     # Techies

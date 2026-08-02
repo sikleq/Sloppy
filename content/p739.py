@@ -973,7 +973,7 @@ def build():
     W(facet_header("elder_titan_deconstruction"))
     W(ul_open())
     W(li("Natural Order: Armor Reduction per second decreased from 1 to 0.8", b(1, 0.8)))
-    W(li("Natural Order: Magic Resistance Reduction per second decreased from 1% to 0.8%", b(1, 0.8, l=True)))
+    W(li("Natural Order: Magic Resistance Reduction per second decreased from 1% to 0.8%", b(1, 0.8)))
     W(ul_close())
     W(ability("Astral Spirit", slug="elder_titan_ancestral_spirit"))
     W(ul_open())
@@ -2258,7 +2258,7 @@ def build():
     W(li("Level 15 Talent +70 Resonant Pulse Damage replaced with +60 Aether Remnant Damage", t("REWORK")))
     W(li("Level 15 Talent Aether Remnant Provides 475 Truesight replaced with +20% Resonant Pulse Barrier", t("REWORK"), extra=inline_note("Affects both base and per hero hit values")))
     W(li("Level 10 Talent Mana Regen decreased from +1.75 to +1.5", b(1.75, 1.5)))
-    W(li("Level 20 Talent Astral Step Charge Restore Time Reduction decreased from 4s to 3s", b(4, 3, l=True)))
+    W(li("Level 20 Talent Astral Step Charge Restore Time Reduction decreased from 4s to 3s", b(4, 3)))
     W(ul_close())
 
     # Warlock

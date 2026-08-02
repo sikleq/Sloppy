@@ -2568,7 +2568,7 @@ def build():
     W(hero_header("Tinker"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Manacost/Manaloss Reduction increased from +8% to +10%", b(8, 10, l=True)))
+    W(li("Level 10 Talent Manacost/Manaloss Reduction increased from +8% to +10%", b(8, 10)))
     W(li("Level 25 Talent +10s Defense Matrix Duration replaced with +40 Intelligence", t("REWORK")))
     W(ul_close())
 
