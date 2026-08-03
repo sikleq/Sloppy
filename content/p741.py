@@ -1962,7 +1962,7 @@ def build():
     W(li("Cooldown decreased from 20/18/16/14s to 14s", b([20, 18, 16, 14], 14, l=True)))
     W(li("Duration increased from 2.6/3.2/3.8/4.4s to 4.4s", b([2.6, 3.2, 3.8, 4.4], 4.4),
          extra=inline_note("Can be increased with Kinetic Field Duration talent")))
-    W(li("Formation Delay increased from 0.4s to 1s", b(0.4, 1)))
+    W(li("Formation Delay increased from 0.4s to 1s", b(0.4, 1, l=True)))
     W(li("Aghanim's Shard: Now grants the Kinetic Field ability. Has only one level instead of sharing levels with Kinetic Fence", t("NEW")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -3546,7 +3546,6 @@ def build():
     W(hero_header("Nature's Prophet"))
     W(ul_open())
     W(li("Minimum Base damage increased by 4", bstat_h("Nature's Prophet", "AttackDamageMin", "7.40c", 4), extra=note_box(hero="Nature's Prophet", field="AttackDamageMin", before_patch="7.40c")))
-    W(li("Damage spread decreased from 10 to 6", b(10, 6)))
     W(li("Damage at level 1 increased from 40–50 to 44–50", br(40, 50, 44, 50)))
     W(ul_close())
     W(ability("Spirit of the Forest"))
@@ -3830,11 +3829,13 @@ def build():
     W(ul_open())
     W(li_formula("For regular abilities Max Mana Restoration changed",
                  "25/35/45/55%", "40% + 5% per 5 levels",
-                 lambda L: 55.0, lambda L: 40.0 + 5.0 * (L // 5),
+                 lambda L: 25.0 if L < 3 else 35.0 if L < 5 else 45.0 if L < 7 else 55.0,
+                 lambda L: 40.0 + 5.0 * (L // 5),
                  levels=[1, 5, 10, 15, 20, 25, 30]))
     W(li_formula("For attack modifiers that spend mana Max Mana Restoration changed",
                  "25/35/45/55%", "25% + 5% per 5 levels",
-                 lambda L: 55.0, lambda L: 25.0 + 5.0 * (L // 5),
+                 lambda L: 25.0 if L < 3 else 35.0 if L < 5 else 45.0 if L < 7 else 55.0,
+                 lambda L: 25.0 + 5.0 * (L // 5),
                  levels=[1, 5, 10, 15, 20, 25, 30]))
     W(ul_close())
     W(ability("Objurgation"))
@@ -4109,7 +4110,7 @@ def build():
     W(ability("Escape Act", slug="ringmaster_the_box"))
     W(ul_open())
     W(li("Radius and Aghanim's Scepter's Explosion Radius now affected by AoE bonuses", t("NEW")))
-    W(li("Targeted unit is no longer stunned for 0.5 seconds when placed in a box", t("DEL")))
+    W(li("Targeted unit is no longer stunned for 0.5 seconds when placed in a box", t("MISC")))
     W(ul_close())
     W(ability("Impalement Arts", slug="ringmaster_impalement"))
     W(ul_open())

@@ -5451,9 +5451,10 @@
         },
         {
           "text": "Formation Delay increased from 0.4s to 1s",
-          "tag": "buff",
+          "tag": "nerf",
           "old": 0.4,
           "new": 1,
+          "lower_is_better": true,
           "scope": "Kinetic Fence"
         },
         {
