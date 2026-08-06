@@ -524,6 +524,18 @@ def _innate_bonus(col_key: str, s: dict, h: str, r: dict | None = None) -> float
             attr_val = _field(s, h, _ATTR_FIELD[eff["source"]])
             total += attr_val * const * entry["factor"]
 
+        elif formula == "bonus_ms_factor":
+            # Elder Titan Momentum: armor = factor% of BONUS movement speed
+            # (MS above base). The hero's starting/base MS is the reference and
+            # does NOT count — only above-base MS does. factor scales with level
+            # (base + per_level * level; increment at level 1). This is the
+            # Starting (level-1) column, so factor = base + per_level. In the
+            # item-less column the only above-base MS is innate MS; Elder Titan
+            # has none, so this is 0 — computed honestly in case that changes.
+            bonus_ms = _innate_bonus("ms", s, h, r)
+            factor = entry.get("base", 0.0) + entry.get("per_level", 0.0) * 1
+            total += bonus_ms * factor / 100.0
+
         # ms_multiplier, mana_pool_pct_per_level, attr_substitution,
         # dmg_universal_bonus_pct — handled by dedicated callers, skip here.
 

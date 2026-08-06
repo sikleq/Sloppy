@@ -146,6 +146,36 @@
         }
       ]
     },
+    "elder_titan": {
+      "innate": "elder_titan_momentum",
+      "since": "7.41a",
+      "effects": [
+        {
+          "target": "armor",
+          "formula": "bonus_ms_factor",
+          "note": "Momentum: armor = factor% of BONUS movement speed (MS above base — starting/base MS is the reference and does NOT count). factor = base + per_level * level and SCALES with hero level: KV value=base, hero_levelup=per_level, and per the 7.41 innate rework the increment is provided at level 1 (so level-1 factor = base + per_level, e.g. 7.0+0.5=7.5% in 7.41e). hero_lab: applied in calc() via elderTitanMomentumArmor() AFTER ms is known — NOT the generic innate() dispatch (which runs before MS). Hero Stats table: Python _innate_bonus() bonus_ms_factor branch reads above-base (innate) MS at level 1; Elder Titan has no innate MS, so it is 0 there. Pre-7.41a Momentum granted attack speed from bonus MS instead; intentionally not modeled.",
+          "history": [
+            {
+              "since": "7.41a",
+              "until": "7.41b",
+              "base": 3.6,
+              "per_level": 0.4
+            },
+            {
+              "since": "7.41c",
+              "until": "7.41d",
+              "base": 5.0,
+              "per_level": 0.5
+            },
+            {
+              "since": "7.41e",
+              "base": 7.0,
+              "per_level": 0.5
+            }
+          ]
+        }
+      ]
+    },
     "drow_ranger": {
       "innate": "drow_ranger_trueshot",
       "since": "7.36",
@@ -279,6 +309,40 @@
           "since": "7.41",
           "factor": 0.15,
           "note": "KV move_speed_per_agi=15 (percent /100). Unchanged since 7.41."
+        },
+        {
+          "target": "castRange",
+          "formula": "attr_factor",
+          "source": "str",
+          "note": "KV cast_range_per_str (flat cast range /100). Introduced 7.41a.",
+          "history": [
+            {
+              "since": "7.41a",
+              "until": "7.41c",
+              "factor": 0.2
+            },
+            {
+              "since": "7.41d",
+              "factor": 0.25
+            }
+          ]
+        },
+        {
+          "target": "slowRes",
+          "formula": "attr_factor",
+          "source": "str",
+          "note": "KV slow_resist_per_str (percent /100). Introduced 7.41a.",
+          "history": [
+            {
+              "since": "7.41a",
+              "until": "7.41c",
+              "factor": 0.2
+            },
+            {
+              "since": "7.41d",
+              "factor": 0.25
+            }
+          ]
         }
       ]
     },

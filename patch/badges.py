@@ -542,6 +542,12 @@ FACETS = {
     "meepo_codependent": ("Codependent", "Yellow1"),
     "marci_buddy_system": ("Buddy System", "Blue1"),
     "marci_pickmeup": ("Pick-me-up", "Purple0"),
+    # 7.38b — auto-registered by generate_patch_code_v2.py
+    "warlock_grimoire": ("Black Grimoire", "Gray3"),
+    "dragon_knight_fire_dragon": ("Fire Dragon", "Red1"),
+    "night_stalker_dayswap": ("Night Reign", "Gray0"),
+    "tusk_facet_fist_bump": ("Drinking Buddies", "Yellow0"),
+    "winter_wyvern_recursive": ("Recursive", "Blue0"),
 }
 
 # Mapping from Valve's facet_color name -> CSS gradient that EXACTLY matches

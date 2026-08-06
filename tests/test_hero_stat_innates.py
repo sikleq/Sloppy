@@ -95,11 +95,12 @@ KNOWN_FORMULAS = {
     "attr_substitution",
     "mana_shield_ehp",
     "attr_floor_capped",
+    "bonus_ms_factor",
 }
 
 EXPECTED_HEROES = {
     "axe", "beastmaster", "centaur", "dark_seer", "death_prophet",
-    "dragon_knight", "drow_ranger", "keeper_of_the_light", "life_stealer",
+    "dragon_knight", "elder_titan", "drow_ranger", "keeper_of_the_light", "life_stealer",
     "luna", "medusa", "morphling", "naga_siren", "ogre_magi", "razor", "sven", "techies", "tinker", "tiny",
     "ursa", "void_spirit",
 }

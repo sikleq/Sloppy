@@ -997,7 +997,10 @@ def _load_items(version: str) -> list[dict]:
                 "default": "damage",
                 "base": {"damage": _sum(fields, "bonus_damage_base")},
                 "damage": {"damage": _sum(fields, "bonus_damage")},
-                "spell": {"spellAmp": _sum(fields, "bonus_spell_amp"), "icon": "icons/items/rapier_alt.png"},
+                # 7.41e: bonus Spell Amplification from multiple Divine Rapiers
+                # no longer stacks. Emit as spellAmpUnique so the model takes the
+                # max across Rapiers (still stacks with other spell-amp sources).
+                "spell": {"spellAmpUnique": _sum(fields, "bonus_spell_amp"), "icon": "icons/items/rapier_alt.png"},
             }
         if item == "item_tranquil_boots":
             broken_ms = _sum(fields, "broken_movement_speed") or 40

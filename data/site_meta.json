@@ -1,7 +1,7 @@
 {
   "latest_patch_filename": "patches/7.41e.html",
   "latest_patch_version": "7.41e",
-  "asset_version": "67aad0731b",
+  "asset_version": "80df58ae80",
   "patch_dates": {
     "7.41e": "30.07.2026",
     "7.41d": "04.06.2026",
@@ -137,6 +137,7 @@
     "7.39b": "Jun 19",
     "7.39": "Jun 20",
     "7.38c": "Jul 8",
-    "7.41e": "Jul 31"
+    "7.41e": "Jul 31",
+    "7.38b": "Aug 5"
   }
 }

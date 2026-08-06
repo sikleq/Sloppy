@@ -19,6 +19,7 @@ from generate_patch_code_v2 import _guess_tag, LOWER_IS_BUFF, _NOT_LOWER_IS_BUFF
     ("No longer provides bonus damage", "DEL"),
     ("No longer applied by illusions", "DEL"),
     ("Can no longer target magic immune units", "DEL"),
+    ("Aghanim's Scepter no longer reduces cooldown by 25s", "DEL"),
     # REWORK
     ("Replaced with a new ability", "REWORK"),
     ("Reworked", "REWORK"),

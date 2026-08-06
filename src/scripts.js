@@ -3453,6 +3453,23 @@
     return 1 + (entry.base_pct + entry.per_level_pct * (level || 1)) / 100;
   }
 
+  // Elder Titan — Momentum (innate, 7.41a+): armor = factor% of BONUS movement
+  // speed (MS above base). Depends on the computed MS, so it is applied in calc()
+  // after ms is known, not via the generic innate() dispatch.
+  function elderTitanMomentumArmor(s, ms, level, includeInnates) {
+    if (!includeInnates || s.slug !== 'elder_titan') return 0;
+    const rules = innateRules.elder_titan;
+    const eff = rules?.effects?.find(e => e.target === 'armor' && e.formula === 'bonus_ms_factor');
+    if (!eff) return 0;
+    const entry = activeEntry(eff, currentPatch);
+    if (!entry) return 0;
+    const baseMs = Number(s.ms) || 0;
+    const bonusMs = Math.max(0, ms - baseMs);
+    // factor scales with level; increment provided at level 1 (7.41 innate rule).
+    const factor = (Number(entry.base) || 0) + (Number(entry.per_level) || 0) * (level || 1);
+    return bonusMs * factor / 100;
+  }
+
   function axeStrBonus(s, a, includeInnates) {
     if (!includeInnates || s.slug !== 'axe') return 0;
     const rules = innateRules.axe;
@@ -3717,7 +3734,7 @@
   function itemTotals(entries, attackType, baubleLevel) {
     const isRanged = String(attackType || '').toLowerCase() === 'ranged';
     const baubleScale = baubleScaleFor(baubleLevel);
-    const out = { str: 0, agi: 0, int: 0, hp: 0, mp: 0, hpr: 0, mpr: 0, mprAmp: 0, _mprAmpVals: [], armor: 0, _rangeUniqueAllVals: [], _rangeUniqueRangedVals: [], _msBootVals: [], _cdrUniqVals: [], _cdrStackVals: [], projSpeed: 0, mrVals: [], evVals: [], statusResVals: [], slowResVals: [], spellAmp: 0, damage: 0, damagePct: 0, aspd: 0, ms: 0, range: 0, dvision: 0, nvision: 0, cost: 0, hprPct: 0, missingHprPct: 0, mpPct: 0, lifesteal: 0, spellLifesteal: 0, castRange: 0, primaryStat: 0, primaryStatUni: 0, batReduce: 0, healthRestoration: 0, cooldownReduction: 0, debuffAmp: 0, hpPct: 0, msPct: 0, _msPctVals: [], knockbackResist: 0, maxHpRegen: 0, incomingDamage: 0, magicDamage: 0, castSpeed: 0, visionReduce: 0, manacostIncrease: 0, intelligencePct: 0, hpRegenReduce: 0, manacostReduction: 0, gpm: 0, xpm: 0, aspdPct: 0, manaReductionPct: 0 };
+    const out = { str: 0, agi: 0, int: 0, hp: 0, mp: 0, hpr: 0, mpr: 0, mprAmp: 0, _mprAmpVals: [], armor: 0, _rangeUniqueAllVals: [], _rangeUniqueRangedVals: [], _msBootVals: [], _cdrUniqVals: [], _cdrStackVals: [], _spellAmpUniqueVals: [], projSpeed: 0, mrVals: [], evVals: [], statusResVals: [], slowResVals: [], spellAmp: 0, damage: 0, damagePct: 0, aspd: 0, ms: 0, range: 0, dvision: 0, nvision: 0, cost: 0, hprPct: 0, missingHprPct: 0, mpPct: 0, lifesteal: 0, spellLifesteal: 0, castRange: 0, primaryStat: 0, primaryStatUni: 0, batReduce: 0, healthRestoration: 0, cooldownReduction: 0, debuffAmp: 0, hpPct: 0, msPct: 0, _msPctVals: [], knockbackResist: 0, maxHpRegen: 0, incomingDamage: 0, magicDamage: 0, castSpeed: 0, visionReduce: 0, manacostIncrease: 0, intelligencePct: 0, hpRegenReduce: 0, manacostReduction: 0, gpm: 0, xpm: 0, aspdPct: 0, manaReductionPct: 0 };
     const visionSeen = new Set();
     entries.forEach(entry => {
       const id = typeof entry === 'string' ? entry : entry.id;
@@ -3753,6 +3770,7 @@
       if (b.statusRes) out.statusResVals.push(Number(b.statusRes) || 0);
       if (b.slowRes) out.slowResVals.push(Number(b.slowRes) || 0);
       out.spellAmp += Number(b.spellAmp) || 0;
+      if (b.spellAmpUnique) out._spellAmpUniqueVals.push(Number(b.spellAmpUnique));
       out.damage += (Number(b.damage) || 0) + (isRanged ? (Number(b.damageRanged) || 0) : (Number(b.damageMelee) || 0));
       out.damagePct += Number(b.damagePct) || 0;
       out.lifesteal += Number(b.lifesteal) || 0;
@@ -3810,6 +3828,7 @@
         if (mb.statusRes) out.statusResVals.push(Number(mb.statusRes) || 0);
         if (mb.slowRes) out.slowResVals.push(Number(mb.slowRes) || 0);
         out.spellAmp += Number(mb.spellAmp) || 0;
+        if (mb.spellAmpUnique) out._spellAmpUniqueVals.push(Number(mb.spellAmpUnique));
         out.damagePct += Number(mb.damagePct) || 0;
         if (mb.mprAmp) out._mprAmpVals.push(Number(mb.mprAmp) || 0);
         if (mb.msPct) out._msPctVals.push(Number(mb.msPct) || 0);
@@ -3859,6 +3878,7 @@
       }
       visionSeen.add(id);
     });
+    out.spellAmp += out._spellAmpUniqueVals.length ? Math.max(...out._spellAmpUniqueVals) : 0;
     out.mprAmp = out._mprAmpVals.length ? Math.max(...out._mprAmpVals) : 0;
     out.msPct = out._msPctVals.length ? Math.max(...out._msPctVals) : 0;
     out.ms += out._msBootVals.length ? Math.max(...out._msBootVals) : 0;
@@ -3947,13 +3967,16 @@
     const proj = (Number(s.proj) || 0) + itemsTotal.projSpeed;
     const dvision = Math.round(((Number(s.dvision) || 0) + itemsTotal.dvision) * (1 - itemsTotal.visionReduce / 100));
     const nvision = Math.round(((Number(s.nvision) || 0) + itemsTotal.nvision + heroLabInnate('nvision', s, a, lvl, hp, includeInnates)) * (1 - itemsTotal.visionReduce / 100));
+    // Elder Titan Momentum: armor from bonus MS — added after ms is known.
+    // Skip when armor was explicitly overridden (custom value is authoritative).
+    if (st.custom.armor === null) armor += elderTitanMomentumArmor(s, ms, lvl, includeInnates);
     const armorPct = armorFactor(armor) * 100;
     const manaShield = manaShieldEhp(s, mp, lvl, includeInnates);
     const ehpPhys = hp / Math.max(0.01, 1 - armorFactor(armor)) + manaShield;
     const ehpMag = hp / Math.max(0.01, 1 - mr / 100) + manaShield;
     const lifesteal = itemsTotal.lifesteal;
     const spellLifesteal = itemsTotal.spellLifesteal;
-    const castRange = itemsTotal.castRange;
+    const castRange = itemsTotal.castRange + heroLabInnate('castRange', s, a, lvl, hp, includeInnates);
     const cooldownReduction = itemsTotal.cooldownReduction || 0;
     const innateItemCdr = heroLabInnate('itemCdr', s, { str, agi, int }, lvl, hp, includeInnates);
     const itemCdr = innateItemCdr > 0
