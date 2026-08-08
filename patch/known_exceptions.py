@@ -66,6 +66,7 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     ("Oracle", "oracle_diviners_deck"),
     ("Chen", "chen_summon_convert"),        # renamed to Zealot in a later patch; historical in p738c.py
     ("Medusa", "medusa_venomed_volley"),    # old facet-specific ability, not in live herodata
+    ("Brewmaster", "brewmaster_belligerent"),  # innate (7.38b-era KV), not in current abilities_slim.json
     ("Ringmaster", "ringmaster_crystal_ball"),   # Sideshow Secrets sub-ability, not surfaced in live API
     ("Ringmaster", "ringmaster_weighted_pie"),   # Sideshow Secrets sub-ability, not surfaced in live API
     ("Tinker", "tinker_defense_matrix"),    # not surfaced in live herodata API

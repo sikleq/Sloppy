@@ -425,9 +425,9 @@ def build():
 
     # Magnus
     W(hero_header("Magnus"))
-    W(ability("Magnus", slug="magnataur_magnus", innate=True))
+    W(ability("Empower", slug="magnataur_empower"))
     W(ul_open())
-    W(li("Eternal Empowerment: Empower: Max self bonus decreased from 10/15/20/25% to 8/12/16/20%", b([10, 15, 20, 25], [8, 12, 16, 20])))
+    W(li("Eternal Empowerment: Max self bonus decreased from 10/15/20/25% to 8/12/16/20%", b([10, 15, 20, 25], [8, 12, 16, 20])))
     W(ul_close())
     W(ability("Skewer", slug="magnataur_skewer"))
     W(ul_open())
@@ -445,7 +445,7 @@ def build():
 
     # Medusa
     W(hero_header("Medusa"))
-    W(ability("Venomous Volley", slug="medusa_venomous_volley", innate=True))
+    W(ability("Venomous Volley", slug="medusa_venomed_volley", innate=True))
     W(ul_open())
     W(li("Attacks required to apply poison increased from 5 to 6", b(5, 6)))
     W(ul_close())
