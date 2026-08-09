@@ -42,6 +42,7 @@ Maintenance rules (read before adding entries):
 
 KNOWN_HISTORICAL_RENAMES = {
     ("Lich", "Death Charge", "p739b.py"),  # renamed to Sacrifice in 7.41
+    ("Dark Seer", "Aggrandize", "p738b.py"),  # innate; Valve renamed to Quick Wit after 7.38b
 }
 
 KNOWN_NON_DATAFEED_ABILITIES = {
