@@ -336,7 +336,8 @@ def main():
     for path in all_paths:
         if (path.startswith(HEROES_VPK_DIR)
                 and path.endswith(".txt")
-                and "npc_dota_hero_" in path):
+                and "npc_dota_hero_" in path
+                and not path.endswith("npc_dota_hero_base.txt")):   # 7.41f+: parent template, not a hero
             local_name = path.rsplit("/", 1)[-1]
             try:
                 hero_files[local_name] = read_vpk(path)
