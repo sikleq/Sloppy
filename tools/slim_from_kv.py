@@ -18,12 +18,31 @@ OUTPUTS = {  # slim file -> (source .txt, extractor)
     "units.json": ("npc_units.txt", fs.extract_units), "abilities.json": ("npc_abilities.txt", fs.extract_abilities),
     "ability_ids.json": ("npc_ability_ids.txt", fs.extract_ability_ids),
 }
+def load_kv(path):
+    """parse_kv + `#base "rel/file.txt"` includes. Since 7.41f npc_heroes.txt is only an include list
+    (each hero lives in heroes/npc_dota_hero_<slug>.txt); the included roots are merged under the
+    first file's top key (DOTAHeroes). Missing includes are skipped (e.g. npc_dota_hero_base.txt, the
+    non-hero template deliberately not kept in the snapshot)."""
+    import re
+    text = open(path, encoding="utf-8", errors="replace").read()
+    kv = fs.parse_kv(text)
+    incs = re.findall(r'^\s*#base\s+"([^"]+)"', text, flags=re.M)
+    if not incs:
+        return kv
+    root_key = next(iter(kv), "DOTAHeroes"); merged = dict(kv.get(root_key) or {})
+    for rel in incs:
+        ip = os.path.join(os.path.dirname(path), *rel.split("/"))
+        if not os.path.exists(ip):
+            continue
+        sub = fs.parse_kv(open(ip, encoding="utf-8", errors="replace").read())
+        merged.update(next(iter(sub.values()), {}) if sub else {})
+    return {root_key: merged}
 def build(version, out_dir):
     src = os.path.join(HERE, "data", "stats", version); os.makedirs(out_dir, exist_ok=True); done = []
     for name, (txt, fn) in OUTPUTS.items():
         p = os.path.join(src, txt)
         if not os.path.exists(p): print(f"  skip {name}: no {txt}"); continue
-        kv = fs.parse_kv(open(p, encoding="utf-8", errors="replace").read())
+        kv = load_kv(p)
         data = fn(kv)
         open(os.path.join(out_dir, name), "w", encoding="utf-8").write(json.dumps(data, ensure_ascii=False, indent=2))
         done.append(name)

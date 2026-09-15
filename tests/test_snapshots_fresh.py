@@ -56,3 +56,17 @@ def test_herolist_covers_latest_stats_heroes():
         f"data/stats/{latest}/heroes.json but not in herolist.json: {missing[:10]}. "
         f"Refresh herolist.json (docs/workflow.md Step 2b)."
     )
+
+
+def test_latest_heroes_json_not_hollow():
+    """7.41f regression: npc_heroes.txt became a `#base` include list and heroes.json
+    was written as `{}` — Hero Lab then offered a single hero. Slim must resolve includes."""
+    latest = latest_stats_version()
+    heroes_json = json.load(open(os.path.join(ROOT, "data", "stats", latest, "heroes.json"),
+                                 encoding="utf-8"))
+    playable = [k for k, v in heroes_json.items()
+                if k.startswith("npc_dota_hero_") and isinstance(v, dict) and v.get("AttributePrimary")]
+    assert len(playable) >= 120, (
+        f"data/stats/{latest}/heroes.json has only {len(playable)} playable heroes — "
+        f"regenerate with `python tools/slim_from_kv.py {latest}` (it follows #base includes)."
+    )
