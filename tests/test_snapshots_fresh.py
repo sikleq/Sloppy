@@ -34,7 +34,7 @@ def test_patchnotes_cover_newest_patch():
     assert n > 0, (
         f"data/patchnotes_english.txt has 0 '{prefix}*' keys but {newest} is the "
         f"newest patch in patch/meta.py. Refresh it: bump PATCH_VERSION in "
-        f"D:\\Sloppy Patches\\extract_patchnotes.py to {newest} and run it "
+        f"scripts/fetch/extract_patchnotes.py to {newest} and run it "
         f"(docs/workflow.md Step 2b)."
     )
 

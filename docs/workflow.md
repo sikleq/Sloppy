@@ -82,7 +82,7 @@ weeks later). Refresh all four every patch:
 
 | File | Feeds | How to refresh |
 |---|---|---|
-| `data/patchnotes_english.txt` | generator section order + `_info` notes, calendar "major patch" counts, OLD-desc lifts, retroactive KV lines Valve adds later | Bump `PATCH_VERSION` in `D:\Sloppy Patches\extract_patchnotes.py` to the new version, run it (reads the live VPK; also writes `data/stats/<version>/` KV) |
+| `data/patchnotes_english.txt` | generator section order + `_info` notes, calendar "major patch" counts, OLD-desc lifts, retroactive KV lines Valve adds later | Bump `PATCH_VERSION` in `scripts/fetch/extract_patchnotes.py` to the new version, run it (reads the live VPK; also writes `data/stats/<version>/` KV) |
 | `data/abilities_slim.json` | ability display names, innate detection (`patch/elements.py`), slug audit (CI + `tests/test_ability_slugs.py`) | KV+loc merge (`dname` / `is_innate`). Regenerate after the KV refresh — a new/renamed ability that is missing here fails the slug audit and loses its innate marker |
 | `data/herolist.json` | hero name resolution (generator, audits) | Valve herolist API (`scripts/fetch/fetch_itemlist.py` sibling flow) |
 | `data/itemlist.json` | item names / Hero Lab item list | `python scripts/fetch/fetch_itemlist.py` |
