@@ -73,6 +73,19 @@ Sanity-check the snapshot against the patch notes before trusting it — a
 couple of "decreased by N" rows (e.g. a base-armor or base-regen change)
 should match the KV diff between the previous version and the new one.
 
+**Fast path (minutes after release, no d2vpkr wait):** once Steam has updated the client, write the
+raw KV straight from the live VPK (the same paths `scripts/fetch/extract_patchnotes.py` uses; keep
+`data/stats/**` LF per `.gitattributes`), then derive the slim JSONs locally:
+
+```powershell
+python tools/slim_from_kv.py 7.42          # heroes/items/units/abilities/ability_ids .json from the .txt
+python tools/slim_from_kv.py 7.41e --check # self-test: regenerate and diff against the committed files
+```
+
+Then run `python build_site.py patch` (writes `data/site_meta.json` with the new version) BEFORE the
+four top-up scripts above — they map patches by `site_meta.json` dates; run them first and they
+rewrite the PREVIOUS latest patch with live data instead.
+
 ## Step 2b — Refresh the GLOBAL snapshots (easy to forget)
 
 Step 2 only fills `data/stats/<version>/`. Four repo-wide files live outside

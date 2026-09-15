@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent  # scripts/fetch/ -> repo root
 OUT = ROOT / "data" / "itemlist.json"
 DATAFEED = "https://www.dota2.com/datafeed/itemlist?language=english"
 

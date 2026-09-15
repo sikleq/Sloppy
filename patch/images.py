@@ -149,6 +149,8 @@ ITEM_SLUG = {
     "Arcane Boots": "arcane_boots",
     "Ash Legion Shield": "ash_legion_shield",
     "Black King Bar": "black_king_bar",
+    "Infused Raindrops": "infused_raindrop",   # 7.41f: engine slug differs from display
+    "Daedalus": "greater_crit",
     "Blade Mail": "blade_mail",
     "Bloodthorn": "bloodthorn",
     "Chainmail": "chainmail",
