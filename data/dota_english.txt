@@ -73,6 +73,7 @@
 		"DOTA_ManaCost"			"MANA COST %s1"
 		"DOTA_Basics"			"BASICS"
 		"DOTA_Upgrades"			"UPGRADES"
+		"DOTA_Neutrals"			"NEUTRALS"
 		"DOTA_Attributes"		"ATTRIBUTES"
 		"DOTA_LevelLabel"		"Level: %s1"
 		"DOTA_StackCount"		"Stack Count: %s1"
@@ -3593,6 +3594,8 @@ As each stone's cultural influence spread, it eventually came in conflict with t
 		"dota_region_automatic_details"		"Automatic (%s1)"
 		"dota_region_us_west"			"US West"
 		"dota_region_us_east"			"US East"
+		"dota_region_us_south_central"		"US South Central"
+		"dota_region_us_north_central"		"US North Central"
 		"dota_region_europe"			"Europe West"
 		"dota_region_hong_kong"			"Hong Kong"
 		"dota_region_singapore"			"Singapore"
@@ -3626,6 +3629,7 @@ As each stone's cultural influence spread, it eventually came in conflict with t
 		"dota_region_india"				"India"
 		"dota_region_japan"				"Japan"
 		"dota_region_taiwan"			"Taiwan"
+		"dota_region_warsaw"			"Warsaw"
 		"dota_region_automatic_desc"	"Choose the server that is best for my region."
 		"dota_region_select_desc"		"Let me choose servers from any region."
 		"dota_division_americas"		"Americas"
@@ -9725,6 +9729,10 @@ As each stone's cultural influence spread, it eventually came in conflict with t
 		"DOTA_HoF_Cr1t-"				"Andreas Nielsen"
 		"DOTA_HoF_AMMAR_THE_F"			"Ammar Al-Assaf"
 		"DOTA_HoF_Malr1ne"				"Stanislav Potorak"
+
+		"TI15_Winner"					"Team Spirit"
+		"DOTA_HoF_not_me"				"Alexey Kosmynin"
+		"DOTA_HoF_rue"					"Alexander Filin"
 
 		"DOTA_ARDM_Loading"					"Loading Heroes"
 		"DOTA_ARDM_Loading_Text"			"Please wait, preloading ARDM hero data..."
@@ -20706,6 +20714,7 @@ To join as an experienced player, you must have at least {d:new_player_req_games
 	"DOTA_Lobby_Settings_Spectator_Section"		"SPECTATOR"
 
 	"DOTA_Lobby_Settings_Dota_TV_Delay"		"DOTA TV DELAY"
+	"DOTA_Lobby_Settings_Dota_TV_Delay_1_Minute"		"1 Minute"
 	"DOTA_Lobby_Settings_Dota_TV_Delay_2_Minutes"		"2 Minutes"
 	"DOTA_Lobby_Settings_Dota_TV_Delay_5_Minutes"		"5 Minutes"
 	"DOTA_Lobby_Settings_Dota_TV_Delay_10_Seconds"		"10 Seconds"
@@ -21023,6 +21032,8 @@ To join as an experienced player, you must have at least {d:new_player_req_games
 	"DOTA_Custom_Game_Dedicated_Servers_I"	"This custom game has dedicated server support. Games played will be hosted by Valve on dedicated servers."
 	"DOTA_Custom_Game_Penalty_Support"		"Penalties Enabled"
 	"DOTA_Custom_Game_Penalty_Support_I"	"This custom game has enabled penalties for failing to ready up and abandoning games.  Receiving a penalty will prevent joining any custom games for the length of the penalty."
+	"DOTA_Custom_Game_Dedicated_Servers_Unavailable"	"Player-Hosted"
+	"DOTA_Custom_Game_Dedicated_Servers_Unavailable_I"	"Dedicated servers are currently fully allocated for other matches. This match will be hosted by one of the players."
 	"custom_game_file_error"				"Error accessing custom game files."
 	"DOTA_Custom_Game_Last_Updated" 		"Updated {t:r:t:last_updated}"
 	"DOTA_Custom_Game_Last_Updated_String"	"Updated {s:last_updated_date_string}"
@@ -35140,6 +35151,7 @@ With early pressure heroes like Zeus and Death Prophet making appearances, split
 
 	"DOTA_Plus_Spring2026_Update_Title"						"Spring 2026 Season Update"
 	"DOTA_Plus_Summer2026_Update_Title"						"Summer 2026 Season Update"
+	"DOTA_Plus_Fall2026_Update_Title"						"Fall 2026 Season Update"
 
 	"DOTA_Plus_Autumn_Assitant_Title"						"New Assistant Features"
 	"DOTA_Plus_Autumn_Assitant_Desc"						"Plus subscribers can now use the Avoid Player feature, friends and foes suggestor, Ward Suggestions, and other assistant features."
@@ -36511,6 +36523,9 @@ Each region has a live leaderboard that will be used to calculate the guild's ti
 
 		"DOTA_PlusSeason_SeasonSummer2026_Name"					"Summer 2026"
 		"DOTA_PlusSeason_SeasonSummer2026_Quests"					"Summer 2026 Quests"
+
+		"DOTA_PlusSeason_SeasonFall2026_Name"					"Fall 2026"
+		"DOTA_PlusSeason_SeasonFall2026_Quests"					"Fall 2026 Quests"
 
 		"DOTA_MatchRewards"							"Match Rewards"
 		"DOTA_MatchRewards_YourShards"				"Your Shards"
@@ -45020,7 +45035,7 @@ If you don't feel that you were able to dedicate the appropriate attention level
 		"DOTA_FantasyCraftHelp_GemShapeDetails"					"Traits will amplifying the stat bonus of emblems, sometimes dependent on certain conditions. Rerolling a trait will guarantee a different trait for that emblem. Listed below are all the available traits:"
 		"DOTA_FantasyCraftHelp_GemShape_ShapeList"				"Trait List"
 
-		"DOTA_FantasyCraft_GroupStageRolls"						"+{d:rolls} Road to the International Fantasy Crafting Rolls"
+		"DOTA_FantasyCraft_GroupStageRolls"						"+{d:rolls} Group Stage Crafting Rolls"
 		"DOTA_FantasyCraft_PlayoffRolls"						"+{d:rolls} The International Fantasy Crafting Rolls"
 		"DOTA_FantasyCraft_MainEventRolls"						"+{d:rolls} Fantasy Crafting Rolls (Unlocks for The International)"
 		"DOTA_FantasyCraft_RollTokens"							"Roll Tokens"
@@ -52353,19 +52368,11 @@ If you don't feel that you were able to dedicate the appropriate attention level
 		"DOTA_Compendium26_LeaderboardTitle_Score"				"Score"
 		"DOTA_Compendium26_Percentile_Unknown"					"–"
 
-		"DOTA_Score2026_FantasyRTTI"							"<b>Road to TI Fantasy</b>: {s:fantasy_rtti_score}"
-		"DOTA_Score2026_FantasyTI"								"<b>The International Fantasy</b>: {s:fantasy_ti_score}"
-		"DOTA_Score2026_PredictionsRTTI"						"<b>Road to TI Predictions</b>: {d:correct_predictions_rtti} Correct Predictions ({d:predictions_rtti_score} Points)"
-		"DOTA_Score2026_PredictionsTI"							"<b>The International Predictions</b>: {d:correct_predictions_ti} Correct Predictions ({d:predictions_ti_score} Points)"
+		"DOTA_Score2026_FantasyRTTI"							"<b>Group Stage Fantasy</b> Percentile: {s:rtti_percentile_string}"
+		"DOTA_Score2026_FantasyTI"								"<b>The International Fantasy</b> Percentile: {s:ti_percentile_string}"
+		"DOTA_Score2026_PredictionsRTTI"						"<b>Group Stage Predictions</b> {d:correct_predictions_rtti} Correct Predictions"
+		"DOTA_Score2026_PredictionsTI"							"<b>The International Predictions</b> {d:correct_predictions_ti} Correct Predictions"
 
-		"DOTA_Score2026_FantasyPlacement_EveryoneElse"			"0th Percentile ({d:score} Points)"
-		"DOTA_Score2026_FantasyPlacement_25"					"25th Percentile ({d:score} Points)"
-		"DOTA_Score2026_FantasyPlacement_50"					"50th Percentile ({d:score} Points)"
-		"DOTA_Score2026_FantasyPlacement_75"					"75th Percentile ({d:score} Points)"
-		"DOTA_Score2026_FantasyPlacement_90"					"90th Percentile ({d:score} Points)"
-		"DOTA_Score2026_FantasyPlacement_99"					"99th Percentile ({d:score} Points)"
-		"DOTA_Score2026_FantasyPlacement_95"					"95th Percentile ({d:score} Points)"
-		"DOTA_Score2026_FantasyPlacement_999"					"99.9th Percentile ({d:score} Points)"
 		"DOTA_Score2026_Fallback"								"Score points through your performance in Fantasy and Predictions!"
 
 		"DOTA_International2026_RTTIDay1"						"Group Stage - Day 1"
@@ -52458,10 +52465,10 @@ If you don't feel that you were able to dedicate the appropriate attention level
 
 		"DOTA_Compendium2026_Rewards_DotaPlus:f"						"{reward_count, plural, one{{d:reward_count} Month} other{{d:reward_count} Months}}"
 
-		"DOTA_International2026_EventFinished_Dashboard_Title"			"Congratulations Team Thunderhide!"
+		"DOTA_International2026_EventFinished_Dashboard_Title"			"Congratulations Team Spirit!"
 		"DOTA_International2026_EventFinished_Dashboard_Description"	"After a year of fierce Dota matchups around the globe, The International 2026 champions have claimed the Aegis in Shanghai."
 		"DOTA_International2026_Champion_Sticker_Header"            	"Champion Stickers"
-		"DOTA_International2026_Champion_Sticker_Description"			"Commemorate Team Thunderhide's victory in The International 2025."
+		"DOTA_International2026_Champion_Sticker_Description"			"Commemorate Team Spirit's victory in The International 2026."
 
 		"DOTA_International2026_AegisHover"				"Purchase via CMD Collectibles"
 
@@ -52525,5 +52532,22 @@ If you don't feel that you were able to dedicate the appropriate attention level
 		"dota_settings_additional_abilities"	"Additional Abilities"
 
 		"dota_settings_unit_picker_summons_tooltip"	"%s1's %s2"
+
+		"DOTA_TeamFanContent_EffigyExtraInfo"	"Global Effigies automatically replace your regular effigy in all matches, allowing you to show your team support! Team Logo Effigies will last until the end of September and will expire along with the rest of the temporary content."
+		"DOTA_TeamFanContent_NoFavorite"		"No Team"
+
+		"Notification_International26_LGD"		"LGD Gaming's TaiLung will no longer be competing at The International. He has been replaced with Topias 'Topson' Taavitsainen. Fantasy rosters have been automatically updated."
+		"Notification_International26_Yatoro"	"Team Spirit's plea did not fall on deaf ears: All TI competitors have been granted a complimentary Tyrian Regalia!"
+
+		"DOTA_HudSpectator_Buffering"			"Buffering..."
+
+		"DOTA_Companion26_FreeTyrian"			"Congratulations, cartographer! Because you already own every terrain, we've granted you a bonus Tyrian Regalia."
+
+		"DOTA_Companion26_FreeTyrian_PopupTitle" "Congratulations!"
+		"DOTA_Companion26_FreeTyrian_PopupBody"	 "You already own every terrain and so we've granted you a bonus Tyrian Regalia. You can still claim a duplicate terrain."
+
+		"DOTA_Armory_InventoryCapacityLimit"			"Your inventory is at <b>{d:backpack_filled_percent}%</b> capacity"
+		"DOTA_Armory_InventoryCapacityLimit_Tooltip"	"When you're over capacity, you won't be able to obtain Dota items through Steam community features like the Market or Trading. You will still be able to purchase and earn items in Dota."
+		
 	}
 } 
