@@ -236,6 +236,31 @@ class TestB:
         assert 'data-overall="buff"' in result
 
 
+class TestBEarlyGameCut:
+    """Max-rank is a real buff (>12%) but >=2 earlier levels got worse and the
+    per-level deltas average <= -10% -> NERF (decided 2026-09-15)."""
+
+    def test_impact_damage_flat_to_ladder_is_nerf(self):
+        # 50 -> 20/35/50/65 = -60/-30/0/+30, avg -15
+        assert 'data-overall="nerf"' in b(50, [20, 35, 50, 65])
+
+    def test_damage_to_healing_is_nerf(self):
+        # 20 -> 10/15/20/25 = -50/-25/0/+25, avg -12.5
+        assert 'data-overall="nerf"' in b(20, [10, 15, 20, 25])
+
+    def test_disseminate_canon_stays_buff(self):
+        # -20/-4/+7/+14, avg -0.75 > -10
+        assert 'data-overall="buff"' in b([20, 25, 30, 35], [16, 24, 32, 40])
+
+    def test_single_early_dip_stays_buff(self):
+        # 100 -> 80/95/110/125 = -20/-5/+10/+25, avg +2.5
+        assert 'data-overall="buff"' in b(100, [80, 95, 110, 125])
+
+    def test_lower_is_better_cooldown_early_cut_is_nerf(self):
+        # l=True: 10 -> 14/13/10/8 = worse/worse/0/better(+20%), avg (-40-30+0+20)/4 = -12.5
+        assert 'data-overall="nerf"' in b(10, [14, 13, 10, 8], l=True)
+
+
 # ---------------------------------------------------------------------------
 # br() — damage range badge
 # ---------------------------------------------------------------------------

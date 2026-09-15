@@ -39,9 +39,11 @@ b([100, 110, 120],
   [110, 120, 130])      # per-skill-level values
 ```
 
-Overall direction (the left BUFF/NERF tag + filter) is computed from the **max-rank** delta (last non-zero per-level value) — the late-game state players settle into — with two automatic refinements:
+Overall direction (the left BUFF/NERF tag + filter) is computed from the **max-rank** delta (last non-zero per-level value) — the late-game state players settle into — with four automatic refinements:
 
 - **Front-loaded rescale:** if max-rank is a *small* nerf (≤12%) but the per-level deltas average to a buff, it flips to **buff** (early-level buffs outweigh an insignificant late dip). E.g. `b([15,30,45,60],[25,35,45,55])` (+67/+17/0/-8) → buff.
+- **Back-loaded rescale:** mirror case — max-rank is a *small* buff (≤12%) but the deltas average to a nerf → **nerf** (Kez Kazurai Katana 5/7/9/11→3/6/9/12 = -40/-14/0/+9).
+- **Early-game cut:** max-rank is a *real* buff (>12%) but **two or more** earlier levels got worse **and** the deltas average **≤ −10%** → **nerf**. E.g. `b(50, [20,35,50,65])` (-60/-30/0/+30, avg -15) → nerf; Disseminate (-20/-4/+7/+14, avg -0.75) and a single-L1 dip (`b(100,[80,95,110,125])`) stay buff.
 - **Flatten** (`b([a,b,c,d], X)` — per-level scaling collapsed to one flat value): tagged by comparing the flat value to the **old average** — **buff if `new ≥ avg(old)`** (ties → buff, since early levels still rose), nerf otherwise; `l=True` inverts. E.g. `b([4,8,12,16], 10)` (avg 10 = 10) → buff; `b([1100,1400,1700,2000], 1500)` (1500 < 1550) → nerf.
 
 Override the result outright with `force_overall="buff"` / `"nerf"`. (Per-level % badges are never affected by the overall tag.) See `b()`'s docstring / AGENTS.md for the full rationale.

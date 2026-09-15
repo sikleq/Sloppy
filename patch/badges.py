@@ -146,6 +146,16 @@ def b(old, new, l=False, slash=False, force_overall=None):
         if (overall == "buff" and abs(max_rank) <= 12
                 and sum(signed_pcts) / len(signed_pcts) < 0):
             overall = "nerf"
+        # Early-game cut: max-rank is a REAL buff (>12%) but TWO OR MORE earlier
+        # levels got worse and the per-level deltas average <= -10% -> NERF.
+        # The levels where the ability decides the lane were cut hard and the
+        # maxed gain does not pay it back (Impact damage 50->20/35/50/65 =
+        # -60/-30/0/+30, avg -15). Disseminate (-20/-4/+7/+14, avg -0.75) and
+        # a single L1 dip (-20/-5/+10/+25, avg +2.5) stay BUFF. Decided 2026-09-15.
+        if (overall == "buff" and abs(max_rank) > 12
+                and sum(1 for v in signed_pcts[:-1] if v < 0) >= 2
+                and sum(signed_pcts) / len(signed_pcts) <= -10):
+            overall = "nerf"
         # "Flatten" rescale (X/Y/Z/W -> ONE flat value): level-scaling removed.
         # Classify by whether the flat value beats the old AVERAGE — ties (mean
         # unchanged) go to BUFF, since the early levels still rose even when the
