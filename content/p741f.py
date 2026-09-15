@@ -141,7 +141,8 @@ def build():
     W(ul_close())
     W(ability("Zealot", slug="chen_zealot"))
     W(ul_open())
-    W(li("Zealot respawn time changed from 60s to 60s - 1s per hero level", b(60, 60, l=True)))
+    W(li_formula("Zealot respawn time changed", "60s", "60s - 1s per hero level",
+                 lambda L: 60.0, lambda L: 60.0 - L, l=True))
     W(ul_close())
 
     # Clockwerk
@@ -413,7 +414,7 @@ def build():
 
     # Ursa
     W(hero_header("Ursa"))
-    W(ability("Maul", slug="ursa_maul"))
+    W(ability("Maul", slug="ursa_maul", innate=True))
     W(ul_open())
     W(li("Health As Damage increased from 1.25% to 1.75%", b(1.25, 1.75)))
     W(ul_close())

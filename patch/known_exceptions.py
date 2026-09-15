@@ -97,4 +97,5 @@ KNOWN_INNATE_NO_CDN_ICON = {
     "queenofpain_succubus",       # Succubus innate
     "terrorblade_dark_unity",     # Dark Unity innate
     "wisp_essence_conduction",    # Io innate — no CDN art
+    "ursa_maul",                  # Maul innate — Valve CDN 404 (checked 7.41f)
 }
