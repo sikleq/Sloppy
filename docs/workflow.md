@@ -73,6 +73,29 @@ Sanity-check the snapshot against the patch notes before trusting it — a
 couple of "decreased by N" rows (e.g. a base-armor or base-regen change)
 should match the KV diff between the previous version and the new one.
 
+## Step 2b — Refresh the GLOBAL snapshots (easy to forget)
+
+Step 2 only fills `data/stats/<version>/`. Four repo-wide files live outside
+that folder, are refreshed **by hand**, and silently go stale otherwise
+(7.41e shipped 30.07 and `patchnotes_english.txt` still had 0 of its keys
+weeks later). Refresh all four every patch:
+
+| File | Feeds | How to refresh |
+|---|---|---|
+| `data/patchnotes_english.txt` | generator section order + `_info` notes, calendar "major patch" counts, OLD-desc lifts, retroactive KV lines Valve adds later | Bump `PATCH_VERSION` in `D:\Sloppy Patches\extract_patchnotes.py` to the new version, run it (reads the live VPK; also writes `data/stats/<version>/` KV) |
+| `data/abilities_slim.json` | ability display names, innate detection (`patch/elements.py`), slug audit (CI + `tests/test_ability_slugs.py`) | KV+loc merge (`dname` / `is_innate`). Regenerate after the KV refresh — a new/renamed ability that is missing here fails the slug audit and loses its innate marker |
+| `data/herolist.json` | hero name resolution (generator, audits) | Valve herolist API (`scripts/fetch/fetch_itemlist.py` sibling flow) |
+| `data/itemlist.json` | item names / Hero Lab item list | `python scripts/fetch/fetch_itemlist.py` |
+
+Gate: `tests/test_snapshots_fresh.py` fails when `patchnotes_english.txt` has no
+`DOTA_Patch_<version>_` keys for the newest patch in `patch/meta.py`, or when a
+hero in `data/stats/<latest>/heroes.json` is absent from `herolist.json`.
+
+Also bump per patch: `PATCH_ENTRY_COUNTS` in `patch/page.py` (calendar
+"extra-major" highlight) and, for a new major, the terrain pins in
+`builders/terrain.py` (`NEW_VER`, `_MAP_PAIRS`) + `_TERRAIN_BUCKETS` in
+`patch/elements.py` + the `terrain_XXX.html` tile in `patch/index_page.py`.
+
 ## Step 3 — Generate the scaffold + normalized JSON
 
 ```powershell
