@@ -437,7 +437,7 @@
         {
           "target": "dmg",
           "formula": "hp_pct",
-          "note": "KV value=1.25 (percent). Leveled phase 7.37b-7.39c: 1.2/1.3/1.4/1.5 per rank — Python/JS both use max rank (1.5) for that window. Handled in JS innateDmg(); Python uses _innate_bonus() with StatusHealth base.",
+          "note": "KV value=1.75 (percent, 7.41f; 1.25 in 7.39d-7.41e). Leveled phase 7.37b-7.39c: 1.2/1.3/1.4/1.5 per rank — Python/JS both use max rank (1.5) for that window. Handled in JS innateDmg(); Python uses _innate_bonus() with StatusHealth base.",
           "history": [
             {
               "since": "7.36",
@@ -452,7 +452,12 @@
             },
             {
               "since": "7.39d",
-              "factor": 1.25
+              "factor": 1.25,
+              "until": "7.41e"
+            },
+            {
+              "since": "7.41f",
+              "factor": 1.75
             }
           ]
         }
