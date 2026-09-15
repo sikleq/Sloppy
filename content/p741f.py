@@ -169,7 +169,8 @@ def build():
     W(ul_open())
     W(li_formula("Charges changed", "7 + 1 per 4 levels", "7 + 1 per 5 levels",
                  lambda L: 7 + L // 4, lambda L: 7 + L // 5,
-                 inline_note_text="Max charges decreased from 14 at level 28 to 13 at level 30"))
+                 inline_note_text="Max charges decreased from 14 at level 28 to 13 at level 30",
+                 levels=[1, 4, 5, 8, 10, 12, 15, 16, 20, 24, 25, 28, 30]))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -339,7 +340,8 @@ def build():
     W(ul_open())
     W(li_formula("Damage per soul changed", "1.35 + 0.15 per level", "1 + 0.8 per 6 levels",
                  lambda L: 1.35 + 0.15 * L, lambda L: 1 + 0.8 * (L // 6),
-                 inline_note_text="From 1.5-5.85 to 1-5"))
+                 inline_note_text="From 1.5-5.85 to 1-5",
+                 levels=[1, 5, 6, 10, 12, 15, 18, 20, 24, 25, 30]))
     W(ul_close())
     W(ability("Shadowraze", slug="nevermore_shadowraze1"))
     W(ul_open())
@@ -364,8 +366,9 @@ def build():
     W(hero_header("Spectre"))
     W(ability("Desolate", slug="spectre_desolate"))
     W(ul_open())
-    _pill1 = scale_pill("23 + 2 per level", lambda L: 23 + 2*L)
-    W(li("Damage decreased from " + _pill1[0] + " to 23.5 + 1.5 per level", t("NERF"), extra=inline_note("From 25-83 to 25-68.5") + _pill1[1]))
+    W(li_formula("Damage decreased", "23 + 2 per level", "23.5 + 1.5 per level",
+                 lambda L: 23 + 2 * L, lambda L: 23.5 + 1.5 * L,
+                 inline_note_text="From 25-83 to 25-68.5"))
     W(ul_close())
 
     # Treant Protector
