@@ -1027,11 +1027,17 @@
   // segment left-edge -> centre (its score) -> right-edge; the edge value is the
   // mean with the neighbouring touched cell, or 0 when the neighbour column is
   // untouched (that cell only draws the baseline), so segments always meet.
-  const DYN_W_CAP = 4;
+  // Vertical scale: sqrt compression so the typical |w| (median ~0.5) already
+  // uses a good part of the cell and a 3+ score reaches the edge; -0.3 and -1.2
+  // are clearly different heights.
+  const DYN_W_CAP = 3;
   function dynDrawRowLines(table) {
     const NS = 'http://www.w3.org/2000/svg';
-    const S = 28, mid = S / 2, amp = mid - 3;
-    const yOf = v => mid - Math.max(-DYN_W_CAP, Math.min(DYN_W_CAP, v)) / DYN_W_CAP * amp;
+    const S = 28, mid = S / 2, amp = mid - 1.5;
+    const yOf = v => {
+      const a = Math.min(Math.abs(v), DYN_W_CAP) / DYN_W_CAP;
+      return mid - Math.sign(v) * Math.sqrt(a) * amp;
+    };
     table.querySelectorAll('tbody tr').forEach(tr => {
       const tds = [...tr.children].filter(td => td.matches('td.hd-cell, td.he, td.ha'));
       const vals = tds.map(td => {

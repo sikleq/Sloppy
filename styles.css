@@ -9786,7 +9786,8 @@ a.whatsnew-row:hover {
 .heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
 .heroes-dyn-table.w-mode td.he::after { width: 100%; }
 .dyn-wl polyline { vector-effect: non-scaling-stroke; }
-.hs-attr-filter.hd-weights-btn img { width: 18px; height: auto; image-rendering: pixelated; }
+.hs-attr-filter.hd-weights-btn img { width: 18px; height: 16px; display: block; image-rendering: pixelated; }
+.hd-weights-group { margin-left: 2px; }
 .heroes-dyn-table .dyn-cell-wrap.w-line .dyn-wl {
   display: block;
   width: 100%;
