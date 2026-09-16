@@ -48,7 +48,7 @@ CAT = [
     ("slow_res", r"slow resist"), ("slow", r"slow"), ("status_res", r"status resist"),
     ("spell_amp", r"spell amp|spell damage amp"),
     ("attack_speed", r"attack speed|base attack time|\bbat\b"),
-    ("projectile", r"projectile|missile|(bolt|arrow|orb|spear|shard|dagger|blade|glaive|axe|hook|ball|wave|dart|rocket|shot|throw|toss|flight|travel) speed"),
+    ("projectile", r"projectile|missile|\b(bolt|arrow|orb|spear|shard|dagger|blade|glaive|axe|hook|ball|wave|dart|rocket|shot|throw|toss|flight|travel) speed"),
     ("move_speed", r"movement speed|move speed|movespeed|movement|\bms\b|\bspeed\b"),
     ("evasion", r"evasion|dodge|backtrack|miss chance"),
     ("magic_res", r"magic resist|magical resist|spell block"),
