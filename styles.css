@@ -9772,11 +9772,21 @@ a.whatsnew-row:hover {
 }
 /* Matrices: every row is a line chart on its own axis (see dynDrawRowLines).
    Touched cells hold an SVG segment; untouched cells draw just the baseline. */
+.heroes-dyn-table.w-mode td.hd-cell { padding: 0; }          /* no gaps: segments meet at cell edges */
+.heroes-dyn-table .dyn-cell-wrap.w-line { width: 100%; height: 28px; display: block; }
 .heroes-dyn-table .dyn-cell-wrap.w-line .dyn-cell {
   box-shadow: none;
   border-radius: 0;
   overflow: visible;
 }
+.heroes-dyn-table .dyn-cell-wrap.w-line:not(.empty):hover .dyn-cell {
+  transform: none;                                             /* a chart segment must not pop out */
+  box-shadow: none;
+}
+.heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
+.heroes-dyn-table.w-mode td.he::after { width: 100%; }
+.dyn-wl polyline { vector-effect: non-scaling-stroke; }
+.hs-attr-filter.hd-weights-btn img { width: 18px; height: auto; image-rendering: pixelated; }
 .heroes-dyn-table .dyn-cell-wrap.w-line .dyn-wl {
   display: block;
   width: 100%;

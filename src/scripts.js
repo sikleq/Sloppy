@@ -1047,6 +1047,7 @@
         const yl = yOf(edge(i - 1)), yc = yOf(v), yr = yOf(edge(i + 1));
         const svg = document.createElementNS(NS, 'svg');
         svg.setAttribute('viewBox', `0 0 ${S} ${S}`);
+        svg.setAttribute('preserveAspectRatio', 'none');   // stretch to the full column so segments join
         svg.setAttribute('class', 'dyn-wl ' + (v > 0 ? 'up' : (v < 0 ? 'down' : 'flat')));
         const axis = document.createElementNS(NS, 'line');
         axis.setAttribute('x1', '0'); axis.setAttribute('x2', String(S));
@@ -1232,6 +1233,7 @@
     refill();
     if (elW) elW.addEventListener('click', () => {
       const on = elW.classList.toggle('active');
+      elW.setAttribute('aria-pressed', on ? 'true' : 'false');
       table.classList.toggle('w-mode', on);
       refill();
     });
@@ -1265,7 +1267,7 @@
     const page = table.closest('.creeps-page');
     const delToggle = document.getElementById('hd-show-deleted');
     const attackBtns = [...document.querySelectorAll('.hs-attack-filter')];
-    const attrBtns = [...document.querySelectorAll('.hs-attr-filter')];
+    const attrBtns = [...document.querySelectorAll('.hs-attr-filter[data-attr-filter]')];
     const priceMin = document.getElementById('hd-price-min');
     const priceMax = document.getElementById('hd-price-max');
     const priceClear = document.getElementById('hd-price-clear');
@@ -2930,7 +2932,7 @@
   const _innateRulesEl = document.getElementById('hs-innate-rules');
   const _innateRules = _innateRulesEl ? JSON.parse(_innateRulesEl.textContent) : {};
   const attackBtns = [...document.querySelectorAll('.hs-attack-filter')];
-  const attrBtns = [...document.querySelectorAll('.hs-attr-filter')];
+  const attrBtns = [...document.querySelectorAll('.hs-attr-filter[data-attr-filter]')];
   const cells = [...table.querySelectorAll('tbody td[data-col]')];
   let attackFilter = '';
   let attrFilter = '';

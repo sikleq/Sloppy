@@ -421,6 +421,9 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         + category_block
         + attack_block
         + attr_block
+        + '<button type="button" class="hs-attr-filter hd-weights-btn" id="dyn-weights-btn" '
+          'aria-pressed="false" title="Weighted scores: each row as a line chart">'
+          '<img src="icons/misc/weights.svg" alt="Weights" loading="lazy"></button>'
         + _switch('hd-hide-old', 'Hide old',
                   'Show only the most recent patches that fit the width '
                   '(latest at the right edge); off shows every patch', True)
@@ -466,7 +469,6 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         f'<tbody>\n{chr(10).join(rows)}\n</tbody>\n'
         '</table>\n</div>\n</div>\n'
         f'<script defer src="src/scripts.js?v={_site.compute_asset_version()}"></script>\n'
-        '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores" title="Dynamics: weighted scores (Valve revealed-preference weights)"></button>\n'
         '</body>\n</html>\n'
     )
     dist = _os.path.join(_HERE, "dist")
