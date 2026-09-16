@@ -1025,49 +1025,45 @@
     if (wMode) dynDrawRowLines(table);
   }
 
-  // Weights mode on the matrices: every row is a line chart with the row itself
-  // as the x axis (thin baseline through every cell). Each touched cell holds the
-  // segment left-edge -> centre (its score) -> right-edge; the edge value is the
-  // mean with the neighbouring touched cell, or 0 when the neighbour column is
-  // untouched (that cell only draws the baseline), so segments always meet.
-  // Vertical scale: sqrt compression so the typical |w| (median ~0.5) already
-  // uses a good part of the cell and a 3+ score reaches the edge; -0.3 and -1.2
-  // are clearly different heights.
-  const DYN_W_CAP = 3;
+  // Weights mode on the matrices: every row is a CUMULATIVE line chart — the
+  // level is the running sum of the net score, oldest -> newest, so a buff always
+  // moves the line UP (green) and a nerf DOWN (red); untouched patches keep the
+  // level (flat line, drawn by CSS from the --wl var set on the cell). Each row is
+  // scaled to its own min..max so the whole cell height is used; a faint dashed
+  // line marks the zero level inside touched cells.
   function dynDrawRowLines(table) {
     const NS = 'http://www.w3.org/2000/svg';
-    const S = 28, mid = S / 2, amp = mid - 1.5;
-    const yOf = v => {
-      const a = Math.min(Math.abs(v), DYN_W_CAP) / DYN_W_CAP;
-      return mid - Math.sign(v) * Math.sqrt(a) * amp;
-    };
+    const S = 28, pad = 2;
     table.querySelectorAll('tbody tr').forEach(tr => {
       const tds = [...tr.children].filter(td => td.matches('td.hd-cell, td.he, td.ha'));
-      const vals = tds.map(td => {
+      const steps = tds.map(td => {
         const c = td.querySelector('.w-line .dyn-cell');
-        return c ? parseFloat(c.dataset.w) || 0 : (td.matches('td.he, td.hd-empty') ? 0 : null);
+        return c ? (parseFloat(c.dataset.w) || 0) : 0;
       });
+      const levels = []; let acc = 0;
+      steps.forEach(v => { acc += v; levels.push(acc); });
+      const lo = Math.min(0, ...levels), hi = Math.max(0, ...levels);
+      const span = (hi - lo) || 1;
+      const yOf = L => (S - pad) - (L - lo) / span * (S - 2 * pad);
       tds.forEach((td, i) => {
+        const prev = i ? levels[i - 1] : 0, cur = levels[i], v = steps[i];
         const c = td.querySelector('.w-line .dyn-cell');
-        if (!c) return;
-        const v = vals[i];
-        const edge = j => (j < 0 || j >= vals.length || vals[j] === null) ? 0
-                        : (tds[j].querySelector('.w-line') ? (vals[j] + v) / 2 : 0);
-        const yl = yOf(edge(i - 1)), yc = yOf(v), yr = yOf(edge(i + 1));
+        if (!c) { td.style.setProperty('--wl', yOf(cur).toFixed(1) + 'px'); return; }
+        const yp = yOf(prev), yc = yOf(cur), y0 = yOf(0);
         const svg = document.createElementNS(NS, 'svg');
         svg.setAttribute('viewBox', `0 0 ${S} ${S}`);
-        svg.setAttribute('preserveAspectRatio', 'none');   // stretch to the full column so segments join
+        svg.setAttribute('preserveAspectRatio', 'none');
         svg.setAttribute('class', 'dyn-wl ' + (v > 0 ? 'up' : (v < 0 ? 'down' : 'flat')));
         const axis = document.createElementNS(NS, 'line');
         axis.setAttribute('x1', '0'); axis.setAttribute('x2', String(S));
-        axis.setAttribute('y1', String(mid)); axis.setAttribute('y2', String(mid));
+        axis.setAttribute('y1', y0.toFixed(1)); axis.setAttribute('y2', y0.toFixed(1));
         axis.setAttribute('class', 'axis');
         svg.appendChild(axis);
         const pl = document.createElementNS(NS, 'polyline');
-        pl.setAttribute('points', `0,${yl.toFixed(1)} ${mid},${yc.toFixed(1)} ${S},${yr.toFixed(1)}`);
+        pl.setAttribute('points', `0,${yp.toFixed(1)} ${S / 2},${yc.toFixed(1)} ${S},${yc.toFixed(1)}`);
         svg.appendChild(pl);
         const dot = document.createElementNS(NS, 'circle');
-        dot.setAttribute('cx', String(mid)); dot.setAttribute('cy', yc.toFixed(1)); dot.setAttribute('r', '2.4');
+        dot.setAttribute('cx', String(S / 2)); dot.setAttribute('cy', yc.toFixed(1)); dot.setAttribute('r', '2.4');
         svg.appendChild(dot);
         c.appendChild(svg);
       });
