@@ -429,6 +429,9 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                   'Collapse each cell to two bands — buff + NEW (green) vs nerf + '
                   'DEL (red); rework/misc/qol drop out of the colour (hover still '
                   'shows every tag)', False)
+        + _switch('hd-weights', 'Weights',
+                  'Show each cell as its weighted score (Valve revealed-preference '
+                  'weights x direction x size) and a per-row sparkline', False)
         + price_block
         + remove_block
         + search_block

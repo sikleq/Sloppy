@@ -9728,3 +9728,39 @@ a.whatsnew-row:hover {
    (Nothing yet — overrides and one-off fixes will migrate here)
    ========================================================================== */
 
+
+/* ---- Dynamics "Weights" mode: number cells + row sparkline ---- */
+.dyn-cell-wrap.w-mode .dyn-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 9px/1 "Segoe UI", Arial, sans-serif;
+  letter-spacing: -0.2px;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+}
+.dyn-cell-wrap.w-mode:not(.empty):hover .dyn-cell {
+  font-size: 5px;   /* hover scale(2.5) blows the digits up - keep them legible, not huge */
+}
+.dyn-tip-score {
+  font-weight: 600;
+}
+.dyn-spark {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+  flex: 0 0 auto;
+}
+.dyn-spark .dyn-spark-base { stroke: rgba(255, 255, 255, 0.18); stroke-width: 1; }
+.dyn-spark rect.up   { fill: rgb(62, 178, 96); }
+.dyn-spark rect.down { fill: rgb(214, 74, 66); }
+.dyn-spark rect.flat { fill: rgba(160, 160, 160, 0.6); }
+.legend-tags .badge.dyn-w-btn {
+  margin-left: 10px;
+  background: rgba(120, 120, 130, 0.35);
+  color: #d8d8dc;
+}
+.legend-tags .badge.dyn-w-btn.active {
+  background: rgba(200, 170, 80, 0.55);
+  color: #fff;
+}

@@ -3,6 +3,7 @@
 import html as _html
 import json as _json
 import os as _os
+from .weights import row_score as _row_score
 import re
 
 from .images import (HERO_CDN, ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG,
@@ -359,7 +360,9 @@ def _close_ability_block():
 _DYN_TAG_WHITELIST = {"buff", "nerf", "new", "del", "rework", "misc", "qol"}
 
 
-def _dyn_record_li(tags, extra_keys=None):
+def _dyn_record_li(tags, extra_keys=None, score=0.0):
+    """Tally the row's tags per (entity, patch); `score` (patch/weights.row_score) is
+    summed into the same bucket under "w" for the dynamics "Weights" mode."""
     if _State.dyn_skip_li:
         return
     pv = _State.current_patch_version
@@ -386,6 +389,8 @@ def _dyn_record_li(tags, extra_keys=None):
         for tag in tags:
             if tag in _DYN_TAG_WHITELIST:
                 patch_bucket[tag] = patch_bucket.get(tag, 0) + 1
+        if score:
+            patch_bucket["w"] = round(patch_bucket.get("w", 0.0) + score, 2)
 
 
 def _slugify(name):
@@ -887,7 +892,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             dyn_tags = set(primary)
         else:
             dyn_tags = set(re.findall(r'data-overall="(\w+)"', badge))
-    _dyn_record_li(dyn_tags, extra_keys=also_dyn)
+    _dyn_record_li(dyn_tags, extra_keys=also_dyn,
+                   score=_row_score(text if isinstance(text, str) else "", dyn_tags, badge))
     if isinstance(text, str) and 'del' in dyn_tags:
         _low = text.strip().rstrip('.').lower()
         if _low in ('removed', 'item removed from the game',

@@ -756,8 +756,22 @@
   // harmless: with no neutral tags, coloredTotal === total whenever total > 0).
   const DYN_NEUTRAL_TAGS = [];
   const DYN_MAX_PATCHES = 12;
+  // "Weights" mode: each cell shows the patch's summed weighted score (bucket key
+  // "w", see patch/weights.py) instead of the tag gradient. Patch pages toggle it
+  // with #dyn-weights-btn, the matrices with the #hd-weights switch.
+  let dynWeightsOn = false;
+  function dynFmtW(w) {
+    const a = Math.abs(w);
+    return (w < 0 ? '\u2212' : '') + (a >= 10 ? a.toFixed(0) : a.toFixed(1));
+  }
+  function dynWeightTint(w) {
+    const rgb = w > 0 ? DYN_TAG_RGB.buff : (w < 0 ? DYN_TAG_RGB.nerf : [110, 110, 110]);
+    const alpha = Math.min(0.9, 0.25 + Math.min(Math.abs(w), 4) * 0.16);
+    const c = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha.toFixed(2)})`;
+    return `linear-gradient(${c}, ${c})`;
+  }
 
-  function dynBuildPill(patch, counts, entityId, isCurrent, fromVersion, filePrefix, bnOnly, removed, debut) {
+  function dynBuildPill(patch, counts, entityId, isCurrent, fromVersion, filePrefix, bnOnly, removed, debut, wMode) {
     // "Remove" tag filter (toolbar chips): zero out user-removed tags for the
     // CELL colouring. The hover tooltip below still uses the ORIGINAL counts, so
     // a removed tag stays visible on hover — it's only dropped from the diamond.
@@ -797,7 +811,12 @@
     const cell = document.createElement('span');
     cell.className = 'dyn-cell';
     wrap.appendChild(cell);
-    if (total) {
+    if (wMode && origTotal) {
+      const w = counts.w || 0;
+      wrap.classList.add('w-mode');
+      cell.textContent = dynFmtW(w);
+      cell.style.setProperty('--dyn-bg', dynWeightTint(w));
+    } else if (total) {
       // Build a vertical gradient where each tag occupies a band proportional
       // to its share. Instead of hard color-stops at the band boundaries we
       // leave a `bleed` zone on each side so adjacent colors interpolate
@@ -893,6 +912,12 @@
         grid.appendChild(row);
       }
       tip.appendChild(grid);
+      if (counts.w !== undefined) {
+        const sc = document.createElement('span');
+        sc.className = 'dyn-tip-note dyn-tip-score';
+        sc.textContent = 'weighted score ' + (counts.w > 0 ? '+' : '') + counts.w.toFixed(2);
+        tip.appendChild(sc);
+      }
     }
     if (note) {
       const noteEl = document.createElement('span');
@@ -949,7 +974,8 @@
     row.className = 'patch-dynamics';
     for (const p of windowed) {
       const counts = perPatch[p.version] || {};
-      row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion, currentVersion));
+      row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion, currentVersion,
+                                   undefined, false, null, false, dynWeightsOn));
     }
     wrap.appendChild(row);
     if (canRight) {
@@ -966,7 +992,7 @@
   // that patch) are filled — untouched cells stay as the CSS empty diamond, so
   // runtime work scales with real data, not the full N×M grid. Re-runnable: it
   // clears any existing pill first, so the "Buff vs nerf" toggle can rebuild.
-  function dynFillMatrix(table, manifest, bnOnly, removed) {
+  function dynFillMatrix(table, manifest, bnOnly, removed, wMode) {
     const byVer = {};
     manifest.patches.forEach(p => { byVer[p.version] = p; });
     // Back-arrow token: 'heroes_dyn' or 'items_dyn' (set on <body data-dyn-from>),
@@ -984,7 +1010,57 @@
       // that page show a back-arrow returning here; filePrefix 'patches/' because
       // the matrix lives at site root, patch pages under /patches.
       const debut = td.dataset.debut === '1';
-      td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed, debut));
+      td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed, debut, wMode));
+    });
+    dynSparkRows(table, manifest, wMode);
+  }
+
+  // Weights mode: a tiny bar sparkline per row (oldest -> newest patch, one bar
+  // per patch the entity was touched in; green up = positive score, red down =
+  // negative) appended to the sticky name cell. Removed when the mode is off.
+  function dynSparkRows(table, manifest, wMode) {
+    const vers = manifest.patches.map(p => p.version).reverse();   // manifest is newest-first
+    const n = vers.length;
+    table.querySelectorAll('tbody tr').forEach(tr => {
+      const nameCell = tr.querySelector('td.hd-hero .hd-hero-inner');
+      if (!nameCell) return;
+      const prev = nameCell.querySelector('.dyn-spark');
+      if (prev) prev.remove();
+      if (!wMode) return;
+      const first = tr.querySelector('td.hd-cell[data-hkey]');
+      const rec = first && manifest.entities[first.dataset.hkey];
+      if (!rec || !rec.patches) return;
+      const W = 96, H = 16, mid = H / 2, bw = Math.max(1, Math.floor(W / n));
+      let maxAbs = 0.5;
+      vers.forEach(v => { const b = rec.patches[v]; if (b && b.w) maxAbs = Math.max(maxAbs, Math.abs(b.w)); });
+      const NS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('class', 'dyn-spark');
+      svg.setAttribute('viewBox', `0 0 ${bw * n} ${H}`);
+      svg.setAttribute('width', String(bw * n));
+      svg.setAttribute('height', String(H));
+      const base = document.createElementNS(NS, 'line');
+      base.setAttribute('x1', '0'); base.setAttribute('x2', String(bw * n));
+      base.setAttribute('y1', String(mid)); base.setAttribute('y2', String(mid));
+      base.setAttribute('class', 'dyn-spark-base');
+      svg.appendChild(base);
+      vers.forEach((v, i) => {
+        const b = rec.patches[v];
+        if (!b) return;
+        const w = b.w || 0;
+        const h = Math.max(1, Math.round(Math.abs(w) / maxAbs * (mid - 1)));
+        const r = document.createElementNS(NS, 'rect');
+        r.setAttribute('x', String(i * bw));
+        r.setAttribute('width', String(Math.max(1, bw - 1)));
+        r.setAttribute('y', String(w >= 0 ? mid - h : mid));
+        r.setAttribute('height', String(h));
+        r.setAttribute('class', w > 0 ? 'up' : (w < 0 ? 'down' : 'flat'));
+        const t = document.createElementNS(NS, 'title');
+        t.textContent = `${v}: ${w > 0 ? '+' : ''}${w.toFixed(2)}`;
+        r.appendChild(t);
+        svg.appendChild(r);
+      });
+      nameCell.appendChild(svg);
     });
   }
 
@@ -1142,6 +1218,7 @@
   function dynSetupMatrix(table, manifest) {
     const elOld = document.getElementById('hd-hide-old');
     const elBn = document.getElementById('hd-bn-only');
+    const elW = document.getElementById('hd-weights');
     const removed = new Set();                 // tags the user toggled off (Remove chips)
     const chips = [...table.closest('.creeps-page').querySelectorAll('.hd-tag[data-tag]')];
     const layout = () => {
@@ -1150,8 +1227,9 @@
       // divider (a separate IIFE) to re-anchor after this layout pass.
       window.dispatchEvent(new CustomEvent('mr:filter-changed'));
     };
-    const refill = () => dynFillMatrix(table, manifest, !!(elBn && elBn.checked), removed);
+    const refill = () => dynFillMatrix(table, manifest, !!(elBn && elBn.checked), removed, !!(elW && elW.checked));
     refill();
+    if (elW) elW.addEventListener('change', () => { table.classList.toggle('w-mode', elW.checked); refill(); });
     layout();
     if (elOld) elOld.addEventListener('change', layout);
 
@@ -1311,6 +1389,19 @@
             const off = parseInt(e.dataset.dynOffset || '0', 10);
             dynRenderRow(e, manifest, dynWindow(manifest, off), currentVersion, off);
           };
+          // "Weights" toggle (toolbar): flip the mode and rebuild every row already built.
+          const wBtn = document.getElementById('dyn-weights-btn');
+          if (wBtn) wBtn.addEventListener('click', () => {
+            dynWeightsOn = !dynWeightsOn;
+            wBtn.classList.toggle('active', dynWeightsOn);
+            document.body.classList.toggle('dyn-weights', dynWeightsOn);
+            document.querySelectorAll('.entity[id^="dyn-"][data-dyn-built]').forEach(e => {
+              const old = e.querySelector('.dyn-row-wrap');
+              if (old) old.remove();
+              const off = parseInt(e.dataset.dynOffset || '0', 10);
+              dynRenderRow(e, manifest, dynWindow(manifest, off), dynCurrentVersion(), off);
+            });
+          });
           // Arrow navigation: per-entity offset stored in data-dyn-offset.
           // Each row navigates independently — clicking an arrow only rebuilds
           // the entity whose dyn-row-wrap contains that arrow.
