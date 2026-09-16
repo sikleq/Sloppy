@@ -17,6 +17,10 @@
                badges (0% included; "Recipe … Total cost …" -> total only) divided by the
                type's typical |%| (signal C medians), so a typical change is 1.0. Cap 3.
                Rows without a % badge count as 1.0.
+  items      — priced stat rows ("+0.8 -> +0.6 mana regen", "Total cost 4900g -> 5100g") are
+               scored in GOLD: Δ × gold-per-unit (signal A, data/rules/item_stat_prices.json)
+               / item cost; net = 0.6 × sign × min(5 × fraction, 3). Other item rows (actives,
+               cooldowns) fall back to the hero formula.
   context    — multiplier by where the row lives (data/rules/valve_weights.json "context"):
                ultimate 1.3, basic ability/innate/scepter/base stat/item 1.0, shard 0.9,
                facet 0.8, talent 10/15/20/25 = 0.6/0.8/1.0/1.2.
@@ -186,12 +190,93 @@ def _magnitude(text, badge_html, kind, ctx=None):
     return min((sum(pcts) / len(pcts)) / _TPCT.get(kind, 20.0), MAG_CAP_NORM)
 
 
+# ---- items: gold scale (review E.6) ---------------------------------------------------
+_PRICES = _json.load(open(_os.path.join(_HERE, "data", "rules", "item_stat_prices.json"),
+                          encoding="utf-8"))["versions"]
+_ITEM_STAT_RE = [  # head keyword -> priced stat; %-stats listed in _PCT_STATS
+    ("all_stats", r"all stats|all attributes"), ("strength", r"strength"), ("agility", r"agility"),
+    ("intelligence", r"intelligence|int"), ("health_regen", r"health regen|hp regen"),
+    ("mana_regen", r"mana regen"), ("lifesteal", r"lifesteal"), ("spell_amp", r"spell amp"),
+    ("magic_res", r"magic resist"), ("evasion", r"evasion"), ("attack_speed", r"attack speed"),
+    ("armor", r"armor"), ("move_speed", r"movement speed|move speed"),
+    ("health", r"health"), ("mana", r"mana"), ("damage", r"damage"),
+]
+_ITEM_STAT = [(k, _re.compile(rx, _re.I)) for k, rx in _ITEM_STAT_RE]
+_PCT_STATS = {"lifesteal", "spell_amp", "magic_res", "evasion"}
+_STAT_FROMTO_RE = _re.compile(r"from\s+\+?(-?\d+(?:\.\d+)?)(%?)\S*\s+to\s+\+?(-?\d+(?:\.\d+)?)(%?)", _re.I)
+_TOTAL_COST_RE = _re.compile(r"total cost[^.]*?from\s+(\d+)g?\s+to\s+(\d+)g?", _re.I)
+ITEM_GOLD_K = 5.0        # 20% of the item's value = 1.0
+ITEM_GOLD_W = 0.6        # neutral weight so item rows sit on the hero scale (median type weight)
+_COST_CACHE = {}
+
+
+def _item_cost(slug, version):
+    """ItemCost from data/stats/<version>/items.json (or the nearest earlier snapshot)."""
+    from .meta import RELEASE_HISTORY
+    if version not in _COST_CACHE:
+        order = [r["version"] for r in RELEASE_HISTORY]        # newest first
+        start = order.index(version) if version in order else 0
+        table = {}
+        for v in order[start:]:
+            f = _os.path.join(_HERE, "data", "stats", v, "items.json")
+            if _os.path.exists(f):
+                table = _json.load(open(f, encoding="utf-8"))
+                break
+        _COST_CACHE[version] = table
+    rec = _COST_CACHE[version].get("item_" + (slug or ""), {})
+    return rec.get("ItemCost") or 0
+
+
+def _price(stat, version):
+    from .meta import RELEASE_HISTORY
+    order = [r["version"] for r in RELEASE_HISTORY]
+    start = order.index(version) if version in order else 0
+    for v in order[start:]:
+        if v in _PRICES and stat in _PRICES[v]:
+            return _PRICES[v][stat]
+    return None
+
+
+def _item_gold_fraction(text, ctx):
+    """Δ of an item row in gold / item cost, or None when the row is not a priced stat / cost."""
+    t = _plain(text)
+    cost = _item_cost(ctx.get("item"), ctx.get("version"))
+    if not cost:
+        return None
+    m = _TOTAL_COST_RE.search(t)
+    if m:
+        return abs(float(m.group(2)) - float(m.group(1))) / cost
+    head = t
+    vm = _VERB_RE.search(t)
+    if vm and vm.start() > 0:
+        head = t[:vm.start()]
+    stat = next((k for k, rx in _ITEM_STAT if rx.search(head)), None)
+    if not stat:
+        return None
+    m = _STAT_FROMTO_RE.search(t)
+    if not m:
+        return None
+    is_pct = bool(m.group(2) or m.group(4))
+    if is_pct != (stat in _PCT_STATS):
+        return None                         # e.g. "bonus movement speed 22% -> 20%": not a flat stat
+    price_key = "agility" if stat == "intelligence" else stat
+    price = _price(price_key, ctx.get("version"))
+    if price is None:
+        return None
+    return abs(float(m.group(3)) - float(m.group(1))) * price / cost
+
+
 def row_scores(text, tags, badge_html="", ctx=None):
     """(net, volume) of one row; both 0.0 when the row is not scorable."""
     kind = classify(text)
     w = weight_of(kind) * context_multiplier(ctx)
     if "buff" in tags or "nerf" in tags:
         d = _DIR["buff"] if "buff" in tags else _DIR["nerf"]
+        if ctx and ctx.get("kind") == "item":
+            frac = _item_gold_fraction(text, ctx)
+            if frac is not None:
+                mag = min(ITEM_GOLD_K * frac, MAG_CAP_NORM)
+                return round(ITEM_GOLD_W * d * mag, 3), round(ITEM_GOLD_W * mag, 3)
         mag = _magnitude(text, badge_html, kind, ctx)
         return round(w * d * mag, 3), round(w * mag, 3)
     if "rework" in tags:

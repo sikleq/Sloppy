@@ -20,6 +20,16 @@ w, v       = Σ rows of the entity in that patch  →  _dynamics.json patches[ve
 | direction | tags | buff +1, nerf −1, sole `new` +0.5, sole `del` −0.5, rework/misc/qol 0 |
 | magnitude | hybrid | GENERAL rows: `|Δ| / typical_step` (MS 5, base dmg 3, stats 2, stat gain 0.2, armor 1, HP regen 0.5, mana regen 0.25 …). Other rows: `mean|%| / typical_pct[type]` (signal C medians: cooldown 17.7, damage 17.8, health 25, cast_point 42.9 …); 0% badges count; "Recipe … Total cost …" uses the total. Cap 3. No badge → 1.0 |
 
+## Items — gold scale (review E.6, done 2026-09-16)
+
+Item rows that change a **priced stat** ("Mana Regen bonus +0.8 → +0.6") or the **total cost** are scored in
+gold: `fraction = Δ × gold-per-unit / item cost`, where gold-per-unit comes from signal A per patch version
+(`data/rules/item_stat_prices.json`, %-stats priced per 1 %) and the cost from `data/stats/<ver>/items.json`.
+`net = 0.6 × sign × min(5 × fraction, 3)` (20 % of the item's value = 1.0; 0.6 = median hero type weight so
+both scales line up). Other item rows (actives, cooldowns, % bonuses) use the hero formula.
+Examples 7.41f: Infused Raindrops −0.2 mana regen = 99 g of a 225 g item → −1.32; Octarine +200 g of 5100 →
+−0.12; Satanic lifesteal 30 → 25 % = 204 g of 5050 → −0.12.
+
 ## Backtest (docs/weights-review.md E.8.1) — 2026-09-16
 
 11 408 numeric hero events 7.08→7.41e. "Reverted" = same parameter moved the other way within 8 patches (base rate 6.0 %).
@@ -35,7 +45,7 @@ score carries real (if modest) information beyond the counter. `corr(w, buff−n
 the number is dominated by how many rows Valve wrote; volume `v` is the honest place for that.
 
 ## Open / next
-1. Items: own scale in gold (Δstat × price-per-unit / item price) — review E.6.
+1. ~~Items in gold~~ done.
 2. Signal J "exchange rate" from compensation pairs as a second source of relative weights — review E.7.
 3. Formula rows (per-level badges): take the magnitude at the level `b()` used for the direction — review F.6.
 4. Manual-annotation agreement test (100–150 rows, 3 grades) — review E.8.2.
