@@ -192,7 +192,7 @@ def build():
     # Faceless Void
     W(hero_header("Faceless Void"))
     W(ul_open())
-    W(li("Base Damage decreased by 3", t("MISC")))
+    W(li("Base Damage decreased by 3", bstat_h("Faceless Void", "AttackDamageMin", "7.40", -3), extra=note_box(hero="Faceless Void", field="AttackDamageMin", before_patch="7.40")))
     W(li("Base Agility increased from 21 to 24", b(21, 24), extra=inline_note("Damage at level 1 unchanged (58–64)")))
     W(ul_close())
 
