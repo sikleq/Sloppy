@@ -7,6 +7,9 @@
                Matched against the PARAMETRIC part of the row (text before the first verb
                increased/decreased/rescaled/…), then against the whole row as a fallback —
                so "Cooldown decreased … dispels …" is cooldown, not bkb_pierce.
+  J          — signal J (exchange rate from Valve's own buff<->nerf compensations, 3 865 pairs):
+               value of +1% of a type. For rows with % badges the value is
+               u[type] × mean|%| / 20 — this REPLACES weight × magnitude there (24 types).
   weight     — data/rules/valve_weights.json "final" (consensus shrunk towards `other`
                when fewer than 3 signals back the type: w = other + (raw − other) × n/3).
   direction  — +1 buff, −1 nerf, ±0.5 new/del (only when it is the row's sole tag),
@@ -48,7 +51,7 @@ CAT = [
     ("slow_res", r"slow resist"), ("slow", r"slow"), ("status_res", r"status resist"),
     ("spell_amp", r"spell amp|spell damage amp"),
     ("attack_speed", r"attack speed|base attack time|\bbat\b"),
-    ("projectile", r"projectile|missile|\b(bolt|arrow|orb|spear|shard|dagger|blade|glaive|axe|hook|ball|wave|dart|rocket|shot|throw|toss|flight|travel) speed"),
+    ("projectile", r"projectile|missile|\b(projectile|missile|bolt|arrow|orb|spear|shard|dagger|blade|glaive|axe|hook|ball|wave|dart|rocket|shot|throw|toss|flight|travel) speed"),
     ("move_speed", r"movement speed|move speed|movespeed|movement|\bms\b|\bspeed\b"),
     ("evasion", r"evasion|dodge|backtrack|miss chance"),
     ("magic_res", r"magic resist|magical resist|spell block"),
@@ -69,6 +72,7 @@ CAT = [
 ]
 _CAT = [(c, _re.compile(p, _re.I)) for c, p in CAT]
 _TAGS_RE = _re.compile(r"<[^>]+>")
+_QUAL_RE = _re.compile(r"\s+(?:on|when|while|against|per|for|to|in|with|during|after|vs\.?)\s+", _re.I)
 _VERB_RE = _re.compile(r"\b(increased|decreased|reduced|improved|rescaled|changed|lowered|raised|"
                        r"replaced|now|no longer|removed|added)\b", _re.I)
 _PCT_RE = _re.compile(r'class="badge (?:(?:buff|nerf)\d+|neutral)">([+\-−]?\d+(?:\.\d+)?)%<')
@@ -89,9 +93,20 @@ def classify(text):
     m = _VERB_RE.search(t)
     if m and m.start() > 0:
         head = t[:m.start()]
+    # The parameter name is "<qualifiers> <measured thing>": drop trailing "on/when/against/
+    # per/for …" clauses and take the LAST matching category in what is left, so
+    # "Movement speed bonus duration" is duration and "Keen Eye disable duration on taking
+    # damage" is duration, not damage.
+    head = _QUAL_RE.split(head, 1)[0]
+    best = None                                  # (category, match end); ties -> earlier in CAT
     for c, rx in _CAT:
-        if rx.search(head):
-            return c
+        mm = None
+        for mm in rx.finditer(head):
+            pass
+        if mm and (best is None or mm.end() > best[1]):
+            best = (c, mm.end())
+    if best:
+        return best[0]
     return next((c for c, rx in _CAT if rx.search(t)), "other")
 
 
@@ -266,10 +281,31 @@ def _item_gold_fraction(text, ctx):
     return abs(float(m.group(3)) - float(m.group(1))) * price / cost
 
 
+_J = _WJ.get("J", {}).get("u", {})       # signal J: value of +1% of the type (exchange rate)
+J_PCT_UNIT = 20.0                        # a 20% change of a u=1 type = 1.0
+
+
+def _row_value(text, badge_html, kind, ctx):
+    """Unsigned value of a buff/nerf row on the common scale (before context)."""
+    if ctx and ctx.get("base_stat"):
+        m = _base_stat_magnitude(text)
+        if m is not None:
+            return weight_of(kind) * min(m, MAG_CAP_NORM)
+    pcts = [abs(float(x.replace("−", "-"))) for x in _PCT_RE.findall(badge_html or "")]
+    if pcts and len(pcts) >= 2 and _re.search(r"total cost", _plain(text), _re.I):
+        pcts = [pcts[-1]]
+    if pcts and kind in _J:
+        return min(_J[kind] * (sum(pcts) / len(pcts)) / J_PCT_UNIT, MAG_CAP_NORM)
+    if pcts:
+        return weight_of(kind) * min((sum(pcts) / len(pcts)) / _TPCT.get(kind, 20.0), MAG_CAP_NORM)
+    return weight_of(kind)
+
+
 def row_scores(text, tags, badge_html="", ctx=None):
     """(net, volume) of one row; both 0.0 when the row is not scorable."""
     kind = classify(text)
-    w = weight_of(kind) * context_multiplier(ctx)
+    cm = context_multiplier(ctx)
+    w = weight_of(kind) * cm
     if "buff" in tags or "nerf" in tags:
         d = _DIR["buff"] if "buff" in tags else _DIR["nerf"]
         if ctx and ctx.get("kind") == "item":
@@ -277,8 +313,8 @@ def row_scores(text, tags, badge_html="", ctx=None):
             if frac is not None:
                 mag = min(ITEM_GOLD_K * frac, MAG_CAP_NORM)
                 return round(ITEM_GOLD_W * d * mag, 3), round(ITEM_GOLD_W * mag, 3)
-        mag = _magnitude(text, badge_html, kind, ctx)
-        return round(w * d * mag, 3), round(w * mag, 3)
+        val = _row_value(text, badge_html, kind, ctx) * cm
+        return round(d * val, 3), round(val, 3)
     if "rework" in tags:
         return 0.0, round(w, 3)
     if tags == {"new"}:

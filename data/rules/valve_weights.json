@@ -130,47 +130,201 @@
   "projectile": 100
  },
  "typical_pct": {
-  "_doc": "non-base rows: magnitude = mean|%| / typical_pct[type] (fallback 20). cost is manual.",
-  "move_speed": 9.5,
-  "attack_speed": 11.1,
-  "base_damage": 11.5,
-  "mana_cost": 11.8,
-  "cast_range": 13.8,
-  "stats": 14.2,
-  "silence": 14.5,
-  "range": 15.0,
-  "duration": 16.7,
-  "crit": 16.7,
-  "cooldown": 17.7,
-  "damage": 17.8,
-  "gold_xp": 19.6,
+  "_doc": "non-base rows: magnitude = mean|%| / typical_pct[type] (fallback 20). Median |%| of numeric ability/talent/item events 7.08-7.41e classified by patch/weights.py (n>=40). cost manual.",
+  "health": 20.0,
+  "damage": 16.7,
+  "cooldown": 15.4,
+  "mana": 20.0,
+  "duration": 19.4,
+  "other": 20.5,
+  "cost": 5.0,
+  "range": 14.3,
+  "mana_cost": 13.1,
   "slow": 20.0,
-  "stun": 20.0,
-  "projectile": 20.0,
+  "move_speed": 20.0,
+  "evasion": 33.3,
+  "gold_xp": 25.6,
+  "stats": 20.0,
+  "cast_point": 36.5,
+  "charges": 25.0,
+  "spell_amp": 25.0,
   "armor": 21.7,
-  "charges": 21.7,
-  "lifesteal": 21.9,
+  "cast_range": 33.3,
+  "stun": 25.0,
   "magic_res": 23.4,
-  "health": 25.0,
-  "mana": 25.0,
-  "vision": 25.1,
-  "cast_point": 42.9,
-  "cost": 5.0
+  "status_res": 25.0,
+  "attack_speed": 33.3,
+  "chance": 20.0,
+  "lifesteal": 20.0
  },
  "context": {
-  "_doc": "multiplier by where the row lives: ultimate, basic ability, talent level, facet, shard, scepter, innate, base stat, item",
+  "_doc": "multiplier by where the row lives. Talents below 1.0 on purpose: talent bonuses are small absolute numbers, so their % changes (and thus J values) run large; ultimate 1.3, basic ability/innate/scepter/base stat/item 1.0, shard 0.9, facet 0.8, talent 10/15/20/25 = 0.5/0.6/0.7/0.8",
   "ultimate": 1.3,
   "ability": 1.0,
   "innate": 1.0,
   "facet": 0.8,
   "shard": 0.9,
   "scepter": 1.0,
-  "talent10": 0.6,
-  "talent15": 0.8,
-  "talent20": 1.0,
-  "talent25": 1.2,
+  "talent10": 0.5,
+  "talent15": 0.6,
+  "talent20": 0.7,
+  "talent25": 0.8,
   "base_stat": 1.0,
   "item": 1.0
  },
- "magnitude_cap": 3.0
+ "magnitude_cap": 3.0,
+ "J": {
+  "_doc": "Signal J — exchange rate: log u_X - log u_Y = log(nerf%) - log(buff%) over Valve's buff<->nerf compensation pairs (cde_dynamics.json, 3 865 pairs, types with >=30 sides), ridge-free least squares, anchor mean log u = 0; ci = 95% bootstrap. u = value of +1% of the type. Used for % rows: value = u * mean|%| / 20.",
+  "pairs": 3865,
+  "u": {
+   "armor": 0.818,
+   "attack_speed": 1.473,
+   "base_damage": 2.795,
+   "cast_point": 0.458,
+   "cast_range": 1.159,
+   "charges": 0.759,
+   "cooldown": 1.186,
+   "crit": 1.311,
+   "damage": 1.063,
+   "duration": 1.135,
+   "gold_xp": 0.839,
+   "health": 0.637,
+   "lifesteal": 0.692,
+   "magic_res": 0.475,
+   "mana": 0.729,
+   "mana_cost": 1.418,
+   "move_speed": 2.109,
+   "projectile": 0.928,
+   "range": 1.247,
+   "silence": 1.185,
+   "slow": 0.777,
+   "stats": 1.212,
+   "stun": 0.965,
+   "vision": 0.823
+  },
+  "ci": {
+   "armor": [
+    0.67,
+    1.01
+   ],
+   "attack_speed": [
+    1.24,
+    1.7
+   ],
+   "base_damage": [
+    2.3,
+    3.31
+   ],
+   "cast_point": [
+    0.4,
+    0.53
+   ],
+   "cast_range": [
+    1.01,
+    1.36
+   ],
+   "charges": [
+    0.62,
+    0.93
+   ],
+   "cooldown": [
+    1.07,
+    1.3
+   ],
+   "crit": [
+    0.98,
+    1.7
+   ],
+   "damage": [
+    0.98,
+    1.16
+   ],
+   "duration": [
+    1.01,
+    1.28
+   ],
+   "gold_xp": [
+    0.58,
+    1.28
+   ],
+   "health": [
+    0.55,
+    0.73
+   ],
+   "lifesteal": [
+    0.48,
+    1.04
+   ],
+   "magic_res": [
+    0.31,
+    0.7
+   ],
+   "mana": [
+    0.51,
+    1.11
+   ],
+   "mana_cost": [
+    1.26,
+    1.61
+   ],
+   "move_speed": [
+    1.77,
+    2.43
+   ],
+   "projectile": [
+    0.73,
+    1.14
+   ],
+   "range": [
+    1.1,
+    1.4
+   ],
+   "silence": [
+    0.84,
+    1.57
+   ],
+   "slow": [
+    0.66,
+    0.91
+   ],
+   "stats": [
+    1.08,
+    1.36
+   ],
+   "stun": [
+    0.82,
+    1.13
+   ],
+   "vision": [
+    0.56,
+    1.15
+   ]
+  },
+  "n": {
+   "armor": 116,
+   "attack_speed": 204,
+   "base_damage": 555,
+   "cast_point": 230,
+   "cast_range": 333,
+   "charges": 116,
+   "cooldown": 908,
+   "crit": 56,
+   "damage": 1233,
+   "duration": 593,
+   "gold_xp": 56,
+   "health": 365,
+   "lifesteal": 62,
+   "magic_res": 40,
+   "mana": 51,
+   "mana_cost": 634,
+   "move_speed": 278,
+   "projectile": 123,
+   "range": 473,
+   "silence": 50,
+   "slow": 273,
+   "stats": 765,
+   "stun": 272,
+   "vision": 43
+  }
+ }
 }

@@ -20,6 +20,34 @@ w, v       = Σ rows of the entity in that patch  →  _dynamics.json patches[ve
 | direction | tags | buff +1, nerf −1, sole `new` +0.5, sole `del` −0.5, rework/misc/qol 0 |
 | magnitude | hybrid | GENERAL rows: `|Δ| / typical_step` (MS 5, base dmg 3, stats 2, stat gain 0.2, armor 1, HP regen 0.5, mana regen 0.25 …). Other rows: `mean|%| / typical_pct[type]` (signal C medians: cooldown 17.7, damage 17.8, health 25, cast_point 42.9 …); 0% badges count; "Recipe … Total cost …" uses the total. Cap 3. No badge → 1.0 |
 
+## Signal J — Valve's exchange rate (done 2026-09-16)
+
+From the 3 865 buff↔nerf compensation pairs inside one (hero, patch) (`cde_dynamics.json`): if Valve gives
++b % of X and takes −n % of Y in the same breath, then `value(X)·b ≈ value(Y)·n`. Least squares on
+`log u_X − log u_Y = log n − log b` (anchor: mean log u = 0), 200-sample bootstrap for the CI. `u` = value of
++1 % of the type. Stored in `valve_weights.json → J`.
+
+| type | u | 95 % CI | | type | u | 95 % CI |
+|---|---|---|---|---|---|---|
+| base_damage | 2.80 | 2.30–3.31 | | stun | 0.97 | 0.82–1.13 |
+| move_speed | 2.11 | 1.77–2.43 | | projectile | 0.93 | 0.73–1.14 |
+| attack_speed | 1.47 | 1.24–1.70 | | armor | 0.82 | 0.67–1.01 |
+| mana_cost | 1.42 | 1.26–1.61 | | slow | 0.78 | 0.66–0.91 |
+| crit | 1.31 | 0.98–1.70 | | charges | 0.76 | 0.62–0.93 |
+| range | 1.25 | 1.10–1.40 | | lifesteal | 0.69 | 0.48–1.04 |
+| stats | 1.21 | 1.08–1.36 | | health | 0.64 | 0.55–0.73 |
+| cooldown | 1.19 | 1.07–1.30 | | magic_res | 0.48 | 0.31–0.70 |
+| damage | 1.06 | 0.98–1.16 | | cast_point | 0.46 | 0.40–0.53 |
+
+**How it is used:** for every row with % badges the value is now `u[type] × mean|%| / 20` (a 20 % change of
+a u = 1 type = 1.0) — this replaces `weight × magnitude` for those rows, because J measures exactly "how much
+of X Valve trades for how much of Y". Base-stat rows (typical step), rows without numbers and types without
+J keep the consensus weight. Talent multipliers lowered to 0.5/0.6/0.7/0.8 (talent bonuses are small
+numbers, so their % swings are huge). Classifier: last-matching category in the trimmed parameter name
+("Movement speed bonus **duration**" → duration), ties to the earlier category ("Bolt Speed" → projectile).
+
+Re-checked after the change: revert backtest Q1→Q5 = 4.6 % → 11.2 %; `corr(w, buff−nerf)` 0.85 → 0.83.
+
 ## Items — gold scale (review E.6, done 2026-09-16)
 
 Item rows that change a **priced stat** ("Mana Regen bonus +0.8 → +0.6") or the **total cost** are scored in
@@ -46,7 +74,7 @@ the number is dominated by how many rows Valve wrote; volume `v` is the honest p
 
 ## Open / next
 1. ~~Items in gold~~ done.
-2. Signal J "exchange rate" from compensation pairs as a second source of relative weights — review E.7.
+2. ~~Signal J~~ done (now the main source for % rows).
 3. Formula rows (per-level badges): take the magnitude at the level `b()` used for the direction — review F.6.
 4. Manual-annotation agreement test (100–150 rows, 3 grades) — review E.8.2.
 5. Niche parameters hitting the cap (e.g. "invisibility linger 2s→1s" = −1.83 for Treant 7.41f): consider a lower cap or per-type caps.
