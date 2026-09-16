@@ -39,6 +39,7 @@ CAT = [
     ("slow_res", r"slow resist"), ("slow", r"slow"), ("status_res", r"status resist"),
     ("spell_amp", r"spell amp|spell damage amp"),
     ("attack_speed", r"attack speed|base attack time|\bbat\b"),
+    ("projectile", r"projectile|missile"),
     ("move_speed", r"movement speed|move speed|movespeed|movement|\bms\b|\bspeed\b"),
     ("evasion", r"evasion|dodge|backtrack|miss chance"),
     ("magic_res", r"magic resist|magical resist|spell block"),
@@ -54,7 +55,6 @@ CAT = [
     ("damage", r"damage|dmg|dps|burn|cleave"),
     ("duration", r"duration|\btime\b|lasts|linger|channel"),
     ("range", r"radius|range|distance|\baoe\b|\barea\b|width|length"),
-    ("projectile", r"projectile|missile"),
     ("bkb_pierce", r"pierce|debuff immun|spell immun|magic immun|dispel"),
     ("chance", r"chance|probability"),
 ]
