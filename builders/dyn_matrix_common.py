@@ -429,9 +429,6 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
                   'Collapse each cell to two bands — buff + NEW (green) vs nerf + '
                   'DEL (red); rework/misc/qol drop out of the colour (hover still '
                   'shows every tag)', False)
-        + _switch('hd-weights', 'Weights',
-                  'Show each cell as its weighted score (Valve revealed-preference '
-                  'weights x direction x size) and a per-row sparkline', False)
         + price_block
         + remove_block
         + search_block
@@ -469,6 +466,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         f'<tbody>\n{chr(10).join(rows)}\n</tbody>\n'
         '</table>\n</div>\n</div>\n'
         f'<script defer src="src/scripts.js?v={_site.compute_asset_version()}"></script>\n'
+        '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores" title="Dynamics: weighted scores (Valve revealed-preference weights)"></button>\n'
         '</body>\n</html>\n'
     )
     dist = _os.path.join(_HERE, "dist")

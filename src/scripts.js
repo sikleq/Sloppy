@@ -764,18 +764,6 @@
     const a = Math.abs(w);
     return (w < 0 ? '\u2212' : '') + (a >= 10 ? a.toFixed(0) : a.toFixed(1));
   }
-  // Matrix weights mode: the cell is a bar on the row's own axis (a thin baseline
-  // through the middle of every cell); up = positive, down = negative, |w| capped at 4.
-  function dynWeightBar(w) {
-    const rgb = w > 0 ? DYN_TAG_RGB.buff : DYN_TAG_RGB.nerf;
-    const h = Math.max(4, Math.round(Math.min(Math.abs(w), 4) / 4 * 46));
-    const col = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.92)`;
-    const bar = w >= 0
-      ? `linear-gradient(to top, transparent 50%, ${col} 50%, ${col} ${50 + h}%, transparent ${50 + h}%)`
-      : `linear-gradient(to top, transparent ${50 - h}%, ${col} ${50 - h}%, ${col} 50%, transparent 50%)`;
-    const axis = 'linear-gradient(rgba(190, 200, 215, 0.35), rgba(190, 200, 215, 0.35)) center / 100% 1px no-repeat';
-    return `${bar}, ${axis}`;
-  }
   function dynWeightTint(w) {
     const rgb = w > 0 ? DYN_TAG_RGB.buff : (w < 0 ? DYN_TAG_RGB.nerf : [110, 110, 110]);
     const alpha = Math.min(0.9, 0.25 + Math.min(Math.abs(w), 4) * 0.16);
@@ -825,9 +813,10 @@
     wrap.appendChild(cell);
     if (wMode && origTotal) {
       const w = counts.w || 0;
-      if (filePrefix === 'patches/') {          // matrix: bar on the row axis
-        wrap.classList.add('w-mode', 'w-bar');
-        cell.style.background = dynWeightBar(w);
+      if (filePrefix === 'patches/') {          // matrix: segment of the row's line chart
+        wrap.classList.add('w-mode', 'w-line');
+        cell.style.background = 'none';
+        cell.dataset.w = String(w);
       } else {                                  // patch page: the number
         wrap.classList.add('w-mode');
         cell.textContent = dynFmtW(w);
@@ -912,7 +901,7 @@
     if (counts && counts.w !== undefined) {
       header.classList.add('has-score');
       const sc = document.createElement('span');
-      sc.className = 'dyn-tip-score';
+      sc.className = 'dyn-tip-score ' + (counts.w > 0 ? 'pos' : (counts.w < 0 ? 'neg' : 'zero'));
       sc.textContent = (counts.w > 0 ? '+' : '') + counts.w.toFixed(1);
       header.appendChild(sc);
     }
@@ -1029,6 +1018,49 @@
       // the matrix lives at site root, patch pages under /patches.
       const debut = td.dataset.debut === '1';
       td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed, debut, wMode));
+    });
+    if (wMode) dynDrawRowLines(table);
+  }
+
+  // Weights mode on the matrices: every row is a line chart with the row itself
+  // as the x axis (thin baseline through every cell). Each touched cell holds the
+  // segment left-edge -> centre (its score) -> right-edge; the edge value is the
+  // mean with the neighbouring touched cell, or 0 when the neighbour column is
+  // untouched (that cell only draws the baseline), so segments always meet.
+  const DYN_W_CAP = 4;
+  function dynDrawRowLines(table) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const S = 28, mid = S / 2, amp = mid - 3;
+    const yOf = v => mid - Math.max(-DYN_W_CAP, Math.min(DYN_W_CAP, v)) / DYN_W_CAP * amp;
+    table.querySelectorAll('tbody tr').forEach(tr => {
+      const tds = [...tr.children].filter(td => td.matches('td.hd-cell, td.he, td.ha'));
+      const vals = tds.map(td => {
+        const c = td.querySelector('.w-line .dyn-cell');
+        return c ? parseFloat(c.dataset.w) || 0 : (td.matches('td.he, td.hd-empty') ? 0 : null);
+      });
+      tds.forEach((td, i) => {
+        const c = td.querySelector('.w-line .dyn-cell');
+        if (!c) return;
+        const v = vals[i];
+        const edge = j => (j < 0 || j >= vals.length || vals[j] === null) ? 0
+                        : (tds[j].querySelector('.w-line') ? (vals[j] + v) / 2 : 0);
+        const yl = yOf(edge(i - 1)), yc = yOf(v), yr = yOf(edge(i + 1));
+        const svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('viewBox', `0 0 ${S} ${S}`);
+        svg.setAttribute('class', 'dyn-wl ' + (v > 0 ? 'up' : (v < 0 ? 'down' : 'flat')));
+        const axis = document.createElementNS(NS, 'line');
+        axis.setAttribute('x1', '0'); axis.setAttribute('x2', String(S));
+        axis.setAttribute('y1', String(mid)); axis.setAttribute('y2', String(mid));
+        axis.setAttribute('class', 'axis');
+        svg.appendChild(axis);
+        const pl = document.createElementNS(NS, 'polyline');
+        pl.setAttribute('points', `0,${yl.toFixed(1)} ${mid},${yc.toFixed(1)} ${S},${yr.toFixed(1)}`);
+        svg.appendChild(pl);
+        const dot = document.createElementNS(NS, 'circle');
+        dot.setAttribute('cx', String(mid)); dot.setAttribute('cy', yc.toFixed(1)); dot.setAttribute('r', '2.4');
+        svg.appendChild(dot);
+        c.appendChild(svg);
+      });
     });
   }
 
@@ -1187,7 +1219,7 @@
   function dynSetupMatrix(table, manifest) {
     const elOld = document.getElementById('hd-hide-old');
     const elBn = document.getElementById('hd-bn-only');
-    const elW = document.getElementById('hd-weights');
+    const elW = document.getElementById('dyn-weights-btn');
     const removed = new Set();                 // tags the user toggled off (Remove chips)
     const chips = [...table.closest('.creeps-page').querySelectorAll('.hd-tag[data-tag]')];
     const layout = () => {
@@ -1196,9 +1228,13 @@
       // divider (a separate IIFE) to re-anchor after this layout pass.
       window.dispatchEvent(new CustomEvent('mr:filter-changed'));
     };
-    const refill = () => dynFillMatrix(table, manifest, !!(elBn && elBn.checked), removed, !!(elW && elW.checked));
+    const refill = () => dynFillMatrix(table, manifest, !!(elBn && elBn.checked), removed, !!(elW && elW.classList.contains('active')));
     refill();
-    if (elW) elW.addEventListener('change', () => { table.classList.toggle('w-mode', elW.checked); refill(); });
+    if (elW) elW.addEventListener('click', () => {
+      const on = elW.classList.toggle('active');
+      table.classList.toggle('w-mode', on);
+      refill();
+    });
     layout();
     if (elOld) elOld.addEventListener('change', layout);
 
@@ -1360,8 +1396,8 @@
           };
           // "Weights" toggle (toolbar): flip the mode and rebuild every row already built.
           const wBtn = document.getElementById('dyn-weights-btn');
-          if (wBtn) wBtn.addEventListener('change', () => {
-            dynWeightsOn = wBtn.checked;
+          if (wBtn) wBtn.addEventListener('click', () => {
+            dynWeightsOn = wBtn.classList.toggle('active');
             document.body.classList.toggle('dyn-weights', dynWeightsOn);
             document.querySelectorAll('.entity[id^="dyn-"][data-dyn-built]').forEach(e => {
               const old = e.querySelector('.dyn-row-wrap');

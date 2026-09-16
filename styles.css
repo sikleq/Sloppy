@@ -1400,7 +1400,8 @@ body:has(.creeps-page) nav.top-nav {
    the tag block). url() is relative to styles.css (repo root) → works on every
    page regardless of depth. */
 .nav-back-arrow,
-.back-to-top {
+.back-to-top,
+.dyn-w-fab {
   position: fixed;
   bottom: 22px;
   width: 42px;
@@ -1441,8 +1442,30 @@ body:has(.creeps-page) nav.top-nav {
 }
 .nav-back-arrow.visible,
 .back-to-top.visible { display: block; }
+/* Weights toggle: same round gold button as back-to-top, sits above it and is
+   ALWAYS shown (it is a mode switch, not a scroll helper). Icon = pixel balance
+   scale. Active = filled gold disc with a dark icon. */
+.dyn-w-fab {
+  right: 22px;
+  bottom: 74px;
+  display: block;
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="9" y="0" width="2" height="14"/><rect x="2" y="3" width="16" height="2"/><rect x="2" y="5" width="2" height="4"/><rect x="16" y="5" width="2" height="4"/><rect x="0" y="9" width="6" height="2"/><rect x="14" y="9" width="6" height="2"/><rect x="6" y="14" width="8" height="2"/><rect x="4" y="16" width="12" height="2"/></g></svg>'),
+    linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  background-size: 20px auto, cover;
+}
+.dyn-w-fab.active {
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 18" shape-rendering="crispEdges"><g fill="%231a1408"><rect x="9" y="0" width="2" height="14"/><rect x="2" y="3" width="16" height="2"/><rect x="2" y="5" width="2" height="4"/><rect x="16" y="5" width="2" height="4"/><rect x="0" y="9" width="6" height="2"/><rect x="14" y="9" width="6" height="2"/><rect x="6" y="14" width="8" height="2"/><rect x="4" y="16" width="12" height="2"/></g></svg>'),
+    linear-gradient(180deg, #e9cd74 0%, #c9a648 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 5px 16px var(--shadow-55),
+    0 0 0 3px rgba(227, 196, 106, 0.22);
+}
 .nav-back-arrow:hover,
-.back-to-top:hover {
+.back-to-top:hover,
+.dyn-w-fab:hover {
   transform: translateY(-3px);
   filter: brightness(1.18);
   box-shadow:
@@ -9747,13 +9770,25 @@ a.whatsnew-row:hover {
 .dyn-cell-wrap.w-mode:not(.empty):hover .dyn-cell {
   font-size: 5px;   /* hover scale(2.5) blows the digits up - keep them legible, not huge */
 }
-/* Matrices: every cell is a bar on the row's own axis; JS paints the bar + the
-   1px baseline as the background, and the untouched cells draw the same baseline
-   so the whole row reads as one chart. */
-.heroes-dyn-table .dyn-cell-wrap.w-bar .dyn-cell {
+/* Matrices: every row is a line chart on its own axis (see dynDrawRowLines).
+   Touched cells hold an SVG segment; untouched cells draw just the baseline. */
+.heroes-dyn-table .dyn-cell-wrap.w-line .dyn-cell {
   box-shadow: none;
   border-radius: 0;
+  overflow: visible;
 }
+.heroes-dyn-table .dyn-cell-wrap.w-line .dyn-wl {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.dyn-wl .axis { stroke: rgba(190, 200, 215, 0.35); stroke-width: 1; }
+.dyn-wl polyline { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.dyn-wl.up polyline, .dyn-wl.up circle { stroke: rgb(62, 178, 96); fill: rgb(62, 178, 96); }
+.dyn-wl.down polyline, .dyn-wl.down circle { stroke: rgb(214, 74, 66); fill: rgb(214, 74, 66); }
+.dyn-wl.flat polyline, .dyn-wl.flat circle { stroke: rgb(160, 165, 175); fill: rgb(160, 165, 175); }
+.dyn-wl polyline { fill: none !important; }
 .heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
 .heroes-dyn-table.w-mode td.he::after {
   height: 1px;
@@ -9768,12 +9803,9 @@ a.whatsnew-row:hover {
   gap: 12px;
 }
 .dyn-tip-score {
-  font-weight: 600;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-/* Patch-page toolbar: the same switch component the table pages use. */
-.legend-tags .dyn-w-toggle {
-  margin-left: 10px;
-  padding: 3px 8px;
-  font-size: 11.5px;
-}
+.dyn-tip-score.pos { color: rgb(88, 200, 118); }
+.dyn-tip-score.neg { color: rgb(232, 96, 88); }
+.dyn-tip-score.zero { color: rgba(200, 205, 215, 0.8); }

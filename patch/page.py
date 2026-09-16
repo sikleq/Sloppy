@@ -59,7 +59,6 @@ def write_head(version, date):
         <button class="badge rework filter-btn" data-filter="rework">REWORK</button>
         <button class="badge misc filter-btn" data-filter="misc">MISC</button>
         <button class="badge qol filter-btn" data-filter="qol">QoL</button>
-        <label class="ua-upgrades-toggle dyn-w-toggle"><span class="ua-upgrades-label">Weights</span><input type="checkbox" id="dyn-weights-btn" class="ua-switch-input"><span class="ua-switch" aria-hidden="true"></span></label>
       </div>
       <div class="legend-categories"><!--CATEGORIES_BAR--></div>
     </div>
@@ -81,6 +80,7 @@ def write_footer():
         W('</section>')
         _State.section_panel_open = False
     W('<button class="back-to-top" aria-label="Back to top" title="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>')
+    W('<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores" title="Dynamics: weighted scores (Valve revealed-preference weights)"></button>')
     W(f'<script defer src="../src/scripts.js?v={_ASSET_VERSION}"></script>')
     W('</div></body></html>')
 
