@@ -11,14 +11,19 @@
                when fewer than 3 signals back the type: w = other + (raw − other) × n/3).
   direction  — +1 buff, −1 nerf, ±0.5 new/del (only when it is the row's sole tag),
                0 rework/misc/qol.
-  magnitude  — mean |%| over the row's per-level badges INCLUDING 0% ones, clamped to
-               MAG_CAP and divided by 25 (25% = 1.0). "Recipe … Total cost …" rows use
-               the total-cost badge only. Rows without a % badge count as 1.0.
+  magnitude  — HYBRID. Hero base-stat rows (GENERAL block): |delta| / typical Valve step
+               for that stat (signal F: MS 5, base damage 3, stats 2, armor 1, …), so
+               "Base Armor -1" is 1.0 for every hero. Other rows: mean |%| over the row's
+               badges (0% included; "Recipe … Total cost …" -> total only) divided by the
+               type's typical |%| (signal C medians), so a typical change is 1.0. Cap 3.
+               Rows without a % badge count as 1.0.
+  context    — multiplier by where the row lives (data/rules/valve_weights.json "context"):
+               ultimate 1.3, basic ability/innate/scepter/base stat/item 1.0, shard 0.9,
+               facet 0.8, talent 10/15/20/25 = 0.6/0.8/1.0/1.2.
   volume     — buff/nerf/new/del rows: weight × magnitude; rework rows: weight × 1.0
                (a rework is a big, sign-less decision); misc/qol: 0.
 
-Decisions 2026-09-16 (Денис): two scales (net + volume), hybrid magnitude (typical Valve
-step for base stats — TODO next step, % for the rest).
+Decisions 2026-09-16 (Денис): two scales (net + volume), hybrid magnitude.
 """
 import json as _json
 import os as _os
@@ -90,22 +95,104 @@ def weight_of(kind):
     return _W.get(kind, _W["other"])
 
 
-def _magnitude(text, badge_html):
-    pcts = [abs(float(x.replace("−", "-"))) for x in _PCT_RE.findall(badge_html or "")]
+_STEP = _WJ.get("typical_step", {})
+_TPCT = _WJ.get("typical_pct", {})
+_CTX = _WJ.get("context", {})
+MAG_CAP_NORM = float(_WJ.get("magnitude_cap", 3.0))
+# hero GENERAL rows -> which typical step applies (order matters)
+BASE_STAT_RE = [
+    ("stats_gain", r"(strength|agility|intelligence)\s+gain"),
+    ("stats", r"strength|agility|intelligence"),
+    ("health_regen", r"health regen"), ("mana_regen", r"mana regen"),
+    ("bat", r"base attack time|\bbat\b"), ("attack_speed", r"attack speed"),
+    ("attack_range", r"attack range"), ("projectile", r"projectile"),
+    ("magic_res", r"magic resist"), ("turn_rate", r"turn rate"), ("vision", r"vision"),
+    ("move_speed", r"movement speed|move speed"), ("base_damage", r"damage"),
+    ("armor", r"armor"), ("health", r"health"), ("mana", r"mana"),
+]
+_BASE_STAT = [(k, _re.compile(rx, _re.I)) for k, rx in BASE_STAT_RE]
+_FROMTO_RE = _re.compile(r"from\s+(-?\d+(?:\.\d+)?)\S*\s+to\s+(-?\d+(?:\.\d+)?)", _re.I)
+_BYN_RE = _re.compile(r"\bby\s+(-?\d+(?:\.\d+)?)", _re.I)
+_ULT_CACHE = {}
+
+
+def ultimates():
+    """Engine slugs of every ultimate in the latest KV snapshot (data/stats/<latest>/heroes)."""
+    if _ULT_CACHE:
+        return _ULT_CACHE["set"]
+    import glob as _glob
+    from .meta import latest_stats_version
+    out = set()
+    for f in _glob.glob(_os.path.join(_HERE, "data", "stats", latest_stats_version(), "heroes", "*.txt")):
+        t = open(f, encoding="utf-8", errors="replace").read()
+        for m in _re.finditer(r'"([a-z_0-9]+)"\s*\{(?:[^{}]|\{[^{}]*\})*?"AbilityType"\s*"(?:DOTA_)?ABILITY_TYPE_ULTIMATE"', t):
+            out.add(m.group(1))
+    _ULT_CACHE["set"] = out
+    return out
+
+
+def context_multiplier(ctx):
+    if not ctx:
+        return 1.0
+    if ctx.get("kind") == "item":
+        return _CTX.get("item", 1.0)
+    if ctx.get("talent"):
+        return _CTX.get(f"talent{ctx['talent']}", 1.0)
+    if ctx.get("base_stat"):
+        return _CTX.get("base_stat", 1.0)
+    if ctx.get("facet"):
+        return _CTX.get("facet", 1.0)
+    if ctx.get("shard"):
+        return _CTX.get("shard", 1.0)
+    if ctx.get("scepter"):
+        return _CTX.get("scepter", 1.0)
+    if ctx.get("innate"):
+        return _CTX.get("innate", 1.0)
+    if ctx.get("ability") and ctx["ability"] in ultimates():
+        return _CTX.get("ultimate", 1.0)
+    return _CTX.get("ability", 1.0)
+
+
+def _base_stat_magnitude(text):
+    """Hero GENERAL row: |delta| / typical Valve step (signal F). None if unparsable."""
+    t = _plain(text)
+    key = next((k for k, rx in _BASE_STAT if rx.search(t)), None)
+    step = _STEP.get(key) if key else None
+    if not step:
+        return None
+    m = _FROMTO_RE.search(t)
+    if m:
+        delta = abs(float(m.group(2)) - float(m.group(1)))
+    else:
+        m = _BYN_RE.search(t)
+        if not m:
+            return None
+        delta = abs(float(m.group(1)))
+    return delta / step
+
+
+def _magnitude(text, badge_html, kind, ctx=None):
+    """Hybrid: base-stat rows by Valve's typical step; everything else by mean |%| over the
+    row's badges (0% included; recipe+total -> total) divided by the type's typical |%|."""
+    if ctx and ctx.get("base_stat"):
+        m = _base_stat_magnitude(text)
+        if m is not None:
+            return min(m, MAG_CAP_NORM)
+    pcts = [abs(float(x.replace("\u2212", "-"))) for x in _PCT_RE.findall(badge_html or "")]
     if not pcts:
         return 1.0
     if len(pcts) >= 2 and _re.search(r"total cost", _plain(text), _re.I):
-        pcts = [pcts[-1]]                       # recipe + total: the total is the real change
-    return min(sum(pcts) / len(pcts), MAG_CAP) / 25.0
+        pcts = [pcts[-1]]
+    return min((sum(pcts) / len(pcts)) / _TPCT.get(kind, 20.0), MAG_CAP_NORM)
 
 
-def row_scores(text, tags, badge_html=""):
+def row_scores(text, tags, badge_html="", ctx=None):
     """(net, volume) of one row; both 0.0 when the row is not scorable."""
     kind = classify(text)
-    w = weight_of(kind)
+    w = weight_of(kind) * context_multiplier(ctx)
     if "buff" in tags or "nerf" in tags:
         d = _DIR["buff"] if "buff" in tags else _DIR["nerf"]
-        mag = _magnitude(text, badge_html)
+        mag = _magnitude(text, badge_html, kind, ctx)
         return round(w * d * mag, 3), round(w * mag, 3)
     if "rework" in tags:
         return 0.0, round(w, 3)

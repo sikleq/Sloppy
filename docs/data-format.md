@@ -151,13 +151,11 @@ on the row directly (e.g. flip `t("BUFF")` → `t("NERF")`, drop the badge for a
 neutral clarification, or add `l=True` to a cost row). Review the scaffold before
 saving it as a content module.
 
-## Dynamics "Weights" mode (`_dynamics.json` bucket key `w`)
+## Dynamics "Weights" mode (`_dynamics.json` bucket keys `w`, `v`)
 
-Each `(entity, patch)` bucket carries the tag counts **and** `w` — the summed weighted score of the
-rows (`patch/weights.py`): `weight(type) × direction × magnitude`, where the type is classified from
-the row text (ordered regex table shared with `outputs/valve-revealed-weights-20260915`), the weight
-comes from `data/rules/valve_weights.json` (Valve revealed-preference consensus, 0..1), direction is
-+1 buff / −1 nerf / ±0.5 new/del / 0 otherwise, and magnitude = mean |%| over the row's per-level badges, capped at 50 and divided by 25 (rows without a % badge count as 1.0). Per-patch values, not cumulative.
-UI: the `WEIGHTS` button on patch pages and the `Weights` switch on heroes_dyn / items_dyn replace
-each diamond with the number (green/red tint by sign) and, on the matrices, append a per-row bar
-sparkline (oldest → newest) to the name cell. Hover tooltips always show the score.
+Each `(entity, patch)` bucket carries the tag counts **and** two scores: `w` — net balance (signed) and
+`v` — volume of changes (unsigned, reworks included). Formula, sources and the backtest live in
+[weights.md](weights.md); the independent review in [weights-review.md](weights-review.md).
+UI: the gold weights button (patch pages: floating above "back to top"; matrices: in the filter panel next
+to the attribute filters). Patch pages show `w` in the cell; matrices draw each row as a line chart on its
+own axis; tooltips show `w / v` in the header.

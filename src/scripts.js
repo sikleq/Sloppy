@@ -898,11 +898,14 @@
     const header = document.createElement('span');
     header.className = 'dyn-tip-header';
     header.textContent = `${patch.version}`;
-    if (counts && counts.w !== undefined) {
+    if (counts && (counts.w !== undefined || counts.v !== undefined)) {
+      if (counts.w === undefined) counts.w = 0;
       header.classList.add('has-score');
       const sc = document.createElement('span');
       sc.className = 'dyn-tip-score ' + (counts.w > 0 ? 'pos' : (counts.w < 0 ? 'neg' : 'zero'));
-      sc.textContent = (counts.w > 0 ? '+' : '') + counts.w.toFixed(1);
+      sc.textContent = (counts.w > 0 ? '+' : '') + counts.w.toFixed(1)
+        + (counts.v !== undefined ? ' / ' + counts.v.toFixed(1) : '');
+      sc.title = 'net balance / volume of changes';
       header.appendChild(sc);
     }
     tip.appendChild(header);
