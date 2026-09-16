@@ -9758,14 +9758,15 @@ a.whatsnew-row:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: inherit;
-  font-size: 8.5px;
+  font-family: Radiance, "Segoe UI", Arial, sans-serif;
+  font-size: 9px;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: -0.3px;
+  letter-spacing: 0;
   font-variant-numeric: tabular-nums;
-  color: var(--text-bright, #fff);
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+  color: #fff;
+  /* dark halo so the digits stay readable on bright green/red/gold fills */
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.9), 0 1px 1px rgba(0, 0, 0, 0.8);
 }
 .dyn-cell-wrap.w-mode:not(.empty):hover .dyn-cell {
   font-size: 5px;   /* hover scale(2.5) blows the digits up - keep them legible, not huge */

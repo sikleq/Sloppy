@@ -72,9 +72,29 @@ Monotone, ×2.5 from Q1 to Q5; raw |%| alone gives 4.0 → 9.2 %, the type weigh
 score carries real (if modest) information beyond the counter. `corr(w, buff−nerf)` per cell is still 0.85 —
 the number is dominated by how many rows Valve wrote; volume `v` is the honest place for that.
 
+## Agreement test (review E.8.2) — 2026-09-17
+
+120 buff/nerf rows, stratified by |score| quintile, graded BLIND (no scores shown) on a 1–5 impact scale by
+an independent judge (LLM analyst persona; Денис can re-grade the same file `outputs/agreement_blind.json`).
+Grades: 1 ×23, 2 ×64, 3 ×29, 4 ×3, 5 ×1. **Spearman ρ(|score|, grade) = 0.21** — weak. Median |score| by
+grade: 0.45 / 0.90 / 0.82 / 0.44 / 1.33 — no monotone rise above grade 2.
+
+Where the model and the judge disagree most:
+- **Tiny absolute changes with big %**: Riki slow 0.4 s → 0.5 s (+25 %) = 1.42, Luna/PA level-10 talents
+  +0.1 s = 1.1–1.2 — judge: 1. The % scale has no notion of "0.1 s is nothing".
+- **Core mechanics the text does not flag**: Meepo clone stats 85 → 90 % (+6 %) = 0.12, Morphling shift rate
+  −20 % = 0.39, Underlord aura reduction +33 % = 0.37 — judge: 3–4.
+- **Base stats**: Spectre BAT 1.7 → 1.8 = 0.52 (one Valve step), judge 4 (carry DPS all game).
+
+Conclusion: the score measures *how large the edit is relative to the parameter*, not *how much the hero
+changes*. The revert backtest says that is still predictive of Valve's own follow-ups (Q1→Q5 4.6 → 11.2 %),
+but it is not "impact". Candidate fixes (need a decision): an absolute floor per unit (durations < 0.5 s,
+talent deltas below one typical step → ×0.5); a per-ability importance prior (ultimates already ×1.3; core
+passives/innates could get a manual list); re-grade by Денис to confirm the judge.
+
 ## Open / next
 1. ~~Items in gold~~ done.
 2. ~~Signal J~~ done (now the main source for % rows).
 3. ~~Formula rows (F.6)~~ done: per-level rows take the |%| of the last non-zero level (max rank) when its direction agrees with the row's tag; when `b()` flipped the tag by the average (front-/back-loaded, early-game cut, flatten) all levels are averaged.
-4. Manual-annotation agreement test (100–150 rows, 3 grades) — review E.8.2.
+4. ~~Agreement test~~ done (ρ = 0.21, see above) — follow-ups pending decision.
 5. Niche parameters hitting the cap (e.g. "invisibility linger 2s→1s" = −1.83 for Treant 7.41f): consider a lower cap or per-type caps.

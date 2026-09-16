@@ -762,7 +762,7 @@
   let dynWeightsOn = false;
   function dynFmtW(w) {
     const a = Math.abs(w);
-    return (w < 0 ? '\u2212' : '') + (a >= 10 ? a.toFixed(1) : a.toFixed(2));
+    return (w < 0 ? '-' : '') + (a >= 10 ? a.toFixed(1) : a.toFixed(2));
   }
   // The mode is remembered across pages (patch pages <-> matrices) in localStorage.
   const DYN_W_KEY = 'sloppy-dyn-weights';
