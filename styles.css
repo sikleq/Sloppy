@@ -9759,10 +9759,10 @@ a.whatsnew-row:hover {
   align-items: center;
   justify-content: center;
   font-family: inherit;
-  font-size: 9.5px;
+  font-size: 8.5px;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
   font-variant-numeric: tabular-nums;
   color: var(--text-bright, #fff);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);

@@ -76,6 +76,26 @@ _QUAL_RE = _re.compile(r"\s+(?:on|when|while|against|per|for|to|in|with|during|a
 _VERB_RE = _re.compile(r"\b(increased|decreased|reduced|improved|rescaled|changed|lowered|raised|"
                        r"replaced|now|no longer|removed|added)\b", _re.I)
 _PCT_RE = _re.compile(r'class="badge (?:(?:buff|nerf)\d+|neutral)">([+\-−]?\d+(?:\.\d+)?)%<')
+_PCT_CLS_RE = _re.compile(r'class="badge (buff|nerf|neutral)\d*">([+\-−]?\d+(?:\.\d+)?)%<')
+_OVERALL_RE = _re.compile(r'data-overall="(buff|nerf)"')
+
+
+def _row_pcts(text, badge_html):
+    """|%| values that define the row's size (review F.6): for per-level rows take the badge
+    at the level b() used for the DIRECTION — the last non-zero level (max rank) when its
+    direction agrees with the row's overall tag; when b() flipped the tag by the average
+    (front-/back-loaded, early-game cut, flatten) use all levels. Recipe+total -> total."""
+    found = [(c, abs(float(v.replace("−", "-")))) for c, v in _PCT_CLS_RE.findall(badge_html or "")]
+    if not found:
+        return []
+    if len(found) >= 2 and _re.search(r"total cost", _plain(text), _re.I):
+        return [found[-1][1]]
+    if len(found) >= 2:
+        overall = _OVERALL_RE.search(badge_html or "")
+        last = next(((c, v) for c, v in reversed(found) if c != "neutral"), None)
+        if last and overall and last[0] == overall.group(1):
+            return [last[1]]
+    return [v for _, v in found]
 _DIR = {"buff": 1.0, "nerf": -1.0}
 MAG_CAP = 50.0
 
@@ -291,9 +311,7 @@ def _row_value(text, badge_html, kind, ctx):
         m = _base_stat_magnitude(text)
         if m is not None:
             return weight_of(kind) * min(m, MAG_CAP_NORM)
-    pcts = [abs(float(x.replace("−", "-"))) for x in _PCT_RE.findall(badge_html or "")]
-    if pcts and len(pcts) >= 2 and _re.search(r"total cost", _plain(text), _re.I):
-        pcts = [pcts[-1]]
+    pcts = _row_pcts(text, badge_html)
     if pcts and kind in _J:
         return min(_J[kind] * (sum(pcts) / len(pcts)) / J_PCT_UNIT, MAG_CAP_NORM)
     if pcts:

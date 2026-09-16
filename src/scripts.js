@@ -762,8 +762,12 @@
   let dynWeightsOn = false;
   function dynFmtW(w) {
     const a = Math.abs(w);
-    return (w < 0 ? '\u2212' : '') + (a >= 10 ? a.toFixed(0) : a.toFixed(1));
+    return (w < 0 ? '\u2212' : '') + (a >= 10 ? a.toFixed(1) : a.toFixed(2));
   }
+  // The mode is remembered across pages (patch pages <-> matrices) in localStorage.
+  const DYN_W_KEY = 'sloppy-dyn-weights';
+  function dynWeightsStored() { try { return localStorage.getItem(DYN_W_KEY) === '1'; } catch (e) { return false; } }
+  function dynWeightsStore(on) { try { localStorage.setItem(DYN_W_KEY, on ? '1' : '0'); } catch (e) {} }
   function dynWeightTint(w) {
     const rgb = w > 0 ? DYN_TAG_RGB.buff : (w < 0 ? DYN_TAG_RGB.nerf : [110, 110, 110]);
     const alpha = Math.min(0.9, 0.25 + Math.min(Math.abs(w), 4) * 0.16);
@@ -903,8 +907,8 @@
       header.classList.add('has-score');
       const sc = document.createElement('span');
       sc.className = 'dyn-tip-score ' + (counts.w > 0 ? 'pos' : (counts.w < 0 ? 'neg' : 'zero'));
-      sc.textContent = (counts.w > 0 ? '+' : '') + counts.w.toFixed(1)
-        + (counts.v !== undefined ? ' / ' + counts.v.toFixed(1) : '');
+      sc.textContent = (counts.w > 0 ? '+' : '') + counts.w.toFixed(2)
+        + (counts.v !== undefined ? ' / ' + counts.v.toFixed(2) : '');
       sc.title = 'net balance / volume of changes';
       header.appendChild(sc);
     }
@@ -1234,12 +1238,16 @@
       // divider (a separate IIFE) to re-anchor after this layout pass.
       window.dispatchEvent(new CustomEvent('mr:filter-changed'));
     };
+    if (elW && dynWeightsStored()) {
+      elW.classList.add('active'); elW.setAttribute('aria-pressed', 'true'); table.classList.add('w-mode');
+    }
     const refill = () => dynFillMatrix(table, manifest, !!(elBn && elBn.checked), removed, !!(elW && elW.classList.contains('active')));
     refill();
     if (elW) elW.addEventListener('click', () => {
       const on = elW.classList.toggle('active');
       elW.setAttribute('aria-pressed', on ? 'true' : 'false');
       table.classList.toggle('w-mode', on);
+      dynWeightsStore(on);
       refill();
     });
     layout();
@@ -1403,8 +1411,12 @@
           };
           // "Weights" toggle (toolbar): flip the mode and rebuild every row already built.
           const wBtn = document.getElementById('dyn-weights-btn');
+          if (wBtn && dynWeightsStored()) {
+            dynWeightsOn = true; wBtn.classList.add('active'); document.body.classList.add('dyn-weights');
+          }
           if (wBtn) wBtn.addEventListener('click', () => {
             dynWeightsOn = wBtn.classList.toggle('active');
+            dynWeightsStore(dynWeightsOn);
             document.body.classList.toggle('dyn-weights', dynWeightsOn);
             document.querySelectorAll('.entity[id^="dyn-"][data-dyn-built]').forEach(e => {
               const old = e.querySelector('.dyn-row-wrap');

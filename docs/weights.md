@@ -75,6 +75,6 @@ the number is dominated by how many rows Valve wrote; volume `v` is the honest p
 ## Open / next
 1. ~~Items in gold~~ done.
 2. ~~Signal J~~ done (now the main source for % rows).
-3. Formula rows (per-level badges): take the magnitude at the level `b()` used for the direction — review F.6.
+3. ~~Formula rows (F.6)~~ done: per-level rows take the |%| of the last non-zero level (max rank) when its direction agrees with the row's tag; when `b()` flipped the tag by the average (front-/back-loaded, early-game cut, flatten) all levels are averaged.
 4. Manual-annotation agreement test (100–150 rows, 3 grades) — review E.8.2.
 5. Niche parameters hitting the cap (e.g. "invisibility linger 2s→1s" = −1.83 for Treant 7.41f): consider a lower cap or per-type caps.
