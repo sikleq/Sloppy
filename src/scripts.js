@@ -821,6 +821,7 @@
         wrap.classList.add('w-mode', 'w-line');
         cell.style.background = 'none';
         cell.dataset.w = String(w);
+        cell.dataset.v = String(counts.v || 0);
       } else {                                  // patch page: the number
         wrap.classList.add('w-mode');
         cell.textContent = dynFmtW(w);
@@ -1026,51 +1027,48 @@
       const debut = td.dataset.debut === '1';
       td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed, debut, wMode));
     });
-    if (wMode) dynDrawRowLines(table);
+    if (wMode) dynDrawRowBars(table);
   }
 
-  // Weights mode on the matrices: every row is a CUMULATIVE line chart — the
-  // level is the running sum of the net score, oldest -> newest, so a buff always
-  // moves the line UP (green) and a nerf DOWN (red); untouched patches keep the
-  // level (flat line, drawn by CSS from the --wl var set on the cell). Each row is
-  // scaled to its own min..max so the whole cell height is used; a faint dashed
-  // line marks the zero level inside touched cells.
-  function dynDrawRowLines(table) {
+  // Weights mode on the matrices: every cell is a BAR on the row's zero axis
+  // (thin line through every cell, untouched ones included). Green bar up =
+  // net buff, red bar down = net nerf; height is sqrt-scaled with ONE global cap
+  // so cells are comparable across heroes (|w| = 4 fills the half-cell). Behind
+  // it a faint grey band shows the VOLUME of changes (reworks included), so a
+  // pure rework (w = 0, v > 0) is still visible.
+  const DYN_W_CAP = 4;
+  function dynDrawRowBars(table) {
     const NS = 'http://www.w3.org/2000/svg';
-    const S = 28, pad = 2;
-    table.querySelectorAll('tbody tr').forEach(tr => {
-      const tds = [...tr.children].filter(td => td.matches('td.hd-cell, td.he, td.ha'));
-      const steps = tds.map(td => {
-        const c = td.querySelector('.w-line .dyn-cell');
-        return c ? (parseFloat(c.dataset.w) || 0) : 0;
-      });
-      const levels = []; let acc = 0;
-      steps.forEach(v => { acc += v; levels.push(acc); });
-      const lo = Math.min(0, ...levels), hi = Math.max(0, ...levels);
-      const span = (hi - lo) || 1;
-      const yOf = L => (S - pad) - (L - lo) / span * (S - 2 * pad);
-      tds.forEach((td, i) => {
-        const prev = i ? levels[i - 1] : 0, cur = levels[i], v = steps[i];
-        const c = td.querySelector('.w-line .dyn-cell');
-        if (!c) { td.style.setProperty('--wl', yOf(cur).toFixed(1) + 'px'); return; }
-        const yp = yOf(prev), yc = yOf(cur), y0 = yOf(0);
-        const svg = document.createElementNS(NS, 'svg');
-        svg.setAttribute('viewBox', `0 0 ${S} ${S}`);
-        svg.setAttribute('preserveAspectRatio', 'none');
-        svg.setAttribute('class', 'dyn-wl ' + (v > 0 ? 'up' : (v < 0 ? 'down' : 'flat')));
-        const axis = document.createElementNS(NS, 'line');
-        axis.setAttribute('x1', '0'); axis.setAttribute('x2', String(S));
-        axis.setAttribute('y1', y0.toFixed(1)); axis.setAttribute('y2', y0.toFixed(1));
-        axis.setAttribute('class', 'axis');
-        svg.appendChild(axis);
-        const pl = document.createElementNS(NS, 'polyline');
-        pl.setAttribute('points', `0,${yp.toFixed(1)} ${S / 2},${yc.toFixed(1)} ${S},${yc.toFixed(1)}`);
-        svg.appendChild(pl);
-        const dot = document.createElementNS(NS, 'circle');
-        dot.setAttribute('cx', String(S / 2)); dot.setAttribute('cy', yc.toFixed(1)); dot.setAttribute('r', '2.4');
-        svg.appendChild(dot);
-        c.appendChild(svg);
-      });
+    const W = 40, H = 28, mid = H / 2, amp = mid - 1.5;
+    const len = x => Math.sqrt(Math.min(Math.abs(x), DYN_W_CAP) / DYN_W_CAP) * amp;
+    table.querySelectorAll('.w-line .dyn-cell').forEach(c => {
+      const w = parseFloat(c.dataset.w) || 0, v = parseFloat(c.dataset.v) || 0;
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      svg.setAttribute('preserveAspectRatio', 'none');
+      svg.setAttribute('class', 'dyn-wl ' + (w > 0 ? 'up' : (w < 0 ? 'down' : 'flat')));
+      if (v) {                                   // volume band, centred on the axis
+        const hv = len(v);
+        const band = document.createElementNS(NS, 'rect');
+        band.setAttribute('x', String(W * 0.2)); band.setAttribute('width', String(W * 0.6));
+        band.setAttribute('y', (mid - hv).toFixed(1)); band.setAttribute('height', (2 * hv).toFixed(1));
+        band.setAttribute('class', 'vol');
+        svg.appendChild(band);
+      }
+      const axis = document.createElementNS(NS, 'line');
+      axis.setAttribute('x1', '0'); axis.setAttribute('x2', String(W));
+      axis.setAttribute('y1', String(mid)); axis.setAttribute('y2', String(mid));
+      axis.setAttribute('class', 'axis');
+      svg.appendChild(axis);
+      if (w) {
+        const hw = len(w);
+        const bar = document.createElementNS(NS, 'rect');
+        bar.setAttribute('x', String(W * 0.3)); bar.setAttribute('width', String(W * 0.4));
+        bar.setAttribute('y', (w > 0 ? mid - hw : mid).toFixed(1)); bar.setAttribute('height', hw.toFixed(1));
+        bar.setAttribute('class', 'net');
+        svg.appendChild(bar);
+      }
+      c.appendChild(svg);
     });
   }
 

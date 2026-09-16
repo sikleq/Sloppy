@@ -9784,14 +9784,10 @@ a.whatsnew-row:hover {
   box-shadow: none;
 }
 .heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
-.heroes-dyn-table.w-mode td.he::after {
-  width: 100%;
-  /* untouched patch: the level line stays where the cumulative sum left it */
-  position: relative;
-  top: calc(var(--wl, 14px) - 14px);
-}
-.heroes-dyn-table.w-mode td.he { position: relative; }
-.dyn-wl .axis { stroke-dasharray: 2 2; }
+.heroes-dyn-table.w-mode td.he::after { width: 100%; }
+.dyn-wl rect.vol { fill: rgba(170, 180, 200, 0.16); }
+.dyn-wl.up rect.net { fill: rgb(62, 178, 96); }
+.dyn-wl.down rect.net { fill: rgb(214, 74, 66); }
 .dyn-wl polyline { vector-effect: non-scaling-stroke; }
 .hs-attr-filter.hd-weights-btn img { width: 18px; height: 16px; display: block; image-rendering: pixelated; }
 .hd-weights-group { margin-left: 2px; }
