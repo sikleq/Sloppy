@@ -59,7 +59,7 @@ def write_head(version, date):
         <button class="badge rework filter-btn" data-filter="rework">REWORK</button>
         <button class="badge misc filter-btn" data-filter="misc">MISC</button>
         <button class="badge qol filter-btn" data-filter="qol">QoL</button>
-        <button class="badge dyn-w-btn" id="dyn-weights-btn" type="button" title="Dynamics cells: weighted score instead of tag colours">WEIGHTS</button>
+        <label class="ua-upgrades-toggle dyn-w-toggle"><span class="ua-upgrades-label">Weights</span><input type="checkbox" id="dyn-weights-btn" class="ua-switch-input"><span class="ua-switch" aria-hidden="true"></span></label>
       </div>
       <div class="legend-categories"><!--CATEGORIES_BAR--></div>
     </div>

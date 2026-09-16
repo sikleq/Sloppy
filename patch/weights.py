@@ -5,7 +5,7 @@ score = weight(type) x direction x magnitude
                same table as outputs/valve-revealed-weights-20260915/common.py CAT)
   weight     — data/rules/valve_weights.json (Valve revealed-preference consensus, 0..1)
   direction  — +1 buff, -1 nerf, +0.5 new, -0.5 del, 0 rework/misc/qol
-  magnitude  — |first % badge| clamped to 50 and divided by 25 (25% = 1.0, 50%+ = 2.0);
+  magnitude  — mean |%| over the row's per-level badges, clamped to 50, divided by 25 (25% = 1.0);
                rows without a % badge count as 1.0
 Per (entity, patch) the scores are summed into the dynamics bucket key "w".
 """
@@ -65,6 +65,6 @@ def row_score(text, tags, badge_html=""):
     d = next((_DIR[t] for t in ("buff", "nerf", "new", "del") if t in tags), 0.0)
     if not d:
         return 0.0
-    m = _PCT_RE.search(badge_html or "")
-    mag = min(abs(float(m.group(1).replace("\u2212", "-"))), MAG_CAP) / 25.0 if m else 1.0
+    pcts = [abs(float(x.replace("−", "-"))) for x in _PCT_RE.findall(badge_html or "")]
+    mag = min(sum(pcts) / len(pcts), MAG_CAP) / 25.0 if pcts else 1.0   # mean over per-level badges
     return round(weight_of(classify(text)) * d * mag, 2)

@@ -9729,38 +9729,51 @@ a.whatsnew-row:hover {
    ========================================================================== */
 
 
-/* ---- Dynamics "Weights" mode: number cells + row sparkline ---- */
+/* ---- Dynamics "Weights" mode ---- */
+/* Patch pages: the cell shows the patch's weighted score as a number (site font). */
 .dyn-cell-wrap.w-mode .dyn-cell {
   display: flex;
   align-items: center;
   justify-content: center;
-  font: 700 9px/1 "Segoe UI", Arial, sans-serif;
+  font-family: inherit;
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 1;
   letter-spacing: -0.2px;
-  color: #fff;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-bright, #fff);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
 }
 .dyn-cell-wrap.w-mode:not(.empty):hover .dyn-cell {
   font-size: 5px;   /* hover scale(2.5) blows the digits up - keep them legible, not huge */
 }
+/* Matrices: every cell is a bar on the row's own axis; JS paints the bar + the
+   1px baseline as the background, and the untouched cells draw the same baseline
+   so the whole row reads as one chart. */
+.heroes-dyn-table .dyn-cell-wrap.w-bar .dyn-cell {
+  box-shadow: none;
+  border-radius: 0;
+}
+.heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
+.heroes-dyn-table.w-mode td.he::after {
+  height: 1px;
+  border-radius: 0;
+  background: rgba(190, 200, 215, 0.35);
+  vertical-align: middle;
+}
+/* Tooltip header: version on the left, weighted score on the right. */
+.dyn-tip-header.has-score {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
 .dyn-tip-score {
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
-.dyn-spark {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 8px;
-  flex: 0 0 auto;
-}
-.dyn-spark .dyn-spark-base { stroke: rgba(255, 255, 255, 0.18); stroke-width: 1; }
-.dyn-spark rect.up   { fill: rgb(62, 178, 96); }
-.dyn-spark rect.down { fill: rgb(214, 74, 66); }
-.dyn-spark rect.flat { fill: rgba(160, 160, 160, 0.6); }
-.legend-tags .badge.dyn-w-btn {
+/* Patch-page toolbar: the same switch component the table pages use. */
+.legend-tags .dyn-w-toggle {
   margin-left: 10px;
-  background: rgba(120, 120, 130, 0.35);
-  color: #d8d8dc;
-}
-.legend-tags .badge.dyn-w-btn.active {
-  background: rgba(200, 170, 80, 0.55);
-  color: #fff;
+  padding: 3px 8px;
+  font-size: 11.5px;
 }

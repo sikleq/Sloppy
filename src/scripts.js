@@ -764,6 +764,18 @@
     const a = Math.abs(w);
     return (w < 0 ? '\u2212' : '') + (a >= 10 ? a.toFixed(0) : a.toFixed(1));
   }
+  // Matrix weights mode: the cell is a bar on the row's own axis (a thin baseline
+  // through the middle of every cell); up = positive, down = negative, |w| capped at 4.
+  function dynWeightBar(w) {
+    const rgb = w > 0 ? DYN_TAG_RGB.buff : DYN_TAG_RGB.nerf;
+    const h = Math.max(4, Math.round(Math.min(Math.abs(w), 4) / 4 * 46));
+    const col = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.92)`;
+    const bar = w >= 0
+      ? `linear-gradient(to top, transparent 50%, ${col} 50%, ${col} ${50 + h}%, transparent ${50 + h}%)`
+      : `linear-gradient(to top, transparent ${50 - h}%, ${col} ${50 - h}%, ${col} 50%, transparent 50%)`;
+    const axis = 'linear-gradient(rgba(190, 200, 215, 0.35), rgba(190, 200, 215, 0.35)) center / 100% 1px no-repeat';
+    return `${bar}, ${axis}`;
+  }
   function dynWeightTint(w) {
     const rgb = w > 0 ? DYN_TAG_RGB.buff : (w < 0 ? DYN_TAG_RGB.nerf : [110, 110, 110]);
     const alpha = Math.min(0.9, 0.25 + Math.min(Math.abs(w), 4) * 0.16);
@@ -813,9 +825,14 @@
     wrap.appendChild(cell);
     if (wMode && origTotal) {
       const w = counts.w || 0;
-      wrap.classList.add('w-mode');
-      cell.textContent = dynFmtW(w);
-      cell.style.setProperty('--dyn-bg', dynWeightTint(w));
+      if (filePrefix === 'patches/') {          // matrix: bar on the row axis
+        wrap.classList.add('w-mode', 'w-bar');
+        cell.style.background = dynWeightBar(w);
+      } else {                                  // patch page: the number
+        wrap.classList.add('w-mode');
+        cell.textContent = dynFmtW(w);
+        cell.style.setProperty('--dyn-bg', dynWeightTint(w));
+      }
     } else if (total) {
       // Build a vertical gradient where each tag occupies a band proportional
       // to its share. Instead of hard color-stops at the band boundaries we
@@ -892,6 +909,13 @@
     const header = document.createElement('span');
     header.className = 'dyn-tip-header';
     header.textContent = `${patch.version}`;
+    if (counts && counts.w !== undefined) {
+      header.classList.add('has-score');
+      const sc = document.createElement('span');
+      sc.className = 'dyn-tip-score';
+      sc.textContent = (counts.w > 0 ? '+' : '') + counts.w.toFixed(1);
+      header.appendChild(sc);
+    }
     tip.appendChild(header);
     if (counts) {
       const grid = document.createElement('span');
@@ -912,12 +936,6 @@
         grid.appendChild(row);
       }
       tip.appendChild(grid);
-      if (counts.w !== undefined) {
-        const sc = document.createElement('span');
-        sc.className = 'dyn-tip-note dyn-tip-score';
-        sc.textContent = 'weighted score ' + (counts.w > 0 ? '+' : '') + counts.w.toFixed(2);
-        tip.appendChild(sc);
-      }
     }
     if (note) {
       const noteEl = document.createElement('span');
@@ -1012,57 +1030,8 @@
       const debut = td.dataset.debut === '1';
       td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed, debut, wMode));
     });
-    dynSparkRows(table, manifest, wMode);
   }
 
-  // Weights mode: a tiny bar sparkline per row (oldest -> newest patch, one bar
-  // per patch the entity was touched in; green up = positive score, red down =
-  // negative) appended to the sticky name cell. Removed when the mode is off.
-  function dynSparkRows(table, manifest, wMode) {
-    const vers = manifest.patches.map(p => p.version).reverse();   // manifest is newest-first
-    const n = vers.length;
-    table.querySelectorAll('tbody tr').forEach(tr => {
-      const nameCell = tr.querySelector('td.hd-hero .hd-hero-inner');
-      if (!nameCell) return;
-      const prev = nameCell.querySelector('.dyn-spark');
-      if (prev) prev.remove();
-      if (!wMode) return;
-      const first = tr.querySelector('td.hd-cell[data-hkey]');
-      const rec = first && manifest.entities[first.dataset.hkey];
-      if (!rec || !rec.patches) return;
-      const W = 96, H = 16, mid = H / 2, bw = Math.max(1, Math.floor(W / n));
-      let maxAbs = 0.5;
-      vers.forEach(v => { const b = rec.patches[v]; if (b && b.w) maxAbs = Math.max(maxAbs, Math.abs(b.w)); });
-      const NS = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(NS, 'svg');
-      svg.setAttribute('class', 'dyn-spark');
-      svg.setAttribute('viewBox', `0 0 ${bw * n} ${H}`);
-      svg.setAttribute('width', String(bw * n));
-      svg.setAttribute('height', String(H));
-      const base = document.createElementNS(NS, 'line');
-      base.setAttribute('x1', '0'); base.setAttribute('x2', String(bw * n));
-      base.setAttribute('y1', String(mid)); base.setAttribute('y2', String(mid));
-      base.setAttribute('class', 'dyn-spark-base');
-      svg.appendChild(base);
-      vers.forEach((v, i) => {
-        const b = rec.patches[v];
-        if (!b) return;
-        const w = b.w || 0;
-        const h = Math.max(1, Math.round(Math.abs(w) / maxAbs * (mid - 1)));
-        const r = document.createElementNS(NS, 'rect');
-        r.setAttribute('x', String(i * bw));
-        r.setAttribute('width', String(Math.max(1, bw - 1)));
-        r.setAttribute('y', String(w >= 0 ? mid - h : mid));
-        r.setAttribute('height', String(h));
-        r.setAttribute('class', w > 0 ? 'up' : (w < 0 ? 'down' : 'flat'));
-        const t = document.createElementNS(NS, 'title');
-        t.textContent = `${v}: ${w > 0 ? '+' : ''}${w.toFixed(2)}`;
-        r.appendChild(t);
-        svg.appendChild(r);
-      });
-      nameCell.appendChild(svg);
-    });
-  }
 
   // Single <style> whose rule hides the oldest patch columns. Editing one rule
   // is far cheaper than toggling display on thousands of cells (115 cols × 127
@@ -1391,9 +1360,8 @@
           };
           // "Weights" toggle (toolbar): flip the mode and rebuild every row already built.
           const wBtn = document.getElementById('dyn-weights-btn');
-          if (wBtn) wBtn.addEventListener('click', () => {
-            dynWeightsOn = !dynWeightsOn;
-            wBtn.classList.toggle('active', dynWeightsOn);
+          if (wBtn) wBtn.addEventListener('change', () => {
+            dynWeightsOn = wBtn.checked;
             document.body.classList.toggle('dyn-weights', dynWeightsOn);
             document.querySelectorAll('.entity[id^="dyn-"][data-dyn-built]').forEach(e => {
               const old = e.querySelector('.dyn-row-wrap');

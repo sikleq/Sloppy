@@ -157,8 +157,7 @@ Each `(entity, patch)` bucket carries the tag counts **and** `w` — the summed 
 rows (`patch/weights.py`): `weight(type) × direction × magnitude`, where the type is classified from
 the row text (ordered regex table shared with `outputs/valve-revealed-weights-20260915`), the weight
 comes from `data/rules/valve_weights.json` (Valve revealed-preference consensus, 0..1), direction is
-+1 buff / −1 nerf / ±0.5 new/del / 0 otherwise, and magnitude = |first % badge| capped at 50 and
-divided by 25 (rows without a % badge count as 1.0). Per-patch values, not cumulative.
++1 buff / −1 nerf / ±0.5 new/del / 0 otherwise, and magnitude = mean |%| over the row's per-level badges, capped at 50 and divided by 25 (rows without a % badge count as 1.0). Per-patch values, not cumulative.
 UI: the `WEIGHTS` button on patch pages and the `Weights` switch on heroes_dyn / items_dyn replace
 each diamond with the number (green/red tint by sign) and, on the matrices, append a per-row bar
 sparkline (oldest → newest) to the name cell. Hover tooltips always show the score.
