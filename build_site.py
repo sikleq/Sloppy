@@ -58,6 +58,7 @@ STEPS = [
     ("hdyn",    "builders/heroes_dyn.py",   "Hero Dynamics matrix"),
     ("idyn",    "builders/items_dyn.py",    "Item Dynamics matrix"),
     ("terrain", "builders/terrain.py",      "Terrain comparison"),
+    ("echg",    "builders/entity_changes.py", "Hero / Item Changes pages"),
 ]
 
 # Map: artifact filename -> key of the step that produces it.

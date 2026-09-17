@@ -9830,3 +9830,37 @@ a.whatsnew-row:hover {
 .dyn-tip-score.pos { color: rgb(88, 200, 118); }
 .dyn-tip-score.neg { color: rgb(232, 96, 88); }
 .dyn-tip-score.zero { color: rgba(200, 205, 215, 0.8); }
+
+/* ---- Hero / Item Changes pages (builders/entity_changes.py) ---- */
+.entity-link { color: inherit; text-decoration: none; }
+.entity-name .entity-link:hover { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+.entity-icon .entity-link { display: block; line-height: 0; }
+.entity-icon .entity-link:hover img { filter: brightness(1.15); }
+.entity-page .ec-head { margin-bottom: 6px; }
+.ec-patch { margin: 22px 0 8px; }
+.ec-ver {
+  display: flex; align-items: baseline; gap: 14px;
+  margin: 0 0 8px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  font-family: 'Jersey 25', 'Jersey 10', monospace; font-weight: 400; font-size: 26px; letter-spacing: 0.5px;
+}
+.ec-ver a { color: var(--gold); text-decoration: none; }
+.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.ec-date { font-size: 15px; color: var(--text-dim, #8b949e); }
+.ec-score { margin-left: auto; font: 600 13px/1 Radiance, "Segoe UI", Arial, sans-serif; font-variant-numeric: tabular-nums; }
+.ec-score i { font-style: normal; font-weight: 400; color: var(--text-dim, #8b949e); }
+.ec-score.pos { color: rgb(88, 200, 118); } .ec-score.neg { color: rgb(232, 96, 88); } .ec-score.zero { color: rgba(200, 205, 215, 0.8); }
+.ec-entity-note { margin: 0 0 6px; }
+.ec-index .creeps-scroll { padding: 0 18px; }
+.ec-intro { margin: 10px 2px 12px; color: var(--text-dim, #8b949e); font-size: 13.5px; line-height: 1.5; }
+.ec-grid { display: grid; gap: 8px; margin: 12px 0 28px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+.ec-card {
+  display: grid; grid-template-columns: 64px 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center;
+  padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg-panel-3);
+  color: inherit; text-decoration: none; transition: border-color 0.12s ease, filter 0.12s ease;
+}
+.ec-card:hover { border-color: var(--gold-line); filter: brightness(1.1); }
+.ec-card img { grid-row: 1 / span 2; width: 64px; height: auto; border-radius: 3px; }
+.ec-card-item img { width: 50px; justify-self: center; }
+.ec-card-name { font-weight: 600; font-size: 13.5px; align-self: end; }
+.ec-card-meta { font-size: 11.5px; color: var(--text-dim, #8b949e); align-self: start; }

@@ -396,6 +396,12 @@ def _dyn_record_li(tags, extra_keys=None, scores=(0.0, 0.0)):
             patch_bucket["v"] = round(patch_bucket.get("v", 0.0) + vol, 3)
 
 
+def _entity_link(folder, name):
+    """Patch page -> the entity's Changes page (builders/entity_changes.py), same slug as its
+    dyn id: ../heroes/<slug>.html / ../items/<slug>.html."""
+    return f"../{folder}/{_slugify(name)}.html"
+
+
 def _slugify(name):
     s = name.lower().replace("'", "").replace("’", "")
     s = re.sub(r'[^a-z0-9]+', '-', s).strip('-')
@@ -454,9 +460,10 @@ def hero_header(name):
     _State.seen_abilities_subgroup = False
     _State.seen_facets_subgroup = False
     eid = _register_entity("hero", name)
+    href = _entity_link("heroes", name)
     return _open_block() + f'''<div class="entity hero-entity"{eid}>
-  <div class="entity-icon hero-icon"><img src="{hero_img(name)}" alt="{name}" loading="lazy" width="256" height="144"></div>
-  <div class="entity-name">{name}</div>
+  <div class="entity-icon hero-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{hero_img(name)}" alt="{name}" loading="lazy" width="256" height="144"></a></div>
+  <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a></div>
 </div>'''
 
 
@@ -496,9 +503,10 @@ def item_header(name, new=False, changed=False):
         extra_cls = ''
         block_data_attr = ''
     eid = _register_entity("item", name)
+    href = _entity_link("items", name)
     return out + _open_block(extra_cls, block_data_attr) + f'''<div class="entity item-entity"{eid}>
-  <div class="entity-icon item-icon"><img src="{item_img(name)}" alt="{name}" loading="lazy" width="88" height="64"></div>
-  <div class="entity-name">{name}{type_label}</div>
+  <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{item_img(name)}" alt="{name}" loading="lazy" width="88" height="64"></a></div>
+  <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a>{type_label}</div>
 </div>'''
 
 

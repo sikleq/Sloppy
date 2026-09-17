@@ -89,12 +89,14 @@ MATERIALS_GROUPS = [
     ("items_grp", "Items", "mana_items.html", [
         ("mana_items", "Mana Items",    "mana_items.html"),
         ("items_dyn",  "Item Dynamics", "items_dyn.html"),
+        ("item_changes", "Item Changes", "item_changes.html"),
     ]),
     ("heroes_grp", "Heroes", "heroes_stats.html", [
         ("heroes_stats", "Hero Stats",    "heroes_stats.html"),
         ("hero_lab",     "Hero Lab",      "hero_lab.html"),
         ("aoe_increase", "AoE Increase",  "aoe_increase.html"),
         ("heroes_dyn",   "Hero Dynamics", "heroes_dyn.html"),
+        ("hero_changes", "Hero Changes",  "hero_changes.html"),
     ]),
     ("terrain", "Terrain", "terrain_741.html", None),
 ]

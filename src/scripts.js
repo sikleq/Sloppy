@@ -989,8 +989,10 @@
     row.className = 'patch-dynamics';
     for (const p of windowed) {
       const counts = perPatch[p.version] || {};
+      // Entity "Changes" pages live outside /patches/: <body data-dyn-prefix="../patches/">
       row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion, currentVersion,
-                                   undefined, false, null, false, dynWeightsOn));
+                                   (document.body && document.body.dataset.dynPrefix) || undefined,
+                                   false, null, false, dynWeightsOn));
     }
     wrap.appendChild(row);
     if (canRight) {
@@ -3361,6 +3363,20 @@
   window.addEventListener('resize', recomputeCats, { passive: true });
   apply();
   applyHeroFilters();
+})();
+
+// ---- HERO / ITEM CHANGES index: name filter (comma-separated, partial) ----
+(function() {
+  const input = document.querySelector('[data-ec-search]');
+  if (!input) return;
+  const cards = [...document.querySelectorAll('.ec-card')];
+  input.addEventListener('input', () => {
+    const terms = input.value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+    cards.forEach(c => {
+      const n = c.dataset.name || '';
+      c.hidden = terms.length > 0 && !terms.some(t => n.includes(t));
+    });
+  });
 })();
 
 // ---- HERO LAB: two-side hero + item calculator ----

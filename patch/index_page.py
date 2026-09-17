@@ -288,6 +288,7 @@ def save_index_html():
         + _panel_link_btn('', 'heroes_stats.html', 'icon_typewriter.png', 'Stats')
         + _panel_link_btn('', 'hero_lab.html', 'icon_teapot.png', 'Hero Lab')
         + _panel_link_btn('', 'aoe_increase.html', 'icon_abilities.png', 'AoE')
+        + _panel_link_btn('', 'hero_changes.html', 'icon_patch.png', 'Changes')
         + '</div></div>'
     )
     items_panel = (
@@ -295,6 +296,7 @@ def save_index_html():
         '<div class="support-options">'
         + _panel_link_btn('inv-cell-mana', 'mana_items.html', 'icon_mana.png', 'Mana')
         + _panel_link_btn('inv-cell-dynamics', 'items_dyn.html', 'icon_dynamics.png', 'Dynamics')
+        + _panel_link_btn('', 'item_changes.html', 'icon_patch.png', 'Changes')
         + '</div></div>'
     )
     # The divider keeps its place under the title; when the Support panel is

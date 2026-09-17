@@ -229,6 +229,15 @@ expanders, icons, and that no Python exceptions surface during the build.
 
 Push to `main` after every gate is green.
 
+## Hero Changes / Item Changes pages
+
+`builders/entity_changes.py` (build step `echg`, runs after `patch`) lifts every hero/item block verbatim
+from the rendered `dist/patches/*.html` and writes `dist/heroes/<slug>.html`, `dist/items/<slug>.html`
+(newest patch first, weighted score next to each version, dynamics row on top) plus the index grids
+`hero_changes.html` / `item_changes.html` (Materials → Heroes / Items, and tiles on the main page). Entity
+headers on patch pages link there (`_entity_link` in `patch/elements.py`). Nothing to do per patch: a new
+`content/p*.py` shows up automatically on the next build.
+
 ## CI gates
 
 Two workflows live in `.github/workflows/`:
