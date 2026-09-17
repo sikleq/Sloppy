@@ -344,6 +344,19 @@ def _small_change_damp(text):
     return 1.0
 
 
+COMPRESS = True
+
+
+def _compress(x):
+    """Soft ceiling for one row: up to 1.0 (a typical change) the value is linear, above it grows
+    logarithmically — 1.5 -> 1.41, 2 -> 1.69, 3 -> 2.10, 6 -> 2.79. A halved niche parameter
+    ("invisibility linger 2s -> 1s") no longer outweighs a real nerf of a core ability."""
+    import math
+    if not COMPRESS:
+        return min(x, MAG_CAP_NORM)
+    return x if x <= 1.0 else 1.0 + math.log(min(x, 6.0))
+
+
 def _row_value(text, badge_html, kind, ctx):
     """Unsigned value of a buff/nerf row on the common scale (before context)."""
     if ctx and ctx.get("base_stat"):
@@ -353,9 +366,9 @@ def _row_value(text, badge_html, kind, ctx):
     pcts = _row_pcts(text, badge_html)
     damp = _small_change_damp(text)
     if pcts and kind in _J:
-        return min(_J[kind] * (sum(pcts) / len(pcts)) / J_PCT_UNIT, MAG_CAP_NORM) * damp
+        return _compress(_J[kind] * (sum(pcts) / len(pcts)) / J_PCT_UNIT) * damp
     if pcts:
-        return weight_of(kind) * min((sum(pcts) / len(pcts)) / _TPCT.get(kind, 20.0), MAG_CAP_NORM) * damp
+        return weight_of(kind) * _compress((sum(pcts) / len(pcts)) / _TPCT.get(kind, 20.0)) * damp
     return weight_of(kind)
 
 

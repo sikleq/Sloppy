@@ -1,5 +1,5 @@
 {
- "_doc": "Signal K per changed talent tier (version|hero|level). changed = how many of the two talents are new at this level. share_delta = measured shift of the pro pick share of the replaced slot against the unchanged sibling (single-side only, >=30 picks before/after). moves = new talents that came from ANOTHER level with the same meaning (type+ability): steps>0 means it is now available earlier (buff of that effect), <0 later (nerf). Two absolute measures were tested and rejected (tier pick timing, tier win rate): neither reacts to known talent value buffs/nerfs.",
+ "_doc": "Signal K per changed talent tier (version|hero|level). changed = how many of the two talents are new. share_delta = measured shift of the pro pick share of the replaced slot against the unchanged sibling (single-side only). moves = new talents that came from ANOTHER level with the same meaning (type+ability): steps>0 = available earlier (buff), <0 = later (nerf). Built by outputs/valve-revealed-weights-20260915/k_talent_tiers.py.",
  "tiers": {
   "7.10|antimage|10": {
    "changed": 1
@@ -9423,17 +9423,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_attack_range_100",
-     "from": 20,
-     "to": 15,
-     "type": "range",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_silencer_6",
      "from": 20,
      "to": 15,
      "type": "slow",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_attack_range_100",
+     "from": 20,
+     "to": 15,
+     "type": "range",
      "steps": 1
     }
    ]
@@ -10370,17 +10370,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_clinkz_1",
-     "from": 15,
-     "to": 10,
-     "type": "duration",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_clinkz_10",
      "from": 15,
      "to": 10,
      "type": "cooldown",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_clinkz_1",
+     "from": 15,
+     "to": 10,
+     "type": "duration",
      "steps": 1
     }
    ]
@@ -13691,17 +13691,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_spirit_breaker_1",
-     "from": 25,
-     "to": 20,
-     "type": "cooldown",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_spirit_breaker_shield",
      "from": 25,
      "to": 20,
      "type": "damage",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_spirit_breaker_1",
+     "from": 25,
+     "to": 20,
+     "type": "cooldown",
      "steps": 1
     }
    ]
@@ -15916,14 +15916,14 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_earth_spirit",
+     "slug": "special_bonus_unique_earth_spirit_8",
      "from": 15,
      "to": 20,
      "type": "damage",
      "steps": -1
     },
     {
-     "slug": "special_bonus_unique_earth_spirit_8",
+     "slug": "special_bonus_unique_earth_spirit",
      "from": 15,
      "to": 20,
      "type": "damage",
@@ -17954,18 +17954,18 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_batrider_4",
-     "from": 25,
-     "to": 15,
-     "type": "damage",
-     "steps": 2
-    },
-    {
      "slug": "special_bonus_unique_batrider_7",
      "from": 10,
      "to": 15,
      "type": "range",
      "steps": -1
+    },
+    {
+     "slug": "special_bonus_unique_batrider_4",
+     "from": 25,
+     "to": 15,
+     "type": "damage",
+     "steps": 2
     }
    ]
   },

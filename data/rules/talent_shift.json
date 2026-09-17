@@ -1,5 +1,5 @@
 {
- "_doc": "Signal K - single-side talent replacements scored by the shift of the pro pick share against the unchanged sibling (OpenDota pro matches; before = up to 3 versions with the old pair, after = up to 4 versions with the new pair; >=30 picks each). delta>0: the new talent is picked more than the old one was.",
+ "_doc": "Signal K - single-side talent replacements scored by the shift of the pro pick share against the unchanged sibling (before = up to 3 versions with the old pair, after = up to 4 with the new pair; >= 30 picks each). delta>0: the new talent is picked more than the old one was.",
  "replacements": {
   "7.10|warlock|10": {
    "old": "special_bonus_cast_range_125",

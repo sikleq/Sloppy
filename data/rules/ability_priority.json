@@ -1,1557 +1,1669 @@
 {
  "_doc": "Objective \"how central is this ability\" prior from how pros actually skill it. See tools/fetch_skill_priority.py.",
- "source": "api.opendota.com/api/explorer (pro matches)",
- "window_days": 120,
+ "source": "demos + opendota for 30 heroes missing in DEMOS",
+ "window_days": 365,
  "fetched": "2026-09-17",
  "stats_version": "7.41f",
  "abilities": {
   "abaddon_aphotic_shield": {
-   "share": 0.474,
-   "mult": 1.212
+   "share": 0.491,
+   "mult": 1.236
   },
   "abaddon_death_coil": {
-   "share": 0.177,
-   "mult": 0.766
+   "share": 0.04,
+   "mult": 0.7
   },
   "abaddon_frostmourne": {
-   "share": 0.348,
-   "mult": 1.023
+   "share": 0.47,
+   "mult": 1.204
   },
   "abyssal_underlord_atrophy_aura": {
-   "share": 0.164,
-   "mult": 0.746
+   "share": 0.208,
+   "mult": 0.812
   },
   "abyssal_underlord_firestorm": {
-   "share": 0.452,
-   "mult": 1.178
+   "share": 0.453,
+   "mult": 1.179
   },
   "abyssal_underlord_pit_of_malice": {
-   "share": 0.384,
-   "mult": 1.075
+   "share": 0.339,
+   "mult": 1.008
   },
   "alchemist_acid_spray": {
-   "share": 0.461,
-   "mult": 1.191
+   "share": 0.446,
+   "mult": 1.294
   },
   "alchemist_corrosive_weaponry": {
-   "share": 0.198,
-   "mult": 0.797
+   "share": 0.153,
+   "mult": 0.855
   },
   "alchemist_unstable_concoction": {
-   "share": 0.341,
-   "mult": 1.012
+   "share": 0.366,
+   "mult": 1.174
+  },
+  "alchemist_unstable_concoction_throw": {
+   "share": 0.035,
+   "mult": 0.7
   },
   "ancient_apparition_chilling_touch": {
-   "share": 0.203,
-   "mult": 0.804
+   "share": 0.192,
+   "mult": 0.788
   },
   "ancient_apparition_cold_feet": {
-   "share": 0.359,
-   "mult": 1.038
+   "share": 0.373,
+   "mult": 1.059
   },
   "ancient_apparition_ice_vortex": {
-   "share": 0.438,
-   "mult": 1.158
+   "share": 0.435,
+   "mult": 1.152
   },
   "antimage_blink": {
-   "share": 0.451,
-   "mult": 1.176
+   "share": 0.403,
+   "mult": 1.23
   },
   "antimage_counterspell": {
-   "share": 0.146,
-   "mult": 0.718
+   "share": 0.148,
+   "mult": 0.847
   },
   "antimage_mana_break": {
-   "share": 0.404,
-   "mult": 1.106
+   "share": 0.365,
+   "mult": 1.172
+  },
+  "antimage_persectur": {
+   "share": 0.084,
+   "mult": 0.751
+  },
+  "arc_warden_flux": {
+   "share": 0.332,
+   "mult": 0.997
+  },
+  "arc_warden_magnetic_field": {
+   "share": 0.216,
+   "mult": 0.824
+  },
+  "arc_warden_spark_wraith": {
+   "share": 0.453,
+   "mult": 1.179
   },
   "axe_battle_hunger": {
-   "share": 0.311,
-   "mult": 0.967
+   "share": 0.333,
+   "mult": 1.0
   },
   "axe_berserkers_call": {
-   "share": 0.25,
-   "mult": 0.874
+   "share": 0.227,
+   "mult": 0.841
   },
   "axe_counter_helix": {
    "share": 0.439,
    "mult": 1.159
   },
   "bane_brain_sap": {
-   "share": 0.323,
-   "mult": 0.984
+   "share": 0.324,
+   "mult": 0.986
   },
   "bane_enfeeble": {
-   "share": 0.242,
-   "mult": 0.862
+   "share": 0.249,
+   "mult": 0.873
   },
   "bane_nightmare": {
-   "share": 0.436,
-   "mult": 1.153
+   "share": 0.427,
+   "mult": 1.141
   },
   "batrider_firefly": {
-   "share": 0.436,
-   "mult": 1.153
+   "share": 0.424,
+   "mult": 1.137
   },
   "batrider_flamebreak": {
    "share": 0.127,
    "mult": 0.7
   },
   "batrider_sticky_napalm": {
-   "share": 0.437,
-   "mult": 1.156
-  },
-  "beastmaster_summon_raptor": {
-   "share": 0.086,
-   "mult": 0.7
-  },
-  "beastmaster_summon_razorback": {
-   "share": 0.453,
-   "mult": 1.18
-  },
-  "beastmaster_wild_axes": {
-   "share": 0.461,
-   "mult": 1.192
-  },
-  "bloodseeker_blood_bath": {
-   "share": 0.348,
-   "mult": 1.022
-  },
-  "bloodseeker_bloodrage": {
-   "share": 0.352,
-   "mult": 1.028
-  },
-  "bloodseeker_thirst": {
-   "share": 0.3,
-   "mult": 0.95
-  },
-  "bounty_hunter_jinada": {
-   "share": 0.148,
-   "mult": 0.722
-  },
-  "bounty_hunter_shuriken_toss": {
-   "share": 0.429,
-   "mult": 1.143
-  },
-  "bounty_hunter_wind_walk": {
-   "share": 0.423,
-   "mult": 1.135
-  },
-  "brewmaster_cinder_brew": {
-   "share": 0.248,
-   "mult": 0.872
-  },
-  "brewmaster_drunken_brawler": {
-   "share": 0.406,
-   "mult": 1.11
-  },
-  "brewmaster_thunder_clap": {
-   "share": 0.345,
-   "mult": 1.018
-  },
-  "bristleback_bristleback": {
-   "share": 0.418,
-   "mult": 1.127
-  },
-  "bristleback_quill_spray": {
-   "share": 0.454,
-   "mult": 1.181
-  },
-  "bristleback_viscous_nasal_goo": {
-   "share": 0.128,
-   "mult": 0.7
-  },
-  "broodmother_incapacitating_bite": {
-   "share": 0.36,
-   "mult": 1.04
-  },
-  "broodmother_insatiable_hunger": {
-   "share": 0.183,
-   "mult": 0.775
-  },
-  "broodmother_spin_web": {
-   "share": 0.457,
-   "mult": 1.185
-  },
-  "centaur_double_edge": {
-   "share": 0.187,
-   "mult": 0.78
-  },
-  "centaur_hoof_stomp": {
-   "share": 0.372,
-   "mult": 1.058
-  },
-  "centaur_return": {
-   "share": 0.441,
-   "mult": 1.162
-  },
-  "chaos_knight_chaos_bolt": {
-   "share": 0.173,
-   "mult": 0.76
-  },
-  "chaos_knight_chaos_strike": {
-   "share": 0.439,
-   "mult": 1.159
-  },
-  "chaos_knight_reality_rift": {
-   "share": 0.387,
-   "mult": 1.081
-  },
-  "chen_divine_favor": {
-   "share": 0.361,
-   "mult": 1.042
-  },
-  "chen_holy_persuasion": {
-   "share": 0.454,
-   "mult": 1.181
-  },
-  "chen_penitence": {
-   "share": 0.185,
-   "mult": 0.778
-  },
-  "clinkz_death_pact": {
-   "share": 0.348,
-   "mult": 1.022
-  },
-  "clinkz_searing_arrows": {
-   "share": 0.445,
-   "mult": 1.168
-  },
-  "clinkz_strafe": {
-   "share": 0.207,
-   "mult": 0.811
-  },
-  "crystal_maiden_brilliance_aura": {
-   "share": 0.288,
-   "mult": 0.933
-  },
-  "crystal_maiden_crystal_nova": {
-   "share": 0.282,
-   "mult": 0.924
-  },
-  "crystal_maiden_frostbite": {
-   "share": 0.429,
-   "mult": 1.144
-  },
-  "dark_seer_ion_shell": {
-   "share": 0.447,
-   "mult": 1.171
-  },
-  "dark_seer_surge": {
-   "share": 0.419,
-   "mult": 1.128
-  },
-  "dark_seer_vacuum": {
-   "share": 0.134,
-   "mult": 0.701
-  },
-  "dark_willow_bramble_maze": {
-   "share": 0.454,
-   "mult": 1.181
-  },
-  "dark_willow_cursed_crown": {
-   "share": 0.218,
-   "mult": 0.827
-  },
-  "dark_willow_shadow_realm": {
-   "share": 0.328,
-   "mult": 0.992
-  },
-  "dawnbreaker_celestial_hammer": {
-   "share": 0.448,
+   "share": 0.449,
    "mult": 1.173
   },
-  "dawnbreaker_fire_wreath": {
+  "beastmaster_inner_beast": {
+   "share": 0.198,
+   "mult": 0.922
+  },
+  "beastmaster_summon_raptor": {
+   "share": 0.062,
+   "mult": 0.717
+  },
+  "beastmaster_summon_razorback": {
+   "share": 0.25,
+   "mult": 0.999
+  },
+  "beastmaster_wild_axes": {
+   "share": 0.491,
+   "mult": 1.3
+  },
+  "bloodseeker_blood_bath": {
+   "share": 0.338,
+   "mult": 1.007
+  },
+  "bloodseeker_bloodrage": {
+   "share": 0.37,
+   "mult": 1.056
+  },
+  "bloodseeker_thirst": {
+   "share": 0.292,
+   "mult": 0.938
+  },
+  "bounty_hunter_jinada": {
+   "share": 0.164,
+   "mult": 0.746
+  },
+  "bounty_hunter_shuriken_toss": {
+   "share": 0.431,
+   "mult": 1.147
+  },
+  "bounty_hunter_wind_walk": {
    "share": 0.405,
    "mult": 1.108
   },
-  "dawnbreaker_luminosity": {
-   "share": 0.146,
-   "mult": 0.719
+  "brewmaster_cinder_brew": {
+   "share": 0.278,
+   "mult": 0.917
   },
-  "dazzle_poison_touch": {
-   "share": 0.315,
-   "mult": 0.973
+  "brewmaster_drunken_brawler": {
+   "share": 0.429,
+   "mult": 1.143
   },
-  "dazzle_shadow_wave": {
-   "share": 0.441,
-   "mult": 1.161
+  "brewmaster_thunder_clap": {
+   "share": 0.294,
+   "mult": 0.94
   },
-  "dazzle_shallow_grave": {
-   "share": 0.244,
-   "mult": 0.866
+  "bristleback_bristleback": {
+   "share": 0.406,
+   "mult": 1.109
   },
-  "death_prophet_carrion_swarm": {
-   "share": 0.446,
+  "bristleback_quill_spray": {
+   "share": 0.445,
    "mult": 1.168
   },
+  "bristleback_viscous_nasal_goo": {
+   "share": 0.149,
+   "mult": 0.723
+  },
+  "broodmother_incapacitating_bite": {
+   "share": 0.331,
+   "mult": 0.997
+  },
+  "broodmother_insatiable_hunger": {
+   "share": 0.222,
+   "mult": 0.832
+  },
+  "broodmother_spin_web": {
+   "share": 0.447,
+   "mult": 1.171
+  },
+  "centaur_double_edge": {
+   "share": 0.153,
+   "mult": 0.73
+  },
+  "centaur_hoof_stomp": {
+   "share": 0.411,
+   "mult": 1.116
+  },
+  "centaur_return": {
+   "share": 0.436,
+   "mult": 1.154
+  },
+  "chaos_knight_chaos_bolt": {
+   "share": 0.171,
+   "mult": 0.756
+  },
+  "chaos_knight_chaos_strike": {
+   "share": 0.446,
+   "mult": 1.17
+  },
+  "chaos_knight_reality_rift": {
+   "share": 0.383,
+   "mult": 1.075
+  },
+  "chen_divine_favor": {
+   "share": 0.398,
+   "mult": 1.098
+  },
+  "chen_holy_persuasion": {
+   "share": 0.445,
+   "mult": 1.167
+  },
+  "chen_penitence": {
+   "share": 0.157,
+   "mult": 0.735
+  },
+  "clinkz_death_pact": {
+   "share": 0.342,
+   "mult": 1.013
+  },
+  "clinkz_searing_arrows": {
+   "share": 0.429,
+   "mult": 1.144
+  },
+  "clinkz_strafe": {
+   "share": 0.229,
+   "mult": 0.844
+  },
+  "crystal_maiden_brilliance_aura": {
+   "share": 0.245,
+   "mult": 0.868
+  },
+  "crystal_maiden_crystal_nova": {
+   "share": 0.318,
+   "mult": 0.977
+  },
+  "crystal_maiden_frostbite": {
+   "share": 0.437,
+   "mult": 1.155
+  },
+  "dark_seer_ion_shell": {
+   "share": 0.448,
+   "mult": 1.172
+  },
+  "dark_seer_surge": {
+   "share": 0.406,
+   "mult": 1.109
+  },
+  "dark_seer_vacuum": {
+   "share": 0.147,
+   "mult": 0.72
+  },
+  "dark_willow_bramble_maze": {
+   "share": 0.448,
+   "mult": 1.173
+  },
+  "dark_willow_cursed_crown": {
+   "share": 0.182,
+   "mult": 0.773
+  },
+  "dark_willow_shadow_realm": {
+   "share": 0.369,
+   "mult": 1.054
+  },
+  "dawnbreaker_celestial_hammer": {
+   "share": 0.438,
+   "mult": 1.157
+  },
+  "dawnbreaker_fire_wreath": {
+   "share": 0.406,
+   "mult": 1.108
+  },
+  "dawnbreaker_luminosity": {
+   "share": 0.156,
+   "mult": 0.734
+  },
+  "dazzle_innate_weave": {
+   "share": 0.077,
+   "mult": 0.741
+  },
+  "dazzle_poison_touch": {
+   "share": 0.241,
+   "mult": 0.987
+  },
+  "dazzle_shadow_wave": {
+   "share": 0.393,
+   "mult": 1.215
+  },
+  "dazzle_shallow_grave": {
+   "share": 0.288,
+   "mult": 1.058
+  },
+  "death_prophet_carrion_swarm": {
+   "share": 0.452,
+   "mult": 1.178
+  },
   "death_prophet_silence": {
-   "share": 0.115,
+   "share": 0.107,
    "mult": 0.7
   },
   "death_prophet_spirit_siphon": {
-   "share": 0.44,
-   "mult": 1.159
+   "share": 0.441,
+   "mult": 1.162
+  },
+  "disruptor_electromagnetic_repulsion": {
+   "share": 0.087,
+   "mult": 0.755
   },
   "disruptor_glimpse": {
-   "share": 0.45,
-   "mult": 1.175
+   "share": 0.412,
+   "mult": 1.243
   },
   "disruptor_kinetic_field": {
-   "share": 0.195,
-   "mult": 0.793
+   "share": 0.151,
+   "mult": 0.852
   },
   "disruptor_thunder_strike": {
-   "share": 0.355,
-   "mult": 1.032
+   "share": 0.35,
+   "mult": 1.15
   },
   "doom_bringer_devour": {
-   "share": 0.416,
-   "mult": 1.124
+   "share": 0.405,
+   "mult": 1.107
   },
   "doom_bringer_infernal_blade": {
-   "share": 0.138,
-   "mult": 0.706
+   "share": 0.151,
+   "mult": 0.726
   },
   "doom_bringer_scorched_earth": {
-   "share": 0.446,
-   "mult": 1.169
+   "share": 0.445,
+   "mult": 1.167
   },
   "dragon_knight_breathe_fire": {
+   "share": 0.41,
+   "mult": 1.24
+  },
+  "dragon_knight_dragon_blood": {
+   "share": 0.039,
+   "mult": 0.7
+  },
+  "dragon_knight_dragon_tail": {
+   "share": 0.212,
+   "mult": 0.944
+  },
+  "dragon_knight_wyrms_wrath": {
+   "share": 0.338,
+   "mult": 1.133
+  },
+  "drow_ranger_frost_arrows": {
    "share": 0.427,
    "mult": 1.14
   },
-  "dragon_knight_dragon_tail": {
-   "share": 0.201,
-   "mult": 0.802
-  },
-  "dragon_knight_wyrms_wrath": {
-   "share": 0.372,
-   "mult": 1.058
-  },
-  "drow_ranger_frost_arrows": {
-   "share": 0.428,
-   "mult": 1.142
-  },
   "drow_ranger_multishot": {
-   "share": 0.457,
-   "mult": 1.185
+   "share": 0.458,
+   "mult": 1.187
   },
   "drow_ranger_wave_of_silence": {
    "share": 0.115,
    "mult": 0.7
   },
   "earth_spirit_boulder_smash": {
-   "share": 0.443,
-   "mult": 1.164
+   "share": 0.437,
+   "mult": 1.155
   },
   "earth_spirit_geomagnetic_grip": {
-   "share": 0.368,
-   "mult": 1.052
+   "share": 0.31,
+   "mult": 0.965
   },
   "earth_spirit_rolling_boulder": {
-   "share": 0.189,
-   "mult": 0.784
+   "share": 0.253,
+   "mult": 0.88
   },
   "earthshaker_aftershock": {
-   "share": 0.422,
-   "mult": 1.133
+   "share": 0.441,
+   "mult": 1.162
   },
   "earthshaker_enchant_totem": {
-   "share": 0.291,
-   "mult": 0.937
+   "share": 0.156,
+   "mult": 0.734
   },
   "earthshaker_fissure": {
-   "share": 0.286,
-   "mult": 0.929
-  },
-  "elder_titan_ancestral_spirit": {
-   "share": 0.284,
-   "mult": 0.926
-  },
-  "elder_titan_echo_stomp": {
    "share": 0.403,
    "mult": 1.105
   },
+  "elder_titan_ancestral_spirit": {
+   "share": 0.234,
+   "mult": 0.851
+  },
+  "elder_titan_echo_stomp": {
+   "share": 0.391,
+   "mult": 1.087
+  },
   "elder_titan_natural_order": {
-   "share": 0.313,
-   "mult": 0.969
+   "share": 0.375,
+   "mult": 1.062
   },
   "ember_spirit_flame_guard": {
-   "share": 0.424,
-   "mult": 1.137
+   "share": 0.389,
+   "mult": 1.083
   },
   "ember_spirit_searing_chains": {
-   "share": 0.319,
-   "mult": 0.978
+   "share": 0.297,
+   "mult": 0.946
   },
   "ember_spirit_sleight_of_fist": {
-   "share": 0.257,
-   "mult": 0.885
+   "share": 0.314,
+   "mult": 0.971
   },
   "enchantress_enchant": {
-   "share": 0.422,
-   "mult": 1.133
+   "share": 0.432,
+   "mult": 1.148
   },
   "enchantress_impetus": {
-   "share": 0.258,
-   "mult": 0.888
+   "share": 0.207,
+   "mult": 0.811
   },
   "enchantress_natures_attendants": {
-   "share": 0.319,
-   "mult": 0.979
-  },
-  "enigma_demonic_conversion": {
-   "share": 0.466,
-   "mult": 1.199
-  },
-  "enigma_malefice": {
-   "share": 0.445,
-   "mult": 1.168
-  },
-  "enigma_midnight_pulse": {
-   "share": 0.088,
-   "mult": 0.7
-  },
-  "faceless_void_time_dilation": {
-   "share": 0.174,
-   "mult": 0.762
-  },
-  "faceless_void_time_lock": {
-   "share": 0.38,
-   "mult": 1.071
-  },
-  "faceless_void_time_walk": {
-   "share": 0.445,
-   "mult": 1.168
-  },
-  "furion_force_of_nature": {
-   "share": 0.39,
-   "mult": 1.085
-  },
-  "furion_sprout": {
-   "share": 0.183,
-   "mult": 0.775
-  },
-  "furion_teleportation": {
-   "share": 0.427,
-   "mult": 1.14
-  },
-  "grimstroke_dark_artistry": {
-   "share": 0.322,
-   "mult": 0.983
-  },
-  "grimstroke_ink_creature": {
-   "share": 0.363,
-   "mult": 1.044
-  },
-  "grimstroke_spirit_walk": {
-   "share": 0.315,
-   "mult": 0.973
-  },
-  "gyrocopter_flak_cannon": {
-   "share": 0.443,
-   "mult": 1.165
-  },
-  "gyrocopter_homing_missile": {
-   "share": 0.167,
-   "mult": 0.751
-  },
-  "gyrocopter_rocket_barrage": {
-   "share": 0.39,
-   "mult": 1.085
-  },
-  "hoodwink_acorn_shot": {
-   "share": 0.418,
-   "mult": 1.127
-  },
-  "hoodwink_bushwhack": {
-   "share": 0.454,
-   "mult": 1.181
-  },
-  "hoodwink_scurry": {
-   "share": 0.128,
-   "mult": 0.7
-  },
-  "huskar_berserkers_blood": {
-   "share": 0.445,
-   "mult": 1.168
-  },
-  "huskar_burning_spear": {
-   "share": 0.411,
-   "mult": 1.116
-  },
-  "huskar_inner_fire": {
-   "share": 0.144,
-   "mult": 0.716
-  },
-  "invoker_exort": {
-   "share": 0.48,
-   "mult": 1.219
-  },
-  "invoker_quas": {
-   "share": 0.393,
-   "mult": 1.09
-  },
-  "invoker_wex": {
-   "share": 0.127,
-   "mult": 0.7
-  },
-  "jakiro_dual_breath": {
-   "share": 0.301,
-   "mult": 1.076
-  },
-  "jakiro_ice_path": {
-   "share": 0.283,
-   "mult": 1.05
-  },
-  "jakiro_liquid_fire": {
-   "share": 0.36,
-   "mult": 1.164
-  },
-  "jakiro_liquid_ice": {
-   "share": 0.056,
-   "mult": 0.709
-  },
-  "juggernaut_blade_dance": {
    "share": 0.361,
    "mult": 1.041
   },
-  "juggernaut_blade_fury": {
-   "share": 0.451,
-   "mult": 1.177
-  },
-  "juggernaut_healing_ward": {
-   "share": 0.188,
-   "mult": 0.781
-  },
-  "keeper_of_the_light_blinding_light": {
-   "share": 0.102,
-   "mult": 0.7
-  },
-  "keeper_of_the_light_chakra_magic": {
-   "share": 0.45,
-   "mult": 1.175
-  },
-  "keeper_of_the_light_illuminate": {
-   "share": 0.448,
-   "mult": 1.172
-  },
-  "kez_echo_slash": {
-   "share": 0.356,
-   "mult": 1.234
-  },
-  "kez_falcon_rush": {
-   "share": 0.087,
-   "mult": 0.831
-  },
-  "kez_grappling_claw": {
-   "share": 0.101,
-   "mult": 0.852
-  },
-  "kez_kazurai_katana": {
-   "share": 0.385,
-   "mult": 1.277
-  },
-  "kez_shodo_sai": {
-   "share": 0.071,
-   "mult": 0.807
-  },
-  "kunkka_tidebringer": {
-   "share": 0.451,
-   "mult": 1.176
-  },
-  "kunkka_torrent": {
-   "share": 0.192,
-   "mult": 0.788
-  },
-  "kunkka_x_marks_the_spot": {
-   "share": 0.357,
-   "mult": 1.035
-  },
-  "largo_catchy_lick": {
-   "share": 0.387,
-   "mult": 1.081
-  },
-  "largo_croak_of_genius": {
-   "share": 0.194,
-   "mult": 0.791
-  },
-  "largo_frogstomp": {
-   "share": 0.419,
-   "mult": 1.128
-  },
-  "legion_commander_moment_of_courage": {
-   "share": 0.395,
-   "mult": 1.093
-  },
-  "legion_commander_overwhelming_odds": {
-   "share": 0.46,
-   "mult": 1.19
-  },
-  "legion_commander_press_the_attack": {
-   "share": 0.144,
-   "mult": 0.717
-  },
-  "leshrac_diabolic_edict": {
-   "share": 0.448,
-   "mult": 1.172
-  },
-  "leshrac_lightning_storm": {
-   "share": 0.365,
-   "mult": 1.047
-  },
-  "leshrac_split_earth": {
-   "share": 0.187,
-   "mult": 0.781
-  },
-  "lich_frost_nova": {
-   "share": 0.456,
-   "mult": 1.184
-  },
-  "lich_frost_shield": {
-   "share": 0.285,
-   "mult": 0.927
-  },
-  "lich_sinister_gaze": {
-   "share": 0.26,
-   "mult": 0.889
-  },
-  "life_stealer_feast": {
-   "share": 0.455,
-   "mult": 1.182
-  },
-  "life_stealer_open_wounds": {
-   "share": 0.146,
-   "mult": 0.719
-  },
-  "life_stealer_rage": {
-   "share": 0.4,
-   "mult": 1.1
-  },
-  "lina_dragon_slave": {
-   "share": 0.422,
-   "mult": 1.133
-  },
-  "lina_fiery_soul": {
-   "share": 0.399,
-   "mult": 1.098
-  },
-  "lina_light_strike_array": {
-   "share": 0.18,
-   "mult": 0.769
-  },
-  "lion_impale": {
-   "share": 0.456,
-   "mult": 1.184
-  },
-  "lion_mana_drain": {
-   "share": 0.334,
-   "mult": 1.001
-  },
-  "lion_voodoo": {
-   "share": 0.21,
-   "mult": 0.815
-  },
-  "lone_druid_entangle": {
+  "enigma_demonic_conversion": {
    "share": 0.447,
-   "mult": 1.171
+   "mult": 1.17
   },
-  "lone_druid_savage_roar": {
+  "enigma_malefice": {
+   "share": 0.438,
+   "mult": 1.157
+  },
+  "enigma_midnight_pulse": {
+   "share": 0.115,
+   "mult": 0.7
+  },
+  "faceless_void_time_dilation": {
+   "share": 0.191,
+   "mult": 0.787
+  },
+  "faceless_void_time_lock": {
+   "share": 0.368,
+   "mult": 1.052
+  },
+  "faceless_void_time_walk": {
+   "share": 0.44,
+   "mult": 1.161
+  },
+  "furion_force_of_nature": {
+   "share": 0.202,
+   "mult": 0.928
+  },
+  "furion_spirit_of_the_forest": {
    "share": 0.095,
-   "mult": 0.7
+   "mult": 0.767
   },
-  "lone_druid_spirit_link": {
-   "share": 0.458,
-   "mult": 1.187
+  "furion_sprout": {
+   "share": 0.291,
+   "mult": 1.061
   },
-  "luna_lucent_beam": {
-   "share": 0.407,
-   "mult": 1.11
+  "furion_teleportation": {
+   "share": 0.413,
+   "mult": 1.244
   },
-  "luna_lunar_orbit": {
-   "share": 0.137,
-   "mult": 0.705
-  },
-  "luna_moon_glaive": {
-   "share": 0.456,
-   "mult": 1.185
-  },
-  "lycan_feral_impulse": {
-   "share": 0.43,
-   "mult": 1.145
-  },
-  "lycan_howl": {
-   "share": 0.119,
-   "mult": 0.7
-  },
-  "lycan_summon_wolves": {
-   "share": 0.451,
-   "mult": 1.177
-  },
-  "magnataur_empower": {
-   "share": 0.336,
-   "mult": 1.004
-  },
-  "magnataur_shockwave": {
-   "share": 0.334,
-   "mult": 1.001
-  },
-  "magnataur_skewer": {
-   "share": 0.33,
-   "mult": 0.995
-  },
-  "marci_bodyguard": {
+  "grimstroke_dark_artistry": {
    "share": 0.297,
-   "mult": 0.945
+   "mult": 0.946
   },
-  "marci_companion_run": {
-   "share": 0.457,
-   "mult": 1.186
+  "grimstroke_ink_creature": {
+   "share": 0.349,
+   "mult": 1.024
   },
-  "marci_grapple": {
-   "share": 0.246,
-   "mult": 0.869
+  "grimstroke_spirit_walk": {
+   "share": 0.353,
+   "mult": 1.03
   },
-  "mars_bulwark": {
-   "share": 0.074,
-   "mult": 0.7
+  "gyrocopter_flak_cannon": {
+   "share": 0.435,
+   "mult": 1.153
   },
-  "mars_gods_rebuke": {
-   "share": 0.462,
-   "mult": 1.193
+  "gyrocopter_homing_missile": {
+   "share": 0.161,
+   "mult": 0.741
   },
-  "mars_spear": {
-   "share": 0.463,
-   "mult": 1.195
+  "gyrocopter_rocket_barrage": {
+   "share": 0.404,
+   "mult": 1.105
   },
-  "medusa_gorgon_grasp": {
-   "share": 0.116,
-   "mult": 0.7
+  "hoodwink_acorn_shot": {
+   "share": 0.324,
+   "mult": 0.986
   },
-  "medusa_mystic_snake": {
+  "hoodwink_bushwhack": {
+   "share": 0.453,
+   "mult": 1.18
+  },
+  "hoodwink_scurry": {
+   "share": 0.223,
+   "mult": 0.834
+  },
+  "huskar_berserkers_blood": {
    "share": 0.444,
    "mult": 1.166
   },
+  "huskar_burning_spear": {
+   "share": 0.409,
+   "mult": 1.114
+  },
+  "huskar_inner_fire": {
+   "share": 0.147,
+   "mult": 0.72
+  },
+  "invoker_exort": {
+   "share": 0.446,
+   "mult": 1.168
+  },
+  "invoker_quas": {
+   "share": 0.389,
+   "mult": 1.083
+  },
+  "invoker_wex": {
+   "share": 0.166,
+   "mult": 0.748
+  },
+  "jakiro_double_trouble": {
+   "share": 0.085,
+   "mult": 0.752
+  },
+  "jakiro_dual_breath": {
+   "share": 0.195,
+   "mult": 0.918
+  },
+  "jakiro_ice_path": {
+   "share": 0.322,
+   "mult": 1.107
+  },
+  "jakiro_liquid_fire": {
+   "share": 0.398,
+   "mult": 1.223
+  },
+  "juggernaut_blade_dance": {
+   "share": 0.332,
+   "mult": 0.999
+  },
+  "juggernaut_blade_fury": {
+   "share": 0.439,
+   "mult": 1.158
+  },
+  "juggernaut_healing_ward": {
+   "share": 0.229,
+   "mult": 0.844
+  },
+  "keeper_of_the_light_blinding_light": {
+   "share": 0.098,
+   "mult": 0.7
+  },
+  "keeper_of_the_light_chakra_magic": {
+   "share": 0.451,
+   "mult": 1.177
+  },
+  "keeper_of_the_light_illuminate": {
+   "share": 0.451,
+   "mult": 1.176
+  },
+  "kez_echo_slash": {
+   "share": 0.352,
+   "mult": 1.228
+  },
+  "kez_falcon_rush": {
+   "share": 0.095,
+   "mult": 0.842
+  },
+  "kez_grappling_claw": {
+   "share": 0.102,
+   "mult": 0.853
+  },
+  "kez_kazurai_katana": {
+   "share": 0.353,
+   "mult": 1.229
+  },
+  "kez_shodo_sai": {
+   "share": 0.098,
+   "mult": 0.847
+  },
+  "kunkka_tidebringer": {
+   "share": 0.45,
+   "mult": 1.174
+  },
+  "kunkka_torrent": {
+   "share": 0.177,
+   "mult": 0.766
+  },
+  "kunkka_x_marks_the_spot": {
+   "share": 0.373,
+   "mult": 1.06
+  },
+  "largo_catchy_lick": {
+   "share": 0.364,
+   "mult": 1.046
+  },
+  "largo_croak_of_genius": {
+   "share": 0.226,
+   "mult": 0.839
+  },
+  "largo_frogstomp": {
+   "share": 0.41,
+   "mult": 1.115
+  },
+  "legion_commander_moment_of_courage": {
+   "share": 0.349,
+   "mult": 1.149
+  },
+  "legion_commander_outfight_them": {
+   "share": 0.033,
+   "mult": 0.7
+  },
+  "legion_commander_overwhelming_odds": {
+   "share": 0.444,
+   "mult": 1.291
+  },
+  "legion_commander_press_the_attack": {
+   "share": 0.174,
+   "mult": 0.886
+  },
+  "leshrac_diabolic_edict": {
+   "share": 0.412,
+   "mult": 1.118
+  },
+  "leshrac_lightning_storm": {
+   "share": 0.375,
+   "mult": 1.063
+  },
+  "leshrac_split_earth": {
+   "share": 0.213,
+   "mult": 0.819
+  },
+  "lich_frost_nova": {
+   "share": 0.455,
+   "mult": 1.182
+  },
+  "lich_frost_shield": {
+   "share": 0.261,
+   "mult": 0.891
+  },
+  "lich_sinister_gaze": {
+   "share": 0.285,
+   "mult": 0.927
+  },
+  "life_stealer_feast": {
+   "share": 0.304,
+   "mult": 1.081
+  },
+  "life_stealer_ghoul_frenzy": {
+   "share": 0.167,
+   "mult": 0.875
+  },
+  "life_stealer_open_wounds": {
+   "share": 0.126,
+   "mult": 0.814
+  },
+  "life_stealer_rage": {
+   "share": 0.403,
+   "mult": 1.229
+  },
+  "lina_dragon_slave": {
+   "share": 0.396,
+   "mult": 1.094
+  },
+  "lina_fiery_soul": {
+   "share": 0.424,
+   "mult": 1.135
+  },
+  "lina_light_strike_array": {
+   "share": 0.18,
+   "mult": 0.77
+  },
+  "lion_impale": {
+   "share": 0.446,
+   "mult": 1.169
+  },
+  "lion_mana_drain": {
+   "share": 0.31,
+   "mult": 0.965
+  },
+  "lion_voodoo": {
+   "share": 0.244,
+   "mult": 0.866
+  },
+  "lone_druid_entangle": {
+   "share": 0.45,
+   "mult": 1.176
+  },
+  "lone_druid_savage_roar": {
+   "share": 0.088,
+   "mult": 0.7
+  },
+  "lone_druid_spirit_link": {
+   "share": 0.462,
+   "mult": 1.193
+  },
+  "luna_lucent_beam": {
+   "share": 0.43,
+   "mult": 1.146
+  },
+  "luna_lunar_orbit": {
+   "share": 0.131,
+   "mult": 0.7
+  },
+  "luna_moon_glaive": {
+   "share": 0.438,
+   "mult": 1.158
+  },
+  "lycan_feral_impulse": {
+   "share": 0.376,
+   "mult": 1.189
+  },
+  "lycan_howl": {
+   "share": 0.12,
+   "mult": 0.805
+  },
+  "lycan_summon_wolves": {
+   "share": 0.403,
+   "mult": 1.229
+  },
+  "lycan_wolf_bite": {
+   "share": 0.101,
+   "mult": 0.777
+  },
+  "magnataur_empower": {
+   "share": 0.284,
+   "mult": 1.05
+  },
+  "magnataur_shockwave": {
+   "share": 0.303,
+   "mult": 1.08
+  },
+  "magnataur_skewer": {
+   "share": 0.349,
+   "mult": 1.148
+  },
+  "magnataur_solid_core": {
+   "share": 0.064,
+   "mult": 0.721
+  },
+  "marci_bodyguard": {
+   "share": 0.317,
+   "mult": 0.976
+  },
+  "marci_companion_run": {
+   "share": 0.447,
+   "mult": 1.171
+  },
+  "marci_grapple": {
+   "share": 0.235,
+   "mult": 0.853
+  },
+  "mars_bulwark": {
+   "share": 0.109,
+   "mult": 0.7
+  },
+  "mars_gods_rebuke": {
+   "share": 0.443,
+   "mult": 1.165
+  },
+  "mars_spear": {
+   "share": 0.447,
+   "mult": 1.171
+  },
+  "medusa_gorgon_grasp": {
+   "share": 0.118,
+   "mult": 0.7
+  },
+  "medusa_mystic_snake": {
+   "share": 0.447,
+   "mult": 1.17
+  },
   "medusa_split_shot": {
-   "share": 0.44,
-   "mult": 1.16
+   "share": 0.435,
+   "mult": 1.153
   },
   "meepo_earthbind": {
    "share": 0.136,
    "mult": 0.704
   },
   "meepo_poof": {
-   "share": 0.497,
-   "mult": 1.246
+   "share": 0.5,
+   "mult": 1.25
   },
   "meepo_ransack": {
-   "share": 0.367,
-   "mult": 1.05
+   "share": 0.364,
+   "mult": 1.046
   },
   "mirana_arrow": {
-   "share": 0.373,
-   "mult": 1.059
+   "share": 0.366,
+   "mult": 1.049
   },
   "mirana_leap": {
-   "share": 0.175,
-   "mult": 0.762
+   "share": 0.189,
+   "mult": 0.783
   },
   "mirana_starfall": {
-   "share": 0.452,
-   "mult": 1.178
+   "share": 0.445,
+   "mult": 1.168
   },
   "monkey_king_boundless_strike": {
-   "share": 0.317,
-   "mult": 0.975
+   "share": 0.326,
+   "mult": 0.99
   },
   "monkey_king_jingu_mastery": {
-   "share": 0.345,
-   "mult": 1.018
+   "share": 0.32,
+   "mult": 0.981
   },
   "monkey_king_tree_dance": {
-   "share": 0.338,
-   "mult": 1.007
+   "share": 0.353,
+   "mult": 1.03
   },
   "morphling_adaptive_strike_agi": {
-   "share": 0.233,
-   "mult": 0.85
-  },
-  "morphling_morph_agi": {
-   "share": 0.296,
-   "mult": 0.944
-  },
-  "morphling_waveform": {
-   "share": 0.471,
-   "mult": 1.206
-  },
-  "muerta_dead_shot": {
-   "share": 0.46,
-   "mult": 1.19
-  },
-  "muerta_gunslinger": {
-   "share": 0.395,
-   "mult": 1.092
-  },
-  "muerta_the_calling": {
-   "share": 0.145,
-   "mult": 0.718
-  },
-  "naga_siren_ensnare": {
-   "share": 0.112,
+   "share": 0.086,
    "mult": 0.7
   },
+  "morphling_morph_agi": {
+   "share": 0.371,
+   "mult": 1.057
+  },
+  "morphling_waveform": {
+   "share": 0.542,
+   "mult": 1.3
+  },
+  "muerta_dead_shot": {
+   "share": 0.448,
+   "mult": 1.171
+  },
+  "muerta_gunslinger": {
+   "share": 0.311,
+   "mult": 0.966
+  },
+  "muerta_the_calling": {
+   "share": 0.242,
+   "mult": 0.863
+  },
+  "naga_siren_ensnare": {
+   "share": 0.198,
+   "mult": 0.796
+  },
   "naga_siren_mirror_image": {
-   "share": 0.446,
-   "mult": 1.17
+   "share": 0.615,
+   "mult": 1.3
   },
   "naga_siren_rip_tide": {
-   "share": 0.442,
-   "mult": 1.163
+   "share": 0.187,
+   "mult": 0.781
   },
   "necrolyte_death_pulse": {
-   "share": 0.455,
-   "mult": 1.183
+   "share": 0.449,
+   "mult": 1.174
   },
   "necrolyte_ghost_shroud": {
-   "share": 0.111,
+   "share": 0.116,
    "mult": 0.7
   },
   "necrolyte_heartstopper_aura": {
-   "share": 0.434,
-   "mult": 1.151
+   "share": 0.435,
+   "mult": 1.152
   },
   "nevermore_dark_lord": {
-   "share": 0.449,
-   "mult": 1.3
+   "share": 0.453,
+   "mult": 1.179
   },
   "nevermore_frenzy": {
-   "share": 0.088,
-   "mult": 0.832
+   "share": 0.084,
+   "mult": 0.7
   },
   "nevermore_shadowraze1": {
-   "share": 0.247,
-   "mult": 1.071
-  },
-  "nevermore_shadowraze2": {
-   "share": 0.106,
-   "mult": 0.858
-  },
-  "nevermore_shadowraze3": {
-   "share": 0.11,
-   "mult": 0.866
+   "share": 0.463,
+   "mult": 1.194
   },
   "night_stalker_crippling_fear": {
-   "share": 0.29,
-   "mult": 0.936
+   "share": 0.263,
+   "mult": 0.895
   },
   "night_stalker_midnight_feast": {
-   "share": 0.272,
-   "mult": 0.908
-  },
-  "night_stalker_void": {
-   "share": 0.437,
-   "mult": 1.156
-  },
-  "nyx_assassin_impale": {
-   "share": 0.449,
-   "mult": 1.173
-  },
-  "nyx_assassin_jolt": {
-   "share": 0.226,
-   "mult": 0.838
-  },
-  "nyx_assassin_spiked_carapace": {
-   "share": 0.326,
-   "mult": 0.989
-  },
-  "obsidian_destroyer_arcane_orb": {
-   "share": 0.443,
-   "mult": 1.165
-  },
-  "obsidian_destroyer_astral_imprisonment": {
-   "share": 0.407,
-   "mult": 1.111
-  },
-  "obsidian_destroyer_objurgation": {
-   "share": 0.149,
-   "mult": 0.724
-  },
-  "ogre_magi_bloodlust": {
-   "share": 0.358,
-   "mult": 1.037
-  },
-  "ogre_magi_fireblast": {
-   "share": 0.257,
-   "mult": 0.885
-  },
-  "ogre_magi_ignite": {
-   "share": 0.385,
-   "mult": 1.078
-  },
-  "omniknight_hammer_of_purity": {
-   "share": 0.247,
-   "mult": 0.871
-  },
-  "omniknight_martyr": {
    "share": 0.296,
    "mult": 0.944
   },
+  "night_stalker_void": {
+   "share": 0.441,
+   "mult": 1.162
+  },
+  "nyx_assassin_impale": {
+   "share": 0.445,
+   "mult": 1.168
+  },
+  "nyx_assassin_jolt": {
+   "share": 0.15,
+   "mult": 0.725
+  },
+  "nyx_assassin_spiked_carapace": {
+   "share": 0.405,
+   "mult": 1.107
+  },
+  "obsidian_destroyer_arcane_orb": {
+   "share": 0.436,
+   "mult": 1.28
+  },
+  "obsidian_destroyer_astral_imprisonment": {
+   "share": 0.426,
+   "mult": 1.265
+  },
+  "obsidian_destroyer_equilibrium": {
+   "share": 0.056,
+   "mult": 0.709
+  },
+  "obsidian_destroyer_objurgation": {
+   "share": 0.081,
+   "mult": 0.746
+  },
+  "ogre_magi_bloodlust": {
+   "share": 0.374,
+   "mult": 1.061
+  },
+  "ogre_magi_fireblast": {
+   "share": 0.243,
+   "mult": 0.864
+  },
+  "ogre_magi_ignite": {
+   "share": 0.383,
+   "mult": 1.075
+  },
+  "omniknight_degen_aura": {
+   "share": 0.06,
+   "mult": 0.716
+  },
+  "omniknight_hammer_of_purity": {
+   "share": 0.276,
+   "mult": 1.039
+  },
+  "omniknight_martyr": {
+   "share": 0.25,
+   "mult": 1.0
+  },
   "omniknight_purification": {
-   "share": 0.457,
-   "mult": 1.185
+   "share": 0.414,
+   "mult": 1.246
   },
   "oracle_fates_edict": {
-   "share": 0.212,
-   "mult": 0.818
+   "share": 0.254,
+   "mult": 0.881
   },
   "oracle_fortunes_end": {
-   "share": 0.332,
-   "mult": 0.998
+   "share": 0.284,
+   "mult": 0.925
   },
   "oracle_purifying_flames": {
-   "share": 0.456,
-   "mult": 1.183
+   "share": 0.462,
+   "mult": 1.194
   },
   "pangolier_lucky_shot": {
-   "share": 0.117,
-   "mult": 0.7
+   "share": 0.144,
+   "mult": 0.716
   },
   "pangolier_shield_crash": {
-   "share": 0.427,
-   "mult": 1.141
+   "share": 0.41,
+   "mult": 1.116
   },
   "pangolier_swashbuckle": {
-   "share": 0.456,
-   "mult": 1.184
+   "share": 0.446,
+   "mult": 1.169
   },
   "phantom_assassin_immaterial": {
    "share": 0.111,
    "mult": 0.7
   },
   "phantom_assassin_phantom_strike": {
-   "share": 0.451,
-   "mult": 1.177
+   "share": 0.453,
+   "mult": 1.18
   },
   "phantom_assassin_stifling_dagger": {
-   "share": 0.438,
-   "mult": 1.157
+   "share": 0.436,
+   "mult": 1.154
   },
   "phantom_lancer_doppelwalk": {
-   "share": 0.141,
-   "mult": 0.711
+   "share": 0.148,
+   "mult": 0.722
   },
   "phantom_lancer_phantom_edge": {
-   "share": 0.422,
-   "mult": 1.133
+   "share": 0.412,
+   "mult": 1.117
   },
   "phantom_lancer_spirit_lance": {
-   "share": 0.437,
-   "mult": 1.156
+   "share": 0.44,
+   "mult": 1.16
   },
   "phoenix_fire_spirits": {
-   "share": 0.368,
-   "mult": 1.177
+   "share": 0.344,
+   "mult": 1.14
   },
   "phoenix_icarus_dive": {
-   "share": 0.309,
-   "mult": 1.088
+   "share": 0.22,
+   "mult": 0.956
   },
   "phoenix_launch_fire_spirit": {
-   "share": 0.091,
-   "mult": 0.761
+   "share": 0.109,
+   "mult": 0.789
   },
   "phoenix_sun_ray": {
-   "share": 0.233,
-   "mult": 0.974
+   "share": 0.327,
+   "mult": 1.115
   },
   "primal_beast_onslaught": {
-   "share": 0.45,
-   "mult": 1.176
+   "share": 0.452,
+   "mult": 1.179
   },
   "primal_beast_trample": {
    "share": 0.464,
-   "mult": 1.195
+   "mult": 1.196
   },
   "primal_beast_uproar": {
-   "share": 0.086,
+   "share": 0.084,
    "mult": 0.7
   },
   "puck_illusory_orb": {
-   "share": 0.462,
-   "mult": 1.193
+   "share": 0.444,
+   "mult": 1.166
   },
   "puck_phase_shift": {
-   "share": 0.118,
+   "share": 0.12,
    "mult": 0.7
   },
   "puck_waning_rift": {
-   "share": 0.42,
-   "mult": 1.13
-  },
-  "pudge_flesh_heap": {
-   "share": 0.259,
-   "mult": 0.889
-  },
-  "pudge_meat_hook": {
-   "share": 0.304,
-   "mult": 0.957
-  },
-  "pudge_rot": {
    "share": 0.437,
    "mult": 1.155
   },
+  "pudge_flesh_heap": {
+   "share": 0.282,
+   "mult": 1.047
+  },
+  "pudge_innate_graft_flesh": {
+   "share": 0.08,
+   "mult": 0.745
+  },
+  "pudge_meat_hook": {
+   "share": 0.233,
+   "mult": 0.975
+  },
+  "pudge_rot": {
+   "share": 0.405,
+   "mult": 1.232
+  },
   "pugna_decrepify": {
-   "share": 0.215,
-   "mult": 0.822
+   "share": 0.19,
+   "mult": 0.785
   },
   "pugna_nether_blast": {
-   "share": 0.46,
-   "mult": 1.19
+   "share": 0.448,
+   "mult": 1.172
   },
   "pugna_nether_ward": {
-   "share": 0.326,
-   "mult": 0.989
+   "share": 0.362,
+   "mult": 1.043
   },
   "queenofpain_blink": {
-   "share": 0.372,
-   "mult": 1.057
+   "share": 0.344,
+   "mult": 1.016
   },
   "queenofpain_scream_of_pain": {
-   "share": 0.449,
-   "mult": 1.173
+   "share": 0.436,
+   "mult": 1.154
   },
   "queenofpain_shadow_strike": {
-   "share": 0.18,
-   "mult": 0.77
+   "share": 0.22,
+   "mult": 0.83
   },
   "rattletrap_battery_assault": {
-   "share": 0.142,
-   "mult": 0.713
+   "share": 0.195,
+   "mult": 0.792
   },
   "rattletrap_power_cogs": {
-   "share": 0.442,
-   "mult": 1.163
+   "share": 0.438,
+   "mult": 1.157
   },
   "rattletrap_rocket_flare": {
-   "share": 0.416,
-   "mult": 1.124
+   "share": 0.367,
+   "mult": 1.051
   },
   "razor_plasma_field": {
-   "share": 0.452,
-   "mult": 1.178
+   "share": 0.443,
+   "mult": 1.164
   },
   "razor_static_link": {
-   "share": 0.279,
-   "mult": 0.919
+   "share": 0.216,
+   "mult": 0.824
   },
   "razor_storm_surge": {
-   "share": 0.269,
-   "mult": 0.903
-  },
-  "riki_blink_strike": {
-   "share": 0.458,
-   "mult": 1.187
-  },
-  "riki_smoke_screen": {
-   "share": 0.123,
-   "mult": 0.7
-  },
-  "riki_tricks_of_the_trade": {
-   "share": 0.419,
-   "mult": 1.128
-  },
-  "ringmaster_impalement": {
-   "share": 0.342,
+   "share": 0.341,
    "mult": 1.012
   },
-  "ringmaster_tame_the_beasts": {
-   "share": 0.449,
-   "mult": 1.173
+  "riki_blink_strike": {
+   "share": 0.426,
+   "mult": 1.264
   },
-  "ringmaster_the_box": {
-   "share": 0.21,
-   "mult": 0.815
-  },
-  "rubick_arcane_supremacy": {
-   "share": 0.425,
-   "mult": 1.138
-  },
-  "rubick_fade_bolt": {
-   "share": 0.451,
-   "mult": 1.176
-  },
-  "rubick_telekinesis": {
-   "share": 0.124,
+  "riki_innate_backstab": {
+   "share": 0.045,
    "mult": 0.7
   },
+  "riki_smoke_screen": {
+   "share": 0.244,
+   "mult": 0.991
+  },
+  "riki_tricks_of_the_trade": {
+   "share": 0.285,
+   "mult": 1.053
+  },
+  "ringmaster_impalement": {
+   "share": 0.361,
+   "mult": 1.041
+  },
+  "ringmaster_tame_the_beasts": {
+   "share": 0.438,
+   "mult": 1.156
+  },
+  "ringmaster_the_box": {
+   "share": 0.202,
+   "mult": 0.803
+  },
+  "rubick_arcane_supremacy": {
+   "share": 0.241,
+   "mult": 0.862
+  },
+  "rubick_fade_bolt": {
+   "share": 0.611,
+   "mult": 1.3
+  },
+  "rubick_telekinesis": {
+   "share": 0.148,
+   "mult": 0.722
+  },
   "sandking_burrowstrike": {
-   "share": 0.41,
-   "mult": 1.115
+   "share": 0.419,
+   "mult": 1.128
   },
   "sandking_sand_storm": {
    "share": 0.447,
    "mult": 1.171
   },
   "sandking_scorpion_strike": {
-   "share": 0.142,
-   "mult": 0.714
+   "share": 0.134,
+   "mult": 0.701
   },
   "shadow_demon_disruption": {
-   "share": 0.292,
-   "mult": 0.938
+   "share": 0.287,
+   "mult": 0.93
   },
   "shadow_demon_disseminate": {
-   "share": 0.354,
-   "mult": 1.031
+   "share": 0.412,
+   "mult": 1.118
   },
   "shadow_demon_shadow_poison": {
-   "share": 0.354,
-   "mult": 1.031
+   "share": 0.302,
+   "mult": 0.952
   },
   "shadow_shaman_ether_shock": {
-   "share": 0.235,
-   "mult": 0.852
+   "share": 0.223,
+   "mult": 0.835
   },
   "shadow_shaman_shackles": {
-   "share": 0.445,
-   "mult": 1.168
-  },
-  "shadow_shaman_voodoo": {
-   "share": 0.32,
-   "mult": 0.98
-  },
-  "shredder_reactive_armor": {
-   "share": 0.184,
-   "mult": 0.776
-  },
-  "shredder_timber_chain": {
-   "share": 0.368,
-   "mult": 1.052
-  },
-  "shredder_whirling_death": {
-   "share": 0.448,
+   "share": 0.449,
    "mult": 1.173
   },
+  "shadow_shaman_voodoo": {
+   "share": 0.328,
+   "mult": 0.992
+  },
+  "shredder_reactive_armor": {
+   "share": 0.173,
+   "mult": 0.759
+  },
+  "shredder_timber_chain": {
+   "share": 0.389,
+   "mult": 1.083
+  },
+  "shredder_whirling_death": {
+   "share": 0.439,
+   "mult": 1.158
+  },
   "silencer_curse_of_the_silent": {
-   "share": 0.448,
-   "mult": 1.171
+   "share": 0.454,
+   "mult": 1.181
   },
   "silencer_glaives_of_wisdom": {
-   "share": 0.129,
+   "share": 0.118,
    "mult": 0.7
   },
   "silencer_last_word": {
-   "share": 0.423,
-   "mult": 1.135
+   "share": 0.428,
+   "mult": 1.142
   },
   "skeleton_king_bone_guard": {
-   "share": 0.444,
-   "mult": 1.166
+   "share": 0.447,
+   "mult": 1.17
   },
   "skeleton_king_hellfire_blast": {
-   "share": 0.153,
-   "mult": 0.729
+   "share": 0.141,
+   "mult": 0.712
   },
   "skeleton_king_mortal_strike": {
-   "share": 0.403,
-   "mult": 1.105
+   "share": 0.412,
+   "mult": 1.118
   },
   "skywrath_mage_ancient_seal": {
-   "share": 0.388,
-   "mult": 1.082
+   "share": 0.402,
+   "mult": 1.103
   },
   "skywrath_mage_arcane_bolt": {
-   "share": 0.397,
-   "mult": 1.095
+   "share": 0.412,
+   "mult": 1.118
   },
   "skywrath_mage_concussive_shot": {
-   "share": 0.216,
-   "mult": 0.824
+   "share": 0.187,
+   "mult": 0.78
   },
   "slardar_bash": {
-   "share": 0.256,
-   "mult": 0.885
+   "share": 0.205,
+   "mult": 0.932
+  },
+  "slardar_seaborn_sentinel": {
+   "share": 0.057,
+   "mult": 0.71
   },
   "slardar_slithereen_crush": {
-   "share": 0.448,
-   "mult": 1.172
+   "share": 0.419,
+   "mult": 1.253
   },
   "slardar_sprint": {
-   "share": 0.296,
-   "mult": 0.943
+   "share": 0.32,
+   "mult": 1.105
   },
   "slark_dark_pact": {
    "share": 0.457,
    "mult": 1.185
   },
   "slark_pounce": {
-   "share": 0.374,
-   "mult": 1.06
+   "share": 0.412,
+   "mult": 1.119
   },
   "slark_saltwater_shiv": {
-   "share": 0.17,
-   "mult": 0.754
-  },
-  "snapfire_firesnap_cookie": {
-   "share": 0.438,
-   "mult": 1.157
-  },
-  "snapfire_lil_shredder": {
-   "share": 0.098,
+   "share": 0.131,
    "mult": 0.7
   },
+  "snapfire_firesnap_cookie": {
+   "share": 0.415,
+   "mult": 1.123
+  },
+  "snapfire_lil_shredder": {
+   "share": 0.141,
+   "mult": 0.712
+  },
   "snapfire_scatterblast": {
-   "share": 0.464,
-   "mult": 1.196
+   "share": 0.443,
+   "mult": 1.165
   },
   "sniper_headshot": {
-   "share": 0.386,
-   "mult": 1.079
+   "share": 0.38,
+   "mult": 1.194
+  },
+  "sniper_keen_scope": {
+   "share": 0.069,
+   "mult": 0.728
   },
   "sniper_shrapnel": {
-   "share": 0.396,
-   "mult": 1.094
+   "share": 0.407,
+   "mult": 1.235
   },
   "sniper_take_aim": {
-   "share": 0.218,
-   "mult": 0.827
+   "share": 0.145,
+   "mult": 0.843
+  },
+  "spectre_desolate": {
+   "share": 0.051,
+   "mult": 0.777
   },
   "spectre_dispersion": {
-   "share": 0.392,
-   "mult": 1.089
+   "share": 0.376,
+   "mult": 1.264
+  },
+  "spectre_reality": {
+   "share": 0.032,
+   "mult": 0.748
   },
   "spectre_shadow_step": {
-   "share": 0.161,
-   "mult": 0.741
+   "share": 0.111,
+   "mult": 0.866
   },
   "spectre_spectral_dagger": {
-   "share": 0.447,
-   "mult": 1.171
+   "share": 0.43,
+   "mult": 1.3
   },
   "spirit_breaker_bulldoze": {
-   "share": 0.141,
-   "mult": 0.711
+   "share": 0.131,
+   "mult": 0.7
   },
   "spirit_breaker_charge_of_darkness": {
-   "share": 0.426,
-   "mult": 1.139
+   "share": 0.43,
+   "mult": 1.146
   },
   "spirit_breaker_greater_bash": {
-   "share": 0.433,
-   "mult": 1.15
+   "share": 0.439,
+   "mult": 1.159
   },
   "storm_spirit_electric_vortex": {
-   "share": 0.113,
+   "share": 0.112,
    "mult": 0.7
   },
   "storm_spirit_overload": {
-   "share": 0.433,
-   "mult": 1.15
+   "share": 0.432,
+   "mult": 1.149
   },
   "storm_spirit_static_remnant": {
-   "share": 0.454,
-   "mult": 1.181
+   "share": 0.456,
+   "mult": 1.184
   },
   "sven_great_cleave": {
-   "share": 0.454,
-   "mult": 1.181
+   "share": 0.43,
+   "mult": 1.146
   },
   "sven_storm_bolt": {
-   "share": 0.355,
-   "mult": 1.033
+   "share": 0.378,
+   "mult": 1.067
   },
   "sven_warcry": {
-   "share": 0.19,
-   "mult": 0.786
+   "share": 0.192,
+   "mult": 0.788
+  },
+  "techies_minefield_sign": {
+   "share": 0.093,
+   "mult": 0.764
   },
   "techies_reactive_tazer": {
-   "share": 0.389,
-   "mult": 1.083
+   "share": 0.345,
+   "mult": 1.142
   },
   "techies_sticky_bomb": {
-   "share": 0.189,
-   "mult": 0.784
+   "share": 0.173,
+   "mult": 0.885
   },
   "techies_suicide": {
-   "share": 0.422,
-   "mult": 1.133
+   "share": 0.389,
+   "mult": 1.208
   },
   "templar_assassin_meld": {
-   "share": 0.365,
-   "mult": 1.047
+   "share": 0.312,
+   "mult": 0.968
   },
   "templar_assassin_psi_blades": {
-   "share": 0.399,
-   "mult": 1.099
+   "share": 0.407,
+   "mult": 1.111
   },
   "templar_assassin_refraction": {
-   "share": 0.236,
-   "mult": 0.854
+   "share": 0.281,
+   "mult": 0.921
   },
   "terrorblade_conjure_image": {
-   "share": 0.47,
-   "mult": 1.206
-  },
-  "terrorblade_metamorphosis": {
-   "share": 0.46,
-   "mult": 1.19
-  },
-  "terrorblade_reflection": {
-   "share": 0.07,
-   "mult": 0.7
-  },
-  "tidehunter_anchor_smash": {
-   "share": 0.454,
-   "mult": 1.18
-  },
-  "tidehunter_gush": {
-   "share": 0.202,
-   "mult": 0.804
-  },
-  "tidehunter_kraken_shell": {
-   "share": 0.344,
-   "mult": 1.016
-  },
-  "tinker_deploy_turrets": {
-   "share": 0.168,
-   "mult": 0.752
-  },
-  "tinker_laser": {
-   "share": 0.368,
-   "mult": 1.051
-  },
-  "tinker_march_of_the_machines": {
-   "share": 0.464,
-   "mult": 1.197
-  },
-  "tiny_avalanche": {
-   "share": 0.424,
-   "mult": 1.26
-  },
-  "tiny_toss": {
-   "share": 0.173,
-   "mult": 0.884
-  },
-  "tiny_toss_tree": {
-   "share": 0.104,
-   "mult": 0.782
-  },
-  "tiny_tree_grab": {
-   "share": 0.299,
-   "mult": 1.074
-  },
-  "treant_leech_seed": {
-   "share": 0.133,
-   "mult": 0.7
-  },
-  "treant_living_armor": {
    "share": 0.451,
    "mult": 1.176
   },
-  "treant_natures_grasp": {
-   "share": 0.416,
-   "mult": 1.124
+  "terrorblade_metamorphosis": {
+   "share": 0.444,
+   "mult": 1.166
   },
-  "troll_warlord_berserkers_rage": {
-   "share": 0.277,
-   "mult": 1.04
+  "terrorblade_reflection": {
+   "share": 0.105,
+   "mult": 0.7
   },
-  "troll_warlord_fervor": {
-   "share": 0.383,
-   "mult": 1.199
+  "tidehunter_anchor_smash": {
+   "share": 0.444,
+   "mult": 1.166
   },
-  "troll_warlord_whirling_axes_melee": {
+  "tidehunter_gush": {
+   "share": 0.188,
+   "mult": 0.781
+  },
+  "tidehunter_kraken_shell": {
+   "share": 0.368,
+   "mult": 1.052
+  },
+  "tinker_deploy_turrets": {
+   "share": 0.069,
+   "mult": 0.729
+  },
+  "tinker_keen_teleport": {
    "share": 0.112,
-   "mult": 0.792
+   "mult": 0.793
   },
-  "troll_warlord_whirling_axes_ranged": {
-   "share": 0.229,
-   "mult": 0.968
+  "tinker_laser": {
+   "share": 0.371,
+   "mult": 1.181
   },
-  "tusk_ice_shards": {
-   "share": 0.269,
-   "mult": 0.904
-  },
-  "tusk_snowball": {
-   "share": 0.34,
-   "mult": 1.011
-  },
-  "tusk_tag_team": {
-   "share": 0.391,
-   "mult": 1.086
-  },
-  "undying_decay": {
-   "share": 0.43,
-   "mult": 1.144
-  },
-  "undying_soul_rip": {
-   "share": 0.219,
-   "mult": 0.829
-  },
-  "undying_tombstone": {
-   "share": 0.351,
-   "mult": 1.027
-  },
-  "ursa_earthshock": {
-   "share": 0.116,
-   "mult": 0.7
-  },
-  "ursa_fury_swipes": {
-   "share": 0.449,
-   "mult": 1.173
-  },
-  "ursa_overpower": {
-   "share": 0.436,
-   "mult": 1.153
-  },
-  "vengefulspirit_command_aura": {
-   "share": 0.214,
-   "mult": 0.821
-  },
-  "vengefulspirit_magic_missile": {
-   "share": 0.356,
-   "mult": 1.034
-  },
-  "vengefulspirit_wave_of_terror": {
-   "share": 0.43,
-   "mult": 1.145
-  },
-  "venomancer_plague_ward": {
+  "tinker_march_of_the_machines": {
    "share": 0.448,
-   "mult": 1.173
+   "mult": 1.297
   },
-  "venomancer_snakebite": {
-   "share": 0.254,
-   "mult": 0.881
+  "tiny_avalanche": {
+   "share": 0.433,
+   "mult": 1.274
   },
-  "venomancer_venomous_gale": {
-   "share": 0.298,
-   "mult": 0.946
+  "tiny_toss": {
+   "share": 0.327,
+   "mult": 1.116
   },
-  "viper_corrosive_skin": {
-   "share": 0.269,
-   "mult": 0.903
+  "tiny_toss_tree": {
+   "share": 0.063,
+   "mult": 0.72
   },
-  "viper_nethertoxin": {
-   "share": 0.367,
-   "mult": 1.051
+  "tiny_tree_grab": {
+   "share": 0.177,
+   "mult": 0.89
   },
-  "viper_poison_attack": {
-   "share": 0.364,
-   "mult": 1.046
+  "treant_leech_seed": {
+   "share": 0.146,
+   "mult": 0.719
   },
-  "visage_grave_chill": {
-   "share": 0.438,
-   "mult": 1.157
-  },
-  "visage_gravekeepers_cloak": {
-   "share": 0.234,
-   "mult": 0.851
-  },
-  "visage_soul_assumption": {
-   "share": 0.328,
-   "mult": 0.992
-  },
-  "void_spirit_aether_remnant": {
-   "share": 0.289,
-   "mult": 0.933
-  },
-  "void_spirit_dissimilate": {
-   "share": 0.289,
-   "mult": 0.934
-  },
-  "void_spirit_resonant_pulse": {
-   "share": 0.422,
-   "mult": 1.133
-  },
-  "warlock_fatal_bonds": {
-   "share": 0.449,
-   "mult": 1.174
-  },
-  "warlock_shadow_word": {
-   "share": 0.447,
-   "mult": 1.171
-  },
-  "warlock_upheaval": {
-   "share": 0.104,
-   "mult": 0.7
-  },
-  "weaver_geminate_attack": {
-   "share": 0.331,
-   "mult": 0.996
-  },
-  "weaver_shukuchi": {
-   "share": 0.447,
-   "mult": 1.17
-  },
-  "weaver_the_swarm": {
-   "share": 0.223,
-   "mult": 0.834
-  },
-  "windrunner_powershot": {
-   "share": 0.446,
-   "mult": 1.169
-  },
-  "windrunner_shackleshot": {
-   "share": 0.196,
-   "mult": 0.794
-  },
-  "windrunner_windrun": {
-   "share": 0.358,
-   "mult": 1.037
-  },
-  "winter_wyvern_arctic_burn": {
-   "share": 0.478,
-   "mult": 1.217
-  },
-  "winter_wyvern_cold_embrace": {
-   "share": 0.201,
-   "mult": 0.802
-  },
-  "winter_wyvern_splinter_blast": {
-   "share": 0.321,
-   "mult": 0.981
-  },
-  "wisp_overcharge": {
-   "share": 0.351,
-   "mult": 1.152
-  },
-  "wisp_spirits": {
-   "share": 0.387,
-   "mult": 1.205
-  },
-  "wisp_tether": {
-   "share": 0.182,
-   "mult": 0.898
-  },
-  "wisp_tether_break": {
-   "share": 0.08,
-   "mult": 0.745
-  },
-  "witch_doctor_maledict": {
+  "treant_living_armor": {
    "share": 0.453,
    "mult": 1.179
   },
+  "treant_natures_grasp": {
+   "share": 0.401,
+   "mult": 1.102
+  },
+  "troll_warlord_berserkers_rage": {
+   "share": 0.308,
+   "mult": 1.087
+  },
+  "troll_warlord_fervor": {
+   "share": 0.389,
+   "mult": 1.209
+  },
+  "troll_warlord_whirling_axes_melee": {
+   "share": 0.069,
+   "mult": 0.729
+  },
+  "troll_warlord_whirling_axes_ranged": {
+   "share": 0.233,
+   "mult": 0.975
+  },
+  "tusk_bitter_chill": {
+   "share": 0.068,
+   "mult": 0.802
+  },
+  "tusk_drinking_buddies": {
+   "share": 0.03,
+   "mult": 0.746
+  },
+  "tusk_ice_shards": {
+   "share": 0.263,
+   "mult": 1.095
+  },
+  "tusk_snowball": {
+   "share": 0.298,
+   "mult": 1.147
+  },
+  "tusk_tag_team": {
+   "share": 0.341,
+   "mult": 1.211
+  },
+  "undying_decay": {
+   "share": 0.425,
+   "mult": 1.138
+  },
+  "undying_soul_rip": {
+   "share": 0.218,
+   "mult": 0.826
+  },
+  "undying_tombstone": {
+   "share": 0.357,
+   "mult": 1.036
+  },
+  "ursa_earthshock": {
+   "share": 0.114,
+   "mult": 0.7
+  },
+  "ursa_fury_swipes": {
+   "share": 0.447,
+   "mult": 1.171
+  },
+  "ursa_overpower": {
+   "share": 0.439,
+   "mult": 1.158
+  },
+  "vengefulspirit_command_aura": {
+   "share": 0.218,
+   "mult": 0.827
+  },
+  "vengefulspirit_magic_missile": {
+   "share": 0.36,
+   "mult": 1.041
+  },
+  "vengefulspirit_wave_of_terror": {
+   "share": 0.421,
+   "mult": 1.132
+  },
+  "venomancer_plague_ward": {
+   "share": 0.44,
+   "mult": 1.285
+  },
+  "venomancer_poison_sting": {
+   "share": 0.095,
+   "mult": 0.768
+  },
+  "venomancer_snakebite": {
+   "share": 0.139,
+   "mult": 0.834
+  },
+  "venomancer_venomous_gale": {
+   "share": 0.325,
+   "mult": 1.113
+  },
+  "viper_corrosive_skin": {
+   "share": 0.3,
+   "mult": 0.949
+  },
+  "viper_nethertoxin": {
+   "share": 0.397,
+   "mult": 1.096
+  },
+  "viper_poison_attack": {
+   "share": 0.303,
+   "mult": 0.955
+  },
+  "visage_grave_chill": {
+   "share": 0.354,
+   "mult": 1.155
+  },
+  "visage_gravekeepers_cloak": {
+   "share": 0.22,
+   "mult": 0.954
+  },
+  "visage_soul_assumption": {
+   "share": 0.323,
+   "mult": 1.11
+  },
+  "visage_stone_form_self_cast": {
+   "share": 0.104,
+   "mult": 0.78
+  },
+  "void_spirit_aether_remnant": {
+   "share": 0.343,
+   "mult": 1.015
+  },
+  "void_spirit_dissimilate": {
+   "share": 0.253,
+   "mult": 0.88
+  },
+  "void_spirit_resonant_pulse": {
+   "share": 0.404,
+   "mult": 1.105
+  },
+  "warlock_eldritch_summoning": {
+   "share": 0.089,
+   "mult": 0.758
+  },
+  "warlock_fatal_bonds": {
+   "share": 0.396,
+   "mult": 1.219
+  },
+  "warlock_shadow_word": {
+   "share": 0.406,
+   "mult": 1.233
+  },
+  "warlock_upheaval": {
+   "share": 0.11,
+   "mult": 0.789
+  },
+  "weaver_geminate_attack": {
+   "share": 0.387,
+   "mult": 1.081
+  },
+  "weaver_shukuchi": {
+   "share": 0.445,
+   "mult": 1.167
+  },
+  "weaver_the_swarm": {
+   "share": 0.168,
+   "mult": 0.752
+  },
+  "windrunner_focusfire_cancel": {
+   "share": 0.097,
+   "mult": 0.771
+  },
+  "windrunner_powershot": {
+   "share": 0.343,
+   "mult": 1.139
+  },
+  "windrunner_shackleshot": {
+   "share": 0.228,
+   "mult": 0.967
+  },
+  "windrunner_windrun": {
+   "share": 0.332,
+   "mult": 1.123
+  },
+  "winter_wyvern_arctic_burn": {
+   "share": 0.484,
+   "mult": 1.226
+  },
+  "winter_wyvern_cold_embrace": {
+   "share": 0.203,
+   "mult": 0.805
+  },
+  "winter_wyvern_splinter_blast": {
+   "share": 0.313,
+   "mult": 0.969
+  },
+  "wisp_overcharge": {
+   "share": 0.333,
+   "mult": 1.124
+  },
+  "wisp_spirits": {
+   "share": 0.354,
+   "mult": 1.156
+  },
+  "wisp_tether": {
+   "share": 0.162,
+   "mult": 0.867
+  },
+  "wisp_tether_break": {
+   "share": 0.152,
+   "mult": 0.853
+  },
+  "witch_doctor_maledict": {
+   "share": 0.463,
+   "mult": 1.194
+  },
   "witch_doctor_paralyzing_cask": {
-   "share": 0.286,
-   "mult": 0.929
+   "share": 0.362,
+   "mult": 1.044
   },
   "witch_doctor_voodoo_restoration": {
-   "share": 0.261,
-   "mult": 0.892
+   "share": 0.175,
+   "mult": 0.762
   },
   "zuus_arc_lightning": {
-   "share": 0.429,
-   "mult": 1.143
+   "share": 0.431,
+   "mult": 1.146
   },
   "zuus_heavenly_jump": {
-   "share": 0.137,
-   "mult": 0.705
+   "share": 0.138,
+   "mult": 0.708
   },
   "zuus_lightning_bolt": {
-   "share": 0.435,
-   "mult": 1.152
+   "share": 0.431,
+   "mult": 1.146
   }
  }
 }

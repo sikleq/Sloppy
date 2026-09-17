@@ -109,6 +109,24 @@ Also bump per patch: `PATCH_ENTRY_COUNTS` in `patch/page.py` (calendar
 `builders/terrain.py` (`NEW_VER`, `_MAP_PAIRS`) + `_TERRAIN_BUCKETS` in
 `patch/elements.py` + the `terrain_XXX.html` tile in `patch/index_page.py`.
 
+## Step 2c — Refresh the external data behind the weights
+
+Two tables come from how pros actually play, not from Valve's files, and drift with the meta:
+
+```powershell
+python tools/refresh_weights_data.py          # everything (~20 min, the talent feature pass is slow)
+python tools/refresh_weights_data.py --fast   # skip that pass (enough when no talents were reworked)
+```
+
+| File | What | Source |
+|---|---|---|
+| `data/rules/ability_priority.json` | share of the first 10 skill points per ability → 0.7–1.3 multiplier | **DEMOS** (`C:/Users/sikle/demos/data/demos.db`, table `ability_builds`, last 365 days); OpenDota only for heroes DEMOS has no builds for (30 of 127 on 2026-09-18 — parser gap tracked in DEMOS) |
+| `data/rules/talent_shift.json`, `talent_tiers.json` | talent replacements: pick-share shift + level moves | research folder `outputs/valve-revealed-weights-20260915` (KV history); new patch windows from **DEMOS**, history cached from OpenDota |
+
+Run it after a patch has been out for 2–3 weeks (there are no picks on day one) and monthly otherwise; a
+scheduled task does the monthly run. Then `python build_site.py`, tests, commit `data/rules/*.json`.
+Formula and validation: [weights.md](weights.md).
+
 ## Step 3 — Generate the scaffold + normalized JSON
 
 ```powershell

@@ -156,6 +156,25 @@ average upgrade number at which the tier's talents are taken, relative to all he
 unchanged slugs: after a buff the tier is taken earlier in 52 % of cases vs 51 % after a nerf, and the
 relative win rate rises in 47 % vs 53 % — no signal in pro data, so neither is used.
 
+## 2026-09-18 — second blind sample, soft ceiling, data sources
+
+**Second agreement test.** New non-overlapping stratified sample of 120 rows, two independent blind judges
+(different models, different personas): model vs judge A ρ = 0.40, vs judge B ρ = 0.37, vs their mean
+**0.43**; judge A vs judge B **0.55**. So the model reaches about three quarters of the agreement two human-
+style judges have with each other. First sample (one judge): 0.34.
+
+**Soft ceiling for one row** (`_compress`): linear up to 1.0 (a typical change), logarithmic above —
+1.5 → 1.41, 2 → 1.69, 3 → 2.10, 6 → 2.79; replaces the hard cap 3 for % rows. A halved niche parameter no
+longer outweighs a real nerf (Treant 7.41f −7.2 → −6.0). Agreement unchanged (0.33 → 0.35, 0.44 → 0.43).
+
+**Can we live without OpenDota? Mostly.** DEMOS (own replay parses, Tier 1–2, 2024+) has `ability_builds`.
+Skill priority from DEMOS vs OpenDota: r = 0.97 on common abilities (120 d). Talent picks for one window
+(7.39e): r = 0.87, but DEMOS has ~9× fewer picks (20.8 k vs 181.7 k), so fewer talent tiers pass the
+≥ 30-pick threshold. Two limits: DEMOS starts in 2024 (history before that stays on the cached OpenDota
+pull, one-off), and DEMOS currently records builds for only 97 of 127 heroes (parser gap, tracked there) —
+until fixed, those 30 heroes are topped up from OpenDota. Refresh: `tools/refresh_weights_data.py`
+(workflow Step 2c).
+
 ## Matrix chart (heroes_dyn / items_dyn)
 
 One **step line** per row, the row is the zero axis: a touched patch is a flat plateau across its cell
