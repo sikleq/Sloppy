@@ -97,7 +97,7 @@ def _head(title: str, asset: str, prefix: str, body_cls: str) -> str:
 _TOOLBAR = '''<div class="toolbar">
   <div class="toolbar-inner">
     <div class="legend-stack">
-      <div class="legend-tags">
+      <div class="legend-tags ec-filters">
         <strong>Tags:</strong>
         <button class="badge buff-text filter-btn" data-filter="buff">BUFF</button>
         <button class="badge nerf-text filter-btn" data-filter="nerf">NERF</button>
@@ -106,8 +106,8 @@ _TOOLBAR = '''<div class="toolbar">
         <button class="badge rework filter-btn" data-filter="rework">REWORK</button>
         <button class="badge misc filter-btn" data-filter="misc">MISC</button>
         <button class="badge qol filter-btn" data-filter="qol">QoL</button>
+        {scopes}{abilities}
       </div>
-      {scopes}
     </div>
     <div class="toolbar-patch-info">{info}</div>
   </div>
@@ -159,13 +159,27 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         seen += [s for s in sc if s not in seen]
     scopes_html = ""
     if len(seen) > 1:
-        scopes_html = ('<div class="legend-categories ec-scopes"><strong>Show:</strong>' + "".join(
+        scopes_html = ('<span class="ec-vsep" aria-hidden="true"></span><strong class="ec-lbl">Show:</strong>' + "".join(
             f'<button type="button" class="badge ec-scope-btn" data-ec-scope="{s}">{_SCOPE_LABEL[s]}</button>'
-            for s in _SCOPE_ORDER if s in seen) + '</div>')
+            for s in _SCOPE_ORDER if s in seen))
+    # every ability that was ever changed (most often changed first) -> one-click filter
+    ab_count: dict[str, int] = {}
+    for p in e["patches"]:
+        for t in set(_re.findall(r'<h4 class="ability-title">(.*?)</h4>', p["_body"], _re.S)):
+            t = _re.sub(r"<[^>]+>", "", t).strip()
+            if t:
+                ab_count[t] = ab_count.get(t, 0) + 1
+    abilities_html = ""
+    if ab_count:
+        abilities_html = ('<span class="ec-vsep" aria-hidden="true"></span><strong class="ec-lbl">Ability:</strong>' + "".join(
+            f'<button type="button" class="badge ec-scope-btn ec-ab-btn" data-ec-ability="{_esc(t)}" '
+            f'title="{n} patch{"es" if n != 1 else ""}">{_esc(t)}</button>'
+            for t, n in sorted(ab_count.items(), key=lambda kv: (-kv[1], kv[0]))))
+    from_tok = f'{e["kind"]}:{e["slug"]}'
     out = [_head(f'{e["name"]} — changes', asset, "../", "patch-page entity-page"),
-           ' data-dyn-prefix="../patches/">\n\n', nav,
-           f'\n<a class="nav-back-arrow" href="../{key}.html" aria-label="All {label.lower()}" title="All {label.lower()}"></a>\n',
-           _TOOLBAR.format(info=info, scopes=scopes_html), '<div class="container">\n',
+           f' data-dyn-prefix="../patches/" data-dyn-from="{from_tok}" data-ec-eid="{eid}">\n\n', nav,
+           f'\n<a class="nav-back-arrow visible" href="../{key}.html" aria-label="All {label.lower()}" title="All {label.lower()}"></a>\n',
+           _TOOLBAR.format(info=info, scopes=scopes_html, abilities=abilities_html), '<div class="container">\n',
            '<section class="cat-panel ec-head-panel"><div class="entity-block ec-head">'
            f'<div class="entity {e["kind"]}-entity" id="{eid}">'
            f'<div class="entity-icon {icon_cls}"><img src="{_esc(e["icon"])}" alt="{_esc(e["name"])}"></div>'
@@ -176,12 +190,12 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         if "w" in bucket or "v" in bucket:
             w = bucket.get("w", 0.0)
             cls = "pos" if w > 0 else ("neg" if w < 0 else "zero")
-            score = (f'<span class="ec-score {cls}" title="weighted score: net / volume">'
-                     f'{"+" if w > 0 else ""}{w:.2f}<i> / {bucket.get("v", 0.0):.2f}</i></span>')
-        body = _re.sub(r'href="(7\.\d+[a-z]?\.html)', r'href="../patches/\1', p["_body"])
+            score = (f'<span class="ec-score {cls}" title="weighted score: net (volume)">'
+                     f'{"+" if w > 0 else ""}{w:.2f}<i> ({bucket.get("v", 0.0):.2f})</i></span>')
+        body = _re.sub(r'href="(7\.\d+[a-z]?\.html)(?:\?[^"#]*)?', rf'href="../patches/\1?from={from_tok}', p["_body"])
         # same panel + banner as a category section on the patch page; the banner IS the patch
         out.append(f'<section class="cat-panel ec-patch" id="p-{_esc(p["version"])}">'
-                   f'<h2 class="section ec-ver"><a href="../patches/{_esc(p["version"])}.html#{eid}" '
+                   f'<h2 class="section ec-ver"><a href="../patches/{_esc(p["version"])}.html?from={from_tok}#{eid}" '
                    f'title="Open {_esc(e["name"])} in patch {_esc(p["version"])}">Patch {_esc(p["version"])}</a>'
                    f'<span class="ec-date">{_esc(p["date"])}</span>{score}</h2>\n{body}\n</section>\n')
     out.append('<button class="back-to-top" aria-label="Back to top" title="Back to top" '

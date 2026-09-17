@@ -9836,7 +9836,25 @@ a.whatsnew-row:hover {
 .entity-name .entity-link:hover { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 .entity-icon .entity-link { display: block; line-height: 0; }
 .entity-icon .entity-link:hover img { filter: brightness(1.15); }
-.entity-page .ec-head-panel { margin-top: 18px; }
+/* head of a Changes page: its own look — no section accent line, a gold hairline under it,
+   big centred icon + pixel title, dynamics row stretched over the free width */
+body.patch-page .cat-panel.ec-head-panel {
+  margin-top: 18px; padding: 14px 22px; border-left: 0;
+  border-bottom: 1px solid var(--gold-line);
+  background: linear-gradient(90deg, rgba(227, 196, 106, 0.07) 0%, rgba(6, 37, 65, 0.30) 60%, rgba(0, 0, 0, 0.30) 100%);
+}
+body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
+.ec-head-panel .entity { margin: 0; align-items: center; gap: 18px; }
+.ec-head-panel .entity-icon { display: flex; align-items: center; }
+.ec-head-panel .entity-icon img { display: block; border-radius: 4px; box-shadow: 0 2px 10px var(--shadow-55); }
+.ec-head-panel .hero-icon img { width: 128px; height: auto; }
+.ec-head-panel .item-icon img { width: 88px; height: auto; }
+.ec-head-panel .entity-name { font-family: var(--font-j25); font-size: 34px; letter-spacing: 1.2px; text-transform: uppercase; line-height: 1; }
+.ec-head-panel .dyn-row-wrap { margin-right: 0; }
+/* one filter row: Tags | Show | Ability */
+.legend-tags.ec-filters { flex-wrap: wrap; row-gap: 5px; }
+.ec-vsep { width: 1px; height: 16px; margin: 0 8px; background: var(--line-bright, rgba(255,255,255,0.18)); flex: 0 0 auto; }
+.legend-tags.ec-filters strong.ec-lbl { width: auto; margin-right: 6px; }
 /* the patch banner = the same red section banner as "ITEM UPDATES" on a patch page */
 h2.section.ec-ver { display: flex; align-items: baseline; gap: 16px; }
 h2.section.ec-ver a { color: #fff; text-decoration: none; }
@@ -9850,7 +9868,6 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-score i { font-style: normal; font-weight: 400; color: rgba(255, 255, 255, 0.6); }
 .ec-score.pos { color: rgb(110, 220, 140); } .ec-score.neg { color: rgb(255, 130, 120); } .ec-score.zero { color: rgba(225, 228, 235, 0.85); }
 /* scope filter row (same look as the Group row on patch pages) */
-.ec-scopes { margin-top: 5px; }
 .ec-scope-btn {
   cursor: pointer; user-select: none; font-family: inherit; font-size: 11px; padding: 3px 9px; border-radius: 3px;
   background: rgba(121, 192, 255, 0.05); color: #87a3bf; border: 1px solid rgba(121, 192, 255, 0.22);

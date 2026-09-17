@@ -65,6 +65,20 @@
     back.title = 'Back to ' + label;
     back.setAttribute('aria-label', 'Back to ' + label);
     back.classList.add('visible');
+  } else if (back && fromParam && /^(hero|item):[a-z0-9-]+$/.test(fromParam)) {
+    // Arrived from a Hero / Item Changes page: go back to it (same patch section).
+    const [kind, slug] = fromParam.split(':');
+    const pv = (window.location.pathname.match(/(\d+\.\d+[a-z]?)\.html$/) || [])[1];
+    back.href = '../' + (kind === 'hero' ? 'heroes' : 'items') + '/' + slug + '.html' + (pv ? '#p-' + pv : '');
+    back.title = 'Back to all changes';
+    back.setAttribute('aria-label', 'Back to all changes of this ' + kind);
+    back.classList.add('visible');
+  } else if (back && fromParam && /^\d+\.\d+[a-z]?$/.test(fromParam) && document.body.classList.contains('entity-page')) {
+    // On a Changes page, arrived from a patch page: return to that entity in that patch.
+    back.href = '../patches/' + fromParam + '.html#' + (document.body.dataset.ecEid || '');
+    back.title = 'Back to ' + fromParam;
+    back.setAttribute('aria-label', 'Back to patch ' + fromParam);
+    back.classList.add('visible');
   } else if (back && fromParam && /^\d+\.\d+[a-z]?$/.test(fromParam)) {
     // Came from another patch via the dynamics widget. The dyn-cell href
     // also carries an entity anchor (#dyn-hero-...) so the destination page
@@ -909,8 +923,8 @@
       const sc = document.createElement('span');
       sc.className = 'dyn-tip-score ' + (counts.w > 0 ? 'pos' : (counts.w < 0 ? 'neg' : 'zero'));
       sc.textContent = (counts.w > 0 ? '+' : '') + counts.w.toFixed(2)
-        + (counts.v !== undefined ? ' / ' + counts.v.toFixed(2) : '');
-      sc.title = 'net balance / volume of changes';
+        + (counts.v !== undefined ? ' (' + counts.v.toFixed(2) + ')' : '');
+      sc.title = 'net balance (volume of changes)';
       header.appendChild(sc);
     }
     tip.appendChild(header);
@@ -959,10 +973,17 @@
   // in build_patch.py. Ordered longest-first so "creep-hero" wins over "creep".
   const DYN_KINDS = ['creep-hero', 'hero', 'item', 'unit', 'plain', 'enchant'];
 
-  function dynWindow(manifest, offset) {
+  function dynWindow(manifest, offset, n) {
     // manifest.patches is newest-first → slice from offset, reverse so the
     // oldest of the window is on the left in the rendered row.
-    return manifest.patches.slice(offset, offset + 12).reverse();
+    return manifest.patches.slice(offset, offset + (n || DYN_MAX_PATCHES)).reverse();
+  }
+  // How many cells a row shows: 12 on patch pages; on a Hero/Item Changes page the
+  // head row stretches over the free width of its panel.
+  function dynRowSize(entityDiv, manifest) {
+    if (!entityDiv.closest('.ec-head')) return DYN_MAX_PATCHES;
+    const free = entityDiv.clientWidth - 420;          // icon + name + arrows
+    return Math.max(DYN_MAX_PATCHES, Math.min(manifest.patches.length, Math.floor(free / 28)));
   }
 
   function dynRenderRow(entityDiv, manifest, windowed, currentVersion, offset) {
@@ -977,7 +998,7 @@
     const perPatch = (rec && rec.patches) || {};
     const wrap = document.createElement('div');
     wrap.className = 'dyn-row-wrap';
-    const canLeft  = offset + 12 < manifest.patches.length;
+    const canLeft  = offset + windowed.length < manifest.patches.length;
     const canRight = offset > 0;
     if (canLeft) {
       const btn = document.createElement('button');
@@ -990,7 +1011,8 @@
     for (const p of windowed) {
       const counts = perPatch[p.version] || {};
       // Entity "Changes" pages live outside /patches/: <body data-dyn-prefix="../patches/">
-      row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion, currentVersion,
+      row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion,
+                                   (document.body && document.body.dataset.dynFrom) || currentVersion,
                                    (document.body && document.body.dataset.dynPrefix) || undefined,
                                    false, null, false, dynWeightsOn));
     }
@@ -1432,7 +1454,7 @@
             if (e.dataset.dynBuilt) return;
             e.dataset.dynBuilt = '1';
             const off = parseInt(e.dataset.dynOffset || '0', 10);
-            dynRenderRow(e, manifest, dynWindow(manifest, off), currentVersion, off);
+            dynRenderRow(e, manifest, dynWindow(manifest, off, dynRowSize(e, manifest)), currentVersion, off);
           };
           // "Weights" toggle (toolbar): flip the mode and rebuild every row already built.
           const wBtn = document.getElementById('dyn-weights-btn');
@@ -1447,7 +1469,7 @@
               const old = e.querySelector('.dyn-row-wrap');
               if (old) old.remove();
               const off = parseInt(e.dataset.dynOffset || '0', 10);
-              dynRenderRow(e, manifest, dynWindow(manifest, off), dynCurrentVersion(), off);
+              dynRenderRow(e, manifest, dynWindow(manifest, off, dynRowSize(e, manifest)), dynCurrentVersion(), off);
             });
           });
           // Arrow navigation: per-entity offset stored in data-dyn-offset.
@@ -1461,12 +1483,13 @@
             const delta = arrow.classList.contains('dyn-nav-left') ? 1 : -1;
             const cur = parseInt(entityDiv.dataset.dynOffset || '0', 10);
             const newOff = cur + delta;
-            if (newOff < 0 || newOff + 12 > manifest.patches.length) return;
+            const rowN = dynRowSize(entityDiv, manifest);
+            if (newOff < 0 || newOff + rowN > manifest.patches.length) return;
             entityDiv.dataset.dynOffset = String(newOff);
             const cv = dynCurrentVersion();
             const old = entityDiv.querySelector('.dyn-row-wrap');
             if (old) old.remove();
-            dynRenderRow(entityDiv, manifest, dynWindow(manifest, newOff), cv, newOff);
+            dynRenderRow(entityDiv, manifest, dynWindow(manifest, newOff, rowN), cv, newOff);
           });
           // Build each entity's cell row LAZILY as it nears the viewport — on a
           // 1800-change patch that's ~3200 gradient cells; creating them all on
@@ -3365,28 +3388,39 @@
   applyHeroFilters();
 })();
 
-// ---- HERO / ITEM CHANGES page: "Show: General / Abilities / Talents / Facets" filter ----
+// ---- HERO / ITEM CHANGES page: "Show: General/Abilities/…" + "Ability: <name>" filters ----
 (function() {
-  const btns = [...document.querySelectorAll('.ec-scope-btn')];
-  if (!btns.length) return;
-  const active = new Set();
+  const scopeBtns = [...document.querySelectorAll('.ec-scope-btn[data-ec-scope]')];
+  const abBtns = [...document.querySelectorAll('.ec-ab-btn[data-ec-ability]')];
+  if (!scopeBtns.length && !abBtns.length) return;
+  const scopes = new Set(), abilities = new Set();
+  const titleOf = blk => { const t = blk.querySelector('.ability-title'); return t ? t.textContent.trim() : ''; };
   const apply = () => {
-    document.querySelectorAll('.ec-scope').forEach(el => {
-      el.classList.toggle('ec-scope-hide', active.size > 0 && !active.has(el.dataset.scope));
+    document.querySelectorAll('.ec-scope').forEach(sc => {
+      const scopeOk = !scopes.size || scopes.has(sc.dataset.scope);
+      let any = false;
+      sc.querySelectorAll('.ability-block').forEach(blk => {
+        const ok = scopeOk && (!abilities.size || abilities.has(titleOf(blk)));
+        blk.classList.toggle('ec-scope-hide', !ok);
+        any = any || ok;
+      });
+      sc.classList.toggle('ec-scope-hide', !any);
     });
     // a patch with nothing left to show collapses entirely
     document.querySelectorAll('section.ec-patch').forEach(sec => {
-      const scopes = sec.querySelectorAll('.ec-scope');
+      const parts = sec.querySelectorAll('.ec-scope');
       sec.classList.toggle('ec-scope-hide',
-        scopes.length > 0 && [...scopes].every(s => s.classList.contains('ec-scope-hide')));
+        (scopes.size > 0 || abilities.size > 0) && parts.length > 0 && [...parts].every(x => x.classList.contains('ec-scope-hide')));
     });
   };
-  btns.forEach(b => b.addEventListener('click', () => {
-    const k = b.dataset.ecScope;
-    if (active.has(k)) active.delete(k); else active.add(k);
-    b.classList.toggle('active', active.has(k));
+  const wire = (btns, set, key) => btns.forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset[key];
+    if (set.has(k)) set.delete(k); else set.add(k);
+    b.classList.toggle('active', set.has(k));
     apply();
   }));
+  wire(scopeBtns, scopes, 'ecScope');
+  wire(abBtns, abilities, 'ecAbility');
 })();
 
 // ---- HERO / ITEM CHANGES index: name filter (comma-separated, partial) ----

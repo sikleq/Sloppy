@@ -399,7 +399,8 @@ def _dyn_record_li(tags, extra_keys=None, scores=(0.0, 0.0)):
 def _entity_link(folder, name):
     """Patch page -> the entity's Changes page (builders/entity_changes.py), same slug as its
     dyn id: ../heroes/<slug>.html / ../items/<slug>.html."""
-    return f"../{folder}/{_slugify(name)}.html"
+    ver = _State.current_patch_version
+    return f"../{folder}/{_slugify(name)}.html" + (f"?from={ver}" if ver else "")
 
 
 def _slugify(name):
