@@ -224,7 +224,7 @@
         },
         {
           "text": "Watchers now only display their potential vision areas when holding Alt",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "base"
         }
       ]
@@ -1843,6 +1843,14 @@
           "text": "Deals 75% of absorbed damage to nearby enemies",
           "tag": "misc",
           "scope": "Aphotic Shield"
+        },
+        {
+          "text": "Mist Coil also deals 40/60/80/100% attack damage and applies effects from items and abilities. Self damage when cast on an enemy is increased from 40% to 70%",
+          "tag": "buff",
+          "old": 40,
+          "new": 70,
+          "scope": "facet:abaddon_mists_of_fate",
+          "info": "Self damage is not affected by attack damage. This is exactly how it was with the previous Aghanim's Shard effect"
         }
       ]
     },
@@ -2155,6 +2163,33 @@
           "old": 20,
           "new": 10,
           "scope": "talent"
+        },
+        {
+          "text": "Also sets Batrider on fire. He's burning away 2% of his max health per second, but gains increasingly bigger bonuses to Movement Speed and Spell Amplification over the duration. Max Movement Speed Bonus: 25/30/35/40%. Max Spell Amplification Bonus: 20%",
+          "tag": "misc",
+          "scope": "facet:batrider_buff_on_displacement"
+        },
+        {
+          "text": "Max bonus values are reached at the end of Firefly's duration and don't linger after. Bonuses increase and self-burn damage are applied every 0.1s. Self-burn damage does not increase over time. Self-burn damage is magical and non-lethal",
+          "tag": "misc",
+          "scope": "facet:batrider_buff_on_displacement"
+        },
+        {
+          "text": "Increases the max level of Sticky Napalm to 5",
+          "tag": "misc",
+          "scope": "facet:batrider_arsonist"
+        },
+        {
+          "text": "Number of times +2 All Attributes can be skilled decreased from 7 to 6",
+          "tag": "nerf",
+          "old": 7,
+          "new": 6,
+          "scope": "facet:batrider_arsonist"
+        },
+        {
+          "text": "At level 5 makes Batrider's attacks apply 1 stack of Sticky Napalm",
+          "tag": "misc",
+          "scope": "facet:batrider_arsonist"
         }
       ]
     },
@@ -2218,6 +2253,15 @@
           "text": "Level 10 Talent +25 Bloodrage Attack Speed replaced with +175 Health",
           "tag": "rework",
           "scope": "talent"
+        },
+        {
+          "text": "Replaces 15/20/25/30% Spell Amplification with 10/15/20/25% base damage amplification. The ability now also silences the target and can be cast on enemies. Decreases Cast Range from 800 to 400. Increases Mana Cost from 0 to 60",
+          "tag": "buff",
+          "old": 800,
+          "new": 400,
+          "lower_is_better": true,
+          "scope": "facet:bloodseeker_old_blood",
+          "info": "Level 20 Talent that reduces Bloodrage's Max Health damage doesn't affect enemy casts. Aghanim's Scepter upgrade also affects only Bloodseeker and doesn't provide bonus damage to enemies"
         }
       ]
     },
@@ -2415,7 +2459,7 @@
       "changes": [
         {
           "text": "Buff is no longer dispellable",
-          "tag": "del",
+          "tag": "new",
           "scope": "Spider's Milk"
         },
         {
@@ -2604,6 +2648,11 @@
           "text": "Level 20 Talent +75 Rocket Flare Damage replaced with +70 Power Cogs Mana Burn",
           "tag": "rework",
           "scope": "talent"
+        },
+        {
+          "text": "Clockwerk gains an ability to self-cast Chainmail item to consume it. Each consumed Chainmail provides him with +4 Armor. Number of stacks is unlimited",
+          "tag": "misc",
+          "scope": "facet:rattletrap_junk_mail"
         }
       ]
     },
@@ -2875,6 +2924,16 @@
           "tag": "misc",
           "scope": "facet:disruptor_line_walls",
           "info": "It used to show Kinetic Field's 350 radius, but the actual length is 1200"
+        },
+        {
+          "text": "Increases the max level of Electromagnetic Repulsion to 4, improves with Static Storm",
+          "tag": "misc",
+          "scope": "facet:disruptor_conduit"
+        },
+        {
+          "text": "Can be activated, targeting allied heroes or self. Manual cast deals damage equal to 10% of Disruptor's current health and sets ability on 26/20/14/8s cooldown. Cast Range: 600. Mana Cost: 50",
+          "tag": "misc",
+          "scope": "facet:disruptor_conduit"
         }
       ]
     },
@@ -3005,6 +3064,12 @@
           "text": "Radius increase rescaled from (+50 with every 10 hero levels) to (+40 with every level of Echo Slam)",
           "tag": "rework",
           "scope": "facet:earthshaker_tectonic_buildup"
+        },
+        {
+          "text": "Enemy heroes stunned by Fissure emit an echo to each nearby unit within a 400 radius, dealing 60% of Echo Slam's current echo damage",
+          "tag": "misc",
+          "scope": "facet:earthshaker_reverberating_ridge",
+          "info": "It's equal to 54/60/66 damage, plus 30 with level 20 talent"
         }
       ]
     },
@@ -3174,6 +3239,11 @@
           "tag": "misc",
           "scope": "Soulbind",
           "info": "Previously, the secondary target would still be leashed"
+        },
+        {
+          "text": "Grimstroke launches a mirrored curved stroke from his free hand. Each enemy can take damage only from one stroke but still contributes to bonus damage accumulation for both",
+          "tag": "misc",
+          "scope": "facet:grimstroke_fine_art"
         }
       ]
     },
@@ -4173,6 +4243,12 @@
           "old": 10,
           "new": 8,
           "scope": "Ice Spire"
+        },
+        {
+          "text": "Sinister Gaze applies a Evil Eye debuff that will deal additional 10/15/20/25 damage every time Lich deals magic damage to the target, and amplifies received movement slows by 50%. The Evil Eye debuff duration lingers up to 2x the elapsed Sinister Gaze channel duration",
+          "tag": "misc",
+          "scope": "facet:lich_cryophobia",
+          "info": "Abilities and items that do not proc certain other abilities (Blood Grenade, Radiance, etc.) do not trigger the additional magic damage"
         }
       ]
     },
@@ -4644,6 +4720,12 @@
             10
           ],
           "scope": "Jingu Mastery"
+        },
+        {
+          "text": "While Wukong's Command is active, Monkey King gains a Changing of the Guard ability which allows him to transform into any one of his soldiers. Upon cast, Monkey King takes the place of the soldier closest to the target location for 1.5s, and leaves another one in his stead. While Transfigured, Monkey King is indistinguishable from other soldiers and invulnerable, but can't issue commands. Cast Point: 0.3s. Mana Cost: 25. Cooldown: 3s",
+          "tag": "misc",
+          "scope": "facet:monkey_king_transfiguration",
+          "info": "Changing of the Guard ability appears in place of Wukong's Command and starts on a 0.5s cooldown after casting Wukong's Command. Can't be cast while rooted and can't target soldiers created by Aghanim's Scepter effect. Monkey King disjoints projectiles upon transformation.The possessed soldier has a small ring around it which is visible only to Monkey King and his allies. When the effect is over, Monkey King becomes his usual self leaving the overtaken soldier's position empty."
         }
       ]
     },
@@ -4736,6 +4818,17 @@
           "text": "Level 25 Talent +25% Magic Resistance replaced with 2 Dead Shot Charges",
           "tag": "rework",
           "scope": "talent"
+        },
+        {
+          "text": "Whenever an enemy is feared, Gunslinger proc chance increases to 1.5x base chance for 5s",
+          "tag": "misc",
+          "scope": "facet:muerta_slingshot"
+        },
+        {
+          "text": "Each time Gunslinger procs, the remaining Dead Shot cooldown is reduced by 1s",
+          "tag": "nerf",
+          "scope": "facet:muerta_slingshot",
+          "info": "Also affects charge restoration time"
         }
       ]
     },
@@ -4767,7 +4860,7 @@
         },
         {
           "text": "Aghanim's Scepter now also applies Break to the target",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Ensnare"
         },
         {
@@ -4894,6 +4987,16 @@
             50
           ],
           "scope": "facet:furion_soothing_saplings"
+        },
+        {
+          "text": "Whenever an enemy hero is killed by Nature's Prophet or dies within 750 range of him, 2 seconds later a money tree grows in their place. Each tree spawns 2 gold bags every second, which can be picked up by any hero. Each gold bag grants gold equal to 1.5x of the killed hero's level. Each money tree has a lifespan of 3s",
+          "tag": "misc",
+          "scope": "facet:furion_natures_profit"
+        },
+        {
+          "text": "Gold bags are created in 200-250 radius from the tree and disappear after 15s of lying on the ground. Gold Bags are automatically picked up by heroes within 50 range from them. Money tree provides 2x Tango healing similarly to Ironwood Tree",
+          "tag": "misc",
+          "scope": "facet:furion_natures_profit"
         }
       ]
     },
@@ -5092,7 +5195,7 @@
         },
         {
           "text": "Pressing Alt will now display which rune will spawn and a timer before it spawns",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "Prognosticate",
           "info": "Nothing will be shown above the rune spot if the next rune will spawn in the other rune spot"
         },
@@ -5627,6 +5730,17 @@
           "text": "Level 25 Talent 35% Sand Storm Slow and Blind replaced with 45% Sand Storm Slow",
           "tag": "rework",
           "scope": "talent"
+        },
+        {
+          "text": "When Sand King attacks enemies in Sand Storm, he applies a debuff that blinds the target by 20/30/40/50%. Blind duration: 5s",
+          "tag": "misc",
+          "scope": "facet:sand_king_obscurity"
+        },
+        {
+          "text": "Each enemy hero hit by Stinger in innermost radius instantly emits a Caustic Finale explosion that deals 50% less damage",
+          "tag": "misc",
+          "scope": "facet:sand_king_pinpoint",
+          "info": "Doesn't apply to Stinger strikes created by Aghanim's Scepter"
         }
       ]
     },
@@ -5755,6 +5869,28 @@
           "text": "Level 20 Talent 1 Glaives of Wisdom Bounce replaced with +40s Glaives of Wisdom Int Steal Duration",
           "tag": "rework",
           "scope": "talent"
+        },
+        {
+          "text": "Increases the max level of Glaives of Wisdom to 5",
+          "tag": "misc",
+          "scope": "facet:silencer_spread_the_knowledge"
+        },
+        {
+          "text": "Number of times +2 All Attributes can be skilled decreased from 7 to 6",
+          "tag": "nerf",
+          "old": 7,
+          "new": 6,
+          "scope": "facet:silencer_spread_the_knowledge"
+        },
+        {
+          "text": "Level 5 makes glaives bounce 1 time to a random target within 450 range. The bounce prioritizes heroes and costs mana just like the original attack",
+          "tag": "misc",
+          "scope": "facet:silencer_spread_the_knowledge"
+        },
+        {
+          "text": "Silencer deals 10/15/20/25% more damage to silenced targets and takes 10/15/20/25% less damage from them. Improves with Global Silence",
+          "tag": "misc",
+          "scope": "facet:silencer_oppressive_silence"
         }
       ]
     },
@@ -6515,6 +6651,16 @@
           "text": "Level 20 Talent Gale Creates Plague Wards replaced with +50 Base Damage",
           "tag": "rework",
           "scope": "talent"
+        },
+        {
+          "text": "Septic Shock: Allows Plague Wards to deal Septic Shock damage based on their damage",
+          "tag": "misc",
+          "scope": "facet:venomancer_plague_carrier"
+        },
+        {
+          "text": "When Venomous Gale impacts enemy heroes, 2 Plague Wards are created around them based on the current level of Plague Ward",
+          "tag": "misc",
+          "scope": "facet:venomancer_plague_carrier"
         }
       ]
     },
@@ -6581,7 +6727,7 @@
         },
         {
           "text": "The tooltip now shows the current values of Health Regen, Armor, Mana Regen, and Magic Resistance gained from the ability",
-          "tag": "misc",
+          "tag": "qol",
           "scope": "Intrinsic Edge"
         },
         {
@@ -6817,6 +6963,12 @@
             6
           ],
           "scope": "Paralyzing Cask"
+        },
+        {
+          "text": "When an enemy dies while under effect of Maledict, 75% of what the next burst damage amount would be is dealt to all enemies in 800 units. This effect works even if the enemy dies to the last burst of damage",
+          "tag": "misc",
+          "scope": "facet:witch_doctor_malpractice",
+          "info": "Doesn't work on illusion's death. Sends projectiles towards enemies within said radius. Projectile speed: 1200. Disjointable"
         }
       ]
     },

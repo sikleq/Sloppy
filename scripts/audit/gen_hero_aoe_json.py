@@ -30,6 +30,7 @@ def build(version: str) -> list[dict]:
     out: list[dict] = []
 
     for path in sorted(hero_dir.glob("npc_dota_hero_*.txt")):
+        if path.name == "npc_dota_hero_base.txt": continue   # parent template (7.41f+), not a hero
         hero_id = path.stem
         if hero_id in _EXCLUDE:
             continue

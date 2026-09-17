@@ -52,6 +52,8 @@ tests/                      ← pytest unit tests (run in CI)
 
 data/
   abilities_slim.json       ← authoritative ability slug → dname + is_innate
+  patchnotes_english.txt    ← Valve loc keys; herolist.json / itemlist.json
+                              (global snapshots — refresh every patch, workflow Step 2b)
   stats/<version>/          ← full per-patch snapshot — see docs/workflow.md
   normalized/patches/*.json ← structured per-patch artifact (CI-required)
   <version>_datafeed.json   ← cached Valve datafeed JSON
@@ -59,6 +61,7 @@ data/
 icons/                      ← local mirror of hero, item, ability icons
 scripts/
   fetch/                    ← data fetchers (fetch_icons, fetch_*_history, …)
+                              extract_patchnotes.py: VPK → repo sync (patch notes + KV)
   gen/                      ← asset generators (terrain maps, layer icons, …)
   audit/                    ← auditors (audit_all, audit_*, check_icons)
 
@@ -92,7 +95,10 @@ Short version (full guide: [docs/workflow.md](docs/workflow.md)):
 
 1. Register the version in `patch/meta.py` (`PATCHES` + `RELEASE_HISTORY`).
 2. Refresh `data/stats/<version>/` via the `scripts/fetch/` helpers — the
-   strict CI manifest checks every required JSON/TXT.
+   strict CI manifest checks every required JSON/TXT. Then refresh the
+   **global** snapshots (`patchnotes_english.txt`, `abilities_slim.json`,
+   `herolist.json`, `itemlist.json`) — workflow Step 2b; `tests/test_snapshots_fresh.py`
+   fails if `patchnotes_english.txt` lacks the newest patch.
 3. Generate the scaffold + normalized JSON:
    ```powershell
    python generate_patch_code_v2.py 7.42
@@ -122,7 +128,8 @@ Two GitHub Actions workflows:
 - **`.github/workflows/build.yml`** — runs on every push to `main` and on
   PRs. Required before deploy: pytest, full `build_site.py`,
   minification verification, normalized-JSON validation, content-rule
-  audits (tag direction, BAT `l=True`, trailing whitespace, ul balance),
+  audits (tag direction, BAT `l=True`, trailing whitespace, ul balance,
+  ability-slug registry),
   the strict current-patch stats manifest, and `check_icons.py`. On `main`,
   the resulting `dist/` is published to GitHub Pages.
 - **`.github/workflows/audit-live.yml`** — runs on a daily schedule (and

@@ -316,6 +316,8 @@ TAG_OVERRIDES = {
     "instead of":                   "REWORK",  # component/requirement swap
     "respawn time increased":       "NERF",    # "increased" heuristic gives BUFF, but higher respawn = worse
     "respawn time decreased":       "BUFF",
+    "no longer reduces cooldown":   "DEL",     # removal of a CD-reduction effect; lower-is-buff logic wrongly gives BUFF
+    "no longer reduces the cooldown": "DEL",   # same, "the cooldown" phrasing
     "cycled out":                   "DEL",     # item removed from the pool
     "moved from tier":              "REWORK",  # tier-change is a structural move, not a buff/nerf
     "dormant curio increases":      "NEW",     # first-ever curio upgrade on an item = new capability
@@ -1926,6 +1928,14 @@ def generate(version):
     out = _postprocess_drop_now_requires(out)
     out = _postprocess_recipe_cost_zero_net(out)
     out = _postprocess_rework_marker(out)
+
+    # Close the page: footer + save. Emitted so the wrapped content/pXXX.py is
+    # complete — without these the site build runs green but the patch HTML is
+    # never written to dist/ (save_html is what flushes the page to disk). Match
+    # the two trailing lines every content/p*.py ends with.
+    out.append('')
+    out.append('write_footer()')
+    out.append(f"save_html('patches/{version}.html')")
 
     return '\n'.join(out)
 

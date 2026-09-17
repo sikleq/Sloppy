@@ -53,8 +53,7 @@ def build():
     # Beastmaster
     W(hero_header("Beastmaster"))
     W(ul_open())
-    W(li("Agility gain increased from 1.9 to 2.0", b(1.9, 2)))
-    W(li("Damage gain per level increased from 3.0 to 3.1", b(3, 3.1)))
+    W(li("Agility gain increased from 1.9 to 2.0", b(1.9, 2), extra=inline_note("Damage gain per level increased from 3.0 to 3.1")))
     W(ul_close())
     W(ability("Wild Axes", slug="beastmaster_wild_axes"))
     W(ul_open())
@@ -64,8 +63,7 @@ def build():
     # Brewmaster
     W(hero_header("Brewmaster"))
     W(ul_open())
-    W(li("Base Strength increased from 23 to 24", b(23, 24)))
-    W(li("Damage at level 1 increased from 52–59 to 53–60", br(52, 59, 53, 60)))
+    W(li("Base Strength increased from 23 to 24", b(23, 24), extra=inline_note("Damage at level 1 increased from 52–59 to 53–60")))
     W(ul_close())
     W(ability("Liquid Courage", slug="brewmaster_liquid_courage"))
     W(ul_open())
@@ -147,7 +145,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent Shallow Grave Cooldown Reduction decreased from 4s to 3s", b(4, 3, l=True)))
+    W(li("Level 20 Talent Shallow Grave Cooldown Reduction decreased from 4s to 3s", b(4, 3)))
     W(ul_close())
 
     # Death Prophet
@@ -181,7 +179,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Frost Arrows Mana Cost Reduction decreased from 25% to 18%", b(25, 18, l=True)))
+    W(li("Level 10 Talent Frost Arrows Mana Cost Reduction decreased from 25% to 18%", b(25, 18)))
     W(ul_close())
 
     # Enigma
@@ -194,7 +192,7 @@ def build():
     # Faceless Void
     W(hero_header("Faceless Void"))
     W(ul_open())
-    W(li("Base Damage decreased by 3", t("MISC")))
+    W(li("Base Damage decreased by 3", bstat_h("Faceless Void", "AttackDamageMin", "7.40", -3), extra=note_box(hero="Faceless Void", field="AttackDamageMin", before_patch="7.40")))
     W(li("Base Agility increased from 21 to 24", b(21, 24), extra=inline_note("Damage at level 1 unchanged (58–64)")))
     W(ul_close())
 
@@ -361,8 +359,7 @@ def build():
     # Marci
     W(hero_header("Marci"))
     W(ul_open())
-    W(li("Strength gain increased from 3.0 to 3.2", b(3, 3.2)))
-    W(li("Damage gain per level increased from 3.2 to 3.3", b(3.2, 3.3)))
+    W(li("Strength gain increased from 3.0 to 3.2", b(3, 3.2), extra=inline_note("Damage gain per level increased from 3.2 to 3.3")))
     W(ul_close())
     W(ability("Rebound", slug="marci_companion_run"))
     W(ul_open())
@@ -384,7 +381,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent God's Rebuke Cooldown Reduction increased from 2s to 2.5s", b(2, 2.5, l=True)))
+    W(li("Level 15 Talent God's Rebuke Cooldown Reduction increased from 2s to 2.5s", b(2, 2.5)))
     W(li("Level 20 Talent Spear of Mars Stun increased from +0.4 to +0.5s", b(0.4, 0.5)))
     W(ul_close())
 
@@ -452,8 +449,7 @@ def build():
     # Pangolier
     W(hero_header("Pangolier"))
     W(ul_open())
-    W(li("Intelligence gain increased from 2.2 to 2.5", b(2.2, 2.5)))
-    W(li("Damage gain per level increased from 3.6 to 3.8", b(3.6, 3.8)))
+    W(li("Intelligence gain increased from 2.2 to 2.5", b(2.2, 2.5), extra=inline_note("Damage gain per level increased from 3.6 to 3.8")))
     W(li("Base Movement Speed increased from 295 to 300", b(295, 300)))
     W(ul_close())
     W(ability("Swashbuckle", slug="pangolier_swashbuckle"))
@@ -588,8 +584,7 @@ def build():
     # Spectre
     W(hero_header("Spectre"))
     W(ul_open())
-    W(li("Base Agility increased from 25 to 26", b(25, 26)))
-    W(li("Damage at level 1 increased from 48–52 to 49–53", br(48, 52, 49, 53)))
+    W(li("Base Agility increased from 25 to 26", b(25, 26), extra=inline_note("Damage at level 1 increased from 48–52 to 49–53")))
     W(li("Agility gain increased from 2.1 to 2.4", b(2.1, 2.4)))
     W(ul_close())
     W(ability("Shadow Step", slug="spectre_shadow_step"))
@@ -617,8 +612,7 @@ def build():
     # Terrorblade
     W(hero_header("Terrorblade"))
     W(ul_open())
-    W(li("Base agility increased from 22 to 23", b(22, 23)))
-    W(li("Damage at level 1 increased from 48–54 to 49–55", br(48, 54, 49, 55)))
+    W(li("Base agility increased from 22 to 23", b(22, 23), extra=inline_note("Damage at level 1 increased from 48–54 to 49–55")))
     W(ul_close())
     W(ability("Metamorphosis", slug="terrorblade_metamorphosis"))
     W(ul_open())
@@ -626,7 +620,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent Metamorphosis Cooldown Reduction decreased from 20s to 10s", b(20, 10, l=True)))
+    W(li("Level 15 Talent Metamorphosis Cooldown Reduction decreased from 20s to 10s", b(20, 10)))
     W(ul_close())
 
     # Tidehunter
@@ -700,7 +694,7 @@ def build():
     W(hero_header("Underlord"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent Firestorm Cooldown Reduction increased from 3s to 4s", b(3, 4, l=True)))
+    W(li("Level 15 Talent Firestorm Cooldown Reduction increased from 3s to 4s", b(3, 4)))
     W(ul_close())
 
     # Ursa

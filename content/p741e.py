@@ -6,9 +6,9 @@ def build():
     # 7.41e — auto-generated from data/7.41e_datafeed.json (generate_patch_code_v2.py)
     # then hand-reviewed: recipe-cost rows with unchanged total moved to the
     # canonical MISC + inline-badge form, "Damage at level 1"/"Damage gain per
-    # level" consequence lines promoted to their own visible rows, Spirit Bear
-    # (hero_id 1961) folded into the Lone Druid section as a unit block, the
-    # per-hero-level Thread Break Distance row moved to li_formula.
+    # level" consequence lines folded into their attribute row's info-note,
+    # Spirit Bear (hero_id 1961) folded into the Lone Druid section as a unit
+    # block, the per-hero-level Thread Break Distance row moved to li_formula.
 
     # ===== GENERAL UPDATES =====
     W(section("General Updates"))
@@ -252,8 +252,7 @@ def build():
     # Death Prophet
     W(hero_header("Death Prophet"))
     W(ul_open())
-    W(li("Agility gain increased from 2.0 to 2.3", b(2, 2.3)))
-    W(li("Damage gain per level increased from 3.6 to 3.7", b(3.6, 3.7)))
+    W(li("Agility gain increased from 2.0 to 2.3", b(2, 2.3), extra=inline_note("Damage gain per level increased from 3.6 to 3.7")))
     W(ul_close())
 
     # Doom
@@ -375,8 +374,7 @@ def build():
     # Legion Commander
     W(hero_header("Legion Commander"))
     W(ul_open())
-    W(li("Base Strength increased from 24 to 25", b(24, 25)))
-    W(li("Damage at level 1 increased from 57-61 to 58-62", br(57, 61, 58, 62)))
+    W(li("Base Strength increased from 24 to 25", b(24, 25), extra=inline_note("Damage at level 1 increased from 57-61 to 58-62")))
     W(li("Strength gain decreased from 3.1 to 3.0", b(3.1, 3)))
     W(li("Base Attack Speed increased from 100 to 105", b(100, 105)))
     W(ul_close())
@@ -620,8 +618,7 @@ def build():
     # Troll Warlord
     W(hero_header("Troll Warlord"))
     W(ul_open())
-    W(li("Base Agility increased from 23 to 24", b(23, 24)))
-    W(li("Damage at level 1 increased from 50-58 to 51-59", br(50, 58, 51, 59)))
+    W(li("Base Agility increased from 23 to 24", b(23, 24), extra=inline_note("Damage at level 1 increased from 50-58 to 51-59")))
     W(ul_close())
     W(ability("Battle Stance", slug="troll_warlord_switch_stance"))
     W(ul_open())

@@ -119,12 +119,11 @@ def build():
     # Invoker
     W(hero_header("Invoker"))
     W(ul_open())
-    W(li("Base Intelligence increased from 20 to 22", b(20, 22)))
-    W(li("Damage at level 1 increased from 39–45 to 41–47", br(39, 45, 41, 47)))
+    W(li("Base Intelligence increased from 20 to 22", b(20, 22), extra=inline_note("Damage at level 1 increased from 39–45 to 41–47")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Tornado Cooldown Reduction increased from 4s to 5s", b(4, 5, l=True)))
+    W(li("Level 10 Talent Tornado Cooldown Reduction increased from 4s to 5s", b(4, 5)))
     W(ul_close())
 
     # Io
@@ -317,7 +316,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Proximity Mines Cooldown Reduction decreased from 3s to 2s", b(3, 2, l=True)))
+    W(li("Level 10 Talent Proximity Mines Cooldown Reduction decreased from 3s to 2s", b(3, 2)))
     W(ul_close())
 
     # Tidehunter
@@ -367,8 +366,7 @@ def build():
     # Windranger
     W(hero_header("Windranger"))
     W(ul_open())
-    W(li("Base Agility increased from 17 to 20", b(17, 20)))
-    W(li("Damage at level 1 increased from 47–59 to 49–61", br(47, 59, 49, 61)))
+    W(li("Base Agility increased from 17 to 20", b(17, 20), extra=inline_note("Damage at level 1 increased from 47–59 to 49–61")))
     W(ul_close())
     W(ability("Tailwind"))
     W(ul_open())

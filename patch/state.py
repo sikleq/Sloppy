@@ -14,6 +14,8 @@ class _State:
                                      # (units have no HERO_SLUG, but their base-stat
                                      # ul must still get the GENERAL block)
     in_stats_ul = False              # True while inside the auto-"STATS" ul (sanity-check facet/innate rows)
+    current_ability_slug = None      # engine slug of the ability() block a row sits in (weights context)
+    current_ability_innate = False   # that block is an innate
     section_panel_open = False       # True while inside a <section class="cat-panel"> wrapper
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup
     seen_facets_subgroup = False     # set when first facet_header() emits "Facets" subgroup

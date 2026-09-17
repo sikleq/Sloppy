@@ -42,6 +42,7 @@ Maintenance rules (read before adding entries):
 
 KNOWN_HISTORICAL_RENAMES = {
     ("Lich", "Death Charge", "p739b.py"),  # renamed to Sacrifice in 7.41
+    ("Dark Seer", "Aggrandize", "p738b.py"),  # innate; Valve renamed to Quick Wit after 7.38b
 }
 
 KNOWN_NON_DATAFEED_ABILITIES = {
@@ -66,12 +67,16 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     ("Oracle", "oracle_diviners_deck"),
     ("Chen", "chen_summon_convert"),        # renamed to Zealot in a later patch; historical in p738c.py
     ("Medusa", "medusa_venomed_volley"),    # old facet-specific ability, not in live herodata
+    ("Brewmaster", "brewmaster_belligerent"),  # innate (7.38b-era KV), not in current abilities_slim.json
     ("Ringmaster", "ringmaster_crystal_ball"),   # Sideshow Secrets sub-ability, not surfaced in live API
     ("Ringmaster", "ringmaster_weighted_pie"),   # Sideshow Secrets sub-ability, not surfaced in live API
     ("Tinker", "tinker_defense_matrix"),    # not surfaced in live herodata API
     # Familiar's self-cast Stone Form (7.41e). Exists in abilities_slim.json as
     # "Stone Form"; live herodata only lists the Familiars' own entry.
     ("Visage", "visage_stone_form_self_cast"),
+    # Centaur's Aghanim's Scepter ability (7.41f row). In abilities_slim.json as "Hitch A Ride"
+    # (KV centaur_mount); Valve's live herodata does not list it (audit-live 2026-09-17).
+    ("Centaur Warrunner", "centaur_mount"),
 }
 
 KNOWN_DISPLAY_NAME_OVERRIDES = {
@@ -95,4 +100,5 @@ KNOWN_INNATE_NO_CDN_ICON = {
     "queenofpain_succubus",       # Succubus innate
     "terrorblade_dark_unity",     # Dark Unity innate
     "wisp_essence_conduction",    # Io innate — no CDN art
+    "ursa_maul",                  # Maul innate — Valve CDN 404 (checked 7.41f)
 }

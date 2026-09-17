@@ -216,8 +216,7 @@ def build():
 
     W(hero_header("Lich"))
     W(ul_open())
-    W(li("Base Intelligence increased from 26 to 28", b(26, 28)))
-    W(li("Damage at level 1 increased by 2 (from 50–59 to 52–61)", t("BUFF")))
+    W(li("Base Intelligence increased from 26 to 28", b(26, 28), extra=inline_note("Damage at level 1 increased by 2 (from 50–59 to 52–61)")))
     W(ul_close())
 
     W(hero_header("Lifestealer"))
@@ -442,8 +441,7 @@ def build():
 
     W(hero_header("Venomancer"))
     W(ul_open())
-    W(li("Base agility increased from 24 to 25", b(24, 25)))
-    W(li("Damage at level 1 increased by 1 (from 45–48 to 46–49)", t("BUFF")))
+    W(li("Base agility increased from 24 to 25", b(24, 25), extra=inline_note("Damage at level 1 increased by 1 (from 45–48 to 46–49)")))
     W(ul_close())
     W(ability("Plague Ward", slug="venomancer_plague_ward"))
     W(ul_open())

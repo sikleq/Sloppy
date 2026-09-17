@@ -80,6 +80,7 @@ def write_footer():
         W('</section>')
         _State.section_panel_open = False
     W('<button class="back-to-top" aria-label="Back to top" title="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>')
+    W('<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores" title="Dynamics: weighted scores (Valve revealed-preference weights)"></button>')
     W(f'<script defer src="../src/scripts.js?v={_ASSET_VERSION}"></script>')
     W('</div></body></html>')
 
@@ -380,5 +381,5 @@ PATCH_ENTRY_COUNTS = {
     "7.37":   692, "7.37b":  259, "7.37c":   84, "7.37d":  216, "7.37e":  119,
     "7.38":  1768, "7.38b":  202, "7.38c":   68, "7.39":   821, "7.39b":  133,
     "7.39c":  162, "7.39d":  146, "7.39e":   86, "7.40":  1054, "7.40b":  143,
-    "7.40c":  152, "7.41":  1795, "7.41a":   60, "7.41b":  191, "7.41c":  204, "7.41d":  192,
+    "7.40c":  152, "7.41":  1796, "7.41a":   60, "7.41b":  191, "7.41c":  204, "7.41d":  210, "7.41e":  161, "7.41f":  104,
 }

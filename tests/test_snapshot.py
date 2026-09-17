@@ -18,8 +18,8 @@ PATCH_FILE = _HERE / "dist" / "patches" / "7.41d.html"
 # Known-good metrics for 7.41d. Update when patch content changes intentionally.
 EXPECTED = {
     "entity_names": 102,
-    "badge_buff": 401,
-    "badge_nerf": 205,
+    "badge_buff": 387,
+    "badge_nerf": 203,
     "badge_new": 1,
     "badge_del": 5,
     "badge_rework": 2,

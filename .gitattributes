@@ -1,0 +1,4 @@
+# KV/JSON snapshots: LF in the index. VPK ships CRLF; without this every
+# local commit flipped line endings in ~450 files (pure noise).
+data/stats/**/*.txt  text eol=lf
+data/stats/**/*.json text eol=lf

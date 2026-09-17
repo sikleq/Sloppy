@@ -1,0 +1,443 @@
+from patch.api import *
+
+def build():
+    write_head("7.41f", "15.09.2026")
+
+    W(section("Item Updates"))
+    W(item_header("Infused Raindrops"))
+    W(ul_open())
+    W(li("Mana Regen bonus decreased from +0.8 to +0.6", b(0.8, 0.6)))
+    W(ul_close())
+    W(item_header("Battle Fury"))
+    W(ul_open())
+    W(li("Chop Tree cooldown decreased from 4s to 3s", b(4, 3, l=True)))
+    W(ul_close())
+    W(item_header("Daedalus"))
+    W(ul_open())
+    W(li("Recipe cost increased from 900 to 1000. Total cost increased from 5100g to 5200g", b([900, 5100], [1000, 5200], l=True, slash=True)))
+    W(ul_close())
+    W(item_header("Dragon Lance"))
+    W(ul_open())
+    W(li("Recipe cost increased from 450 to 550. Total cost increased from 1900g to 2000g", b([450, 1900], [550, 2000], l=True, slash=True)))
+    W(ul_close())
+    W(item_header("Essence Distiller"))
+    W(ul_open())
+    W(li("Mana Regen bonus decreased from +1.75 to +1.5", b(1.75, 1.5)))
+    W(ul_close())
+    W(item_header("Heart of Tarrasque"))
+    W(ul_open())
+    W(li("Recipe cost increased from 700 to 800. Total cost increased from 5200g to 5300g", b([700, 5200], [800, 5300], l=True, slash=True)))
+    W(ul_close())
+    W(item_header("Heaven's Halberd"))
+    W(ul_open())
+    W(li("Recipe cost decreased from 450 to 350. Total cost decreased from 3400g to 3300g", b([450, 3400], [350, 3300], l=True, slash=True)))
+    W(ul_close())
+    W(item_header("Hurricane Pike"))
+    W(ul_open())
+    W(li("Total cost increased from 4450g to 4550g (due to Dragon Lance cost increase)", b(4450, 4550, l=True)))
+    W(ul_close())
+    W(item_header("Hydra's Breath"))
+    W(ul_open())
+    W(li("Recipe cost decreased from 1100 to 1000 " + b(1100, 1000, l=True) + ". Total cost unchanged at 5900g (due to Dragon Lance cost increase)", t("MISC")))
+    W(ul_close())
+    W(item_header("Manta Style"))
+    W(ul_open())
+    W(li("Mirror Image ranged images damage decreased from 28% to 25%", b(28, 25)))
+    W(ul_close())
+    W(item_header("Mask of Madness"))
+    W(ul_open())
+    W(li("Lifesteal bonus decreased from +24% to +22%", b(24, 22), extra=inline_note("Creep lifesteal decreased from +14.4% to +13.2%")))
+    W(ul_close())
+    W(item_header("Mjollnir"))
+    W(ul_open())
+    W(li("Static Charge duration decreased from 15s to 12s", b(15, 12)))
+    W(ul_close())
+    W(item_header("Octarine Core"))
+    W(ul_open())
+    W(li("Recipe cost increased from 200 to 400. Total cost increased from 4900g to 5100g", b([200, 4900], [400, 5100], l=True, slash=True)))
+    W(ul_close())
+    W(item_header("Satanic"))
+    W(ul_open())
+    W(li("Lifesteal bonus decreased from +30% to +25%", b(30, 25), extra=inline_note("Creep lifesteal decreased from +18% to +15%")))
+    W(ul_close())
+    W(item_header("Shiva's Guard"))
+    W(ul_open())
+    W(li("Arctic Blast damage decreased from 260 to 225", b(260, 225)))
+    W(ul_close())
+    W(item_header("Silver Edge"))
+    W(ul_open())
+    W(li("Shadow Walk cooldown increased from 22s to 23s", b(22, 23, l=True)))
+    W(li("Shadow Walk bonus movement speed decreased from 22% to 20%", b(22, 20)))
+    W(ul_close())
+
+    # ===== NEUTRAL ITEM UPDATES =====
+    W(section("Neutral Item Updates"))
+
+    W(plain_header("Enchantment Changes", dynamics=False, sublabel=True))
+    W(enchant_header("Greedy"))
+    W(ul_open())
+    W(li("Attack Damage penalty increased from 30/60 to 35/70", b([30, 60], [35, 70], l=True)))
+    W(ul_close())
+
+    # ===== HERO UPDATES =====
+    W(section("Hero Updates"))
+
+    # Anti-Mage
+    W(hero_header("Anti-Mage"))
+    W(ability("Mana Break", slug="antimage_mana_break"))
+    W(ul_open())
+    W(li("Mana Burned as Damage increased from 60% to 65%", b(60, 65)))
+    W(ul_close())
+
+    # Bane
+    W(hero_header("Bane"))
+    W(ul_open())
+    W(li("Base Armor decreased by 1", bstat_h("Bane", "ArmorPhysical", "7.41e", -1), extra=note_box(hero="Bane", field="ArmorPhysical", before_patch="7.41e")))
+    W(ul_close())
+
+    # Batrider
+    W(hero_header("Batrider"))
+    W(ul_open())
+    W(li("Intelligence gain increased from 2.9 to 3.2", b(2.9, 3.2), extra=inline_note("Damage gain per level increased from 3.5 to 3.6")))
+    W(ul_close())
+
+    # Bounty Hunter
+    W(hero_header("Bounty Hunter"))
+    W(ability("Track", slug="bounty_hunter_track"))
+    W(ul_open())
+    W(li("Self bonus gold decreased from 130/225/320 to 80/160/240", b([130, 225, 320], [80, 160, 240])))
+    W(li("Allies bonus gold decreased from 50/90/130 to 40/80/120", b([50, 90, 130], [40, 80, 120])))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 20 Talent Track Grants Shared Vision replaced with +190 Shuriken Toss Damage", t("REWORK")))
+    W(li("Level 25 Talent +250 Shuriken Toss Damage replaced with Track Grants Shared Vision", t("REWORK")))
+    W(li("Level 10 Talent Shuriken Toss Slow decreased from +0.6s to +0.35s", b(0.6, 0.35)))
+    W(ul_close())
+
+    # Broodmother
+    W(hero_header("Broodmother"))
+    W(ability("Insatiable Hunger", slug="broodmother_insatiable_hunger"))
+    W(ul_open())
+    W(li("Mana Cost decreased from 80 to 70", b(80, 70, l=True)))
+    W(ul_close())
+
+    # Centaur Warrunner
+    W(hero_header("Centaur Warrunner"))
+    W(ul_open())
+    W(li("Base Damage decreased by 2", bstat_h("Centaur Warrunner", "AttackDamageMin", "7.41e", -2), extra=note_box(hero="Centaur Warrunner", field="AttackDamageMin", before_patch="7.41e")))
+    W(li("Damage at level 1 decreased from 64-66 to 62-64", br(64, 66, 62, 64)))
+    W(li("Base Movement Speed decreased from 300 to 295", b(300, 295)))
+    W(ul_close())
+    W(ability("Hitch A Ride", slug="centaur_mount"))
+    W(ul_open())
+    W(li("Cast Range decreased from 250 to 200", b(250, 200)))
+    W(ul_close())
+
+    # Chen
+    W(hero_header("Chen"))
+    W(ul_open())
+    W(li("Strength gain increased from 2.0 to 2.2", b(2, 2.2)))
+    W(ul_close())
+    W(ability("Zealot", slug="chen_zealot"))
+    W(ul_open())
+    W(li_formula("Zealot respawn time changed", "60s", "60s - 1s per hero level",
+                 lambda L: 60.0, lambda L: 60.0 - L, l=True))
+    W(ul_close())
+
+    # Clockwerk
+    W(hero_header("Clockwerk"))
+    W(ability("Power Cogs", slug="rattletrap_power_cogs"))
+    W(ul_open())
+    W(li("Mana Cost increased from 75 to 90", b(75, 90, l=True)))
+    W(li("Knockback Duration decreased from 0.8s to 0.7s", b(0.8, 0.7)))
+    W(ul_close())
+
+    # Disruptor
+    W(hero_header("Disruptor"))
+    W(ul_open())
+    W(li("Base Intelligence increased from 20 to 21", b(20, 21)))
+    W(li("Damage at level 1 increased from 47-51 to 48-52", br(47, 51, 48, 52)))
+    W(ul_close())
+
+    # Earth Spirit
+    W(hero_header("Earth Spirit"))
+    W(ul_open())
+    W(li("Base Attack Speed decreased from 100 to 95", b(100, 95)))
+    W(ul_close())
+    W(ability("Stone Remnant", slug="earth_spirit_stone_caller"))
+    W(ul_open())
+    W(li_formula("Charges changed", "7 + 1 per 4 levels", "7 + 1 per 5 levels",
+                 lambda L: 7 + L // 4, lambda L: 7 + L // 5,
+                 inline_note_text="Max charges decreased from 14 at level 28 to 13 at level 30",
+                 levels=[1, 4, 5, 8, 10, 12, 15, 16, 20, 24, 25, 28, 30]))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 20 Talent +25% Magnetize Damage & Duration replaced with +35 Magnetize Damage Per Second", t("REWORK")))
+    W(li("Level 20 Talent +175% Rolling Boulder Damage from Strength replaced with +200 Geomagnetic Grip Remnant Damage", t("REWORK")))
+    W(li("Level 25 Talent +250 Geomagnetic Grip Remnant Damage replaced with +250% Rolling Boulder Damage from Strength", t("REWORK")))
+    W(ul_close())
+
+    # Ember Spirit
+    W(hero_header("Ember Spirit"))
+    W(ul_open())
+    W(li("Base Agility decreased from 22 to 21", b(22, 21)))
+    W(li("Damage at level 1 decreased from 52-56 to 51-55", br(52, 56, 51, 55)))
+    W(ul_close())
+
+    # Enigma
+    W(hero_header("Enigma"))
+    W(ability("Demonic Summoning", slug="enigma_demonic_conversion"))
+    W(ul_open())
+    W(li("Eidolon Attack Range decreased from 425/450/475/500 to 380/420/460/500", b([425, 450, 475, 500], [380, 420, 460, 500])))
+    W(ul_close())
+    W(ability("Black Hole", slug="enigma_black_hole"))
+    W(ul_open())
+    W(li("Aghanim's Scepter pull speed decreased from 175 to 150", b(175, 150)))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 20 Talent Eidolon Damage decreased from +40 to +30", b(40, 30)))
+    W(ul_close())
+
+    # Hoodwink
+    W(hero_header("Hoodwink"))
+    W(ul_open())
+    W(li("Base Strength decreased from 17 to 16", b(17, 16)))
+    W(ul_close())
+
+    # Huskar
+    W(hero_header("Huskar"))
+    W(ul_open())
+    W(li("Base Strength decreased from 23 to 22", b(23, 22)))
+    W(li("Damage at level 1 decreased from 44-49 to 43-48", br(44, 49, 43, 48)))
+    W(li("Strength gain increased from 3.3 to 3.4", b(3.3, 3.4)))
+    W(ul_close())
+
+    # Invoker
+    W(hero_header("Invoker"))
+    W(ability("Cold Snap", slug="invoker_cold_snap"))
+    W(ul_open())
+    W(li("Cooldown increased from 18s to 19s", b(18, 19, l=True)))
+    W(ul_close())
+    W(ability("Ghost Walk", slug="invoker_ghost_walk"))
+    W(ul_open())
+    W(li("Aghanim's Shard no longer applies damage to non-Hero units", t("DEL")))
+    W(ul_close())
+
+    # Io
+    W(hero_header("Io"))
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 15 Talent Spirits Damage decreased from +50% to +40%", b(50, 40)))
+    W(ul_close())
+
+    # Keeper of the Light
+    W(hero_header("Keeper of the Light"))
+    W(ul_open())
+    W(li("Base Attack Speed decreased from 100 to 90", b(100, 90)))
+    W(ul_close())
+    W(ability("Chakra Magic", slug="keeper_of_the_light_chakra_magic"))
+    W(ul_open())
+    W(li("Cooldown Reduction decreased from 3/4/5/6s to 2.5/3.5/4.5/5.5s", b([3, 4, 5, 6], [2.5, 3.5, 4.5, 5.5])))
+    W(ul_close())
+    W(ability("Spirit Form", slug="keeper_of_the_light_spirit_form"))
+    W(ul_open())
+    W(li("Illuminate Heal decreased from 70% to 60%", b(70, 60), extra=inline_note("Illuminate Heal with Aghanim's Shard unchanged at 100%")))
+    W(ul_close())
+
+    # Kez
+    W(hero_header("Kez"))
+    W(ul_open())
+    W(li("Base Damage decreased by 1", bstat_h("Kez", "AttackDamageMin", "7.41e", -1), extra=note_box(hero="Kez", field="AttackDamageMin", before_patch="7.41e")))
+    W(li("Damage at level 1 decreased from 50-56 to 49-55", br(50, 56, 49, 55)))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 20 Talent Kazurai Katana Damage Per Second decreased from +4% to +3.5%", b(4, 3.5)))
+    W(ul_close())
+
+    # Largo
+    W(hero_header("Largo"))
+    W(ability("Island Elixir", slug="largo_song_good_vibrations"))
+    W(ul_open())
+    W(li("Heal rescaled from 34/56/78 to 30/55/80", b([34, 56, 78], [30, 55, 80])))
+    W(ul_close())
+
+    # Lifestealer
+    W(hero_header("Lifestealer"))
+    W(ability("Rage", slug="life_stealer_rage"))
+    W(ul_open())
+    W(li("Cooldown increased from 20/19/18/17s to 21/20/19/18s", b([20, 19, 18, 17], [21, 20, 19, 18], l=True)))
+    W(ul_close())
+    W(ability("Infest", slug="life_stealer_infest"))
+    W(ul_open())
+    W(li("Aghanim's Scepter Enemy Duration decreased from 5s to 4s", b(5, 4)))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 10 Talent Movement Speed decreased from +20 to +15", b(20, 15)))
+    W(ul_close())
+
+    # Lina
+    W(hero_header("Lina"))
+    W(ul_open())
+    W(li("Base Intelligence decreased from 30 to 28", b(30, 28)))
+    W(li("Damage at level 1 decreased from 51-59 to 49-57", br(51, 59, 49, 57)))
+    W(ul_close())
+    W(ability("Fiery Soul", slug="lina_fiery_soul"))
+    W(ul_open())
+    W(li("Attack Speed Bonus decreased from 8/16/24/32 to 7/14/21/28", b([8, 16, 24, 32], [7, 14, 21, 28])))
+    W(li("Duration decreased from 18s to 16s", b(18, 16)))
+    W(ul_close())
+
+    # Lone Druid
+    W(hero_header("Lone Druid"))
+    W(ability("Entangle", slug="lone_druid_entangle"))
+    W(ul_open())
+    W(li("Stack Duration decreased from 10s to 7/8/9/10s", b(10, [7, 8, 9, 10])))
+    W(ul_close())
+
+    # Marci
+    W(hero_header("Marci"))
+    W(ability("Rebound", slug="marci_companion_run"))
+    W(ul_open())
+    W(li("Ally bonus movement speed rescaled from 15/20/25/30% to 25%", b([15, 20, 25, 30], 25)))
+    W(ul_close())
+
+    # Mars
+    W(hero_header("Mars"))
+    W(ul_open())
+    W(li("Base Armor increased by 1", bstat_h("Mars", "ArmorPhysical", "7.41e", 1), extra=note_box(hero="Mars", field="ArmorPhysical", before_patch="7.41e")))
+    W(ul_close())
+
+    # Mirana
+    W(hero_header("Mirana"))
+    W(ability("Celestial Quiver", slug="mirana_celestial_quiver"))
+    W(ul_open())
+    W(li("Base Charge Restore Time increased from 6s to 7s", b(6, 7, l=True)))
+    W(ul_close())
+    W(ability("Sacred Arrow", slug="mirana_arrow"))
+    W(ul_open())
+    W(li("Maximum Stun decreased from 2.6/3.4/4.2/5s to 2.3/3.2/4.1/5s", b([2.6, 3.4, 4.2, 5], [2.3, 3.2, 4.1, 5])))
+    W(ul_close())
+
+    # Necrophos
+    W(hero_header("Necrophos"))
+    W(ability("Sadist", slug="necrolyte_sadist"))
+    W(ul_open())
+    W(li("Hero Kill Multiplier decreased from 6 to 4", b(6, 4)))
+    W(ul_close())
+    W(ability("Ghost Shroud", slug="necrolyte_ghost_shroud"))
+    W(ul_open())
+    W(li("Restoration Amplification decreased from 55/65/75/85% to 45/55/65/75%", b([55, 65, 75, 85], [45, 55, 65, 75])))
+    W(ul_close())
+
+    # Shadow Fiend
+    W(hero_header("Shadow Fiend"))
+    W(ability("Necromastery", slug="nevermore_necromastery"))
+    W(ul_open())
+    W(li_formula("Damage per soul changed", "1.35 + 0.15 per level", "1 + 0.8 per 6 levels",
+                 lambda L: 1.35 + 0.15 * L, lambda L: 1 + 0.8 * (L // 6),
+                 inline_note_text="From 1.5-5.85 to 1-5",
+                 levels=[1, 5, 6, 10, 12, 15, 18, 20, 24, 25, 30]))
+    W(ul_close())
+    W(ability("Shadowraze", slug="nevermore_shadowraze1"))
+    W(ul_open())
+    W(li("Bonus Damage Per Soul decreased from 3 to 2", b(3, 2)))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 15 Talent Presence Armor Reduction decreased from +2 to +1.5", b(2, 1.5)))
+    W(ul_close())
+
+    # Slardar
+    W(hero_header("Slardar"))
+    W(ul_open())
+    W(li("Base Health Regen decreased by 0.25", bstat_h("Slardar", "StatusHealthRegen", "7.41e", -0.25), extra=note_box(hero="Slardar", field="StatusHealthRegen", before_patch="7.41e")))
+    W(ul_close())
+    W(ability("Slithereen Crush", slug="slardar_slithereen_crush"))
+    W(ul_open())
+    W(li("Damage decreased from 75/150/225/300 to 60/140/220/300", b([75, 150, 225, 300], [60, 140, 220, 300])))
+    W(ul_close())
+
+    # Spectre
+    W(hero_header("Spectre"))
+    W(ability("Desolate", slug="spectre_desolate"))
+    W(ul_open())
+    W(li_formula("Damage decreased", "23 + 2 per level", "23.5 + 1.5 per level",
+                 lambda L: 23 + 2 * L, lambda L: 23.5 + 1.5 * L,
+                 inline_note_text="From 25-83 to 25-68.5"))
+    W(ul_close())
+
+    # Treant Protector
+    W(hero_header("Treant Protector"))
+    W(ul_open())
+    W(li("Base Intelligence decreased from 20 to 17", b(20, 17)))
+    W(ul_close())
+    W(ability("Nature's Guise", slug="treant_natures_guise"))
+    W(ul_open())
+    W(li("Invisibility linger when leaving trees decreased from 2s to 1s", b(2, 1)))
+    W(ul_close())
+    W(ability("Leech Seed", slug="treant_leech_seed"))
+    W(ul_open())
+    W(li("Now costs 35 mana", t("NERF")))
+    W(li("Damage to Healing rescaled from 20% to 10/15/20/25%", b(20, [10, 15, 20, 25])))
+    W(ul_close())
+    W(ability("Living Armor", slug="treant_living_armor"))
+    W(ul_open())
+    W(li("Minimum damage block decreased from 20 to 10", b(20, 10)))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 10 Talent +3 Living Armor Heal per Second replaced with +3s Living Armor Duration", t("REWORK")))
+    W(ul_close())
+
+    # Underlord
+    W(hero_header("Underlord"))
+    W(ability("Pit of Malice", slug="abyssal_underlord_pit_of_malice"))
+    W(ul_open())
+    W(li("No longer upgraded with Aghanim's Scepter", t("DEL")))
+    W(ul_close())
+    W(ability("Fiend's Gate", slug="abyssal_underlord_dark_portal"))
+    W(ul_open())
+    W(li("Aghanim's Scepter Cooldown decreased from 100/95/90s to 90/85/80s", b([100, 95, 90], [90, 85, 80], l=True)))
+    W(ul_close())
+
+    # Undying
+    W(hero_header("Undying"))
+    W(ul_open())
+    W(li("Base Health Regen decreased by 0.25", bstat_h("Undying", "StatusHealthRegen", "7.41e", -0.25), extra=note_box(hero="Undying", field="StatusHealthRegen", before_patch="7.41e")))
+    W(ul_close())
+    W(ability("Decay", slug="undying_decay"))
+    W(ul_open())
+    W(li("Mana Cost increased from 100 to 110", b(100, 110, l=True)))
+    W(ul_close())
+
+    # Ursa
+    W(hero_header("Ursa"))
+    W(ability("Maul", slug="ursa_maul", innate=True))
+    W(ul_open())
+    W(li("Health As Damage increased from 1.25% to 1.75%", b(1.25, 1.75)))
+    W(ul_close())
+
+    # Warlock
+    W(hero_header("Warlock"))
+    W(ul_open())
+    W(li("Base Attack Speed increased from 90 to 95", b(90, 95)))
+    W(ul_close())
+
+    # Winter Wyvern
+    W(hero_header("Winter Wyvern"))
+    W(ability("Arctic Burn", slug="winter_wyvern_arctic_burn"))
+    W(ul_open())
+    W(li("Cooldown increased from 26/24/22/20s to 29/26/23/20s", b([26, 24, 22, 20], [29, 26, 23, 20], l=True)))
+    W(ul_close())
+    W(ability("Cold Embrace", slug="winter_wyvern_cold_embrace"))
+    W(ul_open())
+    W(li("Max HP Heal per second decreased from 2.25/3/3.75/4.5% to 1.5/2.5/3.5/4.5%", b([2.25, 3, 3.75, 4.5], [1.5, 2.5, 3.5, 4.5])))
+    W(ul_close())
+
+    write_footer()
+    save_html('patches/7.41f.html')

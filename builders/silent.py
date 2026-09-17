@@ -181,6 +181,7 @@ def load_hero_abilities(version: str) -> dict[str, dict[str, dict]]:
         return {}
     out: dict[str, dict[str, dict]] = {}
     for p in sorted(heroes_dir.glob("npc_dota_hero_*.txt")):
+        if p.name == "npc_dota_hero_base.txt": continue   # parent template (7.41f+), not a hero
         try:
             text = _decode_bytes(p.read_bytes())
             kv = parse_kv(text)

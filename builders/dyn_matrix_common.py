@@ -421,6 +421,10 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         + category_block
         + attack_block
         + attr_block
+        + '<span class="hs-attr-filter-group hd-weights-group">'
+          '<button type="button" class="hs-attr-filter hd-weights-btn" id="dyn-weights-btn" '
+          'aria-pressed="false" title="Weighted scores: each row as a line chart">'
+          '<img src="icons/misc/weights.svg" alt="Weights" loading="lazy"></button></span>'
         + _switch('hd-hide-old', 'Hide old',
                   'Show only the most recent patches that fit the width '
                   '(latest at the right edge); off shows every patch', True)

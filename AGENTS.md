@@ -31,6 +31,16 @@
 | Вёрстка/стили: patch-page layering, toolbar-panel, Materials rhythm, regen columns, фильтры, Hero Stats, sticky dividers, навигационные стрелки, глобальный UI | [docs/agent-rules/ui-style.md](docs/agent-rules/ui-style.md) |
 | Структура проекта, как запустить, прочие страницы (index/calendar/terrain), грабли | [docs/agent-rules/pages-and-pipeline.md](docs/agent-rules/pages-and-pipeline.md) |
 
+## Скилл разметки патча
+
+При разметке/вычитке нового патча (`content/p<version>.py`) используется скилл
+**`sloppy-patch-annotate`** (`.claude/skills/sloppy-patch-annotate/`) — workflow с воротами:
+generate → adversarial-перетегирование → формулы → build+тесты → сверка OLD desc. Ядро —
+линтер канонических фраз `lint_tags.py` (заново выводит тег из текста строки через
+`generate_patch_code_v2._guess_tag` и показывает расхождения = обязательные решения). Скилл
+не дублирует правила, а ссылается на `docs/agent-rules/*`. Запуск линтера отдельно:
+`python .claude/skills/sloppy-patch-annotate/lint_tags.py content/p<version>.py`.
+
 Узкоспециальные правила:
 - `docs/captains-mode.md` — полное правило **Captains Mode** (`cm_draft`, кодировка `F/S/f/s`).
 - `docs/formula-change.md` — блок `formula_change` для важных **игровых формул** (Assist Gold, Experience…).

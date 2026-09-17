@@ -73,6 +73,60 @@ Sanity-check the snapshot against the patch notes before trusting it — a
 couple of "decreased by N" rows (e.g. a base-armor or base-regen change)
 should match the KV diff between the previous version and the new one.
 
+**Fast path (minutes after release, no d2vpkr wait):** once Steam has updated the client, write the
+raw KV straight from the live VPK (the same paths `scripts/fetch/extract_patchnotes.py` uses; keep
+`data/stats/**` LF per `.gitattributes`), then derive the slim JSONs locally:
+
+```powershell
+python tools/slim_from_kv.py 7.42          # heroes/items/units/abilities/ability_ids .json from the .txt
+python tools/slim_from_kv.py 7.41e --check # self-test: regenerate and diff against the committed files
+```
+
+Then run `python build_site.py patch` (writes `data/site_meta.json` with the new version) BEFORE the
+four top-up scripts above — they map patches by `site_meta.json` dates; run them first and they
+rewrite the PREVIOUS latest patch with live data instead.
+
+## Step 2b — Refresh the GLOBAL snapshots (easy to forget)
+
+Step 2 only fills `data/stats/<version>/`. Four repo-wide files live outside
+that folder, are refreshed **by hand**, and silently go stale otherwise
+(7.41e shipped 30.07 and `patchnotes_english.txt` still had 0 of its keys
+weeks later). Refresh all four every patch:
+
+| File | Feeds | How to refresh |
+|---|---|---|
+| `data/patchnotes_english.txt` | generator section order + `_info` notes, calendar "major patch" counts, OLD-desc lifts, retroactive KV lines Valve adds later | Bump `PATCH_VERSION` in `scripts/fetch/extract_patchnotes.py` to the new version, run it (reads the live VPK; also writes `data/stats/<version>/` KV) |
+| `data/abilities_slim.json` | ability display names, innate detection (`patch/elements.py`), slug audit (CI + `tests/test_ability_slugs.py`) | KV+loc merge (`dname` / `is_innate`). Regenerate after the KV refresh — a new/renamed ability that is missing here fails the slug audit and loses its innate marker |
+| `data/herolist.json` | hero name resolution (generator, audits) | Valve herolist API (`scripts/fetch/fetch_itemlist.py` sibling flow) |
+| `data/itemlist.json` | item names / Hero Lab item list | `python scripts/fetch/fetch_itemlist.py` |
+
+Gate: `tests/test_snapshots_fresh.py` fails when `patchnotes_english.txt` has no
+`DOTA_Patch_<version>_` keys for the newest patch in `patch/meta.py`, or when a
+hero in `data/stats/<latest>/heroes.json` is absent from `herolist.json`.
+
+Also bump per patch: `PATCH_ENTRY_COUNTS` in `patch/page.py` (calendar
+"extra-major" highlight) and, for a new major, the terrain pins in
+`builders/terrain.py` (`NEW_VER`, `_MAP_PAIRS`) + `_TERRAIN_BUCKETS` in
+`patch/elements.py` + the `terrain_XXX.html` tile in `patch/index_page.py`.
+
+## Step 2c — Refresh the external data behind the weights
+
+Two tables come from how pros actually play, not from Valve's files, and drift with the meta:
+
+```powershell
+python tools/refresh_weights_data.py          # everything (~20 min, the talent feature pass is slow)
+python tools/refresh_weights_data.py --fast   # skip that pass (enough when no talents were reworked)
+```
+
+| File | What | Source |
+|---|---|---|
+| `data/rules/ability_priority.json` | share of the first 10 skill points per ability → 0.7–1.3 multiplier | **DEMOS** (`C:/Users/sikle/demos/data/demos.db`, table `ability_builds`, last 365 days); OpenDota only for heroes DEMOS has no builds for (30 of 127 on 2026-09-18 — parser gap tracked in DEMOS) |
+| `data/rules/talent_shift.json`, `talent_tiers.json` | talent replacements: pick-share shift + level moves | research folder `outputs/valve-revealed-weights-20260915` (KV history); new patch windows from **DEMOS**, history cached from OpenDota |
+
+Run it after a patch has been out for 2–3 weeks (there are no picks on day one) and monthly otherwise; a
+scheduled task does the monthly run. Then `python build_site.py`, tests, commit `data/rules/*.json`.
+Formula and validation: [weights.md](weights.md).
+
 ## Step 3 — Generate the scaffold + normalized JSON
 
 ```powershell

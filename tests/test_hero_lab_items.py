@@ -117,7 +117,10 @@ def test_divine_rapier_uses_base_bonus_plus_toggle_modes(items):
     assert rapier["bonus"]["spellAmp"] == 0
     assert rapier["modes"]["default"] == "damage"
     assert rapier["modes"]["damage"]["damage"] == pytest.approx(250)
-    assert rapier["modes"]["spell"]["spellAmp"] == pytest.approx(25)
+    # 7.41e: spell amp from multiple Rapiers no longer stacks -> emitted as
+    # spellAmpUnique (model takes the max across Rapiers), not plain spellAmp.
+    assert "spellAmp" not in rapier["modes"]["spell"]
+    assert rapier["modes"]["spell"]["spellAmpUnique"] == pytest.approx(25)
     assert rapier["tip"]["attribs"] == ["+100 Damage"]
 
 

@@ -173,8 +173,7 @@ def build():
     # Batrider
     W(hero_header("Batrider"))
     W(ul_open())
-    W(li("Base Agility decreased from 15 to 13", bstat_h("Batrider", "AttributeBaseAgility", "7.39c", -2)))
-    W(li("Damage at level 1 decreased from 39–43 to 38–42", br(39, 43, 38, 42)))
+    W(li("Base Agility decreased from 15 to 13", bstat_h("Batrider", "AttributeBaseAgility", "7.39c", -2), extra=inline_note("Damage at level 1 decreased from 39–43 to 38–42")))
     W(ul_close())
     W(ability("Flamebreak", slug="batrider_flamebreak"))
     W(ul_open())

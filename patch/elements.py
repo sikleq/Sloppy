@@ -3,6 +3,7 @@
 import html as _html
 import json as _json
 import os as _os
+from .weights import row_scores as _row_scores
 import re
 
 from .images import (HERO_CDN, ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG,
@@ -359,7 +360,9 @@ def _close_ability_block():
 _DYN_TAG_WHITELIST = {"buff", "nerf", "new", "del", "rework", "misc", "qol"}
 
 
-def _dyn_record_li(tags, extra_keys=None):
+def _dyn_record_li(tags, extra_keys=None, scores=(0.0, 0.0)):
+    """Tally the row's tags per (entity, patch); `scores` = (net, volume) from
+    patch/weights.row_scores, summed into the bucket under "w" and "v"."""
     if _State.dyn_skip_li:
         return
     pv = _State.current_patch_version
@@ -386,6 +389,11 @@ def _dyn_record_li(tags, extra_keys=None):
         for tag in tags:
             if tag in _DYN_TAG_WHITELIST:
                 patch_bucket[tag] = patch_bucket.get(tag, 0) + 1
+        net, vol = scores
+        if net:
+            patch_bucket["w"] = round(patch_bucket.get("w", 0.0) + net, 3)
+        if vol:
+            patch_bucket["v"] = round(patch_bucket.get("v", 0.0) + vol, 3)
 
 
 def _slugify(name):
@@ -438,6 +446,8 @@ def _item_display_name(slug):
 # ---- Public element functions ----
 
 def hero_header(name):
+    _State.current_ability_slug = None
+    _State.current_ability_innate = False
     _State.current_hero = HERO_SLUG.get(name, name.lower().replace(" ", "_").replace("'", "").replace("-", ""))
     _State.current_unit = None
     _State.next_ul_is_hero_stats = True
@@ -662,6 +672,8 @@ def ability(title, slug=None, innate=None, icon_url=None, sub=False):
         _State.seen_abilities_subgroup = True
     _State.ability_block_open = True
     _State.current_block_is_facet = False
+    _State.current_ability_slug = slug
+    _State.current_ability_innate = bool(is_innate)
     return out + (f'<div class="ability-block{" is-innate" if is_innate else ""}">'
                   f'{icon_html}'
                   f'<h4 class="ability-title">{title}</h4>')
@@ -868,6 +880,26 @@ def ul_close():
 
 
 _TALENT_PREFIX_RE = re.compile(r'^(Level \d+ Talent) (?!:)')
+_TALENT_LEVEL_RE = re.compile(r'^\s*Level (\d+)(?: Talent)?\s*:', re.I)
+
+
+def _row_ctx(text):
+    """Where the row lives — drives the weights context multiplier (patch/weights.py)."""
+    ek = _State.current_entity_key or ""
+    m = _TALENT_LEVEL_RE.match(re.sub(r'<[^>]+>', '', text))
+    return {
+        "kind": ek.split("|", 1)[0] if ek else "",
+        "item": (_State.dynamics.get(ek) or {}).get("icon") if ek.startswith("item|") else None,
+        "version": _State.current_patch_version,
+        "hero": _State.current_hero,
+        "base_stat": bool(_State.in_stats_ul),
+        "facet": bool(_State.current_block_is_facet),
+        "ability": _State.current_ability_slug,
+        "innate": bool(_State.current_ability_innate),
+        "talent": int(m.group(1)) if m else None,
+        "scepter": "Aghanim's Scepter" in text,
+        "shard": "Aghanim's Shard" in text,
+    }
 
 
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None):
@@ -887,7 +919,9 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             dyn_tags = set(primary)
         else:
             dyn_tags = set(re.findall(r'data-overall="(\w+)"', badge))
-    _dyn_record_li(dyn_tags, extra_keys=also_dyn)
+    _dyn_record_li(dyn_tags, extra_keys=also_dyn,
+                   scores=_row_scores(text if isinstance(text, str) else "", dyn_tags, badge,
+                                      ctx=_row_ctx(text if isinstance(text, str) else "")))
     if isinstance(text, str) and 'del' in dyn_tags:
         _low = text.strip().rstrip('.').lower()
         if _low in ('removed', 'item removed from the game',

@@ -77,3 +77,9 @@ icons/ref/
 
 # Local one-command refresh helper — contains the Telegram api_hash, never commit
 run_signatures.ps1
+
+# trace-mcp code index (local tool cache)
+.trace-mcp/
+
+# rendered infographics (regenerate with tools/patch_infographic.py)
+outputs/infographic/

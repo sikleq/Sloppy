@@ -131,8 +131,7 @@ def build():
     # Anti-Mage
     W(hero_header("Anti-Mage"))
     W(ul_open())
-    W(li("Base Agility increased from 24 to 25", b(24, 25)))
-    W(li("Damage at level 1 increased by 1 (from 53-57 to 54-58)", br(53, 57, 54, 58)))
+    W(li("Base Agility increased from 24 to 25", b(24, 25), extra=inline_note("Damage at level 1 increased by 1 (from 53-57 to 54-58)")))
     W(ul_close())
     W(ability("Blink", slug="antimage_blink"))
     W(ul_open())
@@ -234,8 +233,7 @@ def build():
     # Dark Willow
     W(hero_header("Dark Willow"))
     W(ul_open())
-    W(li("Base Intelligence increased from 21 to 22", b(21, 22)))
-    W(li("Damage at level 1 increased by 1 (from 48-56 to 49-57)", br(48, 56, 49, 57)))
+    W(li("Base Intelligence increased from 21 to 22", b(21, 22), extra=inline_note("Damage at level 1 increased by 1 (from 48-56 to 49-57)")))
     W(ul_close())
     W(ability("Cursed Crown", slug="dark_willow_cursed_crown"))
     W(ul_open())
@@ -405,8 +403,7 @@ def build():
     # Jakiro
     W(hero_header("Jakiro"))
     W(ul_open())
-    W(li("Base Intelligence increased from 25 to 26", b(25, 26)))
-    W(li("Damage at level 1 increased by 1 (from 52-60 to 53-61)", br(52, 60, 53, 61)))
+    W(li("Base Intelligence increased from 25 to 26", b(25, 26), extra=inline_note("Damage at level 1 increased by 1 (from 52-60 to 53-61)")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -547,8 +544,7 @@ def build():
     W(hero_header("Morphling"))
     W(ul_open())
     W(li("Base Strength decreased from 23 to 16", b(23, 16)))
-    W(li("Base Agility increased from 24 to 33", b(24, 33)))
-    W(li("Damage at level 1 increased by 9 (from 36-45 to 45-54)", br(36, 45, 45, 54)))
+    W(li("Base Agility increased from 24 to 33", b(24, 33), extra=inline_note("Damage at level 1 increased by 9 (from 36-45 to 45-54)")))
     W(ul_close())
     W(ability("Ebb and Flow", slug="morphling_ebb_and_flow"))
     W(ul_open())
@@ -582,8 +578,7 @@ def build():
     # Ogre Magi
     W(hero_header("Ogre Magi"))
     W(ul_open())
-    W(li("Base Strength increased from 25 to 26", b(25, 26)))
-    W(li("Damage at level 1 increased by 1 (from 70-76 to 71-77)", br(70, 76, 71, 77)))
+    W(li("Base Strength increased from 25 to 26", b(25, 26), extra=inline_note("Damage at level 1 increased by 1 (from 70-76 to 71-77)")))
     W(ul_close())
 
     # Omniknight
@@ -603,8 +598,7 @@ def build():
     # Pangolier
     W(hero_header("Pangolier"))
     W(ul_open())
-    W(li("Base Agility decreased from 18 to 17", b(18, 17)))
-    W(li("Damage at level 1 decreased from 50-56 to 49-55", br(50, 56, 49, 55)))
+    W(li("Base Agility decreased from 18 to 17", b(18, 17), extra=inline_note("Damage at level 1 decreased from 50-56 to 49-55")))
     W(li("Base Armor decreased by 1", bstat_h("Pangolier", "ArmorPhysical", "7.41c", -1), extra=note_box(hero="Pangolier", field="ArmorPhysical", before_patch="7.41c")))
     W(ul_close())
 
@@ -688,8 +682,7 @@ def build():
     # Sand King
     W(hero_header("Sand King"))
     W(ul_open())
-    W(li("Strength gain increased from 2.3 to 2.5", b(2.3, 2.5)))
-    W(li("Damage gain per level increased from 2.8 to 2.9", b(2.8, 2.9)))
+    W(li("Strength gain increased from 2.3 to 2.5", b(2.3, 2.5), extra=inline_note("Damage gain per level increased from 2.8 to 2.9")))
     W(ul_close())
 
     # Shadow Demon
@@ -904,8 +897,7 @@ def build():
     # Venomancer
     W(hero_header("Venomancer"))
     W(ul_open())
-    W(li("Intelligence gain increased from 1.8 to 1.9", b(1.8, 1.9)))
-    W(li("Damage gain per level increased from 3.0 to 3.1", b(3.0, 3.1)))
+    W(li("Intelligence gain increased from 1.8 to 1.9", b(1.8, 1.9), extra=inline_note("Damage gain per level increased from 3.0 to 3.1")))
     W(ul_close())
 
     # Visage

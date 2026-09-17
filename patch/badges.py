@@ -146,6 +146,16 @@ def b(old, new, l=False, slash=False, force_overall=None):
         if (overall == "buff" and abs(max_rank) <= 12
                 and sum(signed_pcts) / len(signed_pcts) < 0):
             overall = "nerf"
+        # Early-game cut: max-rank is a REAL buff (>12%) but TWO OR MORE earlier
+        # levels got worse and the per-level deltas average <= -10% -> NERF.
+        # The levels where the ability decides the lane were cut hard and the
+        # maxed gain does not pay it back (Impact damage 50->20/35/50/65 =
+        # -60/-30/0/+30, avg -15). Disseminate (-20/-4/+7/+14, avg -0.75) and
+        # a single L1 dip (-20/-5/+10/+25, avg +2.5) stay BUFF. Decided 2026-09-15.
+        if (overall == "buff" and abs(max_rank) > 12
+                and sum(1 for v in signed_pcts[:-1] if v < 0) >= 2
+                and sum(signed_pcts) / len(signed_pcts) <= -10):
+            overall = "nerf"
         # "Flatten" rescale (X/Y/Z/W -> ONE flat value): level-scaling removed.
         # Classify by whether the flat value beats the old AVERAGE — ties (mean
         # unchanged) go to BUFF, since the early levels still rose even when the
@@ -532,6 +542,22 @@ FACETS = {
     "phoenix_hotspot": ("Hotspot", "Red1"),
     "arc_warden_runed_replica": ("Runed Replica", "Blue1"),
     "dawnbreaker_blaze": ("Starsurge", "Red1"),
+    # 7.38c — auto-registered by generate_patch_code_v2.py
+    "tiny_crash_landing": ("Crash Landing", "Gray2"),
+    "windrunner_killshot": ("Killshot", "Green0"),
+    "life_stealer_fleshfeast": ("Fleshfeast", "Gray0"),
+    "dark_seer_movespd": ("Heart of Battle", "Purple2"),
+    "omniknight_omnipresent": ("Omnipresent", "Gray3"),
+    "jakiro_ice_breaker": ("Ice Breaker", "Blue1"),
+    "meepo_codependent": ("Codependent", "Yellow1"),
+    "marci_buddy_system": ("Buddy System", "Blue1"),
+    "marci_pickmeup": ("Pick-me-up", "Purple0"),
+    # 7.38b — auto-registered by generate_patch_code_v2.py
+    "warlock_grimoire": ("Black Grimoire", "Gray3"),
+    "dragon_knight_fire_dragon": ("Fire Dragon", "Red1"),
+    "night_stalker_dayswap": ("Night Reign", "Gray0"),
+    "tusk_facet_fist_bump": ("Drinking Buddies", "Yellow0"),
+    "winter_wyvern_recursive": ("Recursive", "Blue0"),
 }
 
 # Mapping from Valve's facet_color name -> CSS gradient that EXACTLY matches
@@ -614,6 +640,31 @@ def t(tag):
     else:
         extra = ''
     return f'<span class="badge {color_cls}" data-tag="{tag_id}"{extra}>{tag}</span>'
+
+
+def rank_step(values, ultimate=True):
+    """OLD-side old_fn for an innate that USED to scale with an ability's RANK
+    but was rescaled to scale with HERO level ("No longer levels with <ability>").
+
+    Returns fn(hero_level) that yields the OLD value at the hero level where you
+    would have had that ability rank, so a per-hero-level table compares against
+    the corresponding rank-upgrade level instead of the old max (which falsely
+    reads as a nerf). `values` = the old per-rank list, e.g. [12.5, 15, 17.5, 20].
+
+    ultimate=True  -> ranks unlock at hero levels 6/12/18 (values[0] is the
+                      pre-ultimate value at levels 1-5).
+    ultimate=False -> normal ability, ranks at hero levels 1/3/5/7.
+    """
+    ups = [6, 12, 18] if ultimate else [3, 5, 7]
+
+    def fn(L):
+        idx = 0
+        for k, thr in enumerate(ups, start=1):
+            if L >= thr:
+                idx = k
+        return float(values[min(idx, len(values) - 1)])
+
+    return fn
 
 
 def scale_pill(formula_text, fn, levels=None, value_fmt="{:g}",

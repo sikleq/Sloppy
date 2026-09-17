@@ -756,8 +756,26 @@
   // harmless: with no neutral tags, coloredTotal === total whenever total > 0).
   const DYN_NEUTRAL_TAGS = [];
   const DYN_MAX_PATCHES = 12;
+  // "Weights" mode: each cell shows the patch's summed weighted score (bucket key
+  // "w", see patch/weights.py) instead of the tag gradient. Patch pages toggle it
+  // with #dyn-weights-btn, the matrices with the #hd-weights switch.
+  let dynWeightsOn = false;
+  function dynFmtW(w) {
+    const a = Math.abs(w);
+    return (w < 0 ? '-' : '') + (a >= 10 ? a.toFixed(1) : a.toFixed(2));
+  }
+  // The mode is remembered across pages (patch pages <-> matrices) in localStorage.
+  const DYN_W_KEY = 'sloppy-dyn-weights';
+  function dynWeightsStored() { try { return localStorage.getItem(DYN_W_KEY) === '1'; } catch (e) { return false; } }
+  function dynWeightsStore(on) { try { localStorage.setItem(DYN_W_KEY, on ? '1' : '0'); } catch (e) {} }
+  function dynWeightTint(w) {
+    const rgb = w > 0 ? DYN_TAG_RGB.buff : (w < 0 ? DYN_TAG_RGB.nerf : [110, 110, 110]);
+    const alpha = Math.min(0.9, 0.25 + Math.min(Math.abs(w), 4) * 0.16);
+    const c = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha.toFixed(2)})`;
+    return `linear-gradient(${c}, ${c})`;
+  }
 
-  function dynBuildPill(patch, counts, entityId, isCurrent, fromVersion, filePrefix, bnOnly, removed, debut) {
+  function dynBuildPill(patch, counts, entityId, isCurrent, fromVersion, filePrefix, bnOnly, removed, debut, wMode) {
     // "Remove" tag filter (toolbar chips): zero out user-removed tags for the
     // CELL colouring. The hover tooltip below still uses the ORIGINAL counts, so
     // a removed tag stays visible on hover — it's only dropped from the diamond.
@@ -797,7 +815,19 @@
     const cell = document.createElement('span');
     cell.className = 'dyn-cell';
     wrap.appendChild(cell);
-    if (total) {
+    if (wMode && origTotal) {
+      const w = counts.w || 0;
+      if (filePrefix === 'patches/') {          // matrix: segment of the row's line chart
+        wrap.classList.add('w-mode', 'w-line');
+        cell.style.background = 'none';
+        cell.dataset.w = String(w);
+        cell.dataset.v = String(counts.v || 0);
+      } else {                                  // patch page: the number
+        wrap.classList.add('w-mode');
+        cell.textContent = dynFmtW(w);
+        cell.style.setProperty('--dyn-bg', dynWeightTint(w));
+      }
+    } else if (total) {
       // Build a vertical gradient where each tag occupies a band proportional
       // to its share. Instead of hard color-stops at the band boundaries we
       // leave a `bleed` zone on each side so adjacent colors interpolate
@@ -873,6 +903,16 @@
     const header = document.createElement('span');
     header.className = 'dyn-tip-header';
     header.textContent = `${patch.version}`;
+    if (counts && (counts.w !== undefined || counts.v !== undefined)) {
+      if (counts.w === undefined) counts.w = 0;
+      header.classList.add('has-score');
+      const sc = document.createElement('span');
+      sc.className = 'dyn-tip-score ' + (counts.w > 0 ? 'pos' : (counts.w < 0 ? 'neg' : 'zero'));
+      sc.textContent = (counts.w > 0 ? '+' : '') + counts.w.toFixed(2)
+        + (counts.v !== undefined ? ' / ' + counts.v.toFixed(2) : '');
+      sc.title = 'net balance / volume of changes';
+      header.appendChild(sc);
+    }
     tip.appendChild(header);
     if (counts) {
       const grid = document.createElement('span');
@@ -949,7 +989,8 @@
     row.className = 'patch-dynamics';
     for (const p of windowed) {
       const counts = perPatch[p.version] || {};
-      row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion, currentVersion));
+      row.appendChild(dynBuildPill(p, counts, id, p.version === currentVersion, currentVersion,
+                                   undefined, false, null, false, dynWeightsOn));
     }
     wrap.appendChild(row);
     if (canRight) {
@@ -966,7 +1007,7 @@
   // that patch) are filled — untouched cells stay as the CSS empty diamond, so
   // runtime work scales with real data, not the full N×M grid. Re-runnable: it
   // clears any existing pill first, so the "Buff vs nerf" toggle can rebuild.
-  function dynFillMatrix(table, manifest, bnOnly, removed) {
+  function dynFillMatrix(table, manifest, bnOnly, removed, wMode) {
     const byVer = {};
     manifest.patches.forEach(p => { byVer[p.version] = p; });
     // Back-arrow token: 'heroes_dyn' or 'items_dyn' (set on <body data-dyn-from>),
@@ -984,9 +1025,76 @@
       // that page show a back-arrow returning here; filePrefix 'patches/' because
       // the matrix lives at site root, patch pages under /patches.
       const debut = td.dataset.debut === '1';
-      td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed, debut));
+      td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed, debut, wMode));
+    });
+    if (wMode) dynDrawRowLines(table);
+    else table.querySelectorAll('td.he-seg').forEach(td => { td.classList.remove('he-seg'); td.querySelector('svg.dyn-wl')?.remove(); });
+  }
+
+  // Weights mode on the matrices: every row is ONE step line of the per-patch net
+  // score, the row itself is the zero axis.
+  //  - STEP line: a touched patch is a flat plateau across its whole cell (the value
+  //    belongs to the patch, nothing is interpolated between patches); vertical
+  //    risers at the cell edges join it to the neighbour (0 for an untouched patch).
+  //  - Colour follows the SIDE of the axis, not the cell: everything above the axis
+  //    is green, below is red; a riser that crosses the axis is split at the axis.
+  //  - LINEAR scale per row, computed over the VISIBLE columns only ("Hide old"
+  //    hides the rest), floor 1.5: a 2.0 is exactly twice as high as a 1.0.
+  // Idempotent: called after every refill AND after every layout pass.
+  const DYN_W_MIN_SCALE = 1.5;
+  function dynDrawRowLines(table) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const W = 40, H = 28, mid = H / 2, amp = mid - 2.5;
+    const mk = (tag, attrs) => {
+      const el = document.createElementNS(NS, tag);
+      for (const k in attrs) el.setAttribute(k, attrs[k]);
+      return el;
+    };
+    // visibility of a column = visibility of its header cell (hidden columns are display:none)
+    const headCells = [...table.querySelectorAll('thead tr:last-child th')];
+    table.querySelectorAll('tbody tr').forEach(tr => {
+      const all = [...tr.children];
+      const tds = all.filter(td => td.matches('td.hd-cell, td.he, td.ha') && !td.classList.contains('hd-spacer'));
+      tds.forEach(td => {
+        td.querySelectorAll('svg.dyn-wl').forEach(x => x.remove());
+        td.classList.remove('he-seg');
+      });
+      const vis = tds.map(td => td.getClientRects().length > 0);
+      const vals = tds.map(td => {
+        const c = td.querySelector('.w-line .dyn-cell');
+        return c ? (parseFloat(c.dataset.w) || 0) : 0;
+      });
+      const scale = Math.max(DYN_W_MIN_SCALE, ...vals.filter((_, i) => vis[i]).map(Math.abs));
+      const yOf = v => mid - Math.max(-1, Math.min(1, v / scale)) * amp;
+      const at = j => (j < 0 || j >= vals.length) ? 0 : vals[j];
+      const cls = y => (y < mid - 0.05 ? 'up' : (y > mid + 0.05 ? 'down' : 'flat'));
+      tds.forEach((td, i) => {
+        if (!vis[i]) return;
+        const v = vals[i], prev = at(i - 1);
+        const c = td.querySelector('.w-line .dyn-cell');
+        if (!c && (td.matches('td.ha') || (!v && !prev))) return;   // plain axis from CSS
+        const svg = mk('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'none', class: 'dyn-wl' });
+        svg.appendChild(mk('line', { x1: 0, x2: W, y1: mid, y2: mid, class: 'axis' }));
+        const yv = yOf(v), yp = yOf(prev);
+        // riser at the LEFT edge, from the previous patch's level to this one, split at the axis
+        if (yp !== yv) {
+          const seg = (y1, y2) => svg.appendChild(mk('line', {
+            x1: 0, x2: 0, y1: y1.toFixed(1), y2: y2.toFixed(1), class: 'seg ' + cls((y1 + y2) / 2) }));
+          if ((yp - mid) * (yv - mid) < 0) { seg(yp, mid); seg(mid, yv); } else seg(yp, yv);
+        }
+        // plateau across the whole cell
+        if (v) svg.appendChild(mk('line', { x1: 0, x2: W, y1: yv.toFixed(1), y2: yv.toFixed(1), class: 'seg ' + cls(yv) }));
+        if (c) {
+          svg.appendChild(mk('circle', { cx: W / 2, cy: yv.toFixed(1), r: 2.4, class: 'pt ' + cls(yv) }));
+          c.appendChild(svg);
+        } else {
+          td.classList.add('he-seg');
+          td.appendChild(svg);
+        }
+      });
     });
   }
+
 
   // Single <style> whose rule hides the oldest patch columns. Editing one rule
   // is far cheaper than toggling display on thousands of cells (115 cols × 127
@@ -1142,16 +1250,29 @@
   function dynSetupMatrix(table, manifest) {
     const elOld = document.getElementById('hd-hide-old');
     const elBn = document.getElementById('hd-bn-only');
+    const elW = document.getElementById('dyn-weights-btn');
     const removed = new Set();                 // tags the user toggled off (Remove chips)
     const chips = [...table.closest('.creeps-page').querySelectorAll('.hd-tag[data-tag]')];
     const layout = () => {
       dynLayoutMatrix(table, !elOld || elOld.checked);
+      // the row scale depends on which columns are visible -> redraw after every layout
+      if (table.classList.contains('w-mode')) dynDrawRowLines(table);
       // Column widths + horizontal overflow just changed → tell the sticky-frame
       // divider (a separate IIFE) to re-anchor after this layout pass.
       window.dispatchEvent(new CustomEvent('mr:filter-changed'));
     };
-    const refill = () => dynFillMatrix(table, manifest, !!(elBn && elBn.checked), removed);
+    if (elW && dynWeightsStored()) {
+      elW.classList.add('active'); elW.setAttribute('aria-pressed', 'true'); table.classList.add('w-mode');
+    }
+    const refill = () => dynFillMatrix(table, manifest, !!(elBn && elBn.checked), removed, !!(elW && elW.classList.contains('active')));
     refill();
+    if (elW) elW.addEventListener('click', () => {
+      const on = elW.classList.toggle('active');
+      elW.setAttribute('aria-pressed', on ? 'true' : 'false');
+      table.classList.toggle('w-mode', on);
+      dynWeightsStore(on);
+      refill();
+    });
     layout();
     if (elOld) elOld.addEventListener('change', layout);
 
@@ -1182,7 +1303,7 @@
     const page = table.closest('.creeps-page');
     const delToggle = document.getElementById('hd-show-deleted');
     const attackBtns = [...document.querySelectorAll('.hs-attack-filter')];
-    const attrBtns = [...document.querySelectorAll('.hs-attr-filter')];
+    const attrBtns = [...document.querySelectorAll('.hs-attr-filter[data-attr-filter]')];
     const priceMin = document.getElementById('hd-price-min');
     const priceMax = document.getElementById('hd-price-max');
     const priceClear = document.getElementById('hd-price-clear');
@@ -1311,6 +1432,22 @@
             const off = parseInt(e.dataset.dynOffset || '0', 10);
             dynRenderRow(e, manifest, dynWindow(manifest, off), currentVersion, off);
           };
+          // "Weights" toggle (toolbar): flip the mode and rebuild every row already built.
+          const wBtn = document.getElementById('dyn-weights-btn');
+          if (wBtn && dynWeightsStored()) {
+            dynWeightsOn = true; wBtn.classList.add('active'); document.body.classList.add('dyn-weights');
+          }
+          if (wBtn) wBtn.addEventListener('click', () => {
+            dynWeightsOn = wBtn.classList.toggle('active');
+            dynWeightsStore(dynWeightsOn);
+            document.body.classList.toggle('dyn-weights', dynWeightsOn);
+            document.querySelectorAll('.entity[id^="dyn-"][data-dyn-built]').forEach(e => {
+              const old = e.querySelector('.dyn-row-wrap');
+              if (old) old.remove();
+              const off = parseInt(e.dataset.dynOffset || '0', 10);
+              dynRenderRow(e, manifest, dynWindow(manifest, off), dynCurrentVersion(), off);
+            });
+          });
           // Arrow navigation: per-entity offset stored in data-dyn-offset.
           // Each row navigates independently — clicking an arrow only rebuilds
           // the entity whose dyn-row-wrap contains that arrow.
@@ -2835,7 +2972,7 @@
   const _innateRulesEl = document.getElementById('hs-innate-rules');
   const _innateRules = _innateRulesEl ? JSON.parse(_innateRulesEl.textContent) : {};
   const attackBtns = [...document.querySelectorAll('.hs-attack-filter')];
-  const attrBtns = [...document.querySelectorAll('.hs-attr-filter')];
+  const attrBtns = [...document.querySelectorAll('.hs-attr-filter[data-attr-filter]')];
   const cells = [...table.querySelectorAll('tbody td[data-col]')];
   let attackFilter = '';
   let attrFilter = '';
@@ -3453,6 +3590,23 @@
     return 1 + (entry.base_pct + entry.per_level_pct * (level || 1)) / 100;
   }
 
+  // Elder Titan — Momentum (innate, 7.41a+): armor = factor% of BONUS movement
+  // speed (MS above base). Depends on the computed MS, so it is applied in calc()
+  // after ms is known, not via the generic innate() dispatch.
+  function elderTitanMomentumArmor(s, ms, level, includeInnates) {
+    if (!includeInnates || s.slug !== 'elder_titan') return 0;
+    const rules = innateRules.elder_titan;
+    const eff = rules?.effects?.find(e => e.target === 'armor' && e.formula === 'bonus_ms_factor');
+    if (!eff) return 0;
+    const entry = activeEntry(eff, currentPatch);
+    if (!entry) return 0;
+    const baseMs = Number(s.ms) || 0;
+    const bonusMs = Math.max(0, ms - baseMs);
+    // factor scales with level; increment provided at level 1 (7.41 innate rule).
+    const factor = (Number(entry.base) || 0) + (Number(entry.per_level) || 0) * (level || 1);
+    return bonusMs * factor / 100;
+  }
+
   function axeStrBonus(s, a, includeInnates) {
     if (!includeInnates || s.slug !== 'axe') return 0;
     const rules = innateRules.axe;
@@ -3717,7 +3871,7 @@
   function itemTotals(entries, attackType, baubleLevel) {
     const isRanged = String(attackType || '').toLowerCase() === 'ranged';
     const baubleScale = baubleScaleFor(baubleLevel);
-    const out = { str: 0, agi: 0, int: 0, hp: 0, mp: 0, hpr: 0, mpr: 0, mprAmp: 0, _mprAmpVals: [], armor: 0, _rangeUniqueAllVals: [], _rangeUniqueRangedVals: [], _msBootVals: [], _cdrUniqVals: [], _cdrStackVals: [], projSpeed: 0, mrVals: [], evVals: [], statusResVals: [], slowResVals: [], spellAmp: 0, damage: 0, damagePct: 0, aspd: 0, ms: 0, range: 0, dvision: 0, nvision: 0, cost: 0, hprPct: 0, missingHprPct: 0, mpPct: 0, lifesteal: 0, spellLifesteal: 0, castRange: 0, primaryStat: 0, primaryStatUni: 0, batReduce: 0, healthRestoration: 0, cooldownReduction: 0, debuffAmp: 0, hpPct: 0, msPct: 0, _msPctVals: [], knockbackResist: 0, maxHpRegen: 0, incomingDamage: 0, magicDamage: 0, castSpeed: 0, visionReduce: 0, manacostIncrease: 0, intelligencePct: 0, hpRegenReduce: 0, manacostReduction: 0, gpm: 0, xpm: 0, aspdPct: 0, manaReductionPct: 0 };
+    const out = { str: 0, agi: 0, int: 0, hp: 0, mp: 0, hpr: 0, mpr: 0, mprAmp: 0, _mprAmpVals: [], armor: 0, _rangeUniqueAllVals: [], _rangeUniqueRangedVals: [], _msBootVals: [], _cdrUniqVals: [], _cdrStackVals: [], _spellAmpUniqueVals: [], projSpeed: 0, mrVals: [], evVals: [], statusResVals: [], slowResVals: [], spellAmp: 0, damage: 0, damagePct: 0, aspd: 0, ms: 0, range: 0, dvision: 0, nvision: 0, cost: 0, hprPct: 0, missingHprPct: 0, mpPct: 0, lifesteal: 0, spellLifesteal: 0, castRange: 0, primaryStat: 0, primaryStatUni: 0, batReduce: 0, healthRestoration: 0, cooldownReduction: 0, debuffAmp: 0, hpPct: 0, msPct: 0, _msPctVals: [], knockbackResist: 0, maxHpRegen: 0, incomingDamage: 0, magicDamage: 0, castSpeed: 0, visionReduce: 0, manacostIncrease: 0, intelligencePct: 0, hpRegenReduce: 0, manacostReduction: 0, gpm: 0, xpm: 0, aspdPct: 0, manaReductionPct: 0 };
     const visionSeen = new Set();
     entries.forEach(entry => {
       const id = typeof entry === 'string' ? entry : entry.id;
@@ -3753,6 +3907,7 @@
       if (b.statusRes) out.statusResVals.push(Number(b.statusRes) || 0);
       if (b.slowRes) out.slowResVals.push(Number(b.slowRes) || 0);
       out.spellAmp += Number(b.spellAmp) || 0;
+      if (b.spellAmpUnique) out._spellAmpUniqueVals.push(Number(b.spellAmpUnique));
       out.damage += (Number(b.damage) || 0) + (isRanged ? (Number(b.damageRanged) || 0) : (Number(b.damageMelee) || 0));
       out.damagePct += Number(b.damagePct) || 0;
       out.lifesteal += Number(b.lifesteal) || 0;
@@ -3810,6 +3965,7 @@
         if (mb.statusRes) out.statusResVals.push(Number(mb.statusRes) || 0);
         if (mb.slowRes) out.slowResVals.push(Number(mb.slowRes) || 0);
         out.spellAmp += Number(mb.spellAmp) || 0;
+        if (mb.spellAmpUnique) out._spellAmpUniqueVals.push(Number(mb.spellAmpUnique));
         out.damagePct += Number(mb.damagePct) || 0;
         if (mb.mprAmp) out._mprAmpVals.push(Number(mb.mprAmp) || 0);
         if (mb.msPct) out._msPctVals.push(Number(mb.msPct) || 0);
@@ -3859,6 +4015,7 @@
       }
       visionSeen.add(id);
     });
+    out.spellAmp += out._spellAmpUniqueVals.length ? Math.max(...out._spellAmpUniqueVals) : 0;
     out.mprAmp = out._mprAmpVals.length ? Math.max(...out._mprAmpVals) : 0;
     out.msPct = out._msPctVals.length ? Math.max(...out._msPctVals) : 0;
     out.ms += out._msBootVals.length ? Math.max(...out._msBootVals) : 0;
@@ -3947,13 +4104,16 @@
     const proj = (Number(s.proj) || 0) + itemsTotal.projSpeed;
     const dvision = Math.round(((Number(s.dvision) || 0) + itemsTotal.dvision) * (1 - itemsTotal.visionReduce / 100));
     const nvision = Math.round(((Number(s.nvision) || 0) + itemsTotal.nvision + heroLabInnate('nvision', s, a, lvl, hp, includeInnates)) * (1 - itemsTotal.visionReduce / 100));
+    // Elder Titan Momentum: armor from bonus MS — added after ms is known.
+    // Skip when armor was explicitly overridden (custom value is authoritative).
+    if (st.custom.armor === null) armor += elderTitanMomentumArmor(s, ms, lvl, includeInnates);
     const armorPct = armorFactor(armor) * 100;
     const manaShield = manaShieldEhp(s, mp, lvl, includeInnates);
     const ehpPhys = hp / Math.max(0.01, 1 - armorFactor(armor)) + manaShield;
     const ehpMag = hp / Math.max(0.01, 1 - mr / 100) + manaShield;
     const lifesteal = itemsTotal.lifesteal;
     const spellLifesteal = itemsTotal.spellLifesteal;
-    const castRange = itemsTotal.castRange;
+    const castRange = itemsTotal.castRange + heroLabInnate('castRange', s, a, lvl, hp, includeInnates);
     const cooldownReduction = itemsTotal.cooldownReduction || 0;
     const innateItemCdr = heroLabInnate('itemCdr', s, { str, agi, int }, lvl, hp, includeInnates);
     const itemCdr = innateItemCdr > 0

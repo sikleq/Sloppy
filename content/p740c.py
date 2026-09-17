@@ -40,8 +40,7 @@ def build():
     # Batrider
     W(hero_header("Batrider"))
     W(ul_open())
-    W(li("Agility gain increased from 1.8 to 2.0", b(1.8, 2.0)))
-    W(li("Damage gain per level increased from 3.4 to 3.5", b(3.4, 3.5)))
+    W(li("Agility gain increased from 1.8 to 2.0", b(1.8, 2.0), extra=inline_note("Damage gain per level increased from 3.4 to 3.5")))
     W(ul_close())
 
     # Bloodseeker
@@ -172,8 +171,7 @@ def build():
     # Jakiro
     W(hero_header("Jakiro"))
     W(ul_open())
-    W(li("Base Intelligence decreased from 26 to 25", b(26, 25)))
-    W(li("Damage at level 1 decreased from 53–61 to 52–60", br(53, 61, 52, 60)))
+    W(li("Base Intelligence decreased from 26 to 25", b(26, 25), extra=inline_note("Damage at level 1 decreased from 53–61 to 52–60")))
     W(ul_close())
     W(ability("Ice Path"))
     W(ul_open())
@@ -206,8 +204,7 @@ def build():
     # Lone Druid
     W(hero_header("Lone Druid"))
     W(ul_open())
-    W(li("Base Agility increased from 20 to 22", b(20, 22)))
-    W(li("Damage at level 1 increased from 42–46 to 44–48", br(42, 46, 44, 48)))
+    W(li("Base Agility increased from 20 to 22", b(20, 22), extra=inline_note("Damage at level 1 increased from 42–46 to 44–48")))
     W(ul_close())
     W(ability("Savage Roar"))
     W(ul_open())
@@ -371,16 +368,14 @@ def build():
     # Tidehunter
     W(hero_header("Tidehunter"))
     W(ul_open())
-    W(li("Base Strength decreased from 27 to 26", b(27, 26)))
-    W(li("Damage at level 1 decreased from 52–58 to 51–57", br(52, 58, 51, 57)))
+    W(li("Base Strength decreased from 27 to 26", b(27, 26), extra=inline_note("Damage at level 1 decreased from 52–58 to 51–57")))
     W(ul_close())
 
     # Timbersaw
     W(hero_header("Timbersaw"))
     W(ul_open())
     W(li("Base Strength decreased from 26 to 23", b(26, 23)))
-    W(li("Strength gain increased from 3.5 to 3.6", b(3.5, 3.6)))
-    W(li("Damage at level 1 decreased from 49–53 to 46–50", br(49, 53, 46, 50)))
+    W(li("Strength gain increased from 3.5 to 3.6", b(3.5, 3.6), extra=inline_note("Damage at level 1 decreased from 49–53 to 46–50")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
