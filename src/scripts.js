@@ -1027,48 +1027,58 @@
       const debut = td.dataset.debut === '1';
       td.appendChild(dynBuildPill(patch, counts, td.dataset.eid, false, fromTok, 'patches/', bnOnly, removed, debut, wMode));
     });
-    if (wMode) dynDrawRowBars(table);
+    if (wMode) dynDrawRowLines(table);
+    else table.querySelectorAll('td.he-seg').forEach(td => { td.classList.remove('he-seg'); td.querySelector('svg.dyn-wl')?.remove(); });
   }
 
-  // Weights mode on the matrices: every cell is a BAR on the row's zero axis
-  // (thin line through every cell, untouched ones included). Green bar up =
-  // net buff, red bar down = net nerf; height is sqrt-scaled with ONE global cap
-  // so cells are comparable across heroes (|w| = 4 fills the half-cell). Behind
-  // it a faint grey band shows the VOLUME of changes (reworks included), so a
-  // pure rework (w = 0, v > 0) is still visible.
-  const DYN_W_CAP = 4;
-  function dynDrawRowBars(table) {
+  // Weights mode on the matrices: every row is ONE line chart of the per-patch net
+  // score, with the row itself as the zero axis. The point sits at the centre of
+  // each touched cell (untouched patch = 0, on the axis); neighbouring cells are
+  // joined by straight segments that meet exactly at the cell edge, so the line is
+  // continuous across the whole row. The vertical scale is LINEAR and per row
+  // (row max |w|, at least 1.5, fills the half-cell): a 2.0 is exactly twice as
+  // high as a 1.0. Above the axis = buff (green), below = nerf (red).
+  const DYN_W_MIN_SCALE = 1.5;
+  function dynDrawRowLines(table) {
     const NS = 'http://www.w3.org/2000/svg';
-    const W = 40, H = 28, mid = H / 2, amp = mid - 1.5;
-    const len = x => Math.sqrt(Math.min(Math.abs(x), DYN_W_CAP) / DYN_W_CAP) * amp;
-    table.querySelectorAll('.w-line .dyn-cell').forEach(c => {
-      const w = parseFloat(c.dataset.w) || 0, v = parseFloat(c.dataset.v) || 0;
-      const svg = document.createElementNS(NS, 'svg');
-      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      svg.setAttribute('preserveAspectRatio', 'none');
-      svg.setAttribute('class', 'dyn-wl ' + (w > 0 ? 'up' : (w < 0 ? 'down' : 'flat')));
-      if (v) {                                   // volume band, centred on the axis
-        const hv = len(v);
-        const band = document.createElementNS(NS, 'rect');
-        band.setAttribute('x', String(W * 0.2)); band.setAttribute('width', String(W * 0.6));
-        band.setAttribute('y', (mid - hv).toFixed(1)); band.setAttribute('height', (2 * hv).toFixed(1));
-        band.setAttribute('class', 'vol');
-        svg.appendChild(band);
-      }
-      const axis = document.createElementNS(NS, 'line');
-      axis.setAttribute('x1', '0'); axis.setAttribute('x2', String(W));
-      axis.setAttribute('y1', String(mid)); axis.setAttribute('y2', String(mid));
-      axis.setAttribute('class', 'axis');
-      svg.appendChild(axis);
-      if (w) {
-        const hw = len(w);
-        const bar = document.createElementNS(NS, 'rect');
-        bar.setAttribute('x', String(W * 0.3)); bar.setAttribute('width', String(W * 0.4));
-        bar.setAttribute('y', (w > 0 ? mid - hw : mid).toFixed(1)); bar.setAttribute('height', hw.toFixed(1));
-        bar.setAttribute('class', 'net');
-        svg.appendChild(bar);
-      }
-      c.appendChild(svg);
+    const W = 40, H = 28, mid = H / 2, amp = mid - 2.5;
+    const mk = (tag, attrs) => {
+      const el = document.createElementNS(NS, tag);
+      for (const k in attrs) el.setAttribute(k, attrs[k]);
+      return el;
+    };
+    table.querySelectorAll('tbody tr').forEach(tr => {
+      const tds = [...tr.children].filter(td => td.matches('td.hd-cell, td.he, td.ha'));
+      tds.forEach(td => { if (td.classList.contains('he-seg')) { td.classList.remove('he-seg'); td.querySelector('svg.dyn-wl')?.remove(); } });
+      const vals = tds.map(td => {
+        const c = td.querySelector('.w-line .dyn-cell');
+        return c ? (parseFloat(c.dataset.w) || 0) : 0;
+      });
+      const scale = Math.max(DYN_W_MIN_SCALE, ...vals.map(Math.abs));
+      const yOf = v => mid - (v / scale) * amp;
+      const at = j => (j < 0 || j >= vals.length) ? 0 : vals[j];
+      tds.forEach((td, i) => {
+        const v = vals[i], l = (at(i - 1) + v) / 2, r = (v + at(i + 1)) / 2;
+        const c = td.querySelector('.w-line .dyn-cell');
+        const flat = !v && !l && !r;
+        if (!c && (flat || td.matches('td.ha'))) return;      // plain axis (CSS) / not in game
+        const svg = mk('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'none', class: 'dyn-wl' });
+        svg.appendChild(mk('line', { x1: 0, x2: W, y1: mid, y2: mid, class: 'axis' }));
+        // two half-segments so each half takes the colour of the side it belongs to
+        const half = (x1, y1, x2, y2, val) => svg.appendChild(mk('line', {
+          x1, y1: y1.toFixed(1), x2, y2: y2.toFixed(1),
+          class: 'seg ' + (val > 0 ? 'up' : (val < 0 ? 'down' : 'flat')) }));
+        half(0, yOf(l), W / 2, yOf(v), v || at(i - 1));
+        half(W / 2, yOf(v), W, yOf(r), v || at(i + 1));
+        if (c) {
+          svg.appendChild(mk('circle', { cx: W / 2, cy: yOf(v).toFixed(1), r: 2.6,
+            class: 'pt ' + (v > 0 ? 'up' : (v < 0 ? 'down' : 'flat')) }));
+          c.appendChild(svg);
+        } else {
+          td.classList.add('he-seg');
+          td.appendChild(svg);
+        }
+      });
     });
   }
 

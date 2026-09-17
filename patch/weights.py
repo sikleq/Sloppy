@@ -305,6 +305,29 @@ _J = _WJ.get("J", {}).get("u", {})       # signal J: value of +1% of the type (e
 J_PCT_UNIT = 20.0                        # a 20% change of a u=1 type = 1.0
 
 
+_ABS_FROMTO_RE = _re.compile(r"from\s+([+\-\d./%s x]+?)\s+to\s+([+\-\d./%s x]+?)(?=[\s.,;)]|$)", _re.I)
+_NUM_RE = _re.compile(r"-?\d+(?:\.\d+)?")
+
+
+def _small_change_damp(text):
+    """Absolute floor (agreement test 2026-09-17): a big % of a tiny number is still tiny.
+    Seconds: |Δ| < 0.25 s -> x0.35, < 0.5 s -> x0.5. Percentage points: |Δ| < 2 pp -> x0.5.
+    Uses the LAST value of per-level lists (max rank). 1.0 when not applicable."""
+    m = _ABS_FROMTO_RE.search(_plain(text))
+    if not m:
+        return 1.0
+    a, b = m.group(1), m.group(2)
+    na, nb = _NUM_RE.findall(a), _NUM_RE.findall(b)
+    if not na or not nb:
+        return 1.0
+    delta = abs(float(nb[-1]) - float(na[-1]))
+    if a.rstrip().endswith("s") or b.rstrip().endswith("s"):
+        return 0.35 if delta < 0.25 else (0.5 if delta < 0.5 else 1.0)
+    if "%" in a or "%" in b:
+        return 0.5 if delta < 2 else 1.0
+    return 1.0
+
+
 def _row_value(text, badge_html, kind, ctx):
     """Unsigned value of a buff/nerf row on the common scale (before context)."""
     if ctx and ctx.get("base_stat"):
@@ -312,10 +335,11 @@ def _row_value(text, badge_html, kind, ctx):
         if m is not None:
             return weight_of(kind) * min(m, MAG_CAP_NORM)
     pcts = _row_pcts(text, badge_html)
+    damp = _small_change_damp(text)
     if pcts and kind in _J:
-        return min(_J[kind] * (sum(pcts) / len(pcts)) / J_PCT_UNIT, MAG_CAP_NORM)
+        return min(_J[kind] * (sum(pcts) / len(pcts)) / J_PCT_UNIT, MAG_CAP_NORM) * damp
     if pcts:
-        return weight_of(kind) * min((sum(pcts) / len(pcts)) / _TPCT.get(kind, 20.0), MAG_CAP_NORM)
+        return weight_of(kind) * min((sum(pcts) / len(pcts)) / _TPCT.get(kind, 20.0), MAG_CAP_NORM) * damp
     return weight_of(kind)
 
 

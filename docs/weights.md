@@ -92,6 +92,20 @@ but it is not "impact". Candidate fixes (need a decision): an absolute floor per
 talent deltas below one typical step → ×0.5); a per-ability importance prior (ultimates already ×1.3; core
 passives/innates could get a manual list); re-grade by Денис to confirm the judge.
 
+### Follow-up applied 2026-09-17 — absolute floor (decision delegated to Claude)
+
+A big % of a tiny number is still tiny: rows whose max-rank change is **< 0.25 s → ×0.35**, **< 0.5 s → ×0.5**,
+or **< 2 percentage points → ×0.5** (`_small_change_damp`). With the floor and the correct base-stat context
+the same 120 rows give **ρ = 0.34** (was 0.21). A manual "core mechanics" list was rejected as subjective;
+Денис re-grading the blind file remains the way to check the judge.
+
+## Matrix chart (heroes_dyn / items_dyn)
+
+One line per row, the row is the zero axis; the point is the patch's net score at the cell centre, untouched
+patches sit on the axis, segments meet at cell edges (tails are drawn inside the neighbouring untouched
+cells). **Linear, per-row scale** (row max |w|, at least 1.5, = half cell): 2.0 is exactly twice as high as
+1.0. History of rejected variants: bars v1, sqrt line, cumulative line, bars v2 with a volume band.
+
 ## Open / next
 1. ~~Items in gold~~ done.
 2. ~~Signal J~~ done (now the main source for % rows).

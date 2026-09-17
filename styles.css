@@ -9786,9 +9786,15 @@ a.whatsnew-row:hover {
 }
 .heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
 .heroes-dyn-table.w-mode td.he::after { width: 100%; }
-.dyn-wl rect.vol { fill: rgba(170, 180, 200, 0.16); }
-.dyn-wl.up rect.net { fill: rgb(62, 178, 96); }
-.dyn-wl.down rect.net { fill: rgb(214, 74, 66); }
+/* line chart pieces */
+.dyn-wl .seg { stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.dyn-wl .seg.up, .dyn-wl .pt.up { stroke: rgb(62, 178, 96); fill: rgb(62, 178, 96); }
+.dyn-wl .seg.down, .dyn-wl .pt.down { stroke: rgb(214, 74, 66); fill: rgb(214, 74, 66); }
+.dyn-wl .seg.flat, .dyn-wl .pt.flat { stroke: rgb(160, 165, 175); fill: rgb(160, 165, 175); }
+/* untouched cell that carries the tail of a neighbour's segment */
+.heroes-dyn-table.w-mode td.he { padding: 0; }
+.heroes-dyn-table.w-mode td.he.he-seg::after { display: none; }
+.heroes-dyn-table.w-mode td.he.he-seg > svg.dyn-wl { display: block; width: 100%; height: 28px; }
 .dyn-wl polyline { vector-effect: non-scaling-stroke; }
 .hs-attr-filter.hd-weights-btn img { width: 18px; height: 16px; display: block; image-rendering: pixelated; }
 .hd-weights-group { margin-left: 2px; }
