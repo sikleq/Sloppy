@@ -59,8 +59,11 @@ def _blocks(page: str):
         icon = _re.search(r'<img[^>]*\bsrc="([^"]+)"', header)
         label = _re.search(r'<span class="entity-(?:new|changed)-type">.*?</span>', header, _re.S)
         body = block[:h.start()] + (f'<div class="ec-entity-note">{label.group(0)}</div>' if label else "") + block[h_end:]
-        clean_name = _re.sub(r"<[^>]+>", "", name.group(1)).strip() if name else h.group(2)
-        clean_name = _re.sub(r"\s+(NEW|Recipe changed).*$", "", clean_name).strip()
+        # the header may carry labels ("Returning Tier 4 Artifact", "NEW", "Recipe changed") —
+        # the icon's alt text is the clean display name
+        alt = _re.search(r'<img[^>]*\balt="([^"]+)"', header)
+        clean_name = _html.unescape(alt.group(1)) if alt else (
+            _re.sub(r"<[^>]+>", "", name.group(1)).strip() if name else h.group(2))
         yield h.group(1), h.group(2), clean_name, (icon.group(1) if icon else ""), body
 
 
@@ -104,11 +107,40 @@ _TOOLBAR = '''<div class="toolbar">
         <button class="badge misc filter-btn" data-filter="misc">MISC</button>
         <button class="badge qol filter-btn" data-filter="qol">QoL</button>
       </div>
+      {scopes}
     </div>
     <div class="toolbar-patch-info">{info}</div>
   </div>
 </div>
 '''
+
+
+_SUBGROUP_RE = _re.compile(r'<h4 class="subgroup">([^<]+)</h4>')
+_SCOPE_ORDER = ["general", "abilities", "talents", "facets", "other"]
+_SCOPE_LABEL = {"general": "General", "abilities": "Abilities", "talents": "Talents",
+                "facets": "Facets", "other": "Other"}
+
+
+def _scope_key(title: str) -> str:
+    k = title.strip().lower()
+    return k if k in ("general", "abilities", "talents", "facets") else "other"
+
+
+def _wrap_scopes(body: str):
+    """Wrap every subgroup of a hero block (GENERAL / Abilities / Talents / Facets / …) in
+    <div class="ec-scope" data-scope="…"> so the page can filter by it. Returns (html, scopes)."""
+    ms = list(_SUBGROUP_RE.finditer(body))
+    if not ms:
+        return body, []
+    tail = body.rfind("</div>")                       # the entity-block's own closing tag
+    out, scopes = [body[:ms[0].start()]], []
+    for i, m in enumerate(ms):
+        end = ms[i + 1].start() if i + 1 < len(ms) else tail
+        key = _scope_key(m.group(1))
+        scopes.append(key)
+        out.append(f'<div class="ec-scope" data-scope="{key}">{body[m.start():end]}</div>')
+    out.append(body[tail:])
+    return "".join(out), scopes
 
 
 def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
@@ -120,14 +152,24 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     n = len(e["patches"])
     info = (f'<span class="ti-released">Changed in <b>{n}</b> of {len(_annotated())} annotated patches</span>'
             f'<span class="ti-after">latest: <b>{_esc(e["patches"][0]["version"])}</b></span>')
+    sections, seen = [], []
+    for p in e["patches"]:
+        body, sc = _wrap_scopes(p["body"])
+        p["_body"] = body
+        seen += [s for s in sc if s not in seen]
+    scopes_html = ""
+    if len(seen) > 1:
+        scopes_html = ('<div class="legend-categories ec-scopes"><strong>Show:</strong>' + "".join(
+            f'<button type="button" class="badge ec-scope-btn" data-ec-scope="{s}">{_SCOPE_LABEL[s]}</button>'
+            for s in _SCOPE_ORDER if s in seen) + '</div>')
     out = [_head(f'{e["name"]} — changes', asset, "../", "patch-page entity-page"),
            ' data-dyn-prefix="../patches/">\n\n', nav,
            f'\n<a class="nav-back-arrow" href="../{key}.html" aria-label="All {label.lower()}" title="All {label.lower()}"></a>\n',
-           _TOOLBAR.format(info=info), '<div class="container">\n',
-           '<div class="entity-block ec-head">'
+           _TOOLBAR.format(info=info, scopes=scopes_html), '<div class="container">\n',
+           '<section class="cat-panel ec-head-panel"><div class="entity-block ec-head">'
            f'<div class="entity {e["kind"]}-entity" id="{eid}">'
            f'<div class="entity-icon {icon_cls}"><img src="{_esc(e["icon"])}" alt="{_esc(e["name"])}"></div>'
-           f'<div class="entity-name">{_esc(e["name"])}</div></div></div>\n']
+           f'<div class="entity-name">{_esc(e["name"])}</div></div></div></section>\n']
     for p in e["patches"]:
         bucket = rec.get("patches", {}).get(p["version"], {})
         score = ""
@@ -136,9 +178,11 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
             cls = "pos" if w > 0 else ("neg" if w < 0 else "zero")
             score = (f'<span class="ec-score {cls}" title="weighted score: net / volume">'
                      f'{"+" if w > 0 else ""}{w:.2f}<i> / {bucket.get("v", 0.0):.2f}</i></span>')
-        body = _re.sub(r'href="(7\.\d+[a-z]?\.html)', r'href="../patches/\1', p["body"])
-        out.append(f'<section class="ec-patch" id="p-{_esc(p["version"])}">'
-                   f'<h2 class="ec-ver"><a href="../patches/{_esc(p["version"])}.html#{eid}">{_esc(p["version"])}</a>'
+        body = _re.sub(r'href="(7\.\d+[a-z]?\.html)', r'href="../patches/\1', p["_body"])
+        # same panel + banner as a category section on the patch page; the banner IS the patch
+        out.append(f'<section class="cat-panel ec-patch" id="p-{_esc(p["version"])}">'
+                   f'<h2 class="section ec-ver"><a href="../patches/{_esc(p["version"])}.html#{eid}" '
+                   f'title="Open {_esc(e["name"])} in patch {_esc(p["version"])}">Patch {_esc(p["version"])}</a>'
                    f'<span class="ec-date">{_esc(p["date"])}</span>{score}</h2>\n{body}\n</section>\n')
     out.append('<button class="back-to-top" aria-label="Back to top" title="Back to top" '
                'onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>'
@@ -158,16 +202,24 @@ def _annotated():
     return _ANN
 
 
-def _index_page(kind: str, ents: list[dict], asset: str, latest: str) -> str:
+def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict | None = None) -> str:
     folder, label, key, icon_dir = KINDS[kind]
     nav = _site.render_top_nav("materials", f"patches/{latest}.html", patch_context=False,
                                subtabs_active=key, subnav_in_header=False)
     subnav = _site.render_materials_subnav(key)
-    cards = []
+    # items: only what is in the game NOW is shown by default (same "current" flag as Item
+    # Dynamics — removed / cycled-out items sit behind the "Show deleted" switch)
+    current = {}
+    if kind == "item" and dyn:
+        current = {i["key"].split("|", 1)[1].replace("_", "-"): bool(i.get("current", True)) for i in dyn.get("items", [])}
+    cards, n_old = [], 0
     for e in sorted(ents, key=lambda x: x["name"].lower()):
         icon = e["icon"].replace("../", "", 1)
         vers = [p["version"] for p in e["patches"]]
-        cards.append(f'<a class="ec-card ec-card-{kind}" href="{folder}/{e["slug"]}.html" '
+        is_cur = current.get(e["slug"], True)
+        n_old += 0 if is_cur else 1
+        cards.append(f'<a class="ec-card ec-card-{kind}{"" if is_cur else " ec-old"}" data-current="{1 if is_cur else 0}"'
+                     f'{"" if is_cur else " hidden"} href="{folder}/{e["slug"]}.html" '
                      f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
                      f'<img src="{_esc(icon)}" alt="" loading="lazy">'
                      f'<span class="ec-card-name">{_esc(e["name"])}</span>'
@@ -182,7 +234,11 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str) -> str:
             '<div class="cal-toggle-bar inbox-bar hd-toolbar"><div class="toolbar-panel">'
             '<span class="search-box hd-search">'
             f'<input type="text" data-ec-search placeholder="Search {plural} — comma-separate for several" '
-            'autocomplete="off" spellcheck="false"></span></div></div>'
+            'autocomplete="off" spellcheck="false"></span>'
+            + (f'<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Show deleted ({n_old})</span>'
+               '<input type="checkbox" id="ec-show-old" class="ua-switch-input">'
+               '<span class="ua-switch" aria-hidden="true"></span></label>' if n_old else '')
+            + '</div></div>'
             f'<div class="ec-grid ec-grid-{kind}">' + "".join(cards) + '</div>\n</div>\n</div>\n'
             f'<script defer src="src/scripts.js?v={asset}"></script>\n</body>\n</html>\n')
 
@@ -202,7 +258,7 @@ def main() -> int:
         lst = [e for (k, _), e in ents.items() if k == kind]
         for e in lst:
             (DIST / folder / f'{e["slug"]}.html').write_text(_entity_page(e, asset, latest, dyn), encoding="utf-8")
-        (DIST / f"{KINDS[kind][2]}.html").write_text(_index_page(kind, lst, asset, latest), encoding="utf-8")
+        (DIST / f"{KINDS[kind][2]}.html").write_text(_index_page(kind, lst, asset, latest, dyn), encoding="utf-8")
         counts[kind] = (len(lst), sum(len(e["patches"]) for e in lst))
     print(f"  -> dist/heroes/*.html: {counts['hero'][0]} heroes ({counts['hero'][1]} patch sections); "
           f"dist/items/*.html: {counts['item'][0]} items ({counts['item'][1]} sections); "

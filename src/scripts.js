@@ -3365,18 +3365,46 @@
   applyHeroFilters();
 })();
 
+// ---- HERO / ITEM CHANGES page: "Show: General / Abilities / Talents / Facets" filter ----
+(function() {
+  const btns = [...document.querySelectorAll('.ec-scope-btn')];
+  if (!btns.length) return;
+  const active = new Set();
+  const apply = () => {
+    document.querySelectorAll('.ec-scope').forEach(el => {
+      el.classList.toggle('ec-scope-hide', active.size > 0 && !active.has(el.dataset.scope));
+    });
+    // a patch with nothing left to show collapses entirely
+    document.querySelectorAll('section.ec-patch').forEach(sec => {
+      const scopes = sec.querySelectorAll('.ec-scope');
+      sec.classList.toggle('ec-scope-hide',
+        scopes.length > 0 && [...scopes].every(s => s.classList.contains('ec-scope-hide')));
+    });
+  };
+  btns.forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.ecScope;
+    if (active.has(k)) active.delete(k); else active.add(k);
+    b.classList.toggle('active', active.has(k));
+    apply();
+  }));
+})();
+
 // ---- HERO / ITEM CHANGES index: name filter (comma-separated, partial) ----
 (function() {
   const input = document.querySelector('[data-ec-search]');
   if (!input) return;
   const cards = [...document.querySelectorAll('.ec-card')];
-  input.addEventListener('input', () => {
+  const showOld = document.getElementById('ec-show-old');     // items only: removed / cycled-out
+  const apply = () => {
     const terms = input.value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
     cards.forEach(c => {
       const n = c.dataset.name || '';
-      c.hidden = terms.length > 0 && !terms.some(t => n.includes(t));
+      const old = c.dataset.current === '0' && !(showOld && showOld.checked);
+      c.hidden = old || (terms.length > 0 && !terms.some(t => n.includes(t)));
     });
-  });
+  };
+  input.addEventListener('input', apply);
+  if (showOld) showOld.addEventListener('change', apply);
 })();
 
 // ---- HERO LAB: two-side hero + item calculator ----

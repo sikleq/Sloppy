@@ -9836,20 +9836,29 @@ a.whatsnew-row:hover {
 .entity-name .entity-link:hover { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 .entity-icon .entity-link { display: block; line-height: 0; }
 .entity-icon .entity-link:hover img { filter: brightness(1.15); }
-.entity-page .ec-head { margin-bottom: 6px; }
-.ec-patch { margin: 22px 0 8px; }
-.ec-ver {
-  display: flex; align-items: baseline; gap: 14px;
-  margin: 0 0 8px; padding-bottom: 6px;
-  border-bottom: 1px solid var(--line);
-  font-family: 'Jersey 25', 'Jersey 10', monospace; font-weight: 400; font-size: 26px; letter-spacing: 0.5px;
+.entity-page .ec-head-panel { margin-top: 18px; }
+/* the patch banner = the same red section banner as "ITEM UPDATES" on a patch page */
+h2.section.ec-ver { display: flex; align-items: baseline; gap: 16px; }
+h2.section.ec-ver a { color: #fff; text-decoration: none; }
+h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.ec-date { font-family: var(--font-j25); font-size: 17px; letter-spacing: 1px; color: rgba(255, 255, 255, 0.72); }
+.ec-score {
+  margin-left: auto; padding: 3px 9px; border-radius: 3px; background: rgba(0, 0, 0, 0.42);
+  font: 600 13px/1 Radiance, "Segoe UI", Arial, sans-serif; letter-spacing: 0; text-shadow: none;
+  font-variant-numeric: tabular-nums; text-transform: none;
 }
-.ec-ver a { color: var(--gold); text-decoration: none; }
-.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4px; }
-.ec-date { font-size: 15px; color: var(--text-dim, #8b949e); }
-.ec-score { margin-left: auto; font: 600 13px/1 Radiance, "Segoe UI", Arial, sans-serif; font-variant-numeric: tabular-nums; }
-.ec-score i { font-style: normal; font-weight: 400; color: var(--text-dim, #8b949e); }
-.ec-score.pos { color: rgb(88, 200, 118); } .ec-score.neg { color: rgb(232, 96, 88); } .ec-score.zero { color: rgba(200, 205, 215, 0.8); }
+.ec-score i { font-style: normal; font-weight: 400; color: rgba(255, 255, 255, 0.6); }
+.ec-score.pos { color: rgb(110, 220, 140); } .ec-score.neg { color: rgb(255, 130, 120); } .ec-score.zero { color: rgba(225, 228, 235, 0.85); }
+/* scope filter row (same look as the Group row on patch pages) */
+.ec-scopes { margin-top: 5px; }
+.ec-scope-btn {
+  cursor: pointer; user-select: none; font-family: inherit; font-size: 11px; padding: 3px 9px; border-radius: 3px;
+  background: rgba(121, 192, 255, 0.05); color: #87a3bf; border: 1px solid rgba(121, 192, 255, 0.22);
+  text-transform: uppercase; letter-spacing: 0.4px; transition: filter 0.12s, background 0.12s, border-color 0.12s;
+}
+.ec-scope-btn:hover { background: rgba(121, 192, 255, 0.10); border-color: rgba(121, 192, 255, 0.40); color: var(--text-main); }
+.ec-scope-btn.active { background: rgba(121, 192, 255, 0.22); border-color: rgba(121, 192, 255, 0.60); color: var(--text-main); }
+.ec-scope-hide { display: none !important; }
 .ec-entity-note { margin: 0 0 6px; }
 .ec-index .creeps-scroll { padding: 0 18px; }
 .ec-intro { margin: 10px 2px 12px; color: var(--text-dim, #8b949e); font-size: 13.5px; line-height: 1.5; }
@@ -9862,5 +9871,8 @@ a.whatsnew-row:hover {
 .ec-card:hover { border-color: var(--gold-line); filter: brightness(1.1); }
 .ec-card img { grid-row: 1 / span 2; width: 64px; height: auto; border-radius: 3px; }
 .ec-card-item img { width: 50px; justify-self: center; }
+.ec-card.ec-old { opacity: 0.6; }
+.ec-index .toolbar-panel { display: flex; align-items: center; gap: 12px; }
+.ec-index .toolbar-panel .search-box { flex: 1 1 auto; }
 .ec-card-name { font-weight: 600; font-size: 13.5px; align-self: end; }
 .ec-card-meta { font-size: 11.5px; color: var(--text-dim, #8b949e); align-self: start; }
