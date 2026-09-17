@@ -74,6 +74,9 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     # Familiar's self-cast Stone Form (7.41e). Exists in abilities_slim.json as
     # "Stone Form"; live herodata only lists the Familiars' own entry.
     ("Visage", "visage_stone_form_self_cast"),
+    # Centaur's Aghanim's Scepter ability (7.41f row). In abilities_slim.json as "Hitch A Ride"
+    # (KV centaur_mount); Valve's live herodata does not list it (audit-live 2026-09-17).
+    ("Centaur Warrunner", "centaur_mount"),
 }
 
 KNOWN_DISPLAY_NAME_OVERRIDES = {
