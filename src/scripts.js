@@ -1031,13 +1031,16 @@
     else table.querySelectorAll('td.he-seg').forEach(td => { td.classList.remove('he-seg'); td.querySelector('svg.dyn-wl')?.remove(); });
   }
 
-  // Weights mode on the matrices: every row is ONE line chart of the per-patch net
-  // score, with the row itself as the zero axis. The point sits at the centre of
-  // each touched cell (untouched patch = 0, on the axis); neighbouring cells are
-  // joined by straight segments that meet exactly at the cell edge, so the line is
-  // continuous across the whole row. The vertical scale is LINEAR and per row
-  // (row max |w|, at least 1.5, fills the half-cell): a 2.0 is exactly twice as
-  // high as a 1.0. Above the axis = buff (green), below = nerf (red).
+  // Weights mode on the matrices: every row is ONE step line of the per-patch net
+  // score, the row itself is the zero axis.
+  //  - STEP line: a touched patch is a flat plateau across its whole cell (the value
+  //    belongs to the patch, nothing is interpolated between patches); vertical
+  //    risers at the cell edges join it to the neighbour (0 for an untouched patch).
+  //  - Colour follows the SIDE of the axis, not the cell: everything above the axis
+  //    is green, below is red; a riser that crosses the axis is split at the axis.
+  //  - LINEAR scale per row, computed over the VISIBLE columns only ("Hide old"
+  //    hides the rest), floor 1.5: a 2.0 is exactly twice as high as a 1.0.
+  // Idempotent: called after every refill AND after every layout pass.
   const DYN_W_MIN_SCALE = 1.5;
   function dynDrawRowLines(table) {
     const NS = 'http://www.w3.org/2000/svg';
@@ -1047,32 +1050,42 @@
       for (const k in attrs) el.setAttribute(k, attrs[k]);
       return el;
     };
+    // visibility of a column = visibility of its header cell (hidden columns are display:none)
+    const headCells = [...table.querySelectorAll('thead tr:last-child th')];
     table.querySelectorAll('tbody tr').forEach(tr => {
-      const tds = [...tr.children].filter(td => td.matches('td.hd-cell, td.he, td.ha'));
-      tds.forEach(td => { if (td.classList.contains('he-seg')) { td.classList.remove('he-seg'); td.querySelector('svg.dyn-wl')?.remove(); } });
+      const all = [...tr.children];
+      const tds = all.filter(td => td.matches('td.hd-cell, td.he, td.ha') && !td.classList.contains('hd-spacer'));
+      tds.forEach(td => {
+        td.querySelectorAll('svg.dyn-wl').forEach(x => x.remove());
+        td.classList.remove('he-seg');
+      });
+      const vis = tds.map(td => td.getClientRects().length > 0);
       const vals = tds.map(td => {
         const c = td.querySelector('.w-line .dyn-cell');
         return c ? (parseFloat(c.dataset.w) || 0) : 0;
       });
-      const scale = Math.max(DYN_W_MIN_SCALE, ...vals.map(Math.abs));
-      const yOf = v => mid - (v / scale) * amp;
+      const scale = Math.max(DYN_W_MIN_SCALE, ...vals.filter((_, i) => vis[i]).map(Math.abs));
+      const yOf = v => mid - Math.max(-1, Math.min(1, v / scale)) * amp;
       const at = j => (j < 0 || j >= vals.length) ? 0 : vals[j];
+      const cls = y => (y < mid - 0.05 ? 'up' : (y > mid + 0.05 ? 'down' : 'flat'));
       tds.forEach((td, i) => {
-        const v = vals[i], l = (at(i - 1) + v) / 2, r = (v + at(i + 1)) / 2;
+        if (!vis[i]) return;
+        const v = vals[i], prev = at(i - 1);
         const c = td.querySelector('.w-line .dyn-cell');
-        const flat = !v && !l && !r;
-        if (!c && (flat || td.matches('td.ha'))) return;      // plain axis (CSS) / not in game
+        if (!c && (td.matches('td.ha') || (!v && !prev))) return;   // plain axis from CSS
         const svg = mk('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'none', class: 'dyn-wl' });
         svg.appendChild(mk('line', { x1: 0, x2: W, y1: mid, y2: mid, class: 'axis' }));
-        // two half-segments so each half takes the colour of the side it belongs to
-        const half = (x1, y1, x2, y2, val) => svg.appendChild(mk('line', {
-          x1, y1: y1.toFixed(1), x2, y2: y2.toFixed(1),
-          class: 'seg ' + (val > 0 ? 'up' : (val < 0 ? 'down' : 'flat')) }));
-        half(0, yOf(l), W / 2, yOf(v), v || at(i - 1));
-        half(W / 2, yOf(v), W, yOf(r), v || at(i + 1));
+        const yv = yOf(v), yp = yOf(prev);
+        // riser at the LEFT edge, from the previous patch's level to this one, split at the axis
+        if (yp !== yv) {
+          const seg = (y1, y2) => svg.appendChild(mk('line', {
+            x1: 0, x2: 0, y1: y1.toFixed(1), y2: y2.toFixed(1), class: 'seg ' + cls((y1 + y2) / 2) }));
+          if ((yp - mid) * (yv - mid) < 0) { seg(yp, mid); seg(mid, yv); } else seg(yp, yv);
+        }
+        // plateau across the whole cell
+        if (v) svg.appendChild(mk('line', { x1: 0, x2: W, y1: yv.toFixed(1), y2: yv.toFixed(1), class: 'seg ' + cls(yv) }));
         if (c) {
-          svg.appendChild(mk('circle', { cx: W / 2, cy: yOf(v).toFixed(1), r: 2.6,
-            class: 'pt ' + (v > 0 ? 'up' : (v < 0 ? 'down' : 'flat')) }));
+          svg.appendChild(mk('circle', { cx: W / 2, cy: yv.toFixed(1), r: 2.4, class: 'pt ' + cls(yv) }));
           c.appendChild(svg);
         } else {
           td.classList.add('he-seg');
@@ -1242,6 +1255,8 @@
     const chips = [...table.closest('.creeps-page').querySelectorAll('.hd-tag[data-tag]')];
     const layout = () => {
       dynLayoutMatrix(table, !elOld || elOld.checked);
+      // the row scale depends on which columns are visible -> redraw after every layout
+      if (table.classList.contains('w-mode')) dynDrawRowLines(table);
       // Column widths + horizontal overflow just changed → tell the sticky-frame
       // divider (a separate IIFE) to re-anchor after this layout pass.
       window.dispatchEvent(new CustomEvent('mr:filter-changed'));

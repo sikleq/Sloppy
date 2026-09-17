@@ -27,6 +27,8 @@
   context    — multiplier by where the row lives (data/rules/valve_weights.json "context"):
                ultimate 1.3, basic ability/innate/scepter/base stat/item 1.0, shard 0.9,
                facet 0.8, talent 10/15/20/25 = 0.6/0.8/1.0/1.2.
+  priority   — basic abilities are further scaled 0.7–1.3 by how pros skill them (share of the
+               first 10 skill points, OpenDota pro matches; data/rules/ability_priority.json).
   volume     — buff/nerf/new/del rows: weight × magnitude; rework rows: weight × 1.0
                (a rework is a big, sign-less decision); misc/qol: 0.
 
@@ -153,6 +155,11 @@ _BASE_STAT = [(k, _re.compile(rx, _re.I)) for k, rx in BASE_STAT_RE]
 _FROMTO_RE = _re.compile(r"from\s+(-?\d+(?:\.\d+)?)\S*\s+to\s+(-?\d+(?:\.\d+)?)", _re.I)
 _BYN_RE = _re.compile(r"\bby\s+(-?\d+(?:\.\d+)?)", _re.I)
 _ULT_CACHE = {}
+try:
+    _PRIO = _json.load(open(_os.path.join(_HERE, "data", "rules", "ability_priority.json"),
+                            encoding="utf-8"))["abilities"]
+except OSError:
+    _PRIO = {}
 
 
 def ultimates():
@@ -189,7 +196,11 @@ def context_multiplier(ctx):
         return _CTX.get("innate", 1.0)
     if ctx.get("ability") and ctx["ability"] in ultimates():
         return _CTX.get("ultimate", 1.0)
-    return _CTX.get("ability", 1.0)
+    # basic ability: how central it is in the hero's kit, from how pros skill it
+    # (data/rules/ability_priority.json, tools/fetch_skill_priority.py): maxed-first ~1.2,
+    # value point ~0.7, unknown 1.0.
+    prio = _PRIO.get(ctx.get("ability") or "", {}).get("mult", 1.0)
+    return _CTX.get("ability", 1.0) * prio
 
 
 def _base_stat_magnitude(text):

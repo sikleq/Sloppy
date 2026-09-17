@@ -99,12 +99,25 @@ or **< 2 percentage points → ×0.5** (`_small_change_damp`). With the floor an
 the same 120 rows give **ρ = 0.34** (was 0.21). A manual "core mechanics" list was rejected as subjective;
 Денис re-grading the blind file remains the way to check the judge.
 
+### Skill priority — objective "how central is the ability" (2026-09-17)
+
+The fill-in table idea was dropped (Денис: inconvenient, should be math). Instead: how pros actually skill
+the hero. `tools/fetch_skill_priority.py` asks the OpenDota explorer for the skill points put into each
+ability within the first 10 upgrades (pro matches, last 120 days; 387 abilities, 127 heroes), and turns the
+share among basic abilities into a multiplier `clamp(1 + 1.5·(share − 1/n), 0.7, 1.3)` →
+`data/rules/ability_priority.json`. Examples: Anti-Mage Blink 1.18 / Mana Break 1.11 / Counterspell 0.72;
+Meepo Poof 1.25 / Earthbind 0.70; Riki Smoke Screen 0.70. Ultimates keep ×1.3, innates/facets 1.0.
+Effect on the blind-judge agreement: none (ρ 0.338 → 0.337) — kept because it is objective and cheap;
+re-run the script after big meta shifts.
+
 ## Matrix chart (heroes_dyn / items_dyn)
 
-One line per row, the row is the zero axis; the point is the patch's net score at the cell centre, untouched
-patches sit on the axis, segments meet at cell edges (tails are drawn inside the neighbouring untouched
-cells). **Linear, per-row scale** (row max |w|, at least 1.5, = half cell): 2.0 is exactly twice as high as
-1.0. History of rejected variants: bars v1, sqrt line, cumulative line, bars v2 with a volume band.
+One **step line** per row, the row is the zero axis: a touched patch is a flat plateau across its cell
+(nothing is interpolated between patches), vertical risers at cell edges join neighbours (0 for an untouched
+patch; the riser back to the axis is drawn in the next untouched cell). Colour follows the side of the axis
+(above = green, below = red; a riser crossing the axis is split). **Linear per-row scale over the VISIBLE
+columns only** (row max |w|, at least 1.5, = half cell): 2.0 is exactly twice as high as 1.0. Redrawn after
+every layout pass ("Hide old", resize). History of rejected variants: bars v1, sqrt line, cumulative line, bars v2 with a volume band.
 
 ## Open / next
 1. ~~Items in gold~~ done.
