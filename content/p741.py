@@ -2139,7 +2139,6 @@ def build():
                  levels=[1, 4, 8, 12, 16, 20, 24, 28, 30],
                  value_fmt="{:.0f}"))
     W(ul_close())
-    W(subnote("Bonus charges are gained 1 level earlier (on levels 4/8/12... instead of 5/9/13...)"))
     W(ability("Boulder Smash"))
     W(ul_open())
     W(li("Slow Duration increased from 1.25/2.5/3.25/4s to 1.75/2.5/3.25/4s", b([1.25, 2.5, 3.25, 4], [1.75, 2.5, 3.25, 4])))

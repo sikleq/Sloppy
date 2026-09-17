@@ -557,9 +557,10 @@ def enchant_header(name, slug=None, new=False):
         extra_cls = ''
         block_data_attr = ''
     eid = _register_entity("enchant", name)
+    href = _entity_link("items", "enchantment " + name)
     return _open_block(extra_cls, block_data_attr) + f'''<div class="entity item-entity"{eid}>
-  <div class="entity-icon item-icon"><img src="{icon}" alt="{name}" loading="lazy"></div>
-  <div class="entity-name">{name}{type_label}</div>
+  <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{icon}" alt="{name}" loading="lazy"></a></div>
+  <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a>{type_label}</div>
 </div>'''
 
 

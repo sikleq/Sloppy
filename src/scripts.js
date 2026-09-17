@@ -227,6 +227,7 @@
       if (reworkOnly) el.classList.add('f-hide');
     });
     document.querySelectorAll('.entity-block').forEach(block => {
+      if (block.classList.contains('ec-head')) return;   // Changes-page header: never filtered
       const visibleLi = block.querySelectorAll('ul.changes > li:not(.f-hide):not(.cat-hide)').length;
       const visibleSwaps = block.querySelectorAll('.ability-change:not(.f-hide):not(.cat-hide)').length;
       const visiblePanels = !reworkOnly && Array.from(block.children).some(child =>
@@ -252,6 +253,7 @@
     // emptied section leaves a bare slab strip between two visible sections.
     // Runs AFTER the entity-block pass above so each block's f-hide is settled.
     document.querySelectorAll('section.cat-panel').forEach(panel => {
+      if (panel.classList.contains('ec-head-panel')) return;
       const hasVisible = panel.querySelector('.entity-block:not(.f-hide):not(.cat-hide)');
       panel.classList.toggle('f-hide', !hasVisible);
     });
@@ -3441,12 +3443,15 @@
   if (!input) return;
   const cards = [...document.querySelectorAll('.ec-card')];
   const showOld = document.getElementById('ec-show-old');     // items only: removed / cycled-out
+  const classBtns = [...document.querySelectorAll('[data-ec-class]')];   // Shop / Neutral / Enchantments
+  const classes = new Set();
   const apply = () => {
     const terms = input.value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
     cards.forEach(c => {
       const n = c.dataset.name || '';
       const old = c.dataset.current === '0' && !(showOld && showOld.checked);
-      c.hidden = old || (terms.length > 0 && !terms.some(t => n.includes(t)));
+      const wrongClass = classes.size > 0 && !classes.has(c.dataset.class || '');
+      c.hidden = old || wrongClass || (terms.length > 0 && !terms.some(t => n.includes(t)));
     });
     document.querySelectorAll('.ec-group').forEach(g => {
       g.hidden = ![...g.querySelectorAll('.ec-card')].some(c => !c.hidden);
@@ -3454,6 +3459,13 @@
   };
   input.addEventListener('input', apply);
   if (showOld) showOld.addEventListener('change', apply);
+  classBtns.forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.ecClass;
+    if (classes.has(k)) classes.delete(k); else classes.add(k);
+    b.classList.toggle('active', classes.has(k));
+    b.setAttribute('aria-pressed', classes.has(k) ? 'true' : 'false');
+    apply();
+  }));
 })();
 
 // ---- HERO LAB: two-side hero + item calculator ----

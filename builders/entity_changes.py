@@ -28,9 +28,15 @@ from patch.meta import RELEASE_HISTORY        # noqa: E402
 
 DIST = _HERE / "dist"
 KINDS = {"hero": ("heroes", "Hero Changes", "hero_changes", "heroes"),
-         "item": ("items", "Item Changes", "item_changes", "items")}
+         "item": ("items", "Item Changes", "item_changes", "items"),
+         # enchantments live with the items (file enchantment-<slug>.html, same index page)
+         "enchant": ("items", "Item Changes", "item_changes", "items")}
+
+
+def _file_slug(e: dict) -> str:
+    return ("enchantment-" if e["kind"] == "enchant" else "") + e["slug"]
 _BLOCK_OPEN_RE = _re.compile(r'<div class="entity-block[^"]*"[^>]*>')
-_HEADER_RE = _re.compile(r'<div class="entity (hero|item)-entity"[^>]*\bid="dyn-(?:hero|item)-([a-z0-9-]+)"[^>]*>')
+_HEADER_RE = _re.compile(r'<div class="entity (?:hero|item)-entity"[^>]*\bid="dyn-(hero|item|enchant)-([a-z0-9-]+)"[^>]*>')
 _DIV_RE = _re.compile(r"<(/?)div\b[^>]*>")
 _esc = lambda s: _html.escape(str(s), quote=True)
 
@@ -213,6 +219,7 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     rec = dyn.get("entities", {}).get(f'{e["kind"]}|{e["slug"]}', {})
     eid = f'dyn-{e["kind"]}-{e["slug"]}'
     icon_cls = "hero-icon" if e["kind"] == "hero" else "item-icon"
+    ent_cls = "hero" if e["kind"] == "hero" else "item"
     n = len(e["patches"])
     info = ""
     sections, seen = [], []
@@ -257,13 +264,13 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         abilities_html = ('<span class="ec-vsep" aria-hidden="true"></span>'
                           + "".join(chip(t) for t in current) + "".join(chip(t, True) for t in old)
                           + (f'<button type="button" class="badge ec-ab-more" data-ec-more>+{len(old)}</button>' if old else ""))
-    from_tok = f'{e["kind"]}:{e["slug"]}'
+    from_tok = f'{"hero" if e["kind"] == "hero" else "item"}:{_file_slug(e)}'
     out = [_head(e["name"], asset, "../", "patch-page entity-page"),
            f' data-dyn-prefix="../patches/" data-dyn-from="{from_tok}" data-ec-eid="{eid}">\n\n', nav,
            f'\n<a class="nav-back-arrow visible" href="../{key}.html" aria-label="All {label.lower()}" title="All {label.lower()}"></a>\n',
            _TOOLBAR.format(info=info, scopes=scopes_html, abilities=abilities_html), '<div class="container">\n',
            '<section class="cat-panel ec-head-panel"><div class="entity-block ec-head">'
-           f'<div class="entity {e["kind"]}-entity" id="{eid}">'
+           f'<div class="entity {ent_cls}-entity" id="{eid}">'
            f'<div class="entity-icon {icon_cls}"><img src="{_esc(e["icon"])}" alt="{_esc(e["name"])}"></div>'
            f'<div class="entity-name">{_esc(e["name"])}</div></div></div></section>\n']
     for p in e["patches"]:
@@ -317,25 +324,52 @@ def _hero_groups(ents):
     return [(label, icon, sorted(groups[k], key=lambda x: x["name"].lower())) for k, label, icon in _ATTR if groups[k]]
 
 
+def _shop_order() -> dict[str, list[str]]:
+    """Item order of the Hero Lab picker (src/scripts.js SHOP_ORDER) — the in-game shop order."""
+    js = (_HERE / "src" / "scripts.js").read_text(encoding="utf-8")
+    m = _re.search(r"var SHOP_ORDER = \{(.*?)\n  \};", js, _re.S)
+    out = {}
+    if m:
+        for key, arr in _re.findall(r"(?m)^\s*'?([A-Za-z ]+)'?:\s*\[(.*?)\],?\s*$", m.group(1)):
+            out[key.strip()] = _re.findall(r"'([a-z0-9_]+)'", arr)
+    return out
+
+
 def _item_groups(ents, dyn):
-    """Items as in the shop: category order of Item Dynamics, then neutral tiers, enchantments;
-    not-current items keep their group but sit behind the "Show deleted" switch."""
-    meta = {i["key"].split("|", 1)[1].replace("_", "-"): i for i in (dyn or {}).get("items", [])}
+    """Items as in the shop: category order of Item Dynamics, item order of the Hero Lab picker;
+    then neutral tiers and enchantments. Same roster flags as Item Dynamics: `class`
+    (regular / neutral / enchant) and `current` (removed / cycled-out items sit behind
+    "Show deleted")."""
+    meta = {}
+    for i in (dyn or {}).get("items", []):
+        kind, slug = i["key"].split("|", 1)
+        meta[(kind, slug.replace("_", "-"))] = i
     order = list((dyn or {}).get("item_categories", []))
+    shop = _shop_order()
     buckets: dict[str, list] = {}
     for e in ents:
-        m = meta.get(e["slug"], {})
+        m = meta.get((e["kind"], e["slug"])) or meta.get(("item", e["slug"])) or {}
         e["_current"] = bool(m.get("current", True))
-        if m.get("class") == "neutral":
+        cls = "enchant" if e["kind"] == "enchant" else (m.get("class") or "regular")
+        e["_class"] = cls
+        if cls == "neutral":
             t = m.get("tier")
             g = f"Neutral · Tier {t}" if t and int(t) <= 5 else "Neutral · Other"
-        elif m.get("class") == "enchant":
+        elif cls == "enchant":
             g = "Enchantments"
         else:
             g = m.get("category") or "Other"
+        e["_icon_slug"] = m.get("icon") or _re.sub(r"^.*/|\.png$", "", e["icon"])
         buckets.setdefault(g, []).append(e)
-    names = [c for c in order if c in buckets] + sorted(g for g in buckets if g not in order)
-    return [(g, None, sorted(buckets[g], key=lambda x: x["name"].lower())) for g in names]
+    names = ([c for c in order if c in buckets]
+             + sorted(g for g in buckets if g.startswith("Neutral"))
+             + [g for g in ("Enchantments",) if g in buckets]
+             + sorted(g for g in buckets if g not in order and not g.startswith("Neutral") and g != "Enchantments"))
+
+    def key(g):
+        rank = {s: i for i, s in enumerate(shop.get(g, []))}
+        return lambda e: (rank.get(e["_icon_slug"], 10_000), e["name"].lower())
+    return [(g, None, sorted(buckets[g], key=key(g))) for g in names]
 
 
 def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict | None = None) -> str:
@@ -343,15 +377,16 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
     nav = _site.render_top_nav("materials", f"patches/{latest}.html", patch_context=False,
                                subtabs_active=key, subnav_in_header=False)
     subnav = _site.render_materials_subnav(key)
+    groups = _hero_groups(ents) if kind == "hero" else _item_groups(ents, dyn)
     for e in ents:
         e.setdefault("_current", True)
-    groups = _hero_groups(ents) if kind == "hero" else _item_groups(ents, dyn)
+        e.setdefault("_class", "")
     n_old = sum(1 for e in ents if not e["_current"])
     blocks = []
     for title, icon, lst in groups:
         cards = "".join(
             f'<a class="ec-card ec-card-{kind}{"" if e["_current"] else " ec-old"}" data-current="{1 if e["_current"] else 0}"'
-            f'{"" if e["_current"] else " hidden"} href="{folder}/{e["slug"]}.html" '
+            f' data-class="{e["_class"]}"{"" if e["_current"] else " hidden"} href="{folder}/{_file_slug(e)}.html" '
             f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
             f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="" loading="lazy">'
             f'<span class="ec-card-name">{_esc(e["name"])}</span></a>' for e in lst)
@@ -366,6 +401,11 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
             '<span class="search-box hd-search">'
             f'<input type="text" data-ec-search placeholder="Search {plural} — comma-separate for several" '
             'autocomplete="off" spellcheck="false"></span>'
+            + ('<span class="hs-attr-filter-group ec-class-filters">'
+               '<button type="button" class="hs-attack-filter" data-ec-class="regular">Shop</button>'
+               '<button type="button" class="hs-attack-filter" data-ec-class="neutral">Neutral</button>'
+               '<button type="button" class="hs-attack-filter" data-ec-class="enchant">Enchantments</button>'
+               '</span>' if kind == "item" else '')
             + (f'<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Show deleted ({n_old})</span>'
                '<input type="checkbox" id="ec-show-old" class="ua-switch-input">'
                '<span class="ua-switch" aria-hidden="true"></span></label>' if n_old else '')
@@ -385,9 +425,11 @@ def main() -> int:
     counts = {}
     for kind, (folder, *_rest) in KINDS.items():
         (DIST / folder).mkdir(exist_ok=True)
-        lst = [e for (k, _), e in ents.items() if k == kind]
+        if kind == "enchant":
+            continue                                   # handled together with the items
+        lst = [e for (k, _), e in ents.items() if k == kind or (kind == "item" and k == "enchant")]
         for e in lst:
-            (DIST / folder / f'{e["slug"]}.html').write_text(_entity_page(e, asset, latest, dyn), encoding="utf-8")
+            (DIST / folder / f'{_file_slug(e)}.html').write_text(_entity_page(e, asset, latest, dyn), encoding="utf-8")
         (DIST / f"{KINDS[kind][2]}.html").write_text(_index_page(kind, lst, asset, latest, dyn), encoding="utf-8")
         counts[kind] = (len(lst), sum(len(e["patches"]) for e in lst))
     print(f"  -> dist/heroes/*.html: {counts['hero'][0]} heroes ({counts['hero'][1]} patch sections); "
