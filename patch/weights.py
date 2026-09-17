@@ -30,8 +30,10 @@
   priority   — basic abilities are further scaled 0.7–1.3 by how pros skill them (share of the
                first 10 skill points, OpenDota pro matches; data/rules/ability_priority.json).
   talents    — "Level N Talent: A replaced with B" (REWORK) gets a DIRECTION from signal K when
-               known: shift of the pro pick share of that slot against the unchanged sibling
-               (data/rules/talent_shift.json); 20 points of share = 1.0. Unknown -> net 0.
+               known (data/rules/talent_tiers.json): measured shift of the pro pick share of the
+               slot against the unchanged sibling (20 points = 1.0), else LEVEL MOVES — the new
+               talent came from another level: earlier = buff, later = nerf (0.5 x weight per
+               step); the tier total is split between its rows. Unknown -> net 0.
   volume     — buff/nerf/new/del rows: weight × magnitude; rework rows: weight × 1.0
                (a rework is a big, sign-less decision); misc/qol: 0.
 
@@ -358,21 +360,34 @@ def _row_value(text, badge_html, kind, ctx):
 
 
 try:
-    _TSHIFT = _json.load(open(_os.path.join(_HERE, "data", "rules", "talent_shift.json"),
-                              encoding="utf-8"))["replacements"]
+    _TTIERS = _json.load(open(_os.path.join(_HERE, "data", "rules", "talent_tiers.json"),
+                              encoding="utf-8"))["tiers"]
 except OSError:
-    _TSHIFT = {}
+    _TTIERS = {}
 TALENT_SHIFT_UNIT = 0.2      # a 20-point move of the pro pick share against the sibling = 1.0
+TALENT_MOVE_STEP = 0.5       # one level step (5 hero levels) earlier/later, in units of the type weight
 
 
-def _talent_shift(ctx):
-    """Signal K: "Level N Talent: A replaced with B" — how the pro pick share of that slot moved
-    against the UNCHANGED sibling (data/rules/talent_shift.json; only single-side replacements
-    with >= 30 picks before and after). None when unknown."""
+def _talent_tier_net(ctx, cm):
+    """Signal K for a "Level N Talent: A replaced with B" row -> signed net or None.
+    1. measured: shift of the pro pick share of the slot against the UNCHANGED sibling
+       (single-side replacements, >= 30 picks before and after);
+    2. else inferred from LEVEL MOVES: a new talent that came from another level with the same
+       meaning — earlier = buff of that effect, later = nerf (0.5 x type weight per level step).
+    The tier total is split between the tier's rows (1 or 2 replaced sides)."""
     if not ctx or not ctx.get("talent") or not ctx.get("hero"):
         return None
-    rec = _TSHIFT.get(f"{ctx.get('version')}|{ctx['hero']}|{ctx['talent']}")
-    return rec["delta"] if rec else None
+    rec = _TTIERS.get(f"{ctx.get('version')}|{ctx['hero']}|{ctx['talent']}")
+    if not rec:
+        return None
+    k = max(1, rec.get("changed", 1))
+    if "share_delta" in rec:
+        d = rec["share_delta"]
+        return (1 if d > 0 else -1) * min(abs(d) / TALENT_SHIFT_UNIT, MAG_CAP_NORM) * weight_of("other") * cm / k
+    if rec.get("moves"):
+        tot = sum(m["steps"] * TALENT_MOVE_STEP * weight_of(m["type"]) for m in rec["moves"])
+        return max(-1.5, min(1.5, tot)) * cm / k
+    return None
 
 
 def row_scores(text, tags, badge_html="", ctx=None):
@@ -390,10 +405,9 @@ def row_scores(text, tags, badge_html="", ctx=None):
         val = _row_value(text, badge_html, kind, ctx) * cm
         return round(d * val, 3), round(val, 3)
     if "rework" in tags:
-        shift = _talent_shift(ctx)
-        if shift is not None:                       # signal K: the replacement has a measured direction
-            mag = min(abs(shift) / TALENT_SHIFT_UNIT, MAG_CAP_NORM)
-            return round(w * mag * (1 if shift > 0 else -1), 3), round(max(w, w * mag), 3)
+        net = _talent_tier_net(ctx, cm)             # signal K: talent replacement / level move
+        if net is not None:
+            return round(net, 3), round(max(w, abs(net)), 3)
         return 0.0, round(w, 3)
     if tags == {"new"}:
         return round(w * 0.5, 3), round(w, 3)

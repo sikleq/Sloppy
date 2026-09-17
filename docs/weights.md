@@ -137,11 +137,24 @@ model does explain (logit units, +0.4 ≈ 60/40):
 - **pick share ≠ strength**: over 2 319 pairs with ≥ 100 picks a side, corr(pick share, win-rate gap) =
   **−0.28**; the less popular talent wins more (it is taken when it fits), mean |gap| 4.2 pp.
 
-**What is used on the site:** not the model, but the measured thing. For every single-side talent replacement
-in history (1 542 with ≥ 30 picks before and after; 225 in annotated patches) the shift of the pro pick share
-against the unchanged sibling is stored in `data/rules/talent_shift.json`. A row "Level N Talent: A replaced
-with B" (REWORK) now gets a direction: `net = weight × talent context × sign × min(|Δshare| / 0.2, 3)`.
-Replacements of both sides, or with thin data (e.g. Chaos Knight 7.40 level 25: 17 picks after), stay at 0.
+**What is used on the site:** not the model, but measured / structural facts per changed talent tier
+(`data/rules/talent_tiers.json`, 2 469 tiers in history, 282 in annotated patches):
+1. **Measured share shift** (single-side replacements, ≥ 30 pro picks before and after; 1 542 in history, 225
+   annotated): shift of the pro pick share of the replaced slot against the unchanged sibling;
+   `net = 0.4 × talent context × sign × min(|Δshare| / 0.2, 3)`.
+2. **Level moves** (422 tiers, 104 annotated): the new talent existed in the previous version at another
+   level with the same meaning (same effect type and ability — Valve reuses talent slugs, so the meaning is
+   checked): earlier = the hero gets the effect sooner = buff, later = nerf; `0.5 × type weight` per level
+   step, capped at ±1.5. Used when (1) is missing, which covers replacements of **both sides** (13 annotated).
+3. The tier total is split between the tier's "replaced with" rows (1 or 2).
+Still 0: both sides replaced by brand-new talents (266 in history, 33 annotated tiers with nothing), and thin
+data (Chaos Knight 7.40 level 25: 17 picks after).
+
+**Rejected absolute measures** (tested so both-side replacements could be scored): (a) *tier pick timing* — the
+average upgrade number at which the tier's talents are taken, relative to all heroes in the same window; (b)
+*tier win rate* relative to the hero's level-10 tier. Validation on 900 talent VALUE buffs/nerfs with
+unchanged slugs: after a buff the tier is taken earlier in 52 % of cases vs 51 % after a nerf, and the
+relative win rate rises in 47 % vs 53 % — no signal in pro data, so neither is used.
 
 ## Matrix chart (heroes_dyn / items_dyn)
 
