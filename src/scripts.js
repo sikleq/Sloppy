@@ -3394,13 +3394,18 @@
   const abBtns = [...document.querySelectorAll('.ec-ab-btn[data-ec-ability]')];
   if (!scopeBtns.length && !abBtns.length) return;
   const scopes = new Set(), abilities = new Set();
-  const titleOf = blk => { const t = blk.querySelector('.ability-title'); return t ? t.textContent.trim() : ''; };
+  // a renamed block "Old→New" answers to the chip "New"
+  const titleOf = blk => { const t = blk.querySelector('.ability-title'); return t ? t.textContent.trim().split('→').pop().trim() : ''; };
   const apply = () => {
+    // "innate" is a pseudo-scope: it selects innate ability blocks wherever they sit
+    const realScopes = new Set([...scopes].filter(x => x !== 'innate'));
+    const wantInnate = scopes.has('innate');
     document.querySelectorAll('.ec-scope').forEach(sc => {
-      const scopeOk = !scopes.size || scopes.has(sc.dataset.scope);
       let any = false;
       sc.querySelectorAll('.ability-block').forEach(blk => {
-        const ok = scopeOk && (!abilities.size || abilities.has(titleOf(blk)));
+        const innate = blk.classList.contains('is-innate');
+        const scopeOk = !scopes.size || realScopes.has(sc.dataset.scope) || (wantInnate && innate);
+        const ok = scopeOk && (!abilities.size || (!innate && abilities.has(titleOf(blk))));
         blk.classList.toggle('ec-scope-hide', !ok);
         any = any || ok;
       });

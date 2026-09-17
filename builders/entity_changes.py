@@ -145,36 +145,65 @@ def _wrap_scopes(body: str):
     return "".join(out), scopes, titles
 
 
+_AB_BLOCK_RE = _re.compile(r'<div class="ability-block([^"]*)">(?:(?!<div class="ability-block).)*?'
+                           r'<h4 class="ability-title">(.*?)</h4>', _re.S)
+
+
 def _titles(html: str) -> list[str]:
-    return [t for t in (_re.sub(r"<[^>]+>", "", x).strip()
-                        for x in _re.findall(r'<h4 class="ability-title">(.*?)</h4>', html, _re.S)) if t]
+    """Ability names of the NON-innate ability blocks (innates have their own Show filter).
+    A renamed block "Old→New" counts as "New"."""
+    out = []
+    for m in _AB_BLOCK_RE.finditer(html):
+        cls, t = m.group(1), m.group(2)
+        if "is-innate" in cls:
+            continue
+        t = _re.sub(r"<[^>]+>", "", t).strip().split("→")[-1].strip()
+        slug = _re.search(r'data-slug="([a-z_0-9]+)"', m.group(0))
+        if t:
+            _TITLE_SLUG.setdefault(t, slug.group(1) if slug else "")
+            out.append(t)
+    return out
+
+
+_TITLE_SLUG: dict[str, str] = {}      # ability display name -> engine slug seen on the pages
 
 
 _KIT_CACHE: dict[str, list[str]] = {}
+_KIT_EXTRA: dict[str, tuple] = {}      # npc -> (current innate names, slugs defined in the KV, all known slugs)
 
 
 def _hero_kit(npc: str) -> list[str]:
-    """Display names of the hero's CURRENT abilities in in-game order: basic abilities by slot,
-    then the ultimate(s), then innate(s). Source: latest KV + data/abilities_slim.json."""
+    """Display names of the hero's CURRENT non-innate abilities in in-game order: basic abilities
+    by slot, the ultimate(s), then abilities granted by Aghanim's Scepter / Shard. Every ability
+    DEFINED in the hero's KV file counts as current even when it has no slot (granted ones often
+    do not), so Aghanim abilities never land in the "old" group. Source: latest KV + abilities_slim."""
     if npc in _KIT_CACHE:
         return _KIT_CACHE[npc]
     from patch.meta import latest_stats_version
     from patch.weights import ultimates
     kv = _HERE / "data" / "stats" / latest_stats_version() / "heroes" / f"npc_dota_hero_{npc}.txt"
     slim = _json.loads((_HERE / "data" / "abilities_slim.json").read_text(encoding="utf-8"))
-    basics, ults, innates, seen = [], [], [], set()
+    basics, ults, aghs, seen = [], [], [], set()
     if kv.exists():
         txt = kv.read_text(encoding="utf-8", errors="replace")
-        for _, slug in sorted(((int(n), a) for n, a in _re.findall(r'"Ability(\d+)"\s+"([a-z_0-9]+)"', txt)),
-                              key=lambda x: x[0]):
+        defs = {}                                   # slug -> its KV block text
+        parts = _re.split(r'(?m)^\t\t\t"([a-z_0-9]+)"\s*$', txt)
+        for i in range(1, len(parts) - 1, 2):
+            defs[parts[i]] = parts[i + 1]
+        slotted = [a for _, a in sorted(((int(n), a) for n, a in _re.findall(r'"Ability(\d+)"\s+"([a-z_0-9]+)"', txt)),
+                                        key=lambda x: x[0])]
+        for slug in slotted + [d for d in defs if d not in slotted]:
             info = slim.get(slug) or {}
             name = info.get("dname")
             if (not name or slug in seen or slug.startswith("special_bonus") or "hidden" in slug
-                    or slug.endswith("_empty")):
+                    or slug.endswith("_empty") or info.get("is_innate")):
                 continue
             seen.add(slug)
-            (innates if info.get("is_innate") else ults if slug in ultimates() else basics).append(name)
-    _KIT_CACHE[npc] = basics + ults + innates
+            granted = bool(_re.search(r'"IsGrantedBy(?:Scepter|Shard)"\s+"1"', defs.get(slug, "")))
+            (aghs if granted else ults if slug in ultimates() else basics).append(name)
+    innates = [(slim.get(d) or {}).get("dname") for d in (slotted + list(defs)) if (slim.get(d) or {}).get("is_innate")]
+    _KIT_CACHE[npc] = basics + ults + aghs
+    _KIT_EXTRA[npc] = ([n for n in dict.fromkeys(innates) if n], set(defs) | set(slotted), set(slim))
     return _KIT_CACHE[npc]
 
 
@@ -194,9 +223,11 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         seen += [s for s in sc if s not in seen]
     scopes_html = ""
     if len(seen) > 1:
-        scopes_html = ('<span class="ec-vsep" aria-hidden="true"></span><strong class="ec-lbl">Show:</strong>' + "".join(
+        has_innate = any('class="ability-block is-innate' in p["_body"] or "is-innate" in p["_body"] for p in e["patches"])
+        scopes_html = ('<span class="ec-vsep" aria-hidden="true"></span>' + "".join(
             f'<button type="button" class="badge ec-scope-btn" data-ec-scope="{s}">{_SCOPE_LABEL[s]}</button>'
-            for s in _SCOPE_ORDER if s in seen))
+            for s in _SCOPE_ORDER if s in seen)
+            + ('<button type="button" class="badge ec-scope-btn" data-ec-scope="innate">Innate</button>' if has_innate else ""))
     # every ability that was ever changed (most often changed first) -> one-click filter
     ab_count: dict[str, int] = {}
     for p in e["patches"]:
@@ -208,19 +239,24 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         kit = _hero_kit(npc) if npc else []
         low = {k.lower(): i for i, k in enumerate(kit)}
         current = sorted((t for t in ab_count if t.lower() in low), key=lambda t: low[t.lower()])
-        old = sorted(t for t in ab_count if t.lower() not in low)
+        rest = [t for t in ab_count if t.lower() not in low]
+        innate_now, defined, known = _KIT_EXTRA.get(npc, ([], set(), set()))
+        inn = {n.lower() for n in innate_now}
+        # OLD = a real engine ability (known slug) that the hero's current KV no longer defines.
+        # Anything else stays current: a former ability that is the innate now (Inner Beast,
+        # Necromastery), unit / synthetic sub-blocks (Brewlings, Drunken Brawler stances).
+        old = sorted(t for t in rest if t.lower() not in inn
+                     and _TITLE_SLUG.get(t) in known and _TITLE_SLUG.get(t) not in defined)
+        current += sorted(t for t in rest if t not in old)
         if not kit:                                    # items: no kit, keep everything visible
             current, old = sorted(ab_count), []
 
         def chip(t, hidden=False):
-            n = ab_count[t]
-            return (f'<button type="button" class="badge ec-ab-btn{" ec-ab-old" if hidden else ""}" data-ec-ability="{_esc(t)}" '
-                    f'title="{n} patch{"es" if n != 1 else ""}{" · no longer in the kit" if hidden else ""}"'
+            return (f'<button type="button" class="badge ec-ab-btn{" ec-ab-old" if hidden else ""}" data-ec-ability="{_esc(t)}"'
                     f'{" hidden" if hidden else ""}>{_esc(t)}</button>')
-        abilities_html = ('<span class="ec-vsep" aria-hidden="true"></span><strong class="ec-lbl">Ability:</strong>'
+        abilities_html = ('<span class="ec-vsep" aria-hidden="true"></span>'
                           + "".join(chip(t) for t in current) + "".join(chip(t, True) for t in old)
-                          + (f'<button type="button" class="badge ec-ab-more" data-ec-more '
-                             f'title="Abilities the hero no longer has">+{len(old)} old</button>' if old else ""))
+                          + (f'<button type="button" class="badge ec-ab-more" data-ec-more>+{len(old)}</button>' if old else ""))
     from_tok = f'{e["kind"]}:{e["slug"]}'
     out = [_head(e["name"], asset, "../", "patch-page entity-page"),
            f' data-dyn-prefix="../patches/" data-dyn-from="{from_tok}" data-ec-eid="{eid}">\n\n', nav,

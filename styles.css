@@ -1445,9 +1445,11 @@ body:has(.creeps-page) nav.top-nav {
 /* Weights toggle: same round gold button as back-to-top, sits above it and is
    ALWAYS shown (it is a mode switch, not a scroll helper). Icon = pixel balance
    scale. Active = filled gold disc with a dark icon. */
+/* the weights toggle owns the corner; "back to top" sits above it (only on pages that have both) */
+.back-to-top:has(+ .dyn-w-fab) { bottom: 74px; }
 .dyn-w-fab {
   right: 22px;
-  bottom: 74px;
+  bottom: 22px;
   display: block;
   background-image:
     url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="9" y="0" width="2" height="14"/><rect x="2" y="3" width="16" height="2"/><rect x="2" y="5" width="2" height="4"/><rect x="16" y="5" width="2" height="4"/><rect x="0" y="9" width="6" height="2"/><rect x="14" y="9" width="6" height="2"/><rect x="6" y="14" width="8" height="2"/><rect x="4" y="16" width="12" height="2"/></g></svg>'),
