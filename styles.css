@@ -9855,6 +9855,17 @@ body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
 .legend-tags.ec-filters { flex-wrap: wrap; row-gap: 5px; }
 .ec-vsep { width: 1px; height: 16px; margin: 0 8px; background: var(--line-bright, rgba(255,255,255,0.18)); flex: 0 0 auto; }
 .legend-tags.ec-filters strong.ec-lbl { width: auto; margin-right: 6px; }
+/* ability chips: gold, so they do not blend with the blue Show filters */
+.ec-ab-btn, .ec-ab-more {
+  cursor: pointer; user-select: none; font-family: inherit; font-size: 11px; padding: 3px 9px; border-radius: 3px;
+  background: rgba(227, 196, 106, 0.06); color: #c9b57a; border: 1px solid rgba(227, 196, 106, 0.28);
+  text-transform: uppercase; letter-spacing: 0.4px; transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.ec-ab-btn:hover, .ec-ab-more:hover { background: rgba(227, 196, 106, 0.13); border-color: rgba(227, 196, 106, 0.5); color: #f0dfa6; }
+.ec-ab-btn.active, .ec-ab-more.active { background: rgba(227, 196, 106, 0.26); border-color: rgba(227, 196, 106, 0.75); color: #fff; }
+.ec-ab-btn.ec-ab-old { border-style: dashed; opacity: 0.85; }
+.ec-ab-more { border-style: dotted; color: #9a927c; }
+.ec-ab-btn[hidden] { display: none; }
 /* the patch banner = the same red section banner as "ITEM UPDATES" on a patch page */
 h2.section.ec-ver { display: flex; align-items: baseline; gap: 16px; }
 h2.section.ec-ver a { color: #fff; text-decoration: none; }
@@ -9877,19 +9888,38 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-scope-btn.active { background: rgba(121, 192, 255, 0.22); border-color: rgba(121, 192, 255, 0.60); color: var(--text-main); }
 .ec-scope-hide { display: none !important; }
 .ec-entity-note { margin: 0 0 6px; }
-.ec-index .creeps-scroll { padding: 0 18px; }
-.ec-intro { margin: 10px 2px 12px; color: var(--text-dim, #8b949e); font-size: 13.5px; line-height: 1.5; }
-.ec-grid { display: grid; gap: 8px; margin: 12px 0 28px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
-.ec-card {
-  display: grid; grid-template-columns: 64px 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center;
-  padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg-panel-3);
-  color: inherit; text-decoration: none; transition: border-color 0.12s ease, filter 0.12s ease;
-}
-.ec-card:hover { border-color: var(--gold-line); filter: brightness(1.1); }
-.ec-card img { grid-row: 1 / span 2; width: 64px; height: auto; border-radius: 3px; }
-.ec-card-item img { width: 50px; justify-self: center; }
-.ec-card.ec-old { opacity: 0.6; }
+/* index pages: in-game order — a titled block per attribute / shop category, heroes flow
+   alphabetically TOP-TO-BOTTOM through CSS columns; no extra info on the tiles */
+.ec-index-body { padding: 12px 18px 28px; }
 .ec-index .toolbar-panel { display: flex; align-items: center; gap: 12px; }
 .ec-index .toolbar-panel .search-box { flex: 1 1 auto; }
-.ec-card-name { font-weight: 600; font-size: 13.5px; align-self: end; }
-.ec-card-meta { font-size: 11.5px; color: var(--text-dim, #8b949e); align-self: start; }
+.ec-group { margin: 18px 0 6px; }
+.ec-group[hidden] { display: none; }
+.ec-group-title {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 8px; padding-bottom: 5px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-j25); font-weight: 400; font-size: 22px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-bright);
+}
+.ec-group-icon { width: 20px; height: 20px; }
+.ec-cols { column-gap: 8px; }
+.ec-cols-hero { column-width: 168px; }
+.ec-cols-item { column-width: 190px; }
+.ec-card {
+  display: flex; align-items: center; gap: 9px; break-inside: avoid; margin: 0 0 6px;
+  padding: 4px 8px 4px 4px; border: 1px solid var(--line); border-radius: 5px; background: var(--bg-panel-3);
+  color: inherit; text-decoration: none; transition: border-color 0.12s ease, filter 0.12s ease;
+}
+.ec-card[hidden] { display: none; }
+.ec-card:hover { border-color: var(--gold-line); filter: brightness(1.12); }
+.ec-card img { width: 57px; height: auto; border-radius: 3px; flex: 0 0 auto; }
+.ec-card-item img { width: 44px; }
+.ec-card.ec-old { opacity: 0.6; }
+.ec-card-name { font-weight: 600; font-size: 13px; line-height: 1.2; }
+
+/* Tighter end of a section panel (patch pages AND Changes pages): the panel is cut ~12px under
+   its last row instead of ~47px (ul 3 + ability-block 8 + entity-block 16 + panel 20). */
+body.patch-page .cat-panel { padding-bottom: 4px; }
+body.patch-page .cat-panel > .entity-block:last-child { padding-bottom: 8px; }
+body.patch-page .cat-panel > .entity-block:last-child .ability-block:last-child,
+body.patch-page .cat-panel > .entity-block:last-child .ec-scope:last-child .ability-block:last-child { margin-bottom: 0; }
+body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { margin-bottom: 0; }

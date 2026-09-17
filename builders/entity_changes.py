@@ -109,8 +109,7 @@ _TOOLBAR = '''<div class="toolbar">
         {scopes}{abilities}
       </div>
     </div>
-    <div class="toolbar-patch-info">{info}</div>
-  </div>
+{info}  </div>
 </div>
 '''
 
@@ -131,16 +130,52 @@ def _wrap_scopes(body: str):
     <div class="ec-scope" data-scope="…"> so the page can filter by it. Returns (html, scopes)."""
     ms = list(_SUBGROUP_RE.finditer(body))
     if not ms:
-        return body, []
+        return body, [], _titles(body)
     tail = body.rfind("</div>")                       # the entity-block's own closing tag
-    out, scopes = [body[:ms[0].start()]], []
+    out, scopes, titles = [body[:ms[0].start()]], [], []
     for i, m in enumerate(ms):
         end = ms[i + 1].start() if i + 1 < len(ms) else tail
         key = _scope_key(m.group(1))
         scopes.append(key)
-        out.append(f'<div class="ec-scope" data-scope="{key}">{body[m.start():end]}</div>')
+        seg = body[m.start():end]
+        if key != "facets":                           # a facet upgrades an ability, it is not one
+            titles += _titles(seg)
+        out.append(f'<div class="ec-scope" data-scope="{key}">{seg}</div>')
     out.append(body[tail:])
-    return "".join(out), scopes
+    return "".join(out), scopes, titles
+
+
+def _titles(html: str) -> list[str]:
+    return [t for t in (_re.sub(r"<[^>]+>", "", x).strip()
+                        for x in _re.findall(r'<h4 class="ability-title">(.*?)</h4>', html, _re.S)) if t]
+
+
+_KIT_CACHE: dict[str, list[str]] = {}
+
+
+def _hero_kit(npc: str) -> list[str]:
+    """Display names of the hero's CURRENT abilities in in-game order: basic abilities by slot,
+    then the ultimate(s), then innate(s). Source: latest KV + data/abilities_slim.json."""
+    if npc in _KIT_CACHE:
+        return _KIT_CACHE[npc]
+    from patch.meta import latest_stats_version
+    from patch.weights import ultimates
+    kv = _HERE / "data" / "stats" / latest_stats_version() / "heroes" / f"npc_dota_hero_{npc}.txt"
+    slim = _json.loads((_HERE / "data" / "abilities_slim.json").read_text(encoding="utf-8"))
+    basics, ults, innates, seen = [], [], [], set()
+    if kv.exists():
+        txt = kv.read_text(encoding="utf-8", errors="replace")
+        for _, slug in sorted(((int(n), a) for n, a in _re.findall(r'"Ability(\d+)"\s+"([a-z_0-9]+)"', txt)),
+                              key=lambda x: x[0]):
+            info = slim.get(slug) or {}
+            name = info.get("dname")
+            if (not name or slug in seen or slug.startswith("special_bonus") or "hidden" in slug
+                    or slug.endswith("_empty")):
+                continue
+            seen.add(slug)
+            (innates if info.get("is_innate") else ults if slug in ultimates() else basics).append(name)
+    _KIT_CACHE[npc] = basics + ults + innates
+    return _KIT_CACHE[npc]
 
 
 def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
@@ -150,12 +185,12 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     eid = f'dyn-{e["kind"]}-{e["slug"]}'
     icon_cls = "hero-icon" if e["kind"] == "hero" else "item-icon"
     n = len(e["patches"])
-    info = (f'<span class="ti-released">Changed in <b>{n}</b> of {len(_annotated())} annotated patches</span>'
-            f'<span class="ti-after">latest: <b>{_esc(e["patches"][0]["version"])}</b></span>')
+    info = ""
     sections, seen = [], []
     for p in e["patches"]:
-        body, sc = _wrap_scopes(p["body"])
+        body, sc, tt = _wrap_scopes(p["body"])
         p["_body"] = body
+        p["_titles"] = tt
         seen += [s for s in sc if s not in seen]
     scopes_html = ""
     if len(seen) > 1:
@@ -165,18 +200,29 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     # every ability that was ever changed (most often changed first) -> one-click filter
     ab_count: dict[str, int] = {}
     for p in e["patches"]:
-        for t in set(_re.findall(r'<h4 class="ability-title">(.*?)</h4>', p["_body"], _re.S)):
-            t = _re.sub(r"<[^>]+>", "", t).strip()
-            if t:
-                ab_count[t] = ab_count.get(t, 0) + 1
+        for t in set(p["_titles"]):
+            ab_count[t] = ab_count.get(t, 0) + 1
     abilities_html = ""
     if ab_count:
-        abilities_html = ('<span class="ec-vsep" aria-hidden="true"></span><strong class="ec-lbl">Ability:</strong>' + "".join(
-            f'<button type="button" class="badge ec-scope-btn ec-ab-btn" data-ec-ability="{_esc(t)}" '
-            f'title="{n} patch{"es" if n != 1 else ""}">{_esc(t)}</button>'
-            for t, n in sorted(ab_count.items(), key=lambda kv: (-kv[1], kv[0]))))
+        npc = _re.sub(r"^.*/|\.png$", "", e["icon"]) if e["kind"] == "hero" else ""
+        kit = _hero_kit(npc) if npc else []
+        low = {k.lower(): i for i, k in enumerate(kit)}
+        current = sorted((t for t in ab_count if t.lower() in low), key=lambda t: low[t.lower()])
+        old = sorted(t for t in ab_count if t.lower() not in low)
+        if not kit:                                    # items: no kit, keep everything visible
+            current, old = sorted(ab_count), []
+
+        def chip(t, hidden=False):
+            n = ab_count[t]
+            return (f'<button type="button" class="badge ec-ab-btn{" ec-ab-old" if hidden else ""}" data-ec-ability="{_esc(t)}" '
+                    f'title="{n} patch{"es" if n != 1 else ""}{" · no longer in the kit" if hidden else ""}"'
+                    f'{" hidden" if hidden else ""}>{_esc(t)}</button>')
+        abilities_html = ('<span class="ec-vsep" aria-hidden="true"></span><strong class="ec-lbl">Ability:</strong>'
+                          + "".join(chip(t) for t in current) + "".join(chip(t, True) for t in old)
+                          + (f'<button type="button" class="badge ec-ab-more" data-ec-more '
+                             f'title="Abilities the hero no longer has">+{len(old)} old</button>' if old else ""))
     from_tok = f'{e["kind"]}:{e["slug"]}'
-    out = [_head(f'{e["name"]} — changes', asset, "../", "patch-page entity-page"),
+    out = [_head(e["name"], asset, "../", "patch-page entity-page"),
            f' data-dyn-prefix="../patches/" data-dyn-from="{from_tok}" data-ec-eid="{eid}">\n\n', nav,
            f'\n<a class="nav-back-arrow visible" href="../{key}.html" aria-label="All {label.lower()}" title="All {label.lower()}"></a>\n',
            _TOOLBAR.format(info=info, scopes=scopes_html, abilities=abilities_html), '<div class="container">\n',
@@ -216,35 +262,70 @@ def _annotated():
     return _ANN
 
 
+_ATTR = [("DOTA_ATTRIBUTE_STRENGTH", "Strength", "icons/strength.webp"),
+         ("DOTA_ATTRIBUTE_AGILITY", "Agility", "icons/agility.webp"),
+         ("DOTA_ATTRIBUTE_INTELLECT", "Intelligence", "icons/intelligence.webp"),
+         ("DOTA_ATTRIBUTE_ALL", "Universal", "icons/universal.webp")]
+
+
+def _hero_groups(ents):
+    """Heroes as in the in-game grid: Strength / Agility / Intelligence / Universal by the primary
+    attribute in the LATEST stats snapshot, alphabetical inside a group."""
+    from patch.meta import latest_stats_version
+    hs = _json.loads((_HERE / "data" / "stats" / latest_stats_version() / "heroes.json").read_text(encoding="utf-8"))
+    groups = {k: [] for k, _, _ in _ATTR}
+    for e in ents:
+        npc = _re.sub(r"^.*/|\.png$", "", e["icon"])
+        attr = (hs.get(f"npc_dota_hero_{npc}") or {}).get("AttributePrimary", "DOTA_ATTRIBUTE_ALL")
+        groups.setdefault(attr, groups["DOTA_ATTRIBUTE_ALL"]).append(e)
+    return [(label, icon, sorted(groups[k], key=lambda x: x["name"].lower())) for k, label, icon in _ATTR if groups[k]]
+
+
+def _item_groups(ents, dyn):
+    """Items as in the shop: category order of Item Dynamics, then neutral tiers, enchantments;
+    not-current items keep their group but sit behind the "Show deleted" switch."""
+    meta = {i["key"].split("|", 1)[1].replace("_", "-"): i for i in (dyn or {}).get("items", [])}
+    order = list((dyn or {}).get("item_categories", []))
+    buckets: dict[str, list] = {}
+    for e in ents:
+        m = meta.get(e["slug"], {})
+        e["_current"] = bool(m.get("current", True))
+        if m.get("class") == "neutral":
+            t = m.get("tier")
+            g = f"Neutral · Tier {t}" if t and int(t) <= 5 else "Neutral · Other"
+        elif m.get("class") == "enchant":
+            g = "Enchantments"
+        else:
+            g = m.get("category") or "Other"
+        buckets.setdefault(g, []).append(e)
+    names = [c for c in order if c in buckets] + sorted(g for g in buckets if g not in order)
+    return [(g, None, sorted(buckets[g], key=lambda x: x["name"].lower())) for g in names]
+
+
 def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict | None = None) -> str:
     folder, label, key, icon_dir = KINDS[kind]
     nav = _site.render_top_nav("materials", f"patches/{latest}.html", patch_context=False,
                                subtabs_active=key, subnav_in_header=False)
     subnav = _site.render_materials_subnav(key)
-    # items: only what is in the game NOW is shown by default (same "current" flag as Item
-    # Dynamics — removed / cycled-out items sit behind the "Show deleted" switch)
-    current = {}
-    if kind == "item" and dyn:
-        current = {i["key"].split("|", 1)[1].replace("_", "-"): bool(i.get("current", True)) for i in dyn.get("items", [])}
-    cards, n_old = [], 0
-    for e in sorted(ents, key=lambda x: x["name"].lower()):
-        icon = e["icon"].replace("../", "", 1)
-        vers = [p["version"] for p in e["patches"]]
-        is_cur = current.get(e["slug"], True)
-        n_old += 0 if is_cur else 1
-        cards.append(f'<a class="ec-card ec-card-{kind}{"" if is_cur else " ec-old"}" data-current="{1 if is_cur else 0}"'
-                     f'{"" if is_cur else " hidden"} href="{folder}/{e["slug"]}.html" '
-                     f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
-                     f'<img src="{_esc(icon)}" alt="" loading="lazy">'
-                     f'<span class="ec-card-name">{_esc(e["name"])}</span>'
-                     f'<span class="ec-card-meta">{len(vers)} patch{"es" if len(vers) != 1 else ""} · last {_esc(vers[0])}</span></a>')
-    noun = "hero" if kind == "hero" else "item"
+    for e in ents:
+        e.setdefault("_current", True)
+    groups = _hero_groups(ents) if kind == "hero" else _item_groups(ents, dyn)
+    n_old = sum(1 for e in ents if not e["_current"])
+    blocks = []
+    for title, icon, lst in groups:
+        cards = "".join(
+            f'<a class="ec-card ec-card-{kind}{"" if e["_current"] else " ec-old"}" data-current="{1 if e["_current"] else 0}"'
+            f'{"" if e["_current"] else " hidden"} href="{folder}/{e["slug"]}.html" '
+            f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
+            f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="" loading="lazy">'
+            f'<span class="ec-card-name">{_esc(e["name"])}</span></a>' for e in lst)
+        head = (f'<img class="ec-group-icon" src="{icon}" alt="">' if icon else "") + _esc(title)
+        blocks.append(f'<section class="ec-group"><h3 class="ec-group-title">{head}</h3>'
+                      f'<div class="ec-cols ec-cols-{kind}">{cards}</div></section>')
     plural = "heroes" if kind == "hero" else "items"
     return (_head(label, asset, "", "") + '>\n' + nav +
             '\n<div class="container creeps-page ec-index">\n<div class="creeps-scroll">\n' + subnav +
-            f'<p class="ec-intro">Every {noun} that was touched in the annotated patches. Open one to read all of its '
-            f'changes patch by patch, exactly as they appear on the patch pages. Clicking a {noun} header on any patch '
-            f'page leads here too.</p>'
+            '<div class="ec-index-body">'
             '<div class="cal-toggle-bar inbox-bar hd-toolbar"><div class="toolbar-panel">'
             '<span class="search-box hd-search">'
             f'<input type="text" data-ec-search placeholder="Search {plural} — comma-separate for several" '
@@ -252,8 +333,7 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
             + (f'<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Show deleted ({n_old})</span>'
                '<input type="checkbox" id="ec-show-old" class="ua-switch-input">'
                '<span class="ua-switch" aria-hidden="true"></span></label>' if n_old else '')
-            + '</div></div>'
-            f'<div class="ec-grid ec-grid-{kind}">' + "".join(cards) + '</div>\n</div>\n</div>\n'
+            + '</div></div>' + "".join(blocks) + '</div>\n</div>\n</div>\n'
             f'<script defer src="src/scripts.js?v={asset}"></script>\n</body>\n</html>\n')
 
 

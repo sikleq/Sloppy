@@ -3421,6 +3421,13 @@
   }));
   wire(scopeBtns, scopes, 'ecScope');
   wire(abBtns, abilities, 'ecAbility');
+  const more = document.querySelector('[data-ec-more]');
+  if (more) more.addEventListener('click', () => {
+    const olds = [...document.querySelectorAll('.ec-ab-old')];
+    const show = olds.some(b => b.hidden);
+    olds.forEach(b => { b.hidden = !show; });
+    more.classList.toggle('active', show);
+  });
 })();
 
 // ---- HERO / ITEM CHANGES index: name filter (comma-separated, partial) ----
@@ -3435,6 +3442,9 @@
       const n = c.dataset.name || '';
       const old = c.dataset.current === '0' && !(showOld && showOld.checked);
       c.hidden = old || (terms.length > 0 && !terms.some(t => n.includes(t)));
+    });
+    document.querySelectorAll('.ec-group').forEach(g => {
+      g.hidden = ![...g.querySelectorAll('.ec-card')].some(c => !c.hidden);
     });
   };
   input.addEventListener('input', apply);
