@@ -29,6 +29,9 @@
                facet 0.8, talent 10/15/20/25 = 0.6/0.8/1.0/1.2.
   priority   — basic abilities are further scaled 0.7–1.3 by how pros skill them (share of the
                first 10 skill points, OpenDota pro matches; data/rules/ability_priority.json).
+  talents    — "Level N Talent: A replaced with B" (REWORK) gets a DIRECTION from signal K when
+               known: shift of the pro pick share of that slot against the unchanged sibling
+               (data/rules/talent_shift.json); 20 points of share = 1.0. Unknown -> net 0.
   volume     — buff/nerf/new/del rows: weight × magnitude; rework rows: weight × 1.0
                (a rework is a big, sign-less decision); misc/qol: 0.
 
@@ -354,6 +357,24 @@ def _row_value(text, badge_html, kind, ctx):
     return weight_of(kind)
 
 
+try:
+    _TSHIFT = _json.load(open(_os.path.join(_HERE, "data", "rules", "talent_shift.json"),
+                              encoding="utf-8"))["replacements"]
+except OSError:
+    _TSHIFT = {}
+TALENT_SHIFT_UNIT = 0.2      # a 20-point move of the pro pick share against the sibling = 1.0
+
+
+def _talent_shift(ctx):
+    """Signal K: "Level N Talent: A replaced with B" — how the pro pick share of that slot moved
+    against the UNCHANGED sibling (data/rules/talent_shift.json; only single-side replacements
+    with >= 30 picks before and after). None when unknown."""
+    if not ctx or not ctx.get("talent") or not ctx.get("hero"):
+        return None
+    rec = _TSHIFT.get(f"{ctx.get('version')}|{ctx['hero']}|{ctx['talent']}")
+    return rec["delta"] if rec else None
+
+
 def row_scores(text, tags, badge_html="", ctx=None):
     """(net, volume) of one row; both 0.0 when the row is not scorable."""
     kind = classify(text)
@@ -369,6 +390,10 @@ def row_scores(text, tags, badge_html="", ctx=None):
         val = _row_value(text, badge_html, kind, ctx) * cm
         return round(d * val, 3), round(val, 3)
     if "rework" in tags:
+        shift = _talent_shift(ctx)
+        if shift is not None:                       # signal K: the replacement has a measured direction
+            mag = min(abs(shift) / TALENT_SHIFT_UNIT, MAG_CAP_NORM)
+            return round(w * mag * (1 if shift > 0 else -1), 3), round(max(w, w * mag), 3)
         return 0.0, round(w, 3)
     if tags == {"new"}:
         return round(w * 0.5, 3), round(w, 3)

@@ -891,6 +891,7 @@ def _row_ctx(text):
         "kind": ek.split("|", 1)[0] if ek else "",
         "item": (_State.dynamics.get(ek) or {}).get("icon") if ek.startswith("item|") else None,
         "version": _State.current_patch_version,
+        "hero": _State.current_hero,
         "base_stat": bool(_State.in_stats_ul),
         "facet": bool(_State.current_block_is_facet),
         "ability": _State.current_ability_slug,

@@ -110,6 +110,39 @@ Meepo Poof 1.25 / Earthbind 0.70; Riki Smoke Screen 0.70. Ultimates keep ×1.3, 
 Effect on the blind-judge agreement: none (ρ 0.338 → 0.337) — kept because it is objective and cheap;
 re-run the script after big meta shifts.
 
+## Signal K — talents: what pros pick and why (2026-09-18)
+
+Data: OpenDota explorer, pro matches, one query per patch window — **4.9 M talent picks with wins over 116
+versions** (7.08 → 7.41e); talent pairs of every version from KV (56 512); per talent the modified ability
+parameter and its base value (relative boost). Scripts `k_talent_*.py` live with the model in
+`outputs/valve-revealed-weights-20260915/`.
+
+**Can the "importance" of a talent be learned from features?** Bradley–Terry model
+`P(A over B) = σ(f(A) − f(B))`, f linear in effect type, log relative boost, "modifies the ultimate",
+pro skill priority of the modified ability, generic stat gold value. 4 672 matchups with ≥ 40 picks, time
+split at 7.36:
+
+| model | majority-side accuracy (test) | Spearman |
+|---|---|---|
+| coin flip | 0.46 | 0.03 |
+| effect type only | 0.51 | 0.04 |
+| full model | **0.56** | 0.12 |
+
+So only weakly — Valve builds pairs to be close, and the choice is mostly hero- and game-specific. What the
+model does explain (logit units, +0.4 ≈ 60/40):
+- **target_priority +0.66** — a talent that boosts the ability pros max first is picked far more;
+- liked types: cast range +0.61, charges +0.23, attack speed +0.19; disliked: slow −0.37, move speed −0.29,
+  lifesteal −0.28, armor/evasion −0.22, base damage −0.21;
+- **size of the relative boost ≈ 0** — numbers inside a pair are already balanced by Valve;
+- **pick share ≠ strength**: over 2 319 pairs with ≥ 100 picks a side, corr(pick share, win-rate gap) =
+  **−0.28**; the less popular talent wins more (it is taken when it fits), mean |gap| 4.2 pp.
+
+**What is used on the site:** not the model, but the measured thing. For every single-side talent replacement
+in history (1 542 with ≥ 30 picks before and after; 225 in annotated patches) the shift of the pro pick share
+against the unchanged sibling is stored in `data/rules/talent_shift.json`. A row "Level N Talent: A replaced
+with B" (REWORK) now gets a direction: `net = weight × talent context × sign × min(|Δshare| / 0.2, 3)`.
+Replacements of both sides, or with thin data (e.g. Chaos Knight 7.40 level 25: 17 picks after), stay at 0.
+
 ## Matrix chart (heroes_dyn / items_dyn)
 
 One **step line** per row, the row is the zero axis: a touched patch is a flat plateau across its cell
