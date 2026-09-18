@@ -5,12 +5,12 @@ def build():
 
     W(section("General Updates"))
     W(ul_open())
-    W(li("Item grace period for swapping into the main inventory without a cooldown increased from 3s to 5s", b(3, 5, l=True)))
+    W(li("Item grace period for swapping into the main inventory without a cooldown increased from 3s to 5s", b(3, 5)))
     W(li("Tormentor: Gold to each team member on death decreased from 250 to 175", b(250, 175)))
     W(li("Tormentor: Unyielding Shield: Base Damage absorb increased from 1900 to 2100", b(1900, 2100)))
     W(li("Tormentor: Unyielding Shield: Base Barrier regeneration increased from 30 to 40", b(30, 40)))
     W(li("Removed several trees around camps, making it easier for additional paths to be cut through:", t("DEL"), extra=inline_note("To the right of Dire Ancient camp by Safelane Tier 1 Tower")))
-    W(li("Lotuses can no longer be picked up by Meepo clones, Arc Warden's Tempest Double or Dazzle's Nothl Projection", t("MISC")))
+    W(li("Lotuses can no longer be picked up by Meepo clones, Arc Warden's Tempest Double or Dazzle's Nothl Projection", t("DEL")))
     W(li("Moved the spawn box of the Radiant Safelane tier 1 hard pull camp a little bit down, removing an inaccessible camp block spot that could be created by chopping down a tree", t("MISC")))
     W(li("To the right of Dire Medium camp between mid and top Tier 2 Towers", t("MISC")))
     W(li("To the top of Dire Hard camp nearest to mid Tier 1 Tower", t("MISC")))
@@ -117,7 +117,7 @@ def build():
     W(item_header("Gunpowder Gauntlet"))
     W(ul_open())
     W(li("Beat the Crowd now also deals 50% of the bonus magical damage to enemies in the splash radius", t("NEW")))
-    W(li("Beat the Crowd splash damage now bypasses physical damage block", t("BUFF")))
+    W(li("Beat the Crowd splash damage now bypasses physical damage block", t("NEW")))
     W(ul_close())
     W(item_header("Ninja Gear"))
     W(ul_open())
@@ -240,7 +240,7 @@ def build():
     W(ul_close())
     W(facet_header("broodmother_necrotic_webs"))
     W(ul_open())
-    W(li("Spin Web: Health regen reduction does not affect enemies in fountain", t("MISC")))
+    W(li("Spin Web: Health regen reduction does not affect enemies in fountain", t("NERF")))
     W(ul_close())
 
     # Chen
@@ -595,7 +595,7 @@ def build():
     W(hero_header("Weaver"))
     W(ability("The Swarm", slug="weaver_the_swarm"))
     W(ul_open())
-    W(li("Attack Interval increased from 1.15/1.0/0.85/0.7s to 1.2/1.05/0.9/0.75s", b([1.15, 1, 0.85, 0.7], [1.2, 1.05, 0.9, 0.75])))
+    W(li("Attack Interval increased from 1.15/1.0/0.85/0.7s to 1.2/1.05/0.9/0.75s", b([1.15, 1, 0.85, 0.7], [1.2, 1.05, 0.9, 0.75], l=True)))
     W(ul_close())
 
     # Windranger
@@ -617,7 +617,7 @@ def build():
     W(ability("Winter's Curse", slug="winter_wyvern_winters_curse"))
     W(ul_open())
     W(li("Cooldown increased from 85/80/75s to 100/90/80s", b([85, 80, 75], [100, 90, 80], l=True)))
-    W(li("Cursed target is no longer immune to physical damage from Winter Wyvern and her controlled units", t("MISC")))
+    W(li("Cursed target is no longer immune to physical damage from Winter Wyvern and her controlled units", t("BUFF")))
     W(ul_close())
 
     # Zeus

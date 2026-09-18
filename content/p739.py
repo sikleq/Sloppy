@@ -173,6 +173,7 @@ def build():
         old=[("BUFF", "+22 All Attributes"), ("DEL", "+250 Health"), ("DEL", "+250 Mana")],
         new=[("",     "+35 All Attributes",  b(22, 35))]))
     W(ul_open())
+    W(li("No longer requires a 1050 gold recipe. Total Cost increased from 5300 to 5900", b(5300, 5900, l=True)))
     W(li("Cold Attack instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 40%, now reduces Health Restoration and Heal Amplification by 40%", t("REWORK")))
     W(li("Cold Attack's slow and health restoration reduction no longer stack with Orb of Frost and Orb of Corrosion", t("DEL")))
     W(ul_close())
@@ -322,7 +323,7 @@ def build():
     W(ul_open())
     W(li("Dormant Curio increases Burn Through's total damage from 72 to 93.6", t("NEW")))
     W(ul_close())
-    W(item_header("Kobold Cup"))
+    W(item_header("Pogo Stick"))
     W(ul_open())
     W(li("Dormant Curio increases Vault's jump distance from 300 to 390", t("NEW")))
     W(ul_close())
@@ -552,7 +553,7 @@ def build():
     W(hero_header("Anti-Mage"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent Persecutor Min/Max Movement Slow increased from +5%/15% to +7.5%/15%", t("BUFF")))
+    W(li("Level 15 Talent Persecutor Min/Max Movement Slow increased from +5%/15% to +7.5%/15%", br(5, 15, 7.5, 15)))
     W(li("Level 20 Talent Mana Void Stun increased from +0.7s to +0.8s", b(0.7, 0.8)))
     W(ul_close())
 
@@ -613,7 +614,8 @@ def build():
     W(li("Aghanim's Shard upgrade reworked: Removes the 20 stack limit and allows Sticky Napalm to deal 35% of its damage to buildings", t("REWORK")))
     W(li("Stack limit increased from 10 to 20", b(10, 20)))
     W(li("Movement Slow per stack decreased from 1.5/3/4.5/6% to 0.75/1.5/2.25/3%", b([1.5, 3, 4.5, 6], [0.75, 1.5, 2.25, 3])))
-    W(li("All per-stack values are halved", t("MISC"), extra=inline_note("Application Damage and Turn Rate neither halved nor doubled<br>Damage per stack decreased from 5/10/15/20 to 2.5/5/7.5/10")))
+    W(li("All per-stack values are halved", t("MISC"), extra=inline_note("Application Damage and Turn Rate neither halved nor doubled")))
+    W(li("Damage per stack decreased from 5/10/15/20 to 2.5/5/7.5/10", b([5, 10, 15, 20], [2.5, 5, 7.5, 10])))
     W(ul_close())
     W(ability("Flaming Lasso", slug="batrider_flaming_lasso"))
     W(ul_open())
@@ -684,7 +686,7 @@ def build():
     W(ability("Storm Brewling", slug="brewmaster_storm_unit", icon_url="../icons/units/brewmaster_storm_unit.png"))
     W(ul_open())
     W(li("Wind Walk Bonus Movement Speed increased from 20/30/40% to 25/35/45%", b([20, 30, 40], [25, 35, 45])))
-    W(li("Cyclone now deals 75 damage when the target unit lands", t("MISC")))
+    W(li("Cyclone now deals 75 damage when the target unit lands", t("NEW")))
     W(ul_close())
     W(ability("Fire Brewling", slug="brewmaster_fire_unit", icon_url="../icons/units/brewmaster_fire_unit.png"))
     W(ul_open())
@@ -708,14 +710,14 @@ def build():
     W(ul_close())
     W(ability("Quill Spray", slug="bristleback_quill_spray"))
     W(ul_open())
-    W(li("Added an auto-cast. Right-click the ability to make Bristleback automatically cast it whenever it's possible", t("QoL")))
+    W(li("Added an auto-cast. Right-click the ability to make Bristleback automatically cast it whenever it's possible", t("NEW")))
     W(ul_close())
 
     # Broodmother
     W(hero_header("Broodmother"))
     W(ability("Spider's Milk", slug="broodmother_spiders_milk"))
     W(ul_open())
-    W(li("Buff is no longer dispellable", t("NEW")))
+    W(li("Buff is no longer dispellable", t("BUFF")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -799,7 +801,7 @@ def build():
     W(ul_open())
     W(li("Now also restores a portion of mana to Crystal Maiden herself", t("NEW")))
     W(li("Arcane Aura: Allied mana restoration decreased from 25% to 15%", b(25, 15)))
-    W(li("Activation no longer interrupts movement", t("MISC")))
+    W(li("Activation no longer interrupts movement", t("BUFF")))
     W(ul_close())
 
     # Dark Seer
@@ -851,7 +853,7 @@ def build():
     ))
     W(ability("Starbreaker", slug="dawnbreaker_fire_wreath"))
     W(ul_open())
-    W(li("Aghanim's Shard upgrade now also destroys trees in front of Dawnbreaker", t("MISC")))
+    W(li("Aghanim's Shard upgrade now also destroys trees in front of Dawnbreaker", t("NEW")))
     W(ul_close())
 
     # Dazzle
@@ -977,7 +979,7 @@ def build():
     W(ul_close())
     W(ability("Astral Spirit", slug="elder_titan_ancestral_spirit"))
     W(ul_open())
-    W(li("Astral Spirit no longer automatically rejoins Elder Titan on collision with him. Now requires the duration to run out or the Return ability to be cast", t("MISC")))
+    W(li("Astral Spirit no longer automatically rejoins Elder Titan on collision with him. Now requires the duration to run out or the Return ability to be cast", t("DEL")))
     W(ul_close())
 
     # Ember Spirit
@@ -1010,7 +1012,7 @@ def build():
     W(hero_header("Faceless Void"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Time Dilation DPS per cooldown increased from +7 to +9", b(7, 9, l=True)))
+    W(li("Level 10 Talent Time Dilation DPS per cooldown increased from +7 to +9", b(7, 9)))
     W(li("Level 15 Talent Time Lock Damage increased from +30 to +35", b(30, 35)))
     W(li("Level 20 Talent Time Walk Cooldown Reduction increased from 1s to 1.25s", b(1, 1.25)))
     W(li("Level 20 Talent Attack Speed During Chronosphere/Time Zone increased from +80 to +100", b(80, 100)))
@@ -1161,7 +1163,7 @@ def build():
                  levels=list(range(1, 11)), level_prefix='E',
                  value_fmt="{:g}"))
     W(li("Wall Width now supports AoE bonuses again", t("NEW")))
-    W(li("Damage interval improved from 1s to 0.5s", b(1, 0.5)))
+    W(li("Damage interval improved from 1s to 0.5s", b(1, 0.5, l=True)))
     W(li("The damage per second interval is now based on an individual unit gaining the debuff, rather than on an interval for the entire wall. As a result, the first damage instance is now applied instantly", t("MISC")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -1218,7 +1220,7 @@ def build():
     W(hero_header("Juggernaut"))
     W(ability("Blade Fury", slug="juggernaut_blade_fury"))
     W(ul_open())
-    W(li("Damage rescaled from 40/45/50/55 per tick to 80/110/140/170 per second", t("NERF"), extra=inline_note("Tick interval is no longer based on Juggernaut's attack speed and has been changed to 5 ticks per second")))
+    W(li("Damage rescaled from 40/45/50/55 per tick to 80/110/140/170 per second", t("REWORK"), extra=inline_note("Tick interval is no longer based on Juggernaut's attack speed and has been changed to 5 ticks per second")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -1296,7 +1298,7 @@ def build():
     W(ul_close())
     W(ability("Talon Toss", slug="kez_talon_toss"))
     W(ul_open())
-    W(li("Now inflicts an attack with True Strike and fixed damage instead of simply dealing physical damage", t("NEW"), extra=inline_note("This means it can proc and apply attack modifiers, but it also doesn't affect attack immune units (i.e. Ethereal)")))
+    W(li("Now inflicts an attack with True Strike and fixed damage instead of simply dealing physical damage", t("REWORK"), extra=inline_note("This means it can proc and apply attack modifiers, but it also doesn't affect attack immune units (i.e. Ethereal)")))
     W(li("Damage rescaled from 75/125/175/225 to 60/120/180/240", b([75, 125, 175, 225], [60, 120, 180, 240])))
     W(li("Silence Duration increased from 1.75/2/2.25/2.5s to 2/2.25/2.5/2.75s", b([1.75, 2, 2.25, 2.5], [2, 2.25, 2.5, 2.75])))
     W(li("Cooldown decreased from 16/13/10/7s to 13/11/9/7s", b([16, 13, 10, 7], [13, 11, 9, 7], l=True)))
@@ -1446,7 +1448,7 @@ def build():
     W(ul_close())
     W(ability("Dispose", slug="marci_grapple"))
     W(ul_open())
-    W(li("Damage rescaled from 75/150/225/300 to 60/150/240/330", b([75, 150, 225, 300], [60, 150, 240, 330], force_overall="buff")))
+    W(li("Damage rescaled from 75/150/225/300 to 60/150/240/330", b([75, 150, 225, 300], [60, 150, 240, 330])))
     W(ul_close())
     W(ability("Rebound", slug="marci_companion_run"))
     W(ul_open())
@@ -1559,7 +1561,7 @@ def build():
     W(ul_close())
     W(facet_header("naga_siren_active_riptide"))
     W(ul_open())
-    W(li("No longer reduces enemy status resistance", t("BUFF")))
+    W(li("No longer reduces enemy status resistance", t("DEL")))
     W(li("Damage increased from 80/140/200/260 to 80/150/220/290", b([80, 140, 200, 260], [80, 150, 220, 290])))
     W(li("Max Movement Speed decreased from 240 to 230", b(240, 230)))
     W(ul_close())
@@ -1588,7 +1590,7 @@ def build():
     W(new_facet("furion_natures_profit",
         desc=f"Whenever an enemy hero is killed by Nature's Prophet or dies within 750 range of him, 2 seconds later a money tree grows in their place. Each tree spawns 2 gold bags every second, which can be picked up by any hero. Each gold bag grants gold equal to 1.5x of the killed hero's level. Each money tree has a lifespan of 3s {inline_note('Gold bags are created in 200–250 radius from the tree and disappear after 15s of lying on the ground. Gold Bags are automatically picked up by heroes within 50 range from them. Money tree provides 2x Tango healing similarly to Ironwood Tree')}"))
     W(ul_open())
-    W(li("Level 15 Talent +100 Teleportation Barrier replaced with +1 Nature's Profit Gold Bag", t("REWORK")))
+    W(li("Level 15 Talent +100 Teleportation Barrier replaced with +1 Nature's Profit Gold Bags Per Tick", t("REWORK")))
     W(ul_close())
     W(facet_header("furion_soothing_saplings"))
     W(ul_open())
@@ -1670,7 +1672,7 @@ def build():
     W(ability("Prognosticate", slug="oracle_prognosticate"))
     W(ul_open())
     W(li("Now also foretells which power rune will spawn", t("NEW")))
-    W(li("Pressing Alt will now display which rune will spawn and a timer before it spawns", t("MISC"), extra=inline_note("Nothing will be shown above the rune spot if the next rune will spawn in the other rune spot")))
+    W(li("Pressing Alt will now display which rune will spawn and a timer before it spawns", t("QoL"), extra=inline_note("Nothing will be shown above the rune spot if the next rune will spawn in the other rune spot")))
     W(ul_close())
     W(ability("Fate's Edict", slug="oracle_fates_edict"))
     W(ul_open())
@@ -1804,8 +1806,8 @@ def build():
     W(hero_header("Ringmaster"))
     W(ability("Dark Carnival Barker", slug="ringmaster_dark_carnival_souvenirs"))
     W(ul_open())
-    W(li("If Ringmaster does not have a Souvenir, he will be granted one upon death (instead of upon respawn)", t("NEW"),
-         extra=inline_note("Ringmaster will not be granted a Souvenir if he dies to a Neutral Creep or Roshan")))
+    W(li("If Ringmaster does not have a Souvenir, he will be granted one upon death (instead of upon respawn)", t("NEW")))
+    W(li("Ringmaster will no longer be granted a Souvenir if he has no Souvenirs and dies to a Neutral Creep or Roshan", t("NERF")))
     W(ul_close())
     W(ability("Escape Act", slug="ringmaster_the_box"))
     W(ul_open())
@@ -1833,7 +1835,7 @@ def build():
     W(ul_close())
     W(ability("Spell Steal", slug="rubick_spell_steal"))
     W(ul_open())
-    W(li("Certain spells that are toggleable and do not have a health or mana cost are no longer stealable", t("NEW"), extra=inline_note("This includes Mars' Bulwark, Medusa's Split Shot, Muerta's Gunslinger, and Phantom Lancer's Phantom Rush")))
+    W(li("Certain spells that are toggleable and do not have a health or mana cost are no longer stealable", t("DEL"), extra=inline_note("This includes Mars' Bulwark, Medusa's Split Shot, Muerta's Gunslinger, and Phantom Lancer's Phantom Rush")))
     W(ul_close())
 
     # Sand King
@@ -1847,7 +1849,7 @@ def build():
     W(li("Facet removed", t("DEL")))
     W(ul_close())
     W(new_facet("sand_king_obscurity",
-        desc=f"When Sand King attacks enemies in Sand Storm, he applies a debuff that blinds the target by 20/30/40/50%. Blind duration: 5s. {inline_note("Scorpion Strike: Each enemy hero hit by Stinger in innermost radius emits Caustic Finale debuff to 3 nearby units within 500 range. Doesn't apply to Aghanim's Scepter Stinger strikes")}"))
+        desc=f"When Sand King attacks enemies in Sand Storm, he applies a debuff that blinds the target by 20/30/40/50%. Blind duration: 5s."))
     W(new_facet("sand_king_pinpoint",
         desc=f"Each enemy hero hit by Stinger in innermost radius instantly emits a Caustic Finale explosion that deals 50% less damage. {inline_note("Doesn't apply to Stinger strikes created by Aghanim's Scepter")}"))
     W(ability("Caustic Finale", slug="sandking_caustic_finale"))
@@ -2026,11 +2028,11 @@ def build():
                 + inline_note("Io's Tether is the only exception that will ignore this effect."),
             ],
         ),
-        summary="Ability reworked",
+        summary="Ability reworked.",
         tag="rework",
     ))
     W(ul_open())
-    W(li("Now dispellable only by Strong Dispel", t("NEW")))
+    W(li("Now dispellable only by Strong Dispel", t("NERF")))
     W(li("Cooldown increased from 20s to 25s", b(20, 25, l=True)))
     W(li("Mana Cost increased from 75 to 100", b(75, 100, l=True)))
     W(li("Duration decreased from 7s to 6s", b(7, 6)))
@@ -2150,7 +2152,7 @@ def build():
     W(hero_header("Underlord"))
     W(facet_header("abyssal_underlord_demons_reach"))
     W(ul_open())
-    W(li("Atrophy Aura: No longer loses cleave on death", t("MISC")))
+    W(li("Atrophy Aura: No longer loses cleave on death", t("BUFF")))
     W(ul_close())
     W(facet_header("abyssal_underlord_summons"))
     W(ul_open())
@@ -2331,7 +2333,7 @@ def build():
     W(ability("Vampiric Spirit", slug="skeleton_king_vampiric_spirit"))
     W(ul_open())
     W(li("Lifesteal decreased from 16/24/32/40% to 10/20/30/40%", b([16, 24, 32, 40], [10, 20, 30, 40])))
-    W(li("No longer freezes Reincarnation cooldown while Wraith Delay is active", t("NEW")))
+    W(li("No longer freezes Reincarnation cooldown while Wraith Delay is active", t("BUFF")))
     W(ul_close())
     W(ability("Reincarnation", slug="skeleton_king_reincarnation"))
     W(ul_open())

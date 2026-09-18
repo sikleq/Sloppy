@@ -129,7 +129,7 @@ def build():
 
     W(item_header("Magnifying Monocle"))
     W(ul_open())
-    W(li("Keen Eye disable duration on taking damage increased from 3s to 6s", b(3, 6)))
+    W(li("Keen Eye disable duration on taking damage increased from 3s to 6s", b(3, 6, l=True)))
     W(ul_close())
 
     W(item_header("Outworld Staff"))
@@ -209,7 +209,7 @@ def build():
     W(hero_header("Dark Willow"))
     W(ability("Shadow Realm", slug="dark_willow_shadow_realm"))
     W(ul_open())
-    W(li("Allies can no longer target Dark Willow while active (Dark Willow can still target herself)", t("MISC")))
+    W(li("Allies can no longer target Dark Willow while active (Dark Willow can still target herself)", t("DEL")))
     W(ul_close())
 
     # Dawnbreaker
@@ -244,7 +244,8 @@ def build():
     # Earth Spirit
     W(hero_header("Earth Spirit"))
     W(ul_open())
-    W(li("Min base damage increased by 6", bstat_h("Earth Spirit", "AttackDamageMin", "7.39c", 6), extra=note_box(hero="Earth Spirit", field="AttackDamageMin", before_patch="7.39c")))
+    W(li("Min base damage increased by 6", bstat_h("Earth Spirit", "AttackDamageMin", "7.39c", 6), extra=note_box(hero="Earth Spirit", field="AttackDamageMin", before_patch="7.39c", extra_note="Damage spread decreased from 10 to 4")))
+    W(li("Damage at level 1 increased from 47–57 to 53–57", br(47, 57, 53, 57)))
     W(ul_close())
 
     # Ember Spirit
@@ -332,7 +333,7 @@ def build():
     W(hero_header("Naga Siren"))
     W(facet_header("naga_siren_active_riptide"))
     W(ul_open())
-    W(li("Rip Tide: Duration decreased from 3.5s to 2.6/2.9/3.2/3.5s", b(3.5, [2.6, 2.9, 3.2, 3.5])))
+    W(li("Deluge: Duration decreased from 3.5s to 2.6/2.9/3.2/3.5s", b(3.5, [2.6, 2.9, 3.2, 3.5])))
     W(ul_close())
     W(ul_open())
     W(li("Song of the Siren: Radius decreased from 1000/1200/1400 to 900/1150/1400", b([1000, 1200, 1400], [900, 1150, 1400])))
@@ -470,7 +471,8 @@ def build():
     # Spirit Breaker
     W(hero_header("Spirit Breaker"))
     W(ul_open())
-    W(li("Min base damage increased by 3", bstat_h("Spirit Breaker", "AttackDamageMin", "7.39c", 3), extra=note_box(hero="Spirit Breaker", field="AttackDamageMin", before_patch="7.39c")))
+    W(li("Base Damage increased by 3", bstat_h("Spirit Breaker", "AttackDamageMin", "7.39c", 3), extra=note_box(hero="Spirit Breaker", field="AttackDamageMin", before_patch="7.39c")))
+    W(li("Damage at level 1 increased from 59–69 to 62–72", br(59, 69, 62, 72)))
     W(ul_close())
 
     # Techies
@@ -482,7 +484,8 @@ def build():
     # Templar Assassin
     W(hero_header("Templar Assassin"))
     W(ul_open())
-    W(li("Base Damage decreased by 2–3", bstat_h("Templar Assassin", "AttackDamageMin", "7.39c", -2), extra=note_box(hero="Templar Assassin", field="AttackDamageMin", before_patch="7.39c")))
+    W(li("Base Damage decreased by 2–3", bstat_h("Templar Assassin", "AttackDamageMin", "7.39c", -2), extra=note_box(hero="Templar Assassin", field="AttackDamageMin", before_patch="7.39c", extra_note="Damage spread decreased from 6 to 5")))
+    W(li("Damage at level 1 decreased from 53–59 to 51–56", br(53, 59, 51, 56)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -507,7 +510,7 @@ def build():
     W(hero_header("Undying"))
     W(facet_header("undying_rotting_mitts"))
     W(ul_open())
-    W(li("Flesh Golem: Zombies summoned by the facet effect now die when Undying dies", t("MISC")))
+    W(li("Flesh Golem: Zombies summoned by the facet effect now die when Undying dies", t("NERF")))
     W(ul_close())
     W(ul_open())
     W(li("Tombstone: Zombie vision range decreased from 900/900 to 800/800", b([900, 900], [800, 800])))
@@ -531,7 +534,8 @@ def build():
     # Vengeful Spirit
     W(hero_header("Vengeful Spirit"))
     W(ul_open())
-    W(li("Min base damage increased by 2", bstat_h("Vengeful Spirit", "AttackDamageMin", "7.39c", 2), extra=note_box(hero="Vengeful Spirit", field="AttackDamageMin", before_patch="7.39c")))
+    W(li("Base Damage increased by 2", bstat_h("Vengeful Spirit", "AttackDamageMin", "7.39c", 2), extra=note_box(hero="Vengeful Spirit", field="AttackDamageMin", before_patch="7.39c")))
+    W(li("Damage at level 1 increased from 49–55 to 51–57", br(49, 55, 51, 57)))
     W(li("Agility gain decreased from 3.2 to 3.0", bstat_h("Vengeful Spirit", "AttributeAgilityGain", "7.39c", -0.2)))
     W(ul_close())
 

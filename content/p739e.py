@@ -105,8 +105,8 @@ def build():
 
     W(hero_header("Beastmaster"))
     W(ul_open())
-    W(li("Base damage decreased by 2", bstat_h("Beastmaster", "AttackDamageMin", "7.39e", -2), extra=note_box(hero="Beastmaster", field="AttackDamageMin", before_patch="7.39e")))
-    W(li("Damage at level 1 decreased from 52–56 to 50–54", t("NERF")))
+    W(li("Base damage decreased by 2", bstat_h("Beastmaster", "AttackDamageMin", "7.39d", -2), extra=note_box(hero="Beastmaster", field="AttackDamageMin", before_patch="7.39d")))
+    W(li("Damage at level 1 decreased from 52–56 to 50–54", br(52, 56, 50, 54)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -116,7 +116,7 @@ def build():
 
     W(hero_header("Brewmaster"))
     W(ul_open())
-    W(li("Base armor increased by 1", bstat_h("Brewmaster", "ArmorPhysical", "7.39e", 1), extra=note_box(hero="Brewmaster", field="ArmorPhysical", before_patch="7.39e")))
+    W(li("Base armor increased by 1", bstat_h("Brewmaster", "ArmorPhysical", "7.39d", 1), extra=note_box(hero="Brewmaster", field="ArmorPhysical", before_patch="7.39d")))
     W(ul_close())
 
     W(hero_header("Centaur Warrunner"))
@@ -128,7 +128,7 @@ def build():
     W(hero_header("Crystal Maiden"))
     W(facet_header("crystal_maiden_arcane_overflow"))
     W(ul_open())
-    W(li("Freezing Field: Mana Granted increased from 15% to 20%", b(15, 20)))
+    W(li("Arcane Aura: Mana Granted increased from 15% to 20%", b(15, 20)))
     W(ul_close())
 
     W(hero_header("Dawnbreaker"))
@@ -140,7 +140,7 @@ def build():
     W(hero_header("Disruptor"))
     W(facet_header("disruptor_thunderstorm"))
     W(ul_open())
-    W(li("Static Storm: Slow duration bonus decreased from +100% to +75%", b(100, 75),
+    W(li("Thunder Strike: Slow duration bonus decreased from +100% to +75%", b(100, 75),
          extra=inline_note("Total duration decreased from 0.6s to 0.525s")))
     W(ul_close())
     W(ul_open())
@@ -156,7 +156,7 @@ def build():
     W(hero_header("Earthshaker"))
     W(facet_header("earthshaker_tectonic_buildup"))
     W(ul_open())
-    W(li("Fissure: Bonus AoE decreased from 40 to 30", b(40, 30)))
+    W(li("Aftershock: Bonus AoE decreased from 40 to 30", b(40, 30)))
     W(ul_close())
     W(ul_open())
     W(li("Aftershock: Damage decreased from 70/100/130/160 to 65/90/115/140", b([70, 100, 130, 160], [65, 90, 115, 140])))
@@ -198,10 +198,10 @@ def build():
     W(ul_close())
     W(ul_open())
     W(li("Raptor Dance: Max Health as Damage decreased from 3% to 2.5%", b(3, 2.5)))
-    W(li("Raptor Dance: Can no longer be interrupted by casting Grappling Claw", t("MISC")))
+    W(li("Raptor Dance: Can no longer be interrupted by casting Grappling Claw", t("BUFF")))
     W(ul_close())
     W(ul_open())
-    W(li("Falcon Rush: Now has an 825 break distance", t("NEW")))
+    W(li("Falcon Rush: Now has an 825 break distance", t("NERF")))
     W(li("Falcon Rush: Attack Speed Factor rescaled from 6/8/10/12% to 9%", b([6, 8, 10, 12], 9)))
     W(ul_close())
     W(ul_open())
@@ -234,7 +234,7 @@ def build():
     W(hero_header("Magnus"))
     W(ability("Skewer", slug="magnataur_skewer"))
     W(ul_open())
-    W(li("Movement is now cancelled if Magnus is interrupted", t("REWORK"),
+    W(li("Movement is now cancelled if Magnus is interrupted", t("NERF"),
          extra=inline_note("Stunned, hexed or out of world")))
     W(ul_close())
 
@@ -263,7 +263,7 @@ def build():
     W(ul_close())
     W(ability("Tree Dance", slug="monkey_king_tree_dance"))
     W(ul_open())
-    W(li("Movement is now cancelled if Monkey King is interrupted", t("REWORK"),
+    W(li("Movement is now cancelled if Monkey King is interrupted", t("NERF"),
          extra=inline_note("Stunned, hexed or out of world")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -274,7 +274,7 @@ def build():
     W(hero_header("Naga Siren"))
     W(facet_header("naga_siren_active_riptide"))
     W(ul_open())
-    W(li("Rip Tide: Damage decreased from 80/150/220/290 to 80/140/200/260", b([80, 150, 220, 290], [80, 140, 200, 260])))
+    W(li("Deluge: Damage decreased from 80/150/220/290 to 80/140/200/260", b([80, 150, 220, 290], [80, 140, 200, 260])))
     W(ul_close())
     W(ul_open())
     W(li("Song of the Siren: Aghanim's Shard Max HP Regen per Second decreased from 5/6/7% to 4/5/6%", b([5, 6, 7], [4, 5, 6]),

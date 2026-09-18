@@ -108,7 +108,7 @@ def build():
     W(ul_close())
     W(item_header("Unrelenting Eye"))
     W(ul_open())
-    W(li("Relentless enemy search radius increased from 300 to 600", b(300, 600, l=True)))
+    W(li("Relentless enemy search radius increased from 300 to 600", b(300, 600)))
     W(ul_close())
     
     W(plain_header("Enchantment changes", dynamics=False, sublabel=True))
@@ -159,7 +159,7 @@ def build():
     # Abaddon
     W(hero_header("Abaddon"))
     W(ul_open())
-    W(li("Base Armor decreased by 1", t("NERF"), extra=note_box(hero="Abaddon", field="ArmorPhysical", before_patch="7.38b")))
+    W(li("Base Armor decreased by 1", bstat_h("Abaddon", "ArmorPhysical", "7.38b", -1), extra=note_box(hero="Abaddon", field="ArmorPhysical", before_patch="7.38b")))
     W(ul_close())
     W(facet_header("abaddon_mephitic_shroud"))
     W(ul_open())
@@ -418,13 +418,15 @@ def build():
     # Lycan
     W(hero_header("Lycan"))
     W(ul_open())
-    W(li("Base Strength increased from 26 to 28", b(26, 28), extra=inline_note("Damage at level 1 increased from 50–55 to 52–57")))
+    W(li("Base Strength increased from 26 to 28", b(26, 28)))
+    W(li("Damage at level 1 increased from 50–55 to 52–57", br(50, 55, 52, 57)))
     W(ul_close())
     
     # Magnus
     W(hero_header("Magnus"))
     W(ul_open())
-    W(li("Base Strength decreased from 25 to 23", b(25, 23), extra=inline_note("Damage at level 1 decreased from 55–63 to 54–62")))
+    W(li("Base Strength decreased from 25 to 23", b(25, 23)))
+    W(li("Damage at level 1 decreased from 55–63 to 54–62", br(55, 63, 54, 62)))
     W(ul_close())
     W(ability("Shockwave", slug="magnataur_shockwave"))
     W(ul_open())
@@ -669,7 +671,7 @@ def build():
     W(hero_header("Windranger"))
     W(ul_open())
     W(li("Base Damage increased by 3", bstat_h("Windranger", "AttackDamageMin", "7.38b", 3), extra=note_box(hero="Windranger", field="AttackDamageMin", before_patch="7.38b")))
-    W(li("Damage on level 1 increased from 44–56 to 47–59", t("BUFF")))
+    W(li("Damage on level 1 increased from 44–56 to 47–59", br(44, 56, 47, 59)))
     W(ul_close())
     W(facet_header("windrunner_killshot"))
     W(ul_open())

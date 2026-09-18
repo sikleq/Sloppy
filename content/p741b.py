@@ -9,7 +9,9 @@ def build():
     W(plain_header("Map Objectives"))
     W(subgroup("Tormentor"))
     W(ul_open())
-    W(li("Reflect Damage reflection per minute decreased from 2% to 1.5%", b(2, 1.5)))
+    W(li_formula("Reflect: Damage reflection changed", "30% + 2% per minute", "30% + 1.5% per minute",
+                 lambda M: 30 + 2.0 * M, lambda M: 30 + 1.5 * M,
+                 levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60], level_prefix='M', rework_badge=False, value_fmt="{:g}%"))
     W(ul_close())
 
     # ===== NEUTRAL CREEP UPDATES =====
@@ -50,7 +52,7 @@ def build():
     W(item_header("Helm of the Overlord"))
     W(ul_open())
     W(li("Dominate cooldown decreased from 45s to 40s", b(45, 40, l=True)))
-    W(li("Dominate target unit's max health minimum increased from 1800 to 1900", b(1800, 1900, l=True)))
+    W(li("Dominate target unit's max health minimum increased from 1800 to 1900", b(1800, 1900)))
     W(ul_close())
     W(item_header("Holy Locket"))
     W(ul_open())
@@ -87,7 +89,7 @@ def build():
     W(ul_close())
     W(item_header("Conjurer's Catalyst"))
     W(ul_open())
-    W(li("Spellover now has a 0.1s internal cooldown", t("REWORK")))
+    W(li("Spellover now has a 0.1s internal cooldown", t("NERF")))
     W(ul_close())
     W(subnote("Still can proc multiple times from a single instance of high damage"))
     W(ul_open())
@@ -293,7 +295,7 @@ def build():
     W(ul_close())
     W(ability("Marksmanship"))
     W(ul_open())
-    W(li("Enemy hero disable range decreased from 325 to 300", b(325, 300)))
+    W(li("Enemy hero disable range decreased from 325 to 300", b(325, 300, l=True)))
     W(ul_close())
     W(ability("Glacier"))
     W(ul_open())
@@ -569,7 +571,7 @@ def build():
     W(ul_close())
     W(ability("Sun Ray"))
     W(ul_open())
-    W(li("Aghanim's Shard no longer slows affected enemies by 10%", t("NERF")))
+    W(li("Aghanim's Shard no longer slows affected enemies by 10%", t("DEL")))
     W(ul_close())
 
     # Primal Beast
@@ -726,7 +728,7 @@ def build():
     W(ul_open())
     W(li("Missile speed increased from 1200 to 1350", b(1200, 1350)))
     W(li("Base activation time decreased from 0.3s to 0s", b(0.3, 0, l=True)))
-    W(li("Aghanim's Scepter no longer makes activation faster", ""))
+    W(li("Aghanim's Scepter no longer makes activation faster", t("DEL")))
     W(ul_close())
 
     # Tiny
@@ -754,7 +756,7 @@ def build():
     W(ul_close())
     W(ability("Drinking Buddies"))
     W(ul_open())
-    W(li("No longer has an alt-cast", t("MISC")))
+    W(li("No longer has an alt-cast", t("DEL")))
     W(li("Bonus Armor decreased from 10 to 7", b(10, 7)))
     W(ul_close())
 
@@ -768,7 +770,7 @@ def build():
     # Windranger
     W(hero_header("Windranger"))
     W(ul_open())
-    W(li("Base Health Regen increased by 0.5", bstat_h("Windranger", "StatusHealthRegen", "7.41b", 0.5), extra=note_box(hero="Windranger", field="StatusHealthRegen", before_patch="7.41b")))
+    W(li("Base Health Regen increased by 0.5", bstat_h("Windranger", "StatusHealthRegen", "7.41a", 0.5), extra=note_box(hero="Windranger", field="StatusHealthRegen", before_patch="7.41a")))
     W(ul_close())
     W(ability("Powershot"))
     W(ul_open())

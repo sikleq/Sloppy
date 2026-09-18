@@ -11,7 +11,7 @@ def build():
     W(plain_header("Map Objectives"))
     W(ul_open())
     W(li("Roshan: Melee attacks against couriers are now treated as melee hero attacks", t("REWORK")))
-    W(li("Tormentor: Reflect no longer considers creep-heroes for the damage reflected", t("REWORK"), extra=inline_note("Lone Druid's Spirit Bear is an exception for this")))
+    W(li("Tormentor: Reflect no longer considers creep-heroes for the damage reflected", t("DEL"), extra=inline_note("Lone Druid's Spirit Bear is an exception for this")))
     W(ul_close())
 
     W(plain_header("Terrain Changes", terrain_link="7.39c"))
@@ -49,7 +49,7 @@ def build():
     W(unit_header("Ancient Prowler Shaman", _NC_CDN + "prowler_shaman.png"))
     W(ability("Petrify", icon_url="../icons/abilities/spawnlord_master_freeze.png"))
     W(ul_open())
-    W(li("No longer has a health threshold restriction when the Shaman is controlled by a player", t("MISC")))
+    W(li("No longer has a health threshold restriction when the Shaman is controlled by a player", t("BUFF")))
     W(ul_close())
 
     # ===== ITEM UPDATES =====
@@ -64,11 +64,11 @@ def build():
     W(ul_close())
     W(item_header("Hurricane Pike"))
     W(ul_open())
-    W(li("Hurricane Thrust buff provided to the wearer when targeting an enemy is now dispellable", t("NEW")))
+    W(li("Hurricane Thrust buff provided to the wearer when targeting an enemy is now dispellable", t("NERF")))
     W(ul_close())
     W(item_header("Harpoon"))
     W(ul_open())
-    W(li("Draw Forth initial projectile is now disjointable", t("NEW")))
+    W(li("Draw Forth initial projectile is now disjointable", t("NERF")))
     W(ul_close())
     W(item_header("Phylactery"))
     W(ul_open())
@@ -77,7 +77,7 @@ def build():
     W(item_header("Khanda"))
     W(ul_open())
     W(li("Total cost decreased from 5700 to 5600 (due to Phylactery Recipe cost reduction)", b(5700, 5600, l=True)))
-    W(li("Empower Spell Break debuff no longer dispellable", t("NEW"), extra=inline_note("Slow debuff applied by Empower Spell is still dispellable")))
+    W(li("Empower Spell Break debuff no longer dispellable", t("BUFF"), extra=inline_note("Slow debuff applied by Empower Spell is still dispellable")))
     W(ul_close())
 
     # ===== NEUTRAL ITEM UPDATES =====
@@ -349,7 +349,7 @@ def build():
     W(ul_close())
     W(ability("Fan of Knives", slug="phantom_assassin_fan_of_knives"))
     W(ul_open())
-    W(li("Break debuff is no longer dispellable", t("NEW")))
+    W(li("Break debuff is no longer dispellable", t("BUFF")))
     W(ul_close())
 
     # Phantom Lancer

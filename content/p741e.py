@@ -122,15 +122,15 @@ def build():
     W(item_header("Urn of Shadows"))
     W(ul_open())
     W(li("Mana Regen bonus decreased from +1.25 to +1", b(1.25, 1)))
-    W(li("When in Stash, no longer grants charges from nearby hero deaths", t("MISC")))
+    W(li("When in Stash, no longer grants charges from nearby hero deaths", t("DEL")))
     W(ul_close())
     W(item_header("Essence Distiller"))
     W(ul_open())
-    W(li("When in Stash, no longer grants charges from nearby hero deaths", t("MISC")))
+    W(li("When in Stash, no longer grants charges from nearby hero deaths", t("DEL")))
     W(ul_close())
     W(item_header("Spirit Vessel"))
     W(ul_open())
-    W(li("When in Stash, no longer grants charges from nearby hero deaths", t("MISC")))
+    W(li("When in Stash, no longer grants charges from nearby hero deaths", t("DEL")))
     W(ul_close())
     W(item_header("Veil of Discord"))
     W(ul_open())
@@ -316,7 +316,7 @@ def build():
     W(hero_header("Grimstroke"))
     W(ability("Dark Portrait", slug="grimstroke_dark_portrait"))
     W(ul_open())
-    W(li("No longer has illusion vision penalty", t("DEL")))
+    W(li("No longer has illusion vision penalty", t("BUFF")))
     W(ul_close())
 
     # Gyrocopter
@@ -374,7 +374,8 @@ def build():
     # Legion Commander
     W(hero_header("Legion Commander"))
     W(ul_open())
-    W(li("Base Strength increased from 24 to 25", b(24, 25), extra=inline_note("Damage at level 1 increased from 57-61 to 58-62")))
+    W(li("Base Strength increased from 24 to 25", b(24, 25)))
+    W(li("Damage at level 1 increased from 57–61 to 58–62", br(57, 61, 58, 62)))
     W(li("Strength gain decreased from 3.1 to 3.0", b(3.1, 3)))
     W(li("Base Attack Speed increased from 100 to 105", b(100, 105)))
     W(ul_close())
@@ -434,7 +435,7 @@ def build():
     W(ability("Morph", slug="morphling_replicate"))
     W(ul_open())
     W(li("Cooldown decreased from 140/100/60s to 125/90/55s", b([140, 100, 60], [125, 90, 55], l=True)))
-    W(li("Aghanim's Scepter illusion no longer has illusion vision penalty", t("DEL")))
+    W(li("Aghanim's Scepter illusion no longer has illusion vision penalty", t("BUFF")))
     W(ul_close())
 
     # Muerta
@@ -473,7 +474,7 @@ def build():
     W(hero_header("Oracle"))
     W(ability("Fate's Edict", slug="oracle_fates_edict"))
     W(ul_open())
-    W(li("Fate's Edict that was cast on Oracle or his ally is now dispellable by enemies", t("NEW")))
+    W(li("Fate's Edict that was cast on Oracle or his ally is now dispellable by enemies", t("NERF")))
     W(ul_close())
     W(ability("False Promise", slug="oracle_false_promise"))
     W(ul_open())
@@ -484,7 +485,7 @@ def build():
     W(hero_header("Outworld Destroyer"))
     W(ability("Objurgation", slug="obsidian_destroyer_objurgation"))
     W(ul_open())
-    W(li("Now has an instant cast and no longer cancels movement", t("MISC"), extra=inline_note("Used to have 0.2s cast point")))
+    W(li("Now has an instant cast and no longer cancels movement", t("BUFF"), extra=inline_note("Used to have 0.2s cast point")))
     W(li("Barrier increased from 120/180/240/300 to 150/200/250/300", b([120, 180, 240, 300], [150, 200, 250, 300])))
     W(li("Cooldown decreased from 36/34/32/30 to 36/33/30/27s", b([36, 34, 32, 30], [36, 33, 30, 27], l=True)))
     W(ul_close())
@@ -514,6 +515,7 @@ def build():
     W(hero_header("Pugna"))
     W(ul_open())
     W(li("Base Intelligence increased from 26 to 27", b(26, 27)))
+    W(li("Damage at level 1 increased from 47–54 to 48–55", br(47, 54, 48, 55)))
     W(ul_close())
 
     # Queen of Pain
@@ -618,7 +620,8 @@ def build():
     # Troll Warlord
     W(hero_header("Troll Warlord"))
     W(ul_open())
-    W(li("Base Agility increased from 23 to 24", b(23, 24), extra=inline_note("Damage at level 1 increased from 50-58 to 51-59")))
+    W(li("Base Agility increased from 23 to 24", b(23, 24)))
+    W(li("Damage at level 1 increased from 50–58 to 51–59", br(50, 58, 51, 59)))
     W(ul_close())
     W(ability("Battle Stance", slug="troll_warlord_switch_stance"))
     W(ul_open())
@@ -650,7 +653,7 @@ def build():
     W(hero_header("Vengeful Spirit"))
     W(ability("Vengeance Aura", slug="vengefulspirit_command_aura"))
     W(ul_open())
-    W(li("Aghanim's Scepter illusion no longer has illusion vision penalty", t("DEL")))
+    W(li("Aghanim's Scepter illusion no longer has illusion vision penalty", t("BUFF")))
     W(ul_close())
 
     # Venomancer

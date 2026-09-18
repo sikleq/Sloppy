@@ -53,7 +53,7 @@ def build():
     W(enchant_header("Crude"))
     W(ul_open())
     W(li("Health Restoration bonus increased from +20/30% to +30/40%", b([20, 30], [30, 40])))
-    W(li("Intelligence reduction decreased from 8% to 5%", b(8, 5)))
+    W(li("Intelligence reduction decreased from 8% to 5%", b(8, 5, l=True)))
     W(ul_close())
 
     # ===== HERO UPDATES =====
@@ -158,14 +158,18 @@ def build():
     W(hero_header("Enigma"))
     W(ability("Demonic Summoning", slug="enigma_demonic_conversion"))
     W(ul_open())
-    W(li("Eidolons created from multiplying will now automatically attack the same target as their parent", t("QoL")))
+    W(li("Eidolons created from multiplying will now automatically attack the same target as their parent", t("NEW")))
+    W(ul_close())
+    W(facet_header("enigma_fragment"))
+    W(ul_open())
+    W(li("Damage threshold increased from 350 to 375", b(350, 375)))
     W(ul_close())
 
     # Kez
     W(hero_header("Kez"))
     W(ability("Falcon Rush", slug="kez_falcon_rush"))
     W(ul_open())
-    W(li("Abilities that are unit targeted attacks now allow Kez to rush to the target", t("MISC"), extra=inline_note("As a result, Kazurai Katana's active will now cause Kez to rush if he is within rush range")))
+    W(li("Abilities that are unit targeted attacks now allow Kez to rush to the target", t("NEW"), extra=inline_note("As a result, Kazurai Katana's active will now cause Kez to rush if he is within rush range")))
     W(li("Duration increased from 3/4/5/6s to 3.75/4.5/5.25/6s", b([3, 4, 5, 6], [3.75, 4.5, 5.25, 6])))
     W(ul_close())
     W(ability("Talon Toss", slug="kez_talon_toss"))
@@ -207,7 +211,11 @@ def build():
     W(ul_close())
     W(facet_header("furion_natures_profit"))
     W(ul_open())
-    W(li("Wrath of Nature Base Damage decreased from 100/140/180 to 90/130/170", b([100, 140, 180], [90, 130, 170])))
+    W(li("Gold Per Hero Level increased from 1.5 to 2", b(1.5, 2)))
+    W(ul_close())
+    W(ability("Wrath of Nature", slug="furion_wrath_of_nature"))
+    W(ul_open())
+    W(li("Base Damage decreased from 100/140/180 to 90/130/170", b([100, 140, 180], [90, 130, 170])))
     W(ul_close())
 
     # Night Stalker
@@ -268,6 +276,13 @@ def build():
     W(ul_close())
 
     # Skywrath Mage
+    W(hero_header("Silencer"))
+    W(facet_header("silencer_oppressive_silence"))
+    W(ul_open())
+    W(li("Damage percentage decreased from 10/15/20/25% to 8/12/16/20%", b([10, 15, 20, 25], [8, 12, 16, 20])))
+    W(ul_close())
+
+    # Skywrath Mage
     W(hero_header("Skywrath Mage"))
     W(ability("Arcane Bolt", slug="skywrath_mage_arcane_bolt"))
     W(ul_open())
@@ -307,6 +322,13 @@ def build():
     W(ability("Dark Unity", slug="terrorblade_dark_unity"))
     W(ul_open())
     W(li("Damage Penalty increased from 50% to 60%", b(50, 60, l=True)))
+    W(ul_close())
+
+    # Troll Warlord
+    W(hero_header("Tinker"))
+    W(facet_header("tinker_translocator"))
+    W(ul_open())
+    W(li("Defense Matrix: No longer blinks Tinker if he is rooted or leashed", t("DEL"), extra=inline_note("This only occurs when affected by roots or leashes that cannot be dispelled by Basic Dispels")))
     W(ul_close())
 
     # Troll Warlord

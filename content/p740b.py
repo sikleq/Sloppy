@@ -76,7 +76,7 @@ def build():
     W(ability("Drunken Brawler", slug="brewmaster_drunken_brawler"))
     W(ul_open())
     W(li("Brewed Up extend duration increased from 1s to 2s", b(1, 2)))
-    W(li("Toggling is no longer disabled by silence", t("MISC")))
+    W(li("Toggling is no longer disabled by silence", t("BUFF")))
     W(ul_close())
     W(ability("Primal Split", slug="brewmaster_primal_split"))
     W(ul_open())
@@ -249,7 +249,7 @@ def build():
     W(ul_close())
     W(ability("Omnislash", slug="juggernaut_omni_slash"))
     W(ul_open())
-    W(li("Slashes Rate Multiplier decreased from 1.5 to 1.4", b(1.5, 1.4, l=True)))
+    W(li("Slashes Rate Multiplier decreased from 1.5 to 1.4", b(1.5, 1.4)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -262,7 +262,7 @@ def build():
     W(ul_open())
     W(li("Katana Base Attack Time worsened from 1.8s to 1.9s", b(1.8, 1.9, l=True)))
     W(li("Katana Bonus Agility Base Damage increased from 12% to 16%", b(12, 16)))
-    W(li("Can no longer be disabled by Silence", t("MISC")))
+    W(li("Can no longer be disabled by Silence", t("BUFF")))
     W(ul_close())
     W(ability("Falcon Rush", slug="kez_falcon_rush"))
     W(ul_open())
@@ -291,7 +291,7 @@ def build():
     W(ability("Croak of Genius", slug="largo_croak_of_genius"))
     W(ul_open())
     W(li("Reverberated damage is now only applied if the target is within 2000 range of the caster", t("REWORK")))
-    W(li("Duration is no longer decreased on Largo from his own abilities", t("NEW")))
+    W(li("Duration is no longer decreased on Largo from his own abilities", t("BUFF")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -371,7 +371,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +75 Rebound Landing Radius decreased to +50", t("NERF")))
+    W(li("Level 10 Talent +75 Rebound Landing Radius decreased to +50", b(75, 50)))
     W(ul_close())
 
     # Mars
@@ -389,7 +389,7 @@ def build():
     W(hero_header("Meepo"))
     W(ability("Dig", slug="meepo_petrify"))
     W(ul_open())
-    W(li("Now has a 0.3s cast point", t("NEW")))
+    W(li("Now has a 0.3s cast point", t("NERF")))
     W(ul_close())
     W(ability("MegaMeepo", slug="meepo_megameepo"))
     W(ul_open())
@@ -418,7 +418,7 @@ def build():
     W(hero_header("Muerta"))
     W(ability("Gunslinger", slug="muerta_gunslinger"))
     W(ul_open())
-    W(li("Toggling is no longer disabled by silence", t("MISC")))
+    W(li("Toggling is no longer disabled by silence", t("BUFF")))
     W(ul_close())
 
     # Necrophos
@@ -492,7 +492,7 @@ def build():
     W(ul_close())
     W(ability("Phantom Rush", slug="phantom_lancer_phantom_edge"))
     W(ul_open())
-    W(li("Toggling is no longer disabled by silence", t("MISC")))
+    W(li("Toggling is no longer disabled by silence", t("BUFF")))
     W(ul_close())
 
     # Primal Beast
@@ -687,7 +687,7 @@ def build():
     W(hero_header("Troll Warlord"))
     W(ability("Battle Stance", slug="troll_warlord_switch_stance"))
     W(ul_open())
-    W(li("Toggling is no longer disabled by silence", t("MISC")))
+    W(li("Toggling is no longer disabled by silence", t("BUFF")))
     W(ul_close())
 
     # Underlord

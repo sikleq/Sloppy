@@ -97,7 +97,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 15 Talent Attack Range decreased from +60 to +50", b(60, 50)))
-    W(li("Level 25 Talent Searing Arrows Multishot no longer applies to Skeleton Archers", t("NERF")))
+    W(li("Level 25 Talent Searing Arrows Multishot no longer applies to Skeleton Archers", t("DEL")))
     W(ul_close())
 
     # Dark Seer
@@ -190,7 +190,7 @@ def build():
     W(ul_close())
     W(ability("Amphibian Rhapsody"))
     W(ul_open())
-    W(li("Now can be toggled while silenced", t("MISC")))
+    W(li("Now can be toggled while silenced", t("BUFF")))
     W(li("Radius increased from 750 to 800", b(750, 800)))
     W(ul_close())
 
@@ -375,7 +375,8 @@ def build():
     W(hero_header("Timbersaw"))
     W(ul_open())
     W(li("Base Strength decreased from 26 to 23", b(26, 23)))
-    W(li("Strength gain increased from 3.5 to 3.6", b(3.5, 3.6), extra=inline_note("Damage at level 1 decreased from 49–53 to 46–50")))
+    W(li("Damage at level 1 decreased from 49–53 to 46–50", br(49, 53, 46, 50)))
+    W(li("Strength gain increased from 3.5 to 3.6", b(3.5, 3.6)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

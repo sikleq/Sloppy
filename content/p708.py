@@ -181,7 +181,7 @@ def build():
     W(ul_close())
     W(ability("Morph Replicate", innate=False))
     W(ul_open())
-    W(li("Cast point removed", t("NEW")))
+    W(li("Cast point removed", t("BUFF")))
     W(ul_close())
 
     # Nature's Prophet
@@ -221,7 +221,7 @@ def build():
     W(ability("Rot", innate=False))
     W(ul_open())
     W(li("Slow rescaled from 30% to 20/24/28/32%", b(30, [20, 24, 28, 32]),
-         extra=inline_note("Effectively a nerf at levels 1–2 (20%, 24%) and a buff only at level 4 (32%)")))
+         extra=inline_note("Effectively a nerf at levels 1–3 (20%, 24%, 28%) and a buff only at level 4 (32%)")))
     W(ul_close())
 
     # Pugna
@@ -271,7 +271,7 @@ def build():
     W(hero_header("Tusk"))
     W(ability("Snowball", innate=False))
     W(ul_open())
-    W(li("Can no longer be cast while rooted", t("DEL")))
+    W(li("Can no longer be cast while rooted", t("NERF")))
     W(ul_close())
 
     # Windranger

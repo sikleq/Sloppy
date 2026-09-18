@@ -119,7 +119,8 @@ def build():
     # Invoker
     W(hero_header("Invoker"))
     W(ul_open())
-    W(li("Base Intelligence increased from 20 to 22", b(20, 22), extra=inline_note("Damage at level 1 increased from 39–45 to 41–47")))
+    W(li("Base Intelligence increased from 20 to 22", b(20, 22)))
+    W(li("Damage at level 1 increased from 39–45 to 41–47", br(39, 45, 41, 47)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -205,7 +206,7 @@ def build():
     W(ability("Divided We Stand"))
     W(ul_open())
     W(li("Evasion no longer diminishes when shared between Meepos and has full strength on each", t("BUFF")))
-    W(li("Clones can no longer copy Bottle", t("NERF")))
+    W(li("Clones can no longer copy Bottle", t("DEL")))
     W(ul_close())
 
     # Mirana
@@ -265,7 +266,7 @@ def build():
     W(hero_header("Primal Beast"))
     W(ability("Colossal"))
     W(ul_open())
-    W(li("Now slightly grows in size when crossing an HP threshold", t("MISC")))
+    W(li("Now slightly grows in size when crossing an HP threshold", t("NEW")))
     W(ul_close())
 
     # Puck
@@ -303,7 +304,7 @@ def build():
     W(hero_header("Spirit Breaker"))
     W(ability("Greater Bash"))
     W(ul_open())
-    W(li("Aghanim's Scepter upgrade unit collision radius no longer affected by Area of Effect bonuses", t("NERF")))
+    W(li("Aghanim's Scepter upgrade unit collision radius no longer affected by Area of Effect bonuses", t("DEL")))
     W(ul_close())
 
     # Techies
@@ -366,12 +367,12 @@ def build():
     # Windranger
     W(hero_header("Windranger"))
     W(ul_open())
-    W(li("Base Agility increased from 17 to 20", b(17, 20), extra=inline_note("Damage at level 1 increased from 47–59 to 49–61")))
+    W(li("Base Agility increased from 17 to 20", b(17, 20)))
+    W(li("Damage at level 1 increased from 47–59 to 49–61", br(47, 59, 49, 61)))
     W(ul_close())
     W(ability("Tailwind"))
     W(ul_open())
-    W(li("Duration increased from 2s to 2.5s", b(2, 2.5)))
-    W(li("Aghanim's Scepter bonus is still +1s, so it's increased to 3.5s", t("BUFF")))
+    W(li("Duration increased from 2s to 2.5s", b(2, 2.5), extra=inline_note("Aghanim's Scepter bonus is still +1s, so it's increased to 3.5s")))
     W(ul_close())
     W(ability("Focus Fire", slug="windrunner_focusfire"))
     W(ul_open())
