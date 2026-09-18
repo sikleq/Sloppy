@@ -213,6 +213,48 @@ def _hero_kit(npc: str) -> list[str]:
     return _KIT_CACHE[npc]
 
 
+_TALENT_BLOCK_RE = _re.compile(r'<div class="ability-block talents-block">')
+_LI_RE = _re.compile(r'<li\b([^>]*)>(.*?)</li>', _re.S)
+
+
+def _tag_talent_rows(body: str, names: list[str]) -> str:
+    """Mark every talent row that names one of the hero's abilities with
+    data-ec-ab="Name|Name" so the ability chips can pull it in: clicking Decrepify then
+    shows the talents that upgrade Decrepify next to the direct changes. Longest name wins
+    when one ability name contains another (e.g. "Nether Ward" vs "Ward")."""
+    if not names:
+        return body
+    pats = sorted(names, key=len, reverse=True)
+    rx = [(n, _re.compile(r"(?<![A-Za-z'])" + _re.escape(n) + r"(?![A-Za-z'])", _re.I)) for n in pats]
+
+    def tag_li(m):
+        attrs, inner = m.group(1), m.group(2)
+        if "data-ec-ab=" in attrs:
+            return m.group(0)
+        text = _re.sub(r"<[^>]+>", " ", inner)
+        hits, covered = [], []
+        for n, r in rx:
+            for h in r.finditer(text):
+                if not any(a <= h.start() and h.end() <= b for a, b in covered):
+                    covered.append((h.start(), h.end()))
+                    if n not in hits:
+                        hits.append(n)
+        if not hits:
+            return m.group(0)
+        return f'<li{attrs} data-ec-ab="{_esc("|".join(hits))}">{inner}</li>'
+
+    out, pos = [], 0
+    for m in _TALENT_BLOCK_RE.finditer(body):
+        if m.start() < pos:
+            continue
+        end = _balanced_div(body, m.start())
+        out.append(body[pos:m.start()])
+        out.append(_LI_RE.sub(tag_li, body[m.start():end]))
+        pos = end
+    out.append(body[pos:])
+    return "".join(out)
+
+
 def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     folder, label, key, _ = KINDS[e["kind"]]
     nav = _site.render_top_nav("materials", f"../patches/{latest}.html", patch_context=True, subtabs_active=key)
@@ -257,6 +299,15 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         current += sorted(t for t in rest if t not in old)
         if not kit:                                    # items: no kit, keep everything visible
             current, old = sorted(ab_count), []
+        # talents that upgrade an ability answer to its chip; a current ability changed ONLY through
+        # talents (Nether Blast for Pugna) gets a chip too, sorted into the kit order
+        for p in e["patches"]:
+            p["_body"] = _tag_talent_rows(p["_body"], list(dict.fromkeys(current + old + kit)))
+        via_talent = {a for p in e["patches"] for m in _re.finditer(r'data-ec-ab="([^"]*)"', p["_body"])
+                      for a in _html.unescape(m.group(1)).split("|")}
+        extra = [k for k in kit if k in via_talent and k not in current and k not in old]
+        if extra:
+            current = sorted(dict.fromkeys(current + extra), key=lambda t: low.get(t.lower(), 10_000))
 
         def chip(t, hidden=False):
             return (f'<button type="button" class="badge ec-ab-btn{" ec-ab-old" if hidden else ""}" data-ec-ability="{_esc(t)}"'

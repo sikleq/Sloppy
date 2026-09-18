@@ -238,6 +238,11 @@ from the rendered `dist/patches/*.html` and writes `dist/heroes/<slug>.html`, `d
 headers on patch pages link there (`_entity_link` in `patch/elements.py`). Nothing to do per patch: a new
 `content/p*.py` shows up automatically on the next build.
 
+Ability chips on a hero page also pull in **talents**: at build time `_tag_talent_rows` marks every row of a
+Talents block that names one of the hero's abilities (`data-ec-ab="Nether Ward|Life Drain"`, longest name
+wins on overlaps), and the filter in `src/scripts.js` keeps only those rows while a chip is active. A current
+ability changed only through talents (Pugna's Nether Blast) gets a chip of its own. Facets are not matched.
+
 ## CI gates
 
 Two workflows live in `.github/workflows/`:

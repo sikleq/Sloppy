@@ -3407,7 +3407,19 @@
       sc.querySelectorAll('.ability-block').forEach(blk => {
         const innate = blk.classList.contains('is-innate');
         const scopeOk = !scopes.size || realScopes.has(sc.dataset.scope) || (wantInnate && innate);
-        const ok = scopeOk && (!abilities.size || (!innate && abilities.has(titleOf(blk))));
+        let ok = scopeOk && (!abilities.size || (!innate && abilities.has(titleOf(blk))));
+        // talents block: with an ability chip active, keep only the rows that upgrade that ability
+        const rows = blk.classList.contains('talents-block') ? [...blk.querySelectorAll('li')] : [];
+        if (rows.length) {
+          let anyRow = false;
+          rows.forEach(li => {
+            const abs = (li.dataset.ecAb || '').split('|').filter(Boolean);
+            const rowOk = !abilities.size || abs.some(a => abilities.has(a));
+            li.classList.toggle('ec-scope-hide', abilities.size > 0 && !rowOk);
+            anyRow = anyRow || rowOk;
+          });
+          ok = scopeOk && anyRow;
+        }
         blk.classList.toggle('ec-scope-hide', !ok);
         any = any || ok;
       });
