@@ -2332,7 +2332,7 @@ def build():
     W(ul_open())
     W(li("Enemy attack projectile speed slow rescaled from 35/40/45/50% to 40%", b([35, 40, 45, 50], 40)))
     W(li("Max slow distance rescaled from 600 around Faceless Void to 500 around the targeted hero", t("REWORK")))
-    W(li("Now only applies to projectiles targeting Faceless Void or an allied hero within a 1200 radius of him", t("REWORK")))
+    W(li("Now only applies to projectiles targeting Faceless Void or an allied hero within a 1200 radius of him", t("NERF")))
     W(li("No longer levels with Chronosphere", t("REWORK")))
     W(ul_close())
     W(ability("Time Walk"))

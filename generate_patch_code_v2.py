@@ -224,14 +224,37 @@ CANONICAL_TAGS = [
     (re.compile(r'\bno longer has (?:an? |the )?(?:\w+ ){1,3}(?:penalty|restriction|drawback|downside|debuff slow)\b', re.I), 'BUFF'),
     (re.compile(r'\bno longer (?:reduces|decreases) ', re.I),       'BUFF'),
     (re.compile(r'\bno longer requires (?:a |an )?(?:skill point|mana|charge)', re.I), 'BUFF'),
+    # ── classes from the 2026-09-18 datafeed proofread (memory: sloppy-datafeed-proofread-method) ──
+    # a restriction / self-penalty on the OWNER is lifted → BUFF
+    (re.compile(r'\bno longer (?:be )?(?:disabled|interrupted|cancell?ed|blocked|prevented|stopped) by\b', re.I), 'BUFF'),
+    (re.compile(r'\bno longer (?:interrupts?|cancels?) (?:movement|channel)', re.I), 'BUFF'),
+    (re.compile(r'\b(?:can now|now can) be (?:cast|used|toggled|activated) (?:without|while)\b', re.I), 'BUFF'),
+    (re.compile(r'\bno longer has (?:a |an )?(?:reduced|decreased|lower|fixed|illusion vision)\b', re.I), 'BUFF'),
+    (re.compile(r'\bno longer (?:freezes|loses|pauses|resets|delays)\b', re.I), 'BUFF'),
+    (re.compile(r'\bis no longer (?:decreased|reduced|lowered) on \w+ from (?:his|her|their|its) own\b', re.I), 'BUFF'),
+    (re.compile(r'\brequirement\b.*\b(?:is |was )?removed\b', re.I), 'BUFF'),
+    (re.compile(r'\bno longer dispellable\b', re.I),                'BUFF'),   # own (de)buff can't be removed any more
+    # a restriction / limit / delay is ADDED → NERF
+    (re.compile(r'\bis now dispellable\b', re.I),                   'NERF'),   # own buff can now be removed
+    (re.compile(r'\bis now disjointable\b', re.I),                  'NERF'),   # own projectile can now be dodged
+    (re.compile(r'\bnow (?:only|solely) (?:affects?|available|applies|works|triggers?|targets?|hits?)\b', re.I), 'NERF'),
+    (re.compile(r'\bnow (?:affects?|applies|works) only\b', re.I),  'NERF'),
+    (re.compile(r'\bnow has (?:a |an )?\d[\d./]*\s?(?:s|seconds?)? ?(?:cast point|cast time|internal cooldown|break distance|cooldown|mana cost|delay|health cost)\b', re.I), 'NERF'),
+    (re.compile(r'\bnow (?:ends|expires|dies?|breaks?|is (?:cancell?ed|interrupted|removed)) (?:if|when|once|after)\b', re.I), 'NERF'),
+    (re.compile(r'\b(?:may|can) only (?:trigger|proc|be cast|be used|target|affect|stack)\b', re.I), 'NERF'),
+    (re.compile(r'\bnow disabled by\b', re.I),                      'NERF'),
+    (re.compile(r'\bdoes not affect .* in (?:the )?fountain\b', re.I), 'NERF'),
+    # a capability is taken away → DEL
+    (re.compile(r'\bno longer (?:stealable|copyable|benefits? from|blinks?|copy|copies|has an alt-cast)\b', re.I), 'DEL'),
+    # structural change of the entity → REWORK
+    (re.compile(r'^Now (?:a|an) (?:universal|strength|agility|intelligence)\b', re.I), 'REWORK'),
+    (re.compile(r"^Now \w+'s? (?:ultimate|basic|innate) ability\b", re.I), 'REWORK'),
+    (re.compile(r'\b(?:ability )?is now (?:an? )?innate\b', re.I),  'REWORK'),
     # NERF — adding a penalty/restriction is negative (inverse of no-longer-has-penalty)
     (re.compile(r'\bnow has (?:an? |the )?(?:\w+ ){0,3}(?:penalty|restriction|drawback|downside)\b', re.I), 'NERF'),
     # NEW — new mechanic / capability added
     (re.compile(r'\bAdded to Captains Mode\b', re.I),               'NEW'),
     (re.compile(r'\bCan now be disassembled\b', re.I),              'NEW'),
-    (re.compile(r'\bis now dispellable\b', re.I),                   'NEW'),   # adding dispel-ability to a buff/debuff
-    (re.compile(r'\bno longer dispellable\b', re.I),                'NEW'),   # gaining undispellable property — new capability
-    (re.compile(r'\bis now disjointable\b', re.I),                  'NEW'),   # adding disjoint-ability to a projectile
     (re.compile(r'\bno longer disjointable\b', re.I),               'DEL'),
     (re.compile(r'^Now (?:also )?(?:passively |actively )?(?:grants|provides|gains?|adds?|applies?|deals?|increases|fires?|spawns?|summons?)', re.I), 'NEW'),
     (re.compile(r"\bAghanim's (?:Scepter|Shard) now (?:also )?(?:grants|provides|applies?|adds?|deals?|allows?|gives?|causes?)", re.I), 'NEW'),
@@ -241,7 +264,6 @@ CANONICAL_TAGS = [
     (re.compile(r'\bholding (?:and pressing )?alt\b', re.I),        'QoL'),
     (re.compile(r'\balt[\s-]clicking?\b', re.I),                    'QoL'),
     # MISC — mechanic toggle, classification change, polish, fix, no effective change
-    (re.compile(r'\bNow can be toggled while silenced\b', re.I),    'MISC'),
     (re.compile(r'\bClassified as\b', re.I),                        'MISC'),
     (re.compile(r'\btooltip now (?:shows?|displays?|reflects?)\b', re.I), 'QoL'),  # "The tooltip now shows..." — display-only improvement
     (re.compile(r'^\s*Fixed\s+(?:item\s+|ability\s+|spell\s+)?(?:description|tooltip|text)\b', re.I), 'QoL'),  # "Fixed description stating..." — tooltip fix
@@ -264,7 +286,7 @@ CANONICAL_TAGS = [
     (re.compile(r'\breworked\b', re.I),                             'REWORK'),
     (re.compile(r'\brescaled\b', re.I),                             'REWORK'),
     (re.compile(r'\bchanged from\b', re.I),                         'REWORK'),
-    (re.compile(r'\bis now cancelled if.*interrupted\b', re.I),     'REWORK'),  # movement/channel cancellation behaviour change
+    (re.compile(r'\bis now cancell?ed if.*interrupted\b', re.I),    'NERF'),    # movement now breaks on interrupt — a new restriction
     (re.compile(r'\bare now treated as\b', re.I),                   'REWORK'),  # reclassification: "X are now treated as Y"
     (re.compile(r'\bno longer considers?\b', re.I),                 'REWORK'),  # scoping: "no longer considers X for Y"
     # General "Now ..." → NEW unless context says otherwise
@@ -289,6 +311,16 @@ LOWER_IS_BUFF = re.compile(
     r'|activation\s+time'
     r'|restore\s+time'
     r'|respawn\s+time'
+    # 2026-09-18 proofread: self-penalties, owner-side timers and thresholds
+    r'|disable\s+(?:range|radius|duration)'
+    r'|(?:damage|attack|tick|pulse|explosion)\s+interval'
+    r'|flight\s+time'
+    r'|stun\s+duration\s+from\s+falling'
+    r'|(?:resistance|health|mana|gold|intelligence|agility|strength|armor|speed)\s+(?:loss|reduction)'
+    r'|creep\s+penalty|max\s+mana\s+penalty|vision\s+penalty'
+    r'|mana\s+per\s+second'
+    r'|health\s+cost'
+    r'|(?:damage|hit)\s+threshold'
     r')\b',
     re.I,
 )
@@ -298,7 +330,12 @@ _NOT_LOWER_IS_BUFF = re.compile(
     r'|\bmana\s+cost\s+reduction\b'
     r'|\bpenalty\s+reduction\b'
     # "Magic Resistance bonus" is higher-is-better (item stat), not incoming damage
-    r'|\bmagic\s+resistance\s+bonus\b',
+    r'|\bmagic\s+resistance\s+bonus\b'
+    # enemy-side values scaling "per cooldown" / max slow (Faceless Void, Open Wounds): higher is better
+    r'|\bper\s+cooldown\b'
+    r'|\bmax\s+slow\b'
+    r'|\bsearch\s+radius\b'
+    r'|\bmax\s+health\s+minimum\b',
     re.I,
 )
 

@@ -109,6 +109,11 @@ W(li("-20% <font color='#e03e2e'>Vision</font>", t("NEW")))                # pen
 ## Сводная таблица b() направления (l=True)
 
 `l=True` применять к: cooldown, mana cost, gold cost, BAT, cast point, channel time, recharge, penalty/drawback, incoming damage, damage taken, damage vulnerability, building damage penalty.
+Также (2026-09-18): disable range/radius/duration (радиус, где враг отключает пассивку), damage/attack interval,
+flight time, self-stun, «X loss/reduction» (slow resistance loss, intelligence reduction), creep penalty, max mana
+penalty, mana per second (расход), health cost, damage threshold. **Не** применять к вражеским значениям:
+slow/DPS per cooldown, max slow, magic resistance bonus, search radius. `bstat_h` рисует свой бейдж: никогда
+`t("MISC") + bstat_h(...)`, и версия в нём — предыдущий патч, не текущий.
 
 **НЕ применять** к: damage dealt to enemies, durations (buff/debuff/stun на враге — longer = BUFF), talent value rows ("X Cooldown Reduction", "Cooldown Advance").
 
@@ -123,6 +128,15 @@ W(li("-20% <font color='#e03e2e'>Vision</font>", t("NEW")))                # pen
 `t("DEL")` — удаление фичи/эффекта/поведения. `t("NERF")` — количественное ослабление.
 
 «No longer …» → всегда DEL. «Level N Talent X replaced with Y» → REWORK. «No longer levels with X» (innate decoupling) → REWORK (эффект остаётся, только coupling убирается).
+
+### Снятое собственное ограничение → BUFF; добавленное → NERF (вычитка 2026-09-18)
+«Toggling is no longer disabled by silence», «Can no longer be interrupted by casting X», «no longer interrupts
+movement», «Now can be cast without cancelling X», «No longer has reduced/fixed X», «no longer freezes/loses X»,
+«requirement … removed» → **BUFF**. Свой buff/debuff «no longer dispellable» → **BUFF**; «is now dispellable»,
+«is now disjointable» → **NERF**. «Now only affects…», «now has a 0.3s cast point», «now ends if…», «may only
+trigger…», «now disabled by roots» → **NERF**. «no longer stealable / benefits from / blinks / has an alt-cast» → **DEL**.
+«Now an Agility Hero», «Now X's ultimate ability», «is now innate» → **REWORK**. Всё это в `CANONICAL_TAGS`
+генератора и покрыто `tests/test_generator.py`.
 
 ### «No longer has a X penalty» — это BUFF, не DEL
 
