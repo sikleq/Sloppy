@@ -9923,11 +9923,11 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-card:hover { border-color: var(--gold-line); filter: brightness(1.18);
   transform: translateY(-3px) scale(1.06); position: relative; z-index: 5;
   box-shadow: 0 4px 10px var(--shadow-60); }
-/* Heroes: Strength | Agility | Intelligence | Universal columns (6/6/6/4 portraits per row) */
-.ec-hgrid { display: grid; grid-template-columns: 6fr 6fr 6fr 4fr; gap: 0 22px; margin-top: 14px; }
+/* Heroes: Strength | Agility | Intelligence | Universal columns (4/4/4/3 icons per row) */
+.ec-hgrid { display: grid; grid-template-columns: 4fr 4fr 4fr 3fr; gap: 0 22px; margin-top: 14px; }
 .ec-hcol[hidden], .ec-igroup[hidden] { display: none; }
-.ec-hcards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
-.ec-hcol-universal .ec-hcards { grid-template-columns: repeat(4, 1fr); }
+.ec-hcards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.ec-hcol-universal .ec-hcards { grid-template-columns: repeat(3, 1fr); }
 .ec-card-hero { aspect-ratio: 256 / 144; }
 .ec-hcol-strength .ec-group-title { color: #d9534f; }
 .ec-hcol-agility .ec-group-title { color: #5cb85c; }
