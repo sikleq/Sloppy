@@ -9890,6 +9890,10 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-scope-btn.active { background: rgba(121, 192, 255, 0.22); border-color: rgba(121, 192, 255, 0.60); color: var(--text-main); }
 .ec-scope-hide { display: none !important; }
 .ec-entity-note { margin: 0 0 6px; }
+.ec-ver .ec-ver-label .entity-new-type, .ec-ver .ec-ver-label .entity-changed-type {
+  margin-left: 12px; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.4px;
+  text-transform: uppercase; color: #b08c5a; opacity: 0.85; vertical-align: middle;
+}
 /* index pages: in-game order — a titled block per attribute / shop category, heroes flow
    alphabetically TOP-TO-BOTTOM through CSS columns; no extra info on the tiles */
 .ec-index-body { padding: 12px 18px 28px; }
@@ -9909,16 +9913,22 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
   overflow: hidden; color: inherit; text-decoration: none; transition: filter 0.12s ease, transform 0.12s ease, border-color 0.12s ease;
 }
 .ec-card[hidden] { display: none; }
-.ec-card:hover { border-color: var(--gold-line); filter: brightness(1.18); transform: translateY(-1px); }
 .ec-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .ec-card.ec-old { opacity: 0.55; filter: grayscale(0.6); }
 .ec-card.ec-old:hover { opacity: 1; filter: none; }
+/* item in the roster with no annotated change yet: greyed out, not a link */
+.ec-card.ec-nopage { opacity: 0.32; filter: grayscale(1) brightness(0.8); cursor: default; }
+.ec-card.ec-nopage:hover { border-color: rgba(0, 0, 0, 0.55); transform: none; filter: grayscale(1) brightness(0.8); }
+/* hover: the icon comes forward a little (same move as the Hero Lab inventory) */
+.ec-card:hover { border-color: var(--gold-line); filter: brightness(1.18);
+  transform: translateY(-3px) scale(1.06); position: relative; z-index: 5;
+  box-shadow: 0 4px 10px var(--shadow-60); }
 /* Heroes: Strength | Agility | Intelligence | Universal columns (6/6/6/4 portraits per row) */
 .ec-hgrid { display: grid; grid-template-columns: 6fr 6fr 6fr 4fr; gap: 0 22px; margin-top: 14px; }
 .ec-hcol[hidden], .ec-igroup[hidden] { display: none; }
-.ec-hcards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
+.ec-hcards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
 .ec-hcol-universal .ec-hcards { grid-template-columns: repeat(4, 1fr); }
-.ec-card-hero { aspect-ratio: 235 / 272; }
+.ec-card-hero { aspect-ratio: 256 / 144; }
 .ec-hcol-strength .ec-group-title { color: #d9534f; }
 .ec-hcol-agility .ec-group-title { color: #5cb85c; }
 .ec-hcol-intelligence .ec-group-title { color: #5bc0de; }

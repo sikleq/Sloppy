@@ -333,11 +333,17 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
             score = (f'<span class="ec-score {cls}" title="weighted score: net (volume)">'
                      f'{"+" if w > 0 else ""}{w:.2f}<i> ({bucket.get("v", 0.0):.2f})</i></span>')
         body = _re.sub(r'href="(7\.\d+[a-z]?\.html)(?:\?[^"#]*)?', rf'href="../patches/\1?from={from_tok}', p["_body"])
+        # the header label ("New Tier 1 Artifact", "Recipe changed") sits in the banner, styled as on the patch page
+        note = _re.search(r'<div class="ec-entity-note">(.*?)</div>', body, _re.S)
+        label = ""
+        if note:
+            body = body.replace(note.group(0), "", 1)
+            label = f'<span class="ec-ver-label">{note.group(1)}</span>'
         # same panel + banner as a category section on the patch page; the banner IS the patch
         out.append(f'<section class="cat-panel ec-patch" id="p-{_esc(p["version"])}">'
                    f'<h2 class="section ec-ver"><a href="../patches/{_esc(p["version"])}.html?from={from_tok}#{eid}" '
                    f'title="Open {_esc(e["name"])} in patch {_esc(p["version"])}">Patch {_esc(p["version"])}</a>'
-                   f'<span class="ec-date">{_esc(p["date"])}</span>{score}</h2>\n{body}\n</section>\n')
+                   f'<span class="ec-date">{_esc(p["date"])}</span>{label}{score}</h2>\n{body}\n</section>\n')
     out.append('<button class="back-to-top" aria-label="Back to top" title="Back to top" '
                'onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>'
                '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores" '
@@ -397,6 +403,14 @@ def _item_groups(ents, dyn):
         meta[(kind, slug.replace("_", "-"))] = i
     order = list((dyn or {}).get("item_categories", []))
     shop = _shop_order()
+    # the full roster (Item Dynamics manifest): items without a Changes page yet are shown greyed
+    have = {(e["kind"], e["slug"]) for e in ents}
+    ents = list(ents)
+    for (kind, slug), m in meta.items():
+        if (kind, slug) in have or ("item" if kind == "enchant" else kind, slug) in have:
+            continue
+        ents.append({"kind": kind, "slug": slug, "name": m["name"], "icon": f'../icons/items/{m["icon"]}.png',
+                     "patches": [], "_nopage": True})
     buckets: dict[str, list] = {}
     for e in ents:
         m = meta.get((e["kind"], e["slug"])) or meta.get(("item", e["slug"])) or {}
@@ -445,19 +459,20 @@ def _kv_rank() -> dict[str, int]:
 
 
 def _hero_card(e: dict) -> str:
-    npc = _re.sub(r"^.*/|\.png$", "", e["icon"])
-    vert = _HERE / "icons" / "heroes_vert" / f"{npc}.jpg"
-    src = f"icons/heroes_vert/{npc}.jpg" if vert.exists() else e["icon"].replace("../", "", 1)
-    return (f'<a class="ec-card ec-card-hero" data-current="1" data-class="" href="heroes/{_file_slug(e)}.html" '
+    return (f'<a class="ec-card ec-card-hero" data-current="1" href="heroes/{_file_slug(e)}.html" '
             f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
-            f'<img src="{_esc(src)}" alt="{_esc(e["name"])}" loading="lazy"></a>')
+            f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" loading="lazy"></a>')
 
 
 def _item_card(e: dict) -> str:
-    return (f'<a class="ec-card ec-card-item{"" if e["_current"] else " ec-old"}" data-current="{1 if e["_current"] else 0}"'
-            f' data-class="{e["_class"]}"{"" if e["_current"] else " hidden"} href="items/{_file_slug(e)}.html" '
-            f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
-            f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" loading="lazy"></a>')
+    cls = "ec-card ec-card-item" + ("" if e["_current"] else " ec-old") + (" ec-nopage" if e.get("_nopage") else "")
+    attrs = (f'class="{cls}" data-current="{1 if e["_current"] else 0}"{"" if e["_current"] else " hidden"} '
+             f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}"')
+    img = f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" loading="lazy">'
+    if e.get("_nopage"):                               # no annotated change yet — shown, not clickable
+        return f'<span {attrs}>{img}</span>'
+    return f'<a {attrs} href="items/{_file_slug(e)}.html">{img}</a>'
+
 
 
 def _hero_grid(groups) -> str:
@@ -502,8 +517,7 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
     groups = _hero_groups(ents) if kind == "hero" else _item_groups(ents, dyn)
     for e in ents:
         e.setdefault("_current", True)
-        e.setdefault("_class", "")
-    n_old = sum(1 for e in ents if not e["_current"])
+    n_old = sum(1 for _, _, lst in groups for e in lst if not e["_current"])
     grid = _hero_grid(groups) if kind == "hero" else _item_grid(groups)
     plural = "heroes" if kind == "hero" else "items"
     return (_head(label, asset, "", "") + '>\n' + nav +
@@ -513,11 +527,6 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
             '<span class="search-box hd-search">'
             f'<input type="text" data-ec-search placeholder="Search {plural} — comma-separate for several" '
             'autocomplete="off" spellcheck="false"></span>'
-            + ('<span class="hs-attr-filter-group ec-class-filters">'
-               '<button type="button" class="hs-attack-filter" data-ec-class="regular">Shop</button>'
-               '<button type="button" class="hs-attack-filter" data-ec-class="neutral">Neutral</button>'
-               '<button type="button" class="hs-attack-filter" data-ec-class="enchant">Enchantments</button>'
-               '</span>' if kind == "item" else '')
             + (f'<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Show deleted ({n_old})</span>'
                '<input type="checkbox" id="ec-show-old" class="ua-switch-input">'
                '<span class="ua-switch" aria-hidden="true"></span></label>' if n_old else '')
