@@ -5052,9 +5052,63 @@
       const anyVisible = [...group.querySelectorAll('.hl-hero-tile')].some(tile => !tile.classList.contains('is-hidden'));
       group.classList.toggle('is-hidden', !anyVisible);
     });
+    const visible = [...overlay.querySelectorAll('.hl-hero-tile:not(.is-hidden)')];
+    if (visible.length && !overlay.querySelector('.hl-hero-tile.is-selected:not(.is-hidden)')) {
+      const first = visible[0];
+      overlay.querySelectorAll('.hl-hero-tile').forEach(tile => {
+        tile.classList.toggle('is-selected', tile === first);
+      });
+    }
+  });
+  overlay.addEventListener('keydown', (e) => {
+    const input = e.target.closest('[data-hero-search]');
+    if (!input) return;
+    const visible = [...overlay.querySelectorAll('.hl-hero-tile:not(.is-hidden)')];
+    if (!visible.length) return;
+
+    if (e.key === 'Escape') {
+      input.value = '';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.focus();
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      const chosen = visible[0];
+      if (chosen && activePicker && activePicker.panel) {
+        activePicker.panel.dataset.hero = chosen.dataset.heroId;
+        closePicker();
+        update();
+      }
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const current = overlay.querySelector('.hl-hero-tile.is-selected:not(.is-hidden)');
+      let idx = visible.indexOf(current);
+      if (idx < 0) {
+        idx = e.key === 'ArrowDown' ? 0 : visible.length - 1;
+      } else {
+        idx = e.key === 'ArrowDown'
+          ? Math.min(idx + 1, visible.length - 1)
+          : Math.max(idx - 1, 0);
+      }
+      const next = visible[idx];
+      overlay.querySelectorAll('.hl-hero-tile').forEach(tile => {
+        tile.classList.toggle('is-selected', tile === next);
+      });
+      next.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !overlay.hidden) closePicker();
+    if (e.key === 'Escape' && !overlay.hidden) {
+      const input = overlay.querySelector('[data-hero-search]');
+      if (input && document.activeElement === input) return;
+      closePicker();
+    }
   });
 
   // ---- Item tooltip ----
