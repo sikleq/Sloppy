@@ -1658,7 +1658,7 @@ def build():
             slug="lone_druid_spirit_bear_entangle",
             desc=[
                 "Passive.",
-                "Spirit Bear's attacks have a chance to root the target (Entangle), preventing movement for <b>1/1.6/2.2/2.8s</b> and dealing damage over the duration.",
+                "Spirit Bear's attacks have a <b>20%</b> chance (30% in True Form) to root the target (Entangle), preventing movement for <b>1/1.6/2.2/2.8s</b> and dealing <b>30/40/50/60</b> damage per second over the duration (3x against creeps).",
             ],
         ),
         new=dict(
