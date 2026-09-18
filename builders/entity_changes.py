@@ -404,12 +404,12 @@ def _item_groups(ents, dyn):
         cls = "enchant" if e["kind"] == "enchant" else (m.get("class") or "regular")
         e["_class"] = cls
         if cls == "neutral":
-            t = m.get("tier")
-            g = f"Neutral · Tier {t}" if t and int(t) <= 5 else "Neutral · Other"
+            t = m.get("tier")                          # manifest tier is the KV index: 0..4 = Tier 1..5
+            g = f"Neutral · Tier {int(t) + 1}" if t is not None and 0 <= int(t) <= 4 else "Neutral · Other"
         elif cls == "enchant":
             g = "Enchantments"
         else:
-            g = m.get("category") or "Other"
+            g = m.get("category") or "Removed"
         e["_icon_slug"] = m.get("icon") or _re.sub(r"^.*/|\.png$", "", e["icon"])
         buckets.setdefault(g, []).append(e)
     names = ([c for c in order if c in buckets]
@@ -417,10 +417,81 @@ def _item_groups(ents, dyn):
              + [g for g in ("Enchantments",) if g in buckets]
              + sorted(g for g in buckets if g not in order and not g.startswith("Neutral") and g != "Enchantments"))
 
+    kv = _kv_rank()
+
     def key(g):
         rank = {s: i for i, s in enumerate(shop.get(g, []))}
-        return lambda e: (rank.get(e["_icon_slug"], 10_000), e["name"].lower())
+        if g.startswith("Neutral") or g == "Enchantments":            # the game lists these in KV order
+            rank = kv
+        return lambda e: (0 if e["_current"] else 1, rank.get(e["_icon_slug"], 10_000), e["name"].lower())
     return [(g, None, sorted(buckets[g], key=key(g))) for g in names]
+
+
+# In-game shop layout (screenshot of the shop, 7.41f): three panels, categories in this order,
+# icons 4 per row; neutral tiers with their unlock times; enchantments last.
+_SHOP_PANELS = [
+    ("Basics",   ["Consumables", "Attributes", "Equipment", "Miscellaneous", "Secret Shop", "Other"]),
+    ("Upgrades", ["Accessories", "Support", "Magical", "Armor", "Weapons", "Armaments"]),
+]
+_TIER_TIME = {1: "0:00+", 2: "15:00+", 3: "25:00+", 4: "35:00+", 5: "60:00+"}
+
+
+def _kv_rank() -> dict[str, int]:
+    """Position of every item in the latest items KV — the order the game uses for neutral
+    tiers and enchantments (shops.txt only covers the regular shop)."""
+    from patch.meta import latest_stats_version
+    ks = list(_json.loads((_HERE / "data" / "stats" / latest_stats_version() / "items.json").read_text(encoding="utf-8")))
+    return {k[5:]: i for i, k in enumerate(ks)}                    # strip "item_"
+
+
+def _hero_card(e: dict) -> str:
+    npc = _re.sub(r"^.*/|\.png$", "", e["icon"])
+    vert = _HERE / "icons" / "heroes_vert" / f"{npc}.jpg"
+    src = f"icons/heroes_vert/{npc}.jpg" if vert.exists() else e["icon"].replace("../", "", 1)
+    return (f'<a class="ec-card ec-card-hero" data-current="1" data-class="" href="heroes/{_file_slug(e)}.html" '
+            f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
+            f'<img src="{_esc(src)}" alt="{_esc(e["name"])}" loading="lazy"></a>')
+
+
+def _item_card(e: dict) -> str:
+    return (f'<a class="ec-card ec-card-item{"" if e["_current"] else " ec-old"}" data-current="{1 if e["_current"] else 0}"'
+            f' data-class="{e["_class"]}"{"" if e["_current"] else " hidden"} href="items/{_file_slug(e)}.html" '
+            f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
+            f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" loading="lazy"></a>')
+
+
+def _hero_grid(groups) -> str:
+    """Four attribute columns side by side, portraits alphabetical row by row — the hero picker."""
+    cols = []
+    for label, icon, lst in groups:
+        cols.append(f'<section class="ec-hcol ec-hcol-{label.lower()}">'
+                    f'<h3 class="ec-group-title"><img class="ec-group-icon" src="{icon}" alt="">{_esc(label)}</h3>'
+                    f'<div class="ec-hcards">{"".join(_hero_card(e) for e in lst)}</div></section>')
+    return f'<div class="ec-hgrid">{"".join(cols)}</div>'
+
+
+def _item_grid(groups) -> str:
+    """Basics | Upgrades | Neutral Items panels, categories as 4-per-row icon blocks — the shop."""
+    by = {g: lst for g, _, lst in groups}
+
+    def block(title, lst, extra=""):
+        if not lst:
+            return ""
+        return (f'<section class="ec-group ec-igroup"><h4 class="ec-igroup-title">{_esc(title)}{extra}</h4>'
+                f'<div class="ec-icards">{"".join(_item_card(e) for e in lst)}</div></section>')
+
+    panels = []
+    for name, cats in _SHOP_PANELS:
+        body = "".join(block(c, by.get(c, [])) for c in cats)
+        panels.append(f'<section class="ec-ipanel"><h3 class="ec-group-title ec-ipanel-title">{_esc(name)}</h3>'
+                      f'<div class="ec-ipanel-body">{body}</div></section>')
+    tiers = "".join(block(f"Tier {t}", by.get(f"Neutral · Tier {t}", []),
+                          f'<span class="ec-tier-time">{_TIER_TIME[t]}</span>') for t in range(1, 6))
+    tiers += block("Removed neutrals", by.get("Neutral · Other", []))
+    ench = block("Neutral Enchantments", by.get("Enchantments", []))
+    panels.append('<section class="ec-ipanel ec-ipanel-neutral"><h3 class="ec-group-title ec-ipanel-title">Neutral Items</h3>'
+                  f'<div class="ec-ipanel-body ec-ipanel-body-1">{tiers}{ench}</div></section>')
+    return f'<div class="ec-igrid">{"".join(panels)}</div>'
 
 
 def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict | None = None) -> str:
@@ -433,17 +504,7 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
         e.setdefault("_current", True)
         e.setdefault("_class", "")
     n_old = sum(1 for e in ents if not e["_current"])
-    blocks = []
-    for title, icon, lst in groups:
-        cards = "".join(
-            f'<a class="ec-card ec-card-{kind}{"" if e["_current"] else " ec-old"}" data-current="{1 if e["_current"] else 0}"'
-            f' data-class="{e["_class"]}"{"" if e["_current"] else " hidden"} href="{folder}/{_file_slug(e)}.html" '
-            f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
-            f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="" loading="lazy">'
-            f'<span class="ec-card-name">{_esc(e["name"])}</span></a>' for e in lst)
-        head = (f'<img class="ec-group-icon" src="{icon}" alt="">' if icon else "") + _esc(title)
-        blocks.append(f'<section class="ec-group"><h3 class="ec-group-title">{head}</h3>'
-                      f'<div class="ec-cols ec-cols-{kind}">{cards}</div></section>')
+    grid = _hero_grid(groups) if kind == "hero" else _item_grid(groups)
     plural = "heroes" if kind == "hero" else "items"
     return (_head(label, asset, "", "") + '>\n' + nav +
             '\n<div class="container creeps-page ec-index">\n<div class="creeps-scroll">\n' + subnav +
@@ -460,7 +521,7 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
             + (f'<label class="ua-upgrades-toggle"><span class="ua-upgrades-label">Show deleted ({n_old})</span>'
                '<input type="checkbox" id="ec-show-old" class="ua-switch-input">'
                '<span class="ua-switch" aria-hidden="true"></span></label>' if n_old else '')
-            + '</div></div>' + "".join(blocks) + '</div>\n</div>\n</div>\n'
+            + '</div></div>' + grid + '</div>\n</div>\n</div>\n'
             f'<script defer src="src/scripts.js?v={asset}"></script>\n</body>\n</html>\n')
 
 

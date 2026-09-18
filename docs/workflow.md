@@ -238,6 +238,12 @@ from the rendered `dist/patches/*.html` and writes `dist/heroes/<slug>.html`, `d
 headers on patch pages link there (`_entity_link` in `patch/elements.py`). Nothing to do per patch: a new
 `content/p*.py` shows up automatically on the next build.
 
+The index pages mirror the game: `hero_changes.html` is the hero picker (Strength / Agility / Intelligence /
+Universal columns, vertical portraits from `icons/heroes_vert/<npc>.jpg`, alphabetical row by row), `item_changes.html`
+is the shop (Basics | Upgrades | Neutral Items panels, categories from `data/shops.txt` via the Hero Lab `SHOP_ORDER`,
+neutral tiers with unlock times and enchantments in KV order; the manifest tier is 0-based). Removed items sit behind
+"Show deleted"; a category or column with nothing visible collapses.
+
 Ability chips on a hero page also pull in **talents**: at build time `_tag_talent_rows` marks every row of a
 Talents block that names one of the hero's abilities (`data-ec-ab="Nether Ward|Life Drain"`, longest name
 wins on overlaps), and the filter in `src/scripts.js` keeps only those rows while a chip is active. A current

@@ -9903,20 +9903,50 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
   font-family: var(--font-j25); font-weight: 400; font-size: 22px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-bright);
 }
 .ec-group-icon { width: 20px; height: 20px; }
-.ec-cols { column-gap: 8px; }
-.ec-cols-hero { column-width: 168px; }
-.ec-cols-item { column-width: 190px; }
+/* Index cards = plain icons, like the in-game hero picker / shop */
 .ec-card {
-  display: flex; align-items: center; gap: 9px; break-inside: avoid; margin: 0 0 6px;
-  padding: 4px 8px 4px 4px; border: 1px solid var(--line); border-radius: 5px; background: var(--bg-panel-3);
-  color: inherit; text-decoration: none; transition: border-color 0.12s ease, filter 0.12s ease;
+  display: block; border: 1px solid rgba(0, 0, 0, 0.55); border-radius: 3px; background: var(--bg-panel-3);
+  overflow: hidden; color: inherit; text-decoration: none; transition: filter 0.12s ease, transform 0.12s ease, border-color 0.12s ease;
 }
 .ec-card[hidden] { display: none; }
-.ec-card:hover { border-color: var(--gold-line); filter: brightness(1.12); }
-.ec-card img { width: 57px; height: auto; border-radius: 3px; flex: 0 0 auto; }
-.ec-card-item img { width: 44px; }
-.ec-card.ec-old { opacity: 0.6; }
-.ec-card-name { font-weight: 600; font-size: 13px; line-height: 1.2; }
+.ec-card:hover { border-color: var(--gold-line); filter: brightness(1.18); transform: translateY(-1px); }
+.ec-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ec-card.ec-old { opacity: 0.55; filter: grayscale(0.6); }
+.ec-card.ec-old:hover { opacity: 1; filter: none; }
+/* Heroes: Strength | Agility | Intelligence | Universal columns (6/6/6/4 portraits per row) */
+.ec-hgrid { display: grid; grid-template-columns: 6fr 6fr 6fr 4fr; gap: 0 22px; margin-top: 14px; }
+.ec-hcol[hidden], .ec-igroup[hidden] { display: none; }
+.ec-hcards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
+.ec-hcol-universal .ec-hcards { grid-template-columns: repeat(4, 1fr); }
+.ec-card-hero { aspect-ratio: 235 / 272; }
+.ec-hcol-strength .ec-group-title { color: #d9534f; }
+.ec-hcol-agility .ec-group-title { color: #5cb85c; }
+.ec-hcol-intelligence .ec-group-title { color: #5bc0de; }
+.ec-hcol-universal .ec-group-title { color: #b39ddb; }
+/* Items: Basics | Upgrades | Neutral Items panels, 4 icons per row inside a category */
+.ec-igrid { display: grid; grid-template-columns: 4fr 4fr 3fr; gap: 0 16px; margin-top: 14px; }
+.ec-ipanel { border: 1px solid var(--line); border-radius: 6px; background: rgba(0, 0, 0, 0.18); padding: 10px 12px 6px; }
+.ec-ipanel-title { justify-content: center; font-size: 20px; }
+.ec-ipanel-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 18px; align-content: start; }
+.ec-ipanel-body-1 { grid-template-columns: 1fr; }
+.ec-igroup { margin: 8px 0 4px; }
+.ec-igroup-title {
+  display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 6px;
+  font-family: var(--font-j25); font-weight: 400; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+}
+.ec-tier-time { font-family: inherit; font-size: 12px; letter-spacing: 0.5px; text-transform: none; color: var(--text-dim); }
+.ec-icards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.ec-ipanel-neutral .ec-icards { grid-template-columns: repeat(6, 1fr); }
+.ec-card-item { aspect-ratio: 88 / 64; }
+@media (max-width: 1100px) {
+  .ec-hgrid { grid-template-columns: 1fr 1fr; }
+  .ec-igrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .ec-hgrid { grid-template-columns: 1fr; }
+  .ec-hcards, .ec-hcol-universal .ec-hcards { grid-template-columns: repeat(5, 1fr); }
+  .ec-ipanel-body { grid-template-columns: 1fr; }
+}
 
 /* Tighter end of a section panel (patch pages AND Changes pages): the panel is cut ~12px under
    its last row instead of ~47px (ul 3 + ability-block 8 + entity-block 16 + panel 20). */

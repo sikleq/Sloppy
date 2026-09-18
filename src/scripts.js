@@ -3465,6 +3465,10 @@
       const wrongClass = classes.size > 0 && !classes.has(c.dataset.class || '');
       c.hidden = old || wrongClass || (terms.length > 0 && !terms.some(t => n.includes(t)));
     });
+    // a shop category / neutral tier / attribute column with nothing left collapses
+    document.querySelectorAll('.ec-igroup, .ec-hcol').forEach(g => {
+      g.hidden = ![...g.querySelectorAll('.ec-card')].some(c => !c.hidden);
+    });
     document.querySelectorAll('.ec-group').forEach(g => {
       g.hidden = ![...g.querySelectorAll('.ec-card')].some(c => !c.hidden);
     });
