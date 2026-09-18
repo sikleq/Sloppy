@@ -9929,6 +9929,15 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-hcards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .ec-hcol-universal .ec-hcards { grid-template-columns: repeat(3, 1fr); }
 .ec-card-hero { aspect-ratio: 256 / 144; }
+.ec-hcol { display: flex; flex-direction: column; }
+.ec-hstats { margin-top: auto; padding-top: 14px; }               /* pinned to the bottom → all four line up */
+.ec-hstat-row { display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
+  font-size: 12px; line-height: 1.5; padding: 1px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+.ec-hstat-row span { color: var(--text-dim); white-space: nowrap; }
+.ec-hstat-row b { color: var(--text-bright); font-weight: 600; text-align: right; }
+.ec-hstat-who { color: var(--text-dim); font-weight: 400; }
+.ec-hstat-head { margin: 7px 0 2px; font-family: var(--font-j25); font-weight: 400; font-size: 13px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--text-bright); opacity: 0.85; }
 .ec-hcol-strength .ec-group-title { color: #d9534f; }
 .ec-hcol-agility .ec-group-title { color: #5cb85c; }
 .ec-hcol-intelligence .ec-group-title { color: #5bc0de; }

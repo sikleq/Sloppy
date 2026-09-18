@@ -475,13 +475,103 @@ def _item_card(e: dict) -> str:
 
 
 
+_HERO_STAT_CACHE = None
+
+
+def _hero_stat_data():
+    """(slim heroes.json, raw heroes_raw.json) for the latest stats snapshot — base attributes,
+    gains, movement speed (slim) and melee/ranged (raw AttackCapabilities, #base-inherited)."""
+    global _HERO_STAT_CACHE
+    if _HERO_STAT_CACHE is None:
+        from patch.meta import latest_stats_version
+        v = latest_stats_version()
+        slim = _json.loads((_HERE / "data" / "stats" / v / "heroes.json").read_text(encoding="utf-8"))
+        raw = _json.loads((_HERE / "data" / "stats" / v / "heroes_raw.json").read_text(encoding="utf-8"))
+        _HERO_STAT_CACHE = (slim, raw)
+    return _HERO_STAT_CACHE
+
+
+# level-1 HP / mana constants (same as builders/heroes_stats.py: 120 + 22·Str, 75 + 12·Int)
+_HP_BASE, _HP_PER_STR, _MP_BASE, _MP_PER_INT = 120.0, 22.0, 75.0, 12.0
+# which base-attribute / gain field the category's "starting stat" refers to
+_CAT_ATTR = {"Strength": "Strength", "Agility": "Agility", "Intelligence": "Intelligence"}
+
+
+def _raw_cap(raw, npc):
+    """AttackCapabilities with #base inheritance (matches heroes_stats._raw_field)."""
+    d = raw.get(f"npc_dota_hero_{npc}", {})
+    cap = d.get("AttackCapabilities")
+    if cap is None:
+        cap = raw.get("npc_dota_hero_base", {}).get("AttackCapabilities")
+    return cap or ""
+
+
+def _hero_group_stats(label, lst):
+    """Summary shown under a category column: melee/ranged split, category-attribute extremes
+    (highest/lowest base and gain + the hero), and averages (move speed, level-1 HP/mana, STR/AGI/INT)."""
+    slim, raw = _hero_stat_data()
+    rows = []
+    for e in lst:
+        npc = _re.sub(r"^.*/|\.png$", "", e["icon"])
+        d = slim.get(f"npc_dota_hero_{npc}")
+        if not d:
+            continue
+        g = lambda k: float(d.get(k) or 0)
+        rows.append({
+            "name": e["name"], "melee": "MELEE" in _raw_cap(raw, npc),
+            "str": g("AttributeBaseStrength"), "agi": g("AttributeBaseAgility"), "int": g("AttributeBaseIntelligence"),
+            "strg": g("AttributeStrengthGain"), "agig": g("AttributeAgilityGain"), "intg": g("AttributeIntelligenceGain"),
+            "ms": g("MovementSpeed"),
+        })
+    if not rows:
+        return ""
+    n = len(rows)
+    melee = sum(1 for r in rows if r["melee"])
+    avg = lambda f: sum(f(r) for r in rows) / n
+    hp = lambda r: _HP_BASE + _HP_PER_STR * r["str"]
+    mp = lambda r: _MP_BASE + _MP_PER_INT * r["int"]
+    # category attribute: primary for STR/AGI/INT, the sum of all three for Universal
+    if label in _CAT_ATTR:
+        a = {"strength": "str", "agility": "agi", "intelligence": "int"}[label.lower()]
+        base_of, gain_of, attr_label = (lambda r: r[a]), (lambda r: r[a + "g"]), label
+    else:
+        base_of = lambda r: r["str"] + r["agi"] + r["int"]
+        gain_of = lambda r: r["strg"] + r["agig"] + r["intg"]
+        attr_label = "Attributes"
+    hi_base = max(rows, key=base_of); lo_base = min(rows, key=base_of)
+    hi_gain = max(rows, key=gain_of); lo_gain = min(rows, key=gain_of)
+
+    def num(x):
+        return f"{x:.1f}".rstrip("0").rstrip(".")
+
+    def row(lbl, val):
+        return f'<div class="ec-hstat-row"><span>{lbl}</span><b>{val}</b></div>'
+
+    def ext(who, val):
+        return f'{num(val)} <span class="ec-hstat-who">{_esc(who["name"])}</span>'
+
+    out = [
+        row("Melee / Ranged", f'{melee} / {n - melee}'),
+        row("Avg move speed", f'{round(avg(lambda r: r["ms"]))}'),
+        row("Avg HP / mana (lvl 1)", f'{round(avg(hp))} / {round(avg(mp))}'),
+        row("Avg STR / AGI / INT", f'{num(avg(lambda r: r["str"]))} / {num(avg(lambda r: r["agi"]))} / {num(avg(lambda r: r["int"]))}'),
+        f'<div class="ec-hstat-head">{_esc(attr_label)}</div>',
+        row("Highest base", ext(hi_base, base_of(hi_base))),
+        row("Lowest base", ext(lo_base, base_of(lo_base))),
+        row("Highest gain", ext(hi_gain, gain_of(hi_gain))),
+        row("Lowest gain", ext(lo_gain, gain_of(lo_gain))),
+    ]
+    return f'<div class="ec-hstats">{"".join(out)}</div>'
+
+
 def _hero_grid(groups) -> str:
     """Four attribute columns side by side, portraits alphabetical row by row — the hero picker."""
     cols = []
     for label, icon, lst in groups:
         cols.append(f'<section class="ec-hcol ec-hcol-{label.lower()}">'
                     f'<h3 class="ec-group-title"><img class="ec-group-icon" src="{icon}" alt="">{_esc(label)}</h3>'
-                    f'<div class="ec-hcards">{"".join(_hero_card(e) for e in lst)}</div></section>')
+                    f'<div class="ec-hcards">{"".join(_hero_card(e) for e in lst)}</div>'
+                    f'{_hero_group_stats(label, lst)}</section>')
     return f'<div class="ec-hgrid">{"".join(cols)}</div>'
 
 
