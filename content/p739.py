@@ -323,7 +323,7 @@ def build():
     W(ul_open())
     W(li("Dormant Curio increases Burn Through's total damage from 72 to 93.6", t("NEW")))
     W(ul_close())
-    W(item_header("Pogo Stick"))
+    W(item_header("Tumbler's Toy"))
     W(ul_open())
     W(li("Dormant Curio increases Vault's jump distance from 300 to 390", t("NEW")))
     W(ul_close())

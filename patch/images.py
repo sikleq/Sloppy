@@ -236,7 +236,7 @@ ITEM_SLUG = {
     "Magic Lamp": "panic_button",
     "Stygian Desolator": "desolator_2",
     "Linken's Sphere": "sphere",
-    "Tumbler's Toy": "kobold_cup",
+    "Tumbler's Toy": "pogo_stick",
     "Disgraced Regalia": "divine_regalia_broken",
     # 7.39e Enchantments (engine slug: enhancement_<name>)
     "Timeless": "enhancement_timeless",
