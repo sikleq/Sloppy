@@ -47,7 +47,7 @@ def build():
     W(hero_header("Bloodseeker"))
     W(ability("Bloodrage"))
     W(ul_open())
-    W(li("Max Health Damage per second decreased from 1.4% to 1.2%", b(1.4, 1.2)))
+    W(li("Max Health Damage per second decreased from 1.4% to 1.2%", b(1.4, 1.2, l=True), extra=inline_note("Bloodrage's cost — the health per second Bloodseeker loses to it, so a lower value helps him")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
