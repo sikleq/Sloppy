@@ -93,7 +93,7 @@ def build():
     W(ul_close())
     W(subnote("Still can proc multiple times from a single instance of high damage"))
     W(ul_open())
-    W(li("Spellover damage threshold increased from 100 to 200", b(100, 200)))
+    W(li("Spellover damage threshold increased from 100 to 200", b(100, 200, l=True)))
     W(li("Spellover damage from hero targets increased from 40 to 80", b(40, 80)))
     W(ul_close())
     W(subnote("From 52 to 104 with Dormant Curio"))

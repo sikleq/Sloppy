@@ -108,7 +108,7 @@ def build():
     W(ul_close())
     W(item_header("Searing Signet"))
     W(ul_open())
-    W(li("Burn Through damage threshold increased from 40 to 55", b(40, 55)))
+    W(li("Burn Through damage threshold increased from 40 to 55", b(40, 55, l=True)))
     W(ul_close())
     W(item_header("Gale Guard"))
     W(ul_open())

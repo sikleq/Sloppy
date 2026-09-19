@@ -1120,7 +1120,7 @@ def build():
                  levels=list(range(1, 11)), level_prefix='W',
                  value_fmt="{:g}"))
     W(li("Aghanim's Scepter Twister duration changed from 4s to (3s + 0.2s × Quas)", t("REWORK"), extra=inline_note("3.2/3.4/3.6/3.8/4.0/4.2/4.4/4.6/4.8/5s")))
-    W(li("Aghanim's Scepter Twister spawn interval increased from 300 to 400", b(300, 400)))
+    W(li("Aghanim's Scepter Twister spawn interval increased from 300 to 400", b(300, 400, l=True)))
     W(ul_close())
     W(facet_header("invoker_exort_focus"))
     W(ability("Exort", slug="invoker_exort", sub=True))

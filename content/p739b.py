@@ -162,7 +162,7 @@ def build():
     W(ul_close())
     W(facet_header("enigma_fragment"))
     W(ul_open())
-    W(li("Damage threshold increased from 350 to 375", b(350, 375)))
+    W(li("Damage threshold increased from 350 to 375", b(350, 375, l=True)))
     W(ul_close())
 
     # Kez

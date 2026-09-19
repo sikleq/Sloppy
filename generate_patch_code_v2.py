@@ -303,7 +303,7 @@ LOWER_IS_BUFF = re.compile(
     r'|base attack time|\bBAT\b'
     r'|incoming damage|damage taken|damage vulnerability|building damage penalty'
     r'|status duration|stun resistance'
-    r'|magic resistance|attack point|projectile speed.*incoming'
+    r'|attack point|projectile speed.*incoming'
     r'|penalty'
     r'|(?:intelligence|agility|strength)\s+required'
     r'|recharge\s+(?:time|cooldown)'
@@ -313,10 +313,10 @@ LOWER_IS_BUFF = re.compile(
     r'|respawn\s+time'
     # 2026-09-18 proofread: self-penalties, owner-side timers and thresholds
     r'|disable\s+(?:range|radius|duration)'
-    r'|(?:damage|attack|tick|pulse|explosion)\s+interval'
+    r'|(?:damage|attack|tick|pulse|explosion|spawn)\s+interval'
     r'|flight\s+time'
     r'|stun\s+duration\s+from\s+falling'
-    r'|(?:resistance|health|mana|gold|intelligence|agility|strength|armor|speed)\s+(?:loss|reduction)'
+    r'|slow\s+resistance\s+loss|status\s+resistance\s+loss'   # self-penalty (Spirit Breaker Relentless); NOT enemy armor/AS/MR reduction
     r'|creep\s+penalty|max\s+mana\s+penalty|vision\s+penalty'
     r'|mana\s+per\s+second'
     r'|health\s+cost'
@@ -335,7 +335,9 @@ _NOT_LOWER_IS_BUFF = re.compile(
     r'|\bper\s+cooldown\b'
     r'|\bmax\s+slow\b'
     r'|\bsearch\s+radius\b'
-    r'|\bmax\s+health\s+minimum\b',
+    r'|\bmax\s+health\s+minimum\b'
+    # "damage threshold reduction" is the opposite of a raw "damage threshold": more reduction = better
+    r'|\bthreshold\s+reduction\b',
     re.I,
 )
 

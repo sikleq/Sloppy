@@ -313,7 +313,7 @@ def build():
     W(hero_header("Shadow Demon"))
     W(facet_header("shadow_demon_promulgate"))
     W(ul_open())
-    W(li("Disseminate: Health loss decreased from 9/11/13/15% to 9/10/11/12%", b([9, 11, 13, 15], [9, 10, 11, 12], l=True)))
+    W(li("Disseminate: Health loss decreased from 9/11/13/15% to 9/10/11/12%", b([9, 11, 13, 15], [9, 10, 11, 12])))
     W(ul_close())
 
     # Slardar

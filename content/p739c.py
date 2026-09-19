@@ -400,7 +400,7 @@ def build():
     W(ul_close())
     W(ability("Epicenter", slug="sandking_epicenter"))
     W(ul_open())
-    W(li("Aghanim's Shard pulse interval decreased from 3.5s to 3s", b(3.5, 3)))
+    W(li("Aghanim's Shard pulse interval decreased from 3.5s to 3s", b(3.5, 3, l=True)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
