@@ -222,6 +222,8 @@ CANONICAL_TAGS = [
     # sloppy_no_longer_penalty_is_buff). Tightly anchored so legitimate DEL
     # phrasings don't accidentally match.
     (re.compile(r'\bno longer has (?:an? |the )?(?:\w+ ){1,3}(?:penalty|restriction|drawback|downside|debuff slow)\b', re.I), 'BUFF'),
+    # removing an Aghs upgrade / benefit ("no longer decreases cooldown / stun delay") = DEL, not BUFF
+    (re.compile(r'\bno longer (?:decreases|reduces)\b(?:(?!wind[- ]?up).)*?\b(?:cooldown|stun delay)\b', re.I), 'DEL'),
     (re.compile(r'\bno longer (?:reduces|decreases) ', re.I),       'BUFF'),
     (re.compile(r'\bno longer requires (?:a |an )?(?:skill point|mana|charge)', re.I), 'BUFF'),
     # ── classes from the 2026-09-18 datafeed proofread (memory: sloppy-datafeed-proofread-method) ──
@@ -247,7 +249,8 @@ CANONICAL_TAGS = [
     # a capability is taken away → DEL
     (re.compile(r'\bno longer (?:stealable|copyable|benefits? from|blinks?|copy|copies|has an alt-cast)\b', re.I), 'DEL'),
     # structural change of the entity → REWORK
-    (re.compile(r'^Now (?:a|an) (?:universal|strength|agility|intelligence)\b', re.I), 'REWORK'),
+    (re.compile(r'^(?:Now|Is now) (?:a|an) (?:universal|strength|agility|intelligence)\b', re.I), 'REWORK'),
+    (re.compile(r'\bgained (?:a |an )?(?:\d+% )?creep penalty\b', re.I), 'NERF'),   # lifesteal now hits a creep penalty
     (re.compile(r"^Now \w+'s? (?:ultimate|basic|innate) ability\b", re.I), 'REWORK'),
     (re.compile(r'\b(?:ability )?is now (?:an? )?innate\b', re.I),  'REWORK'),
     # NERF — adding a penalty/restriction is negative (inverse of no-longer-has-penalty)
@@ -276,7 +279,7 @@ CANONICAL_TAGS = [
     (re.compile(r'\bis not applied if\b', re.I),                    'DEL'),   # "X is not applied if Debuff Immune"
     (re.compile(r'\bno longer upgraded with Aghanim', re.I),        'DEL'),
     (re.compile(r"\bno longer.*'s? ability\b", re.I),               'DEL'),
-    (re.compile(r'\bno longer (?:provides|grants|deals|fires|spawns|summons|adds|increases|works|considered|active|applied)\b', re.I), 'DEL'),
+    (re.compile(r'\bno longer (?:provides|grants|deals|fires|spawns|summons|adds|increases|works|considered|active|applied|kills|slows|buffs|restores|silences|freezes|suspends|manipulates|instantly)\b', re.I), 'DEL'),
     (re.compile(r'\bno longer levels with\b', re.I),                'REWORK'),  # memory rule: structural
     (re.compile(r'\bno longer has\b(?! (?:an? |the )?(?:\w+ )?(?:penalty|restriction|drawback|downside|debuff slow|separate))', re.I), 'DEL'),  # "X no longer has True Strike/feature" → DEL; excludes BUFF-pattern exceptions
     (re.compile(r'\bno longer counts? as\b', re.I),                 'DEL'),    # "Hero Creeps no longer count as heroes"

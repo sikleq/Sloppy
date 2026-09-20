@@ -93,6 +93,17 @@ from generate_patch_code_v2 import _guess_tag, LOWER_IS_BUFF, _NOT_LOWER_IS_BUFF
     ("Now an Agility Hero", "REWORK"),
     ("Now Spectre's ultimate ability", "REWORK"),
     ("Ability is now Innate to Spirit Bear", "REWORK"),
+    # 7.38 base-patch classes
+    ("Is now an Agility Hero", "REWORK"),
+    ("Is now a Universal Hero", "REWORK"),
+    ("Now follows global Lifesteal rules (as a result, gained 40% creep penalty)", "NERF"),
+    ("Aghanim's Shard no longer decreases cooldown by 10s", "DEL"),
+    ("Reality: No longer decreases cooldown", "DEL"),
+    ("No longer instantly kills enemy illusions", "DEL"),
+    ("Shadowraze: No longer slows attack speed", "DEL"),
+    ("No longer buffs allies", "DEL"),
+    ("No longer restores mana", "DEL"),
+    ("Sharpshooter: No longer decreases max wind-up time", "BUFF"),
 ])
 def test_guess_tag(text, expected):
     assert _guess_tag(text) == expected
