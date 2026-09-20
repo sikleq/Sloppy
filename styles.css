@@ -7321,7 +7321,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
     box-shadow 0.16s ease;
 }
 .hl-hero-tile.is-hidden,
-.hl-hero-group.is-hidden {
+.hl-hero-group.is-hidden,
+.hl-item-tile.is-hidden,
+.hl-item-section.is-hidden {
   display: none !important;
 }
 .hl-hero-tile img,

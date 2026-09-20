@@ -4632,6 +4632,9 @@
             <button type="button" class="hl-picker-close" data-picker-close aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
           </div>
         </div>
+        <div class="hl-picker-searchbar">
+          <input type="text" class="hl-picker-search" data-item-search placeholder="Search item..." aria-label="Search item" autocomplete="off">
+        </div>
         <div class="hl-shop-body hl-shop-4col">
           <div class="hl-shop-col">
             ${['Consumables','Equipment','Secret Shop'].map(function(n){ var p=itemGroups.basics.find(function(x){return x[0]===n}); return p?itemSectionMarkup(p[0],p[1],selectedId):''; }).join('')}
@@ -4723,6 +4726,17 @@
     }
     overlay.hidden = false;
     overlay.classList.add('is-open');
+    // reset the search and highlight the current item, then focus for keyboard use
+    const isearch = overlay.querySelector('[data-item-search]');
+    if (isearch) {
+      isearch.value = '';
+      overlay.querySelectorAll('.hl-item-tile').forEach(t => {
+        t.classList.remove('is-hidden');
+        t.classList.toggle('is-selected', !!selectedId && t.dataset.itemId === selectedId);
+      });
+      overlay.querySelectorAll('.hl-item-section').forEach(s => s.classList.remove('is-hidden'));
+      isearch.focus();
+    }
   }
 
 
@@ -4788,8 +4802,10 @@
   }
 
   const panels = [...root.querySelectorAll('.hl-panel')];
-  renderPanel(panels[0], 'a', heroes[0].id);
-  renderPanel(panels[1], 'b', heroes[Math.min(1, heroes.length - 1)].id);
+  // left defaults to the first hero of the picker grid (Alchemist), right keeps Abaddon
+  const leftDefaultHero = byHero.has('alchemist') ? 'alchemist' : heroes[Math.min(1, heroes.length - 1)].id;
+  renderPanel(panels[0], 'a', leftDefaultHero);
+  renderPanel(panels[1], 'b', heroes[0].id);
   panels.forEach(p => updateLevelRing(p));
   (function() {
     const dd = document.querySelector('.hero-lab-toolbar .hd-dd[data-dd="diffstat"]');
@@ -5040,28 +5056,35 @@
       update();
     }
   });
+  // search filter + keyboard navigation, shared by the hero picker and the item shop
+  const HL_SEARCH_SEL = '[data-hero-search], [data-item-search]';
+  const hlTiles = (input) => input.matches('[data-hero-search]')
+    ? { tile: '.hl-hero-tile', group: '.hl-hero-group' }
+    : { tile: '.hl-item-tile', group: '.hl-item-section' };
   overlay.addEventListener('input', (e) => {
-    const input = e.target.closest('[data-hero-search]');
+    const input = e.target.closest(HL_SEARCH_SEL);
     if (!input) return;
+    const sel = hlTiles(input);
     const q = String(input.value || '').trim().toLowerCase();
-    overlay.querySelectorAll('.hl-hero-tile').forEach(tile => {
+    overlay.querySelectorAll(sel.tile).forEach(tile => {
       const name = String(tile.getAttribute('aria-label') || '').toLowerCase();
       tile.classList.toggle('is-hidden', !!q && !name.includes(q));
     });
-    overlay.querySelectorAll('.hl-hero-group').forEach(group => {
-      const anyVisible = [...group.querySelectorAll('.hl-hero-tile')].some(tile => !tile.classList.contains('is-hidden'));
+    overlay.querySelectorAll(sel.group).forEach(group => {
+      const anyVisible = [...group.querySelectorAll(sel.tile)].some(tile => !tile.classList.contains('is-hidden'));
       group.classList.toggle('is-hidden', !anyVisible);
     });
-    // keep a highlighted result so Enter / arrows have a starting point
-    const visible = [...overlay.querySelectorAll('.hl-hero-tile:not(.is-hidden)')];
-    if (visible.length && !overlay.querySelector('.hl-hero-tile.is-selected:not(.is-hidden)')) {
-      overlay.querySelectorAll('.hl-hero-tile').forEach(tile => tile.classList.toggle('is-selected', tile === visible[0]));
+    // while searching, keep the first match highlighted so Enter / arrows have a starting point
+    const visible = [...overlay.querySelectorAll(sel.tile + ':not(.is-hidden)')];
+    if (q && visible.length && !overlay.querySelector(sel.tile + '.is-selected:not(.is-hidden)')) {
+      overlay.querySelectorAll(sel.tile).forEach(tile => tile.classList.toggle('is-selected', tile === visible[0]));
     }
   });
-  // keyboard search navigation in the hero picker (contributed by r41ngee, PR #12)
+  // keyboard navigation (hero picker contributed by r41ngee, PR #12; extended to the item shop)
   overlay.addEventListener('keydown', (e) => {
-    const input = e.target.closest('[data-hero-search]');
+    const input = e.target.closest(HL_SEARCH_SEL);
     if (!input) return;
+    const tileSel = hlTiles(input).tile;
     if (e.key === 'Escape') {
       e.preventDefault();
       if (input.value) {                       // has text → clear the search
@@ -5073,24 +5096,20 @@
       }
       return;
     }
-    const visible = [...overlay.querySelectorAll('.hl-hero-tile:not(.is-hidden)')];
+    const visible = [...overlay.querySelectorAll(tileSel + ':not(.is-hidden)')];
     if (!visible.length) return;
     if (e.key === 'Enter') {
       e.preventDefault();
-      const chosen = overlay.querySelector('.hl-hero-tile.is-selected:not(.is-hidden)') || visible[0];
-      if (chosen && activePicker && activePicker.panel) {
-        activePicker.panel.dataset.hero = chosen.dataset.heroId;
-        closePicker();
-        update();
-      }
+      const chosen = overlay.querySelector(tileSel + '.is-selected:not(.is-hidden)') || visible[0];
+      if (chosen) chosen.click();              // reuse the tile's own click handler (hero or item)
       return;
     }
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       e.preventDefault();
-      const current = overlay.querySelector('.hl-hero-tile.is-selected:not(.is-hidden)') || visible[0];
+      const current = overlay.querySelector(tileSel + '.is-selected:not(.is-hidden)') || visible[0];
       const cur = current.getBoundingClientRect();
       const cx0 = cur.left + cur.width / 2, cy0 = cur.top + cur.height / 2;
-      // spatial move: pick the nearest visible tile in the pressed direction (works across the four columns)
+      // spatial move: pick the nearest visible tile in the pressed direction (works across columns)
       let best = null, bestScore = Infinity;
       for (const tile of visible) {
         if (tile === current) continue;
@@ -5105,14 +5124,14 @@
         if (score < bestScore) { bestScore = score; best = tile; }
       }
       if (best) {
-        overlay.querySelectorAll('.hl-hero-tile').forEach(tile => tile.classList.toggle('is-selected', tile === best));
+        overlay.querySelectorAll(tileSel).forEach(tile => tile.classList.toggle('is-selected', tile === best));
         best.scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     }
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !overlay.hidden) {
-      const input = overlay.querySelector('[data-hero-search]');
+      const input = overlay.querySelector(HL_SEARCH_SEL);
       if (input && document.activeElement === input) return;   // handled by the picker's own Escape
       closePicker();
     }
