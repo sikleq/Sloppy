@@ -5052,9 +5052,57 @@
       const anyVisible = [...group.querySelectorAll('.hl-hero-tile')].some(tile => !tile.classList.contains('is-hidden'));
       group.classList.toggle('is-hidden', !anyVisible);
     });
+    // keep a highlighted result so Enter / arrows have a starting point
+    const visible = [...overlay.querySelectorAll('.hl-hero-tile:not(.is-hidden)')];
+    if (visible.length && !overlay.querySelector('.hl-hero-tile.is-selected:not(.is-hidden)')) {
+      overlay.querySelectorAll('.hl-hero-tile').forEach(tile => tile.classList.toggle('is-selected', tile === visible[0]));
+    }
+  });
+  // keyboard search navigation in the hero picker (contributed by r41ngee, PR #12)
+  overlay.addEventListener('keydown', (e) => {
+    const input = e.target.closest('[data-hero-search]');
+    if (!input) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      if (input.value) {                       // has text → clear the search
+        input.value = '';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.focus();
+      } else {                                 // already empty → close the picker
+        closePicker();
+      }
+      return;
+    }
+    const visible = [...overlay.querySelectorAll('.hl-hero-tile:not(.is-hidden)')];
+    if (!visible.length) return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const chosen = overlay.querySelector('.hl-hero-tile.is-selected:not(.is-hidden)') || visible[0];
+      if (chosen && activePicker && activePicker.panel) {
+        activePicker.panel.dataset.hero = chosen.dataset.heroId;
+        closePicker();
+        update();
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const current = overlay.querySelector('.hl-hero-tile.is-selected:not(.is-hidden)');
+      let idx = visible.indexOf(current);
+      idx = idx < 0
+        ? (e.key === 'ArrowDown' ? 0 : visible.length - 1)
+        : (e.key === 'ArrowDown' ? Math.min(idx + 1, visible.length - 1) : Math.max(idx - 1, 0));
+      const next = visible[idx];
+      overlay.querySelectorAll('.hl-hero-tile').forEach(tile => tile.classList.toggle('is-selected', tile === next));
+      next.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !overlay.hidden) closePicker();
+    if (e.key === 'Escape' && !overlay.hidden) {
+      const input = overlay.querySelector('[data-hero-search]');
+      if (input && document.activeElement === input) return;   // handled by the picker's own Escape
+      closePicker();
+    }
   });
 
   // ---- Item tooltip ----

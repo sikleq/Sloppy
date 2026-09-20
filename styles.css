@@ -7259,7 +7259,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .hl-hero-grid-wrap {
   display: grid;
-  gap: 16px;
+  grid-template-columns: 4fr 4fr 4fr 3fr;   /* Strength | Agility | Intelligence | Universal, like hero_changes */
+  gap: 0 18px;
+  align-items: start;
 }
 .hl-hero-group header,
 .hl-item-section header {
@@ -7273,17 +7275,33 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   letter-spacing: 0.11em;
 }
 .hl-hero-group header { color: #d8dee5; }
+/* attribute-coloured column headers, matching hero_changes */
+.hl-hero-group-str header { color: #d9534f; }
+.hl-hero-group-agi header { color: #5cb85c; }
+.hl-hero-group-int header { color: #5bc0de; }
+.hl-hero-group-uni header { color: #b39ddb; }
 .hl-item-section header { color: #e3c46a; margin-bottom: 2px; font-size: 10px; }
 .hl-hero-group-icon {
   width: 16px;
   height: 16px;
   display: block;
 }
-.hl-hero-grid,
 .hl-item-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(58px, 58px));
   gap: 6px;
+}
+/* Hero picker columns mirror hero_changes: fixed count per attribute column, icons fill the cell */
+.hl-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+.hl-hero-group-uni .hl-hero-grid { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 960px) { .hl-hero-grid-wrap { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) {
+  .hl-hero-grid-wrap { grid-template-columns: 1fr; }
+  .hl-hero-grid, .hl-hero-group-uni .hl-hero-grid { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); }
 }
 .hl-hero-tile,
 .hl-item-tile {
@@ -7315,6 +7333,12 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .hl-hero-tile {
   overflow: visible;
   z-index: 0;
+}
+/* in the 4-column layout the hero tile fills its cell (keeps the 256x144 icon ratio) */
+.hl-hero-grid .hl-hero-tile {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 256 / 144;
 }
 .hl-hero-tile:hover {
   z-index: 8;
