@@ -25,7 +25,9 @@ def write_head(version, date):
     # how long this version has been live (or how long it ran). Plain text,
     # no pill / no border.
     prev_part, age_part = _patch_meta_parts(version)
-    parts = [f'<span class="ti-released">Released: <b>{date}</b></span>']
+    parts = [f'<span class="ti-released">Released: '
+             f'<a class="ti-official" href="https://www.dota2.com/patches/{version}" target="_blank" rel="noopener" '
+             f'title="Official {version} notes on dota2.com"><b>{date}</b></a></span>']
     if prev_part:
         parts.append(f'<span class="ti-after">{prev_part}</span>')
     if age_part:

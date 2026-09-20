@@ -2241,6 +2241,18 @@ span.cal-full-day.has-patch {
   font-size: 13px;
   letter-spacing: 0.2px;
 }
+/* the release date links out to the official patch notes on dota2.com — subtle hint, gold on hover */
+.toolbar-patch-info .ti-official {
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px dashed rgba(213, 173, 95, 0.4);
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+.toolbar-patch-info .ti-official:hover,
+.toolbar-patch-info .ti-official:hover b {
+  color: #e3c46a;
+  border-bottom-color: rgba(227, 196, 106, 0.85);
+}
 .patch-age .age-sep {
   margin: 0 8px;
   opacity: 0.45;
