@@ -7294,10 +7294,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 /* Hero picker columns mirror hero_changes: fixed count per attribute column, icons fill the cell */
 .hl-hero-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 5px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
 }
-.hl-hero-group-uni .hl-hero-grid { grid-template-columns: repeat(4, 1fr); }
+.hl-hero-group-uni .hl-hero-grid { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 960px) { .hl-hero-grid-wrap { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 600px) {
   .hl-hero-grid-wrap { grid-template-columns: 1fr; }
