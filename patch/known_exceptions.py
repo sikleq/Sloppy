@@ -46,6 +46,10 @@ KNOWN_HISTORICAL_RENAMES = {
 }
 
 KNOWN_NON_DATAFEED_ABILITIES = {
+    # 7.38 innates that were renamed/removed later, so not in the current datafeed
+    ("Beastmaster", "beastmaster_call_of_the_wild_hawk"),
+    ("Crystal Maiden", "crystal_maiden_blueheart_floe"),
+    ("Drow Ranger", "drow_ranger_vantage_point"),
     ("Io", "wisp_essence_conduction"),
     ("Nyx Assassin", "nyx_assassin_nyxth_sense"),
     ("Snapfire", "snapfire_buckshot"),
