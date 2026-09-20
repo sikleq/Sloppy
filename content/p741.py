@@ -4539,7 +4539,7 @@ def build():
     W(li("Cooldown decreased from 30/26/22/18s to 24/21/18/15s", b([30, 26, 22, 18], [24, 21, 18, 15], l=True)))
     W(li("Cast Range increased from 750/900/1050/1200 to 825/950/1075/1200", b([750, 900, 1050, 1200], [825, 950, 1075, 1200])))
     W(li("Illusion Damage increased from 32/38/44/50% to 35/40/45/50%", b([32, 38, 44, 50], [35, 40, 45, 50])))
-    W(li("Illusion Damage Taken decreased from 200% to 200/185/170/155%", b(200, [200, 185, 170, 155])))
+    W(li("Illusion Damage Taken decreased from 200% to 200/185/170/155%", b(200, [200, 185, 170, 155], l=True)))
     W(ul_close())
     W(ability("Haunt"))
     W(ul_open())
@@ -5099,7 +5099,7 @@ def build():
     W(li("Aghanim's Scepter upgrade no longer refreshes ability cooldowns on activating", t("DEL")))
     W(li("Aghanim's Scepter now increases self-bonus up to 1.3x", t("NEW")))
     W(li("Aghanim's Scepter illusion is now fully affected by Vengeance Aura's bonus", t("NEW")))
-    W(li("Aghanim's Scepter illusion damage taken decreased from 115% to 100%", b(115, 100)))
+    W(li("Aghanim's Scepter illusion damage taken decreased from 115% to 100%", b(115, 100, l=True)))
     W(ul_close())
 
     # Venomancer
