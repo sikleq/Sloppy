@@ -5085,16 +5085,29 @@
       }
       return;
     }
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       e.preventDefault();
-      const current = overlay.querySelector('.hl-hero-tile.is-selected:not(.is-hidden)');
-      let idx = visible.indexOf(current);
-      idx = idx < 0
-        ? (e.key === 'ArrowDown' ? 0 : visible.length - 1)
-        : (e.key === 'ArrowDown' ? Math.min(idx + 1, visible.length - 1) : Math.max(idx - 1, 0));
-      const next = visible[idx];
-      overlay.querySelectorAll('.hl-hero-tile').forEach(tile => tile.classList.toggle('is-selected', tile === next));
-      next.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      const current = overlay.querySelector('.hl-hero-tile.is-selected:not(.is-hidden)') || visible[0];
+      const cur = current.getBoundingClientRect();
+      const cx0 = cur.left + cur.width / 2, cy0 = cur.top + cur.height / 2;
+      // spatial move: pick the nearest visible tile in the pressed direction (works across the four columns)
+      let best = null, bestScore = Infinity;
+      for (const tile of visible) {
+        if (tile === current) continue;
+        const r = tile.getBoundingClientRect();
+        const dx = (r.left + r.width / 2) - cx0, dy = (r.top + r.height / 2) - cy0;
+        let along, across;
+        if (e.key === 'ArrowRight') { if (dx <= 1) continue; along = dx; across = Math.abs(dy); }
+        else if (e.key === 'ArrowLeft') { if (dx >= -1) continue; along = -dx; across = Math.abs(dy); }
+        else if (e.key === 'ArrowDown') { if (dy <= 1) continue; along = dy; across = Math.abs(dx); }
+        else { if (dy >= -1) continue; along = -dy; across = Math.abs(dx); }
+        const score = along + across * 2;     // prefer tiles aligned with the movement axis
+        if (score < bestScore) { bestScore = score; best = tile; }
+      }
+      if (best) {
+        overlay.querySelectorAll('.hl-hero-tile').forEach(tile => tile.classList.toggle('is-selected', tile === best));
+        best.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
     }
   });
   document.addEventListener('keydown', (e) => {
