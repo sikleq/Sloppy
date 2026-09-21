@@ -1027,6 +1027,14 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             text_inner = f'{text_base}{marker}'
     else:
         text_inner = text_base
+    # Ability-rows collapse the tag column (CSS: grid-template-columns 1fr auto),
+    # so a real leading badge stays a grid item and auto-places into the SAME
+    # column as the text, overlapping it (7.38 neutral-artifact "Passive:" rows
+    # under a NEW badge). Fold the badge INTO the row text so it renders inline
+    # at the front — exactly what the ability-row design intends.
+    if 'ability-row' in classes and '<span class="badge' in left_tag:
+        text_inner = f'{left_tag} {text_inner}'
+        left_tag = '<span class="row-tag-empty"></span>'
     return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text_inner}</span>{rest}{extra}</li>'
 
 

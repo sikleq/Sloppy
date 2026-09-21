@@ -1440,7 +1440,9 @@ _NOW_REQUIRES_RE = re.compile(
 # Two emission shapes for the same semantic case (net cost zero):
 #   A) "Recipe cost X from A to B. Total cost unchanged at C ..." — single string
 #   B) "Recipe cost X from A to B"  +  inline_note("Total cost unchanged ...")
-# Both should become t("MISC") + inline badge.
+# A cheaper recipe with an unchanged total is a BUFF (component stats arrive
+# earlier and the final combine is cheaper); a pricier recipe is a NERF. So the
+# recipe b() badge drives the row tag — NOT t("MISC").
 # "Recipe cost X→Y. Total cost decreased/increased X→Y" — both changed.
 # Badge by total cost; recipe % goes inline in the text.
 _RECIPE_COST_BOTH_CHANGED_RE = re.compile(
@@ -1464,8 +1466,8 @@ _RECIPE_COST_UNCHANGED_SPLIT_RE = re.compile(
 def _postprocess_recipe_cost_zero_net(lines):
     """Rewrite recipe-cost rows to the correct badge form:
     - Both recipe and total changed: recipe % inline, total badge as main.
-    - Recipe changed, total unchanged: t("MISC") + inline recipe badge.
-    Per content-rules: tag follows total cost, recipe % always inline.
+    - Recipe changed, total unchanged: recipe badge as main (BUFF if cheaper,
+      NERF if pricier) — a cheaper recipe is a real player benefit.
     """
     out = []
     for line in lines:
@@ -1482,16 +1484,15 @@ def _postprocess_recipe_cost_zero_net(lines):
         if m:
             prefix, a, mid, b_val, tail = m.groups()
             out.append(
-                f'W(li("{prefix}{a}{mid}{b_val} " + b({a}, {b_val}, l=True) + "{tail}", '
-                f't("MISC")))'
+                f'W(li("{prefix}{a}{mid}{b_val}{tail}", b({a}, {b_val}, l=True)))'
             )
             continue
         m = _RECIPE_COST_UNCHANGED_SPLIT_RE.match(line)
         if m:
             prefix, a, mid, b_val, note_text = m.groups()
             out.append(
-                f'W(li("{prefix}{a}{mid}{b_val} " + b({a}, {b_val}, l=True), '
-                f't("MISC"), extra=inline_note("{note_text}")))'
+                f'W(li("{prefix}{a}{mid}{b_val}", b({a}, {b_val}, l=True), '
+                f'extra=inline_note("{note_text}")))'
             )
             continue
         out.append(line)

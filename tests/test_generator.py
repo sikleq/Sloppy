@@ -3,7 +3,10 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pytest
-from generate_patch_code_v2 import _guess_tag, LOWER_IS_BUFF, _NOT_LOWER_IS_BUFF
+from generate_patch_code_v2 import (
+    _guess_tag, LOWER_IS_BUFF, _NOT_LOWER_IS_BUFF,
+    _postprocess_recipe_cost_zero_net,
+)
 
 
 # ── _guess_tag: canonical phrase → expected tag ────────────────────────────
@@ -188,3 +191,39 @@ def test_lower_is_buff(text, should_match):
 def test_not_lower_is_buff_exclusions(text):
     assert LOWER_IS_BUFF.search(text), f"Should match LOWER_IS_BUFF base: {text}"
     assert _NOT_LOWER_IS_BUFF.search(text), f"Should be excluded by _NOT_LOWER_IS_BUFF: {text}"
+
+
+# ── Recipe cost with unchanged total → BUFF/NERF (not MISC) ────────────────
+# A cheaper recipe with an unchanged total is a real player benefit (component
+# stats arrive earlier, the final combine is cheaper); a pricier recipe is a
+# nerf. The recipe b() badge must drive the row, never t("MISC").
+
+def _pp1(line):
+    return _postprocess_recipe_cost_zero_net([line])[0]
+
+
+def test_recipe_cheaper_total_unchanged_inline_is_buff_not_misc():
+    out = _pp1('W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))')
+    assert 't("MISC")' not in out
+    assert 'b(600, 400, l=True)))' in out
+
+
+def test_recipe_pricier_total_unchanged_inline_keeps_nerf_badge():
+    out = _pp1('W(li("Recipe cost increased from 500 to 525. Total cost unchanged at 1625g", b(500, 525, l=True)))')
+    assert 't("MISC")' not in out
+    assert 'b(500, 525, l=True)))' in out
+
+
+def test_recipe_total_unchanged_split_note_is_badge_not_misc():
+    out = _pp1('W(li("Recipe cost decreased from 1350 to 1250", b(1350, 1250, l=True), '
+               'extra=inline_note("Total cost unchanged at 4500g")))')
+    assert 't("MISC")' not in out
+    assert 'b(1350, 1250, l=True)' in out
+    assert 'extra=inline_note("Total cost unchanged at 4500g")' in out
+
+
+def test_recipe_and_total_both_change_still_tags_by_total():
+    out = _pp1('W(li("Recipe cost decreased from 300 to 200. Total cost increased from 2500 to 2600", b(2500, 2600, l=True)))')
+    # recipe % inline, total badge drives the row
+    assert '+ b(300, 200, l=True)' in out
+    assert out.rstrip().endswith('b(2500, 2600, l=True)))')
