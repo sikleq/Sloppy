@@ -215,23 +215,58 @@ def _hero_kit(npc: str) -> list[str]:
 
 _TALENT_BLOCK_RE = _re.compile(r'<div class="ability-block talents-block">')
 _LI_RE = _re.compile(r'<li\b([^>]*)>(.*?)</li>', _re.S)
+_TALENT_MARK_RE = _re.compile(r'Level\s+\d+\s+Talent', _re.I)
 
 
-def _tag_talent_rows(body: str, names: list[str]) -> str:
+def _load_talent_aliases() -> dict:
+    """slug -> {keyword: 'Ability Chip Name'} for talents that reference an
+    ability by a summoned unit / effect name (Eidolon -> Demonic Summoning)."""
+    p = Path(__file__).resolve().parent.parent / "data" / "talent_ability_aliases.json"
+    try:
+        with open(p, encoding="utf-8") as f:
+            d = _json.load(f)
+        return {k: v for k, v in d.items() if not k.startswith("_")}
+    except Exception:
+        return {}
+
+
+_TALENT_ALIASES = _load_talent_aliases()
+
+
+def _tag_talent_rows(body: str, names: list[str], hero_slug: str | None = None) -> str:
     """Mark every talent row that names one of the hero's abilities with
     data-ec-ab="Name|Name" so the ability chips can pull it in: clicking Decrepify then
     shows the talents that upgrade Decrepify next to the direct changes. Longest name wins
-    when one ability name contains another (e.g. "Nether Ward" vs "Ward")."""
-    if not names:
-        return body
-    pats = sorted(names, key=len, reverse=True)
-    rx = [(n, _re.compile(r"(?<![A-Za-z'])" + _re.escape(n) + r"(?![A-Za-z'])", _re.I)) for n in pats]
+    when one ability name contains another (e.g. "Nether Ward" vs "Ward").
 
-    def tag_li(m):
+    Three ways a talent gets linked to an ability:
+      1. the ability's display name appears in the text (plural tolerated: a
+         "Plague Wards" talent answers the "Plague Ward" chip);
+      2. an alias keyword appears — a summoned unit / effect whose name differs
+         from the ability (Eidolon -> Demonic Summoning), from
+         data/talent_ability_aliases.json, applied only when that ability is a
+         real chip on this hero;
+      3. the talent lives OUTSIDE the talents block (folded into a facet/ability
+         block) — a second pass catches any "Level N Talent" row anywhere."""
+    names_set = set(names)
+    pats = sorted(names, key=len, reverse=True)
+    # plural-tolerant word match: "Plague Ward" also matches "Plague Wards"
+    rx = [(n, _re.compile(r"(?<![A-Za-z'])" + _re.escape(n) + r"(?:s|es)?(?![A-Za-z'])", _re.I))
+          for n in pats]
+    arx = []
+    for kw, canon in (_TALENT_ALIASES.get(hero_slug or "", {}) or {}).items():
+        if canon in names_set:
+            arx.append((canon, _re.compile(r"(?<![A-Za-z'])" + _re.escape(kw) + r"(?:s|es)?(?![A-Za-z'])", _re.I)))
+    if not rx and not arx:
+        return body
+
+    def tag_li(m, require_talent=False):
         attrs, inner = m.group(1), m.group(2)
         if "data-ec-ab=" in attrs:
             return m.group(0)
         text = _re.sub(r"<[^>]+>", " ", inner)
+        if require_talent and not _TALENT_MARK_RE.search(text):
+            return m.group(0)
         hits, covered = [], []
         for n, r in rx:
             for h in r.finditer(text):
@@ -239,10 +274,14 @@ def _tag_talent_rows(body: str, names: list[str]) -> str:
                     covered.append((h.start(), h.end()))
                     if n not in hits:
                         hits.append(n)
+        for canon, r in arx:
+            if canon not in hits and r.search(text):
+                hits.append(canon)
         if not hits:
             return m.group(0)
         return f'<li{attrs} data-ec-ab="{_esc("|".join(hits))}">{inner}</li>'
 
+    # pass 1: everything inside a talents block (original coverage)
     out, pos = [], 0
     for m in _TALENT_BLOCK_RE.finditer(body):
         if m.start() < pos:
@@ -252,7 +291,11 @@ def _tag_talent_rows(body: str, names: list[str]) -> str:
         out.append(_LI_RE.sub(tag_li, body[m.start():end]))
         pos = end
     out.append(body[pos:])
-    return "".join(out)
+    body = "".join(out)
+    # pass 2: talent rows folded into a facet/ability block (a "Level N Talent"
+    # <li> that pass 1 never saw). Only rows that look like a talent are touched.
+    body = _LI_RE.sub(lambda mm: tag_li(mm, require_talent=True), body)
+    return body
 
 
 def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
@@ -302,7 +345,7 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         # talents that upgrade an ability answer to its chip; a current ability changed ONLY through
         # talents (Nether Blast for Pugna) gets a chip too, sorted into the kit order
         for p in e["patches"]:
-            p["_body"] = _tag_talent_rows(p["_body"], list(dict.fromkeys(current + old + kit)))
+            p["_body"] = _tag_talent_rows(p["_body"], list(dict.fromkeys(current + old + kit)), hero_slug=e["slug"])
         via_talent = {a for p in e["patches"] for m in _re.finditer(r'data-ec-ab="([^"]*)"', p["_body"])
                       for a in _html.unescape(m.group(1)).split("|")}
         extra = [k for k in kit if k in via_talent and k not in current and k not in old]

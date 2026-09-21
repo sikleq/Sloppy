@@ -1,0 +1,15 @@
+{
+  "_comment": "Talent rows that reference an ability by a summoned unit or effect name that is NOT the ability's display name. Keyed by hero page slug -> { keyword(singular, lowercase): 'Ability Chip Name' }. The keyword matches whole words, singular or plural (s/es). A tag is only applied when the target ability is actually a chip on that hero's page, so a stale mapping is harmless. Extend this when a new talent talks about a summon/effect but the ability filter misses it.",
+
+  "enigma":          { "eidolon": "Demonic Summoning" },
+  "brewmaster":      { "brewling": "Primal Split" },
+  "broodmother":     { "spiderling": "Spawn Spiderlings", "spiderite": "Spawn Spiderlings" },
+  "natures-prophet": { "treant": "Nature's Call" },
+  "visage":          { "familiar": "Summon Familiars" },
+  "lycan":           { "wolf": "Summon Wolves", "wolves": "Summon Wolves" },
+  "warlock":         { "golem": "Chaotic Offering" },
+  "beastmaster":     { "hawk": "Call of the Wild Hawk" },
+  "shadow-shaman":   { "serpent ward": "Mass Serpent Ward", "ward": "Mass Serpent Ward" },
+  "invoker":         { "forged spirit": "Forge Spirit", "forge spirit": "Forge Spirit" },
+  "undying":         { "zombie": "Tombstone" }
+}
