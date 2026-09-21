@@ -9910,6 +9910,12 @@ body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
 .ec-ab-btn.ec-ab-old { border-style: dashed; opacity: 0.85; }
 .ec-ab-more { border-style: dotted; color: #9a927c; }
 .ec-ab-btn[hidden] { display: none; }
+/* facet chips: a gold chip carrying a small facet-coloured dot so it reads as a facet, not an ability */
+.ec-ab-btn.ec-ab-facet::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 5px;
+  border-radius: 2px; vertical-align: middle; background: var(--facet-grad, #565C61);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4);
+}
 /* the patch banner = the same red section banner as "ITEM UPDATES" on a patch page */
 h2.section.ec-ver { display: flex; align-items: baseline; gap: 16px; }
 h2.section.ec-ver a { color: #fff; text-decoration: none; }

@@ -12,7 +12,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from builders.entity_changes import _tag_talent_rows, _TALENT_ALIASES
+from builders.entity_changes import _tag_talent_rows, _TALENT_ALIASES, _wrap_scopes
 
 
 def _talents_block(inner_text):
@@ -67,6 +67,24 @@ def test_non_talent_row_untouched_by_pass_two():
             '</ul></div>')
     out = _tag_talent_rows(body, ["Malefice", "Demonic Summoning"], hero_slug="enigma")
     assert _ab(out) is None
+
+
+def test_facets_become_their_own_chip_titles():
+    """Facets are collected apart from abilities so they render as facet chips
+    (a talent naming the facet then filters to it)."""
+    body = ('<div class="entity-block">'
+            '<h4 class="subgroup">Abilities</h4>'
+            '<div class="ability-block"><h4 class="ability-title">Malefice</h4></div>'
+            '<h4 class="subgroup">Facets</h4>'
+            '<div class="ability-block facet-block">'
+            '<div class="ability-icon-wrap facet-icon-wrap"><img data-slug="enigma_x"></div>'
+            '<h4 class="ability-title">Splitting Image</h4></div>'
+            '</div>')
+    html_out, scopes, titles, facets = _wrap_scopes(body)
+    assert "Malefice" in titles
+    assert "Splitting Image" not in titles      # not mixed into ability chips
+    assert "Splitting Image" in facets          # its own facet chip
+    assert 'data-scope="facets"' in html_out
 
 
 def test_alias_file_targets_are_nonempty_strings():
