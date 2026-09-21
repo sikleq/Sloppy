@@ -34,7 +34,7 @@ def build():
 
     W(item_header("Aeon Disk"))
     W(ul_open())
-    W(li("Combo Breaker now starts on a 6s cooldown after being assembled for the first time", t("MISC")))
+    W(li("Combo Breaker now starts on a 6s cooldown after being assembled for the first time"))
     W(ul_close())
 
     W(item_header("Ghost Scepter"))

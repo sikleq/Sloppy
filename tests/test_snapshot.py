@@ -23,7 +23,7 @@ EXPECTED = {
     "badge_new": 1,
     "badge_del": 5,
     "badge_rework": 2,
-    "badge_misc": 2,
+    "badge_misc": 1,
 }
 
 # Allowed drift: small changes from formatting/whitespace tweaks are OK

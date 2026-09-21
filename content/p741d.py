@@ -52,7 +52,7 @@ def build():
     W(ul_close())
     W(item_header("Prophet's Pendulum"))
     W(ul_open())
-    W(li("Linger delayed damage is now non-lethal if the incoming damage source was non-lethal", t("MISC"), extra=inline_note("Fixes a bug where a hero could kill themselves with their own non-lethal damage (Huskar, Soul Ring, Rot etc.)")))
+    W(li("Linger delayed damage is now non-lethal if the incoming damage source was non-lethal", extra=inline_note("Fixes a bug where a hero could kill themselves with their own non-lethal damage (Huskar, Soul Ring, Rot etc.)")))
     W(ul_close())
     W(item_header("Dezun Bloodrite"))
     W(ul_open())
