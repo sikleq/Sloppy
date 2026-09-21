@@ -97,6 +97,9 @@ ITEM_SLUG = {
     "Gunpowder Gauntlet": "gunpowder_gauntlets",
     "Refresher Orb": "refresher",
     "Eye of Skadi": "skadi",
+    "Eul's Scepter of Divinity": "cyclone",
+    "Orb of Blight": "blight_stone",
+    "Block of Cheese": "royale_with_cheese",
     # 7.40-era / engine-slug-vs-display-name overrides
     "Brigand's Blade": "misericorde",
     "Ghost Scepter": "ghost",
