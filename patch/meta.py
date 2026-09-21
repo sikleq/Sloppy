@@ -1,6 +1,8 @@
 """Patch metadata: PATCHES list, RELEASE_HISTORY, date helpers, nav rendering."""
 
 import datetime
+import re as _re
+import pathlib as _pl
 import builders.site_common as _site
 
 # Single source of truth. Add "filename" when a patch page exists.
@@ -151,6 +153,31 @@ RELEASE_HISTORY = [
     {"version": "7.09",  "date": "15.02.2018"},
     {"version": "7.08",  "date": "01.02.2018", "filename": "patches/7.08.html"},
 ]
+
+# A patch page exists iff there is a content/p<stem>.py with a build(); its
+# output is always patches/<version>.html. Match those stems back onto
+# RELEASE_HISTORY and attach `filename` automatically, so a freshly generated
+# patch never has to be hand-registered here (that omission silently dropped
+# it from the version picker before). An explicit `filename` still wins.
+_CONTENT_DIR = _pl.Path(__file__).resolve().parent.parent / "content"
+_STEM_RE = _re.compile(r'^p(\d)(\d{2})([a-z]?)$')
+
+
+def _content_page_versions():
+    """Set of versions that have a content/p*.py patch page on disk."""
+    versions = set()
+    if _CONTENT_DIR.is_dir():
+        for _path in _CONTENT_DIR.glob("p*.py"):
+            m = _STEM_RE.match(_path.stem)
+            if m:
+                versions.add(f"{m.group(1)}.{m.group(2)}{m.group(3)}")
+    return versions
+
+
+_PAGE_VERSIONS = _content_page_versions()
+for _p in RELEASE_HISTORY:
+    if "filename" not in _p and _p["version"] in _PAGE_VERSIONS:
+        _p["filename"] = f"patches/{_p['version']}.html"
 
 # Auto-derived: all RELEASE_HISTORY entries that have a patch page.
 PATCHES = [p for p in RELEASE_HISTORY if "filename" in p]
