@@ -468,19 +468,48 @@ def hero_header(name):
 </div>'''
 
 
-def unit_header(name, icon_url, kind=None):
+def unit_header(name, icon_url, kind=None, new=False):
+    """`new="New Neutral Creep"` renders the same NEW-entity block as
+    item_header(new=...): is-new block + type label after the name. Pair it
+    with new_stats([...]) for the stat sheet and t("NEW") ability rows (the
+    is-new CSS hides per-row chips but keeps data-tag="new" for the filter)."""
     _State.current_hero = None
     # A unit's own base-stat ul is rendered exactly like a hero's: the first ul
     # after the header becomes the GENERAL block (Spirit Bear 7.41e).
     _State.current_unit = name
-    _State.next_ul_is_hero_stats = True
+    _State.next_ul_is_hero_stats = not new      # a NEW unit shows a stat sheet instead
     kind_attr = f' data-kind="{kind}"' if kind else ''
     entity_kind = "creep-hero" if (kind and kind.lower().startswith("creep-hero")) else "unit"
     eid = _register_entity(entity_kind, name)
-    return _open_block() + f'''<div class="entity unit-entity"{kind_attr}{eid}>
+    if new:
+        type_text = new if isinstance(new, str) else ''
+        type_label = f' <span class="entity-new-type">{type_text}</span>' if type_text else ''
+        extra_cls, block_attr = 'is-new', ' data-new-tag="NEW"'
+    else:
+        type_label, extra_cls, block_attr = '', '', ''
+    return _open_block(extra_cls, block_attr) + f'''<div class="entity unit-entity"{kind_attr}{eid}>
   <div class="entity-icon hero-icon"><img src="{icon_url}" alt="{name}" loading="lazy" width="128" height="72"></div>
-  <div class="entity-name">{name}</div>
+  <div class="entity-name">{name}{type_label}</div>
 </div>'''
+
+
+def new_stats(rows, title=None):
+    """Stat sheet for a NEW entity (creep / item): a full-width properties pane
+    listing its base numbers as clean stat lines instead of change-log bullets.
+    `rows` = ["400 Health", "200 Mana", ...] or (label, value) pairs. Rows carry
+    the NEW tag for the dynamics/filter but the sheet hides the tag column."""
+    norm = []
+    for r in rows:
+        if isinstance(r, (tuple, list)) and len(r) == 2:
+            norm.append(("NEW", f'<span class="stat-label">{r[0]}</span> {r[1]}'))
+        else:
+            norm.append(("NEW", r))
+    html = properties_change(old=[], new=norm)
+    html = html.replace('class="properties-change new-only"',
+                        'class="properties-change new-only stat-sheet"', 1)
+    if title:
+        html = f'<div class="stat-sheet-title">{title}</div>' + html
+    return html
 
 
 def item_header(name, new=False, changed=False):

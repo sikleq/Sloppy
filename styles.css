@@ -3727,6 +3727,44 @@ ul.changes li.ability-row-end {
 }
 .properties-change.new-only .pane-new { grid-column: 3; }
 .properties-change.old-only .pane-old { grid-column: 1; }
+/* STAT SHEET — a NEW entity's base numbers (new creep / new item). Unlike the
+   old→new panel there is nothing to compare against, so the pane spans the
+   full width, drops the hidden arrow column and the tag column: it reads as
+   an in-game stat card, not as a change list. Rows still carry data-tag="new"
+   for the dynamics/filter — the tag is just not painted. */
+.properties-change.new-only.stat-sheet {
+  grid-template-columns: 1fr;
+  margin: 8px 0 6px;
+}
+.properties-change.new-only.stat-sheet .properties-arrow { display: none; }
+.properties-change.new-only.stat-sheet .pane-new {
+  grid-column: 1;
+  grid-template-columns: 1fr auto;
+  row-gap: 3px;
+  padding: 10px 16px;
+}
+.properties-change.stat-sheet .property-tag { display: none; }
+.properties-change.stat-sheet .property-text { grid-column: 1 / -1 !important; }
+.properties-change.stat-sheet .stat-label {
+  color: #b08c5a;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  margin-right: 8px;
+  opacity: 0.85;
+}
+.stat-sheet-title {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #b08c5a;
+  opacity: 0.85;
+  margin: 8px 0 -2px 2px;
+}
 .properties-change .property-text {
   min-width: 0;
   color: var(--text-main);

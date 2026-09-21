@@ -6,7 +6,7 @@ from .elements import (
     hero_header, item_header, unit_header, ability, facet_header, new_facet, facet_change,
     section, subgroup, li, ul_open, ul_close, li_formula, enchant_header,
     enchant_attr_row, enchant_tier_box, souvenir_chip, plain_header,
-    components, item_cost, provides, properties_change, auto_components_change,
+    components, item_cost, provides, properties_change, auto_components_change, new_stats,
     components_change, aghs_line, aghs_shard_line, ability_change, formula_change,
     inline_note, info_tip, show_list, subnote, section_intro, note_box, cm_draft
 )
