@@ -279,7 +279,7 @@ CANONICAL_TAGS = [
     (re.compile(r'\bis not applied if\b', re.I),                    'DEL'),   # "X is not applied if Debuff Immune"
     (re.compile(r'\bno longer upgraded with Aghanim', re.I),        'DEL'),
     (re.compile(r"\bno longer.*'s? ability\b", re.I),               'DEL'),
-    (re.compile(r'\bno longer (?:provides|grants|deals|fires|spawns|summons|adds|increases|works|considered|active|applied|kills|slows|buffs|restores|silences|freezes|suspends|manipulates|instantly)\b', re.I), 'DEL'),
+    (re.compile(r'\bno longer (?:provides|grants|deals|fires|spawns|summons|adds|increases|works|considered|active|applied|kills|slows|buffs|restores|heals|casts|silences|freezes|suspends|manipulates|instantly)\b', re.I), 'DEL'),
     (re.compile(r'\bno longer levels with\b', re.I),                'REWORK'),  # memory rule: structural
     (re.compile(r'\bno longer has\b(?! (?:an? |the )?(?:\w+ )?(?:penalty|restriction|drawback|downside|debuff slow|separate))', re.I), 'DEL'),  # "X no longer has True Strike/feature" → DEL; excludes BUFF-pattern exceptions
     (re.compile(r'\bno longer counts? as\b', re.I),                 'DEL'),    # "Hero Creeps no longer count as heroes"
@@ -475,10 +475,10 @@ def _emit_badge(text):
     return f'b({old!r}, {new!r}{l_arg}{force_arg})'
 
 
-# "Damage at level 1 increased/decreased from X–Y to A–B"
-# also matches "decreased by N (from X–Y to A–B)"
+# "Damage at level N increased/decreased from X–Y to A–B" (any level, not just 1)
+# also matches "decreased by N (from X–Y to A–B)" and "decreased by 51-49 (from …)"
 _DMG_L1_RE = re.compile(
-    r'\bDamage at level 1\s+(?:increased|decreased)(?:\s+by\s+\d+(?:\.\d+)?\s*\()?'
+    r'\bDamage at level \d+\s+(?:increased|decreased)(?:\s+by\s+[\d.\-–]+\s*\()?'
     r'\s*from\s+(\d+)[–\-](\d+)\s+to\s+(\d+)[–\-](\d+)',
     re.I,
 )

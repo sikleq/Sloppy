@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
 from generate_patch_code_v2 import (
     _guess_tag, LOWER_IS_BUFF, _NOT_LOWER_IS_BUFF,
-    _postprocess_recipe_cost_zero_net,
+    _postprocess_recipe_cost_zero_net, _DMG_L1_RE,
 )
 
 
@@ -107,9 +107,25 @@ from generate_patch_code_v2 import (
     ("No longer buffs allies", "DEL"),
     ("No longer restores mana", "DEL"),
     ("Sharpshooter: No longer decreases max wind-up time", "BUFF"),
+    # 7.38 audit: "No longer <heals/casts> ... by default" removes a beneficial effect → DEL
+    ("No longer heals Invoker when dealing damage by default", "DEL"),
+    ("No longer casts Press the Attack on victory by default", "DEL"),
 ])
 def test_guess_tag(text, expected):
     assert _guess_tag(text) == expected
+
+
+# ── Damage-at-level ranges → br() at ANY level (7.38 audit: was level-1 only) ──
+
+@pytest.mark.parametrize("text, groups", [
+    ("Damage at level 1 increased from 44-48 to 48-54", ("44", "48", "48", "54")),
+    ("Damage at level 30 decreased by 61 (from 227-234 to 166-173)", ("227", "234", "166", "173")),
+    ("Damage at level 30 decreased by 51-49 (from 196-204 to 145-155)", ("196", "204", "145", "155")),
+    ("Damage at level 25 increased by 27 (from 122-126 to 149-153)", ("122", "126", "149", "153")),
+])
+def test_damage_at_level_range_matches(text, groups):
+    m = _DMG_L1_RE.search(text)
+    assert m and m.groups() == groups
 
 
 # ── LOWER_IS_BUFF: keywords that flip direction ───────────────────────────
