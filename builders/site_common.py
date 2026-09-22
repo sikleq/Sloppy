@@ -84,8 +84,6 @@ MATERIALS_GROUPS = [
             ("abilities", "Neutral Abilities", "neutral_abilities.html"),
         ]),
         ("unit_changes", "Unit Changes",   "unit_changes.html"),
-        ("summons",   "Summons",           None),
-        ("lane",      "Lane Creeps",       None),
     ]),
     ("items_grp", "Items", "mana_items.html", [
         ("mana_items", "Mana Items",    "mana_items.html"),
@@ -100,6 +98,9 @@ MATERIALS_GROUPS = [
         ("hero_changes", "Hero Changes",  "hero_changes.html"),
     ]),
     ("terrain", "Terrain", "terrain_741.html", None),
+    # Top-level tab with no page yet: ghref=None marks it "soon" (Tormentors,
+    # towers, barracks and other buildings will land here).
+    ("structures", "Structures", None, None),
 ]
 
 
@@ -250,6 +251,11 @@ def render_materials_subnav(active, prefix=""):
     parts = []
     for gkey, glabel, ghref, children in MATERIALS_GROUPS:
         if children is None:
+            if ghref is None:
+                # Top-level tab with no page yet — greyed, non-clickable, "soon".
+                parts.append(f'<span class="nav-subtab nav-subtab-soon" aria-disabled="true">'
+                             f'{glabel}<span class="nav-soon-tag">soon</span></span>')
+                continue
             # Plain link (Terrain — no children).
             cls = "nav-subtab" + (" active" if active == gkey else "")
             parts.append(f'<a class="{cls}" href="{prefix}{ghref}">{glabel}</a>')

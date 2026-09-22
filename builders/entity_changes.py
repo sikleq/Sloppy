@@ -535,7 +535,7 @@ def _hero_card(e: dict) -> str:
 
 
 _UNIT_CAMP_CACHE = None
-_UNIT_ORDER = ["Easy", "Medium", "Hard", "Ancient", "Summons"]
+_UNIT_ORDER = ["Easy", "Medium", "Hard", "Ancient", "Lane Creeps", "Summons"]
 
 # Summoned / split units that have a portrait icon in icons/units/ but belong to
 # no neutral camp, so the camp-roster loop never adds them. Listed here as
@@ -560,6 +560,48 @@ _SUMMON_UNITS = [
     ("brewmaster_storm_unit", "Brewmaster: Storm"),
     ("brewmaster_void_unit", "Brewmaster: Void"),
 ]
+
+# A summon has no change page of its own — its balance changes are documented on
+# its parent's change page (the hero's ability section, or the neutral that
+# spawns it). Map its icon to that page so the card is clickable when the page
+# exists; unmapped / missing-page summons stay greyed reference cards.
+_SUMMON_PARENT = {
+    "npc_dota_warlock_golem": "heroes/warlock.html",
+    "npc_dota_lycan_wolf": "heroes/lycan.html",
+    "npc_dota_furion_treant": "heroes/natures-prophet.html",
+    "npc_dota_broodmother_spiderling": "heroes/broodmother.html",
+    "npc_dota_venomancer_plague_ward": "heroes/venomancer.html",
+    "npc_dota_shadow_shaman_ward": "heroes/shadow-shaman.html",
+    "npc_dota_visage_familiar": "heroes/visage.html",
+    "npc_dota_eidolon": "heroes/enigma.html",
+    "npc_dota_invoker_forged_spirit": "heroes/invoker.html",
+    "npc_dota_beastmaster_boar": "heroes/beastmaster.html",
+    "npc_dota_unit_undying_zombie": "heroes/undying.html",
+    "npc_dota_dark_troll_warlord_skeleton_warrior": "units/dark-troll-summoner.html",
+    "brewmaster_fire_unit": "heroes/brewmaster.html",
+    "brewmaster_earth_unit": "heroes/brewmaster.html",
+    "brewmaster_storm_unit": "heroes/brewmaster.html",
+    "brewmaster_void_unit": "heroes/brewmaster.html",
+}
+
+# Lane creeps (Radiant portraits are the shared reference art for both teams).
+_LANE_UNITS = [
+    ("npc_dota_creep_goodguys_melee", "Melee Creep"),
+    ("npc_dota_creep_goodguys_ranged", "Ranged Creep"),
+    ("npc_dota_creep_goodguys_flagbearer", "Flagbearer Creep"),
+    ("npc_dota_goodguys_siege", "Siege Creep"),
+]
+
+# Units removed from the game — shown only under the "Show deleted" toggle,
+# as (icon basename, display name, column bucket).
+_REMOVED_UNITS = [
+    ("npc_dota_necronomicon_warrior", "Necronomicon Warrior", "Summons"),
+    ("npc_dota_necronomicon_archer", "Necronomicon Archer", "Summons"),
+]
+
+
+def _unit_slug(basename: str) -> str:
+    return basename.replace("npc_dota_neutral_", "").replace("npc_dota_", "").replace("_", "-")
 
 
 def _unit_camp_map() -> dict:
@@ -612,14 +654,34 @@ def _unit_groups(ents: list[dict]):
                        "name": name, "icon": f"../icons/units/{npc}.png", "patches": [],
                        "_nopage": True, "_current": True, "_npc": npc})
     # Summoned / split units — no camp, so add them explicitly to the Summons
-    # column (skip any already present as a tracked change this cycle).
+    # column (skip any already present as a tracked change this cycle). Their
+    # changes live on the parent's page, so link there when it exists.
     have_icons = {e["icon"].rsplit("/", 1)[-1] for e in ents}
     for basename, name in _SUMMON_UNITS:
         if f"{basename}.png" in have_icons:
             continue
-        roster.append({"kind": "unit", "slug": basename.replace("npc_dota_neutral_", "").replace("npc_dota_", "").replace("_", "-"),
+        parent = _SUMMON_PARENT.get(basename)
+        clickable = bool(parent and (DIST / parent).exists())
+        roster.append({"kind": "unit", "slug": _unit_slug(basename),
                        "name": name, "icon": f"../icons/units/{basename}.png", "patches": [],
-                       "_nopage": True, "_current": True, "_npc": _npc_of(f"{basename}.png"), "_bucket": "Summons"})
+                       "_nopage": not clickable, "_href": parent if clickable else None,
+                       "_current": True, "_npc": _npc_of(f"{basename}.png"), "_bucket": "Summons"})
+    # Lane creeps — greyed reference cards in their own column.
+    for basename, name in _LANE_UNITS:
+        if f"{basename}.png" in have_icons:
+            continue
+        roster.append({"kind": "unit", "slug": _unit_slug(basename),
+                       "name": name, "icon": f"../icons/units/{basename}.png", "patches": [],
+                       "_nopage": True, "_current": True, "_npc": _npc_of(f"{basename}.png"),
+                       "_bucket": "Lane Creeps"})
+    # Removed units (e.g. Necronomicon) — hidden until the "Show deleted" toggle.
+    for basename, name, bucket in _REMOVED_UNITS:
+        if f"{basename}.png" in have_icons:
+            continue
+        roster.append({"kind": "unit", "slug": _unit_slug(basename),
+                       "name": name, "icon": f"../icons/units/{basename}.png", "patches": [],
+                       "_nopage": True, "_current": False, "_npc": _npc_of(f"{basename}.png"),
+                       "_bucket": bucket})
     buckets = {k: [] for k in _UNIT_ORDER}
     for e in roster:
         buckets[e.get("_bucket") or camp.get(e["_npc"], "Summons")].append(e)
@@ -635,12 +697,13 @@ def _unit_card(e: dict) -> str:
     img = f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" title="{_esc(e["name"])}" loading="lazy">'
     if nop:                                            # in the roster, no change page yet — shown, not clickable
         return f'<span {attrs}>{img}</span>'
-    return f'<a {attrs} href="units/{_file_slug(e)}.html">{img}</a>'
+    href = e.get("_href") or f"units/{_file_slug(e)}.html"
+    return f'<a {attrs} href="{_esc(href)}">{img}</a>'
 
 
 def _unit_grid(groups) -> str:
-    """Camp-difficulty columns (Easy / Medium / Hard / Ancient / Other), icon-only
-    cards row by row — mirrors the hero picker."""
+    """Fixed-width category columns (Easy / Medium / Hard / Ancient / Lane Creeps
+    / Summons), icon-only cards row by row — mirrors the hero picker."""
     cols = []
     for label, lst in groups:
         if not lst:

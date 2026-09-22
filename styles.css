@@ -5431,6 +5431,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 }
 .nav-subitem-soon { color: #5b6672; cursor: default; }
 .nav-subitem-soon:hover { background: none; }
+/* Top-level Materials tab with no page yet (e.g. Structures). */
+.nav-subtab-soon { color: #5b6672; cursor: default; display: inline-flex; align-items: center; gap: 6px; }
+.nav-subtab-soon:hover { background: none; border-color: transparent; color: #5b6672; }
 /* Nested flyout (Neutral Abilities under Neutral Stats): the parent item opens
    a second menu to its RIGHT on hover — a classic cascading menu. */
 .nav-subgroup-nested { position: relative; display: block; }
@@ -10061,18 +10064,20 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
    creep. Roster creeps with no change this cycle render greyed and unclickable. */
 /* Flush-left (no max-width/centering) so the first column aligns with the
    toolbar panel and with the Hero/Item index grids — the shared ec-index-body
-   left inset is the single source of truth; new index kinds inherit it. */
-.ec-ugrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0 22px; margin-top: 14px; align-items: start; }
-.ec-ucol { min-width: 0; }
-.ec-ucol .ec-group-title { font-size: 13px; font-weight: 600; color: var(--text-dim, #8b949e); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0; }
-/* 3 icons per column-row → card width matches the hero picker (~73px). */
-.ec-ucards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+   left inset is the single source of truth; new index kinds inherit it.
+   Fixed-width columns (flex, not N-fraction grid) keep the card size constant
+   as categories are added (Easy/Medium/Hard/Ancient/Lane/Summons and beyond). */
+.ec-ugrid { display: flex; flex-wrap: wrap; gap: 14px 22px; margin-top: 14px; align-items: flex-start; }
+.ec-ucol { flex: 0 0 158px; min-width: 0; }
+.ec-ucol .ec-group-title { font-size: 13px; font-weight: 600; color: var(--text-dim, #8b949e); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0; white-space: nowrap; }
+/* 2 icons per column-row → card width matches the hero picker (~73px). */
+.ec-ucards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
 .ec-card-unit { aspect-ratio: 128 / 72; border-radius: 4px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--muted-04); transition: transform 0.12s, border-color 0.12s; }
 .ec-card-unit img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ec-card-unit:not(.ec-nopage):hover { transform: translateY(-2px); border-color: rgba(227, 196, 106, 0.5); }
 .ec-card-unit.ec-nopage { opacity: 0.38; }
 .ec-card-unit.ec-nopage:hover { opacity: 0.62; }
-@media (max-width: 900px) { .ec-ugrid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) { .ec-ucol { flex: 1 1 44%; } }
 @media (max-width: 1100px) {
   .ec-hgrid { grid-template-columns: 1fr 1fr; }
   .ec-igrid { grid-template-columns: 1fr; }
