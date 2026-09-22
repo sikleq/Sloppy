@@ -542,6 +542,17 @@ _UNIT_ORDER = ["Easy", "Medium", "Hard", "Ancient", "Summons"]
 # (icon basename without .png, display name) and shown greyed in the Summons
 # column — same reference treatment as unchanged camp creeps.
 _SUMMON_UNITS = [
+    ("npc_dota_warlock_golem", "Golem (Warlock)"),
+    ("npc_dota_lycan_wolf", "Wolf (Lycan)"),
+    ("npc_dota_furion_treant", "Treant (Nature's Prophet)"),
+    ("npc_dota_broodmother_spiderling", "Spiderling (Broodmother)"),
+    ("npc_dota_venomancer_plague_ward", "Plague Ward (Venomancer)"),
+    ("npc_dota_shadow_shaman_ward", "Serpent Ward (Shadow Shaman)"),
+    ("npc_dota_visage_familiar", "Familiar (Visage)"),
+    ("npc_dota_eidolon", "Eidolon (Enigma)"),
+    ("npc_dota_invoker_forged_spirit", "Forged Spirit (Invoker)"),
+    ("npc_dota_beastmaster_boar", "Boar (Beastmaster)"),
+    ("npc_dota_unit_undying_zombie", "Zombie (Undying)"),
     ("npc_dota_dark_troll_warlord_skeleton_warrior", "Skeleton Warrior"),
     ("npc_dota_neutral_mud_golem_split", "Split Golem"),
     ("brewmaster_fire_unit", "Brewmaster: Fire"),
