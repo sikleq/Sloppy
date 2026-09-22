@@ -33,7 +33,8 @@ KINDS = {"hero": ("heroes", "Hero Changes", "hero_changes", "heroes"),
          "enchant": ("items", "Item Changes", "item_changes", "items"),
          # neutral creeps / summoned units get their own pages + Unit Changes index
          "unit": ("units", "Unit Changes", "unit_changes", "units"),
-         "creep-hero": ("units", "Unit Changes", "unit_changes", "units")}
+         # a creep-hero (Spirit Bear) is hero-side — merges into the Hero Changes index
+         "creep-hero": ("heroes", "Hero Changes", "hero_changes", "heroes")}
 
 
 def _file_slug(e: dict) -> str:
@@ -533,20 +534,88 @@ def _hero_card(e: dict) -> str:
             f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" loading="lazy"></a>')
 
 
+_UNIT_CAMP_CACHE = None
+_UNIT_ORDER = ["Easy", "Medium", "Hard", "Ancient", "Other"]
+
+
+def _unit_camp_map() -> dict:
+    """npc_dota_neutral_* -> neutral-camp difficulty (Easy/Medium/Hard/Ancient),
+    from the createhero->npc map in builders/creeps.py + the ⬤-marked camp column
+    of data/creeps_raw.csv (the marker sits on the first creep of each camp)."""
+    global _UNIT_CAMP_CACHE
+    if _UNIT_CAMP_CACHE is not None:
+        return _UNIT_CAMP_CACHE
+    import csv as _csv
+    pairs = dict(_re.findall(r"'([a-z0-9_]+)':\s*'(npc_dota_neutral_[a-z0-9_]+)'",
+                             (_HERE / "builders" / "creeps.py").read_text(encoding="utf-8")))
+    labels = {1: "Easy", 2: "Medium", 3: "Hard", 4: "Ancient"}
+    out, diff = {}, None
+    csv_path = _HERE / "data" / "creeps_raw.csv"
+    if csv_path.exists():
+        for r in list(_csv.reader(csv_path.read_text(encoding="utf-8").splitlines()))[1:]:
+            if len(r) < 4:
+                continue
+            fill = r[0].count("⬤")
+            if fill:
+                diff = fill
+            ch = r[3].strip()
+            if ch and ch in pairs:
+                out[pairs[ch]] = labels.get(diff, "Other")
+    _UNIT_CAMP_CACHE = out
+    return out
+
+
+def _npc_of(icon: str) -> str:
+    m = _re.search(r"(npc_dota_[a-z0-9_]+)\.png", icon or "")
+    return m.group(1) if m else ""
+
+
+def _unit_groups(ents: list[dict]):
+    """Group units by neutral-camp difficulty and append the rest of the neutral
+    roster (creeps unchanged this cycle) as greyed, non-clickable cards."""
+    camp = _unit_camp_map()
+    have = set()
+    for e in ents:
+        e.setdefault("_current", True)
+        e["_npc"] = _npc_of(e["icon"])
+        have.add(e["_npc"])
+    roster = list(ents)
+    for npc, _diff in camp.items():
+        if npc in have:
+            continue
+        name = _re.sub(r"^npc_dota_neutral_", "", npc).replace("_", " ").title()
+        roster.append({"kind": "unit", "slug": npc.replace("npc_dota_neutral_", "").replace("_", "-"),
+                       "name": name, "icon": f"../icons/units/{npc}.png", "patches": [],
+                       "_nopage": True, "_current": True, "_npc": npc})
+    buckets = {k: [] for k in _UNIT_ORDER}
+    for e in roster:
+        buckets[camp.get(e["_npc"], "Other")].append(e)
+    return [(k, buckets[k]) for k in _UNIT_ORDER if buckets[k]]
+
+
 def _unit_card(e: dict) -> str:
     cur = e.get("_current", True)
-    cls = "ec-card ec-card-unit" + ("" if cur else " ec-old")
-    return (f'<a class="{cls}" data-current="{1 if cur else 0}"{"" if cur else " hidden"} '
-            f'href="units/{_file_slug(e)}.html" '
-            f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
-            f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" loading="lazy">'
-            f'<span class="ec-unit-name">{_esc(e["name"])}</span></a>')
+    nop = e.get("_nopage")
+    cls = "ec-card ec-card-unit" + ("" if cur else " ec-old") + (" ec-nopage" if nop else "")
+    attrs = (f'class="{cls}" data-current="{1 if cur else 0}"{"" if cur else " hidden"} '
+             f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}"')
+    img = f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" title="{_esc(e["name"])}" loading="lazy">'
+    if nop:                                            # in the roster, no change page yet — shown, not clickable
+        return f'<span {attrs}>{img}</span>'
+    return f'<a {attrs} href="units/{_file_slug(e)}.html">{img}</a>'
 
 
-def _unit_grid(ents: list[dict]) -> str:
-    cards = "".join(_unit_card(e) for e in sorted(ents, key=lambda e: e["name"].lower()))
-    return (f'<div class="ec-ugrid"><section class="ec-group ec-ugroup">'
-            f'<div class="ec-ucards">{cards}</div></section></div>')
+def _unit_grid(groups) -> str:
+    """Camp-difficulty columns (Easy / Medium / Hard / Ancient / Other), icon-only
+    cards row by row — mirrors the hero picker."""
+    cols = []
+    for label, lst in groups:
+        if not lst:
+            continue
+        cards = "".join(_unit_card(e) for e in sorted(lst, key=lambda e: (0 if e.get("_current", True) else 1, e["name"].lower())))
+        cols.append(f'<section class="ec-ucol"><h3 class="ec-group-title">{_esc(label)}</h3>'
+                    f'<div class="ec-ucards">{cards}</div></section>')
+    return f'<div class="ec-ugrid">{"".join(cols)}</div>'
 
 
 def _item_card(e: dict) -> str:
@@ -691,9 +760,10 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
     subnav = _site.render_materials_subnav(key)
     for e in ents:
         e.setdefault("_current", True)
-    if kind in ("unit", "creep-hero"):
-        grid = _unit_grid(ents)
-        n_old = sum(1 for e in ents if not e["_current"])
+    if kind == "unit":
+        groups = _unit_groups(ents)
+        grid = _unit_grid(groups)
+        n_old = sum(1 for _, lst in groups for e in lst if not e["_current"])
         plural = "units"
     else:
         groups = _hero_groups(ents) if kind == "hero" else _item_groups(ents, dyn)
@@ -727,9 +797,9 @@ def main() -> int:
     for kind, (folder, *_rest) in KINDS.items():
         (DIST / folder).mkdir(exist_ok=True)
         if kind in ("enchant", "creep-hero"):
-            continue                                   # merged into item / unit index
+            continue                                   # merged into item / hero index
         lst = [e for (k, _), e in ents.items()
-               if k == kind or (kind == "item" and k == "enchant") or (kind == "unit" and k == "creep-hero")]
+               if k == kind or (kind == "item" and k == "enchant") or (kind == "hero" and k == "creep-hero")]
         for e in lst:
             (DIST / folder / f'{_file_slug(e)}.html').write_text(_entity_page(e, asset, latest, dyn), encoding="utf-8")
         (DIST / f"{KINDS[kind][2]}.html").write_text(_index_page(kind, lst, asset, latest, dyn), encoding="utf-8")
