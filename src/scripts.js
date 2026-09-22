@@ -6641,7 +6641,9 @@
   if (!btn || !popup) return;
   const sig = popup.dataset.wnSig || 'v1';
   const LS_KEY = 'wn_seen_' + sig;
-  if (localStorage.getItem(LS_KEY)) btn.classList.add('wn-seen');
+  // Guard storage access: some privacy contexts throw "Access to storage is not
+  // allowed from this context" on any localStorage read.
+  try { if (localStorage.getItem(LS_KEY)) btn.classList.add('wn-seen'); } catch (e) {}
 
   function place() {
     // measure with display:block to get real dimensions
