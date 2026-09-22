@@ -10019,11 +10019,14 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 }
 .ec-card[hidden] { display: none; }
 .ec-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.ec-card.ec-old { opacity: 0.55; filter: grayscale(0.6); }
-.ec-card.ec-old:hover { opacity: 1; filter: none; }
+/* Greyed via opacity only — NOT a `filter`. A CSS filter on the ~70 visible
+   roster cards (Item Changes) forced a compositing layer + per-pixel work on
+   every card and made the page janky to scroll; opacity is composited cheaply. */
+.ec-card.ec-old { opacity: 0.5; }
+.ec-card.ec-old:hover { opacity: 1; }
 /* item in the roster with no annotated change yet: greyed out, not a link */
-.ec-card.ec-nopage { opacity: 0.32; filter: grayscale(1) brightness(0.8); cursor: default; }
-.ec-card.ec-nopage:hover { border-color: rgba(0, 0, 0, 0.55); transform: none; filter: grayscale(1) brightness(0.8); }
+.ec-card.ec-nopage { opacity: 0.3; cursor: default; }
+.ec-card.ec-nopage:hover { border-color: rgba(0, 0, 0, 0.55); transform: none; }
 /* hover: the icon comes forward a little (same move as the Hero Lab inventory) */
 .ec-card:hover { border-color: var(--gold-line); filter: brightness(1.18);
   transform: translateY(-3px) scale(1.06); position: relative; z-index: 5;
@@ -10078,7 +10081,10 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
    as Hero attribute / Item panel headers); only keep them on one line. */
 .ec-ucol .ec-group-title { white-space: nowrap; }
 .ec-camp-ico { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; opacity: 0.9; }
-.ec-ucards { display: grid; grid-template-columns: repeat(auto-fill, minmax(66px, 1fr)); gap: 6px; }
+/* Fixed 73px cards = the Hero Changes card width, so unit icons match the hero
+   picker exactly. Columns still flex-grow to fill the row (no page-right gap);
+   cards left-pack inside each. */
+.ec-ucards { display: grid; grid-template-columns: repeat(auto-fill, 73px); gap: 6px; }
 .ec-card-unit { aspect-ratio: 128 / 72; border-radius: 4px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--muted-04); transition: transform 0.12s, border-color 0.12s; }
 .ec-card-unit img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ec-card-unit:not(.ec-nopage):not(.ec-static):hover { transform: translateY(-2px); border-color: rgba(227, 196, 106, 0.5); }

@@ -538,7 +538,7 @@ def _hero_card(e: dict) -> str:
 
 
 _UNIT_CAMP_CACHE = None
-_UNIT_ORDER = ["Easy", "Medium", "Hard", "Ancient", "Lane Creeps", "Summons"]
+_UNIT_ORDER = ["Easy", "Medium", "Large", "Ancient", "Lane Creeps", "Summons"]
 
 # Summoned / split units that have a portrait icon in icons/units/ but belong to
 # no neutral camp, so the camp-roster loop never adds them. Listed here as
@@ -609,7 +609,7 @@ def _unit_slug(basename: str) -> str:
 
 
 # Small camp-difficulty badge shown beside a column title (icons/camps/creepcamp_*).
-_CAMP_TITLE_ICON = {"Easy": "small", "Medium": "mid", "Hard": "big", "Ancient": "ancient"}
+_CAMP_TITLE_ICON = {"Easy": "small", "Medium": "mid", "Large": "big", "Ancient": "ancient"}
 
 # Structures page — a static catalogue of buildings / map objectives, grouped by
 # type, as (icon basename in icons/structures/, display name).
@@ -635,9 +635,27 @@ def _structure_groups():
 
 # Creeps with no createhero token of their own (split/sub-spawns) — assigned to
 # the camp of their parent creep by hand.
-_CAMP_OVERRIDE = {"npc_dota_neutral_mud_golem_split": "Medium"}   # Mud Golem's splinters
-_CAMP_SIZE_DIFF = {"small": "Easy", "mid": "Medium", "big": "Hard", "ancient": "Ancient"}
+_CAMP_OVERRIDE = {
+    "npc_dota_neutral_mud_golem_split": "Medium",   # Mud Golem's splinters
+    "npc_dota_neutral_centaur_khan": "Large",        # Centaur Conqueror leads the Large camp
+}
+_CAMP_SIZE_DIFF = {"small": "Easy", "mid": "Medium", "big": "Large", "ancient": "Ancient"}
 _CAMP_SIZE_RANK = {"small": 0, "mid": 1, "big": 2, "ancient": 3}
+
+
+_CREEP_NAMES_CACHE = None
+
+
+def _creep_display_names() -> dict:
+    """{npc_dota_neutral_* : in-game display name} from CREEP_DISPLAY_NAMES in
+    builders/creeps.py — the same names shown on Neutral Stats (e.g. Hellbear,
+    Centaur Conqueror), instead of a title-cased engine name."""
+    global _CREEP_NAMES_CACHE
+    if _CREEP_NAMES_CACHE is None:
+        src = (_HERE / "builders" / "creeps.py").read_text(encoding="utf-8")
+        _CREEP_NAMES_CACHE = dict(_re.findall(
+            r"'(npc_dota_neutral_[a-z0-9_]+)':\s*'([^']*)'", src))
+    return _CREEP_NAMES_CACHE
 
 
 def _unit_camp_map() -> dict:
@@ -695,11 +713,12 @@ def _unit_groups(ents: list[dict]):
         e.setdefault("_current", True)
         e["_npc"] = _npc_of(e["icon"])
         have.add(e["_npc"])
+    names = _creep_display_names()
     roster = list(ents)
     for npc, _diff in camp.items():
         if npc in have:
             continue
-        name = _re.sub(r"^npc_dota_neutral_", "", npc).replace("_", " ").title()
+        name = names.get(npc) or _re.sub(r"^npc_dota_neutral_", "", npc).replace("_", " ").title()
         roster.append({"kind": "unit", "slug": npc.replace("npc_dota_neutral_", "").replace("_", "-"),
                        "name": name, "icon": f"../icons/units/{npc}.png", "patches": [],
                        "_nopage": True, "_current": True, "_npc": npc})
