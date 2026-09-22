@@ -18,12 +18,12 @@ def build():
 
     W(item_header("Spirit Vessel"))
     W(ul_open())
-    W(li("Soul Release will gain charges only for Spirit Vessel if the same hero has both Spirit Vessel and Urn of Shadows"))
+    W(li("Soul Release will gain charges only for Spirit Vessel if the same hero has both Spirit Vessel and Urn of Shadows", t("MISC")))
     W(ul_close())
 
     W(item_header("Urn of Shadows"))
     W(ul_open())
-    W(li("Soul Release can no longer gain charges on multiple copies of this item if the copies are on the same hero"))
+    W(li("Soul Release can no longer gain charges on multiple copies of this item if the copies are on the same hero", t("MISC")))
     W(ul_close())
 
     # ===== HERO UPDATES =====
@@ -625,6 +625,10 @@ def build():
 
     # Tidehunter
     W(hero_header("Tidehunter"))
+    W(facet_header("tidehunter_sizescale"))
+    W(ul_open())
+    W(li("Strength gain decreased from 4.1 to 3.9", b(4.1, 3.9)))
+    W(ul_close())
     W(ability("Dead in the Water", slug="tidehunter_dead_in_the_water"))
     W(ul_open())
     W(li("No longer deals 100 damage", t("DEL")))
@@ -699,6 +703,10 @@ def build():
 
     # Ursa
     W(hero_header("Ursa"))
+    W(facet_header("ursa_debuff_reduce"))
+    W(ul_open())
+    W(li("Duration Bonus rescaled from 14/16/18/20% to 15%", b([14, 16, 18, 20], 15)))
+    W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 15 Talent +5 Fury Swipes Damage replaced with +0.5% Maul Health as Damage", t("REWORK")))

@@ -100,7 +100,7 @@ def build():
     W(hero_header("Broodmother"))
     W(facet_header("broodmother_necrotic_webs"))
     W(ul_open())
-    W(li("Spin Web: Health Regeneration Reduction now affects Health Restoration instead"))
+    W(li("Spin Web: Health Regeneration Reduction now affects Health Restoration instead", t("MISC")))
     W(ul_close())
 
     # Centaur Warrunner
@@ -194,6 +194,13 @@ def build():
     W(facet_header("life_stealer_gorestorm"))
     W(ul_open())
     W(li("Infest: Remaining Health as Gorestorm Damage increased from 25% to 30%", b(25, 30)))
+    W(ul_close())
+
+    # Lina
+    W(hero_header("Lina"))
+    W(facet_header("lina_dot"))
+    W(ul_open())
+    W(li("Spell Amplification now affects only the total spell damage before the burn damage is calculated", t("NERF"), extra=inline_note("It increases the total damage and then splits it into burn damage without further amplifying the burn damage")))
     W(ul_close())
 
     # Morphling

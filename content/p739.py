@@ -1910,7 +1910,7 @@ def build():
     W(ul_close())
     W(ability("Mass Serpent Ward", slug="shadow_shaman_mass_serpent_ward"))
     W(ul_open())
-    W(li("On creation, wards now prioritize the closest enemy hero in their attack range"))
+    W(li("On creation, wards now prioritize the closest enemy hero in their attack range", t("MISC")))
     W(ul_close())
 
     # Silencer

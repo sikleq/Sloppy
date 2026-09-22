@@ -15,7 +15,7 @@ def build():
 
     W(plain_header("Twin Gates"))
     W(ul_open())
-    W(li("Channeling the Twin Gate can now be interrupted by root"))
+    W(li("Channeling the Twin Gate can now be interrupted by root", t("MISC")))
     W(ul_close())
 
     W(plain_header("Tormentor"))
@@ -117,7 +117,7 @@ def build():
     W(ul_close())
     W(item_header("Smoke of Deceit"))
     W(ul_open())
-    W(li("Disguise now has a fixed duration and is not affected by buff duration amplification"))
+    W(li("Disguise now has a fixed duration and is not affected by buff duration amplification", t("MISC")))
     W(ul_close())
     W(item_header("Urn of Shadows"))
     W(ul_open())
@@ -210,7 +210,7 @@ def build():
     W(hero_header("Batrider"))
     W(ability("Smoldering Resin", slug="batrider_smoldering_resin"))
     W(ul_open())
-    W(li("No longer applies when attacking allies"))
+    W(li("No longer applies when attacking allies", t("MISC")))
     W(ul_close())
 
     # Beastmaster
@@ -303,7 +303,7 @@ def build():
     W(ul_close())
     W(ability("Astral Spirit", slug="elder_titan_ancestral_spirit"))
     W(ul_open())
-    W(li("Return Astral Spirit and Move Astral Spirit sub-abilities no longer break Elder Titan's invisibility when used"))
+    W(li("Return Astral Spirit and Move Astral Spirit sub-abilities no longer break Elder Titan's invisibility when used", t("MISC")))
     W(ul_close())
 
     # Ember Spirit
@@ -427,7 +427,7 @@ def build():
     W(hero_header("Medusa"))
     W(ability("Split Shot", slug="medusa_split_shot"))
     W(ul_open())
-    W(li("Toggling on/off no longer breaks invisibility and can be done while silenced"))
+    W(li("Toggling on/off no longer breaks invisibility and can be done while silenced", t("MISC")))
     W(ul_close())
 
     # Morphling
@@ -442,7 +442,7 @@ def build():
     W(hero_header("Muerta"))
     W(ability("Gunslinger", slug="muerta_gunslinger"))
     W(ul_open())
-    W(li("Toggling on/off no longer breaks invisibility"))
+    W(li("Toggling on/off no longer breaks invisibility", t("MISC")))
     W(ul_close())
 
     # Necrophos
@@ -576,7 +576,7 @@ def build():
     W(hero_header("Sniper"))
     W(ability("Concussive Grenade", slug="sniper_concussive_grenade"))
     W(ul_open())
-    W(li("Can now be cast while rooted, but will not knock Sniper back if he is under the effect of root"))
+    W(li("Can now be cast while rooted, but will not knock Sniper back if he is under the effect of root", t("MISC")))
     W(ul_close())
 
     # Spectre
@@ -594,7 +594,7 @@ def build():
     W(hero_header("Templar Assassin"))
     W(ability("Psionic Projection", slug="templar_assassin_trap_teleport"))
     W(ul_open())
-    W(li("Can now be interrupted by root"))
+    W(li("Can now be interrupted by root", t("MISC")))
     W(ul_close())
 
     # Tiny
@@ -625,7 +625,7 @@ def build():
     W(ul_close())
     W(ability("Battle Stance", slug="troll_warlord_switch_stance"))
     W(ul_open())
-    W(li("Toggling between stances no longer breaks invisibility"))
+    W(li("Toggling between stances no longer breaks invisibility", t("MISC")))
     W(ul_close())
     W(ability("Battle Trance", slug="troll_warlord_battle_trance"))
     W(ul_open())
@@ -636,7 +636,7 @@ def build():
     W(hero_header("Underlord"))
     W(ability("Fiend's Gate", slug="abyssal_underlord_dark_portal"))
     W(ul_open())
-    W(li("Gate channeling can now be interrupted by root"))
+    W(li("Gate channeling can now be interrupted by root", t("MISC")))
     W(ul_close())
 
     # Undying
@@ -667,7 +667,7 @@ def build():
     W(hero_header("Visage"))
     W(ability("Stone Form", slug="visage_stone_form_self_cast"))
     W(ul_open())
-    W(li("No longer breaks Visage's invisibility when used to order Familiars to execute"))
+    W(li("No longer breaks Visage's invisibility when used to order Familiars to execute", t("MISC")))
     W(ul_close())
 
     # Weaver
