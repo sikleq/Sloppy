@@ -494,22 +494,16 @@ def unit_header(name, icon_url, kind=None, new=False):
 
 
 def new_stats(rows, title=None):
-    """Stat sheet for a NEW entity (creep / item): a full-width properties pane
-    listing its base numbers as clean stat lines instead of change-log bullets.
-    `rows` = ["400 Health", "200 Mana", ...] or (label, value) pairs. Rows carry
-    the NEW tag for the dynamics/filter but the sheet hides the tag column."""
-    norm = []
+    """Base-stat table for a NEW entity (creep / item): a compact two-column
+    table (label | value) with thin row separators, so every value lines up in
+    one column instead of floating after labels of different widths.
+    `rows` = (label, value) pairs, e.g. ("Health", "400")."""
+    cells = []
     for r in rows:
-        if isinstance(r, (tuple, list)) and len(r) == 2:
-            norm.append(("NEW", f'<span class="stat-label">{r[0]}</span> {r[1]}'))
-        else:
-            norm.append(("NEW", r))
-    html = properties_change(old=[], new=norm)
-    html = html.replace('class="properties-change new-only"',
-                        'class="properties-change new-only stat-sheet"', 1)
-    if title:
-        html = f'<div class="stat-sheet-title">{title}</div>' + html
-    return html
+        k, v = (r[0], r[1]) if isinstance(r, (tuple, list)) and len(r) == 2 else ('', r)
+        cells.append(f'<div class="stat-k">{k}</div><div class="stat-v">{v}</div>')
+    head = f'<div class="stat-table-title">{title}</div>' if title else ''
+    return f'{head}<div class="stat-table">{"".join(cells)}</div>'
 
 
 def item_header(name, new=False, changed=False):

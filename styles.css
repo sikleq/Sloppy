@@ -3727,43 +3727,51 @@ ul.changes li.ability-row-end {
 }
 .properties-change.new-only .pane-new { grid-column: 3; }
 .properties-change.old-only .pane-old { grid-column: 1; }
-/* STAT SHEET — a NEW entity's base numbers (new creep / new item). Unlike the
-   old→new panel there is nothing to compare against, so the pane spans the
-   full width, drops the hidden arrow column and the tag column: it reads as
-   an in-game stat card, not as a change list. Rows still carry data-tag="new"
-   for the dynamics/filter — the tag is just not painted. */
-.properties-change.new-only.stat-sheet {
-  grid-template-columns: 1fr;
-  margin: 8px 0 6px;
+/* STAT TABLE — a NEW entity's base numbers (new creep / new item). A compact
+   two-column table: label column (auto) then value column (1fr), so every
+   value lines up vertically instead of floating after labels of different
+   widths. Thin row separators; labels are muted, not gold. */
+.entity-block .stat-table {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 28px;
+  max-width: 380px;
+  margin: 6px 0 6px;
+  border-top: 1px solid var(--line-soft);
 }
-.properties-change.new-only.stat-sheet .properties-arrow { display: none; }
-.properties-change.new-only.stat-sheet .pane-new {
-  grid-column: 1;
-  grid-template-columns: 1fr auto;
-  row-gap: 3px;
-  padding: 10px 16px;
+.entity-block .stat-table > div {
+  padding: 5px 2px;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 13.5px;
+  line-height: 1.4;
 }
-.properties-change.stat-sheet .property-tag { display: none; }
-.properties-change.stat-sheet .property-text { grid-column: 1 / -1 !important; }
-.properties-change.stat-sheet .stat-label {
-  color: #b08c5a;
-  font-family: var(--font-ui);
-  font-size: 11px;
+.entity-block .stat-table .stat-k {
+  color: var(--text-dim, #8b949e);
+}
+.entity-block .stat-table .stat-v {
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+.stat-table-title {
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
+  color: var(--text-dim, #8b949e);
+  margin: 8px 0 2px 2px;
+}
+/* CHIP-LESS DESCRIPTION ROWS — a li with no tag (Flooded Camps / Map Objectives
+   mechanics, new-entity notes). Drop the 76px phantom tag column the change
+   grid reserves and mark each line with a small bullet so it reads as a list,
+   not a tag row whose tag was deleted. Ability-rows (Passive:/Active: boxes)
+   keep their own layout. */
+ul.changes li:has(> .row-tag-empty):not([class*="ability-row"]) > .row-text::before,
+.entity-block.is-new ul.changes li:not([class*="ability-row"]) > .row-text::before {
+  content: "\2022";
+  float: none;
+  display: inline;
+  width: auto;
+  height: auto;
   margin-right: 8px;
-  opacity: 0.85;
-}
-.stat-sheet-title {
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: #b08c5a;
-  opacity: 0.85;
-  margin: 8px 0 -2px 2px;
+  color: var(--text-dim, #8b949e);
 }
 .properties-change .property-text {
   min-width: 0;
