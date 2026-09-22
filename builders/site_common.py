@@ -98,9 +98,8 @@ MATERIALS_GROUPS = [
         ("hero_changes", "Hero Changes",  "hero_changes.html"),
     ]),
     ("terrain", "Terrain", "terrain_741.html", None),
-    # Top-level tab with no page yet: ghref=None marks it "soon" (Tormentors,
-    # towers, barracks and other buildings will land here).
-    ("structures", "Structures", None, None),
+    # Buildings / map objectives — towers, barracks, tormentors.
+    ("structures", "Structures", "structures.html", None),
 ]
 
 

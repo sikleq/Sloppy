@@ -56,6 +56,13 @@
   const fromParam = params.get('from');
   if (back && fromParam === 'calendar') {
     back.classList.add('visible');
+  } else if (back && fromParam === 'unit_changes') {
+    // Arrived from the Unit Changes index (a summon card links to its parent
+    // hero's page). Point the back arrow there instead of Hero Changes.
+    back.href = '../unit_changes.html';
+    back.title = 'Back to Unit Changes';
+    back.setAttribute('aria-label', 'Back to Unit Changes');
+    back.classList.add('visible');
   } else if (back && (fromParam === 'heroes_dyn' || fromParam === 'items_dyn')) {
     // Arrived from a Dynamics matrix (root page) via a dyn-cell. Point the back
     // arrow at it. Same fixed bottom-left button + styling as the calendar/patch
@@ -3440,6 +3447,19 @@
   }));
   wire(scopeBtns, scopes, 'ecScope');
   wire(abBtns, abilities, 'ecAbility');
+  // Deep-link: ?ability=<name> (e.g. from a summon card on the Unit Changes
+  // page) pre-activates that ability filter so only its changes show. If the
+  // name matches no chip, nothing is filtered (all changes stay visible).
+  const preAbility = new URLSearchParams(window.location.search).get('ability');
+  if (preAbility) {
+    const target = abBtns.find(b => b.dataset.ecAbility === preAbility);
+    if (target) {
+      abilities.add(preAbility);
+      target.classList.add('active');
+      apply();
+      target.scrollIntoView({ block: 'center' });
+    }
+  }
   const more = document.querySelector('[data-ec-more]');
   if (more) more.addEventListener('click', () => {
     const olds = [...document.querySelectorAll('.ec-ab-old')];

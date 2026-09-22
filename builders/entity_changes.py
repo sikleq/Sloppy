@@ -18,6 +18,7 @@ import json as _json
 import re as _re
 import sys as _sys
 from pathlib import Path
+from urllib.parse import quote as _quote
 
 _HERE = Path(__file__).resolve().parent.parent
 _sys.path.insert(0, str(_HERE))
@@ -34,7 +35,9 @@ KINDS = {"hero": ("heroes", "Hero Changes", "hero_changes", "heroes"),
          # neutral creeps / summoned units get their own pages + Unit Changes index
          "unit": ("units", "Unit Changes", "unit_changes", "units"),
          # a creep-hero (Spirit Bear) is hero-side — merges into the Hero Changes index
-         "creep-hero": ("heroes", "Hero Changes", "hero_changes", "heroes")}
+         "creep-hero": ("heroes", "Hero Changes", "hero_changes", "heroes"),
+         # buildings / map objectives — a static reference catalogue, no change pages
+         "structure": ("structures", "Structures", "structures", "structures")}
 
 
 def _file_slug(e: dict) -> str:
@@ -563,25 +566,27 @@ _SUMMON_UNITS = [
 
 # A summon has no change page of its own — its balance changes are documented on
 # its parent's change page (the hero's ability section, or the neutral that
-# spawns it). Map its icon to that page so the card is clickable when the page
-# exists; unmapped / missing-page summons stay greyed reference cards.
+# spawns it), under a specific ability. Map its icon to (parent page, ability
+# chip name) so the card links there with ?from=unit_changes (back arrow) and
+# &ability=<name> (pre-applies that ability filter, showing only its changes).
+# ability=None → link without a filter (no matching chip / neutral page).
 _SUMMON_PARENT = {
-    "npc_dota_warlock_golem": "heroes/warlock.html",
-    "npc_dota_lycan_wolf": "heroes/lycan.html",
-    "npc_dota_furion_treant": "heroes/natures-prophet.html",
-    "npc_dota_broodmother_spiderling": "heroes/broodmother.html",
-    "npc_dota_venomancer_plague_ward": "heroes/venomancer.html",
-    "npc_dota_shadow_shaman_ward": "heroes/shadow-shaman.html",
-    "npc_dota_visage_familiar": "heroes/visage.html",
-    "npc_dota_eidolon": "heroes/enigma.html",
-    "npc_dota_invoker_forged_spirit": "heroes/invoker.html",
-    "npc_dota_beastmaster_boar": "heroes/beastmaster.html",
-    "npc_dota_unit_undying_zombie": "heroes/undying.html",
-    "npc_dota_dark_troll_warlord_skeleton_warrior": "units/dark-troll-summoner.html",
-    "brewmaster_fire_unit": "heroes/brewmaster.html",
-    "brewmaster_earth_unit": "heroes/brewmaster.html",
-    "brewmaster_storm_unit": "heroes/brewmaster.html",
-    "brewmaster_void_unit": "heroes/brewmaster.html",
+    "npc_dota_warlock_golem": ("heroes/warlock.html", "Chaotic Offering"),
+    "npc_dota_lycan_wolf": ("heroes/lycan.html", "Summon Wolves"),
+    "npc_dota_furion_treant": ("heroes/natures-prophet.html", "Nature's Call"),
+    "npc_dota_broodmother_spiderling": ("heroes/broodmother.html", "Spawn Spiderlings"),
+    "npc_dota_venomancer_plague_ward": ("heroes/venomancer.html", "Plague Ward"),
+    "npc_dota_shadow_shaman_ward": ("heroes/shadow-shaman.html", "Mass Serpent Ward"),
+    "npc_dota_visage_familiar": ("heroes/visage.html", "Summon Familiars"),
+    "npc_dota_eidolon": ("heroes/enigma.html", "Demonic Summoning"),
+    "npc_dota_invoker_forged_spirit": ("heroes/invoker.html", "Forge Spirit"),
+    "npc_dota_beastmaster_boar": ("heroes/beastmaster.html", None),
+    "npc_dota_unit_undying_zombie": ("heroes/undying.html", "Tombstone"),
+    "npc_dota_dark_troll_warlord_skeleton_warrior": ("units/dark-troll-summoner.html", None),
+    "brewmaster_fire_unit": ("heroes/brewmaster.html", "Fire Brewling"),
+    "brewmaster_earth_unit": ("heroes/brewmaster.html", "Earth Brewling"),
+    "brewmaster_storm_unit": ("heroes/brewmaster.html", "Storm Brewling"),
+    "brewmaster_void_unit": ("heroes/brewmaster.html", "Void Brewling"),
 }
 
 # Lane creeps (Radiant portraits are the shared reference art for both teams).
@@ -602,6 +607,31 @@ _REMOVED_UNITS = [
 
 def _unit_slug(basename: str) -> str:
     return basename.replace("npc_dota_neutral_", "").replace("npc_dota_", "").replace("_", "-")
+
+
+# Small camp-difficulty badge shown beside a column title (icons/camps/creepcamp_*).
+_CAMP_TITLE_ICON = {"Easy": "small", "Medium": "mid", "Hard": "big", "Ancient": "ancient"}
+
+# Structures page — a static catalogue of buildings / map objectives, grouped by
+# type, as (icon basename in icons/structures/, display name).
+_STRUCTURE_DEF = [
+    ("Towers", [("tower_radiant", "Tower (Radiant)"), ("tower_dire", "Tower (Dire)")]),
+    ("Barracks", [("barracks", "Barracks")]),
+    ("Tormentors", [("tormentor_radiant", "Tormentor (Radiant)"),
+                    ("tormentor_dire", "Tormentor (Dire)")]),
+]
+
+
+def _structure_groups():
+    """Static building catalogue → [(label, [card dict, …])]. Full-colour,
+    non-clickable reference cards (no per-structure change pages)."""
+    out = []
+    for label, items in _STRUCTURE_DEF:
+        lst = [{"kind": "structure", "slug": b.replace("_", "-"), "name": n,
+                "icon": f"../icons/structures/{b}.png", "patches": [],
+                "_current": True, "_static": True} for b, n in items]
+        out.append((label, lst))
+    return out
 
 
 def _unit_camp_map() -> dict:
@@ -661,10 +691,16 @@ def _unit_groups(ents: list[dict]):
         if f"{basename}.png" in have_icons:
             continue
         parent = _SUMMON_PARENT.get(basename)
-        clickable = bool(parent and (DIST / parent).exists())
+        clickable = bool(parent and (DIST / parent[0]).exists())
+        href = None
+        if clickable:
+            page, ability = parent
+            href = f"{page}?from=unit_changes"
+            if ability:
+                href += "&ability=" + _quote(ability)
         roster.append({"kind": "unit", "slug": _unit_slug(basename),
                        "name": name, "icon": f"../icons/units/{basename}.png", "patches": [],
-                       "_nopage": not clickable, "_href": parent if clickable else None,
+                       "_nopage": not clickable, "_href": href,
                        "_current": True, "_npc": _npc_of(f"{basename}.png"), "_bucket": "Summons"})
     # Lane creeps — greyed reference cards in their own column.
     for basename, name in _LANE_UNITS:
@@ -691,25 +727,31 @@ def _unit_groups(ents: list[dict]):
 def _unit_card(e: dict) -> str:
     cur = e.get("_current", True)
     nop = e.get("_nopage")
-    cls = "ec-card ec-card-unit" + ("" if cur else " ec-old") + (" ec-nopage" if nop else "")
+    static = e.get("_static")                          # full-colour, non-clickable (catalogue)
+    cls = ("ec-card ec-card-unit" + ("" if cur else " ec-old")
+           + (" ec-nopage" if nop and not static else "") + (" ec-static" if static else ""))
     attrs = (f'class="{cls}" data-current="{1 if cur else 0}"{"" if cur else " hidden"} '
              f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}"')
     img = f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" title="{_esc(e["name"])}" loading="lazy">'
-    if nop:                                            # in the roster, no change page yet — shown, not clickable
+    if static or nop:                                  # no change page — shown, not clickable
         return f'<span {attrs}>{img}</span>'
     href = e.get("_href") or f"units/{_file_slug(e)}.html"
     return f'<a {attrs} href="{_esc(href)}">{img}</a>'
 
 
 def _unit_grid(groups) -> str:
-    """Fixed-width category columns (Easy / Medium / Hard / Ancient / Lane Creeps
-    / Summons), icon-only cards row by row — mirrors the hero picker."""
+    """Category columns (camps / Lane Creeps / Summons, or Structures), icon-only
+    cards row by row — mirrors the hero picker. Camp columns get a small
+    difficulty badge beside the title."""
     cols = []
     for label, lst in groups:
         if not lst:
             continue
         cards = "".join(_unit_card(e) for e in sorted(lst, key=lambda e: (0 if e.get("_current", True) else 1, e["name"].lower())))
-        cols.append(f'<section class="ec-ucol"><h3 class="ec-group-title">{_esc(label)}</h3>'
+        camp = _CAMP_TITLE_ICON.get(label)
+        badge = (f'<img class="ec-camp-ico" src="icons/camps/creepcamp_{camp}.png" alt="" aria-hidden="true">'
+                 if camp else '')
+        cols.append(f'<section class="ec-ucol"><h3 class="ec-group-title">{badge}{_esc(label)}</h3>'
                     f'<div class="ec-ucards">{cards}</div></section>')
     return f'<div class="ec-ugrid">{"".join(cols)}</div>'
 
@@ -856,7 +898,12 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
     subnav = _site.render_materials_subnav(key)
     for e in ents:
         e.setdefault("_current", True)
-    if kind == "unit":
+    if kind == "structure":
+        groups = _structure_groups()
+        grid = _unit_grid(groups)
+        n_old = 0
+        plural = "structures"
+    elif kind == "unit":
         groups = _unit_groups(ents)
         grid = _unit_grid(groups)
         n_old = sum(1 for _, lst in groups for e in lst if not e["_current"])
