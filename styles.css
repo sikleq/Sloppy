@@ -3773,6 +3773,11 @@ ul.changes li:has(> .row-tag-empty):not([class*="ability-row"]) > .row-text::bef
   margin-right: 8px;
   color: var(--text-dim, #8b949e);
 }
+/* A NEW entity is already flagged by its header label ("New Tier 3 Artifact");
+   an ability-row inside it must not repeat a folded NEW chip mid-description. */
+.entity-block.is-new ul.changes li[class*="ability-row"] > .row-text > .badge:first-child {
+  display: none;
+}
 .properties-change .property-text {
   min-width: 0;
   color: var(--text-main);
