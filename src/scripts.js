@@ -6883,3 +6883,45 @@
     window.addEventListener('resize', offsetHead, { passive: true });
   }
 })();
+
+// ---- Pause off-screen autocast-snake animations ----
+// The Neutral Stats / Abilities tables can carry dozens of autocast icons, each
+// an infinite stroke-dashoffset "snake". Painting all of them every frame is
+// wasteful when most are scrolled out of view, so pause the ones off-screen.
+(function() {
+  const snakes = document.querySelectorAll('.autocast-snake');
+  if (!snakes.length || !('IntersectionObserver' in window)) return;
+  // Fail-safe: do NOT pause on init. Only the IntersectionObserver adds .ac-off,
+  // and only for icons it reports off-screen. If IO never fires (throttled tab),
+  // nothing is paused and every snake animates exactly as before — no regression.
+  const io = new IntersectionObserver(function(entries) {
+    for (const e of entries) e.target.classList.toggle('ac-off', !e.isIntersecting);
+  }, { rootMargin: '250px' });
+  snakes.forEach(function(s) { io.observe(s); });
+})();
+
+// ---- Big Dynamics matrices: skip rendering off-screen rows ----
+// The Hero / Item Dynamics tables are enormous (16k-44k nodes). content-visibility
+// lets the browser lay out and paint only the rows near the viewport. Column
+// widths are pinned first (on the always-rendered header cells) so auto
+// table-layout cannot reflow them as off-screen rows are skipped.
+(function() {
+  const table = document.querySelector('.heroes-dyn-table');
+  if (!table) return;
+  try { if (!CSS || !CSS.supports || !CSS.supports('content-visibility', 'auto')) return; } catch (e) { return; }
+  function pin() {
+    // Freeze the current (fully-rendered) column widths onto the header cells so
+    // they hold once rows start recycling. Every leaf column has a header cell in
+    // the col-row; the identity column's header cell carries data-col="name".
+    const heads = table.querySelectorAll('thead tr.col-row > *, thead [data-col="name"]');
+    heads.forEach(function(h) {
+      const w = Math.round(h.getBoundingClientRect().width);
+      if (w > 0) { h.style.minWidth = w + 'px'; h.style.maxWidth = w + 'px'; }
+    });
+    table.style.width = Math.round(table.getBoundingClientRect().width) + 'px';
+    table.classList.add('cv-rows');
+  }
+  function run() { pin(); }
+  if (document.readyState === 'complete') setTimeout(run, 60);
+  else window.addEventListener('load', function() { setTimeout(run, 60); });
+})();

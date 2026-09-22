@@ -5854,6 +5854,11 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
      high end; tail fades toward the low end. */
   animation: autocast-snake 1.73s linear infinite;
 }
+/* Off-screen autocast icons pause every animation (IntersectionObserver in
+   scripts.js toggles .ac-off) so the ~30 infinite stroke-dashoffset loops on the
+   Neutral tables don't repaint continuously while scrolled out of view. */
+.creeps-table .autocast-snake.ac-off,
+.creeps-table .autocast-snake.ac-off * { animation-play-state: paused !important; }
 /* Closed base ring — a continuous, static golden line around the whole frame.
    The animated comet below sweeps around within it, so the snake reads as a
    closed loop with the glow travelling inside itself. */
@@ -6041,6 +6046,12 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    colspans span correctly. width:max-content + min-width:0 stops the inherited
    .creeps-table min-width:100% from stretching the columns. */
 .heroes-dyn-table { table-layout: auto; width: max-content; min-width: 0; }
+/* Skip rendering off-screen rows of the big Dynamics matrices (Hero ~16k /
+   Item ~44k DOM nodes) — the browser lays out and paints only the rows near the
+   viewport. contain-intrinsic-size reserves each skipped row's height so the
+   scrollbar stays stable. Column widths are pinned by JS (pinDynColWidths) first
+   so auto table-layout can't reflow them as rows enter and leave. */
+.heroes-dyn-table.cv-rows tbody tr { content-visibility: auto; contain-intrinsic-size: auto 33px; }
 /* Hero identity column. The `.creeps-table` prefix raises specificity ABOVE the
    shared `.creeps-table td:first-child` tier-dots rule (equal-specificity, later
    in the file) which would otherwise force center-align + a symbol font +
