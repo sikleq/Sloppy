@@ -10059,10 +10059,14 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 /* Unit Changes index — neutral-camp difficulty columns (Easy/Medium/Hard/
    Ancient/Other), icon-only cards like the hero picker; a hover title names the
    creep. Roster creeps with no change this cycle render greyed and unclickable. */
-.ec-ugrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; max-width: 1180px; margin: 0 auto; align-items: start; }
+/* Flush-left (no max-width/centering) so the first column aligns with the
+   toolbar panel and with the Hero/Item index grids — the shared ec-index-body
+   left inset is the single source of truth; new index kinds inherit it. */
+.ec-ugrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0 22px; margin-top: 14px; align-items: start; }
 .ec-ucol { min-width: 0; }
-.ec-ucol .ec-group-title { font-size: 13px; font-weight: 600; color: var(--text-dim, #8b949e); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 2px; }
-.ec-ucards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.ec-ucol .ec-group-title { font-size: 13px; font-weight: 600; color: var(--text-dim, #8b949e); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0; }
+/* 3 icons per column-row → card width matches the hero picker (~73px). */
+.ec-ucards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .ec-card-unit { aspect-ratio: 128 / 72; border-radius: 4px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--muted-04); transition: transform 0.12s, border-color 0.12s; }
 .ec-card-unit img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ec-card-unit:not(.ec-nopage):hover { transform: translateY(-2px); border-color: rgba(227, 196, 106, 0.5); }

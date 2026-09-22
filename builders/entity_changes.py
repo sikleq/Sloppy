@@ -535,7 +535,20 @@ def _hero_card(e: dict) -> str:
 
 
 _UNIT_CAMP_CACHE = None
-_UNIT_ORDER = ["Easy", "Medium", "Hard", "Ancient", "Other"]
+_UNIT_ORDER = ["Easy", "Medium", "Hard", "Ancient", "Summons"]
+
+# Summoned / split units that have a portrait icon in icons/units/ but belong to
+# no neutral camp, so the camp-roster loop never adds them. Listed here as
+# (icon basename without .png, display name) and shown greyed in the Summons
+# column — same reference treatment as unchanged camp creeps.
+_SUMMON_UNITS = [
+    ("npc_dota_dark_troll_warlord_skeleton_warrior", "Skeleton Warrior"),
+    ("npc_dota_neutral_mud_golem_split", "Split Golem"),
+    ("brewmaster_fire_unit", "Brewmaster: Fire"),
+    ("brewmaster_earth_unit", "Brewmaster: Earth"),
+    ("brewmaster_storm_unit", "Brewmaster: Storm"),
+    ("brewmaster_void_unit", "Brewmaster: Void"),
+]
 
 
 def _unit_camp_map() -> dict:
@@ -587,9 +600,18 @@ def _unit_groups(ents: list[dict]):
         roster.append({"kind": "unit", "slug": npc.replace("npc_dota_neutral_", "").replace("_", "-"),
                        "name": name, "icon": f"../icons/units/{npc}.png", "patches": [],
                        "_nopage": True, "_current": True, "_npc": npc})
+    # Summoned / split units — no camp, so add them explicitly to the Summons
+    # column (skip any already present as a tracked change this cycle).
+    have_icons = {e["icon"].rsplit("/", 1)[-1] for e in ents}
+    for basename, name in _SUMMON_UNITS:
+        if f"{basename}.png" in have_icons:
+            continue
+        roster.append({"kind": "unit", "slug": basename.replace("npc_dota_neutral_", "").replace("npc_dota_", "").replace("_", "-"),
+                       "name": name, "icon": f"../icons/units/{basename}.png", "patches": [],
+                       "_nopage": True, "_current": True, "_npc": _npc_of(f"{basename}.png"), "_bucket": "Summons"})
     buckets = {k: [] for k in _UNIT_ORDER}
     for e in roster:
-        buckets[camp.get(e["_npc"], "Other")].append(e)
+        buckets[e.get("_bucket") or camp.get(e["_npc"], "Summons")].append(e)
     return [(k, buckets[k]) for k in _UNIT_ORDER if buckets[k]]
 
 
