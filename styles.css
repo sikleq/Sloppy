@@ -10056,6 +10056,20 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-icards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
 .ec-ipanel-neutral .ec-icards { grid-template-columns: repeat(6, 1fr); }
 .ec-card-item { aspect-ratio: 88 / 64; }
+/* Unit Changes index — a card carries the wider unit icon plus a name label,
+   since a creep icon alone doesn't identify it the way a hero/item icon does. */
+.ec-ugrid { max-width: 1040px; margin: 0 auto; }
+.ec-ucards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.ec-card-unit {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 9px 8px; border-radius: 6px; text-decoration: none;
+  background: var(--muted-04); border: 1px solid var(--line-soft);
+  transition: background 0.12s, border-color 0.12s, transform 0.12s;
+}
+.ec-card-unit:hover { background: rgba(227, 196, 106, 0.10); border-color: rgba(227, 196, 106, 0.4); transform: translateY(-2px); }
+.ec-card-unit img { width: 100%; max-width: 128px; aspect-ratio: 128 / 72; object-fit: contain; }
+.ec-card-unit .ec-unit-name { font-size: 12px; color: var(--text-main); text-align: center; line-height: 1.2; }
+@media (max-width: 700px) { .ec-ucards { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 1100px) {
   .ec-hgrid { grid-template-columns: 1fr 1fr; }
   .ec-igrid { grid-template-columns: 1fr; }

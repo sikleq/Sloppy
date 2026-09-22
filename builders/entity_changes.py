@@ -30,13 +30,16 @@ DIST = _HERE / "dist"
 KINDS = {"hero": ("heroes", "Hero Changes", "hero_changes", "heroes"),
          "item": ("items", "Item Changes", "item_changes", "items"),
          # enchantments live with the items (file enchantment-<slug>.html, same index page)
-         "enchant": ("items", "Item Changes", "item_changes", "items")}
+         "enchant": ("items", "Item Changes", "item_changes", "items"),
+         # neutral creeps / summoned units get their own pages + Unit Changes index
+         "unit": ("units", "Unit Changes", "unit_changes", "units"),
+         "creep-hero": ("units", "Unit Changes", "unit_changes", "units")}
 
 
 def _file_slug(e: dict) -> str:
     return ("enchantment-" if e["kind"] == "enchant" else "") + e["slug"]
 _BLOCK_OPEN_RE = _re.compile(r'<div class="entity-block[^"]*"[^>]*>')
-_HEADER_RE = _re.compile(r'<div class="entity (?:hero|item)-entity"[^>]*\bid="dyn-(hero|item|enchant)-([a-z0-9-]+)"[^>]*>')
+_HEADER_RE = _re.compile(r'<div class="entity (?:hero|item|unit)-entity"[^>]*\bid="dyn-(creep-hero|hero|item|enchant|unit)-([a-z0-9-]+)"[^>]*>')
 _DIV_RE = _re.compile(r"<(/?)div\b[^>]*>")
 _esc = lambda s: _html.escape(str(s), quote=True)
 
@@ -307,8 +310,8 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     nav = _site.render_top_nav("materials", f"../patches/{latest}.html", patch_context=True, subtabs_active=key)
     rec = dyn.get("entities", {}).get(f'{e["kind"]}|{e["slug"]}', {})
     eid = f'dyn-{e["kind"]}-{e["slug"]}'
-    icon_cls = "hero-icon" if e["kind"] == "hero" else "item-icon"
-    ent_cls = "hero" if e["kind"] == "hero" else "item"
+    icon_cls = "item-icon" if e["kind"] in ("item", "enchant") else "hero-icon"
+    ent_cls = "hero" if e["kind"] == "hero" else ("item" if e["kind"] in ("item", "enchant") else "unit")
     n = len(e["patches"])
     info = ""
     sections, seen = [], []
@@ -380,7 +383,8 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         abilities_html = '<span class="ec-vsep" aria-hidden="true"></span>' + ability_chips
         if facet_chips:
             abilities_html += ('<span class="ec-vsep" aria-hidden="true"></span>' if ability_chips else '') + facet_chips
-    from_tok = f'{"hero" if e["kind"] == "hero" else "item"}:{_file_slug(e)}'
+    _from_kind = {"hero": "hero", "item": "item", "enchant": "item"}.get(e["kind"], "unit")
+    from_tok = f'{_from_kind}:{_file_slug(e)}'
     out = [_head(e["name"], asset, "../", "patch-page entity-page"),
            f' data-dyn-prefix="../patches/" data-dyn-from="{from_tok}" data-ec-eid="{eid}">\n\n', nav,
            f'\n<a class="nav-back-arrow visible" href="../{key}.html" aria-label="All {label.lower()}" title="All {label.lower()}"></a>\n',
@@ -529,6 +533,22 @@ def _hero_card(e: dict) -> str:
             f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" loading="lazy"></a>')
 
 
+def _unit_card(e: dict) -> str:
+    cur = e.get("_current", True)
+    cls = "ec-card ec-card-unit" + ("" if cur else " ec-old")
+    return (f'<a class="{cls}" data-current="{1 if cur else 0}"{"" if cur else " hidden"} '
+            f'href="units/{_file_slug(e)}.html" '
+            f'data-name="{_esc(e["name"].lower())} {_esc(e["slug"].replace("-", " "))}">'
+            f'<img src="{_esc(e["icon"].replace("../", "", 1))}" alt="{_esc(e["name"])}" loading="lazy">'
+            f'<span class="ec-unit-name">{_esc(e["name"])}</span></a>')
+
+
+def _unit_grid(ents: list[dict]) -> str:
+    cards = "".join(_unit_card(e) for e in sorted(ents, key=lambda e: e["name"].lower()))
+    return (f'<div class="ec-ugrid"><section class="ec-group ec-ugroup">'
+            f'<div class="ec-ucards">{cards}</div></section></div>')
+
+
 def _item_card(e: dict) -> str:
     cls = "ec-card ec-card-item" + ("" if e["_current"] else " ec-old") + (" ec-nopage" if e.get("_nopage") else "")
     attrs = (f'class="{cls}" data-current="{1 if e["_current"] else 0}"{"" if e["_current"] else " hidden"} '
@@ -669,12 +689,17 @@ def _index_page(kind: str, ents: list[dict], asset: str, latest: str, dyn: dict 
     nav = _site.render_top_nav("materials", f"patches/{latest}.html", patch_context=False,
                                subtabs_active=key, subnav_in_header=False)
     subnav = _site.render_materials_subnav(key)
-    groups = _hero_groups(ents) if kind == "hero" else _item_groups(ents, dyn)
     for e in ents:
         e.setdefault("_current", True)
-    n_old = sum(1 for _, _, lst in groups for e in lst if not e["_current"])
-    grid = _hero_grid(groups) if kind == "hero" else _item_grid(groups)
-    plural = "heroes" if kind == "hero" else "items"
+    if kind in ("unit", "creep-hero"):
+        grid = _unit_grid(ents)
+        n_old = sum(1 for e in ents if not e["_current"])
+        plural = "units"
+    else:
+        groups = _hero_groups(ents) if kind == "hero" else _item_groups(ents, dyn)
+        n_old = sum(1 for _, _, lst in groups for e in lst if not e["_current"])
+        grid = _hero_grid(groups) if kind == "hero" else _item_grid(groups)
+        plural = "heroes" if kind == "hero" else "items"
     return (_head(label, asset, "", "") + '>\n' + nav +
             '\n<div class="container creeps-page ec-index">\n<div class="creeps-scroll">\n' + subnav +
             '<div class="ec-index-body">'
@@ -701,16 +726,18 @@ def main() -> int:
     counts = {}
     for kind, (folder, *_rest) in KINDS.items():
         (DIST / folder).mkdir(exist_ok=True)
-        if kind == "enchant":
-            continue                                   # handled together with the items
-        lst = [e for (k, _), e in ents.items() if k == kind or (kind == "item" and k == "enchant")]
+        if kind in ("enchant", "creep-hero"):
+            continue                                   # merged into item / unit index
+        lst = [e for (k, _), e in ents.items()
+               if k == kind or (kind == "item" and k == "enchant") or (kind == "unit" and k == "creep-hero")]
         for e in lst:
             (DIST / folder / f'{_file_slug(e)}.html').write_text(_entity_page(e, asset, latest, dyn), encoding="utf-8")
         (DIST / f"{KINDS[kind][2]}.html").write_text(_index_page(kind, lst, asset, latest, dyn), encoding="utf-8")
         counts[kind] = (len(lst), sum(len(e["patches"]) for e in lst))
     print(f"  -> dist/heroes/*.html: {counts['hero'][0]} heroes ({counts['hero'][1]} patch sections); "
           f"dist/items/*.html: {counts['item'][0]} items ({counts['item'][1]} sections); "
-          f"hero_changes.html, item_changes.html")
+          f"dist/units/*.html: {counts.get('unit', (0, 0))[0]} units; "
+          f"hero_changes.html, item_changes.html, unit_changes.html")
     return 0
 
 

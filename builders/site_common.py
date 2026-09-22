@@ -83,6 +83,7 @@ MATERIALS_GROUPS = [
         ("creeps",    "Neutral Stats",     "neutral_stats.html", [
             ("abilities", "Neutral Abilities", "neutral_abilities.html"),
         ]),
+        ("unit_changes", "Unit Changes",   "unit_changes.html"),
         ("summons",   "Summons",           None),
         ("lane",      "Lane Creeps",       None),
     ]),
