@@ -5463,6 +5463,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   display: inline-block;
   line-height: 0;
 }
+/* Creep name → its Unit Changes page. Inherits the cell colour; gold on hover. */
+.creep-name-link { color: inherit; text-decoration: none; }
+.creep-name-link:hover { color: #e3c46a; text-decoration: underline; }
 /* Vertical divider after every column (both Tables — Neutral Creeps + Unit
    Abilities). The heavier col-sep dividers (set on category starts) stay
    visible over this lighter base. */

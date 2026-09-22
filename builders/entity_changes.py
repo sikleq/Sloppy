@@ -557,7 +557,6 @@ _SUMMON_UNITS = [
     ("npc_dota_beastmaster_boar", "Boar (Beastmaster)"),
     ("npc_dota_unit_undying_zombie", "Zombie (Undying)"),
     ("npc_dota_dark_troll_warlord_skeleton_warrior", "Skeleton Warrior"),
-    ("npc_dota_neutral_mud_golem_split", "Split Golem"),
     ("brewmaster_fire_unit", "Brewmaster: Fire"),
     ("brewmaster_earth_unit", "Brewmaster: Earth"),
     ("brewmaster_storm_unit", "Brewmaster: Storm"),
@@ -634,29 +633,35 @@ def _structure_groups():
     return out
 
 
+# Creeps with no createhero token of their own (split/sub-spawns) — assigned to
+# the camp of their parent creep by hand.
+_CAMP_OVERRIDE = {"npc_dota_neutral_mud_golem_split": "Medium"}   # Mud Golem's splinters
+_CAMP_SIZE_DIFF = {"small": "Easy", "mid": "Medium", "big": "Hard", "ancient": "Ancient"}
+_CAMP_SIZE_RANK = {"small": 0, "mid": 1, "big": 2, "ancient": 3}
+
+
 def _unit_camp_map() -> dict:
-    """npc_dota_neutral_* -> neutral-camp difficulty (Easy/Medium/Hard/Ancient),
-    from the createhero->npc map in builders/creeps.py + the ⬤-marked camp column
-    of data/creeps_raw.csv (the marker sits on the first creep of each camp)."""
+    """npc_dota_neutral_* -> neutral-camp difficulty (Easy/Medium/Hard/Ancient).
+    Authoritative source: the hand-maintained CREEP_CAMP table in
+    builders/creeps.py (createhero shortname -> in-game camp size[s]), the same
+    data that drives the camp badges on Neutral Stats. When a creep spawns in
+    several camp sizes, the LARGEST is used so it shows in its toughest camp.
+    (The old ⬤-column of creeps_raw.csv mis-filed the secondary members of a
+    camp, e.g. Prowler Acolyte in Easy — CREEP_CAMP fixes that.)"""
     global _UNIT_CAMP_CACHE
     if _UNIT_CAMP_CACHE is not None:
         return _UNIT_CAMP_CACHE
-    import csv as _csv
-    pairs = dict(_re.findall(r"'([a-z0-9_]+)':\s*'(npc_dota_neutral_[a-z0-9_]+)'",
-                             (_HERE / "builders" / "creeps.py").read_text(encoding="utf-8")))
-    labels = {1: "Easy", 2: "Medium", 3: "Hard", 4: "Ancient"}
-    out, diff = {}, None
-    csv_path = _HERE / "data" / "creeps_raw.csv"
-    if csv_path.exists():
-        for r in list(_csv.reader(csv_path.read_text(encoding="utf-8").splitlines()))[1:]:
-            if len(r) < 4:
-                continue
-            fill = r[0].count("⬤")
-            if fill:
-                diff = fill
-            ch = r[3].strip()
-            if ch and ch in pairs:
-                out[pairs[ch]] = labels.get(diff, "Other")
+    src = (_HERE / "builders" / "creeps.py").read_text(encoding="utf-8")
+    createhero = dict(_re.findall(r"'([a-z0-9_]+)':\s*'(npc_dota_neutral_[a-z0-9_]+)'", src))
+    block = _re.search(r"CREEP_CAMP\s*=\s*\{(.*?)\n    \}", src, _re.S)
+    out = {}
+    if block:
+        for short, sizes in _re.findall(r"'([a-z0-9_]+)':\s*\[([^\]]+)\]", block.group(1)):
+            npc = createhero.get(short)
+            szs = _re.findall(r"'([a-z]+)'", sizes)
+            if npc and szs:
+                out[npc] = _CAMP_SIZE_DIFF[max(szs, key=lambda s: _CAMP_SIZE_RANK.get(s, 0))]
+    out.update(_CAMP_OVERRIDE)
     _UNIT_CAMP_CACHE = out
     return out
 
@@ -664,6 +669,20 @@ def _unit_camp_map() -> dict:
 def _npc_of(icon: str) -> str:
     m = _re.search(r"(npc_dota_[a-z0-9_]+)\.png", icon or "")
     return m.group(1) if m else ""
+
+
+def unit_page_slugs() -> dict:
+    """{npc_dota_* : unit-page slug} for every neutral/unit that has a change
+    page under dist/units/. The Neutral Stats builder uses this to turn creep
+    names into links. Empty until the patch pages exist (patch step runs first,
+    before this and the Neutral Stats build)."""
+    out = {}
+    for (kind, _slug), e in _collect().items():
+        if kind == "unit":
+            npc = _npc_of(e["icon"])
+            if npc:
+                out[npc] = _file_slug(e)
+    return out
 
 
 def _unit_groups(ents: list[dict]):

@@ -1217,6 +1217,7 @@ def save_creeps_html():
         data['lvl'] = level_for_row  # always set; rowspan handles merging
         data['createhero'] = createhero
         data['name'] = display_name
+        data['npc_key'] = npc_key      # for the Unit Changes name link
         data['icon'] = icon_path
         # Override the heuristic attack type with the curated CSV value
         # (strip trailing */** footnote markers). Falls back to the
@@ -1351,10 +1352,25 @@ def save_creeps_html():
         return bool(slug) and _os.path.exists(
             _os.path.join(_ABIL_ICON_DIR, slug + '.png'))
 
+    # npc -> Unit Changes page slug, so a creep's name links to its change page.
+    # Derived from the same patch pages the Unit Changes index reads (the patch
+    # step runs before this one, so dist/patches is already populated).
+    try:
+        import builders.entity_changes as _echg
+        _unit_page_slugs = _echg.unit_page_slugs()
+    except Exception:
+        _unit_page_slugs = {}
+
     def _cell_inner(k, v, d):
         """Inner HTML for a data cell. Attack Range → number + glass badge.
         Ability cells → the ability ICON (changelog style, smaller); the name
         is shown on hover. Falls back to the name text when no icon exists."""
+        if k == 'name':
+            slug = _unit_page_slugs.get(d.get('npc_key'))
+            if slug:
+                return (f'<a class="creep-name-link" href="units/{slug}.html">'
+                        f'{_esc(v)}</a>')
+            return _esc(v)
         if k == 'camp':
             if not v:
                 return '<span class="ua-dash">—</span>'
