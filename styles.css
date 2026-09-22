@@ -10050,7 +10050,7 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 /* Items: Basics | Upgrades | Neutral Items panels, 4 icons per row inside a category */
 .ec-igrid { display: grid; grid-template-columns: 4fr 4fr 3fr; gap: 0 16px; margin-top: 14px; }
 .ec-ipanel { border: 1px solid var(--line); border-radius: 6px; background: rgba(0, 0, 0, 0.18); padding: 10px 12px 6px; }
-.ec-ipanel-title { justify-content: center; font-size: 20px; }
+.ec-ipanel-title { justify-content: center; }
 .ec-ipanel-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 18px; align-content: start; }
 .ec-ipanel-body-1 { grid-template-columns: 1fr; }
 .ec-igroup { margin: 8px 0 4px; }
@@ -10074,8 +10074,10 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
    is wide so the categories read as clearly separated groups. */
 .ec-ugrid { display: flex; flex-wrap: wrap; gap: 18px 40px; margin-top: 14px; align-items: flex-start; }
 .ec-ucol { flex: 1 1 150px; min-width: 0; }
-.ec-ucol .ec-group-title { font-size: 13px; font-weight: 600; color: var(--text-dim, #8b949e); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
-.ec-camp-ico { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; opacity: 0.9; }
+/* Unit column titles inherit the shared .ec-group-title look (same font + size
+   as Hero attribute / Item panel headers); only keep them on one line. */
+.ec-ucol .ec-group-title { white-space: nowrap; }
+.ec-camp-ico { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; opacity: 0.9; }
 .ec-ucards { display: grid; grid-template-columns: repeat(auto-fill, minmax(66px, 1fr)); gap: 6px; }
 .ec-card-unit { aspect-ratio: 128 / 72; border-radius: 4px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--muted-04); transition: transform 0.12s, border-color 0.12s; }
 .ec-card-unit img { width: 100%; height: 100%; object-fit: cover; display: block; }

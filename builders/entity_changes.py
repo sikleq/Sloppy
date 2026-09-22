@@ -645,7 +645,8 @@ def _unit_camp_map() -> dict:
     Authoritative source: the hand-maintained CREEP_CAMP table in
     builders/creeps.py (createhero shortname -> in-game camp size[s]), the same
     data that drives the camp badges on Neutral Stats. When a creep spawns in
-    several camp sizes, the LARGEST is used so it shows in its toughest camp.
+    several camp sizes, the SMALLEST is used so it shows at the level it first
+    appears (e.g. Centaur Outrunner / Satyr Trickster -> Medium).
     (The old ⬤-column of creeps_raw.csv mis-filed the secondary members of a
     camp, e.g. Prowler Acolyte in Easy — CREEP_CAMP fixes that.)"""
     global _UNIT_CAMP_CACHE
@@ -660,7 +661,7 @@ def _unit_camp_map() -> dict:
             npc = createhero.get(short)
             szs = _re.findall(r"'([a-z]+)'", sizes)
             if npc and szs:
-                out[npc] = _CAMP_SIZE_DIFF[max(szs, key=lambda s: _CAMP_SIZE_RANK.get(s, 0))]
+                out[npc] = _CAMP_SIZE_DIFF[min(szs, key=lambda s: _CAMP_SIZE_RANK.get(s, 99))]
     out.update(_CAMP_OVERRIDE)
     _UNIT_CAMP_CACHE = out
     return out
