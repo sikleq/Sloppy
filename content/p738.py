@@ -1298,9 +1298,6 @@ def build():
     W(ability("Aggrandize", slug="dark_seer_aggrandize", innate=True))
     W(ul_open())
     W(li("New innate ability. Passive, improves with Dark Seer's level"))
-    W(ul_close())
-    W(ability("Quick Wit", slug="dark_seer_quick_wit"))
-    W(ul_open())
     W(li("Attack Speed per Intelligence increased from 0.5 to 1", b(0.5, 1)))
     W(ul_close())
 
