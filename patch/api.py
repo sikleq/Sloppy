@@ -11,5 +11,5 @@ from .elements import (
     inline_note, info_tip, show_list, subnote, section_intro, note_box, cm_draft
 )
 from .stats import stat_h, stat_i, bstat_h, bstat_i, bstat_u, prev_change_patch_h, prev_change_patch_i, prev_change_patch_u
-from .images import hero_img, item_img, abil_img, HERO_CDN, ITEM_CDN, ABIL_CDN
+from .images import hero_img, item_img, abil_img, HERO_CDN, ITEM_CDN, ABIL_CDN, NEUTRAL_CDN
 from .page import write_head, save_html, write_footer, save_assets

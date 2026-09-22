@@ -110,6 +110,25 @@ from generate_patch_code_v2 import (
     # 7.38 audit: "No longer <heals/casts> ... by default" removes a beneficial effect → DEL
     ("No longer heals Invoker when dealing damage by default", "DEL"),
     ("No longer casts Press the Attack on victory by default", "DEL"),
+    # 2026-09-22 generator-vs-proofread diff on 7.38 (confident direction flips)
+    ("Tempest Double no longer has penalties when more than 2000 range away from Arc Warden", "BUFF"),
+    ("Passive: Buried Treasure. Gold loss on death is reduced by 100%", "BUFF"),
+    ("No longer freezes enemy ability and item cooldowns", "DEL"),
+    ("No longer reduces vision", "DEL"),
+    ("Now isn't removed on attack by default", "BUFF"),
+    ("Ghost Shroud: Now also makes enemies have their restoration amplification decreased by the same value", "BUFF"),
+    # unparseable from/to ("3 minutes") falls back to increased/decreased — must honour lower-is-better
+    ("Spawn interval increased from 3 minutes to 4 minutes", "NERF"),
+    ("Spawn interval decreased from 4 minutes to 3 minutes", "BUFF"),
+    # a NEGATIVE cooldown amount is a cooldown-reduction talent: bigger magnitude = buff
+    ("Level 10 Talent increased from -5s Unstable Concoction Cooldown to -8s", "BUFF"),
+    # user rule: adding an icon / indicator is QoL, not a buff
+    ("Added a Roshan icon near the minimap that shows Roshan's state (alive, dead, maybe alive) and location:", "QoL"),
+    ("Added a visual indicator over the caster of the smoke.", "QoL"),
+    ("Now is an innate ability", "REWORK"),
+    ("Now levels with Marksmanship", "REWORK"),
+    ("Now requires Aghanim's Scepter to cast other abilities during channeling", "NERF"),
+    ("Affected units no longer take increased magical and pure damage bonus from Winter Wyvern by default", "NERF"),
 ])
 def test_guess_tag(text, expected):
     assert _guess_tag(text) == expected
@@ -167,7 +186,16 @@ def test_damage_at_level_range_matches(text, groups):
     ("Spellover damage threshold increased from 100 to 200", True),
     ("Aghanim's Shard pulse interval decreased from 3.5s to 3s", True),
     ("Twister spawn interval increased from 300 to 400", True),
+    # 2026-09-22 7.38 diff: owner-side timers / trigger requirements
+    ("Restock Time decreased from 80s to 70s", True),
+    ("Sai Base Attack Rate increased from 1.2/1.1/1.0/0.9s to 1.3/1.2/1.1/1s", True),
+    ("Number of enemy units in range required to trigger a cast increased from 1 to 3", True),
+    ("Summon Familiars: Familiar Gold Bounty decreased from 70 to 50", True),   # own summon's bounty
     # Should NOT match (normal direction)
+    # own bonuses that merely mention a lower-is-better word
+    ("Level 25 Talent BAT Reduction during Insatiable Hunger decreased from 0.3s to 0.25s", False),
+    ("Thirst: Bonus Move Speed while on cooldown increased from 0% to 50%", False),
+    ("Double Edge: Damage taken as damage bonus increased from 25% to 35%", False),
     # enemy debuff strengths (higher = better for the caster): armor / attack-speed / resistance reduction, armor loss
     ("Armor Reduction decreased from 5/6/7/8 to 3.5/5/6.5/8", False),
     ("Attack Speed Reduction increased from 30% to 35%", False),
@@ -243,3 +271,47 @@ def test_recipe_and_total_both_change_still_tags_by_total():
     # recipe % inline, total badge drives the row
     assert '+ b(300, 200, l=True)' in out
     assert out.rstrip().endswith('b(2500, 2600, l=True)))')
+
+
+# ---- Generated scaffolds must be valid Python for every datafeed version ----
+# Regression: a "Base X increased" row already carries extra=note_box(...); when an
+# indented "Damage on level 1 ..." sub-row was folded onto it, the generator appended
+# a SECOND `extra=` kwarg -> SyntaxError ("keyword argument repeated") for 7.41+.
+_ALL_VERSIONS = sorted(
+    os.path.basename(p)[:-len("_datafeed.json")]
+    for p in __import__("glob").glob(os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "*_datafeed.json"))
+)
+
+
+@pytest.mark.parametrize("version", ["7.41", "7.41a", "7.41b", "7.41c", "7.41d", "7.41f"])
+def test_generated_scaffold_compiles(version, capsys):
+    import generate_patch_code_v2 as g
+    src = g.generate(version)
+    capsys.readouterr()
+    compile(src, f"_generated_p_{version}", "exec")      # raises SyntaxError on duplicate kwargs
+
+
+def test_folded_subrow_merges_into_existing_extra(capsys):
+    import generate_patch_code_v2 as g
+    src = g.generate("7.41a")
+    capsys.readouterr()
+    for ln in src.splitlines():
+        if ln.startswith("W(li(") and "note_box(" in ln and "inline_note(" in ln:
+            assert ln.count("extra=") == 1, ln
+            assert "+ inline_note(" in ln, ln
+            break
+    else:
+        pytest.fail("expected a Base-stat row with both note_box and a folded inline_note")
+
+
+# Regression: neutral-creep headers were emitted as `_NC_CDN + "x.png"`, a name that
+# only exists if the content file defines it by hand -> NameError when the scaffold
+# runs. The generator must reference an icon prefix exported by patch.api.
+@pytest.mark.parametrize("version", ["7.31", "7.38", "7.41"])
+def test_generated_scaffold_executes(version, capsys):
+    import generate_patch_code_v2 as g
+    src = g.generate(version)
+    capsys.readouterr()
+    ns = {}
+    exec("from patch.api import *\n" + src, ns)          # NameError before the fix
+    capsys.readouterr()

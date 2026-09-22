@@ -7,6 +7,9 @@ import os as _os
 HERO_CDN = "../icons/heroes/"
 ITEM_CDN = "../icons/items/"
 ABIL_CDN = "../icons/abilities/"
+# Neutral-creep portraits: NEUTRAL_CDN + "<engine name>.png" (e.g. "kobold.png").
+# Exported so generated scaffolds work without a hand-written _NC_CDN.
+NEUTRAL_CDN = "../icons/units/npc_dota_neutral_"
 
 # Local ability-icon filenames (slug, no extension), loaded once. Used to
 # decide at build time whether an ability icon actually exists on disk — if not,

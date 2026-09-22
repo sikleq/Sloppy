@@ -221,7 +221,18 @@ CANONICAL_TAGS = [
     # BUFF first — removing a penalty / restriction is positive (memory rule
     # sloppy_no_longer_penalty_is_buff). Tightly anchored so legitimate DEL
     # phrasings don't accidentally match.
-    (re.compile(r'\bno longer has (?:an? |the )?(?:\w+ ){1,3}(?:penalty|restriction|drawback|downside|debuff slow)\b', re.I), 'BUFF'),
+    (re.compile(r'\bno longer has (?:an? |the )?(?:\w+ ){0,3}(?:penalt(?:y|ies)|restrictions?|drawbacks?|downsides?|debuff slow)\b', re.I), 'BUFF'),
+    # ── 2026-09-22 generator-vs-proofread diff (7.38): confident direction flips ──
+    (re.compile(r"\bno longer (?:reduces|decreases) (?:enemy |enemies'? |their |the target'?s? )?vision\b", re.I), 'DEL'),  # enemy vision debuff removed (NS Void)
+    (re.compile(r'\bno longer freezes enem', re.I), 'DEL'),                              # freezing ENEMY cooldowns = a benefit removed
+    (re.compile(r"\b(?:isn't|is not|no longer|won't be|will not be) (?:be )?removed\b", re.I), 'BUFF'),  # own effect now persists
+    (re.compile(r'\bloss\b[^.]*?\b(?:reduced|decreased|lowered)\b(?![^.]*\bfrom\s+[-+]?\d)', re.I), 'BUFF'),  # "Gold loss on death is reduced"
+    (re.compile(r'\bloss\b[^.]*?\bincreased\b(?![^.]*\bfrom\s+[-+]?\d)', re.I), 'NERF'),
+    (re.compile(r'\b(?:makes|causes) enem(?:y|ies)\b[^.]*\b(?:decreased|reduced|lowered)\b', re.I), 'BUFF'),  # a debuff put on enemies
+    (re.compile(r'\baffected (?:units|enemies|targets) no longer (?:take|receive|suffer|have)\b', re.I), 'NERF'),  # enemy debuff lifted
+    (re.compile(r"^Added (?:an? |the )?(?:[\w']+ ){0,4}(?:icon|indicator|marker)\b", re.I), 'QoL'),  # user rule: new icon = QoL
+    (re.compile(r'^\s*Now is (?:an? )?innate ability\.?\s*$', re.I), 'REWORK'),   # bare conversion only; "…that improves with X" is judged per case
+    (re.compile(r'\bnow levels with\b', re.I), 'REWORK'),
     # removing an Aghs upgrade / benefit ("no longer decreases cooldown / stun delay") = DEL, not BUFF
     (re.compile(r'\bno longer (?:decreases|reduces)\b(?:(?!wind[- ]?up).)*?\b(?:cooldown|stun delay)\b', re.I), 'DEL'),
     (re.compile(r'\bno longer (?:reduces|decreases) ', re.I),       'BUFF'),
@@ -324,6 +335,11 @@ LOWER_IS_BUFF = re.compile(
     r'|mana\s+per\s+second'
     r'|health\s+cost'
     r'|(?:damage|hit)\s+threshold'
+    # 2026-09-22: owner-side timers and trigger requirements
+    r'|restock\s+time'
+    r'|base\s+attack\s+rate'                     # seconds per attack (Kez Sai/Katana) — like BAT
+    r'|required\s+to\s+(?:trigger|cast|activate|proc)'
+    r'|(?:familiar|summon(?:ed)?|illusion|ward|spirit)s?\s+(?:gold\s+)?bounty'   # own summon's bounty
     r')\b',
     re.I,
 )
@@ -340,7 +356,13 @@ _NOT_LOWER_IS_BUFF = re.compile(
     r'|\bsearch\s+radius\b'
     r'|\bmax\s+health\s+minimum\b'
     # "damage threshold reduction" is the opposite of a raw "damage threshold": more reduction = better
-    r'|\bthreshold\s+reduction\b',
+    r'|\bthreshold\s+reduction\b'
+    # own bonuses that merely mention a lower-is-better word (2026-09-22)
+    r'|\b(?:BAT|base\s+attack\s+time)\s+reduction\b'
+    r'|\b(?:while|when|during)\s+(?:on\s+)?cooldown\b'
+    r'|\bdamage\s+taken\s+as\s+(?:damage\s+)?bonus\b'
+    # a NEGATIVE cooldown amount ("-5s Unstable Concoction Cooldown") is a reduction talent
+    r'|-\d[\d./]*s?\s+(?:[\w\']+\s+){0,4}cooldown\b',
     re.I,
 )
 
@@ -354,6 +376,7 @@ TAG_OVERRIDES = {
     "health restoration consolidat": "MISC",  # "consolidated Health Restoration" = structural
     "now shares cooldown":          "MISC",
     "now has a shared cooldown":    "MISC",
+    "now requires aghanim's":       "NERF",    # a capability now gated behind Aghs (checked before "now requires")
     "now requires":                 "REWORK",  # "Now requires X instead of Y"
     "instead of":                   "REWORK",  # component/requirement swap
     "respawn time increased":       "NERF",    # "increased" heuristic gives BUFF, but higher respawn = worse
@@ -383,10 +406,13 @@ def _guess_tag(text):
     has_parseable_from_to = bool(re.search(
         r'\bfrom\s+[-+]?\d[\d./]*\s+to\s+[-+]?\d[\d./]*', clean, re.I
     )) and not re.search(r'\bfrom\s+[-+]?\d+[^0-9\s./]*[–]', clean)
+    # Unparseable values ("from 3 minutes to 4 minutes") can't become b(), so the
+    # direction must come from here — honour lower-is-better (intervals, costs…).
+    lower = _is_lower_better(clean)
     if re.search(r'\b(increased|raised)\b', clean, re.I):
-        return None if has_parseable_from_to else 'BUFF'
+        return None if has_parseable_from_to else ('NERF' if lower else 'BUFF')
     if re.search(r'\b(decreased|reduced|lowered|worsened)\b', clean, re.I):
-        return None if has_parseable_from_to else 'NERF'
+        return None if has_parseable_from_to else ('BUFF' if lower else 'NERF')
     if re.search(r'\bimproved\b', clean, re.I):
         return None if has_parseable_from_to else 'BUFF'
     return 'MISC'
@@ -718,13 +744,15 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
                     old_line, count=1,
                 )
             else:
-                # Insert `, extra=inline_note("text")` before the W(li(…))
-                # closing parens — match the rightmost "))".
+                # Insert the note before the W(li(…)) closing parens — match the
+                # rightmost "))". If the row already carries some other extra=
+                # (e.g. note_box(...) on a "Base X increased" row), concatenate
+                # instead of adding a second `extra=` kwarg (a SyntaxError).
                 i = old_line.rfind('))')
                 if i >= 0:
-                    lines[last_idx] = (
-                        old_line[:i] + f', extra=inline_note("{esc}")))'
-                    )
+                    joiner = (f' + inline_note("{esc}")))' if 'extra=' in old_line
+                              else f', extra=inline_note("{esc}")))')
+                    lines[last_idx] = old_line[:i] + joiner
             last_indent = lvl
             continue
 
@@ -1062,7 +1090,7 @@ def _render_neutral_creep(creep):
     # Some summoned units (e.g. Skeleton Warrior) use npc_dota_ prefix, not neutral.
     if not slug or slug == name:
         slug = name.replace('npc_dota_', '', 1) if name.startswith('npc_dota_') else name
-    icon = f'_NC_CDN + "{slug}.png"' if slug else '""'
+    icon = f'NEUTRAL_CDN + "{slug}.png"' if slug else '""'
     out.append(f'\n# {display}')
     out.append(f'W(unit_header("{display}", {icon}))')
 
