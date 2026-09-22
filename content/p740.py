@@ -1603,17 +1603,7 @@ def build():
     ))
     W(ul_open())
     W(li("Now interacts with other spells, mechanics and game systems as a hero", t("NEW"),
-         extra=show_list(
-             "Attacks now count as melee hero attacks against: Roshan's Banner, Clinkz' Skeleton Archers, Lich's Ice Spire, Phoenix's Supernova, Pugna's Nether Ward, Templar Assassin's Psionic Traps, and Undying's Tombstone (already did hero damage to Shadow Shaman's Mass Serpent Wards, Couriers, Observer Wards and Sentry Wards)",
-             "Can now be targeted or affected as a hero by: Axe's Culling Blade, Bounty Hunter's Track, Earth Spirit's Petrify, Legion Commander's Duel, Lion's Finger of Death, Mars' Spear of Mars, Necrophos' Reaper's Scythe, Slark's Pounce, Terrorblade's Reflection, Terrorblade's Sunder (only if the Bear is not Debuff Immune), and Underlord's Atrophy Aura",
-             "At the same time, Bounty Hunter will not steal Lone Druid's gold anymore by hitting Spirit Bear with Jinada or by using skills with Cutpurse facet on it",
-             "Death will not provide charges for: Urn of Shadows and its upgrades, Pudge's permanent Strength from Flesh Heap, Silencer's permanent Int from Brain Drain, Slark's permanent Agility from Essence Shift, and Storm Spirit's stacks for Galvanized (temporary attribute losses from Silencer's, Slark's and other similar spells still work)",
-             "Can now capture Watchers and Outposts",
-             "Can now break enemy Smoke of Deceit",
-             "Starts with a Town Portal Scroll on cooldown the first time it is summoned",
-             "Receives a copy of Lone Druid's Neutral Item with an independent cooldown",
-             "Has a separate Talent Tree",
-             summary="Show all interactions")))
+         extra=inline_note("Attacks now count as melee hero attacks against: Roshan's Banner, Clinkz' Skeleton Archers, Lich's Ice Spire, Phoenix's Supernova, Pugna's Nether Ward, Templar Assassin's Psionic Traps, and Undying's Tombstone (already did hero damage to Shadow Shaman's Mass Serpent Wards, Couriers, Observer Wards and Sentry Wards)<br>Can now be targeted or affected as a hero by: Axe's Culling Blade, Bounty Hunter's Track, Earth Spirit's Petrify, Legion Commander's Duel, Lion's Finger of Death, Mars' Spear of Mars, Necrophos' Reaper's Scythe, Slark's Pounce, Terrorblade's Reflection, Terrorblade's Sunder (only if the Bear is not Debuff Immune), and Underlord's Atrophy Aura<br>At the same time, Bounty Hunter will not steal Lone Druid's gold anymore by hitting Spirit Bear with Jinada or by using skills with Cutpurse facet on it<br>Death will not provide charges for: Urn of Shadows and its upgrades, Pudge's permanent Strength from Flesh Heap, Silencer's permanent Int from Brain Drain, Slark's permanent Agility from Essence Shift, and Storm Spirit's stacks for Galvanized (temporary attribute losses from Silencer's, Slark's and other similar spells still work)<br>Can now capture Watchers and Outposts<br>Can now break enemy Smoke of Deceit<br>Starts with a Town Portal Scroll on cooldown the first time it is summoned<br>Receives a copy of Lone Druid's Neutral Item with an independent cooldown<br>Has a separate Talent Tree")))
     # Ability order, old → new: bare square ability icons in a single flow row
     # (hover = name), arrow between the groups. NEW-in-7.40 Spirit Link gets the
     # purple ring; the hidden innate Demolish is dimmed.
