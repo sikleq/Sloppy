@@ -34,3 +34,14 @@ def test_static_classes():
     assert all(c in lis[1] for c in ("li-notext", "li-bg", "li-formula"))
     assert out.count("ab-empty") == 1
     assert "has-formula-wrap" in out
+
+
+def test_new_mechanic_rows_drop_only_the_new_chip():
+    from patch.page import _new_mech_rows
+    html = ('<ul class="changes"><!--NEWMECH--><li data-tag="buff new"><span class="badge new" data-tag="new">NEW</span>'
+            '<span class="row-text">a</span></li><li data-tag="misc"><span class="badge misc" data-tag="misc">MISC</span>'
+            '<span class="row-text">b</span></li></ul><ul class="changes"><li data-tag="new"><span class="badge new">NEW</span></li></ul>')
+    out = _new_mech_rows(html)
+    assert "<!--NEWMECH-->" not in out
+    assert out.count('<span class="row-tag-empty"></span>') == 1        # only the NEW row in the marked list
+    assert ">MISC<" in out and out.count(">NEW<") == 1                  # unmarked list keeps its chip

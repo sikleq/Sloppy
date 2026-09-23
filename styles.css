@@ -3246,7 +3246,8 @@ ul.changes li.ability-row-end {
 /* Type label after the item name — small, uppercased, NEW colour family.
    vertical-align: middle so it sits on the item name's optical mid-line
    instead of dropping to the baseline of the larger heading text. */
-.entity-name .entity-new-type {
+.entity-name .entity-new-type,
+h4.subgroup .subgroup-new-type {
   margin-left: 8px;
   /* The entity name itself is pixel-font (Jersey 25); these add-on labels
      ("NEW ARMAMENT ITEM", "Recipe changed") stay in the regular UI font. */

@@ -322,6 +322,7 @@ ITEM_DISPLAY_OVERRIDES = {
 
 def _open_block(extra_cls='', extra_attrs=''):
     pre = _close_ability_block()
+    _State.new_mech_header = _State.new_mech = False     # a new block ends any "new mechanic" run
     cls = 'entity-block' + ((' ' + extra_cls) if extra_cls else '')
     s = (pre + ('</div>\n' if _State.block_open else '')
          + f'<div class="{cls}"{extra_attrs}>\n')
@@ -538,7 +539,9 @@ def item_header(name, new=False, changed=False):
 </div>'''
 
 
-def plain_header(name, dynamics=True, terrain_link=None, sublabel=False):
+def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=None):
+    """new="New mechanic": a label after the title says the whole block is new; its NEW rows
+    then drop the per-row chip (the header already says it) — other tags keep theirs."""
     out = _close_ability_block()
     _State.current_hero = None
     _State.current_unit = None
@@ -566,7 +569,10 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False):
             f'<img src="../icons/ui/gothic/icon_terrain.png" alt="" width="16" height="16">'
             f'<span>View on map</span></a>')
     extra_cls = ' label-only' if sublabel else ''
-    return out + _open_block(extra_cls) + f'<div class="entity plain-entity"{eid}><div class="entity-name">{name}</div>{link_html}</div>'
+    head = _open_block(extra_cls)
+    _State.new_mech_header = _State.new_mech = bool(new)
+    label = f' <span class="entity-new-type">{new}</span>' if new else ''
+    return out + head + f'<div class="entity plain-entity"{eid}><div class="entity-name">{name}{label}</div>{link_html}</div>'
 
 
 def enchant_header(name, slug=None, new=False):
@@ -606,9 +612,12 @@ def section(title):
     return out
 
 
-def subgroup(title):
+def subgroup(title, new=None):
+    """new="New mechanic": same as plain_header(new=…) for one subgroup (a label after the title,
+    NEW rows of its lists without chips). Without it the subgroup inherits the header's state."""
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
+    _State.new_mech = bool(new) or _State.new_mech_header
     if title.lower() == "abilities":
         _State.seen_abilities_subgroup = True
     if title.lower() == "talents":
@@ -623,7 +632,8 @@ def subgroup(title):
         return out + (f'<h4 class="subgroup">{title}</h4>'
                       f'<div class="ability-block talents-block">'
                       f'<div class="ability-icon-wrap">{icon}</div>')
-    return out + f'<h4 class="subgroup">{title}</h4>'
+    label = f' <span class="subgroup-new-type">{new}</span>' if new else ''
+    return out + f'<h4 class="subgroup">{title}{label}</h4>'
 
 
 def ability(title, slug=None, innate=None, icon_url=None, sub=False):
@@ -908,7 +918,8 @@ def ul_open():
         _State.in_stats_ul = True
     if _State.current_block_is_facet:
         _State.facet_block_had_ul = True
-    return out + '<ul class="changes">'
+    # marker read by patch/page.py _new_mech_rows (NEW rows lose the chip, keep data-tag)
+    return out + '<ul class="changes">' + ('<!--NEWMECH-->' if _State.new_mech else '')
 
 
 def ul_close():

@@ -203,3 +203,9 @@ W(li("X no longer has a separate value for incoming heal reduction", t("MISC"),
 - **Тултип НЕ нужен**: рядом уже есть текст эффекта (раздел **Enchantment Changes** — у каждой чары перечислены бонусы рядом с чипом).
 
 HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.enchant-chip[data-tooltip]::after` уже стилизует popup.
+
+## Новая механика целиком — метка в заголовке, без чипа NEW на каждой строке
+
+Если блок описывает **совсем новую механику** (7.38 Wandering Waters, Shrines of Wisdom, Lotus Pools, крафт нейтралок, Flooded Camps), то пометку NEW ставят один раз, в заголовке:
+`W(plain_header("Wandering Waters", new="New mechanic"))` или `W(subgroup("Lotus Pools", new="New mechanic"))`.
+Строки при этом так и пишутся с `t("NEW")`: тег нужен фильтру и динамике. Но на странице у них вместо чипа точка-маркер (`patch/page.py` `_new_mech_rows`). Строки с другими тегами (MISC, DEL, REWORK…) свой чип сохраняют — так видно, что в новой механике «не новое».

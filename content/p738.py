@@ -20,7 +20,7 @@ def build():
     W(li("Items that have entered a Hero's backpack for the very first time now have a 3 second grace period where they can be swapped into the main inventory without any cooldown. This can only happen once per item per Hero", t("NEW")))
     W(ul_close())
 
-    W(plain_header("Wandering Waters"))
+    W(plain_header("Wandering Waters", new="New mechanic"))
     W(ul_open())
     W(li("The top and bottom outer rim areas are now flooded by streams of traversable water", t("NEW")))
     W(li("These streams have a current, starting near the T3 towers (right before the medium camp location), down to the T1 towers (former Twin Gate location)", t("NEW")))
@@ -54,13 +54,13 @@ def build():
     W(li("Tormentor spawns repositioned to the corners of the map", t("MISC")))
     W(li("Tormentor now spawns for the first time at 15:00", t("MISC"), extra=inline_note("7:30 in Turbo")))
     W(ul_close())
-    W(subgroup("Lotus Pools"))
+    W(subgroup("Lotus Pools", new="New mechanic"))
     W(ul_open())
     W(li("Changed the way Healing Lotuses are collected from Lotus Pools", t("REWORK"), extra=inline_note("Lotus Pools now have three entrances and an empty region in the center<br>Heroes will automatically gather lotuses when within 350 units of the center of a pool as long as they have available space in their inventory<br>The first Lotus takes 1.5s to collect, and each subsequent lotus in a row takes 30% less time — The second lotus will take 1.05s, the third one takes 0.735s, down to a minimum of 0.3s<br>The timer only counts down when all heroes within range are on the same team, pausing if an enemy hero enters the area, and resuming when enemies leave<br>If multiple allied heroes are all within range, the Lotus will be granted to a random hero")))
     W(li("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Great Lotuses they could form")))
     W(li("Lotus Pools will now spawn Greater Lotuses after Tier 5 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Great Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Greater Lotuses they could form")))
     W(ul_close())
-    W(subgroup("Shrines of Wisdom"))
+    W(subgroup("Shrines of Wisdom", new="New mechanic"))
     W(ul_open())
     W(li("Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom", t("DEL")))
     W(li("Shrines of Wisdom are located in the offlane side jungles between the Tier 1 and 2 towers where the Ancient camps used to be", t("NEW")))
@@ -95,7 +95,7 @@ def build():
     W(section("Neutral Creep Updates"))
 
     # Flooded Camps (label — no own changes; sub-units follow)
-    W(plain_header("Flooded Camps", dynamics=False))
+    W(plain_header("Flooded Camps", dynamics=False, new="New mechanic"))
     W(ul_open())
     W(li("Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian neutral creeps", t("NEW"), extra=inline_note("Easy camp on the rim between tier 1 and tier 2 towers<br>Medium camp on the rim near tier 2 tower<br>Medium camp in the main jungle that was on the stream's way and used to be a Hard camp")))
     W(li("As the tides of battle rise, every 5 minutes one creep in a Flooded Camp is permanently upgraded to the next tier", t("NEW"), extra=inline_note("Each camp has 3 units, so at 15:00 the Easy camp becomes a Medium camp and both Medium camps become Hard; at 30:00 the Medium camp becomes Hard and both Hard camps become Ancient")))
@@ -449,7 +449,7 @@ def build():
     # ===== NEUTRAL ITEM UPDATES =====
     W(section("Neutral Item Updates"))
 
-    W(plain_header("Neutral Crafting", dynamics=False, sublabel=True))
+    W(plain_header("Neutral Crafting", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
     W(li("Neutral Stash has been removed", t("DEL")))
     W(li("Neutral creeps no longer drop Neutral Tokens", t("DEL")))
@@ -458,7 +458,7 @@ def build():
     W(li("Collecting enough Madstone allows the player to craft a Neutral Item by selecting one Artifact and one Enchantment", t("NEW")))
     W(ul_close())
 
-    W(plain_header("Obtaining Madstone", dynamics=False, sublabel=True))
+    W(plain_header("Obtaining Madstone", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
     W(li("Fully clearing a Neutral Creep Camp provides Madstone for the killing player’s team", t("NEW")))
     W(li("The player who collects the Madstone receives 2 and 1 is given to a random teammate", t("NEW"), extra=inline_note("Clearing an Ancient Creep Camp provides 3 to the killer and 2 are split between random teammates")))
@@ -466,13 +466,13 @@ def build():
     W(li("If the player who collects the Madstone is already at their limit (more info below), all of their Madstone is also evenly split between teammates", t("NEW")))
     W(ul_close())
 
-    W(plain_header("Item Tiers", dynamics=False, sublabel=True))
+    W(plain_header("Item Tiers", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
     W(li("Neutral Items are now composed of two parts: Artifacts & Enchantments", t("NEW"), extra=inline_note("Artifacts are the ability of the item and can be passive and/or active<br>Enchantments provide passive stats and attributes to items")))
     W(li("Similar to the previous Neutral Item System, items are arranged by Tiers", t("NEW"), extra=inline_note("Each Tier is only available past a specific point in time<br>Each Artifact belongs to a single tier<br>Enchantments have multiple levels and can be found in multiple tiers")))
     W(ul_close())
 
-    W(plain_header("Crafting", dynamics=False, sublabel=True))
+    W(plain_header("Crafting", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
     W(li("When crafting, players are given a choice of 4 Artifacts and 4 Enchantments and choose one of each", t("NEW"), extra=inline_note("Artifacts will provide 3 options from the current tier and the last option will be to keep the current Artifact<br>Enchantments will provide 4 options from the current tier with no option to keep the current Enchantment — Given that Enchantments exist across multiple Tiers, it is possible that players can get the same Enchantment multiple Tiers in a row, but it is not guaranteed")))
     W(li("Crafting a Neutral Item replaces the existing Neutral Item, if there is one", t("NEW")))
@@ -481,13 +481,13 @@ def build():
     W(li("Crafting Tier 2, 3, 4, or 5 Neutral Items takes 10 Madstone", t("NEW"), extra=inline_note("Tier 5 Neutral Items can be recrafted for an escalating 10 Madstone cost")))
     W(ul_close())
 
-    W(plain_header("Madstone Limits", dynamics=False, sublabel=True))
+    W(plain_header("Madstone Limits", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
     W(li("Players are limited in the amount of Madstone they can obtain at any given point in time", t("NEW")))
     W(li("At specific intervals, the limit will increase enough to allow players to craft the next Tier of Neutral Items", t("NEW"), extra=inline_note("At the start of the game, the Madstone Cap is 0<br>At 5:00, the Madstone Cap is increased to 5 — This is enough to craft a Tier 1 Neutral Item<br>At 15:00, the Madstone Cap is increased to 15 — This is enough to craft a Tier 2 Neutral Item<br>At 25:00, the Madstone Cap is increased to 25 — This is enough to craft a Tier 3 Neutral Item<br>At 35:00, the Madstone Cap is increased to 35 — This is enough to craft a Tier 4 Neutral Item<br>At 60:00, the Madstone Cap is increased to 45 — This is enough to craft a Tier 5 Neutral Item<br>At 70:00, the Madstone Cap is removed and players can collect infinite Madstone — This is so that the player can recraft their Tier 5 Neutral Item infinite times")))
     W(ul_close())
 
-    W(plain_header("Turbo", dynamics=False, sublabel=True))
+    W(plain_header("Turbo", dynamics=False, sublabel=True, new="New mechanic"))
     W(ul_open())
     W(li("Madstone Availability times are halved in Turbo", t("NEW"), extra=inline_note("Tier 1 items are available starting at 2:30")))
     W(li("Collecting Madstone results in 3 Madstone for the player and 2 for their team", t("NEW"), extra=inline_note("Ancient Creep Camps give 4 Madstone for the primary player and 3 for their team")))

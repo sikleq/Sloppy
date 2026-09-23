@@ -358,6 +358,18 @@ def _thumb_srcs(html):
     return _THUMB_RE.sub(repl, html)
 
 
+_NEWMECH_UL_RE = re.compile(r'<ul class="changes"><!--NEWMECH-->(.*?)</ul>', re.S)
+_NEW_CHIP_RE = re.compile(r'(<li\b[^>]*data-tag="[^"]*\bnew\b[^"]*"[^>]*>)<span class="badge new"[^>]*>NEW</span>')
+
+
+def _new_mech_rows(html):
+    """Lists under a "new mechanic" header (plain_header/subgroup new=…): the header label says
+    NEW once, so each NEW row shows a bullet instead of its chip (data-tag stays for the filters)."""
+    return _NEWMECH_UL_RE.sub(
+        lambda m: '<ul class="changes">' + _NEW_CHIP_RE.sub(r'\1<span class="row-tag-empty"></span>', m.group(1)) + '</ul>',
+        html)
+
+
 def save_html(filename):
     """Write current accumulator to ./{filename} and reset state."""
     out = "\n".join(H)
@@ -365,6 +377,7 @@ def save_html(filename):
     out = _swap_single_row_other_icons(out)
     out = _sort_changes_li(out)
     out = _wrap_ability_boxes(out)
+    out = _new_mech_rows(out)
     # Perf: :has() facts as build-time classes (patch/static_has.py)
     out = add_static_has_classes(out)
     # Perf: 2x-size WebP icons instead of the full PNGs (tools/make_thumbs.py)

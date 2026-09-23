@@ -19,6 +19,8 @@ class _State:
     section_panel_open = False       # True while inside a <section class="cat-panel"> wrapper
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup
     seen_facets_subgroup = False     # set when first facet_header() emits "Facets" subgroup
+    new_mech_header = False          # plain_header(new=…): the whole block is a new mechanic
+    new_mech = False                 # current ul lists a new mechanic → its NEW rows lose the chip
     current_sections = []            # per-patch list of {slug, label}; reset in save_html()
     current_section_slug = None      # slug of the active section(); "general" suppresses dyn-cells
     # Patch-dynamics widget: tag tallies per (entity, patch). Populated by
