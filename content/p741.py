@@ -30,7 +30,7 @@ def build():
          extra=inline_note("Previously was only provided by sections on the base and near it, while other sections provided max bonus of 100.")))
     W(ul_close())
     W(plain_header("Map Objectives"))
-    W(unit_header("Shrine of Wisdom", "../icons/structures/shrine_of_wisdom.png", general=False))
+    W(subgroup("Wisdom Shrines"))
     W(ul_open())
     W(li("Wisdom Shrines and Lotus Pools now reverse their countdowns if heroes from opposing teams enter the area, instead of pausing the countdown", t("REWORK")))
     W(li_formula("Wisdom Shrine Experience changed",

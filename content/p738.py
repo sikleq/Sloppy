@@ -35,13 +35,13 @@ def build():
     W(li("Gold provided after the initial set rescaled from 36 + (9 per 5 minutes) to 40 + (6 per 4 minutes)", t("REWORK")))
     W(li("Spawn interval increased from 3 minutes to 4 minutes", b(3, 4, l=True)))
     W(ul_close())
-    W(unit_header("Lotus Pool", "../icons/structures/lotus_pool.png", general=False))
+    W(subgroup("Lotus Pools"))
     W(ul_open())
     W(li("Changed the way Healing Lotuses are collected from Lotus Pools", t("REWORK"), extra=inline_note("Lotus Pools now have three entrances and an empty region in the center<br>Heroes will automatically gather lotuses when within 350 units of the center of a pool as long as they have available space in their inventory<br>The first Lotus takes 1.5s to collect, and each subsequent lotus in a row takes 30% less time — The second lotus will take 1.05s, the third one takes 0.735s, down to a minimum of 0.3s<br>The timer only counts down when all heroes within range are on the same team, pausing if an enemy hero enters the area, and resuming when enemies leave<br>If multiple allied heroes are all within range, the Lotus will be granted to a random hero")))
     W(li("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Great Lotuses they could form")))
     W(li("Lotus Pools will now spawn Greater Lotuses after Tier 5 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Great Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Greater Lotuses they could form")))
     W(ul_close())
-    W(unit_header("Shrine of Wisdom", "../icons/structures/shrine_of_wisdom.png", general=False, new_mech="New mechanic"))
+    W(subgroup("Shrines of Wisdom", new="New mechanic"))
     W(ul_open())
     W(li("Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom", t("DEL")))
     W(li("Shrines of Wisdom are located in the offlane side jungles between the Tier 1 and 2 towers where the Ancient camps used to be", t("NEW")))
@@ -109,14 +109,17 @@ def build():
     W(ul_open())
     W(li("Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian neutral creeps", t("NEW"), extra=inline_note("Easy camp on the rim between tier 1 and tier 2 towers<br>Medium camp on the rim near tier 2 tower<br>Medium camp in the main jungle that was on the stream's way and used to be a Hard camp")))
     W(li("As the tides of battle rise, every 5 minutes one creep in a Flooded Camp is permanently upgraded to the next tier", t("NEW"), extra=inline_note("Each camp has 3 units, so at 15:00 the Easy camp becomes a Medium camp and both Medium camps become Hard; at 30:00 the Medium camp becomes Hard and both Hard camps become Ancient")))
-    W(li("These camps consist of the following creeps", t("NEW"), extra=inline_note("Easy camp is three Pollywogs<br>Medium camp is two Boglets and a Marshmage Apprentice<br>Hard camp is two Croakers and a Marshmage<br>Ancient camp is two Ancient Croakers and an Ancient Marshmage")))
+    W(li("Easy camp: " + creep_ref("Pollywog", _NC_CDN + "tadpole.png", 3), t("NEW")))
+    W(li("Medium camp: " + creep_ref("Boglet", _NC_CDN + "froglet.png", 2) + ", " + creep_ref("Marshmage Apprentice", _NC_CDN + "froglet_mage.png", 1), t("NEW")))
+    W(li("Hard camp: " + creep_ref("Croaker", _NC_CDN + "grown_frog.png", 2) + ", " + creep_ref("Marshmage", _NC_CDN + "grown_frog_mage.png", 1), t("NEW")))
+    W(li("Ancient camp: " + creep_ref("Ancient Croaker", _NC_CDN + "ancient_frog.png", 2) + ", " + creep_ref("Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png", 1), t("NEW")))
     W(li("Each creep can only be upgraded twice, so an Easy camp never reaches Ancient status", t("NEW")))
     W(li("Units are not upgraded while the camp is blocked, and the number of upgraded units can't be increased", t("NEW")))
     W(ul_close())
 
     # Pollywog
     W(unit_header("Pollywog", _NC_CDN + "tadpole.png", new="New Level 2 Melee Creep"))
-    W(new_stats([("Health", "400"), ("Mana", "200"), ("Move Speed", "270"), ("Damage", "19-21"), ("Armor", "1"), ("Magic Resistance", "0%"), ("Bounty", "17-19 Gold &middot; 30 XP")]))
+    W(new_stats([("Health", "400"), ("Mana", "200"), ("Move Speed", "270"), ("Damage", "19-21"), ("Armor", "1"), ("Magic Resistance", "0%"), ("Bounty", "17-19 Gold / 30 XP")]))
     W(ability("Riverborn Aura", icon_url="../icons/abilities/frogmen_riverborn_aura.png"))
     W(ul_open())
     W(li("Passive: All allies within a 1200 range receive a 10/12/14/16% movement speed and outgoing damage bonus, as long as the aura owner is in water"))
@@ -124,7 +127,7 @@ def build():
 
     # Boglet
     W(unit_header("Boglet", _NC_CDN + "froglet.png", new="New Level 4 Melee Creep"))
-    W(new_stats([("Health", "700"), ("Mana", "300"), ("Damage", "22-24"), ("Move Speed", "290"), ("Armor", "2"), ("Magic Resistance", "0%"), ("Bounty", "25-29 Gold &middot; 42 XP")]))
+    W(new_stats([("Health", "700"), ("Mana", "300"), ("Damage", "22-24"), ("Move Speed", "290"), ("Armor", "2"), ("Magic Resistance", "0%"), ("Bounty", "25-29 Gold / 42 XP")]))
     W(ability("Arm of the Deep", icon_url="../icons/abilities/frogmen_arm_of_the_deep.png"))
     W(ul_open())
     W(li("Active: Sends out tentacles in the target direction, stunning enemies for 0.8s and dealing 80/100/120/140 damage. Range: 275. Mana Cost: 40. Cooldown: 16s"))
@@ -137,7 +140,7 @@ def build():
 
     # Marshmage Apprentice
     W(unit_header("Marshmage Apprentice", _NC_CDN + "froglet_mage.png", new="New Level 4 Ranged Creep"))
-    W(new_stats([("Health", "700"), ("Mana", "300"), ("Damage", "24-27"), ("Move Speed", "290"), ("Attack Range", "250"), ("Armor", "2"), ("Magic Resistance", "0%"), ("Bounty", "25-29 Gold &middot; 42 XP")]))
+    W(new_stats([("Health", "700"), ("Mana", "300"), ("Damage", "24-27"), ("Move Speed", "290"), ("Attack Range", "250"), ("Armor", "2"), ("Magic Resistance", "0%"), ("Bounty", "25-29 Gold / 42 XP")]))
     W(ability("Water Bubble (Small)", icon_url="../icons/abilities/frogmen_water_bubble_small.png"))
     W(ul_open())
     W(li("Active: Creates a barrier bubble that protects the target from 100/120/140/160 magical damage for 10s. Cast Range: 550, Mana Cost: 90, Cooldown: 16s"))
@@ -150,7 +153,7 @@ def build():
 
     # Croaker
     W(unit_header("Croaker", _NC_CDN + "grown_frog.png", new="New Level 4 Melee Creep"))
-    W(new_stats([("Health", "900"), ("Mana", "350"), ("Damage", "41-46"), ("Move Speed", "300"), ("Armor", "3"), ("Magic Resistance", "0%"), ("Bounty", "37-41 Gold &middot; 55 XP")]))
+    W(new_stats([("Health", "900"), ("Mana", "350"), ("Damage", "41-46"), ("Move Speed", "300"), ("Armor", "3"), ("Magic Resistance", "0%"), ("Bounty", "37-41 Gold / 55 XP")]))
     W(ability("Tendrils of the Deep", icon_url="../icons/abilities/frogmen_tendrils_of_the_deep.png"))
     W(ul_open())
     W(li("Active: Sends out tentacles in a cone shape the target direction, stunning enemies for 1.2s and dealing 120/140/160/180 damage. Range: 300. Mana Cost: 50. Cooldown: 18s"))
@@ -163,7 +166,7 @@ def build():
 
     # Marshmage
     W(unit_header("Marshmage", _NC_CDN + "grown_frog_mage.png", new="New Level 4 Ranged Creep"))
-    W(new_stats([("Health", "900"), ("Mana", "350"), ("Damage", "40-45"), ("Move Speed", "300"), ("Attack Range", "250"), ("Armor", "3"), ("Magic Resistance", "0%"), ("Bounty", "37-41 Gold &middot; 55 XP")]))
+    W(new_stats([("Health", "900"), ("Mana", "350"), ("Damage", "40-45"), ("Move Speed", "300"), ("Attack Range", "250"), ("Armor", "3"), ("Magic Resistance", "0%"), ("Bounty", "37-41 Gold / 55 XP")]))
     W(ability("Water Bubble (Medium)", icon_url="../icons/abilities/frogmen_water_bubble_medium.png"))
     W(ul_open())
     W(li("Active: Creates a barrier bubble that protects the target from 150/180/210/240 magical damage for 10s. After the bubble bursts, heals the target for 50% of that amount. Cast Range: 550, Mana Cost: 100, Cooldown: 16s"))
@@ -176,7 +179,7 @@ def build():
 
     # Ancient Croaker
     W(unit_header("Ancient Croaker", _NC_CDN + "ancient_frog.png", new="New Level 5 Ancient Melee Creep"))
-    W(new_stats([("Health", "1250"), ("Mana", "450"), ("Damage", "60-64"), ("Move Speed", "300"), ("Armor", "5"), ("Magic Resistance", "30%"), ("Bounty", "53-56 Gold &middot; 104 XP")]))
+    W(new_stats([("Health", "1250"), ("Mana", "450"), ("Damage", "60-64"), ("Move Speed", "300"), ("Armor", "5"), ("Magic Resistance", "30%"), ("Bounty", "53-56 Gold / 104 XP")]))
     W(ability("Congregations of the Deep", icon_url="../icons/abilities/frogmen_congregation_of_the_deep.png"))
     W(ul_open())
     W(li("Active: Sends out tentacles in 6 directions around itself, stunning enemies for 1.4s and dealing 250/275/300/325 damage. Range: 300. Mana Cost: 70. Cooldown: 20s"))
@@ -189,7 +192,7 @@ def build():
 
     # Ancient Marshmage
     W(unit_header("Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png", new="New Level 5 Ancient Ranged Creep"))
-    W(new_stats([("Health", "1250"), ("Mana", "450"), ("Damage", "58-62"), ("Move Speed", "300"), ("Attack Range", "500"), ("Armor", "5"), ("Magic Resistance", "30%"), ("Bounty", "53-56 Gold &middot; 104 XP")]))
+    W(new_stats([("Health", "1250"), ("Mana", "450"), ("Damage", "58-62"), ("Move Speed", "300"), ("Attack Range", "500"), ("Armor", "5"), ("Magic Resistance", "30%"), ("Bounty", "53-56 Gold / 104 XP")]))
     W(ability("Water Bubble (Large)", icon_url="../icons/abilities/frogmen_water_bubble_large.png"))
     W(ul_open())
     W(li("Active: Creates a barrier bubble that protects the target from 210/240/270/300 magic damage for 10s. After the bubble bursts, heals the target and all allies in a 675 radius for 50% of that amount. Cast Range: 550, Mana Cost: 110, Cooldown: 16s"))
@@ -203,7 +206,8 @@ def build():
     # Ancient Prowlers (label — no own changes; sub-units follow)
     W(plain_header("Ancient Prowlers", dynamics=False))
     W(ul_open())
-    W(li("Prowlers have returned as an Ancient Neutral Camp", t("NEW"), extra=inline_note("Each camp consists of 2 Prowler Acolytes and 1 Prowler Shaman<br>Average bounty: 158 gold and 314 XP")))
+    W(li("Prowlers have returned as an Ancient Neutral Camp", t("NEW"), extra=inline_note("Average bounty: 158 gold and 314 XP")))
+    W(li("Ancient camp: " + creep_ref("Ancient Prowler Acolyte", _NC_CDN + "prowler_acolyte.png", 2) + ", " + creep_ref("Ancient Prowler Shaman", _NC_CDN + "prowler_shaman.png", 1), t("NEW")))
     W(ul_close())
 
     # Ancient Prowler Acolyte

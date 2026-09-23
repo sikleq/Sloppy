@@ -304,6 +304,21 @@ body.patch-page .entity {
   border-top: 0;
   border-image: none;
 }
+/* Sub-category headers (plain_header: Major Mechanics, Wandering Waters, Map Objectives,
+   Terrain Changes, Artifact Changes …): a smaller, thinner version of the category strip
+   (h2.section) — orange left edge + fading band — so the sub-categories read as such. */
+body.patch-page .entity.plain-entity {
+  margin: 6px -22px 10px;
+  padding: 6px 20px 5px;
+  border-left: 2px solid rgba(255, 80, 5, 0.7);
+  background: linear-gradient(to right, rgba(131, 51, 18, 0.45), rgba(131, 51, 18, 0) 55%);
+}
+body.patch-page .entity.plain-entity .entity-name {
+  color: #f1e3d2;
+  font-size: 20px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
 body.patch-page .entity-block > h4.subgroup,
 body.patch-page .entity-block > ul.changes,
 body.patch-page .entity-block > .ability-block,
@@ -3776,6 +3791,12 @@ h4.subgroup .subgroup-new-type {
 }
 .entity-block .stat-table .stat-k {
   color: var(--text-dim, #8b949e);
+  /* vertical divider between the stat name and its value, as in the tables */
+  position: relative;
+}
+.entity-block .stat-table .stat-k::after {
+  content: ""; position: absolute; top: 0; bottom: -1px; right: -14px;
+  width: 1px; background: var(--line-soft);
 }
 .entity-block .stat-table .stat-v {
   color: var(--text-main);
@@ -10260,3 +10281,8 @@ body.patch-page .cat-panel > .entity-block:last-child { padding-bottom: 8px; }
 body.patch-page .cat-panel > .entity-block:last-child .ability-block:last-child,
 body.patch-page .cat-panel > .entity-block:last-child .ec-scope:last-child .ability-block:last-child { margin-bottom: 0; }
 body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { margin-bottom: 0; }
+
+/* a unit named inside a row (creep_ref): small portrait + bold name, capped to the line height */
+.creep-ref { white-space: nowrap; }
+.creep-ref img { width: 28px; height: 16px; object-fit: cover; border-radius: 2px; vertical-align: -3px; margin: 0 4px 0 2px; }
+.creep-ref b { font-weight: 700; color: var(--text-bright); }

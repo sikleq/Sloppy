@@ -499,9 +499,16 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
         extra_cls, block_attr = '', ''
     head = _open_block(extra_cls, block_attr)
     _State.new_mech_header = _State.new_mech = bool(new_mech)
+    img = f'<img src="{icon_url}" alt="{name}" loading="lazy" width="128" height="72">'
+    if eid:          # a tracked unit has a Changes page (units/<slug>.html; a creep-hero lives with the heroes)
+        href = _entity_link("heroes" if entity_kind == "creep-hero" else "units", name)
+        img = f'<a class="entity-link" href="{href}">{img}</a>'
+        name_html = f'<a class="entity-link" href="{href}">{name}</a>'
+    else:            # General Updates (Roshan, Tormentor…): no dynamics id, no page
+        name_html = name
     return head + f'''<div class="entity unit-entity"{kind_attr}{eid}>
-  <div class="entity-icon hero-icon"><img src="{icon_url}" alt="{name}" loading="lazy" width="128" height="72"></div>
-  <div class="entity-name">{name}{type_label}</div>
+  <div class="entity-icon hero-icon">{img}</div>
+  <div class="entity-name">{name_html}{type_label}</div>
 </div>'''
 
 
@@ -1096,6 +1103,15 @@ def attr_change(old, new):
             raise ValueError(f"attr_change: unknown attribute {a!r}")
         return f'<b class="attr-chip {_ATTR_CHIP_CLS[a]}">{a}</b>'
     return f'Main attribute changed from {chip(old)} &rarr; {chip(new)}'
+
+
+def creep_ref(name, icon_url, count=None):
+    """A unit named inside a row: small portrait + bold name, e.g. camp compositions
+    ("Medium camp: 2× [icon] Boglet, 1× [icon] Marshmage Apprentice"). The icon is capped to
+    the text height so the row keeps its line height."""
+    n = f"{count}× " if count else ""
+    return (f'<span class="creep-ref">{n}<img src="{icon_url}" alt="" width="28" height="16">'
+            f'<b>{name}</b></span>')
 
 
 def inline_note(text):

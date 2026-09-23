@@ -27,6 +27,7 @@
 - `subnote(text)` — мелкий серый текст со стрелкой ↳, для **официальных** доп. инфо из патча («Damage at level 1 unchanged at 49-59», «Pressing ALT key will show base value...»). Закрывает changes ul; после неё нужен `ul_open()` если будут ещё изменения
 - `info_li`/raw `<li>` — НЕ использовать
 - `attr_change(old, new)` — смена основного атрибута героя («Is now a Universal Hero»): `W(li(attr_change("Agility", "Universal"), t("REWORK")))` → «Main attribute changed from **Agility** → **Universal**»: названия жирным, шрифтом строки, в цвет атрибута (без иконок). Старый атрибут — из снапшота статов до патча (`data/stats/<prev>/heroes.json`, `AttributePrimary`); генератор делает это сам.
+- `creep_ref(name, icon, count)` — юнит внутри строки: маленькая иконка + имя жирным. Состав лагеря — строкой на лагерь, не списком в «?»: `W(li("Medium camp: " + creep_ref("Boglet", _NC_CDN + "froglet.png", 2) + ", " + creep_ref("Marshmage Apprentice", _NC_CDN + "froglet_mage.png", 1), t("NEW")))`.
 - **Стрелки в контенте — только HTML-сущностью `&rarr;`**, никогда литеральным «→»: консоли PowerShell 5.1 / cp1251 его портят.
 
 ## Порядок строк внутри `ul` (системное правило)
