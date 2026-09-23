@@ -6112,6 +6112,9 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
    so cover fills it without cropping (mirrors mana_items' .mr-ico approach). */
 .items-dyn-table .hd-hero-inner img { height: 29px; }
 .hd-hero-name { font-weight: 600; color: var(--text-bright); }
+/* matrix / Hero Stats row names link to the entity's Changes page */
+a.ec-name-link { color: inherit; text-decoration: none; }
+a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underline-offset: 3px; }
 /* RULE (all tables): hovering a hero/unit portrait pops it out — like Neutral
    Creeps. The 18px gap + name-fitted column width keep the 1.8× zoom from ever
    covering the name. The icon's stacking sits under the sticky header (sticky-col
@@ -9972,24 +9975,31 @@ body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
 .ec-head-panel .item-icon img { width: 88px; height: auto; }
 .ec-head-panel .entity-name { font-family: var(--font-j25); font-size: 34px; letter-spacing: 1.2px; text-transform: uppercase; line-height: 1; }
 .ec-head-panel .dyn-row-wrap { margin-right: 0; }
-/* hero page: name + 3 item slots (Hero Lab inventory wells) under it */
-.ec-name-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.ec-islots { display: flex; gap: 6px; }
+/* hero page: 3 small item slots between the name and the patch-dynamics row,
+   the same 24px glassy pill as a .dyn-cell (4:3 so the item art reads) */
+.ec-islots { display: flex; gap: 4px; margin-left: auto; padding: 2px 4px; }
+.ec-islots + .dyn-row-wrap { margin-left: 14px; }
 .ec-islot {
-  position: relative; width: 60px; height: 45px; padding: 0; border: 0; border-radius: 0; cursor: pointer;
-  background: #1a1c1d88 url('icons/inventory/inventory_item_well_psd.png') center / 100% 100% no-repeat;
-  box-shadow: inset 0 0 2px rgba(0, 0, 0, .67); transition: filter 0.12s ease;
+  position: relative; width: 32px; height: 24px; padding: 0; border: 0; border-radius: 4px; cursor: pointer;
+  background: rgba(5, 6, 9, 0.92); overflow: visible;
+  box-shadow: inset 0 1px 0 var(--shadow-45), inset 0 -1px 0 rgba(255, 255, 255, 0.05), inset 0 0 0 1px rgba(227, 196, 106, 0.22);
+  transition: box-shadow 0.14s ease, filter 0.14s ease;
 }
-.ec-islot:hover { filter: brightness(1.5); }
-.ec-islot:focus-visible { outline: 1px solid rgba(213, 173, 95, 0.85); outline-offset: -2px; }
+.ec-islot:hover { box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.6); filter: brightness(1.25); }
+.ec-islot:focus-visible { outline: 1px solid rgba(213, 173, 95, 0.85); outline-offset: 1px; }
 .ec-islot.is-empty::after {
   content: "+"; position: absolute; inset: 0; display: grid; place-items: center;
-  font-family: var(--font-ui); font-size: 18px; color: rgba(227, 196, 106, 0.35);
+  font-family: var(--font-ui); font-size: 13px; line-height: 1; color: rgba(227, 196, 106, 0.45);
 }
-.ec-islot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.ec-islot img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 4px;
+  box-shadow: 0 1px 2px var(--shadow-55), inset 0 1px 0 var(--white-22);
+}
+.ec-islot .hl-slot-clear { top: -6px; right: -6px; width: 13px; height: 13px; font-size: 9px; line-height: 11px; }
 .ec-islot:hover .hl-slot-clear { opacity: 1; }
-.ec-ipicker { width: min(760px, calc(100vw - 56px)); }
-.ec-ipicker-body { display: flex; flex-wrap: wrap; gap: 10px 18px; align-content: flex-start; }
+/* item picker on hero pages = the Hero Lab shop; the extra groups (neutral tiers,
+   enchantments, removed items) sit in a wrapping row under the four shop columns */
+.ec-ipicker-more { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
 /* an item's changes inside a hero patch section: separated from the hero's own block */
 section.ec-patch .entity-block.ec-item-inject { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(227, 196, 106, 0.18); }
 /* one filter row: Tags | Show | Ability */

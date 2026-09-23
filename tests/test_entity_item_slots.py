@@ -1,4 +1,4 @@
-"""Hero Changes pages: 3 item slots under the hero name; no facet filter chips."""
+"""Hero Changes pages: 3 item slots next to the hero name; no facet filter chips."""
 import sys
 from pathlib import Path
 
@@ -28,3 +28,13 @@ def test_built_hero_page_has_no_facet_chips():
     html = page.read_text(encoding="utf-8")
     assert "ec-ab-facet" not in html
     assert "Magebane" not in html.split('<div class="container">')[0]      # toolbar chips sit before the container
+
+
+def test_matrix_name_links_point_to_changes_pages():
+    from builders.dyn_matrix_common import changes_href, _name_link
+    assert changes_href("item|battle-fury") == "items/battle-fury.html"
+    assert changes_href("enchant|timeless") == "items/enchantment-timeless.html"
+    assert changes_href("creep-hero|spirit-bear") == "heroes/spirit-bear.html"
+    assert changes_href("plain|roshan") is None
+    assert 'href="heroes/anti-mage.html"' in _name_link("hero|anti-mage", "Anti-Mage", True)
+    assert "href" not in _name_link("item|x", "X", False)     # no annotated change -> no page -> no link

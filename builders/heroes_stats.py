@@ -414,6 +414,7 @@ def _gregen(v: float) -> str:
 # the value functions need to know WHICH patch they're computing; we thread
 # the version through a module-global set by the history loop and render.
 from patch.meta import latest_stats_version as _lsv
+from patch.elements import _slugify as _changes_slug      # Hero Changes page = heroes/<slug>.html
 _CTX_VERSION = [_lsv()]
 
 # ── Hero innate rules — loaded once from data/rules/hero_stat_innates.json ──
@@ -1465,7 +1466,8 @@ def render_html() -> str:
         cells = [
             f'<td class="mr-name hs-name" data-cat="basic" data-sort="{_esc(name)}">'
             f'{icon}<span class="mr-name-body">'
-            f'<span class="mr-name-text">{_esc(name)}</span>'
+            f'<a class="mr-name-text ec-name-link" href="heroes/{_changes_slug(name)}.html" '
+            f'title="All changes of {_esc(name)}">{_esc(name)}</a>'
             f'<img class="hs-innate-mini{" is-hidden" if not has_stat_innate else ""}" src="icons/misc/innate_icon.png" alt="" '
             f'loading="lazy" aria-hidden="true"></span></td>'
         ]

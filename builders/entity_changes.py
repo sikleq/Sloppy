@@ -410,7 +410,7 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     return "".join(out)
 
 
-# Hero pages: 3 item slots under the name. The picked items' own change blocks are
+# Hero pages: 3 small item slots between the name and the patch-dynamics row. The picked items' own change blocks are
 # pulled from items/<slug>.html into the matching patch sections (scripts.js).
 _ITEM_SLOTS = 3
 
@@ -423,8 +423,8 @@ def _name_block(e: dict) -> str:
         f'<button type="button" class="ec-islot is-empty" data-ec-islot="{i}" '
         f'aria-label="Choose item {i + 1}" title="Add an item: its changes appear in every patch below"></button>'
         for i in range(_ITEM_SLOTS))
-    return (f'<div class="ec-name-col">{name}'
-            f'<div class="ec-islots" data-ec-hero="{_esc(_file_slug(e))}">{slots}</div></div>')
+    # a sibling of the name, so it sits on the same line as the patch-dynamics row
+    return name + f'<div class="ec-islots" data-ec-hero="{_esc(_file_slug(e))}">{slots}</div>'
 
 
 def _write_item_picker(items: list[dict], dyn: dict) -> None:

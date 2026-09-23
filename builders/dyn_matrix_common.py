@@ -57,6 +57,16 @@ _ITEM_SEARCH_ALIASES = {
 }
 
 
+def _name_link(key, name, has_changes):
+    """Row name; a link to the entity's Changes page when it has one (an entity
+    with no annotated change has no page)."""
+    href = changes_href(key) if has_changes else None
+    if not href:
+        return f'<span class="hd-hero-name">{_esc(name)}</span>'
+    return (f'<a class="hd-hero-name ec-name-link" href="{_esc(href)}" '
+            f'title="All changes of {_esc(name)}">{_esc(name)}</a>')
+
+
 def _search_alias(name, icon, kind):
     """Extra search keywords for a row: manual abbreviations (items) + an acronym of
     the words (Black King Bar→bkb, Phantom Assassin→pa). Possessive 's is stripped so
@@ -75,6 +85,20 @@ def _search_alias(name, icon, kind):
 
 def _esc(s):
     return _html.escape(str(s), quote=True)
+
+
+# Entity key -> its Changes page (builders/entity_changes.py writes them).
+_CHANGES_FOLDER = {"hero": "heroes", "creep-hero": "heroes", "item": "items", "enchant": "items", "unit": "units"}
+
+
+def changes_href(key):
+    """'item|battle-fury' -> 'items/battle-fury.html' (enchantments: items/enchantment-<slug>.html);
+    None for kinds without a Changes page."""
+    kind, _, slug = key.partition("|")
+    folder = _CHANGES_FOLDER.get(kind)
+    if not folder or not slug:
+        return None
+    return f'{folder}/{"enchantment-" if kind == "enchant" else ""}{slug}.html'
 
 
 def _multiselect_dropdown(dd_id, label, options):
@@ -273,7 +297,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
             f'<td class="hd-hero sticky-col" data-col="name" '
             f'data-sort="{_esc(h["name"])}" data-slug="{_esc(h["icon"])}"{alias_attr}>'
             f'<span class="hd-hero-inner">{img}'
-            f'<span class="hd-hero-name">{_esc(h["name"])}</span></span></td>'
+            f'{_name_link(key, h["name"], bool(per_patch))}</span></td>'
         ]
         for i, p in enumerate(patches):
             ver = p["version"]

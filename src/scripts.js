@@ -991,7 +991,8 @@
   // head row stretches over the free width of its panel.
   function dynRowSize(entityDiv, manifest) {
     if (!entityDiv.closest('.ec-head')) return DYN_MAX_PATCHES;
-    const free = entityDiv.clientWidth - 420;          // icon + name + arrows
+    const slots = entityDiv.querySelector('.ec-islots');  // hero pages: item slots share the line
+    const free = entityDiv.clientWidth - 420 - (slots ? slots.offsetWidth + 14 : 0);   // icon + name + arrows
     return Math.max(DYN_MAX_PATCHES, Math.min(manifest.patches.length, Math.floor(free / 28)));
   }
 
@@ -3483,6 +3484,9 @@
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } };
   const save = v => { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} };
   let picks = load().slice(0, slots.length);
+  // the Hero Lab shop's four columns (itemPickerMarkup)
+  const SHOP_COLS = [['Consumables', 'Equipment', 'Secret Shop'], ['Attributes', 'Miscellaneous'],
+                     ['Accessories', 'Magical', 'Weapons'], ['Support', 'Armor', 'Armaments']];
   let catalog = null;                              // {slug: [slug, name, icon]} + groups, loaded on first use
   const pages = {};                                // slug -> Promise<Document>
 
@@ -3566,12 +3570,22 @@
   async function openPicker(i) {
     activeSlot = i;
     const cat = await getCatalog();
-    overlay.innerHTML = `<div class="hl-picker-card hl-item-picker-card ec-ipicker" role="dialog" aria-modal="true" aria-label="Choose item">
-      <div class="hl-picker-head"><strong>Items</strong><div class="hl-picker-actions"><button type="button" class="hl-picker-close" data-ec-iclose aria-label="Close">x</button></div></div>
+    // same card, columns and tiles as the Hero Lab shop; neutral tiers,
+    // enchantments and removed items follow in a row underneath
+    const section = g => `<section class="hl-item-section"><header>${esc(g[0])}</header><div class="hl-item-grid">${
+      g[1].map(it => `<button type="button" class="hl-item-tile${picks[i] === it[0] ? ' is-selected' : ''}" data-ec-ipick="${esc(it[0])}" data-name="${esc(it[1].toLowerCase())}" title="${esc(it[1])}" aria-label="${esc(it[1])}"><img src="../${esc(it[2])}" alt="${esc(it[1])}" loading="lazy"></button>`).join('')
+    }</div></section>`;
+    const byName = {};
+    cat.groups.forEach(g => { byName[g[0]] = g; });
+    const placed = new Set(SHOP_COLS.flat());
+    const col = names => `<div class="hl-shop-col">${names.filter(n => byName[n]).map(n => section(byName[n])).join('')}</div>`;
+    const rest = cat.groups.filter(g => !placed.has(g[0]));
+    const closeSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    overlay.innerHTML = `<div class="hl-picker-card hl-item-picker-card" role="dialog" aria-modal="true" aria-label="Choose item">
+      <div class="hl-picker-head"><strong>Shop</strong><div class="hl-picker-actions"><button type="button" class="hl-picker-close" data-ec-iclose aria-label="Close">${closeSvg}</button></div></div>
       <div class="hl-picker-searchbar"><input type="text" class="hl-picker-search" data-ec-isearch placeholder="Search item..." aria-label="Search item" autocomplete="off"></div>
-      <div class="hl-shop-body ec-ipicker-body">${cat.groups.map(g => `<section class="hl-item-section"><header>${esc(g[0])}</header><div class="hl-item-grid">${
-        g[1].map(it => `<button type="button" class="hl-item-tile${picks[i] === it[0] ? ' is-selected' : ''}" data-ec-ipick="${esc(it[0])}" data-name="${esc(it[1].toLowerCase())}" title="${esc(it[1])}" aria-label="${esc(it[1])}"><img src="../${esc(it[2])}" alt="${esc(it[1])}" loading="lazy"></button>`).join('')
-      }</div></section>`).join('')}</div></div>`;
+      <div class="hl-shop-body"><div class="hl-shop-4col">${SHOP_COLS.map(col).join('')}</div>
+      ${rest.length ? `<div class="ec-ipicker-more">${rest.map(section).join('')}</div>` : ''}</div></div>`;
     overlay.hidden = false;
     overlay.classList.add('is-open');
     const input = overlay.querySelector('[data-ec-isearch]');
