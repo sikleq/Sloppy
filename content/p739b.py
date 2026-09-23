@@ -100,7 +100,7 @@ def build():
     W(hero_header("Broodmother"))
     W(facet_header("broodmother_necrotic_webs"))
     W(ul_open())
-    W(li("Spin Web: Health Regeneration Reduction now affects Health Restoration instead", t("MISC")))
+    W(li("Spin Web: Health Regeneration Reduction now affects Health Restoration instead", t("BUFF")))
     W(ul_close())
 
     # Centaur Warrunner

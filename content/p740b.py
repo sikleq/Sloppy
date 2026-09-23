@@ -18,12 +18,12 @@ def build():
 
     W(item_header("Spirit Vessel"))
     W(ul_open())
-    W(li("Soul Release will gain charges only for Spirit Vessel if the same hero has both Spirit Vessel and Urn of Shadows", t("MISC")))
+    W(li("Soul Release will gain charges only for Spirit Vessel if the same hero has both Spirit Vessel and Urn of Shadows", t("NERF")))
     W(ul_close())
 
     W(item_header("Urn of Shadows"))
     W(ul_open())
-    W(li("Soul Release can no longer gain charges on multiple copies of this item if the copies are on the same hero", t("MISC")))
+    W(li("Soul Release can no longer gain charges on multiple copies of this item if the copies are on the same hero", t("DEL")))
     W(ul_close())
 
     # ===== HERO UPDATES =====

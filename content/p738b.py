@@ -19,7 +19,7 @@ def build():
     W(item_header("Eye of Skadi"))
     W(ul_open())
     W(li("Cold Attack Melee Movement Slow increased from 20% to 25%", b(20, 25)))
-    W(li("Cold Attack no longer has a separate attack speed slow value against melee targets", t("MISC"), extra=inline_note("As a result, attack slow against melee units increased from 10% to 20% — " + b(10, 20))))
+    W(li("Cold Attack no longer has a separate attack speed slow value against melee targets", t("BUFF"), extra=inline_note("As a result, attack slow against melee units increased from 10% to 20% — " + b(10, 20))))
     W(ul_close())
     W(item_header("Glimmer Cape"))
     W(ul_open())

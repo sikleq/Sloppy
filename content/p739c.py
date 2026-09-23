@@ -233,7 +233,7 @@ def build():
     W(hero_header("Earth Spirit"))
     W(facet_header("earth_spirit_ready_to_roll"))
     W(ul_open())
-    W(li("Rolling Boulder: Allied heroes that are affected by Enchant Remnant ability are now considered a hero instead of a Stone Remnant", t("MISC")))
+    W(li("Rolling Boulder: Allied heroes that are affected by Enchant Remnant ability are now considered a hero instead of a Stone Remnant", t("BUFF")))
     W(ul_close())
     W(ul_open())
     W(li("Rolling Boulder: Distance increased from 750 to 800", b(750, 800)))

@@ -424,8 +424,8 @@ def build():
     W(item_header("Disgraced Regalia", new="New Tier 5 Artifact"))
     W(ul_open())
     W(li("Passive: Fallen. Has nothing to provide to one who dared to die"))
-    W(li("Appears only to heroes that died with Divine Regalia artifact", t("MISC")))
-    W(li("Since the 4th slot is taken by your current Artifact when recrafting items, it is possible to recraft Disgraced Regalia with working Tier 5 Enchantment", t("MISC"), extra=inline_note("The usual Divine Regalia still can reappear among the other 3 choices")))
+    W(li("Appears only to heroes that died with Divine Regalia artifact", t("NEW")))
+    W(li("Since the 4th slot is taken by your current Artifact when recrafting items, it is possible to recraft Disgraced Regalia with working Tier 5 Enchantment", t("NEW"), extra=inline_note("The usual Divine Regalia still can reappear among the other 3 choices")))
     W(ul_close())
     W(item_header("Fallen Sky"))
     W(ul_open())
@@ -610,7 +610,7 @@ def build():
     W(li("Now applies 2 stacks on cast", t("NEW")))
     W(li("Aghanim's Shard upgrade reworked: Removes the 20 stack limit and allows Sticky Napalm to deal 35% of its damage to buildings", t("REWORK")))
     W(li("Stack limit increased from 10 to 20", b(10, 20)))
-    W(li("All per-stack values are halved", t("MISC"), extra=inline_note("Application Damage and Turn Rate neither halved nor doubled<br>Damage per stack decreased from 5/10/15/20 to 2.5/5/7.5/10 — " + b([5, 10, 15, 20], [2.5, 5, 7.5, 10]) + "<br>Movement Slow per stack decreased from 1.5/3/4.5/6% to 0.75/1.5/2.25/3% — " + b([1.5, 3, 4.5, 6], [0.75, 1.5, 2.25, 3]))))
+    W(li("All per-stack values are halved", t("REWORK"), extra=inline_note("Application Damage and Turn Rate neither halved nor doubled<br>Damage per stack decreased from 5/10/15/20 to 2.5/5/7.5/10 — " + b([5, 10, 15, 20], [2.5, 5, 7.5, 10]) + "<br>Movement Slow per stack decreased from 1.5/3/4.5/6% to 0.75/1.5/2.25/3% — " + b([1.5, 3, 4.5, 6], [0.75, 1.5, 2.25, 3]))))
     W(ul_close())
     W(ability("Flaming Lasso", slug="batrider_flaming_lasso"))
     W(ul_open())
@@ -1023,11 +1023,11 @@ def build():
     W(ability("Stroke of Fate", slug="grimstroke_dark_artistry"))
     W(ul_open())
     W(li("20/30/40/50 bonus damage per unit replaced with separate values for heroes and creeps: 20/40/60/80 per hero and 10/20/30/40 per creep", t("REWORK"), extra=inline_note("Illusions count as creeps")))
-    W(li("Point Vector Target behavior, previously exclusive to Fine Art facet, is now enabled by default", t("MISC")))
+    W(li("Point Vector Target behavior, previously exclusive to Fine Art facet, is now enabled by default", t("NEW")))
     W(ul_close())
     W(ability("Soulbind", slug="grimstroke_soul_chain"))
     W(ul_open())
-    W(li("If the debuff ends on the primary target early due to status resistance, it will also be destroyed on the secondary target", t("MISC"), extra=inline_note("Previously, the secondary target would still be leashed")))
+    W(li("If the debuff ends on the primary target early due to status resistance, it will also be destroyed on the secondary target", t("NERF"), extra=inline_note("Previously, the secondary target would still be leashed")))
     W(ul_close())
 
     # Gyrocopter
@@ -1159,7 +1159,7 @@ def build():
                  value_fmt="{:g}"))
     W(li("Wall Width now supports AoE bonuses again", t("NEW")))
     W(li("Damage interval improved from 1s to 0.5s", b(1, 0.5, l=True)))
-    W(li("The damage per second interval is now based on an individual unit gaining the debuff, rather than on an interval for the entire wall. As a result, the first damage instance is now applied instantly", t("MISC")))
+    W(li("The damage per second interval is now based on an individual unit gaining the debuff, rather than on an interval for the entire wall. As a result, the first damage instance is now applied instantly", t("BUFF")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -1905,7 +1905,7 @@ def build():
     W(ul_close())
     W(ability("Mass Serpent Ward", slug="shadow_shaman_mass_serpent_ward"))
     W(ul_open())
-    W(li("On creation, wards now prioritize the closest enemy hero in their attack range", t("MISC")))
+    W(li("On creation, wards now prioritize the closest enemy hero in their attack range", t("BUFF")))
     W(ul_close())
 
     # Silencer
@@ -2032,7 +2032,7 @@ def build():
     W(li("Mana Cost increased from 75 to 100", b(75, 100, l=True)))
     W(li("Duration decreased from 7s to 6s", b(7, 6)))
     W(li("Redirected spells are not considered as reflected. If Spirit Breaker is under effects such as Lotus Orb's Echo Shell, redirected spells will be reflected back to the enemy caster", t("MISC")))
-    W(li("If the redirected spell has different interactions for allies and enemies, Spirit Breaker will receive the enemy interaction", t("MISC"), extra=inline_note("Example: Oracle's Fate's Edict will disarm Spirit Breaker even if the ability was redirected from Oracle's ally")))
+    W(li("If the redirected spell has different interactions for allies and enemies, Spirit Breaker will receive the enemy interaction", t("REWORK"), extra=inline_note("Example: Oracle's Fate's Edict will disarm Spirit Breaker even if the ability was redirected from Oracle's ally")))
     W(ul_close())
 
     # Techies

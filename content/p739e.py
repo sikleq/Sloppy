@@ -10,7 +10,7 @@ def build():
 
     W(plain_header("General Changes"))
     W(ul_open())
-    W(li("Scan no longer triggers on creep heroes (with the exception of Lone Druid's Spirit Bear)", t("MISC")))
+    W(li("Scan no longer triggers on creep heroes (with the exception of Lone Druid's Spirit Bear)", t("DEL")))
     W(li("Neutral Creep Gold/XP penalty for stacked camps increased from 15% to 20%", b(15, 20, l=True)))
     W(ul_close())
 
@@ -34,7 +34,7 @@ def build():
 
     W(item_header("Aeon Disk"))
     W(ul_open())
-    W(li("Combo Breaker now starts on a 6s cooldown after being assembled for the first time", t("MISC")))
+    W(li("Combo Breaker now starts on a 6s cooldown after being assembled for the first time", t("NERF")))
     W(ul_close())
 
     W(item_header("Ghost Scepter"))
@@ -186,7 +186,7 @@ def build():
     W(ul_close())
     W(facet_header("kez_flutter"))
     W(ul_open())
-    W(li("Switch Discipline: The first hit bonus is now consumed by the first attack of Echo Slash and Raptor Dance, rather than applying to the entire cast", t("MISC"),
+    W(li("Switch Discipline: The first hit bonus is now consumed by the first attack of Echo Slash and Raptor Dance, rather than applying to the entire cast", t("NERF"),
          extra=inline_note("Still applies bonus to all enemies in the area")))
     W(li("Switch Discipline: Fixed the Katana bonus being lost if Echo Slash hit nothing", t("MISC")))
     W(ul_close())
