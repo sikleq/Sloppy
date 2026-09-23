@@ -1466,8 +1466,7 @@ def render_html() -> str:
         cells = [
             f'<td class="mr-name hs-name" data-cat="basic" data-sort="{_esc(name)}">'
             f'{icon}<span class="mr-name-body">'
-            f'<a class="mr-name-text ec-name-link" href="heroes/{_changes_slug(name)}.html" '
-            f'title="All changes of {_esc(name)}">{_esc(name)}</a>'
+            f'<a class="mr-name-text ec-name-link" href="heroes/{_changes_slug(name)}.html">{_esc(name)}</a>'
             f'<img class="hs-innate-mini{" is-hidden" if not has_stat_innate else ""}" src="icons/misc/innate_icon.png" alt="" '
             f'loading="lazy" aria-hidden="true"></span></td>'
         ]

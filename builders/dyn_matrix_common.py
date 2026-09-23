@@ -63,8 +63,7 @@ def _name_link(key, name, has_changes):
     href = changes_href(key) if has_changes else None
     if not href:
         return f'<span class="hd-hero-name">{_esc(name)}</span>'
-    return (f'<a class="hd-hero-name ec-name-link" href="{_esc(href)}" '
-            f'title="All changes of {_esc(name)}">{_esc(name)}</a>')
+    return f'<a class="hd-hero-name ec-name-link" href="{_esc(href)}">{_esc(name)}</a>'
 
 
 def _search_alias(name, icon, kind):

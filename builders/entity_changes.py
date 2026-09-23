@@ -421,7 +421,7 @@ def _name_block(e: dict) -> str:
         return name
     slots = "".join(
         f'<button type="button" class="ec-islot is-empty" data-ec-islot="{i}" '
-        f'aria-label="Choose item {i + 1}" title="Add an item: its changes appear in every patch below"></button>'
+        f'aria-label="Choose item {i + 1}"></button>'
         for i in range(_ITEM_SLOTS))
     # a sibling of the name, so it sits on the same line as the patch-dynamics row
     return name + f'<div class="ec-islots" data-ec-hero="{_esc(_file_slug(e))}">{slots}</div>'
@@ -429,13 +429,15 @@ def _name_block(e: dict) -> str:
 
 def _write_item_picker(items: list[dict], dyn: dict) -> None:
     """dist/items/picker.json — every item that has a Changes page, laid out exactly like
-    item_changes.html (Basics | Upgrades | Neutral Items panels, titled categories):
-    {"panels": [{"title", "one"?, "neutral"?, "groups": [{"title", "extra"?, "items": [[slug, name, icon, current], …]}]}]}"""
+    item_changes.html (Basics | Upgrades | Neutral Items panels, titled categories) — the whole
+    roster, an item without a Changes page flagged has_page=0 (shown greyed, not pickable):
+    {"panels": [{"title", "one"?, "neutral"?, "groups": [{"title", "extra"?,
+                 "items": [[slug, name, icon, current, has_page], …]}]}]}"""
     by = {g: lst for g, _, lst in _item_groups(items, dyn)}
 
     def group(title, lst, extra=None):
-        row = [[_file_slug(e), e["name"], e["icon"].replace("../", "", 1), 1 if e["_current"] else 0]
-               for e in lst if not e.get("_nopage")]
+        row = [[_file_slug(e), e["name"], e["icon"].replace("../", "", 1), 1 if e["_current"] else 0,
+                0 if e.get("_nopage") else 1] for e in lst]
         return {"title": title, "items": row, **({"extra": extra} if extra else {})} if row else None
 
     panels = [{"title": name, "groups": [x for c in cats if (x := group(c, by.get(c, [])))]}

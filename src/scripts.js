@@ -3471,7 +3471,7 @@
 })();
 
 // ---- Shared "shop" picker body = the Item Changes index look ----
-// panels: [{title, one?, neutral?, groups: [{title, extra?, tiles: '<button…>…'}]}]
+// panels: [{title, one?, neutral?, groups: [{title?, extra?, tiles: '<button…>…'}]}] (no title = no group heading)
 // Panels → titled categories → icon cards (ec-igrid / ec-ipanel / ec-igroup / ec-card).
 // Used by the Hero Changes item slots and the Hero Lab shop / enchantment pickers;
 // each group also carries .hl-item-section so the pickers' search can hide it.
@@ -3480,11 +3480,10 @@ function ecShopMarkup(panels) {
     `<section class="ec-ipanel${p.neutral ? ' ec-ipanel-neutral' : ''}"><h3 class="ec-group-title ec-ipanel-title">${p.title}</h3>`
     + `<div class="ec-ipanel-body${p.one ? ' ec-ipanel-body-1' : ''}">`
     + p.groups.filter(g => g.tiles).map(g =>
-      `<section class="ec-igroup hl-item-section"><h4 class="ec-igroup-title">${g.title}${g.extra ? `<span class="ec-tier-time">${g.extra}</span>` : ''}</h4>`
+      `<section class="ec-igroup hl-item-section">${g.title ? `<h4 class="ec-igroup-title">${g.title}${g.extra ? `<span class="ec-tier-time">${g.extra}</span>` : ''}</h4>` : ''}`
       + `<div class="ec-icards">${g.tiles}</div></section>`).join('')
     + '</div></section>').join('') + '</div>';
 }
-const EC_CLOSE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 
 // ---- HERO CHANGES page: 6 item slots next to the hero name ----
 // A picked item's own change blocks (from items/<slug>.html) are added to the
@@ -3519,7 +3518,6 @@ const EC_CLOSE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none
       const it = picks[i] && cat && cat.by[picks[i]];
       el.classList.toggle('is-empty', !it);
       el.innerHTML = it ? `<img src="../${esc(it[2])}" alt="${esc(it[1])}"><span class="hl-slot-clear" data-ec-iclear role="button" aria-label="Remove item">x</span>` : '';
-      el.title = it ? it[1] + ' — click to change' : 'Add an item: its changes appear in every patch below';
     });
   }
 
@@ -3530,8 +3528,8 @@ const EC_CLOSE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none
     const out = document.createElement('div');
     out.className = blk.className + ' ec-item-inject';
     out.dataset.ecItem = slug;
-    out.innerHTML = `<div class="entity item-entity"><div class="entity-icon item-icon"><a class="entity-link" href="${href}" title="All changes of ${esc(it[1])}"><img src="../${esc(it[2])}" alt="${esc(it[1])}"></a></div>`
-      + `<div class="entity-name"><a class="entity-link" href="${href}" title="All changes of ${esc(it[1])}">${esc(it[1])}</a></div></div>` + blk.innerHTML;
+    out.innerHTML = `<div class="entity item-entity"><div class="entity-icon item-icon"><a class="entity-link" href="${href}"><img src="../${esc(it[2])}" alt="${esc(it[1])}"></a></div>`
+      + `<div class="entity-name"><a class="entity-link" href="${href}">${esc(it[1])}</a></div></div>` + blk.innerHTML;
     return out;
   }
 
@@ -3580,19 +3578,23 @@ const EC_CLOSE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none
   let activeSlot = -1;
   const close = () => { overlay.hidden = true; overlay.classList.remove('is-open'); activeSlot = -1; };
 
-  async function openPicker(i) {
-    activeSlot = i;
-    const cat = await getCatalog();
-    // the Item Changes index layout; removed items stay out (as there, by default)
-    const tile = it => `<button type="button" class="ec-card ec-card-item hl-item-tile${picks[i] === it[0] ? ' is-selected' : ''}" data-ec-ipick="${esc(it[0])}" data-name="${esc(it[1].toLowerCase())}" title="${esc(it[1])}" aria-label="${esc(it[1])}"><img src="../${esc(it[2])}" alt="${esc(it[1])}" loading="lazy"></button>`;
+  // Built once (≈350 lazy icons), then only the selection / search are reset on open.
+  let built = false;
+  function buildPicker(cat) {
+    // the Item Changes index: current roster; an item without a Changes page greyed and not pickable
+    const tile = it => {
+      const img = `<img src="../${esc(it[2])}" alt="${esc(it[1])}" loading="lazy" decoding="async">`;
+      const attrs = `data-name="${esc(it[1].toLowerCase())}" aria-label="${esc(it[1])}"`;
+      return it[4]
+        ? `<button type="button" class="ec-card ec-card-item hl-item-tile" data-ec-ipick="${esc(it[0])}" ${attrs}>${img}</button>`
+        : `<span class="ec-card ec-card-item ec-nopage hl-item-tile" ${attrs}>${img}</span>`;
+    };
     const panels = cat.panels.map(p => ({ ...p, title: esc(p.title), groups: p.groups.map(g => ({
       title: esc(g.title), extra: g.extra && esc(g.extra), tiles: g.items.filter(it => it[3]).map(tile).join('') })) }));
     overlay.innerHTML = `<div class="hl-picker-card hl-item-picker-card ec-shop-card" role="dialog" aria-modal="true" aria-label="Choose item">
-      <div class="hl-picker-head"><strong>Items</strong><div class="hl-picker-actions"><button type="button" class="hl-picker-close" data-ec-iclose aria-label="Close">${EC_CLOSE_SVG}</button></div></div>
-      <div class="hl-picker-searchbar"><input type="text" class="hl-picker-search" data-ec-isearch placeholder="Search item..." aria-label="Search item" autocomplete="off"></div>
+      <div class="ec-picker-top"><input type="text" class="hl-picker-search" data-ec-isearch placeholder="Search item..." aria-label="Search item" autocomplete="off">
+      <button type="button" class="hl-picker-close" data-ec-iclose aria-label="Close"></button></div>
       <div class="hl-shop-body">${ecShopMarkup(panels)}</div></div>`;
-    overlay.hidden = false;
-    overlay.classList.add('is-open');
     const input = overlay.querySelector('[data-ec-isearch]');
     input.addEventListener('input', () => {
       const q = input.value.trim().toLowerCase();
@@ -3602,6 +3604,22 @@ const EC_CLOSE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none
         sec.classList.toggle('is-hidden', !any);
       });
     });
+    built = true;
+  }
+
+  async function openPicker(i) {
+    activeSlot = i;
+    const cat = await getCatalog();
+    if (!built) buildPicker(cat);
+    overlay.querySelectorAll('.hl-item-tile').forEach(t => {
+      t.classList.remove('is-hidden');
+      t.classList.toggle('is-selected', !!picks[i] && t.dataset.ecIpick === picks[i]);
+    });
+    overlay.querySelectorAll('.hl-item-section').forEach(sec => sec.classList.remove('is-hidden'));
+    overlay.hidden = false;
+    overlay.classList.add('is-open');
+    const input = overlay.querySelector('[data-ec-isearch]');
+    input.value = '';
     input.focus();
   }
 
@@ -4764,16 +4782,12 @@ const EC_CLOSE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none
   }
 
   function itemPickerMarkup(selectedId, tab, mode, heroAttr, baubleActive) {
-    const head = (title, search) => `
-        <div class="hl-picker-head">
-          <strong>${title}</strong>
-          <div class="hl-picker-actions">
-            <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">${EC_CLOSE_SVG}</button>
-          </div>
-        </div>${search ? `
-        <div class="hl-picker-searchbar">
-          <input type="text" class="hl-picker-search" data-item-search placeholder="Search item..." aria-label="Search item" autocomplete="off">
-        </div>` : ''}`;
+    // no title words: the search box (shop) and the close button share the top row
+    const head = search => `
+        <div class="ec-picker-top">${search ? `
+          <input type="text" class="hl-picker-search" data-item-search placeholder="Search item..." aria-label="Search item" autocomplete="off">` : ''}
+          <button type="button" class="hl-picker-close" data-picker-close aria-label="Close"></button>
+        </div>`;
     if (mode === 'enchant') {
       const tiles = filteredEnchants(heroAttr).map(item => {
         const isT5 = item.tiersAvailable && item.tiersAvailable.indexOf(5) >= 0;
@@ -4783,9 +4797,8 @@ const EC_CLOSE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none
       }).join('');
       return `
       <div class="hl-picker-card hl-item-picker-card hl-enchant-picker ec-shop-card" role="dialog" aria-modal="true" aria-label="Choose enchantment">
-        ${head('Enchantments', false)}
-        <div class="hl-shop-body">${ecShopMarkup([{ title: 'Neutral Items', one: true, neutral: true,
-          groups: [{ title: 'Neutral Enchantments', tiles }] }])}</div>
+        ${head(false)}
+        <div class="hl-shop-body">${ecShopMarkup([{ title: 'Enchantments', one: true, neutral: true, groups: [{ tiles }] }])}</div>
       </div>`;
     }
     const panels = HL_SHOP_PANELS.map(([title, key, cats]) => ({ title, groups: cats.map(n => {
@@ -4794,7 +4807,7 @@ const EC_CLOSE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none
     }) }));
     return `
       <div class="hl-picker-card hl-item-picker-card ec-shop-card" role="dialog" aria-modal="true" aria-label="Choose item">
-        ${head('Shop', true)}
+        ${head(true)}
         <div class="hl-shop-body">${ecShopMarkup(panels)}</div>
       </div>`;
   }

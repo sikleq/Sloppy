@@ -9970,6 +9970,9 @@ body.patch-page .cat-panel.ec-head-panel {
   background: linear-gradient(90deg, rgba(227, 196, 106, 0.07) 0%, rgba(6, 37, 65, 0.30) 60%, rgba(0, 0, 0, 0.30) 100%);
 }
 body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
+/* the panel's own 14px padding is the only gap, the same above and below the head row */
+body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head { padding: 0; margin: 0; }
+body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head > .entity { padding: 0; margin: 0; }
 .ec-head-panel .entity { margin: 0; align-items: center; gap: 18px; }
 .ec-head-panel .entity-icon { display: flex; align-items: center; }
 .ec-head-panel .entity-icon img { display: block; border-radius: 4px; box-shadow: 0 2px 10px var(--shadow-55); }
@@ -10004,6 +10007,28 @@ body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
 }
 .ec-islot .hl-slot-clear { top: -6px; right: -6px; width: 13px; height: 13px; font-size: 9px; line-height: 11px; }
 .ec-islot:hover .hl-slot-clear { opacity: 1; }
+/* Picker close = the site's round gold / leather button (back-to-top family) with a pixel X;
+   every Hero Lab / Hero Changes picker. The old inline SVG cross is hidden. */
+.hl-picker-close {
+  width: 32px; height: 32px; flex: none; padding: 0; border-radius: 50%; border: 2px solid var(--gold);
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="0" y="0" width="2" height="2"/><rect x="8" y="0" width="2" height="2"/><rect x="2" y="2" width="2" height="2"/><rect x="6" y="2" width="2" height="2"/><rect x="4" y="4" width="2" height="2"/><rect x="2" y="6" width="2" height="2"/><rect x="6" y="6" width="2" height="2"/><rect x="0" y="8" width="2" height="2"/><rect x="8" y="8" width="2" height="2"/></g></svg>'),
+    linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  background-repeat: no-repeat; background-position: center; background-size: 10px 10px, cover;
+  image-rendering: pixelated; box-shadow: inset 0 1px 0 var(--blue-cold-10), 0 3px 10px var(--shadow-55);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.hl-picker-close:hover { transform: translateY(-2px); filter: brightness(1.18); border-color: var(--gold); }
+.hl-picker-close svg { display: none; }
+/* search box + close share one top row (no "Shop" / "Items" title) */
+.ec-picker-top { display: flex; align-items: center; gap: 12px; padding: 14px 14px 4px; }
+.ec-picker-top .hl-picker-search { flex: 1 1 auto; }
+.ec-shop-card { position: relative; }
+.ec-picker-top:not(:has(input)) { position: absolute; top: 14px; right: 24px; padding: 0; z-index: 2; }
+.ec-picker-top:not(:has(input)) ~ .hl-shop-body { padding-top: 10px; }
+/* Hero Lab shop (two panels): wide card, three categories per row → far less scrolling */
+.ec-shop-card:has(.ec-shop[data-panels="2"]) { width: min(1580px, calc(100vw - 40px)); max-height: calc(100vh - 40px); }
+.ec-shop[data-panels="2"] .ec-ipanel-body { grid-template-columns: repeat(3, 1fr); }
 /* Pickers (hero-page item slots, Hero Lab shop + enchantments) = the Item Changes index:
    same panels, Jersey titles and icon cards. Tiles keep .hl-item-tile for the pickers'
    search / keyboard code, so its fixed Hero Lab size is reset to the card look here. */
