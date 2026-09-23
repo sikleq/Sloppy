@@ -313,17 +313,14 @@ def build():
                  recipe=('Recipe', 700), total=2600))
     W(provides('+15% Magic Resistance, +250 Health, +6 All Attributes'))
     W(ul_open())
-    W(li("Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Whenever the wearer takes damage from a player-controlled unit or Roshan, all stacks are removed to create an all-damage barrier for 7s that absorbs 120 damage per removed stack (up to 360). If the wearer reached a max amount of stacks at least once in a game, regaining a stack provides a non-stacking buff that increases movespeed by 20% for 7s"))
-    W(li("Has no damage threshold, but doesn't proc from Health Loss damage (like Heartstopper Aura)", t("NEW")))
-    W(li("Can't gain stacks for 3s after taking damage from Roshan or player-controlled sources", t("NERF")))
+    W(li("Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Whenever the wearer takes damage from a player-controlled unit or Roshan, all stacks are removed to create an all-damage barrier for 7s that absorbs 120 damage per removed stack (up to 360). If the wearer reached a max amount of stacks at least once in a game, regaining a stack provides a non-stacking buff that increases movespeed by 20% for 7s", extra=inline_note("Has no damage threshold, but doesn't proc from Health Loss damage (like Heartstopper Aura)<br>Can't gain stacks for 3s after taking damage from Roshan or player-controlled sources")))
     W(ul_close())
     W(item_header("Crella's Crozier", new="New Magical Item"))
     W(components(('Ghost Scepter', 1500), ('Soul Booster', 3000),
                  recipe=('Recipe', 300), total=4800))
     W(provides('+6 All Attributes, +450 Health, +450 Mana'))
     W(ul_open())
-    W(li("Active: Rite of Rumusque. The wearer enters ghost form for 4 seconds, becoming immune to physical damage, but is unable to attack and 30% more vulnerable to magic damage. Steals 5% movement speed from enemy heroes in a 900 radius every second. Movement speed steal lasts 1.5s. Bonuses stack and have duration refreshed on gaining new stacks. No Mana Cost. Cooldown: 20s"))
-    W(li("The ghost form and stolen speed can be dispelled off the wearer, but the stealing debuff that provides new stacks can't", t("NERF")))
+    W(li("Active: Rite of Rumusque. The wearer enters ghost form for 4 seconds, becoming immune to physical damage, but is unable to attack and 30% more vulnerable to magic damage. Steals 5% movement speed from enemy heroes in a 900 radius every second. Movement speed steal lasts 1.5s. Bonuses stack and have duration refreshed on gaining new stacks. No Mana Cost. Cooldown: 20s", extra=inline_note("The ghost form and stolen speed can be dispelled off the wearer, but the stealing debuff that provides new stacks can't")))
     W(li("Passive: Putrefaction Aura. Reduces health restoration of nearby enemy heroes by 30%. While Rite of Rumusque is active, the effect is increased to 75% and all of the lost Health Restoration is redirected to the wearer every second. Radius: 900"))
     W(ul_close())
     W(item_header("Essence Distiller", new="New Support Item"))
@@ -331,9 +328,7 @@ def build():
                  recipe=('Recipe', 200), total=1775))
     W(provides('+1.75 Mana Regen, +3 All Attributes, +6 Armor, +150 Mana'))
     W(ul_open())
-    W(li("Active: Soul Release. When cast on an ally, provides 40 health regeneration. If the ally is attacked by an enemy hero or Roshan, the effect is lost. When cast on an enemy, deals 25 damage per second, provides True Sight over them and shares their vision with the wearer's team. Both effects last 8 seconds. Can be cast on the ground to put a dormant effect that will latch to the first enemy hero that comes within 400 range from it. The effect waits for 15s and provides 400 vision until it disappears. Gains charges every time an enemy hero dies within 1500 units. Cast Range: 1000. No Mana Cost. Cooldown: 10s"))
-    W(li("Gains one charge if the wearer dies with an empty Essence Distiller", t("NEW")))
-    W(li("Gains two charges if Essence Distiller had no charges and an enemy hero dies within radius", t("NEW")))
+    W(li("Active: Soul Release. When cast on an ally, provides 40 health regeneration. If the ally is attacked by an enemy hero or Roshan, the effect is lost. When cast on an enemy, deals 25 damage per second, provides True Sight over them and shares their vision with the wearer's team. Both effects last 8 seconds. Can be cast on the ground to put a dormant effect that will latch to the first enemy hero that comes within 400 range from it. The effect waits for 15s and provides 400 vision until it disappears. Gains charges every time an enemy hero dies within 1500 units. Cast Range: 1000. No Mana Cost. Cooldown: 10s", extra=inline_note("Gains one charge if the wearer dies with an empty Essence Distiller<br>Gains two charges if Essence Distiller had no charges and an enemy hero dies within radius")))
     W(ul_close())
     W(item_header("Specialist's Array", new="Returning Armaments Item"))
     W(components(('Blade of Alacrity', 1000), ('Broadsword', 1000),
@@ -352,8 +347,7 @@ def build():
     W(provides('+25 Damage, +30 Agility, +15 Strength, +150 Attack Range (Ranged Only)'))
     W(ul_open())
     W(li("Passive: Miasma. Attacks poison the target for 3 seconds, dealing magical damage equal to 2.5% of the target's max health every second. If the debuff is reapplied, the duration is refreshed. Can't be applied by illusions or to Roshan"))
-    W(li("Passive: Polycephaly. Ranged attacks have a 30% chance to fire at up to 3 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects except for Miasma. The primary attack deals 20 + full damage of a normal attack when the ability procs"))
-    W(li("Similarly to Specialist's Array, doesn't work with other sources of secondary projectiles from hero abilities", t("NEW")))
+    W(li("Passive: Polycephaly. Ranged attacks have a 30% chance to fire at up to 3 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects except for Miasma. The primary attack deals 20 + full damage of a normal attack when the ability procs", extra=inline_note("Similarly to Specialist's Array, doesn't work with other sources of secondary projectiles from hero abilities")))
     W(ul_close())
     W(item_header("Arcane Boots", changed=True))
     W(auto_components_change("Arcane Boots", "7.41"))
@@ -405,8 +399,7 @@ def build():
                  header="Stacking rules"))]))
     W(ul_open())
     W(li("Recipe cost unchanged at 1150. Total cost increased from 2800/3950/5100/6250/7400g to 3050/4200/5350/6500/7650g", b([2800, 3950, 5100, 6250, 7400], [3050, 4200, 5350, 6500, 7650], l=True)))
-    W(li("Energy Burst cast range decreased from 700/750/800/850/900 to 640", b([700, 750, 800, 850, 900], 640)))
-    W(li("Effective cast range with item's built-in Cast Range bonus decreased from 700/750/800/850/900 to 700/730/760/790/820", b([700, 750, 800, 850, 900], [700, 730, 760, 790, 820])))
+    W(li("Energy Burst cast range decreased from 700/750/800/850/900 to 640", b([700, 750, 800, 850, 900], 640), extra=inline_note("Effective cast range with item's built-in Cast Range bonus decreased from 700/750/800/850/900 to 700/730/760/790/820 — " + b([700, 750, 800, 850, 900], [700, 730, 760, 790, 820]))))
     W(li("Energy Burst no longer instantly kills non-ancient creeps", t("DEL")))
     W(li("Energy Burst no longer heals for 75% of damage dealt", t("DEL")))
     W(ul_close())
@@ -458,8 +451,7 @@ def build():
     W(ul_close())
     W(item_header("Hand of Midas"))
     W(ul_open())
-    W(li("Transmute no longer prevents camp-clearing Madstone Bundles from spawning if it was used on the last creep in neutral camp", t("MISC")))
-    W(li("Getting guaranteed Madstone Bundle from Transmute used to prevent the camp-clearing bundle from spawning", t("MISC")))
+    W(li("Transmute no longer prevents camp-clearing Madstone Bundles from spawning if it was used on the last creep in neutral camp", t("MISC"), extra=inline_note("Getting guaranteed Madstone Bundle from Transmute used to prevent the camp-clearing bundle from spawning")))
     W(ul_close())
     W(item_header("Harpoon"))
     W(ul_open())
@@ -716,9 +708,8 @@ def build():
     W(li("Bloodpact no longer multiplies spell lifesteal bonus by 3. Now increases spell lifesteal to 60% instead", b(75, 60),
          extra=inline_note("Spell Lifesteal during Bloodpact decreased from 75% to 60%")))
     W(li("Bloodpact no longer applies a basic dispel", t("DEL")))
-    W(li("Now also provides passive Spell Weakness Aura", t("NEW")))
-    W(li("Passive: Enemy units within 1200 radius take 12% increased damage from spells", "",
-         extra=inline_note("Effect does not stack with Veil of Discord's Spell Weakness")))
+    W(li("Now also provides passive Spell Weakness Aura", t("NEW"),
+         extra=inline_note("Passive: Enemy units within 1200 radius take 12% increased damage from spells — Effect does not stack with Veil of Discord's Spell Weakness")))
     W(ul_close())
     W(item_header("Witch Blade"))
     W(ul_open())
@@ -755,12 +746,7 @@ def build():
     # rows land inside ONE shared bordered box.
     W(li("When this item is off cooldown, the wearer can see trees that can be foraged. Standing next to one of those trees for 1s will give the wearer one of the following items. Cooldown: 60s. Tree reveal radius: 1200", t("NEW"), ability_row=True))
     W(li("All items except for bag of gold are placed in inventory (if there are slots available) and can stack up to 5 times per slot.", t("NEW")))
-    W(li("&nbsp;", t("NEW")))
-    W(li("Possible items:", t("NEW")))
-    W(li("Ironwood Nut: Passively provides +3 Movement Speed. Grants +1 Primary Stat when consumed (+.4 all stats for universal heroes)", t("NEW")))
-    W(li("Tomo'kan Ringcap: Passively Provides +2 Intelligence. Can be consumed to instantly grant a target 50 + 5% of their maximum mana", t("NEW")))
-    W(li("Vital Toadstool: Passively Provides +2 Damage. Can be consumed to grant a target +1% Max Health Regeneration for 10s. If the unit is attacked by an enemy hero or Roshan the bonus is lost", t("NEW")))
-    W(li("Bag of Gold: Provides 30 gold to the wearer. Don't need to be picked up", t("NEW")))
+    W(li("Possible items", t("NEW"), extra=inline_note("Ironwood Nut: Passively provides +3 Movement Speed. Grants +1 Primary Stat when consumed (+.4 all stats for universal heroes)<br>Tomo'kan Ringcap: Passively Provides +2 Intelligence. Can be consumed to instantly grant a target 50 + 5% of their maximum mana<br>Vital Toadstool: Passively Provides +2 Damage. Can be consumed to grant a target +1% Max Health Regeneration for 10s. If the unit is attacked by an enemy hero or Roshan the bonus is lost<br>Bag of Gold: Provides 30 gold to the wearer. Don't need to be picked up")))
     W(ul_close())
     W(item_header("Possessed Mask", new="Returning Tier 1 Artifact"))
     W(ul_open())
@@ -826,8 +812,8 @@ def build():
     W(item_header("Partisan's Brand", new="New Tier 3 Artifact"))
     W(ul_open())
     W(li("Passive: Brand. Increases spell damage against player controlled units by 9%", t("NEW"),
-         extra=inline_note("Dormant Curio increases bonus spell damage from 9% to 11.7%")))
-    W(li("Player controlled units includes heroes and any creep summoned or converted by them", t("NEW")))
+         extra=inline_note("Dormant Curio increases bonus spell damage from 9% to 11.7%"
+                           "<br>Player controlled units includes heroes and any creep summoned or converted by them")))
     W(ul_close())
     W(item_header("Serrated Shiv"))
     W(ul_open())
@@ -857,8 +843,8 @@ def build():
     W(item_header("Enchanter's Bauble", new="New Tier 4 Artifact"))
     W(ul_open())
     W(li("Passive: Enchant. Increases bonuses of the item's Neutral Enchantment by 15%. Every time you craft this item again the bonus is increased by 40%", t("NEW"),
-         extra=inline_note("Dormant Curio increases recraft stat bonus from 40% to 52%")))
-    W(li("You can select any Enchantments during re-craft and bonus will still keep increasing as long as you keep Enchanter's Bauble", t("NEW")))
+         extra=inline_note("Dormant Curio increases recraft stat bonus from 40% to 52%"
+                           "<br>You can select any Enchantments during re-craft and bonus will still keep increasing as long as you keep Enchanter's Bauble")))
     W(ul_close())
     W(item_header("Metamorphic Mandible"))
     W(ul_open())
@@ -880,10 +866,9 @@ def build():
     W(item_header("Harmonizer", new="New Tier 5 Artifact"))
     W(ul_open())
     W(li("Passive: Balance. Grants 5% mana cost reduction for every hero ability off cooldown and 6% spell amplification for every spell on cooldown", t("NEW"),
-         extra=inline_note("Dormant Curio increases mana cost reduction from 5% to 6.5% and spell amplification from 6% to 7.8%")))
-    W(li("Item spells are affected by both effects, however item cooldowns don't affect the Harmonizer buff", t("NEW")))
-    W(li("The buff counts only current abilities that have cooldown, even if it's passive", t("NEW")))
-    W(li("Invoked abilities and sub-abilities don't count when they're hidden", t("NEW")))
+         extra=inline_note("Dormant Curio increases mana cost reduction from 5% to 6.5% and spell amplification from 6% to 7.8%"
+                           "<br>Item spells are affected by both effects, however item cooldowns don't affect the Harmonizer buff"
+                           "<br>The buff counts only current abilities that have cooldown, even if it's passive — Invoked abilities and sub-abilities don't count when they're hidden")))
     W(ul_close())
     W(item_header("Riftshadow Prism"))
     W(ul_open())
@@ -1328,8 +1313,7 @@ def build():
     W(ability("Nightmare"))
     W(ul_open())
     W(li("Now a Unit Vector Target Spell", t("REWORK")))
-    W(li("Sleeping units walk in Bane's chosen direction at a speed of 110", t("NEW")))
-    W(li("Can be put on alt-cast to disable sleepwalking behavior", t("NEW")))
+    W(li("Sleeping units walk in Bane's chosen direction at a speed of 110", t("NEW"), extra=inline_note("Can be put on alt-cast to disable sleepwalking behavior")))
     W(ul_close())
 
     # Batrider
@@ -2505,8 +2489,7 @@ def build():
     W(ul_close())
     W(ability("Invoke"))
     W(ul_open())
-    W(li("Now whenever Invoker gets Aghanim's Scepter or Aghanim's Shard, these items are inert in the inventory until Invoker activates them manually. Upon activation, he will be presented with three upgrades to choose from. Upgrades themselves for both Aghanim's Scepter and Aghanim's Shard are unchanged", t("REWORK")))
-    W(li("You can't change selected upgrades. Selling Aghanim's Scepter and buying it again will provide the same upgrade you chose the first time", t("NERF")))
+    W(li("Now whenever Invoker gets Aghanim's Scepter or Aghanim's Shard, these items are inert in the inventory until Invoker activates them manually. Upon activation, he will be presented with three upgrades to choose from. Upgrades themselves for both Aghanim's Scepter and Aghanim's Shard are unchanged", t("REWORK"), extra=inline_note("You can't change selected upgrades. Selling Aghanim's Scepter and buying it again will provide the same upgrade you chose the first time")))
     W(li("Aghanim's Scepter no longer provides +1 level to all three orbs. Now it provides +1 level only to a single orb you choose", t("DEL")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -3059,10 +3042,9 @@ def build():
     W(ul_open())
     W(li("Cooldown decreased from 120/80/40s to 110/70/30s", b([120, 80, 40], [110, 70, 30], l=True)))
     W(li("Damage per kill decreased from 40 to 30", b(40, 30)))
-    W(li("Now has empowered melee attacks after the cast by default", t("NEW")))
-    W(li("After using Finger of Death, Lion's hand becomes empowered, turning him into a melee hero with 250 attack range and 30 bonus movement speed. These melee attacks have 25% cleave and deal 20/30/40 bonus damage which increases with each Finger of Death kill. Enemy heroes that die within 3s after getting hit with these melee attacks (or from them) also provide bonus per kill damage. Melee form duration: 20s",
-         t("REWORK"),
-         extra=inline_note("Ability can be toggled with right-click to disable the melee form."
+    W(li("Now has empowered melee attacks after the cast by default", t("NEW"),
+         extra=inline_note("After using Finger of Death, Lion's hand becomes empowered, turning him into a melee hero with 250 attack range and 30 bonus movement speed. These melee attacks have 25% cleave and deal 20/30/40 bonus damage which increases with each Finger of Death kill. Enemy heroes that die within 3s after getting hit with these melee attacks (or from them) also provide bonus per kill damage. Melee form duration: 20s"
+                           "<br>Ability can be toggled with right-click to disable the melee form."
                            "<br>Cleave area is a cone with 150 width that increases up to 350 at 650 distance.")))
     W(li("Aghanim's Scepter now also increases melee cleave from 25% to 50% and duration from 20s to 30s", t("NEW")))
     W(li("Aghanim's Scepter no longer decreases cooldown", t("DEL")))
@@ -4007,11 +3989,9 @@ def build():
     W(ability("Scream Of Pain"))
     W(ul_open())
     W(li("Damage increased from 75/150/225/300 to 90/175/260/345", b([75, 150, 225, 300], [90, 175, 260, 345])))
-    W(li("25% of the damage dealt to heroes with this ability is reflected back to her", t("NEW")))
-    W(ul_close())
-    W(subnote("Does not trigger on damage to illusions. Damage done is nonlethal reflection damage"))
-    W(ul_open())
-    W(li("Also applies to Scream of Pain instances cast by Shadow Strike upgraded with Aghanim's Scepter", t("MISC")))
+    W(li("25% of the damage dealt to heroes with this ability is reflected back to her", t("NEW"),
+         extra=inline_note("Does not trigger on damage to illusions. Damage done is nonlethal reflection damage"
+                           "<br>Also applies to Scream of Pain instances cast by Shadow Strike upgraded with Aghanim's Scepter")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

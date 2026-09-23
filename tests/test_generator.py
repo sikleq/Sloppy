@@ -354,15 +354,33 @@ def test_single_child_still_folds_as_info():
     assert len(rows) == 1 and "inline_note(\"As a result" in rows[0]
 
 
-def test_substantive_children_stay_rows_none_hidden():
+def test_nested_sub_changes_also_fold_into_parent_popup():
+    # The official page indents them under the parent -> they are its info.
     rows = _gen_rows([
-        {"indent_level": 1, "note": "Heavenly Grace renamed to Repel"},
-        {"indent_level": 2, "note": "No longer grants bonus strength and health regen per dispelled debuff"},
-        {"indent_level": 2, "note": "Now grants bonus strength and health regen per debuff currently on the unit"},
-        {"indent_level": 2, "note": "No longer applies a strong dispel"},
+        {"indent_level": 1, "note": "Tormentor's abilities now scale with game time instead of the number of deaths"},
+        {"indent_level": 2, "note": "Unyielding Shield: Damage absorb rescaled from 2500 + (200 per death) to 1900 + (20 per minute of game time)"},
+        {"indent_level": 2, "note": "Reflect: Damage percentage rescaled from 90 + (20 per death) to 50 + (2 per minute of game time)"},
+        {"indent_level": 1, "note": "The Shining: Radius decreased from 1200 to 1000"},
     ])
-    assert len(rows) == 4, rows
-    assert not any("inline_note(" in r for r in rows), rows
+    assert len(rows) == 2, rows
+    assert "Unyielding Shield" in rows[0] and "<br>Reflect:" in rows[0]
+
+
+def test_damage_at_level_1_kid_stays_a_visible_row():
+    rows = _gen_rows([
+        {"indent_level": 1, "note": "Base Damage decreased by 2"},
+        {"indent_level": 2, "note": "Damage at level 1 decreased from 51-58 to 49-56"},
+    ])
+    assert len(rows) == 2 and "inline_note(" not in rows[0], rows
+
+
+def test_card_body_parents_keep_their_kids_as_rows():
+    rows = _gen_rows([
+        {"indent_level": 1, "note": "Ability Reworked"},
+        {"indent_level": 2, "note": "Cast Range: 900, Mana Cost: 100, Cooldown: 22s"},
+        {"indent_level": 2, "note": "Base Damage: 120/160/200/240"},
+    ])
+    assert len(rows) == 3, rows
 
 
 def test_item_reworked_title_gets_changed_label_and_component_diff():

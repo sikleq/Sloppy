@@ -661,8 +661,13 @@ def _sort_source_ul_blocks(lines):
 
 # ---------- INDENT-TREE WALKER ----------
 
-_CHANGE_LEAD = re.compile(
-    r'^(?:no longer|now|can|cannot|removed|added|increased|decreased|reduced|fixed)\b', re.I)
+# Parents whose nested notes are NOT info: they are the body of a card that the
+# proofread builds (ability_change / Aghanim upgrade rows merge their kids).
+_KIDS_ARE_BODY = re.compile(
+    r"^(?:Ability Reworked|New (?:Ultimate |innate |basic )?ability"
+    r"|Now upgraded with Aghanim|Aghanim's (?:Shard|Scepter)(?: slightly)? reworked)",
+    re.I,
+)
 
 
 def _descendants(notes, i):
@@ -676,19 +681,25 @@ def _descendants(notes, i):
     return out
 
 
-def _is_enumeration(parent_text, kids):
-    """A parent that introduces a list of short items ("…including the
-    following:", "List of …", "The following abilities …") whose children are
-    bare noun phrases — not changes. Those items belong in the parent's "?"
-    popup, never as stand-alone rows."""
-    p = parent_text.strip().lower()
-    if not kids or not (p.endswith(':') or 'following' in p or p.startswith('list of')):
-        return False
-    for k in kids:
-        t = _strip_html(k.get('note') or '').strip()
-        if len(t.split()) > 6 or re.search(r'\d', t) or _CHANGE_LEAD.match(t):
-            return False
-    return True
+def _nested_info_text(notes, lvl, desc):
+    """Nested notes → one popup text: each direct child on its own line; a
+    single deeper note is appended to its line after " — ", several deeper
+    notes follow on their own indented "– " lines."""
+    groups = []                                  # [direct child text, [deeper texts]]
+    for j in desc:
+        t = (notes[j].get('note') or '').strip()
+        if notes[j].get('indent_level', 1) == lvl + 1 or not groups:
+            groups.append([t, []])
+        else:
+            groups[-1][1].append(t)
+    lines = []
+    for head, deeper in groups:
+        if len(deeper) == 1:
+            lines.append(f'{head} — {deeper[0]}')
+        else:
+            lines.append(head)
+            lines.extend(f'&nbsp;&nbsp;– {d}' for d in deeper)
+    return '<br>'.join(lines)
 
 
 def _fold_into_row(lines, idx, text):
@@ -793,27 +804,21 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
         last_indent = lvl
         has_content = True
 
-        # Deeper rows under this one (see _fold_children): an enumeration folds
-        # entirely into this row's "?" popup, a single sub-note folds as its info,
-        # several substantive sub-changes stay as their own rows.
+        # Nested notes (the official patch page indents them under this bullet)
+        # go into this row's "?" popup — all of them, lists and sub-changes
+        # alike, the trailing ":" dropped. Kept as rows: "Damage at level N"
+        # consequences (a visible row by rule) and the body of card-type
+        # parents (_KIDS_ARE_BODY).
         desc = _descendants(notes, i)
-        if desc and lines[-1].startswith('W(li(') and not any(notes[j].get('hide_dot') for j in desc):
-            kids = [j for j in desc if notes[j].get('indent_level', 1) == lvl + 1]
-            text = None
-            if _is_enumeration(clean, [notes[j] for j in kids]):
-                parts = []
-                for j in desc:
-                    t = (notes[j].get('note') or '').strip()
-                    if notes[j].get('indent_level', 1) == lvl + 1 or not parts:
-                        parts.append(t)
-                    else:
-                        parts[-1] += ' — ' + t          # a kid's own explanation sits next to it
-                text = '<br>'.join(parts)
-            elif len(kids) == 1:
-                text = '<br>'.join((notes[j].get('note') or '').strip() for j in desc)
-            if text is not None:
-                _fold_into_row(lines, len(lines) - 1, text)
-                consumed.update(desc)
+        if (desc and lines[-1].startswith('W(li(') and not aghs
+                and not _KIDS_ARE_BODY.match(clean)
+                and not any(notes[j].get('hide_dot') for j in desc)):
+            folded = [j for j in desc
+                      if not _DMG_L1_RE.search(_strip_html(notes[j].get('note') or ''))]
+            if folded:
+                lines[-1] = re.sub(r':(?=")', '', lines[-1], count=1)   # "…the following:" → "…the following"
+                _fold_into_row(lines, len(lines) - 1, _nested_info_text(notes, lvl, folded))
+                consumed.update(folded)
 
     if open_ul:
         lines.append('W(ul_close())')
