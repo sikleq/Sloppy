@@ -1070,7 +1070,7 @@ _ATTR_CHIP_CLS = {"Strength": "is-str", "Agility": "is-agi", "Intelligence": "is
 
 def attr_change(old, new):
     """Row text for a main-attribute change: "Main attribute changed from Agility → Universal",
-    both names bold in the row's own font, coloured with the in-game attribute colour (no icons).
+    both names bold in the row's own font, coloured with the site attribute palette (--attr-*, no icons).
     The arrow is the HTML entity &rarr; (never a literal "→" in content: it gets mangled by
     non-UTF-8 shells/consoles)."""
     def chip(a):

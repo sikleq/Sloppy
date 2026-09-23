@@ -78,6 +78,12 @@
    ========================================================================== */
 
 :root {
+  /* Site attribute palette (the Hero Changes column titles): attribute names and labels
+     everywhere use these — not the harsher in-game hexes. Universal is purple. */
+  --attr-str: #d9534f;
+  --attr-agi: #5cb85c;
+  --attr-int: #5bc0de;
+  --attr-uni: #b39ddb;
   /* -- Backgrounds -- */
   --bg-page:          #0a0e13;
   --bg-panel:         #0d1117;
@@ -2978,10 +2984,10 @@ ul.changes li.ability-row-end {
   filter: drop-shadow(0 1px 1px var(--shadow-55));
 }
 .enchant-attr-name { letter-spacing: 0.2px; }
-.enchant-attr-name.is-str { color: #e73c06; }
-.enchant-attr-name.is-agi { color: #3dcb37; }
-.enchant-attr-name.is-int { color: #00d3e7; }
-.enchant-attr-name.is-uni { color: #d3e700; }
+.enchant-attr-name.is-str { color: var(--attr-str); }
+.enchant-attr-name.is-agi { color: var(--attr-agi); }
+.enchant-attr-name.is-int { color: var(--attr-int); }
+.enchant-attr-name.is-uni { color: var(--attr-uni); }
 .enchant-attr-name.is-all { color: var(--text-main); }
 .enchant-attr-list {
   display: flex;
@@ -6136,12 +6142,12 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 a.ec-name-link { color: inherit; text-decoration: none; }
 a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underline-offset: 3px; }
 /* main-attribute change row (attr_change): the attribute names in the row's own font,
-   bold, in the in-game attribute colours */
+   bold, in the site attribute palette (--attr-*) */
 .attr-chip { font-weight: 700; }
-.attr-chip.is-str { color: #e73c06; }
-.attr-chip.is-agi { color: #3dcb37; }
-.attr-chip.is-int { color: #00d3e7; }
-.attr-chip.is-uni { color: #d3e700; }
+.attr-chip.is-str { color: var(--attr-str); }
+.attr-chip.is-agi { color: var(--attr-agi); }
+.attr-chip.is-int { color: var(--attr-int); }
+.attr-chip.is-uni { color: var(--attr-uni); }
 /* RULE (all tables): hovering a hero/unit portrait pops it out — like Neutral
    Creeps. The 18px gap + name-fitted column width keep the 1.8× zoom from ever
    covering the name. The icon's stacking sits under the sticky header (sticky-col
@@ -7397,10 +7403,10 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 }
 .hl-hero-group header { color: #d8dee5; }
 /* attribute-coloured column headers, matching hero_changes */
-.hl-hero-group-str header { color: #d9534f; }
-.hl-hero-group-agi header { color: #5cb85c; }
-.hl-hero-group-int header { color: #5bc0de; }
-.hl-hero-group-uni header { color: #b39ddb; }
+.hl-hero-group-str header { color: var(--attr-str); }
+.hl-hero-group-agi header { color: var(--attr-agi); }
+.hl-hero-group-int header { color: var(--attr-int); }
+.hl-hero-group-uni header { color: var(--attr-uni); }
 .hl-item-section header { color: #e3c46a; margin-bottom: 2px; font-size: 10px; }
 .hl-hero-group-icon {
   width: 16px;
@@ -10159,10 +10165,10 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-hstat-who { color: var(--text-dim); font-weight: 400; }
 .ec-hstat-head { margin: 7px 0 2px; font-family: var(--font-j25); font-weight: 400; font-size: 13px;
   letter-spacing: 1px; text-transform: uppercase; color: var(--text-bright); opacity: 0.85; }
-.ec-hcol-strength .ec-group-title { color: #d9534f; }
-.ec-hcol-agility .ec-group-title { color: #5cb85c; }
-.ec-hcol-intelligence .ec-group-title { color: #5bc0de; }
-.ec-hcol-universal .ec-group-title { color: #b39ddb; }
+.ec-hcol-strength .ec-group-title { color: var(--attr-str); }
+.ec-hcol-agility .ec-group-title { color: var(--attr-agi); }
+.ec-hcol-intelligence .ec-group-title { color: var(--attr-int); }
+.ec-hcol-universal .ec-group-title { color: var(--attr-uni); }
 /* Items: Basics | Upgrades | Neutral Items panels, 4 icons per row inside a category */
 .ec-igrid { display: grid; grid-template-columns: 4fr 4fr 3fr; gap: 0 16px; margin-top: 14px; }
 .ec-ipanel { border: 1px solid var(--line); border-radius: 6px; background: rgba(0, 0, 0, 0.18); padding: 10px 12px 6px; }
