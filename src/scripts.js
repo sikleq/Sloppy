@@ -3469,6 +3469,149 @@
   });
 })();
 
+// ---- HERO CHANGES page: 3 item slots under the hero name ----
+// A picked item's own change blocks (from items/<slug>.html) are added to the
+// hero's patch sections, so e.g. Anti-Mage + Battle Fury shows both in 7.41f.
+// A patch where only the item changed gets its own section in version order.
+// The picks are remembered per hero in this browser (localStorage).
+(function() {
+  const box = document.querySelector('.ec-islots[data-ec-hero]');
+  if (!box) return;
+  const KEY = 'ec-hero-items:' + box.dataset.ecHero;
+  const slots = [...box.querySelectorAll('[data-ec-islot]')];
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } };
+  const save = v => { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} };
+  let picks = load().slice(0, slots.length);
+  let catalog = null;                              // {slug: [slug, name, icon]} + groups, loaded on first use
+  const pages = {};                                // slug -> Promise<Document>
+
+  const getCatalog = () => catalog || (catalog = fetch('../items/picker.json')
+    .then(r => { if (!r.ok) throw new Error('picker.json ' + r.status); return r.json(); })
+    .then(d => { const by = {}; d.groups.forEach(g => g[1].forEach(it => { by[it[0]] = it; })); return { groups: d.groups, by }; }));
+  const getPage = slug => pages[slug] || (pages[slug] = fetch('../items/' + encodeURIComponent(slug) + '.html')
+    .then(r => { if (!r.ok) throw new Error(slug + ' ' + r.status); return r.text(); })
+    .then(t => new DOMParser().parseFromString(t, 'text/html')));
+
+  // "7.41f" -> comparable [7, 41, 6]; newer patches sort first on the page
+  const verKey = v => { const m = /^(\d+)\.(\d+)([a-z]?)$/.exec(v) || []; return [+m[1] || 0, +m[2] || 0, m[3] ? m[3].charCodeAt(0) - 96 : 0]; };
+  const newer = (a, b) => { const x = verKey(a), y = verKey(b); for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] > y[i]; return false; };
+
+  function renderSlots(cat) {
+    slots.forEach((el, i) => {
+      const it = picks[i] && cat && cat.by[picks[i]];
+      el.classList.toggle('is-empty', !it);
+      el.innerHTML = it ? `<img src="../${esc(it[2])}" alt="${esc(it[1])}"><span class="hl-slot-clear" data-ec-iclear role="button" aria-label="Remove item">x</span>` : '';
+      el.title = it ? it[1] + ' — click to change' : 'Add an item: its changes appear in every patch below';
+    });
+  }
+
+  function itemBlock(slug, it, src) {
+    const blk = src.querySelector('.entity-block');
+    if (!blk) return null;
+    const href = '../items/' + encodeURIComponent(slug) + '.html';
+    const out = document.createElement('div');
+    out.className = blk.className + ' ec-item-inject';
+    out.dataset.ecItem = slug;
+    out.innerHTML = `<div class="entity item-entity"><div class="entity-icon item-icon"><a class="entity-link" href="${href}" title="All changes of ${esc(it[1])}"><img src="../${esc(it[2])}" alt="${esc(it[1])}"></a></div>`
+      + `<div class="entity-name"><a class="entity-link" href="${href}" title="All changes of ${esc(it[1])}">${esc(it[1])}</a></div></div>` + blk.innerHTML;
+    return out;
+  }
+
+  function sectionFor(ver, src) {
+    const id = 'p-' + ver;
+    let sec = document.getElementById(id);
+    if (sec) return sec;
+    sec = document.createElement('section');
+    sec.className = 'cat-panel ec-patch ec-item-only';
+    sec.id = id;
+    const h2 = src.querySelector('h2.ec-ver').cloneNode(true);
+    h2.querySelectorAll('.ec-score, .ec-ver-label').forEach(x => x.remove());
+    sec.appendChild(h2);
+    const all = [...document.querySelectorAll('section.ec-patch')];
+    const before = all.find(s => newer(ver, s.id.slice(2)));
+    if (before) before.parentNode.insertBefore(sec, before);
+    else if (all.length) all[all.length - 1].after(sec);
+    else document.querySelector('.container').appendChild(sec);
+    return sec;
+  }
+
+  let applying = 0;
+  async function apply() {
+    const run = ++applying;
+    const cat = await getCatalog();
+    renderSlots(cat);
+    const docs = await Promise.all(picks.map(s => s && cat.by[s] ? getPage(s).catch(() => null) : null));
+    if (run !== applying) return;                  // a newer pick superseded this one
+    document.querySelectorAll('.ec-item-inject').forEach(x => x.remove());
+    document.querySelectorAll('section.ec-item-only').forEach(x => x.remove());
+    docs.forEach((doc, i) => {
+      if (!doc) return;
+      const slug = picks[i], it = cat.by[slug];
+      doc.querySelectorAll('section.ec-patch[id^="p-"]').forEach(src => {
+        const blk = itemBlock(slug, it, src);
+        if (blk) sectionFor(src.id.slice(2), src).appendChild(blk);
+      });
+    });
+  }
+
+  // picker: the Hero Lab shop overlay look (hl-* classes), filtered by a search box
+  const overlay = document.createElement('div');
+  overlay.className = 'hl-overlay ec-ipicker-overlay';
+  overlay.hidden = true;
+  document.body.appendChild(overlay);
+  let activeSlot = -1;
+  const close = () => { overlay.hidden = true; overlay.classList.remove('is-open'); activeSlot = -1; };
+
+  async function openPicker(i) {
+    activeSlot = i;
+    const cat = await getCatalog();
+    overlay.innerHTML = `<div class="hl-picker-card hl-item-picker-card ec-ipicker" role="dialog" aria-modal="true" aria-label="Choose item">
+      <div class="hl-picker-head"><strong>Items</strong><div class="hl-picker-actions"><button type="button" class="hl-picker-close" data-ec-iclose aria-label="Close">x</button></div></div>
+      <div class="hl-picker-searchbar"><input type="text" class="hl-picker-search" data-ec-isearch placeholder="Search item..." aria-label="Search item" autocomplete="off"></div>
+      <div class="hl-shop-body ec-ipicker-body">${cat.groups.map(g => `<section class="hl-item-section"><header>${esc(g[0])}</header><div class="hl-item-grid">${
+        g[1].map(it => `<button type="button" class="hl-item-tile${picks[i] === it[0] ? ' is-selected' : ''}" data-ec-ipick="${esc(it[0])}" data-name="${esc(it[1].toLowerCase())}" title="${esc(it[1])}" aria-label="${esc(it[1])}"><img src="../${esc(it[2])}" alt="${esc(it[1])}" loading="lazy"></button>`).join('')
+      }</div></section>`).join('')}</div></div>`;
+    overlay.hidden = false;
+    overlay.classList.add('is-open');
+    const input = overlay.querySelector('[data-ec-isearch]');
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      overlay.querySelectorAll('.hl-item-section').forEach(sec => {
+        let any = false;
+        sec.querySelectorAll('.hl-item-tile').forEach(t => { const ok = !q || t.dataset.name.includes(q); t.classList.toggle('is-hidden', !ok); any = any || ok; });
+        sec.classList.toggle('is-hidden', !any);
+      });
+    });
+    input.focus();
+  }
+
+  overlay.addEventListener('click', e => {
+    const pick = e.target.closest('[data-ec-ipick]');
+    if (pick && activeSlot >= 0) {
+      const slug = pick.dataset.ecIpick;
+      picks = picks.map(s => (s === slug ? null : s));          // the same item never sits in two slots
+      picks[activeSlot] = slug;
+      save(picks);
+      close();
+      apply();
+      return;
+    }
+    if (e.target === overlay || e.target.closest('[data-ec-iclose]')) close();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) close(); });
+  slots.forEach((el, i) => el.addEventListener('click', e => {
+    if (e.target.closest('[data-ec-iclear]')) {
+      picks[i] = null;
+      save(picks);
+      apply();
+      return;
+    }
+    openPicker(i).catch(err => console.error('item picker:', err));
+  }));
+  if (picks.some(Boolean)) apply().catch(err => console.error('item slots:', err));
+})();
+
 // ---- HERO / ITEM CHANGES index: name filter (comma-separated, partial) ----
 (function() {
   const input = document.querySelector('[data-ec-search]');
@@ -4085,6 +4228,10 @@
         if (it.isBoot) { if (_bms) out._msBootVals.push(_bms); } else out.ms += _bms; }
       out.range += Number(b.range) || 0;
       if (b.rangeUniqueAll) out._rangeUniqueAllVals.push(Number(b.rangeUniqueAll));
+      // Melee-only unique range (MKB 7.41: "+50 Attack Range to melee heroes only").
+      if (b.rangeUniqueMelee && !isRanged) out._rangeUniqueAllVals.push(Number(b.rangeUniqueMelee));
+      // Butterfly: +% of base + Agility attack speed only (not item/buff AS).
+      out.baseAspdPct = (out.baseAspdPct || 0) + (Number(b.baseAspdPct) || 0);
       if (b.rangeUniqueRanged) out._rangeUniqueRangedVals.push(Number(b.rangeUniqueRanged));
       if (isRanged) out.projSpeed += Number(b.projSpeed) || 0;
       if (!visionSeen.has(id)) { out.dvision += Number(b.dvision) || 0; out.nvision += Number(b.nvision) || 0; }
@@ -4233,7 +4380,7 @@
     const dmin = whiteDmin + Math.floor(whiteDmin * itemsTotal.damagePct / 100) + itemsTotal.damage;
     const dmax = whiteDmax + Math.floor(whiteDmax * itemsTotal.damagePct / 100) + itemsTotal.damage;
     const dmg = (dmin + dmax) / 2;
-    const aspdRaw = (Number(s.bas) || 100) + agi * C.asAgi + heroLabInnate('aspd', s, a, lvl, hp, includeInnates) + itemsTotal.aspd;
+    const aspdRaw = ((Number(s.bas) || 100) + agi * C.asAgi) * (1 + (itemsTotal.baseAspdPct || 0) / 100) + heroLabInnate('aspd', s, a, lvl, hp, includeInnates) + itemsTotal.aspd;
     const aspd = Math.min(Math.max(aspdRaw * (1 + itemsTotal.aspdPct / 100), 20), 700);
     const batBase = Number(s.bat) || 1.7;
     const bat = batBase * (1 - itemsTotal.batReduce / 100);

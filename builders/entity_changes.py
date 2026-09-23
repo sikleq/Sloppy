@@ -141,8 +141,8 @@ def _scope_key(title: str) -> str:
 def _wrap_scopes(body: str):
     """Wrap every subgroup of a hero block (GENERAL / Abilities / Talents / Facets / …) in
     <div class="ec-scope" data-scope="…"> so the page can filter by it.
-    Returns (html, scopes, ability_titles, facet_titles). Facet titles are collected
-    separately so they become their own filter chips (styled apart from abilities)."""
+    Returns (html, scopes, ability_titles, facet_titles). Facet titles are kept
+    apart so a facet never becomes an ability chip (the FACETS scope filters them)."""
     ms = list(_SUBGROUP_RE.finditer(body))
     if not ms:
         return body, [], _titles(body), []
@@ -154,7 +154,7 @@ def _wrap_scopes(body: str):
         scopes.append(key)
         seg = body[m.start():end]
         if key == "facets":
-            facet_titles += _titles(seg)              # facets get their own chips
+            facet_titles += _titles(seg)              # not ability chips
         else:
             titles += _titles(seg)
         out.append(f'<div class="ec-scope" data-scope="{key}">{seg}</div>')
@@ -320,10 +320,9 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     info = ""
     sections, seen = [], []
     for p in e["patches"]:
-        body, sc, tt, ft = _wrap_scopes(p["body"])
+        body, sc, tt, _ = _wrap_scopes(p["body"])
         p["_body"] = body
         p["_titles"] = tt
-        p["_facets"] = ft
         seen += [s for s in sc if s not in seen]
     scopes_html = ""
     if len(seen) > 1:
@@ -334,14 +333,11 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
             + ('<button type="button" class="badge ec-scope-btn" data-ec-scope="innate">Innate</button>' if has_innate else ""))
     # every ability that was ever changed (most often changed first) -> one-click filter
     ab_count: dict[str, int] = {}
-    facet_count: dict[str, int] = {}
     for p in e["patches"]:
         for t in set(p["_titles"]):
             ab_count[t] = ab_count.get(t, 0) + 1
-        for t in set(p.get("_facets", [])):
-            facet_count[t] = facet_count.get(t, 0) + 1
     abilities_html = ""
-    if ab_count or facet_count:
+    if ab_count:
         npc = _re.sub(r"^.*/|\.png$", "", e["icon"]) if e["kind"] == "hero" else ""
         kit = _hero_kit(npc) if npc else []
         low = {k.lower(): i for i, k in enumerate(kit)}
@@ -357,36 +353,25 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         current += sorted(t for t in rest if t not in old)
         if not kit:                                    # items: no kit, keep everything visible
             current, old = sorted(ab_count), []
-        # facets are their own chips (ordered after the abilities). Feed their names to the talent
-        # tagger too, so a talent that upgrades a facet answers to that facet's chip.
-        facets = sorted(facet_count)
         # talents that upgrade an ability answer to its chip; a current ability changed ONLY through
         # talents (Nether Blast for Pugna) gets a chip too, sorted into the kit order
         for p in e["patches"]:
-            p["_body"] = _tag_talent_rows(p["_body"], list(dict.fromkeys(current + old + kit + facets)), hero_slug=e["slug"])
+            p["_body"] = _tag_talent_rows(p["_body"], list(dict.fromkeys(current + old + kit)), hero_slug=e["slug"])
         via_talent = {a for p in e["patches"] for m in _re.finditer(r'data-ec-ab="([^"]*)"', p["_body"])
                       for a in _html.unescape(m.group(1)).split("|")}
         extra = [k for k in kit if k in via_talent and k not in current and k not in old]
         if extra:
             current = sorted(dict.fromkeys(current + extra), key=lambda t: low.get(t.lower(), 10_000))
 
-        from patch.badges import FACETS as _FCT, _FACET_COLOR_GRADIENT as _FGRAD
-
-        def chip(t, hidden=False, facet=False):
-            cls = "badge ec-ab-btn" + (" ec-ab-old" if hidden else "") + (" ec-ab-facet" if facet else "")
-            style = ""
-            if facet:                                  # tint a small leading dot with the facet colour
-                fc = _FCT.get(_TITLE_SLUG.get(t, ""))
-                grad = _FGRAD.get(fc[1] if fc else "Gray0", _FGRAD["Gray0"])
-                style = f' style="--facet-grad:{grad}"'
+        # Facets get no chips: the FACETS scope button already filters them, and a
+        # facet mostly changes an existing ability (which has its own chip).
+        def chip(t, hidden=False):
+            cls = "badge ec-ab-btn" + (" ec-ab-old" if hidden else "")
             return (f'<button type="button" class="{cls}" data-ec-ability="{_esc(t)}"'
-                    f'{" hidden" if hidden else ""}{style}>{_esc(t)}</button>')
+                    f'{" hidden" if hidden else ""}>{_esc(t)}</button>')
         ability_chips = ("".join(chip(t) for t in current) + "".join(chip(t, True) for t in old)
                          + (f'<button type="button" class="badge ec-ab-more" data-ec-more>+{len(old)}</button>' if old else ""))
-        facet_chips = "".join(chip(t, facet=True) for t in facets)
         abilities_html = '<span class="ec-vsep" aria-hidden="true"></span>' + ability_chips
-        if facet_chips:
-            abilities_html += ('<span class="ec-vsep" aria-hidden="true"></span>' if ability_chips else '') + facet_chips
     _from_kind = {"hero": "hero", "item": "item", "enchant": "item"}.get(e["kind"], "unit")
     from_tok = f'{_from_kind}:{_file_slug(e)}'
     out = [_head(e["name"], asset, "../", "patch-page entity-page"),
@@ -396,7 +381,7 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
            '<section class="cat-panel ec-head-panel"><div class="entity-block ec-head">'
            f'<div class="entity {ent_cls}-entity" id="{eid}">'
            f'<div class="entity-icon {icon_cls}"><img src="{_esc(e["icon"])}" alt="{_esc(e["name"])}"></div>'
-           f'<div class="entity-name">{_esc(e["name"])}</div></div></div></section>\n']
+           f'{_name_block(e)}</div></div></section>\n']
     for p in e["patches"]:
         bucket = rec.get("patches", {}).get(p["version"], {})
         score = ""
@@ -423,6 +408,36 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
                'title="Dynamics: weighted scores (Valve revealed-preference weights)"></button>'
                f'<script defer src="../src/scripts.js?v={asset}"></script>\n</div></body></html>\n')
     return "".join(out)
+
+
+# Hero pages: 3 item slots under the name. The picked items' own change blocks are
+# pulled from items/<slug>.html into the matching patch sections (scripts.js).
+_ITEM_SLOTS = 3
+
+
+def _name_block(e: dict) -> str:
+    name = f'<div class="entity-name">{_esc(e["name"])}</div>'
+    if e["kind"] != "hero":
+        return name
+    slots = "".join(
+        f'<button type="button" class="ec-islot is-empty" data-ec-islot="{i}" '
+        f'aria-label="Choose item {i + 1}" title="Add an item: its changes appear in every patch below"></button>'
+        for i in range(_ITEM_SLOTS))
+    return (f'<div class="ec-name-col">{name}'
+            f'<div class="ec-islots" data-ec-hero="{_esc(_file_slug(e))}">{slots}</div></div>')
+
+
+def _write_item_picker(items: list[dict], dyn: dict) -> None:
+    """dist/items/picker.json — every item that has a Changes page, in shop groups
+    (the same order as item_changes.html): {"groups": [[group, [[slug, name, icon], …]], …]}."""
+    groups = []
+    for g, _, lst in _item_groups(items, dyn):
+        row = [[_file_slug(e), e["name"], e["icon"].replace("../", "", 1)]
+               for e in lst if not e.get("_nopage")]
+        if row:
+            groups.append([g, row])
+    (DIST / "items" / "picker.json").write_text(
+        _json.dumps({"groups": groups}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
 
 _ANN = None
@@ -985,6 +1000,8 @@ def main() -> int:
         for e in lst:
             (DIST / folder / f'{_file_slug(e)}.html').write_text(_entity_page(e, asset, latest, dyn), encoding="utf-8")
         (DIST / f"{KINDS[kind][2]}.html").write_text(_index_page(kind, lst, asset, latest, dyn), encoding="utf-8")
+        if kind == "item":
+            _write_item_picker(lst, dyn)
         counts[kind] = (len(lst), sum(len(e["patches"]) for e in lst))
     print(f"  -> dist/heroes/*.html: {counts['hero'][0]} heroes ({counts['hero'][1]} patch sections); "
           f"dist/items/*.html: {counts['item'][0]} items ({counts['item'][1]} sections); "

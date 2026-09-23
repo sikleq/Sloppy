@@ -217,6 +217,25 @@ def _load_item_meta() -> dict[str, dict]:
     return out
 
 
+def _upgrade_level_meta(item: str, data: dict, meta_by_id: dict[str, dict]) -> dict | None:
+    """Meta for purchasable upgrade levels (e.g. Boots of Travel 2).
+
+    _dynamics.json tracks one record per icon family, so level-2 items such as
+    `item_travel_boots_2` (ItemBaseLevel 2, still sold in 7.41f) have no record
+    of their own. Inherit the base item's class/category but keep the level's
+    own icon slug.
+    """
+    level = str(data.get("ItemBaseLevel", "")).strip()
+    if not level.isdigit() or int(level) < 2 or not item.endswith(f"_{level}"):
+        return None
+    if str(data.get("ItemPurchasable", "1")) == "0":
+        return None
+    base = meta_by_id.get(item[: -len(level) - 1])
+    if not base:
+        return None
+    return {**base, "icon": _slug_from_item(item)}
+
+
 def _flatten_special(d: dict) -> dict[str, object]:
     out: dict[str, object] = {}
 
@@ -345,7 +364,9 @@ def _item_bonus_at(fields: dict, idx: int) -> dict[str, float]:
         "msMelee": _sum_at(fields, idx, "bonus_movement_speed_melee", "bonus_move_speed_melee"),
         "msRanged": _sum_at(fields, idx, "bonus_movement_speed_ranged", "bonus_move_speed_ranged"),
         "range": _sum_at(fields, idx, "bonus_attack_range", "attack_range_bonus", "attack_range"),
-        "rangeUniqueAll": _sum_at(fields, idx, "melee_attack_range"),
+        # MKB (7.41): "+50 Attack Range to melee heroes only" — Valve labels
+        # the row "(Melee Only)"; ranged heroes must not receive it.
+        "rangeUniqueMelee": _sum_at(fields, idx, "melee_attack_range"),
         "rangeUniqueRanged": _sum_at(fields, idx, "base_attack_range"),
         "dvision": _sum_at(fields, idx, "bonus_day_vision", "bonus_vision"),
         "nvision": _sum_at(fields, idx, "bonus_night_vision", "night_vision_bonus"),
@@ -420,11 +441,12 @@ def _item_bonus(fields: dict, *, consumable: bool = False) -> dict[str, float]:
         "damageMelee": _sum(fields, "bonus_damage_melee"),
         "damageRanged": _sum(fields, "bonus_damage_range", "bonus_damage_ranged"),
         "aspd": _sum(fields, "bonus_attack_speed", "attack_speed", "bonus_as"),
-        "ms": _sum(fields, "bonus_movement_speed", "bonus_move_speed", "movement_speed", "aura_movement_speed", "bonus_movement", "movespeed"),
+        # `self_movement_speed` = Solar Crest's passive +25 (loc row "+$move_speed").
+        "ms": _sum(fields, "bonus_movement_speed", "bonus_move_speed", "movement_speed", "aura_movement_speed", "bonus_movement", "movespeed", "self_movement_speed"),
         "msMelee": _sum(fields, "bonus_movement_speed_melee", "bonus_move_speed_melee"),
         "msRanged": _sum(fields, "bonus_movement_speed_ranged", "bonus_move_speed_ranged"),
         "range": _sum(fields, "bonus_attack_range", "attack_range_bonus", "attack_range"),
-        "rangeUniqueAll": _sum(fields, "melee_attack_range"),
+        "rangeUniqueMelee": _sum(fields, "melee_attack_range"),
         "rangeUniqueRanged": _sum(fields, "base_attack_range"),
         "dvision": _sum(fields, "bonus_day_vision", "bonus_vision", "bonus_daytime_vision"),
         "nvision": _sum(fields, "bonus_night_vision", "night_vision_bonus", "bonus_nighttime_vision"),
@@ -566,10 +588,11 @@ _ITEM_ATTR_LABELS = {
     "aoe_bonus": "Area of Effect",
     "armor": "Armor",
     "attack": "Attack Speed",
-    "attack_pct": "Attack Speed",
-    "attack_range": "Attack Range",
-    "attack_range_melee": "Attack Range",
-    "attack_range_all": "Attack Range",
+    # Qualifiers follow Valve's dota_ability_variable_* labels.
+    "attack_pct": "Base Attack Speed",
+    "attack_range": "Attack Range (Ranged Only)",
+    "attack_range_melee": "Attack Range (Melee Only)",
+    "attack_range_all": "Attack Range (Melee & Ranged)",
     "cast_range": "Cast Range",
     "cooldown_reduction": "Cooldown Reduction",
     "damage": "Damage",
@@ -689,7 +712,13 @@ def _resolve_pct(desc: str, fields: dict) -> str:
         val = _field_value(fields, key)
         if val is None:
             return m.group(0)
-        s = _display_value(val)
+        # Multi-level values render like Valve's tooltip ("9 / 8 / 7" for
+        # BKB's Avatar duration), not just the first level.
+        parts = str(val).split()
+        if len(parts) > 1 and all(_re.fullmatch(r"-?[\d.]+", p) for p in parts):
+            s = " / ".join(_display_value(p) for p in parts)
+        else:
+            s = _display_value(val)
         return f'<span class="GameplayVariable">{s}</span>'
     return _re.sub(r"%([a-zA-Z_][a-zA-Z0-9_]*)%", _repl, desc)
 
@@ -713,7 +742,19 @@ def _resolve_attribute_entry(entry, fields: dict) -> str:
     else:
         raw, field = str(entry), ""
     placeholders = _re.findall(r"\$([a-zA-Z_][a-zA-Z0-9_]*)", raw)
-    text = _resolve_attr_label(raw, fields)
+    # Valve semantics: the VALUE of a stat row comes from the KV field named by
+    # the localization-key suffix; the `$token` only selects the label.
+    # (Ethereal Blade: `..._bonus_agility` = "+$all" -> +24 All Attributes;
+    # Solar Crest: `..._self_movement_speed` = "+$move_speed".) Resolving the
+    # token through aliases instead dropped those rows.
+    own = _field_value(fields, field) if (field and placeholders) else None
+    if own is not None and _re.fullmatch(r"-?[\d.]+(?:\s+-?[\d.]+)*", str(own).strip()):
+        shown = _display_value(own)
+        if shown.startswith("-"):
+            raw = _re.sub(r"^(%?)[+\-]", r"\1", raw)
+        text = _re.sub(r"\$[a-zA-Z_][a-zA-Z0-9_]*", lambda _m: shown, raw, count=1)
+    else:
+        text = _resolve_attr_label(raw, fields)
     text_plain = _re.sub(r"<[^>]+>", "", text)
     if "$" not in raw and field and not _re.search(r"\d", text_plain):
         val = _field_value(fields, field)
@@ -894,6 +935,8 @@ def _load_items(version: str) -> list[dict]:
             continue
         meta = meta_by_id.get(item)
         if not meta:
+            meta = _upgrade_level_meta(item, data, meta_by_id)
+        if not meta:
             continue
         if data.get("ItemRecipe") == "1":
             continue
@@ -918,6 +961,19 @@ def _load_items(version: str) -> list[dict]:
         if item == "item_manta" and bonus:
             bonus["msPct"] = bonus.get("msPct", 0) + bonus.get("ms", 0)
             bonus["ms"] = 0
+        if bonus.get("projSpeed") and not any(
+            isinstance(a, dict) and a.get("field") == "projectile_speed"
+            for a in tooltips.get(item, {}).get("attribs", [])
+        ):
+            # `projectile_speed` is only a passive stat when Valve shows it as a
+            # stat row (Witch Blade / Devastator). On Ethereal Blade, Nullifier
+            # and Harpoon it is the ACTIVE's projectile speed.
+            bonus["projSpeed"] = 0
+        if item == "item_butterfly" and bonus:
+            # 7.35: "+20% Base Attack Speed (affects only the base Attack Speed
+            # and gained from Agility attribute)". Drums/Bearing reuse the same
+            # KV key for their ACTIVE, so this mapping stays Butterfly-only.
+            bonus["baseAspdPct"] = _sum(fields, "bonus_attack_speed_pct")
         if item == "item_enhancement_hulking" and bonus:
             bonus["aspdPct"] = bonus.get("aspd", 0)
             bonus["aspd"] = 0

@@ -6653,6 +6653,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   border: 1px solid rgba(255,255,255,0.18);
   border-radius: 4px;
   color: #ccc;
+  font-family: var(--font-ui);
   font-size: 10px;
   padding: 0;
   -moz-appearance: textfield;
@@ -6994,7 +6995,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   letter-spacing: 2px;
   text-align: center;
   text-transform: uppercase;
-  font-family: Radiance, sans-serif;
+  font-family: var(--font-dota);
 }
 .hl-diff-row {
   position: relative;
@@ -7081,7 +7082,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 /* ── Hero Lab: Dota-style stats UI ─────────────────────────────────────── */
 .hl-dota-stats {
   margin-top: 10px;
-  font-family: Radiance, sans-serif;
+  font-family: var(--font-dota);
 }
 .hl-dota-combat {
   display: flex;
@@ -7273,7 +7274,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .hl-picker-head strong {
   color: #f0f5fa;
   font-size: 18px;
-  font-family: "Jersey 25", serif;
+  font-family: var(--font-j25);
   letter-spacing: 0.04em;
 }
 .hl-picker-actions {
@@ -9971,6 +9972,26 @@ body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
 .ec-head-panel .item-icon img { width: 88px; height: auto; }
 .ec-head-panel .entity-name { font-family: var(--font-j25); font-size: 34px; letter-spacing: 1.2px; text-transform: uppercase; line-height: 1; }
 .ec-head-panel .dyn-row-wrap { margin-right: 0; }
+/* hero page: name + 3 item slots (Hero Lab inventory wells) under it */
+.ec-name-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.ec-islots { display: flex; gap: 6px; }
+.ec-islot {
+  position: relative; width: 60px; height: 45px; padding: 0; border: 0; border-radius: 0; cursor: pointer;
+  background: #1a1c1d88 url('icons/inventory/inventory_item_well_psd.png') center / 100% 100% no-repeat;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, .67); transition: filter 0.12s ease;
+}
+.ec-islot:hover { filter: brightness(1.5); }
+.ec-islot:focus-visible { outline: 1px solid rgba(213, 173, 95, 0.85); outline-offset: -2px; }
+.ec-islot.is-empty::after {
+  content: "+"; position: absolute; inset: 0; display: grid; place-items: center;
+  font-family: var(--font-ui); font-size: 18px; color: rgba(227, 196, 106, 0.35);
+}
+.ec-islot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.ec-islot:hover .hl-slot-clear { opacity: 1; }
+.ec-ipicker { width: min(760px, calc(100vw - 56px)); }
+.ec-ipicker-body { display: flex; flex-wrap: wrap; gap: 10px 18px; align-content: flex-start; }
+/* an item's changes inside a hero patch section: separated from the hero's own block */
+section.ec-patch .entity-block.ec-item-inject { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(227, 196, 106, 0.18); }
 /* one filter row: Tags | Show | Ability */
 .legend-tags.ec-filters { flex-wrap: wrap; row-gap: 5px; }
 .ec-vsep { width: 1px; height: 16px; margin: 0 8px; background: var(--line-bright, rgba(255,255,255,0.18)); flex: 0 0 auto; }
@@ -9986,12 +10007,6 @@ body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
 .ec-ab-btn.ec-ab-old { border-style: dashed; opacity: 0.85; }
 .ec-ab-more { border-style: dotted; color: #9a927c; }
 .ec-ab-btn[hidden] { display: none; }
-/* facet chips: a gold chip carrying a small facet-coloured dot so it reads as a facet, not an ability */
-.ec-ab-btn.ec-ab-facet::before {
-  content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 5px;
-  border-radius: 2px; vertical-align: middle; background: var(--facet-grad, #565C61);
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4);
-}
 /* the patch banner = the same red section banner as "ITEM UPDATES" on a patch page */
 h2.section.ec-ver { display: flex; align-items: baseline; gap: 16px; }
 h2.section.ec-ver a { color: #fff; text-decoration: none; }
