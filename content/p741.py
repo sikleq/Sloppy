@@ -30,10 +30,7 @@ def build():
          extra=inline_note("Previously was only provided by sections on the base and near it, while other sections provided max bonus of 100.")))
     W(ul_close())
     W(plain_header("Map Objectives"))
-
-
-
-    W(subgroup("Wisdom Shrines"))
+    W(unit_header("Shrine of Wisdom", "../icons/structures/shrine_of_wisdom.png", general=False))
     W(ul_open())
     W(li("Wisdom Shrines and Lotus Pools now reverse their countdowns if heroes from opposing teams enter the area, instead of pausing the countdown", t("REWORK")))
     W(li_formula("Wisdom Shrine Experience changed",
@@ -46,7 +43,8 @@ def build():
                  rework_badge=False,
                  headline_level=2))
     W(ul_close())
-    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png"))
+
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False))
     W(ul_open())
     W(li("Tormentor's spawn preference has switched", t("MISC"),
          extra=inline_note("Now begins in the Bottom Chasm.")))
@@ -78,7 +76,7 @@ def build():
          )))
     W(li("Reward if all players have Aghanim's Shard decreased from 455 gold to 415 gold", b(455, 415)))
     W(ul_close())
-    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png"))
+    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False))
     W(ul_open())
     W(li("Roshan's pit preference has switched", t("MISC"),
          extra=inline_note("Now begins in the Top Pit.")))

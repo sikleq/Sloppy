@@ -2546,7 +2546,15 @@
 // doesn't hide it), follows the badge on scroll and becomes selectable. A second click on
 // the same badge, a click anywhere else or Escape unpins and hides it.
 function ecPinnableTip(tip, show, hide, sel) {
-  let anchor = null;
+  let anchor = null, raf = 0;
+  // A pinned tip is laid out in PAGE coordinates (position:absolute, .is-pinned) so it
+  // scrolls with the page natively — re-placing a fixed tip on every scroll event lagged
+  // a frame behind and made it jitter. Only scrolls of an inner box re-place it (in rAF).
+  const place = () => {
+    show(anchor);
+    tip.style.left = (parseFloat(tip.style.left) + window.scrollX) + 'px';
+    tip.style.top = (parseFloat(tip.style.top) + window.scrollY) + 'px';
+  };
   const unpin = () => { anchor = null; tip.classList.remove('is-pinned'); hide(); };
   document.addEventListener('click', e => {
     const t = e.target.closest(sel);
@@ -2554,8 +2562,8 @@ function ecPinnableTip(tip, show, hide, sel) {
       e.preventDefault();
       if (anchor === t) { unpin(); return; }
       anchor = t;
-      show(t);
       tip.classList.add('is-pinned');
+      place();
       return;
     }
     if (anchor && !tip.contains(e.target)) unpin();
@@ -2563,7 +2571,12 @@ function ecPinnableTip(tip, show, hide, sel) {
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && anchor) unpin(); });
   return {
     pinned: () => !!anchor,
-    follow: () => { if (anchor && anchor.isConnected) show(anchor); else if (anchor) unpin(); },
+    follow: e => {
+      if (!anchor) return;
+      if (!anchor.isConnected) { unpin(); return; }
+      if (!e || e.target === document || e.target === document.documentElement) return;   // page scroll: moves by itself
+      if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (anchor) place(); });
+    },
   };
 }
 
@@ -2622,7 +2635,7 @@ function ecPinnableTip(tip, show, hide, sel) {
     if (e.target.closest(TIP_SEL) && !pin.pinned()) hide();
   });
   // Scroll: an unpinned tip hides (the badge's coords change); a pinned one follows its badge.
-  window.addEventListener('scroll', () => { if (pin.pinned()) pin.follow(); else hide(); }, true);
+  window.addEventListener('scroll', e => { if (pin.pinned()) pin.follow(e); else hide(); }, true);
 })();
 
 // ---- Body-level tooltip for `.info-tip` "?" badges (patch pages) ----
@@ -2666,7 +2679,7 @@ function ecPinnableTip(tip, show, hide, sel) {
   document.addEventListener('focusout', e => {
     if (e.target.closest('.info-tip') && !pin.pinned()) hide();
   });
-  window.addEventListener('scroll', () => { if (pin.pinned()) pin.follow(); else hide(); }, true);
+  window.addEventListener('scroll', e => { if (pin.pinned()) pin.follow(e); else hide(); }, true);
 })();
 
 // ---- Centre the row jumped to via #anchor (cross-page or same-page) ----

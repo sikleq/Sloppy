@@ -469,19 +469,22 @@ def hero_header(name):
 </div>'''
 
 
-def unit_header(name, icon_url, kind=None, new=False, label=None):
+def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, new_mech=None):
     """`new="New Neutral Creep"` renders the same NEW-entity block as
     item_header(new=...): is-new block + type label after the name. Pair it
     with new_stats([...]) for the stat sheet and t("NEW") ability rows (the
     is-new CSS hides per-row chips but keeps data-tag="new" for the filter).
     `label="Returning Ancient Melee Creep"` shows only the type label: a unit
     that comes back WITH numeric changes keeps its normal GENERAL block and
-    per-row chips instead of a NEW card."""
+    per-row chips instead of a NEW card.
+    general=False: no GENERAL block — a map unit / building (Roshan, Tormentor, Shrine of Wisdom,
+    Lotus Pool): its rows follow the header directly.
+    new_mech="New mechanic": label + description-box rows, as plain_header(new=…)."""
     _State.current_hero = None
     # A unit's own base-stat ul is rendered exactly like a hero's: the first ul
     # after the header becomes the GENERAL block (Spirit Bear 7.41e).
     _State.current_unit = name
-    _State.next_ul_is_hero_stats = not new      # a NEW unit shows a stat sheet instead
+    _State.next_ul_is_hero_stats = (not new) and general   # a NEW unit shows a stat sheet instead
     kind_attr = f' data-kind="{kind}"' if kind else ''
     entity_kind = "creep-hero" if (kind and kind.lower().startswith("creep-hero")) else "unit"
     eid = _register_entity(entity_kind, name)
@@ -490,9 +493,12 @@ def unit_header(name, icon_url, kind=None, new=False, label=None):
         type_label = f' <span class="entity-new-type">{type_text}</span>' if type_text else ''
         extra_cls, block_attr = 'is-new', ' data-new-tag="NEW"'
     else:
+        label = label or new_mech
         type_label = f' <span class="entity-new-type">{label}</span>' if label else ''
         extra_cls, block_attr = '', ''
-    return _open_block(extra_cls, block_attr) + f'''<div class="entity unit-entity"{kind_attr}{eid}>
+    head = _open_block(extra_cls, block_attr)
+    _State.new_mech_header = _State.new_mech = bool(new_mech)
+    return head + f'''<div class="entity unit-entity"{kind_attr}{eid}>
   <div class="entity-icon hero-icon"><img src="{icon_url}" alt="{name}" loading="lazy" width="128" height="72"></div>
   <div class="entity-name">{name}{type_label}</div>
 </div>'''
