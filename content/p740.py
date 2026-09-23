@@ -2354,7 +2354,7 @@ def build():
     # Spectre
     W(hero_header("Spectre"))
     W(ul_open())
-    W(li("Now an Agility Hero", t("REWORK"), extra=inline_note("Base attributes and attribute gains are unchanged")))
+    W(li(attr_change("Universal", "Agility"), t("REWORK"), extra=inline_note("Base attributes and attribute gains are unchanged")))
     W(li("Base Damage increased by 2", bstat_h("Spectre", "AttackDamageMin", "7.39e", 2), extra=note_box(hero="Spectre", field="AttackDamageMin", before_patch="7.39e", extra_note="Damage at level 1 unchanged (48–52)")))
     W(li("Damage gain per level decreased from +2.8 to +2.1", b(2.8, 2.1)))
     W(li("Damage at level 30 decreased by 27 (from 149–153 to 122–126)", br(149, 153, 122, 126)))

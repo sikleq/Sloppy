@@ -541,6 +541,22 @@ def _prev_version_in_stats(version):
         return version
 
 
+_ATTR_NOW_RE = re.compile(r'^(?:Is now|Now) an? (Strength|Agility|Intelligence|Universal) Hero\.?$', re.I)
+_ATTR_KV = {"DOTA_ATTRIBUTE_STRENGTH": "Strength", "DOTA_ATTRIBUTE_AGILITY": "Agility",
+            "DOTA_ATTRIBUTE_INTELLECT": "Intelligence", "DOTA_ATTRIBUTE_ALL": "Universal"}
+
+
+def _hero_attr(hero_name, stats_version):
+    """Main attribute ("Agility"…) of a hero (display name) in data/stats/<version>/heroes.json, or None."""
+    try:
+        heroes = json.load(open(os.path.join(_HERE, 'data', 'stats', stats_version, 'heroes.json'), encoding='utf-8'))
+        roster = json.load(open(os.path.join(_HERE, 'data', 'herolist.json'), encoding='utf-8'))
+    except (OSError, ValueError):
+        return None
+    npc = next((h['name'] for h in roster['result']['data']['heroes'] if h['name_english_loc'] == hero_name), None)
+    return _ATTR_KV.get((heroes.get(npc) or {}).get('AttributePrimary')) if npc else None
+
+
 def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, version=None):
     """Render one W(li(...)) call. tag_override overrides heuristic; aghs is
     'scepter'/'shard' (already encoded in text if from datafeed); info is
@@ -554,6 +570,15 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
         old_min, old_max, new_min, new_max = (int(x) for x in dmg_m.groups())
         txt_esc = txt.replace('"', '\\"')
         return f'W(li("{txt_esc}", br({old_min}, {old_max}, {new_min}, {new_max})))'
+
+    # "Is now an Agility Hero" → attr_change(old, new): both attributes with icons, old from
+    # the stats snapshot before this patch
+    attr_m = _ATTR_NOW_RE.match(clean) if hero_name and version else None
+    if attr_m:
+        old_attr = _hero_attr(hero_name, _prev_version_in_stats(version))
+        if old_attr and old_attr != attr_m.group(1):
+            rest = f', extra=inline_note("{info}")' if info else ''
+            return f'W(li(attr_change("{old_attr}", "{attr_m.group(1)}"), t("REWORK"){rest}))'
 
     # Base-stat "by N" pattern → bstat_h + note_box
     bstat_m = _BSTAT_RE.search(clean) if hero_name and version else None

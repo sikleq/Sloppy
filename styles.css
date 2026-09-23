@@ -6117,6 +6117,10 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 /* matrix / Hero Stats row names link to the entity's Changes page */
 a.ec-name-link { color: inherit; text-decoration: none; }
 a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underline-offset: 3px; }
+/* main-attribute change row (attr_change): [icon] Agility → [icon] Universal */
+.attr-chip { display: inline-flex; align-items: center; gap: 4px; margin-left: 5px; font-weight: 600; color: var(--text-bright); white-space: nowrap; }
+.attr-chip img { width: 18px; height: 18px; vertical-align: -3px; }
+.attr-arrow { margin: 0 2px 0 7px; color: var(--gold); font-weight: 700; }
 /* RULE (all tables): hovering a hero/unit portrait pops it out — like Neutral
    Creeps. The 18px gap + name-fitted column width keep the 1.8× zoom from ever
    covering the name. The icon's stacking sits under the sticky header (sticky-col

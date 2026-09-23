@@ -1065,6 +1065,22 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text_inner}</span>{rest}{extra}</li>'
 
 
+_ATTR_CHIP_ICON = {"Strength": "strength", "Agility": "agility", "Intelligence": "intelligence", "Universal": "universal"}
+
+
+def attr_change(old, new):
+    """Row text for a main-attribute change: "Main attribute changed from [icon] Agility → [icon] Universal".
+    The arrow is the HTML entity &rarr; (never a literal "→" in content: it gets mangled by
+    non-UTF-8 shells/consoles); both attribute names carry their in-game icon."""
+    def chip(a):
+        if a not in _ATTR_CHIP_ICON:
+            raise ValueError(f"attr_change: unknown attribute {a!r}")
+        return (f'<span class="attr-chip"><img src="../icons/{_ATTR_CHIP_ICON[a]}.webp" alt="" '
+                f'width="18" height="18">{a}</span>')
+    return (f'Main attribute changed from {chip(old)}'
+            f'<span class="attr-arrow" aria-label="to">&rarr;</span>{chip(new)}')
+
+
 def inline_note(text):
     return f'<!--INLINETIP-->{info_tip(text)}<!--/INLINETIP-->'
 

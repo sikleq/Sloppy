@@ -395,3 +395,16 @@ def test_item_reworked_title_gets_changed_label_and_component_diff():
     assert 'auto_components_change(' in out and '"7.38"' in out
     assert "Requires Orb of Frost" not in out
     assert "Provides +8 Agility" in out
+
+
+def test_attribute_change_row_uses_attr_change_with_old_attribute():
+    row = g._emit_li("Is now a Universal Hero", hero_name="Arc Warden", version="7.38")
+    assert row == 'W(li(attr_change("Agility", "Universal"), t("REWORK")))'
+
+
+def test_attr_change_markup_has_icons_and_entity_arrow():
+    from patch.elements import attr_change
+    html = attr_change("Agility", "Universal")
+    assert "&rarr;" in html and "→" not in html          # entity, never a literal arrow
+    assert html.count("<img") == 2 and "agility.webp" in html and "universal.webp" in html
+    assert html.startswith("Main attribute changed from")

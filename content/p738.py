@@ -830,9 +830,8 @@ def build():
         new_ability="antimage_counterspell"))
     W(ability("Counterspell", slug="antimage_counterspell"))
     W(ul_open())
-    W(li("Now reflects spells by default", t("NEW")))
+    W(li("Now reflects spells by default, also when cast on an ally (Counterspell Ally)", t("NEW")))
     W(li("Passive Magic Resistance rescaled from 15/25/35/45% to 16/24/32/40%", b([15, 25, 35, 45], [16, 24, 32, 40])))
-    W(li("Ally: Now reflects spells by default", t("NEW")))
     W(ul_close())
 
     # Arc Warden
@@ -844,7 +843,7 @@ def build():
     W(li("Damage at level 30 increased by 21 (from 154-160 to 175-181)", br(154, 160, 175, 181)))
     W(li("Zet has attuned to the New Frontiers and no longer has 'Tempest' versions of abilities", t("DEL")))
     W(li("Removed Order and Disorder Facets", t("DEL")))
-    W(li("Is now a Universal Hero", t("REWORK")))
+    W(li(attr_change("Agility", "Universal"), t("REWORK")))
     W(ul_close())
     W(new_facet("arc_warden_runed_replica", desc=[
         "Tempest Double: Tempest Double is infused with the bonuses of Power Runes for 10s when created",
@@ -1082,7 +1081,7 @@ def build():
     W(li("Intelligence gain increased from 1.4 to 2.0", b(1.4, 2)))
     W(li("Damage gain per level decreased from +4.4 to +3.4", b(4.4, 3.4)))
     W(li("Damage at level 30 decreased by 45 (from 204-210 to 159-165)", t("NERF")))
-    W(li("Is now an Agility Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Agility"), t("REWORK")))
     W(li("Damage at level 1 unchanged (47-53)", t("MISC")))
     W(ul_close())
     W(facet_header("broodmother_necrotic_webs"))
@@ -1142,7 +1141,7 @@ def build():
     W(li("Damage gain per level decreased from +5.1 to +3.2", b(5.1, 3.2)))
     W(li("Damage at level 30 decreased from 226-233 to 152-162", t("NERF")))
     W(li("Removed Wolf Convert Facet", t("DEL")))
-    W(li("Is now an Intelligence Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
     W(ul_close())
     W(new_facet("chen_frog_convert", desc=[
         "Chen's convert is an amphibian creep. Summoned unit depends on the level of Holy Persuasion: Marshmage Apprentice (levels 0 and 1) or Marshmage (levels 2-4)",
@@ -1203,7 +1202,7 @@ def build():
     W(li("Agility gain increased from 2.1 to 2.3", b(2.1, 2.3)))
     W(li("Damage gain per level decreased from +4.8 to +3.2", b(4.8, 3.2)))
     W(li("Damage at level 30 decreased by 62 (from 218-220 to 156-158)", t("NERF")))
-    W(li("Is now a Strength Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Strength"), t("REWORK")))
     W(ul_close())
     W(facet_header("rattletrap_hookup"))
     W(ul_open())
@@ -1253,7 +1252,7 @@ def build():
     W(li("Damage gain per level decreased from +5 to +2.7", b(5, 2.7)))
     W(li("Damage at level 30 decreased by 75 (from 221-227 to 146-152)", t("NERF")))
     W(li("Removed Mental Fortitude innate ability", t("DEL"), extra=inline_note("When Dark Seer levels up, he restores a percentage of his max health and mana. Restore percentage is equal to 10% + 2% per hero level. Disabled by Break")))
-    W(li("Is now an Intelligence Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
     W(ul_close())
     # v2-todo: convert to ability_change(old=<replaced ability>, new=..., summary="New innate ability." / "New ability.", tag="new") — OLD pane = the ability this replaces (lift its desc from prior patchnotes)
     W(ability("Aggrandize", slug="dark_seer_aggrandize", innate=True))
@@ -1272,7 +1271,7 @@ def build():
     W(li("Damage gain per level decreased from +4.1 to +3.5", b(4.1, 3.5)))
     W(li("Damage at level 30 decreased by 32 (from 195-203 to 163-171)", t("NERF")))
     W(li("Removed Thorny Thicket Facet", t("DEL")))
-    W(li("Is now an Intelligence Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
     W(ul_close())
     W(new_facet("dark_willow_shattering_crown", desc=[
         "Cursed Crown: While ticking, the effect accumulates 35% of any damage dealt to the target by Dark Willow, and 15% of attack damage dealt by allied heroes. When the counter ends, the accumulated damage is dealt to each enemy in the stun radius as magical damage" + " " + inline_note("Accumulates damage before reductions. Will not deal damage when dispelled"),
@@ -1379,7 +1378,7 @@ def build():
     W(li("Damage gain per level increased from +3 to +3.6", b(3, 3.6)))
     W(li("Damage at level 30 increased by 21 (from 150-160 to 171-181)", br(150, 160, 171, 181)))
     W(li("Removed Suppress Facet", t("DEL")))
-    W(li("Is now a Universal Hero", t("REWORK")))
+    W(li(attr_change("Intelligence", "Universal"), t("REWORK")))
     W(li("Damage at level 1 unchanged (49-59)", t("MISC")))
     W(ul_close())
     W(facet_header("death_prophet_ghosts"))
@@ -1746,7 +1745,7 @@ def build():
     W(li("Damage at level 30 decreased by 46 (from 224-232 to 180-186)", br(224, 232, 180, 186)))
     W(li("Removed Mastermind ability", t("DEL"), extra=inline_note("Now Invoke is classified as Invoker's only innate ability")))
     W(li("Removed Agnostic and Elitist Facets", t("DEL")))
-    W(li("Is now an Intelligence Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
     W(li("Aghanim's Scepter still provides +1 level to all orbs, but also provides an additional level to the orb of the chosen facet, allowing it to reach max level of 10", t("BUFF"), extra=inline_note("By default, Level 30 Invoker will have two orbs at level 7 and one facet-related orb at level 8. Buying Aghanim's Scepter will increase these levels to 8 and 10 respectively")))
     W(ul_close())
     W(new_facet("invoker_quas_focus", desc=[
@@ -2148,7 +2147,7 @@ def build():
     W(li("Damage gain per level decreased from +4.1 to +2.8", b(4.1, 2.8)))
     W(li("Damage at level 30 decreased by 52 (from 185-189 to 133-137)", t("NERF")))
     W(li("Removed Unbearable Facet", t("DEL"), extra=inline_note("It's a facet's name, not the description")))
-    W(li("Is now an Agility Hero", t("REWORK"), extra=inline_note("Spirit Bear remains a Universal Hero")))
+    W(li(attr_change("Universal", "Agility"), t("REWORK"), extra=inline_note("Spirit Bear remains a Universal Hero")))
     W(li("Damage at level 1 unchanged (38-42)", t("MISC")))
     W(ul_close())
     W(facet_header("lone_druid_bear_necessities"))
@@ -2183,7 +2182,7 @@ def build():
     W(li("Intelligence gain increased from 1.2 to 1.7", b(1.2, 1.7)))
     W(li("Damage gain per level decreased from +4.2 to +3.4", b(4.2, 3.4)))
     W(li("Damage at level 30 decreased by 40 (from 202-207 to 162-167)", t("NERF")))
-    W(li("Is now a Strength Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Strength"), t("REWORK")))
     W(li("Damage at level 1 unchanged (50-55)", t("MISC")))
     W(ul_close())
     W(facet_header("lycan_alpha_wolves"))
@@ -2339,7 +2338,7 @@ def build():
     W(li("Selemene's Faithful: Healing Lotus Effectiveness increased from 20% to 50%", b(20, 50)))
     W(li("Damage at level 30 decreased by 40-38 (from 191-195 to 151-157)", t("NERF")))
     W(li("Removed Moonlight Shadow and Solar Flare Facets", t("DEL"), extra=inline_note("Moonlight Shadow remains as Mirana's default ultimate")))
-    W(li("Is now an Agility Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Agility"), t("REWORK")))
     W(ul_close())
     W(new_facet("mirana_starstruck", desc=[
         "Starstorm: Starstorm's second meteor deals more damage and blinds the target. Second Meteor Damage: 100%. Blind Miss Rate: 60%. Blind Duration: 3.5/4/4.5/5s" + " " + inline_note("Does not apply to the second Starstorm created by Sacred Arrow with Aghanim's Scepter"),
@@ -2476,7 +2475,7 @@ def build():
     W(li("Base Damage decreased by 2", bstat_h("Nature's Prophet", "AttackDamageMin", "7.37e", -2), extra=note_box(hero="Nature's Prophet", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage gain per level increased from +3.5 to +4.2", b(3.5, 4.2)))
     W(li("Damage at level 30 increased by 25 (from 155-165 to 180-190)", t("BUFF")))
-    W(li("Is now a Universal Hero", t("REWORK")))
+    W(li(attr_change("Intelligence", "Universal"), t("REWORK")))
     W(li("Damage at level 1 unchanged (40-50)", t("MISC")))
     W(ul_close())
     W(facet_header("furion_soothing_saplings"))
@@ -2716,7 +2715,7 @@ def build():
     W(li("Base Damage increased by 12", bstat_h("Phoenix", "AttackDamageMin", "7.37e", 12), extra=note_box(hero="Phoenix", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage gain per level decreased from +4.6 to +3.3", b(4.6, 3.3)))
     W(li("Damage at level 30 decreased by 54 (from 207-217 to 153-163)", br(207, 217, 153, 163)))
-    W(li("Is now a Strength Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Strength"), t("REWORK")))
     W(li("Damage at level 1 unchanged (44-54)", t("MISC")))
     W(ul_close())
     W(facet_header("phoenix_hotspot"))
@@ -3134,7 +3133,7 @@ def build():
     W(li("Base Damage decreased by 2", bstat_h("Spectre", "AttackDamageMin", "7.37e", -2), extra=note_box(hero="Spectre", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage gain per level increased from +2.1 to +2.8", b(2.1, 2.8)))
     W(li("Damage at level 30 increased by 27 (from 122-126 to 149-153)", br(122, 126, 149, 153)))
-    W(li("Is now a Universal Hero", t("REWORK")))
+    W(li(attr_change("Agility", "Universal"), t("REWORK")))
     W(li("Damage at level 1 unchanged (48-52)", t("MISC")))
     W(ul_close())
     W(facet_change("spectre_forsaken",
@@ -3444,7 +3443,7 @@ def build():
     W(li("Intelligence gain increased from 1.2 to 1.5", b(1.2, 1.5)))
     W(li("Damage gain per level decreased from +3.8 to +3.2", b(3.8, 3.2)))
     W(li("Damage at level 30 decreased by 36 (from 189-195 to 153-159)", t("NERF")))
-    W(li("Is now an Agility Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Agility"), t("REWORK")))
     W(ul_close())
     W(ability("Retribution", slug="vengefulspirit_retribution"))
     W(ul_open())
@@ -3581,7 +3580,7 @@ def build():
     W(li("Base Attack Speed increased from 90 to 100", b(90, 100)))
     W(li("Damage at level 30 decreased by 45-43 (from 203-208 to 158-165)", t("NERF")))
     W(li("Removed Essence of the Blueheart and Dragon Sight Facets", t("DEL")))
-    W(li("Is now an Intelligence Hero", t("REWORK")))
+    W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
     W(ul_close())
     W(new_facet("winter_wyvern_winterproof", desc=[
         "Cold Embrace: Can be cast on buildings. Chosen building isn't healed, but still protected from physical damage. Affected units or buildings gain 60% bonus attack damage after the cocoon thaws. Buff Duration: 6s",
