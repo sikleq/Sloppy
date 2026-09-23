@@ -660,7 +660,7 @@ def build():
     W(li("Now also modifies incoming healing", t("NEW"),
          extra=inline_note("As a result of Health Restoration changes")))
     W(ul_close())
-    W(item_header("Shiva's Guard", changed=True))
+    W(item_header("Shiva's Guard", changed="Item Reworked"))
     W(auto_components_change("Shiva's Guard", "7.41"))
     W(properties_change(
         old=[("BUFF", "+15 Armor"),
@@ -701,7 +701,7 @@ def build():
     W(ul_open())
     W(li("Magic Weakness renamed to Spell Weakness", t("MISC")))
     W(ul_close())
-    W(item_header("Bloodstone", changed=True))
+    W(item_header("Bloodstone", changed="Item Reworked"))
     W(auto_components_change("Bloodstone", "7.41"))
     W(properties_change(
         old=[("NERF", "+25% Spell Lifesteal"),

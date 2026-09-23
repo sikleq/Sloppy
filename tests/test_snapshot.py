@@ -23,7 +23,7 @@ EXPECTED = {
     "badge_new": 1,
     "badge_del": 5,
     "badge_rework": 2,
-    "badge_misc": 1,
+    "badge_misc": 2,  # +1: Linger non-lethal row MISC restored (2026-09-23)
 }
 
 # Allowed drift: small changes from formatting/whitespace tweaks are OK

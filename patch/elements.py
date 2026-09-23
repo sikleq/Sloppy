@@ -468,11 +468,14 @@ def hero_header(name):
 </div>'''
 
 
-def unit_header(name, icon_url, kind=None, new=False):
+def unit_header(name, icon_url, kind=None, new=False, label=None):
     """`new="New Neutral Creep"` renders the same NEW-entity block as
     item_header(new=...): is-new block + type label after the name. Pair it
     with new_stats([...]) for the stat sheet and t("NEW") ability rows (the
-    is-new CSS hides per-row chips but keeps data-tag="new" for the filter)."""
+    is-new CSS hides per-row chips but keeps data-tag="new" for the filter).
+    `label="Returning Ancient Melee Creep"` shows only the type label: a unit
+    that comes back WITH numeric changes keeps its normal GENERAL block and
+    per-row chips instead of a NEW card."""
     _State.current_hero = None
     # A unit's own base-stat ul is rendered exactly like a hero's: the first ul
     # after the header becomes the GENERAL block (Spirit Bear 7.41e).
@@ -486,7 +489,8 @@ def unit_header(name, icon_url, kind=None, new=False):
         type_label = f' <span class="entity-new-type">{type_text}</span>' if type_text else ''
         extra_cls, block_attr = 'is-new', ' data-new-tag="NEW"'
     else:
-        type_label, extra_cls, block_attr = '', '', ''
+        type_label = f' <span class="entity-new-type">{label}</span>' if label else ''
+        extra_cls, block_attr = '', ''
     return _open_block(extra_cls, block_attr) + f'''<div class="entity unit-entity"{kind_attr}{eid}>
   <div class="entity-icon hero-icon"><img src="{icon_url}" alt="{name}" loading="lazy" width="128" height="72"></div>
   <div class="entity-name">{name}{type_label}</div>

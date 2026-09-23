@@ -7,6 +7,7 @@ from generate_patch_code_v2 import (
     _guess_tag, LOWER_IS_BUFF, _NOT_LOWER_IS_BUFF,
     _postprocess_recipe_cost_zero_net, _DMG_L1_RE,
 )
+import generate_patch_code_v2 as g
 
 
 # ── _guess_tag: canonical phrase → expected tag ────────────────────────────
@@ -231,6 +232,7 @@ def test_lower_is_buff(text, should_match):
     "Cooldown Advance increased from 2 to 3",
     "Mana Cost Reduction increased from 10% to 15%",
     "Penalty Reduction increased from 5% to 10%",
+    "Cooldown speed is increased by 30% while in water",
 ])
 def test_not_lower_is_buff_exclusions(text):
     assert LOWER_IS_BUFF.search(text), f"Should match LOWER_IS_BUFF base: {text}"
@@ -285,14 +287,12 @@ _ALL_VERSIONS = sorted(
 
 @pytest.mark.parametrize("version", ["7.41", "7.41a", "7.41b", "7.41c", "7.41d", "7.41f"])
 def test_generated_scaffold_compiles(version, capsys):
-    import generate_patch_code_v2 as g
     src = g.generate(version)
     capsys.readouterr()
     compile(src, f"_generated_p_{version}", "exec")      # raises SyntaxError on duplicate kwargs
 
 
 def test_folded_subrow_merges_into_existing_extra(capsys):
-    import generate_patch_code_v2 as g
     src = g.generate("7.41a")
     capsys.readouterr()
     for ln in src.splitlines():
@@ -309,9 +309,71 @@ def test_folded_subrow_merges_into_existing_extra(capsys):
 # runs. The generator must reference an icon prefix exported by patch.api.
 @pytest.mark.parametrize("version", ["7.31", "7.38", "7.41"])
 def test_generated_scaffold_executes(version, capsys):
-    import generate_patch_code_v2 as g
     src = g.generate(version)
     capsys.readouterr()
     ns = {}
-    exec("from patch.api import *\n" + src, ns)          # NameError before the fix
+    # save_html stubbed: the scaffold ends with save_html('patches/<ver>.html'),
+    # which would overwrite the real built page in dist/ with the raw scaffold.
+    exec("from patch.api import *\nsave_html = lambda *a, **k: None\n" + src, ns)
     capsys.readouterr()
+
+
+# ---- Sub-note folding (2026-09-23) ----
+# Before: only the FIRST deeper row folded into the parent's "?" popup; its
+# siblings became stand-alone rows (7.38 "Reflected spells ... following:" put
+# "Caster's facet upgrades" in the popup, "Bonuses from talents" and the Aghs line
+# as separate rows, and hung the Aghs explanation on the wrong row).
+def _gen_rows(notes):
+    from generate_patch_code_v2 import _emit_notes
+    lines, _ = _emit_notes(notes)
+    return [l for l in lines if l.startswith("W(li(")]
+
+
+def test_enumeration_children_all_fold_into_parent_popup():
+    rows = _gen_rows([
+        {"indent_level": 1, "note": "Reflected spells now benefit from all bonuses the original cast had, including the following:"},
+        {"indent_level": 2, "note": "Caster's facet upgrades"},
+        {"indent_level": 2, "note": "Bonuses from talents"},
+        {"indent_level": 2, "note": "Aghanim's Shard and Aghanim's Scepter upgrades", "aghanims": "scepter"},
+        {"indent_level": 3, "note": "Upgrades used to depend on Aghanim's items the reflecting unit had"},
+        {"indent_level": 1, "note": "Units no longer gain bonus movement speed during the night"},
+    ])
+    assert len(rows) == 2, rows
+    r = rows[0]
+    for part in ("Caster's facet upgrades", "Bonuses from talents",
+                 "Aghanim's Shard and Aghanim's Scepter upgrades — Upgrades used to depend"):
+        assert part in r, (part, r)
+    assert r.count("inline_note(") == 1
+
+
+def test_single_child_still_folds_as_info():
+    rows = _gen_rows([
+        {"indent_level": 1, "note": "Universal Heroes' damage per attribute decreased from 0.7 to 0.45"},
+        {"indent_level": 2, "note": "As a result, many heroes have had their Base Damages and attribute gains changed"},
+    ])
+    assert len(rows) == 1 and "inline_note(\"As a result" in rows[0]
+
+
+def test_substantive_children_stay_rows_none_hidden():
+    rows = _gen_rows([
+        {"indent_level": 1, "note": "Heavenly Grace renamed to Repel"},
+        {"indent_level": 2, "note": "No longer grants bonus strength and health regen per dispelled debuff"},
+        {"indent_level": 2, "note": "Now grants bonus strength and health regen per debuff currently on the unit"},
+        {"indent_level": 2, "note": "No longer applies a strong dispel"},
+    ])
+    assert len(rows) == 4, rows
+    assert not any("inline_note(" in r for r in rows), rows
+
+
+def test_item_reworked_title_gets_changed_label_and_component_diff():
+    from generate_patch_code_v2 import _render_item
+    item = {"ability_id": 1, "title": '<span class="Rework">Item Reworked</span>',
+            "ability_notes": [
+                {"indent_level": 1, "note": "Requires Orb of Frost (250), Orb of Blight (300) and Band of Elvenskin (450). Total cost: 1000"},
+                {"indent_level": 1, "note": "Provides +8 Agility"},
+            ]}
+    out = "\n".join(_render_item(item, "7.38"))
+    assert 'changed="Item Reworked"' in out
+    assert 'auto_components_change(' in out and '"7.38"' in out
+    assert "Requires Orb of Frost" not in out
+    assert "Provides +8 Agility" in out

@@ -346,6 +346,7 @@ LOWER_IS_BUFF = re.compile(
 _NOT_LOWER_IS_BUFF = re.compile(
     r'\bcooldown\s+reduction\b'
     r'|\bcooldown\s+advance\b'
+    r'|\bcooldown\s+(?:speed|recovery)\b'
     r'|\bmana\s+cost\s+reduction\b'
     r'|\bpenalty\s+reduction\b'
     # "Magic Resistance bonus" is higher-is-better (item stat), not incoming damage
@@ -660,6 +661,56 @@ def _sort_source_ul_blocks(lines):
 
 # ---------- INDENT-TREE WALKER ----------
 
+_CHANGE_LEAD = re.compile(
+    r'^(?:no longer|now|can|cannot|removed|added|increased|decreased|reduced|fixed)\b', re.I)
+
+
+def _descendants(notes, i):
+    """Indices of every note nested under notes[i] (deeper indent, contiguous)."""
+    lvl = notes[i].get('indent_level', 1)
+    out = []
+    for j in range(i + 1, len(notes)):
+        if notes[j].get('indent_level', 1) <= lvl:
+            break
+        out.append(j)
+    return out
+
+
+def _is_enumeration(parent_text, kids):
+    """A parent that introduces a list of short items ("…including the
+    following:", "List of …", "The following abilities …") whose children are
+    bare noun phrases — not changes. Those items belong in the parent's "?"
+    popup, never as stand-alone rows."""
+    p = parent_text.strip().lower()
+    if not kids or not (p.endswith(':') or 'following' in p or p.startswith('list of')):
+        return False
+    for k in kids:
+        t = _strip_html(k.get('note') or '').strip()
+        if len(t.split()) > 6 or re.search(r'\d', t) or _CHANGE_LEAD.match(t):
+            return False
+    return True
+
+
+def _fold_into_row(lines, idx, text):
+    """Append `text` to the "?" popup of the W(li(…)) at lines[idx]: extend an
+    existing inline_note with <br>, otherwise add one. A row that already has
+    another extra= (e.g. note_box on a "Base X increased" row) is concatenated,
+    never given a second `extra=` kwarg (SyntaxError)."""
+    esc = text.replace('"', '\\"')
+    old_line = lines[idx]
+    if 'extra=inline_note' in old_line:
+        lines[idx] = re.sub(
+            r'(extra=inline_note\(")(.*?)("\)+)$',
+            lambda m: f'{m.group(1)}{m.group(2)}<br>{esc}{m.group(3)}',
+            old_line, count=1,
+        )
+        return
+    k = old_line.rfind('))')
+    if k >= 0:
+        joiner = (f' + inline_note("{esc}")))' if 'extra=' in old_line
+                  else f', extra=inline_note("{esc}")))')
+        lines[idx] = old_line[:k] + joiner
+
 def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
                 loc_map=None, current_ability_slug=None):
     """Walk notes array, respecting indent_level hierarchy and special
@@ -687,7 +738,11 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
             lines.append('W(ul_open())')
             open_ul = True
 
+    consumed = set()                # sub-note indices already folded into a parent row
+
     for i, n in enumerate(notes):
+        if i in consumed:
+            continue
         txt = (n.get('note') or '').strip()
         lvl = n.get('indent_level', 1)
         hide = n.get('hide_dot', False)
@@ -726,36 +781,6 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
             pending_parent_text = None
             continue
 
-        # Indent N+1 with previous N row → fold as inline_note on previous.
-        if lvl > last_indent and lvl > 1 and lines and pending_parent_text:
-            esc = txt.replace('"', '\\"')
-            # Find LAST emitted W(li(...)) line index.
-            li_indices = [k for k, ln in enumerate(lines) if ln.startswith('W(li(')]
-            if not li_indices:
-                last_indent = lvl
-                continue
-            last_idx = li_indices[-1]
-            old_line = lines[last_idx]
-            if 'extra=inline_note' in old_line:
-                # Already has inline_note — append <br> before closing quote.
-                lines[last_idx] = re.sub(
-                    r'(extra=inline_note\(")(.*?)("\)+)$',
-                    lambda m: f'{m.group(1)}{m.group(2)}<br>{esc}{m.group(3)}',
-                    old_line, count=1,
-                )
-            else:
-                # Insert the note before the W(li(…)) closing parens — match the
-                # rightmost "))". If the row already carries some other extra=
-                # (e.g. note_box(...) on a "Base X increased" row), concatenate
-                # instead of adding a second `extra=` kwarg (a SyntaxError).
-                i = old_line.rfind('))')
-                if i >= 0:
-                    joiner = (f' + inline_note("{esc}")))' if 'extra=' in old_line
-                              else f', extra=inline_note("{esc}")))')
-                    lines[last_idx] = old_line[:i] + joiner
-            last_indent = lvl
-            continue
-
         open_ul_if_needed()
         # Check patchnotes_english: warn if this text belongs to a different ability.
         if loc_map is not None and current_ability_slug is not None:
@@ -767,6 +792,28 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
         pending_parent_text = txt
         last_indent = lvl
         has_content = True
+
+        # Deeper rows under this one (see _fold_children): an enumeration folds
+        # entirely into this row's "?" popup, a single sub-note folds as its info,
+        # several substantive sub-changes stay as their own rows.
+        desc = _descendants(notes, i)
+        if desc and lines[-1].startswith('W(li(') and not any(notes[j].get('hide_dot') for j in desc):
+            kids = [j for j in desc if notes[j].get('indent_level', 1) == lvl + 1]
+            text = None
+            if _is_enumeration(clean, [notes[j] for j in kids]):
+                parts = []
+                for j in desc:
+                    t = (notes[j].get('note') or '').strip()
+                    if notes[j].get('indent_level', 1) == lvl + 1 or not parts:
+                        parts.append(t)
+                    else:
+                        parts[-1] += ' — ' + t          # a kid's own explanation sits next to it
+                text = '<br>'.join(parts)
+            elif len(kids) == 1:
+                text = '<br>'.join((notes[j].get('note') or '').strip() for j in desc)
+            if text is not None:
+                _fold_into_row(lines, len(lines) - 1, text)
+                consumed.update(desc)
 
     if open_ul:
         lines.append('W(ul_close())')
@@ -785,6 +832,8 @@ def _entity_title_decoration(entity):
     txt = _strip_html(title).strip()
     if 'New' in txt or 'Returning' in txt:
         return f', new="{txt}"'
+    if 'Rework' in txt:
+        return f', changed="{txt}"'
     return ''
 
 
@@ -834,7 +883,14 @@ def _render_item(item, version, neutral=False):
                             _strip_html(notes[0].get('note', '')), re.I)
     )
     if is_recipe_changed:
-        deco = deco + ', changed=True' if deco else ', changed=True'
+        if 'changed=' not in deco:          # "Item Reworked" label already set
+            deco += ', changed=True'
+        notes = notes[1:]
+    # "Item Reworked" title: the component diff renders from items.json, so the
+    # datafeed's "Requires A, B and C. Total cost: N" row would only repeat it.
+    is_reworked = not is_enchantment and 'changed="' in deco
+    if is_reworked and notes and re.match(
+            r'^Requires\b', _strip_html(notes[0].get('note', '')).strip()):
         notes = notes[1:]
     # Detect "New Tier N Artifact" / "Returning as a Tier N Neutral Artifact" as
     # the first note in neutral items — convert to item_header(new="...") and drop.
@@ -855,7 +911,7 @@ def _render_item(item, version, neutral=False):
         out.append(f'W(enchant_header("{name}"))')
     else:
         out.append(f'W(item_header("{name}"{deco}))')
-    if is_recipe_changed:
+    if is_recipe_changed or is_reworked:
         out.append(f'W(auto_components_change("{name}", "{version}"))')
     body, _ = _emit_notes(notes)
     out.extend(body)

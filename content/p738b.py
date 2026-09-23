@@ -9,16 +9,9 @@ def build():
     W(li("Tormentor: Gold to each team member on death decreased from 250 to 175", b(250, 175)))
     W(li("Tormentor: Unyielding Shield: Base Damage absorb increased from 1900 to 2100", b(1900, 2100)))
     W(li("Tormentor: Unyielding Shield: Base Barrier regeneration increased from 30 to 40", b(30, 40)))
-    W(li("Removed several trees around camps, making it easier for additional paths to be cut through:", t("DEL"), extra=inline_note("To the right of Dire Ancient camp by Safelane Tier 1 Tower")))
+    W(li("Removed several trees around camps, making it easier for additional paths to be cut through", t("DEL"), extra=inline_note("To the right of Dire Ancient camp by Safelane Tier 1 Tower<br>To the right of Dire Medium camp between mid and top Tier 2 Towers<br>To the top of Dire Hard camp nearest to mid Tier 1 Tower<br>To the top of the Dire Jungle high-ground Medium camp<br>To the right of the Dire offlane Tier 2 Tower Medium camp<br>To the right of the Radiant Hard Camp by mid tier 1<br>To the right and left of the Radiant Hard Camp by offlane Tier 1 Tower<br>To the left of the Radiant Safelane Tier 2 Tower Medium water camp")))
     W(li("Lotuses can no longer be picked up by Meepo clones, Arc Warden's Tempest Double or Dazzle's Nothl Projection", t("DEL")))
     W(li("Moved the spawn box of the Radiant Safelane tier 1 hard pull camp a little bit down, removing an inaccessible camp block spot that could be created by chopping down a tree", t("MISC")))
-    W(li("To the right of Dire Medium camp between mid and top Tier 2 Towers", t("MISC")))
-    W(li("To the top of Dire Hard camp nearest to mid Tier 1 Tower", t("MISC")))
-    W(li("To the top of the Dire Jungle high-ground Medium camp", t("MISC")))
-    W(li("To the right of the Dire offlane Tier 2 Tower Medium camp", t("MISC")))
-    W(li("To the right of the Radiant Hard Camp by mid tier 1", t("MISC")))
-    W(li("To the right and left of the Radiant Hard Camp by offlane Tier 1 Tower", t("MISC")))
-    W(li("To the left of the Radiant Safelane Tier 2 Tower Medium water camp", t("MISC")))
     W(ul_close())
 
     # ===== ITEM UPDATES =====

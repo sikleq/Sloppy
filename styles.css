@@ -4776,6 +4776,14 @@ ul.changes li.aghanim-shard {
     linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 25px / 100% calc(100% - 28px);
   border-radius: 3px;
 }
+/* Chip-less rows (bulleted description rows, rows of a NEW entity card) have no
+   tag column to clear — the stripe starts at the left edge on every line. */
+ul.changes li.aghanim-scepter:has(> .row-tag-empty):not([class*="ability-row"]),
+ul.changes li.aghanim-shard:has(> .row-tag-empty):not([class*="ability-row"]),
+.entity-block.is-new ul.changes li.aghanim-scepter:not([class*="ability-row"]),
+.entity-block.is-new ul.changes li.aghanim-shard:not([class*="ability-row"]) {
+  background: linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%);
+}
 /* When a formula table is inside the li, strip the second gradient layer so it
    doesn't bleed over the table rows. The first-line stripe is kept. */
 ul.changes li.aghanim-scepter:has(> .formula-table),

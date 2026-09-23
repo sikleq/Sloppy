@@ -559,7 +559,7 @@ def build():
     W(hero_header("Silencer"))
     W(ability("Brain Drain", slug="silencer_brain_drain", innate=True, icon_url="../icons/misc/innate_icon.png"))
     W(ul_open())
-    W(li("If Silencer is out of range, Intelligence will now be stolen only if the dying enemy is debuffed by Silencer the moment they die", extra=inline_note("This effect used to have a grace period equal to the full Assist-gaining duration even when the debuff was removed")))
+    W(li("If Silencer is out of range, Intelligence will now be stolen only if the dying enemy is debuffed by Silencer the moment they die", t("MISC"), extra=inline_note("This effect used to have a grace period equal to the full Assist-gaining duration even when the debuff was removed")))
     W(ul_close())
     
     # Skywrath Mage
@@ -577,7 +577,7 @@ def build():
     W(ul_close())
     W(ability("Mortimer Kisses", slug="snapfire_mortimer_kisses"))
     W(ul_open())
-    W(li("No longer interrupted when Snapfire uses items/abilities that can be cast while channeling (Glimmer Cape, etc.)", extra=inline_note("This also fixes being interrupted when receiving Madstone")))
+    W(li("No longer interrupted when Snapfire uses items/abilities that can be cast while channeling (Glimmer Cape, etc.)", t("MISC"), extra=inline_note("This also fixes being interrupted when receiving Madstone")))
     W(ul_close())
     
     # Templar Assassin
@@ -664,7 +664,7 @@ def build():
     W(hero_header("Weaver"))
     W(ability("The Swarm", slug="weaver_the_swarm"))
     W(ul_open())
-    W(li("Bugs are now destroyed if the host unit becomes invulnerable", extra=inline_note("i.e. using Eul's Scepter of Divinity, etc")))
+    W(li("Bugs are now destroyed if the host unit becomes invulnerable", t("MISC"), extra=inline_note("i.e. using Eul's Scepter of Divinity, etc")))
     W(ul_close())
     
     # Windranger

@@ -1032,7 +1032,7 @@ def build():
     W(ul_close())
     W(ability("Soulbind", slug="grimstroke_soul_chain"))
     W(ul_open())
-    W(li("If the debuff ends on the primary target early due to status resistance, it will also be destroyed on the secondary target", extra=inline_note("Previously, the secondary target would still be leashed")))
+    W(li("If the debuff ends on the primary target early due to status resistance, it will also be destroyed on the secondary target", t("MISC"), extra=inline_note("Previously, the secondary target would still be leashed")))
     W(ul_close())
 
     # Gyrocopter
