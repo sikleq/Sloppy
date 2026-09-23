@@ -484,6 +484,7 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
     # A unit's own base-stat ul is rendered exactly like a hero's: the first ul
     # after the header becomes the GENERAL block (Spirit Bear 7.41e).
     _State.current_unit = name
+    _State.seen_abilities_subgroup = False       # an ability() below gets the "Abilities" heading, as for heroes
     _State.next_ul_is_hero_stats = (not new) and general   # a NEW unit shows a stat sheet instead
     kind_attr = f' data-kind="{kind}"' if kind else ''
     entity_kind = "creep-hero" if (kind and kind.lower().startswith("creep-hero")) else "unit"
@@ -720,7 +721,7 @@ def ability(title, slug=None, innate=None, icon_url=None, sub=False):
               file=sys.stderr)
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
-    if not sub and not _State.seen_abilities_subgroup and _State.current_hero:
+    if not sub and not _State.seen_abilities_subgroup and (_State.current_hero or _State.current_unit):
         out += '<h4 class="subgroup">Abilities</h4>'
         _State.seen_abilities_subgroup = True
     _State.ability_block_open = True
@@ -1475,7 +1476,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
         _dyn_record_li({'new', 'del', 'rework'})
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
-    if not sub and _State.current_hero and not _State.seen_abilities_subgroup:
+    if not sub and (_State.current_hero or _State.current_unit) and not _State.seen_abilities_subgroup:
         out += '<h4 class="subgroup">Abilities</h4>'
         _State.seen_abilities_subgroup = True
 
@@ -1564,7 +1565,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
 
     if unified:
         _State.next_ul_is_hero_stats = False
-        if not sub and _State.current_hero and not _State.seen_abilities_subgroup:
+        if not sub and (_State.current_hero or _State.current_unit) and not _State.seen_abilities_subgroup:
             out = ''
             out += '<h4 class="subgroup">Abilities</h4>'
             _State.seen_abilities_subgroup = True
