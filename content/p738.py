@@ -54,7 +54,7 @@ def build():
     W(li("Tormentor spawns repositioned to the corners of the map", t("MISC")))
     W(li("Tormentor now spawns for the first time at 15:00", t("MISC"), extra=inline_note("7:30 in Turbo")))
     W(ul_close())
-    W(subgroup("Lotus Pools", new="New mechanic"))
+    W(subgroup("Lotus Pools"))
     W(ul_open())
     W(li("Changed the way Healing Lotuses are collected from Lotus Pools", t("REWORK"), extra=inline_note("Lotus Pools now have three entrances and an empty region in the center<br>Heroes will automatically gather lotuses when within 350 units of the center of a pool as long as they have available space in their inventory<br>The first Lotus takes 1.5s to collect, and each subsequent lotus in a row takes 30% less time — The second lotus will take 1.05s, the third one takes 0.735s, down to a minimum of 0.3s<br>The timer only counts down when all heroes within range are on the same team, pausing if an enemy hero enters the area, and resuming when enemies leave<br>If multiple allied heroes are all within range, the Lotus will be granted to a random hero")))
     W(li("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Great Lotuses they could form")))

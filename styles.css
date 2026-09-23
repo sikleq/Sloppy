@@ -3167,6 +3167,8 @@ ul.changes li.ability-row-end {
   box-shadow: 0 4px 18px var(--shadow-45);
 }
 .info-pop-body.is-visible { display: block; }
+/* pinned by a click on its "?" (ecPinnableTip in scripts.js): stays up, text selectable */
+.info-pop-body.is-pinned, .qhint-tip.is-pinned { pointer-events: auto; user-select: text; border-color: var(--gold); }
 .info-pop-h {
   display: block;
   margin-bottom: 5px;

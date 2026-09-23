@@ -2541,6 +2541,32 @@
 })();
 
 
+// ---- Pinnable body-level tooltip (shared by the "?" families below) ----
+// Click on a badge matching `sel` pins its tooltip: it stays on screen (hover elsewhere
+// doesn't hide it), follows the badge on scroll and becomes selectable. A second click on
+// the same badge, a click anywhere else or Escape unpins and hides it.
+function ecPinnableTip(tip, show, hide, sel) {
+  let anchor = null;
+  const unpin = () => { anchor = null; tip.classList.remove('is-pinned'); hide(); };
+  document.addEventListener('click', e => {
+    const t = e.target.closest(sel);
+    if (t) {
+      e.preventDefault();
+      if (anchor === t) { unpin(); return; }
+      anchor = t;
+      show(t);
+      tip.classList.add('is-pinned');
+      return;
+    }
+    if (anchor && !tip.contains(e.target)) unpin();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && anchor) unpin(); });
+  return {
+    pinned: () => !!anchor,
+    follow: () => { if (anchor && anchor.isConnected) show(anchor); else if (anchor) unpin(); },
+  };
+}
+
 // ---- Body-level tooltip for `.qhint` badges ----
 // CSS `::after` tooltips are clipped by .creeps-scroll's overflow:auto and by
 // the sticky header. Render a single shared <div> at <body> level, positioned
@@ -2579,22 +2605,24 @@
   // into the body-level tooltip via `.abil-ico-hint` (currently used on
   // ability icons in the Unit Abilities table).
   const TIP_SEL = '.qhint, .abil-ico-hint, .hd-patch[data-tooltip]';
+  // Click pins the tooltip (read it at leisure, select text); a click anywhere else unpins.
+  const pin = ecPinnableTip(tip, show, hide, '.qhint');
   document.addEventListener('mouseover', (e) => {
     const t = e.target.closest(TIP_SEL);
-    if (t) show(t);
+    if (t && !pin.pinned()) show(t);
   });
   document.addEventListener('mouseout', (e) => {
-    if (e.target.closest(TIP_SEL)) hide();
+    if (e.target.closest(TIP_SEL) && !pin.pinned()) hide();
   });
   document.addEventListener('focusin', (e) => {
     const t = e.target.closest(TIP_SEL);
-    if (t) show(t);
+    if (t && !pin.pinned()) show(t);
   });
   document.addEventListener('focusout', (e) => {
-    if (e.target.closest(TIP_SEL)) hide();
+    if (e.target.closest(TIP_SEL) && !pin.pinned()) hide();
   });
-  // Hide on any scroll (the badge's absolute coords change).
-  window.addEventListener('scroll', hide, true);
+  // Scroll: an unpinned tip hides (the badge's coords change); a pinned one follows its badge.
+  window.addEventListener('scroll', () => { if (pin.pinned()) pin.follow(); else hide(); }, true);
 })();
 
 // ---- Body-level tooltip for `.info-tip` "?" badges (patch pages) ----
@@ -2622,21 +2650,23 @@
   }
   function hide() { tip.classList.remove('is-visible'); }
 
+  // Click pins the "?" popup (read it at leisure, select text); a click anywhere else unpins.
+  const pin = ecPinnableTip(tip, show, hide, '.info-tip');
   document.addEventListener('mouseover', e => {
     const t = e.target.closest('.info-tip');
-    if (t) show(t);
+    if (t && !pin.pinned()) show(t);
   });
   document.addEventListener('mouseout', e => {
-    if (e.target.closest('.info-tip')) hide();
+    if (e.target.closest('.info-tip') && !pin.pinned()) hide();
   });
   document.addEventListener('focusin', e => {
     const t = e.target.closest('.info-tip');
-    if (t) show(t);
+    if (t && !pin.pinned()) show(t);
   });
   document.addEventListener('focusout', e => {
-    if (e.target.closest('.info-tip')) hide();
+    if (e.target.closest('.info-tip') && !pin.pinned()) hide();
   });
-  window.addEventListener('scroll', hide, true);
+  window.addEventListener('scroll', () => { if (pin.pinned()) pin.follow(); else hide(); }, true);
 })();
 
 // ---- Centre the row jumped to via #anchor (cross-page or same-page) ----

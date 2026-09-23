@@ -208,9 +208,8 @@ def build():
     W(ul_close())
     W(ability("Savage Roar"))
     W(ul_open())
-    W(li("Duration increased from 0.8/1.2/1.6/2s to 1.1/1.4/1.7/2s", b([0.8, 1.2, 1.6, 2], [1.1, 1.4, 1.7, 2])))
+    W(li("Duration increased from 0.8/1.2/1.6/2s to 1.1/1.4/1.7/2s", b([0.8, 1.2, 1.6, 2], [1.1, 1.4, 1.7, 2]), extra=inline_note("Same change applies to the Spirit Bear's Savage Roar")))
     W(ul_close())
-    W(subnote("Same change applies to the Spirit Bear's Savage Roar"))
     W(ability("Return", slug="lone_druid_spirit_bear_return"))
     W(ul_open())
     W(li("Roots and leashes will now interrupt Return's channeling", t("NERF"),
