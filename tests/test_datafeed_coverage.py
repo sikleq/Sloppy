@@ -66,3 +66,22 @@ def test_datafeed_heroes_and_facets_present(version, path):
                 missing_facets.append(f"{name}: {title} ({slug})")
     assert not missing_heroes, f"{version}: datafeed heroes missing from content: {missing_heroes}"
     assert not missing_facets, f"{version}: datafeed facet changes missing from content: {missing_facets}"
+
+
+@pytest.mark.parametrize("version,path", _annotated_versions())
+def test_valve_new_and_reworked_facets_use_their_cards(version, path):
+    """Valve flags a facet subsection "hero_facet NewFacet" / "hero_facet ReworkedFacet".
+    NewFacet -> new_facet(slug, …) card (not tag="rework"); ReworkedFacet -> facet_change(slug, …)
+    with an OLD -> NEW pair (7.38 Magebane's Mirror was a plain facet_header list)."""
+    src = open(path, encoding="utf-8").read()
+    feed = json.load(open(os.path.join(ROOT, "data", f"{version}_datafeed.json"), encoding="utf-8"))
+    wrong = []
+    for h in feed.get("heroes", []):
+        for s in h.get("subsections", []):
+            slug, style = s.get("facet"), s.get("style") or ""
+            if "ReworkedFacet" in style and f'facet_change("{slug}"' not in src:
+                wrong.append(f"{slug}: Valve ReworkedFacet -> needs facet_change")
+            if "NewFacet" in style and (f'new_facet("{slug}"' not in src
+                                        or re.search(r'new_facet\("' + slug + r'", tag="rework"', src)):
+                wrong.append(f"{slug}: Valve NewFacet -> needs new_facet (tag new)")
+    assert not wrong, f"{version}: " + "; ".join(wrong)

@@ -923,6 +923,43 @@ def _render_item(item, version, neutral=False):
     return out
 
 
+def _facet_card(slug, style, body_lines):
+    """Valve-flagged facet → card lines, else None. NewFacet → new_facet(desc=rows);
+    ReworkedFacet → facet_change with the rows as NEW and an OLD pane the proofreader
+    fills from the previous patch's state (KV values + earlier patch notes)."""
+    kind = 'new' if 'NewFacet' in style else ('rework' if 'ReworkedFacet' in style else None)
+    if not kind:
+        return None
+    import ast as _ast
+    items = []
+    for line in body_lines:
+        if not line.startswith('W(li('):
+            continue
+        try:
+            call = _ast.parse(line, mode='eval').body.args[0]
+        except SyntaxError:
+            return None
+        if not call.args or not isinstance(call.args[0], _ast.Constant):
+            return None
+        text = call.args[0].value.replace('\\', '\\\\').replace('"', '\\"')
+        item = f'"{text}"'
+        for a in call.args[1:]:
+            if not (isinstance(a, _ast.Call) and getattr(a.func, 'id', '') == 't'):
+                item += ' + " " + ' + _ast.get_source_segment(line, a)
+        extra = next((k.value for k in call.keywords if k.arg == 'extra'), None)
+        if extra is not None:
+            item += ' + " " + ' + _ast.get_source_segment(line, extra)
+        items.append(item)
+    if not items:
+        return None
+    rows = ''.join(f'\n    {it},' for it in items)
+    if kind == 'new':
+        return [f'W(new_facet("{slug}", desc=[{rows}\n]))']
+    return [f'W(facet_change("{slug}",\n'
+            f'    old_desc=["TODO: the facet as it was in the previous patch (KV values + earlier notes)"],\n'
+            f'    new_desc=[{rows}\n]))']
+
+
 def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
     """One heroes[] entry: hero_header + hero_notes + abilities + subsections.
 
@@ -1060,6 +1097,7 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
             if facet_slug not in _FACETS:
                 print(f'[WARN] facet "{facet_slug}" not in FACETS — add to badges.py: '
                       f'"{facet_slug}": ("{facet_title}", "{facet_color}")')
+            facet_start = len(out)
             out.append(f'W(facet_header("{facet_slug}"))')
             # general_notes on the facet subsection itself (e.g. radius changes)
             general_notes = s.get('general_notes', [])
@@ -1093,6 +1131,10 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
             if facet_talents:
                 tbody, _ = _emit_notes(facet_talents)
                 out.extend(tbody)
+            # Valve flags the facet itself: "hero_facet NewFacet" / "hero_facet ReworkedFacet"
+            card = _facet_card(facet_slug, s.get('style', ''), out[facet_start + 1:])
+            if card:
+                out[facet_start:] = card
     # Abilities
     for a in hero.get('abilities', []):
         aid = a.get('ability_id')

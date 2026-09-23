@@ -821,13 +821,13 @@ def build():
 
     # Anti-Mage
     W(hero_header("Anti-Mage"))
-    W(facet_header("antimage_magebanes_mirror"))
-    W(ul_open())
-    W(li("Counterspell: Burns 150/190/230/270% of the countered ability's mana cost from its caster and deals damage equal to 100% of the burned mana, up to 400 damage per reflected spell", t("NEW")))
-    W(li("Counterspell: Spell reflection no longer exclusive to this facet", t("DEL")))
-    W(li("Counterspell: Ally: Burns 270% of the countered ability's mana cost from its caster and deals damage equal to 100% of the burned mana, up to 400 damage per reflected spell", t("NEW")))
-    W(li("Counterspell: Ally: Spell reflection no longer exclusive to this facet", t("DEL")))
-    W(ul_close())
+    W(facet_change("antimage_magebanes_mirror",
+        old_desc=["Counterspell reflects spells back at their caster when activated. Reflected spells have 40% Spell Amplification", "Ally: Reflects spells when activated, with the same 40% Spell Amplification"],
+        new_desc=["Burns 150/190/230/270% of the countered ability's mana cost from its caster and deals damage equal to 100% of the burned mana, up to 400 damage per reflected spell",
+                  "Ally: Burns 270% of the countered ability's mana cost from its caster and deals damage equal to 100% of the burned mana, up to 400 damage per reflected spell",
+                  "Spell reflection is no longer exclusive to this facet: Counterspell now reflects spells by default"],
+        old_ability="antimage_counterspell",
+        new_ability="antimage_counterspell"))
     W(ability("Counterspell", slug="antimage_counterspell"))
     W(ul_open())
     W(li("Now reflects spells by default", t("NEW")))
@@ -1448,12 +1448,11 @@ def build():
 
     # Dragon Knight
     W(hero_header("Dragon Knight"))
-    W(facet_header("dragon_knight_fire_dragon"))
-    W(ul_open())
-    W(li("Dragon Tail: While in dragon form, Dragon Tail applies to enemies in a 175 radius around the target", t("REWORK")))
-    W(li("Wyrm's Wrath: Attacks deal 10/20/30/40 bonus magic damage to enemies", t("REWORK")))
-    W(li("Wyrm's Wrath: Increases all AoE effects by 25/50/75/100", t("REWORK")))
-    W(ul_close())
+    W(facet_change("dragon_knight_fire_dragon",
+        old_desc=["While in human form, attacks have 30/40/50/60% cleave with 400 range", "While in dragon form, cleave increases by another 30/40/50/60% and turns into splash damage to all enemies within 350 range from the attack target"],
+        new_desc=["Dragon Tail: While in dragon form, Dragon Tail applies to enemies in a 175 radius around the target",
+                  "Wyrm's Wrath: Attacks deal 10/20/30/40 bonus magic damage to enemies",
+                  "Wyrm's Wrath: Increases all AoE effects by 25/50/75/100"]))
     W(facet_header("dragon_knight_corrosive_dragon"))
     W(ul_open())
     W(li("Now also makes all Dragon Knight's abilities deal physical damage", t("NEW")))
@@ -1685,10 +1684,9 @@ def build():
     W(ul_open())
     W(li("Scurry: Active Cast/Attack Range rescaled from 100/150/200/250 to 75/150/225/300", b([100, 150, 200, 250], [75, 150, 225, 300])))
     W(ul_close())
-    W(facet_header("hoodwink_hipshot"))
-    W(ul_open())
-    W(li("Sharpshooter: Sharpshooter has 50% reduced cooldown. Turn Rate is improved by 33%. Max Damage, Max Debuff Duration, and Max Wind-Up Time are reduced by 25%", t("NERF"), extra=inline_note("Also affects Decoy")))
-    W(ul_close())
+    W(new_facet("hoodwink_hipshot", desc=[
+        "Sharpshooter: Sharpshooter has 50% reduced cooldown. Turn Rate is improved by 33%. Max Damage, Max Debuff Duration, and Max Wind-Up Time are reduced by 25%" + " " + inline_note("Also affects Decoy"),
+    ]))
     W(ability("Mistwoods Wayfarer", slug="hoodwink_mistwoods_wayfarer"))
     W(ul_open())
     W(li("Redirect Chance rescaled from 15/20/25/30% to 14/21/28/35%", b([15, 20, 25, 30], [14, 21, 28, 35])))
@@ -1751,14 +1749,14 @@ def build():
     W(li("Is now an Intelligence Hero", t("REWORK")))
     W(li("Aghanim's Scepter still provides +1 level to all orbs, but also provides an additional level to the orb of the chosen facet, allowing it to reach max level of 10", t("BUFF"), extra=inline_note("By default, Level 30 Invoker will have two orbs at level 7 and one facet-related orb at level 8. Buying Aghanim's Scepter will increase these levels to 8 and 10 respectively")))
     W(ul_close())
-    W(new_facet("invoker_quas_focus", tag="rework", desc=[
+    W(new_facet("invoker_quas_focus", desc=[
         "Quas: When Invoker reaches level 6, he gains a bonus level of Quas without spending a skill point. Also increases its max level up to 8",
         "Quas: Aghanim's Scepter grants 1 additional current level, and increases max level to 10",
         "Cold Snap: Invoker heals for 13-130 health (depending on level of Quas) whenever Cold Snap triggers" + " " + inline_note("Healing effect is now exclusive to this Facet"),
         "Ghost Walk: Can be upgraded with Aghanim's Scepter. When cast, the effect is also applied to all allied heroes and forge spirits within a 600 radius. Allies and spirits have a 0.5s fade time and 20s duration",
         "Ice Wall: Can be upgraded with Aghanim's Shard. Enemy heroes that stay in Ice Wall for longer than 3s freeze, becoming rooted for 1.5s and taking 300 magic damage. Also increases wall's radial thickness by 40 and length by 160",
     ]))
-    W(new_facet("invoker_wex_focus", tag="rework", desc=[
+    W(new_facet("invoker_wex_focus", desc=[
         "E.M.P.: Can be upgraded with Aghanim's Shard. Increases Burn Damage from 60% to 90% and pulls units to its center at 150 units per second" + " " + inline_note("Unchanged from previous Shard upgrade, but made exclusive to this facet"),
         "Wex: When Invoker reaches level 6, he gains a bonus level of Wex without spending a skill point. Also increases its max level up to 8",
         "Wex: Aghanim's Scepter grants 1 additional current level, and increases max level to 10",
@@ -1884,16 +1882,14 @@ def build():
     W(li("Both Liquid Fire and Liquid Frost abilities are now available to the hero at the same time. They have a shared level and cooldown", t("REWORK"), extra=inline_note("This results in swapping special attacks")))
     W(li("Liquid Frost is always applied with the first attack, Liquid Fire with the second, whenever applicable", t("REWORK")))
     W(ul_close())
-    W(facet_header("jakiro_twin_terror"))
-    W(ul_open())
-    W(li("Double Trouble: Damage penalty is decreased from 50% to 40% and improves even further by 5% per Macropyre level", b(50, 40, l=True), extra=inline_note("Total damage penalty decreased from 50% to 40/35/30/25% — " + b(50, [40, 35, 30, 25], l=True))))
-    W(ul_close())
-    W(facet_header("jakiro_ice_breaker"))
-    W(ul_open())
-    W(li("Ice Path: While the path exists, ability is replaced with a sub-ability, which allows Jakiro to detonate his Ice Path early", t("REWORK")))
-    W(li("Ice Path: Path Duration increased from 3/3.5/4/4.5s to 6s", b([3, 3.5, 4, 4.5], 6)))
-    W(li("Ice Path: Upon expiration, Ice Path detonates, dealing an additional 75/125/175/225 damage and stunning enemies for 0.5s a second time", t("NEW")))
-    W(ul_close())
+    W(new_facet("jakiro_twin_terror", desc=[
+        "Double Trouble: Damage penalty is decreased from 50% to 40% and improves even further by 5% per Macropyre level" + " " + b(50, 40, l=True) + " " + inline_note("Total damage penalty decreased from 50% to 40/35/30/25% — " + b(50, [40, 35, 30, 25], l=True)),
+    ]))
+    W(new_facet("jakiro_ice_breaker", desc=[
+        "Ice Path: While the path exists, ability is replaced with a sub-ability, which allows Jakiro to detonate his Ice Path early",
+        "Ice Path: Path Duration increased from 3/3.5/4/4.5s to 6s" + " " + b([3, 3.5, 4, 4.5], 6),
+        "Ice Path: Upon expiration, Ice Path detonates, dealing an additional 75/125/175/225 damage and stunning enemies for 0.5s a second time",
+    ]))
     W(ability("Liquid Fire", slug="jakiro_liquid_fire"))
     W(ul_open())
     # [patchnotes: belongs to jakiro_liquid_ice]
@@ -2083,11 +2079,10 @@ def build():
     W(li("Base Movement Speed decreased from 320 to 315", b(320, 315)))
     W(li("Removed Rage and Unfettered Facets", t("DEL"), extra=inline_note("Rage remains as Lifestealer's default basic ability")))
     W(ul_close())
-    W(facet_header("life_stealer_fleshfeast"))
-    W(ul_open())
-    W(li("Feast: Max HP per Hero Kill increased from 15 to 25/35/45/55 depending on the current level of Infest", b(15, [25, 35, 45, 55])))
-    W(li("Open Wounds: Cooldown is reset if a hero dies while afflicted by Open Wounds", t("NEW")))
-    W(ul_close())
+    W(new_facet("life_stealer_fleshfeast", desc=[
+        "Feast: Max HP per Hero Kill increased from 15 to 25/35/45/55 depending on the current level of Infest" + " " + b(15, [25, 35, 45, 55]),
+        "Open Wounds: Cooldown is reset if a hero dies while afflicted by Open Wounds",
+    ]))
     W(new_facet("life_stealer_gorestorm", desc=[
         "Infest: Allows the ability to be used on Ancient creeps",
         "Infest: Consuming creep drenches affected enemies in blood for 3 seconds. Drenched enemies take damage equal to 25% of the host's remaining health over the duration",
@@ -2210,14 +2205,11 @@ def build():
     W(li("Damage at level 30 decreased by 46 (from 214-222 to 168-176)", t("NERF")))
     W(li("Removed Reverse Polarity and Reverse Reverse Polarity Facets", t("DEL"), extra=inline_note("Reverse Polarity remains as Magnus' default ultimate")))
     W(ul_close())
-    W(facet_header("magnataur_diminishing_return"))
-    W(ul_open())
-    W(li("Number of times +2 All Attributes can be skilled decreased from 7 to 6", b(7, 6)))
-    W(li("Increases the max level of Shockwave to 5", t("NEW")))
-    W(ul_close())
-    W(ul_open())
-    W(li("Shockwave: Level 5 makes the shockwave return once it reaches its max distance, traveling 200 units further and dealing 50% of ability damage on its way back", t("NEW")))
-    W(ul_close())
+    W(new_facet("magnataur_diminishing_return", desc=[
+        "Number of times +2 All Attributes can be skilled decreased from 7 to 6" + " " + b(7, 6),
+        "Increases the max level of Shockwave to 5",
+        "Shockwave: Level 5 makes the shockwave return once it reaches its max distance, traveling 200 units further and dealing 50% of ability damage on its way back",
+    ]))
     W(new_facet("magnataur_eternal_empowerment", desc=[
         "Empower: Ability is always enabled on Magnus. Every one of his subsequent attacks increases his self bonus by 2/3/4/5% up to a max of 10/15/20/25%. Duration: 10s. Each stack refreshes the duration. Bonus per hit and Max bonus scale with the level of Empower",
     ]))
@@ -2254,10 +2246,9 @@ def build():
     W(new_facet("marci_pickmeup", desc=[
         "Rebound: Adds an alt-cast, which allows Marci to bring the target ally with her to her final destination. The ally deals 25% of the Rebound damage to enemies on landing. Won't affect Rooted or Leashed allies",
     ]))
-    W(facet_header("marci_fleeting_fury"))
-    W(ul_open())
-    W(li("Rebound: If Marci has Unleash leveled, after landing from Rebound, Marci gains a short Fury combo. If Unleash is already active, its duration is instead extended by 3s. This combo has 3 hits instead of 5 and Aghanim's Scepter doesn't apply silence to it", t("REWORK")))
-    W(ul_close())
+    W(new_facet("marci_fleeting_fury", desc=[
+        "Rebound: If Marci has Unleash leveled, after landing from Rebound, Marci gains a short Fury combo. If Unleash is already active, its duration is instead extended by 3s. This combo has 3 hits instead of 5 and Aghanim's Scepter doesn't apply silence to it",
+    ]))
     W(ability("Special Delivery", slug="marci_special_delivery"))
     W(ul_open())
     W(li("Now has an active component. Marci whistles and instantly teleports her courier to her. Cooldown: 240s. Cast point: 1s", t("NEW")))
@@ -2299,11 +2290,10 @@ def build():
 
     # Medusa
     W(hero_header("Medusa"))
-    W(facet_header("medusa_undulation"))
-    W(ul_open())
-    W(li("Base movement speed increased from 275 to 310", b(275, 310)))
-    W(li("Medusa's movement speed is fixed and is unaffected by most effects", t("REWORK"), extra=inline_note("The only two exceptions are Stone Gaze, which increases movement speed to fixed 465 for the duration, and bonus from going downstream")))
-    W(ul_close())
+    W(new_facet("medusa_undulation", desc=[
+        "Base movement speed increased from 275 to 310" + " " + b(275, 310),
+        "Medusa's movement speed is fixed and is unaffected by most effects" + " " + inline_note("The only two exceptions are Stone Gaze, which increases movement speed to fixed 465 for the duration, and bonus from going downstream"),
+    ]))
     W(ability("Split Shot", slug="medusa_split_shot"))
     W(ul_open())
     W(li("Aghanim's Scepter: Allows on-hit effects to apply to the secondary attacks from Split Shot and increases target count by 1", t("NEW")))
@@ -2332,7 +2322,7 @@ def build():
     W(ul_open())
     W(li("Number of times +2 All Attributes can be skilled decreased from 7 to 6", b(7, 6)))
     W(ul_close())
-    W(new_facet("meepo_codependent", tag="rework", desc=[
+    W(new_facet("meepo_codependent", desc=[
         "Divided We Stand: All Meepos have a stackable aura that increases nearby Meepos' attack speed by 7% and armor by 2. Radius: 600",
     ]))
 
@@ -2379,14 +2369,12 @@ def build():
 
     # Monkey King
     W(hero_header("Monkey King"))
-    W(facet_header("monkey_king_simian_stride"))
-    W(ul_open())
-    W(li("Number of times +2 All Attributes can be skilled decreased from 7 to 6", b(7, 6)))
-    W(li("Increases the max level of Tree Dance to 5", t("NEW")))
-    W(ul_close())
-    W(ul_open())
-    W(li("Tree Dance: Level 5 reduces Tree Dance cooldown to zero", t("NEW")))
-    W(ul_close())
+    W(facet_change("monkey_king_simian_stride",
+        old_desc=["Tree Dance has no cooldown while Monkey King is above 95% health"],
+        new_desc=["Increases the max level of Tree Dance to 5. Level 5 reduces Tree Dance cooldown to zero",
+                  "Number of times +2 All Attributes can be skilled decreased from 7 to 6 " + b(7, 6)],
+        old_ability="monkey_king_tree_dance",
+        new_ability="monkey_king_tree_dance"))
     W(ability("Mischief", slug="monkey_king_mischief"))
     W(ul_open())
     W(li("Now scales with Wukong's Command", t("NEW")))
@@ -2410,14 +2398,10 @@ def build():
     W(li("Waveform: Now attacks all targets it goes through with 50% of Morphling's Attack Damage. Does not apply on-hit effects", t("REWORK")))
     W(li("Adaptive Strike: No longer knocks back enemies (moved to base spell)", t("REWORK")))
     W(ul_close())
-    W(facet_header("morphling_str"))
-    W(ul_open())
-    W(li("No longer affects Morphling's Cooldowns", t("DEL")))
-    W(li("Changes Morphling's Primary Attribute to Strength. Morphling gains +1% Spell Amp per 4 Agility. Spell Amplification effect is breakable", t("REWORK")))
-    W(ul_close())
-    W(ul_open())
-    W(li("Adaptive Strike: Stuns enemy target for 0.5-2.4s depending on Morphling's Strength. Has the same rules as a knockback effect", t("REWORK"), extra=inline_note("Maximum effect is reached when Morphling's Strength is 50% higher than his Agility")))
-    W(ul_close())
+    W(facet_change("morphling_str",
+        old_desc=["Hero's Primary Attribute is Strength", "Morphling's Agility to Strength ratio affects his Cooldown speed: up to 60% faster at 175% Agility/Strength ratio, regular speed at 50%. Doesn't affect items. Replicated abilities are also affected"],
+        new_desc=["Changes Morphling's Primary Attribute to Strength. Morphling gains +1% Spell Amp per 4 Agility. Spell Amplification effect is breakable",
+                  "Adaptive Strike: Stuns enemy target for 0.5-2.4s depending on Morphling's Strength. Has the same rules as a knockback effect" + " " + inline_note("Maximum effect is reached when Morphling's Strength is 50% higher than his Agility")]))
     W(ability("Waveform", slug="morphling_waveform"))
     W(ul_open())
     W(li("No longer attacks enemies by default", t("DEL")))
@@ -2540,14 +2524,11 @@ def build():
     W(li("Hunter in the Night: Move Speed rescaled from 22/28/34/40% to 16/22/28/34/40%", b([22, 28, 34, 40], [16, 22, 28, 34, 40])))
     W(li("Hunter in the Night: Attack Speed rescaled from 20/40/60/80 to 15/35/55/75/95", b([20, 40, 60, 80], [15, 35, 55, 75, 95])))
     W(ul_close())
-    W(facet_header("night_stalker_voidbringer"))
-    W(ul_open())
-    W(li("Number of times +2 All Attributes can be skilled decreased from 7 to 6", b(7, 6)))
-    W(li("Increases the max level of Void to 5", t("NEW")))
-    W(ul_close())
-    W(ul_open())
-    W(li("Void: Level 5 deals 400 damage, has 4s Night Duration, and becomes a Point Target ability with 300 AoE during the night", t("NEW")))
-    W(ul_close())
+    W(new_facet("night_stalker_voidbringer", desc=[
+        "Number of times +2 All Attributes can be skilled decreased from 7 to 6" + " " + b(7, 6),
+        "Increases the max level of Void to 5",
+        "Void: Level 5 deals 400 damage, has 4s Night Duration, and becomes a Point Target ability with 300 AoE during the night",
+    ]))
     W(ability("Void", slug="night_stalker_void"))
     W(ul_open())
     W(li("No longer reduces vision", t("DEL")))
@@ -2571,9 +2552,10 @@ def build():
     W(li("Damage at level 30 decreased by 52 (from 228-232 to 176-180)", t("NERF")))
     W(li("Damage at level 1 unchanged (51-55)", t("MISC")))
     W(ul_close())
-    W(new_facet("nyx_assassin_burn_mana", tag="rework", desc=[
-        "Mind Flare: Burns 16/19/22/25% of the target's max mana",
-    ]))
+    W(facet_change("nyx_assassin_burn_mana",
+        old_desc=["Nyx Assassin's ability damage burns 15% of the current mana of affected enemies"],
+        new_desc=["Mind Flare: Burns 16/19/22/25% of the target's max mana"],
+        new_ability="nyx_assassin_jolt"))
     W(ability("Impale", slug="nyx_assassin_impale"))
     W(ul_open())
     W(li("Cooldown decreased from 18/16/14/12s to 17/15/13/11s", b([18, 16, 14, 12], [17, 15, 13, 11], l=True)))
@@ -2751,7 +2733,7 @@ def build():
     W(ul_open())
     W(li("Removed Romp N' Stomp Facet", t("DEL")))
     W(ul_close())
-    W(new_facet("primal_beast_provoke_the_beast", tag="rework", desc=[
+    W(new_facet("primal_beast_provoke_the_beast", desc=[
         "Uproar: In addition to stacks from hero damage, Primal Beast also gains 2 Uproar stacks upon being stunned, hexed, taunted, feared, or rooted" + " " + inline_note("Allied and self-applied debuffs like from Mask of Madness or Pig Pole don't count"),
     ]))
     W(facet_header("primal_beast_ferocity"))
@@ -2981,7 +2963,7 @@ def build():
     W(ul_open())
     W(li("Removed Cluster Cluck Facet", t("DEL")))
     W(ul_close())
-    W(new_facet("shadow_shaman_voodoo_hands", tag="rework", desc=[
+    W(new_facet("shadow_shaman_voodoo_hands", desc=[
         "Grants Chicken Fingers ability",
         "Passive. Attacking an enemy hero transforms them into a chicken with 100 movement speed for 1s. Cooldown: 15s" + " " + inline_note("Cannot be toggled or manually cast. All Hex upgrades, including Level 15 Hex Breaks Talent also affect Chicken Fingers"),
     ]))
@@ -3155,10 +3137,11 @@ def build():
     W(li("Is now a Universal Hero", t("REWORK")))
     W(li("Damage at level 1 unchanged (48-52)", t("MISC")))
     W(ul_close())
-    W(facet_header("spectre_forsaken"))
-    W(ul_open())
-    W(li("Desolate: Desolate deals 1.75x damage, but Spectre's illusions can no longer trigger Desolate", t("DEL")))
-    W(ul_close())
+    W(facet_change("spectre_forsaken",
+        old_desc=["Desolate deals 60% of its damage if the target has only non-hero allies within range", "Desolate's damage is applied to Spectral Dagger"],
+        new_desc=["Desolate deals 1.75x damage, but Spectre's illusions can no longer trigger Desolate"],
+        old_ability="spectre_desolate",
+        new_ability="spectre_desolate"))
     W(facet_header("spectre_twist_the_knife"))
     W(ul_open())
     W(li("Reality: No longer decreases cooldown", t("DEL")))
@@ -3253,10 +3236,10 @@ def build():
     W(li("Damage gain per level decreased from +4.8 to +3.2", b(4.8, 3.2)))
     W(li("Damage at level 30 decreased by 52 (from 210-212 to 158-160)", br(210, 212, 158, 160)))
     W(ul_close())
-    W(new_facet("techies_backpack", tag="rework", desc=[
-        "Techies stack all previously selected Enchantments onto newly crafted Neutral Items",
-        "Also allows to have two Tier 5 Enchantments by recrafting a tier 5 item" + " " + inline_note("Further re-crafts will replace only the second Tier 5 Enchantment. The first one can't be replaced. It is possible to have two similar Enchantments at the same time"),
-    ]))
+    W(facet_change("techies_backpack",
+        old_desc=["Techies can use and benefit from backpack items as if they were in their inventory"],
+        new_desc=["Techies stack all previously selected Enchantments onto newly crafted Neutral Items",
+                  "Also allows to have two Tier 5 Enchantments by recrafting a tier 5 item" + " " + inline_note("Further re-crafts will replace only the second Tier 5 Enchantment. The first one can't be replaced. It is possible to have two similar Enchantments at the same time")]))
     W(ability("Minefield Sign", slug="techies_minefield_sign"))
     W(ul_open())
     W(li("Now also causes Sticky Bombs and Proximity Mines within the radius to deal 15% more damage", t("NEW")))
@@ -3382,10 +3365,11 @@ def build():
 
     # Troll Warlord
     W(hero_header("Troll Warlord"))
-    W(facet_header("troll_warlord_bad_influence"))
-    W(ul_open())
-    W(li("Battle Trance: During Battle Trance, Troll Warlord has increased max Fervor stacks and no attack speed limit. Battle Trance grants allied heroes 50% of the attack speed bonus. Battle Trance Max Fervor Stacks: 15", t("BUFF")))
-    W(ul_close())
+    W(facet_change("troll_warlord_bad_influence",
+        old_desc=["Battle Trance grants 40% of its attack speed bonus to all allied heroes globally"],
+        new_desc=["During Battle Trance, Troll Warlord has increased max Fervor stacks and no attack speed limit. Battle Trance grants allied heroes 50% of the attack speed bonus. Battle Trance Max Fervor Stacks: 15"],
+        old_ability="troll_warlord_battle_trance",
+        new_ability="troll_warlord_battle_trance"))
     W(ability("Fervor", slug="troll_warlord_fervor"))
     W(ul_open())
     W(li("Aghanim's Shard no longer increases Max Stacks", t("DEL")))
