@@ -8,10 +8,14 @@ def build():
     # ===== GENERAL UPDATES =====
     W(section("General Updates"))
 
-    W(plain_header("Map Objectives"))
+    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png"))
     W(ul_open())
-    W(li("Roshan: Melee attacks against couriers are now treated as melee hero attacks", t("REWORK")))
-    W(li("Tormentor: Reflect no longer considers creep-heroes for the damage reflected", t("DEL"), extra=inline_note("Lone Druid's Spirit Bear is an exception for this")))
+    W(li("Melee attacks against couriers are now treated as melee hero attacks", t("REWORK")))
+    W(ul_close())
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png"))
+    W(ability("Reflect", icon_url="../icons/abilities/miniboss_reflect.png"))
+    W(ul_open())
+    W(li("No longer considers creep-heroes for the damage reflected", t("DEL"), extra=inline_note("Lone Druid's Spirit Bear is an exception for this")))
     W(ul_close())
 
     W(plain_header("Terrain Changes", terrain_link="7.39c"))

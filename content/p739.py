@@ -11,35 +11,45 @@ def build():
     W(section("General Updates"))
 
     W(plain_header("Map Objectives"))
-    W(subgroup("Tormentor"))
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png"))
     W(ul_open())
-    W(li_formula("Tormentor: Unyielding Shield: Barrier regeneration gain per minute decreased",
+    W(li("First Spawn Time increased from 15:00 to 20:00", b(15, 20, l=True)))
+    W(ul_close())
+    W(ability("Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png"))
+    W(ul_open())
+    W(li_formula("Barrier regeneration gain per minute decreased",
                  "40 + 5 per minute", "40 + 3.5 per minute",
                  lambda M: 40 + 5.0 * M, lambda M: 40 + 3.5 * M,
                  levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
                  level_prefix='M', rework_badge=False))
-    W(li("First Spawn Time increased from 15:00 to 20:00", b(15, 20, l=True)))
-    W(li("Tormentor: Unyielding Shield: Base barrier decreased from 2100 to 2000", b(2100, 2000)))
+    W(li("Base barrier decreased from 2100 to 2000", b(2100, 2000)))
     W(ul_close())
-    W(subgroup("Roshan"))
+    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png"))
+    W(ability("Strength of the Immortal", icon_url="../icons/misc/innate_icon.png"))
     W(ul_open())
-    W(li_formula("Strength of the Immortal: Armor Bonus per minute increased",
+    W(li_formula("Armor Bonus per minute increased",
                  "0.375 per minute", "0.4 per minute",
                  lambda M: 0.375 * M, lambda M: 0.4 * M,
                  levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
                  level_prefix='M', rework_badge=False))
-    W(li_formula("Strength of the Immortal: Attack Damage Bonus per minute increased",
+    W(li_formula("Attack Damage Bonus per minute increased",
                  "6 per minute", "7 per minute",
                  lambda M: 6 * M, lambda M: 7 * M,
                  levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
                  level_prefix='M', rework_badge=False))
-    W(li("Roar of Retribution: Now cast even if Roshan is Silenced or Stunned", t("NEW")))
-    W(li("Roar of Retribution: Now gives Roshan a strong dispel on cast", t("NEW")))
-    W(li("Slam: Hero Duration increased from 2s to 4s", b(2, 4)))
-    W(li("Slam: Non-Hero Duration increased from 4s to 8s", b(4, 8)))
-    W(li("Roar of Retribution: Incoming Damage Buff Duration increased from 8s to 12s", b(8, 12)))
-    W(li("Roar of Retribution: Health Trigger threshold increased from 80% to 85%", b(80, 85)))
-    W(li("Roar of Retribution: Now triggers a message visible to everyone (similar to when Roshan's Banner is planted)", t("QoL")))
+    W(ul_close())
+    W(ability("Roar of Retribution", icon_url="../icons/abilities/roshan_revengeroar.png"))
+    W(ul_open())
+    W(li("Now cast even if Roshan is Silenced or Stunned", t("NEW")))
+    W(li("Now gives Roshan a strong dispel on cast", t("NEW")))
+    W(li("Incoming Damage Buff Duration increased from 8s to 12s", b(8, 12)))
+    W(li("Health Trigger threshold increased from 80% to 85%", b(80, 85)))
+    W(li("Now triggers a message visible to everyone (similar to when Roshan's Banner is planted)", t("QoL")))
+    W(ul_close())
+    W(ability("Slam", icon_url="../icons/abilities/roshan_slam.png"))
+    W(ul_open())
+    W(li("Hero Duration increased from 2s to 4s", b(2, 4)))
+    W(li("Non-Hero Duration increased from 4s to 8s", b(4, 8)))
     W(ul_close())
 
     W(plain_header("Terrain Changes", terrain_link="7.39"))

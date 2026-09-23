@@ -31,7 +31,22 @@ def build():
     W(ul_close())
     W(plain_header("Map Objectives"))
 
-    W(subgroup("Tormentor"))
+
+
+    W(subgroup("Wisdom Shrines"))
+    W(ul_open())
+    W(li("Wisdom Shrines and Lotus Pools now reverse their countdowns if heroes from opposing teams enter the area, instead of pausing the countdown", t("REWORK")))
+    W(li_formula("Wisdom Shrine Experience changed",
+                 "280 per interval",
+                 "200 base and 300 per subsequent shrine",
+                 lambda N: 280 * N,
+                 lambda N: 200 + 300 * (N - 1),
+                 levels=[1, 2, 3, 4, 5, 6, 7],
+                 level_fmt=lambda N: f"#{N}",
+                 rework_badge=False,
+                 headline_level=2))
+    W(ul_close())
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png"))
     W(ul_open())
     W(li("Tormentor's spawn preference has switched", t("MISC"),
          extra=inline_note("Now begins in the Bottom Chasm.")))
@@ -63,26 +78,12 @@ def build():
          )))
     W(li("Reward if all players have Aghanim's Shard decreased from 455 gold to 415 gold", b(455, 415)))
     W(ul_close())
-
-    W(subgroup("Roshan"))
+    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png"))
     W(ul_open())
     W(li("Roshan's pit preference has switched", t("MISC"),
          extra=inline_note("Now begins in the Top Pit.")))
     W(ul_close())
 
-    W(subgroup("Wisdom Shrines"))
-    W(ul_open())
-    W(li("Wisdom Shrines and Lotus Pools now reverse their countdowns if heroes from opposing teams enter the area, instead of pausing the countdown", t("REWORK")))
-    W(li_formula("Wisdom Shrine Experience changed",
-                 "280 per interval",
-                 "200 base and 300 per subsequent shrine",
-                 lambda N: 280 * N,
-                 lambda N: 200 + 300 * (N - 1),
-                 levels=[1, 2, 3, 4, 5, 6, 7],
-                 level_fmt=lambda N: f"#{N}",
-                 rework_badge=False,
-                 headline_level=2))
-    W(ul_close())
     W(plain_header("Terrain Changes", terrain_link="7.41"))
     W(subgroup("Trees"))
     W(ul_open())

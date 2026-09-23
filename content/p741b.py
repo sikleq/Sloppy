@@ -7,14 +7,16 @@ def build():
     W(section("General Updates"))
 
     W(plain_header("Map Objectives"))
-    W(subgroup("Tormentor"))
+
+    # ===== NEUTRAL CREEP UPDATES =====
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png"))
+    W(ability("Reflect", icon_url="../icons/abilities/miniboss_reflect.png"))
     W(ul_open())
-    W(li_formula("Reflect: Damage reflection changed", "30% + 2% per minute", "30% + 1.5% per minute",
+    W(li_formula("Damage reflection changed", "30% + 2% per minute", "30% + 1.5% per minute",
                  lambda M: 30 + 2.0 * M, lambda M: 30 + 1.5 * M,
                  levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60], level_prefix='M', rework_badge=False, value_fmt="{:g}%"))
     W(ul_close())
 
-    # ===== NEUTRAL CREEP UPDATES =====
     W(section("Neutral Creep Updates"))
     W(unit_header("Frostbitten Golem", "../icons/units/npc_dota_neutral_frostbitten_golem.png"))
     W(ability("Time Warp Aura", icon_url="../icons/abilities/frostbitten_golem_time_warp_aura.png"))
