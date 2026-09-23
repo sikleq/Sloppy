@@ -460,12 +460,8 @@ def build():
     W(item_header("Heaven's Halberd", changed=True))
     W(auto_components_change("Heaven's Halberd", "7.41"))
     W(properties_change(
-        old=[("DEL",  "+275 Health"),
-             ("DEL",  "Damage Block (passive)"),
-             ("BUFF", "+6 Health Regen")],
-        new=[("NEW",  "+9 Armor"),
-             ("NEW",  "+25% Evasion"),
-             ("",     "+6.5 Health Regen", b(6, 6.5))]))
+        old=[("BUFF", "+6 Health Regen"), ("DEL",  "+275 Health"), ("DEL",  "Damage Block (passive)")],
+        new=[("",     "+6.5 Health Regen", b(6, 6.5)), ("NEW",  "+9 Armor"), ("NEW",  "+25% Evasion")]))
     W(ul_open())
     W(li("Disarm cooldown decreased from 20s to 16s", b(20, 16, l=True)))
     W(li("Disarm cast range increased from 650 to 750", b(650, 750)))

@@ -403,9 +403,7 @@ def build():
     W(item_header("Refresher Orb", changed=True))
     W(auto_components_change("Refresher Orb", "7.40"))
     W(properties_change(
-        old=[("DEL",  "+10 Damage"),
-             ("NERF", "+18 Health Regen"),
-             ("NERF", "+8 Mana Regen")],
+        old=[("NERF", "+18 Health Regen"), ("NERF", "+8 Mana Regen"), ("DEL",  "+10 Damage")],
         new=[("",    "+12 Health Regen", b(18, 12)),
              ("",    "+6 Mana Regen",    b(8, 6))]))
     W(ul_open())

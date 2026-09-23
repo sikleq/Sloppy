@@ -118,8 +118,17 @@ def _wrap_ability_boxes(html):
         # First pass: classify each li as "starter" (has ability-row class)
         # or "continuation" while inside a box.
         is_starter = []
+        # A row carrying its own change tag (BUFF / NERF / REWORK …) is a separate change,
+        # not part of the ability's description: it must not continue the box, or its tag
+        # lands in the box's collapsed tag column over the text (7.38 Heaven's Halberd:
+        # "Disarm Mana Cost decreased" after "Active: Disarm can now be dispelled").
+        # NEW rows still continue — a NEW entity's description rows are all tagged NEW.
+        breaks_box = []
         for it in items:
             is_starter.append(' ability-row' in it.group(1) or 'class="ability-row' in it.group(1))
+            tag = re.search(r'data-tag="([^"]*)"', it.group(1))
+            own_badge = it.group(2).lstrip().startswith('<span class="badge')
+            breaks_box.append(own_badge and not (tag and 'new' in tag.group(1).split()))
 
         # Determine grouping: a starter opens a box; following non-starters
         # until next starter (or end of ul) are continuations.
@@ -136,6 +145,9 @@ def _wrap_ability_boxes(html):
                 roles[i] = 'start'
                 in_box = True
                 box_start_idx = i
+            elif in_box and breaks_box[i]:
+                roles[i - 1] = 'solo' if box_start_idx == i - 1 else 'cont-end'
+                in_box = False
             elif in_box:
                 roles[i] = 'cont'
         if in_box:

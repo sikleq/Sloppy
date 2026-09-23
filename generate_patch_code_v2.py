@@ -937,6 +937,17 @@ def _render_item(item, version, neutral=False):
             norm = re.sub(r'\s+Neutral\b', '', norm, flags=re.I)
             deco = f', new="{norm}"'
             notes = notes[1:]
+    # "New basic Equipment item. Costs 250 gold" under a generic "New Item" title → the
+    # header label says it ("New Basic Equipment Item"); the row would only repeat it.
+    # Its nested notes stay as the item's rows.
+    if deco == ', new="New Item"' and notes:
+        m = re.match(r'^(New\s+(?:\w+\s+)?\w+\s+item)\b\.?(?:\s*Costs\s+\d+\s+gold\.?)?$',
+                     _strip_html(notes[0].get('note', '')).strip(), re.I)
+        if m:
+            deco = f', new="{m.group(1).title()}"'
+            lvl = notes[0].get('indent_level', 1)
+            notes = [dict(n, indent_level=max(1, n.get('indent_level', 1) - 1)) if i and n.get('indent_level', 1) > lvl
+                     else n for i, n in enumerate(notes)][1:]
     if is_enchantment:
         out.append(f'W(enchant_header("{name}"))')
     else:
