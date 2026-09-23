@@ -2445,9 +2445,11 @@ h2.section {
   height: 45px;
   object-fit: cover;
 }
+/* items / enchantments: the same 45px height as a hero icon (80x45), the item
+   art's own 88:64 ratio -> 62x45 */
 .item-icon img {
-  width: 50px;
-  height: 36px;
+  width: 62px;
+  height: 45px;
   object-fit: cover;
 }
 .ability-icon img {
@@ -9975,31 +9977,49 @@ body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
 .ec-head-panel .item-icon img { width: 88px; height: auto; }
 .ec-head-panel .entity-name { font-family: var(--font-j25); font-size: 34px; letter-spacing: 1.2px; text-transform: uppercase; line-height: 1; }
 .ec-head-panel .dyn-row-wrap { margin-right: 0; }
-/* hero page: 3 small item slots between the name and the patch-dynamics row,
+/* hero page: 6 small item slots between the name and the patch-dynamics row,
    the same 24px glassy pill as a .dyn-cell (4:3 so the item art reads) */
-.ec-islots { display: flex; gap: 4px; margin-left: auto; padding: 2px 4px; }
+.ec-islots { display: flex; gap: 4px; padding: 2px 4px; flex: none; }
 .ec-islots + .dyn-row-wrap { margin-left: 14px; }
+.ec-head-panel .entity-name:has(+ .ec-islots) { font-size: 28px; }   /* room for the slots */
 .ec-islot {
   position: relative; width: 32px; height: 24px; padding: 0; border: 0; border-radius: 4px; cursor: pointer;
   background: rgba(5, 6, 9, 0.92); overflow: visible;
-  box-shadow: inset 0 1px 0 var(--shadow-45), inset 0 -1px 0 rgba(255, 255, 255, 0.05), inset 0 0 0 1px rgba(227, 196, 106, 0.22);
+  box-shadow: inset 0 1px 0 var(--shadow-45), inset 0 -1px 0 rgba(255, 255, 255, 0.05), inset 0 0 0 1px rgba(227, 196, 106, 0.18);
   transition: box-shadow 0.14s ease, filter 0.14s ease;
 }
 .ec-islot:hover { box-shadow: inset 0 0 0 1px rgba(227, 196, 106, 0.6); filter: brightness(1.25); }
 .ec-islot:focus-visible { outline: 1px solid rgba(213, 173, 95, 0.85); outline-offset: 1px; }
-.ec-islot.is-empty::after {
-  content: "+"; position: absolute; inset: 0; display: grid; place-items: center;
-  font-family: var(--font-ui); font-size: 13px; line-height: 1; color: rgba(227, 196, 106, 0.45);
+/* empty slot: a small solid plus drawn from two 2px bars (crisp at any zoom, no font) */
+.ec-islot.is-empty::before, .ec-islot.is-empty::after {
+  content: ""; position: absolute; left: 50%; top: 50%; background: rgba(227, 196, 106, 0.55); border-radius: 1px;
+  transform: translate(-50%, -50%);
 }
+.ec-islot.is-empty::before { width: 8px; height: 2px; }
+.ec-islot.is-empty::after { width: 2px; height: 8px; }
+.ec-islot.is-empty:hover::before, .ec-islot.is-empty:hover::after { background: #f0dfa6; }
 .ec-islot img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 4px;
   box-shadow: 0 1px 2px var(--shadow-55), inset 0 1px 0 var(--white-22);
 }
 .ec-islot .hl-slot-clear { top: -6px; right: -6px; width: 13px; height: 13px; font-size: 9px; line-height: 11px; }
 .ec-islot:hover .hl-slot-clear { opacity: 1; }
-/* item picker on hero pages = the Hero Lab shop; the extra groups (neutral tiers,
-   enchantments, removed items) sit in a wrapping row under the four shop columns */
-.ec-ipicker-more { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+/* Pickers (hero-page item slots, Hero Lab shop + enchantments) = the Item Changes index:
+   same panels, Jersey titles and icon cards. Tiles keep .hl-item-tile for the pickers'
+   search / keyboard code, so its fixed Hero Lab size is reset to the card look here. */
+.ec-shop-card .hl-shop-body { padding: 4px 14px 12px; }
+.ec-shop.ec-igrid { margin-top: 6px; }
+.ec-shop[data-panels="2"] { grid-template-columns: 1fr 1fr; }
+.ec-shop[data-panels="1"] { grid-template-columns: 1fr; }
+.hl-enchant-picker.ec-shop-card { width: min(460px, calc(100vw - 56px)); }
+/* three panels (hero-page picker): as wide as the Item Changes page so the cards keep its size */
+.ec-shop-card:has(.ec-shop[data-panels="3"]) { width: min(1580px, calc(100vw - 40px)); max-height: calc(100vh - 40px); }
+.ec-shop .hl-item-tile {
+  width: auto; height: auto; aspect-ratio: 88 / 64; padding: 0; border: 1px solid rgba(0, 0, 0, 0.55);
+  border-radius: 3px; background: var(--bg-panel-3); box-shadow: none; overflow: hidden;
+}
+.ec-shop .hl-item-tile img { transform: none; }
+.ec-shop .hl-item-tile.is-selected { border-color: #ffe08a; box-shadow: 0 0 0 2px #f1d27b, 0 0 10px 2px rgba(241, 210, 123, 0.55); }
 /* an item's changes inside a hero patch section: separated from the hero's own block */
 section.ec-patch .entity-block.ec-item-inject { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(227, 196, 106, 0.18); }
 /* one filter row: Tags | Show | Ability */

@@ -1,4 +1,4 @@
-"""Hero Changes pages: 3 item slots next to the hero name; no facet filter chips."""
+"""Hero Changes pages: 6 item slots next to the hero name; no facet filter chips."""
 import sys
 from pathlib import Path
 
@@ -9,7 +9,7 @@ from builders.entity_changes import _name_block, _ITEM_SLOTS
 
 def test_hero_name_block_has_item_slots():
     html = _name_block({"kind": "hero", "name": "Anti-Mage", "slug": "anti-mage"})
-    assert html.count('data-ec-islot="') == _ITEM_SLOTS == 3
+    assert html.count('data-ec-islot="') == _ITEM_SLOTS == 6
     assert 'data-ec-hero="anti-mage"' in html
     assert '<div class="entity-name">Anti-Mage</div>' in html
 

@@ -410,9 +410,9 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     return "".join(out)
 
 
-# Hero pages: 3 small item slots between the name and the patch-dynamics row. The picked items' own change blocks are
+# Hero pages: 6 small item slots between the name and the patch-dynamics row. The picked items' own change blocks are
 # pulled from items/<slug>.html into the matching patch sections (scripts.js).
-_ITEM_SLOTS = 3
+_ITEM_SLOTS = 6
 
 
 def _name_block(e: dict) -> str:
@@ -428,16 +428,24 @@ def _name_block(e: dict) -> str:
 
 
 def _write_item_picker(items: list[dict], dyn: dict) -> None:
-    """dist/items/picker.json — every item that has a Changes page, in shop groups
-    (the same order as item_changes.html): {"groups": [[group, [[slug, name, icon], …]], …]}."""
-    groups = []
-    for g, _, lst in _item_groups(items, dyn):
-        row = [[_file_slug(e), e["name"], e["icon"].replace("../", "", 1)]
+    """dist/items/picker.json — every item that has a Changes page, laid out exactly like
+    item_changes.html (Basics | Upgrades | Neutral Items panels, titled categories):
+    {"panels": [{"title", "one"?, "neutral"?, "groups": [{"title", "extra"?, "items": [[slug, name, icon, current], …]}]}]}"""
+    by = {g: lst for g, _, lst in _item_groups(items, dyn)}
+
+    def group(title, lst, extra=None):
+        row = [[_file_slug(e), e["name"], e["icon"].replace("../", "", 1), 1 if e["_current"] else 0]
                for e in lst if not e.get("_nopage")]
-        if row:
-            groups.append([g, row])
+        return {"title": title, "items": row, **({"extra": extra} if extra else {})} if row else None
+
+    panels = [{"title": name, "groups": [x for c in cats if (x := group(c, by.get(c, [])))]}
+              for name, cats in _SHOP_PANELS]
+    neutral = [group(f"Tier {t}", by.get(f"Neutral · Tier {t}", []), _TIER_TIME[t]) for t in range(1, 6)]
+    neutral += [group("Removed neutrals", by.get("Neutral · Other", [])),
+                group("Neutral Enchantments", by.get("Enchantments", []))]
+    panels.append({"title": "Neutral Items", "one": True, "neutral": True, "groups": [x for x in neutral if x]})
     (DIST / "items" / "picker.json").write_text(
-        _json.dumps({"groups": groups}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+        _json.dumps({"panels": panels}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
 
 _ANN = None

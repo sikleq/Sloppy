@@ -3470,7 +3470,23 @@
   });
 })();
 
-// ---- HERO CHANGES page: 3 item slots under the hero name ----
+// ---- Shared "shop" picker body = the Item Changes index look ----
+// panels: [{title, one?, neutral?, groups: [{title, extra?, tiles: '<button…>…'}]}]
+// Panels → titled categories → icon cards (ec-igrid / ec-ipanel / ec-igroup / ec-card).
+// Used by the Hero Changes item slots and the Hero Lab shop / enchantment pickers;
+// each group also carries .hl-item-section so the pickers' search can hide it.
+function ecShopMarkup(panels) {
+  return `<div class="ec-igrid ec-shop" data-panels="${panels.length}">` + panels.map(p =>
+    `<section class="ec-ipanel${p.neutral ? ' ec-ipanel-neutral' : ''}"><h3 class="ec-group-title ec-ipanel-title">${p.title}</h3>`
+    + `<div class="ec-ipanel-body${p.one ? ' ec-ipanel-body-1' : ''}">`
+    + p.groups.filter(g => g.tiles).map(g =>
+      `<section class="ec-igroup hl-item-section"><h4 class="ec-igroup-title">${g.title}${g.extra ? `<span class="ec-tier-time">${g.extra}</span>` : ''}</h4>`
+      + `<div class="ec-icards">${g.tiles}</div></section>`).join('')
+    + '</div></section>').join('') + '</div>';
+}
+const EC_CLOSE_SVG = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+// ---- HERO CHANGES page: 6 item slots next to the hero name ----
 // A picked item's own change blocks (from items/<slug>.html) are added to the
 // hero's patch sections, so e.g. Anti-Mage + Battle Fury shows both in 7.41f.
 // A patch where only the item changed gets its own section in version order.
@@ -3484,15 +3500,12 @@
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } };
   const save = v => { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} };
   let picks = load().slice(0, slots.length);
-  // the Hero Lab shop's four columns (itemPickerMarkup)
-  const SHOP_COLS = [['Consumables', 'Equipment', 'Secret Shop'], ['Attributes', 'Miscellaneous'],
-                     ['Accessories', 'Magical', 'Weapons'], ['Support', 'Armor', 'Armaments']];
-  let catalog = null;                              // {slug: [slug, name, icon]} + groups, loaded on first use
+  let catalog = null;                              // {panels, by: {slug: [slug, name, icon, current]}}, loaded on first use
   const pages = {};                                // slug -> Promise<Document>
 
   const getCatalog = () => catalog || (catalog = fetch('../items/picker.json')
     .then(r => { if (!r.ok) throw new Error('picker.json ' + r.status); return r.json(); })
-    .then(d => { const by = {}; d.groups.forEach(g => g[1].forEach(it => { by[it[0]] = it; })); return { groups: d.groups, by }; }));
+    .then(d => { const by = {}; d.panels.forEach(p => p.groups.forEach(g => g.items.forEach(it => { by[it[0]] = it; }))); return { panels: d.panels, by }; }));
   const getPage = slug => pages[slug] || (pages[slug] = fetch('../items/' + encodeURIComponent(slug) + '.html')
     .then(r => { if (!r.ok) throw new Error(slug + ' ' + r.status); return r.text(); })
     .then(t => new DOMParser().parseFromString(t, 'text/html')));
@@ -3570,22 +3583,14 @@
   async function openPicker(i) {
     activeSlot = i;
     const cat = await getCatalog();
-    // same card, columns and tiles as the Hero Lab shop; neutral tiers,
-    // enchantments and removed items follow in a row underneath
-    const section = g => `<section class="hl-item-section"><header>${esc(g[0])}</header><div class="hl-item-grid">${
-      g[1].map(it => `<button type="button" class="hl-item-tile${picks[i] === it[0] ? ' is-selected' : ''}" data-ec-ipick="${esc(it[0])}" data-name="${esc(it[1].toLowerCase())}" title="${esc(it[1])}" aria-label="${esc(it[1])}"><img src="../${esc(it[2])}" alt="${esc(it[1])}" loading="lazy"></button>`).join('')
-    }</div></section>`;
-    const byName = {};
-    cat.groups.forEach(g => { byName[g[0]] = g; });
-    const placed = new Set(SHOP_COLS.flat());
-    const col = names => `<div class="hl-shop-col">${names.filter(n => byName[n]).map(n => section(byName[n])).join('')}</div>`;
-    const rest = cat.groups.filter(g => !placed.has(g[0]));
-    const closeSvg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-    overlay.innerHTML = `<div class="hl-picker-card hl-item-picker-card" role="dialog" aria-modal="true" aria-label="Choose item">
-      <div class="hl-picker-head"><strong>Shop</strong><div class="hl-picker-actions"><button type="button" class="hl-picker-close" data-ec-iclose aria-label="Close">${closeSvg}</button></div></div>
+    // the Item Changes index layout; removed items stay out (as there, by default)
+    const tile = it => `<button type="button" class="ec-card ec-card-item hl-item-tile${picks[i] === it[0] ? ' is-selected' : ''}" data-ec-ipick="${esc(it[0])}" data-name="${esc(it[1].toLowerCase())}" title="${esc(it[1])}" aria-label="${esc(it[1])}"><img src="../${esc(it[2])}" alt="${esc(it[1])}" loading="lazy"></button>`;
+    const panels = cat.panels.map(p => ({ ...p, title: esc(p.title), groups: p.groups.map(g => ({
+      title: esc(g.title), extra: g.extra && esc(g.extra), tiles: g.items.filter(it => it[3]).map(tile).join('') })) }));
+    overlay.innerHTML = `<div class="hl-picker-card hl-item-picker-card ec-shop-card" role="dialog" aria-modal="true" aria-label="Choose item">
+      <div class="hl-picker-head"><strong>Items</strong><div class="hl-picker-actions"><button type="button" class="hl-picker-close" data-ec-iclose aria-label="Close">${EC_CLOSE_SVG}</button></div></div>
       <div class="hl-picker-searchbar"><input type="text" class="hl-picker-search" data-ec-isearch placeholder="Search item..." aria-label="Search item" autocomplete="off"></div>
-      <div class="hl-shop-body"><div class="hl-shop-4col">${SHOP_COLS.map(col).join('')}</div>
-      ${rest.length ? `<div class="ec-ipicker-more">${rest.map(section).join('')}</div>` : ''}</div></div>`;
+      <div class="hl-shop-body">${ecShopMarkup(panels)}</div></div>`;
     overlay.hidden = false;
     overlay.classList.add('is-open');
     const input = overlay.querySelector('[data-ec-isearch]');
@@ -3798,9 +3803,6 @@
   const combinePct = vals => (1 - vals.reduce((acc, v) => acc * (1 - Math.max(0, v) / 100), 1)) * 100;
   const iconHtml = (src, name, cls) => `<img class="${cls}" src="${src}" alt="${name}" loading="lazy">`;
   const quickFmt = v => Number(v || 0).toFixed(2).replace(/\.00$/, '');
-  var TIER_TIMES = ['0:00+', '15:00+', '25:00+', '35:00+', '60:00+'];
-  const tierLabel = tier => `Tier ${Number(tier) + 1}`;
-  const tierHead = tier => `<span class="hl-tier-label">Tier ${Number(tier) + 1} <span class="hl-tier-time">${TIER_TIMES[tier] || ''}</span></span>`;
   const patchKey = v => {
     const m = String(v || '').match(/^7\.(\d+)([a-z]?)/);
     if (!m) return [0, 0];
@@ -4749,89 +4751,52 @@
     `;
   }
 
-  function itemSectionMarkup(title, list, selectedId) {
-    if (!list.length) return '';
-    return `
-      <section class="hl-item-section">
-        <header>${title}</header>
-        <div class="hl-item-grid">
-          ${list.map(item => `
-            <button type="button" class="hl-item-tile${item.id === selectedId ? ' is-selected' : ''}" data-item-id="${item.id}" aria-label="${item.name}">
-              <img src="${item.icon}" alt="${item.name}" loading="lazy">
-            </button>`).join('')}
-        </div>
-      </section>
-    `;
-  }
-
-  function neutralSectionMarkup(tier, list, selectedId) {
-    if (!list.length) return '';
-    return `
-      <section class="hl-item-section hl-tier-section">
-        <header>${tierHead(tier)}</header>
-        <div class="hl-item-grid">
-          ${list.map(item => `
-            <button type="button" class="hl-item-tile${item.id === selectedId ? ' is-selected' : ''}" data-item-id="${item.id}" aria-label="${item.name}">
-              <img src="${item.icon}" alt="${item.name}" loading="lazy">
-            </button>`).join('')}
-        </div>
-      </section>
-    `;
+  // Item Changes index look (ecShopMarkup): Basics | Upgrades panels for the shop,
+  // one "Neutral Enchantments" panel for the enchantment slot.
+  const HL_SHOP_PANELS = [
+    ['Basics', 'basics', ['Consumables', 'Attributes', 'Equipment', 'Miscellaneous', 'Secret Shop', 'Other']],
+    ['Upgrades', 'upgrades', ['Accessories', 'Support', 'Magical', 'Armor', 'Weapons', 'Armaments']],
+  ];
+  function hlTile(item, selectedId, extraCls, attrs) {
+    return `<button type="button" class="ec-card ec-card-item hl-item-tile${item.id === selectedId ? ' is-selected' : ''}${extraCls || ''}" data-item-id="${item.id}" aria-label="${item.name}"${attrs || ''}>
+                  <img src="${item.icon}" alt="${item.name}" loading="lazy">
+                </button>`;
   }
 
   function itemPickerMarkup(selectedId, tab, mode, heroAttr, baubleActive) {
-    const enchantOnly = mode === 'enchant';
-    if (enchantOnly) {
-      return `
-        <div class="hl-picker-card hl-item-picker-card hl-enchant-picker" role="dialog" aria-modal="true" aria-label="Choose enchantment">
-          <div class="hl-picker-head">
-            <strong>Enchantments</strong>
-            <div class="hl-picker-actions">
-              <button type="button" class="hl-picker-close" data-picker-close aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-            </div>
-          </div>
-          <div class="hl-shop-body hl-enchant-body">
-            <div class="hl-item-grid">
-              ${filteredEnchants(heroAttr).map(item => {
-                var isT5 = item.tiersAvailable && item.tiersAvailable.indexOf(5) >= 0;
-                var dimmed = baubleActive && !isT5;
-                return `<button type="button" class="hl-item-tile${item.id === selectedId ? ' is-selected' : ''}${dimmed ? ' hl-enchant-bauble-dim' : ''}" data-item-id="${item.id}" aria-label="${item.name}"${dimmed ? ' title="Enchanter\'s Bauble only works with Tier 5 enchants"' : ''}>
-                  <img src="${item.icon}" alt="${item.name}" loading="lazy">
-                </button>`;
-              }).join('')}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-    var curTab = tab || 'basics';
-    return `
-      <div class="hl-picker-card hl-item-picker-card" role="dialog" aria-modal="true" aria-label="Choose item">
+    const head = (title, search) => `
         <div class="hl-picker-head">
-          <strong>Shop</strong>
+          <strong>${title}</strong>
           <div class="hl-picker-actions">
-            <button type="button" class="hl-picker-close" data-picker-close aria-label="Close"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button type="button" class="hl-picker-close" data-picker-close aria-label="Close">${EC_CLOSE_SVG}</button>
           </div>
-        </div>
+        </div>${search ? `
         <div class="hl-picker-searchbar">
           <input type="text" class="hl-picker-search" data-item-search placeholder="Search item..." aria-label="Search item" autocomplete="off">
-        </div>
-        <div class="hl-shop-body hl-shop-4col">
-          <div class="hl-shop-col">
-            ${['Consumables','Equipment','Secret Shop'].map(function(n){ var p=itemGroups.basics.find(function(x){return x[0]===n}); return p?itemSectionMarkup(p[0],p[1],selectedId):''; }).join('')}
-          </div>
-          <div class="hl-shop-col">
-            ${['Attributes','Miscellaneous'].map(function(n){ var p=itemGroups.basics.find(function(x){return x[0]===n}); return p?itemSectionMarkup(p[0],p[1],selectedId):''; }).join('')}
-          </div>
-          <div class="hl-shop-col">
-            ${['Accessories','Magical','Weapons'].map(function(n){ var p=itemGroups.upgrades.find(function(x){return x[0]===n}); return p?itemSectionMarkup(p[0],p[1],selectedId):''; }).join('')}
-          </div>
-          <div class="hl-shop-col">
-            ${['Support','Armor','Armaments'].map(function(n){ var p=itemGroups.upgrades.find(function(x){return x[0]===n}); return p?itemSectionMarkup(p[0],p[1],selectedId):''; }).join('')}
-          </div>
-        </div>
-      </div>
-    `;
+        </div>` : ''}`;
+    if (mode === 'enchant') {
+      const tiles = filteredEnchants(heroAttr).map(item => {
+        const isT5 = item.tiersAvailable && item.tiersAvailable.indexOf(5) >= 0;
+        const dimmed = baubleActive && !isT5;
+        return hlTile(item, selectedId, dimmed ? ' hl-enchant-bauble-dim' : '',
+                      dimmed ? ' title="Enchanter&#39;s Bauble only works with Tier 5 enchants"' : '');
+      }).join('');
+      return `
+      <div class="hl-picker-card hl-item-picker-card hl-enchant-picker ec-shop-card" role="dialog" aria-modal="true" aria-label="Choose enchantment">
+        ${head('Enchantments', false)}
+        <div class="hl-shop-body">${ecShopMarkup([{ title: 'Neutral Items', one: true, neutral: true,
+          groups: [{ title: 'Neutral Enchantments', tiles }] }])}</div>
+      </div>`;
+    }
+    const panels = HL_SHOP_PANELS.map(([title, key, cats]) => ({ title, groups: cats.map(n => {
+      const g = (itemGroups[key] || []).find(x => x[0] === n);
+      return { title: n, tiles: g ? g[1].map(item => hlTile(item, selectedId)).join('') : '' };
+    }) }));
+    return `
+      <div class="hl-picker-card hl-item-picker-card ec-shop-card" role="dialog" aria-modal="true" aria-label="Choose item">
+        ${head('Shop', true)}
+        <div class="hl-shop-body">${ecShopMarkup(panels)}</div>
+      </div>`;
   }
 
   function closePicker() {
