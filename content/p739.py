@@ -11,7 +11,7 @@ def build():
     W(section("General Updates"))
 
     W(plain_header("Map Objectives"))
-    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False))
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())
     W(li("First Spawn Time increased from 15:00 to 20:00", b(15, 20, l=True)))
     W(ul_close())
@@ -24,7 +24,7 @@ def build():
                  level_prefix='M', rework_badge=False))
     W(li("Base barrier decreased from 2100 to 2000", b(2100, 2000)))
     W(ul_close())
-    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False))
+    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ability("Strength of the Immortal", icon_url="../icons/misc/innate_icon.png"))
     W(ul_open())
     W(li_formula("Armor Bonus per minute increased",

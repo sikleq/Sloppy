@@ -10,7 +10,7 @@ def build():
     W(li("Lotuses can no longer be picked up by Meepo clones, Arc Warden's Tempest Double or Dazzle's Nothl Projection", t("DEL")))
     W(li("Moved the spawn box of the Radiant Safelane tier 1 hard pull camp a little bit down, removing an inaccessible camp block spot that could be created by chopping down a tree", t("MISC")))
     W(ul_close())
-    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False))
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())
     W(li("Gold to each team member on death decreased from 250 to 175", b(250, 175)))
     W(ul_close())

@@ -9,7 +9,7 @@ def build():
     W(plain_header("Map Objectives"))
 
     # ===== NEUTRAL CREEP UPDATES =====
-    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False))
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ability("Reflect", icon_url="../icons/abilities/miniboss_reflect.png"))
     W(ul_open())
     W(li_formula("Damage reflection changed", "30% + 2% per minute", "30% + 1.5% per minute",

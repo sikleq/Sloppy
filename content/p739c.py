@@ -8,11 +8,11 @@ def build():
     # ===== GENERAL UPDATES =====
     W(section("General Updates"))
 
-    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False))
+    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
     W(li("Melee attacks against couriers are now treated as melee hero attacks", t("REWORK")))
     W(ul_close())
-    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False))
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ability("Reflect", icon_url="../icons/abilities/miniboss_reflect.png"))
     W(ul_open())
     W(li("No longer considers creep-heroes for the damage reflected", t("DEL"), extra=inline_note("Lone Druid's Spirit Bear is an exception for this")))

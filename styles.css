@@ -308,7 +308,8 @@ body.patch-page .entity {
    Terrain Changes, Artifact Changes …): a smaller, thinner version of the category strip
    (h2.section) — orange left edge + fading band — so the sub-categories read as such. */
 body.patch-page .entity.plain-entity {
-  margin: 6px -22px 10px;
+  /* same left / right edges as the category strip (h2.section sits 18px further out) */
+  margin: 6px -40px 10px;
   padding: 6px 20px 5px;
   border-left: 2px solid rgba(255, 80, 5, 0.7);
   background: linear-gradient(to right, rgba(131, 51, 18, 0.45), rgba(131, 51, 18, 0) 55%);
@@ -10286,3 +10287,9 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .creep-ref { white-space: nowrap; }
 .creep-ref img { width: 28px; height: 16px; object-fit: cover; border-radius: 2px; vertical-align: -3px; margin: 0 4px 0 2px; }
 .creep-ref b { font-weight: 700; color: var(--text-bright); }
+/* camp compositions (camp_table): a light table inside the row, creep names in columns */
+.camp-table {
+  display: grid; grid-template-columns: max-content repeat(var(--camp-cols, 2), max-content);
+  column-gap: 22px; row-gap: 3px; margin: 6px 0 2px 2px; align-items: center;
+}
+.camp-table .camp-name { color: var(--text-dim, #8b949e); }

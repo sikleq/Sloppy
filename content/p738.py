@@ -51,7 +51,7 @@ def build():
     W(li("Experience will be granted to a random hero within 300 units of the Shrine and also to their teammate with the lowest experience", t("MISC"), extra=inline_note("The values and behavior are identical to Wisdom Runes")))
     W(ul_close())
 
-    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False))
+    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
     W(li("Roshan is back in the river, with one pit located near each sidelane", t("REWORK"), extra=inline_note("Top lair is slightly closer to Dire's jungle entrance, and bottom one is closer to Radiant's<br>Only the active Roshan pit will show as a minimap icon<br>Roshan initially spawns in the Bottom Pit<br>Starting at 15:00, Roshan will follow the day/night cycle, walking across the river towards his designated pit: Top at night and Bottom at day<br>&nbsp;&nbsp;– Roshan no longer has bonus movement speed while moving between pits<br>&nbsp;&nbsp;– Roshan now has basic 25% Slow Resistance and an additional 25% Slow Resistance when running between pits")))
     W(li("Added a Roshan icon near the minimap that shows Roshan's state (alive, dead, maybe alive) and location", t("QoL"), extra=inline_note("If Roshan is dead, the status will also include a timer until his possible respawn<br>Since Roshan's respawn takes between 8 to 11 minutes, during this window the status will say that he may be alive, but also include a timer until the guaranteed respawn<br>If a team gains vision over Roshan or Roshan's Roar of Retribution is heard during this status, the timer will be updated to inform that Roshan is alive<br>Templar Assassin's Third Eye Innate will cause the icon to display exactly when and where Roshan will respawn")))
@@ -70,7 +70,7 @@ def build():
     W(li("Cooldown increased from 20s to 60s", b(20, 60, l=True)))
     W(li("Added a unique attack animation for Bash, as well as new animation and particles for Roar of Retribution", t("QoL")))
     W(ul_close())
-    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False))
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())
     W(li("There is only a single Tormentor active at a time", t("REWORK")))
     W(li("Tormentor is also dependent on the day and night cycle, so it's at Radiant side at night and at Dire's side at day. As a result, it will always appear at the Radiant side first", t("REWORK"), extra=inline_note("Or at Dire side in Turbo<br>Due to this Roshan and Tormentor are always on opposite sides")))
@@ -113,10 +113,12 @@ def build():
     W(ul_open())
     W(li("Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian neutral creeps", t("NEW"), extra=inline_note("Easy camp on the rim between tier 1 and tier 2 towers<br>Medium camp on the rim near tier 2 tower<br>Medium camp in the main jungle that was on the stream's way and used to be a Hard camp")))
     W(li("As the tides of battle rise, every 5 minutes one creep in a Flooded Camp is permanently upgraded to the next tier", t("NEW"), extra=inline_note("Each camp has 3 units, so at 15:00 the Easy camp becomes a Medium camp and both Medium camps become Hard; at 30:00 the Medium camp becomes Hard and both Hard camps become Ancient")))
-    W(li("Easy camp: " + creep_ref("Pollywog", _NC_CDN + "tadpole.png", 3), t("NEW")))
-    W(li("Medium camp: " + creep_ref("Boglet", _NC_CDN + "froglet.png", 2) + ", " + creep_ref("Marshmage Apprentice", _NC_CDN + "froglet_mage.png", 1), t("NEW")))
-    W(li("Hard camp: " + creep_ref("Croaker", _NC_CDN + "grown_frog.png", 2) + ", " + creep_ref("Marshmage", _NC_CDN + "grown_frog_mage.png", 1), t("NEW")))
-    W(li("Ancient camp: " + creep_ref("Ancient Croaker", _NC_CDN + "ancient_frog.png", 2) + ", " + creep_ref("Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png", 1), t("NEW")))
+    W(li("These camps consist of the following creeps" + camp_table([
+        ("Easy camp", [(3, "Pollywog", _NC_CDN + "tadpole.png")]),
+        ("Medium camp", [(2, "Boglet", _NC_CDN + "froglet.png"), (1, "Marshmage Apprentice", _NC_CDN + "froglet_mage.png")]),
+        ("Hard camp", [(2, "Croaker", _NC_CDN + "grown_frog.png"), (1, "Marshmage", _NC_CDN + "grown_frog_mage.png")]),
+        ("Ancient camp", [(2, "Ancient Croaker", _NC_CDN + "ancient_frog.png"), (1, "Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png")]),
+    ]), t("NEW")))
     W(li("Each creep can only be upgraded twice, so an Easy camp never reaches Ancient status", t("NEW")))
     W(li("Units are not upgraded while the camp is blocked, and the number of upgraded units can't be increased", t("NEW")))
     W(ul_close())
@@ -211,7 +213,9 @@ def build():
     W(plain_header("Ancient Prowlers", dynamics=False))
     W(ul_open())
     W(li("Prowlers have returned as an Ancient Neutral Camp", t("NEW"), extra=inline_note("Average bounty: 158 gold and 314 XP")))
-    W(li("Ancient camp: " + creep_ref("Ancient Prowler Acolyte", _NC_CDN + "prowler_acolyte.png", 2) + ", " + creep_ref("Ancient Prowler Shaman", _NC_CDN + "prowler_shaman.png", 1), t("NEW")))
+    W(li("The camp consists of" + camp_table([
+        ("Ancient camp", [(2, "Ancient Prowler Acolyte", _NC_CDN + "prowler_acolyte.png"), (1, "Ancient Prowler Shaman", _NC_CDN + "prowler_shaman.png")]),
+    ]), t("NEW")))
     W(ul_close())
 
     # Ancient Prowler Acolyte

@@ -13,7 +13,7 @@ def build():
     W(li("Units with flying vision no longer ignore vision restrictions of Roshan's pits. They can no longer see into them from outside and vice versa", t("NERF"), extra=inline_note("Affects Clockwerk during Jetpack, Drow Ranger's Glacier, Monkey King during Tree Dance, Night Stalker during Dark Ascension, Treant Protector's Eyes in the Forest, and Visage's Familiars")))
     W(ul_close())
     W(plain_header("Map Objectives"))
-    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False))
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ability("Alleviation", icon_url="../icons/abilities/miniboss_alleviation.png"))
     W(ul_open())
     W(li("Max health regen increased from 2% to 2.25%", b(2, 2.25)))

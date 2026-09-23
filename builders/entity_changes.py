@@ -565,7 +565,11 @@ def _hero_card(e: dict) -> str:
 
 
 _UNIT_CAMP_CACHE = None
-_UNIT_ORDER = ["Easy", "Medium", "Large", "Ancient", "Lane Creeps", "Summons"]
+_UNIT_ORDER = ["Easy", "Medium", "Large", "Ancient", "Lane Creeps", "Summons", "Other"]
+# Map units with their own Changes page but no camp: Roshan -> "Other"; the Tormentor is
+# reached from its card on structures.html, not listed among the units.
+_UNIT_BUCKET = {"npc_dota_roshan": "Other"}
+_UNIT_NOT_LISTED = {"npc_dota_miniboss"}
 
 # Summoned / split units that have a portrait icon in icons/units/ but belong to
 # no neutral camp, so the camp-roster loop never adds them. Listed here as
@@ -643,9 +647,12 @@ _CAMP_TITLE_ICON = {"Easy": "small", "Medium": "mid", "Large": "big", "Ancient":
 _STRUCTURE_DEF = [
     ("Towers", [("tower_radiant", "Tower (Radiant)"), ("tower_dire", "Tower (Dire)")]),
     ("Barracks", [("barracks", "Barracks")]),
-    ("Tormentors", [("tormentor_radiant", "Tormentor (Radiant)"),
-                    ("tormentor_dire", "Tormentor (Dire)")]),
+    # one Tormentor: the Radiant / Dire models only differ in colour
+    ("Tormentors", [("tormentor_radiant", "Tormentor")]),
 ]
+
+
+_STRUCTURE_PAGE = {"tormentor_radiant": "units/tormentor.html"}
 
 
 def _structure_groups():
@@ -653,9 +660,14 @@ def _structure_groups():
     non-clickable reference cards (no per-structure change pages)."""
     out = []
     for label, items in _STRUCTURE_DEF:
-        lst = [{"kind": "structure", "slug": b.replace("_", "-"), "name": n,
-                "icon": f"../icons/structures/{b}.png", "patches": [],
-                "_current": True, "_static": True} for b, n in items]
+        lst = []
+        for b, n in items:
+            page = _STRUCTURE_PAGE.get(b)           # a structure with its own Changes page is clickable
+            linked = bool(page and (DIST / page).exists())
+            lst.append({"kind": "structure", "slug": b.replace("_", "-"), "name": n,
+                        "icon": f"../icons/structures/{b}.png", "patches": [],
+                        "_current": True, "_static": not linked,
+                        **({"_href": page + "?from=structures"} if linked else {})})
         out.append((label, lst))
     return out
 
@@ -786,7 +798,9 @@ def _unit_groups(ents: list[dict]):
                        "_bucket": bucket})
     buckets = {k: [] for k in _UNIT_ORDER}
     for e in roster:
-        buckets[e.get("_bucket") or camp.get(e["_npc"], "Summons")].append(e)
+        if e["_npc"] in _UNIT_NOT_LISTED:
+            continue
+        buckets[e.get("_bucket") or _UNIT_BUCKET.get(e["_npc"]) or camp.get(e["_npc"], "Summons")].append(e)
     return [(k, buckets[k]) for k in _UNIT_ORDER if buckets[k]]
 
 

@@ -410,8 +410,10 @@ def _slugify(name):
     return s
 
 
-def _register_entity(kind, name):
-    if _State.current_section_slug == 'general':
+def _register_entity(kind, name, force=False):
+    """force=True: tracked even inside General Updates (map units with their own Changes
+    page: Roshan, Tormentor)."""
+    if _State.current_section_slug == 'general' and not force:
         _State.current_entity_key = None
         _State.current_entity_display = None
         return ''
@@ -469,7 +471,7 @@ def hero_header(name):
 </div>'''
 
 
-def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, new_mech=None):
+def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, new_mech=None, track=False):
     """`new="New Neutral Creep"` renders the same NEW-entity block as
     item_header(new=...): is-new block + type label after the name. Pair it
     with new_stats([...]) for the stat sheet and t("NEW") ability rows (the
@@ -488,7 +490,7 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
     _State.next_ul_is_hero_stats = (not new) and general   # a NEW unit shows a stat sheet instead
     kind_attr = f' data-kind="{kind}"' if kind else ''
     entity_kind = "creep-hero" if (kind and kind.lower().startswith("creep-hero")) else "unit"
-    eid = _register_entity(entity_kind, name)
+    eid = _register_entity(entity_kind, name, force=track)
     if new:
         type_text = new if isinstance(new, str) else ''
         type_label = f' <span class="entity-new-type">{type_text}</span>' if type_text else ''
@@ -1112,6 +1114,23 @@ def creep_ref(name, icon_url, count=None):
     n = f"{count}× " if count else ""
     return (f'<span class="creep-ref">{n}<img src="{icon_url}" alt="" width="28" height="16">'
             f'<b>{name}</b></span>')
+
+
+def camp_table(rows):
+    """Camp compositions as a light table so the creep names line up in columns:
+    camp_table([("Easy camp", [(3, "Pollywog", icon)]),
+                ("Medium camp", [(2, "Boglet", icon), (1, "Marshmage Apprentice", icon)])])"""
+    width = max(len(creeps) for _, creeps in rows)
+    cells = []
+    for camp, creeps in rows:
+        cells.append(f'<span class="camp-name">{camp}</span>')
+        for i in range(width):
+            if i < len(creeps):
+                n, name, icon = creeps[i]
+                cells.append(f'<span class="camp-cell">{creep_ref(name, icon, n)}</span>')
+            else:
+                cells.append('<span class="camp-cell"></span>')
+    return (f'<span class="camp-table" style="--camp-cols:{width}">' + "".join(cells) + '</span>')
 
 
 def inline_note(text):

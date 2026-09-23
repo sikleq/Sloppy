@@ -44,7 +44,7 @@ def build():
                  headline_level=2))
     W(ul_close())
 
-    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False))
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())
     W(li("Tormentor's spawn preference has switched", t("MISC"),
          extra=inline_note("Now begins in the Bottom Chasm.")))
@@ -76,7 +76,7 @@ def build():
          )))
     W(li("Reward if all players have Aghanim's Shard decreased from 455 gold to 415 gold", b(455, 415)))
     W(ul_close())
-    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False))
+    W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
     W(li("Roshan's pit preference has switched", t("MISC"),
          extra=inline_note("Now begins in the Top Pit.")))
