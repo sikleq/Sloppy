@@ -338,7 +338,7 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
             ab_count[t] = ab_count.get(t, 0) + 1
     abilities_html = ""
     if ab_count:
-        npc = _re.sub(r"^.*/|\.png$", "", e["icon"]) if e["kind"] == "hero" else ""
+        npc = _re.sub(r"^.*/|\.(?:png|webp)$", "", e["icon"]) if e["kind"] == "hero" else ""
         kit = _hero_kit(npc) if npc else []
         low = {k.lower(): i for i, k in enumerate(kit)}
         current = sorted((t for t in ab_count if t.lower() in low), key=lambda t: low[t.lower()])
@@ -416,9 +416,11 @@ _ITEM_SLOTS = 6
 
 
 def _name_block(e: dict) -> str:
-    name = f'<div class="entity-name">{_esc(e["name"])}</div>'
     if e["kind"] != "hero":
-        return name
+        return f'<div class="entity-name">{_esc(e["name"])}</div>'
+    # class, not CSS `:has(+ .ec-islots)`: a sibling :has on every .entity-name made each
+    # lazily inserted dynamics row re-match styles all over the patch pages (perf)
+    name = f'<div class="entity-name ec-name-slots">{_esc(e["name"])}</div>'
     slots = "".join(
         f'<button type="button" class="ec-islot is-empty" data-ec-islot="{i}" '
         f'aria-label="Choose item {i + 1}"></button>'
@@ -473,7 +475,7 @@ def _hero_groups(ents):
     hs = _json.loads((_HERE / "data" / "stats" / latest_stats_version() / "heroes.json").read_text(encoding="utf-8"))
     groups = {k: [] for k, _, _ in _ATTR}
     for e in ents:
-        npc = _re.sub(r"^.*/|\.png$", "", e["icon"])
+        npc = _re.sub(r"^.*/|\.(?:png|webp)$", "", e["icon"])
         attr = (hs.get(f"npc_dota_hero_{npc}") or {}).get("AttributePrimary", "DOTA_ATTRIBUTE_ALL")
         groups.setdefault(attr, groups["DOTA_ATTRIBUTE_ALL"]).append(e)
     return [(label, icon, sorted(groups[k], key=lambda x: x["name"].lower())) for k, label, icon in _ATTR if groups[k]]
@@ -522,7 +524,7 @@ def _item_groups(ents, dyn):
             g = "Enchantments"
         else:
             g = m.get("category") or "Removed"
-        e["_icon_slug"] = m.get("icon") or _re.sub(r"^.*/|\.png$", "", e["icon"])
+        e["_icon_slug"] = m.get("icon") or _re.sub(r"^.*/|\.(?:png|webp)$", "", e["icon"])
         buckets.setdefault(g, []).append(e)
     names = ([c for c in order if c in buckets]
              + sorted(g for g in buckets if g.startswith("Neutral"))
@@ -868,7 +870,7 @@ def _hero_group_stats(label, lst):
     slim, raw = _hero_stat_data()
     rows = []
     for e in lst:
-        npc = _re.sub(r"^.*/|\.png$", "", e["icon"])
+        npc = _re.sub(r"^.*/|\.(?:png|webp)$", "", e["icon"])
         d = slim.get(f"npc_dota_hero_{npc}")
         if not d:
             continue

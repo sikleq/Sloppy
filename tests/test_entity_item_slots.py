@@ -11,7 +11,7 @@ def test_hero_name_block_has_item_slots():
     html = _name_block({"kind": "hero", "name": "Anti-Mage", "slug": "anti-mage"})
     assert html.count('data-ec-islot="') == _ITEM_SLOTS == 6
     assert 'data-ec-hero="anti-mage"' in html
-    assert '<div class="entity-name">Anti-Mage</div>' in html
+    assert '<div class="entity-name ec-name-slots">Anti-Mage</div>' in html
 
 
 def test_item_and_unit_pages_have_no_item_slots():

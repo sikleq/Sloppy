@@ -3482,17 +3482,17 @@ ul.changes li.ability-row-end {
    both panes. Otherwise `align-items: center` re-centers the shorter pane
    every time the <details> table toggles open — visibly shoving the old
    ability block down. Top-anchoring makes the table grow downward only. */
-.ability-change-block .ability-change.unified-panes:has(.formula-table-wrap) {
+.ability-change-block .ability-change.unified-panes.has-formula-wrap {
   align-items: start;
 }
-.ability-change-block .ability-change.unified-panes:has(.formula-table-wrap) > .ability-change-pane {
+.ability-change-block .ability-change.unified-panes.has-formula-wrap > .ability-change-pane {
   align-self: start;
 }
 /* Arrow also top-anchored when a formula table can expand — otherwise
    `align-self: center` re-aligns to the grid-row centre, which moves
    downward as the table grows, visibly drifting the arrow below the
    old pane's body. */
-.ability-change-block .ability-change.unified-panes:has(.formula-table-wrap) > .ability-change-arrow {
+.ability-change-block .ability-change.unified-panes.has-formula-wrap > .ability-change-arrow {
   align-self: start;
   padding-top: 6px;
 }
@@ -3783,7 +3783,7 @@ ul.changes li.ability-row-end {
    grid reserves and mark each line with a small bullet so it reads as a list,
    not a tag row whose tag was deleted. Ability-rows (Passive:/Active: boxes)
    keep their own layout. */
-ul.changes li:has(> .row-tag-empty):not([class*="ability-row"]) > .row-text::before,
+ul.changes li.li-notag:not([class*="ability-row"]) > .row-text::before,
 .entity-block.is-new ul.changes li:not([class*="ability-row"]) > .row-text::before {
   content: "\2022";
   float: none;
@@ -3994,10 +3994,10 @@ h4.subgroup {
   align-self: start;
 }
 /* Header-only block (empty changes ul, no li) — center title vertically against the icon */
-.ability-block:not(:has(> ul.changes > li)) {
+.ability-block.ab-empty {
   grid-template-rows: minmax(48px, auto);
 }
-.ability-block:not(:has(> ul.changes > li)) > .ability-title {
+.ability-block.ab-empty > .ability-title {
   align-self: center;
   margin: 0;
 }
@@ -4031,8 +4031,8 @@ h4.subgroup {
 }
 /* Raw <li> (no .row-text wrapper) inside ability-block — TWO offsets stack:
    76px to cancel the raw-li padding, plus 60px to clear the ability-block icon. */
-.ability-block ul.changes li:not(:has(> .row-text)) > .formula-table,
-.ability-block ul.changes li:not(:has(> .row-text)) > .correction-note {
+.ability-block ul.changes li.li-notext > .formula-table,
+.ability-block ul.changes li.li-notext > .correction-note {
   margin-left: -136px;
   width: calc(100% + 136px);
 }
@@ -4070,7 +4070,7 @@ ul.changes li {
    under the change-text baseline), not at the bottom of the whole li —
    that way it stays put even when correction-notes/formula-tables span
    full-width below. */
-ul.changes li:has(> .badge-group):hover::after {
+ul.changes li.li-bg:hover::after {
   content: "";
   position: absolute;
   left: 76px;
@@ -4129,13 +4129,13 @@ ul.changes li > .formula-table {
 }
 /* Raw <li> without .row-text wrapper (rare special-case manual rows) — block layout
    with auto-generated left tag from data-tag attribute via ::before. */
-ul.changes li:not(:has(> .row-text)) {
+ul.changes li.li-notext {
   display: block;
   padding-left: 76px;
   position: relative;
   min-height: 22px;
 }
-ul.changes li:not(:has(> .row-text))::before {
+ul.changes li.li-notext::before {
   /* matches .badge:first-child dimensions exactly (width: 64px) */
   position: absolute;
   left: 0;
@@ -4160,27 +4160,27 @@ ul.changes li:not(:has(> .row-text))::before {
   border: 1px solid rgba(225, 90, 75, 0.28);
 }
 /* Extras inside raw rows (formula-table, correction-note) — extend to left edge */
-ul.changes li:not(:has(> .row-text)) > .formula-table,
-ul.changes li:not(:has(> .row-text)) > .correction-note {
+ul.changes li.li-notext > .formula-table,
+ul.changes li.li-notext > .correction-note {
   margin-left: -76px;
   width: calc(100% + 76px);
 }
 /* Tag content (most-specific wins by source order; rework beats buff/nerf for hybrid rows) */
-ul.changes li:not(:has(> .row-text))[data-tag*="buff"]::before  { content: "BUFF"; background: rgba(85,205,115,0.10); color: #6da375; border-color: rgba(85,205,115,0.28); }
-ul.changes li:not(:has(> .row-text))[data-tag*="nerf"]::before  { content: "NERF"; }
-ul.changes li:not(:has(> .row-text))[data-tag*="qol"]::before   { content: "QoL"; background: rgba(121,192,255,0.06); color: #87a3bf; border-color: rgba(121,192,255,0.20); }
-ul.changes li:not(:has(> .row-text))[data-tag*="misc"]::before  { content: "MISC"; background: rgba(139,148,158,0.06); color: var(--text-dimmer); border-color: rgba(139,148,158,0.18); }
-ul.changes li:not(:has(> .row-text))[data-tag*="new"]::before   { content: "NEW"; background: rgba(220,175,95,0.06); color: #9a7f4d; border-color: rgba(220,175,95,0.22); }
-ul.changes li:not(:has(> .row-text))[data-tag*="del"]::before   { content: "DEL"; background: rgba(180,70,70,0.07); color: #a86060; border-color: rgba(180,70,70,0.25); }
-ul.changes li:not(:has(> .row-text))[data-tag*="rework"]::before { content: "REWORK"; background: rgba(180,145,220,0.05); color: #7d6e93; border-color: rgba(180,145,220,0.15); }
+ul.changes li.li-notext[data-tag*="buff"]::before  { content: "BUFF"; background: rgba(85,205,115,0.10); color: #6da375; border-color: rgba(85,205,115,0.28); }
+ul.changes li.li-notext[data-tag*="nerf"]::before  { content: "NERF"; }
+ul.changes li.li-notext[data-tag*="qol"]::before   { content: "QoL"; background: rgba(121,192,255,0.06); color: #87a3bf; border-color: rgba(121,192,255,0.20); }
+ul.changes li.li-notext[data-tag*="misc"]::before  { content: "MISC"; background: rgba(139,148,158,0.06); color: var(--text-dimmer); border-color: rgba(139,148,158,0.18); }
+ul.changes li.li-notext[data-tag*="new"]::before   { content: "NEW"; background: rgba(220,175,95,0.06); color: #9a7f4d; border-color: rgba(220,175,95,0.22); }
+ul.changes li.li-notext[data-tag*="del"]::before   { content: "DEL"; background: rgba(180,70,70,0.07); color: #a86060; border-color: rgba(180,70,70,0.25); }
+ul.changes li.li-notext[data-tag*="rework"]::before { content: "REWORK"; background: rgba(180,145,220,0.05); color: #7d6e93; border-color: rgba(180,145,220,0.15); }
 /* Hide redundant inline tag spans (since ::before shows them) */
-ul.changes li:not(:has(> .row-text)) > .badge.rework,
-ul.changes li:not(:has(> .row-text)) > .badge.misc,
-ul.changes li:not(:has(> .row-text)) > .badge.qol,
-ul.changes li:not(:has(> .row-text)) > .badge.new,
-ul.changes li:not(:has(> .row-text)) > .badge.del,
-ul.changes li:not(:has(> .row-text)) > .badge.buff-text,
-ul.changes li:not(:has(> .row-text)) > .badge.nerf-text {
+ul.changes li.li-notext > .badge.rework,
+ul.changes li.li-notext > .badge.misc,
+ul.changes li.li-notext > .badge.qol,
+ul.changes li.li-notext > .badge.new,
+ul.changes li.li-notext > .badge.del,
+ul.changes li.li-notext > .badge.buff-text,
+ul.changes li.li-notext > .badge.nerf-text {
   display: none;
 }
 
@@ -4201,7 +4201,7 @@ ul.subnotes li::before { content: "↳ "; color: var(--text-dimmer); }
 /* When the subnote is collapsible, drop the ↳ arrow — the rotating ▶ chevron
    on <summary> already serves as the indicator, putting both side-by-side
    reads as visual noise. */
-ul.subnotes li:has(> .subnote-collapse)::before { content: ""; }
+ul.subnotes li.li-collapse::before { content: ""; }
 
 /* Collapsible subnote — long bullet lists hidden behind a "▶ summary (N)"
    click target. Native <details>/<summary> preserves keyboard and SR support. */
@@ -4798,16 +4798,16 @@ ul.changes li.aghanim-shard {
 }
 /* Chip-less rows (bulleted description rows, rows of a NEW entity card) have no
    tag column to clear — the stripe starts at the left edge on every line. */
-ul.changes li.aghanim-scepter:has(> .row-tag-empty):not([class*="ability-row"]),
-ul.changes li.aghanim-shard:has(> .row-tag-empty):not([class*="ability-row"]),
+ul.changes li.aghanim-scepter.li-notag:not([class*="ability-row"]),
+ul.changes li.aghanim-shard.li-notag:not([class*="ability-row"]),
 .entity-block.is-new ul.changes li.aghanim-scepter:not([class*="ability-row"]),
 .entity-block.is-new ul.changes li.aghanim-shard:not([class*="ability-row"]) {
   background: linear-gradient(90deg, rgba(72, 148, 255, 0.20) 0, rgba(72, 148, 255, 0.10) 60%, transparent 100%);
 }
 /* When a formula table is inside the li, strip the second gradient layer so it
    doesn't bleed over the table rows. The first-line stripe is kept. */
-ul.changes li.aghanim-scepter:has(> .formula-table),
-ul.changes li.aghanim-shard:has(> .formula-table) {
+ul.changes li.aghanim-scepter.li-formula,
+ul.changes li.aghanim-shard.li-formula {
   background:
     linear-gradient(90deg, transparent 0 70px, rgba(72, 148, 255, 0.20) 70px, rgba(72, 148, 255, 0.10) 60%, transparent 100%) no-repeat 0 3px / 100% 22px;
 }
@@ -6135,10 +6135,13 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 /* matrix / Hero Stats row names link to the entity's Changes page */
 a.ec-name-link { color: inherit; text-decoration: none; }
 a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underline-offset: 3px; }
-/* main-attribute change row (attr_change): [icon] Agility → [icon] Universal */
-.attr-chip { display: inline-flex; align-items: center; gap: 4px; margin-left: 5px; font-weight: 600; color: var(--text-bright); white-space: nowrap; }
-.attr-chip img { width: 18px; height: 18px; vertical-align: -3px; }
-.attr-arrow { margin: 0 2px 0 7px; color: var(--gold); font-weight: 700; }
+/* main-attribute change row (attr_change): the attribute names in the row's own font,
+   bold, in the in-game attribute colours */
+.attr-chip { font-weight: 700; }
+.attr-chip.is-str { color: #e73c06; }
+.attr-chip.is-agi { color: #3dcb37; }
+.attr-chip.is-int { color: #00d3e7; }
+.attr-chip.is-uni { color: #d3e700; }
 /* RULE (all tables): hovering a hero/unit portrait pops it out — like Neutral
    Creeps. The 18px gap + name-fitted column width keep the 1.8× zoom from ever
    covering the name. The icon's stacking sits under the sticky header (sticky-col
@@ -10006,7 +10009,7 @@ body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head > .entity { paddi
    the same 24px glassy pill as a .dyn-cell (4:3 so the item art reads) */
 .ec-islots { display: flex; gap: 4px; padding: 2px 4px; flex: none; }
 .ec-islots + .dyn-row-wrap { margin-left: 14px; }
-.ec-head-panel .entity-name:has(+ .ec-islots) { font-size: 28px; }   /* room for the slots */
+.ec-head-panel .entity-name.ec-name-slots { font-size: 28px; }   /* room for the slots */
 .ec-islot {
   position: relative; width: 32px; height: 24px; padding: 0; border: 0; border-radius: 4px; cursor: pointer;
   background: rgba(5, 6, 9, 0.92); overflow: visible;
@@ -10046,10 +10049,11 @@ body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head > .entity { paddi
 .ec-picker-top { display: flex; align-items: center; gap: 12px; padding: 14px 14px 4px; }
 .ec-picker-top .hl-picker-search { flex: 1 1 auto; }
 .ec-shop-card { position: relative; }
-.ec-picker-top:not(:has(input)) { position: absolute; top: 14px; right: 24px; padding: 0; z-index: 2; }
-.ec-picker-top:not(:has(input)) ~ .hl-shop-body { padding-top: 10px; }
-/* Hero Lab shop (two panels): wide card, three categories per row → far less scrolling */
-.ec-shop-card:has(.ec-shop[data-panels="2"]) { width: min(1580px, calc(100vw - 40px)); max-height: calc(100vh - 40px); }
+.ec-picker-top.is-bare { position: absolute; top: 14px; right: 24px; padding: 0; z-index: 2; }
+.ec-picker-top.is-bare ~ .hl-shop-body { padding-top: 10px; }
+/* wide shop card (Hero Lab shop, hero-page picker): three categories per row in the Hero Lab
+   shop → far less scrolling; the hero-page picker gets the Item Changes page width */
+.ec-shop-card.is-wide { width: min(1580px, calc(100vw - 40px)); max-height: calc(100vh - 40px); }
 .ec-shop[data-panels="2"] .ec-ipanel-body { grid-template-columns: repeat(3, 1fr); }
 /* Pickers (hero-page item slots, Hero Lab shop + enchantments) = the Item Changes index:
    same panels, Jersey titles and icon cards. Tiles keep .hl-item-tile for the pickers'
@@ -10059,8 +10063,6 @@ body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head > .entity { paddi
 .ec-shop[data-panels="2"] { grid-template-columns: 1fr 1fr; }
 .ec-shop[data-panels="1"] { grid-template-columns: 1fr; }
 .hl-enchant-picker.ec-shop-card { width: min(460px, calc(100vw - 56px)); }
-/* three panels (hero-page picker): as wide as the Item Changes page so the cards keep its size */
-.ec-shop-card:has(.ec-shop[data-panels="3"]) { width: min(1580px, calc(100vw - 40px)); max-height: calc(100vh - 40px); }
 .ec-shop .hl-item-tile {
   width: auto; height: auto; aspect-ratio: 88 / 64; padding: 0; border: 1px solid rgba(0, 0, 0, 0.55);
   border-radius: 3px; background: var(--bg-panel-3); box-shadow: none; overflow: hidden;

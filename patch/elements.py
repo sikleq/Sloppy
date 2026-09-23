@@ -1065,20 +1065,19 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text_inner}</span>{rest}{extra}</li>'
 
 
-_ATTR_CHIP_ICON = {"Strength": "strength", "Agility": "agility", "Intelligence": "intelligence", "Universal": "universal"}
+_ATTR_CHIP_CLS = {"Strength": "is-str", "Agility": "is-agi", "Intelligence": "is-int", "Universal": "is-uni"}
 
 
 def attr_change(old, new):
-    """Row text for a main-attribute change: "Main attribute changed from [icon] Agility → [icon] Universal".
+    """Row text for a main-attribute change: "Main attribute changed from Agility → Universal",
+    both names bold in the row's own font, coloured with the in-game attribute colour (no icons).
     The arrow is the HTML entity &rarr; (never a literal "→" in content: it gets mangled by
-    non-UTF-8 shells/consoles); both attribute names carry their in-game icon."""
+    non-UTF-8 shells/consoles)."""
     def chip(a):
-        if a not in _ATTR_CHIP_ICON:
+        if a not in _ATTR_CHIP_CLS:
             raise ValueError(f"attr_change: unknown attribute {a!r}")
-        return (f'<span class="attr-chip"><img src="../icons/{_ATTR_CHIP_ICON[a]}.webp" alt="" '
-                f'width="18" height="18">{a}</span>')
-    return (f'Main attribute changed from {chip(old)}'
-            f'<span class="attr-arrow" aria-label="to">&rarr;</span>{chip(new)}')
+        return f'<b class="attr-chip {_ATTR_CHIP_CLS[a]}">{a}</b>'
+    return f'Main attribute changed from {chip(old)} &rarr; {chip(new)}'
 
 
 def inline_note(text):

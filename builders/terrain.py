@@ -799,6 +799,9 @@ def save_terrain_html():
     for ver in patches:
         page = _build_terrain_page(ver, patches, by_patch,
                                    markers_by_patch, counts_by_patch, subnav)
+        # the :has() facts styles.css now reads as classes (patch/static_has.py)
+        from patch.static_has import add_static_has_classes
+        page = add_static_has_classes(page)
         fname = _terrain_filename(ver, patches)
         out = _os.path.join(_site.DIST_DIR, fname)
         with open(out, "w", encoding="utf-8") as f:

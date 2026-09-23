@@ -1522,6 +1522,21 @@
               });
             }, { rootMargin: '120% 0px' });   // ~1.2 screen-heights of lead, scales with resolution
             entities.forEach(e => io.observe(e));
+            // PERF: also pre-build the remaining rows in idle time, a few per idle slice,
+            // so they are not inserted DURING scrolling (each insertion mid-scroll cost
+            // style + layout on a 20k-element patch page: p95 frame 33 ms on 7.41).
+            // The observer above stays as the fast path for rows the user reaches first.
+            const pending = [...entities];
+            const idle = window.requestIdleCallback
+              || (cb => setTimeout(() => cb({ timeRemaining: () => 8 }), 50));
+            const pump = deadline => {
+              while (pending.length && deadline.timeRemaining() > 2) {
+                const e = pending.shift();
+                if (!e.dataset.dynBuilt) { buildRow(e); io.unobserve(e); }
+              }
+              if (pending.length) idle(pump);
+            };
+            idle(pump);
           } else {
             entities.forEach(buildRow);
           }
@@ -3601,7 +3616,7 @@ function ecShopMarkup(panels) {
     };
     const panels = cat.panels.map(p => ({ ...p, title: esc(p.title), groups: p.groups.map(g => ({
       title: esc(g.title), extra: g.extra && esc(g.extra), tiles: g.items.filter(it => it[3]).map(tile).join('') })) }));
-    overlay.innerHTML = `<div class="hl-picker-card hl-item-picker-card ec-shop-card" role="dialog" aria-modal="true" aria-label="Choose item">
+    overlay.innerHTML = `<div class="hl-picker-card hl-item-picker-card ec-shop-card is-wide" role="dialog" aria-modal="true" aria-label="Choose item">
       <div class="ec-picker-top"><input type="text" class="hl-picker-search" data-ec-isearch placeholder="Search item..." aria-label="Search item" autocomplete="off">
       <button type="button" class="hl-picker-close" data-ec-iclose aria-label="Close"></button></div>
       <div class="hl-shop-body">${ecShopMarkup(panels)}</div></div>`;
@@ -4794,7 +4809,7 @@ function ecShopMarkup(panels) {
   function itemPickerMarkup(selectedId, tab, mode, heroAttr, baubleActive) {
     // no title words: the search box (shop) and the close button share the top row
     const head = search => `
-        <div class="ec-picker-top">${search ? `
+        <div class="ec-picker-top${search ? '' : ' is-bare'}">${search ? `
           <input type="text" class="hl-picker-search" data-item-search placeholder="Search item..." aria-label="Search item" autocomplete="off">` : ''}
           <button type="button" class="hl-picker-close" data-picker-close aria-label="Close"></button>
         </div>`;
@@ -4816,7 +4831,7 @@ function ecShopMarkup(panels) {
       return { title: n, tiles: g ? g[1].map(item => hlTile(item, selectedId)).join('') : '' };
     }) }));
     return `
-      <div class="hl-picker-card hl-item-picker-card ec-shop-card" role="dialog" aria-modal="true" aria-label="Choose item">
+      <div class="hl-picker-card hl-item-picker-card ec-shop-card is-wide" role="dialog" aria-modal="true" aria-label="Choose item">
         ${head(true)}
         <div class="hl-shop-body">${ecShopMarkup(panels)}</div>
       </div>`;

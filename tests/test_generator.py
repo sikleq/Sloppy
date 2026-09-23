@@ -402,9 +402,10 @@ def test_attribute_change_row_uses_attr_change_with_old_attribute():
     assert row == 'W(li(attr_change("Agility", "Universal"), t("REWORK")))'
 
 
-def test_attr_change_markup_has_icons_and_entity_arrow():
+def test_attr_change_markup_coloured_names_and_entity_arrow():
     from patch.elements import attr_change
     html = attr_change("Agility", "Universal")
     assert "&rarr;" in html and "→" not in html          # entity, never a literal arrow
-    assert html.count("<img") == 2 and "agility.webp" in html and "universal.webp" in html
+    assert "<img" not in html                                   # same font as the row, no icons
+    assert '<b class="attr-chip is-agi">Agility</b>' in html and '<b class="attr-chip is-uni">Universal</b>' in html
     assert html.startswith("Main attribute changed from")

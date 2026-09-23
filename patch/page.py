@@ -10,6 +10,7 @@ from .state import _State
 from .meta import PATCHES, _render_top_nav, _patch_age_line, _patch_meta_parts, _dropdown_options_html
 from .images import HERO_SLUG
 from .elements import _close_block, STAT_ICONS, STAT_DETECT_RULES
+from .static_has import add_static_has_classes
 
 _ASSET_VERSION = _site.compute_asset_version()
 
@@ -343,6 +344,20 @@ def _categories_bar_html():
     return '<strong>Group:</strong>' + ''.join(btns)
 
 
+_THUMB_RE = re.compile(r'src="\.\./icons/(heroes|items|abilities)/([^"?/]+)\.png"')
+_THUMB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "icons", "_t")
+
+
+def _thumb_srcs(html):
+    """Point hero / item / ability icons at their small WebP copy (icons/_t/<dir>/<name>.webp,
+    made by tools/make_thumbs.py) when one exists; otherwise keep the PNG."""
+    def repl(m):
+        if os.path.exists(os.path.join(_THUMB_DIR, m.group(1), m.group(2) + ".webp")):
+            return f'src="../icons/_t/{m.group(1)}/{m.group(2)}.webp"'
+        return m.group(0)
+    return _THUMB_RE.sub(repl, html)
+
+
 def save_html(filename):
     """Write current accumulator to ./{filename} and reset state."""
     out = "\n".join(H)
@@ -350,6 +365,10 @@ def save_html(filename):
     out = _swap_single_row_other_icons(out)
     out = _sort_changes_li(out)
     out = _wrap_ability_boxes(out)
+    # Perf: :has() facts as build-time classes (patch/static_has.py)
+    out = add_static_has_classes(out)
+    # Perf: 2x-size WebP icons instead of the full PNGs (tools/make_thumbs.py)
+    out = _thumb_srcs(out)
     # Safety net: any inline_note (i)-tip sentinel that wasn't lifted into a
     # row by li() (e.g. used outside an `extra=`) ships without its markers —
     # the (i) bubble still renders in place; only the comments are stripped.
