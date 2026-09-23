@@ -354,6 +354,14 @@ nav.top-nav {
       #101216 100%);
   backdrop-filter: blur(8px) saturate(104%);
   -webkit-backdrop-filter: blur(8px) saturate(104%);
+  /* PERF: sticky + backdrop-filter forces the browser to re-sample and
+     re-blur everything scrolling underneath on every frame. Without a
+     compositing hint, Chrome was periodically demoting/re-promoting this
+     layer, producing 80-500ms main-thread stalls while scrolling long
+     pages (measured via tools/perf_probe.py). will-change keeps the
+     backdrop-filter layer pinned so scroll only needs to shift it, not
+     rebuild it — purely a compositing hint, no visual change. */
+  will-change: backdrop-filter;
   border-bottom: 1px solid rgba(163, 135, 73, 0.16);
   box-shadow:
     inset 0 1px 0 rgba(255, 244, 209, 0.06),
@@ -3529,13 +3537,23 @@ ul.changes li.ability-row-end {
               z-index 0s linear 0.16s;
   transform-origin: 50% 50%;
   backface-visibility: hidden;
-  will-change: transform;
 }
 .ability-icon-wrap.has-old-underlay > .ability-icon-old-underlay {
   z-index: 1;
 }
 .ability-icon-wrap.has-old-underlay > .ability-icon-img {
   z-index: 2;
+}
+/* PERF: will-change was static on the rule above, permanently promoting
+   BOTH icons of every old/new pair to their own compositor layer for the
+   whole page lifetime (30+ pairs on a big patch page = 60+ always-on
+   layers, inflating per-frame layer updates while scrolling — measured via
+   tools/perf_probe.py). The shuffle only runs on :hover, so only hint the
+   browser to promote a layer right when that's about to happen; identical
+   animation, no permanent layer cost while merely scrolling past. */
+.ability-icon-wrap.has-old-underlay:hover > .ability-icon-old-underlay,
+.ability-icon-wrap.has-old-underlay:hover > .ability-icon-img {
+  will-change: transform;
 }
 /* Solitaire shuffle on hover: front icon glides out to the right and tilts
    slightly while the back icon emerges from the left, tilts the opposite

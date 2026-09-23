@@ -138,7 +138,17 @@
   // which silently broke the creep-icon copy handler below.
   const btt = document.querySelector('.back-to-top');
   if (btt) {
-    const updateBtt = () => btt.classList.toggle('visible', window.scrollY > 400);
+    // PERF: classList.toggle() still writes/dirties style even when the
+    // value is unchanged, and this fires on every 'scroll' event (i.e. most
+    // animation frames while scrolling). Track the last state and skip the
+    // DOM write entirely once we're past the 400px threshold either way.
+    let bttVisible = null;
+    const updateBtt = () => {
+      const shouldShow = window.scrollY > 400;
+      if (shouldShow === bttVisible) return;
+      bttVisible = shouldShow;
+      btt.classList.toggle('visible', shouldShow);
+    };
     window.addEventListener('scroll', updateBtt, { passive: true });
     updateBtt();
   }

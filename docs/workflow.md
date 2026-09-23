@@ -266,6 +266,41 @@ Two workflows live in `.github/workflows/`:
   Valve's live API. **Deliberately decoupled from the deploy path** — a
   Valve outage or rate limit must not block an otherwise-good deploy.
 
+## Scroll-performance probe
+
+`tools/perf_probe.py` is a reusable Playwright tool that measures real scroll
+jank on any set of pages: it loads a page headless, then programmatically
+scrolls top-to-bottom while recording per-frame times (p50/p95/max, % of
+frames over 16.7ms/33ms), `longtask` entries, CDP `Performance.getMetrics`
+deltas (Layout/RecalcStyle/Script duration), and static DOM stats (element
+count, depth, images, box-shadow/filter/backdrop-filter/sticky/will-change/
+transform counts).
+
+```powershell
+# Requires a static server for dist/ on :8799 (python -m http.server 8799 from dist/)
+python tools/perf_probe.py                          # default page set, budget p95<=25ms
+python tools/perf_probe.py --urls heroes/anti-mage.html hero_changes.html
+python tools/perf_probe.py --label before            # writes outputs/perf/<date>_before.json
+python tools/perf_probe.py --label after --budget-p95 20
+```
+
+It prints a table (p95, %>16.7ms, %>33ms, long tasks, Layout/Recalc/Script ms,
+PASS/FAIL) and writes the full JSON to `outputs/perf/<date>[_<label>].json`.
+Exit code is non-zero if any page's p95 frame time exceeds the budget, so it
+can be wired into CI later.
+
+For root-causing a regression, use `--extra-style <css-file>` /
+`--extra-script <js-file>` to A/B-test a suspect rule or listener via
+`page.add_style_tag` / `context.add_init_script` before re-running the probe
+— compare the JSON before/after to confirm causation instead of guessing.
+Known finding (2026-09-23): the giant single-page patch documents
+(`patches/7.41.html`, `patches/7.38.html`, 12k-20k+ DOM nodes) still show
+multi-second `RecalcStyleDuration` under scroll — proven (via a temporary
+`:has()`-stripped stylesheet swapped in through `context.route`) to come from
+the ~50 `:has()` selectors in `styles.css` combined with the page size; a full
+fix means computing those conditions at build time into plain classes and is
+tracked as follow-up work, not yet done.
+
 ## Common errors
 
 | Error | Cause |
