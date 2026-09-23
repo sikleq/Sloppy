@@ -3800,6 +3800,29 @@ ul.changes li.li-notag:not([class*="ability-row"]) > .row-text::before,
   margin-right: 8px;
   color: var(--text-dim, #8b949e);
 }
+/* NEW MECHANIC description (plain_header/subgroup new="New mechanic"): how the new thing
+   works, as prose in one soft box — no tag column, no chip, no bullet (patch/page.py
+   _new_mech_rows). Rows with other tags (MISC, DEL…) follow as normal change rows. */
+ul.changes li.mech-desc {
+  grid-template-columns: 1fr auto;
+  padding: 3px 14px;
+  background: var(--muted-04);
+  border-left: 1px solid var(--line-soft);
+  border-right: 1px solid var(--line-soft);
+}
+ul.changes li.mech-desc > .row-tag-empty { display: none; }
+ul.changes li.mech-desc > .row-text { grid-column: 1; text-align: left; }
+ul.changes li.li-notag.mech-desc:not([class*="ability-row"]) > .row-text::before { content: none; display: none; }
+ul.changes li.mech-desc.mech-first {
+  border-top: 1px solid var(--line-soft);
+  border-top-left-radius: 6px; border-top-right-radius: 6px;
+  padding-top: 9px; margin-top: 4px;
+}
+ul.changes li.mech-desc.mech-last {
+  border-bottom: 1px solid var(--line-soft);
+  border-bottom-left-radius: 6px; border-bottom-right-radius: 6px;
+  padding-bottom: 9px; margin-bottom: 8px;
+}
 /* A NEW entity is already flagged by its header label ("New Tier 3 Artifact");
    an ability-row inside it must not repeat a folded NEW chip mid-description. */
 .entity-block.is-new ul.changes li[class*="ability-row"] > .row-text > .badge:first-child {

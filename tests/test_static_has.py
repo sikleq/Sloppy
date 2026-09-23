@@ -44,4 +44,5 @@ def test_new_mechanic_rows_drop_only_the_new_chip():
     out = _new_mech_rows(html)
     assert "<!--NEWMECH-->" not in out
     assert out.count('<span class="row-tag-empty"></span>') == 1        # only the NEW row in the marked list
+    assert 'class="mech-desc mech-first mech-last"' in out               # one-row description box
     assert ">MISC<" in out and out.count(">NEW<") == 1                  # unmarked list keeps its chip
