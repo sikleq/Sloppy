@@ -34,7 +34,7 @@ def save_index_html():
         'terrain':  ('Terrain',    'terrain_741.html'),
         'changelog': ('Changelog', 'changelog.html'),
     }
-    _INV_ICON = {'changelog': 'icon_typewriter.png'}      # tiles whose icon file isn't icon_<key>.png
+    _INV_ICON = {'changelog': 'icon_changelog.png'}      # tiles whose icon file isn't icon_<key>.png
     # Arcana (Neutral Abilities) lives under the Materials sub-nav, so it has no
     # hub tile of its own.
     _INV_PLACEHOLDERS = []
@@ -87,7 +87,7 @@ def save_index_html():
         # Items opener: closed treasure chest at rest; hover plays the chest-open
         # APNG (key → lid opens → gold beam + treasure). See .inv-cell-items CSS.
         _opener_tile('items', 'Items', 'items', 'icon_chest.png'),
-        _opener_tile('heroes', 'Heroes', 'heroes', 'icon_hat.png'),
+        _opener_tile('heroes', 'Heroes', 'heroes', 'icon_helm.png'),
         _link_tile('terrain'),
         _link_tile('changelog'),
     ]
@@ -153,7 +153,7 @@ def save_index_html():
         '<a class="support-btn support-kofi" '
         'href="https://ko-fi.com/sikle" target="_blank" rel="noopener">'
         '<span class="inv-slot">'
-        '<img class="inv-icon" src="icons/ui/gothic/gold_stack.png" alt="">'
+        '<img class="inv-icon" src="icons/ui/gothic/icon_kofi.png" alt="">'
         '<span class="support-eng-tag">ENG</span></span>'
         '<span class="inv-cap">Ko-Fi</span></a>'
         '</div>'
@@ -187,18 +187,18 @@ def save_index_html():
         '<div class="inv-panel creeps-panel" data-panel="creeps" aria-hidden="true">'
         '<div class="support-options">'
         + _panel_link_btn('inv-cell-creeps', 'neutral_stats.html', 'icon_creeps.png', 'Neutrals')
-        + _panel_soon_btn('icon_abilities.png', 'Summons')
-        + _panel_soon_btn('icon_tree.png', 'Lane Creeps')
+        + _panel_soon_btn('icon_summons.png', 'Summons')
+        + _panel_soon_btn('icon_swords.png', 'Lane Creeps')
         + '</div></div>'
     )
     heroes_panel = (
         '<div class="inv-panel heroes-panel" data-panel="heroes" aria-hidden="true">'
         '<div class="support-options">'
         + _panel_link_btn('inv-cell-dynamics', 'heroes_dyn.html', 'icon_dynamics.png', 'Dynamics')
-        + _panel_link_btn('', 'heroes_stats.html', 'icon_typewriter.png', 'Stats')
-        + _panel_link_btn('', 'hero_lab.html', 'icon_teapot.png', 'Hero Lab')
-        + _panel_link_btn('', 'aoe_increase.html', 'icon_abilities.png', 'AoE')
-        + _panel_link_btn('', 'hero_changes.html', 'icon_patch.png', 'Changes')
+        + _panel_link_btn('', 'heroes_stats.html', 'icon_ledger.png', 'Stats')
+        + _panel_link_btn('', 'hero_lab.html', 'icon_flask.png', 'Hero Lab')
+        + _panel_link_btn('', 'aoe_increase.html', 'icon_aoe.png', 'AoE')
+        + _panel_link_btn('', 'hero_changes.html', 'icon_hourglass.png', 'Changes')
         + '</div></div>'
     )
     items_panel = (
@@ -206,7 +206,7 @@ def save_index_html():
         '<div class="support-options">'
         + _panel_link_btn('inv-cell-mana', 'mana_items.html', 'icon_mana.png', 'Mana')
         + _panel_link_btn('inv-cell-dynamics', 'items_dyn.html', 'icon_dynamics.png', 'Dynamics')
-        + _panel_link_btn('', 'item_changes.html', 'icon_patch.png', 'Changes')
+        + _panel_link_btn('', 'item_changes.html', 'icon_hourglass.png', 'Changes')
         + '</div></div>'
     )
     # The divider keeps its place under the title; when the Support panel is
