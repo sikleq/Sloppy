@@ -1394,6 +1394,14 @@ def properties_change(old, new, old_extras=None, new_extras=None):
     n = max(len(old), len(new))
     old_rows = list(old) + [None] * (n - len(old))
     new_rows = list(new) + [None] * (n - len(new))
+    # A value that CHANGED ("+10 Strength" -> "+26 Strength +160%") carries its BUFF/NERF chip
+    # on the NEW side, next to the new value and its badge — content may give it on either side.
+    # DEL stays on the old side (the property is gone), NEW on the new side.
+    for i, (o, nw) in enumerate(zip(old_rows, new_rows)):
+        if (isinstance(o, (tuple, list)) and isinstance(nw, (tuple, list)) and len(o) >= 2
+                and o[0] in ("BUFF", "NERF", "REWORK", "MISC", "QoL") and not nw[0]):
+            old_rows[i] = ("",) + tuple(o[1:])
+            new_rows[i] = (o[0],) + tuple(nw[1:])
     _DYN_PROP_MAP = {"BUFF": "buff", "NERF": "nerf", "NEW": "new",
                      "DEL": "del", "REWORK": "rework", "MISC": "misc",
                      "QoL": "qol"}

@@ -279,6 +279,7 @@ CANONICAL_TAGS = [
     (re.compile(r'\bwill now (?:spawn|grant|provide|give|drop)\b', re.I), 'NEW'),
     (re.compile(r'\bis back in the river\b|\bpits? (?:is |are )?(?:now )?located\b', re.I), 'REWORK'),
     (re.compile(r'\bno longer drops?\b', re.I),                  'DEL'),
+    (re.compile(r'\bno longer stacks?\b', re.I),                 'DEL'),   # a stacking ability is taken away
     # a protection is gone -> a NEW way to interact with it (Kobold aura can now be broken)
     (re.compile(r'\bno longer unbreakable\b', re.I),             'NEW'),
     # something that did not exist before: a cooldown, a restore on use

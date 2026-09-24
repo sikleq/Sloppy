@@ -549,3 +549,7 @@ def test_item_and_creep_canonical_tags_738(text, tag):
 
 def test_creep_level_change_is_misc_not_a_percent_badge():
     assert g._emit_li("Level increased from 5 to 6") == 'W(li("Level increased from 5 to 6", t("MISC")))'
+
+
+def test_no_longer_stacks_is_del():
+    assert g._guess_tag("No longer stacks with itself") == "DEL"

@@ -119,32 +119,34 @@ def changelog():
 
 # ------------------------------------------------ stats: heraldic shield with three stat bars (anim: bars fill)
 # (not a book — the Patches tile is already an open book)
-SHIELD = [(4, 3), (9, 2), (15, 1), (16, 1), (22, 2), (27, 3), (27, 16), (25, 21), (21, 26), (16, 30),
-          (15, 30), (10, 26), (6, 21), (4, 16)]
-FACE = [(7, 5), (15, 4), (16, 4), (24, 5), (24, 16), (22, 20), (19, 24), (16, 27), (15, 27), (12, 24),
-        (9, 20), (7, 16)]
+SHIELD = [(3, 4), (9, 2), (15, 1), (16, 1), (22, 2), (28, 4), (28, 16), (26, 22), (21, 26), (16, 30),
+          (15, 30), (10, 26), (5, 22), (3, 16)]
+FACE = [(6, 6), (15, 4), (16, 4), (25, 6), (25, 16), (23, 21), (19, 24), (16, 27), (15, 27), (12, 24),
+        (8, 21), (6, 16)]
 
 
 def stats():
     s = new()
     part(s, "shield")
-    s.polygon(SHIELD, G4)                                   # gold rim
-    cols(s, 4, 27, 1, 30, [G6, G7, G6, G5, G4, G4, G3, G2])
-    s.polygon(FACE, G0)                                     # dark enamel face
-    cols(s, 7, 24, 4, 27, [G1, G1, G0, G0, G0, O])
-    s.line(8, 5, 14, 4, G7)                                 # rim glint top-left
+    s.polygon(SHIELD, G4)
+    shade_ring(s, 15, 15, G7, G5, G2)                       # bevelled rim: lit top-left, dark bottom-right
+    s.polygon(FACE, G1)                                     # heraldic field, split per pale:
+    s.polygon([(16, 4), (25, 6), (25, 16), (23, 21), (19, 24), (16, 27)], G0)   # right half darker
+    s.line(7, 5, 14, 4, G3)                                 # inner lip under the lit rim
+    s.line(6, 6, 6, 15, G3)
     s.outline(O)
     part(s, "bars")
-    for y, x1 in ((8, 21), (13, 16), (18, 19)):             # three stat bars, different lengths
-        s.rect(9, y, 22, y + 2, O)                          # empty track (dark, so the fill reads)
+    for y, x1 in ((8, 22), (13, 17), (18, 20)):             # three stat bars (3px, lit top, dark base)
+        s.rect(9, y, 22, y + 2, O)                          # empty track
         s.rect(9, y, x1, y + 2, G5)
         s.rect(9, y, x1, y, G7)
         s.rect(9, y + 2, x1, y + 2, G3)
+        s.px(x1, y + 1, G6)                                 # bright leading edge
     s.outline(O)
-    part(s, "boss")
-    s.rect(14, 23, 17, 25, G6)                              # small boss at the tip
-    s.px(14, 23, G7)
-    s.px(17, 25, G2)
+    part(s, "gem")
+    s.polygon([(15, 22), (16, 22), (18, 24), (16, 26), (15, 26), (13, 24)], G6)   # gem at the tip
+    s.px(15, 23, G7)
+    s.px(16, 25, G3)
     s.outline(O)
     return s
 

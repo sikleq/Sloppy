@@ -437,3 +437,12 @@ class TestNoteBox:
         from patch.elements import note_box
         result = note_box("text")
         assert "Note:" in result
+
+
+def test_properties_change_puts_change_chip_on_new_side():
+    from patch.elements import properties_change
+    html = properties_change(old=[("BUFF", "+10 Strength"), ("DEL", "+250 Health")],
+                             new=[("", "+26 Strength", "<b>+160%</b>"), ("NEW", "+25% Slow Resistance")])
+    old_pane, new_pane = html.split("→", 1) if "→" in html else html.split("properties-pane", 2)[1:3]
+    assert 'data-tag="buff"' not in old_pane and 'data-tag="buff"' in new_pane
+    assert 'data-tag="del"' in old_pane

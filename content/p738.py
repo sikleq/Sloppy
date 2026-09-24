@@ -268,7 +268,7 @@ def build():
     W(ul_open())
     W(li("Prowler Aura: Lifesteal rescaled from 10% to 9/10/11/12%", b(10, [9, 10, 11, 12])))
     W(li("Prowler Aura: Health Regen rescaled from 10 to 9/10/11/12", b(10, [9, 10, 11, 12])))
-    W(li("No longer stacks with itself", t("NERF")))
+    W(li("No longer stacks with itself", t("DEL")))
     W(ul_close())
 
     # Ancient Prowler Shaman
