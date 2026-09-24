@@ -6853,6 +6853,28 @@ function ecShopMarkup(panels) {
       d.classList.toggle('is-hidden', !!cat && !(d.dataset.cats || '').split(' ').includes(cat)));
   }
   chips.forEach(c => c.addEventListener('click', () => apply(c.dataset.cat)));
+  // carousels: arrows, dots, and left/right keys while the pointer is over one
+  document.querySelectorAll('.clog-carousel').forEach(car => {
+    const slides = car.querySelectorAll('.clog-shot'), dots = car.querySelectorAll('.clog-dot');
+    const count = car.querySelector('.clog-car-count');
+    let cur = 0;
+    const show = i => {
+      cur = (i + slides.length) % slides.length;
+      slides.forEach((s, k) => s.classList.toggle('is-active', k === cur));
+      dots.forEach((d, k) => d.classList.toggle('is-active', k === cur));
+      count.textContent = (cur + 1) + ' / ' + slides.length;
+    };
+    car.querySelectorAll('.clog-car-btn').forEach(b => b.addEventListener('click', () => show(cur + +b.dataset.step)));
+    dots.forEach(d => d.addEventListener('click', () => show(+d.dataset.i)));
+    let hover = false;
+    car.addEventListener('mouseenter', () => { hover = true; });
+    car.addEventListener('mouseleave', () => { hover = false; });
+    document.addEventListener('keydown', ev => {
+      if (!hover) return;
+      if (ev.key === 'ArrowRight') { show(cur + 1); ev.preventDefault(); }
+      if (ev.key === 'ArrowLeft') { show(cur - 1); ev.preventDefault(); }
+    });
+  });
   const days = [...document.querySelectorAll('.clog-day')];
   const links = new Map([...document.querySelectorAll('.clog-rail-day')].map(a => [a.hash.slice(1), a]));
   function mark() {

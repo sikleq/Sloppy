@@ -41,6 +41,13 @@ SHOTS = {
                                [".container > section >> nth=0", ".container > section >> nth=1"], [], 330),
     "2026-09-22_unit_changes.webp": ("unit_changes.html", None, [".ec-ugrid"], [], 420),
     "2026-09-17_hero_changes.webp": ("hero_changes.html", None, [".ec-index-body"], [], 420),
+    "2026-09-17_item_changes.webp": ("item_changes.html", None, [".ec-igrid"], [], 420),
+    "2026-06-24_aoe_increase.webp": ("aoe_increase.html", None, ["table.aoe-table"], [], 380),
+    "2026-06-13_hero_lab.webp": ("hero_lab.html", None, [".hero-lab"], [], 480),
+    "2026-06-11_heroes_stats.webp": ("heroes_stats.html", None, ["table.hs-table"], [], 380),
+    "2026-06-04_terrain.webp": ("terrain_741.html", None, [".terrain-compare-col"], [], 480),
+    "2026-06-03_heroes_dyn.webp": ("heroes_dyn.html", None, ["table.heroes-dyn-table"], [], 380),
+    "2026-05-19_neutral_stats.webp": ("neutral_stats.html", None, ["table.creeps-table"], [], 380),
 }
 
 
@@ -77,14 +84,14 @@ def shoot(page, name, spec):
     locs[0].scroll_into_view_if_needed()
     page.wait_for_timeout(300)
     # pinned header / toolbars / floating buttons would paint over the shot: hide every
-    # fixed or sticky element that doesn't hold the framed parts
+    # fixed or sticky element outside the framed parts (sticky cells INSIDE a table stay)
     for loc in locs:
         loc.evaluate("e => e.setAttribute('data-shot', '1')")
     page.evaluate("""() => {
         const keep = [...document.querySelectorAll('[data-shot]')];
         for (const el of document.querySelectorAll('body *')) {
             const pos = getComputedStyle(el).position;
-            if ((pos === 'fixed' || pos === 'sticky') && !keep.some(k => el.contains(k)))
+            if ((pos === 'fixed' || pos === 'sticky') && !keep.some(k => el.contains(k) || k.contains(el)))
                 el.style.setProperty('opacity', '0', 'important');
         }
     }""")

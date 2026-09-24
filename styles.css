@@ -9905,6 +9905,17 @@ li.tsp-hidden { display: none !important; }
 /* wide screens: the notes on the left, the screenshots next to them */
 .clog-entry.has-shots { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.6fr); column-gap: 28px; align-items: start; }
 .clog-shots { display: flex; flex-direction: column; gap: 10px; }
+/* carousel: one slide at a time (2+ screenshots) */
+.clog-carousel .clog-shot { display: none; }
+.clog-carousel .clog-shot.is-active { display: block; }
+.clog-car-bar { display: flex; align-items: center; gap: 10px; }
+.clog-car-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line-soft);
+  background: rgba(13,17,23,.6); color: var(--text-main); font-size: 18px; line-height: 1; cursor: pointer; }
+.clog-car-btn:hover { border-color: var(--gold); color: var(--gold); }
+.clog-dots { display: flex; gap: 6px; }
+.clog-dot { width: 8px; height: 8px; padding: 0; border-radius: 50%; border: 0; background: rgba(139,148,158,.35); cursor: pointer; }
+.clog-dot.is-active { background: var(--gold); }
+.clog-car-count { margin-left: auto; font-size: 11.5px; color: var(--text-dim, #8b949e); }
 .clog-entry:last-child { border-bottom: 0; }
 .clog-entry-head { display: flex; align-items: baseline; gap: 10px; }
 .clog-title { margin: 0; font-size: 15px; font-weight: 600; color: var(--text-bright); }
