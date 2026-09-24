@@ -85,7 +85,7 @@ def build():
     W(plain_header("Terrain Changes", terrain_link="7.41"))
     W(subgroup("Trees"))
     W(ul_open())
-    W(li("Removed several trees from Dire Safelane easy pull camp and Radiant Safelane large pull camp", t("DEL")))
+    W(li("Removed several trees from Dire Safelane small pull camp and Radiant Safelane large pull camp", t("DEL")))
     W(ul_close())
     W(subgroup("Towers"))
     W(ul_open())

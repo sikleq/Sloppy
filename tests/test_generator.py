@@ -409,3 +409,31 @@ def test_attr_change_markup_coloured_names_and_entity_arrow():
     assert "<img" not in html                                   # same font as the row, no icons
     assert '<b class="attr-chip is-agi">Agility</b>' in html and '<b class="attr-chip is-uni">Universal</b>' in html
     assert html.startswith("Main attribute changed from")
+
+
+def test_minute_formula_diff_becomes_li_formula_with_minute_table():
+    line = 'W(li("Gold provided after the initial set rescaled from 36 + (9 per 5 minutes) to 40 + (6 per 4 minutes)", t("REWORK")))'
+    out = g._postprocess_minute_formula([line])[0]
+    assert out.startswith("W(li_formula(")
+    assert "lambda M: 36 + 9 * (M // 5)" in out and "lambda M: 40 + 6 * (M // 4)" in out
+    compile(out, "<t>", "eval")
+
+
+def test_plain_per_level_line_is_not_a_minute_formula():
+    line = 'W(li("Damage changed from 10 + 2 per level to 12 + 1 per level", t("REWORK")))'
+    assert g._postprocess_minute_formula([line]) == [line]
+
+
+def test_new_building_block_under_map_objectives_is_new_objective():
+    lines = [
+        'W(plain_header("Map Objectives"))',
+        'W(subgroup("Shrines of Wisdom"))',
+        'W(li("Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom", t("DEL")))',
+        'W(li("Shrines are located in the jungle", t("MISC")))',
+        'W(subgroup("Bounty Runes"))',
+        'W(li("Spawn interval increased from 3 minutes to 4 minutes", t("NERF")))',
+    ]
+    out = g._postprocess_new_block_label(lines)
+    assert out[1] == 'W(subgroup("Shrines of Wisdom", new="New objective"))'
+    assert 't("NEW")' in out[3]
+    assert out[4] == lines[4]

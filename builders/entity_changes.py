@@ -565,7 +565,7 @@ def _hero_card(e: dict) -> str:
 
 
 _UNIT_CAMP_CACHE = None
-_UNIT_ORDER = ["Easy", "Medium", "Large", "Ancient", "Lane Creeps", "Summons", "Other"]
+_UNIT_ORDER = ["Small", "Medium", "Large", "Ancient", "Lane Creeps", "Summons", "Other"]
 # Map units with their own Changes page but no camp: Roshan -> "Other"; the Tormentor is
 # reached from its card on structures.html, not listed among the units.
 _UNIT_BUCKET = {"npc_dota_roshan": "Other"}
@@ -640,7 +640,7 @@ def _unit_slug(basename: str) -> str:
 
 
 # Small camp-difficulty badge shown beside a column title (icons/camps/creepcamp_*).
-_CAMP_TITLE_ICON = {"Easy": "small", "Medium": "mid", "Large": "big", "Ancient": "ancient"}
+_CAMP_TITLE_ICON = {"Small": "small", "Medium": "mid", "Large": "big", "Ancient": "ancient"}
 
 # Structures page — a static catalogue of buildings / map objectives, grouped by
 # type, as (icon basename in icons/structures/, display name).
@@ -678,7 +678,7 @@ _CAMP_OVERRIDE = {
     "npc_dota_neutral_mud_golem_split": "Medium",   # Mud Golem's splinters
     "npc_dota_neutral_centaur_khan": "Large",        # Centaur Conqueror leads the Large camp
 }
-_CAMP_SIZE_DIFF = {"small": "Easy", "mid": "Medium", "big": "Large", "ancient": "Ancient"}
+_CAMP_SIZE_DIFF = {"small": "Small", "mid": "Medium", "big": "Large", "ancient": "Ancient"}
 _CAMP_SIZE_RANK = {"small": 0, "mid": 1, "big": 2, "ancient": 3}
 
 
@@ -698,14 +698,14 @@ def _creep_display_names() -> dict:
 
 
 def _unit_camp_map() -> dict:
-    """npc_dota_neutral_* -> neutral-camp difficulty (Easy/Medium/Large/Ancient).
+    """npc_dota_neutral_* -> neutral-camp difficulty (Small/Medium/Large/Ancient).
     Authoritative source: the hand-maintained CREEP_CAMP table in
     builders/creeps.py (createhero shortname -> in-game camp size[s]), the same
     data that drives the camp badges on Neutral Stats. When a creep spawns in
     several camp sizes, the SMALLEST is used so it shows at the level it first
     appears (e.g. Centaur Outrunner / Satyr Trickster -> Medium).
     (The old ⬤-column of creeps_raw.csv mis-filed the secondary members of a
-    camp, e.g. Prowler Acolyte in Easy — CREEP_CAMP fixes that.)"""
+    camp, e.g. Prowler Acolyte in Small — CREEP_CAMP fixes that.)"""
     global _UNIT_CAMP_CACHE
     if _UNIT_CAMP_CACHE is not None:
         return _UNIT_CAMP_CACHE

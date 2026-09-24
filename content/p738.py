@@ -25,14 +25,17 @@ def build():
     W(li("The top and bottom outer rim areas are now flooded by streams of traversable water", t("NEW")))
     W(li("These streams have a current, starting near the T3 towers (right before the medium camp location), down to the T1 towers (former Twin Gate location)", t("NEW")))
     W(li("Going downstream increases current and max movement speed, while going upstream inflicts no penalty", t("NEW"), extra=inline_note("Streams are separated by two zones: ones with a 'strong current' which provides up to 150 bonus movement speed and ones with a 'moderate current' which provides up to 100 bonus speed. The current is 'strong' from stream beginnings near each base up to the waterfalls near T2 towers. All other stream sections are considered to have a 'moderate current'<br>Bonus value depends on the faced direction, ranging from 100% while going downstream to 0% at 90 degrees")))
-    W(li("Radiant and Dire main jungles now also have a stream with moderate current, starting near the easy camp close to the mid T1 towers. They join the outer streams, crossing the safelane near the T2 towers", t("NEW")))
+    W(li("Radiant and Dire main jungles now also have a stream with moderate current, starting near the small camp close to the mid T1 towers. They join the outer streams, crossing the safelane near the T2 towers", t("NEW")))
     W(li("Watchers, camps and pathways in the areas have been slightly adjusted to give way for the stream", t("MISC")))
     W(ul_close())
 
     W(plain_header("Map Objectives"))
     W(subgroup("Bounty Runes"))
     W(ul_open())
-    W(li("Gold provided after the initial set rescaled from 36 + (9 per 5 minutes) to 40 + (6 per 4 minutes)", t("REWORK")))
+    W(li_formula("Gold provided after the initial set rescaled", "36 + (9 per 5 minutes)", "40 + (6 per 4 minutes)",
+                 lambda M: 36 + 9 * (M // 5), lambda M: 40 + 6 * (M // 4),
+                 levels=[4, 5, 8, 10, 12, 15, 16, 20, 25, 30, 35, 40, 45, 50, 55, 60],
+                 level_fmt=lambda M: f"{M}:00", headline_level=4, jump_at=None, value_fmt="{:g}g"))
     W(li("Spawn interval increased from 3 minutes to 4 minutes", b(3, 4, l=True)))
     W(ul_close())
     W(subgroup("Lotus Pools"))
@@ -41,7 +44,7 @@ def build():
     W(li("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Great Lotuses they could form")))
     W(li("Lotus Pools will now spawn Greater Lotuses after Tier 5 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Great Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Greater Lotuses they could form")))
     W(ul_close())
-    W(subgroup("Shrines of Wisdom", new="New mechanic"))
+    W(subgroup("Shrines of Wisdom", new="New objective"))
     W(ul_open())
     W(li("Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom", t("DEL")))
     W(li("Shrines of Wisdom are located in the offlane side jungles between the Tier 1 and 2 towers where the Ancient camps used to be", t("NEW")))
@@ -111,15 +114,15 @@ def build():
     # Flooded Camps (label — no own changes; sub-units follow)
     W(plain_header("Flooded Camps", dynamics=False, new="New mechanic"))
     W(ul_open())
-    W(li("Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian neutral creeps", t("NEW"), extra=inline_note("Easy camp on the rim between tier 1 and tier 2 towers<br>Medium camp on the rim near tier 2 tower<br>Medium camp in the main jungle that was on the stream's way and used to be a Large camp")))
-    W(li("As the tides of battle rise, every 5 minutes one creep in a Flooded Camp is permanently upgraded to the next tier", t("NEW"), extra=inline_note("Each camp has 3 units, so at 15:00 the Easy camp becomes a Medium camp and both Medium camps become Large; at 30:00 the Medium camp becomes Large and both Large camps become Ancient")))
+    W(li("Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian neutral creeps", t("NEW"), extra=inline_note("Small camp on the rim between tier 1 and tier 2 towers<br>Medium camp on the rim near tier 2 tower<br>Medium camp in the main jungle that was on the stream's way and used to be a Large camp")))
+    W(li("As the tides of battle rise, every 5 minutes one creep in a Flooded Camp is permanently upgraded to the next tier", t("NEW"), extra=inline_note("Each camp has 3 units, so at 15:00 the Small camp becomes a Medium camp and both Medium camps become Large; at 30:00 the Medium camp becomes Large and both Large camps become Ancient")))
     W(li("These camps consist of the following creeps" + camp_table([
-        ("Easy camp", [(3, "Pollywog", _NC_CDN + "tadpole.png")]),
+        ("Small camp", [(3, "Pollywog", _NC_CDN + "tadpole.png")]),
         ("Medium camp", [(2, "Boglet", _NC_CDN + "froglet.png"), (1, "Marshmage Apprentice", _NC_CDN + "froglet_mage.png")]),
         ("Large camp", [(2, "Croaker", _NC_CDN + "grown_frog.png"), (1, "Marshmage", _NC_CDN + "grown_frog_mage.png")]),
         ("Ancient camp", [(2, "Ancient Croaker", _NC_CDN + "ancient_frog.png"), (1, "Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png")]),
     ]), t("NEW")))
-    W(li("Each creep can only be upgraded twice, so an Easy camp never reaches Ancient status", t("NEW")))
+    W(li("Each creep can only be upgraded twice, so a Small camp never reaches Ancient status", t("NEW")))
     W(li("Units are not upgraded while the camp is blocked, and the number of upgraded units can't be increased", t("NEW")))
     W(ul_close())
 

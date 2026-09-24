@@ -1702,6 +1702,84 @@ def _postprocess_drop_now_requires(lines):
     return out
 
 
+# "36 + (9 per 5 minutes)" / "40 + 6 per minute" — a value that grows with GAME
+# TIME. A "from <formula> to <formula>" line of two such formulas becomes a
+# li_formula with a minute table (memory sloppy_per_minute_formula_table).
+_PER_MINUTES_FORMULA_RE = re.compile(
+    r'^(?P<base>\d+(?:\.\d+)?)\s*\+\s*\(?\s*(?P<inc>\d+(?:\.\d+)?)\s+(?:\w+\s+)?'
+    r'(?:per|every)\s+(?:(?P<n>\d+)\s+)?min(?:ute)?s?\s*\)?$'
+)
+_MINUTE_GRID = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
+
+
+def _minute_lambda(m):
+    base, inc, n = m.group('base'), m.group('inc'), m.group('n')
+    return (f'lambda M: {base} + {inc} * (M // {n})' if n and n != '1'
+            else f'lambda M: {base} + {inc} * M')
+
+
+def _postprocess_minute_formula(lines):
+    """W(li("X from A + (B per N minutes) to C + (D per K minutes)", t(..)))
+    -> W(li_formula(...)) with a minute table (5:00 … 60:00)."""
+    out = []
+    for line in lines:
+        diff = _FORMULA_DIFF_LINE_RE.match(line)
+        mo = mn = None
+        if diff:
+            mo = _PER_MINUTES_FORMULA_RE.match(diff.group('old').strip())
+            mn = _PER_MINUTES_FORMULA_RE.match(diff.group('new').strip())
+        if not (mo and mn):
+            out.append(line)
+            continue
+        out.append(
+            f'W(li_formula("{diff.group("prefix")}", "{diff.group("old")}", "{diff.group("new")}", '
+            f'{_minute_lambda(mo)}, {_minute_lambda(mn)}, levels={_MINUTE_GRID}, '
+            f'level_fmt=lambda M: f"{{M}}:00", headline_level=5, jump_at=None))'
+        )
+    return out
+
+
+# A block (plain_header / subgroup) that introduces something brand new gets a
+# label after its title: "New objective" for map objectives (buildings, shrines,
+# runes, bosses), "New mechanic" otherwise. Its MISC rows become NEW.
+_NEW_BLOCK_RE = re.compile(
+    r'\breplaced with (?:a )?new\b|\bnew (?:buildings?|objectives?|structures?|mechanics?)\b'
+    r'|\b(?:has|have) been added to the map\b', re.I)
+_NEW_OBJECTIVE_RE = re.compile(
+    r'\b(?:buildings?|objectives?|structures?|shrines?|runes?|outposts?|pools?|boss(?:es)?)\b', re.I)
+_BLOCK_HEAD_RE = re.compile(r'^W\((?P<fn>plain_header|subgroup)\("(?P<title>[^"]+)"(?P<rest>.*)\)\)$')
+
+
+def _postprocess_new_block_label(lines):
+    out = list(lines)
+    section = ''
+    for i, line in enumerate(out):
+        head = _BLOCK_HEAD_RE.match(line)
+        if not head:
+            continue
+        if head.group('fn') == 'plain_header':
+            section = head.group('title')
+        if 'new=' in head.group('rest'):
+            continue
+        j = i + 1
+        rows = []
+        while j < len(out) and not _BLOCK_HEAD_RE.match(out[j]):
+            if out[j].startswith('W(li("'):
+                rows.append(j)
+            j += 1
+        # the announcing row must be the block's FIRST row — a later "replaced
+        # with new …" line inside an old block is an ordinary change
+        if not rows or not _NEW_BLOCK_RE.search(out[rows[0]]):
+            continue
+        objective = (section.lower() == 'map objectives'
+                     or _NEW_OBJECTIVE_RE.search(out[rows[0]]))
+        label = 'New objective' if objective else 'New mechanic'
+        out[i] = line[:-2] + f', new="{label}"))'
+        for r in rows:
+            out[r] = out[r].replace('t("MISC")', 't("NEW")')
+    return out
+
+
 def _postprocess_rework_marker(lines):
     """Add a TODO breadcrumb above W(ability(...)) blocks whose first li
     announces a REWORKED ability ("Innate ability reworked" / "Ability
@@ -2133,7 +2211,9 @@ def generate(version):
     # 2. Auto-emit scale_pill(...) for per-level formula text.
     # 3. Drop a v2-todo breadcrumb above ability blocks tagged "reworked".
     out = _postprocess_aghs_merge(out)
+    out = _postprocess_minute_formula(out)
     out = _postprocess_scale_pill(out)
+    out = _postprocess_new_block_label(out)
     out = _postprocess_properties_change(out)
     out = _postprocess_drop_now_requires(out)
     out = _postprocess_recipe_cost_zero_net(out)
