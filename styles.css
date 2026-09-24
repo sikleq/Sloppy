@@ -9884,7 +9884,8 @@ li.tsp-hidden { display: none !important; }
 .clog-container { max-width: none; margin: 0; padding: 22px 32px 60px; }
 .clog-layout { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 32px; align-items: start; }
 .clog-rail { position: sticky; top: 70px; display: flex; flex-direction: column; gap: 2px;
-  max-height: calc(100vh - 90px); overflow-y: auto; }
+  max-height: calc(100vh - 90px); overflow-y: auto;
+  padding-right: 18px; border-right: 1px solid rgba(139,148,158,.16); }
 .clog-rail-month { font-family: 'Jersey 10', monospace; font-size: 17px; color: var(--gold);
   letter-spacing: .4px; margin: 10px 0 4px; }
 .clog-rail-month:first-child { margin-top: 0; }
@@ -9908,14 +9909,34 @@ li.tsp-hidden { display: none !important; }
 /* carousel: one slide at a time (2+ screenshots) */
 .clog-carousel .clog-shot { display: none; }
 .clog-carousel .clog-shot.is-active { display: block; }
-.clog-car-bar { display: flex; align-items: center; gap: 10px; }
-.clog-car-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line-soft);
-  background: rgba(13,17,23,.6); color: var(--text-main); font-size: 18px; line-height: 1; cursor: pointer; }
-.clog-car-btn:hover { border-color: var(--gold); color: var(--gold); }
-.clog-dots { display: flex; gap: 6px; }
-.clog-dot { width: 8px; height: 8px; padding: 0; border-radius: 50%; border: 0; background: rgba(139,148,158,.35); cursor: pointer; }
-.clog-dot.is-active { background: var(--gold); }
-.clog-car-count { margin-left: auto; font-size: 11.5px; color: var(--text-dim, #8b949e); }
+/* the carousel strip: a visible bar under the slide — site pixel-arrow buttons at the ends,
+   pixel-square dots + counter in the middle */
+.clog-car-bar { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px;
+  padding: 7px 10px; border: 1px solid rgba(227,196,106,.28); border-radius: 8px;
+  background: linear-gradient(180deg, rgba(59,46,29,.38), rgba(42,32,20,.28));
+  box-shadow: inset 0 1px 0 rgba(227,196,106,.08); }
+.clog-car-mid { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.clog-car-btn { width: 32px; height: 32px; padding: 0; appearance: none; border-radius: 50%;
+  border: 2px solid var(--gold); cursor: pointer; image-rendering: pixelated;
+  background-repeat: no-repeat; background-position: center; background-size: auto 16px, cover;
+  box-shadow: 0 3px 10px var(--shadow-45); transition: transform .12s ease, filter .15s ease; }
+.clog-car-btn.is-prev { background-image:
+  url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="10" y="0" width="2" height="2"/><rect x="8" y="2" width="4" height="2"/><rect x="6" y="4" width="6" height="2"/><rect x="4" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="4" y="10" width="8" height="2"/><rect x="6" y="12" width="6" height="2"/><rect x="8" y="14" width="4" height="2"/><rect x="10" y="16" width="2" height="2"/></g></svg>'),
+  linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%); }
+.clog-car-btn.is-next { background-image:
+  url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="2" y="0" width="2" height="2"/><rect x="2" y="2" width="4" height="2"/><rect x="2" y="4" width="6" height="2"/><rect x="2" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="2" y="10" width="8" height="2"/><rect x="2" y="12" width="6" height="2"/><rect x="2" y="14" width="4" height="2"/><rect x="2" y="16" width="2" height="2"/></g></svg>'),
+  linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%); }
+.clog-car-btn:hover { filter: brightness(1.2); }
+.clog-car-btn.is-prev:hover { transform: translateX(-1px); }
+.clog-car-btn.is-next:hover { transform: translateX(1px); }
+/* dots = small pixel squares: gold outline, the current one filled and glowing */
+.clog-dots { display: flex; gap: 7px; }
+.clog-dot { width: 10px; height: 10px; padding: 0; appearance: none; border-radius: 1px; cursor: pointer;
+  border: 2px solid rgba(227,196,106,.45); background: transparent; image-rendering: pixelated;
+  transition: background .15s, border-color .15s, box-shadow .15s; }
+.clog-dot:hover { border-color: var(--gold); }
+.clog-dot.is-active { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 6px rgba(227,196,106,.55); }
+.clog-car-count { font-family: 'Jersey 10', monospace; font-size: 16px; letter-spacing: .5px; color: var(--gold-dim); }
 .clog-entry:last-child { border-bottom: 0; }
 .clog-entry-head { display: flex; align-items: baseline; gap: 10px; }
 .clog-title { margin: 0; font-size: 15px; font-weight: 600; color: var(--text-bright); }
@@ -9947,7 +9968,8 @@ li.tsp-hidden { display: none !important; }
 .clog-page .clog-entry.is-hidden, .clog-page .clog-day.is-hidden, .clog-page .clog-rail-day.is-hidden { display: none; }
 @media (max-width: 760px) {
   .clog-layout { grid-template-columns: 1fr; }
-  .clog-rail { position: static; flex-direction: row; flex-wrap: wrap; max-height: none; }
+  .clog-rail { position: static; flex-direction: row; flex-wrap: wrap; max-height: none;
+    padding: 0 0 12px; border-right: 0; border-bottom: 1px solid rgba(139,148,158,.16); }
   .clog-rail-month { width: 100%; }
   .clog-shot { margin-left: 0; }
 }

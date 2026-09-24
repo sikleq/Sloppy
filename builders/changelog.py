@@ -73,10 +73,10 @@ def _shots_html(e):
     return (f'<div class="clog-shots clog-carousel" data-n="{len(paths)}">'
             f'<div class="clog-slides">{slides}</div>'
             '<div class="clog-car-bar">'
-            '<button class="clog-car-btn" data-step="-1" aria-label="Previous">&#8249;</button>'
-            f'<span class="clog-dots">{dots}</span>'
-            f'<span class="clog-car-count">1 / {len(paths)}</span>'
-            '<button class="clog-car-btn" data-step="1" aria-label="Next">&#8250;</button>'
+            '<button class="clog-car-btn is-prev" data-step="-1" aria-label="Previous screenshot"></button>'
+            f'<span class="clog-car-mid"><span class="clog-dots">{dots}</span>'
+            f'<span class="clog-car-count">1 / {len(paths)}</span></span>'
+            '<button class="clog-car-btn is-next" data-step="1" aria-label="Next screenshot"></button>'
             '</div></div>')
 
 
