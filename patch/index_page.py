@@ -6,101 +6,8 @@ import re
 
 import builders.site_common as _site
 
-from .meta import PATCHES, RELEASE_HISTORY, _render_top_nav
+from .meta import PATCHES, _render_top_nav
 from .page import _ASSET_VERSION
-
-# Manual "page" entries in the What's New popup.
-# Date = when the page was added to the site (not Valve's release date).
-_WHATSNEW_PAGES = [
-    ("page",  "AoE Increase",   "Jun 24", "aoe_increase.html"),
-    ("page",  "Hero Lab",       "Jun 13", "hero_lab.html"),
-    ("page",  "Item Dynamics",  "Jun 5",  "items_dyn.html"),
-    ("page",  "Hero Dynamics",  "Jun 3",  "heroes_dyn.html"),
-    ("page",  "Neutral Creeps", "May 19", "neutral_stats.html"),
-]
-
-# "Added to site" dates for patch pages — loaded from data/site_meta.json at runtime.
-# Fallback dict covers entries that existed before the auto-registration was added.
-_PATCH_SITE_DATES_FALLBACK = {
-    "7.41d": "Jun 5",
-    "7.39c": "Jun 19",
-    "7.39d": "Jun 18",
-    "7.39e": "Jun 14",
-}
-
-def _load_patch_site_dates():
-    import json, os
-    try:
-        with open(os.path.join(os.path.dirname(__file__), "..", "data", "site_meta.json"), encoding="utf-8") as f:
-            return json.load(f).get("patch_site_dates") or _PATCH_SITE_DATES_FALLBACK
-    except Exception:
-        return _PATCH_SITE_DATES_FALLBACK
-
-_WHATSNEW_MAX = 10
-
-
-def _build_whatsnew():
-    """Merge manual page entries with patch entries from PATCHES,
-    sorted newest first. Patch dates come from _PATCH_SITE_DATES;
-    patches not in that dict are omitted from the popup.
-    Total capped at _WHATSNEW_MAX entries."""
-    import datetime
-
-    def _sort_key(entry):
-        _, _, date_str, _ = entry
-        try:
-            dt = datetime.datetime.strptime(f"{date_str} 2026", "%b %d %Y")
-            ref = datetime.datetime.now()
-            if dt > ref:
-                dt = dt.replace(year=dt.year - 1)
-            return dt
-        except ValueError:
-            return datetime.datetime.min
-
-    patch_site_dates = _load_patch_site_dates()
-    patch_entries = []
-    for p in PATCHES:
-        site_date = patch_site_dates.get(p["version"])
-        if site_date:
-            patch_entries.append(("patch", p["version"], site_date, p["filename"]))
-
-    combined = list(_WHATSNEW_PAGES) + patch_entries
-    combined.sort(key=_sort_key, reverse=True)
-    return combined[:_WHATSNEW_MAX]
-
-# Pixel "!" SVG (crispEdges rects, same style as nav-back-arrow).
-# ViewBox 4x12: body 4×8, gap 2, dot 4×2.
-_WN_EXCL_SVG = (
-    "data:image/svg+xml;utf8,"
-    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 12' shape-rendering='crispEdges'>"
-    "<rect x='0' y='0' width='4' height='8' fill='%23e3c46a'/>"
-    "<rect x='0' y='10' width='4' height='2' fill='%23e3c46a'/>"
-    "</svg>"
-)
-
-
-def _whatsnew_html():
-    entries = _build_whatsnew()
-    rows = []
-    for kind, label, date, href in entries:
-        tag = f'<span class="whatsnew-tag whatsnew-tag-{kind}">{kind}</span>'
-        date_span = f'<span class="whatsnew-date">{date}</span>'
-        rows.append(
-            f'<a class="whatsnew-row" href="{href}">'
-            f'{tag}{_html.escape(label)}{date_span}</a>'
-        )
-    items = '\n'.join(rows)
-    # data-wn-sig = date of newest entry; JS uses it to build a versioned
-    # localStorage key so the NEW animation re-fires when a new entry appears.
-    sig = entries[0][2].replace(' ', '') if entries else ''
-    # The badge sits inside .version-beta-wrap (in site_common.py) so it's
-    # positioned at the bottom-right corner of the BETA label.
-    # The popup is body-level so it isn't clipped by the nav overflow.
-    return (
-        f'<div class="whatsnew-popup" data-wn-sig="{sig}" role="dialog" aria-label="What\'s new">\n'
-        f'  <div class="whatsnew-list">{items}</div>\n'
-        '</div>'
-    )
 
 
 def save_index_html():
@@ -125,7 +32,9 @@ def save_index_html():
         'patch':    ('Changelogs', f'patches/{latest}.html' if latest else 'calendar.html'),
         'calendar': ('Calendar',   'calendar.html'),
         'terrain':  ('Terrain',    'terrain_741.html'),
+        'changelog': ('Changelog', 'changelog.html'),
     }
+    _INV_ICON = {'changelog': 'icon_typewriter.png'}      # tiles whose icon file isn't icon_<key>.png
     # Arcana (Neutral Abilities) lives under the Materials sub-nav, so it has no
     # hub tile of its own.
     _INV_PLACEHOLDERS = []
@@ -149,7 +58,7 @@ def save_index_html():
         return (
             f'<a class="inv-cell inv-filled inv-cell-{key}" href="{href}">'
             f'<span class="inv-slot">'
-            f'<img class="inv-icon" src="icons/ui/gothic/icon_{key}.png" alt="">'
+            f'<img class="inv-icon" src="icons/ui/gothic/{_INV_ICON.get(key, f"icon_{key}.png")}" alt="">'
             f'</span>'
             f'<span class="inv-cap">{label}</span>'
             f'</a>'
@@ -180,6 +89,7 @@ def save_index_html():
         _opener_tile('items', 'Items', 'items', 'icon_chest.png'),
         _opener_tile('heroes', 'Heroes', 'heroes', 'icon_hat.png'),
         _link_tile('terrain'),
+        _link_tile('changelog'),
     ]
     # Special "star" tile — the slot emits a faint pixel-gold glow (hinting it's
     # special); on hover the star pulses (grows/shrinks) and throws off a burst
@@ -450,7 +360,6 @@ def save_index_html():
         f'{nav}\n'
         f'{sig_layer}\n'
         f'<div class="container main-page">{grid_html}</div>\n'
-        f'{_whatsnew_html()}\n'
         f'<script defer src="src/scripts.js?v={_ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'
     )

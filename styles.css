@@ -9880,82 +9880,52 @@ li.tsp-hidden { display: none !important; }
   box-shadow: inset 0 0 16px var(--shadow-55);
 }
 
-/* ---- What's New badge (index.html, anchored to BETA label) ---- */
-.version-beta-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-/* Seen state = BETA stays at its default colour, no animation */
-
-/* Unseen state = BETA pulses between its base colour and the sikle gold */
-.version-beta-wrap:not(.wn-seen) .version-beta-text {
-  display: inline-block;
-  animation: whatsnew-breathe 2s ease-in-out infinite;
-}
-.version-beta-wrap { cursor: pointer; }
-.version-beta-wrap .version.version-beta { cursor: pointer; }
-@keyframes whatsnew-breathe {
-  0%   { color: var(--text-main); transform: scale(1);    }
-  50%  { color: var(--gold-dim); transform: scale(1.12); }
-  100% { color: var(--text-main); transform: scale(1);    }
-}
-
-.whatsnew-popup {
-  position: fixed;
-  z-index: 200;
-  background: var(--bg-panel);
-  border: 1px solid var(--blue-35);
-  border-radius: 7px;
-  min-width: 240px;
-  max-width: 310px;
-  box-shadow: 0 8px 28px var(--shadow-65);
-  display: none;
-  overflow: hidden;
-}
-.whatsnew-popup.wn-open { display: block; }
-.whatsnew-popup-head {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--line-soft);
-  font-family: 'Jersey 10', monospace;
-  font-size: 15px;
-  color: var(--gold);
-  letter-spacing: 0.4px;
-}
-.whatsnew-list { padding: 5px 0; }
-.whatsnew-row {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 12px;
-  font-size: 12px;
-  color: var(--text-main);
-  text-decoration: none;
-  transition: background 0.12s;
-}
-a.whatsnew-row:hover {
-  background: rgba(139, 148, 158, 0.1);
-  color: var(--text-bright);
-}
-.whatsnew-tag {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  padding: 2px 5px;
-  border-radius: 2px;
-  text-align: center;
-  box-sizing: border-box;
-}
-.whatsnew-tag-page  { background: rgba(88, 166, 255, 0.10); color: #79afd1; border: 1px solid rgba(88, 166, 255, 0.26); }
-.whatsnew-tag-patch { background: rgba(227, 196, 106, 0.10); color: #b89d5a; border: 1px solid rgba(227, 196, 106, 0.26); }
-.whatsnew-tag-hero  { background: rgba(120, 215, 145, 0.10); color: #7aaa84; border: 1px solid rgba(120, 215, 145, 0.24); }
-.whatsnew-date {
-  font-size: 10px;
-  color: #6b7280;
-  white-space: nowrap;
-  justify-self: end;
+/* ---- Site changelog (changelog.html, builders/changelog.py) ---- */
+.clog-container { max-width: 1100px; margin: 0 auto; padding: 22px 20px 60px; }
+.clog-layout { display: grid; grid-template-columns: 150px 1fr; gap: 28px; align-items: start; }
+.clog-rail { position: sticky; top: 70px; display: flex; flex-direction: column; gap: 2px;
+  max-height: calc(100vh - 90px); overflow-y: auto; }
+.clog-rail-month { font-family: 'Jersey 10', monospace; font-size: 17px; color: var(--gold);
+  letter-spacing: .4px; margin: 10px 0 4px; }
+.clog-rail-month:first-child { margin-top: 0; }
+.clog-rail-day { display: flex; justify-content: space-between; padding: 3px 8px; border-radius: 4px;
+  color: var(--text-main); text-decoration: none; font-size: 13px; border-left: 2px solid transparent; }
+.clog-rail-day span { color: var(--text-dim, #8b949e); font-size: 11px; }
+.clog-rail-day:hover { background: rgba(139,148,158,.1); color: var(--text-bright); }
+.clog-rail-day.is-current { border-left-color: var(--gold); color: var(--text-bright); }
+.clog-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.clog-chip { background: transparent; border: 1px solid var(--line-soft); color: var(--text-main);
+  border-radius: 14px; padding: 4px 12px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.clog-chip:hover { border-color: var(--gold-dim); color: var(--text-bright); }
+.clog-chip.active { border-color: var(--gold); color: var(--gold); background: rgba(227,196,106,.08); }
+.clog-day { margin-bottom: 26px; scroll-margin-top: 70px; }
+.clog-date { font-family: 'Jersey 10', monospace; font-weight: 400; font-size: 24px; color: var(--gold);
+  letter-spacing: .5px; margin: 0 0 10px; padding-bottom: 5px; border-bottom: 1px solid var(--line-soft); }
+.clog-entry { padding: 10px 0 12px; border-bottom: 1px solid var(--line-soft); }
+.clog-entry:last-child { border-bottom: 0; }
+.clog-entry-head { display: flex; align-items: baseline; gap: 10px; }
+.clog-title { margin: 0; font-size: 15px; font-weight: 600; color: var(--text-bright); }
+.clog-cat { flex: none; font-size: 10px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
+  padding: 2px 6px; border-radius: 3px; border: 1px solid; }
+.clog-cat-patch-reader { color: #d7b56a; border-color: rgba(227,196,106,.35); background: rgba(227,196,106,.08); }
+.clog-cat-materials    { color: #7fb2d9; border-color: rgba(88,166,255,.35);  background: rgba(88,166,255,.08); }
+.clog-cat-hero-lab     { color: #86b98f; border-color: rgba(120,215,145,.35); background: rgba(120,215,145,.08); }
+.clog-cat-dynamics     { color: #c29be0; border-color: rgba(190,140,240,.35); background: rgba(190,140,240,.08); }
+.clog-cat-site         { color: #a9b1ba; border-color: rgba(139,148,158,.35); background: rgba(139,148,158,.08); }
+.clog-items { margin: 7px 0 0; padding-left: 20px; color: var(--text-main); font-size: 13.5px; line-height: 1.55; }
+.clog-items li::marker { color: var(--gold); }
+.clog-open { display: inline-block; margin: 6px 0 0 20px; font-size: 12.5px; color: var(--gold); text-decoration: none; }
+.clog-open:hover { text-decoration: underline; }
+.clog-shot { display: block; margin: 10px 0 0 20px; max-width: 640px; }
+.clog-shot img { display: block; width: 100%; height: auto; border: 1px solid var(--line-soft);
+  border-radius: 6px; box-shadow: 0 4px 14px var(--shadow-45); }
+.clog-shot:hover img { border-color: var(--gold-dim); }
+.clog-page .clog-entry.is-hidden, .clog-page .clog-day.is-hidden, .clog-page .clog-rail-day.is-hidden { display: none; }
+@media (max-width: 760px) {
+  .clog-layout { grid-template-columns: 1fr; }
+  .clog-rail { position: static; flex-direction: row; flex-wrap: wrap; max-height: none; }
+  .clog-rail-month { width: 100%; }
+  .clog-shot { margin-left: 0; }
 }
 
 /* ==========================================================================

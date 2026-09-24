@@ -358,11 +358,18 @@ def build():
     W(ul_close())
     W(item_header("Abyssal Blade", changed=True))
     W(auto_components_change("Abyssal Blade", "7.38"))
+    # old values: game KV 7.37e (dotabuff/d2vpkr items.txt) — Damage unchanged, Strength 10 -> 26
     W(properties_change(
-        old=[("DEL", "+250 Health"), ("DEL", "+10 Health Regen")],
-        new=[("", "+35 Damage"), ("", "+26 Strength"), ("", "+25% Slow Resistance"), ("", "+25% Health and Lifesteal Amp")]))
+        old=[("",     "+35 Damage"),
+             ("BUFF", "+10 Strength"),
+             ("DEL",  "+250 Health"),
+             ("DEL",  "+10 Health Regen")],
+        new=[("",     "+35 Damage"),
+             ("",     "+26 Strength", b(10, 26)),
+             ("NEW",  "+25% Slow Resistance"),
+             ("NEW",  "+25% Health and Lifesteal Amp")]))
     W(ul_open())
-    W(li("Removed Damage Block ability", t("DEL")))
+    W(li("Removed Damage Block ability", t("DEL"), extra=inline_note("Blocked 70 damage from melee / 35 from ranged attacks with a 60% chance")))
     W(ul_close())
     W(item_header("Arcane Boots"))
     W(ul_open())

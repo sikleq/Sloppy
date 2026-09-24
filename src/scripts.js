@@ -6841,57 +6841,27 @@ function ecShopMarkup(panels) {
   document.addEventListener('focusin', handler, true);
 })();
 
-// ---- WHAT'S NEW badge (index.html) ----
+// ---- SITE CHANGELOG (changelog.html): category chips + current date in the rail ----
 (function() {
-  const btn = document.querySelector('.version-beta-wrap');
-  const popup = document.querySelector('.whatsnew-popup');
-  if (!btn || !popup) return;
-  const sig = popup.dataset.wnSig || 'v1';
-  const LS_KEY = 'wn_seen_' + sig;
-  // Guard storage access: some privacy contexts throw "Access to storage is not
-  // allowed from this context" on any localStorage read.
-  try { if (localStorage.getItem(LS_KEY)) btn.classList.add('wn-seen'); } catch (e) {}
-
-  function place() {
-    // measure with display:block to get real dimensions
-    const wasHidden = !popup.classList.contains('wn-open');
-    if (wasHidden) { popup.style.visibility = 'hidden'; popup.style.display = 'block'; }
-    const pr = popup.getBoundingClientRect();
-    const br = btn.getBoundingClientRect();
-    if (wasHidden) { popup.style.display = ''; popup.style.visibility = ''; }
-    const gap = 10, vw = window.innerWidth, vh = window.innerHeight;
-    let top = br.top - pr.height - gap;
-    if (top < gap) top = br.bottom + gap;
-    top = Math.max(gap, Math.min(top, vh - pr.height - gap));
-    let left = br.right - pr.width;
-    left = Math.max(gap, Math.min(left, vw - pr.width - gap));
-    popup.style.top = top + 'px';
-    popup.style.left = left + 'px';
+  if (!document.body.classList.contains('clog-page')) return;
+  const chips = document.querySelectorAll('.clog-chip');
+  function apply(cat) {
+    chips.forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
+    document.querySelectorAll('.clog-entry').forEach(e =>
+      e.classList.toggle('is-hidden', !!cat && e.dataset.cat !== cat));
+    document.querySelectorAll('.clog-day, .clog-rail-day').forEach(d =>
+      d.classList.toggle('is-hidden', !!cat && !(d.dataset.cats || '').split(' ').includes(cat)));
   }
-
-  btn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    if (popup.classList.contains('wn-open')) {
-      popup.classList.remove('wn-open');
-    } else {
-      place();
-      popup.classList.add('wn-open');
-      if (!btn.classList.contains('wn-seen')) {
-        btn.classList.add('wn-seen');
-        try { localStorage.setItem(LS_KEY, '1'); } catch(_) {}
-      }
-    }
-  });
-  document.addEventListener('click', function(e) {
-    if (!popup.contains(e.target) && e.target !== btn)
-      popup.classList.remove('wn-open');
-  });
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') popup.classList.remove('wn-open');
-  });
-  window.addEventListener('resize', function() {
-    if (popup.classList.contains('wn-open')) place();
-  });
+  chips.forEach(c => c.addEventListener('click', () => apply(c.dataset.cat)));
+  const days = [...document.querySelectorAll('.clog-day')];
+  const links = new Map([...document.querySelectorAll('.clog-rail-day')].map(a => [a.hash.slice(1), a]));
+  function mark() {
+    let cur = null;
+    for (const d of days) { if (d.getBoundingClientRect().top < 120 && !d.classList.contains('is-hidden')) cur = d; }
+    links.forEach((a, id) => a.classList.toggle('is-current', !!cur && id === cur.id));
+  }
+  window.addEventListener('scroll', mark, { passive: true });
+  mark();
 })();
 
 // ---- AOE INCREASE (aoe_increase.html): item + upgrade filter recompute ----

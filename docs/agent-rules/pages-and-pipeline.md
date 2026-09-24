@@ -176,3 +176,9 @@ Start-Process python -ArgumentList "-m http.server 8765 --directory dist"
 Главные источники координат карты (деревья/кэмпы/башни/тормент/гейты/лотосы по версиям):
 - **Интерактивная карта**: https://tools.spectral.gg/interactive-map
 - **GitHub с координатами**: `leamare/dota-interactive-map` — `assets/data/<ver>/mapdata.json` (per-version coords) + корневой `worlddata.json` (мировые границы для проекции). Дифф считает `scripts/gen/build_terrain_diff.py` → `data/terrain_diff.json`. Проекция: мир ∈ [−10464, 10400] → 1280px (проверено наложением всех деревьев на рендер карты).
+
+## Changelog сайта (`changelog.html`)
+- Данные: `data/changelog.json` (новые записи сверху). Одна запись = одно заметное пользователю изменение: `date`, `category` (Patch Reader / Materials / Hero Lab / Dynamics / Site), короткий `title`, 1–4 коротких `items`; по желанию `link` на страницу и `shot`.
+- Скриншот: добавить строку в `SHOTS` в `tools/changelog_shots.py`, поднять `python -m http.server 8799` из `dist/` и запустить `python tools/changelog_shots.py <часть имени>`. Картинка ляжет в `icons/changelog/*.webp`: блок по селектору или верх страницы, высота до 760 px.
+- Сборка: шаг `clog` (`builders/changelog.py`). Кнопка Changelog есть в шапке (`NAV_TABS`) и плиткой на главной (иконка typewriter). Тест: `tests/test_changelog.py`.
+- **Правило:** каждое заметное изменение сайта в том же коммите получает запись здесь. Пишем лаконично, по-английски, как сайт.

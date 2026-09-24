@@ -456,28 +456,12 @@ def build_rosters():
 
     # Write site_meta.json
     import json as _json2
-    import datetime as _dt
     _meta_path = _os.path.join("data", "site_meta.json")
-    # Load existing patch_site_dates so we don't overwrite previously recorded dates.
-    _existing_site_dates = {}
-    if _os.path.exists(_meta_path):
-        try:
-            with open(_meta_path, encoding="utf-8") as _ef:
-                _existing_site_dates = _json2.load(_ef).get("patch_site_dates", {})
-        except Exception:
-            pass
-    # Auto-register any patch in PATCHES that has no site date yet (use today).
-    _d = _dt.date.today()
-    _today = f"{_d.strftime('%b')} {_d.day}"  # e.g. "Jun 19" (no leading zero)
-    for _p in PATCHES:
-        if _p["version"] not in _existing_site_dates:
-            _existing_site_dates[_p["version"]] = _today
     _site_meta = {
         "latest_patch_filename": PATCHES[0]["filename"] if PATCHES else "patches/7.41c.html",
         "latest_patch_version": PATCHES[0]["version"] if PATCHES else "",
         "asset_version": __import__('site_common').compute_asset_version(),
         "patch_dates": {r["version"]: r["date"] for r in RELEASE_HISTORY},
-        "patch_site_dates": _existing_site_dates,
     }
     _os.makedirs("data", exist_ok=True)
     with open(_meta_path, "w", encoding="utf-8") as _f:
