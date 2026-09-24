@@ -358,34 +358,40 @@ def _thumb_srcs(html):
     return _THUMB_RE.sub(repl, html)
 
 
-_NEWMECH_UL_RE = re.compile(r'<ul class="changes"><!--NEWMECH-->(.*?)</ul>', re.S)
+_NEWMECH_UL_RE = re.compile(r'<ul class="changes"><!--NEWMECH(?::(\w+))?-->(.*?)</ul>', re.S)
 _NEW_CHIP_RE = re.compile(r'(<li\b[^>]*data-tag="[^"]*\bnew\b[^"]*"[^>]*>)<span class="badge new"[^>]*>NEW</span>')
 
 
+def _mech_chip_re(tag):
+    return re.compile(rf'(<li\b[^>]*data-tag="[^"]*\b{tag}\b[^"]*"[^>]*>)<span class="badge {tag}"[^>]*>{tag.upper()}</span>')
+
+
 def _new_mech_rows(html):
-    """Lists under a "new mechanic" header (plain_header/subgroup new=…) describe how the new
-    thing works — prose, not a changelog. The NEW rows (sorted first) become one description
-    box: no chip, no bullet (classes mech-desc / mech-first / mech-last); data-tag stays for
-    the filters and dynamics. Rows with other tags stay normal change rows below it."""
+    """Lists under a "new mechanic" header (plain_header/subgroup/unit_header new=…) describe how
+    the thing works — prose, not a changelog. Rows of the block's tag (NEW; REWORK under a
+    "Reworked …" label) become one description box at the top of the list: no chip, no bullet
+    (classes mech-desc / mech-first / mech-last); data-tag stays for the filters and dynamics.
+    Rows with other tags stay normal change rows below it."""
     def fix(m):
-        body = m.group(1)
+        chip_re = _mech_chip_re(m.group(1) or "new")
+        body = m.group(2)
         items = list(_LI_RE.finditer(body))
-        new_idx = [i for i, it in enumerate(items) if _NEW_CHIP_RE.match(it.group(0))]
-        if not new_idx:
+        box_idx = [i for i, it in enumerate(items) if chip_re.match(it.group(0))]
+        if not box_idx:
             return '<ul class="changes">' + body + '</ul>'
-        out, last = [], 0
+        box, rest, last = [], [], 0
         for i, it in enumerate(items):
-            if i not in new_idx:
+            if i not in box_idx:
                 continue
-            cls = "mech-desc" + (" mech-first" if i == new_idx[0] else "") + (" mech-last" if i == new_idx[-1] else "")
-            li = _NEW_CHIP_RE.sub(r'\1<span class="row-tag-empty"></span>', it.group(0), count=1)
+            cls = "mech-desc" + (" mech-first" if i == box_idx[0] else "") + (" mech-last" if i == box_idx[-1] else "")
+            li = chip_re.sub(r'\1<span class="row-tag-empty"></span>', it.group(0), count=1)
             li = (re.sub(r'class="([^"]*)"', lambda mm: f'class="{mm.group(1)} {cls}"', li, count=1)
                   if re.match(r'<li\b[^>]*\bclass="', li) else li.replace('<li', f'<li class="{cls}"', 1))
-            out.append(body[last:it.start()])
-            out.append(li)
+            box.append(li)
+            rest.append(body[last:it.start()])
             last = it.end()
-        out.append(body[last:])
-        return '<ul class="changes">' + "".join(out) + '</ul>'
+        rest.append(body[last:])
+        return '<ul class="changes">' + "".join(box) + "".join(rest) + '</ul>'
     return _NEWMECH_UL_RE.sub(fix, html)
 
 

@@ -41,17 +41,19 @@ def build():
     W(subgroup("Lotus Pools"))
     W(ul_open())
     W(li("Changed the way Healing Lotuses are collected from Lotus Pools", t("REWORK"), extra=inline_note("Lotus Pools now have three entrances and an empty region in the center<br>Heroes will automatically gather lotuses when within 350 units of the center of a pool as long as they have available space in their inventory<br>The first Lotus takes 1.5s to collect, and each subsequent lotus in a row takes 30% less time — The second lotus will take 1.05s, the third one takes 0.735s, down to a minimum of 0.3s<br>The timer only counts down when all heroes within range are on the same team, pausing if an enemy hero enters the area, and resuming when enemies leave<br>If multiple allied heroes are all within range, the Lotus will be granted to a random hero")))
-    W(li("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Great Lotuses they could form")))
-    W(li("Lotus Pools will now spawn Greater Lotuses after Tier 5 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Great Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Greater Lotuses they could form")))
+    W(li("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available, and Greater Lotuses after Tier 5 Neutral Items are available", t("NEW"), extra=inline_note("All remaining lotuses in Lotus Pools will be combined and rounded up to the nearest number of lotuses of the next tier they could form")))
+    W(ul_close())
+    W(subgroup("Wisdom Runes"))
+    W(ul_open())
+    W(li("Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom", t("DEL")))
     W(ul_close())
     W(subgroup("Shrines of Wisdom", new="New objective"))
     W(ul_open())
-    W(li("Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom", t("DEL")))
     W(li("Shrines of Wisdom are located in the offlane side jungles between the Tier 1 and 2 towers where the Ancient camps used to be", t("NEW")))
     W(li("The Shrines will activate every 7 minutes, glowing and filling with experience", t("NEW")))
     W(li("To gather the experience from an activated Shrine, a hero must stand within 300 units for 3s", t("NEW")))
     W(li("Like Lotus Pools, the Shrine will not count down time if an enemy hero contests by standing within the effect radius, and will resume only if the enemy hero leaves the area or is killed", t("NEW")))
-    W(li("Experience will be granted to a random hero within 300 units of the Shrine and also to their teammate with the lowest experience", t("MISC"), extra=inline_note("The values and behavior are identical to Wisdom Runes")))
+    W(li("Experience will be granted to a random hero within 300 units of the Shrine and also to their teammate with the lowest experience", t("NEW"), extra=inline_note("The values and behavior are identical to Wisdom Runes")))
     W(ul_close())
 
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
@@ -73,7 +75,7 @@ def build():
     W(li("Cooldown increased from 20s to 60s", b(20, 60, l=True)))
     W(li("Added a unique attack animation for Bash, as well as new animation and particles for Roar of Retribution", t("QoL")))
     W(ul_close())
-    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True, label="Reworked objective"))
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True, new_mech="Reworked objective"))
     W(ul_open())
     W(li("There is only a single Tormentor active at a time", t("REWORK")))
     W(li("Tormentor is also dependent on the day and night cycle, so it's at Radiant side at night and at Dire's side at day. As a result, it will always appear at the Radiant side first", t("REWORK"), extra=inline_note("Or at Dire side in Turbo<br>Due to this Roshan and Tormentor are always on opposite sides")))
@@ -82,31 +84,45 @@ def build():
     W(li("Tormentor's abilities now scale with game time instead of the number of deaths", t("REWORK")))
     W(li("Tormentor now grants 250 gold to each team member on death", t("NEW"), extra=inline_note("Still grants additional 280 gold when all team members already have Aghanim's Shard")))
     W(ul_close())
+    # Tooltips: game localization 7.37e / 7.38 (dotabuff/d2vpkr abilities_english.txt) — the text did not
+    # change, only the scaling (numbers: Valve patch notes; old values match the Liquipedia/fandom page).
+    _DEATHS = dict(levels=list(range(0, 7)), level_fmt=lambda D: f"{D}", axis_label="deaths", jump_at=None)
+    _MINUTES = dict(levels=[15, 20, 25, 30, 35, 40, 45, 50, 55, 60], level_fmt=lambda M: f"{M}:00", axis_label="time", jump_at=None)
+    _us_abs_old = scale_pill("2500 + 200 per death", lambda D: 2500 + 200 * D, **_DEATHS)
+    _us_reg_old = scale_pill("100 + 100 per death", lambda D: 100 + 100 * D, **_DEATHS)
+    _us_abs_new = scale_pill("1900 + 20 per minute", lambda M: 1900 + 20 * M, **_MINUTES)
+    _us_reg_new = scale_pill("30 + 5 per minute", lambda M: 30 + 5 * M, **_MINUTES)
     W(ability_change(
         old=dict(name="Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png",
-                 desc=["Passive. Grants a regenerating All Damage Barrier. Grows stronger each time the Tormentor dies.",
-                       "Damage absorb: <b>2500 + 200 per death</b>. Barrier regeneration: <b>100 + 100 per death</b> per second."]),
+                 desc=["Passively grants a regenerating All Damage Barrier. Armor can not go below 0.",
+                       f"Damage Barrier: {_us_abs_old[0]}. Barrier Regeneration: {_us_reg_old[0]} HP/s."],
+                 tables=[_us_abs_old[1], _us_reg_old[1]]),
         new=dict(name="Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png",
-                 desc=["Passive. Grants a regenerating All Damage Barrier. Grows stronger with game time.",
-                       "Damage absorb: <b>1900 + 20 per minute</b> of game time. Barrier regeneration: <b>30 + 5 per minute</b> of game time per second."]),
+                 desc=["Passively grants a regenerating All Damage Barrier. Armor can not go below 0.",
+                       f"Damage Barrier: {_us_abs_new[0]} of game time. Barrier Regeneration: {_us_reg_new[0]} of game time HP/s."],
+                 tables=[_us_abs_new[1], _us_reg_new[1]]),
         summary="Scaling reworked: number of deaths → game time.", tag="rework"))
+    _rf_old = scale_pill("90% + 20% per death", lambda D: 90 + 20 * D, value_fmt="{:g}%", **_DEATHS)
+    _rf_new = scale_pill("50% + 2% per minute", lambda M: 50 + 2 * M, value_fmt="{:g}%", **_MINUTES)
     W(ability_change(
         old=dict(name="Reflect", icon_url="../icons/abilities/miniboss_reflect.png",
-                 desc=["Passive. Reflects damage received evenly to the attacker and all other heroes within 1200 radius. Grows stronger each time the Tormentor dies.",
-                       "Damage reflected: <b>90% + 20% per death</b>."]),
+                 desc=["Reflects damage received evenly to the attacker and all other heroes within 1200 radius",
+                       f"Damage Reflected: {_rf_old[0]}."],
+                 tables=[_rf_old[1]]),
         new=dict(name="Reflect", icon_url="../icons/abilities/miniboss_reflect.png",
-                 desc=["Passive. Reflects damage received evenly to the attacker and all other heroes within 1200 radius. Grows stronger with game time.",
-                       "Damage reflected: <b>50% + 2% per minute</b> of game time."]),
+                 desc=["Reflects damage received evenly to the attacker and all other heroes within 1200 radius",
+                       f"Damage Reflected: {_rf_new[0]} of game time."],
+                 tables=[_rf_new[1]]),
         summary="Scaling reworked: number of deaths → game time.", tag="rework"))
-    W(ability("Alleviation", icon_url="../icons/abilities/miniboss_alleviation.png"))
-    W(ul_open())
-    W(li("New ability. After dying, the Tormentor leaves behind a 900 radius aura that increases health regeneration of all units in the area by 2% of their Max Health. Lasts 15s", t("NEW")))
-    W(ul_close())
     W(ability("The Shining", icon_url="../icons/abilities/miniboss_radiance.png"))
     W(ul_open())
     W(li("Damage per second increased from 30 to 60", b(30, 60)))
     W(li("Radius decreased from 1200 to 1000", b(1200, 1000)))
     W(ul_close())
+    W(ability_change(None, {"name": "Alleviation", "icon_url": "../icons/abilities/miniboss_alleviation.png",
+                            "desc": ["After death, the Tormentor leaves behind a verdant dale, increasing the regeneration of everyone nearby by <b>2%</b> of their Max Health.",
+                                     "Radius: 900. Duration: 15s."]},
+                     summary="New ability", tag="new"))
 
     W(plain_header("Other Terrain Changes"))
     W(ul_open())

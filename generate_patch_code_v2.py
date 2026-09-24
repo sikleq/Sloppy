@@ -267,6 +267,16 @@ CANONICAL_TAGS = [
     # NERF — adding a penalty/restriction is negative (inverse of no-longer-has-penalty)
     (re.compile(r'\bnow has (?:an? |the )?(?:\w+ ){0,3}(?:penalty|restriction|drawback|downside)\b', re.I), 'NERF'),
     # NEW — new mechanic / capability added
+    # map objectives (7.38 Tormentor / Lotus Pools): where and when a boss/objective appears is a
+    # REWORK of how it works, not MISC; a boss/building that starts giving something is NEW
+    (re.compile(r'\bspawns? (?:(?:have|has) been |are |is )?(?:repositioned|relocated)\b', re.I), 'REWORK'),
+    (re.compile(r'\bspawns? for the first time at\b', re.I),       'REWORK'),
+    (re.compile(r'\bonly (?:a )?single \w+ active at a time\b', re.I), 'REWORK'),
+    (re.compile(r'\bdependent on the day and night cycle\b', re.I), 'REWORK'),
+    (re.compile(r'\bwill now (?:spawn|grant|provide|give|drop)\b', re.I), 'NEW'),
+    (re.compile(r'\bis back in the river\b|\bpits? (?:is |are )?(?:now )?located\b', re.I), 'REWORK'),
+    (re.compile(r'\bno longer drops?\b', re.I),                  'DEL'),
+    (re.compile(r"^[A-Z][\w']*(?: [\w']+){0,2} now (?:also )?(?:grants|provides|drops|gives)\b"), 'NEW'),
     (re.compile(r'\bAdded to Captains Mode\b', re.I),               'NEW'),
     (re.compile(r'\bCan now be disassembled\b', re.I),              'NEW'),
     (re.compile(r'\bno longer disjointable\b', re.I),               'DEL'),
@@ -1750,8 +1760,12 @@ _NEW_OBJECTIVE_RE = re.compile(
 _BLOCK_HEAD_RE = re.compile(r'^W\((?P<fn>plain_header|subgroup)\("(?P<title>[^"]+)"(?P<rest>.*)\)\)$')
 
 
+_GONE_RE = re.compile(r'^W\(li\("(?P<old>[A-Z][\w ]+?) (?:have been |has been |were |was )?removed and replaced with (?:a )?new\b')
+
+
 def _postprocess_new_block_label(lines):
     out = list(lines)
+    moves = []
     section = ''
     for i, line in enumerate(out):
         head = _BLOCK_HEAD_RE.match(line)
@@ -1777,6 +1791,149 @@ def _postprocess_new_block_label(lines):
         out[i] = line[:-2] + f', new="{label}"))'
         for r in rows:
             out[r] = out[r].replace('t("MISC")', 't("NEW")')
+        # "Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom" (7.38) is a
+        # change of the OLD thing: it goes under its own "Wisdom Runes" subgroup above the new block.
+        gone = _GONE_RE.match(out[rows[0]])
+        if gone and 't("DEL")' in out[rows[0]] and head.group('fn') == 'subgroup' and out[i + 1] == 'W(ul_open())':
+            moves.append((i, rows[0], gone.group('old')))
+    for i, r, old in reversed(moves):
+        row = out.pop(r)
+        out[i:i] = [f'W(subgroup("{old}"))', 'W(ul_open())', row, 'W(ul_close())']
+    return out
+
+
+_ROW_RE = re.compile(r'^W\(li\("(?P<text>(?:[^"\\]|\\.)*)", (?P<badge>t\("(?P<tag>[A-Za-z]+)"\))'
+                     r'(?:, extra=inline_note\("(?P<note>(?:[^"\\]|\\.)*)"\))?\)\)$')
+
+
+def _row(text, tag, note=None):
+    extra = f', extra=inline_note("{note}")' if note else ''
+    return f'W(li("{text}", t("{tag}"){extra}))'
+
+
+def _postprocess_merge_twin_rows(lines):
+    """Two neighbouring rows that say the same thing about two values (7.38 "Lotus Pools will now
+    spawn Great Lotuses after Tier 4 …" / "… Greater Lotuses after Tier 5 …", both with the same
+    kind of info) are ONE change: "<shared start> A, and B" with a single info.
+    Only tag-rows (no b()) with the same tag, ≥4 shared leading words and near-identical infos."""
+    import difflib
+    out = []
+    i = 0
+    while i < len(lines):
+        a = _ROW_RE.match(lines[i])
+        b = _ROW_RE.match(lines[i + 1]) if i + 1 < len(lines) else None
+        if a and b and a.group('tag') == b.group('tag') and a.group('note') and b.group('note'):
+            wa, wb = a.group('text').split(' '), b.group('text').split(' ')
+            k = 0
+            while k < min(len(wa), len(wb)) and wa[k] == wb[k]:
+                k += 1
+            ratio = difflib.SequenceMatcher(None, a.group('note'), b.group('note')).ratio()
+            if k >= 4 and k < len(wb) and ratio >= 0.85:
+                text = a.group('text') + ', and ' + ' '.join(wb[k:])
+                out.append(_row(text, a.group('tag'), a.group('note')))
+                i += 2
+                continue
+        out.append(lines[i])
+        i += 1
+    return out
+
+
+# Map bosses: an ability-by-ability layout like a hero (7.38 Roshan / Tormentor).
+_BOSSES = {
+    "Roshan": ("../icons/units/npc_dota_roshan.png", "roshan_"),
+    "Tormentor": ("../icons/units/npc_dota_miniboss.png", "miniboss_"),
+}
+_BOSS_ABIL_CACHE = {}
+
+
+def _boss_abilities(prefix):
+    """{display name: icon url} of a boss's abilities, from the game localization."""
+    if prefix not in _BOSS_ABIL_CACHE:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "abilities_english.txt")
+        found = {}
+        try:
+            txt = open(path, encoding="utf-8").read()
+        except OSError:
+            txt = ""
+        for m in re.finditer(r'"DOTA_Tooltip_Ability_(' + prefix + r'[a-z_]+?)"\s+"([^"]+)"', txt, re.I):
+            slug, name = m.group(1).lower(), m.group(2)
+            if name not in found:
+                found[name] = f"../icons/abilities/{slug}.png"
+        _BOSS_ABIL_CACHE[prefix] = found
+    return _BOSS_ABIL_CACHE[prefix]
+
+
+def _postprocess_boss_blocks(lines):
+    """W(subgroup("Tormentor")) + flat rows  ->  unit_header(..., general=False, track=True),
+    general rows, then one block per ability:
+      "Alleviation: New ability. X"            -> new-ability card (ability_change(None, …, tag="new"))
+      "The Shining: <change>" / "Roar of Retribution" + info lines -> ability(...) + its rows
+      info line "Unyielding Shield: … rescaled from A + (B per death) to …" -> a TODO for the
+      old/new card (old tooltip: dotabuff/d2vpkr history; scale_pill tables — see content/p738.py).
+    If every general row is REWORK except NEW ones (and ≥3 REWORK) -> new_mech="Reworked objective":
+    the REWORK rows become the description box, the NEW rows stay changes."""
+    out = []
+    i = 0
+    while i < len(lines):
+        m = re.match(r'^W\(subgroup\("(?P<name>[^"]+)"\)\)$', lines[i])
+        if not (m and m.group('name') in _BOSSES and i + 1 < len(lines) and lines[i + 1] == 'W(ul_open())'):
+            out.append(lines[i])
+            i += 1
+            continue
+        name = m.group('name')
+        icon, prefix = _BOSSES[name]
+        abil_icons = _boss_abilities(prefix)
+        j = i + 2
+        body = []
+        while j < len(lines) and lines[j] != 'W(ul_close())':
+            body.append(lines[j])
+            j += 1
+        general, per_abil, todos, new_cards = [], {}, [], []
+        for ln in body:
+            r = _ROW_RE.match(ln)
+            raw = re.match(r'^W\(li\("((?:[^"\\]|\\.)*)"', ln)
+            text = raw.group(1) if raw else ''
+            hit = next((a for a in sorted(abil_icons, key=len, reverse=True)
+                        if text == a or text.startswith(a + ': ')), None)
+            if r and hit and text.startswith(hit + ': New ability. '):
+                new_cards.append((hit, text[len(hit) + len(': New ability. '):]))
+                continue
+            if r and hit and text == hit and r.group('note'):          # "Roar of Retribution" + nested lines
+                for part in r.group('note').split('<br>'):
+                    per_abil.setdefault(hit, []).append(_emit_li(part))
+                continue
+            if hit:                                                     # "The Shining: Damage … increased …"
+                per_abil.setdefault(hit, []).append(ln.replace(f'W(li("{hit}: ', 'W(li("', 1))
+                continue
+            if not raw:
+                general.append(ln)
+                continue
+            if r and r.group('note'):                                   # info lines that belong to abilities
+                keep = []
+                for part in r.group('note').split('<br>'):
+                    ab = next((a for a in abil_icons if part.startswith(a + ': ')), None)
+                    if ab and re.search(r'\bper (?:death|minute)\b', part):
+                        todos.append((ab, part))
+                    else:
+                        keep.append(part)
+                if len(keep) != len(r.group('note').split('<br>')):
+                    ln = _row(text, r.group('tag'), '<br>'.join(keep) or None)
+            general.append(ln)
+        tags = [mt.group('tag') if (mt := _ROW_RE.match(g)) else None for g in general]
+        reworked = tags.count('REWORK') >= 3 and all(t_ in ('REWORK', 'NEW') for t_ in tags)
+        mech = ', new_mech="Reworked objective"' if reworked else ''
+        out.append(f'W(unit_header("{name}", "{icon}", general=False, track=True{mech}))')
+        out += ['W(ul_open())'] + general + ['W(ul_close())']
+        for ab, part in todos:
+            out.append(f'# v2-todo: {ab} — scaling changed ({part}). Make an ability_change(old=…, new=…, '
+                       f'tag="rework") card: old tooltip from dotabuff/d2vpkr abilities_english.txt history, '
+                       f'formulas as scale_pill tables (deaths / game time) — see content/p738.py Tormentor')
+        for ab, rows in per_abil.items():
+            out += [f'W(ability("{ab}", icon_url="{abil_icons[ab]}"))', 'W(ul_open())'] + rows + ['W(ul_close())']
+        for ab, desc in new_cards:
+            out.append(f'W(ability_change(None, {{"name": "{ab}", "icon_url": "{abil_icons[ab]}", '
+                       f'"desc": ["{desc}"]}}, summary="New ability", tag="new"))')
+        i = j + 1
     return out
 
 
@@ -2211,6 +2368,8 @@ def generate(version):
     # 2. Auto-emit scale_pill(...) for per-level formula text.
     # 3. Drop a v2-todo breadcrumb above ability blocks tagged "reworked".
     out = _postprocess_aghs_merge(out)
+    out = _postprocess_boss_blocks(out)
+    out = _postprocess_merge_twin_rows(out)
     out = _postprocess_minute_formula(out)
     out = _postprocess_scale_pill(out)
     out = _postprocess_new_block_label(out)

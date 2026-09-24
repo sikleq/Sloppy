@@ -714,7 +714,7 @@ def rank_step(values, ultimate=True):
 
 
 def scale_pill(formula_text, fn, levels=None, value_fmt="{:g}",
-               level_prefix='L', jump_at=20):
+               level_prefix='L', jump_at=20, level_fmt=None, axis_label=''):
     """Single-formula scaling pill (no old<->new comparison).
     Returns (trigger_html, table_html). Caller embeds `trigger` inline in
     description text where the formula appears; appends `table` after the
@@ -731,11 +731,11 @@ def scale_pill(formula_text, fn, levels=None, value_fmt="{:g}",
     def cls_for(L):
         return ' class="lvl-jump"' if L == jump_at else ''
 
-    head_cells = "".join(f'<th{cls_for(L)}>{level_prefix}{L}</th>' for L in levels)
+    head_cells = "".join(f'<th{cls_for(L)}>{level_fmt(L) if level_fmt else f"{level_prefix}{L}"}</th>' for L in levels)
     val_cells  = "".join(f'<td{cls_for(L)}>{value_fmt.format(fn(L))}</td>' for L in levels)
     table = (
         f'<table class="formula-table" id="{fid}" hidden>'
-        f'<thead><tr><th></th>{head_cells}</tr></thead>'
+        f'<thead><tr><th>{axis_label}</th>{head_cells}</tr></thead>'
         f'<tbody><tr><th class="row-label-new">value</th>{val_cells}</tr></tbody>'
         f'</table>'
     )

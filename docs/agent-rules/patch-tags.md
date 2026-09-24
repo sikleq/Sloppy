@@ -217,3 +217,14 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
 
 - Новый блок: `new="New objective"` для объектов карты (здания, святилища, руны, боссы — раздел Map Objectives), `new="New mechanic"` для остального. Генератор ставит метку сам (`_postprocess_new_block_label`), если первая строка блока объявляет новое («replaced with new buildings» и т.п.).
 - Значение, растущее со временем игры (`36 + (9 per 5 minutes)`), в строке «from A to B» — `li_formula` с таблицей по минутам (`lambda M: 36 + 9 * (M // 5)`, `level_fmt=lambda M: f"{M}:00"`). Генератор: `_postprocess_minute_formula`.
+
+## Уроки вычитки 7.38: объекты карты (правило → почему)
+- **Старая подсказка способности — не выдумывать.** Брать из истории файлов игры: `dotabuff/d2vpkr`, `dota/resource/localization/abilities_english.txt` на коммите до выхода патча (`gh api repos/dotabuff/d2vpkr/commits?path=…&until=<дата патча>`). Старые числа сверять с историей вики. *Почему:* старая панель карточки должна совпадать с тем, что игрок видел в игре.
+- **Изменение масштабирования способности** («X rescaled from A + (B per death) to C + (D per minute)») — карточка `ability_change(old, new, tag="rework")` в блоке Abilities, формулы как `scale_pill` с таблицей (`axis_label="deaths"/"time"`, `level_fmt`). В «?» у общей строки это не прячем. *Почему:* меняется сама способность; формулу без таблицы не прочитать.
+- **Новая способность юнита/босса** («Alleviation: New ability. …») — карточка `ability_change(None, {...}, summary="New ability", tag="new")`, а не строка NEW. *Почему:* так же выглядят новые способности героев.
+- **Переделанный объект** (все общие строки — REWORK, кроме NEW): `unit_header(..., new_mech="Reworked objective")`. Строки REWORK становятся блоком-описанием «как это работает теперь», строки NEW остаются изменениями ниже. *Почему:* это описание нового устройства, а не пять отдельных изменений — как у Shrines of Wisdom.
+- **Где и когда появляется объект** (spawns repositioned, first spawn at 15:00, single active, day/night) — REWORK, не MISC. «Roshan no longer drops …» — DEL.
+- **«X removed and replaced with new …: Y»** — строка DEL уходит под свой подзаголовок X над блоком Y. *Почему:* это изменение старой вещи, а не описание новой.
+- **Строка без метки внутри описания нового объекта** (например, опыт от Shrines плюс «?») тоже входит в описание: метка NEW, чип скрывается.
+- **Две соседние однотипные строки с одинаковым «?»** (Great / Greater Lotuses) — одна строка «…A, and B», одно «?». *Почему:* это одно изменение про два значения.
+- Генератор делает всё это сам: `_postprocess_boss_blocks`, `_postprocess_new_block_label`, `_postprocess_merge_twin_rows` и CANONICAL_TAGS. Тесты лежат в `tests/test_generator.py`.

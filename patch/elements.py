@@ -320,6 +320,12 @@ ITEM_DISPLAY_OVERRIDES = {
 
 # ---- Internal helpers ----
 
+def _mech_tag(label):
+    """A "Reworked objective / mechanic" block describes how the REWORKED thing works now: its
+    REWORK rows form the description box. Any other label (New mechanic / New objective): NEW rows."""
+    return "rework" if isinstance(label, str) and label.lower().startswith("reworked") else "new"
+
+
 def _open_block(extra_cls='', extra_attrs=''):
     pre = _close_ability_block()
     _State.new_mech_header = _State.new_mech = False     # a new block ends any "new mechanic" run
@@ -501,6 +507,7 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
         extra_cls, block_attr = '', ''
     head = _open_block(extra_cls, block_attr)
     _State.new_mech_header = _State.new_mech = bool(new_mech)
+    _State.new_mech_tag = _mech_tag(new_mech)
     img = f'<img src="{icon_url}" alt="{name}" loading="lazy" width="128" height="72">'
     if eid:          # a tracked unit has a Changes page (units/<slug>.html; a creep-hero lives with the heroes)
         href = _entity_link("heroes" if entity_kind == "creep-hero" else "units", name)
@@ -587,6 +594,7 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
     extra_cls = ' label-only' if sublabel else ''
     head = _open_block(extra_cls)
     _State.new_mech_header = _State.new_mech = bool(new)
+    _State.new_mech_tag = _mech_tag(new)
     label = f' <span class="entity-new-type">{new}</span>' if new else ''
     return out + head + f'<div class="entity plain-entity"{eid}><div class="entity-name">{name}{label}</div>{link_html}</div>'
 
@@ -634,6 +642,8 @@ def subgroup(title, new=None):
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
     _State.new_mech = bool(new) or _State.new_mech_header
+    if new:
+        _State.new_mech_tag = _mech_tag(new)
     if title.lower() == "abilities":
         _State.seen_abilities_subgroup = True
     if title.lower() == "talents":
@@ -935,7 +945,7 @@ def ul_open():
     if _State.current_block_is_facet:
         _State.facet_block_had_ul = True
     # marker read by patch/page.py _new_mech_rows (NEW rows lose the chip, keep data-tag)
-    return out + '<ul class="changes">' + ('<!--NEWMECH-->' if _State.new_mech else '')
+    return out + '<ul class="changes">' + (f'<!--NEWMECH:{_State.new_mech_tag}-->' if _State.new_mech else '')
 
 
 def ul_close():

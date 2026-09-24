@@ -437,3 +437,56 @@ def test_new_building_block_under_map_objectives_is_new_objective():
     assert out[1] == 'W(subgroup("Shrines of Wisdom", new="New objective"))'
     assert 't("NEW")' in out[3]
     assert out[4] == lines[4]
+
+
+def test_twin_rows_with_same_info_merge_into_one():
+    a = 'W(li("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Great Lotuses they could form")))'
+    b = 'W(li("Lotus Pools will now spawn Greater Lotuses after Tier 5 Neutral Items are available", t("NEW"), extra=inline_note("All remaining Great Lotuses in Lotus Pools will be combined and rounded up to the nearest number of Greater Lotuses they could form")))'
+    out = g._postprocess_merge_twin_rows([a, b])
+    assert len(out) == 1
+    assert "Tier 4 Neutral Items are available, and Greater Lotuses after Tier 5" in out[0]
+    assert out[0].count("inline_note(") == 1
+
+
+def test_removed_thing_gets_own_subgroup_above_new_block():
+    lines = [
+        'W(plain_header("Map Objectives"))',
+        'W(subgroup("Shrines of Wisdom"))', 'W(ul_open())',
+        'W(li("Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom", t("DEL")))',
+        'W(li("Experience will be granted to a random hero", t("MISC"), extra=inline_note("Same as Wisdom Runes")))',
+        'W(ul_close())',
+    ]
+    out = g._postprocess_new_block_label(lines)
+    assert out[1:5] == ['W(subgroup("Wisdom Runes"))', 'W(ul_open())', lines[3], 'W(ul_close())']
+    assert out[5] == 'W(subgroup("Shrines of Wisdom", new="New objective"))'
+    assert 't("NEW")' in out[7]
+
+
+def test_boss_block_splits_abilities_and_marks_reworked_objective():
+    lines = [
+        'W(subgroup("Tormentor"))', 'W(ul_open())',
+        'W(li("Tormentor spawns repositioned to the corners of the map", t("REWORK")))',
+        'W(li("There is only a single Tormentor active at a time", t("REWORK")))',
+        'W(li("Tormentor\'s abilities now scale with game time instead of the number of deaths", t("REWORK"), extra=inline_note("Reflect: Damage percentage rescaled from 90 + (20 per death) to 50 + (2 per minute of game time)")))',
+        'W(li("Tormentor now grants 250 gold to each team member on death", t("NEW")))',
+        'W(li("The Shining: Radius decreased from 1200 to 1000", b(1200, 1000)))',
+        'W(li("Alleviation: New ability. Heals nearby units", t("MISC")))',
+        'W(ul_close())',
+    ]
+    out = g._postprocess_boss_blocks(lines)
+    assert out[0].startswith('W(unit_header("Tormentor"') and 'new_mech="Reworked objective"' in out[0]
+    assert not any("The Shining:" in ln or "inline_note(\"Reflect" in ln for ln in out)
+    assert any(ln.startswith('# v2-todo: Reflect') for ln in out)
+    assert 'W(ability("The Shining", icon_url="../icons/abilities/miniboss_radiance.png"))' in out
+    assert any(ln.startswith('W(ability_change(None, {"name": "Alleviation"') and 'tag="new"' in ln for ln in out)
+
+
+@pytest.mark.parametrize("text,tag", [
+    ("Tormentor now spawns for the first time at 15:00", "REWORK"),
+    ("Tormentor spawns repositioned to the corners of the map", "REWORK"),
+    ("Roshan no longer drops Aghanim's Blessing", "DEL"),
+    ("Lotus Pools will now spawn Great Lotuses after Tier 4 Neutral Items are available", "NEW"),
+    ("Tormentor now grants 250 gold to each team member on death", "NEW"),
+])
+def test_map_objective_canonical_tags(text, tag):
+    assert g._guess_tag(text) == tag
