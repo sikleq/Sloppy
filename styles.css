@@ -5425,6 +5425,32 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
     0 0  3px rgba(227, 196, 106, 0.25);
 }
 
+/* Header — ONE gold rule under the nav (it used to be a faint gold line + the toolbar's grey
+   top border = two lines). The active main tab "opens" into what sits below: gold top/side
+   edges, no bottom edge, filled with the colour of the block under the nav, and it covers the
+   rule, so the rule has a gap right under it — like a folder tab. --tab-open-bg = that block:
+   the patch toolbar, the Materials sub-nav, or the page. */
+nav.top-nav { border-bottom: 0; --tab-open-bg: var(--bg-page); }
+body.patch-page nav.top-nav { --tab-open-bg: var(--bg-panel-3); }
+body nav.top-nav.nav-over-subnav { --tab-open-bg: var(--bg-panel-2); }   /* beats body.patch-page (entity pages) */
+nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
+.nav-inner { padding-bottom: 0; }
+.nav-tabs { align-self: end; align-items: flex-end; }
+.nav-tab { margin-bottom: 6px; }
+.nav-tab.active {
+  position: relative;
+  z-index: 2;                               /* above the nav's ::after rule */
+  height: 45px;
+  margin-bottom: -1px;                      /* reach over the rule */
+  padding-bottom: 7px;
+  background: var(--tab-open-bg);
+  border: 1px solid rgba(227, 196, 106, 0.55);
+  border-bottom-color: transparent;
+  box-shadow: none;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px, 100% 100%, 0 100%, 0 2px);
+}
+.toolbar { border-top: 0; }
+
 /* Materials sub-tabs — flat row of three browser-tab pills, hung BELOW the
    main header on a thin bar (so the header itself stays compact). */
 .materials-subnav {

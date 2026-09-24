@@ -210,7 +210,8 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
             f'<div class="nav-context nav-context-flat '
             f'nav-context-{active}">{ver_html}</div>'
         )
-    header = f'''<nav class="top-nav">
+    below = " nav-over-subnav" if subtabs_active is not None else ""
+    header = f'''<nav class="top-nav{below}">
   <div class="nav-inner">
     {brand}
     {centre_html}
