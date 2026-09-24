@@ -395,19 +395,38 @@ def _find_aoe_radii(block: dict, ability_slug: str) -> list[dict]:
     return found
 
 
-def _load_hero_kits(version: str) -> dict[str, set[str]]:
-    """hero slug → set of ability slugs in its CURRENT kit, from npc_heroes.txt.
-    Deprecated ability blocks linger in the per-hero KV files (e.g. Chaos
-    Knight still ships Phantasmagoria though his innate is now Fundamental
-    Forging), so the kit list is the authority on what to show."""
+def _heroes_root(version: str) -> dict:
+    """DOTAHeroes of npc_heroes.txt WITH its `#base "heroes/…"` includes. Since 7.41f the
+    file is only an include list (each hero lives in heroes/npc_dota_hero_<slug>.txt);
+    reading it alone gave empty kits -> an AoE page with no radii at all."""
     path = STATS_DIR / version / "npc_heroes.txt"
     if not path.exists():
         return {}
     text = _strip_backslash_lines(path.read_text(encoding="utf-8", errors="replace"))
     try:
-        root = parse_kv(text).get("DOTAHeroes", {})
+        root = dict(parse_kv(text).get("DOTAHeroes", {}))
     except Exception:
         return {}
+    for rel in _re.findall(r'^\s*#base\s+"([^"]+)"', text, flags=_re.M):
+        inc = path.parent / rel
+        if not inc.exists():
+            continue                      # npc_dota_hero_base.txt is not kept in the snapshot
+        try:
+            sub = parse_kv(_strip_backslash_lines(inc.read_text(encoding="utf-8", errors="replace")))
+        except Exception:
+            continue
+        for block in sub.values():
+            if isinstance(block, dict):
+                root.update(block)
+    return root
+
+
+def _load_hero_kits(version: str) -> dict[str, set[str]]:
+    """hero slug → set of ability slugs in its CURRENT kit, from npc_heroes.txt.
+    Deprecated ability blocks linger in the per-hero KV files (e.g. Chaos
+    Knight still ships Phantasmagoria though his innate is now Fundamental
+    Forging), so the kit list is the authority on what to show."""
+    root = _heroes_root(version)
     kits: dict[str, set[str]] = {}
 
     def collect(d: dict, out: set[str]):
@@ -435,14 +454,7 @@ def _load_hero_generic_aoe_talents(version: str) -> dict[str, list[float]]:
     that hero, but should not reveal a zero-base Shard/Scepter/Talent AoE mode
     by themselves.
     """
-    path = STATS_DIR / version / "npc_heroes.txt"
-    if not path.exists():
-        return {}
-    text = _strip_backslash_lines(path.read_text(encoding="utf-8", errors="replace"))
-    try:
-        root = parse_kv(text).get("DOTAHeroes", {})
-    except Exception:
-        return {}
+    root = _heroes_root(version)
     out: dict[str, list[float]] = {}
     pat = _re.compile(r"^special_bonus_spell_aoe_(\d+(?:\.\d+)?)$")
 
@@ -527,7 +539,7 @@ def _hero_abilities(version: str, hero_slug: str, kit: set[str] | None) -> list[
     except Exception as exc:
         print(f"  ! parse failed for {hero_slug}: {exc}")
         return []
-    root = parsed.get("DOTAAbilities", {})
+    root = _site.hero_ability_blocks(parsed)
     abilities = []
     for slug, block in root.items():
         if slug == "Version" or not isinstance(block, dict):

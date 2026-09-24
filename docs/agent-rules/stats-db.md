@@ -24,3 +24,7 @@
 | movement/move speed | MovementSpeed | False |
 | attack range | AttackRange | False |
 | base damage | AttackDamageMin (avg с Max) | False, is_dmg=True |
+
+## Формат файлов героев с 7.41f (ловушка)
+- `data/stats/<ver>/npc_heroes.txt` с 7.41f — только список `#base "heroes/npc_dota_hero_<slug>.txt"`. Героев читать вместе с включениями: `tools/slim_from_kv.load_kv`, `builders/aoe_increase._heroes_root`.
+- `heroes/npc_dota_hero_<slug>.txt` до 7.41e: `"DOTAAbilities" { <ability> {…} }`. С 7.41f: `"DOTAHeroes" { npc_dota_hero_<slug> { …, "AbilityDefinitions" { <ability> {…} } } }`. Способности брать **только** через `builders.site_common.hero_ability_blocks(kv)`, он понимает оба варианта. Иначе страница молча теряет все способности: так было с AoE Increase, Silent changes 7.41f и врождёнными способностями в Hero Lab. Тест: `tests/test_hero_kv_layout.py`.

@@ -46,14 +46,14 @@ def load_entries(path=DATA):
 
 def _entry_html(e):
     items = "".join(f"<li>{_esc(x)}</li>" for x in e.get("items", []))
-    link = (f'<a class="clog-open" href="{_esc(e["link"])}">Open page &rarr;</a>'
-            if e.get("link") else "")
+    title = (f'<a class="clog-title-link" href="{_esc(e["link"])}">{_esc(e["title"])}</a>'
+             if e.get("link") else _esc(e["title"]))
     shots = _shots_html(e)
     cls = "clog-entry has-shots" if shots else "clog-entry"
     return (f'<article class="{cls}" data-cat="{_slug(e["category"])}"><div class="clog-text">'
             f'<div class="clog-entry-head"><span class="clog-cat clog-cat-{_slug(e["category"])}">'
-            f'{_esc(e["category"])}</span><h3 class="clog-title">{_esc(e["title"])}</h3></div>'
-            f'<ul class="clog-items">{items}</ul>{link}</div>{shots}</article>')
+            f'{_esc(e["category"])}</span><h3 class="clog-title">{title}</h3></div>'
+            f'<ul class="clog-items">{items}</ul></div>{shots}</article>')
 
 
 def _shots_html(e):
@@ -63,7 +63,7 @@ def _shots_html(e):
     if not paths:
         return ""
     slides = "".join(
-        f'<a class="clog-shot{" is-active" if i == 0 else ""}" href="{_esc(p)}" target="_blank" rel="noopener">'
+        f'<a class="clog-shot{" is-active" if i == 0 else ""}" href="{_esc(p)}" data-zoom>'
         f'<img src="{_esc(p)}" alt="{_esc(e["title"])} — {i + 1}" loading="lazy"></a>'
         for i, p in enumerate(paths))
     if len(paths) == 1:

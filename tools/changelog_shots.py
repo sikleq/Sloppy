@@ -22,7 +22,7 @@ BASE = "http://localhost:8799/"
 WIDTH = 1280
 PAD = 6
 
-# file: (page, scope, parts, clicks, max_h)
+# file: (page, scope, parts, clicks, max_h[, {"width": viewport width}])
 #   scope = None (page) | ("block", "<entity name>") | ("row", "<row text>")
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
@@ -42,8 +42,10 @@ SHOTS = {
     "2026-09-22_unit_changes.webp": ("unit_changes.html", None, [".ec-ugrid"], [], 420),
     "2026-09-17_hero_changes.webp": ("hero_changes.html", None, [".ec-index-body"], [], 420),
     "2026-09-17_item_changes.webp": ("item_changes.html", None, [".ec-igrid"], [], 420),
-    "2026-06-24_aoe_increase.webp": ("aoe_increase.html", None, ["table.aoe-table"], [], 380),
-    "2026-06-13_hero_lab.webp": ("hero_lab.html", None, [".hero-lab"], [], 480),
+    "2026-06-24_aoe_increase.webp": ("aoe_increase.html", None, [".aoe-toolbar", "table.aoe-table"], [], 520, {"width": 1600}),
+    "2026-06-13_hero_lab.webp": ("hero_lab.html", None, [".hero-lab"], [], 520, {"width": 1700}),
+    "2026-09-16_weights.webp": ("heroes_dyn.html", None, [".hd-toolbar", "table.heroes-dyn-table"],
+                                [".hd-weights-btn"], 470, {"width": 1600}),
     "2026-06-11_heroes_stats.webp": ("heroes_stats.html", None, ["table.hs-table"], [], 380),
     "2026-06-04_terrain.webp": ("terrain_741.html", None, [".terrain-compare-col"], [], 480),
     "2026-06-03_heroes_dyn.webp": ("heroes_dyn.html", None, ["table.heroes-dyn-table"], [], 380),
@@ -73,15 +75,19 @@ def _union_box(page, locs):
 
 
 def shoot(page, name, spec):
-    url, scope, parts, clicks, max_h = spec
+    url, scope, parts, clicks, max_h = spec[:5]
+    opts = spec[5] if len(spec) > 5 else {}
+    page.set_viewport_size({"width": opts.get("width", WIDTH), "height": 900})
     page.goto(BASE + url, wait_until="networkidle")
     root = _scope(page, scope)
-    root.scroll_into_view_if_needed()
+    if scope is not None:
+        root.scroll_into_view_if_needed()
     for sel in clicks:
         root.locator(sel).first.click()
         page.wait_for_timeout(250)
     locs = [root if p == ":scope" else root.locator(p).first for p in parts]
-    locs[0].scroll_into_view_if_needed()
+    if scope is not None:
+        locs[0].scroll_into_view_if_needed()
     page.wait_for_timeout(300)
     # pinned header / toolbars / floating buttons would paint over the shot: hide every
     # fixed or sticky element outside the framed parts (sticky cells INSIDE a table stay)

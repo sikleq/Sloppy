@@ -1307,7 +1307,7 @@ def _hero_innate_slug(version: str, hero_slug: str) -> str:
         root = parse_kv(path.read_text(encoding="utf-8"))
     except Exception:
         return ""
-    abilities = root.get("DOTAAbilities", {})
+    abilities = _site.hero_ability_blocks(root)
     for ability_slug, data in abilities.items():
         if isinstance(data, dict) and str(data.get("Innate", "0")) == "1":
             return ability_slug

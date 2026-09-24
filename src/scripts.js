@@ -6853,6 +6853,27 @@ function ecShopMarkup(panels) {
       d.classList.toggle('is-hidden', !!cat && !(d.dataset.cats || '').split(' ').includes(cat)));
   }
   chips.forEach(c => c.addEventListener('click', () => apply(c.dataset.cat)));
+  // screenshots open in a lightbox over the page (no new tab); in a carousel the arrows page it
+  const box = document.createElement('div');
+  box.className = 'clog-lightbox';
+  box.innerHTML = '<img alt="">';
+  document.body.appendChild(box);
+  const boxImg = box.querySelector('img');
+  let boxSet = [], boxAt = 0;
+  const boxShow = i => { boxAt = (i + boxSet.length) % boxSet.length; boxImg.src = boxSet[boxAt].getAttribute('href'); };
+  document.querySelectorAll('.clog-shot[data-zoom]').forEach(a => a.addEventListener('click', ev => {
+    ev.preventDefault();
+    boxSet = [...a.closest('.clog-shots').querySelectorAll('.clog-shot')];
+    boxShow(boxSet.indexOf(a));
+    box.classList.add('is-open');
+  }));
+  box.addEventListener('click', () => box.classList.remove('is-open'));
+  document.addEventListener('keydown', ev => {
+    if (!box.classList.contains('is-open')) return;
+    if (ev.key === 'Escape') box.classList.remove('is-open');
+    else if (ev.key === 'ArrowRight' && boxSet.length > 1) { boxShow(boxAt + 1); ev.preventDefault(); }
+    else if (ev.key === 'ArrowLeft' && boxSet.length > 1) { boxShow(boxAt - 1); ev.preventDefault(); }
+  });
   // carousels: arrows, dots, and left/right keys while the pointer is over one
   document.querySelectorAll('.clog-carousel').forEach(car => {
     const slides = car.querySelectorAll('.clog-shot'), dots = car.querySelectorAll('.clog-dot');
@@ -6870,7 +6891,7 @@ function ecShopMarkup(panels) {
     car.addEventListener('mouseenter', () => { hover = true; });
     car.addEventListener('mouseleave', () => { hover = false; });
     document.addEventListener('keydown', ev => {
-      if (!hover) return;
+      if (!hover || box.classList.contains('is-open')) return;
       if (ev.key === 'ArrowRight') { show(cur + 1); ev.preventDefault(); }
       if (ev.key === 'ArrowLeft') { show(cur - 1); ev.preventDefault(); }
     });

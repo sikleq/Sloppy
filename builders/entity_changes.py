@@ -25,7 +25,7 @@ _sys.path.insert(0, str(_HERE))
 _sys.path.insert(0, str(_HERE / "builders"))
 
 import builders.site_common as _site          # noqa: E402
-from patch.meta import RELEASE_HISTORY        # noqa: E402
+from patch.meta import PATCHES, RELEASE_HISTORY        # noqa: E402
 
 DIST = _HERE / "dist"
 KINDS = {"hero": ("heroes", "Hero Changes", "hero_changes", "heroes"),
@@ -82,7 +82,10 @@ def _blocks(page: str):
 
 def _collect():
     dates = {r["version"]: r["date"] for r in RELEASE_HISTORY}
-    order = [r["version"] for r in RELEASE_HISTORY]           # newest first
+    # only the patch pages this build produces (content/p*.py) — a stale file left in
+    # dist/patches/ from an old build (e.g. 7.31) must not add entities to the indexes
+    built = {p["version"] for p in PATCHES}
+    order = [r["version"] for r in RELEASE_HISTORY if r["version"] in built]   # newest first
     ents: dict[tuple, dict] = {}
     for ver in order:
         f = DIST / "patches" / f"{ver}.html"

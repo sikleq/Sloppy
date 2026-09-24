@@ -9928,8 +9928,18 @@ li.tsp-hidden { display: none !important; }
 .clog-cat-site         { color: #a9b1ba; border-color: rgba(139,148,158,.35); background: rgba(139,148,158,.08); }
 .clog-items { margin: 7px 0 0; padding-left: 20px; color: var(--text-main); font-size: 13.5px; line-height: 1.55; }
 .clog-items li::marker { color: var(--gold); }
-.clog-open { display: inline-block; margin: 6px 0 0 20px; font-size: 12.5px; color: var(--gold); text-decoration: none; }
-.clog-open:hover { text-decoration: underline; }
+.clog-title-link { color: inherit; text-decoration: underline dotted rgba(227,196,106,.55);
+  text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.clog-title-link:hover { color: var(--gold); text-decoration-color: var(--gold); }
+.clog-shot { cursor: zoom-in; }
+/* click a screenshot: it grows over the page (no new tab); click / Esc closes, arrows page a carousel */
+.clog-lightbox { position: fixed; inset: 0; z-index: 1200; display: none; align-items: center; justify-content: center;
+  background: rgba(5,7,10,.86); cursor: zoom-out; padding: 24px; }
+.clog-lightbox.is-open { display: flex; }
+.clog-lightbox img { max-width: min(96vw, 1700px); max-height: 92vh; width: auto; height: auto;
+  border: 1px solid var(--gold-dim); border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.6);
+  animation: clog-zoom .16s ease-out; }
+@keyframes clog-zoom { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
 .clog-shot { display: block; width: fit-content; max-width: 100%; }
 .clog-shot img { display: block; max-width: 100%; height: auto; border: 1px solid var(--line-soft);
   border-radius: 6px; box-shadow: 0 4px 14px var(--shadow-45); }

@@ -32,6 +32,7 @@ sys.path.insert(0, str(_HERE))
 
 # Import from canonical source instead of maintaining a duplicate list.
 from patch.meta import RELEASE_HISTORY as _RH
+import builders.site_common as _site   # hero_ability_blocks: per-hero KV layout (7.41f+)
 RELEASE_HISTORY = [p["version"] for p in _RH]
 
 # Field-path patterns we suppress as engine-noise: visual FX, sound events,
@@ -189,7 +190,7 @@ def load_hero_abilities(version: str) -> dict[str, dict[str, dict]]:
             print(f"  ⚠ parse failed: {p.name}: {e}", file=sys.stderr)
             continue
         hero_slug = p.stem
-        root = next(iter(kv.values()), {})
+        root = _site.hero_ability_blocks(kv)       # DOTAAbilities, or 7.41f+ AbilityDefinitions
         if not isinstance(root, dict):
             continue
         abilities: dict[str, dict] = {}
