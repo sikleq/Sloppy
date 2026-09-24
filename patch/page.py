@@ -167,18 +167,31 @@ def _wrap_ability_boxes(html):
                 attrs = ' class="' + extra + '"' + attrs
             return f'<li{attrs}>{li_match.group(2)}</li>'
 
+        # boxes whose starter has its own chip are shifted right by the tag column (CSS)
+        tagged = [False] * len(items)
+        cur = False
+        for i, role in enumerate(roles):
+            if role in ('start', 'solo'):
+                cur = items[i].group(2).lstrip().startswith('<span class="badge')
+            tagged[i] = cur and role is not None
+            if role in ('solo', 'cont-end'):
+                cur = False
+
+        def aug_role(it, i, cls):
+            return aug_class(it, cls + (' ability-box-tagged' if tagged[i] else ''))
+
         out_lis = []
-        for it, role in zip(items, roles):
+        for i, (it, role) in enumerate(zip(items, roles)):
             if role is None:
                 out_lis.append(it.group(0))
             elif role == 'solo':
-                out_lis.append(aug_class(it, 'ability-row-solo'))
+                out_lis.append(aug_role(it, i, 'ability-row-solo'))
             elif role == 'start':
-                out_lis.append(aug_class(it, 'ability-row-start'))
+                out_lis.append(aug_role(it, i, 'ability-row-start'))
             elif role == 'cont':
-                out_lis.append(aug_class(it, 'ability-row-cont'))
+                out_lis.append(aug_role(it, i, 'ability-row-cont'))
             elif role == 'cont-end':
-                out_lis.append(aug_class(it, 'ability-row-cont ability-row-end'))
+                out_lis.append(aug_role(it, i, 'ability-row-cont ability-row-end'))
 
         # Reassemble: prefix (everything in body before first li) +
         # interleaved lis + suffix (text after last li)

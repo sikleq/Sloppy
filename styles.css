@@ -2873,6 +2873,15 @@ ul.changes li.ability-row-start {
   padding-top: 6px;
   margin-top: 10px;          /* gap between adjacent ability boxes */
 }
+/* A box whose ability row has its own change chip (7.38 Heaven's Halberd "NEW Passive:
+   Damage Block"): the box starts after the 76px tag column and the chip hangs in that
+   column — same x, width and height as the chips of the ordinary rows around it.
+   (New-entity cards hide per-row chips, so their boxes stay full width.) */
+ul.changes li.ability-box-tagged { margin-left: 76px; }
+ul.changes li.ability-box-tagged > .badge:first-child { left: -77px; top: 3px; }
+ul.changes li.ability-row-solo.ability-box-tagged > .badge:first-child,
+ul.changes li.ability-row-start.ability-box-tagged > .badge:first-child { top: 8px; }
+.entity-block.is-new ul.changes li.ability-box-tagged { margin-left: 0; }
 ul.changes li.ability-row-solo,
 ul.changes li.ability-row-end {
   border-bottom: 1px solid var(--line-soft);

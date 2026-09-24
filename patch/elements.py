@@ -1091,14 +1091,10 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             text_inner = f'{text_base}{marker}'
     else:
         text_inner = text_base
-    # Ability-rows collapse the tag column (CSS: grid-template-columns 1fr auto),
-    # so a real leading badge stays a grid item and auto-places into the SAME
-    # column as the text, overlapping it (7.38 neutral-artifact "Passive:" rows
-    # under a NEW badge). Fold the badge INTO the row text so it renders inline
-    # at the front — exactly what the ability-row design intends.
-    if 'ability-row' in classes and '<span class="badge' in left_tag:
-        text_inner = f'{left_tag} {text_inner}'
-        left_tag = '<span class="row-tag-empty"></span>'
+    # An ability row with its own chip keeps the chip as the li's first child: page.py
+    # marks its whole box `ability-box-tagged`, and the CSS moves the box right by the tag
+    # column so the chip sits in the SAME column, size and height as every other row's
+    # chip (it used to be folded into the text: 13px right, 8px low, narrower).
     return f'<li{attr}{cls_attr}>{left_tag}<span class="row-text">{text_inner}</span>{rest}{extra}</li>'
 
 
