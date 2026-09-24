@@ -3778,6 +3778,18 @@ h4.subgroup .subgroup-new-type {
   border: 1px solid var(--line-soft);
   border-radius: 6px;
 }
+/* Chips inside the panes = the page's chips: same 64px width, and the recipe + properties pair
+   hangs 15px left (pane padding 14 + border 1) so the old-pane chips (DEL / BUFF …) sit in
+   the SAME column as the change rows' chips below (7.38 Heaven's Halberd). */
+.properties-change .property-tag .badge {
+  display: inline-block;
+  width: 64px;
+  min-width: 64px;
+  box-sizing: border-box;
+  text-align: center;
+}
+body.patch-page .entity-block > .components-change,
+body.patch-page .entity-block > .properties-change { margin-left: -15px; }
 .properties-change .pane-old { grid-column: 1; }
 .properties-change .pane-new { grid-column: 3; }
 .properties-change .properties-arrow {
