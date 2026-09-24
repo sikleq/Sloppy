@@ -5443,10 +5443,18 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   margin-bottom: -1px;                      /* reach over the rule */
   padding-bottom: 7px;
   background: var(--tab-open-bg);
-  border: 1px solid rgba(227, 196, 106, 0.55);
-  border-bottom-color: transparent;
+  /* soft, rounded frame: a quieter gold that fades out down the sides into the block below */
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background-image:
+    linear-gradient(var(--tab-open-bg), var(--tab-open-bg)),
+    linear-gradient(180deg, rgba(227, 196, 106, 0.34) 0%, rgba(227, 196, 106, 0.16) 60%, rgba(227, 196, 106, 0) 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
   box-shadow: none;
-  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 2px, 100% 100%, 0 100%, 0 2px);
+  clip-path: none;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 .toolbar { border-top: 0; }
 
