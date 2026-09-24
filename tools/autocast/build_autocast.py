@@ -24,7 +24,7 @@ import os
 import random
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
@@ -38,6 +38,13 @@ FPS = 24
 RATE = 24.0                               # particles / s, both children
 LAP = 40 / RATE                           # 1.667 s
 FRAMES = 40                               # = one lap at 24 fps
+# The game draws this on a ~64 px HUD button with HDR bloom; our icons are 26 px, where the thin
+# glow veins break into dust and the embers into single pixels. Perceptual compensation only
+# (the motion, timing, colours and counts stay the game's):
+GLOW_GAIN = 1.9                           # glow alpha x (veins survive the downscale)
+EMBER_SCALE = 1.5                         # ember sprites x (at least ~2 px at 1x)
+BLOOM = 0.9                               # soft bloom added back (the game's HDR glow)
+VEIN_GAMMA = 0.55                         # glow texture alpha ** gamma: thicker veins
 
 GLOW_C0, GLOW_C1 = np.array([255, 222, 138]) / 255, np.array([210, 84, 0]) / 255
 EMB_C0, EMB_C1 = np.array([255, 228, 120]) / 255, np.array([255, 102, 13]) / 255
@@ -71,7 +78,8 @@ class Stamp:
             im = self.src.rotate(key[1] * 15, resample=Image.BICUBIC).resize((d, d), Image.LANCZOS)
             a = np.asarray(im).astype(np.float32) / 255.0
             # glow texture: white RGB + alpha falloff; flare: colour on black, alpha from brightness
-            self.cache[key] = a[..., 3] if not self.lum else a[..., :3].max(axis=2)
+            # glow veins: gamma-thickened so the crackle survives a 26 px icon (see GLOW_GAIN)
+            self.cache[key] = (a[..., 3] ** VEIN_GAMMA) if not self.lum else a[..., :3].max(axis=2)
         return self.cache[key]
 
 
@@ -105,6 +113,7 @@ def simulate(t):
             y = py + diry * (r0 + spd * age)
             radius = 8 * (3 + (1 - 3) * life)                     # x3 -> x1
             alpha = life / 0.5 if life < 0.5 else (1 - life) / 0.5  # FadeAndKill 0->1->0
+            alpha = min(1.0, alpha * GLOW_GAIN)
             rgb = GLOW_C0 + (GLOW_C1 - GLOW_C0) * life
             out.append(("glow", x, y, radius, max(0.0, alpha), rgb, rnd(idx, 5) * 360))
         # ---- ember child
@@ -119,7 +128,7 @@ def simulate(t):
             fr = 2 * rnd(idx, 14)
             x += (rnd(idx, 15) * 2 - 1) * 32 / (2 * math.pi * max(fr, 0.3)) * math.sin(2 * math.pi * fr * age)
             y += (rnd(idx, 16) * 2 - 1) * 32 / (2 * math.pi * max(fr, 0.3)) * math.sin(2 * math.pi * fr * age)
-            radius = (4 + 5 * rnd(idx, 17)) * (1 - life)
+            radius = (4 + 5 * rnd(idx, 17)) * (1 - life) * EMBER_SCALE
             fin = 0.1 * rnd(idx, 18)
             fout = 0.3 + 0.2 * rnd(idx, 19)
             alpha = min(1.0, age / fin if fin > 0 else 1.0, (lifetime - age) / fout)
@@ -154,6 +163,11 @@ def render(t, glow, flare):
             else:                                    # additive, overbright x3
                 col[y1:y2, x1:x2] += rgb * mm[..., None] * 3.0
                 alp[y1:y2, x1:x2] = np.minimum(1.0, alp[y1:y2, x1:x2] + mm * 1.5)
+    # bloom: blur the premultiplied light and add it back (colour + coverage)
+    pre = Image.fromarray((np.clip(col, 0, 1) * 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(3))
+    bl = np.asarray(pre).astype(np.float32) / 255.0 * BLOOM
+    col = col + bl
+    alp = np.maximum(alp, np.clip(bl.max(axis=2) * 1.2, 0, 1))
     rgb = np.clip(col / np.maximum(alp[..., None], 1e-4), 0, 1)
     out = np.dstack([rgb, np.clip(alp, 0, 1)])
     return Image.fromarray((out * 255).astype(np.uint8), "RGBA")
@@ -166,7 +180,7 @@ def main():
     frames = [render(warm + i / FPS, glow, flare) for i in range(FRAMES)]
     os.makedirs(os.path.dirname(OUT_WEBP), exist_ok=True)
     frames[0].save(OUT_WEBP, save_all=True, append_images=frames[1:], duration=int(1000 / FPS),
-                   loop=0, lossless=False, quality=72, method=6)
+                   loop=0, lossless=False, quality=76, method=6)
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     sheet = Image.new("RGBA", (SIZE * 8, SIZE * 2), (22, 26, 32, 255))
     for i in range(16):
