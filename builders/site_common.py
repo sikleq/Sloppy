@@ -64,7 +64,7 @@ def get_latest_version():
 # brand link on the left, so it's not duplicated here.
 NAV_TABS = [
     ("main",       "Main",         "index.html"),
-    ("changelogs", "Changelogs",   None),
+    ("changelogs", "Patches",      None),
     ("calendar",   "Calendar",     "calendar.html"),
     ("materials",  "Materials",    "neutral_stats.html"),
     ("changelog",  "Changelog",    "changelog.html"),     # what changed on the site (builders/changelog.py)
@@ -131,7 +131,7 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
     """Render the shared top nav.
 
     active        — one of the NAV_TABS keys ('main'/'changelogs'/...).
-    latest_href   — href for the Changelogs tab (the latest patch page),
+    latest_href   — href for the Patches tab (the latest patch page),
                     already relative-correct for the calling page.
     patch_context — True when rendered inside the patches/ folder; root
                     files (index/calendar/creeps) get a ../ prefix.
@@ -187,22 +187,12 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
     if picker_html:
         right_side = picker_html
     else:
-        # Non-patch pages: show the latest patch version as a NON-clickable
-        # display, except Materials pages which show the current table/page
-        # label there instead.
         materials_label = (get_materials_label(subtabs_active)
                            if active == "materials" and subtabs_active else "")
-        if active == "main":
-            ver_html = ''
-        elif materials_label:
-            ver_html = (f'<span class="version version-static version-materials">'
-                        f'{materials_label}</span>')
-        elif active == "calendar":
-            ver_html = ''
-        else:
-            latest_ver = get_latest_version()
-            ver_html = (f'<span class="version version-static">{latest_ver}</span>'
-                        if latest_ver else '')
+        # Only Materials pages label the right corner (the current table); elsewhere it stays
+        # empty — no latest-version label, the latest patch is one click away under Patches.
+        ver_html = (f'<span class="version version-static version-materials">'
+                    f'{materials_label}</span>') if materials_label else ''
         right_side = (
             f'<div class="nav-context nav-context-flat '
             f'nav-context-{active}">{ver_html}</div>'

@@ -1,85 +1,193 @@
 {
-  "_comment": "Site changelog (changelog.html). Newest first. One entry = one user-visible change: short title, 1-4 short points, optional page link and screenshot (icons/changelog/*.webp, made by tools/changelog_shots.py). Categories: Patch Reader, Materials, Hero Lab, Dynamics, Site.",
+  "_comment": "Site changelog (changelog.html). Newest first. One entry = one user-visible change: short title, 1-4 short points, optional page link and screenshots — \"shots\": [...] (icons/changelog/*.webp, made by tools/changelog_shots.py). Categories: Patch Reader, Materials, Hero Lab, Dynamics, Site.",
   "entries": [
     {
-      "date": "2026-09-24", "category": "Site", "title": "Changelog page",
-      "items": ["This page: short notes on what changed on the site, by date and category", "The \"NEW\" badge and its popup on the main page are gone"]
+      "date": "2026-09-24",
+      "category": "Site",
+      "title": "Changelog page",
+      "items": [
+        "This page: short notes on what changed on the site, by date and category",
+        "\"Changelogs\" tab renamed to Patches; the header no longer shows the latest version",
+        "The \"NEW\" badge and its popup on the main page are gone"
+      ]
     },
     {
-      "date": "2026-09-24", "category": "Patch Reader", "title": "Tormentor as a reworked objective",
-      "items": ["How Tormentor works now is one description box; the only real addition (250 gold on death) stays a change",
-                "Unyielding Shield and Reflect: before/after cards with the real pre-7.38 tooltips and clickable formula tables (per death → per minute)",
-                "Alleviation shown as a new-ability card; Wisdom Runes removal gets its own subgroup above Shrines of Wisdom (New objective)"],
-      "link": "patches/7.38.html", "shot": "icons/changelog/2026-09-24_tormentor.webp"
+      "date": "2026-09-24",
+      "category": "Patch Reader",
+      "title": "Tormentor as a reworked objective",
+      "items": [
+        "How Tormentor works now is one description box; the only real addition (250 gold on death) stays a change",
+        "Unyielding Shield and Reflect: before/after cards with the real pre-7.38 tooltips and clickable formula tables (per death → per minute)",
+        "Alleviation shown as a new-ability card; Wisdom Runes removal gets its own subgroup above Shrines of Wisdom (New objective)"
+      ],
+      "link": "patches/7.38.html",
+      "shots": [
+        "icons/changelog/2026-09-24_tormentor.webp",
+        "icons/changelog/2026-09-24_tormentor_card.webp"
+      ]
     },
     {
-      "date": "2026-09-24", "category": "Patch Reader", "title": "Lifesteal as a reworked mechanic",
-      "items": ["Full Valve text restored, including the parts that were cut and a lost info note", "The new rules read as one description box; examples keep Valve's own notes"],
-      "link": "patches/7.38.html", "shot": "icons/changelog/2026-09-24_lifesteal.webp"
+      "date": "2026-09-24",
+      "category": "Patch Reader",
+      "title": "Lifesteal as a reworked mechanic",
+      "items": [
+        "Full Valve text restored, including the parts that were cut and a lost info note",
+        "The new rules read as one description box; examples keep Valve's own notes"
+      ],
+      "link": "patches/7.38.html",
+      "shots": [
+        "icons/changelog/2026-09-24_lifesteal.webp"
+      ]
     },
     {
-      "date": "2026-09-24", "category": "Patch Reader", "title": "New items as cards, clearer item reworks",
-      "items": ["A new item reads top-down: price → bonuses → abilities (Orb of Frost)", "Abyssal Blade: before/after properties line up, the Strength +10 → +26 buff is visible, new bonuses are marked NEW"],
-      "link": "patches/7.38.html", "shot": "icons/changelog/2026-09-24_abyssal.webp"
+      "date": "2026-09-24",
+      "category": "Patch Reader",
+      "title": "New items as cards, clearer item reworks",
+      "items": [
+        "A new item reads top-down: price → bonuses → abilities (Orb of Frost)",
+        "Abyssal Blade: before/after properties line up, the Strength +10 → +26 buff is visible, new bonuses are marked NEW"
+      ],
+      "link": "patches/7.38.html",
+      "shots": [
+        "icons/changelog/2026-09-24_orb_of_frost.webp",
+        "icons/changelog/2026-09-24_abyssal.webp"
+      ]
     },
     {
-      "date": "2026-09-24", "category": "Site", "title": "Lists in \"?\" popups",
-      "items": ["A popup with several lines is now a bulleted list, on every page"]
+      "date": "2026-09-24",
+      "category": "Site",
+      "title": "Lists in \"?\" popups",
+      "items": [
+        "A popup with several lines is now a bulleted list, on every page"
+      ]
     },
     {
-      "date": "2026-09-24", "category": "Patch Reader", "title": "Game-time formula tables",
-      "items": ["Values that grow with game time (Bounty Rune gold, Tormentor) open a table by minute", "Neutral camps named as in game: Small / Medium / Large / Ancient"]
+      "date": "2026-09-24",
+      "category": "Patch Reader",
+      "title": "Game-time formula tables",
+      "items": [
+        "Values that grow with game time (Bounty Rune gold, Tormentor) open a table by minute",
+        "Neutral camps named as in game: Small / Medium / Large / Ancient"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-24_bounty.webp"
+      ]
     },
     {
-      "date": "2026-09-23", "category": "Materials", "title": "Roshan and Tormentor pages",
-      "items": ["Shown like heroes: portrait, abilities, change history", "Roshan sits in Unit Changes → Other, Tormentor opens from Structures"],
-      "link": "units/roshan.html", "shot": "icons/changelog/2026-09-23_roshan.webp"
+      "date": "2026-09-23",
+      "category": "Materials",
+      "title": "Roshan and Tormentor pages",
+      "items": [
+        "Shown like heroes: portrait, abilities, change history",
+        "Roshan sits in Unit Changes → Other, Tormentor opens from Structures"
+      ],
+      "link": "units/roshan.html",
+      "shots": [
+        "icons/changelog/2026-09-23_roshan.webp"
+      ]
     },
     {
-      "date": "2026-09-23", "category": "Patch Reader", "title": "Easier reading of patch pages",
-      "items": ["\"New mechanic\" label on a header instead of a NEW chip on every row", "Click a \"?\" to pin it; nested Valve notes live in the row's \"?\"", "150+ rows got a real tag instead of MISC across 7.38–7.41e"]
+      "date": "2026-09-23",
+      "category": "Patch Reader",
+      "title": "Easier reading of patch pages",
+      "items": [
+        "\"New mechanic\" label on a header instead of a NEW chip on every row",
+        "Click a \"?\" to pin it; nested Valve notes live in the row's \"?\"",
+        "150+ rows got a real tag instead of MISC across 7.38–7.41e"
+      ]
     },
     {
-      "date": "2026-09-23", "category": "Site", "title": "Faster pages",
-      "items": ["Patch pages scroll smoothly (7.41: slowest frames 50 → 17 ms)", "Lighter icons (WebP)"]
+      "date": "2026-09-23",
+      "category": "Site",
+      "title": "Faster pages",
+      "items": [
+        "Patch pages scroll smoothly (7.41: slowest frames 50 → 17 ms)",
+        "Lighter icons (WebP)"
+      ]
     },
     {
-      "date": "2026-09-23", "category": "Hero Lab", "title": "Item slots and pickers",
-      "items": ["6 item slots on hero pages", "One item picker style everywhere (Hero Lab, hero pages)", "Names in matrices and Hero Stats are clickable"],
+      "date": "2026-09-23",
+      "category": "Hero Lab",
+      "title": "Item slots and pickers",
+      "items": [
+        "6 item slots on hero pages",
+        "One item picker style everywhere (Hero Lab, hero pages)",
+        "Names in matrices and Hero Stats are clickable"
+      ],
       "link": "hero_lab.html"
     },
     {
-      "date": "2026-09-22", "category": "Materials", "title": "Unit Changes and Structures",
-      "items": ["Every neutral creep, summon and lane creep has a changes page", "Index laid out like the in-game picker, by camp size", "Structures page for towers, barracks and Tormentor"],
-      "link": "unit_changes.html", "shot": "icons/changelog/2026-09-22_unit_changes.webp"
+      "date": "2026-09-22",
+      "category": "Materials",
+      "title": "Unit Changes and Structures",
+      "items": [
+        "Every neutral creep, summon and lane creep has a changes page",
+        "Index laid out like the in-game picker, by camp size",
+        "Structures page for towers, barracks and Tormentor"
+      ],
+      "link": "unit_changes.html",
+      "shots": [
+        "icons/changelog/2026-09-22_unit_changes.webp"
+      ]
     },
     {
-      "date": "2026-09-22", "category": "Patch Reader", "title": "New creeps as cards",
-      "items": ["A new creep gets a stat table and its abilities, not a bare list"]
+      "date": "2026-09-22",
+      "category": "Patch Reader",
+      "title": "New creeps as cards",
+      "items": [
+        "A new creep gets a stat table and its abilities, not a bare list"
+      ]
     },
     {
-      "date": "2026-09-22", "category": "Dynamics", "title": "Faster matrices",
-      "items": ["Only visible rows are drawn; autocast animations pause off-screen"],
+      "date": "2026-09-22",
+      "category": "Dynamics",
+      "title": "Faster matrices",
+      "items": [
+        "Only visible rows are drawn; autocast animations pause off-screen"
+      ],
       "link": "heroes_dyn.html"
     },
     {
-      "date": "2026-09-20", "category": "Patch Reader", "title": "Patch 7.38 added",
-      "items": ["The full global patch: 234 heroes, items and units, 1585 changes", "Checked line by line against Valve's data"],
+      "date": "2026-09-20",
+      "category": "Patch Reader",
+      "title": "Patch 7.38 added",
+      "items": [
+        "The full global patch: 234 heroes, items and units, 1585 changes",
+        "Checked line by line against Valve's data"
+      ],
       "link": "patches/7.38.html"
     },
     {
-      "date": "2026-09-20", "category": "Hero Lab", "title": "Keyboard-friendly Hero Lab",
-      "items": ["Search and keyboard navigation in the item shop", "Arrow-key navigation in a roomier hero picker"],
+      "date": "2026-09-20",
+      "category": "Hero Lab",
+      "title": "Keyboard-friendly Hero Lab",
+      "items": [
+        "Search and keyboard navigation in the item shop",
+        "Arrow-key navigation in a roomier hero picker"
+      ],
       "link": "hero_lab.html"
     },
     {
-      "date": "2026-09-17", "category": "Materials", "title": "Hero Changes and Item Changes",
-      "items": ["The whole history of every hero and item on one page", "Filters by tag, ability and talent; links from every patch page header"],
-      "link": "hero_changes.html", "shot": "icons/changelog/2026-09-17_hero_changes.webp"
+      "date": "2026-09-17",
+      "category": "Materials",
+      "title": "Hero Changes and Item Changes",
+      "items": [
+        "The whole history of every hero and item on one page",
+        "Filters by tag, ability and talent; links from every patch page header"
+      ],
+      "link": "hero_changes.html",
+      "shots": [
+        "icons/changelog/2026-09-17_hero_changes.webp"
+      ]
     },
     {
-      "date": "2026-09-16", "category": "Dynamics", "title": "Weights mode",
-      "items": ["Each patch cell can show a weighted score: how much a patch really changed a hero or item", "Switch with the gold weights button"],
+      "date": "2026-09-16",
+      "category": "Dynamics",
+      "title": "Weights mode",
+      "items": [
+        "Each patch cell can show a weighted score: how much a patch really changed a hero or item",
+        "Switch with the gold weights button"
+      ],
       "link": "heroes_dyn.html"
     }
   ]

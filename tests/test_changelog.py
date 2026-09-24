@@ -11,11 +11,11 @@ def test_changelog_entries_are_valid_and_newest_first():
     assert dates == sorted(dates, reverse=True)
     for e in entries:
         assert e["title"] and e.get("items"), e
-        if e.get("shot"):
-            assert os.path.exists(os.path.join(clog._HERE, e["shot"])), e["shot"]
+        for shot in e.get("shots", []):
+            assert os.path.exists(os.path.join(clog._HERE, shot)), shot
 
 
 def test_changelog_renders_rail_chips_and_entries():
     html = clog.render(clog.load_entries())
     assert 'class="clog-rail"' in html and 'class="clog-chip active"' in html
-    assert html.count('class="clog-entry"') == len(clog.load_entries())
+    assert html.count('<article class="clog-entry') == len(clog.load_entries())

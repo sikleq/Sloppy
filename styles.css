@@ -9881,8 +9881,8 @@ li.tsp-hidden { display: none !important; }
 }
 
 /* ---- Site changelog (changelog.html, builders/changelog.py) ---- */
-.clog-container { max-width: 1100px; margin: 0 auto; padding: 22px 20px 60px; }
-.clog-layout { display: grid; grid-template-columns: 150px 1fr; gap: 28px; align-items: start; }
+.clog-container { max-width: none; margin: 0; padding: 22px 32px 60px; }
+.clog-layout { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 32px; align-items: start; }
 .clog-rail { position: sticky; top: 70px; display: flex; flex-direction: column; gap: 2px;
   max-height: calc(100vh - 90px); overflow-y: auto; }
 .clog-rail-month { font-family: 'Jersey 10', monospace; font-size: 17px; color: var(--gold);
@@ -9901,7 +9901,10 @@ li.tsp-hidden { display: none !important; }
 .clog-day { margin-bottom: 26px; scroll-margin-top: 70px; }
 .clog-date { font-family: 'Jersey 10', monospace; font-weight: 400; font-size: 24px; color: var(--gold);
   letter-spacing: .5px; margin: 0 0 10px; padding-bottom: 5px; border-bottom: 1px solid var(--line-soft); }
-.clog-entry { padding: 10px 0 12px; border-bottom: 1px solid var(--line-soft); }
+.clog-entry { padding: 12px 0 14px; border-bottom: 1px solid var(--line-soft); }
+/* wide screens: the notes on the left, the screenshots next to them */
+.clog-entry.has-shots { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.6fr); column-gap: 28px; align-items: start; }
+.clog-shots { display: flex; flex-direction: column; gap: 10px; }
 .clog-entry:last-child { border-bottom: 0; }
 .clog-entry-head { display: flex; align-items: baseline; gap: 10px; }
 .clog-title { margin: 0; font-size: 15px; font-weight: 600; color: var(--text-bright); }
@@ -9916,8 +9919,8 @@ li.tsp-hidden { display: none !important; }
 .clog-items li::marker { color: var(--gold); }
 .clog-open { display: inline-block; margin: 6px 0 0 20px; font-size: 12.5px; color: var(--gold); text-decoration: none; }
 .clog-open:hover { text-decoration: underline; }
-.clog-shot { display: block; margin: 10px 0 0 20px; max-width: 640px; }
-.clog-shot img { display: block; width: 100%; height: auto; border: 1px solid var(--line-soft);
+.clog-shot { display: block; width: fit-content; max-width: 100%; }
+.clog-shot img { display: block; max-width: 100%; height: auto; border: 1px solid var(--line-soft);
   border-radius: 6px; box-shadow: 0 4px 14px var(--shadow-45); }
 .clog-shot:hover img { border-color: var(--gold-dim); }
 .clog-page .clog-entry.is-hidden, .clog-page .clog-day.is-hidden, .clog-page .clog-rail-day.is-hidden { display: none; }
@@ -9926,6 +9929,10 @@ li.tsp-hidden { display: none !important; }
   .clog-rail { position: static; flex-direction: row; flex-wrap: wrap; max-height: none; }
   .clog-rail-month { width: 100%; }
   .clog-shot { margin-left: 0; }
+}
+@media (max-width: 1100px) {
+  .clog-entry.has-shots { grid-template-columns: 1fr; }
+  .clog-shots { margin-top: 10px; }
 }
 
 /* ==========================================================================

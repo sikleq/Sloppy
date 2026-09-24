@@ -29,7 +29,7 @@ def save_index_html():
     # Terrain. Each link tile swaps its static PNG for an animated GIF on hover:
     # calendar (date burn, JS), patch (page-flip, CSS), terrain (levitate, CSS).
     _INV_LINKS = {
-        'patch':    ('Changelogs', f'patches/{latest}.html' if latest else 'calendar.html'),
+        'patch':    ('Patches',    f'patches/{latest}.html' if latest else 'calendar.html'),
         'calendar': ('Calendar',   'calendar.html'),
         'terrain':  ('Terrain',    'terrain_741.html'),
         'changelog': ('Changelog', 'changelog.html'),

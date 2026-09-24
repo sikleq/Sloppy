@@ -2,7 +2,7 @@
 
 Short notes on what changed on the SITE (not Dota patches): newest first, grouped by
 date, each entry with a category chip, 1-4 points, an optional link to the changed
-page and an optional screenshot (icons/changelog/*.webp, tools/changelog_shots.py).
+page and optional screenshots (icons/changelog/*.webp, tools/changelog_shots.py) beside the notes.
 Left rail = month / date navigation; category chips filter the entries.
 """
 import datetime as _dt
@@ -48,14 +48,16 @@ def _entry_html(e):
     items = "".join(f"<li>{_esc(x)}</li>" for x in e.get("items", []))
     link = (f'<a class="clog-open" href="{_esc(e["link"])}">Open page &rarr;</a>'
             if e.get("link") else "")
-    shot = ""
-    if e.get("shot") and _os.path.exists(_os.path.join(_HERE, e["shot"])):
-        shot = (f'<a class="clog-shot" href="{_esc(e["shot"])}" target="_blank" rel="noopener">'
-                f'<img src="{_esc(e["shot"])}" alt="{_esc(e["title"])}" loading="lazy"></a>')
-    return (f'<article class="clog-entry" data-cat="{_slug(e["category"])}">'
+    shots = "".join(
+        f'<a class="clog-shot" href="{_esc(p)}" target="_blank" rel="noopener">'
+        f'<img src="{_esc(p)}" alt="{_esc(e["title"])}" loading="lazy"></a>'
+        for p in e.get("shots", []) if _os.path.exists(_os.path.join(_HERE, p)))
+    cls = "clog-entry has-shots" if shots else "clog-entry"
+    return (f'<article class="{cls}" data-cat="{_slug(e["category"])}"><div class="clog-text">'
             f'<div class="clog-entry-head"><span class="clog-cat clog-cat-{_slug(e["category"])}">'
             f'{_esc(e["category"])}</span><h3 class="clog-title">{_esc(e["title"])}</h3></div>'
-            f'<ul class="clog-items">{items}</ul>{link}{shot}</article>')
+            f'<ul class="clog-items">{items}</ul>{link}</div>'
+            + (f'<div class="clog-shots">{shots}</div>' if shots else '') + '</article>')
 
 
 def render(entries):

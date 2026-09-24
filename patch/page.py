@@ -16,7 +16,7 @@ _ASSET_VERSION = _site.compute_asset_version()
 
 
 def write_head(version, date):
-    """Render head + top nav (Changelogs+Calendar tabs + version) + container + toolbar."""
+    """Render head + top nav (Patches+Calendar tabs + version) + container + toolbar."""
     _State.current_patch_version = version
     _State.current_entity_key = None
     _State.current_section_slug = None
@@ -40,7 +40,7 @@ def write_head(version, date):
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SIKLE | Changelogs {version}</title>
+<title>SIKLE | Patch {version}</title>
 {_site.favicon_links(prefix="../")}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&display=block">
