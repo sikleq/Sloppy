@@ -6841,7 +6841,7 @@ function ecShopMarkup(panels) {
   document.addEventListener('focusin', handler, true);
 })();
 
-// ---- SITE CHANGELOG (changelog.html): category chips + current date in the rail ----
+// ---- SITE CHANGELOG (changelog.html): category chips, current entry in the rail, lightbox, carousels ----
 (function() {
   if (!document.body.classList.contains('clog-page')) return;
   const chips = document.querySelectorAll('.clog-chip');
@@ -6849,8 +6849,10 @@ function ecShopMarkup(panels) {
     chips.forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
     document.querySelectorAll('.clog-entry').forEach(e =>
       e.classList.toggle('is-hidden', !!cat && e.dataset.cat !== cat));
-    document.querySelectorAll('.clog-day, .clog-rail-day').forEach(d =>
+    document.querySelectorAll('.clog-day').forEach(d =>
       d.classList.toggle('is-hidden', !!cat && !(d.dataset.cats || '').split(' ').includes(cat)));
+    document.querySelectorAll('.clog-rail-item').forEach(a =>
+      a.classList.toggle('is-hidden', !!cat && a.dataset.cat !== cat));
   }
   chips.forEach(c => c.addEventListener('click', () => apply(c.dataset.cat)));
   // screenshots open in a lightbox over the page (no new tab); in a carousel the arrows page it
@@ -6896,11 +6898,11 @@ function ecShopMarkup(panels) {
       if (ev.key === 'ArrowLeft') { show(cur - 1); ev.preventDefault(); }
     });
   });
-  const days = [...document.querySelectorAll('.clog-day')];
-  const links = new Map([...document.querySelectorAll('.clog-rail-day')].map(a => [a.hash.slice(1), a]));
+  const days = [...document.querySelectorAll('.clog-entry')];
+  const links = new Map([...document.querySelectorAll('.clog-rail-item')].map(a => [a.hash.slice(1), a]));
   function mark() {
     let cur = null;
-    for (const d of days) { if (d.getBoundingClientRect().top < 120 && !d.classList.contains('is-hidden')) cur = d; }
+    for (const d of days) { if (d.getBoundingClientRect().top < 160 && !d.classList.contains('is-hidden')) cur = d; }
     links.forEach((a, id) => a.classList.toggle('is-current', !!cur && id === cur.id));
   }
   window.addEventListener('scroll', mark, { passive: true });

@@ -3,7 +3,8 @@
 Short notes on what changed on the SITE (not Dota patches): newest first, grouped by
 date, each entry with a category chip, 1-4 points, an optional link to the changed
 page and optional screenshots (icons/changelog/*.webp, tools/changelog_shots.py) beside the notes.
-Left rail = month / date navigation; category chips filter the entries.
+Left rail (fixed, centred on the left edge, faint until hovered) = the entry titles by month;
+category chips filter the entries.
 """
 import datetime as _dt
 import html as _html
@@ -50,10 +51,14 @@ def _entry_html(e):
              if e.get("link") else _esc(e["title"]))
     shots = _shots_html(e)
     cls = "clog-entry has-shots" if shots else "clog-entry"
-    return (f'<article class="{cls}" data-cat="{_slug(e["category"])}"><div class="clog-text">'
+    return (f'<article class="{cls}" id="{_entry_id(e)}" data-cat="{_slug(e["category"])}"><div class="clog-text">'
             f'<div class="clog-entry-head"><span class="clog-cat clog-cat-{_slug(e["category"])}">'
             f'{_esc(e["category"])}</span><h3 class="clog-title">{title}</h3></div>'
             f'<ul class="clog-items">{items}</ul></div>{shots}</article>')
+
+
+def _entry_id(e):
+    return f'e-{e["date"]}-{_slug(e["title"])}'
 
 
 def _shots_html(e):
@@ -92,14 +97,14 @@ def render(entries):
             rail.append(f'<div class="clog-rail-month">{month}</div>')
             month_seen = month
         cats = " ".join(sorted({_slug(e["category"]) for e in group}))
-        rail.append(f'<a class="clog-rail-day" href="#d-{date}" data-cats="{cats}">'
-                    f'{d.strftime("%b")} {d.day}<span>{len(group)}</span></a>')
+        rail.extend(f'<a class="clog-rail-item" href="#{_entry_id(e)}" data-cat="{_slug(e["category"])}">'
+                    f'{_esc(e["title"])}</a>' for e in group)
         days.append(f'<section class="clog-day" id="d-{date}" data-cats="{cats}">'
                     f'<h2 class="clog-date">{d.strftime("%b")} {d.day}, {d.year}</h2>'
                     + "".join(_entry_html(e) for e in group) + '</section>')
     chips = '<button class="clog-chip active" data-cat="">All</button>' + "".join(
         f'<button class="clog-chip" data-cat="{_slug(c)}">{_esc(c)}</button>' for c in CATEGORIES)
-    return (f'<div class="clog-layout"><nav class="clog-rail" aria-label="Dates">{"".join(rail)}</nav>'
+    return (f'<div class="clog-layout"><nav class="clog-rail" aria-label="Changes">{"".join(rail)}</nav>'
             f'<div class="clog-main"><div class="clog-chips" role="toolbar" aria-label="Category">{chips}</div>'
             f'{"".join(days)}</div></div>')
 
