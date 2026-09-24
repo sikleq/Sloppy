@@ -553,3 +553,14 @@ def test_creep_level_change_is_misc_not_a_percent_badge():
 
 def test_no_longer_stacks_is_del():
     assert g._guess_tag("No longer stacks with itself") == "DEL"
+
+
+def test_active_prefixed_change_row_loses_the_prefix():
+    assert g._emit_li("Active: Disarm can now be dispelled").startswith('W(li("Disarm can now be dispelled"')
+    assert g._emit_li("Passive: Frost. On attack, slows").startswith('W(li("Passive: Frost.')
+    assert g._guess_tag("Endurance no longer uses charges") == "REWORK"
+
+
+def test_dispel_direction():
+    assert g._guess_tag("Disarm can now be dispelled") == "NERF"
+    assert g._guess_tag("Can no longer be dispelled") == "BUFF"

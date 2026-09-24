@@ -280,6 +280,9 @@ CANONICAL_TAGS = [
     (re.compile(r'\bis back in the river\b|\bpits? (?:is |are )?(?:now )?located\b', re.I), 'REWORK'),
     (re.compile(r'\bno longer drops?\b', re.I),                  'DEL'),
     (re.compile(r'\bno longer stacks?\b', re.I),                 'DEL'),   # a stacking ability is taken away
+    (re.compile(r'\bno longer uses charges\b', re.I),            'REWORK'),  # how the item is used changes
+    (re.compile(r'\bcan now be dispelled\b|\bis now dispellable\b', re.I), 'NERF'),   # the effect can now be removed
+    (re.compile(r'\bcan no longer be dispelled\b', re.I),        'BUFF'),
     # a protection is gone -> a NEW way to interact with it (Kobold aura can now be broken)
     (re.compile(r'\bno longer unbreakable\b', re.I),             'NEW'),
     # something that did not exist before: a cooldown, a restore on use
@@ -588,6 +591,11 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
     'scepter'/'shard' (already encoded in text if from datafeed); info is
     optional inline_note text appended. hero_name+version enable bstat_h."""
     txt = text.strip()
+    # "Active: Disarm can now be dispelled" is a CHANGE to the active, not its description
+    # ("Active: Name. What it does …") — drop the prefix so it renders as a plain change row
+    chg = re.match(r"^(?:Active|Passive|Toggle): ([A-Z][\w' ]{1,30}?) (?:can now|can no longer|no longer|now|is now|is no longer)\b", txt)
+    if chg and '. ' not in txt[:len(chg.group(0))]:
+        txt = txt.split(': ', 1)[1]
     clean = _strip_html(txt)
     if re.match(r'^Level (?:increased|decreased|changed) from \d+ to \d+$', clean):
         return f'W(li("{txt}", t("MISC")))'        # a creep's level: classification, not a buff/nerf

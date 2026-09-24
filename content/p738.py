@@ -401,7 +401,7 @@ def build():
     W(li("Endurance cooldown increased from 30s to 45s", b(30, 45, l=True)))
     W(li("Endurance bonus attack Speed decreased from 45 to 35", b(45, 35)))
     W(li("Swiftness Aura movement speed bonus decreased from 20 to 15", b(20, 15)))
-    W(li("Endurance no longer uses charges", t("BUFF")))
+    W(li("Endurance no longer uses charges", t("REWORK")))
     W(ul_close())
     W(item_header("Ethereal Blade"))
     W(ul_open())
@@ -422,11 +422,19 @@ def build():
     W(ul_close())
     W(item_header("Heaven's Halberd", changed="Item Reworked"))
     W(auto_components_change("Heaven's Halberd", "7.38"))
+    # old bonuses: game KV 7.37e (dotabuff/d2vpkr items.txt) — the whole stat set was replaced
+    W(properties_change(
+        old=[("DEL", "+20 Strength"),
+             ("DEL", "+25% Evasion"),
+             ("DEL", "+25% Slow Resistance"),
+             ("DEL", "+25% Health and Lifesteal Amp")],
+        new=[("NEW", "+275 Health"),
+             ("NEW", "+6 Health Regen"),
+             ("NEW", "+5 All Attributes")]))
     W(ul_open())
-    W(li("Active: Disarm can now be dispelled", t("NERF")))
+    W(li("Disarm can now be dispelled", t("NERF")))
     W(li("Disarm Mana Cost decreased from 75 to 25", b(75, 25, l=True)))
     W(li("Disarm Duration on Ranged heroes decreased from 5s to 4s", b(5, 4)))
-    W(li("Provides +275 Health, +6 Health Regen and +5 All Attributes", t("REWORK")))
     W(li("Passive: Damage Block. Grants a 60% chance to block 60 damage from attacks on melee heroes, and 30 on ranged", t("NEW")))
     W(ul_close())
     W(item_header("Gleipnir", changed="Item Reworked"))
