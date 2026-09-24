@@ -73,15 +73,31 @@ def build():
     W(li("Cooldown increased from 20s to 60s", b(20, 60, l=True)))
     W(li("Added a unique attack animation for Bash, as well as new animation and particles for Roar of Retribution", t("QoL")))
     W(ul_close())
-    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True, label="Reworked objective"))
     W(ul_open())
     W(li("There is only a single Tormentor active at a time", t("REWORK")))
     W(li("Tormentor is also dependent on the day and night cycle, so it's at Radiant side at night and at Dire's side at day. As a result, it will always appear at the Radiant side first", t("REWORK"), extra=inline_note("Or at Dire side in Turbo<br>Due to this Roshan and Tormentor are always on opposite sides")))
-    W(li("Tormentor's abilities now scale with game time instead of the number of deaths", t("REWORK"), extra=inline_note("Unyielding Shield: Damage absorb rescaled from 2500 + (200 per death) to 1900 + (20 per minute of game time)<br>Unyielding Shield: Barrier regeneration rescaled from 100 + (100 per death) to 30 + (5 per minute of game time)<br>Reflect: Damage percentage rescaled from 90 + (20 per death) to 50 + (2 per minute of game time)")))
+    W(li("Tormentor spawns repositioned to the corners of the map", t("REWORK")))
+    W(li("Tormentor now spawns for the first time at 15:00", t("REWORK"), extra=inline_note("7:30 in Turbo")))
+    W(li("Tormentor's abilities now scale with game time instead of the number of deaths", t("REWORK")))
     W(li("Tormentor now grants 250 gold to each team member on death", t("NEW"), extra=inline_note("Still grants additional 280 gold when all team members already have Aghanim's Shard")))
-    W(li("Tormentor spawns repositioned to the corners of the map", t("MISC")))
-    W(li("Tormentor now spawns for the first time at 15:00", t("MISC"), extra=inline_note("7:30 in Turbo")))
     W(ul_close())
+    W(ability_change(
+        old=dict(name="Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png",
+                 desc=["Passive. Grants a regenerating All Damage Barrier. Grows stronger each time the Tormentor dies.",
+                       "Damage absorb: <b>2500 + 200 per death</b>. Barrier regeneration: <b>100 + 100 per death</b> per second."]),
+        new=dict(name="Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png",
+                 desc=["Passive. Grants a regenerating All Damage Barrier. Grows stronger with game time.",
+                       "Damage absorb: <b>1900 + 20 per minute</b> of game time. Barrier regeneration: <b>30 + 5 per minute</b> of game time per second."]),
+        summary="Scaling reworked: number of deaths → game time.", tag="rework"))
+    W(ability_change(
+        old=dict(name="Reflect", icon_url="../icons/abilities/miniboss_reflect.png",
+                 desc=["Passive. Reflects damage received evenly to the attacker and all other heroes within 1200 radius. Grows stronger each time the Tormentor dies.",
+                       "Damage reflected: <b>90% + 20% per death</b>."]),
+        new=dict(name="Reflect", icon_url="../icons/abilities/miniboss_reflect.png",
+                 desc=["Passive. Reflects damage received evenly to the attacker and all other heroes within 1200 radius. Grows stronger with game time.",
+                       "Damage reflected: <b>50% + 2% per minute</b> of game time."]),
+        summary="Scaling reworked: number of deaths → game time.", tag="rework"))
     W(ability("Alleviation", icon_url="../icons/abilities/miniboss_alleviation.png"))
     W(ul_open())
     W(li("New ability. After dying, the Tormentor leaves behind a 900 radius aura that increases health regeneration of all units in the area by 2% of their Max Health. Lasts 15s", t("NEW")))
