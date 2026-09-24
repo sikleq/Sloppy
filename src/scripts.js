@@ -6880,13 +6880,21 @@ function ecShopMarkup(panels) {
   document.querySelectorAll('.clog-carousel').forEach(car => {
     const slides = car.querySelectorAll('.clog-shot'), dots = car.querySelectorAll('.clog-dot');
     const count = car.querySelector('.clog-car-count');
+    const box = car.querySelector('.clog-slides');
     let cur = 0;
+    // the box takes the active slide's height (CSS transitions it) — no empty band under a
+    // small screenshot; re-fit when a lazy image arrives or the width changes
+    const fit = () => { box.style.height = slides[cur].offsetHeight + 'px'; };
     const show = i => {
       cur = (i + slides.length) % slides.length;
       slides.forEach((s, k) => s.classList.toggle('is-active', k === cur));
       dots.forEach((d, k) => d.classList.toggle('is-active', k === cur));
       count.textContent = (cur + 1) + ' / ' + slides.length;
+      fit();
     };
+    slides.forEach(sl => sl.querySelector('img').addEventListener('load', () => { if (sl === slides[cur]) fit(); }));
+    window.addEventListener('resize', fit);
+    fit();
     car.querySelectorAll('.clog-car-btn').forEach(b => b.addEventListener('click', () => show(cur + +b.dataset.step)));
     dots.forEach(d => d.addEventListener('click', () => show(+d.dataset.i)));
     let hover = false;
