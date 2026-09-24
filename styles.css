@@ -747,9 +747,8 @@ body:has(.creeps-page) nav.top-nav {
   content: url('icons/ui/gothic/icon_patch.gif');
 }
 /* Dynamics: on hover the bar-chart bars grow/shrink in random order (GIF). */
-.inv-cell-dynamics:hover .inv-icon {
-  content: url('icons/ui/gothic/icon_dynamics.gif');
-}
+.inv-cell-dynamics-heroes:hover .inv-icon { content: url('icons/ui/gothic/icon_dynamics_heroes.gif'); }
+.inv-cell-dynamics-items:hover .inv-icon { content: url('icons/ui/gothic/icon_dynamics_items.gif'); }
 /* Items: closed chest at rest; on hover a chest-open APNG plays once — a key
    flies in, inserts and turns, the lid pops open (chest squashes wider) and a
    gold light beam + treasure spill out. Driven from scripts.js (JS src-swap

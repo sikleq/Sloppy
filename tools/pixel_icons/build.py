@@ -8,6 +8,7 @@ Every part that overlaps another sits on its own layer so it gets its own outlin
     python tools/pixel_icons/build.py          # -> tools/pixel_icons/out/*.png + preview.png
     python tools/pixel_icons/build.py --install # also copy to icons/ui/gothic/
 """
+import math
 import os
 import shutil
 import sys
@@ -310,9 +311,164 @@ def kofi():
     return s
 
 
+# ------------------------------------------------ hero lab: bubbling cauldron (anim: bubbles rise, brew glows)
+def cauldron():
+    s = new()
+    part(s, "pot")
+    s.circle(2, 16, 2, G3)                                   # side handles
+    s.circle(29, 16, 2, G3)
+    s.ellipse(3, 11, 28, 29, G3)                             # belly
+    cols(s, 3, 28, 11, 29, [G5, G6, G6, G4, G4, G3, G2, G1])
+    s.rect(7, 28, 9, 30, G1)                                 # legs
+    s.rect(22, 28, 24, 30, G1)
+    s.ellipse(3, 9, 28, 15, G4)                              # rim
+    rows(s, 3, 28, 9, [G7, G6, G5, G4, G3, G2, G1])
+    s.ellipse(6, 10, 25, 14, G6)                             # the brew (glowing)
+    s.line(9, 11, 18, 11, G7)
+    s.outline(O)
+    part(s, "bubbles")
+    for cx, cy, r in ((12, 6, 2), (19, 4, 2), (15, 1, 1)):
+        s.circle(cx, cy, r, G6, fill=True)
+        s.px(cx - 1 if r > 1 else cx, cy - 1 if r > 1 else cy, G7)
+    s.outline(O)
+    return s
+
+
+# ------------------------------------------------ stats: abacus — beads = stat values (anim: beads slide)
+def abacus():
+    s = new()
+    part(s, "frame")
+    s.rect(2, 3, 29, 28, G3)
+    s.rect(5, 6, 26, 25, None)                               # open frame
+    shade_ring(s, 15, 15, G7, G4, G2)
+    for x in (2, 29):                                        # feet
+        s.rect(x - 1 if x == 2 else x - 1, 28, x + 1 if x == 2 else x + 1, 30, G2)
+    s.outline(O)
+    part(s, "rods")
+    for y in (9, 15, 21):
+        s.line(5, y, 26, y, G1)
+    s.outline(O)
+    part(s, "beads")
+    for y, xs in ((9, (6, 10, 14)), (15, (6, 10, 20, 24)), (21, (6, 18, 22))):
+        for x in xs:
+            s.rect(x, y - 2, x + 3, y + 2, G5)
+            s.rect(x, y - 2, x + 1, y - 1, G7)
+            s.rect(x + 2, y + 1, x + 3, y + 2, G3)
+    s.outline(O)
+    return s
+
+
+# ------------------------------------------------ changelog: announcement bell (anim: bell swings, rings)
+def bell():
+    s = new()
+    part(s, "bell")
+    s.polygon([(13, 5), (18, 5), (21, 8), (22, 14), (23, 20), (27, 24), (27, 26), (4, 26), (4, 24),
+               (8, 20), (9, 14), (10, 8)], G4)
+    cols(s, 4, 27, 5, 26, [G6, G7, G6, G5, G4, G4, G3, G2, G1])
+    s.rect(4, 24, 27, 26, G3)                                # lip
+    rows(s, 4, 27, 24, [G6, G4, G2])
+    s.line(11, 9, 11, 19, G7)                                # lit rim of the body
+    s.outline(O)
+    part(s, "loop")
+    s.circle(15, 3, 2, G3)
+    s.px(14, 1, G6)
+    s.outline(O)
+    part(s, "clapper")
+    s.rect(14, 27, 17, 29, G5)
+    s.px(14, 27, G7)
+    s.outline(O)
+    return s
+
+
+# ------------------------------------------------ changes: ring of two arrows around an emblem (anim: ring turns)
+def _arrow_ring(s):
+    part(s, "ring")
+    s.circle(15, 15, 14, G4, fill=True)
+    s.circle(15, 15, 10, None, fill=True)
+    shade_ring(s, 15, 15, G7, G4, G2)
+    for x in range(32):                                        # two gaps (top-right, bottom-left)
+        for y in range(32):
+            a = math.degrees(math.atan2(y - 15, x - 15)) % 360
+            if 300 <= a <= 335 or 120 <= a <= 155:
+                s.px(x, y, None)
+    s.polygon([(17, 0), (24, 4), (17, 8)], G6)                 # arrowheads (clockwise)
+    s.polygon([(14, 30), (7, 26), (14, 22)], G4)
+    s.outline(O)
+
+
+def changes_hero():
+    s = new()
+    _arrow_ring(s)
+    part(s, "helm")
+    s.ellipse(10, 8, 21, 17, G5)
+    s.rect(10, 13, 21, 22, G5)
+    cols(s, 10, 21, 8, 22, [G6, G6, G5, G4, G3, G2])
+    s.rect(12, 14, 19, 15, O)                                  # visor
+    s.line(15, 8, 15, 12, G7)
+    s.outline(O)
+    return s
+
+
+def changes_item():
+    s = new()
+    _arrow_ring(s)
+    part(s, "gem")
+    s.polygon([(12, 9), (19, 9), (22, 13), (15, 22), (16, 22), (9, 13)], G5)
+    s.polygon([(9, 13), (22, 13), (16, 22), (15, 22)], G3)     # lower facets darker
+    s.polygon([(12, 9), (15, 9), (13, 13), (9, 13)], G7)       # lit upper-left facet
+    s.line(15, 13, 15, 21, G6)
+    s.outline(O)
+    return s
+
+
+# ------------------------------------------------ small category emblems for the Dynamics icons (heroes / items)
+def emblem_helm():
+    s = Sprite(12, 12)
+    s.ellipse(1, 1, 10, 8, G5)
+    s.rect(1, 5, 10, 10, G5)
+    cols(s, 1, 10, 1, 10, [G7, G6, G5, G4, G3])
+    s.rect(3, 6, 8, 6, O)
+    s.outline(O)
+    return s
+
+
+def emblem_gem():
+    s = Sprite(12, 12)
+    s.polygon([(3, 1), (8, 1), (10, 4), (6, 10), (5, 10), (1, 4)], G5)
+    s.polygon([(1, 4), (10, 4), (6, 10), (5, 10)], G3)
+    s.polygon([(3, 1), (5, 1), (4, 4), (1, 4)], G7)
+    s.outline(O)
+    return s
+
+
+def dynamics_variants():
+    """icon_dynamics(.png/.gif) + a category emblem in its empty top-left corner -> heroes / items."""
+    base_png = os.path.join(GOTHIC, "icon_dynamics.png")
+    base_gif = os.path.join(GOTHIC, "icon_dynamics.gif")
+    for key, emb in (("heroes", emblem_helm()), ("items", emblem_gem())):
+        emb.flatten()
+        tmp = os.path.join(OUT, f"_emblem_{key}.png")
+        emb.save_png(tmp)
+        e = Image.open(tmp).convert("RGBA")
+        png = Image.open(base_png).convert("RGBA")
+        png.alpha_composite(e, (1, 1))
+        png.save(os.path.join(OUT, f"icon_dynamics_{key}.png"))
+        gif = Image.open(base_gif)
+        frames, durs = [], []
+        for i in range(getattr(gif, "n_frames", 1)):
+            gif.seek(i)
+            fr = gif.convert("RGBA")
+            fr.alpha_composite(e, (1, 1))
+            frames.append(fr)
+            durs.append(gif.info.get("duration", 100))
+        frames[0].save(os.path.join(OUT, f"icon_dynamics_{key}.gif"), save_all=True, append_images=frames[1:],
+                       duration=durs, loop=0, disposal=2, transparency=0, optimize=False)
+        print(f"  icon_dynamics_{key}: png + gif ({len(frames)} frames)")
+
+
 ICONS = {
-    "icon_helm": heroes, "icon_changelog": changelog, "icon_ledger": stats,
-    "icon_flask": hero_lab, "icon_aoe": aoe, "icon_hourglass": changes,
+    "icon_helm": heroes, "icon_abacus": abacus, "icon_cauldron": cauldron, "icon_bell": bell,
+    "icon_aoe": aoe, "icon_changes_hero": changes_hero, "icon_changes_item": changes_item,
     "icon_summons": summons, "icon_swords": lane_creeps, "icon_kofi": kofi,
 }
 
@@ -339,9 +495,13 @@ def main():
     for i, (_, im) in enumerate(tiles):
         one.alpha_composite(im, (8 + i * 40, 8))
     one.resize((one.width * 2, one.height * 2), Image.NEAREST).save(os.path.join(OUT, "preview_1x.png"))
+    dynamics_variants()
     if "--install" in sys.argv:
         for name, _ in tiles:
             shutil.copy(os.path.join(OUT, f"{name}.png"), os.path.join(GOTHIC, f"{name}.png"))
+        for key in ("heroes", "items"):
+            for ext in ("png", "gif"):
+                shutil.copy(os.path.join(OUT, f"icon_dynamics_{key}.{ext}"), os.path.join(GOTHIC, f"icon_dynamics_{key}.{ext}"))
         print("  installed into icons/ui/gothic/")
 
 

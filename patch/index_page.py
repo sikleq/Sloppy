@@ -34,7 +34,7 @@ def save_index_html():
         'terrain':  ('Terrain',    'terrain_741.html'),
         'changelog': ('Changelog', 'changelog.html'),
     }
-    _INV_ICON = {'changelog': 'icon_changelog.png'}      # tiles whose icon file isn't icon_<key>.png
+    _INV_ICON = {'changelog': 'icon_bell.png'}      # tiles whose icon file isn't icon_<key>.png
     # Arcana (Neutral Abilities) lives under the Materials sub-nav, so it has no
     # hub tile of its own.
     _INV_PLACEHOLDERS = []
@@ -194,19 +194,19 @@ def save_index_html():
     heroes_panel = (
         '<div class="inv-panel heroes-panel" data-panel="heroes" aria-hidden="true">'
         '<div class="support-options">'
-        + _panel_link_btn('inv-cell-dynamics', 'heroes_dyn.html', 'icon_dynamics.png', 'Dynamics')
-        + _panel_link_btn('', 'heroes_stats.html', 'icon_ledger.png', 'Stats')
-        + _panel_link_btn('', 'hero_lab.html', 'icon_flask.png', 'Hero Lab')
+        + _panel_link_btn('inv-cell-dynamics-heroes', 'heroes_dyn.html', 'icon_dynamics_heroes.png', 'Dynamics')
+        + _panel_link_btn('', 'heroes_stats.html', 'icon_abacus.png', 'Stats')
+        + _panel_link_btn('', 'hero_lab.html', 'icon_cauldron.png', 'Hero Lab')
         + _panel_link_btn('', 'aoe_increase.html', 'icon_aoe.png', 'AoE')
-        + _panel_link_btn('', 'hero_changes.html', 'icon_hourglass.png', 'Changes')
+        + _panel_link_btn('', 'hero_changes.html', 'icon_changes_hero.png', 'Changes')
         + '</div></div>'
     )
     items_panel = (
         '<div class="inv-panel items-panel" data-panel="items" aria-hidden="true">'
         '<div class="support-options">'
         + _panel_link_btn('inv-cell-mana', 'mana_items.html', 'icon_mana.png', 'Mana')
-        + _panel_link_btn('inv-cell-dynamics', 'items_dyn.html', 'icon_dynamics.png', 'Dynamics')
-        + _panel_link_btn('', 'item_changes.html', 'icon_hourglass.png', 'Changes')
+        + _panel_link_btn('inv-cell-dynamics-items', 'items_dyn.html', 'icon_dynamics_items.png', 'Dynamics')
+        + _panel_link_btn('', 'item_changes.html', 'icon_changes_item.png', 'Changes')
         + '</div></div>'
     )
     # The divider keeps its place under the title; when the Support panel is
