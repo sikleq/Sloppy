@@ -40,6 +40,8 @@ def load_entries(path=DATA):
         entries = _json.load(f)["entries"]
     for e in entries:
         _dt.date.fromisoformat(e["date"])                  # fail fast on a bad date
+        if not e.get("minor") and not e.get("items"):
+            raise ValueError(f"changelog: a feature entry needs items ({e['title']})")
         if e["category"] not in CATEGORIES:
             raise ValueError(f"changelog: unknown category {e['category']!r} ({e['title']})")
     return sorted(entries, key=lambda e: e["date"], reverse=True)
@@ -85,6 +87,25 @@ def _shots_html(e):
             '</div></div>')
 
 
+MINOR_OPEN_MAX = 3            # a day's small changes: up to 3 shown as a list, more fold under a toggle
+
+
+def _minor_html(date, minors):
+    """Small changes of one day ("minor": true) — a compact list; when there are many, it
+    folds under a "Smaller changes (N)" toggle so it doesn't take much room."""
+    lis = "".join(
+        f'<li data-cat="{_slug(e["category"])}"><span class="clog-cat clog-cat-{_slug(e["category"])}">'
+        f'{_esc(e["category"])}</span>' + (f'<a href="{_esc(e["link"])}">{_esc(e["title"])}</a>' if e.get("link")
+                                             else _esc(e["title"])) + '</li>'
+        for e in minors)
+    head = f'Smaller changes <span class="clog-minor-n">{len(minors)}</span>'
+    if len(minors) <= MINOR_OPEN_MAX:
+        return (f'<div class="clog-minor" id="m-{date}"><div class="clog-minor-head">{head}</div>'
+                f'<ul class="clog-minor-list">{lis}</ul></div>')
+    return (f'<details class="clog-minor" id="m-{date}"><summary class="clog-minor-head">{head}</summary>'
+            f'<ul class="clog-minor-list">{lis}</ul></details>')
+
+
 def render(entries):
     by_date = {}
     for e in entries:
@@ -97,11 +118,18 @@ def render(entries):
             rail.append(f'<div class="clog-rail-month">{month}</div>')
             month_seen = month
         cats = " ".join(sorted({_slug(e["category"]) for e in group}))
+        majors = [e for e in group if not e.get("minor")]
+        minors = [e for e in group if e.get("minor")]
         rail.extend(f'<a class="clog-rail-item" href="#{_entry_id(e)}" data-cat="{_slug(e["category"])}">'
-                    f'{_esc(e["title"])}</a>' for e in group)
+                    f'{_esc(e["title"])}</a>' for e in majors)
+        if minors:
+            rail.append(f'<a class="clog-rail-item clog-rail-minor" href="#m-{date}" '
+                        f'data-cats="{" ".join(sorted({_slug(e["category"]) for e in minors}))}">'
+                        f'Smaller changes ({len(minors)})</a>')
         days.append(f'<section class="clog-day" id="d-{date}" data-cats="{cats}">'
                     f'<h2 class="clog-date">{d.strftime("%b")} {d.day}, {d.year}</h2>'
-                    + "".join(_entry_html(e) for e in group) + '</section>')
+                    + "".join(_entry_html(e) for e in majors)
+                    + (_minor_html(date, minors) if minors else '') + '</section>')
     chips = '<button class="clog-chip active" data-cat="">All</button>' + "".join(
         f'<button class="clog-chip" data-cat="{_slug(c)}">{_esc(c)}</button>' for c in CATEGORIES)
     return (f'<div class="clog-layout"><nav class="clog-rail" aria-label="Changes">{"".join(rail)}</nav>'

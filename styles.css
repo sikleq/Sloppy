@@ -9926,7 +9926,23 @@ li.tsp-hidden { display: none !important; }
   border: 1px solid var(--gold-dim); border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.6);
   animation: clog-zoom .16s ease-out; }
 @keyframes clog-zoom { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
-.clog-page .clog-entry.is-hidden, .clog-page .clog-day.is-hidden, .clog-page .clog-rail-item.is-hidden { display: none; }
+.clog-page .clog-entry.is-hidden, .clog-page .clog-day.is-hidden, .clog-page .clog-rail-item.is-hidden,
+.clog-page .clog-minor.is-hidden, .clog-page .clog-minor-list li.is-hidden { display: none; }
+/* a day's small changes: compact list, folded under a toggle when there are many */
+.clog-minor { margin: 10px 0 4px; }
+.clog-minor-head { font-size: 12.5px; color: var(--text-dim, #8b949e); letter-spacing: .3px; }
+summary.clog-minor-head { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+summary.clog-minor-head::-webkit-details-marker { display: none; }
+summary.clog-minor-head::before { content: "\25B8"; color: var(--gold-dim); transition: transform .15s; }
+details[open] > summary.clog-minor-head::before { transform: rotate(90deg); }
+summary.clog-minor-head:hover { color: var(--text-bright); }
+.clog-minor-n { color: var(--gold-dim); }
+.clog-minor-list { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.clog-minor-list li { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--text-main); }
+.clog-minor-list .clog-cat { transform: scale(.9); transform-origin: left center; }
+.clog-minor-list a { color: inherit; text-decoration: underline dotted rgba(227,196,106,.45); text-underline-offset: 3px; }
+.clog-minor-list a:hover { color: var(--gold); }
+.clog-rail-minor { color: var(--text-dim, #8b949e); font-style: italic; }
 @media (max-width: 1100px) {
   .clog-entry.has-shots { grid-template-columns: 1fr; }
   .clog-shots { margin-top: 10px; }

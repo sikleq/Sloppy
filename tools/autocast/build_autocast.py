@@ -187,6 +187,26 @@ def main():
         sheet.alpha_composite(frames[i * 2], ((i % 8) * SIZE, (i // 8) * SIZE))
     sheet.save(os.path.join(HERE, "out", "preview.png"))
     print(f"  -> {OUT_WEBP}: {len(frames)} frames, {os.path.getsize(OUT_WEBP) // 1024} KB")
+    demo(frames)
+
+
+def demo(frames, icon="forest_troll_high_priest_heal", out="icons/changelog/2026-09-24_autocast.webp"):
+    """Changelog demo: a real ability icon with the effect running round it (screen blend, 3x)."""
+    from PIL import ImageChops
+    ic_px = 56 * 3 // 2                                   # icon = the 80-unit square
+    box = SIZE * 3 // 2
+    icon_im = Image.open(os.path.join(ROOT, "icons", "abilities", f"{icon}.png")).convert("RGB").resize((ic_px, ic_px), Image.LANCZOS)
+    shots = []
+    for fr in frames:
+        base = Image.new("RGB", (box, box), (14, 18, 23))
+        base.paste(icon_im, ((box - ic_px) // 2, (box - ic_px) // 2))
+        f = fr.resize((box, box), Image.LANCZOS)
+        light = Image.new("RGB", f.size, (0, 0, 0))
+        light.paste(f.convert("RGB"), mask=f.split()[3])
+        shots.append(ImageChops.screen(base, light))
+    path = os.path.join(ROOT, out)
+    shots[0].save(path, save_all=True, append_images=shots[1:], duration=int(1000 / FPS), loop=0, quality=80, method=6)
+    print(f"  -> {out}: demo")
 
 
 if __name__ == "__main__":

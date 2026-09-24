@@ -6852,7 +6852,16 @@ function ecShopMarkup(panels) {
     document.querySelectorAll('.clog-day').forEach(d =>
       d.classList.toggle('is-hidden', !!cat && !(d.dataset.cats || '').split(' ').includes(cat)));
     document.querySelectorAll('.clog-rail-item').forEach(a =>
-      a.classList.toggle('is-hidden', !!cat && a.dataset.cat !== cat));
+      a.classList.toggle('is-hidden', !!cat && !((a.dataset.cats || a.dataset.cat || '').split(' ').includes(cat))));
+    document.querySelectorAll('.clog-minor').forEach(box => {
+      let any = false;
+      box.querySelectorAll('.clog-minor-list li').forEach(li => {
+        const hide = !!cat && li.dataset.cat !== cat;
+        li.classList.toggle('is-hidden', hide);
+        if (!hide) any = true;
+      });
+      box.classList.toggle('is-hidden', !any);
+    });
   }
   chips.forEach(c => c.addEventListener('click', () => apply(c.dataset.cat)));
   // screenshots open in a lightbox over the page (no new tab); in a carousel the arrows page it

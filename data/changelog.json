@@ -1,5 +1,5 @@
 {
-  "_comment": "Site changelog (changelog.html). Newest first. ONLY new features and pages, not small fixes. One entry: date, category, short title, 1-3 short points, optional page link and screenshots — \"shots\": [...] (icons/changelog/*.webp, made by tools/changelog_shots.py; 2+ shots = a carousel). Categories: Patch Reader, Materials, Hero Lab, Dynamics, Site.",
+  "_comment": "Site changelog (changelog.html). Newest first. Features and new pages = entries with 1-3 short items (optional link, \"shots\": [...] — 2+ = carousel). Small changes = {\"minor\": true, date, category, title, optional link}: listed under the day, folded under a toggle when there are more than 3. Categories: Patch Reader, Materials, Hero Lab, Dynamics, Site. Add an entry in the same commit as the change.",
   "entries": [
     {
       "date": "2026-09-24",
@@ -8,6 +8,94 @@
       "items": [
         "What's new on the site, by date — this page"
       ]
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Site",
+      "title": "New header",
+      "items": [
+        "One gold line under the header; the page you're on opens into the page like a folder tab"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-24_header.webp"
+      ]
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Materials",
+      "title": "Autocast as in the game",
+      "items": [
+        "Autocast abilities on the neutral tables show Dota's own effect: a fiery glow runs round the icon, shedding embers"
+      ],
+      "link": "neutral_stats.html",
+      "shots": [
+        "icons/changelog/2026-09-24_autocast.webp"
+      ]
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Site",
+      "title": "New tile icons on the main page",
+      "items": [
+        "Every tile has its own pixel icon; Dynamics and Changes show whether they're about heroes or items",
+        "Opening a category puts its name at the top"
+      ],
+      "link": "index.html",
+      "shots": [
+        "icons/changelog/2026-09-24_index.webp",
+        "icons/changelog/2026-09-24_index_heroes.webp"
+      ]
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Materials",
+      "title": "AoE Increase shows every radius again (it was empty since 7.41f)",
+      "minor": true,
+      "link": "aoe_increase.html"
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Hero Lab",
+      "title": "Innate abilities are read correctly for 7.41f heroes",
+      "minor": true,
+      "link": "hero_lab.html"
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Patch Reader",
+      "title": "Silent changes for 7.41f compare the right data",
+      "minor": true
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Patch Reader",
+      "title": "Change chips line up in one column everywhere, also inside ability boxes and item property panels",
+      "minor": true
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Patch Reader",
+      "title": "A changed item value shows its BUFF / NERF chip next to the new value",
+      "minor": true
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Patch Reader",
+      "title": "7.38 proofread: Tormentor, Lifesteal, Heaven's Halberd, Abyssal Blade and dozens of tags",
+      "minor": true,
+      "link": "patches/7.38.html"
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Site",
+      "title": "Lists inside \"?\" popups show a bullet per line",
+      "minor": true
+    },
+    {
+      "date": "2026-09-24",
+      "category": "Site",
+      "title": "The main page's \"NEW\" badge and the latest version in the header corner are gone",
+      "minor": true
     },
     {
       "date": "2026-09-24",
