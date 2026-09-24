@@ -5436,45 +5436,54 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
     0 0  3px rgba(227, 196, 106, 0.25);
 }
 
-/* Header — ONE gold rule under the nav (it used to be a faint gold line + the toolbar's grey
-   top border = two lines). The active main tab "opens" into what sits below: gold top/side
-   edges, no bottom edge, filled with the colour of the block under the nav, and it covers the
-   rule, so the rule has a gap right under it — like a folder tab. --tab-open-bg = that block:
-   the patch toolbar, the Materials sub-nav, or the page. */
-nav.top-nav { border-bottom: 0; --tab-open-bg: var(--bg-page); }
-body.patch-page nav.top-nav { --tab-open-bg: var(--bg-panel-3); }
-body nav.top-nav.nav-over-subnav { --tab-open-bg: var(--bg-panel-2); }   /* beats body.patch-page (entity pages) */
+/* Header "embers": the main buttons are plain labels (no plates); the active one glows gold
+   over a thin gold bar with a few sparks rising from it — the autocast embers. Only transform /
+   opacity animate (compositor). ONE gold rule under the nav (the toolbar lost its grey top border). */
+nav.top-nav { border-bottom: 0; }
 nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
-.nav-inner { padding-bottom: 0; }
-.nav-tabs { align-self: end; align-items: flex-end; }
-.nav-tab { margin-bottom: 6px; }
-.nav-tab.active {
-  position: relative;
-  z-index: 2;                               /* above the nav's ::after rule */
-  height: 45px;
-  margin-bottom: -1px;                      /* reach over the rule */
-  padding-bottom: 7px;
-  background: var(--tab-open-bg);
-  /* soft, rounded frame: a quieter gold that fades out down the sides into the block below */
-  border: 1px solid transparent;
-  border-bottom: 0;
-  border-radius: 8px 8px 0 0;
-  background-image:
-    linear-gradient(var(--tab-open-bg), var(--tab-open-bg)),
-    linear-gradient(180deg, rgba(227, 196, 106, 0.34) 0%, rgba(227, 196, 106, 0.16) 60%, rgba(227, 196, 106, 0) 100%);
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
+.toolbar { border-top: 0; }
+.nav-tab, .nav-tab:hover, .nav-tab.active {
+  background: none;
   box-shadow: none;
   clip-path: none;
-  transition: background 0.2s ease, color 0.2s ease;
+  border-color: transparent;
 }
-.toolbar { border-top: 0; }
+.nav-tab { position: relative; padding: 0 12px; color: #9aa3ad; }
+.nav-tab:hover { color: var(--text-bright); }
+.nav-tab.active { color: #ffe08a; text-shadow: 0 0 10px rgba(255, 170, 60, 0.25); }
+.nav-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: 5px;
+  height: 2px;
+  background: var(--gold);
+  box-shadow: 0 0 6px #ff9a2a;
+}
+.nav-ember {
+  position: absolute;
+  bottom: 6px;
+  width: 2px;
+  height: 2px;
+  background: #ffcf6a;
+  box-shadow: 0 0 3px #ff8a1a;
+  opacity: 0;
+  pointer-events: none;
+  animation: nav-ember 1.6s linear infinite;
+}
+@keyframes nav-ember {
+  0%   { opacity: 0; transform: translateY(0); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-16px); }
+}
+@media (prefers-reduced-motion: reduce) { .nav-ember { display: none; } }
 
 /* Materials sub-tabs — flat row of three browser-tab pills, hung BELOW the
    main header on a thin bar (so the header itself stays compact). */
 .materials-subnav {
   background: var(--bg-panel-2);
-  border-bottom: 1px solid var(--blue-18);
+  border-bottom: 1px solid rgba(227, 196, 106, 0.14);
   width: 100%;
 }
 .materials-subnav-inner {
@@ -5517,12 +5526,14 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   align-items: center;
   gap: 0;
 }
-.nav-subtab:hover { color: var(--text-bright); background: rgba(48, 54, 61, 0.45); }
+.nav-subtab:hover { color: var(--text-bright); background: none; }
 .nav-subtab.active {
   color: var(--gold);
-  background: var(--bg-page);          /* matches the page background → tab merges into page */
-  border-color: var(--blue-18);
+  background: none;
+  border-color: transparent;
 }
+/* plain labels, like the main buttons above (no tab pills / blue borders) */
+.nav-subtab { color: #8b98a8; border-color: transparent; border-radius: 0; }
 .nav-subtab-label { color: inherit; }
 /* ---- Grouped sub-nav dropdowns (Creeps ▾ / Items ▾ / Heroes ▾) ---- */
 .nav-subgroup { position: relative; display: inline-flex; align-items: flex-end; }

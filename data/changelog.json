@@ -14,7 +14,8 @@
       "category": "Site",
       "title": "New header",
       "items": [
-        "One gold line under the header; the page you're on opens into the page like a folder tab"
+        "The main buttons are plain labels; the page you're on glows gold over a thin bar with embers rising from it",
+        "The Materials sub-menu is a simple text row, the current page in gold"
       ],
       "shots": [
         "icons/changelog/2026-09-24_header.webp"

@@ -185,9 +185,13 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
         if key == "changelogs":
             return latest_href
         return prefix + href
+    # The active tab smoulders: a thin gold bar with a few sparks rising from it (CSS "nav-ember",
+    # the same embers as the neutral tables' autocast). Staggered so they never rise together.
+    embers = ''.join(f'<i class="nav-ember" style="left:{x}%;animation-delay:{d}s"></i>'
+                     for x, d in ((22, 0), (48, 0.5), (70, 1.0), (35, 1.3)))
     centre = ''.join(
         f'<a class="nav-tab{" active" if active == key else ""}" '
-        f'href="{_tab_href(key, href)}">{label}</a>'
+        f'href="{_tab_href(key, href)}">{label}{embers if active == key else ""}</a>'
         for key, label, href in NAV_TABS)
     # On the index hub the centre tabs are omitted — they'd just duplicate the
     # inventory-tile grid below. Other pages keep them. Keep an EMPTY centre
@@ -210,8 +214,7 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
             f'<div class="nav-context nav-context-flat '
             f'nav-context-{active}">{ver_html}</div>'
         )
-    below = " nav-over-subnav" if subtabs_active is not None else ""
-    header = f'''<nav class="top-nav{below}">
+    header = f'''<nav class="top-nav">
   <div class="nav-inner">
     {brand}
     {centre_html}
