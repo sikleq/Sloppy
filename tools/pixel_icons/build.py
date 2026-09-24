@@ -117,28 +117,34 @@ def changelog():
     return s
 
 
-# ------------------------------------------------ stats: open ledger with bars (anim: bars grow)
+# ------------------------------------------------ stats: heraldic shield with three stat bars (anim: bars fill)
+# (not a book — the Patches tile is already an open book)
+SHIELD = [(4, 3), (9, 2), (15, 1), (16, 1), (22, 2), (27, 3), (27, 16), (25, 21), (21, 26), (16, 30),
+          (15, 30), (10, 26), (6, 21), (4, 16)]
+FACE = [(7, 5), (15, 4), (16, 4), (24, 5), (24, 16), (22, 20), (19, 24), (16, 27), (15, 27), (12, 24),
+        (9, 20), (7, 16)]
+
+
 def stats():
     s = new()
-    part(s, "cover")
-    s.polygon([(1, 10), (15, 12), (16, 12), (30, 10), (30, 28), (16, 30), (15, 30), (1, 28)], G2)
+    part(s, "shield")
+    s.polygon(SHIELD, G4)                                   # gold rim
+    cols(s, 4, 27, 1, 30, [G6, G7, G6, G5, G4, G4, G3, G2])
+    s.polygon(FACE, G0)                                     # dark enamel face
+    cols(s, 7, 24, 4, 27, [G1, G1, G0, G0, G0, O])
+    s.line(8, 5, 14, 4, G7)                                 # rim glint top-left
     s.outline(O)
-    part(s, "pages")
-    s.polygon([(2, 7), (15, 9), (15, 27), (2, 25)], P1)
-    s.polygon([(16, 9), (29, 7), (29, 25), (16, 27)], P1)
-    s.polygon([(2, 25), (15, 27), (15, 28), (2, 26)], P0)   # page-stack edge
-    s.polygon([(16, 27), (29, 25), (29, 26), (16, 28)], P0)
-    s.rect(13, 9, 14, 27, P0)                              # gutter shade
-    s.line(15, 9, 15, 28, O)
-    s.line(16, 9, 16, 28, P0)
-    for y in (12, 16, 20):                                 # ledger lines
-        s.rect(4, y, 11, y, G2)
-        s.rect(4, y + 1, 9, y + 1, G2)
-    for x0, top in ((18, 18), (22, 14), (26, 10)):          # 3px bars
-        s.rect(x0, top, x0 + 2, 23, G4)
-        s.line(x0, top, x0, 23, G6)
-        s.line(x0 + 2, top, x0 + 2, 23, G2)
-        s.line(x0, top, x0 + 2, top, G7)
+    part(s, "bars")
+    for y, x1 in ((8, 21), (13, 16), (18, 19)):             # three stat bars, different lengths
+        s.rect(9, y, 22, y + 2, O)                          # empty track (dark, so the fill reads)
+        s.rect(9, y, x1, y + 2, G5)
+        s.rect(9, y, x1, y, G7)
+        s.rect(9, y + 2, x1, y + 2, G3)
+    s.outline(O)
+    part(s, "boss")
+    s.rect(14, 23, 17, 25, G6)                              # small boss at the tip
+    s.px(14, 23, G7)
+    s.px(17, 25, G2)
     s.outline(O)
     return s
 
