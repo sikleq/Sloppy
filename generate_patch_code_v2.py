@@ -252,6 +252,9 @@ CANONICAL_TAGS = [
     (re.compile(r'\bis now disjointable\b', re.I),                  'NERF'),   # own projectile can now be dodged
     (re.compile(r'\bnow (?:only|solely) (?:affects?|available|applies|works|triggers?|targets?|hits?)\b', re.I), 'NERF'),
     (re.compile(r'\bnow (?:affects?|applies|works) only\b', re.I),  'NERF'),
+    # a whole cooldown where there was none (7.38 "Poison Attack now has a 9s cooldown") -> NEW;
+    # longer sentences ("…cooldown before it can be applied…") keep the NERF rule below
+    (re.compile(r"^[A-Z][\w' ]* now has an? \d+(?:\.\d+)?s cooldown$"), 'NEW'),
     (re.compile(r'\bnow has (?:a |an )?\d[\d./]*\s?(?:s|seconds?)? ?(?:cast point|cast time|internal cooldown|break distance|cooldown|mana cost|delay|health cost)\b', re.I), 'NERF'),
     (re.compile(r'\bnow (?:ends|expires|dies?|breaks?|is (?:cancell?ed|interrupted|removed)) (?:if|when|once|after)\b', re.I), 'NERF'),
     (re.compile(r'\b(?:may|can) only (?:trigger|proc|be cast|be used|target|affect|stack)\b', re.I), 'NERF'),
@@ -276,6 +279,15 @@ CANONICAL_TAGS = [
     (re.compile(r'\bwill now (?:spawn|grant|provide|give|drop)\b', re.I), 'NEW'),
     (re.compile(r'\bis back in the river\b|\bpits? (?:is |are )?(?:now )?located\b', re.I), 'REWORK'),
     (re.compile(r'\bno longer drops?\b', re.I),                  'DEL'),
+    # a protection is gone -> a NEW way to interact with it (Kobold aura can now be broken)
+    (re.compile(r'\bno longer unbreakable\b', re.I),             'NEW'),
+    # something that did not exist before: a cooldown, a restore on use
+    (re.compile(r"^[A-Z][\w']*(?: [\w']+){0,3} now (?:also )?restores\b"), 'NEW'),
+    # a limit on how long an effect lasts changes how it is used
+    (re.compile(r'\bnow has an? \d+(?:\.\d+)?\s*(?:minutes?|min|s|seconds?) duration\b', re.I), 'REWORK'),
+    # a loss with a stated compensation ("can no longer … However, … still …")
+    (re.compile(r'\bno longer\b.*\bHowever\b.*\bstill\b', re.I), 'REWORK'),
+    (re.compile(r'^No longer (?:refills|triggers|activates)\b', re.I), 'DEL'),
     (re.compile(r'\bno longer have special rules\b|\bnow consistent across\b', re.I), 'REWORK'),
     (re.compile(r'^The following (?:sources|targets|abilities|items|units)\b.*\b(?:do not|no longer|now)\b', re.I), 'REWORK'),
     (re.compile(r'\bstill result in\b.*\bcan benefit from\b', re.I), 'REWORK'),
@@ -576,6 +588,8 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
     optional inline_note text appended. hero_name+version enable bstat_h."""
     txt = text.strip()
     clean = _strip_html(txt)
+    if re.match(r'^Level (?:increased|decreased|changed) from \d+ to \d+$', clean):
+        return f'W(li("{txt}", t("MISC")))'        # a creep's level: classification, not a buff/nerf
 
     # "Damage at level 1 changed from X–Y to A–B" → br(X, Y, A, B)
     dmg_m = _DMG_L1_RE.search(clean)
@@ -1959,6 +1973,93 @@ def _postprocess_boss_blocks(lines):
     return out
 
 
+_COST_ROW_RE = re.compile(r'^Costs? (\d+) gold$', re.I)
+_REQ_ROW_RE = re.compile(r'^Requires (?P<parts>.+?)\. Total cost: (?P<total>\d+)g?$', re.I)
+_REQ_PART_RE = re.compile(r"(?:and )?(?:an? )?(?P<name>[A-Za-z][\w' -]+?) \((?P<cost>\d+)\)")
+
+
+_BONUS_ROW_RE = re.compile(r"^[+-]\d[\d./]*%? [A-Za-z][\w' ]+(?:, [+-]\d[\d./]*%? [A-Za-z][\w' ]+)*\.?$")
+
+
+def _new_item_card_parts(text, note):
+    """One row of a NEW item -> a card piece, or None if the row is a normal NEW row."""
+    if re.match(r'^Provides no bonuses\.?$', text, re.I):
+        return []                                          # nothing to show: no bonus box at all
+    m = _COST_ROW_RE.match(text)
+    if m:
+        return [f'W(item_cost({m.group(1)}))']
+    m = _REQ_ROW_RE.match(text)
+    if m:
+        parts = [(pm.group('name'), pm.group('cost')) for pm in _REQ_PART_RE.finditer(m.group('parts'))]
+        recipe = next((c for n, c in parts if n.lower().endswith('recipe')), None)
+        comps = ', '.join(f'("{n}", {c})' for n, c in parts if not n.lower().endswith('recipe'))
+        rec = f', recipe=("Recipe", {recipe})' if recipe else ''
+        return [f'W(components({comps}{rec}, total={m.group("total")}))']
+    if _BONUS_ROW_RE.match(text):                         # "+100 Health" / "+125 Cast Range, -20% Max Mana"
+        return [f'W(provides("{text.rstrip(".")}"))']
+    m = re.match(r'^Provides (.+)$', text)
+    if m:
+        tip = f' + info_tip("{note}")' if note else ''
+        bonuses = re.sub(r',? and ', ', ', m.group(1))          # "A, B, and C" -> one box row each
+        return [f'W(provides("{bonuses}"{tip}))']
+    return None
+
+
+def _kv_item_cost(name, version):
+    """ItemCost of a (new) item in this patch's KV snapshot, or None."""
+    try:
+        from patch.stats import _STATS_I
+    except Exception:
+        return None
+    slug = _KNOWN_ITEM_SLUGS.get(name, name.lower().replace(' ', '_').replace("'", ''))
+    cost = (_STATS_I.get(version, {}).get(f'item_{slug}') or {}).get('ItemCost')
+    try:
+        return int(cost) if cost and int(cost) > 0 else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _postprocess_new_item_card(lines, version=None):
+    """A NEW item is a card, not a change list (docs/agent-rules/patch-tags.md "Новый предмет"):
+    header with label -> price (item_cost / components) -> bonuses (provides box; none -> no box)
+    -> Passive:/Active: ability rows and other notes, all t("NEW")."""
+    out = []
+    i = 0
+    while i < len(lines):
+        ln = lines[i]
+        if not (re.match(r'^W\(item_header\("[^"]+", new="New ', ln) and i + 1 < len(lines)
+                and lines[i + 1] == 'W(ul_open())'):
+            out.append(ln)
+            i += 1
+            continue
+        j = i + 2
+        body = []
+        while j < len(lines) and lines[j] != 'W(ul_close())':
+            body.append(lines[j])
+            j += 1
+        price, bonus, rows = [], [], []
+        for b_ in body:
+            raw = re.match(r'^W\(li\("((?:[^"\\]|\\.)*)"', b_)
+            note = re.search(r'extra=inline_note\("((?:[^"\\]|\\.)*)"\)', b_)
+            piece = _new_item_card_parts(raw.group(1), note.group(1) if note else None) if raw else None
+            if piece is None:
+                rows.append(re.sub(r't\("(?:MISC|BUFF|NERF|REWORK)"\)', 't("NEW")', b_, count=1))
+            elif piece and 'provides(' in piece[0]:
+                bonus += piece
+            else:
+                price += piece
+        if not price and 'Artifact' not in ln and 'Enchantment' not in ln:
+            name = re.match(r'^W\(item_header\("([^"]+)"', ln).group(1)
+            cost = _kv_item_cost(name, version) if version else None
+            if cost:
+                price = [f'W(item_cost({cost}))']
+        out += [ln] + price + bonus
+        if rows:
+            out += ['W(ul_open())'] + rows + ['W(ul_close())']
+        i = j + 1
+    return out
+
+
 def _postprocess_rework_marker(lines):
     """Add a TODO breadcrumb above W(ability(...)) blocks whose first li
     announces a REWORKED ability ("Innate ability reworked" / "Ability
@@ -2395,6 +2496,7 @@ def generate(version):
     out = _postprocess_minute_formula(out)
     out = _postprocess_scale_pill(out)
     out = _postprocess_new_block_label(out)
+    out = _postprocess_new_item_card(out, version)
     out = _postprocess_properties_change(out)
     out = _postprocess_drop_now_requires(out)
     out = _postprocess_recipe_cost_zero_net(out)

@@ -512,3 +512,40 @@ def test_multi_line_info_popup_is_a_bulleted_list():
     html = info_tip("first<br>second<br>&nbsp;&nbsp;– deeper")
     assert html.count('class="pop-li"') == 2 and 'class="pop-li pop-sub">deeper' in html
     assert 'pop-li' not in info_tip("just one line")
+
+
+def test_new_item_becomes_card_price_bonuses_then_abilities():
+    lines = ['W(item_header("Crella\'s Crozier", new="New Magical Item"))', 'W(ul_open())',
+             'W(li("Passive: Putrefaction Aura. Reduces health restoration", t("MISC")))',
+             'W(li("Requires Ghost Scepter (1500), Soul Booster (3000), and a recipe (300). Total cost: 4800g", t("MISC")))',
+             'W(li("Provides +6 All Attributes, +450 Health, and +450 Mana", t("MISC")))',
+             'W(ul_close())']
+    out = g._postprocess_new_item_card(lines)
+    assert out[1] == 'W(components(("Ghost Scepter", 1500), ("Soul Booster", 3000), recipe=("Recipe", 300), total=4800))'
+    assert out[2] == 'W(provides("+6 All Attributes, +450 Health, +450 Mana"))'
+    assert out[3:] == ['W(ul_open())', 'W(li("Passive: Putrefaction Aura. Reduces health restoration", t("NEW")))', 'W(ul_close())']
+
+
+def test_new_item_without_bonuses_has_no_bonus_row_and_gets_kv_price():
+    lines = ['W(item_header("Orb of Frost", new="New Basic Equipment Item"))', 'W(ul_open())',
+             'W(li("Provides no bonuses", t("MISC")))', 'W(li("Passive: Frost. Slows", t("MISC")))', 'W(ul_close())']
+    out = g._postprocess_new_item_card(lines, "7.38")
+    assert out[1] == 'W(item_cost(250))'
+    assert not any("no bonuses" in ln for ln in out)
+
+
+@pytest.mark.parametrize("text,tag", [
+    ("No longer unbreakable", "NEW"),
+    ("Scrumptious now restores 3000 health and 2000 mana when consumed", "NEW"),
+    ("Scrumptious' Savory Shield now has a 5 minute duration", "REWORK"),
+    ("Scrumptious can no longer be cast on an ally to give them the buff. However, item is still fully shareable", "REWORK"),
+    ("No longer refills when carrier has a lingering fountain regeneration buff", "DEL"),
+    ("Poison Attack now has a 9s cooldown", "NEW"),
+    ("Roshan's knockback now has a 2s cooldown before it can be applied to the same unit again", "NERF"),
+])
+def test_item_and_creep_canonical_tags_738(text, tag):
+    assert g._guess_tag(text) == tag
+
+
+def test_creep_level_change_is_misc_not_a_percent_badge():
+    assert g._emit_li("Level increased from 5 to 6") == 'W(li("Level increased from 5 to 6", t("MISC")))'
