@@ -262,12 +262,10 @@ class TestInfoTip:
         result = info_tip("Line 1")
         assert "Line 1" in result
 
-    def test_multiple_lines_joined_with_br(self):
+    def test_multiple_lines_become_bullets(self):
         from patch.elements import info_tip
         result = info_tip("Line 1", "Line 2")
-        assert "Line 1" in result
-        assert "Line 2" in result
-        assert "<br>" in result
+        assert '<span class="pop-li">Line 1</span><span class="pop-li">Line 2</span>' in result
 
     def test_returns_span_with_info_tip_class(self):
         from patch.elements import info_tip

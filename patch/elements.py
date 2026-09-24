@@ -1147,8 +1147,22 @@ def inline_note(text):
     return f'<!--INLINETIP-->{info_tip(text)}<!--/INLINETIP-->'
 
 
+_POP_SUB = '&nbsp;&nbsp;– '
+
+
+def _pop_list(body):
+    """A popup of several lines is an enumeration: one bullet per line (an "&nbsp;&nbsp;– x"
+    line is a sub-item of the line above). A single line stays plain text."""
+    items = [x for x in body.split('<br>') if x.strip()]
+    if len(items) < 2:
+        return body
+    return ''.join(
+        f'<span class="pop-li pop-sub">{x[len(_POP_SUB):]}</span>' if x.startswith(_POP_SUB)
+        else f'<span class="pop-li">{x}</span>' for x in items)
+
+
 def info_tip(*lines, header=None):
-    body = '<br>'.join(lines)
+    body = _pop_list('<br>'.join(lines))
     head = f'<span class="info-pop-h">{header}</span>' if header else ''
     return ('<!--TIP--><span class="info-tip" tabindex="0">?'
             f'<span class="info-pop">{head}{body}</span></span><!--/TIP-->')

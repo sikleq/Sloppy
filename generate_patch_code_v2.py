@@ -276,6 +276,9 @@ CANONICAL_TAGS = [
     (re.compile(r'\bwill now (?:spawn|grant|provide|give|drop)\b', re.I), 'NEW'),
     (re.compile(r'\bis back in the river\b|\bpits? (?:is |are )?(?:now )?located\b', re.I), 'REWORK'),
     (re.compile(r'\bno longer drops?\b', re.I),                  'DEL'),
+    (re.compile(r'\bno longer have special rules\b|\bnow consistent across\b', re.I), 'REWORK'),
+    (re.compile(r'^The following (?:sources|targets|abilities|items|units)\b.*\b(?:do not|no longer|now)\b', re.I), 'REWORK'),
+    (re.compile(r'\bstill result in\b.*\bcan benefit from\b', re.I), 'REWORK'),
     (re.compile(r"^[A-Z][\w']*(?: [\w']+){0,2} now (?:also )?(?:grants|provides|drops|gives)\b"), 'NEW'),
     (re.compile(r'\bAdded to Captains Mode\b', re.I),               'NEW'),
     (re.compile(r'\bCan now be disassembled\b', re.I),              'NEW'),
@@ -723,6 +726,8 @@ def _nested_info_text(notes, lvl, desc):
     groups = []                                  # [direct child text, [deeper texts]]
     for j in desc:
         t = (notes[j].get('note') or '').strip()
+        if (notes[j].get('info') or '').strip():
+            t += f' <span class="pop-note">({notes[j]["info"].strip()})</span>'
         if notes[j].get('indent_level', 1) == lvl + 1 or not groups:
             groups.append([t, []])
         else:
@@ -1763,11 +1768,19 @@ _BLOCK_HEAD_RE = re.compile(r'^W\((?P<fn>plain_header|subgroup)\("(?P<title>[^"]
 _GONE_RE = re.compile(r'^W\(li\("(?P<old>[A-Z][\w ]+?) (?:have been |has been |were |was )?removed and replaced with (?:a )?new\b')
 
 
+def _block_boundary(line):
+    """Any heading call (section / plain_header / subgroup / unit / item / ability …) ends a block."""
+    line = line.lstrip('\n')
+    return line.startswith('W(') and not line.startswith(('W(li(', 'W(li_formula(', 'W(ul_open(', 'W(ul_close('))
+
+
 def _postprocess_new_block_label(lines):
     out = list(lines)
     moves = []
     section = ''
-    for i, line in enumerate(out):
+    for i, raw_line in enumerate(out):
+        line = raw_line.lstrip('\n')          # section spacing: a heading may carry leading blank lines
+        pre = raw_line[:len(raw_line) - len(line)]
         head = _BLOCK_HEAD_RE.match(line)
         if not head:
             continue
@@ -1777,10 +1790,19 @@ def _postprocess_new_block_label(lines):
             continue
         j = i + 1
         rows = []
-        while j < len(out) and not _BLOCK_HEAD_RE.match(out[j]):
+        while j < len(out) and not _block_boundary(out[j]):
             if out[j].startswith('W(li("'):
                 rows.append(j)
             j += 1
+        # a plain_header whose rows are all REWORK (≥3; QoL/NEW rows allowed) describes how a
+        # REWORKED mechanic works now (7.38 Lifesteal): REWORK rows become the description box
+        row_tags = [re.search(r't\("([A-Za-z]+)"\)', out[r]) for r in rows]
+        row_tags = [m_.group(1) if m_ else None for m_ in row_tags]
+        if (head.group('fn') == 'plain_header' and row_tags.count('REWORK') >= 3
+                and all(t_ in ('REWORK', 'QoL', 'NEW') for t_ in row_tags)):
+            label = 'Reworked objective' if section.lower() == 'map objectives' else 'Reworked mechanic'
+            out[i] = pre + line[:-2] + f', new="{label}"))'
+            continue
         # the announcing row must be the block's FIRST row — a later "replaced
         # with new …" line inside an old block is an ordinary change
         if not rows or not _NEW_BLOCK_RE.search(out[rows[0]]):
@@ -1788,7 +1810,7 @@ def _postprocess_new_block_label(lines):
         objective = (section.lower() == 'map objectives'
                      or _NEW_OBJECTIVE_RE.search(out[rows[0]]))
         label = 'New objective' if objective else 'New mechanic'
-        out[i] = line[:-2] + f', new="{label}"))'
+        out[i] = pre + line[:-2] + f', new="{label}"))'
         for r in rows:
             out[r] = out[r].replace('t("MISC")', 't("NEW")')
         # "Wisdom Runes removed and replaced with new buildings: Shrines of Wisdom" (7.38) is a

@@ -490,3 +490,25 @@ def test_boss_block_splits_abilities_and_marks_reworked_objective():
 ])
 def test_map_objective_canonical_tags(text, tag):
     assert g._guess_tag(text) == tag
+
+
+def test_all_rework_plain_header_becomes_reworked_mechanic():
+    lines = ['\nW(plain_header("Lifesteal"))', 'W(ul_open())',
+             'W(li("a", t("REWORK")))', 'W(li("b", t("REWORK")))', 'W(li("c", t("REWORK")))',
+             'W(li("Holding Alt shows more", t("QoL")))', 'W(ul_close())', '\nW(section("Next"))']
+    out = g._postprocess_new_block_label(lines)
+    assert out[0] == '\nW(plain_header("Lifesteal", new="Reworked mechanic"))'
+
+
+def test_nested_child_keeps_its_own_valve_info():
+    notes = [{"indent_level": 1, "note": "The following sources do not provide any lifesteal"},
+             {"indent_level": 2, "note": "Reflected damage ", "info": "Example: Blade Mail return damage"}]
+    txt = g._nested_info_text(notes, 1, [1])
+    assert 'Reflected damage <span class="pop-note">(Example: Blade Mail return damage)</span>' == txt
+
+
+def test_multi_line_info_popup_is_a_bulleted_list():
+    from patch.elements import info_tip
+    html = info_tip("first<br>second<br>&nbsp;&nbsp;– deeper")
+    assert html.count('class="pop-li"') == 2 and 'class="pop-li pop-sub">deeper' in html
+    assert 'pop-li' not in info_tip("just one line")

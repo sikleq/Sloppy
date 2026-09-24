@@ -3185,6 +3185,13 @@ ul.changes li.ability-row-end {
 .info-pop-body.is-visible { display: block; }
 /* pinned by a click on its "?" (ecPinnableTip in scripts.js): stays up, text selectable */
 .info-pop-body.is-pinned, .qhint-tip.is-pinned { position: absolute; pointer-events: auto; user-select: text; border-color: var(--gold); }
+/* several lines in a "?" popup = a list: gold bullet per line, "–" for a sub-item */
+.pop-li { display: block; position: relative; padding-left: 13px; }
+.pop-li + .pop-li { margin-top: 3px; }
+.pop-li::before { content: "•"; position: absolute; left: 1px; color: var(--gold); }
+.pop-li.pop-sub { padding-left: 26px; margin-top: 1px; }
+.pop-li.pop-sub::before { content: "–"; left: 14px; color: var(--text-dim, #8b949e); }
+.pop-note { color: var(--text-dim, #8b949e); }
 .info-pop-h {
   display: block;
   margin-bottom: 5px;
