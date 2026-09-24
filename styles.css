@@ -5920,126 +5920,25 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   z-index: auto;
   box-shadow: none;
 }
-/* A thin golden "snake" — a short stroke segment that crawls along the icon's
-   rounded-rect frame at constant speed, corners included. The SVG <rect> has
-   pathLength=100, so the dash (snake) + gap sum to 100 and the dashoffset
-   animation loops seamlessly around the perimeter. */
-.creeps-table .autocast-snake {
+/* Autocast marker = the in-game effect (glow crackle + embers running round the square),
+   baked from Dota's particle files into one looping WebP (tools/autocast/build_autocast.py).
+   The 80-unit square is 56 of its 100 px, so the image is 100/56 of the icon, centred;
+   "screen" blends it additively like the game's sprites. */
+.creeps-table .autocast-fx {
   position: absolute;
-  inset: -1px;
-  width: calc(100% + 2px);
-  height: calc(100% + 2px);
-  overflow: visible;
+  left: 50%;
+  top: 50%;
+  width: calc(100% * 100 / 56);
+  height: calc(100% * 100 / 56);
+  max-width: none;               /* table img rules cap width at 100% — the overlay is larger */
+  max-height: none;
+  transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 2;
-}
-.creeps-table .autocast-snake rect {
-  fill: none;
-  stroke-linecap: butt;
-  stroke-dashoffset: 0;
-  /* Every stroke shares one phase-locked lap so the whole comet travels as a
-     unit. Painted range [a,b] is expressed as dasharray "0 a (b-a) (100-b)"
-     (leading 0-length dash + gap, then the painted dash). Head leads at the
-     high end; tail fades toward the low end. */
-  animation: autocast-snake 1.73s linear infinite;
-}
-/* Off-screen autocast icons pause every animation (IntersectionObserver in
-   scripts.js toggles .ac-off) so the ~30 infinite stroke-dashoffset loops on the
-   Neutral tables don't repaint continuously while scrolled out of view. */
-.creeps-table .autocast-snake.ac-off,
-.creeps-table .autocast-snake.ac-off * { animation-play-state: paused !important; }
-/* Closed base ring — a continuous, static golden line around the whole frame.
-   The animated comet below sweeps around within it, so the snake reads as a
-   closed loop with the glow travelling inside itself. */
-.creeps-table .autocast-snake .ac-ring {
-  stroke: #ffce72;
-  stroke-width: 1.5;
-  stroke-dasharray: none;
-  opacity: 0.34;
-  filter: drop-shadow(0 0 1.2px rgba(255, 190, 70, 0.6));
-  animation: none;
-}
-/* Wide, very soft, translucent aura spanning the whole comet — the "fluff". */
-.creeps-table .autocast-snake .ac-fluff {
-  stroke: #ffc964;
-  stroke-width: 9;
-  stroke-linecap: round;
-  stroke-dasharray: 0 0 100 0;     /* [0, 100] — full ring */
-  opacity: 0.10;
-}
-/* Bright body — the leading, fully-opaque stretch. Head sits at 100, which on
-   the closed path coincides with position 0, so the head meets the tail's tip:
-   the comet wraps the entire perimeter and touches itself. */
-.creeps-table .autocast-snake .ac-body {
-  stroke: #fff3c8;
-  stroke-width: 1.8;
-  stroke-dasharray: 0 60 40 0;     /* [60, 100] */
-  filter: drop-shadow(0 0 1.8px rgba(255, 190, 70, 0.95));
-}
-/* Tail — 4 overlapping steps with a gentle opacity ramp (1 → .78 → .5 → .28
-   → .12), tapering width and rising blur toward the tip. The painted union
-   covers the whole [0,100] perimeter, so the faint tip (at 0) meets the bright
-   head (at 100) for a fully closed loop with no gap. */
-.creeps-table .autocast-snake .ac-tail1 {
-  stroke: #ffe9ad;
-  stroke-width: 1.55;
-  stroke-dasharray: 0 46 18 36;    /* [46, 64] */
-  opacity: 0.78;
-  filter: drop-shadow(0 0 1.5px rgba(255, 190, 70, 0.75));
-}
-.creeps-table .autocast-snake .ac-tail2 {
-  stroke: #ffe09a;
-  stroke-width: 1.2;
-  stroke-dasharray: 0 30 20 50;    /* [30, 50] */
-  opacity: 0.5;
-}
-.creeps-table .autocast-snake .ac-tail3 {
-  stroke: #ffd98e;
-  stroke-width: 0.85;
-  stroke-dasharray: 0 14 20 66;    /* [14, 34] */
-  opacity: 0.24;
-}
-.creeps-table .autocast-snake .ac-tail4 {
-  stroke: #ffd585;
-  stroke-width: 0.5;
-  stroke-dasharray: 0 0 18 82;     /* [0, 18] */
-  opacity: 0.10;
-}
-/* Pollen — two phase-locked layers of tiny, irregular, heavily-blurred specks
-   that ride with the comet. Small widths + strong blur + varied dash sizes
-   dissolve the dots into a soft golden dust cloud (scatter) instead of crisp
-   beads. Each dasharray sums to 100 for a seamless lap. */
-.creeps-table .autocast-snake .ac-pollen {
-  stroke: #fff3cf;
-  stroke-width: 1;
-  stroke-linecap: round;
-  stroke-dasharray: 0.5 4 0.4 5 0.6 3.5 0.3 5.5 0.5 4 0.4 4.5 0.5 5 0.3 4 0.6 4.5 0.4 5 0.5 4 0.3 45.7;
-  opacity: 0.5;
-  filter: drop-shadow(0 0 1.6px rgba(255, 205, 110, 0.85));
-}
-.creeps-table .autocast-snake .ac-pollen2 {
-  stroke: #ffeec2;
-  stroke-width: 0.6;
-  stroke-linecap: round;
-  stroke-dasharray: 0.3 6 0.4 5.5 0.3 6.5 0.4 5 0.3 7 0.4 6 0.3 6.5 0.4 6 0.3 48.4;
-  opacity: 0.4;
-  filter: drop-shadow(0 0 1.4px rgba(255, 210, 120, 0.8));
-}
-/* Sparse, bright, sharp twinkles with a strong glow — the "magic" sparkle on
-   top of the soft dust haze. */
-.creeps-table .autocast-snake .ac-pollen3 {
-  stroke: #fffdf2;
-  stroke-width: 0.5;
-  stroke-linecap: round;
-  stroke-dasharray: 0.4 9 0.3 11 0.4 8 0.3 12 0.4 10 0.3 47.9;
-  opacity: 0.9;
-  filter: drop-shadow(0 0 2px rgba(255, 225, 150, 0.95));
-}
-@keyframes autocast-snake {
-  to { stroke-dashoffset: -100; }
+  mix-blend-mode: screen;
 }
 @media (prefers-reduced-motion: reduce) {
-  .creeps-table .autocast-snake rect { animation: none; }
+  .creeps-table .autocast-fx { display: none; }
 }
 /* Ability name header inside the changelog tooltip (centered). */
 .stat-hist-tip .abil-tip-name {

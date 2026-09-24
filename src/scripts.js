@@ -1824,12 +1824,12 @@
   const originalOrder = [...tbody.querySelectorAll('tr')];
 
   // Moving rows in the DOM resets CSS animations to t=0. Snapshot currentTime
-  // for every animated element before the move, restore it after so the
-  // autocast-snake comet continues without restarting.
+  // for every animated element before the move, restore it after so running
+  // animations continue without restarting.
   function snapAnims(rows) {
     const map = new Map();
     rows.forEach(tr => {
-      tr.querySelectorAll('[style*="animation"], .autocast-snake rect').forEach(el => {
+      tr.querySelectorAll('[style*="animation"]').forEach(el => {
         const anims = el.getAnimations();
         if (anims.length) map.set(el, anims.map(a => a.currentTime));
       });
@@ -7112,22 +7112,6 @@ function ecShopMarkup(panels) {
     offsetHead();
     window.addEventListener('resize', offsetHead, { passive: true });
   }
-})();
-
-// ---- Pause off-screen autocast-snake animations ----
-// The Neutral Stats / Abilities tables can carry dozens of autocast icons, each
-// an infinite stroke-dashoffset "snake". Painting all of them every frame is
-// wasteful when most are scrolled out of view, so pause the ones off-screen.
-(function() {
-  const snakes = document.querySelectorAll('.autocast-snake');
-  if (!snakes.length || !('IntersectionObserver' in window)) return;
-  // Fail-safe: do NOT pause on init. Only the IntersectionObserver adds .ac-off,
-  // and only for icons it reports off-screen. If IO never fires (throttled tab),
-  // nothing is paused and every snake animates exactly as before — no regression.
-  const io = new IntersectionObserver(function(entries) {
-    for (const e of entries) e.target.classList.toggle('ac-off', !e.isIntersecting);
-  }, { rootMargin: '250px' });
-  snakes.forEach(function(s) { io.observe(s); });
 })();
 
 // ---- Big Dynamics matrices: skip rendering off-screen rows ----

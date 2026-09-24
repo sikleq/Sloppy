@@ -422,23 +422,12 @@ def save_creeps_html():
             "but the effect on an enemy under BKB doesn't work"),
     }
 
-    def _autocast_snake_svg() -> str:
-        """Animated golden ring used as the autocast marker on ability icons."""
-        _r = ('<rect x="1.5" y="1.5" width="25" height="25" '
-              'rx="4.5" ry="4.5" pathLength="100"')
-        return (
-            '<svg class="autocast-snake" viewBox="0 0 28 28" '
-            'preserveAspectRatio="none" aria-hidden="true">'
-            f'{_r} class="ac-ring"></rect>'
-            f'{_r} class="ac-fluff"></rect>'
-            f'{_r} class="ac-tail4"></rect>'
-            f'{_r} class="ac-tail3"></rect>'
-            f'{_r} class="ac-tail2"></rect>'
-            f'{_r} class="ac-tail1"></rect>'
-            f'{_r} class="ac-body"></rect>'
-            f'{_r} class="ac-pollen"></rect>'
-            f'{_r} class="ac-pollen2"></rect>'
-            f'{_r} class="ac-pollen3"></rect></svg>')
+    def _autocast_fx() -> str:
+        """The in-game autocast ring: Dota's own particle system (autocasting_square.vpcf —
+        glow crackle + embers on the 40-point square) baked into a looping WebP by
+        tools/autocast/build_autocast.py. One shared image, no per-frame CPU."""
+        return ('<img class="autocast-fx" src="icons/ui/autocast.webp" alt="" '
+                'aria-hidden="true" width="100" height="100">')
 
     # Camp type(s) per neutral (small / mid / big / ancient) — the in-game
     # minimap camp marker. Not present in npc_units.txt (it lives in the map's
@@ -1408,7 +1397,7 @@ def save_creeps_html():
                     # the high end of the painted range; the tail (low end)
                     # fades out near its tip.
                     inner = (f'<span class="abil-ico-wrap abil-autocast">'
-                             f'{img}{_autocast_snake_svg()}</span>')
+                             f'{img}{_autocast_fx()}</span>')
                 else:
                     inner = img
             else:
@@ -2415,7 +2404,7 @@ def save_creeps_html():
                            f'alt="{_esc(name)}" loading="lazy" width="128" height="128">')
                 if slug in AUTOCAST_ABILITIES:
                     aico = (f'<span class="abil-ico-wrap abil-autocast">'
-                            f'{img_tag}{_autocast_snake_svg()}</span>')
+                            f'{img_tag}{_autocast_fx()}</span>')
                 else:
                     aico = img_tag
                 # Hover-tooltip with Valve's ability description (parsed from
