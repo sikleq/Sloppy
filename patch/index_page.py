@@ -228,7 +228,12 @@ def save_index_html():
     grid_html = (
         '<div class="inv-book">'
         '<div class="inv-head">'
-        '<h1 class="inv-title">What does a hero truly need?</h1>'
+        # The heading names the open category (Creeps / Items / Heroes / Support); CSS swaps
+        # the spans off the book's <name>-open class, so no extra script is needed.
+        '<h1 class="inv-title"><span class="inv-title-main">What does a hero truly need?</span>'
+        + ''.join(f'<span class="inv-title-cat" data-cat="{k}">{v}</span>'
+                  for k, v in (('creeps', 'Creeps'), ('items', 'Items'), ('heroes', 'Heroes'), ('support', 'Support')))
+        + '</h1>'
         '</div>'
         f'{divider_row}'
         '<div class="inv-stage">'

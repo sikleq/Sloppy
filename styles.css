@@ -535,6 +535,14 @@ body:has(.creeps-page) nav.top-nav {
     0 12px 44px var(--shadow-55);
 }
 .inv-head { text-align: center; }
+/* open category name replaces the book heading (same font / gold) */
+.inv-title-cat { display: none; }
+.inv-book.creeps-open .inv-title-main, .inv-book.items-open .inv-title-main,
+.inv-book.heroes-open .inv-title-main, .inv-book.support-open .inv-title-main { display: none; }
+.inv-book.creeps-open .inv-title-cat[data-cat="creeps"],
+.inv-book.items-open .inv-title-cat[data-cat="items"],
+.inv-book.heroes-open .inv-title-cat[data-cat="heroes"],
+.inv-book.support-open .inv-title-cat[data-cat="support"] { display: inline; animation: supportIn 0.28s ease both; }
 .inv-title {
   margin: 0;
   font-family: var(--font-j25);
