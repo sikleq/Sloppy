@@ -111,12 +111,12 @@ def build():
     # Flooded Camps (label — no own changes; sub-units follow)
     W(plain_header("Flooded Camps", dynamics=False, new="New mechanic"))
     W(ul_open())
-    W(li("Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian neutral creeps", t("NEW"), extra=inline_note("Easy camp on the rim between tier 1 and tier 2 towers<br>Medium camp on the rim near tier 2 tower<br>Medium camp in the main jungle that was on the stream's way and used to be a Hard camp")))
-    W(li("As the tides of battle rise, every 5 minutes one creep in a Flooded Camp is permanently upgraded to the next tier", t("NEW"), extra=inline_note("Each camp has 3 units, so at 15:00 the Easy camp becomes a Medium camp and both Medium camps become Hard; at 30:00 the Medium camp becomes Hard and both Hard camps become Ancient")))
+    W(li("Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian neutral creeps", t("NEW"), extra=inline_note("Easy camp on the rim between tier 1 and tier 2 towers<br>Medium camp on the rim near tier 2 tower<br>Medium camp in the main jungle that was on the stream's way and used to be a Large camp")))
+    W(li("As the tides of battle rise, every 5 minutes one creep in a Flooded Camp is permanently upgraded to the next tier", t("NEW"), extra=inline_note("Each camp has 3 units, so at 15:00 the Easy camp becomes a Medium camp and both Medium camps become Large; at 30:00 the Medium camp becomes Large and both Large camps become Ancient")))
     W(li("These camps consist of the following creeps" + camp_table([
         ("Easy camp", [(3, "Pollywog", _NC_CDN + "tadpole.png")]),
         ("Medium camp", [(2, "Boglet", _NC_CDN + "froglet.png"), (1, "Marshmage Apprentice", _NC_CDN + "froglet_mage.png")]),
-        ("Hard camp", [(2, "Croaker", _NC_CDN + "grown_frog.png"), (1, "Marshmage", _NC_CDN + "grown_frog_mage.png")]),
+        ("Large camp", [(2, "Croaker", _NC_CDN + "grown_frog.png"), (1, "Marshmage", _NC_CDN + "grown_frog_mage.png")]),
         ("Ancient camp", [(2, "Ancient Croaker", _NC_CDN + "ancient_frog.png"), (1, "Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png")]),
     ]), t("NEW")))
     W(li("Each creep can only be upgraded twice, so an Easy camp never reaches Ancient status", t("NEW")))
@@ -212,10 +212,10 @@ def build():
     # Ancient Prowlers (label — no own changes; sub-units follow)
     W(plain_header("Ancient Prowlers", dynamics=False))
     W(ul_open())
-    W(li("Prowlers have returned as an Ancient Neutral Camp", t("NEW"), extra=inline_note("Average bounty: 158 gold and 314 XP")))
-    W(li("The camp consists of" + camp_table([
-        ("Ancient camp", [(2, "Ancient Prowler Acolyte", _NC_CDN + "prowler_acolyte.png"), (1, "Ancient Prowler Shaman", _NC_CDN + "prowler_shaman.png")]),
-    ]), t("NEW")))
+    W(li("Prowlers have returned as an Ancient Neutral Camp: "
+         + creep_ref("Ancient Prowler Acolyte", _NC_CDN + "prowler_acolyte.png", 2) + ", "
+         + creep_ref("Ancient Prowler Shaman", _NC_CDN + "prowler_shaman.png", 1),
+         t("NEW"), extra=inline_note("Average bounty: 158 gold and 314 XP")))
     W(ul_close())
 
     # Ancient Prowler Acolyte

@@ -14,7 +14,7 @@ def build():
     W(subgroup("Camps"))
     W(ul_open())
     W(li("Increased spawnboxes of Triangle Ancient camps", t("BUFF")))
-    W(li("Fixed a ward spot in Radiant safe lane hard camp", t("MISC")))
+    W(li("Fixed a ward spot in Radiant safe lane large camp", t("MISC")))
     W(ul_close())
 
     # ===== ITEM UPDATES =====

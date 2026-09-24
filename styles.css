@@ -10290,6 +10290,11 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 /* camp compositions (camp_table): a light table inside the row, creep names in columns */
 .camp-table {
   display: grid; grid-template-columns: max-content repeat(var(--camp-cols, 2), max-content);
-  column-gap: 22px; row-gap: 3px; margin: 6px 0 2px 2px; align-items: center;
+  margin: 6px 0 2px 2px; align-items: stretch;
 }
-.camp-table .camp-name { color: var(--text-dim, #8b949e); }
+/* thin see-through lines between rows and columns, like the site's tables */
+.camp-table .camp-name, .camp-table .camp-cell {
+  display: flex; align-items: center; padding: 3px 14px;
+  border-bottom: 1px solid var(--line-soft); border-left: 1px solid var(--line-soft);
+}
+.camp-table .camp-name { color: var(--text-dim, #8b949e); padding-left: 0; border-left: 0; }

@@ -67,7 +67,7 @@ def build():
     W(subgroup("Camps"))
     W(ul_open())
     W(li("The Radiant Safe Lane small pull camp has been moved to the north, and trees added above it", t("MISC")))
-    W(li("The northern cliff edge, ramps and Hard / Ancient camps of the Radiant triangle have been moved slightly southwest", t("MISC")))
+    W(li("The northern cliff edge, ramps and Large / Ancient camps of the Radiant triangle have been moved slightly southwest", t("MISC")))
     W(li("Flooded camps in main jungles near the bounty runes have had their pull timers reduced", t("MISC")))
     W(ul_close())
     W(subgroup("Watchers"))

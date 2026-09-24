@@ -698,7 +698,7 @@ def _creep_display_names() -> dict:
 
 
 def _unit_camp_map() -> dict:
-    """npc_dota_neutral_* -> neutral-camp difficulty (Easy/Medium/Hard/Ancient).
+    """npc_dota_neutral_* -> neutral-camp difficulty (Easy/Medium/Large/Ancient).
     Authoritative source: the hand-maintained CREEP_CAMP table in
     builders/creeps.py (createhero shortname -> in-game camp size[s]), the same
     data that drives the camp badges on Neutral Stats. When a creep spawns in

@@ -28,7 +28,9 @@
 - `info_li`/raw `<li>` — НЕ использовать
 - `attr_change(old, new)` — смена основного атрибута героя («Is now a Universal Hero»): `W(li(attr_change("Agility", "Universal"), t("REWORK")))` → «Main attribute changed from **Agility** → **Universal**»: названия жирным, шрифтом строки, в цвет атрибута (без иконок). Старый атрибут — из снапшота статов до патча (`data/stats/<prev>/heroes.json`, `AttributePrimary`); генератор делает это сам.
 - `creep_ref(name, icon, count)` — юнит внутри строки: маленькая иконка + имя жирным.
-- `camp_table([(camp, [(count, name, icon), …]), …])` — **состав лагерей всегда лёгкой таблицей** внутри строки (колонки крипов выровнены по вертикали), не списком в «?» и не строкой через запятую: `W(li("These camps consist of the following creeps" + camp_table([("Easy camp", [(3, "Pollywog", _NC_CDN + "tadpole.png")]), …]), t("NEW")))`.
+- Состав **одного** лагеря — прямо в той же строке через `creep_ref`, без таблицы и без отдельной строки «The camp consists of»: `W(li("Prowlers have returned as an Ancient Neutral Camp: " + creep_ref("Ancient Prowler Acolyte", _NC_CDN + "prowler_acolyte.png", 2) + ", " + creep_ref(…), t("NEW")))`.
+- Размеры лагерей называем как в игре (`DOTA_NeutralCamp_Name_*`): **Large**, не Hard (Valve в патчноутах пишет Hard — заменяем).
+- `camp_table([(camp, [(count, name, icon), …]), …])` — **состав нескольких лагерей — лёгкой таблицей** с тонкими полупрозрачными линиями внутри строки (колонки крипов выровнены по вертикали), не списком в «?» и не строкой через запятую: `W(li("These camps consist of the following creeps" + camp_table([("Easy camp", [(3, "Pollywog", _NC_CDN + "tadpole.png")]), …]), t("NEW")))`.
 - Карта-юниты со своей страницей (Roshan, Tormentor): `unit_header(..., general=False, track=True)` — трекаются и в General Updates; Roshan в Unit Changes → колонка Other, Tormentor — по карточке на structures.html.
 - **Стрелки в контенте — только HTML-сущностью `&rarr;`**, никогда литеральным «→»: консоли PowerShell 5.1 / cp1251 его портят.
 

@@ -8,7 +8,7 @@ def build():
     W(plain_header("Dire Safe Lane Jungle"))
     W(ul_open())
     W(li("The tree lines above and below the tower have been reworked", t("MISC")))
-    W(li("The Dire Safe Lane hard camp has been moved away from the Dire Safe Lane Tier 1 tower, and had its tree line reduced and rotated to face the river", t("NERF")))
+    W(li("The Dire Safe Lane large camp has been moved away from the Dire Safe Lane Tier 1 tower, and had its tree line reduced and rotated to face the river", t("NERF")))
     W(li("The Dire Safe Lane Tier 1 tower has been moved forward, away from the Dire base and closer to where the creeps initially meet", t("MISC")))
     W(li("The Top Lane creep paths have been slightly adjusted so the creeps meet closer to the Dire tower", t("MISC")))
     W(li("The cliff above the Dire Safe Lane small camp has been extended slightly towards the Dire Safe Lane Tier 1 tower, and the small camp has been moved and had its tree line adjusted", t("MISC")))
@@ -24,7 +24,7 @@ def build():
     
     W(plain_header("Bottom Lane"))
     W(ul_open())
-    W(li("A tree near the Radiant Safe Lane hard camp has been removed", t("DEL")))
+    W(li("A tree near the Radiant Safe Lane large camp has been removed", t("DEL")))
     W(li("Several trees have been removed from the Radiant high ground leading to the Bottom Roshan Pit", t("DEL")))
     W(li("Trees have been added around the Dire Bottom Tier 1 tower, and several tree positions adjusted", t("MISC")))
     W(li("The Watcher above the secret shop has been repositioned between the ramps from Dire Mid Tier 1 and the bottom Roshan Pit", t("MISC")))
