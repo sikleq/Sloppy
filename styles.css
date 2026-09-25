@@ -10638,3 +10638,23 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
    main-thread frame work 1.8 s -> 0.7 s without it). Patch pages keep the smooth pop. */
 .heroes-dyn-table .dyn-cell,
 .heroes-dyn-table .dyn-cell-wrap:not(.empty):hover .dyn-cell { transition: none; }
+/* Changelog: "fix" marker — the pixel beetle beside the category chip */
+.clog-bug { width: 13px; height: 13px; image-rendering: pixelated; flex: none; vertical-align: middle; margin: 0 2px 0 -2px; }
+.clog-minor-list .clog-bug { align-self: center; }
+/* Changelog screenshots: every shot sits in a frame as wide as the shots column (same width in
+   every entry); a smaller image is centred on a dark vignette instead of shrinking the frame. */
+.clog-shot {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background: radial-gradient(ellipse 80% 90% at 50% 40%, #1d1915 0%, #100e0c 70%, #0b0a09 100%);
+  border: 1px solid rgba(227, 196, 106, 0.38);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px var(--shadow-45);
+  transition: border-color .15s;
+}
+.clog-shot:hover { border-color: var(--gold); }
+.clog-shot img, .clog-shot:hover img { border: 0; border-radius: 3px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55); }

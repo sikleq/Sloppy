@@ -30,3 +30,13 @@ def test_many_small_changes_fold_under_a_toggle():
     many = few + [{"date": "2026-01-01", "category": "Site", "title": "x9", "minor": True}]
     assert "<details" not in clog._minor_html("2026-01-01", few)
     assert "<details" in clog._minor_html("2026-01-01", many)
+
+
+def test_fixes_carry_the_bug_marker_and_the_rail_lists_only_features():
+    entries = [{"date": "2026-01-02", "category": "Site", "title": "Thing", "items": ["x"], "fix": True},
+               {"date": "2026-01-02", "category": "Site", "title": "Small", "minor": True, "fix": True},
+               {"date": "2026-01-02", "category": "Site", "title": "Other", "minor": True}]
+    html = clog.render(entries)
+    assert html.count('class="clog-bug"') == 2
+    rail = html[html.index('class="clog-rail"'):html.index("</nav>")]
+    assert "Thing" in rail and "Small" not in rail and "Smaller changes" not in rail

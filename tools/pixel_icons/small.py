@@ -12,7 +12,7 @@ import sys
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from build import O, G0, G1, G2, G3, G4, G5, G6, G7, P0, P1, OUT, GOTHIC, Sprite  # noqa: E402,F401
+from build import O, G0, G1, G2, G3, G4, G5, G6, G7, P0, P1, OUT, GOTHIC, Sprite, cols  # noqa: E402,F401
 
 SHIP_SCALE = 2
 
@@ -87,7 +87,31 @@ def talents():
     return s
 
 
-ICONS = {"atk_melee": melee, "atk_ranged": ranged, "icon_talents": talents}
+def bug():
+    """Changelog 'fix' marker: a beetle seen from above — V antennae, dark head, a round gold
+    shell split down the middle, three thin legs a side sticking out (no outline on the legs,
+    so they stay separate strokes instead of merging into a blob)."""
+    s = Sprite(13, 13)
+    s.layer("legs")
+    s.use(layer="legs")
+    for (x0, y0), (x1, y1) in (((2, 6), (1, 5)), ((2, 8), (1, 8)), ((2, 10), (1, 11))):
+        s.px(x0, y0, G4); s.px(x1, y1, G3)
+        s.px(12 - x0, y0, G3); s.px(12 - x1, y1, G2)
+    s.px(4, 0, G5); s.px(5, 1, G4)                        # antennae
+    s.px(8, 0, G4); s.px(7, 1, G3)
+    s.layer("body")
+    s.use(layer="body")
+    s.ellipse(3, 4, 9, 11, G4)                            # shell
+    cols(s, 3, 9, 4, 11, [G7, G6, G5, G4, G3, G2, G1])
+    for y in range(5, 12):                                # wing split
+        s.px(6, y, O)
+    s.rect(5, 2, 7, 3, G1)                                # head
+    s.px(5, 2, G3)
+    s.outline(O)
+    return s
+
+
+ICONS = {"atk_melee": melee, "atk_ranged": ranged, "icon_talents": talents, "icon_bug": bug}
 
 
 def main():

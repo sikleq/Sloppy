@@ -3,7 +3,8 @@
 Short notes on what changed on the SITE (not Dota patches): newest first, grouped by
 date, each entry with a category chip, 1-4 points, an optional link to the changed
 page and optional screenshots (icons/changelog/*.webp, tools/changelog_shots.py) beside the notes.
-Left rail (fixed, centred on the left edge, faint until hovered) = the entry titles by month;
+Left rail (fixed, centred on the left edge, faint until hovered) = the FEATURE titles by month
+(small changes are not listed there); fixes ("fix": true) get a pixel-beetle marker;
 category chips filter the entries.
 """
 import datetime as _dt
@@ -47,6 +48,17 @@ def load_entries(path=DATA):
     return sorted(entries, key=lambda e: e["date"], reverse=True)
 
 
+BUG_ICON = "icons/ui/gothic/icon_bug.png"
+
+
+def _bug_html(e):
+    """Fixes of something that was wrong ("fix": true) carry a small pixel beetle beside the chip."""
+    if not e.get("fix"):
+        return ""
+    return (f'<img class="clog-bug" src="{BUG_ICON}" width="13" height="13" alt="Fix" '
+            'title="Fix: something was wrong and now works">')
+
+
 def _entry_html(e):
     items = "".join(f"<li>{_esc(x)}</li>" for x in e.get("items", []))
     title = (f'<a class="clog-title-link" href="{_esc(e["link"])}">{_esc(e["title"])}</a>'
@@ -55,7 +67,7 @@ def _entry_html(e):
     cls = "clog-entry has-shots" if shots else "clog-entry"
     return (f'<article class="{cls}" id="{_entry_id(e)}" data-cat="{_slug(e["category"])}"><div class="clog-text">'
             f'<div class="clog-entry-head"><span class="clog-cat clog-cat-{_slug(e["category"])}">'
-            f'{_esc(e["category"])}</span><h3 class="clog-title">{title}</h3></div>'
+            f'{_esc(e["category"])}</span>{_bug_html(e)}<h3 class="clog-title">{title}</h3></div>'
             f'<ul class="clog-items">{items}</ul></div>{shots}</article>')
 
 
@@ -95,7 +107,7 @@ def _minor_html(date, minors):
     folds under a "Smaller changes (N)" toggle so it doesn't take much room."""
     lis = "".join(
         f'<li data-cat="{_slug(e["category"])}"><span class="clog-cat clog-cat-{_slug(e["category"])}">'
-        f'{_esc(e["category"])}</span>' + (f'<a href="{_esc(e["link"])}">{_esc(e["title"])}</a>' if e.get("link")
+        f'{_esc(e["category"])}</span>{_bug_html(e)}' + (f'<a href="{_esc(e["link"])}">{_esc(e["title"])}</a>' if e.get("link")
                                              else _esc(e["title"])) + '</li>'
         for e in minors)
     head = f'Smaller changes <span class="clog-minor-n">{len(minors)}</span>'
@@ -122,10 +134,7 @@ def render(entries):
         minors = [e for e in group if e.get("minor")]
         rail.extend(f'<a class="clog-rail-item" href="#{_entry_id(e)}" data-cat="{_slug(e["category"])}">'
                     f'{_esc(e["title"])}</a>' for e in majors)
-        if minors:
-            rail.append(f'<a class="clog-rail-item clog-rail-minor" href="#m-{date}" '
-                        f'data-cats="{" ".join(sorted({_slug(e["category"]) for e in minors}))}">'
-                        f'Smaller changes ({len(minors)})</a>')
+        # small changes are not listed in the rail — it names only the features
         days.append(f'<section class="clog-day" id="d-{date}" data-cats="{cats}">'
                     f'<h2 class="clog-date">{d.strftime("%b")} {d.day}, {d.year}</h2>'
                     + "".join(_entry_html(e) for e in majors)
