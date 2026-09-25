@@ -248,8 +248,8 @@ def save_calendar_html():
 
         s = [f'<svg class="cal-ig-spark" viewBox="0 0 {viewW} {totalH}" role="img">']
         s.append(f'<defs><linearGradient id="sg-{uid}" x1="0" y1="0" x2="0" y2="1">'
-                 '<stop offset="0" stop-color="#79c0ff" stop-opacity="0.28"/>'
-                 '<stop offset="1" stop-color="#79c0ff" stop-opacity="0"/>'
+                 '<stop offset="0" stop-color="#e3c46a" stop-opacity="0.28"/>'
+                 '<stop offset="1" stop-color="#e3c46a" stop-opacity="0"/>'
                  '</linearGradient></defs>')
         # Horizontal gridlines + y-axis ticks on the 5-step nice scale.
         for k in range(6):                       # 0,1,2,3,4,5 → 0..nice_max
@@ -267,7 +267,7 @@ def save_calendar_html():
         s.append(f'<line class="cal-ig-axis" x1="{x0p}" y1="{padTop}" x2="{x0p}" y2="{chartH}"/>')
         # area + line.
         s.append(f'<path d="{area}" fill="url(#sg-{uid})"/>')
-        s.append(f'<path d="{d}" fill="none" stroke="#58a6ff" stroke-width="2.4" '
+        s.append(f'<path d="{d}" fill="none" stroke="#e3a24a" stroke-width="2.4" '
                  'stroke-linecap="round" stroke-linejoin="round"/>')
         # x-axis baseline — separates the plot from the category labels below.
         s.append(f'<line class="cal-ig-axis is-base" x1="{x0p}" y1="{chartH}" x2="{x1p}" y2="{chartH}"/>')
@@ -279,7 +279,7 @@ def save_calendar_html():
             s.append(f'<rect class="cal-ig-hit" x="{hx:.1f}" y="{padTop}" '
                      f'width="{hw:.1f}" height="{chartH - padTop:.1f}"/>')
             s.append(f'<circle class="cal-ig-dot" cx="{x:.1f}" cy="{y:.1f}" '
-                     f'fill="#79c0ff" stroke="#0d1117" stroke-width="1.4"/>')
+                     f'fill="#e3c46a" stroke="#110f0d" stroke-width="1.4"/>')
             s.append(f'<text class="cal-ig-pt-val" x="{x:.1f}" y="{y - 8:.1f}" '
                      f'text-anchor="middle">{values[i]}</text>')
             s.append('</g>')

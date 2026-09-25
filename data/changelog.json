@@ -4,6 +4,12 @@
     {
       "date": "2026-09-25",
       "category": "Site",
+      "title": "The whole site switched from cold steel greys and blues to warm tones: panels, lines, table headers, calendar and its charts",
+      "minor": true
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Site",
       "title": "Warm pixel controls",
       "items": [
         "Menus, filter panels, buttons and switches are warm pixel UI now: pixel font, stepped corners, game-like buttons that turn gold when on",
