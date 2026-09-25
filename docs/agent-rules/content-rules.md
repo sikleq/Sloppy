@@ -134,6 +134,18 @@ W(li("Recipe cost decreased from 1350 to 1250 " + b(1350, 1250, l=True), t("BUFF
 `W(li("Eternal Chains Mana Cost decreased from 200 to 100", b(200, 100, l=True)))` (Gleipnir 7.38).
 Генератор: `_ABILITY_NUMBER_RE` в `_postprocess_properties_change`.
 
+## Характеристики переделанного предмета — только карточками (2026-09-25)
+
+У предмета с блоком компонентов (`changed=True` / «Item Reworked» / «Recipe changed») ВСЕ изменения
+его бонусных характеристик — в `properties_change`, не строками:
+- «Now provides +8 Mana Regen instead of +50 Damage» → old `("DEL", "+50 Damage")`, new `("NEW", "+8 Mana Regen")` (Khanda 7.38);
+- «Provides +35 Damage and +16% Spell Lifesteal» → new-карточка; старые значения — из подсказок игры
+  прошлого патча (d2vpkr), генератор оставляет `# TODO` (Revenant's Brooch 7.38: было +70 / +20%);
+- «No longer provides +6 Health Regen» → old `("DEL", ...)` (Nullifier 7.41).
+В карточку идёт только настоящая характеристика (`_ITEM_STAT_NAME_RE`: Damage, Mana Regen, Spell Lifesteal…);
+«Empower Spell bonus damage 150 → 250» — число способности, остаётся строкой.
+У предметов без изменения рецепта характеристики по-прежнему идут обычными строками.
+
 ## «does not stack with …» → в «?» строки Passive/Active (2026-09-25)
 
 Пояснение «Armor reduction does not stack with its components, Desolator…» сразу после строки

@@ -1491,6 +1491,10 @@ _STAT_GRANT_RE = re.compile(
 )
 
 
+_PROP_INSTEAD_RE = re.compile(r'^Now (?:provides?|grants?|gives?)\s+(\+.+?)\s+instead of\s+(\+.+)$')
+_PROP_PROVIDES_RE = re.compile(r'^Provides\s+(\+.+)$')
+
+
 def _parse_stat_grants(text):
     """Split "+X Stat, +Y Stat, and +Z Stat" into ["+X Stat","+Y Stat","+Z Stat"]."""
     return [f'+{m.group(1).strip().rstrip(",.").strip()}'
@@ -1507,6 +1511,14 @@ _PROP_CHANGE_RE = re.compile(
 
 # Numbers of an item's ability, not item stats — never folded into properties_change cards.
 _ABILITY_NUMBER_RE = re.compile(r'\b(?:mana ?cost|cooldown|cast (?:point|range)|duration|radius)\b', re.I)
+# The whole stat name must be a real item stat ("Damage", "Mana Regen", "Spell Lifesteal"…).
+# "Empower Spell damage" / "Empower Spell movement Slow" (Khanda 7.38) are the active's numbers → rows.
+_ITEM_STAT_NAME_RE = re.compile(
+    r'^(?:bonus\s+)?(?:all attributes|strength|agility|intelligence|health|max health|mana|max mana|'
+    r'health regen(?:eration)?|mana regen(?:eration)?|health restoration|mana regen(?:eration)? amplification|'
+    r'armor|magic(?:al)? resistance|damage|attack damage|attack speed|movement speed|move speed|evasion|'
+    r'spell amp(?:lification)?|lifesteal|spell lifesteal|(?:spell )?lifesteal amplification|cast range|'
+    r'attack range|status resistance|slow resistance|aoe bonus|cooldown reduction)(?:\s+bonus)?$', re.I)
 
 
 def _parse_number_or_list(s):
@@ -1562,6 +1574,7 @@ def _postprocess_properties_change(lines):
         old_rows = []
         new_rows = []
         kept_lines = []
+        needs_old = False
         block_end = i
         in_ul = False
         while block_end < len(lines):
@@ -1588,6 +1601,24 @@ def _postprocess_properties_change(lines):
                     for stat in grants:
                         new_rows.append(('NEW', stat))
                     continue
+            # "Now provides +8 Mana Regen instead of +50 Damage" (Khanda 7.38): old stat -> new stat
+            mi = _PROP_INSTEAD_RE.match(txt)
+            if mi:
+                news, olds = _parse_stat_grants(mi.group(1)), _parse_stat_grants(mi.group(2))
+                if news and olds:
+                    new_rows.extend(('NEW', st) for st in news)
+                    old_rows.extend(('DEL', st) for st in olds)
+                    continue
+            # a reworked item's own stat list "Provides +35 Damage and +16% Spell Lifesteal"
+            # (Revenant's Brooch 7.38): the new side; the old side must come from the previous
+            # patch's tooltips (d2vpkr abilities_english) — flagged with a TODO comment
+            mp = _PROP_PROVIDES_RE.match(txt)
+            if mp:
+                grants = _parse_stat_grants(mp.group(1))
+                if grants:
+                    new_rows.extend(('NEW', st) for st in grants)
+                    needs_old = True
+                    continue
             # Try remove
             mr = _PROP_DEL_PREFIX_RE.match(txt)
             if mr:
@@ -1598,7 +1629,8 @@ def _postprocess_properties_change(lines):
                     continue
             # Try change "X increased/decreased from A to B"
             mc = _PROP_CHANGE_RE.match(txt)
-            if mc and _ABILITY_NUMBER_RE.search(mc.group('stat')):
+            if mc and (_ABILITY_NUMBER_RE.search(mc.group('stat'))
+                       or not _ITEM_STAT_NAME_RE.match(mc.group('stat').strip())):
                 # "Eternal Chains mana cost decreased from 200 to 100" is an ACTIVE's number,
                 # not a stat of the item: it stays a plain row (owner, 2026-09-25), never a card line
                 mc = None
@@ -1630,6 +1662,9 @@ def _postprocess_properties_change(lines):
                 tag, stat = row
                 return f'("{tag}", "{stat}")'
             new_repr = ', '.join(_fmt_new(r) for r in new_rows) or ''
+            if needs_old and not old_rows:
+                out.append(f'    # TODO {item_name}: old bonus stats — take them from the previous patch\'s '
+                           f'tooltips (d2vpkr abilities_english), never invent them')
             out.append(
                 f'W(properties_change(old=[{old_repr}], new=[{new_repr}]))'
             )

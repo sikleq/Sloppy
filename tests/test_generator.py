@@ -598,3 +598,26 @@ def test_does_not_stack_note_goes_into_the_passive_rows_info():
         '    W(li("Armor reduction does not stack with its components, Desolator, or Stygian Desolator", t("MISC")))'])
     assert out == ['    W(li("Passive: Corrosion. Reduces armor by 3 " + info_tip("Armor reduction does not '
                    'stack with its components, Desolator, or Stygian Desolator."), t("REWORK")))']
+
+
+def test_now_provides_x_instead_of_y_goes_into_the_cards():
+    """Khanda 7.38: "Now provides +8 Mana Regen instead of +50 Damage" = old +50 Damage -> new +8 Mana Regen;
+    "Empower Spell bonus damage 150 -> 250" is the active's number and stays a row."""
+    import generate_patch_code_v2 as g
+    out = g._postprocess_properties_change([
+        'W(item_header("Khanda", changed=True))',
+        'W(li("Now provides +8 Mana Regen instead of +50 Damage", t("REWORK")))',
+        'W(li("Empower Spell bonus damage increased from 150 to 250", b(150, 250)))'])
+    assert out[1] == 'W(properties_change(old=[("DEL", "+50 Damage")], new=[("NEW", "+8 Mana Regen")]))'
+    assert 'W(li("Empower Spell bonus damage increased from 150 to 250", b(150, 250)))' in out
+
+
+def test_reworked_item_provides_list_is_the_new_card_and_asks_for_old_stats():
+    """Revenant's Brooch 7.38: "Provides +35 Damage and +16% Spell Lifesteal" -> new card; the old side is a TODO
+    (from the previous patch's tooltips, never invented)."""
+    import generate_patch_code_v2 as g
+    out = g._postprocess_properties_change([
+        'W(item_header("Revenant\'s Brooch", changed=True))',
+        'W(li("Provides +35 Damage and +16% Spell Lifesteal", t("REWORK")))'])
+    assert any(x.strip().startswith("# TODO Revenant's Brooch: old bonus stats") for x in out)
+    assert out[-1] == 'W(properties_change(old=[], new=[("NEW", "+35 Damage"), ("NEW", "+16% Spell Lifesteal")]))'
