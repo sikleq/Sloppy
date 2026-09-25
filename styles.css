@@ -10557,3 +10557,34 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
   background: var(--px-on) linear-gradient(var(--px-on-text), var(--px-on-text)) center / 6px 2px no-repeat;
   box-shadow: inset 0 0 0 2px #f0d58c;
 }
+/* Tag chips (BUFF / NERF / NEW / DEL / REWORK / MISC / QOL, the GROUP / scope chips) in the pixel font.
+   Same box as before (11px line box + 3px padding) so rows and toolbars don't grow; value badges
+   (+50, 0%) keep the regular font for legibility. */
+.badge.buff-text, .badge.nerf-text, .badge.rework, .badge.new, .badge.del, .badge.misc, .badge.qol,
+.cat-filter-btn, .ec-scope-btn {
+  font-family: var(--font-j10);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 11px;
+  letter-spacing: 0.8px;
+}
+/* Terrain toolbar (Zoom / Fullscreen / layer toggles): framed pixel buttons. ON keeps a gold-tinted
+   fill (not solid gold — the layer icons are gold themselves), OFF = dim frame + greyed icon. */
+.tc-btn {
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background: var(--px-field);
+  background-clip: padding-box;
+  box-shadow: inset 0 -3px 0 var(--px-press);
+  font-family: var(--font-j10);
+  font-size: 18px;
+  color: var(--px-text);
+}
+.tc-btn:hover { filter: none; border-image-source: var(--px-edge-gold); color: var(--px-hi); }
+.tc-btn[aria-pressed="true"] {
+  background: rgba(227, 196, 106, 0.22);
+  border-image-source: var(--px-edge-on);
+  color: var(--px-hi);
+}
+.tc-btn[aria-pressed="false"] { background: var(--px-field); border-image-source: var(--px-edge-dim); color: var(--px-text-dim); }

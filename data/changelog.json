@@ -4,6 +4,24 @@
     {
       "date": "2026-09-25",
       "category": "Site",
+      "title": "Description paragraphs above the Materials tables are gone: the pages open straight on the controls",
+      "minor": true
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Site",
+      "title": "Tag chips (BUFF, NERF, NEW, DEL, REWORK, MISC, QOL) and group chips use the pixel font",
+      "minor": true
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Materials",
+      "title": "Terrain toolbar buttons (Zoom, Fullscreen, map layers) match the new pixel buttons",
+      "minor": true
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Site",
       "title": "Warm tones toned down: calmer, less yellow greys",
       "minor": true
     },

@@ -481,7 +481,6 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
         '<div class="sticky-frame-top" aria-hidden="true"></div>\n'
         '<div class="creeps-scroll">\n'
         f'{subnav}'
-        f'<p class="mr-blurb inbox-bar">{blurb}</p>\n'
         f'{toolbar}'
         # Column visibility + fit-to-width is set by scripts.js dynLayoutMatrix().
         # items pages get an extra hook class so item-shaped icons (88×64) aren't

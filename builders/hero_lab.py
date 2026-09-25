@@ -1391,7 +1391,6 @@ def render_html() -> str:
 <div class="container creeps-page hero-lab-page">
 {subnav}
 <div class="creeps-scroll">
-<p class="mr-blurb inbox-bar">Compare two heroes side by side with level, six inventory slots, neutral item, enchantment and custom stat overrides. The center column shows the live difference between both builds.</p>
 <div class="cal-toggle-bar inbox-bar hero-lab-toolbar">
   <div class="toolbar-panel">
     <div class="hd-dd" data-dd="diffstat" id="hl-diff-dd">

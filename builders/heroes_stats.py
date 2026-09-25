@@ -1533,18 +1533,7 @@ def render_html() -> str:
         '</table>'
     )
 
-    blurb = (
-        '<p class="mr-blurb inbox-bar">Compare hero stats across three views. '
-        '<em>Base</em> shows raw level-1 game-file values and ignores the level '
-        'control; <em>Starting</em> shows practical values with attribute bonuses '
-        'and supported innate conversions; the <em>+2 stats</em> toggle applies '
-        'the automatic all-attributes level-ups from 15/16/17/19/20/21/22; '
-        'the <em>Innates</em> toggle applies always-on innate-derived stat bonuses '
-        'such as Void Spirit, Centaur, Morphling and Techies mana-pool regen; '
-        '<em>Expanded</em> adds detailed combat, armor, projectile, mobility and '
-        'size columns. Hover any stat for its full patch history since 7.08, then '
-        'use search, sorting and heatmap to find outliers quickly.</p>\n'
-    )
+    blurb = ''                     # page descriptions removed 2026-09-25 (user)
     toolbar = (
         '<div class="cal-toggle-bar mr-toolbar inbox-bar"><div class="toolbar-panel">'
         '<span class="view-group">'

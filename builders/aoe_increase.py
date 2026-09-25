@@ -896,17 +896,7 @@ def render_html() -> str:
         '</table>'
     )
 
-    blurb = (
-        '<p class="mr-blurb inbox-bar">Every ability radius the game flags '
-        '<code>affected_by_aoe_increase</code> — the radii that grow with an '
-        'AoE-bonus item. Pick an <strong>AoE item</strong> and the numbers update '
-        'in place: the three flat items don\'t stack with each other (one choice), '
-        'and <em>Dezun Bloodrite</em> adds +20% of the boosted radius on top. '
-        'The <strong>Upgrade</strong> toggles reveal radii that only exist with a '
-        'talent / Scepter / Shard (e.g. Mist Coil 0 → 350 with its talent); when '
-        'one changes an ability, that upgrade\'s mini-icon appears under the '
-        'ability icon.</p>\n'
-    )
+    blurb = ''                     # page descriptions removed 2026-09-25 (user)
 
     nav = _site.render_top_nav('materials', _latest_href(),
                                patch_context=False, subtabs_active='aoe_increase',

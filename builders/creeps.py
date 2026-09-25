@@ -1513,15 +1513,6 @@ def save_creeps_html():
         # layout — only the site nav and the sticky table headers remain pinned.
         # They're sticky-left so they stay put during horizontal scroll.
         f'{subnav_creeps}'
-        '<p class="mr-blurb inbox-bar">Stats and abilities of every neutral '
-        'camp creep in Dota 2 — pulled from the current patch\'s KV files. '
-        'Hover any cell with the dotted underline to see its change history '
-        'across patches. Click a unit icon to copy its demo-mode spawn command '
-        '(e.g. <code>-createhero tunneler neutral</code>) to the clipboard. '
-        'Click a column header to sort. The '
-        '<strong>View</strong> toggle switches between <em>Standard</em> '
-        '(essentials only) and <em>Expanded</em> (every numeric column — EHP, '
-        'armour %, gold range, collision, projectile speed, etc.).</p>\n'
         '<div class="cal-toggle-bar inbox-bar"><div class="toolbar-panel">'
         '<span class="view-group">'
         '<strong>View</strong>'
@@ -2467,13 +2458,6 @@ def save_creeps_html():
         # scroll away with the table (Mana Items behaviour); sticky-left keeps
         # them put during horizontal scroll.
         f'{subnav_abilities}'
-        '<p class="mr-blurb inbox-bar">Every ability owned by a neutral camp '
-        'creep — one row per (creep, ability). Hover any cell with the dotted '
-        'underline to see how its value changed across patches. The '
-        '<strong>View</strong> dropdown filters the table: <em>Standard</em> '
-        'lists all abilities, <em>Auras</em> shows only the aura-type ones. '
-        'The <strong>Upgrades</strong> toggle dots numbers that progress per '
-        'neutral tier (e.g. 40/36/32/26).</p>\n'
         '<div class="cal-toggle-bar inbox-bar"><div class="toolbar-panel">'
         '<span class="view-group">'
         '<strong>View</strong>'

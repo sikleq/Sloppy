@@ -926,15 +926,6 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
         # pinned. `inbox-bar` makes them sticky-left so they don't slide off on
         # horizontal scroll.
         f'{subnav}'
-        '<p class="mr-blurb inbox-bar">Every purchasable item that contributes mana regen, '
-        'sorted by total <em>Mana regen</em> by default. Intelligence contributes '
-        f'{_int_const_chip("+12 max mana", _INT_MANA_HIST)} and '
-        f'{_int_const_chip("+0.05 mana regen", _INT_REGEN_HIST)} per '
-        'point. Active items that literally restore mana to the caster '
-        '(Soul Ring, Arcane Boots’ replenish) are amortised as '
-        '<code>active_mana / cooldown</code> and added to passive regen. '
-        '<em>Mana regen per 1 gold</em> is ×1000 for readability. '
-        'Click any column header to re-sort.</p>\n'
         # Toolbar — Price min/max + Hide Active + Heatmap. Layout matches
         # the cal-toggle-bar / ua-upgrades-toggle convention used on the
         # Neutral Creeps & Unit Abilities pages.
