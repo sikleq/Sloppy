@@ -3,6 +3,38 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Site",
+      "title": "Warm colours",
+      "items": [
+        "Cold steel greys and blues gave way to calm warm tones across the site: panels, lines, table headers, the calendar and its charts",
+        "Blue stays only where it means something: QOL, magic damage, Intelligence, Aghanim, mana"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-25_warm.webp",
+        "icons/changelog/2026-09-25_warm_calendar.webp"
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Materials",
+      "title": "Per Int on Mana Items",
+      "link": "mana_items.html",
+      "items": [
+        "What one point of Intelligence gives (+12 mana, +0.05 regen) sits at the right of the toolbar — hover either for its patch history"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-25_per_int.webp"
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Materials",
+      "title": "Terrain: the arrows next to the patch number step to the neighbouring map (7.41 ↔ 7.40) at the ends of the list",
+      "minor": true,
+      "link": "terrain_741.html"
+    },
+    {
+      "date": "2026-09-25",
       "category": "Materials",
       "title": "Mana Items: item history uses each patch's mana per Intelligence (11 in 7.36–7.38), not today's 12",
       "minor": true,
@@ -23,13 +55,6 @@
     },
     {
       "date": "2026-09-25",
-      "category": "Materials",
-      "title": "Mana Items: what one point of Intelligence gives (+12 mana, +0.05 regen) sits in the toolbar again, hover for its patch history",
-      "minor": true,
-      "link": "mana_items.html"
-    },
-    {
-      "date": "2026-09-25",
       "category": "Site",
       "title": "Description paragraphs above the Materials tables are gone: the pages open straight on the controls",
       "minor": true
@@ -37,37 +62,17 @@
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Tag chips (BUFF, NERF, NEW, DEL, REWORK, MISC, QOL) and group chips use the pixel font",
-      "minor": true
-    },
-    {
-      "date": "2026-09-25",
-      "category": "Materials",
-      "title": "Terrain toolbar buttons (Zoom, Fullscreen, map layers) match the new pixel buttons",
-      "minor": true
-    },
-    {
-      "date": "2026-09-25",
-      "category": "Site",
-      "title": "Warm tones toned down: calmer, less yellow greys",
-      "minor": true
-    },
-    {
-      "date": "2026-09-25",
-      "category": "Site",
-      "title": "The whole site switched from cold steel greys and blues to warm tones: panels, lines, table headers, calendar and its charts",
-      "minor": true
-    },
-    {
-      "date": "2026-09-25",
-      "category": "Site",
       "title": "Warm pixel controls",
       "items": [
-        "Menus, filter panels, buttons and switches are warm pixel UI now: pixel font, stepped corners, game-like buttons that turn gold when on",
+        "Menus, filter panels, buttons and switches are warm pixel UI: pixel font, stepped corners, game-like buttons that turn gold when on",
+        "Tag chips (BUFF, NERF, NEW…) and group chips in the pixel font; Terrain's Zoom, Fullscreen and layer buttons match",
         "Melee, ranged and talent icons redrawn as gold pixel art"
       ],
       "shots": [
-        "icons/changelog/2026-09-25_controls.webp"
+        "icons/changelog/2026-09-25_controls.webp",
+        "icons/changelog/2026-09-25_menu.webp",
+        "icons/changelog/2026-09-25_tags.webp",
+        "icons/changelog/2026-09-25_terrain_bar.webp"
       ]
     },
     {
@@ -83,6 +88,9 @@
       "title": "Changelog",
       "items": [
         "What's new on the site, by date — this page"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-24_changelog.webp"
       ]
     },
     {

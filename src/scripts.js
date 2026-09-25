@@ -6779,12 +6779,31 @@ function ecShopMarkup(panels) {
           });
         });
         label.textContent = groups[i].ver;
-        btnL.disabled = (i === 0);
-        btnR.disabled = (i === groups.length - 1);
+        // At the ends the arrows step to the neighbouring map page (newer / older terrain
+        // pair from the header's version menu) instead of going dead.
+        btnL.disabled = (i === 0 && !newerPage);
+        btnR.disabled = (i === groups.length - 1 && !olderPage);
+        btnL.title = (i === 0 && newerPage) ? 'Go to ' + newerPage.label : '';
+        btnR.title = (i === groups.length - 1 && olderPage) ? 'Go to ' + olderPage.label : '';
       }
+      // Terrain pages, newest first, as listed in the header version menu.
+      var pages = [].slice.call(document.querySelectorAll('.version-dropdown .version-menu a.version-item'));
+      var curPage = pages.findIndex(function(a) { return a.classList.contains('current'); });
+      function pageAt(k) {
+        var a = (curPage >= 0 && k >= 0 && k < pages.length) ? pages[k] : null;
+        return a ? { href: a.getAttribute('href'), label: a.textContent.trim() } : null;
+      }
+      var newerPage = pageAt(curPage - 1);
+      var olderPage = pageAt(curPage + 1);
       show(0);
-      btnL.addEventListener('click', function() { if (idx > 0) show(idx - 1); });
-      btnR.addEventListener('click', function() { if (idx < groups.length - 1) show(idx + 1); });
+      btnL.addEventListener('click', function() {
+        if (idx > 0) show(idx - 1);
+        else if (newerPage) window.location.href = newerPage.href;
+      });
+      btnR.addEventListener('click', function() {
+        if (idx < groups.length - 1) show(idx + 1);
+        else if (olderPage) window.location.href = olderPage.href;
+      });
     });
   }
 
