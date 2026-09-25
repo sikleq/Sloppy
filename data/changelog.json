@@ -270,7 +270,10 @@
       "items": [
         "All 1585 changes of the 7.38 gameplay patch, checked line by line against Valve's data"
       ],
-      "link": "patches/7.38.html"
+      "link": "patches/7.38.html",
+      "shots": [
+        "icons/changelog/2026-09-20_patch738.webp"
+      ]
     },
     {
       "date": "2026-09-17",
