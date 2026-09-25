@@ -61,21 +61,169 @@ numbers, so their % swings are huge). Classifier: last-matching category in the 
 
 Re-checked after the change: revert backtest Q1→Q5 = 4.6 % → 11.2 %; `corr(w, buff−nerf)` 0.85 → 0.83.
 
-## Items — gold scale (review E.6, done 2026-09-16)
+## Items — gold scale (review E.6, done 2026-09-16; every stat since 2026-09-25)
 
-Item rows that change a **priced stat** ("Mana Regen bonus +0.8 → +0.6") or the **total cost** are scored in
-gold: `fraction = Δ × gold-per-unit / item cost`, where gold-per-unit comes from signal A per patch version
-(`data/rules/item_stat_prices.json`, %-stats priced per 1 %) and the cost from `data/stats/<ver>/items.json`.
-`net = 0.6 × sign × min(5 × fraction, 3)` (20 % of the item's value = 1.0; 0.6 = median hero type weight so
-both scales line up). Other item rows (actives, cooldowns, % bonuses) use the hero formula.
-Since 2026-09-25: a row is priced only when its parameter name IS the item's stat line ("Agility bonus",
-"Bonus Damage", "Mana Regen"); "Glimmer Bonus Movement Speed", "Dominated Creep movement speed", "Arctic
-Blast damage", "Corrosion armor reduction" go through the hero formula. Cost rows: "Total cost unchanged"
-(in the row or its inline note) = 0; a basic item's "Cost A → B" and a lone "Recipe cost A → B" are gold
-deltas like "Total cost A → B". Item property panes (`properties_change`) are scored as
-"<Stat> bonus changed from A to B" with the pane's badge.
-Examples 7.41f: Infused Raindrops −0.2 mana regen = 99 g of a 225 g item → −1.32; Octarine +200 g of 5100 →
-−0.12; Satanic lifesteal 30 → 25 % = 204 g of 5050 → −0.12.
+Item rows that move **gold** are scored in gold: `fraction = gold / item cost`, where the gold comes from the
+price list below (signal A v2, per patch version, `data/rules/item_stat_prices.json`, %-stats per 1 %) and the
+cost is the mean of the item's cost before and after the patch (`data/stats/<ver>/items.json` of the version and
+of the previous one; Heaven's Halberd 7.38: 3500 → 2600 = 3050). `net = 0.6 × sign × 5 × fraction` (20 % of
+the item's value = 1.0; 0.6 = median hero type weight), **linear** — so the rows of one item add up to
+Δ(stat value − cost) — with a safety cap at the whole item (5 × fraction ≤ 5, net ≤ 3.0; no row reaches it).
+Until 2026-09-25 the cap was 3 (60 % of the item) and only a few stats were priced.
+A row is priced only when its parameter name IS the item's stat line ("Agility bonus", "Bonus Damage", "Mana
+Regen"); "Glimmer Bonus Movement Speed", "Dominated Creep movement speed", "Arctic Blast damage", "Corrosion
+armor reduction" go through the hero formula. Cost rows: "Total cost unchanged" (in the row or its inline
+note) = 0; a basic item's "Cost A → B" and a lone "Recipe cost A → B" are gold deltas like "Total cost A → B".
+Items the shop does not sell (Roshan drops, neutral items: `not_for_sale`) have no price.
+Examples 7.41f: Infused Raindrops −0.2 mana regen = 47 g of a 225 g item → −0.62; Octarine +200 g of 5000 →
+−0.12; Satanic lifesteal 30 → 25 % = 250 g of 5050 → −0.15.
+
+## Item prices — every stat in gold (2026-09-25)
+
+Owner's request: find the gold price of every stat items have, value everything with it, count the item's
+cost, decide how to count mana costs, and count a stat that is replaced by a passive (Heaven's Halberd 7.38 lost
++25 % Evasion and got Passive: Damage Block).
+
+**Method** (`tools/fit_item_prices.py`, needs numpy + scipy; reads `data/stats/<v>/items.txt`, else the d2vpkr
+history in the weights-model folder; 118 versions 7.08 → 7.41f, ~11 s):
+1. *Which KV values are stats* — Valve's own tooltips: `DOTA_Tooltip_ability_<item>_<field>` = "+$armor",
+   "%+Slow Resistance" is a line of the item's stat list, the label names the stat. Items no longer in the
+   tooltips use the field-name map learned from the same tooltips. Melee/ranged variants (Phase Boots damage,
+   Power Treads speed) count at their mean.
+2. *Pure items* — purchasable, no active, no ability heading in the tooltip (Aghanim's Scepter's "Ability
+   Upgrade"), every non-zero value is a stat line: all basic items, Sange / Yasha / Kaya and their pairs,
+   Aether Lens, Octarine Core, Dragon Lance, Butterfly, Vanguard … (67 items in 7.41f, 64 in 7.38). An item
+   with an active or another passive carries value we cannot see, so it is not used.
+3. *Damage block is a stat*: chance × (melee block + ranged block) / 2 = expected damage blocked per attack
+   (Vanguard 60 % × (50 + 25) / 2 = 22.5; Halberd 7.38 60 % × (60 + 30) / 2 = 27).
+4. `cost = Σ price × amount` over the pure items: non-negative least squares, squared misses weighted 1/cost.
+   Upgrades price what only exists on upgrades: Sange's recipe pays for slow resistance + health restoration.
+5. *Weak prior*: a stat that a single-stat basic item sells gets a quarter-weight virtual item at that item's
+   rate (Ogre Axe 100 g per Strength …); %-stats without one get the median rate of the anchored %-stats. It
+   only decides what the data cannot — the Sange / Kaya families always bring their %-stats together, so only
+   the family total is identified and the split is the prior's.
+6. Confidence: **anchor** (a single-stat basic item sells it), **fit** (≥ 2 pure items identify it),
+   **single** (one pure item), **prior** (only the family total is identified). Unidentified or zero → no
+   price → the row keeps the old per-type weight.
+
+| stat | unit | 7.38 | 7.41f | confidence (7.41f) | priced by |
+|---|---|---|---|---|---|
+| strength | per point | 75.1 | 75.0 | anchor | Gauntlets / Belt / Ogre Axe / Reaver |
+| agility | per point | 67.2 | 66.9 | anchor | Slippers / Band / Blade / Eaglesong |
+| intelligence | per point | 70.9 | 72.4 | anchor | Mantle / Robe / Staff / Mystic Staff |
+| all_stats | per point | 151.3 | 151.3 | anchor | Circlet / Crown / Diadem / Ultimate Orb |
+| damage | per point | 56.7 | 56.5 | anchor | Blades / Broadsword / Claymore / Mithril / Demon Edge / Relic |
+| armor | per point | 116.8 | 118.8 | anchor | Ring of Protection / Chainmail / Splintmail / Platemail |
+| attack_speed | per point | 26.5 | 25.9 | anchor | Gloves / Blitz Knuckles / Hyperstone |
+| attack_speed_pct (base) | per 1 % | 25.7 | 18.0 | single | Butterfly |
+| move_speed | per point | 15.0 | 15.0 | anchor | Wind Lace |
+| move_speed_pct | per 1 % | 31.1 | 32.6 | fit | Yasha, Sange and Yasha, Yasha and Kaya |
+| boots_move_speed | per point | 11.1 | 11.1 | anchor | Boots of Speed (does not stack, sold cheaper) |
+| health | per point | 2.38 | 2.62 | anchor | Fluffy Hat / Vitality Booster |
+| mana | per point | 3.62 | 3.21 | anchor | Wizard Hat / Energy Booster |
+| health_regen | per point | 135.8 | 141.1 | anchor | Ring of Regen / Ring of Health / Ring of Tarrasque |
+| mana_regen | per point | 217.4 | 234.3 | anchor | Sage's Mask / Void Stone / Tiara |
+| magic_res | per 1 % | 40.0 | 48.0 | anchor | Shawl / Cloak |
+| evasion | per 1 % | 53.9 | 64.2 | anchor | Talisman of Evasion |
+| lifesteal | per 1 % | 50.0 | 50.0 | anchor | Morbid Mask |
+| spell_lifesteal | per 1 % | 58.3 | 43.3 | anchor | Voodoo Mask |
+| spell_amp | per 1 % | 9.35 | 24.8 | prior | Kaya family |
+| slow_res | per 1 % | 17.6 | 19.9 | prior | Sange family |
+| status_res | per 1 % | 30.3 | 31.0 | prior | Sange and Yasha |
+| restoration_amp (health restoration, "health and lifesteal amp") | per 1 % | 17.6 | 19.5 | prior | Sange family |
+| mana_regen_amp | per 1 % | 11.4 | 20.3 | prior | Kaya family |
+| manacost_reduction | per 1 % | 25.4 | 25.3 | prior | Kaya and Sange |
+| cast_speed | per 1 % | 27.7 | 25.9 | prior | Yasha and Kaya |
+| cooldown_reduction | per 1 % | 35.9 | 45.8 | single | Octarine Core |
+| cast_range | per point | 2.86 | 3.23 | single | Aether Lens |
+| attack_range | per point | 0.94 | 1.90 | single | Dragon Lance |
+| aoe_bonus | per point | — | 22.5 | anchor | Chasm Stone (from 7.41) |
+| damage_block | per expected blocked damage | 21.9 | 18.2 | single | Vanguard |
+
+Upgrades are more gold-efficient than basic items (Ogre Axe sells Strength at 100 g, the fit says 75 g), so
+stats that only exist on upgrades look cheap — most of all **attack range**: Dragon Lance's recipe barely pays
+for its extra Strength / Agility, so 10 range ≈ 19 g (Dragon Lance −10 range 7.41: −0.43 → −0.02). No
+stable price: `primary_attribute` (Power Treads has an active), `max_mana_pct` (only Null Talisman).
+
+**Applied to item rows** (`patch/weights.py → _item_gold`):
+- a priced stat changed ("Strength bonus 26 → 30"), added or removed — property-pane sides ("+20 Strength"
+  DEL), "Provides +8 Agility", "No longer provides +12 Health Regen, +6 Mana Regen, or +20 Damage", an aura's
+  "now also provides +2.5 Health Regen" (the wearer's share, a lower bound) — `amount × price`;
+- "Now provides +8 Mana Regen instead of +50 Damage" (REWORK) — both sides, signed by the gold (Khanda 7.38
+  −0.59); a rework row that names only the new side stays sign-less;
+- a **Damage Block** passive gained / lost — its chance × block × the damage-block price; numbers from the row,
+  else from the KV (`damage_block` in the price file; the previous patch for a removed block). So Halberd 7.38
+  counts both sides: −25 % Evasion (−1.32) and +Damage Block (+0.58);
+- the **components panel** (`components_change` / `auto_components_change`): the total A → B is scored as a
+  "Total cost" row when the item block ends, unless an li() row of the block states the cost itself ("Total
+  cost A → B", "Total cost unchanged", "Cost A → B") — that row wins, nothing is counted twice. Not tallied as
+  a tag. 7 panels score in the 20 annotated patches (the other 36 have a cost row, an unchanged total or are
+  new items);
+- an active's **mana cost** — see below.
+Everything else (actives, cooldowns, conditional bonuses) keeps the hero formula / NEW-DEL card weight.
+
+**Mana costs — rule**: `gold = |Δmana| × gold per max mana` (last level that changed; "now has a 50 mana
+cost" = 50), on the item gold scale. The mana a cheaper active saves is mana you need in the pool when you
+press the button — the same thing Valve sells as max mana (3.2 g per point in 7.41f). Items without a price
+(neutral items) are measured against `ref_cost`, the median cost of purchasable items with an active (3788 g).
+Why not the % (signal J, 1.35 per 1 %): J is Valve's rate for hero spells; applied to "Disarm 75 → 25"
+(−67 %) it gave +2.51, the heaviest row of the Halberd rework — worth 1.5 × the item's whole price cut. Data:
+- Valve's own price of cheaper spells: Kaya and Sange's 25 % mana cost reduction = 25 × 25.3 = 630 g. A hero
+  spends ~500 mana per rotation (median max-level spell 100 mana × 4 spells + an item active, median 100):
+  25 % of it ≈ 125 mana ≈ 400 g at the max-mana price — same order as Valve's 630 g. The %-rule valued 25 %
+  off ONE item active at ≈ 1.5 (≈ 45 % of a 3000 g item ≈ 1400 g), more than Valve charges for 25 % off
+  everything;
+- the 18 item mana-cost rows of the annotated patches: median |score| 1.98 → 0.14 (other item rows 0.48); 11
+  of the 46 largest item rows were mana costs, now none. Hero spells keep J.
+
+**Heaven's Halberd 7.38** (`w` +0.70 → **−1.43**, volume 8.31 → 9.10):
+
+| row | before | after |
+|---|---|---|
+| DEL +20 Strength | −0.24 | −1.48 |
+| DEL +25 % Evasion | −0.30 | −1.32 |
+| DEL +25 % Slow Resistance | −0.27 | −0.43 |
+| DEL +25 % Health and Lifesteal Amp | −0.36 | −0.43 |
+| NEW +275 Health | +0.21 | +0.64 |
+| NEW +6 Health Regen | +0.21 | +0.80 |
+| NEW +5 All Attributes | +0.24 | +0.74 |
+| NEW Passive: Damage Block (60 % × 60 / 30) | +0.29 | +0.58 |
+| components panel: total cost 3500 → 2600 | — | +0.89 |
+| Disarm can now be dispelled (NERF) | −0.48 | −0.48 |
+| Disarm mana cost 75 → 25 | +2.51 | +0.18 |
+| Disarm duration on ranged 5 s → 4 s | −1.11 | −1.11 |
+
+The stat swap plus the price cut nets ≈ 0 (stats −912 g, price −900 g: Valve priced the rework fairly); the
+item is a nerf because of the Disarm changes.
+
+**Largest moves** (item cells, net `w`, 20 annotated patches; 147 of 583 item cells change, no hero cell):
+
+| patch | item | before | after | why |
+|---|---|---|---|---|
+| 7.38c | Pollywog Charm | +2.79 | +0.12 | mana cost 40 → 0 (neutral, vs ref cost) |
+| 7.39 | Rod of Atos | −3.17 | −0.53 | mana cost 50 → 100 |
+| 7.39d | Outworld Staff | −2.43 | −0.07 | mana cost 40 → 65 |
+| 7.41d | Witchbane | +4.29 | +2.04 | mana cost 150 → 50 |
+| 7.39 | Gleipnir | −2.41 | −0.26 | mana cost 100 → 150 |
+| 7.38 | Heaven's Halberd | +0.70 | −1.43 | see above |
+| 7.41e | Veil of Discord | +2.22 | +0.14 | mana cost 50 → 25 |
+| 7.38 | Gleipnir | +2.65 | +0.81 | chains mana cost +200 → +100 in gold; +200 Mana priced |
+| 7.38b | Glimmer Cape | −4.00 | −2.21 | mana cost 90 → 125 |
+| 7.38c | Crippling Crossbow | +1.80 | +0.07 | mana cost 75 → 50 |
+| 7.39d | Pavise | +2.00 | +0.32 | mana cost 100 → 60 |
+| 7.38 | Abyssal Blade | +1.01 | −0.27 | pane in gold: +16 Str vs −250 HP, −10 regen, −block |
+| 7.40 | Ethereal Blade | +0.03 | −1.16 | lost +300 Mana, +3 regen, +250 cast range (priced) |
+| 7.38 | Revenant's Brooch | +0.09 | +1.26 | components panel 4900 → 3300 (old stats not listed) |
+| 7.41 | Refresher Orb | +2.08 | +0.98 | mana cost 400 → 325 |
+
+**Blind-judge agreement** (Spearman ρ of |score| vs grade, `outputs/agreement*.json`): sample 1 **0.402 →
+0.406**, sample 2 (mean of two judges) **0.461 → 0.417**; item rows only: 0.64 → 0.72 (n = 15), 0.51 → 0.27
+(n = 21). The sample-2 loss is three item rows the judges grade 2–2.5 that moved from the J scale to the much
+quieter gold scale (Pollywog mana 40 → 0: 2.79 → 0.12; Yasha and Kaya mana regen amp −10 %: 1.08 → 0.14;
+Abyssal health restoration −4 %: 0.87 → 0.04). Scale, not price: Valve's typical item stat change is 6.4 % of
+the item's cost (median of 748 KV changes 7.08 → 7.41f; cost changes 4.0 %), which the 20 % = 1.0 scale turns
+into 0.19 while a typical hero change is ~1.0. Calibrating the scale to it (typical change = 1.0, K = 15.6)
+gives 0.397 / 0.437 — no clear gain, not applied (open question).
 
 ## Backtest (docs/weights-review.md E.8.1) — 2026-09-16
 
@@ -241,8 +389,14 @@ columns only** (row max |w|, at least 1.5, = half cell): 2.0 is exactly twice as
 every layout pass ("Hide old", resize). History of rejected variants: bars v1, sqrt line, cumulative line, bars v2 with a volume band.
 
 ## Open / next
-1. ~~Items in gold~~ done.
+1. ~~Items in gold~~ done; every stat priced 2026-09-25 (section "Item prices").
 2. ~~Signal J~~ done (now the main source for % rows).
 3. ~~Formula rows (F.6)~~ done: per-level rows take the |%| of the last non-zero level (max rank) when its direction agrees with the row's tag; when `b()` flipped the tag by the average (front-/back-loaded, early-game cut, flatten) all levels are averaged.
 4. ~~Agreement test~~ done (ρ = 0.21, see above) — follow-ups pending decision.
 5. Niche parameters hitting the cap (e.g. "invisibility linger 2s→1s" = −1.83 for Treant 7.41f): consider a lower cap or per-type caps.
+6. Item gold scale vs hero scale: a typical Valve item change (6.4 % of the item) scores 0.19, a typical hero
+   change ~1.0 — within one item an active's J-scored row outweighs its stat rows 4:1. Decide whether to
+   calibrate (K = 15.6) or keep 20 % = 1.0.
+7. Reworked items whose old stats the notes do not list (Revenant's Brooch 7.38) count only the price cut from
+   the components panel; the KV has both stat sets (`tools/fit_item_prices.py` parses them) if a KV-based value
+   change is wanted.
