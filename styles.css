@@ -10685,3 +10685,15 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
 @media (max-width: 1760px) { .toolbar-patch-info .ti-after { display: none; } }
 @media (max-width: 1560px) { .toolbar-patch-info .ti-live { display: none; } }
 @media (max-width: 1400px) { .toolbar-patch-info { display: none; } }
+/* Patch-page search: the same height as the tag / group chips beside it (19px) so the toolbar
+   reads as one row of equal pieces (it was a 35px field towering over the chips). */
+.toolbar .search-box input {
+  height: 19px;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 15px;
+  line-height: 15px;
+  background-size: 12px 12px;
+  background-position: 10px center;
+  box-shadow: inset 0 -2px 0 var(--px-press);
+}

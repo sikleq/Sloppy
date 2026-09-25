@@ -3,6 +3,25 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Materials",
+      "title": "Heatmap in olive and brick",
+      "link": "mana_items.html",
+      "items": [
+        "Better values tint olive, worse ones brick — green and red pulled toward the site's gold; the middle of the column stays clear and the tint grows toward the ends",
+        "Applies to every table with the Heatmap switch (Mana Items, Hero Stats)"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-25_heatmap.webp"
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Patch Reader",
+      "title": "The search field on patch pages is as tall as the tag chips beside it",
+      "minor": true
+    },
+    {
+      "date": "2026-09-25",
       "category": "Patch Reader",
       "title": "Tag filters in one row, glowing like neon",
       "items": [

@@ -2960,11 +2960,13 @@ function ecPinnableTip(tip, show, hide, sel) {
       cells.forEach(c => {
         let t = rankMap.get(c.v) / last;   // [0, 1] by unique-value rank
         if (direction === 'lower') t = 1 - t;
-        // 0 → red, 60 → amber, 120 → green. Keep saturation + alpha
-        // moderate so cross-hover darkening still reads on top.
-        const hue = Math.round(t * 120);
-        c.td.style.backgroundColor =
-          `hsla(${hue}, 60%, 50%, 0.22)`;
+        // Olive (better) ↔ brick (worse), both pulled toward yellow so they sit with the
+        // site's gold; the middle 20 % of ranks stays uncoloured and the tint grows toward
+        // the ends (max alpha 0.32). The old red→amber→green put a yellow band mid-table.
+        const d = t - 0.5;
+        const alpha = (Math.max(0, Math.abs(d) - 0.1) / 0.4 * 0.32).toFixed(3);
+        c.td.style.backgroundColor = alpha === '0.000' ? ''
+          : (d > 0 ? `rgba(150, 170, 70, ${alpha})` : `rgba(190, 85, 55, ${alpha})`);
       });
     });
   }

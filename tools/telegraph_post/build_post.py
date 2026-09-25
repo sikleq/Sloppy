@@ -99,8 +99,11 @@ POST = [
             "+2 дальности за каждую рыбу), Dark Willow (+20% регенерации), в Hero Lab — Magnus, "
             "Primal Beast, Wraith King, Death Prophet. Razor теперь даёт +1% скорости за уровень, "
             "а не +1 единицу, а Horsepower Кентавра не складывается с сапогами.",
+            "<b>Heatmap</b> в оливково-кирпичных тонах: лучшее — оливковое, худшее — кирпичное, "
+            "середина без цвета. Зелёный и красный сдвинуты к жёлтому, чтобы жить рядом с золотом сайта.",
             "<b>Terrain:</b> стрелки у номера патча переходят на соседнюю карту (7.41 ↔ 7.40).",
             "Описания над таблицами убраны: страницы открываются сразу с фильтров."]),
+    ("img", ("2026-09-25_heatmap.webp", "Heatmap на Mana Items")),
     ("img", ("2026-09-25_per_int.webp", "Per Int на Mana Items")),
     ("img", ("2026-09-25_hl_diff.webp", "Difference в Hero Lab")),
 
@@ -151,19 +154,19 @@ def _prepare_images():
 
 
 COVER_HTML = """<!doctype html><html><head>
-<link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&family=Tiny5&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&family=Rubik:wght@400;600&display=block" rel="stylesheet">
 <style>
 body{margin:0;width:1280px;height:640px;overflow:hidden;font-family:'Jersey 10',monospace;
  background:radial-gradient(ellipse 70% 90% at 25% 30%,#2a2118 0%,#12100d 60%,#0b0a09 100%);color:#e8dcc0}
 .helm{position:absolute;left:84px;top:150px;width:192px;height:192px;image-rendering:pixelated}
 .t{position:absolute;left:320px;top:132px;font-family:'Jersey 25';font-size:112px;color:#e3c46a;letter-spacing:2px;
  text-shadow:0 0 18px rgba(255,150,40,.35)}
-.s{position:absolute;left:326px;top:258px;font-family:'Tiny5';font-size:50px;color:#d6cbb5;letter-spacing:1px;white-space:nowrap}
+.s{position:absolute;left:326px;top:258px;font-family:'Rubik';font-weight:600;font-size:46px;color:#d6cbb5;letter-spacing:1px;white-space:nowrap}
 .bar{position:absolute;left:326px;top:346px;width:420px;height:4px;background:#e3c46a;box-shadow:0 0 10px #ff9a2a}
 .e{position:absolute;width:5px;height:5px;background:#ffcf6a;box-shadow:0 0 6px #ff8a1a}
 .shot{position:absolute;right:-40px;bottom:-30px;width:640px;border:2px solid rgba(227,196,106,.45);
  box-shadow:0 10px 40px rgba(0,0,0,.7);transform:rotate(-4deg)}
-.u{position:absolute;left:326px;top:384px;font-family:'Tiny5';font-size:30px;color:#9b917f}
+.u{position:absolute;left:326px;top:384px;font-family:'Rubik';font-weight:400;font-size:28px;color:#9b917f}
 </style></head><body>
 <img class="helm" src="http://localhost:8799/icons/ui/gothic/icon_helm.png">
 <div class="t">SLOPPY</div><div class="s">__SUB__</div><div class="bar"></div>
