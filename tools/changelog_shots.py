@@ -52,6 +52,7 @@ SHOTS = {
     "2026-09-25_aoe_talent.webp": ("aoe_increase.html", None, [".toolbar-panel"], ['[data-aoe-upgrade="talent"]'], 120, {"width": 1400}),
     "2026-09-25_innates.webp": ("hero_lab.html", None, [".hero-lab"], [], 420, {"width": 1600}),
     "2026-09-25_heatmap.webp": ("mana_items.html", None, ["table.mr-table"], [], 330, {"width": 1500}),
+    "2026-09-25_item_page.webp": ("items/circlet.html", None, [".ec-head-panel", ".ec-nochange"], [], 300, {"width": 1400}),
     "2026-09-25_menu.webp": ("items_dyn.html", None, [".toolbar-panel", ".hd-dd-menu"], [".hd-dd-btn"], 330, {"width": 1400}),
     "2026-09-25_tags.webp": ("patches/7.38.html", None, [".legend-stack"], ['.legend-tags .filter-btn[data-filter="nerf"]', ".cat-filter-btn >> nth=2"], 60, {"width": 1600}),
     "2026-09-25_terrain_bar.webp": ("terrain_741.html", None, [".tc-controls-bar", ".terrain-subpatch-nav"], [], 90, {"width": 1400}),
