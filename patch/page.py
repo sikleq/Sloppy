@@ -64,10 +64,6 @@ def write_head(version, date):
       </div>
       <div class="legend-categories"><!--CATEGORIES_BAR--></div>
     </div>
-    <div class="search-box">
-      <input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">
-      <div class="search-results" id="search-results"></div>
-    </div>
     {patch_info_html}
   </div>
 </div>
@@ -81,8 +77,16 @@ def write_footer():
     if _State.section_panel_open:
         W('</section>')
         _State.section_panel_open = False
-    W('<button class="back-to-top" aria-label="Back to top" title="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>')
+    # Corner stack, bottom -> top: weights, search, back-to-top (appears on scroll).
+    W('<button class="back-to-top has-search" aria-label="Back to top" title="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>')
     W('<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores" title="Dynamics: weighted scores (Valve revealed-preference weights)"></button>')
+    # Search = a round loupe button above the weights; the field slides out to its left
+    # ("/" opens it, Esc closes). It used to be a toolbar field that never lined up with the chips.
+    W('<button class="search-fab" id="search-fab" type="button" aria-label="Search heroes, items, abilities" '
+      'aria-expanded="false" aria-controls="search-pop" title="Search heroes, items, abilities (/)"></button>')
+    W('<div class="search-pop" id="search-pop" hidden><div class="search-box">'
+      '<input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">'
+      '<div class="search-results" id="search-results"></div></div></div>')
     W(f'<script defer src="../src/scripts.js?v={_ASSET_VERSION}"></script>')
     W('</div></body></html>')
 

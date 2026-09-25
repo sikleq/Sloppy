@@ -10699,3 +10699,35 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
 }
 /* Item page with no annotated change yet */
 .ec-nochange-note { margin: 0; padding: 18px 22px; color: var(--text-dim); font-size: 14px; }
+/* Patch pages: search lives in the corner stack — a round loupe button above the weights
+   (bottom -> top: weights 22px, search 74px, back-to-top 126px when it shows). The field
+   slides out to the LEFT of the button; results open upward. */
+.search-fab {
+  position: fixed; right: 22px; bottom: 74px;
+  width: 42px; height: 42px; box-sizing: border-box; padding: 0;
+  appearance: none; -webkit-appearance: none;
+  border-radius: 50%; border: 2px solid var(--gold);
+  box-shadow: 0 5px 16px var(--shadow-55);
+  background: url('icons/ui/gothic/icon_loupe.png') center / 22px 22px no-repeat,
+              linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
+  image-rendering: pixelated;
+  cursor: pointer; z-index: 100;
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+.search-fab:hover { transform: translateY(-2px); filter: brightness(1.12); }
+.search-fab[aria-expanded="true"] { box-shadow: 0 0 10px rgba(255, 150, 40, 0.45), 0 5px 16px var(--shadow-55); }
+.back-to-top.has-search { bottom: 126px; }
+.search-pop {
+  position: fixed; right: 74px; bottom: 76px; width: min(360px, calc(100vw - 110px));
+  z-index: 101;
+}
+.search-pop[hidden] { display: none; }
+.search-pop .search-box { flex: none; min-width: 0; width: 100%; }
+.search-pop .search-box input {
+  height: 38px; padding: 0 12px 0 36px; text-align: left; font-size: 18px;
+  background: var(--px-field) url('icons/ui/gothic/icon_loupe.png') 10px center / 16px 16px no-repeat;
+  image-rendering: auto;
+  box-shadow: inset 0 -3px 0 var(--px-press), 0 8px 24px rgba(0, 0, 0, 0.6);
+  border-image-source: var(--px-edge-gold);
+}
+.search-pop .search-results { top: auto; bottom: calc(100% + 6px); max-height: min(60vh, 520px); overflow: auto; }

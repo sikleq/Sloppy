@@ -3,6 +3,18 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Patch Reader",
+      "title": "Search moved to a loupe button in the corner",
+      "items": [
+        "The round loupe above the weights button opens the search; the field slides out to its left and results open upward",
+        "Press / anywhere to search, Esc to close — the toolbar keeps only the tag and group chips"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-25_search_fab.webp"
+      ]
+    },
+    {
+      "date": "2026-09-25",
       "category": "Materials",
       "title": "Every item has a page — even without changes yet (133 more), and all of them can be picked into a hero page's item slots",
       "minor": true,
@@ -20,12 +32,6 @@
       "shots": [
         "icons/changelog/2026-09-25_heatmap.webp"
       ]
-    },
-    {
-      "date": "2026-09-25",
-      "category": "Patch Reader",
-      "title": "The search field on patch pages is as tall as the tag chips beside it",
-      "minor": true
     },
     {
       "date": "2026-09-25",
