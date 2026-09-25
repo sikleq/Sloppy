@@ -3,6 +3,19 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Patch Reader",
+      "title": "Tag filters in one row, glowing like neon",
+      "items": [
+        "Tags and group chips share one row, parted by a thin line — no \"Tags:\" / \"Group:\" labels (also on hero, item and unit pages)",
+        "A pressed chip glows in its own colour, letters and frame, like a neon sign",
+        "NEW and REWORK are brighter; DEL is wine-red now, no longer nearly the same as NERF"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-25_tags.webp"
+      ]
+    },
+    {
+      "date": "2026-09-25",
       "category": "Hero Lab",
       "title": "Innate stat bonuses completed",
       "fix": true,

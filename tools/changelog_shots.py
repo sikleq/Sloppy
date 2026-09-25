@@ -48,7 +48,7 @@ SHOTS = {
                                 ["#hl-diff-dd .hd-dd-btn"], 400, {"width": 1400}),
     "2026-09-20_patch738.webp": ("patches/7.38.html", None, ["nav.top-nav", ".toolbar", ".entity-block >> nth=0"], [], 520, {"width": 1400}),
     "2026-09-25_menu.webp": ("items_dyn.html", None, [".toolbar-panel", ".hd-dd-menu"], [".hd-dd-btn"], 330, {"width": 1400}),
-    "2026-09-25_tags.webp": ("patches/7.38.html", None, [".legend-stack", ".toolbar .search-box"], [], 90, {"width": 1400}),
+    "2026-09-25_tags.webp": ("patches/7.38.html", None, [".legend-stack"], ['.legend-tags .filter-btn[data-filter="nerf"]', ".cat-filter-btn >> nth=2"], 60, {"width": 1600}),
     "2026-09-25_terrain_bar.webp": ("terrain_741.html", None, [".tc-controls-bar", ".terrain-subpatch-nav"], [], 90, {"width": 1400}),
     "2026-09-25_per_int.webp": ("mana_items.html", None, [".mr-int-group", ".stat-hist-tip"],
                                 [".mr-int-group .mr-const"], 330, {"width": 1400}),

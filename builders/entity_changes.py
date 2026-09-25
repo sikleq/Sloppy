@@ -114,7 +114,6 @@ _TOOLBAR = '''<div class="toolbar">
   <div class="toolbar-inner">
     <div class="legend-stack">
       <div class="legend-tags ec-filters">
-        <strong>Tags:</strong>
         <button class="badge buff-text filter-btn" data-filter="buff">BUFF</button>
         <button class="badge nerf-text filter-btn" data-filter="nerf">NERF</button>
         <button class="badge new filter-btn" data-filter="new">NEW</button>

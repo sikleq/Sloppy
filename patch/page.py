@@ -54,7 +54,6 @@ def write_head(version, date):
   <div class="toolbar-inner">
     <div class="legend-stack">
       <div class="legend-tags">
-        <strong>Tags:</strong>
         <button class="badge buff-text filter-btn" data-filter="buff">BUFF</button>
         <button class="badge nerf-text filter-btn" data-filter="nerf">NERF</button>
         <button class="badge new filter-btn" data-filter="new">NEW</button>
@@ -354,7 +353,8 @@ def _categories_bar_html():
             f'<button class="badge cat-filter-btn" data-category="{s["slug"]}">'
             f'{s["label"]}</button>'
         )
-    return '<strong>Group:</strong>' + ''.join(btns)
+    # no "Group:" label — a thin vertical line parts the group chips from the tags
+    return '<span class="ec-vsep" aria-hidden="true"></span>' + ''.join(btns)
 
 
 _THUMB_RE = re.compile(r'src="\.\./icons/(heroes|items|abilities)/([^"?/]+)\.png"')
