@@ -1110,7 +1110,9 @@
       });
       const scale = Math.max(DYN_W_MIN_SCALE, ...vals.filter((_, i) => vis[i]).map(Math.abs));
       const yOf = v => mid - Math.max(-1, Math.min(1, v / scale)) * amp;
-      const at = j => (j < 0 || j >= vals.length) ? 0 : vals[j];
+      // a hidden ("Hide old") neighbour counts as the axis: its value is outside the row scale,
+      // so the first visible cell must not start with a riser from an invisible, clipped level
+      const at = j => (j < 0 || j >= vals.length || !vis[j]) ? 0 : vals[j];
       const cls = y => (y < mid - 0.05 ? 'up' : (y > mid + 0.05 ? 'down' : 'flat'));
       tds.forEach((td, i) => {
         if (!vis[i]) return;

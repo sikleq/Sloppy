@@ -333,6 +333,11 @@ def _open_block(extra_cls='', extra_attrs=''):
     s = (pre + ('</div>\n' if _State.block_open else '')
          + f'<div class="{cls}"{extra_attrs}>\n')
     _State.block_open = True
+    # A new entity block starts a new weights context: the ability slug of the previous hero's
+    # last ability() block must not leak into units / items / enchantments (it gave Tormentor rows
+    # Wraith King's ultimate x1.3 and enchantment rows Zeus' skill-priority multiplier).
+    _State.current_ability_slug = None
+    _State.current_ability_innate = False
     cls = extra_cls or ''
     _State.dyn_skip_li = False
     if (('is-new' in cls) or ('is-changed' in cls)) \
@@ -785,7 +790,9 @@ def new_facet(slug, desc, summary=None, tag="new"):
     from .badges import FACETS, _FACET_COLOR_GRADIENT
     from .images import _FACET_ICONS
     tag_key = tag.lower() if tag else "new"
-    _dyn_record_li({'new'} if tag_key == 'new' else {'rework'})
+    _State.current_ability_slug = None
+    _State.current_ability_innate = False
+    _dyn_record_card({'new'} if tag_key == 'new' else {'rework'}, facet=True, base_stat=False)
     if slug not in FACETS:
         return f'<!-- new_facet: unknown slug {slug} -->'
     name, color = FACETS[slug]
@@ -844,7 +851,9 @@ def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_a
     """
     from .badges import FACETS, _FACET_COLOR_GRADIENT
     from .images import _FACET_ICONS
-    _dyn_record_li({'rework'})
+    _State.current_ability_slug = None
+    _State.current_ability_innate = False
+    _dyn_record_card({'rework'}, facet=True, base_stat=False)
     if slug not in FACETS:
         return f'<!-- facet_change: unknown slug {slug} -->'
     name, color = FACETS[slug]
@@ -976,6 +985,29 @@ def _row_ctx(text):
     }
 
 
+def _dyn_record_card(tags, text="", badge="", **ctx_over):
+    """Tally + score a change that is not an li() row (ability/facet cards, item property panes).
+    Before 2026-09-25 these were tallied with scores (0, 0): a reworked ability or an item's
+    "+6 -> +7 Armor" pane moved neither the net balance nor the volume."""
+    ctx = dict(_row_ctx(text), **ctx_over)
+    _dyn_record_li(tags, scores=_row_scores(text, tags, badge, ctx=ctx))
+
+
+_TOTAL_UNCHANGED_RE = re.compile(r'total cost (?:is )?unchanged', re.I)
+_PROP_VALUE_RE = re.compile(r'^\s*([+\-]?\d[\d./]*%?)\s+(.+?)\s*$')
+
+
+def _prop_row_text(o, nw):
+    """Item property pane pair ("+10 Strength" -> "+26 Strength") as a patch-note sentence the
+    weights scorer understands: "Strength bonus changed from +10 to +26"."""
+    ot = re.sub(r'<[^>]+>', ' ', (o or ('', ''))[1] or '')
+    nt = re.sub(r'<[^>]+>', ' ', (nw or ('', ''))[1] or '')
+    mo, mn = _PROP_VALUE_RE.match(ot), _PROP_VALUE_RE.match(nt)
+    if mo and mn:
+        return f"{mn.group(2)} bonus changed from {mo.group(1)} to {mn.group(1)}"
+    return nt or ot
+
+
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None):
     if isinstance(text, str):
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
@@ -993,8 +1025,12 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             dyn_tags = set(primary)
         else:
             dyn_tags = set(re.findall(r'data-overall="(\w+)"', badge))
+    _score_text = text if isinstance(text, str) else ""
+    if isinstance(extra, str) and _TOTAL_UNCHANGED_RE.search(extra):
+        # "Recipe cost 1350 -> 1250" + note "Total cost unchanged": the buyer pays the same
+        _score_text += ". " + re.sub(r'<[^>]+>', ' ', extra)
     _dyn_record_li(dyn_tags, extra_keys=also_dyn,
-                   scores=_row_scores(text if isinstance(text, str) else "", dyn_tags, badge,
+                   scores=_row_scores(_score_text, dyn_tags, badge,
                                       ctx=_row_ctx(text if isinstance(text, str) else "")))
     if isinstance(text, str) and 'del' in dyn_tags:
         _low = text.strip().rstrip('.').lower()
@@ -1401,12 +1437,24 @@ def properties_change(old, new, old_extras=None, new_extras=None):
     _DYN_PROP_MAP = {"BUFF": "buff", "NERF": "nerf", "NEW": "new",
                      "DEL": "del", "REWORK": "rework", "MISC": "misc",
                      "QoL": "qol"}
-    for row in list(old) + list(new):
-        if isinstance(row, (tuple, list)) and len(row) >= 1:
-            tag = row[0]
-            tid = _DYN_PROP_MAP.get(tag)
-            if tid:
-                _dyn_record_li({tid})
+    # Tally AND score every tagged property (after the normalisation above a changed value carries
+    # its tag on the new side; the multiset of tags is unchanged). A changed value is scored as
+    # "<Stat> bonus changed from <old> to <new>" with the new side's % badge, so priced stats land
+    # on the item gold scale like the equivalent li() row; NEW/DEL properties score like NEW/DEL rows.
+    for o, nw in zip(old_rows, new_rows):
+        for side in (o, nw):
+            if not (isinstance(side, (tuple, list)) and len(side) >= 1):
+                continue
+            tid = _DYN_PROP_MAP.get(side[0])
+            if not tid:
+                continue
+            if tid in ("buff", "nerf"):
+                _o = o if isinstance(o, (tuple, list)) else None
+                _n = nw if isinstance(nw, (tuple, list)) else None
+                _badge = _n[2] if (_n and len(_n) >= 3) else (side[2] if len(side) >= 3 else "")
+                _dyn_record_card({tid}, _prop_row_text(_o, _n), _badge or "")
+            else:
+                _dyn_record_card({tid}, re.sub(r'<[^>]+>', ' ', side[1] if len(side) >= 2 else ""))
 
     def pane_cells(rows, extras):
         cells = []
@@ -1531,12 +1579,16 @@ def aghs_shard_line(text):
 
 
 def ability_change(old, new, summary=None, tag=None, sub=False):
+    _State.current_ability_slug = new.get("slug")          # rows below belong to this ability
+    _State.current_ability_innate = bool(new.get("innate"))
+    _card_ctx = {"ability": _State.current_ability_slug, "innate": _State.current_ability_innate,
+                 "facet": False, "base_stat": False}
     if tag == 'new':
-        _dyn_record_li({'new'})
+        _dyn_record_card({'new'}, **_card_ctx)
     elif tag == 'rework':
-        _dyn_record_li({'rework'})
+        _dyn_record_card({'rework'}, **_card_ctx)
     else:
-        _dyn_record_li({'new', 'del', 'rework'})
+        _dyn_record_card({'new', 'del', 'rework'}, **_card_ctx)
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
     if not sub and (_State.current_hero or _State.current_unit) and not _State.seen_abilities_subgroup:
