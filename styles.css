@@ -85,17 +85,17 @@
   --attr-int: #5bc0de;
   --attr-uni: #b39ddb;
   /* -- Backgrounds -- */
-  --bg-page:          #0e0d0c;
-  --bg-panel:         #11100f;
-  --bg-panel-2:       #171513;
-  --bg-panel-3:       #1c1a17;
-  --bg-panel-4:       #282521;
+  --bg-page:          #0d0d0c;
+  --bg-panel:         #111010;
+  --bg-panel-2:       #161514;
+  --bg-panel-3:       #1b1a18;
+  --bg-panel-4:       #262523;
 
   /* -- Text -- */
-  --text-main:        #dcd0b7;
-  --text-bright:      #faeccf;
-  --text-dim:         #9b9281;
-  --text-dimmer:      #7c7567;
+  --text-main:        #d6d0c3;
+  --text-bright:      #f3ecdd;
+  --text-dim:         #969289;
+  --text-dimmer:      #78756e;
 
   /* -- Accent gold -- */
   --gold:             #e3c46a;
@@ -110,9 +110,9 @@
   --blue-bright:      #58a6ff;
 
   /* -- Borders / lines -- */
-  --line:             #38352f;
-  --line-soft:        rgba(155, 146, 129, 0.18);
-  --line-bright:      rgba(255, 247, 217, 0.14);
+  --line:             #363532;
+  --line-soft:        rgba(150, 146, 137, 0.18);
+  --line-bright:      rgba(254, 247, 232, 0.14);
 
   /* -- Typography -- */
   --font-ui:          'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -136,17 +136,17 @@
   --gold-95:          rgba(231, 196, 106, 0.95);
   --gold-14:          rgba(227, 196, 106, 0.14);
   --gold-0:           rgba(227, 196, 106, 0);
-  --blue-18:          rgba(220, 207, 182, 0.18);
-  --blue-30:          rgba(220, 207, 182, 0.30);
-  --blue-35:          rgba(220, 207, 182, 0.35);
-  --blue-40:          rgba(220, 207, 182, 0.4);
-  --blue-cold-10:     rgba(229, 216, 190, 0.10);
+  --blue-18:          rgba(213, 207, 195, 0.18);
+  --blue-30:          rgba(213, 207, 195, 0.30);
+  --blue-35:          rgba(213, 207, 195, 0.35);
+  --blue-40:          rgba(213, 207, 195, 0.4);
+  --blue-cold-10:     rgba(222, 216, 203, 0.10);
   --blue-bright-85:   rgba(227, 196, 106, 0.85);
-  --muted-04:         rgba(155, 146, 129, 0.04);
-  --muted-35:         rgba(155, 146, 129, 0.35);
-  --muted-45:         rgba(155, 146, 129, 0.45);
-  --bg-deep-60:       rgba(17, 16, 15, 0.6);
-  --bg-deep-97:       rgba(17, 16, 15, 0.97);
+  --muted-04:         rgba(150, 146, 137, 0.04);
+  --muted-35:         rgba(150, 146, 137, 0.35);
+  --muted-45:         rgba(150, 146, 137, 0.45);
+  --bg-deep-60:       rgba(17, 16, 16, 0.6);
+  --bg-deep-97:       rgba(17, 16, 16, 0.97);
   --shadow-28:        rgba(0, 0, 0, 0.28);
   --shadow-35:        rgba(0, 0, 0, 0.35);
   --shadow-40:        rgba(0, 0, 0, 0.4);
@@ -159,8 +159,8 @@
   --white-22:         rgba(255, 255, 255, 0.22);
   --bg-warm-dark:     #3b2e1d;
   --bg-warm-darker:   #2a2014;
-  --text-muted-blue:  #b7ad98;
-  --text-muted-blue-2: #bbb19c;
+  --text-muted-blue:  #b2ada2;
+  --text-muted-blue-2: #b6b1a6;
 }
 
 /* ==========================================================================
@@ -213,7 +213,7 @@ body {
 body.patch-page {
   /* Shorthand on purpose: also WIPES the base body rule's radial gradients
      and their background-attachment:fixed (same repaint-on-scroll issue). */
-  background: #11100e;
+  background: #10100f;
 }
 /* Valve's patch-page texture (featured.jpg) as a FIXED UNDERLAY element, not
    `background-attachment: fixed` on body. A fixed-attachment background can't
@@ -227,7 +227,7 @@ body.patch-page::before {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: #11100e url('https://cdn.steamstatic.com/apps/dota2/images/dota_react/backgrounds/featured.jpg') center top / cover no-repeat;
+  background: #10100f url('https://cdn.steamstatic.com/apps/dota2/images/dota_react/backgrounds/featured.jpg') center top / cover no-repeat;
 }
 /* Container is transparent; patch-page depth comes from Valve-style section
    bars and per-entity changelog slabs rather than one large outer card. */
@@ -241,7 +241,7 @@ body.patch-page .container {
    section title. This avoids "gaps" between neighbouring items/entities while
    still letting the orange section bar sit on its own seam. */
 body.patch-page .cat-panel {
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.38) 3.07%, rgba(33, 31, 27, 0.35) 88.06%);
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.38) 3.07%, rgba(32, 31, 29, 0.35) 88.06%);
   border: 0;
   border-left: 2px solid rgba(255, 255, 255, 0.065);
   border-radius: 0;
@@ -271,7 +271,7 @@ body.patch-page .entity-block {
   padding: 0 22px 16px;
   margin: 0;
   border-top: 1px solid;
-  border-image: linear-gradient(to right, var(--line-bright), rgba(255, 247, 217, 0.09) 62%, rgba(255, 247, 217, 0.055)) 1;
+  border-image: linear-gradient(to right, var(--line-bright), rgba(254, 247, 232, 0.09) 62%, rgba(254, 247, 232, 0.055)) 1;
 }
 body.patch-page h2.section + .entity-block {
   border-top: 0;
@@ -371,9 +371,9 @@ nav.top-nav {
       rgba(255, 244, 209, 0.035) 0%,
       rgba(255, 244, 209, 0.0) 12%),
     linear-gradient(180deg,
-      #1c1b18 0%,
-      #161512 58%,
-      #131210 100%);
+      #1c1b19 0%,
+      #151513 58%,
+      #121211 100%);
   backdrop-filter: blur(8px) saturate(104%);
   -webkit-backdrop-filter: blur(8px) saturate(104%);
   /* PERF: sticky + backdrop-filter forces the browser to re-sample and
@@ -438,7 +438,7 @@ body:has(.creeps-page) nav.top-nav {
     linear-gradient(180deg,
       rgba(255, 244, 209, 0.035) 0%,
       rgba(255, 244, 209, 0.0) 12%),
-    linear-gradient(180deg, #1c1b18 0%, #131210 100%);
+    linear-gradient(180deg, #1c1b19 0%, #121211 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -493,7 +493,7 @@ body:has(.creeps-page) nav.top-nav {
   font-size: 22px;
   letter-spacing: 1px;
   line-height: 1;
-  color: #ded1b8;
+  color: #d7d1c4;
   text-shadow:
     0 1px 0 rgba(0, 0, 0, 0.68);
 }
@@ -668,10 +668,10 @@ body:has(.creeps-page) nav.top-nav {
 .inv-sig-hidden {
   font-style: italic;
   letter-spacing: 1px;
-  color: rgba(218, 205, 181, 0.6);    /* cool-grey, not gold (shown only once lit) */
+  color: rgba(211, 205, 193, 0.6);    /* cool-grey, not gold (shown only once lit) */
 }
 .inv-sig-hidden.is-lit {
-  text-shadow: 0 0 8px rgba(173, 163, 144, 0.4);
+  text-shadow: 0 0 8px rgba(168, 163, 153, 0.4);
 }
 /* Star sky: a few dim pixel stars behind everything; each twinkles on its own
    slow cadence (JS sets per-star duration/delay). They never overlap names. */
@@ -1171,7 +1171,7 @@ body:has(.creeps-page) nav.top-nav {
   align-items: center;
 }
 .nav-tab:hover {
-  background: rgba(56, 53, 47, 0.4);
+  background: rgba(54, 53, 50, 0.4);
 }
 .nav-tab.active {
   background: rgba(0, 0, 0, 0.22);
@@ -1508,7 +1508,7 @@ body:has(.creeps-page) nav.top-nav {
   transform: translateY(-3px);
   filter: brightness(1.18);
   box-shadow:
-    inset 0 1px 0 rgba(229, 216, 190, 0.14),
+    inset 0 1px 0 rgba(222, 216, 203, 0.14),
     0 8px 20px var(--shadow-60);
 }
 
@@ -1697,7 +1697,7 @@ body:has(.creeps-page) nav.top-nav {
 /* YEAR BLOCK (shared between modes, collapsible) */
 .cal-year-block {
   margin-bottom: 6px;
-  background: #1a1815;
+  background: #191817;
   border: 1px solid var(--bg-panel-4);
   border-radius: 6px;
   overflow: hidden;
@@ -1729,7 +1729,7 @@ body:has(.creeps-page) nav.top-nav {
 .cal-year-block.is-current {
   margin-left: -140px;
   margin-right: -140px;
-  border-color: rgba(220, 207, 182, 0.28);
+  border-color: rgba(213, 207, 195, 0.28);
   box-shadow:
     inset 0 1px 0 var(--blue-cold-10),
     0 4px 18px var(--shadow-35);
@@ -1750,7 +1750,7 @@ body:has(.creeps-page) nav.top-nav {
    the year block's header row (top-right), not a separate bar above. */
 .cal-compact-toggle.ua-upgrades-toggle {
   background:
-    linear-gradient(180deg, rgba(47, 45, 39, 0.95) 0%, rgba(34, 33, 29, 0.95) 100%);
+    linear-gradient(180deg, rgba(46, 45, 42, 0.95) 0%, rgba(34, 33, 29, 0.95) 100%);
   border: 1px solid var(--blue-35);
   border-radius: 6px;
   color: var(--text-bright);
@@ -1761,7 +1761,7 @@ body:has(.creeps-page) nav.top-nav {
     0 2px 6px var(--shadow-35);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
-.cal-compact-toggle.ua-upgrades-toggle:hover { border-color: rgba(220, 207, 182, 0.6); }
+.cal-compact-toggle.ua-upgrades-toggle:hover { border-color: rgba(213, 207, 195, 0.6); }
 .cal-compact-toggle .ua-upgrades-label {
   font-weight: 700;
   font-size: 13px;
@@ -1783,7 +1783,7 @@ body:has(.creeps-page) nav.top-nav {
   gap: 8px;
   min-width: 90px;             /* symmetric slot keeps the value optically centred */
   background:
-    linear-gradient(180deg, rgba(47, 45, 39, 0.95) 0%, rgba(34, 33, 29, 0.95) 100%);
+    linear-gradient(180deg, rgba(46, 45, 42, 0.95) 0%, rgba(34, 33, 29, 0.95) 100%);
   border: 1px solid var(--blue-35);
   border-radius: 6px;
   color: var(--text-bright);
@@ -1805,13 +1805,13 @@ body:has(.creeps-page) nav.top-nav {
   line-height: 1;
   transition: transform 0.15s;
 }
-.cal-year-current:hover { border-color: rgba(220, 207, 182, 0.6); }
+.cal-year-current:hover { border-color: rgba(213, 207, 195, 0.6); }
 .cal-year-picker.is-open .cal-year-current,
 .cal-year-current:focus-visible {
   outline: none;
-  border-color: rgba(220, 207, 182, 0.75);
+  border-color: rgba(213, 207, 195, 0.75);
   box-shadow:
-    inset 0 1px 0 rgba(229, 216, 190, 0.14),
+    inset 0 1px 0 rgba(222, 216, 203, 0.14),
     0 0 0 3px rgba(227, 196, 106, 0.18);
 }
 .cal-year-picker.is-open .cal-year-caret { transform: rotate(180deg); }
@@ -1884,9 +1884,9 @@ body:has(.creeps-page) nav.top-nav {
   align-items: stretch;
   padding: 12px 6px;
   background:
-    linear-gradient(180deg, rgba(37, 35, 31, 0.5) 0%, rgba(25, 23, 20, 0.5) 100%);
+    linear-gradient(180deg, rgba(36, 35, 33, 0.5) 0%, rgba(24, 23, 22, 0.5) 100%);
   /* Border + shadow matched to .cal-year-block.is-current. */
-  border: 1px solid rgba(220, 207, 182, 0.28);
+  border: 1px solid rgba(213, 207, 195, 0.28);
   border-radius: 6px;
   box-shadow:
     inset 0 1px 0 var(--blue-cold-10),
@@ -1921,7 +1921,7 @@ body:has(.creeps-page) nav.top-nav {
   height: 1px;
   align-self: stretch;
   margin: 4px 0;
-  background: rgba(220, 207, 182, 0.14);
+  background: rgba(213, 207, 195, 0.14);
 }
 .cal-ig-h {
   font-size: 10.5px; font-weight: 600; color: var(--text-muted-blue); text-transform: uppercase;
@@ -1940,8 +1940,8 @@ body:has(.creeps-page) nav.top-nav {
   font-family: inherit;
   font-variant-numeric: tabular-nums;
 }
-.cal-ig-grid { stroke: rgba(220, 207, 182, 0.07); stroke-width: 1; }
-.cal-ig-grid-v { stroke: rgba(220, 207, 182, 0.045); }   /* minor vertical lines */
+.cal-ig-grid { stroke: rgba(213, 207, 195, 0.07); stroke-width: 1; }
+.cal-ig-grid-v { stroke: rgba(213, 207, 195, 0.045); }   /* minor vertical lines */
 .cal-ig-axis { stroke: var(--blue-18); stroke-width: 1; }
 .cal-ig-axis.is-base { stroke: var(--blue-30); }
 .cal-ig-ytick {
@@ -2040,7 +2040,7 @@ body:has(.creeps-page) nav.top-nav {
   line-height: 1;
 }
 .cal-patch.sub {
-  background: rgba(124, 117, 103, 0.22);
+  background: rgba(120, 117, 110, 0.22);
 }
 /* Major patches — unified solid blue (compact), matches the cadence chart */
 .cal-patch.major {
@@ -2106,12 +2106,12 @@ span.cal-patch {
   min-height: 22px;
   max-height: 33px;          /* cap the square so the full grid fits the viewport */
   border-radius: 3px;
-  background: rgba(124, 117, 103, 0.05);
+  background: rgba(120, 117, 110, 0.05);
   font-size: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #605b50;
+  color: #5d5b55;
   text-decoration: none;
   position: relative;
   transition: transform 0.13s ease, filter 0.13s, background 0.1s, z-index 0s;
@@ -2122,10 +2122,10 @@ span.cal-patch {
    lights up around the cursor. */
 .cal-full-grid .cross-row,
 .cal-full-grid .cross-col {
-  background: rgba(220, 207, 182, 0.07);
+  background: rgba(213, 207, 195, 0.07);
 }
 .cal-full-grid .cross-row.cross-col {
-  background: rgba(220, 207, 182, 0.16);
+  background: rgba(213, 207, 195, 0.16);
 }
 .cal-full-month-name.cross-row {
   color: var(--text-bright);
@@ -2149,7 +2149,7 @@ table td.cross-col {
 table tr.cross-row > td.cross-col {
   background-image: linear-gradient(rgba(0, 0, 0, 0.50),
                                     rgba(0, 0, 0, 0.50));
-  box-shadow: inset 0 0 0 1px rgba(220, 207, 182, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(213, 207, 195, 0.55);
 }
 /* Kill per-table row-hover tints on the cross-row so the horizontal band
    darkens by the same amount as the vertical column. */
@@ -2170,7 +2170,7 @@ table tr.cross-row > td.cross-col {
   box-shadow: 0 2px 8px var(--shadow-60);
 }
 .cal-full-day.has-patch.sub {
-  background: rgba(124, 117, 103, 0.4);
+  background: rgba(120, 117, 110, 0.4);
   color: var(--text-main);
 }
 /* Major patches — unified solid blue (full grid), matches the cadence chart */
@@ -2261,7 +2261,7 @@ span.cal-full-day.has-patch {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                "Helvetica Neue", Arial, sans-serif;
   font-size: 12.5px;
-  color: #aaa18d;
+  color: #a5a197;
 }
 .toolbar-patch-info > span { padding: 0 10px; }
 .toolbar-patch-info > span:first-child { padding-left: 0; }
@@ -2459,7 +2459,7 @@ h2.section {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: linear-gradient(90deg, #201f1b 0%, var(--bg-panel-3) 100%);
+  background: linear-gradient(90deg, #201f1d 0%, var(--bg-panel-3) 100%);
   border-radius: 4px;
   padding: 8px 14px;
   margin: 20px 0 8px;
@@ -2696,8 +2696,8 @@ h2.section {
   transform: scale(2.5);
   /* Opaque backdrop under the translucent fluid: stops neighbouring cells
      from showing through the scaled-up hovered cell. Matches the
-     entity-block gradient mid-tone (~#1d1b18). */
-  background-color: rgb(29, 27, 24);
+     entity-block gradient mid-tone (~#1c1b19). */
+  background-color: rgb(28, 27, 25);
   box-shadow:
     0 2px 4px var(--shadow-60),
     inset 0 0 0 1px var(--white-12),
@@ -2774,7 +2774,7 @@ h2.section {
   letter-spacing: 0.4px;
   text-align: center;
   padding-bottom: 5px;
-  border-bottom: 1px solid rgba(155, 146, 129, 0.28);
+  border-bottom: 1px solid rgba(150, 146, 137, 0.28);
 }
 .dyn-tip-grid {
   display: grid;
@@ -2804,7 +2804,7 @@ h2.section {
 }
 .dyn-tip-note {
   font-size: 11px;
-  color: #98907e;
+  color: #949087;
   font-style: italic;
 }
 /* `.is-visible` toggle is handled higher up via display:flex. */
@@ -2930,7 +2930,7 @@ ul.changes li.ability-row-end {
   height: 36px;
   border-radius: 3px;
   object-fit: cover;
-  box-shadow: 0 0 0 1px rgba(155, 146, 129, 0.25);
+  box-shadow: 0 0 0 1px rgba(150, 146, 137, 0.25);
 }
 .component-price {
   font-size: 11px;
@@ -3033,7 +3033,7 @@ ul.changes li.ability-row-end {
   gap: 6px;
   padding: 3px 9px 3px 4px;
   background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(155, 146, 129, 0.22);
+  border: 1px solid rgba(150, 146, 137, 0.22);
   border-radius: 14px;
   font-size: 12.5px;
   color: var(--text-main);
@@ -3043,7 +3043,7 @@ ul.changes li.ability-row-end {
 }
 .enchant-chip:hover {
   background: var(--shadow-35);
-  border-color: rgba(155, 146, 129, 0.4);
+  border-color: rgba(150, 146, 137, 0.4);
 }
 .enchant-chip img {
   width: 22px;
@@ -3111,7 +3111,7 @@ ul.changes li.ability-row-end {
   width: 13px;
   height: 13px;            /* ~cap height of the row text so it fits the line */
   margin-left: 4px;
-  border: 1px solid #7b7466;
+  border: 1px solid #77746d;
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--gold);
@@ -3141,7 +3141,7 @@ ul.changes li.ability-row-end {
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(17, 16, 15, 0.98);
+  background: rgba(17, 16, 16, 0.98);
   color: var(--text-main);
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   font-size: 12px;
@@ -3180,7 +3180,7 @@ ul.changes li.ability-row-end {
   z-index: 1100;
   pointer-events: none;
   display: none;
-  background: rgba(17, 16, 15, 0.98);
+  background: rgba(17, 16, 16, 0.98);
   color: var(--text-main);
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   font-size: 12px;
@@ -3206,8 +3206,8 @@ ul.changes li.ability-row-end {
 .pop-li + .pop-li { margin-top: 3px; }
 .pop-li::before { content: "•"; position: absolute; left: 1px; color: var(--gold); }
 .pop-li.pop-sub { padding-left: 26px; margin-top: 1px; }
-.pop-li.pop-sub::before { content: "–"; left: 14px; color: var(--text-dim, #9b9281); }
-.pop-note { color: var(--text-dim, #9b9281); }
+.pop-li.pop-sub::before { content: "–"; left: 14px; color: var(--text-dim, #969289); }
+.pop-note { color: var(--text-dim, #969289); }
 .info-pop-h {
   display: block;
   margin-bottom: 5px;
@@ -3234,7 +3234,7 @@ ul.changes li.ability-row-end {
 .souvenir-group-label {
   font-weight: 600;
   font-size: 12.5px;
-  color: #8b8474;
+  color: #87847c;
   margin-right: 2px;
 }
 @media (max-width: 640px) {
@@ -3389,7 +3389,7 @@ h4.subgroup .subgroup-new-type {
   align-items: center;
   gap: 10px;
   padding-bottom: 6px;
-  border-bottom: 1px dashed rgba(155, 146, 129, 0.22);
+  border-bottom: 1px dashed rgba(150, 146, 137, 0.22);
 }
 /* Placeholder head — same layout footprint (~47px) as a real head, but
    visually hidden. Used in is-in-place mode on the new pane so the new
@@ -3459,7 +3459,7 @@ h4.subgroup .subgroup-new-type {
 }
 .brewling-connector path {
   fill: none;
-  stroke: rgba(155, 146, 129, 0.55);
+  stroke: rgba(150, 146, 137, 0.55);
   stroke-width: 1.5;
   stroke-dasharray: 4 3;
   stroke-linecap: round;
@@ -3577,7 +3577,7 @@ h4.subgroup .subgroup-new-type {
   /* Solid backing so transparent PNGs (e.g. generic innate_icon.png used
      as an underlay when the old ability had no real icon) still render as
      a proper square with border instead of looking see-through. */
-  background: #12110f;
+  background: #111110;
   box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px var(--shadow-40);
   display: block;
   transition: transform 0.32s cubic-bezier(0.42, 0, 0.16, 1.1),
@@ -3826,7 +3826,7 @@ body.patch-page .entity-block > .properties-change { margin-left: -15px; }
   line-height: 1.4;
 }
 .entity-block .stat-table .stat-k {
-  color: var(--text-dim, #9b9281);
+  color: var(--text-dim, #969289);
   /* vertical divider between the stat name and its value, as in the tables */
   position: relative;
 }
@@ -3841,7 +3841,7 @@ body.patch-page .entity-block > .properties-change { margin-left: -15px; }
 .stat-table-title {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-dim, #9b9281);
+  color: var(--text-dim, #969289);
   margin: 8px 0 2px 2px;
 }
 /* CHIP-LESS DESCRIPTION ROWS — a li with no tag (Flooded Camps / Map Objectives
@@ -3857,7 +3857,7 @@ ul.changes li.li-notag:not([class*="ability-row"]) > .row-text::before,
   width: auto;
   height: auto;
   margin-right: 8px;
-  color: var(--text-dim, #9b9281);
+  color: var(--text-dim, #969289);
 }
 /* NEW MECHANIC description (plain_header/subgroup new="New mechanic"): how the new thing
    works, as prose in one soft box — no tag column, no chip, no bullet (patch/page.py
@@ -3931,7 +3931,7 @@ ul.changes li.mech-desc.mech-last {
   width: 48px;
   height: 48px;
   flex: 0 0 auto;
-  border: 1px solid rgba(155, 146, 129, 0.4);
+  border: 1px solid rgba(150, 146, 137, 0.4);
   border-radius: 4px;
   background: var(--bg-panel-2);
   overflow: visible;          /* tooltip must escape the box */
@@ -4108,7 +4108,7 @@ h4.subgroup {
 }
 /* Other-block: neutral grey framing for the inline-SVG sliders icon */
 .ability-block.other-block > .ability-icon-wrap > .ability-icon-img {
-  background: rgba(155, 146, 129, 0.05);
+  background: rgba(150, 146, 137, 0.05);
   padding: 6px;
   box-shadow: 0 0 0 1px var(--line-soft), 0 2px 6px var(--shadow-40);
 }
@@ -4165,7 +4165,7 @@ ul.changes li.li-bg:hover::after {
   left: 76px;
   right: 0;
   top: calc(1px + 1.5em);     /* li padding-top + line-height of first row */
-  border-bottom: 1px dashed rgba(155, 146, 129, 0.32);
+  border-bottom: 1px dashed rgba(150, 146, 137, 0.32);
   pointer-events: none;
 }
 /* Text-tag: absolutely positioned over the top-left of the row, taking it
@@ -4258,7 +4258,7 @@ ul.changes li.li-notext > .correction-note {
 ul.changes li.li-notext[data-tag*="buff"]::before  { content: "BUFF"; background: rgba(85,205,115,0.10); color: #6da375; border-color: rgba(85,205,115,0.28); }
 ul.changes li.li-notext[data-tag*="nerf"]::before  { content: "NERF"; }
 ul.changes li.li-notext[data-tag*="qol"]::before   { content: "QoL"; background: rgba(121,192,255,0.06); color: #87a3bf; border-color: rgba(121,192,255,0.20); }
-ul.changes li.li-notext[data-tag*="misc"]::before  { content: "MISC"; background: rgba(155, 146, 129,0.06); color: var(--text-dimmer); border-color: rgba(155, 146, 129,0.18); }
+ul.changes li.li-notext[data-tag*="misc"]::before  { content: "MISC"; background: rgba(150, 146, 137,0.06); color: var(--text-dimmer); border-color: rgba(150, 146, 137,0.18); }
 ul.changes li.li-notext[data-tag*="new"]::before   { content: "NEW"; background: rgba(220,175,95,0.06); color: #9a7f4d; border-color: rgba(220,175,95,0.22); }
 ul.changes li.li-notext[data-tag*="del"]::before   { content: "DEL"; background: rgba(180,70,70,0.07); color: #a86060; border-color: rgba(180,70,70,0.25); }
 ul.changes li.li-notext[data-tag*="rework"]::before { content: "REWORK"; background: rgba(180,145,220,0.05); color: #7d6e93; border-color: rgba(180,145,220,0.15); }
@@ -4422,7 +4422,7 @@ ul.subnote-items > li::before {
   font-size: 13px;
   font-style: italic;
   line-height: 1.5;
-  color: #aca28f;
+  color: #a7a298;
   border-left: 2px solid var(--gold-line);
   background: rgba(227, 196, 106, 0.05);
   border-radius: 0 5px 5px 0;
@@ -4436,7 +4436,7 @@ ul.subnote-items > li::before {
   margin-bottom: 9px;
   font-size: 13.5px;
   font-weight: 600;
-  color: #e2d5bb;
+  color: #dbd5c8;
 }
 /* Number input — reader plugs in their own value; scripts.js recomputes rows. */
 .formula-input-row {
@@ -4447,7 +4447,7 @@ ul.subnote-items > li::before {
   margin-bottom: 11px;
   font-size: 12px;
 }
-.formula-input-label { color: #afa591; }   /* "Set" = normal text */
+.formula-input-label { color: #aaa59b; }   /* "Set" = normal text */
 .formula-input-label .fx-vname {            /* the variable name keeps the var colour */
   font-family: ui-monospace, Menlo, Consolas, monospace;
   color: #9fc1e3;
@@ -4456,7 +4456,7 @@ ul.subnote-items > li::before {
   width: 150px;
   padding: 4px 9px;
   background: var(--bg-deep-60);
-  border: 1px solid rgba(146, 137, 121, 0.30);
+  border: 1px solid rgba(141, 137, 129, 0.30);
   border-radius: 5px;
   color: var(--text-bright);
   font-size: 12px;
@@ -4467,7 +4467,7 @@ ul.subnote-items > li::before {
 .formula-input::-webkit-outer-spin-button,
 .formula-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .formula-input::placeholder { color: #6f695d; }
-.formula-input:focus { outline: none; border-color: rgba(188, 177, 156, 0.6); }
+.formula-input:focus { outline: none; border-color: rgba(182, 177, 166, 0.6); }
 .formula-change-panes {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -4490,7 +4490,7 @@ ul.subnote-items > li::before {
   font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.6;
-  color: #9f9684;               /* parentheses / operators — muted */
+  color: #9a968d;               /* parentheses / operators — muted */
   overflow-wrap: anywhere;
 }
 .formula-expr .f-var { color: #9fc1e3; }              /* variables  */
@@ -4503,7 +4503,7 @@ ul.subnote-items > li::before {
 }
 .formula-ex th,
 .formula-ex td {
-  border: 1px solid rgba(146, 137, 121, 0.14);
+  border: 1px solid rgba(141, 137, 129, 0.14);
   padding: 3px 12px;
 }
 .formula-ex th {
@@ -4511,10 +4511,10 @@ ul.subnote-items > li::before {
   font-weight: 700;
   letter-spacing: 0.4px;
   text-transform: uppercase;
-  color: #918878;
+  color: #8c8880;
   text-align: center;
 }
-.formula-ex .fx-k    { color: #d7cab2; text-align: center; }
+.formula-ex .fx-k    { color: #d0cabe; text-align: center; }
 .formula-ex .fx-gold { color: #e0b87a; font-weight: 600; text-align: right; }
 .formula-ex .fx-pct  { text-align: right; }
 
@@ -4572,16 +4572,16 @@ ul.subnote-items > li::before {
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
-  color: #c2b7a1;
+  color: #bcb7ac;
   padding-bottom: 5px;
-  border-bottom: 1px solid rgba(146, 137, 121, 0.22);
+  border-bottom: 1px solid rgba(141, 137, 129, 0.22);
 }
 .cm-vnum {
   position: relative;
   text-align: center;
   font-size: 11px;
   font-weight: 600;
-  color: #918878;
+  color: #8c8880;
   font-variant-numeric: tabular-nums;
 }
 /* Thin connector from the number to its slot — starts right at the number (the
@@ -4593,7 +4593,7 @@ ul.subnote-items > li::before {
   top: 50%;
   width: 20px;
   height: 1px;
-  background: rgba(168, 159, 140, 0.4);
+  background: rgba(163, 159, 149, 0.4);
 }
 .cm-vnum.cm-to-left::before  { right: 100%; }
 .cm-vnum.cm-to-right::after  { left: 100%; }
@@ -4604,8 +4604,8 @@ ul.subnote-items > li::before {
   position: relative;
   align-self: stretch;            /* fill the row(s) the slot spans */
   border-radius: 4px;
-  border: 1.5px solid rgba(159, 150, 132, 0.42);
-  background: rgba(17, 16, 15, 0.85);
+  border: 1.5px solid rgba(154, 150, 141, 0.42);
+  background: rgba(17, 16, 16, 0.85);
 }
 .cm-token.ban  { width: 42px; }
 .cm-token.ban.cm-left  { justify-self: end; }    /* left lane → inner (right) edge by the number */
@@ -4625,8 +4625,8 @@ ul.subnote-items > li::before {
     linear-gradient(-45deg, transparent 42%, rgba(150, 46, 58, 0.5) 42%, rgba(150, 46, 58, 0.5) 58%, transparent 58%);
 }
 .cm-token.pick {
-  border-color: rgba(181, 170, 150, 0.55);   /* picks span 2 rows → naturally taller than bans */
-  background: rgba(29, 27, 24, 0.92);
+  border-color: rgba(175, 170, 160, 0.55);   /* picks span 2 rows → naturally taller than bans */
+  background: rgba(28, 27, 25, 0.92);
 }
 .cm-sw.changed-sw {
   width: 12px;
@@ -4755,7 +4755,7 @@ ul.changes li > .badge-group {
 
 /* NEUTRAL & TEXT TAGS */
 .badge.neutral {
-  background: rgba(155, 146, 129, 0.06);
+  background: rgba(150, 146, 137, 0.06);
   color: var(--text-dimmer);
   border: 1px solid var(--line-soft);
 }
@@ -4765,7 +4765,7 @@ ul.changes li > .badge-group {
   border: 1px solid rgba(180, 145, 220, 0.15);
 }
 .badge.misc {
-  background: rgba(155, 146, 129, 0.06);
+  background: rgba(150, 146, 137, 0.06);
   color: var(--text-dimmer);
   border: 1px solid var(--line-soft);
 }
@@ -4829,7 +4829,7 @@ ul.changes li > .badge-group {
 /* WRONG-CHANGE LINE + CORRECTION NOTE — subtle gray */
 .wrong-line {
   text-decoration: line-through;
-  text-decoration-color: rgba(220, 208, 183, 0.5);
+  text-decoration-color: rgba(214, 208, 195, 0.5);
   text-decoration-thickness: 1px;
   opacity: 0.55;
 }
@@ -4922,7 +4922,7 @@ ul.changes li.aghanim-shard.li-formula {
 
 /* WRONG-WORD HIGHLIGHT — subtle, neutral marker (no strikethrough) */
 .wrong-word {
-  background: rgba(155, 146, 129, 0.08);
+  background: rgba(150, 146, 137, 0.08);
   color: var(--text-dim);
   padding: 0 5px;
   border-radius: 3px;
@@ -4934,9 +4934,9 @@ ul.changes li.aghanim-shard.li-formula {
   white-space: nowrap;
   padding: 0 5px;
   border-radius: 3px;
-  background: rgba(155, 146, 129, 0.08);
+  background: rgba(150, 146, 137, 0.08);
   color: var(--text-dim);
-  border: 1px solid rgba(155, 146, 129, 0.30);
+  border: 1px solid rgba(150, 146, 137, 0.30);
   font-size: inherit;
   cursor: pointer;
   transition: all 0.14s;
@@ -4962,13 +4962,13 @@ ul.changes li.aghanim-shard.li-formula {
   margin-right: 0;
 }
 .formula-trigger:hover {
-  background: rgba(155, 146, 129, 0.16);
-  border-color: rgba(155, 146, 129, 0.50);
+  background: rgba(150, 146, 137, 0.16);
+  border-color: rgba(150, 146, 137, 0.50);
   color: var(--text-main);
 }
 .formula-trigger.active {
-  background: rgba(155, 146, 129, 0.22);
-  border-color: rgba(155, 146, 129, 0.60);
+  background: rgba(150, 146, 137, 0.22);
+  border-color: rgba(150, 146, 137, 0.60);
   color: var(--text-main);
 }
 /* OLD FORMULA — just a subtle dotted underline so it stands out as "the old one" */
@@ -5003,7 +5003,7 @@ ul.changes li.aghanim-shard.li-formula {
 }
 .formula-table[hidden] { display: none; }
 .formula-table thead th {
-  background: rgba(56, 53, 47, 0.55);
+  background: rgba(54, 53, 50, 0.55);
   color: var(--gold);
   font-weight: 600;
   font-size: 10.5px;
@@ -5015,7 +5015,7 @@ ul.changes li.aghanim-shard.li-formula {
   width: 42px;
   text-align: left;
   padding: 4px 8px;
-  background: rgba(56, 53, 47, 0.5);
+  background: rgba(54, 53, 50, 0.5);
   color: var(--text-main);
   font-weight: 700;
   font-size: 10.5px;
@@ -5025,7 +5025,7 @@ ul.changes li.aghanim-shard.li-formula {
 .formula-table tbody td {
   padding: 4px 4px;
   text-align: center;
-  background: rgba(56, 53, 47, 0.30);
+  background: rgba(54, 53, 50, 0.30);
   color: var(--text-main);
   border-radius: 3px;
   font-size: 11px;
@@ -5089,7 +5089,7 @@ ul.changes li.aghanim-shard.li-formula {
   padding: 3px 9px;
   border-radius: 3px;
   background: rgba(227, 196, 106, 0.05);
-  color: #a79e8b;
+  color: #a29e94;
   border: 1px solid rgba(227, 196, 106, 0.22);
   text-transform: uppercase;
   letter-spacing: 0.4px;
@@ -5282,7 +5282,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .creeps-table .lvl-cell {
   font-weight: 600;
   color: var(--gold);
-  background: rgba(220, 207, 182, 0.05);
+  background: rgba(213, 207, 195, 0.05);
   border-right: 1px solid var(--blue-18);
 }
 /* Identity columns (Ур. / icon / Юнит) pinned to the left on horizontal
@@ -5291,7 +5291,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
 .creeps-table .sticky-col {
   position: sticky;
   z-index: 3;
-  --sticky-bg: #12110f;
+  --sticky-bg: #111110;
   background: var(--sticky-bg);
   /* Full-area inset shadow paints over any collapsed-border seam that
      would otherwise bleed through this cell during horizontal scroll. */
@@ -5301,7 +5301,7 @@ body:has(.creeps-scroll) .creeps-page { padding-top: 0; padding-bottom: 12px; }
   z-index: 51;           /* corner cells: above both sticky axes + hover-zoom */
 }
 .creeps-table tbody tr:hover .sticky-col {
-  --sticky-bg: #1e1c19;   /* match the row-hover tint, stay opaque */
+  --sticky-bg: #1d1c1a;   /* match the row-hover tint, stay opaque */
 }
 .creeps-table .lvl-cell.sticky-col {
   --sticky-bg: var(--bg-panel-2);   /* keep the level cell's faint blue-tint readable */
@@ -5448,7 +5448,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   clip-path: none;
   border-color: transparent;
 }
-.nav-tab { position: relative; padding: 0 12px; color: #aba18e; }
+.nav-tab { position: relative; padding: 0 12px; color: #a6a197; }
 .nav-tab:hover { color: var(--text-bright); }
 .nav-tab.active { color: #ffe08a; text-shadow: 0 0 10px rgba(255, 170, 60, 0.25); }
 .nav-tab.active::after {
@@ -5534,7 +5534,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   border-color: transparent;
 }
 /* plain labels, like the main buttons above (no tab pills / blue borders) */
-.nav-subtab { color: #9f9684; border-color: transparent; border-radius: 0; }
+.nav-subtab { color: #9a968d; border-color: transparent; border-radius: 0; }
 .nav-subtab-label { color: inherit; }
 /* ---- Grouped sub-nav dropdowns (Creeps ▾ / Items ▾ / Heroes ▾) ---- */
 .nav-subgroup { position: relative; display: inline-flex; align-items: flex-end; }
@@ -5546,7 +5546,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   left: 0;
   min-width: 184px;
   background: var(--bg-panel-2);
-  border: 1px solid rgba(220, 207, 182, 0.20);
+  border: 1px solid rgba(213, 207, 195, 0.20);
   border-radius: 0 8px 8px 8px;
   padding: 5px;
   display: flex;
@@ -5587,16 +5587,16 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   gap: 14px;
   transition: background 0.12s ease, color 0.12s ease;
 }
-.nav-subitem:hover { color: var(--text-bright); background: rgba(56, 53, 47, 0.55); }
+.nav-subitem:hover { color: var(--text-bright); background: rgba(54, 53, 50, 0.55); }
 .nav-subitem.active {
   color: var(--text-bright);
   background: rgba(227, 196, 106, 0.18);
 }
-.nav-subitem-soon { color: #6a6458; cursor: default; }
+.nav-subitem-soon { color: #67645e; cursor: default; }
 .nav-subitem-soon:hover { background: none; }
 /* Top-level Materials tab with no page yet (e.g. Structures). */
-.nav-subtab-soon { color: #6a6458; cursor: default; display: inline-flex; align-items: center; gap: 6px; }
-.nav-subtab-soon:hover { background: none; border-color: transparent; color: #6a6458; }
+.nav-subtab-soon { color: #67645e; cursor: default; display: inline-flex; align-items: center; gap: 6px; }
+.nav-subtab-soon:hover { background: none; border-color: transparent; color: #67645e; }
 /* Nested flyout (Neutral Abilities under Neutral Stats): the parent item opens
    a second menu to its RIGHT on hover — a classic cascading menu. */
 .nav-subgroup-nested { position: relative; display: block; }
@@ -5609,7 +5609,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   border-radius: 8px;
 }
 /* The nested parent stays visually "open" (highlighted) while its flyout shows. */
-.nav-subgroup-nested:hover > .nav-subitem-parent { color: var(--text-bright); background: rgba(56, 53, 47, 0.55); }
+.nav-subgroup-nested:hover > .nav-subitem-parent { color: var(--text-bright); background: rgba(54, 53, 50, 0.55); }
 .nav-soon-tag {
   font-size: 8.5px;
   text-transform: uppercase;
@@ -5633,7 +5633,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
    Abilities). The heavier col-sep dividers (set on category starts) stay
    visible over this lighter base. */
 .creeps-table th,
-.creeps-table td { border-left: 1px solid rgba(220, 207, 182, 0.12); }
+.creeps-table td { border-left: 1px solid rgba(213, 207, 195, 0.12); }
 .creeps-table th:first-child,
 .creeps-table td:first-child { border-left: none; }
 /* Unit Abilities page table — reuses .creeps-table sticky/scroll machinery. */
@@ -5681,11 +5681,11 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   padding: 0;
   cursor: pointer;
   white-space: nowrap;
-  text-decoration: underline dotted rgba(220, 207, 182, 0.45);
+  text-decoration: underline dotted rgba(213, 207, 195, 0.45);
   text-underline-offset: 2px;
 }
 .lvl-toggle:hover,
-.lvl-toggle[aria-expanded="true"] { color: #f0e2c7; }
+.lvl-toggle[aria-expanded="true"] { color: #e9e2d4; }
 .lvl-popover {
   position: fixed;
   z-index: 80;
@@ -5746,8 +5746,8 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 /* Not-dispellable — hollow (outline) star, same shape/size as the others. */
 .unit-abilities-table .ua-flag.ua-dispel-no {
   color: transparent;
-  -webkit-text-stroke: 1.1px #898272;
-  text-stroke: 1.1px #898272;
+  -webkit-text-stroke: 1.1px #85827a;
+  text-stroke: 1.1px #85827a;
 }
 /* Aura Stack red-x glyph — small. */
 .unit-abilities-table .ua-stack-glyph { font-size: 8px; }
@@ -5820,7 +5820,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   width: 14px;
   height: 14px;
   margin-left: 6px;
-  border: 1px solid #7b7466;
+  border: 1px solid #77746d;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--gold);
@@ -5849,7 +5849,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   display: none;
   max-width: 320px;
   padding: 5px 9px;
-  background: #22201c;
+  background: #21201e;
   color: var(--text-bright);
   border: 1px solid var(--line);
   border-radius: 5px;
@@ -5967,7 +5967,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   transform: scale(1.8);
   position: relative;
   z-index: 30;            /* above the sticky header (z 5/6) and neighbours */
-  background: #12110f;    /* opaque so underlying text doesn't show through */
+  background: #111110;    /* opaque so underlying text doesn't show through */
   box-shadow:
     0 3px 8px var(--shadow-60),
     0 0 0 1px var(--blue-40);
@@ -6021,7 +6021,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   color: var(--text-bright);
   padding-bottom: 3px;
   margin-bottom: 3px;
-  border-bottom: 1px solid rgba(155, 146, 129, 0.25);
+  border-bottom: 1px solid rgba(150, 146, 137, 0.25);
 }
 /* Standard view hides Expanded-only columns. Super-category headers span all
    their columns; the colspan shrinks automatically as hidden cells collapse. */
@@ -6073,7 +6073,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
     0 4px 10px var(--shadow-45),
     0 -14px 0 0 var(--bg-panel-3);
 }
-.creeps-table thead tr.cat-row .cat-head + .cat-head { border-left: 2px solid rgba(220, 207, 182, 0.22); }
+.creeps-table thead tr.cat-row .cat-head + .cat-head { border-left: 2px solid rgba(213, 207, 195, 0.22); }
 /* Freeze the FIRST category cell (Basic = the frozen identity columns) on the
    LEFT too, so during horizontal scroll the other category cells slide UNDER it
    instead of their left borders drifting across the category header over the
@@ -6083,7 +6083,7 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 .creeps-table thead tr.cat-row th.cat-head:first-child {
   left: 0;
   z-index: 53;          /* above sibling cat-heads (52) so they pass beneath it */
-  border-right: 2px solid rgba(220, 207, 182, 0.22);
+  border-right: 2px solid rgba(213, 207, 195, 0.22);
 }
 /* ==========================================================================
    11. HERO DYNAMICS
@@ -6333,8 +6333,8 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .hl-panel,
 .hl-diff-panel {
   background:
-    linear-gradient(180deg, rgba(57, 54, 48, 0.9), rgba(31, 30, 26, 0.96)),
-    #1d1b18;
+    linear-gradient(180deg, rgba(56, 54, 51, 0.9), rgba(30, 30, 28, 0.96)),
+    #1c1b19;
   border: 1px solid rgba(122, 111, 88, 0.55);
   box-shadow:
     inset 0 1px 0 rgba(255, 242, 200, 0.08),
@@ -6380,7 +6380,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   border: 1px solid rgba(117, 108, 87, 0.72);
   border-radius: 3px;
   background:
-    linear-gradient(180deg, rgba(37, 35, 30, 0.95), rgba(12, 12, 10, 0.98)),
+    linear-gradient(180deg, rgba(36, 35, 33, 0.95), rgba(12, 12, 11, 0.98)),
     #0f0e0d;
   box-shadow: inset 0 1px 0 rgba(255, 241, 200, 0.05);
   z-index: 2;
@@ -6418,7 +6418,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   display: block;
   border: 1px solid var(--blue-18);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
-  background: #12110f;
+  background: #111110;
 }
 .hl-hero-trigger {
   width: 124px;
@@ -6610,7 +6610,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  border: 1px solid #5e584e;
+  border: 1px solid #5b5853;
   background-image: url('icons/inventory/bg_neutral_slot_png.png');
   background-size: 100%;
   background-color: #0c0e10;
@@ -6634,8 +6634,8 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1px solid #5e584e;
-  background: radial-gradient(circle at 40% 35%, #423e37, #1e1c19 70%);
+  border: 1px solid #5b5853;
+  background: radial-gradient(circle at 40% 35%, #403e3a, #1d1c1a 70%);
   box-shadow:
     inset 0 2px 8px -2px rgba(0,0,0,0.9),
     inset 0 -1px 2px rgba(255,255,255,0.06);
@@ -6762,8 +6762,8 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   border: 1px solid rgba(117, 108, 87, 0.68);
   border-radius: 3px;
   background:
-    linear-gradient(180deg, rgba(39, 37, 32, 0.96), rgba(14, 13, 11, 0.98)),
-    #0e0d0b;
+    linear-gradient(180deg, rgba(38, 37, 34, 0.96), rgba(13, 13, 12, 0.98)),
+    #0d0d0c;
   box-shadow:
     inset 0 1px 0 rgba(255, 241, 200, 0.05),
     inset 0 -1px 0 rgba(0, 0, 0, 0.45);
@@ -6966,7 +6966,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .hl-bar-value {
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #fff6d8;
+  color: #fdf6e7;
   padding: 0 8px;
   border-radius: 2px;
   background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.34), rgba(0,0,0,0));
@@ -7001,7 +7001,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .hl-custom-grid label {
   display: grid;
   gap: 4px;
-  color: #d0c4ad;
+  color: #cac4b8;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -7019,7 +7019,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .hl-diff-row {
   min-height: 22px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: #e9dcc1;
+  color: #e2dcce;
 }
 .hl-stat-row {
   display: flex;
@@ -7030,12 +7030,12 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 }
 .hl-stat-row span,
 .hl-diff-row span {
-  color: #aea491;
+  color: #a9a49a;
   font-size: 12px;
 }
 .hl-stat-row strong,
 .hl-diff-row strong {
-  color: #fff4d7;
+  color: #fbf4e5;
   font-variant-numeric: tabular-nums;
 }
 .hl-cost strong,
@@ -7124,11 +7124,11 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 }
 .hl-diff-left {
   text-align: left;
-  color: #f1e3c8;
+  color: #eae3d5;
 }
 .hl-diff-right {
   text-align: right;
-  color: #f1e3c8;
+  color: #eae3d5;
 }
 .hl-diff-mid {
   text-align: center;
@@ -7282,11 +7282,11 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 }
 .hl-ds-cost-label {
   font-size: 12px;
-  color: #aea491;
+  color: #a9a49a;
 }
 .hl-ds-cost-val {
   font-size: 13px;
-  color: #fff4d7;
+  color: #fbf4e5;
   font-variant-numeric: tabular-nums;
 }
 @media (max-width: 420px) {
@@ -7304,7 +7304,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   position: fixed;
   inset: 0;
   z-index: 260;
-  background: rgba(10, 9, 8, 0.84);
+  background: rgba(9, 9, 8, 0.84);
   backdrop-filter: blur(6px);
 }
 .hl-overlay.is-open {
@@ -7321,8 +7321,8 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   border: 1px solid rgba(114, 103, 75, 0.92);
   border-radius: 4px;
   background:
-    linear-gradient(180deg, rgba(32, 30, 26, 0.985), rgba(21, 20, 17, 0.985)),
-    #1b1a17;
+    linear-gradient(180deg, rgba(31, 30, 28, 0.985), rgba(20, 20, 18, 0.985)),
+    #1a1a18;
   box-shadow:
     inset 0 1px 0 rgba(255, 244, 205, 0.08),
     0 22px 48px rgba(0, 0, 0, 0.48);
@@ -7336,7 +7336,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 .hl-picker-head strong {
-  color: #fff4d7;
+  color: #fbf4e5;
   font-size: 18px;
   font-family: var(--font-j25);
   letter-spacing: 0.04em;
@@ -7349,7 +7349,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .hl-picker-close,
 .hl-picker-back {
   border: 1px solid rgba(121, 109, 81, 0.6);
-  background: linear-gradient(180deg, rgba(51, 48, 42, 0.9), rgba(21, 20, 18, 0.95));
+  background: linear-gradient(180deg, rgba(49, 48, 45, 0.9), rgba(20, 20, 19, 0.95));
   color: rgba(210, 200, 175, 0.8);
   border-radius: 4px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
@@ -7389,10 +7389,10 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   width: 100%;
   height: 32px;
   padding: 0 10px;
-  border: 1px solid rgba(139, 131, 115, 0.32);
+  border: 1px solid rgba(135, 131, 123, 0.32);
   border-radius: 4px;
-  background: linear-gradient(180deg, rgba(21, 19, 17,0.98), rgba(12, 12, 10,0.98));
-  color: #eaddc2;
+  background: linear-gradient(180deg, rgba(20, 19, 18,0.98), rgba(12, 12, 11,0.98));
+  color: #e3ddcf;
   font: inherit;
   outline: none;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
@@ -7404,7 +7404,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
     0 0 0 1px rgba(213, 173, 95, 0.28);
 }
 .hl-picker-search::placeholder {
-  color: #908878;
+  color: #8c8880;
 }
 .hl-shop-body {
   padding: 8px 12px 10px;
@@ -7429,7 +7429,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   text-transform: uppercase;
   letter-spacing: 0.11em;
 }
-.hl-hero-group header { color: #eaddc2; }
+.hl-hero-group header { color: #e3ddcf; }
 /* attribute-coloured column headers, matching hero_changes */
 .hl-hero-group-str header { color: var(--attr-str); }
 .hl-hero-group-agi header { color: var(--attr-agi); }
@@ -7466,7 +7466,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   border-radius: 2px;
   overflow: hidden;
   position: relative;
-  background: #0c0b0a;
+  background: #0b0b0a;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
   transition:
     filter 0.12s ease,
@@ -7991,7 +7991,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
    same idea as Neutral Creeps' .col-sep category dividers. On the first column
    of each group (except the first); aligns with the cat-row's group border. */
 .heroes-dyn-table th.hd-gsep,
-.heroes-dyn-table td.hd-gsep { border-left: 2px solid rgba(220, 207, 182, 0.22); }
+.heroes-dyn-table td.hd-gsep { border-left: 2px solid rgba(213, 207, 195, 0.22); }
 /* Patch column header: just the version; release date shows in the hover tip. */
 .heroes-dyn-table th.hd-patch {
   white-space: nowrap; padding: 4px 2px; font-weight: 600; font-size: 12px;
@@ -8005,7 +8005,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
    dynRecomputeSupercats() re-spans these to the visible columns after fit. */
 .heroes-dyn-table thead tr.cat-row th.hd-supercat {
   font-size: 12px; text-transform: none; letter-spacing: 0.02em;
-  color: #c2b7a1; text-align: center;
+  color: #bcb7ac; text-align: center;
 }
 /* The cell over the frozen Hero column continues the hero divider (0.30) up
    through the super-category row. (Beats the shared .cat-head:first-child 0.22
@@ -8044,7 +8044,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .heroes-dyn-table td.hd-cell.hd-empty::after,
 .heroes-dyn-table td.he::after {
   content: ''; display: inline-block; width: 28px; height: 28px; border-radius: 4px;
-  background: rgba(15, 14, 12, 0.72);
+  background: rgba(14, 14, 13, 0.72);
 }
 /* Outside the item's lifespan (items_dyn): the item wasn't in the game in this
    patch — either not added yet, or already removed. NO empty-slot square; just a
@@ -8053,13 +8053,13 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .heroes-dyn-table td.hd-cell.hd-absent::after,
 .heroes-dyn-table td.ha::after {
   content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%;
-  background: rgba(142, 134, 118, 0.16);
+  background: rgba(138, 134, 126, 0.16);
 }
 /* In a marked row the n/a dots STAY visible — they carry meaning (the item
    didn't exist in those patches), unlike the decorative empty diamonds (below)
    which drop out. Bump the alpha a touch so the faint dot reads on the gold band. */
 .heroes-dyn-table tbody tr.row-marked td.hd-cell.hd-absent::after,
-.heroes-dyn-table tbody tr.row-marked td.ha::after { background: rgba(169, 159, 140, 0.42); }
+.heroes-dyn-table tbody tr.row-marked td.ha::after { background: rgba(164, 159, 149, 0.42); }
 /* Short-alias sizing: td.he / td.ha need the same width/box-sizing as td.hd-cell
    (defined earlier at ~5963) so the column grid stays consistent. */
 .heroes-dyn-table th.hd-patch,
@@ -8076,7 +8076,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
    flat fill, no glassy pill, no hover pop. Hover still fires the tooltip. */
 .heroes-dyn-table .dyn-cell-wrap.bn-empty .dyn-cell,
 .heroes-dyn-table .dyn-cell-wrap.bn-empty:hover .dyn-cell {
-  background: rgba(15, 14, 12, 0.72);
+  background: rgba(14, 14, 13, 0.72);
   box-shadow: none;
   filter: none;
   transform: none;
@@ -8120,7 +8120,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   max-width: none;
   object-fit: cover;
   border-radius: 4px;
-  background: rgba(155, 146, 129, 0.15);
+  background: rgba(150, 146, 137, 0.15);
   display: inline-block;
   vertical-align: middle;
   /* Depth treatment — the bare crops read as flat rectangles otherwise.
@@ -8139,7 +8139,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   transform: scale(1.6);
   position: relative;
   z-index: 30;            /* above sticky header + neighbours */
-  background: #12110f;    /* opaque under the portrait */
+  background: #111110;    /* opaque under the portrait */
   box-shadow:
     0 3px 8px var(--shadow-60),
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
@@ -8169,7 +8169,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   user-select: none;
 }
 .creeps-table th.sortable:hover {
-  background: #262420;
+  background: #252422;
 }
 /* Sort indicator — thin line arrows (↕ / ↑ / ↓) instead of heavy filled
    triangles, for a more refined look. Dim until the column is active. */
@@ -8197,7 +8197,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   height: 11px;
   /* Coloured via background-color through a PNG mask — neutral default
      greyish, gold when the column is actively sorted (site accent var(--gold)). */
-  background-color: rgba(220, 208, 183, 0.55);
+  background-color: rgba(214, 208, 195, 0.55);
   -webkit-mask: url('icons/sort/sort.png') center / contain no-repeat;
   mask: url('icons/sort/sort.png') center / contain no-repeat;
 }
@@ -8230,7 +8230,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .creeps-table td.has-history,
 .mr-table td.has-history {
   cursor: help;
-  text-decoration: underline dotted rgba(220, 207, 182, 0.5);
+  text-decoration: underline dotted rgba(213, 207, 195, 0.5);
   text-underline-offset: 3px;
 }
 /* Per-stat changelog tooltip — body-level (escapes the .creeps-scroll
@@ -8289,7 +8289,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   font-variant-numeric: tabular-nums;
   padding-bottom: 2px;
   margin-bottom: 2px;
-  border-bottom: 1px solid rgba(155, 146, 129, 0.14);
+  border-bottom: 1px solid rgba(150, 146, 137, 0.14);
 }
 .stat-hist-tip .chg-patch { font-weight: 600; color: var(--gold); }
 .stat-hist-tip .chg-date { color: var(--text-dim); font-size: 10px; }
@@ -8299,7 +8299,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   text-align: left;
   margin-top: 1px;
 }
-.stat-hist-tip .chg-label { color: #c3b8a2; }
+.stat-hist-tip .chg-label { color: #bdb8ad; }
 .stat-hist-tip .chg-cycle { color: var(--text-main); padding: 0 3px; }
 /* Ability tags — same palette as the changelog NEW/DEL badges. */
 .stat-hist-tip .chg-tag {
@@ -8339,7 +8339,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .creeps-table td.atk-pierce   { color: #b18cd9; }   /* "Проникающий" — muted purple */
 /* Tier-break: thicker top border between level groups (Ур. changes). */
 .creeps-table tr.tier-break td {
-  border-top: 2px solid rgba(220, 207, 182, 0.55);
+  border-top: 2px solid rgba(213, 207, 195, 0.55);
 }
 /* "Copied" toast — fixed-positioned near the clicked icon, fades in
    quickly then drifts up and out. JS positions it and toggles
@@ -8353,7 +8353,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   font-size: 11.5px;
   font-weight: 600;
   color: var(--text-bright);
-  background: rgba(17, 16, 15, 0.92);
+  background: rgba(17, 16, 16, 0.92);
   border: 1px solid var(--blue-35);
   border-radius: 5px;
   box-shadow: 0 4px 14px var(--shadow-50);
@@ -8398,7 +8398,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 }
 .creeps-table tbody td {
   padding: 5px 8px;
-  border-bottom: 1px solid rgba(155, 146, 129, 0.12);
+  border-bottom: 1px solid rgba(150, 146, 137, 0.12);
   /* Single-line cells: every value is short (numbers, %, "Ближняя (100)",
      ability dnames like "Envenomed Weapon"). nowrap lets table-layout:
      auto size each column to the widest single-line content, so the
@@ -8484,7 +8484,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .creeps-table tr.tier-4 td:first-child { color: #f85149; }   /* worst — red */
 /* Tier legend footer rows (no data, just label in column 3). */
 .creeps-table tr.creeps-footer td {
-  background: rgba(155, 146, 129, 0.06);
+  background: rgba(150, 146, 137, 0.06);
   color: var(--text-dim);
   font-style: italic;
   border-bottom: none;
@@ -8513,7 +8513,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 }
 .mr-blurb strong { color: var(--text-main); font-weight: 600; }
 .mr-blurb code {
-  background: rgba(124, 117, 103, 0.12);
+  background: rgba(120, 117, 110, 0.12);
   padding: 1px 5px;
   border-radius: 3px;
   font-size: 12px;
@@ -8545,7 +8545,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .mr-table tbody td {
   /* Faint vertical separator on the left edge — matches Neutral Creeps /
      Unit Abilities table convention. Skipped on the first column below. */
-  border-left: 1px solid rgba(220, 207, 182, 0.12);
+  border-left: 1px solid rgba(213, 207, 195, 0.12);
 }
 .mr-table thead th:first-child,
 .mr-table tbody td:first-child {
@@ -8603,7 +8603,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 /* OPAQUE hover background — a translucent one let table rows scrolling
    beneath the sticky header bleed through. This is the var(--bg-panel-3) base blended
    with the old rgba(48,54,61,0.5) tint, fully opaque. */
-.mr-table thead th:hover { background: #2a2823; }
+.mr-table thead th:hover { background: #292825; }
 /* Sort indicator — identical glyph + dim/active logic to the creeps-table
    convention: ↕ (neutral, dim), ↓ (desc, active), ↑ (asc, active). */
 /* (sort-ind centering is defined once in the shared rule above.) */
@@ -8611,16 +8611,16 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
    columns (Cost per regen onward). */
 .mr-table thead th.mr-col-cost_per_regen,
 .mr-table tbody td.mr-sep {
-  border-left: 2px solid rgba(220, 207, 182, 0.40);
+  border-left: 2px solid rgba(213, 207, 195, 0.40);
 }
 /* sort-ind look (mask + colour) is defined once in the shared rule above. */
 .mr-table tbody td {
   padding: 6px 10px;
-  border-bottom: 1px solid rgba(56, 53, 47, 0.5);
+  border-bottom: 1px solid rgba(54, 53, 50, 0.5);
   text-align: center;
   color: var(--text-main);
 }
-.mr-table tbody tr:hover { background: rgba(56, 53, 47, 0.3); }
+.mr-table tbody tr:hover { background: rgba(54, 53, 50, 0.3); }
 /* Item-name cell: icon stays in a fixed-width left column so every icon
    lines up vertically. Name + dropdown arrow share the right region as
    an inline flex group — the arrow sits flush against the name so it
@@ -8658,7 +8658,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 }
 .mr-const.has-history {
   cursor: help;
-  text-decoration: underline dotted rgba(220, 207, 182, 0.5);
+  text-decoration: underline dotted rgba(213, 207, 195, 0.5);
   text-underline-offset: 3px;
 }
 /* Match the patch-page convention for item icons (rectangular 50×36 cover) */
@@ -8684,8 +8684,8 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
     0 0 0 1px var(--blue-40);
 }
 .mr-ico-blank {
-  background: rgba(124, 117, 103, 0.15);
-  border: 1px solid rgba(124, 117, 103, 0.3);
+  background: rgba(120, 117, 110, 0.15);
+  border: 1px solid rgba(120, 117, 110, 0.3);
   box-shadow: none;
 }
 /* Mana-regen multiplier chip (Kaya = +30%, etc). Sits inline next to the
@@ -8811,7 +8811,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
     0 -14px 0 0 var(--bg-panel-3);
 }
 .mr-table.hs-table thead tr.cat-row .cat-head + .cat-head {
-  border-left: 2px solid rgba(220, 207, 182, 0.22);
+  border-left: 2px solid rgba(213, 207, 195, 0.22);
 }
 .mr-table.hs-table th.col-sep,
 .mr-table.hs-table td.col-sep {
@@ -8867,7 +8867,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .mr-table.hs-table thead tr.cat-row th.cat-head:first-child {
   z-index: 53;
 }
-.mr-table.hs-table tbody tr:hover td.hs-name { background: #22201c; }
+.mr-table.hs-table tbody tr:hover td.hs-name { background: #21201e; }
 /* Selected-row gold frame on the STICKY Hero cell.
    The generic `.mr-row-selected > td(:first-child)` frame is an inset box-shadow,
    and Chromium renders box-shadow OFFSET on `position:sticky` cells (the same
@@ -8899,7 +8899,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
     linear-gradient(var(--gold-95), var(--gold-95)) top    / 100% 2px no-repeat,
     linear-gradient(var(--gold-95), var(--gold-95)) bottom / 100% 2px no-repeat,
     linear-gradient(rgba(231, 196, 106, 0.16), rgba(231, 196, 106, 0.16)),
-    #22201c;
+    #21201e;
   background-origin: border-box;
 }
 /* Hero portrait (16:9) in the name cell — same slot the item icon uses. */
@@ -8916,7 +8916,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   margin-left: 6px;
   vertical-align: -2px;
   opacity: 0.9;
-  filter: drop-shadow(0 0 2px rgba(13, 12, 10, 0.6));
+  filter: drop-shadow(0 0 2px rgba(12, 12, 11, 0.6));
 }
 .hs-innate-mini.is-hidden {
   display: none;
@@ -9005,7 +9005,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .mr-table.aoe-table thead th.aoe-slot-th {
   min-width: 84px;
   text-align: center;
-  color: var(--text-muted, #9e9583);
+  color: var(--text-muted, #99958c);
 }
 .mr-table.aoe-table tbody td {
   vertical-align: middle;
@@ -9020,7 +9020,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   padding: 6px 10px;
   border-left: 1px solid rgba(255, 255, 255, 0.04);
   border-bottom: none;
-  box-shadow: inset 0 -1px 0 rgba(56, 53, 47, 0.5);
+  box-shadow: inset 0 -1px 0 rgba(54, 53, 50, 0.5);
   white-space: normal;
   text-align: left;   /* icons hug the left edge so they line up vertically */
 }
@@ -9083,7 +9083,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   border-bottom: none;
   background: var(--bg-panel-2);
   box-shadow:
-    inset 0 -1px 0 rgba(56, 53, 47, 0.5),
+    inset 0 -1px 0 rgba(54, 53, 50, 0.5),
     inset 0 0 0 9999px var(--bg-panel-2);
 }
 /* Row-selection gold frame: Chromium renders box-shadow OFFSET incorrectly on
@@ -9147,7 +9147,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   border-radius: 3px;
   /* Opaque panel backing so transparent innate icons aren't see-through when
      zoomed. Blue ring matches the hero icon (.mr-ico) base exactly. */
-  background: var(--bg-panel-2, #1d1b18);
+  background: var(--bg-panel-2, #1c1b19);
   box-shadow: 0 0 0 1px var(--blue-18);
   transition: box-shadow 0.12s ease;
 }
@@ -9189,7 +9189,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   display: block;
   object-fit: contain;
   border-radius: 3px;
-  background: var(--bg-panel-2, #1d1b18);
+  background: var(--bg-panel-2, #1c1b19);
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -9215,17 +9215,17 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 }
 .aoe-line[hidden] { display: none; }
 .aoe-val {
-  color: var(--text, #d5c9b1);
+  color: var(--text, #cfc9bd);
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   margin-right: 4px;
 }
 .aoe-val.aoe-val-up { color: #e3c46a; }        /* boosted by any item — gold */
 .aoe-val[hidden] { display: none; }
-.aoe-slash { color: var(--text-muted, #9e9583); margin: 0 1px; }
-.aoe-sep { color: var(--text-muted, #9e9583); margin-right: 4px; }
+.aoe-slash { color: var(--text-muted, #99958c); margin: 0 1px; }
+.aoe-sep { color: var(--text-muted, #99958c); margin-right: 4px; }
 .aoe-lbl {
-  color: var(--text-muted, #9e9583);
+  color: var(--text-muted, #99958c);
   font-size: 10.5px;
 }
 
@@ -9263,7 +9263,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   overflow: hidden;
   background: #11140f;
   box-shadow:
-    inset 0 1px 0 rgba(229, 216, 190, 0.08),
+    inset 0 1px 0 rgba(222, 216, 203, 0.08),
     0 6px 22px var(--shadow-50);
   cursor: grab;
   touch-action: none;          /* JS owns the pointer drag — no scroll hijack */
@@ -9327,7 +9327,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   border: 2px solid var(--gold);
   background: linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(229, 216, 190, 0.12),
+    inset 0 1px 0 rgba(222, 216, 203, 0.12),
     0 4px 12px var(--shadow-55);
   display: flex;
   align-items: center;
@@ -9357,7 +9357,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .tc-handle:focus-visible .tc-grip {
   box-shadow:
     0 0 0 3px var(--gold-line),
-    inset 0 1px 0 rgba(229, 216, 190, 0.12);
+    inset 0 1px 0 rgba(222, 216, 203, 0.12);
 }
 /* While actively dragging, hide the I-beam everywhere + brighten the grip. */
 .tc-stage.is-dragging { cursor: grabbing; }
@@ -9648,7 +9648,7 @@ li.tsp-hidden { display: none !important; }
 .tc-btn[aria-pressed="false"] {
   background: rgba(28, 28, 28, 0.66);
   border-color: rgba(120, 120, 120, 0.5);
-  color: #a89f8c;
+  color: #a39f95;
   box-shadow: inset 0 2px 3px var(--shadow-55);
 }
 .tc-btn[aria-pressed="false"] img { filter: grayscale(0.85) brightness(0.85); }
@@ -9723,7 +9723,7 @@ li.tsp-hidden { display: none !important; }
 .tc-picker.is-open .cal-year-current,
 .tc-picker .cal-year-current:focus-visible {
   border-color: var(--gold-strong);
-  box-shadow: inset 0 1px 0 rgba(229, 216, 190, 0.12),
+  box-shadow: inset 0 1px 0 rgba(222, 216, 203, 0.12),
               0 0 0 3px var(--gold-line-soft);
 }
 .tc-picker .cal-year-menu {
@@ -9749,7 +9749,7 @@ li.tsp-hidden { display: none !important; }
   border-radius: 8px;
   overflow: hidden;
   background: #11140f;
-  box-shadow: inset 0 1px 0 rgba(229, 216, 190, 0.08),
+  box-shadow: inset 0 1px 0 rgba(222, 216, 203, 0.08),
               0 6px 22px var(--shadow-50);
 }
 .tc-fallback-img {
@@ -9794,7 +9794,7 @@ li.tsp-hidden { display: none !important; }
 .tc-fallback-note {
   margin-top: 8px;
   font-size: 12px;
-  color: #cabfa8;
+  color: #c4bfb3;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
@@ -9859,7 +9859,7 @@ li.tsp-hidden { display: none !important; }
 .clog-main { margin-left: 236px; }
 .clog-rail { position: fixed; left: 18px; top: 50%; transform: translateY(-50%); z-index: 20;
   width: 200px; max-height: 78vh; overflow-y: auto; display: flex; flex-direction: column; gap: 1px;
-  padding: 6px 14px 6px 0; border-right: 1px solid rgba(155, 146, 129,.16);
+  padding: 6px 14px 6px 0; border-right: 1px solid rgba(150, 146, 137,.16);
   opacity: .5; transition: opacity .2s ease; scrollbar-width: thin; }
 .clog-rail:hover, .clog-rail:focus-within { opacity: 1; }
 .clog-rail-month { font-family: 'Jersey 10', monospace; font-size: 16px; color: var(--gold);
@@ -9867,7 +9867,7 @@ li.tsp-hidden { display: none !important; }
 .clog-rail-month:first-child { margin-top: 0; }
 .clog-rail-item { display: block; padding: 3px 8px; border-left: 2px solid transparent; border-radius: 0 4px 4px 0;
   color: var(--text-main); text-decoration: none; font-size: 12.5px; line-height: 1.3; }
-.clog-rail-item:hover { background: rgba(155, 146, 129,.1); color: var(--text-bright); }
+.clog-rail-item:hover { background: rgba(150, 146, 137,.1); color: var(--text-bright); }
 .clog-rail-item.is-current { border-left-color: var(--gold); color: var(--text-bright); }
 .clog-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
 .clog-chip { background: transparent; border: 1px solid var(--line-soft); color: var(--text-main);
@@ -9892,7 +9892,7 @@ li.tsp-hidden { display: none !important; }
 .clog-cat-materials    { color: #7fb2d9; border-color: rgba(88,166,255,.35);  background: rgba(88,166,255,.08); }
 .clog-cat-hero-lab     { color: #86b98f; border-color: rgba(120,215,145,.35); background: rgba(120,215,145,.08); }
 .clog-cat-dynamics     { color: #c29be0; border-color: rgba(190,140,240,.35); background: rgba(190,140,240,.08); }
-.clog-cat-site         { color: #bab09b; border-color: rgba(155, 146, 129,.35); background: rgba(155, 146, 129,.08); }
+.clog-cat-site         { color: #b5b0a5; border-color: rgba(150, 146, 137,.35); background: rgba(150, 146, 137,.08); }
 .clog-items { margin: 7px 0 0; padding-left: 20px; color: var(--text-main); font-size: 13.5px; line-height: 1.55; }
 .clog-items li::marker { color: var(--gold); }
 /* screenshots: a light gold outline always, brighter on hover; click = lightbox */
@@ -9942,7 +9942,7 @@ li.tsp-hidden { display: none !important; }
 .clog-page .clog-minor.is-hidden, .clog-page .clog-minor-list li.is-hidden { display: none; }
 /* a day's small changes: compact list, folded under a toggle when there are many */
 .clog-minor { margin: 10px 0 4px; }
-.clog-minor-head { font-size: 12.5px; color: var(--text-dim, #9b9281); letter-spacing: .3px; }
+.clog-minor-head { font-size: 12.5px; color: var(--text-dim, #969289); letter-spacing: .3px; }
 summary.clog-minor-head { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; }
 summary.clog-minor-head::-webkit-details-marker { display: none; }
 summary.clog-minor-head::before { content: "\25B8"; color: var(--gold-dim); transition: transform .15s; }
@@ -9954,7 +9954,7 @@ summary.clog-minor-head:hover { color: var(--text-bright); }
 .clog-minor-list .clog-cat { transform: scale(.9); transform-origin: left center; }
 .clog-minor-list a { color: inherit; text-decoration: underline dotted rgba(227,196,106,.45); text-underline-offset: 3px; }
 .clog-minor-list a:hover { color: var(--gold); }
-.clog-rail-minor { color: var(--text-dim, #9b9281); font-style: italic; }
+.clog-rail-minor { color: var(--text-dim, #969289); font-style: italic; }
 @media (max-width: 1100px) {
   .clog-entry.has-shots { grid-template-columns: 1fr; }
   .clog-shots { margin-top: 10px; }
@@ -9963,7 +9963,7 @@ summary.clog-minor-head:hover { color: var(--text-bright); }
   .clog-main { margin-left: 0; }
   .clog-rail { position: static; transform: none; width: auto; max-height: none; opacity: 1;
     flex-direction: row; flex-wrap: wrap; gap: 4px; padding: 0 0 12px; margin-bottom: 14px;
-    border-right: 0; border-bottom: 1px solid rgba(155, 146, 129,.16); }
+    border-right: 0; border-bottom: 1px solid rgba(150, 146, 137,.16); }
   .clog-rail-month { width: 100%; }
 }
 
@@ -10011,7 +10011,7 @@ summary.clog-minor-head:hover { color: var(--text-bright); }
 .dyn-wl .seg { stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
 .dyn-wl .seg.up, .dyn-wl .pt.up { stroke: rgb(62, 178, 96); fill: rgb(62, 178, 96); }
 .dyn-wl .seg.down, .dyn-wl .pt.down { stroke: rgb(214, 74, 66); fill: rgb(214, 74, 66); }
-.dyn-wl .seg.flat, .dyn-wl .pt.flat { stroke: rgb(175, 165, 145); fill: rgb(175, 165, 145); }
+.dyn-wl .seg.flat, .dyn-wl .pt.flat { stroke: rgb(170, 165, 155); fill: rgb(170, 165, 155); }
 /* untouched cell that carries the tail of a neighbour's segment */
 .heroes-dyn-table.w-mode td.he { padding: 0; }
 .heroes-dyn-table.w-mode td.he.he-seg::after { display: none; }
@@ -10025,17 +10025,17 @@ summary.clog-minor-head:hover { color: var(--text-bright); }
   height: 100%;
   overflow: visible;
 }
-.dyn-wl .axis { stroke: rgba(211, 199, 175, 0.35); stroke-width: 1; }
+.dyn-wl .axis { stroke: rgba(205, 199, 187, 0.35); stroke-width: 1; }
 .dyn-wl polyline { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .dyn-wl.up polyline, .dyn-wl.up circle { stroke: rgb(62, 178, 96); fill: rgb(62, 178, 96); }
 .dyn-wl.down polyline, .dyn-wl.down circle { stroke: rgb(214, 74, 66); fill: rgb(214, 74, 66); }
-.dyn-wl.flat polyline, .dyn-wl.flat circle { stroke: rgb(175, 165, 145); fill: rgb(175, 165, 145); }
+.dyn-wl.flat polyline, .dyn-wl.flat circle { stroke: rgb(170, 165, 155); fill: rgb(170, 165, 155); }
 .dyn-wl polyline { fill: none !important; }
 .heroes-dyn-table.w-mode td.hd-cell.hd-empty::after,
 .heroes-dyn-table.w-mode td.he::after {
   height: 1px;
   border-radius: 0;
-  background: rgba(211, 199, 175, 0.35);
+  background: rgba(205, 199, 187, 0.35);
   vertical-align: middle;
 }
 /* Tooltip header: version on the left, weighted score on the right. */
@@ -10050,7 +10050,7 @@ summary.clog-minor-head:hover { color: var(--text-bright); }
 }
 .dyn-tip-score.pos { color: rgb(88, 200, 118); }
 .dyn-tip-score.neg { color: rgb(232, 96, 88); }
-.dyn-tip-score.zero { color: rgba(217, 205, 180, 0.8); }
+.dyn-tip-score.zero { color: rgba(211, 205, 192, 0.8); }
 
 /* ---- Hero / Item Changes pages (builders/entity_changes.py) ---- */
 .entity-link { color: inherit; text-decoration: none; }
@@ -10062,7 +10062,7 @@ summary.clog-minor-head:hover { color: var(--text-bright); }
 body.patch-page .cat-panel.ec-head-panel {
   margin-top: 18px; padding: 14px 22px; border-left: 0;
   border-bottom: 1px solid var(--gold-line);
-  background: linear-gradient(90deg, rgba(227, 196, 106, 0.07) 0%, rgba(33, 31, 27, 0.30) 60%, rgba(0, 0, 0, 0.30) 100%);
+  background: linear-gradient(90deg, rgba(227, 196, 106, 0.07) 0%, rgba(32, 31, 29, 0.30) 60%, rgba(0, 0, 0, 0.30) 100%);
 }
 body.patch-page .ec-head-panel .entity-block { padding: 0; border: 0; }
 /* the panel's own 14px padding is the only gap, the same above and below the head row */
@@ -10167,11 +10167,11 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
   font-variant-numeric: tabular-nums; text-transform: none;
 }
 .ec-score i { font-style: normal; font-weight: 400; color: rgba(255, 255, 255, 0.6); }
-.ec-score.pos { color: rgb(110, 220, 140); } .ec-score.neg { color: rgb(255, 130, 120); } .ec-score.zero { color: rgba(242, 228, 201, 0.85); }
+.ec-score.pos { color: rgb(110, 220, 140); } .ec-score.neg { color: rgb(255, 130, 120); } .ec-score.zero { color: rgba(235, 228, 214, 0.85); }
 /* scope filter row (same look as the Group row on patch pages) */
 .ec-scope-btn {
   cursor: pointer; user-select: none; font-family: inherit; font-size: 11px; padding: 3px 9px; border-radius: 3px;
-  background: rgba(227, 196, 106, 0.05); color: #a79e8b; border: 1px solid rgba(227, 196, 106, 0.22);
+  background: rgba(227, 196, 106, 0.05); color: #a29e94; border: 1px solid rgba(227, 196, 106, 0.22);
   text-transform: uppercase; letter-spacing: 0.4px; transition: filter 0.12s, background 0.12s, border-color 0.12s;
 }
 .ec-scope-btn:hover { background: rgba(227, 196, 106, 0.10); border-color: rgba(227, 196, 106, 0.40); color: var(--text-main); }
@@ -10313,7 +10313,7 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
   display: flex; align-items: center; padding: 3px 14px;
   border-bottom: 1px solid var(--line-soft); border-left: 1px solid var(--line-soft);
 }
-.camp-table .camp-name { color: var(--text-dim, #9b9281); padding-left: 0; border-left: 0; }
+.camp-table .camp-name { color: var(--text-dim, #969289); padding-left: 0; border-left: 0; }
 
 /* ==========================================================================
    WARM PIXEL SKIN — menus, toolbars and their controls (header "embers", variant A)
@@ -10324,21 +10324,21 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
    RULE: a new toolbar control joins the selector lists below instead of its own colours.
    ========================================================================== */
 :root {
-  --px-panel: #15120e;
-  --px-menu: #17130f;
-  --px-field: #221b13;
-  --px-text: #cdbb93;
-  --px-text-soft: #b9a784;
-  --px-text-dim: #8f7a55;
+  --px-panel: #141210;
+  --px-menu: #161311;
+  --px-field: #201b17;
+  --px-text: #c6bba3;
+  --px-text-soft: #b2a893;
+  --px-text-dim: #877b65;
   --px-hi: #ffe08a;
-  --px-press: #0e0b08;
+  --px-press: #0d0b09;
   --px-on: #d9b25a;
-  --px-on-text: #1b140c;
+  --px-on-text: #191410;
   --px-on-press: #9a7424;
-  --px-line: #3e3020;
+  --px-line: #393127;
   --px-ember: linear-gradient(90deg, rgba(255, 138, 26, 0.22), transparent 85%);
-  --px-edge:      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%235a4424' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
-  --px-edge-dim:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%233e3020' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
+  --px-edge:      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23524532' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
+  --px-edge-dim:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23393127' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
   --px-edge-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23e3c46a' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
   --px-edge-on:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23f0d58c' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
 }
@@ -10389,7 +10389,7 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
   background: var(--px-ember);
   box-shadow: inset 2px 0 0 var(--gold);
 }
-.nav-subitem-soon, .nav-subitem-soon:hover { color: #5e5140; background: none; }
+.nav-subitem-soon, .nav-subitem-soon:hover { color: #5a5248; background: none; }
 .hd-dd-sep { background: var(--px-line); }
 .search-results .result-item { border-bottom-color: var(--px-line); }
 
@@ -10433,11 +10433,11 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
   padding: 0 28px 2px 10px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23e3c46a' d='M0 0h10v2H0zM2 2h6v2H2zM4 4h2v2H4z'/%3E%3C/svg%3E");
 }
-.cal-mode-select option { background: var(--px-menu); color: #e8d9b5; }
+.cal-mode-select option { background: var(--px-menu); color: #e2d9c4; }
 
 /* Search: warm field, gold loupe, a gold frame instead of the blue focus ring */
-.search-box input { color: #e8d9b5; }
-.search-box input::placeholder { color: #7d6a4a; }
+.search-box input { color: #e2d9c4; }
+.search-box input::placeholder { color: #766b58; }
 .search-box input:focus {
   border-image-source: var(--px-edge-gold);
   box-shadow: inset 0 -3px 0 var(--px-press);
@@ -10456,7 +10456,7 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
 .ua-upgrades-toggle .ua-switch {
   border-radius: 0;
   background: var(--px-press);
-  box-shadow: inset 0 0 0 2px #5a4424;
+  box-shadow: inset 0 0 0 2px #524532;
 }
 .ua-upgrades-toggle .ua-switch::after {
   top: 4px; left: 4px; width: 8px; height: 8px;
@@ -10473,7 +10473,7 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
 .hd-dd-label { color: var(--px-text); }
 .hd-dd-caret { color: var(--px-text-dim); }
 .hd-dd-btn:hover .hd-dd-label, .hd-dd-btn[aria-expanded="true"] .hd-dd-label { color: var(--px-hi); }
-.toolbar-panel .mr-price-input { border-bottom-color: var(--px-line); color: #e8d9b5; }
+.toolbar-panel .mr-price-input { border-bottom-color: var(--px-line); color: #e2d9c4; }
 .toolbar-panel .mr-price-input:focus { border-bottom-color: var(--gold); }
 
 /* Level field (Hero Stats), calendar year picker, changelog category chips — same skin */
@@ -10486,14 +10486,14 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
   background-clip: padding-box;
   box-shadow: inset 0 -3px 0 var(--px-press);
 }
-.hs-level-group input { color: #e8d9b5; }
+.hs-level-group input { color: #e2d9c4; }
 .hs-level-group input:focus, .cal-year-current:hover, .cal-year-picker.is-open .cal-year-current,
 .cal-year-current:focus-visible, .clog-chip:hover {
   border-image-source: var(--px-edge-gold);
   box-shadow: inset 0 -3px 0 var(--px-press);
 }
 .hs-level-group > span { font-family: var(--font-j10); font-size: 18px; letter-spacing: 1px; color: var(--px-text-dim); }
-.cal-year-current { font-family: var(--font-j10); font-size: 20px; font-weight: 400; color: #e8d9b5; }
+.cal-year-current { font-family: var(--font-j10); font-size: 20px; font-weight: 400; color: #e2d9c4; }
 .cal-year-caret { color: var(--gold-dim); }
 .cal-year-menu {
   border: 2px solid transparent;
@@ -10517,7 +10517,7 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
 .cat-filter-btn, .ec-scope-btn {
   background: var(--px-field);
   color: var(--px-text-soft);
-  border-color: #5a4424;
+  border-color: #524532;
   border-radius: 0;
 }
 .cat-filter-btn:hover, .ec-scope-btn:hover { background: var(--px-field); border-color: var(--gold-dim); color: var(--px-hi); }
@@ -10540,17 +10540,17 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
 /* Upgrade values ("40…26") and their per-tier popover */
 .lvl-toggle { text-decoration-color: rgba(227, 196, 106, 0.45); }
 .lvl-toggle:hover, .lvl-toggle[aria-expanded="true"] { color: var(--px-hi); }
-.lvl-popover { background: var(--px-menu); border-color: #5a4424; border-radius: 0; }
+.lvl-popover { background: var(--px-menu); border-color: #524532; border-radius: 0; }
 /* Checkboxes in the dropdown menus: square pixel boxes, gold when ticked */
 .hd-dd-opt input[type="checkbox"] {
   appearance: none; -webkit-appearance: none;
   width: 14px; height: 14px; margin: 0;
   background: var(--px-press);
-  box-shadow: inset 0 0 0 2px #5a4424;
+  box-shadow: inset 0 0 0 2px #524532;
   border-radius: 0;
 }
 .hd-dd-opt input[type="checkbox"]:checked {
-  background: var(--px-on) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cpath fill='%231b140c' d='M3 7h2v2H3zM5 9h2v2H5zM7 7h2v2H7zM9 5h2v2H9z'/%3E%3C/svg%3E") center / 14px no-repeat;
+  background: var(--px-on) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cpath fill='%23191410' d='M3 7h2v2H3zM5 9h2v2H5zM7 7h2v2H7zM9 5h2v2H9z'/%3E%3C/svg%3E") center / 14px no-repeat;
   box-shadow: inset 0 0 0 2px #f0d58c;
 }
 .hd-dd-opt input[type="checkbox"]:indeterminate {

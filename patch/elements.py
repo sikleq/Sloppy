@@ -900,7 +900,7 @@ def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_a
     connector_html = (
         '<svg class="ability-change-connector" '
         'viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'
-        '<path d="" fill="none" stroke="rgba(155, 146, 129, 0.45)" '
+        '<path d="" fill="none" stroke="rgba(150, 146, 137, 0.45)" '
         'stroke-width="1.3" stroke-dasharray="3 3" stroke-linecap="round" />'
         '</svg>'
     )
@@ -1709,7 +1709,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
             'viewBox="0 0 100 100" preserveAspectRatio="none" '
             'aria-hidden="true">'
             '<path d="" fill="none" '
-            'stroke="rgba(155, 146, 129, 0.45)" stroke-width="1.3" '
+            'stroke="rgba(150, 146, 137, 0.45)" stroke-width="1.3" '
             'stroke-dasharray="3 3" stroke-linecap="round" />'
             '</svg>'
         )

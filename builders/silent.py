@@ -311,31 +311,31 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <style>
 .sc-page {{ max-width: 1080px; margin: 0 auto; padding: 24px 28px 80px; }}
 .sc-page h1 {{ font-family: 'Jersey 10', monospace; font-size: 38px;
-              letter-spacing: 1px; color: #faeccf; margin-bottom: 4px; }}
-.sc-page .sc-sub {{ color: #9b9281; font-size: 13px; margin-bottom: 24px; }}
+              letter-spacing: 1px; color: #f3ecdd; margin-bottom: 4px; }}
+.sc-page .sc-sub {{ color: #969289; font-size: 13px; margin-bottom: 24px; }}
 .sc-hero {{ margin: 28px 0; }}
 .sc-hero h2 {{ font-size: 18px; color: #e3c46a; font-weight: 700;
-              border-bottom: 1px solid #282521; padding-bottom: 6px; }}
+              border-bottom: 1px solid #262523; padding-bottom: 6px; }}
 .sc-ability {{ margin: 14px 0 14px 0; }}
-.sc-ability-name {{ font-size: 13px; color: #dcd0b7; font-weight: 600;
+.sc-ability-name {{ font-size: 13px; color: #d6d0c3; font-weight: 600;
                     font-family: 'Courier New', monospace; margin-bottom: 6px; }}
 .sc-table {{ border-collapse: collapse; width: 100%; font-size: 12px;
             font-variant-numeric: tabular-nums; }}
-.sc-table th, .sc-table td {{ padding: 5px 10px; border: 1px solid #38352f;
+.sc-table th, .sc-table td {{ padding: 5px 10px; border: 1px solid #363532;
                               text-align: left; vertical-align: top; }}
-.sc-table th {{ background: #1c1a17; color: #dcd0b7; font-weight: 600;
+.sc-table th {{ background: #1b1a18; color: #d6d0c3; font-weight: 600;
                 font-size: 11px; text-transform: uppercase;
                 letter-spacing: 0.5px; }}
-.sc-field {{ font-family: 'Courier New', monospace; color: #9b9281;
+.sc-field {{ font-family: 'Courier New', monospace; color: #969289;
              max-width: 280px; word-break: break-all; }}
 .sc-old {{ background: rgba(248, 81, 73, 0.08); color: #f8a39e; }}
 .sc-new {{ background: rgba(86, 211, 100, 0.08); color: #92e3a3; }}
-.sc-absent {{ color: #7c7567; font-style: italic; }}
+.sc-absent {{ color: #78756e; font-style: italic; }}
 .sc-flag {{ display: inline-block; padding: 1px 6px; margin: 2px 4px 2px 0;
             background: rgba(227, 196, 106, 0.12); color: #e3c46a;
             border-radius: 3px; font-size: 10.5px;
             font-family: 'Courier New', monospace; }}
-.sc-empty {{ color: #9b9281; font-style: italic; padding: 40px 0;
+.sc-empty {{ color: #969289; font-style: italic; padding: 40px 0;
              text-align: center; }}
 .sc-back {{ display: inline-block; margin-bottom: 16px; color: #e3c46a;
             text-decoration: none; font-size: 13px; }}

@@ -4,6 +4,12 @@
     {
       "date": "2026-09-25",
       "category": "Site",
+      "title": "Warm tones toned down: calmer, less yellow greys",
+      "minor": true
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Site",
       "title": "The whole site switched from cold steel greys and blues to warm tones: panels, lines, table headers, calendar and its charts",
       "minor": true
     },
