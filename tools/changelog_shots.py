@@ -53,6 +53,13 @@ SHOTS = {
     "2026-09-25_innates.webp": ("hero_lab.html", None, [".hero-lab"], [], 420, {"width": 1600}),
     "2026-09-25_heatmap.webp": ("mana_items.html", None, ["table.mr-table"], [], 330, {"width": 1500}),
     "2026-09-25_item_page.webp": ("items/circlet.html", None, [".ec-head-panel", ".ec-nochange"], [], 300, {"width": 1400}),
+    "2026-09-23_hero_items.webp": ("heroes/anti-mage.html", None, [".ec-head-panel", ".ec-patch >> nth=0"],
+                                   [".ec-islot >> nth=0", ".ec-ipicker-overlay [data-ec-ipick='battle-fury']",
+                                    ".ec-islot >> nth=1", ".ec-ipicker-overlay [data-ec-ipick='manta-style']",
+                                    ".ec-islot >> nth=2", ".ec-ipicker-overlay [data-ec-ipick='abyssal-blade']"],
+                                   560, {"width": 1400, "wait": 1500}),
+    "2026-09-23_hero_items_picker.webp": ("heroes/anti-mage.html", None, [".ec-ipicker-overlay .hl-picker-card"],
+                                          [".ec-islot >> nth=0"], 560, {"width": 1400, "wait": 800}),
     "2026-09-25_menu.webp": ("items_dyn.html", None, [".toolbar-panel", ".hd-dd-menu"], [".hd-dd-btn"], 330, {"width": 1400}),
     "2026-09-25_tags.webp": ("patches/7.38.html", None, [".legend-stack"], ['.legend-tags .filter-btn[data-filter="nerf"]', ".cat-filter-btn >> nth=2"], 60, {"width": 1600}),
     "2026-09-25_terrain_bar.webp": ("terrain_741.html", None, [".tc-controls-bar", ".terrain-subpatch-nav"], [], 90, {"width": 1400}),
@@ -106,6 +113,7 @@ def shoot(page, name, spec):
     for sel in clicks:
         root.locator(sel).first.click()
         page.wait_for_timeout(250)
+    page.wait_for_timeout(opts.get("wait", 0))          # e.g. items pulled into a hero page by fetch
     locs = [root if p == ":scope" else root.locator(p).first for p in parts]
     if scope is not None:
         locs[0].scroll_into_view_if_needed()
