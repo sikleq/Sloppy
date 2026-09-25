@@ -26,7 +26,7 @@
                cooldowns) fall back to the hero formula.
   context    — multiplier by where the row lives (data/rules/valve_weights.json "context"):
                ultimate 1.3, basic ability/innate/scepter/base stat/item 1.0, shard 0.9,
-               facet 0.8, talent 10/15/20/25 = 0.6/0.8/1.0/1.2.
+               facet 0.8, talent 10/15/20/25 = 0.5/0.6/0.7/0.8.
   priority   — basic abilities are further scaled 0.7–1.3 by how pros skill them (share of the
                first 10 skill points, OpenDota pro matches; data/rules/ability_priority.json).
   talents    — "Level N Talent: A replaced with B" (REWORK) gets a DIRECTION from signal K when
