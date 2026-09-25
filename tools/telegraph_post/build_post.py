@@ -215,6 +215,7 @@ def build():
     (OUT / "post.json").write_text(json.dumps({"title": TITLE, "content": nodes}, ensure_ascii=False, indent=1),
                                    encoding="utf-8")
     _preview(nodes)
+    _markup(nodes)
     print(f"  {len(names) + 1} images -> {IMG_DIR.relative_to(ROOT)}; post.json + preview.html -> {OUT.relative_to(ROOT)}")
 
 
@@ -227,6 +228,16 @@ def _render(n):
     if n["tag"] in ("img", "hr"):
         return f"<{n['tag']}{attrs}>"
     return f"<{n['tag']}{attrs}>" + "".join(_render(c) for c in n.get("children", [])) + f"</{n['tag']}>"
+
+
+def _markup(nodes):
+    """The post as plain telegra.ph markup (only tags Telegraph accepts, images by their live site
+    URL) — open it in a browser, select all, copy and paste into the telegra.ph editor, or hand
+    the markup to any Telegraph tool."""
+    body = "\n".join(_render(n) for n in nodes)
+    (OUT / "post_telegraph.html").write_text(
+        f"<!-- {TITLE} -->\n<!-- telegra.ph markup: h3, h4, p, a, b, ul, li, figure, img, figcaption, hr -->\n"
+        f"<meta charset=\"utf-8\">\n<h1>{html.escape(TITLE)}</h1>\n{body}\n", encoding="utf-8")
 
 
 def _preview(nodes):
