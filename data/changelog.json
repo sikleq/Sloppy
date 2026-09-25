@@ -3,6 +3,12 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Site",
+      "title": "Ability chips on hero, item and unit pages use the pixel font too",
+      "minor": true
+    },
+    {
+      "date": "2026-09-25",
       "category": "Dynamics",
       "title": "Weights: audit and nine fixes",
       "fix": true,
