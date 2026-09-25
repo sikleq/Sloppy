@@ -10621,3 +10621,20 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
 .hd-dd-menu[data-dd="diffstat"] > .hd-dd-sep { display: none; }
 .hd-dd-menu[data-dd="diffstat"] > .hd-dd-opt { background: var(--px-menu); padding: 5px 10px; }
 .hd-dd-menu[data-dd="diffstat"] > .hd-dd-opt:hover { background: #1f1a15; }
+/* Icon-only toggle buttons (attributes, AoE items / talent, Dynamics weights): ON = dark field with a
+   bright gold frame and a warm glow — NOT a solid gold fill, which swallowed the gold pixel icons
+   (weights, talent). Text buttons (Melee / Ranged) keep the solid gold "pressed" look. */
+.hs-attr-filter.active, .hs-attr-filter[aria-pressed="true"] {
+  background-color: var(--px-field);
+  background-image: radial-gradient(ellipse 70% 70% at 50% 60%, rgba(255, 150, 40, 0.28), transparent 75%);
+  border-image-source: var(--px-edge-on);
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+/* While a table box scrolls (scripts.js adds .is-scrolling) the table ignores the pointer:
+   no hover repaints of cells passing under the cursor. */
+.creeps-scroll.is-scrolling table { pointer-events: none; }
+/* Hero / Item Dynamics matrices (~3000 diamonds): the hover pop is INSTANT here — the 0.14s
+   grow/shrink transition promoted and repainted a layer per passing cell (hover sweep:
+   main-thread frame work 1.8 s -> 0.7 s without it). Patch pages keep the smooth pop. */
+.heroes-dyn-table .dyn-cell,
+.heroes-dyn-table .dyn-cell-wrap:not(.empty):hover .dyn-cell { transition: none; }

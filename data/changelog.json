@@ -3,6 +3,20 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Site",
+      "title": "Icon toggles (weights, talent, attributes) glow warm when on instead of turning solid gold, so the icon stays visible",
+      "minor": true
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Dynamics",
+      "title": "Hero / Item Dynamics no longer stutter: hover is paused while the table scrolls and the diamond pop is instant",
+      "minor": true,
+      "link": "heroes_dyn.html",
+      "fix": true
+    },
+    {
+      "date": "2026-09-25",
       "category": "Materials",
       "title": "Talent icon redrawn like the game's emblem: a pale ring with a sprig on a dark disc, readable when the button is on",
       "minor": true,
