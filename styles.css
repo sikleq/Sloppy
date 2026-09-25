@@ -9196,7 +9196,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
 }
 .aoe-mark-innate  { background-image: url('icons/misc/innate_icon.png'); }
-.aoe-mark-talent  { background-image: url('icons/misc/talents.svg'); }
+.aoe-mark-talent  { background-image: url('icons/ui/gothic/icon_talents.png'); image-rendering: pixelated; }
 .aoe-mark-scepter { background-image: url('icons/items/ultimate_scepter.png'); }
 .aoe-mark-shard   { background-image: url('icons/items/aghanims_shard.png'); }
 .aoe-mark[hidden] { display: none; }
@@ -10314,3 +10314,244 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
   border-bottom: 1px solid var(--line-soft); border-left: 1px solid var(--line-soft);
 }
 .camp-table .camp-name { color: var(--text-dim, #8b949e); padding-left: 0; border-left: 0; }
+
+/* ==========================================================================
+   WARM PIXEL SKIN — menus, toolbars and their controls (header "embers", variant A)
+   One look for every control: warm dark fields, a 2px pixel frame with notched
+   corners (border-image, so it never clips popups inside), the Jersey 10 pixel
+   font, chunky "game" buttons (dark bottom lip; pressed = gold). No blue anywhere.
+   The frame is a 6x6 SVG: 2px edges, empty 2x2 corners -> the classic stepped corner.
+   RULE: a new toolbar control joins the selector lists below instead of its own colours.
+   ========================================================================== */
+:root {
+  --px-panel: #15120e;
+  --px-menu: #17130f;
+  --px-field: #221b13;
+  --px-text: #cdbb93;
+  --px-text-soft: #b9a784;
+  --px-text-dim: #8f7a55;
+  --px-hi: #ffe08a;
+  --px-press: #0e0b08;
+  --px-on: #d9b25a;
+  --px-on-text: #1b140c;
+  --px-on-press: #9a7424;
+  --px-line: #3e3020;
+  --px-ember: linear-gradient(90deg, rgba(255, 138, 26, 0.22), transparent 85%);
+  --px-edge:      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%235a4424' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
+  --px-edge-dim:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%233e3020' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
+  --px-edge-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23e3c46a' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
+  --px-edge-on:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23f0d58c' d='M2 0h2v2H2zM0 2h2v2H0zM4 2h2v2H4zM2 4h2v2H2z'/%3E%3C/svg%3E");
+}
+
+/* ---- pixel font on every control label ---- */
+.nav-subtab, .nav-subitem, .hd-dd-opt, .hd-dd-label,
+.hs-attack-filter, .cal-mode-select, .ua-upgrades-label,
+.cal-toggle-bar strong, .toolbar-panel strong, .mr-price-label {
+  font-family: var(--font-j10);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+.nav-subtab { font-size: 18px; }
+.nav-subitem, .hd-dd-opt { font-size: 18px; }
+.hs-attack-filter, .cal-mode-select, .ua-upgrades-label, .hd-dd-label { font-size: 18px; }
+.cal-toggle-bar strong, .toolbar-panel strong, .mr-price-label {
+  font-size: 17px; letter-spacing: 1px; color: var(--px-text-dim);
+}
+
+/* ---- framed surfaces: panels + popup menus ---- */
+.toolbar-panel,
+.nav-submenu, .hd-dd-menu, .search-results {
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background-clip: padding-box;
+}
+.toolbar-panel { background-color: var(--px-panel); border-image-source: var(--px-edge-dim); }
+.toolbar-panel > *:not(:first-child)::before { background: var(--px-line); }
+.nav-submenu, .hd-dd-menu, .search-results {
+  background-color: var(--px-menu);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.6);
+}
+.nav-submenu { border-radius: 0; }
+
+/* ---- menu rows: soft gold text; hover lights it, the current one smoulders ---- */
+.nav-subitem, .hd-dd-opt { color: var(--px-text-soft); border-radius: 0; }
+.nav-subitem:hover, .hd-dd-opt:hover,
+.nav-subgroup-nested:hover > .nav-subitem-parent,
+.search-results .result-item:hover {
+  color: var(--px-hi);
+  background: rgba(255, 138, 26, 0.08);
+}
+.nav-subitem.active, .search-results .result-item.active {
+  color: var(--px-hi);
+  background: var(--px-ember);
+  box-shadow: inset 2px 0 0 var(--gold);
+}
+.nav-subitem-soon, .nav-subitem-soon:hover { color: #5e5140; background: none; }
+.hd-dd-sep { background: var(--px-line); }
+.search-results .result-item { border-bottom-color: var(--px-line); }
+
+/* ---- leaf controls: framed "game" fields/buttons ---- */
+.hs-attack-filter, .hs-attr-filter, .cal-mode-select, .search-box input {
+  box-sizing: border-box;
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background-color: var(--px-field);
+  background-clip: padding-box;
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+.hs-attack-filter { color: var(--px-text); padding: 0 9px 2px 5px; }
+.hs-attack-filter:hover, .hs-attr-filter:hover, .cal-mode-select:hover {
+  border-image-source: var(--px-edge-gold);
+  color: var(--px-hi);
+  filter: none;
+}
+.hs-attack-filter:active, .hs-attr-filter:active { box-shadow: inset 0 2px 0 var(--px-press); }
+.hs-attack-filter.active, .hs-attack-filter[aria-pressed="true"],
+.hs-attr-filter.active, .hs-attr-filter[aria-pressed="true"] {
+  background-color: var(--px-on);
+  border-image-source: var(--px-edge-on);
+  color: var(--px-on-text);
+  box-shadow: inset 0 -3px 0 var(--px-on-press);
+}
+.hs-attack-filter .atk-badge {
+  width: 18px; height: 18px;
+  border: 0; border-radius: 0;
+  background: var(--px-press);
+}
+.hs-attack-filter .atk-badge img { opacity: 1; }
+.aoe-up-btn img { border-radius: 0; }
+.aoe-up-btn[data-aoe-upgrade="talent"] img { padding: 0; width: 26px; height: 26px; }
+img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixelated; }
+
+/* View select: warm field + a stepped gold caret; the native list follows */
+.cal-mode-select {
+  color: #e8d9b5;
+  padding: 0 28px 2px 10px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23e3c46a' d='M0 0h10v2H0zM2 2h6v2H2zM4 4h2v2H4z'/%3E%3C/svg%3E");
+}
+.cal-mode-select option { background: var(--px-menu); color: #e8d9b5; }
+
+/* Search: warm field, gold loupe, a gold frame instead of the blue focus ring */
+.search-box input { color: #e8d9b5; }
+.search-box input::placeholder { color: #7d6a4a; }
+.search-box input:focus {
+  border-image-source: var(--px-edge-gold);
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+.toolbar .search-box input {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="%23b09a64" stroke-width="1.8"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 L13.6 13.6"/></svg>');
+}
+
+/* Switches: a square pixel track, square knob; ON = gold */
+.ua-upgrades-toggle { border-radius: 0; background-color: var(--px-field); }
+.ua-upgrades-toggle:hover { border-color: var(--gold-line); }
+.toolbar-panel .ua-upgrades-toggle { background-color: transparent; }
+.toolbar-panel .ua-upgrades-toggle:hover { border-color: transparent; }
+.ua-upgrades-toggle:hover .ua-upgrades-label { color: var(--px-hi); }
+.ua-upgrades-label { color: var(--px-text); }
+.ua-upgrades-toggle .ua-switch {
+  border-radius: 0;
+  background: var(--px-press);
+  box-shadow: inset 0 0 0 2px #5a4424;
+}
+.ua-upgrades-toggle .ua-switch::after {
+  top: 4px; left: 4px; width: 8px; height: 8px;
+  border-radius: 0;
+  background: var(--px-text-dim);
+}
+.ua-upgrades-toggle .ua-switch-input:checked + .ua-switch {
+  background: var(--px-on);
+  box-shadow: inset 0 0 0 2px #f0d58c;
+}
+.ua-upgrades-toggle .ua-switch-input:checked + .ua-switch::after { background: var(--px-on-text); }
+
+/* Multi-select dropdown button + price fields */
+.hd-dd-label { color: var(--px-text); }
+.hd-dd-caret { color: var(--px-text-dim); }
+.hd-dd-btn:hover .hd-dd-label, .hd-dd-btn[aria-expanded="true"] .hd-dd-label { color: var(--px-hi); }
+.toolbar-panel .mr-price-input { border-bottom-color: var(--px-line); color: #e8d9b5; }
+.toolbar-panel .mr-price-input:focus { border-bottom-color: var(--gold); }
+
+/* Level field (Hero Stats), calendar year picker, changelog category chips — same skin */
+.hs-level-group input, .cal-year-current, .clog-chip {
+  box-sizing: border-box;
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background: var(--px-field);
+  background-clip: padding-box;
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+.hs-level-group input { color: #e8d9b5; }
+.hs-level-group input:focus, .cal-year-current:hover, .cal-year-picker.is-open .cal-year-current,
+.cal-year-current:focus-visible, .clog-chip:hover {
+  border-image-source: var(--px-edge-gold);
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+.hs-level-group > span { font-family: var(--font-j10); font-size: 17px; letter-spacing: 1px; color: var(--px-text-dim); }
+.cal-year-current { font-family: var(--font-j10); font-size: 20px; font-weight: 400; color: #e8d9b5; }
+.cal-year-caret { color: var(--gold-dim); }
+.cal-year-menu {
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background-color: var(--px-menu);
+  background-clip: padding-box;
+}
+.clog-chip { font-family: var(--font-j10); font-size: 18px; color: var(--px-text); }
+.clog-chip.active {
+  background: var(--px-on);
+  border-image-source: var(--px-edge-on);
+  color: var(--px-on-text);
+  box-shadow: inset 0 -3px 0 var(--px-on-press);
+}
+.cal-year-opt { font-family: var(--font-j10); font-size: 19px; font-weight: 400; color: var(--px-text-soft); border-radius: 0; }
+.cal-year-opt:hover { background: rgba(255, 138, 26, 0.08); color: var(--px-hi); }
+.cal-year-opt.is-selected { background: var(--px-ember); color: var(--px-hi); box-shadow: inset 2px 0 0 var(--gold); }
+/* Group / scope filter chips (patch pages, entity pages): same size as the TAG badges next to
+   them (1px border, regular font), warm instead of blue */
+.cat-filter-btn, .ec-scope-btn {
+  background: var(--px-field);
+  color: var(--px-text-soft);
+  border-color: #5a4424;
+  border-radius: 0;
+}
+.cat-filter-btn:hover, .ec-scope-btn:hover { background: var(--px-field); border-color: var(--gold-dim); color: var(--px-hi); }
+.cat-filter-btn.active, .ec-scope-btn.active {
+  background: rgba(227, 196, 106, 0.18);
+  border-color: var(--gold);
+  color: var(--px-hi);
+}
+/* Calendar "Compact" switch: a framed pixel button like the year picker */
+.cal-compact-toggle.ua-upgrades-toggle {
+  border: 2px solid transparent;
+  border-image: var(--px-edge) 2 stretch;
+  border-radius: 0;
+  background: var(--px-field);
+  background-clip: padding-box;
+  box-shadow: inset 0 -3px 0 var(--px-press);
+}
+.cal-compact-toggle.ua-upgrades-toggle:hover { border-image-source: var(--px-edge-gold); }
+.cal-compact-toggle .ua-upgrades-label { font-weight: 400; font-size: 18px; letter-spacing: 0.3px; }
+/* Upgrade values ("40…26") and their per-tier popover */
+.lvl-toggle { text-decoration-color: rgba(227, 196, 106, 0.45); }
+.lvl-toggle:hover, .lvl-toggle[aria-expanded="true"] { color: var(--px-hi); }
+.lvl-popover { background: var(--px-menu); border-color: #5a4424; border-radius: 0; }
+/* Checkboxes in the dropdown menus: square pixel boxes, gold when ticked */
+.hd-dd-opt input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  width: 14px; height: 14px; margin: 0;
+  background: var(--px-press);
+  box-shadow: inset 0 0 0 2px #5a4424;
+  border-radius: 0;
+}
+.hd-dd-opt input[type="checkbox"]:checked {
+  background: var(--px-on) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cpath fill='%231b140c' d='M3 7h2v2H3zM5 9h2v2H5zM7 7h2v2H7zM9 5h2v2H9z'/%3E%3C/svg%3E") center / 14px no-repeat;
+  box-shadow: inset 0 0 0 2px #f0d58c;
+}
+.hd-dd-opt input[type="checkbox"]:indeterminate {
+  background: var(--px-on) linear-gradient(var(--px-on-text), var(--px-on-text)) center / 6px 2px no-repeat;
+  box-shadow: inset 0 0 0 2px #f0d58c;
+}

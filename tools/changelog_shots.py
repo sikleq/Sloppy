@@ -44,6 +44,7 @@ SHOTS = {
     "2026-09-17_item_changes.webp": ("item_changes.html", None, [".ec-igrid"], [], 420),
     "2026-06-24_aoe_increase.webp": ("aoe_increase.html", None, [".aoe-toolbar", "table.aoe-table"], [], 520, {"width": 1600}),
     "2026-06-13_hero_lab.webp": ("hero_lab.html", None, [".hero-lab"], [], 520, {"width": 1700}),
+    "2026-09-25_controls.webp": ("heroes_stats.html", None, [".toolbar-panel"], [], 160, {"width": 1400}),
     "2026-09-24_header.webp": ("patches/7.38.html", None, ["nav.top-nav", ".toolbar"], [], 150, {"width": 1500}),
     "2026-09-24_index.webp": ("index.html", None, [".inv-book"], [], 520, {"width": 1400}),
     "2026-09-24_index_heroes.webp": ("index.html", None, [".inv-book"], ['[data-panel-open="heroes"]'], 520, {"width": 1400}),

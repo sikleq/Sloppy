@@ -53,7 +53,7 @@ _esc = lambda s: _html.escape(str(s), quote=True)
 # Upgrade toggles: reveal/raise radii gated behind a talent / Scepter / Shard.
 # (key, label, icon path). Off by default — gated radii stay hidden until on.
 UPGRADE_FILTERS = [
-    ("talent",  "Talent",            "icons/misc/talents.svg"),
+    ("talent",  "Talent",            "icons/ui/gothic/icon_talents.png"),
     ("scepter", "Aghanim's Scepter", "icons/items/ultimate_scepter.png"),
     ("shard",   "Aghanim's Shard",   "icons/items/aghanims_shard.png"),
 ]

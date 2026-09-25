@@ -1357,7 +1357,7 @@ def _attack_range_html(value: str, attack_type: str) -> str:
     return (
         f'<span class="atk-num">{_esc(value)}</span>'
         f'<span class="atk-badge atk-{attack_type}" title="{tip}">'
-        f'<img src="icons/ui/atk_{attack_type}.png" alt="{tip}" '
+        f'<img src="icons/ui/gothic/atk_{attack_type}.png" alt="{tip}" '
         f'title="{tip}" loading="lazy"></span>'
     )
 
@@ -1559,11 +1559,11 @@ def render_html() -> str:
         '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
         'aria-pressed="false" title="Show melee heroes">'
         '<span class="atk-badge" aria-hidden="true">'
-        '<img src="icons/ui/atk_melee.png" alt=""></span><span>Melee</span></button>'
+        '<img src="icons/ui/gothic/atk_melee.png" alt=""></span><span>Melee</span></button>'
         '<button type="button" class="hs-attack-filter" data-attack-filter="ranged" '
         'aria-pressed="false" title="Show ranged heroes">'
         '<span class="atk-badge" aria-hidden="true">'
-        '<img src="icons/ui/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
+        '<img src="icons/ui/gothic/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
         '</span>'
         + _attr_filter_buttons() +
         '<label class="hs-level-group">'
