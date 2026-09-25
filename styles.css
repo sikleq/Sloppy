@@ -10588,3 +10588,18 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
   color: var(--px-hi);
 }
 .tc-btn[aria-pressed="false"] { background: var(--px-field); border-image-source: var(--px-edge-dim); color: var(--px-text-dim); }
+/* Mana Items: "Per Int" constants block at the right end of the toolbar's first row */
+.toolbar-panel > .mr-int-group { margin-left: auto; }
+.mr-int-group { display: inline-flex; align-items: center; gap: 10px; height: 28px; }
+.mr-int-ico { width: 18px; height: 18px; display: block; }
+.mr-int-group .mr-const {
+  font-family: var(--font-j10); font-size: 18px; font-weight: 400; letter-spacing: 0.3px;
+  color: var(--px-text);
+  text-decoration-color: rgba(227, 196, 106, 0.5);
+}
+.mr-int-group .mr-const:hover { color: var(--px-hi); }
+/* Typed text and placeholders in search / price / level fields: the pixel font too */
+.search-box input, .mr-price-input, .hs-level-group input {
+  font-family: var(--font-j10); font-size: 18px; letter-spacing: 0.4px;
+}
+.search-box input::placeholder, .mr-price-input::placeholder { font-family: var(--font-j10); }

@@ -25,3 +25,12 @@ def test_skin_covers_menus_and_toolbar_controls():
     for sel in (".nav-submenu", ".hd-dd-menu", ".toolbar-panel", ".hs-attack-filter", ".cal-mode-select",
                 ".search-box input", ".ua-switch", ".cat-filter-btn"):
         assert sel in skin, sel
+
+
+def test_mana_items_per_int_block_uses_the_latest_constants():
+    from builders import mana_items as m
+    assert m.INT_TO_MAX_MANA == m._INT_MANA_HIST[-1][3]
+    assert m.INT_TO_REGEN == m._INT_REGEN_HIST[-1][3]
+    html = m._int_group()
+    assert 'class="mr-int-group"' in html and html.count('data-hist="') == 2
+    assert f"+{m._short(m.INT_TO_MAX_MANA)} mana" in html

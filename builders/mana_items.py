@@ -33,8 +33,21 @@ import builders.site_common as _site
 ASSET_VERSION = _site.compute_asset_version()
 
 # ── Engine constants ───────────────────────────────────────────────────────
-INT_TO_MAX_MANA = 12.0   # +12 max mana per Int point
-INT_TO_REGEN    = 0.05   # +0.05 mana regen per Int point
+# Intelligence engine-constant history (hardcoded in the Source 2 engine,
+# not in any of our scraped KV files). Sourced from Liquipedia's curated
+# /Intelligence/Changelogs page. Format: (patch, date, old, new).
+_INT_MANA_HIST = [
+    ("7.07",  "31.10.2017", 13, 14),
+    ("7.20",  "19.11.2018", 14, 12),
+    ("7.36",  "10.05.2024", 12, 11),
+    ("7.39",  "21.05.2025", 11, 12),
+]
+_INT_REGEN_HIST = [
+    ("7.07",  "31.10.2017", 0.04, 0.05),
+]
+# The values in use = the LAST history entry: a new engine change is one new history row.
+INT_TO_MAX_MANA = float(_INT_MANA_HIST[-1][3])   # +12 max mana per Int point
+INT_TO_REGEN    = float(_INT_REGEN_HIST[-1][3])  # +0.05 mana regen per Int point
 
 # ── Source data ────────────────────────────────────────────────────────────
 from patch.meta import latest_stats_version as _lsv
@@ -707,20 +720,6 @@ def _icon_html(slug: str) -> str:
     return '<span class="mr-ico mr-ico-blank"></span>'
 
 
-# Intelligence engine-constant history (hardcoded in the Source 2 engine,
-# not in any of our scraped KV files). Sourced from Liquipedia's curated
-# /Intelligence/Changelogs page. Format: (patch, date, old, new).
-_INT_MANA_HIST = [
-    ("7.07",  "31.10.2017", 13, 14),
-    ("7.20",  "19.11.2018", 14, 12),
-    ("7.36",  "10.05.2024", 12, 11),
-    ("7.39",  "21.05.2025", 11, 12),
-]
-_INT_REGEN_HIST = [
-    ("7.07",  "31.10.2017", 0.04, 0.05),
-]
-
-
 def _int_const_chip(label: str, hist: list[tuple]) -> str:
     """Styled like a Mana Items `has-history` cell: dotted underline + the
     same data-hist payload the stat-hist-tip JS reads. `pol="hi"` because
@@ -733,6 +732,19 @@ def _int_const_chip(label: str, hist: list[tuple]) -> str:
         f'data-name="Per Intelligence" data-hist="{_esc(payload)}">'
         f'{_esc(label)}</span>'
     )
+
+
+def _int_group() -> str:
+    """Toolbar block (right end of the first row): INT icon, "Per Int" label and the two
+    constants as hover-history chips — the Mana Items stat-hist-tip reads their data-hist."""
+    mana = _INT_MANA_HIST[-1][3]
+    regen = _INT_REGEN_HIST[-1][3]
+    return ('<span class="mr-int-group" title="What one point of Intelligence gives">'
+            '<img class="mr-int-ico" src="icons/intelligence.webp" alt="" width="18" height="18">'
+            '<strong>Per Int</strong>'
+            f'{_int_const_chip(f"+{_short(mana)} mana", _INT_MANA_HIST)}'
+            f'{_int_const_chip(f"+{_short(regen)} regen", _INT_REGEN_HIST)}'
+            '</span>')
 
 
 def _full(v: float) -> str:
@@ -959,6 +971,9 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
         'class="ua-switch-input" checked>'
         '<span class="ua-switch" aria-hidden="true"></span>'
         '</label>'
+        # What one point of Intelligence gives (engine constants, not in the KV files). The
+        # value shown is the LAST history entry, so a new change only needs one history row.
+        f'{_int_group()}'
         '<span class="search-box hd-search">'
         '<input type="text" id="mr-search" autocomplete="off" spellcheck="false" '
         'placeholder="Search items — blink, kaya, arcane…">'

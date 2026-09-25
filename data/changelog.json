@@ -4,6 +4,19 @@
     {
       "date": "2026-09-25",
       "category": "Site",
+      "title": "Search, price and level fields use the pixel font for both the hint and what you type",
+      "minor": true
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Materials",
+      "title": "Mana Items: what one point of Intelligence gives (+12 mana, +0.05 regen) sits in the toolbar again, hover for its patch history",
+      "minor": true,
+      "link": "mana_items.html"
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Site",
       "title": "Description paragraphs above the Materials tables are gone: the pages open straight on the controls",
       "minor": true
     },
