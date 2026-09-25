@@ -20,10 +20,14 @@
                badges (0% included; "Recipe … Total cost …" -> total only) divided by the
                type's typical |%| (signal C medians), so a typical change is 1.0. Cap 3.
                Rows without a % badge count as 1.0.
-  items      — priced stat rows ("+0.8 -> +0.6 mana regen", "Total cost 4900g -> 5100g") are
-               scored in GOLD: Δ × gold-per-unit (signal A, data/rules/item_stat_prices.json)
-               / item cost; net = 0.6 × sign × min(5 × fraction, 3). Other item rows (actives,
-               cooldowns) fall back to the hero formula.
+  items      — rows that move GOLD are scored in gold: a priced stat changed / added / removed
+               ("+0.8 -> +0.6 mana regen", property pane "+20 Strength" DEL, "Provides +8
+               Agility"), the total cost (li row or components panel), an active's mana cost
+               (|Δmana| × gold per max mana) and a Damage Block passive (priced like Vanguard's).
+               Prices: every item stat per version (signal A v2, tools/fit_item_prices.py ->
+               data/rules/item_stat_prices.json). net = 0.6 × sign × 5 × gold / item cost
+               (mean of the cost before and after the patch), linear so an item's rows add up to
+               Δ(stat value − cost). Other item rows (actives, cooldowns) use the hero formula.
   context    — multiplier by where the row lives (data/rules/valve_weights.json "context"):
                ultimate 1.3, basic ability/innate/scepter/base stat/item 1.0, shard 0.9,
                facet 0.8, talent 10/15/20/25 = 0.5/0.6/0.7/0.8.
@@ -225,40 +229,98 @@ def _base_stat_magnitude(text):
     return delta / step
 
 
-# ---- items: gold scale (review E.6) ---------------------------------------------------
-_PRICES = _json.load(open(_os.path.join(_HERE, "data", "rules", "item_stat_prices.json"),
-                          encoding="utf-8"))["versions"]
+# ---- items: gold scale (review E.6; every stat priced 2026-09-25) --------------------------
+# Every item stat has a gold price per patch version (signal A v2, tools/fit_item_prices.py ->
+# data/rules/item_stat_prices.json; %-stats per 1 %). An item row that changes a priced stat, the
+# item's cost, a mana cost, or adds / removes a stat or a stat-like passive (Damage Block) is scored
+# by the GOLD it moves: net = 0.6 x 5 x gold / item cost, linear, so the rows of one item add up to
+# Δ(stat value − cost). Rows without a price fall back to the hero formula / NEW-DEL card weight.
+_PRICE_FILE = _json.load(open(_os.path.join(_HERE, "data", "rules", "item_stat_prices.json"),
+                              encoding="utf-8"))
+_PRICES = _PRICE_FILE["versions"]
+_REF_COST = _PRICE_FILE.get("ref_cost", {})
+_BLOCK = _PRICE_FILE.get("damage_block", {})
+_NOT_FOR_SALE = _PRICE_FILE.get("not_for_sale", {})   # {version where the list changes: [slugs]}
 # A priced row names ONLY the stat the item grants ("Agility bonus", "Bonus Damage", "Mana Regen").
 # Rows about an active / aura / debuff ("Glimmer Bonus Movement Speed", "Dominated Creep movement
 # speed", "Arctic Blast damage", "Corrosion armor reduction") are not the item's stat line and fall
 # back to the hero formula — pricing them in gold scored a creep's move speed as the item's.
-_ITEM_STAT_RE = [  # full stat phrase -> priced stat; %-stats listed in _PCT_STATS
-    ("all_stats", r"all stats|all attributes"), ("strength", r"strength"), ("agility", r"agility"),
-    ("intelligence", r"intelligence|int"), ("health_regen", r"health regen(?:eration)?|hp regen"),
-    ("mana_regen", r"mana regen(?:eration)?"), ("lifesteal", r"(?:spell )?lifesteal"),
-    ("spell_amp", r"spell amp(?:lification)?"), ("magic_res", r"magic resist(?:ance)?"),
-    ("evasion", r"evasion"), ("attack_speed", r"attack speed"), ("armor", r"armor"),
-    ("move_speed", r"movement speed|move speed"), ("health", r"(?:max )?health"),
-    ("mana", r"(?:max )?mana"), ("damage", r"(?:attack )?damage"),
+_ITEM_STAT_RE = [  # stat as written in notes / property panes -> priced stat (first full match)
+    ("all_stats", r"all (?:stats|attributes)"),
+    ("primary_attribute", r"primary (?:stat|attribute)"),
+    ("strength", r"strength"), ("agility", r"agility"), ("intelligence", r"intelligence|int"),
+    ("restoration_amp", r"health restoration|restoration amp(?:lification)?"
+                        r"|health (?:regen(?:eration)? )?and lifesteal amp(?:lification)?"),
+    ("mana_regen_amp", r"mana regen(?:eration)? amp(?:lification)?"),
+    ("spell_lifesteal_amp", r"spell lifesteal amp(?:lification)?"),
+    ("max_health_regen_pct", r"max(?:imum)? health regen(?:eration)?"),
+    ("health_regen", r"health regen(?:eration)?|hp regen(?:eration)?"),
+    ("mana_regen", r"mana regen(?:eration)?"),
+    ("spell_lifesteal", r"spell lifesteal"), ("lifesteal", r"lifesteal"),
+    ("spell_amp", r"spell amp(?:lification)?"), ("magic_res", r"magic(?:al)? resist(?:ance)?"),
+    ("status_res", r"status resist(?:ance)?"), ("slow_res", r"slow resist(?:ance)?"),
+    ("evasion", r"evasion"), ("attack_speed_pct", r"base attack speed"),
+    ("attack_speed", r"attack speed"), ("armor", r"armor"), ("cast_range", r"cast range"),
+    ("attack_range", r"(?:melee |ranged )?attack range(?: \([^)]*\)| to (?:melee|ranged) heroes(?: only)?)?"),
+    ("cooldown_reduction", r"cooldown reduction"),
+    ("manacost_reduction", r"mana cost(?:/mana loss)? reduction"),
+    ("aoe_bonus", r"aoe(?: radius)?(?: bonus| increase)?|area of effect(?: bonus)?"),
+    ("cast_speed", r"cast speed"),
+    ("move_speed", r"movement speed|move speed"),
+    ("health", r"(?:max(?:imum)? )?health"), ("mana", r"(?:max(?:imum)? )?mana"),
+    ("damage", r"(?:attack )?damage"),
 ]
 _ITEM_STAT = [(k, _re.compile(r"^\s*(?:bonus\s+)?(?:" + rx + r")(?:\s+bonus)?\s*$", _re.I))
               for k, rx in _ITEM_STAT_RE]
-_PCT_STATS = {"lifesteal", "spell_amp", "magic_res", "evasion"}
+_PCT_STATS = {"lifesteal", "spell_lifesteal", "spell_amp", "magic_res", "evasion", "status_res",
+              "slow_res", "restoration_amp", "mana_regen_amp", "spell_lifesteal_amp",
+              "cooldown_reduction", "manacost_reduction", "cast_speed", "max_health_regen_pct",
+              "attack_speed_pct", "move_speed_pct"}
+# boots' movement speed does not stack and is sold cheaper (Boots of Speed) -> its own price
+_BOOTS = {"boots", "phase_boots", "power_treads", "arcane_boots", "tranquil_boots", "travel_boots",
+          "travel_boots_2", "guardian_greaves", "boots_of_bearing"}
 _STAT_FROMTO_RE = _re.compile(r"from\s+\+?(-?\d+(?:\.\d+)?)(%?)\S*\s+to\s+\+?(-?\d+(?:\.\d+)?)(%?)", _re.I)
 _TOTAL_COST_RE = _re.compile(r"total cost[^.]*?from\s+(\d+)[\d/]*g?\s+to\s+(\d+)", _re.I)
 _TOTAL_SAME_RE = _re.compile(r"total cost (?:is )?unchanged", _re.I)
 _COST_HEAD_RE = _re.compile(r"^\s*(?:recipe\s+)?cost\s*$", _re.I)
 _COST_FROMTO_RE = _re.compile(r"from\s+(\d+)g?\s+to\s+(\d+)", _re.I)
+_AMOUNT_RE = _re.compile(r"^\s*\+?(-?\d+(?:\.\d+)?)(%?)\s+(.+?)\s*$")
+_PROVIDES_RE = _re.compile(r"^\s*(?:(now (?:also )?provides?|provides?)|(no longer provides))\s+(.+?)"
+                           r"(?:\s+instead of\s+(.+?))?\s*\.?\s*$", _re.I)
+_AURA_PROVIDES_RE = _re.compile(r"^\s*[A-Z][\w' ]*?\s+(?:(now (?:also )?provides)|(no longer provides))"
+                                r"\s+(.+?)\s*\.?\s*$", _re.I)
+_MANA_COST_RE = _re.compile(r"mana ?cost(?!\s*(?:/|reduction))", _re.I)
+_NOW_HAS_MANA_RE = _re.compile(r"now has an? (\d+) mana ?cost|now costs (\d+) mana", _re.I)
+_BLOCK_RE = _re.compile(r"damage block", _re.I)
+_BLOCK_NUM_RE = _re.compile(r"(\d+(?:\.\d+)?)% chance to block (\d+(?:\.\d+)?)(?: damage)?"
+                            r"(?:[^.]*?(?:and|or) (\d+(?:\.\d+)?)(?: damage)? (?:on|for|from|against) ranged)?",
+                            _re.I)
 ITEM_GOLD_K = 5.0        # 20% of the item's value = 1.0
 ITEM_GOLD_W = 0.6        # neutral weight so item rows sit on the hero scale (median type weight)
+ITEM_ROW_CAP = 5.0       # one row at most "the whole item" (net 3.0); rows stay additive below it
 _COST_CACHE = {}
+
+
+_ORDER = []
+
+
+def _versions_newest_first():
+    if not _ORDER:
+        from .meta import RELEASE_HISTORY
+        _ORDER.extend(r["version"] for r in RELEASE_HISTORY)
+    return _ORDER
+
+
+def _prev_version(version):
+    order = _versions_newest_first()
+    i = order.index(version) if version in order else -1
+    return order[i + 1] if 0 <= i < len(order) - 1 else None
 
 
 def _item_cost(slug, version):
     """ItemCost from data/stats/<version>/items.json (or the nearest earlier snapshot)."""
-    from .meta import RELEASE_HISTORY
     if version not in _COST_CACHE:
-        order = [r["version"] for r in RELEASE_HISTORY]        # newest first
+        order = _versions_newest_first()
         start = order.index(version) if version in order else 0
         table = {}
         for v in order[start:]:
@@ -271,9 +333,30 @@ def _item_cost(slug, version):
     return rec.get("ItemCost") or 0
 
 
+def _for_sale(slug, version):
+    """False for items with an ItemCost the shop does not sell (Roshan drops, neutral items)."""
+    order = _versions_newest_first()
+    start = order.index(version) if version in order else 0
+    v = next((x for x in order[start:] if x in _NOT_FOR_SALE), None)
+    return v is None or slug not in _NOT_FOR_SALE[v]
+
+
+def _item_base_cost(slug, version):
+    """Denominator of an item row: the mean of the item's cost before and after the patch (the
+    rework of Heaven's Halberd 7.38 moved it 3500 -> 2600; its rows are measured against 3050).
+    0 for items the shop does not sell."""
+    if not _for_sale(slug, version):
+        return 0
+    new = _item_cost(slug, version)
+    prev = _prev_version(version)
+    old = _item_cost(slug, prev) if prev else 0
+    if new and old:
+        return (new + old) / 2.0
+    return new or old
+
+
 def _price(stat, version):
-    from .meta import RELEASE_HISTORY
-    order = [r["version"] for r in RELEASE_HISTORY]
+    order = _versions_newest_first()
     start = order.index(version) if version in order else 0
     for v in order[start:]:
         if v in _PRICES and stat in _PRICES[v]:
@@ -281,44 +364,188 @@ def _price(stat, version):
     return None
 
 
-def _item_gold_fraction(text, ctx):
-    """Δ of an item row in gold / item cost, or None when the row is not a priced stat / cost.
-    Cost rows: "Total cost unchanged" -> 0 (only the build path moved); "Total cost A -> B" -> B-A;
-    a basic item's "Cost A -> B" and a lone "Recipe cost A -> B" -> B-A (the total moves with the
-    recipe unless the note says otherwise). The KV snapshots are NOT used for the delta: some
+def _stat_key(name, is_pct, item):
+    """Stat phrase of a patch note -> priced stat key, or None (unit must match: "+22% movement
+    speed" is Yasha's %-speed, "+20 movement speed" Wind Lace's flat speed)."""
+    stat = next((k for k, rx in _ITEM_STAT if rx.match(name)), None)
+    if stat == "move_speed":
+        stat = "move_speed_pct" if is_pct else ("boots_move_speed" if item in _BOOTS else "move_speed")
+    if stat is None or (stat in _PCT_STATS) != bool(is_pct):
+        return None
+    return stat
+
+
+def _stat_gold(stat, amount, version):
+    p = _price(stat, version) if stat else None
+    return None if p is None else amount * p
+
+
+def _amount_list_gold(frag, item, version):
+    """"+12 Health Regen, +6 Mana Regen, or +20 Damage" -> total gold, or None when any part is
+    not a priced stat (no partial pricing)."""
+    frag = frag.strip()
+    whole = _AMOUNT_RE.match(frag)                 # "+25% Health and Lifesteal Amp" is ONE stat
+    if whole:
+        g = _stat_gold(_stat_key(whole.group(3), whole.group(2), item), abs(float(whole.group(1))), version)
+        if g is not None:
+            return g
+    parts = [p for p in _re.split(r"\s*,\s*(?:or\s+|and\s+)?|\s+(?:and|or)\s+", frag) if p]
+    if len(parts) < 2:
+        return None
+    total = 0.0
+    for p in parts:
+        m = _AMOUNT_RE.match(p)
+        if not m:
+            return None
+        g = _stat_gold(_stat_key(m.group(3), m.group(2), item), abs(float(m.group(1))), version)
+        if g is None:
+            return None
+        total += g
+    return total
+
+
+def _last_changed_delta(a, b):
+    """Numbers of "A -> B" (per-level lists allowed): |Δ| at the last level that changed."""
+    na = [float(x) for x in _NUM_RE.findall(a)]
+    nb = [float(x) for x in _NUM_RE.findall(b)]
+    if not na or not nb:
+        return None
+    n = max(len(na), len(nb))
+    na, nb = (na + na[-1:] * n)[:n], (nb + nb[-1:] * n)[:n]
+    return next(((y - x) for x, y in zip(reversed(na), reversed(nb)) if x != y), 0.0)
+
+
+def _mana_cost_gold(t, version):
+    """Mana cost of an item active, in gold: the mana saved per cast is worth the same amount of
+    max mana (you need it in the pool when you press the button). Signed: cheaper = +."""
+    if not _MANA_COST_RE.search(t):
+        return None
+    price = _price("mana", version)
+    if price is None:
+        return None
+    m = _NOW_HAS_MANA_RE.search(t)
+    if m:
+        return -float(m.group(1) or m.group(2)) * price
+    m = _ABS_FROMTO_RE.search(t)
+    if not m:
+        return None
+    d = _last_changed_delta(m.group(1), m.group(2))
+    return None if d is None else -d * price
+
+
+def _block_gold(t, tags, ctx):
+    """A gained / lost Damage Block passive, priced like the block of Vanguard / Crimson Guard:
+    chance x mean(melee, ranged block) x gold per blocked damage. Numbers from the row, else from
+    the KV (previous version for a removed block)."""
+    if not _BLOCK_RE.search(t) or not ({"new", "del"} & set(tags)):
+        return None
+    m = _BLOCK_NUM_RE.search(t)
+    if m:
+        melee = float(m.group(2))
+        ranged = float(m.group(3)) if m.group(3) else melee
+        value = float(m.group(1)) / 100.0 * (melee + ranged) / 2.0
+    else:
+        ver = ctx.get("version")
+        if "del" in tags:
+            ver = _prev_version(ver) or ver
+        value = _BLOCK.get(ver, {}).get(ctx.get("item") or "")
+        if not value:
+            return None
+    g = _stat_gold("damage_block", value, ctx.get("version"))
+    if g is None:
+        return None
+    return -g if "del" in tags else g
+
+
+def _stat_row_gold(t, tags, ctx):
+    """Priced stat rows -> signed gold (more stat = +). None when not a priced stat line."""
+    item, ver = ctx.get("item"), ctx.get("version")
+    vm = _VERB_RE.search(t)
+    m = _STAT_FROMTO_RE.search(t)
+    if m and vm and vm.start() > 0:               # "<Stat> bonus <verb> from A to B"
+        is_pct = bool(m.group(2) or m.group(4))
+        stat = _stat_key(t[:vm.start()], is_pct, item)
+        g = _stat_gold(stat, float(m.group(3)) - float(m.group(1)), ver)
+        if g is not None:
+            return g
+    m = _PROVIDES_RE.match(t)
+    instead = m.group(4) if m else None
+    if not m and tags & {"new", "del"}:           # "Swiftness Aura now also provides +2.5 Health Regen"
+        m = _AURA_PROVIDES_RE.match(t)
+    if m:
+        gained = _amount_list_gold(m.group(3), item, ver)
+        if gained is None:
+            return None
+        if m.group(2):                            # no longer provides
+            return -gained
+        if instead:                               # "Now provides X instead of Y"
+            lost = _amount_list_gold(instead, item, ver)
+            return None if lost is None else gained - lost
+        if tags & {"new", "del"}:
+            return gained
+        return None                               # a rework "Provides X" without the old side
+    if tags & {"new", "del"}:                     # property pane side: "+20 Strength"
+        g = _amount_list_gold(t, item, ver)
+        if g is not None:
+            return -g if "del" in tags else g
+    return None
+
+
+def _item_gold(text, tags, ctx):
+    """Gold an item row moves, signed (+ = better for the holder), and the item cost it is measured
+    against: (gold, cost) or None when the row has no price. Cost rows: "Total cost unchanged"
+    (in the row or its inline note) = 0; "Total cost A -> B", a basic item's "Cost A -> B" and a
+    lone "Recipe cost A -> B" are gold deltas. The KV snapshots are NOT used for the delta: some
     (7.39c, 7.41 items.json) are pre-patch copies."""
-    t = _plain(text)
-    cost = _item_cost(ctx.get("item"), ctx.get("version"))
+    t = _plain(text).strip()
+    ver = ctx.get("version")
+    slug = ctx.get("item")
+    cost = _item_base_cost(slug, ver)
+    tags = set(tags or ())
+    if _MANA_COST_RE.search(t):
+        g = _mana_cost_gold(t, ver)
+        ref = cost or _REF_COST.get(ver) or next(
+            (_REF_COST[v] for v in _versions_newest_first() if _REF_COST.get(v)), None)
+        return None if (g is None or not ref) else (g, ref)
     if not cost:
         return None
     if _TOTAL_SAME_RE.search(t):
-        return 0.0
+        return 0.0, cost
     m = _TOTAL_COST_RE.search(t)
     if m:
-        return abs(float(m.group(2)) - float(m.group(1))) / cost
+        return float(m.group(1)) - float(m.group(2)), cost
     head = t
     vm = _VERB_RE.search(t)
     if vm and vm.start() > 0:
         head = t[:vm.start()]
     if _COST_HEAD_RE.match(head):
         m = _COST_FROMTO_RE.search(t)
-        if not m:
-            return None
-        return abs(float(m.group(2)) - float(m.group(1))) / cost
-    stat = next((k for k, rx in _ITEM_STAT if rx.match(head)), None)
-    if not stat:
+        return None if not m else (float(m.group(1)) - float(m.group(2)), cost)
+    g = _block_gold(t, tags, ctx)
+    if g is None:
+        g = _stat_row_gold(t, tags, ctx)
+    return None if g is None else (g, cost)
+
+
+def _item_gold_fraction(text, ctx, tags=("buff",)):
+    """|gold| / item cost of an item row, or None when the row is not priced (back-compat API)."""
+    r = _item_gold(text, tags, ctx)
+    return None if r is None else abs(r[0]) / r[1]
+
+
+def _item_row_scores(text, tags, ctx):
+    """(net, volume) of a priced item row, or None. buff/nerf keep the page's direction; NEW/DEL
+    and "X instead of Y" reworks take the sign of the gold."""
+    r = _item_gold(text, tags, ctx)
+    if r is None:
         return None
-    m = _STAT_FROMTO_RE.search(t)
-    if not m:
-        return None
-    is_pct = bool(m.group(2) or m.group(4))
-    if is_pct != (stat in _PCT_STATS):
-        return None                         # e.g. "bonus movement speed 22% -> 20%": not a flat stat
-    price_key = "agility" if stat == "intelligence" else stat
-    price = _price(price_key, ctx.get("version"))
-    if price is None:
-        return None
-    return abs(float(m.group(3)) - float(m.group(1))) * price / cost
+    gold, cost = r
+    mag = min(ITEM_GOLD_K * abs(gold) / cost, ITEM_ROW_CAP)
+    if "buff" in tags or "nerf" in tags:
+        d = _DIR["buff"] if "buff" in tags else _DIR["nerf"]
+    else:
+        d = 1.0 if gold > 0 else (-1.0 if gold < 0 else 0.0)
+    return round(ITEM_GOLD_W * d * mag, 3), round(ITEM_GOLD_W * mag, 3)
 
 
 _J = _WJ.get("J", {}).get("u", {})       # signal J: value of +1% of the type (exchange rate)
@@ -417,20 +644,24 @@ def row_scores(text, tags, badge_html="", ctx=None):
     kind = classify(text)
     cm = context_multiplier(ctx)
     w = weight_of(kind) * cm
+    item_row = None
+    if ctx and ctx.get("kind") == "item" and (tags & {"buff", "nerf", "rework"} or tags in ({"new"}, {"del"})):
+        item_row = _item_row_scores(text, tags, ctx)       # gold: priced stat / cost / mana cost / block
     if "buff" in tags or "nerf" in tags:
+        if item_row is not None:
+            return item_row
         d = _DIR["buff"] if "buff" in tags else _DIR["nerf"]
-        if ctx and ctx.get("kind") == "item":
-            frac = _item_gold_fraction(text, ctx)
-            if frac is not None:
-                mag = min(ITEM_GOLD_K * frac, MAG_CAP_NORM)
-                return round(ITEM_GOLD_W * d * mag, 3), round(ITEM_GOLD_W * mag, 3)
         val = _row_value(text, badge_html, kind, ctx) * cm
         return round(d * val, 3), round(val, 3)
     if "rework" in tags:
+        if item_row is not None and item_row[0]:           # "Now provides X instead of Y"
+            return item_row[0], round(max(w, item_row[1]), 3)
         net = _talent_tier_net(ctx, cm)             # signal K: talent replacement / level move
         if net is not None:
             return round(net, 3), round(max(w, abs(net)), 3)
         return 0.0, round(w, 3)
+    if item_row is not None:                                # a stat / Damage Block gained or lost
+        return item_row
     if tags == {"new"}:
         return round(w * 0.5, 3), round(w, 3)
     if tags == {"del"}:

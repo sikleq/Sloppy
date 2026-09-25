@@ -327,6 +327,7 @@ def _mech_tag(label):
 
 
 def _open_block(extra_cls='', extra_attrs=''):
+    _flush_cost_panel()                                   # the previous item's components panel
     pre = _close_ability_block()
     _State.new_mech_header = _State.new_mech = False     # a new block ends any "new mechanic" run
     cls = 'entity-block' + ((' ' + extra_cls) if extra_cls else '')
@@ -353,6 +354,7 @@ def _open_block(extra_cls='', extra_attrs=''):
 
 
 def _close_block():
+    _flush_cost_panel()
     out = _close_ability_block()
     if _State.block_open:
         _State.block_open = False
@@ -993,6 +995,57 @@ def _dyn_record_card(tags, text="", badge="", **ctx_over):
     _dyn_record_li(tags, scores=_row_scores(text, tags, badge, ctx=ctx))
 
 
+_COST_STATED_RE = re.compile(r'total cost|^\s*(?:recipe\s+)?cost\b', re.I)
+
+
+def _note_cost_panel(total_old, total_new):
+    """An item's components panel (components_change / auto_components_change) changes its total
+    cost. It is scored once, as a "Total cost A -> B" row, when the item block ends — unless an
+    li() row of the block states the cost itself ("Total cost A -> B", "Total cost unchanged",
+    a basic item's "Cost A -> B"), which then wins (no double count). Not tallied as a tag."""
+    _flush_cost_panel()
+    ek = _State.current_entity_key or ""
+    if not ek.startswith("item|") or _State.dyn_skip_li or not _State.current_patch_version:
+        return
+    try:
+        old, new = float(total_old), float(total_new)
+    except (TypeError, ValueError):
+        return                                   # "2800/3950/..." (Dagon levels): no single total
+    if old != new:
+        _State.pending_cost_panel = {"ek": ek, "pv": _State.current_patch_version,
+                                     "old": old, "new": new, "ctx": _row_ctx("")}
+
+
+def _cost_panel_covered(score_text):
+    pend = _State.pending_cost_panel
+    if pend and pend["ek"] == _State.current_entity_key \
+            and _COST_STATED_RE.search(re.sub(r'<[^>]+>', ' ', score_text or '')):
+        _State.pending_cost_panel = None
+
+
+def _flush_cost_panel():
+    pend, _State.pending_cost_panel = _State.pending_cost_panel, None
+    if not pend:
+        return
+    verb = "decreased" if pend["new"] < pend["old"] else "increased"
+    text = f"Total cost {verb} from {pend['old']:g} to {pend['new']:g} (components panel)"
+    tags = {"buff"} if pend["new"] < pend["old"] else {"nerf"}
+    cur = _State.current_entity_key
+    _State.current_entity_key = pend["ek"]       # the next header already moved on; score as the item
+    try:
+        net, vol = _row_scores(text, tags, "", ctx=pend["ctx"])
+    finally:
+        _State.current_entity_key = cur
+    rec = _State.dynamics.get(pend["ek"])
+    if rec is None or not (net or vol):
+        return
+    bucket = rec["patches"].setdefault(pend["pv"], {})
+    if net:
+        bucket["w"] = round(bucket.get("w", 0.0) + net, 3)
+    if vol:
+        bucket["v"] = round(bucket.get("v", 0.0) + vol, 3)
+
+
 _TOTAL_UNCHANGED_RE = re.compile(r'total cost (?:is )?unchanged', re.I)
 _PROP_VALUE_RE = re.compile(r'^\s*([+\-]?\d[\d./]*%?)\s+(.+?)\s*$')
 
@@ -1029,6 +1082,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     if isinstance(extra, str) and _TOTAL_UNCHANGED_RE.search(extra):
         # "Recipe cost 1350 -> 1250" + note "Total cost unchanged": the buyer pays the same
         _score_text += ". " + re.sub(r'<[^>]+>', ' ', extra)
+    _cost_panel_covered(_score_text)
     _dyn_record_li(dyn_tags, extra_keys=also_dyn,
                    scores=_row_scores(_score_text, dyn_tags, badge,
                                       ctx=_row_ctx(text if isinstance(text, str) else "")))
@@ -1556,6 +1610,7 @@ def components_change(old, new, total_old, total_new,
                       added=None, removed=None):
     marks_old = {name: 'removed' for name in (removed or [])}
     marks_new = {name: 'added' for name in (added or [])}
+    _note_cost_panel(total_old, total_new)
     return (f'<div class="components-change">'
             f'<div class="components-box components-pane">'
             f'{_components_side(old, recipe_old, total_old, marks_old)}'

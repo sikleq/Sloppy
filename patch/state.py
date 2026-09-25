@@ -35,6 +35,8 @@ class _State:
                                      # whole entity is conceptually a single NEW
                                      # tally; per-li tags inside are stat/property
                                      # rows that shouldn't inflate the dynamics.
+    pending_cost_panel = None        # an item's components panel total A -> B, scored at the end
+                                     # of the block unless an li() row states the cost itself
 
 
 state = _State()
