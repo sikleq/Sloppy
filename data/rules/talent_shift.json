@@ -15339,87 +15339,87 @@
    "share_new": 0.177,
    "delta": -0.005,
    "n_before": 395,
-   "n_after": 632
+   "n_after": 637
   },
   "7.41c|puck|25": {
    "old": "special_bonus_unique_puck_5",
    "new": "special_bonus_unique_puck",
    "sibling": "special_bonus_unique_puck_rift_radius",
    "share_old": 0.713,
-   "share_new": 0.252,
-   "delta": -0.461,
+   "share_new": 0.251,
+   "delta": -0.462,
    "n_before": 122,
-   "n_after": 286
+   "n_after": 287
   },
   "7.41c|tiny|10": {
    "old": "special_bonus_strength_8",
    "new": "special_bonus_unique_tiny_6",
    "sibling": "special_bonus_unique_tiny_4",
    "share_old": 0.657,
-   "share_new": 0.732,
-   "delta": 0.075,
+   "share_new": 0.73,
+   "delta": 0.073,
    "n_before": 635,
-   "n_after": 987
+   "n_after": 1010
   },
   "7.41c|tiny|15": {
    "old": "special_bonus_unique_tiny_6",
    "new": "special_bonus_strength_10",
    "sibling": "special_bonus_unique_tiny",
    "share_old": 0.711,
-   "share_new": 0.739,
-   "delta": 0.028,
+   "share_new": 0.737,
+   "delta": 0.026,
    "n_before": 570,
-   "n_after": 877
+   "n_after": 900
   },
   "7.41c|largo|20": {
    "old": "special_bonus_unique_largo_5",
    "new": "special_bonus_unique_largo_8",
    "sibling": "special_bonus_unique_largo_6",
    "share_old": 0.143,
-   "share_new": 0.694,
-   "delta": 0.551,
+   "share_new": 0.701,
+   "delta": 0.558,
    "n_before": 84,
-   "n_after": 317
+   "n_after": 331
   },
   "7.41c|largo|25": {
    "old": "special_bonus_unique_largo_8",
    "new": "special_bonus_unique_largo_5",
    "sibling": "special_bonus_unique_largo_7",
    "share_old": 0.091,
-   "share_new": 0.203,
-   "delta": 0.112,
+   "share_new": 0.204,
+   "delta": 0.113,
    "n_before": 33,
-   "n_after": 138
+   "n_after": 142
   },
   "7.41d|winter_wyvern|10": {
    "old": "special_bonus_attack_damage_35",
    "new": "special_bonus_attack_damage_30",
    "sibling": "special_bonus_unique_winter_wyvern_5",
    "share_old": 0.335,
-   "share_new": 0.57,
-   "delta": 0.235,
+   "share_new": 0.585,
+   "delta": 0.25,
    "n_before": 364,
-   "n_after": 356
+   "n_after": 386
   },
   "7.41d|kez|10": {
    "old": "special_bonus_magic_resistance_12",
    "new": "special_bonus_unique_kez_switch_weapons_swap_bonus",
    "sibling": "special_bonus_unique_kez_raptor_dance_radius",
    "share_old": 0.494,
-   "share_new": 0.528,
+   "share_new": 0.527,
    "delta": 0.034,
    "n_before": 573,
-   "n_after": 309
+   "n_after": 328
   },
   "7.41e|snapfire|15": {
    "old": "special_bonus_unique_snapfire_3",
    "new": "special_bonus_cast_range_125",
    "sibling": "special_bonus_unique_snapfire_2",
    "share_old": 0.777,
-   "share_new": 0.664,
-   "delta": -0.113,
+   "share_new": 0.646,
+   "delta": -0.131,
    "n_before": 919,
-   "n_after": 110
+   "n_after": 113
   }
  }
 }

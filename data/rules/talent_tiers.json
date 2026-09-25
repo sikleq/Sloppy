@@ -7803,14 +7803,14 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_jakiro_6",
+     "slug": "special_bonus_unique_jakiro_2",
      "from": 15,
      "to": 25,
      "type": "damage",
      "steps": -2
     },
     {
-     "slug": "special_bonus_unique_jakiro_2",
+     "slug": "special_bonus_unique_jakiro_6",
      "from": 15,
      "to": 25,
      "type": "damage",
@@ -9423,17 +9423,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_silencer_6",
-     "from": 20,
-     "to": 15,
-     "type": "slow",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_attack_range_100",
      "from": 20,
      "to": 15,
      "type": "range",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_silencer_6",
+     "from": 20,
+     "to": 15,
+     "type": "slow",
      "steps": 1
     }
    ]
@@ -13691,17 +13691,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_spirit_breaker_shield",
-     "from": 25,
-     "to": 20,
-     "type": "damage",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_spirit_breaker_1",
      "from": 25,
      "to": 20,
      "type": "cooldown",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_spirit_breaker_shield",
+     "from": 25,
+     "to": 20,
+     "type": "damage",
      "steps": 1
     }
    ]
@@ -16832,17 +16832,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_jakiro_6",
-     "from": 15,
-     "to": 10,
-     "type": "damage",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_jakiro_4",
      "from": 15,
      "to": 10,
      "type": "slow",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_jakiro_6",
+     "from": 15,
+     "to": 10,
+     "type": "damage",
      "steps": 1
     }
    ]
@@ -18901,15 +18901,15 @@
    "share_delta": -0.005,
    "n": [
     395,
-    632
+    637
    ]
   },
   "7.41c|puck|25": {
    "changed": 1,
-   "share_delta": -0.461,
+   "share_delta": -0.462,
    "n": [
     122,
-    286
+    287
    ],
    "moves": [
     {
@@ -18923,26 +18923,26 @@
   },
   "7.41c|tiny|10": {
    "changed": 1,
-   "share_delta": 0.075,
+   "share_delta": 0.073,
    "n": [
     635,
-    987
+    1010
    ]
   },
   "7.41c|tiny|15": {
    "changed": 1,
-   "share_delta": 0.028,
+   "share_delta": 0.026,
    "n": [
     570,
-    877
+    900
    ]
   },
   "7.41c|largo|20": {
    "changed": 1,
-   "share_delta": 0.551,
+   "share_delta": 0.558,
    "n": [
     84,
-    317
+    331
    ],
    "moves": [
     {
@@ -18956,18 +18956,18 @@
   },
   "7.41c|largo|25": {
    "changed": 1,
-   "share_delta": 0.112,
+   "share_delta": 0.113,
    "n": [
     33,
-    138
+    142
    ]
   },
   "7.41d|winter_wyvern|10": {
    "changed": 1,
-   "share_delta": 0.235,
+   "share_delta": 0.25,
    "n": [
     364,
-    356
+    386
    ]
   },
   "7.41d|kez|10": {
@@ -18975,16 +18975,31 @@
    "share_delta": 0.034,
    "n": [
     573,
-    309
+    328
    ]
   },
   "7.41e|snapfire|15": {
    "changed": 1,
-   "share_delta": -0.113,
+   "share_delta": -0.131,
    "n": [
     919,
-    110
+    113
    ]
+  },
+  "7.41f|bounty_hunter|20": {
+   "changed": 1
+  },
+  "7.41f|bounty_hunter|25": {
+   "changed": 1
+  },
+  "7.41f|earth_spirit|20": {
+   "changed": 1
+  },
+  "7.41f|earth_spirit|25": {
+   "changed": 1
+  },
+  "7.41f|life_stealer|10": {
+   "changed": 1
   }
  }
 }
