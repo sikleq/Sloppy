@@ -61,28 +61,29 @@ def ranged():
 
 
 def talents():
-    """Talent tree: trunk with two branches and a crown, each ending in a gold node."""
-    s = Sprite(13, 13)
+    """The game's talent emblem: a pale ring around a stem with paired leaves, on a dark disc.
+    Pale bone on dark (like the game's white icon) so it still reads on the gold 'on' button —
+    the old all-gold tree vanished into it."""
+    s = Sprite(15, 15)
+    s.layer("disc")
+    s.use(layer="disc")
+    s.circle(7, 7, 7, "#1a120b", fill=True)               # dark medallion
+    s.circle(7, 7, 7, P0)                                 # ring, shaded
+    s.circle(7, 7, 7, P1, only=P0)
+    for x in range(15):                                   # lower-right half of the RING in shadow
+        for y in range(15):
+            if s.get(x, y) is not None and s.get(x, y)[:3] == s.get(7, 0)[:3] and (x - 7) + (y - 7) >= 3:
+                s.px(x, y, P0)
+    s.outline(O)
     s.layer("tree")
     s.use(layer="tree")
-    for y in range(4, 11):                               # trunk
-        s.px(6, y, G3)
-    s.px(5, 11, G2)
-    s.px(6, 11, G2)
-    s.px(7, 11, G1)
-    for i in range(3):                                   # branches
-        s.px(5 - i, 8 - i, G4)
-        s.px(7 + i, 8 - i, G2)
-    s.outline(O)
-    s.layer("nodes")
-    s.use(layer="nodes")
-    for cx, cy in ((2, 4), (10, 4), (6, 2)):             # 3x3 diamonds, lit top-left
-        s.px(cx, cy - 1, G7)
-        s.px(cx - 1, cy, G7)
-        s.px(cx, cy, G6)
-        s.px(cx + 1, cy, G4)
-        s.px(cx, cy + 1, G3)
-    s.outline(O)
+    for y in range(3, 13):                                # stem
+        s.px(7, y, P1)
+    for y in (4, 7, 10):                                  # three pairs of leaves, reaching up-out
+        s.px(6, y, P1); s.px(5, y - 1, P1)
+        s.px(8, y, P0); s.px(9, y - 1, P0)
+    s.px(4, 5, P1); s.px(10, 5, P0)                       # middle pair is the widest
+    s.px(4, 8, P1); s.px(10, 8, P0)
     return s
 
 

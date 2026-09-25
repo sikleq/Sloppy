@@ -10603,3 +10603,21 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
   font-family: var(--font-j10); font-size: 18px; letter-spacing: 0.4px;
 }
 .search-box input::placeholder, .mr-price-input::placeholder { font-family: var(--font-j10); }
+/* Hero Lab "Difference" stat picker: the 28 stats as a 4-column table (rows read left to right:
+   HP MP regen… / attributes + armor / resists…), "All" across the top, thin gold lines between the
+   cells (the 1px grid gap shows the menu's OPAQUE line colour) — fits without scrolling, and any
+   number of stats still lays out (row-major flow). */
+.hd-dd-menu[data-dd="diffstat"] {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 1px;
+  padding: 0;
+  max-height: none;
+  overflow: visible;
+  background-color: #2e2619;
+}
+.hd-dd-menu[data-dd="diffstat"][hidden] { display: none; }
+.hd-dd-menu[data-dd="diffstat"] > .hd-dd-all { grid-column: 1 / -1; }
+.hd-dd-menu[data-dd="diffstat"] > .hd-dd-sep { display: none; }
+.hd-dd-menu[data-dd="diffstat"] > .hd-dd-opt { background: var(--px-menu); padding: 5px 10px; }
+.hd-dd-menu[data-dd="diffstat"] > .hd-dd-opt:hover { background: #1f1a15; }

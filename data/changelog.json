@@ -3,6 +3,20 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Materials",
+      "title": "Talent icon redrawn like the game's emblem: a pale ring with a sprig on a dark disc, readable when the button is on",
+      "minor": true,
+      "link": "aoe_increase.html"
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Hero Lab",
+      "title": "Hero Lab: the Difference stat list opens as a 4-column table — no scrolling",
+      "minor": true,
+      "link": "hero_lab.html"
+    },
+    {
+      "date": "2026-09-25",
       "category": "Site",
       "title": "Warm colours",
       "items": [
