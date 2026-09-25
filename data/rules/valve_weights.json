@@ -174,157 +174,159 @@
  },
  "magnitude_cap": 3.0,
  "J": {
-  "_doc": "Signal J — exchange rate: log u_X - log u_Y = log(nerf%) - log(buff%) over Valve's buff<->nerf compensation pairs (cde_dynamics.json, 3 865 pairs, types with >=30 sides), ridge-free least squares, anchor mean log u = 0; ci = 95% bootstrap. u = value of +1% of the type. Used for % rows: value = u * mean|%| / 20.",
-  "pairs": 3865,
+  "_doc": "Signal J - exchange rate: log u_X - log u_Y = log(nerf%) - log(buff%) over Valve's buff<->nerf compensation pairs inside one (hero, patch) (events.json of the research folder, types with >= 30 sides), least squares, anchor mean log u = 0; ci = 95% bootstrap. Hero BASE-STAT events are typed separately (base_u, reference only: the site sizes base-stat rows by Valve's typical step), so u is the value of +1% of an ability/talent/item parameter. Used for % rows: value = u * mean|%| / 20. Refit: python tools/fit_signal_j.py",
+  "pairs": 3728,
   "u": {
-   "armor": 0.818,
-   "attack_speed": 1.473,
-   "base_damage": 2.795,
-   "cast_point": 0.458,
-   "cast_range": 1.159,
-   "charges": 0.759,
-   "cooldown": 1.186,
-   "crit": 1.311,
-   "damage": 1.063,
-   "duration": 1.135,
-   "gold_xp": 0.839,
-   "health": 0.637,
-   "lifesteal": 0.692,
-   "magic_res": 0.475,
-   "mana": 0.729,
-   "mana_cost": 1.418,
-   "move_speed": 2.109,
-   "projectile": 0.928,
-   "range": 1.247,
-   "silence": 1.185,
-   "slow": 0.777,
-   "stats": 1.212,
-   "stun": 0.965,
-   "vision": 0.823
+   "armor": 0.845,
+   "attack_speed": 1.288,
+   "base_damage": 1.228,
+   "cast_point": 0.387,
+   "cast_range": 1.094,
+   "charges": 0.748,
+   "cooldown": 1.17,
+   "crit": 1.657,
+   "damage": 1.017,
+   "duration": 1.121,
+   "gold_xp": 0.687,
+   "health": 0.866,
+   "lifesteal": 0.669,
+   "magic_res": 0.53,
+   "mana": 0.733,
+   "mana_cost": 1.352,
+   "move_speed": 1.123,
+   "projectile": 0.873,
+   "range": 1.225,
+   "silence": 1.02,
+   "slow": 0.78,
+   "stats": 0.723,
+   "stun": 0.969
   },
   "ci": {
    "armor": [
-    0.67,
-    1.01
+    0.68,
+    1.06
    ],
    "attack_speed": [
-    1.24,
-    1.7
+    1.03,
+    1.57
    ],
    "base_damage": [
-    2.3,
-    3.31
+    1.01,
+    1.53
    ],
    "cast_point": [
-    0.4,
-    0.53
+    0.33,
+    0.45
    ],
    "cast_range": [
-    1.01,
-    1.36
+    0.91,
+    1.27
    ],
    "charges": [
-    0.62,
-    0.93
+    0.63,
+    0.91
    ],
    "cooldown": [
-    1.07,
-    1.3
+    1.06,
+    1.28
    ],
    "crit": [
-    0.98,
-    1.7
+    1.12,
+    2.23
    ],
    "damage": [
-    0.98,
-    1.16
-   ],
-   "duration": [
-    1.01,
-    1.28
-   ],
-   "gold_xp": [
-    0.58,
-    1.28
-   ],
-   "health": [
-    0.55,
-    0.73
-   ],
-   "lifesteal": [
-    0.48,
-    1.04
-   ],
-   "magic_res": [
-    0.31,
-    0.7
-   ],
-   "mana": [
-    0.51,
+    0.94,
     1.11
    ],
+   "duration": [
+    1.0,
+    1.25
+   ],
+   "gold_xp": [
+    0.46,
+    1.01
+   ],
+   "health": [
+    0.75,
+    0.98
+   ],
+   "lifesteal": [
+    0.5,
+    0.99
+   ],
+   "magic_res": [
+    0.35,
+    0.8
+   ],
+   "mana": [
+    0.45,
+    1.15
+   ],
    "mana_cost": [
-    1.26,
-    1.61
+    1.21,
+    1.52
    ],
    "move_speed": [
-    1.77,
-    2.43
+    0.96,
+    1.32
    ],
    "projectile": [
-    0.73,
-    1.14
+    0.69,
+    1.06
    ],
    "range": [
-    1.1,
-    1.4
+    1.09,
+    1.36
    ],
    "silence": [
-    0.84,
-    1.57
+    0.69,
+    1.56
    ],
    "slow": [
     0.66,
-    0.91
+    0.94
    ],
    "stats": [
-    1.08,
-    1.36
+    0.59,
+    0.93
    ],
    "stun": [
-    0.82,
-    1.13
-   ],
-   "vision": [
-    0.56,
-    1.15
+    0.81,
+    1.17
    ]
   },
   "n": {
-   "armor": 116,
-   "attack_speed": 204,
-   "base_damage": 555,
-   "cast_point": 230,
-   "cast_range": 333,
-   "charges": 116,
-   "cooldown": 908,
-   "crit": 56,
-   "damage": 1233,
-   "duration": 593,
-   "gold_xp": 56,
-   "health": 365,
-   "lifesteal": 62,
-   "magic_res": 40,
-   "mana": 51,
-   "mana_cost": 634,
-   "move_speed": 278,
-   "projectile": 123,
-   "range": 473,
-   "silence": 50,
-   "slow": 273,
-   "stats": 765,
-   "stun": 272,
-   "vision": 43
+   "armor": 111,
+   "attack_speed": 125,
+   "base_damage": 150,
+   "cast_point": 196,
+   "cast_range": 324,
+   "charges": 112,
+   "cooldown": 886,
+   "crit": 43,
+   "damage": 1234,
+   "duration": 585,
+   "gold_xp": 47,
+   "health": 280,
+   "lifesteal": 61,
+   "magic_res": 37,
+   "mana": 44,
+   "mana_cost": 626,
+   "move_speed": 175,
+   "projectile": 120,
+   "range": 463,
+   "silence": 45,
+   "slow": 263,
+   "stats": 98,
+   "stun": 272
+  },
+  "base_u": {
+   "attack_speed": 1.52,
+   "base_damage": 3.81,
+   "cast_point": 1.022,
+   "health": 0.179,
+   "move_speed": 5.301,
+   "stats": 1.36
   }
  }
 }
