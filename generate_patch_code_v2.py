@@ -1505,6 +1505,10 @@ _PROP_CHANGE_RE = re.compile(
 )
 
 
+# Numbers of an item's ability, not item stats — never folded into properties_change cards.
+_ABILITY_NUMBER_RE = re.compile(r'\b(?:mana ?cost|cooldown|cast (?:point|range)|duration|radius)\b', re.I)
+
+
 def _parse_number_or_list(s):
     """Convert "5", "5.5", "5/6/7", "5%" into a value passable to b()."""
     s = s.rstrip('%').strip()
@@ -1594,6 +1598,10 @@ def _postprocess_properties_change(lines):
                     continue
             # Try change "X increased/decreased from A to B"
             mc = _PROP_CHANGE_RE.match(txt)
+            if mc and _ABILITY_NUMBER_RE.search(mc.group('stat')):
+                # "Eternal Chains mana cost decreased from 200 to 100" is an ACTIVE's number,
+                # not a stat of the item: it stays a plain row (owner, 2026-09-25), never a card line
+                mc = None
             if mc:
                 stat = mc.group('stat').replace(' bonus', '').strip()
                 old_v = mc.group('old')
@@ -1668,6 +1676,27 @@ _RECIPE_COST_UNCHANGED_SPLIT_RE = re.compile(
     r'b\(\d+,\s*\d+,\s*l=True\),\s*'
     r'extra=inline_note\("(Total cost unchanged[^"]*)"\)\)\)$'
 )
+
+
+_STACK_NOTE_RE = re.compile(r'^W\(li\("([^"]*\bdoes not stack with\b[^"]*)",\s*t\("(?:MISC|INFO)"\)\)\)$')
+_ABILITY_ROW_RE = re.compile(r'^(\s*W\(li\("(?:Passive|Active)\b[^"]*)(",\s*(?:t|b)\(.*\)\)\))$')
+
+
+def _postprocess_stack_note_into_ability(lines):
+    """A "... does not stack with ..." clarification right after an item's "Passive:/Active: ..." row
+    is that ability's footnote: it goes into the row's "?" popup (info_tip) instead of standing as a
+    separate MISC row (Orb of Corrosion 7.38 — owner, 2026-09-25)."""
+    out = []
+    for line in lines:
+        m = _STACK_NOTE_RE.match(line.strip())
+        if m and out:
+            prev = _ABILITY_ROW_RE.match(out[-1])
+            if prev:
+                note = m.group(1).rstrip(".") + "."
+                out[-1] = f'{prev.group(1)} " + info_tip("{note}") + "{prev.group(2)}'.replace(' + ""', '', 1)
+                continue
+        out.append(line)
+    return out
 
 
 def _postprocess_recipe_cost_zero_net(lines):
@@ -2515,6 +2544,7 @@ def generate(version):
     out = _postprocess_new_block_label(out)
     out = _postprocess_new_item_card(out, version)
     out = _postprocess_properties_change(out)
+    out = _postprocess_stack_note_into_ability(out)
     out = _postprocess_drop_now_requires(out)
     out = _postprocess_recipe_cost_zero_net(out)
     out = _postprocess_rework_marker(out)

@@ -127,6 +127,21 @@ W(li("Recipe cost decreased from 1350 to 1250 " + b(1350, 1250, l=True), t("BUFF
 Генератор делает это сам (`_postprocess_recipe_cost_zero_net`), тесты в `tests/test_generator.py`.
 Рецепт *и* общая цена не изменились → `t("MISC")`.
 
+## Числа способности предмета — строкой, не в карточках (2026-09-25)
+
+Стоимость маны / перезарядка / длительность / радиус **активки или пассивки предмета** — это не
+характеристика предмета. В карточки `properties_change` не попадают, остаются обычной строкой:
+`W(li("Eternal Chains Mana Cost decreased from 200 to 100", b(200, 100, l=True)))` (Gleipnir 7.38).
+Генератор: `_ABILITY_NUMBER_RE` в `_postprocess_properties_change`.
+
+## «does not stack with …» → в «?» строки Passive/Active (2026-09-25)
+
+Пояснение «Armor reduction does not stack with its components, Desolator…» сразу после строки
+«Passive: …» — это сноска к способности: `info_tip(...)` в конце её текста, отдельной MISC-строки нет
+(Orb of Corrosion 7.38). Генератор: `_postprocess_stack_note_into_ability`.
+У переделанного предмета старые/новые бонусные характеристики — карточками `properties_change`;
+старые значения брать из подсказок игры тех лет (d2vpkr abilities_english), не выдумывать.
+
 ## Порядок строк в properties_change
 
 Совпадающие строки (присутствуют в обоих пейнах old и new) — **первыми**. Строки только в old (DEL) или только в new (NEW) — после.

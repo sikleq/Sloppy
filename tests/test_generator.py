@@ -575,3 +575,26 @@ def test_charge_gain_time_is_lower_is_buff():
     a longer time to gain a charge (found by the weights audit, 2026-09-25)."""
     import generate_patch_code_v2 as g
     assert g.LOWER_IS_BUFF.search("Hallowed charge gain time increased from 3s to 4s")
+
+
+def test_item_ability_mana_cost_is_a_row_not_a_card_line():
+    """Gleipnir 7.38: "Eternal Chains mana cost 200 -> 100" is the active's number — a plain row
+    ("mana cost decreased from 200 to 100"), never a "+200 … mana cost" line in the stat cards."""
+    import generate_patch_code_v2 as g
+    out = g._postprocess_properties_change([
+        'W(item_header("Gleipnir", changed=True))',
+        'W(li("Eternal Chains mana cost decreased from 200 to 100", b(200, 100, l=True)))',
+        'W(li("Health bonus increased from +275 to +450", b(275, 450)))'])
+    card = next(x for x in out if x.startswith("W(properties_change("))
+    assert "mana cost" not in card and "+450 Health" in card
+    assert 'W(li("Eternal Chains mana cost decreased from 200 to 100", b(200, 100, l=True)))' in out
+
+
+def test_does_not_stack_note_goes_into_the_passive_rows_info():
+    """Orb of Corrosion 7.38: "Armor reduction does not stack with …" is the Passive's footnote."""
+    import generate_patch_code_v2 as g
+    out = g._postprocess_stack_note_into_ability([
+        '    W(li("Passive: Corrosion. Reduces armor by 3", t("REWORK")))',
+        '    W(li("Armor reduction does not stack with its components, Desolator, or Stygian Desolator", t("MISC")))'])
+    assert out == ['    W(li("Passive: Corrosion. Reduces armor by 3 " + info_tip("Armor reduction does not '
+                   'stack with its components, Desolator, or Stygian Desolator."), t("REWORK")))']
