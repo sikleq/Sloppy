@@ -1491,6 +1491,10 @@ _STAT_GRANT_RE = re.compile(
 )
 
 
+_PROP_INSTEAD_RE = re.compile(r'^Now (?:provides?|grants?|gives?)\s+(\+.+?)\s+instead of\s+(\+.+)$')
+_PROP_PROVIDES_RE = re.compile(r'^Provides\s+(\+.+)$')
+
+
 def _parse_stat_grants(text):
     """Split "+X Stat, +Y Stat, and +Z Stat" into ["+X Stat","+Y Stat","+Z Stat"]."""
     return [f'+{m.group(1).strip().rstrip(",.").strip()}'
@@ -1503,6 +1507,18 @@ _PROP_CHANGE_RE = re.compile(
     r'(?:bonus\s+)?(?P<verb>increased|decreased|rescaled|changed)\s+'
     r'from\s+\+?(?P<old>[\d./]+%?)\s+to\s+\+?(?P<new>[\d./]+%?)\s*$'
 )
+
+
+# Numbers of an item's ability, not item stats — never folded into properties_change cards.
+_ABILITY_NUMBER_RE = re.compile(r'\b(?:mana ?cost|cooldown|cast (?:point|range)|duration|radius)\b', re.I)
+# The whole stat name must be a real item stat ("Damage", "Mana Regen", "Spell Lifesteal"…).
+# "Empower Spell damage" / "Empower Spell movement Slow" (Khanda 7.38) are the active's numbers → rows.
+_ITEM_STAT_NAME_RE = re.compile(
+    r'^(?:bonus\s+)?(?:all attributes|strength|agility|intelligence|health|max health|mana|max mana|'
+    r'health regen(?:eration)?|mana regen(?:eration)?|health restoration|mana regen(?:eration)? amplification|'
+    r'armor|magic(?:al)? resistance|damage|attack damage|attack speed|movement speed|move speed|evasion|'
+    r'spell amp(?:lification)?|lifesteal|spell lifesteal|(?:spell )?lifesteal amplification|cast range|'
+    r'attack range|status resistance|slow resistance|aoe bonus|cooldown reduction)(?:\s+bonus)?$', re.I)
 
 
 def _parse_number_or_list(s):
@@ -1558,6 +1574,7 @@ def _postprocess_properties_change(lines):
         old_rows = []
         new_rows = []
         kept_lines = []
+        needs_old = False
         block_end = i
         in_ul = False
         while block_end < len(lines):
@@ -1584,6 +1601,24 @@ def _postprocess_properties_change(lines):
                     for stat in grants:
                         new_rows.append(('NEW', stat))
                     continue
+            # "Now provides +8 Mana Regen instead of +50 Damage" (Khanda 7.38): old stat -> new stat
+            mi = _PROP_INSTEAD_RE.match(txt)
+            if mi:
+                news, olds = _parse_stat_grants(mi.group(1)), _parse_stat_grants(mi.group(2))
+                if news and olds:
+                    new_rows.extend(('NEW', st) for st in news)
+                    old_rows.extend(('DEL', st) for st in olds)
+                    continue
+            # a reworked item's own stat list "Provides +35 Damage and +16% Spell Lifesteal"
+            # (Revenant's Brooch 7.38): the new side; the old side must come from the previous
+            # patch's tooltips (d2vpkr abilities_english) — flagged with a TODO comment
+            mp = _PROP_PROVIDES_RE.match(txt)
+            if mp:
+                grants = _parse_stat_grants(mp.group(1))
+                if grants:
+                    new_rows.extend(('NEW', st) for st in grants)
+                    needs_old = True
+                    continue
             # Try remove
             mr = _PROP_DEL_PREFIX_RE.match(txt)
             if mr:
@@ -1594,6 +1629,11 @@ def _postprocess_properties_change(lines):
                     continue
             # Try change "X increased/decreased from A to B"
             mc = _PROP_CHANGE_RE.match(txt)
+            if mc and (_ABILITY_NUMBER_RE.search(mc.group('stat'))
+                       or not _ITEM_STAT_NAME_RE.match(mc.group('stat').strip())):
+                # "Eternal Chains mana cost decreased from 200 to 100" is an ACTIVE's number,
+                # not a stat of the item: it stays a plain row (owner, 2026-09-25), never a card line
+                mc = None
             if mc:
                 stat = mc.group('stat').replace(' bonus', '').strip()
                 old_v = mc.group('old')
@@ -1622,6 +1662,9 @@ def _postprocess_properties_change(lines):
                 tag, stat = row
                 return f'("{tag}", "{stat}")'
             new_repr = ', '.join(_fmt_new(r) for r in new_rows) or ''
+            if needs_old and not old_rows:
+                out.append(f'    # TODO {item_name}: old bonus stats — take them from the previous patch\'s '
+                           f'tooltips (d2vpkr abilities_english), never invent them')
             out.append(
                 f'W(properties_change(old=[{old_repr}], new=[{new_repr}]))'
             )
@@ -1668,6 +1711,27 @@ _RECIPE_COST_UNCHANGED_SPLIT_RE = re.compile(
     r'b\(\d+,\s*\d+,\s*l=True\),\s*'
     r'extra=inline_note\("(Total cost unchanged[^"]*)"\)\)\)$'
 )
+
+
+_STACK_NOTE_RE = re.compile(r'^W\(li\("([^"]*\bdoes not stack with\b[^"]*)",\s*t\("(?:MISC|INFO)"\)\)\)$')
+_ABILITY_ROW_RE = re.compile(r'^(\s*W\(li\("(?:Passive|Active)\b[^"]*)(",\s*(?:t|b)\(.*\)\)\))$')
+
+
+def _postprocess_stack_note_into_ability(lines):
+    """A "... does not stack with ..." clarification right after an item's "Passive:/Active: ..." row
+    is that ability's footnote: it goes into the row's "?" popup (info_tip) instead of standing as a
+    separate MISC row (Orb of Corrosion 7.38 — owner, 2026-09-25)."""
+    out = []
+    for line in lines:
+        m = _STACK_NOTE_RE.match(line.strip())
+        if m and out:
+            prev = _ABILITY_ROW_RE.match(out[-1])
+            if prev:
+                note = m.group(1).rstrip(".") + "."
+                out[-1] = f'{prev.group(1)} " + info_tip("{note}") + "{prev.group(2)}'.replace(' + ""', '', 1)
+                continue
+        out.append(line)
+    return out
 
 
 def _postprocess_recipe_cost_zero_net(lines):
@@ -2034,6 +2098,77 @@ def _kv_item_cost(name, version):
         return int(cost) if cost and int(cost) > 0 else None
     except (TypeError, ValueError):
         return None
+
+
+_ENTITY_HEAD_RE = re.compile(r'^\s*W\((?:item_header|hero_header|unit_header|plain_header|section)\(')
+_AUTO_COMP_RE = re.compile(r'^(\s*)W\(auto_components_change\("([^"]+)",\s*"([^"]+)"\)\)')
+_COST_ROW_RE = re.compile(r'W\(li\("[^"]*\bcost\b[^"]*\d', re.I)
+UNSTATED_COST_NOTE = "Read from the item's components"
+
+
+def _prev_version(version):
+    try:
+        from patch.meta import RELEASE_HISTORY
+    except Exception:
+        return None
+    order = [r["version"] for r in RELEASE_HISTORY]          # newest first
+    return order[order.index(version) + 1] if version in order and order.index(version) + 1 < len(order) else None
+
+
+def _next_version(version):
+    try:
+        from patch.meta import RELEASE_HISTORY
+    except Exception:
+        return None
+    order = [r["version"] for r in RELEASE_HISTORY]          # newest first
+    return order[order.index(version) - 1] if version in order and order.index(version) > 0 else None
+
+
+def _postprocess_unstated_total_cost(lines):
+    """An item with a components panel whose total cost changed in the game files, but the patch
+    notes say nothing about the price (Revenant's Brooch 7.38: 4900 -> 3300), gets its own row
+    "Total cost decreased from A to B" with a note that it comes from the game files (owner,
+    2026-09-25). Works on generator output and on indented content/p*.py lines alike."""
+    out = []
+    i = 0
+    while i < len(lines):
+        m = _AUTO_COMP_RE.match(lines[i])
+        if not m:
+            out.append(lines[i])
+            i += 1
+            continue
+        ind, name, ver = m.groups()
+        j = i + 1
+        while j < len(lines) and not _ENTITY_HEAD_RE.match(lines[j]):
+            j += 1
+        block = lines[i:j]
+        old, new = _kv_item_cost(name, _prev_version(ver) or ""), _kv_item_cost(name, ver)
+        if old and new == old:
+            # some snapshots (7.39c, 7.41 items.json) are pre-patch copies: look ahead like
+            # auto_components_change does, to the first later snapshot where the price moved
+            nv = _next_version(ver)
+            while nv and new == old:
+                nxt = _kv_item_cost(name, nv)
+                if nxt and nxt != old:
+                    new = nxt
+                nv = _next_version(nv)
+        if not (old and new and old != new) or any(_COST_ROW_RE.search(x) for x in block):
+            out.extend(block)
+            i = j
+            continue
+        verb = "increased" if new > old else "decreased"
+        row = (f'{ind}W(li("Total cost {verb} from {old} to {new}", b({old}, {new}, l=True), '
+               f'extra=inline_note("{UNSTATED_COST_NOTE}")))')
+        k = next((n for n, x in enumerate(block) if x.strip() == "W(ul_open())"), None)
+        if k is not None:
+            block = block[:k + 1] + [row] + block[k + 1:]
+        else:
+            tail = 0 if block[-1].strip() else 1        # keep a trailing blank line after the block
+            cut = len(block) - (1 - tail) if not block[-1].strip() else len(block)
+            block = block[:cut] + [f"{ind}W(ul_open())", row, f"{ind}W(ul_close())"] + block[cut:]
+        out.extend(block)
+        i = j
+    return out
 
 
 def _postprocess_new_item_card(lines, version=None):
@@ -2515,6 +2650,8 @@ def generate(version):
     out = _postprocess_new_block_label(out)
     out = _postprocess_new_item_card(out, version)
     out = _postprocess_properties_change(out)
+    out = _postprocess_unstated_total_cost(out)
+    out = _postprocess_stack_note_into_ability(out)
     out = _postprocess_drop_now_requires(out)
     out = _postprocess_recipe_cost_zero_net(out)
     out = _postprocess_rework_marker(out)

@@ -4,6 +4,38 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
+      "title": "Price changes the patch notes never mention now have their own row, read from the item's components: Revenant's Brooch 4900 → 3300, Shadow Blade, Orb of Corrosion, Mage Slayer (7.38), Heaven's Halberd, Veil of Discord (7.41); Battle Fury's cleave is a row",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.38.html"
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Patch Reader",
+      "title": "Reworked items show all their stat changes in the before/after cards: Khanda (+50 Damage → +8 Mana Regen), Revenant's Brooch (+70 / +20% → +35 / +16%), Nullifier; Empower Spell numbers are rows",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.38.html"
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Patch Reader",
+      "title": "7.38 Gleipnir: the Eternal Chains mana cost is its own row (200 → 100), not a line in the stat cards",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.38.html"
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Patch Reader",
+      "title": "7.38 Orb of Corrosion: before/after stat cards (+3 Armor, +25 Attack Speed → +8 Agility); the \"does not stack\" note moved into the Passive's ?",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.38.html"
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Patch Reader",
       "title": "\"Recipe cost … Total cost unchanged\" rows: the recipe % sits right after the numbers, no % at the end of the row",
       "minor": true,
       "link": "patches/7.41.html"

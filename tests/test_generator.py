@@ -575,3 +575,66 @@ def test_charge_gain_time_is_lower_is_buff():
     a longer time to gain a charge (found by the weights audit, 2026-09-25)."""
     import generate_patch_code_v2 as g
     assert g.LOWER_IS_BUFF.search("Hallowed charge gain time increased from 3s to 4s")
+
+
+def test_item_ability_mana_cost_is_a_row_not_a_card_line():
+    """Gleipnir 7.38: "Eternal Chains mana cost 200 -> 100" is the active's number — a plain row
+    ("mana cost decreased from 200 to 100"), never a "+200 … mana cost" line in the stat cards."""
+    import generate_patch_code_v2 as g
+    out = g._postprocess_properties_change([
+        'W(item_header("Gleipnir", changed=True))',
+        'W(li("Eternal Chains mana cost decreased from 200 to 100", b(200, 100, l=True)))',
+        'W(li("Health bonus increased from +275 to +450", b(275, 450)))'])
+    card = next(x for x in out if x.startswith("W(properties_change("))
+    assert "mana cost" not in card and "+450 Health" in card
+    assert 'W(li("Eternal Chains mana cost decreased from 200 to 100", b(200, 100, l=True)))' in out
+
+
+def test_does_not_stack_note_goes_into_the_passive_rows_info():
+    """Orb of Corrosion 7.38: "Armor reduction does not stack with …" is the Passive's footnote."""
+    import generate_patch_code_v2 as g
+    out = g._postprocess_stack_note_into_ability([
+        '    W(li("Passive: Corrosion. Reduces armor by 3", t("REWORK")))',
+        '    W(li("Armor reduction does not stack with its components, Desolator, or Stygian Desolator", t("MISC")))'])
+    assert out == ['    W(li("Passive: Corrosion. Reduces armor by 3 " + info_tip("Armor reduction does not '
+                   'stack with its components, Desolator, or Stygian Desolator."), t("REWORK")))']
+
+
+def test_now_provides_x_instead_of_y_goes_into_the_cards():
+    """Khanda 7.38: "Now provides +8 Mana Regen instead of +50 Damage" = old +50 Damage -> new +8 Mana Regen;
+    "Empower Spell bonus damage 150 -> 250" is the active's number and stays a row."""
+    import generate_patch_code_v2 as g
+    out = g._postprocess_properties_change([
+        'W(item_header("Khanda", changed=True))',
+        'W(li("Now provides +8 Mana Regen instead of +50 Damage", t("REWORK")))',
+        'W(li("Empower Spell bonus damage increased from 150 to 250", b(150, 250)))'])
+    assert out[1] == 'W(properties_change(old=[("DEL", "+50 Damage")], new=[("NEW", "+8 Mana Regen")]))'
+    assert 'W(li("Empower Spell bonus damage increased from 150 to 250", b(150, 250)))' in out
+
+
+def test_reworked_item_provides_list_is_the_new_card_and_asks_for_old_stats():
+    """Revenant's Brooch 7.38: "Provides +35 Damage and +16% Spell Lifesteal" -> new card; the old side is a TODO
+    (from the previous patch's tooltips, never invented)."""
+    import generate_patch_code_v2 as g
+    out = g._postprocess_properties_change([
+        'W(item_header("Revenant\'s Brooch", changed=True))',
+        'W(li("Provides +35 Damage and +16% Spell Lifesteal", t("REWORK")))'])
+    assert any(x.strip().startswith("# TODO Revenant's Brooch: old bonus stats") for x in out)
+    assert out[-1] == 'W(properties_change(old=[], new=[("NEW", "+35 Damage"), ("NEW", "+16% Spell Lifesteal")]))'
+
+
+def test_unstated_total_cost_change_gets_its_own_row():
+    """Revenant's Brooch 7.38: the notes never state the price, the components give 4900 -> 3300 —
+    a "Total cost decreased" row with a "Read from the item's components" note (owner, 2026-09-25)."""
+    import generate_patch_code_v2 as g
+    block = ['    W(item_header("Revenant\'s Brooch", changed=True))',
+             '    W(auto_components_change("Revenant\'s Brooch", "7.38"))',
+             '    W(ul_open())',
+             '    W(li("Removed Phantom Province ability", t("DEL")))',
+             '    W(ul_close())']
+    out = g._postprocess_unstated_total_cost(block)
+    assert out[3] == ('    W(li("Total cost decreased from 4900 to 3300", b(4900, 3300, l=True), '
+                      'extra=inline_note("Read from the item\'s components")))')
+    # a block that already states the cost is left alone
+    stated = block[:3] + ['    W(li("Total cost decreased from 4900 to 3300", b(4900, 3300, l=True)))'] + block[3:]
+    assert g._postprocess_unstated_total_cost(stated) == stated

@@ -127,6 +127,42 @@ W(li("Recipe cost decreased from 1350 to 1250 " + b(1350, 1250, l=True), t("BUFF
 Генератор делает это сам (`_postprocess_recipe_cost_zero_net`), тесты в `tests/test_generator.py`.
 Рецепт *и* общая цена не изменились → `t("MISC")`.
 
+## Числа способности предмета — строкой, не в карточках (2026-09-25)
+
+Стоимость маны / перезарядка / длительность / радиус **активки или пассивки предмета** — это не
+характеристика предмета. В карточки `properties_change` не попадают, остаются обычной строкой:
+`W(li("Eternal Chains Mana Cost decreased from 200 to 100", b(200, 100, l=True)))` (Gleipnir 7.38).
+Генератор: `_ABILITY_NUMBER_RE` в `_postprocess_properties_change`.
+
+## Характеристики переделанного предмета — только карточками (2026-09-25)
+
+У предмета с блоком компонентов (`changed=True` / «Item Reworked» / «Recipe changed») ВСЕ изменения
+его бонусных характеристик — в `properties_change`, не строками:
+- «Now provides +8 Mana Regen instead of +50 Damage» → old `("DEL", "+50 Damage")`, new `("NEW", "+8 Mana Regen")` (Khanda 7.38);
+- «Provides +35 Damage and +16% Spell Lifesteal» → new-карточка; старые значения — из подсказок игры
+  прошлого патча (d2vpkr), генератор оставляет `# TODO` (Revenant's Brooch 7.38: было +70 / +20%);
+- «No longer provides +6 Health Regen» → old `("DEL", ...)` (Nullifier 7.41).
+В карточку идёт только настоящая характеристика (`_ITEM_STAT_NAME_RE`: Damage, Mana Regen, Spell Lifesteal…);
+«Empower Spell bonus damage 150 → 250» — число способности, остаётся строкой.
+У предметов без изменения рецепта характеристики по-прежнему идут обычными строками.
+
+## Цена предмета, которой нет в патчноуте → своей строкой (2026-09-25)
+
+Если у предмета с блоком компонентов итоговая цена изменилась в файлах игры, а в патчноуте про цену
+ни слова, — отдельная строка «Total cost decreased/increased from A to B» с `b(A, B, l=True)` и
+`inline_note("Read from the item's components")` (Revenant's Brooch 7.38: 4900 → 3300).
+Генератор: `_postprocess_unstated_total_cost`; у 7.39c/7.41 KV-снимок до патча, поэтому новая цена
+берётся из следующей версии (`_next_version`).
+Число способности предмета («Cleave damage to heroes 70% → 60%», Battle Fury 7.38) — строкой, не в карточке.
+
+## «does not stack with …» → в «?» строки Passive/Active (2026-09-25)
+
+Пояснение «Armor reduction does not stack with its components, Desolator…» сразу после строки
+«Passive: …» — это сноска к способности: `info_tip(...)` в конце её текста, отдельной MISC-строки нет
+(Orb of Corrosion 7.38). Генератор: `_postprocess_stack_note_into_ability`.
+У переделанного предмета старые/новые бонусные характеристики — карточками `properties_change`;
+старые значения брать из подсказок игры тех лет (d2vpkr abilities_english), не выдумывать.
+
 ## Порядок строк в properties_change
 
 Совпадающие строки (присутствуют в обоих пейнах old и new) — **первыми**. Строки только в old (DEL) или только в new (NEW) — после.
