@@ -4,7 +4,7 @@
     -> icons/telegraph/<week>/*.jpg|gif   (images; hosted by the site after deploy)
     -> tools/telegraph_post/out/post.json (Telegraph content nodes + title)
     -> tools/telegraph_post/out/preview.html (local look at the post)
-Then publish with tools/telegraph_post/publish.py (run it yourself — it creates a Telegraph account).
+Then paste out/post_telegraph.html into the telegra.ph editor (open it in a browser, select all, copy).
 
 Telegraph shows images by URL, so they must be LIVE on the site first: commit + push icons/telegraph/.
 Only tags Telegraph allows are used: h3, h4, p, a, b, i, ul, li, figure, img, figcaption, blockquote, hr.
