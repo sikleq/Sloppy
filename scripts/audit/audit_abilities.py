@@ -136,13 +136,17 @@ for m in re.finditer(
 for m in re.finditer(r'W\(ability_change\(', src):
     # Find matching paren and extract the block, then find current hero by walking back
     start = m.start()
-    # Find current_hero at this position
-    last_hero_m = None
-    for hm in re.finditer(r'hero_header\("([^"]+)"\)', src[:start]):
-        last_hero_m = hm
-    hero = last_hero_m.group(1) if last_hero_m else None
-    if not hero:
+    # Owner = the LAST header before this call IN THE SAME content file. A unit/item/plain
+    # header in between means it is not a hero ability (Tormentor's cards at the top of
+    # p738.py were blamed on the previous file's last hero, Windranger).
+    last_hdr = None
+    for hm in re.finditer(r'hero_header\("([^"]+)"\)|unit_header\(|plain_header\(|item_header\('
+                          r'|enchant_header\(', src[:start]):
+        last_hdr = hm
+    if (not last_hdr or not last_hdr.group(1)
+            or file_at(last_hdr.start()) != file_at(start)):
         continue
+    hero = last_hdr.group(1)
     # Extract block
     depth = 0
     j = start + len("W(ability_change(") - 1

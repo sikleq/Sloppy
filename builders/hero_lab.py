@@ -852,8 +852,14 @@ def _innate_summary(rule: dict, version: str) -> str:
         "nvision": "Night Vision",
         "slowRes": "Slow Resistance",
         "statusRes": "Status Resistance",
+        "evasion": "Evasion",
+        "castRange": "Cast Range",
+        "lifesteal": "Lifesteal",
+        "cdr": "Spell Cooldown Reduction",
         "itemCdr": "Item Cooldown Reduction",
     }
+    # Targets whose values are percentages (bonus text gets a "%").
+    pct_targets = {"mr", "slowRes", "statusRes", "evasion", "lifesteal", "cdr", "itemCdr"}
     source_label = {
         "str": "Strength",
         "agi": "Agility",
@@ -870,17 +876,31 @@ def _innate_summary(rule: dict, version: str) -> str:
         formula = active.get("formula")
         target = target_label.get(active.get("target"), active.get("target", "Stat"))
         source = source_label.get(active.get("source"), active.get("source", ""))
+        unit = "%" if active.get("target") in pct_targets else ""
         if formula == "armor_factor":
             parts.append(f"{_fmt_pct_value(float(active.get('factor', 0)))} of Armor as Strength")
         elif formula == "attr_factor":
-            parts.append(f"+{_display_value(active.get('factor', 0))} {target.lower()} per {source}")
+            parts.append(f"+{_display_value(active.get('factor', 0))}{unit} {target.lower()} per {source}")
         elif formula == "base_plus_level":
             base = _display_value(active.get("base", 0))
             per = _display_value(active.get("per_level", 0))
-            parts.append(f"+{base} {target.lower()} and +{per} per level")
+            parts.append(f"+{base}{unit} {target.lower()} and +{per}{unit} per level")
         elif formula == "flat_per_level":
             per = _display_value(active.get("per_level", 0))
-            parts.append(f"+{per} {target.lower()} per level")
+            parts.append(f"+{per}{unit} {target.lower()} per level")
+        elif formula == "flat_per_level_interval":
+            value = _display_value(active.get("value", 0))
+            interval = active.get("interval", 1)
+            every = "every even level" if interval == 2 else (
+                "per level" if interval == 1 else f"every {interval} levels")
+            parts.append(f"+{value}{unit} {target.lower()} {every}")
+        elif formula == "hp_threshold":
+            base = _display_value(active.get("base", 0))
+            per = _display_value(active.get("per_threshold", 0))
+            thr = _display_value(active.get("threshold", 0))
+            parts.append(f"+{base}{unit} {target.lower()} and +{per}{unit} per {thr} max HP")
+        elif formula == "regen_amp_pct":
+            parts.append(f"+{_display_value(active.get('factor', 0))}% {target} amplification")
         elif formula == "self_attr_pct_per_level":
             base = _fmt_pct_value(float(active.get("base_pct", 0)))
             per = _fmt_pct_value(float(active.get("per_level_pct", 0)))
@@ -898,7 +918,19 @@ def _innate_summary(rule: dict, version: str) -> str:
         elif formula == "ms_multiplier":
             base = _display_value(active.get("base_pct", 0))
             per = _display_value(active.get("per_level_pct", 0))
-            parts.append(f"+{base}% move speed and +{per}% per level")
+            if float(active.get("base_pct", 0) or 0):
+                parts.append(f"+{base}% move speed and +{per}% per level")
+            else:
+                parts.append(f"+{per}% move speed per level")
+        elif formula == "mana_shield_ehp":
+            absorb = _fmt_pct_value(float(active.get("absorb_pct", 0)))
+            dpm = str(active.get("dpm", "")).replace(" * level", " per level")
+            dpm_txt = f" (damage per mana: {dpm})" if dpm else ""
+            parts.append(f"{absorb} of damage taken is absorbed by mana{dpm_txt}")
+        elif formula == "bonus_ms_factor":
+            base = _display_value(active.get("base", 0))
+            per = _display_value(active.get("per_level", 0))
+            parts.append(f"Armor equal to {base}% + {per}% per level of bonus move speed")
         elif formula == "secondary_attr_factor":
             parts.append(f"{_fmt_pct_value(float(active.get('factor', 0)))} more {target.lower()} from {source}")
         elif formula == "dmg_universal_bonus_pct":
@@ -1297,21 +1329,6 @@ def _load_items(version: str) -> list[dict]:
             x["name"].lower(),
         ),
     )
-
-
-def _hero_innate_slug(version: str, hero_slug: str) -> str:
-    path = STATS_DIR / version / "heroes" / f"npc_dota_hero_{hero_slug}.txt"
-    if not path.exists():
-        return ""
-    try:
-        root = parse_kv(path.read_text(encoding="utf-8"))
-    except Exception:
-        return ""
-    abilities = _site.hero_ability_blocks(root)
-    for ability_slug, data in abilities.items():
-        if isinstance(data, dict) and str(data.get("Innate", "0")) == "1":
-            return ability_slug
-    return ""
 
 
 def _load_heroes(version: str) -> list[dict]:

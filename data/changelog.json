@@ -3,6 +3,25 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Hero Lab",
+      "title": "Innate stat bonuses completed",
+      "fix": true,
+      "link": "heroes_stats.html",
+      "items": [
+        "Razor's innate is +1% move speed per level (was +1 flat); Death Prophet's move speed history corrected",
+        "New: Rubick +1 damage per level, Tidehunter +3 HP and +2 range per fish, Dark Willow +20% HP and mana regen",
+        "Hero Lab also counts Magnus and Primal Beast slow resist, Wraith King lifesteal, Death Prophet cooldown reduction; Centaur's Horsepower no longer stacks with boots"
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Site",
+      "title": "Changelog: fixes are marked with a pixel beetle, the left list shows only features, screenshots share one width",
+      "minor": true,
+      "link": "changelog.html"
+    },
+    {
+      "date": "2026-09-25",
       "category": "Site",
       "title": "Icon toggles (weights, talent, attributes) glow warm when on instead of turning solid gold, so the icon stays visible",
       "minor": true

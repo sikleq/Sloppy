@@ -3177,6 +3177,9 @@ function ecPinnableTip(tip, show, hide, sel) {
         total += entry.base + entry.per_level * (level || 1);
       } else if (f === 'flat_per_level') {
         total += entry.per_level * (level || 1);
+      } else if (f === 'flat_per_level_interval') {
+        // Tidehunter Leviathan's Catch: a fixed bonus every N levels.
+        total += entry.value * Math.max(0, Math.floor(((level || 1) - (entry.offset || 0)) / entry.interval));
       } else if (f === 'attr_pct_per_level') {
         total += a[eff.source] * (entry.base_pct + entry.per_level_pct * (level || 1));
       } else if (f === 'hp_pct') {
@@ -3184,19 +3187,26 @@ function ecPinnableTip(tip, show, hide, sel) {
       } else if (f === 'secondary_attr_factor') {
         total += a[eff.source] * (_SEC[`${key}:${eff.source}`] || 0) * entry.factor;
       }
-      // ms_multiplier → dpWitchcraftMsMult; dmg_universal_bonus_pct/attr_substitution → dedicated callers
+      // ms_multiplier/regen_amp_pct → innateMult; dmg_universal_bonus_pct/attr_substitution → dedicated callers
     }
     return total;
   };
-  // Death Prophet — Witchcraft: multiplicative MS bonus. Returns multiplier (1 + pct/100).
-  const dpWitchcraftMsMult = (s, level) => {
-    if (!innatesToggle?.checked || s.slug !== 'death_prophet') return 1;
-    const rules = _innateRules['death_prophet'];
-    const eff = rules?.effects?.find(e => e.target === 'ms' && e.formula === 'ms_multiplier');
-    if (!eff) return 1;
-    const entry = _activeEntry(eff, hsTablePatch);
-    if (!entry) return 1;
-    return 1 + (entry.base_pct + entry.per_level_pct * (level || 1)) / 100;
+  // Multiplicative innate bonus (1 + pct/100): ms_multiplier on ms (Death
+  // Prophet Witchcraft, Razor Unstable Current — % move speed) and
+  // regen_amp_pct on hpr/mpr (Dark Willow Pixie Dust).
+  const innateMult = (key, s, level) => {
+    if (!innatesToggle?.checked) return 1;
+    const rules = _innateRules[s.slug];
+    if (!rules) return 1;
+    let pct = 0;
+    for (const eff of (rules.effects || [])) {
+      if (eff.target !== key) continue;
+      const entry = _activeEntry(eff, hsTablePatch);
+      if (!entry) continue;
+      if (eff.formula === 'ms_multiplier') pct += (entry.base_pct || 0) + entry.per_level_pct * (level || 1);
+      else if (eff.formula === 'regen_amp_pct') pct += entry.factor;
+    }
+    return 1 + pct / 100;
   };
   // Axe — One Man Army: bonus STR = (base_armor + agi/6) * 0.5.
   // Self-referential via armor formula; computed before wa to feed HP/armor derivations.
@@ -3279,7 +3289,7 @@ function ecPinnableTip(tip, show, hide, sel) {
     const startArmor = num(s.armor) + a.agi / 6 + innate('armor', s, a, effectiveLevel);
     const startMr = num(s.mr) + a.int * 0.1;
     const rawHp = num(s.hp);
-    const startHp = Math.round(rawHp + wa.str * 22);
+    const startHp = Math.round(rawHp + wa.str * 22 + innate('hp', s, a, effectiveLevel));
     // bonusDmg references startHp (Ursa Maul = % of current HP), so compute it
     // AFTER startHp. primaryDmg = the universal attribute-to-damage; innateDmg
     // adds Sven/Luna/Ursa on top.
@@ -3298,7 +3308,7 @@ function ecPinnableTip(tip, show, hide, sel) {
         ? startMana * techiesPoolPct
         : 0;
       if (s.slug === 'ogre_magi') return num(s.mpr) + a.str * 0.02 + a.int * 0.05;
-      return num(s.mpr) + wa.int * 0.05 + innate('mpr', s, a, effectiveLevel) + techiesPoolRegen;
+      return (num(s.mpr) + wa.int * 0.05 + innate('mpr', s, a, effectiveLevel) + techiesPoolRegen) * innateMult('mpr', s, effectiveLevel);
     })();
     const start = mode !== 'base';
     switch (col) {
@@ -3311,7 +3321,7 @@ function ecPinnableTip(tip, show, hide, sel) {
         const shield = start ? manaShieldEhp(s, startMana, effectiveLevel) : 0;
         return [ehpMag(start ? startHp : rawHp, start ? startMr : num(s.mr)) + shield, g0];
       }
-      case 'hpr': return [start ? num(s.hpr) + wa.str * 0.1 + innate('hpr', s, a, effectiveLevel) : num(s.hpr), regen];
+      case 'hpr': return [start ? (num(s.hpr) + wa.str * 0.1 + innate('hpr', s, a, effectiveLevel)) * innateMult('hpr', s, effectiveLevel) : num(s.hpr), regen];
       case 'mp': return [start ? startMana : rawMana, g0];
       case 'mpr': return [start ? startManaRegen : rawManaRegen, regen];
       case 'str': return [a.str, g];
@@ -3344,11 +3354,11 @@ function ecPinnableTip(tip, show, hide, sel) {
       case 'nvision': return [start ? num(s.nvision) + innate('nvision', s, a, effectiveLevel) : num(s.nvision), g0];
       case 'ms': {
         if (!start) return [num(s.ms), g0];
-        // Death Prophet Witchcraft applies a multiplicative % bonus to MS;
-        // Razor / KotL add flat bonuses via innate(). Apply mult LAST so the
-        // mult scales the full base+flat-innate stack.
+        // Death Prophet Witchcraft / Razor Unstable Current are % bonuses;
+        // Centaur / KotL / Morphling add flat MS via innate(). Apply the %
+        // LAST so it scales the full base+flat-innate stack.
         const flat = num(s.ms) + innate('ms', s, a, effectiveLevel);
-        return [flat * dpWitchcraftMsMult(s, effectiveLevel), g0];
+        return [flat * innateMult('ms', s, effectiveLevel), g0];
       }
       case 'turn': return [num(s.turn), g];
       case 'collision': return [num(s.collision), g0];
@@ -3950,6 +3960,12 @@ function ecShopMarkup(panels) {
         total += entry.base + entry.per_level * (level || 1);
       } else if (f === 'flat_per_level') {
         total += entry.per_level * (level || 1);
+      } else if (f === 'flat_per_level_interval') {
+        // Tidehunter Leviathan's Catch: a fixed bonus every N levels.
+        total += entry.value * Math.max(0, Math.floor(((level || 1) - (entry.offset || 0)) / entry.interval));
+      } else if (f === 'hp_threshold') {
+        // Primal Beast Colossal: base + per_threshold per `threshold` max HP.
+        total += entry.base + entry.per_threshold * Math.floor((startHp || 0) / entry.threshold);
       } else if (f === 'attr_pct_per_level') {
         total += a[eff.source] * (entry.base_pct + entry.per_level_pct * (level || 1));
       } else if (f === 'hp_pct') {
@@ -3966,14 +3982,34 @@ function ecShopMarkup(panels) {
     return total;
   }
 
-  function dpWitchcraftMsMult(s, level, includeInnates) {
-    if (!includeInnates || s.slug !== 'death_prophet') return 1;
-    const rules = innateRules.death_prophet;
-    const eff = rules?.effects?.find(e => e.target === 'ms' && e.formula === 'ms_multiplier');
-    if (!eff) return 1;
-    const entry = activeEntry(eff, currentPatch);
-    if (!entry) return 1;
-    return 1 + (entry.base_pct + entry.per_level_pct * (level || 1)) / 100;
+  // Percentage innate bonuses that add to the matching item % bonus:
+  // ms_multiplier on ms (Death Prophet Witchcraft, Razor Unstable Current)
+  // and regen_amp_pct on hpr/mpr (Dark Willow Pixie Dust).
+  function heroLabInnatePct(key, s, level, includeInnates) {
+    if (!includeInnates) return 0;
+    const rules = innateRules[s.slug];
+    if (!rules) return 0;
+    let pct = 0;
+    for (const eff of (rules.effects || [])) {
+      if (eff.target !== key) continue;
+      const entry = activeEntry(eff, currentPatch);
+      if (!entry) continue;
+      if (eff.formula === 'ms_multiplier') pct += (entry.base_pct || 0) + entry.per_level_pct * (level || 1);
+      else if (eff.formula === 'regen_amp_pct') pct += entry.factor;
+    }
+    return pct;
+  }
+
+  // Centaur Horsepower (7.41+) does not stack with boots move speed.
+  function innateMsStacksWithBoots(s, includeInnates) {
+    if (!includeInnates) return true;
+    const rules = innateRules[s.slug];
+    for (const eff of (rules?.effects || [])) {
+      if (eff.target !== 'ms') continue;
+      const entry = activeEntry(eff, currentPatch);
+      if (entry && entry.stacks_with_boots === false) return false;
+    }
+    return true;
   }
 
   // Elder Titan — Momentum (innate, 7.41a+): armor = factor% of BONUS movement
@@ -4408,7 +4444,8 @@ function ecShopMarkup(panels) {
     out.spellAmp += out._spellAmpUniqueVals.length ? Math.max(...out._spellAmpUniqueVals) : 0;
     out.mprAmp = out._mprAmpVals.length ? Math.max(...out._mprAmpVals) : 0;
     out.msPct = out._msPctVals.length ? Math.max(...out._msPctVals) : 0;
-    out.ms += out._msBootVals.length ? Math.max(...out._msBootVals) : 0;
+    out.msBoots = out._msBootVals.length ? Math.max(...out._msBootVals) : 0;
+    out.ms += out.msBoots;
     { const _uniq = Math.min(out._cdrUniqVals.length ? Math.max(...out._cdrUniqVals) : 0, 99.9);
       let _mult = 1; for (const v of out._cdrStackVals) _mult *= (1 - v / 100);
       out.cooldownReduction = Math.min(Math.round((1 - (1 - _uniq / 100) * _mult) * 1000) / 10, 99.9); }
@@ -4457,7 +4494,7 @@ function ecShopMarkup(panels) {
     let evasion = Math.min(combinePct([heroLabInnate('evasion', s, a, lvl, 0, includeInnates), ...itemsTotal.evVals]), 99.9);
     const spellAmp = itemsTotal.spellAmp;
     let armor = (Number(s.armor) || 0) + agi * C.armorAgi + heroLabInnate('armor', s, a, lvl, 0, includeInnates) + itemsTotal.armor;
-    let hp = Math.round(((Number(s.hp) || 120) + str * C.hpStr + itemsTotal.hp) * (1 + itemsTotal.hpPct / 100));
+    let hp = Math.round(((Number(s.hp) || 120) + str * C.hpStr + heroLabInnate('hp', s, a, lvl, 0, includeInnates) + itemsTotal.hp) * (1 + itemsTotal.hpPct / 100));
     let mp = isHuskar ? 0 : Math.round(((Number(s.mp) || 75) + mpFromAttr + itemsTotal.mp) * (1 + itemsTotal.mpPct / 100) * (1 - itemsTotal.manaReductionPct / 100));
     a._manaPool = mp;
     const statusRes = Math.min(combinePct([...itemsTotal.statusResVals, heroLabInnate('statusRes', s, a, lvl, hp, includeInnates)]), 99.9);
@@ -4465,9 +4502,9 @@ function ecShopMarkup(panels) {
     // missingHprPct (e.g. Heart of Tarrasque) requires knowing current HP at
     // runtime and is intentionally excluded from the static calc display.
     // It is shown as a separate stat row ("Missing HP Regen") instead.
-    let hpr = ((Number(s.hpr) || 0) + str * C.hprStr + heroLabInnate('hpr', s, a, lvl, hp, includeInnates) + itemsTotal.hpr - itemsTotal.hpRegenReduce) * (1 + itemsTotal.healthRestoration / 100)
+    let hpr = ((Number(s.hpr) || 0) + str * C.hprStr + heroLabInnate('hpr', s, a, lvl, hp, includeInnates) + itemsTotal.hpr - itemsTotal.hpRegenReduce) * (1 + (itemsTotal.healthRestoration + heroLabInnatePct('hpr', s, lvl, includeInnates)) / 100)
       + hp * (itemsTotal.hprPct + itemsTotal.maxHpRegen) / 100;
-    let mpr = isHuskar ? 0 : ((Number(s.mpr) || 0) + mprFromAttr + heroLabInnate('mpr', s, a, lvl, hp, includeInnates) + itemsTotal.mpr) * (1 + itemsTotal.mprAmp / 100);
+    let mpr = isHuskar ? 0 : ((Number(s.mpr) || 0) + mprFromAttr + heroLabInnate('mpr', s, a, lvl, hp, includeInnates) + itemsTotal.mpr) * (1 + (itemsTotal.mprAmp + heroLabInnatePct('mpr', s, lvl, includeInnates)) / 100);
     if (st.custom.hp !== null) hp = Math.round(st.custom.hp);
     if (st.custom.mp !== null && !isHuskar) mp = Math.round(st.custom.mp);
     if (st.custom.hpr !== null) hpr = st.custom.hpr;
@@ -4487,9 +4524,18 @@ function ecShopMarkup(panels) {
     const batBase = Number(s.bat) || 1.7;
     const bat = batBase * (1 - itemsTotal.batReduce / 100);
     const tHit = bat * 100 / Math.max(1, aspd);
-    const msFlat = (Number(s.ms) || 0) + heroLabInnate('ms', s, a, lvl, hp, includeInnates);
+    // Flat innate MS (Centaur/KotL/Morphling). Horsepower does not stack with
+    // boots: only the larger of the two applies. % innates (Witchcraft,
+    // Unstable Current) add to item % MS and scale every flat source, boots too.
+    let msInnateFlat = heroLabInnate('ms', s, a, lvl, hp, includeInnates);
+    let msItemsFlat = itemsTotal.ms;
+    if (!innateMsStacksWithBoots(s, includeInnates)) {
+      msItemsFlat -= itemsTotal.msBoots;
+      msInnateFlat = Math.max(msInnateFlat, itemsTotal.msBoots);
+    }
+    const msFlat = (Number(s.ms) || 0) + msInnateFlat + msItemsFlat;
     const msMax = s.slug === 'windrunner' ? 600 : 550;
-    const ms = Math.min(Math.round((msFlat * dpWitchcraftMsMult(s, lvl, includeInnates) + itemsTotal.ms) * (1 + itemsTotal.msPct / 100)), msMax);
+    const ms = Math.min(Math.round(msFlat * (1 + (itemsTotal.msPct + heroLabInnatePct('ms', s, lvl, includeInnates)) / 100)), msMax);
     const range = (Number(s.range) || 0) + heroLabInnate('range', s, a, lvl, hp, includeInnates) + itemsTotal.range;
     const proj = (Number(s.proj) || 0) + itemsTotal.projSpeed;
     const dvision = Math.round(((Number(s.dvision) || 0) + itemsTotal.dvision) * (1 - itemsTotal.visionReduce / 100));
@@ -4501,13 +4547,18 @@ function ecShopMarkup(panels) {
     const manaShield = manaShieldEhp(s, mp, lvl, includeInnates);
     const ehpPhys = hp / Math.max(0.01, 1 - armorFactor(armor)) + manaShield;
     const ehpMag = hp / Math.max(0.01, 1 - mr / 100) + manaShield;
-    const lifesteal = itemsTotal.lifesteal;
+    const lifesteal = itemsTotal.lifesteal + heroLabInnate('lifesteal', s, a, lvl, hp, includeInnates);
     const spellLifesteal = itemsTotal.spellLifesteal;
     const castRange = itemsTotal.castRange + heroLabInnate('castRange', s, a, lvl, hp, includeInnates);
-    const cooldownReduction = itemsTotal.cooldownReduction || 0;
+    const itemsCdr = itemsTotal.cooldownReduction || 0;
+    // Spell CDR innates (Death Prophet Witchcraft) stack multiplicatively with item CDR.
+    const innateCdr = heroLabInnate('cdr', s, a, lvl, hp, includeInnates);
+    const cooldownReduction = innateCdr > 0
+      ? Math.min(Math.round((1 - (1 - innateCdr / 100) * (1 - itemsCdr / 100)) * 1000) / 10, 99.9)
+      : itemsCdr;
     const innateItemCdr = heroLabInnate('itemCdr', s, { str, agi, int }, lvl, hp, includeInnates);
     const itemCdr = innateItemCdr > 0
-      ? Math.min(Math.round((1 - (1 - innateItemCdr / 100) * (1 - cooldownReduction / 100)) * 1000) / 10, 99.9)
+      ? Math.min(Math.round((1 - (1 - innateItemCdr / 100) * (1 - itemsCdr / 100)) * 1000) / 10, 99.9)
       : 0;
     const dps = tHit > 0 ? dmg / tHit : 0;
     const healthRestoration = itemsTotal.healthRestoration;

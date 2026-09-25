@@ -18,12 +18,17 @@
     "attr_pct_per_level": "bonus = attrs[source] * (base_pct + per_level_pct * level)",
     "hp_pct": "bonus = current_hp * factor / 100  (current_hp includes str scaling)",
     "mana_pool_pct_per_level": "bonus = current_mp * (base_pct + per_level_pct * level)  (current_mp includes int scaling)",
-    "ms_multiplier": "multiplier = 1 + (base_pct + per_level_pct * level) / 100  (applied multiplicatively to move speed)",
+    "ms_multiplier": "multiplier = 1 + (base_pct + per_level_pct * level) / 100  (a % move-speed bonus: scales base MS + flat MS bonuses; adds to item % move-speed bonuses)",
     "armor_factor": "bonus = (armor_base + agi * ARMOR_PER_AGI) * factor  (armor_base = ArmorPhysical KV field)",
     "secondary_attr_factor": "bonus = derived_stat_from_attr * factor  (hpr: STR*HPREG_PER_STR; mpr: INT*MANAREG_PER_INT; aspd: AGI*AS_PER_AGI; armor: AGI*ARMOR_PER_AGI; mr: INT*MR_PER_INT)",
     "dmg_universal_bonus_pct": "universal_dmg_mult *= (1 + factor)  (applied inside primary-damage calc, only for Universal heroes)",
     "attr_substitution": "replaces the attribute used to derive target stat (Ogre: STR derives MP and MPR instead of INT)",
-    "mana_shield_ehp": "ehp_bonus = current_mp * absorb_pct * damage_per_mana  (damage absorbed by spending mana; dpm scales with level)"
+    "mana_shield_ehp": "ehp_bonus = current_mp * absorb_pct * damage_per_mana  (damage absorbed by spending mana; dpm scales with level)",
+    "bonus_ms_factor": "bonus = bonus_ms * (base + per_level * level) / 100  (armor from move speed above base; Elder Titan)",
+    "attr_floor_capped": "bonus = min(floor(attrs[source] / divisor), cap)",
+    "flat_per_level_interval": "bonus = value * max(0, floor((level - offset) / interval))  (a fixed bonus granted every `interval` levels, e.g. every even level: interval=2, offset=0)",
+    "hp_threshold": "bonus = base + per_threshold * floor(max_hp / threshold)",
+    "regen_amp_pct": "regen *= 1 + factor / 100  (amplifies the whole regen of the target type; adds to item regen amplification)"
   },
   "heroes": {
     "axe": {
@@ -76,14 +81,16 @@
             },
             {
               "since": "7.41a",
-              "factor": 0.4
+              "factor": 0.4,
+              "stacks_with_boots": false
             }
-          ]
+          ],
+          "note": "KV strength_to_movement_pct. Since the 7.41 rework the bonus does not stack with boots (tooltip: 'does not stack with bonuses from boots') — Hero Lab uses max(horsepower, boots MS) when stacks_with_boots is false. Earlier patches not verified; treated as stacking."
         }
       ]
     },
     "dark_seer": {
-      "innate": "dark_seer_quick_wit",
+      "innate": "dark_seer_aggrandize",
       "since": "7.36",
       "effects": [
         {
@@ -106,23 +113,57 @@
     },
     "death_prophet": {
       "innate": "death_prophet_witchcraft",
-      "since": "7.40",
+      "since": "7.36",
       "effects": [
         {
           "target": "ms",
           "formula": "ms_multiplier",
-          "note": "KV value=base_pct, hero_levelup=per_level_pct. Python cannot return a multiplier via _innate_bonus(); this is handled directly in the MS computation path.",
+          "note": "KV movement_speed_pct (7.41a+: value=base_pct, hero_levelup=per_level_pct; 7.36-7.40c: movement_speed_pct_per_level). 7.40 note '0.75% + 0.75% per level up' = 0.75% * level, so base_pct is 0 there. Python applies it in _ms_l1() via _innate_mult(); JS via innateMult()/heroLabInnatePct(). The 7.40 entry runs to 7.41 because the 7.41 KV snapshot is identical to 7.40c (the 7.41 change is visible from 7.41a).",
           "history": [
             {
+              "since": "7.36",
+              "until": "7.36a",
+              "base_pct": 0,
+              "per_level_pct": 0.5
+            },
+            {
+              "since": "7.36b",
+              "until": "7.37e",
+              "base_pct": 0,
+              "per_level_pct": 0.75
+            },
+            {
+              "since": "7.38",
+              "until": "7.39e",
+              "base_pct": 0,
+              "per_level_pct": 0.5
+            },
+            {
               "since": "7.40",
-              "until": "7.40c",
-              "base_pct": 0.75,
+              "until": "7.41",
+              "base_pct": 0,
               "per_level_pct": 0.75
             },
             {
               "since": "7.41a",
               "base_pct": 0.5,
               "per_level_pct": 0.75
+            }
+          ]
+        },
+        {
+          "target": "cdr",
+          "formula": "flat_per_level",
+          "note": "Spell cooldown reduction %. KV cooldown_reduction_pct hero_levelup=+0.75 (7.36-7.40c: cooldown_reduction_pct_per_level). 7.36: 0.5%/level; 7.38: 0.75%/level; 7.40 '0.75% + 0.75% per level up' and 7.41 '0.75% per level' are the same effective value. Hero Lab only (Cooldown Reduction row) — combined multiplicatively with item CDR.",
+          "history": [
+            {
+              "since": "7.36",
+              "until": "7.37e",
+              "per_level": 0.5
+            },
+            {
+              "since": "7.38",
+              "per_level": 0.75
             }
           ]
         }
@@ -381,14 +422,15 @@
     },
     "razor": {
       "innate": "razor_unstable_current",
-      "since": "7.41a",
+      "since": "7.36",
       "effects": [
         {
           "target": "ms",
-          "formula": "flat_per_level",
-          "since": "7.41a",
-          "per_level": 1,
-          "note": "KV hero_levelup=+1 (no base value)."
+          "formula": "ms_multiplier",
+          "since": "7.36",
+          "base_pct": 0,
+          "per_level_pct": 1,
+          "note": "A PERCENT move-speed bonus, not flat: KV movespeed_pct hero_levelup=+1 (7.36-7.41: movespeed_per_level_pct=1), tooltip '%MOVEMENT SPEED:', 7.36 note 'Increases movement speed by 1% per level'."
         }
       ]
     },
@@ -606,6 +648,138 @@
           "source": "int",
           "divisor": 3,
           "cap": 60
+        }
+      ]
+    },
+    "rubick": {
+      "innate": "rubick_curiosity",
+      "since": "7.41a",
+      "effects": [
+        {
+          "target": "dmg",
+          "formula": "flat_per_level",
+          "since": "7.41a",
+          "per_level": 1,
+          "note": "KV curiosity_per_level=1 stack per hero level x curiosity_attack_damage=1 base damage (tooltip: '1 stack of Curiosity per level that grants him 1 base damage'); per the 7.41 rule the increment is granted at level 1. Temporary (spell-cast) and kill stacks are not modelled. New in 7.41 — gated at 7.41a because the 7.41 KV snapshot equals 7.40c."
+        }
+      ]
+    },
+    "tidehunter": {
+      "innate": "tidehunter_leviathans_catch",
+      "since": "7.41a",
+      "effects": [
+        {
+          "target": "hp",
+          "formula": "flat_per_level_interval",
+          "note": "KV fish_health_bonus=3 per fish. Tidehunter eats a free fish every even hero level (tooltip; 7.41b 'Now gains fish on every even level instead of every level'). 7.41/7.41a: a fish on every level-up (modelled as level-1 fish). Enemy-kill fish not modelled.",
+          "history": [
+            {
+              "since": "7.41a",
+              "until": "7.41a",
+              "value": 3,
+              "interval": 1,
+              "offset": 1
+            },
+            {
+              "since": "7.41b",
+              "value": 3,
+              "interval": 2,
+              "offset": 0
+            }
+          ]
+        },
+        {
+          "target": "range",
+          "formula": "flat_per_level_interval",
+          "note": "KV fish_attack_range=2 per fish. Tidehunter eats a free fish every even hero level (tooltip; 7.41b 'Now gains fish on every even level instead of every level'). 7.41/7.41a: a fish on every level-up (modelled as level-1 fish). Enemy-kill fish not modelled.",
+          "history": [
+            {
+              "since": "7.41a",
+              "until": "7.41a",
+              "value": 2,
+              "interval": 1,
+              "offset": 1
+            },
+            {
+              "since": "7.41b",
+              "value": 2,
+              "interval": 2,
+              "offset": 0
+            }
+          ]
+        }
+      ]
+    },
+    "dark_willow": {
+      "innate": "dark_willow_pixie_dust",
+      "since": "7.36",
+      "effects": [
+        {
+          "target": "hpr",
+          "formula": "regen_amp_pct",
+          "since": "7.41a",
+          "factor": 20,
+          "note": "KV hp_regen_amp=20, always on since the 7.41 rework. hp_regen_amp_out_of_world=100 (while untargetable/invulnerable) is not modelled; 7.36-7.40c Pixie Dust (+100%/+150%) only worked while untargetable/hidden, so it is not modelled either."
+        },
+        {
+          "target": "mpr",
+          "formula": "regen_amp_pct",
+          "since": "7.41a",
+          "factor": 20,
+          "note": "KV mana_regen_amp=20 (see hpr note)."
+        }
+      ]
+    },
+    "magnataur": {
+      "innate": "magnataur_solid_core",
+      "since": "7.36",
+      "effects": [
+        {
+          "target": "slowRes",
+          "formula": "base_plus_level",
+          "since": "7.41a",
+          "base": 24,
+          "per_level": 1,
+          "note": "KV slow_resistance value=24, hero_levelup=1 (7.41 note '24% + 1% per level'). 7.37b-7.40c: 20/30/40/50% by Reverse Polarity rank — not modelled. Hero Lab only."
+        }
+      ]
+    },
+    "skeleton_king": {
+      "innate": "skeleton_king_vampiric_spirit",
+      "since": "7.36",
+      "effects": [
+        {
+          "target": "lifesteal",
+          "formula": "base_plus_level",
+          "note": "KV vampiric_aura value + hero_levelup. Before 7.41 it levelled with Reincarnation rank — not modelled. Hero Lab only.",
+          "history": [
+            {
+              "since": "7.41a",
+              "until": "7.41c",
+              "base": 14,
+              "per_level": 1
+            },
+            {
+              "since": "7.41d",
+              "base": 20,
+              "per_level": 0.5
+            }
+          ]
+        }
+      ]
+    },
+    "primal_beast": {
+      "innate": "primal_beast_colossal",
+      "since": "7.36",
+      "effects": [
+        {
+          "target": "slowRes",
+          "formula": "hp_threshold",
+          "since": "7.41a",
+          "base": 10,
+          "per_threshold": 1,
+          "threshold": 100,
+          "note": "KV base_slow_resist=10, slow_resistance_per_threshold=1, hp_per_threshold=100 (per 100 Max Health). Pre-7.41 Colossal only gave building damage. Hero Lab only."
         }
       ]
     }

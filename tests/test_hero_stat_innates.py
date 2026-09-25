@@ -96,12 +96,16 @@ KNOWN_FORMULAS = {
     "mana_shield_ehp",
     "attr_floor_capped",
     "bonus_ms_factor",
+    "flat_per_level_interval",
+    "hp_threshold",
+    "regen_amp_pct",
 }
 
 EXPECTED_HEROES = {
-    "axe", "beastmaster", "centaur", "dark_seer", "death_prophet",
+    "axe", "beastmaster", "centaur", "dark_seer", "dark_willow", "death_prophet",
     "dragon_knight", "elder_titan", "drow_ranger", "keeper_of_the_light", "life_stealer",
-    "luna", "medusa", "morphling", "naga_siren", "ogre_magi", "razor", "sven", "techies", "tinker", "tiny",
+    "luna", "magnataur", "medusa", "morphling", "naga_siren", "ogre_magi", "primal_beast",
+    "razor", "rubick", "skeleton_king", "sven", "techies", "tidehunter", "tinker", "tiny",
     "ursa", "void_spirit",
 }
 
@@ -276,13 +280,21 @@ class TestPatchBoundaries:
         e = active_entry(self._eff(heroes, "keeper_of_the_light", "ms"), "7.40c")
         assert e is None
 
-    def test_death_prophet_inactive_before_7_40(self, heroes):
+    def test_death_prophet_7_36_half_pct_per_level(self, heroes):
+        """7.36 note: 0.5% movement speed per level (0.75% from 7.36b)."""
         e = active_entry(self._eff(heroes, "death_prophet", "ms"), "7.36")
-        assert e is None
+        assert e["base_pct"] == pytest.approx(0)
+        assert e["per_level_pct"] == pytest.approx(0.5)
+        e = active_entry(self._eff(heroes, "death_prophet", "ms"), "7.36b")
+        assert e["per_level_pct"] == pytest.approx(0.75)
+
+    def test_death_prophet_inactive_before_7_36(self, heroes):
+        assert active_entry(self._eff(heroes, "death_prophet", "ms"), "7.35d") is None
 
     def test_death_prophet_base_7_40(self, heroes):
+        """7.40 '0.75% + 0.75% per level up' == 0.75% * level (no extra base)."""
         e = active_entry(self._eff(heroes, "death_prophet", "ms"), "7.40")
-        assert e["base_pct"] == pytest.approx(0.75)
+        assert e["base_pct"] == pytest.approx(0)
         assert e["per_level_pct"] == pytest.approx(0.75)
 
     def test_death_prophet_base_7_41a(self, heroes):
@@ -332,9 +344,10 @@ class TestPatchBoundaries:
         e = active_entry(heroes["beastmaster"]["effects"][0], "7.40c")
         assert e is None
 
-    def test_razor_inactive_before_7_41a(self, heroes):
-        e = active_entry(heroes["razor"]["effects"][0], "7.40c")
-        assert e is None
+    def test_razor_active_from_7_36(self, heroes):
+        """7.36 note: Unstable Current returns as an innate, +1% MS per level."""
+        assert active_entry(heroes["razor"]["effects"][0], "7.40c") is not None
+        assert active_entry(heroes["razor"]["effects"][0], "7.35d") is None
 
 
 # ---------------------------------------------------------------------------
@@ -398,12 +411,14 @@ class TestFormulas:
         result = entry["per_level"] * 1
         assert result == pytest.approx(4)
 
-    def test_flat_per_level_razor_ms(self, heroes):
-        """Razor: MS bonus at level 10 = 1 * 10 = 10."""
+    def test_ms_multiplier_razor_is_percent(self, heroes):
+        """Razor Unstable Current: +1% move speed per level (KV movespeed_pct,
+        tooltip '%MOVEMENT SPEED:'), NOT +1 flat."""
         eff = heroes["razor"]["effects"][0]
+        assert eff["formula"] == "ms_multiplier"
         entry = active_entry(eff, "7.41d")
-        result = entry["per_level"] * 10
-        assert result == pytest.approx(10)
+        mult = 1 + (entry.get("base_pct", 0) + entry["per_level_pct"] * 10) / 100
+        assert mult == pytest.approx(1.10)
 
     def test_self_attr_pct_per_level_drow_agi(self, heroes):
         """Drow: bonus AGI at level 1 = base_agi * (0.10 + 0.01 * 1)."""
@@ -525,3 +540,142 @@ class TestLunaEffects:
         entry = active_entry(eff, "7.41d")
         result = entry["base"] + entry["per_level"] * 1
         assert result == pytest.approx(250)
+
+
+# ---------------------------------------------------------------------------
+# Innates added / fixed after the 7.41f audit
+# ---------------------------------------------------------------------------
+
+def _interval_bonus(entry: dict, level: int) -> float:
+    """Mirror of the flat_per_level_interval formula (Python + JS)."""
+    steps = (level - entry.get("offset", 0)) // entry["interval"]
+    return entry["value"] * max(0, steps)
+
+
+class TestAuditInnates:
+    def _eff(self, heroes, slug, target):
+        return next(e for e in heroes[slug]["effects"] if e["target"] == target)
+
+    def test_razor_active_since_7_36(self, heroes):
+        eff = self._eff(heroes, "razor", "ms")
+        assert active_entry(eff, "7.35d") is None
+        assert active_entry(eff, "7.36")["per_level_pct"] == pytest.approx(1)
+
+    def test_rubick_damage_one_per_level(self, heroes):
+        eff = self._eff(heroes, "rubick", "dmg")
+        assert eff["formula"] == "flat_per_level"
+        entry = active_entry(eff, "7.41f")
+        assert entry["per_level"] * 1 == pytest.approx(1)
+        assert entry["per_level"] * 30 == pytest.approx(30)
+        assert active_entry(eff, "7.40c") is None
+
+    @pytest.mark.parametrize(("level", "hp", "rng"), [
+        (1, 0, 0), (2, 3, 2), (3, 3, 2), (4, 6, 4), (29, 42, 28), (30, 45, 30),
+    ])
+    def test_tidehunter_fish_every_even_level(self, heroes, level, hp, rng):
+        hp_entry = active_entry(self._eff(heroes, "tidehunter", "hp"), "7.41f")
+        rng_entry = active_entry(self._eff(heroes, "tidehunter", "range"), "7.41f")
+        assert _interval_bonus(hp_entry, level) == pytest.approx(hp)
+        assert _interval_bonus(rng_entry, level) == pytest.approx(rng)
+
+    def test_tidehunter_every_level_up_in_7_41a(self, heroes):
+        entry = active_entry(self._eff(heroes, "tidehunter", "hp"), "7.41a")
+        assert _interval_bonus(entry, 1) == 0
+        assert _interval_bonus(entry, 30) == pytest.approx(29 * 3)
+
+    def test_death_prophet_cdr_history(self, heroes):
+        eff = self._eff(heroes, "death_prophet", "cdr")
+        assert active_entry(eff, "7.37e")["per_level"] == pytest.approx(0.5)
+        assert active_entry(eff, "7.41f")["per_level"] == pytest.approx(0.75)
+
+    def test_death_prophet_ms_7_40_is_per_level_only(self, heroes):
+        """7.40 note: '0.75% + 0.75% per level up' == 0.75% * level."""
+        entry = active_entry(self._eff(heroes, "death_prophet", "ms"), "7.40b")
+        assert entry["base_pct"] + entry["per_level_pct"] * 1 == pytest.approx(0.75)
+
+    def test_centaur_horsepower_does_not_stack_with_boots(self, heroes):
+        eff = self._eff(heroes, "centaur", "ms")
+        assert active_entry(eff, "7.41f").get("stacks_with_boots") is False
+        assert active_entry(eff, "7.40c").get("stacks_with_boots", True) is True
+
+    def test_dark_seer_innate_is_aggrandize(self, heroes):
+        assert heroes["dark_seer"]["innate"] == "dark_seer_aggrandize"
+
+
+# ---------------------------------------------------------------------------
+# builders/heroes_stats.py — Starting (level-1) values and innate hero list
+# ---------------------------------------------------------------------------
+
+@pytest.fixture
+def hs():
+    from builders import heroes_stats as mod
+    saved = mod._CTX_VERSION[0]
+    mod._set_ctx_version("7.41f")
+    yield mod
+    mod._set_ctx_version(saved)
+
+
+def _snap(hero: str, **fields) -> dict:
+    return {f"npc_dota_hero_{hero}": {k: str(v) for k, v in fields.items()}}
+
+
+class TestHeroStatsBuilder:
+    def test_razor_ms_is_percent(self, hs):
+        s = _snap("razor", MovementSpeed=280)
+        assert hs._ms_l1(s, "npc_dota_hero_razor", None) == round(280 * 1.01)
+
+    def test_death_prophet_ms_multiplier_applied(self, hs):
+        s = _snap("death_prophet", MovementSpeed=290)
+        assert hs._ms_l1(s, "npc_dota_hero_death_prophet", None) == round(290 * (1 + 1.25 / 100))
+
+    def test_tidehunter_no_fish_at_level_1(self, hs):
+        s = _snap("tidehunter", StatusHealth=120, AttributeBaseStrength=25)
+        assert hs._innate_bonus("hp", s, "npc_dota_hero_tidehunter") == 0
+        assert hs._innate_bonus("range", s, "npc_dota_hero_tidehunter") == 0
+
+    def test_dark_willow_regen_amplified(self, hs):
+        s = _snap("dark_willow", StatusHealthRegen=0.25, AttributeBaseStrength=20,
+                  StatusManaRegen=0, AttributeBaseIntelligence=20)
+        h = "npc_dota_hero_dark_willow"
+        assert hs._hpreg_l1(s, h, None) == pytest.approx(round((0.25 + 2.0) * 1.2, 2))
+        assert hs._mpreg_l1(s, h, None) == pytest.approx(round(1.0 * 1.2, 2))
+        hs._set_ctx_version("7.40c")
+        assert hs._hpreg_l1(s, h, None) == pytest.approx(2.25)
+
+    def test_innate_hero_list_derived_from_rules(self, hs):
+        derived = {slug for slug in hs._INNATE_RULES
+                   if hs._has_stat_innate(slug, "7.41f")}
+        assert derived == {
+            "axe", "beastmaster", "centaur", "dark_seer", "dark_willow",
+            "death_prophet", "dragon_knight", "drow_ranger", "keeper_of_the_light",
+            "life_stealer", "luna", "medusa", "morphling", "ogre_magi", "razor",
+            "rubick", "sven", "techies", "tidehunter", "ursa", "void_spirit",
+        }
+
+    def test_innate_hero_list_not_hardcoded(self):
+        import inspect
+        from builders import heroes_stats as mod
+        assert 'slug in {"axe"' not in inspect.getsource(mod)
+
+
+# ---------------------------------------------------------------------------
+# builders/hero_lab.py — innate chip text
+# ---------------------------------------------------------------------------
+
+class TestHeroLabSummary:
+    @pytest.mark.parametrize(("slug", "expected"), [
+        ("razor", "+1% move speed per level"),
+        ("rubick", "+1 damage per level"),
+        ("tidehunter", "+3 health every even level; +2 attack range every even level"),
+        ("magnataur", "+24% slow resistance and +1% per level"),
+        ("naga_siren", "+4% evasion and +0.1% per level"),
+    ])
+    def test_summary_text(self, heroes, slug, expected):
+        from builders.hero_lab import _innate_summary
+        assert _innate_summary(heroes[slug], "7.41f") == expected
+
+    @pytest.mark.parametrize("slug", ["medusa", "elder_titan", "morphling", "primal_beast", "dark_willow"])
+    def test_summary_not_empty(self, heroes, slug):
+        from builders.hero_lab import _innate_summary
+        text = _innate_summary(heroes[slug], "7.41f")
+        assert text and "castRange" not in text

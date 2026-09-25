@@ -415,7 +415,8 @@ def _gregen(v: float) -> str:
 # the version through a module-global set by the history loop and render.
 from patch.meta import latest_stats_version as _lsv
 from patch.elements import _slugify as _changes_slug      # Hero Changes page = heroes/<slug>.html
-_CTX_VERSION = [_lsv()]
+_LATEST_STATS_VERSION = _lsv()
+_CTX_VERSION = [_LATEST_STATS_VERSION]
 
 # ── Hero innate rules — loaded once from data/rules/hero_stat_innates.json ──
 _INNATE_RULES: dict = _json.loads(
@@ -471,7 +472,7 @@ def _innate_bonus(col_key: str, s: dict, h: str, r: dict | None = None) -> float
     hero's innate ability, driven by data/rules/hero_stat_innates.json.
 
     Excluded from this function (need dedicated callers):
-      • Death Prophet  — ms_multiplier (multiplicative, not additive)
+      • ms_multiplier / regen_amp_pct — multiplicative, see _innate_mult()
       • Techies        — mana_pool_pct_per_level (needs MP total from caller)
       • Ogre Magi      — attr_substitution (rewires MP/MPR derivation in caller)
       • Void Spirit dmg — dmg_universal_bonus_pct (applied inside _primary_dmg)
@@ -502,6 +503,11 @@ def _innate_bonus(col_key: str, s: dict, h: str, r: dict | None = None) -> float
 
         elif formula == "flat_per_level":
             total += entry["per_level"] * 1
+
+        elif formula == "flat_per_level_interval":
+            # Tidehunter Leviathan's Catch: a fixed bonus every N levels.
+            steps = (1 - entry.get("offset", 0)) // entry["interval"]
+            total += entry["value"] * max(0, steps)
 
         elif formula == "self_attr_pct_per_level":
             attr_val = _field(s, h, _ATTR_FIELD[col_key])
@@ -537,10 +543,56 @@ def _innate_bonus(col_key: str, s: dict, h: str, r: dict | None = None) -> float
             factor = entry.get("base", 0.0) + entry.get("per_level", 0.0) * 1
             total += bonus_ms * factor / 100.0
 
-        # ms_multiplier, mana_pool_pct_per_level, attr_substitution,
-        # dmg_universal_bonus_pct — handled by dedicated callers, skip here.
+        # ms_multiplier, regen_amp_pct, mana_pool_pct_per_level,
+        # attr_substitution, dmg_universal_bonus_pct — handled by dedicated
+        # callers, skip here.
 
     return total
+
+
+def _innate_mult(col_key: str, s: dict, h: str) -> float:
+    """Multiplicative innate bonus (1 + pct/100) for a Starting (level-1)
+    column: ms_multiplier on ms (Death Prophet Witchcraft, Razor Unstable
+    Current — a % move-speed bonus that scales base + flat MS) and
+    regen_amp_pct on hpr/mpr (Dark Willow Pixie Dust)."""
+    hero_rules = _INNATE_RULES.get(h.replace("npc_dota_hero_", ""))
+    if not hero_rules:
+        return 1.0
+    pct = 0.0
+    for eff in hero_rules.get("effects", []):
+        if eff.get("target") != col_key:
+            continue
+        entry = _active_entry(eff, _CTX_VERSION[0])
+        if entry is None:
+            continue
+        if eff["formula"] == "ms_multiplier":
+            pct += entry.get("base_pct", 0.0) + entry["per_level_pct"] * 1
+        elif eff["formula"] == "regen_amp_pct":
+            pct += entry["factor"]
+    return 1.0 + pct / 100.0
+
+
+# Innate targets that move a Hero Stats column. slowRes / statusRes /
+# evasion / lifesteal / cdr / itemCdr / castRange exist only in Hero Lab.
+_HS_INNATE_TARGETS = frozenset({
+    "str", "agi", "int", "hp", "mp", "hpr", "mpr", "armor", "mr", "dmg",
+    "aspd", "ms", "range", "nvision", "ehp",
+})
+
+
+def _has_stat_innate(slug: str, version: str) -> bool:
+    """True when the hero's innate (per hero_stat_innates.json) changes at
+    least one Hero Stats column at *version*. bonus_ms_factor (Elder Titan
+    Momentum) is skipped: it reads move speed above base, which the item-less
+    Hero Stats table never has, so it is always 0 there."""
+    for eff in _INNATE_RULES.get(slug, {}).get("effects", []):
+        if eff.get("target") not in _HS_INNATE_TARGETS:
+            continue
+        if eff.get("formula") == "bonus_ms_factor":
+            continue
+        if _active_entry(eff, version) is not None:
+            return True
+    return False
 
 
 def _start_attr(s, h, r, key: str) -> float:
@@ -655,13 +707,15 @@ def _dmg_range_start(s, h, r):
 
 def _hp_l1(s, h, r):
     return round(_field(s, h, "StatusHealth")
-                 + HP_PER_STR * _whole_start_attr(s, h, r, "str"))
+                 + HP_PER_STR * _whole_start_attr(s, h, r, "str")
+                 + _innate_bonus("hp", s, h, r))
 
 
 def _hpreg_l1(s, h, r):
-    return round(_field(s, h, "StatusHealthRegen")
-                 + HPREG_PER_STR * _whole_start_attr(s, h, r, "str")
-                 + _innate_bonus("hpr", s, h, r), 2)
+    return round((_field(s, h, "StatusHealthRegen")
+                  + HPREG_PER_STR * _whole_start_attr(s, h, r, "str")
+                  + _innate_bonus("hpr", s, h, r))
+                 * _innate_mult("hpr", s, h), 2)
 
 
 def _mp_base_raw(s, h, r):
@@ -697,10 +751,11 @@ def _mpreg_l1(s, h, r):
         return round(_field(s, h, "StatusManaRegen")
                      + OGRE_MANAREG_PER_STR * _start_attr(s, h, r, "str")
                      + MANAREG_PER_INT * _start_attr(s, h, r, "int"), 2)
-    return round(_field(s, h, "StatusManaRegen")
-                 + MANAREG_PER_INT * _whole_start_attr(s, h, r, "int")
-                 + _innate_bonus("mpr", s, h, r)
-                 + _techies_pool_regen_l1(s, h, r), 2)
+    return round((_field(s, h, "StatusManaRegen")
+                  + MANAREG_PER_INT * _whole_start_attr(s, h, r, "int")
+                  + _innate_bonus("mpr", s, h, r)
+                  + _techies_pool_regen_l1(s, h, r))
+                 * _innate_mult("mpr", s, h), 2)
 
 
 # Armor / MR / Attack speed --------------------------------------------------
@@ -750,7 +805,8 @@ def _ms_base(s, h, r):
 
 
 def _ms_l1(s, h, r):
-    return round(_field(s, h, "MovementSpeed") + _innate_bonus("ms", s, h, r))
+    return round((_field(s, h, "MovementSpeed") + _innate_bonus("ms", s, h, r))
+                 * _innate_mult("ms", s, h))
 
 
 # Expanded helper values ------------------------------------------------------
@@ -1372,7 +1428,7 @@ def _row_stats(hero: str, snap: dict, raw: dict) -> str:
     slug = hero.replace("npc_dota_hero_", "")
     data = {
         "slug": slug,
-        "hasStatInnate": slug in {"axe", "beastmaster", "centaur", "dark_seer", "death_prophet", "dragon_knight", "drow_ranger", "keeper_of_the_light", "life_stealer", "luna", "medusa", "morphling", "naga_siren", "ogre_magi", "razor", "sven", "techies", "tiny", "ursa", "void_spirit"},
+        "hasStatInnate": _has_stat_innate(slug, _LATEST_STATS_VERSION),
         "attr": meta[0],
         "str": _field(snap, hero, "AttributeBaseStrength"),
         "strGain": _field(snap, hero, "AttributeStrengthGain"),
@@ -1457,7 +1513,7 @@ def render_html() -> str:
     for hero in heroes:
         slug = hero.replace("npc_dota_hero_", "")
         name = _display_name(hero, names)
-        has_stat_innate = slug in {"axe", "beastmaster", "centaur", "dark_seer", "death_prophet", "dragon_knight", "drow_ranger", "keeper_of_the_light", "life_stealer", "luna", "medusa", "morphling", "ogre_magi", "razor", "sven", "techies", "ursa", "void_spirit"}
+        has_stat_innate = _has_stat_innate(slug, latest)
         attack_type = _attack_type(latest, hero, raw)
         icon = (f'<img class="mr-ico hs-ico" src="icons/heroes/{slug}.png" '
                 f'alt="" loading="lazy" width="256" height="144">'
