@@ -120,6 +120,9 @@ ITEM_SLUG = {
     "Blink Dagger": "blink",
     "Bloodstone": "bloodstone",
     "Boots of Bearing": "boots_of_bearing",
+    "Boots of Speed": "boots",           # engine slug item_boots (weights look up the KV cost by it)
+    "Boots of Travel": "travel_boots",
+    "Boots of Travel 2": "travel_boots_2",
     "Crella's Crozier": "crellas_crozier",
     "Disperser": "disperser",
     "Essence Distiller": "essence_distiller",

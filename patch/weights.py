@@ -426,7 +426,7 @@ def _mana_cost_gold(t, version):
     m = _NOW_HAS_MANA_RE.search(t)
     if m:
         return -float(m.group(1) or m.group(2)) * price
-    m = _ABS_FROMTO_RE.search(t)
+    m = _ABS_FROMTO_RE.search(t, _MANA_COST_RE.search(t).start())   # the pair after "mana cost", not an earlier one
     if not m:
         return None
     d = _last_changed_delta(m.group(1), m.group(2))

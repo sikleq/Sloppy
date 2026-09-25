@@ -228,3 +228,25 @@ def test_panel_alone_scores_the_total_and_unchanged_totals_score_nothing(v738):
     blade = _cell("item|shadow-blade", "7.38")
     assert blade["w"] == pytest.approx(-0.6 * 5 * 350 / W._item_base_cost("invis_sword", "7.38"), abs=2e-3)
     assert _cell("item|eye-of-skadi", "7.38").get("w", 0) == 0
+
+
+def test_every_item_name_resolves_to_a_kv_key():
+    """The weights price an item row by its KV cost, looked up by the icon slug. A name whose naive slug
+    is not the engine one (Boots of Speed -> item_boots) would silently lose its price (review 2026-09-25)."""
+    import glob
+    import json
+    import os
+    import re
+    from patch.images import ITEM_SLUG
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    keys = set()
+    for f in glob.glob(os.path.join(root, "data", "stats", "*", "items.json")):
+        keys |= set(json.load(open(f, encoding="utf-8")))
+    if not keys:
+        import pytest
+        pytest.skip("no KV snapshots")
+    names = {"Boots of Speed", "Boots of Travel", "Boots of Travel 2"}
+    for f in glob.glob(os.path.join(root, "content", "p7*.py")):
+        names |= set(re.findall(r'item_header\("([^"]+)"', open(f, encoding="utf-8").read()))
+    slug = lambda n: ITEM_SLUG.get(n, n.lower().replace(" ", "_").replace("'", ""))
+    assert [n for n in sorted(names) if "item_" + slug(n) not in keys] == []
