@@ -7361,11 +7361,8 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   justify-content: center;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-.hl-picker-close:hover {
-  color: #e8d8a0;
-  border-color: rgba(200, 70, 70, 0.7);
-  background: linear-gradient(180deg, rgba(80, 30, 30, 0.85), rgba(40, 10, 10, 0.95));
-}
+/* (the picker-close hover lives with the pixel close button below — an old shorthand
+   `background` here wiped its pixel X on hover) */
 .hl-picker-back {
   margin-right: 4px;
 }
@@ -9196,7 +9193,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
 }
 .aoe-mark-innate  { background-image: url('icons/misc/innate_icon.png'); }
-.aoe-mark-talent  { background-image: url('icons/ui/gothic/icon_talents.png'); image-rendering: pixelated; }
+.aoe-mark-talent  { background-image: url('icons/misc/talents.svg'); }
 .aoe-mark-scepter { background-image: url('icons/items/ultimate_scepter.png'); }
 .aoe-mark-shard   { background-image: url('icons/items/aghanims_shard.png'); }
 .aoe-mark[hidden] { display: none; }
@@ -10424,7 +10421,6 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 }
 .hs-attack-filter .atk-badge img { opacity: 1; }
 .aoe-up-btn img { border-radius: 0; }
-.aoe-up-btn[data-aoe-upgrade="talent"] img { padding: 0; width: 26px; height: 26px; }
 img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixelated; }
 
 /* View select: warm field + a stepped gold caret; the native list follows */
@@ -10739,3 +10735,19 @@ img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixe
   line-height: 11px;
   letter-spacing: 0.8px;
 }
+
+/* Hero Lab / Hero Changes pickers: title and search in the pixel skin */
+.hl-picker-head strong {
+  font-family: var(--font-j10); font-size: 24px; font-weight: 400;
+  color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px;
+}
+.hl-picker-search {
+  height: 34px; box-sizing: border-box; padding: 0 12px 0 34px;
+  border: 2px solid transparent; border-image: var(--px-edge) 2 stretch; border-radius: 0;
+  background: var(--px-field) url('icons/ui/gothic/icon_loupe.png') 10px center / 16px 16px no-repeat;
+  background-clip: padding-box;
+  box-shadow: inset 0 -3px 0 var(--px-press);
+  font-family: var(--font-j10); font-size: 19px; letter-spacing: 0.4px; color: #e8d9b5;
+}
+.hl-picker-search::placeholder { color: #7d6a4a; }
+.hl-picker-search:focus { border-image-source: var(--px-edge-gold); box-shadow: inset 0 -3px 0 var(--px-press); }

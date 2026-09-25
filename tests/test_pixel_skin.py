@@ -10,13 +10,12 @@ def _read(rel):
         return f.read()
 
 
-def test_attack_and_talent_icons_are_the_pixel_ones():
-    for rel in ("builders/creeps.py", "builders/heroes_stats.py", "builders/dyn_matrix_common.py", "builders/aoe_increase.py"):
-        src = _read(rel)
-        assert not re.search(r"icons/ui/atk_", src), rel
-        assert "icons/misc/talents.svg" not in src, rel
-    for name in ("atk_melee", "atk_ranged", "icon_talents"):
-        assert os.path.exists(os.path.join(ROOT, "icons", "ui", "gothic", f"{name}.png")), name
+def test_attack_and_talent_icons_are_the_game_ones():
+    """2026-09-25: the owner asked to keep the game's own melee / ranged / talent icons
+    (the pixel redraws were reverted)."""
+    for rel in ("builders/creeps.py", "builders/heroes_stats.py", "builders/dyn_matrix_common.py"):
+        assert "gothic/atk_" not in _read(rel), rel
+    assert "icons/misc/talents.svg" in _read("builders/aoe_increase.py")
 
 
 def test_skin_covers_menus_and_toolbar_controls():

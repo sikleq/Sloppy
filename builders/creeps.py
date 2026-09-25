@@ -1376,7 +1376,7 @@ def save_creeps_html():
             tip = 'Ranged' if typ == 'ranged' else 'Melee'
             return (f'<span class="atk-num">{_esc(v)}</span>'
                     f'<span class="atk-badge atk-{typ}" title="{tip}">'
-                    f'<img src="icons/ui/gothic/atk_{typ}.png" alt="{tip}" '
+                    f'<img src="icons/ui/atk_{typ}.png" alt="{tip}" '
                     f'title="{tip}" loading="lazy"></span>')
         if k in ('ability1', 'ability2', 'ability3'):
             if not v:
@@ -1525,11 +1525,11 @@ def save_creeps_html():
         '<button type="button" class="hs-attack-filter" data-attack-filter="melee" '
         'aria-pressed="false" title="Show melee units">'
         '<span class="atk-badge" aria-hidden="true">'
-        '<img src="icons/ui/gothic/atk_melee.png" alt=""></span><span>Melee</span></button>'
+        '<img src="icons/ui/atk_melee.png" alt=""></span><span>Melee</span></button>'
         '<button type="button" class="hs-attack-filter" data-attack-filter="ranged" '
         'aria-pressed="false" title="Show ranged units">'
         '<span class="atk-badge" aria-hidden="true">'
-        '<img src="icons/ui/gothic/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
+        '<img src="icons/ui/atk_ranged.png" alt=""></span><span>Ranged</span></button>'
         '</span>'
         '</div></div>\n'
         '<table class="creeps-table mode-standard">\n'

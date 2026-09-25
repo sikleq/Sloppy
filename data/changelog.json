@@ -3,6 +3,20 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Hero Lab",
+      "title": "Hero Lab pickers: the close cross keeps its pixel look on hover; \"Choose Hero\" title and the search fields in the pixel style",
+      "minor": true,
+      "fix": true,
+      "link": "hero_lab.html"
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Site",
+      "title": "Melee, ranged and talent icons are the game's own again",
+      "minor": true
+    },
+    {
+      "date": "2026-09-25",
       "category": "Site",
       "title": "Ability chips on hero, item and unit pages use the pixel font too",
       "minor": true
@@ -111,13 +125,6 @@
     },
     {
       "date": "2026-09-25",
-      "category": "Materials",
-      "title": "Talent icon redrawn like the game's emblem: a pale ring with a sprig on a dark disc, readable when the button is on",
-      "minor": true,
-      "link": "aoe_increase.html"
-    },
-    {
-      "date": "2026-09-25",
       "category": "Hero Lab",
       "title": "Hero Lab: the Difference stat list opens as a 4-column table — no scrolling",
       "minor": true,
@@ -190,8 +197,7 @@
       "title": "Warm pixel controls",
       "items": [
         "Menus, filter panels, buttons and switches are warm pixel UI: pixel font, stepped corners, game-like buttons that turn gold when on",
-        "Tag chips (BUFF, NERF, NEW…) and group chips in the pixel font; Terrain's Zoom, Fullscreen and layer buttons match",
-        "Melee, ranged and talent icons redrawn as gold pixel art"
+        "Tag chips (BUFF, NERF, NEW…) and group chips in the pixel font; Terrain's Zoom, Fullscreen and layer buttons match"
       ],
       "shots": [
         "icons/changelog/2026-09-25_controls.webp",
