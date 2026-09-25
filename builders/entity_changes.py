@@ -379,11 +379,18 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     out = [_head(e["name"], asset, "../", "patch-page entity-page"),
            f' data-dyn-prefix="../patches/" data-dyn-from="{from_tok}" data-ec-eid="{eid}">\n\n', nav,
            f'\n<a class="nav-back-arrow visible" href="../{key}.html" aria-label="All {label.lower()}" title="All {label.lower()}"></a>\n',
-           _TOOLBAR.format(info=info, scopes=scopes_html, abilities=abilities_html), '<div class="container">\n',
+           (_TOOLBAR.format(info=info, scopes=scopes_html, abilities=abilities_html) if e["patches"] else ""),
+           '<div class="container">\n',
            '<section class="cat-panel ec-head-panel"><div class="entity-block ec-head">'
            f'<div class="entity {ent_cls}-entity" id="{eid}">'
            f'<div class="entity-icon {icon_cls}"><img src="{_esc(e["icon"])}" alt="{_esc(e["name"])}"></div>'
            f'{_name_block(e)}</div></div></section>\n']
+    if not e["patches"]:
+        first = _annotated()[-1] if _annotated() else ""
+        since = f" (since {_esc(first)})" if first else ""
+        out.append('<section class="cat-panel ec-patch ec-nochange"><p class="ec-nochange-note">'
+                   f'No balance changes to {_esc(e["name"])} in the annotated patches{since} yet.'
+                   '</p></section>\n')
     for p in e["patches"]:
         bucket = rec.get("patches", {}).get(p["version"], {})
         score = ""
@@ -429,6 +436,22 @@ def _name_block(e: dict) -> str:
         for i in range(_ITEM_SLOTS))
     # a sibling of the name, so it sits on the same line as the patch-dynamics row
     return name + f'<div class="ec-islots" data-ec-hero="{_esc(_file_slug(e))}">{slots}</div>'
+
+
+def _unchanged_items(have: list[dict], dyn: dict) -> list[dict]:
+    """Every item of the roster (Item Dynamics manifest) that no annotated patch changed yet —
+    as a regular entity with no patch sections, so it gets its own page, a clickable card and
+    a pickable slot on hero pages ("No changes yet" instead of a greyed, dead icon)."""
+    got = {(e["kind"], e["slug"]) for e in have}
+    out = []
+    for i in (dyn or {}).get("items", []):
+        kind, slug = i["key"].split("|", 1)
+        slug = slug.replace("_", "-")
+        if (kind, slug) in got or ("item" if kind == "enchant" else kind, slug) in got:
+            continue
+        out.append({"kind": kind, "slug": slug, "name": i["name"], "icon": f'../icons/items/{i["icon"]}.png',
+                    "patches": [], "_nochange": True})
+    return out
 
 
 def _write_item_picker(items: list[dict], dyn: dict) -> None:
@@ -1025,6 +1048,8 @@ def main() -> int:
             continue                                   # merged into item / hero index
         lst = [e for (k, _), e in ents.items()
                if k == kind or (kind == "item" and k == "enchant") or (kind == "hero" and k == "creep-hero")]
+        if kind == "item":
+            lst += _unchanged_items(lst, dyn)
         for e in lst:
             (DIST / folder / f'{_file_slug(e)}.html').write_text(_entity_page(e, asset, latest, dyn), encoding="utf-8")
         (DIST / f"{KINDS[kind][2]}.html").write_text(_index_page(kind, lst, asset, latest, dyn), encoding="utf-8")

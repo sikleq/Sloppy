@@ -4,6 +4,13 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
+      "title": "Every item has a page — even without changes yet (133 more), and all of them can be picked into a hero page's item slots",
+      "minor": true,
+      "link": "item_changes.html"
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Materials",
       "title": "Heatmap in olive and brick",
       "link": "mana_items.html",
       "items": [

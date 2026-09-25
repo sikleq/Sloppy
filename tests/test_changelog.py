@@ -40,3 +40,12 @@ def test_fixes_carry_the_bug_marker_and_the_rail_lists_only_features():
     assert html.count('class="clog-bug"') == 2
     rail = html[html.index('class="clog-rail"'):html.index("</nav>")]
     assert "Thing" in rail and "Small" not in rail and "Smaller changes" not in rail
+
+
+def test_every_roster_item_gets_a_page_even_without_changes():
+    from builders import entity_changes as ec
+    dyn = {"items": [{"key": "item|circlet", "name": "Circlet", "icon": "circlet"},
+                     {"key": "item|blink", "name": "Blink Dagger", "icon": "blink"}]}
+    have = [{"kind": "item", "slug": "blink", "name": "Blink Dagger", "icon": "", "patches": [{"version": "7.41"}]}]
+    extra = ec._unchanged_items(have, dyn)
+    assert [e["slug"] for e in extra] == ["circlet"] and extra[0]["patches"] == []
