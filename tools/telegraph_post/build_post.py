@@ -129,6 +129,22 @@ POST = [
 ]
 
 
+IV_MAX_RATIO = 3.2      # Telegram Instant View refuses very thin strips ("Resource fetch failed")
+IV_MIN_H = 200          # and then drops the WHOLE page (NO_MEDIA_FOUND) — found 2026-09-25
+
+
+def _iv_safe(im):
+    """Centre a thin screenshot (a toolbar strip: 1346x52, 905x31) on a dark canvas with sane
+    proportions, so Instant View accepts it."""
+    w, h = im.size
+    need_h = max(IV_MIN_H, round(w / IV_MAX_RATIO))
+    if h >= need_h:
+        return im
+    canvas = Image.new("RGB", (w, need_h), (17, 16, 14))
+    canvas.paste(im, (0, (need_h - h) // 2))
+    return canvas
+
+
 def _prepare_images():
     """Changelog WebP -> JPG (GIF for the animated autocast) under icons/telegraph/<week>/."""
     IMG_DIR.mkdir(parents=True, exist_ok=True)
@@ -148,7 +164,7 @@ def _prepare_images():
                            duration=im.info.get("duration", 40), loop=0)
         else:
             name = src.stem + ".jpg"
-            im.convert("RGB").save(IMG_DIR / name, "JPEG", quality=88, optimize=True)
+            _iv_safe(im.convert("RGB")).save(IMG_DIR / name, "JPEG", quality=88, optimize=True)
         names[payload[0]] = name
     return names
 
