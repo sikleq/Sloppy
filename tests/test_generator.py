@@ -564,3 +564,10 @@ def test_active_prefixed_change_row_loses_the_prefix():
 def test_dispel_direction():
     assert g._guess_tag("Disarm can now be dispelled") == "NERF"
     assert g._guess_tag("Can no longer be dispelled") == "BUFF"
+
+
+def test_charge_gain_time_is_lower_is_buff():
+    """7.41b Consecrated Wraps: "Hallowed charge gain time increased from 3s to 4s" is a NERF —
+    a longer time to gain a charge (found by the weights audit, 2026-09-25)."""
+    import generate_patch_code_v2 as g
+    assert g.LOWER_IS_BUFF.search("Hallowed charge gain time increased from 3s to 4s")

@@ -3,6 +3,30 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Dynamics",
+      "title": "Weights: audit and nine fixes",
+      "fix": true,
+      "link": "heroes_dyn.html",
+      "items": [
+        "Unit, enchantment and Spirit Bear rows no longer borrow the previous hero's ability multiplier; reworked abilities, new facets and item stat panes now count",
+        "Recipe cost changes with the same total cost score 0; item cost rows use one gold scale; an item's active effects are no longer priced as its stats",
+        "The value of a +1% change was refitted without hero base stats (it doubled spell damage and ability move speed); agreement with blind judges 0.35 → 0.40 and 0.43 → 0.46",
+        "With \"Hide old\" the line no longer jumps from a hidden column"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-25_weights_on.webp"
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Patch Reader",
+      "title": "7.41b Consecrated Wraps: a longer charge gain time is a NERF",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.41b.html"
+    },
+    {
+      "date": "2026-09-25",
       "category": "Patch Reader",
       "title": "Search moved to a loupe button in the corner",
       "items": [

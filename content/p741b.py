@@ -36,7 +36,7 @@ def build():
     W(li("All Attributes bonus decreased from +6 to +5", b(6, 5)))
     W(li("Hallowed stacks are now item charges instead of a stack counter on the buff", t("REWORK"), extra=inline_note("All charges are consumed when the barrier is created<br>Charge Restore Time of Hallowed is not affected by effects that reduce or modify cooldowns")))
     W(li("Hallowed now starts with all 3 charges when Consecrated Wraps is purchased or built", t("BUFF"), extra=inline_note("Gaining max stacks requirement for the speedup buff is removed<br>Initial 3 charges don't provide the movement speed buff")))
-    W(li("Hallowed charge gain time increased from 3s to 4s", b(3, 4)))
+    W(li("Hallowed charge gain time increased from 3s to 4s", b(3, 4, l=True)))
     W(ul_close())
     W(item_header("Gleipnir"))
     W(ul_open())

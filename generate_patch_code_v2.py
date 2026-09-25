@@ -366,6 +366,8 @@ LOWER_IS_BUFF = re.compile(
     r'|(?:damage|hit)\s+threshold'
     # 2026-09-22: owner-side timers and trigger requirements
     r'|restock\s+time'
+    # 2026-09-25: time to gain / restore a charge (Consecrated Wraps "Hallowed charge gain time 3s -> 4s" = NERF)
+    r'|charge\s+(?:gain|restore|replenish|regen(?:eration)?)\s+time'
     r'|base\s+attack\s+rate'                     # seconds per attack (Kez Sai/Katana) — like BAT
     r'|required\s+to\s+(?:trigger|cast|activate|proc)'
     r'|(?:familiar|summon(?:ed)?|illusion|ward|spirit)s?\s+(?:gold\s+)?bounty'   # own summon's bounty
