@@ -5529,7 +5529,8 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 .nav-subtab:hover { color: var(--text-bright); background: none; }
 .nav-subtab.active {
   color: var(--gold);
-  background: none;
+  /* warm glow from below — the coals under the main button's embers */
+  background: radial-gradient(ellipse 60% 75% at 50% 100%, rgba(255, 138, 26, 0.22), transparent 70%);
   border-color: transparent;
 }
 /* plain labels, like the main buttons above (no tab pills / blue borders) */

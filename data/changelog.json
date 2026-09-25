@@ -2,6 +2,13 @@
   "_comment": "Site changelog (changelog.html). Newest first. Features and new pages = entries with 1-3 short items (optional link, \"shots\": [...] — 2+ = carousel). Small changes = {\"minor\": true, date, category, title, optional link}: listed under the day, folded under a toggle when there are more than 3. Categories: Patch Reader, Materials, Hero Lab, Dynamics, Site. Add an entry in the same commit as the change.",
   "entries": [
     {
+      "date": "2026-09-25",
+      "category": "Materials",
+      "title": "The current Materials section glows warm from below, like the coals under the header's embers",
+      "minor": true,
+      "link": "neutral_stats.html"
+    },
+    {
       "date": "2026-09-24",
       "category": "Site",
       "title": "Changelog",
