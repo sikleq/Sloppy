@@ -146,6 +146,15 @@ W(li("Recipe cost decreased from 1350 to 1250 " + b(1350, 1250, l=True), t("BUFF
 «Empower Spell bonus damage 150 → 250» — число способности, остаётся строкой.
 У предметов без изменения рецепта характеристики по-прежнему идут обычными строками.
 
+## Цена предмета, которой нет в патчноуте → своей строкой (2026-09-25)
+
+Если у предмета с блоком компонентов итоговая цена изменилась в файлах игры, а в патчноуте про цену
+ни слова, — отдельная строка «Total cost decreased/increased from A to B» с `b(A, B, l=True)` и
+`inline_note("Read from the item's components")` (Revenant's Brooch 7.38: 4900 → 3300).
+Генератор: `_postprocess_unstated_total_cost`; у 7.39c/7.41 KV-снимок до патча, поэтому новая цена
+берётся из следующей версии (`_next_version`).
+Число способности предмета («Cleave damage to heroes 70% → 60%», Battle Fury 7.38) — строкой, не в карточке.
+
 ## «does not stack with …» → в «?» строки Passive/Active (2026-09-25)
 
 Пояснение «Armor reduction does not stack with its components, Desolator…» сразу после строки

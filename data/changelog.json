@@ -4,6 +4,14 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
+      "title": "Price changes the patch notes never mention now have their own row, read from the item's components: Revenant's Brooch 4900 → 3300, Shadow Blade, Orb of Corrosion, Mage Slayer (7.38), Heaven's Halberd, Veil of Discord (7.41); Battle Fury's cleave is a row",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.38.html"
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Patch Reader",
       "title": "Reworked items show all their stat changes in the before/after cards: Khanda (+50 Damage → +8 Mana Regen), Revenant's Brooch (+70 / +20% → +35 / +16%), Nullifier; Empower Spell numbers are rows",
       "minor": true,
       "fix": true,

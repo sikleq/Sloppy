@@ -2100,6 +2100,77 @@ def _kv_item_cost(name, version):
         return None
 
 
+_ENTITY_HEAD_RE = re.compile(r'^\s*W\((?:item_header|hero_header|unit_header|plain_header|section)\(')
+_AUTO_COMP_RE = re.compile(r'^(\s*)W\(auto_components_change\("([^"]+)",\s*"([^"]+)"\)\)')
+_COST_ROW_RE = re.compile(r'W\(li\("[^"]*\bcost\b[^"]*\d', re.I)
+UNSTATED_COST_NOTE = "Read from the item's components"
+
+
+def _prev_version(version):
+    try:
+        from patch.meta import RELEASE_HISTORY
+    except Exception:
+        return None
+    order = [r["version"] for r in RELEASE_HISTORY]          # newest first
+    return order[order.index(version) + 1] if version in order and order.index(version) + 1 < len(order) else None
+
+
+def _next_version(version):
+    try:
+        from patch.meta import RELEASE_HISTORY
+    except Exception:
+        return None
+    order = [r["version"] for r in RELEASE_HISTORY]          # newest first
+    return order[order.index(version) - 1] if version in order and order.index(version) > 0 else None
+
+
+def _postprocess_unstated_total_cost(lines):
+    """An item with a components panel whose total cost changed in the game files, but the patch
+    notes say nothing about the price (Revenant's Brooch 7.38: 4900 -> 3300), gets its own row
+    "Total cost decreased from A to B" with a note that it comes from the game files (owner,
+    2026-09-25). Works on generator output and on indented content/p*.py lines alike."""
+    out = []
+    i = 0
+    while i < len(lines):
+        m = _AUTO_COMP_RE.match(lines[i])
+        if not m:
+            out.append(lines[i])
+            i += 1
+            continue
+        ind, name, ver = m.groups()
+        j = i + 1
+        while j < len(lines) and not _ENTITY_HEAD_RE.match(lines[j]):
+            j += 1
+        block = lines[i:j]
+        old, new = _kv_item_cost(name, _prev_version(ver) or ""), _kv_item_cost(name, ver)
+        if old and new == old:
+            # some snapshots (7.39c, 7.41 items.json) are pre-patch copies: look ahead like
+            # auto_components_change does, to the first later snapshot where the price moved
+            nv = _next_version(ver)
+            while nv and new == old:
+                nxt = _kv_item_cost(name, nv)
+                if nxt and nxt != old:
+                    new = nxt
+                nv = _next_version(nv)
+        if not (old and new and old != new) or any(_COST_ROW_RE.search(x) for x in block):
+            out.extend(block)
+            i = j
+            continue
+        verb = "increased" if new > old else "decreased"
+        row = (f'{ind}W(li("Total cost {verb} from {old} to {new}", b({old}, {new}, l=True), '
+               f'extra=inline_note("{UNSTATED_COST_NOTE}")))')
+        k = next((n for n, x in enumerate(block) if x.strip() == "W(ul_open())"), None)
+        if k is not None:
+            block = block[:k + 1] + [row] + block[k + 1:]
+        else:
+            tail = 0 if block[-1].strip() else 1        # keep a trailing blank line after the block
+            cut = len(block) - (1 - tail) if not block[-1].strip() else len(block)
+            block = block[:cut] + [f"{ind}W(ul_open())", row, f"{ind}W(ul_close())"] + block[cut:]
+        out.extend(block)
+        i = j
+    return out
+
+
 def _postprocess_new_item_card(lines, version=None):
     """A NEW item is a card, not a change list (docs/agent-rules/patch-tags.md "Новый предмет"):
     header with label -> price (item_cost / components) -> bonuses (provides box; none -> no box)
@@ -2579,6 +2650,7 @@ def generate(version):
     out = _postprocess_new_block_label(out)
     out = _postprocess_new_item_card(out, version)
     out = _postprocess_properties_change(out)
+    out = _postprocess_unstated_total_cost(out)
     out = _postprocess_stack_note_into_ability(out)
     out = _postprocess_drop_now_requires(out)
     out = _postprocess_recipe_cost_zero_net(out)

@@ -457,6 +457,7 @@ def build():
         old=[("BUFF", "+6 Health Regen"), ("DEL",  "+275 Health"), ("DEL",  "Damage Block (passive)")],
         new=[("",     "+6.5 Health Regen", b(6, 6.5)), ("NEW",  "+9 Armor"), ("NEW",  "+25% Evasion")]))
     W(ul_open())
+    W(li("Total cost increased from 2600 to 3400", b(2600, 3400, l=True), extra=inline_note("Read from the item's components")))
     W(li("Disarm cooldown decreased from 20s to 16s", b(20, 16, l=True)))
     W(li("Disarm cast range increased from 650 to 750", b(650, 750)))
     W(li("Disarm duration increased from 3s to 3.5s", b(3, 3.5)))
@@ -681,6 +682,7 @@ def build():
              ("NEW", "+175 Health"),
              ("NEW", "+18% Spell Lifesteal")]))
     W(ul_open())
+    W(li("Total cost decreased from 1725 to 1700", b(1725, 1700, l=True), extra=inline_note("Read from the item's components")))
     W(li("Magic Weakness renamed to Spell Weakness", t("MISC")))
     W(ul_close())
     W(item_header("Bloodstone", changed="Item Reworked"))
