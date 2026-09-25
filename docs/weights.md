@@ -27,17 +27,30 @@ From the 3 865 buff↔nerf compensation pairs inside one (hero, patch) (`cde_dyn
 `log u_X − log u_Y = log n − log b` (anchor: mean log u = 0), 200-sample bootstrap for the CI. `u` = value of
 +1 % of the type. Stored in `valve_weights.json → J`.
 
+First fit (2026-09-16; superseded 2026-09-25, see below): base_damage 2.80, move_speed 2.11,
+attack_speed 1.47, mana_cost 1.42, crit 1.31, range 1.25, stats 1.21, cooldown 1.19, damage 1.06 … cast_point 0.46.
+
+**Refit 2026-09-25 (`tools/fit_signal_j.py`):** the first fit pooled hero **base-stat** events with
+ability/talent events. Base stats move in tiny % steps (+5 of 300 MS = 1.7 %, +3 of 55 damage = 5 %), so they
+pushed `u` up for the types that also name spell parameters — but the site never applies J to base-stat rows
+(those use the typical step). A spell's "Base Damage 270 → 240" was therefore valued 2.6× the same change
+named "Damage". The refit types base-stat events separately (`base:<type>`, stored as `J.base_u` for
+reference: base damage 3.81, base MS 5.30, base stats 1.36) — 3 728 pairs, types with ≥ 30 sides:
+
 | type | u | 95 % CI | | type | u | 95 % CI |
 |---|---|---|---|---|---|---|
-| base_damage | 2.80 | 2.30–3.31 | | stun | 0.97 | 0.82–1.13 |
-| move_speed | 2.11 | 1.77–2.43 | | projectile | 0.93 | 0.73–1.14 |
-| attack_speed | 1.47 | 1.24–1.70 | | armor | 0.82 | 0.67–1.01 |
-| mana_cost | 1.42 | 1.26–1.61 | | slow | 0.78 | 0.66–0.91 |
-| crit | 1.31 | 0.98–1.70 | | charges | 0.76 | 0.62–0.93 |
-| range | 1.25 | 1.10–1.40 | | lifesteal | 0.69 | 0.48–1.04 |
-| stats | 1.21 | 1.08–1.36 | | health | 0.64 | 0.55–0.73 |
-| cooldown | 1.19 | 1.07–1.30 | | magic_res | 0.48 | 0.31–0.70 |
-| damage | 1.06 | 0.98–1.16 | | cast_point | 0.46 | 0.40–0.53 |
+| crit | 1.66 | 1.12–2.23 | | silence | 1.02 | 0.69–1.56 |
+| mana_cost | 1.35 | 1.21–1.52 | | damage | 1.02 | 0.94–1.11 |
+| attack_speed | 1.29 | 1.03–1.57 | | stun | 0.97 | 0.81–1.17 |
+| base_damage | 1.23 | 1.01–1.53 | | projectile | 0.87 | 0.69–1.06 |
+| range | 1.23 | 1.09–1.36 | | health | 0.87 | 0.75–0.98 |
+| cooldown | 1.17 | 1.06–1.28 | | armor | 0.85 | 0.68–1.06 |
+| move_speed | 1.12 | 0.96–1.32 | | slow | 0.78 | 0.66–0.94 |
+| duration | 1.12 | 1.00–1.25 | | charges | 0.75 | 0.63–0.91 |
+| cast_range | 1.09 | 0.91–1.27 | | stats | 0.72 | 0.59–0.93 |
+| mana | 0.73 | 0.45–1.15 | | gold_xp | 0.69 | 0.46–1.01 |
+| lifesteal | 0.67 | 0.50–0.99 | | magic_res | 0.53 | 0.35–0.80 |
+| cast_point | 0.39 | 0.33–0.45 | | vision | — | < 30 sides, consensus weight |
 
 **How it is used:** for every row with % badges the value is now `u[type] × mean|%| / 20` (a 20 % change of
 a u = 1 type = 1.0) — this replaces `weight × magnitude` for those rows, because J measures exactly "how much
@@ -55,6 +68,12 @@ gold: `fraction = Δ × gold-per-unit / item cost`, where gold-per-unit comes fr
 (`data/rules/item_stat_prices.json`, %-stats priced per 1 %) and the cost from `data/stats/<ver>/items.json`.
 `net = 0.6 × sign × min(5 × fraction, 3)` (20 % of the item's value = 1.0; 0.6 = median hero type weight so
 both scales line up). Other item rows (actives, cooldowns, % bonuses) use the hero formula.
+Since 2026-09-25: a row is priced only when its parameter name IS the item's stat line ("Agility bonus",
+"Bonus Damage", "Mana Regen"); "Glimmer Bonus Movement Speed", "Dominated Creep movement speed", "Arctic
+Blast damage", "Corrosion armor reduction" go through the hero formula. Cost rows: "Total cost unchanged"
+(in the row or its inline note) = 0; a basic item's "Cost A → B" and a lone "Recipe cost A → B" are gold
+deltas like "Total cost A → B". Item property panes (`properties_change`) are scored as
+"<Stat> bonus changed from A to B" with the pane's badge.
 Examples 7.41f: Infused Raindrops −0.2 mana regen = 99 g of a 225 g item → −1.32; Octarine +200 g of 5100 →
 −0.12; Satanic lifesteal 30 → 25 % = 204 g of 5050 → −0.12.
 
@@ -174,6 +193,43 @@ Skill priority from DEMOS vs OpenDota: r = 0.97 on common abilities (120 d). Tal
 pull, one-off), and DEMOS currently records builds for only 97 of 127 heroes (parser gap, tracked there) —
 until fixed, those 30 heroes are topped up from OpenDota. Refresh: `tools/refresh_weights_data.py`
 (workflow Step 2c).
+
+## Audit 2026-09-25 — bugs fixed
+
+Every scored row of the 20 annotated patches (7.08, 7.38 → 7.41f; 6 273 scored records) was dumped with its
+type, context and score and read by type, by largest score and at random. Fixed:
+
+| symptom | cause | fix |
+|---|---|---|
+| Tormentor "First Spawn Time 15:00 → 20:00" ×1.3; enchantment rows ×0.76–1.3 | `current_ability_slug` was reset only by `hero_header`: units / items / enchantments / Spirit Bear inherited the previous hero's last ability (ultimate ×1.3 or skill-priority multiplier); 47 scored rows | every entity block resets it (`_open_block`); `ability_change` sets the slug of its own ability |
+| reworked abilities, new / reworked facets, item property panes moved neither `w` nor `v` (Solar Crest 7.41, Mage Slayer 7.38: no score at all) | `ability_change`, `new_facet`, `facet_change`, `properties_change` tallied tags with scores (0, 0) — 260 records | scored like the equivalent `li()` rows (`_dyn_record_card`) |
+| "Cooldown 30/25/20/15s → 24/21/18/15s" damped ×0.35 as a "tiny change" | the absolute floor read the LAST level (unchanged), the magnitude the last CHANGED level | floor uses the last level that changed |
+| "Recipe cost 600 → 400. Total cost unchanged" = ±1.26 (Battle Fury, Orchid, Glimmer 7.41, Witch Blade, Skadi, Halberd …) | total unchanged → recipe % on the hero formula | 0 |
+| "Cost 50 → 60" (Clarity) 1.07 vs "Total cost 50 → 60" 0.50 | basic-item cost and recipe-only rows missed the gold scale | same gold delta |
+| Glimmer active MS priced as the item's MS stat (−1.10), dominated creep speed (−0.47), Arctic Blast damage (+1.13), Corrosion armor reduction (−0.80) | gold pricing matched the stat keyword anywhere in the parameter name | only the item's own stat line is priced |
+| spell "Base Damage" / ability "Move Speed" valued ~2× | signal J inflated by hero base stats (see Signal J refit) | refit |
+| "Turn/Cast Speed Manipulation" → move speed, "Attack Rate" → other, a spell's "Health Cost" → gold cost (5 % typical) | classifier gaps | turn_rate / cast_point / attack_speed / health |
+| matrix, "Hide old" on: the first visible cell drew a riser from the hidden column's (clipped) level | `dynDrawRowLines` read hidden neighbours | hidden neighbour = axis |
+
+Checked and fine: ultimates are read correctly from the 7.41f KV layout (151 = every
+`ABILITY_TYPE_ULTIMATE` in the files, same as 7.41e); every `_dynamics.json` entity is in its roster and every
+patch key is in the patch list; signs come from the page tags and agree with `b()`.
+
+**Measured** (blind-judge samples, Spearman ρ of |score| vs grade; judge mean for sample 2):
+
+| | sample 1 (1 judge) | sample 2 (2 judges) |
+|---|---|---|
+| before | 0.346 | 0.426 |
+| J refit only | 0.377 | 0.452 |
+| all fixes | **0.402** | **0.461** |
+
+`corr(w, buff − nerf)` per cell 0.839 → 0.850 (the property panes add buff/nerf rows that were 0 before).
+Tried and **not** applied (no clear gain): "barrier" → health (ρ +0.003 / 0), count words ("number of",
+"bounces", "jumps", "targets") → charges (ρ −0.009 / +0.011). The unclassified share of buff/nerf rows is 4.2 %.
+
+Known data gaps (not code): `data/stats/7.39c|7.41/items.json` are pre-patch copies (17 "Total cost" rows
+disagree with the note), so item costs of those versions are the old ones; `talent_tiers.json` has no 7.41f
+tiers yet (run `tools/refresh_weights_data.py`).
 
 ## Matrix chart (heroes_dyn / items_dyn)
 
