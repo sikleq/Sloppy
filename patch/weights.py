@@ -26,7 +26,7 @@
                cooldowns) fall back to the hero formula.
   context    — multiplier by where the row lives (data/rules/valve_weights.json "context"):
                ultimate 1.3, basic ability/innate/scepter/base stat/item 1.0, shard 0.9,
-               facet 0.8, talent 10/15/20/25 = 0.6/0.8/1.0/1.2.
+               facet 0.8, talent 10/15/20/25 = 0.5/0.6/0.7/0.8.
   priority   — basic abilities are further scaled 0.7–1.3 by how pros skill them (share of the
                first 10 skill points, OpenDota pro matches; data/rules/ability_priority.json).
   talents    — "Level N Talent: A replaced with B" (REWORK) gets a DIRECTION from signal K when
@@ -52,12 +52,13 @@ CAT = [
     ("cooldown", r"cooldown|\bcd\b|charge restore|recharge|restore time"),
     ("mana_cost", r"mana cost|manacost|costs? \d+ mana|mana per"),
     ("cast_range", r"cast range"),
-    ("cast_point", r"cast point|cast time|backswing|attack point|animation|\bdelay\b"),
+    ("cast_point", r"cast point|cast time|cast speed|backswing|attack point|animation|\bdelay\b"),
     ("stun", r"stun|bash|knockback|taunt"),
     ("silence", r"silence|\bhex\b|\broot|disarm|mute|leash"),
     ("slow_res", r"slow resist"), ("slow", r"slow"), ("status_res", r"status resist"),
     ("spell_amp", r"spell amp|spell damage amp"),
-    ("attack_speed", r"attack speed|base attack time|\bbat\b"),
+    ("attack_speed", r"attack speed|base attack time|\bbat\b|attack rate|attack interval"),
+    ("turn_rate", r"\bturn rate|\bturn speed"),   # before move_speed: "Turn Speed" ties with "speed"
     ("projectile", r"\b(projectile|missile|bolt|arrow|orb|spear|shard|dagger|blade|glaive|axe|hook|ball|wave|dart|rocket|shot|throw|toss|flight|travel) speed|projectile|missile"),
     ("move_speed", r"movement speed|move speed|movespeed|movement|\bms\b|\bspeed\b"),
     ("evasion", r"evasion|dodge|backtrack|miss chance"),
@@ -69,8 +70,8 @@ CAT = [
     ("base_damage", r"base damage|attack damage|damage at level"),
     ("charges", r"charge|stack|max attacks|attacks to"),
     ("gold_xp", r"gold|bounty|experience|\bxp\b"), ("respawn", r"respawn|reincarnat"),
-    ("turn_rate", r"turn rate"), ("vision", r"vision|sight|reveal"),
-    ("cost", r"recipe cost|total cost|\bcost\b|price"),
+    ("vision", r"vision|sight|reveal"),
+    ("cost", r"recipe cost|total cost|(?<!health )\bcost\b|price"),   # a spell's health cost = health
     ("damage", r"damage|dmg|dps|burn|cleave"),
     ("duration", r"duration|\btime\b|lasts|linger|channel"),
     ("range", r"radius|range|distance|\baoe\b|\barea\b|width|length"),
@@ -82,7 +83,6 @@ _TAGS_RE = _re.compile(r"<[^>]+>")
 _QUAL_RE = _re.compile(r"\s+(?:on|when|while|against|per|for|to|in|with|during|after|vs\.?)\s+", _re.I)
 _VERB_RE = _re.compile(r"\b(increased|decreased|reduced|improved|rescaled|changed|lowered|raised|"
                        r"replaced|now|no longer|removed|added)\b", _re.I)
-_PCT_RE = _re.compile(r'class="badge (?:(?:buff|nerf)\d+|neutral)">([+\-−]?\d+(?:\.\d+)?)%<')
 _PCT_CLS_RE = _re.compile(r'class="badge (buff|nerf|neutral)\d*">([+\-−]?\d+(?:\.\d+)?)%<')
 _OVERALL_RE = _re.compile(r'data-overall="(buff|nerf)"')
 
@@ -104,7 +104,6 @@ def _row_pcts(text, badge_html):
             return [last[1]]
     return [v for _, v in found]
 _DIR = {"buff": 1.0, "nerf": -1.0}
-MAG_CAP = 50.0
 
 
 def _plain(text):
@@ -226,36 +225,30 @@ def _base_stat_magnitude(text):
     return delta / step
 
 
-def _magnitude(text, badge_html, kind, ctx=None):
-    """Hybrid: base-stat rows by Valve's typical step; everything else by mean |%| over the
-    row's badges (0% included; recipe+total -> total) divided by the type's typical |%|."""
-    if ctx and ctx.get("base_stat"):
-        m = _base_stat_magnitude(text)
-        if m is not None:
-            return min(m, MAG_CAP_NORM)
-    pcts = [abs(float(x.replace("\u2212", "-"))) for x in _PCT_RE.findall(badge_html or "")]
-    if not pcts:
-        return 1.0
-    if len(pcts) >= 2 and _re.search(r"total cost", _plain(text), _re.I):
-        pcts = [pcts[-1]]
-    return min((sum(pcts) / len(pcts)) / _TPCT.get(kind, 20.0), MAG_CAP_NORM)
-
-
 # ---- items: gold scale (review E.6) ---------------------------------------------------
 _PRICES = _json.load(open(_os.path.join(_HERE, "data", "rules", "item_stat_prices.json"),
                           encoding="utf-8"))["versions"]
-_ITEM_STAT_RE = [  # head keyword -> priced stat; %-stats listed in _PCT_STATS
+# A priced row names ONLY the stat the item grants ("Agility bonus", "Bonus Damage", "Mana Regen").
+# Rows about an active / aura / debuff ("Glimmer Bonus Movement Speed", "Dominated Creep movement
+# speed", "Arctic Blast damage", "Corrosion armor reduction") are not the item's stat line and fall
+# back to the hero formula — pricing them in gold scored a creep's move speed as the item's.
+_ITEM_STAT_RE = [  # full stat phrase -> priced stat; %-stats listed in _PCT_STATS
     ("all_stats", r"all stats|all attributes"), ("strength", r"strength"), ("agility", r"agility"),
-    ("intelligence", r"intelligence|int"), ("health_regen", r"health regen|hp regen"),
-    ("mana_regen", r"mana regen"), ("lifesteal", r"lifesteal"), ("spell_amp", r"spell amp"),
-    ("magic_res", r"magic resist"), ("evasion", r"evasion"), ("attack_speed", r"attack speed"),
-    ("armor", r"armor"), ("move_speed", r"movement speed|move speed"),
-    ("health", r"health"), ("mana", r"mana"), ("damage", r"damage"),
+    ("intelligence", r"intelligence|int"), ("health_regen", r"health regen(?:eration)?|hp regen"),
+    ("mana_regen", r"mana regen(?:eration)?"), ("lifesteal", r"(?:spell )?lifesteal"),
+    ("spell_amp", r"spell amp(?:lification)?"), ("magic_res", r"magic resist(?:ance)?"),
+    ("evasion", r"evasion"), ("attack_speed", r"attack speed"), ("armor", r"armor"),
+    ("move_speed", r"movement speed|move speed"), ("health", r"(?:max )?health"),
+    ("mana", r"(?:max )?mana"), ("damage", r"(?:attack )?damage"),
 ]
-_ITEM_STAT = [(k, _re.compile(rx, _re.I)) for k, rx in _ITEM_STAT_RE]
+_ITEM_STAT = [(k, _re.compile(r"^\s*(?:bonus\s+)?(?:" + rx + r")(?:\s+bonus)?\s*$", _re.I))
+              for k, rx in _ITEM_STAT_RE]
 _PCT_STATS = {"lifesteal", "spell_amp", "magic_res", "evasion"}
 _STAT_FROMTO_RE = _re.compile(r"from\s+\+?(-?\d+(?:\.\d+)?)(%?)\S*\s+to\s+\+?(-?\d+(?:\.\d+)?)(%?)", _re.I)
-_TOTAL_COST_RE = _re.compile(r"total cost[^.]*?from\s+(\d+)g?\s+to\s+(\d+)g?", _re.I)
+_TOTAL_COST_RE = _re.compile(r"total cost[^.]*?from\s+(\d+)[\d/]*g?\s+to\s+(\d+)", _re.I)
+_TOTAL_SAME_RE = _re.compile(r"total cost (?:is )?unchanged", _re.I)
+_COST_HEAD_RE = _re.compile(r"^\s*(?:recipe\s+)?cost\s*$", _re.I)
+_COST_FROMTO_RE = _re.compile(r"from\s+(\d+)g?\s+to\s+(\d+)", _re.I)
 ITEM_GOLD_K = 5.0        # 20% of the item's value = 1.0
 ITEM_GOLD_W = 0.6        # neutral weight so item rows sit on the hero scale (median type weight)
 _COST_CACHE = {}
@@ -289,11 +282,17 @@ def _price(stat, version):
 
 
 def _item_gold_fraction(text, ctx):
-    """Δ of an item row in gold / item cost, or None when the row is not a priced stat / cost."""
+    """Δ of an item row in gold / item cost, or None when the row is not a priced stat / cost.
+    Cost rows: "Total cost unchanged" -> 0 (only the build path moved); "Total cost A -> B" -> B-A;
+    a basic item's "Cost A -> B" and a lone "Recipe cost A -> B" -> B-A (the total moves with the
+    recipe unless the note says otherwise). The KV snapshots are NOT used for the delta: some
+    (7.39c, 7.41 items.json) are pre-patch copies."""
     t = _plain(text)
     cost = _item_cost(ctx.get("item"), ctx.get("version"))
     if not cost:
         return None
+    if _TOTAL_SAME_RE.search(t):
+        return 0.0
     m = _TOTAL_COST_RE.search(t)
     if m:
         return abs(float(m.group(2)) - float(m.group(1))) / cost
@@ -301,7 +300,12 @@ def _item_gold_fraction(text, ctx):
     vm = _VERB_RE.search(t)
     if vm and vm.start() > 0:
         head = t[:vm.start()]
-    stat = next((k for k, rx in _ITEM_STAT if rx.search(head)), None)
+    if _COST_HEAD_RE.match(head):
+        m = _COST_FROMTO_RE.search(t)
+        if not m:
+            return None
+        return abs(float(m.group(2)) - float(m.group(1))) / cost
+    stat = next((k for k, rx in _ITEM_STAT if rx.match(head)), None)
     if not stat:
         return None
     m = _STAT_FROMTO_RE.search(t)
@@ -328,15 +332,20 @@ _NUM_RE = _re.compile(r"-?\d+(?:\.\d+)?")
 def _small_change_damp(text):
     """Absolute floor (agreement test 2026-09-17): a big % of a tiny number is still tiny.
     Seconds: |Δ| < 0.25 s -> x0.35, < 0.5 s -> x0.5. Percentage points: |Δ| < 2 pp -> x0.5.
-    Uses the LAST value of per-level lists (max rank). 1.0 when not applicable."""
+    Δ is taken at the LAST level whose value changed — the same level _row_pcts sizes the row by.
+    (Taking the last level blindly damped "30/25/20/15s -> 24/21/18/15s" x0.35: max rank equal.)
+    1.0 when not applicable."""
     m = _ABS_FROMTO_RE.search(_plain(text))
     if not m:
         return 1.0
     a, b = m.group(1), m.group(2)
-    na, nb = _NUM_RE.findall(a), _NUM_RE.findall(b)
+    na = [float(x) for x in _NUM_RE.findall(a)]
+    nb = [float(x) for x in _NUM_RE.findall(b)]
     if not na or not nb:
         return 1.0
-    delta = abs(float(nb[-1]) - float(na[-1]))
+    n = max(len(na), len(nb))
+    na, nb = (na + na[-1:] * n)[:n], (nb + nb[-1:] * n)[:n]
+    delta = next((abs(y - x) for x, y in zip(reversed(na), reversed(nb)) if x != y), 0.0)
     if a.rstrip().endswith("s") or b.rstrip().endswith("s"):
         return 0.35 if delta < 0.25 else (0.5 if delta < 0.5 else 1.0)
     if "%" in a or "%" in b:
