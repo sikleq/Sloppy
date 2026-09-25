@@ -114,14 +114,18 @@ W(li("...follows global lifesteal rules...", t("NERF"),
 
 Recipe cost decrease не BUFF, если total вырос. Всегда читать следующее предложение после «Recipe cost».
 
-## Recipe cost net zero → MISC
+## Recipe cost changed, total unchanged → BUFF/NERF, % inline (2026-09-25)
 
-«Recipe cost increased from X to Y. Total cost unchanged at Z» → MISC, recipe % inline:
+«Recipe cost increased from X to Y. Total cost unchanged at Z» → тег по направлению рецепта
+(дороже = NERF, дешевле = BUFF), **процент рецепта — сразу после «X to Y»**, в конце строки процента
+НЕТ (общая цена не изменилась). Тег — только слово `t("NERF"|"BUFF")`:
 ```python
-W(li("Recipe cost increased from 800 to 850 " + b(800, 850, l=True),
-     t("MISC"),
-     extra=inline_note("Total cost unchanged at 1775g due to Chainmail cost decrease")))
+W(li("Recipe cost increased from 450 to 800 " + b(450, 800, l=True) + ". Total cost unchanged at 2150g", t("NERF")))
+W(li("Recipe cost decreased from 1350 to 1250 " + b(1350, 1250, l=True), t("BUFF"),
+     extra=inline_note("Total cost unchanged at 4500g")))
 ```
+Генератор делает это сам (`_postprocess_recipe_cost_zero_net`), тесты в `tests/test_generator.py`.
+Рецепт *и* общая цена не изменились → `t("MISC")`.
 
 ## Порядок строк в properties_change
 

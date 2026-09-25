@@ -3,6 +3,13 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Patch Reader",
+      "title": "\"Recipe cost … Total cost unchanged\" rows: the recipe % sits right after the numbers, no % at the end of the row",
+      "minor": true,
+      "link": "patches/7.41.html"
+    },
+    {
+      "date": "2026-09-25",
       "category": "Hero Lab",
       "title": "Hero Lab pickers: the close cross keeps its pixel look on hover; \"Choose Hero\" title and the search fields in the pixel style",
       "minor": true,

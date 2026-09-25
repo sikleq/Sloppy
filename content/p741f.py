@@ -38,7 +38,7 @@ def build():
     W(ul_close())
     W(item_header("Hydra's Breath"))
     W(ul_open())
-    W(li("Recipe cost decreased from 1100 to 1000. Total cost unchanged at 5900g (due to Dragon Lance cost increase)", b(1100, 1000, l=True)))
+    W(li("Recipe cost decreased from 1100 to 1000 " + b(1100, 1000, l=True) + ". Total cost unchanged at 5900g (due to Dragon Lance cost increase)", t("BUFF")))
     W(ul_close())
     W(item_header("Manta Style"))
     W(ul_open())

@@ -251,21 +251,25 @@ def _pp1(line):
 def test_recipe_cheaper_total_unchanged_inline_is_buff_not_misc():
     out = _pp1('W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))')
     assert 't("MISC")' not in out
-    assert 'b(600, 400, l=True)))' in out
+    # recipe % inline after the numbers, the row tag is the word only (no % at the row end)
+    assert out == ('W(li("Recipe cost decreased from 600 to 400 " + b(600, 400, l=True)'
+                   ' + ". Total cost unchanged at 3900g", t("BUFF")))')
 
 
 def test_recipe_pricier_total_unchanged_inline_keeps_nerf_badge():
-    out = _pp1('W(li("Recipe cost increased from 500 to 525. Total cost unchanged at 1625g", b(500, 525, l=True)))')
-    assert 't("MISC")' not in out
-    assert 'b(500, 525, l=True)))' in out
+    """7.41 "Recipe cost increased from 450 to 800. Total cost unchanged at 2150g": NERF on the left,
+    +78% right after "450 to 800", nothing at the end (owner, 2026-09-25)."""
+    out = _pp1('W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b(450, 800, l=True)))')
+    assert out == ('W(li("Recipe cost increased from 450 to 800 " + b(450, 800, l=True)'
+                   ' + ". Total cost unchanged at 2150g", t("NERF")))')
 
 
 def test_recipe_total_unchanged_split_note_is_badge_not_misc():
     out = _pp1('W(li("Recipe cost decreased from 1350 to 1250", b(1350, 1250, l=True), '
                'extra=inline_note("Total cost unchanged at 4500g")))')
     assert 't("MISC")' not in out
-    assert 'b(1350, 1250, l=True)' in out
-    assert 'extra=inline_note("Total cost unchanged at 4500g")' in out
+    assert out == ('W(li("Recipe cost decreased from 1350 to 1250 " + b(1350, 1250, l=True), t("BUFF"), '
+                   'extra=inline_note("Total cost unchanged at 4500g")))')
 
 
 def test_recipe_and_total_both_change_still_tags_by_total():

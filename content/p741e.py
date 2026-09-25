@@ -40,12 +40,12 @@ def build():
     W(ul_close())
     W(item_header("Shiva's Guard"))
     W(ul_open())
-    W(li("Recipe cost decreased from 1350 to 1250", b(1350, 1250, l=True),
+    W(li("Recipe cost decreased from 1350 to 1250 " + b(1350, 1250, l=True), t("BUFF"),
          extra=inline_note("Total cost unchanged at 4500g")))
     W(ul_close())
     W(item_header("Gleipnir"))
     W(ul_open())
-    W(li("Recipe cost decreased from 400 to 300", b(400, 300, l=True),
+    W(li("Recipe cost decreased from 400 to 300 " + b(400, 300, l=True), t("BUFF"),
          extra=inline_note("Total cost unchanged at 4650g")))
     W(ul_close())
     W(item_header("Crella's Crozier"))

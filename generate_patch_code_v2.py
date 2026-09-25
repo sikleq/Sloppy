@@ -1673,8 +1673,9 @@ _RECIPE_COST_UNCHANGED_SPLIT_RE = re.compile(
 def _postprocess_recipe_cost_zero_net(lines):
     """Rewrite recipe-cost rows to the correct badge form:
     - Both recipe and total changed: recipe % inline, total badge as main.
-    - Recipe changed, total unchanged: recipe badge as main (BUFF if cheaper,
-      NERF if pricier) — a cheaper recipe is a real player benefit.
+    - Recipe changed, total unchanged: recipe % inline after "A to B", the row tag is the
+      word only — BUFF if cheaper, NERF if pricier (a cheaper recipe is a real player
+      benefit), no % at the end of the row.
     """
     out = []
     for line in lines:
@@ -1687,18 +1688,23 @@ def _postprocess_recipe_cost_zero_net(lines):
                 f' + "{tpre}{ta}{tmid}{tb}", b({ta}, {tb}, l=True)))'
             )
             continue
+        # Total unchanged (2026-09-25): the recipe % sits INLINE right after "A to B" and the row
+        # carries only the tag word (NERF if the recipe got pricier, BUFF if cheaper) — no % at
+        # the end of the row, because the thing the player pays in total did not change.
         m = _RECIPE_COST_UNCHANGED_INLINE_RE.match(line)
         if m:
             prefix, a, mid, b_val, tail = m.groups()
+            tag = "NERF" if int(b_val) > int(a) else "BUFF"
             out.append(
-                f'W(li("{prefix}{a}{mid}{b_val}{tail}", b({a}, {b_val}, l=True)))'
+                f'W(li("{prefix}{a}{mid}{b_val} " + b({a}, {b_val}, l=True) + "{tail}", t("{tag}")))'
             )
             continue
         m = _RECIPE_COST_UNCHANGED_SPLIT_RE.match(line)
         if m:
             prefix, a, mid, b_val, note_text = m.groups()
+            tag = "NERF" if int(b_val) > int(a) else "BUFF"
             out.append(
-                f'W(li("{prefix}{a}{mid}{b_val}", b({a}, {b_val}, l=True), '
+                f'W(li("{prefix}{a}{mid}{b_val} " + b({a}, {b_val}, l=True), t("{tag}"), '
                 f'extra=inline_note("{note_text}")))'
             )
             continue

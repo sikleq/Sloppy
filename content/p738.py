@@ -414,7 +414,7 @@ def build():
     W(item_header("Eye of Skadi", changed=True))
     W(auto_components_change("Eye of Skadi", "7.38"))
     W(ul_open())
-    W(li("Recipe cost decreased from 1300 to 1050. Total cost unchanged at 5300", b(1300, 1050, l=True)))
+    W(li("Recipe cost decreased from 1300 to 1050 " + b(1300, 1050, l=True) + ". Total cost unchanged at 5300", t("BUFF")))
     W(ul_close())
     W(item_header("Hand of Midas"))
     W(ul_open())
@@ -514,7 +514,7 @@ def build():
     W(item_header("Witch Blade", changed=True))
     W(auto_components_change("Witch Blade", "7.38"))
     W(ul_open())
-    W(li("Recipe cost decreased from 600 to 250. Total cost unchanged at 2775", b(600, 250, l=True)))
+    W(li("Recipe cost decreased from 600 to 250 " + b(600, 250, l=True) + ". Total cost unchanged at 2775", t("BUFF")))
     W(ul_close())
 
     # ===== NEUTRAL ITEM UPDATES =====
