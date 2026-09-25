@@ -10421,7 +10421,6 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 }
 .hs-attack-filter .atk-badge img { opacity: 1; }
 .aoe-up-btn img { border-radius: 0; }
-img[src*="gothic/atk_"], img[src*="gothic/icon_talents"] { image-rendering: pixelated; }
 
 /* View select: warm field + a stepped gold caret; the native list follows */
 .cal-mode-select {

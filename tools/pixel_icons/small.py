@@ -111,7 +111,8 @@ def bug():
     return s
 
 
-ICONS = {"atk_melee": melee, "atk_ranged": ranged, "icon_talents": talents, "icon_bug": bug}
+# melee / ranged / talents were reverted to the game icons (2026-09-25); only the beetle ships.
+ICONS = {"icon_bug": bug}
 
 
 def main():
