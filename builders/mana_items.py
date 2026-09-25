@@ -49,6 +49,24 @@ _INT_REGEN_HIST = [
 INT_TO_MAX_MANA = float(_INT_MANA_HIST[-1][3])   # +12 max mana per Int point
 INT_TO_REGEN    = float(_INT_REGEN_HIST[-1][3])  # +0.05 mana regen per Int point
 
+
+def _vkey(v: str) -> tuple:
+    """'7.36' < '7.36a' < '7.37' — numeric major/minor, then the letter."""
+    m = re.match(r"(\d+)\.(\d+)([a-z]?)", v)
+    return (int(m.group(1)), int(m.group(2)), m.group(3)) if m else (0, 0, "")
+
+
+def _int_const_at(hist: list[tuple], patch: str | None) -> float:
+    """The Intelligence constant IN EFFECT at `patch` (history cells of past patches must
+    use that patch's value — 11 mana/Int in 7.36–7.38, not today's 12)."""
+    if not patch:
+        return float(hist[-1][3])
+    val = float(hist[0][2])
+    for p, _date, _old, new in hist:
+        if _vkey(p) <= _vkey(patch):
+            val = float(new)
+    return val
+
 # ── Source data ────────────────────────────────────────────────────────────
 from patch.meta import latest_stats_version as _lsv
 ITEMS_TXT = _HERE / "data" / "stats" / _lsv() / "items.txt"
@@ -277,7 +295,7 @@ def _patches_with_items() -> list[tuple[str, str]]:
     ]
 
 
-def _flat_metric(d: dict, kind: str, slug: str = "") -> float:
+def _flat_metric(d: dict, kind: str, slug: str = "", patch: str | None = None) -> float:
     """Compute a single Mana-Items column metric from a FLAT items.json item
     dict (the slim per-patch JSON has one flat level per slug after the
     DEEP_ITEM_FIELDS flattening in fetch_stats.py). Mirrors load_items()."""
@@ -287,9 +305,10 @@ def _flat_metric(d: dict, kind: str, slug: str = "") -> float:
     if kind == "intel":
         return intel
     if kind == "mana":
-        return g(*MAX_MANA_FIELDS) + intel * INT_TO_MAX_MANA
+        return g(*MAX_MANA_FIELDS) + intel * _int_const_at(_INT_MANA_HIST, patch)
     if kind == "regen":
-        passive = g(*PASSIVE_REGEN_FIELDS) + intel * INT_TO_REGEN + AURA_REGEN_EXTRA.get(slug, 0.0)
+        passive = (g(*PASSIVE_REGEN_FIELDS) + intel * _int_const_at(_INT_REGEN_HIST, patch)
+                   + AURA_REGEN_EXTRA.get(slug, 0.0))
         active_mana = max(
             (_to_float(str(d.get(k, 0))) for k in ACTIVE_MANA_FIELDS),
             default=0.0,
@@ -300,7 +319,7 @@ def _flat_metric(d: dict, kind: str, slug: str = "") -> float:
         return (passive + active) * mult
     # Computed columns — derived from regen + cost, matching load_items().
     if kind in ("cost_per_regen", "regen_per_gold", "mana_per_60s"):
-        regen = _flat_metric(d, "regen", slug)
+        regen = _flat_metric(d, "regen", slug, patch)
         cost = _to_float(str(d.get("ItemCost", 0)))
         if kind == "mana_per_60s":
             return regen * 60
@@ -353,7 +372,7 @@ def load_metric_history(kind: str) -> dict[str, list[tuple[str, str, float, floa
         for slug, fields in data.items():
             if not isinstance(fields, dict):
                 continue
-            val = _flat_metric(fields, kind, slug)
+            val = _flat_metric(fields, kind, slug, patch)
             prev = last.get(slug)
             if prev is not None and round(prev, 3) != round(val, 3):
                 # ('V', ...) shape so _encode_hist treats it like a value change.

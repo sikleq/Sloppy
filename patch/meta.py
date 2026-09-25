@@ -8,7 +8,8 @@ import builders.site_common as _site
 # Single source of truth. Add "filename" when a patch page exists.
 # PATCHES is derived automatically — do NOT maintain it separately.
 # Major-patch dates from odota/dotaconstants. Sub-patches sourced from Liquipedia
-# and Fandom. Append new entries here when patches release; sorted internally.
+# and Fandom. Add new entries anywhere — the list is re-sorted NEWEST-FIRST right
+# below (PATCHES[0], rosters, Mana Items history and the Dynamics columns rely on it).
 RELEASE_HISTORY = [
     # 7.41 cycle
     {"version": "7.41f", "date": "15.09.2026", "filename": "patches/7.41f.html"},
@@ -180,6 +181,11 @@ for _p in RELEASE_HISTORY:
         _p["filename"] = f"patches/{_p['version']}.html"
 
 # Auto-derived: all RELEASE_HISTORY entries that have a patch page.
+RELEASE_HISTORY = sorted(
+    RELEASE_HISTORY,
+    key=lambda p: datetime.datetime.strptime(p["date"], "%d.%m.%Y"),
+    reverse=True,
+)
 PATCHES = [p for p in RELEASE_HISTORY if "filename" in p]
 
 

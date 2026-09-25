@@ -3,6 +3,20 @@
   "entries": [
     {
       "date": "2026-09-25",
+      "category": "Materials",
+      "title": "Mana Items: item history uses each patch's mana per Intelligence (11 in 7.36–7.38), not today's 12",
+      "minor": true,
+      "link": "mana_items.html"
+    },
+    {
+      "date": "2026-09-25",
+      "category": "Materials",
+      "title": "Hero Stats / Hero Lab: 7.41f base attack speed fixed (Earth Spirit 95, Keeper of the Light 90, Warlock 95) — the data was stuck at 7.41e",
+      "minor": true,
+      "link": "heroes_stats.html"
+    },
+    {
+      "date": "2026-09-25",
       "category": "Site",
       "title": "Search, price and level fields use the pixel font for both the hint and what you type",
       "minor": true

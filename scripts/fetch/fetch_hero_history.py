@@ -13,6 +13,14 @@ history for those raw-only fields (e.g. Gyrocopter night vision 7.41d).
 
 After a new patch ships: create data/stats/<patch>/ and run — it fills in
 heroes_raw.json for the newcomer.
+
+7.41f+ (per-hero KV layout): a patch folder that has the local per-hero files
+(data/stats/<patch>/heroes/*.txt) is built FROM THEM, not from d2vpkr. d2vpkr's
+npc_heroes.txt became a #base include list in 7.41f and its commits can predate the
+release, which silently froze 7.41f at the 7.41e values (Earth Spirit / KotL / Warlock
+base attack speed). The parent template npc_dota_hero_base comes from
+data/stats/<patch>/npc_dota_hero_base.txt when present (extract it from the game VPK),
+otherwise it is carried over from the previous patch with a warning.
 """
 import json
 import re
@@ -97,6 +105,40 @@ def parse_npc_heroes(text):
     return out
 
 
+def build_from_local(ver_dir, prev_raw_path=None):
+    """heroes_raw for a patch that has the local per-hero KV files, else None."""
+    # Only the 7.41f+ layout: npc_heroes.txt is a #base include list and the per-hero files
+    # carry the hero stats. (Older folders also have heroes/*.txt, but those hold only the
+    # abilities — building from them would wipe the hero stats.)
+    root_kv = ver_dir / "npc_heroes.txt"
+    if not root_kv.exists() or '#base "heroes/' not in root_kv.read_text(encoding="utf-8", errors="ignore"):
+        return None
+    heroes_dir = ver_dir / "heroes"
+    files = sorted(heroes_dir.glob("npc_dota_hero_*.txt")) if heroes_dir.is_dir() else []
+    if not files:
+        return None
+    out = {}
+    for f in files:
+        out.update(parse_npc_heroes(f.read_text(encoding="utf-8", errors="ignore")))
+    base_txt = ver_dir / "npc_dota_hero_base.txt"
+    if base_txt.exists():
+        out.update(parse_npc_heroes(base_txt.read_text(encoding="utf-8", errors="ignore")))
+    elif prev_raw_path and prev_raw_path.exists():
+        prev = json.loads(prev_raw_path.read_text(encoding="utf-8"))
+        if "npc_dota_hero_base" in prev:
+            out["npc_dota_hero_base"] = prev["npc_dota_hero_base"]
+            print("  ! {}: npc_dota_hero_base.txt нет — шаблон взят из {}".format(
+                ver_dir.name, prev_raw_path.parent.name))
+    return out
+
+
+def _write(out_path, parsed):
+    out_path.write_text(
+        json.dumps(parsed, ensure_ascii=False, indent=0,
+                   separators=(",", ":"), sort_keys=True),
+        encoding="utf-8")
+
+
 def load_patch_dates():
     meta = json.loads(META_PATH.read_text(encoding="utf-8"))
     out = {}
@@ -176,6 +218,19 @@ def main():
     if not patches:
         print("X нет папок data/stats/<patch>/")
         return 1
+    # Local per-hero KV first (7.41f+): no network, always rebuilt (cheap, exact).
+    local_done = set()
+    for i, ver in enumerate(patches):
+        prev = STATS_DIR / patches[i - 1] / "heroes_raw.json" if i else None
+        parsed = build_from_local(STATS_DIR / ver, prev)
+        if parsed is not None:
+            _write(STATS_DIR / ver / "heroes_raw.json", parsed)
+            local_done.add(ver)
+            print("  + {} ← локальные heroes/*.txt ({} героев)".format(ver, len(parsed)))
+    if all(v in local_done or ((STATS_DIR / v / "heroes_raw.json").exists() and not force)
+           for v in patches[:-1]) and patches[-1] in local_done:
+        print("Готово: всё из локальных файлов / кэша")
+        return 0
     print("Индексирую коммиты d2vpkr (npc_heroes.txt)…")
     commit_idx = fetch_commit_index()
     if not commit_idx:
@@ -188,6 +243,8 @@ def main():
     latest = patches[-1]
     for i, ver in enumerate(patches):
         out_path = STATS_DIR / ver / "heroes_raw.json"
+        if ver in local_done:
+            continue
         if out_path.exists() and not force and ver != latest:
             skipped += 1
             continue
