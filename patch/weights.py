@@ -650,6 +650,10 @@ def _compress(x):
 # 2026-09-26: "Skeleton Building Damage penalty 25% -> 75%" scored -3.63; judge rho +0.007).
 _NICHE_RE = _re.compile(r"building|structure|tower|sub-ability|illusion|creep|neutral|roshan", _re.I)
 NICHE_W = 0.5
+# A buff/nerf row with no number at all ("can now be cast while channeling") was scored by the bare
+# type weight — half of what a blind judge gives it next to numbered rows (2026-09-26, 115 such hero
+# rows + 60 numbered anchors graded blind: rho 0.341 -> 0.465 at x2, plateau x2-2.25).
+NUMBERLESS_W = 2.0
 
 
 def _row_value(text, badge_html, kind, ctx):
@@ -669,6 +673,8 @@ def _row_value_raw(text, badge_html, kind, ctx):
         return _compress(_J[kind] * (sum(pcts) / len(pcts)) / J_PCT_UNIT) * damp
     if pcts:
         return weight_of(kind) * _compress((sum(pcts) / len(pcts)) / _TPCT.get(kind, 20.0)) * damp
+    if not _re.search(r"\d", _plain(text)):
+        return weight_of(kind) * NUMBERLESS_W    # "Toggling is no longer disabled by silence"
     return weight_of(kind)
 
 

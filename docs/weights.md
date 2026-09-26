@@ -362,6 +362,11 @@ Neighbouring thresholds give 0.479–0.489 (a plateau, not a spike); hero net vs
 Also: "Leash pull strength growth" was typed as the Strength attribute — "pull / push / slow / effect
 strength" no longer is.
 
+**Rows without any number** (115 hero rows: "Toggling is no longer disabled by silence") were scored by
+the bare type weight. A blind grading of those 115 mixed with 60 numbered rows (Sonnet judge, grades 1–5,
+`judge3/` in the session scratchpad): they average grade 2.37 vs 2.17 for the numbered ones while the model gave
+them half the score (0.46 vs 0.82). `NUMBERLESS_W = 2`: ρ on the 175 rows 0.341 → 0.465 (plateau ×2–2.25).
+
 Checked and left as they are:
 - **A value that becomes 0 at max level** ("Mana Cost 225 → 220/110/0", +3.63): the row is in blind sample 2
   and both judges gave it 3 and 4, among their highest grades. Removing an ultimate's mana cost is a big buff.

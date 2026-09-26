@@ -10,7 +10,7 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Hero scores: tiny time changes (a 1 s cooldown doubled, a 2 s linger halved) and numbers that only hit buildings, illusions, creeps or a sub-ability no longer outweigh real changes",
+      "title": "Hero scores: tiny time changes (a 1 s cooldown doubled, a 2 s linger halved) and numbers that only hit buildings, illusions, creeps or a sub-ability no longer outweigh real changes; changes described without numbers (\"can now be cast while channeling\") are no longer weighed at half",
       "minor": true,
       "fix": true
     },

@@ -181,3 +181,9 @@ def test_matrix_line_ignores_hidden_neighbour():
 def test_pull_strength_is_not_the_strength_attribute():
     assert W.classify("Leash pull strength growth increased from 0.5 to 1.5") == "silence"
     assert W.classify("Bonus Strength increased from 10 to 12") == "stats"
+
+
+def test_a_row_without_numbers_is_not_half_a_numbered_one():
+    plain = W.row_scores("Toggling is no longer disabled by silence", {"buff"}, t("BUFF"))[0]
+    assert plain == pytest.approx(W.weight_of(W.classify("Toggling is no longer disabled by silence"))
+                                  * W.NUMBERLESS_W * W._DIR["buff"], abs=0.01)
