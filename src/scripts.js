@@ -7250,8 +7250,11 @@ function ecShopMarkup(panels) {
 
 // ---------------------------------------------------------------------
 // Patch pages: the search sits behind the round loupe button in the corner stack.
-// Click / "/" opens the field (slides out left of the button), Esc or a click outside
+// Click / "\" opens the field (slides out left of the button); "\" again, Esc or a click outside
 // closes it, picking a result closes it too (the jump itself lives in ENTITY SEARCH).
+// The key is found by its PHYSICAL position (e.code "Backslash"), so it works in any keyboard layout,
+// and it is never typed into the field. The field takes English only: a Russian-layout letter becomes
+// the English letter on the same key ("ыуфк" -> "sear"), anything else non-ASCII is dropped.
 // ---------------------------------------------------------------------
 (function () {
   var fab = document.getElementById('search-fab');
@@ -7273,8 +7276,31 @@ function ecShopMarkup(panels) {
   document.addEventListener('keydown', function (e) {
     var t = e.target;
     var typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
-    if (e.key === '/' && !typing && pop.hidden) { e.preventDefault(); open(); }
+    var hotkey = e.code === 'Backslash' && !e.ctrlKey && !e.altKey && !e.metaKey;
+    if (hotkey && (!typing || t === input)) {       // never typed; toggles from the page or the field
+      e.preventDefault();
+      if (pop.hidden) open(); else close();
+    }
     else if (e.key === 'Escape' && !pop.hidden) close();
+  });
+  // English only (owner 2026-09-26): a wrong layout must not produce "ыуфк" instead of "sear"
+  var RU = 'йцукенгшщзхъфывапролджэячсмитьбюё', EN = "qwertyuiop[]asdfghjkl;'zxcvbnm,.`";
+  function toEnglish(s) {
+    var out = '';
+    for (var i = 0; i < s.length; i++) {
+      var ch = s[i], low = ch.toLowerCase(), k = RU.indexOf(low);
+      if (k >= 0) ch = ch === low ? EN[k] : EN[k].toUpperCase();
+      if (ch >= ' ' && ch <= '~') out += ch;
+    }
+    return out;
+  }
+  input.addEventListener('input', function () {
+    var v = input.value, fixed = toEnglish(v);
+    if (fixed === v) return;
+    var pos = input.selectionStart - (v.length - fixed.length);
+    input.value = fixed;
+    try { input.setSelectionRange(pos, pos); } catch (err) {}
+    input.dispatchEvent(new Event('input'));
   });
   document.addEventListener('mousedown', function (e) {
     if (!pop.hidden && !pop.contains(e.target) && e.target !== fab) close();
