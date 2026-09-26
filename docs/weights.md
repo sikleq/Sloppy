@@ -463,6 +463,16 @@ model does explain (logit units, +0.4 ≈ 60/40):
    checked): earlier = the hero gets the effect sooner = buff, later = nerf; `0.5 × type weight` per level
    step, capped at ±1.5. Used when (1) is missing, which covers replacements of **both sides** (13 annotated).
 3. The tier total is split between the tier's "replaced with" rows (1 or 2).
+4. **Value of the talents themselves** (2026-09-26, owner: "not only picks, the values too";
+   `talent_value_steps` in patch/weights.py). Valve's exchange rate between a talent's size and its level:
+   ~**1.43× of the same effect per level step** (generic ladders over all patches: HP 200/325/450/600,
+   STR 8/14/20/35, move speed 20/30/40; `data/rules/talent_norms.json`, exported by `k_talent_tiers.py`).
+   Per SWAP row, in level steps (+ = buff): (a) the new effect was at ANOTHER level in the same patch (another
+   row's old talent): `(old level − new level) / 5 + log(new / old number) / log 1.43` — Bounty Hunter 7.41f
+   "+250 Shuriken Toss Damage" at 25 → "+190" at 20 = +1 − 0.77 = **+0.23**, Track Shared Vision 20 → 25 = −1;
+   capped at ±2; (b) both talents generic (+HP, +Armor …): each against Valve's usual size at that level.
+   `net = steps × 0.5 × type weight` (±1.5). With a measured share shift both count half; otherwise the value
+   replaces the old level-move rule. 129 of 455 annotated SWAP rows get a value (125 moves, 4 generic).
 Still 0: both sides replaced by brand-new talents (266 in history, 33 annotated tiers with nothing), and thin
 data (Chaos Knight 7.40 level 25: 17 picks after).
 

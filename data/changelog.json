@@ -4,6 +4,18 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
+      "title": "Hero scores weigh SWAP talents by their numbers too: a talent a level earlier is worth ~1.43× less",
+      "minor": true
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Dynamics",
+      "title": "Hero Changes summary: Min before Max, the hero first and the value on the right",
+      "minor": true
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Patch Reader",
       "title": "SWAP tag and a lit talent tree",
       "items": [
         "Replaced talents get their own teal SWAP tag (455 rows); REWORK now means a real rework",

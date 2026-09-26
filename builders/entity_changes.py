@@ -1141,8 +1141,8 @@ def _hero_group_stats(label, lst):
 
     def who(w, val):
         return td(f'<a class="ec-hstat-who" href="heroes/{_esc(w["slug"])}.html">'
-                  f'<b>{num(val)}</b><img class="ec-hs-face" src="{_esc(w["icon"])}" alt="" loading="lazy">'
-                  f'<span>{_esc(w["name"])}</span></a>', 3)
+                  f'<img class="ec-hs-face" src="{_esc(w["icon"])}" alt="" loading="lazy">'
+                  f'<span>{_esc(w["name"])}</span><b>{num(val)}</b></a>', 3)
 
     def row(label, cells):
         return f'<tr><th>{label}</th>{"".join(cells)}</tr>'
@@ -1151,14 +1151,14 @@ def _hero_group_stats(label, lst):
              for k, name in (("str", "strength"), ("agi", "agility"), ("int", "intelligence"))]
     out = [
         '<table class="ec-hs-table"><colgroup><col class="ec-hs-lab">' + '<col>' * 6 + '</colgroup><tbody>',
-        row("Attack", [td(f'{ico("icons/ui/atk_melee.png", "Melee")}<b>{melee}</b>', 3),
+        row("Attack type", [td(f'{ico("icons/ui/atk_melee.png", "Melee")}<b>{melee}</b>', 3),
                        td(f'{ico("icons/ui/atk_ranged.png", "Ranged")}<b>{n - melee}</b>', 3)]),
         row("HP / Mana", [td(f'<b>{round(avg(hp))}</b>', 3, "ec-hs-hp"), td(f'<b>{round(avg(mp))}</b>', 3, "ec-hs-mp")]),
         row("Attributes", attrs),
         row("Move speed", [td(f'{ico("icons/move_speed.png", "")}<b>{round(avg(lambda r: r["ms"]))}</b>', 6)]),
-        f'<tr class="ec-hs-cap"><th>{_esc(attr_label)}</th><th colspan="3">Max</th><th colspan="3">Min</th></tr>',
-        row("Base", [who(hi_base, base_of(hi_base)), who(lo_base, base_of(lo_base))]),
-        row("Gain", [who(hi_gain, gain_of(hi_gain)), who(lo_gain, gain_of(lo_gain))]),
+        f'<tr class="ec-hs-cap"><th>{_esc(attr_label)}</th><th colspan="3">Min</th><th colspan="3">Max</th></tr>',
+        row("Base", [who(lo_base, base_of(lo_base)), who(hi_base, base_of(hi_base))]),
+        row("Gain", [who(lo_gain, gain_of(lo_gain)), who(hi_gain, gain_of(hi_gain))]),
         '</tbody></table>',
     ]
     return f'<div class="ec-hstats">{"".join(out)}</div>'

@@ -687,22 +687,120 @@ TALENT_SHIFT_UNIT = 0.2      # a 20-point move of the pro pick share against the
 TALENT_MOVE_STEP = 0.5       # one level step (5 hero levels) earlier/later, in units of the type weight
 
 
-def _talent_tier_net(ctx, cm):
+# ---- SWAP value signal (owner 2026-09-26: "not only picks, the values too") ----
+# Valve gives ~1.43x of the same effect per talent level step (5 hero levels): generic ladders
+# HP 200/325/450/600, STR 8/14/20/35 ... (data/rules/talent_norms.json). So a talent's size and its
+# level trade at that rate: "+250 Shuriken Toss Damage" at 25 -> "+190" at 20 is one step earlier
+# (+1) but 24% smaller (log 0.76 / log 1.43 = -0.77): +0.23 steps, a slight buff of that effect.
+try:
+    _TNORM = _json.load(open(_os.path.join(_HERE, "data", "rules", "talent_norms.json"), encoding="utf-8"))
+except OSError:
+    _TNORM = {"step_ratio": 1.43, "norms": {}}
+# the whole effect text (numbers stripped) of a GENERIC talent -> its stat in the norms table
+_GENERIC_TALENT = {
+    "strength": "strength", "agility": "agility", "intelligence": "intelligence", "all attributes": "all_stats",
+    "all stats": "all_stats", "armor": "armor", "damage": "attack_damage", "attack damage": "attack_damage",
+    "attack speed": "attack_speed", "attack range": "attack_range", "cast range": "cast_range", "health": "hp",
+    "hp": "hp", "max health": "hp", "mana": "mp", "health regen": "hp_regen", "hp regen": "hp_regen",
+    "movement speed": "movement_speed", "move speed": "movement_speed", "magic resistance": "magic_resistance",
+    "spell amplification": "spell_amplify", "spell amp": "spell_amplify", "evasion": "evasion",
+    "lifesteal": "lifesteal", "cooldown reduction": "cooldown_reduction", "status resistance": "status_resistance",
+    "gold/min": "gold_income", "gpm": "gold_income", "xp gain": "exp_boost", "night vision": "night_vision",
+    "cleave": "cleave", "spell lifesteal": "spell_lifesteal",
+}
+_T_NUM_RE = _re.compile(r"[-+]?\d+(?:\.\d+)?")
+_T_ROW_RE = _re.compile(r'W\(li\("Level (10|15|20|25)(?: Talent)?:?\s+((?:[^"\\]|\\.)*?)\s+replaced (?:with|by)\s+((?:[^"\\]|\\.)*)"')
+_T_HERO_RE = _re.compile(r'hero_header\("([^"]+)"')
+_TROWS = None
+
+
+def _effect_key(text):
+    t = _T_NUM_RE.sub(" ", _plain(text).lower())
+    t = _re.sub(r"(?<![a-z])s(?![a-z])|[%+]|\btalent\b", " ", t)       # "-10s" leaves a lone "s"
+    return " ".join(t.split()).strip(" .:")
+
+
+def _effect_num(text):
+    m = _T_NUM_RE.search(_plain(text))
+    return abs(float(m.group())) if m and float(m.group()) else None
+
+
+def _talent_rows():
+    """(version, hero) -> [(level, old text, new text)] of every "Level N Talent: A replaced with B"
+    row in content/p*.py, read once — a row's value needs the OTHER rows of its hero (a moved effect)."""
+    global _TROWS
+    if _TROWS is None:
+        from patch.images import HERO_SLUG
+        _TROWS = {}
+        folder = _os.path.join(_HERE, "content")
+        for f in sorted(_os.listdir(folder)):
+            m = _re.match(r"p7(\d\d)([a-z]?)\.py$", f)
+            if not m:
+                continue
+            ver = f"7.{m.group(1)}{m.group(2)}"
+            hero = None
+            for line in open(_os.path.join(folder, f), encoding="utf-8"):
+                h = _T_HERO_RE.search(line)
+                if h:
+                    name = h.group(1)
+                    hero = HERO_SLUG.get(name, name.lower().replace(" ", "_").replace("'", "").replace("-", ""))
+                r = _T_ROW_RE.search(line)
+                if r and hero:
+                    _TROWS.setdefault((ver, hero), []).append((int(r.group(1)), r.group(2), r.group(3)))
+    return _TROWS
+
+
+def _norm_steps(text, level):
+    stat = _GENERIC_TALENT.get(_effect_key(text))
+    norm = (_TNORM["norms"].get(stat) or {}).get(str(level)) if stat else None
+    n = _effect_num(text)
+    return _math.log(n / norm) / _math.log(_TNORM["step_ratio"]) if norm and n else None
+
+
+def talent_value_steps(version, hero, level, text):
+    """Value of a "Level N Talent: A replaced with B" row in level steps (+ = buff), or None:
+    1. B is an effect that was at ANOTHER level in this patch (another row's A): the level move plus
+       the size change at Valve's rate (above);
+    2. A and B are both generic talents (+HP, +Armor ...): each against Valve's usual size at level N."""
+    m = _re.search(r"replaced (?:with|by)\s+(.*)$", _plain(text), _re.I)
+    if not m:
+        return None
+    new = m.group(1)
+    old = _re.sub(r"^\s*Level \d+(?: Talent)?:?\s*|\s+replaced (?:with|by)\s+.*$", "", _plain(text), flags=_re.I)
+    key = _effect_key(new)
+    for lvl, o_old, _o_new in _talent_rows().get((version, hero), []):
+        if lvl != level and key and _effect_key(o_old) == key:
+            steps = (lvl - level) / 5
+            a, b = _effect_num(new), _effect_num(o_old)
+            if a and b:
+                steps += _math.log(a / b) / _math.log(_TNORM["step_ratio"])
+            return max(-2.0, min(2.0, steps))            # a unit change ("+2" -> "+400") must not explode
+    a, b = _norm_steps(new, level), _norm_steps(old, level)
+    return a - b if a is not None and b is not None else None
+
+
+def _talent_tier_net(ctx, cm, text=""):
     """Signal K for a "Level N Talent: A replaced with B" row -> signed net or None.
     1. measured: shift of the pro pick share of the slot against the UNCHANGED sibling
        (single-side replacements, >= 30 picks before and after);
-    2. else inferred from LEVEL MOVES: a new talent that came from another level with the same
+    2. VALUE (talent_value_steps): a moved effect's level + size, or generic sizes vs Valve's norm;
+       with a measured shift both count half;
+    3. else inferred from LEVEL MOVES: a new talent that came from another level with the same
        meaning — earlier = buff of that effect, later = nerf (0.5 x type weight per level step).
-    The tier total is split between the tier's rows (1 or 2 replaced sides)."""
+    The measured tier total is split between the tier's rows (1 or 2 replaced sides)."""
     if not ctx or not ctx.get("talent") or not ctx.get("hero"):
         return None
-    rec = _TTIERS.get(f"{ctx.get('version')}|{ctx['hero']}|{ctx['talent']}")
-    if not rec:
-        return None
+    rec = _TTIERS.get(f"{ctx.get('version')}|{ctx['hero']}|{ctx['talent']}") or {}
     k = max(1, rec.get("changed", 1))
+    steps = talent_value_steps(ctx.get("version"), ctx["hero"], ctx["talent"], text) if text else None
+    value = (max(-1.5, min(1.5, steps * TALENT_MOVE_STEP * weight_of(classify(text)))) * cm
+             if steps is not None else None)
     if "share_delta" in rec:
         d = rec["share_delta"]
-        return (1 if d > 0 else -1) * min(abs(d) / TALENT_SHIFT_UNIT, MAG_CAP_NORM) * weight_of("other") * cm / k
+        measured = (1 if d > 0 else -1) * min(abs(d) / TALENT_SHIFT_UNIT, MAG_CAP_NORM) * weight_of("other") * cm / k
+        return measured if value is None else 0.5 * measured + 0.5 * value
+    if value is not None:
+        return value
     if rec.get("moves"):
         tot = sum(m["steps"] * TALENT_MOVE_STEP * weight_of(m["type"]) for m in rec["moves"])
         return max(-1.5, min(1.5, tot)) * cm / k
@@ -729,7 +827,7 @@ def row_scores(text, tags, badge_html="", ctx=None):
     if "rework" in tags or "swap" in tags:                 # SWAP = a talent replaced (was REWORK)
         if item_row is not None and item_row[0]:           # "Now provides X instead of Y"
             return item_row[0], round(max(w, item_row[1]), 3)
-        net = _talent_tier_net(ctx, cm)             # signal K: talent replacement / level move
+        net = _talent_tier_net(ctx, cm, text)       # signal K: picks + the talents' own values
         if net is not None:
             return round(net, 3), round(max(w, abs(net)), 3)
         return 0.0, round(w, 3)

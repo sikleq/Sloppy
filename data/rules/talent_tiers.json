@@ -10370,17 +10370,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_clinkz_10",
-     "from": 15,
-     "to": 10,
-     "type": "cooldown",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_clinkz_1",
      "from": 15,
      "to": 10,
      "type": "duration",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_clinkz_10",
+     "from": 15,
+     "to": 10,
+     "type": "cooldown",
      "steps": 1
     }
    ]
@@ -11664,17 +11664,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_silencer_7",
-     "from": 20,
-     "to": 15,
-     "type": "cooldown",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_silencer_4",
      "from": 20,
      "to": 15,
      "type": "range",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_silencer_7",
+     "from": 20,
+     "to": 15,
+     "type": "cooldown",
      "steps": 1
     }
    ]
@@ -13691,17 +13691,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_spirit_breaker_1",
-     "from": 25,
-     "to": 20,
-     "type": "cooldown",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_spirit_breaker_shield",
      "from": 25,
      "to": 20,
      "type": "damage",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_spirit_breaker_1",
+     "from": 25,
+     "to": 20,
+     "type": "cooldown",
      "steps": 1
     }
    ]
@@ -16832,17 +16832,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_jakiro_4",
-     "from": 15,
-     "to": 10,
-     "type": "slow",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_jakiro_6",
      "from": 15,
      "to": 10,
      "type": "damage",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_jakiro_4",
+     "from": 15,
+     "to": 10,
+     "type": "slow",
      "steps": 1
     }
    ]
@@ -17954,18 +17954,18 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_batrider_7",
-     "from": 10,
-     "to": 15,
-     "type": "range",
-     "steps": -1
-    },
-    {
      "slug": "special_bonus_unique_batrider_4",
      "from": 25,
      "to": 15,
      "type": "damage",
      "steps": 2
+    },
+    {
+     "slug": "special_bonus_unique_batrider_7",
+     "from": 10,
+     "to": 15,
+     "type": "range",
+     "steps": -1
     }
    ]
   },

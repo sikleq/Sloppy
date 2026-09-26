@@ -39,3 +39,20 @@ def test_placed_row_gets_the_gold_overlay():
     assert 'class="ability-icon-img ttree"' in out and "talents_gold.svg" in out
     assert tt.BRANCH_POLYS["15r"] in out and tt.BRANCH_POLYS["15l"] not in out
     assert 'data-tt="15r"' in out and 'data-b="15r"' in out        # a filter can switch this twig off
+
+
+def test_swap_value_trades_level_for_size_at_valves_rate():
+    """Owner 2026-09-26: a SWAP is weighed by the talents' own values too. Valve gives ~1.43x of an
+    effect per level step, so +250 at 25 -> +190 at 20 is +1 step - 0.77 = +0.23 (slightly better)."""
+    from patch import weights as w
+    up = w.talent_value_steps("7.41f", "bounty_hunter", 20,
+                              "Level 20 Talent: Track Grants Shared Vision replaced with +190 Shuriken Toss Damage")
+    down = w.talent_value_steps("7.41f", "bounty_hunter", 25,
+                                "Level 25 Talent: +250 Shuriken Toss Damage replaced with Track Grants Shared Vision")
+    assert 0.1 < up < 0.4 and down == -1.0
+
+
+def test_generic_swap_is_weighed_against_valves_usual_size():
+    from patch import weights as w
+    # the same stat, twice the usual size at level 10 -> about two level steps better
+    assert w._norm_steps("+400 Health", 10) > 1.5 and abs(w._norm_steps("+200 Health", 10)) < 0.01
