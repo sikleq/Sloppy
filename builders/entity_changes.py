@@ -202,6 +202,7 @@ _TITLE_SLUG: dict[str, str] = {}      # ability display name -> engine slug seen
 
 
 _KIT_CACHE: dict[str, list[str]] = {}
+_KIT_DEAD: dict[str, list] = {}       # npc -> display names of abilities left in the KV but no longer the hero's
 _KIT_EXTRA: dict[str, tuple] = {}      # npc -> (current innate names, slugs defined in the KV, all known slugs)
 
 
@@ -238,11 +239,27 @@ def _hero_kit(npc: str) -> list[str]:
     live = _live_abilities(txt, defs, slotted) if kv.exists() else set()
     _KIT_CACHE[npc] = [n for n in basics + ults + aghs if n in {(slim.get(d) or {}).get("dname") for d in live}]
     _KIT_EXTRA[npc] = ([n for n in dict.fromkeys(innates) if n], live, set(slim))
+    # abilities whose block is still in the KV but which the hero no longer has (Nature's Profit)
+    _KIT_DEAD[npc] = [n for n in dict.fromkeys((slim.get(d) or {}).get("dname") for d in defs
+                                               if d not in live and not d.startswith("special_bonus")
+                                               and not (slim.get(d) or {}).get("is_innate")) if n]
     return _KIT_CACHE[npc]
 
 
 _UNITS_CODE: list = []
+EMPTY_ABILITY_ICON = "../icons/_t/abilities/doom_bringer_empty1.webp"
 _SLIM: dict = {}
+
+
+def _ability_slug(npc: str, title: str):
+    """Engine slug of an ability by its display name: the page map, else the hero's own prefix in
+    abilities_slim, else a name only one ability has (Nature's Profit -> furion_natures_profit)."""
+    if not _SLIM:
+        _SLIM.update(_json.loads((_HERE / "data" / "abilities_slim.json").read_text(encoding="utf-8")))
+    if _TITLE_SLUG.get(title):
+        return _TITLE_SLUG[title]
+    named = [k for k, v in _SLIM.items() if (v or {}).get("dname") == title]
+    return next((k for k in named if k.startswith(npc + "_")), None) or (named[0] if len(named) == 1 else None)
 
 
 def _ability_icon(npc: str, title: str) -> str:
@@ -256,11 +273,42 @@ def _ability_icon(npc: str, title: str) -> str:
                  named[0] if len(named) == 1 else None):
         if slug and (_HERE / "icons" / "_t" / "abilities" / f"{slug}.webp").exists():
             return f"../icons/_t/abilities/{slug}.webp"
-    return ""
+    # no icon of its own (Nature's Profit: an ability a facet opened, hidden inside the hero): the game's
+    # own empty ability slot, as on Doom before he eats a creep (owner 2026-09-26)
+    return EMPTY_ABILITY_ICON
 
 
 def _code(text: str) -> str:
     return "\n".join(line.split("//")[0] for line in text.split("\n"))
+
+
+_DEPRECATED_RE = _re.compile(r'"Deprecated"\s+"(?:true|1)"', _re.I)
+
+
+def _drop_deprecated(code: str) -> str:
+    """The KV text without blocks marked "Deprecated" "true" at their own level (a removed facet still
+    names its ability: Nature's Prophet 7.41f, facet furion_natures_profit -> Nature's Profit is old)."""
+    lines, out, i = code.split("\n"), [], 0
+    while i < len(lines):
+        if not (lines[i].strip().startswith('"') and i + 1 < len(lines) and lines[i + 1].strip() == "{"):
+            out.append(lines[i])
+            i += 1
+            continue
+        depth, j = 0, i + 1
+        while j < len(lines):
+            depth += lines[j].count("{") - lines[j].count("}")
+            if depth <= 0:
+                break
+            j += 1
+        own, d = [], 0                        # lines at the block's OWN level (not nested blocks)
+        for ln in lines[i + 2:j]:
+            if d == 0:
+                own.append(ln)
+            d += ln.count("{") - ln.count("}")
+        if not any(_DEPRECATED_RE.search(ln) for ln in own):
+            out += lines[i:i + 2] + [_drop_deprecated("\n".join(lines[i + 2:j]))] + lines[j:j + 1]
+        i = j + 1
+    return "\n".join(out)
 
 
 def _live_abilities(txt: str, defs: dict, slotted: list) -> set:
@@ -273,7 +321,7 @@ def _live_abilities(txt: str, defs: dict, slotted: list) -> set:
     if not _UNITS_CODE:
         u = _HERE / "data" / "stats" / latest_stats_version() / "npc_units.txt"
         _UNITS_CODE.append(_code(u.read_text(encoding="utf-8", errors="replace")) if u.exists() else "")
-    code, units = _code(txt), _UNITS_CODE[0]
+    code, units = _drop_deprecated(_code(txt)), _UNITS_CODE[0]
     live = set(slotted)
     for d, blk in defs.items():
         if d in live:
@@ -411,17 +459,20 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         # Anything else stays current: a former ability that is the innate now (Inner Beast,
         # Necromastery), unit / synthetic sub-blocks (Brewlings, Drunken Brawler stances).
         old = sorted(t for t in rest if t.lower() not in inn
-                     and _TITLE_SLUG.get(t) in known and _TITLE_SLUG.get(t) not in defined)
+                     and (_ability_slug(npc, t) or "") in known and _ability_slug(npc, t) not in defined)
         current += sorted(t for t in rest if t not in old)
         if not kit:                                    # items: no kit, keep everything visible
             current, old = sorted(ab_count), []
         # talents that upgrade an ability answer to its chip; a current ability changed ONLY through
         # talents (Nether Blast for Pugna) gets a chip too, sorted into the kit order
         for p in e["patches"]:
-            p["_body"] = _tag_talent_rows(p["_body"], list(dict.fromkeys(current + old + kit)), hero_slug=e["slug"])
+            p["_body"] = _tag_talent_rows(p["_body"], list(dict.fromkeys(current + old + kit + _KIT_DEAD.get(npc, []))),
+                                          hero_slug=e["slug"])
         via_talent = {a for p in e["patches"] for m in _re.finditer(r'data-ec-ab="([^"]*)"', p["_body"])
                       for a in _html.unescape(m.group(1)).split("|")}
         extra = [k for k in kit if k in via_talent and k not in current and k not in old]
+        # a former ability that only talents name (Nature's Profit, a removed facet's ability) -> OLD chip
+        old += [k for k in _KIT_DEAD.get(npc, []) if k in via_talent and k not in current and k not in old]
         if extra:
             current = sorted(dict.fromkeys(current + extra), key=lambda t: low.get(t.lower(), 10_000))
 

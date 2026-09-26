@@ -84,3 +84,15 @@ def test_an_ability_left_in_the_kv_only_in_comments_is_old():
     live = _live_abilities(txt, defs, ["antimage_mana_break"])
     assert "antimage_counterspell_ally" not in live
     assert {"antimage_mana_break", "antimage_persectur"} <= live
+
+
+def test_a_deprecated_facet_does_not_keep_its_ability_alive():
+    """Nature's Prophet 7.41f: the removed facet furion_natures_profit ("Deprecated" "true") still names
+    Nature's Profit -> not a current ability; a chip without an icon of its own gets the game's empty slot."""
+    from builders.entity_changes import _drop_deprecated, EMPTY_ABILITY_ICON
+    kv = ('\t\t"Facets"\n\t\t{\n\t\t\t"furion_natures_profit"\n\t\t\t{\n\t\t\t\t"Abilities"\n\t\t\t\t{\n'
+          '\t\t\t\t\t"AbilityName"\t"furion_natures_profit"\n\t\t\t\t}\n\t\t\t\t"Deprecated"\t"true"\n\t\t\t}\n'
+          '\t\t\t"furion_spirit"\n\t\t\t{\n\t\t\t\t"Icon"\t"tree"\n\t\t\t}\n\t\t}')
+    out = _drop_deprecated(kv)
+    assert "furion_natures_profit" not in out and "furion_spirit" in out
+    assert EMPTY_ABILITY_ICON.endswith("doom_bringer_empty1.webp")

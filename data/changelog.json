@@ -10,7 +10,7 @@
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: Aghanim's Shard / Scepter filters (after Innate) show only the rows those upgrades change in abilities, talents and facets; ability filters are now the ability icons (the name on hover), removed abilities greyed after their own separator on the right (Anti-Mage: Counterspell Ally)",
+      "title": "Hero pages: Aghanim's Shard / Scepter filters (after Innate) show only the rows those upgrades change in abilities, talents and facets; ability filters are now the ability icons (the name on hover); removed abilities are greyed after their own separator on the right (Counterspell Ally, abilities of removed facets like Nature's Profit), an ability without an icon shows the game's empty ability slot",
       "minor": true
     },
     {
