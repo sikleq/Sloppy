@@ -52,7 +52,18 @@ def test_small_change_floor_uses_the_last_level_that_changed():
     # max rank unchanged (15s -> 15s): the change is 20 -> 18s at level 3, not "0 s"
     assert W._small_change_damp("Cooldown decreased from 30/25/20/15s to 24/21/18/15s") == 1.0
     assert W._small_change_damp("Cooldown decreased from 140/120/100s to 120/110/100s") == 1.0
-    assert W._small_change_damp("Duration increased from 1.2s to 1.3s") == 0.35
+    assert W._small_change_damp("Duration increased from 1.2s to 1.3s") == pytest.approx(0.35 * 0.6)
+
+
+def test_short_times_and_niche_numbers_are_not_the_heaviest_rows():
+    """2026-09-26: "Morph Replicate sub-ability cooldown 1s -> 2s" (-3.60) and "Skeleton Building Damage
+    penalty 25% -> 75%" (-3.63) were the heaviest hero rows of all four patches."""
+    assert W._small_change_damp("Linger duration decreased from 2s to 1s") == pytest.approx(0.6 * 0.6)
+    assert W._small_change_damp("Duration decreased from 5s to 4s") == pytest.approx(0.6)
+    assert W._small_change_damp("Duration decreased from 60s to 18s") == 1.0
+    big = W.row_scores("Damage penalty increased from 25% to 75%", {"nerf"}, b(25, 75, l=True))[0]
+    niche = W.row_scores("Skeleton Building Damage penalty increased from 25% to 75%", {"nerf"}, b(25, 75, l=True))[0]
+    assert niche == pytest.approx(big * W.NICHE_W, abs=0.01)
     assert W._small_change_damp("Damage to Healing rescaled from 20% to 10/15/20/25%") == 1.0
 
 
@@ -165,3 +176,8 @@ def test_matrix_line_ignores_hidden_neighbour():
     body = js[js.index("function dynDrawRowLines"):]
     body = body[:body.index("\n  }\n")]
     assert re.search(r"const at = j => \([^)]*!vis\[j\]\)", body)
+
+
+def test_pull_strength_is_not_the_strength_attribute():
+    assert W.classify("Leash pull strength growth increased from 0.5 to 1.5") == "silence"
+    assert W.classify("Bonus Strength increased from 10 to 12") == "stats"

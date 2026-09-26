@@ -49,3 +49,13 @@ def test_every_roster_item_gets_a_page_even_without_changes():
     have = [{"kind": "item", "slug": "blink", "name": "Blink Dagger", "icon": "", "patches": [{"version": "7.41"}]}]
     extra = ec._unchanged_items(have, dyn)
     assert [e["slug"] for e in extra] == ["circlet"] and extra[0]["patches"] == []
+
+
+def test_a_day_links_to_the_same_page_only_once():
+    """Owner 2026-09-26: five entries of one day all linked patches/7.38.html — only the first keeps it."""
+    from builders.changelog import _one_link_per_patch
+    g = [{"title": "a", "link": "patches/7.38.html"}, {"title": "b", "link": "patches/7.38.html"},
+         {"title": "c", "link": "patches/7.39.html"}, {"title": "d"}]
+    out = _one_link_per_patch(g)
+    assert [e.get("link") for e in out] == ["patches/7.38.html", None, "patches/7.39.html", None]
+    assert g[1]["link"] == "patches/7.38.html"          # the data itself is not changed

@@ -3,40 +3,48 @@
   "entries": [
     {
       "date": "2026-09-26",
+      "category": "Site",
+      "title": "Changelog: a day links to the same patch page only once",
+      "minor": true
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Patch Reader",
+      "title": "Hero scores: tiny time changes (a 1 s cooldown doubled, a 2 s linger halved) and numbers that only hit buildings, illusions, creeps or a sub-ability no longer outweigh real changes",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-26",
       "category": "Patch Reader",
       "title": "Hero scores: a Base Damage change next to \"Damage at level 1 / 30\" is no longer counted on top of them (7.38 raised base damage only to make up for the lower Universal multiplier), and \"Damage gain per level\" is not counted twice with level 30",
       "minor": true,
-      "fix": true,
-      "link": "patches/7.38.html"
+      "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
       "title": "Reworked hero abilities, facets and innates now count in the hero's score too: measured from how often Tier 1-2 pros played the hero after the patch, minus what the hero's other changes already explain",
-      "minor": true,
-      "link": "patches/7.38.html"
+      "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
       "title": "Reworked item abilities now count in the item's score: measured from how Tier 1-2 pros bought the item after the patch (our own replay data), minus what its other changes already explain. Orb of Corrosion 7.38 is no longer a huge nerf",
-      "minor": true,
-      "link": "patches/7.38.html"
+      "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
       "title": "Item scores: an item's active and its stats are now on one scale (Heaven's Halberd 7.38 is a mild nerf, not a big one), and the Sange/Kaya/Yasha stat prices are measured from neighbouring patches instead of guessed",
       "minor": true,
-      "fix": true,
-      "link": "patches/7.38.html"
+      "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
       "title": "Item change scores are now counted in gold: every item stat has a price per patch (from the shop's own items), so stat swaps, price changes and item mana costs weigh what they cost. Heaven's Halberd 7.38 is now a nerf; item mana-cost rows no longer dominate",
-      "minor": true,
-      "link": "patches/7.38.html"
+      "minor": true
     },
     {
       "date": "2026-09-25",

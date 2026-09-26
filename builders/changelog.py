@@ -118,12 +118,27 @@ def _minor_html(date, minors):
             f'<ul class="clog-minor-list">{lis}</ul></details>')
 
 
+def _one_link_per_patch(group):
+    """A day's entries link to the same page only once (owner 2026-09-26): the first entry keeps the
+    link, later ones with the same link are shown as plain text. Copies, the data is not changed."""
+    seen, out = set(), []
+    for e in group:
+        link = e.get("link")
+        if link and link in seen:
+            e = {k: v for k, v in e.items() if k != "link"}
+        elif link:
+            seen.add(link)
+        out.append(e)
+    return out
+
+
 def render(entries):
     by_date = {}
     for e in entries:
         by_date.setdefault(e["date"], []).append(e)
     days, rail, month_seen = [], [], None
     for date, group in by_date.items():
+        group = _one_link_per_patch(group)
         d = _dt.date.fromisoformat(date)
         month = d.strftime("%B %Y")
         if month != month_seen:

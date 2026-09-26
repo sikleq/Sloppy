@@ -343,6 +343,32 @@ gain rows nearly cancelled); with signal R +4.94 → +4.99. Largest moves: Lifes
 Dawnbreaker 7.41 +2.54 → +1.33, Earth Spirit 7.40 −3.15 → −1.95, Spectre 7.38 +2.88 → +1.76, Dark Willow
 7.38 +0.57 → −0.47.
 
+## Hero row audit (2026-09-26)
+
+Audit of all 4605 hero rows 7.38–7.41f (owner: "what else can be wrong with heroes?"): no BUFF row with a
+negative score or the reverse; no other "base + at level N" pairs; 4 cells of 655 strongly against the pro
+pick share. Found and fixed, each checked on the two blind-judge samples (mean ρ):
+
+| rule | example | mean ρ |
+|---|---|---|
+| before | | 0.444 |
+| seconds: \|Δ\| ≤ 1 s → ×0.6 (after the 0.25 / 0.5 s steps) | Morph Replicate cooldown 1 s → 2 s: −3.60, the heaviest hero row | 0.469 |
+| + both values ≤ 2 s → another ×0.6 | Jakiro linger 2 s → 1 s, Brewed Up 1 s → 2 s | 0.486 |
+| + niche target (building, structure, tower, sub-ability, illusion, creep, neutral, Roshan) ×0.5 | Skeleton Building Damage penalty 25 % → 75 %: −3.63 | **0.493** |
+| rejected: radius \|Δ\| < 50 ×0.5 | Dragon Knight AoE 25 → 50 | 0.439 |
+| rejected: coefficients ≤ 2 ×0.6 | AoE per Intelligence 0.4 → 0.7 | 0.437 |
+
+Neighbouring thresholds give 0.479–0.489 (a plateau, not a spike); hero net vs pick share 0.311 → 0.313.
+Also: "Leash pull strength growth" was typed as the Strength attribute — "pull / push / slow / effect
+strength" no longer is.
+
+Checked and left as they are:
+- **A value that becomes 0 at max level** ("Mana Cost 225 → 220/110/0", +3.63): the row is in blind sample 2
+  and both judges gave it 3 and 4, among their highest grades. Removing an ultimate's mana cost is a big buff.
+- **Signal R cap ±3 for heroes**: out of sample (R from half A vs pick share in half B) more R always predicts
+  better (cap 1 → 3 → 6: ρ 0.12 → 0.27 → 0.30), but that test compares popularity with popularity. The cap is a
+  choice of how much of a hero's score may come from popularity, not something the data sets. Kept.
+
 ## Backtest (docs/weights-review.md E.8.1) — 2026-09-16
 
 11 408 numeric hero events 7.08→7.41e. "Reverted" = same parameter moved the other way within 8 patches (base rate 6.0 %).

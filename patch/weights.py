@@ -71,7 +71,8 @@ CAT = [
     ("armor", r"armor|corruption|damage block|\bblock\b"), ("crit", r"crit"),
     ("lifesteal", r"lifesteal|life steal"),
     ("health", r"health|\bhp\b|regen|\bheal|healing"), ("mana", r"\bmana\b|\bmp\b"),
-    ("stats", r"strength|agility|intelligence|all stats|attribute"),
+    # "Leash pull strength growth" (Dazzle 7.38c) is the leash, not the Strength attribute
+    ("stats", r"(?<!pull )(?<!push )(?<!slow )(?<!effect )strength|agility|intelligence|all stats|attribute"),
     ("base_damage", r"base damage|attack damage|damage at level"),
     ("charges", r"charge|stack|max attacks|attacks to"),
     ("gold_xp", r"gold|bounty|experience|\bxp\b"), ("respawn", r"respawn|reincarnat"),
@@ -606,7 +607,10 @@ _NUM_RE = _re.compile(r"-?\d+(?:\.\d+)?")
 
 def _small_change_damp(text):
     """Absolute floor (agreement test 2026-09-17): a big % of a tiny number is still tiny.
-    Seconds: |Δ| < 0.25 s -> x0.35, < 0.5 s -> x0.5. Percentage points: |Δ| < 2 pp -> x0.5.
+    Seconds: |Δ| < 0.25 s -> x0.35, < 0.5 s -> x0.5, <= 1 s -> x0.6; and when both values are <= 2 s
+    (a 1 s -> 2 s sub-ability cooldown, a 0.5 s -> 1 s linger) another x0.6 (2026-09-26: "Morph Replicate
+    cooldown 1s -> 2s" was the heaviest hero row of all, -3.60; blind-judge mean rho 0.444 -> 0.486).
+    Percentage points: |Δ| < 2 pp -> x0.5.
     Δ is taken at the LAST level whose value changed — the same level _row_pcts sizes the row by.
     (Taking the last level blindly damped "30/25/20/15s -> 24/21/18/15s" x0.35: max rank equal.)
     1.0 when not applicable."""
@@ -622,7 +626,8 @@ def _small_change_damp(text):
     na, nb = (na + na[-1:] * n)[:n], (nb + nb[-1:] * n)[:n]
     delta = next((abs(y - x) for x, y in zip(reversed(na), reversed(nb)) if x != y), 0.0)
     if a.rstrip().endswith("s") or b.rstrip().endswith("s"):
-        return 0.35 if delta < 0.25 else (0.5 if delta < 0.5 else 1.0)
+        d = 0.35 if delta < 0.25 else (0.5 if delta < 0.5 else (0.6 if delta <= 1.0 else 1.0))
+        return d * (0.6 if max(max(na), max(nb)) <= 2.0 else 1.0)
     if "%" in a or "%" in b:
         return 0.5 if delta < 2 else 1.0
     return 1.0
@@ -641,8 +646,19 @@ def _compress(x):
     return x if x <= 1.0 else 1.0 + math.log(min(x, 6.0))
 
 
+# Numbers that act on buildings, illusions, creeps, a sub-ability — not on the enemy heroes (x0.5;
+# 2026-09-26: "Skeleton Building Damage penalty 25% -> 75%" scored -3.63; judge rho +0.007).
+_NICHE_RE = _re.compile(r"building|structure|tower|sub-ability|illusion|creep|neutral|roshan", _re.I)
+NICHE_W = 0.5
+
+
 def _row_value(text, badge_html, kind, ctx):
     """Unsigned value of a buff/nerf row on the common scale (before context)."""
+    v = _row_value_raw(text, badge_html, kind, ctx)
+    return v * NICHE_W if _NICHE_RE.search(_plain(text)) else v
+
+
+def _row_value_raw(text, badge_html, kind, ctx):
     if ctx and ctx.get("base_stat"):
         m = _base_stat_magnitude(text)
         if m is not None:
