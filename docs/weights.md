@@ -281,6 +281,34 @@ where it wins). Where pros disagree most — Heaven's Halberd 7.38 (−0.49, pic
 parity, while pros reward a cheaper item that fits more builds, and a reworked passive/active (REWORK row)
 scores 0. That is what the score measures (power per gold), not popularity; the gap is documented, not tuned.
 
+## Item reworks — what Valve's own data can and cannot tell (2026-09-26)
+
+Owner: score REWORK rows, and learn Valve's logic from all patches, not only from pro purchases.
+KV history of every purchasable item 7.08 → 7.41f (118 versions, `tools/fit_item_prices.py` parser):
+1366 item changes, 207 of them reworks (an ability field added or removed). Three candidate "developer
+logic" signals were tested; none can give a rework its direction:
+
+| signal | idea | result |
+|---|---|---|
+| Valve's follow-up | a change Valve over-tuned is corrected next | next change vs this one: ρ +0.14 (next 1), −0.04 (next 3), −0.03 (next 6). After a rework Valve nerfs 45–51 %, buffs 46–52 %: a coin |
+| implied ability price | ability = item cost − stat gold (the method of "Шиз поясняет. Системы уравнений и стоимость статов в Dota 2", SHIZ, youtube A-OLKDD6EyE — same least squares as ours; his 7.35 prices str 80 / agi, int 77 / AS 28 / armor 127 / damage 58 / MS 11 vs ours for 7.35d 86.7 / 77, 82.5 / 26.8 / 127.5 / 56.3 / 11.1 — within 10 %) | its change vs pro buy share after reworks 7.38+: ρ −0.11 (n 37). Valve priced Khanda's new Empower Spell +34 % of the item; pros bought it ×0.11. Price = intent, not outcome. Upgrades also sell stats cheaper than basic items, so the residual is negative for a quarter of items |
+| Valve's exchange rates | a number change + a price change in the same patch compensate each other → gold per % of cooldown, duration… | 79 such co-changes; the price moves WITH the ability (buff + price up) in only 30. Valve stacks same-direction changes, it does not compensate — no rate can be read |
+
+The one consistent Valve system is the stat pricing of simple items (already used). So a rework's
+direction is measured, like talent replacements (signal K):
+
+**Signal R** (`rework_adoption_net`): DEMOS (our Tier 1–2 replay parses, 22 k matches since 2024),
+share of player-games that BOUGHT the item, 21 days before vs after the patch (`tools/fetch_item_adoption.py`
+→ `data/rules/item_adoption.json`, 25 patch windows 7.35c–7.41f). On 171 non-rework item cells the item net
+explains it as dlog = 0.41 × net + 0.13 (ρ **0.32**; OpenDota final inventory, all pro leagues: 0.20 — DEMOS
+is the better source for these patches, OpenDota only for years before 2024). At the end of an item block the
+REWORK rows get (dlog − 0.41 × net − 0.13), minus the 0.21 meta noise, / 0.41, × n / (n + 100) buyers, capped
+±3. Changed cells: Orb of Corrosion 7.38 −3.84 → −0.84 (bought ×2.85 despite ~1000 g of stats lost: the new
+Corrosion), Drum of Endurance 7.38 −2.76 → −0.90, Mask of Madness 7.41e −0.80 → −0.33, Shiva's Guard 7.39
+0 → −0.29, Consecrated Wraps 7.41b −1.08 → −1.10; the other 8 reworks with data are within the noise.
+Against OpenDota (independent): ρ 0.202 → 0.207. Patches without a DEMOS window (7.41: 7.41a came 4 days
+later; the newest patch until ~5 days of games) keep REWORK = 0 until `tools/refresh_weights_data.py` runs.
+
 ## Backtest (docs/weights-review.md E.8.1) — 2026-09-16
 
 11 408 numeric hero events 7.08→7.41e. "Reverted" = same parameter moved the other way within 8 patches (base rate 6.0 %).

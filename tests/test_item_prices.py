@@ -263,3 +263,19 @@ def test_unpriced_item_row_is_scaled_to_the_gold_scale():
     item = W.row_scores(text, {"nerf"}, "", _ctx("heavens_halberd", "7.38"))
     assert item[0] == pytest.approx(hero[0] * W.ITEM_ABILITY_F / W.context_multiplier(
         {"kind": "hero", "version": "7.38"}) * W.context_multiplier({"kind": "item"}), abs=2e-3)
+
+
+def test_rework_row_takes_the_adoption_shift_the_other_rows_do_not_explain(monkeypatch):
+    """Signal R: Orb of Corrosion 7.38 lost ~1000 g of stats (net -3.84), yet pros bought it ~3x as often:
+    the REWORK row (new Corrosion passive) gets the unexplained part, capped and shrunk by sample size."""
+    monkeypatch.setitem(W._ADOPT, "7.38", {"games": [8447, 1010], "items": {"orb_of_corrosion": [354, 120]}})
+    net = W.rework_adoption_net({"version": "7.38", "item": "orb_of_corrosion"}, -3.84)
+    assert 0 < net <= W.ITEM_REWORK_CAP
+    # the same shift, fully explained by the other rows -> nothing left for the rework
+    assert W.rework_adoption_net({"version": "7.38", "item": "orb_of_corrosion"}, 2.2) == 0.0
+
+
+def test_rework_row_without_adoption_data_stays_zero(monkeypatch):
+    monkeypatch.setitem(W._ADOPT, "7.38", {"games": [8447, 1010], "items": {"orb_of_corrosion": [10, 5]}})
+    assert W.rework_adoption_net({"version": "7.38", "item": "orb_of_corrosion"}, 0.0) is None   # < 30 buyers
+    assert W.rework_adoption_net({"version": "7.99", "item": "orb_of_corrosion"}, 0.0) is None   # no window

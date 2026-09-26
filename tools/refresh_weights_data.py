@@ -3,6 +3,8 @@
 
   1. data/rules/ability_priority.json  - how pros skill each hero (DEMOS, OpenDota only for heroes
                                          DEMOS has no builds for)           tools/fetch_skill_priority.py
+  1b. data/rules/item_adoption.json    - how pros bought each item before/after every patch
+                                         (DEMOS; signal R for item REWORK rows)  tools/fetch_item_adoption.py
   2. data/rules/talent_shift.json      - talent replacements: shift of the pro pick share
      data/rules/talent_tiers.json      - + level moves                       (model folder, signal K)
      Needs the research folder outputs/valve-revealed-weights-20260915 (KV history lives there);
@@ -25,6 +27,7 @@ def run(args, cwd):
 
 def main():
     ok = run(["tools/fetch_skill_priority.py"], HERE)
+    ok = run(["tools/fetch_item_adoption.py"], HERE) and ok
     if not os.path.isdir(MODEL):
         print("model folder not found - talent tables not refreshed:", MODEL)
         return 0 if ok else 1

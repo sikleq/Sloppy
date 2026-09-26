@@ -44,6 +44,7 @@
 Decisions 2026-09-16 (Денис): two scales (net + volume), hybrid magnitude.
 """
 import json as _json
+import math as _math
 import os as _os
 import re as _re
 
@@ -527,6 +528,41 @@ def _item_gold(text, tags, ctx):
     if g is None:
         g = _stat_row_gold(t, tags, ctx)
     return None if g is None else (g, cost)
+
+
+try:
+    _ADOPT = _json.load(open(_os.path.join(_HERE, "data", "rules", "item_adoption.json"),
+                             encoding="utf-8"))["versions"]
+except OSError:
+    _ADOPT = {}
+# Signal R (2026-09-26): an item's REWORK row ("Passive: Corrosion. <new text>") has no number to read
+# its direction from; Valve's prices and follow-up patches do not tell it either (docs/weights.md
+# "Item reworks"). It gets the part of the pro adoption shift (DEMOS buy share, 21 days before vs
+# after) that the item's other rows do not explain. Fitted on 171 non-rework item cells 7.35c-7.41f:
+# dlog(buy share) = 0.41 x item net + 0.13 (rho 0.32); median |dlog| = 0.21 (meta noise).
+ADOPT_SLOPE = 0.41
+ADOPT_DRIFT = 0.127
+ADOPT_NOISE = 0.21
+ADOPT_MIN_BUYERS = 30        # player-games that bought the item, both windows together
+ADOPT_SHRINK_N = 100         # n / (n + 100): few buyers -> a smaller share of the shift
+ITEM_REWORK_CAP = 3.0
+
+
+def rework_adoption_net(ctx, other_net):
+    """Signal R: signed net of an item's REWORK row(s) at the end of the item block, or None
+    (no DEMOS window for the patch / too few buyers)."""
+    a = _ADOPT.get((ctx or {}).get("version") or "")
+    rec = a and a["items"].get((ctx or {}).get("item") or "")
+    if not rec:
+        return None
+    (g0, g1), (b0, b1) = a["games"], rec
+    if b0 + b1 < ADOPT_MIN_BUYERS or not g0 or not g1:
+        return None
+    d = _math.log(((b1 + 1) / g1) / ((b0 + 1) / g0))
+    resid = d - (ADOPT_SLOPE * other_net + ADOPT_DRIFT)
+    resid = (1 if resid > 0 else -1) * max(abs(resid) - ADOPT_NOISE, 0.0)
+    score = resid / ADOPT_SLOPE * (b0 + b1) / (b0 + b1 + ADOPT_SHRINK_N)
+    return round(max(-ITEM_REWORK_CAP, min(ITEM_REWORK_CAP, score)), 3)
 
 
 def _item_gold_fraction(text, ctx, tags=("buff",)):

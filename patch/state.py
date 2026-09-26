@@ -36,6 +36,7 @@ class _State:
                                      # tally; per-li tags inside are stat/property
                                      # rows that shouldn't inflate the dynamics.
     pending_cost_panel = None        # an item's components panel total A -> B, scored at the end
+    pending_rework = None            # an item's unscored REWORK rows, scored at the end (signal R)
                                      # of the block unless an li() row states the cost itself
 
 

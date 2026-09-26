@@ -328,6 +328,7 @@ def _mech_tag(label):
 
 def _open_block(extra_cls='', extra_attrs=''):
     _flush_cost_panel()                                   # the previous item's components panel
+    _flush_rework()                                       # ... and its REWORK rows (signal R)
     pre = _close_ability_block()
     _State.new_mech_header = _State.new_mech = False     # a new block ends any "new mechanic" run
     cls = 'entity-block' + ((' ' + extra_cls) if extra_cls else '')
@@ -355,6 +356,7 @@ def _open_block(extra_cls='', extra_attrs=''):
 
 def _close_block():
     _flush_cost_panel()
+    _flush_rework()
     out = _close_ability_block()
     if _State.block_open:
         _State.block_open = False
@@ -404,6 +406,8 @@ def _dyn_record_li(tags, extra_keys=None, scores=(0.0, 0.0)):
             if tag in _DYN_TAG_WHITELIST:
                 patch_bucket[tag] = patch_bucket.get(tag, 0) + 1
         net, vol = scores
+        if not net and "rework" in tags and ek == _State.current_entity_key and ek.startswith("item|"):
+            _note_rework(ek, pv)
         if net:
             patch_bucket["w"] = round(patch_bucket.get("w", 0.0) + net, 3)
         if vol:
@@ -1021,6 +1025,32 @@ def _cost_panel_covered(score_text):
     if pend and pend["ek"] == _State.current_entity_key \
             and _COST_STATED_RE.search(re.sub(r'<[^>]+>', ' ', score_text or '')):
         _State.pending_cost_panel = None
+
+
+def _note_rework(ek, pv):
+    pend = _State.pending_rework
+    if pend and (pend["ek"], pend["pv"]) == (ek, pv):
+        pend["n"] += 1
+        return
+    _flush_rework()
+    _State.pending_rework = {"ek": ek, "pv": pv, "n": 1, "ctx": _row_ctx("")}
+
+
+def _flush_rework():
+    """Signal R: the item's REWORK rows get the pro adoption shift its other rows do not explain.
+    Runs after _flush_cost_panel, so the bucket's net already holds every other row of the item."""
+    pend, _State.pending_rework = _State.pending_rework, None
+    if not pend:
+        return
+    rec = _State.dynamics.get(pend["ek"])
+    if rec is None:
+        return
+    from . import weights
+    bucket = rec["patches"].setdefault(pend["pv"], {})
+    net = weights.rework_adoption_net(pend["ctx"], bucket.get("w", 0.0))
+    if net:
+        bucket["w"] = round(bucket.get("w", 0.0) + net, 3)
+        bucket["v"] = round(bucket.get("v", 0.0) + abs(net), 3)
 
 
 def _flush_cost_panel():
