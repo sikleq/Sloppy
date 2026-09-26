@@ -3,8 +3,16 @@
   "entries": [
     {
       "date": "2026-09-26",
+      "category": "Materials",
+      "title": "AoE Increase: columns follow the hero's ability slots (#1–#3 basic, #4 ultimate — Mana Void, Ice Blast and Culling Blade no longer sit in #1/#3), Scepter / Shard and extra abilities stacked in one Other column; labels like \"Speed\" read \"Speed radius\"",
+      "minor": true,
+      "fix": true,
+      "link": "aoe_increase.html"
+    },
+    {
+      "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero Changes: the summary under each attribute column is visual now — melee / ranged bar, move speed, game-style HP and mana bars, attribute averages with their icons, and the base / gain records as small hero cards linking to the hero",
+      "title": "Hero Changes: the summary under each attribute column reads easier — small melee / ranged, speed and attribute icons, HP / mana and attributes in their colours, and the record holders with a small portrait linking to the hero",
       "minor": true,
       "link": "hero_changes.html"
     },

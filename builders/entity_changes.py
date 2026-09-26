@@ -1077,7 +1077,6 @@ def _hero_stat_data():
 
 # level-1 HP / mana constants (same as builders/heroes_stats.py: 120 + 22·Str, 75 + 12·Int)
 _HP_BASE, _HP_PER_STR, _MP_BASE, _MP_PER_INT = 120.0, 22.0, 75.0, 12.0
-HS_HP_FULL, HS_MP_FULL = 700, 400      # a full HP / mana bar in the group summary (level-1 averages 540-660 / 280-370)
 # which base-attribute / gain field the category's "starting stat" refers to
 _CAT_ATTR = {"Strength": "Strength", "Agility": "Agility", "Intelligence": "Intelligence"}
 
@@ -1129,43 +1128,33 @@ def _hero_group_stats(label, lst):
     def num(x):
         return f"{x:.1f}".rstrip("0").rstrip(".")
 
-    # Visual summary (owner 2026-09-26: "only numbers"): a melee / ranged split bar, move speed, HUD-style
-    # HP / mana bars, attribute averages with their icons, and the four records as small hero cards.
-    ms = round(avg(lambda r: r["ms"]))
-    hp_avg, mp_avg = round(avg(hp)), round(avg(mp))
-    mel_pct = round(100 * melee / n)
-    split = (f'<div class="ec-hs-split" title="Melee {melee} / Ranged {n - melee}">'
-             f'<img src="icons/ui/atk_melee.png" alt="Melee"><b>{melee}</b>'
-             f'<span class="ec-hs-splitbar"><i style="width:{mel_pct}%"></i></span>'
-             f'<b>{n - melee}</b><img src="icons/ui/atk_ranged.png" alt="Ranged"></div>')
-    speed = (f'<div class="ec-hs-chip" title="Average base movement speed">'
-             f'<img src="icons/move_speed.png" alt=""><b>{ms}</b></div>')
-    bars = (f'<div class="ec-hs-bar ec-hs-hp"><i style="width:{min(100, round(100 * hp_avg / HS_HP_FULL))}%"></i>'
-            f'<span>{hp_avg} HP</span></div>'
-            f'<div class="ec-hs-bar ec-hs-mp"><i style="width:{min(100, round(100 * mp_avg / HS_MP_FULL))}%"></i>'
-            f'<span>{mp_avg} MP</span></div>')
-    attrs = "".join(
-        f'<span class="ec-hs-attr ec-hs-{k}"><img src="icons/attributes/{name}.png" alt="{name}">'
-        f'{num(avg(lambda r, k=k: r[k]))}</span>'
+    # Plain rows as before, the numbers made readable with small icons and colour (owner 2026-09-26:
+    # first "only numbers", then "too heavy" for bars and cards) — no bars, no boxes.
+    def row(lbl, val):
+        return f'<div class="ec-hstat-row"><span>{lbl}</span><b>{val}</b></div>'
+
+    def ico(src, alt):
+        return f'<img class="ec-hs-ico" src="{src}" alt="{alt}">'
+
+    def ext(who, val):
+        return (f'{num(val)} <a class="ec-hstat-who" href="heroes/{_esc(who["slug"])}.html">'
+                f'<img class="ec-hs-face" src="{_esc(who["icon"])}" alt="" loading="lazy">{_esc(who["name"])}</a>')
+
+    attrs = " ".join(
+        f'<span class="ec-hs-{k}">{ico(f"icons/attributes/{name}.png", name)}{num(avg(lambda r, k=k: r[k]))}</span>'
         for k, name in (("str", "strength"), ("agi", "agility"), ("int", "intelligence")))
-
-    def rec(lbl, who, val):
-        return (f'<a class="ec-hs-rec" href="heroes/{_esc(who["slug"])}.html">'
-                f'<span class="ec-hs-rec-lbl">{lbl}</span>'
-                f'<span class="ec-hs-rec-body"><img src="{_esc(who["icon"])}" alt="" loading="lazy">'
-                f'<b>{num(val)}</b><em>{_esc(who["name"])}</em></span></a>')
-
     out = [
-        f'<div class="ec-hs-top">{split}{speed}</div>',
-        f'<div class="ec-hs-bars">{bars}</div>',
-        f'<div class="ec-hs-attrs">{attrs}</div>',
+        row("Melee / Ranged", f'{ico("icons/ui/atk_melee.png", "Melee")}{melee}'
+                              f' <i class="ec-hs-sep">/</i> {ico("icons/ui/atk_ranged.png", "Ranged")}{n - melee}'),
+        row("Avg move speed", f'{ico("icons/move_speed.png", "")}{round(avg(lambda r: r["ms"]))}'),
+        row("Avg HP / mana (lvl 1)", f'<span class="ec-hs-hp">{round(avg(hp))}</span>'
+                                     f' <i class="ec-hs-sep">/</i> <span class="ec-hs-mp">{round(avg(mp))}</span>'),
+        row("Avg attributes", attrs),
         f'<div class="ec-hstat-head">{_esc(attr_label)}</div>',
-        '<div class="ec-hs-recs">',
-        rec("Highest base", hi_base, base_of(hi_base)),
-        rec("Lowest base", lo_base, base_of(lo_base)),
-        rec("Highest gain", hi_gain, gain_of(hi_gain)),
-        rec("Lowest gain", lo_gain, gain_of(lo_gain)),
-        '</div>',
+        row("Highest base", ext(hi_base, base_of(hi_base))),
+        row("Lowest base", ext(lo_base, base_of(lo_base))),
+        row("Highest gain", ext(hi_gain, gain_of(hi_gain))),
+        row("Lowest gain", ext(lo_gain, gain_of(lo_gain))),
     ]
     return f'<div class="ec-hstats">{"".join(out)}</div>'
 

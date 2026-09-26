@@ -567,6 +567,39 @@ def _hero_abilities(version: str, hero_slug: str, kit: set[str] | None) -> list[
     return abilities
 
 
+def _slot_layout(version: str, hero_slug: str) -> tuple[list[str], str | None]:
+    """(basic ability slugs in slot order, ultimate slug) from the hero's own "AbilityN" slots (two tabs
+    deep, so Invoker's AbilityDraftAbilities list is ignored). Innates, hidden / empty slots and Aghanim
+    grants are left out; the ultimate is the slot with AbilityType ULTIMATE (or a known ultimate)."""
+    path = STATS_DIR / version / "heroes" / f"npc_dota_hero_{hero_slug}.txt"
+    if not path.exists():
+        return [], None
+    text = path.read_text(encoding="utf-8", errors="replace")
+    code = "\n".join(line.split("//")[0] for line in text.split("\n"))
+    slots = [a for _, a in sorted((int(n), a) for n, a in
+                                  _re.findall(r'(?m)^\t\t"Ability(\d+)"\s+"([a-z0-9_]+)"', code))]
+    from patch.weights import ultimates
+    from patch.aghs_granted import kind_of
+
+    def block(slug):
+        m = _re.search(r'(?ms)^\s*"' + slug + r'"\s*$(.*?)^\t{1,3}\}', code)
+        return m.group(1) if m else ""
+
+    basics, ult = [], None
+    for a in slots:
+        if a.startswith("special_bonus") or "hidden" in a or a.endswith(("_empty", "_empty1", "_empty2")) \
+                or kind_of(a):
+            continue
+        b = block(a)
+        if '"Innate"' in b and _re.search(r'"Innate"\s+"1"', b):
+            continue
+        if "ABILITY_TYPE_ULTIMATE" in b or a in ultimates():
+            ult = ult or a
+        else:
+            basics.append(a)
+    return basics, ult
+
+
 def _item_filter_bar(items: list[tuple]) -> str:
     def _item_btn(key, label, icon, kind, amt):
         sign = f"+{amt}%" if kind == "pct" else f"+{amt}"
@@ -640,20 +673,25 @@ def render_html() -> str:
             or r["talent_set"] or r["scepter_set"] or r["shard_set"]
             or r.get("talent_global")
             for r in a["radii"])]
-        # Slot #0 reserved for INNATE; heroes with no AoE abilities still get a row
-        # (all cells will be empty dashes).
+        # Columns follow the hero's slots (owner 2026-09-26: Anti-Mage's Mana Void sat in "#1", Ancient
+        # Apparition's Ice Blast in "#3"): Innate | #1-#3 = basic slots | #4 = ultimate | extra columns =
+        # Scepter / Shard grants, sub-abilities. Heroes with no AoE ability still get a row of dashes.
         innate = next((a for a in abilities if a.get("innate")), None)
         rest = [a for a in abilities if a is not innate]
-        ordered: list[dict | None] = [innate] + rest
+        basics, ult = _slot_layout(latest, slug)
+        by_slug = {a["slug"]: a for a in rest}
+        ordered: list[dict | None] = [innate] + [by_slug.pop(b, None) for b in basics[:3]]
+        ordered += [None] * (4 - len(ordered)) + [by_slug.pop(ult, None) if ult else None]
+        ordered += list(by_slug.values())
         max_slots = max(max_slots, len(ordered))
         rows.append((hero, slug, ordered))
 
     # ---- header ---- (Hero column is the only sortable one)
     head = ['<th class="mr-th hs-th hs-name aoe-name sortable" data-col="name">'
             '<span class="th-label">Hero</span><span class="sort-ind"></span></th>']
-    for i in range(max_slots):
+    for i in range(min(max_slots, 6)):              # Innate, #1-#4, one "Other"
         # Slot 0 = Innate; everything after restarts at #1.
-        label = "Innate" if i == 0 else f"#{i}"
+        label = "Innate" if i == 0 else (f"#{i}" if i <= 4 else "Other")
         head.append(f'<th class="mr-th aoe-slot-th">{label}</th>')
     thead = "".join(head)
 
@@ -790,6 +828,9 @@ def render_html() -> str:
                 if not parts:
                     return ""
                 txt = " ".join(parts).strip()
+                if (("aoe" in key.split("_") or "area_of_effect" in key)
+                        and not _re.search(r"(radius|width|distance|range|length|spread)$", txt)):
+                    txt += " radius"             # speed_aoe -> "Speed radius" (Axe Culling Blade)
                 return txt[:1].upper() + txt[1:] if txt else ""
 
             # Auto-merge opposed-pair radii (start/end, min/max, near/far,
@@ -885,6 +926,13 @@ def render_html() -> str:
                 f'{ab_icon}'
                 f'<div class="aoe-radii" style="--aoe-radii-min:{radii_min_h:.2f}px">{"".join(lines)}</div>'
                 f'</div></td>')
+        # one "Other" column: Scepter / Shard grants and sub-abilities stacked in a single cell
+        if len(cells) > 6:                          # hero name + Innate + #1-#4
+            inner = [_re.sub(r'^<td[^>]*>|</td>$', '', c) for c in cells[6:] if "aoe-cell-empty" not in c]
+            for k in range(1, len(inner)):          # one dash placeholder per cell is enough
+                inner[k] = inner[k].replace('<span class="ua-dash aoe-cell-dash" hidden>—</span>', '', 1)
+            cells = cells[:6] + [f'<td class="aoe-cell aoe-cell-other">{"".join(inner)}</td>' if inner else
+                                 '<td class="aoe-cell aoe-cell-empty"><span class="ua-dash">—</span></td>']
         body.append(
             f'<tr data-slug="{slug}" data-name="{_esc(name.lower())}">'
             f'{"".join(cells)}</tr>')
