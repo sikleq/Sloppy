@@ -119,4 +119,10 @@ KNOWN_INNATE_NO_CDN_ICON = {
     "silencer_brain_drain",         # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
     "storm_spirit_galvanized",      # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
     "void_spirit_intrinsic_edge",   # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "dark_seer_mental_fortitude",   # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
+    "keeper_of_the_light_mana_magnifier", # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
+    "keeper_of_the_light_special_reserve", # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
+    "lone_druid_gift_bearer",       # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
+    "slark_barracuda",              # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
+    "spectre_spectral",             # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
 }
