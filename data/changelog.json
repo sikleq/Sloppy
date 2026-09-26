@@ -3,6 +3,12 @@
   "entries": [
     {
       "date": "2026-09-27",
+      "category": "Dynamics",
+      "title": "Hero scores: removed / added abilities and facets weigh like real changes; an item leaving the game is no longer a nerf",
+      "minor": true
+    },
+    {
+      "date": "2026-09-27",
       "category": "Patch Reader",
       "title": "7 disputed tags fixed: HUD timers are QoL, \"now levels with\" is REWORK, lost targets are DEL",
       "minor": true,

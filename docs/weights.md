@@ -17,7 +17,7 @@ w, v       = Σ rows of the entity in that patch  →  _dynamics.json patches[ve
 | type | ordered regex table `CAT`, matched on the text **before the first verb** (increased/decreased/…); `replaced with …` rows use the new effect | bkb_pierce/chance demoted to the end; projectile before move_speed; `damage block` → armor |
 | weight | `data/rules/valve_weights.json` → `final` | consensus rank shrunk to `other` (0.40) when < 3 signals: `respawn 0.97→0.59`, `chance 0.93→0.58`, `bkb_pierce 0.90→0.57`; `cost 0.45`, `turn_rate 0.2`, `other 0.4` are manual |
 | context | `valve_weights.json` → `context` | ultimate 1.3 (slugs read from the latest KV `AbilityType ULTIMATE`, 151), ability/innate/scepter/base stat/item 1.0, shard 0.9, facet 0.8, talent 10/15/20/25 = 0.5/0.6/0.7/0.8 (lowered with signal J) |
-| direction | tags | buff +1, nerf −1, sole `new` +0.5, sole `del` −0.5, rework/misc/qol 0 |
+| direction | tags | buff +1, nerf −1, sole `new`/`del` ±1.0 for heroes/units (±0.5 items; whole ability/facet ±`WHOLE_W`; item leaving the game 0 — see "DEL and NEW rows"), rework/misc/qol 0 |
 | magnitude | hybrid | GENERAL rows: `|Δ| / typical_step` (MS 5, base dmg 3, stats 2, stat gain 0.2, armor 1, HP regen 0.5, mana regen 0.25 …). Other rows: `mean|%| / typical_pct[type]` (signal C medians: cooldown 17.7, damage 17.8, health 25, cast_point 42.9 …); 0% badges count; "Recipe … Total cost …" uses the total. Cap 3. No badge → 1.0 |
 
 ## Signal J — Valve's exchange rate (done 2026-09-16)
@@ -559,3 +559,44 @@ every layout pass ("Hide old", resize). History of rejected variants: bars v1, s
 7. Reworked items whose old stats the notes do not list (Revenant's Brooch 7.38) count only the price cut from
    the components panel; the KV has both stat sets (`tools/fit_item_prices.py` parses them) if a KV-based value
    change is wanted.
+
+
+## DEL and NEW rows (2026-09-27)
+
+**Problem.** Every sole NEW/DEL row was `±0.5 × weight × context`, numbers ignored: median |net| 0.20 against 0.61
+for buff/nerf; "Removed Chain Lightning ability" (−0.12) weighed less than "No longer deals bonus damage to
+creeps" (−0.19).
+
+**Evidence.**
+1. Blind judge (Sonnet, analyst persona), 200 rows: 100 DEL by kind, 40 NEW, 60 buff/nerf anchors by |score|
+   quintile (scratchpad `del_judge_*`). Judge vs model on the anchors ρ 0.43 — as the earlier judges. Mean grade:
+   whole ability/facet/item removed 4.25, Aghanim's upgrade lost 3.22, part of an effect 3.07, NEW 2.83, nerf 2.36,
+   use restriction 1.88, buff 1.80, lost target class (creeps, illusions, invulnerable) 1.60. Current scores vs
+   grades: ρ −0.21 on all 200, −0.13 inside DEL/NEW.
+2. Devil's advocate (separate agent, read-only) + pro adoption (DEMOS, 21 days, non-rework cells, bootstrap):
+   for heroes one DEL row moves pick share like ~2.4 buff/nerf rows (CI 1.15–4.5), a NEW row ~3.2; items: no signal.
+
+**Done** (`_sole_new_del` in patch/weights.py):
+- heroes / units: sole NEW/DEL direction 0.5 → **1.0**; a lost/gained effect that acts ON a niche target
+  ("to/against/by creeps, illusions, buildings", invulnerable, Debuff Immune) × `NICHE_W` 0.5;
+- a whole ability / facet / innate — the "Removed X ability / facet" row and the card of a new one (empty text) —
+  `weight(other) × WHOLE_W 2 × context` on BOTH sides (facet context 0.8), so a replaced facet nets 0 and an
+  unreplaced removal stays a clear nerf;
+- items / enchantments leaving the game ("Item cycled out", "removed from the game", "Removed") → 0 net, volume
+  only: nobody holds a weaker item;
+- items otherwise unchanged (±0.5; priced stats in gold as before).
+
+Result: inside DEL/NEW ρ −0.13 → **0.30**, all 200 rows −0.21 → 0.19; hero median |net| DEL 0.46, NEW 0.56.
+Signal R: the hero adoption fit on the new nets moves slope 0.129 → 0.132 (ρ 0.264 → 0.273) — kept, not refitted.
+
+**Rejected (devil's advocate, confirmed by the judge):**
+- *A number in a DEL row = that value going to 0 (−100 %)*: constant, so the number never matters; 38 of 50 numbered
+  hero DEL rows would land above the 95th percentile of nerfs; 11 of the numbers are multipliers / targets
+  ("to 100/110/120 %", "1.25x"), 7 unrelated ("Level 25 Talent"). Judge ρ inside DEL/NEW 0.18 → 0.11.
+- *An item's ability value = cost − priced stats*: negative for about a third of items (Khanda −143 g, Brooch −235 g),
+  shared between abilities (Gleipnir), and an accounting identity with the stat + price rows (the item's score
+  becomes minus its new ability). Fixed weight beats it on the judge (0.22 vs 0.18).
+- Doubling item DEL/NEW: no evidence either way (adoption CI −2.0 … 7.7).
+
+**Open:** a DEL row and its REWORK partner (8 Aghanim's Shard/Scepter moves score DEL + 0); double rows for one
+removal (Anti-Mage 7.40 Counterspell Ally); debut item cells made only of NEW rows (+0.13) could be 0 like exits.

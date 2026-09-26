@@ -833,11 +833,50 @@ def row_scores(text, tags, badge_html="", ctx=None):
         return 0.0, round(w, 3)
     if item_row is not None:                                # a stat / Damage Block gained or lost
         return item_row
-    if tags == {"new"}:
-        return round(w * 0.5, 3), round(w, 3)
-    if tags == {"del"}:
-        return round(-w * 0.5, 3), round(w, 3)
+    if tags in ({"new"}, {"del"}):
+        return _sole_new_del(text, tags, ctx, w, cm)
     return 0.0, 0.0
+
+
+# ---- Sole NEW / DEL rows (owner 2026-09-27; docs/weights.md "DEL and NEW rows") ----
+# Blind judge, 200 rows (100 DEL, 40 NEW, 60 buff/nerf anchors; judge vs anchors rho 0.43 as before):
+# the flat x0.5 ranked DEL/NEW rows BELOW numeric tweaks (rho -0.13 inside DEL/NEW), while a whole
+# removed ability / facet averaged grade 4.25, a lost Aghanim's upgrade 3.2, part of an effect 3.1,
+# a lost target class (creeps, illusions, invulnerable) 1.6, a use restriction 1.9 (buff/nerf 1.8-2.4).
+# Pro adoption (DEMOS) agrees for HEROES: one DEL row moves pick share like ~2.4 buff/nerf rows, a NEW
+# row ~3.2; items show no signal. Devil's advocate (same session) killed "a number -> 0 = -100%" and
+# "an item ability = cost - priced stats" (negative for a third of items) — neither is done.
+DELNEW_HERO_W = 1.0       # direction of a sole NEW / DEL row of a hero / unit (was 0.5, like items still)
+WHOLE_W = 2.0             # a whole ability / facet / innate removed or added = a numberless NERF / BUFF
+_HERO_KINDS = ("hero", "unit", "creep-hero")
+# an item / enchantment that leaves the game is not a weaker item: 0 net, only volume
+_EXIT_RE = _re.compile(r"cycled out|removed from the game|^\s*removed\s*$", _re.I)
+_WHOLE_DEL_RE = _re.compile(r"^(?:[\w' ]+: )?removed\b.*\b(?:ability|facets?|innate)\b|\bfacet removed\b"
+                            r"|^(?:[\w' ]+: )?(?:ability|innate) removed\b", _re.I)
+# the lost / gained effect acts ON a niche target (not merely a niche word in the row)
+_NICHE_TARGET_RE = _re.compile(r"\b(?:to|against|on|from|by|vs\.?)\s+(?:\w+\s+)?(?:buildings?|structures?|towers?|"
+                               r"illusions?|creeps?|neutrals?|roshan|wards?|denies)\b|applied by illusions|"
+                               r"\b(?:invulnerable|debuff immune)\b", _re.I)
+
+
+def _sole_new_del(text, tags, ctx, w, cm):
+    """(net, volume) of a row tagged only NEW or only DEL (not a priced item stat)."""
+    sign = 1.0 if tags == {"new"} else -1.0
+    ek = (ctx or {}).get("kind") or ""
+    t = _plain(text).strip()
+    if ek in ("item", "enchant") and sign < 0 and _EXIT_RE.search(t):
+        return 0.0, round(w, 3)
+    if ek not in _HERO_KINDS:
+        return round(sign * w * 0.5, 3), round(w, 3)
+    # a whole ability / facet / innate: the "Removed X ability / facet" row, or the card of a new one
+    # (its text is empty). Both sides weigh the same, so a replaced facet nets 0.
+    if (sign < 0 and _WHOLE_DEL_RE.search(t)) or (sign > 0 and not t):
+        if _re.search(r"\bfacets?\b", t, _re.I):              # same context as the new facet's card
+            cm = context_multiplier(dict(ctx or {}, facet=True, base_stat=False, talent=None))
+        v = weight_of("other") * WHOLE_W * cm
+        return round(sign * v, 3), round(v, 3)
+    v = w * DELNEW_HERO_W * (NICHE_W if _NICHE_TARGET_RE.search(t) else 1.0)
+    return round(sign * v, 3), round(v, 3)
 
 
 def row_score(text, tags, badge_html=""):
