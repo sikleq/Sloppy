@@ -159,3 +159,14 @@ extra=inline_note(info_tip("Batrider's Arsonist", "Magnus' Diminishing Return", 
   - `< 365` дней → `"N days ago"`
   - `>= 365` дней → `"Y years M months ago"` (months скрыт если 0; singular/plural корректно)
 - Лейбл `"Previously:"` — отдельный `<span class="correction-label">`.
+
+
+## Карточка характеристик предмета «было → стало»: все характеристики (2026-09-27)
+
+`properties_change` сама дописывает внизу обеих колонок характеристики, которые патч НЕ менял и которые
+не названы в карточке (Mage Slayer 7.38: +20% Magic Resistance, +2 Mana Regen) — без тегов, одинаково слева
+и справа. Источник: items.txt игры прошлого и этого патча → `data/rules/item_stat_lines.json`
+(`tools/build_item_stat_lines.py`, перезапускать при новом патче). Поле без собственной подсказки-характеристики
+берётся только если оно `bonus_*` (иначе урон Dagon и скорость снаряда Ethereal Blade читались как +статы);
+% скорости атаки и скорость снаряда не выводятся никогда — у предметов это числа активной способности.
+В content ничего дописывать не нужно. Тест: `tests/test_item_card_unchanged_stats.py`.

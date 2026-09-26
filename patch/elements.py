@@ -1557,12 +1557,108 @@ def _prop_cells(row):
     return (row[0], row[1], row[2])
 
 
+# ---- Unchanged stat lines of a "before -> after" item card (owner 2026-09-27, Mage Slayer 7.38) ----
+# The card must list ALL the item's stats; patch notes only name the changed ones, so the rest comes
+# from the game's items.txt of the previous and this patch (data/rules/item_stat_lines.json, built by
+# tools/build_item_stat_lines.py). Stat key -> (display name, is %, words that mean it in a row).
+# Not listed on purpose: % attack speed and projectile speed — on items those are an active's numbers
+# (Drum / Boots of Bearing Endurance, Ethereal Blade), never a passive stat line.
+_STAT_LINE = {
+    "magic_res": ("Magic Resistance", True, r"magic(?:al)? resist"),
+    "mana_regen": ("Mana Regen", False, r"mana regen(?!\w* amp)"),
+    "health_regen": ("Health Regen", False, r"(?:health|hp) regen(?!\w* amp)"),
+    "damage": ("Damage", False, r"(?<!spell )(?<!block )\bdamage\b(?! block)"),
+    "attack_speed": ("Attack Speed", False, r"attack speed"),
+    "all_stats": ("All Attributes", False, r"all (?:attributes|stats)"),
+    "strength": ("Strength", False, r"\bstrength\b"),
+    "agility": ("Agility", False, r"\bagility\b"),
+    "intelligence": ("Intelligence", False, r"\bintelligence\b"),
+    "primary_attribute": ("Primary Attribute", False, r"primary attribute"),
+    "armor": ("Armor", False, r"\barmor\b"),
+    "health": ("Health", False, r"\bhealth\b(?! regen| restoration)"),
+    "mana": ("Mana", False, r"\bmana\b(?! regen| cost| loss)"),
+    "evasion": ("Evasion", True, r"\bevasion\b"),
+    "lifesteal": ("Lifesteal", True, r"(?<!spell )\blifesteal\b(?! amp)"),
+    "spell_lifesteal": ("Spell Lifesteal", True, r"spell lifesteal(?! amp)"),
+    "cast_range": ("Cast Range", False, r"cast range"),
+    "attack_range": ("Attack Range", False, r"attack range"),
+    "cooldown_reduction": ("Cooldown Reduction", True, r"cooldown reduction"),
+    "slow_res": ("Slow Resistance", True, r"slow resist"),
+    "status_res": ("Status Resistance", True, r"status resist"),
+    "restoration_amp": ("Health Restoration", True, r"health restoration|regen and lifesteal amp"),
+    "spell_amp": ("Spell Amplification", True, r"spell amp"),
+    "mana_regen_amp": ("Mana Regen Amplification", True, r"mana regen\w* amp"),
+    "spell_lifesteal_amp": ("Spell Lifesteal Amplification", True, r"spell lifesteal amp"),
+    "manacost_reduction": ("Mana Cost Reduction", True, r"mana cost"),
+    "aoe_bonus": ("AoE Bonus", False, r"aoe bonus"),
+    "debuff_amp": ("Debuff Amplification", True, r"debuff amp"),
+    "heal_amp": ("Heal Amplification", True, r"heal(?:ing)? amp"),
+    "night_vision": ("Night Vision", False, r"night vision"),
+    "move_speed": ("Movement Speed", False, r"move(?:ment)? speed"),
+    "move_speed_pct": ("Movement Speed", True, r"move(?:ment)? speed"),
+    "boots_move_speed": ("Movement Speed", False, r"move(?:ment)? speed"),
+}
+_ITEM_STATS = None
+
+
+def _item_stats_at(slug, version):
+    """{stat: value} of an item in a patch, or None when that patch has no data for it."""
+    global _ITEM_STATS
+    if _ITEM_STATS is None:
+        try:
+            with open(_os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
+                                    "data", "rules", "item_stat_lines.json"), encoding="utf-8") as f:
+                _ITEM_STATS = _json.load(f)
+        except OSError:
+            _ITEM_STATS = {"versions": [], "items": {}}
+    vers = _ITEM_STATS["versions"]
+    if version not in vers:
+        return None
+    out = None
+    for first, stats in _ITEM_STATS["items"].get(slug, []):
+        if vers.index(first) <= vers.index(version):
+            out = stats
+    return out
+
+
+def _unchanged_stat_rows(old, new):
+    """("", "+20% Magic Resistance") rows for the stats the card doesn't name and the patch didn't
+    change — to be shown on BOTH sides. Empty when the item or either patch has no data."""
+    ek = _State.current_entity_key or ""
+    ver = _State.current_patch_version
+    if not ek.startswith("item|") or not ver:
+        return []
+    from .meta import RELEASE_HISTORY
+    order = [r["version"] for r in RELEASE_HISTORY]          # newest first
+    if ver not in order or order.index(ver) + 1 >= len(order):
+        return []
+    name = _State.current_entity_display or ""
+    slug = ITEM_SLUG.get(name, name.lower().replace(" ", "_").replace("'", ""))
+    before = _item_stats_at(slug, order[order.index(ver) + 1])
+    after = _item_stats_at(slug, ver)
+    if not before or not after:
+        return []
+    named = " ".join(re.sub(r"<[^>]+>", " ", str(r[1])).lower()
+                     for r in list(old) + list(new) if isinstance(r, (tuple, list)) and len(r) >= 2)
+    rows = []
+    for stat, x in before.items():
+        spec = _STAT_LINE.get(stat)
+        if not spec or after.get(stat) != x or re.search(spec[2], named):
+            continue
+        num = f"{x:g}"
+        rows.append(("", f"{'+' if x > 0 else ''}{num}{'%' if spec[1] else ''} {spec[0]}"))
+    return rows
+
+
 def properties_change(old, new, old_extras=None, new_extras=None):
     old_extras = old_extras or {}
     new_extras = new_extras or {}
     n = max(len(old), len(new))
     old_rows = list(old) + [None] * (n - len(old))
     new_rows = list(new) + [None] * (n - len(new))
+    same = _unchanged_stat_rows(old, new)                  # after the changed rows, on both sides
+    old_rows += same
+    new_rows += same
     # A value that CHANGED ("+10 Strength" -> "+26 Strength +160%") carries its BUFF/NERF chip
     # on the NEW side, next to the new value and its badge — content may give it on either side.
     # DEL stays on the old side (the property is gone), NEW on the new side.
