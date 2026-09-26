@@ -135,6 +135,20 @@ _SCOPE_LABEL = {"general": "General", "abilities": "Abilities", "talents": "Tale
                 "facets": "Facets", "other": "Other"}
 
 
+_AB_ICON_RE = _re.compile(r'<div class="ability-icon-wrap[^"]*"><img[^>]*?src="([^"]+)"[^>]*></div>'
+                         r'<h4 class="ability-title">([^<]+)</h4>')
+_AGHS = {"shard": ("Aghanim's Shard", "../icons/stats/aghs_shard_icon.png"),
+         "scepter": ("Aghanim's Scepter", "../icons/stats/aghs_scepter_icon.png")}
+
+
+def _aghs_btn(kind):
+    """Shard / Scepter filter (owner 2026-09-26): the rows an Aghanim upgrade changes in abilities,
+    talents and facets. The item itself (stats, price) is the item slots' job."""
+    name, icon = _AGHS[kind]
+    return (f'<button type="button" class="badge ec-scope-btn ec-aghs-btn" data-ec-scope="{kind}" '
+            f'data-tooltip="{name}" aria-label="{name}"><img src="{icon}" alt=""></button>')
+
+
 def _scope_key(title: str) -> str:
     k = title.strip().lower()
     return k if k in ("general", "abilities", "talents", "facets") else "other"
@@ -332,7 +346,9 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         scopes_html = ('<span class="ec-vsep" aria-hidden="true"></span>' + "".join(
             f'<button type="button" class="badge ec-scope-btn" data-ec-scope="{s}">{_SCOPE_LABEL[s]}</button>'
             for s in _SCOPE_ORDER if s in seen)
-            + ('<button type="button" class="badge ec-scope-btn" data-ec-scope="innate">Innate</button>' if has_innate else ""))
+            + ('<button type="button" class="badge ec-scope-btn" data-ec-scope="innate">Innate</button>' if has_innate else "")
+            + "".join(_aghs_btn(k) for k in ("shard", "scepter")
+                      if any(f"aghanim-{k}" in p["_body"] for p in e["patches"])))
     # every ability that was ever changed (most often changed first) -> one-click filter
     ab_count: dict[str, int] = {}
     for p in e["patches"]:
@@ -367,12 +383,22 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
 
         # Facets get no chips: the FACETS scope button already filters them, and a
         # facet mostly changes an existing ability (which has its own chip).
-        def chip(t, hidden=False):
-            cls = "badge ec-ab-btn" + (" ec-ab-old" if hidden else "")
-            return (f'<button type="button" class="{cls}" data-ec-ability="{_esc(t)}"'
-                    f'{" hidden" if hidden else ""}>{_esc(t)}</button>')
-        ability_chips = ("".join(chip(t) for t in current) + "".join(chip(t, True) for t in old)
-                         + (f'<button type="button" class="badge ec-ab-more" data-ec-more>+{len(old)}</button>' if old else ""))
+        # the chip is the ability's own icon (owner 2026-09-26: long names made the row too wide), same
+        # height as the tag badges; a removed ability stays visible, greyed. The name is the tooltip.
+        icons = {}
+        for p in e["patches"]:
+            for m in _AB_ICON_RE.finditer(p["_body"]):
+                icons.setdefault(_html.unescape(m.group(2)).split("→")[-1].strip(), m.group(1))
+
+        def chip(t, is_old=False):
+            cls = "badge ec-ab-btn" + (" ec-ab-old" if is_old else "")
+            src = icons.get(t)
+            if not src:
+                return f'<button type="button" class="{cls}" data-ec-ability="{_esc(t)}">{_esc(t)}</button>'
+            return (f'<button type="button" class="{cls} ec-ab-icon" data-ec-ability="{_esc(t)}" '
+                    f'data-tooltip="{_esc(t)}{" (removed)" if is_old else ""}" aria-label="{_esc(t)}">'
+                    f'<img src="{_esc(src)}" alt="" loading="lazy" decoding="async"></button>')
+        ability_chips = "".join(chip(t) for t in current) + "".join(chip(t, True) for t in old)
         abilities_html = '<span class="ec-vsep" aria-hidden="true"></span>' + ability_chips
     _from_kind = {"hero": "hero", "item": "item", "enchant": "item"}.get(e["kind"], "unit")
     from_tok = f'{_from_kind}:{_file_slug(e)}'

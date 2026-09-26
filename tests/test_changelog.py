@@ -59,3 +59,15 @@ def test_a_day_links_to_the_same_page_only_once():
     out = _one_link_per_patch(g)
     assert [e.get("link") for e in out] == ["patches/7.38.html", None, "patches/7.39.html", None]
     assert g[1]["link"] == "patches/7.38.html"          # the data itself is not changed
+
+
+def test_hero_page_filters_are_icons_and_aghanim_scopes():
+    """Owner 2026-09-26: ability chips are the ability icons (long names widened the row); Shard / Scepter
+    chips after Innate filter the rows an Aghanim upgrade changes."""
+    from builders.entity_changes import _AB_ICON_RE, _aghs_btn
+    body = ('<div class="ability-icon-wrap"><img decoding="async" src="../icons/_t/abilities/x_cold_feet.webp" '
+            'alt="Cold Feet"></div><h4 class="ability-title">Cold Feet</h4>')
+    m = _AB_ICON_RE.search(body)
+    assert m and m.group(1).endswith("x_cold_feet.webp") and m.group(2) == "Cold Feet"
+    btn = _aghs_btn("shard")
+    assert 'data-ec-scope="shard"' in btn and "aghs_shard_icon" in btn and "ec-aghs-btn" in btn

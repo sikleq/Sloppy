@@ -3489,14 +3489,24 @@ function ecPinnableTip(tip, show, hide, sel) {
   // a renamed block "Old→New" answers to the chip "New"
   const titleOf = blk => { const t = blk.querySelector('.ability-title'); return t ? t.textContent.trim().split('→').pop().trim() : ''; };
   const apply = () => {
-    // "innate" is a pseudo-scope: it selects innate ability blocks wherever they sit
-    const realScopes = new Set([...scopes].filter(x => x !== 'innate'));
+    // "innate" is a pseudo-scope: it selects innate ability blocks wherever they sit;
+    // "shard" / "scepter" select the rows an Aghanim upgrade changes (abilities, talents, facets)
+    const PSEUDO = ['innate', 'shard', 'scepter'];
+    const realScopes = new Set([...scopes].filter(x => !PSEUDO.includes(x)));
     const wantInnate = scopes.has('innate');
+    const aghs = ['shard', 'scepter'].filter(x => scopes.has(x));
+    const aghsSel = aghs.map(a => `li.aghanim-${a}, .ability-change-row.aghanim-${a}`).join(', ');
+    document.querySelectorAll('.ec-aghs-hide').forEach(x => x.classList.remove('ec-aghs-hide'));
     document.querySelectorAll('.ec-scope').forEach(sc => {
       let any = false;
       sc.querySelectorAll('.ability-block').forEach(blk => {
         const innate = blk.classList.contains('is-innate');
-        const scopeOk = !scopes.size || realScopes.has(sc.dataset.scope) || (wantInnate && innate);
+        const baseOk = !scopes.size || realScopes.has(sc.dataset.scope) || (wantInnate && innate);
+        const aghsRows = aghs.length ? [...blk.querySelectorAll(aghsSel)] : [];
+        const viaAghs = !baseOk && aghsRows.length > 0;
+        if (viaAghs)            // chosen only for its Aghanim rows: the other rows step aside
+          blk.querySelectorAll('ul.changes > li').forEach(li => { if (!aghsRows.includes(li)) li.classList.add('ec-aghs-hide'); });
+        const scopeOk = baseOk || viaAghs;
         let ok = scopeOk && (!abilities.size || (!innate && abilities.has(titleOf(blk))));
         // talents block: with an ability chip active, keep only the rows that upgrade that ability
         const rows = blk.classList.contains('talents-block') ? [...blk.querySelectorAll('li')] : [];
@@ -3543,13 +3553,6 @@ function ecPinnableTip(tip, show, hide, sel) {
       target.scrollIntoView({ block: 'center' });
     }
   }
-  const more = document.querySelector('[data-ec-more]');
-  if (more) more.addEventListener('click', () => {
-    const olds = [...document.querySelectorAll('.ec-ab-old')];
-    const show = olds.some(b => b.hidden);
-    olds.forEach(b => { b.hidden = !show; });
-    more.classList.toggle('active', show);
-  });
 })();
 
 // ---- Shared "shop" picker body = the Item Changes index look ----
