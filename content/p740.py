@@ -1524,7 +1524,6 @@ def build():
     W(li("Base Movement Speed decreased from 325 to 295", b(325, 295)))
     W(li("Base Damage increased by 4", bstat_h("Lone Druid", "AttackDamageMin", "7.39e", 4), extra=note_box(hero="Lone Druid", field="AttackDamageMin", before_patch="7.39e")))
     W(li("Damage at level 1 increased from 38–42 to 42–46", br(38, 42, 42, 46)))
-    W(li("Gift Bearer: Innate ability removed. Its effect is now a part of Summon Spirit Bear ability", t("DEL")))
     W(ul_close())
     W(facet_header("lone_druid_bear_with_me"))
     W(ul_open())
@@ -1534,9 +1533,27 @@ def build():
     W(ul_open())
     W(li("Bear Necessities: Facet removed", t("DEL")))
     W(ul_close())
-    W(ability("Summon Spirit Bear", slug="lone_druid_spirit_bear"))
+    W(ability_change(
+        old=dict(
+            name="Gift Bearer", slug="lone_druid_gift_bearer", innate=True,
+            desc=[
+                "Passive.",
+                "Lone Druid's Spirit Bear receives a copy of his Neutral Item that has an independent cooldown.",
+            ],
+        ),
+        new=dict(
+            name="Summon Spirit Bear", slug="lone_druid_spirit_bear", innate=True,
+            desc=[
+                "Innate, cannot be leveled up.",
+                "Summons a powerful Spirit Bear companion that can equip items.",
+                "If the bear moves <b>1100</b> distance away from the Lone Druid, it cannot attack. Lone Druid suffers <b>20%</b> of his max health as backlash damage if the Spirit Bear dies.",
+                "Spirit Bear receives a copy of Lone Druid's Neutral Item that has an independent cooldown.",
+            ],
+        ),
+        summary="Moved to an innate ability. Cannot be leveled up. Gift Bearer's effect is now a part of it",
+        tag="rework",
+    ))
     W(ul_open())
-    W(li("Moved to an innate ability. Cannot be leveled up", t("REWORK")))
     W(li("Ability is moved to the 4th ability slot", t("MISC")))
     W(li("Spirit Bear now counts as a melee hero for most spells", t("REWORK"), extra=inline_note("Since the bear is now a hero, all unit-related changes moved to a separate Spirit Bear section below. This section is for the summon ability changes only")))
     W(li("Cooldown decreased from 150/140/130/120s to 120s", b([150, 140, 130, 120], 120, l=True)))
@@ -2319,9 +2336,6 @@ def build():
 
     # Slark
     W(hero_header("Slark"))
-    W(ul_open())
-    W(li("Barracuda: Innate ability removed", t("DEL"), extra=inline_note("Effect moved to the Ultimate")))
-    W(ul_close())
     W(facet_header("slark_leeching_leash"))
     W(ul_open())
     W(li("Leeching Leash: Facet removed", t("DEL")))
@@ -2330,9 +2344,25 @@ def build():
     W(ul_open())
     W(li("Dark Reef Renegade: Facet removed", t("DEL")))
     W(ul_close())
-    W(ability("Essence Shift", slug="slark_essence_shift"))
+    W(ability_change(
+        old=dict(
+            name="Barracuda", slug="slark_barracuda", innate=True,
+            desc=[
+                "Passive.",
+                "When not visible to the enemy team, Slark gains bonus movement speed and health regeneration.",
+            ],
+        ),
+        new=dict(
+            name="Essence Shift", slug="slark_essence_shift", innate=True,
+            desc=[
+                "Passive, improves with Slark's level.",
+                "Slark steals the life essence of enemy heroes with his attacks, draining <b>1</b> of each of their attributes and converting them to bonus <b>3</b> Agility. If Slark kills an affected enemy hero, he permanently steals <b>1</b> Agility.",
+            ],
+        ),
+        summary="Now an innate ability. Passive, improves with Slark's level. Barracuda's effect moved to the Ultimate",
+        tag="rework",
+    ))
     W(ul_open())
-    W(li("Now an innate ability. Passive, improves with Slark's level", t("NEW")))
     W(li_formula("Duration rescaled",
                  "15/35/55/75s", "15s + 2.5s each time Slark levels up",
                  rank_step([15, 35, 55, 75], ultimate=False), lambda L: 15 + 2.5 * (L - 1),
@@ -2404,7 +2434,6 @@ def build():
     W(li("Damage at level 30 decreased by 27 (from 149–153 to 122–126)", br(149, 153, 122, 126)))
     W(li("Base Attack Time worsened from 1.7s to 1.8s", b(1.7, 1.8, l=True)))
     W(li("Base Attack Speed increased from 90 to 110", b(90, 110)))
-    W(li("Spectral: Innate ability removed", t("DEL")))
     W(ul_close())
     W(facet_header("spectre_forsaken"))
     W(ul_open())
@@ -2414,9 +2443,25 @@ def build():
     W(ul_open())
     W(li("Twist the Knife: Facet removed", t("DEL")))
     W(ul_close())
-    W(ability("Desolate", slug="spectre_desolate"))
+    W(ability_change(
+        old=dict(
+            name="Spectral", slug="spectre_spectral", innate=True,
+            desc=[
+                "Passive.",
+                "Spectre and her illusions are permanently phased.",
+            ],
+        ),
+        new=dict(
+            name="Desolate", slug="spectre_desolate", innate=True,
+            desc=[
+                "Passive, improves with Spectre's level.",
+                "Spectre and her illusions deal bonus Pure damage if attacking an enemy that does not have any allied units within a <b>350</b> radius around them.",
+            ],
+        ),
+        summary="Now an innate ability. Passive, improves with Spectre's level",
+        tag="rework",
+    ))
     W(ul_open())
-    W(li("Now an innate ability. Passive, improves with Spectre's level", t("NEW")))
     W(li_formula("Damage rescaled",
                  "25/40/55/70", "25 + 2 every time Spectre levels up",
                  rank_step([25, 40, 55, 70], ultimate=False), lambda L: 25 + 2 * (L - 1),
@@ -2786,8 +2831,9 @@ def build():
 
     # Venomancer
     W(hero_header("Venomancer"))
+    W(ability("Septic Shock", slug="venomancer_sepsis", innate=True))
     W(ul_open())
-    W(li("Septic Shock: Base Damage per Debuff decreased from 10% to 8%", b(10, 8)))
+    W(li("Base Damage per Debuff decreased from 10% to 8%", b(10, 8)))
     W(ul_close())
     W(facet_header("venomancer_plague_carrier"))
     W(ul_open())

@@ -267,3 +267,15 @@ W(li("Aghanim's Shard reworked: Applies 3 Fury Swipe stacks to each affected ene
 ```
 
 `inline_note` — только для ДОПОЛНИТЕЛЬНЫХ уточнений, не для самого описания реворка.
+
+
+## Врождённые способности — не в общем списке героя (2026-09-26)
+
+Изменение врождённой («Sticky Fingers: …», «Septic Shock: …») — в её собственном блоке
+`W(ability("<name>", slug=..., innate=True))` сразу после списка характеристик, не строкой в нём.
+Удалённая врождённая + новая в том же патче → одна карточка `ability_change(old=<удалённая>, new=<новая>)`:
+Mental Fortitude → Aggrandize, Mana Magnifier → Special Reserve (7.38), Barracuda → Essence Shift,
+Gift Bearer → Summon Spirit Bear, Spectral → Desolate (7.40). Переделка на месте («Gift Bearer: Reworked»)
+→ `ability_change` с одинаковым именем. Тексты old/new — из d2vpkr `abilities_english.txt` до/после патча,
+числа — из `data/stats/<версия>` KV; не выдумывать. Генератор: `_postprocess_innate_rows_out_of_stats`
+(переносит строки, для удаления ставит `# TODO[innate-swap]`).

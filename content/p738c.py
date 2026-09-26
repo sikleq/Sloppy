@@ -482,8 +482,9 @@ def build():
     
     # Night Stalker
     W(hero_header("Night Stalker"))
+    W(ability("Heart of Darkness", slug="night_stalker_heart_of_darkness", innate=True))
     W(ul_open())
-    W(li("Heart of Darkness: Bonus health regen at night decreased from 40% to 20%", b(40, 20)))
+    W(li("Bonus health regen at night decreased from 40% to 20%", b(40, 20)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

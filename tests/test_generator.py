@@ -676,3 +676,22 @@ def test_no_rows_hang_after_a_facet_block_without_a_header():
             elif state == "orphan" and s.startswith("W(li"):
                 bad.append(f"{os.path.basename(f)}:{i}")
     assert bad == []
+
+
+def test_innate_rows_leave_the_stats_ul():
+    """Owner 2026-09-26: "Barracuda: Innate ability removed" / "Septic Shock: ..." sat in the hero's general
+    (stats) notes. An innate change goes to its own innate block; a removal also gets a TODO for the
+    old -> new ability_change card (old text from d2vpkr, never invented)."""
+    import generate_patch_code_v2 as g
+    out = g._postprocess_innate_rows_out_of_stats([
+        'W(hero_header("Venomancer"))', 'W(ul_open())',
+        'W(li("Base Armor increased by 1", b(1, 2)))',
+        'W(li("Septic Shock: Base Damage per Debuff decreased from 10% to 8%", b(10, 8)))',
+        'W(ul_close())'])
+    assert out == ['W(hero_header("Venomancer"))', 'W(ul_open())', 'W(li("Base Armor increased by 1", b(1, 2)))',
+                   'W(ul_close())', 'W(ability("Septic Shock", slug="venomancer_sepsis", innate=True))', 'W(ul_open())',
+                   'W(li("Base Damage per Debuff decreased from 10% to 8%", b(10, 8)))', 'W(ul_close())']
+    gone = g._postprocess_innate_rows_out_of_stats([
+        'W(hero_header("Slark"))', 'W(ul_open())',
+        'W(li("Removed Barracuda innate ability (effect moved to the Ultimate)", t("DEL")))', 'W(ul_close())'])
+    assert gone[1].startswith("# TODO[innate-swap]") and gone[2] == 'W(ability("Barracuda", slug="slark_barracuda", innate=True))'

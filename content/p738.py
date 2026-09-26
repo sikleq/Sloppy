@@ -1333,13 +1333,29 @@ def build():
     W(li("Damage at level 1 increased by 5 (from 49-55 to 54-60)", br(49, 55, 54, 60)))
     W(li("Damage gain per level decreased from +5 to +2.7", b(5, 2.7)))
     W(li("Damage at level 30 decreased by 75 (from 221-227 to 146-152)", t("NERF")))
-    W(li("Removed Mental Fortitude innate ability", t("DEL"), extra=inline_note("When Dark Seer levels up, he restores a percentage of his max health and mana. Restore percentage is equal to 10% + 2% per hero level. Disabled by Break")))
     W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
     W(ul_close())
     # v2-todo: convert to ability_change(old=<replaced ability>, new=..., summary="New innate ability." / "New ability.", tag="new") — OLD pane = the ability this replaces (lift its desc from prior patchnotes)
-    W(ability("Aggrandize", slug="dark_seer_aggrandize", innate=True))
+    W(ability_change(
+        old=dict(
+            name="Mental Fortitude", slug="dark_seer_mental_fortitude", innate=True,
+            desc=[
+                "Passive.",
+                "Dark Seer's Intelligence cannot be lower than the average of his Strength and Agility.",
+                "If the average between his Strength and Agility is higher, he gains Bonus Intelligence to match them.",
+            ],
+        ),
+        new=dict(
+            name="Aggrandize", slug="dark_seer_aggrandize", innate=True,
+            desc=[
+                "Passive.",
+                "When Dark Seer levels up, he restores a percentage of his max health and mana. Restore percentage is equal to <b>10% + 2%</b> per hero level.",
+            ],
+        ),
+        summary="New innate ability. Passive, improves with Dark Seer's level",
+        tag="new",
+    ))
     W(ul_open())
-    W(li("New innate ability. Passive, improves with Dark Seer's level", t("NEW")))
     W(li("Attack Speed per Intelligence increased from 0.5 to 1", b(0.5, 1)))
     W(ul_close())
 
@@ -2000,9 +2016,25 @@ def build():
     W(hero_header("Keeper of the Light"))
     W(ul_open())
     W(li("Intelligence gain increased from 3.2 to 3.3", b(3.2, 3.3)))
-    W(li("Removed Mana Magnifier innate ability", t("DEL")))
-    W(li("Special Reserve: New Innate Ability. Passive, can't be leveled up", t("NEW"), extra=inline_note("Keeper of the Light cannot go below 75 mana")))
     W(ul_close())
+    W(ability_change(
+        old=dict(
+            name="Mana Magnifier", slug="keeper_of_the_light_mana_magnifier", innate=True,
+            desc=[
+                "Passive.",
+                "Allies within <b>900</b> range of Keeper of the Light have <b>15%</b> more mana. Lingers for 5 seconds.",
+            ],
+        ),
+        new=dict(
+            name="Special Reserve", slug="keeper_of_the_light_special_reserve", innate=True,
+            desc=[
+                "Passive, can't be leveled up.",
+                "Keeper of the Light cannot go below <b>75</b> mana.",
+            ],
+        ),
+        summary="New innate ability. Passive, can't be leveled up",
+        tag="new",
+    ))
     W(ability("Blinding Light", slug="keeper_of_the_light_blinding_light"))
     W(ul_open())
     W(li("Cooldown decreased from 25/22/19/16s to 24/21/18/15s", b([25, 22, 19, 16], [24, 21, 18, 15], l=True)))
@@ -2214,7 +2246,6 @@ def build():
     # Lone Druid
     W(hero_header("Lone Druid"))
     W(ul_open())
-    W(li("Gift Bearer: Reworked", t("REWORK"), extra=inline_note("Lone Druid's Spirit Bear receives a copy of his neutral item. This copy has an independent cooldown of the main one")))
     W(li("Base Damage increased by 17", bstat_h("Lone Druid", "AttackDamageMin", "7.37e", 17), extra=note_box(hero="Lone Druid", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Strength decreased from 20 to 18", b(20, 18)))
     W(li("Strength gain increased from 1.8 to 2.5", b(1.8, 2.5)))
@@ -2226,6 +2257,24 @@ def build():
     W(li(attr_change("Universal", "Agility"), t("REWORK"), extra=inline_note("Spirit Bear remains a Universal Hero")))
     W(li("Damage at level 1 unchanged (38-42)", t("MISC")))
     W(ul_close())
+    W(ability_change(
+        old=dict(
+            name="Gift Bearer", slug="lone_druid_gift_bearer", innate=True,
+            desc=[
+                "Passive.",
+                "Lone Druid can re-roll his Neutral Token once per tier.",
+            ],
+        ),
+        new=dict(
+            name="Gift Bearer", slug="lone_druid_gift_bearer", innate=True,
+            desc=[
+                "Passive.",
+                "Lone Druid's Spirit Bear receives a copy of his Neutral Item that has an independent cooldown.",
+            ],
+        ),
+        summary="Reworked",
+        tag="rework",
+    ))
     W(facet_header("lone_druid_bear_necessities"))
     W(ul_open())
     W(li("Stat Bonus increased from 30/45/60/75% to 45/55/65/75%", b([30, 45, 60, 75], [45, 55, 65, 75])))
@@ -2390,8 +2439,11 @@ def build():
     # Meepo
     W(hero_header("Meepo"))
     W(ul_open())
-    W(li("Sticky Fingers: Updated to the new Neutral crafting system. Increases selection of Artifacts and Enchantments from 4 to 5", b(4, 5)))
     W(li("Removed Pack Rat Facet", t("DEL")))
+    W(ul_close())
+    W(ability("Sticky Fingers", slug="meepo_sticky_fingers", innate=True))
+    W(ul_open())
+    W(li("Updated to the new Neutral crafting system. Increases selection of Artifacts and Enchantments from 4 to 5", b(4, 5)))
     W(ul_close())
     W(facet_header("meepo_more_meepo"))
     W(ul_open())
@@ -2411,10 +2463,13 @@ def build():
     W(li("Agility gain increased from 2.5 to 3.1", b(2.5, 3.1)))
     W(li("Intelligence gain increased from 1.4 to 1.9", b(1.4, 1.9)))
     W(li("Damage gain per level decreased from +4.1 to +3.1", b(4.1, 3.1)))
-    W(li("Selemene's Faithful: Healing Lotus Effectiveness increased from 20% to 50%", b(20, 50)))
     W(li("Damage at level 30 decreased by 40-38 (from 191-195 to 151-157)", t("NERF")))
     W(li("Removed Moonlight Shadow and Solar Flare Facets", t("DEL"), extra=inline_note("Moonlight Shadow remains as Mirana's default ultimate")))
     W(li(attr_change("Universal", "Agility"), t("REWORK")))
+    W(ul_close())
+    W(ability("Selemene's Faithful", slug="mirana_selemenes_faithful", innate=True))
+    W(ul_open())
+    W(li("Healing Lotus Effectiveness increased from 20% to 50%", b(20, 50)))
     W(ul_close())
     W(new_facet("mirana_starstruck", desc=[
         "Starstorm: Starstorm's second meteor deals more damage and blinds the target. Second Meteor Damage: 100%. Blind Miss Rate: 60%. Blind Duration: 3.5/4/4.5/5s" + " " + inline_note("Does not apply to the second Starstorm created by Sacred Arrow with Aghanim's Scepter"),
@@ -3641,7 +3696,6 @@ def build():
     # Winter Wyvern
     W(hero_header("Winter Wyvern"))
     W(ul_open())
-    W(li("Eldwurm Scholar: Now applies to Shrines of Wisdom instead of removed Wisdom Runes", t("REWORK"), extra=inline_note("Effect and mechanics are not changed")))
     W(li("Base Damage increased by 15-17", bstat_h("Winter Wyvern", "AttackDamageMin", "7.37e", 15), extra=note_box(hero="Winter Wyvern", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Strength increased from 20 to 22", b(20, 22)))
     W(li("Damage at level 1 decreased from 42-47 to 40-47", br(42, 47, 40, 47)))
@@ -3653,6 +3707,10 @@ def build():
     W(li("Damage at level 30 decreased by 45-43 (from 203-208 to 158-165)", t("NERF")))
     W(li("Removed Essence of the Blueheart and Dragon Sight Facets", t("DEL")))
     W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
+    W(ul_close())
+    W(ability("Eldwurm Scholar", slug="winter_wyvern_eldwurm_scholar", innate=True))
+    W(ul_open())
+    W(li("Now applies to Shrines of Wisdom instead of removed Wisdom Runes", t("REWORK"), extra=inline_note("Effect and mechanics are not changed")))
     W(ul_close())
     W(new_facet("winter_wyvern_winterproof", desc=[
         "Cold Embrace: Can be cast on buildings. Chosen building isn't healed, but still protected from physical damage. Affected units or buildings gain 60% bonus attack damage after the cocoon thaws. Buff Duration: 6s",

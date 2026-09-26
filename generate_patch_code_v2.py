@@ -2119,6 +2119,91 @@ def _next_version(version):
     return order[order.index(version) - 1] if version in order and order.index(version) > 0 else None
 
 
+_INNATE_NAMES = {}
+
+
+def _innate_names():
+    """display name -> engine slug of every innate (abilities_slim is_innate)."""
+    if not _INNATE_NAMES:
+        slim = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "abilities_slim.json"),
+                              encoding="utf-8"))
+        _INNATE_NAMES.update({v["dname"]: k for k, v in slim.items() if v and v.get("is_innate") and v.get("dname")})
+        _ALL_NAMES.update({v["dname"]: k for k, v in slim.items() if v and v.get("dname")})
+        # removed abilities are gone from abilities_slim but their tooltip name stays in the game's text
+        loc = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "abilities_english.txt")
+        if os.path.exists(loc):
+            for slug, name in re.findall(r'"DOTA_Tooltip_ability_([a-z0-9_]+)"\s+"([^"]+)"',
+                                         open(loc, encoding="utf-8", errors="replace").read()):
+                _ALL_NAMES.setdefault(name, slug)
+    return _INNATE_NAMES
+
+
+_ALL_NAMES = {}                  # any ability: a REMOVED innate is often no longer flagged is_innate
+_EVER_IDS = set()
+
+
+def _removed_innate_slug(hero_display, name):
+    """Slug of an innate that is gone from today's data (Barracuda 7.40): <hero npc>_<snake name>, if some
+    snapshot's ability_ids.json ever had it."""
+    if not _EVER_IDS:
+        import glob
+        for f in glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "stats", "*", "ability_ids.json")):
+            _EVER_IDS.update(json.load(open(f, encoding="utf-8")).values())
+    from patch.images import HERO_SLUG
+    npc = HERO_SLUG.get(hero_display, "")
+    cand = f"{npc}_{re.sub(r'[^a-z0-9]+', '_', name.lower()).strip('_')}"
+    return cand if npc and cand in _EVER_IDS else None
+
+
+_INNATE_ROW_RE = re.compile(r'^(\s*)W\(li\("([^":]{3,40}): (.*)$')
+_INNATE_REMOVED_RE = re.compile(r'^\s*W\(li\("(?:Removed ([^"]+?) innate ability|([^":]{3,40}): Innate ability removed)')
+
+
+def _postprocess_innate_rows_out_of_stats(lines):
+    """Valve writes an innate's change in the hero's general notes ("Sticky Fingers: ...", "Removed Gift
+    Bearer innate ability"); Sloppy puts it in the innate's own block after the stats ul (owner 2026-09-26,
+    rule "innate + facet changes go under Abilities"). A plain change -> ability(<name>, innate=True) block;
+    a removal -> the same block plus a TODO to render it as ability_change(old=<removed>, new=<the hero's new
+    innate>) with the OLD description lifted from d2vpkr abilities_english of the previous patch (never
+    invented)."""
+    names = _innate_names()
+    out, i = [], 0
+    while i < len(lines):
+        out.append(lines[i])
+        if not lines[i].lstrip().startswith("W(hero_header(") or i + 1 >= len(lines) \
+                or lines[i + 1].strip() != "W(ul_open())":
+            i += 1
+            continue
+        j = i + 2
+        while j < len(lines) and lines[j].strip() != "W(ul_close())":
+            j += 1
+        keep, moved = [], []
+        hero = re.search(r'hero_header\("([^"]+)"', lines[i]).group(1)
+        for ln in lines[i + 2:j]:
+            m = _INNATE_ROW_RE.match(ln)
+            r = _INNATE_REMOVED_RE.match(ln)
+            name = (r and (r.group(1) or r.group(2))) or (m and m.group(2) in names and m.group(2))
+            slug = name and (names.get(name) or (r and (_ALL_NAMES.get(name) or _removed_innate_slug(hero, name))))
+            if slug:
+                moved.append((name, ln, bool(r), slug))
+            else:
+                keep.append(ln)
+        if not moved:
+            i += 1
+            continue
+        ind = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
+        if keep:
+            out += [lines[i + 1]] + keep + [lines[j]]
+        for name, ln, removed, slug in moved:
+            if removed:
+                out.append(f"{ind}# TODO[innate-swap]: ability_change(old={name!r} desc from d2vpkr abilities_english "
+                           f"before this patch, new=<the hero's new innate>) — never invent the old text")
+            out.append(f'{ind}W(ability("{name}", slug="{slug}", innate=True))')
+            out += [f"{ind}W(ul_open())", ln.replace(f'W(li("{name}: ', 'W(li("', 1), f"{ind}W(ul_close())"]
+        i = j + 1
+    return out
+
+
 def _postprocess_unstated_total_cost(lines):
     """An item with a components panel whose total cost changed in the game files, but the patch
     notes say nothing about the price (Revenant's Brooch 7.38: 4900 -> 3300), gets its own row
@@ -2646,6 +2731,7 @@ def generate(version):
     out = _postprocess_new_item_card(out, version)
     out = _postprocess_properties_change(out)
     out = _postprocess_unstated_total_cost(out)
+    out = _postprocess_innate_rows_out_of_stats(out)
     out = _postprocess_stack_note_into_ability(out)
     out = _postprocess_drop_now_requires(out)
     out = _postprocess_recipe_cost_zero_net(out)
