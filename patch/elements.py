@@ -1213,6 +1213,14 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     elif isinstance(text, str) and "Aghanim's Shard" in text_noclass:
         classes.append("aghanim-shard")
         marker = '<span class="aghanim-marker shard"></span>'
+    elif isinstance(text, str) and _State.current_ability_slug:
+        # a row of an ability that Aghanim's Shard / Scepter GRANTS is an Aghanim row even without the
+        # words (Medusa 7.38 Cold Blooded; owner 2026-09-26) — KV IsGrantedByShard / IsGrantedByScepter
+        from .aghs_granted import kind_of
+        _aghs = kind_of(_State.current_ability_slug)
+        if _aghs:
+            classes.append(f"aghanim-{_aghs}")
+            marker = f'<span class="aghanim-marker {_aghs}"></span>'
     if isinstance(text, str) and re.match(r'^\s*(Passive|Active|Toggle|Aura|Ability)\s*:', text):
         classes.append("ability-row")
         text = re.sub(r'^(\s*)(Passive|Active|Toggle|Aura|Ability)(\s*:)',

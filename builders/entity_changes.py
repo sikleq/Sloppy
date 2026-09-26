@@ -226,6 +226,7 @@ def _active_innates() -> set:
 
 _KIT_CACHE: dict[str, list[str]] = {}
 _KIT_FACET: dict[str, set] = {}      # npc -> display names of abilities granted by a facet
+_KIT_BASIC: dict[str, set] = {}      # npc -> display names of the current NON-Aghanim abilities
 _KIT_DEAD: dict[str, list] = {}       # npc -> display names of abilities left in the KV but no longer the hero's
 _KIT_EXTRA: dict[str, tuple] = {}      # npc -> (current innate names, slugs defined in the KV, all known slugs)
 
@@ -248,7 +249,10 @@ def _hero_kit(npc: str) -> list[str]:
         parts = _re.split(r'(?m)^\t\t\t"([a-z_0-9]+)"\s*$', txt)
         for i in range(1, len(parts) - 1, 2):
             defs[parts[i]] = parts[i + 1]
-        slotted = [a for _, a in sorted(((int(n), a) for n, a in _re.findall(r'"Ability(\d+)"\s+"([a-z_0-9]+)"', txt)),
+        # the hero's own slots only (two tabs deep): the nested AbilityDraftAbilities list put Invoker's
+        # Deafening Blast third (owner 2026-09-26)
+        slotted = [a for _, a in sorted(((int(n), a) for n, a in
+                                         _re.findall(r'(?m)^\t\t"Ability(\d+)"\s+"([a-z_0-9]+)"', txt)),
                                         key=lambda x: x[0])]
         for slug in slotted + [d for d in defs if d not in slotted]:
             info = slim.get(slug) or {}
@@ -261,6 +265,7 @@ def _hero_kit(npc: str) -> list[str]:
             # slot order: an ultimate stays where its slot is (Invoke = slot 6, before the invoked spells in
             # 7-16; owner 2026-09-26); only Scepter / Shard grants go to the end
             (aghs if granted else basics).append(name)
+    _KIT_BASIC[npc] = set(basics)
     innates = [(slim.get(d) or {}).get("dname") for d in (slotted + list(defs)) if (slim.get(d) or {}).get("is_innate")]
     live = _live_abilities(txt, defs, slotted) if kv.exists() else set()
     _KIT_CACHE[npc] = [n for n in basics + ults + aghs if n in {(slim.get(d) or {}).get("dname") for d in live}]
@@ -494,7 +499,9 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     if ab_count:
         npc = _re.sub(r"^.*/|\.(?:png|webp)$", "", e["icon"]) if e["kind"] == "hero" else ""
         kit = _hero_kit(npc) if npc else []
-        low = {k.lower(): i for i, k in enumerate(kit)}
+        low = {}                                    # FIRST slot of a name: Elder Titan's Astral Spirit repeats
+        for i, k in enumerate(kit):                 # Echo Stomp / Natural Order later in the kit (owner 2026-09-26)
+            low.setdefault(k.lower(), i)
         current = sorted((t for t in ab_count if t.lower() in low), key=lambda t: low[t.lower()])
         rest = [t for t in ab_count if t.lower() not in low]
         innate_now, defined, known = _KIT_EXTRA.get(npc, ([], set(), set()))
@@ -522,8 +529,13 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         innate_titles = {part.strip() for p in e["patches"] for m in _INNATE_TITLE_RE.finditer(p["_body"])
                          for part in _html.unescape(_re.sub(r"<[^>]+>", "→", m.group(1))).split("→") if part.strip()}
         no_chip = (_KIT_FACET.get(npc, set()) - set(kit)) | (innate_titles - set(kit))
+        # an ability Aghanim's Shard / Scepter grants (Cold Blooded) is covered by the SHARD / SCEPTER
+        # filter, unless it is a regular ability of the hero now (owner 2026-09-26)
+        from patch.aghs_granted import kind_of
+        no_chip |= {k for k in current + old
+                    if kind_of(_ability_slug(npc, k)) and k not in _KIT_BASIC.get(npc, set())}
         old = [k for k in old if k not in no_chip]
-        current = [k for k in current if k not in no_chip or k.lower() in low]
+        current = [k for k in current if k not in no_chip]
         if extra:
             current = sorted(dict.fromkeys(current + extra), key=lambda t: low.get(t.lower(), 10_000))
 

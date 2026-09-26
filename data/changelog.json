@@ -4,6 +4,13 @@
     {
       "date": "2026-09-26",
       "category": "Dynamics",
+      "title": "Hero pages: abilities that Aghanim's Shard / Scepter grant (Cold Blooded, Tree Volley, Warp Flare…) are marked as Shard / Scepter rows and covered by those filters instead of a chip; ability filters in the true slot order (Elder Titan, Invoker); 6 official ability icons that were missing (Cold Blooded, Stifling Dagger, Global Silence, Swiftslash, Flame Cloak, Bunny Hop)",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Dynamics",
       "title": "Hero pages: an ability filter no longer shows empty blocks — rows hidden by a previously pressed ability come back (Invoke, Stone Remnant, Blur, Summon Spirit Bear…), ability + Shard/Scepter shows only blocks that have both, and Primal Split shows its Brewlings; Shard / Scepter filters back to blue",
       "minor": true,
       "fix": true

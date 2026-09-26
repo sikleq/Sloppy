@@ -129,3 +129,22 @@ def test_no_unofficial_icon_for_an_innate_without_game_art():
             if os.path.exists(os.path.join(here, "icons", "abilities", f"{s}.png"))
             or os.path.exists(os.path.join(here, "icons", "_t", "abilities", f"{s}.webp"))]
     assert back == []
+
+
+def test_aghanim_granted_abilities_are_aghanim_rows_and_get_no_chip():
+    """Owner 2026-09-26, Medusa 7.38 Cold Blooded: a Shard-granted ability. Its rows are Shard rows even
+    without the words, and the SHARD filter covers it (no chip of its own)."""
+    from patch.aghs_granted import kind_of
+    assert kind_of("medusa_cold_blooded") == "shard"
+    assert kind_of("tiny_tree_channel") == "scepter"
+    assert kind_of("medusa_mystic_snake") == ""
+
+
+def test_hero_slots_ignore_the_ability_draft_list():
+    """Invoker's nested AbilityDraftAbilities put Deafening Blast third; Elder Titan's repeated Echo Stomp
+    (Astral Spirit) sorted it last. Slot order = the hero's own two-tab slots, first occurrence wins."""
+    from builders.entity_changes import _hero_kit
+    inv = _hero_kit("invoker")
+    assert inv.index("Invoke") < inv.index("Deafening Blast") and inv.index("Exort") < inv.index("Invoke")
+    et = _hero_kit("elder_titan")
+    assert et.index("Echo Stomp") < et.index("Astral Spirit") < et.index("Natural Order") < et.index("Earth Splitter")
