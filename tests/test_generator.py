@@ -715,13 +715,13 @@ def test_no_talent_replacement_left_as_rework_in_content():
     assert bad == []
 
 
-def test_toggle_under_silence_or_invisibility_is_misc_and_damage_type_is_rework():
-    """Owner 2026-09-27: what a toggle may be switched under doesn't change its gameplay → MISC;
-    a damage type / damage classification change → REWORK (buff or nerf depends on the situation)."""
+def test_toggle_under_silence_or_invisibility_is_misc():
+    """Owner 2026-09-27: what a toggle may be switched under doesn't change its gameplay → MISC.
+    Damage type rows keep their old tags (REWORK; "classified as reflection damage" MISC)."""
     import generate_patch_code_v2 as g
     assert g._guess_tag("Toggling is no longer disabled by silence") == "MISC"
     assert g._guess_tag("Toggling on/off no longer breaks invisibility and can be done while silenced") == "MISC"
     assert g._guess_tag("Now can be toggled while silenced") == "MISC"
     assert g._guess_tag("Damage type changed from Magical to Pure") == "REWORK"
-    assert g._guess_tag("Damage done is now classified as reflection damage") == "REWORK"
+    assert g._guess_tag("Damage done is now classified as reflection damage") == "MISC"
     assert g._guess_tag("Now can be toggled on and off for the duration of the buff") == "NEW"

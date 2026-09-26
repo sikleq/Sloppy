@@ -241,13 +241,10 @@ CANONICAL_TAGS = [
     (re.compile(r'\bno longer (?:reduces|decreases) ', re.I),       'BUFF'),
     (re.compile(r'\bno longer requires (?:a |an )?(?:skill point|mana|charge)', re.I), 'BUFF'),
     # Owner 2026-09-27: what a TOGGLE may be switched under (silence, invisibility) doesn't change the
-    # gameplay of such an ability → MISC; a DAMAGE TYPE / damage classification change → REWORK
-    # ("whether it is a buff or a nerf depends on the situation, not ours to decide").
+    # gameplay of such an ability → MISC. (Damage type rows stay as they were: "Damage type changed" REWORK,
+    # "classified as reflection damage" MISC.)
     (re.compile(r'\btoggl(?:e|es|ed|ing)\b[^.]*?\b(?:no longer (?:be )?(?:disabled|breaks?|stops?)|while silenced)', re.I), 'MISC'),
     (re.compile(r'\b(?:can now|now can) be toggled while\b', re.I), 'MISC'),
-    (re.compile(r'\bdamage type changed\b', re.I),                  'REWORK'),
-    (re.compile(r'\bclassified as (?:reflection damage|health removal)\b', re.I), 'REWORK'),
-    (re.compile(r'^\s*now deals (?:physical|magical|pure) damage\b', re.I), 'REWORK'),
     # ── classes from the 2026-09-18 datafeed proofread (memory: sloppy-datafeed-proofread-method) ──
     # a restriction / self-penalty on the OWNER is lifted → BUFF
     (re.compile(r'\bno longer (?:be )?(?:disabled|interrupted|cancell?ed|blocked|prevented|stopped) by\b', re.I), 'BUFF'),
