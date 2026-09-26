@@ -10165,6 +10165,8 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
   font: 600 13px/1 Radiance, "Segoe UI", Arial, sans-serif; letter-spacing: 0; text-shadow: none;
   font-variant-numeric: tabular-nums; text-transform: none;
 }
+/* an item's score on a hero page (item slots): at the right of the item name line */
+.ec-item-inject > .entity > .ec-score { align-self: center; margin-left: auto; }
 .ec-score i { font-style: normal; font-weight: 400; color: rgba(255, 255, 255, 0.6); }
 .ec-score.pos { color: rgb(110, 220, 140); } .ec-score.neg { color: rgb(255, 130, 120); } .ec-score.zero { color: rgba(235, 228, 214, 0.85); }
 /* scope filter row (same look as the Group row on patch pages) */

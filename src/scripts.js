@@ -3612,6 +3612,9 @@ function ecShopMarkup(panels) {
     out.dataset.ecItem = slug;
     out.innerHTML = `<div class="entity item-entity"><div class="entity-icon item-icon"><a class="entity-link" href="${href}"><img src="../${esc(it[2])}" alt="${esc(it[1])}"></a></div>`
       + `<div class="entity-name"><a class="entity-link" href="${href}">${esc(it[1])}</a></div></div>` + blk.innerHTML;
+    // the item's own weighted score (the banner above is the hero's, so it is not merged there)
+    const score = src.querySelector('h2.ec-ver .ec-score');
+    if (score) out.querySelector('.entity').appendChild(score.cloneNode(true));
     return out;
   }
 

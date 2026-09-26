@@ -3,6 +3,13 @@
   "entries": [
     {
       "date": "2026-09-26",
+      "category": "Dynamics",
+      "title": "Hero pages: an item added to the hero's slots shows its own weighted score next to its name (the patch banner stays the hero's)",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-26",
       "category": "Patch Reader",
       "title": "Formula tables follow the formula's own interval: \"0.1 + 0.1 per 3 levels\" (Ancient Apparition 7.41) shows L1, L3, L6 … L30 instead of every 5th level after 15; tables inside ability panes no longer drop columns",
       "minor": true,
