@@ -1734,43 +1734,38 @@ def _postprocess_stack_note_into_ability(lines):
     return out
 
 
+def _recipe_total_badge(ra, rb, ta, tb):
+    """One badge for "Recipe cost A -> B. Total cost C -> D": both % at the END of the row, "+100% / +4%"
+    (owner 2026-09-26, Octarine Core 7.41f). The tag follows the TOTAL (what the buyer pays): a pricier
+    recipe with a cheaper total is a BUFF. Said only when the two directions differ."""
+    tag = "" if (int(rb) > int(ra)) == (int(tb) > int(ta)) else         (', force_overall="buff"' if int(tb) < int(ta) else ', force_overall="nerf"')
+    return f"b([{ra}, {ta}], [{rb}, {tb}], l=True, slash=True{tag})"
+
+
 def _postprocess_recipe_cost_zero_net(lines):
-    """Rewrite recipe-cost rows to the correct badge form:
-    - Both recipe and total changed: recipe % inline, total badge as main.
-    - Recipe changed, total unchanged: recipe % inline after "A to B", the row tag is the
-      word only — BUFF if cheaper, NERF if pricier (a cheaper recipe is a real player
-      benefit), no % at the end of the row.
+    """Rewrite recipe-cost rows to the one badge form (owner 2026-09-26): every % at the end of the row.
+    - Both recipe and total changed: "... A to B. Total cost ... C to D", badge "+x% / +y%" (recipe / total),
+      tag by the total.
+    - Recipe changed, total unchanged: the recipe % at the end ("Total cost unchanged" has no %), tag by
+      the recipe — a cheaper recipe is a real player benefit.
     """
     out = []
     for line in lines:
         m = _RECIPE_COST_BOTH_CHANGED_RE.match(line)
         if m:
             rpre, ra, rmid, rb, tpre, ta, tmid, tb = m.groups()
-            # Total cost direction determines l=True (lower=buff for costs)
-            out.append(
-                f'W(li("{rpre}{ra}{rmid}{rb} " + b({ra}, {rb}, l=True)'
-                f' + "{tpre}{ta}{tmid}{tb}", b({ta}, {tb}, l=True)))'
-            )
+            out.append(f'W(li("{rpre}{ra}{rmid}{rb}{tpre}{ta}{tmid}{tb}", {_recipe_total_badge(ra, rb, ta, tb)}))')
             continue
-        # Total unchanged (2026-09-25): the recipe % sits INLINE right after "A to B" and the row
-        # carries only the tag word (NERF if the recipe got pricier, BUFF if cheaper) — no % at
-        # the end of the row, because the thing the player pays in total did not change.
         m = _RECIPE_COST_UNCHANGED_INLINE_RE.match(line)
         if m:
             prefix, a, mid, b_val, tail = m.groups()
-            tag = "NERF" if int(b_val) > int(a) else "BUFF"
-            out.append(
-                f'W(li("{prefix}{a}{mid}{b_val} " + b({a}, {b_val}, l=True) + "{tail}", t("{tag}")))'
-            )
+            out.append(f'W(li("{prefix}{a}{mid}{b_val}{tail}", b({a}, {b_val}, l=True)))')
             continue
         m = _RECIPE_COST_UNCHANGED_SPLIT_RE.match(line)
         if m:
             prefix, a, mid, b_val, note_text = m.groups()
-            tag = "NERF" if int(b_val) > int(a) else "BUFF"
-            out.append(
-                f'W(li("{prefix}{a}{mid}{b_val} " + b({a}, {b_val}, l=True), t("{tag}"), '
-                f'extra=inline_note("{note_text}")))'
-            )
+            out.append(f'W(li("{prefix}{a}{mid}{b_val}", b({a}, {b_val}, l=True), '
+                       f'extra=inline_note("{note_text}")))')
             continue
         out.append(line)
     return out

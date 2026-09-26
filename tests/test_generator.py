@@ -251,32 +251,32 @@ def _pp1(line):
 def test_recipe_cheaper_total_unchanged_inline_is_buff_not_misc():
     out = _pp1('W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))')
     assert 't("MISC")' not in out
-    # recipe % inline after the numbers, the row tag is the word only (no % at the row end)
-    assert out == ('W(li("Recipe cost decreased from 600 to 400 " + b(600, 400, l=True)'
-                   ' + ". Total cost unchanged at 3900g", t("BUFF")))')
+    # every % at the end of the row (owner 2026-09-26); "Total cost unchanged" has no % of its own
+    assert out == 'W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))'
 
 
 def test_recipe_pricier_total_unchanged_inline_keeps_nerf_badge():
-    """7.41 "Recipe cost increased from 450 to 800. Total cost unchanged at 2150g": NERF on the left,
-    +78% right after "450 to 800", nothing at the end (owner, 2026-09-25)."""
+    """7.41 "Recipe cost increased from 450 to 800. Total cost unchanged at 2150g": NERF, +78% at the end."""
     out = _pp1('W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b(450, 800, l=True)))')
-    assert out == ('W(li("Recipe cost increased from 450 to 800 " + b(450, 800, l=True)'
-                   ' + ". Total cost unchanged at 2150g", t("NERF")))')
+    assert out == 'W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b(450, 800, l=True)))'
 
 
 def test_recipe_total_unchanged_split_note_is_badge_not_misc():
     out = _pp1('W(li("Recipe cost decreased from 1350 to 1250", b(1350, 1250, l=True), '
                'extra=inline_note("Total cost unchanged at 4500g")))')
     assert 't("MISC")' not in out
-    assert out == ('W(li("Recipe cost decreased from 1350 to 1250 " + b(1350, 1250, l=True), t("BUFF"), '
+    assert out == ('W(li("Recipe cost decreased from 1350 to 1250", b(1350, 1250, l=True), '
                    'extra=inline_note("Total cost unchanged at 4500g")))')
 
 
-def test_recipe_and_total_both_change_still_tags_by_total():
+def test_recipe_and_total_both_change_one_slash_badge_tagged_by_total():
+    """Owner 2026-09-26: "+100% / +4%" at the end, like Octarine Core 7.41f; a cheaper recipe with a
+    pricier total is a NERF (the buyer pays more)."""
     out = _pp1('W(li("Recipe cost decreased from 300 to 200. Total cost increased from 2500 to 2600", b(2500, 2600, l=True)))')
-    # recipe % inline, total badge drives the row
-    assert '+ b(300, 200, l=True)' in out
-    assert out.rstrip().endswith('b(2500, 2600, l=True)))')
+    assert out == ('W(li("Recipe cost decreased from 300 to 200. Total cost increased from 2500 to 2600", '
+                   'b([300, 2500], [200, 2600], l=True, slash=True, force_overall="nerf")))')
+    same = _pp1('W(li("Recipe cost increased from 200 to 400. Total cost increased from 4900 to 5100", b(4900, 5100, l=True)))')
+    assert same.endswith('b([200, 4900], [400, 5100], l=True, slash=True)))')
 
 
 # ---- Generated scaffolds must be valid Python for every datafeed version ----

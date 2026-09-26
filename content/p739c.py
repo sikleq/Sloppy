@@ -76,7 +76,7 @@ def build():
     W(ul_close())
     W(item_header("Phylactery"))
     W(ul_open())
-    W(li("Recipe cost decreased from 400 to 300 " + b(400, 300, l=True) + ". Total cost decreased from 2600 to 2500", b(2600, 2500, l=True)))
+    W(li("Recipe cost decreased from 400 to 300. Total cost decreased from 2600 to 2500", b([400, 2600], [300, 2500], l=True, slash=True)))
     W(ul_close())
     W(item_header("Khanda"))
     W(ul_open())

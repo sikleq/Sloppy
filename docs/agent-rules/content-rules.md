@@ -114,17 +114,23 @@ W(li("...follows global lifesteal rules...", t("NERF"),
 
 Recipe cost decrease не BUFF, если total вырос. Всегда читать следующее предложение после «Recipe cost».
 
-## Recipe cost changed, total unchanged → BUFF/NERF, % inline (2026-09-25)
+## Рецепт и общая цена — все проценты в конце строки (2026-09-26)
 
-«Recipe cost increased from X to Y. Total cost unchanged at Z» → тег по направлению рецепта
-(дороже = NERF, дешевле = BUFF), **процент рецепта — сразу после «X to Y»**, в конце строки процента
-НЕТ (общая цена не изменилась). Тег — только слово `t("NERF"|"BUFF")`:
+Процент посреди строки больше не ставим (владелец, образец — Octarine Core 7.41f).
+- **Изменились рецепт и общая цена** → один значок в конце «рецепт / итог», тег — **по общей цене** (её
+  платит покупатель): рецепт дороже, а итог дешевле = BUFF. `force_overall` пишется, только когда
+  направления расходятся:
 ```python
-W(li("Recipe cost increased from 450 to 800 " + b(450, 800, l=True) + ". Total cost unchanged at 2150g", t("NERF")))
-W(li("Recipe cost decreased from 1350 to 1250 " + b(1350, 1250, l=True), t("BUFF"),
-     extra=inline_note("Total cost unchanged at 4500g")))
+W(li("Recipe cost increased from 200 to 400. Total cost increased from 4900g to 5100g", b([200, 4900], [400, 5100], l=True, slash=True)))
+W(li("Recipe cost increased from 450 to 600. Total cost decreased from 4100 to 3900", b([450, 4100], [600, 3900], l=True, slash=True, force_overall="buff")))
 ```
-Генератор делает это сам (`_postprocess_recipe_cost_zero_net`), тесты в `tests/test_generator.py`.
+- **Общая цена не изменилась** → процент рецепта в конце, тег по рецепту (дороже = NERF); у «Total cost
+  unchanged» своего процента нет:
+```python
+W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b(450, 800, l=True)))
+W(li("Recipe cost decreased from 1350 to 1250", b(1350, 1250, l=True), extra=inline_note("Total cost unchanged at 4500g")))
+```
+Генератор: `_postprocess_recipe_cost_zero_net` / `_recipe_total_badge`, тесты в `tests/test_generator.py`.
 Рецепт *и* общая цена не изменились → `t("MISC")`.
 
 ## Числа способности предмета — строкой, не в карточках (2026-09-25)

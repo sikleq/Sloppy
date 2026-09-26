@@ -35,7 +35,7 @@ def build():
     W(item_header("Heaven's Halberd", changed=True))
     W(auto_components_change("Heaven's Halberd", "7.38b"))
     W(ul_open())
-    W(li("Recipe cost increased from 275 to 450 " + b(275, 450, l=True) + ". Total cost unchanged", t("NERF")))
+    W(li("Recipe cost increased from 275 to 450. Total cost unchanged", b(275, 450, l=True)))
     W(ul_close())
     W(item_header("Khanda"))
     W(ul_open())

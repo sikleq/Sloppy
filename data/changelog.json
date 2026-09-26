@@ -3,6 +3,13 @@
   "entries": [
     {
       "date": "2026-09-26",
+      "category": "Patch Reader",
+      "title": "Recipe and total cost rows show both % at the end of the row, \"recipe / total\" (like Octarine Core 7.41f), and are tagged by the total the buyer pays; no more % in the middle of the row",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-26",
       "category": "Dynamics",
       "title": "Hero pages: an item added to the hero's slots shows its own weighted score next to its name (the patch banner stays the hero's)",
       "minor": true,

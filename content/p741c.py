@@ -54,7 +54,7 @@ def build():
     W(ul_close())
     W(item_header("Heart of Tarrasque"))
     W(ul_open())
-    W(li("Recipe cost increased from 600 to 700. Total cost increased from 5100 to 5200", b(5100, 5200, l=True)))
+    W(li("Recipe cost increased from 600 to 700. Total cost increased from 5100 to 5200", b([600, 5100], [700, 5200], l=True, slash=True)))
     W(ul_close())
     W(item_header("Mage Slayer"))
     W(ul_open())
