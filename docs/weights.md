@@ -261,6 +261,26 @@ Disarm dispellable −0.29, mana cost +0.36, ranged duration −0.67 → **−0.
 Largest moves: Orb of Venom 7.38 +3.90 → +0.94, Drum 7.38 −4.71 → −2.76, Crippling Crossbow 7.41 −4.45 → −2.67,
 Gleipnir 7.38 +0.81 → +2.17 (priced +200 Mana now counts next to the active), Khanda 7.38 −0.64 → −1.76.
 
+**Row cap = the whole item.** `ITEM_ROW_CAP` is now a share of the item's cost (1.0 = |gold| = cost), not a
+score: at K = 10 the old cap (5.0 score) clipped half an item, so Orb of Corrosion 7.38's "+8 Agility" and
+"−25 Attack Speed" both read 3.00 and cancelled out (net −3.04 → −3.84).
+
+**3. Against what pros did** (OpenDota Explorer, pro matches `leagueid > 0`, final inventory; 21-day window
+before vs after each patch, min 14 days, capped by the neighbouring patch; 18 patches 7.38–7.41f; data and
+query in `~/outputs/item-winrate-20260926/`). Item cells with ≥ 30 games on both sides, |score| > 0.05:
+
+| | n | ρ(score, Δlog pick share) | ρ(score, Δ win rate) | same sign, |score| ≥ 1 and share moved ≥ 20 % |
+|---|---|---|---|---|
+| K 5 / F 1 (before) | 277 | +0.208 | −0.052 | 0.65 (n 31) |
+| K 10 / F 0.6 (now) | 285 | +0.203 | −0.057 | 0.62 (n 16) |
+
+Every K/F of the sweep lands at +0.19…+0.22: pro pick share cannot choose the scale, it only confirms the
+direction (weakly, p ≈ 0.001). Win rate of the item's holders says nothing (a nerfed item is bought only
+where it wins). Where pros disagree most — Heaven's Halberd 7.38 (−0.49, pick share ×4.4), Orb of Corrosion
+7.38 (−3.84, ×3.3), Crippling Crossbow 7.41 (−2.67, ×2.1) — the model prices stats and price in gold at
+parity, while pros reward a cheaper item that fits more builds, and a reworked passive/active (REWORK row)
+scores 0. That is what the score measures (power per gold), not popularity; the gap is documented, not tuned.
+
 ## Backtest (docs/weights-review.md E.8.1) — 2026-09-16
 
 11 408 numeric hero events 7.08→7.41e. "Reverted" = same parameter moved the other way within 8 patches (base rate 6.0 %).

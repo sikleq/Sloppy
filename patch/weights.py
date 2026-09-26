@@ -297,7 +297,7 @@ _BLOCK_NUM_RE = _re.compile(r"(\d+(?:\.\d+)?)% chance to block (\d+(?:\.\d+)?)(?
                             _re.I)
 ITEM_GOLD_K = 10.0       # 10% of the item's value = 1.0 x W (blind-judge sweep 2026-09-26: plateau 7.5-15.6)
 ITEM_GOLD_W = 0.6        # neutral weight so item rows sit on the hero scale (median type weight)
-ITEM_ROW_CAP = 5.0       # one row at most "the whole item" (net 3.0); rows stay additive below it
+ITEM_ROW_CAP = 1.0       # one row at most "the whole item" (|gold| = cost); rows stay additive below it
 ITEM_ABILITY_F = 0.6     # item rows WITHOUT a gold price (an active's duration, dispel…) x this: the active
                          # as half the item on the gold scale (0.2 x 0.5 x K x W); sweep plateau 0.45-0.75
 _COST_CACHE = {}
@@ -542,7 +542,7 @@ def _item_row_scores(text, tags, ctx):
     if r is None:
         return None
     gold, cost = r
-    mag = min(ITEM_GOLD_K * abs(gold) / cost, ITEM_ROW_CAP)
+    mag = ITEM_GOLD_K * min(abs(gold) / cost, ITEM_ROW_CAP)
     if "buff" in tags or "nerf" in tags:
         d = _DIR["buff"] if "buff" in tags else _DIR["nerf"]
     else:
