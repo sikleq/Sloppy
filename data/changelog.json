@@ -4,13 +4,31 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "New SWAP tag for replaced talents (455 rows); REWORK now means a real rework",
+      "title": "SWAP tag and a lit talent tree",
+      "items": [
+        "Replaced talents get their own teal SWAP tag (455 rows); REWORK now means a real rework",
+        "The talent tree lights the changed twigs in gold, left or right on levels 10–25, as in the game"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-26_swap_tree.webp"
+      ]
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Site",
+      "title": "Changelog: rows in aligned columns, shorter texts",
+      "minor": true
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Dynamics",
+      "title": "Hero / Item Dynamics: the hovered cell grows smoothly and glides from cell to cell",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Materials",
-      "title": "AoE Increase: columns follow the hero's ability slots (#1–#3 basic, #4 ultimate — Mana Void, Ice Blast and Culling Blade no longer sit in #1/#3), Scepter / Shard and extra abilities stacked in one Other column; labels like \"Speed\" read \"Speed radius\"",
+      "title": "AoE Increase: columns follow the ability slots (#1–#3 basic, #4 ultimate); extras in one Other column",
       "minor": true,
       "fix": true,
       "link": "aoe_increase.html"
@@ -18,28 +36,28 @@
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero Changes: the summary under each attribute column reads easier — small melee / ranged, speed and attribute icons, HP / mana and attributes in their colours, and the record holders with a small portrait linking to the hero",
+      "title": "Hero Changes: the summary under each attribute is a small aligned table with icons and portraits",
       "minor": true,
       "link": "hero_changes.html"
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: abilities that Aghanim's Shard / Scepter grant (Cold Blooded, Tree Volley, Warp Flare…) are marked as Shard / Scepter rows and covered by those filters instead of a chip; ability filters in the true slot order (Elder Titan, Invoker); 6 official ability icons that were missing (Cold Blooded, Stifling Dagger, Global Silence, Swiftslash, Flame Cloak, Bunny Hop)",
+      "title": "Hero pages: Shard / Scepter-granted abilities fall under those filters; 6 missing official icons",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: an ability filter no longer shows empty blocks — rows hidden by a previously pressed ability come back (Invoke, Stone Remnant, Blur, Summon Spirit Bear…), ability + Shard/Scepter shows only blocks that have both, and Primal Split shows its Brewlings; Shard / Scepter filters back to blue",
+      "title": "Hero pages: ability filters no longer leave empty blocks; Shard / Scepter filters back to blue",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "7.40 Barracuda (old innate) shows its in-game numbers: movement speed 6/24/36/48%, health per second 5/70/100/130, levels with Shadow Dance",
+      "title": "7.40 Barracuda shows its in-game numbers",
       "minor": true,
       "fix": true,
       "link": "patches/7.40.html"
@@ -47,68 +65,68 @@
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: ability filters follow the in-game slot order (Invoke right after Exort, an ultimate before its sub-abilities); an innate's row that names another ability answers that ability's filter (Ball Lightning -> Galvanized); Shard / Scepter filters in the site's gold",
+      "title": "Hero pages: ability filters in the in-game slot order; an innate row answers the ability it names",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Innate abilities: a replaced innate is now an old → new card with both in-game descriptions (Barracuda → Essence Shift, Spectral → Desolate, Gift Bearer → Summon Spirit Bear in 7.40; Mental Fortitude → Aggrandize, Mana Magnifier → Special Reserve in 7.38), and innate changes sit in their own ability block instead of the hero's stats",
+      "title": "A replaced innate is an old → new card with both in-game descriptions (7.38, 7.40)",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "13 innate icons that are not in the game (Galvanized, Dauntless, Colossal, Eelskin, Break of Dawn and others) replaced by the game's own innate marker",
+      "title": "13 unofficial innate icons replaced by the game's own innate marker",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: the dashed line from a parent ability to its sub-abilities (Invoker's orbs, Brewmaster's Primal Split) no longer runs across several patches; cast innates like Invoke, Stone Remnant and Summon Spirit Bear get an ability filter",
+      "title": "Hero pages: the sub-ability line stays inside its patch; Invoke, Stone Remnant and others get filters",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "141 ability changes in 7.38–7.40c that sat right after a facet without their own heading (so they read as facet changes, e.g. Nature's Prophet 7.39c Curse of the Oldgrowth) now sit under their ability, as in Valve's notes",
+      "title": "141 ability changes in 7.38–7.40c no longer read as facet changes",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Site",
-      "title": "Patch page search: the key is now \\ (works in any keyboard layout, pressing it again closes the search, it is never typed into the field); the field takes English only — letters typed in the Russian layout turn into the English ones on the same keys",
+      "title": "Patch search opens and closes with \\ in any keyboard layout; English letters only",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: Aghanim's Shard / Scepter filters (after Innate) show only the rows those upgrades change in abilities, talents and facets; ability filters are now the ability icons (the name on hover); removed abilities are greyed after their own separator on the right (Counterspell Ally, Tar Bomb); a facet's ability or a former innate gets no filter of its own — Facets / Innate cover them",
+      "title": "Hero pages: Shard / Scepter filters, ability filters as icons, removed abilities greyed",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Recipe and total cost rows show both % at the end of the row, \"recipe / total\" (like Octarine Core 7.41f), and are tagged by the total the buyer pays; no more % in the middle of the row",
+      "title": "Recipe and total cost: both % at the end of the row, “recipe / total”",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: an item added to the hero's slots shows its own weighted score next to its name (the patch banner stays the hero's)",
+      "title": "Hero pages: an added item shows its own score next to its name",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Formula tables follow the formula's own interval: \"0.1 + 0.1 per 3 levels\" (Ancient Apparition 7.41) shows L1, L3, L6 … L30 instead of every 5th level after 15; tables inside ability panes no longer drop columns",
+      "title": "Formula tables follow the formula's own interval (“per 3 levels” → L1, L3, L6 …)",
       "minor": true,
       "fix": true,
       "link": "patches/7.41.html"
@@ -122,46 +140,46 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Hero scores: tiny time changes (a 1 s cooldown doubled, a 2 s linger halved) and numbers that only hit buildings, illusions, creeps or a sub-ability no longer outweigh real changes; changes described without numbers (\"can now be cast while channeling\") are no longer weighed at half",
+      "title": "Hero scores: tiny time changes and side-unit numbers no longer outweigh real changes",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Hero scores: a Base Damage change next to \"Damage at level 1 / 30\" is no longer counted on top of them (7.38 raised base damage only to make up for the lower Universal multiplier), and \"Damage gain per level\" is not counted twice with level 30",
+      "title": "Hero scores: base damage and damage gain are no longer counted twice",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Reworked hero abilities, facets and innates now count in the hero's score too: measured from how often Tier 1-2 pros played the hero after the patch, minus what the hero's other changes already explain",
+      "title": "Hero scores count reworked abilities, facets and innates (from pro picks)",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Reworked item abilities now count in the item's score: measured from how Tier 1-2 pros bought the item after the patch (our own replay data), minus what its other changes already explain. Orb of Corrosion 7.38 is no longer a huge nerf",
+      "title": "Item scores count reworked abilities (from pro purchases)",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Item scores: an item's active and its stats are now on one scale (Heaven's Halberd 7.38 is a mild nerf, not a big one), and the Sange/Kaya/Yasha stat prices are measured from neighbouring patches instead of guessed",
+      "title": "Item scores: the active and the stats on one scale; Sange / Kaya / Yasha stat prices measured",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Item change scores are now counted in gold: every item stat has a price per patch (from the shop's own items), so stat swaps, price changes and item mana costs weigh what they cost. Heaven's Halberd 7.38 is now a nerf; item mana-cost rows no longer dominate",
+      "title": "Item scores are counted in gold: every stat has a price per patch",
       "minor": true
     },
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "Price changes the patch notes never mention now have their own row, read from the item's components: Revenant's Brooch 4900 → 3300, Shadow Blade, Orb of Corrosion, Mage Slayer (7.38), Heaven's Halberd, Veil of Discord (7.41); Battle Fury's cleave is a row",
+      "title": "Price changes Valve didn't mention get their own row (Revenant's Brooch 4900 → 3300 …)",
       "minor": true,
       "fix": true,
       "link": "patches/7.38.html"
@@ -169,7 +187,7 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "Reworked items show all their stat changes in the before/after cards: Khanda (+50 Damage → +8 Mana Regen), Revenant's Brooch (+70 / +20% → +35 / +16%), Nullifier; Empower Spell numbers are rows",
+      "title": "Reworked items show all stat changes in before / after cards (Khanda, Brooch, Nullifier)",
       "minor": true,
       "fix": true,
       "link": "patches/7.38.html"
@@ -177,7 +195,7 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "7.38 Gleipnir: the Eternal Chains mana cost is its own row (200 → 100), not a line in the stat cards",
+      "title": "7.38 Gleipnir: Eternal Chains mana cost is its own row",
       "minor": true,
       "fix": true,
       "link": "patches/7.38.html"
@@ -185,7 +203,7 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "7.38 Orb of Corrosion: before/after stat cards (+3 Armor, +25 Attack Speed → +8 Agility); the \"does not stack\" note moved into the Passive's ?",
+      "title": "7.38 Orb of Corrosion: before / after stat cards",
       "minor": true,
       "fix": true,
       "link": "patches/7.38.html"
@@ -193,14 +211,14 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "\"Recipe cost … Total cost unchanged\" rows: the recipe % sits right after the numbers, no % at the end of the row",
+      "title": "Recipe rows with an unchanged total: % right after the numbers",
       "minor": true,
       "link": "patches/7.41.html"
     },
     {
       "date": "2026-09-25",
       "category": "Hero Lab",
-      "title": "Hero Lab pickers: the close cross keeps its pixel look on hover; \"Choose Hero\" title and the search fields in the pixel style",
+      "title": "Hero Lab pickers in the pixel style",
       "minor": true,
       "fix": true,
       "link": "hero_lab.html"
@@ -224,10 +242,9 @@
       "fix": true,
       "link": "heroes_dyn.html",
       "items": [
-        "Unit, enchantment and Spirit Bear rows no longer borrow the previous hero's ability multiplier; reworked abilities, new facets and item stat panes now count",
-        "Recipe cost changes with the same total cost score 0; item cost rows use one gold scale; an item's active effects are no longer priced as its stats",
-        "The value of a +1% change was refitted without hero base stats (it doubled spell damage and ability move speed); agreement with blind judges 0.35 → 0.40 and 0.43 → 0.46",
-        "With \"Hide old\" the line no longer jumps from a hidden column"
+        "Unit, enchantment and Spirit Bear rows use their own multiplier",
+        "Recipe changes with the same total score 0; item costs on one gold scale",
+        "The value of +1% refitted: closer to blind judges (0.35 → 0.40)"
       ],
       "shots": [
         "icons/changelog/2026-09-25_weights_on.webp"
@@ -246,8 +263,8 @@
       "category": "Patch Reader",
       "title": "Search moved to a loupe button in the corner",
       "items": [
-        "The round loupe above the weights button opens the search; the field slides out to its left and results open upward",
-        "Press / anywhere to search, Esc to close — the toolbar keeps only the tag and group chips"
+        "The round loupe above the weights button opens the search",
+        "Esc closes it"
       ],
       "shots": [
         "icons/changelog/2026-09-25_search_fab.webp"
@@ -256,7 +273,7 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
-      "title": "Every item has a page — even without changes yet (133 more), and all of them can be picked into a hero page's item slots",
+      "title": "Every item has a page (133 more), all pickable into hero item slots",
       "minor": true,
       "link": "item_changes.html"
     },
@@ -266,8 +283,8 @@
       "title": "Heatmap in olive and brick",
       "link": "mana_items.html",
       "items": [
-        "Better values tint olive, worse ones brick — green and red pulled toward the site's gold; the middle of the column stays clear and the tint grows toward the ends",
-        "Applies to every table with the Heatmap switch (Mana Items, Hero Stats)"
+        "Better values olive, worse ones brick; the middle stays clear",
+        "Every table with the Heatmap switch"
       ],
       "shots": [
         "icons/changelog/2026-09-25_heatmap.webp"
@@ -278,9 +295,9 @@
       "category": "Patch Reader",
       "title": "Tag filters in one row, glowing like neon",
       "items": [
-        "Tags and group chips share one row, parted by a thin line — no \"Tags:\" / \"Group:\" labels (also on hero, item and unit pages)",
-        "A pressed chip glows in its own colour, letters and frame, like a neon sign",
-        "NEW and REWORK are brighter; DEL is wine-red now, no longer nearly the same as NERF"
+        "Tags and group chips share one row",
+        "A pressed chip glows in its own colour",
+        "DEL is wine-red, no longer close to NERF"
       ],
       "shots": [
         "icons/changelog/2026-09-25_tags.webp"
@@ -293,28 +310,27 @@
       "fix": true,
       "link": "heroes_stats.html",
       "items": [
-        "Razor's innate is +1% move speed per level (was +1 flat); Death Prophet's move speed history corrected",
-        "New: Rubick +1 damage per level, Tidehunter +3 HP and +2 range per fish, Dark Willow +20% HP and mana regen",
-        "Hero Lab also counts Magnus and Primal Beast slow resist, Wraith King lifesteal, Death Prophet cooldown reduction; Centaur's Horsepower no longer stacks with boots"
+        "Razor, Death Prophet corrected; Rubick, Tidehunter, Dark Willow added",
+        "Hero Lab counts more innates; Horsepower no longer stacks with boots"
       ]
     },
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Changelog: fixes are marked with a pixel beetle, the left list shows only features, screenshots share one width",
+      "title": "Changelog: fixes are marked with a pixel beetle",
       "minor": true,
       "link": "changelog.html"
     },
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Icon toggles (weights, talent, attributes) glow warm when on instead of turning solid gold, so the icon stays visible",
+      "title": "Icon toggles glow warm when on, the icon stays visible",
       "minor": true
     },
     {
       "date": "2026-09-25",
       "category": "Dynamics",
-      "title": "Hero / Item Dynamics no longer stutter: hover is paused while the table scrolls and the diamond pop is instant",
+      "title": "Hero / Item Dynamics no longer stutter while scrolling",
       "minor": true,
       "link": "heroes_dyn.html",
       "fix": true
@@ -331,8 +347,8 @@
       "category": "Site",
       "title": "Warm colours",
       "items": [
-        "Cold steel greys and blues gave way to calm warm tones across the site: panels, lines, table headers, the calendar and its charts",
-        "Blue stays only where it means something: QOL, magic damage, Intelligence, Aghanim, mana"
+        "Warm tones instead of steel greys and blues",
+        "Blue only where it means something: QoL, magic, Intelligence, Aghanim, mana"
       ],
       "shots": [
         "icons/changelog/2026-09-25_warm.webp",
@@ -345,7 +361,7 @@
       "title": "Per Int on Mana Items",
       "link": "mana_items.html",
       "items": [
-        "What one point of Intelligence gives (+12 mana, +0.05 regen) sits at the right of the toolbar — hover either for its patch history"
+        "What one point of Intelligence gives, with its patch history on hover"
       ],
       "shots": [
         "icons/changelog/2026-09-25_per_int.webp"
@@ -354,7 +370,7 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
-      "title": "Terrain: the arrows next to the patch number step to the neighbouring map (7.41 ↔ 7.40) at the ends of the list",
+      "title": "Terrain: the patch arrows wrap around at the ends of the list",
       "minor": true,
       "link": "terrain_741.html",
       "fix": true
@@ -362,7 +378,7 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
-      "title": "Mana Items: item history uses each patch's mana per Intelligence (11 in 7.36–7.38), not today's 12",
+      "title": "Mana Items: history uses each patch's mana per Intelligence",
       "minor": true,
       "link": "mana_items.html",
       "fix": true
@@ -370,7 +386,7 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
-      "title": "Hero Stats / Hero Lab: 7.41f base attack speed fixed (Earth Spirit 95, Keeper of the Light 90, Warlock 95) — the data was stuck at 7.41e",
+      "title": "Hero Stats / Hero Lab: 7.41f base attack speed fixed",
       "minor": true,
       "link": "heroes_stats.html",
       "fix": true
@@ -378,13 +394,13 @@
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Search, price and level fields use the pixel font for both the hint and what you type",
+      "title": "Search, price and level fields in the pixel font",
       "minor": true
     },
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Description paragraphs above the Materials tables are gone: the pages open straight on the controls",
+      "title": "Materials pages open straight on the controls",
       "minor": true
     },
     {
@@ -392,8 +408,8 @@
       "category": "Site",
       "title": "Warm pixel controls",
       "items": [
-        "Menus, filter panels, buttons and switches are warm pixel UI: pixel font, stepped corners, game-like buttons that turn gold when on",
-        "Tag chips (BUFF, NERF, NEW…) and group chips in the pixel font; Terrain's Zoom, Fullscreen and layer buttons match"
+        "Menus, filters, buttons and switches in a warm pixel style",
+        "Tag and group chips in the pixel font"
       ],
       "shots": [
         "icons/changelog/2026-09-25_controls.webp",
@@ -405,7 +421,7 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
-      "title": "The current Materials section glows warm from below, like the coals under the header's embers",
+      "title": "The current Materials section glows warm from below",
       "minor": true,
       "link": "neutral_stats.html"
     },
@@ -425,8 +441,8 @@
       "category": "Site",
       "title": "New header",
       "items": [
-        "The main buttons are plain labels; the page you're on glows gold over a thin bar with embers rising from it",
-        "The Materials sub-menu is a simple text row, the current page in gold"
+        "Plain labels; the current page glows gold with rising embers",
+        "The Materials sub-menu is a text row"
       ],
       "shots": [
         "icons/changelog/2026-09-24_header.webp"
@@ -437,7 +453,7 @@
       "category": "Materials",
       "title": "Autocast as in the game",
       "items": [
-        "Autocast abilities on the neutral tables show Dota's own effect: a fiery glow runs round the icon, shedding embers"
+        "Autocast icons on neutral tables show the game's fiery glow"
       ],
       "link": "neutral_stats.html",
       "shots": [
@@ -449,8 +465,7 @@
       "category": "Site",
       "title": "New tile icons on the main page",
       "items": [
-        "Every tile has its own pixel icon; Dynamics and Changes show whether they're about heroes or items",
-        "Opening a category puts its name at the top"
+        "Every tile has its own pixel icon"
       ],
       "link": "index.html",
       "shots": [
@@ -484,7 +499,7 @@
     {
       "date": "2026-09-24",
       "category": "Patch Reader",
-      "title": "Change chips line up in one column everywhere, also inside ability boxes and item property panels",
+      "title": "Change chips line up in one column everywhere",
       "minor": true,
       "fix": true
     },
@@ -520,9 +535,8 @@
       "category": "Patch Reader",
       "title": "Clearer reworks and new things",
       "items": [
-        "Reworked mechanics and objectives read as one description of how they work now",
-        "Changed abilities get before/after cards with the real old tooltip",
-        "Values that grow with game time open a table by minute; new items read as a card"
+        "Changed abilities get before / after cards with the real old tooltip",
+        "Values that grow with time open a table by minute"
       ],
       "link": "patches/7.38.html",
       "shots": [
@@ -540,8 +554,8 @@
       "title": "Items on hero pages",
       "link": "heroes/anti-mage.html",
       "items": [
-        "Six item slots next to the hero's name: pick the items you build, and their own changes appear inside the same patch sections as the hero's",
-        "The picker is the in-game shop: basics, upgrades, neutral tiers — every item can be picked, even one that never changed"
+        "Six item slots next to the hero: their changes appear in the hero's patches",
+        "The picker is the in-game shop"
       ],
       "shots": [
         "icons/changelog/2026-09-23_hero_items.webp",
@@ -578,7 +592,7 @@
       "category": "Patch Reader",
       "title": "Patch 7.38",
       "items": [
-        "All 1585 changes of the 7.38 gameplay patch, checked line by line against Valve's data"
+        "All 1585 changes, checked line by line against Valve's data"
       ],
       "link": "patches/7.38.html",
       "shots": [
@@ -604,7 +618,7 @@
       "category": "Dynamics",
       "title": "Weights mode",
       "items": [
-        "The gold weights button turns every patch cell into a score: how much the patch really changed a hero or item"
+        "The gold button turns every patch cell into a score"
       ],
       "link": "heroes_dyn.html",
       "shots": [

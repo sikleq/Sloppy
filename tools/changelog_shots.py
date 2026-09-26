@@ -69,6 +69,7 @@ SHOTS = {
     "2026-09-25_warm_calendar.webp": ("calendar.html", None, [".cal-year-block"], [], 420, {"width": 1400}),
     "2026-09-24_changelog.webp": ("changelog.html", None, [".clog-layout"], [], 460, {"width": 1400}),
     "2026-09-25_controls.webp": ("heroes_stats.html", None, [".toolbar-panel"], [], 160, {"width": 1400}),
+    "2026-09-26_swap_tree.webp": ("patches/7.41.html", ("block", "Abaddon"), [":scope .talents-block"], [], 160),
     "2026-09-24_header.webp": ("patches/7.38.html", None, ["nav.top-nav", ".toolbar"], [], 150, {"width": 1500}),
     "2026-09-24_index.webp": ("index.html", None, [".inv-book"], [], 520, {"width": 1400}),
     "2026-09-24_index_heroes.webp": ("index.html", None, [".inv-book"], ['[data-panel-open="heroes"]'], 520, {"width": 1400}),

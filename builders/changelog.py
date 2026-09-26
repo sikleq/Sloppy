@@ -52,11 +52,15 @@ BUG_ICON = "icons/ui/gothic/icon_bug.png"
 
 
 def _bug_html(e):
-    """Fixes of something that was wrong ("fix": true) carry a small pixel beetle beside the chip."""
-    if not e.get("fix"):
-        return ""
-    return (f'<img class="clog-bug" src="{BUG_ICON}" width="13" height="13" alt="Fix" '
-            'title="Fix: something was wrong and now works">')
+    """Fixes of something that was wrong ("fix": true) carry a small pixel beetle beside the chip.
+    The cell is there even without a beetle, so every title starts on the same vertical line."""
+    bug = (f'<img class="clog-bug" src="{BUG_ICON}" width="13" height="13" alt="Fix" '
+           'title="Fix: something was wrong and now works">') if e.get("fix") else ""
+    return f'<span class="clog-bugcell">{bug}</span>'
+
+
+def _cat_html(e):
+    return f'<span class="clog-catcell"><span class="clog-cat clog-cat-{_slug(e["category"])}">{_esc(e["category"])}</span></span>'
 
 
 def _entry_html(e):
@@ -66,8 +70,7 @@ def _entry_html(e):
     shots = _shots_html(e)
     cls = "clog-entry has-shots" if shots else "clog-entry"
     return (f'<article class="{cls}" id="{_entry_id(e)}" data-cat="{_slug(e["category"])}"><div class="clog-text">'
-            f'<div class="clog-entry-head"><span class="clog-cat clog-cat-{_slug(e["category"])}">'
-            f'{_esc(e["category"])}</span>{_bug_html(e)}<h3 class="clog-title">{title}</h3></div>'
+            f'<div class="clog-entry-head">{_cat_html(e)}{_bug_html(e)}<h3 class="clog-title">{title}</h3></div>'
             f'<ul class="clog-items">{items}</ul></div>{shots}</article>')
 
 
@@ -105,10 +108,11 @@ MINOR_OPEN_MAX = 3            # a day's small changes: up to 3 shown as a list, 
 def _minor_html(date, minors):
     """Small changes of one day ("minor": true) — a compact list; when there are many, it
     folds under a "Smaller changes (N)" toggle so it doesn't take much room."""
+    # Chip | beetle | text columns with faint row lines (owner 2026-09-26): the text always starts at one x.
     lis = "".join(
-        f'<li data-cat="{_slug(e["category"])}"><span class="clog-cat clog-cat-{_slug(e["category"])}">'
-        f'{_esc(e["category"])}</span>{_bug_html(e)}' + (f'<a href="{_esc(e["link"])}">{_esc(e["title"])}</a>' if e.get("link")
-                                             else _esc(e["title"])) + '</li>'
+        f'<li data-cat="{_slug(e["category"])}">{_cat_html(e)}{_bug_html(e)}<span class="clog-minor-txt">'
+        + (f'<a href="{_esc(e["link"])}">{_esc(e["title"])}</a>' if e.get("link") else _esc(e["title"]))
+        + '</span></li>'
         for e in minors)
     head = f'Smaller changes <span class="clog-minor-n">{len(minors)}</span>'
     if len(minors) <= MINOR_OPEN_MAX:

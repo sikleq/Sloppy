@@ -96,3 +96,17 @@ For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `neutral_stats
 не попадает. Поле принимает только английский: русская буква заменяется английской с той же клавиши
 («щсефкшту» → «octarine»), остальное не-ASCII отбрасывается. Код — `src/scripts.js`, блок «Patch pages: the
 search sits behind the round loupe button».
+
+
+## Talent tree icon, Dynamics hover lens, Changelog columns (2026-09-26)
+
+- **Talent tree** (`patch/talent_tree.py`, post-pass in `patch/page.py save_html`): the Talents block icon lights
+  the changed twigs in gold, as the game lights a taken talent. Side = the hero's talent slots of THAT patch
+  (`data/rules/talent_slots.json`, built by `tools/build_talent_slots.py` from the d2vpkr npc_heroes.txt
+  history): the first 8 `special_bonus_*` slots in order, first of each pair = RIGHT (checked on Liquipedia:
+  Axe, Abaddon, Sniper). A row is placed by words vs. today's tooltip + the ability/value the talent changed
+  in its own patch; a row that fits neither side lights nothing. Gold copy of the icon: `icons/misc/talents_gold.svg`.
+- **Dynamics matrices**: cells never pop; one `.dyn-lens` (scripts.js) with a copy of the hovered pill grows
+  over it and glides between cells (transform/opacity only). A per-cell transition repaints every passing cell.
+- **Changelog**: chip | beetle | text columns (`--clog-cat-w`), titles, bullets and small changes start on one x;
+  small changes are separated by faint lines. Keep titles short (about 90 characters).

@@ -9891,7 +9891,12 @@ li.tsp-hidden { display: none !important; }
 .clog-entry:last-child { border-bottom: 0; }
 /* wide screens: the notes on the left, the screenshots next to them */
 .clog-entry.has-shots { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.6fr); column-gap: 28px; align-items: start; }
-.clog-entry-head { display: flex; align-items: baseline; gap: 10px; }
+/* Chip | beetle | text columns (owner 2026-09-26): titles, bullets and small changes start on one x */
+.clog-page { --clog-cat-w: 100px; --clog-bug-w: 14px; --clog-gap: 8px;
+  --clog-text-x: calc(var(--clog-cat-w) + var(--clog-bug-w) + 2 * var(--clog-gap)); }
+.clog-entry-head { display: grid; grid-template-columns: var(--clog-cat-w) var(--clog-bug-w) minmax(0, 1fr);
+  column-gap: var(--clog-gap); align-items: baseline; }
+.clog-catcell, .clog-bugcell { display: flex; align-items: center; align-self: center; }
 .clog-title { margin: 0; font-size: 15px; font-weight: 600; color: var(--text-bright); }
 .clog-title-link { color: inherit; text-decoration: underline dotted rgba(227,196,106,.55);
   text-underline-offset: 4px; text-decoration-thickness: 1px; }
@@ -9903,7 +9908,7 @@ li.tsp-hidden { display: none !important; }
 .clog-cat-hero-lab     { color: #86b98f; border-color: rgba(120,215,145,.35); background: rgba(120,215,145,.08); }
 .clog-cat-dynamics     { color: #c29be0; border-color: rgba(190,140,240,.35); background: rgba(190,140,240,.08); }
 .clog-cat-site         { color: #b5b0a5; border-color: rgba(150, 146, 137,.35); background: rgba(150, 146, 137,.08); }
-.clog-items { margin: 7px 0 0; padding-left: 20px; color: var(--text-main); font-size: 13.5px; line-height: 1.55; }
+.clog-items { margin: 5px 0 0; padding-left: var(--clog-text-x); color: var(--text-main); font-size: 13.5px; line-height: 1.55; }
 .clog-items li::marker { color: var(--gold); }
 /* screenshots: a light gold outline always, brighter on hover; click = lightbox */
 .clog-shots { display: flex; flex-direction: column; gap: 6px; }
@@ -9952,6 +9957,7 @@ li.tsp-hidden { display: none !important; }
 .clog-page .clog-minor.is-hidden, .clog-page .clog-minor-list li.is-hidden { display: none; }
 /* a day's small changes: compact list, folded under a toggle when there are many */
 .clog-minor { margin: 10px 0 4px; }
+.clog-minor-head { padding-left: var(--clog-text-x); }
 .clog-minor-head { font-size: 12.5px; color: var(--text-dim, #969289); letter-spacing: .3px; }
 summary.clog-minor-head { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; }
 summary.clog-minor-head::-webkit-details-marker { display: none; }
@@ -9959,9 +9965,10 @@ summary.clog-minor-head::before { content: "\25B8"; color: var(--gold-dim); tran
 details[open] > summary.clog-minor-head::before { transform: rotate(90deg); }
 summary.clog-minor-head:hover { color: var(--text-bright); }
 .clog-minor-n { color: var(--gold-dim); }
-.clog-minor-list { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
-.clog-minor-list li { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--text-main); }
-.clog-minor-list .clog-cat { transform: scale(.9); transform-origin: left center; }
+.clog-minor-list { list-style: none; margin: 6px 0 0; padding: 0; border-top: 1px solid rgba(255, 255, 255, .06); }
+.clog-minor-list li { display: grid; grid-template-columns: var(--clog-cat-w) var(--clog-bug-w) minmax(0, 1fr);
+  column-gap: var(--clog-gap); align-items: baseline; padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, .06);
+  font-size: 13px; line-height: 1.45; color: var(--text-main); }
 .clog-minor-list a { color: inherit; text-decoration: underline dotted rgba(227,196,106,.45); text-underline-offset: 3px; }
 .clog-minor-list a:hover { color: var(--gold); }
 .clog-rail-minor { color: var(--text-dim, #969289); font-style: italic; }
@@ -10235,6 +10242,16 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-hcol { display: flex; flex-direction: column; }
 .ec-hstats { margin-top: auto; padding-top: 14px; }               /* pinned to the bottom → all four line up */
 /* Group summary: plain rows; small icons and colour make the numbers readable (2026-09-26) */
+.ec-hs-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; line-height: 1.35; }
+.ec-hs-table th, .ec-hs-table td { border: 1px solid rgba(255, 255, 255, 0.07); padding: 3px 6px; text-align: left;
+  vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ec-hs-table tbody th { width: 34%; font-weight: 400; color: var(--text-dim); }
+.ec-hs-table td { color: var(--text-bright); }
+.ec-hs-table td b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.ec-hs-table tr.ec-hs-cap th { width: auto; padding-top: 6px; font-family: var(--font-j25); font-size: 12px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--text-bright); opacity: 0.85;
+  background: rgba(255, 255, 255, 0.025); }
+.ec-hs-table tr.ec-hs-cap th + th { font-family: inherit; letter-spacing: 0.4px; font-size: 10px; color: var(--text-dim); }
 .ec-hs-ico { width: 14px; height: 14px; object-fit: contain; vertical-align: -2px; margin-right: 3px; opacity: 0.9; }
 .ec-hs-sep { font-style: normal; color: var(--text-dim); font-weight: 400; }
 .ec-hstat-row .ec-hs-hp { color: #6fce5c; } .ec-hstat-row .ec-hs-mp { color: #6aa6f0; }
@@ -10653,14 +10670,30 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 /* While a table box scrolls (scripts.js adds .is-scrolling) the table ignores the pointer:
    no hover repaints of cells passing under the cursor. */
 .creeps-scroll.is-scrolling table { pointer-events: none; }
-/* Hero / Item Dynamics matrices (~3000 diamonds): the hover pop is INSTANT here — the 0.14s
-   grow/shrink transition promoted and repainted a layer per passing cell (hover sweep:
-   main-thread frame work 1.8 s -> 0.7 s without it). Patch pages keep the smooth pop. */
+/* Hero / Item Dynamics matrices (~3000 diamonds): the cells themselves never pop — a single
+   .dyn-lens (scripts.js "DYNAMICS MATRICES") holding a copy of the hovered pill grows over it and
+   glides between cells (owner 2026-09-26: the instant pop felt jerky; a per-cell transition
+   repainted every passing cell). Patch pages keep the per-cell pop. */
 .heroes-dyn-table .dyn-cell,
-.heroes-dyn-table .dyn-cell-wrap:not(.empty):hover .dyn-cell { transition: none; }
+.heroes-dyn-table .dyn-cell-wrap:not(.empty):hover .dyn-cell { transition: none; transform: none; }
+.dyn-lens {
+  position: fixed; left: 0; top: 0; z-index: 900; width: 28px; height: 28px;
+  pointer-events: none; opacity: 0; transform-origin: 50% 50%;
+  transition: transform 0.12s cubic-bezier(.2, .7, .3, 1), opacity 0.12s ease;
+}
+.dyn-lens.is-on { opacity: 1; }
+.dyn-lens.no-anim { transition: none; }
+.dyn-lens .dyn-cell {
+  width: 28px; height: 28px; transition: none; transform: none;
+  background-color: rgb(28, 27, 25);
+  box-shadow: 0 2px 4px var(--shadow-60), inset 0 0 0 1px var(--white-12), 0 0 8px var(--white-22);
+}
+.dyn-lens.current .dyn-cell {
+  box-shadow: 0 2px 4px var(--shadow-60), inset 0 0 0 1px var(--white-12), 0 0 8px var(--white-22),
+    0 0 0 1.5px rgba(227, 196, 106, 0.95), 0 0 0 2.5px rgba(0, 0, 0, 0.85);
+}
 /* Changelog: "fix" marker — the pixel beetle beside the category chip */
-.clog-bug { width: 13px; height: 13px; image-rendering: pixelated; flex: none; vertical-align: middle; margin: 0 2px 0 -2px; }
-.clog-minor-list .clog-bug { align-self: center; }
+.clog-bug { width: 13px; height: 13px; image-rendering: pixelated; flex: none; display: block; }
 /* Changelog screenshots: every shot sits in a frame as wide as the shots column (same width in
    every entry); a smaller image is centred on a dark vignette instead of shrinking the frame. */
 .clog-shot {
@@ -10804,3 +10837,6 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 }
 .ec-ab-icon[data-tooltip]:hover::after, .ec-aghs-btn[data-tooltip]:hover::after { opacity: 1; }
 .ec-aghs-hide { display: none !important; }
+/* Talent tree: the changed twigs (patch/talent_tree.py) glow a little, like the lit branch in game */
+.ability-block.talents-block svg.ttree image + image { filter: drop-shadow(0 0 1.2px rgba(255, 196, 64, .9)); }
+.clog-catcell .clog-cat { width: 100%; box-sizing: border-box; text-align: center; }

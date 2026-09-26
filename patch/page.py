@@ -11,6 +11,7 @@ from .meta import PATCHES, _render_top_nav, _patch_age_line, _patch_meta_parts, 
 from .images import HERO_SLUG
 from .elements import _close_block, STAT_ICONS, STAT_DETECT_RULES
 from .static_has import add_static_has_classes
+from .talent_tree import light_talent_trees
 
 _ASSET_VERSION = _site.compute_asset_version()
 
@@ -421,6 +422,8 @@ def save_html(filename):
     out = _sort_changes_li(out)
     out = _wrap_ability_boxes(out)
     out = _new_mech_rows(out)
+    # Talent tree with the changed twigs in gold (patch/talent_tree.py)
+    out = light_talent_trees(out, os.path.splitext(os.path.basename(filename))[0])
     # Perf: :has() facts as build-time classes (patch/static_has.py)
     out = add_static_has_classes(out)
     # Perf: 2x-size WebP icons instead of the full PNGs (tools/make_thumbs.py)
