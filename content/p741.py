@@ -169,7 +169,7 @@ def build():
     W(ul_open())
     W(li("Reflected damage cannot be reflected back", t("NEW")))
     W(li("Lifesteal and Spell Lifesteal don't apply to reflected damage", t("NEW")))
-    W(li("Reflected damage doesn't affect Debuff Immune units", t("NEW")))
+    W(li("Reflected damage doesn't affect Debuff Immune units", t("DEL")))
     W(li("Units with free movement now can miss their attacks when attacking uphill targets " + info_tip(
             "Batrider during Firefly", "Dragon Knight during Elder Dragon Form with Aghanim's Scepter",
             "Lina during Flame Cloak", "Terrorblade's Reflection illusions",

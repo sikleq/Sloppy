@@ -272,3 +272,12 @@ REWORK теперь значит только настоящую передел�
   Касты НЕ-переключаемых способностей под root/silence остаются BUFF/NERF.
 - **Тип урона — как было**: «Damage type changed» = REWORK, «classified as reflection damage» = MISC (владелец 2026-09-27).
 - Генератор: первые правила `CANONICAL_TAGS`; тест `test_toggle_under_silence_or_invisibility_is_misc`.
+
+## Решения владельца 2026-09-27 (разбор спорных тегов)
+
+- Эффект перестал действовать на класс целей (Debuff Immune, иллюзии, неуязвимые): «doesn't affect Debuff Immune
+  units» → **DEL** (как «is not applied if»). Исключение «не действует в фонтане» остаётся NERF.
+- Индикатор / таймер в интерфейсе («overhead indicator», «Tormentor Timer near the minimap») → **QoL**.
+- «Now levels up with / Now scales with <способность> / Now upgrades with …» → **REWORK** (зеркало «No longer levels with»).
+- «Can no longer be cast while rooted» → **DEL** (Tusk 7.08 выровнен с 7.41c).
+- Тест: `test_owner_decisions_2026_09_27_del_qol_rework`.

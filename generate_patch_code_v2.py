@@ -245,6 +245,13 @@ CANONICAL_TAGS = [
     # "classified as reflection damage" MISC.)
     (re.compile(r'\btoggl(?:e|es|ed|ing)\b[^.]*?\b(?:no longer (?:be )?(?:disabled|breaks?|stops?)|while silenced)', re.I), 'MISC'),
     (re.compile(r'\b(?:can now|now can) be toggled while\b', re.I), 'MISC'),
+    # Owner 2026-09-27: an effect that stops working on a class of targets → DEL (as "is not applied if");
+    # an indicator / timer added to the HUD is interface → QoL; an ability that starts leveling with
+    # another one → REWORK (mirror of "No longer levels with").
+    (re.compile(r"\bdo(?:es)?(?:n't| not) affect (?:\w+ )?(?:debuff immune|spell immune|magic immune|invulnerable|illusions?)\b", re.I), 'DEL'),
+    (re.compile(r'\b(?:now has an?|added an?) (?:\w+ )?(?:indicator|timer)\b', re.I), 'QoL'),
+    (re.compile(r'\bnear the minimap\b', re.I),                     'QoL'),
+    (re.compile(r'^\s*now (?:levels(?: up)?|scales|upgrades) with\b', re.I), 'REWORK'),
     # ── classes from the 2026-09-18 datafeed proofread (memory: sloppy-datafeed-proofread-method) ──
     # a restriction / self-penalty on the OWNER is lifted → BUFF
     (re.compile(r'\bno longer (?:be )?(?:disabled|interrupted|cancell?ed|blocked|prevented|stopped) by\b', re.I), 'BUFF'),

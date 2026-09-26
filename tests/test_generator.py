@@ -725,3 +725,16 @@ def test_toggle_under_silence_or_invisibility_is_misc():
     assert g._guess_tag("Damage type changed from Magical to Pure") == "REWORK"
     assert g._guess_tag("Damage done is now classified as reflection damage") == "MISC"
     assert g._guess_tag("Now can be toggled on and off for the duration of the buff") == "NEW"
+
+
+def test_owner_decisions_2026_09_27_del_qol_rework():
+    """Owner 2026-09-27: target class excluded → DEL; HUD indicator / timer → QoL;
+    starts leveling with another ability → REWORK; "Can no longer be cast while rooted" → DEL."""
+    import generate_patch_code_v2 as g
+    assert g._guess_tag("Reflected damage doesn't affect Debuff Immune units") == "DEL"
+    assert g._guess_tag("Now has an overhead indicator when the ability is active") == "QoL"
+    assert g._guess_tag("Added a Tormentor Timer near the minimap") == "QoL"
+    assert g._guess_tag("Now levels up with Freezing Field") == "REWORK"
+    assert g._guess_tag("Now scales with Wukong's Command") == "REWORK"
+    assert g._guess_tag("Now upgrades with each subsequent drop") == "REWORK"
+    assert g._guess_tag("Can no longer be cast while rooted") == "DEL"

@@ -271,7 +271,7 @@ def build():
     W(hero_header("Tusk"))
     W(ability("Snowball", innate=False))
     W(ul_open())
-    W(li("Can no longer be cast while rooted", t("NERF")))
+    W(li("Can no longer be cast while rooted", t("DEL")))
     W(ul_close())
 
     # Windranger

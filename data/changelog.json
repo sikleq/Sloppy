@@ -4,6 +4,13 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "7 disputed tags fixed: HUD timers are QoL, \"now levels with\" is REWORK, lost targets are DEL",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "Item before / after cards list every stat, also the unchanged ones (18 cards, e.g. Mage Slayer)",
       "minor": true,
       "fix": true
