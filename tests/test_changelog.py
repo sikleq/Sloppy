@@ -71,3 +71,16 @@ def test_hero_page_filters_are_icons_and_aghanim_scopes():
     assert m and m.group(1).endswith("x_cold_feet.webp") and m.group(2) == "Cold Feet"
     btn = _aghs_btn("shard")
     assert 'data-ec-scope="shard"' in btn and "aghs_shard_icon" in btn and "ec-aghs-btn" in btn
+
+
+def test_an_ability_left_in_the_kv_only_in_comments_is_old():
+    """Owner 2026-09-26: Anti-Mage's Counterspell Ally (7.41f KV: block kept, "IsGrantedByShard" and the
+    facet line commented out) is a removed ability; Spirit Bear's Return (named by a unit) is not."""
+    from builders.entity_changes import _live_abilities
+    txt = ('"Ability1" "antimage_mana_break"\n'
+           '//\t"antimage_counterspell_ally" "shard"\n')
+    defs = {"antimage_mana_break": "", "antimage_counterspell_ally": '//"IsGrantedByShard" "1"\n',
+            "antimage_persectur": '"IsGrantedByScepter" "1"\n'}
+    live = _live_abilities(txt, defs, ["antimage_mana_break"])
+    assert "antimage_counterspell_ally" not in live
+    assert {"antimage_mana_break", "antimage_persectur"} <= live

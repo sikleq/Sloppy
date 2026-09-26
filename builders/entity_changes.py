@@ -235,9 +235,53 @@ def _hero_kit(npc: str) -> list[str]:
             granted = bool(_re.search(r'"IsGrantedBy(?:Scepter|Shard)"\s+"1"', defs.get(slug, "")))
             (aghs if granted else ults if slug in ultimates() else basics).append(name)
     innates = [(slim.get(d) or {}).get("dname") for d in (slotted + list(defs)) if (slim.get(d) or {}).get("is_innate")]
-    _KIT_CACHE[npc] = basics + ults + aghs
-    _KIT_EXTRA[npc] = ([n for n in dict.fromkeys(innates) if n], set(defs) | set(slotted), set(slim))
+    live = _live_abilities(txt, defs, slotted) if kv.exists() else set()
+    _KIT_CACHE[npc] = [n for n in basics + ults + aghs if n in {(slim.get(d) or {}).get("dname") for d in live}]
+    _KIT_EXTRA[npc] = ([n for n in dict.fromkeys(innates) if n], live, set(slim))
     return _KIT_CACHE[npc]
+
+
+_UNITS_CODE: list = []
+_SLIM: dict = {}
+
+
+def _ability_icon(npc: str, title: str) -> str:
+    """Icon of an ability that has no block of its own on the page (Summon Raptors changed only through
+    talents): its engine slug from the page map or from abilities_slim, then the local thumbnail."""
+    if not _SLIM:
+        _SLIM.update(_json.loads((_HERE / "data" / "abilities_slim.json").read_text(encoding="utf-8")))
+    named = [k for k, v in _SLIM.items() if (v or {}).get("dname") == title]
+    # the hero's own prefix first; else a name only one ability has (Wraith King = skeleton_king_*)
+    for slug in (_TITLE_SLUG.get(title), next((k for k in named if k.startswith(npc + "_")), None),
+                 named[0] if len(named) == 1 else None):
+        if slug and (_HERE / "icons" / "_t" / "abilities" / f"{slug}.webp").exists():
+            return f"../icons/_t/abilities/{slug}.webp"
+    return ""
+
+
+def _code(text: str) -> str:
+    return "\n".join(line.split("//")[0] for line in text.split("\n"))
+
+
+def _live_abilities(txt: str, defs: dict, slotted: list) -> set:
+    """Abilities the hero really has now (owner 2026-09-26: Anti-Mage's Counterspell Ally was shown as
+    current). A block that is merely left in the hero's KV file is not enough: it must sit in a slot,
+    be granted by Aghanim's Scepter / Shard, or be named by another ability or by a unit (Spirit Bear,
+    Brewmaster spirits) OUTSIDE comments. Counterspell Ally 7.41f: "IsGrantedByShard" and its facet line
+    are both commented out -> old."""
+    from patch.meta import latest_stats_version
+    if not _UNITS_CODE:
+        u = _HERE / "data" / "stats" / latest_stats_version() / "npc_units.txt"
+        _UNITS_CODE.append(_code(u.read_text(encoding="utf-8", errors="replace")) if u.exists() else "")
+    code, units = _code(txt), _UNITS_CODE[0]
+    live = set(slotted)
+    for d, blk in defs.items():
+        if d in live:
+            continue
+        if (_re.search(r'"IsGrantedBy(?:Scepter|Shard)"\s+"1"', _code(blk))
+                or len(_re.findall(rf'"{d}"', code)) > 1 or f'"{d}"' in units):
+            live.add(d)
+    return live
 
 
 _TALENT_BLOCK_RE = _re.compile(r'<div class="ability-block talents-block">')
@@ -392,13 +436,16 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
 
         def chip(t, is_old=False):
             cls = "badge ec-ab-btn" + (" ec-ab-old" if is_old else "")
-            src = icons.get(t)
+            src = icons.get(t) or _ability_icon(npc, t)
             if not src:
                 return f'<button type="button" class="{cls}" data-ec-ability="{_esc(t)}">{_esc(t)}</button>'
             return (f'<button type="button" class="{cls} ec-ab-icon" data-ec-ability="{_esc(t)}" '
                     f'data-tooltip="{_esc(t)}{" (removed)" if is_old else ""}" aria-label="{_esc(t)}">'
                     f'<img src="{_esc(src)}" alt="" loading="lazy" decoding="async"></button>')
-        ability_chips = "".join(chip(t) for t in current) + "".join(chip(t, True) for t in old)
+        # removed abilities after their own separator, on the right (owner 2026-09-26)
+        ability_chips = ("".join(chip(t) for t in current)
+                         + ('<span class="ec-vsep ec-old-sep" aria-hidden="true"></span>'
+                            + "".join(chip(t, True) for t in old) if old else ""))
         abilities_html = '<span class="ec-vsep" aria-hidden="true"></span>' + ability_chips
     _from_kind = {"hero": "hero", "item": "item", "enchant": "item"}.get(e["kind"], "unit")
     from_tok = f'{_from_kind}:{_file_slug(e)}'
