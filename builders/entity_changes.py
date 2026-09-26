@@ -1129,31 +1129,36 @@ def _hero_group_stats(label, lst):
     def num(x):
         return f"{x:.1f}".rstrip("0").rstrip(".")
 
-    # A small table with faint grid lines (owner 2026-09-26: text scattered left / right): values start on
-    # one vertical line; the records are a Max / Min grid instead of four loose rows.
+    # One grid (owner 2026-09-26: "more columns, everything aligned"): a label column + 6 equal value
+    # columns, so a pair (melee / ranged, HP / mana, max / min) takes 3 + 3 and the attributes 2 + 2 + 2.
+    # Every value is centred in its own cell; averages need no "Average" caption.
     def ico(src, alt):
         return f'<img class="ec-hs-ico" src="{src}" alt="{alt}">'
 
-    def who(w, val):
-        return (f'<b>{num(val)}</b> <a class="ec-hstat-who" href="heroes/{_esc(w["slug"])}.html">'
-                f'<img class="ec-hs-face" src="{_esc(w["icon"])}" alt="" loading="lazy">{_esc(w["name"])}</a>')
+    def td(html, span, cls=""):
+        klass = f' class="{cls}"' if cls else ""
+        return f'<td colspan="{span}"{klass}>{html}</td>'
 
-    attrs = " ".join(
-        f'<span class="ec-hs-{k}">{ico(f"icons/attributes/{name}.png", name)}{num(avg(lambda r, k=k: r[k]))}</span>'
-        for k, name in (("str", "strength"), ("agi", "agility"), ("int", "intelligence")))
-    tr = lambda th, td: f"<tr><th>{th}</th><td colspan=\"2\">{td}</td></tr>"
+    def who(w, val):
+        return td(f'<a class="ec-hstat-who" href="heroes/{_esc(w["slug"])}.html">'
+                  f'<b>{num(val)}</b><img class="ec-hs-face" src="{_esc(w["icon"])}" alt="" loading="lazy">'
+                  f'<span>{_esc(w["name"])}</span></a>', 3)
+
+    def row(label, cells):
+        return f'<tr><th>{label}</th>{"".join(cells)}</tr>'
+
+    attrs = [td(f'{ico(f"icons/attributes/{name}.png", name)}<b>{num(avg(lambda r, k=k: r[k]))}</b>', 2, f"ec-hs-{k}")
+             for k, name in (("str", "strength"), ("agi", "agility"), ("int", "intelligence"))]
     out = [
-        '<table class="ec-hs-table"><tbody>',
-        f'<tr class="ec-hs-cap"><th colspan="3">Average</th></tr>',
-        tr("Melee / ranged", f'{ico("icons/ui/atk_melee.png", "Melee")}<b>{melee}</b>'
-                             f' <i class="ec-hs-sep">/</i> {ico("icons/ui/atk_ranged.png", "Ranged")}<b>{n - melee}</b>'),
-        tr("Move speed", f'{ico("icons/move_speed.png", "")}<b>{round(avg(lambda r: r["ms"]))}</b>'),
-        tr("HP / mana, lvl 1", f'<b class="ec-hs-hp">{round(avg(hp))}</b> <i class="ec-hs-sep">/</i> '
-                               f'<b class="ec-hs-mp">{round(avg(mp))}</b>'),
-        tr("Attributes", attrs),
-        f'<tr class="ec-hs-cap"><th>{_esc(attr_label)}</th><th>Max</th><th>Min</th></tr>',
-        f'<tr><th>Base</th><td>{who(hi_base, base_of(hi_base))}</td><td>{who(lo_base, base_of(lo_base))}</td></tr>',
-        f'<tr><th>Gain</th><td>{who(hi_gain, gain_of(hi_gain))}</td><td>{who(lo_gain, gain_of(lo_gain))}</td></tr>',
+        '<table class="ec-hs-table"><colgroup><col class="ec-hs-lab">' + '<col>' * 6 + '</colgroup><tbody>',
+        row("Attack", [td(f'{ico("icons/ui/atk_melee.png", "Melee")}<b>{melee}</b>', 3),
+                       td(f'{ico("icons/ui/atk_ranged.png", "Ranged")}<b>{n - melee}</b>', 3)]),
+        row("HP / Mana", [td(f'<b>{round(avg(hp))}</b>', 3, "ec-hs-hp"), td(f'<b>{round(avg(mp))}</b>', 3, "ec-hs-mp")]),
+        row("Attributes", attrs),
+        row("Move speed", [td(f'{ico("icons/move_speed.png", "")}<b>{round(avg(lambda r: r["ms"]))}</b>', 6)]),
+        f'<tr class="ec-hs-cap"><th>{_esc(attr_label)}</th><th colspan="3">Max</th><th colspan="3">Min</th></tr>',
+        row("Base", [who(hi_base, base_of(hi_base)), who(lo_base, base_of(lo_base))]),
+        row("Gain", [who(hi_gain, gain_of(hi_gain)), who(lo_gain, gain_of(lo_gain))]),
         '</tbody></table>',
     ]
     return f'<div class="ec-hstats">{"".join(out)}</div>'

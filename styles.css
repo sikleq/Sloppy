@@ -10243,31 +10243,30 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-hstats { margin-top: auto; padding-top: 14px; }               /* pinned to the bottom → all four line up */
 /* Group summary: plain rows; small icons and colour make the numbers readable (2026-09-26) */
 .ec-hs-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; line-height: 1.35; }
-.ec-hs-table th, .ec-hs-table td { border: 1px solid rgba(255, 255, 255, 0.07); padding: 3px 6px; text-align: left;
-  vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ec-hs-table tbody th { width: 34%; font-weight: 400; color: var(--text-dim); }
-.ec-hs-table td { color: var(--text-bright); }
+.ec-hs-table col.ec-hs-lab { width: 27%; }
+.ec-hs-table th, .ec-hs-table td { border: 1px solid rgba(255, 255, 255, 0.07); padding: 4px 5px; height: 26px;
+  box-sizing: border-box; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ec-hs-table tbody th { text-align: left; font-weight: 400; color: var(--text-dim); }
+.ec-hs-table td { text-align: center; color: var(--text-bright); }
 .ec-hs-table td b { font-weight: 600; font-variant-numeric: tabular-nums; }
-.ec-hs-table tr.ec-hs-cap th { width: auto; padding-top: 6px; font-family: var(--font-j25); font-size: 12px;
-  letter-spacing: 1px; text-transform: uppercase; color: var(--text-bright); opacity: 0.85;
-  background: rgba(255, 255, 255, 0.025); }
-.ec-hs-table tr.ec-hs-cap th + th { font-family: inherit; letter-spacing: 0.4px; font-size: 10px; color: var(--text-dim); }
-.ec-hs-ico { width: 14px; height: 14px; object-fit: contain; vertical-align: -2px; margin-right: 3px; opacity: 0.9; }
-.ec-hs-sep { font-style: normal; color: var(--text-dim); font-weight: 400; }
-.ec-hstat-row .ec-hs-hp { color: #6fce5c; } .ec-hstat-row .ec-hs-mp { color: #6aa6f0; }
-.ec-hstat-row .ec-hs-str { color: var(--attr-str); } .ec-hstat-row .ec-hs-agi { color: var(--attr-agi); }
-.ec-hstat-row .ec-hs-int { color: var(--attr-int); }
-.ec-hs-str + .ec-hs-agi, .ec-hs-agi + .ec-hs-int { margin-left: 6px; }
+.ec-hs-table td.ec-hs-hp b { color: #6fce5c; }
+.ec-hs-table td.ec-hs-mp b { color: #6aa6f0; }
+.ec-hs-table td.ec-hs-str b { color: var(--attr-str); }
+.ec-hs-table td.ec-hs-agi b { color: var(--attr-agi); }
+.ec-hs-table td.ec-hs-int b { color: var(--attr-int); }
+.ec-hs-table tr.ec-hs-cap th { font-family: var(--font-j25); font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-bright); background: rgba(255, 255, 255, 0.025); }
+.ec-hs-table tr.ec-hs-cap th + th { text-align: center; font-family: inherit; letter-spacing: 0.4px; font-size: 10px;
+  color: var(--text-dim); }
+.ec-hs-ico { width: 14px; height: 14px; object-fit: contain; vertical-align: -2px; margin-right: 4px; opacity: 0.9; }
+.ec-hs-table a.ec-hstat-who { display: flex; align-items: center; justify-content: flex-start; gap: 5px; min-width: 0; padding-left: 4px;
+  color: var(--text-dim); }
+.ec-hs-table a.ec-hstat-who b { color: var(--text-bright); }
+.ec-hs-table a.ec-hstat-who span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 a.ec-hstat-who { text-decoration: none; }
 a.ec-hstat-who:hover { color: var(--gold); }
-.ec-hs-face { width: 25px; height: 14px; object-fit: cover; vertical-align: -3px; margin: 0 4px 0 2px; }
-.ec-hstat-row { display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
-  font-size: 12px; line-height: 1.5; padding: 1px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
-.ec-hstat-row span { color: var(--text-dim); white-space: nowrap; }
-.ec-hstat-row b { color: var(--text-bright); font-weight: 600; text-align: right; }
+.ec-hs-face { flex: none; width: 25px; height: 14px; object-fit: cover; }
 .ec-hstat-who { color: var(--text-dim); font-weight: 400; }
-.ec-hstat-head { margin: 7px 0 2px; font-family: var(--font-j25); font-weight: 400; font-size: 13px;
-  letter-spacing: 1px; text-transform: uppercase; color: var(--text-bright); opacity: 0.85; }
 .ec-hcol-strength .ec-group-title { color: var(--attr-str); }
 .ec-hcol-agility .ec-group-title { color: var(--attr-agi); }
 .ec-hcol-intelligence .ec-group-title { color: var(--attr-int); }
@@ -10838,5 +10837,6 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .ec-ab-icon[data-tooltip]:hover::after, .ec-aghs-btn[data-tooltip]:hover::after { opacity: 1; }
 .ec-aghs-hide { display: none !important; }
 /* Talent tree: the changed twigs (patch/talent_tree.py) glow a little, like the lit branch in game */
-.ability-block.talents-block svg.ttree image + image { filter: drop-shadow(0 0 1.2px rgba(255, 196, 64, .9)); }
+.ability-block.talents-block svg.ttree.ttree-lit .ttree-base { opacity: .42; }   /* unlit twigs recede */
+.ability-block.talents-block svg.ttree .ttree-on { filter: drop-shadow(0 0 1.6px rgba(255, 190, 40, 1)); }
 .clog-catcell .clog-cat { width: 100%; box-sizing: border-box; text-align: center; }

@@ -38,3 +38,4 @@ def test_placed_row_gets_the_gold_overlay():
     out = tt.light_talent_trees(html, "7.41")
     assert 'class="ability-icon-img ttree"' in out and "talents_gold.svg" in out
     assert tt.BRANCH_POLYS["15r"] in out and tt.BRANCH_POLYS["15l"] not in out
+    assert 'data-tt="15r"' in out and 'data-b="15r"' in out        # a filter can switch this twig off

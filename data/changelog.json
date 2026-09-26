@@ -15,6 +15,13 @@
     },
     {
       "date": "2026-09-26",
+      "category": "Patch Reader",
+      "title": "Talent tree: with a filter on, only the twigs of visible rows glow; brighter gold",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-26",
       "category": "Site",
       "title": "Changelog: rows in aligned columns, shorter texts",
       "minor": true

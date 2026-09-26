@@ -106,6 +106,8 @@ search sits behind the round loupe button».
   history): the first 8 `special_bonus_*` slots in order, first of each pair = RIGHT (checked on Liquipedia:
   Axe, Abaddon, Sniper). A row is placed by words vs. today's tooltip + the ability/value the talent changed
   in its own patch; a row that fits neither side lights nothing. Gold copy of the icon: `icons/misc/talents_gold.svg`.
+  Each placed row gets `data-tt="20r 25r"`, each twig its own gold `<image data-b>`; scripts.js "TALENT TREE"
+  lights only the twigs of rows a filter leaves visible (a hidden NERF row's twig must not glow). Unlit twigs dim to 42%.
 - **Dynamics matrices**: cells never pop; one `.dyn-lens` (scripts.js) with a copy of the hovered pill grows
   over it and glides between cells (transform/opacity only). A per-cell transition repaints every passing cell.
 - **Changelog**: chip | beetle | text columns (`--clog-cat-w`), titles, bullets and small changes start on one x;

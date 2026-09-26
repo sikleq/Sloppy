@@ -146,14 +146,16 @@ def changed_branches(version, hero, row_texts):
 
 
 def tree_svg(icon_url, gold_url, lit, uid):
-    """Inline SVG: the official icon with the changed twigs overlaid from its gold copy."""
+    """Inline SVG: the official icon (dimmed) with each changed twig overlaid from its gold copy.
+    One gold layer per twig (data-b), so scripts.js can light only the twigs of the rows a filter
+    leaves visible (owner 2026-09-26: with SWAP on, a hidden NERF row's twig still glowed)."""
     title = ", ".join(f"level {k[:2]} {'left' if k[2] == 'l' else 'right'}" for k in sorted(lit))
-    polys = "".join(f'<polygon points="{BRANCH_POLYS[k]}"/>' for k in sorted(lit))
+    clips = "".join(f'<clipPath id="{uid}-{k}"><polygon points="{BRANCH_POLYS[k]}"/></clipPath>' for k in sorted(lit))
+    golds = "".join(f'<image class="ttree-on" data-b="{k}" href="{gold_url}" width="73" height="77" '
+                    f'clip-path="url(#{uid}-{k})"/>' for k in sorted(lit))
     return (f'<svg class="ability-icon-img ttree" viewBox="0 0 73 77" width="128" height="128" role="img" '
-            f'aria-label="Talent tree, changed: {title}">'
-            f'<defs><clipPath id="{uid}">{polys}</clipPath></defs>'
-            f'<image href="{icon_url}" width="73" height="77"/>'
-            f'<image href="{gold_url}" width="73" height="77" clip-path="url(#{uid})"/></svg>')
+            f'aria-label="Talent tree, changed: {title}"><defs>{clips}</defs>'
+            f'<image class="ttree-base" href="{icon_url}" width="73" height="77"/>{golds}</svg>')
 
 
 _BLOCK_RE = re.compile(
@@ -161,6 +163,7 @@ _BLOCK_RE = re.compile(
     r'(</div>\s*<ul class="changes">)(.*?)(</ul>)', re.S)
 _HERO_RE = re.compile(r'class="entity hero-entity"[^>]*>\s*<div class="entity-icon hero-icon">.*?/heroes/([a-z0-9_]+)\.(?:webp|png)"', re.S)
 _ROW_RE = re.compile(r'<span class="row-text">(.*?)</span>', re.S)
+_LI_RE = re.compile(r'<li\b([^>]*)>(.*?)</li>', re.S)
 
 
 def light_talent_trees(html, version):
@@ -177,13 +180,23 @@ def light_talent_trees(html, version):
             hero = h
         if not hero:
             return m.group(0)
-        lit = changed_branches(version, hero, _ROW_RE.findall(m.group(5)))
+        lit = set()
+
+        def tag_li(li):
+            row = _ROW_RE.search(li.group(2))
+            own = changed_branches(version, hero, [row.group(1)]) if row else set()
+            if not own:
+                return li.group(0)
+            lit.update(own)
+            return f'<li{li.group(1)} data-tt="{" ".join(sorted(own))}">{li.group(2)}</li>'
+
+        rows = _LI_RE.sub(tag_li, m.group(5))
         if not lit:
             return m.group(0)
         n[0] += 1
         icon = m.group(3)
         gold = icon.replace("talents.svg", "talents_gold.svg")
         uid = f"tt-{version.replace('.', '_')}-{hero}-{n[0]}"
-        return m.group(1) + tree_svg(icon, gold, lit, uid) + m.group(4) + m.group(5) + m.group(6)
+        return m.group(1) + tree_svg(icon, gold, lit, uid) + m.group(4) + rows + m.group(6)
 
     return _BLOCK_RE.sub(repl, html)
