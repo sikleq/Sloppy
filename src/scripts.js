@@ -664,14 +664,22 @@
     return wrap || img;
   }
 
+  // A hero Changes page stacks many patches: parent and children are looked up inside ONE patch
+  // section (or one entity block on a patch page), else Cold Snap in 7.41f was joined to a Quas block
+  // several patches below by a dashed line across the whole screen (owner 2026-09-26).
   function drawAbilityTree(parentSlug, childSlugs) {
-    const parentImg = document.querySelector('img[data-slug="' + parentSlug + '"]');
-    if (!parentImg) return;
-    if (parentImg.closest('.f-hide, .cat-hide')) return;
+    document.querySelectorAll('img[data-slug="' + parentSlug + '"]').forEach(function (img) {
+      const scope = img.closest('section.ec-patch') || img.closest('.entity-block') || document;
+      drawAbilityTreeIn(scope, img, childSlugs);
+    });
+  }
+
+  function drawAbilityTreeIn(scope, parentImg, childSlugs) {
+    if (parentImg.closest('.f-hide, .cat-hide, .ec-scope-hide')) return;
     const childImgs = childSlugs
-      .map((s) => document.querySelector('img[data-slug="' + s + '"]'))
+      .map((s) => scope.querySelector('img[data-slug="' + s + '"]'))
       .filter(Boolean)
-      .filter(img => !img.closest('.f-hide, .cat-hide'));
+      .filter(img => !img.closest('.f-hide, .cat-hide, .ec-scope-hide'));
     if (!childImgs.length) return;
 
     // Use document-level coordinates so the SVG can span multiple
@@ -3507,7 +3515,8 @@ function ecPinnableTip(tip, show, hide, sel) {
         if (viaAghs)            // chosen only for its Aghanim rows: the other rows step aside
           blk.querySelectorAll('ul.changes > li').forEach(li => { if (!aghsRows.includes(li)) li.classList.add('ec-aghs-hide'); });
         const scopeOk = baseOk || viaAghs;
-        let ok = scopeOk && (!abilities.size || (!innate && abilities.has(titleOf(blk))));
+        // an active innate (Invoke) has a chip of its own: its block answers to it like any ability
+        let ok = scopeOk && (!abilities.size || abilities.has(titleOf(blk)));
         // talents block: with an ability chip active, keep only the rows that upgrade that ability
         const rows = blk.classList.contains('talents-block') ? [...blk.querySelectorAll('li')] : [];
         if (rows.length) {

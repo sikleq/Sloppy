@@ -190,9 +190,9 @@ def _titles(html: str) -> list[str]:
     out = []
     for m in _AB_BLOCK_RE.finditer(html):
         cls, t = m.group(1), m.group(2)
-        if "is-innate" in cls:
-            continue
         t = _re.sub(r"<[^>]+>", "", t).strip().split("→")[-1].strip()
+        if "is-innate" in cls and t not in _active_innates():
+            continue
         slug = _re.search(r'data-slug="([a-z_0-9]+)"', m.group(0))
         if t:
             _TITLE_SLUG.setdefault(t, slug.group(1) if slug else "")
@@ -201,6 +201,27 @@ def _titles(html: str) -> list[str]:
 
 
 _TITLE_SLUG: dict[str, str] = {}      # ability display name -> engine slug seen on the pages
+_ACTIVE_INNATES: set = set()
+
+
+def _active_innates() -> set:
+    """Innates that sit in an ability slot and are cast (Invoke, Stone Remnant, Summon Spirit Bear, Blur):
+    they get an ability chip like any other spell (owner 2026-09-26: "Invoke is missing"); passive
+    innates stay under the INNATE filter only."""
+    if not _ACTIVE_INNATES:
+        from patch.meta import latest_stats_version
+        slim = _json.loads((_HERE / "data" / "abilities_slim.json").read_text(encoding="utf-8"))
+        for f in (_HERE / "data" / "stats" / latest_stats_version() / "heroes").glob("npc_dota_hero_*.txt"):
+            txt = _code(f.read_text(encoding="utf-8", errors="replace"))
+            for slug in _re.findall(r'"Ability\d+"\s+"([a-z_0-9]+)"', txt):
+                if not (slim.get(slug) or {}).get("is_innate"):
+                    continue
+                blk = _re.search(rf'(?ms)^			"{slug}"\s*$(.*?)^			\}}', txt)
+                beh = _re.search(r'"AbilityBehavior"\s+"([^"]+)"', blk.group(1) if blk else "")
+                if beh and "PASSIVE" not in beh.group(1):
+                    _ACTIVE_INNATES.add(slim[slug]["dname"])
+        _ACTIVE_INNATES.add("")                      # computed (even if empty)
+    return _ACTIVE_INNATES
 
 
 _KIT_CACHE: dict[str, list[str]] = {}
@@ -233,7 +254,7 @@ def _hero_kit(npc: str) -> list[str]:
             info = slim.get(slug) or {}
             name = info.get("dname")
             if (not name or slug in seen or slug.startswith("special_bonus") or "hidden" in slug
-                    or slug.endswith("_empty") or info.get("is_innate")):
+                    or slug.endswith("_empty") or (info.get("is_innate") and name not in _active_innates())):
                 continue
             seen.add(slug)
             granted = bool(_re.search(r'"IsGrantedBy(?:Scepter|Shard)"\s+"1"', defs.get(slug, "")))

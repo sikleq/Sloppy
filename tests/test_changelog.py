@@ -109,3 +109,12 @@ def test_a_former_innate_title_is_read_from_a_renamed_pane():
     names = {p.strip() for m in _INNATE_TITLE_RE.finditer(body)
              for p in html.unescape(re.sub(r"<[^>]+>", "→", m.group(1))).split("→") if p.strip()}
     assert names == {"Duelist", "Bladeform"}
+
+
+def test_active_innates_get_an_ability_chip():
+    """Owner 2026-09-26: Invoke was missing from Invoker's ability filters (it is an innate in the KV);
+    a slotted, cast innate is a spell like any other. Passive innates stay under INNATE only."""
+    from builders.entity_changes import _active_innates
+    act = _active_innates()
+    assert {"Invoke", "Stone Remnant", "Summon Spirit Bear"} <= act
+    assert "Inner Beast" not in act

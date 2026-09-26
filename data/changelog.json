@@ -3,6 +3,13 @@
   "entries": [
     {
       "date": "2026-09-26",
+      "category": "Dynamics",
+      "title": "Hero pages: the dashed line from a parent ability to its sub-abilities (Invoker's orbs, Brewmaster's Primal Split) no longer runs across several patches; cast innates like Invoke, Stone Remnant and Summon Spirit Bear get an ability filter",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-26",
       "category": "Patch Reader",
       "title": "141 ability changes in 7.38–7.40c that sat right after a facet without their own heading (so they read as facet changes, e.g. Nature's Prophet 7.39c Curse of the Oldgrowth) now sit under their ability, as in Valve's notes",
       "minor": true,
