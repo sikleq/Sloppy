@@ -650,3 +650,29 @@ def test_formula_table_follows_the_formulas_own_interval():
     assert step_levels("5 + 2 per level") is None                               # the default grid
     _, table = scale_pill("0.1 + 0.1 per 3 levels", lambda L: 0.1 + 0.1 * (L // 3))
     assert "<th>L27</th>" in table and "<th>L20</th>" not in table
+
+
+def test_no_rows_hang_after_a_facet_block_without_a_header():
+    """Owner 2026-09-26, Nature's Prophet 7.39c: "Curse of the Oldgrowth: DPS per Tree 20 -> 15" sat in a
+    header-less ul right after the Soothing Saplings facet, so it read as a facet change. Valve lists it
+    as an ability of its own: after a facet's ul, a new ul needs its own ability()/subgroup() header."""
+    import glob
+    import re
+    bad = []
+    for f in sorted(glob.glob(os.path.join(os.path.dirname(os.path.dirname(__file__)), "content", "p7*.py"))):
+        state = None
+        for i, ln in enumerate(open(f, encoding="utf-8").read().split("\n"), 1):
+            s = ln.strip()
+            if re.match(r'W\((hero|item|unit|plain)_header\(', s):
+                state = "hero"
+            elif re.match(r'W\((facet_header|new_facet)\(', s):
+                state = "facet"
+            elif re.match(r'W\((ability|ability_change|subgroup)\(', s):
+                state = "block"
+            elif s == "W(ul_close())" and state == "facet":
+                state = "after_facet"
+            elif s == "W(ul_open())" and state == "after_facet":
+                state = "orphan"
+            elif state == "orphan" and s.startswith("W(li"):
+                bad.append(f"{os.path.basename(f)}:{i}")
+    assert bad == []

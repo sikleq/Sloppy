@@ -3,6 +3,13 @@
   "entries": [
     {
       "date": "2026-09-26",
+      "category": "Patch Reader",
+      "title": "141 ability changes in 7.38–7.40c that sat right after a facet without their own heading (so they read as facet changes, e.g. Nature's Prophet 7.39c Curse of the Oldgrowth) now sit under their ability, as in Valve's notes",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-26",
       "category": "Site",
       "title": "Patch page search: the key is now \\ (works in any keyboard layout, pressing it again closes the search, it is never typed into the field); the field takes English only — letters typed in the Russian layout turn into the English ones on the same keys",
       "minor": true
