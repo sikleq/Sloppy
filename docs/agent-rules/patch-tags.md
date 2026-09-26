@@ -262,3 +262,15 @@ REWORK теперь значит только настоящую передел�
 - Бейдж: бирюзовый (`.badge.swap`), фильтр SWAP на страницах патчей и Changes, полоса в динамике.
 - Вес: как у прежней строки REWORK таланта (сигнал K по доле выбора профи, иначе вес типа).
 - Генератор: первая строка `CANONICAL_TAGS`.
+
+
+## Переключаемые способности и тип урона (2026-09-27, решение владельца)
+
+- **Toggle под silence / невидимостью → MISC.** «Toggling is no longer disabled by silence», «Toggling no longer
+  breaks invisibility», «Now can be toggled while silenced», переключение стойки/оружия (Kez Switch Discipline
+  «Can no longer be disabled by Silence») — для такой способности это геймплей не меняет. 11 строк 7.40b–7.41e.
+  Касты НЕ-переключаемых способностей под root/silence остаются BUFF/NERF.
+- **Тип урона и классификация урона → REWORK**, всегда: «Damage type changed from Magical to Pure»,
+  «classified as reflection damage», «Now deals physical damage». Бафф это или нерф — зависит от ситуации,
+  решать не нам. 3 строки 7.38 (reflection) MISC → REWORK.
+- Генератор: первые правила `CANONICAL_TAGS`; тест `test_toggle_under_silence_or_invisibility_is_misc_and_damage_type_is_rework`.

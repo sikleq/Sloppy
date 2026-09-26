@@ -76,7 +76,7 @@ def build():
     W(ability("Drunken Brawler", slug="brewmaster_drunken_brawler"))
     W(ul_open())
     W(li("Brewed Up extend duration increased from 1s to 2s", b(1, 2)))
-    W(li("Toggling is no longer disabled by silence", t("BUFF")))
+    W(li("Toggling is no longer disabled by silence", t("MISC")))
     W(ul_close())
     W(ability("Primal Split", slug="brewmaster_primal_split"))
     W(ul_open())
@@ -264,7 +264,7 @@ def build():
     W(ul_open())
     W(li("Katana Base Attack Time worsened from 1.8s to 1.9s", b(1.8, 1.9, l=True)))
     W(li("Katana Bonus Agility Base Damage increased from 12% to 16%", b(12, 16)))
-    W(li("Can no longer be disabled by Silence", t("BUFF")))
+    W(li("Can no longer be disabled by Silence", t("MISC")))
     W(ul_close())
     W(ability("Falcon Rush", slug="kez_falcon_rush"))
     W(ul_open())
@@ -422,7 +422,7 @@ def build():
     W(hero_header("Muerta"))
     W(ability("Gunslinger", slug="muerta_gunslinger"))
     W(ul_open())
-    W(li("Toggling is no longer disabled by silence", t("BUFF")))
+    W(li("Toggling is no longer disabled by silence", t("MISC")))
     W(ul_close())
 
     # Necrophos
@@ -496,7 +496,7 @@ def build():
     W(ul_close())
     W(ability("Phantom Rush", slug="phantom_lancer_phantom_edge"))
     W(ul_open())
-    W(li("Toggling is no longer disabled by silence", t("BUFF")))
+    W(li("Toggling is no longer disabled by silence", t("MISC")))
     W(ul_close())
 
     # Primal Beast
@@ -696,7 +696,7 @@ def build():
     W(hero_header("Troll Warlord"))
     W(ability("Battle Stance", slug="troll_warlord_switch_stance"))
     W(ul_open())
-    W(li("Toggling is no longer disabled by silence", t("BUFF")))
+    W(li("Toggling is no longer disabled by silence", t("MISC")))
     W(ul_close())
 
     # Underlord

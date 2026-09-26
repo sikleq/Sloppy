@@ -55,9 +55,9 @@ import generate_patch_code_v2 as g
     ("Cooldown decreased from 30 to 25", None),
     # ── classes found by the 2026-09-18 datafeed proofread ──
     # removed own restriction / self-penalty → BUFF
-    ("Toggling is no longer disabled by silence", "BUFF"),
+    ("Toggling is no longer disabled by silence", "MISC"),   # owner 2026-09-27: toggles → MISC
     ("Can no longer be disabled by Silence", "BUFF"),
-    ("Now can be toggled while silenced", "BUFF"),
+    ("Now can be toggled while silenced", "MISC"),
     ("Raptor Dance: Can no longer be interrupted by casting Grappling Claw", "BUFF"),
     ("Activation no longer interrupts movement", "BUFF"),
     ("Land sub-ability no longer cancels channeling or interrupts movement", "BUFF"),
@@ -713,3 +713,15 @@ def test_no_talent_replacement_left_as_rework_in_content():
     bad = [f"{os.path.basename(f)}" for f in glob.glob(os.path.join(os.path.dirname(os.path.dirname(__file__)), "content", "p7*.py"))
            if rx.search(open(f, encoding="utf-8").read())]
     assert bad == []
+
+
+def test_toggle_under_silence_or_invisibility_is_misc_and_damage_type_is_rework():
+    """Owner 2026-09-27: what a toggle may be switched under doesn't change its gameplay → MISC;
+    a damage type / damage classification change → REWORK (buff or nerf depends on the situation)."""
+    import generate_patch_code_v2 as g
+    assert g._guess_tag("Toggling is no longer disabled by silence") == "MISC"
+    assert g._guess_tag("Toggling on/off no longer breaks invisibility and can be done while silenced") == "MISC"
+    assert g._guess_tag("Now can be toggled while silenced") == "MISC"
+    assert g._guess_tag("Damage type changed from Magical to Pure") == "REWORK"
+    assert g._guess_tag("Damage done is now classified as reflection damage") == "REWORK"
+    assert g._guess_tag("Now can be toggled on and off for the duration of the buff") == "NEW"

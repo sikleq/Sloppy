@@ -609,7 +609,7 @@ def build():
     W(ul_close())
     W(item_header("Radiance"))
     W(ul_open())
-    W(li("Burn toggling no longer breaks invisibility nor stops channels", t("BUFF")))
+    W(li("Burn toggling no longer breaks invisibility nor stops channels", t("MISC")))
     W(ul_close())
     W(item_header("Refresher Orb"))
     W(ul_open())

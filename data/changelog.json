@@ -2,6 +2,12 @@
   "_comment": "Site changelog (changelog.html). Newest first. Features and new pages = entries with 1-3 short items (optional link, \"shots\": [...] — 2+ = carousel). Small changes = {\"minor\": true, date, category, title, optional link}: listed under the day, folded under a toggle when there are more than 3. Categories: Patch Reader, Materials, Hero Lab, Dynamics, Site. Add an entry in the same commit as the change. \"fix\": true = a correction of something that was wrong (shown with a pixel beetle).",
   "entries": [
     {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "Toggles usable under silence or invisibility are MISC; damage type changes are REWORK (14 rows)",
+      "minor": true
+    },
+    {
       "date": "2026-09-26",
       "category": "Patch Reader",
       "title": "Hero scores weigh SWAP talents by their numbers too: one level earlier is worth ~1.43× the size",

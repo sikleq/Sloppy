@@ -192,7 +192,7 @@ def build():
     W(ul_close())
     W(ability("Amphibian Rhapsody"))
     W(ul_open())
-    W(li("Now can be toggled while silenced", t("BUFF")))
+    W(li("Now can be toggled while silenced", t("MISC")))
     W(li("Radius increased from 750 to 800", b(750, 800)))
     W(ul_close())
 

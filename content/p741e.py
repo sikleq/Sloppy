@@ -427,7 +427,7 @@ def build():
     W(hero_header("Medusa"))
     W(ability("Split Shot", slug="medusa_split_shot"))
     W(ul_open())
-    W(li("Toggling on/off no longer breaks invisibility and can be done while silenced", t("BUFF")))
+    W(li("Toggling on/off no longer breaks invisibility and can be done while silenced", t("MISC")))
     W(ul_close())
 
     # Morphling
@@ -442,7 +442,7 @@ def build():
     W(hero_header("Muerta"))
     W(ability("Gunslinger", slug="muerta_gunslinger"))
     W(ul_open())
-    W(li("Toggling on/off no longer breaks invisibility", t("BUFF")))
+    W(li("Toggling on/off no longer breaks invisibility", t("MISC")))
     W(ul_close())
 
     # Necrophos
@@ -625,7 +625,7 @@ def build():
     W(ul_close())
     W(ability("Battle Stance", slug="troll_warlord_switch_stance"))
     W(ul_open())
-    W(li("Toggling between stances no longer breaks invisibility", t("BUFF")))
+    W(li("Toggling between stances no longer breaks invisibility", t("MISC")))
     W(ul_close())
     W(ability("Battle Trance", slug="troll_warlord_battle_trance"))
     W(ul_open())
@@ -694,7 +694,7 @@ def build():
     W(ability("Lightning Hands", slug="zuus_lightning_hands"))
     W(ul_open())
     W(li("Bonus Attack Speed decreased from 30 to 20", b(30, 20)))
-    W(li("Toggling on/off no longer breaks invisibility and can be done while silenced", t("BUFF")))
+    W(li("Toggling on/off no longer breaks invisibility and can be done while silenced", t("MISC")))
     W(ul_close())
 
     write_footer()
