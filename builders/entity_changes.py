@@ -1122,7 +1122,7 @@ def _hero_group_stats(label, lst):
     else:
         base_of = lambda r: r["str"] + r["agi"] + r["int"]
         gain_of = lambda r: r["strg"] + r["agig"] + r["intg"]
-        attr_label = "Attributes"
+        attr_label = "Total"                 # the sum of the three attributes
     hi_base = max(rows, key=base_of); lo_base = min(rows, key=base_of)
     hi_gain = max(rows, key=gain_of); lo_gain = min(rows, key=gain_of)
 
@@ -1140,9 +1140,11 @@ def _hero_group_stats(label, lst):
         return f'<td colspan="{span}"{klass}>{html}</td>'
 
     def who(w, val):
-        return td(f'<a class="ec-hstat-who" href="heroes/{_esc(w["slug"])}.html">'
-                  f'<img class="ec-hs-face" src="{_esc(w["icon"])}" alt="" loading="lazy">'
-                  f'<span>{_esc(w["name"])}</span><b>{num(val)}</b></a>', 3)
+        """Two cells (owner 2026-09-26): the hero, left-aligned, then the value in its own column."""
+        return (td(f'<a class="ec-hstat-who" href="heroes/{_esc(w["slug"])}.html">'
+                   f'<img class="ec-hs-face" src="{_esc(w["icon"])}" alt="" loading="lazy">'
+                   f'<span>{_esc(w["name"])}</span></a>', 2, "ec-hs-hero")
+                + td(f'<b>{num(val)}</b>', 1, "ec-hs-val"))
 
     def row(label, cells):
         return f'<tr><th>{label}</th>{"".join(cells)}</tr>'

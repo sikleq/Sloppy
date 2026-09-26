@@ -10243,7 +10243,7 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-hstats { margin-top: auto; padding-top: 14px; }               /* pinned to the bottom → all four line up */
 /* Group summary: plain rows; small icons and colour make the numbers readable (2026-09-26) */
 .ec-hs-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; line-height: 1.35; }
-.ec-hs-table col.ec-hs-lab { width: 24%; }
+.ec-hs-table col.ec-hs-lab { width: 22.5%; }
 .ec-hs-table th, .ec-hs-table td { border: 1px solid rgba(255, 255, 255, 0.07); padding: 4px 5px; height: 26px;
   box-sizing: border-box; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ec-hs-table tbody th { text-align: left; font-weight: 400; color: var(--text-dim); }
@@ -10259,14 +10259,15 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-hs-table tr.ec-hs-cap th + th { text-align: center; font-family: inherit; letter-spacing: 0.4px; font-size: 10px;
   color: var(--text-dim); }
 .ec-hs-ico { width: 14px; height: 14px; object-fit: contain; vertical-align: -2px; margin-right: 4px; opacity: 0.9; }
-.ec-hs-table a.ec-hstat-who { display: flex; align-items: center; justify-content: flex-start; gap: 5px; min-width: 0; padding-left: 4px;
+.ec-hs-table a.ec-hstat-who { display: flex; align-items: center; justify-content: flex-start; gap: 4px; min-width: 0;
   color: var(--text-dim); }
 .ec-hs-table a.ec-hstat-who b { color: var(--text-bright); }
 .ec-hs-table a.ec-hstat-who span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: left; }
-.ec-hs-table a.ec-hstat-who b { flex: none; padding-right: 2px; }   /* hero first, the value on the cell's right edge */
+.ec-hs-table td.ec-hs-hero { text-align: left; }                     /* hero cell | value cell */
+.ec-hs-table td.ec-hs-val { text-align: center; }
 a.ec-hstat-who { text-decoration: none; }
 a.ec-hstat-who:hover { color: var(--gold); }
-.ec-hs-face { flex: none; width: 25px; height: 14px; object-fit: cover; }
+.ec-hs-face { flex: none; width: 22px; height: 12px; object-fit: cover; }
 .ec-hstat-who { color: var(--text-dim); font-weight: 400; }
 .ec-hcol-strength .ec-group-title { color: var(--attr-str); }
 .ec-hcol-agility .ec-group-title { color: var(--attr-agi); }

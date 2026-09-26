@@ -103,8 +103,10 @@ search sits behind the round loupe button».
 - **Talent tree** (`patch/talent_tree.py`, post-pass in `patch/page.py save_html`): the Talents block icon lights
   the changed twigs in gold, as the game lights a taken talent. Side = the hero's talent slots of THAT patch
   (`data/rules/talent_slots.json`, built by `tools/build_talent_slots.py` from the d2vpkr npc_heroes.txt
-  history): the first 8 `special_bonus_*` slots in order, first of each pair = RIGHT (checked on Liquipedia:
-  Axe, Abaddon, Sniper). A row is placed by words vs. today's tooltip + the ability/value the talent changed
+  history): the first 8 `special_bonus_*` slots in order, first of each pair = RIGHT. Source: the game's own
+  talent picker `panorama/layout/hud/dota_hud_stat_branch.vxml_c` (pak01): buttons Upgrade1/3/5/7 are
+  `BranchChoice RightBranch`, Upgrade2/4/6/8 `LeftBranch` (Upgrade N = the N-th talent slot). Liquipedia agrees
+  (14 heroes, 56 levels, 0 mirrored); no need to re-check per patch. A row is placed by words vs. today's tooltip + the ability/value the talent changed
   in its own patch; a row that fits neither side lights nothing. Gold copy of the icon: `icons/misc/talents_gold.svg`.
   Each placed row gets `data-tt="20r 25r"`, each twig its own gold `<image data-b>`; scripts.js "TALENT TREE"
   lights only the twigs of rows a filter leaves visible (a hidden NERF row's twig must not glow). Unlit twigs dim to 42%.
