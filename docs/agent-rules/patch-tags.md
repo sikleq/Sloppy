@@ -134,7 +134,7 @@ slow/DPS per cooldown, max slow, magic resistance bonus, search radius. `bstat_h
 
 `t("DEL")` — удаление фичи/эффекта/поведения. `t("NERF")` — количественное ослабление.
 
-«No longer …» → всегда DEL. «Level N Talent X replaced with Y» → REWORK. «No longer levels with X» (innate decoupling) → REWORK (эффект остаётся, только coupling убирается).
+«No longer …» → всегда DEL. «Level N Talent X replaced with Y» → SWAP (с 2026-09-26). «No longer levels with X» (innate decoupling) → REWORK (эффект остаётся, только coupling убирается).
 
 ### Снятое собственное ограничение → BUFF; добавленное → NERF (вычитка 2026-09-18)
 «Toggling is no longer disabled by silence», «Can no longer be interrupted by casting X», «no longer interrupts

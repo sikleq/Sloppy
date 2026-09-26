@@ -7,7 +7,7 @@
 - `t("DEL")` — **удаление фичи/эффекта/поведения/скейлинга**: «No longer …», «Removed …»
 - `t("NERF")` — **количественное ослабление** без удаления механики
 
-Строки с «No longer» → всегда DEL, не NERF. Строки «Level N Talent X replaced with Y» → REWORK (слот остаётся, контент меняется).
+Строки с «No longer» → всегда DEL, не NERF. Строки «Level N Talent X replaced with Y» → SWAP (с 2026-09-26; слот остаётся, контент меняется).
 
 ## «No longer has a penalty» → BUFF
 
