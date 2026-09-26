@@ -96,3 +96,16 @@ def test_a_deprecated_facet_does_not_keep_its_ability_alive():
     out = _drop_deprecated(kv)
     assert "furion_natures_profit" not in out and "furion_spirit" in out
     assert EMPTY_ABILITY_ICON.endswith("doom_bringer_empty1.webp")
+
+
+def test_a_former_innate_title_is_read_from_a_renamed_pane():
+    """Juggernaut 7.41 "Duelist -> Bladeform" (an innate pane): both names are innate, so neither gets
+    an ability chip — the INNATE filter covers them (owner 2026-09-26)."""
+    import html, re
+    from builders.entity_changes import _INNATE_TITLE_RE
+    body = ('<div class="ability-block ability-change-block is-innate"><div class="ability-icon-wrap"></div>'
+            '<h4 class="ability-title"><span class="ability-title-old">Duelist</span><span>→</span>'
+            '<span class="ability-title-new">Bladeform</span></h4>')
+    names = {p.strip() for m in _INNATE_TITLE_RE.finditer(body)
+             for p in html.unescape(re.sub(r"<[^>]+>", "→", m.group(1))).split("→") if p.strip()}
+    assert names == {"Duelist", "Bladeform"}

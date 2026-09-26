@@ -135,6 +135,8 @@ _SCOPE_LABEL = {"general": "General", "abilities": "Abilities", "talents": "Tale
                 "facets": "Facets", "other": "Other"}
 
 
+_INNATE_TITLE_RE = _re.compile(r'<div class="ability-block[^"]*is-innate[^"]*">'
+                               r'(?:(?!<div class="ability-block).)*?<h4 class="ability-title">(.*?)</h4>', _re.S)
 _AB_ICON_RE = _re.compile(r'<div class="ability-icon-wrap[^"]*"><img[^>]*?src="([^"]+)"[^>]*></div>'
                          r'<h4 class="ability-title">([^<]+)</h4>')
 _AGHS = {"shard": ("Aghanim's Shard", "../icons/stats/aghs_shard_icon.png"),
@@ -202,6 +204,7 @@ _TITLE_SLUG: dict[str, str] = {}      # ability display name -> engine slug seen
 
 
 _KIT_CACHE: dict[str, list[str]] = {}
+_KIT_FACET: dict[str, set] = {}      # npc -> display names of abilities granted by a facet
 _KIT_DEAD: dict[str, list] = {}       # npc -> display names of abilities left in the KV but no longer the hero's
 _KIT_EXTRA: dict[str, tuple] = {}      # npc -> (current innate names, slugs defined in the KV, all known slugs)
 
@@ -239,10 +242,15 @@ def _hero_kit(npc: str) -> list[str]:
     live = _live_abilities(txt, defs, slotted) if kv.exists() else set()
     _KIT_CACHE[npc] = [n for n in basics + ults + aghs if n in {(slim.get(d) or {}).get("dname") for d in live}]
     _KIT_EXTRA[npc] = ([n for n in dict.fromkeys(innates) if n], live, set(slim))
-    # abilities whose block is still in the KV but which the hero no longer has (Nature's Profit)
+    # abilities whose block is still in the KV but which the hero no longer has (Tar Bomb)
     _KIT_DEAD[npc] = [n for n in dict.fromkeys((slim.get(d) or {}).get("dname") for d in defs
                                                if d not in live and not d.startswith("special_bonus")
                                                and not (slim.get(d) or {}).get("is_innate")) if n]
+    # abilities a facet grants (removed facets too): no chip of their own, the FACETS filter covers them
+    # (owner 2026-09-26: Nature's Profit, Duelist, Time Zone, Spectral Blade)
+    fac = _re.search(r'(?ms)^\t\t"Facets"\s*\{(.*?)^\t\t\}', _code(txt)) if kv.exists() else None
+    _KIT_FACET[npc] = {(slim.get(a) or {}).get("dname") for a in
+                       _re.findall(r'"AbilityName"\s+"([a-z_0-9]+)"', fac.group(1) if fac else "")} - {None}
     return _KIT_CACHE[npc]
 
 
@@ -471,8 +479,15 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         via_talent = {a for p in e["patches"] for m in _re.finditer(r'data-ec-ab="([^"]*)"', p["_body"])
                       for a in _html.unescape(m.group(1)).split("|")}
         extra = [k for k in kit if k in via_talent and k not in current and k not in old]
-        # a former ability that only talents name (Nature's Profit, a removed facet's ability) -> OLD chip
+        # a former ability that only talents name (Tar Bomb) -> OLD chip
         old += [k for k in _KIT_DEAD.get(npc, []) if k in via_talent and k not in current and k not in old]
+        # ...but a facet's ability (Nature's Profit, Time Zone) or a former innate (Duelist, Blinding Sun)
+        # gets no chip at all: the FACETS / INNATE filters cover them (owner 2026-09-26)
+        innate_titles = {part.strip() for p in e["patches"] for m in _INNATE_TITLE_RE.finditer(p["_body"])
+                         for part in _html.unescape(_re.sub(r"<[^>]+>", "→", m.group(1))).split("→") if part.strip()}
+        no_chip = (_KIT_FACET.get(npc, set()) - set(kit)) | (innate_titles - set(kit))
+        old = [k for k in old if k not in no_chip]
+        current = [k for k in current if k not in no_chip or k.lower() in low]
         if extra:
             current = sorted(dict.fromkeys(current + extra), key=lambda t: low.get(t.lower(), 10_000))
 
