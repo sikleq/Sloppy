@@ -2350,6 +2350,8 @@ def build():
             desc=[
                 "Passive.",
                 "When not visible to the enemy team, Slark gains bonus movement speed and health regeneration.",
+                "Bonus Movement Speed: <b>6/24/36/48%</b>. Health Gained per Second: <b>5/70/100/130</b>. Levels with Shadow Dance.",
+                "If Slark is damaged by a neutral unit, the passive movement and health regeneration bonuses are lost for <b>2</b> seconds.",
             ],
         ),
         new=dict(

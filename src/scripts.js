@@ -3518,7 +3518,11 @@ function ecPinnableTip(tip, show, hide, sel) {
         // an active innate (Invoke) has a chip of its own: its block answers to it like any ability
         let ok = scopeOk && (!abilities.size || abilities.has(titleOf(blk)));
         // talents block: with an ability chip active, keep only the rows that upgrade that ability
-        const rows = blk.classList.contains('talents-block') ? [...blk.querySelectorAll('li')] : [];
+        // an innate block whose rows name another ability (Galvanized: "Leveling up Ball Lightning ...")
+        // answers to that ability's chip with those rows only, like talents
+        const rowFilter = blk.classList.contains('talents-block')
+          || (innate && abilities.size > 0 && !abilities.has(titleOf(blk)));
+        const rows = rowFilter ? [...blk.querySelectorAll('li')] : [];
         if (rows.length) {
           let anyRow = false;
           rows.forEach(li => {

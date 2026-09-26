@@ -10758,7 +10758,7 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 /* ---- Hero / item / unit Changes pages: icon filters (2026-09-26) ----
    Ability chips = the ability's own icon, the same 19px box as the tag badges, so the filter row keeps
    its height; a removed ability stays visible, greyed and half transparent. Shard / Scepter chips sit
-   after Innate with a light blue tint (the Aghanim colour). The name is a tooltip below the chip. */
+   after Innate in the site's gold. The name is a tooltip below the chip. */
 .ec-ab-btn.ec-ab-icon, .ec-scope-btn.ec-aghs-btn {
   position: relative; box-sizing: border-box; width: 19px; min-width: 0; height: 17px; padding: 0;
   display: inline-flex; align-items: center; justify-content: center; vertical-align: middle;
@@ -10767,11 +10767,16 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .ec-ab-btn.ec-ab-icon.ec-ab-old { border-style: dashed; opacity: 1; }
 .ec-ab-btn.ec-ab-icon.ec-ab-old img { filter: grayscale(1) brightness(0.8); opacity: 0.45; }
 .ec-ab-btn.ec-ab-icon.ec-ab-old:hover img, .ec-ab-btn.ec-ab-icon.ec-ab-old.active img { opacity: 0.8; }
-.ec-scope-btn.ec-aghs-btn {
-  color: #8fc3ff; background: rgba(80, 150, 235, 0.14); border-color: rgba(110, 170, 240, 0.5);
+/* Shard / Scepter chips in the site's gold (owner 2026-09-26): the regular warm scope-chip frame, the
+   game icon tinted gold; a pressed chip lights up like the other filters */
+.ec-scope-btn.ec-aghs-btn { color: var(--gold); }
+.ec-scope-btn.ec-aghs-btn img {
+  width: 13px; height: 13px; object-fit: contain; display: block;
+  filter: grayscale(1) sepia(1) saturate(2.6) hue-rotate(-8deg) brightness(1.15);
 }
-.ec-scope-btn.ec-aghs-btn:hover { background: rgba(80, 150, 235, 0.24); border-color: rgba(140, 190, 250, 0.8); }
-.ec-scope-btn.ec-aghs-btn img { width: 13px; height: 13px; object-fit: contain; display: block; }
+.ec-scope-btn.ec-aghs-btn:hover img, .ec-scope-btn.ec-aghs-btn.active img {
+  filter: grayscale(1) sepia(1) saturate(3.2) hue-rotate(-8deg) brightness(1.4);
+}
 .ec-ab-icon[data-tooltip]::after, .ec-aghs-btn[data-tooltip]::after {
   content: attr(data-tooltip); position: absolute; top: calc(100% + 6px); left: 50%;
   transform: translateX(-50%); white-space: nowrap; pointer-events: none; opacity: 0; z-index: 100;

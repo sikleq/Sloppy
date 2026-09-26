@@ -4,6 +4,21 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
+      "title": "7.40 Barracuda (old innate) shows its in-game numbers: movement speed 6/24/36/48%, health per second 5/70/100/130, levels with Shadow Dance",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.40.html"
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Dynamics",
+      "title": "Hero pages: ability filters follow the in-game slot order (Invoke right after Exort, an ultimate before its sub-abilities); an innate's row that names another ability answers that ability's filter (Ball Lightning -> Galvanized); Shard / Scepter filters in the site's gold",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Patch Reader",
       "title": "Innate abilities: a replaced innate is now an old → new card with both in-game descriptions (Barracuda → Essence Shift, Spectral → Desolate, Gift Bearer → Summon Spirit Bear in 7.40; Mental Fortitude → Aggrandize, Mana Magnifier → Special Reserve in 7.38), and innate changes sit in their own ability block instead of the hero's stats",
       "minor": true,
       "fix": true

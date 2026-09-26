@@ -258,7 +258,9 @@ def _hero_kit(npc: str) -> list[str]:
                 continue
             seen.add(slug)
             granted = bool(_re.search(r'"IsGrantedBy(?:Scepter|Shard)"\s+"1"', defs.get(slug, "")))
-            (aghs if granted else ults if slug in ultimates() else basics).append(name)
+            # slot order: an ultimate stays where its slot is (Invoke = slot 6, before the invoked spells in
+            # 7-16; owner 2026-09-26); only Scepter / Shard grants go to the end
+            (aghs if granted else basics).append(name)
     innates = [(slim.get(d) or {}).get("dname") for d in (slotted + list(defs)) if (slim.get(d) or {}).get("is_innate")]
     live = _live_abilities(txt, defs, slotted) if kv.exists() else set()
     _KIT_CACHE[npc] = [n for n in basics + ults + aghs if n in {(slim.get(d) or {}).get("dname") for d in live}]
@@ -362,6 +364,7 @@ def _live_abilities(txt: str, defs: dict, slotted: list) -> set:
 
 
 _TALENT_BLOCK_RE = _re.compile(r'<div class="ability-block talents-block">')
+_INNATE_BLOCK_RE = _re.compile(r'<div class="ability-block[^"]*\bis-innate\b[^"]*">')
 _LI_RE = _re.compile(r'<li\b([^>]*)>(.*?)</li>', _re.S)
 _TALENT_MARK_RE = _re.compile(r'Level\s+\d+\s+Talent', _re.I)
 
@@ -443,7 +446,19 @@ def _tag_talent_rows(body: str, names: list[str], hero_slug: str | None = None) 
     # pass 2: talent rows folded into a facet/ability block (a "Level N Talent"
     # <li> that pass 1 never saw). Only rows that look like a talent are touched.
     body = _LI_RE.sub(lambda mm: tag_li(mm, require_talent=True), body)
-    return body
+    # pass 3: rows of an INNATE block that name another ability ("Leveling up Ball Lightning no longer
+    # grants 3 Galvanized charges", Storm Spirit 7.40): the Ball Lightning chip shows that row too
+    # (owner 2026-09-26)
+    out, pos = [], 0
+    for m in _INNATE_BLOCK_RE.finditer(body):
+        if m.start() < pos:
+            continue
+        end = _balanced_div(body, m.start())
+        out.append(body[pos:m.start()])
+        out.append(_LI_RE.sub(tag_li, body[m.start():end]))
+        pos = end
+    out.append(body[pos:])
+    return "".join(out)
 
 
 def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
