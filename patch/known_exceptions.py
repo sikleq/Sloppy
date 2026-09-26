@@ -106,4 +106,17 @@ KNOWN_INNATE_NO_CDN_ICON = {
     "terrorblade_dark_unity",     # Dark Unity innate
     "wisp_essence_conduction",    # Io innate — no CDN art
     "ursa_maul",                  # Maul innate — Valve CDN 404 (checked 7.41f)
+    "dark_seer_aggrandize",         # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "dawnbreaker_break_of_dawn",    # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "earthshaker_slugger",          # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "ember_spirit_immolation",      # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "enigma_event_horizon",         # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "faceless_void_distortion_field", # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "hoodwink_mistwoods_wayfarer",  # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "mars_dauntless",               # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "naga_siren_eelskin",           # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "primal_beast_colossal",        # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "silencer_brain_drain",         # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "storm_spirit_galvanized",      # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
+    "void_spirit_intrinsic_edge",   # not in the client VPK nor the CDN (2026-09-26); the old PNG was unofficial
 }

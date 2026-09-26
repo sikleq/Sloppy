@@ -118,3 +118,14 @@ def test_active_innates_get_an_ability_chip():
     act = _active_innates()
     assert {"Invoke", "Stone Remnant", "Summon Spirit Bear"} <= act
     assert "Inner Beast" not in act
+
+
+def test_no_unofficial_icon_for_an_innate_without_game_art():
+    """Owner 2026-09-26: storm_spirit_galvanized.webp was not a game icon. 13 such PNGs (not in the client
+    VPK spellicons, not on Valve's CDN) moved to icons/_unofficial/; those innates show innate_icon.png."""
+    from patch.known_exceptions import KNOWN_INNATE_NO_CDN_ICON
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    back = [s for s in KNOWN_INNATE_NO_CDN_ICON
+            if os.path.exists(os.path.join(here, "icons", "abilities", f"{s}.png"))
+            or os.path.exists(os.path.join(here, "icons", "_t", "abilities", f"{s}.webp"))]
+    assert back == []
