@@ -4,6 +4,13 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
+      "title": "Reworked hero abilities, facets and innates now count in the hero's score too: measured from how often Tier 1-2 pros played the hero after the patch, minus what the hero's other changes already explain",
+      "minor": true,
+      "link": "patches/7.38.html"
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Patch Reader",
       "title": "Reworked item abilities now count in the item's score: measured from how Tier 1-2 pros bought the item after the patch (our own replay data), minus what its other changes already explain. Orb of Corrosion 7.38 is no longer a huge nerf",
       "minor": true,
       "link": "patches/7.38.html"

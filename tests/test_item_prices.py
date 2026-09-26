@@ -268,14 +268,24 @@ def test_unpriced_item_row_is_scaled_to_the_gold_scale():
 def test_rework_row_takes_the_adoption_shift_the_other_rows_do_not_explain(monkeypatch):
     """Signal R: Orb of Corrosion 7.38 lost ~1000 g of stats (net -3.84), yet pros bought it ~3x as often:
     the REWORK row (new Corrosion passive) gets the unexplained part, capped and shrunk by sample size."""
-    monkeypatch.setitem(W._ADOPT, "7.38", {"games": [8447, 1010], "items": {"orb_of_corrosion": [354, 120]}})
-    net = W.rework_adoption_net({"version": "7.38", "item": "orb_of_corrosion"}, -3.84)
+    monkeypatch.setitem(W._ADOPT["item"], "7.38", {"games": [8447, 1010], "n": {"orb_of_corrosion": [354, 120]}})
+    ctx = {"kind": "item", "version": "7.38", "item": "orb_of_corrosion"}
+    net = W.rework_adoption_net(ctx, -3.84)
     assert 0 < net <= W.ITEM_REWORK_CAP
     # the same shift, fully explained by the other rows -> nothing left for the rework
-    assert W.rework_adoption_net({"version": "7.38", "item": "orb_of_corrosion"}, 2.2) == 0.0
+    assert W.rework_adoption_net(ctx, 2.2) == 0.0
 
 
 def test_rework_row_without_adoption_data_stays_zero(monkeypatch):
-    monkeypatch.setitem(W._ADOPT, "7.38", {"games": [8447, 1010], "items": {"orb_of_corrosion": [10, 5]}})
-    assert W.rework_adoption_net({"version": "7.38", "item": "orb_of_corrosion"}, 0.0) is None   # < 30 buyers
-    assert W.rework_adoption_net({"version": "7.99", "item": "orb_of_corrosion"}, 0.0) is None   # no window
+    monkeypatch.setitem(W._ADOPT["item"], "7.38", {"games": [8447, 1010], "n": {"orb_of_corrosion": [10, 5]}})
+    assert W.rework_adoption_net({"kind": "item", "version": "7.38", "item": "orb_of_corrosion"}, 0.0) is None
+    assert W.rework_adoption_net({"kind": "item", "version": "7.99", "item": "orb_of_corrosion"}, 0.0) is None
+
+
+def test_hero_rework_uses_the_pro_pick_share(monkeypatch):
+    """Signal R for heroes: a hero picked 3x as often after a patch whose numbered rows net ~0 -> its
+    REWORK rows are a buff; picked as the other rows predict -> nothing."""
+    monkeypatch.setitem(W._ADOPT["hero"], "7.39", {"games": [10000, 10000], "n": {"pudge": [100, 300]}})
+    ctx = {"kind": "hero", "version": "7.39", "hero": "pudge"}
+    assert W.rework_adoption_net(ctx, 0.0) > 1.0
+    assert W.rework_adoption_net({**ctx, "kind": "ability"}, 0.0) is None

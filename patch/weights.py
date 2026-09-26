@@ -530,38 +530,48 @@ def _item_gold(text, tags, ctx):
     return None if g is None else (g, cost)
 
 
-try:
-    _ADOPT = _json.load(open(_os.path.join(_HERE, "data", "rules", "item_adoption.json"),
-                             encoding="utf-8"))["versions"]
-except OSError:
-    _ADOPT = {}
-# Signal R (2026-09-26): an item's REWORK row ("Passive: Corrosion. <new text>") has no number to read
-# its direction from; Valve's prices and follow-up patches do not tell it either (docs/weights.md
-# "Item reworks"). It gets the part of the pro adoption shift (DEMOS buy share, 21 days before vs
-# after) that the item's other rows do not explain. Fitted on 171 non-rework item cells 7.35c-7.41f:
-# dlog(buy share) = 0.41 x item net + 0.13 (rho 0.32); median |dlog| = 0.21 (meta noise).
-ADOPT_SLOPE = 0.41
-ADOPT_DRIFT = 0.127
-ADOPT_NOISE = 0.21
-ADOPT_MIN_BUYERS = 30        # player-games that bought the item, both windows together
-ADOPT_SHRINK_N = 100         # n / (n + 100): few buyers -> a smaller share of the shift
-ITEM_REWORK_CAP = 3.0
+def _load_adopt(name, key):
+    try:
+        return {v: {"games": x["games"], "n": x[key]} for v, x in _json.load(open(
+            _os.path.join(_HERE, "data", "rules", name), encoding="utf-8"))["versions"].items()}
+    except OSError:
+        return {}
+
+
+_ADOPT = {"item": _load_adopt("item_adoption.json", "items"), "hero": _load_adopt("hero_adoption.json", "heroes")}
+# Signal R (2026-09-26): a REWORK row ("Passive: Corrosion. <new text>", a reworked hero ability) has no
+# number to read its direction from; Valve's prices and follow-up patches do not tell it either
+# (docs/weights.md "Reworks"). It gets the part of the Tier 1-2 pro adoption shift (DEMOS, 21 days
+# before vs after; items: share of player-games that bought it, heroes: that played it) the entity's
+# other rows do not explain. Fitted on the non-rework cells 7.35c-7.41f:
+#   items  dlog = 0.41 x net + 0.13 (n 171, rho 0.32), median |dlog| 0.21 (meta noise)
+#   heroes dlog = 0.135 x net + 0.095 (n 577, rho 0.27), median |dlog| 0.36
+# The unexplained shift is real, not noise: independent halves of the windows agree, rho 0.55 / 0.43.
+ADOPT_FIT = {"item": {"slope": 0.41, "drift": 0.127, "noise": 0.21, "min_n": 30},
+             "hero": {"slope": 0.135, "drift": 0.095, "noise": 0.36, "min_n": 20}}
+ADOPT_SHRINK_N = 50          # n / (n + 50), n = harmonic mean of the before / after counts: the SMALLER
+                             # side decides how much of the shift is trusted (7.38 had ~100 matches after)
+ITEM_REWORK_CAP = 3.0        # cap of signal R for one entity per patch (items and heroes)
 
 
 def rework_adoption_net(ctx, other_net):
-    """Signal R: signed net of an item's REWORK row(s) at the end of the item block, or None
-    (no DEMOS window for the patch / too few buyers)."""
-    a = _ADOPT.get((ctx or {}).get("version") or "")
-    rec = a and a["items"].get((ctx or {}).get("item") or "")
+    """Signal R: signed net of an item's / a hero's REWORK rows at the end of its block, or None
+    (no DEMOS window for the patch / too few buyers or games)."""
+    ctx = ctx or {}
+    kind = ctx.get("kind")
+    fit = ADOPT_FIT.get(kind)
+    a = fit and _ADOPT[kind].get(ctx.get("version") or "")
+    rec = a and a["n"].get(ctx.get(kind) or "")
     if not rec:
         return None
     (g0, g1), (b0, b1) = a["games"], rec
-    if b0 + b1 < ADOPT_MIN_BUYERS or not g0 or not g1:
+    if b0 + b1 < fit["min_n"] or not g0 or not g1:
         return None
     d = _math.log(((b1 + 1) / g1) / ((b0 + 1) / g0))
-    resid = d - (ADOPT_SLOPE * other_net + ADOPT_DRIFT)
-    resid = (1 if resid > 0 else -1) * max(abs(resid) - ADOPT_NOISE, 0.0)
-    score = resid / ADOPT_SLOPE * (b0 + b1) / (b0 + b1 + ADOPT_SHRINK_N)
+    resid = d - (fit["slope"] * other_net + fit["drift"])
+    resid = (1 if resid > 0 else -1) * max(abs(resid) - fit["noise"], 0.0)
+    n = 2.0 / (1.0 / (b0 + 1) + 1.0 / (b1 + 1))
+    score = resid / fit["slope"] * n / (n + ADOPT_SHRINK_N)
     return round(max(-ITEM_REWORK_CAP, min(ITEM_REWORK_CAP, score)), 3)
 
 

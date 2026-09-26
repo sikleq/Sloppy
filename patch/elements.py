@@ -406,7 +406,7 @@ def _dyn_record_li(tags, extra_keys=None, scores=(0.0, 0.0)):
             if tag in _DYN_TAG_WHITELIST:
                 patch_bucket[tag] = patch_bucket.get(tag, 0) + 1
         net, vol = scores
-        if not net and "rework" in tags and ek == _State.current_entity_key and ek.startswith("item|"):
+        if not net and "rework" in tags and ek == _State.current_entity_key                 and ek.startswith(("item|", "hero|")):
             _note_rework(ek, pv)
         if net:
             patch_bucket["w"] = round(patch_bucket.get("w", 0.0) + net, 3)
@@ -1037,7 +1037,7 @@ def _note_rework(ek, pv):
 
 
 def _flush_rework():
-    """Signal R: the item's REWORK rows get the pro adoption shift its other rows do not explain.
+    """Signal R: an item's / hero's REWORK rows get the pro adoption shift its other rows do not explain.
     Runs after _flush_cost_panel, so the bucket's net already holds every other row of the item."""
     pend, _State.pending_rework = _State.pending_rework, None
     if not pend:

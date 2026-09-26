@@ -309,6 +309,25 @@ Corrosion), Drum of Endurance 7.38 −2.76 → −0.90, Mask of Madness 7.41e �
 Against OpenDota (independent): ρ 0.202 → 0.207. Patches without a DEMOS window (7.41: 7.41a came 4 days
 later; the newest patch until ~5 days of games) keep REWORK = 0 until `tools/refresh_weights_data.py` runs.
 
+### Signal R for heroes (2026-09-26)
+
+Same method for a hero's REWORK rows (reworked abilities, facets, innates, talent replacements signal K
+could not measure): share of Tier 1–2 player-games ON the hero, 21 days before vs after
+(`data/rules/hero_adoption.json`, same tool). On 577 non-rework hero cells: dlog = 0.135 × net + 0.095,
+ρ 0.27, meta noise 0.36 (heroes move more with the meta than items).
+
+**Trust in the sample** is the harmonic mean of the before / after counts, n / (n + 50) (items too, instead
+of the sum): 7.38 had ~100 Tier 1–2 matches in its after window, so a hero with 18 games before and 2 after is
+barely moved.
+
+**Is the unexplained shift real?** Independent halves of the windows (first vs second half of both the before
+and the after window, no shared matches): ρ 0.55 items, 0.43 heroes — mostly signal, not noise.
+**Out of sample** (signal R from half A, tested against half B, rework cells only): items ρ 0.19 → **0.57**
+(n 11), heroes −0.08 → **+0.19** (n 53).
+
+Heroes changed: 56 of 1224 cells, e.g. 7.38 Dark Seer +1.94 → +4.94, Jakiro +0.32 → +3.32, Storm Spirit
+0 → +2.71, Marci −1.15 → +1.85, Clockwerk −0.57 → −2.56; 7.38c Batrider +5.56 → +2.56.
+
 ## Backtest (docs/weights-review.md E.8.1) — 2026-09-16
 
 11 408 numeric hero events 7.08→7.41e. "Reverted" = same parameter moved the other way within 8 patches (base rate 6.0 %).
