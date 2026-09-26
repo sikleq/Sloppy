@@ -648,6 +648,7 @@
       ],
     },
   ];
+  window.SLOPPY_ABILITY_TREES = ABILITY_TREES;      // the Changes-page filters show a parent's children
 
   function drawBrewlingConnectors() {
     // Remove any existing SVGs so we can redraw fresh on each call.
@@ -3496,6 +3497,17 @@ function ecPinnableTip(tip, show, hide, sel) {
   const scopes = new Set(), abilities = new Set();
   // a renamed block "Old→New" answers to the chip "New"
   const titleOf = blk => { const t = blk.querySelector('.ability-title'); return t ? t.textContent.trim().split('→').pop().trim() : ''; };
+  const parentOfSlug = {};
+  (window.SLOPPY_ABILITY_TREES || []).forEach(t => t.children.forEach(c => { parentOfSlug[c] = t.parent; }));
+  const viaParent = blk => {
+    const img = blk.querySelector('img[data-slug]');
+    const parent = img && parentOfSlug[img.dataset.slug];
+    if (!parent) return false;
+    const scope = blk.closest('section.ec-patch') || document;
+    const pimg = scope.querySelector('img[data-slug="' + parent + '"]');
+    const pblk = pimg && pimg.closest('.ability-block');
+    return !!pblk && abilities.has(titleOf(pblk));
+  };
   const apply = () => {
     // "innate" is a pseudo-scope: it selects innate ability blocks wherever they sit;
     // "shard" / "scepter" select the rows an Aghanim upgrade changes (abilities, talents, facets)
@@ -3515,13 +3527,17 @@ function ecPinnableTip(tip, show, hide, sel) {
         if (viaAghs)            // chosen only for its Aghanim rows: the other rows step aside
           blk.querySelectorAll('ul.changes > li').forEach(li => { if (!aghsRows.includes(li)) li.classList.add('ec-aghs-hide'); });
         const scopeOk = baseOk || viaAghs;
-        // an active innate (Invoke) has a chip of its own: its block answers to it like any ability
-        let ok = scopeOk && (!abilities.size || abilities.has(titleOf(blk)));
+        // an active innate (Invoke) has a chip of its own: its block answers to it like any ability;
+        // a child of an ability tree (Earth Brewling) answers to its parent's chip (Primal Split)
+        let ok = scopeOk && (!abilities.size || abilities.has(titleOf(blk)) || viaParent(blk));
         // talents block: with an ability chip active, keep only the rows that upgrade that ability
         // an innate block whose rows name another ability (Galvanized: "Leveling up Ball Lightning ...")
         // answers to that ability's chip with those rows only, like talents
         const rowFilter = blk.classList.contains('talents-block')
           || (innate && abilities.size > 0 && !abilities.has(titleOf(blk)));
+        // rows hidden by an EARLIER chip come back first: Quas hid Invoke's rows, then Invoke showed an
+        // empty Invoke block (owner 2026-09-26)
+        if (!rowFilter) blk.querySelectorAll('li.ec-scope-hide').forEach(li => li.classList.remove('ec-scope-hide'));
         const rows = rowFilter ? [...blk.querySelectorAll('li')] : [];
         if (rows.length) {
           let anyRow = false;
@@ -3529,7 +3545,8 @@ function ecPinnableTip(tip, show, hide, sel) {
             const abs = (li.dataset.ecAb || '').split('|').filter(Boolean);
             const rowOk = !abilities.size || abs.some(a => abilities.has(a));
             li.classList.toggle('ec-scope-hide', abilities.size > 0 && !rowOk);
-            anyRow = anyRow || rowOk;
+            // a row the Shard / Scepter filter already hid does not keep the block alive
+            anyRow = anyRow || (rowOk && !li.classList.contains('ec-aghs-hide'));
           });
           ok = scopeOk && anyRow;
         }

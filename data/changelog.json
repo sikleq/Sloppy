@@ -3,6 +3,13 @@
   "entries": [
     {
       "date": "2026-09-26",
+      "category": "Dynamics",
+      "title": "Hero pages: an ability filter no longer shows empty blocks — rows hidden by a previously pressed ability come back (Invoke, Stone Remnant, Blur, Summon Spirit Bear…), ability + Shard/Scepter shows only blocks that have both, and Primal Split shows its Brewlings; Shard / Scepter filters back to blue",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-26",
       "category": "Patch Reader",
       "title": "7.40 Barracuda (old innate) shows its in-game numbers: movement speed 6/24/36/48%, health per second 5/70/100/130, levels with Shadow Dance",
       "minor": true,
