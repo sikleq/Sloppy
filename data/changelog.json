@@ -4,6 +4,13 @@
     {
       "date": "2026-09-26",
       "category": "Dynamics",
+      "title": "Hero Changes: the summary under each attribute column is visual now — melee / ranged bar, move speed, game-style HP and mana bars, attribute averages with their icons, and the base / gain records as small hero cards linking to the hero",
+      "minor": true,
+      "link": "hero_changes.html"
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Dynamics",
       "title": "Hero pages: abilities that Aghanim's Shard / Scepter grant (Cold Blooded, Tree Volley, Warp Flare…) are marked as Shard / Scepter rows and covered by those filters instead of a chip; ability filters in the true slot order (Elder Titan, Invoker); 6 official ability icons that were missing (Cold Blooded, Stifling Dagger, Global Silence, Swiftslash, Flame Cloak, Bunny Hop)",
       "minor": true,
       "fix": true
