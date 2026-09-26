@@ -3701,7 +3701,9 @@ h4.subgroup .subgroup-new-type {
 }
 /* Formula tables inside ability_change panes show only 7 key levels
    (L1/5/10/15/20/25/30) — columns 3-5, 7-10, 12-15 are the intermediate
-   L2-L4, L6-L9, L11-L14 columns (col 1 = label, col 2 = L1, col 6 = L5…). */
+   L2-L4, L6-L9, L11-L14 columns (col 1 = label, col 2 = L1, col 6 = L5…).
+   Only the DEFAULT grid (.lvl-default): a "per 3 levels" table has its own
+   step grid (L1/3/6/…/30, badges.step_levels) and shows every column. */
 .ability-change-body .formula-table {
   font-size: 10.5px;
   margin: 0;
@@ -3709,8 +3711,8 @@ h4.subgroup .subgroup-new-type {
   table-layout: fixed;
   font-variant-numeric: tabular-nums;
 }
-.ability-change-body .formula-table th:is(:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(7),:nth-child(8),:nth-child(9),:nth-child(10),:nth-child(12),:nth-child(13),:nth-child(14),:nth-child(15)),
-.ability-change-body .formula-table td:is(:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(7),:nth-child(8),:nth-child(9),:nth-child(10),:nth-child(12),:nth-child(13),:nth-child(14),:nth-child(15)) {
+.ability-change-body .formula-table.lvl-default th:is(:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(7),:nth-child(8),:nth-child(9),:nth-child(10),:nth-child(12),:nth-child(13),:nth-child(14),:nth-child(15)),
+.ability-change-body .formula-table.lvl-default td:is(:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(7),:nth-child(8),:nth-child(9),:nth-child(10),:nth-child(12),:nth-child(13),:nth-child(14),:nth-child(15)) {
   display: none;
 }
 .ability-change-body .formula-table th,

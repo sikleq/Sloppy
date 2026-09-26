@@ -2103,6 +2103,7 @@ def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
     if label:
         bf_kwargs.setdefault('axis_label', label)
         bf_kwargs.setdefault('jump_at', None)
+    bf_kwargs.setdefault('extra_formulas', (old_formula,))   # old -> new steps: union of breakpoints
     trigger, badge, table = bf(old_fn, new_fn, new_formula, l=l, **bf_kwargs)
     if force_rework:
         badge = '<span class="badge-group"></span>'

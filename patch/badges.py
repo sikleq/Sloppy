@@ -1,5 +1,6 @@
 """Badge and percentage-change helpers: b, br, bf, t, gradient_class, facet_badge, scale_pill."""
 
+import re
 from .images import _FACET_ICONS
 
 
@@ -218,9 +219,39 @@ def fold(text):
     return f'<span class="formula-old">{text}</span>'
 
 
+_PER_N_LEVELS_RE = re.compile(r"per\s+(\d+)?\s*(?:hero\s+)?level(\s*-?\s*ups?)?", re.I)
+DEFAULT_LEVELS = list(range(1, 16)) + [20, 25, 30]
+MAX_COLUMNS = 20          # wider than this does not fit a patch row
+
+
+def step_levels(*formula_texts, max_level=30):
+    """Level grid of a formula table that follows the formula's own interval (owner 2026-09-26:
+    "0.1 + 0.1 per 3 levels" showed L1-15, L20, L25, L30 — every 5th level after 15).
+    "per N levels" changes at N, 2N, ...; "per N level ups" at N+1, 2N+1, ... (level 1 has no level up).
+    Several formulas (old -> new) -> the union of their breakpoints; a per-level formula among them adds
+    the default grid. None when no formula steps by more than one level (the caller keeps its default)."""
+    grid, stepped, per_level = {1, max_level}, False, False
+    for text in formula_texts:
+        for m in _PER_N_LEVELS_RE.finditer(re.sub(r"<[^>]+>", " ", text or "")):
+            n = int(m.group(1) or 1)
+            if n <= 1:
+                per_level = True
+                continue
+            stepped = True
+            off = 1 if m.group(2) else 0
+            grid.update(k * n + off for k in range(1, max_level // n + 1) if k * n + off <= max_level)
+    if not stepped:
+        return None
+    if per_level:                  # every level changes anyway: the default grid, plus sparse steps
+        grid.update(DEFAULT_LEVELS)
+        if len(grid) > MAX_COLUMNS:
+            return None
+    return sorted(grid)
+
+
 def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
        level_prefix='L', level_fmt=None, jump_at=20, headline_level=1,
-       effective_unchanged=False, axis_label=None):
+       effective_unchanged=False, axis_label=None, extra_formulas=()):
     """Formula-based change. Returns (trigger_html, badge_html, table_html).
     The trigger wraps formula_text as a clickable pill that toggles the table.
     Tag is determined by `headline_level` (default L1).
@@ -236,7 +267,11 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
     The Delta% row is dropped automatically when every level resolves to the same
     delta — in that case the headline badge already conveys the full picture."""
     if levels is None:
-        levels = list(range(1, 16)) + [20, 25, 30]
+        levels = step_levels(formula_text, *extra_formulas)
+        if levels is not None:
+            jump_at = None                      # an even step grid has no "L15 -> L20" gap
+        else:
+            levels = list(DEFAULT_LEVELS)
     elif isinstance(levels, int):
         levels = list(range(1, levels + 1))
 
@@ -259,7 +294,7 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
         val_cells  = "".join(f'<td{_cls(L)}>{value_fmt.format(new_fn(L))}</td>' for L in levels)
         trigger = f'<span class="formula-trigger" data-formula="{fid}">{formula_text}</span>'
         badge   = '<span class="badge-group"></span>'
-        table   = (f'<table class="formula-table" id="{fid}" hidden>'
+        table   = (f'<table class="formula-table{" lvl-default" if levels == DEFAULT_LEVELS else ""}" id="{fid}" hidden>'
                    f'<thead><tr>{axis_th}{head_cells}</tr></thead>'
                    f'<tbody><tr><th class="row-label-new">value</th>{val_cells}</tr></tbody>'
                    f'</table>')
@@ -345,7 +380,7 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
     values_unchanged = all(old_fn(L) == new_fn(L) for L in levels)
     if values_unchanged:
         table = (
-            f'<table class="formula-table" id="{fid}" hidden>'
+            f'<table class="formula-table{" lvl-default" if levels == DEFAULT_LEVELS else ""}" id="{fid}" hidden>'
             f'<thead><tr>{axis_th}{head_cells}</tr></thead>'
             f'<tbody><tr><th class="row-label-new">value</th>{new_cells}</tr></tbody>'
             f'</table>'
@@ -364,7 +399,7 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
     )
 
     table = (
-        f'<table class="formula-table" id="{fid}" hidden>'
+        f'<table class="formula-table{" lvl-default" if levels == DEFAULT_LEVELS else ""}" id="{fid}" hidden>'
         f'<thead><tr>{axis_th}{head_cells}</tr></thead>'
         f'<tbody>'
         f'<tr><th class="row-label-old">old</th>{old_cells}</tr>'
@@ -721,7 +756,11 @@ def scale_pill(formula_text, fn, levels=None, value_fmt="{:g}",
     description rows. Use for brand-new abilities whose scaling shouldn't
     be diffed against a previous version."""
     if levels is None:
-        levels = list(range(1, 16)) + [20, 25, 30]
+        levels = step_levels(formula_text)
+        if levels is not None:
+            jump_at = None
+        else:
+            levels = list(DEFAULT_LEVELS)
     elif isinstance(levels, int):
         levels = list(range(1, levels + 1))
     _formula_id_counter[0] += 1
@@ -734,7 +773,7 @@ def scale_pill(formula_text, fn, levels=None, value_fmt="{:g}",
     head_cells = "".join(f'<th{cls_for(L)}>{level_fmt(L) if level_fmt else f"{level_prefix}{L}"}</th>' for L in levels)
     val_cells  = "".join(f'<td{cls_for(L)}>{value_fmt.format(fn(L))}</td>' for L in levels)
     table = (
-        f'<table class="formula-table" id="{fid}" hidden>'
+        f'<table class="formula-table{" lvl-default" if levels == DEFAULT_LEVELS else ""}" id="{fid}" hidden>'
         f'<thead><tr><th>{axis_label}</th>{head_cells}</tr></thead>'
         f'<tbody><tr><th class="row-label-new">value</th>{val_cells}</tr></tbody>'
         f'</table>'

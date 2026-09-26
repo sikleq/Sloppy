@@ -638,3 +638,15 @@ def test_unstated_total_cost_change_gets_its_own_row():
     # a block that already states the cost is left alone
     stated = block[:3] + ['    W(li("Total cost decreased from 4900 to 3300", b(4900, 3300, l=True)))'] + block[3:]
     assert g._postprocess_unstated_total_cost(stated) == stated
+
+
+def test_formula_table_follows_the_formulas_own_interval():
+    """Owner 2026-09-26, Ancient Apparition 7.41: "0.1 + 0.1 per 3 levels" showed L1-15, L20, L25, L30."""
+    from patch.badges import step_levels, scale_pill
+    assert step_levels("0.1 + 0.1 per 3 levels") == [1, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30]
+    assert step_levels("20 + 20 per 3 hero levels")[:3] == [1, 3, 6]
+    assert step_levels("7 + 1 per 4 level ups")[:3] == [1, 5, 9]                 # level ups: +1
+    assert step_levels("2 + 1 per 7 levels", "2 + 1 per 6 levels") == [1, 6, 7, 12, 14, 18, 21, 24, 28, 30]
+    assert step_levels("5 + 2 per level") is None                               # the default grid
+    _, table = scale_pill("0.1 + 0.1 per 3 levels", lambda L: 0.1 + 0.1 * (L // 3))
+    assert "<th>L27</th>" in table and "<th>L20</th>" not in table
