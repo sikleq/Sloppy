@@ -289,3 +289,23 @@ def test_hero_rework_uses_the_pro_pick_share(monkeypatch):
     ctx = {"kind": "hero", "version": "7.39", "hero": "pudge"}
     assert W.rework_adoption_net(ctx, 0.0) > 1.0
     assert W.rework_adoption_net({**ctx, "kind": "ability"}, 0.0) is None
+
+
+def test_base_damage_next_to_effective_damage_rows_is_scored_once(v738, monkeypatch):
+    """Dark Seer 7.38 (owner): "Base Damage increased by 26" only makes up for the Universal multiplier
+    0.7 -> 0.45; the real change is "Damage at level 1" / "at level 30". "Damage gain per level" is the
+    L30 row again. Only L1 + L30 (and the other rows) count."""
+    from patch.elements import hero_header, li, ul_open, ul_close
+    monkeypatch.setitem(W._ADOPT, "hero", {})                 # no signal R in this test
+    _State.dynamics.pop("hero|dark-seer", None)
+    hero_header("Dark Seer")
+    ul_open()
+    li("Base Damage increased by 26", b(24, 50))
+    li("Damage at level 1 increased by 5 (from 49-55 to 54-60)", b(52, 57))
+    li("Damage gain per level decreased from +5 to +2.7", b(5, 2.7))
+    li("Damage at level 30 decreased by 75 (from 221-227 to 146-152)", t("NERF"))
+    ul_close()
+    hero_header("Dark Willow")                                # ends the block
+    cell = _cell("hero|dark-seer", "7.38")
+    assert cell["w"] == pytest.approx(1.00 - 1.80, abs=0.05)       # L1 +1.00, L30 -1.80 (was -0.85 with all four)
+    assert cell["buff"] == 2 and cell["nerf"] == 2                 # the rows are still shown and tallied

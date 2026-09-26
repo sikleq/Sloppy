@@ -37,6 +37,7 @@ class _State:
                                      # rows that shouldn't inflate the dynamics.
     pending_cost_panel = None        # an item's components panel total A -> B, scored at the end
     pending_rework = None            # an item's unscored REWORK rows, scored at the end (signal R)
+    damage_rows = None               # hero damage rows of the block: base / L1 / gain / L30 (no double count)
                                      # of the block unless an li() row states the cost itself
 
 

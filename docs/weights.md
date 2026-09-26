@@ -328,6 +328,21 @@ and the after window, no shared matches): ρ 0.55 items, 0.43 heroes — mostly 
 Heroes changed: 56 of 1224 cells, e.g. 7.38 Dark Seer +1.94 → +4.94, Jakiro +0.32 → +3.32, Storm Spirit
 0 → +2.71, Marci −1.15 → +1.85, Clockwerk −0.57 → −2.56; 7.38c Batrider +5.56 → +2.56.
 
+## Hero damage rows counted once (2026-09-26)
+
+Owner, Dark Seer 7.38: "Base Damage increased by 26" is not a change of its own — 7.38 lowered the Universal
+damage per attribute 0.7 → 0.45 (and Dark Seer went Universal → Intelligence), and base damage was raised to
+make up for it. The damage the hero really has is "Damage at level 1" (base + attributes × multiplier) and
+"Damage at level 30"; "Damage gain per level" is (L30 − L1) / 29, the L30 row again. Rule
+(`_note_damage_row` / `_flush_damage_rows`, end of the hero block): with an L1 or L30 row in the block the
+Base Damage row is taken back out of the net and volume; with an L30 row the gain row is too. A Base Damage
+change with no L1/L30 row still counts. The rows stay on the page and in the tag tallies.
+Effect: 76 hero cells; hero net vs Tier 1–2 pick share ρ 0.250 → 0.253 (signal R constants unchanged).
+Dark Seer 7.38 rows: +1.80 base, +1.00 L1, −1.85 gain, −1.80 L30 = −0.85 → L1 + L30 = −0.80 (the base and
+gain rows nearly cancelled); with signal R +4.94 → +4.99. Largest moves: Lifestealer 7.41 +9.26 → +7.46,
+Dawnbreaker 7.41 +2.54 → +1.33, Earth Spirit 7.40 −3.15 → −1.95, Spectre 7.38 +2.88 → +1.76, Dark Willow
+7.38 +0.57 → −0.47.
+
 ## Backtest (docs/weights-review.md E.8.1) — 2026-09-16
 
 11 408 numeric hero events 7.08→7.41e. "Reverted" = same parameter moved the other way within 8 patches (base rate 6.0 %).

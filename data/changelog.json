@@ -4,6 +4,14 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
+      "title": "Hero scores: a Base Damage change next to \"Damage at level 1 / 30\" is no longer counted on top of them (7.38 raised base damage only to make up for the lower Universal multiplier), and \"Damage gain per level\" is not counted twice with level 30",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.38.html"
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Patch Reader",
       "title": "Reworked hero abilities, facets and innates now count in the hero's score too: measured from how often Tier 1-2 pros played the hero after the patch, minus what the hero's other changes already explain",
       "minor": true,
       "link": "patches/7.38.html"

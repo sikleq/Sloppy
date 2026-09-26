@@ -328,6 +328,7 @@ def _mech_tag(label):
 
 def _open_block(extra_cls='', extra_attrs=''):
     _flush_cost_panel()                                   # the previous item's components panel
+    _flush_damage_rows()                                  # the previous hero's damage rows, once
     _flush_rework()                                       # ... and its REWORK rows (signal R)
     pre = _close_ability_block()
     _State.new_mech_header = _State.new_mech = False     # a new block ends any "new mechanic" run
@@ -356,6 +357,7 @@ def _open_block(extra_cls='', extra_attrs=''):
 
 def _close_block():
     _flush_cost_panel()
+    _flush_damage_rows()
     _flush_rework()
     out = _close_ability_block()
     if _State.block_open:
@@ -1027,6 +1029,48 @@ def _cost_panel_covered(score_text):
         _State.pending_cost_panel = None
 
 
+_DMG_ROW_RE = re.compile(r'^\s*(?:(base damage)|(damage (?:at|on) level 1(?!\d))|(damage gain per level)'
+                         r'|(damage at level 30))', re.I)
+
+
+def _note_damage_row(text, scores):
+    """Hero damage rows of one block, scored once (owner 2026-09-26, Dark Seer 7.38). "Damage at level 1"
+    / "at level 30" are the damage the hero really has (base + attributes x multiplier); a "Base Damage
+    increased by 26" next to them is one of their parts — 7.38 lowered the Universal multiplier 0.7 -> 0.45
+    and raised base damage to make up for it, so alone it means nothing. "Damage gain per level" is
+    (L30 - L1) / 29, i.e. the L30 row again. Such rows are taken back out at the end of the block."""
+    ek, pv = _State.current_entity_key or "", _State.current_patch_version
+    m = _DMG_ROW_RE.match(re.sub(r'<[^>]+>', ' ', text or ''))
+    if not (m and ek.startswith("hero|") and pv and not _State.dyn_skip_li):
+        return
+    rows = _State.damage_rows
+    if not rows or (rows["ek"], rows["pv"]) != (ek, pv):
+        _flush_damage_rows()
+        rows = _State.damage_rows = {"ek": ek, "pv": pv, "rows": []}
+    kind = ("base", "l1", "gain", "l30")[[i for i in range(4) if m.group(i + 1)][0]]
+    rows["rows"].append((kind, scores[0], scores[1]))
+
+
+def _flush_damage_rows():
+    rows, _State.damage_rows = _State.damage_rows, None
+    if not rows:
+        return
+    kinds = {k for k, _, _ in rows["rows"]}
+    drop = set()
+    if kinds & {"l1", "l30"}:
+        drop.add("base")
+    if "l30" in kinds:
+        drop.add("gain")
+    rec = _State.dynamics.get(rows["ek"])
+    if rec is None or not drop:
+        return
+    bucket = rec["patches"].setdefault(rows["pv"], {})
+    for k, net, vol in rows["rows"]:
+        if k in drop:
+            bucket["w"] = round(bucket.get("w", 0.0) - net, 3)
+            bucket["v"] = round(bucket.get("v", 0.0) - vol, 3)
+
+
 def _note_rework(ek, pv):
     pend = _State.pending_rework
     if pend and (pend["ek"], pend["pv"]) == (ek, pv):
@@ -1113,9 +1157,9 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         # "Recipe cost 1350 -> 1250" + note "Total cost unchanged": the buyer pays the same
         _score_text += ". " + re.sub(r'<[^>]+>', ' ', extra)
     _cost_panel_covered(_score_text)
-    _dyn_record_li(dyn_tags, extra_keys=also_dyn,
-                   scores=_row_scores(_score_text, dyn_tags, badge,
-                                      ctx=_row_ctx(text if isinstance(text, str) else "")))
+    _scores = _row_scores(_score_text, dyn_tags, badge, ctx=_row_ctx(text if isinstance(text, str) else ""))
+    _dyn_record_li(dyn_tags, extra_keys=also_dyn, scores=_scores)
+    _note_damage_row(_score_text, _scores)
     if isinstance(text, str) and 'del' in dyn_tags:
         _low = text.strip().rstrip('.').lower()
         if _low in ('removed', 'item removed from the game',
