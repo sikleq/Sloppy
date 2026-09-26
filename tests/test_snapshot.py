@@ -22,7 +22,7 @@ EXPECTED = {
     "badge_nerf": 203,
     "badge_new": 1,
     "badge_del": 5,
-    "badge_rework": 2,
+    "badge_rework": 1,  # -1: the talent swap row is SWAP now (2026-09-26)
     "badge_misc": 2,  # +1: Linger non-lethal row MISC restored (2026-09-23)
 }
 

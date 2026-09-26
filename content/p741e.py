@@ -381,7 +381,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 25 Talent Duel Refreshes Cooldown On Victory replaced with Duel Advances Cooldown by 30s On Victory", t("REWORK")))
+    W(li("Level 25 Talent Duel Refreshes Cooldown On Victory replaced with Duel Advances Cooldown by 30s On Victory", t("SWAP")))
     W(ul_close())
 
     # Lina
@@ -568,7 +568,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent Mortimer Kisses Burn DPS decreased from +35 to +30", b(35, 30)))
-    W(li("Level 15 Talent -3s Firesnap Cookie Cooldown replaced with +125 Cast Range", t("REWORK")))
+    W(li("Level 15 Talent -3s Firesnap Cookie Cooldown replaced with +125 Cast Range", t("SWAP")))
     W(li("Level 25 Talent Mortimer Kisses Launched decreased from +8 to +6", b(8, 6)))
     W(ul_close())
 

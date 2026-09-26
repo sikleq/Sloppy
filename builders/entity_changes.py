@@ -119,6 +119,7 @@ _TOOLBAR = '''<div class="toolbar">
         <button class="badge new filter-btn" data-filter="new">NEW</button>
         <button class="badge del filter-btn" data-filter="del">DEL</button>
         <button class="badge rework filter-btn" data-filter="rework">REWORK</button>
+        <button class="badge swap filter-btn" data-filter="swap">SWAP</button>
         <button class="badge misc filter-btn" data-filter="misc">MISC</button>
         <button class="badge qol filter-btn" data-filter="qol">QoL</button>
         {scopes}{abilities}

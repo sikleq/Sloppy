@@ -708,6 +708,7 @@ def t(tag):
         "BUFF":   ("buff-text", "buff"),
         "NERF":   ("nerf-text", "nerf"),
         "REWORK": ("rework",    "rework"),
+        "SWAP":   ("swap",      "swap"),       # a talent replaced by another in the same slot
         "MISC":   ("misc",      "misc"),
         "QoL":    ("qol",       "qol"),
         "NEW":    ("new",       "new"),

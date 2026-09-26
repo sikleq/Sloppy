@@ -355,7 +355,7 @@ def save_dyn_matrix(*, kind, roster_key, out_file, page_title, subtab, noun,
     _TAG_CHIPS = [
         ('buff', 'buff-text', 'BUFF'), ('nerf', 'nerf-text', 'NERF'),
         ('new', 'new', 'NEW'), ('del', 'del', 'DEL'),
-        ('rework', 'rework', 'REWORK'), ('misc', 'misc', 'MISC'),
+        ('rework', 'rework', 'REWORK'), ('swap', 'swap', 'SWAP'), ('misc', 'misc', 'MISC'),
         ('qol', 'qol', 'QoL'),
     ]
     tag_chips = ''.join(

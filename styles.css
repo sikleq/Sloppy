@@ -4264,8 +4264,10 @@ ul.changes li.li-notext[data-tag*="misc"]::before  { content: "MISC"; background
 ul.changes li.li-notext[data-tag*="new"]::before   { content: "NEW"; background: rgba(220,175,95,0.06); color: #9a7f4d; border-color: rgba(220,175,95,0.22); }
 ul.changes li.li-notext[data-tag*="del"]::before   { content: "DEL"; background: rgba(180,70,70,0.07); color: #a86060; border-color: rgba(180,70,70,0.25); }
 ul.changes li.li-notext[data-tag*="rework"]::before { content: "REWORK"; background: rgba(180,145,220,0.05); color: #7d6e93; border-color: rgba(180,145,220,0.15); }
+ul.changes li.li-notext[data-tag*="swap"]::before { content: "SWAP"; background: rgba(95,176,164,0.05); color: #5b8f87; border-color: rgba(95,176,164,0.18); }
 /* Hide redundant inline tag spans (since ::before shows them) */
 ul.changes li.li-notext > .badge.rework,
+ul.changes li.li-notext > .badge.swap,
 ul.changes li.li-notext > .badge.misc,
 ul.changes li.li-notext > .badge.qol,
 ul.changes li.li-notext > .badge.new,
@@ -4765,6 +4767,12 @@ ul.changes li > .badge-group {
   background: rgba(180, 145, 220, 0.05);
   color: #7d6e93;
   border: 1px solid rgba(180, 145, 220, 0.15);
+}
+/* SWAP (2026-09-26): a talent replaced by another in the same slot — teal, apart from REWORK purple */
+.badge.swap {
+  background: rgba(95, 176, 164, 0.05);
+  color: #5b8f87;
+  border: 1px solid rgba(95, 176, 164, 0.18);
 }
 .badge.misc {
   background: rgba(150, 146, 137, 0.06);
@@ -10572,7 +10580,7 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 /* Tag chips (BUFF / NERF / NEW / DEL / REWORK / MISC / QOL, the GROUP / scope chips) in the pixel font.
    Same box as before (11px line box + 3px padding) so rows and toolbars don't grow; value badges
    (+50, 0%) keep the regular font for legibility. */
-.badge.buff-text, .badge.nerf-text, .badge.rework, .badge.new, .badge.del, .badge.misc, .badge.qol,
+.badge.buff-text, .badge.nerf-text, .badge.rework, .badge.swap, .badge.new, .badge.del, .badge.misc, .badge.qol,
 .cat-filter-btn, .ec-scope-btn {
   font-family: var(--font-j10);
   font-size: 15px;
@@ -10679,6 +10687,7 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
    REWORK = clear violet, DEL = wine (rose-red, apart from NERF's orange-red). */
 .badge.new    { color: #d4ae55; background: rgba(220, 175, 95, 0.10);  border-color: rgba(220, 175, 95, 0.38); }
 .badge.rework { color: #a58ad2; background: rgba(170, 135, 220, 0.09); border-color: rgba(170, 135, 220, 0.34); }
+.badge.swap   { color: #6fbfb2; background: rgba(95, 176, 164, 0.09);  border-color: rgba(95, 176, 164, 0.34); }
 .badge.del    { color: #c0668e; background: rgba(190, 85, 130, 0.09);  border-color: rgba(190, 85, 130, 0.34); }
 /* Pressed filter chip = a neon sign: the letters glow in the chip's own colour and the frame
    lights up with a soft halo of the same colour (no plain outline ring). */

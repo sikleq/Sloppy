@@ -726,7 +726,7 @@ def row_scores(text, tags, badge_html="", ctx=None):
         d = _DIR["buff"] if "buff" in tags else _DIR["nerf"]
         val = _row_value(text, badge_html, kind, ctx) * cm
         return round(d * val, 3), round(val, 3)
-    if "rework" in tags:
+    if "rework" in tags or "swap" in tags:                 # SWAP = a talent replaced (was REWORK)
         if item_row is not None and item_row[0]:           # "Now provides X instead of Y"
             return item_row[0], round(max(w, item_row[1]), 3)
         net = _talent_tier_net(ctx, cm)             # signal K: talent replacement / level move

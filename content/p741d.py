@@ -438,7 +438,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +12% Magic Resistance replaced with +6% Switch Discipline Swap Bonuses", t("REWORK"), extra=inline_note("Katana Swap Bonus Damage from 12% to 18%. Sai Swap Movement Speed from 12% to 18%")))
+    W(li("Level 10 Talent +12% Magic Resistance replaced with +6% Switch Discipline Swap Bonuses", t("SWAP"), extra=inline_note("Katana Swap Bonus Damage from 12% to 18%. Sai Swap Movement Speed from 12% to 18%")))
     W(ul_close())
 
     # Largo

@@ -495,8 +495,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent Tombstone on Death replaced with +4 Tombstone Attacks to Destroy", t("REWORK")))
-    W(li("Level 25 Talent +6 Tombstone Attacks to Destroy replaced with Tombstone on Death", t("REWORK")))
+    W(li("Level 20 Talent Tombstone on Death replaced with +4 Tombstone Attacks to Destroy", t("SWAP")))
+    W(li("Level 25 Talent +6 Tombstone Attacks to Destroy replaced with Tombstone on Death", t("SWAP")))
     W(ul_close())
 
     # Vengeful Spirit
@@ -520,7 +520,7 @@ def build():
     W(hero_header("Windranger"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +25 Easy Breezy Min/Max Movespeed replaced with +4 All Attributes", t("REWORK")))
+    W(li("Level 10 Talent +25 Easy Breezy Min/Max Movespeed replaced with +4 All Attributes", t("SWAP")))
     W(ul_close())
 
     # Winter Wyvern

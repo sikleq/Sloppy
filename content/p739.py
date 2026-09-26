@@ -656,7 +656,7 @@ def build():
         desc=f"Replaces 15/20/25/30% Spell Amplification with 10/15/20/25% base damage amplification. The ability now also silences the target and can be cast on enemies. Decreases Cast Range from 800 to 400. Increases Mana Cost from 0 to 60. {inline_note("Level 20 Talent that reduces Bloodrage's Max Health damage doesn't affect enemy casts. Aghanim's Scepter upgrade also affects only Bloodseeker and doesn't provide bonus damage to enemies")}"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +25 Bloodrage Attack Speed replaced with +175 Health", t("REWORK")))
+    W(li("Level 10 Talent +25 Bloodrage Attack Speed replaced with +175 Health", t("SWAP")))
     W(ul_close())
 
     # Bounty Hunter
@@ -726,8 +726,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent -5s Spin Web Charge Restore Time replaced with +12 Incapacitating Bite Attack Bonus", t("REWORK")))
-    W(li("Level 20 Talent +12 Incapacitating Bite Attack Bonus replaced with -6s Spin Web Charge Restore Time", t("REWORK")))
+    W(li("Level 15 Talent -5s Spin Web Charge Restore Time replaced with +12 Incapacitating Bite Attack Bonus", t("SWAP")))
+    W(li("Level 20 Talent +12 Incapacitating Bite Attack Bonus replaced with -6s Spin Web Charge Restore Time", t("SWAP")))
     W(li("Level 10 Talent Spider's Milk Hero Health as heal increased from +0.5% to +1.5%", b(0.5, 1.5)))
     W(ul_close())
 
@@ -775,7 +775,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent -30s Hand of God Cooldown replaced with +20% Divine Favor Heal Amplification", t("REWORK")))
+    W(li("Level 20 Talent -30s Hand of God Cooldown replaced with +20% Divine Favor Heal Amplification", t("SWAP")))
     W(li("Level 15 Talent Holy Persuasion Damage increased from +12 to +14", b(12, 14)))
     W(li("Level 20 Talent Holy Persuasion Minimum Health increased from +1200 to +1300", b(1200, 1300)))
     W(ul_close())
@@ -797,7 +797,7 @@ def build():
         desc="Clockwerk gains an ability to self-cast Chainmail item to consume it. Each consumed Chainmail provides him with +4 Armor. Number of stacks is unlimited"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent +75 Rocket Flare Damage replaced with +70 Power Cogs Mana Burn", t("REWORK")))
+    W(li("Level 20 Talent +75 Rocket Flare Damage replaced with +70 Power Cogs Mana Burn", t("SWAP")))
     W(ul_close())
 
     # Crystal Maiden
@@ -904,8 +904,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +1.5s Static Storm Duration replaced with +60 Static Storm Max DPS", t("REWORK")))
-    W(li("Level 20 Talent +0.6s Thunder Strike Slow Duration replaced with +150 Electromagnetic Repulsion Radius/Knockback", t("REWORK")))
+    W(li("Level 15 Talent +1.5s Static Storm Duration replaced with +60 Static Storm Max DPS", t("SWAP")))
+    W(li("Level 20 Talent +0.6s Thunder Strike Slow Duration replaced with +150 Electromagnetic Repulsion Radius/Knockback", t("SWAP")))
     W(li("Level 20 Talent Kinetic Field Duration decreased from +2s to +1.5s", b(2, 1.5)))
     W(ul_close())
 
@@ -1173,7 +1173,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent -4s Sun Strike Cooldown replaced with +1 Facet Orb Level", t("REWORK")))
+    W(li("Level 15 Talent -4s Sun Strike Cooldown replaced with +1 Facet Orb Level", t("SWAP")))
     W(li("Level 20 Talent Alacrity Damage/Speed increased from +30 to +35", b(30, 35)))
     W(ul_close())
 
@@ -1229,7 +1229,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent -3s Blade Fury Cooldown replaced with +90 Blade Fury DPS", t("REWORK")))
+    W(li("Level 20 Talent -3s Blade Fury Cooldown replaced with +90 Blade Fury DPS", t("SWAP")))
     W(ul_close())
 
     # Keeper of the Light
@@ -1317,9 +1317,9 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +1.5 Mana Regen replaced with +50 Raptor Dance Radius", t("REWORK")))
-    W(li("Level 15 Talent Raven's Veil Mark Applies Parry Bonus replaced with +1 Raptor Dance Strike", t("REWORK")))
-    W(li("Level 20 Talent +50% Falcon Rush Evasion replaced with Add 50% of Attack Damage to Talon Toss (always uses attack value of Sai discipline)", t("REWORK")))
+    W(li("Level 10 Talent +1.5 Mana Regen replaced with +50 Raptor Dance Radius", t("SWAP")))
+    W(li("Level 15 Talent Raven's Veil Mark Applies Parry Bonus replaced with +1 Raptor Dance Strike", t("SWAP")))
+    W(li("Level 20 Talent +50% Falcon Rush Evasion replaced with Add 50% of Attack Damage to Talon Toss (always uses attack value of Sai discipline)", t("SWAP")))
     W(li("Level 20 Talent Kazurai Katana Damage Per Second decreased from +5% to +4%", b(5, 4)))
     W(ul_close())
 
@@ -1555,8 +1555,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent 2 Dead Shot Charges replaced with +2s Pierce The Veil Duration", t("REWORK")))
-    W(li("Level 25 Talent +25% Magic Resistance replaced with 2 Dead Shot Charges", t("REWORK")))
+    W(li("Level 20 Talent 2 Dead Shot Charges replaced with +2s Pierce The Veil Duration", t("SWAP")))
+    W(li("Level 25 Talent +25% Magic Resistance replaced with 2 Dead Shot Charges", t("SWAP")))
     W(ul_close())
 
     # Naga Siren
@@ -1580,7 +1580,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 25 Talent Ensnare applies Break replaced with +25 Agility", t("REWORK")))
+    W(li("Level 25 Talent Ensnare applies Break replaced with +25 Agility", t("SWAP")))
     W(ul_close())
 
     # Nature's Prophet
@@ -1595,7 +1595,7 @@ def build():
     W(new_facet("furion_natures_profit",
         desc=f"Whenever an enemy hero is killed by Nature's Prophet or dies within 750 range of him, 2 seconds later a money tree grows in their place. Each tree spawns 2 gold bags every second, which can be picked up by any hero. Each gold bag grants gold equal to 1.5x of the killed hero's level. Each money tree has a lifespan of 3s {inline_note('Gold bags are created in 200–250 radius from the tree and disappear after 15s of lying on the ground. Gold Bags are automatically picked up by heroes within 50 range from them. Money tree provides 2x Tango healing similarly to Ironwood Tree')}"))
     W(ul_open())
-    W(li("Level 15 Talent +100 Teleportation Barrier replaced with +1 Nature's Profit Gold Bags Per Tick", t("REWORK")))
+    W(li("Level 15 Talent +100 Teleportation Barrier replaced with +1 Nature's Profit Gold Bags Per Tick", t("SWAP")))
     W(ul_close())
     W(facet_header("furion_soothing_saplings"))
     W(ul_open())
@@ -1624,7 +1624,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +125 Reaper's Scythe Cast Range replaced with -2.5s Ghost Shroud Cooldown", t("REWORK")))
+    W(li("Level 10 Talent +125 Reaper's Scythe Cast Range replaced with -2.5s Ghost Shroud Cooldown", t("SWAP")))
     W(ul_close())
 
     # Night Stalker
@@ -1742,7 +1742,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent +300 Phantom Rush Range replaced with +15% Spirit Lance Illusion Damage", t("REWORK")))
+    W(li("Level 20 Talent +300 Phantom Rush Range replaced with +15% Spirit Lance Illusion Damage", t("SWAP")))
     W(ul_close())
 
     # Phoenix
@@ -1829,7 +1829,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +200 Escape Act Cast Range replaced with +75 Impalement Arts Impact Damage", t("REWORK")))
+    W(li("Level 10 Talent +200 Escape Act Cast Range replaced with +75 Impalement Arts Impact Damage", t("SWAP")))
     W(ul_close())
 
     # Rubick
@@ -1874,7 +1874,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 25 Talent 35% Sand Storm Slow and Blind replaced with 45% Sand Storm Slow", t("REWORK")))
+    W(li("Level 25 Talent 35% Sand Storm Slow and Blind replaced with 45% Sand Storm Slow", t("SWAP")))
     W(li("Level 20 Talent Base/Incremental Radius of Epicenter decreased from +100/12 to +75/7", b([100, 12], [75, 7])))
     W(ul_close())
 
@@ -1904,7 +1904,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent Presence Aura Affects Buildings replaced with +2 Presence Armor Reduction", t("REWORK")))
+    W(li("Level 15 Talent Presence Aura Affects Buildings replaced with +2 Presence Armor Reduction", t("SWAP")))
     W(ul_close())
 
     # Shadow Shaman
@@ -1941,7 +1941,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent 1 Glaives of Wisdom Bounce replaced with +40s Glaives of Wisdom Int Steal Duration", t("REWORK")))
+    W(li("Level 20 Talent 1 Glaives of Wisdom Bounce replaced with +40s Glaives of Wisdom Int Steal Duration", t("SWAP")))
     W(ul_close())
 
     # Skywrath Mage
@@ -1951,8 +1951,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +0.5x Arcane Bolt Int Multiplier replaced with +125 Arcane Bolt Cast Range", t("REWORK")))
-    W(li("Level 25 Talent Arcane Bolt Pierces Spell Immunity replaced with +1.5x Arcane Bolt Int Multiplier", t("REWORK")))
+    W(li("Level 10 Talent +0.5x Arcane Bolt Int Multiplier replaced with +125 Arcane Bolt Cast Range", t("SWAP")))
+    W(li("Level 25 Talent Arcane Bolt Pierces Spell Immunity replaced with +1.5x Arcane Bolt Int Multiplier", t("SWAP")))
     W(ul_close())
 
     # Slardar
@@ -1985,7 +1985,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent +60 Mortimer Kisses Impact Damage replaced with 2 Firesnap Cookie Charges", t("REWORK")))
+    W(li("Level 20 Talent +60 Mortimer Kisses Impact Damage replaced with 2 Firesnap Cookie Charges", t("SWAP")))
     W(ul_close())
 
     # Sniper
@@ -2064,7 +2064,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +100 Psi Blades Attack and Split Range replaced with +3 Meld Armor Reduction", t("REWORK")))
+    W(li("Level 15 Talent +100 Psi Blades Attack and Split Range replaced with +3 Meld Armor Reduction", t("SWAP")))
     W(li("Level 10 Talent Meld Debuff Duration decreased from +2.5s to +2s", b(2.5, 2)))
     W(ul_close())
 
@@ -2220,7 +2220,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent Gale Creates Plague Wards replaced with +50 Base Damage", t("REWORK")))
+    W(li("Level 20 Talent Gale Creates Plague Wards replaced with +50 Base Damage", t("SWAP")))
     W(ul_close())
 
     # Viper
@@ -2261,9 +2261,9 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +50 Aether Remnant Damage replaced with +40 Resonant Pulse Damage", t("REWORK")))
-    W(li("Level 15 Talent +70 Resonant Pulse Damage replaced with +60 Aether Remnant Damage", t("REWORK")))
-    W(li("Level 15 Talent Aether Remnant Provides 475 Truesight replaced with +20% Resonant Pulse Barrier", t("REWORK"), extra=inline_note("Affects both base and per hero hit values")))
+    W(li("Level 10 Talent +50 Aether Remnant Damage replaced with +40 Resonant Pulse Damage", t("SWAP")))
+    W(li("Level 15 Talent +70 Resonant Pulse Damage replaced with +60 Aether Remnant Damage", t("SWAP")))
+    W(li("Level 15 Talent Aether Remnant Provides 475 Truesight replaced with +20% Resonant Pulse Barrier", t("SWAP"), extra=inline_note("Affects both base and per hero hit values")))
     W(li("Level 10 Talent Mana Regen decreased from +1.75 to +1.5", b(1.75, 1.5)))
     W(li("Level 20 Talent Astral Step Charge Restore Time Reduction decreased from 4s to 3s", b(4, 3)))
     W(ul_close())
@@ -2349,8 +2349,8 @@ def build():
     W(hero_header("Zeus"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +1.75 Mana Regen replaced with +1 Heavenly Jump Target", t("REWORK")))
-    W(li("Level 15 Talent +1 Heavenly Jump Target replaced with -0.4s Arc Lightning Cooldown", t("REWORK")))
+    W(li("Level 10 Talent +1.75 Mana Regen replaced with +1 Heavenly Jump Target", t("SWAP")))
+    W(li("Level 15 Talent +1 Heavenly Jump Target replaced with -0.4s Arc Lightning Cooldown", t("SWAP")))
     W(li("Level 25 Talent Static Field Damage increased from +1% to +1.5%", b(1, 1.5)))
     W(ul_close())
 

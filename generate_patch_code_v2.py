@@ -218,6 +218,9 @@ def _strip_html(s):
 # IMPORTANT: BUFF-override patterns must come BEFORE DEL patterns since
 # 'no longer has a penalty' should NOT be DEL.
 CANONICAL_TAGS = [
+    # SWAP (owner 2026-09-26): a talent replaced by another in the same slot — its own tag, not REWORK
+    # ("Level 15 Talent +110 Rolling Boulder Damage replaced with +80 Boulder Smash Damage")
+    (re.compile(r'^\s*Level \d+(?: Talent)?:?\s.*\breplaced with\b', re.I), 'SWAP'),
     # BUFF first — removing a penalty / restriction is positive (memory rule
     # sloppy_no_longer_penalty_is_buff). Tightly anchored so legitimate DEL
     # phrasings don't accidentally match.

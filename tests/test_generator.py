@@ -695,3 +695,21 @@ def test_innate_rows_leave_the_stats_ul():
         'W(hero_header("Slark"))', 'W(ul_open())',
         'W(li("Removed Barracuda innate ability (effect moved to the Ultimate)", t("DEL")))', 'W(ul_close())'])
     assert gone[1].startswith("# TODO[innate-swap]") and gone[2] == 'W(ability("Barracuda", slug="slark_barracuda", innate=True))'
+
+
+
+def test_a_talent_replacement_is_swap_not_rework():
+    """Owner 2026-09-26: "Level N Talent X replaced with Y" gets its own SWAP tag."""
+    import generate_patch_code_v2 as g
+    assert g._guess_tag("Level 15 Talent +110 Rolling Boulder Damage replaced with +80 Boulder Smash Damage") == "SWAP"
+    assert g._guess_tag("Level 10: +8 Strength replaced with +2 Tree Grab Attacks") == "SWAP"
+    assert g._guess_tag("Wisdom Runes removed and replaced with new buildings") != "SWAP"
+
+
+def test_no_talent_replacement_left_as_rework_in_content():
+    import glob
+    import re
+    rx = re.compile(r'W\(li\("Level \d+(?: Talent)?:?\s[^"]*?\breplaced with\b[^"]*"[^\n]*(t\("REWORK"\)|data-tag="rework")')
+    bad = [f"{os.path.basename(f)}" for f in glob.glob(os.path.join(os.path.dirname(os.path.dirname(__file__)), "content", "p7*.py"))
+           if rx.search(open(f, encoding="utf-8").read())]
+    assert bad == []

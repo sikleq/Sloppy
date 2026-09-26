@@ -25,7 +25,7 @@ CARD = (243, 239, 230)
 INK = (34, 30, 26)
 MUTED = (112, 104, 92)
 LINE = (200, 191, 174)
-TAG = {"buff": (40, 148, 74), "nerf": (196, 62, 54), "rework": (208, 130, 24),
+TAG = {"buff": (40, 148, 74), "nerf": (196, 62, 54), "rework": (208, 130, 24), "swap": (208, 130, 24),
        "new": (52, 120, 200), "del": (105, 105, 105), "misc": (150, 145, 135), "qol": (95, 150, 170)}
 TAG_LABEL = {"buff": "BUFF", "nerf": "NERF", "rework": "REWORK", "new": "NEW", "del": "REMOVED",
              "misc": "MISC", "qol": "QoL"}

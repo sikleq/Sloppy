@@ -230,7 +230,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent 2 Flamebreak Charges replaced with -6s Flamebreak Cooldown", t("REWORK")))
+    W(li("Level 20 Talent 2 Flamebreak Charges replaced with -6s Flamebreak Cooldown", t("SWAP")))
     W(li("Level 20 Talent Smoldering Resin Duration increased from +2s to +4s", b(2, 4)))
     W(li("Level 25 Talent Sticky Napalm Damage increased from +15 to +20", b(15, 20)))
     W(ul_close())
@@ -284,7 +284,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +90 Attack Speed replaced with +5s Nothl Projection Duration", t("REWORK")))
+    W(li("Level 15 Talent +90 Attack Speed replaced with +5s Nothl Projection Duration", t("SWAP")))
     W(li("Level 10 Talent Poison Touch Attack Range decreased from +300 to +200", b(300, 200)))
     W(ul_close())
     
@@ -517,8 +517,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent -1s Purifying Flames Cooldown replaced with +25% Purifying Flames Enemy Damage", t("REWORK")))
-    W(li("Level 20 Talent +30% Purifying Flames Enemy Damage replaced with -1s Purifying Flames Cooldown", t("REWORK")))
+    W(li("Level 15 Talent -1s Purifying Flames Cooldown replaced with +25% Purifying Flames Enemy Damage", t("SWAP")))
+    W(li("Level 20 Talent +30% Purifying Flames Enemy Damage replaced with -1s Purifying Flames Cooldown", t("SWAP")))
     W(ul_close())
     
     # Phantom Assassin
@@ -685,7 +685,7 @@ def build():
     W(ul_open())
     W(li("Cooldown decreased from 50s to 42s", b(50, 42, l=True)))
     W(li("Skeleton Duration increased from 40s to 46s", b(40, 46)))
-    W(li("Level 10 Talent +25%/-25% Bone Guard Duration / Cooldown replaced with +2s Wraithfire Blast Slow Duration", t("REWORK")))
+    W(li("Level 10 Talent +25%/-25% Bone Guard Duration / Cooldown replaced with +2s Wraithfire Blast Slow Duration", t("SWAP")))
     W(ul_close())
     W(ability("Wraithfire Blast", slug="skeleton_king_hellfire_blast"))
     W(ul_open())

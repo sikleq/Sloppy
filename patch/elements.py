@@ -105,6 +105,7 @@ _PROP_TAG_CSS = {
     'BUFF':   'buff-text',
     'NERF':   'nerf-text',
     'REWORK': 'rework',
+    'SWAP': 'swap',
     'MISC':   'misc',
     'QOL':    'qol',
     'NEW':    'new',
@@ -375,7 +376,7 @@ def _close_ability_block():
     return ''
 
 
-_DYN_TAG_WHITELIST = {"buff", "nerf", "new", "del", "rework", "misc", "qol"}
+_DYN_TAG_WHITELIST = {"buff", "nerf", "new", "del", "rework", "swap", "misc", "qol"}
 
 
 def _dyn_record_li(tags, extra_keys=None, scores=(0.0, 0.0)):
@@ -408,7 +409,7 @@ def _dyn_record_li(tags, extra_keys=None, scores=(0.0, 0.0)):
             if tag in _DYN_TAG_WHITELIST:
                 patch_bucket[tag] = patch_bucket.get(tag, 0) + 1
         net, vol = scores
-        if not net and "rework" in tags and ek == _State.current_entity_key                 and ek.startswith(("item|", "hero|")):
+        if not net and tags & {"rework", "swap"} and ek == _State.current_entity_key                 and ek.startswith(("item|", "hero|")):
             _note_rework(ek, pv)
         if net:
             patch_bucket["w"] = round(patch_bucket.get("w", 0.0) + net, 3)
@@ -1187,7 +1188,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         tag_str = " ".join(sorted(tags))
 
     text_tag_re = re.search(
-        r'<span class="badge (buff-text|nerf-text|rework|misc|qol|new|del)"[^>]*>\w+</span>\s*',
+        r'<span class="badge (buff-text|nerf-text|rework|swap|misc|qol|new|del)"[^>]*>\w+</span>\s*',
         badge
     )
     if text_tag_re:
@@ -1376,7 +1377,7 @@ def _formula_pct_badge(o, n, lower=False):
 
 def formula_change(name, old, new, *, tag="REWORK", vary=None, fixed=None,
                    unit="", lower_better=False):
-    _TAG = {'NEW': ('new', 'new'), 'REWORK': ('rework', 'rework'),
+    _TAG = {'NEW': ('new', 'new'), 'REWORK': ('rework', 'rework'), 'SWAP': ('swap', 'swap'),
             'BUFF': ('buff-text', 'buff'), 'NERF': ('nerf-text', 'nerf'),
             'DEL': ('del', 'del'), 'MISC': ('misc', 'misc'), 'QOL': ('qol', 'qol')}
     badge_cls, tag_id = _TAG.get(tag.upper(), (tag.lower(), tag.lower()))
@@ -1571,7 +1572,7 @@ def properties_change(old, new, old_extras=None, new_extras=None):
             old_rows[i] = ("",) + tuple(o[1:])
             new_rows[i] = (o[0],) + tuple(nw[1:])
     _DYN_PROP_MAP = {"BUFF": "buff", "NERF": "nerf", "NEW": "new",
-                     "DEL": "del", "REWORK": "rework", "MISC": "misc",
+                     "DEL": "del", "REWORK": "rework", "SWAP": "swap", "MISC": "misc",
                      "QoL": "qol"}
     # Tally AND score every tagged property (after the normalisation above a changed value carries
     # its tag on the new side; the multiset of tags is unchanged). A changed value is scored as

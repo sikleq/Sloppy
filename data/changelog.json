@@ -3,6 +3,12 @@
   "entries": [
     {
       "date": "2026-09-26",
+      "category": "Patch Reader",
+      "title": "New SWAP tag for replaced talents (455 rows); REWORK now means a real rework",
+      "minor": true
+    },
+    {
+      "date": "2026-09-26",
       "category": "Materials",
       "title": "AoE Increase: columns follow the hero's ability slots (#1–#3 basic, #4 ultimate — Mana Void, Ice Blast and Culling Blade no longer sit in #1/#3), Scepter / Shard and extra abilities stacked in one Other column; labels like \"Speed\" read \"Speed radius\"",
       "minor": true,

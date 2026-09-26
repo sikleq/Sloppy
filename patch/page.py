@@ -59,6 +59,7 @@ def write_head(version, date):
         <button class="badge new filter-btn" data-filter="new">NEW</button>
         <button class="badge del filter-btn" data-filter="del">DEL</button>
         <button class="badge rework filter-btn" data-filter="rework">REWORK</button>
+        <button class="badge swap filter-btn" data-filter="swap">SWAP</button>
         <button class="badge misc filter-btn" data-filter="misc">MISC</button>
         <button class="badge qol filter-btn" data-filter="qol">QoL</button>
       </div>
@@ -302,11 +303,11 @@ def _li_rank(li_html):
     (NEW carries data-tag='buff new', DEL carries 'del nerf'). For numeric
     rows the left-tag is synthesized in li() based on data-overall, so
     'buff-text' / 'nerf-text' covers both textual and numeric BUFF/NERF."""
-    m = re.search(r'<span class="badge (buff-text|nerf-text|rework|misc|qol|new|del)"', li_html)
+    m = re.search(r'<span class="badge (buff-text|nerf-text|rework|swap|misc|qol|new|del)"', li_html)
     if m:
         kind = m.group(1)
         return {
-            'new': 1, 'rework': 2,
+            'new': 1, 'rework': 2, 'swap': 2,
             'buff-text': 3, 'nerf-text': 4,
             'del': 5,
             'qol': 6, 'misc': 7,

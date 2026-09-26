@@ -756,6 +756,7 @@
     buff:   [93, 177, 78],   // green
     new:    [220, 175, 95],  // gold
     rework: [164, 114, 207], // purple
+    swap:   [95, 176, 164],  // teal — a talent replaced (2026-09-26)
     misc:   [139, 144, 153], // grey
     qol:    [108, 171, 240], // blue
     del:    [177, 78, 107],  // pink
@@ -779,18 +780,18 @@
   }
   const DYN_TAG_LABEL = {
     buff:'BUFF', nerf:'NERF', new:'NEW', del:'DEL',
-    rework:'REWORK', misc:'MISC', qol:'QoL',
+    rework:'REWORK', swap:'SWAP', misc:'MISC', qol:'QoL',
   };
   // Tag id → page-badge css class. Matches the styles in styles.css so
   // tooltip badges look identical to the row badges everywhere else.
   const DYN_TAG_BADGE_CLASS = {
     buff:'buff-text', nerf:'nerf-text', new:'new', del:'del',
-    rework:'rework', misc:'misc', qol:'qol',
+    rework:'rework', swap:'swap', misc:'misc', qol:'qol',
   };
   // Order is also the visual top→bottom band stack inside each pill, AND
   // the row order in the tooltip grid. Sequenced so neighbouring bands
   // change hue family (green → gold → purple → grey → blue → pink → red).
-  const DYN_TAG_ORDER = ['buff','new','rework','misc','qol','del','nerf'];
+  const DYN_TAG_ORDER = ['buff','new','rework','swap','misc','qol','del','nerf'];
   // Tags kept OUT of the dyn-cell colored gradient. Now EMPTY — MISC (grey)
   // and QoL (blue) are coloured bands like every other tag (user request), so
   // they contribute to the diamond's fill on both patch pages and heroes_dyn.

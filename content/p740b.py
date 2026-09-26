@@ -134,7 +134,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +1 Death Pact Charge replaced with -10s Death Pact Charge Restore Time", t("REWORK")))
+    W(li("Level 15 Talent +1 Death Pact Charge replaced with -10s Death Pact Charge Restore Time", t("SWAP")))
     W(ul_close())
 
     # Dazzle
@@ -507,8 +507,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent Basic Self-Dispel on Uproar Cast replaced with +6 Uproar Armor Per Stack", t("REWORK")))
-    W(li("Level 20 Talent +7 Uproar Armor Per Stack replaced with Basic Self-Dispel on Uproar Cast", t("REWORK")))
+    W(li("Level 15 Talent Basic Self-Dispel on Uproar Cast replaced with +6 Uproar Armor Per Stack", t("SWAP")))
+    W(li("Level 20 Talent +7 Uproar Armor Per Stack replaced with Basic Self-Dispel on Uproar Cast", t("SWAP")))
     W(ul_close())
 
     # Pudge
@@ -714,8 +714,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +5 Fury Swipes Damage replaced with +0.5% Maul Health as Damage", t("REWORK")))
-    W(li("Level 20 Talent +0.5% Maul Health as Damage replaced with +6 Fury Swipes Damage", t("REWORK")))
+    W(li("Level 15 Talent +5 Fury Swipes Damage replaced with +0.5% Maul Health as Damage", t("SWAP")))
+    W(li("Level 20 Talent +0.5% Maul Health as Damage replaced with +6 Fury Swipes Damage", t("SWAP")))
     W(li("Level 20 Talent Earthshock Radius decreased from +400 to +300", b(400, 300)))
     W(ul_close())
 
@@ -727,8 +727,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +20 Corrosive Skin Damage Per Second replaced with +10% Poison Attack Slow/Damage", t("REWORK")))
-    W(li("Level 15 Talent +15% Poison Attack Slow/Damage replaced with +20 Corrosive Skin Damage Per Second", t("REWORK")))
+    W(li("Level 10 Talent +20 Corrosive Skin Damage Per Second replaced with +10% Poison Attack Slow/Damage", t("SWAP")))
+    W(li("Level 15 Talent +15% Poison Attack Slow/Damage replaced with +20 Corrosive Skin Damage Per Second", t("SWAP")))
     W(li("Level 15 Talent Nethertoxin Min/Max Damage decreased from +40 to +30", b(40, 30)))
     W(ul_close())
 

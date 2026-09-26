@@ -228,7 +228,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +200 Thunder Clap AoE replaced with +1.5s Thunder Clap Duration", t("REWORK")))
+    W(li("Level 10 Talent +200 Thunder Clap AoE replaced with +1.5s Thunder Clap Duration", t("SWAP")))
     W(ul_close())
 
     # Broodmother
@@ -334,7 +334,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent -1.5s Ice Path Cooldown replaced with +60 Ice Path Base Damage", t("REWORK")))
+    W(li("Level 15 Talent -1.5s Ice Path Cooldown replaced with +60 Ice Path Base Damage", t("SWAP")))
     W(ul_close())
 
     # Keeper of the Light
@@ -347,7 +347,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent +15s Spirit Form Duration replaced with +10% Spirit Form Movement Speed", t("REWORK")))
+    W(li("Level 20 Talent +15s Spirit Form Duration replaced with +10% Spirit Form Movement Speed", t("SWAP")))
     W(ul_close())
 
     # Kez
@@ -485,7 +485,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent Sprout Leashes replaced with -15s Wrath of Nature cooldown", t("REWORK")))
+    W(li("Level 20 Talent Sprout Leashes replaced with -15s Wrath of Nature cooldown", t("SWAP")))
     W(li("Level 10 Talent Wrath of Nature Base Damage bonus decreased from +30 to +25", b(30, 25)))
     W(ul_close())
 

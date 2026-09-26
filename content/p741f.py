@@ -110,8 +110,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent Track Grants Shared Vision replaced with +190 Shuriken Toss Damage", t("REWORK")))
-    W(li("Level 25 Talent +250 Shuriken Toss Damage replaced with Track Grants Shared Vision", t("REWORK")))
+    W(li("Level 20 Talent Track Grants Shared Vision replaced with +190 Shuriken Toss Damage", t("SWAP")))
+    W(li("Level 25 Talent +250 Shuriken Toss Damage replaced with Track Grants Shared Vision", t("SWAP")))
     W(li("Level 10 Talent Shuriken Toss Slow decreased from +0.6s to +0.35s", b(0.6, 0.35)))
     W(ul_close())
 
@@ -174,9 +174,9 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent +25% Magnetize Damage & Duration replaced with +35 Magnetize Damage Per Second", t("REWORK")))
-    W(li("Level 20 Talent +175% Rolling Boulder Damage from Strength replaced with +200 Geomagnetic Grip Remnant Damage", t("REWORK")))
-    W(li("Level 25 Talent +250 Geomagnetic Grip Remnant Damage replaced with +250% Rolling Boulder Damage from Strength", t("REWORK")))
+    W(li("Level 20 Talent +25% Magnetize Damage & Duration replaced with +35 Magnetize Damage Per Second", t("SWAP")))
+    W(li("Level 20 Talent +175% Rolling Boulder Damage from Strength replaced with +200 Geomagnetic Grip Remnant Damage", t("SWAP")))
+    W(li("Level 25 Talent +250 Geomagnetic Grip Remnant Damage replaced with +250% Rolling Boulder Damage from Strength", t("SWAP")))
     W(ul_close())
 
     # Ember Spirit
@@ -391,7 +391,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +3 Living Armor Heal per Second replaced with +3s Living Armor Duration", t("REWORK")))
+    W(li("Level 10 Talent +3 Living Armor Heal per Second replaced with +3s Living Armor Duration", t("SWAP")))
     W(ul_close())
 
     # Underlord

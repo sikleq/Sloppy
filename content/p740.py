@@ -654,10 +654,10 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +10% Battle Hunger Slow replaced with +12 Battle Hunger Damage Per Second", t("REWORK")))
+    W(li("Level 15 Talent +10% Battle Hunger Slow replaced with +12 Battle Hunger Damage Per Second", t("SWAP")))
     W(li("Level 20 Talent Counter Helix Damage increased from +30 to +40", b(30, 40)))
-    W(li("Level 20 Talent +100 Culling Blade Damage replaced with +15 Strength", t("REWORK")))
-    W(li("Level 25 Talent 2x Battle Hunger Armor Multiplier replaced with +150 Culling Blade Damage", t("REWORK")))
+    W(li("Level 20 Talent +100 Culling Blade Damage replaced with +15 Strength", t("SWAP")))
+    W(li("Level 25 Talent 2x Battle Hunger Armor Multiplier replaced with +150 Culling Blade Damage", t("SWAP")))
     W(ul_close())
 
     # Bane
@@ -721,10 +721,10 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +15% Bloodrage Spell Amplification replaced with +30 Bloodrage Attack Speed", t("REWORK")))
-    W(li("Level 15 Talent +8% Rupture Initial Damage replaced with -0.7% Bloodrage Max Health DPS For Allies", t("REWORK")))
-    W(li("Level 20 Talent -0.7% Bloodrage Max Health DPS For Allies replaced with +20 Agility", t("REWORK")))
-    W(li("Level 25 Talent 2 Rupture Charges replaced with +2.5s Blood Rite Silence Duration", t("REWORK")))
+    W(li("Level 10 Talent +15% Bloodrage Spell Amplification replaced with +30 Bloodrage Attack Speed", t("SWAP")))
+    W(li("Level 15 Talent +8% Rupture Initial Damage replaced with -0.7% Bloodrage Max Health DPS For Allies", t("SWAP")))
+    W(li("Level 20 Talent -0.7% Bloodrage Max Health DPS For Allies replaced with +20 Agility", t("SWAP")))
+    W(li("Level 25 Talent 2 Rupture Charges replaced with +2.5s Blood Rite Silence Duration", t("SWAP")))
     W(ul_close())
 
     # Bounty Hunter
@@ -864,12 +864,12 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +1.5s Thunder Clap Duration replaced with +1s Drunken Brawler Brew Up / Extend Duration", t("REWORK")))
-    W(li("Level 10 Talent +10 Brewlings Damage replaced with +14 Brewlings Base Damage", t("REWORK")))
+    W(li("Level 10 Talent +1.5s Thunder Clap Duration replaced with +1s Drunken Brawler Brew Up / Extend Duration", t("SWAP")))
+    W(li("Level 10 Talent +10 Brewlings Damage replaced with +14 Brewlings Base Damage", t("SWAP")))
     W(li("Level 15 Talent Cinder Brew Damage/Duration increased from +30% to 40%", b(30, 40)))
-    W(li("Level 15 Talent +1x Brewed Up multiplier for Drunken Brawler replaced with +600 Brewlings Health", t("REWORK")))
-    W(li("Level 20 Talent +1200 Brewlings Health replaced with -15s Primal Split Cooldown", t("REWORK")))
-    W(li("Level 25 Talent Brewlings Gain Drunken Brawler Passive replaced with 1.5x Drunken Brawler Stance Bonuses", t("REWORK")))
+    W(li("Level 15 Talent +1x Brewed Up multiplier for Drunken Brawler replaced with +600 Brewlings Health", t("SWAP")))
+    W(li("Level 20 Talent +1200 Brewlings Health replaced with -15s Primal Split Cooldown", t("SWAP")))
+    W(li("Level 25 Talent Brewlings Gain Drunken Brawler Passive replaced with 1.5x Drunken Brawler Stance Bonuses", t("SWAP")))
     W(ul_close())
 
     # Bristleback
@@ -902,11 +902,11 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +1.5% Spider's Milk Heal replaced with +20% Insatiable Hunger Lifesteal", t("REWORK")))
+    W(li("Level 10 Talent +1.5% Spider's Milk Heal replaced with +20% Insatiable Hunger Lifesteal", t("SWAP")))
     W(li("Level 15 Talent Spiderlings Health increased from +125 to +150", b(125, 150)))
     W(li("Level 15 Talent Incapacitating Bite Attack Bonus decreased from +12 to +10", b(12, 10)))
-    W(li("Level 20 Talent +35 Attack Speed replaced with +25% Incapacitating Bite Slow/Miss Chance", t("REWORK")))
-    W(li("Level 25 Talent +30% Incapacitating Bite Slow/Miss Chance replaced with +14% Spin Web Move Speed and Ignore Speed Limit", t("REWORK")))
+    W(li("Level 20 Talent +35 Attack Speed replaced with +25% Incapacitating Bite Slow/Miss Chance", t("SWAP")))
+    W(li("Level 25 Talent +30% Incapacitating Bite Slow/Miss Chance replaced with +14% Spin Web Move Speed and Ignore Speed Limit", t("SWAP")))
     W(ul_close())
 
     # Centaur Warrunner
@@ -930,7 +930,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 25 Talent +10s Phantasm Duration replaced with -125% Phantasm Damage Taken", t("REWORK")))
+    W(li("Level 25 Talent +10s Phantasm Duration replaced with -125% Phantasm Damage Taken", t("SWAP")))
     W(ul_close())
 
     # Chen
@@ -944,7 +944,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Penitence Deals 175 Damage replaced with +75 Penitence Damage", t("REWORK")))
+    W(li("Level 10 Talent Penitence Deals 175 Damage replaced with +75 Penitence Damage", t("SWAP")))
     W(li("Level 20 Talent Divine Favor Heal Amplification decreased from +20% to +15%", b(20, 15)))
     W(ul_close())
 
@@ -1011,7 +1011,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 25 Talent Tar Bomb Multishot replaced with Searing Arrows Multishot", t("REWORK")))
+    W(li("Level 25 Talent Tar Bomb Multishot replaced with Searing Arrows Multishot", t("SWAP")))
     W(ul_close())
 
     # Clockwerk
@@ -1054,7 +1054,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +150 Cursed Crown AoE replaced with -15s Terrorize Cooldown", t("REWORK")))
+    W(li("Level 15 Talent +150 Cursed Crown AoE replaced with -15s Terrorize Cooldown", t("SWAP")))
     W(ul_close())
 
     # Dawnbreaker
@@ -1070,7 +1070,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +12 Damage replaced with +15% Break of Dawn Max Damage", t("REWORK")))
+    W(li("Level 10 Talent +12 Damage replaced with +15% Break of Dawn Max Damage", t("SWAP")))
     W(ul_close())
 
     # Dazzle
@@ -1124,8 +1124,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent 30% Breathe Fire Damage Reduction replaced with -2s Breathe Fire Cooldown", t("REWORK")))
-    W(li("Level 20 Talent +85% Breathe Fire Damage/Cast Range in Dragon Form replaced with +60% Breathe Fire Damage/Cast Range", t("REWORK")))
+    W(li("Level 10 Talent 30% Breathe Fire Damage Reduction replaced with -2s Breathe Fire Cooldown", t("SWAP")))
+    W(li("Level 20 Talent +85% Breathe Fire Damage/Cast Range in Dragon Form replaced with +60% Breathe Fire Damage/Cast Range", t("SWAP")))
     W(ul_close())
 
     # Drow Ranger
@@ -1140,7 +1140,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent Gust Costs No Mana replaced with -25% Frost Arrows Mana Cost", t("REWORK")))
+    W(li("Level 10 Talent Gust Costs No Mana replaced with -25% Frost Arrows Mana Cost", t("SWAP")))
     W(ul_close())
 
     # Earth Spirit
@@ -1184,10 +1184,10 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent -3s Geomagnetic Grip Cooldown replaced with -2s Boulder Smash Cooldown", t("REWORK")))
-    W(li("Level 20 Talent +180 Rolling Boulder Damage replaced with +175% Rolling Boulder Damage from Strength", t("REWORK")))
-    W(li("Level 25 Talent -3s Boulder Smash Cooldown replaced with +175 Geomagnetic Grip Remnant Damage", t("REWORK")))
-    W(li("Level 25 Talent Magnetize Undispellable replaced with Earth Spirit Magnetizes Himself", t("REWORK"), extra=inline_note("Applies Magnetize at its current duration to enemy Heroes around Earth Spirit, and can be refreshed with Stone Remnants")))
+    W(li("Level 10 Talent -3s Geomagnetic Grip Cooldown replaced with -2s Boulder Smash Cooldown", t("SWAP")))
+    W(li("Level 20 Talent +180 Rolling Boulder Damage replaced with +175% Rolling Boulder Damage from Strength", t("SWAP")))
+    W(li("Level 25 Talent -3s Boulder Smash Cooldown replaced with +175 Geomagnetic Grip Remnant Damage", t("SWAP")))
+    W(li("Level 25 Talent Magnetize Undispellable replaced with Earth Spirit Magnetizes Himself", t("SWAP"), extra=inline_note("Applies Magnetize at its current duration to enemy Heroes around Earth Spirit, and can be refreshed with Stone Remnants")))
     W(ul_close())
 
     # Earthshaker
@@ -1256,9 +1256,9 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +10 Enchanted Creep Armor replaced with +5 Armor for Enchantress and her units", t("REWORK"), extra=inline_note("Requires at least 1 level of Enchant")))
-    W(li("Level 20 Talent +60 Untouchable Attack Slow replaced with +9 Nature's Attendants Wisps", t("REWORK")))
-    W(li("Level 25 Talent +12 Nature's Attendants Wisps replaced with +70 Untouchable Attack Slow", t("REWORK")))
+    W(li("Level 10 Talent +10 Enchanted Creep Armor replaced with +5 Armor for Enchantress and her units", t("SWAP"), extra=inline_note("Requires at least 1 level of Enchant")))
+    W(li("Level 20 Talent +60 Untouchable Attack Slow replaced with +9 Nature's Attendants Wisps", t("SWAP")))
+    W(li("Level 25 Talent +12 Nature's Attendants Wisps replaced with +70 Untouchable Attack Slow", t("SWAP")))
     W(ul_close())
 
     # Enigma
@@ -1328,9 +1328,9 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +1.5 Mana Regen replaced with +150 Health", t("REWORK")))
-    W(li("Level 10 Talent +1 Scurry Ability Charge replaced with +50 Bushwhack Damage", t("REWORK")))
-    W(li("Level 15 Talent +60 Bushwhack Damage replaced with +1 Scurry Ability Charge", t("REWORK")))
+    W(li("Level 10 Talent +1.5 Mana Regen replaced with +150 Health", t("SWAP")))
+    W(li("Level 10 Talent +1 Scurry Ability Charge replaced with +50 Bushwhack Damage", t("SWAP")))
+    W(li("Level 15 Talent +60 Bushwhack Damage replaced with +1 Scurry Ability Charge", t("SWAP")))
     W(ul_close())
 
     # Invoker
@@ -1372,19 +1372,19 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +12 Attack Damage to Tethered Units replaced with +7 Strength", t("REWORK")))
-    W(li("Level 15 Talent +60 Spirits Hero Damage replaced with +50% Spirits Damage", t("REWORK")))
-    W(li("Level 25 Talent Unslowable during Overcharge replaced with -1.5s Relocate Cast Delay", t("REWORK")))
+    W(li("Level 10 Talent +12 Attack Damage to Tethered Units replaced with +7 Strength", t("SWAP")))
+    W(li("Level 15 Talent +60 Spirits Hero Damage replaced with +50% Spirits Damage", t("SWAP")))
+    W(li("Level 25 Talent Unslowable during Overcharge replaced with -1.5s Relocate Cast Delay", t("SWAP")))
     W(ul_close())
 
     # Jakiro
     W(hero_header("Jakiro"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent -2s Dual Breath Cooldown replaced with +60 Ice Path Base Damage", t("REWORK")))
-    W(li("Level 10 Talent +150 Attack Range replaced with +30 Liquid Fire Attack Speed Slow", t("REWORK")))
-    W(li("Level 15 Talent +60 Ice Path Base Damage replaced with -3s Dual Breath Cooldown", t("REWORK")))
-    W(li("Level 15 Talent +50 Liquid Fire Attack Speed Slow replaced with +175 Attack Range", t("REWORK")))
+    W(li("Level 10 Talent -2s Dual Breath Cooldown replaced with +60 Ice Path Base Damage", t("SWAP")))
+    W(li("Level 10 Talent +150 Attack Range replaced with +30 Liquid Fire Attack Speed Slow", t("SWAP")))
+    W(li("Level 15 Talent +60 Ice Path Base Damage replaced with -3s Dual Breath Cooldown", t("SWAP")))
+    W(li("Level 15 Talent +50 Liquid Fire Attack Speed Slow replaced with +175 Attack Range", t("SWAP")))
     W(li("Level 25 Talent Liquid Frost and Fire Max Health Damage increased from +2.5% to +3%", b(2.5, 3)))
     W(ul_close())
 
@@ -1423,7 +1423,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent -5s Blinding Light Cooldown replaced with +90 Blinding Light Damage", t("REWORK")))
+    W(li("Level 15 Talent -5s Blinding Light Cooldown replaced with +90 Blinding Light Damage", t("SWAP")))
     W(ul_close())
 
     # Kez
@@ -1461,7 +1461,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent +50% Attack Damage Added to Talon Toss replaced with +60 Attack Speed During Falcon Rush", t("REWORK")))
+    W(li("Level 20 Talent +50% Attack Damage Added to Talon Toss replaced with +60 Attack Speed During Falcon Rush", t("SWAP")))
     W(ul_close())
 
     # Kunkka
@@ -1592,12 +1592,12 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +30 Spirit Bear Movement Speed replaced with +15 Entangle Root Damage Per Second", t("REWORK")))
-    W(li("Level 10 Talent +200 Health replaced with -25s Summon Spirit Bear Cooldown", t("REWORK")))
-    W(li("Level 15 Talent +7 Spirit Bear Armor replaced with +12 Agility", t("REWORK")))
-    W(li("Level 20 Talent +30 Entangling Claws DPS replaced with +55 Attack Speed", t("REWORK")))
-    W(li("Level 25 Talent +45 Spirit Link Attack Speed replaced with +0.6s Entangle Root Duration (also affects Spirit Bear's Entangling Claws)", t("REWORK")))
-    W(li("Level 25 Talent -50s True Form Cooldown replaced with True Form provides 60% Slow Resistance", t("REWORK")))
+    W(li("Level 10 Talent +30 Spirit Bear Movement Speed replaced with +15 Entangle Root Damage Per Second", t("SWAP")))
+    W(li("Level 10 Talent +200 Health replaced with -25s Summon Spirit Bear Cooldown", t("SWAP")))
+    W(li("Level 15 Talent +7 Spirit Bear Armor replaced with +12 Agility", t("SWAP")))
+    W(li("Level 20 Talent +30 Entangling Claws DPS replaced with +55 Attack Speed", t("SWAP")))
+    W(li("Level 25 Talent +45 Spirit Link Attack Speed replaced with +0.6s Entangle Root Duration (also affects Spirit Bear's Entangling Claws)", t("SWAP")))
+    W(li("Level 25 Talent -50s True Form Cooldown replaced with True Form provides 60% Slow Resistance", t("SWAP")))
     W(ul_close())
 
     # Spirit Bear (Lone Druid pet)
@@ -1724,9 +1724,9 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent -40s Eclipse Cooldown replaced with +80 Lucent Beam Damage", t("REWORK")))
-    W(li("Level 20 Talent +110 Lucent Beam Damage replaced with -40s Eclipse Cooldown", t("REWORK")))
-    W(li("Level 25 Talent +1 Lunar Blessing Damage per Level replaced with +30 Lunar Blessing Damage", t("REWORK")))
+    W(li("Level 15 Talent -40s Eclipse Cooldown replaced with +80 Lucent Beam Damage", t("SWAP")))
+    W(li("Level 20 Talent +110 Lucent Beam Damage replaced with -40s Eclipse Cooldown", t("SWAP")))
+    W(li("Level 25 Talent +1 Lunar Blessing Damage per Level replaced with +30 Lunar Blessing Damage", t("SWAP")))
     W(ul_close())
 
     # Lycan
@@ -1781,8 +1781,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent +1.5s Stone Gaze Duration replaced with +1 Gorgon's Grasp Volley", t("REWORK")))
-    W(li("Level 25 Talent +1 Gorgon's Grasp Volley replaced with +2s Stone Gaze Duration", t("REWORK")))
+    W(li("Level 20 Talent +1.5s Stone Gaze Duration replaced with +1 Gorgon's Grasp Volley", t("SWAP")))
+    W(li("Level 25 Talent +1 Gorgon's Grasp Volley replaced with +2s Stone Gaze Duration", t("SWAP")))
     W(ul_close())
 
     # Meepo
@@ -1808,8 +1808,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent -20s Moonlight Shadow Cooldown replaced with +200 Starstorm Damage", t("REWORK")))
-    W(li("Level 25 Talent +250 Starstorm Damage replaced with -30s Moonlight Shadow Cooldown", t("REWORK")))
+    W(li("Level 20 Talent -20s Moonlight Shadow Cooldown replaced with +200 Starstorm Damage", t("SWAP")))
+    W(li("Level 25 Talent +250 Starstorm Damage replaced with -30s Moonlight Shadow Cooldown", t("SWAP")))
     W(ul_close())
 
     # Monkey King
@@ -1852,7 +1852,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +150 Health replaced with +20 Attack Speed", t("REWORK")))
+    W(li("Level 10 Talent +150 Health replaced with +20 Attack Speed", t("SWAP")))
     W(ul_close())
 
     # Naga Siren
@@ -2023,10 +2023,10 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +90 Shield Crash Barrier Per Hero replaced with +125 Shield Crash Barrier", t("REWORK")))
-    W(li("Level 15 Talent +15% Attack Damage as Swashbuckle Damage replaced with -2s Swashbuckle Cooldown", t("REWORK")))
-    W(li("Level 20 Talent +125 Shield Crash Radius and Damage replaced with -1.5s Shield Crash Cooldown", t("REWORK")))
-    W(li("Level 25 Talent -4s Swashbuckle Cooldown replaced with +20% Attack Damage as Swashbuckle Damage", t("REWORK")))
+    W(li("Level 15 Talent +90 Shield Crash Barrier Per Hero replaced with +125 Shield Crash Barrier", t("SWAP")))
+    W(li("Level 15 Talent +15% Attack Damage as Swashbuckle Damage replaced with -2s Swashbuckle Cooldown", t("SWAP")))
+    W(li("Level 20 Talent +125 Shield Crash Radius and Damage replaced with -1.5s Shield Crash Cooldown", t("SWAP")))
+    W(li("Level 25 Talent -4s Swashbuckle Cooldown replaced with +20% Attack Damage as Swashbuckle Damage", t("SWAP")))
     W(ul_close())
 
     # Phantom Assassin
@@ -2094,12 +2094,12 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +10 Phantom Rush Agility replaced with +3% Juxtapose Illusion Trigger Chance", t("REWORK")))
-    W(li("Level 15 Talent -1s Spirit Lance Cooldown replaced with +125 Doppelganger Cast Range", t("REWORK")))
-    W(li("Level 15 Talent +2.5s Phantom Rush Bonus Agility Duration replaced with 50% Illusion Spirit Lance Damage", t("REWORK"), extra=inline_note("Spirit Lances fired from illusions deal 50% of the regular damage, which is then further reduced by the illusion's outgoing damage multiplier")))
-    W(li("Level 20 Talent +6% Juxtapose Damage replaced with -70% Juxtapose Illusion Damage Taken", t("REWORK")))
-    W(li("Level 20 Talent +15% Spirit Lance Illusion Damage replaced with +100 Spirit Lance Damage", t("REWORK")))
-    W(li("Level 25 Talent +20% Illusory Armaments Damage replaced with +2s Illusory Armaments Duration", t("REWORK")))
+    W(li("Level 10 Talent +10 Phantom Rush Agility replaced with +3% Juxtapose Illusion Trigger Chance", t("SWAP")))
+    W(li("Level 15 Talent -1s Spirit Lance Cooldown replaced with +125 Doppelganger Cast Range", t("SWAP")))
+    W(li("Level 15 Talent +2.5s Phantom Rush Bonus Agility Duration replaced with 50% Illusion Spirit Lance Damage", t("SWAP"), extra=inline_note("Spirit Lances fired from illusions deal 50% of the regular damage, which is then further reduced by the illusion's outgoing damage multiplier")))
+    W(li("Level 20 Talent +6% Juxtapose Damage replaced with -70% Juxtapose Illusion Damage Taken", t("SWAP")))
+    W(li("Level 20 Talent +15% Spirit Lance Illusion Damage replaced with +100 Spirit Lance Damage", t("SWAP")))
+    W(li("Level 25 Talent +20% Illusory Armaments Damage replaced with +2s Illusory Armaments Duration", t("SWAP")))
     W(ul_close())
 
     # Phoenix
@@ -2214,9 +2214,9 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +50 Tricks of the Trade Agility replaced with 15% of Riki's Base damage added to Tricks of the Trade", t("REWORK")))
-    W(li("Level 20 Talent -4s Blink Strike Replenish Time replaced with -1s Blink Strike Cooldown", t("REWORK")))
-    W(li("Level 25 Talent Tricks of the Trade Applies a Basic Dispel replaced with +500 Blink Strike Cast Range", t("REWORK")))
+    W(li("Level 15 Talent +50 Tricks of the Trade Agility replaced with 15% of Riki's Base damage added to Tricks of the Trade", t("SWAP")))
+    W(li("Level 20 Talent -4s Blink Strike Replenish Time replaced with -1s Blink Strike Cooldown", t("SWAP")))
+    W(li("Level 25 Talent Tricks of the Trade Applies a Basic Dispel replaced with +500 Blink Strike Cast Range", t("SWAP")))
     W(ul_close())
 
     # Ringmaster
@@ -2238,7 +2238,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +0.5s Telekinesis Lift/Stun Duration replaced with +20% Fade Bolt Damage Reduction", t("REWORK")))
+    W(li("Level 15 Talent +0.5s Telekinesis Lift/Stun Duration replaced with +20% Fade Bolt Damage Reduction", t("SWAP")))
     W(ul_close())
 
     # Sand King
@@ -2399,7 +2399,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent Dark Pact Cooldown Reduction increased from 0.5s to 0.75s", b(0.5, 0.75)))
-    W(li("Level 15 Talent +50 Barracuda Regen replaced with +30 Shadow Dance Regen", t("REWORK")))
+    W(li("Level 15 Talent +50 Barracuda Regen replaced with +30 Shadow Dance Regen", t("SWAP")))
     W(li("Level 25 Talent Shadow Dance Duration increased from +1.25s to +1.5s", b(1.25, 1.5)))
     W(ul_close())
 
@@ -2521,8 +2521,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +5 Health Regen replaced with +10 Desolate Damage", t("REWORK")))
-    W(li("Level 15 Talent +15 Desolate Damage replaced with +1s Shadow Step Duration", t("REWORK")))
+    W(li("Level 10 Talent +5 Health Regen replaced with +10 Desolate Damage", t("SWAP")))
+    W(li("Level 15 Talent +15 Desolate Damage replaced with +1s Shadow Step Duration", t("SWAP")))
     W(li("Level 20 Talent Spectral Dagger Slow/Bonus increased from +12% to +15%", b(12, 15)))
     W(li("Level 25 Talent All Spectre Illusion Damage decreased from +25% to +20%", b(25, 20)))
     W(ul_close())
@@ -2574,7 +2574,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent +125 Sticky Bomb Latch/Explosion Radius replaced with +160 Sticky Bomb Damage", t("REWORK")))
+    W(li("Level 20 Talent +125 Sticky Bomb Latch/Explosion Radius replaced with +160 Sticky Bomb Damage", t("SWAP")))
     W(ul_close())
 
     # Templar Assassin
@@ -2627,10 +2627,10 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent Gush Slow increased from +15% to +20%", b(15, 20)))
-    W(li("Level 10 Talent +40 Anchor Smash Damage replaced with +20% Anchor Smash Damage Reduction", t("REWORK")))
-    W(li("Level 15 Talent +30% Anchor Smash Damage Reduction replaced with -15s Ravage Cooldown", t("REWORK")))
-    W(li("Level 20 Talent Anchor Smash affects buildings replaced with Blubber effect triggers Anchor Smash", t("REWORK")))
-    W(li("Level 25 Talent 50% chance of Anchor Smash on attack replaced with Anchor Smash affects buildings", t("REWORK")))
+    W(li("Level 10 Talent +40 Anchor Smash Damage replaced with +20% Anchor Smash Damage Reduction", t("SWAP")))
+    W(li("Level 15 Talent +30% Anchor Smash Damage Reduction replaced with -15s Ravage Cooldown", t("SWAP")))
+    W(li("Level 20 Talent Anchor Smash affects buildings replaced with Blubber effect triggers Anchor Smash", t("SWAP")))
+    W(li("Level 25 Talent 50% chance of Anchor Smash on attack replaced with Anchor Smash affects buildings", t("SWAP")))
     W(li("Level 25 Talent Ravage Stun Duration increased from +0.8s to +1s", b(0.8, 1)))
     W(ul_close())
 
@@ -2654,7 +2654,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent Manacost/Manaloss Reduction increased from +8% to +10%", b(8, 10)))
-    W(li("Level 25 Talent +10s Defense Matrix Duration replaced with +40 Intelligence", t("REWORK")))
+    W(li("Level 25 Talent +10s Defense Matrix Duration replaced with +40 Intelligence", t("SWAP")))
     W(ul_close())
 
     # Tiny
@@ -2743,12 +2743,12 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +2.5% Nature's Guise Movement Speed replaced with +50 Base Damage", t("REWORK")))
+    W(li("Level 10 Talent +2.5% Nature's Guise Movement Speed replaced with +50 Base Damage", t("SWAP")))
     W(li("Level 10 Talent Living Armor Heal Per Second increased from +2 to +4", b(2, 4)))
-    W(li("Level 15 Talent +18% Leech Seed Movement Slow replaced with +10% Leech Seed Damage to Healing", t("REWORK")))
+    W(li("Level 15 Talent +18% Leech Seed Movement Slow replaced with +10% Leech Seed Damage to Healing", t("SWAP")))
     W(li("Level 20 Talent Leech Seed Bonus Damage increased from +45 to +80", b(45, 80)))
-    W(li("Level 20 Talent +8 Living Armor Bonus Armor replaced with +20 Living Armor Damage Block", t("REWORK")))
-    W(li("Level 25 Talent -35s Overgrowth Cooldown replaced with -3s Leech Seed Cooldown", t("REWORK")))
+    W(li("Level 20 Talent +8 Living Armor Bonus Armor replaced with +20 Living Armor Damage Block", t("SWAP")))
+    W(li("Level 25 Talent -35s Overgrowth Cooldown replaced with -3s Leech Seed Cooldown", t("SWAP")))
     W(ul_close())
 
     # Troll Warlord
@@ -2813,7 +2813,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent Earthshock applies 2 Fury Swipes replaced with +0.5% Maul Health as Damage", t("REWORK")))
+    W(li("Level 20 Talent Earthshock applies 2 Fury Swipes replaced with +0.5% Maul Health as Damage", t("SWAP")))
     W(ul_close())
 
     # Vengeful Spirit
@@ -2874,7 +2874,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 25 Talent +15 Gravekeeper's Cloak Armor replaced with -2s Gravekeeper's Cloak Recovery Time", t("REWORK")))
+    W(li("Level 25 Talent +15 Gravekeeper's Cloak Armor replaced with -2s Gravekeeper's Cloak Recovery Time", t("SWAP")))
     W(ul_close())
 
     # Void Spirit
@@ -2897,9 +2897,9 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 15 Talent Upheaval Attack Speed per second on Allies decreased from +10 to +8", b(10, 8)))
-    W(li("Level 20 Talent Summons a Golem on Death replaced with +25% Damage Resistance for Chaotic Offering Golems", t("REWORK")))
-    W(li("Level 25 Talent +80% Golem Magic Resistance replaced with +3 Fatal Bonds targets", t("REWORK")))
-    W(li("Level 25 Talent +20 Chaotic Offering Golems Armor replaced with Summons a Golem on Death", t("REWORK")))
+    W(li("Level 20 Talent Summons a Golem on Death replaced with +25% Damage Resistance for Chaotic Offering Golems", t("SWAP")))
+    W(li("Level 25 Talent +80% Golem Magic Resistance replaced with +3 Fatal Bonds targets", t("SWAP")))
+    W(li("Level 25 Talent +20 Chaotic Offering Golems Armor replaced with Summons a Golem on Death", t("SWAP")))
     W(ul_close())
 
     # Weaver
@@ -2960,8 +2960,8 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 15 Talent +125 Maledict AoE replaced with +4s Maledict Duration", t("REWORK")))
-    W(li("Level 25 Talent +8s Maledict Duration replaced with -6s Paralyzing Cask Cooldown", t("REWORK")))
+    W(li("Level 15 Talent +125 Maledict AoE replaced with +4s Maledict Duration", t("SWAP")))
+    W(li("Level 25 Talent +8s Maledict Duration replaced with -6s Paralyzing Cask Cooldown", t("SWAP")))
     W(ul_close())
 
     # Wraith King
