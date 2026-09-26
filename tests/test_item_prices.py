@@ -48,7 +48,8 @@ EVERY_ITEM_STAT = ["strength", "agility", "intelligence", "all_stats", "damage",
 def test_every_item_stat_has_a_price_in_the_latest_patch():
     latest = PRICES["versions"]["7.41f"]
     assert [s for s in EVERY_ITEM_STAT if s not in latest] == []
-    assert all(PRICES["confidence"]["7.41f"][s] in ("anchor", "fit", "single", "prior") for s in latest)
+    assert all(PRICES["confidence"]["7.41f"][s] in ("anchor", "fit", "single") or PRICES["confidence"]["7.41f"][s].startswith("pooled")
+               for s in latest)       # no "prior" left: pooling splits the Sange family (2026-09-26)
 
 
 @pytest.mark.parametrize("stat,lo,hi", [
@@ -82,7 +83,7 @@ def test_a_removed_stat_is_valued_by_its_amount_not_a_flat_del_weight():
     s20 = _net("+20 Strength", {"del"}, "heavens_halberd", "7.38")
     a5 = _net("+5 All Attributes", {"new"}, "heavens_halberd", "7.38")
     gold = 20 * W._price("strength", "7.38")
-    assert s20 == pytest.approx(-0.6 * 5 * gold / 3050, abs=2e-3)
+    assert s20 == pytest.approx(-W.ITEM_GOLD_W * W.ITEM_GOLD_K * gold / 3050, abs=2e-3)
     assert a5 > 0 and abs(s20) > 1.5 * a5
 
 
@@ -151,7 +152,7 @@ def test_item_mana_cost_is_the_mana_in_gold_not_its_percent():
     """Disarm 75 -> 25 (-67 %) was +2.51, the heaviest row of the Halberd rework. Now: 50 mana
     x gold per max mana, measured against the item's cost."""
     net = _net("Disarm Mana Cost decreased from 75 to 25", {"buff"}, "heavens_halberd", "7.38", b(75, 25, l=True))
-    assert net == pytest.approx(0.6 * 5 * 50 * W._price("mana", "7.38") / 3050, abs=2e-3)
+    assert net == pytest.approx(W.ITEM_GOLD_W * W.ITEM_GOLD_K * 50 * W._price("mana", "7.38") / 3050, abs=2e-3)
     assert 0 < net < 0.4
     assert _net("Dominate now has a 50 mana cost", {"nerf"}, "helm_of_the_dominator", "7.39e") < 0
     # neutral items have no price: the reference cost of an item with an active
@@ -197,8 +198,10 @@ def test_heavens_halberd_738_is_a_nerf(v738):
     _halberd_738()
     item_header("Heart of Tarrasque")          # ends the block: the panel's cost row is added
     cell = _cell("item|heavens-halberd", "7.38")
-    # stat side + price cut ~ 0 (Valve priced the swap fairly); the Disarm nerfs make it negative
-    assert -2.0 < cell["w"] < -1.0
+    # stat side + price cut ~ 0 (Valve priced the swap fairly); the Disarm nerfs, on the same gold
+    # scale as the stats (ITEM_ABILITY_F), make it a mild nerf (-1.43 before 2026-09-26: Disarm was
+    # on the louder hero scale and outweighed everything)
+    assert -1.0 < cell["w"] < -0.2
     assert cell["new"] == 4 and cell["del"] == 4 and cell["rework"] == 1
 
 
@@ -226,7 +229,7 @@ def test_panel_alone_scores_the_total_and_unchanged_totals_score_nothing(v738):
     components_change(old=[("Ultimate Orb", 2800)], new=[("Ultimate Orb", 2800)], total_old=5300, total_new=5300)
     section("Neutral Items")                   # the block ends with the section
     blade = _cell("item|shadow-blade", "7.38")
-    assert blade["w"] == pytest.approx(-0.6 * 5 * 350 / W._item_base_cost("invis_sword", "7.38"), abs=2e-3)
+    assert blade["w"] == pytest.approx(-W.ITEM_GOLD_W * W.ITEM_GOLD_K * 350 / W._item_base_cost("invis_sword", "7.38"), abs=2e-3)
     assert _cell("item|eye-of-skadi", "7.38").get("w", 0) == 0
 
 
@@ -250,3 +253,13 @@ def test_every_item_name_resolves_to_a_kv_key():
         names |= set(re.findall(r'item_header\("([^"]+)"', open(f, encoding="utf-8").read()))
     slug = lambda n: ITEM_SLUG.get(n, n.lower().replace(" ", "_").replace("'", ""))
     assert [n for n in sorted(names) if "item_" + slug(n) not in keys] == []
+
+
+def test_unpriced_item_row_is_scaled_to_the_gold_scale():
+    """An item active's number (Disarm duration 5s -> 4s) has no gold price: it is scored like a hero
+    spell row, times ITEM_ABILITY_F, so it does not drown the item's gold-priced stat rows."""
+    text = "Disarm Duration on Ranged heroes decreased from 5s to 4s"
+    hero = W.row_scores(text, {"nerf"}, "", {"kind": "hero", "version": "7.38"})
+    item = W.row_scores(text, {"nerf"}, "", _ctx("heavens_halberd", "7.38"))
+    assert item[0] == pytest.approx(hero[0] * W.ITEM_ABILITY_F / W.context_multiplier(
+        {"kind": "hero", "version": "7.38"}) * W.context_multiplier({"kind": "item"}), abs=2e-3)

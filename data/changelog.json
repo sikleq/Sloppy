@@ -4,6 +4,14 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
+      "title": "Item scores: an item's active and its stats are now on one scale (Heaven's Halberd 7.38 is a mild nerf, not a big one), and the Sange/Kaya/Yasha stat prices are measured from neighbouring patches instead of guessed",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.38.html"
+    },
+    {
+      "date": "2026-09-26",
+      "category": "Patch Reader",
       "title": "Item change scores are now counted in gold: every item stat has a price per patch (from the shop's own items), so stat swaps, price changes and item mana costs weigh what they cost. Heaven's Halberd 7.38 is now a nerf; item mana-cost rows no longer dominate",
       "minor": true,
       "link": "patches/7.38.html"

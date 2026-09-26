@@ -225,6 +225,42 @@ the item's cost (median of 748 KV changes 7.08 → 7.41f; cost changes 4.0 %), w
 into 0.19 while a typical hero change is ~1.0. Calibrating the scale to it (typical change = 1.0, K = 15.6)
 gives 0.397 / 0.437 — no clear gain, not applied (open question).
 
+## Items — one scale for stats and actives (2026-09-26)
+
+Two fixes to the item gold scale above (owner: "fix these weak spots yourself").
+
+**1. Actives on the gold scale.** Before, an item row without a gold price (Disarm duration, "can be
+dispelled") was scored on the hero scale, ~4x louder than the gold-priced stat rows of the same item, so
+Heaven's Halberd 7.38 was "−1.43" almost only because of two Disarm rows. Now such rows are multiplied by
+`ITEM_ABILITY_F`. The cost-minus-stats residual cannot measure what an active is worth: upgrades sell their
+stats cheaper than basic items (Halberd 7.38: stats 2818 g, item 2600 g; median residual share 0.15, a
+quarter of items negative). So K and F were swept on the two blind-judge samples (mean Spearman ρ):
+
+| K \ F | 1 | 0.75 | 0.6 | 0.45 | 0.3 |
+|---|---|---|---|---|---|
+| 5 (old) | 0.425 | | 0.437 | | 0.421 |
+| 7.5 | | | 0.442 | 0.443 | |
+| 10 | 0.432 | 0.441 | **0.445** | 0.445 | 0.428 |
+| 12.5 | | 0.440 | 0.445 | | |
+| 15.6 | 0.431 | | 0.443 | | 0.425 |
+
+A flat plateau (K 7.5–15.6, F 0.45–0.75); the centre K = 10, F = 0.6 is used. It reads as "20 % of an
+active = 20 % of half the item" (0.2 × 0.5 × K × W = 0.6). After the price pooling below: sample 1
+0.414 → 0.406, sample 2 0.436 → **0.482**, mean 0.425 → 0.444.
+
+**2. No "prior" prices on the site's patches.** Sange/Kaya/Yasha stats (slow resistance, restoration amp,
+spell amp, mana regen amp, mana-cost reduction, cast speed, status resistance) always come together in one
+patch, but the family ratios change between patches. `fit_item_prices.py` now re-fits such a stat on the
+pure items of this and the 3 / 6 / 10 / 15 earlier patches (older items weigh 0.85^age) until the split is
+identified — confidence `pooledN`. Every version from 7.35b on is fully identified; "prior" is left only in
+7.08–7.35 (not on the site). 7.41f: restoration amp 19.5 → 15.6, mana regen amp 20.3 → 15.6, mana-cost
+reduction 25.3 → 18.9, spell amp 24.8 → 28.4, slow res 19.9 → 20.3 g per 1 %.
+
+**Heaven's Halberd 7.38 now**: stats −4.2 g-rows + new +5.5 + price cut +1.77 ≈ +0.1 (the swap is fair),
+Disarm dispellable −0.29, mana cost +0.36, ranged duration −0.67 → **−0.49**, a mild nerf.
+Largest moves: Orb of Venom 7.38 +3.90 → +0.94, Drum 7.38 −4.71 → −2.76, Crippling Crossbow 7.41 −4.45 → −2.67,
+Gleipnir 7.38 +0.81 → +2.17 (priced +200 Mana now counts next to the active), Khanda 7.38 −0.64 → −1.76.
+
 ## Backtest (docs/weights-review.md E.8.1) — 2026-09-16
 
 11 408 numeric hero events 7.08→7.41e. "Reverted" = same parameter moved the other way within 8 patches (base rate 6.0 %).

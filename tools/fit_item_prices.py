@@ -30,6 +30,9 @@ Method (per version):
      %-stat rate. It only decides what the data cannot: Sange-family stats (slow resistance,
      health restoration, status resistance, spell amp, mana regen amp) always come together, so
      their split is the prior's (confidence "prior"). Identified stats barely move.
+  4b. Pooling: the Sange/Kaya family ratios differ between patches, so a "prior" stat is re-fit on
+     the pure items of this and the N earlier patches (N = 3, 6, 10, 15 until the split is
+     identified; older items weigh 0.85^age). Its price then comes from that fit ("pooledN").
   5. Confidence per stat: "anchor" (a single-stat basic item sells it), "fit" (identified by >= 2
      pure items), "single" (identified by one pure item: Aether Lens = cast range, Octarine Core =
      cooldown reduction, Dragon Lance = attack range, Vanguard = damage block), "prior" (collinear —
@@ -63,6 +66,8 @@ OUT = os.path.join(HERE, "data", "rules", "item_stat_prices.json")
 LOC = os.path.join(HERE, "data", "abilities_english.txt")
 
 PRIOR_WEIGHT = 0.25          # a stat's virtual prior item counts as a quarter of a real item
+POOL_WINDOWS = (3, 6, 10, 15)  # earlier patches pooled for stats one patch cannot split (Sange family)
+POOL_DECAY = 0.85            # weight of a pure item per patch of age in the pooled fit
 ZERO = 1e-9
 
 # Tooltip label -> stat. Checked in order on the label text (after the leading "%+"/"+").
@@ -285,16 +290,38 @@ def identified(A, cols):
     return {c for j, c in enumerate(cols) if null.shape[0] == 0 or np.abs(null[:, j]).max() < 1e-6}
 
 
-def fit_version(items):
-    rows = [it for it in items.values() if pure(it)]
+def fit_version(items, history=()):
+    """history: parsed items of the earlier versions, newest first (pooling of "prior" stats)."""
+    prices, conf, meta, anchors = _fit_rows([(it, 1.0) for it in items.values() if pure(it)], items)
+    pending = {s for s, c in conf.items() if c == "prior"}
+    for win in POOL_WINDOWS:                              # the family split, from the patches around
+        if not pending or len(history) < 1:
+            break
+        seen, rows = set(), []
+        for age, its in enumerate([items] + list(history[:win])):
+            for n, it in its.items():
+                key = (n, it["cost"], tuple(sorted(it["stats"].items())))
+                if pure(it) and key not in seen:
+                    seen.add(key)
+                    rows.append((it, POOL_DECAY ** age))
+        p2, c2, _, _ = _fit_rows(rows, items)
+        for st in list(pending):
+            if c2.get(st) in ("fit", "single") and st in p2:
+                prices[st], conf[st] = p2[st], f"pooled{min(win, len(history))}"
+                pending.discard(st)
+    return prices, conf, meta
+
+
+def _fit_rows(weighted_rows, items):
+    rows = [it for it, _ in weighted_rows]
     anchors = direct_prices(items)
     pct_anchor = [p for s, p in anchors.items() if s in PCT_STATS]
     pct_prior = float(np.median(pct_anchor)) if pct_anchor else None
     stats = sorted({s for it in rows for s in it["stats"]})
     idx = {s: j for j, s in enumerate(stats)}
     A, y = [], []
-    for it in rows:
-        w = 1.0 / math.sqrt(it["cost"])
+    for it, rw in weighted_rows:
+        w = math.sqrt(rw) / math.sqrt(it["cost"])
         a = np.zeros(len(stats))
         for s, x in it["stats"].items():
             a[idx[s]] = x * w
@@ -335,7 +362,7 @@ def fit_version(items):
             conf[s] = "prior"
         else:
             conf[s] = "fit" if carriers[s] >= 2 else "single"
-    return prices, conf, {"n_pure": len(rows), "anchors": {s: round(p, 1) for s, p in anchors.items()}}
+    return prices, conf, {"n_pure": len(rows), "anchors": {s: round(p, 1) for s, p in anchors.items()}}, anchors
 
 
 def ref_cost(items):
@@ -367,12 +394,14 @@ def main():
     fmap = learn_field_map(loc, names)
     out_v, out_c, out_meta, out_block, out_ref, out_nfs = {}, {}, {}, {}, {}, {}
     last_nfs = None
+    history = []
     for v in versions:
         items = parse_version(v, loc, fmap)
         nfs = sorted(n[5:] for n, it in items.items() if it["cost"] > 0 and not it["purchasable"])
         if nfs != last_nfs:                  # stored at change points only
             out_nfs[v] = last_nfs = nfs
-        prices, conf, meta = fit_version(items)
+        prices, conf, meta = fit_version(items, history)
+        history.insert(0, items)
         out_v[v], out_c[v], out_meta[v] = prices, conf, meta
         out_ref[v] = ref_cost(items)
         out_block[v] = {n[5:]: it["stats"]["damage_block"] for n, it in sorted(items.items())
@@ -382,7 +411,7 @@ def main():
            "expected damage blocked per attack (chance x mean of melee and ranged block). confidence: "
            "anchor = a single-stat basic item sells it, fit = identified by >= 2 pure items, single = by "
            "one pure item, prior = only the item family's total is identified, the split is the weak "
-           "prior's. ref_cost = median cost of "
+           "prior's; pooledN = split identified by pooling the pure items of the N earlier patches. ref_cost = median cost of "
            "purchasable items with an active (mana-cost rows of items without a price). not_for_sale = items "
            "with an ItemCost that the shop does not sell (Roshan drops, neutral items), listed at the "
            "versions where the list changes (valid until the next entry).")
