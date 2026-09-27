@@ -1229,7 +1229,8 @@ def _prop_row_text(o, nw):
 # ability_*_icon_psd -> icons/ui/ability/*.png). Only an item's description rows (no change tag / NEW).
 _ITEM_ABILITY_RE = re.compile(r'^\s*(Passive|Active|Toggle|Aura|Ability|Use)\s*:\s*(.*)$', re.S)
 _IAB_N = r"\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*"
-_IAB_META = (  # (key, icon, pattern of a whole sentence) — header order = game order: range, cost, cooldown
+_IAB_META = (  # (key, icon, pattern of a whole sentence) — header order: radius, then the game's range, cost, cooldown
+    ("aoe", "aoe", rf"Radius\s*:?\s*({_IAB_N})"),              # owner 2026-09-27: the radius goes to the header too
     ("castrange", "castrange", rf"Cast Range\s*:?\s*({_IAB_N})"),
     ("manacost", "manacost", rf"Mana Cost\s*:?\s*({_IAB_N}%?)"),
     ("healthcost", "healthcost", rf"Health Cost\s*:?\s*({_IAB_N}%?)"),
@@ -1366,27 +1367,87 @@ def _iab_has(num, text):
     return re.search(rf"(?<![\d./]){re.escape(num)}(?![\d/]|\.\d)", text) is not None
 
 
-def _iab_covered_change(text, tags):
-    """A numeric change row whose old and new values are both in the card (owner 2026-09-27: "don't
-    repeat what the card shows"): records which number of the new side to colour and returns True."""
+def _iab_note(text, extra):
+    """The row's own clarification — a trailing "(…)" or the popup of its inline note / (?) — as tooltip
+    HTML (badges kept), or ''."""
+    notes = []
+    m = re.search(r"\(([^()]{8,})\)\s*$", re.sub(r"<!--TIP-->.*?<!--/TIP-->", "", text, flags=re.S))
+    if m:
+        notes.append(_html.escape(m.group(1).strip(), quote=False))
+    blobs = re.findall(r"<!--TIP-->.*?<!--/TIP-->", text, flags=re.S)
+    if isinstance(extra, str):
+        blobs += re.findall(r"<!--TIP-->.*?<!--/TIP-->", extra, flags=re.S)
+    for blob in blobs:
+        pop = re.search(r'<span class="info-pop">(.*)</span></span><!--/TIP-->', blob, flags=re.S)
+        if pop and pop.group(1).strip():
+            notes.append(pop.group(1).strip())
+    note = "<br>".join(notes)
+    return note[:1].upper() + note[1:]
+
+
+def _iab_covered_change(text, tags, extra=""):
+    """A numeric change row the card can show (owner 2026-09-27: "don't repeat what the card shows"):
+    old and new value both in the card, or an AoE radius (it gets its own header value). Records what to
+    colour — and the row's note, shown as a dotted underline + hover text on that value — returns True."""
     card = getattr(_State, "iab_card", None)
     if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
         return False
-    plain = re.sub(r"<[^>]+>", " ", text)
-    direction = "buff" if "buff" in tags else "nerf" if "nerf" in tags else "new" if "new" in tags else ""
+    plain = re.sub(r"<!--TIP-->.*?<!--/TIP-->", " ", text, flags=re.S)
+    plain = re.sub(r"<[^>]+>", " ", plain)
+    direction = ("buff" if "buff" in tags else "nerf" if "nerf" in tags else "new" if "new" in tags
+                 else "misc" if "misc" in tags else "")
     if not direction:
         return False
     low = plain.lower()
-    target = next((v for k, v in _IAB_META_WORDS.items() if k in low), "num")
+    note = _iab_note(text, extra)
     m = _IAB_FROMTO_RE.search(plain)
+    if m and re.search(r"\bradius\b", low) and "cast range" not in low:
+        ability = next((n for n in card["names"] if n and low.startswith(n)), "")
+        if not ability and len(card["names"]) == 1 and low.startswith("radius"):
+            ability = next(iter(card["names"]))
+        if not ability:                                       # an ability the card doesn't show: keep the row
+            return False
+        _IAB_MARKS.setdefault(card["key"], []).append(("aoe", m.group(2), direction, note, ability, m.group(1)))
+        return True
+    target = next((v for k, v in _IAB_META_WORDS.items() if k in low), "num")
     if m and _iab_has(m.group(2), card["new"]) and _iab_has(m.group(1), card["old"]):
-        _IAB_MARKS.setdefault(card["key"], []).append((target, m.group(2), direction))
+        _IAB_MARKS.setdefault(card["key"], []).append((target, m.group(2), direction, note, "", ""))
         return True
     m = _IAB_NOWHAS_RE.search(plain)
     if m and _iab_has(m.group(1), card["new"]):
-        _IAB_MARKS.setdefault(card["key"], []).append((_IAB_META_WORDS[m.group(2).lower()], m.group(1), direction))
+        _IAB_MARKS.setdefault(card["key"], []).append((_IAB_META_WORDS[m.group(2).lower()], m.group(1), direction, note, "", ""))
         return True
     return False
+
+
+def _iab_hint(inner, note):
+    """A value with a note: light dotted underline, the note on hover (site tooltip, data-tooltip)."""
+    return (f'<span class="iab-hint abil-ico-hint" data-tooltip="{_html.escape(note, quote=True)}">{inner}</span>'
+            if note else inner)
+
+
+_IAB_AOE_SPAN = r'<span class="iab-m">(<img class="iab-ico" src="[^"]*aoe\.png" alt="">)({num})</span>'
+
+
+def _iab_set_radius(pane_html, ability, value, cls="", note=""):
+    """The ability's radius in its card header (by name): colour the radius value the tooltip already
+    gives ("Radius: 825"), or add one when the radius is only in the prose ("in a 350 radius")."""
+    cards = pane_html.split('<div class="iab-card">')
+    idx = next((i for i, c in enumerate(cards[1:], 1)
+                if re.search(rf'<span class="iab-name">{re.escape(ability)}</span>', c, re.I)), None)
+    if idx is None:
+        return pane_html
+    card = cards[idx]
+    ico = f'<img class="iab-ico" src="{ABILITY_ICON_DIR}aoe.png" alt="">'
+    cls_attr = f"iab-m {cls}".strip()
+    if re.search(_IAB_AOE_SPAN.format(num=r"[^<]*"), card):
+        card = re.sub(_IAB_AOE_SPAN.format(num=re.escape(value)),
+                      lambda m: f'<span class="{cls_attr}">{m.group(1)}{_iab_hint(m.group(2), note)}</span>', card, count=1)
+    else:
+        card = card.replace('<span class="iab-meta">',
+                            f'<span class="iab-meta"><span class="{cls_attr}">{ico}{_iab_hint(value, note)}</span>', 1)
+    cards[idx] = card
+    return '<div class="iab-card">'.join(cards)
 
 
 def render_iab_card(key):
@@ -1406,17 +1467,21 @@ def render_iab_card(key):
             cards.append(f'<div class="iab-card">{h}</div>')
         return "".join(cards)
 
-    right = pane(new, slots=True)
-    for target, value, direction in _IAB_MARKS.get(key, []):
+    right, left = pane(new, slots=True), pane(old)
+    for target, value, direction, note, ability, was in _IAB_MARKS.get(key, []):
         num = re.escape(value)
-        if target == "num":
+        if target == "aoe":                                   # a radius: a header value on both sides
+            right = _iab_set_radius(right, ability, value, f"iab-{direction}", note)
+            left = _iab_set_radius(left, ability, was)
+        elif target == "num":
             right = re.sub(rf'<b class="iab-num">([+\-]?{num}(?:%|s)?)</b>',
-                           rf'<b class="iab-num iab-{direction}">\1</b>', right, count=1)
+                           lambda m: _iab_hint(f'<b class="iab-num iab-{direction}">{m.group(1)}</b>', note), right, count=1)
         else:
-            right = re.sub(rf'<span class="iab-m">(<img class="iab-ico" src="[^"]*{target}\.png" alt="">{num})</span>',
-                           rf'<span class="iab-m iab-{direction}">\1</span>', right, count=1)
+            right = re.sub(rf'<span class="iab-m">(<img class="iab-ico" src="[^"]*{target}\.png" alt="">)({num})</span>',
+                           lambda m: f'<span class="iab-m iab-{direction}">{m.group(1)}{_iab_hint(m.group(2), note)}</span>',
+                           right, count=1)
     return ('<div class="properties-change iab-change">'
-            f'<div class="properties-pane pane-old">{pane(old)}</div>'
+            f'<div class="properties-pane pane-old">{left}</div>'
             '<span class="properties-arrow">→</span>'
             f'<div class="properties-pane pane-new">{right}</div></div>')
 
@@ -1527,7 +1592,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         classes.append("ability-row")
     # a number change the abilities card above already shows: hidden, its number coloured in the card
     if (isinstance(text, str) and "iab-covered" not in classes and "item-ability" not in classes
-            and (_State.current_entity_key or "").startswith("item|") and _iab_covered_change(text, dyn_tags)):
+            and (_State.current_entity_key or "").startswith("item|") and _iab_covered_change(text, dyn_tags, extra)):
         classes.append("iab-covered")
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""
     attr = f' data-tag="{tag_str}"' if tag_str else ""
@@ -1985,6 +2050,20 @@ def properties_change(old, new, old_extras=None, new_extras=None):
     old_rows = list(old) + [None] * (n - len(old))
     new_rows = list(new) + [None] * (n - len(new))
     same = _unchanged_stat_rows(old, new)                  # laid out by _prop_layout below
+    # An untagged row the content repeats on both sides ("+35 Damage" -> "+35 Damage", Abyssal Blade
+    # 7.38) is an unchanged stat too: dimmed with the others (owner 2026-09-27)
+    keep, twins = [], []
+    for i, (o, nw) in enumerate(zip(old_rows, new_rows)):
+        if (isinstance(o, (tuple, list)) and isinstance(nw, (tuple, list)) and len(o) == 2 and len(nw) == 2
+                and not o[0] and not nw[0] and o[1] == nw[1] and i not in old_extras and i not in new_extras):
+            twins.append(("", o[1]))
+        else:
+            keep.append(i)
+    if twins:
+        old_extras = {keep.index(i): v for i, v in old_extras.items()}
+        new_extras = {keep.index(i): v for i, v in new_extras.items()}
+        old_rows, new_rows = [old_rows[i] for i in keep], [new_rows[i] for i in keep]
+        same = twins + same
     # A value that CHANGED ("+10 Strength" -> "+26 Strength +160%") carries its BUFF/NERF chip
     # on the NEW side, next to the new value and its badge — content may give it on either side.
     # DEL stays on the old side (the property is gone), NEW on the new side.
@@ -2055,8 +2134,10 @@ def properties_change(old, new, old_extras=None, new_extras=None):
 
     if same:
         old_rows, new_rows, old_extras, new_extras = _prop_layout(old_rows, new_rows, same, old_extras, new_extras)
-    old_empty = not old or all(r is None for r in old)
-    new_empty = not new or all(r is None for r in new)
+    # the unchanged stats fill BOTH panes: a card whose only change is a removed stat still shows the
+    # item's stats of this patch on the right (owner 2026-09-27, Bloodstone 7.38), not an empty space
+    old_empty = (not old or all(r is None for r in old)) and not same
+    new_empty = (not new or all(r is None for r in new)) and not same
     old_body, old_n = pane_cells(old_rows, old_extras)
     new_body, new_n = pane_cells(new_rows, new_extras)
     total_rows = max(old_n, new_n)

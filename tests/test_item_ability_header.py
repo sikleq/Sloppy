@@ -23,6 +23,34 @@ def test_a_description_without_a_name_keeps_its_first_sentence():
     assert "iab-name" not in h and "Increases your current" in h
 
 
+def test_a_radius_sentence_goes_to_the_header_with_the_aoe_icon():
+    h = el._item_ability_html("Active: Arctic Blast. Emits a freezing wave. Radius: 825. Mana Cost: 75. Cooldown: 27s")
+    head, desc = h.split('<span class="iab-desc">')
+    assert "aoe.png" in head and ">825<" in head and "Radius" not in desc
+
+
+def test_a_misc_radius_row_joins_the_header_grey_with_its_note_on_hover():
+    # Gleipnir 7.38: the radius is only in the prose, the row says why it doesn't matter
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _State.current_entity_key, _State.current_patch_version = "item|gleipnir-test", "7.38"
+        el.item_abilities_change(
+            old=["Active: Eternal Chains. Roots all enemies in a target 350 radius for 2 seconds. Cooldown: 18s"],
+            new=["Active: Eternal Chains. Roots all enemies in a 350 radius for 2 seconds. Cooldown: 18s"])
+        row = ("Eternal Chains radius decreased from 350 to 275 "
+               "(effective spell radius unchanged due to item's built-in AoE Bonus)")
+        assert el._iab_covered_change(row, {"misc"})
+        assert not el._iab_covered_change("Chain Lightning radius increased from 600 to 650", {"buff"})
+        old, new = el.render_iab_card("item|gleipnir-test|7.38").split("pane-new")
+        assert "aoe.png" in old and ">350<" in old
+        assert 'class="iab-m iab-misc"' in new and "aoe.png" in new
+        assert ('class="iab-hint abil-ico-hint" data-tooltip="Effective spell radius unchanged due to '
+                'item&#x27;s built-in AoE Bonus">275</span>') in new
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
 def test_item_abilities_change_puts_each_ability_in_a_card_on_its_side():
     from patch.state import _State
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))

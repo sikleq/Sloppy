@@ -487,7 +487,7 @@ def build():
     W(item_header("Heaven's Halberd", changed=True))
     W(auto_components_change("Heaven's Halberd", "7.41"))
     W(properties_change(
-        old=[("BUFF", "+6 Health Regen"), ("DEL",  "+275 Health"), ("DEL",  "Damage Block (passive)")],
+        old=[("BUFF", "+6 Health Regen"), ("DEL",  "+275 Health")],
         new=[("",     "+6.5 Health Regen", b(6, 6.5)), ("NEW",  "+9 Armor"), ("NEW",  "+25% Evasion")]))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
@@ -499,6 +499,7 @@ def build():
     W(li("Disarm cooldown decreased from 20s to 16s", b(20, 16, l=True)))
     W(li("Disarm cast range increased from 650 to 750", b(650, 750)))
     W(li("Disarm duration increased from 3s to 3.5s", b(3, 3.5)))
+    W(li("Removed Damage Block ability", t("DEL")))
     W(li("Can no longer be disassembled", t("DEL")))
     W(ul_close())
     W(item_header("Kaya"))

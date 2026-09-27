@@ -336,7 +336,9 @@ body.patch-page .entity-block > .properties-change {
    widths, no per-box nudge needed. */
 body.patch-page .dyn-row-wrap {
   margin-left: 0;
-  margin-right: 0;
+  /* -4px = .patch-dynamics' own side padding: the LAST CELL (not the padded row) ends on the boxes' right
+     border (owner 2026-09-27: it sat 4px inside) */
+  margin-right: -4px;
 }
 /* ul.changes carried a 6px right padding to compensate the old cell-row
    overhang. The row now ends at the content edge, so drop it — otherwise the
@@ -3988,9 +3990,9 @@ ul.changes li.mech-desc.mech-last {
 .properties-change .property-badge {
   justify-self: end;
   white-space: nowrap;
-  /* Pane has padding-right: 14px. Pull the badge cell 12px outside that
-     padding so the b() % bands sit only 2px from the pane's right border. */
-  margin-right: -12px;
+  /* Pane has padding-right: 14px: the b() % bands keep it, as far from the right border as the tags are
+     from the left one (owner 2026-09-27: 2px from the border looked cramped). */
+  margin-right: 0;
 }
 .properties-change .property-row-empty {
   min-height: 1.5em;
@@ -10852,9 +10854,11 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-head { display: flex; align-items: center; justify-content: space-between; gap: 12px;
   margin: -6px -12px 5px; padding: 2px 12px; min-height: 22px; box-sizing: border-box;
   background: rgba(255, 255, 255, 0.035); border-bottom: 1px solid var(--line-soft);
-  border-radius: 6px 6px 0 0; line-height: 18px; }
+  border-radius: 6px 6px 0 0; line-height: 18px; flex-wrap: wrap; row-gap: 0; }
+/* the name stays on one line; long values (Dagon's 5 levels) wrap below it, still on the right */
+.iab-title { white-space: nowrap; }
 .iab-name { color: var(--text-bright); font-weight: 600; }
-.iab-meta { display: flex; align-items: center; gap: 12px; flex: none; font-weight: 600;
+.iab-meta { display: flex; align-items: center; gap: 12px; flex: none; font-weight: 600; margin-left: auto;
   color: var(--text-bright); font-variant-numeric: tabular-nums; }
 .iab-m { display: inline-flex; align-items: center; gap: 4px; }
 .iab-ico { width: 13px; height: 13px; border-radius: 2px; display: block; }
@@ -10884,3 +10888,7 @@ ul.changes li.iab-covered { display: none !important; }
 .iab-num.iab-buff, .iab-m.iab-buff { color: #7fd08c; }
 .iab-num.iab-nerf, .iab-m.iab-nerf { color: #e3806e; }
 .iab-num.iab-new, .iab-m.iab-new { color: #e0bd62; }
+.iab-num.iab-misc, .iab-m.iab-misc { color: var(--text-dimmer); }
+/* a value with a note (the row's "(…)" / (?)): light dotted underline, the note on hover — no (?) icon in
+   the header (owner 2026-09-27, Gleipnir 7.38 radius) */
+.iab-hint { display: inline; border-bottom: 1px dotted currentColor; padding-bottom: 0; line-height: 1.1; }

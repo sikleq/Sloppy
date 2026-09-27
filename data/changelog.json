@@ -4,6 +4,26 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "Item ability headers show the radius with the game's icon; a note on a value is a dotted underline with the text on hover (e.g. Gleipnir 7.38)",
+      "minor": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "Item stats cards: the right side always lists the item's stats (Bloodstone 7.38), unchanged stats are greyed (Abyssal Blade 7.38), abilities are no longer listed as stats (Heaven's Halberd 7.41)",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "Percentages in stats cards sit further from the border; the patch squares line up with the cards' right edge",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "Every item whose stats changed shows the before / after stats card (75 more items, e.g. Bloodstone 7.38)",
       "minor": true,
       "fix": true
