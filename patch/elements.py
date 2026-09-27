@@ -1450,16 +1450,41 @@ def _iab_set_radius(pane_html, ability, value, cls="", note=""):
     return '<div class="iab-card">'.join(cards)
 
 
+def _iab_ability_key(text):
+    m = _ITEM_ABILITY_RE.match(text)
+    return _iab_name(m.group(2).strip())[0].lower() if m else text.lower()
+
+
+def _iab_pair_rows(old, new):
+    """Old and new abilities side by side, paired by name (owner 2026-09-27, Heaven's Halberd 7.38: an
+    arrow next to an ability that has no counterpart points at nothing). Both sides keep their order; an
+    ability only one side has gets a row of its own with an empty cell on the other side."""
+    new_keys = [_iab_ability_key(t) for t in new]
+    rows, used = [], set()
+    for t in old:
+        j = next((j for j, k in enumerate(new_keys) if k == _iab_ability_key(t) and j not in used), None)
+        if j is not None:
+            rows += [(None, new[i]) for i in range(j) if i not in used]
+            used.update(range(j + 1))
+        rows.append((t, new[j] if j is not None else None))
+    rows += [(None, new[i]) for i in range(len(new)) if i not in used]
+    return rows
+
+
 def render_iab_card(key):
-    """The abilities card html (page.save_html fills <!--IABCARD:key-->): both panes, the numbers the
-    hidden rows change coloured by their tag (green better / red worse / gold new)."""
+    """The abilities card html (page.save_html fills <!--IABCARD:key-->): the abilities in rows, old left /
+    new right, an arrow only between an ability and its counterpart; the numbers the hidden rows change
+    coloured by their tag (green better / red worse / gold new)."""
     if key not in _IAB_CARDS:
         return ""
-    old, new = _IAB_CARDS[key]
+    rows = _iab_pair_rows(*_IAB_CARDS[key])
 
     def pane(texts, slots=False):
         cards = []
         for t in texts:
+            if t is None:
+                cards.append('<div class="iab-none"></div>')    # the other side's ability has no counterpart
+                continue
             h = _item_ability_html(t) or _html.escape(t)
             m = _ITEM_ABILITY_RE.match(t)
             if slots and m and "iab-desc" in h:                 # a slot for a moved (?) note
@@ -1467,7 +1492,7 @@ def render_iab_card(key):
             cards.append(f'<div class="iab-card">{h}</div>')
         return "".join(cards)
 
-    right, left = pane(new, slots=True), pane(old)
+    right, left = pane([n for _, n in rows], slots=True), pane([o for o, _ in rows])
     for target, value, direction, note, ability, was in _IAB_MARKS.get(key, []):
         num = re.escape(value)
         if target == "aoe":                                   # a radius: a header value on both sides
@@ -1480,9 +1505,10 @@ def render_iab_card(key):
             right = re.sub(rf'<span class="iab-m">(<img class="iab-ico" src="[^"]*{target}\.png" alt="">)({num})</span>',
                            lambda m: f'<span class="iab-m iab-{direction}">{m.group(1)}{_iab_hint(m.group(2), note)}</span>',
                            right, count=1)
-    return ('<div class="properties-change iab-change">'
-            f'<div class="properties-pane pane-old">{left}</div>'
-            '<span class="properties-arrow">→</span>'
+    arrows = "".join(f'<span class="properties-arrow" style="grid-row:{i}">→</span>'
+                     for i, (o, n) in enumerate(rows, 1) if o is not None and n is not None)
+    return (f'<div class="properties-change iab-change" style="grid-template-rows:repeat({len(rows)},auto)">'
+            f'<div class="properties-pane pane-old">{left}</div>{arrows}'
             f'<div class="properties-pane pane-new">{right}</div></div>')
 
 

@@ -4,6 +4,22 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "Reworked items: abilities before and after, as in the game",
+      "link": "patches/7.38.html",
+      "items": [
+        "Each changed item ability is shown before and after, side by side, from the game's own tooltips of each patch (51 items, 7.38–7.41)",
+        "A header like the game's: radius, cast range, mana cost and cooldown with their icons, numbers in bold",
+        "Changed numbers are coloured in the card; rows that only repeat it are hidden (tag filters still count them)",
+        "Stats cards list every stat of the item, the unchanged ones greyed"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-27_item_rework.webp",
+        "icons/changelog/2026-09-27_item_abilities.webp"
+      ]
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "Item ability headers show the radius with the game's icon; a note on a value is a dotted underline with the text on hover (e.g. Gleipnir 7.38)",
       "minor": true
     },

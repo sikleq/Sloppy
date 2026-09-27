@@ -336,9 +336,9 @@ body.patch-page .entity-block > .properties-change {
    widths, no per-box nudge needed. */
 body.patch-page .dyn-row-wrap {
   margin-left: 0;
-  /* -4px = .patch-dynamics' own side padding: the LAST CELL (not the padded row) ends on the boxes' right
-     border (owner 2026-09-27: it sat 4px inside) */
-  margin-right: -4px;
+  /* -19px = .patch-dynamics' own 4px side padding + the cards' 15px right overhang: the LAST CELL ends on
+     the item cards' right border (owner 2026-09-27) */
+  margin-right: -19px;
 }
 /* ul.changes carried a 6px right padding to compensate the old cell-row
    overhang. The row now ends at the content edge, so drop it — otherwise the
@@ -3771,7 +3771,9 @@ h4.subgroup .subgroup-new-type {
 }
 .properties-change .properties-pane {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  /* the tag column is always the chip's width: a pane without tags (Gleipnir 7.38 old side, Bloodstone
+     7.38 new side) starts its text where the other pane does (owner 2026-09-27) */
+  grid-template-columns: 64px 1fr auto;
   grid-template-rows: subgrid;
   grid-row: 1 / -1;
   column-gap: 8px;
@@ -3792,8 +3794,10 @@ h4.subgroup .subgroup-new-type {
   box-sizing: border-box;
   text-align: center;
 }
+/* ... and 15px right, the mirror: the cards' % bands end on the change rows' % column (owner 2026-09-27,
+   Battle Fury 7.38: -23% in the card vs -14% in the row) */
 body.patch-page .entity-block > .components-change,
-body.patch-page .entity-block > .properties-change { margin-left: -15px; }
+body.patch-page .entity-block > .properties-change { margin-left: -15px; margin-right: -15px; }
 .properties-change .pane-old { grid-column: 1; }
 .properties-change .pane-new { grid-column: 3; }
 .properties-change .properties-arrow {
@@ -10864,10 +10868,13 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-ico { width: 13px; height: 13px; border-radius: 2px; display: block; }
 .iab-desc { display: block; }
 .iab-num { font-weight: 700; color: var(--text-bright); }
-/* Item abilities before -> after (item_abilities_change): each pane is a column of ability cards */
-.properties-change.iab-change { align-items: start; }
-.properties-change.iab-change .properties-pane { display: flex; flex-direction: column; align-items: stretch; gap: 8px; grid-row: auto;
-  padding: 0; background: none; border: 0; }
+/* Item abilities before -> after (item_abilities_change): one row per ability, old left / new right paired
+   by name (render_iab_card); a pair's two cards share the row height; an arrow only between a pair, an
+   ability without a counterpart sits next to an empty cell (owner 2026-09-27, Heaven's Halberd 7.38) */
+.properties-change.iab-change { align-items: stretch; row-gap: 8px; }
+.properties-change.iab-change .properties-pane { display: grid; grid-template-columns: 1fr; grid-template-rows: subgrid;
+  grid-row: 1 / -1; row-gap: 8px; padding: 0; background: none; border: 0; align-items: stretch; }
+.properties-change.iab-change .properties-arrow { align-self: center; }
 .iab-card { background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px; padding: 6px 12px; }
 .iab-card .iab-desc { line-height: 1.45; }
 /* Tagged item-ability box: the chip's top edge on the header's top edge (owner 2026-09-27) */

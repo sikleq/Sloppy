@@ -51,6 +51,28 @@ def test_a_misc_radius_row_joins_the_header_grey_with_its_note_on_hover():
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
 
 
+def test_abilities_pair_by_name_and_only_a_pair_gets_an_arrow():
+    # Heaven's Halberd 7.38: Disarm -> Disarm gets the arrow, the new Damage Block has nothing to point from
+    rows = el._iab_pair_rows(["Active: Disarm. Old text."],
+                             ["Active: Disarm. New text.", "Passive: Damage Block. Blocks damage."])
+    assert rows == [("Active: Disarm. Old text.", "Active: Disarm. New text."),
+                    (None, "Passive: Damage Block. Blocks damage.")]
+    # Gleipnir 7.38: the removed Chain Lightning keeps its place, an empty cell on the right
+    rows = el._iab_pair_rows(["Active: Eternal Chains. A.", "Passive: Chain Lightning. B."], ["Active: Eternal Chains. C."])
+    assert rows[1] == ("Passive: Chain Lightning. B.", None)
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _State.current_entity_key, _State.current_patch_version = "item|halberd-test", "7.38"
+        el.item_abilities_change(old=["Active: Disarm. Old text."],
+                                 new=["Active: Disarm. New text.", "Passive: Damage Block. Blocks damage."])
+        html = el.render_iab_card("item|halberd-test|7.38")
+        assert html.count('class="properties-arrow"') == 1 and 'style="grid-row:1"' in html
+        assert 'class="iab-none"' in html.split("pane-new")[0]            # the empty cell is on the old side
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
 def test_item_abilities_change_puts_each_ability_in_a_card_on_its_side():
     from patch.state import _State
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
