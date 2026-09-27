@@ -10872,3 +10872,8 @@ ul.changes li.item-ability.ability-box-tagged > .badge:first-child { top: 0; }
 ul.changes li.ability-row-solo, ul.changes li.ability-row-start { margin-top: 14px; }
 ul.changes li.ability-row-solo, ul.changes li.ability-row-end { margin-bottom: 8px; }
 .properties-change.iab-change { margin-bottom: 12px; }
+/* Header numbers as in the game's tooltip: Radiance bold, proportional digits (tabular "1 1 0 0" looked
+   spaced out — owner 2026-09-27) */
+.iab-meta { font-family: 'Radiance', 'Segoe UI', Arial, sans-serif; font-weight: 700;
+  font-variant-numeric: proportional-nums; letter-spacing: 0; }
+.iab-m { gap: 3px; }

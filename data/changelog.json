@@ -4,6 +4,13 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "Ability header numbers in the game's font, no longer spaced out",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "Items whose ability changed show it before and after, side by side (51 items, 7.38–7.41)",
       "minor": true
     },
