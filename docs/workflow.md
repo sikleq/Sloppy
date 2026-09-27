@@ -311,3 +311,12 @@ tracked as follow-up work, not yet done.
 | Filter doesn't catch a row | `data-tag` attribute missing — check the `b()` / `t()` call on the row. |
 | Per-level table doesn't expand | `bf()` table not threaded through `extra=` on the `li()`. |
 | BAT row tagged the wrong direction | Missing `l=True` on `b(old, new)`. |
+
+
+## Old tooltips of any patch (2026-09-27)
+
+`python tools/fetch_loc_history.py` keeps the game's localization of every patch (abilities, items, talents,
+facets, hero texts) in `~/outputs/loc_history/<version>/` (outside the repo, from d2vpkr: the last commit
+before the next patch). Read a tooltip as it was: `tools.loc_history.tooltip(key, "7.37e")` — numbers stay as
+%placeholders%, fill them from that patch's KV. Run it after every new patch (only missing versions are fetched).
+Old descriptions on the site (ability_change / item_abilities_change) come from here — never invented.
