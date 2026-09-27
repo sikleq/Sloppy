@@ -77,6 +77,7 @@ def build():
     W(li("Recipe cost decreased from 400 to 300. Total cost decreased from 2600 to 2500", b([400, 2600], [300, 2500], l=True, slash=True)))
     W(ul_close())
     W(item_header("Khanda"))
+    W(auto_components_change("Khanda", "7.39c"))
     W(ul_open())
     W(li("Total cost decreased from 5700 to 5600 (due to Phylactery Recipe cost reduction)", b(5700, 5600, l=True)))
     W(li("Empower Spell Break debuff no longer dispellable", t("BUFF"), extra=inline_note("Slow debuff applied by Empower Spell is still dispellable")))

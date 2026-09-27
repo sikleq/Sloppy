@@ -20,6 +20,12 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "Item prices move into the components card: the recipe and total coloured, the total's % at the end of the card; the separate cost row is gone (tag filters still count it)",
+      "minor": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "Item stats cards now also show the stats a patch changed without saying so, from the game files (Gleipnir 7.38: +25 Damage and +25 Attack Speed removed; Heaven's Halberd 7.41: +5 All Attributes removed)",
       "minor": true,
       "fix": true

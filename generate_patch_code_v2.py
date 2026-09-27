@@ -1695,6 +1695,38 @@ def _postprocess_properties_change(lines):
     return out
 
 
+_ITEM_PRICE_LI_RE = re.compile(r'^\s*W\(li\(\s*"(?:Recipe [Cc]ost|Total [Cc]ost|No longer requires an? \d+ gold recipe)')
+_ENTITY_START_RE = re.compile(r'^\s*W\((?:item|hero|unit|plain|enchant)_header\(|^\s*W\(section\(')
+
+
+def _postprocess_cost_components(lines, version):
+    """Owner 2026-09-27 ("if the item has other changes, put its price into the cards"): an item whose
+    recipe / total cost changed AND that has other changes gets the components card
+    (auto_components_change) even when only the recipe price moved; the card shows the recipe chip and
+    the total old -> new with its %, and the cost row under it is hidden (elements._cost_covered). An
+    item whose only change is its price keeps the plain row."""
+    out, i = [], 0
+    while i < len(lines):
+        m_hdr = re.match(r'^(\s*)W\(item_header\("([^"]+)"(?![^)]*new=)[^)]*\)\)', lines[i])
+        if not m_hdr:
+            out.append(lines[i])
+            i += 1
+            continue
+        end = i + 1
+        while end < len(lines) and not _ENTITY_START_RE.match(lines[end]):
+            end += 1
+        block = lines[i:end]
+        has_card = any('auto_components_change(' in ln for ln in block)
+        cost_rows = [ln for ln in block if _ITEM_PRICE_LI_RE.match(ln)]
+        others = [ln for ln in block[1:] if re.match(r'^\s*W\((?:li|properties_change|item_abilities_change)\(', ln)
+                  and not _ITEM_PRICE_LI_RE.match(ln)]
+        if cost_rows and others and not has_card:
+            block.insert(1, f'{m_hdr.group(1)}W(auto_components_change("{m_hdr.group(2)}", "{version}"))')
+        out.extend(block)
+        i = end
+    return out
+
+
 _CARD_LINE_RE = re.compile(r'^(W\(properties_change\(old=\[)(.*?)(\], new=\[)(.*)(\]\)\))$')
 _GRANT_TOKEN_RE = re.compile(r"\+[\d./]+%?\s+[A-Za-z' ]+")
 
@@ -2826,6 +2858,7 @@ def generate(version):
     out = _postprocess_scale_pill(out)
     out = _postprocess_new_block_label(out)
     out = _postprocess_new_item_card(out, version)
+    out = _postprocess_cost_components(out, version)
     out = _postprocess_properties_change(out)
     out = _postprocess_silent_stats(out, version)
     out = _postprocess_unstated_total_cost(out)

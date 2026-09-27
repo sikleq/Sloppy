@@ -171,6 +171,7 @@ def build():
     W(li("Frost's slow and health restoration reduction no longer stack with Orb of Corrosion and Eye of Skadi", t("DEL")))
     W(ul_close())
     W(item_header("Orb of Corrosion"))
+    W(auto_components_change("Orb of Corrosion", "7.39"))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Corrosion. Your attacks reduce the target's armor by -2, slows their movement by -16% (-8% against melee targets), and reduces heals, health regeneration, lifesteal and Spell lifesteal by 16% for 3 seconds."],

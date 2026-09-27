@@ -1620,6 +1620,10 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     if (isinstance(text, str) and "iab-covered" not in classes and "item-ability" not in classes
             and (_State.current_entity_key or "").startswith("item|") and _iab_covered_change(text, dyn_tags, extra)):
         classes.append("iab-covered")
+    # a cost row the components card above already shows: hidden, the card gets its % and colours
+    if (isinstance(text, str) and "iab-covered" not in classes
+            and (_State.current_entity_key or "").startswith("item|") and _cost_covered(text, extra)):
+        classes.append("iab-covered")
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""
     attr = f' data-tag="{tag_str}"' if tag_str else ""
     trailing_tips = []
@@ -2267,21 +2271,118 @@ def _components_side(parts, recipe, total, marks):
             f'<div class="components-total">= <span>{total}</span></div>')
 
 
+_COST_CARDS = {}          # "<ek>|<pv>" -> components_change arguments, drawn by render_cost_card
+_COST_MARKS = {}          # "<ek>|<pv>" -> {"total": dir, "recipe": dir, "note": html} from the hidden cost rows
+
+
 def components_change(old, new, total_old, total_new,
                       recipe_old=None, recipe_new=None,
                       added=None, removed=None):
+    _note_cost_panel(total_old, total_new)
+    args = (old, new, total_old, total_new, recipe_old, recipe_new, added, removed)
+    ek = _State.current_entity_key or ""
+    if not ek.startswith("item|") or not _State.current_patch_version:
+        return _components_html(*args)
+    # drawn when the page is saved: the cost rows under it (hidden, still counted) mark it first
+    key = f"{ek}|{_State.current_patch_version}"
+    _COST_CARDS[key] = args
+    _State.cost_card = {"ek": ek, "pv": _State.current_patch_version, "key": key,
+                        "total_old": total_old, "total_new": total_new,
+                        "recipe_old": recipe_old[1] if recipe_old else None,
+                        "recipe_new": recipe_new[1] if recipe_new else None}
+    return f"<!--COSTCARD:{key}-->"
+
+
+def _components_html(old, new, total_old, total_new, recipe_old=None, recipe_new=None,
+                     added=None, removed=None, marks=None):
     marks_old = {name: 'removed' for name in (removed or [])}
     marks_new = {name: 'added' for name in (added or [])}
-    _note_cost_panel(total_old, total_new)
+    right = _components_side(new, recipe_new, total_new, marks_new)
+    marks = marks or {}
+    if marks.get("recipe") and recipe_new:
+        # the new recipe price, coloured by its direction (cheaper = green)
+        price = '<div class="component-price">'
+        i = right.rfind(price)
+        right = right[:i] + f'<div class="component-price cost-{marks["recipe"]}">' + right[i + len(price):]
+    if marks.get("total") or marks.get("note"):
+        cls = f' class="cost-{marks["total"]}"' if marks.get("total") else ""
+        right = right.replace(f'= <span>{total_new}</span>',
+                              f'= <span{cls}>{_iab_hint(str(total_new), marks.get("note", ""))}</span>', 1)
+    if marks.get("total"):
+        # the total's change at the end of the block, on the change rows' % column (owner 2026-09-27)
+        from .badges import b
+        right += f'<span class="components-pct">{b(total_old, total_new, l=True)}</span>'
     return (f'<div class="components-change">'
             f'<div class="components-box components-pane">'
             f'{_components_side(old, recipe_old, total_old, marks_old)}'
             f'</div>'
             f'<span class="components-arrow">→</span>'
-            f'<div class="components-box components-pane">'
-            f'{_components_side(new, recipe_new, total_new, marks_new)}'
-            f'</div>'
+            f'<div class="components-box components-pane">{right}</div>'
             f'</div>')
+
+
+def render_cost_card(key):
+    """The components card html (page.save_html fills <!--COSTCARD:key-->)."""
+    if key not in _COST_CARDS:
+        return ""
+    return _components_html(*_COST_CARDS[key], marks=_COST_MARKS.get(key))
+
+
+_COST_SENTENCES = (
+    ("total", re.compile(r"Total [Cc]ost (?:increased|decreased) from (\d+)g? to (\d+)g?")),
+    ("total_same", re.compile(r"Total [Cc]ost unchanged(?: at (\d+)g?)?")),
+    ("recipe", re.compile(r"Recipe [Cc]ost (?:increased|decreased) from (\d+)g? to (\d+)g?")),
+    ("recipe_same", re.compile(r"Recipe [Cc]ost unchanged(?: at (\d+)g?)?")),
+    ("recipe_gone", re.compile(r"No longer requires an? (\d+) gold recipe")),
+)
+
+
+def _cost_sentence_ok(kind, nums, card):
+    n = [int(x) for x in nums if x]
+    to, tn, ro, rn = card["total_old"], card["total_new"], card["recipe_old"], card["recipe_new"]
+    if kind == "total":
+        return n == [to, tn]
+    if kind == "total_same":
+        return to == tn and all(x == tn for x in n)
+    if kind == "recipe":
+        return n == [ro, rn]
+    if kind == "recipe_same":
+        return ro == rn and all(x == rn for x in n)
+    return rn is None and n == [ro]                            # recipe_gone
+
+
+def _cost_covered(text, extra=""):
+    """A cost row whose every number the components card above already shows (the recipe chip, the
+    "= total"): hidden, still counted (owner 2026-09-27: "Total cost decreased from 2825 to 2800" ->
+    the card's own % at the end of the block). Records the colours, the % and the row's note."""
+    card = getattr(_State, "cost_card", None)
+    if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
+        return False
+    plain = re.sub(r"<[^>]+>", " ", re.sub(r"<!--TIP-->.*?<!--/TIP-->", " ", text, flags=re.S))
+    rest, kinds = plain, set()
+    for kind, rx in _COST_SENTENCES:
+        m = rx.search(rest)
+        if not m:
+            continue
+        if not _cost_sentence_ok(kind, m.groups(), card):
+            return False
+        kinds.add(kind)
+        rest = rest[:m.start()] + " " + rest[m.end():]
+    if not kinds & {"total", "recipe", "recipe_gone", "total_same"}:
+        return False
+    rest = re.sub(r"[+\-−]\d+%", " ", rest)                   # a b() badge written into the text (Pipe 7.41)
+    rest = re.sub(r"\s+", " ", rest).strip(" .,;")
+    if re.search(r"\d", rest) or (rest and not re.match(r"\(?(?:change is \w+ )?due to ", rest, re.I)):
+        return False                                           # something the card can't show: keep the row
+    note = _iab_note(text, extra)
+    if rest and not rest.startswith("("):
+        note = "<br>".join(x for x in (note, rest[:1].upper() + rest[1:]) if x)
+    to, tn, ro, rn = card["total_old"], card["total_new"], card["recipe_old"], card["recipe_new"]
+    _COST_MARKS[card["key"]] = {
+        "total": ("buff" if tn < to else "nerf") if to != tn else None,
+        "recipe": ("buff" if rn < ro else "nerf") if ro and rn and ro != rn else None,
+        "note": note}
+    return True
 
 
 def aghs_line(text, kind="scepter", inline_note_text=None):

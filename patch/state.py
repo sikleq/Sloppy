@@ -39,6 +39,7 @@ class _State:
     pending_rework = None            # an item's unscored REWORK rows, scored at the end (signal R)
     damage_rows = None               # hero damage rows of the block: base / L1 / gain / L30 (no double count)
     iab_card = None                  # the item abilities card of the current block (hides duplicate rows)
+    cost_card = None                 # the item components card of the current block (hides its cost rows)
     cell_rows = None                 # a hero block's NEW / DEL / REWORK rows: replacements, moves (weights)
                                      # of the block unless an li() row states the cost itself
 

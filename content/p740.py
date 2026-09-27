@@ -258,6 +258,7 @@ def build():
     W(li("Cost decreased from 700 to 650", b(700, 650, l=True)))
     W(ul_close())
     W(item_header("Bloodstone"))
+    W(auto_components_change("Bloodstone", "7.40"))
     W(properties_change(old=[("BUFF", "+20% Spell Lifesteal")], new=[("", "+25% Spell Lifesteal", b(20, 25))]))
     W(ul_open())
     W(li("Total cost decreased from 4400 to 4350 due to Voodoo Mask cost decrease", b(4400, 4350, l=True)))
@@ -345,6 +346,7 @@ def build():
     W(li("Transmute charge restore time decreased from 110s to 90s", b(110, 90, l=True)))
     W(ul_close())
     W(item_header("Heart of Tarrasque"))
+    W(auto_components_change("Heart of Tarrasque", "7.40"))
     W(ul_open())
     W(li("Total cost decreased from 5200 to 5100 due to Ring of Tarrasque cost decrease", b(5200, 5100, l=True)))
     W(li("Max Health Regen bonus decreased from +1.4% to +1%", b(1.4, 1)))
@@ -467,6 +469,7 @@ def build():
     W(li("Arctic Blast no longer does extra damage to illusions", t("DEL")))
     W(ul_close())
     W(item_header("Silver Edge"))
+    W(auto_components_change("Silver Edge", "7.40"))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Shadow Walk. Makes you invisible for 17 seconds, or until you attack or cast a spell. While invisible, you move 25% faster and can move through units. Attacking to end the invisibility will deal 300 bonus physical damage and disable their passive abilities for 6 seconds. Mana Cost: 75. Cooldown: 20s"],

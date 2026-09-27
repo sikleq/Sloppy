@@ -10896,6 +10896,11 @@ ul.changes li.iab-covered { display: none !important; }
 .iab-num.iab-nerf, .iab-m.iab-nerf { color: #e3806e; }
 .iab-num.iab-new, .iab-m.iab-new { color: #e0bd62; }
 .iab-num.iab-misc, .iab-m.iab-misc { color: var(--text-dimmer); }
+/* Components card with its cost rows folded in (owner 2026-09-27): the new recipe price and total coloured
+   by direction, the total's % at the end of the block on the rows' % column */
+.components-change .components-pct { margin-left: auto; white-space: nowrap; }
+.components-change .component-price.cost-buff, .components-change .components-total span.cost-buff { color: #7fd08c; }
+.components-change .component-price.cost-nerf, .components-change .components-total span.cost-nerf { color: #e3806e; }
 /* a value with a note (the row's "(…)" / (?)): light dotted underline, the note on hover — no (?) icon in
    the header (owner 2026-09-27, Gleipnir 7.38 radius) */
 .iab-hint { display: inline; border-bottom: 1px dotted currentColor; padding-bottom: 0; line-height: 1.1; }

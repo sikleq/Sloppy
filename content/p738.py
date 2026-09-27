@@ -416,6 +416,7 @@ def build():
     W(li("Total cost decreased from 4275 to 4225 (due to Wind Lace cost decrease)", b(4275, 4225, l=True)))
     W(ul_close())
     W(item_header("Drum of Endurance"))
+    W(auto_components_change("Drum of Endurance", "7.38"))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Endurance. Consumes a charge and gives +45 attack speed and +13% movement speed to nearby allies for 6 seconds. Comes with 8 charges. Radius: 1200. Cooldown: 30s",
@@ -553,6 +554,7 @@ def build():
     W(li("Total cost increased from 3000 to 3350", b(3000, 3350, l=True)))
     W(ul_close())
     W(item_header("Silver Edge"))
+    W(auto_components_change("Silver Edge", "7.38"))
     W(properties_change(old=[("BUFF", "+60 Bonus Damage")], new=[("", "+70 Bonus Damage", b(60, 70))]))
     W(ul_open())
     W(li("Total cost increased from 5450 to 5800 due to Shadow Blade Changes", b(5450, 5800, l=True)))
