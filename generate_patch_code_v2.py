@@ -1695,6 +1695,49 @@ def _postprocess_properties_change(lines):
     return out
 
 
+_CARD_LINE_RE = re.compile(r'^(W\(properties_change\(old=\[)(.*?)(\], new=\[)(.*)(\]\)\))$')
+_GRANT_TOKEN_RE = re.compile(r"\+[\d./]+%?\s+[A-Za-z' ]+")
+
+
+def _postprocess_silent_stats(lines, version):
+    """Owner 2026-09-27 (Gleipnir 7.38 lost +25 Damage and +25 Attack Speed without a word in the notes):
+    the stats card also gets what the game's items.txt shows changed between the previous patch and this
+    one but the block never mentions — removed -> DEL on the old side, added -> NEW, changed -> old / new
+    with its b() badge. Guarded by tests/test_item_card_rows.py."""
+    from patch.elements import silent_stat_changes, _stat_text
+    out, i = [], 0
+    while i < len(lines):
+        m_hdr = re.match(r'W\(item_header\("([^"]+)"(?![^)]*new=)[^)]*\)\)', lines[i])
+        if not m_hdr:
+            out.append(lines[i])
+            i += 1
+            continue
+        end = i + 1
+        while end < len(lines) and not re.match(r'W\((?:item|hero|unit|plain)_header\(|W\(section\(', lines[end]):
+            end += 1
+        block = lines[i:end]
+        card_at = next((k for k, ln in enumerate(block) if _CARD_LINE_RE.match(ln)), None)
+        card_rows = " ".join(re.findall(r'\(\s*"[^"]*"\s*,\s*"([^"]*)"', block[card_at])) if card_at is not None else ""
+        grants = " ".join(_GRANT_TOKEN_RE.findall(" ".join(re.findall(r'li\(\s*"([^"]*)"', "\n".join(block)))))
+        removed, added, changed = silent_stat_changes(m_hdr.group(1), version, (card_rows + " " + grants).lower())
+        if removed or added or changed:
+            olds = [f'("DEL", "{_stat_text(s, a)}")' for s, a, _ in removed]
+            olds += [f'("", "{_stat_text(s, a)}")' for s, a, _ in changed]
+            news = [f'("", "{_stat_text(s, b)}", b({_py_repr(a)}, {_py_repr(b)}))' for s, a, b in changed]
+            news += [f'("NEW", "{_stat_text(s, b)}")' for s, _, b in added]
+            if card_at is None:
+                at = 2 if len(block) > 1 and block[1].startswith('W(auto_components_change(') else 1
+                block.insert(at, f'W(properties_change(old=[{", ".join(olds)}], new=[{", ".join(news)}]))')
+            else:
+                mc = _CARD_LINE_RE.match(block[card_at])
+                o = ", ".join(x for x in [mc.group(2)] + olds if x)
+                n = ", ".join(x for x in [mc.group(4)] + news if x)
+                block[card_at] = f'{mc.group(1)}{o}{mc.group(3)}{n}{mc.group(5)}'
+        out.extend(block)
+        i = end
+    return out
+
+
 def _py_repr(v):
     """Format a number or list-of-numbers for inline emission."""
     if isinstance(v, list):
@@ -2784,6 +2827,7 @@ def generate(version):
     out = _postprocess_new_block_label(out)
     out = _postprocess_new_item_card(out, version)
     out = _postprocess_properties_change(out)
+    out = _postprocess_silent_stats(out, version)
     out = _postprocess_unstated_total_cost(out)
     out = _postprocess_item_ability_cards(out, version)
     out = _drop_empty_ul(out)

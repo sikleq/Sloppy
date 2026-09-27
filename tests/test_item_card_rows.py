@@ -29,6 +29,53 @@ def test_stats_cards_hold_stats_not_abilities():
     assert not bad, f"an ability in a stats card (make it a 'Removed <Name> ability' row): {bad}"
 
 
+_GRANT = re.compile(r"\+[\d./]+%?\s+[A-Za-z' ]+")
+
+
+def _item_blocks():
+    """(file, version, item name, lower-case text of its card rows + every "+N stat" its rows mention)"""
+    for path in sorted(CONTENT.glob("p7*.py")):
+        m = re.match(r"p(\d)(\d\d)([a-z]?)\.py$", path.name)
+        version = f"{m.group(1)}.{m.group(2)}{m.group(3)}"
+        src = path.read_text(encoding="utf-8")
+        for block in re.split(r"(?=W\((?:item|hero|unit|plain)_header\(|W\(section\()", src):
+            hm = re.match(r'W\(item_header\("((?:[^"\\]|\\.)*)"(?P<rest>[^\n]*)', block)
+            if not hm or "new=" in hm.group("rest") or "properties_change(" not in block:
+                continue
+            name = hm.group(1).replace("\\'", "'")
+            card = block[block.find("properties_change("):]
+            card = card[:card.find("item_abilities_change(")] if "item_abilities_change(" in card else card
+            rows = " ".join(re.findall(r'\(\s*"[^"]*"\s*,\s*"([^"]*)"', card))
+            grants = " ".join(_GRANT.findall(" ".join(re.findall(r'li\(\s*"([^"]*)"', block))))
+            yield path.name, version, name, (rows + " " + grants).lower()
+
+
+def test_item_cards_show_every_stat_the_game_changed():
+    # Gleipnir 7.38 lost +25 Damage and +25 Attack Speed, Heaven's Halberd 7.41 +5 All Attributes, and the
+    # patch notes said nothing: the game's items.txt of both patches is the truth (owner 2026-09-27)
+    from patch.elements import silent_stat_changes
+    missing = []
+    for f, version, name, named in _item_blocks():
+        removed, added, changed = silent_stat_changes(name, version, named)
+        if removed or added or changed:
+            missing.append((f, name, removed, added, changed))
+    assert not missing, f"stats the game changed but the card doesn't show (rerun the generator pass): {missing}"
+
+
+def test_generator_adds_the_stats_the_notes_kept_quiet_about():
+    import generate_patch_code_v2 as g
+    lines = ['W(item_header("Gleipnir", changed="Item Reworked"))', 'W(auto_components_change("Gleipnir", "7.38"))',
+             'W(properties_change(old=[("BUFF", "+275 Health"), ("NERF", "+24 Intelligence")], '
+             'new=[("", "+450 Health", b(275, 450)), ("", "+15 Intelligence", b(24, 15)), '
+             '("NEW", "+75 AoE Bonus"), ("NEW", "+200 Mana")]))',
+             "W(ul_open())", 'W(li("Eternal Chains no longer deals damage", t("DEL")))', "W(ul_close())"]
+    out = g._postprocess_silent_stats(lines, "7.38")
+    card = out[2]
+    assert '("DEL", "+25 Damage")' in card and '("DEL", "+25 Attack Speed")' in card   # a li's "damage" isn't a stat
+    assert card.count("+450 Health") == 1 and out[3:] == lines[3:]
+    assert g._postprocess_silent_stats(out, "7.38") == out                              # idempotent
+
+
 def test_generator_never_folds_an_ability_into_the_card():
     import generate_patch_code_v2 as g
     lines = ['W(item_header("Heaven\'s Halberd", changed=True))', "W(ul_open())",

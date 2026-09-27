@@ -470,7 +470,8 @@ def build():
     W(ul_close())
     W(item_header("Gleipnir", changed="Item Reworked"))
     W(auto_components_change("Gleipnir", "7.38"))
-    W(properties_change(old=[("BUFF", "+275 Health"), ("NERF", "+24 Intelligence")], new=[("", "+450 Health", b(275, 450)), ("", "+15 Intelligence", b(24, 15)), ("NEW", "+75 AoE Bonus"), ("NEW", "+200 Mana")]))
+    # +25 Attack Speed / +25 Damage: gone in the game's items.txt 7.37e -> 7.38, the notes kept quiet
+    W(properties_change(old=[("BUFF", "+275 Health"), ("NERF", "+24 Intelligence"), ("DEL", "+25 Attack Speed"), ("DEL", "+25 Damage")], new=[("", "+450 Health", b(275, 450)), ("", "+15 Intelligence", b(24, 15)), ("NEW", "+75 AoE Bonus"), ("NEW", "+200 Mana")]))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Eternal Chains. Roots all enemies in a target 350 radius for 2 seconds and deals 165 damage. Cast Range: 1100. Mana Cost: 200. Cooldown: 18s",

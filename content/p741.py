@@ -487,7 +487,8 @@ def build():
     W(item_header("Heaven's Halberd", changed=True))
     W(auto_components_change("Heaven's Halberd", "7.41"))
     W(properties_change(
-        old=[("BUFF", "+6 Health Regen"), ("DEL",  "+275 Health")],
+        # +5 All Attributes: gone in the game's items.txt 7.40 -> 7.41, the notes kept quiet
+        old=[("BUFF", "+6 Health Regen"), ("DEL",  "+275 Health"), ("DEL", "+5 All Attributes")],
         new=[("",     "+6.5 Health Regen", b(6, 6.5)), ("NEW",  "+9 Armor"), ("NEW",  "+25% Evasion")]))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(

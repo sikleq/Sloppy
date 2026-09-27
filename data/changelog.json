@@ -20,6 +20,20 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "Item stats cards now also show the stats a patch changed without saying so, from the game files (Gleipnir 7.38: +25 Damage and +25 Attack Speed removed; Heaven's Halberd 7.41: +5 All Attributes removed)",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "Item ability cards: each ability faces its own old or new version, with an arrow only between a pair; card percentages line up with the rows below",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "Item ability headers show the radius with the game's icon; a note on a value is a dotted underline with the text on hover (e.g. Gleipnir 7.38)",
       "minor": true
     },

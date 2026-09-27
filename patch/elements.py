@@ -1979,12 +1979,13 @@ _STAT_LINE = {
     "cooldown_reduction": ("Cooldown Reduction", True, r"cooldown reduction"),
     "slow_res": ("Slow Resistance", True, r"slow resist"),
     "status_res": ("Status Resistance", True, r"status resist"),
-    "restoration_amp": ("Health Restoration", True, r"health restoration|regen and lifesteal amp"),
+    "restoration_amp": ("Health Restoration", True,
+                        r"health restoration|regen and lifesteal amp|health and lifesteal amp|lifesteal and health regen amp"),
     "spell_amp": ("Spell Amplification", True, r"spell amp"),
     "mana_regen_amp": ("Mana Regen Amplification", True, r"mana regen\w* amp"),
     "spell_lifesteal_amp": ("Spell Lifesteal Amplification", True, r"spell lifesteal amp"),
     "manacost_reduction": ("Mana Cost Reduction", True, r"mana cost"),
-    "aoe_bonus": ("AoE Bonus", False, r"aoe bonus"),
+    "aoe_bonus": ("AoE Bonus", False, r"aoe (?:bonus|radius)|area of effect"),
     "debuff_amp": ("Debuff Amplification", True, r"debuff amp"),
     "heal_amp": ("Heal Amplification", True, r"heal(?:ing)? amp"),
     "night_vision": ("Night Vision", False, r"night vision"),
@@ -2015,33 +2016,79 @@ def _item_stats_at(slug, version):
     return out
 
 
-def _unchanged_stat_rows(old, new):
-    """("", "+20% Magic Resistance") rows for the stats the card doesn't name and the patch didn't
-    change — to be shown on BOTH sides. Empty when the item or either patch has no data."""
+_ATTRS = ("strength", "agility", "intelligence")
+
+
+def _plain_stats(stats):
+    """items.txt snapshot without the Strength / Agility / Intelligence copies of an All Attributes bonus
+    (Ethereal Blade lists both)."""
+    every = stats.get("all_stats")
+    return {s: x for s, x in stats.items() if not (s in _ATTRS and every is not None and x == every)}
+
+
+def item_stats_pair(name, version):
+    """The item's stats (items.txt) in the patch before `version` and in `version`: (before, after), or
+    None when either is unknown."""
+    from .meta import RELEASE_HISTORY
+    order = [r["version"] for r in RELEASE_HISTORY]          # newest first
+    if version not in order or order.index(version) + 1 >= len(order):
+        return None
+    slug = ITEM_SLUG.get(name, name.lower().replace(" ", "_").replace("'", ""))
+    before = _item_stats_at(slug, order[order.index(version) + 1])
+    after = _item_stats_at(slug, version)
+    return (_plain_stats(before), _plain_stats(after)) if before and after else None
+
+
+def _stat_named(stat, named):
+    """Does the text already speak of this stat? ("+6 All Attributes" covers Strength / Agility / Intelligence)"""
+    return bool(re.search(_STAT_LINE[stat][2], named)
+                or (stat in _ATTRS and re.search(_STAT_LINE["all_stats"][2], named)))
+
+
+def silent_stat_changes(name, version, named):
+    """Stats the game's items.txt shows changed in `version` but `named` (the item's card rows and its
+    "+N stat" mentions) never speaks of — the patch notes kept quiet (Gleipnir 7.38 lost +25 Damage and
+    +25 Attack Speed). Lists of (stat, before, after): removed, added, changed."""
+    pair = item_stats_pair(name, version)
+    if not pair:
+        return [], [], []
+    before, after = pair
+    quiet = sorted(s for s in set(before) | set(after) if s in _STAT_LINE and not _stat_named(s, named))
+    removed = [(s, before[s], None) for s in quiet if s in before and s not in after]
+    added = [(s, None, after[s]) for s in quiet if s in after and s not in before]
+    changed = [(s, before[s], after[s]) for s in quiet if s in before and s in after and before[s] != after[s]]
+    return removed, added, changed
+
+
+def _card_stats(old, new):
+    """(before, after, named) for the item block being rendered: its stats in the previous patch and in
+    this one (items.txt), and the card's own rows as lower-case text. None when there is no data."""
     ek = _State.current_entity_key or ""
     ver = _State.current_patch_version
     if not ek.startswith("item|") or not ver:
-        return []
-    from .meta import RELEASE_HISTORY
-    order = [r["version"] for r in RELEASE_HISTORY]          # newest first
-    if ver not in order or order.index(ver) + 1 >= len(order):
-        return []
-    name = _State.current_entity_display or ""
-    slug = ITEM_SLUG.get(name, name.lower().replace(" ", "_").replace("'", ""))
-    before = _item_stats_at(slug, order[order.index(ver) + 1])
-    after = _item_stats_at(slug, ver)
-    if not before or not after:
-        return []
+        return None
+    pair = item_stats_pair(_State.current_entity_display or "", ver)
+    if not pair:
+        return None
     named = " ".join(re.sub(r"<[^>]+>", " ", str(r[1])).lower()
                      for r in list(old) + list(new) if isinstance(r, (tuple, list)) and len(r) >= 2)
-    rows = []
-    for stat, x in before.items():
-        spec = _STAT_LINE.get(stat)
-        if not spec or after.get(stat) != x or re.search(spec[2], named):
-            continue
-        num = f"{x:g}"
-        rows.append(("", f"{'+' if x > 0 else ''}{num}{'%' if spec[1] else ''} {spec[0]}"))
-    return rows
+    return pair[0], pair[1], named
+
+
+def _stat_text(stat, x):
+    spec = _STAT_LINE[stat]
+    return f"{'+' if x > 0 else ''}{x:g}{'%' if spec[1] else ''} {spec[0]}"
+
+
+def _unchanged_stat_rows(old, new):
+    """("", "+20% Magic Resistance") rows for the stats the card doesn't name and the patch didn't
+    change — to be shown on BOTH sides. Empty when the item or either patch has no data."""
+    data = _card_stats(old, new)
+    if not data:
+        return []
+    before, after, named = data
+    return [("", _stat_text(stat, x)) for stat, x in before.items()
+            if stat in _STAT_LINE and after.get(stat) == x and not _stat_named(stat, named)]
 
 
 def _prop_layout(old_rows, new_rows, same, old_extras, new_extras):
