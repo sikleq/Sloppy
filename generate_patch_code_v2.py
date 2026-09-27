@@ -979,8 +979,11 @@ def _render_item(item, version, neutral=False):
         notes = notes[1:]
     # Detect "New Tier N Artifact" / "Returning as a Tier N Neutral Artifact" as
     # the first note in neutral items — convert to item_header(new="...") and drop.
+    # Owner 2026-09-27: "Now is a Tier 1 Neutral Artifact" (7.38, an old neutral item in the new artifact
+    # list) is a header too — "Now a Tier 1 Artifact" (not "New": the item existed before) — and its
+    # ability description, nested under that note, becomes the item's own row(s), not an inline_note.
     _NEW_RET_RE = re.compile(
-        r'^(New|Returning(?:\s+as\s+a))\s+Tier\s+\d+\s+(?:Neutral\s+)?Artifact$',
+        r'^(New|Returning(?:\s+as\s+a)|Now\s+is\s+a)\s+Tier\s+\d+\s+(?:Neutral\s+)?Artifact$',
         re.I,
     )
     if neutral and not deco and notes:
@@ -988,10 +991,13 @@ def _render_item(item, version, neutral=False):
         m = _NEW_RET_RE.match(first_txt)
         if m:
             # Normalise: "Returning as a Tier 2 Neutral Artifact" → "Returning Tier 2 Artifact"
-            norm = re.sub(r'\s+as\s+a\b', '', first_txt, flags=re.I)
+            norm = re.sub(r'^Now\s+is\s+a\b', 'Now a', first_txt, flags=re.I)
+            norm = re.sub(r'\s+as\s+a\b', '', norm, flags=re.I)
             norm = re.sub(r'\s+Neutral\b', '', norm, flags=re.I)
             deco = f', new="{norm}"'
-            notes = notes[1:]
+            lvl = notes[0].get('indent_level', 1)
+            notes = [dict(n, indent_level=max(1, n.get('indent_level', 1) - 1)) if i and n.get('indent_level', 1) > lvl
+                     else n for i, n in enumerate(notes)][1:]
     # "New basic Equipment item. Costs 250 gold" under a generic "New Item" title → the
     # header label says it ("New Basic Equipment Item"); the row would only repeat it.
     # Its nested notes stay as the item's rows.

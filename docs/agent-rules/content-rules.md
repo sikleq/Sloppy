@@ -207,6 +207,7 @@ properties_change(
 |---|---|---|
 | Новый (никогда не был) | `item_header("Name", new="New Tier N Artifact")` | Active/Passive → `t("NEW")` |
 | Возвращается | `item_header("Name", new="Returning Tier N Artifact")` | Active/Passive → `t("NEW")` |
+| Был обычным нейтральным предметом, «Now is a Tier N Neutral Artifact» (7.38) | `item_header("Name", new="Now a Tier N Artifact")` | Active/Passive — строками (как у соседей в списке), не в `inline_note` (владелец 2026-09-27; 17 предметов 7.38) |
 | Уже в ротации, твик | `item_header("Name")` без `new=` | Обычные теги |
 | Выходит из ротации | `item_header("Name")` + DEL строка | |
 

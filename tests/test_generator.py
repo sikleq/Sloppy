@@ -737,3 +737,17 @@ def test_owner_decisions_2026_09_27_del_qol_rework():
     assert g._guess_tag("Now scales with Wukong's Command") == "REWORK"
     assert g._guess_tag("Now upgrades with each subsequent drop") == "REWORK"
     assert g._guess_tag("Can no longer be cast while rooted") == "DEL"
+
+
+def test_now_is_a_tier_artifact_is_a_header_and_its_ability_a_row():
+    """Owner 2026-09-27, Occult Bracelet 7.38: "Now is a Tier 1 Neutral Artifact" goes to the header
+    ("Now a Tier 1 Artifact" — the item existed before, so not "New"); the ability is a row, not an (i)."""
+    import generate_patch_code_v2 as g
+    aid = next(a for a, (n, s) in g.ITEMS.items() if n == "Occult Bracelet")
+    item = {"ability_id": aid, "ability_notes": [
+        {"note": "Now is a Tier 1 Neutral Artifact", "indent_level": 1},
+        {"note": "Passive: Rites of Eloshar. Each time the wearer is attacked, they gain a stack of 0.4 mana regen",
+         "indent_level": 2}]}
+    out = "\n".join(g._render_item(item, "7.38", neutral=True))
+    assert 'item_header("Occult Bracelet", new="Now a Tier 1 Artifact")' in out
+    assert "Passive: Rites of Eloshar" in out and "inline_note" not in out and "Now is a Tier" not in out

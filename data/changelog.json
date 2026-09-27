@@ -3,6 +3,13 @@
   "entries": [
     {
       "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "7.38: 17 neutral items that became artifacts show \"Now a Tier N Artifact\" in the header and their abilities as rows",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
       "category": "Dynamics",
       "title": "Replaced facets and moved Aghanim's upgrades take their direction from pro picks, not a fixed minus",
       "minor": true
