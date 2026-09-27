@@ -1264,11 +1264,36 @@ def _iab_bold_numbers(html_text):
     return "".join(out)
 
 
+def iab_attach_tail(html, cluster):
+    """Put a (?)/(i) cluster right after the LAST word of the description, in one no-wrap span, so the
+    icon never drops alone onto an empty line (owner 2026-09-27, Revenant's Brooch 7.38)."""
+    if not cluster:
+        return html
+    end = html.rfind("</span>")                               # the end of .iab-desc
+    body = html[:end]
+    mw = re.search(r"(\S+)\s*$", body)
+    if mw and "<" not in mw.group(1) and ">" not in mw.group(1):
+        body = body[:mw.start(1)] + f'<span class="li-tail">{mw.group(1)}{cluster}</span>'
+    else:
+        body = body.rstrip() + f' <span class="li-tail">{cluster}</span>'
+    return body + html[end:]
+
+
 def _item_ability_html(text):
     """The header + description html of an item ability row, or None when the text doesn't fit."""
+    tips = []
+    while isinstance(text, str) and text.rstrip().endswith("<!--/TIP-->"):   # trailing (?) tips ride along
+        i = text.rfind("<!--TIP-->")
+        if i < 0:
+            break
+        tips.insert(0, text[i:].strip())
+        text = text[:i].rstrip()
     m = _ITEM_ABILITY_RE.match(text)
     if not m or "<!--" in text or "<div" in text:
         return None
+    if tips:
+        html = _item_ability_html(text)
+        return iab_attach_tail(html, "".join(tips)) if html and "iab-desc" in html else None
     kind, body = m.group(1), m.group(2).strip()
     name, desc = _iab_name(body)
     meta = []
@@ -1285,18 +1310,58 @@ def _item_ability_html(text):
     return head + (f'<span class="iab-desc">{_iab_bold_numbers(desc)}</span>' if desc else "")
 
 
+_IAB_NOTES = {}           # "<ek>|<pv>|<ability>" -> (?) html moved from a hidden duplicate row into the card
+
+
+def _iab_shown_in_card(text, extra):
+    """A full "Passive: Name. ..." description row of an item whose abilities card (this block) already
+    shows that ability on its right side. Its (?) notes move into the card (page.save_html fills the
+    <!--IABNOTE:key--> slot), so nothing is lost (owner 2026-09-27, Revenant's Brooch 7.38)."""
+    card = getattr(_State, "iab_card", None)
+    if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
+        return False
+    base = re.sub(r"<!--TIP-->.*?<!--/TIP-->", "", text, flags=re.S).strip()
+    m = _ITEM_ABILITY_RE.match(base)
+    name = _iab_name(m.group(2).strip())[0].lower() if m else ""
+    if not name or name not in card["names"]:
+        return False
+    tips = re.findall(r"<!--TIP-->.*?<!--/TIP-->", text, flags=re.S)
+    if isinstance(extra, str):
+        tips += re.findall(r"<!--INLINETIP-->(.*?)<!--/INLINETIP-->", extra, flags=re.S)
+        rest = re.sub(r"<!--INLINETIP-->.*?<!--/INLINETIP-->", "", extra, flags=re.S).strip()
+        if rest:
+            return False                                    # a visible note under the row: keep the row
+    if tips:
+        _IAB_NOTES[f"{card['ek']}|{card['pv']}|{name}"] = "".join(tips)
+    return True
+
+
 def item_abilities_change(old, new):
     """An item's abilities before -> after (owner 2026-09-27, Khanda 7.38 pilot): two panes like the
     stats card, each ability in the game-tooltip style (_item_ability_html). `old` / `new` are lists of
     one-line ability texts ("Passive: Empower Spell. The next ... Cooldown: 6s"); the old ones are the
     game's tooltips of the previous patch (d2vpkr), never invented. The card is not scored — the tagged
     rows under it keep the weights."""
-    def pane(texts):
-        return "".join(f'<div class="iab-card">{_item_ability_html(t) or _html.escape(t)}</div>' for t in texts)
+    def pane(texts, slots=False):
+        cards = []
+        for t in texts:
+            h = _item_ability_html(t) or _html.escape(t)
+            m = _ITEM_ABILITY_RE.match(t)
+            if slots and m and "iab-desc" in h:                 # a slot for a moved (?) note
+                key = f"{_State.current_entity_key}|{_State.current_patch_version}|{_iab_name(m.group(2).strip())[0].lower()}"
+                h = iab_attach_tail(h, f"<!--IABNOTE:{key}-->")
+            cards.append(f'<div class="iab-card">{h}</div>')
+        return "".join(cards)
+    names = set()
+    for t in new:
+        m = _ITEM_ABILITY_RE.match(t)
+        if m:
+            names.add(_iab_name(m.group(2).strip())[0].lower())
+    _State.iab_card = {"ek": _State.current_entity_key, "pv": _State.current_patch_version, "names": names}
     return ('<div class="properties-change iab-change">'
             f'<div class="properties-pane pane-old">{pane(old)}</div>'
             '<span class="properties-arrow">→</span>'
-            f'<div class="properties-pane pane-new">{pane(new)}</div></div>')
+            f'<div class="properties-pane pane-new">{pane(new, slots=True)}</div></div>')
 
 
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None):
@@ -1390,7 +1455,9 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     if isinstance(text, str) and re.match(r'^\s*(Passive|Active|Toggle|Aura|Ability)\s*:', text):
         classes.append("ability-row")
         _card = (_item_ability_html(text) if (_State.current_entity_key or "").startswith("item|")
-                 and dyn_tags <= {"new"} else None)
+                 and dyn_tags <= {"new", "rework"} else None)
+        if _card and _iab_shown_in_card(text, extra):
+            return ""                       # scored above; its full text is the card's right pane already
         if _card:
             classes.append("item-ability")
             text = _card
@@ -1418,6 +1485,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         trailing_tips.extend(_lifted)
     if not isinstance(text_base, str):
         text_inner = text_base
+    elif trailing_tips and "item-ability" in classes:          # the (?) stays with the description's last word
+        text_inner = iab_attach_tail(text_base, marker + ''.join(trailing_tips))
     elif trailing_tips:
         cluster = marker + ''.join(trailing_tips)
         _mw = re.search(r'(\S+)\s*$', text_base)

@@ -90,6 +90,12 @@ def build():
     W(li("Mana Regen Amplification decreased from 40% to 30%", b(40, 30)))
     W(ul_close())
     W(item_header("Mask of Madness"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Berserk. Gives 100 attack speed, 8% / 12% movement speed (ranged/melee), and 30% slow resistance, but reduces your armor by 7 and silences you. Lasts 6 seconds. Mana Cost: 25. Cooldown: 16s",
+             "Passive: Lifesteal. Heals the attacker for a percentage of physical damage dealt."],
+        new=["Active: Berserk. Gives 100 attack speed, 6% / 12% movement speed (ranged/melee), and 15%/30% slow resistance (ranged/melee), but reduces your armor by 7 and silences you. Lasts 6 seconds. Mana Cost: 25. Cooldown: 16s",
+             "Passive: Lifesteal. Heals the attacker for a percentage of physical damage dealt."]))
     W(ul_open())
     W(li("Berserk now provides 15% slow resistance for ranged heroes and 30% for melee heroes, instead of 30% for any hero", t("REWORK")))
     W(li("Berserk movement speed bonus on ranged heroes decreased from 8% to 6%", b(8, 6)))

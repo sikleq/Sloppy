@@ -48,6 +48,10 @@ def build():
     W(ul_close())
 
     W(item_header("Helm of the Dominator"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Dominate. Takes control of one neutral, non-ancient target unit and sets its movement speed to 380 and max health to a minimum of 1000. Also provides the unit with +25 base attack damage, +12 health regen, +4 mana regen and +4 armor. Dominated units with a max health of greater than 1000 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 100 gold and it can no longer be killed by abilities that instantly kill creeps otherwise. Cast Range: 700. Cooldown: 45s"],
+        new=["Active: Dominate. Takes control of one neutral, non-ancient target unit and sets its movement speed to 370 and max health to a minimum of 1000. Also provides the unit with +25 base attack damage, +12 health regen, +4 mana regen and +4 armor. Dominated units with a max health of greater than 1000 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 100 gold and it can no longer be killed by abilities that instantly kill creeps otherwise. The Helm cannot be used for 3 seconds after the dominated creep takes damage from an enemy hero or Roshan. Cast Range: 700. Mana Cost: 50. Cooldown: 45s"]))
     W(ul_open())
     W(li("Dominate now has a 50 mana cost", b(0, 50, l=True)))
     W(li("Dominate can no longer be used if the currently dominated creep took damage from hero-based sources in the last 3s", t("DEL")))
@@ -55,6 +59,10 @@ def build():
     W(ul_close())
 
     W(item_header("Helm of the Overlord"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Dominate. Takes control of one neutral target unit and sets its movement speed to 380 and max health to a minimum of 1800. Also provides the unit with +70 base attack damage, +12 health regen, +4 mana regen, +7 armor, and levels up some abilities of the target by 1 level. Dominated units with a max health of greater than 1800 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 250 gold and it can no longer be killed by abilities that instantly kill creeps otherwise. Cast Range: 700. Cooldown: 45s"],
+        new=["Active: Dominate. Takes control of one neutral target unit and sets its movement speed to 380 and max health to a minimum of 1800. Also provides the unit with +70 base attack damage, +12 health regen, +4 mana regen, +7 armor, and levels up some abilities of the target by 1 level. Dominated units with a max health of greater than 1800 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 250 gold and it can no longer be killed by abilities that instantly kill creeps otherwise. The Helm cannot be used for 3 seconds after the dominated creep takes damage from an enemy hero or Roshan. Cast Range: 700. Mana Cost: 50. Cooldown: 45s"]))
     W(ul_open())
     W(li("Dominate now has a 50 mana cost", b(0, 50, l=True)))
     W(li("Dominate can no longer be used if the currently dominated creep took damage from hero-based sources in the last 3s", t("DEL")))
@@ -73,6 +81,10 @@ def build():
 
     W(plain_header("Artifact Changes", dynamics=False, sublabel=True))
     W(item_header("Outworld Staff"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Self-Exile. Removes the caster from the world for 0.7 seconds, making them invulnerable and disabled. When returning to the world, the caster takes 5% of their maximum health as damage. Mana Cost: 65. Cooldown: 30s"],
+        new=["Active: Self-Exile. Makes the caster completely invulnerable and disabled for 0.7 seconds. When returning to the world, the caster takes 5% of their maximum health as damage. Mana Cost: 65. Cooldown: 30s"]))
     W(ul_open())
     W(li("Self-Exile now makes the user invulnerable and immobile for the duration, instead of hidden", t("REWORK")))
     W(ul_close())

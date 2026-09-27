@@ -55,6 +55,10 @@ def build():
     W(ul_close())
 
     W(item_header("Maelstrom"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Chain Lightning. Grants a 25% chance on attack to release a bolt of electricity that leaps between 4 targets within a 650 radius, dealing 110 magical damage to each. Lightning proc pierces evasion. Deals 150% damage to illusions."],
+        new=["Passive: Chain Lightning. Grants a 25% chance on attack to release a bolt of electricity that leaps between 4 targets within a 650 radius, dealing 110 magical damage to each. Lightning proc pierces evasion."]))
     W(ul_open())
     W(li("Chain Lightning no longer deals bonus damage to illusions", t("DEL")))
     W(ul_close())
@@ -117,6 +121,10 @@ def build():
     W(ul_close())
 
     W(item_header("Helm of the Undying"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Death Delay. Survive for an extra 5 seconds after receiving a killing blow. If any enemy heroes dies within 1200 units, the death delay effect is extended by 5 seconds. Cooldown: 100s"],
+        new=["Passive: Death Delay. Survive for an extra 6 seconds after receiving a killing blow. If any enemy heroes dies within 1200 units, the death delay effect is extended by 5 seconds. The hero cannot attack buildings during Death Delay. Cooldown: 100s"]))
     W(ul_open())
     W(li("Death Delay base duration increased from 5s to 6s", b(5, 6)))
     W(li("Units can no longer attack buildings while under the effect of Death Delay", t("DEL")))

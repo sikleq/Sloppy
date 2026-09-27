@@ -166,12 +166,20 @@ def build():
     W(li("+25% Lifesteal, Spell Lifesteal and Health Regen Amplifications replaced with +20% Health Restoration", t("REWORK")))
     W(ul_close())
     W(item_header("Orb of Frost"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Frost. Your attacks slow the target's movement by -13% (-6% against melee targets) and reduces heals, health regeneration, lifesteal and Spell lifesteal by 13%. Lasts for 3 seconds."],
+        new=["Passive: Frost. Your attacks slow the target's movement by -13% (-6% against melee targets), and reduces Health Restoration by 13%. Lasts for 3 seconds."]))
     W(ul_open())
     W(li("Frost instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 13%, now reduces Health Restoration by 13%", t("REWORK")))
     W(li("Cost increased from 250 to 300", b(250, 300, l=True)))
     W(li("Frost's slow and health restoration reduction no longer stack with Orb of Corrosion and Eye of Skadi", t("DEL")))
     W(ul_close())
     W(item_header("Orb of Corrosion"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Corrosion. Your attacks reduce the target's armor by -2, slows their movement by -16% (-8% against melee targets), and reduces heals, health regeneration, lifesteal and Spell lifesteal by 16% for 3 seconds."],
+        new=["Passive: Corrosion. Your attacks reduce the target's armor by -2, slows their movement by -16% (-8% against melee targets), and reduces Health Restoration by 16%. Lasts for 3 seconds."]))
     W(ul_open())
     W(li("Corrosion instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 16%, now reduces Health Restoration by 16%", t("REWORK")))
     W(li("Total Cost increased from 1000 to 1050", b(1000, 1050, l=True)))
@@ -182,12 +190,22 @@ def build():
     W(properties_change(
         old=[("BUFF", "+22 All Attributes"), ("DEL", "+250 Health"), ("DEL", "+250 Mana")],
         new=[("",     "+35 All Attributes",  b(22, 35))]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Cold Attack. Attacks lower enemy movement by -25% if they are melee and -50% if they are ranged. Attacks also lower enemy attack speed by -20%. Additionally it reduces all healing, lifesteal and regen by 40% Lasts for 3 seconds."],
+        new=["Passive: Cold Attack. Attacks lower enemy movement by -25% if they are melee and -50% if they are ranged. Attacks also lower enemy attack speed by -20%. Additionally it reduces Health Restoration by 40% and Incoming Heals by 40% Lasts for 3 seconds."]))
     W(ul_open())
     W(li("No longer requires a 1050 gold recipe. Total Cost increased from 5300 to 5900", b(5300, 5900, l=True)))
     W(li("Cold Attack instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 40%, now reduces Health Restoration and Heal Amplification by 40%", t("REWORK")))
     W(li("Cold Attack's slow and health restoration reduction no longer stack with Orb of Frost and Orb of Corrosion", t("DEL")))
     W(ul_close())
     W(item_header("Shiva's Guard"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Arctic Blast. Emits a freezing wave that causes enemies to take 15% more damage from spells for 16 seconds, deals 200 magical damage and slows their movement by -40% for 4 seconds. Deals 150% damage to illusions. Radius: 900. Mana Cost: 75. Cooldown: 27s",
+             "Passive: Freezing Aura. Reduces the attack speed of all enemies by -45 and all heals, regeneration and lifesteal by 25%. Radius: 1200."],
+        new=["Active: Arctic Blast. Emits a freezing wave that causes enemies to take 15% more damage from spells for 16 seconds, deals 200 magical damage and slows their movement by -40% for 4 seconds. Deals 150% damage to illusions. Radius: 900. Mana Cost: 75. Cooldown: 27s",
+             "Passive: Freezing Aura. Reduces the attack speed of all enemies by -45 and Health Restoration and Incoming Heal Amplification by 25%. Radius: 1200."]))
     W(ul_open())
     W(li("Freezing Aura instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 25%, now reduces Health Restoration and Heal Amplification by 25%", t("REWORK")))
     W(ul_close())
@@ -257,6 +275,10 @@ def build():
     W(item_header("Spirit Vessel", changed=True))
     W(auto_components_change("Spirit Vessel", "7.39"))
     W(properties_change(old=[("DEL", "+375 Health")], new=[("NEW", "+10 All Attributes")]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Soul Release. When used against enemies, it reduces health by 4% of current health per second, and reduces HP regeneration, healing, lifesteal and Spell lifesteal by 70%. Deals 25 damage per second. When used on allies, it provides 40 health regeneration per second. Lasts 8 seconds. If the unit is attacked by an enemy hero or Roshan, the effect is lost. Gains charges every time an enemy hero dies within 1400 units or the user dies. Only the closest Spirit Vessel to the dying hero will gain a charge. Cast Range: 750. Cooldown: 10s"],
+        new=["Active: Soul Release. When used against enemies, it reduces health by 4% of current health per second, and reduces Health Restoration by 70% and incoming heals by 70%. Deals 25 damage per second. When used on allies, it provides 40 health regeneration per second. Lasts 8 seconds. If the unit is attacked by an enemy hero or Roshan, the effect is lost. Gains charges every time an enemy hero dies within 1400 units or the user dies. Only the closest Spirit Vessel to the dying hero will gain a charge. Cast Range: 750. Cooldown: 10s"]))
     W(ul_open())
     W(li("Soul Release when cast on enemy, instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 70%, now reduces Health Restoration and Heal Amplification by 70%", t("REWORK")))
     W(li("Recipe cost unchanged. Total Cost decreased from 2780 to 2725 due to Urn of Shadows change", b(2780, 2725, l=True)))
@@ -382,6 +404,10 @@ def build():
     W(li("Item Cycled Out", t("DEL")))
     W(ul_close())
     W(item_header("Crippling Crossbow"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Hobble. Hits an enemy for 75 damage, then slows them by 80% and reduces healing effects by 40% for 4 seconds. The slow gradually fades over the duration of the spell. Cast Range: 800. Mana Cost: 50. Cooldown: 12s"],
+        new=["Active: Hobble. Hits an enemy for 75 damage, then slows them by 80% and reduces Health Restoration by 40% for 4 seconds. The slow gradually fades over the duration of the spell. Cast Range: 800. Mana Cost: 50. Cooldown: 12s"]))
     W(ul_open())
     W(li("Dormant Curio increases Health Restoration reduction from 40% to 52%", t("NEW")))
     W(li("Hobble 40% Healing, Health Regen, Lifesteal and Spell Lifesteal reductions replaced with a new 40% Health Restoration reduction stat", t("REWORK")))

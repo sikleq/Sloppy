@@ -108,6 +108,10 @@ def build():
     W(li("Reverberate projectile physical damage decreased from 110 to 90", b(110, 90), extra=inline_note("From 143 to 117 with Dormant Curio")))
     W(ul_close())
     W(item_header("Book of the Dead"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Greater Demonic Summoning. Summon 2 demonic warriors and 2 demonic archers that last 65 seconds. The Warrior burns mana every hit, reveals invisible units, and deals magical damage to whoever kills it. The Archer has a basic dispel ability with a slow and a passive movement speed aura. Cooldown: 80s"],
+        new=["Active: Greater Demonic Summoning. Summon 2 demonic warriors and 2 demonic archers that last 65 seconds. The Warrior burns mana every hit and deals magical damage to whoever kills it. The Archer has a basic dispel ability with a slow and a passive movement speed aura. Cooldown: 80s"]))
     W(ul_open())
     W(li("Demonic Warrior no longer has True Sight ability", t("DEL")))
     W(ul_close())

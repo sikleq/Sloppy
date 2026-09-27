@@ -2687,6 +2687,28 @@ def _build_prev_hero_abils(version):
     return result
 
 
+def _postprocess_item_ability_cards(lines, version):
+    """Owner 2026-09-27: an item whose ability changed gets its abilities before -> after card
+    (item_abilities_change) from the game's tooltips of both patches. Needs the local tooltip history
+    (tools/fetch_loc_history.py); without it the pass is skipped with a note."""
+    try:
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools"))
+        from item_ability_text import insert_cards
+        from patch.weights import _prev_version
+    except Exception as e:                                   # pragma: no cover — optional local data
+        print(f"  [note] item ability cards skipped: {e}")
+        return lines
+    prev = _prev_version(version)
+    if not prev:
+        return lines
+    name_to_slug = {n: s for n, s in ITEMS.values() if not str(s).startswith("enhancement_")}
+    try:
+        return insert_cards(lines, version, prev, name_to_slug)
+    except Exception as e:                                   # pragma: no cover
+        print(f"  [note] item ability cards skipped: {e}")
+        return lines
+
+
 def generate(version):
     d = fetch_datafeed(version)
     patchnotes_loc = _load_patchnotes_loc(version)
@@ -2751,6 +2773,7 @@ def generate(version):
     out = _postprocess_new_item_card(out, version)
     out = _postprocess_properties_change(out)
     out = _postprocess_unstated_total_cost(out)
+    out = _postprocess_item_ability_cards(out, version)
     out = _postprocess_innate_rows_out_of_stats(out)
     out = _postprocess_stack_note_into_ability(out)
     out = _postprocess_drop_now_requires(out)

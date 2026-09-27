@@ -10866,3 +10866,9 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
   padding: 0; background: none; border: 0; }
 .iab-card { background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px; padding: 6px 12px; }
 .iab-card .iab-desc { line-height: 1.45; }
+/* Tagged item-ability box: the chip's top edge on the header's top edge (owner 2026-09-27) */
+ul.changes li.item-ability.ability-box-tagged > .badge:first-child { top: 0; }
+/* A bit more air around ability boxes and the abilities before/after card (owner 2026-09-27) */
+ul.changes li.ability-row-solo, ul.changes li.ability-row-start { margin-top: 14px; }
+ul.changes li.ability-row-solo, ul.changes li.ability-row-end { margin-bottom: 8px; }
+.properties-change.iab-change { margin-bottom: 12px; }

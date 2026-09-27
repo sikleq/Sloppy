@@ -4,6 +4,19 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "Items whose ability changed show it before and after, side by side (51 items, 7.38–7.41)",
+      "minor": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "Ability boxes: the tag sits level with the box header, the (?) stays by the last word, a bit more air around",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "7.38 Khanda: its abilities before and after, side by side, as in the game's tooltip",
       "minor": true
     },

@@ -315,6 +315,10 @@ def build():
     # ===== ITEM UPDATES =====
     W(section("Item Updates"))
     W(item_header("Block of Cheese"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Use: Scrumptious. Try me! Cast Range: 250. Cooldown: 40s"],
+        new=["Use: Scrumptious. Try me! Cooldown: 40s"]))
     W(ul_open())
     W(li("Scrumptious can no longer be cast on an ally to give them the buff. However, item is still fully shareable", t("REWORK")))
     W(li("Scrumptious now restores 3000 health and 2000 mana when consumed", t("NEW")))
@@ -335,6 +339,10 @@ def build():
     W(li("Passive: Frost. On attack, slows the enemy by 13% if the target is ranged and by 5% if the target is melee. Reduces target's incoming healing by 13%. Duration: 3s", t("NEW")))
     W(ul_close())
     W(item_header("Orb of Venom"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Poison Attack. Poisons the target, dealing 2 magical damage per second and slowing movement by -13% if the equipped hero is melee, or by -4% if they are ranged. Lasts for 2 seconds."],
+        new=["Passive: Poison Attack. Poisons the target, dealing 10 magical damage per second. Lasts for 3 seconds. Cooldown: 9s"]))
     W(ul_open())
     W(li("Cost increased from 250 to 350", b(250, 350, l=True)))
     W(li("Poison Attack damage per second increased from 2 to 10", b(2, 10)))
@@ -368,6 +376,13 @@ def build():
              ("",     "+26 Strength", b(10, 26)),
              ("NEW",  "+25% Slow Resistance"),
              ("NEW",  "+25% Health and Lifesteal Amp")]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Overwhelm. Stuns a target enemy unit for 1.6 seconds. Pierces Spell Immunity. Cast Range: 150. Mana Cost: 75. Cooldown: 35s",
+             "Passive: Bash. Grants melee heroes a 25% chance on hit to stun the target for 1.2 seconds and deal 120 bonus physical damage. Bash chance for ranged heroes is 10%.",
+             "Passive: Damage Block. Grants a 60% chance to block 70 damage from incoming attacks on melee heroes, and 35 damage on ranged."],
+        new=["Active: Overwhelm. Stuns a target enemy unit for 1.6 seconds. Pierces Debuff Immunity. Cast Range: 150. Mana Cost: 75. Cooldown: 35s",
+             "Passive: Bash. Grants melee heroes a 25% chance on hit to stun the target for 1.2 seconds and deal 120 bonus physical damage. Bash chance for ranged heroes is 10%."]))
     W(ul_open())
     W(li("Removed Damage Block ability", t("DEL"), extra=inline_note("Blocked 70 damage from melee / 35 from ranged attacks with a 60% chance")))
     W(ul_close())
@@ -383,6 +398,10 @@ def build():
     W(li("Recipe cost increased from 450 to 600. Total cost decreased from 4100 to 3900", b([450, 4100], [600, 3900], l=True, slash=True, force_overall="buff")))
     W(ul_close())
     W(item_header("Bloodstone"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Bloodpact. Increases Bloodstone's Spell Lifesteal by 4x. Lasts 5 seconds. Cooldown: 35s"],
+        new=["Active: Bloodpact. Increases Bloodstone's Spell Lifesteal by 4x. Lasts 5 seconds. Dispel Type: Basic Dispel. Cooldown: 35s"]))
     W(ul_open())
     W(li("No longer provides +75 AoE radius increase", t("DEL")))
     W(li("Bloodpact now applies a basic dispel on cast", t("NEW")))
@@ -397,6 +416,12 @@ def build():
     W(li("Total cost decreased from 4275 to 4225 (due to Wind Lace cost decrease)", b(4275, 4225, l=True)))
     W(ul_close())
     W(item_header("Drum of Endurance"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Endurance. Consumes a charge and gives +45 attack speed and +13% movement speed to nearby allies for 6 seconds. Comes with 8 charges. Radius: 1200. Cooldown: 30s",
+             "Passive: Swiftness Aura. Grants 20 movement speed to allies. Radius: 1200."],
+        new=["Active: Endurance. Gives +35 attack speed and +13% movement speed to nearby allies for 6 seconds. Radius: 1200. Cooldown: 45s",
+             "Passive: Swiftness Aura. Grants 15 movement speed to allies. Radius: 1200."]))
     W(ul_open())
     W(li("Total cost decreased from 1650 to 1625 (due to Wind Lace cost decrease)", b(1650, 1625, l=True)))
     W(li("Endurance cooldown increased from 30s to 45s", b(30, 45, l=True)))
@@ -432,6 +457,11 @@ def build():
         new=[("NEW", "+275 Health"),
              ("NEW", "+6 Health Regen"),
              ("NEW", "+5 All Attributes")]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Disarm. Prevents a target from attacking for 3 seconds on melee targets, and 5 seconds on ranged targets. Cast Range: 650. Mana Cost: 75. Cooldown: 18s"],
+        new=["Active: Disarm. Prevents a target from attacking for 3 seconds on melee targets, and 4 seconds on ranged targets. Cast Range: 650. Mana Cost: 25. Cooldown: 18s",
+             "Passive: Damage Block. Grants a 60% chance to block 60 damage from incoming attacks on melee heroes, and 30 damage on ranged."]))
     W(ul_open())
     W(li("Disarm can now be dispelled", t("NERF")))
     W(li("Disarm Mana Cost decreased from 75 to 25", b(75, 25, l=True)))
@@ -441,6 +471,11 @@ def build():
     W(item_header("Gleipnir", changed="Item Reworked"))
     W(auto_components_change("Gleipnir", "7.38"))
     W(properties_change(old=[("BUFF", "+275 Health"), ("NERF", "+24 Intelligence")], new=[("", "+450 Health", b(275, 450)), ("", "+15 Intelligence", b(24, 15)), ("NEW", "+75 AoE Bonus"), ("NEW", "+200 Mana")]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Eternal Chains. Roots all enemies in a target 350 radius for 2 seconds and deals 165 damage. Cast Range: 1100. Mana Cost: 200. Cooldown: 18s",
+             "Passive: Chain Lightning. Grants a 25% chance on attack to release a bolt of electricity that leaps between 4 targets within a 650 radius, dealing 140 magical damage to each. Lightning proc pierces evasion. Deals 150% damage to illusions."],
+        new=["Active: Eternal Chains. Roots all enemies in a 350 radius for 2 seconds. Cast Range: 1100. Mana Cost: 100. Cooldown: 18s"]))
     W(ul_open())
     W(li("Eternal Chains Mana Cost decreased from 200 to 100", b(200, 100, l=True)))
     W(li("Recipe cost increased from 550 to 1100. Total cost decreased from 5750 to 4550", b([550, 5750], [1100, 4550], l=True, slash=True, force_overall="buff")))
@@ -462,6 +497,10 @@ def build():
     W(auto_components_change("Orb of Corrosion", "7.38"))
     # old bonus stats from the 7.37e tooltips (d2vpkr abilities_english: "+$armor", "+$attack" = armor 3, attack_speed 25)
     W(properties_change(old=[("DEL", "+3 Armor"), ("DEL", "+25 Attack Speed")], new=[("NEW", "+8 Agility")]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Corrosion. Dealing 5 damage per second, and slowing movement by 13% if the equipped hero is melee, or by 4% if they are ranged and reduces heals, health regeneration, lifesteal and spell lifesteal by 20%. Affects Buildings. Lasts for 3 seconds."],
+        new=["Passive: Corrosion. Your attacks reduce the target's armor by -3, slows their movement by -16% (-6% against melee targets), and reduces heals, health regeneration, lifesteal and Spell lifesteal by 16% for 3 seconds."]))
     W(ul_open())
     W(li("Total cost increased from 875 to 1000", b(875, 1000, l=True)))
     W(li("Passive: Corrosion. On attack, slows the enemy by 16% if the target is ranged and by 6% if the target is melee. Also reduces the target's incoming healing by 16% and their armor by 3. Duration: 3s "
@@ -476,10 +515,10 @@ def build():
     W(item_header("Khanda", changed="Item Reworked"))
     W(auto_components_change("Khanda", "7.38"))
     W(properties_change(old=[("DEL", "+50 Damage")], new=[("NEW", "+8 Mana Regen")]))
-    # tooltips of each patch: tools/loc_history.py (d2vpkr) + that patch's items.txt values
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Empower Spell. The next Unit Target spell you cast on an enemy deals 150 + 60% of your attack damage as bonus damage to the target, and slows them by 50% for 1.5s. Cooldown: 6s",
-             "Passive: Critical Strike. Grants each attack a 30% chance to deal 160% damage"],
+             "Passive: Critical Strike. Grants each attack a 30% chance to deal 160% damage."],
         new=["Passive: Empower Spell. The next Unit Target spell you cast on an enemy deals a separate 250 additional damage and applies a debuff that slows the target by 30% and disables their passives for 3s. Cooldown: 12s"]))
     W(ul_open())
     W(li("Recipe cost increased from 500 to 1500. Total cost increased from 5100 to 5900", b([500, 5100], [1500, 5900], l=True, slash=True)))
@@ -495,6 +534,10 @@ def build():
     W(auto_components_change("Revenant's Brooch", "7.38"))
     # old bonus stats from the 7.37e tooltips (d2vpkr: bonus_damage 70, spell_lifesteal 20)
     W(properties_change(old=[("NERF", "+70 Damage"), ("NERF", "+20% Spell Lifesteal")], new=[("", "+35 Damage", b(70, 35)), ("", "+16% Spell Lifesteal", b(20, 16))]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Toggle: Phantom Province. When enabled, attacks cost 50 mana, deal magical damage, and can hit ethereal units, but cannot crit."],
+        new=["Passive: Phantom Critical. Grants each attack a 30% chance to deal an additional 80% of the attack's damage as bonus magic damage."]))
     W(ul_open())
     W(li("Total cost decreased from 4900 to 3300", b(4900, 3300, l=True)))
     W(li("Removed Phantom Province ability", t("DEL")))

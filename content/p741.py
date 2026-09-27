@@ -285,6 +285,10 @@ def build():
          extra=inline_note("As a result of Health Restoration changes")))
     W(ul_close())
     W(item_header("Refresher Shard"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Use: Reset Cooldowns. Resets the cooldowns of all your items and abilities. Shares a cooldown with Refresher Orb. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 200."],
+        new=["Use: Reset Cooldowns. Resets the cooldowns of all your abilities. Shares a cooldown with Refresher Orb. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 200."]))
     W(ul_open())
     W(li("Reset Cooldowns no longer refreshes items", t("DEL")))
     W(ul_close())
@@ -363,6 +367,10 @@ def build():
     W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))
     W(ul_close())
     W(item_header("Black King Bar"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Avatar. Applies a basic dispel. Grants 60% Magic resistance and immunity to pure and reflected damage. For the duration of the effect, any negative effect from enemy spells has no effect. Duration: 9/8/7/6. Dispel Type: Basic Dispel. Mana Cost: 50. Cooldown: 95s"],
+        new=["Active: Avatar. Applies a basic dispel. Grants 60% magic resistance and immunity to reflected and pure damage. For the duration of the effect, any negative effect from enemy spells has no effect. Duration: 9/8/7s. Dispel Type: Basic Dispel. Mana Cost: 50. Cooldown: 95s"]))
     W(ul_open())
     W(li("Avatar duration changed from 9/8/7/6s to 9/8/7s", t("REWORK")))
     W(ul_close())
@@ -375,6 +383,12 @@ def build():
     W(li("Recipe cost decreased from 750 to 450. Total cost increased from 2300g to 2400g", b([750, 2300], [450, 2400], l=True, slash=True, force_overall="nerf")))
     W(ul_close())
     W(item_header("Crimson Guard"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Guard. For 7 seconds, grant nearby allied heroes and buildings a 100% chance to block damage equal to 70 plus 2.2% of the casters max health value from each incoming attack. Units may only be affected by Guard once every 35 seconds. Radius: 1200. Cast Range: 1200. Mana Cost: 75. Cooldown: 40s",
+             "Passive: Damage Block. Grants a 60% chance to block 75 damage from incoming attacks on melee heroes, and 50 damage on ranged."],
+        new=["Active: Guard. For 7 seconds, grant nearby allied heroes and buildings a 100% chance to block damage equal to 70 plus 2% of the caster's max health value from each incoming attack. Radius: 1200. Cast Range: 1200. Mana Cost: 75. Cooldown: 40s",
+             "Passive: Damage Block. Grants a 60% chance to block 75 damage from incoming attacks on melee heroes, and 50 damage on ranged."]))
     W(ul_open())
     W(li("Armor bonus decreased from +8 to +6", b(8, 6)))
     W(li("Guard max health damage block decreased from 2.2% to 2%", b(2.2, 2)))
@@ -391,6 +405,10 @@ def build():
              ("NEW", "+60/90/120/150/180 Cast Range " + info_tip(
                  "Cast Range Bonus does not stack with Aether Lens or multiple Dagons",
                  header="Stacking rules"))]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Energy Burst. Emits a powerful burst of magical damage upon a targeted enemy unit. Heals the caster 75% of damage dealt by Dagon. Damage: 400/500/600/700/800. Mana Cost: 120/140/160/180/200. Cast Range: 700/750/800/850/900. Cooldown: 27/24/21/18/15s"],
+        new=["Active: Energy Burst. Emits a powerful burst of magical damage upon a targeted enemy unit. Damage: 400/500/600/700/800. Mana Cost: 120/140/160/180/200. Cast Range: 640. Cooldown: 27/24/21/18/15s"]))
     W(ul_open())
     W(li("Recipe cost unchanged at 1150. Total cost increased from 2800/3950/5100/6250/7400g to 3050/4200/5350/6500/7650g", b([2800, 3950, 5100, 6250, 7400], [3050, 4200, 5350, 6500, 7650], l=True)))
     W(li("Energy Burst cast range decreased from 700/750/800/850/900 to 640", b([700, 750, 800, 850, 900], 640), extra=inline_note("Effective cast range with item's built-in Cast Range bonus decreased from 700/750/800/850/900 to 700/730/760/790/820 — " + b([700, 750, 800, 850, 900], [700, 730, 760, 790, 820]))))
@@ -413,12 +431,24 @@ def build():
         old=[("BUFF", "+7 Strength"),
              ("DEL",  "+7 Intelligence")],
         new=[("",     "+8 Strength", b(7, 8))]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Endurance. Gives +35 attack speed and +13% movement speed to nearby allies for 6 seconds. Radius: 1200. Cooldown: 45s",
+             "Passive: Swiftness Aura. Grants 15 movement speed to allies. Radius: 1200."],
+        new=["Active: Endurance. Gives +35 attack speed and +13% movement speed to nearby allies for 6 seconds. Radius: 1200. Cooldown: 45s",
+             "Passive: Swiftness Aura. Grants 15 movement speed and 2.5 health regeneration to allies. Radius: 1200."]))
     W(ul_open())
     W(li("Endurance now shares cooldown with Boots of Bearing", t("NERF")))
     W(li("Swiftness Aura now also provides +2.5 Health Regen", t("NEW")))
     W(li("Recipe cost increased from 500 to 525. Total cost unchanged at 1625g", b(500, 525, l=True)))
     W(ul_close())
     W(item_header("Boots of Bearing"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Endurance. Gives +50 attack speed and +15% movement speed to nearby allies for 6 seconds. For the first 1.5 seconds allies are immune to slows. Radius: 1200. Cooldown: 30s",
+             "Passive: Swiftness Aura. Grants 20 movement speed to allies. Radius: 1200. Movement speed bonuses from multiple pairs of boots do not stack."],
+        new=["Active: Endurance. Gives +50 attack speed and +15% movement speed to nearby allies for 6 seconds. For the first 1.5 seconds allies are immune to slows. Radius: 1200. Cooldown: 30s",
+             "Passive: Swiftness Aura. Grants 20 movement speed and 2.5 health regeneration to allies. Radius: 1200. Movement speed bonuses from multiple pairs of boots do not stack."]))
     W(ul_open())
     W(li("Endurance now shares cooldown with Drum of Endurance", t("NERF")))
     W(li("No longer provides +8 Intelligence", t("DEL")))
@@ -448,6 +478,12 @@ def build():
     W(li("Transmute no longer prevents camp-clearing Madstone Bundles from spawning if it was used on the last creep in neutral camp", t("BUFF"), extra=inline_note("Getting guaranteed Madstone Bundle from Transmute used to prevent the camp-clearing bundle from spawning")))
     W(ul_close())
     W(item_header("Harpoon"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Draw Forth. When targeting an enemy, fire a harpoon at them, that pulls you and the target closer together, up to 35% of the distance between you and your target. If the caster is melee, the hero and target are always pulled to within melee distance of each other. Cast Range: 700. Mana Cost: 50. Cooldown: 19s",
+             "Passive: Echo Strike. Causes melee attacks to attack twice in quick succession. The double attacks apply a 100% movement slow for 1 seconds on the first strike. Echo Strike cooldown: 5s."],
+        new=["Active: Draw Forth. When targeting an enemy, fire a harpoon at them, that pulls you and the target closer together, up to 35% of the distance between you and your target. If the caster is melee, the hero and target are always pulled to within melee distance of each other. Targeting a tree always pulls you all the way to that tree. Cast Range: 700. Mana Cost: 50. Cooldown: 19s",
+             "Passive: Echo Strike. Causes melee attacks to attack twice in quick succession. The double attacks apply a 100% movement slow for 1 seconds on the first strike. Echo Strike cooldown: 5s."]))
     W(ul_open())
     W(li("Draw Forth can now target trees and will pull the caster to it, destroying all trees on the way", t("NEW")))
     W(ul_close())
@@ -456,6 +492,11 @@ def build():
     W(properties_change(
         old=[("BUFF", "+6 Health Regen"), ("DEL",  "+275 Health"), ("DEL",  "Damage Block (passive)")],
         new=[("",     "+6.5 Health Regen", b(6, 6.5)), ("NEW",  "+9 Armor"), ("NEW",  "+25% Evasion")]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Disarm. Prevents a target from attacking for 3 seconds. Cast Range: 650. Mana Cost: 25. Cooldown: 20s",
+             "Passive: Damage Block. Grants a 60% chance to block 60 damage from incoming attacks on melee heroes, and 30 damage on ranged."],
+        new=["Active: Disarm. Prevents a target from attacking for 3.5 seconds. Cast Range: 750. Mana Cost: 25. Cooldown: 16s"]))
     W(ul_open())
     W(li("Total cost increased from 2600 to 3400", b(2600, 3400, l=True)))
     W(li("Disarm cooldown decreased from 20s to 16s", b(20, 16, l=True)))
@@ -495,12 +536,22 @@ def build():
         new=[("",     "+6 Health Regen",  b(5, 6)),
              ("",     "+2.5 Mana Regen",  b(2, 2.5)),
              ("",     "+15 Damage",       b(8, 15))]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Mage Slayer. Places a debuff when you attack enemies, dealing 20 damage per second and causing them to do 40% less spell damage for 3 seconds."],
+        new=["Passive: Mage Slayer. Places a debuff when you attack enemies, dealing 40 physical damage per second and causing them to do 40% less spell damage for 3 seconds."]))
     W(ul_open())
     W(li("Mage Slayer damage per second increased from 20 to 40", b(20, 40)))
     W(li("Total cost increased from 2800g to 3100g (change is bigger due to Cloak cost increase)", b(2800, 3100, l=True)))
     W(li("Mage Slayer damage type changed from magical to physical", t("REWORK")))
     W(ul_close())
     W(item_header("Mask of Madness"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Berserk. Gives 100 attack speed and 25 movement speed, but reduces your armor by 8 and silences you. Lasts 6 seconds. Mana Cost: 25. Cooldown: 16s",
+             "Passive: Lifesteal. Heals the attacker for a percentage of physical damage dealt."],
+        new=["Active: Berserk. Gives 100 attack speed, 8% / 12% movement speed (ranged/melee), and 30% slow resistance, but reduces your armor by 7 and silences you. Lasts 6 seconds. Mana Cost: 25. Cooldown: 16s",
+             "Passive: Lifesteal. Heals the attacker for a percentage of physical damage dealt."]))
     W(ul_open())
     W(li("Berserk armor reduction decreased from 8 to 7", b(8, 7, l=True)))
     W(li("Berserk now also grants 30% Slow Resistance for the duration", t("NEW")))
@@ -602,6 +653,12 @@ def build():
     W(ul_close())
     W(item_header("Pipe of Insight", changed=True))
     W(auto_components_change("Pipe of Insight", "7.41"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Barrier. Gives a magic damage barrier that absorbs 425 damage to all nearby allies. Lasts 8 seconds. Radius: 1200. Cast Range: 1200. Mana Cost: 150. Cooldown: 60s",
+             "Passive: Insight Aura. Gives allied units 2.5 health regeneration and 8% magic resistance. Radius: 1200."],
+        new=["Active: Barrier. Gives a magic damage barrier that absorbs 425 damage to all nearby allies. Lasts 8 seconds. Radius: 1200. Cast Range: 1200. Mana Cost: 150. Cooldown: 60s",
+             "Passive: Insight Aura. Gives allied units 8% magic resistance. Radius: 1200."]))
     W(ul_open())
     W(li("Recipe Cost decreased from 800 to 675 " + b(800, 675, l=True), t("BUFF"), extra=inline_note("Total cost unchanged at 3725g (due to Cloak cost increase)")))
     W(li("Barrier no longer affects units that have been affected by Barrier within Pipe of Insight's cooldown", t("NERF")))
@@ -612,6 +669,10 @@ def build():
     W(li("Burn toggling no longer breaks invisibility nor stops channels", t("MISC")))
     W(ul_close())
     W(item_header("Refresher Orb"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Reset Cooldowns. Resets the cooldowns of all your items and abilities. Shares a cooldown with Refresher Shard. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 400."],
+        new=["Active: Reset Cooldowns. Resets the cooldowns of all your abilities. Shares a cooldown with Refresher Shard. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 325."]))
     W(ul_open())
     W(li("Health Regen bonus increased from +12 to +14", b(12, 14)))
     W(li("Mana Regen bonus increased from +6 to +7", b(6, 7)))
@@ -653,6 +714,12 @@ def build():
              ("DEL",  "+5 Health Regen")],
         new=[("",    "+17 Armor", b(15, 17)),
              ("NEW", "+75 Area of Effect")]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Arctic Blast. Emits a freezing wave that causes enemies to take 15% more damage from spells for 16 seconds, deals 200 magical damage and slows their movement by -40% for 4 seconds. Radius: 900. Mana Cost: 75. Cooldown: 27s",
+             "Passive: Freezing Aura. Reduces the attack speed of all enemies by -45 and Health Restoration and Incoming Heal Amplification by 25%. Radius: 1200."],
+        new=["Active: Arctic Blast. Emits a freezing wave that deals 260 magical damage to enemies and slows their movement by -40% for 4 seconds. Radius: 825. Mana Cost: 75. Cooldown: 27s",
+             "Passive: Freezing Aura. Reduces the attack speed of all enemies by -45. Radius: 1200."]))
     W(ul_open())
     W(li("Recipe cost decreased from 2050 to 1350. Total cost decreased from 5175g to 4500g", b([2050, 5175], [1350, 4500], l=True, slash=True)))
     W(li("Arctic Blast damage increased from 200 to 260", b(200, 260)))
@@ -694,6 +761,11 @@ def build():
         new=[("",    "+20% Spell Lifesteal", b(25, 20)),
              ("",    "+650 Health",          b(450, 650)),
              ("NEW", "+15 Intelligence")]))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Bloodpact. Increases Bloodstone's Spell Lifesteal by 3x. Lasts 5 seconds. Dispel Type: Basic Dispel. Cooldown: 30s"],
+        new=["Active: Bloodpact. Increases Bloodstone's Spell Lifesteal to 60%. Lasts 5 seconds. Cooldown: 30s",
+             "Passive: Spell Weakness Aura. Enemy units take 12% increased damage from spells. Radius: 1200."]))
     W(ul_open())
     W(li("Bloodpact no longer has a 30s self debuff preventing repeated usage of Bloodpact", t("BUFF")))
     W(li("Total cost increased from 4350g to 4700g", b(4350, 4700, l=True)))
@@ -752,6 +824,10 @@ def build():
     W(li("Pound of Rocks: Increases armor by 3 and decreases distance of forced movement effects by 30%", t("NEW")))
     W(ul_close())
     W(item_header("Weighted Dice"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Loaded. When calculating your base damage or creep bounty from last hits, the value is computed 2 times and the highest value is taken."],
+        new=["Passive: Loaded. Increases your base damage maximum by 6. When calculating your base damage or creep bounty from last hits, the value is computed 2 times and the highest value is taken."]))
     W(ul_open())
     W(li("Loaded now also increases max base damage by 6", t("NEW")))
     W(ul_close())
@@ -793,6 +869,10 @@ def build():
     W(li("Beat the Crowd cooldown increased from 6s to 10s", b(6, 10, l=True)))
     W(ul_close())
     W(item_header("Jidi Pollen Bag"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Pollinate. Spreads pollen on all nearby enemy units, decreasing their health restoration and dealing damage over time based on their maximum health. Cooldown: 25s"],
+        new=["Active: Pollinate. Spreads pollen on all enemy units in a 700 unit radius for 9 seconds, decreasing their health restoration by 50% and dealing damage equal to 9% of their maximum health per second. Cooldown: 25s"]))
     W(ul_open())
     W(li("Pollinate health restoration loss increased from 30% to 50%", b(30, 50)))
     W(li("Pollinate now also modifies incoming healing", t("NEW"),
