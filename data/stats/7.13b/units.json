@@ -352,7 +352,7 @@
     "AttackRate": 0,
     "AttackRange": 0,
     "MovementSpeed": 0,
-    "StatusHealth": 1750,
+    "StatusHealth": 1500,
     "StatusMana": 0
   },
   "npc_dota_badguys_fillers": {
@@ -372,7 +372,7 @@
     "AttackRate": 0,
     "AttackRange": 0,
     "MovementSpeed": 0,
-    "StatusHealth": 1750,
+    "StatusHealth": 1500,
     "StatusMana": 0
   },
   "npc_dota_goodguys_melee_rax_top": {
@@ -382,7 +382,7 @@
     "AttackRate": 0,
     "AttackRange": 0,
     "MovementSpeed": 0,
-    "StatusHealth": 1800,
+    "StatusHealth": 1500,
     "StatusMana": 0
   },
   "npc_dota_goodguys_melee_rax_mid": {
@@ -392,7 +392,7 @@
     "AttackRate": 0,
     "AttackRange": 0,
     "MovementSpeed": 0,
-    "StatusHealth": 1800,
+    "StatusHealth": 1500,
     "StatusMana": 0
   },
   "npc_dota_goodguys_melee_rax_bot": {
@@ -402,7 +402,7 @@
     "AttackRate": 0,
     "AttackRange": 0,
     "MovementSpeed": 0,
-    "StatusHealth": 1800,
+    "StatusHealth": 1500,
     "StatusMana": 0
   },
   "npc_dota_goodguys_range_rax_top": {
@@ -442,7 +442,7 @@
     "AttackRate": 0,
     "AttackRange": 0,
     "MovementSpeed": 0,
-    "StatusHealth": 1800,
+    "StatusHealth": 1500,
     "StatusMana": 0
   },
   "npc_dota_badguys_melee_rax_mid": {
@@ -452,7 +452,7 @@
     "AttackRate": 0,
     "AttackRange": 0,
     "MovementSpeed": 0,
-    "StatusHealth": 1800,
+    "StatusHealth": 1500,
     "StatusMana": 0
   },
   "npc_dota_badguys_melee_rax_bot": {
@@ -462,7 +462,7 @@
     "AttackRate": 0,
     "AttackRange": 0,
     "MovementSpeed": 0,
-    "StatusHealth": 1800,
+    "StatusHealth": 1500,
     "StatusMana": 0
   },
   "npc_dota_badguys_range_rax_top": {

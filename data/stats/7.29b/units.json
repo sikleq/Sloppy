@@ -1265,8 +1265,8 @@
   },
   "npc_dota_furion_treant_2": {
     "ArmorPhysical": 0,
-    "AttackDamageMin": 24,
-    "AttackDamageMax": 28,
+    "AttackDamageMin": 22,
+    "AttackDamageMax": 26,
     "AttackRate": 1.6,
     "AttackRange": 100,
     "MovementSpeed": 320,
@@ -1275,8 +1275,8 @@
   },
   "npc_dota_furion_treant_3": {
     "ArmorPhysical": 0,
-    "AttackDamageMin": 32,
-    "AttackDamageMax": 36,
+    "AttackDamageMin": 28,
+    "AttackDamageMax": 32,
     "AttackRate": 1.6,
     "AttackRange": 100,
     "MovementSpeed": 340,
@@ -1285,8 +1285,8 @@
   },
   "npc_dota_furion_treant_4": {
     "ArmorPhysical": 0,
-    "AttackDamageMin": 40,
-    "AttackDamageMax": 44,
+    "AttackDamageMin": 34,
+    "AttackDamageMax": 38,
     "AttackRate": 1.6,
     "AttackRange": 100,
     "MovementSpeed": 360,
@@ -1860,7 +1860,7 @@
     "AttackRate": 1.2,
     "AttackRange": 90,
     "MovementSpeed": 400,
-    "StatusHealth": 325,
+    "StatusHealth": 300,
     "StatusMana": 0
   },
   "npc_dota_lycan_wolf2": {
@@ -1870,7 +1870,7 @@
     "AttackRate": 1.1,
     "AttackRange": 90,
     "MovementSpeed": 420,
-    "StatusHealth": 375,
+    "StatusHealth": 350,
     "StatusMana": 0
   },
   "npc_dota_lycan_wolf3": {
@@ -1880,7 +1880,7 @@
     "AttackRate": 1.0,
     "AttackRange": 90,
     "MovementSpeed": 440,
-    "StatusHealth": 425,
+    "StatusHealth": 400,
     "StatusMana": 0
   },
   "npc_dota_lycan_wolf4": {
@@ -1890,7 +1890,7 @@
     "AttackRate": 0.9,
     "AttackRange": 90,
     "MovementSpeed": 460,
-    "StatusHealth": 475,
+    "StatusHealth": 450,
     "StatusMana": 0
   },
   "npc_dota_lycan_wolf_lane": {

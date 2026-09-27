@@ -1606,7 +1606,7 @@
   "npc_dota_unit_tombstone4": {
     "ArmorPhysical": 5,
     "MovementSpeed": 0,
-    "StatusHealth": 14,
+    "StatusHealth": 16,
     "StatusMana": 0
   },
   "npc_dota_unit_undying_zombie": {

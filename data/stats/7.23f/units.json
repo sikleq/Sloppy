@@ -1869,8 +1869,8 @@
   },
   "npc_dota_lone_druid_bear1": {
     "ArmorPhysical": 3,
-    "AttackDamageMin": 20,
-    "AttackDamageMax": 20,
+    "AttackDamageMin": 25,
+    "AttackDamageMax": 25,
     "AttackRate": 1.75,
     "AttackRange": 150,
     "MovementSpeed": 340,
@@ -1879,8 +1879,8 @@
   },
   "npc_dota_lone_druid_bear2": {
     "ArmorPhysical": 4,
-    "AttackDamageMin": 20,
-    "AttackDamageMax": 20,
+    "AttackDamageMin": 25,
+    "AttackDamageMax": 25,
     "AttackRate": 1.65,
     "AttackRange": 150,
     "MovementSpeed": 360,
@@ -1889,8 +1889,8 @@
   },
   "npc_dota_lone_druid_bear3": {
     "ArmorPhysical": 5,
-    "AttackDamageMin": 20,
-    "AttackDamageMax": 20,
+    "AttackDamageMin": 25,
+    "AttackDamageMax": 25,
     "AttackRate": 1.55,
     "AttackRange": 150,
     "MovementSpeed": 380,
@@ -1899,8 +1899,8 @@
   },
   "npc_dota_lone_druid_bear4": {
     "ArmorPhysical": 6,
-    "AttackDamageMin": 20,
-    "AttackDamageMax": 20,
+    "AttackDamageMin": 25,
+    "AttackDamageMax": 25,
     "AttackRate": 1.45,
     "AttackRange": 150,
     "MovementSpeed": 400,
@@ -2461,15 +2461,5 @@
     "AttackRange": 600,
     "MovementSpeed": 0,
     "StatusHealth": 100
-  },
-  "npc_dota_seasonal_penguin": {
-    "ArmorPhysical": 100,
-    "AttackDamageMin": 0,
-    "AttackDamageMax": 0,
-    "AttackRate": 1,
-    "AttackRange": 0,
-    "MovementSpeed": 200,
-    "StatusHealth": 100,
-    "StatusMana": 0
   }
 }

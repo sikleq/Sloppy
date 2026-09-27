@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-r"""Re-extract data/stats/<version>/{items,heroes}.json from the per-patch KV history, where they differ.
+r"""Re-extract data/stats/<version>/{items,heroes,units}.json from the per-patch KV history, where they differ.
 
 Why (2026-09-27): fetch_stats takes the first d2vpkr commit dated on the patch day, which can predate the
 patch, so several slim JSONs were copies of the previous patch: items.json 7.41 = 7.40c byte for byte (the
@@ -23,6 +23,8 @@ FETCH_STATS = r"D:\Sloppy Patches\fetch_stats.py"
 KINDS = (  # slim file, history folder, raw file, extractor name
     ("items.json", "items_history", "items.txt", "extract_items"),
     ("heroes.json", "heroes_history", "npc_heroes.txt", "extract_heroes"),
+    # units_history: npc_units.txt of dotabuff/d2vpkr at the items history plan's commits (2026-09-27)
+    ("units.json", "units_history", "npc_units.txt", "extract_units"),
 )   # abilities.json is read by no page: not resynced
 
 

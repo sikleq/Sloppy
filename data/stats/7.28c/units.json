@@ -1297,7 +1297,7 @@
     "ArmorPhysical": 0,
     "AttackDamageMin": 102,
     "AttackDamageMax": 114,
-    "AttackRate": 1.4,
+    "AttackRate": 1.0,
     "AttackRange": 100,
     "MovementSpeed": 360,
     "StatusHealth": 1650,
@@ -1345,8 +1345,8 @@
   },
   "npc_dota_wraith_king_skeleton_warrior": {
     "ArmorPhysical": 1,
-    "AttackDamageMin": 32,
-    "AttackDamageMax": 37,
+    "AttackDamageMin": 35,
+    "AttackDamageMax": 40,
     "AttackRate": 1.2,
     "AttackRange": 115,
     "MovementSpeed": 350,
@@ -1524,7 +1524,7 @@
     "AttackDamageMax": 16,
     "AttackRate": 1.25,
     "AttackRange": 550,
-    "MovementSpeed": 320,
+    "MovementSpeed": 350,
     "StatusHealth": 300
   },
   "npc_dota_beastmaster_boar_2": {
@@ -1533,7 +1533,7 @@
     "AttackDamageMax": 32,
     "AttackRate": 1.25,
     "AttackRange": 550,
-    "MovementSpeed": 330,
+    "MovementSpeed": 350,
     "StatusHealth": 450
   },
   "npc_dota_beastmaster_boar_3": {
@@ -1542,7 +1542,7 @@
     "AttackDamageMax": 48,
     "AttackRate": 1.25,
     "AttackRange": 550,
-    "MovementSpeed": 340,
+    "MovementSpeed": 350,
     "StatusHealth": 600
   },
   "npc_dota_beastmaster_boar_4": {

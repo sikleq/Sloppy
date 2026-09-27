@@ -1796,8 +1796,8 @@
   },
   "npc_dota_lycan_wolf1": {
     "ArmorPhysical": 0,
-    "AttackDamageMin": 20,
-    "AttackDamageMax": 23,
+    "AttackDamageMin": 22,
+    "AttackDamageMax": 24,
     "AttackRate": 1.2,
     "AttackRange": 90,
     "MovementSpeed": 400,
@@ -1805,22 +1805,22 @@
     "StatusMana": 0
   },
   "npc_dota_lycan_wolf2": {
-    "AttackDamageMin": 26,
-    "AttackDamageMax": 29,
+    "AttackDamageMin": 28,
+    "AttackDamageMax": 30,
     "AttackRate": 1.1,
     "MovementSpeed": 420,
     "StatusHealth": 375
   },
   "npc_dota_lycan_wolf3": {
-    "AttackDamageMin": 32,
-    "AttackDamageMax": 34,
+    "AttackDamageMin": 34,
+    "AttackDamageMax": 36,
     "AttackRate": 1.0,
     "MovementSpeed": 440,
     "StatusHealth": 425
   },
   "npc_dota_lycan_wolf4": {
-    "AttackDamageMin": 38,
-    "AttackDamageMax": 40,
+    "AttackDamageMin": 40,
+    "AttackDamageMax": 42,
     "AttackRate": 0.9,
     "MovementSpeed": 460,
     "StatusHealth": 475

@@ -197,8 +197,8 @@
   },
   "npc_dota_goodguys_tower3_top": {
     "ArmorPhysical": 16,
-    "AttackDamageMin": 142,
-    "AttackDamageMax": 162,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 180,
     "AttackRate": 0.95,
     "AttackRange": 700,
     "MovementSpeed": 0,
@@ -207,8 +207,8 @@
   },
   "npc_dota_goodguys_tower3_mid": {
     "ArmorPhysical": 16,
-    "AttackDamageMin": 142,
-    "AttackDamageMax": 162,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 180,
     "AttackRate": 0.95,
     "AttackRange": 700,
     "MovementSpeed": 0,
@@ -217,8 +217,8 @@
   },
   "npc_dota_goodguys_tower3_bot": {
     "ArmorPhysical": 16,
-    "AttackDamageMin": 142,
-    "AttackDamageMax": 162,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 180,
     "AttackRate": 0.95,
     "AttackRange": 700,
     "MovementSpeed": 0,
@@ -227,8 +227,8 @@
   },
   "npc_dota_goodguys_tower4": {
     "ArmorPhysical": 21,
-    "AttackDamageMin": 142,
-    "AttackDamageMax": 162,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 180,
     "AttackRate": 0.95,
     "AttackRange": 700,
     "MovementSpeed": 0,
@@ -297,8 +297,8 @@
   },
   "npc_dota_badguys_tower3_top": {
     "ArmorPhysical": 16,
-    "AttackDamageMin": 142,
-    "AttackDamageMax": 162,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 180,
     "AttackRate": 0.95,
     "AttackRange": 700,
     "MovementSpeed": 0,
@@ -307,8 +307,8 @@
   },
   "npc_dota_badguys_tower3_mid": {
     "ArmorPhysical": 16,
-    "AttackDamageMin": 142,
-    "AttackDamageMax": 162,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 180,
     "AttackRate": 0.95,
     "AttackRange": 700,
     "MovementSpeed": 0,
@@ -317,8 +317,8 @@
   },
   "npc_dota_badguys_tower3_bot": {
     "ArmorPhysical": 16,
-    "AttackDamageMin": 142,
-    "AttackDamageMax": 162,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 180,
     "AttackRate": 0.95,
     "AttackRange": 700,
     "MovementSpeed": 0,
@@ -327,8 +327,8 @@
   },
   "npc_dota_badguys_tower4": {
     "ArmorPhysical": 21,
-    "AttackDamageMin": 142,
-    "AttackDamageMax": 162,
+    "AttackDamageMin": 170,
+    "AttackDamageMax": 180,
     "AttackRate": 0.95,
     "AttackRange": 700,
     "MovementSpeed": 0,
@@ -519,7 +519,7 @@
     "ArmorPhysical": 0,
     "AttackDamageMin": 35,
     "AttackDamageMax": 46,
-    "AttackRate": 2.7,
+    "AttackRate": 3.0,
     "AttackRange": 690,
     "MovementSpeed": 325,
     "StatusHealth": 875,
@@ -529,7 +529,7 @@
     "ArmorPhysical": 0,
     "AttackDamageMin": 51,
     "AttackDamageMax": 62,
-    "AttackRate": 2.7,
+    "AttackRate": 3.0,
     "AttackRange": 690,
     "MovementSpeed": 325,
     "StatusHealth": 875,
@@ -539,7 +539,7 @@
     "ArmorPhysical": 0,
     "AttackDamageMin": 51,
     "AttackDamageMax": 62,
-    "AttackRate": 2.7,
+    "AttackRate": 3.0,
     "AttackRange": 690,
     "MovementSpeed": 325,
     "StatusHealth": 875,
@@ -549,7 +549,7 @@
     "ArmorPhysical": 0,
     "AttackDamageMin": 35,
     "AttackDamageMax": 46,
-    "AttackRate": 2.7,
+    "AttackRate": 3.0,
     "AttackRange": 690,
     "MovementSpeed": 325,
     "StatusHealth": 875,
@@ -559,7 +559,7 @@
     "ArmorPhysical": 0,
     "AttackDamageMin": 51,
     "AttackDamageMax": 62,
-    "AttackRate": 2.7,
+    "AttackRate": 3.0,
     "AttackRange": 690,
     "MovementSpeed": 325,
     "StatusHealth": 875,
@@ -569,7 +569,7 @@
     "ArmorPhysical": 0,
     "AttackDamageMin": 51,
     "AttackDamageMax": 62,
-    "AttackRate": 2.7,
+    "AttackRate": 3.0,
     "AttackRange": 690,
     "MovementSpeed": 325,
     "StatusHealth": 875,
@@ -1245,8 +1245,8 @@
   },
   "npc_dota_furion_treant_1": {
     "ArmorPhysical": 0,
-    "AttackDamageMin": 25,
-    "AttackDamageMax": 29,
+    "AttackDamageMin": 22,
+    "AttackDamageMax": 26,
     "AttackRate": 1.75,
     "AttackRange": 100,
     "MovementSpeed": 325,
@@ -1255,8 +1255,8 @@
   },
   "npc_dota_furion_treant_2": {
     "ArmorPhysical": 0,
-    "AttackDamageMin": 28,
-    "AttackDamageMax": 32,
+    "AttackDamageMin": 26,
+    "AttackDamageMax": 30,
     "AttackRate": 1.75,
     "AttackRange": 100,
     "MovementSpeed": 325,
@@ -1265,8 +1265,8 @@
   },
   "npc_dota_furion_treant_3": {
     "ArmorPhysical": 0,
-    "AttackDamageMin": 31,
-    "AttackDamageMax": 35,
+    "AttackDamageMin": 30,
+    "AttackDamageMax": 34,
     "AttackRate": 1.75,
     "AttackRange": 100,
     "MovementSpeed": 325,
@@ -1360,7 +1360,7 @@
     "StatusMana": 0
   },
   "npc_dota_roshan": {
-    "ArmorPhysical": 18,
+    "ArmorPhysical": 20,
     "AttackDamageMin": 75,
     "AttackDamageMax": 75,
     "AttackRate": 2.0,
@@ -1631,25 +1631,25 @@
   "npc_dota_unit_tombstone1": {
     "ArmorPhysical": 5,
     "MovementSpeed": 0,
-    "StatusHealth": 8,
+    "StatusHealth": 16,
     "StatusMana": 0
   },
   "npc_dota_unit_tombstone2": {
     "ArmorPhysical": 5,
     "MovementSpeed": 0,
-    "StatusHealth": 10,
+    "StatusHealth": 20,
     "StatusMana": 0
   },
   "npc_dota_unit_tombstone3": {
     "ArmorPhysical": 5,
     "MovementSpeed": 0,
-    "StatusHealth": 12,
+    "StatusHealth": 24,
     "StatusMana": 0
   },
   "npc_dota_unit_tombstone4": {
     "ArmorPhysical": 5,
     "MovementSpeed": 0,
-    "StatusHealth": 14,
+    "StatusHealth": 28,
     "StatusMana": 0
   },
   "npc_dota_unit_undying_zombie": {
@@ -1847,6 +1847,16 @@
     "StatusHealth": 450,
     "StatusMana": 0
   },
+  "npc_dota_lycan_wolf_lane": {
+    "ArmorPhysical": 0,
+    "AttackDamageMin": 48,
+    "AttackDamageMax": 52,
+    "AttackRate": 0.9,
+    "AttackRange": 90,
+    "MovementSpeed": 325,
+    "StatusHealth": 450,
+    "StatusMana": 0
+  },
   "npc_dota_lone_druid_bear1": {
     "ArmorPhysical": 3,
     "AttackDamageMin": 30,
@@ -1894,7 +1904,7 @@
     "AttackRate": 0.4,
     "AttackRange": 160,
     "MovementSpeed": 430,
-    "StatusHealth": 400,
+    "StatusHealth": 500,
     "StatusMana": 0
   },
   "npc_dota_visage_familiar2": {
@@ -1904,7 +1914,7 @@
     "AttackRate": 0.4,
     "AttackRange": 160,
     "MovementSpeed": 430,
-    "StatusHealth": 550,
+    "StatusHealth": 600,
     "StatusMana": 0
   },
   "npc_dota_visage_familiar3": {

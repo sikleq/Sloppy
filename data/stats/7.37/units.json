@@ -1811,31 +1811,25 @@
     "ArmorPhysical": 0,
     "AttackDamageMin": 28,
     "AttackDamageMax": 28,
-    "AttackRate": 1.85,
-    "AttackRange": 150,
-    "MovementSpeed": 300,
-    "StatusHealth": 800,
-    "StatusMana": 300
-  },
-  "npc_dota_lone_druid_bear2": {
     "AttackRate": 1.75,
+    "AttackRange": 150,
     "MovementSpeed": 300,
     "StatusHealth": 1100,
     "StatusMana": 300
   },
-  "npc_dota_lone_druid_bear3": {
+  "npc_dota_lone_druid_bear2": {
     "AttackRate": 1.65,
     "MovementSpeed": 330,
     "StatusHealth": 1400,
     "StatusMana": 300
   },
-  "npc_dota_lone_druid_bear4": {
+  "npc_dota_lone_druid_bear3": {
     "AttackRate": 1.55,
     "MovementSpeed": 360,
     "StatusHealth": 1700,
     "StatusMana": 300
   },
-  "npc_dota_lone_druid_bear5": {
+  "npc_dota_lone_druid_bear4": {
     "AttackRate": 1.45,
     "MovementSpeed": 390,
     "StatusHealth": 2000,

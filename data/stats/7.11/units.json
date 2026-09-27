@@ -1361,8 +1361,8 @@
   },
   "npc_dota_warlock_golem_2": {
     "ArmorPhysical": 9,
-    "AttackDamageMin": 125,
-    "AttackDamageMax": 125,
+    "AttackDamageMin": 100,
+    "AttackDamageMax": 100,
     "AttackRate": 1.2,
     "AttackRange": 225,
     "MovementSpeed": 340,
@@ -1371,8 +1371,8 @@
   },
   "npc_dota_warlock_golem_3": {
     "ArmorPhysical": 12,
-    "AttackDamageMin": 175,
-    "AttackDamageMax": 175,
+    "AttackDamageMin": 125,
+    "AttackDamageMax": 125,
     "AttackRate": 1.2,
     "AttackRange": 225,
     "MovementSpeed": 360,
@@ -1391,8 +1391,8 @@
   },
   "npc_dota_warlock_golem_scepter_2": {
     "ArmorPhysical": 9,
-    "AttackDamageMin": 94,
-    "AttackDamageMax": 94,
+    "AttackDamageMin": 75,
+    "AttackDamageMax": 75,
     "AttackRate": 1.2,
     "AttackRange": 225,
     "MovementSpeed": 340,
@@ -1401,8 +1401,8 @@
   },
   "npc_dota_warlock_golem_scepter_3": {
     "ArmorPhysical": 12,
-    "AttackDamageMin": 131,
-    "AttackDamageMax": 131,
+    "AttackDamageMin": 94,
+    "AttackDamageMax": 94,
     "AttackRate": 1.2,
     "AttackRange": 225,
     "MovementSpeed": 360,

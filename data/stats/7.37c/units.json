@@ -1335,7 +1335,7 @@
     "ArmorPhysical": 0,
     "AttackDamageMin": 102,
     "AttackDamageMax": 114,
-    "AttackRate": 1.4,
+    "AttackRate": 1.6,
     "AttackRange": 100,
     "MovementSpeed": 360,
     "StatusHealth": 1650,

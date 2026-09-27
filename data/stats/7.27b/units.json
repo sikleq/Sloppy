@@ -1330,7 +1330,7 @@
     "AttackRate": 1.35,
     "AttackRange": 100,
     "MovementSpeed": 350,
-    "StatusHealth": 100,
+    "StatusHealth": 120,
     "StatusMana": 0
   },
   "npc_dota_dark_troll_warlord_skeleton_warrior": {

@@ -1727,7 +1727,7 @@
     "AttackDamageMax": 0,
     "AttackRate": 1.0,
     "AttackRange": 0,
-    "MovementSpeed": 300,
+    "MovementSpeed": 150,
     "StatusHealth": 10
   },
   "npc_dota_pugna_nether_ward_2": {

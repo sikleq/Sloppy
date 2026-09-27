@@ -1887,7 +1887,7 @@
     "AttackDamageMax": 25,
     "AttackRate": 0.5,
     "AttackRange": 180,
-    "MovementSpeed": 430,
+    "MovementSpeed": 420,
     "StatusHealth": 500,
     "StatusMana": 0
   },
