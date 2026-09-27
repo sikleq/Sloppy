@@ -4,6 +4,12 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "7.38 Khanda: its abilities before and after, side by side, as in the game's tooltip",
+      "minor": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "Item abilities read like the game's tooltip: a header with range, mana cost and cooldown icons, numbers in bold",
       "minor": true
     },
@@ -17,7 +23,7 @@
     {
       "date": "2026-09-27",
       "category": "Dynamics",
-      "title": "Replaced facets and moved Aghanim's upgrades take their direction from pro picks, not a fixed minus",
+      "title": "Replaced facets and moved Aghanim's upgrades are no longer a fixed minus",
       "minor": true
     },
     {
@@ -231,13 +237,13 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Hero scores count reworked abilities, facets and innates (from pro picks)",
+      "title": "Hero scores count reworked abilities, facets and innates",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Item scores count reworked abilities (from pro purchases)",
+      "title": "Item scores count reworked abilities",
       "minor": true
     },
     {

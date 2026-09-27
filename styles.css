@@ -10860,3 +10860,9 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-ico { width: 13px; height: 13px; border-radius: 2px; display: block; }
 .iab-desc { display: block; }
 .iab-num { font-weight: 700; color: var(--text-bright); }
+/* Item abilities before -> after (item_abilities_change): each pane is a column of ability cards */
+.properties-change.iab-change { align-items: start; }
+.properties-change.iab-change .properties-pane { display: flex; flex-direction: column; align-items: stretch; gap: 8px; grid-row: auto;
+  padding: 0; background: none; border: 0; }
+.iab-card { background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px; padding: 6px 12px; }
+.iab-card .iab-desc { line-height: 1.45; }

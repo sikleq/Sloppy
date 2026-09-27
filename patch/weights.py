@@ -542,7 +542,7 @@ def _load_adopt(name, key):
 _ADOPT = {"item": _load_adopt("item_adoption.json", "items"), "hero": _load_adopt("hero_adoption.json", "heroes")}
 # Signal R (2026-09-26): a REWORK row ("Passive: Corrosion. <new text>", a reworked hero ability) has no
 # number to read its direction from; Valve's prices and follow-up patches do not tell it either
-# (docs/weights.md "Reworks"). It gets the part of the Tier 1-2 pro adoption shift (DEMOS, 21 days
+# (docs/weights.md "Reworks"). It gets the part of the Tier 1-2 pro adoption shift (the match database, 21 days
 # before vs after; items: share of player-games that bought it, heroes: that played it) the entity's
 # other rows do not explain. Fitted on the non-rework cells 7.35c-7.41f:
 #   items  dlog = 0.41 x net + 0.13 (n 171, rho 0.32), median |dlog| 0.21 (meta noise)
@@ -557,7 +557,7 @@ ITEM_REWORK_CAP = 3.0        # cap of signal R for one entity per patch (items a
 
 def rework_adoption_net(ctx, other_net):
     """Signal R: signed net of an item's / a hero's REWORK rows at the end of its block, or None
-    (no DEMOS window for the patch / too few buyers or games)."""
+    (no match database window for the patch / too few buyers or games)."""
     ctx = ctx or {}
     kind = ctx.get("kind")
     fit = ADOPT_FIT.get(kind)
@@ -852,7 +852,7 @@ def _row_scores(text, tags, badge_html="", ctx=None):
 # the flat x0.5 ranked DEL/NEW rows BELOW numeric tweaks (rho -0.13 inside DEL/NEW), while a whole
 # removed ability / facet averaged grade 4.25, a lost Aghanim's upgrade 3.2, part of an effect 3.1,
 # a lost target class (creeps, illusions, invulnerable) 1.6, a use restriction 1.9 (buff/nerf 1.8-2.4).
-# Pro adoption (DEMOS) agrees for HEROES: one DEL row moves pick share like ~2.4 buff/nerf rows, a NEW
+# Pro adoption (the match database) agrees for HEROES: one DEL row moves pick share like ~2.4 buff/nerf rows, a NEW
 # row ~3.2; items show no signal. Devil's advocate (same session) killed "a number -> 0 = -100%" and
 # "an item ability = cost - priced stats" (negative for a third of items) — neither is done.
 DELNEW_HERO_W = 1.0       # direction of a sole NEW / DEL row of a hero / unit (was 0.5, like items still)

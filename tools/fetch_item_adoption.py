@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """How pros adopted an item after each patch: share of player-games that BOUGHT it, before vs after.
 
-Source: DEMOS (our own replay parses, Tier 1-2 pro matches, 2024 onwards), table `purchases`
+Source: a Tier 1-2 pro match database (2024 onwards), table `purchases`
 (match_id, slot, item, ts). A player-game "bought" an item when the item appears in its purchase log
 at least once (a component bought for a different upgrade still counts: it is what pros spent on).
 Windows: up to 21 days before and after the patch date, cut at the neighbouring patches.
@@ -26,7 +26,8 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 from patch.meta import RELEASE_HISTORY  # noqa: E402
 
-DEMOS_DB = os.environ.get("DEMOS_DB", "C:/Users/sikle/demos/data/demos.db")
+from match_db import match_db_path  # noqa: E402
+MATCH_DB = match_db_path()
 OUT = os.path.join(HERE, "data", "rules", "item_adoption.json")
 OUT_HEROES = os.path.join(HERE, "data", "rules", "hero_adoption.json")
 WINDOW_DAYS = 21
@@ -86,10 +87,10 @@ def write(path, doc, out):
 
 
 def main():
-    if not os.path.exists(DEMOS_DB):
-        print("DEMOS database not found, item_adoption.json kept as is:", DEMOS_DB)
+    if not MATCH_DB or not os.path.exists(MATCH_DB):
+        print("match database not found (MATCH_DB), item_adoption.json kept as is")
         return 0
-    con = sqlite3.connect("file:" + DEMOS_DB + "?mode=ro", uri=True)
+    con = sqlite3.connect("file:" + MATCH_DB + "?mode=ro", uri=True)
     out, out_h, names = {}, {}, hero_names()
     for v, lo, t, hi in windows():
         gb, cb = counts(con, lo, t)
@@ -106,7 +107,7 @@ def main():
     doc = __doc__.strip().split("\n\n")[0] + (" items: slug -> [player-games that bought it before, after]; "
                                                 "games: all player-games in the two windows.")
     write(OUT, doc, out)
-    write(OUT_HEROES, "Tier 1-2 pro pick counts per hero, before/after every patch (DEMOS, tools/fetch_item_adoption.py). "
+    write(OUT_HEROES, "Tier 1-2 pro pick counts per hero, before/after every patch (the match database, tools/fetch_item_adoption.py). "
           "heroes: npc name -> [player-games on the hero before, after]; games: all player-games.", out_h)
     print(len(out), "patch windows ->", OUT)
     return 0

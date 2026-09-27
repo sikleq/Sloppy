@@ -297,16 +297,16 @@ logic" signals were tested; none can give a rework its direction:
 The one consistent Valve system is the stat pricing of simple items (already used). So a rework's
 direction is measured, like talent replacements (signal K):
 
-**Signal R** (`rework_adoption_net`): DEMOS (our Tier 1–2 replay parses, 22 k matches since 2024),
+**Signal R** (`rework_adoption_net`): a Tier 1–2 pro match database (22 k matches since 2024),
 share of player-games that BOUGHT the item, 21 days before vs after the patch (`tools/fetch_item_adoption.py`
 → `data/rules/item_adoption.json`, 25 patch windows 7.35c–7.41f). On 171 non-rework item cells the item net
-explains it as dlog = 0.41 × net + 0.13 (ρ **0.32**; OpenDota final inventory, all pro leagues: 0.20 — DEMOS
+explains it as dlog = 0.41 × net + 0.13 (ρ **0.32**; OpenDota final inventory, all pro leagues: 0.20 — the match database
 is the better source for these patches, OpenDota only for years before 2024). At the end of an item block the
 REWORK rows get (dlog − 0.41 × net − 0.13), minus the 0.21 meta noise, / 0.41, × n / (n + 100) buyers, capped
 ±3. Changed cells: Orb of Corrosion 7.38 −3.84 → −0.84 (bought ×2.85 despite ~1000 g of stats lost: the new
 Corrosion), Drum of Endurance 7.38 −2.76 → −0.90, Mask of Madness 7.41e −0.80 → −0.33, Shiva's Guard 7.39
 0 → −0.29, Consecrated Wraps 7.41b −1.08 → −1.10; the other 8 reworks with data are within the noise.
-Against OpenDota (independent): ρ 0.202 → 0.207. Patches without a DEMOS window (7.41: 7.41a came 4 days
+Against OpenDota (independent): ρ 0.202 → 0.207. Patches without a match database window (7.41: 7.41a came 4 days
 later; the newest patch until ~5 days of games) keep REWORK = 0 until `tools/refresh_weights_data.py` runs.
 
 ### Signal R for heroes (2026-09-26)
@@ -493,11 +493,11 @@ style judges have with each other. First sample (one judge): 0.34.
 1.5 → 1.41, 2 → 1.69, 3 → 2.10, 6 → 2.79; replaces the hard cap 3 for % rows. A halved niche parameter no
 longer outweighs a real nerf (Treant 7.41f −7.2 → −6.0). Agreement unchanged (0.33 → 0.35, 0.44 → 0.43).
 
-**Can we live without OpenDota? Mostly.** DEMOS (own replay parses, Tier 1–2, 2024+) has `ability_builds`.
-Skill priority from DEMOS vs OpenDota: r = 0.97 on common abilities (120 d). Talent picks for one window
-(7.39e): r = 0.87, but DEMOS has ~9× fewer picks (20.8 k vs 181.7 k), so fewer talent tiers pass the
-≥ 30-pick threshold. Two limits: DEMOS starts in 2024 (history before that stays on the cached OpenDota
-pull, one-off), and DEMOS currently records builds for only 97 of 127 heroes (parser gap, tracked there) —
+**Can we live without OpenDota? Mostly.** The match database (Tier 1–2, 2024+) has `ability_builds`.
+Skill priority from the match database vs OpenDota: r = 0.97 on common abilities (120 d). Talent picks for one window
+(7.39e): r = 0.87, but the match database has ~9× fewer picks (20.8 k vs 181.7 k), so fewer talent tiers pass the
+≥ 30-pick threshold. Two limits: the match database starts in 2024 (history before that stays on the cached OpenDota
+pull, one-off), and the match database currently records builds for only 97 of 127 heroes —
 until fixed, those 30 heroes are topped up from OpenDota. Refresh: `tools/refresh_weights_data.py`
 (workflow Step 2c).
 
@@ -573,7 +573,7 @@ creeps" (−0.19).
    whole ability/facet/item removed 4.25, Aghanim's upgrade lost 3.22, part of an effect 3.07, NEW 2.83, nerf 2.36,
    use restriction 1.88, buff 1.80, lost target class (creeps, illusions, invulnerable) 1.60. Current scores vs
    grades: ρ −0.21 on all 200, −0.13 inside DEL/NEW.
-2. Devil's advocate (separate agent, read-only) + pro adoption (DEMOS, 21 days, non-rework cells, bootstrap):
+2. Devil's advocate (separate agent, read-only) + pro adoption (the match database, 21 days, non-rework cells, bootstrap):
    for heroes one DEL row moves pick share like ~2.4 buff/nerf rows (CI 1.15–4.5), a NEW row ~3.2; items: no signal.
 
 **Done** (`_sole_new_del` in patch/weights.py):
@@ -600,7 +600,7 @@ Signal R: the hero adoption fit on the new nets moves slope 0.129 → 0.132 (ρ 
 
 **Replacements (2026-09-27, `_flush_cell_rows` in patch/elements.py).** By text a replacement has no direction —
 owner: "a replaced facet can be better or worse". So it nets 0 and **signal R** (the pro pick-share shift the hero's
-other rows don't explain) gives it one where DEMOS has the patch (7.35c+); before that it stays 0 ("unknown"):
+other rows don't explain) gives it one where the match database has the patch (7.35c+); before that it stays 0 ("unknown"):
 - a whole ability / facet / innate removed and one added in the same hero block (±WHOLE_W cancel) → R;
 - an Aghanim's Shard/Scepter upgrade moved to another ability: the "no longer upgraded with" DEL is cancelled by
   its NEW partner or set to 0 next to a "… reworked" REWORK partner → R (Legion Commander, Wraith King 7.41 …);

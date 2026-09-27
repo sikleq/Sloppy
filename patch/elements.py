@@ -1008,7 +1008,7 @@ def _dyn_record_card(tags, text="", badge="", **ctx_over):
 
 # ---- A hero block's replacements (owner 2026-09-27: "a replaced facet can be better or worse") ----
 # By text alone a replacement has no direction, so it nets 0 and signal R (the pro pick-share shift the
-# hero's other rows don't explain) gives it one where DEMOS has the patch (7.35c+):
+# hero's other rows don't explain) gives it one where the match database has the patch (7.35c+):
 #  - a whole ability / facet / innate removed AND one added in the same block (±WHOLE_W cancel);
 #  - an Aghanim's Shard / Scepter upgrade that moved to another ability: the "no longer upgraded with"
 #    DEL is cancelled by its NEW partner (or set to 0 next to a REWORK "... reworked" partner);
@@ -1283,6 +1283,20 @@ def _item_ability_html(text):
     title = f'<b class="iab-kind">{kind}:</b>' + (f' <span class="iab-name">{name}</span>' if name else "")
     head = f'<span class="iab-head"><span class="iab-title">{title}</span><span class="iab-meta">{"".join(meta)}</span></span>'
     return head + (f'<span class="iab-desc">{_iab_bold_numbers(desc)}</span>' if desc else "")
+
+
+def item_abilities_change(old, new):
+    """An item's abilities before -> after (owner 2026-09-27, Khanda 7.38 pilot): two panes like the
+    stats card, each ability in the game-tooltip style (_item_ability_html). `old` / `new` are lists of
+    one-line ability texts ("Passive: Empower Spell. The next ... Cooldown: 6s"); the old ones are the
+    game's tooltips of the previous patch (d2vpkr), never invented. The card is not scored — the tagged
+    rows under it keep the weights."""
+    def pane(texts):
+        return "".join(f'<div class="iab-card">{_item_ability_html(t) or _html.escape(t)}</div>' for t in texts)
+    return ('<div class="properties-change iab-change">'
+            f'<div class="properties-pane pane-old">{pane(old)}</div>'
+            '<span class="properties-arrow">→</span>'
+            f'<div class="properties-pane pane-new">{pane(new)}</div></div>')
 
 
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None):

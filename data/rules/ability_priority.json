@@ -1,6 +1,6 @@
 {
  "_doc": "Objective \"how central is this ability\" prior from how pros actually skill it. See tools/fetch_skill_priority.py.",
- "source": "demos + opendota for 30 heroes missing in DEMOS",
+ "source": "db + opendota for 30 heroes missing in the db",
  "window_days": 365,
  "fetched": "2026-09-17",
  "stats_version": "7.41f",

@@ -21,3 +21,12 @@ def test_no_mana_cost_is_dropped_and_a_name_with_bang_is_kept():
 def test_a_description_without_a_name_keeps_its_first_sentence():
     h = el._item_ability_html("Active: Increases your current and max health by 240 for 10 seconds")
     assert "iab-name" not in h and "Increases your current" in h
+
+
+def test_item_abilities_change_puts_each_ability_in_a_card_on_its_side():
+    html = el.item_abilities_change(
+        old=["Passive: Empower Spell. Deals 150 bonus damage. Cooldown: 6s", "Passive: Critical Strike. 30% chance"],
+        new=["Passive: Empower Spell. Deals 250 bonus damage. Cooldown: 12s"])
+    old, new = html.split('pane-new')
+    assert old.count('class="iab-card"') == 2 and new.count('class="iab-card"') == 1
+    assert ">6<" in old and ">12<" in new

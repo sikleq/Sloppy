@@ -476,6 +476,11 @@ def build():
     W(item_header("Khanda", changed="Item Reworked"))
     W(auto_components_change("Khanda", "7.38"))
     W(properties_change(old=[("DEL", "+50 Damage")], new=[("NEW", "+8 Mana Regen")]))
+    # old tooltips: d2vpkr abilities_english.txt 7.37e (Client 6286) + 7.37e items.txt values
+    W(item_abilities_change(
+        old=["Passive: Empower Spell. The next Unit Target spell you cast on an enemy deals 150 + 60% of your attack damage as bonus damage to the target, and slows them by 50% for 1.5s. Cooldown: 6s",
+             "Passive: Critical Strike. Grants each attack a 30% chance to deal 160% damage"],
+        new=["Passive: Empower Spell. The next Unit Target spell you cast on an enemy deals a separate 250 additional damage, disables their passives, and slows their movement speed by 30% for 3s. Cooldown: 12s"]))
     W(ul_open())
     W(li("Recipe cost increased from 500 to 1500. Total cost increased from 5100 to 5900", b([500, 5100], [1500, 5900], l=True, slash=True)))
     W(li("Empower Spell bonus damage increased from 150 to 250", b(150, 250)))

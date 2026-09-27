@@ -12,9 +12,9 @@ so an evenly-skilled kit gives 1.0 everywhere, the maxed-first ability ~1.15-1.3
 ~0.7-0.8. Ultimates keep the fixed context multiplier (valve_weights.json "context.ultimate");
 innates/facets are not skilled and stay 1.0.
 
-Usage:  python tools/fetch_skill_priority.py [days=365] [auto|demos|opendota]
+Usage:  python tools/fetch_skill_priority.py [days=365] [auto|db|opendota]
         -> data/rules/ability_priority.json
-Default "auto": DEMOS (our own replay parses, Tier 1-2) for every hero it covers, OpenDota only for heroes DEMOS has no builds for.
+Default "auto": the match database (Tier 1-2) for every hero it covers, OpenDota only for heroes the match database has no builds for.
 """
 import sys, os, re, json, glob, time, urllib.request, urllib.parse, collections
 
@@ -30,16 +30,17 @@ SQL = ("SELECT t.hero_id, t.ability, count(*) AS n FROM (SELECT pm.hero_id, a.ab
        "GROUP BY 1,2")
 
 
-DEMOS_DB = "C:/Users/sikle/demos/data/demos.db"
+from match_db import match_db_path  # noqa: E402
+MATCH_DB = match_db_path()
 
 
-def rows_from_demos(days):
-    """Same counts from OUR OWN replay parses (DEMOS, Tier 1-2 pro matches): table ability_builds
+def rows_from_db(days):
+    """Same counts from the Tier 1-2 pro match database: table ability_builds
     holds every ability level-up with a timestamp. The first block of rows of a player (all at the
     minimal ts) is the kit registration, not skill points; linked abilities level together at the
     same ts, so only the first row of a timestamp counts. Returns [(hero_id, ability_slug, n)]."""
     import sqlite3
-    con = sqlite3.connect("file:" + DEMOS_DB + "?mode=ro", uri=True)
+    con = sqlite3.connect("file:" + MATCH_DB + "?mode=ro", uri=True)
     cur = con.execute(
         "SELECT ab.match_id, ab.slot, mp.hero_id, ab.ability, ab.ts FROM ability_builds ab "
         "JOIN matches m USING(match_id) JOIN match_players mp ON mp.match_id = ab.match_id AND mp.slot = ab.slot "
@@ -65,17 +66,17 @@ def main(days=120, source="auto"):
         return json.load(urllib.request.urlopen(
             urllib.request.Request(url, headers={"User-Agent": "sloppy-skill-priority"}), timeout=180))["rows"]
 
-    if source == "auto" and not os.path.exists(DEMOS_DB):
+    if source == "auto" and not (MATCH_DB and os.path.exists(MATCH_DB)):
         source = "opendota"
-    if source in ("auto", "demos"):
-        rows = [{"hero_id": h, "slug": a, "n": n} for h, a, n in rows_from_demos(days)]
+    if source in ("auto", "db"):
+        rows = [{"hero_id": h, "slug": a, "n": n} for h, a, n in rows_from_db(days)]
         have = {r["hero_id"] for r in rows}
         if source == "auto":
-            # DEMOS currently records skill builds for ~97 of 127 heroes (parser gap, tracked
+            # the match database currently records skill builds for ~97 of 127 heroes (parser gap, tracked
             # separately) — the missing heroes are topped up from OpenDota until that is fixed.
             extra = [r for r in opendota_rows() if r["hero_id"] not in have]
             rows += extra
-            source = "demos" if not extra else f"demos + opendota for {len({r['hero_id'] for r in extra})} heroes missing in DEMOS"
+            source = "db" if not extra else f"db + opendota for {len({r['hero_id'] for r in extra})} heroes missing in the db"
     else:
         rows = opendota_rows()
     ults = ultimates()

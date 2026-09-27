@@ -7,7 +7,7 @@ from .elements import (
     section, subgroup, li, ul_open, ul_close, li_formula, enchant_header,
     enchant_attr_row, enchant_tier_box, souvenir_chip, plain_header,
     components, item_cost, provides, properties_change, auto_components_change, new_stats,
-    components_change, aghs_line, aghs_shard_line, ability_change, formula_change,
+    components_change, aghs_line, aghs_shard_line, ability_change, formula_change, item_abilities_change,
     inline_note, info_tip, show_list, subnote, section_intro, note_box, cm_draft, attr_change, creep_ref, camp_table
 )
 from .stats import stat_h, stat_i, bstat_h, bstat_i, bstat_u, prev_change_patch_h, prev_change_patch_i, prev_change_patch_u

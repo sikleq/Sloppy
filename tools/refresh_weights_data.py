@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """Refresh the EXTERNAL data behind the weights (run after every patch, and monthly).
 
-  1. data/rules/ability_priority.json  - how pros skill each hero (DEMOS, OpenDota only for heroes
-                                         DEMOS has no builds for)           tools/fetch_skill_priority.py
+  1. data/rules/ability_priority.json  - how pros skill each hero (the match database, OpenDota only for heroes
+                                         the match database has no builds for)           tools/fetch_skill_priority.py
   1b. data/rules/item_adoption.json    - how pros bought each item before/after every patch
-                                         (DEMOS; signal R for item REWORK rows)  tools/fetch_item_adoption.py
+                                         (the match database; signal R for item REWORK rows)  tools/fetch_item_adoption.py
   2. data/rules/talent_shift.json      - talent replacements: shift of the pro pick share
      data/rules/talent_tiers.json      - + level moves                       (model folder, signal K)
      Needs the research folder outputs/valve-revealed-weights-20260915 (KV history lives there);
-     skipped with a note when it is absent. New patch windows are read from DEMOS; history is cached.
+     skipped with a note when it is absent. New patch windows are read from the match database; history is cached.
 
 Usage:  python tools/refresh_weights_data.py            # everything
         python tools/refresh_weights_data.py --fast     # skip the slow talent feature pass (~15 min)

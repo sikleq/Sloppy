@@ -120,8 +120,8 @@ python tools/refresh_weights_data.py --fast   # skip that pass (enough when no t
 
 | File | What | Source |
 |---|---|---|
-| `data/rules/ability_priority.json` | share of the first 10 skill points per ability → 0.7–1.3 multiplier | **DEMOS** (`C:/Users/sikle/demos/data/demos.db`, table `ability_builds`, last 365 days); OpenDota only for heroes DEMOS has no builds for (30 of 127 on 2026-09-18 — parser gap tracked in DEMOS) |
-| `data/rules/talent_shift.json`, `talent_tiers.json` | talent replacements: pick-share shift + level moves | research folder `outputs/valve-revealed-weights-20260915` (KV history); new patch windows from **DEMOS**, history cached from OpenDota |
+| `data/rules/ability_priority.json` | share of the first 10 skill points per ability → 0.7–1.3 multiplier | **match database** (path in `MATCH_DB` / `~/.sloppy/match_db.txt`, table `ability_builds`, last 365 days); OpenDota only for heroes it has no builds for (30 of 127 on 2026-09-18) |
+| `data/rules/talent_shift.json`, `talent_tiers.json` | talent replacements: pick-share shift + level moves | research folder `outputs/valve-revealed-weights-20260915` (KV history); new patch windows from **the match database**, history cached from OpenDota |
 
 Run it after a patch has been out for 2–3 weeks (there are no picks on day one) and monthly otherwise; a
 scheduled task does the monthly run. Then `python build_site.py`, tests, commit `data/rules/*.json`.
