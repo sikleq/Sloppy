@@ -330,6 +330,7 @@ def _mech_tag(label):
 def _open_block(extra_cls='', extra_attrs=''):
     _flush_cost_panel()                                   # the previous item's components panel
     _flush_damage_rows()                                  # the previous hero's damage rows, once
+    _flush_cell_rows()                                    # ... its replacements (before signal R)
     _flush_rework()                                       # ... and its REWORK rows (signal R)
     pre = _close_ability_block()
     _State.new_mech_header = _State.new_mech = False     # a new block ends any "new mechanic" run
@@ -359,6 +360,7 @@ def _open_block(extra_cls='', extra_attrs=''):
 def _close_block():
     _flush_cost_panel()
     _flush_damage_rows()
+    _flush_cell_rows()
     _flush_rework()
     out = _close_ability_block()
     if _State.block_open:
@@ -999,7 +1001,91 @@ def _dyn_record_card(tags, text="", badge="", **ctx_over):
     Before 2026-09-25 these were tallied with scores (0, 0): a reworked ability or an item's
     "+6 -> +7 Armor" pane moved neither the net balance nor the volume."""
     ctx = dict(_row_ctx(text), **ctx_over)
-    _dyn_record_li(tags, scores=_row_scores(text, tags, badge, ctx=ctx))
+    scores = _row_scores(text, tags, badge, ctx=ctx)
+    _dyn_record_li(tags, scores=scores)
+    _note_cell_row(text, tags, scores, ctx)
+
+
+# ---- A hero block's replacements (owner 2026-09-27: "a replaced facet can be better or worse") ----
+# By text alone a replacement has no direction, so it nets 0 and signal R (the pro pick-share shift the
+# hero's other rows don't explain) gives it one where DEMOS has the patch (7.35c+):
+#  - a whole ability / facet / innate removed AND one added in the same block (±WHOLE_W cancel);
+#  - an Aghanim's Shard / Scepter upgrade that moved to another ability: the "no longer upgraded with"
+#    DEL is cancelled by its NEW partner (or set to 0 next to a REWORK "... reworked" partner);
+#  - a DEL row about an ability that the same block removes whole (Anti-Mage 7.40 "Aghanim's Shard no
+#    longer provides Counterspell Ally ability" + "Ability removed") counts once.
+_AGHS_LOST_RE = re.compile(r"no longer upgraded with aghanim's (shard|scepter)"
+                           r"|aghanim's (shard|scepter)(?: upgrade)?\b[^.]*?\bno longer\b", re.I)
+
+
+def _note_cell_row(text, tags, scores, ctx):
+    ek, pv = _State.current_entity_key or "", _State.current_patch_version
+    if not (ek.startswith("hero|") and pv and not _State.dyn_skip_li and tags & {"new", "del", "rework"}):
+        return
+    rows = _State.cell_rows
+    if not rows or (rows["ek"], rows["pv"]) != (ek, pv):
+        _flush_cell_rows()
+        rows = _State.cell_rows = {"ek": ek, "pv": pv, "rows": [], "ctx": _row_ctx("")}
+    from . import weights
+    plain = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', text or '')).strip()
+    rows["rows"].append({"text": plain, "tags": set(tags), "net": scores[0], "ability": (ctx or {}).get("ability"),
+                         "whole": weights.is_whole_new_del(plain, set(tags), ctx)})
+
+
+def _ability_names(slug):
+    """Words a row may use for an ability slug: its trailing words ("antimage_counterspell_ally" ->
+    "counterspell ally"), at least two words or one of 6+ letters."""
+    words = (slug or "").split("_")
+    out = []
+    for i in range(1, len(words)):
+        tail = words[i:]
+        if len(tail) >= 2 or len(tail[0]) >= 6:
+            out.append(" ".join(tail))
+    return out
+
+
+def _flush_cell_rows():
+    cell, _State.cell_rows = _State.cell_rows, None
+    if not cell or not cell["rows"]:
+        return
+    rows, delta, replaced = cell["rows"], 0.0, False
+    # 1. the same removal twice: a DEL row naming an ability this block removes whole
+    gone = [n for r in rows if r["whole"] and "del" in r["tags"] for n in _ability_names(r["ability"])]
+    for r in rows:
+        if "del" in r["tags"] and not r["whole"] and r["net"]:
+            low = r["text"].lower()
+            if any(n in low for n in gone if not (r["ability"] or "").endswith(n.replace(" ", "_"))):
+                delta -= r["net"]
+                r["net"] = 0.0
+    # 2. an Aghanim's upgrade that moved to another ability
+    used = set()
+    for r in rows:
+        m = _AGHS_LOST_RE.search(r["text"]) if "del" in r["tags"] else None
+        if not m or not r["net"]:
+            continue
+        item = (m.group(1) or m.group(2)).lower()
+        for j, p in enumerate(rows):
+            if j in used or p is r or not (p["tags"] & {"new", "rework"}) or p["ability"] == r["ability"]:
+                continue
+            if f"aghanim's {item}" in p["text"].lower():
+                new_net = -p["net"] if "new" in p["tags"] and "rework" not in p["tags"] else 0.0
+                delta += new_net - r["net"]
+                r["net"] = new_net
+                used.add(j)
+                replaced = True
+                break
+    # 3. a whole ability / facet / innate removed and another added: a replacement
+    if any(r["whole"] and "del" in r["tags"] for r in rows) and any(r["whole"] and "new" in r["tags"] for r in rows):
+        replaced = True
+    rec = _State.dynamics.get(cell["ek"])
+    if rec is not None and delta:
+        bucket = rec["patches"].setdefault(cell["pv"], {})
+        bucket["w"] = round(bucket.get("w", 0.0) + delta, 3)
+    if replaced:                                             # signal R gives the replacement a direction
+        pend = _State.pending_rework
+        if not (pend and (pend["ek"], pend["pv"]) == (cell["ek"], cell["pv"])):
+            _flush_rework()
+            _State.pending_rework = {"ek": cell["ek"], "pv": cell["pv"], "n": 1, "ctx": cell["ctx"]}
 
 
 _COST_STATED_RE = re.compile(r'total cost|^\s*(?:recipe\s+)?cost\b', re.I)
@@ -1158,8 +1244,10 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         # "Recipe cost 1350 -> 1250" + note "Total cost unchanged": the buyer pays the same
         _score_text += ". " + re.sub(r'<[^>]+>', ' ', extra)
     _cost_panel_covered(_score_text)
-    _scores = _row_scores(_score_text, dyn_tags, badge, ctx=_row_ctx(text if isinstance(text, str) else ""))
+    _ctx = _row_ctx(text if isinstance(text, str) else "")
+    _scores = _row_scores(_score_text, dyn_tags, badge, ctx=_ctx)
     _dyn_record_li(dyn_tags, extra_keys=also_dyn, scores=_scores)
+    _note_cell_row(_score_text, dyn_tags, _scores, _ctx)
     _note_damage_row(_score_text, _scores)
     if isinstance(text, str) and 'del' in dyn_tags:
         _low = text.strip().rstrip('.').lower()
@@ -1650,15 +1738,38 @@ def _unchanged_stat_rows(old, new):
     return rows
 
 
+def _prop_layout(old_rows, new_rows, same, old_extras, new_extras):
+    """Owner 2026-09-27 (Mage Slayer 7.38: a blank row in the old pane before the unchanged stats):
+    changed pairs first, then the unchanged stats on both sides (dimmed, tag "="), then the one-sided
+    rows (DEL left / NEW right) zipped — so a shorter pane only ends earlier, never has a hole."""
+    pairs, lone_o, lone_n = [], [], []
+    for i, (o, n) in enumerate(zip(old_rows, new_rows)):
+        ot = o[0] if isinstance(o, (tuple, list)) and o else None
+        nt = n[0] if isinstance(n, (tuple, list)) and n else None
+        if o is not None and n is not None and ot != "DEL" and nt != "NEW":
+            pairs.append((i, o, i, n))
+            continue
+        if o is not None:
+            lone_o.append((i, o))
+        if n is not None:
+            lone_n.append((i, n))
+    rows = pairs + [(None, ("=",) + tuple(s[1:]), None, ("=",) + tuple(s[1:])) for s in same]
+    for k in range(max(len(lone_o), len(lone_n))):
+        oi, o = lone_o[k] if k < len(lone_o) else (None, None)
+        ni, n = lone_n[k] if k < len(lone_n) else (None, None)
+        rows.append((oi, o, ni, n))
+    new_old_ex = {j: old_extras[oi] for j, (oi, _, _, _) in enumerate(rows) if oi in old_extras}
+    new_new_ex = {j: new_extras[ni] for j, (_, _, ni, _) in enumerate(rows) if ni in new_extras}
+    return [r[1] for r in rows], [r[3] for r in rows], new_old_ex, new_new_ex
+
+
 def properties_change(old, new, old_extras=None, new_extras=None):
     old_extras = old_extras or {}
     new_extras = new_extras or {}
     n = max(len(old), len(new))
     old_rows = list(old) + [None] * (n - len(old))
     new_rows = list(new) + [None] * (n - len(new))
-    same = _unchanged_stat_rows(old, new)                  # after the changed rows, on both sides
-    old_rows += same
-    new_rows += same
+    same = _unchanged_stat_rows(old, new)                  # laid out by _prop_layout below
     # A value that CHANGED ("+10 Strength" -> "+26 Strength +160%") carries its BUFF/NERF chip
     # on the NEW side, next to the new value and its badge — content may give it on either side.
     # DEL stays on the old side (the property is gone), NEW on the new side.
@@ -1710,10 +1821,11 @@ def properties_change(old, new, old_extras=None, new_extras=None):
                         f'{badge}</span>'
                     )
                 else:
+                    same_cls = " property-same" if tag == "=" else ""   # an unchanged stat (dimmed)
                     cells.append(
                         f'<span class="property-tag" style="grid-row:{cur_row};grid-column:1">'
-                        f'{_prop_tag(tag)}</span>'
-                        f'<span class="property-text" style="grid-row:{cur_row};grid-column:2/-1">'
+                        f'{_prop_tag("" if tag == "=" else tag)}</span>'
+                        f'<span class="property-text{same_cls}" style="grid-row:{cur_row};grid-column:2/-1">'
                         f'{text}</span>'
                     )
             cur_row += 1
@@ -1726,6 +1838,8 @@ def properties_change(old, new, old_extras=None, new_extras=None):
                 cur_row += 1
         return ''.join(cells), cur_row - 1
 
+    if same:
+        old_rows, new_rows, old_extras, new_extras = _prop_layout(old_rows, new_rows, same, old_extras, new_extras)
     old_empty = not old or all(r is None for r in old)
     new_empty = not new or all(r is None for r in new)
     old_body, old_n = pane_cells(old_rows, old_extras)

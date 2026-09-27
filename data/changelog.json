@@ -4,6 +4,25 @@
     {
       "date": "2026-09-27",
       "category": "Dynamics",
+      "title": "Replaced facets and moved Aghanim's upgrades take their direction from pro picks, not a fixed minus",
+      "minor": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "Item cards: unchanged stats sit between the changed pairs and the added / removed ones — no blank rows",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "Removed the \"Read from the item's components\" notes",
+      "minor": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Dynamics",
       "title": "Hero scores: removed / added abilities and facets weigh like real changes; an item leaving the game is no longer a nerf",
       "minor": true
     },

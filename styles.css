@@ -10842,3 +10842,6 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .ability-block.talents-block svg.ttree.ttree-lit .ttree-base { opacity: .42; }   /* unlit twigs recede */
 .ability-block.talents-block svg.ttree .ttree-on { filter: drop-shadow(0 0 1.6px rgba(255, 190, 40, 1)); }
 .clog-catcell .clog-cat { width: 100%; box-sizing: border-box; text-align: center; }
+/* Item before/after card: stats the patch did not change (patch/elements.py _prop_layout) — shown on
+   both sides, a step dimmer so the eye goes to the changes */
+.properties-change .property-text.property-same { color: var(--text-dim); }

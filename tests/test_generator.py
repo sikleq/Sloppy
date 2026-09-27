@@ -625,7 +625,7 @@ def test_reworked_item_provides_list_is_the_new_card_and_asks_for_old_stats():
 
 def test_unstated_total_cost_change_gets_its_own_row():
     """Revenant's Brooch 7.38: the notes never state the price, the components give 4900 -> 3300 —
-    a "Total cost decreased" row with a "Read from the item's components" note (owner, 2026-09-25)."""
+    a "Total cost decreased" row (owner, 2026-09-25); no "Read from the item's components" note (2026-09-27)."""
     import generate_patch_code_v2 as g
     block = ['    W(item_header("Revenant\'s Brooch", changed=True))',
              '    W(auto_components_change("Revenant\'s Brooch", "7.38"))',
@@ -633,8 +633,7 @@ def test_unstated_total_cost_change_gets_its_own_row():
              '    W(li("Removed Phantom Province ability", t("DEL")))',
              '    W(ul_close())']
     out = g._postprocess_unstated_total_cost(block)
-    assert out[3] == ('    W(li("Total cost decreased from 4900 to 3300", b(4900, 3300, l=True), '
-                      'extra=inline_note("Read from the item\'s components")))')
+    assert out[3] == '    W(li("Total cost decreased from 4900 to 3300", b(4900, 3300, l=True)))'
     # a block that already states the cost is left alone
     stated = block[:3] + ['    W(li("Total cost decreased from 4900 to 3300", b(4900, 3300, l=True)))'] + block[3:]
     assert g._postprocess_unstated_total_cost(stated) == stated

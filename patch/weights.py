@@ -809,6 +809,15 @@ def _talent_tier_net(ctx, cm, text=""):
 
 def row_scores(text, tags, badge_html="", ctx=None):
     """(net, volume) of one row; both 0.0 when the row is not scorable."""
+    net, vol = _row_scores(text, tags, badge_html, ctx)
+    # an item's first patch: nothing was weaker before it — 0 net, only volume (mirror of an item
+    # leaving the game; owner 2026-09-27)
+    if net and tags == {"new"} and _item_debut(ctx):
+        return 0.0, vol
+    return net, vol
+
+
+def _row_scores(text, tags, badge_html="", ctx=None):
     kind = classify(text)
     cm = context_multiplier(ctx)
     w = weight_of(kind) * cm
@@ -851,12 +860,50 @@ WHOLE_W = 2.0             # a whole ability / facet / innate removed or added = 
 _HERO_KINDS = ("hero", "unit", "creep-hero")
 # an item / enchantment that leaves the game is not a weaker item: 0 net, only volume
 _EXIT_RE = _re.compile(r"cycled out|removed from the game|^\s*removed\s*$", _re.I)
+# ... nor is one that enters the neutral pool a stronger item (brand-new items are "is-new" blocks: 0 already)
+_ENTER_RE = _re.compile(r"^\s*now is a tier \d+ neutral (?:artifact|item|enchantment)", _re.I)
 _WHOLE_DEL_RE = _re.compile(r"^(?:[\w' ]+: )?removed\b.*\b(?:ability|facets?|innate)\b|\bfacet removed\b"
                             r"|^(?:[\w' ]+: )?(?:ability|innate) removed\b", _re.I)
 # the lost / gained effect acts ON a niche target (not merely a niche word in the row)
 _NICHE_TARGET_RE = _re.compile(r"\b(?:to|against|on|from|by|vs\.?)\s+(?:\w+\s+)?(?:buildings?|structures?|towers?|"
                                r"illusions?|creeps?|neutrals?|roshan|wards?|denies)\b|applied by illusions|"
                                r"\b(?:invulnerable|debuff immune)\b", _re.I)
+
+
+def is_whole_new_del(text, tags, ctx):
+    """A hero's whole ability / facet / innate removed ("Removed X ability / Facet", "Ability removed")
+    or added (the card of a new one — its text is empty)."""
+    if ((ctx or {}).get("kind") or "") not in _HERO_KINDS or tags not in ({"new"}, {"del"}):
+        return False
+    t = _plain(text).strip()
+    return bool(_WHOLE_DEL_RE.search(t)) if tags == {"del"} else not t
+
+
+_ITEM_LINES = None
+
+
+def item_first_version(slug):
+    """The first patch whose items.txt has the item (data/rules/item_stat_lines.json), or None."""
+    global _ITEM_LINES
+    if _ITEM_LINES is None:
+        try:
+            _ITEM_LINES = _json.load(open(_os.path.join(_HERE, "data", "rules", "item_stat_lines.json"),
+                                          encoding="utf-8"))
+        except OSError:
+            _ITEM_LINES = {"versions": [], "items": {}}
+    runs = _ITEM_LINES["items"].get(slug or "")
+    return runs[0][0] if runs else None
+
+
+def _item_debut(ctx):
+    """True when the row's item appears in the game for the first time in this patch (not in 7.08,
+    the first patch of the data, where every item is "first")."""
+    ctx = ctx or {}
+    if ctx.get("kind") != "item" or not ctx.get("version"):
+        return False
+    first = item_first_version(ctx.get("item"))
+    vers = (_ITEM_LINES or {}).get("versions") or []
+    return bool(first) and first == ctx["version"] and vers and first != vers[0]
 
 
 def _sole_new_del(text, tags, ctx, w, cm):
@@ -866,11 +913,13 @@ def _sole_new_del(text, tags, ctx, w, cm):
     t = _plain(text).strip()
     if ek in ("item", "enchant") and sign < 0 and _EXIT_RE.search(t):
         return 0.0, round(w, 3)
+    if ek in ("item", "enchant") and sign > 0 and _ENTER_RE.search(t):     # the mirror: back in the pool
+        return 0.0, round(w, 3)
     if ek not in _HERO_KINDS:
         return round(sign * w * 0.5, 3), round(w, 3)
     # a whole ability / facet / innate: the "Removed X ability / facet" row, or the card of a new one
     # (its text is empty). Both sides weigh the same, so a replaced facet nets 0.
-    if (sign < 0 and _WHOLE_DEL_RE.search(t)) or (sign > 0 and not t):
+    if is_whole_new_del(text, tags, ctx):
         if _re.search(r"\bfacets?\b", t, _re.I):              # same context as the new facet's card
             cm = context_multiplier(dict(ctx or {}, facet=True, base_stat=False, talent=None))
         v = weight_of("other") * WHOLE_W * cm

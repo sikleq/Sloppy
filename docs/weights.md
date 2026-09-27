@@ -598,5 +598,13 @@ Signal R: the hero adoption fit on the new nets moves slope 0.129 → 0.132 (ρ 
   becomes minus its new ability). Fixed weight beats it on the judge (0.22 vs 0.18).
 - Doubling item DEL/NEW: no evidence either way (adoption CI −2.0 … 7.7).
 
-**Open:** a DEL row and its REWORK partner (8 Aghanim's Shard/Scepter moves score DEL + 0); double rows for one
-removal (Anti-Mage 7.40 Counterspell Ally); debut item cells made only of NEW rows (+0.13) could be 0 like exits.
+**Replacements (2026-09-27, `_flush_cell_rows` in patch/elements.py).** By text a replacement has no direction —
+owner: "a replaced facet can be better or worse". So it nets 0 and **signal R** (the pro pick-share shift the hero's
+other rows don't explain) gives it one where DEMOS has the patch (7.35c+); before that it stays 0 ("unknown"):
+- a whole ability / facet / innate removed and one added in the same hero block (±WHOLE_W cancel) → R;
+- an Aghanim's Shard/Scepter upgrade moved to another ability: the "no longer upgraded with" DEL is cancelled by
+  its NEW partner or set to 0 next to a "… reworked" REWORK partner → R (Legion Commander, Wraith King 7.41 …);
+- a DEL row naming an ability the same block removes whole counts once (Anti-Mage 7.40 Counterspell Ally);
+- a neutral item entering the pool ("Now is a Tier N Neutral Artifact", 17 rows) = 0 net, mirror of "cycled out";
+  brand-new items are "is-new" blocks and were 0 already (`_item_debut` guards the rest).
+34 hero cells changed.

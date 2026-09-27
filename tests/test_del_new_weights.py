@@ -34,3 +34,14 @@ def test_a_number_in_a_del_row_does_not_turn_it_into_minus_100_percent():
     """Rejected: "a number -> 0 = -100%" put 38 of 50 rows above the 95th percentile of hero nerfs."""
     a, _ = w.row_scores("Aghanim's Shard no longer decreases cooldown by 10s", {"del"}, ctx=dict(HERO, shard=True))
     assert abs(a) < 1.0
+
+
+def test_a_neutral_item_entering_the_pool_is_not_a_buff():
+    net, vol = w.row_scores("Now is a Tier 1 Neutral Artifact", {"new"},
+                            ctx={"kind": "item", "version": "7.38", "item": "occult_bracelet"})
+    assert net == 0.0 and vol > 0
+
+
+def test_an_item_debut_scores_zero_net():
+    net, vol = w.row_scores("+10 Strength", {"new"}, ctx={"kind": "item", "version": "7.38", "item": "orb_of_frost"})
+    assert net == 0.0 and vol > 0

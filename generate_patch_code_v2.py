@@ -2113,7 +2113,6 @@ def _kv_item_cost(name, version):
 _ENTITY_HEAD_RE = re.compile(r'^\s*W\((?:item_header|hero_header|unit_header|plain_header|section)\(')
 _AUTO_COMP_RE = re.compile(r'^(\s*)W\(auto_components_change\("([^"]+)",\s*"([^"]+)"\)\)')
 _COST_ROW_RE = re.compile(r'W\(li\("[^"]*\bcost\b[^"]*\d', re.I)
-UNSTATED_COST_NOTE = "Read from the item's components"
 
 
 def _prev_version(version):
@@ -2252,8 +2251,8 @@ def _postprocess_unstated_total_cost(lines):
             i = j
             continue
         verb = "increased" if new > old else "decreased"
-        row = (f'{ind}W(li("Total cost {verb} from {old} to {new}", b({old}, {new}, l=True), '
-               f'extra=inline_note("{UNSTATED_COST_NOTE}")))')
+        # no "Read from the item's components" note (owner 2026-09-27: remove it everywhere)
+        row = f'{ind}W(li("Total cost {verb} from {old} to {new}", b({old}, {new}, l=True)))'
         k = next((n for n, x in enumerate(block) if x.strip() == "W(ul_open())"), None)
         if k is not None:
             block = block[:k + 1] + [row] + block[k + 1:]
