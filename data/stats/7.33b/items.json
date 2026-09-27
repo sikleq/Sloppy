@@ -462,18 +462,19 @@
     "ItemCost": 2300
   },
   "item_recipe_phylactery": {
-    "ItemCost": 200,
+    "ItemCost": 0,
     "ItemRecipe": 1,
     "ItemResult": "item_phylactery",
     "ItemRequirements": {
-      "01": "item_point_booster;item_diadem"
+      "01": "item_point_booster;item_diadem;item_sobi_mask"
     }
   },
   "item_phylactery": {
     "AbilityCooldown": 6.0,
-    "ItemCost": 2400,
+    "ItemCost": 2375,
     "bonus_mana": 200,
-    "bonus_all_stats": 7
+    "bonus_all_stats": 7,
+    "bonus_mana_regen": 0.7
   },
   "item_grandmasters_glaive": {
     "ItemCost": 5000
@@ -2157,16 +2158,14 @@
     "bonus_intellect": 30
   },
   "item_recipe_fallen_sky": {
-    "ItemCost": 1,
+    "ItemCost": 0,
     "ItemRecipe": 1,
     "ItemResult": "item_fallen_sky",
-    "ItemRequirements": {
-      "01": "item_blink;item_meteor_hammer;"
-    }
+    "ItemRequirements": {}
   },
   "item_fallen_sky": {
     "AbilityCooldown": 15.0,
-    "ItemCost": 4751,
+    "ItemCost": 0,
     "bonus_intellect": 15,
     "bonus_mana_regen": 10.0
   },
@@ -2185,7 +2184,7 @@
   },
   "item_faded_broach": {
     "ItemCost": 0,
-    "bonus_mana": 200
+    "bonus_mana": 125
   },
   "item_paladin_sword": {
     "ItemCost": 0
@@ -2302,7 +2301,7 @@
   },
   "item_ascetic_cap": {
     "ItemCost": 0,
-    "AbilityCooldown": 30.0,
+    "AbilityCooldown": 25.0,
     "AbilityManaCost": 0
   },
   "item_sample_picker": {
@@ -2348,7 +2347,7 @@
   },
   "item_seeds_of_serenity": {
     "ItemCost": 0,
-    "AbilityCooldown": 40.0
+    "AbilityCooldown": 35.0
   },
   "item_lance_of_pursuit": {
     "ItemCost": 0,
@@ -2403,7 +2402,8 @@
     "AbilityCooldown": 45.0
   },
   "item_eye_of_the_vizier": {
-    "ItemCost": 0
+    "ItemCost": 0,
+    "bonus_mana_regen": 0.5
   },
   "item_manacles_of_power": {
     "ItemCost": 0,

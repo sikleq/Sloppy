@@ -2204,7 +2204,7 @@
   "item_arcane_ring": {
     "AbilityCooldown": 60.0,
     "ItemCost": 0,
-    "bonus_intelligence": 8,
+    "bonus_intelligence": 7,
     "mana_restore": 75
   },
   "item_titan_sliver": {

@@ -499,8 +499,8 @@ def _item_gold(text, tags, ctx):
     """Gold an item row moves, signed (+ = better for the holder), and the item cost it is measured
     against: (gold, cost) or None when the row has no price. Cost rows: "Total cost unchanged"
     (in the row or its inline note) = 0; "Total cost A -> B", a basic item's "Cost A -> B" and a
-    lone "Recipe cost A -> B" are gold deltas. The KV snapshots are NOT used for the delta: some
-    (7.39c, 7.41 items.json) are pre-patch copies."""
+    lone "Recipe cost A -> B" are gold deltas. The delta comes from the row, not the KV snapshots (some
+    items.json were pre-patch copies until tools/resync_item_snapshots.py, 2026-09-27)."""
     t = _plain(text).strip()
     ver = ctx.get("version")
     slug = ctx.get("item")

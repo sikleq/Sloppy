@@ -7,6 +7,15 @@
 Ключи из npc_heroes.txt: `ArmorPhysical`, `AttackDamageMin/Max`, `AttackRate`, `MovementSpeed`, `AttackRange`, `AttributeBaseStrength/Agility/Intelligence`, `AttributeStrengthGain/AgilityGain/IntelligenceGain`, `StatusHealth`, `StatusMana`, `StatusHealthRegen`, `StatusManaRegen`.
 Ключи из items.txt: `ItemCost`, `ItemCooldown`, `AbilityManaCost`.
 
+**Ловушка: слепки-копии прошлого патча (2026-09-27).** Скачиватель (`D:\Sloppy Patches\fetch_stats.py`,
+`find_commit_for_patch`) берёт первый коммит d2vpkr, датированный днём патча. Он бывает сделан ДО выхода патча,
+и тогда слепок равен прошлому патчу: `items.json` 7.41 был побайтно 7.40c (вся переработка предметов 7.41 лежала в
+7.41a), в 7.37e у Khanda остался рецепт 7.37d (600, а не 500). Эталон — история items.txt по патчам
+(`~/outputs/valve-revealed-weights-20260915/items_history`, по ней же считаются веса). `tools/resync_item_snapshots.py`
+пересобирает `items.json` из неё; тест `tests/test_item_snapshots_match_history.py` (пропускается без истории).
+Обходы «взять цены из следующего патча» (auto_components_change, `_postprocess_unstated_total_cost`) убраны: они
+приписывали бы патчу чужое изменение.
+
 ## Маппинг описаний → поля БД (HERO_STAT_MAP в generate_patch_code.py)
 
 При паттерне `"увеличено/уменьшено на N"` (без явного from-to) генератор смотрит первое совпадение:

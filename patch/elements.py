@@ -2838,12 +2838,6 @@ def auto_components_change(item_display, this_version):
             return None
         return RELEASE_HISTORY[idx + 1]['version']
 
-    def _next_patch_version(version):
-        idx = _patch_index(version)
-        if idx is None or idx == 0:
-            return None
-        return RELEASE_HISTORY[idx - 1]['version']
-
     def _get_recipe(item_display, version):
         raw_slug = ITEM_SLUG.get(item_display,
                                   item_display.lower().replace(' ', '_').replace("'", ''))
@@ -2872,18 +2866,9 @@ def auto_components_change(item_display, this_version):
         return f'<!-- auto_components_change: no prev for {this_version} -->'
     old = _get_recipe(item_display, prev_v)
     new = _get_recipe(item_display, this_version)
-    if old and new and old['raw_slugs'] == new['raw_slugs'] \
-       and old['recipe_cost'] == new['recipe_cost'] \
-       and old['total'] == new['total']:
-        nxt = _next_patch_version(this_version)
-        while nxt:
-            candidate = _get_recipe(item_display, nxt)
-            if candidate and (candidate['raw_slugs'] != old['raw_slugs']
-                              or candidate['recipe_cost'] != old['recipe_cost']
-                              or candidate['total'] != old['total']):
-                new = candidate
-                break
-            nxt = _next_patch_version(nxt)
+    # No look-ahead to a later snapshot any more: it covered stale items.json copies (7.41 = 7.40c,
+    # 7.37e without Khanda's 7.37e recipe), which tools/resync_item_snapshots.py fixed at the root
+    # (2026-09-27) — and a look-ahead would put a later patch's price into this one.
     if not old or not new:
         return (f'<!-- auto_components_change: recipe missing for '
                 f'{item_display} in {prev_v}/{this_version} -->')

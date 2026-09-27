@@ -624,7 +624,7 @@
     "ItemCost": 1775
   },
   "item_recipe_vladmir": {
-    "ItemCost": 250,
+    "ItemCost": 0,
     "ItemRecipe": 1,
     "ItemResult": "item_vladmir",
     "ItemRequirements": {
@@ -632,7 +632,7 @@
     }
   },
   "item_vladmir": {
-    "ItemCost": 2450
+    "ItemCost": 2200
   },
   "item_recipe_wraith_pact": {
     "ItemCost": 400,
@@ -646,7 +646,7 @@
     "AbilityCooldown": 60,
     "AbilityDuration": 25,
     "AbilityManaCost": 100,
-    "ItemCost": 4050,
+    "ItemCost": 3800,
     "bonus_mana": 250
   },
   "item_recipe_buckler": {
@@ -1069,7 +1069,7 @@
     "AbilityCooldown": 27,
     "AbilityManaCost": 75,
     "ItemCost": 4825,
-    "bonus_intellect": 8
+    "bonus_intellect": 6
   },
   "item_recipe_bloodstone": {
     "ItemCost": 700,
@@ -1115,7 +1115,7 @@
     "bonus_mana": 250
   },
   "item_recipe_meteor_hammer": {
-    "ItemCost": 800,
+    "ItemCost": 600,
     "ItemRecipe": 1,
     "ItemResult": "item_meteor_hammer",
     "ItemRequirements": {
@@ -1125,7 +1125,7 @@
   "item_meteor_hammer": {
     "AbilityCooldown": 24,
     "AbilityManaCost": 100,
-    "ItemCost": 3300,
+    "ItemCost": 3100,
     "bonus_intellect": 24,
     "mana_regen_multiplier": 75
   },
@@ -1769,8 +1769,9 @@
   },
   "item_solar_crest": {
     "AbilityCooldown": 16.0,
+    "AbilityManaCost": 100,
     "ItemCost": 2700,
-    "bonus_all_stats": 6,
+    "bonus_all_stats": 4,
     "bonus_mana": 300
   },
   "item_recipe_pavise": {

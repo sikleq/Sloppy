@@ -468,7 +468,7 @@
     "ItemCost": 2275
   },
   "item_recipe_phylactery": {
-    "ItemCost": 400,
+    "ItemCost": 300,
     "ItemRecipe": 1,
     "ItemResult": "item_phylactery",
     "ItemRequirements": {
@@ -477,7 +477,7 @@
   },
   "item_phylactery": {
     "AbilityCooldown": 10.0,
-    "ItemCost": 2600,
+    "ItemCost": 2500,
     "bonus_mana": 200,
     "bonus_all_stats": 7
   },
@@ -491,7 +491,7 @@
   },
   "item_angels_demise": {
     "AbilityCooldown": 10.0,
-    "ItemCost": 5700,
+    "ItemCost": 5600,
     "bonus_mana_regen": 8,
     "bonus_mana": 200,
     "bonus_all_stats": 8
@@ -2652,7 +2652,7 @@
   "item_mana_draught": {
     "ItemCost": 0,
     "AbilityCooldown": 60,
-    "mana_restore": 60
+    "mana_restore": 70
   },
   "item_rippers_lash": {
     "ItemCost": 0,

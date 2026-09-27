@@ -1243,7 +1243,8 @@
   },
   "item_consecrated_wraps": {
     "ItemCost": 2600,
-    "bonus_all_stats": 6
+    "AbilityCooldown": 0,
+    "bonus_all_stats": 5
   },
   "item_recipe_crellas_crozier": {
     "ItemCost": 300,
@@ -1524,7 +1525,7 @@
     }
   },
   "item_helm_of_the_overlord": {
-    "AbilityCooldown": 45,
+    "AbilityCooldown": 40,
     "AbilityManaCost": 50,
     "ItemCost": 5650
   },
@@ -2659,7 +2660,7 @@
     "ItemCost": 0
   },
   "item_riftshadow_prism": {
-    "AbilityCooldown": 30.0,
+    "AbilityCooldown": 27.0,
     "ItemCost": 0
   },
   "item_metamorphic_mandible": {

@@ -2206,14 +2206,6 @@ def _prev_version(version):
     return order[order.index(version) + 1] if version in order and order.index(version) + 1 < len(order) else None
 
 
-def _next_version(version):
-    try:
-        from patch.meta import RELEASE_HISTORY
-    except Exception:
-        return None
-    order = [r["version"] for r in RELEASE_HISTORY]          # newest first
-    return order[order.index(version) - 1] if version in order and order.index(version) > 0 else None
-
 
 _INNATE_NAMES = {}
 
@@ -2318,16 +2310,9 @@ def _postprocess_unstated_total_cost(lines):
         while j < len(lines) and not _ENTITY_HEAD_RE.match(lines[j]):
             j += 1
         block = lines[i:j]
+        # no look-ahead to a later snapshot: the stale items.json copies it covered are fixed at the
+        # root (tools/resync_item_snapshots.py, 2026-09-27); it would put a later patch's price here
         old, new = _kv_item_cost(name, _prev_version(ver) or ""), _kv_item_cost(name, ver)
-        if old and new == old:
-            # some snapshots (7.39c, 7.41 items.json) are pre-patch copies: look ahead like
-            # auto_components_change does, to the first later snapshot where the price moved
-            nv = _next_version(ver)
-            while nv and new == old:
-                nxt = _kv_item_cost(name, nv)
-                if nxt and nxt != old:
-                    new = nxt
-                nv = _next_version(nv)
         if not (old and new and old != new) or any(_COST_ROW_RE.search(x) for x in block):
             out.extend(block)
             i = j

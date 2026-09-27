@@ -583,7 +583,7 @@
   },
   "item_bracer": {
     "ItemCost": 505,
-    "bonus_intellect": "2 4"
+    "bonus_intellect": 2
   },
   "item_recipe_wraith_band": {
     "ItemCost": 210,
@@ -595,7 +595,7 @@
   },
   "item_wraith_band": {
     "ItemCost": 505,
-    "bonus_intellect": "2 4"
+    "bonus_intellect": 2
   },
   "item_recipe_null_talisman": {
     "ItemCost": 210,
@@ -607,8 +607,8 @@
   },
   "item_null_talisman": {
     "ItemCost": 505,
-    "bonus_intellect": "5 10",
-    "bonus_mana_regen": "1.0 2.0"
+    "bonus_intellect": 5,
+    "bonus_mana_regen": 1.0
   },
   "item_recipe_mekansm": {
     "ItemCost": 800,
@@ -671,7 +671,7 @@
   },
   "item_ring_of_basilius": {
     "ItemCost": 425,
-    "mana_regen": 0.5,
+    "mana_regen": 0.25,
     "aura_mana_regen": 1.0
   },
   "item_recipe_holy_locket": {
@@ -1547,7 +1547,7 @@
     "ItemCost": 2950
   },
   "item_recipe_gungir": {
-    "ItemCost": 250,
+    "ItemCost": 550,
     "ItemRecipe": 1,
     "ItemResult": "item_gungir",
     "ItemRequirements": {
@@ -1557,7 +1557,7 @@
   "item_gungir": {
     "AbilityCooldown": 18,
     "AbilityManaCost": 200,
-    "ItemCost": 5450,
+    "ItemCost": 5750,
     "bonus_intellect": 24
   },
   "item_recipe_desolator": {
@@ -1653,7 +1653,7 @@
     "mana_gain": 170
   },
   "item_recipe_arcane_boots": {
-    "ItemCost": 375,
+    "ItemCost": 475,
     "ItemRecipe": 1,
     "ItemResult": "item_arcane_boots",
     "ItemRequirements": {
@@ -1663,10 +1663,10 @@
   "item_arcane_boots": {
     "AbilityCooldown": 55.0,
     "AbilityManaCost": 0,
-    "ItemCost": 1300,
-    "mana_regen": 0.5,
+    "ItemCost": 1400,
+    "mana_regen": 0.25,
     "aura_mana_regen": 1,
-    "replenish_amount": 175
+    "replenish_amount": 150
   },
   "item_recipe_octarine_core": {
     "ItemCost": 0,
@@ -1786,7 +1786,7 @@
   },
   "item_pavise": {
     "AbilityCooldown": 16.0,
-    "AbilityManaCost": 75,
+    "AbilityManaCost": 100,
     "ItemCost": 1400,
     "bonus_mana": 250
   },
@@ -1847,7 +1847,7 @@
   "item_guardian_greaves": {
     "AbilityCooldown": 45,
     "AbilityManaCost": 0,
-    "ItemCost": 4950,
+    "ItemCost": 5050,
     "mana_regen": 1.5,
     "aura_mana_regen": 1.5
   },

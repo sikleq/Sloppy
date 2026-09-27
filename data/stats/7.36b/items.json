@@ -675,7 +675,7 @@
     "aura_mana_regen": 1.0
   },
   "item_recipe_holy_locket": {
-    "ItemCost": 900,
+    "ItemCost": 800,
     "ItemRecipe": 1,
     "ItemResult": "item_holy_locket",
     "ItemRequirements": {
@@ -683,7 +683,7 @@
     }
   },
   "item_holy_locket": {
-    "ItemCost": 2350,
+    "ItemCost": 2250,
     "AbilityCooldown": 0.0,
     "bonus_mana": 0,
     "bonus_all_stats": 9
@@ -1084,7 +1084,7 @@
     "AbilityCooldown": 35.0,
     "AbilityManaCost": 0,
     "ItemCost": 4400,
-    "bonus_mana": 500,
+    "bonus_mana": 450,
     "bonus_mp_regen": 3
   },
   "item_recipe_sphere": {
@@ -1220,7 +1220,7 @@
     "ItemCost": 3725
   },
   "item_recipe_blade_mail": {
-    "ItemCost": 550,
+    "ItemCost": 750,
     "ItemRecipe": 1,
     "ItemResult": "item_blade_mail",
     "ItemRequirements": {
@@ -1230,7 +1230,7 @@
   "item_blade_mail": {
     "AbilityCooldown": 25.0,
     "AbilityManaCost": 25,
-    "ItemCost": 2100,
+    "ItemCost": 2300,
     "bonus_intellect": 0
   },
   "item_recipe_soul_booster": {
@@ -1679,7 +1679,7 @@
   },
   "item_octarine_core": {
     "ItemCost": 4800,
-    "bonus_mana": 550,
+    "bonus_mana": 500,
     "bonus_mana_regen": 6
   },
   "item_orb_of_venom": {
@@ -2253,7 +2253,7 @@
     "AbilityCooldown": 60.0,
     "ItemCost": 0,
     "bonus_intelligence": 6,
-    "mana_restore": 75
+    "mana_restore": 65
   },
   "item_titan_sliver": {
     "ItemCost": 0
@@ -2335,7 +2335,7 @@
   },
   "item_stormcrafter": {
     "ItemCost": 0,
-    "AbilityCooldown": 3.0,
+    "AbilityCooldown": 3.5,
     "bonus_mana_regen": 4
   },
   "item_overflowing_elixir": {

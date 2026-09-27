@@ -1225,7 +1225,7 @@
     "ItemCost": 0
   },
   "item_recipe_eternal_shroud": {
-    "ItemCost": 600,
+    "ItemCost": 800,
     "ItemRecipe": 1,
     "ItemResult": "item_eternal_shroud",
     "ItemRequirements": {
@@ -1233,7 +1233,7 @@
     }
   },
   "item_eternal_shroud": {
-    "ItemCost": 3100
+    "ItemCost": 3300
   },
   "item_recipe_rapier": {
     "ItemCost": 0,
@@ -1639,14 +1639,14 @@
     "ItemRecipe": 1,
     "ItemResult": "item_octarine_core",
     "ItemRequirements": {
-      "01": "item_void_stone;item_void_stone;item_soul_booster"
+      "01": "item_pers;item_soul_booster"
     }
   },
   "item_octarine_core": {
     "AbilityCooldown": 6.0,
     "ItemCost": 4600,
     "bonus_mana": 625,
-    "bonus_mana_regen": 5
+    "bonus_mana_regen": 3.25
   },
   "item_orb_of_venom": {
     "ItemCost": 275
@@ -2286,7 +2286,6 @@
   },
   "item_stormcrafter": {
     "ItemCost": 0,
-    "AbilityCooldown": 3.0,
     "bonus_mana_regen": 4
   },
   "item_overflowing_elixir": {

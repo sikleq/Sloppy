@@ -2053,11 +2053,6 @@
   "item_mirror_shield": {
     "ItemCost": 0
   },
-  "item_recipe_ironwood_tree": {
-    "ItemCost": 1,
-    "ItemRecipe": 1,
-    "ItemResult": "item_ironwood_tree"
-  },
   "item_ironwood_tree": {
     "AbilityCooldown": 15.0,
     "ItemCost": 0,

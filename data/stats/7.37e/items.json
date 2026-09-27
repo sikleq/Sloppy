@@ -481,7 +481,7 @@
     "bonus_all_stats": 7
   },
   "item_recipe_angels_demise": {
-    "ItemCost": 600,
+    "ItemCost": 500,
     "ItemRecipe": 1,
     "ItemResult": "item_angels_demise",
     "ItemRequirements": {
@@ -490,7 +490,7 @@
   },
   "item_angels_demise": {
     "AbilityCooldown": 6.0,
-    "ItemCost": 5200,
+    "ItemCost": 5100,
     "bonus_mana": 200,
     "bonus_all_stats": 8
   },

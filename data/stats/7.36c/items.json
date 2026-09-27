@@ -15,7 +15,7 @@
     "ItemCost": 6800
   },
   "item_arcane_blink": {
-    "AbilityCooldown": 7.0,
+    "AbilityCooldown": 9.0,
     "AbilityManaCost": 0,
     "ItemCost": 6800,
     "bonus_intellect": 25,
@@ -467,7 +467,7 @@
     "ItemCost": 2300
   },
   "item_recipe_phylactery": {
-    "ItemCost": 200,
+    "ItemCost": 400,
     "ItemRecipe": 1,
     "ItemResult": "item_phylactery",
     "ItemRequirements": {
@@ -476,7 +476,7 @@
   },
   "item_phylactery": {
     "AbilityCooldown": 6.0,
-    "ItemCost": 2400,
+    "ItemCost": 2600,
     "bonus_mana": 200,
     "bonus_all_stats": 7
   },
@@ -490,7 +490,7 @@
   },
   "item_angels_demise": {
     "AbilityCooldown": 6.0,
-    "ItemCost": 5000,
+    "ItemCost": 5200,
     "bonus_mana": 200,
     "bonus_all_stats": 8
   },
@@ -1126,10 +1126,10 @@
   },
   "item_meteor_hammer": {
     "AbilityCooldown": 24,
-    "AbilityManaCost": 100,
+    "AbilityManaCost": 75,
     "ItemCost": 2850,
     "bonus_intellect": 24,
-    "mana_regen_multiplier": 75
+    "mana_regen_multiplier": 50
   },
   "item_recipe_nullifier": {
     "ItemCost": 0,
@@ -1665,7 +1665,7 @@
     "AbilityCooldown": 55.0,
     "AbilityManaCost": 0,
     "ItemCost": 1300,
-    "mana_regen": 0.75,
+    "mana_regen": 0.5,
     "aura_mana_regen": 1,
     "replenish_amount": 175
   },

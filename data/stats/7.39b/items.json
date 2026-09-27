@@ -2119,7 +2119,7 @@
   },
   "item_helm_of_the_undying": {
     "ItemCost": 0,
-    "AbilityCooldown": 50
+    "AbilityCooldown": 100
   },
   "item_vambrace": {
     "ItemCost": 0

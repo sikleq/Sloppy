@@ -510,14 +510,6 @@
     "AbilityManaCost": 0,
     "ItemCost": 2200
   },
-  "item_recipe_aetherial_halo": {
-    "ItemCost": 0,
-    "ItemRecipe": 1,
-    "ItemResult": "item_aetherial_halo",
-    "ItemRequirements": {
-      "01": "item_ultimate_orb;item_meteor_hammer"
-    }
-  },
   "item_aetherial_halo": {
     "AbilityCooldown": 24,
     "AbilityManaCost": 100,
@@ -748,14 +740,6 @@
     "ItemCost": 5200,
     "bonus_intellect": 30,
     "bonus_mana_regen": 8.5
-  },
-  "item_recipe_caster_rapier": {
-    "ItemCost": 0,
-    "ItemRecipe": 1,
-    "ItemResult": "item_caster_rapier",
-    "ItemRequirements": {
-      "01": "item_mystic_staff;item_ultimate_orb"
-    }
   },
   "item_caster_rapier": {
     "ItemCost": 5600,
