@@ -500,7 +500,7 @@ def _item_gold(text, tags, ctx):
     against: (gold, cost) or None when the row has no price. Cost rows: "Total cost unchanged"
     (in the row or its inline note) = 0; "Total cost A -> B", a basic item's "Cost A -> B" and a
     lone "Recipe cost A -> B" are gold deltas. The delta comes from the row, not the KV snapshots (some
-    items.json were pre-patch copies until tools/resync_item_snapshots.py, 2026-09-27)."""
+    items.json were pre-patch copies until tools/resync_snapshots.py, 2026-09-27)."""
     t = _plain(text).strip()
     ver = ctx.get("version")
     slug = ctx.get("item")

@@ -932,7 +932,7 @@
     "AttributeBaseAgility": 14,
     "AttributeAgilityGain": 1.0,
     "StatusManaRegen": 0.5,
-    "MovementSpeed": 290
+    "MovementSpeed": 280
   },
   "npc_dota_hero_tinker": {
     "Ability1": "tinker_laser",
@@ -1224,8 +1224,8 @@
       "Ability4": "phantom_assassin_coup_de_grace"
     },
     "ArmorPhysical": 1,
-    "AttackDamageMin": 33,
-    "AttackDamageMax": 35,
+    "AttackDamageMin": 35,
+    "AttackDamageMax": 37,
     "AttackRate": 1.7,
     "StatusHealthRegen": 1.0,
     "AttackRange": 150,
@@ -2279,7 +2279,7 @@
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_STRENGTH",
     "AttributeBaseStrength": 24,
-    "AttributeStrengthGain": 3.2,
+    "AttributeStrengthGain": 3.1,
     "AttributeBaseAgility": 18,
     "AttributeAgilityGain": 1.4,
     "AttributeBaseIntelligence": 18,
@@ -2703,7 +2703,7 @@
       "Ability4": "centaur_stampede"
     },
     "ArmorPhysical": -2,
-    "StatusHealthRegen": 4,
+    "StatusHealthRegen": 3,
     "AttackDamageMin": 36,
     "AttackDamageMax": 38,
     "AttackRate": 1.7,

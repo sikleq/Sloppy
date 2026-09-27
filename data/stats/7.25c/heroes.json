@@ -230,6 +230,12 @@
     "Ability4": "nevermore_necromastery",
     "Ability5": "nevermore_dark_lord",
     "Ability6": "nevermore_requiem",
+    "AbilityDraftAbilities": {
+      "Ability1": "nevermore_shadowraze1",
+      "Ability2": "nevermore_dark_lord",
+      "Ability3": "nevermore_necromastery",
+      "Ability6": "nevermore_requiem"
+    },
     "ArmorPhysical": 0,
     "AttackDamageMin": 15,
     "AttackDamageMax": 21,
@@ -255,6 +261,11 @@
     "Ability6": "morphling_replicate",
     "Ability7": "morphling_morph_replicate",
     "Ability8": "morphling_morph",
+    "AbilityDraftAbilities": {
+      "Ability1": "morphling_waveform",
+      "Ability2": "morphling_adaptive_strike_agi",
+      "Ability3": "morphling_adaptive_strike_str"
+    },
     "ArmorPhysical": -2,
     "AttackDamageMin": 9,
     "AttackDamageMax": 18,
@@ -299,6 +310,11 @@
     "Ability4": "puck_ethereal_jaunt",
     "Ability5": "generic_hidden",
     "Ability6": "puck_dream_coil",
+    "AbilityDraftAbilities": {
+      "Ability1": "puck_waning_rift",
+      "Ability2": "puck_phase_shift",
+      "Ability3": "puck_dream_coil"
+    },
     "AttackDamageMin": 23,
     "AttackDamageMax": 34,
     "AttackRate": 1.7,
@@ -491,6 +507,12 @@
     "Ability4": "zuus_cloud",
     "Ability5": "generic_hidden",
     "Ability6": "zuus_thundergods_wrath",
+    "AbilityDraftAbilities": {
+      "Ability1": "zuus_arc_lightning",
+      "Ability2": "zuus_lightning_bolt",
+      "Ability3": "zuus_static_field",
+      "Ability4": "zuus_thundergods_wrath"
+    },
     "ArmorPhysical": 1,
     "AttackDamageMin": 33,
     "AttackDamageMax": 41,
@@ -812,6 +834,12 @@
     "Ability4": "beastmaster_inner_beast",
     "Ability5": "generic_hidden",
     "Ability6": "beastmaster_primal_roar",
+    "AbilityDraftAbilities": {
+      "Ability1": "beastmaster_wild_axes",
+      "Ability2": "beastmaster_call_of_the_wild_boar",
+      "Ability3": "beastmaster_inner_beast",
+      "Ability4": "beastmaster_primal_roar"
+    },
     "ArmorPhysical": -1,
     "AttackDamageMin": 41,
     "AttackDamageMax": 45,
@@ -983,6 +1011,12 @@
     "Ability4": "templar_assassin_trap",
     "Ability5": "templar_assassin_trap_teleport",
     "Ability6": "templar_assassin_psionic_trap",
+    "AbilityDraftAbilities": {
+      "Ability1": "templar_assassin_refraction",
+      "Ability2": "templar_assassin_meld",
+      "Ability3": "templar_assassin_psi_blades",
+      "Ability4": "templar_assassin_psionic_trap"
+    },
     "ArmorPhysical": 1,
     "AttackDamageMin": 30,
     "AttackDamageMax": 36,
@@ -1026,6 +1060,12 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "luna_eclipse",
+    "AbilityDraftAbilities": {
+      "Ability1": "luna_lucent_beam",
+      "Ability2": "luna_moon_glaive",
+      "Ability3": "luna_lunar_blessing",
+      "Ability4": "luna_eclipse"
+    },
     "ArmorPhysical": 0,
     "AttackDamageMin": 29,
     "AttackDamageMax": 35,
@@ -1048,6 +1088,11 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "dragon_knight_elder_dragon_form",
+    "AbilityDraftAbilities": {
+      "Ability1": "dragon_knight_breathe_fire",
+      "Ability2": "dragon_knight_dragon_tail",
+      "Ability3": "dragon_knight_dragon_blood"
+    },
     "ArmorPhysical": 0,
     "AttackDamageMin": 31,
     "AttackDamageMax": 37,
@@ -1154,6 +1199,11 @@
     "Ability5": "generic_hidden",
     "Ability6": "life_stealer_infest",
     "Ability7": "life_stealer_consume",
+    "AbilityDraftAbilities": {
+      "Ability1": "life_stealer_rage",
+      "Ability2": "life_stealer_feast",
+      "Ability3": "life_stealer_open_wounds"
+    },
     "ArmorPhysical": 1,
     "AttackDamageMin": 17,
     "AttackDamageMax": 27,
@@ -1413,6 +1463,12 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "chen_hand_of_god",
+    "AbilityDraftAbilities": {
+      "Ability1": "chen_penitence",
+      "Ability2": "chen_divine_favor",
+      "Ability3": "chen_holy_persuasion",
+      "Ability4": "chen_hand_of_god"
+    },
     "ArmorPhysical": -1,
     "AttackDamageMin": 25,
     "AttackDamageMax": 35,
@@ -1434,6 +1490,12 @@
     "Ability4": "spectre_reality",
     "Ability5": "spectre_haunt_single",
     "Ability6": "spectre_haunt",
+    "AbilityDraftAbilities": {
+      "Ability1": "spectre_spectral_dagger",
+      "Ability2": "spectre_desolate",
+      "Ability3": "spectre_dispersion",
+      "Ability4": "spectre_haunt"
+    },
     "ArmorPhysical": 0,
     "AttackDamageMin": 23,
     "AttackDamageMax": 27,
@@ -1456,6 +1518,11 @@
     "Ability4": "doom_bringer_empty1",
     "Ability5": "doom_bringer_empty2",
     "Ability6": "doom_bringer_doom",
+    "AbilityDraftAbilities": {
+      "Ability1": "doom_bringer_scorched_earth",
+      "Ability2": "doom_bringer_infernal_blade",
+      "Ability3": "doom_bringer_doom"
+    },
     "ArmorPhysical": -1,
     "AttackDamageMin": 30,
     "AttackDamageMax": 46,
@@ -1499,6 +1566,12 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "ursa_enrage",
+    "AbilityDraftAbilities": {
+      "Ability1": "ursa_earthshock",
+      "Ability2": "ursa_overpower",
+      "Ability3": "ursa_fury_swipes",
+      "Ability4": "ursa_enrage"
+    },
     "ArmorPhysical": 1,
     "AttackDamageMin": 24,
     "AttackDamageMax": 28,
@@ -1543,6 +1616,12 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "gyrocopter_call_down",
+    "AbilityDraftAbilities": {
+      "Ability1": "gyrocopter_rocket_barrage",
+      "Ability2": "gyrocopter_homing_missile",
+      "Ability3": "gyrocopter_flak_cannon",
+      "Ability4": "gyrocopter_call_down"
+    },
     "ArmorPhysical": 2,
     "AttackDamageMin": 21,
     "AttackDamageMax": 31,
@@ -1651,6 +1730,12 @@
     "Ability4": "lycan_wolf_bite",
     "Ability5": "generic_hidden",
     "Ability6": "lycan_shapeshift",
+    "AbilityDraftAbilities": {
+      "Ability1": "lycan_summon_wolves",
+      "Ability2": "lycan_howl",
+      "Ability3": "lycan_feral_impulse",
+      "Ability4": "lycan_shapeshift"
+    },
     "ArmorPhysical": -1,
     "AttackDamageMin": 24,
     "AttackDamageMax": 29,
@@ -1694,6 +1779,11 @@
     "Ability4": "shadow_demon_shadow_poison_release",
     "Ability5": "generic_hidden",
     "Ability6": "shadow_demon_demonic_purge",
+    "AbilityDraftAbilities": {
+      "Ability1": "shadow_demon_disruption",
+      "Ability2": "shadow_demon_soul_catcher",
+      "Ability3": "shadow_demon_demonic_purge"
+    },
     "ArmorPhysical": 0,
     "AttackDamageMin": 29,
     "AttackDamageMax": 33,
@@ -1715,6 +1805,12 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "lone_druid_true_form",
+    "AbilityDraftAbilities": {
+      "Ability1": "lone_druid_spirit_bear",
+      "Ability2": "lone_druid_spirit_link",
+      "Ability3": "lone_druid_savage_roar",
+      "Ability4": "lone_druid_true_form"
+    },
     "ArmorPhysical": -2,
     "AttackDamageMin": 18,
     "AttackDamageMax": 22,
@@ -1758,6 +1854,11 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "meepo_divided_we_stand",
+    "AbilityDraftAbilities": {
+      "Ability1": "meepo_earthbind",
+      "Ability2": "meepo_poof",
+      "Ability3": "meepo_ransack"
+    },
     "ArmorPhysical": 4,
     "AttackDamageMin": 29,
     "AttackDamageMax": 35,
@@ -1780,6 +1881,12 @@
     "Ability4": "treant_eyes_in_the_forest",
     "Ability5": "treant_natures_guise",
     "Ability6": "treant_overgrowth",
+    "AbilityDraftAbilities": {
+      "Ability1": "treant_natures_grasp",
+      "Ability2": "treant_leech_seed",
+      "Ability3": "treant_living_armor",
+      "Ability4": "treant_overgrowth"
+    },
     "ArmorPhysical": -1,
     "AttackDamageMin": 62,
     "AttackDamageMax": 70,
@@ -1802,6 +1909,11 @@
     "Ability4": "ogre_magi_unrefined_fireblast",
     "Ability5": "generic_hidden",
     "Ability6": "ogre_magi_multicast",
+    "AbilityDraftAbilities": {
+      "Ability1": "ogre_magi_fireblast",
+      "Ability2": "ogre_magi_ignite",
+      "Ability3": "ogre_magi_bloodlust"
+    },
     "ArmorPhysical": 5.0,
     "AttackDamageMin": 39,
     "AttackDamageMax": 45,
@@ -1847,6 +1959,11 @@
     "Ability6": "rubick_spell_steal",
     "Ability7": "rubick_telekinesis_land",
     "Ability8": "rubick_hidden1",
+    "AbilityDraftAbilities": {
+      "Ability1": "rubick_telekinesis",
+      "Ability2": "rubick_fade_bolt",
+      "Ability3": "rubick_arcane_supremacy"
+    },
     "ArmorPhysical": 0.0,
     "AttackDamageMin": 22,
     "AttackDamageMax": 32,
@@ -1890,6 +2007,12 @@
     "Ability5": "generic_hidden",
     "Ability6": "nyx_assassin_vendetta",
     "Ability7": "nyx_assassin_unburrow",
+    "AbilityDraftAbilities": {
+      "Ability1": "nyx_assassin_impale",
+      "Ability2": "nyx_assassin_mana_burn",
+      "Ability3": "nyx_assassin_spiked_carapace",
+      "Ability4": "nyx_assassin_vendetta"
+    },
     "ArmorPhysical": 1.0,
     "AttackDamageMin": 27,
     "AttackDamageMax": 31,
@@ -1937,6 +2060,12 @@
     "Ability6": "keeper_of_the_light_will_o_wisp",
     "Ability7": "keeper_of_the_light_illuminate_end",
     "Ability8": "keeper_of_the_light_spirit_form_illuminate",
+    "AbilityDraftAbilities": {
+      "Ability1": "keeper_of_the_light_illuminate",
+      "Ability2": "keeper_of_the_light_blinding_light",
+      "Ability3": "keeper_of_the_light_chakra_magic",
+      "Ability4": "keeper_of_the_light_will_o_wisp"
+    },
     "ArmorPhysical": -1.0,
     "AttackDamageMin": 20,
     "AttackDamageMax": 27,
@@ -2045,6 +2174,12 @@
     "Ability4": "troll_warlord_fervor",
     "Ability5": "generic_hidden",
     "Ability6": "troll_warlord_battle_trance",
+    "AbilityDraftAbilities": {
+      "Ability1": "troll_warlord_fervor",
+      "Ability2": "troll_warlord_whirling_axes_ranged",
+      "Ability3": "troll_warlord_whirling_axes_melee",
+      "Ability4": "troll_warlord_battle_trance"
+    },
     "ArmorPhysical": -1,
     "AttackDamageMin": 27,
     "AttackDamageMax": 35,
@@ -2112,6 +2247,12 @@
     "Ability6": "shredder_chakram",
     "Ability7": "shredder_return_chakram",
     "Ability8": "shredder_return_chakram_2",
+    "AbilityDraftAbilities": {
+      "Ability1": "shredder_whirling_death",
+      "Ability2": "shredder_timber_chain",
+      "Ability3": "shredder_reactive_armor",
+      "Ability4": "shredder_chakram"
+    },
     "ArmorPhysical": -1,
     "AttackDamageMin": 26,
     "AttackDamageMax": 30,
@@ -2156,6 +2297,12 @@
     "Ability5": "generic_hidden",
     "Ability6": "tusk_walrus_punch",
     "Ability7": "tusk_launch_snowball",
+    "AbilityDraftAbilities": {
+      "Ability1": "tusk_ice_shards",
+      "Ability2": "tusk_snowball",
+      "Ability3": "tusk_tag_team",
+      "Ability4": "tusk_walrus_punch"
+    },
     "ArmorPhysical": 0,
     "AttackDamageMin": 27,
     "AttackDamageMax": 31,
@@ -2221,6 +2368,11 @@
     "Ability5": "generic_hidden",
     "Ability6": "elder_titan_earth_splitter",
     "Ability7": "elder_titan_return_spirit",
+    "AbilityDraftAbilities": {
+      "Ability1": "elder_titan_echo_stomp",
+      "Ability2": "elder_titan_natural_order",
+      "Ability3": "elder_titan_earth_splitter"
+    },
     "ArmorPhysical": 0.0,
     "AttackDamageMin": 23,
     "AttackDamageMax": 33,
@@ -2257,6 +2409,12 @@
     "MovementSpeed": 330
   },
   "npc_dota_hero_ember_spirit": {
+    "AbilityDraftAbilities": {
+      "Ability1": "ember_spirit_searing_chains",
+      "Ability2": "ember_spirit_sleight_of_fist",
+      "Ability3": "ember_spirit_flame_guard",
+      "Ability4": "ember_spirit_fire_remnant"
+    },
     "Ability1": "ember_spirit_searing_chains",
     "Ability2": "ember_spirit_sleight_of_fist",
     "Ability3": "ember_spirit_flame_guard",
@@ -2306,6 +2464,11 @@
     "Ability4": "terrorblade_terror_wave",
     "Ability5": "generic_hidden",
     "Ability6": "terrorblade_sunder",
+    "AbilityDraftAbilities": {
+      "Ability1": "terrorblade_reflection",
+      "Ability2": "terrorblade_conjure_image",
+      "Ability3": "terrorblade_sunder"
+    },
     "ArmorPhysical": 7,
     "AttackDamageMin": 26,
     "AttackDamageMax": 32,
@@ -2329,6 +2492,11 @@
     "Ability6": "phoenix_supernova",
     "Ability7": "phoenix_launch_fire_spirit",
     "Ability8": "phoenix_icarus_dive_stop",
+    "AbilityDraftAbilities": {
+      "Ability1": "phoenix_icarus_dive",
+      "Ability2": "phoenix_fire_spirits",
+      "Ability3": "phoenix_supernova"
+    },
     "ArmorPhysical": -1,
     "AttackDamageMin": 28,
     "AttackDamageMax": 38,
@@ -2373,6 +2541,12 @@
     "Ability4": "techies_focused_detonate",
     "Ability5": "techies_minefield_sign",
     "Ability6": "techies_remote_mines",
+    "AbilityDraftAbilities": {
+      "Ability1": "techies_land_mines",
+      "Ability2": "techies_stasis_trap",
+      "Ability3": "techies_suicide",
+      "Ability4": "techies_remote_mines"
+    },
     "ArmorPhysical": 5,
     "AttackDamageMin": 9,
     "AttackDamageMax": 11,
@@ -2440,6 +2614,11 @@
     "Ability4": "arc_warden_scepter",
     "Ability5": "generic_hidden",
     "Ability6": "arc_warden_tempest_double",
+    "AbilityDraftAbilities": {
+      "Ability1": "arc_warden_flux",
+      "Ability2": "arc_warden_magnetic_field",
+      "Ability3": "arc_warden_spark_wraith"
+    },
     "ArmorPhysical": -2,
     "AttackDamageMin": 31,
     "AttackDamageMax": 41,
@@ -2486,6 +2665,12 @@
     "Ability6": "monkey_king_wukongs_command",
     "Ability7": "monkey_king_primal_spring_early",
     "Ability8": "monkey_king_untransform",
+    "AbilityDraftAbilities": {
+      "Ability1": "monkey_king_boundless_strike",
+      "Ability2": "monkey_king_tree_dance",
+      "Ability3": "monkey_king_jingu_mastery",
+      "Ability4": "monkey_king_wukongs_command"
+    },
     "ArmorPhysical": -2,
     "AttackDamageMin": 29,
     "AttackDamageMax": 35,
@@ -2532,6 +2717,12 @@
     "Ability4": "dark_willow_bedlam",
     "Ability5": "generic_hidden",
     "Ability6": "dark_willow_terrorize",
+    "AbilityDraftAbilities": {
+      "Ability1": "dark_willow_bramble_maze",
+      "Ability2": "dark_willow_shadow_realm",
+      "Ability3": "dark_willow_cursed_crown",
+      "Ability4": "dark_willow_terrorize"
+    },
     "AttackDamageMin": 27,
     "AttackDamageMax": 35,
     "AttackRate": 1.5,
@@ -2616,6 +2807,12 @@
     "Ability4": "snapfire_gobble_up",
     "Ability5": "snapfire_spit_creep",
     "Ability6": "snapfire_mortimer_kisses",
+    "AbilityDraftAbilities": {
+      "Ability1": "snapfire_scatterblast",
+      "Ability2": "snapfire_firesnap_cookie",
+      "Ability3": "snapfire_lil_shredder",
+      "Ability4": "snapfire_mortimer_kisses"
+    },
     "ArmorPhysical": 0,
     "AttackDamageMin": 26,
     "AttackDamageMax": 32,

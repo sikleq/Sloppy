@@ -649,7 +649,7 @@
     "AttributeStrengthGain": 2.1,
     "AttributeBaseAgility": 11,
     "AttributeAgilityGain": 1.2,
-    "AttributeBaseIntelligence": 22,
+    "AttributeBaseIntelligence": 23,
     "AttributeIntelligenceGain": 3.3,
     "MovementSpeed": 315
   },
@@ -779,7 +779,7 @@
       "Ability3": "shadow_shaman_shackles",
       "Ability4": "shadow_shaman_mass_serpent_ward"
     },
-    "ArmorPhysical": 3,
+    "ArmorPhysical": 2,
     "StatusHealthRegen": 1,
     "AttackDamageMin": 40,
     "AttackDamageMax": 47,
@@ -790,7 +790,7 @@
     "AttributeStrengthGain": 2.3,
     "AttributeBaseAgility": 16,
     "AttributeAgilityGain": 1.6,
-    "AttributeBaseIntelligence": 25,
+    "AttributeBaseIntelligence": 23,
     "AttributeIntelligenceGain": 3.5,
     "MovementSpeed": 285
   },
@@ -1195,7 +1195,7 @@
       "Ability3": "death_prophet_spirit_siphon",
       "Ability4": "death_prophet_exorcism"
     },
-    "ArmorPhysical": 1,
+    "ArmorPhysical": 0,
     "AttackDamageMin": 22,
     "AttackDamageMax": 32,
     "AttackRate": 1.7,
@@ -1286,7 +1286,7 @@
     "AttackRate": 1.6,
     "AttackRange": 250,
     "AttributePrimary": "DOTA_ATTRIBUTE_AGILITY",
-    "AttributeBaseStrength": 23,
+    "AttributeBaseStrength": 21,
     "AttributeStrengthGain": 2.4,
     "AttributeBaseAgility": 23,
     "AttributeAgilityGain": 3.4,
@@ -1829,7 +1829,7 @@
     "AttributeAgilityGain": 1.8,
     "AttributeBaseIntelligence": 22,
     "AttributeIntelligenceGain": 2.9,
-    "StatusHealthRegen": 1.75,
+    "StatusHealthRegen": 1.25,
     "MovementSpeed": 320
   },
   "npc_dota_hero_chen": {
@@ -1910,7 +1910,7 @@
     "AttackRange": 200,
     "AttributePrimary": "DOTA_ATTRIBUTE_STRENGTH",
     "AttributeBaseStrength": 24,
-    "AttributeStrengthGain": 3.8,
+    "AttributeStrengthGain": 3.5,
     "AttributeBaseAgility": 15,
     "AttributeAgilityGain": 1.5,
     "AttributeBaseIntelligence": 15,
@@ -2515,7 +2515,7 @@
     "AttributeStrengthGain": 2.4,
     "AttributeBaseAgility": 22,
     "AttributeAgilityGain": 3.3,
-    "AttributeBaseIntelligence": 21,
+    "AttributeBaseIntelligence": 20,
     "AttributeIntelligenceGain": 2.0,
     "MovementSpeed": 330,
     "StatusHealthRegen": 1.0
@@ -2833,7 +2833,7 @@
     "AttributeBaseStrength": 23,
     "AttributeStrengthGain": 3.9,
     "AttributeBaseAgility": 23,
-    "AttributeAgilityGain": 2.1,
+    "AttributeAgilityGain": 1.9,
     "AttributeBaseIntelligence": 18,
     "AttributeIntelligenceGain": 1.7,
     "MovementSpeed": 310,
@@ -3026,8 +3026,8 @@
       "Ability4": "terrorblade_sunder"
     },
     "ArmorPhysical": 5,
-    "AttackDamageMin": 28,
-    "AttackDamageMax": 34,
+    "AttackDamageMin": 26,
+    "AttackDamageMax": 32,
     "AttackRate": 1.5,
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_AGILITY",
@@ -3166,8 +3166,8 @@
       "Ability4": "winter_wyvern_winters_curse"
     },
     "ArmorPhysical": 1,
-    "AttackDamageMin": 14,
-    "AttackDamageMax": 21,
+    "AttackDamageMin": 15,
+    "AttackDamageMax": 22,
     "AttackRate": 1.7,
     "AttackRange": 425,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
@@ -3280,8 +3280,8 @@
       "Ability4": "pangolier_gyroshell"
     },
     "ArmorPhysical": 2,
-    "AttackDamageMin": 28,
-    "AttackDamageMax": 34,
+    "AttackDamageMin": 26,
+    "AttackDamageMax": 32,
     "AttackRate": 1.7,
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_ALL",
@@ -3463,7 +3463,7 @@
     "AttributeBaseIntelligence": 21,
     "AttributeIntelligenceGain": 2.9,
     "StatusHealthRegen": 0.25,
-    "MovementSpeed": 310
+    "MovementSpeed": 315
   },
   "npc_dota_hero_dawnbreaker": {
     "Ability1": "dawnbreaker_fire_wreath",
@@ -3573,7 +3573,7 @@
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
     "AttributeBaseStrength": 19,
     "AttributeStrengthGain": 2.0,
-    "AttributeBaseAgility": 20,
+    "AttributeBaseAgility": 21,
     "AttributeAgilityGain": 2.7,
     "AttributeBaseIntelligence": 23,
     "AttributeIntelligenceGain": 3.4,

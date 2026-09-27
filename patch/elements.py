@@ -2867,7 +2867,7 @@ def auto_components_change(item_display, this_version):
     old = _get_recipe(item_display, prev_v)
     new = _get_recipe(item_display, this_version)
     # No look-ahead to a later snapshot any more: it covered stale items.json copies (7.41 = 7.40c,
-    # 7.37e without Khanda's 7.37e recipe), which tools/resync_item_snapshots.py fixed at the root
+    # 7.37e without Khanda's 7.37e recipe), which tools/resync_snapshots.py fixed at the root
     # (2026-09-27) — and a look-ahead would put a later patch's price into this one.
     if not old or not new:
         return (f'<!-- auto_components_change: recipe missing for '

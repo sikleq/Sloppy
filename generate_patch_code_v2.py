@@ -2311,7 +2311,7 @@ def _postprocess_unstated_total_cost(lines):
             j += 1
         block = lines[i:j]
         # no look-ahead to a later snapshot: the stale items.json copies it covered are fixed at the
-        # root (tools/resync_item_snapshots.py, 2026-09-27); it would put a later patch's price here
+        # root (tools/resync_snapshots.py, 2026-09-27); it would put a later patch's price here
         old, new = _kv_item_cost(name, _prev_version(ver) or ""), _kv_item_cost(name, ver)
         if not (old and new and old != new) or any(_COST_ROW_RE.search(x) for x in block):
             out.extend(block)

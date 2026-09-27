@@ -46,7 +46,7 @@
     "AttackRate": 1.4,
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_AGILITY",
-    "AttributeBaseStrength": 19,
+    "AttributeBaseStrength": 21,
     "AttributeStrengthGain": 1.6,
     "AttributeBaseIntelligence": 12,
     "AttributeIntelligenceGain": 1.8,
@@ -761,7 +761,7 @@
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
     "AttributeBaseStrength": 18,
     "AttributeStrengthGain": 2.4,
-    "AttributeBaseIntelligence": 20,
+    "AttributeBaseIntelligence": 19,
     "AttributeIntelligenceGain": 3.5,
     "AttributeBaseAgility": 15,
     "AttributeAgilityGain": 1.7,
@@ -1168,7 +1168,7 @@
       "Ability3": "skeleton_king_mortal_strike",
       "Ability4": "skeleton_king_reincarnation"
     },
-    "ArmorPhysical": -1,
+    "ArmorPhysical": 1,
     "AttackDamageMin": 38,
     "AttackDamageMax": 40,
     "AttackRate": 1.7,
@@ -2202,7 +2202,7 @@
     "AttributeStrengthGain": 3.7,
     "AttributeBaseAgility": 19,
     "AttributeAgilityGain": 2.0,
-    "AttributeBaseIntelligence": 15,
+    "AttributeBaseIntelligence": 17,
     "AttributeIntelligenceGain": 1.6,
     "StatusHealthRegen": 0.5,
     "MovementSpeed": 310
@@ -3587,7 +3587,6 @@
     "Ability5": "ringmaster_spotlight",
     "Ability6": "ringmaster_wheel",
     "Ability7": "ringmaster_tame_the_beasts_crack",
-    "Ability8": "generic_hidden",
     "AbilityDraftAbilities": {
       "Ability1": "ringmaster_tame_the_beasts",
       "Ability2": "ringmaster_the_box",

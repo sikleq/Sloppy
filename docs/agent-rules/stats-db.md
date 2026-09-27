@@ -11,8 +11,8 @@
 `find_commit_for_patch`) берёт первый коммит d2vpkr, датированный днём патча. Он бывает сделан ДО выхода патча,
 и тогда слепок равен прошлому патчу: `items.json` 7.41 был побайтно 7.40c (вся переработка предметов 7.41 лежала в
 7.41a), в 7.37e у Khanda остался рецепт 7.37d (600, а не 500). Эталон — история items.txt по патчам
-(`~/outputs/valve-revealed-weights-20260915/items_history`, по ней же считаются веса). `tools/resync_item_snapshots.py`
-пересобирает `items.json` из неё; тест `tests/test_item_snapshots_match_history.py` (пропускается без истории).
+(`~/outputs/valve-revealed-weights-20260915/items_history`, по ней же считаются веса). `tools/resync_snapshots.py`
+пересобирает `items.json` и `heroes.json` (история npc_heroes.txt там же, `heroes_history`) — у героев это чинит подсказки «Now it's …» / «Before this patch it was changed in …» (Night Stalker 7.36a писал «−1.25, now 1.5» вместо 0.25); тест `tests/test_snapshots_match_history.py` (пропускается без истории).
 Обходы «взять цены из следующего патча» (auto_components_change, `_postprocess_unstated_total_cost`) убраны: они
 приписывали бы патчу чужое изменение.
 

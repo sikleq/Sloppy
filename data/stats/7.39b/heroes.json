@@ -976,7 +976,7 @@
       "Ability3": "sniper_take_aim",
       "Ability4": "sniper_assassinate"
     },
-    "ArmorPhysical": -1,
+    "ArmorPhysical": 0,
     "AttackDamageMin": 13,
     "AttackDamageMax": 19,
     "AttackRate": 1.7,
@@ -1915,7 +1915,7 @@
     "AttributeAgilityGain": 1.5,
     "AttributeBaseIntelligence": 15,
     "AttributeIntelligenceGain": 1.7,
-    "StatusHealthRegen": 1.25,
+    "StatusHealthRegen": 0.66,
     "MovementSpeed": 290
   },
   "npc_dota_hero_ancient_apparition": {
@@ -2926,7 +2926,7 @@
     "AttributeIntelligenceGain": 1.6,
     "StatusHealthRegen": 0.75,
     "StatusManaRegen": 0.25,
-    "MovementSpeed": 310
+    "MovementSpeed": 305
   },
   "npc_dota_hero_legion_commander": {
     "Ability1": "legion_commander_overwhelming_odds",
@@ -3090,7 +3090,7 @@
     "AttackRange": 625,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
     "AttributeBaseStrength": 20,
-    "AttributeStrengthGain": 2.4,
+    "AttributeStrengthGain": 2.2,
     "AttributeBaseAgility": 15,
     "AttributeAgilityGain": 1.7,
     "AttributeBaseIntelligence": 26,
@@ -3102,9 +3102,10 @@
     "Ability1": "techies_sticky_bomb",
     "Ability2": "techies_reactive_tazer",
     "Ability3": "techies_suicide",
-    "Ability4": "techies_reactive_tazer_stop",
+    "Ability4": "generic_hidden",
     "Ability5": "techies_minefield_sign",
     "Ability6": "techies_land_mines",
+    "Ability7": "techies_reactive_tazer_stop",
     "AbilityDraftAbilities": {
       "Ability1": "techies_sticky_bomb",
       "Ability2": "techies_reactive_tazer",
