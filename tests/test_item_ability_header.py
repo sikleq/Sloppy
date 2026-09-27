@@ -92,6 +92,60 @@ def test_a_row_without_numbers_colours_the_card_text_it_describes():
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
 
 
+def _card_for(key, old, new):
+    from patch.state import _State
+    _State.current_entity_key, _State.current_patch_version = key, "7.38"
+    el.item_abilities_change(old=old, new=new)
+
+
+def test_no_longer_colours_the_removed_sentence_red_not_the_rewritten_fragment():
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        # Drum of Endurance 7.38: "Comes with 8 charges." went away; "Consumes a charge and gives" was rewritten
+        _card_for("item|drum2-test",
+                  ["Active: Endurance. Consumes a charge and gives +45 attack speed for 6 seconds. Comes with 8 charges."],
+                  ["Active: Endurance. Gives +35 attack speed for 6 seconds."])
+        assert el._iab_text_change("Endurance no longer uses charges", {"rework"})
+        old = el.render_iab_card("item|drum2-test|7.38").split("pane-new")[0]
+        assert '<span class="iab-hl iab-hl-del">Comes with <b class="iab-num">8</b> charges</span>' in old
+        assert "iab-hl-del\">Consumes" not in old
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
+def test_a_phrase_is_found_when_no_changed_piece_holds_the_rows_words():
+    # Khanda 7.38: "Empower Spell no longer deals attack damage" = the old "your attack damage"
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _card_for("item|khanda2-test",
+                  ["Passive: Empower Spell. The next spell deals 150 + 60% of your attack damage as bonus damage to the target."],
+                  ["Passive: Empower Spell. The next spell deals a separate 250 additional damage to the target."])
+        assert el._iab_text_change("Empower Spell no longer deals attack damage", {"del"})
+        old = el.render_iab_card("item|khanda2-test|7.38").split("pane-new")[0]
+        assert '<span class="iab-hl iab-hl-del">your attack damage</span>' in old
+        # what stopped must be in the text: "no longer stack with …" is not "bonus damage"
+        assert not el._iab_text_change("Empower Spell no longer stacks with Khanda", {"del"})
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
+def test_can_now_be_dispelled_adds_dispellable_at_the_end_of_the_description():
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _card_for("item|halberd2-test",
+                  ["Active: Disarm. Prevents a target from attacking for 3 seconds. Cast Range: 650. Cooldown: 18s"],
+                  ["Active: Disarm. Prevents a target from attacking for 3 seconds. Cast Range: 650. Cooldown: 18s"])
+        assert el._iab_text_change("Disarm can now be dispelled", {"nerf"})
+        new = el.render_iab_card("item|halberd2-test|7.38").split("pane-new")[1]
+        assert '<b class="iab-num">3</b> seconds. <span class="iab-hl iab-hl-nerf">Dispellable</span>.' in new
+        assert "castrange.png" in new and "cooldown.png" in new           # the header values still found
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
 def test_removed_ability_row_is_hidden_when_the_card_shows_it_on_one_side():
     from patch.state import _State
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))

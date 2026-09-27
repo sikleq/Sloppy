@@ -222,9 +222,25 @@
   function elementVisible(el) {
     return !!el && !el.classList.contains('f-hide') && !el.classList.contains('cat-hide');
   }
+  // A row an item card already shows (li.iab-covered, CSS-hidden) still carries its tag for the filters, but
+  // it is never what keeps a block on screen: its card is (owner 2026-09-27, Witch Blade under BUFF showed a
+  // bare header).
+  function rowOnScreen(li) {
+    return elementVisible(li) && !li.classList.contains('iab-covered');
+  }
+  // A card is shown under a non-REWORK filter when it holds a chip of an active tag, or took over a hidden
+  // row that matches: covered-cost -> the components card, covered-iab -> the abilities card.
+  function panelMatches(el) {
+    const hit = node => (node.dataset.tag || '').split(' ').some(t => activeFilters.has(t));
+    if (Array.from(el.querySelectorAll('[data-tag]')).some(hit)) return true;
+    const block = el.closest('.entity-block');
+    const kind = el.classList.contains('iab-change') ? 'covered-iab'
+      : el.classList.contains('components-change') ? 'covered-cost' : null;
+    return !!(block && kind && block.querySelector(`ul.changes > li.${kind}:not(.f-hide):not(.cat-hide)`));
+  }
   function refreshPatchFilterLayout() {
     document.querySelectorAll('ul.changes').forEach(ul => {
-      const hasVisible = Array.from(ul.children).some(elementVisible);
+      const hasVisible = Array.from(ul.children).some(rowOnScreen);
       ul.classList.toggle('f-hide', !hasVisible);
     });
     document.querySelectorAll('h4.ability-title').forEach(h => {
@@ -236,18 +252,18 @@
       const ul = block.querySelector('ul.changes');
       block.classList.toggle('f-hide', !elementVisible(ul));
     });
-    // Component/stat panels (.properties-change, .components-change, etc.) only
-    // belong to the REWORK filter. Hide them under any other active filter so
-    // items with recipe changes don't bleed through QoL/BUFF/etc. filters.
+    // Component/stat panels (.properties-change, .components-change, etc.) belong to the REWORK filter;
+    // under any other filter a panel stays only when it holds a matching tag (panelMatches), so items with
+    // recipe changes don't bleed through QoL/BUFF/etc. filters.
     const reworkOnly = activeFilters.size > 0 && !activeFilters.has('rework');
     document.querySelectorAll('.components-box, .components-change, .provides-box, .properties-change').forEach(el => {
-      if (reworkOnly) el.classList.add('f-hide');
+      if (reworkOnly && !panelMatches(el)) el.classList.add('f-hide');
     });
     document.querySelectorAll('.entity-block').forEach(block => {
       if (block.classList.contains('ec-head')) return;   // Changes-page header: never filtered
-      const visibleLi = block.querySelectorAll('ul.changes > li:not(.f-hide):not(.cat-hide)').length;
+      const visibleLi = block.querySelectorAll('ul.changes > li:not(.f-hide):not(.cat-hide):not(.iab-covered)').length;
       const visibleSwaps = block.querySelectorAll('.ability-change:not(.f-hide):not(.cat-hide)').length;
-      const visiblePanels = !reworkOnly && Array.from(block.children).some(child =>
+      const visiblePanels = Array.from(block.children).some(child =>
         child.matches('.components-box, .components-change, .provides-box, .properties-change') &&
         elementVisible(child)
       );

@@ -1349,10 +1349,14 @@ def item_abilities_change(old, new):
     old_names = {_iab_ability_key(t) for t in old if _ITEM_ABILITY_RE.match(t)}
     key = f"{_State.current_entity_key}|{_State.current_patch_version}"
     _IAB_CARDS[key] = (list(old), list(new))
-    segs = {_iab_ability_key(n): _iab_text_diff(o, n) for o, n in _iab_pair_rows(old, new) if o and n}
+    pairs = [(o, n) for o, n in _iab_pair_rows(old, new) if o and n]
+    segs = {_iab_ability_key(n): _iab_text_diff(o, n) for o, n in pairs}
+    pairs_by = {}
+    for o, n in pairs:
+        pairs_by[(_iab_ability_key(n), "old")], pairs_by[(_iab_ability_key(n), "new")] = o, n
     _State.iab_card = {"ek": _State.current_entity_key, "pv": _State.current_patch_version, "names": names,
                        "old_names": old_names, "old": " ".join(old), "new": " ".join(new), "key": key,
-                       "segs": segs}
+                       "segs": segs, "pairs": pairs, "pairs_by": pairs_by}
     return f"<!--IABCARD:{key}-->"
 
 
@@ -1363,8 +1367,9 @@ _IAB_META_SEG_RE = re.compile(r"\b(?:cast range|mana cost|health cost|cooldown|r
 
 def _iab_text_diff(old, new):
     """Word spans that differ between an ability's old and new text, numbers ignored (the numeric rows colour
-    those): {"old": [(start, end, text)] removed, "new": [...] added}. Meta sentences (range, cost, cooldown,
-    radius) are left out — the header shows them."""
+    those): {"old": [(start, end, text, op)] removed, "new": [...] added}; op is difflib's "delete" / "insert"
+    (gone / added outright) or "replace" (rewritten). Meta sentences (range, cost, cooldown, radius) are left
+    out — the header shows them."""
     def toks(t):
         return [(m.start(), m.end(), _IAB_NUMTOK_RE.sub("#", m.group(0).lower().strip(".,;:"))) for m in _IAB_WORD_RE.finditer(t)]
     a, b_ = toks(old), toks(new)
@@ -1383,7 +1388,7 @@ def _iab_text_diff(old, new):
                 a0 += len(full[a0:a1]) - len(full[a0:a1].lstrip())
                 if not text or _IAB_META_SEG_RE.search(text) or not re.search(r"[A-Za-z]{3}", _IAB_NUMTOK_RE.sub("", text)):
                     continue
-                out[side].append((a0, a0 + len(text), text))
+                out[side].append((a0, a0 + len(text), text, op))
     return out
 
 
@@ -1488,26 +1493,89 @@ def _iab_text_change(text, tags):
     diff = card.get("segs", {}).get(ability)
     if not diff:
         return False
-    words = _iab_stems(low, drop=set(ability.split()))
+    m = re.match(rf"^{re.escape(ability)}'?s? can (now|no longer) be dispelled$", low)
+    if m:
+        # "Disarm can now be dispelled" (Heaven's Halberd 7.38): the game's tooltip doesn't say it, so the
+        # new description gets "Dispellable." at its end, in the row's colour (owner 2026-09-27)
+        tail = "Dispellable." if m.group(1) == "now" else "Not dispellable."
+        _IAB_HL.setdefault(card["key"], []).append({"ability": ability, "side": "new", "append": tail, "dir": direction})
+        return True
+    words = _iab_stems(low, drop=set(ability.split()) | _IAB_VERBS)
     if not words:
         return False
-    first = "old" if ("no longer" in low or direction == "del") else "new"
-    for side in (first, "new" if first == "old" else "old"):
-        # the card text must carry at least half of the row's words, and be two words or more — a lone
-        # "Restoration" or "physical" out of a longer sentence explains nothing
-        hits = [i for i, (_, _, seg) in enumerate(diff[side])
-                if len(re.findall(r"[A-Za-z]{2,}", seg)) >= 2 and len(words & _iab_stems(seg)) * 2 >= len(words)]
-        if hits:
-            _IAB_HL.setdefault(card["key"], []).extend((ability, side, i, direction) for i in hits)
-            return True
-    return False
+    # "no longer …" / DEL speaks of the OLD text, anything else of the NEW one — never the other side (a NEW
+    # row must not colour old text: Disperser 7.40)
+    side = "old" if ("no longer" in low or direction == "del") else "new"
+    wordy = lambda seg: len(re.findall(r"[A-Za-z]{2,}", seg)) >= 2
+    got = lambda seg: len(words & _iab_stems(seg))
+    # the old side: only text removed outright — a rewritten "Consumes a charge and gives" isn't what "no
+    # longer uses charges" means, "Comes with 8 charges." is (Drum of Endurance 7.38)
+    pool = [s for s in diff[side] if wordy(s[2]) and (side == "new" or s[3] == "delete")]
+    strong = [s for s in pool if got(s[2]) >= min(2, len(words))]
+    full = card.get("pairs_by", {}).get((ability, side), "")
+    sentence = lambda s: re.search(r"[.!]$", s[2]) and re.search(r"(?:^|[.!:])\s*$", full[:s[0]])
+    hits = [s for s in strong if sentence(s)] or strong          # a whole sentence beats a fragment
+    if not hits:
+        # no single piece holds two of the row's words: the shortest phrase that does ("your attack damage")
+        span = _iab_phrase(card, ability, side, words)
+        hits = [span] if span else [s for s in pool if got(s[2]) * 2 >= len(words)]
+    # "no longer X": what stopped is X — the text must hold one of the first two words after "no longer"
+    # ("no longer stack with Orb of Corrosion" is not "reduces heals, health", Orb of Frost 7.39)
+    after = re.search(r"no longer (.*)", low)
+    if after:
+        obj = [w[:5] for w in re.findall(r"[a-z]{4,}", after.group(1)) if w not in _IAB_STOP and w not in _IAB_VERBS][:2]
+        hits = [s for s in hits if set(obj) & _iab_stems(full[s[0]:s[1]])]
+    if not hits:
+        return False
+    # removed text is red whatever the row's tag (owner 2026-09-27); added text takes the tag's colour
+    d = "del" if side == "old" else direction
+    _IAB_HL.setdefault(card["key"], []).extend(
+        {"ability": ability, "side": side, "span": (s[0], s[1]), "dir": d} for s in hits)
+    return True
 
 
-def _iab_unpaired_row(text, tags):
+_IAB_VERBS = {"deal", "deals", "apply", "applies", "gives", "grants", "provides", "uses", "does"}
+_IAB_DETERMINERS = ("your ", "their ", "its ", "the ")
+
+
+def _iab_phrase(card, ability, side, words):
+    """The shortest run of words on one side that holds two of the row's words and doesn't appear on the
+    other side ("Empower Spell no longer deals attack damage" = the old "your attack damage", Khanda 7.38),
+    a determiner before it included; (start, end) or None."""
+    pair = next(((o, n) for o, n in card.get("pairs", []) if _iab_ability_key(n) == ability), None)
+    if not pair or len(words) < 2:
+        return None
+    text, other = (pair[0], pair[1]) if side == "old" else (pair[1], pair[0])
+    toks = [(m.start(), m.end(), _iab_stems(m.group(0)))
+            for m in _IAB_WORD_RE.finditer(text)]
+    best = None
+    for i in range(len(toks)):
+        got = set()
+        for j in range(i, min(i + 6, len(toks))):
+            got |= toks[j][2] & words
+            if len(got) >= 2:
+                if best is None or toks[j][1] - toks[i][0] < best[1] - best[0]:
+                    best = (toks[i][0], toks[j][1])
+                break
+    if not best:
+        return None
+    phrase = text[best[0]:best[1]].strip(".,;: ")
+    if phrase.lower() in other.lower():
+        return None
+    before = text[:best[0]].lower()
+    det = next((d for d in _IAB_DETERMINERS if before.endswith(d)), "")
+    return (best[0] - len(det), best[0] + len(phrase))
+
+
+def _iab_unpaired_row(text, tags, extra=""):
     """"Removed Damage Block ability" when the card shows Damage Block on the old side only (or a NEW row of
-    an ability only the new side has): the card says it, the row is hidden (owner 2026-09-27)."""
+    an ability only the new side has): the card says it, the row is hidden (owner 2026-09-27). An inline
+    note ("Blocked 70 damage from melee…", Abyssal Blade 7.38) only repeats the card's text; any other
+    note under the row keeps it."""
     card = getattr(_State, "iab_card", None)
     if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
+        return False
+    if isinstance(extra, str) and re.sub(r"<!--INLINETIP-->.*?<!--/INLINETIP-->", "", extra, flags=re.S).strip():
         return False
     low = re.sub(r"<[^>]+>", " ", re.sub(r"<!--TIP-->.*?<!--/TIP-->", " ", text, flags=re.S)).lower()
     old_only = card.get("old_names", set()) - card["names"]
@@ -1598,15 +1666,27 @@ def render_iab_card(key):
     if key not in _IAB_CARDS:
         return ""
     rows = _iab_pair_rows(*_IAB_CARDS[key])
-    marks = {}                                                # (ability, side) -> [(start, end, direction)]
-    for o, n in rows:
-        if o and n:
-            diff, name = _iab_text_diff(o, n), _iab_ability_key(n)
-            seen = set()
-            for ability, side, i, direction in _IAB_HL.get(key, []):
-                if ability == name and (side, i) not in seen and i < len(diff[side]):
-                    seen.add((side, i))
-                    marks.setdefault((name, side), []).append((*diff[side][i][:2], direction))
+    spans, tails = {}, {}                                     # (ability, side) -> [(start, end, dir)] / [(text, dir)]
+    for hl in _IAB_HL.get(key, []):
+        k = (hl["ability"], hl["side"])
+        if hl.get("append"):
+            tails.setdefault(k, []).append((hl["append"], hl["dir"]))
+        elif hl["span"] not in [s[:2] for s in spans.get(k, [])]:
+            spans.setdefault(k, []).append((*hl["span"], hl["dir"]))
+
+    def with_tails(t, k):
+        """A sentence the row adds (\"Dispellable.\") at the end of the description, before the header
+        values, plus its colour span."""
+        extra = [s for s in spans.get(k, [])]
+        for tail, d in tails.get(k, []):
+            mm = re.search(r"(?:(?<=[.!])|^)\s*(?:Cast Range|Mana Cost|Health Cost|Cooldown|Radius|No Mana Cost|No Cooldown)\b", t)
+            p = mm.start() if mm else len(t)
+            ins = (" " if p and t[p - 1] != " " else "") + tail + (" " if mm else "")
+            t = t[:p] + ins + t[p:]
+            extra = [(a + len(ins), b + len(ins), dd) if a >= p else (a, b, dd) for a, b, dd in extra]
+            start = p + (1 if ins.startswith(" ") else 0)
+            extra.append((start, start + len(tail), d))
+        return t, extra
 
     def pane(texts, side, slots=False):
         cards = []
@@ -1614,8 +1694,8 @@ def render_iab_card(key):
             if t is None:
                 cards.append('<div class="iab-none"></div>')    # the other side's ability has no counterpart
                 continue
-            spans = marks.get((_iab_ability_key(t), side), [])
-            h = _item_ability_html(_iab_mark_text(t, spans)) if spans else None
+            t, marks = with_tails(t, (_iab_ability_key(t), side))
+            h = _item_ability_html(_iab_mark_text(t, marks)) if marks else None
             h = _iab_markers_html(h) if h else (_item_ability_html(t) or _html.escape(t))
             m = _ITEM_ABILITY_RE.match(t)
             if slots and m and "iab-desc" in h:                 # a slot for a moved (?) note
@@ -1738,7 +1818,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         if _card and _iab_shown_in_card(text, extra):
             # its full text is the card's right pane already: kept hidden (scored above, tag counted by filters)
             classes.remove("ability-row")
-            classes.append("iab-covered")
+            classes += ["iab-covered", "covered-iab"]
         elif _card:
             classes.append("item-ability")
             text = _card
@@ -1753,12 +1833,13 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             and (_iab_covered_change(text, dyn_tags, extra, badge)
                  # the card shows it as text: an ability only one side has, or words a row without numbers
                  # describes (a row with a note keeps showing it)
-                 or (not extra and (_iab_unpaired_row(text, dyn_tags) or _iab_text_change(text, dyn_tags))))):
-        classes.append("iab-covered")
+                 or _iab_unpaired_row(text, dyn_tags, extra)
+                 or (not extra and _iab_text_change(text, dyn_tags)))):
+        classes += ["iab-covered", "covered-iab"]       # covered-*: the card that shows it (tag filters)
     # a cost row the components card above already shows: hidden, the card gets its % and colours
     if (isinstance(text, str) and "iab-covered" not in classes
             and (_State.current_entity_key or "").startswith("item|") and _cost_covered(text, extra)):
-        classes.append("iab-covered")
+        classes += ["iab-covered", "covered-cost"]
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""
     attr = f' data-tag="{tag_str}"' if tag_str else ""
     trailing_tips = []

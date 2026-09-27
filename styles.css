@@ -1005,7 +1005,7 @@ body:has(.creeps-page) nav.top-nav {
   position: absolute;
   right: 2px;
   bottom: 2px;
-  padding: 0 5px;
+  padding: 1px;
   font-family: 'Jersey 10', monospace;
   font-size: 11px;
   letter-spacing: 0.5px;
@@ -1019,7 +1019,7 @@ body:has(.creeps-page) nav.top-nav {
   position: absolute;
   right: 2px;
   bottom: 2px;
-  padding: 0 5px;
+  padding: 1px;
   font-family: 'Jersey 10', monospace;
   font-size: 11px;
   letter-spacing: 0.5px;
@@ -3346,18 +3346,18 @@ h4.subgroup .subgroup-new-type {
   opacity: 0.85;
   padding: 0 2px;
 }
-/* added (gold) / removed (red) components: a 3px frame that reads at a glance (owner 2026-09-27: 1.5px was
+/* added (gold) / removed (red) components: a 2px frame that reads at a glance (owner 2026-09-27: 1.5px was
    barely visible); padding shrinks by the same amount so the chip keeps its size */
 .component.component-added {
-  border: 3px solid rgba(226, 178, 52, 0.95);
+  border: 2px solid rgba(226, 178, 52, 0.95);
   border-radius: 6px;
-  padding: 0.5px;
+  padding: 1px;
   box-shadow: 0 0 8px rgba(218, 165, 32, 0.35);
 }
 .component.component-removed {
-  border: 3px solid rgba(226, 88, 88, 0.85);
+  border: 2px solid rgba(226, 88, 88, 0.85);
   border-radius: 6px;
-  padding: 0.5px;
+  padding: 1px;
   opacity: 0.85;
 }
 
@@ -4951,7 +4951,7 @@ ul.changes li.aghanim-shard.li-formula {
 .wrong-word {
   background: rgba(150, 146, 137, 0.08);
   color: var(--text-dim);
-  padding: 0 5px;
+  padding: 1px;
   border-radius: 3px;
 }
 
@@ -4959,7 +4959,7 @@ ul.changes li.aghanim-shard.li-formula {
 .formula-trigger {
   display: inline-block;
   white-space: nowrap;
-  padding: 0 5px;
+  padding: 1px;
   border-radius: 3px;
   background: rgba(150, 146, 137, 0.08);
   color: var(--text-dim);
@@ -8329,7 +8329,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .stat-hist-tip .chg-tag {
   display: inline-block;
   margin-left: 6px;
-  padding: 0 5px;
+  padding: 1px;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -10893,7 +10893,7 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-hl-new { color: #e0bd62; }
 .iab-hl-buff { color: #7fd08c; }
 .iab-hl-nerf { color: #e3806e; }
-.iab-hl-del { color: #d98aa6; }
+.iab-hl-del { color: #e3806e; }            /* removed text: red, whatever the row's tag */
 .iab-hl-rework, .iab-hl-swap { color: #b99ae6; }
 .iab-hl-qol, .iab-hl-misc { color: var(--text-dimmer); }
 .iab-hl .iab-num { color: inherit; }          /* a number inside the coloured phrase takes its colour */
