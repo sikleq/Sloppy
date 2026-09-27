@@ -67,10 +67,67 @@ def test_abilities_pair_by_name_and_only_a_pair_gets_an_arrow():
         el.item_abilities_change(old=["Active: Disarm. Old text."],
                                  new=["Active: Disarm. New text.", "Passive: Damage Block. Blocks damage."])
         html = el.render_iab_card("item|halberd-test|7.38")
-        assert html.count('class="properties-arrow"') == 1 and 'style="grid-row:1"' in html
+        # one arrow for the whole card (owner 2026-09-27), centred across every row
+        assert html.count('class="properties-arrow"') == 1 and 'style="grid-row:1 / -1"' in html
         assert 'class="iab-none"' in html.split("pane-new")[0]            # the empty cell is on the old side
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
+def test_a_row_without_numbers_colours_the_card_text_it_describes():
+    # Bloodstone 7.38: "Bloodpact now applies a basic dispel on cast" = the new "Dispel Type: Basic Dispel."
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _State.current_entity_key, _State.current_patch_version = "item|bloodstone-test", "7.38"
+        el.item_abilities_change(old=["Active: Bloodpact. Increases Spell Lifesteal by 4x. Lasts 5 seconds. Cooldown: 35s"],
+                                 new=["Active: Bloodpact. Increases Spell Lifesteal by 4x. Lasts 5 seconds. "
+                                      "Dispel Type: Basic Dispel. Cooldown: 35s"])
+        assert el._iab_text_change("Bloodpact now applies a basic dispel on cast", {"new"})
+        assert not el._iab_text_change("Bloodpact lifesteal increased from 4x to 5x", {"buff"})   # numbers: not this rule
+        new = el.render_iab_card("item|bloodstone-test|7.38").split("pane-new")[1]
+        assert '<span class="iab-hl iab-hl-new">Dispel Type: Basic Dispel</span>.' in new
+        assert "cooldown.png" in new                                    # the header values still found
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
+def test_removed_ability_row_is_hidden_when_the_card_shows_it_on_one_side():
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _State.current_entity_key, _State.current_patch_version = "item|halberd41-test", "7.41"
+        el.item_abilities_change(old=["Active: Disarm. A.", "Passive: Damage Block. B."], new=["Active: Disarm. C."])
+        assert el._iab_unpaired_row("Removed Damage Block ability", {"del"})
+        assert not el._iab_unpaired_row("Removed Disarm ability", {"del"})       # Disarm is on both sides
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
+def test_a_changed_number_carries_its_percent_in_the_hover_tip():
+    from patch.state import _State
+    from patch.badges import b
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _State.current_entity_key, _State.current_patch_version = "item|drum-test", "7.38"
+        el.item_abilities_change(old=["Passive: Swiftness Aura. Grants 20 movement speed to allies."],
+                                 new=["Passive: Swiftness Aura. Grants 15 movement speed to allies."])
+        assert el._iab_covered_change("Swiftness Aura movement speed decreased from 20 to 15", {"nerf"}, "", b(20, 15))
+        new = el.render_iab_card("item|drum-test|7.38").split("pane-new")[1]
+        assert 'class="iab-hint abil-ico-hint" data-tooltip="' in new and "-25%" in new
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
+def test_generator_skips_a_card_whose_tooltips_say_the_same_words():
+    import sys
+    import pathlib
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "tools"))
+    from item_ability_text import _same_words
+    # Block of Cheese 7.38: "Try me!" both times, only the 250 cast range gone
+    assert _same_words(["Use: Scrumptious. Try me! Cast Range: 250. Cooldown: 40s"],
+                       ["Use: Scrumptious. Try me! Cooldown: 40s"])
+    assert not _same_words(["Active: Bloodpact. Lasts 5 seconds."], ["Active: Bloodpact. Lasts 5 seconds. Dispel Type: Basic Dispel."])
 
 
 def test_item_abilities_change_puts_each_ability_in_a_card_on_its_side():

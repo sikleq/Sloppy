@@ -100,6 +100,18 @@ def _norm(texts):
     return [re.sub(r"[-+]?\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*%?s?", "#", t) for t in texts]
 
 
+_META_SENTENCE_RE = re.compile(r"(?:Cast Range|Mana Cost|Health Cost|Cooldown|Radius)\s*:?\s*[\d./%s]+\.?|No Mana Cost\.?|"
+                               r"No Cooldown\.?", re.I)
+
+
+def _same_words(old, new):
+    """Every ability says the same words on both sides once its header values (range, cost, cooldown, radius)
+    are set aside — the game's tooltip didn't change (Block of Cheese 7.38: "Try me!" both times, only the
+    250 cast range gone): a card would show two identical boxes (owner 2026-09-27), so the rows stay."""
+    strip = lambda ts: sorted(re.sub(r"\s+", " ", _META_SENTENCE_RE.sub(" ", t)).strip() for t in ts)
+    return strip(old) == strip(new)
+
+
 _STRUCT_TAG_RE = re.compile(r't\("(NEW|DEL|REWORK)"\)')
 _NOT_ABILITY_RE = re.compile(r"cycled out|removed from the game|disassembl|now is a tier|guaranteed|tier|total cost|"
                              r"recipe|^\s*cost\b|^\s*\+[\d.]+", re.I)
@@ -127,7 +139,7 @@ def insert_cards(lines, version, prev, name_to_slug):
             i = j
             continue
         old, new = item_abilities(slug, prev), item_abilities(slug, version)
-        if old is None or new is None or not (old or new) or _norm(old) == _norm(new):
+        if old is None or new is None or not (old or new) or _norm(old) == _norm(new) or _same_words(old, new):
             i = j
             continue
         names = {re.match(r"\w+: ([^.!]+)", t).group(1).lower() for t in old + new if re.match(r"\w+: ([^.!]+)", t)}

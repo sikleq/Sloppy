@@ -1,5 +1,6 @@
 """HTML builder functions — li, ul, section, ability, item, hero headers, etc."""
 
+import difflib
 import html as _html
 import json as _json
 import os as _os
@@ -1244,7 +1245,7 @@ ABILITY_ICON_DIR = "../icons/ui/ability/"
 
 def _iab_name(body):
     """("Bottoms Up", rest) when the body starts with an ability name sentence, else ("", body)."""
-    m = re.match(r"^(.{1,40}?)([.!])\s+(?=[A-Z0-9+\-])(.*)$", body, re.S)
+    m = re.match(r"^(.{1,40}?)([.!])\s+(?=[A-Z0-9+\--])(.*)$", body, re.S)   # U+E00x: highlight markers
     if not m:
         return "", body
     words = m.group(1).replace(",", " ").split()
@@ -1344,16 +1345,46 @@ def item_abilities_change(old, new):
     game's tooltips of the previous patch (d2vpkr), never invented. The card is not scored — the tagged
     rows under it keep the weights. It is drawn when the page is saved (render_iab_card), after the rows
     under it have marked the numbers they change."""
-    names = set()
-    for t in new:
-        m = _ITEM_ABILITY_RE.match(t)
-        if m:
-            names.add(_iab_name(m.group(2).strip())[0].lower())
+    names = {_iab_ability_key(t) for t in new if _ITEM_ABILITY_RE.match(t)}
+    old_names = {_iab_ability_key(t) for t in old if _ITEM_ABILITY_RE.match(t)}
     key = f"{_State.current_entity_key}|{_State.current_patch_version}"
     _IAB_CARDS[key] = (list(old), list(new))
+    segs = {_iab_ability_key(n): _iab_text_diff(o, n) for o, n in _iab_pair_rows(old, new) if o and n}
     _State.iab_card = {"ek": _State.current_entity_key, "pv": _State.current_patch_version, "names": names,
-                       "old": " ".join(old), "new": " ".join(new), "key": key}
+                       "old_names": old_names, "old": " ".join(old), "new": " ".join(new), "key": key,
+                       "segs": segs}
     return f"<!--IABCARD:{key}-->"
+
+
+_IAB_WORD_RE = re.compile(r"\S+")
+_IAB_NUMTOK_RE = re.compile(r"[+\-]?\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*[%sx]?")
+_IAB_META_SEG_RE = re.compile(r"\b(?:cast range|mana cost|health cost|cooldown|radius)\b", re.I)
+
+
+def _iab_text_diff(old, new):
+    """Word spans that differ between an ability's old and new text, numbers ignored (the numeric rows colour
+    those): {"old": [(start, end, text)] removed, "new": [...] added}. Meta sentences (range, cost, cooldown,
+    radius) are left out — the header shows them."""
+    def toks(t):
+        return [(m.start(), m.end(), _IAB_NUMTOK_RE.sub("#", m.group(0).lower().strip(".,;:"))) for m in _IAB_WORD_RE.finditer(t)]
+    a, b_ = toks(old), toks(new)
+    out = {"old": [], "new": []}
+    sm = difflib.SequenceMatcher(a=[x[2] for x in a], b=[x[2] for x in b_], autojunk=False)
+    for op, i1, i2, j1, j2 in sm.get_opcodes():
+        for side, src, lo, hi in (("old", a, i1, i2), ("new", b_, j1, j2)):
+            if op == "equal" or lo >= hi:
+                continue
+            full, s0 = (old if side == "old" else new), src[lo][0]
+            # clause by clause (". ", ", ", " and "): a row about armor colours "and 8 armor", not the
+            # whole "health regeneration, 5 mana regeneration and 8 armor" (Guardian Greaves 7.40)
+            cuts = [s0] + [s0 + m.end() for m in re.finditer(r"[.,;]\s+|\s+(?=and\s)", full[s0:src[hi - 1][1]])]
+            for a0, a1 in zip(cuts, cuts[1:] + [src[hi - 1][1]]):
+                text = full[a0:a1].strip()
+                a0 += len(full[a0:a1]) - len(full[a0:a1].lstrip())
+                if not text or _IAB_META_SEG_RE.search(text) or not re.search(r"[A-Za-z]{3}", _IAB_NUMTOK_RE.sub("", text)):
+                    continue
+                out[side].append((a0, a0 + len(text), text))
+    return out
 
 
 _IAB_CARDS = {}           # "<ek>|<pv>" -> (old texts, new texts)
@@ -1385,10 +1416,11 @@ def _iab_note(text, extra):
     return note[:1].upper() + note[1:]
 
 
-def _iab_covered_change(text, tags, extra=""):
+def _iab_covered_change(text, tags, extra="", badge=""):
     """A numeric change row the card can show (owner 2026-09-27: "don't repeat what the card shows"):
     old and new value both in the card, or an AoE radius (it gets its own header value). Records what to
-    colour — and the row's note, shown as a dotted underline + hover text on that value — returns True."""
+    colour — and the row's % badge + note, shown as a dotted underline + hover text on that value (owner
+    2026-09-27: "20 > 15 — by how many %?") — returns True."""
     card = getattr(_State, "iab_card", None)
     if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
         return False
@@ -1400,6 +1432,8 @@ def _iab_covered_change(text, tags, extra=""):
         return False
     low = plain.lower()
     note = _iab_note(text, extra)
+    if isinstance(badge, str) and "badge-group" in badge:
+        note = "<br>".join(x for x in (f'<span class="iab-tip-pct">{badge}</span>', note) if x)
     m = _IAB_FROMTO_RE.search(plain)
     if m and re.search(r"\bradius\b", low) and "cast range" not in low:
         ability = next((n for n in card["names"] if n and low.startswith(n)), "")
@@ -1418,6 +1452,92 @@ def _iab_covered_change(text, tags, extra=""):
         _IAB_MARKS.setdefault(card["key"], []).append((_IAB_META_WORDS[m.group(2).lower()], m.group(1), direction, note, "", ""))
         return True
     return False
+
+
+_IAB_HL = {}              # "<ek>|<pv>" -> [(ability, side, span index, direction)] text a hidden row describes
+_IAB_TAG_ORDER = ("new", "del", "buff", "nerf", "rework", "swap", "qol", "misc")
+_IAB_STOP = {"now", "longer", "also", "with", "from", "that", "this", "when", "into", "than", "have", "been",
+             "will", "your", "their", "them", "only", "each", "item", "items", "ability", "abilities"}
+
+
+def _iab_row_ability(low, card, names):
+    """The ability (lower-case name) a row speaks of: its name in the row, or the card's only one."""
+    hit = [n for n in names if n and re.search(rf"\b{re.escape(n)}\b", low)]
+    if hit:
+        return max(hit, key=len)
+    return next(iter(names)) if len(names) == 1 else ""
+
+
+def _iab_stems(text, drop=()):
+    return {w[:5] for w in re.findall(r"[a-z]{4,}", text.lower()) if w not in _IAB_STOP and w not in drop}
+
+
+def _iab_text_change(text, tags):
+    """A change row WITHOUT numbers whose words the card shows as added / removed text of that ability
+    (owner 2026-09-27, Bloodstone 7.38: "Bloodpact now applies a basic dispel on cast" = the new
+    "Dispel Type: Basic Dispel."): that text is coloured by the row's tag, the row hidden (still counted)."""
+    card = getattr(_State, "iab_card", None)
+    if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
+        return False
+    plain = re.sub(r"<[^>]+>", " ", re.sub(r"<!--TIP-->.*?<!--/TIP-->", " ", text, flags=re.S)).strip()
+    direction = next((t for t in _IAB_TAG_ORDER if t in tags), "")
+    if not direction or re.search(r"\d", plain):
+        return False
+    low = plain.lower()
+    ability = _iab_row_ability(low, card, set(card.get("segs", {})))
+    diff = card.get("segs", {}).get(ability)
+    if not diff:
+        return False
+    words = _iab_stems(low, drop=set(ability.split()))
+    if not words:
+        return False
+    first = "old" if ("no longer" in low or direction == "del") else "new"
+    for side in (first, "new" if first == "old" else "old"):
+        # the card text must carry at least half of the row's words, and be two words or more — a lone
+        # "Restoration" or "physical" out of a longer sentence explains nothing
+        hits = [i for i, (_, _, seg) in enumerate(diff[side])
+                if len(re.findall(r"[A-Za-z]{2,}", seg)) >= 2 and len(words & _iab_stems(seg)) * 2 >= len(words)]
+        if hits:
+            _IAB_HL.setdefault(card["key"], []).extend((ability, side, i, direction) for i in hits)
+            return True
+    return False
+
+
+def _iab_unpaired_row(text, tags):
+    """"Removed Damage Block ability" when the card shows Damage Block on the old side only (or a NEW row of
+    an ability only the new side has): the card says it, the row is hidden (owner 2026-09-27)."""
+    card = getattr(_State, "iab_card", None)
+    if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
+        return False
+    low = re.sub(r"<[^>]+>", " ", re.sub(r"<!--TIP-->.*?<!--/TIP-->", " ", text, flags=re.S)).lower()
+    old_only = card.get("old_names", set()) - card["names"]
+    new_only = card["names"] - card.get("old_names", set())
+    if "del" in tags and re.search(r"\bremoved\b|\bno longer has\b", low):
+        return any(n and re.search(rf"\b{re.escape(n)}\b", low) for n in old_only)
+    if "new" in tags and not re.search(r"\d", low):
+        return any(n and re.search(rf"\b{re.escape(n)}\b", low) for n in new_only)
+    return False
+
+
+_IAB_HL_OPEN, _IAB_HL_CLOSE = 0xE000, ""   # private-use characters: never a word, a number or a tag
+
+
+def _iab_mark_text(text, spans):
+    """Wrap (start, end, direction) spans of a plain ability text in private-use marker characters (the
+    trailing full stop stays outside, so the header's meta sentences are still found); _iab_markers_html
+    turns them into coloured spans once the text is html."""
+    for start, end, direction in sorted(spans, reverse=True):
+        while end > start and text[end - 1] in ".,;:":
+            end -= 1
+        opener = chr(_IAB_HL_OPEN + _IAB_TAG_ORDER.index(direction))
+        text = text[:start] + opener + text[start:end] + _IAB_HL_CLOSE + text[end:]
+    return text
+
+
+def _iab_markers_html(html_text):
+    for i, direction in enumerate(_IAB_TAG_ORDER):
+        html_text = html_text.replace(chr(_IAB_HL_OPEN + i), f'<span class="iab-hl iab-hl-{direction}">')
+    return html_text.replace(_IAB_HL_CLOSE, "</span>")
 
 
 def _iab_hint(inner, note):
@@ -1478,21 +1598,32 @@ def render_iab_card(key):
     if key not in _IAB_CARDS:
         return ""
     rows = _iab_pair_rows(*_IAB_CARDS[key])
+    marks = {}                                                # (ability, side) -> [(start, end, direction)]
+    for o, n in rows:
+        if o and n:
+            diff, name = _iab_text_diff(o, n), _iab_ability_key(n)
+            seen = set()
+            for ability, side, i, direction in _IAB_HL.get(key, []):
+                if ability == name and (side, i) not in seen and i < len(diff[side]):
+                    seen.add((side, i))
+                    marks.setdefault((name, side), []).append((*diff[side][i][:2], direction))
 
-    def pane(texts, slots=False):
+    def pane(texts, side, slots=False):
         cards = []
         for t in texts:
             if t is None:
                 cards.append('<div class="iab-none"></div>')    # the other side's ability has no counterpart
                 continue
-            h = _item_ability_html(t) or _html.escape(t)
+            spans = marks.get((_iab_ability_key(t), side), [])
+            h = _item_ability_html(_iab_mark_text(t, spans)) if spans else None
+            h = _iab_markers_html(h) if h else (_item_ability_html(t) or _html.escape(t))
             m = _ITEM_ABILITY_RE.match(t)
             if slots and m and "iab-desc" in h:                 # a slot for a moved (?) note
                 h = iab_attach_tail(h, f"<!--IABNOTE:{key}|{_iab_name(m.group(2).strip())[0].lower()}-->")
             cards.append(f'<div class="iab-card">{h}</div>')
         return "".join(cards)
 
-    right, left = pane([n for _, n in rows], slots=True), pane([o for o, _ in rows])
+    right, left = pane([n for _, n in rows], "new", slots=True), pane([o for o, _ in rows], "old")
     for target, value, direction, note, ability, was in _IAB_MARKS.get(key, []):
         num = re.escape(value)
         if target == "aoe":                                   # a radius: a header value on both sides
@@ -1505,10 +1636,10 @@ def render_iab_card(key):
             right = re.sub(rf'<span class="iab-m">(<img class="iab-ico" src="[^"]*{target}\.png" alt="">)({num})</span>',
                            lambda m: f'<span class="iab-m iab-{direction}">{m.group(1)}{_iab_hint(m.group(2), note)}</span>',
                            right, count=1)
-    arrows = "".join(f'<span class="properties-arrow" style="grid-row:{i}">→</span>'
-                     for i, (o, n) in enumerate(rows, 1) if o is not None and n is not None)
+    # one arrow for the whole card, between the two columns (owner 2026-09-27: not one per ability)
     return (f'<div class="properties-change iab-change" style="grid-template-rows:repeat({len(rows)},auto)">'
-            f'<div class="properties-pane pane-old">{left}</div>{arrows}'
+            f'<div class="properties-pane pane-old">{left}</div>'
+            f'<span class="properties-arrow" style="grid-row:1 / -1">→</span>'
             f'<div class="properties-pane pane-new">{right}</div></div>')
 
 
@@ -1618,7 +1749,11 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         classes.append("ability-row")
     # a number change the abilities card above already shows: hidden, its number coloured in the card
     if (isinstance(text, str) and "iab-covered" not in classes and "item-ability" not in classes
-            and (_State.current_entity_key or "").startswith("item|") and _iab_covered_change(text, dyn_tags, extra)):
+            and (_State.current_entity_key or "").startswith("item|")
+            and (_iab_covered_change(text, dyn_tags, extra, badge)
+                 # the card shows it as text: an ability only one side has, or words a row without numbers
+                 # describes (a row with a note keeps showing it)
+                 or (not extra and (_iab_unpaired_row(text, dyn_tags) or _iab_text_change(text, dyn_tags))))):
         classes.append("iab-covered")
     # a cost row the components card above already shows: hidden, the card gets its % and colours
     if (isinstance(text, str) and "iab-covered" not in classes
@@ -2299,18 +2434,22 @@ def _components_html(old, new, total_old, total_new, recipe_old=None, recipe_new
     marks_new = {name: 'added' for name in (added or [])}
     right = _components_side(new, recipe_new, total_new, marks_new)
     marks = marks or {}
-    if marks.get("recipe") and recipe_new:
-        # the new recipe price, coloured by its direction (cheaper = green)
+    from .badges import b
+    ro, rn = (recipe_old or (None, None))[1], (recipe_new or (None, None))[1]
+    if ro and rn and ro != rn and _is_num(ro) and _is_num(rn):
+        # the new recipe price coloured (cheaper = green), its % on hover under a dotted line (owner 2026-09-27)
         price = '<div class="component-price">'
         i = right.rfind(price)
-        right = right[:i] + f'<div class="component-price cost-{marks["recipe"]}">' + right[i + len(price):]
-    if marks.get("total") or marks.get("note"):
-        cls = f' class="cost-{marks["total"]}"' if marks.get("total") else ""
+        j = right.index("</div>", i)
+        right = (right[:i] + f'<div class="component-price cost-{"buff" if rn < ro else "nerf"}">'
+                 + _iab_hint(right[i + len(price):j], b(ro, rn, l=True)) + right[j:])
+    changed = _is_num(total_old) and _is_num(total_new) and total_old != total_new
+    if changed or marks.get("note"):
+        cls = f' class="cost-{"buff" if total_new < total_old else "nerf"}"' if changed else ""
         right = right.replace(f'= <span>{total_new}</span>',
                               f'= <span{cls}>{_iab_hint(str(total_new), marks.get("note", ""))}</span>', 1)
-    if marks.get("total"):
+    if changed:
         # the total's change at the end of the block, on the change rows' % column (owner 2026-09-27)
-        from .badges import b
         right += f'<span class="components-pct">{b(total_old, total_new, l=True)}</span>'
     return (f'<div class="components-change">'
             f'<div class="components-box components-pane">'
@@ -2319,6 +2458,10 @@ def _components_html(old, new, total_old, total_new, recipe_old=None, recipe_new
             f'<span class="components-arrow">→</span>'
             f'<div class="components-box components-pane">{right}</div>'
             f'</div>')
+
+
+def _is_num(x):
+    return isinstance(x, (int, float)) and not isinstance(x, bool)
 
 
 def render_cost_card(key):

@@ -20,6 +20,38 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "Item ability cards: a text-only change is coloured right in the card (Bloodstone 7.38 \"Dispel Type: Basic Dispel.\"), a changed number shows its % on hover, a removed ability faces a faint dashed frame, one arrow per card",
+      "minor": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "Components card: the recipe price shows its % on hover and the total its % even without a price row (Heaven's Halberd 7.38); thicker gold / red frames on added and removed components",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "Game data fixed: item and hero snapshots of several patches",
+      "fix": true,
+      "items": [
+        "Some patches' game files were copies of the previous patch (7.41 items and heroes were 7.40c)",
+        "Khanda 7.38 card: recipe 500 and total 5100 before the patch, as in the game",
+        "Base-stat hints (\"Now it's …\", \"changed before in …\") fixed on 34 hero pages",
+        "7.41 item weights use the real 7.41 prices"
+      ]
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
+      "title": "Small layout fixes: Orb of Frost 7.38 boxes line up with the other items, no extra line above sub-category strips, Block of Cheese without a card of two identical tooltips",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "Item prices move into the components card: the recipe and total coloured, the total's % at the end of the card; the separate cost row is gone (tag filters still count it)",
       "minor": true
     },

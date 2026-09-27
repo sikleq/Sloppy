@@ -20,7 +20,9 @@ def test_a_cost_row_whose_numbers_the_card_shows_is_hidden_and_the_card_gets_its
         assert el._cost_covered("Recipe cost increased from 600 to 900. Total cost increased from 4700g to 5000g")
         html = el.render_cost_card("item|cost-test|7.41")
         new = html.split("components-arrow")[1]
-        assert 'component-price cost-nerf">900<' in new and 'class="cost-nerf">5000<' in new
+        # the recipe: coloured, its % (+50%) on hover under a dotted line; the total: coloured, % at the end
+        assert 'component-price cost-nerf"><span class="iab-hint' in new and "+50%" in new and ">900</span>" in new
+        assert 'class="cost-nerf">5000<' in new
         assert 'class="components-pct"' in new and "+6%" in new
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.cost_card = saved

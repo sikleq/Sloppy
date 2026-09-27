@@ -289,6 +289,9 @@ body.patch-page .entity-block.first-visible {
    rule so there's no orphan separator between the label and first entry). */
 body.patch-page .entity-block.label-only {
   padding-bottom: 0;
+  /* the sub-category strip is its own coloured band now: the hairline above it was one line too many
+     (owner 2026-09-27, 7.38 "List of Neutral Enchantments") */
+  border-top: 0;
 }
 body.patch-page .entity-block.label-only + .entity-block {
   border-top: 0;
@@ -3343,16 +3346,18 @@ h4.subgroup .subgroup-new-type {
   opacity: 0.85;
   padding: 0 2px;
 }
+/* added (gold) / removed (red) components: a 3px frame that reads at a glance (owner 2026-09-27: 1.5px was
+   barely visible); padding shrinks by the same amount so the chip keeps its size */
 .component.component-added {
-  border: 1.5px solid rgba(218, 165, 32, 0.85);
+  border: 3px solid rgba(226, 178, 52, 0.95);
   border-radius: 6px;
-  padding: 2px;
-  box-shadow: 0 0 6px rgba(218, 165, 32, 0.25);
+  padding: 0.5px;
+  box-shadow: 0 0 8px rgba(218, 165, 32, 0.35);
 }
 .component.component-removed {
-  border: 1.5px solid rgba(220, 80, 80, 0.55);
+  border: 3px solid rgba(226, 88, 88, 0.85);
   border-radius: 6px;
-  padding: 2px;
+  padding: 0.5px;
   opacity: 0.85;
 }
 
@@ -3798,6 +3803,12 @@ h4.subgroup .subgroup-new-type {
    Battle Fury 7.38: -23% in the card vs -14% in the row) */
 body.patch-page .entity-block > .components-change,
 body.patch-page .entity-block > .properties-change { margin-left: -15px; margin-right: -15px; }
+/* a new item's cost box and a full-width item ability box (no chip column) hang the same way, so every
+   item box starts on one line (owner 2026-09-27: Orb of Frost 7.38 sat 15px right of Block of Cheese
+   and Orb of Venom) */
+body.patch-page .entity-block > .item-cost-box,
+body.patch-page .entity-block.is-new ul.changes li.item-ability,
+body.patch-page ul.changes li.item-ability:not(.ability-box-tagged) { margin-left: -15px; margin-right: -15px; }
 .properties-change .pane-old { grid-column: 1; }
 .properties-change .pane-new { grid-column: 3; }
 .properties-change .properties-arrow {
@@ -10875,6 +10886,18 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .properties-change.iab-change .properties-pane { display: grid; grid-template-columns: 1fr; grid-template-rows: subgrid;
   grid-row: 1 / -1; row-gap: 8px; padding: 0; background: none; border: 0; align-items: stretch; }
 .properties-change.iab-change .properties-arrow { align-self: center; }
+/* the empty place opposite an ability only one side has: a barely visible dashed frame (owner 2026-09-27) */
+.iab-none { border: 1px dashed rgba(150, 146, 137, 0.22); border-radius: 6px; }
+/* card text a hidden row without numbers describes, in its tag's colour (Bloodpact 7.38 "Dispel Type: Basic
+   Dispel." gold = NEW); the % of a changed number sits in its hover tip */
+.iab-hl-new { color: #e0bd62; }
+.iab-hl-buff { color: #7fd08c; }
+.iab-hl-nerf { color: #e3806e; }
+.iab-hl-del { color: #d98aa6; }
+.iab-hl-rework, .iab-hl-swap { color: #b99ae6; }
+.iab-hl-qol, .iab-hl-misc { color: var(--text-dimmer); }
+.iab-hl .iab-num { color: inherit; }          /* a number inside the coloured phrase takes its colour */
+.iab-tip-pct .badge-group { display: inline-flex; }
 .iab-card { background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px; padding: 6px 12px; }
 .iab-card .iab-desc { line-height: 1.45; }
 /* Tagged item-ability box: the chip's top edge on the header's top edge (owner 2026-09-27) */
