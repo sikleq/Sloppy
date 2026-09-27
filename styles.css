@@ -10845,3 +10845,18 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 /* Item before/after card: stats the patch did not change (patch/elements.py _prop_layout) — shown on
    both sides, a step dimmer so the eye goes to the changes */
 .properties-change .property-text.property-same { color: var(--text-dim); }
+/* Item ability row as a small game-tooltip card (patch/elements.py _item_ability_html, owner 2026-09-27):
+   a low header strip — "Active: Name" left, cast range / mana / health cost / cooldown right with the
+   game's own icons — then the description with every number bold and a step brighter. */
+ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
+.iab-head { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin: -6px -12px 5px; padding: 2px 12px; min-height: 22px; box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.035); border-bottom: 1px solid var(--line-soft);
+  border-radius: 6px 6px 0 0; line-height: 18px; }
+.iab-name { color: var(--text-bright); font-weight: 600; }
+.iab-meta { display: flex; align-items: center; gap: 12px; flex: none; font-weight: 600;
+  color: var(--text-bright); font-variant-numeric: tabular-nums; }
+.iab-m { display: inline-flex; align-items: center; gap: 4px; }
+.iab-ico { width: 13px; height: 13px; border-radius: 2px; display: block; }
+.iab-desc { display: block; }
+.iab-num { font-weight: 700; color: var(--text-bright); }

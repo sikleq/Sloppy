@@ -1222,6 +1222,69 @@ def _prop_row_text(o, nw):
     return nt or ot
 
 
+# ---- An item's ability described in a row: a light header like the game's item tooltip ----
+# Owner 2026-09-27: "Active: Bottoms Up. Restores 60 Mana ... Cast Range: 650. No Mana Cost. Cooldown: 40s"
+# -> header [Active: Bottoms Up ....... (range) 650  (cooldown) 40], the description below with every
+# number bold and a bit brighter. Icons are the game's own (pak01 panorama/images/status_icons/
+# ability_*_icon_psd -> icons/ui/ability/*.png). Only an item's description rows (no change tag / NEW).
+_ITEM_ABILITY_RE = re.compile(r'^\s*(Passive|Active|Toggle|Aura|Ability|Use)\s*:\s*(.*)$', re.S)
+_IAB_N = r"\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*"
+_IAB_META = (  # (key, icon, pattern of a whole sentence) — header order = game order: range, cost, cooldown
+    ("castrange", "castrange", rf"Cast Range\s*:?\s*({_IAB_N})"),
+    ("manacost", "manacost", rf"Mana Cost\s*:?\s*({_IAB_N}%?)"),
+    ("healthcost", "healthcost", rf"Health Cost\s*:?\s*({_IAB_N}%?)"),
+    ("cooldown", "cooldown", rf"(?:Cooldown\s*:?\s*({_IAB_N})s?|({_IAB_N})s\s+Cooldown)"),
+)
+_IAB_DROP = r"No Mana Cost|No Cooldown"
+_IAB_SMALL = {"of", "the", "a", "an", "and", "to", "in", "on", "for", "with", "from"}
+_IAB_NUM_RE = re.compile(r"(?<![\w#&.])([+\-]?\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*%?s?)(?![\w%])")
+ABILITY_ICON_DIR = "../icons/ui/ability/"
+
+
+def _iab_name(body):
+    """("Bottoms Up", rest) when the body starts with an ability name sentence, else ("", body)."""
+    m = re.match(r"^(.{1,40}?)([.!])\s+(?=[A-Z0-9+\-])(.*)$", body, re.S)
+    if not m:
+        return "", body
+    words = m.group(1).replace(",", " ").split()
+    if not words or len(words) > 5 or not all(w[:1].isupper() or w.lower() in _IAB_SMALL for w in words):
+        return "", body
+    name = m.group(1) + ("!" if m.group(2) == "!" else "")
+    return name, m.group(3)
+
+
+def _iab_bold_numbers(html_text):
+    """Every number outside tags / tooltip markers -> <b class="iab-num">."""
+    out = []
+    for part in re.split(r"(<!--TIP-->.*?<!--/TIP-->|<[^>]+>)", html_text, flags=re.S):
+        if part.startswith("<"):
+            out.append(part)
+        else:
+            out.append(_IAB_NUM_RE.sub(r'<b class="iab-num">\1</b>', part))
+    return "".join(out)
+
+
+def _item_ability_html(text):
+    """The header + description html of an item ability row, or None when the text doesn't fit."""
+    m = _ITEM_ABILITY_RE.match(text)
+    if not m or "<!--" in text or "<div" in text:
+        return None
+    kind, body = m.group(1), m.group(2).strip()
+    name, desc = _iab_name(body)
+    meta = []
+    for key, icon, pat in _IAB_META:
+        mm = re.search(rf"(?:^|(?<=[.!]))\s*(?:{pat})\s*\.?\s*(?=$|[A-Z])", desc)
+        if mm:
+            val = next(g for g in mm.groups() if g)
+            meta.append(f'<span class="iab-m"><img class="iab-ico" src="{ABILITY_ICON_DIR}{icon}.png" alt="">{val}</span>')
+            desc = (desc[:mm.start()] + " " + desc[mm.end():]).strip()
+    desc = re.sub(rf"(?:^|(?<=[.!]))\s*(?:{_IAB_DROP})\s*\.?", " ", desc).strip()
+    desc = re.sub(r"\s{2,}", " ", desc).strip()
+    title = f'<b class="iab-kind">{kind}:</b>' + (f' <span class="iab-name">{name}</span>' if name else "")
+    head = f'<span class="iab-head"><span class="iab-title">{title}</span><span class="iab-meta">{"".join(meta)}</span></span>'
+    return head + (f'<span class="iab-desc">{_iab_bold_numbers(desc)}</span>' if desc else "")
+
+
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None):
     if isinstance(text, str):
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
@@ -1312,8 +1375,14 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             marker = f'<span class="aghanim-marker {_aghs}"></span>'
     if isinstance(text, str) and re.match(r'^\s*(Passive|Active|Toggle|Aura|Ability)\s*:', text):
         classes.append("ability-row")
-        text = re.sub(r'^(\s*)(Passive|Active|Toggle|Aura|Ability)(\s*:)',
-                      r'\1<b>\2\3</b>', text)
+        _card = (_item_ability_html(text) if (_State.current_entity_key or "").startswith("item|")
+                 and dyn_tags <= {"new"} else None)
+        if _card:
+            classes.append("item-ability")
+            text = _card
+        else:
+            text = re.sub(r'^(\s*)(Passive|Active|Toggle|Aura|Ability)(\s*:)',
+                          r'\1<b>\2\3</b>', text)
     elif ability_row:
         classes.append("ability-row")
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""

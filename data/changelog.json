@@ -4,6 +4,12 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "Item abilities read like the game's tooltip: a header with range, mana cost and cooldown icons, numbers in bold",
+      "minor": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "7.38: 17 neutral items that became artifacts show \"Now a Tier N Artifact\" in the header and their abilities as rows",
       "minor": true,
       "fix": true
