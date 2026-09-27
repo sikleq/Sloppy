@@ -21,8 +21,8 @@ def build():
     W(section("Item Updates"))
 
     W(item_header("Blade Mail"))
+    W(properties_change(old=[("NERF", "+18 Damage")], new=[("", "+15 Damage", b(18, 15))]))
     W(ul_open())
-    W(li("Damage bonus decreased from +18 to +15", b(18, 15)))
     W(li_formula(
         "Damage Return passive attack damage returned decreased",
         "20 + 20% attack damage", "10 + 15% attack damage",
@@ -35,14 +35,10 @@ def build():
     W(ul_close())
 
     W(item_header("Dragon Lance"))
-    W(ul_open())
-    W(li("Attack Range bonus decreased from +150 to +140", b(150, 140)))
-    W(ul_close())
+    W(properties_change(old=[("NERF", "+150 Attack Range")], new=[("", "+140 Attack Range", b(150, 140))]))
 
     W(item_header("Hurricane Pike"))
-    W(ul_open())
-    W(li("Attack Range bonus decreased from +150 to +140", b(150, 140)))
-    W(ul_close())
+    W(properties_change(old=[("NERF", "+150 Attack Range")], new=[("", "+140 Attack Range", b(150, 140))]))
 
     W(item_header("Glimmer Cape"))
     W(ul_open())
@@ -74,10 +70,7 @@ def build():
     W(ul_close())
 
     W(item_header("Octarine Core"))
-    W(ul_open())
-    W(li("Health bonus decreased from +500 to +450", b(500, 450)))
-    W(li("Mana bonus decreased from +500 to +450", b(500, 450)))
-    W(ul_close())
+    W(properties_change(old=[("NERF", "+500 Health"), ("NERF", "+500 Mana")], new=[("", "+450 Health", b(500, 450)), ("", "+450 Mana", b(500, 450))]))
 
     W(item_header("Pavise"))
     W(ul_open())
@@ -95,14 +88,10 @@ def build():
     W(ul_close())
 
     W(item_header("Witch Blade"))
-    W(ul_open())
-    W(li("Armor bonus decreased from +6 to +5", b(6, 5)))
-    W(ul_close())
+    W(properties_change(old=[("NERF", "+6 Armor")], new=[("", "+5 Armor", b(6, 5))]))
 
     W(item_header("Parasma"))
-    W(ul_open())
-    W(li("Armor bonus decreased from +8 to +7", b(8, 7)))
-    W(ul_close())
+    W(properties_change(old=[("NERF", "+8 Armor")], new=[("", "+7 Armor", b(8, 7))]))
 
     # ===== NEUTRAL ITEM UPDATES =====
     W(section("Neutral Item Updates"))

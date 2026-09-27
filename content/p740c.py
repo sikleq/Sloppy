@@ -12,10 +12,7 @@ def build():
     W(ul_close())
 
     W(item_header("Phylactery"))
-    W(ul_open())
-    W(li("All Attributes bonus decreased from 7 to 6", b(7, 6)))
-    W(li("Mana Regen decreased from 2.5 to 2.25", b(2.5, 2.25)))
-    W(ul_close())
+    W(properties_change(old=[("NERF", "+7 All Attributes"), ("NERF", "+2.5 Mana Regen")], new=[("", "+6 All Attributes", b(7, 6)), ("", "+2.25 Mana Regen", b(2.5, 2.25))]))
 
     # ===== HERO UPDATES =====
     W(section("Hero Updates"))

@@ -1575,8 +1575,9 @@ def _postprocess_properties_change(lines):
     i = 0
     while i < len(lines):
         line = lines[i]
-        # Find item_header( ... changed=True) start
-        m_hdr = re.match(r'W\(item_header\("([^"]+)"[^)]*changed=True[^)]*\)\)', line)
+        # Any item header except a new / returning item (owner 2026-09-27, Bloodstone 7.38: "No longer
+        # provides +75 AoE radius" stayed a row because only changed=True items got the stats card)
+        m_hdr = re.match(r'W\(item_header\("([^"]+)"(?![^)]*new=)[^)]*\)\)', line)
         if not m_hdr:
             out.append(line)
             i += 1
@@ -2687,6 +2688,17 @@ def _build_prev_hero_abils(version):
     return result
 
 
+def _drop_empty_ul(lines):
+    """W(ul_open()) right before W(ul_close()) — every row of the block moved into a card — is dropped."""
+    out = []
+    for ln in lines:
+        if ln.strip() == "W(ul_close())" and out and out[-1].strip() == "W(ul_open())":
+            out.pop()
+            continue
+        out.append(ln)
+    return out
+
+
 def _postprocess_item_ability_cards(lines, version):
     """Owner 2026-09-27: an item whose ability changed gets its abilities before -> after card
     (item_abilities_change) from the game's tooltips of both patches. Needs the local tooltip history
@@ -2774,6 +2786,7 @@ def generate(version):
     out = _postprocess_properties_change(out)
     out = _postprocess_unstated_total_cost(out)
     out = _postprocess_item_ability_cards(out, version)
+    out = _drop_empty_ul(out)
     out = _postprocess_innate_rows_out_of_stats(out)
     out = _postprocess_stack_note_into_ability(out)
     out = _postprocess_drop_now_requires(out)

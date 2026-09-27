@@ -4,6 +4,13 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
+      "title": "Every item whose stats changed shows the before / after stats card (75 more items, e.g. Bloodstone 7.38)",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-27",
+      "category": "Patch Reader",
       "title": "Item ability cards: changed numbers coloured in the card, the repeating rows are gone (tag filters still see them)",
       "minor": true
     },

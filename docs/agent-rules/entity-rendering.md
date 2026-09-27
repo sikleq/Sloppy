@@ -208,3 +208,9 @@ bonus damage increased from 150 to 250», «Poison Attack now has a 9s cooldown�
 считаются как раньше. Карточка рисуется при сохранении страницы (`<!--IABCARD:key-->` → `render_iab_card`), когда
 все строки под ней уже отметили свои числа. Видны остаются строки, которых нет в карточке: цена, «no longer …»,
 «Removed … ability», механика словами.
+
+Карточка характеристик — у ЛЮБОГО изменённого предмета (2026-09-27, Bloodstone 7.38 «No longer provides +75 AoE
+radius»): раньше генератор делал её только для `changed=True`. Теперь `_postprocess_properties_change` берёт
+любой `item_header` без `new=`; строки «No longer provides / Now also provides / X bonus increased from A to B»
+уходят в карточку (веса те же — строки карточки считаются так же). Пустые `ul_open/ul_close` убираются
+(`_drop_empty_ul`). Проставлено в 75 предметах 7.38–7.41f.
