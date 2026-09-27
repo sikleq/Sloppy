@@ -1341,27 +1341,84 @@ def item_abilities_change(old, new):
     stats card, each ability in the game-tooltip style (_item_ability_html). `old` / `new` are lists of
     one-line ability texts ("Passive: Empower Spell. The next ... Cooldown: 6s"); the old ones are the
     game's tooltips of the previous patch (d2vpkr), never invented. The card is not scored — the tagged
-    rows under it keep the weights."""
+    rows under it keep the weights. It is drawn when the page is saved (render_iab_card), after the rows
+    under it have marked the numbers they change."""
+    names = set()
+    for t in new:
+        m = _ITEM_ABILITY_RE.match(t)
+        if m:
+            names.add(_iab_name(m.group(2).strip())[0].lower())
+    key = f"{_State.current_entity_key}|{_State.current_patch_version}"
+    _IAB_CARDS[key] = (list(old), list(new))
+    _State.iab_card = {"ek": _State.current_entity_key, "pv": _State.current_patch_version, "names": names,
+                       "old": " ".join(old), "new": " ".join(new), "key": key}
+    return f"<!--IABCARD:{key}-->"
+
+
+_IAB_CARDS = {}           # "<ek>|<pv>" -> (old texts, new texts)
+_IAB_MARKS = {}           # "<ek>|<pv>" -> [(target, value, direction)] from the hidden rows under the card
+_IAB_META_WORDS = {"cooldown": "cooldown", "mana cost": "manacost", "cast range": "castrange", "health cost": "healthcost"}
+_IAB_FROMTO_RE = re.compile(r"from\s+[+\-]?(\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*)\S*\s+to\s+[+\-]?(\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*)", re.I)
+_IAB_NOWHAS_RE = re.compile(r"now has an?\s+(\d+(?:\.\d+)?)s?\s+(cooldown|mana cost)", re.I)
+
+
+def _iab_has(num, text):
+    return re.search(rf"(?<![\d./]){re.escape(num)}(?![\d/]|\.\d)", text) is not None
+
+
+def _iab_covered_change(text, tags):
+    """A numeric change row whose old and new values are both in the card (owner 2026-09-27: "don't
+    repeat what the card shows"): records which number of the new side to colour and returns True."""
+    card = getattr(_State, "iab_card", None)
+    if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
+        return False
+    plain = re.sub(r"<[^>]+>", " ", text)
+    direction = "buff" if "buff" in tags else "nerf" if "nerf" in tags else "new" if "new" in tags else ""
+    if not direction:
+        return False
+    low = plain.lower()
+    target = next((v for k, v in _IAB_META_WORDS.items() if k in low), "num")
+    m = _IAB_FROMTO_RE.search(plain)
+    if m and _iab_has(m.group(2), card["new"]) and _iab_has(m.group(1), card["old"]):
+        _IAB_MARKS.setdefault(card["key"], []).append((target, m.group(2), direction))
+        return True
+    m = _IAB_NOWHAS_RE.search(plain)
+    if m and _iab_has(m.group(1), card["new"]):
+        _IAB_MARKS.setdefault(card["key"], []).append((_IAB_META_WORDS[m.group(2).lower()], m.group(1), direction))
+        return True
+    return False
+
+
+def render_iab_card(key):
+    """The abilities card html (page.save_html fills <!--IABCARD:key-->): both panes, the numbers the
+    hidden rows change coloured by their tag (green better / red worse / gold new)."""
+    if key not in _IAB_CARDS:
+        return ""
+    old, new = _IAB_CARDS[key]
+
     def pane(texts, slots=False):
         cards = []
         for t in texts:
             h = _item_ability_html(t) or _html.escape(t)
             m = _ITEM_ABILITY_RE.match(t)
             if slots and m and "iab-desc" in h:                 # a slot for a moved (?) note
-                key = f"{_State.current_entity_key}|{_State.current_patch_version}|{_iab_name(m.group(2).strip())[0].lower()}"
-                h = iab_attach_tail(h, f"<!--IABNOTE:{key}-->")
+                h = iab_attach_tail(h, f"<!--IABNOTE:{key}|{_iab_name(m.group(2).strip())[0].lower()}-->")
             cards.append(f'<div class="iab-card">{h}</div>')
         return "".join(cards)
-    names = set()
-    for t in new:
-        m = _ITEM_ABILITY_RE.match(t)
-        if m:
-            names.add(_iab_name(m.group(2).strip())[0].lower())
-    _State.iab_card = {"ek": _State.current_entity_key, "pv": _State.current_patch_version, "names": names}
+
+    right = pane(new, slots=True)
+    for target, value, direction in _IAB_MARKS.get(key, []):
+        num = re.escape(value)
+        if target == "num":
+            right = re.sub(rf'<b class="iab-num">([+\-]?{num}(?:%|s)?)</b>',
+                           rf'<b class="iab-num iab-{direction}">\1</b>', right, count=1)
+        else:
+            right = re.sub(rf'<span class="iab-m">(<img class="iab-ico" src="[^"]*{target}\.png" alt="">{num})</span>',
+                           rf'<span class="iab-m iab-{direction}">\1</span>', right, count=1)
     return ('<div class="properties-change iab-change">'
             f'<div class="properties-pane pane-old">{pane(old)}</div>'
             '<span class="properties-arrow">→</span>'
-            f'<div class="properties-pane pane-new">{pane(new, slots=True)}</div></div>')
+            f'<div class="properties-pane pane-new">{right}</div></div>')
 
 
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None):
@@ -1457,8 +1514,10 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         _card = (_item_ability_html(text) if (_State.current_entity_key or "").startswith("item|")
                  and dyn_tags <= {"new", "rework"} else None)
         if _card and _iab_shown_in_card(text, extra):
-            return ""                       # scored above; its full text is the card's right pane already
-        if _card:
+            # its full text is the card's right pane already: kept hidden (scored above, tag counted by filters)
+            classes.remove("ability-row")
+            classes.append("iab-covered")
+        elif _card:
             classes.append("item-ability")
             text = _card
         else:
@@ -1466,6 +1525,10 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
                           r'\1<b>\2\3</b>', text)
     elif ability_row:
         classes.append("ability-row")
+    # a number change the abilities card above already shows: hidden, its number coloured in the card
+    if (isinstance(text, str) and "iab-covered" not in classes and "item-ability" not in classes
+            and (_State.current_entity_key or "").startswith("item|") and _iab_covered_change(text, dyn_tags)):
+        classes.append("iab-covered")
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""
     attr = f' data-tag="{tag_str}"' if tag_str else ""
     trailing_tips = []

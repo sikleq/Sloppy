@@ -24,9 +24,22 @@ def test_a_description_without_a_name_keeps_its_first_sentence():
 
 
 def test_item_abilities_change_puts_each_ability_in_a_card_on_its_side():
-    html = el.item_abilities_change(
-        old=["Passive: Empower Spell. Deals 150 bonus damage. Cooldown: 6s", "Passive: Critical Strike. 30% chance"],
-        new=["Passive: Empower Spell. Deals 250 bonus damage. Cooldown: 12s"])
-    old, new = html.split('pane-new')
-    assert old.count('class="iab-card"') == 2 and new.count('class="iab-card"') == 1
-    assert ">6<" in old and ">12<" in new
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _State.current_entity_key, _State.current_patch_version = "item|khanda-test", "7.38"
+        slot = el.item_abilities_change(
+            old=["Passive: Empower Spell. Deals 150 bonus damage. Cooldown: 6s", "Passive: Critical Strike. 30% chance"],
+            new=["Passive: Empower Spell. Deals 250 bonus damage. Cooldown: 12s"])
+        assert slot == "<!--IABCARD:item|khanda-test|7.38-->"          # drawn when the page is saved
+        # rows under the card that it already shows: hidden, their numbers coloured
+        assert el._iab_covered_change("Empower Spell bonus damage increased from 150 to 250", {"buff"})
+        assert el._iab_covered_change("Empower Spell cooldown increased from 6s to 12s", {"nerf"})
+        assert not el._iab_covered_change("Recipe cost increased from 500 to 1500", {"nerf"})
+        html = el.render_iab_card("item|khanda-test|7.38")
+        old, new = html.split('pane-new')
+        assert old.count('class="iab-card"') == 2 and new.count('class="iab-card"') == 1
+        assert ">6<" in old and '<b class="iab-num iab-buff">250</b>' in new
+        assert 'class="iab-m iab-nerf"' in new and "cooldown.png" in new
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved

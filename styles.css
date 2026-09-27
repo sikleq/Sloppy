@@ -10877,3 +10877,10 @@ ul.changes li.ability-row-solo, ul.changes li.ability-row-end { margin-bottom: 8
 .iab-meta { font-family: 'Radiance', 'Segoe UI', Arial, sans-serif; font-weight: 700;
   font-variant-numeric: proportional-nums; letter-spacing: 0; }
 .iab-m { gap: 3px; }
+/* Rows the abilities card already shows (_iab_covered_change / duplicate descriptions): kept in the page,
+   hidden, so tag filters and counts still see their tags (owner 2026-09-27) */
+ul.changes li.iab-covered { display: none !important; }
+/* the numbers those rows change, coloured by the row's tag */
+.iab-num.iab-buff, .iab-m.iab-buff { color: #7fd08c; }
+.iab-num.iab-nerf, .iab-m.iab-nerf { color: #e3806e; }
+.iab-num.iab-new, .iab-m.iab-new { color: #e0bd62; }

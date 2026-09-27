@@ -432,7 +432,8 @@ def save_html(filename):
     # row by li() (e.g. used outside an `extra=`) ships without its markers —
     # the (i) bubble still renders in place; only the comments are stripped.
     # (?) notes of hidden duplicate item-ability rows, moved into the abilities card (elements._IAB_NOTES)
-    from .elements import _IAB_NOTES
+    from .elements import _IAB_NOTES, render_iab_card
+    out = re.sub(r'<!--IABCARD:(.*?)-->', lambda m: render_iab_card(m.group(1)), out)
     out = re.sub(r'<!--IABNOTE:(.*?)-->', lambda m: _IAB_NOTES.get(m.group(1), ''), out)
     out = out.replace('<!--INLINETIP-->', '').replace('<!--/INLINETIP-->', '')
     out = out.replace('<!--TIP-->', '').replace('<!--/TIP-->', '')
