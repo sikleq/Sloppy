@@ -82,6 +82,13 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     # Centaur's Aghanim's Scepter ability (7.41f row). In abilities_slim.json as "Hitch A Ride"
     # (KV centaur_mount); Valve's live herodata does not list it (audit-live 2026-09-17).
     ("Centaur Warrunner", "centaur_mount"),
+    # 7.38 innates shown as the old side of later replacements (content/p738.py, commit 28a6ea6c); all in
+    # abilities_slim.json with is_innate=True, gone from live herodata (audit-live 2026-09-27)
+    ("Meepo", "meepo_sticky_fingers"),
+    ("Mirana", "mirana_selemenes_faithful"),
+    ("Winter Wyvern", "winter_wyvern_eldwurm_scholar"),
+    ("Keeper of the Light", "keeper_of_the_light_special_reserve"),
+    ("Lone Druid", "lone_druid_gift_bearer"),
 }
 
 KNOWN_DISPLAY_NAME_OVERRIDES = {
