@@ -628,10 +628,11 @@ _HS_GAIN_VALVE_RE = re.compile(r"damage gain per level \w+ from \+?([\d.]+) to \
 _HS_DMG_VALVE_RE = re.compile(r"damage at level (1|30) \w+ by \d+ \(from (\d+)-(\d+) to (\d+)-(\d+)\)", re.I)
 
 
-def hero_stat_card(before=None):
+def hero_stat_card(before=None, tag=None):
     """Called right after the GENERAL ul_open() of a hero block. `before` = the patch compared against (the
-    previous one by default). Drawn when the page is saved (render_hs_card), after the rows under it have
-    been matched: they are hidden, their tags go on the card for the filters."""
+    previous one by default); `tag` = the row's chip when the owner set it (else the site's rule for a change
+    by level). Drawn when the page is saved (render_hs_card), after the rows under it have been matched: they
+    are hidden, their tags go on the row for the filters."""
     from .hero_stats import attrs_changed
     from .weights import _prev_version
     ek, pv, hero = _State.current_entity_key or "", _State.current_patch_version, _State.current_hero
@@ -639,7 +640,7 @@ def hero_stat_card(before=None):
     if not (ek.startswith("hero|") and pv and hero and before and attrs_changed(hero, before, pv)):
         return ""
     key = f"{ek}|{pv}"
-    _HS_CARDS[key] = {"hero": hero, "before": before, "after": pv, "tags": set(), "valve": {}}
+    _HS_CARDS[key] = {"hero": hero, "before": before, "after": pv, "tags": set(), "valve": {}, "tag": tag}
     _State.hs_card = {"ek": ek, "pv": pv, "key": key}
     return f"<!--HSCARD:{key}-->"
 
@@ -668,16 +669,19 @@ def _hs_covered(text, tags):
 
 
 def _hs_damage_cells(rec, old, new):
-    """[(level, old (min, max), new (min, max))] for levels 1, 5, ..., 30; level 1 = Valve's own figure."""
+    """[(level, old (min, max), new (min, max))] for levels 1, 5, ..., 30. Level 30 counts all 7 Attribute
+    Bonus levels, as Valve's notes do (owner 2026-09-28: "match Valve"); levels 1 and 30 are Valve's own
+    figures when the notes state them, the rest the hero's own growth from the game files."""
     from .hero_stats import damage_at
     out = []
     for L in _HS_LEVELS:
-        valve = rec["valve"].get(1) if L == 1 else None
+        bonus = L == _HS_LEVELS[-1]
+        valve = rec["valve"].get(L) if L in (1, 30) else None
         if valve:
             o, n = valve
         else:
-            o = tuple(int(x + 1e-9) for x in damage_at(old, rec["before"], L))
-            n = tuple(int(x + 1e-9) for x in damage_at(new, rec["after"], L))
+            o = tuple(int(x + 1e-9) for x in damage_at(old, rec["before"], L, bonus=bonus))
+            n = tuple(int(x + 1e-9) for x in damage_at(new, rec["after"], L, bonus=bonus))
         out.append((L, o, n))
     return out
 
@@ -694,47 +698,38 @@ def _hs_table(fid, head, row_o, row_n, row_p, rec):
 
 
 def render_hs_card(key):
-    """ONE row in place of the hero's damage rows (owner 2026-09-28): "Starting damage and damage gain per level
-    rescaled", each term a formula trigger with its own table by level — the damage at levels 1 … 30, and the
-    damage the levels added by 5 … 30 (the first column: per level); start / end % of the damage; what damage
-    is made of (damage per attribute, base damage) in the (?). The attribute rows stay rows."""
+    """ONE row in place of the hero's damage rows (owner 2026-09-28): "Starting damage rescaled from 40–50 to
+    50–60 and damage gain per level from 3.6 to 2.7" — "Starting damage" opens the damage at levels 1 … 30 (level
+    30 with all Attribute Bonus levels, as Valve counts it); start / end % of that damage; what damage is made of
+    (damage per attribute, base damage) in the (?). The attribute rows stay rows."""
     from .badges import b
-    from .hero_stats import hero_stats, universal_multiplier
+    from .hero_stats import damage_at, hero_stats, universal_multiplier
     rec = _HS_CARDS.get(key)
     if not rec:
         return ""
     old, new = hero_stats(rec["hero"], rec["before"]), hero_stats(rec["hero"], rec["after"])
     avg = lambda p: (p[0] + p[1]) / 2
     cells = _hs_damage_cells(rec, old, new)
-    # starting damage: the damage at every level
     pcts = [b(avg(o), avg(n)) for _, o, n in cells]
-    overall_badge = b([avg(o) for _, o, _ in cells], [avg(n) for _, _, n in cells])   # the site's own rule
-    overall = re.search(r'data-overall="(\w+)"', overall_badge)
-    overall = overall.group(1) if overall and overall.group(1) in ("buff", "nerf") else "misc"
-    _HS_TABLE_ID[0] += 1
-    f1, f2 = f"hsf{_HS_TABLE_ID[0]}a", f"hsf{_HS_TABLE_ID[0]}b"
-    t1 = _hs_table(f1, "".join(f"<th>{L}</th>" for L, _, _ in cells),
-                   "".join(f"<td>{o[0]}–{o[1]}</td>" for _, o, _ in cells),
-                   "".join(f"<td>{n[0]}–{n[1]}</td>" for _, _, n in cells),
-                   "".join(f"<td>{_hs_inner(p)}</td>" for p in pcts), rec)
-    # damage gain per level: per level, then what the levels added by 5 … 30
-    # Valve's own per-level figures when the notes state them, else the game files' rounded to 0.1 — and the
-    # columns from those, so the table agrees with itself (3.6 -> 2.7 is -25% in every column)
-    from .hero_stats import damage_at
+    overall = rec.get("tag")
+    if overall not in ("buff", "nerf", "misc", "rework"):
+        rule = re.search(r'data-overall="(\w+)"', b([avg(o) for _, o, _ in cells], [avg(n) for _, _, n in cells]))
+        overall = rule.group(1) if rule and rule.group(1) in ("buff", "nerf") else "misc"
+    # Valve's own per-level figures when the notes state them, else the game files' rounded to 0.1
     model = lambda st, ver: round(damage_at(st, ver, 2)[0] - damage_at(st, ver, 1)[0], 1)
     per_o, per_n = rec["valve"].get("gain") or (model(old, rec["before"]), model(new, rec["after"]))
-    gains = [(L, per_o * (L - 1), per_n * (L - 1)) for L in _HS_LEVELS[1:]]
-    head2 = '<th>per level</th>' + "".join(f"<th>{L}</th>" for L, _, _ in gains)
-    t2 = _hs_table(f2, head2,
-                   f"<td>{per_o:.1f}</td>" + "".join(f"<td>+{o:.0f}</td>" for _, o, _ in gains),
-                   f"<td>{per_n:.1f}</td>" + "".join(f"<td>+{n:.0f}</td>" for _, _, n in gains),
-                   f"<td>{_hs_inner(b(per_o, per_n))}</td>"
-                   + "".join(f"<td>{_hs_inner(b(o, n))}</td>" for _, o, n in gains), rec)
+    _HS_TABLE_ID[0] += 1
+    fid = f"hsf{_HS_TABLE_ID[0]}"
+    table = _hs_table(fid, "".join(f"<th>{L}</th>" for L, _, _ in cells),
+                      "".join(f"<td>{o[0]}–{o[1]}</td>" for _, o, _ in cells),
+                      "".join(f"<td>{n[0]}–{n[1]}</td>" for _, _, n in cells),
+                      "".join(f"<td>{_hs_inner(p)}</td>" for p in pcts), rec)
     badge = (f'<span class="badge-group" data-overall="{overall}">{_hs_inner(pcts[0])}'
              f'<span class="formula-endpoint-label">start</span>{_hs_inner(pcts[-1])}'
              f'<span class="formula-endpoint-label">end</span></span>')
     chip = {"buff": '<span class="badge buff-text" data-tag="buff" data-overall="buff">BUFF</span>',
             "nerf": '<span class="badge nerf-text" data-tag="nerf" data-overall="nerf">NERF</span>',
+            "rework": '<span class="badge rework" data-tag="rework">REWORK</span>',
             "misc": '<span class="badge misc" data-tag="misc">MISC</span>'}[overall]
     notes = []
     if "all" in (old["primary"], new["primary"]):
@@ -745,12 +740,14 @@ def render_hs_card(key):
     if (old["dmg_min"], old["dmg_max"]) != (new["dmg_min"], new["dmg_max"]):
         notes.append(f'Base damage {old["dmg_min"]:g}–{old["dmg_max"]:g} → {new["dmg_min"]:g}–{new["dmg_max"]:g}'
                      + (" makes up for it" if notes else ""))
-    tip = f'<span class="li-tail">{info_tip(*notes)}</span>' if notes else ""
+    notes.append("Level 30 counts all 7 Attribute Bonus levels (+14 to every attribute), as Valve does")
+    tip = f'<span class="li-tail">{info_tip(*notes)}</span>'
     tags = " ".join(sorted(rec["tags"] | {overall}))
-    text = (f'<span class="formula-trigger" data-formula="{f1}">Starting damage</span> and '
-            f'<span class="formula-trigger" data-formula="{f2}">damage gain per level</span> rescaled{tip}')
+    (o1, n1) = cells[0][1], cells[0][2]
+    text = (f'<span class="formula-trigger" data-formula="{fid}">Starting damage</span> rescaled from '
+            f'{o1[0]}–{o1[1]} to {n1[0]}–{n1[1]} and damage gain per level from {per_o:g} to {per_n:g}{tip}')
     return (f'<li data-tag="{tags}" class="li-bg li-formula hs-dmg-li">{chip}<span class="row-text">{text}</span>'
-            f'{badge}{t1}{t2}</li>')
+            f'{badge}{table}</li>')
 
 
 _HS_TABLE_ID = [0]
