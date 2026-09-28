@@ -29,13 +29,18 @@ def test_card_hides_its_rows_and_carries_their_tags():
         # the attribute rows stay rows (owner 2026-09-28: "more laconic")
         assert not el._hs_covered("Strength gain increased from 2.2 to 2.6", {"buff"})
         assert not el._hs_covered("Mist Coil damage increased from 100 to 120", {"buff"})
+        assert el._hs_covered("Damage gain per level decreased from +3.6 to +2.7", {"nerf"})
         html = el.render_hs_card("hero|abaddon|7.38")
-        # ONE row: the chip by the average over the levels, start / end %, the table behind a click
+        # ONE row "Starting damage and damage gain per level rescaled", each term opening its own table
         assert html.startswith('<li data-tag="buff nerf" class="li-bg li-formula hs-dmg-li">')
-        assert 'data-overall="nerf">NERF</span>' in html and 'class="formula-trigger"' in html
+        assert re.search(r'>Starting damage</span> and <span class="formula-trigger" data-formula="[^"]+">'
+                         r'damage gain per level</span> rescaled', html)
         assert re.search(r'\+22%</span><span class="formula-endpoint-label">start</span>'
-                         r'<span class="badge nerf\d+">-14%</span>', html)
-        assert "173–183" in html and "148–158" in html and " hidden>" in html   # Valve's level-30 figures
+                         r'<span class="badge nerf\d+">-10%</span>', html)
+        assert "40–50" in html and "50–60" in html and "144–154" in html and "129–139" in html
+        assert "30 + AB" not in html and "Attribute Bonus" not in html
+        # the gain table: Valve's 3.6 -> 2.7 per level, the levels' sum from it (-25% everywhere)
+        assert "<td>3.6</td>" in html and "<td>2.7</td>" in html and "<td>+104</td>" in html and "<td>+78</td>" in html
         assert "0.7 → 0.45 damage per attribute" in html
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card = saved
