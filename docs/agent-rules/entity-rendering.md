@@ -275,7 +275,9 @@ damage» — не про характеристику урона). «+N All Attr
 «Base Damage increased by 26» (+650%) сам по себе ничего не значил. Пилот: `hero_stat_card()` (patch/elements.py,
 модель — patch/hero_stats.py по файлам игры обоих патчей) — ОДНА строка вместо строк урона:
 
-«**Starting damage** rescaled from 40–50 to 50–60 and damage gain per level from 3.6 to 2.7 (?)  +22% start −14% end»
+«**Starting damage** rescaled from 40–50 to 50–60 and damage gain per level from 3.6 to 2.7 (?)  +22% start −25% per level»
+
+Справа — проценты обоих чисел (стартовый урон и прирост за уровень); итог на 30-м уровне (−14%) — в таблице.
 
 - «Starting damage» — кнопка формулы: урон на уровнях 1, 5, 10, 15, 20, 25, 30 (было / стало / Δ%). 30-й уровень
   считает все 7 уровней Attribute Bonus (+14 ко всем характеристикам), как у Valve: числа 1-го и 30-го уровней —

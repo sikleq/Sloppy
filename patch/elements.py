@@ -700,8 +700,8 @@ def _hs_table(fid, head, row_o, row_n, row_p, rec):
 def render_hs_card(key):
     """ONE row in place of the hero's damage rows (owner 2026-09-28): "Starting damage rescaled from 40–50 to
     50–60 and damage gain per level from 3.6 to 2.7" — "Starting damage" opens the damage at levels 1 … 30 (level
-    30 with all Attribute Bonus levels, as Valve counts it); start / end % of that damage; what damage is made of
-    (damage per attribute, base damage) in the (?). The attribute rows stay rows."""
+    30 with all Attribute Bonus levels, as Valve counts it); the % of both numbers on the right (start, per
+    level); what damage is made of (damage per attribute, base damage) in the (?). Attribute rows stay rows."""
     from .badges import b
     from .hero_stats import damage_at, hero_stats, universal_multiplier
     rec = _HS_CARDS.get(key)
@@ -724,9 +724,11 @@ def render_hs_card(key):
                       "".join(f"<td>{o[0]}–{o[1]}</td>" for _, o, _ in cells),
                       "".join(f"<td>{n[0]}–{n[1]}</td>" for _, _, n in cells),
                       "".join(f"<td>{_hs_inner(p)}</td>" for p in pcts), rec)
+    # the two numbers of the row, each with its %: starting damage and damage gain per level (owner 2026-09-28:
+    # "start / end" showed the level-30 damage, not the gain; that one is in the table)
     badge = (f'<span class="badge-group" data-overall="{overall}">{_hs_inner(pcts[0])}'
-             f'<span class="formula-endpoint-label">start</span>{_hs_inner(pcts[-1])}'
-             f'<span class="formula-endpoint-label">end</span></span>')
+             f'<span class="formula-endpoint-label">start</span>{_hs_inner(b(per_o, per_n))}'
+             f'<span class="formula-endpoint-label">per level</span></span>')
     chip = {"buff": '<span class="badge buff-text" data-tag="buff" data-overall="buff">BUFF</span>',
             "nerf": '<span class="badge nerf-text" data-tag="nerf" data-overall="nerf">NERF</span>',
             "rework": '<span class="badge rework" data-tag="rework">REWORK</span>',

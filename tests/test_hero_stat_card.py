@@ -38,8 +38,9 @@ def test_card_hides_its_rows_and_carries_their_tags():
         assert html.count('class="formula-table') == 1                        # one table
         # level 30 = Valve's figure, all 7 Attribute Bonus levels counted
         assert "173–183" in html and "148–158" in html and "all 7 Attribute Bonus levels" in html
+        # the % of both numbers: starting damage +22%, gain per level 3.6 -> 2.7 = -25% (level 30's -14%: table)
         assert re.search(r'\+22%</span><span class="formula-endpoint-label">start</span>'
-                         r'<span class="badge nerf\d+">-14%</span>', html)
+                         r'<span class="badge nerf\d+">-25%</span><span class="formula-endpoint-label">per level</span>', html)
         assert 'data-overall="nerf">NERF</span>' in html                      # the site's rule: -14% at the end
         assert "0.7 → 0.45 damage per attribute" in html
         _HS = el._HS_CARDS["hero|abaddon|7.38"]
