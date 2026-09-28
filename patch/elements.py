@@ -756,16 +756,19 @@ def render_hs_card(key):
         notes.append(f"Damage gain per level unchanged at {g1}")
     notes.append("Level 30 counts all 7 Attribute Bonus levels (+14 to every attribute), as Valve does")
     tip = f'<span class="li-tail">{info_tip(*notes)}</span>'
-    trig = lambda words: f'<span class="formula-trigger" data-formula="{fid}">{words}</span>'
-    start = (("Starting damage", s1, s2, pcts[0]),) if o1 != n1 else ()
-    gain = (("Damage gain per level", g1, g2, b(per_o, per_n)),) if g1 != g2 else ()
-    shown = start + gain or (("Starting damage", s1, s2, pcts[0]),)
+    # (first word, the rest): the button is the rest, mid-line — a button on the first word shifted the row's
+    # text right of the rows above and below (owner 2026-09-28: "Damage <gain per level>")
+    start = (("Starting", "damage", s1, s2, pcts[0]),) if o1 != n1 else ()
+    gain = (("Damage", "gain per level", g1, g2, b(per_o, per_n)),) if g1 != g2 else ()
+    shown = start + gain or (("Starting", "damage", s1, s2, pcts[0]),)
     # each row only its own tag: the hidden rows' tags (Base Damage +26 = BUFF) do not put a NERF row under BUFF;
     # a hidden row never keeps a block on screen (scripts.js rowOnScreen)
     rows = []
-    for i, (name, before, after, badge) in enumerate(shown):
+    for i, (lead, rest, before, after, badge) in enumerate(shown):
         last = i == len(shown) - 1                   # the last row opens the table and carries the (?)
-        rows.append(_hs_row(trig(name) if last else name, before, after, badge,
+        if last:
+            rest = f'<span class="formula-trigger" data-formula="{fid}">{rest}</span>'
+        rows.append(_hs_row(f"{lead} {rest}", before, after, badge,
                             tail=tip if last else "", table=table if last else ""))
     return "".join(rows)
 
