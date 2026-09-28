@@ -69,8 +69,6 @@ SHOTS = {
     "2026-09-25_warm_calendar.webp": ("calendar.html", None, [".cal-year-block"], [], 420, {"width": 1400}),
     "2026-09-24_changelog.webp": ("changelog.html", None, [".clog-layout"], [], 460, {"width": 1400}),
     "2026-09-25_controls.webp": ("heroes_stats.html", None, [".toolbar-panel"], [], 160, {"width": 1400}),
-    "2026-09-28_hero_stat_card.webp": ("patches/7.38.html", ("block", "Abaddon"),
-                                       [":scope > .entity", ":scope li.hs-card-li"], [], 520),
     "2026-09-28_hero_slots.webp": ("heroes/outworld-destroyer.html", None, [".ec-head-panel"],
                                    [".ec-islot >> nth=0", ".ec-ipicker-overlay [data-ec-ipick='black-king-bar']",
                                     ".ec-islot >> nth=1", ".ec-ipicker-overlay [data-ec-ipick='blink-dagger']"],

@@ -2951,7 +2951,7 @@ def generate(version):
     out = _postprocess_properties_change(out)
     out = _postprocess_silent_stats(out, version)
     out = _postprocess_card_stat_notes(out)
-    out = _postprocess_hero_stat_card(out, version)
+    # out = _postprocess_hero_stat_card(out, version)   # pilot on Abaddon 7.38 only until the owner approves (2026-09-28)
     out = _postprocess_unstated_total_cost(out)
     out = _postprocess_item_ability_cards(out, version)
     out = _drop_empty_ul(out)

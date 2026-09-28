@@ -1102,7 +1102,6 @@ def build():
     # Invoker
     W(hero_header("Invoker"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Aghanim's Scepter no longer grants +2 levels to facet-centered orb and +1 to the others. Now grants only +1 level to all Orbs", t("REWORK"), extra=inline_note("Additional orb level is moved to the new Level 15 Talent")))
     W(li("Damage at level 1 increased from 35–41 to 39–45", br(35, 41, 39, 45)))
     W(li("Intelligence gain decreased from 4.7 to 4.0", b(4.7, 4)))

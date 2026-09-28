@@ -31,9 +31,11 @@ def test_card_hides_its_rows_and_carries_their_tags():
         html = el.render_hs_card("hero|abaddon|7.38")
         assert 'data-tag="buff nerf"' in html
         assert "173–183" in html and "148–158" in html                     # Valve's level-30 figures
-        new = html.split('class="hs-pane hs-new"')[1]
-        assert re.search(r'class="badge buff\d+ tone"><span class="iab-hint[^>]*>2\.6<', new)   # gain in its % shade
-        assert "0.45" in new and "Makes up for the lower damage per attribute" in new
+        # one line per attribute: "1.6 → 2.0" (the new value in its %'s shade) and the % beside it
+        assert re.search(r'<span class="hs-old">2\.2</span><span class="hs-to">→</span>'
+                         r'<span class="badge buff\d+ tone">2\.6</span>', html)
+        assert '<span class="hs-same">22</span>' in html                   # an unchanged base stays plain
+        assert "0.45" in html and "Makes up for the lower damage per attribute" in html
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card = saved
 

@@ -547,7 +547,6 @@ def build():
     # Vengeful Spirit
     W(hero_header("Vengeful Spirit"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 2", bstat_h("Vengeful Spirit", "AttackDamageMin", "7.39c", 2), extra=note_box(hero="Vengeful Spirit", field="AttackDamageMin", before_patch="7.39c")))
     W(li("Damage at level 1 increased from 49–55 to 51–57", br(49, 55, 51, 57)))
     W(li("Agility gain decreased from 3.2 to 3.0", bstat_h("Vengeful Spirit", "AttributeAgilityGain", "7.39c", -0.2)))

@@ -880,7 +880,6 @@ def build():
     # Arc Warden
     W(hero_header("Arc Warden"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage decreased by 10", bstat_h("Arc Warden", "AttackDamageMin", "7.37e", -10), extra=note_box(hero="Arc Warden", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 decreased by 2 (from 53-59 to 51-57)", br(53, 59, 51, 57)))
     W(li("Damage gain per level increased from +3.0 to +3.6", b(3, 3.6)))
@@ -956,7 +955,6 @@ def build():
     # Bane
     W(hero_header("Bane"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 25", bstat_h("Bane", "AttackDamageMin", "7.37e", 25), extra=note_box(hero="Bane", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 8 (from 47-53 to 55-61)", br(47, 53, 55, 61)))
     W(li("Damage gain per level decreased from +5.7 to +3.6", b(5.7, 3.6)))
@@ -978,7 +976,6 @@ def build():
     # Batrider
     W(hero_header("Batrider"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 16", bstat_h("Batrider", "AttackDamageMin", "7.37e", 16), extra=note_box(hero="Batrider", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Strength decreased from 25 to 23", b(25, 23)))
     W(li("Strength gain increased from 2.6 to 2.9", b(2.6, 2.9)))
@@ -1000,7 +997,6 @@ def build():
     # Beastmaster
     W(hero_header("Beastmaster"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 23", bstat_h("Beastmaster", "AttackDamageMin", "7.37e", 23), extra=note_box(hero="Beastmaster", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 7 (from 49-53 to 56-60)", br(49, 53, 56, 60)))
     W(li("Agility gain increased from 1.6 to 1.9", b(1.6, 1.9)))
@@ -1072,7 +1068,6 @@ def build():
     # Brewmaster
     W(hero_header("Brewmaster"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 17", bstat_h("Brewmaster", "AttackDamageMin", "7.37e", 17), extra=note_box(hero="Brewmaster", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 2 (from 50-57 to 52-59)", br(50, 57, 52, 59)))
     W(li("Damage gain per level decreased from +5.1 to +3.3", b(5.1, 3.3)))
@@ -1122,7 +1117,6 @@ def build():
     # Broodmother
     W(hero_header("Broodmother"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 20", bstat_h("Broodmother", "AttackDamageMin", "7.37e", 20), extra=note_box(hero="Broodmother", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Strength decreased from 19 to 18", b(19, 18)))
     W(li("Strength gain increased from 2.3 to 2.9", b(2.3, 2.9)))
@@ -1185,7 +1179,6 @@ def build():
     # Chen
     W(hero_header("Chen"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Damage at level 1 rescaled from 48-55 to 46-56", br(48, 55, 46, 56)))
     W(li("Base Damage increased by 18-21", bstat_h("Chen", "AttackDamageMin", "7.37e", 18), extra=note_box(hero="Chen", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage gain per level decreased from +5.1 to +3.2", b(5.1, 3.2)))
@@ -1245,7 +1238,6 @@ def build():
     # Clockwerk
     W(hero_header("Clockwerk"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 16", bstat_h("Clockwerk", "AttackDamageMin", "7.37e", 16), extra=note_box(hero="Clockwerk", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Strength decreased from 27 to 26", b(27, 26)))
     W(li("Damage at level 1 increased by 2 (from 48-50 to 50-52)", br(48, 50, 50, 52)))
@@ -1298,7 +1290,6 @@ def build():
     # Dark Seer
     W(hero_header("Dark Seer"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 26", bstat_h("Dark Seer", "AttackDamageMin", "7.37e", 26), extra=note_box(hero="Dark Seer", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 5 (from 49-55 to 54-60)", br(49, 55, 54, 60)))
     W(li("Damage gain per level decreased from +5 to +2.7", b(5, 2.7)))
@@ -1332,7 +1323,6 @@ def build():
     # Dark Willow
     W(hero_header("Dark Willow"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 22", bstat_h("Dark Willow", "AttackDamageMin", "7.37e", 22), extra=note_box(hero="Dark Willow", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 2 (from 46-54 to 48-56)", br(46, 54, 48, 56)))
     W(li("Agility gain increased from 1.3 to 1.6", b(1.3, 1.6)))
@@ -1389,7 +1379,6 @@ def build():
     # Dazzle
     W(hero_header("Dazzle"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 16", bstat_h("Dazzle", "AttackDamageMin", "7.37e", 16), extra=note_box(hero="Dazzle", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Strength gain increased from 2.0 to 2.3", b(2, 2.3)))
     W(li("Agility gain increased from 1.4 to 1.7", b(1.4, 1.7)))
@@ -1443,7 +1432,6 @@ def build():
     # Death Prophet
     W(hero_header("Death Prophet"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage decreased by 3", bstat_h("Death Prophet", "AttackDamageMin", "7.37e", -3), extra=note_box(hero="Death Prophet", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Agility increased from 16 to 17", b(16, 17)))
     W(li("Damage gain per level increased from +3 to +3.6", b(3, 3.6)))
@@ -1661,7 +1649,6 @@ def build():
     # Enigma
     W(hero_header("Enigma"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 12", bstat_h("Enigma", "AttackDamageMin", "7.37e", 12), extra=note_box(hero="Enigma", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 decreased by 1 (from 44-50 to 43-49)", br(44, 50, 43, 49)))
     W(li("Damage gain per level decreased from +5 to +3.2", b(5, 3.2)))
@@ -1799,7 +1786,6 @@ def build():
     # Invoker
     W(hero_header("Invoker"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Added three orb-centered facets. Each provides an extra level for the specific orb, permanently improves an ability, and sets their own Aghanim's Scepter and Shard upgrades", t("NEW")))
     W(li("Base Health Regen decreased from 0.5 to 0.25", b(0.5, 0.25)))
     W(li("Base Damage increased by 12-10", bstat_h("Invoker", "AttackDamageMin", "7.37e", 12), extra=note_box(hero="Invoker", field="AttackDamageMin", before_patch="7.37e")))
@@ -1917,7 +1903,6 @@ def build():
     # Io
     W(hero_header("Io"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 7", bstat_h("Io", "AttackDamageMin", "7.37e", 7), extra=note_box(hero="Io", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 4 (from 41-47 to 45-51)", br(41, 47, 45, 51)))
     W(li("Strength gain increased from 2.7 to 3.0", b(2.7, 3)))
@@ -2222,7 +2207,6 @@ def build():
     # Lone Druid
     W(hero_header("Lone Druid"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 17", bstat_h("Lone Druid", "AttackDamageMin", "7.37e", 17), extra=note_box(hero="Lone Druid", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Strength decreased from 20 to 18", b(20, 18)))
     W(li("Strength gain increased from 1.8 to 2.5", b(1.8, 2.5)))
@@ -2278,7 +2262,6 @@ def build():
     # Lycan
     W(hero_header("Lycan"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 20", bstat_h("Lycan", "AttackDamageMin", "7.37e", 20), extra=note_box(hero="Lycan", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Strength gain increased from 3.0 to 3.4", b(3, 3.4)))
     W(li("Agility gain decreased from 1.8 to 1.7", b(1.8, 1.7)))
@@ -2300,7 +2283,6 @@ def build():
     # Magnus
     W(hero_header("Magnus"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 21", bstat_h("Magnus", "AttackDamageMin", "7.37e", 21), extra=note_box(hero="Magnus", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 7 (from 48-56 to 55-63)", br(48, 56, 55, 63)))
     W(li("Intelligence gain increased from 1.6 to 2.1", b(1.6, 2.1)))
@@ -2336,7 +2318,6 @@ def build():
     # Marci
     W(hero_header("Marci"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 22-20", bstat_h("Marci", "AttackDamageMin", "7.37e", 22), extra=note_box(hero="Marci", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased from 50-56 to 56-60", br(50, 56, 56, 60)))
     W(li("Intelligence gain increased from 1.5 to 1.9", b(1.5, 1.9)))
@@ -2436,7 +2417,6 @@ def build():
     # Mirana
     W(hero_header("Mirana"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 24-26", bstat_h("Mirana", "AttackDamageMin", "7.37e", 24), extra=note_box(hero="Mirana", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Strength increased from 18 to 20", b(18, 20)))
     W(li("Damage at level 1 increased from 44-48 to 48-54", br(44, 48, 48, 54)))
@@ -2584,7 +2564,6 @@ def build():
     # Nature's Prophet
     W(hero_header("Nature's Prophet"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage decreased by 2", bstat_h("Nature's Prophet", "AttackDamageMin", "7.37e", -2), extra=note_box(hero="Nature's Prophet", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage gain per level increased from +3.5 to +4.2", b(3.5, 4.2)))
     W(li("Damage at level 30 increased by 25 (from 155-165 to 180-190)", t("BUFF")))
@@ -2654,7 +2633,6 @@ def build():
     # Nyx Assassin
     W(hero_header("Nyx Assassin"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 14", bstat_h("Nyx Assassin", "AttackDamageMin", "7.37e", 14), extra=note_box(hero="Nyx Assassin", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Strength gain increased from 2.5 to 2.7", b(2.5, 2.7)))
     W(li("Agility gain increased from 2.3 to 2.9", b(2.3, 2.9)))
@@ -2742,7 +2720,6 @@ def build():
     # Pangolier
     W(hero_header("Pangolier"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 20", bstat_h("Pangolier", "AttackDamageMin", "7.37e", 20), extra=note_box(hero="Pangolier", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 6 (from 45-51 to 51-57)", br(45, 51, 51, 57)))
     W(li("Agility gain increased from 2.8 to 3.2", b(2.8, 3.2)))
@@ -2825,7 +2802,6 @@ def build():
     # Phoenix
     W(hero_header("Phoenix"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 12", bstat_h("Phoenix", "AttackDamageMin", "7.37e", 12), extra=note_box(hero="Phoenix", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage gain per level decreased from +4.6 to +3.3", b(4.6, 3.3)))
     W(li("Damage at level 30 decreased by 54 (from 207-217 to 153-163)", br(207, 217, 153, 163)))
@@ -3016,7 +2992,6 @@ def build():
     # Sand King
     W(hero_header("Sand King"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Damage at level 1 rescaled from 46-54 to 45-55", br(46, 54, 45, 55)))
     W(li("Base Damage increased by 12-14", bstat_h("Sand King", "AttackDamageMin", "7.37e", 12), extra=note_box(hero="Sand King", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Strength increased from 21 to 22", b(21, 22)))
@@ -3213,7 +3188,6 @@ def build():
     # Snapfire
     W(hero_header("Snapfire"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 14", bstat_h("Snapfire", "AttackDamageMin", "7.37e", 14), extra=note_box(hero="Snapfire", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Strength gain increased from 3.2 to 3.5", b(3.2, 3.5)))
     W(li("Agility gain increased from 1.2 to 1.9", b(1.2, 1.9)))
@@ -3244,7 +3218,6 @@ def build():
     # Spectre
     W(hero_header("Spectre"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage decreased by 2", bstat_h("Spectre", "AttackDamageMin", "7.37e", -2), extra=note_box(hero="Spectre", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage gain per level increased from +2.1 to +2.8", b(2.1, 2.8)))
     W(li("Damage at level 30 increased by 27 (from 122-126 to 149-153)", br(122, 126, 149, 153)))
@@ -3342,7 +3315,6 @@ def build():
     # Techies
     W(hero_header("Techies"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 17", bstat_h("Techies", "AttackDamageMin", "7.37e", 17), extra=note_box(hero="Techies", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 3 (from 43-45 to 46-48)", br(43, 45, 46, 48)))
     W(li("Strength gain increased from 2.5 to 2.6", b(2.5, 2.6)))
@@ -3552,7 +3524,6 @@ def build():
     # Vengeful Spirit
     W(hero_header("Vengeful Spirit"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 17", bstat_h("Vengeful Spirit", "AttackDamageMin", "7.37e", 17), extra=note_box(hero="Vengeful Spirit", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 decreased by 4 (from 51-57 to 47-53)", br(51, 57, 47, 53)))
     W(li("Strength gain increased from 2.1 to 2.6", b(2.1, 2.6)))
@@ -3570,7 +3541,6 @@ def build():
     # Venomancer
     W(hero_header("Venomancer"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 21", bstat_h("Venomancer", "AttackDamageMin", "7.37e", 21), extra=note_box(hero="Venomancer", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 5 (from 40-43 to 45-48)", br(40, 43, 45, 48)))
     W(li("Strength gain increased from 2.0 to 2.1", b(2, 2.1)))
@@ -3595,7 +3565,6 @@ def build():
     # Visage
     W(hero_header("Visage"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 17", bstat_h("Visage", "AttackDamageMin", "7.37e", 17), extra=note_box(hero="Visage", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Damage at level 1 increased by 3 (from 42-52 to 45-55)", br(42, 52, 45, 55)))
     W(li("Strength gain increased from 2.4 to 2.8", b(2.4, 2.8)))
@@ -3621,7 +3590,6 @@ def build():
     # Void Spirit
     W(hero_header("Void Spirit"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 18", bstat_h("Void Spirit", "AttackDamageMin", "7.37e", 18), extra=note_box(hero="Void Spirit", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Strength increased from 21 to 22", b(21, 22)))
     W(li("Damage at level 1 increased by 3 (from 48-52 to 51-55)", br(48, 52, 51, 55)))
@@ -3656,7 +3624,6 @@ def build():
     # Windranger
     W(hero_header("Windranger"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Damage at level 1 rescaled from 46-52 to 44-56", br(46, 52, 44, 56)))
     W(li("Base Damage increased by 14-20", bstat_h("Windranger", "AttackDamageMin", "7.37e", 14), extra=note_box(hero="Windranger", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Intelligence decreased from 21 to 18", b(21, 18)))
@@ -3690,7 +3657,6 @@ def build():
     # Winter Wyvern
     W(hero_header("Winter Wyvern"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Damage increased by 15-17", bstat_h("Winter Wyvern", "AttackDamageMin", "7.37e", 15), extra=note_box(hero="Winter Wyvern", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Strength increased from 20 to 22", b(20, 22)))
     W(li("Damage at level 1 decreased from 42-47 to 40-47", br(42, 47, 40, 47)))

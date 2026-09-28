@@ -668,52 +668,38 @@ def _hs_covered(text, tags):
     return True
 
 
-def _hs_value(old, new, fmt="{:g}", note=""):
-    """(old html, new html): the new value in the shade of its % with the % (and a note) on hover."""
+def _hs_change(old, new, fmt="{:g}", l=False):
+    """(value cell, % cell) of one number: "22" when it didn't change; "1.6 → 2.0" with the new value in the
+    shade of its % otherwise, the % in its own column (as the change rows have it)."""
     from .badges import b
     o, n = fmt.format(old), fmt.format(new)
     if old == new:
-        return o, n
-    pct = b(old, new)
-    tip = "<br>".join(x for x in (f'<span class="iab-tip-pct">{pct}</span>', note) if x)
-    return o, f'<span class="{_tone_cls(pct)}">{_iab_hint(n, tip)}</span>'
+        return f'<span class="hs-same">{n}</span>', ""
+    pct = b(old, new, l=l)
+    return (f'<span class="hs-old">{o}</span><span class="hs-to">→</span>'
+            f'<span class="{_tone_cls(pct)}">{n}</span>', pct)
 
 
-def _hs_pane(st, other, version, is_new):
-    from .hero_stats import ATTRS, universal_multiplier
-    prim = _HS_PRIMARY_KEY.get(st["primary"], "uni")
-    changed = is_new and st["primary"] != other["primary"]          # a main attribute change: REWORK colour
-    rows = [f'<div class="hs-prim{" is-changed" if changed else ""}"><img src="{_ATTR_ICON[prim]}" alt="">'
-            f'<span>{_ATTR_LABEL[prim]}</span></div>',
-            '<span class="hs-h"></span><span class="hs-h">Base</span><span class="hs-h">Gain</span>']
+def _hs_attr_table(old, new, rec):
+    """Attributes: one line each — base and gain, "old → new" where they changed, the % beside."""
+    from .hero_stats import ATTRS
+    po, pn = _HS_PRIMARY_KEY.get(old["primary"], "uni"), _HS_PRIMARY_KEY.get(new["primary"], "uni")
+    title = (f'<img src="{_ATTR_ICON[pn]}" alt="">{_ATTR_LABEL[pn]}' if po == pn else
+             f'<img src="{_ATTR_ICON[po]}" alt="">{_ATTR_LABEL[po]}<span class="hs-to">→</span>'
+             f'<span class="hs-prim-new"><img src="{_ATTR_ICON[pn]}" alt="">{_ATTR_LABEL[pn]}</span>')
+    rows = []
     for attr, key in ATTRS:
-        base, gain = st[attr]
-        if is_new:
-            base_html = _hs_value(other[attr][0], base)[1]
-            gain_html = _hs_value(other[attr][1], gain, "{:.1f}")[1]
-        else:
-            base_html, gain_html = f"{base:g}", f"{gain:.1f}"
-        rows.append(f'<span class="hs-attr{" is-prim" if prim in (key, "uni") else ""}">'
-                    f'<img src="{_ATTR_ICON[_HS_ATTR_KEY[attr.lower()]]}" alt="">{attr}</span>'
-                    f'<span class="hs-v">{base_html}</span><span class="hs-v">{gain_html}</span>')
-    dmg = f'{st["dmg_min"]:g} – {st["dmg_max"]:g}'
-    if is_new and (st["dmg_min"], st["dmg_max"]) != (other["dmg_min"], other["dmg_max"]):
-        # no colour, no %: base damage alone says little — the damage table below is the real change
-        note = ("Makes up for the lower damage per attribute" if universal_multiplier(version) !=
-                universal_multiplier(_HS_OTHER_VERSION[0]) else "Attack damage by level: the table below")
-        dmg = _iab_hint(dmg, note)
-    rows.append(f'<span class="hs-attr hs-dmg-l">Base damage</span><span class="hs-v hs-wide">{dmg}</span>')
-    if st["primary"] == "all" or other["primary"] == "all":
-        mult_o, mult_n = universal_multiplier(_HS_OTHER_VERSION[0]), universal_multiplier(version)
-        if is_new:
-            val = _hs_value(mult_o, mult_n, "{:g}")[1] if st["primary"] == "all" else "—"
-        else:
-            val = f"{mult_n:g}" if st["primary"] == "all" else "—"
-        rows.append(f'<span class="hs-attr hs-dmg-l">Damage per attribute</span><span class="hs-v hs-wide">{val}</span>')
-    return "".join(rows)
-
-
-_HS_OTHER_VERSION = [""]        # the other side's version while a pane is drawn
+        base_v, base_p = _hs_change(old[attr][0], new[attr][0])
+        gain_v, gain_p = _hs_change(old[attr][1], new[attr][1], "{:.1f}")
+        prim = " is-prim" if pn in (key, "uni") else ""
+        rows.append(f'<tr><th class="hs-attr{prim}"><img src="{_ATTR_ICON[key]}" alt="">{attr}</th>'
+                    f'<td class="hs-v">{base_v}</td><td class="hs-p">{base_p}</td>'
+                    f'<td class="hs-v">{gain_v}</td><td class="hs-p">{gain_p}</td><td class="hs-fill"></td></tr>')
+    cols = ('<colgroup><col style="width:190px"><col style="width:120px"><col style="width:64px">'
+            '<col style="width:120px"><col style="width:64px"><col></colgroup>')
+    return (f'<table class="hs-tbl hs-attr-tbl">{cols}<thead><tr><th class="hs-t">{title}</th>'
+            f'<th class="hs-v">Base</th><th></th><th class="hs-v">Gain per level</th><th></th><th class="hs-fill"></th></tr></thead>'
+            f'<tbody>{"".join(rows)}</tbody></table>')
 
 
 def _hs_damage_table(rec, old, new):
@@ -738,29 +724,45 @@ def _hs_damage_table(rec, old, new):
         row_p.append(f"<td{cls}>{pct}</td>")
     note = ("Levels 1-30: the hero's own attribute growth. 30 + AB: all 7 Attribute Bonus levels taken "
             "(+14 to every attribute), as Valve counts level 30. Levels 1 and 30 + AB are Valve's figures.")
-    return (f'<table class="hs-dmg"><thead><tr><th class="hs-dmg-t">Attack damage'
-            f'{info_tip(note)}</th>{head}</tr></thead><tbody>'
-            f'<tr><th>{rec["before"]}</th>{"".join(row_o)}</tr>'
-            f'<tr><th>{rec["after"]}</th>{"".join(row_n)}</tr>'
+    return (f'<table class="hs-tbl hs-dmg"><thead><tr><th class="hs-t">Attack damage{info_tip(note)}</th>'
+            f'{head}</tr></thead><tbody>'
+            f'<tr class="hs-row-old"><th>{rec["before"]}</th>{"".join(row_o)}</tr>'
+            f'<tr class="hs-row-new"><th>{rec["after"]}</th>{"".join(row_n)}</tr>'
             f'<tr class="hs-pct"><th></th>{"".join(row_p)}</tr></tbody></table>')
 
 
+def _hs_foot(old, new, rec):
+    """What attack damage is made of, when it changed: damage per attribute (Universal) and base damage."""
+    from .hero_stats import universal_multiplier
+    bits = []
+    if "all" in (old["primary"], new["primary"]):
+        mo, mn = universal_multiplier(rec["before"]), universal_multiplier(rec["after"])
+        mo = mo if old["primary"] == "all" else None
+        mn = mn if new["primary"] == "all" else None
+        if mo != mn and mo is not None and mn is not None:
+            v, p = _hs_change(mo, mn)
+            bits.append(f'Damage per attribute (Universal) {v} {p}')
+    if (old["dmg_min"], old["dmg_max"]) != (new["dmg_min"], new["dmg_max"]):
+        bits.append(f'Base damage <span class="hs-old">{old["dmg_min"]:g}–{old["dmg_max"]:g}</span>'
+                    f'<span class="hs-to">→</span><span class="hs-same">{new["dmg_min"]:g}–{new["dmg_max"]:g}</span>'
+                    + (info_tip("Makes up for the lower damage per attribute: the table above is the real change")
+                       if bits else ""))
+    return f'<div class="hs-foot">{"<span class=hs-dot>·</span>".join(bits)}</div>' if bits else ""
+
+
 def render_hs_card(key):
-    """The hero's attributes card + damage table as the first row of its GENERAL list."""
+    """The hero's attributes + attack damage by level as the first row of its GENERAL list: one frame, the
+    attributes as lines ("1.6 → 2.0  +25%"), the damage table, a footnote on what damage is made of
+    (owner 2026-09-28: the two-box before / after card looked bad)."""
     from .hero_stats import hero_stats
     rec = _HS_CARDS.get(key)
     if not rec:
         return ""
     old, new = hero_stats(rec["hero"], rec["before"]), hero_stats(rec["hero"], rec["after"])
-    _HS_OTHER_VERSION[0] = rec["after"]
-    left = _hs_pane(old, new, rec["before"], False)
-    _HS_OTHER_VERSION[0] = rec["before"]
-    right = _hs_pane(new, old, rec["after"], True)
     tags = " ".join(sorted(rec["tags"])) or "misc"
     return (f'<li class="hs-card-li" data-tag="{tags}"><div class="hs-card">'
-            f'<div class="hs-attrs"><div class="hs-pane hs-old">{left}</div>'
-            f'<span class="hs-arrow">→</span><div class="hs-pane hs-new">{right}</div></div>'
-            f'{_hs_damage_table(rec, old, new)}</div></li>')
+            f'{_hs_attr_table(old, new, rec)}{_hs_damage_table(rec, old, new)}{_hs_foot(old, new, rec)}'
+            f'</div></li>')
 
 
 _ENCHANT_TIERS = (1, 2, 3, 4, 5)

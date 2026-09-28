@@ -156,7 +156,6 @@ def build():
     # Disruptor
     W(hero_header("Disruptor"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Intelligence increased from 20 to 21", b(20, 21)))
     W(li("Damage at level 1 increased from 47-51 to 48-52", br(47, 51, 48, 52)))
     W(ul_close())
@@ -183,7 +182,6 @@ def build():
     # Ember Spirit
     W(hero_header("Ember Spirit"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Agility decreased from 22 to 21", b(22, 21)))
     W(li("Damage at level 1 decreased from 52-56 to 51-55", br(52, 56, 51, 55)))
     W(ul_close())
@@ -212,7 +210,6 @@ def build():
     # Huskar
     W(hero_header("Huskar"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Strength decreased from 23 to 22", b(23, 22)))
     W(li("Damage at level 1 decreased from 44-49 to 43-48", br(44, 49, 43, 48)))
     W(li("Strength gain increased from 3.3 to 3.4", b(3.3, 3.4)))
@@ -286,7 +283,6 @@ def build():
     # Lina
     W(hero_header("Lina"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Intelligence decreased from 30 to 28", b(30, 28)))
     W(li("Damage at level 1 decreased from 51-59 to 49-57", br(51, 59, 49, 57)))
     W(ul_close())

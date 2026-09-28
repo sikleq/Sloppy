@@ -639,7 +639,6 @@ def build():
     # Abaddon
     W(hero_header("Abaddon"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Strength decreased from 22 to 21", b(22, 21)))
     W(li("Base Agility decreased from 23 to 22", b(23, 22)))
     W(li("Damage at level 1 decreased from 50–60 to 49–59", br(50, 60, 49, 59)))
@@ -1443,7 +1442,6 @@ def build():
     # Juggernaut
     W(hero_header("Juggernaut"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Agility decreased from 34 to 32", b(34, 32)))
     W(li("Damage at level 1 decreased from 56–58 to 54–56", br(56, 58, 54, 56)))
     W(ul_close())
@@ -1459,7 +1457,6 @@ def build():
     # Keeper of the Light
     W(hero_header("Keeper of the Light"))
     W(ul_open())
-    W(hero_stat_card())
     W(li("Base Intelligence increased from 23 to 24", b(23, 24)))
     W(li("Damage at level 1 increased from 43–50 to 44–51", br(43, 50, 44, 51)))
     W(ul_close())
@@ -2484,7 +2481,6 @@ def build():
     # Spectre
     W(hero_header("Spectre"))
     W(ul_open())
-    W(hero_stat_card())
     W(li(attr_change("Universal", "Agility"), t("REWORK"), extra=inline_note("Base attributes and attribute gains are unchanged")))
     W(li("Base Damage increased by 2", bstat_h("Spectre", "AttackDamageMin", "7.39e", 2), extra=note_box(hero="Spectre", field="AttackDamageMin", before_patch="7.39e", extra_note="Damage at level 1 unchanged (48–52)")))
     W(li("Damage gain per level decreased from +2.8 to +2.1", b(2.8, 2.1)))
