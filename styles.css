@@ -2968,6 +2968,40 @@ ul.changes li.ability-row-end {
 /* ENCHANT-BY-ATTRIBUTE GRID — 7.41 Tier-X enchantment selection box.
    Layout: rows of [attr icon][attr name] | [enchant chip] [enchant chip]...
    Shares the muted bordered look of components-box / provides-box. */
+/* HERO ATTRIBUTES CARD + ATTACK DAMAGE BY LEVEL (hero_stat_card, owner 2026-09-28): the first row of a hero's
+   GENERAL list — base + gain of every attribute, base damage and damage per attribute before -> after, then a
+   table of attack damage by level. The rows it shows stay hidden in the list. */
+ul.changes li.hs-card-li { display: block; padding: 2px 0 6px; list-style: none; }
+ul.changes li.hs-card-li::before { display: none; }
+.hs-attrs { display: grid; grid-template-columns: 1fr auto 1fr; column-gap: 12px; align-items: stretch; margin: 0 0 8px; }
+.hs-arrow { align-self: center; font-size: 22px; font-weight: 700; color: var(--text-main); opacity: 0.85; padding: 0 2px; }
+.hs-pane {
+  display: grid; grid-template-columns: minmax(0, 1fr) 54px 54px; column-gap: 10px; row-gap: 3px;
+  align-items: center; align-content: start; font-variant-numeric: tabular-nums;
+  padding: 8px 14px; background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px;
+}
+.hs-prim { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; color: var(--text-dim);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
+.hs-prim img, .hs-attr img { width: 16px; height: 16px; object-fit: contain; }
+.hs-prim.is-changed { color: #b99ae6; }                 /* main attribute changed (the REWORK row it hides) */
+.hs-h { color: var(--text-dimmer); font-size: 11px; text-align: center; }
+.hs-attr { display: flex; align-items: center; gap: 6px; color: var(--text-main); }
+.hs-attr.is-prim { color: var(--text-bright); font-weight: 600; }
+.hs-attr.hs-dmg-l { padding-left: 22px; color: var(--text-dim); }
+.hs-v { text-align: center; color: var(--text-bright); font-weight: 600; }
+.hs-v.hs-wide { grid-column: 2 / -1; }
+.hs-dmg { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums;
+  background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px; }
+.hs-dmg th, .hs-dmg td { padding: 4px 6px; text-align: center; white-space: nowrap; }
+.hs-dmg thead th { color: var(--text-dim); font-size: 11px; font-weight: 700; letter-spacing: 0.4px;
+  border-bottom: 1px solid var(--line-soft); }
+.hs-dmg tbody th { text-align: left; color: var(--text-dim); font-weight: 600; padding-left: 12px; }
+.hs-dmg thead th.hs-dmg-t { text-align: left; padding-left: 12px; text-transform: uppercase; }
+.hs-dmg td + td, .hs-dmg th + td, .hs-dmg th + th { border-left: 1px solid rgba(254, 247, 232, 0.06); }
+.hs-dmg .hs-ab { background: rgba(0, 0, 0, 0.14); }
+.hs-dmg tbody tr:nth-child(2) td { color: var(--text-bright); font-weight: 600; }
+.hs-dmg tr.hs-pct td { font-size: 12px; padding-top: 0; }
+
 /* LIST OF ENCHANTMENTS AS ONE TABLE (owner 2026-09-28, 7.38 "List of Neutral Enchantments"): every
    enchantment is still its own entity block (patch squares, its Changes page), drawn as a row of one framed
    table — icon | name | its bonuses with a value per tier (empty = not offered at that tier) | patch squares.

@@ -375,6 +375,7 @@ def build():
     # Timbersaw
     W(hero_header("Timbersaw"))
     W(ul_open())
+    W(hero_stat_card())
     W(li("Base Strength decreased from 26 to 23", b(26, 23)))
     W(li("Damage at level 1 decreased from 49–53 to 46–50", br(49, 53, 46, 50)))
     W(li("Strength gain increased from 3.5 to 3.6", b(3.5, 3.6)))

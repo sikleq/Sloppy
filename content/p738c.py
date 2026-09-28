@@ -426,6 +426,7 @@ def build():
     # Lycan
     W(hero_header("Lycan"))
     W(ul_open())
+    W(hero_stat_card())
     W(li("Base Strength increased from 26 to 28", b(26, 28)))
     W(li("Damage at level 1 increased from 50–55 to 52–57", br(50, 55, 52, 57)))
     W(ul_close())
@@ -433,6 +434,7 @@ def build():
     # Magnus
     W(hero_header("Magnus"))
     W(ul_open())
+    W(hero_stat_card())
     W(li("Base Strength decreased from 25 to 23", b(25, 23)))
     W(li("Damage at level 1 decreased from 55–63 to 54–62", br(55, 63, 54, 62)))
     W(ul_close())

@@ -18,8 +18,8 @@ PATCH_FILE = _HERE / "dist" / "patches" / "7.41d.html"
 # Known-good metrics for 7.41d. Update when patch content changes intentionally.
 EXPECTED = {
     "entity_names": 102,
-    "badge_buff": 400,
-    "badge_nerf": 203,
+    "badge_buff": 490,  # +90 / +16: hero attribute cards + damage-by-level tables (2026-09-28)
+    "badge_nerf": 219,
     "badge_new": 1,
     "badge_del": 5,
     "badge_rework": 1,  # -1: the talent swap row is SWAP now (2026-09-26)

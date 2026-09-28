@@ -617,6 +617,152 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
     return out + head + f'<div class="entity plain-entity"{eid}><div class="entity-name">{name}{label}</div>{link_html}</div>'
 
 
+# ---- A hero's attributes card + attack damage by level (owner 2026-09-28, Abaddon 7.38) ----
+# 7.38 lowered the Universal damage per attribute 0.7 -> 0.45 and raised base damage and attribute gains to make
+# up for it: "Base Damage increased by 26" (+650%) alone meant nothing. The GENERAL block of such a hero starts
+# with a card (base + gain of every attribute, base damage, damage per attribute, before -> after) and a table of
+# attack damage by level; the rows it shows stay in the page hidden (tag filters, weights as before).
+_HS_CARDS = {}                  # "<ek>|<pv>" -> {"hero", "before", "after", "tags", "valve": {1: ..., 30: ...}}
+_HS_LEVELS = (1, 5, 10, 15, 20, 25, 30)
+_HS_ATTR_ROW_RE = re.compile(r"^(?:base )?(strength|agility|intelligence)(?: gain)? (?:increased|decreased) "
+                             r"(?:from [+\-]?([\d.]+) to [+\-]?([\d.]+)|by ([\d.]+))", re.I)
+_HS_DMG_VALVE_RE = re.compile(r"damage at level (1|30) \w+ by \d+ \(from (\d+)-(\d+) to (\d+)-(\d+)\)", re.I)
+_HS_ATTR_KEY = {"strength": "str", "agility": "agi", "intelligence": "int"}
+_HS_PRIMARY_KEY = {"Strength": "str", "Agility": "agi", "Intelligence": "int", "all": "uni"}
+
+
+def hero_stat_card(before=None):
+    """Called right after the GENERAL ul_open() of a hero block. `before` = the patch compared against (the
+    previous one by default). Drawn when the page is saved (render_hs_card), after the rows under it have
+    been matched: they are hidden, their tags go on the card for the filters."""
+    from .hero_stats import attrs_changed
+    from .weights import _prev_version
+    ek, pv, hero = _State.current_entity_key or "", _State.current_patch_version, _State.current_hero
+    before = before or _prev_version(pv)
+    if not (ek.startswith("hero|") and pv and hero and before and attrs_changed(hero, before, pv)):
+        return ""
+    key = f"{ek}|{pv}"
+    _HS_CARDS[key] = {"hero": hero, "before": before, "after": pv, "tags": set(), "valve": {}}
+    _State.hs_card = {"ek": ek, "pv": pv, "key": key}
+    return f"<!--HSCARD:{key}-->"
+
+
+def _hs_covered(text, tags):
+    """A GENERAL row the hero's attributes card / damage table shows: attribute base / gain, base damage,
+    damage at level 1 / 30 and damage gain per level. Its tag goes on the card; Valve's level-1 / level-30
+    damage numbers are kept (the table shows them as Valve stated them)."""
+    card = getattr(_State, "hs_card", None)
+    if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
+        return False
+    plain = re.sub(r"<[^>]+>", " ", re.sub(r"<!--TIP-->.*?<!--/TIP-->", " ", text, flags=re.S))
+    plain = re.sub(r"\s+", " ", plain).strip()
+    rec = _HS_CARDS[card["key"]]
+    m = _HS_DMG_VALVE_RE.search(plain)
+    if m:
+        rec["valve"][int(m.group(1))] = ((int(m.group(2)), int(m.group(3))), (int(m.group(4)), int(m.group(5))))
+    # "Main attribute changed from Universal -> Intelligence": the card's pane titles say it
+    main_attr = plain.lower().startswith("main attribute changed from")
+    if not (m or main_attr or _DMG_ROW_RE.match(plain) or _HS_ATTR_ROW_RE.match(plain)):
+        return False
+    rec["tags"] |= set(tags)
+    return True
+
+
+def _hs_value(old, new, fmt="{:g}", note=""):
+    """(old html, new html): the new value in the shade of its % with the % (and a note) on hover."""
+    from .badges import b
+    o, n = fmt.format(old), fmt.format(new)
+    if old == new:
+        return o, n
+    pct = b(old, new)
+    tip = "<br>".join(x for x in (f'<span class="iab-tip-pct">{pct}</span>', note) if x)
+    return o, f'<span class="{_tone_cls(pct)}">{_iab_hint(n, tip)}</span>'
+
+
+def _hs_pane(st, other, version, is_new):
+    from .hero_stats import ATTRS, universal_multiplier
+    prim = _HS_PRIMARY_KEY.get(st["primary"], "uni")
+    changed = is_new and st["primary"] != other["primary"]          # a main attribute change: REWORK colour
+    rows = [f'<div class="hs-prim{" is-changed" if changed else ""}"><img src="{_ATTR_ICON[prim]}" alt="">'
+            f'<span>{_ATTR_LABEL[prim]}</span></div>',
+            '<span class="hs-h"></span><span class="hs-h">Base</span><span class="hs-h">Gain</span>']
+    for attr, key in ATTRS:
+        base, gain = st[attr]
+        if is_new:
+            base_html = _hs_value(other[attr][0], base)[1]
+            gain_html = _hs_value(other[attr][1], gain, "{:.1f}")[1]
+        else:
+            base_html, gain_html = f"{base:g}", f"{gain:.1f}"
+        rows.append(f'<span class="hs-attr{" is-prim" if prim in (key, "uni") else ""}">'
+                    f'<img src="{_ATTR_ICON[_HS_ATTR_KEY[attr.lower()]]}" alt="">{attr}</span>'
+                    f'<span class="hs-v">{base_html}</span><span class="hs-v">{gain_html}</span>')
+    dmg = f'{st["dmg_min"]:g} – {st["dmg_max"]:g}'
+    if is_new and (st["dmg_min"], st["dmg_max"]) != (other["dmg_min"], other["dmg_max"]):
+        # no colour, no %: base damage alone says little — the damage table below is the real change
+        note = ("Makes up for the lower damage per attribute" if universal_multiplier(version) !=
+                universal_multiplier(_HS_OTHER_VERSION[0]) else "Attack damage by level: the table below")
+        dmg = _iab_hint(dmg, note)
+    rows.append(f'<span class="hs-attr hs-dmg-l">Base damage</span><span class="hs-v hs-wide">{dmg}</span>')
+    if st["primary"] == "all" or other["primary"] == "all":
+        mult_o, mult_n = universal_multiplier(_HS_OTHER_VERSION[0]), universal_multiplier(version)
+        if is_new:
+            val = _hs_value(mult_o, mult_n, "{:g}")[1] if st["primary"] == "all" else "—"
+        else:
+            val = f"{mult_n:g}" if st["primary"] == "all" else "—"
+        rows.append(f'<span class="hs-attr hs-dmg-l">Damage per attribute</span><span class="hs-v hs-wide">{val}</span>')
+    return "".join(rows)
+
+
+_HS_OTHER_VERSION = [""]        # the other side's version while a pane is drawn
+
+
+def _hs_damage_table(rec, old, new):
+    from .badges import b
+    from .hero_stats import damage_at
+    cols = [(str(L), L, False) for L in _HS_LEVELS] + [("30 + AB", 30, True)]
+    def cell(stats, ver, L, bonus, side):
+        valve = rec["valve"].get(30 if bonus else L) if (bonus or L == 1) else None
+        if valve:                                            # Valve's own figure for level 1 / level 30 + AB
+            return valve[0 if side == "old" else 1]
+        lo, hi = damage_at(stats, ver, L, bonus=bonus)
+        return int(lo + 1e-9), int(hi + 1e-9)
+    head = "".join(f'<th{" class=hs-ab" if bonus else ""}>{lab}</th>' for lab, _, bonus in cols)
+    row_o, row_n, row_p = [], [], []
+    for lab, L, bonus in cols:
+        o = cell(old, rec["before"], L, bonus, "old")
+        n = cell(new, rec["after"], L, bonus, "new")
+        pct = b((o[0] + o[1]) / 2, (n[0] + n[1]) / 2)
+        cls = ' class="hs-ab"' if bonus else ""
+        row_o.append(f"<td{cls}>{o[0]}–{o[1]}</td>")
+        row_n.append(f'<td{cls}><span class="{_tone_cls(pct)}">{n[0]}–{n[1]}</span></td>')
+        row_p.append(f"<td{cls}>{pct}</td>")
+    note = ("Levels 1-30: the hero's own attribute growth. 30 + AB: all 7 Attribute Bonus levels taken "
+            "(+14 to every attribute), as Valve counts level 30. Levels 1 and 30 + AB are Valve's figures.")
+    return (f'<table class="hs-dmg"><thead><tr><th class="hs-dmg-t">Attack damage'
+            f'{info_tip(note)}</th>{head}</tr></thead><tbody>'
+            f'<tr><th>{rec["before"]}</th>{"".join(row_o)}</tr>'
+            f'<tr><th>{rec["after"]}</th>{"".join(row_n)}</tr>'
+            f'<tr class="hs-pct"><th></th>{"".join(row_p)}</tr></tbody></table>')
+
+
+def render_hs_card(key):
+    """The hero's attributes card + damage table as the first row of its GENERAL list."""
+    from .hero_stats import hero_stats
+    rec = _HS_CARDS.get(key)
+    if not rec:
+        return ""
+    old, new = hero_stats(rec["hero"], rec["before"]), hero_stats(rec["hero"], rec["after"])
+    _HS_OTHER_VERSION[0] = rec["after"]
+    left = _hs_pane(old, new, rec["before"], False)
+    _HS_OTHER_VERSION[0] = rec["before"]
+    right = _hs_pane(new, old, rec["after"], True)
+    tags = " ".join(sorted(rec["tags"])) or "misc"
+    return (f'<li class="hs-card-li" data-tag="{tags}"><div class="hs-card">'
+            f'<div class="hs-attrs"><div class="hs-pane hs-old">{left}</div>'
+            f'<span class="hs-arrow">→</span><div class="hs-pane hs-new">{right}</div></div>'
+            f'{_hs_damage_table(rec, old, new)}</div></li>')
+
+
 _ENCHANT_TIERS = (1, 2, 3, 4, 5)
 
 
@@ -1925,6 +2071,10 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
                  or _iab_unpaired_row(text, dyn_tags, extra)
                  or (not extra and _iab_text_change(text, dyn_tags)))):
         classes += ["iab-covered", "covered-iab"]       # covered-*: the card that shows it (tag filters)
+    # an attribute / damage row the hero's attributes card shows: hidden, its tag on the card
+    if (isinstance(text, str) and "iab-covered" not in classes
+            and (_State.current_entity_key or "").startswith("hero|") and _hs_covered(text, dyn_tags)):
+        classes += ["iab-covered", "covered-hs"]
     # a cost row the components card above already shows: hidden, the card gets its % and colours
     if (isinstance(text, str) and "iab-covered" not in classes
             and (_State.current_entity_key or "").startswith("item|") and _cost_covered(text, extra)):

@@ -3159,6 +3159,7 @@ def build():
     # Magnus
     W(hero_header("Magnus"))
     W(ul_open())
+    W(hero_stat_card())
     W(li("Base Agility increased from 12 to 14", b(12, 14)))
     W(li("Damage at level 1 increased from 55–63 to 56–64", br(55, 63, 56, 64)))
     W(ul_close())
@@ -4645,6 +4646,7 @@ def build():
     # Sven
     W(hero_header("Sven"))
     W(ul_open())
+    W(hero_stat_card())
     W(li("Base Strength increased from 23 to 24", b(23, 24)))
     W(li("Damage at level 1 increased from 60–62 to 61–63", br(60, 62, 61, 63)))
     W(ul_close())
@@ -5539,6 +5541,7 @@ def build():
     # Zeus
     W(hero_header("Zeus"))
     W(ul_open())
+    W(hero_stat_card())
     W(li("Base Strength increased from 19 to 21", b(19, 21)))
     W(li("Base Damage increased by 1–3", bstat_h("Zeus", "AttackDamageMin", "7.40c", 1),
          extra=note_box(hero="Zeus", field="AttackDamageMin", before_patch="7.40c") + inline_note("Damage spread increased from 8 to 10 — " + b(8, 10))))

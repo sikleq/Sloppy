@@ -3,6 +3,21 @@
   "entries": [
     {
       "date": "2026-09-28",
+      "category": "Patch Reader",
+      "title": "Hero attributes as a card, attack damage by level as a table",
+      "link": "patches/7.38.html",
+      "items": [
+        "A card before / after: every attribute's base and gain, base damage, damage per attribute for Universal heroes",
+        "A table of attack damage at levels 1-30, with the change in % at each level",
+        "7.38's \"Base Damage increased by 26 (+650%)\" no longer misleads: the table shows what the Universal damage change really did",
+        "The rows the card shows are hidden; tag filters and weights see them as before"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-28_hero_stat_card.webp"
+      ]
+    },
+    {
+      "date": "2026-09-28",
       "category": "Site",
       "title": "Hero pages: 10 item slots and more patch squares",
       "link": "heroes/outworld-destroyer.html",

@@ -1731,6 +1731,41 @@ def _postprocess_cost_components(lines, version):
     return out
 
 
+_HERO_DMG_ROW_RE = re.compile(r'W\(li\(\s*"Damage at level (?:1|30) ')
+
+
+def _postprocess_hero_stat_card(lines, version=None):
+    """Owner 2026-09-28 (Abaddon 7.38): a hero whose GENERAL rows restate its attack damage ("Damage at level 1
+    / 30 …") and whose attributes changed gets the attributes card + damage-by-level table (hero_stat_card) as
+    the first thing of that list; the rows it shows are hidden at render time. Works on generator output and
+    indented content."""
+    from patch.hero_stats import attrs_changed
+    from patch.weights import _prev_version
+    out, i = [], 0
+    while i < len(lines):
+        out.append(lines[i])
+        if not re.match(r'^\s*W\(hero_header\(', lines[i]):
+            i += 1
+            continue
+        j = i + 1
+        if j < len(lines) and lines[j].strip() == "W(ul_open())":
+            k = j + 1
+            while k < len(lines) and lines[k].strip() != "W(ul_close())":
+                k += 1
+            general = lines[j:k]
+            hero = re.match(r'^\s*W\(hero_header\("([^"]+)"', lines[i]).group(1)
+            changed = version is None or attrs_changed(hero, _prev_version(version) or "", version)
+            if (changed and any(_HERO_DMG_ROW_RE.search(x) for x in general)
+                    and not any("hero_stat_card(" in x for x in general)):
+                ind = re.match(r'^(\s*)', lines[j]).group(1)
+                out.append(lines[j])
+                out.append(f"{ind}W(hero_stat_card())")
+                i = j + 1
+                continue
+        i += 1
+    return out
+
+
 _CARD_NOTE_ROW_RE = re.compile(r'^\s*W\(li\("([^"\d]*)", t\("(?:MISC|QoL)"\)\)\)\s*$')
 
 
@@ -2916,6 +2951,7 @@ def generate(version):
     out = _postprocess_properties_change(out)
     out = _postprocess_silent_stats(out, version)
     out = _postprocess_card_stat_notes(out)
+    out = _postprocess_hero_stat_card(out, version)
     out = _postprocess_unstated_total_cost(out)
     out = _postprocess_item_ability_cards(out, version)
     out = _drop_empty_ul(out)
