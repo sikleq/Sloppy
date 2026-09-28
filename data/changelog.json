@@ -4,21 +4,28 @@
     {
       "date": "2026-09-28",
       "category": "Site",
-      "title": "Hero pages: 10 item slots (5 a row, tighter); the hero name no longer takes spare room, so the patch squares fill the line (Io 22, Outworld Destroyer 16 instead of 13)",
+      "title": "Hero pages: 10 item slots and more patch squares",
+      "link": "heroes/outworld-destroyer.html",
+      "items": [
+        "10 item slots next to the hero's name, in two rows of 5",
+        "The name takes only its own width, a long one wraps onto two lines",
+        "The patch squares fill the rest of the line: Io 22, Outworld Destroyer 16 (was 14)"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-28_hero_slots.webp"
+      ]
+    },
+    {
+      "date": "2026-09-28",
+      "category": "Site",
+      "title": "Thin column lines in the 7.38 enchantments table",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-28",
       "category": "Site",
-      "title": "Hero pages: the 9 item slots sit in two rows, so the patch squares keep their room; thin column lines in the 7.38 enchantments table",
-      "minor": true,
-      "fix": true
-    },
-    {
-      "date": "2026-09-28",
-      "category": "Site",
-      "title": "Hero pages: 9 item slots instead of 6; abilities that Aghanim's Shard / Scepter grant get their own filter too (Crystal Clone, Cold Blooded)",
+      "title": "Hero pages: abilities that Aghanim's Shard / Scepter grant get their own filter too (Crystal Clone, Cold Blooded)",
       "minor": true
     },
     {
