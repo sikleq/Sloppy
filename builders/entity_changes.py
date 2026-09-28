@@ -605,9 +605,9 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     return "".join(out)
 
 
-# Hero pages: 9 small item slots (owner 2026-09-28; was 6) between the name and the patch-dynamics row. The picked items' own change blocks are
+# Hero pages: 10 small item slots, 5 a row (owner 2026-09-28; was 6) between the name and the patch-dynamics row. The picked items' own change blocks are
 # pulled from items/<slug>.html into the matching patch sections (scripts.js).
-_ITEM_SLOTS = 9
+_ITEM_SLOTS = 10
 
 
 def _name_block(e: dict) -> str:

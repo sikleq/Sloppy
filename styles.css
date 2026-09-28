@@ -10187,9 +10187,11 @@ body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head > .entity { paddi
 /* hero page: 6 small item slots between the name and the patch-dynamics row,
    the same 24px glassy pill as a .dyn-cell (4:3 so the item art reads) */
 /* 9 slots in two rows (5 + 4): the patch squares keep their room (owner 2026-09-28) */
-.ec-islots { display: grid; grid-template-columns: repeat(5, 32px); gap: 4px; padding: 2px 4px; flex: none; }
+.ec-islots { display: grid; grid-template-columns: repeat(5, 32px); gap: 2px; padding: 2px 4px; flex: none; }
 .ec-islots + .dyn-row-wrap { margin-left: 14px; }
-.ec-head-panel .entity-name.ec-name-slots { font-size: 28px; }   /* room for the slots */
+/* the name takes only its own width (it used to stretch: "Io" held ~290px the patch squares need; owner
+   2026-09-28); a long one wraps */
+.ec-head-panel .entity-name.ec-name-slots { font-size: 28px; flex: 0 1 auto; max-width: 180px; }
 .ec-islot {
   position: relative; width: 32px; height: 24px; padding: 0; border: 0; border-radius: 4px; cursor: pointer;
   background: rgba(5, 6, 9, 0.92); overflow: visible;

@@ -1047,8 +1047,13 @@
   // head row stretches over the free width of its panel.
   function dynRowSize(entityDiv, manifest) {
     if (!entityDiv.closest('.ec-head')) return DYN_MAX_PATCHES;
-    const slots = entityDiv.querySelector('.ec-islots');  // hero pages: item slots share the line
-    const free = entityDiv.clientWidth - 420 - (slots ? slots.offsetWidth + 14 : 0);   // icon + name + arrows
+    // the real width of what shares the line — icon, name (as long as it is: "Io" leaves room), the hero's
+    // item slots — plus the gaps between them and room for the two nav arrows (owner 2026-09-28: a fixed
+    // guess for the name cost patch squares)
+    const gap = parseFloat(getComputedStyle(entityDiv).columnGap) || 18;
+    const others = Array.from(entityDiv.children).filter(c => !c.classList.contains('dyn-row-wrap'));
+    const used = others.reduce((s, c) => s + c.getBoundingClientRect().width, 0) + gap * others.length;
+    const free = entityDiv.clientWidth - used - 14 - 18;   // the row's own left margin after the slots; the right arrow
     return Math.max(DYN_MAX_PATCHES, Math.min(manifest.patches.length, Math.floor(free / 28)));
   }
 
@@ -1524,6 +1529,16 @@
             const off = parseInt(e.dataset.dynOffset || '0', 10);
             dynRenderRow(e, manifest, dynWindow(manifest, off, dynRowSize(e, manifest)), currentVersion, off);
           };
+          // Hero / Item Changes page: the head row is sized from the name's real width, which changes once the
+          // pixel font arrives — size it again then (it was left a few squares short)
+          const head = document.querySelector('.ec-head .entity[id^="dyn-"]');
+          if (head && document.fonts && document.fonts.ready) document.fonts.ready.then(() => {
+            if (!head.dataset.dynBuilt) return;
+            const old = head.querySelector('.dyn-row-wrap');
+            if (old) old.remove();
+            const off = parseInt(head.dataset.dynOffset || '0', 10);
+            dynRenderRow(head, manifest, dynWindow(manifest, off, dynRowSize(head, manifest)), dynCurrentVersion(), off);
+          });
           // "Weights" toggle (toolbar): flip the mode and rebuild every row already built.
           const wBtn = document.getElementById('dyn-weights-btn');
           if (wBtn && dynWeightsStored()) {
@@ -3724,7 +3739,7 @@ function ecShopMarkup(panels) {
     + '</div></section>').join('') + '</div>';
 }
 
-// ---- HERO CHANGES page: 9 item slots next to the hero name ----
+// ---- HERO CHANGES page: 10 item slots next to the hero name ----
 // A picked item's own change blocks (from items/<slug>.html) are added to the
 // hero's patch sections, so e.g. Anti-Mage + Battle Fury shows both in 7.41f.
 // A patch where only the item changed gets its own section in version order.
