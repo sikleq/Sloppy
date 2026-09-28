@@ -10893,7 +10893,7 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-hl-new { color: #e0bd62; }
 .iab-hl-buff { color: #7fd08c; }
 .iab-hl-nerf { color: #e3806e; }
-.iab-hl-del { color: #e3806e; }            /* removed text: red, whatever the row's tag */
+.iab-hl-del { color: #d97aa2; }            /* removed text: the DEL colour, whatever the row's tag */
 .iab-hl-rework, .iab-hl-swap { color: #b99ae6; }
 .iab-hl-qol, .iab-hl-misc { color: var(--text-dimmer); }
 .iab-hl .iab-num { color: inherit; }          /* a number inside the coloured phrase takes its colour */
@@ -10919,6 +10919,13 @@ ul.changes li.iab-covered { display: none !important; }
 .iab-num.iab-nerf, .iab-m.iab-nerf { color: #e3806e; }
 .iab-num.iab-new, .iab-m.iab-new { color: #e0bd62; }
 .iab-num.iab-misc, .iab-m.iab-misc { color: var(--text-dimmer); }
+.iab-num.iab-rework, .iab-m.iab-rework { color: #b99ae6; }   /* Orb of Venom 7.38: a cooldown where there was none */
+/* A changed value painted with its %'s own shade class ("badge nerf3 tone", _tone_cls): the colour of the
+   .badge.nerfN rule, none of the chip's box (owner 2026-09-28: "1000" and "+14%" in two different reds) */
+.badge.tone { background: none !important; border: none !important; padding: 0 !important; text-shadow: none !important;
+  margin: 0; min-width: 0; text-transform: none; letter-spacing: inherit; font-size: inherit; line-height: inherit;
+  display: inline; vertical-align: baseline; text-align: inherit; white-space: inherit; }
+.iab-m.badge.tone { display: inline-flex; }
 /* Components card with its cost rows folded in (owner 2026-09-27): the new recipe price and total coloured
    by direction, the total's % at the end of the block on the rows' % column */
 .components-change .components-pct { margin-left: auto; white-space: nowrap; }

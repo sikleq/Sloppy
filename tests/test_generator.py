@@ -544,7 +544,7 @@ def test_new_item_without_bonuses_has_no_bonus_row_and_gets_kv_price():
     ("Scrumptious' Savory Shield now has a 5 minute duration", "REWORK"),
     ("Scrumptious can no longer be cast on an ally to give them the buff. However, item is still fully shareable", "REWORK"),
     ("No longer refills when carrier has a lingering fountain regeneration buff", "DEL"),
-    ("Poison Attack now has a 9s cooldown", "NEW"),
+    ("Poison Attack now has a 9s cooldown", "REWORK"),   # owner 2026-09-28 (was NEW)
     ("Roshan's knockback now has a 2s cooldown before it can be applied to the same unit again", "NERF"),
 ])
 def test_item_and_creep_canonical_tags_738(text, tag):
@@ -583,6 +583,7 @@ def test_item_ability_mana_cost_is_a_row_not_a_card_line():
     import generate_patch_code_v2 as g
     out = g._postprocess_properties_change([
         'W(item_header("Gleipnir", changed=True))',
+        'W(auto_components_change("Gleipnir", "7.38"))',      # the build changed: the stats card comes with it
         'W(li("Eternal Chains mana cost decreased from 200 to 100", b(200, 100, l=True)))',
         'W(li("Health bonus increased from +275 to +450", b(275, 450)))'])
     card = next(x for x in out if x.startswith("W(properties_change("))
@@ -606,9 +607,10 @@ def test_now_provides_x_instead_of_y_goes_into_the_cards():
     import generate_patch_code_v2 as g
     out = g._postprocess_properties_change([
         'W(item_header("Khanda", changed=True))',
+        'W(auto_components_change("Khanda", "7.38"))',
         'W(li("Now provides +8 Mana Regen instead of +50 Damage", t("REWORK")))',
         'W(li("Empower Spell bonus damage increased from 150 to 250", b(150, 250)))'])
-    assert out[1] == 'W(properties_change(old=[("DEL", "+50 Damage")], new=[("NEW", "+8 Mana Regen")]))'
+    assert out[2] == 'W(properties_change(old=[("DEL", "+50 Damage")], new=[("NEW", "+8 Mana Regen")]))'
     assert 'W(li("Empower Spell bonus damage increased from 150 to 250", b(150, 250)))' in out
 
 
@@ -618,6 +620,7 @@ def test_reworked_item_provides_list_is_the_new_card_and_asks_for_old_stats():
     import generate_patch_code_v2 as g
     out = g._postprocess_properties_change([
         'W(item_header("Revenant\'s Brooch", changed=True))',
+        'W(auto_components_change("Revenant\'s Brooch", "7.38"))',
         'W(li("Provides +35 Damage and +16% Spell Lifesteal", t("REWORK")))'])
     assert any(x.strip().startswith("# TODO Revenant's Brooch: old bonus stats") for x in out)
     assert out[-1] == 'W(properties_change(old=[], new=[("NEW", "+35 Damage"), ("NEW", "+16% Spell Lifesteal")]))'

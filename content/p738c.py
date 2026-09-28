@@ -35,7 +35,9 @@ def build():
     # ===== ITEM UPDATES =====
     W(section("Item Updates"))
     W(item_header("Desolator"))
-    W(properties_change(old=[("BUFF", "+50 Damage")], new=[("", "+55 Damage", b(50, 55))]))
+    W(ul_open())
+    W(li("Damage bonus increased from +50 to +55", b(50, 55)))
+    W(ul_close())
     W(item_header("Helm of the Dominator"))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
@@ -61,7 +63,9 @@ def build():
     W(li("Corrosion armor reduction decreased from 3 to 2", b(3, 2)))
     W(ul_close())
     W(item_header("Revenant's Brooch"))
-    W(properties_change(old=[("NERF", "+16% Spell Lifesteal")], new=[("", "+14% Spell Lifesteal", b(16, 14))]))
+    W(ul_open())
+    W(li("Spell Lifesteal bonus decreased from +16% to +14%", b(16, 14)))
+    W(ul_close())
     W(item_header("Spirit Vessel"))
     W(ul_open())
     W(li("Soul Release healing, regen and lifesteal reduction increased from 60% to 70%", b(60, 70)))

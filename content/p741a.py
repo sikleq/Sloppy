@@ -7,8 +7,8 @@ def build():
     W(section("Item Updates"))
 
     W(item_header("Consecrated Wraps"))
-    W(properties_change(old=[("NERF", "+15% Magic Resistance")], new=[("", "+12% Magic Resistance", b(15, 12))]))
     W(ul_open())
+    W(li("Magic Resistance bonus decreased from +15% to +12%", b(15, 12)))
     W(li("Hallowed movement speed on stack gain decreased from 20% to 15%", b(20, 15)))
     W(li("Hallowed barrier and movement speed duration decreased from 7s to 5s", b(7, 5)))
     W(ul_close())

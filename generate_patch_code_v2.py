@@ -267,9 +267,10 @@ CANONICAL_TAGS = [
     (re.compile(r'\bis now disjointable\b', re.I),                  'NERF'),   # own projectile can now be dodged
     (re.compile(r'\bnow (?:only|solely) (?:affects?|available|applies|works|triggers?|targets?|hits?)\b', re.I), 'NERF'),
     (re.compile(r'\bnow (?:affects?|applies|works) only\b', re.I),  'NERF'),
-    # a whole cooldown where there was none (7.38 "Poison Attack now has a 9s cooldown") -> NEW;
-    # longer sentences ("…cooldown before it can be applied…") keep the NERF rule below
-    (re.compile(r"^[A-Z][\w' ]* now has an? \d+(?:\.\d+)?s cooldown$"), 'NEW'),
+    # a whole cooldown where there was none (7.38 "Poison Attack now has a 9s cooldown") -> REWORK: the
+    # ability now works differently (owner 2026-09-28; it was NEW); longer sentences ("…cooldown before it
+    # can be applied…") keep the NERF rule below
+    (re.compile(r"^[A-Z][\w' ]* now has an? \d+(?:\.\d+)?s cooldown$"), 'REWORK'),
     (re.compile(r'\bnow has (?:a |an )?\d[\d./]*\s?(?:s|seconds?)? ?(?:cast point|cast time|internal cooldown|break distance|cooldown|mana cost|delay|health cost)\b', re.I), 'NERF'),
     (re.compile(r'\bnow (?:ends|expires|dies?|breaks?|is (?:cancell?ed|interrupted|removed)) (?:if|when|once|after)\b', re.I), 'NERF'),
     (re.compile(r'\b(?:may|can) only (?:trigger|proc|be cast|be used|target|affect|stack)\b', re.I), 'NERF'),
@@ -1586,10 +1587,13 @@ def _postprocess_properties_change(lines):
         item_name = m_hdr.group(1)
         out.append(line)
         i += 1
-        # Optionally an auto_components_change line follows the header
-        if i < len(lines) and lines[i].startswith('W(auto_components_change('):
-            out.append(lines[i])
-            i += 1
+        # Owner 2026-09-28 (Sange and Yasha: one changed stat drawn as a whole card): the stats card only
+        # comes with a changed BUILD — an auto_components_change right under the header. Otherwise the stat
+        # rows stay plain rows ("Status Resistance bonus decreased from +25% to +20%").
+        if not (i < len(lines) and lines[i].startswith('W(auto_components_change(')):
+            continue
+        out.append(lines[i])
+        i += 1
 
         # Collect li rows of this item block. The block ends at the next
         # W(item_header(...)) / W(hero_header(...)) / section header.
@@ -1750,9 +1754,22 @@ def _postprocess_silent_stats(lines, version):
         block = lines[i:end]
         card_at = next((k for k, ln in enumerate(block) if _CARD_LINE_RE.match(ln)), None)
         card_rows = " ".join(re.findall(r'\(\s*"[^"]*"\s*,\s*"([^"]*)"', block[card_at])) if card_at is not None else ""
-        grants = " ".join(_GRANT_TOKEN_RE.findall(" ".join(re.findall(r'li\(\s*"([^"]*)"', "\n".join(block)))))
-        removed, added, changed = silent_stat_changes(m_hdr.group(1), version, (card_rows + " " + grants).lower())
-        if removed or added or changed:
+        li_texts = re.findall(r'li\(\s*"([^"]*)"', "\n".join(block))
+        grants = " ".join(_GRANT_TOKEN_RE.findall(" ".join(li_texts)))
+        changes = " ".join(m.group(1) for t in li_texts for m in [_PROP_CHANGE_RE.match(t)] if m)
+        removed, added, changed = silent_stat_changes(m_hdr.group(1), version,
+                                                      (card_rows + " " + grants + " " + changes).lower())
+        has_build = any(ln.startswith('W(auto_components_change(') for ln in block)
+        if (removed or added or changed) and not has_build and card_at is None:
+            # no build change -> no stats card (owner 2026-09-28): plain rows, like the notes' own
+            rows = [f'W(li("No longer provides {_stat_text(s, a)}", t("DEL")))' for s, a, _ in removed]
+            rows += [f'W(li("Now also provides {_stat_text(s, b)}", t("NEW")))' for s, _, b in added]
+            rows += [f'W(li("{_stat_line_name(s)} bonus {"increased" if b > a else "decreased"} from '
+                     f'{_stat_text(s, a).split(" ")[0]} to {_stat_text(s, b).split(" ")[0]}", b({_py_repr(a)}, {_py_repr(b)})))'
+                     for s, a, b in changed]
+            k = next((j for j, ln in enumerate(block) if ln.strip() == "W(ul_open())"), None)
+            block = (block[:k + 1] + rows + block[k + 1:]) if k is not None else block + ["W(ul_open())"] + rows + ["W(ul_close())"]
+        elif removed or added or changed:
             olds = [f'("DEL", "{_stat_text(s, a)}")' for s, a, _ in removed]
             olds += [f'("", "{_stat_text(s, a)}")' for s, a, _ in changed]
             news = [f'("", "{_stat_text(s, b)}", b({_py_repr(a)}, {_py_repr(b)}))' for s, a, b in changed]
@@ -1768,6 +1785,11 @@ def _postprocess_silent_stats(lines, version):
         out.extend(block)
         i = end
     return out
+
+
+def _stat_line_name(stat):
+    from patch.elements import _STAT_LINE
+    return _STAT_LINE[stat][0]
 
 
 def _py_repr(v):

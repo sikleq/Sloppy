@@ -1,6 +1,8 @@
 """Owner 2026-09-27: an item that has other changes shows its price change in the components card — the
 recipe chip and "= total" coloured, the total's % at the end of the block — and the cost row under it is
 hidden (still counted by tag filters and weights)."""
+import re
+
 from patch import elements as el
 from patch.state import _State
 
@@ -20,10 +22,15 @@ def test_a_cost_row_whose_numbers_the_card_shows_is_hidden_and_the_card_gets_its
         assert el._cost_covered("Recipe cost increased from 600 to 900. Total cost increased from 4700g to 5000g")
         html = el.render_cost_card("item|cost-test|7.41")
         new = html.split("components-arrow")[1]
-        # the recipe: coloured, its % (+50%) on hover under a dotted line; the total: coloured, % at the end
-        assert 'component-price cost-nerf"><span class="iab-hint' in new and "+50%" in new and ">900</span>" in new
-        assert 'class="cost-nerf">5000<' in new
-        assert 'class="components-pct"' in new and "+6%" in new
+        # the recipe: in its %'s own shade, the % (+50%) on hover under a dotted line; the total: in the shade of
+        # the % at the end of the card (owner 2026-09-28: the value and its % the same colour)
+        from patch.badges import b
+        recipe_tone = el._tone_cls(b(600, 900, l=True))                     # the +50% lives in the hover tip
+        assert f'<div class="component-price"><span class="{recipe_tone}"><span class="iab-hint' in new
+        assert "+50%" in new
+        assert ">900</span>" in new
+        total_pct = re.search(r'components-pct">.*?class="badge (nerf\d+)">\+6%', new).group(1)
+        assert f'class="badge {total_pct} tone">5000<' in new
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.cost_card = saved
 

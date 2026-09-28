@@ -1432,13 +1432,15 @@ def _iab_covered_change(text, tags, extra="", badge=""):
     plain = re.sub(r"<!--TIP-->.*?<!--/TIP-->", " ", text, flags=re.S)
     plain = re.sub(r"<[^>]+>", " ", plain)
     direction = ("buff" if "buff" in tags else "nerf" if "nerf" in tags else "new" if "new" in tags
-                 else "misc" if "misc" in tags else "")
+                 else "rework" if "rework" in tags else "misc" if "misc" in tags else "")
     if not direction:
         return False
     low = plain.lower()
     note = _iab_note(text, extra)
     if isinstance(badge, str) and "badge-group" in badge:
         note = "<br>".join(x for x in (f'<span class="iab-tip-pct">{badge}</span>', note) if x)
+        # the number takes the very shade of its % (owner 2026-09-28): "iab-nerf badge nerf3 tone"
+        direction = f"{direction} {_tone_cls(badge)}".strip()
     m = _IAB_FROMTO_RE.search(plain)
     if m and re.search(r"\bradius\b", low) and "cast range" not in low:
         ability = next((n for n in card["names"] if n and low.startswith(n)), "")
@@ -2518,15 +2520,19 @@ def _components_html(old, new, total_old, total_new, recipe_old=None, recipe_new
     from .badges import b
     ro, rn = (recipe_old or (None, None))[1], (recipe_new or (None, None))[1]
     if ro and rn and ro != rn and _is_num(ro) and _is_num(rn):
-        # the new recipe price coloured (cheaper = green), its % on hover under a dotted line (owner 2026-09-27)
+        # the new recipe price coloured in its %'s shade (cheaper = green), the % on hover under a dotted line
+        # (owner 2026-09-27)
         price = '<div class="component-price">'
         i = right.rfind(price)
         j = right.index("</div>", i)
-        right = (right[:i] + f'<div class="component-price cost-{"buff" if rn < ro else "nerf"}">'
-                 + _iab_hint(right[i + len(price):j], b(ro, rn, l=True)) + right[j:])
+        pct = b(ro, rn, l=True)
+        tone = _tone_cls(pct, f'cost-{"buff" if rn < ro else "nerf"}')
+        right = (right[:i] + price + f'<span class="{tone}">' + _iab_hint(right[i + len(price):j], pct)
+                 + "</span>" + right[j:])
     changed = _is_num(total_old) and _is_num(total_new) and total_old != total_new
     if changed or marks.get("note"):
-        cls = f' class="cost-{"buff" if total_new < total_old else "nerf"}"' if changed else ""
+        tone = _tone_cls(b(total_old, total_new, l=True), f'cost-{"buff" if total_new < total_old else "nerf"}')
+        cls = f' class="{tone}"' if changed else ""
         right = right.replace(f'= <span>{total_new}</span>',
                               f'= <span{cls}>{_iab_hint(str(total_new), marks.get("note", ""))}</span>', 1)
     if changed:
@@ -2543,6 +2549,13 @@ def _components_html(old, new, total_old, total_new, recipe_old=None, recipe_new
 
 def _is_num(x):
     return isinstance(x, (int, float)) and not isinstance(x, bool)
+
+
+def _tone_cls(badge_html, fallback=""):
+    """The shade class of a b() badge ("badge nerf3 tone"): a changed value painted with it looks exactly like
+    its % (owner 2026-09-28: "1000" and "+14%" in two reds); `.badge.tone` drops the chip's box."""
+    m = re.search(r'class="badge ((?:buff|nerf)\d+)"', badge_html or "")
+    return f"badge {m.group(1)} tone" if m else fallback
 
 
 def render_cost_card(key):

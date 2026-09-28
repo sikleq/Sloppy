@@ -4,6 +4,34 @@
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
+      "title": "An item whose build didn't change shows its stat changes as plain rows again, not a whole stats card (Sange and Yasha 7.38: one row)",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-28",
+      "category": "Patch Reader",
+      "title": "A changed value in the cards takes the very shade of its % (Orb of Corrosion 7.38: \"1000\" and \"+14%\" in one colour); removed card text back in the DEL colour",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-28",
+      "category": "Patch Reader",
+      "title": "Tag filters: switching a filter off no longer leaves sub-category labels hidden or cards with a bare arrow",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-28",
+      "category": "Patch Reader",
+      "title": "Orb of Venom 7.38: \"Poison Attack now has a 9s cooldown\" is REWORK, not NEW",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-28",
+      "category": "Patch Reader",
       "title": "Tag filters: a card that shows a filtered change stays, an item with nothing to show is hidden (Witch Blade 7.41 under BUFF left a bare header)",
       "minor": true,
       "fix": true

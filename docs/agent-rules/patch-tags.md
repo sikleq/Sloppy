@@ -246,7 +246,7 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
 
 ## Уроки вычитки 7.38: метки (правило → почему)
 - «No longer unbreakable» → **NEW**: у врага появилась новая возможность (сломать ауру).
-- «X now restores …» (раньше не восстанавливал) → **NEW**. «Poison Attack now has a 9s cooldown» (раньше кулдауна не было) → **NEW**.
+- «X now restores …» (раньше не восстанавливал) → **NEW**. «Poison Attack now has a 9s cooldown» (раньше кулдауна не было) → **REWORK** (2026-09-28: способность теперь работает иначе; было NEW).
 - «… now has a 5 minute duration» → **REWORK**: меняется то, как эффектом пользуются.
 - «can no longer … However, … still …» → **REWORK**: потеря с оговоркой, а не просто удаление.
 - «No longer refills / triggers / activates when …» → **DEL**.

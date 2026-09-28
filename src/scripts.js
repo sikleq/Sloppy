@@ -256,11 +256,21 @@
     // under any other filter a panel stays only when it holds a matching tag (panelMatches), so items with
     // recipe changes don't bleed through QoL/BUFF/etc. filters.
     const reworkOnly = activeFilters.size > 0 && !activeFilters.has('rework');
-    document.querySelectorAll('.components-box, .components-change, .provides-box, .properties-change').forEach(el => {
-      if (reworkOnly && !panelMatches(el)) el.classList.add('f-hide');
+    // top-level panels only: a components card's own two panes are .components-box too (hiding them left a
+    // bare arrow under a filter, owner 2026-09-28)
+    const PANELS = ':scope > .components-box, :scope > .components-change, :scope > .provides-box, :scope > .properties-change';
+    document.querySelectorAll('.entity-block').forEach(block => {
+      block.querySelectorAll(PANELS).forEach(el => {
+        if (reworkOnly && !panelMatches(el)) el.classList.add('f-hide');
+      });
     });
+    const filtering = activeFilters.size > 0;
     document.querySelectorAll('.entity-block').forEach(block => {
       if (block.classList.contains('ec-head')) return;   // Changes-page header: never filtered
+      // no tag filter on: every block shows (a sub-category label or a block without rows stayed hidden
+      // after a filter was switched off, owner 2026-09-28)
+      if (!filtering) { block.classList.remove('f-hide'); return; }
+      if (block.classList.contains('label-only')) return;  // decided below, from the blocks under it
       const visibleLi = block.querySelectorAll('ul.changes > li:not(.f-hide):not(.cat-hide):not(.iab-covered)').length;
       const visibleSwaps = block.querySelectorAll('.ability-change:not(.f-hide):not(.cat-hide)').length;
       const visiblePanels = Array.from(block.children).some(child =>
@@ -268,6 +278,16 @@
         elementVisible(child)
       );
       block.classList.toggle('f-hide', !visibleLi && !visibleSwaps && !visiblePanels);
+    });
+    // A sub-category label ("List of Neutral Artifacts") shows while any block under it (up to the next
+    // label or category) is visible.
+    if (filtering) document.querySelectorAll('.entity-block.label-only').forEach(label => {
+      let nx = label.nextElementSibling, shown = false;
+      while (nx && !nx.classList.contains('label-only') && !nx.matches('h2.section')) {
+        if (nx.classList.contains('entity-block') && elementVisible(nx)) { shown = true; break; }
+        nx = nx.nextElementSibling;
+      }
+      label.classList.toggle('f-hide', !shown);
     });
     document.querySelectorAll('h4.subgroup').forEach(h => {
       let nx = h.nextElementSibling;

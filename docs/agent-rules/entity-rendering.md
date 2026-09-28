@@ -209,11 +209,18 @@ bonus damage increased from 150 to 250», «Poison Attack now has a 9s cooldown�
 все строки под ней уже отметили свои числа. Видны остаются строки, которых нет в карточке: цена, «no longer …»,
 «Removed … ability», механика словами.
 
-Карточка характеристик — у ЛЮБОГО изменённого предмета (2026-09-27, Bloodstone 7.38 «No longer provides +75 AoE
-radius»): раньше генератор делал её только для `changed=True`. Теперь `_postprocess_properties_change` берёт
-любой `item_header` без `new=`; строки «No longer provides / Now also provides / X bonus increased from A to B»
-уходят в карточку (веса те же — строки карточки считаются так же). Пустые `ul_open/ul_close` убираются
-(`_drop_empty_ul`). Проставлено в 75 предметах 7.38–7.41f.
+Карточка характеристик — ТОЛЬКО когда поменялась сборка (2026-09-28, отменяет правило 09-27 «у любого изменённого
+предмета»; Sange and Yasha 7.38: одна изменённая характеристика рисовалась целой карточкой). `_postprocess_properties_change`
+складывает строки «No longer provides / Now also provides / X bonus increased from A to B» в карточку, только если под
+заголовком стоит `auto_components_change`; иначе это обычные строки («Status Resistance bonus decreased from +25%
+to +20%»). Так же `_postprocess_silent_stats`: без изменения сборки «молчаливые» характеристики становятся строками.
+71 блок 7.38–7.41f переведён обратно в строки; сторож — `tests/test_item_card_rows.py::test_no_stats_card_without_a_build_change`.
+Пустые `ul_open/ul_close` убираются (`_drop_empty_ul`).
+
+Цвет изменённого значения = цвет его процента (2026-09-28: «1000» и «+14%» были разными красными): итог и цена
+рецепта в карточке состава, числа в карточке способностей получают класс оттенка процента (`_tone_cls` →
+`badge nerf3 tone`; `.badge.tone` снимает рамку и фон метки). Убранный текст — цвет DEL (как раньше), он только для
+глаза: веса считает скрытая строка по своему тегу.
 
 В карточке характеристик — только характеристики (2026-09-27, Heaven's Halberd 7.41). Убранная или добавленная
 способность («Damage Block (passive)») — отдельная строка «Removed <Name> ability» (DEL), её текст показывает
