@@ -4,11 +4,11 @@
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "Hero attack damage in one line",
+      "title": "Hero attack damage: starting damage and gain per level",
       "link": "patches/7.38.html",
       "items": [
-        "Where Valve rescaled a hero's damage growth: \"Starting damage rescaled from 40–50 to 50–60 and damage gain per level from 3.6 to 2.7\"",
-        "% of both numbers on the right; \"Starting damage\" opens the damage at levels 1–30",
+        "Where Valve rescaled a hero's damage growth: \"Starting damage increased from 40–50 to 50–60\" and \"Damage gain per level decreased from 3.6 to 2.7\"",
+        "Each row has its own tag and %; \"Damage gain per level\" opens the damage at levels 1–30",
         "36 heroes: 35 in 7.38 (Universal heroes 0.7 → 0.45 damage per attribute) and Spectre in 7.40"
       ],
       "shots": [

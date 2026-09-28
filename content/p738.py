@@ -790,7 +790,7 @@ def build():
     # Abaddon
     W(hero_header("Abaddon"))
     W(ul_open())
-    W(hero_stat_card(tag="buff"))   # the owner kept BUFF (2026-09-28)
+    W(hero_stat_card())
     W(li("Base Damage increased by 26", bstat_h("Abaddon", "AttackDamageMin", "7.37e", 26), extra=note_box(hero="Abaddon", field="AttackDamageMin", before_patch="7.37e")))
     W(li("Base Intelligence decreased from 19 to 18", b(19, 18)))
     W(li("Damage at level 1 increased by 10 (from 40-50 to 50-60)", br(40, 50, 50, 60)))

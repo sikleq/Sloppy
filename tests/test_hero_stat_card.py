@@ -1,5 +1,6 @@
-"""Owner 2026-09-28 (Abaddon 7.38): a hero's GENERAL block starts with an attributes card (base + gain, base damage,
-damage per attribute; before -> after) and a table of attack damage by level; the rows it shows are hidden."""
+"""Owner 2026-09-28 (Abaddon 7.38): a hero whose damage growth Valve rescaled gets two rows at the top of GENERAL,
+"Starting damage …" and "Damage gain per level …", each with its own tag, the second opening the damage by level;
+Valve's damage rows under them are hidden."""
 import re
 
 from patch import elements as el
@@ -31,21 +32,16 @@ def test_card_hides_its_rows_and_carries_their_tags():
         assert not el._hs_covered("Mist Coil damage increased from 100 to 120", {"buff"})
         assert el._hs_covered("Damage gain per level decreased from +3.6 to +2.7", {"nerf"})
         html = el.render_hs_card("hero|abaddon|7.38")
-        # ONE row with the numbers in it; "Starting damage" opens the damage by level
-        assert html.startswith('<li data-tag="buff nerf" class="li-bg li-formula hs-dmg-li">')
-        assert re.search(r'>Starting damage</span> rescaled from 40–50 to 50–60 and damage gain per level '
-                         r'from 3\.6 to 2\.7<', html)
-        assert html.count('class="formula-table') == 1                        # one table
+        # TWO rows, each with its own tag (owner 2026-09-28: the start went up, the growth went down)
+        start, gain = re.findall(r"<li .*?</li>(?=<li |$)", html, re.S)
+        assert start.startswith('<li data-tag="buff" class="li-bg hs-dmg-li">')
+        assert "Starting damage increased from 40–50 to 50–60<" in start and ">+22%<" in start
+        assert gain.startswith('<li data-tag="nerf" class="li-bg li-formula hs-dmg-li">')
+        assert re.search(r'>Damage gain per level</span> decreased from 3\.6 to 2\.7<', gain) and ">-25%<" in gain
+        assert html.count('class="formula-table') == 1 and 'class="formula-table' in gain   # one table, 2nd row
         # level 30 = Valve's figure, all 7 Attribute Bonus levels counted
-        assert "173–183" in html and "148–158" in html and "all 7 Attribute Bonus levels" in html
-        # the % of both numbers: starting damage +22%, gain per level 3.6 -> 2.7 = -25% (level 30's -14%: table)
-        assert re.search(r'\+22%</span><span class="formula-endpoint-label">start</span>'
-                         r'<span class="badge nerf\d+">-25%</span><span class="formula-endpoint-label">per level</span>', html)
-        assert 'data-overall="nerf">NERF</span>' in html                      # the site's rule: -14% at the end
-        assert "0.7 → 0.45 damage per attribute" in html
-        _HS = el._HS_CARDS["hero|abaddon|7.38"]
-        _HS["tag"] = "buff"                                                   # the owner's choice for Abaddon
-        assert 'data-overall="buff">BUFF</span>' in el.render_hs_card("hero|abaddon|7.38")
+        assert "173–183" in gain and "148–158" in gain and "all 7 Attribute Bonus levels" in gain
+        assert "0.7 → 0.45 damage per attribute" in gain
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card = saved
 
@@ -72,7 +68,8 @@ def test_unchanged_starting_damage_is_said_so():
         el.hero_stat_card()
         el._hs_covered("Damage at level 1 increased by 0 (from 39-43 to 39-43)", {"misc"})
         html = el.render_hs_card("hero|batrider|7.38")
-        assert re.search(r'>Damage gain per level</span> rescaled from [\d.]+ to [\d.]+, starting damage unchanged '
-                         r'at 39–43', html)
+        # the start did not move: no row for it, only the growth's row, the (?) says so
+        assert html.count("<li ") == 1 and "Starting damage unchanged at 39–43" in html
+        assert re.search(r'data-tag="nerf".*>Damage gain per level</span> decreased from [\d.]+ to [\d.]+<', html)
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card = saved
