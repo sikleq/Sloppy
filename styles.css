@@ -2968,42 +2968,9 @@ ul.changes li.ability-row-end {
 /* ENCHANT-BY-ATTRIBUTE GRID — 7.41 Tier-X enchantment selection box.
    Layout: rows of [attr icon][attr name] | [enchant chip] [enchant chip]...
    Shares the muted bordered look of components-box / provides-box. */
-/* HERO ATTRIBUTES + ATTACK DAMAGE BY LEVEL (hero_stat_card, pilot Abaddon 7.38, owner 2026-09-28): the first
-   row of a hero's GENERAL list, one frame — the attributes as lines ("1.6 → 2.0  +25%"), the damage table,
-   a footnote on what damage is made of. The rows it shows stay hidden in the list. */
-ul.changes li.hs-card-li { display: block; padding: 2px 0 6px; list-style: none; }
-ul.changes li.hs-card-li::before { display: none; }
-.hs-card { background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px; overflow: hidden;
-  font-variant-numeric: tabular-nums; }
-.hs-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
-.hs-tbl th, .hs-tbl td { padding: 4px 8px; white-space: nowrap; }
-.hs-tbl thead th { color: var(--text-dim); font-size: 11px; font-weight: 700; letter-spacing: 0.4px;
-  text-transform: uppercase; border-bottom: 1px solid var(--line-soft); }
-.hs-tbl .hs-t { text-align: left; padding-left: 12px; }
-.hs-tbl .hs-t img { width: 14px; height: 14px; vertical-align: -2px; margin-right: 5px; }
-.hs-prim-new { color: #b99ae6; }                       /* the main attribute changed (the REWORK row it hides) */
-.hs-dmg { border-top: 1px solid var(--line-soft); }
-/* attributes: name | base | % | gain | % */
-.hs-attr-tbl th.hs-v, .hs-attr-tbl td.hs-v, .hs-attr-tbl td.hs-p { text-align: left; }
-.hs-attr-tbl { table-layout: fixed; }                 /* column widths from the colgroup; the spare width goes right */
-.hs-attr-tbl tbody th { text-align: left; padding-left: 12px; font-weight: 400; color: var(--text-main); }
-.hs-attr-tbl tbody th img { width: 16px; height: 16px; vertical-align: -3px; margin-right: 6px; }
-.hs-attr-tbl tbody th.is-prim { color: var(--text-bright); font-weight: 600; }
-.hs-attr-tbl tbody tr + tr > * { border-top: 1px dashed rgba(254, 247, 232, 0.05); }
-.hs-same { color: var(--text-main); }
-.hs-old { color: var(--text-dim); }
-.hs-to { color: var(--text-dimmer); margin: 0 6px; }
-.hs-v .badge.tone, .hs-foot .badge.tone { font-weight: 700; }
-/* damage by level */
-.hs-dmg td, .hs-dmg thead th:not(.hs-t) { text-align: center; }
-.hs-dmg tbody th { text-align: left; color: var(--text-dim); font-weight: 600; padding-left: 12px; }
-.hs-dmg td + td, .hs-dmg th + td, .hs-dmg th + th { border-left: 1px solid rgba(254, 247, 232, 0.06); }
-.hs-dmg .hs-ab { background: rgba(0, 0, 0, 0.14); }
-.hs-dmg tr.hs-row-old td { color: var(--text-dim); }
-.hs-dmg tr.hs-row-new td { color: var(--text-bright); font-weight: 600; }
-.hs-dmg tr.hs-pct td { font-size: 12px; padding-top: 0; }
-.hs-foot { padding: 6px 12px; border-top: 1px solid var(--line-soft); color: var(--text-dim); font-size: 12.5px; }
-.hs-foot .hs-dot { margin: 0 10px; color: var(--text-dimmer); }
+/* HERO ATTACK DAMAGE BY LEVEL (hero_stat_card, pilot Abaddon 7.38, owner 2026-09-28): one formula-style row;
+   the damage ranges keep one line each in its table */
+.formula-table.hs-ft td { white-space: nowrap; }
 
 /* LIST OF ENCHANTMENTS AS ONE TABLE (owner 2026-09-28, 7.38 "List of Neutral Enchantments"): every
    enchantment is still its own entity block (patch squares, its Changes page), drawn as a row of one framed

@@ -24,18 +24,19 @@ def test_card_hides_its_rows_and_carries_their_tags():
         slot = el.hero_stat_card()
         assert slot == "<!--HSCARD:hero|abaddon|7.38-->"
         assert el._hs_covered("Base Damage increased by 26", {"buff"})
+        assert el._hs_covered("Damage at level 1 increased by 10 (from 40-50 to 50-60)", {"buff"})
         assert el._hs_covered("Damage at level 30 decreased by 25 (from 173-183 to 148-158)", {"nerf"})
-        assert el._hs_covered("Strength gain increased from 2.2 to 2.6", {"buff"})
-        assert el._hs_covered("Base Intelligence decreased from 19 to 18", {"nerf"})
+        # the attribute rows stay rows (owner 2026-09-28: "more laconic")
+        assert not el._hs_covered("Strength gain increased from 2.2 to 2.6", {"buff"})
         assert not el._hs_covered("Mist Coil damage increased from 100 to 120", {"buff"})
         html = el.render_hs_card("hero|abaddon|7.38")
-        assert 'data-tag="buff nerf"' in html
-        assert "173–183" in html and "148–158" in html                     # Valve's level-30 figures
-        # one line per attribute: "1.6 → 2.0" (the new value in its %'s shade) and the % beside it
-        assert re.search(r'<span class="hs-old">2\.2</span><span class="hs-to">→</span>'
-                         r'<span class="badge buff\d+ tone">2\.6</span>', html)
-        assert '<span class="hs-same">22</span>' in html                   # an unchanged base stays plain
-        assert "0.45" in html and "Makes up for the lower damage per attribute" in html
+        # ONE row: the chip by the average over the levels, start / end %, the table behind a click
+        assert html.startswith('<li data-tag="buff nerf" class="li-bg li-formula hs-dmg-li">')
+        assert 'data-overall="nerf">NERF</span>' in html and 'class="formula-trigger"' in html
+        assert re.search(r'\+22%</span><span class="formula-endpoint-label">start</span>'
+                         r'<span class="badge nerf\d+">-14%</span>', html)
+        assert "173–183" in html and "148–158" in html and " hidden>" in html   # Valve's level-30 figures
+        assert "0.7 → 0.45 damage per attribute" in html
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card = saved
 
