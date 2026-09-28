@@ -36,14 +36,12 @@ def test_card_hides_its_rows_and_carries_their_tags():
         start, gain = re.findall(r"<li .*?</li>(?=<li |$)", html, re.S)
         assert start.startswith('<li data-tag="buff" class="li-bg hs-dmg-li">')
         assert "Starting damage increased from 40–50 to 50–60<" in start and ">+22%<" in start
-        assert gain.startswith('<li data-tag="nerf" class="li-bg li-formula hs-dmg-li">')
-        # the button is "gain per level", mid-line: on the first word it shifted the row's text (owner 2026-09-28)
-        assert re.search(r'>Damage <span class="formula-trigger" data-formula="hsf\d+">gain per level</span> '
-                         r'decreased from 3\.6 to 2\.7<', gain) and ">-25%<" in gain
-        assert html.count('class="formula-table') == 1 and 'class="formula-table' in gain   # one table, 2nd row
-        # level 30 = Valve's figure, all 7 Attribute Bonus levels counted
-        assert "173–183" in gain and "148–158" in gain and "all 7 Attribute Bonus levels" in gain
-        assert "0.7 → 0.45 damage per attribute" in gain
+        assert gain.startswith('<li data-tag="nerf" class="li-bg hs-dmg-li">')
+        assert ">Damage gain per level decreased from 3.6 to 2.7<" in gain and ">-25%<" in gain
+        # no table by level (owner 2026-09-28: the two numbers already say it)
+        assert "formula-table" not in html and "formula-trigger" not in html
+        # the (?): level 30 = Valve's figure, all 7 Attribute Bonus levels counted; the multiplier
+        assert "Damage at level 30: 173–183 → 148–158 (-14%)" in gain and "0.7 → 0.45 damage per attribute" in gain
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card = saved
 
@@ -72,7 +70,6 @@ def test_unchanged_starting_damage_is_said_so():
         html = el.render_hs_card("hero|batrider|7.38")
         # the start did not move: no row for it, only the growth's row, the (?) says so
         assert html.count("<li ") == 1 and "Starting damage unchanged at 39–43" in html
-        assert re.search(r'data-tag="nerf".*>Damage <span[^>]*>gain per level</span> decreased from [\d.]+ to [\d.]+<',
-                         html)
+        assert re.search(r'data-tag="nerf".*>Damage gain per level decreased from [\d.]+ to [\d.]+<', html)
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card = saved

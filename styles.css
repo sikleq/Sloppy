@@ -2968,10 +2968,6 @@ ul.changes li.ability-row-end {
 /* ENCHANT-BY-ATTRIBUTE GRID — 7.41 Tier-X enchantment selection box.
    Layout: rows of [attr icon][attr name] | [enchant chip] [enchant chip]...
    Shares the muted bordered look of components-box / provides-box. */
-/* HERO ATTACK DAMAGE BY LEVEL (hero_stat_card, pilot Abaddon 7.38, owner 2026-09-28): one formula-style row;
-   the damage ranges keep one line each in its table */
-.formula-table.hs-ft td { white-space: nowrap; }
-
 /* LIST OF ENCHANTMENTS AS ONE TABLE (owner 2026-09-28, 7.38 "List of Neutral Enchantments"): every
    enchantment is still its own entity block (patch squares, its Changes page), drawn as a row of one framed
    table — icon | name | its bonuses with a value per tier (empty = not offered at that tier) | patch squares.

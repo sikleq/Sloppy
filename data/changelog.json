@@ -8,7 +8,7 @@
       "link": "patches/7.38.html",
       "items": [
         "Where Valve rescaled a hero's damage growth: \"Starting damage increased from 40–50 to 50–60\" and \"Damage gain per level decreased from 3.6 to 2.7\"",
-        "Each row has its own tag and %; \"Damage gain per level\" opens the damage at levels 1–30",
+        "Each row has its own tag and %; the damage at level 30 is in the (?)",
         "36 heroes: 35 in 7.38 (Universal heroes 0.7 → 0.45 damage per attribute) and Spectre in 7.40"
       ],
       "shots": [

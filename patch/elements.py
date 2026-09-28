@@ -621,10 +621,8 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
 # 7.38 lowered the Universal damage per attribute 0.7 -> 0.45 and raised base damage and attribute gains to make
 # up for it: "Base Damage increased by 26" (+650%) alone meant nothing. The damage rows of such a hero (base
 # damage, damage at level 1 / 30, damage gain per level) become two rows, "Starting damage" and "Damage gain per
-# level", each with its own tag, the second with a table by level behind a click; the old rows stay in the page
-# hidden (tag filters, weights as before). Attribute rows stay rows.
-_HS_CARDS = {}                  # "<ek>|<pv>" -> {"hero", "before", "after", "valve": {1: ..., 30: ...}}
-_HS_LEVELS = (1, 5, 10, 15, 20, 25, 30)
+# level", each with its own tag; the old rows stay in the page hidden (weights as before). Attribute rows stay rows.
+_HS_CARDS = {}                  # "<ek>|<pv>" -> {"hero", "before", "after", "valve": {1: ..., 30: ..., "gain": ...}}
 _HS_GAIN_VALVE_RE = re.compile(r"damage gain per level \w+ from \+?([\d.]+) to \+?([\d.]+)", re.I)
 _HS_DMG_VALVE_RE = re.compile(r"damage at level (1|30) \w+ by \d+ \(from (\d+)-(\d+) to (\d+)-(\d+)\)", re.I)
 
@@ -632,7 +630,7 @@ _HS_DMG_VALVE_RE = re.compile(r"damage at level (1|30) \w+ by \d+ \(from (\d+)-(
 def hero_stat_card(before=None):
     """Called right after the GENERAL ul_open() of a hero block. `before` = the patch compared against (the
     previous one by default). Drawn when the page is saved (render_hs_card), after the rows under it have been
-    matched: they are hidden, their tags go on the rows for the filters."""
+    matched: they are hidden."""
     from .hero_stats import attrs_changed
     from .weights import _prev_version
     ek, pv, hero = _State.current_entity_key or "", _State.current_patch_version, _State.current_hero
@@ -648,7 +646,7 @@ def hero_stat_card(before=None):
 def _hs_covered(text, tags):
     """A GENERAL damage row the two damage rows show: base damage, damage at level 1 / 30 and damage gain per
     level (hidden; its tag still counts for weights, `tags` unused here). Valve's level-1 / level-30 damage and
-    gain per level are kept: the rows and the table show them as Valve stated them."""
+    gain per level are kept: the rows and their (?) show them as Valve stated them."""
     card = getattr(_State, "hs_card", None)
     if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
         return False
@@ -665,33 +663,14 @@ def _hs_covered(text, tags):
     return bool(m or _DMG_ROW_RE.match(plain))
 
 
-def _hs_damage_cells(rec, old, new):
-    """[(level, old (min, max), new (min, max))] for levels 1, 5, ..., 30. Level 30 counts all 7 Attribute
-    Bonus levels, as Valve's notes do (owner 2026-09-28: "match Valve"); levels 1 and 30 are Valve's own
-    figures when the notes state them, the rest the hero's own growth from the game files."""
+def _hs_damage(rec, old, new, level):
+    """(old (min, max), new (min, max)) at level 1 or 30: Valve's own figures when the notes state them, else
+    the game files'. Level 30 counts all 7 Attribute Bonus levels, as Valve's notes do ("match Valve")."""
     from .hero_stats import damage_at
-    out = []
-    for L in _HS_LEVELS:
-        bonus = L == _HS_LEVELS[-1]
-        valve = rec["valve"].get(L) if L in (1, 30) else None
-        if valve:
-            o, n = valve
-        else:
-            o = tuple(int(x + 1e-9) for x in damage_at(old, rec["before"], L, bonus=bonus))
-            n = tuple(int(x + 1e-9) for x in damage_at(new, rec["after"], L, bonus=bonus))
-        out.append((L, o, n))
-    return out
-
-
-def _hs_inner(badge_html):
-    return re.search(r'<span class="badge [^"]*">[^<]*</span>', badge_html).group(0)
-
-
-def _hs_table(fid, head, row_o, row_n, row_p, rec):
-    return (f'<table class="formula-table hs-ft" id="{fid}" hidden><thead><tr><th></th>{head}</tr></thead><tbody>'
-            f'<tr><th class="row-label-old">{rec["before"]}</th>{row_o}</tr>'
-            f'<tr><th class="row-label-new">{rec["after"]}</th>{row_n}</tr>'
-            f'<tr><th>Δ%</th>{row_p}</tr></tbody></table>')
+    if rec["valve"].get(level):
+        return rec["valve"][level]
+    at = lambda st, ver: tuple(int(x + 1e-9) for x in damage_at(st, ver, level, bonus=level == 30))
+    return at(old, rec["before"]), at(new, rec["after"])
 
 
 _HS_CHIPS = {"buff": '<span class="badge buff-text" data-tag="buff" data-overall="buff">BUFF</span>',
@@ -704,22 +683,20 @@ def _hs_tag(badge):
     return rule.group(1) if rule and rule.group(1) in ("buff", "nerf") else "misc"
 
 
-def _hs_row(name, before, after, badge, tail="", table=""):
+def _hs_row(name, before, after, badge, tail=""):
     """One row "<name> increased from A to B" with its own chip by the direction of its own number."""
     tag = _hs_tag(badge)
     verb = {"buff": "increased", "nerf": "decreased"}.get(tag, "changed")
-    cls = "li-bg li-formula hs-dmg-li" if table else "li-bg hs-dmg-li"
-    return (f'<li data-tag="{tag}" class="{cls}">{_HS_CHIPS[tag]}<span class="row-text">{name} {verb} from '
-            f'{before} to {after}{tail}</span>{badge}{table}</li>')
+    return (f'<li data-tag="{tag}" class="li-bg hs-dmg-li">{_HS_CHIPS[tag]}<span class="row-text">{name} {verb} '
+            f'from {before} to {after}{tail}</span>{badge}</li>')
 
 
 def render_hs_card(key):
     """TWO rows in place of the hero's damage rows (owner 2026-09-28: one row could not carry one tag when the
     start went up and the growth went down, Abaddon 7.38): "Starting damage increased from 40–50 to 50–60" and
-    "Damage gain per level decreased from 3.6 to 2.7", each with its own % and chip; "Damage gain per level"
-    opens the damage at levels 1 … 30 (level 30 with all Attribute Bonus levels, as Valve counts it); what
-    damage is made of (damage per attribute, base damage) in the (?). A number that did not change has no row.
-    Attribute rows stay rows."""
+    "Damage gain per level decreased from 3.6 to 2.7", each with its own % and chip. No table by level: the two
+    numbers already say it (owner 2026-09-28); the damage at level 30 and what damage is made of (damage per
+    attribute, base damage) are in the (?). A number that did not change has no row. Attribute rows stay rows."""
     from .badges import b
     from .hero_stats import damage_at, hero_stats, universal_multiplier
     rec = _HS_CARDS.get(key)
@@ -727,17 +704,12 @@ def render_hs_card(key):
         return ""
     old, new = hero_stats(rec["hero"], rec["before"]), hero_stats(rec["hero"], rec["after"])
     avg = lambda p: (p[0] + p[1]) / 2
-    cells = _hs_damage_cells(rec, old, new)
-    pcts = [b(avg(o), avg(n)) for _, o, n in cells]
+    (o1, n1), (o30, n30) = _hs_damage(rec, old, new, 1), _hs_damage(rec, old, new, 30)
     # Valve's own per-level figures when the notes state them, else the game files' rounded to 0.1
     model = lambda st, ver: round(damage_at(st, ver, 2)[0] - damage_at(st, ver, 1)[0], 1)
     per_o, per_n = rec["valve"].get("gain") or (model(old, rec["before"]), model(new, rec["after"]))
-    _HS_TABLE_ID[0] += 1
-    fid = f"hsf{_HS_TABLE_ID[0]}"
-    table = _hs_table(fid, "".join(f"<th>{L}</th>" for L, _, _ in cells),
-                      "".join(f"<td>{o[0]}–{o[1]}</td>" for _, o, _ in cells),
-                      "".join(f"<td>{n[0]}–{n[1]}</td>" for _, _, n in cells),
-                      "".join(f"<td>{_hs_inner(p)}</td>" for p in pcts), rec)
+    s1, s2 = f"{o1[0]}–{o1[1]}", f"{n1[0]}–{n1[1]}"
+    g1, g2 = f"{per_o:.1f}", f"{per_n:.1f}"
     notes = []
     if "all" in (old["primary"], new["primary"]):
         mo = universal_multiplier(rec["before"]) if old["primary"] == "all" else None
@@ -747,33 +719,20 @@ def render_hs_card(key):
     if (old["dmg_min"], old["dmg_max"]) != (new["dmg_min"], new["dmg_max"]):
         notes.append(f'Base damage {old["dmg_min"]:g}–{old["dmg_max"]:g} → {new["dmg_min"]:g}–{new["dmg_max"]:g}'
                      + (" makes up for it" if notes else ""))
-    (o1, n1) = cells[0][1], cells[0][2]
-    s1, s2 = f"{o1[0]}–{o1[1]}", f"{n1[0]}–{n1[1]}"
-    g1, g2 = f"{per_o:.1f}", f"{per_n:.1f}"
     if o1 == n1:                                     # Batrider 7.38: the start stayed, only the growth moved
         notes.append(f"Starting damage unchanged at {s1}")
     if g1 == g2:
         notes.append(f"Damage gain per level unchanged at {g1}")
-    notes.append("Level 30 counts all 7 Attribute Bonus levels (+14 to every attribute), as Valve does")
+    pct30 = round((avg(n30) - avg(o30)) / avg(o30) * 100)
+    notes.append(f"Damage at level 30: {o30[0]}–{o30[1]} → {n30[0]}–{n30[1]} ({pct30:+d}%), with all 7 Attribute "
+                 f"Bonus levels, as Valve counts it")
     tip = f'<span class="li-tail">{info_tip(*notes)}</span>'
-    # (first word, the rest): the button is the rest, mid-line — a button on the first word shifted the row's
-    # text right of the rows above and below (owner 2026-09-28: "Damage <gain per level>")
-    start = (("Starting", "damage", s1, s2, pcts[0]),) if o1 != n1 else ()
-    gain = (("Damage", "gain per level", g1, g2, b(per_o, per_n)),) if g1 != g2 else ()
-    shown = start + gain or (("Starting", "damage", s1, s2, pcts[0]),)
+    start = (("Starting damage", s1, s2, b(avg(o1), avg(n1))),) if o1 != n1 else ()
+    gain = (("Damage gain per level", g1, g2, b(per_o, per_n)),) if g1 != g2 else ()
+    shown = start + gain or (("Starting damage", s1, s2, b(avg(o1), avg(n1))),)
     # each row only its own tag: the hidden rows' tags (Base Damage +26 = BUFF) do not put a NERF row under BUFF;
-    # a hidden row never keeps a block on screen (scripts.js rowOnScreen)
-    rows = []
-    for i, (lead, rest, before, after, badge) in enumerate(shown):
-        last = i == len(shown) - 1                   # the last row opens the table and carries the (?)
-        if last:
-            rest = f'<span class="formula-trigger" data-formula="{fid}">{rest}</span>'
-        rows.append(_hs_row(f"{lead} {rest}", before, after, badge,
-                            tail=tip if last else "", table=table if last else ""))
-    return "".join(rows)
-
-
-_HS_TABLE_ID = [0]
+    # a hidden row never keeps a block on screen (scripts.js rowOnScreen). The last row carries the (?).
+    return "".join(_hs_row(*row, tail=tip if i == len(shown) - 1 else "") for i, row in enumerate(shown))
 
 
 _ENCHANT_TIERS = (1, 2, 3, 4, 5)
