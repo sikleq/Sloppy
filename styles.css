@@ -2968,6 +2968,62 @@ ul.changes li.ability-row-end {
 /* ENCHANT-BY-ATTRIBUTE GRID — 7.41 Tier-X enchantment selection box.
    Layout: rows of [attr icon][attr name] | [enchant chip] [enchant chip]...
    Shares the muted bordered look of components-box / provides-box. */
+/* LIST OF ENCHANTMENTS AS ONE TABLE (owner 2026-09-28, 7.38 "List of Neutral Enchantments"): every
+   enchantment is still its own entity block (patch squares, its Changes page), drawn as a row of one framed
+   table — icon | name | its bonuses with a value per tier (empty = not offered at that tier) | patch squares.
+   The .entity box itself is display:contents so its icon, name and the squares JS adds become grid cells. */
+body.patch-page .entity-block.enchant-list-head,
+body.patch-page .entity-block.enchant-list-row {
+  display: grid;
+  grid-template-columns: 34px 150px minmax(0, 1fr) 344px;
+  column-gap: 12px;
+  align-items: center;
+  margin: -1px -15px 0;
+  padding: 6px 14px;
+  background: var(--muted-04);
+  border: 1px solid var(--line-soft);
+  border-image: none;
+}
+body.patch-page .entity-block.enchant-list-head {
+  margin-top: 6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 6px 6px 0 0;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+body.patch-page .entity-block.enchant-list-row + :not(.enchant-list-row) { margin-top: 10px; }
+.enchant-list-head .ench-name-h { grid-column: 1 / 3; }
+.enchant-list-head .ench-dyn-h { grid-column: 4; text-align: right; }
+.enchant-list-row > .entity { display: contents; }
+.enchant-list-row .entity-icon { grid-column: 1; grid-row: 1; }
+.enchant-list-row .entity-icon img { width: 34px; height: auto; display: block; border-radius: 3px; }
+.enchant-list-row .entity-name { grid-column: 2; grid-row: 1; font-size: 16px; }
+.enchant-list-row .ench-tiers { grid-column: 3; grid-row: 1; }
+.enchant-list-row .dyn-row-wrap { grid-column: 4; grid-row: 1; justify-self: end; margin: 0 !important; }
+.ench-tiers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(5, 56px);
+  column-gap: 6px;
+  row-gap: 2px;
+  align-items: center;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.ench-tiers-h { grid-column: 3; }
+.ench-tier-h, .ench-v { text-align: center; }
+.ench-stat { color: var(--text-main); overflow-wrap: anywhere; }
+.ench-v { color: var(--text-bright); font-weight: 600; }
+.ench-v.ench-zero { color: var(--text-dimmer); font-weight: 400; }
+.ench-v.ench-off { align-self: stretch; background: rgba(0, 0, 0, 0.12); border-radius: 2px; }
+.ench-stat.ench-neg, .ench-v.ench-neg { color: #e3806e; }
+.ench-row-h { display: contents; }
+.ench-row-h .ench-tier-h { color: var(--text-dim); font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
+.enchant-list-head ~ .enchant-list-row .ench-row-h { display: none; }   /* the table's own head row says it */
+
 .enchant-attr-grid {
   display: flex;
   flex-direction: column;

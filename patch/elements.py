@@ -617,6 +617,56 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
     return out + head + f'<div class="entity plain-entity"{eid}><div class="entity-name">{name}{label}</div>{link_html}</div>'
 
 
+_ENCHANT_TIERS = (1, 2, 3, 4, 5)
+
+
+def enchant_list_head():
+    """The column titles over a list of enchantments drawn as one table (owner 2026-09-28, 7.38 "List of
+    Neutral Enchantments"): Tier 1 … Tier 5 above the value columns of every enchant_row below."""
+    cells = "".join(f'<span class="ench-tier-h">Tier {t}</span>' for t in _ENCHANT_TIERS)
+    return (_open_block("enchant-list-head")
+            + f'<div class="ench-name-h">Enchantment</div><div class="ench-tiers ench-tiers-h">'
+              f'<span class="ench-stat-h">Bonus</span>{cells}</div><div class="ench-dyn-h">Patches</div>')
+
+
+def enchant_row(name, stats, tiers, slug=None, new=True):
+    """One enchantment as a row of that table: icon + name | its bonuses, a value per tier it can be rolled at
+    (an empty cell: not offered at that tier) | the patch squares. `stats` = [(label, values, negative)],
+    values one per tier in `tiers` (a single value = the same at every tier; 0 = no such bonus at that tier).
+    The row stays an entity block of its own — the patch squares and the enchantment's Changes page read it.
+    Replaces the per-enchantment rows and the repeated "Available at Tiers 1, 2, 3, and 4"."""
+    if slug is None:
+        slug = name.lower().replace(" ", "_").replace("-", "_").replace("'", "")
+    icon = f"{ITEM_CDN}enhancement_{slug}.png"
+    eid = _register_entity("enchant", name)
+    href = _entity_link("items", "enchantment " + name)
+    lines = []
+    for label, values, negative in stats:
+        vals = list(values) if len(values) > 1 else list(values) * len(tiers)
+        by_tier = dict(zip(tiers, vals))
+        cells = []
+        for t in _ENCHANT_TIERS:
+            v = by_tier.get(t)
+            if v is None:
+                cells.append('<span class="ench-v ench-off"></span>')
+            elif re.fullmatch(r"[+\-]?0(?:\.0+)?%?", str(v)):
+                cells.append('<span class="ench-v ench-zero">—</span>')
+            else:
+                cells.append(f'<span class="ench-v{" ench-neg" if negative else ""}">{v}</span>')
+        cls = " ench-neg" if negative else ""
+        lines.append(f'<span class="ench-stat{cls}">{label}</span>{"".join(cells)}')
+    tag = ' data-tag="new"' if new else ""
+    # the tier titles again, shown only where the table's head row isn't (the enchantment's Changes page)
+    own_head = ('<span class="ench-row-h"><span class="ench-stat-h"></span>'
+                + "".join(f'<span class="ench-tier-h">Tier {t}</span>' for t in _ENCHANT_TIERS) + "</span>")
+    lines.insert(0, own_head)
+    return (_open_block(("is-new " if new else "") + "item-block enchant-list-row", ' data-new-tag="NEW"' if new else "")
+            + f'''<div class="entity item-entity"{eid}>
+  <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{icon}" alt="{name}" loading="lazy"></a></div>
+  <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a></div>
+</div><div class="ench-tiers"{tag}>{"".join(lines)}</div>''')
+
+
 def enchant_header(name, slug=None, new=False):
     if slug is None:
         slug = name.lower().replace(" ", "_").replace("-", "_").replace("'", "")

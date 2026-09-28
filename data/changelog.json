@@ -4,6 +4,20 @@
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
+      "title": "7.38 neutral enchantments as one table",
+      "link": "patches/7.38.html",
+      "items": [
+        "A row per enchantment: its bonuses with the value at every tier it can be rolled at",
+        "An empty cell = not offered at that tier; no more \"Available at Tiers 1, 2, 3, and 4\" under each",
+        "Downsides in red; each row keeps its patch squares and links to the enchantment's page"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-28_enchant_table.webp"
+      ]
+    },
+    {
+      "date": "2026-09-28",
+      "category": "Patch Reader",
       "title": "Shiva's Guard 7.41 and alike: \"Pierces Debuff Immunity.\" added to the new aura text, removed aura effects coloured in the old one, the Chasm Stone stacking remark is a (?) on +75 Area of Effect",
       "minor": true
     },

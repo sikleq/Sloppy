@@ -232,7 +232,7 @@
   // row that matches: covered-cost -> the components card, covered-iab -> the abilities card.
   function panelMatches(el) {
     const hit = node => (node.dataset.tag || '').split(' ').some(t => activeFilters.has(t));
-    if (Array.from(el.querySelectorAll('[data-tag]')).some(hit)) return true;
+    if (hit(el) || Array.from(el.querySelectorAll('[data-tag]')).some(hit)) return true;
     const block = el.closest('.entity-block');
     const kind = el.classList.contains('iab-change') ? 'covered-iab'
       : el.classList.contains('components-change') ? 'covered-cost' : null;
@@ -258,7 +258,7 @@
     const reworkOnly = activeFilters.size > 0 && !activeFilters.has('rework');
     // top-level panels only: a components card's own two panes are .components-box too (hiding them left a
     // bare arrow under a filter, owner 2026-09-28)
-    const PANELS = ':scope > .components-box, :scope > .components-change, :scope > .provides-box, :scope > .properties-change';
+    const PANELS = ':scope > .components-box, :scope > .components-change, :scope > .provides-box, :scope > .properties-change, :scope > .ench-tiers';   // .ench-tiers: an enchantment table row (7.38)
     document.querySelectorAll('.entity-block').forEach(block => {
       block.querySelectorAll(PANELS).forEach(el => {
         if (reworkOnly && !panelMatches(el)) el.classList.add('f-hide');
@@ -270,18 +270,18 @@
       // no tag filter on: every block shows (a sub-category label or a block without rows stayed hidden
       // after a filter was switched off, owner 2026-09-28)
       if (!filtering) { block.classList.remove('f-hide'); return; }
-      if (block.classList.contains('label-only')) return;  // decided below, from the blocks under it
+      if (block.classList.contains('label-only') || block.classList.contains('enchant-list-head')) return;  // decided below, from the blocks under it
       const visibleLi = block.querySelectorAll('ul.changes > li:not(.f-hide):not(.cat-hide):not(.iab-covered)').length;
       const visibleSwaps = block.querySelectorAll('.ability-change:not(.f-hide):not(.cat-hide)').length;
       const visiblePanels = Array.from(block.children).some(child =>
-        child.matches('.components-box, .components-change, .provides-box, .properties-change') &&
+        child.matches('.components-box, .components-change, .provides-box, .properties-change, .ench-tiers') &&
         elementVisible(child)
       );
       block.classList.toggle('f-hide', !visibleLi && !visibleSwaps && !visiblePanels);
     });
     // A sub-category label ("List of Neutral Artifacts") shows while any block under it (up to the next
     // label or category) is visible.
-    if (filtering) document.querySelectorAll('.entity-block.label-only').forEach(label => {
+    if (filtering) document.querySelectorAll('.entity-block.label-only, .entity-block.enchant-list-head').forEach(label => {
       let nx = label.nextElementSibling, shown = false;
       while (nx && !nx.classList.contains('label-only') && !nx.matches('h2.section')) {
         if (nx.classList.contains('entity-block') && elementVisible(nx)) { shown = true; break; }

@@ -69,6 +69,8 @@ SHOTS = {
     "2026-09-25_warm_calendar.webp": ("calendar.html", None, [".cal-year-block"], [], 420, {"width": 1400}),
     "2026-09-24_changelog.webp": ("changelog.html", None, [".clog-layout"], [], 460, {"width": 1400}),
     "2026-09-25_controls.webp": ("heroes_stats.html", None, [".toolbar-panel"], [], 160, {"width": 1400}),
+    "2026-09-28_enchant_table.webp": ("patches/7.38.html", None,
+                                      [".entity-block.enchant-list-head", ".entity-block.enchant-list-row >> nth=5"], [], 420, {"settle": 2500}),
     "2026-09-27_item_rework.webp": ("patches/7.38.html", ("block", "Gleipnir"),
                                     [":scope > .entity", ":scope > .components-change", ":scope > .iab-change"], [], 640),
     "2026-09-27_item_abilities.webp": ("patches/7.38.html", ("block", "Khanda"),
@@ -120,9 +122,9 @@ def shoot(page, name, spec):
         page.wait_for_timeout(250)
     page.wait_for_timeout(opts.get("wait", 0))          # e.g. items pulled into a hero page by fetch
     locs = [root if p == ":scope" else root.locator(p).first for p in parts]
-    if scope is not None:
+    if scope is not None or opts.get("settle"):
         locs[0].scroll_into_view_if_needed()
-    page.wait_for_timeout(300)
+    page.wait_for_timeout(opts.get("settle", 300))      # lazy images below the fold need a moment
     # pinned header / toolbars / floating buttons would paint over the shot: hide every
     # fixed or sticky element outside the framed parts (sticky cells INSIDE a table stay)
     for loc in locs:
