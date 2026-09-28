@@ -4,6 +4,19 @@
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
+      "title": "Shiva's Guard 7.41 and alike: \"Pierces Debuff Immunity.\" added to the new aura text, removed aura effects coloured in the old one, the Chasm Stone stacking remark is a (?) on +75 Area of Effect",
+      "minor": true
+    },
+    {
+      "date": "2026-09-28",
+      "category": "Patch Reader",
+      "title": "Every framed box of an item lines up on one edge (7.41 Stonefeather Satchel, Forager's Kit); no hover tips on the corner buttons, the loupe keeps \"Search (\\)\"",
+      "minor": true,
+      "fix": true
+    },
+    {
+      "date": "2026-09-28",
+      "category": "Patch Reader",
       "title": "Item ability cards: an ability removed and another added in the same patch face each other as a replacement (Revenant's Brooch 7.38: Phantom Province -> Phantom Critical); coloured card text counts for the tag filters (Drum of Endurance under DEL)",
       "minor": true,
       "fix": true

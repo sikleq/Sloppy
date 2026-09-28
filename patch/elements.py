@@ -573,7 +573,8 @@ def item_header(name, new=False, changed=False):
         block_data_attr = ''
     eid = _register_entity("item", name)
     href = _entity_link("items", name)
-    return out + _open_block(extra_cls, block_data_attr) + f'''<div class="entity item-entity"{eid}>
+    # item-block: every framed box of an item hangs out on one common edge (CSS, owner 2026-09-28)
+    return out + _open_block((extra_cls + ' item-block').strip(), block_data_attr) + f'''<div class="entity item-entity"{eid}>
   <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{item_img(name)}" alt="{name}" loading="lazy" width="88" height="64"></a></div>
   <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a>{type_label}</div>
 </div>'''
@@ -632,7 +633,7 @@ def enchant_header(name, slug=None, new=False):
         block_data_attr = ''
     eid = _register_entity("enchant", name)
     href = _entity_link("items", "enchantment " + name)
-    return _open_block(extra_cls, block_data_attr) + f'''<div class="entity item-entity"{eid}>
+    return _open_block((extra_cls + ' item-block').strip(), block_data_attr) + f'''<div class="entity item-entity"{eid}>
   <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{icon}" alt="{name}" loading="lazy"></a></div>
   <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a>{type_label}</div>
 </div>'''
@@ -1489,20 +1490,27 @@ def _iab_text_change(text, tags):
         return False
     plain = re.sub(r"<[^>]+>", " ", re.sub(r"<!--TIP-->.*?<!--/TIP-->", " ", text, flags=re.S)).strip()
     direction = next((t for t in _IAB_TAG_ORDER if t in tags), "")
-    if not direction or re.search(r"\d", plain):
-        return False
     low = plain.lower()
+    # numbers: only a "no longer …" row whose numbers the removed text shows (checked below)
+    nums = re.findall(r"\d+(?:\.\d+)?", plain)
+    if not direction or (nums and "no longer" not in low):
+        return False
     ability = _iab_row_ability(low, card, set(card.get("segs", {})))
     diff = card.get("segs", {}).get(ability)
     if not diff:
         return False
-    m = re.match(rf"^{re.escape(ability)}'?s? can (now|no longer) be dispelled$", low)
-    if m:
-        # "Disarm can now be dispelled" (Heaven's Halberd 7.38): the game's tooltip doesn't say it, so the
-        # new description gets "Dispellable." at its end, in the row's colour (owner 2026-09-27)
-        tail = "Dispellable." if m.group(1) == "now" else "Not dispellable."
-        _IAB_HL.setdefault(card["key"], []).append({"ability": ability, "side": "new", "append": tail, "dir": direction})
-        return True
+    for rx, tail in _IAB_TAILS:
+        # a property the game's tooltip doesn't spell out: the new description gets it at its end, in the
+        # row's colour ("Disarm can now be dispelled" -> "Dispellable.", Heaven's Halberd 7.38; "Freezing Aura
+        # now pierces debuff immunity" -> "Pierces Debuff Immunity.", Shiva's Guard 7.41) — or, when the
+        # tooltip already says it, that sentence is coloured
+        if re.match(rf"^{re.escape(ability)}'?s? {rx}$", low):
+            new_text = card.get("pairs_by", {}).get((ability, "new"), "")
+            at = new_text.lower().find(tail.lower().rstrip("."))
+            entry = ({"ability": ability, "side": "new", "span": (at, at + len(tail.rstrip("."))), "dir": direction}
+                     if at >= 0 else {"ability": ability, "side": "new", "append": tail, "dir": direction})
+            _IAB_HL.setdefault(card["key"], []).append(entry)
+            return True
     words = _iab_stems(low, drop=set(ability.split()) | _IAB_VERBS)
     if not words:
         return False
@@ -1527,7 +1535,11 @@ def _iab_text_change(text, tags):
     after = re.search(r"no longer (.*)", low)
     if after:
         obj = [w[:5] for w in re.findall(r"[a-z]{4,}", after.group(1)) if w not in _IAB_STOP and w not in _IAB_VERBS][:2]
-        hits = [s for s in hits if set(obj) & _iab_stems(full[s[0]:s[1]])]
+        if not any(set(obj) & _iab_stems(full[s[0]:s[1]]) for s in hits):
+            hits = []
+    # a row with numbers ("…by 25%", Shiva's Guard 7.41) only when the coloured text shows every one of them
+    if nums and not all(any(_iab_has(n, full[s[0]:s[1]]) for s in hits) for n in nums):
+        hits = []
     if not hits:
         return False
     # removed text is red whatever the row's tag (owner 2026-09-27); added text takes the tag's colour
@@ -1538,6 +1550,12 @@ def _iab_text_change(text, tags):
 
 
 _IAB_VERBS = {"deal", "deals", "apply", "applies", "gives", "grants", "provides", "uses", "does"}
+_IAB_TAILS = (   # (the row after the ability's name, the sentence the new description gets)
+    (r"can now be dispelled", "Dispellable."),
+    (r"can no longer be dispelled", "Not dispellable."),
+    (r"now pierces debuff immunity", "Pierces Debuff Immunity."),
+    (r"no longer pierces debuff immunity", "Does not pierce Debuff Immunity."),
+)
 _IAB_DETERMINERS = ("your ", "their ", "its ", "the ")
 
 

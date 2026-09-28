@@ -599,10 +599,10 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
                    f'<h2 class="section ec-ver"><a href="../patches/{_esc(p["version"])}.html?from={from_tok}#{eid}" '
                    f'title="Open {_esc(e["name"])} in patch {_esc(p["version"])}">Patch {_esc(p["version"])}</a>'
                    f'<span class="ec-date">{_esc(p["date"])}</span>{label}{score}</h2>\n{body}\n</section>\n')
-    out.append('<button class="back-to-top" aria-label="Back to top" title="Back to top" '
+    # no hover tips on the corner buttons, as on the patch pages (owner 2026-09-28)
+    out.append('<button class="back-to-top" aria-label="Back to top" '
                'onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>'
-               '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores" '
-               'title="Dynamics: weighted scores (Valve revealed-preference weights)"></button>'
+               '<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button>'
                f'<script defer src="../src/scripts.js?v={asset}"></script>\n</div></body></html>\n')
     return "".join(out)
 

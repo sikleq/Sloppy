@@ -714,7 +714,7 @@ def build():
              ("DEL",  "+5 Intelligence"),
              ("DEL",  "+5 Health Regen")],
         new=[("",    "+17 Armor", b(15, 17)),
-             ("NEW", "+75 Area of Effect")]))
+             ("NEW", "+75 Area of Effect" + info_tip("Area of Effect bonuses from multiple Chasm Stones or its upgrades do not stack"))]))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Arctic Blast. Emits a freezing wave that causes enemies to take 15% more damage from spells for 16 seconds, deals 200 magical damage and slows their movement by -40% for 4 seconds. Radius: 900. Mana Cost: 75. Cooldown: 27s",
@@ -727,7 +727,6 @@ def build():
     W(li("Freezing Aura now pierces debuff immunity", t("NEW")))
     W(li("Arctic Blast no longer increases damage taken from spells", t("DEL")))
     W(li("Freezing Aura no longer reduces Health Restoration and Incoming Heal Amplification by 25%", t("DEL")))
-    W(li("Area of Effect bonuses from multiple Chasm Stones or its upgrades do not stack", t("MISC")))
     W(li("Arctic Blast radius decreased from 900 to 825", t("MISC"),
          extra=inline_note("Effective spell radius unchanged due to item's built-in Area of Effect bonus")))
     W(ul_close())

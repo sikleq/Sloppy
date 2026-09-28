@@ -80,12 +80,13 @@ def write_footer():
         W('</section>')
         _State.section_panel_open = False
     # Corner stack, bottom -> top: weights, search, back-to-top (appears on scroll).
-    W('<button class="back-to-top has-search" aria-label="Back to top" title="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>')
-    W('<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores" title="Dynamics: weighted scores (Valve revealed-preference weights)"></button>')
+    # no hover tips on the corner buttons (owner 2026-09-28) — the loupe keeps only its key, "Search (\)"
+    W('<button class="back-to-top has-search" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:\'smooth\'})"></button>')
+    W('<button class="dyn-w-fab" id="dyn-weights-btn" type="button" aria-label="Weighted scores"></button>')
     # Search = a round loupe button above the weights; the field slides out to its left
     # ("/" opens it, Esc closes). It used to be a toolbar field that never lined up with the chips.
     W('<button class="search-fab" id="search-fab" type="button" aria-label="Search heroes, items, abilities" '
-      'aria-expanded="false" aria-controls="search-pop" title="Search heroes, items, abilities (\\)" aria-keyshortcuts="Backslash"></button>')
+      'aria-expanded="false" aria-controls="search-pop" title="Search (\\)" aria-keyshortcuts="Backslash"></button>')
     W('<div class="search-pop" id="search-pop" hidden><div class="search-box">'
       '<input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">'
       '<div class="search-results" id="search-results"></div></div></div>')

@@ -1731,6 +1731,53 @@ def _postprocess_cost_components(lines, version):
     return out
 
 
+_CARD_NOTE_ROW_RE = re.compile(r'^\s*W\(li\("([^"\d]*)", t\("(?:MISC|QoL)"\)\)\)\s*$')
+
+
+def _postprocess_card_stat_notes(lines):
+    """Owner 2026-09-28 (Shiva's Guard 7.41): a MISC / QoL remark without numbers about a stat the stats card
+    lists ("Area of Effect bonuses from multiple Chasm Stones or its upgrades do not stack") becomes that
+    stat's info (?) in the card — the row goes (MISC / QoL weigh 0). Works on generator output and on
+    indented content lines alike."""
+    out, i = [], 0
+    while i < len(lines):
+        if not re.match(r'^\s*W\(item_header\(', lines[i]):
+            out.append(lines[i])
+            i += 1
+            continue
+        end = i + 1
+        while end < len(lines) and not _ENTITY_START_RE.match(lines[end]):
+            end += 1
+        out.extend(_card_notes_in_block(lines[i:end]))
+        i = end
+    return out
+
+
+def _card_notes_in_block(block):
+    notes = [(ln, m.group(1)) for ln in block for m in [_CARD_NOTE_ROW_RE.match(ln)] if m]
+    text = "\n".join(block)
+    for row, note in notes:
+        c0 = text.find("properties_change(")
+        new_at = text.find("new=[", c0) if c0 >= 0 else -1
+        close = text.find("]))", new_at) if new_at >= 0 else -1
+        if close < 0:
+            break
+        hit = None
+        for m in re.finditer(r'"(\+[^"]*)"', text[new_at:close]):
+            stat = re.sub(r"^[+\-]?[\d./]+%?\s+", "", m.group(1)).lower()
+            if len(stat) > 3 and stat in note.lower():
+                hit = m
+                break
+        if not hit:
+            continue
+        pos = new_at + hit.start()
+        text = text[:pos] + f'{hit.group(0)} + info_tip("{note}")' + text[pos + len(hit.group(0)):]
+        kept = text.split("\n")
+        kept.remove(row)                                   # the remark lives in the card now
+        text = "\n".join(kept)
+    return text.split("\n")
+
+
 _CARD_LINE_RE = re.compile(r'^(W\(properties_change\(old=\[)(.*?)(\], new=\[)(.*)(\]\)\))$')
 _GRANT_TOKEN_RE = re.compile(r"\+[\d./]+%?\s+[A-Za-z' ]+")
 
@@ -2868,6 +2915,7 @@ def generate(version):
     out = _postprocess_cost_components(out, version)
     out = _postprocess_properties_change(out)
     out = _postprocess_silent_stats(out, version)
+    out = _postprocess_card_stat_notes(out)
     out = _postprocess_unstated_total_cost(out)
     out = _postprocess_item_ability_cards(out, version)
     out = _drop_empty_ul(out)

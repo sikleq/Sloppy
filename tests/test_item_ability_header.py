@@ -156,6 +156,41 @@ def test_can_now_be_dispelled_adds_dispellable_at_the_end_of_the_description():
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
 
 
+def test_pierces_debuff_immunity_and_a_no_longer_row_with_its_number():
+    # Shiva's Guard 7.41
+    from patch.state import _State
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        _card_for("item|shiva-test",
+                  ["Passive: Freezing Aura. Reduces the attack speed of all enemies by -45 and Health Restoration "
+                   "and Incoming Heal Amplification by 25%. Radius: 1200."],
+                  ["Passive: Freezing Aura. Reduces the attack speed of all enemies by -45. Radius: 1200."])
+        assert el._iab_text_change("Freezing Aura now pierces debuff immunity", {"new"})
+        assert el._iab_text_change("Freezing Aura no longer reduces Health Restoration and Incoming Heal "
+                                   "Amplification by 25%", {"del"})
+        # a number the card text doesn't show keeps the row
+        assert not el._iab_text_change("Freezing Aura no longer reduces Health Restoration by 30%", {"del"})
+        old, new = el.render_iab_card("item|shiva-test|7.38").split("pane-new")
+        assert 'data-tag="new">Pierces Debuff Immunity</span>.' in new and "aoe.png" in new
+        assert 'iab-hl-del" data-tag="del">and Incoming Heal Amplification by <b class="iab-num">25%</b></span>' in old
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
+def test_generator_moves_a_stat_remark_into_the_card_as_info():
+    import generate_patch_code_v2 as g
+    block = ['W(item_header("Shiva\'s Guard", changed="Item Reworked"))',
+             'W(auto_components_change("Shiva\'s Guard", "7.41"))',
+             'W(properties_change(old=[("BUFF", "+15 Armor")], new=[("", "+17 Armor", b(15, 17)), ("NEW", "+75 Area of Effect")]))',
+             "W(ul_open())",
+             'W(li("Area of Effect bonuses from multiple Chasm Stones or its upgrades do not stack", t("MISC")))',
+             "W(ul_close())"]
+    out = g._postprocess_card_stat_notes(block)
+    assert '("NEW", "+75 Area of Effect" + info_tip("Area of Effect bonuses from multiple Chasm Stones or its upgrades do not stack"))' in out[2]
+    assert not any("W(li(" in x for x in out)
+    assert g._postprocess_card_stat_notes(out) == out
+
+
 def test_removed_ability_row_is_hidden_when_the_card_shows_it_on_one_side():
     from patch.state import _State
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))

@@ -3806,9 +3806,15 @@ body.patch-page .entity-block > .properties-change { margin-left: -15px; margin-
 /* a new item's cost box and a full-width item ability box (no chip column) hang the same way, so every
    item box starts on one line (owner 2026-09-27: Orb of Frost 7.38 sat 15px right of Block of Cheese
    and Orb of Venom) */
-body.patch-page .entity-block > .item-cost-box,
-body.patch-page .entity-block.is-new ul.changes li.item-ability,
-body.patch-page ul.changes li.item-ability:not(.ability-box-tagged) { margin-left: -15px; margin-right: -15px; }
+body.patch-page .entity-block.item-block > .item-cost-box,
+body.patch-page .entity-block.item-block > .components-box,
+body.patch-page .entity-block.item-block > .provides-box,
+body.patch-page .entity-block.item-block ul.changes li.ability-row:not(.ability-box-tagged),
+body.patch-page .entity-block.item-block ul.changes li.ability-row-cont:not(.ability-box-tagged),
+body.patch-page .entity-block.item-block.is-new ul.changes li.ability-box-tagged { margin-left: -15px; margin-right: -15px; }
+/* ... every line of a multi-line box (7.41 Stonefeather Satchel: the "Pound of Feathers" lines sat 15px in)
+   — and a box with its chip column keeps the chip, but its right edge joins the others */
+body.patch-page .entity-block.item-block:not(.is-new) ul.changes li.ability-box-tagged { margin-right: -15px; }
 .properties-change .pane-old { grid-column: 1; }
 .properties-change .pane-new { grid-column: 3; }
 .properties-change .properties-arrow {
