@@ -74,6 +74,16 @@ def test_abilities_pair_by_name_and_only_a_pair_gets_an_arrow():
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
 
 
+def test_a_removed_and_an_added_ability_are_a_replacement_row():
+    # Revenant's Brooch 7.38: Toggle: Phantom Province -> Passive: Phantom Critical (owner 2026-09-28)
+    rows = el._iab_pair_rows(["Toggle: Phantom Province. Attacks cost 50 mana."],
+                             ["Passive: Phantom Critical. Grants each attack a 30% chance."])
+    assert rows == [("Toggle: Phantom Province. Attacks cost 50 mana.", "Passive: Phantom Critical. Grants each attack a 30% chance.")]
+    # a removal with nothing added stays alone (Gleipnir 7.38), and so does an addition (Heaven's Halberd 7.38)
+    assert el._iab_pair_rows(["Active: A. x.", "Passive: B. y."], ["Active: A. z."])[1] == ("Passive: B. y.", None)
+    assert not el._iab_same_ability("Toggle: Phantom Province. a.", "Passive: Phantom Critical. b.")
+
+
 def test_a_row_without_numbers_colours_the_card_text_it_describes():
     # Bloodstone 7.38: "Bloodpact now applies a basic dispel on cast" = the new "Dispel Type: Basic Dispel."
     from patch.state import _State
@@ -86,7 +96,7 @@ def test_a_row_without_numbers_colours_the_card_text_it_describes():
         assert el._iab_text_change("Bloodpact now applies a basic dispel on cast", {"new"})
         assert not el._iab_text_change("Bloodpact lifesteal increased from 4x to 5x", {"buff"})   # numbers: not this rule
         new = el.render_iab_card("item|bloodstone-test|7.38").split("pane-new")[1]
-        assert '<span class="iab-hl iab-hl-new">Dispel Type: Basic Dispel</span>.' in new
+        assert '<span class="iab-hl iab-hl-new" data-tag="new">Dispel Type: Basic Dispel</span>.' in new
         assert "cooldown.png" in new                                    # the header values still found
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
@@ -108,7 +118,7 @@ def test_no_longer_colours_the_removed_sentence_red_not_the_rewritten_fragment()
                   ["Active: Endurance. Gives +35 attack speed for 6 seconds."])
         assert el._iab_text_change("Endurance no longer uses charges", {"rework"})
         old = el.render_iab_card("item|drum2-test|7.38").split("pane-new")[0]
-        assert '<span class="iab-hl iab-hl-del">Comes with <b class="iab-num">8</b> charges</span>' in old
+        assert '<span class="iab-hl iab-hl-del" data-tag="del">Comes with <b class="iab-num">8</b> charges</span>' in old
         assert "iab-hl-del\">Consumes" not in old
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
@@ -124,7 +134,7 @@ def test_a_phrase_is_found_when_no_changed_piece_holds_the_rows_words():
                   ["Passive: Empower Spell. The next spell deals a separate 250 additional damage to the target."])
         assert el._iab_text_change("Empower Spell no longer deals attack damage", {"del"})
         old = el.render_iab_card("item|khanda2-test|7.38").split("pane-new")[0]
-        assert '<span class="iab-hl iab-hl-del">your attack damage</span>' in old
+        assert '<span class="iab-hl iab-hl-del" data-tag="del">your attack damage</span>' in old
         # what stopped must be in the text: "no longer stack with …" is not "bonus damage"
         assert not el._iab_text_change("Empower Spell no longer stacks with Khanda", {"del"})
     finally:
@@ -140,7 +150,7 @@ def test_can_now_be_dispelled_adds_dispellable_at_the_end_of_the_description():
                   ["Active: Disarm. Prevents a target from attacking for 3 seconds. Cast Range: 650. Cooldown: 18s"])
         assert el._iab_text_change("Disarm can now be dispelled", {"nerf"})
         new = el.render_iab_card("item|halberd2-test|7.38").split("pane-new")[1]
-        assert '<b class="iab-num">3</b> seconds. <span class="iab-hl iab-hl-nerf">Dispellable</span>.' in new
+        assert '<b class="iab-num">3</b> seconds. <span class="iab-hl iab-hl-nerf" data-tag="nerf">Dispellable</span>.' in new
         assert "castrange.png" in new and "cooldown.png" in new           # the header values still found
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved

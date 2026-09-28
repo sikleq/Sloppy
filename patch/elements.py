@@ -1349,7 +1349,8 @@ def item_abilities_change(old, new):
     old_names = {_iab_ability_key(t) for t in old if _ITEM_ABILITY_RE.match(t)}
     key = f"{_State.current_entity_key}|{_State.current_patch_version}"
     _IAB_CARDS[key] = (list(old), list(new))
-    pairs = [(o, n) for o, n in _iab_pair_rows(old, new) if o and n]
+    # the same ability on both sides (a replacement pair's two texts aren't one ability rewritten)
+    pairs = [(o, n) for o, n in _iab_pair_rows(old, new) if _iab_same_ability(o, n)]
     segs = {_iab_ability_key(n): _iab_text_diff(o, n) for o, n in pairs}
     pairs_by = {}
     for o, n in pairs:
@@ -1605,8 +1606,11 @@ def _iab_mark_text(text, spans):
 
 
 def _iab_markers_html(html_text):
+    # data-tag: the tag filters find the card by its coloured text too (owner 2026-09-28: Drum of Endurance
+    # 7.38 under DEL — its "Comes with 8 charges." is removed text, its row is REWORK)
     for i, direction in enumerate(_IAB_TAG_ORDER):
-        html_text = html_text.replace(chr(_IAB_HL_OPEN + i), f'<span class="iab-hl iab-hl-{direction}">')
+        html_text = html_text.replace(chr(_IAB_HL_OPEN + i),
+                                      f'<span class="iab-hl iab-hl-{direction}" data-tag="{direction}">')
     return html_text.replace(_IAB_HL_CLOSE, "</span>")
 
 
@@ -1641,8 +1645,11 @@ def _iab_set_radius(pane_html, ability, value, cls="", note=""):
 
 
 def _iab_ability_key(text):
+    """The ability's name, lower-case; the whole text when no name can be read (two nameless abilities are
+    not one ability)."""
     m = _ITEM_ABILITY_RE.match(text)
-    return _iab_name(m.group(2).strip())[0].lower() if m else text.lower()
+    name = _iab_name(m.group(2).strip())[0] if m else ""
+    return (name or text).lower()
 
 
 def _iab_pair_rows(old, new):
@@ -1658,7 +1665,19 @@ def _iab_pair_rows(old, new):
             used.update(range(j + 1))
         rows.append((t, new[j] if j is not None else None))
     rows += [(None, new[i]) for i in range(len(new)) if i not in used]
-    return rows
+    # an ability removed and another added in the same patch is a REPLACEMENT: one row, old -> new
+    # (owner 2026-09-28, Revenant's Brooch 7.38: Toggle: Phantom Province -> Passive: Phantom Critical);
+    # the n-th removed one faces the n-th added one
+    gone = [i for i, (o, n) in enumerate(rows) if n is None]
+    came = [i for i, (o, n) in enumerate(rows) if o is None]
+    for gi, ci in zip(gone, came):
+        rows[min(gi, ci)] = (rows[gi][0], rows[ci][1])
+        rows[max(gi, ci)] = None
+    return [r for r in rows if r is not None]
+
+
+def _iab_same_ability(o, n):
+    return bool(o and n) and _iab_ability_key(o) == _iab_ability_key(n)
 
 
 def render_iab_card(key):
