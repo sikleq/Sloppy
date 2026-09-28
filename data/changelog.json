@@ -3,6 +3,20 @@
   "entries": [
     {
       "date": "2026-09-28",
+      "category": "Patch Reader",
+      "title": "Hero attack damage in one line",
+      "link": "patches/7.38.html",
+      "items": [
+        "Where Valve rescaled a hero's damage growth: \"Starting damage rescaled from 40–50 to 50–60 and damage gain per level from 3.6 to 2.7\"",
+        "% of both numbers on the right; \"Starting damage\" opens the damage at levels 1–30",
+        "36 heroes: 35 in 7.38 (Universal heroes 0.7 → 0.45 damage per attribute) and Spectre in 7.40"
+      ],
+      "shots": [
+        "icons/changelog/2026-09-28_hero_damage.webp"
+      ]
+    },
+    {
+      "date": "2026-09-28",
       "category": "Site",
       "title": "Hero pages: 10 item slots and more patch squares",
       "link": "heroes/outworld-destroyer.html",

@@ -53,8 +53,26 @@ def test_card_hides_its_rows_and_carries_their_tags():
 def test_generator_puts_the_card_first_in_general():
     import generate_patch_code_v2 as g
     lines = ['W(hero_header("Abaddon"))', "W(ul_open())", 'W(li("Base Damage increased by 26", t("BUFF")))',
-             'W(li("Damage at level 1 increased by 10 (from 40-50 to 50-60)", br(40, 50, 50, 60)))', "W(ul_close())"]
-    out = g._postprocess_hero_stat_card(lines)
-    assert out[2] == "W(hero_stat_card())" and g._postprocess_hero_stat_card(out) == out
+             'W(li("Damage at level 1 increased by 10 (from 40-50 to 50-60)", br(40, 50, 50, 60)))',
+             'W(li("Damage gain per level decreased from +3.6 to +2.7", b(3.6, 2.7)))', "W(ul_close())"]
+    out = g._postprocess_hero_stat_card(lines, "7.38")
+    assert out[2] == "W(hero_stat_card())" and g._postprocess_hero_stat_card(out, "7.38") == out
     plain = ['W(hero_header("Axe"))', "W(ul_open())", 'W(li("Base Armor increased by 1", t("BUFF")))', "W(ul_close())"]
-    assert g._postprocess_hero_stat_card(plain) == plain
+    assert g._postprocess_hero_stat_card(plain, "7.38") == plain
+    # a lone "+1 damage at level 1" (Sven 7.41): Valve did not rescale the growth -> its own rows stay
+    lone = ['W(hero_header("Sven"))', "W(ul_open())",
+            'W(li("Damage at level 1 increased from 60–62 to 61–63", br(60, 62, 61, 63)))', "W(ul_close())"]
+    assert g._postprocess_hero_stat_card(lone, "7.41") == lone
+
+
+def test_unchanged_starting_damage_is_said_so():
+    saved = (_State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card)
+    try:
+        _State.current_entity_key, _State.current_patch_version, _State.current_hero = "hero|batrider", "7.38", "Batrider"
+        el.hero_stat_card()
+        el._hs_covered("Damage at level 1 increased by 0 (from 39-43 to 39-43)", {"misc"})
+        html = el.render_hs_card("hero|batrider|7.38")
+        assert re.search(r'>Damage gain per level</span> rescaled from [\d.]+ to [\d.]+, starting damage unchanged '
+                         r'at 39–43', html)
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card = saved

@@ -1731,14 +1731,16 @@ def _postprocess_cost_components(lines, version):
     return out
 
 
-_HERO_DMG_ROW_RE = re.compile(r'W\(li\(\s*"Damage at level (?:1|30) ')
+# Valve described the damage GROWTH as rescaled (7.38 Universal heroes, Spectre 7.40): a gain-per-level or a
+# level-30 row. A lone "Damage at level 1" (+1 base damage) keeps its own row.
+_HERO_DMG_ROW_RE = re.compile(r'W\(li\(\s*"(?:Damage gain per level|Damage at level 30) ')
 
 
 def _postprocess_hero_stat_card(lines, version=None):
-    """Owner 2026-09-28 (Abaddon 7.38): a hero whose GENERAL rows restate its attack damage ("Damage at level 1
-    / 30 …") and whose attributes changed gets the attributes card + damage-by-level table (hero_stat_card) as
-    the first thing of that list; the rows it shows are hidden at render time. Works on generator output and
-    indented content."""
+    """Owner 2026-09-28 (Abaddon 7.38): a hero whose GENERAL rows describe its damage growth as rescaled
+    ("Damage gain per level …" / "Damage at level 30 …") and whose attributes changed gets ONE row "Starting
+    damage … and damage gain per level … rescaled" (hero_stat_card) first in that list; the damage rows are
+    hidden at render time. Works on generator output and indented content."""
     from patch.hero_stats import attrs_changed
     from patch.weights import _prev_version
     out, i = [], 0
@@ -2951,7 +2953,7 @@ def generate(version):
     out = _postprocess_properties_change(out)
     out = _postprocess_silent_stats(out, version)
     out = _postprocess_card_stat_notes(out)
-    # out = _postprocess_hero_stat_card(out, version)   # pilot on Abaddon 7.38 only until the owner approves (2026-09-28)
+    out = _postprocess_hero_stat_card(out, version)   # approved by the owner 2026-09-28
     out = _postprocess_unstated_total_cost(out)
     out = _postprocess_item_ability_cards(out, version)
     out = _drop_empty_ul(out)

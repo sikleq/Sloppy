@@ -269,10 +269,10 @@ damage» — не про характеристику урона). «+N All Attr
   про встроенный бонус дальности).
 - Длинные значения (5 уровней Dagon) переносятся второй строкой справа, название способности не разрывается.
 
-## Урон атаки героя одной строкой (2026-09-28, ПИЛОТ только на Abaddon 7.38)
+## Урон атаки героя одной строкой (2026-09-28: пилот на Abaddon 7.38, раскатано на 36 героев)
 
 7.38 снизил урон универсалов за очко характеристики 0.7 → 0.45 и поднял базовый урон и прирост в компенсацию:
-«Base Damage increased by 26» (+650%) сам по себе ничего не значил. Пилот: `hero_stat_card()` (patch/elements.py,
+«Base Damage increased by 26» (+650%) сам по себе ничего не значил. `hero_stat_card()` (patch/elements.py,
 модель — patch/hero_stats.py по файлам игры обоих патчей) — ОДНА строка вместо строк урона:
 
 «**Starting damage** rescaled from 40–50 to 50–60 and damage gain per level from 3.6 to 2.7 (?)  +22% start −25% per level»
@@ -290,8 +290,15 @@ damage» — не про характеристику урона). «+N All Attr
   веса — как раньше (`_flush_damage_rows`). Строки характеристик и смена основной характеристики — обычные строки.
 - Отвергнуты владельцем: две коробки «было | стало», рамка с таблицей характеристик, «Attack damage by level» со
   столбцом «30 + AB», вторая таблица прироста за уровень.
-- Раскатка — ТОЛЬКО после одобрения: генератор `_postprocess_hero_stat_card` написан, но в конвейер не включён.
-  Тест: `tests/test_hero_stat_card.py`.
+- Формулировка по тому, что поменялось: оба числа — «Starting damage rescaled from A to B and damage gain per
+  level from X to Y»; старт тот же (Batrider 7.38) — «Damage gain per level rescaled from X to Y, starting damage
+  unchanged at A»; прирост тот же — «Starting damage rescaled from A to B, damage gain per level unchanged at X».
+- Где стоит (одобрено владельцем 2026-09-28): только там, где Valve САМИ пересчитали рост урона — в GENERAL есть
+  строка «Damage gain per level …» или «Damage at level 30 …», и у героя по файлам игры поменялись характеристики
+  (`attrs_changed`). Одиночная «Damage at level 1 +1» (Sven 7.41) остаётся строкой: это правка базового урона.
+  Сейчас: 35 героев 7.38 + Spectre 7.40. Генератор вставляет сам: `_postprocess_hero_stat_card(lines, version)`
+  первым в GENERAL. Тег по правилу: у большинства NERF; BUFF — Arc Warden, Death Prophet, Nature's Prophet,
+  Spectre 7.38; Abaddon — BUFF по решению владельца. Тест: `tests/test_hero_stat_card.py`.
 
 ## Список нейтральных зачарований — одна таблица (2026-09-28, 7.38)
 

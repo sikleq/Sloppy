@@ -746,8 +746,16 @@ def render_hs_card(key):
     tip = f'<span class="li-tail">{info_tip(*notes)}</span>'
     tags = " ".join(sorted(rec["tags"] | {overall}))
     (o1, n1) = cells[0][1], cells[0][2]
-    text = (f'<span class="formula-trigger" data-formula="{fid}">Starting damage</span> rescaled from '
-            f'{o1[0]}–{o1[1]} to {n1[0]}–{n1[1]} and damage gain per level from {per_o:g} to {per_n:g}{tip}')
+    trig = lambda words: f'<span class="formula-trigger" data-formula="{fid}">{words}</span>'
+    s1, s2 = f"{o1[0]}–{o1[1]}", f"{n1[0]}–{n1[1]}"
+    g1, g2 = f"{per_o:.1f}", f"{per_n:.1f}"
+    if o1 == n1:          # Batrider 7.38: "rescaled from 39–43 to 39–43" said nothing
+        text = f'{trig("Damage gain per level")} rescaled from {g1} to {g2}, starting damage unchanged at {s1}{tip}'
+    elif g1 == g2:
+        text = f'{trig("Starting damage")} rescaled from {s1} to {s2}, damage gain per level unchanged at {g1}{tip}'
+    else:
+        text = (f'{trig("Starting damage")} rescaled from {s1} to {s2} and damage gain per level '
+                f'from {g1} to {g2}{tip}')
     return (f'<li data-tag="{tags}" class="li-bg li-formula hs-dmg-li">{chip}<span class="row-text">{text}</span>'
             f'{badge}{table}</li>')
 
