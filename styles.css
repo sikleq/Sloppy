@@ -3007,12 +3007,25 @@ body.patch-page .entity-block.enchant-list-row + :not(.enchant-list-row) { margi
 .ench-tiers {
   display: grid;
   grid-template-columns: minmax(0, 1fr) repeat(5, 56px);
-  column-gap: 6px;
+  column-gap: 0;
   row-gap: 2px;
   align-items: center;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
+/* thin column lines before every tier column, through the whole table (owner 2026-09-28): the tier columns
+   are the last 5 x 56px, so a line every 56px from the right; the grid stretches over its row's padding so
+   the lines meet the next row's */
+body.patch-page .enchant-list-row .ench-tiers,
+body.patch-page .enchant-list-head .ench-tiers {
+  align-self: stretch;
+  align-content: center;
+  margin: -6px 0;
+  padding: 6px 0;
+  background: repeating-linear-gradient(to left, transparent 0 55px, rgba(254, 247, 232, 0.08) 55px 56px)
+              right top / 280px 100% no-repeat;
+}
+body.patch-page .enchant-list-head .ench-tiers { margin: -5px 0; padding: 5px 0; }
 .ench-tiers-h { grid-column: 3; }
 .ench-tier-h, .ench-v { text-align: center; }
 .ench-stat { color: var(--text-main); overflow-wrap: anywhere; }
@@ -10173,7 +10186,8 @@ body.patch-page .cat-panel.ec-head-panel .entity-block.ec-head > .entity { paddi
 .ec-head-panel .dyn-row-wrap { margin-right: 0; }
 /* hero page: 6 small item slots between the name and the patch-dynamics row,
    the same 24px glassy pill as a .dyn-cell (4:3 so the item art reads) */
-.ec-islots { display: flex; gap: 4px; padding: 2px 4px; flex: none; }
+/* 9 slots in two rows (5 + 4): the patch squares keep their room (owner 2026-09-28) */
+.ec-islots { display: grid; grid-template-columns: repeat(5, 32px); gap: 4px; padding: 2px 4px; flex: none; }
 .ec-islots + .dyn-row-wrap { margin-left: 14px; }
 .ec-head-panel .entity-name.ec-name-slots { font-size: 28px; }   /* room for the slots */
 .ec-islot {
