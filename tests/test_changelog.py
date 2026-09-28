@@ -131,9 +131,10 @@ def test_no_unofficial_icon_for_an_innate_without_game_art():
     assert back == []
 
 
-def test_aghanim_granted_abilities_are_aghanim_rows_and_get_no_chip():
+def test_aghanim_granted_abilities_are_aghanim_rows():
     """Owner 2026-09-26, Medusa 7.38 Cold Blooded: a Shard-granted ability. Its rows are Shard rows even
-    without the words, and the SHARD filter covers it (no chip of its own)."""
+    without the words, so the SHARD filter covers it; since 2026-09-28 it also has a chip of its own
+    (Crystal Clone)."""
     from patch.aghs_granted import kind_of
     assert kind_of("medusa_cold_blooded") == "shard"
     assert kind_of("tiny_tree_channel") == "scepter"

@@ -3724,7 +3724,7 @@ function ecShopMarkup(panels) {
     + '</div></section>').join('') + '</div>';
 }
 
-// ---- HERO CHANGES page: 6 item slots next to the hero name ----
+// ---- HERO CHANGES page: 9 item slots next to the hero name ----
 // A picked item's own change blocks (from items/<slug>.html) are added to the
 // hero's patch sections, so e.g. Anti-Mage + Battle Fury shows both in 7.41f.
 // A patch where only the item changed gets its own section in version order.

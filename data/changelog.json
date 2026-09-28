@@ -3,6 +3,12 @@
   "entries": [
     {
       "date": "2026-09-28",
+      "category": "Site",
+      "title": "Hero pages: 9 item slots instead of 6; abilities that Aghanim's Shard / Scepter grant get their own filter too (Crystal Clone, Cold Blooded)",
+      "minor": true
+    },
+    {
+      "date": "2026-09-28",
       "category": "Patch Reader",
       "title": "7.38 neutral enchantments as one table",
       "link": "patches/7.38.html",

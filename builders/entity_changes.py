@@ -530,11 +530,9 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
         innate_titles = {part.strip() for p in e["patches"] for m in _INNATE_TITLE_RE.finditer(p["_body"])
                          for part in _html.unescape(_re.sub(r"<[^>]+>", "→", m.group(1))).split("→") if part.strip()}
         no_chip = (_KIT_FACET.get(npc, set()) - set(kit)) | (innate_titles - set(kit))
-        # an ability Aghanim's Shard / Scepter grants (Cold Blooded) is covered by the SHARD / SCEPTER
-        # filter, unless it is a regular ability of the hero now (owner 2026-09-26)
-        from patch.aghs_granted import kind_of
-        no_chip |= {k for k in current + old
-                    if kind_of(_ability_slug(npc, k)) and k not in _KIT_BASIC.get(npc, set())}
+        # an ability Aghanim's Shard / Scepter grants (Crystal Clone, Cold Blooded) gets its own chip too — its
+        # rows also answer the SHARD / SCEPTER filter (owner 2026-09-28: "Crystal Clone has no filter";
+        # 2026-09-26 it had only the Shard / Scepter one)
         old = [k for k in old if k not in no_chip]
         current = [k for k in current if k not in no_chip]
         if extra:
@@ -607,9 +605,9 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     return "".join(out)
 
 
-# Hero pages: 6 small item slots between the name and the patch-dynamics row. The picked items' own change blocks are
+# Hero pages: 9 small item slots (owner 2026-09-28; was 6) between the name and the patch-dynamics row. The picked items' own change blocks are
 # pulled from items/<slug>.html into the matching patch sections (scripts.js).
-_ITEM_SLOTS = 6
+_ITEM_SLOTS = 9
 
 
 def _name_block(e: dict) -> str:
