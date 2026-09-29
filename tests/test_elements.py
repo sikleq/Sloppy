@@ -88,6 +88,14 @@ class TestLi:
         result = li("Change", force_tag="misc")
         assert 'data-tag="misc"' in result
 
+    def test_li_forced_buff_or_nerf_is_also_the_chip(self):
+        # 7.41c Bloodstone: the notes' "+600 -> +625" (+4%) is really 650 -> 625; filtered as NERF, chip said BUFF
+        from patch.elements import li
+        result = li("Health bonus increased from +600 to +625", b(600, 625), force_tag="nerf")
+        assert result.startswith('<li data-tag="nerf"')
+        assert '>NERF</span>' in result and '>BUFF</span>' not in result
+        assert "+4%" in result                                     # the stated number keeps its own %
+
     def test_li_extra_appended_inside_element(self):
         from patch.elements import li
         result = li("Base text", extra='<div class="note">note</div>')

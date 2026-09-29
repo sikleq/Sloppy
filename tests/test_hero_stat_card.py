@@ -61,6 +61,17 @@ def test_generator_puts_the_card_first_in_general():
     assert g._postprocess_hero_stat_card(lone, "7.41") == lone
 
 
+def test_valves_figures_are_read_in_every_way_valve_writes_them():
+    # the (?) showed the model's level 30 instead of Valve's for these (the regex wanted "by <one number> (from a-b")
+    for text, level, figures in (
+            ("Damage at level 30 decreased by 51-49 (from 196-204 to 145-155)", 30, ((196, 204), (145, 155))),
+            ("Damage at level 1 rescaled from 46-54 to 45-55", 1, ((46, 54), (45, 55))),
+            ("Damage at level 30 decreased by 27 (from 149–153 to 122–126)", 30, ((149, 153), (122, 126)))):
+        m = el._HS_DMG_VALVE_RE.search(text)
+        assert m and int(m.group(1)) == level, text
+        assert ((int(m.group(2)), int(m.group(3))), (int(m.group(4)), int(m.group(5)))) == figures
+
+
 def test_unchanged_starting_damage_is_said_so():
     saved = (_State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card)
     try:

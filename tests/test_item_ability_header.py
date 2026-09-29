@@ -13,6 +13,13 @@ def test_meta_goes_to_the_header_and_leaves_the_description():
     assert "Cast Range" not in desc and "Cooldown" not in desc and '<b class="iab-num">8</b>' in desc
 
 
+def test_a_multiplier_is_bold_whole_not_cut_at_its_decimal_point():
+    # 7.39 Sister's Shroud "reduces this evasion bonus to 0.25x" showed a bold "0" and a plain ".25x"
+    html = el._iab_bold_numbers("reduces it to 0.25x of its value, take 1.5x damage, ends at 5. Then 2x")
+    assert '<b class="iab-num">0.25x</b> of' in html and '<b class="iab-num">1.5x</b> damage' in html
+    assert '<b class="iab-num">5</b>. Then <b class="iab-num">2x</b>' in html
+
+
 def test_no_mana_cost_is_dropped_and_a_name_with_bang_is_kept():
     h = el._item_ability_html("Active: Pig, Out! Turn your hero into a critter for 4 seconds. No Mana Cost. Cooldown: 25s")
     assert "Pig, Out!" in h and "No Mana Cost" not in h and "manacost.png" not in h

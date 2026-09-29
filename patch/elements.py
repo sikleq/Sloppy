@@ -624,7 +624,10 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
 # level", each with its own tag; the old rows stay in the page hidden (weights as before). Attribute rows stay rows.
 _HS_CARDS = {}                  # "<ek>|<pv>" -> {"hero", "before", "after", "valve": {1: ..., 30: ..., "gain": ...}}
 _HS_GAIN_VALVE_RE = re.compile(r"damage gain per level \w+ from \+?([\d.]+) to \+?([\d.]+)", re.I)
-_HS_DMG_VALVE_RE = re.compile(r"damage at level (1|30) \w+ by \d+ \(from (\d+)-(\d+) to (\d+)-(\d+)\)", re.I)
+# Valve writes "decreased by 36 (from 189-195 to 153-159)", "decreased by 51-49 (from …)" (min and max moved
+# apart: Sand King, Mirana, Marci 7.38), "rescaled from 46-54 to 45-55" and, in 7.40, an en dash (Spectre)
+_HS_DMG_VALVE_RE = re.compile(r"damage at level (1|30) (?:\w+ by \d+(?:[-–]\d+)? \(from|rescaled from) "
+                              r"(\d+)[-–](\d+) to (\d+)[-–](\d+)", re.I)
 
 
 def hero_stat_card(before=None):
@@ -1408,7 +1411,8 @@ _IAB_META = (  # (key, icon, pattern of a whole sentence) — header order: radi
 )
 _IAB_DROP = r"No Mana Cost|No Cooldown"
 _IAB_SMALL = {"of", "the", "a", "an", "and", "to", "in", "on", "for", "with", "from"}
-_IAB_NUM_RE = re.compile(r"(?<![\w#&.])([+\-]?\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*%?s?)(?![\w%])")
+# a multiplier "0.25x" is one number; never stop at its decimal point (7.39 Sister's Shroud showed a bold "0" + ".25x")
+_IAB_NUM_RE = re.compile(r"(?<![\w#&.])([+\-]?\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*%?s?x?)(?![\w%]|\.\d)")
 ABILITY_ICON_DIR = "../icons/ui/ability/"
 
 
@@ -1990,6 +1994,12 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     if text_tag_re:
         left_tag = text_tag_re.group(0).rstrip()
         rest = badge[:text_tag_re.start()] + badge[text_tag_re.end():]
+    elif force_tag in ("buff", "nerf"):
+        # the chip says what the row is filtered as: 7.41c Bloodstone's wrongly stated "+600 -> +625" (+4%) is
+        # really 650 -> 625, force_tag="nerf" — its chip said BUFF while the NERF filter showed it
+        left_tag = (f'<span class="badge {force_tag}-text" data-tag="{force_tag}" data-overall="{force_tag}">'
+                    f'{force_tag.upper()}</span>')
+        rest = badge
     elif 'data-overall="buff"' in badge:
         left_tag = '<span class="badge buff-text" data-tag="buff" data-overall="buff">BUFF</span>'
         rest = badge
