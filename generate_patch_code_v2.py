@@ -475,20 +475,22 @@ def _is_lower_better(text):
 
 # ---------- B() / TEXT-TAG EMITTERS ----------
 
+# unit suffix: % / s / x, and g for gold ("Total cost increased from 4450g to 4550g", 7.41f Hurricane Pike: no
+# old/new, so the normalized record had no lower_is_better and the validator read the right NERF as a mistake)
 _FROM_TO_RE = re.compile(
     r'\bfrom\s+'                                # 'from '
-    r'([-+]?\d+(?:\.\d+)?(?:[/–][-+]?\d+(?:\.\d+)?)*[%sx]?)\s+'  # OLD value(s), optional unit suffix
+    r'([-+]?\d+(?:\.\d+)?(?:[/–][-+]?\d+(?:\.\d+)?)*[%sxg]?)\s+'  # OLD value(s), optional unit suffix
     r'to\s+'                                    # 'to '
-    r'([-+]?\d+(?:\.\d+)?(?:[/–][-+]?\d+(?:\.\d+)?)*[%sx]?)',    # NEW value(s)
+    r'([-+]?\d+(?:\.\d+)?(?:[/–][-+]?\d+(?:\.\d+)?)*[%sxg]?)',    # NEW value(s)
 )
 # For "from X–Y to A–B" style (en-dash range): take first number of range as the value
 _RANGE_FIRST_RE = re.compile(r'^([-+]?\d+(?:\.\d+)?)–')
 
 
 def _split_levels(s):
-    """'5/7/9/11' or '5' or '52–56' → list or scalar. Strips trailing unit suffix (%/s/x).
+    """'5/7/9/11' or '5' or '52–56' → list or scalar. Strips trailing unit suffix (%/s/x/g).
     En-dash ranges (52–56) are kept as-is (string); / separates levels."""
-    s = s.rstrip('%sx')
+    s = s.rstrip('%sxg')
     parts = s.split('/')
     nums = []
     for p in parts:

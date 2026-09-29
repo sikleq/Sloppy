@@ -70,3 +70,12 @@ def test_basic_shape(path):
         assert "name" in e
         assert "changes" in e
         assert isinstance(e["changes"], list)
+
+
+def test_a_gold_price_is_parsed_so_a_cost_increase_is_a_nerf_with_lower_is_better():
+    # 7.41f Hurricane Pike "Total cost increased from 4450g to 4550g": no old/new was read, so the record had no
+    # lower_is_better and the CI validator took the right NERF for a mistake
+    sys.path.insert(0, str(_ROOT))
+    import generate_patch_code_v2 as g
+    rec = g._normalize_note_text("Total cost increased from 4450g to 4550g (due to Dragon Lance cost increase)")
+    assert (rec["old"], rec["new"], rec["tag"], rec.get("lower_is_better")) == (4450, 4550, "nerf", True)
