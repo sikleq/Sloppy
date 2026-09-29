@@ -112,7 +112,7 @@
       "changes": [
         {
           "text": "Total cost increased from 4450g to 4550g (due to Dragon Lance cost increase)",
-          "tag": "buff",
+          "tag": "nerf",
           "scope": "base"
         }
       ]
@@ -365,12 +365,12 @@
         },
         {
           "text": "Level 20 Talent Track Grants Shared Vision replaced with +190 Shuriken Toss Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +250 Shuriken Toss Damage replaced with Track Grants Shared Vision",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -526,17 +526,17 @@
         },
         {
           "text": "Level 20 Talent +25% Magnetize Damage & Duration replaced with +35 Magnetize Damage Per Second",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 20 Talent +175% Rolling Boulder Damage from Strength replaced with +200 Geomagnetic Grip Remnant Damage",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         },
         {
           "text": "Level 25 Talent +250 Geomagnetic Grip Remnant Damage replaced with +250% Rolling Boulder Damage from Strength",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
@@ -1106,7 +1106,7 @@
         },
         {
           "text": "Level 10 Talent +3 Living Armor Heal per Second replaced with +3s Living Armor Duration",
-          "tag": "rework",
+          "tag": "swap",
           "scope": "talent"
         }
       ]
