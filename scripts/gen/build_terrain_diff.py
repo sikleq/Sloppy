@@ -68,8 +68,14 @@ def _dotted(code):
     return code if "." in code else f"{code[0]}.{code[1:]}"
 
 
+_OWN = os.path.join(_ROOT, "data", "map")
+
+
 def _load(code):
-    path = os.path.join(_CACHE, f"mapdata_{code}.json")
+    """Our own map data first (data/map/mapdata_<code>.json, read from the game files by
+    scripts/gen/extract_map_entities.py — same shape), else leamare's cached export."""
+    own = os.path.join(_OWN, f"mapdata_{code}.json")
+    path = own if os.path.exists(own) else os.path.join(_CACHE, f"mapdata_{code}.json")
     with open(path, encoding="utf-8") as f:
         return json.load(f)["data"]
 

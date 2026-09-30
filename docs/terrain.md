@@ -70,6 +70,35 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/gen/build_terrain_m
 - The 7.40→7.41 diff: **+324 / −305 trees, camps moved/relocated + 2 demoted,
   2 towers, tormentor/twin-gate/lotus moves** — all match the 7.41 text list.
 
+## Our own map data — from the game files (2026-09-30)
+
+`scripts/gen/extract_map_entities.py` reads the map VPKs of the local game install with Source2Viewer-CLI
+(path in env `S2V_CLI`; no game running, no downloads) → `data/map/mapdata_<code>.json` (committed), same
+shape as leamare's `mapdata.json`. `build_terrain_diff.py` prefers these files and falls back to the
+`.cache/leamare/` export only for maps we don't have yet.
+
+- Source: the entity lumps `maps/dota/entities/*.vents_c` — `default_ents` + the `world_layer_*_base` layers,
+  NOT `*_destruction`. Trees = `ent_dota_tree`; camps = `npc_dota_neutral_spawner` (`neutraltype`,
+  `pulltype`, `volumename`); camp boxes = the `trigger_multiple` volume's hull bounds (`m_vMin/MaxBounds` in its
+  `.vmdl_c`, or the sibling `.vphys_c` in legacy maps; several hulls → one box) + the entity origin/yaw;
+  Roshan = the spawner + `info_player_start_dota` `roshan_location_2`; Tormentors = `miniboss_location_*`;
+  shrines (7.00–7.22) = buildings with `mapunitname` `*_healers`. Coordinates rounded to whole units.
+- Maps on disk: the live `dota.vpk` (= 7.41 terrain) + legacy snapshots the game keeps for old replays:
+  `dota_683 / 685 / 688 / 706 / 719 / 722 / 728 / 732 / 737.vpk`.
+- Checked against leamare (`tests/test_map_entities.py`, skips without the cache): trees, camps + types, boxes,
+  towers, runes, Roshan, Tormentors, gates, lotus, watchers, outposts identical for 7.41, 7.35 (=737), 7.32,
+  7.22, 7.19. Only differences: leamare's hand-added `landmarks` / `landmark_aura` (not in the map files) and one
+  7.06 camp box (his is wider). Counts: 6.83 2669 trees · 6.85 2489 · 6.88 2371 · 7.06 2190 · 7.19 2205 ·
+  7.22 2208 · 7.28 2104 · 7.32 2303 · 7.37 2531 · 7.41 2475.
+- Missing so far: 7.38, 7.38b/c, 7.39*, 7.40* — the game install has no snapshot of them. Next: take
+  `maps/dota.vpk` from old builds (DepotDownloader `-filelist`, Steam login by the owner) and pass it with
+  `--vpk`. Rendering the top-down image ourselves: Source2Viewer glTF export → Blender orthographic (needs
+  Source2Viewer 20.0 for Dota's terrain shaders).
+- How leamare does it (for reference): a Lua custom game in Workshop Tools dumps entities to the console
+  (`leamare/dota-map-coordinates`); the image is SFM camera sweeps stitched in Microsoft ICE and calibrated by
+  hand (`dota-interactive-map/docs/05-mapimage.md`). The courier tile server DOES have some letter patches
+  (738b, 739b).
+
 ## Map source availability (investigated 2026-06-04)
 
 - **Tiles** `maps/tiles/<ver>/default/<z>/…` — only the `default` skin (no
