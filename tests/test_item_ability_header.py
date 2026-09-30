@@ -1,5 +1,7 @@
 """Owner 2026-09-27: an item ability row gets a light header like the game's item tooltip — name left,
 cast range / mana / health cost / cooldown right with the game's icons; numbers bold."""
+import re
+
 from patch import elements as el
 
 
@@ -77,6 +79,13 @@ def test_abilities_pair_by_name_and_only_a_pair_gets_an_arrow():
         # one arrow for the whole card (owner 2026-09-27), centred across every row
         assert html.count('class="properties-arrow"') == 1 and 'style="grid-row:1 / -1"' in html
         assert 'class="iab-none"' in html.split("pane-new")[0]            # the empty cell is on the old side
+        # owner 2026-09-30: the added ability's own card gets the light green dashed frame, the paired one none
+        assert html.count("iab-added") == 1 and "iab-removed" not in html
+        assert re.search(r'class="iab-card iab-added">.*?Damage Block', html, re.S)
+        el.item_abilities_change(old=["Active: Eternal Chains. A.", "Passive: Chain Lightning. B."],
+                                 new=["Active: Eternal Chains. C."])
+        html = el.render_iab_card("item|halberd-test|7.38")
+        assert re.search(r'class="iab-card iab-removed">.*?Chain Lightning', html, re.S) and "iab-added" not in html
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
 
@@ -251,7 +260,8 @@ def test_item_abilities_change_puts_each_ability_in_a_card_on_its_side():
         assert not el._iab_covered_change("Recipe cost increased from 500 to 1500", {"nerf"})
         html = el.render_iab_card("item|khanda-test|7.38")
         old, new = html.split('pane-new')
-        assert old.count('class="iab-card"') == 2 and new.count('class="iab-card"') == 1
+        assert old.count('class="iab-card') == 2 and new.count('class="iab-card') == 1
+        assert old.count("iab-removed") == 1                              # Critical Strike: gone in the new item
         assert ">6<" in old and '<b class="iab-num iab-buff">250</b>' in new
         assert 'class="iab-m iab-nerf"' in new and "cooldown.png" in new
     finally:

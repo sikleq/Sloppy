@@ -392,6 +392,13 @@ def save_calendar_html():
     });
     grid.addEventListener('mouseleave', clear);
   });
+  // Today's cell: a light frame (owner 2026-09-30). The page is built ahead of time, so the visitor's own clock
+  // decides which day that is.
+  const now = new Date();
+  const todayPane = document.querySelector(`.cal-year-pane[data-year="${now.getFullYear()}"]`);
+  const todayCell = todayPane && todayPane.querySelector(
+    `.cal-full-day[data-month="${now.getMonth() + 1}"][data-day="${now.getDate()}"]`);
+  if (todayCell) { todayCell.classList.add('is-today'); todayCell.title = 'Today'; }
 })();
 </script>'''
 

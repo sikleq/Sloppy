@@ -1998,22 +1998,27 @@ def render_iab_card(key):
             extra.append((start, start + len(tail), d))
         return t, extra
 
-    def pane(texts, side, slots=False):
+    def pane(texts, side, slots=False, others=()):
         cards = []
-        for t in texts:
+        for i, t in enumerate(texts):
             if t is None:
-                cards.append('<div class="iab-none"></div>')    # the other side's ability has no counterpart
+                # the other side's ability has no counterpart: an empty cell that keeps the rows aligned, no frame
+                # (owner 2026-09-30: the added / removed card itself carries a light green / red dashed frame)
+                cards.append('<div class="iab-none"></div>')
                 continue
+            alone = i < len(others) and others[i] is None
+            frame = (" iab-added" if side == "new" else " iab-removed") if alone else ""
             t, marks = with_tails(t, (_iab_ability_key(t), side))
             h = _item_ability_html(_iab_mark_text(t, marks)) if marks else None
             h = _iab_markers_html(h) if h else (_item_ability_html(t) or _html.escape(t))
             m = _ITEM_ABILITY_RE.match(t)
             if slots and m and "iab-desc" in h:                 # a slot for a moved (?) note
                 h = iab_attach_tail(h, f"<!--IABNOTE:{key}|{_iab_name(m.group(2).strip())[0].lower()}-->")
-            cards.append(f'<div class="iab-card">{h}</div>')
+            cards.append(f'<div class="iab-card{frame}">{h}</div>')
         return "".join(cards)
 
-    right, left = pane([n for _, n in rows], "new", slots=True), pane([o for o, _ in rows], "old")
+    olds, news = [o for o, _ in rows], [n for _, n in rows]
+    right, left = pane(news, "new", slots=True, others=olds), pane(olds, "old", others=news)
     for target, value, direction, note, ability, was in _IAB_MARKS.get(key, []):
         num = re.escape(value)
         if target == "aoe":                                   # a radius: a header value on both sides

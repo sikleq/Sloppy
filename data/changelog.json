@@ -3,6 +3,20 @@
   "entries": [
     {
       "date": "2026-09-30",
+      "category": "Site",
+      "minor": true,
+      "link": "calendar.html",
+      "title": "Calendar: today's day has a light frame"
+    },
+    {
+      "date": "2026-09-30",
+      "category": "Patch Reader",
+      "minor": true,
+      "link": "patches/7.38.html",
+      "title": "Item abilities before → after: an added ability has a light green dashed frame, a removed one a light red one; no empty frame opposite them"
+    },
+    {
+      "date": "2026-09-30",
       "category": "Patch Reader",
       "title": "Ability and facet cards read like item abilities",
       "link": "patches/7.40.html",

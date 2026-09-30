@@ -2122,6 +2122,8 @@ span.cal-patch {
   transition: transform 0.13s ease, filter 0.13s, background 0.1s, z-index 0s;
 }
 .cal-full-day.no-day { background: transparent; }
+/* today (set by the calendar page's script from the visitor's clock): a light warm frame, the number brighter */
+.cal-full-day.is-today { box-shadow: inset 0 0 0 1px rgba(224, 189, 98, 0.6); color: var(--text-bright); }
 /* Cross-highlight: when hovering any day cell, JS marks all cells sharing the
    same data-day (column) and data-month (row) so a vertical + horizontal band
    lights up around the cursor. */
@@ -10977,7 +10979,11 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
   grid-row: 1 / -1; row-gap: 8px; padding: 0; background: none; border: 0; align-items: stretch; }
 .properties-change.iab-change .properties-arrow { align-self: center; }
 /* the empty place opposite an ability only one side has: a barely visible dashed frame (owner 2026-09-27) */
-.iab-none { border: 1px dashed rgba(150, 146, 137, 0.22); border-radius: 6px; }
+/* ...and no frame at all since 2026-09-30: the ability that is alone says it itself — added: a light green dashed
+   frame on the new side, removed: a light red one on the old side (Heaven's Halberd / Gleipnir 7.38) */
+.iab-none { border: 0; }
+.iab-card.iab-added { border: 1px dashed rgba(127, 208, 140, 0.5); }
+.iab-card.iab-removed { border: 1px dashed rgba(227, 128, 110, 0.5); }
 /* card text a hidden row without numbers describes, in its tag's colour (Bloodpact 7.38 "Dispel Type: Basic
    Dispel." gold = NEW); the % of a changed number sits in its hover tip */
 .iab-hl-new { color: #e0bd62; }
