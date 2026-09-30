@@ -77,7 +77,8 @@ def test_abilities_pair_by_name_and_only_a_pair_gets_an_arrow():
                                  new=["Active: Disarm. New text.", "Passive: Damage Block. Blocks damage."])
         html = el.render_iab_card("item|halberd-test|7.38")
         # one arrow for the whole card (owner 2026-09-27), centred across every row
-        assert html.count('class="properties-arrow"') == 1 and 'style="grid-row:1 / -1"' in html
+        # ...centred on the rows that have both sides: here row 1 only (owner 2026-09-30: it pointed at nothing)
+        assert html.count('class="properties-arrow"') == 1 and 'style="grid-row:1 / 2"' in html
         assert 'class="iab-none"' in html.split("pane-new")[0]            # the empty cell is on the old side
         # owner 2026-09-30: the added ability's own card gets the light green dashed frame, the paired one none
         assert html.count("iab-added") == 1 and "iab-removed" not in html

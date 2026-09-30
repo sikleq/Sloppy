@@ -2031,10 +2031,14 @@ def render_iab_card(key):
             right = re.sub(rf'<span class="iab-m">(<img class="iab-ico" src="[^"]*{target}\.png" alt="">)({num})</span>',
                            lambda m: f'<span class="iab-m iab-{direction}">{m.group(1)}{_iab_hint(m.group(2), note)}</span>',
                            right, count=1)
-    # one arrow for the whole card, between the two columns (owner 2026-09-27: not one per ability)
+    # one arrow for the whole card, between the two columns (owner 2026-09-27: not one per ability), centred on
+    # the rows that have both sides — beside an ability alone on one side it pointed at nothing (owner 2026-09-30,
+    # Gleipnir / Heaven's Halberd 7.38); no pair at all: the whole card
+    paired = [i for i, (o, n) in enumerate(rows, 1) if o and n] or [1, len(rows)]
+    span = f"{paired[0]} / {paired[-1] + 1}"
     return (f'<div class="properties-change iab-change" style="grid-template-rows:repeat({len(rows)},auto)">'
             f'<div class="properties-pane pane-old">{left}</div>'
-            f'<span class="properties-arrow" style="grid-row:1 / -1">→</span>'
+            f'<span class="properties-arrow" style="grid-row:{span}">→</span>'
             f'<div class="properties-pane pane-new">{right}</div></div>')
 
 

@@ -13,7 +13,7 @@
       "category": "Patch Reader",
       "minor": true,
       "link": "patches/7.38.html",
-      "title": "Item abilities before → after: an added ability has a light green dashed frame, a removed one a light red one; no empty frame opposite them"
+      "title": "Item abilities before → after: an added ability has a light green dashed frame, a removed one a light red one; no empty frame opposite them, and the arrow sits beside the abilities that pair"
     },
     {
       "date": "2026-09-30",

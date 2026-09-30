@@ -10982,7 +10982,7 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 /* ...and no frame at all since 2026-09-30: the ability that is alone says it itself — added: a light green dashed
    frame on the new side, removed: a light red one on the old side (Heaven's Halberd / Gleipnir 7.38) */
 .iab-none { border: 0; }
-.iab-card.iab-added { border: 1px dashed rgba(127, 208, 140, 0.5); }
+.iab-card.iab-added { border: 1px dashed rgba(110, 170, 118, 0.42); }   /* a step darker (owner 2026-09-30) */
 .iab-card.iab-removed { border: 1px dashed rgba(227, 128, 110, 0.5); }
 /* card text a hidden row without numbers describes, in its tag's colour (Bloodpact 7.38 "Dispel Type: Basic
    Dispel." gold = NEW); the % of a changed number sits in its hover tip */
