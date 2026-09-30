@@ -10957,6 +10957,10 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-ico { width: 13px; height: 13px; border-radius: 2px; display: block; }
 .iab-desc { display: block; }
 .iab-num { font-weight: 700; color: var(--text-bright); }
+/* An ability / facet card has no header strip (its name is the title above), so its radius / range / cost /
+   cooldown sit in the pane's top-right corner, the text flowing round them (owner 2026-09-30, 7.38 Alleviation) */
+.ability-change-row > .pane-meta { float: right; margin: 0 0 2px 16px; line-height: inherit; }
+.formula-trigger .iab-num { color: inherit; }     /* a number inside a formula button keeps the button's colour */
 /* Item abilities before -> after (item_abilities_change): one row per ability, old left / new right paired
    by name (render_iab_card); a pair's two cards share the row height; an arrow only between a pair, an
    ability without a counterpart sits next to an empty cell (owner 2026-09-27, Heaven's Halberd 7.38) */

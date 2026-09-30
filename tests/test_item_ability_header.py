@@ -256,3 +256,36 @@ def test_item_abilities_change_puts_each_ability_in_a_card_on_its_side():
         assert 'class="iab-m iab-nerf"' in new and "cooldown.png" in new
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
+def test_an_ability_card_puts_its_header_values_in_the_corner_and_bolds_the_rest():
+    # owner 2026-09-30, 7.38 Tormentor's Alleviation: no header strip with a name, so the radius goes to the corner
+    html = el._pane_rows_html(["After death, the Tormentor leaves behind a verdant dale, increasing the regeneration "
+                               "of everyone nearby by <b>2%</b> of their Max Health.", "Radius: 900. Duration: 15s."])
+    first, second = html.split('</div><div class="ability-change-row">')
+    assert first.startswith('<div class="ability-change-row"><span class="iab-meta pane-meta">')
+    assert "aoe.png" in first and ">900</span>" in first and "Radius" not in html
+    assert second == 'Duration: <b class="iab-num">15s</b>.</div>'           # no icon for a duration: stays text
+
+
+def test_a_value_said_twice_in_one_pane_stays_in_the_text():
+    html = el._pane_rows_html(["Summons a hawk. Cooldown: 20s.", "Recast: a dive. Cooldown: 5s."])
+    assert "pane-meta" not in html and "Cooldown: <b" in html
+
+
+def test_numbers_in_a_popup_a_badge_or_a_table_are_not_touched():
+    html = el._bold_numbers_html('Deals 50 <span class="info-tip">?<span class="info-pop">was 40 '
+                                 '<span class="badge buff3">+25%</span></span></span> '
+                                 '<div class="formula-table-wrap"><table><td>7</td></table></div> and 3x')
+    assert '<b class="iab-num">50</b>' in html and '<b class="iab-num">3x</b>' in html
+    assert "was 40 " in html and ">+25%<" in html and "<td>7</td>" in html
+
+
+def test_a_units_ability_row_gets_the_item_header_with_comma_separated_values():
+    # 7.38 Marshmage Apprentice: "Cast Range: 550, Mana Cost: 90, Cooldown: 16s"; Boglet: "Range: 275"
+    h = el._item_ability_html("Active: Creates a barrier bubble for 10s. Cast Range: 550, Mana Cost: 90, Cooldown: 16s")
+    head, desc = h.split('<span class="iab-desc">')
+    assert "castrange.png" in head and ">550<" in head and ">90<" in head and ">16<" in head
+    assert "Cast Range" not in desc and "Cooldown" not in desc and '<b class="iab-num">10s</b>' in desc
+    h = el._item_ability_html("Active: Sends out tentacles, dealing 80 damage. Range: 275. Mana Cost: 40. Cooldown: 16s")
+    assert "castrange.png" in h and ">275<" in h and "Range:" not in h

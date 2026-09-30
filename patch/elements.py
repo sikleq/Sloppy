@@ -994,12 +994,7 @@ def new_facet(slug, desc, summary=None, tag="new"):
                     f'class="facet-icon-overlay" loading="lazy" width="72" height="72">') if icon_name else ''
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
                  f'style="background-image:{gradient}">{icon_overlay}</div>')
-    desc_items = desc if isinstance(desc, list) else [desc]
-    desc_html = ''.join(
-        (d if isinstance(d, str) and d.lstrip().startswith('<div')
-         else f'<div class="ability-change-row">{d}</div>')
-        for d in desc_items
-    )
+    desc_html = _pane_rows_html(desc)
     default_summary = "New facet" if tag_key == "new" else "Reworked facet"
     summary_text = summary or default_summary
     tag_label = tag_key.upper()
@@ -1057,13 +1052,7 @@ def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_a
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
                  f'style="background-image:{gradient}">{icon_overlay}</div>')
 
-    def _pane_body(desc):
-        items = desc if isinstance(desc, list) else [desc]
-        return ''.join(
-            (d if isinstance(d, str) and d.lstrip().startswith('<div')
-             else f'<div class="ability-change-row">{d}</div>')
-            for d in items
-        )
+    _pane_body = _pane_rows_html
 
     def _ability_head(abil_slug):
         if not abil_slug:
@@ -1404,7 +1393,7 @@ _ITEM_ABILITY_RE = re.compile(r'^\s*(Passive|Active|Toggle|Aura|Ability|Use)\s*:
 _IAB_N = r"\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*"
 _IAB_META = (  # (key, icon, pattern of a whole sentence) — header order: radius, then the game's range, cost, cooldown
     ("aoe", "aoe", rf"Radius\s*:?\s*({_IAB_N})"),              # owner 2026-09-27: the radius goes to the header too
-    ("castrange", "castrange", rf"Cast Range\s*:?\s*({_IAB_N})"),
+    ("castrange", "castrange", rf"(?:Cast )?Range\s*:?\s*({_IAB_N})"),   # 7.38 Boglet: "Range: 275"
     ("manacost", "manacost", rf"Mana Cost\s*:?\s*({_IAB_N}%?)"),
     ("healthcost", "healthcost", rf"Health Cost\s*:?\s*({_IAB_N}%?)"),
     ("cooldown", "cooldown", rf"(?:Cooldown\s*:?\s*({_IAB_N})s?|({_IAB_N})s\s+Cooldown)"),
@@ -1471,18 +1460,88 @@ def _item_ability_html(text):
         return iab_attach_tail(html, "".join(tips)) if html and "iab-desc" in html else None
     kind, body = m.group(1), m.group(2).strip()
     name, desc = _iab_name(body)
-    meta = []
-    for key, icon, pat in _IAB_META:
-        mm = re.search(rf"(?:^|(?<=[.!]))\s*(?:{pat})\s*\.?\s*(?=$|[A-Z])", desc)
-        if mm:
-            val = next(g for g in mm.groups() if g)
-            meta.append(f'<span class="iab-m"><img class="iab-ico" src="{ABILITY_ICON_DIR}{icon}.png" alt="">{val}</span>')
-            desc = (desc[:mm.start()] + " " + desc[mm.end():]).strip()
-    desc = re.sub(rf"(?:^|(?<=[.!]))\s*(?:{_IAB_DROP})\s*\.?", " ", desc).strip()
-    desc = re.sub(r"\s{2,}", " ", desc).strip()
+    meta, desc = _iab_take_meta(desc)
     title = f'<b class="iab-kind">{kind}:</b>' + (f' <span class="iab-name">{name}</span>' if name else "")
     head = f'<span class="iab-head"><span class="iab-title">{title}</span><span class="iab-meta">{"".join(meta)}</span></span>'
     return head + (f'<span class="iab-desc">{_iab_bold_numbers(desc)}</span>' if desc else "")
+
+
+def _iab_meta_re(pat):
+    # a whole sentence, "." or "," separated ("Cast Range: 550, Mana Cost: 90, Cooldown: 16s" — 7.38 Marshmage)
+    return rf"(?:^|(?<=[.!,]))\s*(?:{pat})\s*[.,]?\s*(?=$|[A-Z])"
+
+
+def _iab_meta_chip(icon, val):
+    return f'<span class="iab-m"><img class="iab-ico" src="{ABILITY_ICON_DIR}{icon}.png" alt="">{val}</span>'
+
+
+def _iab_take_meta(desc, only=None):
+    """([header chips], the text without those sentences and without "No Mana Cost" / "No Cooldown")."""
+    meta = []
+    for key, icon, pat in _IAB_META:
+        mm = re.search(_iab_meta_re(pat), desc) if only is None or key in only else None
+        if mm:
+            val = next(g for g in mm.groups() if g)
+            meta.append(_iab_meta_chip(icon, val))
+            desc = (desc[:mm.start()] + " " + desc[mm.end():]).strip()
+    desc = re.sub(rf"(?:^|(?<=[.!,]))\s*(?:{_IAB_DROP})\s*[.,]?", " ", desc).strip()
+    return meta, re.sub(r"\s{2,}", " ", desc).strip()
+
+
+# ---- The description of a new / reworked ability, facet or innate card, like an item ability's (owner 2026-09-30,
+# 7.38 Tormentor's Alleviation "... Radius: 900. Duration: 15s.") ----
+# The card has no header strip with the ability's name (that is the title above it), so the radius / cast range /
+# mana / health cost / cooldown go to the pane's top-right corner with the same game icons; every other number is
+# bold and a step brighter. Nothing inside a (?) popup, a % badge or a table is touched.
+_PANE_SKIP_RE = re.compile(r'class="[^"]*\b(?:badge|info-tip|info-pop|formula-table)', re.I)
+_VOID_TAGS = {"img", "br", "hr", "input", "wbr", "source", "col", "path"}
+
+
+def _bold_numbers_html(html_text):
+    """_iab_bold_numbers for card html: numbers inside a badge, a (?) popup, a table or an svg stay as they are."""
+    out, stack = [], []
+    for part in re.split(r"(<!--.*?-->|<[^>]+>)", html_text, flags=re.S):
+        if not part or part.startswith("<!--"):
+            out.append(part)
+        elif part.startswith("</"):
+            if stack:
+                stack.pop()
+            out.append(part)
+        elif part.startswith("<"):
+            tag = (re.match(r"<\s*(\w+)", part) or [None, ""])[1].lower()
+            if tag not in _VOID_TAGS and not part.endswith("/>"):
+                stack.append(bool(_PANE_SKIP_RE.search(part)) or tag in ("table", "svg", "details"))
+            out.append(part)
+        else:
+            out.append(part if any(stack) else _IAB_NUM_RE.sub(r'<b class="iab-num">\1</b>', part))
+    return "".join(out)
+
+
+def _pane_rows_html(desc):
+    """The body rows of an ability / facet card pane: header values to the corner, numbers bold."""
+    items = [d for d in (desc if isinstance(desc, list) else [desc]) if d is not None]
+    plain = [i for i, d in enumerate(items) if isinstance(d, str) and not d.lstrip().startswith("<div")]
+    # a value said twice in one pane (two cooldowns of two sub-abilities) stays in the text: the corner can't say whose
+    once = {key for key, _, pat in _IAB_META
+            if sum(len(re.findall(_iab_meta_re(pat), items[i])) for i in plain) == 1}
+    meta = []
+    for i in plain:
+        chips, items[i] = _iab_take_meta(items[i], only=once)
+        meta += chips
+    rows = []
+    for i, d in enumerate(items):
+        if i in plain and not d:
+            continue                                     # the row was only "Radius: 900."
+        html = d if not isinstance(d, str) or d.lstrip().startswith("<div") else f'<div class="ability-change-row">{d}</div>'
+        rows.append(_bold_numbers_html(html) if isinstance(html, str) else html)
+    if meta:
+        corner = f'<span class="iab-meta pane-meta">{"".join(meta)}</span>'
+        first = next((k for k, r in enumerate(rows) if r.startswith('<div class="ability-change-row">')), None)
+        if first is None:
+            rows.insert(0, f'<div class="ability-change-row">{corner}</div>')
+        else:
+            rows[first] = rows[first].replace('<div class="ability-change-row">', '<div class="ability-change-row">' + corner, 1)
+    return "".join(rows)
 
 
 _IAB_NOTES = {}           # "<ek>|<pv>|<ability>" -> (?) html moved from a hidden duplicate row into the card
@@ -2030,7 +2089,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             marker = f'<span class="aghanim-marker {_aghs}"></span>'
     if isinstance(text, str) and re.match(r'^\s*(Passive|Active|Toggle|Aura|Ability)\s*:', text):
         classes.append("ability-row")
-        _card = (_item_ability_html(text) if (_State.current_entity_key or "").startswith("item|")
+        # a unit's ability too (owner 2026-09-30: 7.38 Boglet "Active: ... Range: 275. Mana Cost: 40. Cooldown: 16s")
+        _card = (_item_ability_html(text) if (_State.current_entity_key or "").startswith(("item|", "unit|"))
                  and dyn_tags <= {"new", "rework"} else None)
         if _card and _iab_shown_in_card(text, extra):
             # its full text is the card's right pane already: kept hidden (scored above, tag counted by filters)
@@ -2910,10 +2970,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
             f'class="innate-marker">'
             if spec.get("innate") and not used_innate_fallback else ''
         )
-        desc_html = ''.join(
-            (d if isinstance(d, str) and d.lstrip().startswith('<div')
-             else f'<div class="ability-change-row">{d}</div>')
-            for d in spec.get("desc", []))
+        desc_html = _pane_rows_html(spec.get("desc", []))
         tables_html = ''.join(
             f'<div class="formula-table-wrap">{tbl}</div>'
             for tbl in (spec.get("tables", []) or [])
