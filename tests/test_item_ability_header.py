@@ -258,19 +258,35 @@ def test_item_abilities_change_puts_each_ability_in_a_card_on_its_side():
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
 
 
-def test_an_ability_card_puts_its_header_values_in_the_corner_and_bolds_the_rest():
-    # owner 2026-09-30, 7.38 Tormentor's Alleviation: no header strip with a name, so the radius goes to the corner
-    html = el._pane_rows_html(["After death, the Tormentor leaves behind a verdant dale, increasing the regeneration "
-                               "of everyone nearby by <b>2%</b> of their Max Health.", "Radius: 900. Duration: 15s."])
-    first, second = html.split('</div><div class="ability-change-row">')
-    assert first.startswith('<div class="ability-change-row"><span class="iab-meta pane-meta">')
-    assert "aoe.png" in first and ">900</span>" in first and "Radius" not in html
-    assert second == 'Duration: <b class="iab-num">15s</b>.</div>'           # no icon for a duration: stays text
+def test_an_ability_card_gets_the_item_header_strip_with_its_kind_from_the_game_files():
+    # owner 2026-09-30, 7.38 Tormentor's Alleviation: "you could have added a Passive header" — as an item ability
+    props = el._pane_props({"icon_url": "../icons/abilities/miniboss_alleviation.png"}, "7.38")
+    assert props["kind"] == "Passive"
+    head, rows = el._pane_parts(["After death, the Tormentor leaves behind a verdant dale, increasing the regeneration "
+                                 "of everyone nearby by <b>2%</b> of their Max Health.", "Radius: 900. Duration: 15s."],
+                                props)
+    assert head.startswith('<div class="iab-head pane-head">') and '<b class="iab-kind">Passive</b>' in head
+    assert "aoe.png" in head and ">900</span>" in head and "Radius" not in rows
+    assert rows.endswith('<div class="ability-change-row">Duration: <b class="iab-num">15s</b>.</div>')  # no icon
+
+
+def test_the_game_files_fill_the_header_where_the_text_is_silent():
+    # 7.38 Riverborn Aura "All allies within a 1200 range ..." — 1200 is its radius (av_radius in the files)
+    from patch.ability_kv import ability_props
+    p = ability_props("frogmen_riverborn_aura", "7.38")
+    assert (p["kind"], p["aoe"]) == ("Passive", "1200")
+    h = el._item_ability_html("Passive: All allies within a 1200 range receive a 10/12/14/16% movement speed bonus", p)
+    assert "aoe.png" in h.split('<span class="iab-desc">')[0] and ">1200<" in h
+    # Throw 7.38: Roshan's ability, from abilities.json
+    t = ability_props("roshan_grab_and_throw", "7.38")
+    assert (t["kind"], t["castrange"]) == ("Active", "400")
+    # a hero ability, levels joined as the game shows them
+    assert ability_props("lone_druid_entangle", "7.40")["cooldown"] == "24/22/20/18"
 
 
 def test_a_value_said_twice_in_one_pane_stays_in_the_text():
-    html = el._pane_rows_html(["Summons a hawk. Cooldown: 20s.", "Recast: a dive. Cooldown: 5s."])
-    assert "pane-meta" not in html and "Cooldown: <b" in html
+    head, rows = el._pane_parts(["Summons a hawk. Cooldown: 20s.", "Recast: a dive. Cooldown: 5s."])
+    assert head == "" and "Cooldown: <b" in rows
 
 
 def test_numbers_in_a_popup_a_badge_or_a_table_are_not_touched():
@@ -289,3 +305,14 @@ def test_a_units_ability_row_gets_the_item_header_with_comma_separated_values():
     assert "Cast Range" not in desc and "Cooldown" not in desc and '<b class="iab-num">10s</b>' in desc
     h = el._item_ability_html("Active: Sends out tentacles, dealing 80 damage. Range: 275. Mana Cost: 40. Cooldown: 16s")
     assert "castrange.png" in h and ">275<" in h and "Range:" not in h
+
+
+def test_the_texts_own_kind_and_a_facets_ability_name_go_to_the_header():
+    # 7.41 Summon Raptors: "Active." again under an "Active" header; 7.38 Arcane Overflow: "Arcane Aura: ..." rows
+    head, rows = el._pane_parts(["Active. Now a separately leveled ability.", "Summons 2 hawks. Cooldown: 30s."])
+    assert '<b class="iab-kind">Active</b>' in head and rows.startswith('<div class="ability-change-row">Now a')
+    head, rows = el._pane_parts(["Arcane Aura: Can be activated. Cooldown: 30s.", "Arcane Aura: Paused during X."],
+                                facet=True)
+    assert '<span class="iab-name">Arcane Aura</span>' in head and "Arcane Aura:" not in rows
+    # not in an ability card: "Damage Barrier: 1900" is a value, not a name
+    assert "iab-name" not in el._pane_parts(["Damage Barrier: 1900."])[0]

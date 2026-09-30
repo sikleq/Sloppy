@@ -443,6 +443,7 @@ def _register_entity(kind, name, force=False):
     slug = _slugify(name)
     key = f"{kind}|{slug}"
     _State.current_entity_key = key
+    _State.current_ability_kv = None
     _State.current_entity_display = name
     rec = _State.dynamics.setdefault(key, {"name": name, "kind": kind, "patches": {}})
     rec["name"] = name
@@ -936,6 +937,8 @@ def ability(title, slug=None, innate=None, icon_url=None, sub=False):
     _State.current_block_is_facet = False
     _State.current_ability_slug = slug
     _State.current_ability_innate = bool(is_innate)
+    from .ability_kv import slug_of
+    _State.current_ability_kv = slug or slug_of(icon_url or "")
     return out + (f'<div class="ability-block{" is-innate" if is_innate else ""}">'
                   f'{icon_html}'
                   f'<h4 class="ability-title">{title}</h4>')
@@ -994,7 +997,7 @@ def new_facet(slug, desc, summary=None, tag="new"):
                     f'class="facet-icon-overlay" loading="lazy" width="72" height="72">') if icon_name else ''
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
                  f'style="background-image:{gradient}">{icon_overlay}</div>')
-    desc_html = _pane_rows_html(desc)
+    head_html, desc_html = _pane_parts(desc, facet=True)
     default_summary = "New facet" if tag_key == "new" else "Reworked facet"
     summary_text = summary or default_summary
     tag_label = tag_key.upper()
@@ -1010,7 +1013,7 @@ def new_facet(slug, desc, summary=None, tag="new"):
     panes_html = (
         f'<div class="ability-change unified-panes is-single-new" data-tag="{tag_key}">'
         f'<div class="ability-change-pane ability-change-new">'
-        f'<div class="ability-change-body">{desc_html}</div>'
+        f'{head_html}<div class="ability-change-body">{desc_html}</div>'
         f'</div>'
         f'</div>'
     )
@@ -1052,7 +1055,9 @@ def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_a
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
                  f'style="background-image:{gradient}">{icon_overlay}</div>')
 
-    _pane_body = _pane_rows_html
+    def _pane_body(desc):
+        head, rows = _pane_parts(desc, facet=True)
+        return f'{head}<div class="ability-change-body">{rows}</div>'
 
     def _ability_head(abil_slug):
         if not abil_slug:
@@ -1090,12 +1095,12 @@ def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_a
         f'<div class="ability-change unified-panes is-in-place" data-tag="new del rework">'
         f'<div class="ability-change-pane ability-change-old">'
         f'{_ability_head(old_ability)}'
-        f'<div class="ability-change-body">{_pane_body(old_desc)}</div>'
+        f'{_pane_body(old_desc)}'
         f'</div>'
         f'<span class="ability-change-arrow">→</span>'
         f'<div class="ability-change-pane ability-change-new">'
         f'{_ability_head(new_ability)}'
-        f'<div class="ability-change-body">{_pane_body(new_desc)}</div>'
+        f'{_pane_body(new_desc)}'
         f'</div>'
         f'</div>'
     )
@@ -1443,8 +1448,10 @@ def iab_attach_tail(html, cluster):
     return body + html[end:]
 
 
-def _item_ability_html(text):
-    """The header + description html of an item ability row, or None when the text doesn't fit."""
+def _item_ability_html(text, props=None):
+    """The header + description html of an item ability row, or None when the text doesn't fit. `props`: the
+    ability's own values from the game files (patch/ability_kv.py) — they fill the header where the text is silent
+    (7.38 Riverborn Aura "All allies within a 1200 range" = its 1200 radius)."""
     tips = []
     while isinstance(text, str) and text.rstrip().endswith("<!--/TIP-->"):   # trailing (?) tips ride along
         i = text.rfind("<!--TIP-->")
@@ -1456,13 +1463,16 @@ def _item_ability_html(text):
     if not m or "<!--" in text or "<div" in text:
         return None
     if tips:
-        html = _item_ability_html(text)
+        html = _item_ability_html(text, props)
         return iab_attach_tail(html, "".join(tips)) if html and "iab-desc" in html else None
     kind, body = m.group(1), m.group(2).strip()
     name, desc = _iab_name(body)
-    meta, desc = _iab_take_meta(desc)
-    title = f'<b class="iab-kind">{kind}:</b>' + (f' <span class="iab-name">{name}</span>' if name else "")
-    head = f'<span class="iab-head"><span class="iab-title">{title}</span><span class="iab-meta">{"".join(meta)}</span></span>'
+    values, desc = _iab_take_meta(desc)
+    # "Active: Name"; without a name just "Passive", as an ability card's header (owner 2026-09-30)
+    title = (f'<b class="iab-kind">{kind}:</b> <span class="iab-name">{name}</span>' if name
+             else f'<b class="iab-kind">{kind}</b>')
+    head = (f'<span class="iab-head"><span class="iab-title">{title}</span>'
+            f'<span class="iab-meta">{_iab_meta_chips(values, props)}</span></span>')
     return head + (f'<span class="iab-desc">{_iab_bold_numbers(desc)}</span>' if desc else "")
 
 
@@ -1471,28 +1481,34 @@ def _iab_meta_re(pat):
     return rf"(?:^|(?<=[.!,]))\s*(?:{pat})\s*[.,]?\s*(?=$|[A-Z])"
 
 
-def _iab_meta_chip(icon, val):
-    return f'<span class="iab-m"><img class="iab-ico" src="{ABILITY_ICON_DIR}{icon}.png" alt="">{val}</span>'
+def _iab_meta_chips(values, props=None):
+    """The header's icon + value chips in the game's order; the game files' value wins over the text's."""
+    out = []
+    for key, icon, _ in _IAB_META:
+        val = (props or {}).get(key) or values.get(key)
+        if val:
+            out.append(f'<span class="iab-m"><img class="iab-ico" src="{ABILITY_ICON_DIR}{icon}.png" alt="">{val}</span>')
+    return "".join(out)
 
 
 def _iab_take_meta(desc, only=None):
-    """([header chips], the text without those sentences and without "No Mana Cost" / "No Cooldown")."""
-    meta = []
+    """({key: value} of the header sentences, the text without them and without "No Mana Cost" / "No Cooldown")."""
+    values = {}
     for key, icon, pat in _IAB_META:
         mm = re.search(_iab_meta_re(pat), desc) if only is None or key in only else None
         if mm:
-            val = next(g for g in mm.groups() if g)
-            meta.append(_iab_meta_chip(icon, val))
+            values[key] = next(g for g in mm.groups() if g)
             desc = (desc[:mm.start()] + " " + desc[mm.end():]).strip()
     desc = re.sub(rf"(?:^|(?<=[.!,]))\s*(?:{_IAB_DROP})\s*[.,]?", " ", desc).strip()
-    return meta, re.sub(r"\s{2,}", " ", desc).strip()
+    return values, re.sub(r"\s{2,}", " ", desc).strip()
 
 
 # ---- The description of a new / reworked ability, facet or innate card, like an item ability's (owner 2026-09-30,
 # 7.38 Tormentor's Alleviation "... Radius: 900. Duration: 15s.") ----
-# The card has no header strip with the ability's name (that is the title above it), so the radius / cast range /
-# mana / health cost / cooldown go to the pane's top-right corner with the same game icons; every other number is
-# bold and a step brighter. Nothing inside a (?) popup, a % badge or a table is touched.
+# The same low header strip as an item ability, on top of the pane: left "Passive" / "Active" / "Toggle" from the
+# game files (the name is the title above the card), right the radius / cast range / mana / health cost / cooldown
+# with the game's icons — from the files, else from the text's own "Radius: 900." sentences, which leave the text.
+# Every other number is bold and a step brighter. Nothing inside a (?) popup, a % badge or a table is touched.
 _PANE_SKIP_RE = re.compile(r'class="[^"]*\b(?:badge|info-tip|info-pop|formula-table)', re.I)
 _VOID_TAGS = {"img", "br", "hr", "input", "wbr", "source", "col", "path"}
 
@@ -1517,31 +1533,55 @@ def _bold_numbers_html(html_text):
     return "".join(out)
 
 
-def _pane_rows_html(desc):
-    """The body rows of an ability / facet card pane: header values to the corner, numbers bold."""
+_PANE_KIND_RE = re.compile(r"^\s*(Active|Passive|Toggle|Aura)\.\s*")
+_PANE_NAME_RE = re.compile(r"^\s*([A-Z][\w'’-]*(?: [A-Za-z][\w'’-]*){0,4}):\s+")
+
+
+def _pane_parts(desc, props=None, facet=False):
+    """(header strip html or "", body rows html) of an ability / facet card pane. The text's own leading "Active." goes
+    to the header (7.41 Summon Raptors said it twice); a facet's rows that all start with the ability they change
+    ("Arcane Aura: …", 7.38 Arcane Overflow) give the header its name."""
     items = [d for d in (desc if isinstance(desc, list) else [desc]) if d is not None]
     plain = [i for i, d in enumerate(items) if isinstance(d, str) and not d.lstrip().startswith("<div")]
-    # a value said twice in one pane (two cooldowns of two sub-abilities) stays in the text: the corner can't say whose
+    kind = (props or {}).get("kind", "")
+    if plain:
+        mk = _PANE_KIND_RE.match(items[plain[0]])
+        if mk:
+            kind = kind or mk.group(1)
+            items[plain[0]] = items[plain[0]][mk.end():]
+    name = ""
+    names = {(_PANE_NAME_RE.match(items[i]) or [None, None])[1] for i in plain if items[i]}
+    if facet and len(names) == 1 and None not in names:
+        name = names.pop()
+        for i in plain:
+            items[i] = _PANE_NAME_RE.sub("", items[i], count=1)
+            items[i] = items[i][:1].upper() + items[i][1:]
+    # a value said twice in one pane (two cooldowns of two sub-abilities) stays in the text: the header can't say whose
     once = {key for key, _, pat in _IAB_META
             if sum(len(re.findall(_iab_meta_re(pat), items[i])) for i in plain) == 1}
-    meta = []
+    values = {}
     for i in plain:
-        chips, items[i] = _iab_take_meta(items[i], only=once)
-        meta += chips
+        found, items[i] = _iab_take_meta(items[i], only=once)
+        values.update(found)
     rows = []
     for i, d in enumerate(items):
         if i in plain and not d:
             continue                                     # the row was only "Radius: 900."
         html = d if not isinstance(d, str) or d.lstrip().startswith("<div") else f'<div class="ability-change-row">{d}</div>'
         rows.append(_bold_numbers_html(html) if isinstance(html, str) else html)
-    if meta:
-        corner = f'<span class="iab-meta pane-meta">{"".join(meta)}</span>'
-        first = next((k for k, r in enumerate(rows) if r.startswith('<div class="ability-change-row">')), None)
-        if first is None:
-            rows.insert(0, f'<div class="ability-change-row">{corner}</div>')
-        else:
-            rows[first] = rows[first].replace('<div class="ability-change-row">', '<div class="ability-change-row">' + corner, 1)
-    return "".join(rows)
+    chips = _iab_meta_chips(values, props)
+    title = (f'<b class="iab-kind">{kind}:</b> <span class="iab-name">{name}</span>' if kind and name
+             else f'<b class="iab-kind">{kind}</b>' if kind
+             else f'<span class="iab-name">{name}</span>' if name else "")
+    head = (f'<div class="iab-head pane-head"><span class="iab-title">{title}</span>'
+            f'<span class="iab-meta">{chips}</span></div>') if chips or title else ""
+    return head, "".join(rows)
+
+
+def _pane_props(spec, version):
+    """The game files' values of a card side's ability ({"slug"} or its icon's file name) in `version`."""
+    from .ability_kv import ability_props, slug_of
+    return ability_props(slug_of(spec), version) if isinstance(spec, dict) else None
 
 
 _IAB_NOTES = {}           # "<ek>|<pv>|<ability>" -> (?) html moved from a hidden duplicate row into the card
@@ -2090,7 +2130,12 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     if isinstance(text, str) and re.match(r'^\s*(Passive|Active|Toggle|Aura|Ability)\s*:', text):
         classes.append("ability-row")
         # a unit's ability too (owner 2026-09-30: 7.38 Boglet "Active: ... Range: 275. Mana Cost: 40. Cooldown: 16s")
-        _card = (_item_ability_html(text) if (_State.current_entity_key or "").startswith(("item|", "unit|"))
+        _ek = _State.current_entity_key or ""
+        _props = None
+        if _ek.startswith("unit|") and _State.current_ability_kv:   # its values from the game files (radius 1200)
+            from .ability_kv import ability_props
+            _props = ability_props(_State.current_ability_kv, _State.current_patch_version)
+        _card = (_item_ability_html(text, _props) if _ek.startswith(("item|", "unit|"))
                  and dyn_tags <= {"new", "rework"} else None)
         if _card and _iab_shown_in_card(text, extra):
             # its full text is the card's right pane already: kept hidden (scored above, tag counted by filters)
@@ -2970,7 +3015,10 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
             f'class="innate-marker">'
             if spec.get("innate") and not used_innate_fallback else ''
         )
-        desc_html = _pane_rows_html(spec.get("desc", []))
+        from .weights import _prev_version
+        pv = _State.current_patch_version
+        strip_html, desc_html = _pane_parts(spec.get("desc", []),
+                                            _pane_props(spec, _prev_version(pv) if kind == "old" else pv))
         tables_html = ''.join(
             f'<div class="formula-table-wrap">{tbl}</div>'
             for tbl in (spec.get("tables", []) or [])
@@ -2994,7 +3042,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
             )
         return (
             f'<div class="ability-change-pane ability-change-{kind}{innate_cls}">'
-            f'{head_html}'
+            f'{head_html}{strip_html}'
             f'<div class="ability-change-body">{desc_html}{tables_html}</div>'
             f'</div>'
         )

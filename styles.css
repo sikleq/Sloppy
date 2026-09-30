@@ -3455,6 +3455,7 @@ h4.subgroup .subgroup-new-type {
   flex-direction: column;
   gap: 8px;
   padding: 10px 14px;
+  --pt: 10px; --px: 14px;   /* the header strip (.pane-head) spans the pane edge to edge */
   background: var(--muted-04);
   border: 1px solid var(--line-soft);
   border-radius: 6px;
@@ -3512,7 +3513,7 @@ h4.subgroup .subgroup-new-type {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 13.5px;
+  font-size: 15px;          /* as an item ability card's text (owner 2026-09-30: 13.5px "very small" next to them) */
   line-height: 1.5;
   color: var(--text-main);
   min-width: 0;
@@ -3598,9 +3599,11 @@ h4.subgroup .subgroup-new-type {
 .ability-change-block .ability-change.unified-panes > .ability-change-pane {
   align-self: center;
   padding: 0 4px;
+  --pt: 0px; --px: 4px;
 }
 .facet-block .ability-change.unified-panes > .ability-change-pane {
   padding: 8px 10px 4px;
+  --pt: 8px; --px: 10px;
 }
 /* When a pane carries an expandable formula table (scale_pill), TOP-anchor
    both panes. Otherwise `align-items: center` re-centers the shorter pane
@@ -3630,6 +3633,7 @@ h4.subgroup .subgroup-new-type {
   align-self: start;
   justify-self: stretch;
   padding: 0 4px;
+  --pt: 0px; --px: 4px;
 }
 /* Old-icon underlay: when an ability_change unified block has a different
    icon for old vs new, both icons fully overlap inside the same 48px wrap.
@@ -10959,7 +10963,11 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-num { font-weight: 700; color: var(--text-bright); }
 /* An ability / facet card has no header strip (its name is the title above), so its radius / range / cost /
    cooldown sit in the pane's top-right corner, the text flowing round them (owner 2026-09-30, 7.38 Alleviation) */
-.ability-change-row > .pane-meta { float: right; margin: 0 0 2px 16px; line-height: inherit; }
+/* ...so the pane gets the item card's own header strip: "Passive" / "Active" left (game files), values right; edge
+   to edge whatever the pane's padding (--pt / --px, set with each padding rule) */
+.ability-change-pane > .pane-head { margin: calc(-1 * var(--pt, 0px)) calc(-1 * var(--px, 0px)) 0;
+  padding: 2px var(--px, 12px); border-radius: 5px 5px 0 0; }
+.ability-change-head + .pane-head { margin-top: 0; border-radius: 0; }   /* under a pane's own icon + name head */
 .formula-trigger .iab-num { color: inherit; }     /* a number inside a formula button keeps the button's colour */
 /* Item abilities before -> after (item_abilities_change): one row per ability, old left / new right paired
    by name (render_iab_card); a pair's two cards share the row height; an arrow only between a pair, an

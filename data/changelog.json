@@ -7,9 +7,9 @@
       "title": "Ability and facet cards read like item abilities",
       "link": "patches/7.40.html",
       "items": [
-        "Radius, cast range, mana / health cost and cooldown sit in the card's top-right corner with the game's icons",
-        "Every other number in the description is bold and brighter",
-        "New creeps' abilities (7.38 Boglet, Marshmage Apprentice, Croaker) get the item-style header strip"
+        "A header strip as on item abilities: Passive / Active from the game files, the facet's ability name, and radius, cast range, mana / health cost, cooldown with the game's icons",
+        "Values come from the game files of that patch where the text is silent (Riverborn Aura's 1200 radius); every other number is bold and brighter; card text is as large as item cards'",
+        "New creeps' abilities (7.38 Boglet, Marshmage Apprentice, Croaker) get the same header"
       ],
       "shots": [
         "icons/changelog/2026-09-30_ability_card_corner.webp",

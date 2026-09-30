@@ -74,7 +74,7 @@ SHOTS = {
                                     ".ec-islot >> nth=1", ".ec-ipicker-overlay [data-ec-ipick='blink-dagger']"],
                                    140, {"width": 1400, "wait": 1500}),
     "2026-09-30_ability_card_corner.webp": ("patches/7.40.html", None,
-                                            [".ability-change-block:has(img[alt='Entangle'])"], [], 260, {"width": 1400, "settle": 2000}),
+                                            [".ability-change-block:has(img[alt='Entangle'])"], [], 330, {"width": 1400, "settle": 2000}),
     "2026-09-30_unit_ability_head.webp": ("patches/7.38.html", None,
                                           [".entity-block:has(img[alt='Marshmage Apprentice']) .ability-block >> nth=0"],
                                           [], 200, {"width": 1400, "settle": 2000}),
