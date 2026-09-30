@@ -99,6 +99,33 @@ shape as leamare's `mapdata.json`. `build_terrain_diff.py` prefers these files a
   hand (`dota-interactive-map/docs/05-mapimage.md`). The courier tile server DOES have some letter patches
   (738b, 739b).
 
+## Our own top-down picture — shot in the game (2026-10-01)
+
+`scripts/gen/capture_map.py` = leamare's SFM method without SFM's clicks: Dota 2 in Workshop Tools mode runs our
+custom game `scripts/gen/topdown_addon` (installed with `--install`; no fog of war, no day/night, pre-game forever,
+`topdown_hide` hides heroes / couriers / Roshan / Tormentors / creeps, `topdown_cam x y dist` = Panorama
+`GameUI.SetCameraPitchMin/Max(90)` + `SetCameraTargetPosition`), driven over the remote console
+(`scripts/gen/game_console.py`, VConsole2 TCP 29000; replies are read from `console.log` — launch with `-condebug`).
+Launch: `dota2.exe -tools -novid -vconsole -condebug -windowed -w 1920 -h 1080 -addon sloppy_topdown
++dota_launch_custom_game sloppy_topdown dota`.
+
+What it took (each one silently broke the shots):
+- `r_always_render_all_windows 1` (Tools' "Render All Windows") — else the game window is not redrawn and every
+  screenshot is the same old frame; `engine_no_focus_sleep 0`; `r_drawpanorama 0`, `dota_hud_healthbars 0`.
+- `dota_camera_lerp_duration 0` + `dota_camera_smooth_count 1` — else the camera glides and a shot 1 s after a move
+  is taken mid-flight (scale off by ~20%).
+- Setup stages of the custom game ≥ 1 s each — all at 0 left the client on its loading screen.
+- The game camera is wide-angle (~97°) and its field of view can't be changed (`default_fov`, `fov_desired`,
+  stage cvars, `point_camera` + `GameUI.SetCameraEntity` — none work), so only the middle of each shot is kept:
+  7680×4320 shots from 5000 up → 1.4925 units/px, 900-unit tiles, 23×24 = 552 shots, ~2 s each (~20 min).
+  Higher up the game drops its detail level (15360 px from 13400: pixelated), so don't go higher.
+- The camera's look-at point is clamped to the playable area (7.41: x ±8448, y -9472..8448, probed by
+  `look_at_bounds`): edge tiles are shot from the nearest allowed point and cut off-centre.
+- Output: `<work>/map_<ver>_game_full.png` (13399×13970 for 7.41) + `map_<ver>_game.webp` 4096² on the same world
+  rectangle as our map images (data/terrain_map_meta.json) — checked: buildings land where the current picture has them.
+- Blender route (`scripts/gen/render_map.py`: glTF export + our multiblend rebuild) stays as a fallback: exact
+  geometry, but not the game's own look.
+
 ## Map source availability (investigated 2026-06-04)
 
 - **Tiles** `maps/tiles/<ver>/default/<z>/…` — only the `default` skin (no

@@ -1,0 +1,6 @@
+<root>
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/topdown.js" />
+	</scripts>
+	<Panel />
+</root>
