@@ -77,8 +77,14 @@ def map_sha(work, mid):
     """SHA-1 and size of dota.vpk in a manifest (fetched once, kept in work/manifests)."""
     folder = os.path.join(work, "manifests")
     path = os.path.join(folder, f"manifest_{DEPOT}_{mid}.txt")
-    if not os.path.exists(path):
-        _dd(["-manifest", mid, "-manifest-only", "-dir", folder], work)
+    for _ in range(6):
+        if os.path.exists(path):
+            break
+        r = _dd(["-manifest", mid, "-manifest-only", "-dir", folder], work)
+        if "RateLimitExceeded" not in (r.stdout + r.stderr):
+            break
+        print("rate limited, waiting 30 min", flush=True)
+        time.sleep(1800)
     if not os.path.exists(path):
         return None
     with open(path, encoding="utf-8", errors="replace") as f:
@@ -89,38 +95,31 @@ def map_sha(work, mid):
     return {"sha1": None, "size": 0}
 
 
-def fetch_manifests(work, ids, batch=40, pause=120):
-    """The file lists of many manifests, `batch` per Steam login (DepotDownloader takes -depot / -manifest lists):
-    one login per manifest got 'RateLimitExceeded' after ~110 logins in half an hour."""
-    folder = os.path.join(work, "manifests")
-    todo = [m for m in dict.fromkeys(ids) if not os.path.exists(os.path.join(folder, f"manifest_{DEPOT}_{m}.txt"))]
-    for i in range(0, len(todo), batch):
-        part = todo[i:i + batch]
-        for attempt in range(6):
-            user = os.environ.get("STEAM_USER")
-            cmd = [DD, "-app", APP, "-username", user, "-remember-password", "-manifest-only", "-dir", folder,
-                   "-depot"] + [DEPOT] * len(part) + ["-manifest"] + part
-            r = subprocess.run(cmd, cwd=work, capture_output=True, text=True, encoding="utf-8", errors="replace")
-            if "RateLimitExceeded" not in (r.stdout + r.stderr):
-                break
-            print("rate limited, waiting 30 min", flush=True)
-            time.sleep(1800)
-        got = sum(os.path.exists(os.path.join(folder, f"manifest_{DEPOT}_{m}.txt")) for m in part)
-        print(f"manifests {i + len(part)}/{len(todo)}: {got} of {len(part)} fetched", flush=True)
-        time.sleep(pause)
-
-
 def cmd_hashes(args):
     pats, mans = patches(args.start), manifests(args.manifests)
     cands = candidates(pats, mans)
-    fetch_manifests(args.work, [mid for c in cands.values() for role in ("release", "final") for _, mid in c[role]])
+    if args.until:
+        cands = {v: c for v, c in cands.items() if _ver_key(v) < _ver_key(args.until)}
+    if args.lean:
+        # one login per manifest (DepotDownloader 3.4 takes one -depot/-manifest per run) and Steam rate-limits
+        # logins: only the build a patch's map is taken from — its last release-day build, else the build before
+        prev_final = None
+        for ver, c in cands.items():
+            c["release"], fin = c["release"][-1:], c["final"]
+            if not c["release"] and prev_final:
+                c["release"] = [prev_final]
+            prev_final = fin[-1] if fin else prev_final
+            c["final"] = []
     out_path = os.path.join(args.work, "map_history.json")
     hist = json.load(open(out_path, encoding="utf-8")) if os.path.exists(out_path) else {}
     for ver, c in cands.items():
         rows = []
         for role in ("release", "final"):
             for seen, mid in c[role]:
+                fresh = not os.path.exists(os.path.join(args.work, "manifests", f"manifest_{DEPOT}_{mid}.txt"))
                 info = map_sha(args.work, mid)
+                if fresh:
+                    time.sleep(args.pause)
                 rows.append({"role": role, "seen": seen, "manifest": mid, **(info or {"sha1": "?"})})
         hist[ver] = rows
         shas = [r["sha1"] for r in rows]
@@ -183,6 +182,9 @@ def main():
     h.add_argument("manifests")
     h.add_argument("--from", dest="start", default="7.38")
     h.add_argument("--work", required=True)
+    h.add_argument("--until", help="stop before this patch")
+    h.add_argument("--lean", action="store_true", help="only the build each patch's map comes from")
+    h.add_argument("--pause", type=float, default=0, help="seconds between Steam logins")
     d = sub.add_parser("download")
     d.add_argument("--work", required=True)
     d.add_argument("--from", dest="start", default="7.38")
