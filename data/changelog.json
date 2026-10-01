@@ -5,6 +5,13 @@
       "date": "2026-10-01",
       "category": "Materials",
       "minor": true,
+      "link": "terrain_740.html",
+      "title": "Terrain 7.39 → 7.40: trees, camps and the other map objects are now read from each patch's own map file (the very file Steam shipped that day)"
+    },
+    {
+      "date": "2026-10-01",
+      "category": "Materials",
+      "minor": true,
       "fix": true,
       "link": "terrain_741.html",
       "title": "Terrain 7.41: the empty corners beyond the map's edge now show plain ground — grass by Radiant, grey ground by Dire, no copied trees or bushes — instead of a murky fade; the credit line is down to “Inspired by Leamare and devilesk”"

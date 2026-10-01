@@ -190,15 +190,19 @@ def _void_mask(a, min_area=40000):
 
     c = a.astype(np.int16)
     void = c.max(axis=2) < 8
-    grey = (abs(c[..., 0] - c[..., 1]) < 3) & (abs(c[..., 1] - c[..., 2]) < 3) & (c.max(axis=2) >= 45) & (c.max(axis=2) <= 66)
-    rim = np.zeros(void.shape, bool)
-    rim[:20], rim[-20:], rim[:, :20], rim[:, -20:] = True, True, True, True
-    void |= grey & rim
-    labels, n = ndimage.label(void)
+    # SFM's flat grey background (64 64 64): a rim past 7.41's edge, wide margins around the older, smaller maps —
+    # neutral, and with no texture at all (the Dire ground is grey-blue and textured)
+    grey = (abs(c[..., 0] - c[..., 1]) < 3) & (abs(c[..., 1] - c[..., 2]) < 3) & (c.max(axis=2) >= 45) & (c.max(axis=2) <= 80)
+    g = c.mean(axis=2).astype(np.float32)
+    flat = np.abs(g - ndimage.uniform_filter(g, 7)) < 1.5
+    void |= ndimage.binary_opening(grey & flat, iterations=3)
+    labels, n = ndimage.label(ndimage.binary_dilation(void, iterations=4))      # joined across thin seams
     border = set(np.unique(np.concatenate([labels[0], labels[-1], labels[:, 0], labels[:, -1]]))) - {0}
     sizes = ndimage.sum(void, labels, range(n + 1))
     keep = [i for i in border if sizes[i] >= min_area]
-    return ndimage.binary_dilation(np.isin(labels, keep), iterations=2) if keep else np.zeros(void.shape, bool)
+    if not keep:
+        return np.zeros(void.shape, bool)
+    return ndimage.binary_dilation(void & np.isin(labels, keep), iterations=2)
 
 
 def _ground_sources(a, known, near, patch=128, count=400, q=4):
@@ -307,6 +311,31 @@ def _quilt(sources, h, w, patch=128, overlap=32, tries=80, seed=741, masks=None,
     return out[:h, :w]
 
 
+def _land_colour(a, known, box, q=8, reach=640):
+    """A smooth colour field over box = (y0, y1, x0, x1): the plain ground nearest each point, spread outwards
+    (normalized convolution of the low-detail land at 1/q size) — grass beside Radiant, grey ground beside Dire,
+    blended between. Around the older, smaller maps the void is one ring round the whole map: one colour for all
+    of it was a muddy green."""
+    from scipy import ndimage
+
+    h, w = known.shape
+    small = np.asarray(Image.fromarray(a).resize((w // q, h // q), Image.BOX), np.float32)
+    kn = np.asarray(Image.fromarray(known.astype(np.uint8) * 255).resize((w // q, h // q), Image.BOX)) > 250
+    grey = small.mean(axis=2)
+    detail = ndimage.uniform_filter(np.abs(ndimage.sobel(grey, 0)) + np.abs(ndimage.sobel(grey, 1)), 3)
+    plain = kn & (detail <= np.percentile(detail[kn], 30))
+    wgt = plain.astype(np.float32)
+    sig = reach / q
+    field = ndimage.gaussian_filter(small * wgt[..., None], (sig, sig, 0)) / np.maximum(
+        ndimage.gaussian_filter(wgt, sig), 1e-6)[..., None]
+    y0, y1, x0, x1 = box
+    crop = field[y0 // q:(y1 + q - 1) // q, x0 // q:(x1 + q - 1) // q]
+    big = np.stack([np.asarray(Image.fromarray(crop[..., k]).resize(
+        ((x1 + q - 1) // q * q - x0 // q * q, (y1 + q - 1) // q * q - y0 // q * q), Image.BILINEAR)) for k in range(3)], -1)
+    oy, ox = y0 - y0 // q * q, x0 - x0 // q * q
+    return big[oy:oy + (y1 - y0), ox:ox + (x1 - x0)]
+
+
 def fill_void(img, shade=0.8, shadow=90, near_px=2500):
     """The corners beyond the map's edge (nothing renders there: black) painted in our own way (the owner
     2026-10-01: "fill the black corners, in our own way" — then "the bottom-left is all murky; leamare's looks more
@@ -335,7 +364,8 @@ def fill_void(img, shade=0.8, shadow=90, near_px=2500):
         tex = _quilt(sources, y1 - y0, x1 - x0, seed=741 + k)
         # no large-scale colour bands (the patches' rows showed as stripes): keep the grass's fine grain, even out
         # everything wider than ~60 px to the ground's own colour
-        tex = tex - ndimage.gaussian_filter(tex, (60, 60, 0)) + target
+        base = _land_colour(a, ~mask, (y0, y1, x0, x1))
+        tex = tex - ndimage.gaussian_filter(tex, (60, 60, 0)) + base
         dist = ndimage.distance_transform_edt(m[y0:y1, x0:x1])          # px from the map's edge (within the box)
         light = shade * (1 - 0.35 * np.exp(-dist / shadow))
         mm = m[y0:y1, x0:x1]
@@ -358,8 +388,11 @@ def main():
         raise SystemExit(f"{len(files)} frames on disk, the session exports {len(frames)}")
     prints = footprints(frames, quat, fov, width)
     upp = measured_upp(files, frames)
-    print("units per pixel in a frame: lens", round(prints[0][3], 4), "measured", upp and round(upp, 4))
-    if upp:
+    lens = prints[0][3]
+    print("units per pixel in a frame: lens", round(lens, 4), "measured", upp and round(upp, 4))
+    # the measurement wins only when it is plausible: over SFM's flat background (old, smaller maps) the frames
+    # have nothing to match and 7.22 measured 3.93 against the lens's 1.09
+    if upp and abs(upp / lens - 1) < 0.01:
         prints = [(c, r, u, upp) for c, r, u, _ in prints]
     full = fill_void(stitch(files, prints, args.upp, world_rect()))
     full.save(os.path.join(args.work, f"map_{args.version}_sfm_full.png"))
