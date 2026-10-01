@@ -45,6 +45,16 @@ def test_a_render_must_cover_the_picture_and_hold_the_whole_map():
     assert len(short) == 1 and "not the whole picture" in short[0]
 
 
+def test_black_void_paints_only_the_empty_corner_and_sfm_grey_rim():
+    rng = np.random.default_rng(9)
+    pic = np.clip(np.array([90, 150, 60]) + rng.normal(0, 6, (900, 900, 3)), 0, 255).round()
+    pic[600:, 600:] = 3                                          # the near-black void, touching the corner
+    pic[-12:, :] = 64                                            # SFM's flat grey background along the edge
+    out = np.asarray(ss.black_void(Image.fromarray(pic.astype(np.uint8))), np.float32)
+    assert np.array_equal(out[:580, :580], pic[:580, :580].astype(np.float32))                 # the map is untouched
+    assert out[620:880, 620:880].max() == 0 and out[-6:, 100:500].max() == 0
+
+
 def test_the_seam_runs_where_the_two_patches_differ_least():
     err = np.full((20, 10), 9.0)
     err[:, 6] = 0                                                # a free column

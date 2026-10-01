@@ -1,6 +1,8 @@
 {
-  "about": "Map versions whose top-down picture (icons/maps/map_<ver>.webp) we rendered ourselves; every other picture is still a borrowed render. sfm = Source Filmmaker, scripts/gen/stitch_sfm.py (docs/terrain.md). The Terrain page's credit line names whatever is still borrowed.",
+  "about": "Map versions whose top-down picture (icons/maps/map_<ver>.webp) we rendered ourselves; every other picture is still a borrowed render. sfm = Source Filmmaker, scripts/gen/stitch_sfm.py (docs/terrain.md); sfm-7.40c = rendered on the 7.40c build of the game (the current engine breaks older maps' water). The Terrain page's credit line names whatever is still borrowed.",
   "pictures": {
+    "7.39": "sfm-7.40c",
+    "7.40": "sfm-7.40c",
     "7.41": "sfm"
   }
 }

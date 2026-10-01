@@ -362,6 +362,18 @@ def check_fits(prints, width, height, rect, objects=(), margin=300):
     return out
 
 
+def black_void(img):
+    """The corners beyond the map's edge left as the game draws them — it lights nothing out there, on the current
+    and on the 7.40c engine alike, and no setting changes that (tried 2026-10-01: mat_fullbright,
+    sc_disable_baked_lighting, r_indirectlighting, r_dota_shadow_ambient_light, r_deferred_height_fog,
+    dota_height_fog_scale, r_dota_height_fog_plane_height). Only SFM's flat grey background around them is
+    painted black, so the corners read as one dark field. Every painted fill was rejected by the owner (a blurred
+    fade: "murky"; quilted ground: "terrible")."""
+    a = np.asarray(img.convert("RGB")).copy()
+    a[_void_mask(a)] = 0
+    return Image.fromarray(a)
+
+
 def fill_void(img, shade=0.8, shadow=90, near_px=2500):
     """The corners beyond the map's edge (nothing renders there: black) painted in our own way (the owner
     2026-10-01: "fill the black corners, in our own way" — then "the bottom-left is all murky; leamare's looks more
@@ -408,6 +420,9 @@ def main():
     ap.add_argument("--work", required=True, help="a folder outside the repo")
     ap.add_argument("--upp", type=float, default=2.0, help="game units per pixel of the full picture")
     ap.add_argument("--mapdata", help="the version's mapdata json (extract_map_entities.py): its objects must fit")
+    ap.add_argument("--no-fill", action="store_true", help="leave the empty corners beyond the map's edge as rendered")
+    ap.add_argument("--void-black", action="store_true",
+                    help="the corners beyond the map's edge as the game draws them (near-black), SFM's grey rim black")
     args = ap.parse_args()
     frames, quat, fov, width, height = camera_path(session_text(args.session))
     files = sorted(glob.glob(os.path.join(args.frames, "*.png")))
@@ -430,7 +445,11 @@ def main():
     problems = check_fits(prints, width, height, world_rect(), objects)
     if problems:
         raise SystemExit("this render does not fit: " + "; ".join(problems))
-    full = fill_void(stitch(files, prints, args.upp, world_rect()))
+    full = stitch(files, prints, args.upp, world_rect())
+    if args.void_black:
+        full = black_void(full)
+    elif not args.no_fill:
+        full = fill_void(full)
     full.save(os.path.join(args.work, f"map_{args.version}_sfm_full.png"))
     full.resize((SITE_PX, SITE_PX), Image.LANCZOS).save(
         os.path.join(args.work, f"map_{args.version}_sfm.webp"), "WEBP", quality=88, method=6)

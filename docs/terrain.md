@@ -183,7 +183,26 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   everything wider than ~60 px is evened out to the ground's colour (rows of patches showed as stripes); 80%
   brightness, a soft shadow under the map's edge. Tried before: mirroring the edge (duplicated cliffs), a blurred
   fade (murky), six big source windows (on Radiant's lawns every big window has bushes or paving: bushes and paving
-  got copied, then the few clean patches ran out).
+  got copied, then the few clean patches ran out). The owner rejected that too ("terrible"), so since 2026-10-02
+  the site's pictures use `--void-black`: the corners stay as the game draws them (near-black, nothing lit out
+  there) and only SFM's grey rim is painted black. Why they're dark: the game lights nothing beyond the playable
+  edge — on the current engine and on the 7.40c engine alike, for 7.38-7.41f maps alike; none of mat_fullbright,
+  sc_disable_baked_lighting, r_indirectlighting, r_dota_shadow_ambient_light, r_deferred_height_fog,
+  dota_height_fog_scale, r_dota_height_fog_plane_height changes a pixel (SFM, 2026-10-01). Leamare's pictures
+  show lit ground there from an older pipeline.
+- Older maps on the current engine: the water of 7.38-7.40c maps renders as maroon triangles (7.41 reworked the
+  water shader; ~20 000 px per 4096 picture, none on 7.41+). Swapping in only the old shaders gives black frames.
+  So 7.38-7.40c are rendered on a copy of the whole game as it was on 2026-03-16 (the 7.40c build): the install
+  robocopied to another drive, then every depot brought to that day's manifest with DepotDownloader `-validate`
+  (only ~4.5 GB differed); manifests per depot from their histories. SFM runs from that copy (its dota2.exe needs
+  the owner to answer a Windows Firewall prompt once). The rendering scripts take the game folder from DOTA_GAME.
+- Check the first exported frame: now and then (3 of 26 exports) SFM writes frame 0 before the camera reaches its
+  first key — a patch of Radiant jungle instead of the empty bottom-left corner (mean brightness ~102 against
+  ~25). That frame is the empty corner, so a sound frame 0 of the same map from another export replaces it.
+- Map history: `scripts/gen/map_history.py` — which dota.vpk each patch shipped (SHA-1 from depot 373301's
+  manifests, one Steam login per manifest, with pauses: Steam rate-limits logins) and one download per distinct
+  file. 7.38-7.41f: 16 map files; 7.08-7.37: 49. Their pictures, objects and counts go to
+  [Oldgrowth](https://github.com/sikleq/Oldgrowth).
 - Map size changes (the owner 2026-10-01: "what if a patch's map was a different size?"): trees and buildings
   reach ±7680 units until 7.32 (6.83-7.32 legacy maps), ±8768 from 7.33 (7.37-7.39e), slightly more from 7.40
   (x to 8960, y to -9088); the ancients never moved. Every picture uses one world rectangle and scale (2 units/px),
