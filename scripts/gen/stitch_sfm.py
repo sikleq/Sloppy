@@ -183,42 +183,13 @@ def stitch(frame_files, prints, upp_out, rect, blend_px=64):
     return canvas
 
 
-def _push_pull(rgb, known, levels=10):
-    """Smooth colours for the unknown pixels, spread in from the known ones (an image pyramid down and up)."""
-    if levels == 0 or min(rgb.shape[:2]) < 4:
-        mean = rgb[known].mean(axis=0) if known.any() else np.zeros(3, np.float32)
-        out = rgb.copy()
-        out[~known] = mean
-        return out
-    h, w = known.shape
-    hh, ww = (h + 1) // 2, (w + 1) // 2
-    k = np.zeros((hh * 2, ww * 2), np.float32)
-    k[:h, :w] = known
-    c = np.zeros((hh * 2, ww * 2, 3), np.float32)
-    c[:h, :w] = rgb * known[..., None]
-    ks = k.reshape(hh, 2, ww, 2).sum(axis=(1, 3))
-    cs = c.reshape(hh, 2, ww, 2, 3).sum(axis=(1, 3))
-    small_known = ks > 0
-    small = np.where(small_known[..., None], cs / np.maximum(ks, 1)[..., None], 0)
-    filled = _push_pull(small, small_known, levels - 1)
-    up = np.repeat(np.repeat(filled, 2, axis=0), 2, axis=1)[:h, :w]
-    out = rgb.copy()
-    out[~known] = up[~known]
-    return out
-
-
-def fill_void(img, dark=0.3, reach=700, min_area=40000):
-    """The corners beyond the map's edge (nothing renders there: black) painted in: the edge's own colours carried
-    outwards, more and more blurred and darkened over `reach` pixels — land fading into darkness, with no copied
-    objects that could be mistaken for map. The owner 2026-10-01: "fill the black corners, in our own way"
-    (leamare's pictures have Microsoft ICE's auto-complete). Mirroring the edge outwards was tried first: it
-    duplicated cliffs and left hard lines where the mirror ran out."""
+def _void_mask(a, min_area=40000):
+    """The empty corners beyond the map's edge: big near-black regions touching the picture's border (their
+    outermost ~12 px are SFM's flat grey background, not black)."""
     from scipy import ndimage
 
-    a = np.asarray(img.convert("RGB"))
     c = a.astype(np.int16)
     void = c.max(axis=2) < 8
-    # the picture's outermost ~12 px past the map's edge are SFM's flat grey background, not black
     grey = (abs(c[..., 0] - c[..., 1]) < 3) & (abs(c[..., 1] - c[..., 2]) < 3) & (c.max(axis=2) >= 45) & (c.max(axis=2) <= 66)
     rim = np.zeros(void.shape, bool)
     rim[:20], rim[-20:], rim[:, :20], rim[:, -20:] = True, True, True, True
@@ -227,39 +198,135 @@ def fill_void(img, dark=0.3, reach=700, min_area=40000):
     border = set(np.unique(np.concatenate([labels[0], labels[-1], labels[:, 0], labels[:, -1]]))) - {0}
     sizes = ndimage.sum(void, labels, range(n + 1))
     keep = [i for i in border if sizes[i] >= min_area]
-    if not keep:
+    return ndimage.binary_dilation(np.isin(labels, keep), iterations=2) if keep else np.zeros(void.shape, bool)
+
+
+def _ground_sources(a, known, near, size=384, count=6, q=4):
+    """The plainest stretches of ground next to a void (`near`: where to look): windows with the least detail
+    (gradient energy) and no single sharp object in them (the strongest local edge counts too — glyph circles,
+    lamps, a pond's rim got into the first version), whose colour is close to the most common plain ground near
+    the void — so the Radiant corner gets grass, the Dire one grey ground, never water or lava. Searched at 1/q size."""
+    from scipy import ndimage
+
+    h, w = known.shape
+    small = np.asarray(Image.fromarray(a).resize((w // q, h // q), Image.BOX), np.float32)
+    kn = np.asarray(Image.fromarray(known.astype(np.uint8) * 255).resize((w // q, h // q), Image.BOX)) > 250
+    nr = np.asarray(Image.fromarray(near.astype(np.uint8) * 255).resize((w // q, h // q), Image.BOX)) > 127
+    grey = small.mean(axis=2)
+    detail = np.abs(ndimage.sobel(grey, 0)) + np.abs(ndimage.sobel(grey, 1))
+    # the colour to match: the most common plain ground near the void (the plainest quarter of its pixels) — not
+    # the land right along the void, which is cliffs and, by Dire, lava (the Dire corner came out as tiled lava)
+    local = ndimage.uniform_filter(detail, 9)
+    area = kn & nr
+    plain = area & (local <= np.percentile(local[area], 25))
+    target = np.median(small[plain], axis=0)
+    s = size // q
+    ii = ndimage.uniform_filter(detail, s)
+    peak = ndimage.maximum_filter(ndimage.uniform_filter(detail, 5), s)          # the sharpest thing in the window
+    # the most off-colour spot in the window (a bit of a pond's water got into the grass)
+    odd = ndimage.maximum_filter(np.abs(np.stack([ndimage.uniform_filter(small[..., k], 5) for k in range(3)], -1)
+                                        - target).sum(axis=-1), s)
+    ok = ndimage.minimum_filter(kn.astype(np.uint8), s) > 0                    # the whole window is map
+    col = np.stack([ndimage.uniform_filter(small[..., k], s) for k in range(3)], axis=-1)
+    cands = []
+    for y in range(s // 2, small.shape[0] - s // 2, max(s // 4, 1)):
+        for x in range(s // 2, small.shape[1] - s // 2, max(s // 4, 1)):
+            if ok[y, x] and nr[y, x]:
+                cands.append((ii[y, x] + 0.5 * peak[y, x] + 0.35 * np.abs(col[y, x] - target).sum()
+                              + 0.5 * odd[y, x], y - s // 2, x - s // 2))
+    cands.sort()
+    picked = []
+    for _, y, x in cands:                                      # spread out: no two sources overlap
+        if all(abs(y - py) >= s or abs(x - px) >= s for py, px in picked):
+            picked.append((y, x))
+        if len(picked) == count:
+            break
+    return [a[y * q:y * q + size, x * q:x * q + size].astype(np.float32) for y, x in picked],         [(y * q, x * q) for y, x in picked]
+
+
+def _min_cut(err):
+    """The cheapest top-to-bottom path through an overlap's error (rows x overlap width): mask, 1 right of it."""
+    h, w = err.shape
+    cost = err.copy()
+    for i in range(1, h):
+        left = np.r_[np.inf, cost[i - 1, :-1]]
+        right = np.r_[cost[i - 1, 1:], np.inf]
+        cost[i] += np.minimum(np.minimum(left, cost[i - 1]), right)
+    mask = np.zeros((h, w), np.float32)
+    j = int(np.argmin(cost[-1]))
+    for i in range(h - 1, -1, -1):
+        mask[i, j:] = 1
+        if i:
+            lo, hi = max(j - 1, 0), min(j + 2, w)
+            j = lo + int(np.argmin(cost[i - 1, lo:hi]))
+    return mask
+
+
+def _quilt(sources, h, w, patch=192, overlap=48, tries=80, seed=741):
+    """A ground texture of h x w from patches of `sources` (Efros & Freeman's image quilting): each patch chosen
+    among random ones for the best match with what is already laid down, joined along the cheapest seam."""
+    rng = np.random.default_rng(seed)
+    step = patch - overlap
+    out = np.zeros((h + patch, w + patch, 3), np.float32)
+    for y in range(0, h, step):
+        for x in range(0, w, step):
+            best = None
+            for _ in range(tries):
+                src = sources[rng.integers(len(sources))]
+                sy, sx = rng.integers(src.shape[0] - patch + 1), rng.integers(src.shape[1] - patch + 1)
+                cand = src[sy:sy + patch, sx:sx + patch]
+                e = 0.0
+                if x:
+                    e += ((cand[:, :overlap] - out[y:y + patch, x:x + overlap]) ** 2).sum()
+                if y:
+                    e += ((cand[:overlap] - out[y:y + overlap, x:x + patch]) ** 2).sum()
+                if best is None or e < best[0]:
+                    best = (e, cand)
+            cand = best[1]
+            mask = np.ones((patch, patch), np.float32)
+            if x:
+                err = ((cand[:, :overlap] - out[y:y + patch, x:x + overlap]) ** 2).sum(axis=2)
+                mask[:, :overlap] = np.minimum(mask[:, :overlap], _min_cut(err))
+            if y:
+                err = ((cand[:overlap] - out[y:y + overlap, x:x + patch]) ** 2).sum(axis=2)
+                mask[:overlap] = np.minimum(mask[:overlap], _min_cut(err.T).T)
+            region = out[y:y + patch, x:x + patch]
+            region[:] = cand * mask[..., None] + region * (1 - mask[..., None])
+    return out[:h, :w]
+
+
+def fill_void(img, shade=0.8, shadow=90, near_px=2500):
+    """The corners beyond the map's edge (nothing renders there: black) painted in our own way (the owner
+    2026-10-01: "fill the black corners, in our own way" — then "the bottom-left is all murky; leamare's looks more
+    harmonious"): plain ground continues past the edge — a texture quilted from the plainest ground next to the
+    void (grass by Radiant, grey ground by Dire), a little darker than the map, with a soft shadow under the map's
+    edge so it reads as outside the playable area. Tried before: mirroring the edge (duplicated cliffs), a
+    blurred colour fade (murky)."""
+    from scipy import ndimage
+
+    a = np.asarray(img.convert("RGB"))
+    mask = _void_mask(a)
+    if not mask.any():
         return img
-    mask = ndimage.binary_dilation(np.isin(labels, keep), iterations=2)
-    out = a.copy()
-    q = 4                                                       # the fill is smooth: worked out at 1/4 size
-    for sl in ndimage.find_objects(ndimage.label(mask)[0]):
-        y0, y1 = max(sl[0].start - reach, 0), min(sl[0].stop + reach, a.shape[0])
-        x0, x1 = max(sl[1].start - reach, 0), min(sl[1].stop + reach, a.shape[1])
-        m = mask[y0:y1, x0:x1]
-        h, w = m.shape
-        small = np.asarray(Image.fromarray(a[y0:y1, x0:x1]).resize((w // q, h // q), Image.BOX), np.float32)
-        known = np.asarray(Image.fromarray((~m).astype(np.uint8) * 255).resize((w // q, h // q), Image.BOX)) > 250
-        k = known.astype(np.float32)
-
-        def spread(sigma):
-            """Normalized convolution: the known colours' Gaussian average, wherever there is any weight."""
-            wsum = ndimage.gaussian_filter(k, sigma)
-            col = ndimage.gaussian_filter(small * k[..., None], (sigma, sigma, 0))
-            return col / np.maximum(wsum, 1e-6)[..., None], wsum
-
-        fill, _ = spread(reach / q)                             # coarse first, then finer where weight allows
-        for sigma in (reach / q / 3, reach / q / 10):
-            col, wsum = spread(sigma)
-            wgt = np.clip(wsum / 0.25, 0, 1)[..., None]
-            fill = col * wgt + fill * (1 - wgt)
-        dist = ndimage.distance_transform_edt(~known) * q
-        t = np.clip(dist / reach, 0, 1)
-        t = (t * t * (3 - 2 * t))[..., None]
-        fill = fill * (1 - t * (1 - dark))
-        big = np.asarray(Image.fromarray(np.clip(fill + 0.5, 0, 255).astype(np.uint8)).resize((w, h), Image.BICUBIC))
+    out = a.astype(np.float32)
+    lab, n = ndimage.label(mask)
+    for k, sl in enumerate(ndimage.find_objects(lab), 1):
+        m = lab == k
+        known = ~mask
+        q = 8                                                          # where to look, worked out at 1/8 size
+        ms = np.asarray(Image.fromarray(m.astype(np.uint8) * 255).resize((m.shape[1] // q, m.shape[0] // q))) > 0
+        near_small = ndimage.distance_transform_edt(~ms) < near_px / q
+        near = np.asarray(Image.fromarray(near_small.astype(np.uint8) * 255).resize((m.shape[1], m.shape[0]))) > 127
+        sources, where = _ground_sources(a, known, near)
+        print("void", k, "ground sources at", where, flush=True)
+        y0, y1, x0, x1 = sl[0].start, sl[0].stop, sl[1].start, sl[1].stop
+        tex = _quilt(sources, y1 - y0, x1 - x0, seed=741 + k)
+        dist = ndimage.distance_transform_edt(m[y0:y1, x0:x1])          # px from the map's edge (within the box)
+        light = shade * (1 - 0.35 * np.exp(-dist / shadow))
+        mm = m[y0:y1, x0:x1]
         region = out[y0:y1, x0:x1]
-        region[m] = big[m]
-    return Image.fromarray(out)
+        region[mm] = (tex * light[..., None])[mm]
+    return Image.fromarray(np.clip(out + 0.5, 0, 255).astype(np.uint8))
 
 
 def main():

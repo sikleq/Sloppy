@@ -173,10 +173,16 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   where the water is in a frame. Frame brightness otherwise matches (overlap means within 0.1%).
 - Output: `map_<ver>_sfm_full.png` (9999×10425 at 2 units/px) + `map_<ver>_sfm.webp` 4096². The corners beyond
   the map's edge render black (nothing there; the outermost ~12 px are SFM's flat grey background). `fill_void`
-  paints them in our own way (the owner: "fill the black corners, in our own way"): the edge's colours carried
-  outwards by normalized convolution at three blur widths (worked out at 1/4 size), darkening to 30% over
-  700 px — land fading into darkness, no copied objects. Mirroring the edge outwards was tried first: it
-  duplicated cliffs and left hard lines where the mirror ran out; a coarse pyramid fill left blocky steps.
+  paints them in our own way: plain ground continues past the edge (the owner: "fill the black corners, in our own
+  way", then "the bottom-left is all murky — leamare's looks more harmonious"; leamare's older pictures show real
+  ground there, 7.41's map has none). The six plainest 384-px stretches of ground near each void are picked at
+  1/4 size — least gradient energy, no sharp object inside (its strongest local edge counts), no off-colour spot,
+  colour close to the most common plain ground near the void (grass by Radiant, grey ground by Dire; matching the
+  land right along the void gave tiled lava by Dire) — and quilted into the void (Efros & Freeman's image
+  quilting: 192-px patches, 48-px overlaps, best of 80 random candidates, minimum-error seams), 80% brightness
+  with a soft shadow under the map's edge. Tried before: mirroring the edge outwards (duplicated cliffs), a
+  blurred colour fade into darkness (murky), sources picked by mean detail only (glyph circles, lamps and a
+  pond's rim got copied).
 - Provenance: `data/map/renders.json` lists the versions whose picture is ours; the Terrain page's credit line
   (idea and inspiration: Leamare and devilesk, linked to their repositories — the owner 2026-10-01) names
   whatever on a page is still borrowed (a picture not in renders.json, map objects without

@@ -4,6 +4,14 @@
     {
       "date": "2026-10-01",
       "category": "Materials",
+      "minor": true,
+      "fix": true,
+      "link": "terrain_741.html",
+      "title": "Terrain 7.41: the empty corners beyond the map's edge now show plain ground (grass by Radiant, grey ground by Dire) instead of a murky fade"
+    },
+    {
+      "date": "2026-10-01",
+      "category": "Materials",
       "title": "Terrain: our own 7.41 map picture",
       "link": "terrain_741.html",
       "items": [

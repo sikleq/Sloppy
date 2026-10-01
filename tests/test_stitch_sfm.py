@@ -30,6 +30,27 @@ def test_the_cross_fade_weights_of_two_neighbours_add_up_to_one():
     assert a[0] == 1 and b[-1] == 1
 
 
+def test_the_seam_runs_where_the_two_patches_differ_least():
+    err = np.full((20, 10), 9.0)
+    err[:, 6] = 0                                                # a free column
+    mask = ss._min_cut(err)
+    assert (mask[:, 6:] == 1).all() and (mask[:, :6] == 0).all()
+
+
+def test_the_void_gets_plain_ground_and_the_map_is_left_alone():
+    rng = np.random.default_rng(5)
+    grass = np.clip(np.array([90, 150, 60]) + rng.normal(0, 6, (900, 900, 3)), 0, 255).round()
+    grass[100:140, 100:140] = [250, 250, 250]                     # an object: must not be copied
+    pic = grass.copy()
+    pic[600:, 600:] = 0                                          # the void, touching the picture's corner
+    out = np.asarray(ss.fill_void(Image.fromarray(pic.astype(np.uint8))), np.float32)
+    assert np.array_equal(out[:590, :590], pic[:590, :590].astype(np.float32))
+    filled = out[620:, 620:]
+    assert filled.mean() > 40                                    # not black any more
+    assert (filled.max(axis=2) < 200).all()                      # no copied white object
+    assert filled[..., 1].mean() > filled[..., 0].mean()         # green, like the ground around it
+
+
 def test_frames_cut_from_a_picture_stitch_back_into_it(tmp_path):
     rng = np.random.default_rng(3)
     small = rng.uniform(0, 255, size=(40, 40, 3)).astype(np.uint8)
