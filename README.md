@@ -17,7 +17,8 @@ QoL), every numeric delta is computed as a percentage, every per-level formula u
 - **Every hero, item and unit on its own page** — all its changes across patches, with a patch-by-patch strip.
 - **Calendar and changelog.** Patch lifespans and yearly stats; the site's own changelog.
 - **Terrain comparison.** An old ↔ new map slider per map change, with trees, camps, towers, runes and objectives as
-  layers. Map entities are read straight from the game's map files (`scripts/gen/extract_map_entities.py`).
+  layers. The map pictures are rendered in Source Filmmaker (`scripts/gen/stitch_sfm.py`) and the map entities are
+  read straight from the game's map files (`scripts/gen/extract_map_entities.py`).
 - **Materials.** Hero stats, Hero Lab, hero/item change matrices, neutral creeps and their abilities, mana items,
   AoE bonuses, structures.
 
@@ -124,7 +125,9 @@ license.
 - Game data history from [muk-as/DOTA2_CLIENT](https://github.com/muk-as/DOTA2_CLIENT) and
   [dotabuff/d2vpkr](https://github.com/dotabuff/d2vpkr).
 - Game files read with [ValveResourceFormat](https://github.com/ValveResourceFormat/ValveResourceFormat) (Source2Viewer).
-- Map tiles and coordinates for older map versions from [Spectral](https://spectral.gg) /
-  [leamare/dota-interactive-map](https://github.com/leamare/dota-interactive-map).
+- Terrain page: the idea and inspiration come from the interactive maps of
+  [Leamare](https://github.com/leamare/dota-interactive-map) and
+  [devilesk](https://github.com/devilesk/dota-interactive-map); the renders, the data and the rest are our own.
+  Map pictures and objects we haven't made yet for an older version are still Leamare's, and the page says so.
 - Icons from Valve's CDN; patch notes from Valve's datafeed.
 - Landing-page inventory UI: [Gothic Pixel UI](https://abyssowl.itch.io/gothic-pixel-ui) by **abyssowl**.

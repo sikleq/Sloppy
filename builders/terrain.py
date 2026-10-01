@@ -643,16 +643,42 @@ def _counts_html(counts):
     )
 
 
-def _source_html():
-    """Data-source credit shown under the slider — the map renders come from one
-    leamare repo, the entity coordinates (tree/camp diff) from another."""
-    def link(repo):
-        return (f'<a href="https://github.com/leamare/{repo}" target="_blank" '
-                f'rel="noopener noreferrer">leamare/{repo}</a>')
+_INSPIRED_BY = (("Leamare", "https://github.com/leamare/dota-interactive-map"),
+                ("devilesk", "https://github.com/devilesk/dota-interactive-map"))
+
+
+def _own_pictures():
+    """Versions whose map picture we rendered ourselves (data/map/renders.json)."""
+    try:
+        with open(_os.path.join(_HERE, "data", "map", "renders.json"), encoding="utf-8") as f:
+            return set(_json.load(f)["pictures"])
+    except (OSError, ValueError, KeyError):
+        return set()
+
+
+def _own_entities(ver):
+    """True when the version's map entities are read from the game files by us (data/map/mapdata_<code>.json)."""
+    return _os.path.exists(_os.path.join(_HERE, "data", "map", f"mapdata_{ver.replace('.', '')}.json"))
+
+
+def _source_html(old_ver=None, new_ver=None):
+    """Credit under the slider (the owner 2026-10-01): the idea comes from Leamare's and devilesk's interactive maps;
+    the pictures, the data and the rest are ours. Whatever on this page is still borrowed is named, so the line
+    never claims more than is true."""
+    def link(name, url):
+        return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'
+    names = " and ".join(link(n, u) for n, u in _INSPIRED_BY)
+    vers = [v for v in (old_ver, new_ver) if v]
+    pics = _own_pictures()
+    borrowed = [f"the {v} picture" for v in vers if v not in pics]
+    borrowed += [f"the {v} map objects" for v in vers if not _own_entities(v)]
+    note = ""
+    if borrowed:
+        what = ", ".join(borrowed[:-1]) + (" and " if len(borrowed) > 1 else "") + borrowed[-1]
+        note = (f' For now {what} {"is" if len(borrowed) == 1 else "are"} Leamare’s — ours are on the way.')
     return (
-        '<p class="tc-source">Map renders from '
-        f'{link("dota-interactive-map")}; entity coordinates from '
-        f'{link("dota-map-coordinates")}.</p>\n'
+        f'<p class="tc-source">Idea and inspiration: {names}. The map pictures (rendered in Source Filmmaker), '
+        f'the map data read from the game’s files and everything else here are our own work.{note}</p>\n'
     )
 
 
@@ -722,6 +748,7 @@ def _build_terrain_page(ver, patches, by_patch, markers_by_patch, counts_by_patc
                                picker_html=_picker_html(patches, ver),
                                subnav_in_header=False)
 
+    ov = nv = None
     if ver in _MAP_PAIRS:
         ov, nv = _MAP_PAIRS[ver]
         map_inner = _compare_html(ov, nv, markers_by_patch.get(ver, ""))
@@ -751,7 +778,7 @@ def _build_terrain_page(ver, patches, by_patch, markers_by_patch, counts_by_patc
         '<div class="terrain-compare-col">\n'
         f'<div class="terrain-map-pane" data-patch="{ver}">\n'
         f'{map_inner}</div>\n'
-        f'{_source_html()}'
+        f'{_source_html(ov, nv)}'
         '</div>\n'
         '<div class="terrain-list-box">\n'
         f'<div class="terrain-list-pane" data-patch="{ver}">\n'

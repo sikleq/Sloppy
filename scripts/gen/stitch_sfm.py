@@ -183,6 +183,85 @@ def stitch(frame_files, prints, upp_out, rect, blend_px=64):
     return canvas
 
 
+def _push_pull(rgb, known, levels=10):
+    """Smooth colours for the unknown pixels, spread in from the known ones (an image pyramid down and up)."""
+    if levels == 0 or min(rgb.shape[:2]) < 4:
+        mean = rgb[known].mean(axis=0) if known.any() else np.zeros(3, np.float32)
+        out = rgb.copy()
+        out[~known] = mean
+        return out
+    h, w = known.shape
+    hh, ww = (h + 1) // 2, (w + 1) // 2
+    k = np.zeros((hh * 2, ww * 2), np.float32)
+    k[:h, :w] = known
+    c = np.zeros((hh * 2, ww * 2, 3), np.float32)
+    c[:h, :w] = rgb * known[..., None]
+    ks = k.reshape(hh, 2, ww, 2).sum(axis=(1, 3))
+    cs = c.reshape(hh, 2, ww, 2, 3).sum(axis=(1, 3))
+    small_known = ks > 0
+    small = np.where(small_known[..., None], cs / np.maximum(ks, 1)[..., None], 0)
+    filled = _push_pull(small, small_known, levels - 1)
+    up = np.repeat(np.repeat(filled, 2, axis=0), 2, axis=1)[:h, :w]
+    out = rgb.copy()
+    out[~known] = up[~known]
+    return out
+
+
+def fill_void(img, dark=0.3, reach=700, min_area=40000):
+    """The corners beyond the map's edge (nothing renders there: black) painted in: the edge's own colours carried
+    outwards, more and more blurred and darkened over `reach` pixels — land fading into darkness, with no copied
+    objects that could be mistaken for map. The owner 2026-10-01: "fill the black corners, in our own way"
+    (leamare's pictures have Microsoft ICE's auto-complete). Mirroring the edge outwards was tried first: it
+    duplicated cliffs and left hard lines where the mirror ran out."""
+    from scipy import ndimage
+
+    a = np.asarray(img.convert("RGB"))
+    c = a.astype(np.int16)
+    void = c.max(axis=2) < 8
+    # the picture's outermost ~12 px past the map's edge are SFM's flat grey background, not black
+    grey = (abs(c[..., 0] - c[..., 1]) < 3) & (abs(c[..., 1] - c[..., 2]) < 3) & (c.max(axis=2) >= 45) & (c.max(axis=2) <= 66)
+    rim = np.zeros(void.shape, bool)
+    rim[:20], rim[-20:], rim[:, :20], rim[:, -20:] = True, True, True, True
+    void |= grey & rim
+    labels, n = ndimage.label(void)
+    border = set(np.unique(np.concatenate([labels[0], labels[-1], labels[:, 0], labels[:, -1]]))) - {0}
+    sizes = ndimage.sum(void, labels, range(n + 1))
+    keep = [i for i in border if sizes[i] >= min_area]
+    if not keep:
+        return img
+    mask = ndimage.binary_dilation(np.isin(labels, keep), iterations=2)
+    out = a.copy()
+    q = 4                                                       # the fill is smooth: worked out at 1/4 size
+    for sl in ndimage.find_objects(ndimage.label(mask)[0]):
+        y0, y1 = max(sl[0].start - reach, 0), min(sl[0].stop + reach, a.shape[0])
+        x0, x1 = max(sl[1].start - reach, 0), min(sl[1].stop + reach, a.shape[1])
+        m = mask[y0:y1, x0:x1]
+        h, w = m.shape
+        small = np.asarray(Image.fromarray(a[y0:y1, x0:x1]).resize((w // q, h // q), Image.BOX), np.float32)
+        known = np.asarray(Image.fromarray((~m).astype(np.uint8) * 255).resize((w // q, h // q), Image.BOX)) > 250
+        k = known.astype(np.float32)
+
+        def spread(sigma):
+            """Normalized convolution: the known colours' Gaussian average, wherever there is any weight."""
+            wsum = ndimage.gaussian_filter(k, sigma)
+            col = ndimage.gaussian_filter(small * k[..., None], (sigma, sigma, 0))
+            return col / np.maximum(wsum, 1e-6)[..., None], wsum
+
+        fill, _ = spread(reach / q)                             # coarse first, then finer where weight allows
+        for sigma in (reach / q / 3, reach / q / 10):
+            col, wsum = spread(sigma)
+            wgt = np.clip(wsum / 0.25, 0, 1)[..., None]
+            fill = col * wgt + fill * (1 - wgt)
+        dist = ndimage.distance_transform_edt(~known) * q
+        t = np.clip(dist / reach, 0, 1)
+        t = (t * t * (3 - 2 * t))[..., None]
+        fill = fill * (1 - t * (1 - dark))
+        big = np.asarray(Image.fromarray(np.clip(fill + 0.5, 0, 255).astype(np.uint8)).resize((w, h), Image.BICUBIC))
+        region = out[y0:y1, x0:x1]
+        region[m] = big[m]
+    return Image.fromarray(out)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("session")
@@ -200,7 +279,7 @@ def main():
     print("units per pixel in a frame: lens", round(prints[0][3], 4), "measured", upp and round(upp, 4))
     if upp:
         prints = [(c, r, u, upp) for c, r, u, _ in prints]
-    full = stitch(files, prints, args.upp, world_rect())
+    full = fill_void(stitch(files, prints, args.upp, world_rect()))
     full.save(os.path.join(args.work, f"map_{args.version}_sfm_full.png"))
     full.resize((SITE_PX, SITE_PX), Image.LANCZOS).save(
         os.path.join(args.work, f"map_{args.version}_sfm.webp"), "WEBP", quality=88, method=6)

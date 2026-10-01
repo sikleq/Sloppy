@@ -1,0 +1,6 @@
+{
+  "about": "Map versions whose top-down picture (icons/maps/map_<ver>.webp) we rendered ourselves; every other picture is still a borrowed render. sfm = Source Filmmaker, scripts/gen/stitch_sfm.py (docs/terrain.md). The Terrain page's credit line names whatever is still borrowed.",
+  "pictures": {
+    "7.41": "sfm"
+  }
+}

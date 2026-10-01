@@ -26,6 +26,7 @@ PAD = 6
 #   scope = None (page) | ("block", "<entity name>") | ("row", "<row text>")
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
+    "2026-10-01_terrain_sfm.webp": ("terrain_741.html", None, [".terrain-compare-col"], [], 560, {"width": 1400, "wait": 1500}),
     "2026-09-24_tormentor.webp": ("patches/7.38.html", ("block", "Tormentor"),
                                   [":scope > .entity", ":scope > ul.changes"], [], 560),
     "2026-09-24_tormentor_card.webp": ("patches/7.38.html", ("block", "Tormentor"),

@@ -136,15 +136,11 @@ What it took (each one silently broke the shots):
 - The player's own `autoexec.cfg` / video settings apply (FSR upscaling here): turning FSR off made the ground
   blurrier, not sharper; at the site's 4096 px its blockiness doesn't show. `sc_force_lod_level 0` changes nothing.
 - Colours (the owner 2026-10-01: "our map is too bright, it should look like leamare's"): the game's picture is
-  warmer and more saturated (lime grass, orange sand, light tree shadows) than leamare's SFM renders, though the
-  average brightness is the same. `scripts/gen/tone_match.py` moves the colours of our 7.41 picture onto the
-  colours of leamare's 7.41 picture (iterative distribution transfer: random rotations of the RGB cube, three 1-D
-  histogram matches each) and bakes that into a 33³ lookup table, `data/map/tone_lut.png`, applied to every site
-  picture we shoot (`--no-grade` keeps the game's colours). A least-squares fit pixel against pixel was tried
-  first: it washes the picture out (pulls every colour to the average). Fitted on the still capture (clouds off);
-  the reference is leamare's `icons/maps/map_7.41.webp` as of commit c641afe4 (`git show c641afe4:icons/maps/…`).
+  warmer and more saturated (lime grass, orange sand, light tree shadows). A colour grade on top was tried (a
+  pixel-against-pixel fit washed the picture out; a histogram transfer dirtied the ground and kept the orange camp
+  glows) and removed 2026-10-01 — the Source Filmmaker route below replaced this capture.
 - Output: `<work>/map_<ver>_game_full.png` (13399×13970 for 7.41, the game's own colours) + `map_<ver>_game.webp`
-  4096² (graded) on the same world rectangle as our map images (data/terrain_map_meta.json) — checked: buildings
+  4096² on the same world rectangle as our map images (data/terrain_map_meta.json) — checked: buildings
   land where the current picture has them.
 - Blender route (`scripts/gen/render_map.py`: glTF export + our multiblend rebuild) stays as a fallback: exact
   geometry, but not the game's own look.
@@ -176,7 +172,17 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   cross-faded over 64 px either side of a border: a hard cut showed as a line across water, whose glints depend on
   where the water is in a frame. Frame brightness otherwise matches (overlap means within 0.1%).
 - Output: `map_<ver>_sfm_full.png` (9999×10425 at 2 units/px) + `map_<ver>_sfm.webp` 4096². The corners beyond
-  the map's edge come out black — there is nothing there (leamare's have ICE's "auto complete" fill).
+  the map's edge render black (nothing there; the outermost ~12 px are SFM's flat grey background). `fill_void`
+  paints them in our own way (the owner: "fill the black corners, in our own way"): the edge's colours carried
+  outwards by normalized convolution at three blur widths (worked out at 1/4 size), darkening to 30% over
+  700 px — land fading into darkness, no copied objects. Mirroring the edge outwards was tried first: it
+  duplicated cliffs and left hard lines where the mirror ran out; a coarse pyramid fill left blocky steps.
+- Provenance: `data/map/renders.json` lists the versions whose picture is ours; the Terrain page's credit line
+  (idea and inspiration: Leamare and devilesk, linked to their repositories — the owner 2026-10-01) names
+  whatever on a page is still borrowed (a picture not in renders.json, map objects without
+  `data/map/mapdata_<code>.json`), so it never claims more than is true. Tests: tests/test_terrain_credit.py.
+- 7.41 on the site since 2026-10-01 (`icons/maps/map_7.41.webp`): registered on the old picture's grid within
+  ±1 px at 4096 (phase correlation at five spots), so the 7.40 ↔ 7.41 slider still lines up.
 - Clicking SFM: no command opens SFM or a session, and SFM in Dota has no Python (the script window has no
   interpreter behind it), so it is driven through its menus.
 

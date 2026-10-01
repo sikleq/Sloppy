@@ -11,7 +11,8 @@ that lean small. The tiles are stitched on the world grid of our map images (dat
                  +dota_launch_custom_game sloppy_topdown dota
     2. python scripts/gen/capture_map.py 7.41 --work D:\\maprender
        (one game session per tiles folder: two sessions' tiles differed in scale by ~4%)
-The site picture goes through the colour table of scripts/gen/tone_match.py (leamare's look), the full one doesn't.
+Superseded by scripts/gen/stitch_sfm.py (Source Filmmaker renders: no camp glows, no FSR blockiness, full-detail
+models); kept as the fallback that needs no SFM.
 """
 import argparse
 import glob
@@ -25,7 +26,6 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import tone_match  # noqa: E402
 from game_console import GameConsole  # noqa: E402
 from render_map import SITE_PX, world_rect  # noqa: E402
 
@@ -187,7 +187,6 @@ def main():
     ap.add_argument("--settle", type=float, default=1.2, help="seconds for textures to stream after a move")
     ap.add_argument("--region", type=float, nargs=4, metavar=("X0", "X1", "Y0", "Y1"),
                     help="a part of the map (default: the whole picture rectangle)")
-    ap.add_argument("--no-grade", action="store_true", help="keep the game's own colours in the site picture")
     args = ap.parse_args()
     if args.install:
         install()
@@ -210,12 +209,10 @@ def main():
     # the tiles run past the rectangle's right / bottom edge: cut it back to the rectangle exactly
     per = round(args.tile / upp) / args.tile                 # pixels per game unit of the stitched picture
     full = full.crop((0, 0, round((x1 - x0) * per), round((y1 - y0) * per)))
-    full.save(os.path.join(args.work, f"map_{args.version}_game_full.png"))      # as the game shows it
+    full.save(os.path.join(args.work, f"map_{args.version}_game_full.png"))
     if not args.region:
-        site = full.resize((SITE_PX, SITE_PX), Image.LANCZOS)
-        if os.path.exists(tone_match.LUT) and not args.no_grade:      # leamare's colour look (tone_match.py)
-            site = tone_match.apply(site)
-        site.save(os.path.join(args.work, f"map_{args.version}_game.webp"), "WEBP", quality=88, method=6)
+        full.resize((SITE_PX, SITE_PX), Image.LANCZOS).save(
+            os.path.join(args.work, f"map_{args.version}_game.webp"), "WEBP", quality=88, method=6)
     print("done", full.size)
 
 
