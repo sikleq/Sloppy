@@ -11,6 +11,5 @@
         GameUI.SetCameraTargetPosition([x, y, 0], 0);
     }
     GameEvents.Subscribe("topdown_cam", function (d) { point(d.x, d.y, d.dist); });
-    GameEvents.Subscribe("topdown_pointcam", function (d) { GameUI.SetCameraEntity(d.ent); });
     $.Schedule(1.0, function () { point(0, 0, 6000); });
 })();

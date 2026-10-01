@@ -121,8 +121,31 @@ What it took (each one silently broke the shots):
   Higher up the game drops its detail level (15360 px from 13400: pixelated), so don't go higher.
 - The camera's look-at point is clamped to the playable area (7.41: x ±8448, y -9472..8448, probed by
   `look_at_bounds`): edge tiles are shot from the nearest allowed point and cut off-centre.
-- Output: `<work>/map_<ver>_game_full.png` (13399×13970 for 7.41) + `map_<ver>_game.webp` 4096² on the same world
-  rectangle as our map images (data/terrain_map_meta.json) — checked: buildings land where the current picture has them.
+- A camera move sent right after another is now and then lost: `Camera.goto` reads the look-at point back
+  (`dota_camera_get_lookatpos` → console.log) and resends until the camera is there.
+- One game session per capture: tiles of two sessions differed in scale by ~4% (same calibration, same spot).
+  Resuming into a tiles folder from another session mixes them — start a fresh folder after a restart.
+- Nothing moves (2026-10-01, the owner: "outposts visible, ambient like butterflies, moving water — or stop
+  time"): `topdown_hide` removes the outposts (`npc_dota_watch_tower`, their ring with them; the round white
+  platforms left are the wisdom shrines — map objects); SETUP turns off critters (`dota_ambient_creatures 0`),
+  tree shake and cloth, **wind in the foliage** (`r_dota_allow_wind_on_trees 0`), **drifting cloud shadows**
+  (`r_dota_clouds 0`) and freezes particles (`r_freezeparticles 1`). Two shots of one spot 3 s apart then differ in
+  0.03% of the pixels (one pond's ripples). Pausing the game (`PauseGame`) was tried: it stops neither the foliage
+  nor the water, and a paused server runs console commands 10-20 s late — the camera stayed put for whole shots.
+  Never leave `host_timescale` below 1: the server then runs a command every ~20 s.
+- The player's own `autoexec.cfg` / video settings apply (FSR upscaling here): turning FSR off made the ground
+  blurrier, not sharper; at the site's 4096 px its blockiness doesn't show. `sc_force_lod_level 0` changes nothing.
+- Colours (the owner 2026-10-01: "our map is too bright, it should look like leamare's"): the game's picture is
+  warmer and more saturated (lime grass, orange sand, light tree shadows) than leamare's SFM renders, though the
+  average brightness is the same. `scripts/gen/tone_match.py` moves the colours of our 7.41 picture onto the
+  colours of leamare's 7.41 picture (iterative distribution transfer: random rotations of the RGB cube, three 1-D
+  histogram matches each) and bakes that into a 33³ lookup table, `data/map/tone_lut.png`, applied to every site
+  picture we shoot (`--no-grade` keeps the game's colours). A least-squares fit pixel against pixel was tried
+  first: it washes the picture out (pulls every colour to the average). Fitted on the still capture (clouds off);
+  the reference is leamare's `icons/maps/map_7.41.webp` as of commit c641afe4 (`git show c641afe4:icons/maps/…`).
+- Output: `<work>/map_<ver>_game_full.png` (13399×13970 for 7.41, the game's own colours) + `map_<ver>_game.webp`
+  4096² (graded) on the same world rectangle as our map images (data/terrain_map_meta.json) — checked: buildings
+  land where the current picture has them.
 - Blender route (`scripts/gen/render_map.py`: glTF export + our multiblend rebuild) stays as a fallback: exact
   geometry, but not the game's own look.
 

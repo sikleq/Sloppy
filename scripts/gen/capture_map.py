@@ -10,6 +10,8 @@ that lean small. The tiles are stitched on the world grid of our map images (dat
        dota2.exe -tools -novid -vconsole -condebug -windowed -w 1920 -h 1080 -addon sloppy_topdown
                  +dota_launch_custom_game sloppy_topdown dota
     2. python scripts/gen/capture_map.py 7.41 --work D:\\maprender
+       (one game session per tiles folder: two sessions' tiles differed in scale by ~4%)
+The site picture goes through the colour table of scripts/gen/tone_match.py (leamare's look), the full one doesn't.
 """
 import argparse
 import glob
@@ -23,17 +25,25 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import tone_match  # noqa: E402
 from game_console import GameConsole  # noqa: E402
 from render_map import SITE_PX, world_rect  # noqa: E402
 
 Image.MAX_IMAGE_PIXELS = None
 GAME = os.environ.get("DOTA_GAME", r"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game")
 SHOTS = os.path.join(GAME, "dota", "screenshots")
+LOG = os.path.join(GAME, "dota", "console.log")                         # the game's console output (-condebug)
 ADDON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "topdown_addon")
 # render while not focused (Tools' "Render All Windows"), no fog / UI / health bars, units hidden, and the camera
 # jumps instead of gliding (with the glide a shot 1 s after a move was taken mid-flight: tiles off by ~20%)
+# no butterflies / critters, no tree shake or cloth wind, no wind in the foliage, no drifting cloud shadows, particles
+# frozen, outposts removed (the owner 2026-10-01: "ambient like butterflies, moving water" — two shots of one spot
+# 3 s apart differ in 0.03% of the pixels, a pond's ripples). The game is NOT paused: PauseGame stops neither the
+# foliage nor the water, and while paused the server runs console commands 10-20 s late — the camera stayed put
 SETUP = ("r_always_render_all_windows 1", "engine_no_focus_sleep 0", "fog_enable 0", "r_drawpanorama 0",
-         "dota_hud_healthbars 0", "topdown_hide", "dota_camera_lerp_duration 0", "dota_camera_smooth_count 1")
+         "dota_hud_healthbars 0", "topdown_hide", "dota_camera_lerp_duration 0", "dota_camera_smooth_count 1",
+         "dota_ambient_creatures 0", "cl_dota_ambient_tree_shake 0", "dota_ambient_cloth 0",
+         "r_dota_allow_wind_on_trees 0", "r_dota_clouds 0", "r_freezeparticles 1")
 
 
 def install():
@@ -51,11 +61,37 @@ class Camera:
         for cmd in SETUP + (f"screenshot_width {shot_w}", f"screenshot_height {shot_h}"):
             self.c.run(cmd, 0.4)
         self.dist, self.settle = dist, settle
+        time.sleep(3)                       # the first shot right after the settings came out shifted and different
+
+    def lookat(self, timeout=3.0):
+        """Where the camera looks now (x, y), from the game's own report in console.log (needs -condebug)."""
+        size = os.path.getsize(LOG)
+        self.c.run("dota_camera_get_lookatpos", 0.1)
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            with open(LOG, "rb") as f:
+                f.seek(size)
+                lines = [l for l in f.read().decode("utf-8", "replace").splitlines() if "Camera look-at position:" in l]
+            if lines:
+                return tuple(float(v) for v in lines[-1].split(":")[-1].split()[:2])
+            time.sleep(0.1)
+        return None
+
+    def goto(self, x, y, tries=6):
+        """Point the camera and make sure it got there: a move sent right after another one is now and then lost."""
+        for _ in range(tries):
+            self.c.run(f"topdown_cam {x:.1f} {y:.1f} {self.dist}", 0.2)
+            for _ in range(10):
+                at = self.lookat()
+                if at and abs(at[0] - x) < 2 and abs(at[1] - y) < 2:
+                    return
+                time.sleep(0.2)
+        raise RuntimeError(f"the camera does not go to {x} {y}")
 
     def shot(self, x, y):
         """The game's screenshot of the ground straight below (x, y), as a greyscale-able PIL image."""
         before = set(glob.glob(os.path.join(SHOTS, "*.tga")))
-        self.c.run(f"topdown_cam {x:.1f} {y:.1f} {self.dist}", 0.2)
+        self.goto(x, y)
         time.sleep(self.settle)
         self.c.run("screenshot", 0.2)
         deadline = time.time() + 60
@@ -94,15 +130,15 @@ def calibrate(cam, x, y, step=400):
 def look_at_bounds(cam, far=20000):
     """How far the game lets the camera look: it clamps its look-at point to the playable area (7.41: x ±8448,
     y -9472..8448), so a tile beyond that is shot from the nearest allowed point and cut off-centre."""
-    log = os.path.join(GAME, "dota", "console.log")                    # needs -condebug
     got = []
     for x, y in ((-far, -far), (far, far)):
-        cam.c.run(f"topdown_cam {x} {y} {cam.dist}", 0.3)
-        time.sleep(0.8)
-        cam.c.run("dota_camera_get_lookatpos", 0.8)
-        with open(log, encoding="utf-8", errors="replace") as f:
-            line = [l for l in f if "Camera look-at position:" in l][-1]
-        got.append([float(v) for v in line.split(":")[-1].split()[:2]])
+        for _ in range(6):                                  # until the camera leaves the middle, the move may be lost
+            cam.c.run(f"topdown_cam {x} {y} {cam.dist}", 0.3)
+            time.sleep(0.8)
+            at = cam.lookat()
+            if at and abs(at[0]) > 4000 and abs(at[1]) > 4000:
+                break
+        got.append(at)
     (ax, ay), (bx, by) = got
     return ax, bx, ay, by
 
@@ -151,6 +187,7 @@ def main():
     ap.add_argument("--settle", type=float, default=1.2, help="seconds for textures to stream after a move")
     ap.add_argument("--region", type=float, nargs=4, metavar=("X0", "X1", "Y0", "Y1"),
                     help="a part of the map (default: the whole picture rectangle)")
+    ap.add_argument("--no-grade", action="store_true", help="keep the game's own colours in the site picture")
     args = ap.parse_args()
     if args.install:
         install()
@@ -173,10 +210,12 @@ def main():
     # the tiles run past the rectangle's right / bottom edge: cut it back to the rectangle exactly
     per = round(args.tile / upp) / args.tile                 # pixels per game unit of the stitched picture
     full = full.crop((0, 0, round((x1 - x0) * per), round((y1 - y0) * per)))
-    full.save(os.path.join(args.work, f"map_{args.version}_game_full.png"))
+    full.save(os.path.join(args.work, f"map_{args.version}_game_full.png"))      # as the game shows it
     if not args.region:
-        full.resize((SITE_PX, SITE_PX), Image.LANCZOS).save(
-            os.path.join(args.work, f"map_{args.version}_game.webp"), "WEBP", quality=88, method=6)
+        site = full.resize((SITE_PX, SITE_PX), Image.LANCZOS)
+        if os.path.exists(tone_match.LUT) and not args.no_grade:      # leamare's colour look (tone_match.py)
+            site = tone_match.apply(site)
+        site.save(os.path.join(args.work, f"map_{args.version}_game.webp"), "WEBP", quality=88, method=6)
     print("done", full.size)
 
 

@@ -48,20 +48,16 @@ function Activate()
                 n = n + 1
             end
         end
-        print("TOPDOWN_HIDDEN " .. n)
-    end, "hide heroes, couriers, Roshan, Tormentors and creeps", 0)
-    -- a point_camera with its own field of view, as SFM's narrow lens: the client looks through it
-    Convars:RegisterCommand("topdown_pointcam", function(_, x, y, z, fov)
-        if TopDown.cam == nil or TopDown.fov ~= fov then       -- the lens is set at spawn: a new fov, a new camera
-            if TopDown.cam then UTIL_Remove(TopDown.cam) end
-            TopDown.cam = SpawnEntityFromTableSynchronous("point_camera",
-                { origin = "0 0 0", angles = "90 90 0", FOV = fov or "10", ZFar = "200000" })
-            TopDown.fov = fov
+        -- outposts go entirely, their team-coloured rings with them (the owner 2026-10-01)
+        for _, cls in pairs({ "npc_dota_watch_tower" }) do
+            for _, e in pairs(Entities:FindAllByClassname(cls)) do
+                UTIL_Remove(e)
+                n = n + 1
+            end
         end
-        TopDown.cam:SetAbsOrigin(Vector(tonumber(x), tonumber(y), tonumber(z)))
-        TopDown.cam:SetAngles(90, 90, 0)
-        CustomGameEventManager:Send_ServerToAllClients("topdown_pointcam", { ent = TopDown.cam:entindex() })
-        print("TOPDOWN_POINTCAM " .. TopDown.cam:entindex())
-    end, "look through a point_camera at x y z with a field of view", 0)
+        print("TOPDOWN_HIDDEN " .. n)
+    end, "hide heroes, couriers, Roshan, Tormentors, creeps; remove outposts", 0)
+    -- no pause command: PauseGame freezes neither the foliage nor the water (capture_map.py turns the wind, the
+    -- clouds and the particles off instead), and a paused server runs console commands 10-20 s late
     print("TOPDOWN_READY")
 end
