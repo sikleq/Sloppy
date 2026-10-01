@@ -149,6 +149,37 @@ What it took (each one silently broke the shots):
 - Blender route (`scripts/gen/render_map.py`: glTF export + our multiblend rebuild) stays as a fallback: exact
   geometry, but not the game's own look.
 
+## Our own top-down picture — rendered in Source Filmmaker (2026-10-01) — the way to go
+
+The in-game capture above never looked like leamare's pictures (the owner: "too bright", "orange spots", "dirty
+ground"): the game camera adds its post-processing, low-detail models from 5000 up, the player's FSR upscaling, and
+the camps' orange glows — 12 game settings (lights, particles, overlays, decals, bloom, tone map, time of day) don't
+remove them, and colour grading on top only traded one fault for another. Source Filmmaker (Workshop Tools →
+Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
+
+- The session (`*.dmx`, kept outside the repo — SFM sessions live in `game/dota_addons/<addon>/elements/sessions`;
+  `game/bin/win64/dmxconvert.exe -i in.dmx -o out.dmx -oe keyvalues2` makes it text, `-oe binary` back):
+  camera `fieldOfView 1`, at z 240000 (`znear 200000`, `zfar 300000`), orientation quaternion
+  `-0.49645 0.50352 0.50352 0.49645` (straight down but 0.81° off: the view centre lands 3395 units west of the
+  camera), position keyed once a second in a serpentine — x -6000…12000 step 3600, y -9793…10207 step 2000 = 6 × 11
+  frames, 66 s at `frameRate 1`; render settings `modelLod 0`, `SkipMainPipelinePostProcessing 1`,
+  `ambientOcclusionMode 1`, progressive refinement on; movie: image sequence, PNG, 3840×2160, 0–66 s. Frames are
+  ~4190 × 2360 units at 1.09 units/px with ~15% overlap; they cover x -11489…10699, y -10971…11385 — our picture
+  rectangle with room to spare (7.33's camera path fits 7.41 unchanged).
+- Steps: launch `dota2.exe -tools -addon dotamapsfm`, Tools → Source Filmmaker, open the session, File → Export →
+  Movie (Ctrl+M) into a frames folder (~2 min for 66 frames), then
+  `python scripts/gen/stitch_sfm.py SESSION.dmx FRAMES 7.41 --work D:\maprender`.
+- `stitch_sfm.py` reads the camera path from the session (position log, the channels clip's time offset, the
+  movie's frame rate and range) and places every frame by geometry — the lens is narrow enough to be
+  near-orthographic, so no feature matching (the guide this follows used Microsoft ICE). Units per pixel are measured
+  on neighbouring frames (1.0902 against 1.0904 from the lens). Frames meet in cells around their centres,
+  cross-faded over 64 px either side of a border: a hard cut showed as a line across water, whose glints depend on
+  where the water is in a frame. Frame brightness otherwise matches (overlap means within 0.1%).
+- Output: `map_<ver>_sfm_full.png` (9999×10425 at 2 units/px) + `map_<ver>_sfm.webp` 4096². The corners beyond
+  the map's edge come out black — there is nothing there (leamare's have ICE's "auto complete" fill).
+- Clicking SFM: no command opens SFM or a session, and SFM in Dota has no Python (the script window has no
+  interpreter behind it), so it is driven through its menus.
+
 ## Map source availability (investigated 2026-06-04)
 
 - **Tiles** `maps/tiles/<ver>/default/<z>/…` — only the `default` skin (no

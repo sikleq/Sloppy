@@ -57,6 +57,11 @@ function Activate()
         end
         print("TOPDOWN_HIDDEN " .. n)
     end, "hide heroes, couriers, Roshan, Tormentors, creeps; remove outposts", 0)
+    -- the time of day sets the sun's colour and strength (0.5 = noon)
+    Convars:RegisterCommand("topdown_time", function(_, t)
+        GameRules:SetTimeOfDay(tonumber(t) or 0.5)
+        print("TOPDOWN_TIME " .. tostring(GameRules:GetTimeOfDay()))
+    end, "set the time of day, 0..1", 0)
     -- no pause command: PauseGame freezes neither the foliage nor the water (capture_map.py turns the wind, the
     -- clouds and the particles off instead), and a paused server runs console commands 10-20 s late
     print("TOPDOWN_READY")
