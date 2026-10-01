@@ -201,11 +201,14 @@ def _void_mask(a, min_area=40000):
     return ndimage.binary_dilation(np.isin(labels, keep), iterations=2) if keep else np.zeros(void.shape, bool)
 
 
-def _ground_sources(a, known, near, size=384, count=6, q=4):
-    """The plainest stretches of ground next to a void (`near`: where to look): windows with the least detail
-    (gradient energy) and no single sharp object in them (the strongest local edge counts too — glyph circles,
-    lamps, a pond's rim got into the first version), whose colour is close to the most common plain ground near
-    the void — so the Radiant corner gets grass, the Dire one grey ground, never water or lava. Searched at 1/q size."""
+def _ground_sources(a, known, near, patch=128, count=400, q=4):
+    """A pool of `count` clean patches of the void's own ground, from anywhere on the map: the colour to match is
+    the most common plain ground near the void (the plainest quarter of its pixels) — grass by Radiant, grey ground
+    by Dire, never the land right along the void (cliffs, lava). A patch qualifies with no bush, tree or shadow in
+    it (nothing darker than that ground), colour close to it, little colour spread (paving: stones between grass),
+    little detail. The owner 2026-10-01: "trees in the corners? remove them if they aren't really there" — six big
+    source windows were tried first: on Radiant's lawns every big window has bushes or paving in it.
+    Returns (patches, their top-left corners, the ground colour)."""
     from scipy import ndimage
 
     h, w = known.shape
@@ -214,34 +217,30 @@ def _ground_sources(a, known, near, size=384, count=6, q=4):
     nr = np.asarray(Image.fromarray(near.astype(np.uint8) * 255).resize((w // q, h // q), Image.BOX)) > 127
     grey = small.mean(axis=2)
     detail = np.abs(ndimage.sobel(grey, 0)) + np.abs(ndimage.sobel(grey, 1))
-    # the colour to match: the most common plain ground near the void (the plainest quarter of its pixels) — not
-    # the land right along the void, which is cliffs and, by Dire, lava (the Dire corner came out as tiled lava)
     local = ndimage.uniform_filter(detail, 9)
     area = kn & nr
     plain = area & (local <= np.percentile(local[area], 25))
     target = np.median(small[plain], axis=0)
-    s = size // q
-    ii = ndimage.uniform_filter(detail, s)
-    peak = ndimage.maximum_filter(ndimage.uniform_filter(detail, 5), s)          # the sharpest thing in the window
-    # the most off-colour spot in the window (a bit of a pond's water got into the grass)
-    odd = ndimage.maximum_filter(np.abs(np.stack([ndimage.uniform_filter(small[..., k], 5) for k in range(3)], -1)
-                                        - target).sum(axis=-1), s)
-    ok = ndimage.minimum_filter(kn.astype(np.uint8), s) > 0                    # the whole window is map
+    ground = float(np.median(grey[plain]))
+    s = patch // q
     col = np.stack([ndimage.uniform_filter(small[..., k], s) for k in range(3)], axis=-1)
-    cands = []
-    for y in range(s // 2, small.shape[0] - s // 2, max(s // 4, 1)):
-        for x in range(s // 2, small.shape[1] - s // 2, max(s // 4, 1)):
-            if ok[y, x] and nr[y, x]:
-                cands.append((ii[y, x] + 0.5 * peak[y, x] + 0.35 * np.abs(col[y, x] - target).sum()
-                              + 0.5 * odd[y, x], y - s // 2, x - s // 2))
-    cands.sort()
+    spread = np.sqrt(np.maximum(np.stack([ndimage.uniform_filter(small[..., k] ** 2, s) for k in range(3)], -1)
+                                - col ** 2, 0)).sum(axis=-1)
+    dark = ndimage.maximum_filter((ndimage.uniform_filter(grey, 3) < ground - 18).astype(np.uint8), s) > 0
+    ok = (ndimage.minimum_filter(kn.astype(np.uint8), s) > 0) & ~dark
+    score = ndimage.uniform_filter(detail, s) + 1.5 * spread + 0.5 * np.abs(col - target).sum(axis=-1)
+    score[~ok] = np.inf
+    score[np.abs(col - target).max(axis=-1) > 12] = np.inf
+    ys, xs = np.mgrid[s // 2:small.shape[0] - s // 2:max(s // 2, 1), s // 2:small.shape[1] - s // 2:max(s // 2, 1)]
+    flat = score[ys, xs].ravel()
+    order = np.argsort(flat)
     picked = []
-    for _, y, x in cands:                                      # spread out: no two sources overlap
-        if all(abs(y - py) >= s or abs(x - px) >= s for py, px in picked):
-            picked.append((y, x))
-        if len(picked) == count:
+    for i in order[:count]:
+        if not np.isfinite(flat[i]):
             break
-    return [a[y * q:y * q + size, x * q:x * q + size].astype(np.float32) for y, x in picked],         [(y * q, x * q) for y, x in picked]
+        picked.append(((ys.ravel()[i] - s // 2) * q, (xs.ravel()[i] - s // 2) * q))
+    patches = [a[y:y + patch, x:x + patch].astype(np.float32) for y, x in picked]
+    return patches, picked, target
 
 
 def _min_cut(err):
@@ -262,7 +261,7 @@ def _min_cut(err):
     return mask
 
 
-def _quilt(sources, h, w, patch=192, overlap=48, tries=80, seed=741):
+def _quilt(sources, h, w, patch=128, overlap=32, tries=80, seed=741, masks=None, target=None, tol=14):
     """A ground texture of h x w from patches of `sources` (Efros & Freeman's image quilting): each patch chosen
     among random ones for the best match with what is already laid down, joined along the cheapest seam."""
     rng = np.random.default_rng(seed)
@@ -271,9 +270,18 @@ def _quilt(sources, h, w, patch=192, overlap=48, tries=80, seed=741):
     for y in range(0, h, step):
         for x in range(0, w, step):
             best = None
-            for _ in range(tries):
-                src = sources[rng.integers(len(sources))]
+            drawn = 0
+            for _ in range(tries * 20):
+                if drawn == tries:
+                    break
+                k = rng.integers(len(sources))
+                src = sources[k]
                 sy, sx = rng.integers(src.shape[0] - patch + 1), rng.integers(src.shape[1] - patch + 1)
+                if masks is not None and masks[k][sy:sy + patch, sx:sx + patch].any():
+                    continue                                   # touches a bush or a tree
+                if target is not None and np.abs(src[sy:sy + patch, sx:sx + patch].mean(axis=(0, 1)) - target).max() > tol:
+                    continue                                   # a patch of dirt or of a path, not of the ground
+                drawn += 1
                 cand = src[sy:sy + patch, sx:sx + patch]
                 e = 0.0
                 if x:
@@ -282,6 +290,10 @@ def _quilt(sources, h, w, patch=192, overlap=48, tries=80, seed=741):
                     e += ((cand[:overlap] - out[y:y + overlap, x:x + patch]) ** 2).sum()
                 if best is None or e < best[0]:
                     best = (e, cand)
+            if best is None:                                   # nothing passed the checks: any patch will do
+                src = sources[rng.integers(len(sources))]
+                sy, sx = rng.integers(src.shape[0] - patch + 1), rng.integers(src.shape[1] - patch + 1)
+                best = (0.0, src[sy:sy + patch, sx:sx + patch])
             cand = best[1]
             mask = np.ones((patch, patch), np.float32)
             if x:
@@ -317,10 +329,13 @@ def fill_void(img, shade=0.8, shadow=90, near_px=2500):
         ms = np.asarray(Image.fromarray(m.astype(np.uint8) * 255).resize((m.shape[1] // q, m.shape[0] // q))) > 0
         near_small = ndimage.distance_transform_edt(~ms) < near_px / q
         near = np.asarray(Image.fromarray(near_small.astype(np.uint8) * 255).resize((m.shape[1], m.shape[0]))) > 127
-        sources, where = _ground_sources(a, known, near)
-        print("void", k, "ground sources at", where, flush=True)
+        sources, where, target = _ground_sources(a, known, near)
+        print("void", k, len(sources), "clean ground patches, colour", np.round(target), flush=True)
         y0, y1, x0, x1 = sl[0].start, sl[0].stop, sl[1].start, sl[1].stop
         tex = _quilt(sources, y1 - y0, x1 - x0, seed=741 + k)
+        # no large-scale colour bands (the patches' rows showed as stripes): keep the grass's fine grain, even out
+        # everything wider than ~60 px to the ground's own colour
+        tex = tex - ndimage.gaussian_filter(tex, (60, 60, 0)) + target
         dist = ndimage.distance_transform_edt(m[y0:y1, x0:x1])          # px from the map's edge (within the box)
         light = shade * (1 - 0.35 * np.exp(-dist / shadow))
         mm = m[y0:y1, x0:x1]

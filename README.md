@@ -125,9 +125,8 @@ license.
 - Game data history from [muk-as/DOTA2_CLIENT](https://github.com/muk-as/DOTA2_CLIENT) and
   [dotabuff/d2vpkr](https://github.com/dotabuff/d2vpkr).
 - Game files read with [ValveResourceFormat](https://github.com/ValveResourceFormat/ValveResourceFormat) (Source2Viewer).
-- Terrain page: the idea and inspiration come from the interactive maps of
-  [Leamare](https://github.com/leamare/dota-interactive-map) and
-  [devilesk](https://github.com/devilesk/dota-interactive-map); the renders, the data and the rest are our own.
-  Map pictures and objects we haven't made yet for an older version are still Leamare's, and the page says so.
+- Terrain page: inspired by [Leamare](https://github.com/leamare/dota-interactive-map) and
+  [devilesk](https://github.com/devilesk/dota-interactive-map); map pictures and data:
+  [Oldgrowth](https://github.com/sikleq/Oldgrowth).
 - Icons from Valve's CDN; patch notes from Valve's datafeed.
 - Landing-page inventory UI: [Gothic Pixel UI](https://abyssowl.itch.io/gothic-pixel-ui) by **abyssowl**.

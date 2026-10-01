@@ -174,18 +174,19 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
 - Output: `map_<ver>_sfm_full.png` (9999×10425 at 2 units/px) + `map_<ver>_sfm.webp` 4096². The corners beyond
   the map's edge render black (nothing there; the outermost ~12 px are SFM's flat grey background). `fill_void`
   paints them in our own way: plain ground continues past the edge (the owner: "fill the black corners, in our own
-  way", then "the bottom-left is all murky — leamare's looks more harmonious"; leamare's older pictures show real
-  ground there, 7.41's map has none). The six plainest 384-px stretches of ground near each void are picked at
-  1/4 size — least gradient energy, no sharp object inside (its strongest local edge counts), no off-colour spot,
-  colour close to the most common plain ground near the void (grass by Radiant, grey ground by Dire; matching the
-  land right along the void gave tiled lava by Dire) — and quilted into the void (Efros & Freeman's image
-  quilting: 192-px patches, 48-px overlaps, best of 80 random candidates, minimum-error seams), 80% brightness
-  with a soft shadow under the map's edge. Tried before: mirroring the edge outwards (duplicated cliffs), a
-  blurred colour fade into darkness (murky), sources picked by mean detail only (glyph circles, lamps and a
-  pond's rim got copied).
+  way", "the bottom-left is all murky", then "trees in the corners? remove them if they aren't really there").
+  A pool of up to 400 clean 128-px patches of the void's own ground is collected from the whole map (searched at
+  1/4 size): the colour to match is the most common plain ground near the void (grass by Radiant, grey ground by
+  Dire — not the land right along it: cliffs, lava); a patch qualifies with nothing darker than that ground in it
+  (no bush, tree or shadow), colour within 12 of it, little colour spread (no paving), little detail. The pool is
+  quilted into the void (Efros & Freeman: 32-px overlaps, best of 80 random patches, minimum-error seams), then
+  everything wider than ~60 px is evened out to the ground's colour (rows of patches showed as stripes); 80%
+  brightness, a soft shadow under the map's edge. Tried before: mirroring the edge (duplicated cliffs), a blurred
+  fade (murky), six big source windows (on Radiant's lawns every big window has bushes or paving: bushes and paving
+  got copied, then the few clean patches ran out).
 - Provenance: `data/map/renders.json` lists the versions whose picture is ours; the Terrain page's credit line
-  (idea and inspiration: Leamare and devilesk, linked to their repositories — the owner 2026-10-01) names
-  whatever on a page is still borrowed (a picture not in renders.json, map objects without
+  ("Inspired by Leamare and devilesk", linked to their repositories, kept to the minimum — the owner
+  2026-10-01) names a version whose map is still borrowed (a picture not in renders.json, map objects without
   `data/map/mapdata_<code>.json`), so it never claims more than is true. Tests: tests/test_terrain_credit.py.
 - 7.41 on the site since 2026-10-01 (`icons/maps/map_7.41.webp`): registered on the old picture's grid within
   ±1 px at 4096 (phase correlation at five spots), so the 7.40 ↔ 7.41 slider still lines up.

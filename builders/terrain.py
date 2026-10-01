@@ -662,24 +662,17 @@ def _own_entities(ver):
 
 
 def _source_html(old_ver=None, new_ver=None):
-    """Credit under the slider (the owner 2026-10-01): the idea comes from Leamare's and devilesk's interactive maps;
-    the pictures, the data and the rest are ours. Whatever on this page is still borrowed is named, so the line
-    never claims more than is true."""
+    """Credit under the slider, kept to the minimum (the owner 2026-10-01): inspired by Leamare's and devilesk's
+    interactive maps; a version whose picture or objects are still Leamare's is named, so the line never claims
+    more than is true."""
     def link(name, url):
         return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'
     names = " and ".join(link(n, u) for n, u in _INSPIRED_BY)
     vers = [v for v in (old_ver, new_ver) if v]
     pics = _own_pictures()
-    borrowed = [f"the {v} picture" for v in vers if v not in pics]
-    borrowed += [f"the {v} map objects" for v in vers if not _own_entities(v)]
-    note = ""
-    if borrowed:
-        what = ", ".join(borrowed[:-1]) + (" and " if len(borrowed) > 1 else "") + borrowed[-1]
-        note = (f' For now {what} {"is" if len(borrowed) == 1 else "are"} Leamare’s — ours are on the way.')
-    return (
-        f'<p class="tc-source">Idea and inspiration: {names}. The map pictures (rendered in Source Filmmaker), '
-        f'the map data read from the game’s files and everything else here are our own work.{note}</p>\n'
-    )
+    borrowed = [v for v in vers if v not in pics or not _own_entities(v)]
+    note = f" {', '.join(borrowed)}: Leamare’s map for now." if borrowed else ""
+    return f'<p class="tc-source">Inspired by {names}.{note}</p>\n'
 
 
 def _terrain_filename(ver, patches=None):

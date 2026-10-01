@@ -186,13 +186,14 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("codes", nargs="*", help="map codes (patch without the dot); default: all known")
     ap.add_argument("--vpk", help="a map VPK to read instead of the game's (one code)")
+    ap.add_argument("--out", default=OUT_DIR, help="where mapdata_<code>.json goes (default: data/map)")
     args = ap.parse_args()
     codes = args.codes or list(MAPS)
-    os.makedirs(OUT_DIR, exist_ok=True)
+    os.makedirs(args.out, exist_ok=True)
     for code in codes:
         vpk = args.vpk or os.path.join(MAPS_DIR, MAPS[code])
         md = extract(vpk)
-        with open(os.path.join(OUT_DIR, f"mapdata_{code}.json"), "w", encoding="utf-8") as f:
+        with open(os.path.join(args.out, f"mapdata_{code}.json"), "w", encoding="utf-8") as f:
             json.dump(md, f, ensure_ascii=False, separators=(",", ":"))
             f.write("\n")
         c = md["counts"]

@@ -21,6 +21,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from patch.meta import RELEASE_HISTORY  # noqa: E402
@@ -105,14 +106,30 @@ def cmd_hashes(args):
         json.dump(hist, open(out_path, "w", encoding="utf-8"), indent=1)
 
 
+def patch_maps(hist):
+    """The map each patch shipped: the dota.vpk of the last build in its release window (the first build after a
+    patch date is now and then still the old one — 7.41's map came a day later); a patch with no build in its
+    window keeps the previous patch's last map. -> {version: {"sha1", "manifest"}} (versions in hist's order)."""
+    out, prev = {}, None
+    for ver, rows in hist.items():
+        rel = [r for r in rows if r["role"] == "release" and r.get("sha1") not in (None, "?")]
+        fin = [r for r in rows if r["role"] == "final" and r.get("sha1") not in (None, "?")]
+        pick = rel[-1] if rel else prev
+        if pick:
+            out[ver] = {"sha1": pick["sha1"], "manifest": pick["manifest"]}
+        prev = fin[-1] if fin else pick
+    return out
+
+
 def cmd_download(args):
-    """One dota.vpk per distinct SHA-1, into work/maps/<sha1>.vpk."""
+    """One dota.vpk per distinct per-patch map, into work/maps/<sha1>.vpk; a pause between Steam logins (one login
+    per manifest — ~110 logins in half an hour got 'RateLimitExceeded')."""
     hist = json.load(open(os.path.join(args.work, "map_history.json"), encoding="utf-8"))
+    maps = patch_maps(hist)
     want = {}
-    for rows in hist.values():
-        for r in rows:
-            if r.get("sha1") and r["sha1"] != "?":
-                want.setdefault(r["sha1"], r["manifest"])
+    for ver, m in maps.items():
+        if _ver_key(args.start) <= _ver_key(ver):
+            want.setdefault(m["sha1"], m["manifest"])
     os.makedirs(os.path.join(args.work, "maps"), exist_ok=True)
     flist = os.path.join(args.work, "filelist.txt")
     open(flist, "w").write(MAP_FILE.replace("\\", "/") + "\n")
@@ -121,13 +138,20 @@ def cmd_download(args):
         if os.path.exists(dest):
             continue
         tmp = os.path.join(args.work, "dl", mid)
-        _dd(["-manifest", mid, "-filelist", flist, "-dir", tmp], args.work)
+        for attempt in range(6):
+            r = _dd(["-manifest", mid, "-filelist", flist, "-dir", tmp], args.work)
+            if "RateLimitExceeded" not in (r.stdout + r.stderr):
+                break
+            print("rate limited, waiting 30 min", flush=True)          # every retry is a login: wait it out
+            time.sleep(1800)
         got = os.path.join(tmp, *MAP_FILE.split("\\"))
         if os.path.exists(got):
             os.replace(got, dest)
             print("got", sha[:8], "from", mid, flush=True)
         else:
-            print("FAILED", sha[:8], mid, flush=True)
+            print("FAILED", sha[:8], mid, (r.stdout + r.stderr)[-300:], flush=True)
+        time.sleep(args.pause)
+    json.dump(maps, open(os.path.join(args.work, "patch_maps.json"), "w", encoding="utf-8"), indent=1)
 
 
 def main():
@@ -139,6 +163,8 @@ def main():
     h.add_argument("--work", required=True)
     d = sub.add_parser("download")
     d.add_argument("--work", required=True)
+    d.add_argument("--from", dest="start", default="7.38")
+    d.add_argument("--pause", type=float, default=90, help="seconds between Steam logins")
     args = ap.parse_args()
     os.makedirs(args.work, exist_ok=True)
     {"hashes": cmd_hashes, "download": cmd_download}[args.cmd](args)
