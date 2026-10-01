@@ -3,8 +3,10 @@ bright, it should look like leamare's"): a colour lookup table fitted once on 7.
 import os
 import sys
 
-import numpy as np
-from PIL import Image
+import pytest
+
+np = pytest.importorskip("numpy")              # map tools run locally; CI installs no imaging libraries
+Image = pytest.importorskip("PIL.Image")
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
