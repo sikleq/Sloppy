@@ -184,6 +184,12 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   brightness, a soft shadow under the map's edge. Tried before: mirroring the edge (duplicated cliffs), a blurred
   fade (murky), six big source windows (on Radiant's lawns every big window has bushes or paving: bushes and paving
   got copied, then the few clean patches ran out).
+- Map size changes (the owner 2026-10-01: "what if a patch's map was a different size?"): trees and buildings
+  reach ±7680 units until 7.32 (6.83-7.32 legacy maps), ±8768 from 7.33 (7.37-7.39e), slightly more from 7.40
+  (x to 8960, y to -9088); the ancients never moved. Every picture uses one world rectangle and scale (2 units/px),
+  so a smaller map is drawn smaller, at its true size, and the slider and the object layers stay aligned.
+  `stitch_sfm.check_fits` stops a render whose frames don't cover the rectangle or whose objects (`--mapdata`)
+  come closer than 300 units to its edge — then the camera path and data/terrain_map_meta.json must grow.
 - Provenance: `data/map/renders.json` lists the versions whose picture is ours; the Terrain page's credit line
   ("Inspired by Leamare and devilesk", linked to their repositories, kept to the minimum — the owner
   2026-10-01) names a version whose map is still borrowed (a picture not in renders.json, map objects without

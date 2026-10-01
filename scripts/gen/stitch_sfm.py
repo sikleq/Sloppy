@@ -13,6 +13,7 @@ in-game capture's orange camp glows, lime grass or blocky FSR upscaling.
     2. python scripts/gen/stitch_sfm.py SESSION.dmx FRAMES 7.41 --work D:\\maprender
 """
 import argparse
+import json
 import glob
 import math
 import os
@@ -336,6 +337,31 @@ def _land_colour(a, known, box, q=8, reach=640):
     return big[oy:oy + (y1 - y0), ox:ox + (x1 - x0)]
 
 
+def check_fits(prints, width, height, rect, objects=(), margin=300):
+    """What is wrong with this render's coverage, as a list of messages (empty: fine). The owner 2026-10-01:
+    "what if a patch's map was a different size?" — sizes did change: trees and buildings reach ±7680 units until
+    7.32, ±8768 from 7.33, a little more from 7.40; the ancients never moved. Every picture shares one world
+    rectangle and scale, so a smaller map is simply drawn smaller; a bigger one must not be cut off. Checked: the
+    frames together cover the rectangle, and every object (x, y) lies inside it with `margin` units to spare."""
+    x0, x1, y0, y1 = rect
+    upp = prints[0][3]
+    cx = [c[0] for c, *_ in prints]
+    cy = [c[1] for c, *_ in prints]
+    fx0, fx1 = min(cx) - width * upp / 2, max(cx) + width * upp / 2
+    fy0, fy1 = min(cy) - height * upp / 2, max(cy) + height * upp / 2
+    out = []
+    if fx0 > x0 or fx1 < x1 or fy0 > y0 or fy1 < y1:
+        out.append(f"the frames cover x {fx0:.0f}..{fx1:.0f}, y {fy0:.0f}..{fy1:.0f}, "
+                   f"not the whole picture x {x0:.0f}..{x1:.0f}, y {y0:.0f}..{y1:.0f}")
+    if objects:
+        ox = [x for x, _ in objects]
+        oy = [y for _, y in objects]
+        if min(ox) - margin < x0 or max(ox) + margin > x1 or min(oy) - margin < y0 or max(oy) + margin > y1:
+            out.append(f"the map's objects reach x {min(ox)}..{max(ox)}, y {min(oy)}..{max(oy)}: closer than "
+                       f"{margin} units to the picture's edge — widen it (data/terrain_map_meta.json)")
+    return out
+
+
 def fill_void(img, shade=0.8, shadow=90, near_px=2500):
     """The corners beyond the map's edge (nothing renders there: black) painted in our own way (the owner
     2026-10-01: "fill the black corners, in our own way" — then "the bottom-left is all murky; leamare's looks more
@@ -381,6 +407,7 @@ def main():
     ap.add_argument("version")
     ap.add_argument("--work", required=True, help="a folder outside the repo")
     ap.add_argument("--upp", type=float, default=2.0, help="game units per pixel of the full picture")
+    ap.add_argument("--mapdata", help="the version's mapdata json (extract_map_entities.py): its objects must fit")
     args = ap.parse_args()
     frames, quat, fov, width, height = camera_path(session_text(args.session))
     files = sorted(glob.glob(os.path.join(args.frames, "*.png")))
@@ -394,6 +421,15 @@ def main():
     # have nothing to match and 7.22 measured 3.93 against the lens's 1.09
     if upp and abs(upp / lens - 1) < 0.01:
         prints = [(c, r, u, upp) for c, r, u, _ in prints]
+    objects = []
+    if args.mapdata:
+        with open(args.mapdata, encoding="utf-8") as f:
+            md = json.load(f)["data"]
+        objects = [(e["x"], e["y"]) for k in ("ent_dota_tree", "npc_dota_fort", "npc_dota_tower", "npc_dota_barracks")
+                   for e in md.get(k, []) if "x" in e]
+    problems = check_fits(prints, width, height, world_rect(), objects)
+    if problems:
+        raise SystemExit("this render does not fit: " + "; ".join(problems))
     full = fill_void(stitch(files, prints, args.upp, world_rect()))
     full.save(os.path.join(args.work, f"map_{args.version}_sfm_full.png"))
     full.resize((SITE_PX, SITE_PX), Image.LANCZOS).save(

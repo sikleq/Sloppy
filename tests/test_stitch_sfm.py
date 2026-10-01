@@ -30,6 +30,21 @@ def test_the_cross_fade_weights_of_two_neighbours_add_up_to_one():
     assert a[0] == 1 and b[-1] == 1
 
 
+def test_a_render_must_cover_the_picture_and_hold_the_whole_map():
+    text = ss.session_text(os.path.join(_ROOT, "tests", "fixtures", "sfm_session_text.dmx")) \
+        if os.path.exists(os.path.join(_ROOT, "tests", "fixtures", "sfm_session_text.dmx")) else None
+    frames = [np.array([x, y, 240000.0]) for y in (-9793.1 + 2000 * j for j in range(11))
+              for x in (-6000 + 3600 * i for i in range(6))]
+    prints = ss.footprints(frames, SESSION_QUAT, 1.0, 3840)
+    rect = (-10014, 9984, -10750, 10101)                          # the site's picture rectangle
+    assert ss.check_fits(prints, 3840, 2160, rect, [(-8704, -9088), (8960, 8704)]) == []      # 7.41's extent
+    assert ss.check_fits(prints, 3840, 2160, rect, [(-7680, -7168), (7680, 7424)]) == []      # a pre-7.33 map
+    big = ss.check_fits(prints, 3840, 2160, rect, [(-9900, 0)])                               # a bigger map
+    assert len(big) == 1 and "closer than" in big[0]
+    short = ss.check_fits(prints[:-6], 3840, 2160, rect)                                      # top row missing
+    assert len(short) == 1 and "not the whole picture" in short[0]
+
+
 def test_the_seam_runs_where_the_two_patches_differ_least():
     err = np.full((20, 10), 9.0)
     err[:, 6] = 0                                                # a free column
