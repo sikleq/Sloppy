@@ -93,6 +93,28 @@ def test_the_page_before_names_the_patches_that_changed_nothing():
     assert "7.39e changed nothing on the map." in _page("7.39d", runs["7.39d"])
 
 
+def test_the_zoom_tiles_are_named_on_the_slider(monkeypatch):
+    """The owner: "is this quality normal when zoomed?" — fullscreen zoom lays 8192 tiles from Oldgrowth over the
+    4096 pictures; the slider says where each side's tiles are, only for pictures that have them."""
+    monkeypatch.setattr(terrain, "_tiled_pictures", lambda: {"7.39", "7.39b"})
+    html = terrain._compare_html("7.39", "7.39b", "", "7.39", "7.39b")
+    assert 'data-tiles-old="https://sikleq.github.io/Oldgrowth/tiles/7.39/"' in html
+    assert 'data-tiles-new="https://sikleq.github.io/Oldgrowth/tiles/7.39b/"' in html
+    monkeypatch.setattr(terrain, "_tiled_pictures", lambda: {"7.39b"})
+    assert "data-tiles-old" not in terrain._compare_html("7.39", "7.39b", "", "7.39", "7.39b")
+
+
+def test_map_tiles_cut_the_squeezed_square():
+    pytest = __import__("pytest")
+    Image = pytest.importorskip("PIL.Image")
+    sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
+    import map_tiles
+    full = Image.new("RGB", (100, 120), (10, 20, 30))
+    got = map_tiles.tiles(full, size=64, grid=4)
+    assert len(got) == 16 and {im.size for _r, _c, im in got} == {(16, 16)}
+    assert (got[5][0], got[5][1]) == (1, 1)
+
+
 def test_the_picker_lists_patches_not_ranges():
     html = terrain._picker_html(["7.39b", "7.39"], "7.39b")
     assert '<a class="version-item current" href="terrain_739b.html"' in html and "–" not in html

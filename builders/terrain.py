@@ -574,8 +574,11 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None):
     old_map = f"icons/maps/map_{old_pic or old_ver}.webp"
     new_map = f"icons/maps/map_{new_pic or new_ver}.webp"
     top_bar, fs_bar = _controls_html(layers=bool(markers_svg))
+    tiled = _tiled_pictures()
+    tiles = "".join(f' data-tiles-{side}="{_TILES_BASE}{v}/"'
+                    for side, v in (("old", old_pic or old_ver), ("new", new_pic or new_ver)) if v in tiled)
     return (
-        '<div class="terrain-compare" data-pos="50" data-zoom="1.9" data-lens="184">\n'
+        f'<div class="terrain-compare" data-pos="50" data-zoom="1.9" data-lens="184"{tiles}>\n'
         f'{top_bar}'
         '  <div class="tc-fs-canvas">\n'
         '    <div class="tc-stage">\n'
@@ -704,6 +707,21 @@ def _own_pictures():
         with open(_os.path.join(_HERE, "data", "map", "renders.json"), encoding="utf-8") as f:
             return set(_json.load(f)["pictures"])
     except (OSError, ValueError, KeyError):
+        return set()
+
+
+# Fullscreen zoom tiles (scripts/gen/map_tiles.py): 16 x 16 tiles of an 8192 picture per map file, kept in
+# Oldgrowth and served by its GitHub Pages (the owner 2026-10-02 chose that over growing Sloppy). renders.json
+# "tiles" lists the pictures that have them.
+_TILES_BASE = "https://sikleq.github.io/Oldgrowth/tiles/"
+
+
+def _tiled_pictures():
+    """Picture versions with zoom tiles published (data/map/renders.json "tiles")."""
+    try:
+        with open(_os.path.join(_HERE, "data", "map", "renders.json"), encoding="utf-8") as f:
+            return set(_json.load(f).get("tiles", []))
+    except (OSError, ValueError):
         return set()
 
 

@@ -4,6 +4,13 @@
     {
       "date": "2026-10-02",
       "category": "Materials",
+      "minor": true,
+      "link": "terrain_741.html",
+      "title": "Terrain: zooming in fullscreen stays sharp — the part in view loads at twice the detail"
+    },
+    {
+      "date": "2026-10-02",
+      "category": "Materials",
       "title": "Terrain: a page for every patch, letter patches included",
       "link": "terrain_739b.html",
       "items": [

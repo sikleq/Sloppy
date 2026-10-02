@@ -6871,6 +6871,55 @@ function ecShopMarkup(panels) {
     function fsGetL() { return parseFloat(stage.style.left) || 0; }
     function fsGetT() { return parseFloat(stage.style.top)  || 0; }
 
+    // ---- Fullscreen zoom tiles: once a picture pixel would be drawn bigger than a
+    // screen pixel, 512-px tiles of an 8192 picture (data-tiles-old / -new, from
+    // Oldgrowth — scripts/gen/map_tiles.py) cover the visible part of each picture.
+    // Only the tiles in view are fetched; the 4096 picture shows until they land. ----
+    var TILE_GRID = 16, BASE_PX = 4096;
+    var tileSets = [];
+    [['Old', stage, '.tc-old'], ['New', root.querySelector('.tc-new-layer'), '.tc-new']].forEach(function(p) {
+      var base = root.dataset['tiles' + p[0]];
+      var host = p[1];
+      if (!base || !host) return;
+      var box = document.createElement('div');
+      box.className = 'tc-tiles';
+      box.style.display = 'none';
+      var img = host.querySelector(p[2]);
+      host.insertBefore(box, img ? img.nextSibling : host.firstChild);
+      tileSets.push({ base: base, box: box, have: {} });
+    });
+    function updateTiles() {
+      if (!tileSets.length) return;
+      var w = parseFloat(stage.style.width) || 0;
+      var on = fsActive && w * (window.devicePixelRatio || 1) > BASE_PX * 1.05;
+      tileSets.forEach(function(t) { t.box.style.display = on ? '' : 'none'; });
+      if (!on) return;
+      var sr = stage.getBoundingClientRect(), cr = fsCanvas.getBoundingClientRect();
+      var cw = sr.width / TILE_GRID, ch = sr.height / TILE_GRID;
+      var c0 = Math.max(0, Math.floor((cr.left - sr.left) / cw));
+      var c1 = Math.min(TILE_GRID - 1, Math.floor((cr.right - sr.left) / cw));
+      var r0 = Math.max(0, Math.floor((cr.top - sr.top) / ch));
+      var r1 = Math.min(TILE_GRID - 1, Math.floor((cr.bottom - sr.top) / ch));
+      tileSets.forEach(function(t) {
+        for (var r = r0; r <= r1; r++) {
+          for (var c = c0; c <= c1; c++) {
+            var k = r + '_' + c;
+            if (t.have[k]) continue;
+            var im = document.createElement('img');
+            im.className = 'tc-tile';
+            im.alt = '';
+            im.draggable = false;
+            im.decoding = 'async';
+            im.style.left = (c * 100 / TILE_GRID) + '%';
+            im.style.top = (r * 100 / TILE_GRID) + '%';
+            im.src = t.base + k + '.webp';
+            t.box.appendChild(im);
+            t.have[k] = true;
+          }
+        }
+      });
+    }
+
     function fsEnter() {
       if (!pane) return;
       var req = pane.requestFullscreen || pane.webkitRequestFullscreen;
@@ -6900,6 +6949,7 @@ function ecShopMarkup(panels) {
           stage.style.width = fsBaseW + 'px';
           stage.style.left = '0px';
           stage.style.top = ((cr.height - fsBaseW) / 2) + 'px';
+          updateTiles();
         }, 60);
       } else if (fsActive) {
         pane.classList.remove('tc-fs-active');
@@ -6908,6 +6958,7 @@ function ecShopMarkup(panels) {
         stage.style.top = '';
         stage.style.transform = '';
         fsActive = false;
+        updateTiles();
       }
     }
     document.addEventListener('fullscreenchange', onFullscreenChange);
@@ -6937,6 +6988,7 @@ function ecShopMarkup(panels) {
           fsRaf = null;
           stage.style.left = nl + 'px';
           stage.style.top  = nt + 'px';
+          updateTiles();
         });
       });
       window.addEventListener('mouseup', function(e) {
@@ -6959,6 +7011,7 @@ function ecShopMarkup(panels) {
         stage.style.width = newW + 'px';
         stage.style.left = (mx - ratio * (mx - oldL)) + 'px';
         stage.style.top  = (my - ratio * (my - oldT)) + 'px';
+        updateTiles();
       }, { passive: false });
     }
   }

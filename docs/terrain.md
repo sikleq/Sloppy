@@ -304,6 +304,15 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   patch before's, both files pictured → a page `terrain_<code>.html` (unless quiet, below). The OLD side is labelled with
   the patch right before and shows the picture of the file that patch ran — 7.40b shipped 7.40's file, so the 7.40c
   page compared `map_7.40.webp`. A patch with terrain notes but no step still gets a page, with the fallback.
+- **Fullscreen zoom tiles (2026-10-02)** — the owner: "is this quality normal when zoomed?" (fullscreen zoom goes to
+  8× the screen width, the 4096 picture blurred). `scripts/gen/map_tiles.py FULL.png OUT` squeezes the full render
+  into an 8192 square (the 4096 picture's own geometry, ×2) and cuts 16 × 16 webp tiles of 512 px (~10 MB a map).
+  They live in Oldgrowth `tiles/<ver>/<row>_<col>.webp`, served by its GitHub Pages
+  (`https://sikleq.github.io/Oldgrowth/`, `.nojekyll`) — the owner chose that over growing Sloppy by ~190 MB.
+  `data/map/renders.json` "tiles" lists the pictures that have them → `_compare_html` writes
+  `data-tiles-old/-new`; scripts.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
+  picture — the old ones next to `.tc-old`, the new ones inside the clipped `.tc-new-layer` — once a picture pixel
+  would be drawn bigger than a screen pixel. Pages' 1 GB limit: tiles for the site's maps only.
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
   a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
   (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —

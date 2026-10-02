@@ -9402,6 +9402,19 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   clip-path: inset(0 calc(100% - var(--pos)) 0 0);
   will-change: clip-path;
 }
+/* Fullscreen zoom tiles (scripts.js updateTiles): 16 x 16 tiles of an 8192 picture laid over each 4096 picture
+   once it is drawn bigger than 1:1. A hair wider than 1/16 so rounding never opens a seam. */
+.tc-tiles { position: absolute; inset: 0; pointer-events: none; }
+.tc-tile {
+  position: absolute;
+  width: calc(6.25% + 0.6px);
+  height: calc(6.25% + 0.6px);
+  max-width: none;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
 .tc-handle {
   position: absolute;
   top: 0;

@@ -1,5 +1,5 @@
 {
-  "about": "Map files whose top-down picture (icons/maps/map_<ver>.webp, <ver> = the first patch that shipped the file) we rendered ourselves; every other picture is still a borrowed render. sfm = Source Filmmaker, scripts/gen/stitch_sfm.py (docs/terrain.md); sfm-7.40c = rendered on the 7.40c build of the game (the current engine breaks older maps' water). 7.39's two pink templar gates are mended from 7.39b (scripts/gen/mend_map.py). The Terrain page's credit line names whatever is still borrowed.",
+  "about": "Map files whose top-down picture (icons/maps/map_<ver>.webp, <ver> = the first patch that shipped the file) we rendered ourselves; every other picture is still a borrowed render. sfm = Source Filmmaker, scripts/gen/stitch_sfm.py (docs/terrain.md); sfm-7.40c = rendered on the 7.40c build of the game (the current engine breaks older maps' water). 7.39's two pink templar gates are mended from 7.39b (scripts/gen/mend_map.py). The Terrain page's credit line names whatever is still borrowed. \"tiles\": the pictures with fullscreen zoom tiles in Oldgrowth (scripts/gen/map_tiles.py, served at https://sikleq.github.io/Oldgrowth/tiles/<ver>/).",
   "pictures": {
     "7.38": "sfm-7.40c",
     "7.38b": "sfm-7.40c",
@@ -17,5 +17,23 @@
     "7.41d": "sfm",
     "7.41e": "sfm",
     "7.41f": "sfm"
-  }
+  },
+  "tiles": [
+    "7.38",
+    "7.38b",
+    "7.38c",
+    "7.39",
+    "7.39b",
+    "7.39c",
+    "7.39d",
+    "7.39e",
+    "7.40",
+    "7.40c",
+    "7.41",
+    "7.41a",
+    "7.41c",
+    "7.41d",
+    "7.41e",
+    "7.41f"
+  ]
 }
