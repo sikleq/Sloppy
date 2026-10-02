@@ -24,14 +24,11 @@ cropped map renders (verified by overlaying all trees on the map image). The cro
 box is shared across every version, so the same projector places any patch's
 markers correctly.
 
-Refresh the cached inputs + rebuild ALL pairs with::
+Since 2026-10-02 every map file 7.38-7.41f is our own (data/map/mapdata_<code>.json, one per distinct map file,
+named by the first patch that shipped it), and the default pairs are the Terrain pages' steps
+(builders/map_versions.py): every patch whose map file differs from the patch before's, old file -> new file::
 
-    mkdir -p .cache/leamare
-    for v in 739 740 741; do
-      curl -s "https://raw.githubusercontent.com/leamare/dota-interactive-map/master/assets/data/$v/mapdata.json" \
-        -o ".cache/leamare/mapdata_$v.json"
-    done
-    python scripts/gen/build_terrain_diff.py            # default pairs below
+    python scripts/gen/build_terrain_diff.py            # every step -> data/terrain_diff_<patch>.json
     python scripts/gen/build_terrain_diff.py 739:740    # or a single pair
 """
 import json
@@ -42,9 +39,16 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))  # scripts/gen -> scripts -> repo root
 _CACHE = os.path.join(_ROOT, ".cache", "leamare")
 
-# old_code -> new_code pairs. Each NEW patch gets its own diff file. Codes are the
-# leamare/tile-server form (no dot); the diff is keyed by the dotted NEW version.
-DEFAULT_PAIRS = [("739", "740"), ("740", "741")]
+sys.path.insert(0, _ROOT)
+from builders import map_versions  # noqa: E402
+
+
+def default_pairs():
+    """(old_code, new_code, page) for every Terrain step. Codes have no dot; the diff is saved under the step's own
+    patch (the page that reads it) — not the new file's first patch, which differs if a patch ever brings back an
+    older map file."""
+    return [(map_versions.code(s.old_pic), map_versions.code(s.new_pic), s.patch) for s in map_versions.steps()]
+
 
 # Point-entity layers (full old+new sets → toggleable slider-split map layers).
 # leamare keys (layerDefinitions.js): Outpost == npc_dota_watch_tower (2),
@@ -187,9 +191,11 @@ def _diff_pair(old_code, new_code):
 
 def main(pairs):
     from collections import Counter
-    for old_code, new_code in pairs:
+    for pair in pairs:
+        old_code, new_code = pair[:2]
         diff = _diff_pair(old_code, new_code)
-        out = os.path.join(_ROOT, "data", f"terrain_diff_{diff['newVer']}.json")
+        page = pair[2] if len(pair) > 2 else diff["newVer"]
+        out = os.path.join(_ROOT, "data", f"terrain_diff_{page}.json")
         with open(out, "w", encoding="utf-8") as f:
             json.dump(diff, f, separators=(",", ":"))
         tiers = Counter(c["tier"] for c in diff["campsNew"])
@@ -210,7 +216,7 @@ def _parse_args(argv):
         if ":" in a:
             o, n = a.split(":", 1)
             pairs.append((o.replace(".", ""), n.replace(".", "")))
-    return pairs or DEFAULT_PAIRS
+    return pairs or default_pairs()
 
 
 if __name__ == "__main__":

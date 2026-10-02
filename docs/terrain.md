@@ -1,4 +1,4 @@
-# Terrain page (`terrain.html`)
+# Terrain pages (`terrain_<code>.html`)
 
 5th tab under **Materials**. Compares the Dota map **old → new** with a swipe
 slider, plus that patch's *Terrain Changes* list. Built by `builders/terrain.py`
@@ -199,6 +199,15 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
 - Check the first exported frame: now and then (3 of 26 exports) SFM writes frame 0 before the camera reaches its
   first key — a patch of Radiant jungle instead of the empty bottom-left corner (mean brightness ~102 against
   ~25). That frame is the empty corner, so a sound frame 0 of the same map from another export replaces it.
+- Pink objects = a material the build we render on lacks. 7.39's release map file holds two "templar gates"
+  (`npc_dota_unit_templar_gate`, the Twin Gate model `team_portal.vmdl` with skin 2, at (1875, -5075) and
+  (-1527, 4000)) that no patch note mentions and 7.39b removed; the 7.40c build has no material for that skin. The
+  owner (2026-10-02, "shouldn't this pink object be gone in 7.39?") — they're mended out:
+  `scripts/gen/mend_map.py BAD_full.png DONOR_full.png OUT NAME --at=x,y …` takes the pink object (+ its rim and
+  shadow, ≤6 px) from a donor render with the same ground there (7.39b: nothing moved within 900 units), not the
+  ground around it — 7.39b painted grass where the portal stood, 7.39 keeps its sand. The unmended render is kept
+  as `map_<sha8>_sfm_full_pink.png`; the work script `stitch_final.py` (`MEND`) re-applies it. Tests:
+  tests/test_mend_map.py.
 - Map history: `scripts/gen/map_history.py` — which dota.vpk each patch shipped (SHA-1 from depot 373301's
   manifests, one Steam login per manifest, with pauses: Steam rate-limits logins) and one download per distinct
   file. 7.38-7.41f: 16 map files; 7.08-7.37: 49. Their pictures, objects and counts go to
@@ -213,8 +222,8 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   ("Inspired by Leamare and devilesk", linked to their repositories, kept to the minimum — the owner
   2026-10-01) names a version whose map is still borrowed (a picture not in renders.json, map objects without
   `data/map/mapdata_<code>.json`), so it never claims more than is true. Tests: tests/test_terrain_credit.py.
-- 7.41 on the site since 2026-10-01 (`icons/maps/map_7.41.webp`): registered on the old picture's grid within
-  ±1 px at 4096 (phase correlation at five spots), so the 7.40 ↔ 7.41 slider still lines up.
+- Since 2026-10-02 every map file 7.38-7.41f is on the site (`icons/maps/map_<first patch>.webp`, the Oldgrowth
+  pictures) and every patch whose file changed has its own Terrain page ("One page per patch" below).
 - Clicking SFM: no command opens SFM or a session, and SFM in Dota has no Python (the script window has no
   interpreter behind it), so it is driven through its menus.
 
@@ -283,27 +292,30 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
 
 ## Patch picker + per-patch data (added 2026-06-04)
 
-- **Picker** (`_picker_html`) — gold-skinned calendar year-picker in a
-  `.cal-toggle-bar` toolbar, lists every patch with terrain changes (newest
-  first). `scripts.js initTerrainPicker` toggles `.terrain-map-pane` +
-  `.terrain-list-pane` by `data-patch`.
-- **Change lists are PARSED from `content/` patch files** (`builders/terrain.py::_terrain_changes_by_patch`)
+- **Picker** (`_picker_html`) — the version menu in the header nav (`.nav-context-terrain`): one link per Terrain
+  page, newest first; the subpatch arrows (`initSubpatchPicker`) step to the neighbouring links.
+- **Change lists are PARSED from `content/` patch files** (`builders/terrain.py::_terrain_notes_by_patch`)
   → no drift. One `(text, TAG)` list per `plain_header("Terrain Changes")`
   section. `b(...)` rows → BUFF/NERF by direction honouring `l=True`.
-- **Map pairs** — `_MAP_PAIRS` maps `patch → (old_ver, new_ver)` for every patch
-  we hold matched old→new webp for. Today: `7.41`→(7.40,7.41) and
-  `7.40`→(7.39,7.40). `_compare_html(old_ver, new_ver, markers_svg)` builds the
-  swipe slider for any pair (map URLs derived from the versions).
-- **Markers + layer toolbar are PER-PATCH** — each patch ships its own
-  `data/terrain_diff_<ver>.json` (`scripts/gen/build_terrain_diff.py <prev>:<new>`,
-  generic keys `treesOld/New`, `campsOld/New`, `entities`). `save_terrain_html`
-  builds `markers_by_patch` / `counts_by_patch` via `_load_diff(ver)` and renders
-  each pane's overlays. The SHARED crop meta (`terrain_map_meta.json`) projects
-  any patch's markers correctly — no per-patch projection. A pair WITHOUT a diff
-  passes empty `markers_svg` → `_controls_html(layers=False)` (Zoom only, no dead
-  toggles). **Add a new patch:** (1) `build_terrain_maps.py <prev> <new> …ALL…`
-  (shared crop must stay put), (2) `build_terrain_diff.py <prev>:<new>`, (3) add a
-  `_MAP_PAIRS` entry; `git add` the new `map_<ver>.webp` + `terrain_diff_<ver>.json`.
+- **One page per patch (2026-10-02)** — the owner: "the difference between the letter patches has to be shown too,
+  not just two major versions" (7.39b's own changes used to sit under a 7.39 → 7.40 slider). `builders/map_versions.py`
+  reads `data/map/patch_maps.json` (which map file every patch shipped — `map_history.py`'s `patch_maps.json`) and
+  `data/map/renders.json` (the files we hold a picture of). A **step** = a patch whose map file differs from the
+  patch before's, both files pictured: 7.38b … 7.41f, 15 pages `terrain_<code>.html`. The OLD side is labelled with
+  the patch right before and shows the picture of the file that patch ran — 7.40b shipped 7.40's file, so the 7.40c
+  page compares `map_7.40.webp` and says "7.40b kept the map file of 7.40". A same-file patch (7.40b, 7.41b) gets no
+  page. A patch with terrain notes but no step still gets one, with the fallback.
+- **Pictures and objects per map file**, named by the FIRST patch that shipped the file: `icons/maps/map_<ver>.webp`,
+  `data/map/mapdata_<code>.json` (so `mapdata_741` = 7.41's release map, 2476 trees; `741f` = today's, 2475).
+- **Each page's list = that patch's own notes**; a patch whose notes list none shows "The patch notes list no terrain
+  changes." Under the counts, **"Moved in the map file"** (`_moved_summary`, read off the diff: "trees +38 −27, camps
+  moved: 2, towers moved: 1, watchers moved: 1" for 7.39b — what its notes say) or "nothing (the file still changed)".
+- **Markers + layer toolbar** — every step ships `data/terrain_diff_<patch>.json`
+  (`python scripts/gen/build_terrain_diff.py` builds every step; `<old>:<new>` one pair; generic keys
+  `treesOld/New`, `campsOld/New`, `entities`). The SHARED crop meta (`terrain_map_meta.json`) projects any patch's
+  markers. A pair WITHOUT a diff passes empty `markers_svg` → `_controls_html(layers=False)` (Zoom only).
+  **Add a new patch:** render its map file (SFM section), copy the picture + `mapdata` under the first-shipping
+  patch's name, refresh `data/map/patch_maps.json` + `renders.json`, run `build_terrain_diff.py`; the page appears.
 - **scripts.js inits ALL sliders** — `initTerrainCompare` does
   `querySelectorAll('.terrain-compare').forEach(initOneTerrainCompare)`; the
   default-hidden second pane (7.40) still gets a working handle/lens/toggles so the
@@ -313,18 +325,16 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   isn't available yet" overlay; the textual change list still renders.
 - **Deep-link from patch pages** — `plain_header("Terrain Changes",
   terrain_link="<base_ver>")` (`patch/elements.py`) renders a gold `.terrain-jump-btn`
-  "View on map" link in the section header → `../terrain.html?patch=<base_ver>`.
-  `initTerrainPicker` reads `?patch=` on load and preselects that pane via the
-  existing picker. ONE shared page — no per-patch `terrain_<ver>.html`.
-  ⚠ The parser regex is `plain_header\("Terrain Changes"` (no trailing `\)`) so
+  "View on map" link in the section header → `../terrain_<code>.html` — that patch's own page (every patch with
+  terrain notes has one). The subpatch arrows (`initSubpatchPicker`) step to the neighbouring pages in the header
+  menu's order. ⚠ The parser regex is `plain_header\("Terrain Changes"` (no trailing `\)`) so
   the new `terrain_link=` arg doesn't make it miss every block.
 
 ## TODO / action items
 
 1. ✅ **No-map fallback** — done (`_fallback_html`).
-2. ✅ **Patch picker** — done; lists only patches with terrain changes, sourced
-   from `content/` so it can't drift. Next: when a NEW patch gets a real
-   old→new map pair, add it to `_MAP_PAIRS` + drop its maps in `icons/maps/`.
+2. ✅ **Patch picker** — done; one page per patch whose map file changed (+ any patch with terrain notes). A new
+   patch: see "One page per patch" above. Still to do: a 7.37e picture, so 7.38 gets its page too.
 3. ✅ **Marker redesign — done.** Toggleable tree + camp layers, both split
    old/new by the slider; magnifier lens. **Projection is now EXACT** — uses the
    real leamare transform (`src/js/conversion.js worldToLatLon` + mapConstants

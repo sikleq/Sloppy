@@ -1,31 +1,28 @@
-"""Build terrain.html — per-patch terrain comparison (Materials tab).
+"""Build terrain_<code>.html — one terrain comparison page per patch (Materials tab).
 
-A before/after **swipe slider** over each patch's old→new map renders, plus that
-patch's "Terrain Changes" list. The patch picker (heading) switches panes.
-Today two pairs ship: 7.41 (7.40→7.41) and 7.40 (7.39→7.40), each with the FULL
-marker toolbar (Trees / Camps / point-entities) from its committed
-``data/terrain_diff_<ver>.json``. See ``_MAP_PAIRS``.
+A before/after **swipe slider** over the map file a patch shipped against the
+one the patch before it ran, plus that patch's own "Terrain Changes" list and
+what moved in the map file. Every patch whose map file changed is a page
+(builders/map_versions.py: 7.38b … 7.41f), letter patches included; the header
+picker and the subpatch arrows step through them. Each page has the FULL marker
+toolbar (Trees / Camps / point-entities) from its committed
+``data/terrain_diff_<patch>.json``.
 
-Maps live in ``icons/maps/`` as ``map_<ver>.webp`` — all stitched from the
-spectral courier tile server and cropped to ONE shared content box
-(``scripts/gen/build_terrain_maps.py 7.39 7.40 7.41``) so every pair is pixel-aligned
-and the swipe handle lines up exactly. The same shared crop meta
-(``data/terrain_map_meta.json``) projects every patch's markers onto its own map.
+Maps live in ``icons/maps/`` as ``map_<ver>.webp``, one per distinct map file,
+named by the first patch that shipped it — our own Source Filmmaker renders
+(scripts/gen/stitch_sfm.py, docs/terrain.md) on ONE shared world box so every
+pair is pixel-aligned and the swipe handle lines up exactly. The same shared
+crop meta (``data/terrain_map_meta.json``) projects every patch's markers.
 
 The slider itself is driven by ``scripts.js`` (terrainCompareInit): the NEW
 image is clipped with ``clip-path: inset(...)`` to ``--pos`` and a draggable
 gold handle sets ``--pos`` (pointer + keyboard + click-to-position).
 
-**Terrain change list — source of truth:** the 7.41 "Terrain Changes" section
-in ``build_patch.py`` (search ``plain_header("Terrain Changes")``, ~line 13190).
-Keep this list in sync when the live patch terrain section changes; it is a
-small static list that only moves once per patch.
+**Terrain change list — source of truth:** every patch's "Terrain Changes"
+section in ``content/p*.py`` (``plain_header("Terrain Changes", terrain_link=…)``),
+parsed at build time; a patch whose notes list none says so.
 
-Run anytime (no manifest dependency). CI runs it after build_patch.py so the
-nav's latest-patch href is fresh::
-
-    python build_patch.py
-    python build_terrain.py
+``python build_site.py`` runs it (``save_terrain_html``).
 """
 import html as _html
 import json as _json
@@ -36,6 +33,7 @@ _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 _sys.path.insert(0, _HERE)
 
 import builders.site_common as _site
+import builders.map_versions as _map_versions
 ASSET_VERSION = _site.compute_asset_version()
 
 OLD_VER = "7.40"
@@ -277,31 +275,21 @@ def _latest_href():
 
 
 # ---- terrain change list -----------------------------------------------------
-# SOURCE OF TRUTH: the "Terrain Changes" sections in build_patch.py. Rather than
-# duplicate them (and risk drift), we PARSE them straight out of build_patch.py
-# at build time — one list per patch that has a terrain section. Today that's
-# 7.41 (the moves that line up with our 7.40->7.41 map diff) and 7.40 (the big
-# stream/Wisdom-Shrine/bridge rework). The patch picker shows every patch found.
+# SOURCE OF TRUTH: the "Terrain Changes" sections in content/p*.py. Rather than
+# duplicate them (and risk drift), we PARSE them straight out of the content files
+# at build time — one list per patch that has a terrain section.
 #
-# Patches we hold a matched OLD->NEW map pair for (so the swipe slider works);
-# any other patch with terrain changes still lists its changes but shows a
-# "comparison not available yet" fallback in place of the slider.
-_MAP_PAIRS = {
-    "7.41": ("7.40", "7.41"),   # icons/maps/map_7.40.webp + map_7.41.webp
-    "7.40": ("7.39", "7.40"),   # icons/maps/map_7.39.webp + map_7.40.webp
-}
-_RANGE_LABELS = {
-    "7.41": "7.40b – 7.41",
-    "7.40": "7.39b – 7.40",
-}
-# Picker shows only major versions (spectral only renders maps for major patches).
-# Letter patches (7.39b, 7.39d …) are grouped under the next major version that
-# has a map pair — their changes appear in that major version's change list with
-# a sub-patch header ("7.39d") so it's clear when each change landed.
-# Marker overlays + tree/camp counts come from a committed per-patch diff
-# (data/terrain_diff_<patch>.json). Any patch with one gets the full layer toolbar
-# (Trees / Camps / point-entities); patches without a diff show the slider + Zoom
-# only. The shared crop meta projects every patch's markers identically.
+# ONE PAGE PER PATCH (2026-10-02, the owner: "the difference between the letter
+# patches has to be shown too, not just two major versions"): every patch whose
+# map file differs from the patch before's is a step (builders/map_versions.py)
+# with its own page terrain_<code>.html comparing the two map files — its own
+# pictures, markers, counts and its own notes. A patch with terrain notes but no
+# step still gets a page, with a "comparison not available yet" fallback in place
+# of the slider. Patches that shipped the very same map file (7.40b, 7.41b) get
+# none; the next step's page names them.
+# Marker overlays + tree/camp counts come from the committed per-step diff
+# (data/terrain_diff_<patch>.json, scripts/gen/build_terrain_diff.py). The shared
+# crop meta projects every patch's markers identically.
 
 
 def _ver_key(v):
@@ -313,22 +301,11 @@ def _ver_key(v):
     return tuple(_part(x) for x in v.split("."))
 
 
-def _major(ver):
-    """'7.39d' -> '7.39',  '7.40' -> '7.40'."""
-    import re
-    return re.sub(r'[a-z]+$', '', ver)
-
-
-def _terrain_changes_by_patch():
+def _terrain_notes_by_patch():
     """Parse every ``plain_header("Terrain Changes")`` block from content/*.py.
 
-    Returns ``{major_ver: [(sub_patch, [(text, TAG), ...]), ...]}`` sorted
-    oldest-first within each major bucket so the subpatch headers appear in
-    chronological order in the change list.
-
-    Letter patches (7.39b, 7.39d …) are grouped under the next major version
-    that has a map pair in ``_MAP_PAIRS``.  A patch with no known major bucket
-    falls back to its own major version string so nothing is silently dropped.
+    Returns ``{patch: [(text, TAG, subgroup), ...]}`` — each patch's own notes
+    (its page shows only them; subgroup may be None).
     """
     import re, glob as _glob
     here = _HERE
@@ -384,29 +361,46 @@ def _terrain_changes_by_patch():
             rows.append((text, tag, cur_subgroup))
         if rows:
             raw.setdefault(patch_for(i), rows)
+    return raw
 
-    # Build sorted list of major versions from _MAP_PAIRS (newest-first for picker,
-    # but we need oldest-first to assign letter patches to the NEXT major bucket).
-    majors_asc = sorted(_MAP_PAIRS.keys(), key=_ver_key)
 
-    def _bucket(ver):
-        """Assign ver to the smallest major >= ver that is in _MAP_PAIRS."""
-        maj = _major(ver)
-        # If ver itself is major and in _MAP_PAIRS, use it directly.
-        if ver in _MAP_PAIRS:
-            return ver
-        # Otherwise find the next major version with a map pair.
-        for m in majors_asc:
-            if _ver_key(m) >= _ver_key(maj):
-                return m
-        return maj  # fallback: no map pair but still show
+# What moved in the map file, per point-entity layer of the diff (plural nouns).
+_MOVED_NAMES = {"towers": "towers", "lotus": "lotus pools", "twinGates": "twin gates",
+                "tormentors": "Tormentors", "bounty": "bounty runes", "power": "power runes",
+                "wisdom": "wisdom shrines", "outposts": "outposts", "watchers": "watchers",
+                "roshan": "Roshan pits"}
 
-    # Group into {major: [(subpatch, rows), ...]} oldest-first within each bucket.
-    grouped = {}
-    for ver in sorted(raw.keys(), key=_ver_key, reverse=True):
-        bucket = _bucket(ver)
-        grouped.setdefault(bucket, []).append((ver, raw[ver]))
-    return grouped
+
+def _moved_summary(diff):
+    """What moved between the step's two map files, read off its diff — e.g.
+    ["trees +38 −27", "camps moved: 2", "towers moved: 1"]; [] when nothing did.
+    A layer whose count changed reads "+added −removed", one that kept its count
+    "moved: n" (the Oldgrowth table says the same)."""
+    if not diff:
+        return []
+
+    def delta(old, new, name):
+        a, b = {tuple(p) for p in old}, {tuple(p) for p in new}
+        added, removed = len(b - a), len(a - b)
+        if not added and not removed:
+            return None
+        if len(old) == len(new):
+            return f"{name} moved: {added}"
+        return f"{name} +{added} −{removed}"
+
+    out = [delta(diff.get("treesOld", []), diff.get("treesNew", []), "trees")]
+    out.append(delta([(c["x"], c["y"]) for c in diff.get("campsOld", [])],
+                     [(c["x"], c["y"]) for c in diff.get("campsNew", [])], "camps"))
+    old_tier = {(c["x"], c["y"]): c.get("tier") for c in diff.get("campsOld", [])}
+    retiered = sum(1 for c in diff.get("campsNew", [])
+                   if (c["x"], c["y"]) in old_tier and old_tier[(c["x"], c["y"])] != c.get("tier"))
+    if retiered:
+        out.append(f"camp tiers changed: {retiered}")
+    for key, name in _MOVED_NAMES.items():
+        ed = diff.get("entities", {}).get(key)
+        if ed:
+            out.append(delta(ed.get("old", []), ed.get("new", []), name))
+    return [s for s in out if s]
 
 
 # Canonical tag order (same as the site convention): NEW → REWORK → BUFF →
@@ -560,8 +554,12 @@ def _controls_html(layers=True):
     return top_html, fs_html
 
 
-def _compare_html(old_ver, new_ver, markers_svg=""):
+def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None):
     """The before/after swipe stage + magnifier lens for an old→new map pair.
+
+    old_ver/new_ver label the two sides; old_pic/new_pic (default: the same) name
+    the pictures — a patch that kept the map file before it (7.40b) is shown with
+    the picture of the patch that first shipped that file (7.40).
 
     Layers: top control bar | OLD map (base) | .tc-new-layer (NEW map, clipped
     to --pos) | tree/camp SVG (above maps, NOT slider-clipped) | drag handle |
@@ -572,8 +570,8 @@ def _compare_html(old_ver, new_ver, markers_svg=""):
 
     markers_svg is non-empty when the patch ships a terrain_diff_<ver>.json; when
     empty, the layer-toggle buttons are dropped (Zoom stays)."""
-    old_map = f"icons/maps/map_{old_ver}.webp"
-    new_map = f"icons/maps/map_{new_ver}.webp"
+    old_map = f"icons/maps/map_{old_pic or old_ver}.webp"
+    new_map = f"icons/maps/map_{new_pic or new_ver}.webp"
     top_bar, fs_bar = _controls_html(layers=bool(markers_svg))
     return (
         '<div class="terrain-compare" data-pos="50" data-zoom="1.9" data-lens="184">\n'
@@ -643,6 +641,28 @@ def _counts_html(counts):
     )
 
 
+def _map_file_html(step, diff):
+    """Under the counts: what moved in the map file since the patch before (read
+    off the diff, so a patch Valve's notes say nothing about still shows its
+    changes), and the patch before when it kept an older patch's file (7.40b ran
+    7.40's map, so the 7.40c page's OLD side is 7.40's picture)."""
+    if step is None:
+        return ""
+    moved = _moved_summary(diff)
+    out = ('<p class="terrain-counts terrain-moved"><b>Moved in the map file:</b> '
+           f'{_esc(", ".join(moved)) if moved else "nothing (the file still changed)"}</p>\n')
+    if step.old_pic != step.before:
+        out += (f'<p class="terrain-counts terrain-same-file">{_esc(step.before)} kept the map file '
+                f'of {_esc(step.old_pic)}.</p>\n')
+    return out
+
+
+def _no_notes_html():
+    """The change list of a patch whose notes list no terrain changes."""
+    return ('<li class="terrain-no-notes"><span class="row-text">The patch notes list no terrain '
+            'changes.</span></li>')
+
+
 _INSPIRED_BY = (("Leamare", "https://github.com/leamare/dota-interactive-map"),
                 ("devilesk", "https://github.com/devilesk/dota-interactive-map"))
 
@@ -682,20 +702,19 @@ def _terrain_filename(ver, patches=None):
 
 def _picker_html(patches, current):
     """Version-picker dropdown styled as nav-context-flat nav-context-materials,
-    matching the aesthetic of non-patch pages while using href links."""
-    def _range_label(ver):
-        return _RANGE_LABELS.get(ver, ver)
-
+    matching the aesthetic of non-patch pages while using href links. One item
+    per page = per patch, newest first (scripts.js's subpatch arrows step
+    through them in this order)."""
     items = []
     for ver in patches:
         cls = "version-item current" if ver == current else "version-item"
         href = _terrain_filename(ver, patches)
         items.append(
             f'<a class="{cls}" href="{href}" role="menuitem">'
-            f'<span class="vi-name">{_esc(_range_label(ver))}</span>'
+            f'<span class="vi-name">{_esc(ver)}</span>'
             f'</a>')
     label = _site.get_materials_label('terrain') or 'Terrain'
-    current_label = _range_label(current)
+    current_label = _esc(current)
     return (
         '<div class="nav-context nav-context-flat nav-context-materials nav-context-picker nav-context-terrain">'
         f'<span class="version version-static version-materials">{label}</span>'
@@ -733,24 +752,35 @@ def _fallback_html(ver):
     )
 
 
-def _build_terrain_page(ver, patches, by_patch, markers_by_patch, counts_by_patch, subnav):
-    """Build one terrain HTML page for a single map-pair version."""
+def _pages(steps, notes):
+    """Every Terrain page, newest first: each step (a patch with its own map file)
+    and each patch with terrain notes."""
+    return sorted(set(steps) | set(notes), key=_ver_key, reverse=True)
+
+
+def _build_terrain_page(ver, patches, notes, step, diff, subnav):
+    """Build one terrain HTML page: patch ``ver``'s map file against the patch
+    before's (``step``, None when there's no pair → fallback), its own notes
+    (``notes`` = {patch: rows}) and what moved (``diff``)."""
     nav = _site.render_top_nav('materials', _latest_href(),
                                patch_context=False,
                                subtabs_active='terrain',
                                picker_html=_picker_html(patches, ver),
                                subnav_in_header=False)
 
-    ov = nv = None
-    if ver in _MAP_PAIRS:
-        ov, nv = _MAP_PAIRS[ver]
-        map_inner = _compare_html(ov, nv, markers_by_patch.get(ver, ""))
+    markers, counts = (_markers_svg(diff, ver.replace(".", "")) if SHOW_MARKERS and diff
+                       else ("", {}))
+    if step:
+        map_inner = _compare_html(step.before, ver, markers, step.old_pic, step.new_pic)
+        credit = _source_html(step.old_pic, step.new_pic)
     else:
         map_inner = _fallback_html(ver)
+        credit = _source_html()
 
-    counts_html = _counts_html(counts_by_patch.get(ver, {}))
-    subs = by_patch.get(ver, [])
-    first_ver = subs[0][0] if subs else ver
+    counts_html = _counts_html(counts) + _map_file_html(step, diff)
+    rows = notes.get(ver)
+    list_html = _changes_html([(ver, rows)], skip_first_head=True) if rows else _no_notes_html()
+    first_ver = ver
 
     return (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
@@ -771,12 +801,12 @@ def _build_terrain_page(ver, patches, by_patch, markers_by_patch, counts_by_patc
         '<div class="terrain-compare-col">\n'
         f'<div class="terrain-map-pane" data-patch="{ver}">\n'
         f'{map_inner}</div>\n'
-        f'{_source_html(ov, nv)}'
+        f'{credit}'
         '</div>\n'
         '<div class="terrain-list-box">\n'
         f'<div class="terrain-list-pane" data-patch="{ver}">\n'
         f'<div class="terrain-subpatch-head terrain-subpatch-top">{_esc(first_ver)}</div>\n'
-        f'<ul class="changes terrain-list">\n{_changes_html(subs, skip_first_head=True)}\n</ul>\n'
+        f'<ul class="changes terrain-list">\n{list_html}\n</ul>\n'
         f'{counts_html}'
         '</div>\n'
         '</div>\n'
@@ -791,24 +821,15 @@ def _build_terrain_page(ver, patches, by_patch, markers_by_patch, counts_by_patc
 def save_terrain_html():
     subnav = _site.render_materials_subnav('terrain')
 
-    by_patch = _terrain_changes_by_patch()
-    patches = sorted(by_patch.keys(), key=_ver_key, reverse=True)
-    if not patches:
-        patches = sorted(_MAP_PAIRS, key=_ver_key, reverse=True) or ["7.41"]
-        by_patch = {p: [] for p in patches}
-
-    markers_by_patch, counts_by_patch = {}, {}
-    if SHOW_MARKERS:
-        for ver in _MAP_PAIRS:
-            diff = _load_diff(ver)
-            if diff:
-                markers_by_patch[ver], counts_by_patch[ver] = _markers_svg(diff, ver.replace(".", ""))
+    notes = _terrain_notes_by_patch()
+    steps = {s.patch: s for s in _map_versions.steps()}
+    patches = _pages(steps, notes) or ["7.41"]
 
     _os.makedirs(_site.DIST_DIR, exist_ok=True)
-    total = sum(len(rows) for subs in by_patch.values() for _, rows in subs)
+    total = sum(len(rows) for rows in notes.values())
     for ver in patches:
-        page = _build_terrain_page(ver, patches, by_patch,
-                                   markers_by_patch, counts_by_patch, subnav)
+        page = _build_terrain_page(ver, patches, notes, steps.get(ver),
+                                   _load_diff(ver) if ver in steps else None, subnav)
         # the :has() facts styles.css now reads as classes (patch/static_has.py)
         from patch.static_has import add_static_has_classes
         page = add_static_has_classes(page)

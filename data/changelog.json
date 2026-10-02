@@ -4,6 +4,28 @@
     {
       "date": "2026-10-02",
       "category": "Materials",
+      "title": "Terrain: a page for every patch, letter patches included",
+      "link": "terrain_739b.html",
+      "items": [
+        "Every patch whose map file changed has its own page and slider, 7.38b to 7.41f; the arrows step from patch to patch",
+        "Each page lists that patch's own terrain notes, and what moved in its map file — even where the notes say nothing",
+        "Patches that kept the map file before them (7.40b, 7.41b) are named on the next patch's page"
+      ],
+      "shots": [
+        "icons/changelog/2026-10-02_terrain_steps.webp"
+      ]
+    },
+    {
+      "date": "2026-10-02",
+      "category": "Materials",
+      "minor": true,
+      "fix": true,
+      "link": "terrain_739.html",
+      "title": "Terrain 7.39: two pink objects are gone — unannounced portals in 7.39's map file (removed in 7.39b) whose texture the game build we render on lacks"
+    },
+    {
+      "date": "2026-10-02",
+      "category": "Materials",
       "title": "Terrain: our own pictures for 7.39, 7.40 and 7.41",
       "link": "terrain_740.html",
       "items": [

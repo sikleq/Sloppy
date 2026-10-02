@@ -1,8 +1,21 @@
 {
-  "about": "Map versions whose top-down picture (icons/maps/map_<ver>.webp) we rendered ourselves; every other picture is still a borrowed render. sfm = Source Filmmaker, scripts/gen/stitch_sfm.py (docs/terrain.md); sfm-7.40c = rendered on the 7.40c build of the game (the current engine breaks older maps' water). The Terrain page's credit line names whatever is still borrowed.",
+  "about": "Map files whose top-down picture (icons/maps/map_<ver>.webp, <ver> = the first patch that shipped the file) we rendered ourselves; every other picture is still a borrowed render. sfm = Source Filmmaker, scripts/gen/stitch_sfm.py (docs/terrain.md); sfm-7.40c = rendered on the 7.40c build of the game (the current engine breaks older maps' water). 7.39's two pink templar gates are mended from 7.39b (scripts/gen/mend_map.py). The Terrain page's credit line names whatever is still borrowed.",
   "pictures": {
+    "7.38": "sfm-7.40c",
+    "7.38b": "sfm-7.40c",
+    "7.38c": "sfm-7.40c",
     "7.39": "sfm-7.40c",
+    "7.39b": "sfm-7.40c",
+    "7.39c": "sfm-7.40c",
+    "7.39d": "sfm-7.40c",
+    "7.39e": "sfm-7.40c",
     "7.40": "sfm-7.40c",
-    "7.41": "sfm"
+    "7.40c": "sfm-7.40c",
+    "7.41": "sfm",
+    "7.41a": "sfm",
+    "7.41c": "sfm",
+    "7.41d": "sfm",
+    "7.41e": "sfm",
+    "7.41f": "sfm"
   }
 }

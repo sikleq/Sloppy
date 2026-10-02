@@ -9786,6 +9786,8 @@ li.tsp-hidden { display: none !important; }
    default 14px top would read as an empty line between them). */
 .terrain-counts + .terrain-counts { margin-top: 1px; }
 .terrain-counts b { color: var(--text-bright); }
+/* A patch whose notes list no terrain changes: one plain row, no tag. */
+.terrain-list li.terrain-no-notes { color: var(--text-dim); font-style: italic; }
 .tm-add-text { color: #6fe089; font-weight: 600; }
 .tm-rem-text { color: #ff7a7a; font-weight: 600; }
 

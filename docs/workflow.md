@@ -105,9 +105,10 @@ Gate: `tests/test_snapshots_fresh.py` fails when `patchnotes_english.txt` has no
 hero in `data/stats/<latest>/heroes.json` is absent from `herolist.json`.
 
 Also bump per patch: `PATCH_ENTRY_COUNTS` in `patch/page.py` (calendar
-"extra-major" highlight) and, for a new major, the terrain pins in
-`builders/terrain.py` (`NEW_VER`, `_MAP_PAIRS`) + `_TERRAIN_BUCKETS` in
-`patch/elements.py` + the `terrain_XXX.html` tile in `patch/index_page.py`.
+"extra-major" highlight) and, for a patch that ships a new map file, its Terrain page: render the map, add its
+picture + mapdata + `data/map/patch_maps.json` / `renders.json` rows, `python scripts/gen/build_terrain_diff.py`
+(docs/terrain.md, "One page per patch"); for a new major, the `terrain_XXX.html` nav link (`builders/site_common.py`)
+and index tile (`patch/index_page.py`).
 
 ## Step 2c — Refresh the external data behind the weights
 

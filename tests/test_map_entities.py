@@ -44,14 +44,17 @@ def test_every_map_has_its_forest_buildings_and_camps(path):
 
 
 def test_the_current_map_is_the_741_terrain():
-    d = _load("741")
+    """mapdata_<code> is the map file the patch <code> first shipped: 741 = 7.41's release (2476 trees), 7.41a cut
+    one tree, and 741f is today's."""
+    assert len(_load("741")["ent_dota_tree"]) == 2476
+    d = _load("741f")
     assert len(d["ent_dota_tree"]) == 2475
     types = [c["neutralType"] for c in d["npc_dota_neutral_spawner"]]
     assert {t: types.count(t) for t in "0123"} == {"0": 6, "1": 14, "2": 6, "3": 2}
     assert len(d["npc_dota_roshan_spawner"]) == 2 and len(d["npc_dota_miniboss_spawner"]) == 2
 
 
-@pytest.mark.parametrize("code,theirs", [("741", "741"), ("737", "735"), ("732", "732"), ("722", "722")])
+@pytest.mark.parametrize("code,theirs", [("741f", "741"), ("737", "735"), ("732", "732"), ("722", "722")])
 def test_the_forest_is_the_one_the_interactive_map_has(code, theirs):
     """Same trees as leamare's export where one is cached (.cache/leamare, not committed)."""
     path = os.path.join(_ROOT, ".cache", "leamare", f"mapdata_{theirs}.json")
