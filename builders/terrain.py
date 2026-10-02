@@ -676,11 +676,8 @@ def _controls_html(layers=True):
     return top_html, fs_html
 
 
-def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, layers_on=()):
+def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None):
     """The before/after swipe stage + magnifier lens for an old→new map pair.
-
-    layers_on: layer keys the page opens with turned on (scripts.js reads
-    data-layers-on) — a patch that changed only where wards can stand shows it.
 
     old_ver/new_ver label the two sides; old_pic/new_pic (default: the same) name
     the pictures — a patch that kept the map file before it (7.40b) is shown with
@@ -698,12 +695,11 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, 
     old_map = f"icons/maps/map_{old_pic or old_ver}.webp"
     new_map = f"icons/maps/map_{new_pic or new_ver}.webp"
     top_bar, fs_bar = _controls_html(layers=bool(markers_svg))
-    layers_on = f' data-layers-on="{" ".join(layers_on)}"' if layers_on else ""
     tiled = _tiled_pictures()
     tiles = "".join(f' data-tiles-{side}="{_TILES_BASE}{v}/"'
                     for side, v in (("old", old_pic or old_ver), ("new", new_pic or new_ver)) if v in tiled)
     return (
-        f'<div class="terrain-compare" data-pos="50" data-zoom="1.9" data-lens="184"{tiles}{layers_on}>\n'
+        f'<div class="terrain-compare" data-pos="50" data-zoom="1.9" data-lens="184"{tiles}>\n'
         f'{top_bar}'
         '  <div class="tc-fs-canvas">\n'
         '    <div class="tc-stage">\n'
@@ -778,7 +774,7 @@ def _facts_html(counts, step, diff, quiet_after=()):
       CHANGED IN THE MAP FILE — Moved / Changed / Added · removed, each a row of
         chips (_chip), so a patch Valve's notes say nothing about still shows
         what changed.
-    Then the patches after it that changed nothing on the map (they get no page —
+    The patches after it that changed nothing on the map are the last row, "Unchanged in" (they get no page —
     the owner: "if nothing changed, there's nothing to compare")."""
     out = []
     if counts:
@@ -805,12 +801,14 @@ def _facts_html(counts, step, diff, quiet_after=()):
                      for name, kind, n, removed, total in items if kind in kinds]
             if chips:
                 rows.append(f'<div class="tf-verb">{verb}</div><div class="tf-chips">{"".join(chips)}</div>')
+        # the patches after it that changed nothing on the map (no page of their own) — a row of the same grid,
+        # not a sentence below it (the owner: "7.41f changed nothing on the map" stood out of the format)
+        if quiet_after:
+            chips = "".join(f'<span class="tf-chip">{_esc(p)}</span>' for p in quiet_after)
+            rows.append(f'<div class="tf-verb">Unchanged in</div><div class="tf-chips">{chips}</div>')
         out.append('<div class="tf-head">Changed in the map file</div>\n'
                    + (f'<div class="tf-changes">{"".join(rows)}</div>\n' if rows
                       else '<div class="tf-none">Nothing</div>\n'))
-    if quiet_after:
-        run = quiet_after[0] if len(quiet_after) == 1 else f"{quiet_after[0]} – {quiet_after[-1]}"
-        out.append(f'<p class="terrain-quiet">{_esc(run)} changed nothing on the map.</p>\n')
     return f'<div class="terrain-facts">\n{"".join(out)}</div>\n' if out else ""
 
 
@@ -843,9 +841,10 @@ def _quiet_runs(pages, patch_maps, quiet):
 
 
 def _no_notes_html():
-    """The change list of a patch whose notes list no terrain changes."""
-    return ('<li class="terrain-no-notes"><span class="row-text">The patch notes list no terrain '
-            'changes.</span></li>')
+    """The change list of a patch whose notes list no terrain changes: a "Patch notes" head and one chip, in the
+    facts' own format (the owner 2026-10-02: an italic sentence "stands out of the changes' format")."""
+    return ('<li class="terrain-subgroup-head">Patch notes</li>\n'
+            '<li class="terrain-no-notes"><span class="tf-chip">No terrain changes</span></li>')
 
 
 _INSPIRED_BY = (("Leamare", "https://github.com/leamare/dota-interactive-map"),
@@ -972,9 +971,7 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav, quiet_after=())
     markers, counts = (_markers_svg(diff, ver.replace(".", "")) if SHOW_MARKERS and diff
                        else ("", {}))
     if step:
-        only_wards = {i[0] for i in _moved_items(diff)} == {"no-ward cells"}
-        map_inner = _compare_html(step.before, ver, markers, step.old_pic, step.new_pic,
-                                  ("nowards",) if only_wards else ())
+        map_inner = _compare_html(step.before, ver, markers, step.old_pic, step.new_pic)
         credit = _source_html(step.old_pic, step.new_pic)
     else:
         map_inner = _fallback_html(ver)

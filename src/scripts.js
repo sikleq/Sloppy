@@ -6871,10 +6871,6 @@ function ecShopMarkup(panels) {
         syncAllBtn();
       });
     });
-    // A page whose only change is in one layer opens with it on (data-layers-on="nowards":
-    // 7.41c-e changed only where wards can stand — invisible in the pictures).
-    (root.dataset.layersOn || '').split(' ').filter(Boolean).forEach(function(k) { setLayer(k, true); });
-    syncAllBtn();
 
     // ---- Fullscreen: pan (right-drag) + zoom (wheel) ----
     // Zoom changes stage CSS width (aspect-ratio 1:1 sets height) so the

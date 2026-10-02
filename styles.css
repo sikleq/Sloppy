@@ -9836,9 +9836,9 @@ li.tsp-hidden { display: none !important; }
 }
 .tf-chip b { color: var(--text-bright); font-weight: 600; }
 .tf-none { color: var(--text-dim); font-style: italic; }
-.terrain-quiet { margin: 10px 0 0; font-size: 12.5px; color: var(--text-dim); font-style: italic; }
-/* A patch whose notes list no terrain changes: one plain row, no tag. */
-.terrain-list li.terrain-no-notes { color: var(--text-dim); font-style: italic; }
+/* A patch whose notes list no terrain changes: under a "Patch notes" head, one chip like the facts' chips. */
+.terrain-list li.terrain-no-notes { padding: 4px 0 0; list-style: none; }
+.terrain-list li.terrain-no-notes::before { content: none; }
 .tm-add-text { color: #6fe089; font-weight: 600; }
 .tm-rem-text { color: #ff7a7a; font-weight: 600; }
 

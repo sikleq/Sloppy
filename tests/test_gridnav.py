@@ -53,7 +53,8 @@ def test_what_the_grids_say_about_valves_ward_fixes():
     assert (_wards("7.41c")["lost"], _wards("7.41c")["gained"]) == (0, 149)
 
 
-def test_the_layer_shows_each_sides_grid_and_a_ward_only_page_opens_with_it():
+def test_the_layer_shows_each_sides_grid_and_starts_off():
+    """Off on every page, a ward-only one (7.41c) too — the owner 2026-10-02: "forgot to turn it off by default"."""
     diff = terrain._load_diff("7.41c")
     svg, _counts = terrain._markers_svg(diff, "741c")
     assert 'tm-layer-nowards tm-old' in svg and 'href="icons/maps/nowards_7.41a.png"' in svg
@@ -61,9 +62,7 @@ def test_the_layer_shows_each_sides_grid_and_a_ward_only_page_opens_with_it():
     assert 'data-layer="nowards"' in terrain._controls_html(layers=True)[0]
     steps = {s.patch: s for s in mv.steps()}
     html = terrain._build_terrain_page("7.41c", list(steps), {}, steps["7.41c"], diff, "")
-    assert 'data-layers-on="nowards"' in html
-    assert 'data-layers-on' not in terrain._build_terrain_page("7.39b", list(steps), {}, steps["7.39b"],
-                                                               terrain._load_diff("7.39b"), "")
+    assert "data-layers-on" not in html and "show-nowards" not in html
 
 
 def test_the_overlay_is_one_pixel_per_cell_north_up(tmp_path):

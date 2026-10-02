@@ -365,8 +365,8 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `gridnav.py overlay` draws `icons/maps/nowards_<ver>.png` (one pixel per cell, magenta: zones strong, cliffs
   lighter, the void faint), laid over x -10240..10240, y -10752..10240 with `image-rendering: pixelated`, old/new
   split by the slider. `build_terrain_diff.py` adds `"wards": {old, new, lost, gained, cells}`; "No-ward cells
-  +lost −gained" joins the changes, so 7.41c-e (only ward cells changed: invisible in the pictures) got pages,
-  which open with the layer on (`data-layers-on`).
+  +lost −gained" joins the changes, so 7.41c-e (only ward cells changed: invisible in the pictures) got pages.
+  The layer starts off on every page, those too (the owner: "forgot to turn it off by default").
   **"How did Valve fix 7.39b's 'locations incorrectly blocked for warding'?"** Not in the map file: its gridnav,
   the five no-ward volumes (byte-identical models), the world physics and every entity but trees, camps, a tower,
   a watcher, lane path corners and decor are the same as 7.39's — a game-code fix. 7.39d's "Fixed a ward spot in
@@ -378,7 +378,10 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   map" as five tiles (trees + the four camp tiers: icon, number, name, change), "Changed in the map file" as rows
   Moved / Changed / Added · removed (small right-aligned verb) of chips — one per kind of object with its layer
   icon and "n/of all" (the owner: "Bounty runes 1 moved (1/2)"; a row per kind "looked cheap"). Tiles and chips
-  share one gold-outline style; everything left-aligned like the list; the quiet patches below.
+  share one gold-outline style; everything left-aligned like the list. No sentences in between (the owner: "The
+  patch notes list no terrain changes" and "7.41f changed nothing on the map" stood out of the format): a patch
+  without notes shows a "Patch notes" head with a "No terrain changes" chip, and the quiet patches after it are
+  the last row of the changes, "Unchanged in" + a chip per patch.
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
   a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
   (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —

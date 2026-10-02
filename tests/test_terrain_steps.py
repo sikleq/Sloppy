@@ -141,8 +141,9 @@ def test_the_page_before_names_the_patches_that_changed_nothing():
     assert runs["7.41a"] == ["7.41b"] and runs["7.41e"] == ["7.41f"]
     assert runs["7.40"] == ["7.40b", "7.40c"] and runs["7.39d"] == ["7.39e"] and runs["7.39b"] == []
     html = _page("7.40", runs["7.40"])
-    assert "7.40b – 7.40c changed nothing on the map." in html
-    assert "7.39e changed nothing on the map." in _page("7.39d", runs["7.39d"])
+    assert ('<div class="tf-verb">Unchanged in</div><div class="tf-chips"><span class="tf-chip">7.40b</span>'
+            '<span class="tf-chip">7.40c</span></div>') in html
+    assert '<span class="tf-chip">7.39e</span>' in _page("7.39d", runs["7.39d"])
 
 
 def test_the_facts_read_like_the_list():
@@ -163,7 +164,7 @@ def test_the_facts_read_like_the_list():
     assert 'Camps <b>9/28</b>' in row("Moved") and 'Towers <b>1/22</b>' in row("Moved")
     assert 'Camp tiers <b>4/28</b>' in row("Changed") and 'Camp spawn boxes <b>10/28</b>' in row("Changed")
     assert 'icons/ui/gothic/tc_towers.png' in html and html.count('class="tf-chip"') >= 6
-    assert '<p class="terrain-quiet">7.40b – 7.40c changed nothing on the map.</p>' in html
+    assert '<span class="tf-chip">7.40c</span>' in row("Unchanged in") and "terrain-quiet" not in html  # a row
     assert '<div class="tf-none">Nothing</div>' in terrain._facts_html({}, step, {"treesOld": [], "treesNew": []})
 
 
