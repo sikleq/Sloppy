@@ -10,6 +10,7 @@ the export folder is the placeholder FRAMES_DIR.
     python scripts/gen/sfm_session.py FRAMES_DIR OUT.dmx --text     # KeyValues2 text only
 """
 import argparse
+import ntpath
 import os
 import subprocess
 
@@ -20,10 +21,11 @@ GAME = os.environ.get("DOTA_GAME", r"C:\Program Files (x86)\Steam\steamapps\comm
 
 
 def session_text(frames_dir):
-    """The template with the export folder set: a KeyValues2 string, backslashes doubled, ending in one."""
+    """The template with the export folder set: a KeyValues2 string, backslashes doubled, ending in one. Always a
+    Windows path (SFM runs only there) — ntpath, so the same on any OS the session is written from."""
     with open(TEMPLATE, encoding="utf-8") as f:
         s = f.read()
-    path = os.path.normpath(frames_dir).rstrip("\\/") + "\\"
+    path = ntpath.normpath(frames_dir).rstrip("\\/") + "\\"
     return s.replace(PLACEHOLDER, '"' + path.replace("\\", "\\\\") + '"')
 
 
