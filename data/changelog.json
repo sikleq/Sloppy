@@ -5,6 +5,14 @@
       "date": "2026-10-02",
       "category": "Materials",
       "minor": true,
+      "fix": true,
+      "link": "terrain_740.html",
+      "title": "Terrain: no thin light strip along the map's edges when zoomed in — every map picture's rim is black like the rest of the void"
+    },
+    {
+      "date": "2026-10-02",
+      "category": "Materials",
+      "minor": true,
       "link": "terrain_741.html",
       "title": "Terrain: the Fullscreen button reads “Full”, so every layer button fits on one line, spread across the map's width like its header"
     },
