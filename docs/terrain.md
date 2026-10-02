@@ -313,6 +313,11 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `data-tiles-old/-new`; scripts.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
   picture — the old ones next to `.tc-old`, the new ones inside the clipped `.tc-new-layer` — once a picture pixel
   would be drawn bigger than a screen pixel. Pages' 1 GB limit: tiles for the site's maps only.
+- **"All layers" toggle (2026-10-02)** — the owner: "add an 'all' filter that turns every object filter on". First
+  of the layer buttons (`layer_btn("all", …)`, both bars); scripts.js turns every layer on, or all off when all are
+  on already, and keeps it pressed exactly while every layer is on. Icon `tc_all.png` (four discs in four layer
+  colours) from `scripts/gen/gen_terrain_layer_icons.py tc_all` (the generator now takes icon names; its root
+  path was one level short and wrote into scripts/icons/).
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
   a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
   (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —

@@ -5,6 +5,13 @@
       "date": "2026-10-02",
       "category": "Materials",
       "minor": true,
+      "link": "terrain_741.html",
+      "title": "Terrain: an “All layers” button turns every map layer on (or off) at once"
+    },
+    {
+      "date": "2026-10-02",
+      "category": "Materials",
+      "minor": true,
       "link": "terrain_738.html",
       "title": "Terrain 7.38: its own page — the 7.37e map against 7.38, with the Wandering Waters notes"
     },

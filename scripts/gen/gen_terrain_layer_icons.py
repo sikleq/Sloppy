@@ -11,15 +11,21 @@ lotus_pool_sheet / twin_gate_sheet / outpost_sheet (cells cut from the
 minimap_sheet). Power = 7 runes in runes/ (cycled by scripts.js). Wisdom has no
 game icon → drawn custom (wisdom_icon: a dense purple inner ring + glow).
 
+tc_all (the "All layers" toggle, the owner 2026-10-02) has no game icon either → drawn: four discs in four layer
+colours, 2 × 2 — every kind of object at once.
+
 SVGs are rasterised with ImageMagick (`magick`). Run::
-    python scripts/gen/gen_terrain_layer_icons.py
+    python scripts/gen/gen_terrain_layer_icons.py            # every icon
+    python scripts/gen/gen_terrain_layer_icons.py tc_all     # just these
 """
 import os
 import shutil
 import subprocess
+import sys
 from PIL import Image
 
-_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# scripts/gen/<this> -> the repo root (was two levels up = scripts/, so the icons went to scripts/icons/)
+_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 _OUT = os.path.join(_ROOT, "icons", "ui", "gothic")
 _REF = os.path.join(_ROOT, "icons", "ref")
 N = 16
@@ -216,46 +222,79 @@ def spawnbox_icon():
     return Image.alpha_composite(ol, img)
 
 
+def all_icon():
+    """The "All layers" toggle: four discs, 2 x 2, in four layer colours (towers, lotus, tormentors, watchers) —
+    every kind of object at once. Drawn at 4x + downscaled, thin dark outline like the others."""
+    from PIL import ImageDraw, ImageFilter
+    S = ICON_RES * 4
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    r = S * 0.19
+    for (fx, fy), name in zip(((0.29, 0.29), (0.71, 0.29), (0.29, 0.71), (0.71, 0.71)),
+                              ("tc_towers", "tc_lotus", "tc_tormentors", "tc_watchers")):
+        cx, cy = S * fx, S * fy
+        light = tuple(min(255, int(c * 1.15) + 20) for c in COLORS[name])
+        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=COLORS[name] + (255,))
+        draw.ellipse([cx - r * 0.55, cy - r * 0.62, cx + r * 0.25, cy + r * 0.1], fill=light + (255,))
+    img = img.resize((ICON_RES, ICON_RES), Image.LANCZOS)
+    dil = img.split()[3].filter(ImageFilter.MaxFilter(3))
+    ol = Image.new("RGBA", img.size, OUTLINE)
+    ol.putalpha(dil)
+    return Image.alpha_composite(ol, img)
+
+
 # Icons kept in their NATURAL colours (the game icon is already the right colour
 # + reads on the dark marker backing) instead of tinted to the type colour.
 NATURAL = {"tc_bounty"}
 
-cells = []
-for name, color in COLORS.items():
-    if name == "tc_power":
-        continue                     # generated from the rune set below
-    if name == "tc_wisdom":
-        im = wisdom_icon(color)      # custom (no game icon)
-    elif name in REFS:
-        im = from_ref(REFS[name], color, tint=(name not in NATURAL))
-    else:
-        im = from_glyph(FALLBACK[name], color)
-    im.save(os.path.join(_OUT, f"{name}.png"))
-    cells.append((name, im))
-    print("wrote", name)
 
-# ---- spawnbox icon (custom drawn) ----
-im = spawnbox_icon()
-im.save(os.path.join(_OUT, "icon_spawnbox.png"))
-cells.append(("icon_spawnbox", im))
-print("wrote icon_spawnbox")
+def main(only=()):
+    def want(name):
+        return not only or name in only
 
-# ---- 7 power runes (natural colours) → tc_rune_0..6.png; tc_power.png defaults
-# to the regeneration rune (green, matches the layer). scripts.js cycles them. ----
-for i, nm in enumerate(RUNE_ORDER):
-    im = from_ref(f"runes/{nm}.png", (255, 255, 255), tint=False)
-    im.save(os.path.join(_OUT, f"tc_rune_{i}.png"))
-    cells.append((f"tc_rune_{i}", im))
-    print("wrote", f"tc_rune_{i} ({nm})")
-Image.open(os.path.join(_OUT, "tc_rune_5.png")).save(os.path.join(_OUT, "tc_power.png"))
-print("wrote tc_power (= regeneration default)")
+    cells = []
+    for name, color in COLORS.items():
+        if name == "tc_power" or not want(name):
+            continue                     # tc_power: generated from the rune set below
+        if name == "tc_wisdom":
+            im = wisdom_icon(color)      # custom (no game icon)
+        elif name in REFS:
+            im = from_ref(REFS[name], color, tint=(name not in NATURAL))
+        else:
+            im = from_glyph(FALLBACK[name], color)
+        im.save(os.path.join(_OUT, f"{name}.png"))
+        cells.append((name, im))
+        print("wrote", name)
 
-# montage on mid-grey so the dark outline reads
-cols = 5
-rows_n = (len(cells) + cols - 1) // cols
-mont = Image.new("RGBA", (cols * ICON_RES * 3, rows_n * ICON_RES * 3), (70, 78, 64, 255))
-for i, (name, im) in enumerate(cells):
-    big = im.resize((ICON_RES * 3, ICON_RES * 3), Image.NEAREST)
-    mont.alpha_composite(big, ((i % cols) * ICON_RES * 3, (i // cols) * ICON_RES * 3))
-mont.save(os.path.join(_ROOT, "_preview_tc_icons.png"))
-print("montage -> _preview_tc_icons.png")
+    # ---- custom drawn: spawnbox, "all layers" ----
+    for name, make in (("icon_spawnbox", spawnbox_icon), ("tc_all", all_icon)):
+        if want(name):
+            im = make()
+            im.save(os.path.join(_OUT, f"{name}.png"))
+            cells.append((name, im))
+            print("wrote", name)
+
+    # ---- 7 power runes (natural colours) → tc_rune_0..6.png; tc_power.png defaults
+    # to the regeneration rune (green, matches the layer). scripts.js cycles them. ----
+    if want("tc_power"):
+        for i, nm in enumerate(RUNE_ORDER):
+            im = from_ref(f"runes/{nm}.png", (255, 255, 255), tint=False)
+            im.save(os.path.join(_OUT, f"tc_rune_{i}.png"))
+            cells.append((f"tc_rune_{i}", im))
+            print("wrote", f"tc_rune_{i} ({nm})")
+        Image.open(os.path.join(_OUT, "tc_rune_5.png")).save(os.path.join(_OUT, "tc_power.png"))
+        print("wrote tc_power (= regeneration default)")
+
+    # montage on mid-grey so the dark outline reads
+    cols = 5
+    rows_n = (len(cells) + cols - 1) // cols
+    mont = Image.new("RGBA", (cols * ICON_RES * 3, rows_n * ICON_RES * 3), (70, 78, 64, 255))
+    for i, (name, im) in enumerate(cells):
+        big = im.resize((ICON_RES * 3, ICON_RES * 3), Image.NEAREST)
+        mont.alpha_composite(big, ((i % cols) * ICON_RES * 3, (i // cols) * ICON_RES * 3))
+    mont.save(os.path.join(_ROOT, "_preview_tc_icons.png"))
+    print("montage -> _preview_tc_icons.png")
+
+
+if __name__ == "__main__":
+    main(set(sys.argv[1:]))

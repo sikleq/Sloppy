@@ -6844,13 +6844,31 @@ function ecShopMarkup(panels) {
     if (powerBtnImg) powerBtnImg.src = RUNE_BASE + Math.floor(Math.random() * RUNE_COUNT) + '.png';
 
     // Layer toggles — both in .tc-controls-bar and .tc-fs-bar; keep in sync.
+    // data-layer="all" turns every layer on (or all off when all are on already)
+    // and stays pressed exactly while every layer is on.
+    const layerKeys = [];
+    root.querySelectorAll('.tc-controls-bar .tc-layer-btn').forEach(function(b) {
+      if (b.dataset.layer !== 'all') layerKeys.push(b.dataset.layer);
+    });
+    function setLayer(key, on) {
+      root.querySelectorAll('.tc-layer-btn[data-layer="' + key + '"]')
+        .forEach(function(b) { setPressed(b, on); });
+      root.classList.toggle('show-' + key, on);
+      if (key === 'power') togglePowerCycle(on);
+    }
+    function syncAllBtn() {
+      const allOn = layerKeys.length > 0 && layerKeys.every(function(k) {
+        return root.classList.contains('show-' + k);
+      });
+      root.querySelectorAll('.tc-layer-btn[data-layer="all"]')
+        .forEach(function(b) { setPressed(b, allOn); });
+    }
     root.querySelectorAll('.tc-layer-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const on = !pressed(btn);
-        root.querySelectorAll('.tc-layer-btn[data-layer="' + btn.dataset.layer + '"]')
-          .forEach(function(b) { setPressed(b, on); });
-        root.classList.toggle('show-' + btn.dataset.layer, on);
-        if (btn.dataset.layer === 'power') togglePowerCycle(on);
+        if (btn.dataset.layer === 'all') layerKeys.forEach(function(k) { setLayer(k, on); });
+        else setLayer(btn.dataset.layer, on);
+        syncAllBtn();
       });
     });
 

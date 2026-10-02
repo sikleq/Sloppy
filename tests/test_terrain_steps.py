@@ -125,6 +125,18 @@ def test_map_tiles_cut_the_squeezed_square():
     assert (got[5][0], got[5][1]) == (1, 1)
 
 
+def test_an_all_layers_button_leads_the_layer_toggles():
+    """The owner: add an "all" filter that turns every object layer on; its icon is drawn by the generator."""
+    import re
+    top, fs = terrain._controls_html(layers=True)
+    for bar in (top, fs):
+        layers = re.findall(r'data-layer="(\w+)"', bar)
+        assert layers[0] == "all" and "trees" in layers and len(layers) == 14
+    assert 'src="icons/ui/gothic/tc_all.png"' in top
+    assert os.path.exists(os.path.join(_ROOT, "icons", "ui", "gothic", "tc_all.png"))
+    assert "data-layer" not in terrain._controls_html(layers=False)[0]
+
+
 def test_the_picker_lists_patches_not_ranges():
     html = terrain._picker_html(["7.39b", "7.39"], "7.39b")
     assert '<a class="version-item current" href="terrain_739b.html"' in html and "–" not in html
