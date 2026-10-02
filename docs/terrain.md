@@ -373,10 +373,12 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   Radiant safe lane hard camp" IS in the file: 10 cells turned no-ward (4 there, 6 by the Dire safe lane small
   camp). 7.41c opened 149 cells by the Twin Gates and Tormentors, 7.41d closed 23, 7.41e 2 — no notes.
 - **Facts under the list (2026-10-02)** — the owner: the lines "Trees / Neutral camps / Moved in the map file / X
-  changed nothing" should be laid out better. `_facts_html`: two small tables, "On the map" (trees, camps by tier
-  with their icons, each with its change) and "Changed in the map file" — grouped by what happened (Moved /
-  Changed / Added / removed), one chip per kind of object with its layer icon and "n/of all" (the owner: "Bounty
-  runes 1 moved (1/2)"; a row per kind "looked cheap"), centred with faint grid lines; the quiet patches below.
+  changed nothing" should be laid out better; then two centred tables "aren't harmonious — it can be better". Now
+  `_facts_html` speaks the list's own look: headings styled as the list's subgroup heads (`.tf-head`), "On the
+  map" as five tiles (trees + the four camp tiers: icon, number, name, change), "Changed in the map file" as rows
+  Moved / Changed / Added · removed (small right-aligned verb) of chips — one per kind of object with its layer
+  icon and "n/of all" (the owner: "Bounty runes 1 moved (1/2)"; a row per kind "looked cheap"). Tiles and chips
+  share one gold-outline style; everything left-aligned like the list; the quiet patches below.
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
   a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
   (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —

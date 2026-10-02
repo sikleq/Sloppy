@@ -9802,30 +9802,41 @@ li.tsp-hidden { display: none !important; }
 .tc-ver-old { left: 8px; top: 8px; }
 
 /* ---- tree tally + camp note under the change list ---- */
-/* Facts under the change list (builders/terrain.py _facts_html): "On the map" + "Changed in the map file", two
-   small tables — centred, faint grid lines, like the site's other tables. */
-.terrain-facts { width: 100%; border-collapse: collapse; margin: 16px 0 0; font-size: 13px; line-height: 1.4; }
-.terrain-facts caption {
-  caption-side: top; text-align: center; padding: 0 0 5px;
-  font-size: 12px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-main);
+/* Facts under the change list (builders/terrain.py _facts_html), in the list's own look (the owner: the tables
+   "aren't harmonious"): headings as the list's subgroup heads, five tiles for what's on the map, then the changes as
+   rows of chips under a small verb — one gold-outline language for tiles and chips, left-aligned like the list. */
+.terrain-facts { margin: 6px 0 0; font-size: 13px; line-height: 1.4; }
+.tf-head {
+  font-size: 12px; font-weight: 700; color: var(--text-main); letter-spacing: 0.6px; text-transform: uppercase;
+  padding: 12px 0 4px; margin-bottom: 8px;
+  border-bottom: 1px solid;
+  border-image: linear-gradient(to right, var(--bg-panel-4) 0%, var(--bg-panel-4) 61%, transparent 71%) 1;
 }
-.terrain-facts td {
-  text-align: center; vertical-align: middle; padding: 4px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.09); color: var(--text-dim);
+.tf-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.tf-tile, .tf-chip {
+  border: 1px solid rgba(227, 196, 106, 0.18); background: rgba(227, 196, 106, 0.045); border-radius: 3px;
 }
-.terrain-facts td.tf-label { color: var(--text-bright); width: 38%; }
-.tf-camp { display: inline-flex; align-items: center; gap: 3px; margin: 1px 6px; white-space: nowrap; }
-/* "Changed in the map file": one chip per kind of object — icon, name, n/of all */
-.terrain-facts td.tf-chips { padding: 4px 4px; line-height: 1.9; }
+.tf-tile { padding: 6px 2px 5px; text-align: center; min-width: 0; }
+.tf-num {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  font-size: 15px; font-weight: 700; color: var(--text-bright); line-height: 1.15;
+}
+.tf-num img, .tf-chip img { width: 16px; height: 16px; flex: none; }
+.tf-name { margin-top: 2px; font-size: 11.5px; color: var(--text-dim); white-space: nowrap; }
+.tf-name .tm-add-text, .tf-name .tm-rem-text { font-size: 11px; }
+.tf-changes { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 10px; align-items: start; }
+.tf-verb {
+  font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-dim);
+  padding-top: 5px; text-align: right;
+}
+.tf-chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .tf-chip {
-  display: inline-flex; align-items: center; gap: 4px; margin: 2px 3px; padding: 1px 7px 1px 5px;
-  white-space: nowrap; border: 1px solid rgba(227, 196, 106, 0.22); background: rgba(227, 196, 106, 0.05);
-  border-radius: 3px; color: var(--text-dim);
+  display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 5px;
+  white-space: nowrap; color: var(--text-dim); line-height: 1.35;
 }
-.tf-chip img { width: 16px; height: 16px; }
 .tf-chip b { color: var(--text-bright); font-weight: 600; }
-.tf-camp img { width: 16px; height: 16px; image-rendering: auto; }
-.terrain-quiet { margin: 8px 2px 0; font-size: 12.5px; color: var(--text-dim); font-style: italic; text-align: center; }
+.tf-none { color: var(--text-dim); font-style: italic; }
+.terrain-quiet { margin: 10px 0 0; font-size: 12.5px; color: var(--text-dim); font-style: italic; }
 /* A patch whose notes list no terrain changes: one plain row, no tag. */
 .terrain-list li.terrain-no-notes { color: var(--text-dim); font-style: italic; }
 .tm-add-text { color: #6fe089; font-weight: 600; }

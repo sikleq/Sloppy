@@ -769,29 +769,31 @@ def _chip(name, kind, n, removed, total):
 
 
 def _facts_html(counts, step, diff, quiet_after=()):
-    """The facts under the change list as two small tables (the owner 2026-10-02:
-    four lines of text "should be laid out better"):
-      ON THE MAP — trees, and the neutral camps by tier with their icons, each
-        with its change since the patch before;
-      CHANGED IN THE MAP FILE — one row per kind of object (_moved_items), so a
-        patch Valve's notes say nothing about still shows what changed.
+    """The facts under the change list, in the list's own look (the owner
+    2026-10-02: four lines of text "should be laid out better"; then the tables
+    "aren't harmonious — it can be better"): headings like the list's subgroup
+    heads, then
+      ON THE MAP — five tiles: trees and the four camp tiers, icon + number +
+        name, with the change since the patch before;
+      CHANGED IN THE MAP FILE — Moved / Changed / Added · removed, each a row of
+        chips (_chip), so a patch Valve's notes say nothing about still shows
+        what changed.
     Then the patches after it that changed nothing on the map (they get no page —
     the owner: "if nothing changed, there's nothing to compare")."""
     out = []
     if counts:
         old_t, new_t = counts.get("campsOld", {}), counts.get("campsNew", {})
 
-        def tier(t, label):
-            cur = new_t.get(t, new_t.get(str(t), 0))
-            was = old_t.get(t, old_t.get(str(t), 0))
-            return (f'<span class="tf-camp"><img src="icons/camps/{_CAMP_ICON[t]}.png" alt="" width="16" '
-                    f'height="16">{cur} {label}{_signed(cur - was)}</span>')
+        def tile(icon, num, name, delta):
+            return (f'<div class="tf-tile"><div class="tf-num"><img src="icons/{icon}.png" alt="" width="16" '
+                    f'height="16">{num}</div><div class="tf-name">{name}{_signed(delta)}</div></div>')
         trees = counts.get("treesNew", 0)
-        out.append(
-            '<table class="terrain-facts"><caption>On the map</caption>\n'
-            f'<tr><td class="tf-label">Trees</td><td>{trees}{_signed(trees - counts.get("treesOld", 0))}</td></tr>\n'
-            f'<tr><td class="tf-label">Neutral camps</td><td>{"".join(tier(t, l) for t, l in _CAMP_TIERS)}</td></tr>\n'
-            '</table>\n')
+        tiles = [tile("ui/gothic/tc_trees", trees, "trees", trees - counts.get("treesOld", 0))]
+        for t, label in _CAMP_TIERS:
+            cur = new_t.get(t, new_t.get(str(t), 0))
+            tiles.append(tile(f"camps/{_CAMP_ICON[t]}", cur, label, cur - old_t.get(t, old_t.get(str(t), 0))))
+        out.append('<div class="tf-head">On the map</div>\n'
+                   f'<div class="tf-tiles">{"".join(tiles)}</div>\n')
     if step is not None:
         # grouped by what happened, one chip per kind of object with its icon and
         # "n/of all" (the owner: "x moved, y moved, z moved" row after row "looks cheap";
@@ -802,13 +804,14 @@ def _facts_html(counts, step, diff, quiet_after=()):
             chips = [_chip(name, kind, n, removed, total)
                      for name, kind, n, removed, total in items if kind in kinds]
             if chips:
-                rows.append(f'<tr><td class="tf-label">{verb}</td><td class="tf-chips">{"".join(chips)}</td></tr>\n')
-        out.append('<table class="terrain-facts"><caption>Changed in the map file</caption>\n'
-                   + ("".join(rows) or '<tr><td colspan="2">Nothing</td></tr>\n') + '</table>\n')
+                rows.append(f'<div class="tf-verb">{verb}</div><div class="tf-chips">{"".join(chips)}</div>')
+        out.append('<div class="tf-head">Changed in the map file</div>\n'
+                   + (f'<div class="tf-changes">{"".join(rows)}</div>\n' if rows
+                      else '<div class="tf-none">Nothing</div>\n'))
     if quiet_after:
         run = quiet_after[0] if len(quiet_after) == 1 else f"{quiet_after[0]} – {quiet_after[-1]}"
         out.append(f'<p class="terrain-quiet">{_esc(run)} changed nothing on the map.</p>\n')
-    return "".join(out)
+    return f'<div class="terrain-facts">\n{"".join(out)}</div>\n' if out else ""
 
 
 def _quiet(steps, notes, diffs):
