@@ -341,10 +341,26 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   stacked map layers in the site's gold ramp (the owner: "simpler, like our other icons"; four coloured discs were
   rejected), from `scripts/gen/gen_terrain_layer_icons.py tc_all` (the generator now takes icon names; its root
   path was one level short and wrote into scripts/icons/).
+- **No-ward ground layer (2026-10-02)** — the owner: "a layer of every place where wards can't be placed". The map's
+  gridnav (`maps/dota.gnv`, one byte per 64-unit cell; `scripts/gen/gridnav.py`) carries it: bit0 = walkable,
+  bit4 = no wards (set on the walkable ground of both fountains, both Roshan pits and the secret shop — the five
+  `trigger_no_wards` volumes baked in — and on every cliff edge), 20 = out of bounds. A ward stands on a walkable
+  cell without bit4 (trees aside — they are entities). Stored per map file as `data/map/gridnav_<code>.gnv.gz`;
+  `gridnav.py overlay` draws `icons/maps/nowards_<ver>.png` (one pixel per cell, magenta: zones strong, cliffs
+  lighter, the void faint), laid over x -10240..10240, y -10752..10240 with `image-rendering: pixelated`, old/new
+  split by the slider. `build_terrain_diff.py` adds `"wards": {old, new, lost, gained, cells}`; "No-ward cells
+  +lost −gained" joins the changes, so 7.41c-e (only ward cells changed: invisible in the pictures) got pages,
+  which open with the layer on (`data-layers-on`).
+  **"How did Valve fix 7.39b's 'locations incorrectly blocked for warding'?"** Not in the map file: its gridnav,
+  the five no-ward volumes (byte-identical models), the world physics and every entity but trees, camps, a tower,
+  a watcher, lane path corners and decor are the same as 7.39's — a game-code fix. 7.39d's "Fixed a ward spot in
+  Radiant safe lane hard camp" IS in the file: 10 cells turned no-ward (4 there, 6 by the Dire safe lane small
+  camp). 7.41c opened 149 cells by the Twin Gates and Tormentors, 7.41d closed 23, 7.41e 2 — no notes.
 - **Facts under the list (2026-10-02)** — the owner: the lines "Trees / Neutral camps / Moved in the map file / X
   changed nothing" should be laid out better. `_facts_html`: two small tables, "On the map" (trees, camps by tier
-  with their icons, each with its change) and "Changed in the map file" (`_moved_items`, one row per kind:
-  "+38 −27", "2 moved", "4 changed"), centred with faint grid lines; the quiet patches in a line below.
+  with their icons, each with its change) and "Changed in the map file" — grouped by what happened (Moved /
+  Changed / Added / removed), one chip per kind of object with its layer icon and "n/of all" (the owner: "Bounty
+  runes 1 moved (1/2)"; a row per kind "looked cheap"), centred with faint grid lines; the quiet patches below.
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
   a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
   (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —

@@ -268,6 +268,21 @@ def _markers_svg(diff, pair_id="default"):
         f'aria-hidden="true">{boxes_same}{boxes_new}{boxes_old}</svg>'
     )
 
+    # ---- no-ward ground: the gridnav picture of each side (scripts/gen/gridnav.py
+    # overlay — one pixel per 64-unit cell over x -10240..10240, y -10752..10240),
+    # old/new split by the slider like the other layers ----
+    wards = diff.get("wards") or {}
+    ward_svgs = ""
+    if wards.get("old") and wards.get("new"):
+        gx0, gy0 = proj(-10240, 10240)                 # north-west corner of the grid
+        gx1, gy1 = proj(10240, -10752)                 # south-east
+        for side in ("old", "new"):
+            ward_svgs += (
+                f'<svg class="tc-markers tm-layer tm-layer-nowards tm-{side}" viewBox="0 0 {MAP_VB} {MAP_VB}" '
+                f'preserveAspectRatio="none" aria-hidden="true"><image href="icons/maps/nowards_{wards[side]}.png" '
+                f'x="{gx0}" y="{gy0}" width="{round(gx1 - gx0, 1)}" height="{round(gy1 - gy0, 1)}" '
+                f'preserveAspectRatio="none"/></svg>')
+
     old_t = tier_counts(diff.get("campsOld", []))
     new_t = tier_counts(diff.get("campsNew", []))
     counts = {
@@ -275,7 +290,7 @@ def _markers_svg(diff, pair_id="default"):
         "treesNew": len(diff.get("treesNew", [])),
         "campsOld": old_t, "campsNew": new_t,
     }
-    return (trees_old + trees_new + camps_old + camps_new
+    return (ward_svgs + trees_old + trees_new + camps_old + camps_new
             + "".join(ent_svgs) + sb_svg, counts)
 
 
@@ -449,10 +464,10 @@ def _retiered(old, new, radius=_SAME_CAMP):
 
 def _moved_items(diff):
     """What changed between the step's two map files, read off its diff, as
-    (name, kind, n, removed): kind "delta" when the count changed (n added,
-    `removed` removed), "moved" when it kept its count (n moved), "changed" for
-    camp tiers and resized/moved spawn boxes (7.39d: "Increased spawnboxes of
-    Triangle Ancient camps"). [] when nothing changed."""
+    (name, kind, n, removed, total): kind "delta" when the count changed (n
+    added, `removed` removed), "moved" when it kept its count (n of `total`
+    moved), "changed" for camp tiers and resized/moved spawn boxes (7.39d:
+    "Increased spawnboxes of Triangle Ancient camps"). [] when nothing changed."""
     if not diff:
         return []
 
@@ -462,32 +477,38 @@ def _moved_items(diff):
         if not added and not removed:
             return None
         if len(old) == len(new):
-            return (name, "moved", added, 0)
-        return (name, "delta", added, removed)
+            return (name, "moved", added, 0, len(new))
+        return (name, "delta", added, removed, len(new))
 
+    camps_new = diff.get("campsNew", [])
     out = [delta(diff.get("treesOld", []), diff.get("treesNew", []), "trees")]
     out.append(delta([(c["x"], c["y"]) for c in diff.get("campsOld", [])],
-                     [(c["x"], c["y"]) for c in diff.get("campsNew", [])], "camps"))
-    retiered = _retiered(diff.get("campsOld", []), diff.get("campsNew", []))
+                     [(c["x"], c["y"]) for c in camps_new], "camps"))
+    retiered = _retiered(diff.get("campsOld", []), camps_new)
     if retiered:
-        out.append(("camp tiers", "changed", retiered, 0))
+        out.append(("camp tiers", "changed", retiered, 0, len(camps_new)))
     old_boxes = {_box_key(b) for b in diff.get("spawnboxesOld", [])}
     new_boxes = {_box_key(b) for b in diff.get("spawnboxesNew", [])}
     if len(old_boxes) == len(new_boxes) and new_boxes - old_boxes:
-        out.append(("camp spawn boxes", "changed", len(new_boxes - old_boxes), 0))
+        out.append(("camp spawn boxes", "changed", len(new_boxes - old_boxes), 0, len(new_boxes)))
     elif old_boxes != new_boxes:
-        out.append(("camp spawn boxes", "delta", len(new_boxes - old_boxes), len(old_boxes - new_boxes)))
+        out.append(("camp spawn boxes", "delta", len(new_boxes - old_boxes), len(old_boxes - new_boxes),
+                    len(new_boxes)))
     for key, name in _MOVED_NAMES.items():
         ed = diff.get("entities", {}).get(key)
         if ed:
             out.append(delta(ed.get("old", []), ed.get("new", []), name))
+    w = diff.get("wards") or {}
+    if w.get("lost") or w.get("gained"):
+        # gridnav cells (64 units) where a ward can't stand: "lost" = became no-ward, so +lost −gained
+        out.append(("no-ward cells", "delta", w.get("lost", 0), w.get("gained", 0), w.get("cells", 0)))
     return [i for i in out if i]
 
 
 def _moved_summary(diff):
     """_moved_items as text — e.g. ["trees +38 −27", "camps moved: 2", "camp tiers
     changed: 4"] (the Oldgrowth table says the same)."""
-    def text(name, kind, n, removed):
+    def text(name, kind, n, removed, _total):
         return {"delta": f"{name} +{n} −{removed}", "moved": f"{name} moved: {n}"}.get(kind, f"{name} {kind}: {n}")
     return [text(*i) for i in _moved_items(diff)]
 
@@ -600,6 +621,8 @@ def _controls_html(layers=True):
         layer_parts.append(layer_btn("trees", "Trees", "tc_trees"))
         layer_parts.append(layer_btn("camps", "Neutral Camps", "creepcamp_mid", icon_dir="camps"))
         layer_parts.append(layer_btn("spawnboxes", "Spawn Boxes", "icon_spawnbox"))
+        # every place a ward can't stand (the owner 2026-10-02), from the map's gridnav
+        layer_parts.append(layer_btn("nowards", "No-ward ground", "tc_nowards"))
         for key, label, icon, _color in _ENTITY_LAYERS:
             layer_parts.append(layer_btn(key, label, icon))
 
@@ -652,8 +675,11 @@ def _controls_html(layers=True):
     return top_html, fs_html
 
 
-def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None):
+def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, layers_on=()):
     """The before/after swipe stage + magnifier lens for an old→new map pair.
+
+    layers_on: layer keys the page opens with turned on (scripts.js reads
+    data-layers-on) — a patch that changed only where wards can stand shows it.
 
     old_ver/new_ver label the two sides; old_pic/new_pic (default: the same) name
     the pictures — a patch that kept the map file before it (7.40b) is shown with
@@ -671,11 +697,12 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None):
     old_map = f"icons/maps/map_{old_pic or old_ver}.webp"
     new_map = f"icons/maps/map_{new_pic or new_ver}.webp"
     top_bar, fs_bar = _controls_html(layers=bool(markers_svg))
+    layers_on = f' data-layers-on="{" ".join(layers_on)}"' if layers_on else ""
     tiled = _tiled_pictures()
     tiles = "".join(f' data-tiles-{side}="{_TILES_BASE}{v}/"'
                     for side, v in (("old", old_pic or old_ver), ("new", new_pic or new_ver)) if v in tiled)
     return (
-        f'<div class="terrain-compare" data-pos="50" data-zoom="1.9" data-lens="184"{tiles}>\n'
+        f'<div class="terrain-compare" data-pos="50" data-zoom="1.9" data-lens="184"{tiles}{layers_on}>\n'
         f'{top_bar}'
         '  <div class="tc-fs-canvas">\n'
         '    <div class="tc-stage">\n'
@@ -719,6 +746,26 @@ def _signed(n):
 
 _CAMP_TIERS = ((3, "ancient"), (2, "large"), (1, "medium"), (0, "small"))
 
+# The icon of each kind of object in the "Changed in the map file" chips (its map layer's icon).
+_ITEM_ICON = {"trees": "ui/gothic/tc_trees", "camps": "camps/creepcamp_mid", "camp tiers": "camps/creepcamp_big",
+              "camp spawn boxes": "ui/gothic/icon_spawnbox", "towers": "ui/gothic/tc_towers",
+              "lotus pools": "ui/gothic/tc_lotus", "twin gates": "ui/gothic/tc_twingates",
+              "Tormentors": "ui/gothic/tc_tormentors", "bounty runes": "ui/gothic/tc_bounty",
+              "power runes": "ui/gothic/tc_power", "wisdom shrines": "ui/gothic/tc_wisdom",
+              "wisdom runes": "ui/gothic/tc_wisdom", "outposts": "ui/gothic/tc_outposts",
+              "watchers": "ui/gothic/tc_watchers", "Roshan pits": "ui/gothic/tc_roshan",
+              "no-ward cells": "ui/gothic/tc_nowards"}
+
+
+def _chip(name, kind, n, removed, total):
+    """One kind of object in the changes table: icon, name, and "n/of all" — or
+    "+added −removed" when the count changed."""
+    icon = _ITEM_ICON.get(name)
+    img = f'<img src="icons/{icon}.png" alt="" width="16" height="16">' if icon else ""
+    value = (f'{_signed(n)}{_signed(-removed)}'.strip() if kind == "delta"
+             else f'<b>{n}/{total}</b>')
+    return f'<span class="tf-chip">{img}{_esc(name[:1].upper() + name[1:])} {value}</span>'
+
 
 def _facts_html(counts, step, diff, quiet_after=()):
     """The facts under the change list as two small tables (the owner 2026-10-02:
@@ -745,11 +792,16 @@ def _facts_html(counts, step, diff, quiet_after=()):
             f'<tr><td class="tf-label">Neutral camps</td><td>{"".join(tier(t, l) for t, l in _CAMP_TIERS)}</td></tr>\n'
             '</table>\n')
     if step is not None:
+        # grouped by what happened, one chip per kind of object with its icon and
+        # "n/of all" (the owner: "x moved, y moved, z moved" row after row "looks cheap";
+        # "Bounty runes 1 moved (1/2)")
+        items = _moved_items(diff)
         rows = []
-        for name, kind, n, removed in _moved_items(diff):
-            label = _esc(name[:1].upper() + name[1:])
-            value = (f'{_signed(n)}{_signed(-removed)}'.strip() if kind == "delta" else f"{n} {kind}")
-            rows.append(f'<tr><td class="tf-label">{label}</td><td>{value}</td></tr>\n')
+        for verb, kinds in (("Moved", ("moved",)), ("Changed", ("changed",)), ("Added / removed", ("delta",))):
+            chips = [_chip(name, kind, n, removed, total)
+                     for name, kind, n, removed, total in items if kind in kinds]
+            if chips:
+                rows.append(f'<tr><td class="tf-label">{verb}</td><td class="tf-chips">{"".join(chips)}</td></tr>\n')
         out.append('<table class="terrain-facts"><caption>Changed in the map file</caption>\n'
                    + ("".join(rows) or '<tr><td colspan="2">Nothing</td></tr>\n') + '</table>\n')
     if quiet_after:
@@ -916,7 +968,9 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav, quiet_after=())
     markers, counts = (_markers_svg(diff, ver.replace(".", "")) if SHOW_MARKERS and diff
                        else ("", {}))
     if step:
-        map_inner = _compare_html(step.before, ver, markers, step.old_pic, step.new_pic)
+        only_wards = {i[0] for i in _moved_items(diff)} == {"no-ward cells"}
+        map_inner = _compare_html(step.before, ver, markers, step.old_pic, step.new_pic,
+                                  ("nowards",) if only_wards else ())
         credit = _source_html(step.old_pic, step.new_pic)
     else:
         map_inner = _fallback_html(ver)

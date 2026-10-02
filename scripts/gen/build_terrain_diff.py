@@ -87,6 +87,18 @@ def _load(code):
         return json.load(f)["data"]
 
 
+def _wards(old_code, new_code):
+    """{"old", "new", "lost", "gained", "cells"} from data/map/gridnav_<code>.gnv.gz, or None without them."""
+    import gridnav
+    paths = [os.path.join(_OWN, f"gridnav_{c}.gnv.gz") for c in (old_code, new_code)]
+    if not all(os.path.exists(p) for p in paths):
+        return None
+    (_ha, a), (_hb, b) = gridnav.load(paths[0]), gridnav.load(paths[1])
+    lost, gained = gridnav.ward_changes(a, b)
+    return {"old": _dotted(old_code), "new": _dotted(new_code), "lost": lost, "gained": gained,
+            "cells": gridnav.no_ward_cells(b)}
+
+
 def _nearest(target, candidates):
     return min(candidates, key=lambda c: (c["x"] - target["x"]) ** 2
                + (c["y"] - target["y"]) ** 2)
@@ -178,6 +190,9 @@ def _diff_pair(old_code, new_code):
 
     return {
         "oldVer": _dotted(old_code), "newVer": _dotted(new_code),
+        # where a ward can't stand (the map's gridnav, scripts/gen/gridnav.py): the layer's pictures
+        # (icons/maps/nowards_<ver>.png) and how many cells turned no-ward / wardable
+        "wards": _wards(old_code, new_code),
         "world": {"minX": -10464, "maxX": 10400, "minY": -10464, "maxY": 10400},
         "treesOld": [[x, y] for x, y in trees_old],
         "treesNew": [[x, y] for x, y in trees_new],

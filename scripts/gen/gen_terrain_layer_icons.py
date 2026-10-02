@@ -244,6 +244,34 @@ ALL_GLYPH = [                 # three stacked map layers; '#' top face, '+' its 
 ]
 
 
+NOWARDS = (235, 80, 255)      # the No-ward ground layer's colour (scripts/gen/gridnav.py ZONE)
+
+
+def nowards_icon(color=NOWARDS):
+    """No-ward ground (the owner 2026-10-02): a ward's eye, struck through. Drawn at 4x + downscaled, dark
+    outline, like the other drawn layer icons."""
+    from PIL import ImageDraw, ImageFilter
+    S = ICON_RES * 4
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    c = color + (255,)
+    light = tuple(min(255, int(v * 1.25) + 25) for v in color) + (255,)
+    cx, cy = S / 2, S / 2
+    # the eye: an almond of two arcs, a round iris inside
+    d.chord([S * 0.08, S * 0.22, S * 0.92, S * 0.98], 200, 340, fill=c)
+    d.chord([S * 0.08, S * 0.02, S * 0.92, S * 0.78], 20, 160, fill=c)
+    d.ellipse([cx - S * 0.17, cy - S * 0.17, cx + S * 0.17, cy + S * 0.17], fill=(20, 17, 14, 255))
+    d.ellipse([cx - S * 0.09, cy - S * 0.09, cx + S * 0.09, cy + S * 0.09], fill=light)
+    # the strike: a dark band with a light one inside, corner to corner
+    d.line([S * 0.14, S * 0.86, S * 0.86, S * 0.14], fill=(20, 17, 14, 255), width=int(S * 0.17))
+    d.line([S * 0.16, S * 0.84, S * 0.84, S * 0.16], fill=light, width=int(S * 0.08))
+    img = img.resize((ICON_RES, ICON_RES), Image.LANCZOS)
+    dil = img.split()[3].filter(ImageFilter.MaxFilter(3))
+    ol = Image.new("RGBA", img.size, OUTLINE)
+    ol.putalpha(dil)
+    return Image.alpha_composite(ol, img)
+
+
 def all_icon():
     """The "All layers" toggle (the owner 2026-10-02: simpler, like the site's other icons): a 16-px pixel glyph of
     three stacked map layers in the gold ramp, dark outline, scaled up hard-edged like tc_trees."""
@@ -280,7 +308,7 @@ def main(only=()):
         print("wrote", name)
 
     # ---- custom drawn: spawnbox, "all layers" ----
-    for name, make in (("icon_spawnbox", spawnbox_icon), ("tc_all", all_icon)):
+    for name, make in (("icon_spawnbox", spawnbox_icon), ("tc_all", all_icon), ("tc_nowards", nowards_icon)):
         if want(name):
             im = make()
             im.save(os.path.join(_OUT, f"{name}.png"))

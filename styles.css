@@ -9635,7 +9635,11 @@ li.tsp-hidden { display: none !important; }
 .terrain-compare.show-outposts .tm-layer-outposts,
 .terrain-compare.show-watchers .tm-layer-watchers,
 .terrain-compare.show-roshan .tm-layer-roshan,
-.terrain-compare.show-spawnboxes .tm-layer-spawnboxes { opacity: 1; }
+.terrain-compare.show-spawnboxes .tm-layer-spawnboxes,
+.terrain-compare.show-nowards .tm-layer-nowards { opacity: 1; }
+/* No-ward ground: the map's gridnav cells (64 units) where a ward can't stand — one pixel per cell, kept square */
+.tm-layer-nowards image { image-rendering: pixelated; }
+.tc-markers.tm-layer-nowards { overflow: hidden; }   /* the grid reaches past the picture's edge */
 /* trees — ONE colour everywhere. The 7.40 layout (old side) and 7.41 layout
    (new side) are split by the slider, so sweeping reveals how the forest moved. */
 /* match the spectral/leamare tree style (styleDefinitions tree.alive) */
@@ -9811,6 +9815,15 @@ li.tsp-hidden { display: none !important; }
 }
 .terrain-facts td.tf-label { color: var(--text-bright); width: 38%; }
 .tf-camp { display: inline-flex; align-items: center; gap: 3px; margin: 1px 6px; white-space: nowrap; }
+/* "Changed in the map file": one chip per kind of object — icon, name, n/of all */
+.terrain-facts td.tf-chips { padding: 4px 4px; line-height: 1.9; }
+.tf-chip {
+  display: inline-flex; align-items: center; gap: 4px; margin: 2px 3px; padding: 1px 7px 1px 5px;
+  white-space: nowrap; border: 1px solid rgba(227, 196, 106, 0.22); background: rgba(227, 196, 106, 0.05);
+  border-radius: 3px; color: var(--text-dim);
+}
+.tf-chip img { width: 16px; height: 16px; }
+.tf-chip b { color: var(--text-bright); font-weight: 600; }
 .tf-camp img { width: 16px; height: 16px; image-rendering: auto; }
 .terrain-quiet { margin: 8px 2px 0; font-size: 12.5px; color: var(--text-dim); font-style: italic; text-align: center; }
 /* A patch whose notes list no terrain changes: one plain row, no tag. */

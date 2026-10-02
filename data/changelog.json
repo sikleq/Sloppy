@@ -3,6 +3,20 @@
   "entries": [
     {
       "date": "2026-10-02",
+      "category": "Materials",
+      "minor": true,
+      "link": "terrain_741c.html",
+      "title": "Terrain: a No-ward ground layer — every spot where a ward can't stand, read from each patch's map file; 7.41c, 7.41d and 7.41e get pages for the ward spots they quietly changed"
+    },
+    {
+      "date": "2026-10-02",
+      "category": "Materials",
+      "minor": true,
+      "link": "terrain_739b.html",
+      "title": "Terrain: what's on the map and what changed in the map file are now two small tables — changes grouped as moved, changed, added / removed, each with its icon and how many of all (Bounty runes 1/2)"
+    },
+    {
+      "date": "2026-10-02",
       "category": "Patch Reader",
       "minor": true,
       "link": "patches/7.41.html",

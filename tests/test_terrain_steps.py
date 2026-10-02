@@ -88,7 +88,8 @@ def test_7_39d_bigger_triangle_ancient_boxes_show():
     """The owner: 7.39d "Increased spawnboxes of Triangle Ancient camps", yet the map showed no difference — the
     summary didn't count boxes, and the old dashed box hid a few px inside the new one."""
     diff = terrain._load_diff("7.39d")
-    assert terrain._moved_summary(diff) == ["trees +0 −3", "camp spawn boxes changed: 2"]
+    # + "Fixed a ward spot in Radiant safe lane hard camp": 10 gridnav cells turned no-ward
+    assert terrain._moved_summary(diff) == ["trees +0 −3", "camp spawn boxes changed: 2", "no-ward cells +10 −0"]
     svg, _counts = terrain._markers_svg(diff, "739d")
     assert svg.count("tc-sb-new tc-sb-changed") == 2 and svg.count("tc-sb-old tc-sb-changed") == 2
     assert svg.count("tc-sb-same") == 26
@@ -103,8 +104,7 @@ def test_a_patch_without_terrain_notes_says_so_and_shows_what_moved():
     html = _page("7.38b")
     assert 'class="terrain-no-notes"' in html
     assert '<caption>Changed in the map file</caption>' in html
-    assert ('<td class="tf-label">Trees</td><td><span class="tm-add-text">+2</span> '
-            '<span class="tm-rem-text">−11</span></td>') in html
+    assert ('Trees <span class="tm-add-text">+2</span> <span class="tm-rem-text">−11</span></span>') in html
     assert 'src="icons/maps/map_7.38.webp' in html and 'src="icons/maps/map_7.38b.webp' in html
     assert "← 7.38&nbsp; OLD" in html and "NEW &nbsp;7.38b →" in html
 
@@ -118,9 +118,10 @@ def _quiet_set():
 def test_a_patch_that_changed_nothing_gets_no_page():
     """The owner: "if nothing changed in a patch, there's nothing to compare" — no object moved, no notes."""
     steps, notes, quiet = _quiet_set()
-    assert quiet == {"7.39e", "7.40c", "7.41c", "7.41d", "7.41e", "7.41f"}
+    assert quiet == {"7.39e", "7.40c", "7.41f"}          # 7.41c-e changed where wards can stand
     pages = terrain._pages([p for p in steps if p not in quiet], notes)
-    assert pages == ["7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39", "7.38c", "7.38b", "7.38"]
+    assert pages == ["7.41e", "7.41d", "7.41c", "7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39",
+                     "7.38c", "7.38b", "7.38"]
 
 
 def test_7_38_has_its_page_and_its_map_notes():
@@ -137,7 +138,7 @@ def test_the_page_before_names_the_patches_that_changed_nothing():
     steps, notes, quiet = _quiet_set()
     pages = terrain._pages([p for p in steps if p not in quiet], notes)
     runs = terrain._quiet_runs(pages, mv.load_patch_maps(), quiet)
-    assert runs["7.41a"] == ["7.41b", "7.41c", "7.41d", "7.41e", "7.41f"]
+    assert runs["7.41a"] == ["7.41b"] and runs["7.41e"] == ["7.41f"]
     assert runs["7.40"] == ["7.40b", "7.40c"] and runs["7.39d"] == ["7.39e"] and runs["7.39b"] == []
     html = _page("7.40", runs["7.40"])
     assert "7.40b – 7.40c changed nothing on the map." in html
@@ -154,8 +155,12 @@ def test_the_facts_are_two_small_tables():
     assert html.count('<table class="terrain-facts">') == 2
     assert '<caption>On the map</caption>' in html and 'icons/camps/creepcamp_ancient.png' in html
     assert '6 large <span class="tm-rem-text">−4</span>' in html and '14 medium <span class="tm-add-text">+4</span>' in html
-    assert '<td class="tf-label">Camp tiers</td><td>4 changed</td>' in html
-    assert '<td class="tf-label">Camps</td><td>9 moved</td>' in html
+    # grouped by what happened, each kind of object a chip with "n/of all" (the owner: "Bounty runes 1 moved (1/2)")
+    moved = html[html.index('<td class="tf-label">Moved</td>'):]
+    assert 'Camps <b>9/28</b>' in moved.split("</tr>")[0] and 'Towers <b>1/22</b>' in moved.split("</tr>")[0]
+    changed = html[html.index('<td class="tf-label">Changed</td>'):].split("</tr>")[0]
+    assert 'Camp tiers <b>4/28</b>' in changed and 'Camp spawn boxes <b>10/28</b>' in changed
+    assert 'icons/ui/gothic/tc_towers.png' in html and html.count('class="tf-chip"') >= 6
     assert html.endswith('<p class="terrain-quiet">7.40b – 7.40c changed nothing on the map.</p>\n')
     assert "Nothing</td>" in terrain._facts_html({}, step, {"treesOld": [], "treesNew": []})
 
@@ -188,7 +193,7 @@ def test_an_all_layers_button_leads_the_layer_toggles():
     top, fs = terrain._controls_html(layers=True)
     for bar in (top, fs):
         layers = re.findall(r'data-layer="(\w+)"', bar)
-        assert layers[0] == "all" and "trees" in layers and len(layers) == 14
+        assert layers[0] == "all" and "trees" in layers and "nowards" in layers and len(layers) == 15
     assert 'src="icons/ui/gothic/tc_all.png"' in top
     assert os.path.exists(os.path.join(_ROOT, "icons", "ui", "gothic", "tc_all.png"))
     assert "data-layer" not in terrain._controls_html(layers=False)[0]
