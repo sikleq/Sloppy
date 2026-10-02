@@ -5,6 +5,14 @@
       "date": "2026-10-02",
       "category": "Materials",
       "minor": true,
+      "fix": true,
+      "link": "terrain_739d.html",
+      "title": "Terrain: camp spawn boxes that changed now stand out on the Spawn Boxes layer and are counted under the list (7.39d's bigger Triangle Ancient boxes were a few pixels apart and easy to miss)"
+    },
+    {
+      "date": "2026-10-02",
+      "category": "Materials",
+      "minor": true,
       "link": "terrain_741.html",
       "title": "Terrain: an “All layers” button turns every map layer on (or off) at once"
     },

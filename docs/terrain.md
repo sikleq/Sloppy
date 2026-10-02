@@ -313,6 +313,14 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `data-tiles-old/-new`; scripts.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
   picture — the old ones next to `.tc-old`, the new ones inside the clipped `.tc-new-layer` — once a picture pixel
   would be drawn bigger than a screen pixel. Pages' 1 GB limit: tiles for the site's maps only.
+- **Changed spawn boxes stand out (2026-10-02)** — the owner: 7.39d "Increased spawnboxes of Triangle Ancient camps",
+  yet the map showed nothing: the old dashed box hid a few px inside the new one, and the summary didn't count
+  boxes. Now a box that didn't change is drawn once (`.tc-sb-same`), a changed one thick (`.tc-sb-changed`: new
+  with a stronger fill, old dashed red over it), matched by corners (`_box_key`), and `_moved_summary` says
+  "camp spawn boxes changed: n".
+- **SFM session in the repo (2026-10-02)** — `scripts/gen/sfm_map_session.dmx` (KeyValues2 text, export folder =
+  `FRAMES_DIR`) + `scripts/gen/sfm_session.py FRAMES OUT.dmx` (fills it in, converts with dmxconvert); the
+  render scripts use it. Tests: tests/test_sfm_session.py.
 - **"All layers" toggle (2026-10-02)** — the owner: "add an 'all' filter that turns every object filter on". First
   of the layer buttons (`layer_btn("all", …)`, both bars); scripts.js turns every layer on, or all off when all are
   on already, and keeps it pressed exactly while every layer is on. Icon `tc_all.png` (four discs in four layer

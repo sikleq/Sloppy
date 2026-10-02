@@ -1,0 +1,4239 @@
+<!-- dmx encoding keyvalues2 4 format sfm_session 22 -->
+"DmElement"
+{
+	"id" "elementid" "da66532f-d482-4da4-aad5-3ba7e6411f9c"
+	"name" "string" "session"
+	"activeClip" "element" "1aec4de0-57a4-4215-a57f-9ff7f25c846d"
+	"miscBin" "element_array" 
+	[
+	]
+	"cameraBin" "element_array" 
+	[
+	]
+	"clipBin" "element_array" 
+	[
+		"element" "1aec4de0-57a4-4215-a57f-9ff7f25c846d"
+	]
+	"settings" "DmElement"
+	{
+		"id" "elementid" "61fbffd7-ace3-482e-a32d-97b122cff05e"
+		"name" "string" "sessionSettings"
+		"timeSelection" "DmeTimeSelection"
+		{
+			"id" "elementid" "46b07456-b8d6-446d-9179-1d45050c3633"
+			"name" "string" "timeSelection"
+			"enabled" "bool" "1"
+			"relative" "bool" "0"
+			"falloff_left" "time" "-214748.3647"
+			"falloff_right" "time" "214748.3647"
+			"hold_left" "time" "-214748.3647"
+			"hold_right" "time" "214748.3647"
+			"interpolator_left" "int" "6"
+			"interpolator_right" "int" "6"
+			"threshold" "float" "0.0005"
+			"resampleinterval" "time" "0.0100"
+			"recordingstate" "int" "2"
+		}
+
+		"graphEditorState" "DmeGraphEditorState"
+		{
+			"id" "elementid" "7f09d022-606d-47f8-a639-6c8748b5daaa"
+			"name" "string" "graphEditorState"
+			"displayGrid" "bool" "1"
+		}
+
+		"proceduralPresets" "DmeProceduralPresetSettings"
+		{
+			"id" "elementid" "be5142c2-ef3a-44f7-896c-c9837472b961"
+			"name" "string" "proceduralPresets"
+			"jitterscale" "float" "1"
+			"smoothscale" "float" "1"
+			"jitterscale_vector" "float" "2.5"
+			"smoothscale_vector" "float" "2.5"
+			"jitteriterations" "int" "5"
+			"smoothiterations" "int" "5"
+			"staggerinterval" "time" "0.0833"
+		}
+
+		"renderSettings" "DmElement"
+		{
+			"id" "elementid" "e97a6478-65e2-4f3c-b9ac-6bdddabdf734"
+			"name" "string" "renderSettings"
+			"width" "int" "3840"
+			"height" "int" "2160"
+			"frameRate" "float" "1"
+			"lightAverage" "int" "0"
+			"modelLod" "int" "0"
+			"engineCameraEffects" "bool" "0"
+			"ambientOcclusionMode" "int" "1"
+			"showAmbientOcclusion" "int" "0"
+			"drawGameRenderablesMask" "int" "63"
+			"drawToolRenderablesMask" "int" "29"
+			"toneMapScale" "float" "1"
+			"globalLightShadowEnabled" "bool" "1"
+			"ProgressiveRefinement" "DmElement"
+			{
+				"id" "elementid" "1ce44ec3-1f63-487d-9490-37f39d8b5530"
+				"name" "string" "ProgressiveRefinementSettings"
+				"on" "bool" "1"
+				"useDepthOfField" "bool" "0"
+				"overrideDepthOfFieldSamples" "bool" "0"
+				"overrideDepthOfFieldSamplesValue" "int" "512"
+				"useMotionBlur" "bool" "0"
+				"overrideMotionBlurSamples" "bool" "0"
+				"overrideMotionBlurSamplesValue" "int" "8"
+				"useAntialiasing" "bool" "0"
+				"overrideShutterSpeed" "bool" "0"
+				"overrideShutterSpeedValue" "float" "0.0099999998"
+			}
+
+			"showShotIDOverlay" "bool" "0"
+			"drawGrid" "bool" "0"
+			"exrCompressionType" "int" "3"
+			"SkipMainPipelinePostProcessing" "bool" "1"
+			"ignoreAlphaFade" "bool" "0"
+		}
+
+		"posterSettings" "DmElement"
+		{
+			"id" "elementid" "65fe45dd-dbea-45e5-914c-353cfacb97f0"
+			"name" "string" "posterSettings"
+			"width" "int" "1920"
+			"height" "int" "1080"
+			"DPI" "int" "300"
+			"units" "int" "0"
+			"constrainAspect" "bool" "1"
+			"heightInPixels" "bool" "1"
+			"widthInPixels" "bool" "1"
+			"filename" "string" "c:\\program files (x86)\\steam\\steamapps\\common\\dota 2 beta\\game\\dota\\elements\\renders\\poster"
+			"format" "string" "PNG"
+			"writeAlpha" "bool" "0"
+		}
+
+		"movieSettings" "DmElement"
+		{
+			"id" "elementid" "2ef41ab1-f443-4777-9ae5-2fca9c1eea1f"
+			"name" "string" "movieSettings"
+			"videoTarget" "int" "4"
+			"audioTarget" "int" "2"
+			"stereoscopic" "bool" "0"
+			"stereoSingleFile" "bool" "0"
+			"clearDecals" "bool" "0"
+			"width" "int" "3840"
+			"height" "int" "2160"
+			"filename" "string" "FRAMES_DIR"
+			"writeAlpha" "bool" "0"
+			"writeDepth" "bool" "0"
+			"TimeRangeFormat" "int" "0"
+			"TimeRangeDurationFormat" "int" "2"
+			"TimeRangeStartTime" "float" "0"
+			"TimeRangeEndTime" "float" "66"
+			"IsOverridingFrameRate" "bool" "0"
+			"OverridingFrameRate" "float" "1"
+			"stereoSquashed" "bool" "0"
+			"UseMoviePostRenderCommand" "bool" "0"
+			"MoviePostRenderCommand" "string" ""
+			"MoviePostRenderArguments" "string" ""
+			"UseMovieAfterRenderCommand" "bool" "0"
+			"MovieAfterRenderCommand" "string" ""
+			"MovieAfterRenderArguments" "string" ""
+			"simulateWhenShutterClosed" "bool" "0"
+		}
+
+		"sharedPresetGroupSettings" "DmElement"
+		{
+			"id" "elementid" "5db88c6f-6020-4967-b8ed-21a391ac80f6"
+			"name" "string" "sharedPresetGroupSettings"
+			"presetGroupInfos" "element_array" 
+			[
+			]
+		}
+
+	}
+
+}
+
+"DmeFilmClip"
+{
+	"id" "elementid" "1aec4de0-57a4-4215-a57f-9ff7f25c846d"
+	"name" "string" "session2"
+	"timeFrame" "DmeTimeFrame"
+	{
+		"id" "elementid" "e9910f04-8bd1-44c5-938c-642ee93ebb1d"
+		"start" "time" "0.0000"
+		"duration" "time" "66.0000"
+		"offset" "time" "0.0000"
+		"scale" "float" "1"
+	}
+
+	"color" "color" "0 0 0 0"
+	"text" "string" ""
+	"mute" "bool" "0"
+	"trackGroups" "element_array" 
+	[
+		"DmeTrackGroup"
+		{
+			"id" "elementid" "2a7c72a0-97b4-463b-884d-582148c6a29d"
+			"name" "string" "Sound"
+			"tracks" "element_array" 
+			[
+				"DmeTrack"
+				{
+					"id" "elementid" "3988c436-8a44-4f67-98cd-4e35a6b1ee01"
+					"name" "string" "Dialog"
+					"children" "element_array" 
+					[
+					]
+					"collapsed" "bool" "0"
+					"mute" "bool" "0"
+					"synched" "bool" "1"
+					"clipType" "int" "1"
+					"volume" "float" "1"
+					"displayScale" "float" "1"
+				},
+				"DmeTrack"
+				{
+					"id" "elementid" "c2db41f1-c203-4ed8-be35-814afdd8ec26"
+					"name" "string" "Music"
+					"children" "element_array" 
+					[
+					]
+					"collapsed" "bool" "0"
+					"mute" "bool" "0"
+					"synched" "bool" "1"
+					"clipType" "int" "1"
+					"volume" "float" "1"
+					"displayScale" "float" "1"
+				},
+				"DmeTrack"
+				{
+					"id" "elementid" "ae5c854e-3a45-4ffd-bee6-2450066e3ae5"
+					"name" "string" "Effects"
+					"children" "element_array" 
+					[
+					]
+					"collapsed" "bool" "0"
+					"mute" "bool" "0"
+					"synched" "bool" "1"
+					"clipType" "int" "1"
+					"volume" "float" "1"
+					"displayScale" "float" "1"
+				}
+			]
+			"visible" "bool" "1"
+			"mute" "bool" "0"
+			"displayScale" "float" "1"
+			"minimized" "bool" "0"
+			"volume" "float" "1"
+			"forcemultitrack" "bool" "0"
+		},
+		"DmeTrackGroup"
+		{
+			"id" "elementid" "0f607908-b21d-46e4-b065-2747e92359ec"
+			"name" "string" "Overlay"
+			"tracks" "element_array" 
+			[
+				"DmeTrack"
+				{
+					"id" "elementid" "7b2bdf3d-8dad-4eb9-a221-aa83f62ee1eb"
+					"name" "string" "Effects"
+					"children" "element_array" 
+					[
+					]
+					"collapsed" "bool" "0"
+					"mute" "bool" "0"
+					"synched" "bool" "1"
+					"clipType" "int" "2"
+					"volume" "float" "1"
+					"displayScale" "float" "1"
+				}
+			]
+			"visible" "bool" "1"
+			"mute" "bool" "0"
+			"displayScale" "float" "1"
+			"minimized" "bool" "0"
+			"volume" "float" "1"
+			"forcemultitrack" "bool" "0"
+		}
+	]
+	"displayScale" "float" "1"
+	"mapname" "string" "maps/dota.vmap"
+	"camera" "element" ""
+	"scene" "element" ""
+	"globalState" "element" ""
+	"fadeIn" "time" "0.0000"
+	"fadeOut" "time" "0.0000"
+	"backgroundColor" "color" "64 64 64 255"
+	"backgroundFXClip" "element" ""
+	"operators" "element_array" 
+	[
+	]
+	"animationSets" "element_array" 
+	[
+	]
+	"bookmarkSets" "element_array" 
+	[
+		"DmeBookmarkSet"
+		{
+			"id" "elementid" "4ccb37c2-b9a7-49aa-97b7-2417d1cf032b"
+			"name" "string" "Default Set"
+			"bookmarks" "element_array" 
+			[
+			]
+		}
+	]
+	"activeBookmarkSet" "int" "0"
+	"subClipTrackGroup" "DmeTrackGroup"
+	{
+		"id" "elementid" "406ce74b-3b52-4edd-9270-85df3019e2b7"
+		"name" "string" "subClipTrackGroup"
+		"tracks" "element_array" 
+		[
+			"DmeTrack"
+			{
+				"id" "elementid" "606cb67d-ebba-4cea-af6e-a7512166a025"
+				"name" "string" "Film"
+				"children" "element_array" 
+				[
+					"DmeFilmClip"
+					{
+						"id" "elementid" "b00de67e-ecd2-41ab-8729-a19a268b43af"
+						"name" "string" "shot1"
+						"timeFrame" "DmeTimeFrame"
+						{
+							"id" "elementid" "4db1bf3b-f099-4587-b928-1b0de3d418d4"
+							"start" "time" "0.0000"
+							"duration" "time" "66.0000"
+							"offset" "time" "0.0000"
+							"scale" "float" "1"
+						}
+
+						"color" "color" "0 0 0 0"
+						"text" "string" ""
+						"mute" "bool" "0"
+						"trackGroups" "element_array" 
+						[
+							"DmeTrackGroup"
+							{
+								"id" "elementid" "05960922-a545-4b39-9360-2a46e71a6044"
+								"name" "string" "channelTrackGroup"
+								"tracks" "element_array" 
+								[
+									"DmeTrack"
+									{
+										"id" "elementid" "31b4b21c-53a1-438b-97d5-fa1d787f7eda"
+										"name" "string" "animSetEditorChannels"
+										"children" "element_array" 
+										[
+											"DmeChannelsClip"
+											{
+												"id" "elementid" "564ba178-d442-44fd-988f-9f132a1f7fdb"
+												"name" "string" "camera1"
+												"timeFrame" "DmeTimeFrame"
+												{
+													"id" "elementid" "c1dffe2e-b844-4cfe-a2cd-17349ab5525c"
+													"start" "time" "-5.0000"
+													"duration" "time" "70.0000"
+													"offset" "time" "0.0000"
+													"scale" "float" "1"
+												}
+
+												"color" "color" "0 0 0 0"
+												"text" "string" ""
+												"mute" "bool" "0"
+												"trackGroups" "element_array" 
+												[
+												]
+												"displayScale" "float" "1"
+												"channels" "element_array" 
+												[
+													"element" "22b15f38-9cf4-45f2-864e-21be0deff8e2",
+													"DmeChannel"
+													{
+														"id" "elementid" "63417544-5c7c-424a-9fdf-f4dda8f6ab88"
+														"name" "string" "scaled_fieldOfView_channel"
+														"fromElement" "element" "6c29ad9e-4e39-46d1-87e9-9d3c2e5b9eff"
+														"fromAttribute" "string" "result"
+														"fromIndex" "int" "0"
+														"toElement" "element" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+														"toAttribute" "string" "fieldOfView"
+														"toIndex" "int" "0"
+														"mode" "int" "1"
+														"log" "DmeFloatLog"
+														{
+															"id" "elementid" "68f3a21c-de1c-4c5e-a04a-a6620dfb0e40"
+															"name" "string" "float log"
+															"layers" "element_array" 
+															[
+																"DmeFloatLogLayer"
+																{
+																	"id" "elementid" "66f5694c-e4f1-4734-9c63-57a13ddada3b"
+																	"name" "string" "float log"
+																	"times" "time_array" 
+																	[
+																	]
+																	"curvetypes" "int_array" 
+																	[
+																	]
+																	"values" "float_array" 
+																	[
+																	]
+																	"compressed" "binary" 
+																	"
+																	"
+																}
+															]
+															"curveinfo" "element" ""
+															"usedefaultvalue" "bool" "0"
+															"defaultvalue" "float" "0"
+															"bookmarks" "time_array" 
+															[
+															]
+														}
+
+													},
+													"element" "835267c2-8e7c-447d-a8e6-2c714b999bf6",
+													"DmeChannel"
+													{
+														"id" "elementid" "5da41f03-0a21-4eb0-a8e3-623ba9e5d421"
+														"name" "string" "scaled_focalDistance_channel"
+														"fromElement" "element" "69a576ba-ca3d-4dcf-8fd1-a22507d0736b"
+														"fromAttribute" "string" "result"
+														"fromIndex" "int" "0"
+														"toElement" "element" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+														"toAttribute" "string" "focalDistance"
+														"toIndex" "int" "0"
+														"mode" "int" "1"
+														"log" "DmeFloatLog"
+														{
+															"id" "elementid" "f0a7d29e-d082-43df-8415-6aa4a343c1d2"
+															"name" "string" "float log"
+															"layers" "element_array" 
+															[
+																"DmeFloatLogLayer"
+																{
+																	"id" "elementid" "21e18aba-334c-4be8-9855-2d2b45a376fb"
+																	"name" "string" "float log"
+																	"times" "time_array" 
+																	[
+																	]
+																	"curvetypes" "int_array" 
+																	[
+																	]
+																	"values" "float_array" 
+																	[
+																	]
+																	"compressed" "binary" 
+																	"
+																	"
+																}
+															]
+															"curveinfo" "element" ""
+															"usedefaultvalue" "bool" "0"
+															"defaultvalue" "float" "0"
+															"bookmarks" "time_array" 
+															[
+															]
+														}
+
+													},
+													"element" "7af05dd9-18ed-416f-8324-cd0482c2bbfb",
+													"DmeChannel"
+													{
+														"id" "elementid" "5c09a770-4d4c-4074-adb8-c36c2272bb31"
+														"name" "string" "scaled_aperture_channel"
+														"fromElement" "element" "0e53d650-5d36-49e9-87e6-51d328ec041b"
+														"fromAttribute" "string" "result"
+														"fromIndex" "int" "0"
+														"toElement" "element" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+														"toAttribute" "string" "aperture"
+														"toIndex" "int" "0"
+														"mode" "int" "1"
+														"log" "DmeFloatLog"
+														{
+															"id" "elementid" "baefa528-d4e2-4604-bffd-fc093bee2374"
+															"name" "string" "float log"
+															"layers" "element_array" 
+															[
+																"DmeFloatLogLayer"
+																{
+																	"id" "elementid" "d9b356b8-b103-459f-9729-19274b7dd912"
+																	"name" "string" "float log"
+																	"times" "time_array" 
+																	[
+																	]
+																	"curvetypes" "int_array" 
+																	[
+																	]
+																	"values" "float_array" 
+																	[
+																	]
+																	"compressed" "binary" 
+																	"
+																	"
+																}
+															]
+															"curveinfo" "element" ""
+															"usedefaultvalue" "bool" "0"
+															"defaultvalue" "float" "0"
+															"bookmarks" "time_array" 
+															[
+															]
+														}
+
+													},
+													"element" "9e60c42a-ccad-4b14-8797-feb2a5908302",
+													"element" "dce5b7c0-18e8-4133-9b9c-63aedbde2c2c",
+													"DmeChannel"
+													{
+														"id" "elementid" "fbeb2144-40a5-40c7-b93c-dfdd5f54ac44"
+														"name" "string" "scaled_SSAOStrength_channel"
+														"fromElement" "element" "5d7f521a-d353-4d7b-8dd9-4565836251d5"
+														"fromAttribute" "string" "result"
+														"fromIndex" "int" "0"
+														"toElement" "element" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+														"toAttribute" "string" "SSAOStrength"
+														"toIndex" "int" "0"
+														"mode" "int" "1"
+														"log" "DmeFloatLog"
+														{
+															"id" "elementid" "ca9219d6-6023-43e2-bb9a-747b00321a9e"
+															"name" "string" "float log"
+															"layers" "element_array" 
+															[
+																"DmeFloatLogLayer"
+																{
+																	"id" "elementid" "35c007f6-e16e-4b4b-80f9-2c538dcaa578"
+																	"name" "string" "float log"
+																	"times" "time_array" 
+																	[
+																	]
+																	"curvetypes" "int_array" 
+																	[
+																	]
+																	"values" "float_array" 
+																	[
+																	]
+																	"compressed" "binary" 
+																	"
+																	"
+																}
+															]
+															"curveinfo" "element" ""
+															"usedefaultvalue" "bool" "0"
+															"defaultvalue" "float" "0"
+															"bookmarks" "time_array" 
+															[
+															]
+														}
+
+													},
+													"element" "c6a7e52d-da42-4cf5-8e20-186566fbe4d4",
+													"DmeChannel"
+													{
+														"id" "elementid" "773bb8cb-b5f1-4860-bea9-8803adc55e30"
+														"name" "string" "scaled_SSAORadius_channel"
+														"fromElement" "element" "3f27aa00-f7d8-4b5c-91f9-627ddce5d5d7"
+														"fromAttribute" "string" "result"
+														"fromIndex" "int" "0"
+														"toElement" "element" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+														"toAttribute" "string" "SSAORadius"
+														"toIndex" "int" "0"
+														"mode" "int" "1"
+														"log" "DmeFloatLog"
+														{
+															"id" "elementid" "169afe53-b700-4438-8fe4-40de69f89f3b"
+															"name" "string" "float log"
+															"layers" "element_array" 
+															[
+																"DmeFloatLogLayer"
+																{
+																	"id" "elementid" "a6ac12d9-d163-46a3-8c57-0a30f1c4b685"
+																	"name" "string" "float log"
+																	"times" "time_array" 
+																	[
+																	]
+																	"curvetypes" "int_array" 
+																	[
+																	]
+																	"values" "float_array" 
+																	[
+																	]
+																	"compressed" "binary" 
+																	"
+																	"
+																}
+															]
+															"curveinfo" "element" ""
+															"usedefaultvalue" "bool" "0"
+															"defaultvalue" "float" "0"
+															"bookmarks" "time_array" 
+															[
+															]
+														}
+
+													},
+													"element" "34080d38-6b63-4a6b-adc5-6a8b0a6ce92b",
+													"element" "d97544c5-6f48-415b-9138-cdb15e25f391",
+													"element" "52dabbf9-153f-4dd6-84d1-46c8632ec440",
+													"element" "409d1f42-5a9c-400e-acd4-2cd5095c8cff"
+												]
+											}
+										]
+										"collapsed" "bool" "0"
+										"mute" "bool" "0"
+										"synched" "bool" "1"
+										"clipType" "int" "0"
+										"volume" "float" "1"
+										"displayScale" "float" "1"
+									}
+								]
+								"visible" "bool" "1"
+								"mute" "bool" "0"
+								"displayScale" "float" "1"
+								"minimized" "bool" "0"
+								"volume" "float" "1"
+								"forcemultitrack" "bool" "0"
+							}
+						]
+						"displayScale" "float" "1"
+						"mapname" "string" ""
+						"camera" "element" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+						"scene" "DmeDag"
+						{
+							"id" "elementid" "6286e2df-2a67-4d8e-99a4-580287e03b18"
+							"name" "string" "scene"
+							"transform" "DmeTransform"
+							{
+								"id" "elementid" "6f27e2a0-b0e8-4bb0-bf30-bd6037465bfa"
+								"position" "vector3" "0 0 0"
+								"orientation" "quaternion" "0 0 0 1"
+							}
+
+							"shape" "element" ""
+							"visible" "bool" "1"
+							"children" "element_array" 
+							[
+								"DmeDag"
+								{
+									"id" "elementid" "f8926ca7-5823-40ed-b5bc-96f33f805d2f"
+									"name" "string" "Cameras"
+									"transform" "DmeTransform"
+									{
+										"id" "elementid" "11d97147-3032-4a02-be48-50834e4c88a9"
+										"position" "vector3" "0 0 0"
+										"orientation" "quaternion" "0 0 0 1"
+									}
+
+									"shape" "element" ""
+									"visible" "bool" "1"
+									"children" "element_array" 
+									[
+									]
+								},
+								"DmeDag"
+								{
+									"id" "elementid" "9fb928b1-019b-4219-a2d6-0fecf33a041f"
+									"name" "string" "Lights"
+									"transform" "DmeTransform"
+									{
+										"id" "elementid" "01e55271-8f2b-4b4d-b592-88addd59e898"
+										"position" "vector3" "0 0 0"
+										"orientation" "quaternion" "0 0 0 1"
+									}
+
+									"shape" "element" ""
+									"visible" "bool" "1"
+									"children" "element_array" 
+									[
+									]
+								}
+							]
+						}
+
+						"globalState" "element" ""
+						"fadeIn" "time" "0.0000"
+						"fadeOut" "time" "0.0000"
+						"backgroundColor" "color" "64 64 64 255"
+						"backgroundFXClip" "element" ""
+						"operators" "element_array" 
+						[
+						]
+						"animationSets" "element_array" 
+						[
+							"DmeAnimationSet"
+							{
+								"id" "elementid" "013c3ecd-70d1-4ad7-85bf-ff06f65b993a"
+								"name" "string" "camera1"
+								"controls" "element_array" 
+								[
+									"element" "4cc4d3ab-e890-4c65-9cb0-9a92027c07fc",
+									"element" "f3411912-c729-4f2e-8f1d-8af5e1967226",
+									"element" "1aa68dc3-e6ec-4ea1-8523-558a4240f961",
+									"element" "a3c2fc3c-1eac-4c0c-93b7-df04698e1ae2",
+									"element" "aa9e41b0-99f6-432a-8f64-6d9c60544f73",
+									"element" "00b993ce-0611-4f7e-a78e-e4dd0cc785ef",
+									"element" "feb82244-d96b-4795-a294-ce8d94c2c2f1",
+									"element" "02b3e07c-30a5-4ecf-8ac3-511e0097e1e0",
+									"element" "7ba2b451-b2ee-4def-95f2-fd6fdc04db65"
+								]
+								"presetGroups" "element_array" 
+								[
+								]
+								"phonememap" "element_array" 
+								[
+								]
+								"operators" "element_array" 
+								[
+									"element" "6c29ad9e-4e39-46d1-87e9-9d3c2e5b9eff",
+									"element" "69a576ba-ca3d-4dcf-8fd1-a22507d0736b",
+									"element" "0e53d650-5d36-49e9-87e6-51d328ec041b",
+									"element" "5d7f521a-d353-4d7b-8dd9-4565836251d5",
+									"element" "3f27aa00-f7d8-4b5c-91f9-627ddce5d5d7"
+								]
+								"rootControlGroup" "DmeControlGroup"
+								{
+									"id" "elementid" "ec80a1fc-4e89-477a-bbab-71941b97effe"
+									"children" "element_array" 
+									[
+										"DmeControlGroup"
+										{
+											"id" "elementid" "7ca16291-76b6-4a62-b6e3-4e480917471e"
+											"name" "string" "all"
+											"children" "element_array" 
+											[
+											]
+											"controls" "element_array" 
+											[
+												"element" "4cc4d3ab-e890-4c65-9cb0-9a92027c07fc",
+												"element" "f3411912-c729-4f2e-8f1d-8af5e1967226",
+												"element" "1aa68dc3-e6ec-4ea1-8523-558a4240f961",
+												"element" "a3c2fc3c-1eac-4c0c-93b7-df04698e1ae2",
+												"element" "aa9e41b0-99f6-432a-8f64-6d9c60544f73",
+												"element" "00b993ce-0611-4f7e-a78e-e4dd0cc785ef",
+												"element" "feb82244-d96b-4795-a294-ce8d94c2c2f1",
+												"element" "02b3e07c-30a5-4ecf-8ac3-511e0097e1e0",
+												"element" "7ba2b451-b2ee-4def-95f2-fd6fdc04db65"
+											]
+											"groupColor" "color" "200 200 200 255"
+											"controlColor" "color" "200 200 200 255"
+											"visible" "bool" "1"
+											"selectable" "bool" "1"
+											"snappable" "bool" "1"
+										}
+									]
+									"controls" "element_array" 
+									[
+									]
+									"groupColor" "color" "200 200 200 255"
+									"controlColor" "color" "200 200 200 255"
+									"visible" "bool" "1"
+									"selectable" "bool" "1"
+									"snappable" "bool" "1"
+								}
+
+								"camera" "element" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+							}
+						]
+						"bookmarkSets" "element_array" 
+						[
+							"DmeBookmarkSet"
+							{
+								"id" "elementid" "e004581f-1baa-4fd3-9491-0e8de53cbf28"
+								"name" "string" "Default Set"
+								"bookmarks" "element_array" 
+								[
+								]
+							}
+						]
+						"activeBookmarkSet" "int" "0"
+						"subClipTrackGroup" "element" ""
+						"volume" "float" "1"
+						"concommands" "string_array" 
+						[
+						]
+						"convars" "string_array" 
+						[
+						]
+					}
+				]
+				"collapsed" "bool" "0"
+				"mute" "bool" "0"
+				"synched" "bool" "1"
+				"clipType" "int" "3"
+				"volume" "float" "1"
+				"displayScale" "float" "1"
+			}
+		]
+		"visible" "bool" "1"
+		"mute" "bool" "0"
+		"displayScale" "float" "1"
+		"minimized" "bool" "0"
+		"volume" "float" "1"
+		"forcemultitrack" "bool" "0"
+	}
+
+	"volume" "float" "1"
+	"concommands" "string_array" 
+	[
+	]
+	"convars" "string_array" 
+	[
+	]
+	"worldLayerVisibility" "DmElement"
+	{
+		"id" "elementid" "ca89d6c2-280a-4fcf-b0e9-a550722b4587"
+		"name" "string" "worldLayerVisibility"
+		"showcase_trees" "bool" "0"
+		"world_layer_dire_base" "bool" "1"
+		"world_layer_dire_destruction" "bool" "0"
+		"world_layer_radiant_base" "bool" "1"
+		"world_layer_radiant_destruction" "bool" "0"
+	}
+
+}
+
+"DmeCamera"
+{
+	"id" "elementid" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+	"name" "string" "camera1"
+	"transform" "element" "455440d7-3cd1-4a62-b02a-64316526b975"
+	"shape" "element" ""
+	"visible" "bool" "1"
+	"children" "element_array" 
+	[
+	]
+	"fieldOfView" "float" "1"
+	"znear" "float" "200000"
+	"zfar" "float" "300000"
+	"micDistance" "float" "0"
+	"eyeOffset" "float" "0"
+	"focalDistance" "float" "72"
+	"aperture" "float" "0.2000000179"
+	"shutterSpeed" "time" "0.0208"
+	"toneMapScale" "float" "1"
+	"SSAOBias" "float" "0.5"
+	"SSAOStrength" "float" "1.4680850506"
+	"SSAORadius" "float" "31.0637702942"
+	"depthOfFieldSamples" "int" "64"
+	"motionBlurSamples" "int" "8"
+	"mapLightScale" "float" "1"
+	"timeOfDayAmount" "float" "1"
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "455440d7-3cd1-4a62-b02a-64316526b975"
+	"position" "vector3" "-6000 -9793.1044921875 240000"
+	"orientation" "quaternion" "-0.4964516461 0.5035233498 0.5035233498 0.4964516461"
+}
+
+"DmElement"
+{
+	"id" "elementid" "4cc4d3ab-e890-4c65-9cb0-9a92027c07fc"
+	"name" "string" "fieldOfView"
+	"value" "float" "0"
+	"channel" "element" "22b15f38-9cf4-45f2-864e-21be0deff8e2"
+	"defaultValue" "float" "0.3697479069"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "22b15f38-9cf4-45f2-864e-21be0deff8e2"
+	"name" "string" "fieldOfView"
+	"fromElement" "element" "4cc4d3ab-e890-4c65-9cb0-9a92027c07fc"
+	"fromAttribute" "string" "value"
+	"fromIndex" "int" "0"
+	"toElement" "element" "6c29ad9e-4e39-46d1-87e9-9d3c2e5b9eff"
+	"toAttribute" "string" "value"
+	"toIndex" "int" "0"
+	"mode" "int" "3"
+	"log" "DmeFloatLog"
+	{
+		"id" "elementid" "54df665a-faec-4f29-82a5-faf9db892a36"
+		"name" "string" "float log"
+		"layers" "element_array" 
+		[
+			"DmeFloatLogLayer"
+			{
+				"id" "elementid" "91b9283a-4858-4e24-bd32-2c706b4af938"
+				"name" "string" "float log"
+				"times" "time_array" 
+				[
+					"5.0091"
+				]
+				"curvetypes" "int_array" 
+				[
+				]
+				"values" "float_array" 
+				[
+					"0"
+				]
+				"compressed" "binary" 
+				"
+				"
+			}
+		]
+		"curveinfo" "element" ""
+		"usedefaultvalue" "bool" "0"
+		"defaultvalue" "float" "0"
+		"bookmarks" "time_array" 
+		[
+		]
+	}
+
+	"graphCurve" "DmeGraphEditorCurve"
+	{
+		"id" "elementid" "2c7dd48f-790f-46e7-8b06-7e304e28eeb0"
+		"name" "string" "graphCurve_fieldOfView"
+	}
+
+}
+
+"DmeExpressionOperator"
+{
+	"id" "elementid" "6c29ad9e-4e39-46d1-87e9-9d3c2e5b9eff"
+	"name" "string" "fieldOfView_rescale"
+	"result" "float" "1"
+	"expr" "string" "lerp(value, lo, hi)"
+	"spewresult" "bool" "0"
+	"value" "float" "0"
+	"lo" "float" "1"
+	"hi" "float" "120"
+}
+
+"DmElement"
+{
+	"id" "elementid" "f3411912-c729-4f2e-8f1d-8af5e1967226"
+	"name" "string" "focalDistance"
+	"value" "float" "0.0710710734"
+	"channel" "element" "835267c2-8e7c-447d-a8e6-2c714b999bf6"
+	"defaultValue" "float" "0.1191191152"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "835267c2-8e7c-447d-a8e6-2c714b999bf6"
+	"name" "string" "focalDistance"
+	"fromElement" "element" "f3411912-c729-4f2e-8f1d-8af5e1967226"
+	"fromAttribute" "string" "value"
+	"fromIndex" "int" "0"
+	"toElement" "element" "69a576ba-ca3d-4dcf-8fd1-a22507d0736b"
+	"toAttribute" "string" "value"
+	"toIndex" "int" "0"
+	"mode" "int" "3"
+	"log" "DmeFloatLog"
+	{
+		"id" "elementid" "c7a1b7c3-fabe-4872-9d58-0fec67fd55be"
+		"name" "string" "float log"
+		"layers" "element_array" 
+		[
+			"DmeFloatLogLayer"
+			{
+				"id" "elementid" "4285abef-9e1e-49c2-aa63-eb674a35fb10"
+				"name" "string" "float log"
+				"times" "time_array" 
+				[
+					"5.0091"
+				]
+				"curvetypes" "int_array" 
+				[
+				]
+				"values" "float_array" 
+				[
+					"0.0710710734"
+				]
+				"compressed" "binary" 
+				"
+				"
+			}
+		]
+		"curveinfo" "element" ""
+		"usedefaultvalue" "bool" "0"
+		"defaultvalue" "float" "0"
+		"bookmarks" "time_array" 
+		[
+		]
+	}
+
+	"graphCurve" "DmeGraphEditorCurve"
+	{
+		"id" "elementid" "e71b39d5-2b89-4276-a895-a6d31f0d0204"
+		"name" "string" "graphCurve_focalDistance"
+	}
+
+}
+
+"DmeExpressionOperator"
+{
+	"id" "elementid" "69a576ba-ca3d-4dcf-8fd1-a22507d0736b"
+	"name" "string" "focalDistance_rescale"
+	"result" "float" "72"
+	"expr" "string" "lerp(value, lo, hi)"
+	"spewresult" "bool" "0"
+	"value" "float" "0.0710710734"
+	"lo" "float" "1"
+	"hi" "float" "1000"
+}
+
+"DmElement"
+{
+	"id" "elementid" "1aa68dc3-e6ec-4ea1-8523-558a4240f961"
+	"name" "string" "aperture"
+	"value" "float" "0.0200000014"
+	"channel" "element" "7af05dd9-18ed-416f-8324-cd0482c2bbfb"
+	"defaultValue" "float" "0.0200000014"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "7af05dd9-18ed-416f-8324-cd0482c2bbfb"
+	"name" "string" "aperture"
+	"fromElement" "element" "1aa68dc3-e6ec-4ea1-8523-558a4240f961"
+	"fromAttribute" "string" "value"
+	"fromIndex" "int" "0"
+	"toElement" "element" "0e53d650-5d36-49e9-87e6-51d328ec041b"
+	"toAttribute" "string" "value"
+	"toIndex" "int" "0"
+	"mode" "int" "3"
+	"log" "DmeFloatLog"
+	{
+		"id" "elementid" "4f424579-3710-4eef-859c-f0c5caefb7a6"
+		"name" "string" "float log"
+		"layers" "element_array" 
+		[
+			"DmeFloatLogLayer"
+			{
+				"id" "elementid" "993966f4-e30f-4829-8db4-d887fc05294c"
+				"name" "string" "float log"
+				"times" "time_array" 
+				[
+					"5.0091"
+				]
+				"curvetypes" "int_array" 
+				[
+				]
+				"values" "float_array" 
+				[
+					"0.0200000014"
+				]
+				"compressed" "binary" 
+				"
+				"
+			}
+		]
+		"curveinfo" "element" ""
+		"usedefaultvalue" "bool" "0"
+		"defaultvalue" "float" "0"
+		"bookmarks" "time_array" 
+		[
+		]
+	}
+
+	"graphCurve" "DmeGraphEditorCurve"
+	{
+		"id" "elementid" "08676008-3786-4bd3-9c4a-11ed0161ac46"
+		"name" "string" "graphCurve_aperture"
+	}
+
+}
+
+"DmeExpressionOperator"
+{
+	"id" "elementid" "0e53d650-5d36-49e9-87e6-51d328ec041b"
+	"name" "string" "aperture_rescale"
+	"result" "float" "0.2000000179"
+	"expr" "string" "lerp(value, lo, hi)"
+	"spewresult" "bool" "0"
+	"value" "float" "0.0200000014"
+	"lo" "float" "0"
+	"hi" "float" "10"
+}
+
+"DmElement"
+{
+	"id" "elementid" "a3c2fc3c-1eac-4c0c-93b7-df04698e1ae2"
+	"name" "string" "SSAOBias"
+	"value" "float" "0.5"
+	"channel" "element" "9e60c42a-ccad-4b14-8797-feb2a5908302"
+	"defaultValue" "float" "0.5"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "9e60c42a-ccad-4b14-8797-feb2a5908302"
+	"name" "string" "SSAOBias"
+	"fromElement" "element" "a3c2fc3c-1eac-4c0c-93b7-df04698e1ae2"
+	"fromAttribute" "string" "value"
+	"fromIndex" "int" "0"
+	"toElement" "element" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+	"toAttribute" "string" "SSAOBias"
+	"toIndex" "int" "0"
+	"mode" "int" "3"
+	"log" "DmeFloatLog"
+	{
+		"id" "elementid" "8c5ca63d-2a72-408b-98f5-2b6dcdb71fa5"
+		"name" "string" "float log"
+		"layers" "element_array" 
+		[
+			"DmeFloatLogLayer"
+			{
+				"id" "elementid" "26dcb229-bef8-4c62-b294-79f054afe2ac"
+				"name" "string" "float log"
+				"times" "time_array" 
+				[
+					"5.0091"
+				]
+				"curvetypes" "int_array" 
+				[
+				]
+				"values" "float_array" 
+				[
+					"0.5"
+				]
+				"compressed" "binary" 
+				"
+				"
+			}
+		]
+		"curveinfo" "element" ""
+		"usedefaultvalue" "bool" "0"
+		"defaultvalue" "float" "0"
+		"bookmarks" "time_array" 
+		[
+		]
+	}
+
+	"graphCurve" "DmeGraphEditorCurve"
+	{
+		"id" "elementid" "3959ee88-4031-4167-a53c-4b0536e0b91d"
+		"name" "string" "graphCurve_SSAOBias"
+	}
+
+}
+
+"DmElement"
+{
+	"id" "elementid" "aa9e41b0-99f6-432a-8f64-6d9c60544f73"
+	"name" "string" "SSAOStrength"
+	"value" "float" "0.1468085051"
+	"channel" "element" "dce5b7c0-18e8-4133-9b9c-63aedbde2c2c"
+	"defaultValue" "float" "0.200000003"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "dce5b7c0-18e8-4133-9b9c-63aedbde2c2c"
+	"name" "string" "SSAOStrength"
+	"fromElement" "element" "aa9e41b0-99f6-432a-8f64-6d9c60544f73"
+	"fromAttribute" "string" "value"
+	"fromIndex" "int" "0"
+	"toElement" "element" "5d7f521a-d353-4d7b-8dd9-4565836251d5"
+	"toAttribute" "string" "value"
+	"toIndex" "int" "0"
+	"mode" "int" "3"
+	"log" "DmeFloatLog"
+	{
+		"id" "elementid" "8b46c3ed-487c-4117-a1cd-c530d2af548d"
+		"name" "string" "float log"
+		"layers" "element_array" 
+		[
+			"DmeFloatLogLayer"
+			{
+				"id" "elementid" "97826524-4259-480a-b818-f5c04d11cac0"
+				"name" "string" "float log"
+				"times" "time_array" 
+				[
+					"5.0091"
+				]
+				"curvetypes" "int_array" 
+				[
+				]
+				"values" "float_array" 
+				[
+					"0.1468085051"
+				]
+				"compressed" "binary" 
+				"
+				"
+			}
+		]
+		"curveinfo" "element" ""
+		"usedefaultvalue" "bool" "0"
+		"defaultvalue" "float" "0"
+		"bookmarks" "time_array" 
+		[
+			"20.0000"
+		]
+	}
+
+	"graphCurve" "DmeGraphEditorCurve"
+	{
+		"id" "elementid" "dd69ab2c-d992-4b95-b842-28e409d9be31"
+		"name" "string" "graphCurve_SSAOStrength"
+		"keysStateFlags_0" "int_array" 
+		[
+			"3"
+		]
+		"keysInMode_0" "int_array" 
+		[
+			"2"
+		]
+		"keysOutMode_0" "int_array" 
+		[
+			"2"
+		]
+		"keysTime_0" "time_array" 
+		[
+			"20.0000"
+		]
+		"keysInTime_0" "time_array" 
+		[
+			"0.0000"
+		]
+		"keysInDelta_0" "float_array" 
+		[
+			"0"
+		]
+		"keysOutTime_0" "time_array" 
+		[
+			"0.0000"
+		]
+		"keysOutDelta_0" "float_array" 
+		[
+			"0"
+		]
+	}
+
+}
+
+"DmeExpressionOperator"
+{
+	"id" "elementid" "5d7f521a-d353-4d7b-8dd9-4565836251d5"
+	"name" "string" "SSAOStrength_rescale"
+	"result" "float" "1.4680850506"
+	"expr" "string" "lerp(value, lo, hi)"
+	"spewresult" "bool" "0"
+	"value" "float" "0.1468085051"
+	"lo" "float" "0"
+	"hi" "float" "10"
+}
+
+"DmElement"
+{
+	"id" "elementid" "00b993ce-0611-4f7e-a78e-e4dd0cc785ef"
+	"name" "string" "SSAORadius"
+	"value" "float" "0.3106377125"
+	"channel" "element" "c6a7e52d-da42-4cf5-8e20-186566fbe4d4"
+	"defaultValue" "float" "0.2999999821"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "c6a7e52d-da42-4cf5-8e20-186566fbe4d4"
+	"name" "string" "SSAORadius"
+	"fromElement" "element" "00b993ce-0611-4f7e-a78e-e4dd0cc785ef"
+	"fromAttribute" "string" "value"
+	"fromIndex" "int" "0"
+	"toElement" "element" "3f27aa00-f7d8-4b5c-91f9-627ddce5d5d7"
+	"toAttribute" "string" "value"
+	"toIndex" "int" "0"
+	"mode" "int" "3"
+	"log" "DmeFloatLog"
+	{
+		"id" "elementid" "e504b037-6490-4ee1-9293-f9bdd8237893"
+		"name" "string" "float log"
+		"layers" "element_array" 
+		[
+			"DmeFloatLogLayer"
+			{
+				"id" "elementid" "a333256e-3e3d-4f19-8a54-c8b5de461bff"
+				"name" "string" "float log"
+				"times" "time_array" 
+				[
+					"5.0091"
+				]
+				"curvetypes" "int_array" 
+				[
+				]
+				"values" "float_array" 
+				[
+					"0.3106377125"
+				]
+				"compressed" "binary" 
+				"
+				"
+			}
+		]
+		"curveinfo" "element" ""
+		"usedefaultvalue" "bool" "0"
+		"defaultvalue" "float" "0"
+		"bookmarks" "time_array" 
+		[
+			"20.0000"
+		]
+	}
+
+	"graphCurve" "DmeGraphEditorCurve"
+	{
+		"id" "elementid" "92b1a874-bb57-4ebe-a85d-e8389c87dca1"
+		"name" "string" "graphCurve_SSAORadius"
+		"keysStateFlags_0" "int_array" 
+		[
+			"3"
+		]
+		"keysInMode_0" "int_array" 
+		[
+			"2"
+		]
+		"keysOutMode_0" "int_array" 
+		[
+			"2"
+		]
+		"keysTime_0" "time_array" 
+		[
+			"20.0000"
+		]
+		"keysInTime_0" "time_array" 
+		[
+			"0.0000"
+		]
+		"keysInDelta_0" "float_array" 
+		[
+			"0"
+		]
+		"keysOutTime_0" "time_array" 
+		[
+			"0.0000"
+		]
+		"keysOutDelta_0" "float_array" 
+		[
+			"0"
+		]
+	}
+
+}
+
+"DmeExpressionOperator"
+{
+	"id" "elementid" "3f27aa00-f7d8-4b5c-91f9-627ddce5d5d7"
+	"name" "string" "SSAORadius_rescale"
+	"result" "float" "31.0637702942"
+	"expr" "string" "lerp(value, lo, hi)"
+	"spewresult" "bool" "0"
+	"value" "float" "0.3106377125"
+	"lo" "float" "0"
+	"hi" "float" "100"
+}
+
+"DmElement"
+{
+	"id" "elementid" "feb82244-d96b-4795-a294-ce8d94c2c2f1"
+	"name" "string" "mapLightScale"
+	"value" "float" "1"
+	"channel" "element" "34080d38-6b63-4a6b-adc5-6a8b0a6ce92b"
+	"defaultValue" "float" "1"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "34080d38-6b63-4a6b-adc5-6a8b0a6ce92b"
+	"name" "string" "mapLightScale"
+	"fromElement" "element" "feb82244-d96b-4795-a294-ce8d94c2c2f1"
+	"fromAttribute" "string" "value"
+	"fromIndex" "int" "0"
+	"toElement" "element" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+	"toAttribute" "string" "mapLightScale"
+	"toIndex" "int" "0"
+	"mode" "int" "3"
+	"log" "DmeFloatLog"
+	{
+		"id" "elementid" "da0e25d7-c8de-45bc-b9c7-76960b48e028"
+		"name" "string" "float log"
+		"layers" "element_array" 
+		[
+			"DmeFloatLogLayer"
+			{
+				"id" "elementid" "b9fa9862-54fe-4e7b-8246-86693de54d55"
+				"name" "string" "float log"
+				"times" "time_array" 
+				[
+					"5.0091"
+				]
+				"curvetypes" "int_array" 
+				[
+				]
+				"values" "float_array" 
+				[
+					"1"
+				]
+				"compressed" "binary" 
+				"
+				"
+			}
+		]
+		"curveinfo" "element" ""
+		"usedefaultvalue" "bool" "0"
+		"defaultvalue" "float" "0"
+		"bookmarks" "time_array" 
+		[
+		]
+	}
+
+	"graphCurve" "DmeGraphEditorCurve"
+	{
+		"id" "elementid" "a7aba614-e36f-4e23-8003-9d9cd342013d"
+		"name" "string" "graphCurve_mapLightScale"
+	}
+
+}
+
+"DmElement"
+{
+	"id" "elementid" "02b3e07c-30a5-4ecf-8ac3-511e0097e1e0"
+	"name" "string" "timeOfDayAmount"
+	"value" "float" "1"
+	"channel" "element" "d97544c5-6f48-415b-9138-cdb15e25f391"
+	"defaultValue" "float" "1"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "d97544c5-6f48-415b-9138-cdb15e25f391"
+	"name" "string" "timeOfDayAmount"
+	"fromElement" "element" "02b3e07c-30a5-4ecf-8ac3-511e0097e1e0"
+	"fromAttribute" "string" "value"
+	"fromIndex" "int" "0"
+	"toElement" "element" "bdc3e543-38a6-4363-94b2-f47a5b9fc874"
+	"toAttribute" "string" "timeOfDayAmount"
+	"toIndex" "int" "0"
+	"mode" "int" "3"
+	"log" "DmeFloatLog"
+	{
+		"id" "elementid" "e019d007-3653-4b8e-beb4-e50a1a1b3123"
+		"name" "string" "float log"
+		"layers" "element_array" 
+		[
+			"DmeFloatLogLayer"
+			{
+				"id" "elementid" "122cb259-c0c6-421a-bae7-f775f643c3e1"
+				"name" "string" "float log"
+				"times" "time_array" 
+				[
+					"5.0091"
+				]
+				"curvetypes" "int_array" 
+				[
+				]
+				"values" "float_array" 
+				[
+					"1"
+				]
+				"compressed" "binary" 
+				"
+				"
+			}
+		]
+		"curveinfo" "element" ""
+		"usedefaultvalue" "bool" "0"
+		"defaultvalue" "float" "0"
+		"bookmarks" "time_array" 
+		[
+		]
+	}
+
+	"graphCurve" "DmeGraphEditorCurve"
+	{
+		"id" "elementid" "6c37cc00-75cd-4f96-8a00-3f13759c9865"
+		"name" "string" "graphCurve_timeOfDayAmount"
+	}
+
+}
+
+"DmeTransformControl"
+{
+	"id" "elementid" "7ba2b451-b2ee-4def-95f2-fd6fdc04db65"
+	"name" "string" "transform"
+	"valuePosition" "vector3" "4800 -5793.1059570312 240000"
+	"valueOrientation" "quaternion" "-0.4951677322 0.5047860146 0.5042494535 0.4957142174"
+	"positionChannel" "element" "52dabbf9-153f-4dd6-84d1-46c8632ec440"
+	"orientationChannel" "element" "409d1f42-5a9c-400e-acd4-2cd5095c8cff"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "409d1f42-5a9c-400e-acd4-2cd5095c8cff"
+	"name" "string" "transform_rot"
+	"fromElement" "element" "7ba2b451-b2ee-4def-95f2-fd6fdc04db65"
+	"fromAttribute" "string" "valueOrientation"
+	"fromIndex" "int" "0"
+	"toElement" "element" "455440d7-3cd1-4a62-b02a-64316526b975"
+	"toAttribute" "string" "orientation"
+	"toIndex" "int" "0"
+	"mode" "int" "3"
+	"log" "DmeQuaternionLog"
+	{
+		"id" "elementid" "a9dc6645-8d26-43d5-9274-4b534970b55e"
+		"name" "string" "quaternion log"
+		"layers" "element_array" 
+		[
+			"DmeQuaternionLogLayer"
+			{
+				"id" "elementid" "8d8440ec-da66-4acd-bc30-9b24f12eedab"
+				"name" "string" "quaternion log"
+				"times" "time_array" 
+				[
+					"5.0000",
+					"49.5000",
+					"49.9999"
+				]
+				"curvetypes" "int_array" 
+				[
+				]
+				"values" "quaternion_array" 
+				[
+					"-0.4964516461 0.5035233498 0.5035233498 0.4964516461",
+					"-0.4964516461 0.5035233498 0.5035233498 0.4964516461",
+					"-0.4964516461 0.5035233498 0.5035233498 0.4964516461"
+				]
+				"compressed" "binary" 
+				"
+				"
+			}
+		]
+		"curveinfo" "element" ""
+		"usedefaultvalue" "bool" "1"
+		"defaultvalue" "quaternion" "-0.5 0.5 0.5 0.5"
+		"bookmarksX" "time_array" 
+		[
+			"5.0000",
+			"6.0000",
+			"7.0000",
+			"8.0000",
+			"9.0000",
+			"10.0000",
+			"11.0000",
+			"12.0000",
+			"13.0000",
+			"14.0000",
+			"15.0000",
+			"16.0000",
+			"17.0000",
+			"18.0000",
+			"19.0000",
+			"20.0000",
+			"21.0000",
+			"22.0000",
+			"23.0000",
+			"24.0000",
+			"25.0000",
+			"26.0000",
+			"27.0000",
+			"28.0000",
+			"29.0000",
+			"30.0000",
+			"31.0000",
+			"32.0000",
+			"33.0000",
+			"34.0000",
+			"35.0000",
+			"36.0000",
+			"37.0000",
+			"38.0000",
+			"39.0000",
+			"40.0000",
+			"41.0000",
+			"42.0000",
+			"43.0000",
+			"44.0000",
+			"45.0000",
+			"46.0000",
+			"47.0000",
+			"48.0000",
+			"49.0000",
+			"50.0000"
+		]
+		"bookmarksY" "time_array" 
+		[
+			"5.0000",
+			"6.0000",
+			"7.0000",
+			"8.0000",
+			"9.0000",
+			"10.0000",
+			"11.0000",
+			"12.0000",
+			"13.0000",
+			"14.0000",
+			"15.0000",
+			"16.0000",
+			"17.0000",
+			"18.0000",
+			"19.0000",
+			"20.0000",
+			"21.0000",
+			"22.0000",
+			"23.0000",
+			"24.0000",
+			"25.0000",
+			"26.0000",
+			"27.0000",
+			"28.0000",
+			"29.0000",
+			"30.0000",
+			"31.0000",
+			"32.0000",
+			"33.0000",
+			"34.0000",
+			"35.0000",
+			"36.0000",
+			"37.0000",
+			"38.0000",
+			"39.0000",
+			"40.0000",
+			"41.0000",
+			"42.0000",
+			"43.0000",
+			"44.0000",
+			"45.0000",
+			"46.0000",
+			"47.0000",
+			"48.0000",
+			"49.0000",
+			"50.0000"
+		]
+		"bookmarksZ" "time_array" 
+		[
+			"5.0000",
+			"6.0000",
+			"7.0000",
+			"8.0000",
+			"9.0000",
+			"10.0000",
+			"11.0000",
+			"12.0000",
+			"13.0000",
+			"14.0000",
+			"15.0000",
+			"16.0000",
+			"17.0000",
+			"18.0000",
+			"19.0000",
+			"20.0000",
+			"21.0000",
+			"22.0000",
+			"23.0000",
+			"24.0000",
+			"25.0000",
+			"26.0000",
+			"27.0000",
+			"28.0000",
+			"29.0000",
+			"30.0000",
+			"31.0000",
+			"32.0000",
+			"33.0000",
+			"34.0000",
+			"35.0000",
+			"36.0000",
+			"37.0000",
+			"38.0000",
+			"39.0000",
+			"40.0000",
+			"41.0000",
+			"42.0000",
+			"43.0000",
+			"44.0000",
+			"45.0000",
+			"46.0000",
+			"47.0000",
+			"48.0000",
+			"49.0000",
+			"50.0000"
+		]
+	}
+
+	"graphCurve" "DmeGraphEditorCurve"
+	{
+		"id" "elementid" "f902be66-4e33-4575-b3a9-e48186a4eaa2"
+		"name" "string" "graphCurve_transform_rot"
+		"keysStateFlags_0" "int_array" 
+		[
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5"
+		]
+		"keysInMode_0" "int_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0"
+		]
+		"keysOutMode_0" "int_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0"
+		]
+		"keysTime_0" "time_array" 
+		[
+			"5.0000",
+			"6.0000",
+			"7.0000",
+			"8.0000",
+			"9.0000",
+			"10.0000",
+			"11.0000",
+			"12.0000",
+			"13.0000",
+			"14.0000",
+			"15.0000",
+			"16.0000",
+			"17.0000",
+			"18.0000",
+			"19.0000",
+			"20.0000",
+			"21.0000",
+			"22.0000",
+			"23.0000",
+			"24.0000",
+			"25.0000",
+			"26.0000",
+			"27.0000",
+			"28.0000",
+			"29.0000",
+			"30.0000",
+			"31.0000",
+			"32.0000",
+			"33.0000",
+			"34.0000",
+			"35.0000",
+			"36.0000",
+			"37.0000",
+			"38.0000",
+			"39.0000",
+			"40.0000",
+			"41.0000",
+			"42.0000",
+			"43.0000",
+			"44.0000",
+			"45.0000",
+			"46.0000",
+			"47.0000",
+			"48.0000",
+			"49.0000",
+			"50.0000"
+		]
+		"keysInTime_0" "time_array" 
+		[
+			"0.3333",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3333",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3333",
+			"0.3333",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334"
+		]
+		"keysInDelta_0" "float_array" 
+		[
+			"0",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000152565",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000152565",
+			"-0.0000152565",
+			"0",
+			"-0.0000076283",
+			"-0.0000076283",
+			"0",
+			"-0.0000076283",
+			"0",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000076283",
+			"0",
+			"0",
+			"-0.0000076283",
+			"-0.0000076283",
+			"-0.0000076283",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"-0.0000076283",
+			"0",
+			"-0.0000076283",
+			"0",
+			"0",
+			"0",
+			"-0.0000076283",
+			"-0.0000076283",
+			"0",
+			"-0.0000076283",
+			"0",
+			"0"
+		]
+		"keysOutTime_0" "time_array" 
+		[
+			"0.3333",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334"
+		]
+		"keysOutDelta_0" "float_array" 
+		[
+			"0",
+			"-0.0000076305",
+			"-0.0000076305",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"-0.0000076305",
+			"0",
+			"0",
+			"0",
+			"-0.0000076305",
+			"-0.0000076305",
+			"0",
+			"-0.0000076305",
+			"-0.0000076305",
+			"0",
+			"-0.0000076305",
+			"0",
+			"-0.0000076305",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"-0.0000076305",
+			"0",
+			"0",
+			"0.0000076305",
+			"0.0000076305",
+			"0.0000076305",
+			"0",
+			"0",
+			"0.0000076305",
+			"0",
+			"0",
+			"0"
+		]
+		"keysStateFlags_1" "int_array" 
+		[
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5"
+		]
+		"keysInMode_1" "int_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0"
+		]
+		"keysOutMode_1" "int_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0"
+		]
+		"keysTime_1" "time_array" 
+		[
+			"5.0000",
+			"6.0000",
+			"7.0000",
+			"8.0000",
+			"9.0000",
+			"10.0000",
+			"11.0000",
+			"12.0000",
+			"13.0000",
+			"14.0000",
+			"15.0000",
+			"16.0000",
+			"17.0000",
+			"18.0000",
+			"19.0000",
+			"20.0000",
+			"21.0000",
+			"22.0000",
+			"23.0000",
+			"24.0000",
+			"25.0000",
+			"26.0000",
+			"27.0000",
+			"28.0000",
+			"29.0000",
+			"30.0000",
+			"31.0000",
+			"32.0000",
+			"33.0000",
+			"34.0000",
+			"35.0000",
+			"36.0000",
+			"37.0000",
+			"38.0000",
+			"39.0000",
+			"40.0000",
+			"41.0000",
+			"42.0000",
+			"43.0000",
+			"44.0000",
+			"45.0000",
+			"46.0000",
+			"47.0000",
+			"48.0000",
+			"49.0000",
+			"50.0000"
+		]
+		"keysInTime_1" "time_array" 
+		[
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333"
+		]
+		"keysInDelta_1" "float_array" 
+		[
+			"-0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"-0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0"
+		]
+		"keysOutTime_1" "time_array" 
+		[
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333"
+		]
+		"keysOutDelta_1" "float_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"-0"
+		]
+		"keysStateFlags_2" "int_array" 
+		[
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5",
+			"5"
+		]
+		"keysInMode_2" "int_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0"
+		]
+		"keysOutMode_2" "int_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0"
+		]
+		"keysTime_2" "time_array" 
+		[
+			"5.0000",
+			"6.0000",
+			"7.0000",
+			"8.0000",
+			"9.0000",
+			"10.0000",
+			"11.0000",
+			"12.0000",
+			"13.0000",
+			"14.0000",
+			"15.0000",
+			"16.0000",
+			"17.0000",
+			"18.0000",
+			"19.0000",
+			"20.0000",
+			"21.0000",
+			"22.0000",
+			"23.0000",
+			"24.0000",
+			"25.0000",
+			"26.0000",
+			"27.0000",
+			"28.0000",
+			"29.0000",
+			"30.0000",
+			"31.0000",
+			"32.0000",
+			"33.0000",
+			"34.0000",
+			"35.0000",
+			"36.0000",
+			"37.0000",
+			"38.0000",
+			"39.0000",
+			"40.0000",
+			"41.0000",
+			"42.0000",
+			"43.0000",
+			"44.0000",
+			"45.0000",
+			"46.0000",
+			"47.0000",
+			"48.0000",
+			"49.0000",
+			"50.0000"
+		]
+		"keysInTime_2" "time_array" 
+		[
+			"0.3333",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334"
+		]
+		"keysInDelta_2" "float_array" 
+		[
+			"0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055"
+		]
+		"keysOutTime_2" "time_array" 
+		[
+			"0.3333",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334",
+			"0.3334"
+		]
+		"keysOutDelta_2" "float_array" 
+		[
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"-0.0000000055",
+			"0.0000000055"
+		]
+	}
+
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "52dabbf9-153f-4dd6-84d1-46c8632ec440"
+	"name" "string" "transform_pos"
+	"fromElement" "element" "7ba2b451-b2ee-4def-95f2-fd6fdc04db65"
+	"fromAttribute" "string" "valuePosition"
+	"fromIndex" "int" "0"
+	"toElement" "element" "455440d7-3cd1-4a62-b02a-64316526b975"
+	"toAttribute" "string" "position"
+	"toIndex" "int" "0"
+	"mode" "int" "3"
+	"log" "DmeVector3Log"
+	{
+		"id" "elementid" "391c557b-f609-4e13-916c-28843ef6121c"
+		"name" "string" "vector3 log"
+		"layers" "element_array" 
+		[
+			"DmeVector3LogLayer"
+			{
+				"id" "elementid" "0554bd68-b044-4118-a7f5-0b0ba14eb663"
+				"name" "string" "vector3 log"
+				"times" "time_array" 
+				[
+					"5.0000",
+					"5.2708",
+					"5.5000",
+					"5.5417",
+					"6.0000",
+					"6.3333",
+					"6.5000",
+					"6.8542",
+					"7.1458",
+					"7.5000",
+					"7.6667",
+					"8.0000",
+					"8.4583",
+					"8.5000",
+					"9.0000",
+					"9.2500",
+					"9.3750",
+					"9.4167",
+					"9.5000",
+					"9.6250",
+					"9.8333",
+					"9.9999",
+					"10.0000",
+					"10.2500",
+					"10.5000",
+					"10.9999",
+					"11.0000",
+					"11.2500",
+					"11.5000",
+					"14.0000",
+					"14.2500",
+					"14.3750",
+					"14.4167",
+					"14.5000",
+					"14.6250",
+					"14.8333",
+					"15.0000",
+					"15.5000",
+					"15.9999",
+					"16.0000",
+					"16.2500",
+					"16.5000",
+					"16.9999",
+					"17.0000",
+					"17.2500",
+					"17.5000",
+					"18.0000",
+					"19.0000",
+					"19.2500",
+					"19.3750",
+					"19.4167",
+					"19.5000",
+					"19.6250",
+					"19.8333",
+					"20.0000",
+					"20.2500",
+					"20.5000",
+					"21.5000",
+					"21.8958",
+					"21.9999",
+					"22.0000",
+					"22.2500",
+					"22.5000",
+					"22.9999",
+					"23.0000",
+					"23.2500",
+					"23.5000",
+					"24.0000",
+					"24.2500",
+					"24.3750",
+					"24.4167",
+					"24.5000",
+					"24.6250",
+					"24.8333",
+					"25.0000",
+					"27.5000",
+					"27.9999",
+					"28.0000",
+					"28.2500",
+					"28.5000",
+					"28.9999",
+					"29.0000",
+					"29.2500",
+					"29.3750",
+					"29.4167",
+					"29.5000",
+					"29.6250",
+					"29.8333",
+					"30.0000",
+					"30.2500",
+					"30.5000",
+					"31.5000",
+					"32.5000",
+					"33.5000",
+					"33.9999",
+					"34.0000",
+					"34.2500",
+					"34.5000",
+					"34.9999",
+					"35.0000",
+					"35.2500",
+					"35.5000",
+					"36.0000",
+					"36.5000",
+					"37.0000",
+					"38.0000",
+					"39.0000",
+					"39.2500",
+					"39.3750",
+					"39.4167",
+					"39.5000",
+					"39.6250",
+					"39.8333",
+					"39.9999",
+					"40.0000",
+					"40.2500",
+					"40.5000",
+					"40.9999",
+					"41.0000",
+					"41.2500",
+					"41.5000",
+					"44.0000",
+					"44.2500",
+					"44.3750",
+					"44.4167",
+					"44.5000",
+					"44.6250",
+					"44.8333",
+					"45.0000",
+					"45.5000",
+					"45.9999",
+					"46.0000",
+					"46.2500",
+					"46.5000",
+					"46.9999",
+					"47.0000",
+					"47.2500",
+					"47.5000",
+					"48.0000",
+					"49.0000",
+					"49.2500",
+					"49.5000",
+					"50.0000",
+					"50.2500",
+					"50.5000",
+					"51.5000",
+					"51.9999",
+					"52.0000",
+					"52.2500",
+					"52.5000",
+					"52.9999",
+					"53.0000",
+					"53.2500",
+					"53.5000",
+					"53.9200",
+					"54.2500",
+					"54.5000",
+					"55.0000",
+					"55.3333",
+					"55.6667",
+					"56.0000",
+					"56.5000",
+					"57.0000",
+					"57.2500",
+					"57.5000",
+					"57.6667",
+					"57.9999",
+					"58.0000",
+					"58.2500",
+					"58.5000",
+					"58.9999",
+					"59.0000",
+					"59.2500",
+					"59.5000",
+					"60.5000",
+					"61.0000",
+					"62.0000",
+					"63.7500",
+					"63.9999",
+					"64.0000",
+					"64.2500",
+					"64.5000",
+					"64.9999",
+					"65.0000",
+					"65.2500",
+					"65.5000",
+					"66.5000",
+					"67.5000",
+					"68.0000",
+					"69.0001",
+					"69.7500",
+					"69.9999",
+					"70.0001",
+					"71.7500",
+					"72.2500",
+					"72.5000",
+					"73.7500",
+					"74.0000",
+					"74.5000",
+					"75.0000",
+					"75.7500",
+					"76.0000",
+					"76.2500",
+					"76.5000",
+					"77.2500",
+					"77.7500",
+					"78.0000",
+					"78.2500",
+					"78.5000",
+					"79.0000",
+					"79.5000",
+					"80.7500",
+					"81.0000",
+					"82.5000",
+					"82.7500",
+					"83.0000",
+					"83.5000",
+					"83.7500"
+				]
+				"curvetypes" "int_array" 
+				[
+				]
+				"values" "vector3_array" 
+				[
+					"-6000 -9793.1044921875 240000",
+					"-5025.0224609375 -9793.1044921875 240000",
+					"-4200 -9793.1044921875 240000",
+					"-4049.9099121094 -9793.1044921875 240000",
+					"-2399.9997558594 -9793.103515625 240000",
+					"-1199.9995117188 -9793.1044921875 240000",
+					"-599.9997558594 -9793.1044921875 240000",
+					"675.0675048828 -9793.1044921875 240000",
+					"1724.9324951172 -9793.1044921875 240000",
+					"3000.0004882812 -9793.1044921875 240000",
+					"3600.0009765625 -9793.1044921875 240000",
+					"4800 -9793.103515625 240000",
+					"6449.91015625 -9793.1044921875 240000",
+					"6600 -9793.1044921875 240000",
+					"8400 -9793.103515625 240000",
+					"9300.08984375 -9793.103515625 240000",
+					"9750.08984375 -9793.103515625 240000",
+					"9900.1796875 -9793.103515625 240000",
+					"10200 -9793.103515625 240000",
+					"10649.91015625 -9793.103515625 240000",
+					"11400 -9793.103515625 240000",
+					"12000 -9793.103515625 240000",
+					"12000 -9793.1044921875 240000",
+					"12000 -9292.9541015625 240000",
+					"12000 -8792.9541015625 240000",
+					"12000 -7793.1030273438 240000",
+					"12000 -7793.1059570312 240000",
+					"11099.91015625 -7793.1059570312 240000",
+					"10200 -7793.1059570312 240000",
+					"1200 -7793.1049804688 240000",
+					"299.9100341797 -7793.1049804688 240000",
+					"-150.0899810791 -7793.1049804688 240000",
+					"-300.1799621582 -7793.1049804688 240000",
+					"-600 -7793.1049804688 240000",
+					"-1049.9100341797 -7793.1049804688 240000",
+					"-1799.8199462891 -7793.10546875 240000",
+					"-2400 -7793.1044921875 240000",
+					"-4200 -7793.1044921875 240000",
+					"-6000 -7793.1044921875 240000",
+					"-6000 -7793.1059570312 240000",
+					"-6000 -7292.9545898438 240000",
+					"-6000 -6792.9560546875 240000",
+					"-6000 -5793.1064453125 240000",
+					"-6000 -5793.1059570312 240000",
+					"-5099.91015625 -5793.1059570312 240000",
+					"-4200 -5793.1059570312 240000",
+					"-2399.9997558594 -5793.1059570312 239999.984375",
+					"1200 -5793.1059570312 240000",
+					"2100.08984375 -5793.1059570312 240000",
+					"2550.0900878906 -5793.1059570312 240000",
+					"2700.1801757812 -5793.1059570312 240000",
+					"3000.0004882812 -5793.1059570312 240000",
+					"3449.9108886719 -5793.1059570312 240000",
+					"4199.8203125 -5793.1059570312 240000",
+					"4800 -5793.1059570312 240000",
+					"5700.08984375 -5793.1059570312 240000",
+					"6600 -5793.1059570312 240000",
+					"10200 -5793.1064453125 240000",
+					"11625.08984375 -5793.1064453125 240000",
+					"12000 -5793.1064453125 240000",
+					"12000 -5793.1059570312 240000",
+					"12000 -5292.955078125 240000",
+					"12000 -4792.95703125 240000",
+					"12000 -3793.1071777344 240000",
+					"12000 -3793.1057128906 240000",
+					"11099.91015625 -3793.1059570312 240000",
+					"10200 -3793.1059570312 240000",
+					"8400 -3793.1059570312 240000",
+					"7499.9096679688 -3793.1059570312 240000",
+					"7049.9091796875 -3793.10546875 240000",
+					"6899.8198242188 -3793.10546875 240000",
+					"6600 -3793.1057128906 240000",
+					"6150.08984375 -3793.1057128906 240000",
+					"5400.1796875 -3793.1057128906 240000",
+					"4800 -3793.1057128906 240000",
+					"-4200 -3793.1049804688 240000",
+					"-6000 -3793.1049804688 240000",
+					"-6000 -3793.1057128906 240000",
+					"-6000 -3292.9545898438 240000",
+					"-6000 -2792.9560546875 240000",
+					"-6000 -1793.1064453125 240000",
+					"-6000 -1793.1057128906 240000",
+					"-5099.91015625 -1793.1057128906 240000",
+					"-4649.91015625 -1793.1057128906 240000",
+					"-4499.8203125 -1793.1057128906 240000",
+					"-4200 -1793.1057128906 240000",
+					"-3750.0895996094 -1793.1057128906 240000",
+					"-3000.1796875 -1793.1057128906 240000",
+					"-2399.9997558594 -1793.1057128906 240000",
+					"-1499.9096679688 -1793.1057128906 240000",
+					"-599.9997558594 -1793.1057128906 240000",
+					"3000.0004882812 -1793.1057128906 239999.984375",
+					"6600 -1793.1057128906 239999.984375",
+					"10200 -1793.1057128906 240000",
+					"12000 -1793.1057128906 240000",
+					"12000 -1793.1057128906 240000",
+					"12000 -1292.9543457031 240000",
+					"12000 -792.9555664062 240000",
+					"12000 206.8946533203 240000",
+					"12000 206.8943634033 240000",
+					"11099.91015625 206.8943634033 240000",
+					"10200 206.8943481445 240000",
+					"8400 206.8943481445 239999.984375",
+					"6600 206.8943481445 240000",
+					"4800 206.8943481445 239999.984375",
+					"1199.9995117188 206.8943481445 239999.984375",
+					"-2400 206.894317627 240000",
+					"-3300.0900878906 206.8943328857 240000",
+					"-3750.08984375 206.8943328857 240000",
+					"-3900.1801757812 206.8943328857 240000",
+					"-4200 206.8943328857 240000",
+					"-4649.91015625 206.8943328857 240000",
+					"-5400 206.894317627 240000",
+					"-6000 206.894317627 240000",
+					"-6000 206.8943634033 240000",
+					"-6000 707.0458374023 240000",
+					"-6000 1207.0444335938 240000",
+					"-6000 2206.8942871094 240000",
+					"-6000 2206.8942871094 240000",
+					"-5099.91015625 2206.8942871094 240000",
+					"-4200 2206.8942871094 240000",
+					"4800 2206.8947753906 240000",
+					"5700.08984375 2206.8947753906 240000",
+					"6150.0903320312 2206.8947753906 240000",
+					"6300.1796875 2206.8947753906 240000",
+					"6600 2206.89453125 240000",
+					"7049.9096679688 2206.8947753906 240000",
+					"7799.8198242188 2206.8947753906 240000",
+					"8400 2206.8950195312 240000",
+					"10200 2206.8950195312 240000",
+					"12000 2206.8950195312 240000",
+					"12000 2206.8942871094 240000",
+					"12000 2707.0454101562 240000",
+					"12000 3207.0437011719 240000",
+					"12000 4206.892578125 240000",
+					"12000 4206.8940429688 240000",
+					"11099.91015625 4206.8940429688 240000",
+					"10200 4206.8940429688 240000",
+					"8400 4206.8940429688 239999.984375",
+					"4800 4206.8935546875 240000",
+					"3899.91015625 4206.8940429688 240000",
+					"2999.9995117188 4206.8940429688 240000",
+					"1200 4206.8940429688 240000",
+					"299.9100341797 4206.8940429688 240000",
+					"-600 4206.89453125 239999.984375",
+					"-4200 4206.8935546875 240000",
+					"-6000 4206.8935546875 240000",
+					"-6000 4206.8940429688 240000",
+					"-6000 4707.0458984375 240000",
+					"-6000 5207.044921875 240000",
+					"-6000 6206.8955078125 239999.984375",
+					"-6000 6206.8940429688 240000",
+					"-5099.91015625 6206.8940429688 240000",
+					"-4200 6206.8940429688 240000",
+					"-2688.0285644531 6206.8940429688 240000",
+					"-1499.9096679688 6206.8935546875 240000",
+					"-599.9997558594 6206.8940429688 240000",
+					"1200 6206.89453125 240000",
+					"2400 6206.89453125 240000",
+					"3600.0009765625 6206.8940429688 240000",
+					"4800 6206.89453125 239999.984375",
+					"6600 6206.8935546875 240000",
+					"8400 6206.8940429688 239999.984375",
+					"9300.08984375 6206.8935546875 240000",
+					"10200 6206.8935546875 240000",
+					"10800 6206.8935546875 240000",
+					"12000 6206.8935546875 240000",
+					"12000 6206.8940429688 240000",
+					"12000 6706.9799804688 240000",
+					"12000 7207.0146484375 240000",
+					"11999.9970703125 8206.89453125 240000",
+					"12000.0009765625 8206.8955078125 240000",
+					"11099.9111328125 8206.8955078125 240000",
+					"10200.0009765625 8206.8955078125 240000",
+					"6600 8206.8955078125 240000.015625",
+					"4800 8206.8955078125 240000.015625",
+					"1200.0007324219 8206.89453125 240000",
+					"-5100.0004882812 8206.896484375 240000",
+					"-5999.9990234375 8206.896484375 240000",
+					"-6000 8206.8955078125 240000",
+					"-6000 8706.845703125 240000",
+					"-6000 9206.896484375 240000",
+					"-6000 10206.8984375 240000",
+					"-6000 10206.8955078125 240000",
+					"-5099.91015625 10206.8955078125 240000",
+					"-4200 10206.8955078125 240000",
+					"-599.9997558594 10206.8955078125 240000.015625",
+					"3000.0002441406 10206.8955078125 240000.015625",
+					"4800.0004882812 10206.896484375 240000.015625",
+					"8400.359375 10206.8955078125 240000",
+					"11100 10206.8955078125 240000",
+					"12000 10206.8955078125 240000",
+					"12000 10206.8955078125 240000",
+					"12000 10206.8955078125 240000",
+					"12000 10206.8955078125 240000.015625",
+					"12000 10206.8955078125 240000.046875",
+					"12000 10206.8955078125 240000.015625",
+					"12000 10206.8955078125 240000.03125",
+					"12000 10206.8955078125 240000.03125",
+					"12000 10206.8955078125 240000",
+					"12000 10206.8955078125 240000.015625",
+					"12000 10206.8955078125 240000.03125",
+					"12000 10206.8955078125 240000.015625",
+					"12000 10206.8955078125 240000.046875",
+					"12000 10206.8955078125 240000.015625",
+					"12000 10206.8955078125 240000.03125",
+					"12000 10206.8955078125 240000.015625",
+					"12000 10206.8955078125 240000.046875",
+					"12000 10206.8955078125 240000.046875",
+					"12000 10206.8955078125 240000",
+					"12000 10206.8955078125 240000.03125",
+					"12000 10206.8955078125 240000.015625",
+					"12000 10206.8955078125 240000.03125",
+					"12000 10206.8955078125 240000.015625",
+					"12000 10206.8955078125 240000",
+					"12000 10206.8955078125 240000.015625",
+					"12000 10206.8955078125 240000",
+					"12000 10206.8955078125 240000.015625"
+				]
+				"compressed" "binary" 
+				"
+				"
+			}
+		]
+		"curveinfo" "element" ""
+		"usedefaultvalue" "bool" "1"
+		"defaultvalue" "vector3" "-2000 -2000 240000"
+		"bookmarksX" "time_array" 
+		[
+			"5.0000",
+			"10.0000",
+			"11.0000",
+			"16.0000",
+			"17.0000",
+			"22.0000",
+			"23.0000",
+			"28.0000",
+			"29.0000",
+			"34.0000",
+			"35.0000",
+			"40.0000",
+			"41.0000",
+			"46.0000",
+			"47.0000",
+			"52.0000",
+			"53.0000",
+			"58.0000",
+			"59.0000",
+			"64.0000",
+			"65.0000",
+			"70.0000"
+		]
+		"bookmarksY" "time_array" 
+		[
+			"5.0000",
+			"10.0000",
+			"11.0000",
+			"16.0000",
+			"17.0000",
+			"22.0000",
+			"23.0000",
+			"28.0000",
+			"29.0000",
+			"34.0000",
+			"35.0000",
+			"40.0000",
+			"41.0000",
+			"46.0000",
+			"47.0000",
+			"52.0000",
+			"53.0000",
+			"58.0000",
+			"59.0000",
+			"64.0000",
+			"65.0000",
+			"69.0000"
+		]
+		"bookmarksZ" "time_array" 
+		[
+			"5.0000",
+			"6.0000",
+			"7.0000",
+			"8.0000",
+			"9.0000",
+			"10.0000",
+			"11.0000",
+			"12.0000",
+			"13.0000",
+			"14.0000",
+			"15.0000",
+			"16.0000",
+			"17.0000",
+			"18.0000",
+			"19.0000",
+			"20.0000",
+			"21.0000",
+			"22.0000",
+			"23.0000",
+			"24.0000",
+			"25.0000",
+			"26.0000",
+			"27.0000",
+			"28.0000",
+			"29.0000",
+			"30.0000",
+			"31.0000",
+			"32.0000",
+			"33.0000",
+			"34.0000",
+			"35.0000",
+			"36.0000",
+			"37.0000",
+			"38.0000",
+			"39.0000",
+			"40.0000",
+			"41.0000",
+			"42.0000",
+			"43.0000",
+			"44.0000",
+			"45.0000",
+			"46.0000",
+			"47.0000",
+			"48.0000",
+			"49.0000",
+			"50.0000",
+			"71.0000"
+		]
+	}
+
+	"graphCurve" "DmeGraphEditorCurve"
+	{
+		"id" "elementid" "7821718a-ec6a-4cfd-a9bf-0c2efd98dee4"
+		"name" "string" "graphCurve_transform_pos"
+		"keysStateFlags_0" "int_array" 
+		[
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"2"
+		]
+		"keysInMode_0" "int_array" 
+		[
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"2"
+		]
+		"keysOutMode_0" "int_array" 
+		[
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"1",
+			"2"
+		]
+		"keysTime_0" "time_array" 
+		[
+			"5.0000",
+			"10.0000",
+			"11.0000",
+			"16.0000",
+			"17.0000",
+			"22.0000",
+			"23.0000",
+			"28.0000",
+			"29.0000",
+			"34.0000",
+			"35.0000",
+			"40.0000",
+			"41.0000",
+			"46.0000",
+			"47.0000",
+			"52.0000",
+			"53.0000",
+			"58.0000",
+			"59.0000",
+			"64.0000",
+			"65.0000",
+			"70.0000",
+			"20.0000"
+		]
+		"keysInTime_0" "time_array" 
+		[
+			"1.6667",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"0.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"1.0000"
+		]
+		"keysInDelta_0" "float_array" 
+		[
+			"-6000",
+			"-6000",
+			"-0",
+			"6000",
+			"0",
+			"-2400",
+			"0",
+			"6000",
+			"0",
+			"-6000",
+			"0",
+			"6000",
+			"0",
+			"-6000",
+			"0",
+			"6000",
+			"0",
+			"-6000",
+			"-0.0003255208",
+			"6000",
+			"-0",
+			"-6000",
+			"-3600"
+		]
+		"keysOutTime_0" "time_array" 
+		[
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.0000",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"0.3333",
+			"1.6667",
+			"1.6667",
+			"0.6667"
+		]
+		"keysOutDelta_0" "float_array" 
+		[
+			"6000",
+			"0",
+			"-6000",
+			"0",
+			"3600",
+			"0",
+			"-6000",
+			"0",
+			"6000",
+			"0",
+			"-6000",
+			"0",
+			"6000",
+			"0",
+			"-6000",
+			"0",
+			"6000",
+			"0.0003255208",
+			"-6000",
+			"0",
+			"6000",
+			"6000",
+			"2400.1201171875"
+		]
+		"keysStateFlags_1" "int_array" 
+		[
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"3",
+			"7",
+			"2"
+		]
+		"keysInMode_1" "int_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"1",
+			"1",
+			"1",
+			"2"
+		]
+		"keysOutMode_1" "int_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"1",
+			"1",
+			"1",
+			"2"
+		]
+		"keysTime_1" "time_array" 
+		[
+			"5.0000",
+			"10.0000",
+			"11.0000",
+			"16.0000",
+			"17.0000",
+			"22.0000",
+			"23.0000",
+			"28.0000",
+			"29.0000",
+			"34.0000",
+			"35.0000",
+			"40.0000",
+			"41.0000",
+			"46.0000",
+			"47.0000",
+			"52.0000",
+			"53.0000",
+			"58.0000",
+			"59.0000",
+			"64.0000",
+			"65.0000",
+			"69.0000",
+			"20.0000"
+		]
+		"keysInTime_1" "time_array" 
+		[
+			"1.3326",
+			"1.3322",
+			"0.3333",
+			"1.0001",
+			"0.3333",
+			"1.3327",
+			"0.3333",
+			"1.3317",
+			"0.3333",
+			"1.3334",
+			"0.3333",
+			"1.3333",
+			"0.3333",
+			"1.3317",
+			"0.3333",
+			"1.3335",
+			"0.3333",
+			"1.3332",
+			"0.3334",
+			"1.6667",
+			"0.3333",
+			"1.3333",
+			"1.0000"
+		]
+		"keysInDelta_1" "float_array" 
+		[
+			"0",
+			"0",
+			"-666.6455078125",
+			"0.0004882812",
+			"-666.6499023438",
+			"0",
+			"-666.6511230469",
+			"0.0002441406",
+			"-666.6496582031",
+			"0",
+			"-666.6492919922",
+			"0.0000305176",
+			"-666.6492919922",
+			"0.0002441406",
+			"-666.6494140625",
+			"0",
+			"-666.6479492188",
+			"0",
+			"-666.5341796875",
+			"-0",
+			"-666.6666870117",
+			"-0",
+			"0"
+		]
+		"keysOutTime_1" "time_array" 
+		[
+			"1.3326",
+			"0.3332",
+			"0.3333",
+			"0.3332",
+			"1.3333",
+			"0.3332",
+			"1.3330",
+			"0.3332",
+			"1.3333",
+			"0.3332",
+			"1.3333",
+			"0.3332",
+			"1.3330",
+			"0.3332",
+			"1.3333",
+			"0.3332",
+			"1.3333",
+			"0.3333",
+			"1.6663",
+			"0.3333",
+			"1.3333",
+			"1.3333",
+			"0.6667"
+		]
+		"keysOutDelta_1" "float_array" 
+		[
+			"0",
+			"666.78125",
+			"0",
+			"666.783203125",
+			"0",
+			"666.783203125",
+			"-0.0002441406",
+			"666.7829589844",
+			"0",
+			"666.7832641602",
+			"-0.0000305176",
+			"666.7834472656",
+			"0",
+			"666.7824707031",
+			"0",
+			"666.783203125",
+			"0",
+			"666.587890625",
+			"0",
+			"666.6666870117",
+			"0",
+			"0",
+			"0"
+		]
+		"keysStateFlags_2" "int_array" 
+		[
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7",
+			"7"
+		]
+		"keysInMode_2" "int_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0"
+		]
+		"keysOutMode_2" "int_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0"
+		]
+		"keysTime_2" "time_array" 
+		[
+			"5.0000",
+			"6.0000",
+			"7.0000",
+			"8.0000",
+			"9.0000",
+			"10.0000",
+			"11.0000",
+			"12.0000",
+			"13.0000",
+			"14.0000",
+			"15.0000",
+			"16.0000",
+			"17.0000",
+			"18.0000",
+			"19.0000",
+			"20.0000",
+			"21.0000",
+			"22.0000",
+			"23.0000",
+			"24.0000",
+			"25.0000",
+			"26.0000",
+			"27.0000",
+			"28.0000",
+			"29.0000",
+			"30.0000",
+			"31.0000",
+			"32.0000",
+			"33.0000",
+			"34.0000",
+			"35.0000",
+			"36.0000",
+			"37.0000",
+			"38.0000",
+			"39.0000",
+			"40.0000",
+			"41.0000",
+			"42.0000",
+			"43.0000",
+			"44.0000",
+			"45.0000",
+			"46.0000",
+			"47.0000",
+			"48.0000",
+			"49.0000",
+			"50.0000",
+			"71.0000"
+		]
+		"keysInTime_2" "time_array" 
+		[
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"7.0000"
+		]
+		"keysInDelta_2" "float_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"-0",
+			"-0",
+			"-0",
+			"0",
+			"0",
+			"-0",
+			"-0",
+			"-0",
+			"0",
+			"0",
+			"0",
+			"-0",
+			"-0",
+			"-0",
+			"0",
+			"-0",
+			"-0",
+			"0",
+			"0",
+			"0",
+			"-0",
+			"-0",
+			"0",
+			"0",
+			"0",
+			"-0",
+			"-0",
+			"0",
+			"0",
+			"0",
+			"-0",
+			"-0",
+			"-0",
+			"0",
+			"0",
+			"-0",
+			"-0",
+			"-0",
+			"0",
+			"0",
+			"0"
+		]
+		"keysOutTime_2" "time_array" 
+		[
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"0.3333",
+			"7.0000",
+			"7.0000"
+		]
+		"keysOutDelta_2" "float_array" 
+		[
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"0",
+			"-0"
+		]
+	}
+
+}
+

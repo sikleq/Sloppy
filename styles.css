@@ -9658,6 +9658,10 @@ li.tsp-hidden { display: none !important; }
    artifacts. Old boxes = dashed red; new boxes = solid teal. */
 .tc-sb-old { fill: rgba(255,80,80,.12); stroke: #ff5555; stroke-width: 1.5px; stroke-dasharray: 5 3; }
 .tc-sb-new { fill: rgba(77,212,172,.15); stroke: #4dd4ac; stroke-width: 1.5px; }
+/* A box that changed in this patch stands out: the new one thick + stronger fill,
+   the old one thick dashed red drawn over it (no fill, so both outlines read). */
+.tc-sb-new.tc-sb-changed { fill: rgba(77,212,172,.38); stroke: #7dffd6; stroke-width: 3px; }
+.tc-sb-old.tc-sb-changed { fill: none; stroke: #ff5555; stroke-width: 3px; stroke-dasharray: 7 4; }
 
 /* ---- Fullscreen (native browser API — requestFullscreen) ---- */
 .tc-fs-canvas { width: 100%; }

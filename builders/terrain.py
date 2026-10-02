@@ -137,6 +137,11 @@ _ENTITY_LAYERS = [
 ]
 
 
+def _box_key(box):
+    """A camp spawn box as a hashable set of its corners (order-free)."""
+    return frozenset((p["x"], p["y"]) for p in box)
+
+
 def _markers_svg(diff, pair_id="default"):
     """Build the SVG overlays. Returns (svg_html, counts). Three layers, all the
     SAME colour for trees:
@@ -241,15 +246,25 @@ def _markers_svg(diff, pair_id="default"):
             for p in points)
         return f'<polygon class="tc-spawnbox {cls}" points="{pts_str}"/>'
 
-    boxes_old = "".join(_box_poly(box, "tc-sb-old")
-                        for box in diff.get("spawnboxesOld", []))
-    boxes_new = "".join(_box_poly(box, "tc-sb-new")
-                        for box in diff.get("spawnboxesNew", []))
+    # A box that didn't change is drawn once (plain teal). A changed one stands
+    # out (the owner 2026-10-02: 7.39d's bigger Triangle Ancient boxes didn't
+    # show — the old dashed box hid inside the new one, a few px apart): the new
+    # box thick with a stronger fill, the old one thick dashed red on top.
+    old_boxes = diff.get("spawnboxesOld", [])
+    new_boxes = diff.get("spawnboxesNew", [])
+    old_keys = {_box_key(b) for b in old_boxes}
+    new_keys = {_box_key(b) for b in new_boxes}
+    boxes_same = "".join(_box_poly(b, "tc-sb-new tc-sb-same")
+                         for b in new_boxes if _box_key(b) in old_keys)
+    boxes_new = "".join(_box_poly(b, "tc-sb-new tc-sb-changed")
+                        for b in new_boxes if _box_key(b) not in old_keys)
+    boxes_old = "".join(_box_poly(b, "tc-sb-old tc-sb-changed")
+                        for b in old_boxes if _box_key(b) not in new_keys)
 
     sb_svg = (
         f'<svg class="tc-markers tm-layer tm-layer-spawnboxes" '
         f'viewBox="0 0 {MAP_VB} {MAP_VB}" preserveAspectRatio="none" '
-        f'aria-hidden="true">{boxes_old}{boxes_new}</svg>'
+        f'aria-hidden="true">{boxes_same}{boxes_new}{boxes_old}</svg>'
     )
 
     old_t = tier_counts(diff.get("campsOld", []))
@@ -400,6 +415,13 @@ def _moved_summary(diff):
                    if (c["x"], c["y"]) in old_tier and old_tier[(c["x"], c["y"])] != c.get("tier"))
     if retiered:
         out.append(f"camp tiers changed: {retiered}")
+    # resized/moved camp spawn boxes (7.39d: "Increased spawnboxes of Triangle Ancient camps")
+    old_boxes = {_box_key(b) for b in diff.get("spawnboxesOld", [])}
+    new_boxes = {_box_key(b) for b in diff.get("spawnboxesNew", [])}
+    if len(old_boxes) == len(new_boxes) and new_boxes - old_boxes:
+        out.append(f"camp spawn boxes changed: {len(new_boxes - old_boxes)}")
+    elif old_boxes != new_boxes:
+        out.append(f"camp spawn boxes +{len(new_boxes - old_boxes)} −{len(old_boxes - new_boxes)}")
     for key, name in _MOVED_NAMES.items():
         ed = diff.get("entities", {}).get(key)
         if ed:

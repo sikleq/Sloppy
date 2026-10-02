@@ -52,7 +52,17 @@ def test_what_moved_is_read_off_the_diff():
 def test_7_39b_moved_what_its_notes_say():
     """7.39b's notes: trees cut and planted, Bottom Radiant T1 moved, two camps, one watcher."""
     assert terrain._moved_summary(terrain._load_diff("7.39b")) == [
-        "trees +38 −27", "camps moved: 2", "towers moved: 1", "watchers moved: 1"]
+        "trees +38 −27", "camps moved: 2", "camp spawn boxes changed: 2", "towers moved: 1", "watchers moved: 1"]
+
+
+def test_7_39d_bigger_triangle_ancient_boxes_show():
+    """The owner: 7.39d "Increased spawnboxes of Triangle Ancient camps", yet the map showed no difference — the
+    summary didn't count boxes, and the old dashed box hid a few px inside the new one."""
+    diff = terrain._load_diff("7.39d")
+    assert terrain._moved_summary(diff) == ["trees +0 −3", "camp spawn boxes changed: 2"]
+    svg, _counts = terrain._markers_svg(diff, "739d")
+    assert svg.count("tc-sb-new tc-sb-changed") == 2 and svg.count("tc-sb-old tc-sb-changed") == 2
+    assert svg.count("tc-sb-same") == 26
 
 
 def _page(ver, quiet_after=()):
