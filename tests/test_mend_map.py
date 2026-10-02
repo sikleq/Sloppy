@@ -3,7 +3,11 @@ rim and shadow; the ground around it stays the mended render's own (7.39b painte
 import os
 import sys
 
-import numpy as np
+import pytest
+
+np = pytest.importorskip("numpy")              # map tools run locally; CI installs no imaging libraries
+pytest.importorskip("scipy")
+pytest.importorskip("PIL")
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
