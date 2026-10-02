@@ -95,16 +95,20 @@ def test_7_39d_bigger_triangle_ancient_boxes_show():
     assert svg.count("tc-sb-same") == 26
 
 
-def _page(ver, quiet_after=()):
+def _page(ver):
     steps = {s.patch: s for s in mv.steps()}
-    return terrain._build_terrain_page(ver, list(steps), {}, steps[ver], terrain._load_diff(ver), "", quiet_after)
+    return terrain._build_terrain_page(ver, list(steps), {}, steps[ver], terrain._load_diff(ver), "")
 
 
 def test_a_patch_without_terrain_notes_says_so_and_shows_what_moved():
+    """Plain text under a "Patch notes" head, outside the change list — as a list row it got the list's empty tag
+    box, "a red rectangular stub" (the owner 2026-10-02)."""
     html = _page("7.38b")
-    assert 'class="terrain-no-notes"' in html
+    assert ('<div class="tf-head">Patch notes</div><div class="tf-none">No terrain changes</div>' in html)
+    assert '<ul class="changes terrain-list">\n\n</ul>' in html and "terrain-no-notes" not in html
     assert '<div class="tf-head">Changed in the map file</div>' in html
-    assert ('Trees <span class="tm-add-text">+2</span> <span class="tm-rem-text">−11</span></span>') in html
+    assert ('alt="Trees" width="16" height="16"><span class="tm-add-text">+2</span> '
+            '<span class="tm-rem-text">−11</span></span>') in html
     assert 'src="icons/maps/map_7.38.webp' in html and 'src="icons/maps/map_7.38b.webp' in html
     assert "← 7.38&nbsp; OLD" in html and "NEW &nbsp;7.38b →" in html
 
@@ -134,37 +138,35 @@ def test_7_38_has_its_page_and_its_map_notes():
     assert "lotus pools moved: 2" in moved and "wisdom runes +0 −2" in moved and "wisdom shrines +2 −0" in moved
 
 
-def test_the_page_before_names_the_patches_that_changed_nothing():
+def test_the_patches_that_changed_nothing_are_not_mentioned():
+    """The owner 2026-10-02: "remove 'Unchanged in 7.41f'" — no page and no line about them."""
     steps, notes, quiet = _quiet_set()
     pages = terrain._pages([p for p in steps if p not in quiet], notes)
-    runs = terrain._quiet_runs(pages, mv.load_patch_maps(), quiet)
-    assert runs["7.41a"] == ["7.41b"] and runs["7.41e"] == ["7.41f"]
-    assert runs["7.40"] == ["7.40b", "7.40c"] and runs["7.39d"] == ["7.39e"] and runs["7.39b"] == []
-    html = _page("7.40", runs["7.40"])
-    assert ('<div class="tf-verb">Unchanged in</div><div class="tf-chips"><span class="tf-chip">7.40b</span>'
-            '<span class="tf-chip">7.40c</span></div>') in html
-    assert '<span class="tf-chip">7.39e</span>' in _page("7.39d", runs["7.39d"])
+    html = terrain._build_terrain_page("7.41e", pages, notes, steps["7.41e"], terrain._load_diff("7.41e"), "")
+    body = html.split('<div class="terrain-wrap">')[1]            # the header's "Patches" tab links 7.41f
+    assert "7.41f" not in body and "Unchanged" not in body
+    assert 'href="terrain_741f.html"' not in html
 
 
 def test_the_facts_read_like_the_list():
     """The owner: four lines of text "should be laid out better", then the tables "aren't harmonious" — headings like
-    the list's subgroup heads, five tiles for what's on the map, the changes as chips under Moved / Changed /
-    Added · removed with "n/of all" ("Bounty runes 1 moved (1/2)"), then the quiet patches."""
+    the list's subgroup heads, five tiles (trees, then camps small → ancient), the changes as "icon: change" chips
+    with "n/of all" ("Bounty runes 1 moved (1/2)"; not "Added / removed: No-ward cells +2")."""
     diff = terrain._load_diff("7.40")
     _svg, counts = terrain._markers_svg(diff, "740")
     step = next(s for s in mv.steps() if s.patch == "7.40")
-    html = terrain._facts_html(counts, step, diff, ["7.40b", "7.40c"])
+    html = terrain._facts_html(counts, step, diff)
     assert "<table" not in html and html.count('<div class="tf-head">') == 2
     assert html.count('<div class="tf-tile">') == 5 and 'icons/camps/creepcamp_ancient.png' in html
+    names = [n.split(" ")[0].split("<")[0] for n in html.split('<div class="tf-name">')[1:]]
+    assert names == ["trees", "small", "medium", "large", "ancient"]
     assert '<div class="tf-name">large <span class="tm-rem-text">−4</span></div>' in html
     assert '<div class="tf-name">medium <span class="tm-add-text">+4</span></div>' in html
-
-    def row(verb):
-        return html[html.index(f'<div class="tf-verb">{verb}</div>'):].split('<div class="tf-verb">')[1]
-    assert 'Camps <b>9/28</b>' in row("Moved") and 'Towers <b>1/22</b>' in row("Moved")
-    assert 'Camp tiers <b>4/28</b>' in row("Changed") and 'Camp spawn boxes <b>10/28</b>' in row("Changed")
-    assert 'icons/ui/gothic/tc_towers.png' in html and html.count('class="tf-chip"') >= 6
-    assert '<span class="tf-chip">7.40c</span>' in row("Unchanged in") and "terrain-quiet" not in html  # a row
+    assert "tf-verb" not in html and "Moved</div>" not in html
+    assert 'alt="Camps" width="16" height="16"><b>9/28</b> moved</span>' in html
+    assert 'alt="Towers" width="16" height="16"><b>1/22</b> moved</span>' in html
+    assert 'alt="Camp tiers" width="16" height="16"><b>4/28</b> re-tiered</span>' in html
+    assert 'alt="Camp spawn boxes" width="16" height="16"><b>10/28</b> resized</span>' in html
     assert '<div class="tf-none">Nothing</div>' in terrain._facts_html({}, step, {"treesOld": [], "treesNew": []})
 
 

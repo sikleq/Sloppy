@@ -184,6 +184,9 @@ def stitch(frame_files, prints, upp_out, rect, blend_px=64):
     return canvas
 
 
+BORDER_PX = 16            # the band along the picture's edge where any neutral grey is SFM's background
+
+
 def _void_mask(a, min_area=40000):
     """The empty corners beyond the map's edge: big near-black regions touching the picture's border (their
     outermost ~12 px are SFM's flat grey background, not black)."""
@@ -197,13 +200,20 @@ def _void_mask(a, min_area=40000):
     g = c.mean(axis=2).astype(np.float32)
     flat = np.abs(g - ndimage.uniform_filter(g, 7)) < 1.5
     void |= ndimage.binary_opening(grey & flat, iterations=3)
+    # a thin strip of that grey along the picture's own edge (5-6 px where the outer frames stop short of it) is
+    # too thin for the opening and too narrow to look flat — it stayed grey and showed as a white line when zoomed
+    # in (the owner 2026-10-02). Neutral grey within BORDER_PX of the edge is void too.
+    band = np.zeros(void.shape, bool)
+    band[:BORDER_PX], band[-BORDER_PX:], band[:, :BORDER_PX], band[:, -BORDER_PX:] = True, True, True, True
+    rim = grey & band                                       # always void, whatever it touches
+    void |= rim
     labels, n = ndimage.label(ndimage.binary_dilation(void, iterations=4))      # joined across thin seams
     border = set(np.unique(np.concatenate([labels[0], labels[-1], labels[:, 0], labels[:, -1]]))) - {0}
     sizes = ndimage.sum(void, labels, range(n + 1))
     keep = [i for i in border if sizes[i] >= min_area]
     if not keep:
-        return np.zeros(void.shape, bool)
-    return ndimage.binary_dilation(void & np.isin(labels, keep), iterations=2)
+        return rim
+    return ndimage.binary_dilation(void & np.isin(labels, keep), iterations=2) | rim
 
 
 def _ground_sources(a, known, near, patch=128, count=400, q=4):

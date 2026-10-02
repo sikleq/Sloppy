@@ -199,6 +199,10 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
 - Check the first exported frame: now and then (3 of 26 exports) SFM writes frame 0 before the camera reaches its
   first key — a patch of Radiant jungle instead of the empty bottom-left corner (mean brightness ~102 against
   ~25). That frame is the empty corner, so a sound frame 0 of the same map from another export replaces it.
+- Edge strip (2026-10-02, the owner: "a white strip at the left edge when zoomed in"): where the outer frames stop
+  5-6 px short of the picture's edge, SFM's flat grey (55) stayed — too thin for `_void_mask`'s opening and its
+  flatness test. Neutral grey within `BORDER_PX` (16) of the edge is now always void; every picture, its webp,
+  zoom tiles and release asset were redone (`sfm/reblack_edges.py`).
 - Pink objects = a material the build we render on lacks. 7.39's release map file holds two "templar gates"
   (`npc_dota_unit_templar_gate`, the Twin Gate model `team_portal.vmdl` with skin 2, at (1875, -5075) and
   (-1527, 4000)) that no patch note mentions and 7.39b removed; the 7.40c build has no material for that skin. The
@@ -385,13 +389,14 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
 - **Facts under the list (2026-10-02)** — the owner: the lines "Trees / Neutral camps / Moved in the map file / X
   changed nothing" should be laid out better; then two centred tables "aren't harmonious — it can be better". Now
   `_facts_html` speaks the list's own look: headings styled as the list's subgroup heads (`.tf-head`), "On the
-  map" as five tiles (trees + the four camp tiers: icon, number, name, change), "Changed in the map file" as rows
-  Moved / Changed / Added · removed (small right-aligned verb) of chips — one per kind of object with its layer
-  icon and "n/of all" (the owner: "Bounty runes 1 moved (1/2)"; a row per kind "looked cheap"). Tiles and chips
-  share one gold-outline style; everything left-aligned like the list. No sentences in between (the owner: "The
-  patch notes list no terrain changes" and "7.41f changed nothing on the map" stood out of the format): a patch
-  without notes shows a "Patch notes" head with a "No terrain changes" chip, and the quiet patches after it are
-  the last row of the changes, "Unchanged in" + a chip per patch.
+  map" as five tiles (trees, then the camp tiers small → ancient — the owner: "from smaller to bigger"),
+  "Changed in the map file" as one chip per kind of object, "icon: change" (the owner: not "Added / removed:
+  No-ward cells +2"): the layer icon (the name in its alt text) and "+added −removed" or "n/of all moved /
+  re-tiered / resized" ("Bounty runes 1 moved (1/2)"). Tiles and chips share one gold-outline style; everything
+  left-aligned like the list. No sentences: a patch without notes shows a "Patch notes" head over plain "No
+  terrain changes" OUTSIDE the `ul.changes` list (inside it the list's `li.li-notext::before` tag box drew "a red
+  rectangular stub"); patches that changed nothing on the map are not mentioned at all (the owner: "remove
+  'Unchanged in 7.41f'").
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
   a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
   (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —

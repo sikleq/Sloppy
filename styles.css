@@ -9824,21 +9824,18 @@ li.tsp-hidden { display: none !important; }
 .tf-num img, .tf-chip img { width: 16px; height: 16px; flex: none; }
 .tf-name { margin-top: 2px; font-size: 11.5px; color: var(--text-dim); white-space: nowrap; }
 .tf-name .tm-add-text, .tf-name .tm-rem-text { font-size: 11px; }
-.tf-changes { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 10px; align-items: start; }
-.tf-verb {
-  font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-dim);
-  padding-top: 5px; text-align: right;
-}
-.tf-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+/* "Changed in the map file": one chip per kind of object — "icon: change" (the name is the icon's alt text) */
+.tf-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .tf-chip {
-  display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 5px;
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 6px;
   white-space: nowrap; color: var(--text-dim); line-height: 1.35;
 }
 .tf-chip b { color: var(--text-bright); font-weight: 600; }
-.tf-none { color: var(--text-dim); font-style: italic; }
-/* A patch whose notes list no terrain changes: under a "Patch notes" head, one chip like the facts' chips. */
-.terrain-list li.terrain-no-notes { padding: 4px 0 0; list-style: none; }
-.terrain-list li.terrain-no-notes::before { content: none; }
+.tf-chip-name { color: var(--text-main); }
+/* plain text under a head: "No terrain changes" (Patch notes), "Nothing" (Changed in the map file) */
+.tf-none { color: var(--text-dim); }
+.terrain-notes-none { margin-top: 0; }
+.terrain-notes-none .tf-head { padding-top: 2px; }
 .tm-add-text { color: #6fe089; font-weight: 600; }
 .tm-rem-text { color: #ff7a7a; font-weight: 600; }
 

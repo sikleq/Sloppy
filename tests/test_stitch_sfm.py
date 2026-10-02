@@ -55,6 +55,19 @@ def test_black_void_paints_only_the_empty_corner_and_sfm_grey_rim():
     assert out[620:880, 620:880].max() == 0 and out[-6:, 100:500].max() == 0
 
 
+def test_a_thin_grey_strip_along_the_edge_goes_black_too():
+    """The owner 2026-10-02: a white line at the map's left edge when zoomed in — 5-6 px of SFM's grey (55) where
+    the outer frames stop short of the picture's edge, too thin for the void's opening."""
+    rng = np.random.default_rng(3)
+    pic = np.clip(np.array([90, 150, 60]) + rng.normal(0, 6, (900, 900, 3)), 0, 255).round()
+    pic[:, 700:] = 0                                             # the void along the right side
+    pic[:, :5] = 55                                              # the strip on the left, beside the map
+    pic[:, -5:] = 55                                             # and one inside the void
+    out = np.asarray(ss.black_void(Image.fromarray(pic.astype(np.uint8))), np.float32)
+    assert out[:, -5:].max() == 0 and out[:, :5].max() == 0
+    assert np.array_equal(out[:, 40:600], pic[:, 40:600].astype(np.float32))                   # the map untouched
+
+
 def test_the_seam_runs_where_the_two_patches_differ_least():
     err = np.full((20, 10), 9.0)
     err[:, 6] = 0                                                # a free column

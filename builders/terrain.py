@@ -741,7 +741,8 @@ def _signed(n):
     return f' <span class="{"tm-add-text" if n > 0 else "tm-rem-text"}">{"+" if n > 0 else "−"}{abs(n)}</span>'
 
 
-_CAMP_TIERS = ((3, "ancient"), (2, "large"), (1, "medium"), (0, "small"))
+# smallest to biggest (the owner 2026-10-02: "camps from smaller to bigger, not starting with ancient")
+_CAMP_TIERS = ((0, "small"), (1, "medium"), (2, "large"), (3, "ancient"))
 
 # The icon of each kind of object in the "Changed in the map file" chips (its map layer's icon).
 _ITEM_ICON = {"trees": "ui/gothic/tc_trees", "camps": "camps/creepcamp_mid", "camp tiers": "camps/creepcamp_big",
@@ -754,28 +755,36 @@ _ITEM_ICON = {"trees": "ui/gothic/tc_trees", "camps": "camps/creepcamp_mid", "ca
               "no-ward cells": "ui/gothic/tc_nowards"}
 
 
+_CHANGED_WORD = {"camp tiers": "re-tiered", "camp spawn boxes": "resized"}
+
+
 def _chip(name, kind, n, removed, total):
-    """One kind of object in the changes table: icon, name, and "n/of all" — or
-    "+added −removed" when the count changed."""
+    """One kind of object in the changes: its layer icon and the change — "+added −removed", or "n/of all moved"
+    (the owner 2026-10-02: "icon: change" instead of "Added / removed: No-ward cells +2"; "Bounty runes 1 moved
+    (1/2)"). The name stays in the icon's alt text."""
     icon = _ITEM_ICON.get(name)
-    img = f'<img src="icons/{icon}.png" alt="" width="16" height="16">' if icon else ""
-    value = (f'{_signed(n)}{_signed(-removed)}'.strip() if kind == "delta"
-             else f'<b>{n}/{total}</b>')
-    return f'<span class="tf-chip">{img}{_esc(name[:1].upper() + name[1:])} {value}</span>'
+    label = _esc(name[:1].upper() + name[1:])
+    img = (f'<img src="icons/{icon}.png" alt="{label}" width="16" height="16">' if icon
+           else f'<span class="tf-chip-name">{label}</span>')
+    if kind == "delta":
+        value = f'{_signed(n)}{_signed(-removed)}'.strip()
+    else:
+        value = f'<b>{n}/{total}</b> {_CHANGED_WORD.get(name, kind)}'
+    return f'<span class="tf-chip">{img}{value}</span>'
 
 
-def _facts_html(counts, step, diff, quiet_after=()):
+def _facts_html(counts, step, diff):
     """The facts under the change list, in the list's own look (the owner
     2026-10-02: four lines of text "should be laid out better"; then the tables
     "aren't harmonious — it can be better"): headings like the list's subgroup
     heads, then
-      ON THE MAP — five tiles: trees and the four camp tiers, icon + number +
-        name, with the change since the patch before;
-      CHANGED IN THE MAP FILE — Moved / Changed / Added · removed, each a row of
-        chips (_chip), so a patch Valve's notes say nothing about still shows
-        what changed.
-    The patches after it that changed nothing on the map are the last row, "Unchanged in" (they get no page —
-    the owner: "if nothing changed, there's nothing to compare")."""
+      ON THE MAP — five tiles: trees and the camp tiers small → ancient, icon +
+        number + name, with the change since the patch before;
+      CHANGED IN THE MAP FILE — one chip per kind of object, "icon: change"
+        (_chip), so a patch Valve's notes say nothing about still shows what
+        changed.
+    Patches that changed nothing on the map get no page and no mention (the
+    owner: "remove 'Unchanged in 7.41f'")."""
     out = []
     if counts:
         old_t, new_t = counts.get("campsOld", {}), counts.get("campsNew", {})
@@ -791,23 +800,9 @@ def _facts_html(counts, step, diff, quiet_after=()):
         out.append('<div class="tf-head">On the map</div>\n'
                    f'<div class="tf-tiles">{"".join(tiles)}</div>\n')
     if step is not None:
-        # grouped by what happened, one chip per kind of object with its icon and
-        # "n/of all" (the owner: "x moved, y moved, z moved" row after row "looks cheap";
-        # "Bounty runes 1 moved (1/2)")
-        items = _moved_items(diff)
-        rows = []
-        for verb, kinds in (("Moved", ("moved",)), ("Changed", ("changed",)), ("Added / removed", ("delta",))):
-            chips = [_chip(name, kind, n, removed, total)
-                     for name, kind, n, removed, total in items if kind in kinds]
-            if chips:
-                rows.append(f'<div class="tf-verb">{verb}</div><div class="tf-chips">{"".join(chips)}</div>')
-        # the patches after it that changed nothing on the map (no page of their own) — a row of the same grid,
-        # not a sentence below it (the owner: "7.41f changed nothing on the map" stood out of the format)
-        if quiet_after:
-            chips = "".join(f'<span class="tf-chip">{_esc(p)}</span>' for p in quiet_after)
-            rows.append(f'<div class="tf-verb">Unchanged in</div><div class="tf-chips">{chips}</div>')
+        chips = [_chip(*i) for i in _moved_items(diff)]
         out.append('<div class="tf-head">Changed in the map file</div>\n'
-                   + (f'<div class="tf-changes">{"".join(rows)}</div>\n' if rows
+                   + (f'<div class="tf-chips">{"".join(chips)}</div>\n' if chips
                       else '<div class="tf-none">Nothing</div>\n'))
     return f'<div class="terrain-facts">\n{"".join(out)}</div>\n' if out else ""
 
@@ -820,31 +815,12 @@ def _quiet(steps, notes, diffs):
     return {p for p in steps if not notes.get(p) and not _moved_summary(diffs.get(p))}
 
 
-def _quiet_runs(pages, patch_maps, quiet):
-    """{page: [the patches right after it that changed nothing on the map]} — the
-    quiet steps and the patches that shipped the very same map file, up to the
-    next page (or the first patch that changed something we hold no page for)."""
-    order = list(patch_maps)
-    out = {}
-    for ver in pages:
-        if ver not in patch_maps:
-            continue
-        run = []
-        for i in range(order.index(ver) + 1, len(order)):
-            p = order[i]
-            same = patch_maps[p] == patch_maps[order[i - 1]]
-            if p in pages or not (same or p in quiet):
-                break
-            run.append(p)
-        out[ver] = run
-    return out
-
-
 def _no_notes_html():
-    """The change list of a patch whose notes list no terrain changes: a "Patch notes" head and one chip, in the
-    facts' own format (the owner 2026-10-02: an italic sentence "stands out of the changes' format")."""
-    return ('<li class="terrain-subgroup-head">Patch notes</li>\n'
-            '<li class="terrain-no-notes"><span class="tf-chip">No terrain changes</span></li>')
+    """A patch whose notes list no terrain changes: a "Patch notes" head over plain text, in the facts' own format,
+    outside the change list (the owner 2026-10-02: an italic sentence "stands out of the changes' format"; as a list
+    row it also got the list's empty tag box — "a red rectangular stub")."""
+    return ('<div class="terrain-facts terrain-notes-none"><div class="tf-head">Patch notes</div>'
+            '<div class="tf-none">No terrain changes</div></div>\n')
 
 
 _INSPIRED_BY = (("Leamare", "https://github.com/leamare/dota-interactive-map"),
@@ -957,11 +933,10 @@ def _pages(steps, notes):
     return sorted(set(steps) | set(notes), key=_ver_key, reverse=True)
 
 
-def _build_terrain_page(ver, patches, notes, step, diff, subnav, quiet_after=()):
+def _build_terrain_page(ver, patches, notes, step, diff, subnav):
     """Build one terrain HTML page: patch ``ver``'s map file against the patch
     before's (``step``, None when there's no pair → fallback), its own notes
-    (``notes`` = {patch: rows}), what moved (``diff``) and the patches after it
-    that changed nothing (``quiet_after``)."""
+    (``notes`` = {patch: rows}) and what moved (``diff``)."""
     nav = _site.render_top_nav('materials', _latest_href(),
                                patch_context=False,
                                subtabs_active='terrain',
@@ -977,9 +952,11 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav, quiet_after=())
         map_inner = _fallback_html(ver)
         credit = _source_html()
 
-    counts_html = _facts_html(counts, step, diff, quiet_after)
+    counts_html = _facts_html(counts, step, diff)
     rows = notes.get(ver)
-    list_html = _changes_html([(ver, rows)], skip_first_head=True) if rows else _no_notes_html()
+    # an empty list stays (the subpatch arrows hang off it); "no notes" goes beside it, not in it
+    list_html = _changes_html([(ver, rows)], skip_first_head=True) if rows else ""
+    no_notes = "" if rows else _no_notes_html()
     first_ver = ver
 
     return (
@@ -1007,6 +984,7 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav, quiet_after=())
         f'<div class="terrain-list-pane" data-patch="{ver}">\n'
         f'<div class="terrain-subpatch-head terrain-subpatch-top">{_esc(first_ver)}</div>\n'
         f'<ul class="changes terrain-list">\n{list_html}\n</ul>\n'
+        f'{no_notes}'
         f'{counts_html}'
         '</div>\n'
         '</div>\n'
@@ -1026,15 +1004,12 @@ def save_terrain_html():
     diffs = {p: _load_diff(p) for p in steps}
     quiet = _quiet(steps, notes, diffs)
     patches = _pages([p for p in steps if p not in quiet], notes) or ["7.41"]
-    runs = _quiet_runs(patches, _map_versions.load_patch_maps(), quiet)
-
     _os.makedirs(_site.DIST_DIR, exist_ok=True)
     for stale in _glob.glob(_os.path.join(_site.DIST_DIR, "terrain_*.html")):
         _os.remove(stale)                     # a page that went quiet must not linger in dist/
     total = sum(len(rows) for rows in notes.values())
     for ver in patches:
-        page = _build_terrain_page(ver, patches, notes, steps.get(ver), diffs.get(ver), subnav,
-                                   runs.get(ver, ()))
+        page = _build_terrain_page(ver, patches, notes, steps.get(ver), diffs.get(ver), subnav)
         # the :has() facts styles.css now reads as classes (patch/static_has.py)
         from patch.static_has import add_static_has_classes
         page = add_static_has_classes(page)
