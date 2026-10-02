@@ -6,6 +6,14 @@
       "category": "Materials",
       "minor": true,
       "fix": true,
+      "link": "terrain_738c.html",
+      "title": "Terrain: 7.38b and 7.38c now list their map notes (they said there were none), notes' details open under (?), and camps demoted while moving are counted (7.40 and 7.41 demoted 4 camps, not 2)"
+    },
+    {
+      "date": "2026-10-02",
+      "category": "Materials",
+      "minor": true,
+      "fix": true,
       "link": "terrain_739d.html",
       "title": "Terrain: camp spawn boxes that changed now stand out on the Spawn Boxes layer and are counted under the list (7.39d's bigger Triangle Ancient boxes were a few pixels apart and easy to miss)"
     },

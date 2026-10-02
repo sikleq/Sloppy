@@ -313,6 +313,20 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `data-tiles-old/-new`; scripts.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
   picture — the old ones next to `.tc-old`, the new ones inside the clipped `.tc-new-layer` — once a picture pixel
   would be drawn bigger than a screen pixel. Pages' 1 GB limit: tiles for the site's maps only.
+- **Terrain audit (2026-10-02)** — the owner: "check the changed terrain for other errors too, both what the
+  notes say and what actually changed". `scripts/gen/terrain_audit.py [PATCH…] --pictures sfm/final` prints, per
+  step, the notes next to every change placed by its nearest landmark (tree clusters, camps moved / re-tiered /
+  boxes, towers and point objects with direction, ground changes from the pictures). Found and fixed:
+  - 7.38b's and 7.38c's pages said "no terrain changes": their map notes sat in the General list / under "Dire
+    Safe Lane Jungle", "Top Roshan Pit", "Bottom Lane". Now **a block with `terrain_link=` is map notes, whatever
+    its title**; 7.38b's two rows moved into a "Terrain Changes" block. The notes are read as Python (ast), so a
+    row's inline note (7.41's "Result:" lines) comes along as the (?) popup.
+  - "camp tiers changed" missed a camp demoted AND moved (7.40 read 2 of 4): `_retiered` pairs camps by mutual
+    nearest position within 1000 units — not by trigger name (7.38 renumbered its camps).
+  - Valve vs the map file: every direction checks out (towers, camps, pits, lotus pools, runes, watchers, gates,
+    Tormentors). One claim doesn't: 7.41 "Radiant offlane tier 2 tower has been adjusted slightly to the left" —
+    the tower moved 37 units west in 7.40 (whose notes say so) and not in 7.41. Changes no note mentions show in
+    "Moved in the map file" (e.g. 7.39 moved Radiant bot T1 42 S and Dire top T1 67 W).
 - **Changed spawn boxes stand out (2026-10-02)** — the owner: 7.39d "Increased spawnboxes of Triangle Ancient camps",
   yet the map showed nothing: the old dashed box hid a few px inside the new one, and the summary didn't count
   boxes. Now a box that didn't change is drawn once (`.tc-sb-same`), a changed one thick (`.tc-sb-changed`: new

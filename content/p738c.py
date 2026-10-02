@@ -5,7 +5,7 @@ def build():
 
     W(section("General Updates"))
     
-    W(plain_header("Dire Safe Lane Jungle"))
+    W(plain_header("Dire Safe Lane Jungle", terrain_link="7.38c"))
     W(ul_open())
     W(li("The tree lines above and below the tower have been reworked", t("MISC")))
     W(li("The Dire Safe Lane large camp has been moved away from the Dire Safe Lane Tier 1 tower, and had its tree line reduced and rotated to face the river", t("NERF")))
@@ -16,13 +16,13 @@ def build():
     W(li("Several additional tree and visual adjustments have been made to this area", t("MISC")))
     W(ul_close())
     
-    W(plain_header("Top Roshan Pit"))
+    W(plain_header("Top Roshan Pit", terrain_link="7.38c"))
     W(ul_open())
     W(li("Fixed a spot at the north side of the pit that had incorrect vision rules", t("MISC")))
     W(li("Fixed some areas that visually looked pathable but were not", t("MISC")))
     W(ul_close())
     
-    W(plain_header("Bottom Lane"))
+    W(plain_header("Bottom Lane", terrain_link="7.38c"))
     W(ul_open())
     W(li("A tree near the Radiant Safe Lane large camp has been removed", t("DEL")))
     W(li("Several trees have been removed from the Radiant high ground leading to the Bottom Roshan Pit", t("DEL")))

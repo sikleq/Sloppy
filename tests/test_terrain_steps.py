@@ -55,6 +55,35 @@ def test_7_39b_moved_what_its_notes_say():
         "trees +38 −27", "camps moved: 2", "camp spawn boxes changed: 2", "towers moved: 1", "watchers moved: 1"]
 
 
+def test_every_block_linked_to_the_map_is_read():
+    """The owner: "check the changed terrain for other errors too" — 7.38b's map notes sat in the General list and
+    7.38c's under "Dire Safe Lane Jungle" / "Top Roshan Pit" / "Bottom Lane", so both pages said "no terrain
+    changes". A block with terrain_link= is map notes, whatever its title."""
+    notes = terrain._terrain_notes_by_patch()
+    assert len(notes["7.38b"]) == 2 and len(notes["7.38c"]) == 15
+    assert {r[2] for r in notes["7.38c"]} == {"Dire Safe Lane Jungle", "Top Roshan Pit", "Bottom Lane"}
+    assert all(r[2] != "Terrain Changes" for rows in notes.values() for r in rows)   # that title is no subgroup
+
+
+def test_a_rows_inline_note_comes_along():
+    """7.41's "Result:" lines are the Watcher row's inline note; the Terrain page shows them as the patch page does."""
+    rows = terrain._terrain_notes_by_patch()["7.41"]
+    watcher = next(r for r in rows if r[0].startswith("The watcher between"))
+    assert watcher[3].startswith("Tormentor is on the low ground")
+    html = terrain._changes_html([("7.41", [watcher])], skip_first_head=True)
+    assert 'class="li-tail"' in html and 'class="info-tip"' in html and "Twin Gate highground" in html
+
+
+def test_camp_tier_changes_follow_the_camp_not_its_name():
+    """7.40 demoted 4 camps (2 of them also moved — an exact-position match read 2); 7.41 too. 7.38 renumbered its
+    camps, so matching by name would call camps 12000 units apart the same camp."""
+    for patch in ("7.40", "7.41"):
+        assert "camp tiers changed: 4" in terrain._moved_summary(terrain._load_diff(patch))
+    old = [{"x": 0, "y": 0, "tier": 2}, {"x": 5000, "y": 0, "tier": 1}]
+    new = [{"x": 300, "y": 0, "tier": 1}, {"x": 5000, "y": 3000, "tier": 3}]
+    assert terrain._retiered(old, new) == 1                       # the far one is another camp, not a promotion
+
+
 def test_7_39d_bigger_triangle_ancient_boxes_show():
     """The owner: 7.39d "Increased spawnboxes of Triangle Ancient camps", yet the map showed no difference — the
     summary didn't count boxes, and the old dashed box hid a few px inside the new one."""

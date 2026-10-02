@@ -24,6 +24,7 @@ parsed at build time; a patch whose notes list none says so.
 
 ``python build_site.py`` runs it (``save_terrain_html``).
 """
+import ast as _ast
 import glob as _glob
 import html as _html
 import json as _json
@@ -317,69 +318,102 @@ def _ver_key(v):
     return tuple(_part(x) for x in v.split("."))
 
 
-def _terrain_notes_by_patch():
-    """Parse every ``plain_header("Terrain Changes")`` block from content/*.py
-    (and 7.38's "Wandering Waters" / "Other Terrain Changes").
+def _call_name(node):
+    return node.func.id if isinstance(node, _ast.Call) and isinstance(node.func, _ast.Name) else None
 
-    Returns ``{patch: [(text, TAG, subgroup), ...]}`` — each patch's own notes
-    (its page shows only them; subgroup may be None).
-    """
-    import re, glob as _glob
-    here = _HERE
-    content_files = sorted(_glob.glob(_os.path.join(here, "content", "*.py")))
-    if not content_files:
-        content_files = [_os.path.join(here, "build_patch.py")]
-    src_parts = []
-    for p in content_files:
-        try:
-            src_parts.append(open(p, encoding="utf-8").read())
-        except OSError:
-            pass
-    if not src_parts:
-        return {}
-    src = "\n".join(src_parts)
-    heads = [(m.start(), m.group(1))
-             for m in re.finditer(r'write_head\("([^"]+)"', src)]
 
-    def patch_for(off):
-        prev = [h for h in heads if h[0] < off]
-        return prev[-1][1] if prev else "?"
+def _str_arg(node):
+    """A plain string literal ("a" "b" implicit concatenation is one constant)."""
+    return node.value if isinstance(node, _ast.Constant) and isinstance(node.value, str) else None
 
-    # raw: {patch_ver: [(text, tag, subgroup), ...]}
-    # 7.38 put its map notes under "Wandering Waters" (the new streams) and "Other
-    # Terrain Changes"; those blocks count too, each under its own title.
+
+def _row_tag(text, badge):
+    """t("X") -> X; b(old, new[, l=True]) -> BUFF/NERF by the row's direction."""
+    name = _call_name(badge)
+    if name == "t" and badge.args:
+        return _str_arg(badge.args[0]) or "MISC"
+    if name in ("b", "bf"):
+        lower_better = any(k.arg == "l" and isinstance(k.value, _ast.Constant) and k.value.value
+                           for k in badge.keywords)
+        low = text.lower()
+        good = lower_better if ("decreased" in low or "reduced" in low) else not lower_better
+        return "BUFF" if good else "NERF"
+    return "MISC"
+
+
+def _statements(body):
+    """A function body's statements in order, nested if/for/with bodies included."""
+    for st in body:
+        yield st
+        for field in ("body", "orelse"):
+            if isinstance(st, (_ast.If, _ast.For, _ast.While, _ast.With)) and getattr(st, field, None):
+                yield from _statements(getattr(st, field))
+
+
+def _notes_in(source):
+    """{patch: rows} of one content file (see _terrain_notes_by_patch)."""
     raw = {}
-    for hm in re.finditer(r'plain_header\("((?:Other )?Terrain Changes|Wandering Waters)"', src):
-        i = hm.start()
-        # Find end of terrain section: next plain_header, section(), or write_footer
-        end_m = re.search(r'(?:plain_header|section|write_footer)\(', src[i + 1:])
-        j = (i + 1 + end_m.start()) if end_m else len(src)
-        block = src[i:j]
-        rows = []
-        cur_subgroup = None if hm.group(1) == "Terrain Changes" else hm.group(1)
-        for line in block.split("\n"):
-            sg = re.search(r'subgroup\("([^"]+)"\)', line)
-            if sg:
-                cur_subgroup = sg.group(1)
-                continue
-            li_m = re.search(r'W\(li\(\s*"([^"]*)"', line)
-            if not li_m:
-                continue
-            text = li_m.group(1)
-            rest = line[li_m.end():li_m.end() + 300]
-            tm = re.search(r't\("(\w+)"\)', rest)
-            if tm:
-                tag = tm.group(1)
-            elif re.match(r"\s*,\s*b\(", rest):
-                lower_better = "l=True" in rest
-                low = text.lower()
-                good = lower_better if ("decreased" in low or "reduced" in low) else not lower_better
-                tag = "BUFF" if good else "NERF"
-            else:
-                tag = "MISC"
-            rows.append((text, tag, cur_subgroup))
-        if rows:
-            raw.setdefault(patch_for(i), []).extend(rows)
+    for st in _ast.parse(source).body:
+        if isinstance(st, _ast.FunctionDef):
+            for k, v in _notes_in_body(st.body).items():
+                raw.setdefault(k, []).extend(v)
+    return raw
+
+
+def _notes_in_body(body):
+    raw, patch, in_block, sub = {}, None, False, None
+    for st in _statements(body):
+        call = st.value if isinstance(st, _ast.Expr) else None
+        name = _call_name(call)
+        if name == "write_head" and call.args:
+            patch = _str_arg(call.args[0])
+            continue
+        if name != "W" or not call.args:
+            continue
+        inner = call.args[0]
+        iname = _call_name(inner)
+        if iname == "plain_header":
+            title = _str_arg(inner.args[0]) if inner.args else None
+            in_block = any(k.arg == "terrain_link" for k in inner.keywords)
+            sub = None if title == "Terrain Changes" else title
+        elif not in_block or iname in ("ul_open", "ul_close"):
+            continue
+        elif iname == "subgroup" and inner.args:
+            sub = _str_arg(inner.args[0])
+        elif iname == "li" and inner.args and _str_arg(inner.args[0]) and patch:
+            text = _str_arg(inner.args[0])
+            badge = inner.args[1] if len(inner.args) > 1 else next(
+                (k.value for k in inner.keywords if k.arg == "badge"), None)
+            extra = next((k.value for k in inner.keywords if k.arg == "extra"), None)
+            note = (_str_arg(extra.args[0]) if _call_name(extra) == "inline_note" and extra.args else None)
+            raw.setdefault(patch, []).append((text, _row_tag(text, badge), sub, note))
+        else:
+            in_block = False                   # any other block (an item, a unit, a section) ends it
+    return raw
+
+
+def _terrain_notes_by_patch():
+    """Every patch's map notes from content/*.py: the rows of each block whose
+    ``plain_header(..., terrain_link=...)`` links it to the map — "Terrain
+    Changes" (7.39+), 7.38's "Wandering Waters" / "Other Terrain Changes",
+    7.38c's "Dire Safe Lane Jungle" / "Top Roshan Pit" / "Bottom Lane" (the
+    owner 2026-10-02: 7.38b's and 7.38c's map notes were missing). A block
+    titled other than "Terrain Changes" is its own subgroup.
+
+    Read as Python (ast), not by regex: a row's inline note (7.41's "Result:"
+    lines under the Watcher row) comes along and the page shows it as on the
+    patch page. Returns ``{patch: [(text, TAG, subgroup, note), ...]}``.
+    """
+    import glob as _glob
+    raw = {}
+    for p in sorted(_glob.glob(_os.path.join(_HERE, "content", "*.py"))):
+        try:
+            with open(p, encoding="utf-8") as f:
+                found = _notes_in(f.read())
+        except (OSError, SyntaxError):
+            continue
+        for k, v in found.items():
+            raw.setdefault(k, []).extend(v)
     return raw
 
 
@@ -388,6 +422,29 @@ _MOVED_NAMES = {"towers": "towers", "lotus": "lotus pools", "twinGates": "twin g
                 "tormentors": "Tormentors", "bounty": "bounty runes", "power": "power runes",
                 "wisdom": "wisdom shrines", "wisdomRunes": "wisdom runes", "outposts": "outposts",
                 "watchers": "watchers", "roshan": "Roshan pits"}
+
+
+_SAME_CAMP = 1000          # units: a camp this close on both sides is the same camp, moved
+
+
+def _retiered(old, new, radius=_SAME_CAMP):
+    """Camps whose tier changed: each new camp paired with the old camp nearest to
+    it when they are each other's nearest and within `radius`. By position, not
+    by trigger name — 7.38 renumbered the camps (by name, camps "moved" 12000
+    units and "changed tier"), and a camp demoted AND moved (7.40's triangle
+    camps) is still found, which an exact-position match missed (7.40 read 2 of
+    its 4 demotions)."""
+    def d2(a, b):
+        return (a["x"] - b["x"]) ** 2 + (a["y"] - b["y"]) ** 2
+    n = 0
+    for c in new:
+        if not old:
+            break
+        o = min(old, key=lambda o: d2(o, c))
+        back = min(new, key=lambda x: d2(o, x))
+        if back is c and d2(o, c) <= radius ** 2 and o.get("tier") != c.get("tier"):
+            n += 1
+    return n
 
 
 def _moved_summary(diff):
@@ -410,9 +467,7 @@ def _moved_summary(diff):
     out = [delta(diff.get("treesOld", []), diff.get("treesNew", []), "trees")]
     out.append(delta([(c["x"], c["y"]) for c in diff.get("campsOld", [])],
                      [(c["x"], c["y"]) for c in diff.get("campsNew", [])], "camps"))
-    old_tier = {(c["x"], c["y"]): c.get("tier") for c in diff.get("campsOld", [])}
-    retiered = sum(1 for c in diff.get("campsNew", [])
-                   if (c["x"], c["y"]) in old_tier and old_tier[(c["x"], c["y"])] != c.get("tier"))
+    retiered = _retiered(diff.get("campsOld", []), diff.get("campsNew", []))
     if retiered:
         out.append(f"camp tiers changed: {retiered}")
     # resized/moved camp spawn boxes (7.39d: "Increased spawnboxes of Triangle Ancient camps")
@@ -450,7 +505,7 @@ def _badge(tag):
     return f'<span class="badge {cls}" data-tag="{tid}">{tag}</span>'
 
 
-def _change_li(text, tag):
+def _change_li(text, tag, note=None):
     _cls, tid, overall = _TAG_CLS[tag]
     # data-tag carries the primary tag plus its filter-overall (NEW→buff,
     # DEL→nerf) so a future filter surfaces them correctly; dedupe so BUFF/NERF
@@ -460,6 +515,11 @@ def _change_li(text, tag):
         tags.append("buff")
     elif 'data-overall="nerf"' in overall and "nerf" not in tags:
         tags.append("nerf")
+    if note:
+        # the row's inline note: the (?) popup on its last word, as on the patch page
+        from patch.elements import info_tip
+        head, _sp, last = text.rpartition(" ")
+        text = f'{head}{_sp}<span class="li-tail">{last}{info_tip(note)}</span>'
     return (f'<li data-tag="{" ".join(tags)}">{_badge(tag)}'
             f'<span class="row-text">{text}</span></li>')
 
@@ -467,8 +527,8 @@ def _change_li(text, tag):
 def _changes_html(subpatches, skip_first_head=False):
     """Render change list for one major-version bucket.
 
-    subpatches: [(sub_ver, [(text, tag, subgroup), ...]), ...]  oldest-first.
-    Rows are 3-tuples (text, tag, subgroup) where subgroup may be None.
+    subpatches: [(sub_ver, [(text, tag, subgroup[, note]), ...]), ...]  oldest-first.
+    subgroup and note may be None.
     """
     parts = []
     for idx, (sub_ver, rows) in enumerate(subpatches):
@@ -480,13 +540,14 @@ def _changes_html(subpatches, skip_first_head=False):
         for i, row in enumerate(rows):
             text, tag = row[0], row[1]
             sg = row[2] if len(row) > 2 else None
-            groups.setdefault(sg, []).append((i, text, tag))
+            note = row[3] if len(row) > 3 else None
+            groups.setdefault(sg, []).append((i, text, tag, note))
         for sg, sg_rows in groups.items():
             if sg:
                 parts.append(f'<li class="terrain-subgroup-head">{sg}</li>')
             sorted_rows = sorted(sg_rows,
                                  key=lambda it: (_TAG_RANK.get(it[2], 9), it[0]))
-            parts.extend(_change_li(text, tag) for _, text, tag in sorted_rows)
+            parts.extend(_change_li(text, tag, note) for _, text, tag, note in sorted_rows)
     return "\n".join(parts)
 
 
