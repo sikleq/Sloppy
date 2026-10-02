@@ -6,7 +6,7 @@
       "category": "Materials",
       "minor": true,
       "link": "terrain_741.html",
-      "title": "Terrain: the Fullscreen button reads “Full”, so every layer button fits on one line"
+      "title": "Terrain: the Fullscreen button reads “Full”, so every layer button fits on one line, spread across the map's width like its header"
     },
     {
       "date": "2026-10-02",
@@ -20,7 +20,7 @@
       "category": "Materials",
       "minor": true,
       "link": "terrain_739b.html",
-      "title": "Terrain: under the list, what's on the map as five tiles (trees, then camps from small to ancient) and what changed in the map file as “icon: change” chips with how many of all (Bounty runes 1/2 moved)"
+      "title": "Terrain: under the list, what's on the map as five tiles (trees, then camps from small to ancient) and what changed in the map file as “icon: change” chips with how many of all (Bounty runes 1/2 moved); press a chip to ring those places in red on the old map"
     },
     {
       "date": "2026-10-02",

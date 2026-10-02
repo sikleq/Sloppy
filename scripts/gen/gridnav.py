@@ -65,6 +65,13 @@ def ward_changes(old_cells, new_cells):
     return lost, gained
 
 
+def changed_cells(head, old_cells, new_cells):
+    """[[x, y]] world centres of the cells whose wardability changed (the Terrain chips ring them on the map)."""
+    w, cell = head["w"], head["cell"]
+    return [[int(head["x0"] + (i % w + 0.5) * cell), int(head["y0"] + (i // w + 0.5) * cell)]
+            for i, (a, b) in enumerate(zip(old_cells, new_cells)) if wardable(a) != wardable(b)]
+
+
 def no_ward_cells(cells):
     """Cells of the map (out of bounds aside) where a ward can't stand."""
     return sum(1 for v in cells if kind(v) in ("zone", "blocked"))

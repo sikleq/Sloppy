@@ -7108,14 +7108,32 @@ function ecShopMarkup(panels) {
     });
   }
 
+  // "Changed in the map file" chips: pressed, the changed places are ringed red on the
+  // old side of the map (.tm-hl-<key>, the stage's and the lens's copies alike).
+  function initChangeHighlights() {
+    const root = document.querySelector('.terrain-compare');
+    if (!root) return;
+    document.querySelectorAll('.tf-chip-btn[data-hl]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const on = btn.getAttribute('aria-pressed') !== 'true';
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        root.querySelectorAll('.tm-hl-' + btn.dataset.hl).forEach(function(svg) {
+          svg.classList.toggle('tm-hl-on', on);
+        });
+      });
+    });
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       initTerrainCompare();
       initSubpatchPicker();
+      initChangeHighlights();
     });
   } else {
     initTerrainCompare();
     initSubpatchPicker();
+    initChangeHighlights();
   }
 })();
 

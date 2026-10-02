@@ -397,6 +397,15 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   terrain changes" OUTSIDE the `ul.changes` list (inside it the list's `li.li-notext::before` tag box drew "a red
   rectangular stub"); patches that changed nothing on the map are not mentioned at all (the owner: "remove
   'Unchanged in 7.41f'").
+- **A chip rings its changes (2026-10-02)** — the owner: pressing a "Changed in the map file" chip outlines the
+  changed places in red on the OLD version, except spawn boxes (their layer already draws the changed boxes red).
+  Each chip but spawn boxes is a `<button class="tf-chip tf-chip-btn" data-hl="<key>">`; `_highlights_svg` adds one
+  hidden `svg.tm-hl.tm-hl-<key>.tm-old` per key (red `#ff4d4d` rings, so it shows only left of the slider), and
+  `initChangeHighlights` (src/scripts.js) toggles `.tm-hl-on` + `aria-pressed`. What is ringed (`_changed_points`):
+  trees / camps / point entities = the old-only and new-only positions (a move rings both its spots), camp tiers =
+  the old spot of each re-tiered pair (`_retiered_pairs`), no-ward cells = a 64-unit square per cell whose
+  wardability flipped (`wards.changed` in the diff, `gridnav.changed_cells`). The layer bar spreads its buttons
+  across the map's width (`justify-content: space-between`) — "like the minimap's header".
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
   a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
   (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —

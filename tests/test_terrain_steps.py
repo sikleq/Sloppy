@@ -108,7 +108,7 @@ def test_a_patch_without_terrain_notes_says_so_and_shows_what_moved():
     assert '<ul class="changes terrain-list">\n\n</ul>' in html and "terrain-no-notes" not in html
     assert '<div class="tf-head">Changed in the map file</div>' in html
     assert ('alt="Trees" width="16" height="16"><span class="tm-add-text">+2</span> '
-            '<span class="tm-rem-text">−11</span></span>') in html
+            '<span class="tm-rem-text">−11</span></button>') in html
     assert 'src="icons/maps/map_7.38.webp' in html and 'src="icons/maps/map_7.38b.webp' in html
     assert "← 7.38&nbsp; OLD" in html and "NEW &nbsp;7.38b →" in html
 
@@ -163,11 +163,28 @@ def test_the_facts_read_like_the_list():
     assert '<div class="tf-name">large <span class="tm-rem-text">−4</span></div>' in html
     assert '<div class="tf-name">medium <span class="tm-add-text">+4</span></div>' in html
     assert "tf-verb" not in html and "Moved</div>" not in html
-    assert 'alt="Camps" width="16" height="16"><b>9/28</b> moved</span>' in html
-    assert 'alt="Towers" width="16" height="16"><b>1/22</b> moved</span>' in html
-    assert 'alt="Camp tiers" width="16" height="16"><b>4/28</b> re-tiered</span>' in html
+    assert 'alt="Camps" width="16" height="16"><b>9/28</b> moved</button>' in html
+    assert 'alt="Towers" width="16" height="16"><b>1/22</b> moved</button>' in html
+    assert 'alt="Camp tiers" width="16" height="16"><b>4/28</b> re-tiered</button>' in html
     assert 'alt="Camp spawn boxes" width="16" height="16"><b>10/28</b> resized</span>' in html
     assert '<div class="tf-none">Nothing</div>' in terrain._facts_html({}, step, {"treesOld": [], "treesNew": []})
+
+
+def test_a_chip_rings_its_changes_red_on_the_old_side():
+    """The owner 2026-10-02: pressing a "Changed in the map file" chip outlines the changed places in red on the old
+    version — not for spawn boxes, the layer already shows them."""
+    diff = terrain._load_diff("7.39b")
+    svg, counts = terrain._markers_svg(diff, "739b")
+    step = next(s for s in mv.steps() if s.patch == "7.39b")
+    html = terrain._facts_html(counts, step, diff)
+    assert 'class="tf-chip tf-chip-btn" data-hl="towers"' in html and 'data-hl="trees"' in html
+    assert 'alt="Camp spawn boxes"' in html and "data-hl=\"camp" not in html.split('alt="Camp spawn boxes"')[0][-90:]
+    towers = svg.split('tm-hl-towers tm-old')[1].split("</svg>")[0]
+    assert towers.count("<circle") == 2 and 'stroke="#ff4d4d"' in towers        # the tower's old and new spot
+    trees = svg.split('tm-hl-trees tm-old')[1].split("</svg>")[0]
+    assert trees.count("<circle") == 38 + 27
+    wards = terrain._markers_svg(terrain._load_diff("7.39d"), "739d")[0]
+    assert wards.split("tm-hl-nowards tm-old")[1].split("</svg>")[0].count("<rect") == 10
 
 
 def test_the_zoom_tiles_are_named_on_the_slider(monkeypatch):

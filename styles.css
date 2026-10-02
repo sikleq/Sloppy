@@ -9727,6 +9727,9 @@ li.tsp-hidden { display: none !important; }
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  /* spread over the map's width like a header of it: the first button at the map's left edge, the last at its right,
+     the gaps between all equal (the owner 2026-10-02) */
+  justify-content: space-between;
   gap: 6px;
   padding: 0 0 10px;
 }
@@ -9831,6 +9834,12 @@ li.tsp-hidden { display: none !important; }
   white-space: nowrap; color: var(--text-dim); line-height: 1.35;
 }
 .tf-chip b { color: var(--text-bright); font-weight: 600; }
+/* a chip that rings its changes red on the map (scripts.js initChangeHighlights) */
+button.tf-chip-btn { font: inherit; cursor: pointer; }
+button.tf-chip-btn:hover { border-color: rgba(227, 196, 106, 0.45); }
+button.tf-chip-btn[aria-pressed="true"] { border-color: #ff4d4d; background: rgba(255, 77, 77, 0.12); }
+.tm-hl { opacity: 0; transition: opacity 0.15s ease; }
+.tm-hl.tm-hl-on { opacity: 1; }
 .tf-chip-name { color: var(--text-main); }
 /* plain text under a head: "No terrain changes" (Patch notes), "Nothing" (Changed in the map file) */
 .tf-none { color: var(--text-dim); }

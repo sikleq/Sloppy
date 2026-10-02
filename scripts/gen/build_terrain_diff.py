@@ -93,10 +93,10 @@ def _wards(old_code, new_code):
     paths = [os.path.join(_OWN, f"gridnav_{c}.gnv.gz") for c in (old_code, new_code)]
     if not all(os.path.exists(p) for p in paths):
         return None
-    (_ha, a), (_hb, b) = gridnav.load(paths[0]), gridnav.load(paths[1])
+    (_ha, a), (hb, b) = gridnav.load(paths[0]), gridnav.load(paths[1])
     lost, gained = gridnav.ward_changes(a, b)
     return {"old": _dotted(old_code), "new": _dotted(new_code), "lost": lost, "gained": gained,
-            "cells": gridnav.no_ward_cells(b)}
+            "cells": gridnav.no_ward_cells(b), "changed": gridnav.changed_cells(hb, a, b)}
 
 
 def _nearest(target, candidates):

@@ -291,7 +291,7 @@ def _markers_svg(diff, pair_id="default"):
         "campsOld": old_t, "campsNew": new_t,
     }
     return (ward_svgs + trees_old + trees_new + camps_old + camps_new
-            + "".join(ent_svgs) + sb_svg, counts)
+            + "".join(ent_svgs) + sb_svg + _highlights_svg(diff, proj), counts)
 
 
 def _latest_href():
@@ -442,24 +442,28 @@ _MOVED_NAMES = {"towers": "towers", "lotus": "lotus pools", "twinGates": "twin g
 _SAME_CAMP = 1000          # units: a camp this close on both sides is the same camp, moved
 
 
-def _retiered(old, new, radius=_SAME_CAMP):
-    """Camps whose tier changed: each new camp paired with the old camp nearest to
-    it when they are each other's nearest and within `radius`. By position, not
-    by trigger name — 7.38 renumbered the camps (by name, camps "moved" 12000
-    units and "changed tier"), and a camp demoted AND moved (7.40's triangle
-    camps) is still found, which an exact-position match missed (7.40 read 2 of
-    its 4 demotions)."""
+def _retiered_pairs(old, new, radius=_SAME_CAMP):
+    """Camps whose tier changed, as (old camp, new camp): each new camp paired with
+    the old camp nearest to it when they are each other's nearest and within
+    `radius`. By position, not by trigger name — 7.38 renumbered the camps (by
+    name, camps "moved" 12000 units and "changed tier"), and a camp demoted AND
+    moved (7.40's triangle camps) is still found, which an exact-position match
+    missed (7.40 read 2 of its 4 demotions)."""
     def d2(a, b):
         return (a["x"] - b["x"]) ** 2 + (a["y"] - b["y"]) ** 2
-    n = 0
+    out = []
     for c in new:
         if not old:
             break
         o = min(old, key=lambda o: d2(o, c))
         back = min(new, key=lambda x: d2(o, x))
         if back is c and d2(o, c) <= radius ** 2 and o.get("tier") != c.get("tier"):
-            n += 1
-    return n
+            out.append((o, c))
+    return out
+
+
+def _retiered(old, new, radius=_SAME_CAMP):
+    return len(_retiered_pairs(old, new, radius))
 
 
 def _moved_items(diff):
@@ -503,6 +507,52 @@ def _moved_items(diff):
         # gridnav cells (64 units) where a ward can't stand: "lost" = became no-ward, so +lost −gained
         out.append(("no-ward cells", "delta", w.get("lost", 0), w.get("gained", 0), w.get("cells", 0)))
     return [i for i in out if i]
+
+
+# Chip -> the key of its red rings on the map (scripts.js toggles .tm-hl-<key>); spawn boxes have none — the
+# Spawn Boxes layer already marks a changed box (the owner 2026-10-02).
+_HL_KEY = {"trees": "trees", "camps": "camps", "camp tiers": "camptiers", "no-ward cells": "nowards",
+           **{name: key for key, name in _MOVED_NAMES.items()}}
+_HL_RING = {"trees": 6, "camps": 22, "camptiers": 26}      # ring radius, viewBox units (entities: 19)
+_HL_RED = "#ff4d4d"
+
+
+def _changed_points(diff):
+    """{highlight key: [(x, y) world]} — every place a chip's change touches: what's only in the old map or only in
+    the new one (a move rings both ends), the re-tiered camps, the cells whose wardability changed."""
+    def sym(old, new):
+        a, b = {tuple(p) for p in old}, {tuple(p) for p in new}
+        return sorted(a ^ b)
+    out = {"trees": sym(diff.get("treesOld", []), diff.get("treesNew", [])),
+           "camps": sym([(c["x"], c["y"]) for c in diff.get("campsOld", [])],
+                        [(c["x"], c["y"]) for c in diff.get("campsNew", [])]),
+           "camptiers": [(o["x"], o["y"]) for o, _c in _retiered_pairs(diff.get("campsOld", []),
+                                                                       diff.get("campsNew", []))]}
+    for key in _MOVED_NAMES:
+        ed = diff.get("entities", {}).get(key)
+        if ed:
+            out[key] = sym(ed.get("old", []), ed.get("new", []))
+    out["nowards"] = [tuple(p) for p in (diff.get("wards") or {}).get("changed", [])]
+    return {k: v for k, v in out.items() if v}
+
+
+def _highlights_svg(diff, proj):
+    """One SVG per chip, hidden until its chip is pressed: red rings round the changed places (squares round the
+    changed ward cells), on the OLD side of the slider (the owner: "outlined in red on the old version")."""
+    out = []
+    for key, pts in _changed_points(diff).items():
+        if key == "nowards":
+            shapes = []
+            for x, y in pts:
+                (ax, ay), (bx, by) = proj(x - 32, y + 32), proj(x + 32, y - 32)
+                shapes.append(f'<rect x="{ax}" y="{ay}" width="{round(bx - ax, 1)}" height="{round(by - ay, 1)}"/>')
+        else:
+            r = _HL_RING.get(key, 19)
+            shapes = [f'<circle cx="{px}" cy="{py}" r="{r}"/>' for px, py in (proj(x, y) for x, y in pts)]
+        out.append(f'<svg class="tc-markers tm-hl tm-hl-{key} tm-old" viewBox="0 0 {MAP_VB} {MAP_VB}" '
+                   f'preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="{_HL_RED}" '
+                   f'stroke-width="2.4">{"".join(shapes)}</g></svg>')
+    return "".join(out)
 
 
 def _moved_summary(diff):
@@ -770,6 +820,11 @@ def _chip(name, kind, n, removed, total):
         value = f'{_signed(n)}{_signed(-removed)}'.strip()
     else:
         value = f'<b>{n}/{total}</b> {_CHANGED_WORD.get(name, kind)}'
+    key = _HL_KEY.get(name)
+    if key:
+        # pressed: the changed places ringed red on the old side of the map (scripts.js initChangeHighlights)
+        return (f'<button type="button" class="tf-chip tf-chip-btn" data-hl="{key}" aria-pressed="false">'
+                f'{img}{value}</button>')
     return f'<span class="tf-chip">{img}{value}</span>'
 
 
