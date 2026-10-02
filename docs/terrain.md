@@ -367,9 +367,19 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   split by the slider. `build_terrain_diff.py` adds `"wards": {old, new, lost, gained, cells}`; "No-ward cells
   +lost −gained" joins the changes, so 7.41c-e (only ward cells changed: invisible in the pictures) got pages.
   The layer starts off on every page, those too (the owner: "forgot to turn it off by default").
-  **"How did Valve fix 7.39b's 'locations incorrectly blocked for warding'?"** Not in the map file: its gridnav,
-  the five no-ward volumes (byte-identical models), the world physics and every entity but trees, camps, a tower,
-  a watcher, lane path corners and decor are the same as 7.39's — a game-code fix. 7.39d's "Fixed a ward spot in
+  **"How did Valve fix 7.39b's 'locations incorrectly blocked for warding'?"** Not in the map file's ward data: its
+  gridnav, the five no-ward volumes (byte-identical models) and the world physics are the same as 7.39's. Not in
+  server.dll either (the owner: "let's take server.dll apart" — the dota2-ida-researcher agent on the last 7.39 and
+  the first 7.39b build, depot 373303 manifests 6843372111976121097 / 639057744321842479): the ward-location check
+  (7.39 0x1C8FEE0) is the same — a cell must be walkable (bit 0x01) with none of 0x02 / 0x10 / 0x100, then no object
+  flagged 0x20 and no live building at the point (`#dota_hud_error_no_wards_here`); of 68 real code changes none is
+  ward-related. What 7.39b removed that blocks wards at runtime: the two unannounced `npc_dota_unit_templar_gate`
+  ("templar portals") — `CDOTA_Unit_Templar_Gate` derives from `CDOTA_BaseNPC_Building` (building flag set on
+  spawn, FILLER hull ≈ 96-112 radius, 450 HP), spawns hidden (`modifier_generic_hidden`, lifted only by an unreleased
+  `CDOTA_Ability_Templar_Assassin_Hidden_Gates`). Most likely those two hidden "buildings" were the "locations
+  incorrectly blocked for warding" (INFERRED: not checked whether a hidden unit stays in the ward check's point
+  query). Our No-ward layer shows the map file's part of the check; trees (0x02 at runtime) and buildings add theirs
+  in the game. 7.39d's "Fixed a ward spot in
   Radiant safe lane hard camp" IS in the file: 10 cells turned no-ward (4 there, 6 by the Dire safe lane small
   camp). 7.41c opened 149 cells by the Twin Gates and Tormentors, 7.41d closed 23, 7.41e 2 — no notes.
 - **Facts under the list (2026-10-02)** — the owner: the lines "Trees / Neutral camps / Moved in the map file / X
