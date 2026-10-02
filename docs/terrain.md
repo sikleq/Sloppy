@@ -341,6 +341,22 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   stacked map layers in the site's gold ramp (the owner: "simpler, like our other icons"; four coloured discs were
   rejected), from `scripts/gen/gen_terrain_layer_icons.py tc_all` (the generator now takes icon names; its root
   path was one level short and wrote into scripts/icons/).
+- **Map changes no note mentions — tracked every patch (the owner 2026-10-02: "useful that you mark map changes
+  nobody wrote about — track it with every patch").** For each patch with a new map file: `python
+  scripts/gen/terrain_audit.py <patch> --pictures <sfm/final>` (and the No-ward cells in its diff), set each change
+  against the notes, and add what no note covers here (the page's "Changed in the map file" table shows the numbers;
+  this list says what they are). So far:
+  | Patch | Changed in the map file, no note about it |
+  |---|---|
+  | 7.38b | 2 trees added (the notes only remove); 16 cells turned no-ward by both Ancient camps by the offlane T1 |
+  | 7.39 | Radiant bot T1 42 units S, Dire top T1 67 W; Radiant safe-lane small camp 383 NE; two "templar gates" placed (pink in our render, mended; removed in 7.39b) |
+  | 7.39b | Radiant safe-lane small and large camps moved (26 / 89 units) with their spawn boxes; a watcher 22 E |
+  | 7.39e, 7.40c, 7.41f | the map file changed, nothing in it moved (pictures: render noise only) |
+  | 7.41 | Dire small camp 11 moved 338 E, Radiant small camp 14 439 W. And the other way round: "Radiant offlane tier 2 tower has been adjusted slightly to the left" — it didn't move (it did in 7.40; note on the patch page) |
+  | 7.41a | 1 tree removed by the Dire secret shop |
+  | 7.41c | 149 cells by the Twin Gates and Tormentors became wardable |
+  | 7.41d | 23 cells turned no-ward (by Dire small camp 11, a Tormentor, a watcher); 693 cells at the map's edge out of bounds |
+  | 7.41e | 2 cells by Radiant top T2 turned no-ward |
 - **No-ward ground layer (2026-10-02)** — the owner: "a layer of every place where wards can't be placed". The map's
   gridnav (`maps/dota.gnv`, one byte per 64-unit cell; `scripts/gen/gridnav.py`) carries it: bit0 = walkable,
   bit4 = no wards (set on the walkable ground of both fountains, both Roshan pits and the secret shop — the five

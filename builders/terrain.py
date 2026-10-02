@@ -633,7 +633,8 @@ def _controls_html(layers=True):
         'Zoom</button>',
         f'<button type="button" class="tc-btn tc-btn-fs" aria-pressed="false" '
         f'aria-label="Fullscreen" title="Fullscreen">'
-        f'{_FS_ENTER_ICON}Fullscreen</button>',
+        # "Full", not "Fullscreen": the owner 2026-10-02 — every toggle on one line
+        f'{_FS_ENTER_ICON}Full</button>',
     ] + layer_parts
 
     _RMB_ICON = (

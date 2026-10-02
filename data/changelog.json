@@ -5,6 +5,13 @@
       "date": "2026-10-02",
       "category": "Materials",
       "minor": true,
+      "link": "terrain_741.html",
+      "title": "Terrain: the Fullscreen button reads “Full”, so every layer button fits on one line"
+    },
+    {
+      "date": "2026-10-02",
+      "category": "Materials",
+      "minor": true,
       "link": "terrain_741c.html",
       "title": "Terrain: a No-ward ground layer — every spot where a ward can't stand, read from each patch's map file; 7.41c, 7.41d and 7.41e get pages for the ward spots they quietly changed"
     },

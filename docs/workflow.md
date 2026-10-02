@@ -107,7 +107,9 @@ hero in `data/stats/<latest>/heroes.json` is absent from `herolist.json`.
 Also bump per patch: `PATCH_ENTRY_COUNTS` in `patch/page.py` (calendar
 "extra-major" highlight) and, for a patch that ships a new map file, its Terrain page: render the map, add its
 picture + mapdata + `data/map/patch_maps.json` / `renders.json` rows, `python scripts/gen/build_terrain_diff.py`
-(docs/terrain.md, "One page per patch"); for a new major, the `terrain_XXX.html` nav link (`builders/site_common.py`)
+(docs/terrain.md, "One page per patch"), then `python scripts/gen/terrain_audit.py <patch>` against the notes and
+add every map change no note mentions to docs/terrain.md's "Map changes no note mentions" (tracked every patch, the
+owner 2026-10-02); for a new major, the `terrain_XXX.html` nav link (`builders/site_common.py`)
 and index tile (`patch/index_page.py`).
 
 ## Step 2c — Refresh the external data behind the weights
