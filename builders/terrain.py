@@ -24,6 +24,7 @@ parsed at build time; a patch whose notes list none says so.
 
 ``python build_site.py`` runs it (``save_terrain_html``).
 """
+import glob as _glob
 import html as _html
 import json as _json
 import os as _os
@@ -641,19 +642,49 @@ def _counts_html(counts):
     )
 
 
-def _map_file_html(step, diff):
+def _map_file_html(step, diff, quiet_after=()):
     """Under the counts: what moved in the map file since the patch before (read
     off the diff, so a patch Valve's notes say nothing about still shows its
-    changes), and the patch before when it kept an older patch's file (7.40b ran
-    7.40's map, so the 7.40c page's OLD side is 7.40's picture)."""
-    if step is None:
-        return ""
-    moved = _moved_summary(diff)
-    out = ('<p class="terrain-counts terrain-moved"><b>Moved in the map file:</b> '
-           f'{_esc(", ".join(moved)) if moved else "nothing (the file still changed)"}</p>\n')
-    if step.old_pic != step.before:
-        out += (f'<p class="terrain-counts terrain-same-file">{_esc(step.before)} kept the map file '
-                f'of {_esc(step.old_pic)}.</p>\n')
+    changes), and the patches after it that changed nothing on the map (they get
+    no page — the owner 2026-10-02: "if nothing changed, there's nothing to
+    compare")."""
+    out = ""
+    if step is not None:
+        moved = _moved_summary(diff)
+        out = ('<p class="terrain-counts terrain-moved"><b>Moved in the map file:</b> '
+               f'{_esc(", ".join(moved)) if moved else "nothing"}</p>\n')
+    if quiet_after:
+        run = quiet_after[0] if len(quiet_after) == 1 else f"{quiet_after[0]} – {quiet_after[-1]}"
+        out += (f'<p class="terrain-counts terrain-quiet">{_esc(run)} changed nothing on the '
+                'map.</p>\n')
+    return out
+
+
+def _quiet(steps, notes, diffs):
+    """Steps whose notes list nothing and whose map file moved nothing — no page.
+    Their pictures differ from the patch before only by render noise (checked
+    2026-10-02 with scripts/gen/map_picture_diff.py: no change bigger than the
+    wind in the trees), so there is nothing to compare."""
+    return {p for p in steps if not notes.get(p) and not _moved_summary(diffs.get(p))}
+
+
+def _quiet_runs(pages, patch_maps, quiet):
+    """{page: [the patches right after it that changed nothing on the map]} — the
+    quiet steps and the patches that shipped the very same map file, up to the
+    next page (or the first patch that changed something we hold no page for)."""
+    order = list(patch_maps)
+    out = {}
+    for ver in pages:
+        if ver not in patch_maps:
+            continue
+        run = []
+        for i in range(order.index(ver) + 1, len(order)):
+            p = order[i]
+            same = patch_maps[p] == patch_maps[order[i - 1]]
+            if p in pages or not (same or p in quiet):
+                break
+            run.append(p)
+        out[ver] = run
     return out
 
 
@@ -758,10 +789,11 @@ def _pages(steps, notes):
     return sorted(set(steps) | set(notes), key=_ver_key, reverse=True)
 
 
-def _build_terrain_page(ver, patches, notes, step, diff, subnav):
+def _build_terrain_page(ver, patches, notes, step, diff, subnav, quiet_after=()):
     """Build one terrain HTML page: patch ``ver``'s map file against the patch
     before's (``step``, None when there's no pair → fallback), its own notes
-    (``notes`` = {patch: rows}) and what moved (``diff``)."""
+    (``notes`` = {patch: rows}), what moved (``diff``) and the patches after it
+    that changed nothing (``quiet_after``)."""
     nav = _site.render_top_nav('materials', _latest_href(),
                                patch_context=False,
                                subtabs_active='terrain',
@@ -777,7 +809,7 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
         map_inner = _fallback_html(ver)
         credit = _source_html()
 
-    counts_html = _counts_html(counts) + _map_file_html(step, diff)
+    counts_html = _counts_html(counts) + _map_file_html(step, diff, quiet_after)
     rows = notes.get(ver)
     list_html = _changes_html([(ver, rows)], skip_first_head=True) if rows else _no_notes_html()
     first_ver = ver
@@ -823,13 +855,18 @@ def save_terrain_html():
 
     notes = _terrain_notes_by_patch()
     steps = {s.patch: s for s in _map_versions.steps()}
-    patches = _pages(steps, notes) or ["7.41"]
+    diffs = {p: _load_diff(p) for p in steps}
+    quiet = _quiet(steps, notes, diffs)
+    patches = _pages([p for p in steps if p not in quiet], notes) or ["7.41"]
+    runs = _quiet_runs(patches, _map_versions.load_patch_maps(), quiet)
 
     _os.makedirs(_site.DIST_DIR, exist_ok=True)
+    for stale in _glob.glob(_os.path.join(_site.DIST_DIR, "terrain_*.html")):
+        _os.remove(stale)                     # a page that went quiet must not linger in dist/
     total = sum(len(rows) for rows in notes.values())
     for ver in patches:
-        page = _build_terrain_page(ver, patches, notes, steps.get(ver),
-                                   _load_diff(ver) if ver in steps else None, subnav)
+        page = _build_terrain_page(ver, patches, notes, steps.get(ver), diffs.get(ver), subnav,
+                                   runs.get(ver, ()))
         # the :has() facts styles.css now reads as classes (patch/static_has.py)
         from patch.static_has import add_static_has_classes
         page = add_static_has_classes(page)

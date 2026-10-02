@@ -55,17 +55,42 @@ def test_7_39b_moved_what_its_notes_say():
         "trees +38 −27", "camps moved: 2", "towers moved: 1", "watchers moved: 1"]
 
 
-def _page(ver):
+def _page(ver, quiet_after=()):
     steps = {s.patch: s for s in mv.steps()}
-    return terrain._build_terrain_page(ver, list(steps), {}, steps[ver], terrain._load_diff(ver), "")
+    return terrain._build_terrain_page(ver, list(steps), {}, steps[ver], terrain._load_diff(ver), "", quiet_after)
 
 
-def test_a_patch_without_terrain_notes_says_so_and_names_the_kept_file():
-    html = _page("7.40c")
+def test_a_patch_without_terrain_notes_says_so_and_shows_what_moved():
+    html = _page("7.38b")
     assert 'class="terrain-no-notes"' in html
-    assert "7.40b kept the map file of 7.40." in html
-    assert 'src="icons/maps/map_7.40.webp' in html and 'src="icons/maps/map_7.40c.webp' in html
-    assert "← 7.40b&nbsp; OLD" in html and "NEW &nbsp;7.40c →" in html
+    assert "<b>Moved in the map file:</b> trees +2 −11" in html
+    assert 'src="icons/maps/map_7.38.webp' in html and 'src="icons/maps/map_7.38b.webp' in html
+    assert "← 7.38&nbsp; OLD" in html and "NEW &nbsp;7.38b →" in html
+
+
+def _quiet_set():
+    steps = {s.patch: s for s in mv.steps()}
+    notes = terrain._terrain_notes_by_patch()
+    return steps, notes, terrain._quiet(steps, notes, {p: terrain._load_diff(p) for p in steps})
+
+
+def test_a_patch_that_changed_nothing_gets_no_page():
+    """The owner: "if nothing changed in a patch, there's nothing to compare" — no object moved, no notes."""
+    steps, notes, quiet = _quiet_set()
+    assert quiet == {"7.39e", "7.40c", "7.41c", "7.41d", "7.41e", "7.41f"}
+    pages = terrain._pages([p for p in steps if p not in quiet], notes)
+    assert pages == ["7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39", "7.38c", "7.38b"]
+
+
+def test_the_page_before_names_the_patches_that_changed_nothing():
+    steps, notes, quiet = _quiet_set()
+    pages = terrain._pages([p for p in steps if p not in quiet], notes)
+    runs = terrain._quiet_runs(pages, mv.load_patch_maps(), quiet)
+    assert runs["7.41a"] == ["7.41b", "7.41c", "7.41d", "7.41e", "7.41f"]
+    assert runs["7.40"] == ["7.40b", "7.40c"] and runs["7.39d"] == ["7.39e"] and runs["7.39b"] == []
+    html = _page("7.40", runs["7.40"])
+    assert "7.40b – 7.40c changed nothing on the map." in html
+    assert "7.39e changed nothing on the map." in _page("7.39d", runs["7.39d"])
 
 
 def test_the_picker_lists_patches_not_ranges():

@@ -301,10 +301,15 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   not just two major versions" (7.39b's own changes used to sit under a 7.39 → 7.40 slider). `builders/map_versions.py`
   reads `data/map/patch_maps.json` (which map file every patch shipped — `map_history.py`'s `patch_maps.json`) and
   `data/map/renders.json` (the files we hold a picture of). A **step** = a patch whose map file differs from the
-  patch before's, both files pictured: 7.38b … 7.41f, 15 pages `terrain_<code>.html`. The OLD side is labelled with
+  patch before's, both files pictured → a page `terrain_<code>.html` (unless quiet, below). The OLD side is labelled with
   the patch right before and shows the picture of the file that patch ran — 7.40b shipped 7.40's file, so the 7.40c
-  page compares `map_7.40.webp` and says "7.40b kept the map file of 7.40". A same-file patch (7.40b, 7.41b) gets no
-  page. A patch with terrain notes but no step still gets one, with the fallback.
+  page compared `map_7.40.webp`. A patch with terrain notes but no step still gets a page, with the fallback.
+- **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
+  a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
+  (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —
+  `scripts/gen/map_picture_diff.py OLD_full.png NEW_full.png` (biggest blob ≤ 616 px at 8 units/px; a real change
+  like 7.39 → 7.39b makes 1000-3800). The page before names them: "7.41b – 7.41f changed nothing on the map"
+  (`_quiet_runs`). 9 pages now: 7.38b, 7.38c, 7.39, 7.39b, 7.39c, 7.39d, 7.40, 7.41, 7.41a.
 - **Pictures and objects per map file**, named by the FIRST patch that shipped the file: `icons/maps/map_<ver>.webp`,
   `data/map/mapdata_<code>.json` (so `mapdata_741` = 7.41's release map, 2476 trees; `741f` = today's, 2475).
 - **Each page's list = that patch's own notes**; a patch whose notes list none shows "The patch notes list no terrain
