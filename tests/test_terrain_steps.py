@@ -20,9 +20,9 @@ def test_a_step_needs_both_pictures():
     assert mv.steps({"7.37e": "x", "7.38": "y"}, {"7.38"}) == []
 
 
-def test_the_site_has_every_letter_patch_from_738b_to_741f():
+def test_the_site_has_every_map_file_from_738_to_741f():
     got = [s.patch for s in mv.steps()]
-    assert got == ["7.38b", "7.38c", "7.39", "7.39b", "7.39c", "7.39d", "7.39e", "7.40", "7.40c",
+    assert got == ["7.38", "7.38b", "7.38c", "7.39", "7.39b", "7.39c", "7.39d", "7.39e", "7.40", "7.40c",
                    "7.41", "7.41a", "7.41c", "7.41d", "7.41e", "7.41f"]
     same = mv.same_file_as()
     assert same["7.40b"] == "7.40" and same["7.41b"] == "7.41a"
@@ -79,7 +79,17 @@ def test_a_patch_that_changed_nothing_gets_no_page():
     steps, notes, quiet = _quiet_set()
     assert quiet == {"7.39e", "7.40c", "7.41c", "7.41d", "7.41e", "7.41f"}
     pages = terrain._pages([p for p in steps if p not in quiet], notes)
-    assert pages == ["7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39", "7.38c", "7.38b"]
+    assert pages == ["7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39", "7.38c", "7.38b", "7.38"]
+
+
+def test_7_38_has_its_page_and_its_map_notes():
+    """The owner: "make the 7.37e picture so 7.38 has a page"; 7.38's map notes sit under "Wandering Waters" and
+    "Other Terrain Changes", and its Lotus Pools were npc_dota_mango_tree before."""
+    assert mv.Step("7.38", "7.37e", "7.37e", "7.38") in mv.steps()
+    rows = terrain._terrain_notes_by_patch()["7.38"]
+    assert {r[2] for r in rows} == {"Wandering Waters", "Other Terrain Changes"}
+    moved = terrain._moved_summary(terrain._load_diff("7.38"))
+    assert "lotus pools moved: 2" in moved and "wisdom runes +0 −2" in moved and "wisdom shrines +2 −0" in moved
 
 
 def test_the_page_before_names_the_patches_that_changed_nothing():

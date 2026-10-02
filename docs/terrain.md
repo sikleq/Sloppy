@@ -318,7 +318,13 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —
   `scripts/gen/map_picture_diff.py OLD_full.png NEW_full.png` (biggest blob ≤ 616 px at 8 units/px; a real change
   like 7.39 → 7.39b makes 1000-3800). The page before names them: "7.41b – 7.41f changed nothing on the map"
-  (`_quiet_runs`). 9 pages now: 7.38b, 7.38c, 7.39, 7.39b, 7.39c, 7.39d, 7.40, 7.41, 7.41a.
+  (`_quiet_runs`). 10 pages now: 7.38, 7.38b, 7.38c, 7.39, 7.39b, 7.39c, 7.39d, 7.40, 7.41, 7.41a.
+- **7.38's page** (the owner 2026-10-02: "make the 7.37e picture so 7.38 has a page"): 7.37e rendered on the 7.40c
+  clone like the others (its water renders fine there). 7.38's map notes sit under `plain_header("Wandering
+  Waters")` and `("Other Terrain Changes")` — the parser takes those too, each as a subgroup, and the headers carry
+  `terrain_link="7.38"`. Before 7.38 the Lotus Pools were `npc_dota_mango_tree` and wisdom came from
+  `dota_item_rune_spawner_xp` runes: `build_terrain_diff.py` reads the old class name for the lotus layer and keeps
+  a `wisdomRunes` entity set (no map layer), so 7.38 reads "lotus pools moved: 2, wisdom runes +0 −2".
 - **Pictures and objects per map file**, named by the FIRST patch that shipped the file: `icons/maps/map_<ver>.webp`,
   `data/map/mapdata_<code>.json` (so `mapdata_741` = 7.41's release map, 2476 trees; `741f` = today's, 2475).
 - **Each page's list = that patch's own notes**; a patch whose notes list none shows "The patch notes list no terrain
@@ -348,7 +354,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
 
 1. ✅ **No-map fallback** — done (`_fallback_html`).
 2. ✅ **Patch picker** — done; one page per patch whose map file changed (+ any patch with terrain notes). A new
-   patch: see "One page per patch" above. Still to do: a 7.37e picture, so 7.38 gets its page too.
+   patch: see "One page per patch" above. 7.37e's picture (done 2026-10-02) gives 7.38 its page.
 3. ✅ **Marker redesign — done.** Toggleable tree + camp layers, both split
    old/new by the slider; magnifier lens. **Projection is now EXACT** — uses the
    real leamare transform (`src/js/conversion.js worldToLatLon` + mapConstants

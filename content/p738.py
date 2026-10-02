@@ -20,7 +20,7 @@ def build():
     W(li("Items that have entered a Hero's backpack for the very first time now have a 3 second grace period where they can be swapped into the main inventory without any cooldown. This can only happen once per item per Hero", t("NEW")))
     W(ul_close())
 
-    W(plain_header("Wandering Waters", new="New mechanic"))
+    W(plain_header("Wandering Waters", new="New mechanic", terrain_link="7.38"))
     W(ul_open())
     W(li("The top and bottom outer rim areas are now flooded by streams of traversable water", t("NEW")))
     W(li("These streams have a current, starting near the T3 towers (right before the medium camp location), down to the T1 towers (former Twin Gate location)", t("NEW")))
@@ -124,7 +124,7 @@ def build():
                                      "Radius: 900. Duration: 15s."]},
                      summary="New ability", tag="new"))
 
-    W(plain_header("Other Terrain Changes"))
+    W(plain_header("Other Terrain Changes", terrain_link="7.38"))
     W(ul_open())
     W(li("The region specific map buffs (Mighty Mines, etc.) have been removed", t("DEL")))
     W(li("Corner outposts have been removed", t("DEL")))

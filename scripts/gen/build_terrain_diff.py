@@ -55,7 +55,10 @@ def default_pairs():
 # Watcher == npc_dota_lantern (10) — SEPARATE layers.
 _ENTITY_KEYS = {
     "towers": "npc_dota_tower",
-    "lotus": "npc_dota_lotus_pool",
+    # before 7.38 the Lotus Pools were npc_dota_mango_tree (7.38's notes: "changed the way Healing Lotuses are
+    # collected from Lotus Pools"); without the old name 7.37e -> 7.38 read "lotus pools +2"
+    "lotus": ("npc_dota_lotus_pool", "npc_dota_mango_tree"),
+    "wisdomRunes": "dota_item_rune_spawner_xp",   # until 7.38 replaced them with the Shrines (no map layer)
     "twinGates": "npc_dota_unit_twin_gate",
     "tormentors": "npc_dota_miniboss_spawner",
     "bounty": "dota_item_rune_spawner_bounty",
@@ -159,7 +162,11 @@ def _diff_pair(old_code, new_code):
     camps_new = camp_list(B["npc_dota_neutral_spawner"])
 
     def coords(src, key):
-        return [[e["x"], e["y"]] for e in src.get(key, [])]
+        """The first of the class names (one, or old and new names) the map has."""
+        for k in (key,) if isinstance(key, str) else key:
+            if src.get(k):
+                return [[e["x"], e["y"]] for e in src[k]]
+        return []
     entities = {name: {"old": coords(A, key), "new": coords(B, key)}
                 for name, key in _ENTITY_KEYS.items()}
 

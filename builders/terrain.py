@@ -303,7 +303,8 @@ def _ver_key(v):
 
 
 def _terrain_notes_by_patch():
-    """Parse every ``plain_header("Terrain Changes")`` block from content/*.py.
+    """Parse every ``plain_header("Terrain Changes")`` block from content/*.py
+    (and 7.38's "Wandering Waters" / "Other Terrain Changes").
 
     Returns ``{patch: [(text, TAG, subgroup), ...]}`` — each patch's own notes
     (its page shows only them; subgroup may be None).
@@ -330,15 +331,17 @@ def _terrain_notes_by_patch():
         return prev[-1][1] if prev else "?"
 
     # raw: {patch_ver: [(text, tag, subgroup), ...]}
+    # 7.38 put its map notes under "Wandering Waters" (the new streams) and "Other
+    # Terrain Changes"; those blocks count too, each under its own title.
     raw = {}
-    for hm in re.finditer(r'plain_header\("Terrain Changes"', src):
+    for hm in re.finditer(r'plain_header\("((?:Other )?Terrain Changes|Wandering Waters)"', src):
         i = hm.start()
         # Find end of terrain section: next plain_header, section(), or write_footer
         end_m = re.search(r'(?:plain_header|section|write_footer)\(', src[i + 1:])
         j = (i + 1 + end_m.start()) if end_m else len(src)
         block = src[i:j]
         rows = []
-        cur_subgroup = None
+        cur_subgroup = None if hm.group(1) == "Terrain Changes" else hm.group(1)
         for line in block.split("\n"):
             sg = re.search(r'subgroup\("([^"]+)"\)', line)
             if sg:
@@ -361,15 +364,15 @@ def _terrain_notes_by_patch():
                 tag = "MISC"
             rows.append((text, tag, cur_subgroup))
         if rows:
-            raw.setdefault(patch_for(i), rows)
+            raw.setdefault(patch_for(i), []).extend(rows)
     return raw
 
 
 # What moved in the map file, per point-entity layer of the diff (plural nouns).
 _MOVED_NAMES = {"towers": "towers", "lotus": "lotus pools", "twinGates": "twin gates",
                 "tormentors": "Tormentors", "bounty": "bounty runes", "power": "power runes",
-                "wisdom": "wisdom shrines", "outposts": "outposts", "watchers": "watchers",
-                "roshan": "Roshan pits"}
+                "wisdom": "wisdom shrines", "wisdomRunes": "wisdom runes", "outposts": "outposts",
+                "watchers": "watchers", "roshan": "Roshan pits"}
 
 
 def _moved_summary(diff):
