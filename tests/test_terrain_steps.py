@@ -102,7 +102,9 @@ def _page(ver, quiet_after=()):
 def test_a_patch_without_terrain_notes_says_so_and_shows_what_moved():
     html = _page("7.38b")
     assert 'class="terrain-no-notes"' in html
-    assert "<b>Moved in the map file:</b> trees +2 −11" in html
+    assert '<caption>Changed in the map file</caption>' in html
+    assert ('<td class="tf-label">Trees</td><td><span class="tm-add-text">+2</span> '
+            '<span class="tm-rem-text">−11</span></td>') in html
     assert 'src="icons/maps/map_7.38.webp' in html and 'src="icons/maps/map_7.38b.webp' in html
     assert "← 7.38&nbsp; OLD" in html and "NEW &nbsp;7.38b →" in html
 
@@ -140,6 +142,22 @@ def test_the_page_before_names_the_patches_that_changed_nothing():
     html = _page("7.40", runs["7.40"])
     assert "7.40b – 7.40c changed nothing on the map." in html
     assert "7.39e changed nothing on the map." in _page("7.39d", runs["7.39d"])
+
+
+def test_the_facts_are_two_small_tables():
+    """The owner: the four lines of "Trees / Neutral camps / Moved in the map file / … changed nothing" should be
+    laid out better — "On the map" (with camp icons) and "Changed in the map file", then the quiet patches."""
+    diff = terrain._load_diff("7.40")
+    _svg, counts = terrain._markers_svg(diff, "740")
+    step = next(s for s in mv.steps() if s.patch == "7.40")
+    html = terrain._facts_html(counts, step, diff, ["7.40b", "7.40c"])
+    assert html.count('<table class="terrain-facts">') == 2
+    assert '<caption>On the map</caption>' in html and 'icons/camps/creepcamp_ancient.png' in html
+    assert '6 large <span class="tm-rem-text">−4</span>' in html and '14 medium <span class="tm-add-text">+4</span>' in html
+    assert '<td class="tf-label">Camp tiers</td><td>4 changed</td>' in html
+    assert '<td class="tf-label">Camps</td><td>9 moved</td>' in html
+    assert html.endswith('<p class="terrain-quiet">7.40b – 7.40c changed nothing on the map.</p>\n')
+    assert "Nothing</td>" in terrain._facts_html({}, step, {"treesOld": [], "treesNew": []})
 
 
 def test_the_zoom_tiles_are_named_on_the_slider(monkeypatch):

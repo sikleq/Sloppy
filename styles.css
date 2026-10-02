@@ -9798,11 +9798,21 @@ li.tsp-hidden { display: none !important; }
 .tc-ver-old { left: 8px; top: 8px; }
 
 /* ---- tree tally + camp note under the change list ---- */
-.terrain-counts { margin: 14px 4px 2px; font-size: 13px; color: var(--text-dim); line-height: 1.55; }
-/* Trees + Neutral-camps lines are one logical block — keep them tight (the
-   default 14px top would read as an empty line between them). */
-.terrain-counts + .terrain-counts { margin-top: 1px; }
-.terrain-counts b { color: var(--text-bright); }
+/* Facts under the change list (builders/terrain.py _facts_html): "On the map" + "Changed in the map file", two
+   small tables — centred, faint grid lines, like the site's other tables. */
+.terrain-facts { width: 100%; border-collapse: collapse; margin: 16px 0 0; font-size: 13px; line-height: 1.4; }
+.terrain-facts caption {
+  caption-side: top; text-align: center; padding: 0 0 5px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-main);
+}
+.terrain-facts td {
+  text-align: center; vertical-align: middle; padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.09); color: var(--text-dim);
+}
+.terrain-facts td.tf-label { color: var(--text-bright); width: 38%; }
+.tf-camp { display: inline-flex; align-items: center; gap: 3px; margin: 1px 6px; white-space: nowrap; }
+.tf-camp img { width: 16px; height: 16px; image-rendering: auto; }
+.terrain-quiet { margin: 8px 2px 0; font-size: 12.5px; color: var(--text-dim); font-style: italic; text-align: center; }
 /* A patch whose notes list no terrain changes: one plain row, no tag. */
 .terrain-list li.terrain-no-notes { color: var(--text-dim); font-style: italic; }
 .tm-add-text { color: #6fe089; font-weight: 600; }

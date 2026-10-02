@@ -222,25 +222,38 @@ def spawnbox_icon():
     return Image.alpha_composite(ol, img)
 
 
+# The site's gold ramp (icons/ui/gothic) — "All layers" is no layer of its own, so it has no type colour.
+GOLD = [(38, 28, 16), (104, 84, 48), (140, 116, 68), (188, 160, 92), (226, 200, 112), (246, 230, 170)]
+ALL_GLYPH = [                 # three stacked map layers; '#' top face, '+' its lit edge, 'o' / ':' the layers below
+    "................",
+    ".......++.......",
+    ".....++##++.....",
+    "...++######++...",
+    ".++##########++.",
+    "...##########...",
+    ".o...######...o.",
+    ".ooo...##...ooo.",
+    "...ooo....ooo...",
+    ".:...oooooo...:.",
+    ".:::...oo...:::.",
+    "...:::....:::...",
+    ".....::::::.....",
+    ".......::.......",
+    "................",
+    "................",
+]
+
+
 def all_icon():
-    """The "All layers" toggle: four discs, 2 x 2, in four layer colours (towers, lotus, tormentors, watchers) —
-    every kind of object at once. Drawn at 4x + downscaled, thin dark outline like the others."""
-    from PIL import ImageDraw, ImageFilter
-    S = ICON_RES * 4
-    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    r = S * 0.19
-    for (fx, fy), name in zip(((0.29, 0.29), (0.71, 0.29), (0.29, 0.71), (0.71, 0.71)),
-                              ("tc_towers", "tc_lotus", "tc_tormentors", "tc_watchers")):
-        cx, cy = S * fx, S * fy
-        light = tuple(min(255, int(c * 1.15) + 20) for c in COLORS[name])
-        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=COLORS[name] + (255,))
-        draw.ellipse([cx - r * 0.55, cy - r * 0.62, cx + r * 0.25, cy + r * 0.1], fill=light + (255,))
-    img = img.resize((ICON_RES, ICON_RES), Image.LANCZOS)
-    dil = img.split()[3].filter(ImageFilter.MaxFilter(3))
-    ol = Image.new("RGBA", img.size, OUTLINE)
-    ol.putalpha(dil)
-    return Image.alpha_composite(ol, img)
+    """The "All layers" toggle (the owner 2026-10-02: simpler, like the site's other icons): a 16-px pixel glyph of
+    three stacked map layers in the gold ramp, dark outline, scaled up hard-edged like tc_trees."""
+    pal = {"+": GOLD[5], "#": GOLD[4], "o": GOLD[3], ":": GOLD[2]}
+    im = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+    for y, row in enumerate(ALL_GLYPH):
+        for x, ch in enumerate(row):
+            if ch in pal:
+                im.putpixel((x, y), pal[ch] + (255,))
+    return _outline(im).resize((ICON_RES, ICON_RES), Image.NEAREST)
 
 
 # Icons kept in their NATURAL colours (the game icon is already the right colour

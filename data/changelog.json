@@ -3,6 +3,13 @@
   "entries": [
     {
       "date": "2026-10-02",
+      "category": "Patch Reader",
+      "minor": true,
+      "link": "patches/7.41.html",
+      "title": "7.41: a note under “Radiant offlane tier 2 tower has been adjusted slightly to the left” — in the map file the tower didn't move in 7.41; it moved in 7.40"
+    },
+    {
+      "date": "2026-10-02",
       "category": "Materials",
       "minor": true,
       "fix": true,
@@ -28,13 +35,6 @@
       "date": "2026-10-02",
       "category": "Materials",
       "minor": true,
-      "link": "terrain_738.html",
-      "title": "Terrain 7.38: its own page — the 7.37e map against 7.38, with the Wandering Waters notes"
-    },
-    {
-      "date": "2026-10-02",
-      "category": "Materials",
-      "minor": true,
       "link": "terrain_741.html",
       "title": "Terrain: zooming in fullscreen stays sharp — the part in view loads at twice the detail"
     },
@@ -44,9 +44,9 @@
       "title": "Terrain: a page for every patch, letter patches included",
       "link": "terrain_739b.html",
       "items": [
-        "Every patch that changed the map has its own page and slider, letter patches included; the arrows step from patch to patch",
-        "Each page lists that patch's own terrain notes, and what moved in its map file — even where the notes say nothing",
-        "Patches that changed nothing on the map get no page; the page before them names them"
+        "Every patch that changed the map has its own page and slider, from 7.38 to 7.41a; the arrows step from patch to patch",
+        "Every map picture is our own render of the map file Steam shipped with that patch (7.38 to 7.40c on the game as it was before 7.41)",
+        "Each page lists that patch's own terrain notes and what moved in its map file; a patch that changed nothing gets no page, the one before names it"
       ],
       "shots": [
         "icons/changelog/2026-10-02_terrain_steps.webp"
@@ -59,17 +59,6 @@
       "fix": true,
       "link": "terrain_739.html",
       "title": "Terrain 7.39: two pink objects are gone — unannounced portals in 7.39's map file (removed in 7.39b) whose texture the game build we render on lacks"
-    },
-    {
-      "date": "2026-10-02",
-      "category": "Materials",
-      "title": "Terrain: our own pictures for 7.39, 7.40 and 7.41",
-      "link": "terrain_740.html",
-      "items": [
-        "Every Terrain map is now our own render, made in Source Filmmaker from the map file Steam shipped with that patch",
-        "7.39 and 7.40 are rendered on the game as it was before 7.41 (today's game draws their rivers wrong)",
-        "The land beyond the map's edge stays dark, as the game draws it; pictures and object counts of every patch are in the Oldgrowth repository"
-      ]
     },
     {
       "date": "2026-10-01",

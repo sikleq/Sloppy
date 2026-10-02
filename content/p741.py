@@ -90,7 +90,10 @@ def build():
     W(subgroup("Towers"))
     W(ul_open())
     W(li("The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet", t("MISC")))
-    W(li("Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides of the tower", t("MISC")))
+    # Checked against the map files (scripts/gen/terrain_audit.py, the owner 2026-10-02): the tower's position is
+    # the same in 7.40c and 7.41; it moved 37 units west in 7.40.
+    W(li("Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides of the tower", t("MISC"),
+         extra=inline_note("In the map file the tower did not move in 7.41: it stands where 7.40 put it, 37 units to the left of its 7.39 spot (7.40: \"Very slightly adjusted ... the position of the Radiant Offlane Tier 2 tower\")")))
     W(ul_close())
     W(subgroup("Camps"))
     W(ul_open())

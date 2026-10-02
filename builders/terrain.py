@@ -447,11 +447,12 @@ def _retiered(old, new, radius=_SAME_CAMP):
     return n
 
 
-def _moved_summary(diff):
-    """What moved between the step's two map files, read off its diff — e.g.
-    ["trees +38 −27", "camps moved: 2", "towers moved: 1"]; [] when nothing did.
-    A layer whose count changed reads "+added −removed", one that kept its count
-    "moved: n" (the Oldgrowth table says the same)."""
+def _moved_items(diff):
+    """What changed between the step's two map files, read off its diff, as
+    (name, kind, n, removed): kind "delta" when the count changed (n added,
+    `removed` removed), "moved" when it kept its count (n moved), "changed" for
+    camp tiers and resized/moved spawn boxes (7.39d: "Increased spawnboxes of
+    Triangle Ancient camps"). [] when nothing changed."""
     if not diff:
         return []
 
@@ -461,27 +462,34 @@ def _moved_summary(diff):
         if not added and not removed:
             return None
         if len(old) == len(new):
-            return f"{name} moved: {added}"
-        return f"{name} +{added} −{removed}"
+            return (name, "moved", added, 0)
+        return (name, "delta", added, removed)
 
     out = [delta(diff.get("treesOld", []), diff.get("treesNew", []), "trees")]
     out.append(delta([(c["x"], c["y"]) for c in diff.get("campsOld", [])],
                      [(c["x"], c["y"]) for c in diff.get("campsNew", [])], "camps"))
     retiered = _retiered(diff.get("campsOld", []), diff.get("campsNew", []))
     if retiered:
-        out.append(f"camp tiers changed: {retiered}")
-    # resized/moved camp spawn boxes (7.39d: "Increased spawnboxes of Triangle Ancient camps")
+        out.append(("camp tiers", "changed", retiered, 0))
     old_boxes = {_box_key(b) for b in diff.get("spawnboxesOld", [])}
     new_boxes = {_box_key(b) for b in diff.get("spawnboxesNew", [])}
     if len(old_boxes) == len(new_boxes) and new_boxes - old_boxes:
-        out.append(f"camp spawn boxes changed: {len(new_boxes - old_boxes)}")
+        out.append(("camp spawn boxes", "changed", len(new_boxes - old_boxes), 0))
     elif old_boxes != new_boxes:
-        out.append(f"camp spawn boxes +{len(new_boxes - old_boxes)} −{len(old_boxes - new_boxes)}")
+        out.append(("camp spawn boxes", "delta", len(new_boxes - old_boxes), len(old_boxes - new_boxes)))
     for key, name in _MOVED_NAMES.items():
         ed = diff.get("entities", {}).get(key)
         if ed:
             out.append(delta(ed.get("old", []), ed.get("new", []), name))
-    return [s for s in out if s]
+    return [i for i in out if i]
+
+
+def _moved_summary(diff):
+    """_moved_items as text — e.g. ["trees +38 −27", "camps moved: 2", "camp tiers
+    changed: 4"] (the Oldgrowth table says the same)."""
+    def text(name, kind, n, removed):
+        return {"delta": f"{name} +{n} −{removed}", "moved": f"{name} moved: {n}"}.get(kind, f"{name} {kind}: {n}")
+    return [text(*i) for i in _moved_items(diff)]
 
 
 # Canonical tag order (same as the site convention): NEW → REWORK → BUFF →
@@ -702,54 +710,52 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None):
     )
 
 
-def _counts_html(counts):
-    """Two lines under the change list: tree count old→new (net delta), and the
-    neutral-camp roster by tier with the change vs the old patch."""
-    if not counts:
+def _signed(n):
+    """' +3' green / ' −3' red; '' for 0."""
+    if not n:
         return ""
-    o = counts.get("treesOld", 0)
-    n = counts.get("treesNew", 0)
-    d = n - o
-    tree_delta_cls = "tm-add-text" if d >= 0 else "tm-rem-text"
-
-    old_t = counts.get("campsOld", {})
-    new_t = counts.get("campsNew", {})
-
-    def camp_part(tier, label):
-        cur = new_t.get(tier, new_t.get(str(tier), 0))
-        delta = cur - old_t.get(tier, old_t.get(str(tier), 0))
-        if delta:
-            cls = "tm-add-text" if delta > 0 else "tm-rem-text"
-            return f'{cur} {label} (<span class="{cls}">{delta:+d}</span>)'
-        return f'{cur} {label}'
-
-    camps_str = ", ".join([
-        camp_part(3, "ancients"), camp_part(2, "large"),
-        camp_part(1, "medium"), camp_part(0, "small"),
-    ])
-    return (
-        '<p class="terrain-counts"><b>Trees:</b> '
-        f'{n} (<span class="{tree_delta_cls}">{d:+d}</span>)</p>\n'
-        f'<p class="terrain-counts"><b>Neutral camps:</b> {camps_str}</p>\n'
-    )
+    return f' <span class="{"tm-add-text" if n > 0 else "tm-rem-text"}">{"+" if n > 0 else "−"}{abs(n)}</span>'
 
 
-def _map_file_html(step, diff, quiet_after=()):
-    """Under the counts: what moved in the map file since the patch before (read
-    off the diff, so a patch Valve's notes say nothing about still shows its
-    changes), and the patches after it that changed nothing on the map (they get
-    no page — the owner 2026-10-02: "if nothing changed, there's nothing to
-    compare")."""
-    out = ""
+_CAMP_TIERS = ((3, "ancient"), (2, "large"), (1, "medium"), (0, "small"))
+
+
+def _facts_html(counts, step, diff, quiet_after=()):
+    """The facts under the change list as two small tables (the owner 2026-10-02:
+    four lines of text "should be laid out better"):
+      ON THE MAP — trees, and the neutral camps by tier with their icons, each
+        with its change since the patch before;
+      CHANGED IN THE MAP FILE — one row per kind of object (_moved_items), so a
+        patch Valve's notes say nothing about still shows what changed.
+    Then the patches after it that changed nothing on the map (they get no page —
+    the owner: "if nothing changed, there's nothing to compare")."""
+    out = []
+    if counts:
+        old_t, new_t = counts.get("campsOld", {}), counts.get("campsNew", {})
+
+        def tier(t, label):
+            cur = new_t.get(t, new_t.get(str(t), 0))
+            was = old_t.get(t, old_t.get(str(t), 0))
+            return (f'<span class="tf-camp"><img src="icons/camps/{_CAMP_ICON[t]}.png" alt="" width="16" '
+                    f'height="16">{cur} {label}{_signed(cur - was)}</span>')
+        trees = counts.get("treesNew", 0)
+        out.append(
+            '<table class="terrain-facts"><caption>On the map</caption>\n'
+            f'<tr><td class="tf-label">Trees</td><td>{trees}{_signed(trees - counts.get("treesOld", 0))}</td></tr>\n'
+            f'<tr><td class="tf-label">Neutral camps</td><td>{"".join(tier(t, l) for t, l in _CAMP_TIERS)}</td></tr>\n'
+            '</table>\n')
     if step is not None:
-        moved = _moved_summary(diff)
-        out = ('<p class="terrain-counts terrain-moved"><b>Moved in the map file:</b> '
-               f'{_esc(", ".join(moved)) if moved else "nothing"}</p>\n')
+        rows = []
+        for name, kind, n, removed in _moved_items(diff):
+            label = _esc(name[:1].upper() + name[1:])
+            value = (f'{_signed(n)}{_signed(-removed)}'.strip() if kind == "delta" else f"{n} {kind}")
+            rows.append(f'<tr><td class="tf-label">{label}</td><td>{value}</td></tr>\n')
+        out.append('<table class="terrain-facts"><caption>Changed in the map file</caption>\n'
+                   + ("".join(rows) or '<tr><td colspan="2">Nothing</td></tr>\n') + '</table>\n')
     if quiet_after:
         run = quiet_after[0] if len(quiet_after) == 1 else f"{quiet_after[0]} – {quiet_after[-1]}"
-        out += (f'<p class="terrain-counts terrain-quiet">{_esc(run)} changed nothing on the '
-                'map.</p>\n')
-    return out
+        out.append(f'<p class="terrain-quiet">{_esc(run)} changed nothing on the map.</p>\n')
+    return "".join(out)
 
 
 def _quiet(steps, notes, diffs):
@@ -916,7 +922,7 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav, quiet_after=())
         map_inner = _fallback_html(ver)
         credit = _source_html()
 
-    counts_html = _counts_html(counts) + _map_file_html(step, diff, quiet_after)
+    counts_html = _facts_html(counts, step, diff, quiet_after)
     rows = notes.get(ver)
     list_html = _changes_html([(ver, rows)], skip_first_head=True) if rows else _no_notes_html()
     first_ver = ver

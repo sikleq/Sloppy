@@ -337,9 +337,14 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   render scripts use it. Tests: tests/test_sfm_session.py.
 - **"All layers" toggle (2026-10-02)** — the owner: "add an 'all' filter that turns every object filter on". First
   of the layer buttons (`layer_btn("all", …)`, both bars); scripts.js turns every layer on, or all off when all are
-  on already, and keeps it pressed exactly while every layer is on. Icon `tc_all.png` (four discs in four layer
-  colours) from `scripts/gen/gen_terrain_layer_icons.py tc_all` (the generator now takes icon names; its root
+  on already, and keeps it pressed exactly while every layer is on. Icon `tc_all.png` — a 16-px pixel glyph of three
+  stacked map layers in the site's gold ramp (the owner: "simpler, like our other icons"; four coloured discs were
+  rejected), from `scripts/gen/gen_terrain_layer_icons.py tc_all` (the generator now takes icon names; its root
   path was one level short and wrote into scripts/icons/).
+- **Facts under the list (2026-10-02)** — the owner: the lines "Trees / Neutral camps / Moved in the map file / X
+  changed nothing" should be laid out better. `_facts_html`: two small tables, "On the map" (trees, camps by tier
+  with their icons, each with its change) and "Changed in the map file" (`_moved_items`, one row per kind:
+  "+38 −27", "2 moved", "4 changed"), centred with faint grid lines; the quiet patches in a line below.
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
   a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
   (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —
