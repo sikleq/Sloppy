@@ -1,7 +1,7 @@
 {
-  "_about": "Where each terrain note happens, for its micro-screenshots (scripts/gen/terrain_shots.py -> icons/terrain/<code>_<i>.webp, i counting spots in file order). A row whose text starts with 'match' shows the pictures of its 'spots' ([x, y] game units: the centre of a square 2r wide; for a moved object the midpoint of its old and new spot). Picked from scripts/gen/terrain_audit.py and the map files; a note whose change can't be seen on the map (a camp's evolutions) has no entry. Only the note's own objects are outlined (terrain_shots.show_keys: its first object word; ground words give none); 'show' overrides that with the keys to draw (camps, camptiers, boxes, trees, towers, watchers, lotus, twinGates, tormentors, bounty, roshan, wisdom, outposts).",
+  "_about": "Where each terrain note happens, for its micro-screenshots (scripts/gen/terrain_shots.py -> icons/terrain/<code>_<i>.webp, i counting spots in file order). A row whose text starts with 'match' shows the pictures of its 'spots' ([x, y] game units: the centre of a square 2r wide; for a moved object the midpoint of its old and new spot). Picked from scripts/gen/terrain_audit.py and the map files; a note whose change can't be seen on the map (a camp's evolutions) has no entry. Only the note's own objects are outlined (terrain_shots.show_keys: its first object word; ground words give none); 'show' overrides that with the keys to draw (camps, camptiers, boxes, trees, towers, watchers, lotus, twinGates, tormentors, bounty, roshan, wisdom, outposts). A spot [x, y, \"7.40\"] pictures that patch's two maps instead of the entry's own (a change the map file made a patch earlier than the note says); 'mark' outlines unchanged camps white, or towers with 'mark_kind': 'towers'. The row's words naming the object open the pictures (patch/terrain_notes.note_phrase); 'phrase' names them when it picks wrong.",
   "7.38": [
-    {"match": "The top and bottom outer rim areas are now flooded by streams of traversable water", "spots": [[3500, -7900], [-3500, 7900]], "r": 1400},
+    {"match": "The top and bottom outer rim areas are now flooded by streams of traversable water", "spots": [[3500, -7900], [-3500, 7900]], "r": 1400, "phrase": "top and bottom outer rim areas"},
     {"match": "The Twin Gates have been repositioned to the corners of the map", "spots": [[6624, -6848], [-6816, 7232]], "r": 1100},
     {"match": "Radiant and Dire main jungles now also have a stream with moderate current", "spots": [[300, -5400], [-600, 5100]], "r": 1300},
     {"match": "Corner outposts have been removed", "spots": [[4992, -8256], [-5312, 7680]]}
@@ -25,7 +25,7 @@
     {"match": "Several trees between the two neutrals camps on the easternmost region", "spots": [[8256, 1003]]},
     {"match": "Many trees have been moved and adjusted in the Radiant Safe Lane pull area", "spots": [[4400, -5300]], "r": 900},
     {"match": "Several trees have been added and adjusted near the Dire mid tier 2 tower", "spots": [[2900, 2200]], "r": 900},
-    {"match": "The top Radiant Tier 2 and the cliff to the right have been shifted", "spots": [[-6376, -872]]},
+    {"match": "The top Radiant Tier 2 and the cliff to the right have been shifted", "spots": [[-6376, -872]], "phrase": "top Radiant Tier 2"},
     {"match": "The mid Radiant Tier 2 tower has been shifted away from the Triangle", "spots": [[-3263, -2859]], "r": 800},
     {"match": "The Radiant Safe Lane small pull camp has been moved to the north", "spots": [[3841, -5235]]},
     {"match": "The northern cliff edge, ramps and Large / Ancient camps of the Radiant triangle", "spots": [[-4450, 480]], "r": 1000, "show": ["camps", "camptiers", "boxes"]},
@@ -76,7 +76,7 @@
     {"match": "Extended the streams into both Radiant and Dire bases", "spots": [[-3700, -7400], [3300, 7200]], "r": 1200},
     {"match": "Removed some trees inside the base near the new safelane defender's gate positions", "spots": [[-4400, -6950], [3750, 6750]], "r": 600},
     {"match": "Removed a tree between Dire Safelane Tier 1 tower and the small pull camp", "spots": [[-4800, 5248]], "r": 500},
-    {"match": "Changed the 'bridges' to actual bridges", "spots": [[7604, -4805], [-7627, 4598]]}
+    {"match": "Changed the 'bridges' to actual bridges", "spots": [[7604, -4805], [-7627, 4598]], "phrase": "actual bridges"}
   ],
   "7.41": [
     {"match": "Removed several trees from Dire Safelane small pull camp and Radiant Safelane large pull camp", "spots": [[-3500, 4829], [4649, -3699]]},
@@ -93,6 +93,7 @@
     {"match": "The medium flooded camp near the bounty runes can now evolve twice", "spots": [[186, -5197], [-852, 4940]], "show": [], "mark": [[186, -5197], [-852, 4940]], "tiers": {"old": ["mid", "big"], "new": ["mid", "big", "ancient"]}},
     {"match": "The medium flooded camp near the safe lane tier 2 towers can now only evolve once", "spots": [[-752, -7644], [253, 7975]], "r": 800, "show": [], "mark": [[-720, -7696], [336, 7696]], "tiers": {"old": ["mid", "big", "ancient"], "new": ["mid", "big"]}},
     {"match": "Tormentor spawn areas have been reduced to low ground", "spots": [[7616, -7032], [-7441, 7141]], "r": 1100},
-    {"match": "The ramp leading from the Radiant tier 1 tower to the stream", "spots": [[4500, -7300]], "r": 800, "show": ["nowards"]}
+    {"match": "The ramp leading from the Radiant tier 1 tower to the stream", "spots": [[4500, -7300]], "r": 800, "show": ["nowards"]},
+    {"match": "Radiant offlane tier 2 tower has been adjusted slightly to the left", "spots": [[-6482, -872], [-6482, -872, "7.40"]], "r": 500, "mark": [[-6501, -872]], "mark_kind": "towers"}
   ]
 }

@@ -706,10 +706,10 @@ _TAG_CLS = {
 }
 
 
-def _change_li(text, tag, note=None, patch=None):
+def _change_li(text, tag, note=None, patch=None, num=None):
     _cls, tid, overall = _TAG_CLS[tag]
-    from patch.elements import terrain_shots_html, split_terrain_button
-    button, shots = split_terrain_button(terrain_shots_html(patch, text, prefix=""))
+    from patch.elements import terrain_note, terrain_button, terrain_num_chip
+    phrase, shots = terrain_note(patch, text, prefix="")
     # data-tag carries the primary tag plus its filter-overall (NEW→buff,
     # DEL→nerf) so a future filter surfaces them correctly; dedupe so BUFF/NERF
     # (whose tid already equals the overall) don't repeat.
@@ -723,8 +723,10 @@ def _change_li(text, tag, note=None, patch=None):
         from patch.elements import info_tip
         head, _sp, last = text.rpartition(" ")
         text = f'{head}{_sp}<span class="li-tail">{last}{info_tip(note)}</span>'
-    # the chip's place holds the pictures' Show button, or stays empty — no tag (the owner 2026-10-03)
-    chip = button or '<span class="row-tag-empty"></span>'
+    if phrase:                   # the words naming the note's object open its pictures (the owner 2026-10-03)
+        text = terrain_button(text, phrase)
+    # the chip is the row's number in its category, as on the patch page — no tag (the owner 2026-10-03)
+    chip = terrain_num_chip(num) if num else '<span class="row-tag-empty"></span>'
     return (f'<li class="terrain-row" data-tag="{" ".join(tags)}">{chip}'
             f'<span class="row-text">{text}</span>{shots}</li>')
 
@@ -750,8 +752,10 @@ def _changes_html(subpatches, skip_first_head=False):
         for sg, sg_rows in groups.items():
             if sg:
                 parts.append(f'<li class="terrain-subgroup-head">{sg}</li>')
-            # Valve's order, like the patch page (no tags to sort by since 2026-10-03)
-            parts.extend(_change_li(text, tag, note, sub_ver) for _, text, tag, note in sg_rows)
+            # Valve's order, numbered from 1 in each category like the patch page (no tags since 2026-10-03), so a
+            # row has the same number on both pages
+            parts.extend(_change_li(text, tag, note, sub_ver, num=k)
+                         for k, (_, text, tag, note) in enumerate(sg_rows, 1))
     return "\n".join(parts)
 
 

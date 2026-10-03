@@ -11,6 +11,7 @@ from .images import (HERO_CDN, ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG,
                      hero_img, item_img, abil_img, _LOCAL_ABIL_ICONS)
 from .output import H, W
 from .state import _State
+from .terrain_notes import note_phrase, wrap_phrase
 
 try:
     with open(_os.path.join(_os.path.dirname(__file__), '..', 'data', 'abilities_slim.json'),
@@ -827,6 +828,8 @@ def subgroup(title, new=None):
     NEW rows of its lists without chips). Without it the subgroup inherits the header's state."""
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
+    if _State.terrain_rows is not None:
+        _State.terrain_rows = 0                           # each terrain category counts from 1
     _State.new_mech = bool(new) or _State.new_mech_header
     if new:
         _State.new_mech_tag = _mech_tag(new)
@@ -2061,50 +2064,59 @@ def _terrain_spot_index():
                 n = len(e.get("spots", []))
                 names = [f"{code}_{k}.webp" for k in range(i, i + n)
                          if _os.path.exists(_os.path.join(root, "icons", "terrain", f"{code}_{k}.webp"))]
-                rows.append((e["match"], names))
+                rows.append((e["match"], names, e.get("phrase") or note_phrase(e["match"])))
                 i += n
             _TERRAIN_SPOTS[patch] = rows
     return _TERRAIN_SPOTS
 
 
-_TSHOT_BTN_RE = re.compile(r"<!--TSHOTBTN-->(.*?)<!--/TSHOTBTN-->", re.S)
 TSHOT_W, TSHOT_H = 480, 238        # a note picture's css size (files: 360-px halves + a 6-px gap, 726 x 360)
 
 
-def split_terrain_button(extra):
-    """(the pictures' Show button or '', extra without it) — a terrain row puts the button in its chip's place."""
-    if not isinstance(extra, str):
-        return "", extra
-    found = _TSHOT_BTN_RE.findall(extra)
-    return "".join(found), _TSHOT_BTN_RE.sub("", extra)
-
-
-def terrain_shots_html(patch, text, prefix="../"):
-    """The micro-screenshots of a terrain note (the owner 2026-10-03: the terrain rows were "all under one tag, mush —
-    maybe micro-screenshots"): the old | new map squares around the change, only the note's own objects outlined.
-    They wait under a "Show" button in the row's chip place (the owner 2026-10-03: "remove the numbers that replaced
-    the tags, put the Show button there" — marked TSHOTBTN, li() / _change_li take it out), the pictures below in
-    their own rounded, centred box (hidden, so the lazy pictures load only when opened); a click on one opens its
-    large copy (<name>_lg.webp, data-large) over the page — the section's "View on map" button is the way to the
-    Terrain page. '' for any other row."""
+def terrain_note(patch, text, prefix="../"):
+    """(phrase, pictures) of a terrain note (the owner 2026-10-03: the terrain rows were "all under one tag, mush —
+    maybe micro-screenshots"): the old | new map squares around the change, only the note's own objects outlined,
+    in their own rounded, centred box under the row (hidden, so the lazy pictures load only when opened); a click on
+    one opens its large copy (<name>_lg.webp, data-large) over the page — the section's "View on map" button is the
+    way to the Terrain page. The phrase — the words naming the note's object ("tier 1 safe lane towers", spot
+    "phrase" or patch.terrain_notes.note_phrase) — becomes the button that opens them (terrain_button; the owner
+    2026-10-03: "no Show buttons in the tags' place: the screenshot opens from the name of the objective that
+    moved"). ('', '') for any other row."""
     if not patch or not isinstance(text, str):
-        return ""
+        return "", ""
     plain = re.sub(r"<[^>]+>", "", text).strip()
-    for match, names in _terrain_spot_index().get(patch, []):
+    for match, names, phrase in _terrain_spot_index().get(patch, []):
         if names and plain.startswith(match):
             imgs = "".join(
                 f'<img src="{prefix}icons/terrain/{n}" data-large="{prefix}icons/terrain/{n[:-5]}_lg.webp" '
                 f'width="{TSHOT_W}" height="{TSHOT_H}" alt="The old and the new map here" loading="lazy" '
                 f'decoding="async">' for n in names)
-            return ('<!--TSHOTBTN--><button type="button" class="badge tshots-btn" aria-expanded="false">Show'
-                    f'</button><!--/TSHOTBTN--><span class="tshots" hidden>{imgs}</span>')
-    return ""
+            return phrase, f'<span class="tshots" hidden>{imgs}</span>'
+    return "", ""
+
+
+def terrain_button(html, phrase):
+    """The row's html with its phrase as the pictures' button (unchanged, with a warning, when markup splits it)."""
+    out = wrap_phrase(html, phrase,
+                      lambda p: f'<button type="button" class="tshots-btn" aria-expanded="false">{p}</button>')
+    if out is None:
+        print(f"  [warn] terrain note: {phrase!r} not found in its row — its pictures have no button")
+        return html
+    return out
+
+
+def terrain_num_chip(n):
+    """A terrain row's chip: its number in its category, in the tag chip's frame (the owner 2026-10-03: "the rows
+    are just numbered instead of tag chips")."""
+    return f'<span class="badge tnum">{n}</span>'
 
 
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None):
+    _tphrase = ""
     if isinstance(text, str):
-        # a terrain note's micro-screenshots ride along under its text
-        extra = (extra or "") + terrain_shots_html(_State.current_patch_version, text)
+        # a terrain note's micro-screenshots ride along under its text, opened by the words naming its object
+        _tphrase, _tshots = terrain_note(_State.current_patch_version, text)
+        extra = (extra or "") + _tshots
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
         if _State.in_stats_ul:
             _m = _FACET_INNATE_PREFIX_RE.match(text)
@@ -2178,13 +2190,11 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     else:
         left_tag = '<span class="row-tag-empty"></span>'
         rest = badge
-    terrain_btn, extra = split_terrain_button(extra)
     if _State.terrain_rows is not None and isinstance(text, str):
-        # a terrain row's chip place holds its pictures' Show button, or stays empty (the owner 2026-10-03: no tag,
-        # no number); data-tag keeps the tag for the filters / weights
-        left_tag = terrain_btn or '<span class="row-tag-empty"></span>'
-    elif terrain_btn:
-        extra = f"<!--INLINETIP-->{terrain_btn}<!--/INLINETIP-->{extra}"      # outside a terrain block: line end
+        # a terrain row's chip is its number in its category (the owner 2026-10-03: "just number the rows instead of
+        # tag chips"); data-tag keeps the tag for the filters / weights
+        _State.terrain_rows += 1
+        left_tag = terrain_num_chip(_State.terrain_rows)
 
     classes = ["terrain-row"] if _State.terrain_rows is not None and isinstance(text, str) else []
     marker = ""
@@ -2281,6 +2291,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             text_inner = f'{text_base}{marker}'
     else:
         text_inner = text_base
+    if _tphrase and isinstance(text_inner, str):
+        text_inner = terrain_button(text_inner, _tphrase)
     # An ability row with its own chip keeps the chip as the li's first child: page.py
     # marks its whole box `ability-box-tagged`, and the CSS moves the box right by the tag
     # column so the chip sits in the SAME column, size and height as every other row's

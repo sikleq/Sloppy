@@ -353,22 +353,25 @@ def test_the_slider_writes_clip_paths_not_an_inherited_property():
 
 def test_a_terrain_note_shows_its_micro_screenshots():
     """The owner 2026-10-03: terrain rows were "all under one tag, mush — maybe micro-screenshots". A row matched in
-    data/terrain_spots.json carries its old | new pictures under a "Show" button in its chip place (the owner: no
-    tags, no numbers there), hidden until pressed, no link to the Terrain page — "View on map" is for that; a click
-    opens the large copy; every picture exists twice."""
-    from patch.elements import terrain_shots_html, _terrain_spot_index
+    data/terrain_spots.json carries its old | new pictures, hidden until the words naming its object are pressed (the
+    owner 2026-10-03: "no Show buttons in the tags' place: the screenshot opens from the name of the objective that
+    moved — 'tier 1 safe lane towers' …; the rows are just numbered instead of tag chips", from 1 in each category);
+    no link to the Terrain page — "View on map" is for that; a click opens the large copy; every picture exists
+    twice."""
+    from patch.elements import terrain_note, _terrain_spot_index
     row = "The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet"
-    html = terrain_shots_html("7.41", row)
-    btn = '<button type="button" class="badge tshots-btn" aria-expanded="false">Show</button>'
-    assert html.startswith(f'<!--TSHOTBTN-->{btn}<!--/TSHOTBTN--><span class="tshots" hidden>')
+    phrase, html = terrain_note("7.41", row)
+    btn = '<button type="button" class="tshots-btn" aria-expanded="false">tier 1 safe lane towers</button>'
+    assert phrase == "tier 1 safe lane towers" and html.startswith('<span class="tshots" hidden>')
     assert html.count("<img") == 2 and "<a " not in html and 'data-large="../icons/terrain/741_' in html
-    assert 'width="480" height="238"' in html
-    assert terrain_shots_html("7.41", "Some row no spot matches") == ""
-    li = terrain._change_li(row, "REWORK", None, "7.41")
-    assert li.startswith(f'<li class="terrain-row" data-tag="rework">{btn}<span class="row-text">')
+    assert 'width="480" height="238"' in html and "Show" not in html
+    assert terrain_note("7.41", "Some row no spot matches") == ("", "")
+    li = terrain._change_li(row, "REWORK", None, "7.41", num=2)
+    assert li.startswith('<li class="terrain-row" data-tag="rework"><span class="badge tnum">2</span>'
+                         f'<span class="row-text">The {btn} have been moved')
     assert '</span><span class="tshots" hidden><img src="icons/terrain/741_' in li and "REWORK" not in li
-    assert terrain._change_li("Watchers now can't be activated", "NERF", None, "7.41").startswith(
-        '<li class="terrain-row" data-tag="nerf"><span class="row-tag-empty"></span>')
+    assert terrain._change_li("Watchers now can't be activated", "NERF", None, "7.41", num=1).startswith(
+        '<li class="terrain-row" data-tag="nerf"><span class="badge tnum">1</span><span class="row-text">Watchers')
     from patch import elements
     saved = elements._State.current_patch_version
     elements._State.current_patch_version = "7.41"
@@ -376,16 +379,19 @@ def test_a_terrain_note_shows_its_micro_screenshots():
         elements.plain_header("Terrain Changes", dynamics=False, terrain_link="7.41")
         page_li = elements.li(row, '<span class="badge rework" data-tag="rework">REWORK</span>')
         plain_li = elements.li("A rule", '<span class="badge nerf-text" data-tag="nerf">NERF</span>')
+        elements.subgroup("Camps")
+        next_li = elements.li("Another rule", '<span class="badge nerf-text" data-tag="nerf">NERF</span>')
         elements.plain_header("General Changes", dynamics=False)
         outside = elements.li(row, '<span class="badge rework" data-tag="rework">REWORK</span>')
     finally:
         elements._State.current_patch_version = saved
-    assert 'class="terrain-row"' in page_li and page_li.index(btn) < page_li.index('class="row-text"')
-    assert 'class="badge rework"' not in page_li and 'data-tag="rework"' in page_li
-    assert '<span class="row-tag-empty"></span>' in plain_li and 'class="badge nerf-text"' not in plain_li
-    assert 'class="badge rework"' in outside and "terrain-row" not in outside      # elsewhere: the tag, button at the end
+    assert 'class="terrain-row"' in page_li and '<span class="badge tnum">1</span><span class="row-text">' in page_li
+    assert btn in page_li and 'class="badge rework"' not in page_li and 'data-tag="rework"' in page_li
+    assert '<span class="badge tnum">2</span>' in plain_li and 'class="badge nerf-text"' not in plain_li
+    assert '<span class="badge tnum">1</span>' in next_li                         # each category counts from 1
+    assert 'class="badge rework"' in outside and "terrain-row" not in outside and btn in outside  # elsewhere: the tag
     for patch, rows in _terrain_spot_index().items():
-        for _match, names in rows:
+        for _match, names, _phrase in rows:
             for n in names:
                 assert os.path.exists(os.path.join(_ROOT, "icons", "terrain", n)), n
                 assert os.path.exists(os.path.join(_ROOT, "icons", "terrain", n[:-5] + "_lg.webp")), n
@@ -403,6 +409,32 @@ def test_a_note_outlines_only_its_own_objects():
     assert ts.show_keys("The cliff above the Dire Safe Lane small camp has been extended") == set()
     assert ts.show_keys("Twin Gates slightly moved away from the stairs") == {"twinGates"}
     assert ts.spot_keys({"match": "Cleared up some areas around the Tormentor locations", "show": ["trees"]}) == {"trees"}
+
+
+def test_the_button_is_the_name_of_what_changed():
+    """The owner 2026-10-03, examples of the words that open the pictures: "tier 1 safe lane towers", "several trees",
+    "medium flooded camp", "safe lane small camp", "Tormentor spawns" — the subject word with the words describing it,
+    up to an article, a side, a verb, a preposition or an adverb; and every note with pictures finds its words in its
+    row, on the patch page and on the Terrain page."""
+    from patch.terrain_notes import note_phrase, wrap_phrase
+    assert note_phrase("The tier 1 safe lane towers have been moved slightly away") == "tier 1 safe lane towers"
+    assert note_phrase("Removed several trees from Dire Safelane small pull camp") == "several trees"
+    assert note_phrase("The medium flooded camp near the safe lane tier 2 towers moved closer") == "medium flooded camp"
+    assert note_phrase("Radiant safe lane small camp has been slightly moved north") == "safe lane small camp"
+    assert note_phrase("Tormentor spawns have been positioned closer towards Lotus Pools") == "Tormentor spawns"
+    assert note_phrase("Radiant safe lane large camp's spawn box has been moved") == "safe lane large camp's spawn box"
+    assert note_phrase("Twin Gates slightly moved away from the stairs") == "Twin Gates"
+    assert note_phrase("The ramp leading from the Radiant tier 1 tower to the stream") == "ramp"
+    assert note_phrase("Watchers now can't be activated") == "Watchers"
+    assert wrap_phrase('a <b class="ramp">ramp</b> ramps', "ramp", "[{}]".format) == 'a <b class="ramp">[ramp]</b> ramps'
+    assert wrap_phrase("trampoline", "ramp", "[{}]".format) is None
+    from patch.elements import terrain_note
+    with open(os.path.join(_ROOT, "data", "terrain_spots.json"), encoding="utf-8") as f:
+        spots = json.load(f)
+    for patch, entries in spots.items():
+        for e in entries if not patch.startswith("_") else []:
+            phrase, _shots = terrain_note(patch, e["match"] + " …")
+            assert phrase and phrase in e["match"], (patch, e["match"])
 
 
 def test_moved_objects_leave_a_dashed_ghost_on_the_new_side():
@@ -444,8 +476,27 @@ def test_everything_on_the_old_side_is_dashed():
     def drawn(side, kind):
         img = Image.new("RGB", (200, 200))
         ts._outlines(img, 0, 0, 700, {"camps": {kind: [(0, 0)]}}, side, {"camps"}, 200, 3)
-        return sum(1 for p in img.getdata() if p != (0, 0, 0))
+        return sum(1 for x in range(img.width) for y in range(img.height) if img.getpixel((x, y)) != (0, 0, 0))
     assert 0 < drawn("old", "removed") < 0.85 * drawn("new", "added")
+
+
+def test_the_offlane_tower_note_shows_where_it_stands_and_where_it_moved():
+    """The owner 2026-10-03 asked for pictures of 7.41's "Radiant offlane tier 2 tower has been adjusted slightly to
+    the left": the map file moved it in 7.40, not 7.41. Two pictures: 7.40c → 7.41 with the tower marked white (it
+    stands still), and 7.39e → 7.40 — a spot's third element names the patch whose maps it compares."""
+    from patch.elements import terrain_note
+    sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
+    import terrain_shots as ts
+    row = "Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides"
+    phrase, shots = terrain_note("7.41", row)
+    assert phrase == "offlane tier 2 tower" and shots.count("<img") == 2
+    entry = next(e for e in ts.spot_list()["7.41"] if row.startswith(e["match"]))
+    assert [ts.spot_patch(s, "7.41") for s in entry["spots"]] == ["7.41", "7.40"]
+    assert entry["mark_kind"] == "towers" and ts.MARK_KINDS["towers"] == ("npc_dota_tower", False)
+    moved = terrain._changed_points(terrain._load_diff("7.40"))["towers"]["moved"]
+    assert ((-6464, -872), (-6501, -872)) in moved                        # 37 units left, in 7.40
+    moved_741 = terrain._changed_points(terrain._load_diff("7.41"))["towers"]["moved"]
+    assert all(abs(a[0] + 6501) > 500 for a, _b in moved_741)            # and not in 7.41
 
 
 def test_terrain_lists_keep_valves_order_without_tags():

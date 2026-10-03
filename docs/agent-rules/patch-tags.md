@@ -231,10 +231,12 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
   (деревья — DEL, как и раньше); лагерь понижен («demoted», «can now only evolve once») → **NERF**, повышен / «evolve
   twice» → **BUFF**; исправления (dead spot, incorrect vision, pathing blockers, ward spot, «Touched up») → **MISC**.
   У строки ландшафта под текстом — микроскриншоты «было | стало» (data/terrain_spots.json →
-  scripts/gen/terrain_shots.py → icons/terrain/, patch/elements.py `terrain_shots_html`). Генератор:
+  scripts/gen/terrain_shots.py → icons/terrain/, patch/elements.py `terrain_note`). Генератор:
   CANONICAL_TAGS «Terrain», тесты `test_terrain_canon`. **Показ:** с 2026-10-03 тег строки ландшафта на странице
-  не виден — на месте чипа кнопка «Show» её картинок (или пустое место); владелец: «убери номера вместо тегов,
-  посади туда кнопку show». Тег по канону всё равно ставится в контенте — он задаёт `data-tag` для фильтров и весов.
+  не виден — на месте чипа номер строки в её категории (с 1 в каждой), а картинки раскрывает название объекта в
+  тексте («tier 1 safe lane towers», «several trees»; patch/terrain_notes.py `note_phrase`); владелец: «убираем
+  кнопки SHOW внутри тегов… а сами строки просто нумеруем». Тег по канону всё равно ставится в контенте — он задаёт
+  `data-tag` для фильтров и весов.
 - **Вторая вычитка 7.38b–7.41e (2026-10-03), правило → почему** (генератор: CANONICAL_TAGS / LOWER_IS_BUFF,
   тесты `test_canonical_tags_from_the_second_audit`, `test_lower_is_better_from_the_second_audit`):
   - «Now granted by Aghanim's Scepter/Shard» → **REWORK** (+ «?» откуда было): способность переехала между

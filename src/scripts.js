@@ -7258,8 +7258,9 @@ function ecShopMarkup(panels) {
 })();
 
 // ---------------------------------------------------------------------
-// Terrain note pictures (patch pages + Terrain pages, patch/elements.py terrain_shots_html): "Show" at the end of a
-// note opens its old | new micro-screenshots below (hidden until then, so they load on demand); a click on one opens its large copy
+// Terrain note pictures (patch pages + Terrain pages, patch/elements.py terrain_note): the words naming the note's
+// object ("tier 1 safe lane towers" — the owner 2026-10-03: "the screenshot opens from the objective's name") open its
+// old | new micro-screenshots below (hidden until then, so they load on demand); a click on one opens its large copy
 // (data-large) over the page — Esc or a click closes it (the owner 2026-10-03: "the picture grows in quality, it
 // doesn't take you to Terrain"). Delegated, one listener for every note.
 // ---------------------------------------------------------------------
@@ -7284,7 +7285,6 @@ function ecShopMarkup(panels) {
       const pics = row && row.querySelector(':scope > .tshots');
       const open = btn.getAttribute('aria-expanded') !== 'true';
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      btn.textContent = open ? 'Hide' : 'Show';
       if (pics) pics.hidden = !open;
       return;
     }

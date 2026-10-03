@@ -4238,22 +4238,28 @@ ul.changes {
                                itself uses margin-right:-8px against the
                                entity header's 14px padding → also 6px in). */
 }
-/* A terrain note's micro-screenshots (patch/elements.py terrain_shots_html): old | new map around the change, only
-   the note's objects outlined; a full-width row of the li's grid under the text (the owner 2026-10-03: terrain rows
-   were "all under one tag, mush"). "Show" sits in the row's chip place, in the chip's frame (the owner 2026-10-03:
-   no tags, no numbers there — ul.changes li > .badge:first-child gives it the chip column); the pictures open below
-   in their own rounded box, centred, framed like the item ability cards, each with a minimap of where it is; a click
-   on a picture opens its large copy (scripts.js "Terrain note pictures"). */
-/* Cream, a colour no tag uses (the owner 2026-10-03: the gold one "looks like the NEW tag — misleading"); no fill
-   ("with a fill it looks like MISC") and thin letters — a frame around a word, not a tag */
-.badge.tshots-btn {
-  appearance: none; margin: 0; font-family: var(--font-ui); font-size: 10.5px; font-weight: 400; line-height: 11px;
-  letter-spacing: 1px; text-transform: uppercase; text-align: center; color: #d9cfbb; background: transparent;
-  border: 1px solid rgba(226, 216, 196, 0.38); cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease;
+/* A terrain note's micro-screenshots (patch/elements.py terrain_note): old | new map around the change, only the
+   note's objects outlined; a full-width row of the li's grid under the text (the owner 2026-10-03: terrain rows were
+   "all under one tag, mush"). The words naming the note's object open them — "tier 1 safe lane towers", "several
+   trees" (the owner 2026-10-03: "no Show buttons in the tags' place, the screenshot opens from the name of the
+   objective that moved; the rows are just numbered") — dotted underline and a small caret that flips when open; the
+   pictures open below in their own rounded box, centred, framed like the item ability cards, each with a minimap of
+   where it is; a click on a picture opens its large copy (scripts.js "Terrain note pictures"). */
+.tshots-btn {
+  appearance: none; display: inline; margin: 0; padding: 0; border: 0; background: none; font: inherit;
+  letter-spacing: inherit; text-transform: inherit; text-align: inherit; color: #efe3c6; cursor: pointer;
+  text-decoration: underline dotted rgba(226, 216, 196, 0.6); text-decoration-thickness: 1px;
+  text-underline-offset: 3px; transition: color 0.15s ease;
 }
-.badge.tshots-btn:hover, .badge.tshots-btn:focus-visible { color: #fff6e6; border-color: rgba(240, 232, 216, 0.75); }
-.badge.tshots-btn[aria-expanded="true"] { color: #fff6e6; border-color: rgba(240, 232, 216, 0.85); }
+.tshots-btn::after {
+  content: ""; display: inline-block; margin-left: 4px; vertical-align: 2px; border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent; border-top: 4px solid currentColor; opacity: 0.75;
+  transition: transform 0.15s ease;
+}
+.tshots-btn:hover, .tshots-btn:focus-visible { color: #fff6e6; text-decoration-style: solid; }
+.tshots-btn:focus-visible { outline: 1px dotted rgba(240, 232, 216, 0.7); outline-offset: 2px; }
+.tshots-btn[aria-expanded="true"] { color: #fff6e6; text-decoration-style: solid; }
+.tshots-btn[aria-expanded="true"]::after { transform: rotate(180deg); }
 ul.changes li > .tshots {
   grid-column: 1 / -1; justify-self: center; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
   margin: 6px 0 6px; padding: 8px; background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px;
@@ -10950,6 +10956,10 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .badge.rework { color: #a58ad2; background: rgba(170, 135, 220, 0.09); border-color: rgba(170, 135, 220, 0.34); }
 .badge.swap   { color: #6fbfb2; background: rgba(95, 176, 164, 0.09);  border-color: rgba(95, 176, 164, 0.34); }
 .badge.del    { color: #c0668e; background: rgba(190, 85, 130, 0.09);  border-color: rgba(190, 85, 130, 0.34); }
+/* A terrain row's number in its category, in the tag chip's frame (the owner 2026-10-03: no rework / buff tags on
+   terrain notes, just numbers from 1 in each category) */
+.badge.tnum   { font-family: var(--font-j10); font-size: 15px; font-weight: 400; line-height: 11px; text-align: center;
+  color: var(--gold-dim); background: rgba(227, 196, 106, 0.06); border-color: rgba(227, 196, 106, 0.30); }
 /* Pressed filter chip = a neon sign: the letters glow in the chip's own colour and the frame
    lights up with a soft halo of the same colour (no plain outline ring). */
 .legend-tags .badge.filter-btn.active,

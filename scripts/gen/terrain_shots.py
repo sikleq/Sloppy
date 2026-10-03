@@ -4,7 +4,7 @@ old map, added green on the new one, moved yellow on both, changed spawn boxes r
 
 Why (the owner 2026-10-03): the terrain rows were "all under one tag, mush"; "maybe micro-screenshots, tree
 positions — we know now which tree went where". A row of a patch page / Terrain page whose text starts with a spot's
-"match" ends with a "Show" button that opens its pictures (patch/elements.py terrain_shots_html, builders/terrain.py).
+"match" opens its pictures from the words naming its object (patch/elements.py terrain_note, builders/terrain.py).
 
 Only the note's own objects are outlined (the owner 2026-10-03: "a camps note shows only the camps, not the trees and
 everything else"): `show_keys` takes the first object word of the note (camp, tree, watcher, tower / tier N, lotus,
@@ -22,7 +22,6 @@ SFM_FINAL to move them), so it runs on the owner's PC; the pictures it writes ar
 import json
 import math
 import os
-import re
 import sys
 
 try:                      # CI has no Pillow; show_keys / spot_keys are tested there without it
@@ -58,34 +57,8 @@ SIZE = {"trees": 64, "camps": 170, "camptiers": 190}     # half size of an outli
 CIRCLE = 150
 CAMP_KEYS = ("camps", "camptiers", "boxes")              # "boxes" = changed spawn boxes
 
-# the note's subject = its FIRST object word; ground words (cliff, ramp, stream…) name no object
-_SUBJECTS = (
-    (r"\bcamps?\b|\bspawn ?box", CAMP_KEYS),
-    (r"\btrees?\b|\bjuke paths?\b", ("trees",)),
-    (r"\bwatchers?\b", ("watchers",)),
-    (r"\btowers?\b|\btier [1-4]\b", ("towers",)),
-    (r"\blotus", ("lotus",)),
-    (r"\btwin gates?\b", ("twinGates",)),
-    (r"\btormentors?\b", ("tormentors",)),
-    (r"\bbounty runes?\b", ("bounty",)),
-    (r"\broshan pits?\b", ("roshan",)),
-    (r"\bwisdom shrines?\b", ("wisdom",)),
-    (r"\boutposts?\b", ("outposts",)),
-    # the ground itself as the subject: no outlines, the two pictures show it ("The ramp … Roshan Pit", "The cliff
-    # above the … camp", "the entrance to the bridge by the Lotus pools")
-    (r"\b(?:cliffs?|ramps?|streams?|paths?|entrances?|areas?|rim|bridge|high ground|low ground)\b", ()),
-)
-
-
-def show_keys(text):
-    """The map-object keys a note is about: those of its first object word ('Removed several trees from the …
-    pull camp' -> trees only; 'The Large camp nearest to Tier 3 towers …' -> camps only); none for a ground note."""
-    best = None
-    for rx, keys in _SUBJECTS:
-        m = re.search(rx, text, re.I)
-        if m and (best is None or m.start() < best[0]):
-            best = (m.start(), keys)
-    return set(best[1]) if best else set()
+# the note's subject = its FIRST object word (patch/terrain_notes.py, shared with the row's button phrase)
+from patch.terrain_notes import show_keys  # noqa: E402
 
 
 def spot_keys(entry):
@@ -177,28 +150,34 @@ def _cells(img, cells, px, k, colour, width):
 _CAMPS = {}
 
 
-def _camps(ver):
-    """Camp spawner spots of one map picture (data/map/mapdata_<code>.json)."""
-    if ver not in _CAMPS:
+# what a "mark" can outline (an entry's "mark_kind", camps by default): the map data list, square or round
+MARK_KINDS = {"camps": ("npc_dota_neutral_spawner", True), "towers": ("npc_dota_tower", False)}
+
+
+def _camps(ver, kind="camps"):
+    """Camp spawner (or tower) spots of one map picture (data/map/mapdata_<code>.json)."""
+    if (ver, kind) not in _CAMPS:
         with open(os.path.join(_ROOT, "data", "map", f"mapdata_{mv.code(ver)}.json"), encoding="utf-8") as f:
-            _CAMPS[ver] = [(c["x"], c["y"]) for c in json.load(f)["data"]["npc_dota_neutral_spawner"]]
-    return _CAMPS[ver]
+            _CAMPS[ver, kind] = [(c["x"], c["y"]) for c in json.load(f)["data"][MARK_KINDS[kind][0]]]
+    return _CAMPS[ver, kind]
 
 
-def _marks(img, cx, cy, r, ver, points, half, width):
-    """The camps a note is about, outlined white where each map picture has them (a camp may stand elsewhere on the
-    old map): the nearest camp to each mark within 1500 units."""
+def _marks(img, cx, cy, r, ver, points, half, width, kind="camps"):
+    """The camps (or towers) a note is about, outlined white where each map picture has them (a camp may stand
+    elsewhere on the old map): the nearest one to each mark within 1500 units."""
     d = ImageDraw.Draw(img)
     k = half / (2 * r)
+    square = MARK_KINDS[kind][1]
+    shape = d.rectangle if square else d.ellipse
     ys = []
     for mx, my in points:
-        camp = min(_camps(ver), key=lambda c: (c[0] - mx) ** 2 + (c[1] - my) ** 2)
+        camp = min(_camps(ver, kind), key=lambda c: (c[0] - mx) ** 2 + (c[1] - my) ** 2)
         if (camp[0] - mx) ** 2 + (camp[1] - my) ** 2 > 1500 ** 2 or abs(camp[0] - cx) > r or abs(camp[1] - cy) > r:
             continue
         X, Y = (camp[0] - (cx - r)) * k, ((cy + r) - camp[1]) * k
-        s = SIZE["camps"] * k
-        d.rectangle([X - s - 1, Y - s - 1, X + s + 1, Y + s + 1], outline=(0, 0, 0), width=width + 2)
-        d.rectangle([X - s, Y - s, X + s, Y + s], outline=MARK, width=width)
+        s = (SIZE["camps"] if square else CIRCLE) * k
+        shape([X - s - 1, Y - s - 1, X + s + 1, Y + s + 1], outline=(0, 0, 0), width=width + 2)
+        shape([X - s, Y - s, X + s, Y + s], outline=MARK, width=width)
         ys.append(Y)
     return ys                                # where the marked camps sit: the tier plate keeps away from them
 
@@ -311,7 +290,17 @@ def _label(img, text, font):
     d.text((2 * pad, pad + 2), text, font=font, fill=(244, 230, 191, 255))
 
 
-def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size):
+def spot_patch(spot, patch):
+    """The patch whose two maps a spot's picture compares: its own, or the one a third element names — [x, y, "7.40"]
+    (the owner 2026-10-03 asked for pictures of 7.41's "Radiant offlane tier 2 tower has been adjusted slightly to
+    the left": in the map file it didn't move in 7.41 but in 7.40, so the note shows 7.40c → 7.41, the tower marked
+    where it stands, and 7.39e → 7.40, where it moved)."""
+    return spot[2] if len(spot) > 2 else patch
+
+
+def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=True):
+    """One picture: the old | new halves. `own` = the entry's own patch; a picture of another patch's step (see
+    spot_patch) shows that step's changes and none of the entry's marks or tier icons."""
     half, _suffix, gap, width, font_px = size
     keys = spot_keys(entry)
     font = ImageFont.truetype(os.path.join(_ROOT, "src", "fonts", "radiance-semibold.otf"), font_px)
@@ -321,8 +310,9 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size):
         if "boxes" in keys:
             _boxes(img, cx, cy, r, diff, side, half, width)
         _outlines(img, cx, cy, r, groups, side, keys, half, width)
-        ys = _marks(img, cx, cy, r, ver, entry.get("mark", []), half, width)
-        _tiers(img, entry.get("tiers", {}).get(side), half, ys)
+        ys = _marks(img, cx, cy, r, ver, entry.get("mark", []) if own else [], half, width,
+                    entry.get("mark_kind", "camps"))
+        _tiers(img, entry.get("tiers", {}).get(side) if own else None, half, ys)
         if side == "old":
             _minimap(img, fulls[ver], rect, cx, cy, r, half)
         _label(img, label, font)
@@ -335,19 +325,28 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size):
 
 def make(patch, entries, maps, steps):
     from render_map import world_rect
-    step = steps[patch]
-    diff = terrain._load_diff(patch)
-    groups = terrain._changed_points(diff)
     rect = world_rect()
-    fulls = {v: Image.open(os.path.join(FINAL, f"map_{_sha8(v, maps)}_sfm_full.png")).convert("RGB")
-             for v in (step.old_pic, step.new_pic)}
+    fulls, steps_of = {}, {}
+
+    def step_of(p):              # a step's maps (loaded once), diff and changed points
+        if p not in steps_of:
+            st = steps[p]
+            for v in (st.old_pic, st.new_pic):
+                if v not in fulls:
+                    fulls[v] = Image.open(os.path.join(FINAL, f"map_{_sha8(v, maps)}_sfm_full.png")).convert("RGB")
+            diff = terrain._load_diff(p)
+            steps_of[p] = (st, diff, terrain._changed_points(diff))
+        return steps_of[p]
     os.makedirs(OUT, exist_ok=True)
     i = 0
     for e in entries:
         r = round(e.get("r", 700) * ZOOM_OUT)
-        for cx, cy in e["spots"]:
+        for spot in e["spots"]:
+            cx, cy = spot[:2]
+            p = spot_patch(spot, patch)
+            step, diff, groups = step_of(p)
             for size in SIZES:
-                sheet = _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, e, size)
+                sheet = _sheet(fulls, rect, step, p, diff, groups, cx, cy, r, e, size, own=p == patch)
                 sheet.save(os.path.join(OUT, shot_name(patch, i, size[1])), "WEBP", quality=82 if not size[1] else 78,
                            method=6)
             i += 1

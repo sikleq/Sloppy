@@ -332,10 +332,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   re-tiered + boxes, tree / juke path, watcher, tower / tier N, lotus, twin gates, tormentor, bounty rune, Roshan
   pit, wisdom shrine, outpost); a ground word first (cliff, ramp, stream, path, entrance, areas) → no outlines;
   a spot's `"show": [...]` overrides (3 do: the triangle's cliff + camps, a path cut through trees, the cleared
-  Tormentor areas). `patch/elements.py terrain_shots_html` puts them under a matching row — `li()` does it for
-  patch pages, `_change_li` for the Terrain page's own list — folded under a "Show" button at the END of the row's
-  text (an INLINETIP, so it hangs on the last word like a (?); the owner: "hide them under a button", "Show, at the
-  end of the line, not on a new line"); the pictures open below in their own rounded box, centred, framed like the
+  Tormentor areas). `patch/elements.py terrain_note` puts them under a matching row — `li()` does it for patch
+  pages, `_change_li` for the Terrain page's own list — opened by the row's words naming its object (see "the
+  objective's name opens the pictures" below); the pictures open below in their own rounded box, centred, framed like the
   item ability cards (`hidden`, so the lazy pictures load only when opened), and a click on a picture opens its
   large copy (`data-large`) in a lightbox, not the Terrain page ("View on map" in the section header is for that).
   scripts.js "Terrain note pictures".
@@ -350,14 +349,20 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   older pictures keep their numbers. Not shown (no place on the map or no data): rules (stream speed, watcher
   vision, gate mana), "Touched up the map" / "additional adjustments to this area", fixes the files don't record
   (7.39b warding blocks, 7.38c vision rules).
-- **Terrain rows: "Show" in the tag's place (2026-10-03)** — the owner first asked for numbers instead of tags,
-  then: "remove the numbers, put the Show button there". `terrain_shots_html` marks its button `<!--TSHOTBTN-->`;
-  `li()` inside a `plain_header(terrain_link=…)` block (`_State.terrain_rows` not None) takes it out
-  (`split_terrain_button`) and makes it the row's chip — `<button class="badge tshots-btn">`, the chip's 64-px
-  frame; a row without pictures gets the empty chip slot. Outside a terrain block the button would hang on the last
-  word. `_change_li` does the same on the Terrain page, which keeps Valve's order now (it sorted by tag); terrain
-  rows carry `class="terrain-row"` and `_sort_changes_li` leaves them in order. The tag canon still decides each
-  row's `data-tag` (filters, weights).
+- **Terrain rows: numbered, the objective's name opens the pictures (2026-10-03)** — the owner went numbers →
+  "Show" in the tag's place → back: "no Show buttons inside the tags: the expandable screenshot sits in the name of
+  the objective that moved — 'tier 1 safe lane towers', 'several trees', 'medium flooded camp', 'safe lane small
+  camp', 'Tormentor spawns'; the rows are just numbered instead of tag chips". The chip is the row's number in its
+  category (`terrain_num_chip`, `.badge.tnum`): `li()` inside a `plain_header(terrain_link=…)` block
+  (`_State.terrain_rows` not None) counts, `subgroup()` restarts at 1; `_changes_html` numbers the Terrain page's
+  list the same way, so a row has the same number on both pages. The words come from `patch/terrain_notes.py
+  note_phrase` (the subject word `show_keys` finds, plus the words describing it — left up to an article, a side
+  (Radiant / Dire), a verb, a preposition or an adverb, right up to one or a participle) or a spot's `"phrase"`
+  (3 do: "top and bottom outer rim areas", "top Radiant Tier 2", "actual bridges"); `wrap_phrase` makes the first
+  plain-text occurrence `<button class="tshots-btn">` — dotted underline, a caret that flips when open; the build
+  warns when markup splits it. Outside a terrain block the row keeps its tag and the words still open the pictures.
+  Both lists keep Valve's order; terrain rows carry `class="terrain-row"` and `_sort_changes_li` leaves them in
+  order. The tag canon still decides each row's `data-tag` (filters, weights).
 - **Bigger pictures with a minimap (2026-10-03)** — the owner: "when you show where something is, add a minimap
   with a mark, otherwise it's unclear; the pictures should be bigger and the camera a bit further out". The row
   picture is 726 x 360 (360-px halves, shown 480 x 238 css), the large copy 1450 x 720; every spot's square is
@@ -376,9 +381,11 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   too, solid lines are only ever the new state. Pictures: `_outlines` / `_boxes` call `_dashed` / `_dashed_poly` on
   the old side. Terrain page: `_dashed_old` masks the old SVG's merged contours with 45° stripes (a stroke dash
   would break the one-contour union of overlapping outlines); no-ward cells stay filled, they are areas, not
-  outlines. The "Show" chip is a cream frame
-  with no fill and thin uppercase letters (`--font-ui`) — gold "looks like the NEW tag", a filled one "like MISC".
-  Not placed: notes the map can't show (watcher rules, camp evolutions, pull timers, fixes) and the doubled 7.38c
+  outlines. **A picture from another patch (2026-10-03)** — the owner asked for pictures of 7.41's "Radiant offlane
+  tier 2 tower has been adjusted slightly to the left", which the map file did in 7.40 (37 units west), not 7.41: a
+  spot `[x, y, "7.40"]` pictures that patch's two maps (`spot_patch`; its own changes outlined, the entry's marks
+  and tier icons left out), so the note shows 7.40c → 7.41 with the tower marked white (`"mark_kind": "towers"`,
+  `MARK_KINDS`) and 7.39e → 7.40 with the move. Not placed: notes the map can't show (watcher rules, camp evolutions, pull timers, fixes) and the doubled 7.38c
   "Several additional tree and visual adjustments". With the shots, the terrain tag canon (docs/agent-rules/
   patch-tags.md): moved / reshaped REWORK, added NEW, removed DEL, demoted NERF, fixes MISC.
 - **Slider performance (2026-10-03)** — the owner: "check Terrain for lag and needless loading — weak PCs". A
