@@ -50,9 +50,12 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+# scripts/fetch/<this> -> the repo is three levels up. It was two before the move into scripts/fetch/, so the
+# 2026-09-18 run wrote scripts/data/signatures.json and the site kept the June list (found 2026-10-03).
+REPO_ROOT = Path(__file__).resolve().parents[2]
 OUT_PATH = REPO_ROOT / "data" / "signatures.json"
-SESSION_NAME = str(REPO_ROOT / ".tg_signatures")  # -> .tg_signatures.session
+# the working Telethon session (2026-09-18) lives in scripts/ — kept there so the next run needs no new login
+SESSION_NAME = str(Path(__file__).resolve().parents[1] / ".tg_signatures")  # -> scripts/.tg_signatures.session
 
 # Members to always skip entirely (not shown, not counted as Hidden) — matched
 # by @username, case-insensitive, no leading @. The channel owner's own account
