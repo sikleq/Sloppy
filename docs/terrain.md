@@ -317,6 +317,20 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `data-tiles-old/-new`; scripts.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
   picture — the old ones next to `.tc-old`, the new ones inside the clipped `.tc-new-layer` — once a picture pixel
   would be drawn bigger than a screen pixel. Pages' 1 GB limit: tiles for the site's maps only.
+- **Terrain notes with micro-screenshots (2026-10-03)** — the owner: the terrain rows were "all under one tag, mush —
+  maybe micro-screenshots, tree positions, now that we know which tree went where". `data/terrain_spots.json` places
+  each note that can be seen on the map: `{"match": <the row's text start>, "spots": [[x, y], …], "r": half size}`
+  (a moved object → the midpoint of its old and new spot; a mirrored change → one spot per side). Coordinates come
+  from the diff (scratchpad `changes_xy.py`-style listing: tree clusters, moved objects, changed boxes, each by its
+  nearest landmark — `terrain_audit.landmarks`). `scripts/gen/terrain_shots.py` crops the same square from the old
+  and the new full SFM render (2 units/px → 240 px a side), outlines what changed inside (removed red / added green
+  / moved yellow — the chips' `_changed_points`; squares round trees and camps, circles round entities; changed spawn
+  boxes red / green), labels the halves with their versions and writes `icons/terrain/<code>_<i>.webp` (i = spot
+  order in the file; ~35 KB each). `patch/elements.py terrain_shots_html` puts them under a matching row — `li()`
+  does it for patch pages (linked to the Terrain page), `_change_li` for the Terrain page's own list (no link).
+  Not placed: notes the map can't show (watcher rules, camp evolutions, pull timers, fixes) and the doubled 7.38c
+  "Several additional tree and visual adjustments". With the shots, the terrain tag canon (docs/agent-rules/
+  patch-tags.md): moved / reshaped REWORK, added NEW, removed DEL, demoted NERF, fixes MISC.
 - **Slider performance (2026-10-03)** — the owner: "check Terrain for lag and needless loading — weak PCs". A
   Playwright probe (drag the handle across and back, CDP Performance metrics, 4× CPU throttle) found a drag spent
   13 s in style recalc, p95 frame 167-183 ms, layers on or off: `apply()` set `--pos` on `.tc-stage`, and a custom

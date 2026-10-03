@@ -1,5 +1,66 @@
 {
   "_about": "Where each terrain note happens, for its micro-screenshots (scripts/gen/terrain_shots.py -> icons/terrain/<code>_<i>.webp, i counting spots in file order). A row whose text starts with 'match' shows the pictures of its 'spots' ([x, y] game units: the centre of a square 2r wide; for a moved object the midpoint of its old and new spot). Picked from scripts/gen/terrain_audit.py and the map files; a note whose change can't be seen on the map (a camp's evolutions) has no entry.",
+  "7.38b": [
+    {"match": "Removed several trees around camps, making it easier", "spots": [[-8300, -600], [-1056, -3264]], "r": 600},
+    {"match": "Moved the spawn box of the Radiant Safelane tier 1 large pull camp", "spots": [[4736, -3968]], "r": 600}
+  ],
+  "7.38c": [
+    {"match": "The tree lines above and below the tower have been reworked", "spots": [[-5300, 6200]], "r": 900},
+    {"match": "The Dire Safe Lane large camp has been moved away", "spots": [[-4812, 3973]], "r": 800},
+    {"match": "The Dire Safe Lane Tier 1 tower has been moved forward", "spots": [[-4942, 5962]], "r": 800},
+    {"match": "The cliff above the Dire Safe Lane small camp has been extended", "spots": [[-3698, 4832]], "r": 800},
+    {"match": "The ramp leading to the river and the Roshan Pit from the Dire Safe Lane pull area",
+     "spots": [[-4000, 3600]], "r": 900},
+    {"match": "A tree near the Radiant Safe Lane large camp has been removed", "spots": [[5760, -3456]], "r": 600},
+    {"match": "Several trees have been removed from the Radiant high ground leading to the Bottom Roshan Pit",
+     "spots": [[1792, -3392]], "r": 700},
+    {"match": "Trees have been added around the Dire Bottom Tier 1 tower", "spots": [[5817, -1700]], "r": 800},
+    {"match": "The Watcher above the secret shop has been repositioned", "spots": [[3346, -818]], "r": 1100}
+  ],
+  "7.39": [
+    {"match": "Several trees between the two neutrals camps on the easternmost region", "spots": [[8256, 1003]]},
+    {"match": "Many trees have been moved and adjusted in the Radiant Safe Lane pull area", "spots": [[4400, -5300]], "r": 900},
+    {"match": "Several trees have been added and adjusted near the Dire mid tier 2 tower", "spots": [[2900, 2200]], "r": 900},
+    {"match": "The top Radiant Tier 2 and the cliff to the right have been shifted", "spots": [[-6376, -872]]},
+    {"match": "The mid Radiant Tier 2 tower has been shifted away from the Triangle", "spots": [[-3263, -2859]], "r": 800},
+    {"match": "The Radiant Safe Lane small pull camp has been moved to the north", "spots": [[3841, -5235]]},
+    {"match": "The northern cliff edge, ramps and Large / Ancient camps of the Radiant triangle",
+     "spots": [[-4450, 480]], "r": 1000},
+    {"match": "The Dire triangle watcher has been moved slightly to the north", "spots": [[2671, -713]], "r": 600},
+    {"match": "The ramp directly south of the bottom Roshan Pit has been moved north", "spots": [[2900, -3300]], "r": 800},
+    {"match": "The ramp leading from the Dire triangle area to the river and bottom Roshan Pit",
+     "spots": [[3200, -2600]], "r": 900},
+    {"match": "The Top Roshan Pit has been adjusted to be closer to the center", "spots": [[-3154, 2422]]},
+    {"match": "The Bottom Roshan Pit has been moved northwest slightly", "spots": [[2898, -2854]]},
+    {"match": "The Radiant triangle ramp leading behind the top Radiant Tier 2 has been shifted north",
+     "spots": [[-5600, -800]], "r": 900},
+    {"match": "The ramps on the east side of the Radiant Triangle have been shifted", "spots": [[-3900, 1200]], "r": 800},
+    {"match": "A ramp has been added leading from the Radiant Triangle to behind the middle Radiant Tier 2",
+     "spots": [[-3900, -2200]], "r": 800},
+    {"match": "A juke path has been added to the trees east of the Radiant mid tier 2 tower",
+     "spots": [[-2700, -3100]], "r": 600},
+    {"match": "A path has been added closest to the Dire Bottom Tier 1 tower from the lane to the lotus pool",
+     "spots": [[7300, -4000]], "r": 900},
+    {"match": "The Dire bounty rune has been moved slightly to the east", "spots": [[-1074, 4424]], "r": 600},
+    {"match": "The bottom lane lotus pool has been moved to the north and to the west", "spots": [[7805, -4901]], "r": 900},
+    {"match": "The top lane lotus pool has been moved slightly to the north", "spots": [[-7655, 4509]], "r": 800}
+  ],
+  "7.39b": [
+    {"match": "Several trees have been added and adjusted above the Bottom Radiant Tier 1 tower",
+     "spots": [[4700, -5500]], "r": 800},
+    {"match": "A tree has been removed to the south of the Top Dire Tier 1 tower", "spots": [[-4672, 5056]], "r": 600},
+    {"match": "The Bottom Radiant Tier 1 tower has been moved slightly to the south", "spots": [[4914, -6160]], "r": 600},
+    {"match": "Adjusted a juke path to the east of the Mid Radiant Tier 2 tower", "spots": [[-2560, -3136]], "r": 500}
+  ],
+  "7.39c": [
+    {"match": "Watchers by the respective Wisdom shrines have been slightly moved away",
+     "spots": [[7800, -1233], [-7574, 730]], "r": 600}
+  ],
+  "7.39d": [
+    {"match": "Removed several trees from the inside corner of the Dire Safelane small camp",
+     "spots": [[-3776, 4704]], "r": 600},
+    {"match": "Increased spawnboxes of Triangle Ancient camps", "spots": [[4099, 63], [-4797, -104]], "r": 600}
+  ],
   "7.40": [
     {"match": "The Large camp nearest to Tier 3 towers where the streams used to start has been demoted",
      "spots": [[-2410, -8380], [2154, 8036]], "r": 600},
