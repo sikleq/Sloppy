@@ -317,6 +317,14 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `data-tiles-old/-new`; scripts.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
   picture — the old ones next to `.tc-old`, the new ones inside the clipped `.tc-new-layer` — once a picture pixel
   would be drawn bigger than a screen pixel. Pages' 1 GB limit: tiles for the site's maps only.
+- **Slider performance (2026-10-03)** — the owner: "check Terrain for lag and needless loading — weak PCs". A
+  Playwright probe (drag the handle across and back, CDP Performance metrics, 4× CPU throttle) found a drag spent
+  13 s in style recalc, p95 frame 167-183 ms, layers on or off: `apply()` set `--pos` on `.tc-stage`, and a custom
+  property inherits — every move re-styled all ~6500 marker shapes under the stage, hidden layers too. Now
+  `apply()` writes `clip-path` straight onto the split elements (`.tc-new-layer, .tm-new, .tc-trees-new,
+  .tc-camps-new, .tc-lens-new` → `inset(0 0 0 X%)`; `.tm-old, .tc-trees-old, .tc-camps-old` → `inset(0 (100-X)% 0
+  0)`) and the handle's `left`; the CSS `var(--pos)` rules stay as the no-JS default. After: p95 16.7 ms (60 fps)
+  with every layer on, recalc 0.3 s per drag. Don't set an inherited custom property on the stage per frame again.
 - **Fullscreen panel (2026-10-03)** — the owner: the "Changed in the map file" filters belong in fullscreen too,
   "maybe a separate panel, left or right, that opens and closes … everything neat". The fullscreen bar under the map
   became `.tc-fs-bar` = a 236 px panel LEFT of the map (`order: -1` in a row flex): Exit + a fold toggle

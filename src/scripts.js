@@ -6658,9 +6658,19 @@ function ecShopMarkup(panels) {
     let pos = parseFloat(root.dataset.pos);
     if (!isFinite(pos)) pos = 50;
 
+    // The slider writes each split layer's clip-path (and the handle's left) itself instead of
+    // changing --pos on the stage: --pos is inherited, so every move re-styled all ~6500 marker
+    // shapes under the stage, hidden layers too (2026-10-03 probe, 4x CPU throttle: a drag spent
+    // 13 s in style recalc, p95 frame 167 ms). The CSS var(--pos) rules stay as the no-JS default.
+    const SPLIT_NEW = '.tc-new-layer, .tm-new, .tc-trees-new, .tc-camps-new, .tc-lens-new';
+    const SPLIT_OLD = '.tm-old, .tc-trees-old, .tc-camps-old';
     function apply(p) {
       pos = Math.max(0, Math.min(100, p));
-      stage.style.setProperty('--pos', pos + '%');
+      const clipNew = 'inset(0 0 0 ' + pos + '%)';
+      const clipOld = 'inset(0 ' + (100 - pos) + '% 0 0)';
+      root.querySelectorAll(SPLIT_NEW).forEach(function(el) { el.style.clipPath = clipNew; });
+      root.querySelectorAll(SPLIT_OLD).forEach(function(el) { el.style.clipPath = clipOld; });
+      handle.style.left = pos + '%';
       handle.setAttribute('aria-valuenow', Math.round(pos));
     }
     apply(pos);

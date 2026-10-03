@@ -316,6 +316,15 @@ def test_fullscreen_has_a_folding_panel_with_the_change_filters():
     assert 'class="tc-sep"' not in panel                    # the grid needs no separators
 
 
+def test_the_slider_writes_clip_paths_not_an_inherited_property():
+    """2026-10-03 probe: setting --pos on the stage re-styled every marker under it on each move (13 s of style
+    recalc per drag on a 4x-throttled CPU); the slider now writes each split element's clip-path itself."""
+    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    apply = js.split("function apply(p) {")[1].split("apply(pos);")[0]
+    assert "setProperty('--pos'" not in apply and "el.style.clipPath = clipNew" in apply
+    assert "handle.style.left = pos + '%'" in apply
+
+
 def test_the_picker_lists_patches_not_ranges():
     html = terrain._picker_html(["7.39b", "7.39"], "7.39b")
     assert '<a class="version-item current" href="terrain_739b.html"' in html and "–" not in html

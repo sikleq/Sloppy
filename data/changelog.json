@@ -21,6 +21,14 @@
       "date": "2026-10-03",
       "category": "Materials",
       "minor": true,
+      "fix": true,
+      "link": "terrain_741.html",
+      "title": "Terrain: dragging the slider stays smooth on slower computers, layers on or off (it re-styled every tree and camp marker on each move)"
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Materials",
+      "minor": true,
       "title": "Terrain: no line under the slider any more — every map picture and object list on the pages is our own"
     },
     {
