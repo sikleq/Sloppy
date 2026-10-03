@@ -598,16 +598,20 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
     if terrain_link:
         # every patch with terrain notes has its own Terrain page (builders/terrain.py)
         _tfile = f"terrain_{terrain_link.replace('.', '')}.html"
+        # the page's first terrain block is #terrain: the Terrain page's patch label links to it (the owner
+        # 2026-10-03: "click the patch switcher to jump to that patch")
+        _anchor = '' if _State.terrain_anchor else ' id="terrain"'
+        _State.terrain_anchor = True
         link_html = (
-            f'<a class="terrain-jump-btn" href="../{_tfile}" '
+            f'<a class="terrain-jump-btn"{_anchor} href="../{_tfile}" '
             f'title="See these changes on the map">'
             f'<img src="../icons/ui/gothic/icon_terrain.png" alt="" width="16" height="16">'
             f'<span>View on map</span></a>')
     extra_cls = ' label-only' if sublabel else ''
     head = _open_block(extra_cls)
     if terrain_link:
-        # terrain rows show their pictures' Show button in the chip's place, no tag (the owner 2026-10-03);
-        # data-tag stays for the filters / weights
+        # terrain rows are numbered in their category, no tag (the owner 2026-10-03); data-tag stays for the
+        # filters / weights
         _State.terrain_rows = 0
     _State.new_mech_header = _State.new_mech = bool(new)
     _State.new_mech_tag = _mech_tag(new)

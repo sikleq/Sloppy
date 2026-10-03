@@ -72,6 +72,12 @@
     back.title = 'Back to ' + label;
     back.setAttribute('aria-label', 'Back to ' + label);
     back.classList.add('visible');
+  } else if (back && fromParam && /^terrain_[0-9a-z]+$/.test(fromParam)) {
+    // Arrived from a Terrain page's patch label: back to that map.
+    back.href = '../' + fromParam + '.html';
+    back.title = 'Back to Terrain';
+    back.setAttribute('aria-label', 'Back to the Terrain map');
+    back.classList.add('visible');
   } else if (back && fromParam && /^(hero|item):[a-z0-9-]+$/.test(fromParam)) {
     // Arrived from a Hero / Item Changes page: go back to it (same patch section).
     const [kind, slug] = fromParam.split(':');
@@ -7107,9 +7113,16 @@ function ecShopMarkup(panels) {
       var btnL = document.createElement('button');
       btnL.className = 'tsp-arrow tsp-arrow-left';
       btnL.setAttribute('aria-label', 'Newer subpatch');
-      var label = document.createElement('span');
+      // the version is a link to its patch page's terrain notes (the owner 2026-10-03: "click the patch switcher
+      // to jump to that patch"); ?from= gives that page a back arrow to this one
+      var label = document.createElement('a');
       label.className = 'tsp-label';
       label.textContent = topVer;
+      var here = (window.location.pathname.match(/(terrain_[0-9a-z]+)\.html$/) || [])[1];
+      function linkTo(ver) {
+        label.href = 'patches/' + ver + '.html' + (here ? '?from=' + here : '') + '#terrain';
+        label.setAttribute('aria-label', 'Patch ' + ver + ' notes');
+      }
       var btnR = document.createElement('button');
       btnR.className = 'tsp-arrow tsp-arrow-right';
       btnR.setAttribute('aria-label', 'Older subpatch');
@@ -7127,6 +7140,7 @@ function ecShopMarkup(panels) {
           });
         });
         label.textContent = groups[i].ver;
+        linkTo(groups[i].ver);
         // At the ends the arrows step to the neighbouring map page (newer / older terrain
         // pair from the header's version menu) instead of going dead.
         btnL.disabled = (i === 0 && !newerPage);

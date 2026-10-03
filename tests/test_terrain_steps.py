@@ -509,6 +509,29 @@ def test_terrain_lists_keep_valves_order_without_tags():
     assert page._li_rank('<li class="terrain-row" data-tag="buff"><span class="badge-group"></span></li>') == 8
 
 
+def test_the_patch_label_opens_its_notes_and_the_tiles_pop_out():
+    """The owner 2026-10-03: "make the patch switcher clickable — it jumps to that patch (with the back arrow there)";
+    "the On the map tiles slide out softly on hover, like our dynamics cells". The label is a link to the patch
+    page's first terrain block (#terrain, on its View on map button) with ?from=<this Terrain page>, which gives the
+    patch page a back arrow to the map."""
+    from patch import elements
+    elements._State.terrain_anchor = False
+    first = elements.plain_header("Terrain Changes", dynamics=False, terrain_link="7.41")
+    second = elements.plain_header("Terrain Changes", dynamics=False, terrain_link="7.41")
+    elements.plain_header("General Changes", dynamics=False)
+    assert '<a class="terrain-jump-btn" id="terrain" href="../terrain_741.html"' in first
+    assert 'id="terrain"' not in second
+    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    picker = js.split("function initSubpatchPicker()", 1)[1].split("function initChangeHighlights()", 1)[0]
+    assert "document.createElement('a')" in picker and "'patches/' + ver + '.html'" in picker
+    assert "'?from=' + here" in picker and "'#terrain'" in picker and "linkTo(groups[i].ver)" in picker
+    assert "/^terrain_[0-9a-z]+$/.test(fromParam)" in js and "back.href = '../' + fromParam + '.html'" in js
+    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    hover = css.split(".tf-tile:hover {", 1)[1].split("}", 1)[0]
+    assert "transform: scale(1.12)" in hover and "z-index: 2" in hover
+    assert "a.tsp-label {" in css
+
+
 def test_note_pictures_mark_camps_and_show_tier_icons():
     """Evolution / pull-timer notes mark the camp they are about (white); tier changes carry the camp icons, before
     and after (the owner 2026-10-03); a ground note can outline its changed no-ward cells."""

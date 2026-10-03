@@ -21,6 +21,7 @@ def write_head(version, date):
     _State.current_patch_version = version
     _State.current_entity_key = None
     _State.current_section_slug = None
+    _State.terrain_anchor = False
     nav = _render_top_nav(active="changelogs", current_version=version, date=date, patch_context=True)
     # Patch info block in the toolbar — three discrete labelled facts on a
     # single right-aligned row: release date, gap from the previous patch,

@@ -9597,6 +9597,13 @@ li.tsp-hidden { display: none !important; }
   min-width: 48px;
   text-align: center;
 }
+/* the version links to its patch page's terrain notes (the owner 2026-10-03), underlined dotted like the notes'
+   picture buttons */
+a.tsp-label {
+  text-decoration: underline dotted rgba(226, 216, 196, 0.45); text-decoration-thickness: 1px;
+  text-underline-offset: 4px; transition: color 0.15s ease;
+}
+a.tsp-label:hover, a.tsp-label:focus-visible { color: #e3c46a; text-decoration-color: rgba(227, 196, 106, 0.8); }
 .tsp-arrow {
   width: 16px; height: 24px; padding: 0; border: none;
   background: var(--shadow-28);
@@ -9887,7 +9894,20 @@ li.tsp-hidden { display: none !important; }
 .tf-tile, .tf-chip {
   border: 1px solid rgba(227, 196, 106, 0.18); background: rgba(227, 196, 106, 0.045); border-radius: 3px;
 }
-.tf-tile { padding: 6px 2px 5px; text-align: center; min-width: 0; }
+.tf-tile {
+  position: relative; padding: 6px 2px 5px; text-align: center; min-width: 0;
+  /* on hover a tile pops out softly, like the dynamics cells (the owner 2026-10-03); z-index drops back only
+     after it has shrunk, so a neighbour never paints over it halfway */
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s ease, background-color 0.18s ease,
+    border-color 0.18s ease, z-index 0s linear 0.18s;
+}
+.tf-tile:hover {
+  z-index: 2; transform: scale(1.12); background-color: rgb(32, 29, 22); border-color: rgba(227, 196, 106, 0.42);
+  box-shadow: 0 3px 8px var(--shadow-60), 0 0 10px rgba(227, 196, 106, 0.16), inset 0 1px 0 var(--white-12);
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s ease, background-color 0.18s ease,
+    border-color 0.18s ease, z-index 0s linear 0s;
+}
+@media (prefers-reduced-motion: reduce) { .tf-tile, .tf-tile:hover { transition: none; transform: none; } }
 .tf-num {
   display: flex; align-items: center; justify-content: center; gap: 5px;
   font-size: 15px; font-weight: 700; color: var(--text-bright); line-height: 1.15;

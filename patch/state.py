@@ -3,9 +3,10 @@
 
 class _State:
     block_open = False
-    # not None inside a terrain block (plain_header(terrain_link=…)): its rows put their pictures' Show button in the
-    # chip's place instead of a tag (2026-10-03)
+    # not None inside a terrain block (plain_header(terrain_link=…)): its rows are numbered in their category instead
+    # of tagged (2026-10-03)
     terrain_rows = None
+    terrain_anchor = False           # the page's first terrain block got id="terrain" (the Terrain page links to it)
     current_hero = None  # internal slug of current hero block (for ability icon derivation)
     ability_icons = set()  # all ability-icon URLs emitted during build (for icon-validator)
     ability_block_open = False  # tracks <div class="ability-block"> wrapper

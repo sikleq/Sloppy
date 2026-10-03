@@ -363,6 +363,15 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   warns when markup splits it. Outside a terrain block the row keeps its tag and the words still open the pictures.
   Both lists keep Valve's order; terrain rows carry `class="terrain-row"` and `_sort_changes_li` leaves them in
   order. The tag canon still decides each row's `data-tag` (filters, weights).
+- **The list's patch label opens that patch (2026-10-03)** — the owner: "make the patch switcher clickable, it
+  jumps to that patch (the back arrow appears there)". scripts.js `initSubpatchPicker` makes `.tsp-label` an `<a>`
+  to `patches/<ver>.html?from=terrain_<code>#terrain` (re-pointed when the arrows step); `plain_header` puts
+  `id="terrain"` on the page's FIRST terrain block's View on map button (`_State.terrain_anchor`, reset by
+  `write_head`); `?from=terrain_<code>` shows the patch page's bottom-left back arrow, pointed at that map. Dotted
+  underline like the notes' picture buttons. The "On the map" tiles pop out on hover (`.tf-tile:hover`, scale
+  1.12, a soft gold glow, the dynamics cells' z-index trick) — the owner: "softly, like our dynamics cells".
+- **Changelog animations** — `tools/changelog_terrain_anim.py [layer]` records one map layer's changes on four
+  patches (`LAYERS`: trees in every mode, camps, watchers, towers, no-ward ground), needs dist/ on :8799.
 - **Bigger pictures with a minimap (2026-10-03)** — the owner: "when you show where something is, add a minimap
   with a mark, otherwise it's unclear; the pictures should be bigger and the camera a bit further out". The row
   picture is 726 x 360 (360-px halves, shown 480 x 238 css), the large copy 1450 x 720; every spot's square is

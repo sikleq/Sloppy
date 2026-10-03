@@ -3,16 +3,22 @@
   "entries": [
     {
       "date": "2026-10-03",
-      "category": "Patch Reader",
-      "title": "Terrain notes you can see",
-      "link": "patches/7.41.html",
+      "category": "Materials",
+      "title": "Terrain changes, shown on the map",
+      "link": "terrain_741.html",
       "items": [
-        "Terrain notes are numbered in each category instead of tagged, and in every note from 7.38 to 7.41 that can be seen on the map the name of what changed — “tier 1 safe lane towers”, “several trees” — opens its pictures: below it, in their own box, the old and the new map side by side with only the note's own objects outlined — removed red, added green, moved yellow; dashed always means where it was (the whole old side, plus a faint ghost of the old spot or spawn box on the new side) — and a small minimap marking where it is; a click on a picture opens it large",
-        "A note about a camp that didn't move marks it white (7.39 pull timers, 7.41 evolutions), and a camp that changed tier shows the game's camp icons before and after (medium → small, medium → large → ancient); ramps, cliffs and ward spots outline the cells that changed",
-        "16 more notes got pictures: 7.38's jungle streams and corner outposts, 7.39's rotated Roshan pit and cliff, 7.40's shrines, defender's gates, bridges and removed trees, 7.41's Tormentor areas and ramp — and 7.41's offlane tier 2 tower: standing still in 7.41, and its real move in 7.40"
+        "In a terrain note, click the name of what changed — “several trees”, “tier 1 safe lane towers” — to see the old and the new map side by side",
+        "On the Terrain page, a chip outlines its changes: red removed, green added, yellow moved; dashed always means where it was",
+        "Notes are numbered instead of tagged, and the patch name above the list opens that patch's notes"
       ],
       "shots": [
-        "icons/changelog/2026-10-03_terrain_notes.webp"
+        "icons/changelog/2026-10-03_terrain_notes.webp",
+        "icons/changelog/2026-10-03_terrain_trees_modes.webp",
+        "icons/changelog/2026-10-03_terrain_camps_anim.webp",
+        "icons/changelog/2026-10-03_terrain_watchers_anim.webp",
+        "icons/changelog/2026-10-03_terrain_towers_anim.webp",
+        "icons/changelog/2026-10-03_terrain_nowards_anim.webp",
+        "icons/changelog/2026-10-03_terrain_fullscreen.webp"
       ]
     },
     {
@@ -54,23 +60,6 @@
       "fix": true,
       "link": "patches/7.40.html",
       "title": "7.40 proofread again against Valve's data: 40 fixes — tags (Healing Salve, Pangolier, Spectre's Reality, Treant's Eyes In The Forest moving from Scepter to Shard…), Naga Siren's Deluge cooldown under its own name, Searing Arrows as a returning ability card, old descriptions matching 7.39e"
-    },
-    {
-      "date": "2026-10-03",
-      "category": "Materials",
-      "title": "Terrain: what changed, outlined on both maps",
-      "link": "terrain_740.html",
-      "items": [
-        "Press a chip under the list: what was removed is outlined red on the old map, what was added green on the new map, what moved yellow on both — dashed where it stood, solid where it stands; dashed always means old, so on the new map a light dashed outline shows where a moved one stood",
-        "Each outline takes its object's own shape — a square round a tree or a camp — and shows with that object's map layer, which the chip turns on — and off again with the chip, unless the layer was already on",
-        "Switches by the heading show only what moved, what was removed or what was added; changed no-ward ground is filled red or green instead",
-        "In fullscreen the controls sit in a panel beside the map that folds away: the layers, the switches and the chips"
-      ],
-      "shots": [
-        "icons/changelog/2026-10-03_terrain_trees_modes.webp",
-        "icons/changelog/2026-10-03_terrain_outlines.webp",
-        "icons/changelog/2026-10-03_terrain_fullscreen.webp"
-      ]
     },
     {
       "date": "2026-10-03",
