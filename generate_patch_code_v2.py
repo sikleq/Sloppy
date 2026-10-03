@@ -290,6 +290,27 @@ CANONICAL_TAGS = [
     (re.compile(r"^Aghanim's (?:Scepter|Shard) (?:slightly )?reworked\b", re.I), 'REWORK'),
     (re.compile(r'\brenamed to\b.*\b(?:no longer|now)\b', re.I),     'REWORK'),
     (re.compile(r'\bno longer\b[^.]*\bbut (?:may|can|will) still\b', re.I), 'REWORK'),  # Kez echoes "but may still create"
+    # Terrain (the owner 2026-10-03: the terrain rows were "all under one tag, mush"): a map object or a piece of ground
+    # that moved / was reshaped is a REWORK of the map, like "where an object appears" (7.38 rule) — not MISC. An
+    # ability moved to another key slot is not this ("…moved to the 4th ability slot" stays MISC).
+    (re.compile(r'\bdemoted to\b|\bcan now only evolve once\b', re.I), 'NERF'),        # a camp worth less now
+    (re.compile(r'\bcan now evolve twice\b|\bpromoted to\b', re.I), 'BUFF'),
+    (re.compile(r'^(?:Fixed(?!\s+(?:item\s+|ability\s+|spell\s+)?(?:description|tooltip|text))|Touched up)\b|'
+                r'\bdead spot\b|\bincorrect vision\b|\bblocks preventing\b|'
+                r'\bunnecessary pathing blockers?\b|\bvisually looked pathable\b', re.I), 'MISC'),   # map fixes
+    (re.compile(r'\b(?:trees?|a ramp|a path|a juke path)\b[^.]*\b(?:has|have) been added\b(?![^.]*\badjusted\b)|'
+                r'^(?:A|An) (?:ramp|path|juke path|bridge)\b[^.]*\bhas been added\b', re.I), 'NEW'),
+    (re.compile(r'^(?:Moved|Extended|Changed the|Lowered|Cleared up)\b(?![^.]*\bslot\b)|'
+                r'\b(?:expanded|reduced in size|extended slightly|added and adjusted)\b', re.I), 'REWORK'),
+    (re.compile(r'\b(?:has|have) been (?:slightly |very slightly )?(?:moved|repositioned|adjusted|positioned|relocated|'
+                r'shifted|reduced to|decreased in width|reworked)\b(?![^.]*\bslot\b)', re.I), 'REWORK'),
+    (re.compile(r'^Very slightly adjusted\b|\btrigger area moved\b|^Adjusted an? \w|\bslightly rotated\b|'
+                r'\bhave had their pull timers\b|\btree positions adjusted\b', re.I), 'REWORK'),
+    (re.compile(r"\bcapture time decreased\b", re.I), 'BUFF'),                     # a watcher taken faster
+    (re.compile(r"\bnow can't be activated before\b", re.I), 'NERF'),
+    (re.compile(r'\b(?:slightly )?moved (?:slightly )?(?:closer|away|towards?|north|south|east|west|farther|further)\b'
+                r'(?![^.]*\bslot\b)', re.I), 'REWORK'),
+    (re.compile(r'\bspawn ?box(?:es)? (?:has|have) been (?:moved|enlarged|increased|decreased|reduced|resized)\b', re.I), 'REWORK'),
     # interface, not gameplay
     (re.compile(r'\bfor the "[^"]+" option\b', re.I),               'QoL'),
     (re.compile(r'\bnow has a distinct sound\b', re.I),             'QoL'),

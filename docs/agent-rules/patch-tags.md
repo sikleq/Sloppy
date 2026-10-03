@@ -224,6 +224,15 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
 - **Новая способность юнита/босса** («Alleviation: New ability. …») — карточка `ability_change(None, {...}, summary="New ability", tag="new")`, а не строка NEW. *Почему:* так же выглядят новые способности героев.
 - **Переделанный объект** (все общие строки — REWORK, кроме NEW): `unit_header(..., new_mech="Reworked objective")`. Строки REWORK становятся блоком-описанием «как это работает теперь», строки NEW остаются изменениями ниже. *Почему:* это описание нового устройства, а не пять отдельных изменений — как у Shrines of Wisdom.
 - **Где и когда появляется объект** (spawns repositioned, first spawn at 15:00, single active, day/night) — REWORK, не MISC. «Roshan no longer drops …» — DEL.
+- **Строки ландшафта (Terrain Changes), канон 2026-10-03** (владелец: «всё под одним тегом, кашеобразно»): объект или
+  кусок земли перемещён / переставлен / сдвинут / повёрнут / перестроен («has been moved / repositioned / shifted /
+  adjusted / rotated / reduced to / decreased in width», «Moved …», «Extended …», «Lowered …», «expanded», «added and
+  adjusted») → **REWORK**; добавлено новое (деревья, рампа, тропа: «has been added») → **NEW**; убрано → **DEL**
+  (деревья — DEL, как и раньше); лагерь понижен («demoted», «can now only evolve once») → **NERF**, повышен / «evolve
+  twice» → **BUFF**; исправления (dead spot, incorrect vision, pathing blockers, ward spot, «Touched up») → **MISC**.
+  У строки ландшафта под текстом — микроскриншоты «было | стало» (data/terrain_spots.json →
+  scripts/gen/terrain_shots.py → icons/terrain/, patch/elements.py `terrain_shots_html`). Генератор:
+  CANONICAL_TAGS «Terrain», тесты `test_terrain_canon`.
 - **«X removed and replaced with new …: Y»** — строка DEL уходит под свой подзаголовок X над блоком Y. *Почему:* это изменение старой вещи, а не описание новой.
 - **Строка без метки внутри описания нового объекта** (например, опыт от Shrines плюс «?») тоже входит в описание: метка NEW, чип скрывается.
 - **Две соседние однотипные строки с одинаковым «?»** (Great / Greater Lotuses) — одна строка «…A, and B», одно «?». *Почему:* это одно изменение про два значения.

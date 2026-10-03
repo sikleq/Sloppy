@@ -325,6 +325,23 @@ def test_the_slider_writes_clip_paths_not_an_inherited_property():
     assert "handle.style.left = pos + '%'" in apply
 
 
+def test_a_terrain_note_shows_its_micro_screenshots():
+    """The owner 2026-10-03: terrain rows were "all under one tag, mush — maybe micro-screenshots". A row matched in
+    data/terrain_spots.json shows its old | new pictures: linked to the Terrain page on a patch page, plain on the
+    Terrain page itself; every picture it names exists."""
+    from patch.elements import terrain_shots_html, _terrain_spot_index
+    row = "The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet"
+    html = terrain_shots_html("7.41", row)
+    assert html.count("<img") == 2 and 'href="../terrain_741.html"' in html and "../icons/terrain/741_" in html
+    assert terrain_shots_html("7.41", "Some row no spot matches") == ""
+    li = terrain._change_li(row, "REWORK", None, "7.41")
+    assert '<span class="tshots"><img src="icons/terrain/741_' in li and "<a " not in li
+    for patch, rows in _terrain_spot_index().items():
+        for _match, names in rows:
+            for n in names:
+                assert os.path.exists(os.path.join(_ROOT, "icons", "terrain", n)), n
+
+
 def test_the_picker_lists_patches_not_ranges():
     html = terrain._picker_html(["7.39b", "7.39"], "7.39b")
     assert '<a class="version-item current" href="terrain_739b.html"' in html and "–" not in html

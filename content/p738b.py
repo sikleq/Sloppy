@@ -13,7 +13,7 @@ def build():
     W(plain_header("Terrain Changes", terrain_link="7.38b"))
     W(ul_open())
     W(li("Removed several trees around camps, making it easier for additional paths to be cut through", t("DEL"), extra=inline_note("To the right of Dire Ancient camp by Safelane Tier 1 Tower<br>To the right of Dire Medium camp between mid and top Tier 2 Towers<br>To the top of Dire Large camp nearest to mid Tier 1 Tower<br>To the top of the Dire Jungle high-ground Medium camp<br>To the right of the Dire offlane Tier 2 Tower Medium camp<br>To the right of the Radiant Large Camp by mid tier 1<br>To the right and left of the Radiant Large Camp by offlane Tier 1 Tower<br>To the left of the Radiant Safelane Tier 2 Tower Medium water camp")))
-    W(li("Moved the spawn box of the Radiant Safelane tier 1 large pull camp a little bit down, removing an inaccessible camp block spot that could be created by chopping down a tree", t("MISC")))
+    W(li("Moved the spawn box of the Radiant Safelane tier 1 large pull camp a little bit down, removing an inaccessible camp block spot that could be created by chopping down a tree", t("REWORK")))
     W(ul_close())
     W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())

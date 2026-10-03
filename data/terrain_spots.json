@@ -1,0 +1,22 @@
+{
+  "_about": "Where each terrain note happens, for its micro-screenshots (scripts/gen/terrain_shots.py -> icons/terrain/<code>_<i>.webp, i counting spots in file order). A row whose text starts with 'match' shows the pictures of its 'spots' ([x, y] game units: the centre of a square 2r wide; for a moved object the midpoint of its old and new spot). Picked from scripts/gen/terrain_audit.py and the map files; a note whose change can't be seen on the map (a camp's evolutions) has no entry.",
+  "7.41": [
+    {"match": "Removed several trees from Dire Safelane small pull camp and Radiant Safelane large pull camp",
+     "spots": [[-3500, 4829], [4649, -3699]]},
+    {"match": "The tier 1 safe lane towers have been moved slightly away",
+     "spots": [[4882, -6288], [-5275, 5982]], "r": 600},
+    {"match": "Radiant safe lane small camp has been slightly moved north", "spots": [[3965, -5051]], "r": 600},
+    {"match": "Radiant safe lane large camp's spawn box has been moved", "spots": [[4649, -3699]], "r": 600},
+    {"match": "The medium flooded camp near the safe lane tier 2 towers moved closer",
+     "spots": [[-752, -7644], [253, 7975]]},
+    {"match": "Ancient neutral camps near stream ends demoted", "spots": [[4655, -8386], [-4466, 8352]]},
+    {"match": "Medium neutral camp near offlane defender's gate has been demoted",
+     "spots": [[8430, 1263], [-8023, -1838]], "r": 600},
+    {"match": "The watcher between the safe lane tier 1 tower and the tormentor has been repositioned",
+     "spots": [[6571, -6432], [-6662, 6455]], "r": 800},
+    {"match": "Twin Gates slightly moved away from the stairs", "spots": [[6893, -6921], [-6973, 7255]], "r": 900},
+    {"match": "Tormentor spawns have been positioned closer towards Lotus Pools",
+     "spots": [[7616, -7032], [-7441, 7141]], "r": 1100},
+    {"match": "Lotus Pools have been moved slightly closer", "spots": [[7554, -4605], [-7587, 4403]], "r": 600}
+  ]
+}

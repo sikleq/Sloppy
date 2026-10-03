@@ -4238,6 +4238,16 @@ ul.changes {
                                itself uses margin-right:-8px against the
                                entity header's 14px padding → also 6px in). */
 }
+/* A terrain note's micro-screenshots (patch/elements.py terrain_shots_html): old | new map around the change, the
+   changed objects outlined; a full-width row of the li's grid under the text (the owner 2026-10-03: terrain rows were
+   "all under one tag, mush"). */
+ul.changes li > .tshots { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 4px; }
+.tshots a { display: contents; }
+.tshots img {
+  width: 242px; height: 120px; border-radius: 3px; border: 1px solid rgba(227, 196, 106, 0.22);
+  background: #080b06; transition: border-color 0.15s ease;
+}
+.tshots a:hover img { border-color: rgba(227, 196, 106, 0.6); }
 ul.changes li {
   display: grid;
   /* 2-column grid (text | badge). The text-tag is absolutely positioned over

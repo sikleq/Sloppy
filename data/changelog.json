@@ -4,6 +4,19 @@
     {
       "date": "2026-10-03",
       "category": "Patch Reader",
+      "title": "Terrain notes you can see",
+      "link": "patches/7.41.html",
+      "items": [
+        "Every terrain note of 7.41 shows its spot: the old and the new map side by side, what was removed outlined red, what was added green, what moved yellow; a click opens the Terrain page",
+        "Terrain notes carry real tags instead of MISC almost everywhere: moved or reshaped REWORK, added NEW, removed DEL, a camp's tier BUFF or NERF, fixes MISC"
+      ],
+      "shots": [
+        "icons/changelog/2026-10-03_terrain_notes.webp"
+      ]
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Patch Reader",
       "minor": true,
       "fix": true,
       "link": "patches/7.41.html",

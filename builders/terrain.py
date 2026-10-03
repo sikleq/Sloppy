@@ -535,7 +535,8 @@ _HL_YELLOW = "#ffd23f"
 _HL_COLOUR = {"moved": _HL_YELLOW, "removed": _HL_RED, "added": _HL_GREEN}
 _HL_KINDS = ("moved", "removed", "added")
 # a removed and an added spot this close (game units), each other's nearest, are one object moved
-_MOVE_REACH = {"trees": 200, "camps": _SAME_CAMP}
+# (7.41 moved the Tormentors ~1700 units and the Twin Gates ~1240: one of each per side, so a long reach is safe)
+_MOVE_REACH = {"trees": 200, "camps": _SAME_CAMP, "tormentors": 2500, "twinGates": 2000}
 _MOVE_REACH_ENT = 1500
 _CELL = 64                            # gridnav cell, game units
 _CELL_FILL = 0.55                     # changed ward cells: filled like the magenta layer, red / green
@@ -578,7 +579,7 @@ def _changed_points(diff):
     for key in _MOVED_NAMES:
         ed = diff.get("entities", {}).get(key)
         if ed:
-            out[key] = split(ed.get("old", []), ed.get("new", []), _MOVE_REACH_ENT)
+            out[key] = split(ed.get("old", []), ed.get("new", []), _MOVE_REACH.get(key, _MOVE_REACH_ENT))
     w = diff.get("wards") or {}
     out["nowards"] = {"removed": [tuple(p) for p in w.get("toWardable", [])],
                       "added": [tuple(p) for p in w.get("toNoWard", [])]}
@@ -682,8 +683,10 @@ def _badge(tag):
     return f'<span class="badge {cls}" data-tag="{tid}">{tag}</span>'
 
 
-def _change_li(text, tag, note=None):
+def _change_li(text, tag, note=None, patch=None):
     _cls, tid, overall = _TAG_CLS[tag]
+    from patch.elements import terrain_shots_html
+    shots = terrain_shots_html(patch, text, prefix="", link=False)      # the map is right beside the list
     # data-tag carries the primary tag plus its filter-overall (NEW→buff,
     # DEL→nerf) so a future filter surfaces them correctly; dedupe so BUFF/NERF
     # (whose tid already equals the overall) don't repeat.
@@ -698,7 +701,7 @@ def _change_li(text, tag, note=None):
         head, _sp, last = text.rpartition(" ")
         text = f'{head}{_sp}<span class="li-tail">{last}{info_tip(note)}</span>'
     return (f'<li data-tag="{" ".join(tags)}">{_badge(tag)}'
-            f'<span class="row-text">{text}</span></li>')
+            f'<span class="row-text">{text}</span>{shots}</li>')
 
 
 def _changes_html(subpatches, skip_first_head=False):
@@ -724,7 +727,7 @@ def _changes_html(subpatches, skip_first_head=False):
                 parts.append(f'<li class="terrain-subgroup-head">{sg}</li>')
             sorted_rows = sorted(sg_rows,
                                  key=lambda it: (_TAG_RANK.get(it[2], 9), it[0]))
-            parts.extend(_change_li(text, tag, note) for _, text, tag, note in sorted_rows)
+            parts.extend(_change_li(text, tag, note, sub_ver) for _, text, tag, note in sorted_rows)
     return "\n".join(parts)
 
 

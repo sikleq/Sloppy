@@ -595,6 +595,30 @@ def test_canonical_tags_from_the_740_741_audit(text, tag):
     assert g._guess_tag(text) == tag
 
 
+@pytest.mark.parametrize("text,tag", [
+    # terrain canon (the owner 2026-10-03: the terrain rows were "all under one tag, mush")
+    ("The tier 1 safe lane towers have been moved slightly away from their pull camps", "REWORK"),
+    ("Twin Gates slightly moved away from the stairs towards the map border", "REWORK"),
+    ("Radiant safe lane large camp's spawn box has been moved towards the offlane", "REWORK"),
+    ("Moved Wisdom Shrines to the low ground and slightly closer to the Tier 1 towers", "REWORK"),
+    ("Lowered the Wisdom Shrine areas to low ground, compared to the respective offlanes", "REWORK"),
+    ("The Bottom Roshan Pit has been slightly rotated to face more towards the middle of the map", "REWORK"),
+    ("Adjusted a juke path to the east of the Mid Radiant Tier 2 tower", "REWORK"),
+    ("Trees have been added around the Dire Bottom Tier 1 tower, and several tree positions adjusted", "REWORK"),
+    ("A ramp has been added leading from the Radiant Triangle to behind the middle Radiant Tier 2", "NEW"),
+    ("Medium neutral camp near offlane defender's gate has been demoted to a small neutral camp", "NERF"),
+    ("Ancient neutral camps near stream ends demoted to medium camps and moved slightly towards bases", "NERF"),
+    ("The medium flooded camp near the bounty runes can now evolve twice into an Ancient Camp", "BUFF"),
+    ("Fixed a ward spot in Radiant safe lane large camp", "MISC"),
+    ("A dead spot has been fixed in the Bottom Roshan Pit", "MISC"),
+    ("Watcher capture time decreased from 1.5s to 1s", "BUFF"),
+    ("Watchers now can't be activated before the start of the game", "NERF"),
+    ("Ability is moved to the 4th ability slot", "MISC"),       # an ability's key slot is not the map
+])
+def test_terrain_canon(text, tag):
+    assert g._guess_tag(text) == tag
+
+
 def test_creep_level_change_is_misc_not_a_percent_badge():
     assert g._emit_li("Level increased from 5 to 6") == 'W(li("Level increased from 5 to 6", t("MISC")))'
 

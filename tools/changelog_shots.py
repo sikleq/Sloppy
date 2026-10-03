@@ -26,6 +26,10 @@ PAD = 6
 #   scope = None (page) | ("block", "<entity name>") | ("row", "<row text>")
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
+    "2026-10-03_terrain_notes.webp": ("patches/7.41.html", None,
+                                      ['li:has-text("The watcher between the safe lane tier 1")',
+                                       'li:has-text("Tormentor spawns have been positioned closer")'], [], 620,
+                                      {"width": 1400, "settle": 2500}),
     "2026-10-03_terrain_fullscreen.webp": ("terrain_740.html", None, [".terrain-map-pane"],
                                            [".tc-btn-fs", '.tc-fs-bar .tf-chip-btn[data-hl="camps"]'], 720,
                                            {"width": 1400, "wait": 1500, "settle": 1500}),

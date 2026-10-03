@@ -2033,8 +2033,57 @@ def render_iab_card(key):
             f'<div class="properties-pane pane-new">{right}</div></div>')
 
 
+_TERRAIN_SPOTS = None
+
+
+def _terrain_spot_index():
+    """{patch: [(match, [picture file names])]} from data/terrain_spots.json, the pictures numbered in file order the
+    way scripts/gen/terrain_shots.py writes them (icons/terrain/<code>_<i>.webp)."""
+    global _TERRAIN_SPOTS
+    if _TERRAIN_SPOTS is None:
+        root = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+        try:
+            with open(_os.path.join(root, "data", "terrain_spots.json"), encoding="utf-8") as f:
+                raw = _json.load(f)
+        except (OSError, ValueError):
+            raw = {}
+        _TERRAIN_SPOTS = {}
+        for patch, entries in raw.items():
+            if patch.startswith("_"):
+                continue
+            code, i, rows = patch.replace(".", ""), 0, []
+            for e in entries:
+                n = len(e.get("spots", []))
+                names = [f"{code}_{k}.webp" for k in range(i, i + n)
+                         if _os.path.exists(_os.path.join(root, "icons", "terrain", f"{code}_{k}.webp"))]
+                rows.append((e["match"], names))
+                i += n
+            _TERRAIN_SPOTS[patch] = rows
+    return _TERRAIN_SPOTS
+
+
+def terrain_shots_html(patch, text, prefix="../", link=True):
+    """The micro-screenshots of a terrain note (the owner 2026-10-03: the terrain rows were "all under one tag, mush —
+    maybe micro-screenshots"): the old | new map squares around the change, its objects outlined; on a patch page
+    they link to the patch's Terrain page (link=False on the Terrain page itself). '' for any other row."""
+    if not patch or not isinstance(text, str):
+        return ""
+    plain = re.sub(r"<[^>]+>", "", text).strip()
+    for match, names in _terrain_spot_index().get(patch, []):
+        if names and plain.startswith(match):
+            imgs = "".join(f'<img src="{prefix}icons/terrain/{n}" width="242" height="120" alt="" loading="lazy" '
+                           f'decoding="async">' for n in names)
+            if link:
+                imgs = (f'<a href="{prefix}terrain_{patch.replace(".", "")}.html" '
+                        f'title="Old and new map here — open the Terrain page">{imgs}</a>')
+            return f'<span class="tshots">{imgs}</span>'
+    return ""
+
+
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None):
     if isinstance(text, str):
+        # a terrain note's micro-screenshots ride along under its text
+        extra = (extra or "") + terrain_shots_html(_State.current_patch_version, text)
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
         if _State.in_stats_ul:
             _m = _FACET_INNATE_PREFIX_RE.match(text)

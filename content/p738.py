@@ -26,7 +26,7 @@ def build():
     W(li("These streams have a current, starting near the T3 towers (right before the medium camp location), down to the T1 towers (former Twin Gate location)", t("NEW")))
     W(li("Going downstream increases current and max movement speed, while going upstream inflicts no penalty", t("NEW"), extra=inline_note("Streams are separated by two zones: ones with a 'strong current' which provides up to 150 bonus movement speed and ones with a 'moderate current' which provides up to 100 bonus speed. The current is 'strong' from stream beginnings near each base up to the waterfalls near T2 towers. All other stream sections are considered to have a 'moderate current'<br>Bonus value depends on the faced direction, ranging from 100% while going downstream to 0% at 90 degrees")))
     W(li("Radiant and Dire main jungles now also have a stream with moderate current, starting near the small camp close to the mid T1 towers. They join the outer streams, crossing the safelane near the T2 towers", t("NEW")))
-    W(li("Watchers, camps and pathways in the areas have been slightly adjusted to give way for the stream", t("MISC")))
+    W(li("Watchers, camps and pathways in the areas have been slightly adjusted to give way for the stream", t("REWORK")))
     W(ul_close())
 
     W(plain_header("Map Objectives"))
@@ -128,7 +128,7 @@ def build():
     W(ul_open())
     W(li("The region specific map buffs (Mighty Mines, etc.) have been removed", t("DEL")))
     W(li("Corner outposts have been removed", t("DEL")))
-    W(li("The Twin Gates have been repositioned to the corners of the map on a new high ground area near Tormentors", t("MISC")))
+    W(li("The Twin Gates have been repositioned to the corners of the map on a new high ground area near Tormentors", t("REWORK")))
     W(li("Touched up the map in general. Slightly adjusted neutral camps, trees, and cliffs", t("MISC")))
     W(ul_close())
 

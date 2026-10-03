@@ -89,17 +89,17 @@ def build():
     W(ul_close())
     W(subgroup("Towers"))
     W(ul_open())
-    W(li("The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet", t("MISC")))
+    W(li("The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet", t("REWORK")))
     # Checked against the map files (scripts/gen/terrain_audit.py, the owner 2026-10-02): the tower's position is
     # the same in 7.40c and 7.41; it moved 37 units west in 7.40.
-    W(li("Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides of the tower", t("MISC"),
+    W(li("Radiant offlane tier 2 tower has been adjusted slightly to the left, such that creeps do not path on both sides of the tower", t("REWORK"),
          extra=inline_note("In the map file the tower did not move in 7.41: it stands where 7.40 put it, 37 units to the left of its 7.39 spot (7.40: \"Very slightly adjusted ... the position of the Radiant Offlane Tier 2 tower\")")))
     W(ul_close())
     W(subgroup("Camps"))
     W(ul_open())
-    W(li("Radiant safe lane small camp has been slightly moved north away from the lane", t("MISC")))
-    W(li("Radiant safe lane large camp's spawn box has been moved towards the offlane to remove a bad ward location", t("MISC")))
-    W(li("The medium flooded camp near the safe lane tier 2 towers moved closer to the middle of the stream (substantially more for Dire than for Radiant)", t("MISC")))
+    W(li("Radiant safe lane small camp has been slightly moved north away from the lane", t("REWORK")))
+    W(li("Radiant safe lane large camp's spawn box has been moved towards the offlane to remove a bad ward location", t("REWORK")))
+    W(li("The medium flooded camp near the safe lane tier 2 towers moved closer to the middle of the stream (substantially more for Dire than for Radiant)", t("REWORK")))
     W(li("The medium flooded camp near the safe lane tier 2 towers can now only evolve once into a large camp, rather than into an Ancient Camp", t("NERF")))
     W(li("The medium flooded camp near the bounty runes can now evolve twice into an Ancient Camp", t("BUFF")))
     W(li("Ancient neutral camps near stream ends demoted to medium camps and moved slightly towards bases", t("NERF")))
@@ -107,7 +107,7 @@ def build():
     W(ul_close())
     W(subgroup("Watchers"))
     W(ul_open())
-    W(li("The watcher between the safe lane tier 1 tower and the tormentor has been repositioned", t("MISC"),
+    W(li("The watcher between the safe lane tier 1 tower and the tormentor has been repositioned", t("REWORK"),
          extra=inline_note(
              "Tormentor is on the low ground which has three stairs: one leading to the Lotus Pool, one leading to the lane, and one leading to even higher ground area with the Twin Gate."
              "<br>Twin Gate highground area is now smaller and has three stairs: one that leads to new Tormentor area, one that leads back to the lane, and one that goes two levels down straight to the end of the stream."
@@ -116,17 +116,17 @@ def build():
     W(ul_close())
     W(subgroup("Twin Gate"))
     W(ul_open())
-    W(li("Twin Gates slightly moved away from the stairs towards the map border", t("MISC")))
+    W(li("Twin Gates slightly moved away from the stairs towards the map border", t("REWORK")))
     W(ul_close())
     W(subgroup("Tormentor"))
     W(ul_open())
-    W(li("Tormentor spawns have been positioned closer towards Lotus Pools", t("MISC")))
-    W(li("Tormentor spawn areas have been reduced to low ground relative to the lane's level", t("MISC")))
+    W(li("Tormentor spawns have been positioned closer towards Lotus Pools", t("REWORK")))
+    W(li("Tormentor spawn areas have been reduced to low ground relative to the lane's level", t("REWORK")))
     W(ul_close())
     W(subgroup("Other"))
     W(ul_open())
-    W(li("Lotus Pools have been moved slightly closer to their respective offlane tower", t("MISC")))
-    W(li("The ramp leading from the Radiant tier 1 tower to the stream has been decreased in width and moved away from the tower", t("MISC")))
+    W(li("Lotus Pools have been moved slightly closer to their respective offlane tower", t("REWORK")))
+    W(li("The ramp leading from the Radiant tier 1 tower to the stream has been decreased in width and moved away from the tower", t("REWORK")))
     W(ul_close())
     W(plain_header("Mechanics Changes"))
 
