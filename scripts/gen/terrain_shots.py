@@ -4,7 +4,7 @@ old map, added green on the new one, moved yellow on both, changed spawn boxes r
 
 Why (the owner 2026-10-03): the terrain rows were "all under one tag, mush"; "maybe micro-screenshots, tree
 positions — we know now which tree went where". A row of a patch page / Terrain page whose text starts with a spot's
-"match" shows its pictures under a "Show where" button (patch/elements.py terrain_shots_html, builders/terrain.py).
+"match" ends with a "Show" button that opens its pictures (patch/elements.py terrain_shots_html, builders/terrain.py).
 
 Only the note's own objects are outlined (the owner 2026-10-03: "a camps note shows only the camps, not the trees and
 everything else"): `show_keys` takes the first object word of the note (camp, tree, watcher, tower / tier N, lotus,

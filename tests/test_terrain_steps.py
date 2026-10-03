@@ -351,17 +351,28 @@ def test_the_slider_writes_clip_paths_not_an_inherited_property():
 
 def test_a_terrain_note_shows_its_micro_screenshots():
     """The owner 2026-10-03: terrain rows were "all under one tag, mush — maybe micro-screenshots". A row matched in
-    data/terrain_spots.json carries its old | new pictures under a "Show where" button (hidden until pressed, no link
+    data/terrain_spots.json carries its old | new pictures under a "Show" button (hidden until pressed, no link
     to the Terrain page — "View on map" is for that); a click opens the large copy; every picture exists twice."""
     from patch.elements import terrain_shots_html, _terrain_spot_index
     row = "The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet"
     html = terrain_shots_html("7.41", row)
-    assert html.startswith('<span class="tshots-wrap"><button type="button" class="tshots-btn" aria-expanded="false">'
-                           'Show where</button><span class="tshots" hidden>')
+    assert html.startswith('<!--INLINETIP--><button type="button" class="tshots-btn" aria-expanded="false">Show'
+                           '</button><!--/INLINETIP--><span class="tshots" hidden>')
     assert html.count("<img") == 2 and "<a " not in html and 'data-large="../icons/terrain/741_' in html
     assert terrain_shots_html("7.41", "Some row no spot matches") == ""
     li = terrain._change_li(row, "REWORK", None, "7.41")
-    assert '<img src="icons/terrain/741_' in li and 'data-large="icons/terrain/741_' in li and "<a " not in li
+    # "Show" hangs on the row's last word (the owner: "at the end of the line"), the pictures follow the text
+    assert '<span class="li-tail">meet<button type="button" class="tshots-btn"' in li
+    assert '</span></span><span class="tshots" hidden><img src="icons/terrain/741_' in li and "<a " not in li
+    from patch import elements
+    saved = elements._State.current_patch_version
+    elements._State.current_patch_version = "7.41"
+    try:
+        page_li = elements.li(row, '<span class="badge rework" data-tag="rework">REWORK</span>')
+    finally:
+        elements._State.current_patch_version = saved
+    assert 'meet<button type="button" class="tshots-btn"' in page_li
+    assert page_li.index('class="tshots-btn"') < page_li.index('</span><span class="tshots" hidden>')
     for patch, rows in _terrain_spot_index().items():
         for _match, names in rows:
             for n in names:

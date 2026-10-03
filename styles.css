@@ -4240,25 +4240,27 @@ ul.changes {
 }
 /* A terrain note's micro-screenshots (patch/elements.py terrain_shots_html): old | new map around the change, only
    the note's objects outlined; a full-width row of the li's grid under the text (the owner 2026-10-03: terrain rows
-   were "all under one tag, mush"). They wait under "Show where"; a click on a picture opens its large copy
-   (scripts.js "Terrain note pictures"). */
-ul.changes li > .tshots-wrap {
-  grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin: 4px 0 2px;
-}
+   were "all under one tag, mush"). "Show" sits at the end of the note's text (the owner 2026-10-03: "at the end of
+   the line, not on a new line"); the pictures open below in their own rounded box, centred, framed like the item
+   ability cards; a click on a picture opens its large copy (scripts.js "Terrain note pictures"). */
 .tshots-btn {
-  position: relative; padding: 4px 9px 4px 21px; font: inherit; font-size: 12px; line-height: 1.2;
-  color: var(--gold-dim); background: transparent; border: 1px solid rgba(227, 196, 106, 0.28); border-radius: 3px;
-  cursor: pointer; transition: color 0.15s ease, border-color 0.15s ease;
+  position: relative; margin-left: 8px; padding: 1px 7px 1px 17px; font: inherit; font-size: 11.5px;
+  line-height: 1.3; vertical-align: 1px; color: var(--gold-dim); background: transparent;
+  border: 1px solid rgba(227, 196, 106, 0.28); border-radius: 3px; cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 .tshots-btn::before {
-  content: ""; position: absolute; left: 8px; top: 50%; border-left: 5px solid currentColor;
+  content: ""; position: absolute; left: 7px; top: 50%; border-left: 5px solid currentColor;
   border-top: 4px solid transparent; border-bottom: 4px solid transparent;
   transform: translateY(-50%); transition: transform 0.15s ease;
 }
 .tshots-btn[aria-expanded="true"]::before { transform: translateY(-50%) rotate(90deg); }
 .tshots-btn:hover, .tshots-btn:focus-visible { color: var(--gold); border-color: rgba(227, 196, 106, 0.6); }
-.tshots { display: flex; flex-wrap: wrap; gap: 6px; }
-.tshots[hidden] { display: none; }
+ul.changes li > .tshots {
+  grid-column: 1 / -1; justify-self: center; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+  margin: 6px 0 6px; padding: 8px; background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px;
+}
+ul.changes li > .tshots[hidden] { display: none; }
 .tshots img {
   width: 242px; height: 120px; border-radius: 3px; border: 1px solid rgba(227, 196, 106, 0.22);
   background: #080b06; cursor: zoom-in; transition: border-color 0.15s ease;

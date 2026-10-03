@@ -7,7 +7,7 @@
       "title": "Terrain notes you can see",
       "link": "patches/7.41.html",
       "items": [
-        "Every terrain note from 7.38 to 7.41 that can be seen on the map has a “Show where” button: the old and the new map side by side with only the note's own objects outlined — removed red, added green, moved yellow; a click on a picture opens it large",
+        "Every terrain note from 7.38 to 7.41 that can be seen on the map ends with a “Show” button: below it, in their own box, the old and the new map side by side with only the note's own objects outlined — removed red, added green, moved yellow; a click on a picture opens it large",
         "Terrain notes carry real tags instead of MISC almost everywhere: moved or reshaped REWORK, added NEW, removed DEL, a camp's tier BUFF or NERF, fixes MISC"
       ],
       "shots": [

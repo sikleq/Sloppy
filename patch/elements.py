@@ -2065,9 +2065,10 @@ def _terrain_spot_index():
 def terrain_shots_html(patch, text, prefix="../"):
     """The micro-screenshots of a terrain note (the owner 2026-10-03: the terrain rows were "all under one tag, mush —
     maybe micro-screenshots"): the old | new map squares around the change, only the note's own objects outlined.
-    They wait under a "Show where" button (hidden, so the lazy pictures load only when opened), and a click on one
-    opens its large copy (<name>_lg.webp, data-large) over the page — the section's "View on map" button is the way
-    to the Terrain page (the owner 2026-10-03). '' for any other row."""
+    They wait under a "Show" button at the end of the row's text (an INLINETIP, so li() hangs it on the last word
+    like a (?)), the pictures below in their own rounded, centred box (hidden, so the lazy pictures load only when
+    opened); a click on one opens its large copy (<name>_lg.webp, data-large) over the page — the section's "View
+    on map" button is the way to the Terrain page (the owner 2026-10-03). '' for any other row."""
     if not patch or not isinstance(text, str):
         return ""
     plain = re.sub(r"<[^>]+>", "", text).strip()
@@ -2077,8 +2078,8 @@ def terrain_shots_html(patch, text, prefix="../"):
                 f'<img src="{prefix}icons/terrain/{n}" data-large="{prefix}icons/terrain/{n[:-5]}_lg.webp" '
                 f'width="242" height="120" alt="The old and the new map here" loading="lazy" '
                 f'decoding="async">' for n in names)
-            return ('<span class="tshots-wrap"><button type="button" class="tshots-btn" aria-expanded="false">'
-                    f'Show where</button><span class="tshots" hidden>{imgs}</span></span>')
+            return ('<!--INLINETIP--><button type="button" class="tshots-btn" aria-expanded="false">Show</button>'
+                    f'<!--/INLINETIP--><span class="tshots" hidden>{imgs}</span>')
     return ""
 
 

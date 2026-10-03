@@ -7258,8 +7258,8 @@ function ecShopMarkup(panels) {
 })();
 
 // ---------------------------------------------------------------------
-// Terrain note pictures (patch pages + Terrain pages, patch/elements.py terrain_shots_html): "Show where" opens a
-// note's old | new micro-screenshots (hidden until then, so they load on demand); a click on one opens its large copy
+// Terrain note pictures (patch pages + Terrain pages, patch/elements.py terrain_shots_html): "Show" at the end of a
+// note opens its old | new micro-screenshots below (hidden until then, so they load on demand); a click on one opens its large copy
 // (data-large) over the page — Esc or a click closes it (the owner 2026-10-03: "the picture grows in quality, it
 // doesn't take you to Terrain"). Delegated, one listener for every note.
 // ---------------------------------------------------------------------
@@ -7280,10 +7280,11 @@ function ecShopMarkup(panels) {
   document.addEventListener('click', function(ev) {
     const btn = ev.target.closest && ev.target.closest('.tshots-btn');
     if (btn) {
-      const pics = btn.nextElementSibling;
+      const row = btn.closest('li');
+      const pics = row && row.querySelector(':scope > .tshots');
       const open = btn.getAttribute('aria-expanded') !== 'true';
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      btn.textContent = open ? 'Hide' : 'Show where';
+      btn.textContent = open ? 'Hide' : 'Show';
       if (pics) pics.hidden = !open;
       return;
     }

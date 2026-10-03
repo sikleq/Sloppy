@@ -695,11 +695,15 @@ def _change_li(text, tag, note=None, patch=None):
         tags.append("buff")
     elif 'data-overall="nerf"' in overall and "nerf" not in tags:
         tags.append("nerf")
-    if note:
-        # the row's inline note: the (?) popup on its last word, as on the patch page
+    # the row's inline note (?) and its pictures' "Show" button hang on its last word, as on the patch page
+    import re as _re
+    button = "".join(_re.findall(r"<!--INLINETIP-->(.*?)<!--/INLINETIP-->", shots, _re.S))
+    shots = _re.sub(r"<!--INLINETIP-->.*?<!--/INLINETIP-->", "", shots, flags=_re.S)
+    if note or button:
         from patch.elements import info_tip
         head, _sp, last = text.rpartition(" ")
-        text = f'{head}{_sp}<span class="li-tail">{last}{info_tip(note)}</span>'
+        tip = info_tip(note) if note else ""
+        text = f'{head}{_sp}<span class="li-tail">{last}{tip}{button}</span>'
     return (f'<li data-tag="{" ".join(tags)}">{_badge(tag)}'
             f'<span class="row-text">{text}</span>{shots}</li>')
 

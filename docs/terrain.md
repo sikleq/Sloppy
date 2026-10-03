@@ -333,10 +333,12 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   pit, wisdom shrine, outpost); a ground word first (cliff, ramp, stream, path, entrance, areas) → no outlines;
   a spot's `"show": [...]` overrides (3 do: the triangle's cliff + camps, a path cut through trees, the cleared
   Tormentor areas). `patch/elements.py terrain_shots_html` puts them under a matching row — `li()` does it for
-  patch pages, `_change_li` for the Terrain page's own list — folded under a "Show where" button (the owner:
-  "hide them under a button"; `hidden`, so the lazy pictures load only when opened), and a click on a picture
-  opens its large copy (`data-large`) in a lightbox, not the Terrain page ("View on map" in the section header is
-  for that). scripts.js "Terrain note pictures".
+  patch pages, `_change_li` for the Terrain page's own list — folded under a "Show" button at the END of the row's
+  text (an INLINETIP, so it hangs on the last word like a (?); the owner: "hide them under a button", "Show, at the
+  end of the line, not on a new line"); the pictures open below in their own rounded box, centred, framed like the
+  item ability cards (`hidden`, so the lazy pictures load only when opened), and a click on a picture opens its
+  large copy (`data-large`) in a lightbox, not the Terrain page ("View on map" in the section header is for that).
+  scripts.js "Terrain note pictures".
   Not placed: notes the map can't show (watcher rules, camp evolutions, pull timers, fixes) and the doubled 7.38c
   "Several additional tree and visual adjustments". With the shots, the terrain tag canon (docs/agent-rules/
   patch-tags.md): moved / reshaped REWORK, added NEW, removed DEL, demoted NERF, fixes MISC.
