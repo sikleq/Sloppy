@@ -9701,16 +9701,47 @@ li.tsp-hidden { display: none !important; }
   border-radius: 0 !important;
   border-width: 0 !important;
 }
+/* Fullscreen panel beside the map (the owner 2026-10-03: the "Changed in the map file" filters in fullscreen too,
+   "a separate panel that opens and closes, everything neat"): Exit + fold toggle, layers in a grid, the change
+   switches and chips, the mouse hints at the foot. Folded (.tc-fsp-closed) it's a strip with the two buttons. */
+.tc-fs-active .terrain-compare { flex-direction: row; }
 .tc-fs-active .tc-fs-bar {
+  order: -1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 6px 12px;
+  flex-direction: column;
+  gap: 8px;
+  flex: 0 0 236px;
+  width: 236px;
+  padding: 10px;
+  overflow-y: auto;
   background: rgba(6, 8, 5, 0.96);
-  border-top: 1px solid rgba(227,196,106,.18);
-  flex-shrink: 0;
+  border-right: 1px solid rgba(227,196,106,.18);
+}
+.tc-fsp-head { display: flex; justify-content: space-between; gap: 6px; }
+.tc-fsp-body { display: flex; flex-direction: column; gap: 8px; flex: 1 1 auto; }
+.tc-fsp-title {
+  margin-top: 4px; padding-bottom: 3px; font-size: 11px; font-weight: 700; letter-spacing: 0.6px;
+  text-transform: uppercase; color: var(--text-main); border-bottom: 1px solid var(--bg-panel-4);
+}
+.tc-fsp-layers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.tc-fsp-layers .tc-btn { width: 100%; }
+.tc-fsp-kinds { display: flex; flex-wrap: wrap; gap: 4px; }
+.tc-fsp-chips { display: flex; flex-direction: column; gap: 4px; }
+.tc-fsp-chips .tf-chip { justify-content: flex-start; }
+.tc-fsp-hints { margin-top: auto; padding-top: 6px; display: flex; gap: 12px; }
+.tc-fsp-toggle svg { transition: transform 0.15s ease; }
+.tc-fs-active .terrain-compare.tc-fsp-closed .tc-fs-bar { flex-basis: 48px; width: 48px; padding: 10px 6px; }
+.tc-fsp-closed .tc-fsp-body, .tc-fsp-closed .tc-fsp-label { display: none; }
+.tc-fsp-closed .tc-fsp-head { flex-direction: column; align-items: center; }
+.tc-fsp-closed .tc-fsp-toggle svg { transform: rotate(180deg); }
+@media (max-width: 720px) {          /* a phone: the panel under the map, folding to a row */
+  .tc-fs-active .terrain-compare { flex-direction: column; }
+  .tc-fs-active .tc-fs-bar { order: 2; flex: 0 0 auto; width: auto; max-height: 42vh; border-right: 0;
+    border-top: 1px solid rgba(227,196,106,.18); }
+  .tc-fs-active .terrain-compare.tc-fsp-closed .tc-fs-bar { flex-basis: auto; width: auto; }
+  .tc-fsp-closed .tc-fsp-head { flex-direction: row; }
+  .tc-fsp-toggle svg { transform: rotate(-90deg); }
+  .tc-fsp-closed .tc-fsp-toggle svg { transform: rotate(90deg); }
 }
 .tc-fs-hint {
   display: inline-flex;

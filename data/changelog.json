@@ -9,10 +9,12 @@
       "items": [
         "Press a chip under the list: what was removed is outlined red on the old map, what was added green on the new map, what moved yellow on both — where it stood and where it stands",
         "Each outline takes its object's own shape — a square round a tree or a camp — and shows with that object's map layer, which the chip turns on",
-        "Switches by the heading show only what moved, what was removed or what was added; changed no-ward ground is filled red or green instead"
+        "Switches by the heading show only what moved, what was removed or what was added; changed no-ward ground is filled red or green instead",
+        "In fullscreen the controls sit in a panel beside the map that folds away: the layers, the switches and the chips"
       ],
       "shots": [
-        "icons/changelog/2026-10-03_terrain_outlines.webp"
+        "icons/changelog/2026-10-03_terrain_outlines.webp",
+        "icons/changelog/2026-10-03_terrain_fullscreen.webp"
       ]
     },
     {

@@ -300,6 +300,22 @@ def test_an_all_layers_button_leads_the_layer_toggles():
     assert "data-layer" not in terrain._controls_html(layers=False)[0]
 
 
+def test_fullscreen_has_a_folding_panel_with_the_change_filters():
+    """The owner 2026-10-03: the "Changed in the map file" filters in fullscreen too, in "a separate panel that opens
+    and closes" — the same chips and switches as under the list."""
+    steps = {s.patch: s for s in mv.steps()}
+    html = terrain._build_terrain_page("7.40", list(steps), {}, steps["7.40"], terrain._load_diff("7.40"), "")
+    panel = html.split('<div class="tc-fs-bar"')[1].split('<div class="terrain-list-box">')[0]
+    assert 'class="tc-btn tc-btn-icon tc-fsp-toggle" aria-expanded="true"' in panel
+    assert '<div class="tc-fsp-title">Layers</div>' in panel and 'data-layer="nowards"' in panel
+    assert '<div class="tc-fsp-title">Changed in the map file</div>' in panel
+    facts = html.split('<div class="terrain-facts">')[1]
+    for key in ("trees", "camps", "towers", "nowards"):
+        assert panel.count(f'data-hl="{key}"') == 1 and facts.count(f'data-hl="{key}"') == 1
+    assert panel.count('class="tf-kind"') == facts.count('class="tf-kind"') == 3
+    assert 'class="tc-sep"' not in panel                    # the grid needs no separators
+
+
 def test_the_picker_lists_patches_not_ranges():
     html = terrain._picker_html(["7.39b", "7.39"], "7.39b")
     assert '<a class="version-item current" href="terrain_739b.html"' in html and "–" not in html

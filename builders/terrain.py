@@ -728,7 +728,7 @@ def _changes_html(subpatches, skip_first_head=False):
     return "\n".join(parts)
 
 
-def _controls_html(layers=True):
+def _controls_html(layers=True, changes=("", "")):
     """The control bar ABOVE the map (not overlaid, so it never covers the now
     edge-to-edge map): the Zoom mode button + every overlay-layer toggle (Trees,
     Camps, and the eight point-entity layers). Icon-only square buttons with
@@ -805,26 +805,41 @@ def _controls_html(layers=True):
         'stroke="currentColor" stroke-width="1.2"/>'
         '</svg>'
     )
-    fs_hints = (
-        '<span class="tc-sep" aria-hidden="true"></span>'
-        f'<span class="tc-fs-hint">{_RMB_ICON}Drag</span>'
-        f'<span class="tc-fs-hint">{_MMB_ICON}Zoom</span>'
-    )
-    # Bottom fullscreen bar: Exit + same layer toggles (no Zoom) + hints
-    fs_parts = [
-        f'<button type="button" class="tc-btn tc-btn-fs-exit" aria-pressed="false" '
-        f'aria-label="Exit fullscreen" title="Exit fullscreen (Esc)">'
-        f'{_FS_EXIT_ICON}Exit</button>',
-    ] + (layer_parts if layers else []) + [fs_hints]
-
+    _CHEVRON = ('<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" focusable="false">'
+                '<path d="M9 2.5L4.5 7L9 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" '
+                'stroke-linejoin="round"/></svg>')
+    fs_hints = (f'<span class="tc-fs-hint">{_RMB_ICON}Drag</span>'
+                f'<span class="tc-fs-hint">{_MMB_ICON}Zoom</span>')
+    # Fullscreen: a panel beside the map, not a bar under it (the owner 2026-10-03: the "Changed in the map file"
+    # filters belong in fullscreen too — "a separate panel, left or right, that opens and closes, everything neat"):
+    # Exit + a hide/show toggle, the layer toggles in a grid, the change switches and chips (the same buttons as
+    # under the list — scripts.js keeps both copies in step), the mouse hints at the foot.
+    kinds, chips = changes
+    fs_layers = [p for p in layer_parts if 'class="tc-sep"' not in p]
+    body = []
+    if fs_layers:
+        body.append(f'<div class="tc-fsp-title">Layers</div><div class="tc-fsp-layers">{"".join(fs_layers)}</div>')
+    if chips:
+        body.append('<div class="tc-fsp-title">Changed in the map file</div>'
+                    + (f'<div class="tc-fsp-kinds">{kinds}</div>' if kinds else '')
+                    + f'<div class="tc-fsp-chips">{chips}</div>')
+    body.append(f'<div class="tc-fsp-hints">{fs_hints}</div>')
+    fs_html = (
+        '    <div class="tc-fs-bar" role="region" aria-label="Map controls">\n'
+        '      <div class="tc-fsp-head">'
+        '<button type="button" class="tc-btn tc-btn-fs-exit" aria-pressed="false" '
+        'aria-label="Exit fullscreen" title="Exit fullscreen (Esc)">'
+        f'{_FS_EXIT_ICON}<span class="tc-fsp-label">Exit</span></button>'
+        '<button type="button" class="tc-btn tc-btn-icon tc-fsp-toggle" aria-expanded="true" '
+        f'aria-label="Hide the panel" title="Hide the panel">{_CHEVRON}</button></div>\n'
+        f'      <div class="tc-fsp-body">{"".join(body)}</div>\n'
+        '    </div>\n')
     top_html = ('    <div class="tc-controls-bar">\n      '
                  + "".join(top_parts) + '\n    </div>\n')
-    fs_html = ('    <div class="tc-fs-bar">\n      '
-               + "".join(fs_parts) + '\n    </div>\n')
     return top_html, fs_html
 
 
-def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None):
+def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, changes=("", "")):
     """The before/after swipe stage + magnifier lens for an old→new map pair.
 
     old_ver/new_ver label the two sides; old_pic/new_pic (default: the same) name
@@ -842,7 +857,7 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None):
     empty, the layer-toggle buttons are dropped (Zoom stays)."""
     old_map = f"icons/maps/map_{old_pic or old_ver}.webp"
     new_map = f"icons/maps/map_{new_pic or new_ver}.webp"
-    top_bar, fs_bar = _controls_html(layers=bool(markers_svg))
+    top_bar, fs_bar = _controls_html(layers=bool(markers_svg), changes=changes)
     tiled = _tiled_pictures()
     tiles = "".join(f' data-tiles-{side}="{_TILES_BASE}{v}/"'
                     for side, v in (("old", old_pic or old_ver), ("new", new_pic or new_ver)) if v in tiled)
@@ -962,16 +977,25 @@ def _facts_html(counts, step, diff):
                    f'<div class="tf-tiles">{"".join(tiles)}</div>\n'
                    + (f'<div class="tf-tiles tf-tiles-more">{"".join(more)}</div>\n' if more else ''))
     if step is not None:
-        chips = [_chip(*i) for i in _moved_items(diff)]
-        # switches for what the outlines show (the owner 2026-10-03: "choose what to show: moved, removed or
-        # added"), each in its outline colour; scripts.js hides a kind with .hl-hide-<kind> on the map
-        kinds = "".join(f'<button type="button" class="tf-kind" data-kind="{k}" aria-pressed="true">'
-                        f'<i class="tf-kind-sw tf-kind-{k}"></i>{k}</button>' for k in _hl_kinds(diff))
-        kinds_html = f'<span class="tf-kinds">{kinds}</span>' if chips and kinds else ""
+        kinds, chips = _change_controls(diff)
+        kinds_html = f'<span class="tf-kinds">{kinds}</span>' if kinds else ""
         out.append(f'<div class="tf-head">Changed in the map file{kinds_html}</div>\n'
-                   + (f'<div class="tf-chips">{"".join(chips)}</div>\n' if chips
+                   + (f'<div class="tf-chips">{chips}</div>\n' if chips
                       else '<div class="tf-none">Nothing</div>\n'))
     return f'<div class="terrain-facts">\n{"".join(out)}</div>\n' if out else ""
+
+
+def _change_controls(diff):
+    """(switches, chips): the moved / removed / added switches (the owner 2026-10-03: "choose what to show: moved,
+    removed or added"), each in its outline colour — scripts.js hides a kind with .hl-hide-<kind> on the map — and
+    the "Changed in the map file" chips. Under the list and in the fullscreen panel alike; scripts.js keeps the
+    copies in step."""
+    chips = "".join(_chip(*i) for i in _moved_items(diff))
+    if not chips:
+        return "", ""
+    kinds = "".join(f'<button type="button" class="tf-kind" data-kind="{k}" aria-pressed="true">'
+                    f'<i class="tf-kind-sw tf-kind-{k}"></i>{k}</button>' for k in _hl_kinds(diff))
+    return kinds, chips
 
 
 def _quiet(steps, notes, diffs):
@@ -1079,7 +1103,8 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
                        else ("", {}))
     # no line under the slider (the owner 2026-10-03: remove "Inspired by Leamare and devilesk" — every picture and
     # object list is ours, and the Oldgrowth README credits them)
-    map_inner = (_compare_html(step.before, ver, markers, step.old_pic, step.new_pic) if step
+    map_inner = (_compare_html(step.before, ver, markers, step.old_pic, step.new_pic,
+                               changes=_change_controls(diff) if markers else ("", "")) if step
                  else _fallback_html(ver))
 
     counts_html = _facts_html(counts, step, diff)

@@ -6985,6 +6985,24 @@ function ecShopMarkup(panels) {
     if (fsBtn) fsBtn.addEventListener('click', fsEnter);
     if (fsExitBtn) fsExitBtn.addEventListener('click', fsExit);
 
+    // The fullscreen panel folds to a strip and back (the owner 2026-10-03: "opens and
+    // closes"); the map keeps its place against the canvas centre as the canvas widens.
+    var fspToggle = root.querySelector('.tc-fsp-toggle');
+    if (fspToggle && fsCanvas) fspToggle.addEventListener('click', function() {
+      var before = fsCanvas.getBoundingClientRect().width;
+      var closed = root.classList.toggle('tc-fsp-closed');
+      var label = closed ? 'Show the panel' : 'Hide the panel';
+      fspToggle.setAttribute('aria-expanded', closed ? 'false' : 'true');
+      fspToggle.setAttribute('aria-label', label);
+      fspToggle.title = label;
+      if (!fsActive) return;
+      requestAnimationFrame(function() {
+        var after = fsCanvas.getBoundingClientRect().width;
+        stage.style.left = (fsGetL() + (after - before) / 2) + 'px';
+        updateTiles();
+      });
+    });
+
     if (fsCanvas) {
       fsCanvas.addEventListener('contextmenu', function(e) {
         if (fsActive) e.preventDefault();
@@ -7116,13 +7134,22 @@ function ecShopMarkup(panels) {
   function initChangeHighlights() {
     const root = document.querySelector('.terrain-compare');
     if (!root) return;
+    // the chips and switches exist twice — under the list and in the fullscreen panel — and
+    // every copy of one key / kind shows the same state
     const chips = document.querySelectorAll('.tf-chip-btn[data-hl]');
+    function setAll(selector, on) {
+      document.querySelectorAll(selector).forEach(function(b) {
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
     function layerOn(layer) {
       return !layer || root.classList.contains('show-' + layer);
     }
     function refresh() {
-      const dim = {};
+      const dim = {}, done = {};
       chips.forEach(function(btn) {
+        if (done[btn.dataset.hl]) return;
+        done[btn.dataset.hl] = true;
         const on = btn.getAttribute('aria-pressed') === 'true' && layerOn(btn.dataset.layer);
         root.querySelectorAll('.tm-hl-' + btn.dataset.hl).forEach(function(svg) {
           svg.classList.toggle('tm-hl-on', on);
@@ -7140,7 +7167,7 @@ function ecShopMarkup(panels) {
     chips.forEach(function(btn) {
       btn.addEventListener('click', function() {
         const on = btn.getAttribute('aria-pressed') !== 'true';
-        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        setAll('.tf-chip-btn[data-hl="' + btn.dataset.hl + '"]', on);
         const layer = btn.dataset.layer;
         if (on && !layerOn(layer)) {
           const layerBtn = root.querySelector('.tc-controls-bar .tc-layer-btn[data-layer="' + layer + '"]');
@@ -7154,7 +7181,7 @@ function ecShopMarkup(panels) {
     document.querySelectorAll('.tf-kind[data-kind]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const on = btn.getAttribute('aria-pressed') !== 'true';
-        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        setAll('.tf-kind[data-kind="' + btn.dataset.kind + '"]', on);
         root.classList.toggle('hl-hide-' + btn.dataset.kind, !on);
       });
     });

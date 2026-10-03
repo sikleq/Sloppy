@@ -317,6 +317,14 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `data-tiles-old/-new`; scripts.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
   picture — the old ones next to `.tc-old`, the new ones inside the clipped `.tc-new-layer` — once a picture pixel
   would be drawn bigger than a screen pixel. Pages' 1 GB limit: tiles for the site's maps only.
+- **Fullscreen panel (2026-10-03)** — the owner: the "Changed in the map file" filters belong in fullscreen too,
+  "maybe a separate panel, left or right, that opens and closes … everything neat". The fullscreen bar under the map
+  became `.tc-fs-bar` = a 236 px panel LEFT of the map (`order: -1` in a row flex): Exit + a fold toggle
+  (`.tc-fsp-toggle`), "Layers" as a 5-wide grid of the layer buttons, "Changed in the map file" with the moved /
+  removed / added switches and the chips (the very markup `_change_controls` writes under the list — scripts.js
+  `initChangeHighlights` presses every copy of a key / kind together), the mouse hints at the foot. Folded
+  (`.tc-fsp-closed` on `.terrain-compare`) it's a 48 px strip with the two buttons; the map keeps its place against
+  the canvas centre (`stage.left += Δwidth / 2`). Under 720 px wide it sits under the map instead.
 - **Terrain audit (2026-10-02)** — the owner: "check the changed terrain for other errors too, both what the
   notes say and what actually changed". `scripts/gen/terrain_audit.py [PATCH…] --pictures sfm/final` prints, per
   step, the notes next to every change placed by its nearest landmark (tree clusters, camps moved / re-tiered /
