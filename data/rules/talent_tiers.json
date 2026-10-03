@@ -7803,14 +7803,14 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_jakiro_2",
+     "slug": "special_bonus_unique_jakiro_6",
      "from": 15,
      "to": 25,
      "type": "damage",
      "steps": -2
     },
     {
-     "slug": "special_bonus_unique_jakiro_6",
+     "slug": "special_bonus_unique_jakiro_2",
      "from": 15,
      "to": 25,
      "type": "damage",
@@ -9423,17 +9423,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_attack_range_100",
-     "from": 20,
-     "to": 15,
-     "type": "range",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_silencer_6",
      "from": 20,
      "to": 15,
      "type": "slow",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_attack_range_100",
+     "from": 20,
+     "to": 15,
+     "type": "range",
      "steps": 1
     }
    ]
@@ -11664,17 +11664,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_silencer_4",
-     "from": 20,
-     "to": 15,
-     "type": "range",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_silencer_7",
      "from": 20,
      "to": 15,
      "type": "cooldown",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_silencer_4",
+     "from": 20,
+     "to": 15,
+     "type": "range",
      "steps": 1
     }
    ]
@@ -13691,17 +13691,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_spirit_breaker_shield",
-     "from": 25,
-     "to": 20,
-     "type": "damage",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_spirit_breaker_1",
      "from": 25,
      "to": 20,
      "type": "cooldown",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_spirit_breaker_shield",
+     "from": 25,
+     "to": 20,
+     "type": "damage",
      "steps": 1
     }
    ]
@@ -15897,18 +15897,18 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_earth_spirit_3",
-     "from": 25,
-     "to": 15,
-     "type": "stun",
-     "steps": 2
-    },
-    {
      "slug": "special_bonus_unique_earth_spirit_6",
      "from": 20,
      "to": 15,
      "type": "damage",
      "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_earth_spirit_3",
+     "from": 25,
+     "to": 15,
+     "type": "stun",
+     "steps": 2
     }
    ]
   },
@@ -18901,15 +18901,15 @@
    "share_delta": -0.005,
    "n": [
     395,
-    637
+    644
    ]
   },
   "7.41c|puck|25": {
    "changed": 1,
-   "share_delta": -0.462,
+   "share_delta": -0.466,
    "n": [
     122,
-    287
+    291
    ],
    "moves": [
     {
@@ -18923,26 +18923,26 @@
   },
   "7.41c|tiny|10": {
    "changed": 1,
-   "share_delta": 0.073,
+   "share_delta": 0.075,
    "n": [
     635,
-    1010
+    1027
    ]
   },
   "7.41c|tiny|15": {
    "changed": 1,
-   "share_delta": 0.026,
+   "share_delta": 0.027,
    "n": [
     570,
-    900
+    917
    ]
   },
   "7.41c|largo|20": {
    "changed": 1,
-   "share_delta": 0.558,
+   "share_delta": 0.563,
    "n": [
     84,
-    331
+    337
    ],
    "moves": [
     {
@@ -18956,34 +18956,34 @@
   },
   "7.41c|largo|25": {
    "changed": 1,
-   "share_delta": 0.113,
+   "share_delta": 0.112,
    "n": [
     33,
-    142
+    143
    ]
   },
   "7.41d|winter_wyvern|10": {
    "changed": 1,
-   "share_delta": 0.25,
+   "share_delta": 0.263,
    "n": [
     364,
-    386
+    411
    ]
   },
   "7.41d|kez|10": {
    "changed": 1,
-   "share_delta": 0.034,
+   "share_delta": 0.031,
    "n": [
     573,
-    328
+    335
    ]
   },
   "7.41e|snapfire|15": {
    "changed": 1,
-   "share_delta": -0.131,
+   "share_delta": -0.128,
    "n": [
     919,
-    113
+    114
    ]
   },
   "7.41f|bounty_hunter|20": {
@@ -18999,7 +18999,12 @@
    "changed": 1
   },
   "7.41f|life_stealer|10": {
-   "changed": 1
+   "changed": 1,
+   "share_delta": 0.084,
+   "n": [
+    535,
+    35
+   ]
   }
  }
 }
