@@ -403,6 +403,24 @@ def test_a_note_outlines_only_its_own_objects():
     assert ts.spot_keys({"match": "Cleared up some areas around the Tormentor locations", "show": ["trees"]}) == {"trees"}
 
 
+def test_moved_objects_leave_a_dashed_ghost_on_the_new_side():
+    """The owner 2026-10-03: "on the new map show with a light dashed line where the object was before" — the new
+    side's SVG carries a dashed outline at each moved object's old spot, in the moved group (so the switch hides it);
+    the old side has none."""
+    diff = terrain._load_diff("7.41")
+    svg = terrain._highlights_svg(diff, lambda x, y: (x, y))
+    new_camps = svg.split('tm-hl-camps tm-new"', 1)[1].split("</svg>", 1)[0]
+    old_camps = svg.split('tm-hl-camps tm-old"', 1)[1].split("</svg>", 1)[0]
+    assert 'class="tm-hl-g-moved tm-hl-ghost"' in new_camps and "stroke-dasharray" in new_camps
+    assert "tm-hl-ghost" not in old_camps
+    js_css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    assert ".terrain-compare.hl-hide-moved .tm-hl-g-moved" in js_css
+    sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
+    import terrain_shots as ts
+    src = open(ts.__file__, encoding="utf-8").read()
+    assert 'if side == "new":            # where the moved ones stood' in src and "def _dashed(" in src
+
+
 def test_terrain_lists_keep_valves_order_without_tags():
     """No tags to sort by (2026-10-03): the Terrain page and the patch page keep Valve's order; the page's tag-order
     sorter leaves terrain rows alone."""

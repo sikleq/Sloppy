@@ -363,6 +363,12 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   picture is 726 x 360 (360-px halves, shown 480 x 238 css), the large copy 1450 x 720; every spot's square is
   `ZOOM_OUT` = 1.4 times its `r`; the old half's bottom-left corner holds the whole map (`MINIMAP` = 0.32 of a
   half, from the same full render) with the pictured square framed yellow. ~65 KB / ~190 KB a picture.
+- **Where a moved object stood: a dashed ghost (2026-10-03)** — the owner, on a camp moved a little ("why the yellow
+  squares?"): "on the new map show with a light dashed line where the object was before". The new side draws, at
+  each moved object's OLD spot, the same shape dashed and faint: on the Terrain page `_ghost_outlines` (inside
+  `g.tm-hl-g-moved`, so the "moved" switch hides it), in the pictures `terrain_shots._dashed`. Yellow solid = where
+  it stands on that side; on the new side the dashed one shows where it came from. The "Show" chip is cream — a
+  colour no tag uses (gold "looks like the NEW tag — misleading").
   Not placed: notes the map can't show (watcher rules, camp evolutions, pull timers, fixes) and the doubled 7.38c
   "Several additional tree and visual adjustments". With the shots, the terrain tag canon (docs/agent-rules/
   patch-tags.md): moved / reshaped REWORK, added NEW, removed DEL, demoted NERF, fixes MISC.

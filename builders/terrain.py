@@ -621,6 +621,21 @@ def _cells_fill(kind, cells, proj, colour):
             f'fill-opacity="{_CELL_FILL}"/></g>')
 
 
+def _ghost_outlines(points, shape, stroke):
+    """Where moved objects stood, on the NEW side: a light dashed outline of the same shape (the owner 2026-10-03:
+    "on the new map show with a light dashed line where the object was before"). In g.tm-hl-g-moved, so the
+    "moved" switch hides it with the solid outlines."""
+    if not points:
+        return ""
+    kind, half = shape
+    marks = "".join(
+        f'<rect x="{x - half:.1f}" y="{y - half:.1f}" width="{2 * half:.1f}" height="{2 * half:.1f}"/>'
+        if kind == "rect" else f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{half:.1f}"/>' for x, y in points)
+    return (f'<g class="tm-hl-g-moved tm-hl-ghost" fill="none" stroke="{_HL_COLOUR["moved"]}" '
+            f'stroke-width="{stroke * 0.7:.2f}" stroke-dasharray="{stroke * 2.2:.1f} {stroke * 1.8:.1f}" '
+            f'opacity="0.6">{marks}</g>')
+
+
 def _highlights_svg(diff, proj):
     """Two SVGs per chip, hidden until the chip is pressed (and its layer is on): the old side's — removed red, moved
     yellow where it stood — and the new side's — added green, moved yellow where it stands now; each clipped to its
@@ -640,6 +655,9 @@ def _highlights_svg(diff, proj):
                                               _HL_SHAPE.get(key, _HL_ENT_SHAPE), _HL_COLOUR[k],
                                               _HL_STROKE.get(key, 2.4))
                                for k in _HL_KINDS)
+                if side == "new":
+                    body += _ghost_outlines([proj(*m[0]) for m in g.get("moved", [])],
+                                            _HL_SHAPE.get(key, _HL_ENT_SHAPE), _HL_STROKE.get(key, 2.4))
             if body:
                 out.append(f'<svg class="tc-markers tm-hl tm-hl-{key} tm-{side}" data-layer="{layer}" '
                            f'viewBox="0 0 {MAP_VB} {MAP_VB}" preserveAspectRatio="none" aria-hidden="true">{body}</svg>')

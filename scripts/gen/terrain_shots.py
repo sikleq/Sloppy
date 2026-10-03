@@ -20,6 +20,7 @@ SFM_FINAL to move them), so it runs on the owner's PC; the pictures it writes ar
     python scripts/gen/terrain_shots.py 7.41       # one
 """
 import json
+import math
 import os
 import re
 import sys
@@ -129,6 +130,13 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
         spots = {"moved": [m[0] if side == "old" else m[1] for m in g.get("moved", [])],
                  "removed": g.get("removed", []) if side == "old" else [],
                  "added": g.get("added", []) if side == "new" else []}
+        if side == "new":            # where the moved ones stood: a light dashed outline (the owner 2026-10-03)
+            ghost = ImageDraw.Draw(img, "RGBA")
+            for x, y in (m[0] for m in g.get("moved", [])):
+                if abs(x - cx) <= r + 300 and abs(y - cy) <= r + 300:
+                    X, Y = px(x, y)
+                    s = (SIZE[key] if key in SIZE else CIRCLE) * k
+                    _dashed(ghost, key in SIZE, X, Y, s, COLOUR["moved"] + (175,), max(1, width - 1))
         for kind, pts in spots.items():
             for x, y in pts:
                 if abs(x - cx) > r + 300 or abs(y - cy) > r + 300:
@@ -137,6 +145,25 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
                 s = (SIZE[key] if key in SIZE else CIRCLE) * k
                 shape = d.rectangle if key in SIZE else d.ellipse
                 shape([X - s, Y - s, X + s, Y + s], outline=COLOUR[kind], width=width)
+
+
+def _dashed(d, square, X, Y, s, colour, width):
+    """A dashed square (or circle) of half size s round (X, Y)."""
+    dash, gap = max(3.0, s / 3), max(2.0, s / 5)
+    if not square:
+        steps = max(8, int(2 * math.pi * s / (dash + gap)))
+        for i in range(steps):
+            a = 360 * i / steps
+            d.arc([X - s, Y - s, X + s, Y + s], a, a + 360 * dash / (dash + gap) / steps, fill=colour, width=width)
+        return
+    corners = [(X - s, Y - s), (X + s, Y - s), (X + s, Y + s), (X - s, Y + s)]
+    for (ax, ay), (bx, by) in zip(corners, corners[1:] + corners[:1]):
+        length, t = math.hypot(bx - ax, by - ay), 0.0
+        while t < length:
+            e = min(t + dash, length)
+            d.line([ax + (bx - ax) * t / length, ay + (by - ay) * t / length,
+                    ax + (bx - ax) * e / length, ay + (by - ay) * e / length], fill=colour, width=width)
+            t += dash + gap
 
 
 def _cells(img, cells, px, k, colour, width):

@@ -4244,17 +4244,18 @@ ul.changes {
    no tags, no numbers there — ul.changes li > .badge:first-child gives it the chip column); the pictures open below
    in their own rounded box, centred, framed like the item ability cards, each with a minimap of where it is; a click
    on a picture opens its large copy (scripts.js "Terrain note pictures"). */
+/* Cream, a colour no tag uses (the owner 2026-10-03: the gold one "looks like the NEW tag — misleading") */
 .badge.tshots-btn {
   appearance: none; margin: 0; font-family: var(--font-j10); font-size: 15px; font-weight: 400; line-height: 11px;
-  letter-spacing: 0.8px; text-align: center; color: var(--gold-dim); background: rgba(227, 196, 106, 0.06);
-  border: 1px solid rgba(227, 196, 106, 0.30); cursor: pointer;
+  letter-spacing: 0.8px; text-align: center; color: #e2d8c4; background: rgba(226, 216, 196, 0.07);
+  border: 1px solid rgba(226, 216, 196, 0.34); cursor: pointer;
   transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
 }
 .badge.tshots-btn:hover, .badge.tshots-btn:focus-visible {
-  color: var(--gold); border-color: rgba(227, 196, 106, 0.6); background: rgba(227, 196, 106, 0.12);
+  color: #fff6e6; border-color: rgba(240, 232, 216, 0.7); background: rgba(240, 232, 216, 0.14);
 }
 .badge.tshots-btn[aria-expanded="true"] {
-  color: var(--gold); border-color: rgba(227, 196, 106, 0.55); background: rgba(227, 196, 106, 0.16);
+  color: #fff6e6; border-color: rgba(240, 232, 216, 0.6); background: rgba(240, 232, 216, 0.2);
 }
 ul.changes li > .tshots {
   grid-column: 1 / -1; justify-self: center; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;

@@ -7,7 +7,7 @@
       "title": "Terrain notes you can see",
       "link": "patches/7.41.html",
       "items": [
-        "Every terrain note from 7.38 to 7.41 that can be seen on the map has a “Show” button in its tag's place: below it, in their own box, the old and the new map side by side with only the note's own objects outlined — removed red, added green, moved yellow — and a small minimap marking where it is; a click on a picture opens it large",
+        "Every terrain note from 7.38 to 7.41 that can be seen on the map has a “Show” button in its tag's place: below it, in their own box, the old and the new map side by side with only the note's own objects outlined — removed red, added green, moved yellow, dashed where it stood — and a small minimap marking where it is; a click on a picture opens it large",
         "A note about a camp that didn't move marks it white (7.39 pull timers, 7.41 evolutions), and a camp that changed tier shows the game's camp icons before and after (medium → small, medium → large → ancient); ramps, cliffs and ward spots outline the cells that changed",
         "15 more notes got pictures: 7.38's jungle streams and corner outposts, 7.39's rotated Roshan pit and cliff, 7.40's shrines, defender's gates, bridges and removed trees, 7.41's Tormentor areas and ramp"
       ],
@@ -61,7 +61,7 @@
       "title": "Terrain: what changed, outlined on both maps",
       "link": "terrain_740.html",
       "items": [
-        "Press a chip under the list: what was removed is outlined red on the old map, what was added green on the new map, what moved yellow on both — where it stood and where it stands",
+        "Press a chip under the list: what was removed is outlined red on the old map, what was added green on the new map, what moved yellow on both — where it stood and where it stands; on the new map a light dashed outline shows where a moved one stood",
         "Each outline takes its object's own shape — a square round a tree or a camp — and shows with that object's map layer, which the chip turns on — and off again with the chip, unless the layer was already on",
         "Switches by the heading show only what moved, what was removed or what was added; changed no-ward ground is filled red or green instead",
         "In fullscreen the controls sit in a panel beside the map that folds away: the layers, the switches and the chips"
