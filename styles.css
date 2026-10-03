@@ -10156,7 +10156,12 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 .clog-cat-dynamics     { color: #c29be0; border-color: rgba(190,140,240,.35); background: rgba(190,140,240,.08); }
 .clog-cat-site         { color: #b5b0a5; border-color: rgba(150, 146, 137,.35); background: rgba(150, 146, 137,.08); }
 .clog-items { margin: 5px 0 0; padding-left: var(--clog-text-x); color: var(--text-main); font-size: 13.5px; line-height: 1.55; }
-.clog-items li::marker { color: var(--gold); }
+/* our own bullet, centred on the same x as the "Show N more changes" arrow (the owner 2026-10-03: "the dot isn't
+   in the same place"): both are centred 8.5px left of the text */
+.clog-items { list-style: none; }
+.clog-items li { position: relative; }
+.clog-items li::before { content: ""; position: absolute; left: -11px; top: calc(0.775em - 2.5px); width: 5px;
+  height: 5px; border-radius: 50%; background: var(--gold); }
 /* screenshots: a light gold outline always, brighter on hover; click = lightbox */
 .clog-shots { display: flex; flex-direction: column; gap: 6px; }
 .clog-shot { display: block; width: fit-content; max-width: 100%; cursor: zoom-in; }
@@ -10216,8 +10221,9 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 summary.clog-minor-more { position: relative; padding-left: var(--clog-text-x); font-size: 12.5px;
   color: var(--text-dim, #969289); letter-spacing: .3px; cursor: pointer; list-style: none; display: inline-block; }
 summary.clog-minor-more::-webkit-details-marker { display: none; }
-summary.clog-minor-more::before { content: "\25B8"; position: absolute; left: calc(var(--clog-text-x) - 15px); top: 50%;
-  color: var(--gold-dim); transform: translateY(-50%); transition: transform .15s; }
+summary.clog-minor-more::before { content: "\25B8"; position: absolute; left: calc(var(--clog-text-x) - 13.5px); top: 50%;
+  width: 10px; text-align: center; line-height: 1; color: var(--gold-dim); transform: translateY(-50%);
+  transition: transform .15s; }
 details[open] > summary.clog-minor-more::before { transform: translateY(-50%) rotate(90deg); }
 summary.clog-minor-more:hover { color: var(--text-bright); }
 .clog-more-hide, details[open] > summary .clog-more-show { display: none; }

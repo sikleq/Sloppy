@@ -88,7 +88,11 @@ def test_notes_are_short_and_heroes_are_icons():
     css = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "styles.css"),
                encoding="utf-8").read()
     marker = css.split("summary.clog-minor-more::before {", 1)[1].split("}", 1)[0]
-    assert "position: absolute; left: calc(var(--clog-text-x) - 15px)" in marker
+    # the arrow and our own bullet share one centre, 8.5px left of the text (the owner: "the dot isn't in the
+    # same place"): arrow box 10px from text-x - 13.5px, bullet 5px from -11px
+    assert "position: absolute; left: calc(var(--clog-text-x) - 13.5px)" in marker and "width: 10px" in marker
+    bullet = css.split(".clog-items li::before {", 1)[1].split("}", 1)[0]
+    assert "left: -11px" in bullet and "width: 5px" in bullet and ".clog-items { list-style: none; }" in css
 
 
 def test_fixes_carry_the_bug_marker_and_the_rail_lists_only_features():
