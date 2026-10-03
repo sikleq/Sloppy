@@ -947,19 +947,6 @@ def _quiet(steps, notes, diffs):
     return {p for p in steps if not notes.get(p) and not _moved_summary(diffs.get(p))}
 
 
-_INSPIRED_BY = (("Leamare", "https://github.com/leamare/dota-interactive-map"),
-                ("devilesk", "https://github.com/devilesk/dota-interactive-map"))
-
-
-def _own_pictures():
-    """Versions whose map picture we rendered ourselves (data/map/renders.json)."""
-    try:
-        with open(_os.path.join(_HERE, "data", "map", "renders.json"), encoding="utf-8") as f:
-            return set(_json.load(f)["pictures"])
-    except (OSError, ValueError, KeyError):
-        return set()
-
-
 # Fullscreen zoom tiles (scripts/gen/map_tiles.py): 16 x 16 tiles of an 8192 picture per map file, kept in
 # Oldgrowth and served by its GitHub Pages (the owner 2026-10-02 chose that over growing Sloppy). renders.json
 # "tiles" lists the pictures that have them.
@@ -975,23 +962,6 @@ def _tiled_pictures():
         return set()
 
 
-def _own_entities(ver):
-    """True when the version's map entities are read from the game files by us (data/map/mapdata_<code>.json)."""
-    return _os.path.exists(_os.path.join(_HERE, "data", "map", f"mapdata_{ver.replace('.', '')}.json"))
-
-
-def _source_html(old_ver=None, new_ver=None):
-    """Credit under the slider, kept to the minimum (the owner 2026-10-01): inspired by Leamare's and devilesk's
-    interactive maps; a version whose picture or objects are still Leamare's is named, so the line never claims
-    more than is true."""
-    def link(name, url):
-        return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'
-    names = " and ".join(link(n, u) for n, u in _INSPIRED_BY)
-    vers = [v for v in (old_ver, new_ver) if v]
-    pics = _own_pictures()
-    borrowed = [v for v in vers if v not in pics or not _own_entities(v)]
-    note = f" {', '.join(borrowed)}: Leamare’s map for now." if borrowed else ""
-    return f'<p class="tc-source">Inspired by {names}.{note}</p>\n'
 
 
 def _terrain_filename(ver, patches=None):
@@ -1069,12 +1039,10 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
 
     markers, counts = (_markers_svg(diff, ver.replace(".", "")) if SHOW_MARKERS and diff
                        else ("", {}))
-    if step:
-        map_inner = _compare_html(step.before, ver, markers, step.old_pic, step.new_pic)
-        credit = _source_html(step.old_pic, step.new_pic)
-    else:
-        map_inner = _fallback_html(ver)
-        credit = _source_html()
+    # no line under the slider (the owner 2026-10-03: remove "Inspired by Leamare and devilesk" — every picture and
+    # object list is ours, and the Oldgrowth README credits them)
+    map_inner = (_compare_html(step.before, ver, markers, step.old_pic, step.new_pic) if step
+                 else _fallback_html(ver))
 
     counts_html = _facts_html(counts, step, diff)
     rows = notes.get(ver)
@@ -1103,7 +1071,6 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
         '<div class="terrain-compare-col">\n'
         f'<div class="terrain-map-pane" data-patch="{ver}">\n'
         f'{map_inner}</div>\n'
-        f'{credit}'
         '</div>\n'
         '<div class="terrain-list-box">\n'
         f'<div class="terrain-list-pane" data-patch="{ver}">\n'

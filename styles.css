@@ -9850,21 +9850,6 @@ button.tf-chip-btn[aria-pressed="true"] { border-color: #ff4d4d; background: rgb
 .tm-add-text { color: #6fe089; font-weight: 600; }
 .tm-rem-text { color: #ff7a7a; font-weight: 600; }
 
-/* ---- data-source credit under the slider (centred on the map) ---- */
-.tc-source {
-  margin: 12px 2px 0;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--text-dimmer);
-  text-align: center;
-}
-.tc-source a {
-  color: var(--gold);
-  text-decoration: none;
-  border-bottom: 1px dotted var(--gold-line);
-}
-.tc-source a:hover { border-bottom-color: var(--gold); }
-
 /* ---- patch picker (lives in the change-list heading) + per-patch panes ---- */
 /* The picker reuses the calendar year-picker structure but in the terrain
    page's GOLD theme (the calendar's is blue). It sits inline in the heading as

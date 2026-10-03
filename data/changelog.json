@@ -5,6 +5,12 @@
       "date": "2026-10-03",
       "category": "Materials",
       "minor": true,
+      "title": "Terrain: no line under the slider any more — every map picture and object list on the pages is our own"
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Materials",
+      "minor": true,
       "link": "terrain_741c.html",
       "title": "Terrain: towers, lotus pools, twin gates, Tormentors, runes, outposts, watchers and Roshan pits are counted under the list too, a row below trees and camps; a patch whose notes say nothing about the map no longer says “No terrain changes”"
     },
@@ -113,7 +119,7 @@
       "minor": true,
       "fix": true,
       "link": "terrain_741.html",
-      "title": "Terrain 7.41: the empty corners beyond the map's edge now show plain ground — grass by Radiant, grey ground by Dire, no copied trees or bushes — instead of a murky fade; the credit line is down to “Inspired by Leamare and devilesk”"
+      "title": "Terrain 7.41: the empty corners beyond the map's edge now show plain ground — grass by Radiant, grey ground by Dire, no copied trees or bushes — instead of a murky fade"
     },
     {
       "date": "2026-10-01",
@@ -122,8 +128,7 @@
       "link": "terrain_741.html",
       "items": [
         "The 7.41 map is now our own render, made in Source Filmmaker from the game's files, frame by frame, and stitched by our script",
-        "The empty corners beyond the map's edge fade softly into darkness instead of showing patched-in map",
-        "Idea and inspiration: Leamare and devilesk, linked under the slider; whatever on a page is still borrowed is named there"
+        "The empty corners beyond the map's edge fade softly into darkness instead of showing patched-in map"
       ],
       "shots": [
         "icons/changelog/2026-10-01_terrain_sfm.webp"

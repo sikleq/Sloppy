@@ -222,10 +222,10 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   so a smaller map is drawn smaller, at its true size, and the slider and the object layers stay aligned.
   `stitch_sfm.check_fits` stops a render whose frames don't cover the rectangle or whose objects (`--mapdata`)
   come closer than 300 units to its edge — then the camera path and data/terrain_map_meta.json must grow.
-- Provenance: `data/map/renders.json` lists the versions whose picture is ours; the Terrain page's credit line
-  ("Inspired by Leamare and devilesk", linked to their repositories, kept to the minimum — the owner
-  2026-10-01) names a version whose map is still borrowed (a picture not in renders.json, map objects without
-  `data/map/mapdata_<code>.json`), so it never claims more than is true. Tests: tests/test_terrain_credit.py.
+- Provenance: `data/map/renders.json` lists the versions whose picture is ours (all of them). No credit line
+  under the slider: it read "Inspired by Leamare and devilesk" from 2026-10-01 until the owner asked to remove it
+  on 2026-10-03 — every picture and object list is ours, and the Oldgrowth README credits them. Test:
+  tests/test_terrain_credit.py.
 - Since 2026-10-02 every map file 7.38-7.41f is on the site (`icons/maps/map_<first patch>.webp`, the Oldgrowth
   pictures) and every patch whose file changed has its own Terrain page ("One page per patch" below).
 - Clicking SFM: no command opens SFM or a session, and SFM in Dota has no Python (the script window has no
