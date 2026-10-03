@@ -24,7 +24,10 @@ import os
 import re
 import sys
 
-from PIL import Image, ImageDraw, ImageFont
+try:                      # CI has no Pillow; show_keys / spot_keys are tested there without it
+    from PIL import Image, ImageDraw, ImageFont
+except ImportError:
+    Image = ImageDraw = ImageFont = None
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
@@ -33,7 +36,8 @@ sys.path.insert(0, _HERE)
 from builders import map_versions as mv  # noqa: E402
 import builders.terrain as terrain  # noqa: E402
 
-Image.MAX_IMAGE_PIXELS = None
+if Image:
+    Image.MAX_IMAGE_PIXELS = None
 FINAL = os.environ.get("SFM_FINAL", r"C:\Users\sikle\tools\maprender\sfm\final")
 OUT = os.path.join(_ROOT, "icons", "terrain")
 SPOTS = os.path.join(_ROOT, "data", "terrain_spots.json")
