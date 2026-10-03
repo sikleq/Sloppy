@@ -636,10 +636,22 @@ def _ghost_outlines(points, shape, stroke):
             f'opacity="0.6">{marks}</g>')
 
 
+def _dashed_old(body, mask, stroke):
+    """The old side's outlines cut into dashes (the owner 2026-10-03: "on the old versions let everything be dashed,
+    so dashed means old at a glance"): the merged contours stay one shape, masked by 45° stripes — every edge,
+    straight or round, breaks into dashes about as long as the new side's ghost dashes."""
+    w, gap = round(stroke * 1.6, 2), round(stroke * 1.3, 2)
+    return (f'<defs><pattern id="{mask}-p" patternUnits="userSpaceOnUse" width="{w + gap}" height="{w + gap}" '
+            f'patternTransform="rotate(45)"><rect width="{w}" height="{w + gap}" fill="#fff"/></pattern>'
+            f'<mask id="{mask}" maskUnits="userSpaceOnUse" x="0" y="0" width="{MAP_VB}" height="{MAP_VB}">'
+            f'<rect width="{MAP_VB}" height="{MAP_VB}" fill="url(#{mask}-p)"/></mask></defs>'
+            f'<g class="tm-hl-dashed" mask="url(#{mask})">{body}</g>')
+
+
 def _highlights_svg(diff, proj):
     """Two SVGs per chip, hidden until the chip is pressed (and its layer is on): the old side's — removed red, moved
-    yellow where it stood — and the new side's — added green, moved yellow where it stands now; each clipped to its
-    side of the slider like the layers."""
+    yellow where it stood, all dashed — and the new side's — added green, moved yellow where it stands now, plus a
+    dashed ghost where a moved one stood; each clipped to its side of the slider like the layers."""
     out = []
     for key, g in _changed_points(diff).items():
         layer = _HL_LAYER.get(key, "")
@@ -658,6 +670,8 @@ def _highlights_svg(diff, proj):
                 if side == "new":
                     body += _ghost_outlines([proj(*m[0]) for m in g.get("moved", [])],
                                             _HL_SHAPE.get(key, _HL_ENT_SHAPE), _HL_STROKE.get(key, 2.4))
+                elif body:
+                    body = _dashed_old(body, f"tm-hl-dash-{key}", _HL_STROKE.get(key, 2.4))
             if body:
                 out.append(f'<svg class="tc-markers tm-hl tm-hl-{key} tm-{side}" data-layer="{layer}" '
                            f'viewBox="0 0 {MAP_VB} {MAP_VB}" preserveAspectRatio="none" aria-hidden="true">{body}</svg>')

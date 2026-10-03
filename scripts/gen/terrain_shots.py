@@ -114,7 +114,9 @@ def _crop(full, rect, cx, cy, r, half):
 
 def _outlines(img, cx, cy, r, groups, side, keys, half, width):
     """Draw one side's outlines of the given keys: old side = removed + moved (where it stood), new side = added +
-    moved (where it stands); trees and camps as squares, the round entity markers as circles."""
+    moved (where it stands); trees and camps as squares, the round entity markers as circles. Everything on the old
+    side is dashed, as is the ghost of an old spot on the new side: dashed always means "where it was" (the owner
+    2026-10-03)."""
     d = ImageDraw.Draw(img)
     k = half / (2 * r)
 
@@ -136,6 +138,9 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
                     continue
                 X, Y = px(x, y)
                 s = (SIZE[key] if key in SIZE else CIRCLE) * k
+                if side == "old":
+                    _dashed(d, key in SIZE, X, Y, s, COLOUR[kind], width)
+                    continue
                 shape = d.rectangle if key in SIZE else d.ellipse
                 shape([X - s, Y - s, X + s, Y + s], outline=COLOUR[kind], width=width)
         if side == "new":            # where the moved ones stood: a light dashed outline, on top (the owner 2026-10-03)
@@ -228,9 +233,10 @@ def _tiers(img, chain, half, camp_ys=()):
 
 
 def _boxes(img, cx, cy, r, diff, side, half, width):
-    """Changed camp spawn boxes: the old box red on the old side, the new box green on the new side — and on the new
-    side the old box again, red dashed and faint, so a box that moved a little shows its shift (the owner 2026-10-03:
-    "a camp that moves moves its spawn boxes too — it doesn't show that they moved")."""
+    """Changed camp spawn boxes: the old box red dashed on the old side, the new box green on the new side — and on
+    the new side the old box again, red dashed and faint, so a box that moved a little shows its shift (the owner
+    2026-10-03: "a camp that moves moves its spawn boxes too — it doesn't show that they moved"; "on the old map let
+    everything be dashed")."""
     d = ImageDraw.Draw(img, "RGBA")
     k = half / (2 * r)
     old = {terrain._box_key(b) for b in diff.get("spawnboxesOld", [])}
@@ -243,8 +249,10 @@ def _boxes(img, cx, cy, r, diff, side, half, width):
     other = new if side == "old" else old
     for b in boxes:
         pts = None if terrain._box_key(b) in other else corners(b)
-        if pts:
-            d.line(pts + pts[:1], fill=COLOUR["removed" if side == "old" else "added"], width=width)
+        if pts and side == "old":
+            _dashed_poly(d, pts, COLOUR["removed"], width, max(5.0, half / 36), max(3.0, half / 60))
+        elif pts:
+            d.line(pts + pts[:1], fill=COLOUR["added"], width=width)
     if side == "new":                # on top, so a box moved by a few pixels still shows its old edge
         for b in diff.get("spawnboxesOld", []):
             pts = None if terrain._box_key(b) in new else corners(b)

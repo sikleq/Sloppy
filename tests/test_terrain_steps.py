@@ -4,6 +4,8 @@ import json
 import os
 import sys
 
+import pytest
+
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 import builders.map_versions as mv  # noqa: E402
@@ -422,6 +424,28 @@ def test_moved_objects_leave_a_dashed_ghost_on_the_new_side():
     # a camp's spawn box that moved a little: the old box dashed red on top of the new one (the owner 2026-10-03)
     boxes = src.split("def _boxes(", 1)[1].split("\ndef ", 1)[0]
     assert 'if side == "new":                # on top' in boxes and "_dashed_poly(" in boxes
+
+
+def test_everything_on_the_old_side_is_dashed():
+    """The owner 2026-10-03: "on the old versions let everything be dashed — then, looking at the new map layer, dashed
+    clearly means old". The page masks the old side's merged outlines into dashes (the new side stays solid, with its
+    dashed ghosts); a note picture draws the old side's outline with gaps where the new side's is solid."""
+    svg = terrain._highlights_svg(terrain._load_diff("7.41"), lambda x, y: (x, y))
+    old_camps = svg.split('tm-hl-camps tm-old"', 1)[1].split("</svg>", 1)[0]
+    new_camps = svg.split('tm-hl-camps tm-new"', 1)[1].split("</svg>", 1)[0]
+    assert '<g class="tm-hl-dashed" mask="url(#tm-hl-dash-camps)">' in old_camps
+    assert 'patternTransform="rotate(45)"' in old_camps and "tm-hl-g-moved" in old_camps
+    assert "tm-hl-dashed" not in new_camps
+    pytest.importorskip("PIL")
+    from PIL import Image
+    sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
+    import terrain_shots as ts
+
+    def drawn(side, kind):
+        img = Image.new("RGB", (200, 200))
+        ts._outlines(img, 0, 0, 700, {"camps": {kind: [(0, 0)]}}, side, {"camps"}, 200, 3)
+        return sum(1 for p in img.getdata() if p != (0, 0, 0))
+    assert 0 < drawn("old", "removed") < 0.85 * drawn("new", "added")
 
 
 def test_terrain_lists_keep_valves_order_without_tags():

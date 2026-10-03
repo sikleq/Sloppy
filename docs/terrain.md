@@ -370,7 +370,13 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   it stands on that side; on the new side the dashed one shows where it came from. Spawn boxes too ("a camp that
   moves moves its spawn boxes — it doesn't show they moved"): the pictures draw the old box red dashed over the new
   green one on the new side (`_boxes`; the Terrain page's spawn box layer already overlays old dashed on new). The
-  dashes go on top of the solid outlines, so a shift of a few pixels still shows. The "Show" chip is a cream frame
+  dashes go on top of the solid outlines, so a shift of a few pixels still shows. **Dashed = old, everywhere** (the
+  owner, same day: "on the old versions let everything be dashed — then, looking at the new map layer, dashed clearly
+  means old"): the old side's outlines — removed red, moved yellow where it stood, the old spawn boxes — are dashed
+  too, solid lines are only ever the new state. Pictures: `_outlines` / `_boxes` call `_dashed` / `_dashed_poly` on
+  the old side. Terrain page: `_dashed_old` masks the old SVG's merged contours with 45° stripes (a stroke dash
+  would break the one-contour union of overlapping outlines); no-ward cells stay filled, they are areas, not
+  outlines. The "Show" chip is a cream frame
   with no fill and thin uppercase letters (`--font-ui`) — gold "looks like the NEW tag", a filled one "like MISC".
   Not placed: notes the map can't show (watcher rules, camp evolutions, pull timers, fixes) and the doubled 7.38c
   "Several additional tree and visual adjustments". With the shots, the terrain tag canon (docs/agent-rules/
