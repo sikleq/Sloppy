@@ -130,13 +130,6 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
         spots = {"moved": [m[0] if side == "old" else m[1] for m in g.get("moved", [])],
                  "removed": g.get("removed", []) if side == "old" else [],
                  "added": g.get("added", []) if side == "new" else []}
-        if side == "new":            # where the moved ones stood: a light dashed outline (the owner 2026-10-03)
-            ghost = ImageDraw.Draw(img, "RGBA")
-            for x, y in (m[0] for m in g.get("moved", [])):
-                if abs(x - cx) <= r + 300 and abs(y - cy) <= r + 300:
-                    X, Y = px(x, y)
-                    s = (SIZE[key] if key in SIZE else CIRCLE) * k
-                    _dashed(ghost, key in SIZE, X, Y, s, COLOUR["moved"] + (175,), max(1, width - 1))
         for kind, pts in spots.items():
             for x, y in pts:
                 if abs(x - cx) > r + 300 or abs(y - cy) > r + 300:
@@ -145,6 +138,13 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
                 s = (SIZE[key] if key in SIZE else CIRCLE) * k
                 shape = d.rectangle if key in SIZE else d.ellipse
                 shape([X - s, Y - s, X + s, Y + s], outline=COLOUR[kind], width=width)
+        if side == "new":            # where the moved ones stood: a light dashed outline, on top (the owner 2026-10-03)
+            ghost = ImageDraw.Draw(img, "RGBA")
+            for x, y in (m[0] for m in g.get("moved", [])):
+                if abs(x - cx) <= r + 300 and abs(y - cy) <= r + 300:
+                    X, Y = px(x, y)
+                    s = (SIZE[key] if key in SIZE else CIRCLE) * k
+                    _dashed(ghost, key in SIZE, X, Y, s, COLOUR["moved"] + (200,), max(1, width - 1))
 
 
 def _dashed(d, square, X, Y, s, colour, width):
@@ -156,14 +156,7 @@ def _dashed(d, square, X, Y, s, colour, width):
             a = 360 * i / steps
             d.arc([X - s, Y - s, X + s, Y + s], a, a + 360 * dash / (dash + gap) / steps, fill=colour, width=width)
         return
-    corners = [(X - s, Y - s), (X + s, Y - s), (X + s, Y + s), (X - s, Y + s)]
-    for (ax, ay), (bx, by) in zip(corners, corners[1:] + corners[:1]):
-        length, t = math.hypot(bx - ax, by - ay), 0.0
-        while t < length:
-            e = min(t + dash, length)
-            d.line([ax + (bx - ax) * t / length, ay + (by - ay) * t / length,
-                    ax + (bx - ax) * e / length, ay + (by - ay) * e / length], fill=colour, width=width)
-            t += dash + gap
+    _dashed_poly(d, [(X - s, Y - s), (X + s, Y - s), (X + s, Y + s), (X - s, Y + s)], colour, width, dash, gap)
 
 
 def _cells(img, cells, px, k, colour, width):
@@ -235,19 +228,40 @@ def _tiers(img, chain, half, camp_ys=()):
 
 
 def _boxes(img, cx, cy, r, diff, side, half, width):
-    """Changed camp spawn boxes: the old box red on the old side, the new box green on the new side."""
-    d = ImageDraw.Draw(img)
+    """Changed camp spawn boxes: the old box red on the old side, the new box green on the new side — and on the new
+    side the old box again, red dashed and faint, so a box that moved a little shows its shift (the owner 2026-10-03:
+    "a camp that moves moves its spawn boxes too — it doesn't show that they moved")."""
+    d = ImageDraw.Draw(img, "RGBA")
     k = half / (2 * r)
     old = {terrain._box_key(b) for b in diff.get("spawnboxesOld", [])}
     new = {terrain._box_key(b) for b in diff.get("spawnboxesNew", [])}
+
+    def corners(b):
+        pts = [((p["x"] - (cx - r)) * k, ((cy + r) - p["y"]) * k) for p in b]
+        return pts if all(-half < x < 2 * half and -half < y < 2 * half for x, y in pts) else None
     boxes = diff.get("spawnboxesOld" if side == "old" else "spawnboxesNew", [])
     other = new if side == "old" else old
     for b in boxes:
-        if terrain._box_key(b) in other:
-            continue
-        pts = [((p["x"] - (cx - r)) * k, ((cy + r) - p["y"]) * k) for p in b]
-        if all(-half < x < 2 * half and -half < y < 2 * half for x, y in pts):
+        pts = None if terrain._box_key(b) in other else corners(b)
+        if pts:
             d.line(pts + pts[:1], fill=COLOUR["removed" if side == "old" else "added"], width=width)
+    if side == "new":                # on top, so a box moved by a few pixels still shows its old edge
+        for b in diff.get("spawnboxesOld", []):
+            pts = None if terrain._box_key(b) in new else corners(b)
+            if pts:
+                _dashed_poly(d, pts, COLOUR["removed"] + (220,), max(1, width - 1), max(4.0, half / 45),
+                             max(3.0, half / 70))
+
+
+def _dashed_poly(d, pts, colour, width, dash, gap):
+    """A closed polygon drawn dashed."""
+    for (ax, ay), (bx, by) in zip(pts, pts[1:] + pts[:1]):
+        length, t = math.hypot(bx - ax, by - ay), 0.0
+        while length and t < length:
+            e = min(t + dash, length)
+            d.line([ax + (bx - ax) * t / length, ay + (by - ay) * t / length,
+                    ax + (bx - ax) * e / length, ay + (by - ay) * e / length], fill=colour, width=width)
+            t += dash + gap
 
 
 _MINI = {}

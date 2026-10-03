@@ -419,6 +419,9 @@ def test_moved_objects_leave_a_dashed_ghost_on_the_new_side():
     import terrain_shots as ts
     src = open(ts.__file__, encoding="utf-8").read()
     assert 'if side == "new":            # where the moved ones stood' in src and "def _dashed(" in src
+    # a camp's spawn box that moved a little: the old box dashed red on top of the new one (the owner 2026-10-03)
+    boxes = src.split("def _boxes(", 1)[1].split("\ndef ", 1)[0]
+    assert 'if side == "new":                # on top' in boxes and "_dashed_poly(" in boxes
 
 
 def test_terrain_lists_keep_valves_order_without_tags():

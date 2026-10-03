@@ -367,8 +367,11 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   squares?"): "on the new map show with a light dashed line where the object was before". The new side draws, at
   each moved object's OLD spot, the same shape dashed and faint: on the Terrain page `_ghost_outlines` (inside
   `g.tm-hl-g-moved`, so the "moved" switch hides it), in the pictures `terrain_shots._dashed`. Yellow solid = where
-  it stands on that side; on the new side the dashed one shows where it came from. The "Show" chip is cream — a
-  colour no tag uses (gold "looks like the NEW tag — misleading").
+  it stands on that side; on the new side the dashed one shows where it came from. Spawn boxes too ("a camp that
+  moves moves its spawn boxes — it doesn't show they moved"): the pictures draw the old box red dashed over the new
+  green one on the new side (`_boxes`; the Terrain page's spawn box layer already overlays old dashed on new). The
+  dashes go on top of the solid outlines, so a shift of a few pixels still shows. The "Show" chip is a cream frame
+  with no fill and thin uppercase letters (`--font-ui`) — gold "looks like the NEW tag", a filled one "like MISC".
   Not placed: notes the map can't show (watcher rules, camp evolutions, pull timers, fixes) and the doubled 7.38c
   "Several additional tree and visual adjustments". With the shots, the terrain tag canon (docs/agent-rules/
   patch-tags.md): moved / reshaped REWORK, added NEW, removed DEL, demoted NERF, fixes MISC.
