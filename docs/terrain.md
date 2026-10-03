@@ -350,12 +350,19 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   older pictures keep their numbers. Not shown (no place on the map or no data): rules (stream speed, watcher
   vision, gate mana), "Touched up the map" / "additional adjustments to this area", fixes the files don't record
   (7.39b warding blocks, 7.38c vision rules).
-- **Terrain rows are numbered, not tagged (2026-10-03)** — the owner: "remove the rework / buff tags and just
-  number them, from 1 in each category". `li()` inside a `plain_header(terrain_link=…)` block shows
-  `terrain_num_chip(n)` (`.badge.tnum`, the tag chip's frame) instead of the tag chip, counting from 1 after every
-  `subgroup()`; `_change_li(num=…)` does the same on the Terrain page, which now keeps Valve's order (it sorted by
-  tag) so a row has the same number on both pages. `_sort_changes_li` ranks numbered rows alike, so they stay in
-  order. The tag canon still decides each row's `data-tag` (filters, weights).
+- **Terrain rows: "Show" in the tag's place (2026-10-03)** — the owner first asked for numbers instead of tags,
+  then: "remove the numbers, put the Show button there". `terrain_shots_html` marks its button `<!--TSHOTBTN-->`;
+  `li()` inside a `plain_header(terrain_link=…)` block (`_State.terrain_rows` not None) takes it out
+  (`split_terrain_button`) and makes it the row's chip — `<button class="badge tshots-btn">`, the chip's 64-px
+  frame; a row without pictures gets the empty chip slot. Outside a terrain block the button would hang on the last
+  word. `_change_li` does the same on the Terrain page, which keeps Valve's order now (it sorted by tag); terrain
+  rows carry `class="terrain-row"` and `_sort_changes_li` leaves them in order. The tag canon still decides each
+  row's `data-tag` (filters, weights).
+- **Bigger pictures with a minimap (2026-10-03)** — the owner: "when you show where something is, add a minimap
+  with a mark, otherwise it's unclear; the pictures should be bigger and the camera a bit further out". The row
+  picture is 726 x 360 (360-px halves, shown 480 x 238 css), the large copy 1450 x 720; every spot's square is
+  `ZOOM_OUT` = 1.4 times its `r`; the old half's bottom-left corner holds the whole map (`MINIMAP` = 0.32 of a
+  half, from the same full render) with the pictured square framed yellow. ~65 KB / ~190 KB a picture.
   Not placed: notes the map can't show (watcher rules, camp evolutions, pull timers, fixes) and the doubled 7.38c
   "Several additional tree and visual adjustments". With the shots, the terrain tag canon (docs/agent-rules/
   patch-tags.md): moved / reshaped REWORK, added NEW, removed DEL, demoted NERF, fixes MISC.

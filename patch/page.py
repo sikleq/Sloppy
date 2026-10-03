@@ -305,8 +305,8 @@ def _li_rank(li_html):
     (NEW carries data-tag='buff new', DEL carries 'del nerf'). For numeric
     rows the left-tag is synthesized in li() based on data-overall, so
     'buff-text' / 'nerf-text' covers both textual and numeric BUFF/NERF."""
-    if 'class="badge tnum"' in li_html:
-        return 8          # numbered terrain rows keep Valve's order, so their numbers count up (2026-10-03)
+    if li_html.startswith('<li') and 'terrain-row' in li_html[:200]:
+        return 8          # terrain rows show a Show button, not a tag: they keep Valve's order (2026-10-03)
     m = re.search(r'<span class="badge (buff-text|nerf-text|rework|swap|misc|qol|new|del)"', li_html)
     if m:
         kind = m.group(1)

@@ -662,7 +662,7 @@ def _moved_summary(diff):
     return [text(*i) for i in _moved_items(diff)]
 
 
-# The list keeps Valve's order and numbers its rows per category (2026-10-03); the tag still sets data-tag
+# The list keeps Valve's order and shows no tag chips (2026-10-03); the tag still sets each row's data-tag
 _TAG_CLS = {
     "NEW": ("new", "new", ' data-overall="buff"'),
     "REWORK": ("rework", "rework", ""),
@@ -674,15 +674,10 @@ _TAG_CLS = {
 }
 
 
-def _badge(tag):
-    cls, tid, _extra = _TAG_CLS[tag]
-    return f'<span class="badge {cls}" data-tag="{tid}">{tag}</span>'
-
-
-def _change_li(text, tag, note=None, patch=None, num=None):
+def _change_li(text, tag, note=None, patch=None):
     _cls, tid, overall = _TAG_CLS[tag]
-    from patch.elements import terrain_shots_html, terrain_num_chip
-    shots = terrain_shots_html(patch, text, prefix="")
+    from patch.elements import terrain_shots_html, split_terrain_button
+    button, shots = split_terrain_button(terrain_shots_html(patch, text, prefix=""))
     # data-tag carries the primary tag plus its filter-overall (NEW→buff,
     # DEL→nerf) so a future filter surfaces them correctly; dedupe so BUFF/NERF
     # (whose tid already equals the overall) don't repeat.
@@ -691,17 +686,14 @@ def _change_li(text, tag, note=None, patch=None, num=None):
         tags.append("buff")
     elif 'data-overall="nerf"' in overall and "nerf" not in tags:
         tags.append("nerf")
-    # the row's inline note (?) and its pictures' "Show" button hang on its last word, as on the patch page
-    import re as _re
-    button = "".join(_re.findall(r"<!--INLINETIP-->(.*?)<!--/INLINETIP-->", shots, _re.S))
-    shots = _re.sub(r"<!--INLINETIP-->.*?<!--/INLINETIP-->", "", shots, flags=_re.S)
-    if note or button:
+    if note:
+        # the row's inline note: the (?) popup on its last word, as on the patch page
         from patch.elements import info_tip
         head, _sp, last = text.rpartition(" ")
-        tip = info_tip(note) if note else ""
-        text = f'{head}{_sp}<span class="li-tail">{last}{tip}{button}</span>'
-    chip = terrain_num_chip(num) if num else _badge(tag)
-    return (f'<li data-tag="{" ".join(tags)}">{chip}'
+        text = f'{head}{_sp}<span class="li-tail">{last}{info_tip(note)}</span>'
+    # the chip's place holds the pictures' Show button, or stays empty — no tag (the owner 2026-10-03)
+    chip = button or '<span class="row-tag-empty"></span>'
+    return (f'<li class="terrain-row" data-tag="{" ".join(tags)}">{chip}'
             f'<span class="row-text">{text}</span>{shots}</li>')
 
 
@@ -726,10 +718,8 @@ def _changes_html(subpatches, skip_first_head=False):
         for sg, sg_rows in groups.items():
             if sg:
                 parts.append(f'<li class="terrain-subgroup-head">{sg}</li>')
-            # Valve's order, numbered from 1 in each category like the patch page (the owner 2026-10-03: numbers
-            # instead of tags), so a row has the same number on both pages
-            parts.extend(_change_li(text, tag, note, sub_ver, num=k)
-                         for k, (_, text, tag, note) in enumerate(sg_rows, 1))
+            # Valve's order, like the patch page (no tags to sort by since 2026-10-03)
+            parts.extend(_change_li(text, tag, note, sub_ver) for _, text, tag, note in sg_rows)
     return "\n".join(parts)
 
 

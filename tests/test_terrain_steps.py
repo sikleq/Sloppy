@@ -351,28 +351,37 @@ def test_the_slider_writes_clip_paths_not_an_inherited_property():
 
 def test_a_terrain_note_shows_its_micro_screenshots():
     """The owner 2026-10-03: terrain rows were "all under one tag, mush — maybe micro-screenshots". A row matched in
-    data/terrain_spots.json carries its old | new pictures under a "Show" button (hidden until pressed, no link
-    to the Terrain page — "View on map" is for that); a click opens the large copy; every picture exists twice."""
+    data/terrain_spots.json carries its old | new pictures under a "Show" button in its chip place (the owner: no
+    tags, no numbers there), hidden until pressed, no link to the Terrain page — "View on map" is for that; a click
+    opens the large copy; every picture exists twice."""
     from patch.elements import terrain_shots_html, _terrain_spot_index
     row = "The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet"
     html = terrain_shots_html("7.41", row)
-    assert html.startswith('<!--INLINETIP--><button type="button" class="tshots-btn" aria-expanded="false">Show'
-                           '</button><!--/INLINETIP--><span class="tshots" hidden>')
+    btn = '<button type="button" class="badge tshots-btn" aria-expanded="false">Show</button>'
+    assert html.startswith(f'<!--TSHOTBTN-->{btn}<!--/TSHOTBTN--><span class="tshots" hidden>')
     assert html.count("<img") == 2 and "<a " not in html and 'data-large="../icons/terrain/741_' in html
+    assert 'width="480" height="238"' in html
     assert terrain_shots_html("7.41", "Some row no spot matches") == ""
     li = terrain._change_li(row, "REWORK", None, "7.41")
-    # "Show" hangs on the row's last word (the owner: "at the end of the line"), the pictures follow the text
-    assert '<span class="li-tail">meet<button type="button" class="tshots-btn"' in li
-    assert '</span></span><span class="tshots" hidden><img src="icons/terrain/741_' in li and "<a " not in li
+    assert li.startswith(f'<li class="terrain-row" data-tag="rework">{btn}<span class="row-text">')
+    assert '</span><span class="tshots" hidden><img src="icons/terrain/741_' in li and "REWORK" not in li
+    assert terrain._change_li("Watchers now can't be activated", "NERF", None, "7.41").startswith(
+        '<li class="terrain-row" data-tag="nerf"><span class="row-tag-empty"></span>')
     from patch import elements
     saved = elements._State.current_patch_version
     elements._State.current_patch_version = "7.41"
     try:
+        elements.plain_header("Terrain Changes", dynamics=False, terrain_link="7.41")
         page_li = elements.li(row, '<span class="badge rework" data-tag="rework">REWORK</span>')
+        plain_li = elements.li("A rule", '<span class="badge nerf-text" data-tag="nerf">NERF</span>')
+        elements.plain_header("General Changes", dynamics=False)
+        outside = elements.li(row, '<span class="badge rework" data-tag="rework">REWORK</span>')
     finally:
         elements._State.current_patch_version = saved
-    assert 'meet<button type="button" class="tshots-btn"' in page_li
-    assert page_li.index('class="tshots-btn"') < page_li.index('</span><span class="tshots" hidden>')
+    assert 'class="terrain-row"' in page_li and page_li.index(btn) < page_li.index('class="row-text"')
+    assert 'class="badge rework"' not in page_li and 'data-tag="rework"' in page_li
+    assert '<span class="row-tag-empty"></span>' in plain_li and 'class="badge nerf-text"' not in plain_li
+    assert 'class="badge rework"' in outside and "terrain-row" not in outside      # elsewhere: the tag, button at the end
     for patch, rows in _terrain_spot_index().items():
         for _match, names in rows:
             for n in names:
@@ -394,26 +403,14 @@ def test_a_note_outlines_only_its_own_objects():
     assert ts.spot_keys({"match": "Cleared up some areas around the Tormentor locations", "show": ["trees"]}) == {"trees"}
 
 
-def test_terrain_rows_are_numbered_per_category_instead_of_tagged():
-    """The owner 2026-10-03: "remove the rework / buff tags and just number them, from 1 in each category" — on the
-    patch page (li() inside a plain_header(terrain_link=…) block, reset by subgroup()) and on the Terrain page; the
-    row keeps its data-tag for the filters and the weights."""
-    from patch import elements
-    head = elements.plain_header("Terrain Changes", dynamics=False, terrain_link="7.41")
-    assert "terrain-jump-btn" in head
-    rows = [elements.li("Some note", '<span class="badge rework" data-tag="rework">REWORK</span>') for _ in range(2)]
-    elements.subgroup("Camps")
-    rows.append(elements.li("Another", '<span class="badge new" data-tag="new">NEW</span>'))
-    assert ['<span class="badge tnum">1</span>' in rows[0], '<span class="badge tnum">2</span>' in rows[1],
-            '<span class="badge tnum">1</span>' in rows[2]] == [True, True, True]
-    assert 'data-tag="rework"' in rows[0] and 'class="badge rework"' not in rows[0]
-    elements.plain_header("General Changes", dynamics=False)
-    assert "tnum" not in elements.li("Elsewhere", '<span class="badge rework" data-tag="rework">REWORK</span>')
+def test_terrain_lists_keep_valves_order_without_tags():
+    """No tags to sort by (2026-10-03): the Terrain page and the patch page keep Valve's order; the page's tag-order
+    sorter leaves terrain rows alone."""
     html = terrain._changes_html([("7.41", [("A", "NERF", "Camps"), ("B", "BUFF", "Camps"), ("C", "REWORK", "Other")])],
                                  skip_first_head=True)
-    import re
-    assert re.findall(r'class="badge tnum">(\d)<', html) == ["1", "2", "1"]
-    assert html.index('row-text">A') < html.index('row-text">B')        # Valve's order, not the tag order
+    assert html.index('row-text">A') < html.index('row-text">B') and "badge nerf" not in html
+    from patch import page
+    assert page._li_rank('<li class="terrain-row" data-tag="buff"><span class="badge-group"></span></li>') == 8
 
 
 def test_note_pictures_mark_camps_and_show_tier_icons():

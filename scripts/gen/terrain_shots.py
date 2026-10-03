@@ -42,9 +42,12 @@ FINAL = os.environ.get("SFM_FINAL", r"C:\Users\sikle\tools\maprender\sfm\final")
 OUT = os.path.join(_ROOT, "icons", "terrain")
 SPOTS = os.path.join(_ROOT, "data", "terrain_spots.json")
 UPP = 2.0                 # game units per pixel of the full renders
-# (half px, file suffix, gap, line width, label font px): the row picture (shown at 120 css px: crisp on hi-dpi)
-# and the large one a click opens
-SIZES = ((240, "", 4, 2, 14), (600, "_lg", 8, 4, 26))
+# (half px, file suffix, gap, line width, label font px): the row picture (shown at 240 css px a half) and the large
+# one a click opens. The owner 2026-10-03: "the pictures should be bigger and the camera a bit further out" —
+# every spot's square is ZOOM_OUT times wider than its r says, and a minimap shows where it is.
+SIZES = ((360, "", 6, 3, 20), (720, "_lg", 10, 5, 32))
+ZOOM_OUT = 1.4
+MINIMAP = 0.32                # minimap side, share of a half
 COLOUR = {"removed": (255, 77, 77), "added": (93, 255, 138), "moved": (255, 210, 63)}
 MARK = (240, 240, 240)       # "here": an unchanged camp a note is about (evolutions, pull timers)
 # camp tier icons for "tiers" (the owner 2026-10-03: "a demoted camp's pictures get the camp icons, before / after")
@@ -220,6 +223,35 @@ def _boxes(img, cx, cy, r, diff, side, half, width):
             d.line(pts + pts[:1], fill=COLOUR["removed" if side == "old" else "added"], width=width)
 
 
+_MINI = {}
+
+
+def _minimap(img, full, rect, cx, cy, r, half):
+    """The whole map, small, in the bottom-left corner of the old half, the pictured square framed on it (the owner
+    2026-10-03: "when you show where something is, add a minimap with a mark, otherwise it's unclear")."""
+    x0, x1, yb, yt = rect
+    side = round(half * MINIMAP)
+    key = (id(full), side)
+    if key not in _MINI:
+        _MINI[key] = full.resize((side, round(side * (yt - yb) / (x1 - x0))), Image.LANCZOS)
+    mini = _MINI[key].copy()
+    mw, mh = mini.size
+    d = ImageDraw.Draw(mini)
+    fx, fy = mw / (x1 - x0), mh / (yt - yb)
+    left, right = (cx - r - x0) * fx, (cx + r - x0) * fx
+    top, bottom = (yt - (cy + r)) * fy, (yt - (cy - r)) * fy
+    grow = max(0, 7 - (right - left)) / 2              # a tiny square still shows as a frame
+    left, right, top, bottom = left - grow, right + grow, top - grow, bottom + grow
+    d.rectangle([left - 1, top - 1, right + 1, bottom + 1], outline=(0, 0, 0), width=2)
+    d.rectangle([left, top, right, bottom], outline=(255, 210, 63), width=max(2, side // 60))
+    m = max(4, half // 40)
+    pos = (m, half - mh - m)
+    plate = ImageDraw.Draw(img, "RGBA")
+    plate.rectangle([pos[0] - 2, pos[1] - 2, pos[0] + mw + 1, pos[1] + mh + 1], fill=(20, 16, 9, 230),
+                    outline=(227, 196, 106, 170))
+    img.paste(mini, pos)
+
+
 def _label(img, text, font):
     d = ImageDraw.Draw(img, "RGBA")
     w = d.textlength(text, font=font)
@@ -242,6 +274,8 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size):
         _outlines(img, cx, cy, r, groups, side, keys, half, width)
         ys = _marks(img, cx, cy, r, ver, entry.get("mark", []), half, width)
         _tiers(img, entry.get("tiers", {}).get(side), half, ys)
+        if side == "old":
+            _minimap(img, fulls[ver], rect, cx, cy, r, half)
         _label(img, label, font)
         halves.append(img)
     sheet = Image.new("RGB", (2 * half + gap, half), (8, 11, 6))
@@ -261,7 +295,7 @@ def make(patch, entries, maps, steps):
     os.makedirs(OUT, exist_ok=True)
     i = 0
     for e in entries:
-        r = e.get("r", 700)
+        r = round(e.get("r", 700) * ZOOM_OUT)
         for cx, cy in e["spots"]:
             for size in SIZES:
                 sheet = _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, e, size)

@@ -335,7 +335,7 @@ def _open_block(extra_cls='', extra_attrs=''):
     _flush_rework()                                       # ... and its REWORK rows (signal R)
     pre = _close_ability_block()
     _State.new_mech_header = _State.new_mech = False     # a new block ends any "new mechanic" run
-    _State.terrain_rows = None                            # ... and any numbered terrain list
+    _State.terrain_rows = None                            # ... and any terrain block
     cls = 'entity-block' + ((' ' + extra_cls) if extra_cls else '')
     s = (pre + ('</div>\n' if _State.block_open else '')
          + f'<div class="{cls}"{extra_attrs}>\n')
@@ -605,8 +605,8 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
     extra_cls = ' label-only' if sublabel else ''
     head = _open_block(extra_cls)
     if terrain_link:
-        # terrain rows are numbered per category instead of tagged (the owner 2026-10-03: "remove the
-        # rework / buff tags and just number them, from 1 in each category"); data-tag stays for filters / weights
+        # terrain rows show their pictures' Show button in the chip's place, no tag (the owner 2026-10-03);
+        # data-tag stays for the filters / weights
         _State.terrain_rows = 0
     _State.new_mech_header = _State.new_mech = bool(new)
     _State.new_mech_tag = _mech_tag(new)
@@ -827,8 +827,6 @@ def subgroup(title, new=None):
     NEW rows of its lists without chips). Without it the subgroup inherits the header's state."""
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
-    if _State.terrain_rows is not None:
-        _State.terrain_rows = 0                           # each terrain category counts from 1
     _State.new_mech = bool(new) or _State.new_mech_header
     if new:
         _State.new_mech_tag = _mech_tag(new)
@@ -2069,18 +2067,26 @@ def _terrain_spot_index():
     return _TERRAIN_SPOTS
 
 
-def terrain_num_chip(n):
-    """A terrain row's chip: its number in its category, in the tag chip's frame (the owner 2026-10-03)."""
-    return f'<span class="badge tnum">{n}</span>'
+_TSHOT_BTN_RE = re.compile(r"<!--TSHOTBTN-->(.*?)<!--/TSHOTBTN-->", re.S)
+TSHOT_W, TSHOT_H = 480, 238        # a note picture's css size (files: 360-px halves + a 6-px gap, 726 x 360)
+
+
+def split_terrain_button(extra):
+    """(the pictures' Show button or '', extra without it) — a terrain row puts the button in its chip's place."""
+    if not isinstance(extra, str):
+        return "", extra
+    found = _TSHOT_BTN_RE.findall(extra)
+    return "".join(found), _TSHOT_BTN_RE.sub("", extra)
 
 
 def terrain_shots_html(patch, text, prefix="../"):
     """The micro-screenshots of a terrain note (the owner 2026-10-03: the terrain rows were "all under one tag, mush —
     maybe micro-screenshots"): the old | new map squares around the change, only the note's own objects outlined.
-    They wait under a "Show" button at the end of the row's text (an INLINETIP, so li() hangs it on the last word
-    like a (?)), the pictures below in their own rounded, centred box (hidden, so the lazy pictures load only when
-    opened); a click on one opens its large copy (<name>_lg.webp, data-large) over the page — the section's "View
-    on map" button is the way to the Terrain page (the owner 2026-10-03). '' for any other row."""
+    They wait under a "Show" button in the row's chip place (the owner 2026-10-03: "remove the numbers that replaced
+    the tags, put the Show button there" — marked TSHOTBTN, li() / _change_li take it out), the pictures below in
+    their own rounded, centred box (hidden, so the lazy pictures load only when opened); a click on one opens its
+    large copy (<name>_lg.webp, data-large) over the page — the section's "View on map" button is the way to the
+    Terrain page. '' for any other row."""
     if not patch or not isinstance(text, str):
         return ""
     plain = re.sub(r"<[^>]+>", "", text).strip()
@@ -2088,10 +2094,10 @@ def terrain_shots_html(patch, text, prefix="../"):
         if names and plain.startswith(match):
             imgs = "".join(
                 f'<img src="{prefix}icons/terrain/{n}" data-large="{prefix}icons/terrain/{n[:-5]}_lg.webp" '
-                f'width="242" height="120" alt="The old and the new map here" loading="lazy" '
+                f'width="{TSHOT_W}" height="{TSHOT_H}" alt="The old and the new map here" loading="lazy" '
                 f'decoding="async">' for n in names)
-            return ('<!--INLINETIP--><button type="button" class="tshots-btn" aria-expanded="false">Show</button>'
-                    f'<!--/INLINETIP--><span class="tshots" hidden>{imgs}</span>')
+            return ('<!--TSHOTBTN--><button type="button" class="badge tshots-btn" aria-expanded="false">Show'
+                    f'</button><!--/TSHOTBTN--><span class="tshots" hidden>{imgs}</span>')
     return ""
 
 
@@ -2172,11 +2178,15 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     else:
         left_tag = '<span class="row-tag-empty"></span>'
         rest = badge
+    terrain_btn, extra = split_terrain_button(extra)
     if _State.terrain_rows is not None and isinstance(text, str):
-        _State.terrain_rows += 1
-        left_tag = terrain_num_chip(_State.terrain_rows)
+        # a terrain row's chip place holds its pictures' Show button, or stays empty (the owner 2026-10-03: no tag,
+        # no number); data-tag keeps the tag for the filters / weights
+        left_tag = terrain_btn or '<span class="row-tag-empty"></span>'
+    elif terrain_btn:
+        extra = f"<!--INLINETIP-->{terrain_btn}<!--/INLINETIP-->{extra}"      # outside a terrain block: line end
 
-    classes = []
+    classes = ["terrain-row"] if _State.terrain_rows is not None and isinstance(text, str) else []
     marker = ""
     text_noclass = (re.sub(r'<!--TIP-->.*?<!--/TIP-->', '', text, flags=re.S)
                     if isinstance(text, str) else text)
