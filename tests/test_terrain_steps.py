@@ -106,7 +106,7 @@ def test_a_patch_without_terrain_notes_says_nothing_and_shows_what_moved():
     html = _page("7.38b")
     assert "Patch notes" not in html and "No terrain changes" not in html and "terrain-notes-none" not in html
     assert '<ul class="changes terrain-list">\n\n</ul>\n<div class="terrain-facts">' in html
-    assert '<div class="tf-head">Changed in the map file</div>' in html
+    assert '<div class="tf-head">Changed in the map file<span class="tf-kinds">' in html
     assert ('alt="Trees" width="16" height="16"><span class="tm-add-text">+2</span> '
             '<span class="tm-rem-text">−11</span></button>') in html
     assert 'src="icons/maps/map_7.38.webp' in html and 'src="icons/maps/map_7.38b.webp' in html
@@ -119,13 +119,16 @@ def _quiet_set():
     return steps, notes, terrain._quiet(steps, notes, {p: terrain._load_diff(p) for p in steps})
 
 
-def test_a_patch_that_changed_nothing_gets_no_page():
-    """The owner: "if nothing changed in a patch, there's nothing to compare" — no object moved, no notes."""
+def test_a_patch_that_changed_nothing_gets_no_page_but_the_newest_does():
+    """The owner: "if nothing changed in a patch, there's nothing to compare" — no object moved, no notes. 2026-10-03:
+    the newest patch keeps its page all the same, "or one could think the patch doesn't exist" (7.41f)."""
     steps, notes, quiet = _quiet_set()
-    assert quiet == {"7.39e", "7.40c", "7.41f"}          # 7.41c-e changed where wards can stand
+    assert quiet == {"7.39e", "7.40c"}                   # 7.41c-e changed where wards can stand
     pages = terrain._pages([p for p in steps if p not in quiet], notes)
-    assert pages == ["7.41e", "7.41d", "7.41c", "7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39",
+    assert pages == ["7.41f", "7.41e", "7.41d", "7.41c", "7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39",
                      "7.38c", "7.38b", "7.38"]
+    html = terrain._build_terrain_page("7.41f", pages, notes, steps["7.41f"], terrain._load_diff("7.41f"), "")
+    assert '<div class="tf-none">Nothing</div>' in html and "NEW &nbsp;7.41f →" in html
 
 
 def test_7_38_has_its_page_and_its_map_notes():
@@ -142,10 +145,10 @@ def test_the_patches_that_changed_nothing_are_not_mentioned():
     """The owner 2026-10-02: "remove 'Unchanged in 7.41f'" — no page and no line about them."""
     steps, notes, quiet = _quiet_set()
     pages = terrain._pages([p for p in steps if p not in quiet], notes)
-    html = terrain._build_terrain_page("7.41e", pages, notes, steps["7.41e"], terrain._load_diff("7.41e"), "")
-    body = html.split('<div class="terrain-wrap">')[1]            # the header's "Patches" tab links 7.41f
-    assert "7.41f" not in body and "Unchanged" not in body
-    assert 'href="terrain_741f.html"' not in html
+    html = terrain._build_terrain_page("7.39d", pages, notes, steps["7.39d"], terrain._load_diff("7.39d"), "")
+    body = html.split('<div class="terrain-wrap">')[1]
+    assert "7.39e" not in body and "Unchanged" not in body
+    assert 'href="terrain_739e.html"' not in html
 
 
 def test_the_facts_read_like_the_list():
@@ -187,34 +190,54 @@ def test_every_kind_of_object_has_a_tile_under_trees_and_camps():
     assert '<div class="tf-name">watchers <span class="tm-rem-text">−4</span></div>' in more    # 7.40: 14 -> 10
 
 
-def _hl(svg, key):
-    return svg.split(f"tm-hl-{key} tm-old")[1].split("</svg>")[0]
+def _hl(svg, key, side="old"):
+    parts = svg.split(f"tm-hl-{key} tm-{side}")
+    return parts[1].split("</svg>")[0] if len(parts) > 1 else ""
 
 
-def test_a_chip_outlines_its_changes_on_the_old_side():
-    """The owner 2026-10-02: pressing a "Changed in the map file" chip outlines the changed places on the old
-    version — not for spawn boxes, the layer already shows them. 2026-10-03: red where something is removed, green
-    where something is added, yellow for a small move (one outline, not "two frames")."""
+def test_a_chip_outlines_removed_on_the_old_map_added_on_the_new_moved_on_both():
+    """The owner 2026-10-02: pressing a "Changed in the map file" chip outlines the changed places — not for spawn
+    boxes, their layer already shows them. 2026-10-03: in the object's own shape (a square like the tree itself),
+    red = removed (old map), green = added (new map), yellow = moved — where it stood on the old map and where it
+    stands on the new one; the chip turns its layer on."""
     diff = terrain._load_diff("7.39b")
     svg, counts = terrain._markers_svg(diff, "739b")
     step = next(s for s in mv.steps() if s.patch == "7.39b")
     html = terrain._facts_html(counts, step, diff)
-    assert 'class="tf-chip tf-chip-btn" data-hl="towers"' in html and 'data-hl="trees"' in html
+    assert 'class="tf-chip tf-chip-btn" data-hl="towers" data-layer="towers"' in html
+    assert 'data-hl="trees" data-layer="trees"' in html
     assert 'alt="Camp spawn boxes"' in html and "data-hl=\"camp" not in html.split('alt="Camp spawn boxes"')[0][-90:]
-    towers = _hl(svg, "towers")                       # 7.39b's offlane tier 2 tower moved a little: one yellow outline
-    assert 'fill="#ffd23f" mask="url(#tm-hl-mask-towers-changed)"' in towers
-    assert "#ff4d4d" not in towers and "#5dff8a" not in towers
-    trees = _hl(svg, "trees")
-    assert trees.count("<circle") == 2 * (38 + 27) and "#ff4d4d" in trees and "#5dff8a" in trees
+    old, new = _hl(svg, "towers", "old"), _hl(svg, "towers", "new")       # the offlane tier 2 tower moved
+    assert 'fill="#ffd23f" mask="url(#tm-hl-mask-towers-old-moved)"' in old and "<circle" in old
+    assert 'fill="#ffd23f" mask="url(#tm-hl-mask-towers-new-moved)"' in new
+    assert "#ff4d4d" not in old + new and "#5dff8a" not in old + new
+    t_old, t_new = _hl(svg, "trees", "old"), _hl(svg, "trees", "new")
+    assert "<rect" in t_old and "<circle" not in t_old                   # squares, like the trees
+    assert "#ff4d4d" in t_old and "#5dff8a" not in t_old and "#5dff8a" in t_new and "#ff4d4d" not in t_new
+    assert 'data-layer="trees"' in svg.split("tm-hl-trees tm-old")[1][:40]
 
 
-def test_no_ward_cells_added_are_green_and_removed_red():
+def test_moved_removed_added_switches_sit_by_the_heading():
+    """The owner 2026-10-03: "somehow choose what to show: moved, removed or added"."""
+    diff = terrain._load_diff("7.39b")
+    _svg, counts = terrain._markers_svg(diff, "739b")
+    step = next(s for s in mv.steps() if s.patch == "7.39b")
+    html = terrain._facts_html(counts, step, diff)
+    head = html.split('<div class="tf-head">Changed in the map file')[1].split("</div>")[0]
+    assert [k.split('"')[0] for k in head.split('data-kind="')[1:]] == ["moved", "removed", "added"]
+    assert 'aria-pressed="true"' in head and "tf-kind-sw tf-kind-moved" in head
+
+
+def test_no_ward_cells_added_are_green_and_removed_red_filled():
     """The owner 2026-10-03: 7.41d's "+23" no-ward cells were drawn red — "it should be green, since they were
-    added"; 7.41c's 149 cells that turned wardable are the removed ones, red."""
-    added = _hl(terrain._markers_svg(terrain._load_diff("7.41d"), "741d")[0], "nowards")
-    removed = _hl(terrain._markers_svg(terrain._load_diff("7.41c"), "741c")[0], "nowards")
-    assert added.count("<path") == 1 and 'stroke="#5dff8a"' in added
-    assert removed.count("<path") == 1 and 'stroke="#ff4d4d"' in removed
+    added" — and filled half-transparent like the magenta layer, not outlined; 7.41c's 149 cells that turned
+    wardable are the removed ones, red on the old map."""
+    d_svg = terrain._markers_svg(terrain._load_diff("7.41d"), "741d")[0]
+    c_svg = terrain._markers_svg(terrain._load_diff("7.41c"), "741c")[0]
+    added, removed = _hl(d_svg, "nowards", "new"), _hl(c_svg, "nowards", "old")
+    assert 'fill="#5dff8a" fill-opacity="0.55"' in added and added.count("Z") == 23
+    assert 'fill="#ff4d4d" fill-opacity="0.55"' in removed and removed.count("Z") == 149
+    assert _hl(d_svg, "nowards", "old") == "" and _hl(c_svg, "nowards", "new") == ""
 
 
 def test_the_old_map_is_left_of_the_handle_under_its_chip():
@@ -228,18 +251,19 @@ def test_the_old_map_is_left_of_the_handle_under_its_chip():
     assert "clip-path: inset(0 0 0 var(--pos));" in new_layer
 
 
-def test_overlapping_rings_merge_into_one_outline():
-    """The owner 2026-10-03 (a slightly moved object showed "two frames"): each ring is drawn widened by half the
-    stroke and cut by itself narrowed by half the stroke, so two overlapping rings leave one outer contour; ward
-    cells side by side leave only their outer sides."""
-    svg = terrain._ring_union("tm-hl-mask-watchers-changed", [(100, 100), (100, 108)], 19)
+def test_overlapping_outlines_merge_into_one():
+    """The owner 2026-10-03 (a slightly moved object showed "two frames"): each shape is drawn widened by half the
+    stroke and cut by itself narrowed by half the stroke, so overlapping ones leave one outer contour."""
+    svg = terrain._outline_union("tm-hl-mask-w", "moved", [(100, 100), (100, 108)], ("circle", 19), "#ffd23f")
     assert '<circle cx="100" cy="100" r="20.2"/>' in svg and '<circle cx="100" cy="108" r="17.8"/>' in svg
-    assert svg.index("<mask") < svg.index('mask="url(#tm-hl-mask-watchers-changed)"')
-    assert terrain._ring_union("unused", [], 19) == ""
-    removed, added, moved = terrain._small_moves([(0, 0), (500, 500)], [(10, 0), (900, 900)], 38)
-    assert (removed, added, moved) == ([(500, 500)], [(900, 900)], [(0, 0), (10, 0)])
-    path = terrain._cell_outline([(32, 32), (96, 32)], lambda x, y: (x, -y))       # two cells side by side
-    assert path.count("M") == 6                       # 2 tops + 2 bottoms + the two outer ends, not the shared side
+    assert svg.startswith('<g class="tm-hl-g tm-hl-g-moved">')
+    assert svg.index("<mask") < svg.index('mask="url(#tm-hl-mask-w)"')
+    sq = terrain._outline_union("m", "removed", [(10, 10)], ("rect", 5), "#ff4d4d", 2)
+    assert '<rect x="4.0" y="4.0" width="12.0" height="12.0"/>' in sq
+    assert '<rect x="6.0" y="6.0" width="8.0" height="8.0"/>' in sq
+    assert terrain._outline_union("unused", "added", [], ("circle", 19), "#5dff8a") == ""
+    removed, added, moved = terrain._pair_moves([(0, 0), (500, 500)], [(10, 0), (900, 900)], 38)
+    assert (removed, added, moved) == ([(500, 500)], [(900, 900)], [((0, 0), (10, 0))])
 
 
 def test_the_zoom_tiles_are_named_on_the_slider(monkeypatch):

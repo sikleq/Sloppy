@@ -26,8 +26,10 @@ PAD = 6
 #   scope = None (page) | ("block", "<entity name>") | ("row", "<row text>")
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
+    "2026-10-03_terrain_outlines.webp": ("terrain_740.html", None, [".terrain-compare-col"],
+                                         ['.tf-chip-btn[data-hl="trees"]'], 560, {"width": 1400, "wait": 1500, "settle": 2000}),
     "2026-10-02_terrain_rings.webp": ("terrain_740.html", None, [".terrain-compare-col"],
-                                      ['.tf-chip-btn[data-hl="trees"]'], 560, {"width": 1400, "wait": 1500, "settle": 2000}),
+                                      ['.tf-chip-btn[data-hl="camps"]'], 560, {"width": 1400, "wait": 1500, "settle": 2000}),
     "2026-10-02_terrain_nowards.webp": ("terrain_741c.html", None, [".terrain-compare-col"],
                                         ['.tc-layer-btn[data-layer="nowards"]'], 560, {"width": 1400, "wait": 1500}),
     "2026-10-02_terrain_steps.webp": ("terrain_739b.html", None, [".terrain-wrap"], [], 560, {"width": 1400, "wait": 1500}),

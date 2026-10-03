@@ -26,9 +26,11 @@ import tempfile
 
 MAGIC = 0xFADEBEAD
 WALKABLE, NO_WARD, OUT = 1, 16, 4
-# overlay colours (RGBA): a no-ward zone on walkable ground stands out, a cliff/obstacle less, the void least
+# overlay colours (RGBA): a no-ward zone on walkable ground stands out; cliffs/obstacles and the void off the map
+# share one fainter shade — they were 95 / 38 until 2026-10-03, when 7.41d moving the map's edge (670 cliff cells
+# turned "off the map") read to the owner as "it got more transparent, though nothing was added there"
 # magenta: no other layer uses it (Roshan is crimson, Tormentors red, lotus pink, wisdom purple)
-ZONE, BLOCKED, VOID = (235, 80, 255, 175), (235, 80, 255, 95), (235, 80, 255, 38)
+ZONE, BLOCKED, VOID = (235, 80, 255, 175), (235, 80, 255, 60), (235, 80, 255, 60)
 
 
 def parse(raw):

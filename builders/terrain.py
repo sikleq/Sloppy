@@ -511,116 +511,146 @@ def _moved_items(diff):
     return [i for i in out if i]
 
 
-# Chip -> the key of its red rings on the map (scripts.js toggles .tm-hl-<key>); spawn boxes have none — the
+# Chip -> the key of its outlines on the map (scripts.js toggles .tm-hl-<key>); spawn boxes have none — the
 # Spawn Boxes layer already marks a changed box (the owner 2026-10-02).
 _HL_KEY = {"trees": "trees", "camps": "camps", "camp tiers": "camptiers", "no-ward cells": "nowards",
            **{name: key for key, name in _MOVED_NAMES.items()}}
-_HL_RING = {"trees": 6, "camps": 22, "camptiers": 26}      # ring radius, viewBox units (entities: 19)
-# the outline's colour says what happened there (the owner 2026-10-03, on 7.41d's "+23" no-ward cells drawn red:
-# "it should be green, since they were added") — like the chip's own +green / −red numbers
-_HL_RED = "#ff4d4d"       # removed: only on the old map
-_HL_GREEN = "#5dff8a"     # added: only on the new map
-_HL_YELLOW = "#ffd23f"    # changed in place: moved a little (its two rings would overlap), re-tiered
-_HL_COLOUR = {"removed": _HL_RED, "added": _HL_GREEN, "changed": _HL_YELLOW}
+# The map layer each chip's outlines belong to: pressing the chip turns it on, and the outlines show only while it
+# is on (the owner 2026-10-03: "taking the Trees filter in the bar into account"). Wisdom runes have no layer.
+_HL_LAYER = {"trees": "trees", "camps": "camps", "camptiers": "camps", "nowards": "nowards",
+             **{key: key for key, _label, _icon, _colour in _ENTITY_LAYERS}}
+# The outline follows the object's own marker (the owner 2026-10-03: "a square outline, like the tree itself"):
+# squares round trees and camp icons, circles round the round entity markers — (shape, half size in viewBox units)
+_HL_SHAPE = {"trees": ("rect", _TREE_SIDE / 2 + 2.4), "camps": ("rect", _CAMP_SIDE / 2 + 3),
+             "camptiers": ("rect", _CAMP_SIDE / 2 + 3)}
+_HL_ENT_SHAPE = ("circle", _ENT_DISC + 3)
+_HL_STROKE = {"trees": 1.6}           # outline width, viewBox units (others: 2.4)
+# Colour = what happened (the owner 2026-10-03, on 7.41d's "+23" no-ward cells drawn red: "it should be green,
+# since they were added"), like the chip's own +green / −red: removed on the old map, added on the new one, moved
+# on both — where it stood and where it stands (the owner: "a moved tree outlined yellow on the old map, and in its
+# new spot, yellow too, when you slide to the new map")
+_HL_RED = "#ff4d4d"
+_HL_GREEN = "#5dff8a"
+_HL_YELLOW = "#ffd23f"
+_HL_COLOUR = {"moved": _HL_YELLOW, "removed": _HL_RED, "added": _HL_GREEN}
+_HL_KINDS = ("moved", "removed", "added")
+# a removed and an added spot this close (game units), each other's nearest, are one object moved
+_MOVE_REACH = {"trees": 200, "camps": _SAME_CAMP}
+_MOVE_REACH_ENT = 1500
+_CELL = 64                            # gridnav cell, game units
+_CELL_FILL = 0.55                     # changed ward cells: filled like the magenta layer, red / green
+
+
+def _pair_moves(removed, added, reach):
+    """(removed left, added left, [(old spot, new spot)]): a removed and an added spot that are each other's nearest
+    and closer than `reach` are one object that moved."""
+    def d2(a, b):
+        return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+    pairs, used_r, used_a = [], set(), set()
+    for i, r in enumerate(removed):
+        if not added:
+            break
+        j = min(range(len(added)), key=lambda k: d2(r, added[k]))
+        back = min(range(len(removed)), key=lambda k: d2(removed[k], added[j]))
+        if back == i and j not in used_a and d2(r, added[j]) < reach ** 2:
+            used_r.add(i)
+            used_a.add(j)
+            pairs.append((r, added[j]))
+    return ([p for i, p in enumerate(removed) if i not in used_r],
+            [p for j, p in enumerate(added) if j not in used_a], pairs)
 
 
 def _changed_points(diff):
-    """{highlight key: {"removed" / "added" / "changed": [(x, y) world]}} — every place a chip's change touches:
-    what's only on the old map (removed), only on the new one (added), the re-tiered camps (changed); for the ward
-    cells, those that turned wardable (no-ward ground removed) and those that turned no-ward (added)."""
-    def split(old, new):
+    """{highlight key: {"removed": [(x, y)], "added": [(x, y)], "moved": [((x, y) old, (x, y) new)]}} in world units
+    — what's only on the old map, only on the new one, and what moved (a removed + an added spot paired by
+    `_pair_moves`; a re-tiered camp counts as moved too: changed in place). Ward cells: removed = no-ward ground that
+    turned wardable, added = ground that turned no-ward."""
+    def split(old, new, reach):
         a, b = {tuple(p) for p in old}, {tuple(p) for p in new}
-        return {"removed": sorted(a - b), "added": sorted(b - a)}
-    out = {"trees": split(diff.get("treesOld", []), diff.get("treesNew", [])),
-           "camps": split([(c["x"], c["y"]) for c in diff.get("campsOld", [])],
-                          [(c["x"], c["y"]) for c in diff.get("campsNew", [])]),
-           "camptiers": {"changed": [(o["x"], o["y"]) for o, _c in _retiered_pairs(diff.get("campsOld", []),
-                                                                                  diff.get("campsNew", []))]}}
+        removed, added, moved = _pair_moves(sorted(a - b), sorted(b - a), reach)
+        return {"removed": removed, "added": added, "moved": moved}
+    camps_old, camps_new = diff.get("campsOld", []), diff.get("campsNew", [])
+    out = {"trees": split(diff.get("treesOld", []), diff.get("treesNew", []), _MOVE_REACH["trees"]),
+           "camps": split([(c["x"], c["y"]) for c in camps_old], [(c["x"], c["y"]) for c in camps_new],
+                          _MOVE_REACH["camps"]),
+           "camptiers": {"moved": [((o["x"], o["y"]), (c["x"], c["y"]))
+                                   for o, c in _retiered_pairs(camps_old, camps_new)]}}
     for key in _MOVED_NAMES:
         ed = diff.get("entities", {}).get(key)
         if ed:
-            out[key] = split(ed.get("old", []), ed.get("new", []))
+            out[key] = split(ed.get("old", []), ed.get("new", []), _MOVE_REACH_ENT)
     w = diff.get("wards") or {}
     out["nowards"] = {"removed": [tuple(p) for p in w.get("toWardable", [])],
                       "added": [tuple(p) for p in w.get("toNoWard", [])]}
     return {k: v for k, v in out.items() if any(v.values())}
 
 
-def _small_moves(removed, added, reach):
-    """Pairs of a removed and an added spot (projected) that are each other's nearest and closer than `reach` — one
-    object moved a little. Returns (removed left, added left, the paired spots)."""
-    def d2(a, b):
-        return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
-    paired_r, paired_a = set(), set()
-    for i, r in enumerate(removed):
-        if not added:
-            break
-        j = min(range(len(added)), key=lambda k: d2(r, added[k]))
-        back = min(range(len(removed)), key=lambda k: d2(removed[k], added[j]))
-        if back == i and j not in paired_a and d2(r, added[j]) < reach ** 2:
-            paired_r.add(i)
-            paired_a.add(j)
-    return ([p for i, p in enumerate(removed) if i not in paired_r],
-            [p for j, p in enumerate(added) if j not in paired_a],
-            [removed[i] for i in sorted(paired_r)] + [added[j] for j in sorted(paired_a)])
-
-
-_HL_STROKE = 2.4          # outline width, viewBox units
-_CELL = 64                # gridnav cell, game units
-
-
-def _ring_union(mask, centres, r, colour=_HL_RED):
-    """Rings that overlap merged into ONE outline (the owner 2026-10-03: a slightly moved object showed "two
-    frames" — its old and new spot each ringed): every ring widened by half the stroke, minus every ring narrowed by
-    half the stroke (an SVG mask `mask`, an id unique on the page), leaves only the outer contour of the union."""
+def _outline_union(mask, kind, centres, shape, colour, stroke=2.4):
+    """One kind's outlines, overlapping ones merged into ONE contour (the owner 2026-10-03: a slightly moved object
+    showed "two frames"): every shape widened by half the stroke, minus every shape narrowed by half the stroke (an
+    SVG mask `mask`, an id unique on the page) — only the union's outer edge stays. Wrapped in .tm-hl-g-<kind> so
+    the moved / removed / added switches can hide it."""
     if not centres:
         return ""
-    h = _HL_STROKE / 2
-    outer = "".join(f'<circle cx="{x}" cy="{y}" r="{round(r + h, 2)}"/>' for x, y in centres)
-    inner = "".join(f'<circle cx="{x}" cy="{y}" r="{round(r - h, 2)}"/>' for x, y in centres)
-    return (f'<mask id="{mask}" maskUnits="userSpaceOnUse" x="0" y="0" width="{MAP_VB}" height="{MAP_VB}">'
-            f'<rect width="{MAP_VB}" height="{MAP_VB}" fill="#fff"/><g fill="#000">{inner}</g></mask>'
-            f'<g fill="{colour}" mask="url(#{mask})">{outer}</g>')
+    form, s = shape
+    h = stroke / 2
+
+    def draw(grow):
+        if form == "rect":
+            a = round(s + grow, 2)
+            return "".join(f'<rect x="{round(x - a, 1)}" y="{round(y - a, 1)}" width="{2 * a}" height="{2 * a}"/>'
+                           for x, y in centres)
+        return "".join(f'<circle cx="{x}" cy="{y}" r="{round(s + grow, 2)}"/>' for x, y in centres)
+    return (f'<g class="tm-hl-g tm-hl-g-{kind}"><mask id="{mask}" maskUnits="userSpaceOnUse" x="0" y="0" '
+            f'width="{MAP_VB}" height="{MAP_VB}"><rect width="{MAP_VB}" height="{MAP_VB}" fill="#fff"/>'
+            f'<g fill="#000">{draw(-h)}</g></mask><g fill="{colour}" mask="url(#{mask})">{draw(h)}</g></g>')
 
 
-def _cell_outline(cells, proj, colour=_HL_RED):
-    """The outline of a set of changed ward cells: only the sides no other changed cell shares, so neighbouring
-    cells read as one patch, not a grid of squares."""
+def _cells_fill(kind, cells, proj, colour):
+    """Changed ward cells filled half-transparent, like the magenta no-ward layer but red / green (the owner
+    2026-10-03: "not an outline — filled, more transparent, like the original purple")."""
     if not cells:
         return ""
-    have = {(round(x), round(y)) for x, y in cells}
     h = _CELL // 2
-    segs = []
-    for x, y in have:
-        for (dx, dy), (ax, ay, bx, by) in (((0, _CELL), (-h, h, h, h)), ((0, -_CELL), (-h, -h, h, -h)),
-                                           ((-_CELL, 0), (-h, -h, -h, h)), ((_CELL, 0), (h, -h, h, h))):
-            if (x + dx, y + dy) not in have:
-                (px, py), (qx, qy) = proj(x + ax, y + ay), proj(x + bx, y + by)
-                segs.append(f"M{px} {py}L{qx} {qy}")
-    return (f'<path d="{"".join(sorted(segs))}" fill="none" stroke="{colour}" stroke-width="{_HL_STROKE}" '
-            f'stroke-linecap="square"/>')
+    d = []
+    for x, y in sorted(cells):
+        (ax, ay), (bx, by) = proj(x - h, y + h), proj(x + h, y - h)
+        d.append(f"M{ax} {ay}H{bx}V{by}H{ax}Z")
+    return (f'<g class="tm-hl-g tm-hl-g-{kind}"><path d="{"".join(d)}" fill="{colour}" '
+            f'fill-opacity="{_CELL_FILL}"/></g>')
 
 
 def _highlights_svg(diff, proj):
-    """One SVG per chip, hidden until its chip is pressed: outlines round the changed places on the OLD side of the
-    slider (the owner: "outlined on the old version") — red where something is removed, green where something is
-    added, yellow where it changed in place (moved so little its two rings would overlap, or re-tiered). Overlapping
-    rings and neighbouring ward cells merge into one outline."""
+    """Two SVGs per chip, hidden until the chip is pressed (and its layer is on): the old side's — removed red, moved
+    yellow where it stood — and the new side's — added green, moved yellow where it stands now; each clipped to its
+    side of the slider like the layers."""
     out = []
-    for key, groups in _changed_points(diff).items():
-        if key == "nowards":
-            body = "".join(_cell_outline(groups.get(g, []), proj, _HL_COLOUR[g]) for g in ("removed", "added"))
-        else:
-            r = _HL_RING.get(key, 19)
-            removed, added, moved = _small_moves([proj(x, y) for x, y in groups.get("removed", [])],
-                                                 [proj(x, y) for x, y in groups.get("added", [])], 2 * r)
-            spots = {"removed": removed, "added": added,
-                     "changed": [proj(x, y) for x, y in groups.get("changed", [])] + moved}
-            body = "".join(_ring_union(f"tm-hl-mask-{key}-{g}", spots[g], r, _HL_COLOUR[g])
-                           for g in ("removed", "added", "changed"))
-        out.append(f'<svg class="tc-markers tm-hl tm-hl-{key} tm-old" viewBox="0 0 {MAP_VB} {MAP_VB}" '
-                   f'preserveAspectRatio="none" aria-hidden="true">{body}</svg>')
+    for key, g in _changed_points(diff).items():
+        layer = _HL_LAYER.get(key, "")
+        for side in ("old", "new"):
+            if key == "nowards":
+                kind = "removed" if side == "old" else "added"
+                body = _cells_fill(kind, g.get(kind, []), proj, _HL_COLOUR[kind])
+            else:
+                spots = {"moved": [m[0] if side == "old" else m[1] for m in g.get("moved", [])],
+                         "removed": g.get("removed", []) if side == "old" else [],
+                         "added": g.get("added", []) if side == "new" else []}
+                body = "".join(_outline_union(f"tm-hl-mask-{key}-{side}-{k}", k, [proj(x, y) for x, y in spots[k]],
+                                              _HL_SHAPE.get(key, _HL_ENT_SHAPE), _HL_COLOUR[k],
+                                              _HL_STROKE.get(key, 2.4))
+                               for k in _HL_KINDS)
+            if body:
+                out.append(f'<svg class="tc-markers tm-hl tm-hl-{key} tm-{side}" data-layer="{layer}" '
+                           f'viewBox="0 0 {MAP_VB} {MAP_VB}" preserveAspectRatio="none" aria-hidden="true">{body}</svg>')
     return "".join(out)
+
+
+def _hl_kinds(diff):
+    """The kinds of change this step's outlines hold, in switch order (moved, removed, added)."""
+    have = set()
+    for g in _changed_points(diff).values():
+        have |= {k for k, v in g.items() if v}
+    return [k for k in _HL_KINDS if k in have]
 
 
 def _moved_summary(diff):
@@ -890,9 +920,9 @@ def _chip(name, kind, n, removed, total):
         value = f'<b>{n}/{total}</b> {_CHANGED_WORD.get(name, kind)}'
     key = _HL_KEY.get(name)
     if key:
-        # pressed: the changed places outlined on the old side of the map (scripts.js initChangeHighlights)
-        return (f'<button type="button" class="tf-chip tf-chip-btn" data-hl="{key}" aria-pressed="false">'
-                f'{img}{value}</button>')
+        # pressed: the changed places outlined on the map, its layer turned on (scripts.js initChangeHighlights)
+        return (f'<button type="button" class="tf-chip tf-chip-btn" data-hl="{key}" '
+                f'data-layer="{_HL_LAYER.get(key, "")}" aria-pressed="false">{img}{value}</button>')
     return f'<span class="tf-chip">{img}{value}</span>'
 
 
@@ -933,7 +963,12 @@ def _facts_html(counts, step, diff):
                    + (f'<div class="tf-tiles tf-tiles-more">{"".join(more)}</div>\n' if more else ''))
     if step is not None:
         chips = [_chip(*i) for i in _moved_items(diff)]
-        out.append('<div class="tf-head">Changed in the map file</div>\n'
+        # switches for what the outlines show (the owner 2026-10-03: "choose what to show: moved, removed or
+        # added"), each in its outline colour; scripts.js hides a kind with .hl-hide-<kind> on the map
+        kinds = "".join(f'<button type="button" class="tf-kind" data-kind="{k}" aria-pressed="true">'
+                        f'<i class="tf-kind-sw tf-kind-{k}"></i>{k}</button>' for k in _hl_kinds(diff))
+        kinds_html = f'<span class="tf-kinds">{kinds}</span>' if chips and kinds else ""
+        out.append(f'<div class="tf-head">Changed in the map file{kinds_html}</div>\n'
                    + (f'<div class="tf-chips">{"".join(chips)}</div>\n' if chips
                       else '<div class="tf-none">Nothing</div>\n'))
     return f'<div class="terrain-facts">\n{"".join(out)}</div>\n' if out else ""
@@ -943,8 +978,11 @@ def _quiet(steps, notes, diffs):
     """Steps whose notes list nothing and whose map file moved nothing — no page.
     Their pictures differ from the patch before only by render noise (checked
     2026-10-02 with scripts/gen/map_picture_diff.py: no change bigger than the
-    wind in the trees), so there is nothing to compare."""
-    return {p for p in steps if not notes.get(p) and not _moved_summary(diffs.get(p))}
+    wind in the trees), so there is nothing to compare. The newest step keeps its
+    page all the same (the owner 2026-10-03: without it "one could think the patch
+    doesn't exist" — 7.41f, the current map)."""
+    newest = max(steps, key=_ver_key) if steps else None
+    return {p for p in steps if p != newest and not notes.get(p) and not _moved_summary(diffs.get(p))}
 
 
 # Fullscreen zoom tiles (scripts/gen/map_tiles.py): 16 x 16 tiles of an 8192 picture per map file, kept in

@@ -366,8 +366,11 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   bit4 = no wards (set on the walkable ground of both fountains, both Roshan pits and the secret shop — the five
   `trigger_no_wards` volumes baked in — and on every cliff edge), 20 = out of bounds. A ward stands on a walkable
   cell without bit4 (trees aside — they are entities). Stored per map file as `data/map/gridnav_<code>.gnv.gz`;
-  `gridnav.py overlay` draws `icons/maps/nowards_<ver>.png` (one pixel per cell, magenta: zones strong, cliffs
-  lighter, the void faint), laid over x -10240..10240, y -10752..10240 with `image-rendering: pixelated`, old/new
+  `gridnav.py overlay` draws `icons/maps/nowards_<ver>.png` (one pixel per cell, magenta: walkable no-ward zones
+  strong (175), cliffs and the void off the map one fainter shade (60) — until 2026-10-03 cliffs 95 / void 38, but
+  7.41d moving the map's edge (670 cliff cells turned "off the map", 23 wardable ones too) then looked "more
+  transparent, though nothing was added there" to the owner), laid over x -10240..10240, y -10752..10240 with
+  `image-rendering: pixelated`, old/new
   split by the slider. `build_terrain_diff.py` adds `"wards": {old, new, lost, gained, cells}`; "No-ward cells
   +lost −gained" joins the changes, so 7.41c-e (only ward cells changed: invisible in the pictures) got pages.
   The layer starts off on every page, those too (the owner: "forgot to turn it off by default").
@@ -408,24 +411,32 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   styles.css: `.tc-new-layer` / `.tm-new` / `.tc-trees-new` / `.tc-camps-new` / `.tc-lens-new` clip
   `inset(0 0 0 var(--pos))`, `.tm-old` / `.tc-trees-old` / `.tc-camps-old` clip `inset(0 calc(100% - var(--pos))
   0 0)`.
-- **A chip outlines its changes (2026-10-02)** — the owner: pressing a "Changed in the map file" chip outlines the
-  changed places on the OLD version, except spawn boxes (their layer already draws the changed boxes red).
-  Each chip but spawn boxes is a `<button class="tf-chip tf-chip-btn" data-hl="<key>">`; `_highlights_svg` adds one
-  hidden `svg.tm-hl.tm-hl-<key>.tm-old` per key (`.tm-old`, so only on the old side), and `initChangeHighlights`
-  (src/scripts.js) toggles `.tm-hl-on` + `aria-pressed`. The colour says what happened (2026-10-03, the owner on
-  7.41d's "+23" no-ward cells drawn red: "it should be green, since they were added" — the chip's own +green /
-  −red): `_changed_points` → red `removed` = only on the old map, green `added` = only on the new map, yellow
-  `changed` = re-tiered camps (the old spot of each `_retiered_pairs` pair) and a removed + an added spot whose
-  rings would overlap (`_small_moves`: mutual nearest, closer than two radii — one object moved a little). Ward
-  cells: green = turned no-ward (`wards.toNoWard`), red = turned wardable (`wards.toWardable`), both from
-  `gridnav.changed_cells`. ONE outline, not overlapping rings (2026-10-03, the owner: a slightly moved object showed
-  "two frames"): `_ring_union` draws every ring of a colour widened by half the stroke through an SVG mask of
-  every ring narrowed by half the stroke — only the union's outer contour stays; `_cell_outline` draws just the
-  cell sides no other changed cell shares. The layer bar spreads its buttons across the map's width
-  (`justify-content: space-between`) — "like the minimap's header".
+- **A chip outlines its changes (2026-10-02, reworked 2026-10-03)** — pressing a "Changed in the map file" chip
+  outlines the changed places on the map, except spawn boxes (their layer already draws the changed boxes red).
+  Each chip but spawn boxes is a `<button class="tf-chip tf-chip-btn" data-hl="<key>" data-layer="<layer>">`.
+  `_changed_points` sorts each kind of object's changes: `removed` (only on the old map), `added` (only on the new
+  map), `moved` = (old spot, new spot) pairs — a removed and an added spot that are each other's nearest within
+  `_MOVE_REACH` (trees 200 units, camps 1000, entities 1500), plus re-tiered camps (`_retiered_pairs`). The owner
+  2026-10-03: colour = what happened (on 7.41d's "+23" no-ward cells drawn red: "it should be green, since they
+  were added"), the shape = the object's own marker ("a square outline, like the tree itself"), a moved tree
+  "outlined yellow on the old map — and in its new spot, yellow too, when you slide to the new map", "choose what
+  to show: moved, removed or added", "taking the Trees filter into account". So `_highlights_svg` draws two hidden
+  SVGs per key: `svg.tm-hl.tm-hl-<key>.tm-old` (removed red + moved yellow where it stood) and `.tm-new` (added
+  green + moved yellow where it stands), each `data-layer` = its map layer (`_HL_LAYER`); squares round trees and
+  camp icons, circles round the round entity markers (`_HL_SHAPE`). Overlapping outlines of one colour merge into
+  ONE contour (a slightly moved object showed "two frames"): `_outline_union` draws every shape widened by half
+  the stroke through an SVG mask of every shape narrowed by half the stroke, inside `g.tm-hl-g-<kind>`. Ward cells
+  are filled, not outlined (the owner: "filled, more transparent, like the original purple"): `_cells_fill`, red
+  on the old map = turned wardable (`wards.toWardable`), green on the new map = turned no-ward
+  (`wards.toNoWard`), both from `gridnav.changed_cells`. `initChangeHighlights` (src/scripts.js): a pressed chip
+  clicks its layer's bar button on when it's off, and its SVGs get `.tm-hl-on` only while that layer is shown
+  (re-checked on every bar click); the moved / removed / added switches by the heading (`.tf-kind`, only the
+  kinds the step has — `_hl_kinds`) put `.hl-hide-<kind>` on the map. The layer bar spreads its buttons across
+  the map's width (`justify-content: space-between`) — "like the minimap's header".
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
   a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
-  (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —
+  (`_quiet`: 7.39e, 7.40c). The NEWEST step keeps its page all the same (the owner 2026-10-03: without it "one
+  could think the patch doesn't exist") — 7.41f, the current map. Their pictures differ from the patch before only by render noise —
   `scripts/gen/map_picture_diff.py OLD_full.png NEW_full.png` (biggest blob ≤ 616 px at 8 units/px; a real change
   like 7.39 → 7.39b makes 1000-3800). The page before names them: "7.41b – 7.41f changed nothing on the map"
   (`_quiet_runs`). 10 pages now: 7.38, 7.38b, 7.38c, 7.39, 7.39b, 7.39c, 7.39d, 7.40, 7.41, 7.41a.

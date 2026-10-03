@@ -4,6 +4,20 @@
     {
       "date": "2026-10-03",
       "category": "Materials",
+      "title": "Terrain: what changed, outlined on both maps",
+      "link": "terrain_740.html",
+      "items": [
+        "Press a chip under the list: what was removed is outlined red on the old map, what was added green on the new map, what moved yellow on both — where it stood and where it stands",
+        "Each outline takes its object's own shape — a square round a tree or a camp — and shows with that object's map layer, which the chip turns on",
+        "Switches by the heading show only what moved, what was removed or what was added; changed no-ward ground is filled red or green instead"
+      ],
+      "shots": [
+        "icons/changelog/2026-10-03_terrain_outlines.webp"
+      ]
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Materials",
       "minor": true,
       "title": "Terrain: no line under the slider any more — every map picture and object list on the pages is our own"
     },
@@ -26,8 +40,15 @@
       "date": "2026-10-03",
       "category": "Materials",
       "minor": true,
-      "fix": true,
-      "title": "Terrain: a chip's outlines say what happened — red where something was removed, green where something was added (7.41d's 23 new no-ward cells), yellow where it moved a little, outlined once instead of with two overlapping rings"
+      "link": "terrain_741f.html",
+      "title": "Terrain: 7.41f has its page again — the newest patch always gets one, even when nothing on its map changed"
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Materials",
+      "minor": true,
+      "link": "terrain_741d.html",
+      "title": "Terrain: the No-ward ground layer draws cliffs and the ground off the map in one shade, so a map edge that moved (7.41d) no longer looks like ground that changed"
     },
     {
       "date": "2026-10-02",

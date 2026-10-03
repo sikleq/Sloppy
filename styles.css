@@ -9841,9 +9841,28 @@ li.tsp-hidden { display: none !important; }
 /* a chip that rings its changes red on the map (scripts.js initChangeHighlights) */
 button.tf-chip-btn { font: inherit; cursor: pointer; }
 button.tf-chip-btn:hover { border-color: rgba(227, 196, 106, 0.45); }
-button.tf-chip-btn[aria-pressed="true"] { border-color: #ff4d4d; background: rgba(255, 77, 77, 0.12); }
+button.tf-chip-btn[aria-pressed="true"] { border-color: var(--gold); background: rgba(227, 196, 106, 0.14); }
 .tm-hl { opacity: 0; transition: opacity 0.15s ease; }
 .tm-hl.tm-hl-on { opacity: 1; }
+/* a layer whose changes are outlined steps back, so the outlines read (scripts.js initChangeHighlights) */
+.terrain-compare .tc-markers.tm-layer.tm-dim { opacity: 0.3; }   /* outranks .show-<layer> .tm-layer-<layer> */
+/* moved / removed / added switches next to "Changed in the map file", each in its outline colour */
+.tf-head .tf-kinds { float: right; display: inline-flex; gap: 4px; text-transform: none; letter-spacing: 0; }
+button.tf-kind {
+  display: inline-flex; align-items: center; gap: 5px; padding: 1px 7px; font: inherit; font-size: 11px;
+  font-weight: 600; color: var(--text-dim); background: none; cursor: pointer;
+  border: 1px solid rgba(227, 196, 106, 0.18); border-radius: 3px;
+}
+button.tf-kind:hover { border-color: rgba(227, 196, 106, 0.45); }
+button.tf-kind[aria-pressed="true"] { color: var(--text-bright); }
+button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
+.tf-kind-sw { width: 9px; height: 9px; border: 2px solid; border-radius: 1px; }
+.tf-kind-moved { border-color: #ffd23f; }
+.tf-kind-removed { border-color: #ff4d4d; }
+.tf-kind-added { border-color: #5dff8a; }
+.terrain-compare.hl-hide-moved .tm-hl-g-moved,
+.terrain-compare.hl-hide-removed .tm-hl-g-removed,
+.terrain-compare.hl-hide-added .tm-hl-g-added { display: none; }
 .tf-chip-name { color: var(--text-main); }
 /* plain text under a head: "Nothing" (Changed in the map file) */
 .tf-none { color: var(--text-dim); }

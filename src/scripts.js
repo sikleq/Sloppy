@@ -7108,18 +7108,54 @@ function ecShopMarkup(panels) {
     });
   }
 
-  // "Changed in the map file" chips: pressed, the changed places are outlined on the old
-  // side of the map, left of the handle (.tm-hl-<key>, the stage's and the lens's copies alike).
+  // "Changed in the map file" chips: pressed, the changed places are outlined on the map —
+  // removed on the old side, added on the new side, moved on both (.tm-hl-<key>, the stage's
+  // and the lens's copies alike). A chip turns its map layer on, and its outlines show only
+  // while that layer is on (the owner: "taking the Trees filter into account"). The
+  // moved / removed / added switches hide a kind of outline (.hl-hide-<kind> on the map).
   function initChangeHighlights() {
     const root = document.querySelector('.terrain-compare');
     if (!root) return;
-    document.querySelectorAll('.tf-chip-btn[data-hl]').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        const on = btn.getAttribute('aria-pressed') !== 'true';
-        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    const chips = document.querySelectorAll('.tf-chip-btn[data-hl]');
+    function layerOn(layer) {
+      return !layer || root.classList.contains('show-' + layer);
+    }
+    function refresh() {
+      const dim = {};
+      chips.forEach(function(btn) {
+        const on = btn.getAttribute('aria-pressed') === 'true' && layerOn(btn.dataset.layer);
         root.querySelectorAll('.tm-hl-' + btn.dataset.hl).forEach(function(svg) {
           svg.classList.toggle('tm-hl-on', on);
         });
+        if (btn.dataset.layer) dim[btn.dataset.layer] = dim[btn.dataset.layer] || on;
+      });
+      // the layer's own markers step back while its changes are outlined (a green "added"
+      // outline would melt into the green tree squares)
+      Object.keys(dim).forEach(function(layer) {
+        root.querySelectorAll('.tm-layer-' + layer).forEach(function(svg) {
+          svg.classList.toggle('tm-dim', dim[layer]);
+        });
+      });
+    }
+    chips.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const on = btn.getAttribute('aria-pressed') !== 'true';
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        const layer = btn.dataset.layer;
+        if (on && !layerOn(layer)) {
+          const layerBtn = root.querySelector('.tc-controls-bar .tc-layer-btn[data-layer="' + layer + '"]');
+          if (layerBtn) layerBtn.click();          // goes through the bar, so its button shows pressed
+        }
+        refresh();
+      });
+    });
+    // the bar's own layer buttons (and "All") change what the pressed chips may show
+    root.querySelectorAll('.tc-layer-btn').forEach(function(b) { b.addEventListener('click', refresh); });
+    document.querySelectorAll('.tf-kind[data-kind]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const on = btn.getAttribute('aria-pressed') !== 'true';
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        root.classList.toggle('hl-hide-' + btn.dataset.kind, !on);
       });
     });
   }
