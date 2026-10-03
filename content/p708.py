@@ -282,7 +282,7 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent changed from +1 Shackleshot Target to +0.5s Shackleshot Duration", t("REWORK")))
+    W(li("Level 20 Talent changed from +1 Shackleshot Target to +0.5s Shackleshot Duration", t("SWAP")))
     W(li("Level 25 Talent increased from +30% Ministun Focus Fire to +35%", b(30, 35)))
     W(ul_close())
 

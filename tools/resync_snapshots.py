@@ -27,6 +27,29 @@ KINDS = (  # slim file, history folder, raw file, extractor name
     ("units.json", "units_history", "npc_units.txt", "extract_units"),
 )   # abilities.json is read by no page: not resynced
 
+# d2vpkr has no commit between 7.41 and 7.41a (the history plan maps both to 62894e2, the 7.41a state), so the 7.41
+# heroes come out with 7.41a's base stats: the 7.41 page said Lifestealer's damage is "now 23" (26) and the 7.41a
+# page priced its -3 from 23 (audit 2026-10-03). Valve's 7.41a notes undo them: {version: {slim: {npc: {field}}}}.
+LATER_STATE_UNDONE = {"7.41": {"heroes.json": {
+    "npc_dota_hero_antimage": {"MovementSpeed": 310, "StatusHealthRegen": 1.0},
+    "npc_dota_hero_morphling": {"AttributeAgilityGain": 3.9},
+    "npc_dota_hero_windrunner": {"AttributeBaseAgility": 17},
+    "npc_dota_hero_skeleton_king": {"AttackRate": 1.7, "AttributeIntelligenceGain": 1.6},
+    "npc_dota_hero_leshrac": {"AttributeStrengthGain": 2.8},
+    "npc_dota_hero_life_stealer": {"AttackDamageMin": 26, "AttackDamageMax": 32},
+    "npc_dota_hero_doom_bringer": {"ArmorPhysical": 2},
+    "npc_dota_hero_alchemist": {"MovementSpeed": 295},
+    "npc_dota_hero_invoker": {"AttributeBaseIntelligence": 20},
+    "npc_dota_hero_chaos_knight": {"AttackDamageMin": 29, "AttackDamageMax": 49},
+    "npc_dota_hero_void_spirit": {"StatusManaRegen": 0.6},
+}}}
+
+
+def _undo_later_state(v, slim_name, truth):
+    """truth with a later patch's values put back where the history file is that later patch's state."""
+    fix = LATER_STATE_UNDONE.get(v, {}).get(slim_name, {})
+    return {k: ({**row, **fix[k]} if k in fix else row) for k, row in truth.items()}
+
 
 def stale_snapshots(fs):
     """[(version, slim file, items differing, extracted truth)] for every slim JSON that differs."""
@@ -40,7 +63,7 @@ def stale_snapshots(fs):
             text = open(raw, encoding="utf-8", errors="replace").read()
             if "#base" in text:
                 continue                                   # an include list (7.41f+): slim_from_kv's job
-            truth = getattr(fs, fn)(fs.parse_kv(text))
+            truth = _undo_later_state(v, slim_name, getattr(fs, fn)(fs.parse_kv(text)))
             have = json.load(open(slim, encoding="utf-8"))
             if truth != have:
                 out.append((v, slim_name, sum(1 for k in set(truth) | set(have) if truth.get(k) != have.get(k)), truth))

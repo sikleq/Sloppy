@@ -21,7 +21,8 @@ def build():
                  "40 + 5 per minute", "40 + 3.5 per minute",
                  lambda M: 40 + 5.0 * M, lambda M: 40 + 3.5 * M,
                  levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
-                 level_prefix='M', rework_badge=False))
+                 level_prefix='M', rework_badge=False,
+                 inline_note_text="At 20 minutes: barrier decreased from 2500 + 140 regen to 2400 + 110 regen. At 40 minutes: barrier decreased from 2900 + 240 regen to 2800 + 180 regen"))
     W(li("Base barrier decreased from 2100 to 2000", b(2100, 2000)))
     W(ul_close())
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
@@ -101,7 +102,7 @@ def build():
 
     W(plain_header("General Changes"))
     W(subgroup("Health Restoration"))
-    W(section_intro("Lifesteal Amplification and Spell Lifesteal Amplification have been removed and a new umbrella stat has been created in their place: Health Restoration — a percentage increase to the health gained from Lifesteal, Spell Lifesteal, and Health Regeneration."))
+    W(section_intro("Lifesteal Amplification and Spell Lifesteal Amplification have been removed and a new umbrella stat has been created in their place: Health Restoration — a percentage increase to the health gained from Lifesteal, Spell Lifesteal, and Health Regeneration." + inline_note("Also decreases those values when negative")))
     W(ul_open())
     W(li("Positive and Negative sources of Health Restoration stack diminishingly with each other", t("REWORK"), extra=inline_note("\"Stacking diminishingly\" is the same behavior as evasion and magic resistance. Given N sources of positive Health Restoration, the final value will be calculated as: 1 - (1 - n0) * (1 - n1) * ...<br><br>For example, if you have a Sange (16%) and a Tier 4 Neutral Item with the Crude Enchantment (20%), your total Health Restoration would be 1 - (1 - .16) * (1 - .2) = 32.8%. In other words, multiple smaller sources are less effective than one single large source.<br><br>Negative sources of Health Restoration are stacked the same way, and then the positive and negative values are added together for your final Health Restoration.")))
     W(li("Health Restoration cannot go lower than -100% and cannot go higher than 100%", t("REWORK")))
@@ -319,7 +320,7 @@ def build():
     W(ul_close())
     W(item_header("Sister's Shroud", new="New Tier 1 Artifact"))
     W(ul_open())
-    W(li("Passive: Veiled. Whenever your health falls below 50% you gain a +200% evasion bonus for 8s. Each attack negated by evasion reduces this evasion bonus to 0.25x of its current value"))
+    W(li("Passive: Veiled. Whenever your health falls below 50% you gain a +200% evasion bonus for 8s. Each attack negated by evasion reduces this evasion bonus to 0.25x of its current value", extra=inline_note("As a result the effect will provide +200/50/12.5/3.125/0.78% evasion after 0/1/2/3/4 evaded attacks. Triggers only from damage by player-controlled sources and Roshan")))
     W(li("Passive: Last Caress. Veiled cooldown is only reset if the wearer dies or kills an enemy hero"))
     W(ul_close())
     W(item_header("Gossamer Cape"))
@@ -375,7 +376,7 @@ def build():
     W(ul_close())
     W(item_header("Jidi Pollen Bag", new="New Tier 3 Artifact"))
     W(ul_open())
-    W(li("Active: Pollinate. Spread pollen on enemies within 700 units, decreasing their Health Restoration by 20% for 12s and dealing 12% of the target's max health as damage over the duration. Damage interval: 1s. No Mana Cost. Cooldown: 45s"))
+    W(li("Active: Pollinate. Spread pollen on enemies within 700 units, decreasing their Health Restoration by 20% for 12s and dealing 12% of the target's max health as damage over the duration. Damage interval: 1s. No Mana Cost. Cooldown: 45s", extra=inline_note("Damage is non-lethal and classified as HP Loss (does not break Blink Dagger)")))
     W(li("Dormant Curio increases total max health damage from 12% to 15.6%", t("NEW")))
     W(ul_close())
     W(item_header("Psychic Headband", new="Returning Tier 3 Artifact"))
@@ -429,7 +430,7 @@ def build():
     W(ul_close())
     W(item_header("Outworld Staff", new="New Tier 4 Artifact"))
     W(ul_open())
-    W(li("Active: Self-Exile: Removes the caster from the world, making them invulnerable and disabled for 0.7s. Caster loses 5% of their max health on return. This damage is not lethal, but it mutes Blink Dagger and similar items after the effect. Mana Cost: 40. Cooldown: 30s"))
+    W(li("Active: Self-Exile: Removes the caster from the world, making them invulnerable and disabled for 0.7s. Caster loses 5% of their max health on return. This damage is not lethal, but it mutes Blink Dagger and similar items after the effect. Mana Cost: 40. Cooldown: 30s", extra=inline_note("Tranquil Boots are not muted on this self-damage")))
     W(li("Dormant Curio increases duration from 0.7s to 0.91s", t("NEW")))
     W(ul_close())
     W(item_header("Pyrrhic Cloak"))
@@ -455,7 +456,7 @@ def build():
     W(ul_close())
     W(item_header("Divine Regalia", new="New Tier 5 Artifact"))
     W(ul_open())
-    W(li("Passive: Exalted. Increases outgoing damage by 20%. If the wearer is killed, the item permanently loses the current Enchantment and turns into a Disgraced Regalia"))
+    W(li("Passive: Exalted. Increases outgoing damage by 20%. If the wearer is killed, the item permanently loses the current Enchantment and turns into a Disgraced Regalia", extra=inline_note("Enchantments retained with Techies' Spoon's Stash facet are unaffected with the exception of the last obtained Tier 5 enchantment. Unleashed enchantment from Dormant Curio artifact is lost as well")))
     W(li("Dormant Curio increases damage multiplier from 20% to 26%", t("NEW")))
     W(ul_close())
     W(item_header("Disgraced Regalia", new="New Tier 5 Artifact"))
@@ -470,7 +471,7 @@ def build():
     W(ul_close())
     W(item_header("Helm of the Undying", new="Returning Tier 5 Artifact"))
     W(ul_open())
-    W(li("Passive: Death Delay. Survive for an extra 5 seconds after receiving a killing blow. Enemy heroes dying within 1200 units extends this effect by 5 seconds. Cooldown: 50s"))
+    W(li("Passive: Death Delay. Survive for an extra 5 seconds after receiving a killing blow. Enemy heroes dying within 1200 units extends this effect by 5 seconds. Cooldown: 50s", extra=inline_note("Procs before Wraith King's innate Vampiric Spirit ability, but after his Reincarnation ability or Aegis of the Immortal")))
     W(li("Dormant Curio increases base duration from 5s to 6.5s", t("NEW")))
     W(ul_close())
     W(item_header("Minotaur Horn"))
@@ -684,6 +685,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent +25 Bloodrage Attack Speed replaced with +175 Health", t("SWAP")))
+    W(li("Old Blood: Level 10 Talent +15% Bloodrage Spell Amplification replaced with +15% Bloodrage Base Damage Amp", t("SWAP")))
     W(ul_close())
 
     # Bounty Hunter
@@ -798,7 +800,7 @@ def build():
     W(ul_close())
     W(ability("Hand of God", slug="chen_hand_of_god"))
     W(ul_open())
-    W(li("Aghanim's Scepter: Reduces cooldown by 40s. Hand of God becomes a channeled spell. After the initial heal, Chen can keep channeling the ability for up to 6 seconds to grant Debuff Immunity with 60% Magic Resistance to all allied units within 800 radius with the exception of himself. This effect also triples the Hand of God's heal over time for all units within the Debuff Immunity radius", t("NEW")))
+    W(li("Aghanim's Scepter: Reduces cooldown by 40s. Hand of God becomes a channeled spell. After the initial heal, Chen can keep channeling the ability for up to 6 seconds to grant Debuff Immunity with 60% Magic Resistance to all allied units within 800 radius with the exception of himself. This effect also triples the Hand of God's heal over time for all units within the Debuff Immunity radius", t("NEW"), extra=inline_note("Channel Radius can be increased with AoE Bonuses")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -831,9 +833,9 @@ def build():
     W(hero_header("Crystal Maiden"))
     W(facet_header("crystal_maiden_arcane_overflow"))
     W(ul_open())
-    W(li("Now also restores a portion of mana to Crystal Maiden herself", t("NEW")))
+    W(li("Arcane Aura: Now also restores a portion of mana to Crystal Maiden herself", t("NEW")))
     W(li("Arcane Aura: Allied mana restoration decreased from 25% to 15%", b(25, 15)))
-    W(li("Activation no longer interrupts movement", t("BUFF")))
+    W(li("Arcane Aura: Activation no longer interrupts movement", t("BUFF")))
     W(ul_close())
 
     # Dark Seer
@@ -872,7 +874,7 @@ def build():
         old=dict(
             name="Break of Dawn",
             innate=True,
-            desc=["Whenever the sun rises, Dawnbreaker gradually reveals the entire map to allies over 4 seconds. Fog of War returns in 1 second after that."],
+            desc=["Whenever the sun comes out, Dawnbreaker reveals the whole map to allies for 4 seconds."],
         ),
         new=dict(
             name="Break of Dawn",
@@ -976,23 +978,27 @@ def build():
     W(ul_close())
     W(subgroup("Abilities"))
     W(ability_change(
-        summary="New innate ability.",
-        tag="new",
+        summary="Spirit Cairn removed; Slugger is now an innate ability.",
+        tag="rework",
         old=dict(
             name="Spirit Cairn",
             innate=True,
             desc=[
-                "When Earthshaker dies, a fissure is created where he died. This fissure blocks movement and allows Earthshaker to continue to gain experience around it. It remains until Earthshaker respawns.",
+                "When Earthshaker dies, a 75 radius fissure is created where he died. This fissure blocks movement and allows Earthshaker to continue to gain experience around it. It remains until Earthshaker respawns.",
             ],
         ),
         new=dict(
             name="Slugger",
+            slug="earthshaker_slugger",
             innate=True,
             desc=[
                 "Enemies killed with Enchant Totem or Earthshaker's other abilities are sent flying, dealing damage to enemies they hit.",
-                "Damage (Creep Death) decreased from 40/60/80/100 to 30/45/60/75.",
             ],
         )))
+    W(ul_open())
+    W(li("Now is an innate ability", t("REWORK"), extra=inline_note("Almost no values were changed, still improves with Echo Slam")))
+    W(li("Damage (Creep Death) decreased from 40/60/80/100 to 30/45/60/75", b([40, 60, 80, 100], [30, 45, 60, 75])))
+    W(ul_close())
     W(ability("Aftershock", slug="earthshaker_aftershock"))
     W(ul_open())
     W(li("Radius decreased from 350 to 300", b(350, 300)))
@@ -1053,7 +1059,7 @@ def build():
     # Grimstroke
     W(hero_header("Grimstroke"))
     W(facet_change("grimstroke_fine_art",
-        old_desc="Stroke of Fate additionally launches a reflected curved stroke from the right hand.",
+        old_desc="Stroke of Fate can now be vector targeted to manipulate the ink's travel path.",
         new_desc="Grimstroke launches a mirrored curved stroke from his free hand. Each enemy can take damage only from one stroke but still contributes to bonus damage accumulation for both.",
         old_ability="grimstroke_dark_artistry",
         new_ability="grimstroke_dark_artistry"))
@@ -1125,7 +1131,7 @@ def build():
         new=dict(name="Ice Wall", slug="invoker_ice_wall",
                  desc=[
                      "Aghanim's Scepter: Ice Wall becomes Ice Floe, vector targeted. After a 1.3s delay, the Ice Floe forms from the center of the targeted area, creating a 150 width Ice Floe in its wake. Enemies that stay in it for longer than 2.5 seconds freeze, becoming rooted for 1.5 + (0.1 × Quas) seconds and take (75 + 25 × Quas) magical damage.",
-                     f"Cast range: 600. Ice Floe can freeze the same unit multiple times. {inline_note('1.6/1.7/1.8/1.9/2.0/2.1/2.2/2.3/2.4/2.5s root duration and 100/125/150/175/200/225/250/275/300/325 damage')}",
+                     f"Cast range: 600. Ice Floe can freeze the same unit multiple times if they leave the floe and enter it again. Staying in the floe would prevent the unit from being rooted again. {inline_note('1.6/1.7/1.8/1.9/2.0/2.1/2.2/2.3/2.4/2.5s root duration and 100/125/150/175/200/225/250/275/300/325 damage')}",
                  ])))
     W(ability_change(
         sub=True,
@@ -1151,7 +1157,11 @@ def build():
                  lambda W: 120, lambda W: 50 + 10 * W,
                  levels=list(range(1, 11)), level_prefix='W',
                  value_fmt="{:g}"))
-    W(li("Aghanim's Scepter Twister duration changed from 4s to (3s + 0.2s × Quas)", t("REWORK"), extra=inline_note("3.2/3.4/3.6/3.8/4.0/4.2/4.4/4.6/4.8/5s")))
+    W(li_formula("Aghanim's Scepter Twister duration changed",
+                 "4s", "3s + 0.2s × Quas Level",
+                 lambda Q: 4, lambda Q: 3 + 0.2 * Q,
+                 levels=list(range(1, 11)), level_prefix='Q',
+                 value_fmt="{:g}s"))
     W(li("Aghanim's Scepter Twister spawn interval increased from 300 to 400", b(300, 400, l=True)))
     W(ul_close())
     W(facet_header("invoker_exort_focus"))
@@ -1177,11 +1187,15 @@ def build():
     W(ul_close())
     W(ability("Cold Snap", slug="invoker_cold_snap"))
     W(ul_open())
-    W(li("Freeze Damage increased by 20", t("BUFF"), extra=inline_note("From 8/16/24/32/40/48/56/64/72/80 to 28/36/44/52/60/68/76/84/92/100")))
+    W(li("Freeze Damage increased by 20", b([8, 16, 24, 32, 40, 48, 56, 64, 72, 80], [28, 36, 44, 52, 60, 68, 76, 84, 92, 100]), extra=inline_note("From 8/16/24/32/40/48/56/64/72/80 to 28/36/44/52/60/68/76/84/92/100")))
     W(ul_close())
     W(ability("Sun Strike", slug="invoker_sun_strike"))
     W(ul_open())
-    W(li("Damage decreased from (150 + 50 * Exort) to (125 + 50 * Exort)", t("NERF"), extra=inline_note("From 200/250/300/350/400/450/500/550/600/650 to 175/225/275/325/375/425/475/525/575/625")))
+    W(li_formula("Damage decreased",
+                 "150 + 50 × Exort Level", "125 + 50 × Exort Level",
+                 lambda E: 150 + 50 * E, lambda E: 125 + 50 * E,
+                 levels=list(range(1, 11)), level_prefix='E',
+                 value_fmt="{:g}"))
     W(ul_close())
     W(ability("Forge Spirit", slug="invoker_forge_spirit"))
     W(ul_open())
@@ -1212,7 +1226,7 @@ def build():
         tag="new",
         old=dict(
             name="Sight Seer",
-            slug="wisp_essence_conduction",
+            slug="wisp_sight_seer",
             innate=True,
             desc=[
                 "Io's team takes <b>1</b>s less to channel Watchers. When a Watcher is under their control, its vision radius is increased by <b>300</b>.",
@@ -1223,7 +1237,7 @@ def build():
             slug="wisp_essence_conduction",
             innate=True,
             desc=[
-                "Io regenerates from consumables and the fountain 2x faster.",
+                "Io regenerates from consumables 2x faster.",
                 "Applies to Healing Salve, Tango, Clarity, Bottle, Urn of Shadows, Spirit Vessel, Pollywog Charm, and Mana Draught. Total amount restored remains the same.",
             ],
         )))
@@ -1252,7 +1266,8 @@ def build():
     W(hero_header("Juggernaut"))
     W(ability("Blade Fury", slug="juggernaut_blade_fury"))
     W(ul_open())
-    W(li("Damage rescaled from 40/45/50/55 per tick to 80/110/140/170 per second", t("REWORK"), extra=inline_note("Tick interval is no longer based on Juggernaut's attack speed and has been changed to 5 ticks per second")))
+    W(li("Damage tick interval is no longer based on Juggernaut's attack speed and has been changed to 5 ticks per second", t("REWORK")))
+    W(li("Damage rescaled from 40/45/50/55 per tick to 80/110/140/170 per second", t("REWORK")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -1361,7 +1376,8 @@ def build():
     W(hero_header("Legion Commander"))
     W(ability("Outfight Them!", slug="legion_commander_outfight_them"))
     W(ul_open())
-    W(li("Now levels up with Duel and applies when attacking enemy heroes that are equal or higher level than you, instead of only higher level enemy heroes", t("REWORK")))
+    W(li("Now levels up with Duel", t("REWORK")))
+    W(li("Now applies when attacking enemy heroes that are equal or higher level than you, instead of only higher level enemy heroes", t("BUFF")))
     W(li("Instead of increasing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 50%, now increases Health Restoration by 30/40/50/60%", t("REWORK")))
     W(ul_close())
 
@@ -1384,7 +1400,7 @@ def build():
     W(li("Facet removed", t("DEL")))
     W(ul_close())
     W(new_facet("lich_cryophobia",
-        desc=f"Sinister Gaze: Sinister Gaze applies a Evil Eye debuff that will deal additional 10/15/20/25 damage every time Lich deals magic damage to the target, and amplifies received movement slows by 50%. The Evil Eye debuff duration lingers up to 2x the elapsed Sinister Gaze channel duration. {inline_note("Abilities and items that do not proc certain other abilities (Blood Grenade, Radiance, etc.) will not trigger Evil Eye's debuff")}"))
+        desc=f"Sinister Gaze: Sinister Gaze applies a Evil Eye debuff that will deal additional 10/15/20/25 damage every time Lich deals magic damage to the target, and amplifies received movement slows by 50%. The Evil Eye debuff duration lingers up to 2x the elapsed Sinister Gaze channel duration. {inline_note("Abilities and items that do not proc certain other abilities (Blood Grenade, Radiance, etc.) do not trigger the additional magic damage")}"))
     W(ability("Sinister Gaze", slug="lich_sinister_gaze"))
     W(ul_open())
     W(li("Mana Drain per second increased from 15% to 20%", b(15, 20)))
@@ -1408,7 +1424,7 @@ def build():
     W(ul_close())
     W(facet_header("life_stealer_gorestorm"))
     W(ul_open())
-    W(li("Infest: Damage over time debuff is now undispellable", t("NEW")))
+    W(li("Infest: Damage over time debuff is now undispellable", t("BUFF")))
     W(ul_close())
     W(ability("Feast", slug="life_stealer_feast"))
     W(ul_open())
@@ -1417,7 +1433,7 @@ def build():
     W(ul_close())
     W(ability("Infest", slug="life_stealer_infest"))
     W(ul_open())
-    W(li("Creep Max HP Loss / sec decreased from 2/1/0% to 1.5/0.75/0%", b([2, 1, 0], [1.5, 0.75, 0])))
+    W(li("Creep Max HP Loss / sec decreased from 2/1/0% to 1.5/0.75/0%", b([2, 1, 0], [1.5, 0.75, 0], l=True)))
     W(ul_close())
 
     # Lina
@@ -1595,7 +1611,7 @@ def build():
     W(ul_open())
     W(li("No longer reduces enemy status resistance", t("DEL")))
     W(li("Damage increased from 80/140/200/260 to 80/150/220/290", b([80, 140, 200, 260], [80, 150, 220, 290])))
-    W(li("Max Movement Speed decreased from 240 to 230", b(240, 230)))
+    W(li("Max Movement Speed decreased from 240 to 230", b(240, 230, l=True)))
     W(ul_close())
     W(ability("Ensnare", slug="naga_siren_ensnare"))
     W(ul_open())
@@ -1627,7 +1643,7 @@ def build():
     W(facet_header("furion_soothing_saplings"))
     W(ul_open())
     W(li("Sprout: Healing mechanic reworked. Now enchants all trees in a 1200 AoE around the Sprout. Each enchanted tree emits a 175 radius healing aura. No longer heals buildings", t("REWORK")))
-    W(li("Sprout: Level 15 Talent +100 Teleportation Barrier replaced with +30% Sprout Heal Per Second", t("REWORK")))
+    W(li("Level 15 Talent +100 Teleportation Barrier replaced with +30% Sprout Heal Per Second", t("SWAP")))
     W(li("Sprout: Heal per second increased from 10/20/30/40 to 14/26/38/50", b([10, 20, 30, 40], [14, 26, 38, 50])))
     W(ul_close())
     W(ability("Sprout", slug="furion_sprout"))
@@ -1735,20 +1751,21 @@ def build():
     W(hero_header("Phantom Assassin"))
     W(ability("Blur", slug="phantom_assassin_blur"))
     W(ul_open())
-    W(li("Now is an innate ability that improves with Coup de Grace level", t("NEW"), extra=inline_note("Values were not changed")))
-    W(li("Dispel conditions reworked: now dispelled when attacking Roshan or enemy Barracks; no longer dispelled when near enemy Outposts, Watchers or base buildings (other than Towers/Ancient)", t("REWORK")))
+    W(li("Now is an innate ability that improves with Coup de Grace level", t("REWORK"), extra=inline_note("Values were not changed")))
+    W(li("No longer dispelled when near enemy Outposts, Watchers or base buildings (other than Towers/Ancient)", t("BUFF")))
+    W(li("Now dispelled when attacking Roshan or enemy Barracks", t("NERF")))
     W(li("Aghanim's Shard: Decreases cooldown from 60/55/50/45s to 50/45/40/35s. Any time Phantom Assassin gets a hero kill, her ability cooldowns advance 60% of their max cooldown values", t("NEW")))
     W(ul_close())
     W(ability("Immaterial", slug="phantom_assassin_immaterial"))
     W(ul_open())
-    W(li("Now is a basic ability", t("NEW")))
+    W(li("Now is a basic ability", t("REWORK")))
     _pill_eva = scale_pill("20% + 1% per hero level", lambda H: 20 + H,
                            levels=list(range(1, 16)) + [20, 25, 30], level_prefix='L', value_fmt="{:g}%")
     W(li(f"Bonus Evasion changed from {_pill_eva[0]} to 20/30/40/50%", t("REWORK"), extra=_pill_eva[1]))
     W(ul_close())
     W(ability("Fan of Knives", slug="phantom_assassin_fan_of_knives"))
     W(ul_open())
-    W(li("Now granted by Aghanim's Scepter", t("NEW")))
+    W(li("Now granted by Aghanim's Scepter", t("REWORK"), extra=inline_note("Was granted by Aghanim's Shard")))
     W(li("Max Health Damage increased from 28% to 30%", b(28, 30)))
     W(li("Break Duration increased from 3s to 4s", b(3, 4)))
     W(li("Cooldown decreased from 20s to 14s", b(20, 14, l=True)))
@@ -1838,7 +1855,7 @@ def build():
     W(hero_header("Ringmaster"))
     W(ability("Dark Carnival Barker", slug="ringmaster_dark_carnival_souvenirs"))
     W(ul_open())
-    W(li("If Ringmaster does not have a Souvenir, he will be granted one upon death (instead of upon respawn)", t("NEW")))
+    W(li("If Ringmaster does not have a Souvenir, he will be granted one upon death (instead of upon respawn)", t("REWORK")))
     W(li("Ringmaster will no longer be granted a Souvenir if he has no Souvenirs and dies to a Neutral Creep or Roshan", t("NERF")))
     W(ul_close())
     W(ability("Escape Act", slug="ringmaster_the_box"))
@@ -1920,7 +1937,7 @@ def build():
     W(ul_close())
     W(ability("Necromastery", slug="nevermore_necromastery"))
     W(ul_open())
-    W(li("Hero kills now grant 3 souls", t("NEW")))
+    W(li("Hero kills now grant 3 souls", b(1, 3)))
     W(ul_close())
     W(ability("Feast of Souls", slug="nevermore_frenzy"))
     W(ul_open())
@@ -2028,7 +2045,7 @@ def build():
     W(hero_header("Spectre"))
     W(ability("Desolate", slug="spectre_desolate"))
     W(ul_open())
-    W(li("Radius decreased from 400 to 350", b(400, 350)))
+    W(li("Radius decreased from 400 to 350", b(400, 350, l=True)))
     W(ul_close())
     W(ability("Shadow Step", slug="spectre_shadow_step"))
     W(ul_open())
@@ -2147,7 +2164,7 @@ def build():
     W(ul_close())
     W(ability("Grow", slug="tiny_grow"))
     W(ul_open())
-    W(li("Attack Speed Reduction increased from 30% to 35%", b(30, 35)))
+    W(li("Attack Speed Reduction increased from 30% to 35%", b(30, 35, l=True)))
     W(ul_close())
     W(ability("Avalanche", slug="tiny_avalanche"))
     W(ul_open())
@@ -2243,7 +2260,7 @@ def build():
     W(ability("Plague Ward", slug="venomancer_plague_ward"))
     W(ul_open())
     W(li("Ward HP increased from 120/230/340/450 to 150/250/350/450", b([120, 230, 340, 450], [150, 250, 350, 450])))
-    W(li("Gold Bounty rescaled from 15/17/19/21 to 10/14/18/22", b([15, 17, 19, 21], [10, 14, 18, 22])))
+    W(li("Gold Bounty rescaled from 15/17/19/21 to 10/14/18/22", b([15, 17, 19, 21], [10, 14, 18, 22], l=True)))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -2319,7 +2336,7 @@ def build():
     W(ul_close())
     W(ability("Focus Fire", slug="windrunner_focusfire"))
     W(ul_open())
-    W(li("Damage Reduction decreased from 30% to 25%", b(30, 25)))
+    W(li("Damage Reduction decreased from 30% to 25%", b(30, 25, l=True)))
     W(ul_close())
     W(ability("Gale Force", slug="windrunner_gale_force"))
     W(ul_open())

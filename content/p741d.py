@@ -150,7 +150,7 @@ def build():
     # Axe
     W(hero_header("Axe"))
     W(ul_open())
-    W(li("Base Health Regen decreased by 0.5", bstat_h("Axe", "StatusHealthRegen", "7.41c", -0.5), extra=inline_note("Valve also lists \"Sense of Foreboding increased from 0 to 0.5\", but no such ability exists anywhere in the game files (likely a Valve leftover) — the only real change is the base Health Regen reduction")))
+    W(li("Base Health Regen decreased by 0.5", bstat_h("Axe", "StatusHealthRegen", "7.41c", -0.5), extra=inline_note("Sense of Foreboding increased from 0 to 0.5")))
     W(ul_close())
     W(ability("Battle Hunger", slug="axe_battle_hunger"))
     W(ul_open())
@@ -492,13 +492,13 @@ def build():
 
     # Lone Druid (Spirit Bear changes — id 1961 — folded into Lone Druid)
     W(hero_header("Lone Druid"))
-    W(subgroup("Talents"))
-    W(ul_open())
-    W(li("Level 10 Talent Movement Speed decreased from +20 to +15", b(20, 15)))
-    W(ul_close())
     W(unit_header("Spirit Bear", "../icons/abilities/lone_druid_spirit_bear.png", kind="Creep-hero"))
     W(ul_open())
     W(li("Base Health Regen decreased by 1.5", b(3, 1.5), extra=note_box(prev_val=3, new_val=1.5, prev_patch="7.40")))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 10 Talent Movement Speed decreased from +20 to +15", b(20, 15)))
     W(ul_close())
 
     # Marci

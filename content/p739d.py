@@ -51,7 +51,7 @@ def build():
 
     W(item_header("Heaven's Halberd"))
     W(ul_open())
-    W(li("Disarm duration increased from 3s to 3.5s on melee targets and from 4s to 4.5s on ranged targets", b(3, 3.5)))
+    W(li("Disarm duration increased from 3s to 3.5s on melee targets and from 4s to 4.5s on ranged targets", b([3, 4], [3.5, 4.5], slash=True)))
     W(ul_close())
 
     W(item_header("Maelstrom"))

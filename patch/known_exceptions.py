@@ -89,11 +89,12 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     ("Winter Wyvern", "winter_wyvern_eldwurm_scholar"),
     ("Keeper of the Light", "keeper_of_the_light_special_reserve"),
     ("Lone Druid", "lone_druid_gift_bearer"),
+    # Slark's 7.39-era innate (data/stats/7.39/heroes/npc_dota_hero_slark.txt "slark_barracuda", Innate 1); p739b
+    # showed it under slark_pounce, i.e. Pounce's icon and link (audit 2026-10-03)
+    ("Slark", "slark_barracuda"),
 }
 
-KNOWN_DISPLAY_NAME_OVERRIDES = {
-    ("Slark", "Barracuda", "slark_pounce"),
-}
+KNOWN_DISPLAY_NAME_OVERRIDES = set()
 
 KNOWN_ICON_URL_PSEUDO_SLUGS = {
     "brewmaster_earth_unit", "brewmaster_storm_unit",

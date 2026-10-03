@@ -97,7 +97,7 @@ def build():
         new=["Active: Berserk. Gives 100 attack speed, 6% / 12% movement speed (ranged/melee), and 15%/30% slow resistance (ranged/melee), but reduces your armor by 7 and silences you. Lasts 6 seconds. Mana Cost: 25. Cooldown: 16s",
              "Passive: Lifesteal. Heals the attacker for a percentage of physical damage dealt."]))
     W(ul_open())
-    W(li("Berserk now provides 15% slow resistance for ranged heroes and 30% for melee heroes, instead of 30% for any hero", t("REWORK")))
+    W(li("Berserk now provides 15% slow resistance for ranged heroes and 30% for melee heroes, instead of 30% for any hero", t("NERF")))
     W(li("Berserk movement speed bonus on ranged heroes decreased from 8% to 6%", b(8, 6)))
     W(ul_close())
     W(item_header("Orb of Frost"))
@@ -502,7 +502,7 @@ def build():
     W(hero_header("Phantom Assassin"))
     W(ability("Blur", slug="phantom_assassin_blur"))
     W(ul_open())
-    W(li("Now cannot be dispelled", t("NEW")))
+    W(li("Now cannot be dispelled", t("BUFF")))
     W(ul_close())
 
     # Phantom Lancer
@@ -690,7 +690,7 @@ def build():
     W(hero_header("Witch Doctor"))
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 20 Talent Maledict bursts deal 75% damage in a 800 AoE now considers illusions as creep targets and bursts from them will not deal damage", t("REWORK")))
+    W(li("Level 20 Talent Maledict bursts deal 75% damage in a 800 AoE now considers illusions as creep targets and bursts from them will not deal damage", t("DEL")))
     W(ul_close())
 
     # Zeus

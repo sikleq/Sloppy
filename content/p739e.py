@@ -71,7 +71,7 @@ def build():
     W(item_header("Refresher Orb"))
     W(ul_open())
     W(li("Reset Cooldowns cooldown now increases by 10s with each subsequent use up to 210s",
-         t("NERF") + b(180, [180, 190, 200, 210], l=True),
+         b(180, [180, 190, 200, 210], l=True),
          extra=inline_note("Maximum is reached after 4 uses: 180/190/200/210s")))
     W(li("Reset Cooldowns mana cost increased from 350 to 400", b(350, 400, l=True)))
     W(ul_close())

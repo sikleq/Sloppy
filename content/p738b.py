@@ -409,7 +409,7 @@ def build():
     W(ul_close())
     W(ability("Infest", slug="life_stealer_infest"))
     W(ul_open())
-    W(li("Aghanim's Scepter attack rate improved from 1.25s to 1s", b(1.25, 1)))
+    W(li("Aghanim's Scepter attack rate improved from 1.25s to 1s", b(1.25, 1, l=True)))
     W(li("Aghanim's Scepter no longer disarms targeted enemy hero", t("DEL")))
     W(ul_close())
 
@@ -429,9 +429,9 @@ def build():
 
     # Magnus
     W(hero_header("Magnus"))
-    W(ability("Empower", slug="magnataur_empower"))
+    W(facet_header("magnataur_eternal_empowerment"))
     W(ul_open())
-    W(li("Eternal Empowerment: Max self bonus decreased from 10/15/20/25% to 8/12/16/20%", b([10, 15, 20, 25], [8, 12, 16, 20])))
+    W(li("Empower: Max self bonus decreased from 10/15/20/25% to 8/12/16/20%", b([10, 15, 20, 25], [8, 12, 16, 20])))
     W(ul_close())
     W(ability("Skewer", slug="magnataur_skewer"))
     W(ul_open())
@@ -449,9 +449,9 @@ def build():
 
     # Medusa
     W(hero_header("Medusa"))
-    W(ability("Venomous Volley", slug="medusa_venomed_volley", innate=True))
+    W(ability("Venomous Volley", slug="medusa_venomed_volley"))
     W(ul_open())
-    W(li("Attacks required to apply poison increased from 5 to 6", b(5, 6)))
+    W(li("Attacks required to apply poison increased from 5 to 6", b(5, 6, l=True)))
     W(ul_close())
 
     # Meepo

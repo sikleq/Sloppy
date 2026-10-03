@@ -292,7 +292,7 @@ def build():
     W(ul_close())
     W(ability("Croak of Genius", slug="largo_croak_of_genius"))
     W(ul_open())
-    W(li("Reverberated damage is now only applied if the target is within 2000 range of the caster", t("REWORK")))
+    W(li("Reverberated damage is now only applied if the target is within 2000 range of the caster", t("NERF")))
     W(li("Duration is no longer decreased on Largo from his own abilities", t("BUFF")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -350,7 +350,7 @@ def build():
     W(ul_open())
     W(li_formula("Gold/Experience Bounty changed",
                  "300", "175 + 8 per Spirit Bear level up",
-                 lambda L: 300, lambda L: 175 + 8 * L,
+                 lambda L: 300, lambda L: 175 + 8 * (L - 1),
                  levels=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 25, 30],
                  l=True,
                  rework_badge=False))
@@ -415,7 +415,7 @@ def build():
     # Morphling
     W(hero_header("Morphling"))
     W(ul_open())
-    W(li("Base armor increased by 1", t("BUFF")))
+    W(li("Base armor increased by 1", bstat_h("Morphling", "ArmorPhysical", "7.40", 1), extra=note_box(hero="Morphling", field="ArmorPhysical", before_patch="7.40")))
     W(ul_close())
 
     # Muerta
@@ -673,7 +673,7 @@ def build():
     # Treant Protector
     W(hero_header("Treant Protector"))
     W(ul_open())
-    W(li("Base Armor increased by 1", t("BUFF")))
+    W(li("Base Armor increased by 1", bstat_h("Treant Protector", "ArmorPhysical", "7.40", 1), extra=note_box(hero="Treant Protector", field="ArmorPhysical", before_patch="7.40")))
     W(ul_close())
     W(ability("Nature's Guise", slug="treant_natures_guise"))
     W(ul_open())

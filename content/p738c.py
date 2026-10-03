@@ -260,7 +260,7 @@ def build():
     W(hero_header("Chen"))
     W(ability("Summon Convert", slug="chen_summon_convert", innate=True))
     W(ul_open())
-    W(li("Summon Convert: Convert is now considered a creep-hero", t("NEW"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
+    W(li("Convert is now considered a creep-hero", t("NEW"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
     W(ul_close())
     
     # Dark Seer
@@ -556,7 +556,8 @@ def build():
     W(ul_close())
     W(ability("Unicycle", slug="ringmaster_summon_unicycle", sub=True))
     W(ul_open())
-    W(li("No longer gets knocked off from damage below 20 or from any damage for 1.5s after mounting the unicycle", t("NEW")))
+    W(li("No longer gets knocked off if the damage taken is below 20", t("BUFF")))
+    W(li("No longer gets knocked off from any damage for 1.5s after mounting the unicycle", t("BUFF")))
     W(li("Can now cast non-channeling spells and pick up runes without dismounting the unicycle", t("NEW"), extra=inline_note("Still requires Ringmaster to be facing in the spell direction")))
     W(ul_close())
     W(ability("Weighted Pie", slug="ringmaster_weighted_pie", sub=True))

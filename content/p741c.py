@@ -193,7 +193,7 @@ def build():
     W(subgroup("Abilities"))
     W(ability("Primal Split"))
     W(ul_open())
-    W(li("Cancel Split now has a 3s initial cooldown", '<span class="badge qol" data-tag="qol">QoL</span>'))
+    W(li("Cancel Split now has a 3s initial cooldown", t("NERF")))
     W(ul_close())
     W(hero_header("Bristleback"))
     W(subgroup("Abilities"))
@@ -389,8 +389,6 @@ def build():
     W(ability("Savage Roar"))
     W(ul_open())
     W(li("Aghanim's Shard buff duration decreased from 5s to 4s", b(5, 4)))
-    W(ul_close())
-    W(ul_open())
     W(li("Aghanim's Shard bonus movement speed decreased from 15% to 10%", b(15, 10)))
     W(ul_close())
     W(subgroup("Talents"))
@@ -400,8 +398,8 @@ def build():
     W(unit_header("Spirit Bear", "../icons/abilities/lone_druid_spirit_bear.png", kind="Creep-hero"))
     W(ul_open())
     W(li_formula("Gold/Experience Bounty changed",
-                 "175 + 8 per Spirit Bear level", "165 + 10 per Spirit Bear level",
-                 lambda L: 175 + 8 * L,
+                 "175 + 8 per Spirit Bear level up", "165 + 10 per Spirit Bear level",
+                 lambda L: 175 + 8 * (L - 1),
                  lambda L: 165 + 10 * L,
                  levels=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 25, 30],
                  l=True,

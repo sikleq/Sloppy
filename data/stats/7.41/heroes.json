@@ -52,8 +52,8 @@
     "AttributeAgilityGain": 2.8,
     "AttributeBaseIntelligence": 12,
     "AttributeIntelligenceGain": 1.8,
-    "StatusHealthRegen": 1.5,
-    "MovementSpeed": 315
+    "StatusHealthRegen": 1.0,
+    "MovementSpeed": 310
   },
   "npc_dota_hero_axe": {
     "Ability1": "axe_berserkers_call",
@@ -335,7 +335,7 @@
     "AttributeBaseStrength": 23,
     "AttributeStrengthGain": 2.6,
     "AttributeBaseAgility": 24,
-    "AttributeAgilityGain": 4.2,
+    "AttributeAgilityGain": 3.9,
     "AttributeBaseIntelligence": 19,
     "AttributeIntelligenceGain": 1.8,
     "MovementSpeed": 285
@@ -617,7 +617,7 @@
     "AttributePrimary": "DOTA_ATTRIBUTE_ALL",
     "AttributeBaseStrength": 18,
     "AttributeStrengthGain": 2.6,
-    "AttributeBaseAgility": 20,
+    "AttributeBaseAgility": 17,
     "AttributeAgilityGain": 2.1,
     "AttributeBaseIntelligence": 18,
     "AttributeIntelligenceGain": 3.2,
@@ -1171,7 +1171,7 @@
     "ArmorPhysical": 0,
     "AttackDamageMin": 38,
     "AttackDamageMax": 40,
-    "AttackRate": 1.8,
+    "AttackRate": 1.7,
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_STRENGTH",
     "AttributeBaseStrength": 22,
@@ -1179,7 +1179,7 @@
     "AttributeBaseAgility": 16,
     "AttributeAgilityGain": 1.7,
     "AttributeBaseIntelligence": 16,
-    "AttributeIntelligenceGain": 1.4,
+    "AttributeIntelligenceGain": 1.6,
     "StatusHealthRegen": 0.5,
     "MovementSpeed": 310
   },
@@ -1458,7 +1458,7 @@
     "AttackRange": 575,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
     "AttributeBaseStrength": 20,
-    "AttributeStrengthGain": 2.5,
+    "AttributeStrengthGain": 2.8,
     "AttributeBaseAgility": 17,
     "AttributeAgilityGain": 2.5,
     "AttributeBaseIntelligence": 22,
@@ -1507,8 +1507,8 @@
       "Ability4": "life_stealer_infest"
     },
     "ArmorPhysical": 1,
-    "AttackDamageMin": 23,
-    "AttackDamageMax": 29,
+    "AttackDamageMin": 26,
+    "AttackDamageMax": 32,
     "AttackRate": 1.7,
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_STRENGTH",
@@ -1902,7 +1902,7 @@
       "Ability3": "doom_bringer_infernal_blade",
       "Ability4": "doom_bringer_doom"
     },
-    "ArmorPhysical": 1,
+    "ArmorPhysical": 2,
     "AttackDamageMin": 32,
     "AttackDamageMax": 42,
     "AttackRate": 1.9,
@@ -2057,7 +2057,7 @@
     "AttributeAgilityGain": 1.5,
     "AttributeBaseIntelligence": 25,
     "AttributeIntelligenceGain": 1.8,
-    "MovementSpeed": 290
+    "MovementSpeed": 295
   },
   "npc_dota_hero_invoker": {
     "Ability1": "invoker_quas",
@@ -2091,7 +2091,7 @@
     "AttributeStrengthGain": 2.5,
     "AttributeBaseAgility": 14,
     "AttributeAgilityGain": 2.0,
-    "AttributeBaseIntelligence": 22,
+    "AttributeBaseIntelligence": 20,
     "AttributeIntelligenceGain": 4.0,
     "MovementSpeed": 285
   },
@@ -2275,8 +2275,8 @@
       "Ability4": "chaos_knight_phantasm"
     },
     "ArmorPhysical": 2,
-    "AttackDamageMin": 32,
-    "AttackDamageMax": 52,
+    "AttackDamageMin": 29,
+    "AttackDamageMax": 49,
     "AttackRate": 1.7,
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_STRENGTH",
@@ -3402,7 +3402,7 @@
     "AttributeAgilityGain": 2.2,
     "AttributeBaseIntelligence": 24,
     "AttributeIntelligenceGain": 3.1,
-    "StatusManaRegen": 0.0,
+    "StatusManaRegen": 0.6,
     "MovementSpeed": 290
   },
   "npc_dota_hero_snapfire": {

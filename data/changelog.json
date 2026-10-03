@@ -19,6 +19,22 @@
       "category": "Patch Reader",
       "minor": true,
       "fix": true,
+      "link": "patches/7.39.html",
+      "title": "7.39 proofread against Valve's data: 40 fixes — Valve's (?) notes that were missing (Tormentor, Health Restoration, Chen, five neutral artifacts), costs and penalties where lower is better (Tiny's Grow, Windranger's Focus Fire, Spectre's Desolate, Naga Siren's Deluge…), Phantom Assassin's Blur and Immaterial, old descriptions matching 7.38c (Grimstroke, Dawnbreaker, Earthshaker, Io), Invoker's Sun Strike and Twister as tables by orb level"
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Patch Reader",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.41a.html",
+      "title": "Letter patches 7.38b–7.41e and 7.08 proofread against Valve's data: 38 fixes — tags (Mask of Madness, Clinkz, Largo, Witch Doctor, Ringmaster's Unicycle…), Lifestealer's Infest and Medusa's poison where lower is better, Magnus's facet, Slark's Barracuda and Pudge's Flesh Heap under their own names, Lone Druid's talent under the Spirit Bear, Valve's own typos marked (Techies 7.41a, Grimstroke 7.40c); 7.41a base stats now compare with 7.41 (Anti-Mage +50%, Doom −50% — they were counted from 7.41a's own values)"
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Patch Reader",
+      "minor": true,
+      "fix": true,
       "link": "patches/7.41.html",
       "title": "7.41 proofread again against Valve's data: 70 fixes — tags (Crimson Guard, Tranquil Boots, Titanic, Queen of Pain's reflection…), old descriptions now match 7.40c (Juggernaut, Lich, Lina, Muerta, Dragon Knight, Tinker…), Shodo Sai and Pudge's Flesh Heap under their own names"
     },
@@ -28,7 +44,7 @@
       "minor": true,
       "fix": true,
       "link": "patches/7.40.html",
-      "title": "7.40 proofread again against Valve's data: 39 fixes — tags (Healing Salve, Pangolier, Spectre's Reality…), Naga Siren's Deluge cooldown under its own name, Searing Arrows as a returning ability card, old descriptions matching 7.39e"
+      "title": "7.40 proofread again against Valve's data: 40 fixes — tags (Healing Salve, Pangolier, Spectre's Reality, Treant's Eyes In The Forest moving from Scepter to Shard…), Naga Siren's Deluge cooldown under its own name, Searing Arrows as a returning ability card, old descriptions matching 7.39e"
     },
     {
       "date": "2026-10-03",

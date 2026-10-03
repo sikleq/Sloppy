@@ -93,8 +93,7 @@ def build():
     W(ul_open())
     W(li("Skeleton Building Damage penalty increased from 25% to 75%", b(25, 75, l=True),
          extra=inline_note("Also applies to Burning Army skeletons.")))
-    W(li("No longer upgraded with Aghanim's Scepter", t("DEL")))
-    W(li("Aghanim's Scepter now only provides Burning Army ability without increasing Skeleton Archer Hits to Kill by 1", t("DEL")))
+    W(li("No longer upgraded with Aghanim's Scepter", t("DEL"), extra=inline_note("Aghanim's Scepter now only provides Burning Army ability without increasing Skeleton Archer Hits to Kill by 1")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -105,7 +104,7 @@ def build():
     # Dark Seer
     W(hero_header("Dark Seer"))
     W(ul_open())
-    W(li("Base Armor increased by 1", t("BUFF")))
+    W(li("Base Armor increased by 1", bstat_h("Dark Seer", "ArmorPhysical", "7.40b", 1), extra=note_box(hero="Dark Seer", field="ArmorPhysical", before_patch="7.40b")))
     W(ul_close())
 
     # Doom
@@ -141,7 +140,7 @@ def build():
     W(hero_header("Grimstroke"))
     W(ul_open())
     W(li("Base damage increased by 1", bstat_h("Grimstroke", "AttackDamageMin", "7.40b", 1), extra=note_box(hero="Grimstroke", field="AttackDamageMin", before_patch="7.40b")))
-    W(li("Damage at level 1 changed from 46–50 to 47–51", br(46, 50, 47, 51)))
+    W(li('Damage at level 1 <span class="wrong-word">decreased</span> from 46–50 to 47–51', br(46, 50, 47, 51), extra=note_box('The patch text says "decreased", but the values actually went up.')))
     W(ul_close())
     W(ability("Ink Swell", slug="grimstroke_spirit_walk"))
     W(ul_open())

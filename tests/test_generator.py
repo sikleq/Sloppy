@@ -619,6 +619,41 @@ def test_terrain_canon(text, tag):
     assert g._guess_tag(text) == tag
 
 
+@pytest.mark.parametrize("text,tag", [
+    # second audit (2026-10-03, 7.38b-7.41e against Valve's datafeed and the previous KV)
+    ("Old Blood: Level 10 Talent +15% Bloodrage Spell Amplification replaced with +15% Bloodrage Base Damage Amp",
+     "SWAP"),
+    ("No longer gets knocked off if the damage taken is below 20", "BUFF"),
+    ("Infest: Damage over time debuff is now undispellable", "BUFF"),
+    ("Now cannot be dispelled", "BUFF"),
+    ("Now dispelled when attacking Roshan or enemy Barracks", "NERF"),
+    ("Health change is now affected by negative Health Restoration effects", "NERF"),
+    ("Tower hits on archers now count as hero hits", "NERF"),
+    ("Cancel Split now has a 3s initial cooldown", "NERF"),
+    ("Reverberated damage is now only applied if the target is within 2000 range of the caster", "NERF"),
+    ("Level 20 Talent Maledict bursts deal 75% damage in a 800 AoE now considers illusions as creep targets and "
+     "bursts from them will not deal damage", "DEL"),
+    ("Now granted by Aghanim's Scepter", "REWORK"),
+    ("Now is a basic ability", "REWORK"),
+    ("Now applies when attacking enemy heroes that are equal or higher level than you, instead of only higher level "
+     "enemy heroes", "BUFF"),
+    ("If Ringmaster does not have a Souvenir, he will be granted one upon death (instead of upon respawn)", "REWORK"),
+])
+def test_canonical_tags_from_the_second_audit(text, tag):
+    assert g._guess_tag(text) == tag
+
+
+@pytest.mark.parametrize("text", [
+    "Aghanim's Scepter attack rate improved from 1.25s to 1s",
+    "Attacks required to apply poison increased from 5 to 6",
+    "Flight duration decreased from 1.4s to 1.25s",
+    "Aghanim's Scepter time for Frostbite application decreased from 2.5s to 2s",
+    "Aghanim's Shard Illusion damage reduction decreased from 30% to 15%",
+])
+def test_lower_is_better_from_the_second_audit(text):
+    assert g._is_lower_better(text)
+
+
 def test_creep_level_change_is_misc_not_a_percent_badge():
     assert g._emit_li("Level increased from 5 to 6") == 'W(li("Level increased from 5 to 6", t("MISC")))'
 

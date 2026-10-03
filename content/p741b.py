@@ -579,7 +579,7 @@ def build():
 
     # Pudge
     W(hero_header("Pudge"))
-    W(ability("Meat Shield", slug="pudge_flesh_heap"))
+    W(ability("Flesh Heap", slug="pudge_innate_graft_flesh"))
     W(ul_open())
     W(li("Strength gain per stack increased from 1.6 to 2.0", b(1.6, 2.0)))
     W(ul_close())
@@ -696,7 +696,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 15 Talent Gush Damage decreased from +100 to +90", b(100, 90)))
-    W(li("Level 25 Talent Anchor Smash damage to buildings decreased from 100% to 50%", b(100, 50)))
+    W(li("Level 25 Talent Anchor Smash affects buildings now deals 50% damage to buildings", b(100, 50)))
     W(ul_close())
 
     # Timbersaw

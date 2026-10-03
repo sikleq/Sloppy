@@ -233,6 +233,24 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
   У строки ландшафта под текстом — микроскриншоты «было | стало» (data/terrain_spots.json →
   scripts/gen/terrain_shots.py → icons/terrain/, patch/elements.py `terrain_shots_html`). Генератор:
   CANONICAL_TAGS «Terrain», тесты `test_terrain_canon`.
+- **Вторая вычитка 7.38b–7.41e (2026-10-03), правило → почему** (генератор: CANONICAL_TAGS / LOWER_IS_BUFF,
+  тесты `test_canonical_tags_from_the_second_audit`, `test_lower_is_better_from_the_second_audit`):
+  - «Now granted by Aghanim's Scepter/Shard» → **REWORK** (+ «?» откуда было): способность переехала между
+    улучшениями, она не новая (PA Fan of Knives 7.39, Treant Eyes In The Forest 7.40 — по KV `IsGrantedBy…`).
+  - «Now is a basic ability» → **REWORK**; «Now is an innate ability» — **REWORK** и в карточке, если врождённой
+    стала существующая способность (Earthshaker Slugger 7.39 был фасетом).
+  - Своё «now undispellable» / «Now cannot be dispelled» → **BUFF**; «Now dispelled when …» → **NERF**;
+    «No longer gets knocked off …» → **BUFF**; «now affected by negative Health Restoration», «now count as hero
+    hits», «now has a 3s initial cooldown», «now only applied if …» → **NERF**; иллюзии / creep-heroes, по которым
+    эффект «will not deal damage» → **DEL**; «…instead of only higher level heroes» (область расширена) → **BUFF**.
+  - Фасетный талант «Facet: Level N Talent X replaced with Y» → **SWAP**, как и обычный.
+  - `l=True` (меньше = лучше): attack rate (секунды на удар), attacks required, flight duration, «time for X
+    application», урон своей иллюзии (illusion damage reduction). Только по смыслу, не словом: свой штраф к урону
+    или скорости атаки (Focus Fire, Grow), потолок скорости врагов (Deluge), награда за своего варда, радиус, где
+    союзник врага отключает пассивку (Desolate), — `l=True` ставится руками.
+  - Опечатка Valve в числах (Techies Proximity Mines 7.41a «450», «225») — `wrong-word` + `note_box` с реальными
+    значениями из KV, бейдж по KV. Valve пишет «decreased», а числа выросли — то же (Grimstroke 7.40c).
+  - «per Spirit Bear level up» → формула `A + B*(L-1)` (Spirit Bear 7.40b, 7.41c), см. formula-tables.
 - **«X removed and replaced with new …: Y»** — строка DEL уходит под свой подзаголовок X над блоком Y. *Почему:* это изменение старой вещи, а не описание новой.
 - **Строка без метки внутри описания нового объекта** (например, опыт от Shrines плюс «?») тоже входит в описание: метка NEW, чип скрывается.
 - **Две соседние однотипные строки с одинаковым «?»** (Great / Greater Lotuses) — одна строка «…A, and B», одно «?». *Почему:* это одно изменение про два значения.

@@ -15,7 +15,7 @@ def build():
     W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ability("Reflect", icon_url="../icons/abilities/miniboss_reflect.png"))
     W(ul_open())
-    W(li("No longer considers creep-heroes for the damage reflected", t("DEL"), extra=inline_note("Lone Druid's Spirit Bear is an exception for this")))
+    W(li("No longer considers creep-heroes for the damage reflected", t("REWORK"), extra=inline_note("Lone Druid's Spirit Bear is an exception for this")))
     W(ul_close())
 
     W(plain_header("Terrain Changes", terrain_link="7.39c"))
@@ -32,14 +32,14 @@ def build():
     W(unit_header("Boglet", _NC_CDN + "froglet.png"))
     W(ability("Arm of the Deep", icon_url="../icons/abilities/frogmen_arm_of_the_deep.png"))
     W(ul_open())
-    W(li("Arm of the Deep: Cast point increased from 0.2s to 0.3s", b(0.2, 0.3, l=True)))
+    W(li("Cast point increased from 0.2s to 0.3s", b(0.2, 0.3, l=True)))
     W(ul_close())
 
     # Croaker
     W(unit_header("Croaker", _NC_CDN + "grown_frog.png"))
     W(ability("Tendrils of the Deep", icon_url="../icons/abilities/frogmen_tendrils_of_the_deep.png"))
     W(ul_open())
-    W(li("Tendrils of the Deep: Cast point increased from 0.2s to 0.3s", b(0.2, 0.3, l=True)))
+    W(li("Cast point increased from 0.2s to 0.3s", b(0.2, 0.3, l=True)))
     W(ul_close())
 
     # Ancient Croaker
@@ -169,21 +169,21 @@ def build():
     W(hero_header("Chaos Knight"))
     W(ability("Chaos Bolt", slug="chaos_knight_chaos_bolt"))
     W(ul_open())
-    W(li("Aghanim's Shard Illusion damage reduction decreased from 30% to 15%", b(30, 15)))
+    W(li("Aghanim's Shard Illusion damage reduction decreased from 30% to 15%", b(30, 15, l=True)))
     W(ul_close())
 
     # Clinkz
     W(hero_header("Clinkz"))
     W(ability("Bone and Arrow", slug="clinkz_bone_and_arrow"))
     W(ul_open())
-    W(li("Tower hits on archers now count as hero hits", t("REWORK")))
+    W(li("Tower hits on archers now count as hero hits", t("NERF")))
     W(ul_close())
 
     # Crystal Maiden
     W(hero_header("Crystal Maiden"))
     W(ability("Freezing Field", slug="crystal_maiden_freezing_field"))
     W(ul_open())
-    W(li("Aghanim's Scepter time for Frostbite application decreased from 2.5s to 2s", b(2.5, 2)))
+    W(li("Aghanim's Scepter time for Frostbite application decreased from 2.5s to 2s", b(2.5, 2, l=True)))
     W(ul_close())
 
     # Dark Seer
@@ -472,7 +472,7 @@ def build():
     W(hero_header("Tiny"))
     W(ability("Toss", slug="tiny_toss"))
     W(ul_open())
-    W(li("Flight duration decreased from 1.4s to 1.25s", b(1.4, 1.25)))
+    W(li("Flight duration decreased from 1.4s to 1.25s", b(1.4, 1.25, l=True)))
     W(ul_close())
 
     # Tusk

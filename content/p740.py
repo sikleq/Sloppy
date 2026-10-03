@@ -2798,7 +2798,7 @@ def build():
     W(ul_close())
     W(ability("Eyes In The Forest", slug="treant_eyes_in_the_forest"))
     W(ul_open())
-    W(li("Now granted by Aghanim's Shard", t("NEW")))
+    W(li("Now granted by Aghanim's Shard", t("REWORK"), extra=inline_note("Was granted by Aghanim's Scepter")))
     W(li("Mana Cost decreased from 100 to 30", b(100, 30, l=True)))
     W(li("Cast Range increased from 160 to 350", b(160, 350)))
     W(li("Overgrowth is no longer applied around enchanted trees", t("DEL")))

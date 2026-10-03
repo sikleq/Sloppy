@@ -207,7 +207,7 @@ def build():
     W(hero_header("Morphling"))
     W(ability("Attribute Shift (Strength Gain)", slug="morphling_morph_str"))
     W(ul_open())
-    W(li("Health change is now affected by negative Health Restoration effects", t("REWORK")))
+    W(li("Health change is now affected by negative Health Restoration effects", t("NERF")))
     W(ul_close())
 
     # Nature's Prophet
@@ -298,7 +298,7 @@ def build():
 
     # Slark
     W(hero_header("Slark"))
-    W(ability("Barracuda", slug="slark_pounce", innate=True))
+    W(ability("Barracuda", slug="slark_barracuda", innate=True))
     W(ul_open())
     W(li("Health Gained per second decreased from 10/70/100/130 to 5/70/100/130", b([10, 70, 100, 130], [5, 70, 100, 130])))
     W(ul_close())

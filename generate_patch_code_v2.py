@@ -221,6 +221,17 @@ CANONICAL_TAGS = [
     # SWAP (owner 2026-09-26): a talent replaced by another in the same slot — its own tag, not REWORK
     # ("Level 15 Talent +110 Rolling Boulder Damage replaced with +80 Boulder Smash Damage")
     (re.compile(r'^\s*Level \d+(?: Talent)?:?\s.*\breplaced with\b', re.I), 'SWAP'),
+    # …and a facet's own talent swap, prefixed by the facet ("Old Blood: Level 10 Talent … replaced with …")
+    (re.compile(r"^\s*[A-Z][\w' ]{0,40}: Level \d+(?: Talent)?:?\s.*\breplaced with\b"), 'SWAP'),
+    # ── 2026-10-03 second audit (7.38b-7.41e): classes the scaffold got wrong ──
+    (re.compile(r'\bno longer gets? knocked off\b', re.I),           'BUFF'),   # own mount restriction lifted
+    (re.compile(r'\b(?:is now|now) undispellable\b|^\s*Now cannot be dispelled\b', re.I), 'BUFF'),
+    (re.compile(r'^\s*Now (?:dispelled|dispellable)\b', re.I),       'NERF'),   # a new way to lose an own buff
+    (re.compile(r'\bnow affected by negative\b', re.I),              'NERF'),   # enemy heal cuts now apply to it
+    (re.compile(r'\bnow counts? as hero hits\b', re.I),              'NERF'),   # own summons die faster
+    (re.compile(r'\bnow has an? \d+(?:\.\d+)?s initial cooldown\b', re.I), 'NERF'),
+    (re.compile(r'\b(?:illusions?|creep-heroes?)\b[^.]*\bwill not (?:deal|apply|trigger|affect)\b', re.I), 'DEL'),
+    (re.compile(r"^\s*Now granted by Aghanim's (?:Scepter|Shard)\b", re.I), 'REWORK'),   # moved between upgrades
     # BUFF first — removing a penalty / restriction is positive (memory rule
     # sloppy_no_longer_penalty_is_buff). Tightly anchored so legitimate DEL
     # phrasings don't accidentally match.
@@ -266,7 +277,7 @@ CANONICAL_TAGS = [
     # a restriction / limit / delay is ADDED → NERF
     (re.compile(r'\bis now dispellable\b', re.I),                   'NERF'),   # own buff can now be removed
     (re.compile(r'\bis now disjointable\b', re.I),                  'NERF'),   # own projectile can now be dodged
-    (re.compile(r'\bnow (?:only|solely) (?:affects?|available|applies|works|triggers?|targets?|hits?)\b', re.I), 'NERF'),
+    (re.compile(r'\bnow (?:only|solely) (?:affects?|available|appl(?:ies|ied)|works|triggers?|targets?|hits?)\b', re.I), 'NERF'),
     (re.compile(r'\bnow (?:affects?|applies|works) only\b', re.I),  'NERF'),
     # a whole cooldown where there was none (7.38 "Poison Attack now has a 9s cooldown") -> REWORK: the
     # ability now works differently (owner 2026-09-28; it was NEW); longer sentences ("…cooldown before it
@@ -323,7 +334,7 @@ CANONICAL_TAGS = [
     (re.compile(r"^Aghanim's (?:Shard|Scepter): ", re.I),          'NEW'),            # a new upgrade, described
     (re.compile(r'^Now is a guaranteed\b.*\boption\b', re.I),       'REWORK'),         # neutral enchantment pools
     (re.compile(r'^\s*Now (?:is )?(?:an? )?innate ability\b', re.I), 'REWORK'),
-    (re.compile(r'^Now always a basic ability\b|^Now the default (?:\w+ )?ability\b', re.I), 'REWORK'),
+    (re.compile(r'^Now (?:always |is )?a basic ability\b|^Now the default (?:\w+ )?ability\b', re.I), 'REWORK'),
     (re.compile(r'^Now automatically triggers\b|^Now is a no-target ability\b', re.I), 'REWORK'),
     (re.compile(r'\bno longer has an? (?:\w+ ){0,3}self debuff\b', re.I), 'BUFF'),    # Bloodpact's own lockout lifted
     # a capability is taken away → DEL
@@ -423,7 +434,13 @@ LOWER_IS_BUFF = re.compile(
     # 2026-09-18 proofread: self-penalties, owner-side timers and thresholds
     r'|disable\s+(?:range|radius|duration)'
     r'|(?:damage|attack|tick|pulse|explosion|spawn)\s+interval'
-    r'|flight\s+time'
+    r'|flight\s+(?:time|duration)'
+    # 2026-10-03 second audit: seconds per attack, a count of hits needed, a wait before an effect lands,
+    # an own illusion's damage penalty
+    r'|attack\s+rate'
+    r'|attacks?\s+required'
+    r'|time\s+for\s+\w+\s+application'
+    r'|illusion\s+damage\s+(?:reduction|penalty)'
     r'|stun\s+duration\s+from\s+falling'
     r'|slow\s+resistance\s+loss|status\s+resistance\s+loss'   # self-penalty (Spirit Breaker Relentless); NOT enemy armor/AS/MR reduction
     r'|creep\s+penalty|max\s+mana\s+penalty|vision\s+penalty'
@@ -476,6 +493,7 @@ TAG_OVERRIDES = {
     "now has a shared cooldown":    "MISC",
     "now requires aghanim's":       "NERF",    # a capability now gated behind Aghs (checked before "now requires")
     "now requires":                 "REWORK",  # "Now requires X instead of Y"
+    "instead of only higher":       "BUFF",    # scope widened ("…equal or higher level, instead of only higher"; audit 2026-10-03)
     "instead of":                   "REWORK",  # component/requirement swap
     "respawn time increased":       "NERF",    # "increased" heuristic gives BUFF, but higher respawn = worse
     "respawn time decreased":       "BUFF",
