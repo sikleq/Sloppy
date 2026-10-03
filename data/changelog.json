@@ -7,7 +7,7 @@
       "title": "Terrain notes you can see",
       "link": "patches/7.41.html",
       "items": [
-        "Every terrain note from 7.38b to 7.41 that can be seen on the map shows its spot: the old and the new map side by side, what was removed outlined red, what was added green, what moved yellow; a click opens the Terrain page",
+        "Every terrain note from 7.38 to 7.41 that can be seen on the map shows its spot: the old and the new map side by side, what was removed outlined red, what was added green, what moved yellow; a click opens the Terrain page",
         "Terrain notes carry real tags instead of MISC almost everywhere: moved or reshaped REWORK, added NEW, removed DEL, a camp's tier BUFF or NERF, fixes MISC"
       ],
       "shots": [
@@ -52,7 +52,7 @@
       "minor": true,
       "fix": true,
       "link": "terrain_741.html",
-      "title": "Terrain: dragging the slider stays smooth on slower computers, layers on or off (it re-styled every tree and camp marker on each move)"
+      "title": "Terrain: pages open faster and stay smooth on slower computers — the maps load at half size first (1.7 MB instead of 8 MB; the full pictures come only for the lens on sharp screens or fullscreen zoom), and dragging the slider no longer re-styles every tree and camp marker on each move"
     },
     {
       "date": "2026-10-03",

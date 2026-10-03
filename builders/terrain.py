@@ -860,6 +860,7 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, 
     empty, the layer-toggle buttons are dropped (Zoom stays)."""
     old_map = f"icons/maps/map_{old_pic or old_ver}.webp"
     new_map = f"icons/maps/map_{new_pic or new_ver}.webp"
+    old_src, new_src = _picture_attrs(old_map), _picture_attrs(new_map)
     top_bar, fs_bar = _controls_html(layers=bool(markers_svg), changes=changes)
     tiled = _tiled_pictures()
     tiles = "".join(f' data-tiles-{side}="{_TILES_BASE}{v}/"'
@@ -869,11 +870,11 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, 
         f'{top_bar}'
         '  <div class="tc-fs-canvas">\n'
         '    <div class="tc-stage">\n'
-        f'      <img class="tc-img tc-old" src="{old_map}?v={ASSET_VERSION}" '
+        f'      <img class="tc-img tc-old" src="{old_src[0]}"{old_src[1]} '
         f'width="4096" height="4096" alt="Dota 2 map terrain in patch {old_ver}" '
         f'draggable="false" loading="eager" fetchpriority="high">\n'
         '      <div class="tc-new-layer">\n'
-        f'        <img class="tc-img tc-new" src="{new_map}?v={ASSET_VERSION}" '
+        f'        <img class="tc-img tc-new" src="{new_src[0]}"{new_src[1]} '
         f'width="4096" height="4096" alt="Dota 2 map terrain in patch {new_ver}" '
         f'draggable="false" loading="eager">\n'
         '      </div>\n'
@@ -889,8 +890,8 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, 
         '<span class="tc-chev tc-chev-r"></span></span>\n'
         '      </div>\n'
         '      <div class="tc-lens" aria-hidden="true">\n'
-        f'        <img class="tc-lens-img tc-lens-old" src="{old_map}?v={ASSET_VERSION}" alt="" draggable="false">\n'
-        f'        <img class="tc-lens-img tc-lens-new" src="{new_map}?v={ASSET_VERSION}" alt="" draggable="false">\n'
+        f'        <img class="tc-lens-img tc-lens-old"{old_src[1]} alt="" draggable="false">\n'
+        f'        <img class="tc-lens-img tc-lens-new"{new_src[1]} alt="" draggable="false">\n'
         '        <span class="tc-lens-rim" aria-hidden="true"></span>\n'
         '      </div>\n'
         '    </div>\n'
@@ -1025,6 +1026,17 @@ def _tiled_pictures():
             return set(_json.load(f).get("tiles", []))
     except (OSError, ValueError):
         return set()
+
+
+def _picture_attrs(path):
+    """(first src, data attrs) of a map picture. The page opens on the 2048-px copy (scripts/gen/map_small.py,
+    ~0.85 MB against ~4.2 MB) when it exists; scripts.js fitSrc swaps in data-full once a picture pixel would be
+    drawn bigger than a screen pixel (the owner 2026-10-03: "on weak computers it may lag")."""
+    stem, ext = _os.path.splitext(path)
+    small = f"{stem}_2k{ext}"
+    full = f"{path}?v={ASSET_VERSION}"
+    first = f"{small}?v={ASSET_VERSION}" if _os.path.exists(_os.path.join(_HERE, small)) else full
+    return first, f' data-small="{first}" data-full="{full}"'
 
 
 

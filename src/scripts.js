@@ -6655,6 +6655,23 @@ function ecShopMarkup(panels) {
     const LENS_PX = parseFloat(root.dataset.lens) || 184;
     if (root.dataset.lens) stage.style.setProperty('--lens', root.dataset.lens + 'px');
 
+    // The page opens on 2048-px copies of the map pictures (data-small, a fifth of the bytes); an
+    // image swaps to its 4096 picture (data-full) once a picture pixel would be drawn bigger than a
+    // screen pixel (a big retina screen, the lens, fullscreen zoom) and never swaps back. The lens
+    // images get no src until the lens is first switched on (the owner 2026-10-03: weak computers).
+    const SMALL_PX = 2048;
+    const baseImgs = [root.querySelector('.tc-img.tc-old'), root.querySelector('.tc-img.tc-new')];
+    function fitSrc(img, cssW) {
+      if (!img || !img.dataset.full || img.dataset.sharp) return;
+      const sharp = cssW * (window.devicePixelRatio || 1) > SMALL_PX * 1.05;
+      const want = sharp ? img.dataset.full : (img.dataset.small || img.dataset.full);
+      if (sharp) img.dataset.sharp = '1';
+      if (img.getAttribute('src') !== want) img.src = want;
+    }
+    function fitBase(cssW) { baseImgs.forEach(function(img) { fitSrc(img, cssW); }); }
+    fitBase(stage.getBoundingClientRect().width);
+    window.addEventListener('resize', function() { fitBase(stage.getBoundingClientRect().width); });
+
     let pos = parseFloat(root.dataset.pos);
     if (!isFinite(pos)) pos = 50;
 
@@ -6755,6 +6772,7 @@ function ecShopMarkup(panels) {
       [lensOld, lensNew].concat(lensMarkers).forEach(function(el) {
         if (el) { el.style.width = w + 'px'; el.style.height = w + 'px'; }
       });
+      if (loupeMode) { fitSrc(lensOld, w); fitSrc(lensNew, w); }
       // lensR is fixed (derived from data-lens); no DOM read needed here.
     }
     function placeLens(cx, cy) {
@@ -6917,8 +6935,9 @@ function ecShopMarkup(panels) {
       tileSets.push({ base: base, box: box, have: {} });
     });
     function updateTiles() {
-      if (!tileSets.length) return;
       var w = parseFloat(stage.style.width) || 0;
+      if (fsActive && w) fitBase(w);
+      if (!tileSets.length) return;
       var on = fsActive && w * (window.devicePixelRatio || 1) > BASE_PX * 1.05;
       tileSets.forEach(function(t) { t.box.style.display = on ? '' : 'none'; });
       if (!on) return;

@@ -339,6 +339,15 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   .tc-camps-new, .tc-lens-new` → `inset(0 0 0 X%)`; `.tm-old, .tc-trees-old, .tc-camps-old` → `inset(0 (100-X)% 0
   0)`) and the handle's `left`; the CSS `var(--pos)` rules stay as the no-JS default. After: p95 16.7 ms (60 fps)
   with every layer on, recalc 0.3 s per drag. Don't set an inherited custom property on the stage per frame again.
+- **Small pictures first (2026-10-03)** — same request. A page fetched both 4096 pictures (~8.3 MB) and the lens
+  pointed at them too, though the map is drawn ~720 px wide. `scripts/gen/map_small.py` writes a 2048-px copy of
+  every picture (`icons/maps/map_<ver>_2k.webp`, q82, ~0.87 MB; rerun it after adding a map picture). The base
+  images open on the copy (`src` = `data-small`, the 4096 file in `data-full`; `_picture_attrs` falls back to the
+  full file when no copy exists); the lens images carry no `src` until the lens is first switched on. `fitSrc` swaps
+  an image to `data-full` once its drawn width × devicePixelRatio passes 2048 × 1.05 (a big retina screen, the lens
+  at ZOOM 1.9 on a 2× screen, fullscreen zoom via `updateTiles`) and never swaps back. Probe
+  (`terrain_741.html`, 1400×900): DPR 1 loads only the two copies (1.75 MB) and the lens reuses them; DPR 2 adds the
+  two full pictures when the lens goes on.
 - **Fullscreen panel (2026-10-03)** — the owner: the "Changed in the map file" filters belong in fullscreen too,
   "maybe a separate panel, left or right, that opens and closes … everything neat". The fullscreen bar under the map
   became `.tc-fs-bar` = a 236 px panel LEFT of the map (`order: -1` in a row flex): Exit + a fold toggle

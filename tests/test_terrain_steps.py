@@ -109,8 +109,32 @@ def test_a_patch_without_terrain_notes_says_nothing_and_shows_what_moved():
     assert '<div class="tf-head">Changed in the map file<span class="tf-kinds">' in html
     assert ('alt="Trees" width="16" height="16"><span class="tm-add-text">+2</span> '
             '<span class="tm-rem-text">−11</span></button>') in html
-    assert 'src="icons/maps/map_7.38.webp' in html and 'src="icons/maps/map_7.38b.webp' in html
+    assert 'src="icons/maps/map_7.38_2k.webp' in html and 'src="icons/maps/map_7.38b_2k.webp' in html
     assert "← 7.38&nbsp; OLD" in html and "NEW &nbsp;7.38b →" in html
+
+
+def test_the_page_opens_on_the_small_pictures_and_keeps_the_full_ones_for_zoom():
+    """Each map picture opens as its 2048-px copy (~0.85 MB against ~4.2 MB; the owner 2026-10-03: "on weak
+    computers it may lag"); the 4096 picture waits in data-full, and the lens images carry no src until the lens
+    is switched on (scripts.js fitSrc)."""
+    html = _page("7.41")
+    old = '<img class="tc-img tc-old" src="icons/maps/map_7.40c_2k.webp?v='
+    assert old in html and 'data-full="icons/maps/map_7.40c.webp?v=' in html
+    assert '<img class="tc-img tc-new" src="icons/maps/map_7.41_2k.webp?v=' in html
+    lens = html.split('<div class="tc-lens"', 1)[1].split("</div>", 1)[0]
+    assert lens.count("<img ") == 2 and " src=" not in lens and lens.count("data-full=") == 2
+    for ver in ("7.38", "7.41f"):
+        assert os.path.exists(os.path.join(_ROOT, "icons", "maps", f"map_{ver}_2k.webp"))
+
+
+def test_small_pictures_are_swapped_for_full_ones_only_when_drawn_bigger():
+    """fitSrc swaps to data-full once the drawn width times the pixel ratio passes 2048, never back; the lens
+    fits on switch-on, fullscreen zoom on every resize (updateTiles)."""
+    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    fit = js.split("function fitSrc(img, cssW) {", 1)[1].split("\n    }\n", 1)[0]
+    assert "devicePixelRatio" in fit and "SMALL_PX * 1.05" in fit and "img.dataset.sharp" in fit
+    assert "if (loupeMode) { fitSrc(lensOld, w); fitSrc(lensNew, w); }" in js
+    assert "if (fsActive && w) fitBase(w);" in js.split("function updateTiles() {", 1)[1][:200]
 
 
 def _quiet_set():
