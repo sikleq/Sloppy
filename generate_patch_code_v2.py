@@ -224,9 +224,10 @@ CANONICAL_TAGS = [
     # BUFF first — removing a penalty / restriction is positive (memory rule
     # sloppy_no_longer_penalty_is_buff). Tightly anchored so legitimate DEL
     # phrasings don't accidentally match.
-    (re.compile(r'\bno longer has (?:an? |the )?(?:\w+ ){0,3}(?:penalt(?:y|ies)|restrictions?|drawbacks?|downsides?|debuff slow)\b', re.I), 'BUFF'),
+    (re.compile(r'\bno longer has (?:an? |the )?(?:\w+ ){0,5}(?:penalt(?:y|ies)|restrictions?|drawbacks?|downsides?|debuff slow)\b', re.I), 'BUFF'),
     # ── 2026-09-22 generator-vs-proofread diff (7.38): confident direction flips ──
     (re.compile(r"\bno longer (?:reduces|decreases) (?:enemy |enemies'? |their |the target'?s? )?vision\b", re.I), 'DEL'),  # enemy vision debuff removed (NS Void)
+    (re.compile(r'\bno longer reduces health restoration\b', re.I), 'DEL'),   # an ENEMY heal debuff taken away (Freezing Aura, 7.41)
     (re.compile(r'\bno longer freezes enem', re.I), 'DEL'),                              # freezing ENEMY cooldowns = a benefit removed
     (re.compile(r"\b(?:isn't|is not|no longer|won't be|will not be) (?:be )?removed\b", re.I), 'BUFF'),  # own effect now persists
     (re.compile(r'\bloss\b[^.]*?\b(?:reduced|decreased|lowered)\b(?![^.]*\bfrom\s+[-+]?\d)', re.I), 'BUFF'),  # "Gold loss on death is reduced"
@@ -276,6 +277,34 @@ CANONICAL_TAGS = [
     (re.compile(r'\b(?:may|can) only (?:trigger|proc|be cast|be used|target|affect|stack)\b', re.I), 'NERF'),
     (re.compile(r'\bnow disabled by\b', re.I),                      'NERF'),
     (re.compile(r'\bdoes not affect .* in (?:the )?fountain\b', re.I), 'NERF'),
+    # ── 2026-10-03 audit of 7.40 / 7.41 (7 reviewers vs the datafeeds): more "a limit is added" phrasings ──
+    (re.compile(r'\bnow only (?:starts?|begins?|deals?|activates?)\b', re.I), 'NERF'),   # Tormentor "only when attacked"
+    (re.compile(r'\bnow takes \d+(?:\.\d+)?\s*(?:s|seconds?) to\b', re.I), 'NERF'),     # Pangolier roll ramp-up
+    (re.compile(r'\bnow heals? (?:for )?half\b', re.I),            'NERF'),            # Salve / shared Tango
+    (re.compile(r'\b(?:can now|now can) be reflected\b|\bcannot be reflected back\b', re.I), 'NERF'),
+    (re.compile(r'\b(?:can now|now can) miss\b', re.I),            'NERF'),            # free-movement units uphill
+    (re.compile(r'^Now also provides -\d', re.I),                   'NERF'),            # a penalty added (Titanic)
+    (re.compile(r'\balso goes on cooldown when\b', re.I),           'NERF'),            # Tranquil Boots' break on disassembly
+    (re.compile(r"\bdo(?:es)?(?:n't| not) apply to\b", re.I),       'DEL'),             # lifesteal vs reflected damage
+    # a rename / rework / loss-with-a-catch reads REWORK before any "no longer" DEL rule below
+    (re.compile(r"^Aghanim's (?:Scepter|Shard) (?:slightly )?reworked\b", re.I), 'REWORK'),
+    (re.compile(r'\brenamed to\b.*\b(?:no longer|now)\b', re.I),     'REWORK'),
+    (re.compile(r'\bno longer\b[^.]*\bbut (?:may|can|will) still\b', re.I), 'REWORK'),  # Kez echoes "but may still create"
+    # interface, not gameplay
+    (re.compile(r'\bfor the "[^"]+" option\b', re.I),               'QoL'),
+    (re.compile(r'\bnow has a distinct sound\b', re.I),             'QoL'),
+    (re.compile(r'^Added a tooltip\b|^Now the default cast\b|\bicon is shown\b', re.I), 'QoL'),
+    # targeting / classification rules with no real gain or loss
+    (re.compile(r'\bfor prioritization\b|\bself damage before\b|\btreats creep heroes as creeps\b', re.I), 'MISC'),
+    # 7.41 classes the linter kept flagging (the generator's bare "^Now " → NEW was wrong for them)
+    (re.compile(r'\bthat affects only\b|\bonly to a single\b', re.I), 'NERF'),       # Bloodseeker / Invoker scepter
+    (re.compile(r"^(?:Passive|Active): [A-Z][\w' ]*\.", re.I),     'NEW'),            # a new item's ability card line
+    (re.compile(r"^Aghanim's (?:Shard|Scepter): ", re.I),          'NEW'),            # a new upgrade, described
+    (re.compile(r'^Now is a guaranteed\b.*\boption\b', re.I),       'REWORK'),         # neutral enchantment pools
+    (re.compile(r'^\s*Now (?:is )?(?:an? )?innate ability\b', re.I), 'REWORK'),
+    (re.compile(r'^Now always a basic ability\b|^Now the default (?:\w+ )?ability\b', re.I), 'REWORK'),
+    (re.compile(r'^Now automatically triggers\b|^Now is a no-target ability\b', re.I), 'REWORK'),
+    (re.compile(r'\bno longer has an? (?:\w+ ){0,3}self debuff\b', re.I), 'BUFF'),    # Bloodpact's own lockout lifted
     # a capability is taken away → DEL
     (re.compile(r'\bno longer (?:stealable|copyable|benefits? from|blinks?|copy|copies|has an alt-cast)\b', re.I), 'DEL'),
     # structural change of the entity → REWORK
@@ -434,6 +463,7 @@ TAG_OVERRIDES = {
     "cycled out":                   "DEL",     # item removed from the pool
     "moved from tier":              "REWORK",  # tier-change is a structural move, not a buff/nerf
     "dormant curio increases":      "NEW",     # first-ever curio upgrade on an item = new capability
+    "destroys the target illusion": "NERF",    # Spectre Reality (7.40): the swapped illusion is lost (audit 2026-10-03)
 }
 
 

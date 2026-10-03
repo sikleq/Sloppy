@@ -101,7 +101,7 @@ def build():
     W(li("Radiant safe lane large camp's spawn box has been moved towards the offlane to remove a bad ward location", t("MISC")))
     W(li("The medium flooded camp near the safe lane tier 2 towers moved closer to the middle of the stream (substantially more for Dire than for Radiant)", t("MISC")))
     W(li("The medium flooded camp near the safe lane tier 2 towers can now only evolve once into a large camp, rather than into an Ancient Camp", t("NERF")))
-    W(li("The medium flooded camp near the bounty runes can now evolve twice into an Ancient Camp", t("REWORK")))
+    W(li("The medium flooded camp near the bounty runes can now evolve twice into an Ancient Camp", t("BUFF")))
     W(li("Ancient neutral camps near stream ends demoted to medium camps and moved slightly towards bases", t("NERF")))
     W(li("Medium neutral camp near offlane defender's gate has been demoted to a small neutral camp", t("NERF")))
     W(ul_close())
@@ -170,13 +170,13 @@ def build():
 
     W(subgroup("Miscellaneous"))
     W(ul_open())
-    W(li("Reflected damage cannot be reflected back", t("NEW")))
-    W(li("Lifesteal and Spell Lifesteal don't apply to reflected damage", t("NEW")))
+    W(li("Reflected damage cannot be reflected back", t("NERF")))
+    W(li("Lifesteal and Spell Lifesteal don't apply to reflected damage", t("DEL")))
     W(li("Reflected damage doesn't affect Debuff Immune units", t("DEL")))
     W(li("Units with free movement now can miss their attacks when attacking uphill targets " + info_tip(
             "Batrider during Firefly", "Dragon Knight during Elder Dragon Form with Aghanim's Scepter",
             "Lina during Flame Cloak", "Terrorblade's Reflection illusions",
-            header="Affected units:"), t("NEW")))
+            header="Affected units:"), t("NERF")))
     W(li("All sources of reflection damage now have an ALT-note detailing mechanics of reflected damage " + info_tip(
             "Tormentor's Reflect ability", "Blade Mail (both active and passive)", "Chipped Vest", "Rattlecage",
             "Axe's Counter Helix", "Bristleback's Quill Spray triggered by Bristleback passive",
@@ -192,23 +192,23 @@ def build():
     _NC_CDN = "../icons/units/npc_dota_neutral_"
     W(unit_header("Kobold Foreman", _NC_CDN + "kobold_taskmaster.png"))
     W(ul_open())
-    W(li("Damage increased from 22–24 to 24–26", b(23, 25)))
+    W(li("Damage increased from 22–24 to 24–26", br(22, 24, 24, 26)))
     W(ul_close())
     W(unit_header("Kobold Soldier", _NC_CDN + "kobold_tunneler.png"))
     W(ul_open())
-    W(li("Damage increased from 20–21 to 22–23", b(20.5, 22.5)))
+    W(li("Damage increased from 20–21 to 22–23", br(20, 21, 22, 23)))
     W(ul_close())
     W(unit_header("Kobold", _NC_CDN + "kobold.png"))
     W(ul_open())
-    W(li("Damage increased from 13–14 to 15–16", b(13.5, 15.5)))
+    W(li("Damage increased from 13–14 to 15–16", br(13, 14, 15, 16)))
     W(ul_close())
     W(unit_header("Vhoul Assassin", _NC_CDN + "gnoll_assassin.png"))
     W(ul_open())
-    W(li("Damage decreased from 30–32 to 25–27", b(31, 26)))
+    W(li("Damage decreased from 30–32 to 25–27", br(30, 32, 25, 27)))
     W(ul_close())
     W(unit_header("Ghost", _NC_CDN + "ghost.png"))
     W(ul_open())
-    W(li("Damage decreased from 45–50 to 38–43", b(47.5, 40.5)))
+    W(li("Damage decreased from 45–50 to 38–43", br(45, 50, 38, 43)))
     W(ul_close())
     W(unit_header("Harpy Stormcrafter", _NC_CDN + "harpy_storm.png"))
     W(ability("Chain Lightning", icon_url="../icons/abilities/harpy_storm_chain_lightning.png"))
@@ -375,7 +375,7 @@ def build():
         old=["Active: Avatar. Applies a basic dispel. Grants 60% Magic resistance and immunity to pure and reflected damage. For the duration of the effect, any negative effect from enemy spells has no effect. Duration: 9/8/7/6. Dispel Type: Basic Dispel. Mana Cost: 50. Cooldown: 95s"],
         new=["Active: Avatar. Applies a basic dispel. Grants 60% magic resistance and immunity to reflected and pure damage. For the duration of the effect, any negative effect from enemy spells has no effect. Duration: 9/8/7s. Dispel Type: Basic Dispel. Mana Cost: 50. Cooldown: 95s"]))
     W(ul_open())
-    W(li("Avatar duration changed from 9/8/7/6s to 9/8/7s", t("REWORK")))
+    W(li("Avatar duration changed from 9/8/7/6s to 9/8/7s", t("BUFF"), extra=inline_note("Minimum duration increased from 6s to 7s")))
     W(ul_close())
     W(item_header("Blade Mail", changed=True))
     W(auto_components_change("Blade Mail", "7.41"))
@@ -395,7 +395,7 @@ def build():
     W(ul_open())
     W(li("Armor bonus decreased from +8 to +6", b(8, 6)))
     W(li("Guard max health damage block decreased from 2.2% to 2%", b(2.2, 2)))
-    W(li("Guard base damage block rescaled from 70 for all units to 70 on melee heroes and buildings and 45 on ranged heroes", t("REWORK")))
+    W(li("Guard base damage block rescaled from 70 for all units to 70 on melee heroes and buildings and 45 on ranged heroes", t("NERF")))
     W(ul_close())
     W(item_header("Dagon", changed=True))
     W(auto_components_change("Dagon", "7.41"))
@@ -664,7 +664,7 @@ def build():
         new=["Active: Barrier. Gives a magic damage barrier that absorbs 425 damage to all nearby allies. Lasts 8 seconds. Radius: 1200. Cast Range: 1200. Mana Cost: 150. Cooldown: 60s",
              "Passive: Insight Aura. Gives allied units 8% magic resistance. Radius: 1200."]))
     W(ul_open())
-    W(li("Recipe Cost decreased from 800 to 675 " + b(800, 675, l=True), t("BUFF"), extra=inline_note("Total cost unchanged at 3725g (due to Cloak cost increase)")))
+    W(li("Recipe Cost decreased from 800 to 675", b(800, 675, l=True), extra=inline_note("Total cost unchanged at 3725g (due to Cloak cost increase)")))
     W(li("Barrier no longer affects units that have been affected by Barrier within Pipe of Insight's cooldown", t("NERF")))
     W(li("Insight Aura no longer provides 2.5 health regen", t("DEL")))
     W(ul_close())
@@ -735,12 +735,12 @@ def build():
     W(ul_close())
     W(item_header("Spirit Vessel"))
     W(ul_open())
-    W(li("Soul Release no longer has a separate value for incoming heal reduction",
+    W(li("Soul Release no longer has a separate value for incoming heal reduction", t("MISC"),
          extra=inline_note("Still reduces incoming heals due to Health Restoration changes")))
     W(ul_close())
     W(item_header("Tranquil Boots"))
     W(ul_open())
-    W(li("Break now also goes on cooldown when the item is disassembled. Reassembling the item will remember the time remaining", t("REWORK")))
+    W(li("Break now also goes on cooldown when the item is disassembled. Reassembling the item will remember the time remaining", t("NERF")))
     W(ul_close())
     W(item_header("Veil of Discord", changed=True))
     W(auto_components_change("Veil of Discord", "7.41"))
@@ -895,7 +895,7 @@ def build():
     W(ul_open())
     W(li("Passive: Salvo. Whenever you cast a spell, 20% of the spell's mana cost is restored over 10s. Tick rate: 2s", t("NEW"),
          extra=inline_note("Dormant Curio increases mana restored from 20% to 26%")))
-    W(li("Mana recovery duration cannot be modified", t("NERF")))
+    W(li("Mana recovery duration cannot be modified", t("NEW")))
     W(ul_close())
     W(item_header("Stormcrafter", new="Returning Tier 3 Artifact"))
     W(ul_open())
@@ -1066,7 +1066,7 @@ def build():
     W(ul_open())
     W(li("Attack Damage bonus rescaled from +10/20% to +8/12/16%", b([10, 20], [8, 12, 16])))
     W(li("Status Resistance rescaled from 10/15% to +10/12/14%", b([10, 15], [10, 12, 14])))
-    W(li("Now also provides -10/12/14% <font color='#e03e2e'>Attack Speed</font>", t("NEW")))
+    W(li("Now also provides -10/12/14% <font color='#e03e2e'>Attack Speed</font>", t("NERF")))
     W(li("Now is a guaranteed option for Universal heroes only", t("REWORK")))
     W(li("Tiers changed from 4/5 to 2-4", t("REWORK")))
     W(ul_close())
@@ -1309,7 +1309,7 @@ def build():
     W(ul_open())
     W(li_formula("Gold and XP Bounty rescaled",
                  "180/240/300", "70 + 10 per level",
-                 lambda L: 300.0, lambda L: 70.0 + 10.0 * L))
+                 rank_step([180.0, 180.0, 240.0, 300.0], ultimate=True), lambda L: 70.0 + 10.0 * L, l=True))
     W(li("Aghanim's Shard: The Tempest Double is infused with the bonuses of Arcane, Invisibility, and Haste Runes for 12s. These bonuses don't provide Runic Infusion stacks", t("NEW")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -1327,7 +1327,7 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "Whenever Axe kills an enemy, he gains <b>+0.2/0.3/0.4/0.5 permanent armor</b> (by Culling Blade rank). Kills with Culling Blade give <b>3×</b> that amount.",
+                "Whenever Axe kills an enemy hero, he gains <b>+0.2/0.3/0.4/0.5 permanent armor</b> (by Culling Blade rank). Kills with Culling Blade give <b>3×</b> that amount.",
             ],
         ),
         new=dict(
@@ -1426,9 +1426,14 @@ def build():
             ],
             tables=[_ib_table],
         ),
-        summary="New innate ability.",
-        tag="new",
+        summary="Inner Beast is now the innate ability (replaces Rugged).",
+        tag="rework",
     ))
+    W(ul_open())
+    W(li("Now an innate ability", t("REWORK")))
+    W(li_formula("Bonus Attack Speed changed", "10/30/50/70", "7 + 3 per level",
+                 rank_step([10.0, 30.0, 50.0, 70.0], ultimate=False), lambda L: 7.0 + 3.0 * L))
+    W(ul_close())
     W(ability("Wild Axes"))
     W(ul_open())
     W(li("Damage per axe increased from 30/65/100/135 to 40/80/120/160", b([30, 65, 100, 135], [40, 80, 120, 160])))
@@ -1452,7 +1457,7 @@ def build():
                 "Beastmaster summons a Hawk that circles around him and dives onto an enemy within 500 range, dealing 50/80/110/140 damage and rooting them for 0.25/0.5/0.75/1s.",
                 "Hawk cannot be controlled, prioritizes heroes, and is killed upon Beastmaster's death. Hawk has an attack interval of 4s, but it scales with attack speed.",
                 "Hawk Duration: 25s. Mana Cost: 50. Cooldown: 45/40/35/30s.",
-                aghs_shard_line("Summons an additional Hawk."),
+                aghs_shard_line("Increases Hawk duration by 5s and summons an additional Hawk."),
             ],
         ),
         new=dict(
@@ -1496,7 +1501,7 @@ def build():
     W(ul_close())
     W(ability("Bloodrage"))
     W(ul_open())
-    W(li("Now a no target ability that affects only Bloodseeker", t("REWORK")))
+    W(li("Now a no target ability that affects only Bloodseeker", t("NERF")))
     W(li("Pure damage based on target's max health with Aghanim's Shard now pierces Debuff Immunity", t("BUFF")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -1512,7 +1517,7 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "When getting a kill or assist on an enemy with a kill streak, Bounty Hunter gains <b>10% extra gold</b>.",
+                "When getting a kill or assist on an enemy with a kill streak, Bounty Hunter gains <b>20% extra gold</b>.",
             ],
         ),
         new=dict(
@@ -1621,7 +1626,7 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "Centaur Warrunner permanently gains <b>+40 max health</b> every <b>120s</b>.",
+                "Centaur Warrunner permanently gains <b>+25 max health</b> every <b>120s</b>.",
             ],
         ),
         new=dict(
@@ -1687,7 +1692,7 @@ def build():
             innate=True,
             desc=[
                 "Active, levels with Holy Persuasion.",
-                "Chen summons a convert to fight for him. The convert gains bonuses from Holy Persuasion, including its abilities. Health is set to 200 + 80 × Chen's Level. The convert is considered a creep-hero.",
+                "Chen summons a convert to fight for him. The convert gains bonuses from Holy Persuasion, including its abilities. Health is set to 220 + 80 × Chen's Level. The convert is considered a creep-hero.",
                 "Only one convert can be summoned at a time, and it dies if Chen dies. Mana Cost: 50. Cooldown: 30s. Cooldown starts once the convert dies and automatically refreshes on Chen's respawn.",
                 "Which creature is summoned depends on the chosen Facet. Summoned convert counts toward Holy Persuasion's Max Units limit.",
             ],
@@ -1794,9 +1799,10 @@ def build():
                 "Active (Aghanim's Scepter upgrade). All of Clockwerk's abilities are supercharged for the duration:",
                 "&nbsp;&nbsp;• Battery Assault damages and stuns all enemies within its radius — radius increased to 330.",
                 "&nbsp;&nbsp;• Power Cogs radius increased to 330 and Clockwerk gets +25% bonus armor while near cogs.",
-                "&nbsp;&nbsp;• Rocket Flare damage, vision and slow duration increased by 35%.",
+                "&nbsp;&nbsp;• Rocket Flare fires 2 additional flares to either side of the target; its damage, vision and slow duration are increased by 35%.",
                 "&nbsp;&nbsp;• Hookshot stun radius and duration increased by 50%.",
                 "&nbsp;&nbsp;• Jetpack movement speed bonus increased from 20% to 40%.",
+                "When duration expires, Clockwerk's movement and attack speed are slowed by 100% briefly.",
                 "Duration: 18s. Mana: 90. Cooldown: 50s.",
             ],
         ),
@@ -1877,8 +1883,8 @@ def build():
                 "Also provides Dark Seer with +1 attack speed for each point of Intelligence.",
             ],
         ),
-        summary="New innate ability.",
-        tag="new",
+        summary="Innate renamed and reworked.",
+        tag="rework",
     ))
     W(ul_open())
     W(li("Max Health and Mana Restore base value decreased from 10% to 8.5%", b(10, 8.5)))
@@ -1898,7 +1904,7 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "Whenever a hero ability makes Dark Willow untargetable or hidden, she gains <b>+100% Health Regen</b> and <b>+100% Mana Regen</b> while in that state.",
+                "Whenever a skill makes Dark Willow untargetable, she gains <b>+150% Health Regen</b> and <b>+150% Mana Regen</b> while in that state.",
             ],
         ),
         new=dict(
@@ -2035,8 +2041,8 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "Doom's attacks deal <b>25% more damage</b> to enemies whose level is lower than his."
-                + inline_note("Also works at level 30. Only Doom's own attacks count, not damage from allied sources."),
+                "Doom's attacks deal <b>25% bonus damage</b> to heroes whose level is lower than Doom's level."
+                + inline_note("Also applies to all attacks when Doom is at max level."),
             ],
         ),
         new=dict(
@@ -2101,18 +2107,17 @@ def build():
     W(ul_close())
     W(ability("Wyrm's Wrath"))
     W(ul_open())
-    W(li("Now always grants the 10/20/30/40 bonus magic damage on attack, and 25/50/75/100 Area of Effect bonus", t("NEW")))
+    W(li("Now always grants the 10/20/30/40 bonus magic damage on attack, and 25/50/75/100 Area of Effect bonus", t("NEW"), extra=inline_note("Previously only with the Fire Dragon facet, which gave 6/12/18/24 magic damage")))
     W(ul_close())
     W(ability_change(
         old=dict(
             name="Elder Dragon Form",
             slug="dragon_knight_elder_dragon_form",
             desc=[
-                "Ultimate. No target, transforms Dragon Knight into a ranged dragon for the duration. Levels of the ability determine which dragon form is used.",
-                "Level 1: Bonus attack range, +20 bonus move speed, and bonus attack damage. Splash damage 50% within 250 AoE.",
-                "Level 2: Adds a Frost debuff on attacks that slows the target's attack and movement speed.",
-                "Level 3: Adds a Corrosive poison on attacks that deals magical damage over time and affects buildings.",
-                aghs_line("Upgrades to Level 4 Black Dragon (combined effects, magic resistance, free pathing). Also improves Wyrm's Wrath effectiveness while in Dragon Form."),
+                "Ultimate. No target, transforms Dragon Knight into a ranged elder dragon for 60s. The dragon type (Corrosive / Fire / Frost) is chosen by Facet.",
+                "+20 bonus move speed, +350 attack range, +20/50/80 attack damage. Attacks splash 30/40/50% of attack damage within 275 AoE and apply Wyrm's Wrath on-hit effects; Wyrm's Wrath effects increased by 20/30/40%.",
+                "Increases Dragon Tail range, and health regeneration and armor bonuses from Dragon Blood. Mana Cost: 50. Cooldown: 100s.",
+                aghs_line("Adds a Level 4 Black Dragon: free pathing, increased damage (+110), 60% splash, and increased Wyrm's Wrath effectiveness (50%)."),
             ],
         ),
         new=dict(
@@ -2168,7 +2173,7 @@ def build():
     W(ul_close())
     W(ability("Gust", slug="drow_ranger_wave_of_silence"))
     W(ul_open())
-    W(li("Knockback duration now scales inversely with distance from the target, similar to knockback distance. Minimum knockback duration is 0.4 seconds", t("REWORK")))
+    W(li("Knockback duration now scales inversely with distance from the target, similar to knockback distance. Minimum knockback duration is 0.4 seconds", t("NERF")))
     W(ul_close())
     W(ability("Multishot"))
     W(ul_open())
@@ -2290,8 +2295,8 @@ def build():
                  "10/18/26/34", "10 + 1 per level",
                  rank_step([10.0, 18.0, 26.0, 34.0], ultimate=True), lambda L: 10.0 + 1.0 * L))
     W(li("Radius increased from 175 to 200", b(175, 200)))
-    W(li("Aghanim's Shard bonus radius decreased from 175 to 150", b(175, 150),
-         extra=inline_note("Total Shard radius unchanged with base radius increase")))
+    W(li("Aghanim's Shard bonus radius decreased from 175 to 150", t("MISC"),
+         extra=inline_note("Total Shard radius unchanged (175 + 175 = 200 + 150 = 350)")))
     W(ul_close())
     W(ability("Searing Chains"))
     W(ul_open())
@@ -2556,7 +2561,7 @@ def build():
     W(ability("Invoke"))
     W(ul_open())
     W(li("Now whenever Invoker gets Aghanim's Scepter or Aghanim's Shard, these items are inert in the inventory until Invoker activates them manually. Upon activation, he will be presented with three upgrades to choose from. Upgrades themselves for both Aghanim's Scepter and Aghanim's Shard are unchanged", t("REWORK"), extra=inline_note("You can't change selected upgrades. Selling Aghanim's Scepter and buying it again will provide the same upgrade you chose the first time")))
-    W(li("Aghanim's Scepter no longer provides +1 level to all three orbs. Now it provides +1 level only to a single orb you choose", t("DEL")))
+    W(li("Aghanim's Scepter no longer provides +1 level to all three orbs. Now it provides +1 level only to a single orb you choose", t("NERF")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -2643,7 +2648,7 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "Juggernaut deals <b>10% more damage</b> to targets that are facing him. Damage bonus is always applied during Omnislash.",
+                "Juggernaut deals <b>12% more damage</b> to targets that are facing him. Damage bonus always applies during Omnislash.",
             ],
         ),
         new=dict(
@@ -2750,7 +2755,10 @@ def build():
     W(ability("Talon Toss"))
     W(ul_open())
     W(li("Cast Range decreased from 1200 to 650/750/850/950", b(1200, [650, 750, 850, 950]), extra=inline_note("Now matches Grappling Claw")))
-    W(li("Shodo Sai: The proc effect now triggers a critical strike only instead of creating a Mark", t("REWORK")))
+    W(ul_close())
+    W(ability("Shodo Sai", slug="kez_shodo_sai"))
+    W(ul_open())
+    W(li("The proc effect now triggers a critical strike only instead of creating a Mark", t("REWORK")))
     W(li("18% Chance to Mark replaced with 20% Critical Strike Chance", t("REWORK"),
          extra=inline_note("As a result, marks are applied only by parrying and casting Raven's Veil")))
     W(li("No longer restricts Kez from proccing passive Bash spells of Skull Basher and Abyssal Blade", t("BUFF")))
@@ -2934,8 +2942,8 @@ def build():
             desc=[
                 "Passive.",
                 "Lich's max mana regeneration is <b>0</b>. Whenever any unit dies nearby, Lich restores a portion of his Max Mana. Dying heroes restore a bigger portion.",
-                "<b>Radius:</b> 1200. <b>Max Mana Restored:</b> 2.5% (Creep), 15% (Hero).",
-                "Lich can regenerate mana only under effect of a Fountain.",
+                "<b>Radius:</b> 1500. <b>Max Mana Restored:</b> 2.5% (Creep), 25% (Hero).",
+                "Instant mana restoration from items and abilities apply to Lich as normal.",
             ],
         ),
         new=dict(
@@ -2981,7 +2989,7 @@ def build():
             innate=True,
             desc=[
                 "Passive, levels up with Infest.",
-                "Lifestealer's attacks deal bonus magic damage equal to <b>2/2.25/2.5/2.75%</b> of target's max health and lifesteal back <b>2/2.25/2.5/2.75%</b> of target's max health.",
+                "Lifestealer's attacks deal bonus physical damage equal to <b>2/2.25/2.5/2.75%</b> of target's max health and lifesteal back <b>2/2.25/2.5/2.75%</b> of target's max health.",
                 "Also allows hitting allied creeps below <b>75%</b> health (default deny threshold is 50%).",
             ],
         ),
@@ -3037,8 +3045,8 @@ def build():
             innate=True,
             desc=[
                 "Passive, levels up with Laguna Blade.",
-                "Lina's fire damage stacks <b>Overheat</b> on enemies. When the target reaches the <b>175 damage threshold</b>, they combust and take additional Overheat damage.",
-                "<b>Overheat Damage:</b> 15/35/55/75 (post-7.39).",
+                "Every <b>175</b> damage Lina does to an enemy hero causes them to overheat, doing damage to their nearby allies (radius 400).",
+                "<b>Overheat Damage:</b> 15/35/55/75.",
             ],
         ),
         new=dict(
@@ -3069,7 +3077,7 @@ def build():
     W(ul_open())
     W(li("Level 15 Talent Light Strike Array Damage decreased from +150 to +110", b(150, 110)))
     W(li("Level 25 Talent +150% Crit On Targets Affected By Spells replaced with 150% Attack Crit on Targets Affected by Slow Burn", t("SWAP")))
-    W(li("Level 25 Talent +60% Combustion Overheat Damage replaced with +1s Slow Burn Duration", t("SWAP")))
+    W(li("Level 25 Talent +60% Combustion Overheat Damage replaced with +1s Slow Burn Duration", t("SWAP"), extra=inline_note("This increases additional damage from 64% to 80%")))
     W(ul_close())
 
     # Lion
@@ -3089,7 +3097,7 @@ def build():
             innate=True,
             desc=[
                 "Passive. Reworked into a two-trigger buff:",
-                "<b>Kill / assist trigger:</b> killing or assisting in a Hero kill grants Lion <b>20% debuff duration</b> against that hero <b>while it is dead</b>.",
+                "<b>Kill / assist trigger:</b> killing or assisting in a Hero kill grants Lion <b>20% debuff duration</b> <b>while that hero is dead</b>.",
                 "<b>Respawn trigger:</b> whenever Lion respawns or resurrects, he gains <b>20% spell amplification</b> for <b>90s</b>, or until he gets a kill or an assist (whichever comes first).",
             ],
         ),
@@ -3118,7 +3126,9 @@ def build():
     W(hero_header("Luna"))
     W(ability("Lunar Blessing"))
     W(ul_open())
-    W(li("Damage for Allies/Self changed from 1/2 + 1/2 per level up to 1/2 per level", t("MISC")))
+    W(li_formula("Damage for Allies/Self changed", "1/2 + 1/2 per level up", "1/2 per level",
+                 lambda L: 1.0 + 1.0 * (L - 1), lambda L: 1.0 * L, effective_unchanged=True,
+                 inline_note_text="Effective values are not changed"))
     W(li_formula("Bonus Night Vision changed",
                  "250 + 25 per level up", "225 + 25 per level",
                  lambda L: 250.0 + 25.0 * (L - 1), lambda L: 225.0 + 25.0 * L,
@@ -3227,7 +3237,7 @@ def build():
             slug="marci_bodyguard",
             desc=[
                 "Active. Target an allied hero to become their bodyguard for <b>6s</b>.",
-                "<b>Passive:</b> Marci gains <b>12/18/24/30% Lifesteal</b> and <b>+12/18/24/30% bonus base attack damage</b>. Health gained from lifesteal also heals the bodyguarded ally.",
+                "<b>Passive:</b> Marci gains <b>12/18/24/30% Lifesteal</b> and <b>+12/18/24/30% bonus base attack damage</b>.",
                 "<b>Active:</b> the bodyguarded ally receives <b>75%</b> of these bonuses. Whenever the ally attacks or is attacked by an enemy within Marci's attack range + <b>125</b>, Marci attacks that enemy.",
             ],
         ),
@@ -3328,8 +3338,8 @@ def build():
     W(ability("Ransack"))
     W(ul_open())
     W(li("Now pierces Debuff Immunity", t("NEW")))
-    W(li("No longer has separate creep values. Follows global lifesteal rules instead", t("NERF"),
-         extra=inline_note("Has a 40% penalty against creeps — " + b(100, 60))))
+    W(li("No longer has separate creep values. Follows global lifesteal rules instead", b([3, 5, 7, 9], [5.4, 7.2, 9, 10.8]),
+         extra=inline_note("Has a 40% penalty against creeps: 60% of the hero values 9/12/15/18")))
     W(ul_close())
     W(ability_change(
         old=dict(
@@ -3339,7 +3349,7 @@ def build():
                 "Ultimate. Passive — at the ult's level-up points, Meepo gains an additional clone.",
                 "<b>Max Level:</b> 3 (levels at 4 / 11 / 18).",
                 "Passively grants Meepo and all clones bonus <b>Magic Resistance</b>.",
-                "Each clone is a separate hero unit but does not copy items.",
+                "Clones cannot wield any items but the boots that Meepo himself wears.",
             ],
         ),
         new=dict(
@@ -3464,7 +3474,7 @@ def build():
             desc=[
                 "Passive.",
                 "Morphling receives <b>50% of Attribute gain bonuses every half level</b> instead of full bonuses at level up.",
-                "Also increases <b>All Attributes bonus gained for skill points in the Talent Tree from +2 to +4</b>.",
+                "All Attributes bonuses from skill points in the Talent Tree provide an additional <b>+3</b> to Morphling's primary attribute.",
             ],
         ),
         new=dict(
@@ -3499,8 +3509,8 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "Muerta is permanently endowed with <b>passive ethereal bonuses</b>: she can always attack ethereal targets and can be attacked while ethereal herself.",
-                "While either she or her target is ethereal, her attack damage converts to magical and her physical lifesteal is treated as spell lifesteal.",
+                "Muerta can always attack when she is ethereal. Muerta can always attack ethereal targets.",
+                "When attacking ethereal targets, all of her attack damage is dealt as magical damage.",
             ],
         ),
         new=dict(
@@ -3524,8 +3534,7 @@ def build():
             desc=[
                 "Active ultimate. <b>Duration:</b> 8s.",
                 "Muerta's attacks deal <b>magical damage</b> instead of physical and gain <b>+70/100/130 bonus attack damage</b>.",
-                "Grants <b>30% Spell Lifesteal</b> for the duration.",
-                aghs_shard_line("Muerta permanently gains <b>+2% Spell Amplification</b> whenever she kills an enemy hero during Pierce the Veil, or any enemy hero dies within 925 units of her. Applies retroactively."),
+                aghs_shard_line("Muerta gains <b>30% Spell Lifesteal</b> during Pierce the Veil and permanently gains <b>+2% Spell Amplification</b> whenever she kills an enemy hero during Pierce the Veil, or any enemy hero dies within 925 units of her. Applies retroactively."),
             ],
         ),
         new=dict(
@@ -3535,7 +3544,7 @@ def build():
                 "Now has both <b>passive</b> and <b>active</b> components.",
                 "<b>Passive:</b> Muerta can always attack ethereal targets and can attack while ethereal herself. When either she or her target is ethereal, her attack damage is dealt as <b>magical</b>, and her physical lifesteal is treated as <b>spell lifesteal</b>. "
                 + inline_note("Lifesteal conversion happens only for attacks — it does not affect her spells."),
-                "<b>Active:</b> grants <b>+75% base damage</b> and <b>30% Spell Lifesteal</b>. <b>Duration:</b> 8s.",
+                "<b>Active:</b> grants <b>+75% base damage</b>. <b>Duration:</b> 8s.",
             ],
         ),
         summary="Ability reworked.",
@@ -3606,7 +3615,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 15 Talent changed from facet specific to +100 Teleportation Barrier", t("REWORK")))
-    W(li("Level 25 Talent 3x Treant HP/Damage no longer affects Spirit of the Forest Multiplier", t("NERF")))
+    W(li("Level 25 Talent 3x Treant HP/Damage no longer affects Spirit of the Forest Multiplier", t("DEL")))
     W(ul_close())
 
     # Necrophos
@@ -3914,7 +3923,7 @@ def build():
     W(ability("Blur"))
     W(ul_open())
     W(li("No longer levels with Coup de Grace", t("REWORK")))
-    W(li("Vanish Radius rescaled from 625/550/475/400 to 500", b([625, 550, 475, 400], 500)))
+    W(li("Vanish Radius rescaled from 625/550/475/400 to 500", b([625, 550, 475, 400], 500, l=True)))
     W(li("Vanish Buffer rescaled from 0.4/0.6/0.8/1s to 0.8s", b([0.4, 0.6, 0.8, 1], 0.8)))
     W(li_formula("Active Movement Speed changed",
                  "6/9/12/15%", "9.5% + 0.5% per level",
@@ -4013,14 +4022,14 @@ def build():
 
     # Pudge
     W(hero_header("Pudge"))
-    W(ability("Meat Shield", slug="pudge_flesh_heap"))
+    W(ability("Flesh Heap", slug="pudge_innate_graft_flesh"))
     W(ul_open())
     W(li("Permanent Bonus Strength rescaled from 1.1/1.4/1.7/2.0 to 1.6", b([1.1, 1.4, 1.7, 2.0], 1.6)))
     W(li("No longer levels with Dismember", t("REWORK")))
     W(ul_close())
     W(ability("Rot"))
     W(ul_open())
-    W(li("No longer has a separate value for incoming heal reduction",
+    W(li("No longer has a separate value for incoming heal reduction", t("MISC"),
          extra=inline_note("Still reduces incoming heals due to Health Restoration changes")))
     W(ul_close())
 
@@ -4043,7 +4052,7 @@ def build():
     W(ability("Scream Of Pain"))
     W(ul_open())
     W(li("Damage increased from 75/150/225/300 to 90/175/260/345", b([75, 150, 225, 300], [90, 175, 260, 345])))
-    W(li("25% of the damage dealt to heroes with this ability is reflected back to her", t("NEW"),
+    W(li("25% of the damage dealt to heroes with this ability is reflected back to her", t("NERF"),
          extra=inline_note("Does not trigger on damage to illusions. Damage done is nonlethal reflection damage"
                            "<br>Also applies to Scream of Pain instances cast by Shadow Strike upgraded with Aghanim's Scepter")))
     W(ul_close())
@@ -4137,7 +4146,7 @@ def build():
     W(ability("Escape Act", slug="ringmaster_the_box"))
     W(ul_open())
     W(li("Radius and Aghanim's Scepter's Explosion Radius now affected by AoE bonuses", t("NEW")))
-    W(li("Targeted unit is no longer stunned for 0.5 seconds when placed in a box", t("DEL")))
+    W(li("Targeted unit is no longer stunned for 0.5 seconds when placed in a box", t("BUFF")))
     W(ul_close())
     W(ability("Impalement Arts", slug="ringmaster_impalement"))
     W(ul_open())
@@ -4473,7 +4482,7 @@ def build():
     W(li("Stacks now have independent durations and don't refresh previous ones", t("REWORK")))
     W(li("Cooldown increased from 10/8/6/4s to 14/12/10/8s", b([10, 8, 6, 4], [14, 12, 10, 8], l=True)))
     W(li("Mana Cost increased from 20 to 25/30/35/40", b(20, [25, 30, 35, 40], l=True)))
-    W(li("Cast Range is now Slark's attack range + 50", t("REWORK")))
+    W(li("Cast Range is now Slark's attack range + 50", t("REWORK"), extra=inline_note("With Slark's base 150 attack range: 150 &rarr; 200")))
     W(li("Stack Restoration Steal increased from 2/4/6/8% to 4/8/12/16%", b([2, 4, 6, 8], [4, 8, 12, 16])))
     W(li("Stack Regen Steal increased from 2/4/6/8 to 4/8/12/16", b([2, 4, 6, 8], [4, 8, 12, 16])))
     W(li("Stack Speed Steal increased from 2/4/6/8 to 4/8/12/16", b([2, 4, 6, 8], [4, 8, 12, 16])))
@@ -4499,7 +4508,7 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "Snapfire's attacks deal <b>30% more damage</b>, but they have a <b>25% chance</b> of a glancing shot that will deal <b>40% less damage</b>.",
+                "When attacking enemy heroes, Snapfire's attacks deal <b>30% more damage</b>, but they have a <b>25% chance</b> of a glancing shot that deals only <b>60% damage</b>.",
             ],
         ),
         new=dict(
@@ -4622,7 +4631,7 @@ def build():
     W(ul_close())
     W(ability("Planar Pocket"))
     W(ul_open())
-    W(li("Aghanim's Shard: Now grants Planar Pocket", t("NEW")))
+    W(li("Now granted by Aghanim's Shard instead of Aghanim's Scepter", t("REWORK")))
     W(li("Cooldown increased from 25s to 30s", b(25, 30, l=True)))
     W(li("Self Magic Resistance decreased from 75% to 40%", b(75, 40)))
     W(li("Effect now ends if Spirit Breaker is more than 900 units away from the target", t("NERF")))
@@ -4642,7 +4651,7 @@ def build():
     W(ul_close())
     W(ability("Static Remnant"))
     W(ul_open())
-    W(li("Remnants now spawn at Storm Spirit's location and move at 300 speed to the target location", t("NEW")))
+    W(li("Remnants now spawn at Storm Spirit's location and move at 300 speed to the target location", t("REWORK")))
     W(ul_close())
 
     # Sven
@@ -4663,7 +4672,6 @@ def build():
             desc=[
                 "Passive.",
                 "Sven's attacks deal <b>20% more damage</b> to <b>stunned enemies</b>.",
-                "Worked off Sven's base attack damage; talent line scaled the bonus.",
             ],
         ),
         new=dict(
@@ -4683,7 +4691,7 @@ def build():
     W(ability("Warcry"))
     W(ul_open())
     W(li("Aghanim's Shard reworked: makes Warcry undispellable, increases radius from 700 to 900, and grants a <b>300 physical damage barrier</b> + an additional <b>+3% movement speed</b> bonus when active",
-         t("NEW"),
+         t("REWORK"),
          extra=inline_note("No longer provides a passive aura.")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -4706,8 +4714,8 @@ def build():
             innate=True,
             desc=[
                 "Active.",
-                "Places a sign that makes mines within a <b>500 radius</b> invulnerable.",
-                "<b>Cast Point:</b> 1.5s. <b>Cooldown:</b> 60s. <b>Duration:</b> 60s. Only one sign can exist at a time.",
+                "Places a sign that makes mines within a <b>500 radius</b> invulnerable and deal <b>15% more damage</b>.",
+                "<b>Cast Point:</b> 1.25s. <b>Cooldown:</b> 60s. <b>Duration:</b> 60s. Only one sign can exist at a time.",
                 aghs_line("Increases radius to 1000 and duration to 4 minutes. When an enemy hero gets within 200 units of the sign, the entire 1000 radius becomes a minefield for 10s — enemy units take 300 damage for every 200 units moved. Minefield area becomes visible to enemies once activated. The sign is destroyed after the minefield expires."),
             ],
         ),
@@ -4910,8 +4918,7 @@ def build():
             name="Defense Matrix",
             slug="tinker_defense_matrix",
             desc=[
-                "Surrounds the target ally with an energy field that absorbs <b>80/160/240/320</b> magical damage and grants <b>15/20/25/30%</b> Status Resistance. Lasts 15 seconds. Cast Range: 700. Mana Cost: 90/105/120/135. Cooldown: 20s.",
-                "Cast Range: 700/750/800/850. Mana Cost: 70/80/90/100. Cooldown: 20s.",
+                "Surrounds the target ally with an energy field that absorbs <b>80/160/240/320</b> damage (all damage types) and grants <b>15/20/25/30%</b> Status Resistance. Lasts 15 seconds. Cast Range: 700. Mana Cost: 90/105/120/135. Cooldown: 20s.",
             ],
         ),
         new=dict(
@@ -5022,7 +5029,7 @@ def build():
     W(ul_open())
     W(li("Mana Cost increased from 40/45/50/55 to 65/70/75/80", b([40, 45, 50, 55], [65, 70, 75, 80], l=True)))
     W(li("Max Damage Blocked decreased from 120 to 60/80/100/120", b(120, [60, 80, 100, 120])))
-    W(li("Damage Block Decrease improved from 35/30/25/20 to 20", b([35, 30, 25, 20], 20)))
+    W(li("Damage Block Decrease improved from 35/30/25/20 to 20", b([35, 30, 25, 20], 20, l=True)))
     W(ul_close())
     W(ability("Eyes In The Forest"))
     W(ul_open())
@@ -5154,8 +5161,8 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "Venomancer's attacks deal extra magical damage based on how many debuffs the target has (only counts debuffs from Venomancer and his Plague Wards). <b>Base Damage per debuff:</b> 10%.",
-                aghs_line("Increases damage per debuff from 10% to 20%. Plague Wards also deal Septic Shock damage based on their attack damage."),
+                "Venomancer's attacks deal extra magical damage based on how many debuffs the target has (only counts debuffs from Venomancer and his Plague Wards). <b>Base Damage per debuff:</b> 8%.",
+                aghs_line("Increases damage per debuff from 8% to 23%."),
             ],
         ),
         new=dict(
@@ -5172,6 +5179,9 @@ def build():
         summary="New innate ability.",
         tag="new",
     ))
+    W(ul_open())
+    W(li("Poison Sting is now an innate ability (previously a basic ability)", t("REWORK")))
+    W(ul_close())
     W(ability("Venomous Gale"))
     W(ul_open())
     W(li("Aghanim's Shard reworked: Increases cast range and projectile speed by 25%. Creates 2 Plague Wards around every enemy hero hit", t("REWORK")))
@@ -5280,6 +5290,7 @@ def build():
         tag="new",
     ))
     W(ul_open())
+    W(li("Silent as the Grave is now an innate ability (previously granted by Aghanim's Scepter)", t("REWORK")))
     W(li("Mana Cost decreased from 115 to 50", b(115, 50, l=True)))
     W(li_formula("Cooldown changed",
                  "45s", "45.75s − 0.75s per level",
@@ -5343,7 +5354,7 @@ def build():
     W(ul_close())
     W(ability("Aether Remnant"))
     W(ul_open())
-    W(li("Aghanim's Shard True Sight no longer reveals wards", t("NERF")))
+    W(li("Aghanim's Shard True Sight no longer reveals wards", t("DEL")))
     W(ul_close())
     W(ability("Resonant Pulse"))
     W(ul_open())
@@ -5364,7 +5375,7 @@ def build():
     W(li_formula("Minor Imp movement speed rescaled",
                  "300/315/330/345", "297 + 3 per level",
                  rank_step([300.0, 315.0, 330.0, 345.0], ultimate=True), lambda L: 297.0 + 3.0 * L))
-    W(li("Minor Imp attack damage rescaled from 10-11/14-15/18-19/22-23/26-27 to 20-21", b(18.5, 20.5)))
+    W(li("Minor Imp attack damage rescaled from 10-11/14-15/18-19/22-23/26-27 to 20-21", b([10.5, 14.5, 18.5, 22.5, 26.5], 20.5)))
     W(li("Aghanim's Shard now increases health of minor imps by 80 and explosion damage by 45", t("MISC"),
          extra=inline_note("Same values as before, but explicitly stated now.")))
     W(ul_close())

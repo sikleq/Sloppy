@@ -551,6 +551,50 @@ def test_item_and_creep_canonical_tags_738(text, tag):
     assert g._guess_tag(text) == tag
 
 
+@pytest.mark.parametrize("text,tag", [
+    # the 2026-10-03 audit of 7.40 / 7.41: a limit added reads NERF, a lost application DEL, a rename / catch REWORK
+    ("Now only starts dealing damage to the surrounding enemies when attacked/damaged", "NERF"),
+    ("Now takes 1 second to reach full Roll Speed", "NERF"),
+    ("Now heals for half the amount per second when cast on an ally", "NERF"),
+    ("Shared Tango now heals for half the amount per second", "NERF"),
+    ("Ability can now be reflected", "NERF"),
+    ("Reflected damage cannot be reflected back", "NERF"),
+    ("Units with free movement now can miss their attacks when attacking uphill targets", "NERF"),
+    ("Now also provides -10/12/14% Attack Speed", "NERF"),
+    ("Break now also goes on cooldown when the item is disassembled", "NERF"),
+    ("Now always destroys the target illusion", "NERF"),
+    ("Lifesteal and Spell Lifesteal don't apply to reflected damage", "DEL"),
+    ("Aghanim's Scepter slightly reworked: No longer increases the number of targets attacked", "REWORK"),
+    ("Debuff Immunity ability renamed to Earth Element. No longer grants Debuff Immunity", "REWORK"),
+    ("Echoes can no longer trigger Marks, but may still create them", "REWORK"),
+    ('Now considered a Teleport for the "Teleport Requires Hold/Cancel to Stop" option', "QoL"),
+    ("Now has a distinct sound between casts on Shadow Step and Haunt illusions", "QoL"),
+    # the 7.41 rows the linter kept flagging (owner-reviewed content was right, the generator wasn't)
+    ("Now is a guaranteed Tiers 1-4 option for all heroes", "REWORK"),
+    ("Now an innate ability", "REWORK"),
+    ("Now a no target ability that affects only Bloodseeker", "NERF"),
+    ("Aghanim's Scepter no longer provides +1 level to all three orbs. Now it provides +1 level only to a single orb "
+     "you choose", "NERF"),
+    ("Now always a basic ability for Naga Siren", "REWORK"),
+    ("Now the default ultimate ability", "REWORK"),
+    ("Now automatically triggers after taking 7/6/5/4 attacks", "REWORK"),
+    ("Now is a no-target ability. The effect is applied in an aura centered around Omniknight", "REWORK"),
+    ("Aghanim's Shard: Thrown trees and tossed units deal 20% more damage in their AoE", "NEW"),
+    ("Passive: Enchant. Increases bonuses of the item's Neutral Enchantment by 15%", "NEW"),
+    ("Bloodpact no longer has a 30s self debuff preventing repeated usage of Bloodpact", "BUFF"),
+    ("No longer has a one debuff per cast restriction on enemy heroes", "BUFF"),
+    ("Freezing Aura no longer reduces Health Restoration and Incoming Heal Amplification by 25%", "DEL"),
+    ("Added a tooltip to display the total max possible heal", "QoL"),
+    ("Now the default cast gained on learning Devour is the one that grants abilities", "QoL"),
+    ("Now killer's icon is shown as a buff on Vengeful Spirit to know who to hate", "QoL"),
+    ("Now considers Spirit Bear as a true hero for prioritization", "MISC"),
+    ("Now deals its self damage before damaging enemies", "MISC"),
+    ("Now treats creep heroes as creeps", "MISC"),
+])
+def test_canonical_tags_from_the_740_741_audit(text, tag):
+    assert g._guess_tag(text) == tag
+
+
 def test_creep_level_change_is_misc_not_a_percent_badge():
     assert g._emit_li("Level increased from 5 to 6") == 'W(li("Level increased from 5 to 6", t("MISC")))'
 

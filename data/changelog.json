@@ -3,6 +3,22 @@
   "entries": [
     {
       "date": "2026-10-03",
+      "category": "Patch Reader",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.41.html",
+      "title": "7.41 proofread again against Valve's data: 70 fixes — tags (Crimson Guard, Tranquil Boots, Titanic, Queen of Pain's reflection…), old descriptions now match 7.40c (Juggernaut, Lich, Lina, Muerta, Dragon Knight, Tinker…), Shodo Sai and Pudge's Flesh Heap under their own names"
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Patch Reader",
+      "minor": true,
+      "fix": true,
+      "link": "patches/7.40.html",
+      "title": "7.40 proofread again against Valve's data: 39 fixes — tags (Healing Salve, Pangolier, Spectre's Reality…), Naga Siren's Deluge cooldown under its own name, Searing Arrows as a returning ability card, old descriptions matching 7.39e"
+    },
+    {
+      "date": "2026-10-03",
       "category": "Materials",
       "title": "Terrain: what changed, outlined on both maps",
       "link": "terrain_740.html",
