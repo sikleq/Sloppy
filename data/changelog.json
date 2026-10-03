@@ -7,7 +7,7 @@
       "title": "Terrain notes you can see",
       "link": "patches/7.41.html",
       "items": [
-        "Every terrain note from 7.38 to 7.41 that can be seen on the map shows its spot: the old and the new map side by side, what was removed outlined red, what was added green, what moved yellow; a click opens the Terrain page",
+        "Every terrain note from 7.38 to 7.41 that can be seen on the map has a “Show where” button: the old and the new map side by side with only the note's own objects outlined — removed red, added green, moved yellow; a click on a picture opens it large",
         "Terrain notes carry real tags instead of MISC almost everywhere: moved or reshaped REWORK, added NEW, removed DEL, a camp's tier BUFF or NERF, fixes MISC"
       ],
       "shots": [
@@ -61,11 +61,12 @@
       "link": "terrain_740.html",
       "items": [
         "Press a chip under the list: what was removed is outlined red on the old map, what was added green on the new map, what moved yellow on both — where it stood and where it stands",
-        "Each outline takes its object's own shape — a square round a tree or a camp — and shows with that object's map layer, which the chip turns on",
+        "Each outline takes its object's own shape — a square round a tree or a camp — and shows with that object's map layer, which the chip turns on — and off again with the chip, unless the layer was already on",
         "Switches by the heading show only what moved, what was removed or what was added; changed no-ward ground is filled red or green instead",
         "In fullscreen the controls sit in a panel beside the map that folds away: the layers, the switches and the chips"
       ],
       "shots": [
+        "icons/changelog/2026-10-03_terrain_trees_modes.webp",
         "icons/changelog/2026-10-03_terrain_outlines.webp",
         "icons/changelog/2026-10-03_terrain_fullscreen.webp"
       ]
@@ -171,7 +172,7 @@
       "title": "Terrain: a page for every patch, letter patches included",
       "link": "terrain_739b.html",
       "items": [
-        "Every patch that changed the map has its own page and slider, from 7.38 to 7.41e, each picture our own render of the map file Steam shipped with that patch; a patch that changed nothing gets no page",
+        "Every patch that changed the map has its own page and slider, from 7.38 to 7.41e, each picture our own render of the map file Steam shipped with that patch — made in Source Filmmaker from the game's files and stitched by our script; a patch that changed nothing gets no page",
         "Under the patch's own terrain notes: what's on the map as tiles, and what changed in its map file as “icon: change” chips (Bounty runes 1/2 moved)",
         "Press a chip and the places it counts are outlined on the old map",
         "A No-ward ground layer: every spot where a ward can't stand, read from each patch's map file — 7.41c, 7.41d and 7.41e get pages for the ward spots they changed without a note"
@@ -179,7 +180,8 @@
       "shots": [
         "icons/changelog/2026-10-02_terrain_steps.webp",
         "icons/changelog/2026-10-02_terrain_rings.webp",
-        "icons/changelog/2026-10-02_terrain_nowards.webp"
+        "icons/changelog/2026-10-02_terrain_nowards.webp",
+        "icons/changelog/2026-10-01_terrain_sfm.webp"
       ]
     },
     {
@@ -204,19 +206,6 @@
       "fix": true,
       "link": "terrain_741.html",
       "title": "Terrain 7.41: the empty corners beyond the map's edge now show plain ground — grass by Radiant, grey ground by Dire, no copied trees or bushes — instead of a murky fade"
-    },
-    {
-      "date": "2026-10-01",
-      "category": "Materials",
-      "title": "Terrain: our own 7.41 map picture",
-      "link": "terrain_741.html",
-      "items": [
-        "The 7.41 map is now our own render, made in Source Filmmaker from the game's files, frame by frame, and stitched by our script",
-        "The empty corners beyond the map's edge fade softly into darkness instead of showing patched-in map"
-      ],
-      "shots": [
-        "icons/changelog/2026-10-01_terrain_sfm.webp"
-      ]
     },
     {
       "date": "2026-09-30",

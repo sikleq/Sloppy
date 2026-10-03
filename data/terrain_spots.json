@@ -1,5 +1,5 @@
 {
-  "_about": "Where each terrain note happens, for its micro-screenshots (scripts/gen/terrain_shots.py -> icons/terrain/<code>_<i>.webp, i counting spots in file order). A row whose text starts with 'match' shows the pictures of its 'spots' ([x, y] game units: the centre of a square 2r wide; for a moved object the midpoint of its old and new spot). Picked from scripts/gen/terrain_audit.py and the map files; a note whose change can't be seen on the map (a camp's evolutions) has no entry.",
+  "_about": "Where each terrain note happens, for its micro-screenshots (scripts/gen/terrain_shots.py -> icons/terrain/<code>_<i>.webp, i counting spots in file order). A row whose text starts with 'match' shows the pictures of its 'spots' ([x, y] game units: the centre of a square 2r wide; for a moved object the midpoint of its old and new spot). Picked from scripts/gen/terrain_audit.py and the map files; a note whose change can't be seen on the map (a camp's evolutions) has no entry. Only the note's own objects are outlined (terrain_shots.show_keys: its first object word; ground words give none); 'show' overrides that with the keys to draw (camps, camptiers, boxes, trees, towers, watchers, lotus, twinGates, tormentors, bounty, roshan, wisdom, outposts).",
   "7.38": [
     {"match": "The top and bottom outer rim areas are now flooded by streams of traversable water",
      "spots": [[3500, -7900], [-3500, 7900]], "r": 1400},
@@ -31,7 +31,7 @@
     {"match": "The mid Radiant Tier 2 tower has been shifted away from the Triangle", "spots": [[-3263, -2859]], "r": 800},
     {"match": "The Radiant Safe Lane small pull camp has been moved to the north", "spots": [[3841, -5235]]},
     {"match": "The northern cliff edge, ramps and Large / Ancient camps of the Radiant triangle",
-     "spots": [[-4450, 480]], "r": 1000},
+     "spots": [[-4450, 480]], "r": 1000, "show": ["camps", "camptiers", "boxes"]},
     {"match": "The Dire triangle watcher has been moved slightly to the north", "spots": [[2671, -713]], "r": 600},
     {"match": "The ramp directly south of the bottom Roshan Pit has been moved north", "spots": [[2900, -3300]], "r": 800},
     {"match": "The ramp leading from the Dire triangle area to the river and bottom Roshan Pit",
@@ -46,7 +46,7 @@
     {"match": "A juke path has been added to the trees east of the Radiant mid tier 2 tower",
      "spots": [[-2700, -3100]], "r": 600},
     {"match": "A path has been added closest to the Dire Bottom Tier 1 tower from the lane to the lotus pool",
-     "spots": [[7300, -4000]], "r": 900},
+     "spots": [[7300, -4000]], "r": 900, "show": ["trees"]},
     {"match": "The Dire bounty rune has been moved slightly to the east", "spots": [[-1074, 4424]], "r": 600},
     {"match": "The bottom lane lotus pool has been moved to the north and to the west", "spots": [[7805, -4901]], "r": 900},
     {"match": "The top lane lotus pool has been moved slightly to the north", "spots": [[-7655, 4509]], "r": 800}
@@ -81,7 +81,8 @@
     {"match": "The watchers in the primary jungles have been repositioned",
      "spots": [[1978, -4434], [-2346, 4136]], "r": 1200},
     {"match": "Lowered the Wisdom Shrine areas to low ground", "spots": [[8253, -1075], [-8088, 588]], "r": 900},
-    {"match": "Cleared up some areas around the Tormentor locations", "spots": [[7488, -7857], [-7202, 7947]], "r": 800},
+    {"match": "Cleared up some areas around the Tormentor locations", "spots": [[7488, -7857], [-7202, 7947]], "r": 800,
+     "show": ["trees"]},
     {"match": "Slightly expanded the entrance to the bridge by the Lotus pools",
      "spots": [[7604, -4805], [-7627, 4598]]},
     {"match": "Very slightly adjusted the paths and spawn points of the Radiant Offlane lane creeps",

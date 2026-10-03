@@ -32,6 +32,26 @@ def test_many_small_changes_fold_under_a_toggle():
     assert "<details" in clog._minor_html("2026-01-01", many)
 
 
+def test_small_changes_continue_the_day_without_a_heading():
+    """The owner 2026-10-03: "don't set smaller changes apart from the main changes, just 'show N more changes' at
+    the end" — no "Smaller changes" heading; many fold under "Show N more changes" ("Show N changes" on a day with
+    no feature)."""
+    few = [{"date": "2026-01-01", "category": "Site", "title": f"x{i}", "minor": True} for i in range(3)]
+    many = few + [{"date": "2026-01-01", "category": "Site", "title": "x9", "minor": True}]
+    assert "Smaller changes" not in clog._minor_html("2026-01-01", few) + clog._minor_html("2026-01-01", many)
+    assert "clog-minor-head" not in clog._minor_html("2026-01-01", few)
+    folded = clog._minor_html("2026-01-01", many)
+    assert ('Show <span class="clog-minor-n">4</span> more change<span class="clog-minor-s">s</span>' in folded
+            and "Show fewer" in folded)
+    assert '<span class="clog-minor-n">4</span> change' in clog._minor_html("2026-01-01", many, after_features=False)
+
+
+def test_the_two_terrain_page_news_are_one():
+    titles = [e["title"] for e in clog.load_entries()]
+    assert "Terrain: our own 7.41 map picture" not in titles
+    assert "Terrain: a page for every patch, letter patches included" in titles
+
+
 def test_fixes_carry_the_bug_marker_and_the_rail_lists_only_features():
     entries = [{"date": "2026-01-02", "category": "Site", "title": "Thing", "items": ["x"], "fix": True},
                {"date": "2026-01-02", "category": "Site", "title": "Small", "minor": True, "fix": True},

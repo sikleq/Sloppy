@@ -686,7 +686,7 @@ def _badge(tag):
 def _change_li(text, tag, note=None, patch=None):
     _cls, tid, overall = _TAG_CLS[tag]
     from patch.elements import terrain_shots_html
-    shots = terrain_shots_html(patch, text, prefix="", link=False)      # the map is right beside the list
+    shots = terrain_shots_html(patch, text, prefix="")
     # data-tag carries the primary tag plus its filter-overall (NEW→buff,
     # DEL→nerf) so a future filter surfaces them correctly; dedupe so BUFF/NERF
     # (whose tid already equals the overall) don't repeat.

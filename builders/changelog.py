@@ -105,20 +105,24 @@ def _shots_html(e):
 MINOR_OPEN_MAX = 3            # a day's small changes: up to 3 shown as a list, more fold under a toggle
 
 
-def _minor_html(date, minors):
-    """Small changes of one day ("minor": true) — a compact list; when there are many, it
-    folds under a "Smaller changes (N)" toggle so it doesn't take much room."""
+def _minor_html(date, minors, after_features=True):
+    """Small changes of one day ("minor": true) continue the day's list — no heading of their own (the owner
+    2026-10-03: "don't set smaller changes apart from the main changes, just 'show N more changes' at the end"):
+    up to MINOR_OPEN_MAX are listed as they are, more fold under "Show N more changes" (just "Show N changes" on a
+    day without features). scripts.js keeps N to the rows the category filter leaves."""
     # Chip | beetle | text columns with faint row lines (owner 2026-09-26): the text always starts at one x.
     lis = "".join(
         f'<li data-cat="{_slug(e["category"])}">{_cat_html(e)}{_bug_html(e)}<span class="clog-minor-txt">'
         + (f'<a href="{_esc(e["link"])}">{_esc(e["title"])}</a>' if e.get("link") else _esc(e["title"]))
         + '</span></li>'
         for e in minors)
-    head = f'Smaller changes <span class="clog-minor-n">{len(minors)}</span>'
     if len(minors) <= MINOR_OPEN_MAX:
-        return (f'<div class="clog-minor" id="m-{date}"><div class="clog-minor-head">{head}</div>'
-                f'<ul class="clog-minor-list">{lis}</ul></div>')
-    return (f'<details class="clog-minor" id="m-{date}"><summary class="clog-minor-head">{head}</summary>'
+        return f'<div class="clog-minor" id="m-{date}"><ul class="clog-minor-list">{lis}</ul></div>'
+    more = " more" if after_features else ""
+    return (f'<details class="clog-minor" id="m-{date}"><summary class="clog-minor-more">'
+            f'<span class="clog-more-show">Show <span class="clog-minor-n">{len(minors)}</span>{more} '
+            f'change<span class="clog-minor-s">s</span></span>'
+            f'<span class="clog-more-hide">Show fewer</span></summary>'
             f'<ul class="clog-minor-list">{lis}</ul></details>')
 
 
@@ -157,7 +161,7 @@ def render(entries):
         days.append(f'<section class="clog-day" id="d-{date}" data-cats="{cats}">'
                     f'<h2 class="clog-date">{d.strftime("%b")} {d.day}, {d.year}</h2>'
                     + "".join(_entry_html(e) for e in majors)
-                    + (_minor_html(date, minors) if minors else '') + '</section>')
+                    + (_minor_html(date, minors, bool(majors)) if minors else '') + '</section>')
     chips = '<button class="clog-chip active" data-cat="">All</button>' + "".join(
         f'<button class="clog-chip" data-cat="{_slug(c)}">{_esc(c)}</button>' for c in CATEGORIES)
     return (f'<div class="clog-layout"><nav class="clog-rail" aria-label="Changes">{"".join(rail)}</nav>'

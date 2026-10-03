@@ -351,19 +351,54 @@ def test_the_slider_writes_clip_paths_not_an_inherited_property():
 
 def test_a_terrain_note_shows_its_micro_screenshots():
     """The owner 2026-10-03: terrain rows were "all under one tag, mush — maybe micro-screenshots". A row matched in
-    data/terrain_spots.json shows its old | new pictures: linked to the Terrain page on a patch page, plain on the
-    Terrain page itself; every picture it names exists."""
+    data/terrain_spots.json carries its old | new pictures under a "Show where" button (hidden until pressed, no link
+    to the Terrain page — "View on map" is for that); a click opens the large copy; every picture exists twice."""
     from patch.elements import terrain_shots_html, _terrain_spot_index
     row = "The tier 1 safe lane towers have been moved slightly away from their pull camps and where the creeps meet"
     html = terrain_shots_html("7.41", row)
-    assert html.count("<img") == 2 and 'href="../terrain_741.html"' in html and "../icons/terrain/741_" in html
+    assert html.startswith('<span class="tshots-wrap"><button type="button" class="tshots-btn" aria-expanded="false">'
+                           'Show where</button><span class="tshots" hidden>')
+    assert html.count("<img") == 2 and "<a " not in html and 'data-large="../icons/terrain/741_' in html
     assert terrain_shots_html("7.41", "Some row no spot matches") == ""
     li = terrain._change_li(row, "REWORK", None, "7.41")
-    assert '<span class="tshots"><img src="icons/terrain/741_' in li and "<a " not in li
+    assert '<img src="icons/terrain/741_' in li and 'data-large="icons/terrain/741_' in li and "<a " not in li
     for patch, rows in _terrain_spot_index().items():
         for _match, names in rows:
             for n in names:
                 assert os.path.exists(os.path.join(_ROOT, "icons", "terrain", n)), n
+                assert os.path.exists(os.path.join(_ROOT, "icons", "terrain", n[:-5] + "_lg.webp")), n
+
+
+def test_a_note_outlines_only_its_own_objects():
+    """The owner 2026-10-03: "a camps note shows only the camps, not the trees and everything else" — the first
+    object word decides; the ground (cliff, ramp, path) gives none; 'show' in terrain_spots.json overrides."""
+    sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
+    import terrain_shots as ts
+    assert ts.show_keys("Moved the safelane medium amphibian neutral camp closest to the Tier 2 tower") == set(ts.CAMP_KEYS)
+    assert ts.show_keys("Removed several trees from Dire Safelane small pull camp") == {"trees"}
+    assert ts.show_keys("The tier 1 safe lane towers have been moved slightly away from their pull camps") == {"towers"}
+    assert ts.show_keys("The ramp leading to the river and the Roshan Pit from the Dire Safe Lane pull area") == set()
+    assert ts.show_keys("The cliff above the Dire Safe Lane small camp has been extended") == set()
+    assert ts.show_keys("Twin Gates slightly moved away from the stairs") == {"twinGates"}
+    assert ts.spot_keys({"match": "Cleared up some areas around the Tormentor locations", "show": ["trees"]}) == {"trees"}
+
+
+def test_a_chip_turns_off_the_layer_it_turned_on():
+    """The owner 2026-10-03: a chip that switched its layer on switches it off again with the chip; a layer the viewer
+    had on (or clicked meanwhile, "All" too) stays."""
+    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    block = js.split("function initChangeHighlights() {", 1)[1].split("\n  }\n", 1)[0]
+    assert "autoLayers[layer] = true;" in block
+    assert "!on && autoLayers[layer] && !layerChipsOn(layer)" in block
+    assert "if (!chipClick) {" in block and "b.dataset.layer !== 'all'" in block
+
+
+def test_note_pictures_open_large_and_fold_under_the_button():
+    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    block = js.split("Terrain note pictures", 1)[1][:3000]
+    assert ".tshots-btn" in block and "pics.hidden = !open" in block and "img.dataset.large" in block
+    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    assert ".tshots[hidden] { display: none; }" in css and "cursor: zoom-in" in css
 
 
 def test_patch_pages_add_decoding_only_where_an_image_lacks_it():

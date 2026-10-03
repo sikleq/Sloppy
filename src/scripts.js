@@ -7193,20 +7193,48 @@ function ecShopMarkup(panels) {
         });
       });
     }
+    // A layer a chip switched on goes off again with the last pressed chip of that layer; one the viewer had on
+    // (or touched since) stays (the owner 2026-10-03).
+    const autoLayers = {};
+    let chipClick = false;
+    function pressLayer(layer) {
+      const layerBtn = root.querySelector('.tc-controls-bar .tc-layer-btn[data-layer="' + layer + '"]');
+      if (!layerBtn) return;
+      chipClick = true;
+      layerBtn.click();                           // goes through the bar, so its button shows its state
+      chipClick = false;
+    }
+    function layerChipsOn(layer) {
+      return Array.prototype.some.call(chips, function(c) {
+        return c.dataset.layer === layer && c.getAttribute('aria-pressed') === 'true';
+      });
+    }
     chips.forEach(function(btn) {
       btn.addEventListener('click', function() {
         const on = btn.getAttribute('aria-pressed') !== 'true';
         setAll('.tf-chip-btn[data-hl="' + btn.dataset.hl + '"]', on);
         const layer = btn.dataset.layer;
-        if (on && !layerOn(layer)) {
-          const layerBtn = root.querySelector('.tc-controls-bar .tc-layer-btn[data-layer="' + layer + '"]');
-          if (layerBtn) layerBtn.click();          // goes through the bar, so its button shows pressed
+        if (layer && on && !layerOn(layer)) {
+          pressLayer(layer);
+          autoLayers[layer] = true;
+        } else if (layer && !on && autoLayers[layer] && !layerChipsOn(layer)) {
+          delete autoLayers[layer];
+          if (layerOn(layer)) pressLayer(layer);
         }
         refresh();
       });
     });
-    // the bar's own layer buttons (and "All") change what the pressed chips may show
-    root.querySelectorAll('.tc-layer-btn').forEach(function(b) { b.addEventListener('click', refresh); });
+    // the bar's own layer buttons (and "All") change what the pressed chips may show; a click by the viewer makes
+    // the layer theirs
+    root.querySelectorAll('.tc-layer-btn').forEach(function(b) {
+      b.addEventListener('click', function() {
+        if (!chipClick) {
+          if (b.dataset.layer && b.dataset.layer !== 'all') delete autoLayers[b.dataset.layer];
+          else Object.keys(autoLayers).forEach(function(k) { delete autoLayers[k]; });
+        }
+        refresh();
+      });
+    });
     document.querySelectorAll('.tf-kind[data-kind]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const on = btn.getAttribute('aria-pressed') !== 'true';
@@ -7227,6 +7255,44 @@ function ecShopMarkup(panels) {
     initSubpatchPicker();
     initChangeHighlights();
   }
+})();
+
+// ---------------------------------------------------------------------
+// Terrain note pictures (patch pages + Terrain pages, patch/elements.py terrain_shots_html): "Show where" opens a
+// note's old | new micro-screenshots (hidden until then, so they load on demand); a click on one opens its large copy
+// (data-large) over the page — Esc or a click closes it (the owner 2026-10-03: "the picture grows in quality, it
+// doesn't take you to Terrain"). Delegated, one listener for every note.
+// ---------------------------------------------------------------------
+(function() {
+  let box = null;
+  function lightbox() {
+    if (box) return box;
+    box = document.createElement('div');
+    box.className = 'clog-lightbox tshot-lightbox';
+    box.innerHTML = '<img alt="">';
+    box.addEventListener('click', function() { box.classList.remove('is-open'); });
+    document.addEventListener('keydown', function(ev) {
+      if (ev.key === 'Escape' && box.classList.contains('is-open')) box.classList.remove('is-open');
+    });
+    document.body.appendChild(box);
+    return box;
+  }
+  document.addEventListener('click', function(ev) {
+    const btn = ev.target.closest && ev.target.closest('.tshots-btn');
+    if (btn) {
+      const pics = btn.nextElementSibling;
+      const open = btn.getAttribute('aria-expanded') !== 'true';
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.textContent = open ? 'Hide' : 'Show where';
+      if (pics) pics.hidden = !open;
+      return;
+    }
+    const img = ev.target.closest && ev.target.closest('.tshots img[data-large]');
+    if (!img) return;
+    const b = lightbox();
+    b.querySelector('img').src = img.dataset.large;
+    b.classList.add('is-open');
+  });
 })();
 
 // ---------------------------------------------------------------------
@@ -7284,13 +7350,17 @@ function ecShopMarkup(panels) {
     document.querySelectorAll('.clog-rail-item').forEach(a =>
       a.classList.toggle('is-hidden', !!cat && !((a.dataset.cats || a.dataset.cat || '').split(' ').includes(cat))));
     document.querySelectorAll('.clog-minor').forEach(box => {
-      let any = false;
+      let shown = 0;
       box.querySelectorAll('.clog-minor-list li').forEach(li => {
         const hide = !!cat && li.dataset.cat !== cat;
         li.classList.toggle('is-hidden', hide);
-        if (!hide) any = true;
+        if (!hide) shown++;
       });
-      box.classList.toggle('is-hidden', !any);
+      box.classList.toggle('is-hidden', !shown);
+      const n = box.querySelector('.clog-minor-n');      // "Show N more changes" counts what the filter leaves
+      if (n) n.textContent = shown;
+      const s = box.querySelector('.clog-minor-s');
+      if (s) s.textContent = shown === 1 ? '' : 's';
     });
   }
   chips.forEach(c => c.addEventListener('click', () => apply(c.dataset.cat)));

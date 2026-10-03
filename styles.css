@@ -4238,16 +4238,32 @@ ul.changes {
                                itself uses margin-right:-8px against the
                                entity header's 14px padding → also 6px in). */
 }
-/* A terrain note's micro-screenshots (patch/elements.py terrain_shots_html): old | new map around the change, the
-   changed objects outlined; a full-width row of the li's grid under the text (the owner 2026-10-03: terrain rows were
-   "all under one tag, mush"). */
-ul.changes li > .tshots { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 4px; }
-.tshots a { display: contents; }
+/* A terrain note's micro-screenshots (patch/elements.py terrain_shots_html): old | new map around the change, only
+   the note's objects outlined; a full-width row of the li's grid under the text (the owner 2026-10-03: terrain rows
+   were "all under one tag, mush"). They wait under "Show where"; a click on a picture opens its large copy
+   (scripts.js "Terrain note pictures"). */
+ul.changes li > .tshots-wrap {
+  grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin: 4px 0 2px;
+}
+.tshots-btn {
+  position: relative; padding: 4px 9px 4px 21px; font: inherit; font-size: 12px; line-height: 1.2;
+  color: var(--gold-dim); background: transparent; border: 1px solid rgba(227, 196, 106, 0.28); border-radius: 3px;
+  cursor: pointer; transition: color 0.15s ease, border-color 0.15s ease;
+}
+.tshots-btn::before {
+  content: ""; position: absolute; left: 8px; top: 50%; border-left: 5px solid currentColor;
+  border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+  transform: translateY(-50%); transition: transform 0.15s ease;
+}
+.tshots-btn[aria-expanded="true"]::before { transform: translateY(-50%) rotate(90deg); }
+.tshots-btn:hover, .tshots-btn:focus-visible { color: var(--gold); border-color: rgba(227, 196, 106, 0.6); }
+.tshots { display: flex; flex-wrap: wrap; gap: 6px; }
+.tshots[hidden] { display: none; }
 .tshots img {
   width: 242px; height: 120px; border-radius: 3px; border: 1px solid rgba(227, 196, 106, 0.22);
-  background: #080b06; transition: border-color 0.15s ease;
+  background: #080b06; cursor: zoom-in; transition: border-color 0.15s ease;
 }
-.tshots a:hover img { border-color: rgba(227, 196, 106, 0.6); }
+.tshots img:hover { border-color: rgba(227, 196, 106, 0.6); }
 ul.changes li {
   display: grid;
   /* 2-column grid (text | badge). The text-tag is absolutely positioned over
@@ -10159,17 +10175,20 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 @keyframes clog-zoom { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
 .clog-page .clog-entry.is-hidden, .clog-page .clog-day.is-hidden, .clog-page .clog-rail-item.is-hidden,
 .clog-page .clog-minor.is-hidden, .clog-page .clog-minor-list li.is-hidden { display: none; }
-/* a day's small changes: compact list, folded under a toggle when there are many */
-.clog-minor { margin: 10px 0 4px; }
-.clog-minor-head { padding-left: var(--clog-text-x); }
-.clog-minor-head { font-size: 12.5px; color: var(--text-dim, #969289); letter-spacing: .3px; }
-summary.clog-minor-head { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; }
-summary.clog-minor-head::-webkit-details-marker { display: none; }
-summary.clog-minor-head::before { content: "\25B8"; color: var(--gold-dim); transition: transform .15s; }
-details[open] > summary.clog-minor-head::before { transform: rotate(90deg); }
-summary.clog-minor-head:hover { color: var(--text-bright); }
+/* a day's small changes continue its list — no heading, no divider of their own (the owner 2026-10-03); many fold
+   under "Show N more changes" at the end */
+.clog-minor { margin: 4px 0 4px; }
+summary.clog-minor-more { padding-left: var(--clog-text-x); font-size: 12.5px; color: var(--text-dim, #969289);
+  letter-spacing: .3px; cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+summary.clog-minor-more::-webkit-details-marker { display: none; }
+summary.clog-minor-more::before { content: "\25B8"; color: var(--gold-dim); transition: transform .15s; }
+details[open] > summary.clog-minor-more::before { transform: rotate(90deg); }
+summary.clog-minor-more:hover { color: var(--text-bright); }
+.clog-more-hide, details[open] > summary .clog-more-show { display: none; }
+details[open] > summary .clog-more-hide { display: inline; }
 .clog-minor-n { color: var(--gold-dim); }
-.clog-minor-list { list-style: none; margin: 6px 0 0; padding: 0; border-top: 1px solid rgba(255, 255, 255, .06); }
+.clog-minor-list { list-style: none; margin: 0; padding: 0; }
+details.clog-minor > .clog-minor-list { margin-top: 6px; }
 .clog-minor-list li { display: grid; grid-template-columns: var(--clog-cat-w) var(--clog-bug-w) minmax(0, 1fr);
   column-gap: var(--clog-gap); align-items: baseline; padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, .06);
   font-size: 13px; line-height: 1.45; color: var(--text-main); }

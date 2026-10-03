@@ -2062,21 +2062,23 @@ def _terrain_spot_index():
     return _TERRAIN_SPOTS
 
 
-def terrain_shots_html(patch, text, prefix="../", link=True):
+def terrain_shots_html(patch, text, prefix="../"):
     """The micro-screenshots of a terrain note (the owner 2026-10-03: the terrain rows were "all under one tag, mush —
-    maybe micro-screenshots"): the old | new map squares around the change, its objects outlined; on a patch page
-    they link to the patch's Terrain page (link=False on the Terrain page itself). '' for any other row."""
+    maybe micro-screenshots"): the old | new map squares around the change, only the note's own objects outlined.
+    They wait under a "Show where" button (hidden, so the lazy pictures load only when opened), and a click on one
+    opens its large copy (<name>_lg.webp, data-large) over the page — the section's "View on map" button is the way
+    to the Terrain page (the owner 2026-10-03). '' for any other row."""
     if not patch or not isinstance(text, str):
         return ""
     plain = re.sub(r"<[^>]+>", "", text).strip()
     for match, names in _terrain_spot_index().get(patch, []):
         if names and plain.startswith(match):
-            imgs = "".join(f'<img src="{prefix}icons/terrain/{n}" width="242" height="120" alt="" loading="lazy" '
-                           f'decoding="async">' for n in names)
-            if link:
-                imgs = (f'<a href="{prefix}terrain_{patch.replace(".", "")}.html" '
-                        f'title="Old and new map here — open the Terrain page">{imgs}</a>')
-            return f'<span class="tshots">{imgs}</span>'
+            imgs = "".join(
+                f'<img src="{prefix}icons/terrain/{n}" data-large="{prefix}icons/terrain/{n[:-5]}_lg.webp" '
+                f'width="242" height="120" alt="The old and the new map here" loading="lazy" '
+                f'decoding="async">' for n in names)
+            return ('<span class="tshots-wrap"><button type="button" class="tshots-btn" aria-expanded="false">'
+                    f'Show where</button><span class="tshots" hidden>{imgs}</span></span>')
     return ""
 
 

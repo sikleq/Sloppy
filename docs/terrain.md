@@ -326,8 +326,17 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   and the new full SFM render (2 units/px → 240 px a side), outlines what changed inside (removed red / added green
   / moved yellow — the chips' `_changed_points`; squares round trees and camps, circles round entities; changed spawn
   boxes red / green), labels the halves with their versions and writes `icons/terrain/<code>_<i>.webp` (i = spot
-  order in the file; ~35 KB each). `patch/elements.py terrain_shots_html` puts them under a matching row — `li()`
-  does it for patch pages (linked to the Terrain page), `_change_li` for the Terrain page's own list (no link).
+  order in the file; ~35 KB each) plus a large copy `<code>_<i>_lg.webp` (600-px halves, ~140 KB). Only the
+  note's own objects are outlined (the owner 2026-10-03: "a camps note shows only the camps, not the trees and
+  everything else"): `terrain_shots.show_keys` takes the note's FIRST object word (camp / spawn box → camps +
+  re-tiered + boxes, tree / juke path, watcher, tower / tier N, lotus, twin gates, tormentor, bounty rune, Roshan
+  pit, wisdom shrine, outpost); a ground word first (cliff, ramp, stream, path, entrance, areas) → no outlines;
+  a spot's `"show": [...]` overrides (3 do: the triangle's cliff + camps, a path cut through trees, the cleared
+  Tormentor areas). `patch/elements.py terrain_shots_html` puts them under a matching row — `li()` does it for
+  patch pages, `_change_li` for the Terrain page's own list — folded under a "Show where" button (the owner:
+  "hide them under a button"; `hidden`, so the lazy pictures load only when opened), and a click on a picture
+  opens its large copy (`data-large`) in a lightbox, not the Terrain page ("View on map" in the section header is
+  for that). scripts.js "Terrain note pictures".
   Not placed: notes the map can't show (watcher rules, camp evolutions, pull timers, fixes) and the doubled 7.38c
   "Several additional tree and visual adjustments". With the shots, the terrain tag canon (docs/agent-rules/
   patch-tags.md): moved / reshaped REWORK, added NEW, removed DEL, demoted NERF, fixes MISC.
@@ -469,7 +478,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   on the old map = turned wardable (`wards.toWardable`), green on the new map = turned no-ward
   (`wards.toNoWard`), both from `gridnav.changed_cells`. `initChangeHighlights` (src/scripts.js): a pressed chip
   clicks its layer's bar button on when it's off, and its SVGs get `.tm-hl-on` only while that layer is shown
-  (re-checked on every bar click); the moved / removed / added switches by the heading (`.tf-kind`, only the
+  (re-checked on every bar click); a layer a chip switched on (`autoLayers`) goes off again with the last pressed
+  chip of that layer, unless the viewer clicked that layer (or "All") meanwhile — then it's theirs and stays (the
+  owner 2026-10-03: a chip turned the No-ward layer on and it stayed on); the moved / removed / added switches by the heading (`.tf-kind`, only the
   kinds the step has — `_hl_kinds`) put `.hl-hide-<kind>` on the map. The layer bar spreads its buttons across
   the map's width (`justify-content: space-between`) — "like the minimap's header".
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
