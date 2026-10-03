@@ -248,6 +248,11 @@ CANONICAL_TAGS = [
     (re.compile(r"^Added (?:an? |the )?(?:[\w']+ ){0,4}(?:icon|indicator|marker)\b", re.I), 'QoL'),  # user rule: new icon = QoL
     (re.compile(r'^\s*Now is (?:an? )?innate ability\.?\s*$', re.I), 'REWORK'),   # bare conversion only; "…that improves with X" is judged per case
     (re.compile(r'\bnow levels with\b', re.I), 'REWORK'),
+    # an Aghanim's upgrade that stops giving its benefit = DEL, wind-up included ("Aghanim's Scepter no longer
+    # decreases max wind-up time": the 7.37e tooltip "Decreases wind-up time …", audit 2026-10-03)
+    (re.compile(r"^\s*Aghanim's (?:Scepter|Shard) no longer (?:decreases|reduces)\b", re.I), 'DEL'),
+    # a new creep penalty on an own effect ("Kraken Shell: Now has 50% block value against creeps", 7.38)
+    (re.compile(r'\bnow has (?:a |an )?\d+(?:\.\d+)?% [\w ]{0,25}against creeps\b', re.I), 'NERF'),
     # removing an Aghs upgrade / benefit ("no longer decreases cooldown / stun delay") = DEL, not BUFF
     (re.compile(r'\bno longer (?:decreases|reduces)\b(?:(?!wind[- ]?up).)*?\b(?:cooldown|stun delay)\b', re.I), 'DEL'),
     (re.compile(r'\bno longer (?:reduces|decreases) ', re.I),       'BUFF'),

@@ -251,6 +251,11 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
   - Опечатка Valve в числах (Techies Proximity Mines 7.41a «450», «225») — `wrong-word` + `note_box` с реальными
     значениями из KV, бейдж по KV. Valve пишет «decreased», а числа выросли — то же (Grimstroke 7.40c).
   - «per Spirit Bear level up» → формула `A + B*(L-1)` (Spirit Bear 7.40b, 7.41c), см. formula-tables.
+  - 7.38 (вычитка 2026-10-03): «Aghanim's Scepter/Shard no longer decreases …» → **DEL**, и wind-up тоже (подсказка
+    7.37e «Decreases wind-up time»; исключение «wind-up → BUFF» осталось только для строки фасета); «Now has 50%
+    block value against creeps» → **NERF** (новый штраф по крипам); строка Valve под не той способностью (Quick Wit
+    «Attack Speed per Intelligence 0.5 → 1» была под новой Aggrandize) уходит к своему фасету; «Ability Reworked» +
+    описание в «?» → карточка `ability_change` со старой подсказкой (Silencer Arcane Curse, Last Word).
   - Слово Valve «improved» / «worsened» само задаёт направление: улучшено в сторону меньшего числа (или ухудшено в
     сторону большего) → `l=True` («Ghost spawn rate improved from 0.35s to 0.25s»). Генератор: `_said_lower_better`,
     оно сильнее списка слов. Сверка флагов `l=True` в 7.40–7.41 с генератором (2026-10-03) дала ещё слова: mana

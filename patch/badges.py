@@ -582,6 +582,7 @@ FACETS = {
     "windrunner_killshot": ("Killshot", "Green0"),
     "life_stealer_fleshfeast": ("Fleshfeast", "Gray0"),
     "dark_seer_movespd": ("Heart of Battle", "Purple2"),
+    "dark_seer_atkspd": ("Quick Wit", "Gray3"),      # 7.36 datafeed; its 7.38 change sat under Aggrandize (audit 2026-10-03)
     "omniknight_omnipresent": ("Omnipresent", "Gray3"),
     "jakiro_ice_breaker": ("Ice Breaker", "Blue1"),
     "meepo_codependent": ("Codependent", "Yellow1"),

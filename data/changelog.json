@@ -19,6 +19,14 @@
       "category": "Patch Reader",
       "minor": true,
       "fix": true,
+      "link": "patches/7.38.html",
+      "title": "7.38 proofread again against Valve's data: 59 fixes — Silencer's Arcane Curse and Last Word as old → new cards, Dark Seer's Quick Wit change under its own facet, tags (Tidehunter's Kraken Shell against creeps, Hoodwink's Scepter, Lich's Ice Spire, Invoker's orb bonuses…), Mirana's reworked Shard in one row, Valve's missing (?) notes (Tormentor, crafting, Arc Warden's previous values, Io's Tether…), old descriptions matching 7.37e (Dragon Knight, Spectre, Techies, Troll Warlord)"
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Patch Reader",
+      "minor": true,
+      "fix": true,
       "link": "patches/7.39.html",
       "title": "7.39 proofread against Valve's data: 40 fixes — Valve's (?) notes that were missing (Tormentor, Health Restoration, Chen, five neutral artifacts), costs and penalties where lower is better (Tiny's Grow, Windranger's Focus Fire, Spectre's Desolate, Naga Siren's Deluge…), Phantom Assassin's Blur and Immaterial, old descriptions matching 7.38c (Grimstroke, Dawnbreaker, Earthshaker, Io), Invoker's Sun Strike and Twister as tables by orb level"
     },
