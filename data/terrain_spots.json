@@ -1,5 +1,11 @@
 {
   "_about": "Where each terrain note happens, for its micro-screenshots (scripts/gen/terrain_shots.py -> icons/terrain/<code>_<i>.webp, i counting spots in file order). A row whose text starts with 'match' shows the pictures of its 'spots' ([x, y] game units: the centre of a square 2r wide; for a moved object the midpoint of its old and new spot). Picked from scripts/gen/terrain_audit.py and the map files; a note whose change can't be seen on the map (a camp's evolutions) has no entry.",
+  "7.38": [
+    {"match": "The top and bottom outer rim areas are now flooded by streams of traversable water",
+     "spots": [[3500, -7900], [-3500, 7900]], "r": 1400},
+    {"match": "The Twin Gates have been repositioned to the corners of the map", "spots": [[6624, -6848], [-6816, 7232]],
+     "r": 1100}
+  ],
   "7.38b": [
     {"match": "Removed several trees around camps, making it easier", "spots": [[-8300, -600], [-1056, -3264]], "r": 600},
     {"match": "Moved the spawn box of the Radiant Safelane tier 1 large pull camp", "spots": [[4736, -3968]], "r": 600}
