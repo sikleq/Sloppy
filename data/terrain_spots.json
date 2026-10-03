@@ -1,5 +1,25 @@
 {
   "_about": "Where each terrain note happens, for its micro-screenshots (scripts/gen/terrain_shots.py -> icons/terrain/<code>_<i>.webp, i counting spots in file order). A row whose text starts with 'match' shows the pictures of its 'spots' ([x, y] game units: the centre of a square 2r wide; for a moved object the midpoint of its old and new spot). Picked from scripts/gen/terrain_audit.py and the map files; a note whose change can't be seen on the map (a camp's evolutions) has no entry.",
+  "7.40": [
+    {"match": "The Large camp nearest to Tier 3 towers where the streams used to start has been demoted",
+     "spots": [[-2410, -8380], [2154, 8036]], "r": 600},
+    {"match": "Moved the safelane medium amphibian neutral camp closest to the Tier 2 tower",
+     "spots": [[-374, -7590], [-137, 8293]]},
+    {"match": "Large camps nearest to Wisdom Shrines have been moved slightly back", "spots": [[-8325, -461]]},
+    {"match": "The Large camp in the 'triangle' has been demoted", "spots": [[3392, -1408], [-4013, 992]], "r": 600},
+    {"match": "The watchers nearest to the mid-lane and near the small water camps",
+     "spots": [[105, -2535], [-774, 2397], [3455, -7766], [-3567, 7864]], "r": 600},
+    {"match": "Moved Watchers to the low ground and slightly closer to the Tier 1 towers",
+     "spots": [[7887, -1386], [-7684, 922]]},
+    {"match": "The watchers in the primary jungles have been repositioned",
+     "spots": [[1978, -4434], [-2346, 4136]], "r": 1200},
+    {"match": "Lowered the Wisdom Shrine areas to low ground", "spots": [[8253, -1075], [-8088, 588]], "r": 900},
+    {"match": "Cleared up some areas around the Tormentor locations", "spots": [[7488, -7857], [-7202, 7947]], "r": 800},
+    {"match": "Slightly expanded the entrance to the bridge by the Lotus pools",
+     "spots": [[7604, -4805], [-7627, 4598]]},
+    {"match": "Very slightly adjusted the paths and spawn points of the Radiant Offlane lane creeps",
+     "spots": [[-6483, -872]], "r": 600}
+  ],
   "7.41": [
     {"match": "Removed several trees from Dire Safelane small pull camp and Radiant Safelane large pull camp",
      "spots": [[-3500, 4829], [4649, -3699]]},
