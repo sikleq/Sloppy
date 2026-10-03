@@ -63,7 +63,9 @@ def _cat_html(e):
     return f'<span class="clog-catcell"><span class="clog-cat clog-cat-{_slug(e["category"])}">{_esc(e["category"])}</span></span>'
 
 
-def _entry_html(e):
+def _entry_html(e, minor=""):
+    """One feature; `minor` = the day's small changes, under its items (the day's last feature carries them — the
+    owner 2026-10-03: "move it up to the topic, not a separate news item behind a line")."""
     items = "".join(f"<li>{_esc(x)}</li>" for x in e.get("items", []))
     title = (f'<a class="clog-title-link" href="{_esc(e["link"])}">{_esc(e["title"])}</a>'
              if e.get("link") else _esc(e["title"]))
@@ -71,7 +73,7 @@ def _entry_html(e):
     cls = "clog-entry has-shots" if shots else "clog-entry"
     return (f'<article class="{cls}" id="{_entry_id(e)}" data-cat="{_slug(e["category"])}"><div class="clog-text">'
             f'<div class="clog-entry-head">{_cat_html(e)}{_bug_html(e)}<h3 class="clog-title">{title}</h3></div>'
-            f'<ul class="clog-items">{items}</ul></div>{shots}</article>')
+            f'<ul class="clog-items">{items}</ul>{minor}</div>{shots}</article>')
 
 
 def _entry_id(e):
@@ -158,10 +160,11 @@ def render(entries):
         rail.extend(f'<a class="clog-rail-item" href="#{_entry_id(e)}" data-cat="{_slug(e["category"])}">'
                     f'{_esc(e["title"])}</a>' for e in majors)
         # small changes are not listed in the rail — it names only the features
+        minor = _minor_html(date, minors, bool(majors)) if minors else ''
+        body = ("".join(_entry_html(e, minor if i == len(majors) - 1 else "") for i, e in enumerate(majors))
+                if majors else minor)
         days.append(f'<section class="clog-day" id="d-{date}" data-cats="{cats}">'
-                    f'<h2 class="clog-date">{d.strftime("%b")} {d.day}, {d.year}</h2>'
-                    + "".join(_entry_html(e) for e in majors)
-                    + (_minor_html(date, minors, bool(majors)) if minors else '') + '</section>')
+                    f'<h2 class="clog-date">{d.strftime("%b")} {d.day}, {d.year}</h2>{body}</section>')
     chips = '<button class="clog-chip active" data-cat="">All</button>' + "".join(
         f'<button class="clog-chip" data-cat="{_slug(c)}">{_esc(c)}</button>' for c in CATEGORIES)
     return (f'<div class="clog-layout"><nav class="clog-rail" aria-label="Changes">{"".join(rail)}</nav>'

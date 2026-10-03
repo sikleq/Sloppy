@@ -46,6 +46,25 @@ def test_small_changes_continue_the_day_without_a_heading():
     assert '<span class="clog-minor-n">4</span> change' in clog._minor_html("2026-01-01", many, after_features=False)
 
 
+def test_small_changes_sit_under_the_last_feature_of_the_day():
+    """The owner 2026-10-03 (a screenshot, the toggle far below the feature behind a line): "move it to the topic,
+    not a separate news item" — the small changes go inside the day's last feature, under its items; filtered out,
+    that feature keeps only them (scripts.js only-minor)."""
+    day = [{"date": "2026-01-01", "category": "Materials", "title": "A", "items": ["a"]},
+           {"date": "2026-01-01", "category": "Site", "title": "B", "items": ["b"]}]
+    day += [{"date": "2026-01-01", "category": "Patch Reader", "title": f"m{i}", "minor": True} for i in range(4)]
+    html = clog.render(day)
+    last = html.split('id="e-2026-01-01-b"', 1)[1].split("</article>", 1)[0]
+    assert '<ul class="clog-items"><li>b</li></ul><details class="clog-minor"' in last
+    assert "clog-minor" not in html.split('id="e-2026-01-01-a"', 1)[1].split("</article>", 1)[0]
+    assert html.split('id="e-2026-01-01-b"', 1)[1].split("</article>", 1)[1].startswith("</section>")
+    only = clog.render([dict(e, date="2026-01-02") for e in day[2:]])
+    assert '<h2 class="clog-date">Jan 2, 2026</h2><details class="clog-minor"' in only
+    js = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src", "scripts.js"),
+              encoding="utf-8").read()
+    assert "e.classList.toggle('only-minor', keep)" in js
+
+
 def test_the_two_terrain_page_news_are_one():
     titles = [e["title"] for e in clog.load_entries()]
     assert "Terrain: our own 7.41 map picture" not in titles

@@ -10205,6 +10205,12 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 /* a day's small changes continue its list — no heading, no divider of their own (the owner 2026-10-03); many fold
    under "Show N more changes" at the end */
 .clog-minor { margin: 4px 0 4px; }
+/* under the day's last feature, right below its items (the owner 2026-10-03: "move it to the topic, not a separate
+   news item behind a line"); filtered out, that feature keeps only them (scripts.js only-minor) */
+.clog-text > .clog-minor { margin: 10px 0 0; }
+.clog-entry.only-minor { display: block; padding-top: 4px; }
+.clog-entry.only-minor > .clog-shots,
+.clog-entry.only-minor > .clog-text > :not(.clog-minor) { display: none; }
 summary.clog-minor-more { padding-left: var(--clog-text-x); font-size: 12.5px; color: var(--text-dim, #969289);
   letter-spacing: .3px; cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; }
 summary.clog-minor-more::-webkit-details-marker { display: none; }

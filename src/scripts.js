@@ -7358,8 +7358,15 @@ function ecShopMarkup(panels) {
   const chips = document.querySelectorAll('.clog-chip');
   function apply(cat) {
     chips.forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
-    document.querySelectorAll('.clog-entry').forEach(e =>
-      e.classList.toggle('is-hidden', !!cat && e.dataset.cat !== cat));
+    document.querySelectorAll('.clog-entry').forEach(e => {
+      // the day's small changes sit under its last feature: filtered out, the feature still shows them when they
+      // match (only-minor hides everything else of it)
+      const off = !!cat && e.dataset.cat !== cat;
+      const box = e.querySelector('.clog-minor');
+      const keep = off && !!box && [...box.querySelectorAll('.clog-minor-list li')].some(li => li.dataset.cat === cat);
+      e.classList.toggle('is-hidden', off && !keep);
+      e.classList.toggle('only-minor', keep);
+    });
     document.querySelectorAll('.clog-day').forEach(d =>
       d.classList.toggle('is-hidden', !!cat && !(d.dataset.cats || '').split(' ').includes(cat)));
     document.querySelectorAll('.clog-rail-item').forEach(a =>
