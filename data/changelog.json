@@ -7,9 +7,9 @@
       "title": "Terrain changes, shown on the map",
       "link": "terrain_741.html",
       "items": [
-        "In a terrain note, click the name of what changed — “several trees”, “tier 1 safe lane towers” — to see the old and the new map side by side",
-        "On the Terrain page, a chip outlines its changes: red removed, green added, yellow moved; dashed always means where it was",
-        "Notes are numbered instead of tagged, and the patch name above the list opens that patch's notes"
+        "Click what changed in a terrain note to see the map before and after",
+        "Chips on the Terrain page outline changes: red removed, green added, yellow moved, dashed = old spot",
+        "Notes are numbered; the patch name above the list opens its notes"
       ],
       "shots": [
         "icons/changelog/2026-10-03_terrain_notes.webp",
@@ -23,11 +23,17 @@
     },
     {
       "date": "2026-10-03",
+      "category": "Site",
+      "minor": true,
+      "title": "Changelog: shorter notes, heroes shown as icons, small changes under the day's topic"
+    },
+    {
+      "date": "2026-10-03",
       "category": "Patch Reader",
       "minor": true,
       "fix": true,
       "link": "patches/7.38.html",
-      "title": "7.38 proofread again against Valve's data: 59 fixes — Silencer's Arcane Curse and Last Word as old → new cards, Dark Seer's Quick Wit change under its own facet, tags (Tidehunter's Kraken Shell against creeps, Hoodwink's Scepter, Lich's Ice Spire, Invoker's orb bonuses…), Mirana's reworked Shard in one row, Valve's missing (?) notes (Tormentor, crafting, Arc Warden's previous values, Io's Tether…), old descriptions matching 7.37e (Dragon Knight, Spectre, Techies, Troll Warlord)"
+      "title": "7.38 proofread again, 59 fixes: Silencer Dark Seer Tidehunter Hoodwink Lich Invoker Mirana Arc Warden Io Dragon Knight Spectre Techies Troll Warlord"
     },
     {
       "date": "2026-10-03",
@@ -35,7 +41,7 @@
       "minor": true,
       "fix": true,
       "link": "patches/7.39.html",
-      "title": "7.39 proofread against Valve's data: 40 fixes — Valve's (?) notes that were missing (Tormentor, Health Restoration, Chen, five neutral artifacts), costs and penalties where lower is better (Tiny's Grow, Windranger's Focus Fire, Spectre's Desolate, Naga Siren's Deluge…), Phantom Assassin's Blur and Immaterial, old descriptions matching 7.38c (Grimstroke, Dawnbreaker, Earthshaker, Io), Invoker's Sun Strike and Twister as tables by orb level"
+      "title": "7.39 proofread, 40 fixes: Chen Tiny Windranger Spectre Naga Siren Phantom Assassin Grimstroke Dawnbreaker Earthshaker Io Invoker"
     },
     {
       "date": "2026-10-03",
@@ -43,7 +49,7 @@
       "minor": true,
       "fix": true,
       "link": "patches/7.41a.html",
-      "title": "Letter patches 7.38b–7.41e and 7.08 proofread against Valve's data: 38 fixes — tags (Mask of Madness, Clinkz, Largo, Witch Doctor, Ringmaster's Unicycle…), Lifestealer's Infest and Medusa's poison where lower is better, Magnus's facet, Slark's Barracuda and Pudge's Flesh Heap under their own names, Lone Druid's talent under the Spirit Bear, Valve's own typos marked (Techies 7.41a, Grimstroke 7.40c); 7.41a base stats now compare with 7.41 (Anti-Mage +50%, Doom −50% — they were counted from 7.41a's own values)"
+      "title": "Letter patches 7.38b–7.41e and 7.08 proofread, 38 fixes: Clinkz Largo Witch Doctor Ringmaster Lifestealer Medusa Magnus Slark Pudge Lone Druid Techies Grimstroke Anti-Mage Doom"
     },
     {
       "date": "2026-10-03",
@@ -51,7 +57,7 @@
       "minor": true,
       "fix": true,
       "link": "patches/7.41.html",
-      "title": "7.41 proofread again against Valve's data: 70 fixes — tags (Crimson Guard, Tranquil Boots, Titanic, Queen of Pain's reflection…), old descriptions now match 7.40c (Juggernaut, Lich, Lina, Muerta, Dragon Knight, Tinker…), Shodo Sai and Pudge's Flesh Heap under their own names"
+      "title": "7.41 proofread again, 70 fixes: Queen of Pain Juggernaut Lich Lina Muerta Dragon Knight Tinker Pudge"
     },
     {
       "date": "2026-10-03",
@@ -59,7 +65,7 @@
       "minor": true,
       "fix": true,
       "link": "patches/7.40.html",
-      "title": "7.40 proofread again against Valve's data: 40 fixes — tags (Healing Salve, Pangolier, Spectre's Reality, Treant's Eyes In The Forest moving from Scepter to Shard…), Naga Siren's Deluge cooldown under its own name, Searing Arrows as a returning ability card, old descriptions matching 7.39e"
+      "title": "7.40 proofread again, 40 fixes: Pangolier Spectre Treant Protector Naga Siren Clinkz"
     },
     {
       "date": "2026-10-03",
@@ -67,20 +73,20 @@
       "minor": true,
       "fix": true,
       "link": "terrain_741.html",
-      "title": "Terrain: pages open faster and stay smooth on slower computers — the maps load at half size first (1.7 MB instead of 8 MB; the full pictures come only for the lens on sharp screens or fullscreen zoom), and dragging the slider no longer re-styles every tree and camp marker on each move"
+      "title": "Terrain: faster pages — maps load at half size first, the slider drags smoothly"
     },
     {
       "date": "2026-10-03",
       "category": "Materials",
       "minor": true,
-      "title": "Terrain: no line under the slider any more — every map picture and object list on the pages is our own"
+      "title": "Terrain: every map picture and list is our own"
     },
     {
       "date": "2026-10-03",
       "category": "Materials",
       "minor": true,
       "link": "terrain_741c.html",
-      "title": "Terrain: towers, lotus pools, twin gates, Tormentors, runes, outposts, watchers and Roshan pits are counted under the list too, a row below trees and camps; a patch whose notes say nothing about the map no longer says “No terrain changes”"
+      "title": "Terrain: towers, runes, watchers and other objects counted under the list"
     },
     {
       "date": "2026-10-03",
@@ -88,21 +94,21 @@
       "minor": true,
       "fix": true,
       "link": "terrain_741d.html",
-      "title": "Terrain: the old map is now left of the slider and the new one right of it, as their corner labels say (it was the other way round)"
+      "title": "Terrain: old map on the left, new on the right, as labelled"
     },
     {
       "date": "2026-10-03",
       "category": "Materials",
       "minor": true,
       "link": "terrain_741f.html",
-      "title": "Terrain: 7.41f has its page again — the newest patch always gets one, even when nothing on its map changed"
+      "title": "Terrain: the newest patch always has a page"
     },
     {
       "date": "2026-10-03",
       "category": "Materials",
       "minor": true,
       "link": "terrain_741d.html",
-      "title": "Terrain: the No-ward ground layer draws cliffs and the ground off the map in one shade, so a map edge that moved (7.41d) no longer looks like ground that changed"
+      "title": "Terrain: a moved map edge no longer looks like changed no-ward ground"
     },
     {
       "date": "2026-10-02",
@@ -110,21 +116,21 @@
       "minor": true,
       "fix": true,
       "link": "terrain_740.html",
-      "title": "Terrain: no thin light strip along the map's edges when zoomed in — every map picture's rim is black like the rest of the void"
+      "title": "Terrain: no light strip along the map edges when zoomed in"
     },
     {
       "date": "2026-10-02",
       "category": "Materials",
       "minor": true,
       "link": "terrain_741.html",
-      "title": "Terrain: the Fullscreen button reads “Full”, so every layer button fits on one line, spread across the map's width like its header"
+      "title": "Terrain: the layer buttons fit one line"
     },
     {
       "date": "2026-10-02",
       "category": "Patch Reader",
       "minor": true,
       "link": "patches/7.41.html",
-      "title": "7.41: a note under “Radiant offlane tier 2 tower has been adjusted slightly to the left” — in the map file the tower didn't move in 7.41; it moved in 7.40"
+      "title": "7.41: the offlane tier 2 tower moved in 7.40, not 7.41 — a note says so"
     },
     {
       "date": "2026-10-02",
@@ -132,7 +138,7 @@
       "minor": true,
       "fix": true,
       "link": "terrain_738c.html",
-      "title": "Terrain: 7.38b and 7.38c now list their map notes (they said there were none), notes' details open under (?), and camps demoted while moving are counted (7.40 and 7.41 demoted 4 camps, not 2)"
+      "title": "Terrain: 7.38b and 7.38c list their map notes; demoted camps counted right"
     },
     {
       "date": "2026-10-02",
@@ -140,32 +146,31 @@
       "minor": true,
       "fix": true,
       "link": "terrain_739d.html",
-      "title": "Terrain: camp spawn boxes that changed now stand out on the Spawn Boxes layer and are counted under the list (7.39d's bigger Triangle Ancient boxes were a few pixels apart and easy to miss)"
+      "title": "Terrain: changed spawn boxes stand out and are counted"
     },
     {
       "date": "2026-10-02",
       "category": "Materials",
       "minor": true,
       "link": "terrain_741.html",
-      "title": "Terrain: an “All layers” button turns every map layer on (or off) at once"
+      "title": "Terrain: an “All layers” button"
     },
     {
       "date": "2026-10-02",
       "category": "Materials",
       "minor": true,
       "link": "terrain_741.html",
-      "title": "Terrain: zooming in fullscreen stays sharp — the part in view loads at twice the detail"
+      "title": "Terrain: fullscreen zoom stays sharp"
     },
     {
       "date": "2026-10-02",
       "category": "Materials",
-      "title": "Terrain: a page for every patch, letter patches included",
+      "title": "Terrain: a page for every patch",
       "link": "terrain_739b.html",
       "items": [
-        "Every patch that changed the map has its own page and slider, from 7.38 to 7.41e, each picture our own render of the map file Steam shipped with that patch — made in Source Filmmaker from the game's files and stitched by our script; a patch that changed nothing gets no page",
-        "Under the patch's own terrain notes: what's on the map as tiles, and what changed in its map file as “icon: change” chips (Bounty runes 1/2 moved)",
-        "Press a chip and the places it counts are outlined on the old map",
-        "A No-ward ground layer: every spot where a ward can't stand, read from each patch's map file — 7.41c, 7.41d and 7.41e get pages for the ward spots they changed without a note"
+        "Every patch that changed the map has its own page and slider, 7.38–7.41e",
+        "Every map is our own render of that patch's map file",
+        "A No-ward ground layer shows where wards can't stand"
       ],
       "shots": [
         "icons/changelog/2026-10-02_terrain_steps.webp",
@@ -180,14 +185,14 @@
       "minor": true,
       "fix": true,
       "link": "terrain_739.html",
-      "title": "Terrain 7.39: two pink objects are gone — unannounced portals in 7.39's map file (removed in 7.39b) whose texture the game build we render on lacks"
+      "title": "Terrain 7.39: two stray pink objects gone"
     },
     {
       "date": "2026-10-01",
       "category": "Materials",
       "minor": true,
       "link": "terrain_740.html",
-      "title": "Terrain 7.39 → 7.40: trees, camps and the other map objects are now read from each patch's own map file (the very file Steam shipped that day)"
+      "title": "Terrain: objects read from each patch's own map file"
     },
     {
       "date": "2026-10-01",
@@ -195,31 +200,31 @@
       "minor": true,
       "fix": true,
       "link": "terrain_741.html",
-      "title": "Terrain 7.41: the empty corners beyond the map's edge now show plain ground — grass by Radiant, grey ground by Dire, no copied trees or bushes — instead of a murky fade"
+      "title": "Terrain 7.41: plain ground beyond the map edge, no murky fade"
     },
     {
       "date": "2026-09-30",
       "category": "Site",
       "minor": true,
       "link": "calendar.html",
-      "title": "Calendar: today's day has a light frame"
+      "title": "Calendar: today is framed"
     },
     {
       "date": "2026-09-30",
       "category": "Patch Reader",
       "minor": true,
       "link": "patches/7.38.html",
-      "title": "Item abilities before → after: an added ability has a light green dashed frame, a removed one a light red one; no empty frame opposite them, and the arrow sits beside the abilities that pair"
+      "title": "Item abilities: an added one framed green, a removed one red"
     },
     {
       "date": "2026-09-30",
       "category": "Patch Reader",
-      "title": "Ability and facet cards read like item abilities",
+      "title": "Ability cards like item abilities",
       "link": "patches/7.40.html",
       "items": [
-        "A header strip as on item abilities: Passive / Active from the game files, the facet's ability name, and radius, cast range, mana / health cost, cooldown with the game's icons",
-        "Values come from the game files of that patch where the text is silent (Riverborn Aura's 1200 radius); every other number is bold and brighter; card text is as large as item cards'",
-        "New creeps' abilities (7.38 Boglet, Marshmage Apprentice, Croaker) get the same header"
+        "A header with Passive / Active, radius, range, cost and cooldown icons",
+        "Missing values come from that patch's game files",
+        "New creeps' abilities get the same header"
       ],
       "shots": [
         "icons/changelog/2026-09-30_ability_card_corner.webp",
@@ -231,38 +236,38 @@
       "category": "Patch Reader",
       "minor": true,
       "fix": true,
-      "title": "Item ability cards: a multiplier like 0.25x is no longer cut into a bold 0 and .25x (7.39 Sister's Shroud, 7.40)"
+      "title": "Item ability cards: multipliers like 0.25x no longer split"
     },
     {
       "date": "2026-09-29",
       "category": "Patch Reader",
       "minor": true,
       "fix": true,
-      "title": "Hero damage: the level 30 damage in the (?) is Valve's own figure for Sand King 7.38 and Spectre 7.40 too"
+      "title": "Hero damage: level 30 damage is Valve's figure for Sand King 7.38 and Spectre 7.40 too"
     },
     {
       "date": "2026-09-29",
       "category": "Patch Reader",
       "minor": true,
       "fix": true,
-      "title": "7.41f Mask of Madness and Satanic: the creep lifesteal change is back under the lifesteal row"
+      "title": "7.41f Mask of Madness and Satanic: creep lifesteal back under lifesteal"
     },
     {
       "date": "2026-09-29",
       "category": "Patch Reader",
       "minor": true,
       "fix": true,
-      "title": "7.41c Bloodstone: the wrongly stated health row is labelled NERF, as the real change 650 → 625 is"
+      "title": "7.41c Bloodstone: the misstated health row is a NERF"
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "Hero attack damage: starting damage and gain per level",
+      "title": "Hero damage: start and gain per level",
       "link": "patches/7.38.html",
       "items": [
-        "Where Valve rescaled a hero's damage growth: \"Starting damage increased from 40–50 to 50–60\" and \"Damage gain per level decreased from 3.6 to 2.7\"",
-        "Each row has its own tag and %; the damage at level 30 is in the (?)",
-        "36 heroes: 35 in 7.38 (Universal heroes 0.7 → 0.45 damage per attribute) and Spectre in 7.40"
+        "Rescaled damage shows as starting damage and gain per level, each tagged",
+        "Damage at level 30 is in the (?)",
+        "36 heroes: 35 in 7.38, Spectre in 7.40"
       ],
       "shots": [
         "icons/changelog/2026-09-28_hero_damage.webp"
@@ -271,12 +276,11 @@
     {
       "date": "2026-09-28",
       "category": "Site",
-      "title": "Hero pages: 10 item slots and more patch squares",
+      "title": "Hero pages: 10 item slots",
       "link": "heroes/outworld-destroyer.html",
       "items": [
-        "10 item slots next to the hero's name, in two rows of 5",
-        "The name takes only its own width, a long one wraps onto two lines",
-        "The patch squares fill the rest of the line: Io 22, Outworld Destroyer 16 (was 14)"
+        "10 item slots beside the hero, two rows of 5",
+        "More patch squares per line: Io 22, Outworld Destroyer 16"
       ],
       "shots": [
         "icons/changelog/2026-09-28_hero_slots.webp"
@@ -285,25 +289,24 @@
     {
       "date": "2026-09-28",
       "category": "Site",
-      "title": "Thin column lines in the 7.38 enchantments table",
+      "title": "7.38 enchantments table: thin column lines",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-28",
       "category": "Site",
-      "title": "Hero pages: abilities that Aghanim's Shard / Scepter grant get their own filter too (Crystal Clone, Cold Blooded)",
+      "title": "Hero pages: filters for Shard / Scepter-granted abilities",
       "minor": true
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "7.38 neutral enchantments as one table",
+      "title": "7.38 enchantments in one table",
       "link": "patches/7.38.html",
       "items": [
-        "A row per enchantment: its bonuses with the value at every tier it can be rolled at",
-        "An empty cell = not offered at that tier; no more \"Available at Tiers 1, 2, 3, and 4\" under each",
-        "Downsides in red; each row keeps its patch squares and links to the enchantment's page"
+        "A row per enchantment, its value at every tier",
+        "An empty cell = not offered at that tier; downsides in red"
       ],
       "shots": [
         "icons/changelog/2026-09-28_enchant_table.webp"
@@ -312,81 +315,80 @@
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "Shiva's Guard 7.41 and alike: \"Pierces Debuff Immunity.\" added to the new aura text, removed aura effects coloured in the old one, the Chasm Stone stacking remark is a (?) on +75 Area of Effect",
+      "title": "Shiva's Guard 7.41 and alike: added and removed aura text coloured",
       "minor": true
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "Every framed box of an item lines up on one edge (7.41 Stonefeather Satchel, Forager's Kit); no hover tips on the corner buttons, the loupe keeps \"Search (\\)\"",
+      "title": "Item boxes line up on one edge",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "Item ability cards: an ability removed and another added in the same patch face each other as a replacement (Revenant's Brooch 7.38: Phantom Province -> Phantom Critical); coloured card text counts for the tag filters (Drum of Endurance under DEL)",
+      "title": "Item ability cards: a replaced ability faces its successor",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "An item whose build didn't change shows its stat changes as plain rows again, not a whole stats card (Sange and Yasha 7.38: one row)",
+      "title": "Items with an unchanged build show stat rows, not a card",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "A changed value in the cards takes the very shade of its % (Orb of Corrosion 7.38: \"1000\" and \"+14%\" in one colour); removed card text back in the DEL colour",
+      "title": "Card values take the colour of their %",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "Tag filters: switching a filter off no longer leaves sub-category labels hidden or cards with a bare arrow",
+      "title": "Tag filters: switching one off no longer hides labels",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "Orb of Venom 7.38: \"Poison Attack now has a 9s cooldown\" is REWORK, not NEW",
+      "title": "Orb of Venom 7.38: the cooldown note is REWORK",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "Tag filters: a card that shows a filtered change stays, an item with nothing to show is hidden (Witch Blade 7.41 under BUFF left a bare header)",
+      "title": "Tag filters: items with nothing to show are hidden",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "Item ability cards: removed text in red (Khanda 7.38 \"your attack damage\", Drum \"Comes with 8 charges.\"), \"Dispellable.\" added where a patch made an ability dispellable (Heaven's Halberd 7.38)",
+      "title": "Item ability cards: removed text in red",
       "minor": true
     },
     {
       "date": "2026-09-28",
       "category": "Patch Reader",
-      "title": "Unit snapshots of several patches were copies of the previous patch: Beastmaster 7.41 Boar / Hawk armor hints are right now",
+      "title": "Beastmaster 7.41: boar and hawk armor hints fixed",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Reworked items: abilities before and after, as in the game",
+      "title": "Reworked items: abilities before and after",
       "link": "patches/7.38.html",
       "items": [
-        "Each changed item ability is shown before and after, side by side, from the game's own tooltips of each patch (51 items, 7.38–7.41)",
-        "A header like the game's: radius, cast range, mana cost and cooldown with their icons, numbers in bold",
-        "Changed numbers are coloured in the card; rows that only repeat it are hidden (tag filters still count them)",
-        "Stats cards list every stat of the item, the unchanged ones greyed"
+        "Changed item abilities side by side, from each patch's tooltips (51 items)",
+        "A game-style header; changed numbers coloured in the card",
+        "Stats cards list every stat, unchanged ones greyed"
       ],
       "shots": [
         "icons/changelog/2026-09-27_item_rework.webp",
@@ -396,182 +398,149 @@
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Item ability cards: a text-only change is coloured right in the card (Bloodstone 7.38 \"Dispel Type: Basic Dispel.\"), a changed number shows its % on hover, a removed ability faces a faint dashed frame, one arrow per card",
+      "title": "Item ability cards: text changes coloured, % on hover",
       "minor": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Components card: the recipe price shows its % on hover and the total its % even without a price row (Heaven's Halberd 7.38); thicker gold / red frames on added and removed components",
+      "title": "Components card: % on recipe and total",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Game data fixed: item and hero snapshots of several patches",
+      "title": "Game data fixed for several patches",
       "fix": true,
       "items": [
-        "Some patches' game files were copies of the previous patch (7.41 items and heroes were 7.40c)",
-        "Khanda 7.38 card: recipe 500 and total 5100 before the patch, as in the game",
-        "Base-stat hints (\"Now it's …\", \"changed before in …\") fixed on 34 hero pages",
-        "7.41 item weights use the real 7.41 prices"
+        "Some patches' files were copies of the previous patch (7.41 was 7.40c)",
+        "Base-stat hints fixed on 34 hero pages; 7.41 item weights use real prices"
       ]
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Small layout fixes: Orb of Frost 7.38 boxes line up with the other items, no extra line above sub-category strips, Block of Cheese without a card of two identical tooltips",
+      "title": "Small item card layout fixes",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Item prices move into the components card: the recipe and total coloured, the total's % at the end of the card; the separate cost row is gone (tag filters still count it)",
+      "title": "Item prices move into the components card",
       "minor": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Item stats cards now also show the stats a patch changed without saying so, from the game files (Gleipnir 7.38: +25 Damage and +25 Attack Speed removed; Heaven's Halberd 7.41: +5 All Attributes removed)",
+      "title": "Item stats cards show unannounced stat changes too",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Item ability cards: each ability faces its own old or new version, with an arrow only between a pair; card percentages line up with the rows below",
+      "title": "Item ability cards: each ability faces its own pair",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Item ability headers show the radius with the game's icon; a note on a value is a dotted underline with the text on hover (e.g. Gleipnir 7.38)",
+      "title": "Item ability headers show the radius; notes on values on hover",
       "minor": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Item stats cards: the right side always lists the item's stats (Bloodstone 7.38), unchanged stats are greyed (Abyssal Blade 7.38), abilities are no longer listed as stats (Heaven's Halberd 7.41)",
+      "title": "Item stats cards: unchanged stats greyed",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Percentages in stats cards sit further from the border; the patch squares line up with the cards' right edge",
+      "title": "Stats cards: % further from the border",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Every item whose stats changed shows the before / after stats card (75 more items, e.g. Bloodstone 7.38)",
+      "title": "75 more items show before / after stats cards",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Item ability cards: changed numbers coloured in the card, the repeating rows are gone (tag filters still see them)",
-      "minor": true
-    },
-    {
-      "date": "2026-09-27",
-      "category": "Patch Reader",
-      "title": "Ability header numbers in the game's font, no longer spaced out",
+      "title": "Ability header numbers in the game's font",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Items whose ability changed show it before and after, side by side (51 items, 7.38–7.41)",
-      "minor": true
-    },
-    {
-      "date": "2026-09-27",
-      "category": "Patch Reader",
-      "title": "Ability boxes: the tag sits level with the box header, the (?) stays by the last word, a bit more air around",
+      "title": "Ability boxes: the tag level with the header",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "7.38 Khanda: its abilities before and after, side by side, as in the game's tooltip",
-      "minor": true
-    },
-    {
-      "date": "2026-09-27",
-      "category": "Patch Reader",
-      "title": "Item abilities read like the game's tooltip: a header with range, mana cost and cooldown icons, numbers in bold",
-      "minor": true
-    },
-    {
-      "date": "2026-09-27",
-      "category": "Patch Reader",
-      "title": "7.38: 17 neutral items that became artifacts show \"Now a Tier N Artifact\" in the header and their abilities as rows",
+      "title": "7.38: 17 neutral items turned artifacts say so in the header",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Dynamics",
-      "title": "Replaced facets and moved Aghanim's upgrades are no longer a fixed minus",
+      "title": "Weights: replaced facets and moved Aghanim's no longer a fixed minus",
       "minor": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Item cards: unchanged stats sit between the changed pairs and the added / removed ones — no blank rows",
+      "title": "Item cards: no blank rows",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Removed the \"Read from the item's components\" notes",
+      "title": "No more “Read from the item's components” notes",
       "minor": true
     },
     {
       "date": "2026-09-27",
       "category": "Dynamics",
-      "title": "Hero scores: removed / added abilities and facets weigh like real changes; an item leaving the game is no longer a nerf",
+      "title": "Hero scores: removed and added abilities weigh like real changes",
       "minor": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "7 disputed tags fixed: HUD timers are QoL, \"now levels with\" is REWORK, lost targets are DEL",
+      "title": "7 disputed tags fixed",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-27",
       "category": "Patch Reader",
-      "title": "Item before / after cards list every stat, also the unchanged ones (18 cards, e.g. Mage Slayer)",
-      "minor": true,
-      "fix": true
-    },
-    {
-      "date": "2026-09-27",
-      "category": "Patch Reader",
-      "title": "Toggles usable under silence or invisibility are MISC (11 rows)",
+      "title": "Toggles usable when silenced are MISC",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Hero scores weigh SWAP talents by their numbers too: one level earlier is worth ~1.43× the size",
+      "title": "Hero scores weigh SWAP talents by their numbers",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero Changes summary: Min before Max, the hero and the value in their own cells",
+      "title": "Hero Changes summary: clearer cells",
       "minor": true
     },
     {
@@ -579,8 +548,8 @@
       "category": "Patch Reader",
       "title": "SWAP tag and a lit talent tree",
       "items": [
-        "Replaced talents get their own teal SWAP tag (455 rows); REWORK now means a real rework",
-        "The talent tree lights the changed twigs in gold, left or right on levels 10–25, as in the game"
+        "Replaced talents get a teal SWAP tag",
+        "The talent tree lights changed twigs in gold"
       ],
       "shots": [
         "icons/changelog/2026-09-26_swap_tree.webp"
@@ -589,26 +558,26 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Talent tree: with a filter on, only the twigs of visible rows glow; brighter gold",
+      "title": "Talent tree: only visible rows glow",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Site",
-      "title": "Changelog: rows in aligned columns, shorter texts",
+      "title": "Changelog: aligned columns",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero / Item Dynamics: the hovered cell grows smoothly and glides from cell to cell",
+      "title": "Dynamics: the hovered cell grows smoothly",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Materials",
-      "title": "AoE Increase: columns follow the ability slots (#1–#3 basic, #4 ultimate); extras in one Other column",
+      "title": "AoE Increase: columns follow the ability slots",
       "minor": true,
       "fix": true,
       "link": "aoe_increase.html"
@@ -616,28 +585,28 @@
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero Changes: the summary under each attribute is a small aligned table with icons and portraits",
+      "title": "Hero Changes: the summary is a small table with icons",
       "minor": true,
       "link": "hero_changes.html"
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: Shard / Scepter-granted abilities fall under those filters; 6 missing official icons",
+      "title": "Hero pages: Shard / Scepter filters fixed, 6 icons added",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: ability filters no longer leave empty blocks; Shard / Scepter filters back to blue",
+      "title": "Hero pages: no empty blocks under ability filters",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "7.40 Barracuda shows its in-game numbers",
+      "title": "Slark 7.40: Barracuda shows its in-game numbers",
       "minor": true,
       "fix": true,
       "link": "patches/7.40.html"
@@ -645,68 +614,68 @@
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: ability filters in the in-game slot order; an innate row answers the ability it names",
+      "title": "Hero pages: ability filters in slot order",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "A replaced innate is an old → new card with both in-game descriptions (7.38, 7.40)",
+      "title": "A replaced innate shows old → new",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "13 unofficial innate icons replaced by the game's own innate marker",
+      "title": "13 innate icons replaced by the game's marker",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: the sub-ability line stays inside its patch; Invoke, Stone Remnant and others get filters",
+      "title": "Hero pages: more sub-ability filters",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "141 ability changes in 7.38–7.40c no longer read as facet changes",
+      "title": "141 ability changes no longer read as facet changes",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Site",
-      "title": "Patch search opens and closes with \\ in any keyboard layout; English letters only",
+      "title": "Search opens with \\ in any keyboard layout",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: Shard / Scepter filters, ability filters as icons, removed abilities greyed",
+      "title": "Hero pages: Shard / Scepter and ability filters",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Recipe and total cost: both % at the end of the row, “recipe / total”",
+      "title": "Recipe and total cost: both % at the row's end",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Dynamics",
-      "title": "Hero pages: an added item shows its own score next to its name",
+      "title": "Hero pages: an added item shows its score",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Formula tables follow the formula's own interval (“per 3 levels” → L1, L3, L6 …)",
+      "title": "Formula tables follow the formula's interval",
       "minor": true,
       "fix": true,
       "link": "patches/7.41.html"
@@ -714,27 +683,27 @@
     {
       "date": "2026-09-26",
       "category": "Site",
-      "title": "Changelog: a day links to the same patch page only once",
+      "title": "Changelog: one link per patch page a day",
       "minor": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Hero scores: tiny time changes and side-unit numbers no longer outweigh real changes",
+      "title": "Hero scores: tiny changes no longer outweigh real ones",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Hero scores: base damage and damage gain are no longer counted twice",
+      "title": "Hero scores: damage no longer counted twice",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Hero scores count reworked abilities, facets and innates",
+      "title": "Hero scores count reworks, facets and innates",
       "minor": true
     },
     {
@@ -746,20 +715,20 @@
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Item scores: the active and the stats on one scale; Sange / Kaya / Yasha stat prices measured",
+      "title": "Item scores: actives and stats on one scale",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-26",
       "category": "Patch Reader",
-      "title": "Item scores are counted in gold: every stat has a price per patch",
+      "title": "Item scores counted in gold",
       "minor": true
     },
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "Price changes Valve didn't mention get their own row (Revenant's Brooch 4900 → 3300 …)",
+      "title": "Unannounced price changes get their own row",
       "minor": true,
       "fix": true,
       "link": "patches/7.38.html"
@@ -767,7 +736,7 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "Reworked items show all stat changes in before / after cards (Khanda, Brooch, Nullifier)",
+      "title": "Reworked items show every stat change",
       "minor": true,
       "fix": true,
       "link": "patches/7.38.html"
@@ -775,7 +744,7 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "7.38 Gleipnir: Eternal Chains mana cost is its own row",
+      "title": "7.38 Gleipnir: the mana cost on its own row",
       "minor": true,
       "fix": true,
       "link": "patches/7.38.html"
@@ -783,7 +752,7 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "7.38 Orb of Corrosion: before / after stat cards",
+      "title": "7.38 Orb of Corrosion: stat cards",
       "minor": true,
       "fix": true,
       "link": "patches/7.38.html"
@@ -791,7 +760,7 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "Recipe rows with an unchanged total: % right after the numbers",
+      "title": "Recipe rows: % right after the numbers",
       "minor": true,
       "link": "patches/7.41.html"
     },
@@ -806,13 +775,13 @@
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Melee, ranged and talent icons are the game's own again",
+      "title": "Melee, ranged and talent icons from the game",
       "minor": true
     },
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Ability chips on hero, item and unit pages use the pixel font too",
+      "title": "Ability chips in the pixel font",
       "minor": true
     },
     {
@@ -822,9 +791,9 @@
       "fix": true,
       "link": "heroes_dyn.html",
       "items": [
-        "Unit, enchantment and Spirit Bear rows use their own multiplier",
-        "Recipe changes with the same total score 0; item costs on one gold scale",
-        "The value of +1% refitted: closer to blind judges (0.35 → 0.40)"
+        "Units, enchantments and Spirit Bear use their own multiplier",
+        "Recipe changes with the same total score 0",
+        "The value of +1% refitted closer to blind judges"
       ],
       "shots": [
         "icons/changelog/2026-09-25_weights_on.webp"
@@ -833,7 +802,7 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "7.41b Consecrated Wraps: a longer charge gain time is a NERF",
+      "title": "7.41b Consecrated Wraps: slower charges are a NERF",
       "minor": true,
       "fix": true,
       "link": "patches/7.41b.html"
@@ -841,10 +810,9 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "Search moved to a loupe button in the corner",
+      "title": "Search behind a loupe",
       "items": [
-        "The round loupe above the weights button opens the search",
-        "Esc closes it"
+        "The loupe in the corner opens search, Esc closes it"
       ],
       "shots": [
         "icons/changelog/2026-09-25_search_fab.webp"
@@ -853,7 +821,7 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
-      "title": "Every item has a page (133 more), all pickable into hero item slots",
+      "title": "Every item has a page",
       "minor": true,
       "link": "item_changes.html"
     },
@@ -863,8 +831,7 @@
       "title": "Heatmap in olive and brick",
       "link": "mana_items.html",
       "items": [
-        "Better values olive, worse ones brick; the middle stays clear",
-        "Every table with the Heatmap switch"
+        "Better olive, worse brick, the middle clear — on every table"
       ],
       "shots": [
         "icons/changelog/2026-09-25_heatmap.webp"
@@ -873,11 +840,10 @@
     {
       "date": "2026-09-25",
       "category": "Patch Reader",
-      "title": "Tag filters in one row, glowing like neon",
+      "title": "Neon tag filters",
       "items": [
-        "Tags and group chips share one row",
-        "A pressed chip glows in its own colour",
-        "DEL is wine-red, no longer close to NERF"
+        "Tags and group chips in one row; a pressed chip glows",
+        "DEL is wine-red, apart from NERF"
       ],
       "shots": [
         "icons/changelog/2026-09-25_tags.webp"
@@ -890,27 +856,27 @@
       "fix": true,
       "link": "heroes_stats.html",
       "items": [
-        "Razor, Death Prophet corrected; Rubick, Tidehunter, Dark Willow added",
-        "Hero Lab counts more innates; Horsepower no longer stacks with boots"
+        "Fixed: Razor Death Prophet; added: Rubick Tidehunter Dark Willow",
+        "Horsepower no longer stacks with boots"
       ]
     },
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Changelog: fixes are marked with a pixel beetle",
+      "title": "Changelog: fixes marked with a beetle",
       "minor": true,
       "link": "changelog.html"
     },
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Icon toggles glow warm when on, the icon stays visible",
+      "title": "Icon toggles glow warm when on",
       "minor": true
     },
     {
       "date": "2026-09-25",
       "category": "Dynamics",
-      "title": "Hero / Item Dynamics no longer stutter while scrolling",
+      "title": "Dynamics: smooth scrolling",
       "minor": true,
       "link": "heroes_dyn.html",
       "fix": true
@@ -918,7 +884,7 @@
     {
       "date": "2026-09-25",
       "category": "Hero Lab",
-      "title": "Hero Lab: the Difference stat list opens as a 4-column table — no scrolling",
+      "title": "Hero Lab: the Difference list as a 4-column table",
       "minor": true,
       "link": "hero_lab.html"
     },
@@ -927,8 +893,7 @@
       "category": "Site",
       "title": "Warm colours",
       "items": [
-        "Warm tones instead of steel greys and blues",
-        "Blue only where it means something: QoL, magic, Intelligence, Aghanim, mana"
+        "Warm tones instead of steel; blue only where it means something"
       ],
       "shots": [
         "icons/changelog/2026-09-25_warm.webp",
@@ -941,7 +906,7 @@
       "title": "Per Int on Mana Items",
       "link": "mana_items.html",
       "items": [
-        "What one point of Intelligence gives, with its patch history on hover"
+        "What one point of Intelligence gives, with its history"
       ],
       "shots": [
         "icons/changelog/2026-09-25_per_int.webp"
@@ -950,7 +915,7 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
-      "title": "Terrain: the patch arrows wrap around at the ends of the list",
+      "title": "Terrain: the patch arrows wrap around",
       "minor": true,
       "link": "terrain_741.html",
       "fix": true
@@ -958,7 +923,7 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
-      "title": "Mana Items: history uses each patch's mana per Intelligence",
+      "title": "Mana Items: history uses each patch's mana per Int",
       "minor": true,
       "link": "mana_items.html",
       "fix": true
@@ -966,7 +931,7 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
-      "title": "Hero Stats / Hero Lab: 7.41f base attack speed fixed",
+      "title": "7.41f base attack speed fixed",
       "minor": true,
       "link": "heroes_stats.html",
       "fix": true
@@ -974,13 +939,13 @@
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Search, price and level fields in the pixel font",
+      "title": "Fields in the pixel font",
       "minor": true
     },
     {
       "date": "2026-09-25",
       "category": "Site",
-      "title": "Materials pages open straight on the controls",
+      "title": "Materials open straight on the controls",
       "minor": true
     },
     {
@@ -988,8 +953,7 @@
       "category": "Site",
       "title": "Warm pixel controls",
       "items": [
-        "Menus, filters, buttons and switches in a warm pixel style",
-        "Tag and group chips in the pixel font"
+        "Menus, filters and buttons in a warm pixel style"
       ],
       "shots": [
         "icons/changelog/2026-09-25_controls.webp",
@@ -1001,7 +965,7 @@
     {
       "date": "2026-09-25",
       "category": "Materials",
-      "title": "The current Materials section glows warm from below",
+      "title": "Materials: the current section glows",
       "minor": true,
       "link": "neutral_stats.html"
     },
@@ -1010,7 +974,7 @@
       "category": "Site",
       "title": "Changelog",
       "items": [
-        "What's new on the site, by date — this page"
+        "What's new on the site, by date"
       ],
       "shots": [
         "icons/changelog/2026-09-24_changelog.webp"
@@ -1021,8 +985,7 @@
       "category": "Site",
       "title": "New header",
       "items": [
-        "Plain labels; the current page glows gold with rising embers",
-        "The Materials sub-menu is a text row"
+        "Plain labels; the current page glows gold"
       ],
       "shots": [
         "icons/changelog/2026-09-24_header.webp"
@@ -1033,7 +996,7 @@
       "category": "Materials",
       "title": "Autocast as in the game",
       "items": [
-        "Autocast icons on neutral tables show the game's fiery glow"
+        "Autocast icons glow like in the game"
       ],
       "link": "neutral_stats.html",
       "shots": [
@@ -1043,9 +1006,9 @@
     {
       "date": "2026-09-24",
       "category": "Site",
-      "title": "New tile icons on the main page",
+      "title": "New tile icons",
       "items": [
-        "Every tile has its own pixel icon"
+        "Every main page tile has its own pixel icon"
       ],
       "link": "index.html",
       "shots": [
@@ -1056,7 +1019,7 @@
     {
       "date": "2026-09-24",
       "category": "Materials",
-      "title": "AoE Increase shows every radius again (it was empty since 7.41f)",
+      "title": "AoE Increase shows every radius again",
       "minor": true,
       "link": "aoe_increase.html",
       "fix": true
@@ -1064,7 +1027,7 @@
     {
       "date": "2026-09-24",
       "category": "Hero Lab",
-      "title": "Innate abilities are read correctly for 7.41f heroes",
+      "title": "Hero Lab: 7.41f innates read right",
       "minor": true,
       "link": "hero_lab.html",
       "fix": true
@@ -1072,28 +1035,28 @@
     {
       "date": "2026-09-24",
       "category": "Patch Reader",
-      "title": "Silent changes for 7.41f compare the right data",
+      "title": "7.41f silent changes compare the right data",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-24",
       "category": "Patch Reader",
-      "title": "Change chips line up in one column everywhere",
+      "title": "Change chips in one column",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-24",
       "category": "Patch Reader",
-      "title": "A changed item value shows its BUFF / NERF chip next to the new value",
+      "title": "A changed item value shows its chip",
       "minor": true,
       "fix": true
     },
     {
       "date": "2026-09-24",
       "category": "Patch Reader",
-      "title": "7.38 proofread: Tormentor, Lifesteal, Heaven's Halberd, Abyssal Blade and dozens of tags",
+      "title": "7.38 proofread: Tormentor, Lifesteal and dozens of tags",
       "minor": true,
       "link": "patches/7.38.html",
       "fix": true
@@ -1101,21 +1064,21 @@
     {
       "date": "2026-09-24",
       "category": "Site",
-      "title": "Lists inside \"?\" popups show a bullet per line",
+      "title": "Lists in (?) popups have bullets",
       "minor": true
     },
     {
       "date": "2026-09-24",
       "category": "Site",
-      "title": "The main page's \"NEW\" badge and the latest version in the header corner are gone",
+      "title": "Main page: the “NEW” badge is gone",
       "minor": true
     },
     {
       "date": "2026-09-24",
       "category": "Patch Reader",
-      "title": "Clearer reworks and new things",
+      "title": "Clearer reworks",
       "items": [
-        "Changed abilities get before / after cards with the real old tooltip",
+        "Changed abilities get before / after cards",
         "Values that grow with time open a table by minute"
       ],
       "link": "patches/7.38.html",
@@ -1134,8 +1097,7 @@
       "title": "Items on hero pages",
       "link": "heroes/anti-mage.html",
       "items": [
-        "Six item slots next to the hero: their changes appear in the hero's patches",
-        "The picker is the in-game shop"
+        "Six item slots: their changes join the hero's patches"
       ],
       "shots": [
         "icons/changelog/2026-09-23_hero_items.webp",
@@ -1147,7 +1109,7 @@
       "category": "Materials",
       "title": "Roshan and Tormentor pages",
       "items": [
-        "Their full change history, shown like a hero"
+        "Their full change history"
       ],
       "link": "units/roshan.html",
       "shots": [
@@ -1159,8 +1121,7 @@
       "category": "Materials",
       "title": "Unit Changes and Structures",
       "items": [
-        "A change history for every neutral creep, summon and lane creep",
-        "Structures: towers, barracks and Tormentor"
+        "History of every creep, summon and building"
       ],
       "link": "unit_changes.html",
       "shots": [
@@ -1172,7 +1133,7 @@
       "category": "Patch Reader",
       "title": "Patch 7.38",
       "items": [
-        "All 1585 changes, checked line by line against Valve's data"
+        "All 1585 changes, checked against Valve's data"
       ],
       "link": "patches/7.38.html",
       "shots": [
@@ -1182,10 +1143,9 @@
     {
       "date": "2026-09-17",
       "category": "Materials",
-      "title": "Hero Changes and Item Changes",
+      "title": "Hero and Item Changes",
       "items": [
-        "The whole history of every hero and item on one page",
-        "Filter by tag, ability or talent"
+        "Every hero's and item's full history, with filters"
       ],
       "link": "hero_changes.html",
       "shots": [
@@ -1198,7 +1158,7 @@
       "category": "Dynamics",
       "title": "Weights mode",
       "items": [
-        "The gold button turns every patch cell into a score"
+        "The gold button turns patch cells into scores"
       ],
       "link": "heroes_dyn.html",
       "shots": [
@@ -1210,7 +1170,7 @@
       "category": "Materials",
       "title": "AoE Increase",
       "items": [
-        "Every hero's area-of-effect radii and how AoE items and upgrades grow them"
+        "Every hero's radii and what AoE items add"
       ],
       "link": "aoe_increase.html",
       "shots": [
@@ -1234,7 +1194,7 @@
       "category": "Materials",
       "title": "Hero Stats",
       "items": [
-        "Base stats of every hero in one sortable table"
+        "Every hero's base stats, sortable"
       ],
       "link": "heroes_stats.html",
       "shots": [
@@ -1246,7 +1206,7 @@
       "category": "Dynamics",
       "title": "Item Dynamics",
       "items": [
-        "Which items each patch buffed or nerfed, patch by patch"
+        "Which items each patch buffed or nerfed"
       ],
       "link": "items_dyn.html"
     },
@@ -1255,7 +1215,7 @@
       "category": "Materials",
       "title": "Terrain",
       "items": [
-        "Compare the map between patches with a sliding wipe"
+        "Compare the map between patches with a slider"
       ],
       "link": "terrain_741.html",
       "shots": [
@@ -1267,7 +1227,7 @@
       "category": "Dynamics",
       "title": "Hero Dynamics",
       "items": [
-        "Which heroes each patch buffed or nerfed, patch by patch"
+        "Which heroes each patch buffed or nerfed"
       ],
       "link": "heroes_dyn.html",
       "shots": [
@@ -1279,7 +1239,7 @@
       "category": "Site",
       "title": "New main page",
       "items": [
-        "The site opens as an inventory: every section is a slot"
+        "Every section is an inventory slot"
       ],
       "link": "index.html"
     },
@@ -1288,7 +1248,7 @@
       "category": "Materials",
       "title": "Mana Items",
       "items": [
-        "Mana, regen and cost of every mana item in one table"
+        "Every mana item's mana, regen and cost"
       ],
       "link": "mana_items.html"
     },
@@ -1297,7 +1257,7 @@
       "category": "Materials",
       "title": "Neutral Creeps",
       "items": [
-        "Stats of every neutral creep with their history by patch"
+        "Every neutral creep's stats and history"
       ],
       "link": "neutral_stats.html",
       "shots": [

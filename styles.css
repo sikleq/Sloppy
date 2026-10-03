@@ -10211,11 +10211,14 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 .clog-entry.only-minor { display: block; padding-top: 4px; }
 .clog-entry.only-minor > .clog-shots,
 .clog-entry.only-minor > .clog-text > :not(.clog-minor) { display: none; }
-summary.clog-minor-more { padding-left: var(--clog-text-x); font-size: 12.5px; color: var(--text-dim, #969289);
-  letter-spacing: .3px; cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+/* "Show" starts where the items' text starts, its arrow in the bullets' column (the owner 2026-10-03: "not level
+   with the other items") */
+summary.clog-minor-more { position: relative; padding-left: var(--clog-text-x); font-size: 12.5px;
+  color: var(--text-dim, #969289); letter-spacing: .3px; cursor: pointer; list-style: none; display: inline-block; }
 summary.clog-minor-more::-webkit-details-marker { display: none; }
-summary.clog-minor-more::before { content: "\25B8"; color: var(--gold-dim); transition: transform .15s; }
-details[open] > summary.clog-minor-more::before { transform: rotate(90deg); }
+summary.clog-minor-more::before { content: "\25B8"; position: absolute; left: calc(var(--clog-text-x) - 15px); top: 50%;
+  color: var(--gold-dim); transform: translateY(-50%); transition: transform .15s; }
+details[open] > summary.clog-minor-more::before { transform: translateY(-50%) rotate(90deg); }
 summary.clog-minor-more:hover { color: var(--text-bright); }
 .clog-more-hide, details[open] > summary .clog-more-show { display: none; }
 details[open] > summary .clog-more-hide { display: inline; }
@@ -10227,6 +10230,9 @@ details.clog-minor > .clog-minor-list { margin-top: 6px; }
   font-size: 13px; line-height: 1.45; color: var(--text-main); }
 .clog-minor-list a { color: inherit; text-decoration: underline dotted rgba(227,196,106,.45); text-underline-offset: 3px; }
 .clog-minor-list a:hover { color: var(--gold); }
+/* a hero named in a note = its small picture (the owner 2026-10-03) */
+.clog-hero { width: 28px; height: 16px; object-fit: cover; border-radius: 2px; vertical-align: -3px; margin: 0 1px;
+  box-shadow: 0 0 0 1px rgba(227, 196, 106, 0.18); }
 .clog-rail-minor { color: var(--text-dim, #969289); font-style: italic; }
 @media (max-width: 1100px) {
   .clog-entry.has-shots { grid-template-columns: 1fr; }

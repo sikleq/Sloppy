@@ -68,7 +68,27 @@ def test_small_changes_sit_under_the_last_feature_of_the_day():
 def test_the_two_terrain_page_news_are_one():
     titles = [e["title"] for e in clog.load_entries()]
     assert "Terrain: our own 7.41 map picture" not in titles
-    assert "Terrain: a page for every patch, letter patches included" in titles
+    assert "Terrain: a page for every patch" in titles
+
+
+def test_notes_are_short_and_heroes_are_icons():
+    """The owner 2026-10-03: "too much text, shorten it; where there are hero names, put their small icons instead";
+    "Show more changes isn't level with the other items"."""
+    entries = clog.load_entries()
+    for e in entries:
+        assert len(e.get("items", [])) <= 3, e["title"]
+        assert len(e["title"].split()) <= 30, e["title"]          # a proofread lists its heroes, as icons
+        for it in e.get("items", []):
+            assert len(it.split()) <= 20, it
+    html = clog._rich("7.40 proofread: Mirana's Shard, Treant, Io 22 — Shiva's Guard, tiny changes")
+    assert 'alt="Mirana" width="28" height="16"' in html and "Mirana" not in html.replace('alt="Mirana"', "")
+    assert "</span>" not in html and "Shard" in html and "&#x27;s Shard" not in html
+    assert 'src="icons/heroes/treant.png" alt="Treant Protector"' in html and 'src="icons/heroes/wisp.png"' in html
+    assert "Shiva&#x27;s Guard" in html and "tiny changes" in html
+    css = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "styles.css"),
+               encoding="utf-8").read()
+    marker = css.split("summary.clog-minor-more::before {", 1)[1].split("}", 1)[0]
+    assert "position: absolute; left: calc(var(--clog-text-x) - 15px)" in marker
 
 
 def test_fixes_carry_the_bug_marker_and_the_rail_lists_only_features():

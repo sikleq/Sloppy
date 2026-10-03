@@ -11,6 +11,7 @@ import datetime as _dt
 import html as _html
 import json as _json
 import os as _os
+import re as _re
 import sys as _sys
 
 _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
@@ -25,6 +26,36 @@ CATEGORIES = ["Patch Reader", "Materials", "Hero Lab", "Dynamics", "Site"]
 
 def _esc(s):
     return _html.escape(str(s), quote=True)
+
+
+# hero names in the notes become the hero's small picture (the owner 2026-10-03: "where there are hero names, put
+# their small icons instead") — "Mirana's Shard" -> [Mirana] Shard; short forms the notes use map to the full name
+_HERO_ALIASES = {"Treant": "Treant Protector"}
+_HERO_RE = None
+
+
+def _hero_re():
+    global _HERO_RE
+    if _HERO_RE is None:
+        from patch.images import HERO_SLUG
+        names = sorted(set(HERO_SLUG) | set(_HERO_ALIASES), key=len, reverse=True)
+        _HERO_RE = (_re.compile(r"(?<![\w'’-])(" + "|".join(map(_re.escape, names)) + r")(?:'s|’s)?(?![\w-])"),
+                    HERO_SLUG)
+    return _HERO_RE
+
+
+def _rich(text):
+    """The note's text, escaped, its hero names as icons (alt = the name)."""
+    rx, slugs = _hero_re()
+    out, pos = [], 0
+    for m in rx.finditer(text):
+        name = _HERO_ALIASES.get(m.group(1), m.group(1))
+        out.append(_esc(text[pos:m.start()]))
+        out.append(f'<img class="clog-hero" src="icons/heroes/{slugs[name]}.png" alt="{_esc(name)}" width="28" '
+                   f'height="16" loading="lazy" decoding="async">')
+        pos = m.end()
+    out.append(_esc(text[pos:]))
+    return "".join(out)
 
 
 def _slug(s):
@@ -66,9 +97,9 @@ def _cat_html(e):
 def _entry_html(e, minor=""):
     """One feature; `minor` = the day's small changes, under its items (the day's last feature carries them — the
     owner 2026-10-03: "move it up to the topic, not a separate news item behind a line")."""
-    items = "".join(f"<li>{_esc(x)}</li>" for x in e.get("items", []))
-    title = (f'<a class="clog-title-link" href="{_esc(e["link"])}">{_esc(e["title"])}</a>'
-             if e.get("link") else _esc(e["title"]))
+    items = "".join(f"<li>{_rich(x)}</li>" for x in e.get("items", []))
+    title = (f'<a class="clog-title-link" href="{_esc(e["link"])}">{_rich(e["title"])}</a>'
+             if e.get("link") else _rich(e["title"]))
     shots = _shots_html(e)
     cls = "clog-entry has-shots" if shots else "clog-entry"
     return (f'<article class="{cls}" id="{_entry_id(e)}" data-cat="{_slug(e["category"])}"><div class="clog-text">'
@@ -115,7 +146,7 @@ def _minor_html(date, minors, after_features=True):
     # Chip | beetle | text columns with faint row lines (owner 2026-09-26): the text always starts at one x.
     lis = "".join(
         f'<li data-cat="{_slug(e["category"])}">{_cat_html(e)}{_bug_html(e)}<span class="clog-minor-txt">'
-        + (f'<a href="{_esc(e["link"])}">{_esc(e["title"])}</a>' if e.get("link") else _esc(e["title"]))
+        + (f'<a href="{_esc(e["link"])}">{_rich(e["title"])}</a>' if e.get("link") else _rich(e["title"]))
         + '</span></li>'
         for e in minors)
     if len(minors) <= MINOR_OPEN_MAX:
