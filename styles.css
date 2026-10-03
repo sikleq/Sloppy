@@ -9392,14 +9392,16 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   user-select: none;
   -webkit-user-drag: none;
 }
-/* NEW map + its change markers revealed from the left edge up to the handle.
+/* NEW map + its change markers revealed from the handle to the right edge — the OLD map left of the handle, under
+   the "← OLD" chip, the new one right of it, under "NEW →" (the owner 2026-10-03: the sides were the other way
+   round, so a change outlined on the old map read as drawn on the new one).
    clip-path is compositor-friendly so the wipe stays smooth while dragging.
    Clipping the whole layer (not just the img) means the markers reveal together
    with the new terrain. */
 .tc-new-layer {
   position: absolute;
   inset: 0;
-  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+  clip-path: inset(0 0 0 var(--pos));
   will-change: clip-path;
 }
 /* Fullscreen zoom tiles (scripts.js updateTiles): 16 x 16 tiles of an 8192 picture laid over each 4096 picture
@@ -9651,13 +9653,13 @@ li.tsp-hidden { display: none !important; }
 /* point-entity markers — recoloured GAME icons (32–40px), shown small + smooth
    so they read like the real minimap icons (not hard-pixelated). */
 .tm-ent-g image { image-rendering: auto; }
-/* every old/new layer splits at the slider (old = right of handle, new = left) */
+/* every old/new layer splits at the slider (old = left of handle, new = right) */
 .tc-trees-old,
 .tc-camps-old,
-.tm-old { clip-path: inset(0 0 0 var(--pos)); }
+.tm-old { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
 .tc-trees-new,
 .tc-camps-new,
-.tm-new { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+.tm-new { clip-path: inset(0 0 0 var(--pos)); }
 /* spawnboxes — always-visible overlay (no slider clip) to avoid open-rectangle
    artifacts. Old boxes = dashed red; new boxes = solid teal. */
 .tc-sb-old { fill: rgba(255,80,80,.12); stroke: #ff5555; stroke-width: 1.5px; stroke-dasharray: 5 3; }
@@ -9816,6 +9818,8 @@ li.tsp-hidden { display: none !important; }
   border-image: linear-gradient(to right, var(--bg-panel-4) 0%, var(--bg-panel-4) 61%, transparent 71%) 1;
 }
 .tf-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+/* every other kind of object, a gap below trees + camps (the owner: those two on one row, the rest on the others) */
+.tf-tiles-more { margin-top: 12px; }
 .tf-tile, .tf-chip {
   border: 1px solid rgba(227, 196, 106, 0.18); background: rgba(227, 196, 106, 0.045); border-radius: 3px;
 }
@@ -9841,10 +9845,8 @@ button.tf-chip-btn[aria-pressed="true"] { border-color: #ff4d4d; background: rgb
 .tm-hl { opacity: 0; transition: opacity 0.15s ease; }
 .tm-hl.tm-hl-on { opacity: 1; }
 .tf-chip-name { color: var(--text-main); }
-/* plain text under a head: "No terrain changes" (Patch notes), "Nothing" (Changed in the map file) */
+/* plain text under a head: "Nothing" (Changed in the map file) */
 .tf-none { color: var(--text-dim); }
-.terrain-notes-none { margin-top: 0; }
-.terrain-notes-none .tf-head { padding-top: 2px; }
 .tm-add-text { color: #6fe089; font-weight: 600; }
 .tm-rem-text { color: #ff7a7a; font-weight: 600; }
 
@@ -10010,7 +10012,7 @@ button.tf-chip-btn[aria-pressed="true"] { border-color: #ff4d4d; background: rgb
   -webkit-user-drag: none;
   will-change: transform;
 }
-.tc-lens-new { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+.tc-lens-new { clip-path: inset(0 0 0 var(--pos)); }
 .tc-lens-markers { pointer-events: none; overflow: visible; }
 .tc-lens-rim {
   position: absolute;

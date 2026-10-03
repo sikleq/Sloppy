@@ -289,6 +289,8 @@ def _markers_svg(diff, pair_id="default"):
         "treesOld": len(diff.get("treesOld", [])),
         "treesNew": len(diff.get("treesNew", [])),
         "campsOld": old_t, "campsNew": new_t,
+        # every other kind of object, (old, new) — the "On the map" tiles under trees and camps
+        "entities": {key: (len(ed.get("old", [])), len(ed.get("new", []))) for key, ed in entities.items() if ed},
     }
     return (ward_svgs + trees_old + trees_new + camps_old + camps_new
             + "".join(ent_svgs) + sb_svg + _highlights_svg(diff, proj), counts)
@@ -514,44 +516,110 @@ def _moved_items(diff):
 _HL_KEY = {"trees": "trees", "camps": "camps", "camp tiers": "camptiers", "no-ward cells": "nowards",
            **{name: key for key, name in _MOVED_NAMES.items()}}
 _HL_RING = {"trees": 6, "camps": 22, "camptiers": 26}      # ring radius, viewBox units (entities: 19)
-_HL_RED = "#ff4d4d"
+# the outline's colour says what happened there (the owner 2026-10-03, on 7.41d's "+23" no-ward cells drawn red:
+# "it should be green, since they were added") — like the chip's own +green / −red numbers
+_HL_RED = "#ff4d4d"       # removed: only on the old map
+_HL_GREEN = "#5dff8a"     # added: only on the new map
+_HL_YELLOW = "#ffd23f"    # changed in place: moved a little (its two rings would overlap), re-tiered
+_HL_COLOUR = {"removed": _HL_RED, "added": _HL_GREEN, "changed": _HL_YELLOW}
 
 
 def _changed_points(diff):
-    """{highlight key: [(x, y) world]} — every place a chip's change touches: what's only in the old map or only in
-    the new one (a move rings both ends), the re-tiered camps, the cells whose wardability changed."""
-    def sym(old, new):
+    """{highlight key: {"removed" / "added" / "changed": [(x, y) world]}} — every place a chip's change touches:
+    what's only on the old map (removed), only on the new one (added), the re-tiered camps (changed); for the ward
+    cells, those that turned wardable (no-ward ground removed) and those that turned no-ward (added)."""
+    def split(old, new):
         a, b = {tuple(p) for p in old}, {tuple(p) for p in new}
-        return sorted(a ^ b)
-    out = {"trees": sym(diff.get("treesOld", []), diff.get("treesNew", [])),
-           "camps": sym([(c["x"], c["y"]) for c in diff.get("campsOld", [])],
-                        [(c["x"], c["y"]) for c in diff.get("campsNew", [])]),
-           "camptiers": [(o["x"], o["y"]) for o, _c in _retiered_pairs(diff.get("campsOld", []),
-                                                                       diff.get("campsNew", []))]}
+        return {"removed": sorted(a - b), "added": sorted(b - a)}
+    out = {"trees": split(diff.get("treesOld", []), diff.get("treesNew", [])),
+           "camps": split([(c["x"], c["y"]) for c in diff.get("campsOld", [])],
+                          [(c["x"], c["y"]) for c in diff.get("campsNew", [])]),
+           "camptiers": {"changed": [(o["x"], o["y"]) for o, _c in _retiered_pairs(diff.get("campsOld", []),
+                                                                                  diff.get("campsNew", []))]}}
     for key in _MOVED_NAMES:
         ed = diff.get("entities", {}).get(key)
         if ed:
-            out[key] = sym(ed.get("old", []), ed.get("new", []))
-    out["nowards"] = [tuple(p) for p in (diff.get("wards") or {}).get("changed", [])]
-    return {k: v for k, v in out.items() if v}
+            out[key] = split(ed.get("old", []), ed.get("new", []))
+    w = diff.get("wards") or {}
+    out["nowards"] = {"removed": [tuple(p) for p in w.get("toWardable", [])],
+                      "added": [tuple(p) for p in w.get("toNoWard", [])]}
+    return {k: v for k, v in out.items() if any(v.values())}
+
+
+def _small_moves(removed, added, reach):
+    """Pairs of a removed and an added spot (projected) that are each other's nearest and closer than `reach` — one
+    object moved a little. Returns (removed left, added left, the paired spots)."""
+    def d2(a, b):
+        return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+    paired_r, paired_a = set(), set()
+    for i, r in enumerate(removed):
+        if not added:
+            break
+        j = min(range(len(added)), key=lambda k: d2(r, added[k]))
+        back = min(range(len(removed)), key=lambda k: d2(removed[k], added[j]))
+        if back == i and j not in paired_a and d2(r, added[j]) < reach ** 2:
+            paired_r.add(i)
+            paired_a.add(j)
+    return ([p for i, p in enumerate(removed) if i not in paired_r],
+            [p for j, p in enumerate(added) if j not in paired_a],
+            [removed[i] for i in sorted(paired_r)] + [added[j] for j in sorted(paired_a)])
+
+
+_HL_STROKE = 2.4          # outline width, viewBox units
+_CELL = 64                # gridnav cell, game units
+
+
+def _ring_union(mask, centres, r, colour=_HL_RED):
+    """Rings that overlap merged into ONE outline (the owner 2026-10-03: a slightly moved object showed "two
+    frames" — its old and new spot each ringed): every ring widened by half the stroke, minus every ring narrowed by
+    half the stroke (an SVG mask `mask`, an id unique on the page), leaves only the outer contour of the union."""
+    if not centres:
+        return ""
+    h = _HL_STROKE / 2
+    outer = "".join(f'<circle cx="{x}" cy="{y}" r="{round(r + h, 2)}"/>' for x, y in centres)
+    inner = "".join(f'<circle cx="{x}" cy="{y}" r="{round(r - h, 2)}"/>' for x, y in centres)
+    return (f'<mask id="{mask}" maskUnits="userSpaceOnUse" x="0" y="0" width="{MAP_VB}" height="{MAP_VB}">'
+            f'<rect width="{MAP_VB}" height="{MAP_VB}" fill="#fff"/><g fill="#000">{inner}</g></mask>'
+            f'<g fill="{colour}" mask="url(#{mask})">{outer}</g>')
+
+
+def _cell_outline(cells, proj, colour=_HL_RED):
+    """The outline of a set of changed ward cells: only the sides no other changed cell shares, so neighbouring
+    cells read as one patch, not a grid of squares."""
+    if not cells:
+        return ""
+    have = {(round(x), round(y)) for x, y in cells}
+    h = _CELL // 2
+    segs = []
+    for x, y in have:
+        for (dx, dy), (ax, ay, bx, by) in (((0, _CELL), (-h, h, h, h)), ((0, -_CELL), (-h, -h, h, -h)),
+                                           ((-_CELL, 0), (-h, -h, -h, h)), ((_CELL, 0), (h, -h, h, h))):
+            if (x + dx, y + dy) not in have:
+                (px, py), (qx, qy) = proj(x + ax, y + ay), proj(x + bx, y + by)
+                segs.append(f"M{px} {py}L{qx} {qy}")
+    return (f'<path d="{"".join(sorted(segs))}" fill="none" stroke="{colour}" stroke-width="{_HL_STROKE}" '
+            f'stroke-linecap="square"/>')
 
 
 def _highlights_svg(diff, proj):
-    """One SVG per chip, hidden until its chip is pressed: red rings round the changed places (squares round the
-    changed ward cells), on the OLD side of the slider (the owner: "outlined in red on the old version")."""
+    """One SVG per chip, hidden until its chip is pressed: outlines round the changed places on the OLD side of the
+    slider (the owner: "outlined on the old version") — red where something is removed, green where something is
+    added, yellow where it changed in place (moved so little its two rings would overlap, or re-tiered). Overlapping
+    rings and neighbouring ward cells merge into one outline."""
     out = []
-    for key, pts in _changed_points(diff).items():
+    for key, groups in _changed_points(diff).items():
         if key == "nowards":
-            shapes = []
-            for x, y in pts:
-                (ax, ay), (bx, by) = proj(x - 32, y + 32), proj(x + 32, y - 32)
-                shapes.append(f'<rect x="{ax}" y="{ay}" width="{round(bx - ax, 1)}" height="{round(by - ay, 1)}"/>')
+            body = "".join(_cell_outline(groups.get(g, []), proj, _HL_COLOUR[g]) for g in ("removed", "added"))
         else:
             r = _HL_RING.get(key, 19)
-            shapes = [f'<circle cx="{px}" cy="{py}" r="{r}"/>' for px, py in (proj(x, y) for x, y in pts)]
+            removed, added, moved = _small_moves([proj(x, y) for x, y in groups.get("removed", [])],
+                                                 [proj(x, y) for x, y in groups.get("added", [])], 2 * r)
+            spots = {"removed": removed, "added": added,
+                     "changed": [proj(x, y) for x, y in groups.get("changed", [])] + moved}
+            body = "".join(_ring_union(f"tm-hl-mask-{key}-{g}", spots[g], r, _HL_COLOUR[g])
+                           for g in ("removed", "added", "changed"))
         out.append(f'<svg class="tc-markers tm-hl tm-hl-{key} tm-old" viewBox="0 0 {MAP_VB} {MAP_VB}" '
-                   f'preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="{_HL_RED}" '
-                   f'stroke-width="2.4">{"".join(shapes)}</g></svg>')
+                   f'preserveAspectRatio="none" aria-hidden="true">{body}</svg>')
     return "".join(out)
 
 
@@ -822,7 +890,7 @@ def _chip(name, kind, n, removed, total):
         value = f'<b>{n}/{total}</b> {_CHANGED_WORD.get(name, kind)}'
     key = _HL_KEY.get(name)
     if key:
-        # pressed: the changed places ringed red on the old side of the map (scripts.js initChangeHighlights)
+        # pressed: the changed places outlined on the old side of the map (scripts.js initChangeHighlights)
         return (f'<button type="button" class="tf-chip tf-chip-btn" data-hl="{key}" aria-pressed="false">'
                 f'{img}{value}</button>')
     return f'<span class="tf-chip">{img}{value}</span>'
@@ -834,7 +902,8 @@ def _facts_html(counts, step, diff):
     "aren't harmonious — it can be better"): headings like the list's subgroup
     heads, then
       ON THE MAP — five tiles: trees and the camp tiers small → ancient, icon +
-        number + name, with the change since the patch before;
+        number + name, with the change since the patch before; then, a gap
+        below, one tile per other kind of object (towers, runes, Roshan …);
       CHANGED IN THE MAP FILE — one chip per kind of object, "icon: change"
         (_chip), so a patch Valve's notes say nothing about still shows what
         changed.
@@ -852,8 +921,16 @@ def _facts_html(counts, step, diff):
         for t, label in _CAMP_TIERS:
             cur = new_t.get(t, new_t.get(str(t), 0))
             tiles.append(tile(f"camps/{_CAMP_ICON[t]}", cur, label, cur - old_t.get(t, old_t.get(str(t), 0))))
+        # every other kind of object under them, a gap apart (the owner 2026-10-03: "trees and camps on one row,
+        # everything else on the others")
+        more = []
+        for key, name in _MOVED_NAMES.items():
+            old_n, new_n = counts.get("entities", {}).get(key, (0, 0))
+            if old_n or new_n:
+                more.append(tile(_ITEM_ICON[name], new_n, _esc(name), new_n - old_n))
         out.append('<div class="tf-head">On the map</div>\n'
-                   f'<div class="tf-tiles">{"".join(tiles)}</div>\n')
+                   f'<div class="tf-tiles">{"".join(tiles)}</div>\n'
+                   + (f'<div class="tf-tiles tf-tiles-more">{"".join(more)}</div>\n' if more else ''))
     if step is not None:
         chips = [_chip(*i) for i in _moved_items(diff)]
         out.append('<div class="tf-head">Changed in the map file</div>\n'
@@ -868,14 +945,6 @@ def _quiet(steps, notes, diffs):
     2026-10-02 with scripts/gen/map_picture_diff.py: no change bigger than the
     wind in the trees), so there is nothing to compare."""
     return {p for p in steps if not notes.get(p) and not _moved_summary(diffs.get(p))}
-
-
-def _no_notes_html():
-    """A patch whose notes list no terrain changes: a "Patch notes" head over plain text, in the facts' own format,
-    outside the change list (the owner 2026-10-02: an italic sentence "stands out of the changes' format"; as a list
-    row it also got the list's empty tag box — "a red rectangular stub")."""
-    return ('<div class="terrain-facts terrain-notes-none"><div class="tf-head">Patch notes</div>'
-            '<div class="tf-none">No terrain changes</div></div>\n')
 
 
 _INSPIRED_BY = (("Leamare", "https://github.com/leamare/dota-interactive-map"),
@@ -1009,9 +1078,10 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
 
     counts_html = _facts_html(counts, step, diff)
     rows = notes.get(ver)
-    # an empty list stays (the subpatch arrows hang off it); "no notes" goes beside it, not in it
+    # an empty list stays (the subpatch arrows hang off it); a patch whose notes say nothing about the map says
+    # nothing here either — the facts below speak for it (the owner 2026-10-03: drop "Patch notes / No terrain
+    # changes", "we won't write anything if there were no changes")
     list_html = _changes_html([(ver, rows)], skip_first_head=True) if rows else ""
-    no_notes = "" if rows else _no_notes_html()
     first_ver = ver
 
     return (
@@ -1039,7 +1109,6 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
         f'<div class="terrain-list-pane" data-patch="{ver}">\n'
         f'<div class="terrain-subpatch-head terrain-subpatch-top">{_esc(first_ver)}</div>\n'
         f'<ul class="changes terrain-list">\n{list_html}\n</ul>\n'
-        f'{no_notes}'
         f'{counts_html}'
         '</div>\n'
         '</div>\n'

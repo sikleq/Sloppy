@@ -2,6 +2,28 @@
   "_comment": "Site changelog (changelog.html). Newest first. Features and new pages = entries with 1-3 short items (optional link, \"shots\": [...] — 2+ = carousel). Small changes = {\"minor\": true, date, category, title, optional link}: listed under the day, folded under a toggle when there are more than 3. Categories: Patch Reader, Materials, Hero Lab, Dynamics, Site. Add an entry in the same commit as the change. \"fix\": true = a correction of something that was wrong (shown with a pixel beetle).",
   "entries": [
     {
+      "date": "2026-10-03",
+      "category": "Materials",
+      "minor": true,
+      "link": "terrain_741c.html",
+      "title": "Terrain: towers, lotus pools, twin gates, Tormentors, runes, outposts, watchers and Roshan pits are counted under the list too, a row below trees and camps; a patch whose notes say nothing about the map no longer says “No terrain changes”"
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Materials",
+      "minor": true,
+      "fix": true,
+      "link": "terrain_741d.html",
+      "title": "Terrain: the old map is now left of the slider and the new one right of it, as their corner labels say (it was the other way round)"
+    },
+    {
+      "date": "2026-10-03",
+      "category": "Materials",
+      "minor": true,
+      "fix": true,
+      "title": "Terrain: a chip's outlines say what happened — red where something was removed, green where something was added (7.41d's 23 new no-ward cells), yellow where it moved a little, outlined once instead of with two overlapping rings"
+    },
+    {
       "date": "2026-10-02",
       "category": "Materials",
       "minor": true,
@@ -15,20 +37,6 @@
       "minor": true,
       "link": "terrain_741.html",
       "title": "Terrain: the Fullscreen button reads “Full”, so every layer button fits on one line, spread across the map's width like its header"
-    },
-    {
-      "date": "2026-10-02",
-      "category": "Materials",
-      "minor": true,
-      "link": "terrain_741c.html",
-      "title": "Terrain: a No-ward ground layer — every spot where a ward can't stand, read from each patch's map file; 7.41c, 7.41d and 7.41e get pages for the ward spots they quietly changed"
-    },
-    {
-      "date": "2026-10-02",
-      "category": "Materials",
-      "minor": true,
-      "link": "terrain_739b.html",
-      "title": "Terrain: under the list, what's on the map as five tiles (trees, then camps from small to ancient) and what changed in the map file as “icon: change” chips with how many of all (Bounty runes 1/2 moved); press a chip to ring those places in red on the old map"
     },
     {
       "date": "2026-10-02",
@@ -73,12 +81,15 @@
       "title": "Terrain: a page for every patch, letter patches included",
       "link": "terrain_739b.html",
       "items": [
-        "Every patch that changed the map has its own page and slider, from 7.38 to 7.41a; the arrows step from patch to patch",
-        "Every map picture is our own render of the map file Steam shipped with that patch (7.38 to 7.40c on the game as it was before 7.41)",
-        "Each page lists that patch's own terrain notes and what moved in its map file; a patch that changed nothing gets no page, the one before names it"
+        "Every patch that changed the map has its own page and slider, from 7.38 to 7.41e, each picture our own render of the map file Steam shipped with that patch; a patch that changed nothing gets no page",
+        "Under the patch's own terrain notes: what's on the map as tiles, and what changed in its map file as “icon: change” chips (Bounty runes 1/2 moved)",
+        "Press a chip and the places it counts are outlined on the old map",
+        "A No-ward ground layer: every spot where a ward can't stand, read from each patch's map file — 7.41c, 7.41d and 7.41e get pages for the ward spots they changed without a note"
       ],
       "shots": [
-        "icons/changelog/2026-10-02_terrain_steps.webp"
+        "icons/changelog/2026-10-02_terrain_steps.webp",
+        "icons/changelog/2026-10-02_terrain_rings.webp",
+        "icons/changelog/2026-10-02_terrain_nowards.webp"
       ]
     },
     {

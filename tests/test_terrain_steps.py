@@ -100,12 +100,12 @@ def _page(ver):
     return terrain._build_terrain_page(ver, list(steps), {}, steps[ver], terrain._load_diff(ver), "")
 
 
-def test_a_patch_without_terrain_notes_says_so_and_shows_what_moved():
-    """Plain text under a "Patch notes" head, outside the change list — as a list row it got the list's empty tag
-    box, "a red rectangular stub" (the owner 2026-10-02)."""
+def test_a_patch_without_terrain_notes_says_nothing_and_shows_what_moved():
+    """No "Patch notes / No terrain changes" (the owner 2026-10-03: "we won't write anything if there were no
+    changes") — the empty list (the subpatch arrows hang off it), then the facts."""
     html = _page("7.38b")
-    assert ('<div class="tf-head">Patch notes</div><div class="tf-none">No terrain changes</div>' in html)
-    assert '<ul class="changes terrain-list">\n\n</ul>' in html and "terrain-no-notes" not in html
+    assert "Patch notes" not in html and "No terrain changes" not in html and "terrain-notes-none" not in html
+    assert '<ul class="changes terrain-list">\n\n</ul>\n<div class="terrain-facts">' in html
     assert '<div class="tf-head">Changed in the map file</div>' in html
     assert ('alt="Trees" width="16" height="16"><span class="tm-add-text">+2</span> '
             '<span class="tm-rem-text">−11</span></button>') in html
@@ -157,8 +157,9 @@ def test_the_facts_read_like_the_list():
     step = next(s for s in mv.steps() if s.patch == "7.40")
     html = terrain._facts_html(counts, step, diff)
     assert "<table" not in html and html.count('<div class="tf-head">') == 2
-    assert html.count('<div class="tf-tile">') == 5 and 'icons/camps/creepcamp_ancient.png' in html
-    names = [n.split(" ")[0].split("<")[0] for n in html.split('<div class="tf-name">')[1:]]
+    first = html.split('<div class="tf-tiles tf-tiles-more">')[0]
+    assert first.count('<div class="tf-tile">') == 5 and 'icons/camps/creepcamp_ancient.png' in first
+    names = [n.split(" ")[0].split("<")[0] for n in first.split('<div class="tf-name">')[1:]]
     assert names == ["trees", "small", "medium", "large", "ancient"]
     assert '<div class="tf-name">large <span class="tm-rem-text">−4</span></div>' in html
     assert '<div class="tf-name">medium <span class="tm-add-text">+4</span></div>' in html
@@ -170,21 +171,75 @@ def test_the_facts_read_like_the_list():
     assert '<div class="tf-none">Nothing</div>' in terrain._facts_html({}, step, {"treesOld": [], "treesNew": []})
 
 
-def test_a_chip_rings_its_changes_red_on_the_old_side():
-    """The owner 2026-10-02: pressing a "Changed in the map file" chip outlines the changed places in red on the old
-    version — not for spawn boxes, the layer already shows them."""
+def test_every_kind_of_object_has_a_tile_under_trees_and_camps():
+    """The owner 2026-10-03: "add all the other objects the way you show trees and camps — only with a gap, so trees
+    and camps stand on one row and everything else on the others"."""
+    diff = terrain._load_diff("7.40")
+    _svg, counts = terrain._markers_svg(diff, "740")
+    step = next(s for s in mv.steps() if s.patch == "7.40")
+    html = terrain._facts_html(counts, step, diff)
+    first, more = html.split('<div class="tf-tiles">')[1].split('<div class="tf-tiles tf-tiles-more">')
+    assert first.count('<div class="tf-tile">') == 5
+    names = [n.split(" <")[0].split("<")[0] for n in more.split('<div class="tf-name">')[1:]]
+    assert names == ["towers", "lotus pools", "twin gates", "Tormentors", "bounty runes", "power runes",
+                     "wisdom shrines", "outposts", "watchers", "Roshan pits"]
+    assert 'tc_towers.png" alt="" width="16" height="16">22</div><div class="tf-name">towers</div>' in more
+    assert '<div class="tf-name">watchers <span class="tm-rem-text">−4</span></div>' in more    # 7.40: 14 -> 10
+
+
+def _hl(svg, key):
+    return svg.split(f"tm-hl-{key} tm-old")[1].split("</svg>")[0]
+
+
+def test_a_chip_outlines_its_changes_on_the_old_side():
+    """The owner 2026-10-02: pressing a "Changed in the map file" chip outlines the changed places on the old
+    version — not for spawn boxes, the layer already shows them. 2026-10-03: red where something is removed, green
+    where something is added, yellow for a small move (one outline, not "two frames")."""
     diff = terrain._load_diff("7.39b")
     svg, counts = terrain._markers_svg(diff, "739b")
     step = next(s for s in mv.steps() if s.patch == "7.39b")
     html = terrain._facts_html(counts, step, diff)
     assert 'class="tf-chip tf-chip-btn" data-hl="towers"' in html and 'data-hl="trees"' in html
     assert 'alt="Camp spawn boxes"' in html and "data-hl=\"camp" not in html.split('alt="Camp spawn boxes"')[0][-90:]
-    towers = svg.split('tm-hl-towers tm-old')[1].split("</svg>")[0]
-    assert towers.count("<circle") == 2 and 'stroke="#ff4d4d"' in towers        # the tower's old and new spot
-    trees = svg.split('tm-hl-trees tm-old')[1].split("</svg>")[0]
-    assert trees.count("<circle") == 38 + 27
-    wards = terrain._markers_svg(terrain._load_diff("7.39d"), "739d")[0]
-    assert wards.split("tm-hl-nowards tm-old")[1].split("</svg>")[0].count("<rect") == 10
+    towers = _hl(svg, "towers")                       # 7.39b's offlane tier 2 tower moved a little: one yellow outline
+    assert 'fill="#ffd23f" mask="url(#tm-hl-mask-towers-changed)"' in towers
+    assert "#ff4d4d" not in towers and "#5dff8a" not in towers
+    trees = _hl(svg, "trees")
+    assert trees.count("<circle") == 2 * (38 + 27) and "#ff4d4d" in trees and "#5dff8a" in trees
+
+
+def test_no_ward_cells_added_are_green_and_removed_red():
+    """The owner 2026-10-03: 7.41d's "+23" no-ward cells were drawn red — "it should be green, since they were
+    added"; 7.41c's 149 cells that turned wardable are the removed ones, red."""
+    added = _hl(terrain._markers_svg(terrain._load_diff("7.41d"), "741d")[0], "nowards")
+    removed = _hl(terrain._markers_svg(terrain._load_diff("7.41c"), "741c")[0], "nowards")
+    assert added.count("<path") == 1 and 'stroke="#5dff8a"' in added
+    assert removed.count("<path") == 1 and 'stroke="#ff4d4d"' in removed
+
+
+def test_the_old_map_is_left_of_the_handle_under_its_chip():
+    """The owner 2026-10-03 read a change outlined on 7.41c as "drawn on 7.41d": the new map was revealed from the
+    left while the corner chips said "← OLD" left, "NEW →" right. Now the sides match the chips."""
+    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    assert ".tm-old { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }" in css
+    assert ".tm-new { clip-path: inset(0 0 0 var(--pos)); }" in css
+    assert ".tc-lens-new { clip-path: inset(0 0 0 var(--pos)); }" in css
+    new_layer = css.split(".tc-new-layer {")[1].split("}")[0]
+    assert "clip-path: inset(0 0 0 var(--pos));" in new_layer
+
+
+def test_overlapping_rings_merge_into_one_outline():
+    """The owner 2026-10-03 (a slightly moved object showed "two frames"): each ring is drawn widened by half the
+    stroke and cut by itself narrowed by half the stroke, so two overlapping rings leave one outer contour; ward
+    cells side by side leave only their outer sides."""
+    svg = terrain._ring_union("tm-hl-mask-watchers-changed", [(100, 100), (100, 108)], 19)
+    assert '<circle cx="100" cy="100" r="20.2"/>' in svg and '<circle cx="100" cy="108" r="17.8"/>' in svg
+    assert svg.index("<mask") < svg.index('mask="url(#tm-hl-mask-watchers-changed)"')
+    assert terrain._ring_union("unused", [], 19) == ""
+    removed, added, moved = terrain._small_moves([(0, 0), (500, 500)], [(10, 0), (900, 900)], 38)
+    assert (removed, added, moved) == ([(500, 500)], [(900, 900)], [(0, 0), (10, 0)])
+    path = terrain._cell_outline([(32, 32), (96, 32)], lambda x, y: (x, -y))       # two cells side by side
+    assert path.count("M") == 6                       # 2 tops + 2 bottoms + the two outer ends, not the shared side
 
 
 def test_the_zoom_tiles_are_named_on_the_slider(monkeypatch):

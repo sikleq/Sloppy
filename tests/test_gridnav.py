@@ -34,11 +34,13 @@ def test_a_ward_stands_on_walkable_ground_without_the_no_ward_flag():
 
 
 def test_the_changed_cells_are_their_world_centres():
-    """The chips ring these on the map: the centre of each cell that turned wardable or no-ward."""
+    """The chips outline these on the map: the centre of each cell that turned no-ward (green), and of each that
+    turned wardable (red)."""
     head, _ = gridnav.parse(_gnv([0] * 8))
     old, new = bytes([1, 1, 17, 16, 1, 1, 1, 1]), bytes([17, 1, 1, 16, 1, 1, 1, 0])
-    assert gridnav.changed_cells(head, old, new) == [[-96, -32], [32, -32], [96, 32]]
-    assert len(_wards("7.39d")["changed"]) == 10
+    assert gridnav.changed_cells(head, old, new) == ([[-96, -32], [96, 32]], [[32, -32]])
+    assert (len(_wards("7.41d")["toNoWard"]), len(_wards("7.41d")["toWardable"])) == (23, 0)
+    assert (len(_wards("7.41c")["toNoWard"]), len(_wards("7.41c")["toWardable"])) == (0, 149)
 
 
 def test_every_pictured_map_file_has_its_grid_and_its_layer_picture():

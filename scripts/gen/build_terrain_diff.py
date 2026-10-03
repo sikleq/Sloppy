@@ -95,8 +95,9 @@ def _wards(old_code, new_code):
         return None
     (_ha, a), (hb, b) = gridnav.load(paths[0]), gridnav.load(paths[1])
     lost, gained = gridnav.ward_changes(a, b)
+    to_no_ward, to_wardable = gridnav.changed_cells(hb, a, b)
     return {"old": _dotted(old_code), "new": _dotted(new_code), "lost": lost, "gained": gained,
-            "cells": gridnav.no_ward_cells(b), "changed": gridnav.changed_cells(hb, a, b)}
+            "cells": gridnav.no_ward_cells(b), "toNoWard": to_no_ward, "toWardable": to_wardable}
 
 
 def _nearest(target, candidates):

@@ -66,10 +66,15 @@ def ward_changes(old_cells, new_cells):
 
 
 def changed_cells(head, old_cells, new_cells):
-    """[[x, y]] world centres of the cells whose wardability changed (the Terrain chips ring them on the map)."""
+    """([[x, y]] that turned no-ward, [[x, y]] that turned wardable): world centres of the cells whose wardability
+    changed (the Terrain chips outline them on the map — green where no-ward ground was added, red where removed)."""
     w, cell = head["w"], head["cell"]
-    return [[int(head["x0"] + (i % w + 0.5) * cell), int(head["y0"] + (i // w + 0.5) * cell)]
-            for i, (a, b) in enumerate(zip(old_cells, new_cells)) if wardable(a) != wardable(b)]
+    to_no_ward, to_wardable = [], []
+    for i, (a, b) in enumerate(zip(old_cells, new_cells)):
+        if wardable(a) != wardable(b):
+            centre = [int(head["x0"] + (i % w + 0.5) * cell), int(head["y0"] + (i // w + 0.5) * cell)]
+            (to_no_ward if wardable(a) else to_wardable).append(centre)
+    return to_no_ward, to_wardable
 
 
 def no_ward_cells(cells):

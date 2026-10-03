@@ -20,8 +20,8 @@ slider, plus that patch's *Terrain Changes* list. Built by `builders/terrain.py`
   `data-lens=184`. Math: lens centred on cursor, inner layers scaled by zoom,
   seam = `--pos` reused (verified analytically).
 - ✅ **Trees layer** — TWO same-colour layouts: the 7.40 forest clipped to the
-  OLD side (`.tc-trees-old`, clip right) and the 7.41 forest clipped to the NEW
-  side (`.tc-trees-new`, clip left), so sweeping the handle shows the forest
+  OLD side (`.tc-trees-old`, left of the handle since 2026-10-03) and the 7.41 forest clipped to the NEW
+  side (`.tc-trees-new`, right of it), so sweeping the handle shows the forest
   move. One **Trees** button, `.show-trees`. (Data: `treesOld`+`treesNew`, full
   sets.) No add/remove colouring.
 - ✅ **Camps layer** — tier icons (`icons/camps/`: small/mid/big/ancient, by
@@ -389,23 +389,40 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
 - **Facts under the list (2026-10-02)** — the owner: the lines "Trees / Neutral camps / Moved in the map file / X
   changed nothing" should be laid out better; then two centred tables "aren't harmonious — it can be better". Now
   `_facts_html` speaks the list's own look: headings styled as the list's subgroup heads (`.tf-head`), "On the
-  map" as five tiles (trees, then the camp tiers small → ancient — the owner: "from smaller to bigger"),
-  "Changed in the map file" as one chip per kind of object, "icon: change" (the owner: not "Added / removed:
-  No-ward cells +2"): the layer icon (the name in its alt text) and "+added −removed" or "n/of all moved /
-  re-tiered / resized" ("Bounty runes 1 moved (1/2)"). Tiles and chips share one gold-outline style; everything
-  left-aligned like the list. No sentences: a patch without notes shows a "Patch notes" head over plain "No
-  terrain changes" OUTSIDE the `ul.changes` list (inside it the list's `li.li-notext::before` tag box drew "a red
-  rectangular stub"); patches that changed nothing on the map are not mentioned at all (the owner: "remove
-  'Unchanged in 7.41f'").
-- **A chip rings its changes (2026-10-02)** — the owner: pressing a "Changed in the map file" chip outlines the
-  changed places in red on the OLD version, except spawn boxes (their layer already draws the changed boxes red).
+  map" as five tiles (trees, then the camp tiers small → ancient — the owner: "from smaller to bigger"), then
+  (2026-10-03, the owner: "add all the other objects … trees and camps on one row, everything else on the
+  others") a second grid `.tf-tiles-more` 12 px below: one tile per other kind of object the step's maps hold
+  (towers, lotus pools, twin gates, Tormentors, bounty / power runes, wisdom shrines / runes, outposts, watchers,
+  Roshan pits — `_MOVED_NAMES` order, counts from `counts["entities"]`), "Changed in the map file" as one chip
+  per kind of object, "icon: change" (the owner: not "Added / removed: No-ward cells +2"): the layer icon (the
+  name in its alt text) and "+added −removed" or "n/of all moved / re-tiered / resized" ("Bounty runes 1 moved
+  (1/2)"). Tiles and chips share one gold-outline style; everything left-aligned like the list. No sentences: a
+  patch whose notes say nothing about the map shows nothing for them — just the empty `ul.changes` (the subpatch
+  arrows hang off it) and the facts (2026-10-03, the owner: drop "Patch notes / No terrain changes", "we won't
+  write anything if there were no changes"; before that it was a list row, whose `li.li-notext::before` tag box
+  drew "a red rectangular stub"); patches that changed nothing on the map are not mentioned at all (the owner:
+  "remove 'Unchanged in 7.41f'").
+- **Which side is which (2026-10-03)** — the OLD map is LEFT of the handle, the NEW one RIGHT, under their corner
+  chips "← 7.41c OLD" / "NEW 7.41d →". Until then the new map was revealed from the left while the chips said the
+  opposite, so the owner read a change outlined on 7.41c as "drawn on 7.41d". Every side rule flips together in
+  styles.css: `.tc-new-layer` / `.tm-new` / `.tc-trees-new` / `.tc-camps-new` / `.tc-lens-new` clip
+  `inset(0 0 0 var(--pos))`, `.tm-old` / `.tc-trees-old` / `.tc-camps-old` clip `inset(0 calc(100% - var(--pos))
+  0 0)`.
+- **A chip outlines its changes (2026-10-02)** — the owner: pressing a "Changed in the map file" chip outlines the
+  changed places on the OLD version, except spawn boxes (their layer already draws the changed boxes red).
   Each chip but spawn boxes is a `<button class="tf-chip tf-chip-btn" data-hl="<key>">`; `_highlights_svg` adds one
-  hidden `svg.tm-hl.tm-hl-<key>.tm-old` per key (red `#ff4d4d` rings, so it shows only left of the slider), and
-  `initChangeHighlights` (src/scripts.js) toggles `.tm-hl-on` + `aria-pressed`. What is ringed (`_changed_points`):
-  trees / camps / point entities = the old-only and new-only positions (a move rings both its spots), camp tiers =
-  the old spot of each re-tiered pair (`_retiered_pairs`), no-ward cells = a 64-unit square per cell whose
-  wardability flipped (`wards.changed` in the diff, `gridnav.changed_cells`). The layer bar spreads its buttons
-  across the map's width (`justify-content: space-between`) — "like the minimap's header".
+  hidden `svg.tm-hl.tm-hl-<key>.tm-old` per key (`.tm-old`, so only on the old side), and `initChangeHighlights`
+  (src/scripts.js) toggles `.tm-hl-on` + `aria-pressed`. The colour says what happened (2026-10-03, the owner on
+  7.41d's "+23" no-ward cells drawn red: "it should be green, since they were added" — the chip's own +green /
+  −red): `_changed_points` → red `removed` = only on the old map, green `added` = only on the new map, yellow
+  `changed` = re-tiered camps (the old spot of each `_retiered_pairs` pair) and a removed + an added spot whose
+  rings would overlap (`_small_moves`: mutual nearest, closer than two radii — one object moved a little). Ward
+  cells: green = turned no-ward (`wards.toNoWard`), red = turned wardable (`wards.toWardable`), both from
+  `gridnav.changed_cells`. ONE outline, not overlapping rings (2026-10-03, the owner: a slightly moved object showed
+  "two frames"): `_ring_union` draws every ring of a colour widened by half the stroke through an SVG mask of
+  every ring narrowed by half the stroke — only the union's outer contour stays; `_cell_outline` draws just the
+  cell sides no other changed cell shares. The layer bar spreads its buttons across the map's width
+  (`justify-content: space-between`) — "like the minimap's header".
 - **Quiet patches get no page** (the owner 2026-10-02: "if nothing changed in a patch, there's nothing to compare"):
   a same-file patch (7.40b, 7.41b) and a step whose notes list nothing and whose map file moved nothing
   (`_quiet`: 7.39e, 7.40c, 7.41c-f). Their pictures differ from the patch before only by render noise —

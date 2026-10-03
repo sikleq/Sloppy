@@ -7108,8 +7108,8 @@ function ecShopMarkup(panels) {
     });
   }
 
-  // "Changed in the map file" chips: pressed, the changed places are ringed red on the
-  // old side of the map (.tm-hl-<key>, the stage's and the lens's copies alike).
+  // "Changed in the map file" chips: pressed, the changed places are outlined on the old
+  // side of the map, left of the handle (.tm-hl-<key>, the stage's and the lens's copies alike).
   function initChangeHighlights() {
     const root = document.querySelector('.terrain-compare');
     if (!root) return;
