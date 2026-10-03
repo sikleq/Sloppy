@@ -8,7 +8,8 @@
       "link": "patches/7.41.html",
       "items": [
         "Every terrain note from 7.38 to 7.41 that can be seen on the map ends with a “Show” button: below it, in their own box, the old and the new map side by side with only the note's own objects outlined — removed red, added green, moved yellow; a click on a picture opens it large",
-        "Terrain notes carry real tags instead of MISC almost everywhere: moved or reshaped REWORK, added NEW, removed DEL, a camp's tier BUFF or NERF, fixes MISC"
+        "A note about a camp that didn't move marks it white (7.39 pull timers, 7.41 evolutions), and a camp that changed tier shows the game's camp icons before and after (medium → small, medium → large → ancient); ramps, cliffs and ward spots outline the cells that changed",
+        "Terrain notes are numbered from 1 in each category instead of tagged; 15 more notes got pictures: 7.38's jungle streams and corner outposts, 7.39's rotated Roshan pit and cliff, 7.40's shrines, defender's gates, bridges and removed trees, 7.41's Tormentor areas and ramp"
       ],
       "shots": [
         "icons/changelog/2026-10-03_terrain_notes.webp"

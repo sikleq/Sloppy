@@ -232,7 +232,9 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
   twice» → **BUFF**; исправления (dead spot, incorrect vision, pathing blockers, ward spot, «Touched up») → **MISC**.
   У строки ландшафта под текстом — микроскриншоты «было | стало» (data/terrain_spots.json →
   scripts/gen/terrain_shots.py → icons/terrain/, patch/elements.py `terrain_shots_html`). Генератор:
-  CANONICAL_TAGS «Terrain», тесты `test_terrain_canon`.
+  CANONICAL_TAGS «Terrain», тесты `test_terrain_canon`. **Показ:** с 2026-10-03 тег строки ландшафта на странице
+  не виден — вместо чипа номер строки в её категории (владелец: «убери теги и просто пронумеруй»); тег по канону
+  всё равно ставится в контенте — он задаёт `data-tag` для фильтров и весов.
 - **Вторая вычитка 7.38b–7.41e (2026-10-03), правило → почему** (генератор: CANONICAL_TAGS / LOWER_IS_BUFF,
   тесты `test_canonical_tags_from_the_second_audit`, `test_lower_is_better_from_the_second_audit`):
   - «Now granted by Aghanim's Scepter/Shard» → **REWORK** (+ «?» откуда было): способность переехала между

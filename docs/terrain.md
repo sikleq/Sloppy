@@ -339,6 +339,23 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   item ability cards (`hidden`, so the lazy pictures load only when opened), and a click on a picture opens its
   large copy (`data-large`) in a lightbox, not the Terrain page ("View on map" in the section header is for that).
   scripts.js "Terrain note pictures".
+  More on the pictures (the owner 2026-10-03, "show these on the map too, check the other patches"): a spot's
+  `"mark": [[x, y], …]` outlines, white, the camp nearest each point on EACH map picture (`mapdata_<code>.json`
+  spawners — a camp may stand elsewhere on the old map) for notes about an unchanged camp (7.39 pull timers, 7.41
+  evolutions); `"tiers": {"old": [...], "new": [...]}` puts the game's minimap camp icons (`icons/camps/
+  creepcamp_<small|mid|big|ancient>.png`, 32 / 64 px unblurred) as a chain "mid → big → ancient" on a plate in the
+  top-right corner of each half (bottom-right when a marked camp sits high) — demotions and evolutions; `"show":
+  ["nowards"]` outlines the changed no-ward cells (turned wardable red on the old side, turned no-ward green on the
+  new) for ground notes (7.39 cliff, 7.39d ward spot, 7.41 ramp). New spots are appended to a patch's list so the
+  older pictures keep their numbers. Not shown (no place on the map or no data): rules (stream speed, watcher
+  vision, gate mana), "Touched up the map" / "additional adjustments to this area", fixes the files don't record
+  (7.39b warding blocks, 7.38c vision rules).
+- **Terrain rows are numbered, not tagged (2026-10-03)** — the owner: "remove the rework / buff tags and just
+  number them, from 1 in each category". `li()` inside a `plain_header(terrain_link=…)` block shows
+  `terrain_num_chip(n)` (`.badge.tnum`, the tag chip's frame) instead of the tag chip, counting from 1 after every
+  `subgroup()`; `_change_li(num=…)` does the same on the Terrain page, which now keeps Valve's order (it sorted by
+  tag) so a row has the same number on both pages. `_sort_changes_li` ranks numbered rows alike, so they stay in
+  order. The tag canon still decides each row's `data-tag` (filters, weights).
   Not placed: notes the map can't show (watcher rules, camp evolutions, pull timers, fixes) and the doubled 7.38c
   "Several additional tree and visual adjustments". With the shots, the terrain tag canon (docs/agent-rules/
   patch-tags.md): moved / reshaped REWORK, added NEW, removed DEL, demoted NERF, fixes MISC.

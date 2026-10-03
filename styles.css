@@ -10951,6 +10951,10 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .badge.rework { color: #a58ad2; background: rgba(170, 135, 220, 0.09); border-color: rgba(170, 135, 220, 0.34); }
 .badge.swap   { color: #6fbfb2; background: rgba(95, 176, 164, 0.09);  border-color: rgba(95, 176, 164, 0.34); }
 .badge.del    { color: #c0668e; background: rgba(190, 85, 130, 0.09);  border-color: rgba(190, 85, 130, 0.34); }
+/* A terrain row's number in its category, in the tag chip's frame (the owner 2026-10-03: no rework / buff tags on
+   terrain notes, just numbers from 1 in each category) */
+.badge.tnum   { font-family: var(--font-j10); font-size: 15px; font-weight: 400; line-height: 11px; text-align: center;
+  color: var(--gold-dim); background: rgba(227, 196, 106, 0.06); border-color: rgba(227, 196, 106, 0.30); }
 /* Pressed filter chip = a neon sign: the letters glow in the chip's own colour and the frame
    lights up with a soft halo of the same colour (no plain outline ring). */
 .legend-tags .badge.filter-btn.active,

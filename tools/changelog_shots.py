@@ -27,11 +27,11 @@ PAD = 6
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
     "2026-10-03_terrain_notes.webp": ("patches/7.41.html", None,
-                                      ['li:has-text("Radiant safe lane large camp\'s spawn box has been moved")',
-                                       'li:has-text("The medium flooded camp near the safe lane tier 2 towers moved")'],
-                                      ['li:has-text("Radiant safe lane large camp\'s spawn box has been moved") .tshots-btn',
-                                       'li:has-text("The medium flooded camp near the safe lane tier 2 towers moved") .tshots-btn'],
-                                      620,
+                                      ['li:has-text("The medium flooded camp near the bounty runes can now evolve")',
+                                       'li:has-text("Medium neutral camp near offlane defender\'s gate")'],
+                                      ['li:has-text("The medium flooded camp near the bounty runes can now evolve") .tshots-btn',
+                                       'li:has-text("Medium neutral camp near offlane defender\'s gate") .tshots-btn'],
+                                      700,
                                       {"width": 1400, "settle": 2500}),
     "2026-10-03_terrain_fullscreen.webp": ("terrain_740.html", None, [".terrain-map-pane"],
                                            [".tc-btn-fs", '.tc-fs-bar .tf-chip-btn[data-hl="camps"]'], 720,

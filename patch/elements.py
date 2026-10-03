@@ -335,6 +335,7 @@ def _open_block(extra_cls='', extra_attrs=''):
     _flush_rework()                                       # ... and its REWORK rows (signal R)
     pre = _close_ability_block()
     _State.new_mech_header = _State.new_mech = False     # a new block ends any "new mechanic" run
+    _State.terrain_rows = None                            # ... and any numbered terrain list
     cls = 'entity-block' + ((' ' + extra_cls) if extra_cls else '')
     s = (pre + ('</div>\n' if _State.block_open else '')
          + f'<div class="{cls}"{extra_attrs}>\n')
@@ -603,6 +604,10 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
             f'<span>View on map</span></a>')
     extra_cls = ' label-only' if sublabel else ''
     head = _open_block(extra_cls)
+    if terrain_link:
+        # terrain rows are numbered per category instead of tagged (the owner 2026-10-03: "remove the
+        # rework / buff tags and just number them, from 1 in each category"); data-tag stays for filters / weights
+        _State.terrain_rows = 0
     _State.new_mech_header = _State.new_mech = bool(new)
     _State.new_mech_tag = _mech_tag(new)
     label = f' <span class="entity-new-type">{new}</span>' if new else ''
@@ -822,6 +827,8 @@ def subgroup(title, new=None):
     NEW rows of its lists without chips). Without it the subgroup inherits the header's state."""
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
+    if _State.terrain_rows is not None:
+        _State.terrain_rows = 0                           # each terrain category counts from 1
     _State.new_mech = bool(new) or _State.new_mech_header
     if new:
         _State.new_mech_tag = _mech_tag(new)
@@ -2062,6 +2069,11 @@ def _terrain_spot_index():
     return _TERRAIN_SPOTS
 
 
+def terrain_num_chip(n):
+    """A terrain row's chip: its number in its category, in the tag chip's frame (the owner 2026-10-03)."""
+    return f'<span class="badge tnum">{n}</span>'
+
+
 def terrain_shots_html(patch, text, prefix="../"):
     """The micro-screenshots of a terrain note (the owner 2026-10-03: the terrain rows were "all under one tag, mush —
     maybe micro-screenshots"): the old | new map squares around the change, only the note's own objects outlined.
@@ -2160,6 +2172,9 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     else:
         left_tag = '<span class="row-tag-empty"></span>'
         rest = badge
+    if _State.terrain_rows is not None and isinstance(text, str):
+        _State.terrain_rows += 1
+        left_tag = terrain_num_chip(_State.terrain_rows)
 
     classes = []
     marker = ""

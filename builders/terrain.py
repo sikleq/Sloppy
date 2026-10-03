@@ -662,11 +662,7 @@ def _moved_summary(diff):
     return [text(*i) for i in _moved_items(diff)]
 
 
-# Canonical tag order (same as the site convention): NEW → REWORK → BUFF →
-# NERF → DEL → QoL → MISC. QoL gets its own rank before MISC so QoL rows group
-# together instead of interleaving with MISC. Stable within a rank.
-_TAG_RANK = {"NEW": 1, "REWORK": 2, "BUFF": 3, "NERF": 4, "DEL": 5,
-             "QoL": 6, "MISC": 7}
+# The list keeps Valve's order and numbers its rows per category (2026-10-03); the tag still sets data-tag
 _TAG_CLS = {
     "NEW": ("new", "new", ' data-overall="buff"'),
     "REWORK": ("rework", "rework", ""),
@@ -683,9 +679,9 @@ def _badge(tag):
     return f'<span class="badge {cls}" data-tag="{tid}">{tag}</span>'
 
 
-def _change_li(text, tag, note=None, patch=None):
+def _change_li(text, tag, note=None, patch=None, num=None):
     _cls, tid, overall = _TAG_CLS[tag]
-    from patch.elements import terrain_shots_html
+    from patch.elements import terrain_shots_html, terrain_num_chip
     shots = terrain_shots_html(patch, text, prefix="")
     # data-tag carries the primary tag plus its filter-overall (NEW→buff,
     # DEL→nerf) so a future filter surfaces them correctly; dedupe so BUFF/NERF
@@ -704,7 +700,8 @@ def _change_li(text, tag, note=None, patch=None):
         head, _sp, last = text.rpartition(" ")
         tip = info_tip(note) if note else ""
         text = f'{head}{_sp}<span class="li-tail">{last}{tip}{button}</span>'
-    return (f'<li data-tag="{" ".join(tags)}">{_badge(tag)}'
+    chip = terrain_num_chip(num) if num else _badge(tag)
+    return (f'<li data-tag="{" ".join(tags)}">{chip}'
             f'<span class="row-text">{text}</span>{shots}</li>')
 
 
@@ -729,9 +726,10 @@ def _changes_html(subpatches, skip_first_head=False):
         for sg, sg_rows in groups.items():
             if sg:
                 parts.append(f'<li class="terrain-subgroup-head">{sg}</li>')
-            sorted_rows = sorted(sg_rows,
-                                 key=lambda it: (_TAG_RANK.get(it[2], 9), it[0]))
-            parts.extend(_change_li(text, tag, note, sub_ver) for _, text, tag, note in sorted_rows)
+            # Valve's order, numbered from 1 in each category like the patch page (the owner 2026-10-03: numbers
+            # instead of tags), so a row has the same number on both pages
+            parts.extend(_change_li(text, tag, note, sub_ver, num=k)
+                         for k, (_, text, tag, note) in enumerate(sg_rows, 1))
     return "\n".join(parts)
 
 

@@ -394,6 +394,46 @@ def test_a_note_outlines_only_its_own_objects():
     assert ts.spot_keys({"match": "Cleared up some areas around the Tormentor locations", "show": ["trees"]}) == {"trees"}
 
 
+def test_terrain_rows_are_numbered_per_category_instead_of_tagged():
+    """The owner 2026-10-03: "remove the rework / buff tags and just number them, from 1 in each category" — on the
+    patch page (li() inside a plain_header(terrain_link=…) block, reset by subgroup()) and on the Terrain page; the
+    row keeps its data-tag for the filters and the weights."""
+    from patch import elements
+    head = elements.plain_header("Terrain Changes", dynamics=False, terrain_link="7.41")
+    assert "terrain-jump-btn" in head
+    rows = [elements.li("Some note", '<span class="badge rework" data-tag="rework">REWORK</span>') for _ in range(2)]
+    elements.subgroup("Camps")
+    rows.append(elements.li("Another", '<span class="badge new" data-tag="new">NEW</span>'))
+    assert ['<span class="badge tnum">1</span>' in rows[0], '<span class="badge tnum">2</span>' in rows[1],
+            '<span class="badge tnum">1</span>' in rows[2]] == [True, True, True]
+    assert 'data-tag="rework"' in rows[0] and 'class="badge rework"' not in rows[0]
+    elements.plain_header("General Changes", dynamics=False)
+    assert "tnum" not in elements.li("Elsewhere", '<span class="badge rework" data-tag="rework">REWORK</span>')
+    html = terrain._changes_html([("7.41", [("A", "NERF", "Camps"), ("B", "BUFF", "Camps"), ("C", "REWORK", "Other")])],
+                                 skip_first_head=True)
+    import re
+    assert re.findall(r'class="badge tnum">(\d)<', html) == ["1", "2", "1"]
+    assert html.index('row-text">A') < html.index('row-text">B')        # Valve's order, not the tag order
+
+
+def test_note_pictures_mark_camps_and_show_tier_icons():
+    """Evolution / pull-timer notes mark the camp they are about (white); tier changes carry the camp icons, before
+    and after (the owner 2026-10-03); a ground note can outline its changed no-ward cells."""
+    sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
+    import terrain_shots as ts
+    spots = ts.spot_list()
+    by_match = {e["match"]: e for es in spots.values() for e in es}
+    e = by_match["The medium flooded camp near the bounty runes can now evolve twice"]
+    assert e["mark"] and e["tiers"] == {"old": ["mid", "big"], "new": ["mid", "big", "ancient"]}
+    assert by_match["Medium neutral camp near offlane defender's gate has been demoted"]["tiers"] == {
+        "old": ["mid"], "new": ["small"]}
+    assert ts.spot_keys(by_match["The ramp leading from the Radiant tier 1 tower to the stream"]) == {"nowards"}
+    for es in spots.values():
+        for e in es:
+            for side in e.get("tiers", {}).values():
+                assert all(t in ts.TIER_ICON for t in side), e["match"]
+
+
 def test_a_chip_turns_off_the_layer_it_turned_on():
     """The owner 2026-10-03: a chip that switched its layer on switches it off again with the chip; a layer the viewer
     had on (or clicked meanwhile, "All" too) stays."""

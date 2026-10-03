@@ -3,6 +3,9 @@
 
 class _State:
     block_open = False
+    # rows counted inside a "Terrain Changes" block (plain_header(terrain_link=…)): their chip shows the row's
+    # number in its category instead of a tag; None outside such a block, reset by every subgroup()
+    terrain_rows = None
     current_hero = None  # internal slug of current hero block (for ability icon derivation)
     ability_icons = set()  # all ability-icon URLs emitted during build (for icon-validator)
     ability_block_open = False  # tracks <div class="ability-block"> wrapper
