@@ -441,8 +441,9 @@ def save_html(filename):
     out = out.replace('<!--INLINETIP-->', '').replace('<!--/INLINETIP-->', '')
     out = out.replace('<!--TIP-->', '').replace('<!--/TIP-->', '')
     # Perf: let the browser decode images off the main thread (smoother render
-    # on icon-heavy pages — 600+ icons). Safe + universal; no visual change.
-    out = out.replace('<img ', '<img decoding="async" ')
+    # on icon-heavy pages — 600+ icons). Safe + universal; no visual change. An <img> that already says
+    # decoding= keeps its own (terrain micro-screenshots had it twice, 2026-10-03).
+    out = re.sub(r'<img (?![^>]*\bdecoding=)', '<img decoding="async" ', out)
     path = os.path.join(_site.DIST_DIR, filename)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:

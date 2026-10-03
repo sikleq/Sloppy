@@ -366,6 +366,17 @@ def test_a_terrain_note_shows_its_micro_screenshots():
                 assert os.path.exists(os.path.join(_ROOT, "icons", "terrain", n)), n
 
 
+def test_patch_pages_add_decoding_only_where_an_image_lacks_it():
+    """patch/page.py gives every <img> decoding="async"; one that already has it (the terrain micro-screenshots)
+    must not get it twice (2026-10-03)."""
+    src = open(os.path.join(_ROOT, "patch", "page.py"), encoding="utf-8").read()
+    assert "out.replace('<img ', '<img decoding=\"async\" ')" not in src
+    import re
+    rx = re.compile(r'<img (?![^>]*\bdecoding=)')
+    html = '<img src="a.png"><img src="b.webp" loading="lazy" decoding="async">'
+    assert rx.sub('<img decoding="async" ', html).count("decoding=") == 2
+
+
 def test_the_picker_lists_patches_not_ranges():
     html = terrain._picker_html(["7.39b", "7.39"], "7.39b")
     assert '<a class="version-item current" href="terrain_739b.html"' in html and "–" not in html
