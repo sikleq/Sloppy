@@ -439,6 +439,15 @@ LOWER_IS_BUFF = re.compile(
     # an own illusion's damage penalty
     r'|attack\s+rate'
     r'|attacks?\s+required'
+    # 2026-10-03 cross-check of 7.40-7.41 against the proofread flags
+    r'|mana\s*costs'
+    r'|mana\s*/\s*sec'
+    r'|capture\s+time'
+    r'|formation\s+(?:time|delay)'
+    r'|time\s+to\s+max\s+effect'
+    r'|time\s+until\s+\w+\s+starts'
+    r'|charge\s+loss'
+    r'|explosion\s+delay|fade\s+time|self\s+damage'
     r'|time\s+for\s+\w+\s+application'
     r'|illusion\s+damage\s+(?:reduction|penalty)'
     r'|stun\s+duration\s+from\s+falling'
@@ -462,6 +471,12 @@ _NOT_LOWER_IS_BUFF = re.compile(
     r'|\bcooldown\s+advance\b'
     r'|\bcooldown\s+(?:speed|recovery)\b'
     r'|\bmana\s+cost\s+reduction\b'
+    r'|\bmana\s*cost(?:/\w+)?\s+reduction\b'          # "Manacost/Manaloss Reduction increased" (7.40 talent)
+    r'|\bdamage\s+taken\s+reduction\b'                # "Illusion Damage Taken Reduction increased" (7.41 talent)
+    r'|\bfalse\s+flight\b'                            # an ability's name, not a flight time
+    r'|\bwithout\s+(?:a\s+)?cooldown\b'               # "grace period … without a cooldown increased" (7.38b)
+    r'|\btime\s+reduction\b'                          # "Charge Restore Time Reduction decreased" (7.39 talent)
+    r'|\bincoming\s+damage\s+buff\b'                  # Roshan's own Roar buff (7.39)
     r'|\bpenalty\s+reduction\b'
     # "Magic Resistance bonus" is higher-is-better (item stat), not incoming damage
     r'|\bmagic\s+resistance\s+bonus\b'
@@ -614,7 +629,8 @@ def _emit_badge(text):
     new = _split_levels(m.group(2))
     if old is None or new is None:
         return None
-    l = _is_lower_better(text)
+    said = _said_lower_better(text, old, new)
+    l = _is_lower_better(text) if said is None else said
     l_arg = ', l=True' if l else ''
     force_arg = ', force_overall="buff"' if _l1_only_dip(old, new, l) else ''
     return f'b({old!r}, {new!r}{l_arg}{force_arg})'
@@ -2653,6 +2669,19 @@ def _mean(v):
     return v
 
 
+def _said_lower_better(text, old, new):
+    """Valve's own "improved" / "worsened" settles the direction: improved toward a smaller number (or worsened
+    toward a bigger one) means lower is better ("Ghost spawn rate improved from 0.35s to 0.25s", "Duration improved
+    from 10s to 8s"; 2026-10-03 cross-check of 7.40-7.41). None when the row doesn't say or the means are equal."""
+    word = re.search(r'\b(improved|worsened)\b', text, re.I)
+    if not word or old is None or new is None:
+        return None
+    o, n = _mean(old), _mean(new)
+    if o == n:
+        return None
+    return (n < o) == (word.group(1).lower() == 'improved')
+
+
 def _numeric_direction(old, new, lower_is_better):
     """buff/nerf/misc from old→new means, respecting lower_is_better."""
     if old is None or new is None:
@@ -2742,6 +2771,9 @@ def _normalize_note_text(text):
             new = [_num(rm.group(3)), _num(rm.group(4))]
             is_range = True
 
+    said = _said_lower_better(clean, old, new)
+    if said is not None:
+        lower = said
     rec = {'text': clean, 'tag': _resolve_tag(clean, old, new, lower)}
     if old is not None:
         rec['old'] = old

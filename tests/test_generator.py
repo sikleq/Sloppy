@@ -649,9 +649,44 @@ def test_canonical_tags_from_the_second_audit(text, tag):
     "Flight duration decreased from 1.4s to 1.25s",
     "Aghanim's Scepter time for Frostbite application decreased from 2.5s to 2s",
     "Aghanim's Shard Illusion damage reduction decreased from 30% to 15%",
+    # cross-check of the 7.40-7.41 l=True flags against the generator (2026-10-03)
+    "Song Mana Costs increased from 20/32/44 to 25/35/45",
+    "Mana/Sec decreased from 25/45/65 to 20/40/60",
+    "Watcher capture time decreased from 1.5s to 1s",
+    "Formation Delay increased from 0.4s to 1s",
+    "Corrosive Skin: Time to max effect increased from 4s to 5s",
+    "Time until meditation starts decreased from 0.25s to 0.2s",
+    "Charge loss on death decreased from 3 to 2",
+    "Imp explosion delay increased from 0.2s to 0.3s",
+    "Ally Fade Time decreased from 1.0s to 0.5s",
+    "Glass Cannon self damage amp decreased from 8% to 6%",
 ])
 def test_lower_is_better_from_the_second_audit(text):
     assert g._is_lower_better(text)
+
+
+@pytest.mark.parametrize("text", [
+    "Level 10 Talent Manacost/Manaloss Reduction increased from +8% to +10%",
+    "Level 15 Talent Mirror Image Illusion Damage Taken Reduction increased from 50% to 75%",
+    "False Flight duration increased from 5s to 6.5s",
+    "Item grace period for swapping into the main inventory without a cooldown increased from 3s to 5s",
+    "Level 20 Talent Astral Step Charge Restore Time Reduction decreased from 4s to 3s",
+    "Incoming Damage Buff Duration increased from 8s to 12s",
+])
+def test_not_lower_is_better_from_the_cross_check(text):
+    assert not g._is_lower_better(text)
+
+
+@pytest.mark.parametrize("text,lower", [
+    ("Ghost spawn rate improved from 0.35s to 0.25s", True),     # improved toward smaller -> lower is better
+    ("Duration improved from 10s to 8s", True),
+    ("Damage Block Decrease improved from 35/30/25/20 to 20", True),
+    ("Base Attack Time worsened from 1.7s to 1.8s", True),        # worsened toward bigger -> lower is better
+    ("Range improved from 600 to 700", False),
+])
+def test_valve_improved_or_worsened_sets_the_direction(text, lower):
+    """Valve's own word decides l=True when the keywords don't know the stat (2026-10-03 cross-check)."""
+    assert ("l=True" in g._emit_badge(text)) == lower
 
 
 def test_creep_level_change_is_misc_not_a_percent_badge():

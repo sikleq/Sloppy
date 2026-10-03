@@ -251,6 +251,12 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
   - Опечатка Valve в числах (Techies Proximity Mines 7.41a «450», «225») — `wrong-word` + `note_box` с реальными
     значениями из KV, бейдж по KV. Valve пишет «decreased», а числа выросли — то же (Grimstroke 7.40c).
   - «per Spirit Bear level up» → формула `A + B*(L-1)` (Spirit Bear 7.40b, 7.41c), см. formula-tables.
+  - Слово Valve «improved» / «worsened» само задаёт направление: улучшено в сторону меньшего числа (или ухудшено в
+    сторону большего) → `l=True` («Ghost spawn rate improved from 0.35s to 0.25s»). Генератор: `_said_lower_better`,
+    оно сильнее списка слов. Сверка флагов `l=True` в 7.40–7.41 с генератором (2026-10-03) дала ещё слова: mana
+    costs, mana/sec, capture time, formation time/delay, time to max effect, charge loss, explosion delay, fade time,
+    self damage; и исключения: «… Reduction increased» у талантов (Manacost/Manaloss, Damage Taken, Time Reduction),
+    «without a cooldown», «Incoming Damage Buff» Рошана, способность False Flight.
 - **«X removed and replaced with new …: Y»** — строка DEL уходит под свой подзаголовок X над блоком Y. *Почему:* это изменение старой вещи, а не описание новой.
 - **Строка без метки внутри описания нового объекта** (например, опыт от Shrines плюс «?») тоже входит в описание: метка NEW, чип скрывается.
 - **Две соседние однотипные строки с одинаковым «?»** (Great / Greater Lotuses) — одна строка «…A, and B», одно «?». *Почему:* это одно изменение про два значения.
