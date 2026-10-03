@@ -133,4 +133,6 @@ KNOWN_INNATE_NO_CDN_ICON = {
     "lone_druid_gift_bearer",       # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
     "slark_barracuda",              # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
     "spectre_spectral",             # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
+    "wisp_sight_seer",              # Io's old innate on the 7.39 old -> new card (was mislabelled wisp_essence_conduction);
+                                    # Valve CDN 404 (2026-10-03)
 }
