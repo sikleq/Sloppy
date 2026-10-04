@@ -111,7 +111,12 @@ MATERIALS_GROUPS = [
         ("heroes_dyn",   "Hero Dynamics", "heroes_dyn.html"),
         ("hero_changes", "Hero Changes",  "hero_changes.html"),
     ]),
-    ("terrain", "Terrain", "terrain_741.html", None),
+    # Terrain Stats nests under Terrain (the owner 2026-10-04: "a sub-tab of the Terrain button — Terrain Stats,
+    # with more info"): the map history 7.08 → now, builders/terrain_stats.py
+    ("terrain_grp", "Terrain", "terrain_741.html", [
+        ("terrain",       "Terrain",       "terrain_741.html"),
+        ("terrain_stats", "Terrain Stats", "terrain_stats.html"),
+    ]),
     # Buildings / map objectives — towers, barracks, tormentors.
     ("structures", "Structures", "structures.html", None),
 ]

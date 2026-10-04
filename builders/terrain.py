@@ -1235,17 +1235,23 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
     )
 
 
-def save_terrain_html():
-    subnav = _site.render_materials_subnav('terrain')
-
+def page_patches():
+    """The patches that get a Terrain page, newest first (Terrain Stats links its rows to them), with what
+    save_terrain_html needs to build them: (patches, notes, steps, diffs)."""
     notes = _terrain_notes_by_patch()
     steps = {s.patch: s for s in _map_versions.steps()}
     diffs = {p: _load_diff(p) for p in steps}
     quiet = _quiet(steps, notes, diffs)
-    patches = _pages([p for p in steps if p not in quiet], notes) or ["7.41"]
+    return (_pages([p for p in steps if p not in quiet], notes) or ["7.41"]), notes, steps, diffs
+
+
+def save_terrain_html():
+    subnav = _site.render_materials_subnav('terrain')
+
+    patches, notes, steps, diffs = page_patches()
     _os.makedirs(_site.DIST_DIR, exist_ok=True)
-    for stale in _glob.glob(_os.path.join(_site.DIST_DIR, "terrain_*.html")):
-        _os.remove(stale)                     # a page that went quiet must not linger in dist/
+    for stale in _glob.glob(_os.path.join(_site.DIST_DIR, "terrain_[0-9]*.html")):
+        _os.remove(stale)                     # a page that went quiet must not linger in dist/ (terrain_stats stays)
     total = sum(len(rows) for rows in notes.values())
     for ver in patches:
         page = _build_terrain_page(ver, patches, notes, steps.get(ver), diffs.get(ver), subnav)

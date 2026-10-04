@@ -1,0 +1,2078 @@
+{
+"_about": "Map history for Terrain Stats, from Oldgrowth versions.json (scripts/gen/map_history_table.py). A patch with 'same_as' shipped that patch's map file unchanged.",
+"patches": [
+{
+"patch": "7.08",
+"date": "2018-02-01",
+"sha8": "b6a7bd8f",
+"changes": "the first map file of the history",
+"n": {
+"trees": 2208,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.09",
+"date": "2018-02-15",
+"sha8": "2f5217e7",
+"changes": "trees +2 −3; towers moved: 2",
+"n": {
+"trees": 2207,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.10",
+"date": "2018-03-01",
+"sha8": "2f5217e7",
+"same_as": "7.09"
+},
+{
+"patch": "7.11",
+"date": "2018-03-15",
+"sha8": "1ac7282e",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2207,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.12",
+"date": "2018-03-29",
+"sha8": "1ac7282e",
+"same_as": "7.11"
+},
+{
+"patch": "7.13",
+"date": "2018-04-12",
+"sha8": "1ac7282e",
+"same_as": "7.11"
+},
+{
+"patch": "7.13b",
+"date": "2018-04-13",
+"sha8": "1ac7282e",
+"same_as": "7.11"
+},
+{
+"patch": "7.14",
+"date": "2018-04-26",
+"sha8": "1ac7282e",
+"same_as": "7.11"
+},
+{
+"patch": "7.15",
+"date": "2018-05-10",
+"sha8": "628a5cb7",
+"changes": "trees +1 −5; camp spawn boxes changed: 4; towers moved: 2; bounty runes moved: 1; power runes moved: 2",
+"n": {
+"trees": 2203,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.16",
+"date": "2018-05-27",
+"sha8": "628a5cb7",
+"same_as": "7.15"
+},
+{
+"patch": "7.17",
+"date": "2018-06-10",
+"sha8": "3a96c1eb",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2203,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.18",
+"date": "2018-06-25",
+"sha8": "3a96c1eb",
+"same_as": "7.17"
+},
+{
+"patch": "7.19",
+"date": "2018-07-29",
+"sha8": "d7c38abe",
+"changes": "trees +2 −0",
+"n": {
+"trees": 2205,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.19b",
+"date": "2018-09-01",
+"sha8": "dde129d2",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2205,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.19c",
+"date": "2018-09-14",
+"sha8": "c2f391d2",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2205,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.19d",
+"date": "2018-10-12",
+"sha8": "c2f391d2",
+"same_as": "7.19c"
+},
+{
+"patch": "7.20",
+"date": "2018-11-19",
+"sha8": "4972ab7e",
+"changes": "trees +414 −412; camps moved: 11; camp tiers changed: 4; camp spawn boxes changed: 14; towers moved: 3; bounty runes moved: 2",
+"n": {
+"trees": 2207,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.20b",
+"date": "2018-11-20",
+"sha8": "9b7c3942",
+"changes": "camp spawn boxes changed: 1",
+"n": {
+"trees": 2207,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.20c",
+"date": "2018-11-24",
+"sha8": "9b7c3942",
+"same_as": "7.20b"
+},
+{
+"patch": "7.20d",
+"date": "2018-11-30",
+"sha8": "018992e1",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2207,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.20e",
+"date": "2018-12-09",
+"sha8": "d487c7e0",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2207,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+6,
+4
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.21",
+"date": "2019-01-29",
+"sha8": "688635e8",
+"changes": "camp tiers changed: 2",
+"n": {
+"trees": 2207,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.21b",
+"date": "2019-02-16",
+"sha8": "688635e8",
+"same_as": "7.21"
+},
+{
+"patch": "7.21c",
+"date": "2019-03-02",
+"sha8": "8eb1d2b6",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2207,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.21d",
+"date": "2019-03-24",
+"sha8": "939f4e3e",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2207,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.22",
+"date": "2019-05-24",
+"sha8": "227f96d6",
+"changes": "trees +54 −53; camps moved: 3; camp spawn boxes changed: 5; towers moved: 1; bounty runes moved: 1",
+"n": {
+"trees": 2208,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.22b",
+"date": "2019-05-27",
+"sha8": "227f96d6",
+"same_as": "7.22"
+},
+{
+"patch": "7.22c",
+"date": "2019-06-09",
+"sha8": "227f96d6",
+"same_as": "7.22"
+},
+{
+"patch": "7.22d",
+"date": "2019-06-30",
+"sha8": "227f96d6",
+"same_as": "7.22"
+},
+{
+"patch": "7.22e",
+"date": "2019-07-14",
+"sha8": "227f96d6",
+"same_as": "7.22"
+},
+{
+"patch": "7.22f",
+"date": "2019-07-28",
+"sha8": "227f96d6",
+"same_as": "7.22"
+},
+{
+"patch": "7.22g",
+"date": "2019-09-06",
+"sha8": "2727e20c",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2208,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 0,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.22h",
+"date": "2019-09-29",
+"sha8": "2727e20c",
+"same_as": "7.22g"
+},
+{
+"patch": "7.23",
+"date": "2019-11-26",
+"sha8": "c7792658",
+"changes": "trees +308 −414; camps moved: 9; camp tiers changed: 2; camp spawn boxes changed: 10; bounty runes moved: 4; power runes moved: 2; outposts +2 −0; Roshan pits moved: 1",
+"n": {
+"trees": 2102,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.23a",
+"date": "2019-11-27",
+"sha8": "c7792658",
+"same_as": "7.23"
+},
+{
+"patch": "7.23b",
+"date": "2019-11-29",
+"sha8": "c7792658",
+"same_as": "7.23"
+},
+{
+"patch": "7.23c",
+"date": "2019-12-06",
+"sha8": "89ec0348",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2102,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 4,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.23d",
+"date": "2019-12-11",
+"sha8": "89ec0348",
+"same_as": "7.23c"
+},
+{
+"patch": "7.23e",
+"date": "2019-12-14",
+"sha8": "36051a20",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2102,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 2,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.23f",
+"date": "2020-01-07",
+"sha8": "9da06ad4",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2102,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 2,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.24",
+"date": "2020-01-26",
+"sha8": "0af1f34e",
+"changes": "trees +51 −46; camps moved: 1; camp spawn boxes changed: 1; bounty runes moved: 2; outposts moved: 2",
+"n": {
+"trees": 2107,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.24b",
+"date": "2020-02-26",
+"sha8": "630cef1a",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2107,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.25",
+"date": "2020-03-17",
+"sha8": "4e3fa123",
+"changes": "trees moved: 4",
+"n": {
+"trees": 2107,
+"camps": 18,
+"camp_tiers": [
+2,
+6,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.25a",
+"date": "2020-03-18",
+"sha8": "4e3fa123",
+"same_as": "7.25"
+},
+{
+"patch": "7.25b",
+"date": "2020-03-25",
+"sha8": "4e3fa123",
+"same_as": "7.25"
+},
+{
+"patch": "7.25c",
+"date": "2020-04-06",
+"sha8": "4e3fa123",
+"same_as": "7.25"
+},
+{
+"patch": "7.26",
+"date": "2020-04-17",
+"sha8": "4e3fa123",
+"same_as": "7.25"
+},
+{
+"patch": "7.26a",
+"date": "2020-04-21",
+"sha8": "4e3fa123",
+"same_as": "7.25"
+},
+{
+"patch": "7.26b",
+"date": "2020-04-28",
+"sha8": "4e3fa123",
+"same_as": "7.25"
+},
+{
+"patch": "7.26c",
+"date": "2020-05-02",
+"sha8": "4e3fa123",
+"same_as": "7.25"
+},
+{
+"patch": "7.27",
+"date": "2020-06-28",
+"sha8": "d89fa97a",
+"changes": "trees +5 −6; camps moved: 1; camp tiers changed: 5; camp spawn boxes changed: 3",
+"n": {
+"trees": 2106,
+"camps": 18,
+"camp_tiers": [
+4,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.27a",
+"date": "2020-07-04",
+"sha8": "d89fa97a",
+"same_as": "7.27"
+},
+{
+"patch": "7.27b",
+"date": "2020-07-15",
+"sha8": "d89fa97a",
+"same_as": "7.27"
+},
+{
+"patch": "7.27c",
+"date": "2020-07-17",
+"sha8": "d89fa97a",
+"same_as": "7.27"
+},
+{
+"patch": "7.27d",
+"date": "2020-08-26",
+"sha8": "d89fa97a",
+"same_as": "7.27"
+},
+{
+"patch": "7.28",
+"date": "2020-12-17",
+"sha8": "13fc024c",
+"changes": "trees +1 −3",
+"n": {
+"trees": 2104,
+"camps": 18,
+"camp_tiers": [
+4,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.28a",
+"date": "2020-12-22",
+"sha8": "13fc024c",
+"same_as": "7.28"
+},
+{
+"patch": "7.28b",
+"date": "2021-01-10",
+"sha8": "223003cd",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2104,
+"camps": 18,
+"camp_tiers": [
+4,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.28c",
+"date": "2021-02-19",
+"sha8": "09b9bd61",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2104,
+"camps": 18,
+"camp_tiers": [
+4,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 4,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.29",
+"date": "2021-04-09",
+"sha8": "4859e132",
+"changes": "trees +734 −548; camps moved: 15; camp tiers changed: 2; camp spawn boxes changed: 16; towers moved: 5; bounty runes +1 −3; power runes moved: 2; outposts moved: 2",
+"n": {
+"trees": 2290,
+"camps": 18,
+"camp_tiers": [
+4,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.29b",
+"date": "2021-04-16",
+"sha8": "77f8998a",
+"changes": "trees +5 −10",
+"n": {
+"trees": 2285,
+"camps": 18,
+"camp_tiers": [
+4,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.29c",
+"date": "2021-04-29",
+"sha8": "ae17bb72",
+"changes": "trees +6 −5",
+"n": {
+"trees": 2286,
+"camps": 18,
+"camp_tiers": [
+4,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.29d",
+"date": "2021-05-24",
+"sha8": "fdf5815a",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2286,
+"camps": 18,
+"camp_tiers": [
+4,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.30",
+"date": "2021-08-18",
+"sha8": "fdf5815a",
+"same_as": "7.29d"
+},
+{
+"patch": "7.30b",
+"date": "2021-08-23",
+"sha8": "fdf5815a",
+"same_as": "7.29d"
+},
+{
+"patch": "7.30c",
+"date": "2021-09-11",
+"sha8": "fdf5815a",
+"same_as": "7.29d"
+},
+{
+"patch": "7.30d",
+"date": "2021-09-25",
+"sha8": "fdf5815a",
+"same_as": "7.29d"
+},
+{
+"patch": "7.30e",
+"date": "2021-10-28",
+"sha8": "fdf5815a",
+"same_as": "7.29d"
+},
+{
+"patch": "7.31",
+"date": "2022-02-23",
+"sha8": "2824d065",
+"changes": "trees +4 −0; towers moved: 2; bounty runes moved: 2",
+"n": {
+"trees": 2290,
+"camps": 18,
+"camp_tiers": [
+4,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.31b",
+"date": "2022-02-28",
+"sha8": "2824d065",
+"same_as": "7.31"
+},
+{
+"patch": "7.31c",
+"date": "2022-05-04",
+"sha8": "2824d065",
+"same_as": "7.31"
+},
+{
+"patch": "7.31d",
+"date": "2022-06-08",
+"sha8": "3b93a543",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2290,
+"camps": 18,
+"camp_tiers": [
+4,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.32",
+"date": "2022-08-24",
+"sha8": "7aa57609",
+"changes": "trees +57 −44; camps +0 −2; camp spawn boxes +1 −3; bounty runes moved: 1; outposts moved: 1",
+"n": {
+"trees": 2303,
+"camps": 16,
+"camp_tiers": [
+2,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.32b",
+"date": "2022-08-30",
+"sha8": "187475a2",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2303,
+"camps": 16,
+"camp_tiers": [
+2,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.32c",
+"date": "2022-09-27",
+"sha8": "187475a2",
+"same_as": "7.32b"
+},
+{
+"patch": "7.32d",
+"date": "2022-11-29",
+"sha8": "187475a2",
+"same_as": "7.32b"
+},
+{
+"patch": "7.32e",
+"date": "2023-03-07",
+"sha8": "ff89b0d9",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2303,
+"camps": 16,
+"camp_tiers": [
+2,
+4,
+8,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 0,
+"lotus": 0,
+"wisdom": 0,
+"gates": 0,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 1,
+"tormentors": 0
+}
+},
+{
+"patch": "7.33",
+"date": "2023-04-20",
+"sha8": "6249be51",
+"changes": "trees +1838 −1578; camps +24 −12; camp tiers changed: 3; camp spawn boxes +24 −12; towers moved: 3; lotus pools +2 −0; twin gates +2 −0; Tormentors +2 −0; bounty runes moved: 2; wisdom runes +2 −0; outposts +4 −2; watchers +8 −0; Roshan pits +2 −1",
+"n": {
+"trees": 2563,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 8,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.33b",
+"date": "2023-04-25",
+"sha8": "04af1613",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2563,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 8,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.33c",
+"date": "2023-05-13",
+"sha8": "ff01e294",
+"changes": "trees +57 −84",
+"n": {
+"trees": 2536,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 8,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.33d",
+"date": "2023-06-15",
+"sha8": "ff01e294",
+"same_as": "7.33c"
+},
+{
+"patch": "7.33e",
+"date": "2023-07-13",
+"sha8": "ff01e294",
+"same_as": "7.33c"
+},
+{
+"patch": "7.34",
+"date": "2023-08-08",
+"sha8": "e4712e67",
+"changes": "trees +0 −1; outposts moved: 2; watchers moved: 4",
+"n": {
+"trees": 2535,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 8,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.34b",
+"date": "2023-08-14",
+"sha8": "e4712e67",
+"same_as": "7.34"
+},
+{
+"patch": "7.34c",
+"date": "2023-09-08",
+"sha8": "825b4fa4",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2535,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 8,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.34d",
+"date": "2023-10-05",
+"sha8": "689ba8d2",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2535,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 8,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.34e",
+"date": "2023-11-20",
+"sha8": "689ba8d2",
+"same_as": "7.34d"
+},
+{
+"patch": "7.35",
+"date": "2023-12-14",
+"sha8": "0fbe84fb",
+"changes": "trees +0 −4; watchers +2 −0",
+"n": {
+"trees": 2531,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.35b",
+"date": "2023-12-21",
+"sha8": "0fbe84fb",
+"same_as": "7.35"
+},
+{
+"patch": "7.35c",
+"date": "2024-02-21",
+"sha8": "29af3d9b",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2531,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.35d",
+"date": "2024-03-21",
+"sha8": "29af3d9b",
+"same_as": "7.35c"
+},
+{
+"patch": "7.36",
+"date": "2024-05-22",
+"sha8": "35eaa445",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2531,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.36a",
+"date": "2024-05-26",
+"sha8": "35eaa445",
+"same_as": "7.36"
+},
+{
+"patch": "7.36b",
+"date": "2024-06-05",
+"sha8": "35eaa445",
+"same_as": "7.36"
+},
+{
+"patch": "7.36c",
+"date": "2024-06-24",
+"sha8": "35eaa445",
+"same_as": "7.36"
+},
+{
+"patch": "7.37",
+"date": "2024-07-31",
+"sha8": "35eaa445",
+"same_as": "7.36"
+},
+{
+"patch": "7.37b",
+"date": "2024-08-14",
+"sha8": "35eaa445",
+"same_as": "7.36"
+},
+{
+"patch": "7.37c",
+"date": "2024-08-28",
+"sha8": "caeeeb2b",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2531,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.37d",
+"date": "2024-10-01",
+"sha8": "7ae179cb",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2531,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.37e",
+"date": "2024-11-19",
+"sha8": "7216d111",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2531,
+"camps": 28,
+"camp_tiers": [
+4,
+8,
+12,
+4
+],
+"towers": 22,
+"outposts": 4,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.38",
+"date": "2025-02-19",
+"sha8": "cf2153b0",
+"changes": "trees +1017 −1052; camps moved: 21; lotus pools moved: 2; twin gates moved: 2; Tormentors moved: 2; bounty runes moved: 2; wisdom shrines +2 −0; wisdom runes +0 −2; outposts +0 −2; watchers +14 −10; Roshan pits moved: 2",
+"n": {
+"trees": 2496,
+"camps": 28,
+"camp_tiers": [
+4,
+10,
+10,
+4
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 14,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.38b",
+"date": "2025-03-05",
+"sha8": "d92126db",
+"changes": "trees +2 −11",
+"n": {
+"trees": 2487,
+"camps": 28,
+"camp_tiers": [
+4,
+10,
+10,
+4
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 14,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.38c",
+"date": "2025-03-27",
+"sha8": "f6860ab2",
+"changes": "trees +152 −130; camps moved: 2; towers moved: 1; watchers moved: 1",
+"n": {
+"trees": 2509,
+"camps": 28,
+"camp_tiers": [
+4,
+10,
+10,
+4
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 14,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.39",
+"date": "2025-05-21",
+"sha8": "d5517810",
+"changes": "trees +290 −297; camps moved: 5; towers moved: 4; watchers moved: 1; lotus pools moved: 2; Roshan pits moved: 2; bounty runes moved: 1",
+"n": {
+"trees": 2502,
+"camps": 28,
+"camp_tiers": [
+4,
+10,
+10,
+4
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 14,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.39b",
+"date": "2025-05-29",
+"sha8": "851928c5",
+"changes": "trees +38 −27; camps moved: 2; towers moved: 1; watchers moved: 1",
+"n": {
+"trees": 2513,
+"camps": 28,
+"camp_tiers": [
+4,
+10,
+10,
+4
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 14,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.39c",
+"date": "2025-06-24",
+"sha8": "2fcec617",
+"changes": "watchers moved: 2",
+"n": {
+"trees": 2513,
+"camps": 28,
+"camp_tiers": [
+4,
+10,
+10,
+4
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 14,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.39d",
+"date": "2025-08-05",
+"sha8": "64e32b26",
+"changes": "trees +0 −3",
+"n": {
+"trees": 2510,
+"camps": 28,
+"camp_tiers": [
+4,
+10,
+10,
+4
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 14,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.39e",
+"date": "2025-10-02",
+"sha8": "4346552d",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2510,
+"camps": 28,
+"camp_tiers": [
+4,
+10,
+10,
+4
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 14,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.40",
+"date": "2025-12-15",
+"sha8": "cb69e349",
+"changes": "trees +239 −293; camps moved: 9; towers moved: 1; watchers +4 −8; wisdom shrines moved: 2",
+"n": {
+"trees": 2456,
+"camps": 28,
+"camp_tiers": [
+4,
+14,
+6,
+4
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.40b",
+"date": "2025-12-23",
+"sha8": "cb69e349",
+"same_as": "7.40"
+},
+{
+"patch": "7.40c",
+"date": "2026-01-21",
+"sha8": "e84183fb",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2456,
+"camps": 28,
+"camp_tiers": [
+4,
+14,
+6,
+4
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.41",
+"date": "2026-03-24",
+"sha8": "7fb22d91",
+"changes": "trees +324 −304; camps moved: 7; towers moved: 2; watchers moved: 3; lotus pools moved: 2; Tormentors moved: 2; twin gates moved: 2",
+"n": {
+"trees": 2476,
+"camps": 28,
+"camp_tiers": [
+6,
+14,
+6,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.41a",
+"date": "2026-03-28",
+"sha8": "dbb3027e",
+"changes": "trees +0 −1",
+"n": {
+"trees": 2475,
+"camps": 28,
+"camp_tiers": [
+6,
+14,
+6,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.41b",
+"date": "2026-04-07",
+"sha8": "dbb3027e",
+"same_as": "7.41a"
+},
+{
+"patch": "7.41c",
+"date": "2026-05-06",
+"sha8": "0b5a09de",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2475,
+"camps": 28,
+"camp_tiers": [
+6,
+14,
+6,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.41d",
+"date": "2026-06-04",
+"sha8": "9b4ca69f",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2475,
+"camps": 28,
+"camp_tiers": [
+6,
+14,
+6,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.41e",
+"date": "2026-07-30",
+"sha8": "f049eadf",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2475,
+"camps": 28,
+"camp_tiers": [
+6,
+14,
+6,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+},
+{
+"patch": "7.41f",
+"date": "2026-09-15",
+"sha8": "412137a1",
+"changes": "no object moved (the map file still changed)",
+"n": {
+"trees": 2475,
+"camps": 28,
+"camp_tiers": [
+6,
+14,
+6,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+}
+}
+]
+}

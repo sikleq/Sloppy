@@ -370,8 +370,21 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `write_head`); `?from=terrain_<code>` shows the patch page's bottom-left back arrow, pointed at that map. Dotted
   underline like the notes' picture buttons. The "On the map" tiles pop out on hover (`.tf-tile:hover`, scale
   1.12, a soft gold glow, the dynamics cells' z-index trick) — the owner: "softly, like our dynamics cells".
-- **Changelog animations** — `tools/changelog_terrain_anim.py [layer]` records one map layer's changes on four
-  patches (`LAYERS`: trees in every mode, camps, watchers, towers, no-ward ground), needs dist/ on :8799.
+- **Changelog animations** — `tools/changelog_terrain_anim.py [layer]` records the trees in every mode on four
+  patches (the other layers moved to the slider sweeps, `tools/changelog_terrain_sweep.py`: no two news show the same
+  layer); needs dist/ on :8799.
+- **Terrain Stats (2026-10-04)** — the owner: "add the Oldgrowth table somewhere, carefully, not breaking the Terrain
+  page visually or technically — a sub-tab of the Terrain button, Terrain Stats, with more info". Materials ▸ Terrain is
+  now a group (`MATERIALS_GROUPS` "terrain_grp": Terrain, Terrain Stats). `builders/terrain_stats.py` →
+  dist/terrain_stats.html (build step "tstats"): tiles (patches, map files, trees and camps since 7.08), an inline-SVG
+  step chart of the trees with the 5 files that moved the most trees labelled ("7.33 ±3416"), and one row per map file,
+  newest first — the patches that shipped it ("also 7.22b–7.22f"), 15 counts that changed over the years (trees, camps
+  and each tier, outposts, watchers, lotus pools, wisdom, Twin Gates, bounty runes, shrines, Roshan pits, Tormentors;
+  towers / power runes are constant, no column), each with its change from the file before, "what moved", a link to its
+  Terrain page (`terrain.page_patches()`) and to its Oldgrowth picture. Data: `data/map/map_history.json` from
+  Oldgrowth's versions.json (`scripts/gen/map_history_table.py`, rerun when Oldgrowth gains a patch) — the CI build
+  can't reach the Oldgrowth folder. Styles all under `.terrain-stats-page` / `.ts-*`; terrain.py's stale-page sweep is
+  `terrain_[0-9]*.html`, so it never deletes terrain_stats.html.
 - **Bigger pictures with a minimap (2026-10-03)** — the owner: "when you show where something is, add a minimap
   with a mark, otherwise it's unclear; the pictures should be bigger and the camera a bit further out". The row
   picture is 726 x 360 (360-px halves, shown 480 x 238 css), the large copy 1450 x 720; every spot's square is

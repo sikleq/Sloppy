@@ -4,6 +4,21 @@
     {
       "date": "2026-10-04",
       "category": "Terrain",
+      "title": "Terrain Stats: the map history in one table",
+      "link": "terrain_stats.html",
+      "items": [
+        "A new page under the Terrain tab: every map file since 7.08, one row each",
+        "Trees, camps by tier, watchers, runes and more, with the change from the file before",
+        "A chart of the trees over the years, the big reworks marked"
+      ],
+      "shots": [
+        "icons/changelog/2026-10-04_terrain_stats.webp",
+        "icons/changelog/2026-10-04_terrain_stats_table.webp"
+      ]
+    },
+    {
+      "date": "2026-10-04",
+      "category": "Terrain",
       "title": "Terrain: every map since 7.08",
       "link": "https://github.com/sikleq/Oldgrowth",
       "items": [
@@ -46,10 +61,6 @@
       "shots": [
         "icons/changelog/2026-10-03_terrain_notes.webp",
         "icons/changelog/2026-10-03_terrain_trees_modes.webp",
-        "icons/changelog/2026-10-03_terrain_camps_anim.webp",
-        "icons/changelog/2026-10-03_terrain_watchers_anim.webp",
-        "icons/changelog/2026-10-03_terrain_towers_anim.webp",
-        "icons/changelog/2026-10-03_terrain_nowards_anim.webp",
         "icons/changelog/2026-10-03_terrain_fullscreen.webp"
       ]
     },
@@ -990,7 +1001,6 @@
       "shots": [
         "icons/changelog/2026-09-25_controls.webp",
         "icons/changelog/2026-09-25_menu.webp",
-        "icons/changelog/2026-09-25_tags.webp",
         "icons/changelog/2026-09-25_terrain_bar.webp"
       ]
     },

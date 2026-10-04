@@ -30,6 +30,9 @@ bp.TITLE = "Sloppy: вся история карты Dota 2"
 bp.COVER_HTML = (bp.COVER_HTML
                  .replace("Новый облик · патч 7.38 · новые страницы · sikleq.github.io/Sloppy",
                           "65 карт · буквенные патчи тоже · sikleq.github.io/Sloppy")
+                 # the site's own icon, not the helm (the owner 2026-10-04: "the site icon instead of the helm")
+                 .replace("http://localhost:8799/icons/ui/gothic/icon_helm.png",
+                          (ROOT / "icons" / "logo_knight.png").as_uri())
                  # smaller and lower than the weekly cover's: the bottom line stays readable
                  .replace(".shot{position:absolute;right:-40px;bottom:-30px;width:640px;",
                           ".shot{position:absolute;right:-30px;bottom:-95px;width:560px;")
@@ -191,10 +194,20 @@ def _prepare_images():
     return names
 
 
+COVER_NAME = "cover_site.jpg"     # a new name for a changed cover: Telegram keeps a fetched picture by its URL
+
+
+def _cover(subtitle):
+    name = _plain_cover(subtitle)
+    (bp.IMG_DIR / name).replace(bp.IMG_DIR / COVER_NAME)
+    return COVER_NAME
+
+
 if __name__ == "__main__":
     bp.OUT.mkdir(parents=True, exist_ok=True)
     _facts_shot()
     _oldgrowth_shot()
     _cover_shot()
     bp._prepare_images = _prepare_images
+    _plain_cover, bp._cover = bp._cover, _cover
     bp.build()

@@ -106,6 +106,18 @@ def test_every_new_feature_comes_with_a_picture_small_changes_with_icons():
     assert "clog-thumb" not in clog.render(entries)
 
 
+def test_no_picture_shows_in_two_news():
+    """The owner 2026-10-04: "Terrain changes, shown on the map partly repeats the animated shots of Terrain: every
+    map since 7.08" — a picture belongs to one entry, and no two entries show the same layer animation."""
+    seen = {}
+    for e in clog.load_entries():
+        for p in e.get("shots", []):
+            assert p not in seen, (p, seen.get(p), e["title"])
+            seen[p] = e["title"]
+    shots_0403 = next(e for e in clog.load_entries() if e["title"] == "Terrain changes, shown on the map")["shots"]
+    assert not [p for p in shots_0403 if "_anim.webp" in p]          # the layer comparisons are the 10-04 sweeps
+
+
 def test_notes_are_short_and_heroes_are_icons():
     """The owner 2026-10-03: "too much text, shorten it; where there are hero names, put their small icons instead";
     "Show more changes isn't level with the other items"."""

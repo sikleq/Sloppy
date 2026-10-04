@@ -30,11 +30,8 @@ MODES = ALL + (("moved", MOVED, ("moved",)),
 # chip key -> (caption, patches whose Terrain page has the chip, modes, file name)
 LAYERS = {
     "trees": ("Trees", ("7.38", "7.39", "7.40", "7.41"), MODES, "2026-10-03_terrain_trees_modes.webp"),
-    "camps": ("Camps", ("7.38", "7.39", "7.40", "7.41"), ALL, "2026-10-03_terrain_camps_anim.webp"),
-    "watchers": ("Watchers", ("7.38", "7.39", "7.40", "7.41"), ALL, "2026-10-03_terrain_watchers_anim.webp"),
-    "towers": ("Towers", ("7.38c", "7.39", "7.40", "7.41"), ALL, "2026-10-03_terrain_towers_anim.webp"),
-    # the patches with the most cells changed: 7.39d / 7.41d moved a few, unseen on the whole map
-    "nowards": ("No-ward ground", ("7.38", "7.40", "7.41", "7.41c"), ALL, "2026-10-03_terrain_nowards_anim.webp"),
+    # the other layers show in the slider sweeps (tools/changelog_terrain_sweep.py, the owner 2026-10-04: no two
+    # news with the same layer animation); add one back here as ("Camps", patches, ALL, file) if a news needs it
 }
 # what the outline colours mean, per layer ("all changes" frames)
 LEGEND = {"nowards": (("wards allowed", REMOVED), ("no wards", ADDED))}

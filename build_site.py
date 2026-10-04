@@ -13,6 +13,7 @@ Pages are built in dependency order:
   hdyn    -- hero dynamics matrix
   idyn    -- item dynamics matrix
   terrain -- terrain comparison
+  tstats  -- Terrain Stats (the map history 7.08 -> now)
 """
 
 import shutil
@@ -58,6 +59,7 @@ STEPS = [
     ("hdyn",    "builders/heroes_dyn.py",   "Hero Dynamics matrix"),
     ("idyn",    "builders/items_dyn.py",    "Item Dynamics matrix"),
     ("terrain", "builders/terrain.py",      "Terrain comparison"),
+    ("tstats",  "builders/terrain_stats.py", "Terrain Stats (map history)"),
     ("echg",    "builders/entity_changes.py", "Hero / Item Changes pages"),
     ("clog",    "builders/changelog.py",   "Site changelog page"),
 ]

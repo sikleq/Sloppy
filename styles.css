@@ -9952,6 +9952,47 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 .tf-none { color: var(--text-dim); }
 .tm-add-text { color: #6fe089; font-weight: 600; }
 .tm-rem-text { color: #ff7a7a; font-weight: 600; }
+/* ---- Terrain Stats (builders/terrain_stats.py): the map history 7.08 → now under Materials ▸ Terrain (the owner
+   2026-10-04: "carefully, not breaking the Terrain page — a sub-tab, Terrain Stats, with more info"). Every rule is
+   under .terrain-stats-page, so the Terrain pages never see them. ---- */
+.terrain-stats-page .ts-wrap { max-width: 1320px; margin: 0 auto; padding: 4px 0 40px; }
+.terrain-stats-page .ts-intro { margin: 6px 0 10px; color: var(--text-dim); font-size: 13.5px; line-height: 1.5; }
+.terrain-stats-page .ts-intro a { color: inherit; text-decoration: underline dotted rgba(227, 196, 106, 0.5);
+  text-underline-offset: 3px; }
+.terrain-stats-page .ts-tiles { max-width: 760px; }
+.terrain-stats-page .ts-chart { display: block; width: 100%; max-width: 1000px; height: auto; margin: 4px 0 6px; }
+.ts-chart .ts-grid { stroke: rgba(255, 255, 255, 0.07); stroke-width: 1; }
+.ts-chart .ts-tick { stroke: rgba(255, 255, 255, 0.25); stroke-width: 1; }
+.ts-chart .ts-ylab, .ts-chart .ts-xlab { fill: var(--text-dim); font-size: 11px; font-family: var(--font-ui, sans-serif); }
+.ts-chart .ts-ylab { text-anchor: end; }
+.ts-chart .ts-xlab { text-anchor: middle; }
+.ts-chart .ts-line { fill: none; stroke: #e3c46a; stroke-width: 2; stroke-linejoin: round; }
+.ts-chart .ts-dot { fill: #e3c46a; }
+.ts-chart .ts-dot-big { fill: #fff3d6; stroke: #e3c46a; stroke-width: 1.5; }
+.ts-chart .ts-mark { fill: #f0e3c2; font-size: 11.5px; font-weight: 700; text-anchor: middle; }
+.terrain-stats-page .ts-table-wrap { overflow-x: auto; border: 1px solid rgba(227, 196, 106, 0.18); border-radius: 4px; }
+.ts-table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+.ts-table th, .ts-table td { padding: 5px 6px; text-align: center; vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06); border-right: 1px solid rgba(255, 255, 255, 0.04); }
+.ts-table thead th { position: sticky; top: 0; z-index: 1; background: #17140f; color: var(--text-dim);
+  font-size: 10.5px; font-weight: 600; line-height: 1.2; }
+.ts-table thead th img { display: block; margin: 0 auto 3px; width: 16px; height: 16px; }
+.ts-table thead th span { display: block; white-space: nowrap; }
+.ts-table tbody tr:hover td { background: rgba(227, 196, 106, 0.05); }
+.ts-table td.ts-file { white-space: nowrap; font-weight: 700; color: var(--text-bright); }
+.ts-table td.ts-file a { color: inherit; text-decoration: underline dotted rgba(227, 196, 106, 0.5); text-underline-offset: 3px; }
+.ts-table .ts-also { display: block; font-weight: 400; font-size: 10.5px; color: var(--text-dim); white-space: normal;
+  max-width: 120px; margin: 1px auto 0; }
+.ts-table td.ts-date { white-space: nowrap; color: var(--text-dim); }
+.ts-table td.ts-changed { color: var(--text-bright); font-weight: 700; }
+.ts-table .ts-delta { display: block; font-size: 10px; font-weight: 600; }
+.ts-table .ts-up { color: #6fe089; }
+.ts-table .ts-down { color: #ff7a7a; }
+.ts-table .ts-moved { text-align: left; min-width: 240px; max-width: 360px; color: var(--text-main); font-size: 12px; }
+.ts-table thead th.ts-moved { text-align: left; }
+.ts-table a.ts-pic { color: var(--text-dim); text-decoration: underline dotted rgba(227, 196, 106, 0.4);
+  text-underline-offset: 3px; }
+.ts-table a.ts-pic:hover { color: var(--gold); }
 
 /* ---- patch picker (lives in the change-list heading) + per-patch panes ---- */
 /* The picker reuses the calendar year-picker structure but in the terrain
