@@ -155,7 +155,8 @@ def main() -> int:
             dst = _dist / name
             if dst.exists():
                 shutil.rmtree(dst)
-            shutil.copytree(src, dst)
+            # icons/ref holds third-party / reference pictures that .gitignore keeps out of the site — never deploy it
+            shutil.copytree(src, dst, ignore=shutil.ignore_patterns("ref") if name == "icons" else None)
     # Minify CSS and JS copies in dist/ (source files stay readable)
     _minify_assets(_dist)
     print("  [OK]")

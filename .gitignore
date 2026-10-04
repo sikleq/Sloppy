@@ -20,6 +20,13 @@ _ability_icons.txt
 # pytest cache
 .pytest_cache/
 
+# Local leftovers that never belong in the repo (audit 2026-10-04): Windows folder settings, local reports,
+# the telegra.ph post builder's output (its pictures live in icons/telegraph/), icon previews
+Desktop.ini
+outputs/
+tools/telegraph_post/out*/
+_preview_*.png
+
 # IDE / editor local config
 .claude/*
 !.claude/settings.local.json

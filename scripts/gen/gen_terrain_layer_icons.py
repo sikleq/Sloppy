@@ -364,8 +364,10 @@ def main(only=()):
     for i, (name, im) in enumerate(cells):
         big = im.resize((ICON_RES * 3, ICON_RES * 3), Image.NEAREST)
         mont.alpha_composite(big, ((i % cols) * ICON_RES * 3, (i // cols) * ICON_RES * 3))
-    mont.save(os.path.join(_ROOT, "_preview_tc_icons.png"))
-    print("montage -> _preview_tc_icons.png")
+    preview = os.path.join(_ROOT, ".cache", "_preview_tc_icons.png")     # a look only — kept out of the repo root
+    os.makedirs(os.path.dirname(preview), exist_ok=True)
+    mont.save(preview)
+    print("montage ->", os.path.relpath(preview, _ROOT))
 
 
 if __name__ == "__main__":
