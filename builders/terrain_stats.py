@@ -26,7 +26,8 @@ DATA = _os.path.join(_HERE, "data", "map", "map_history.json")
 OG_REPO = "https://github.com/sikleq/Oldgrowth"
 OG_PAGES = "https://sikleq.github.io/Oldgrowth/versions/"
 ASSET_VERSION = _site.compute_asset_version()
-# (key, label, icon) — every kind of object; "boxes" (camp spawn boxes) has no count, only its changes
+# (key, label, icon) — every kind of object (camp spawn boxes left out: the column was nearly always empty, the owner
+# 2026-10-04)
 COLUMNS = (
     ("trees", "Trees", "ui/gothic/tc_trees"),
     ("camps", "Camps", "camps/creepcamp_mid"),
@@ -34,7 +35,6 @@ COLUMNS = (
     ("tier1", "Medium", "camps/creepcamp_mid"),
     ("tier2", "Large", "camps/creepcamp_big"),
     ("tier3", "Ancient", "camps/creepcamp_ancient"),
-    ("boxes", "Spawn boxes", "ui/gothic/icon_spawnbox"),
     ("towers", "Towers", "ui/gothic/tc_towers"),
     ("outposts", "Outposts", "ui/gothic/tc_outposts"),
     ("watchers", "Watchers", "ui/gothic/tc_watchers"),
@@ -84,6 +84,18 @@ def load():
         elif r.get("same_as") in by:
             by[r["same_as"]]["also"].append(r["patch"])
     return files
+
+
+def group(files):
+    """Map files with nothing different from the one before — the same counts, nothing moved (7.41c … 7.41f) — share
+    the earlier file's row (the owner 2026-10-04: "versions that don't differ at all — glue them, no value changes")."""
+    rows = []
+    for f in files:
+        if rows and not f["moves"] and f["n"] == rows[-1]["n"]:
+            rows[-1] = {**rows[-1], "also": rows[-1]["also"] + [f["patch"]] + f["also"]}
+        else:
+            rows.append(f)
+    return rows
 
 
 def _ranges(patches):
@@ -175,19 +187,16 @@ def chart_svg(files, w=1300, h=260):
     labels, points = [], []
     for i, (f, dt) in enumerate(zip(files, dates)):
         x, y = X(dt), Y(ys[i])
-        t = f["moves"].get("trees", {})
         big = i in top and churn(f)
-        if big:                                                         # a plate, so the line under it never cuts it
-            lw = 112
+        if big:              # the version only, on a plate the line never cuts (the owner: no "+1838 −1578" there)
+            lw = 14 + len(f["patch"]) * 7.5
             ly = y - 30 if y - 30 > 6 else y + 12
             lx = min(max(x - lw / 2, pad_l + 2), right - lw - 2)
             labels.append(f'<g class="ts-mark"><rect x="{lx}" y="{ly}" width="{lw}" height="20" rx="3"/>'
-                          f'<text x="{lx + lw / 2}" y="{ly + 14}"><tspan class="ts-mark-v">{_esc(f["patch"])}</tspan>'
-                          f' <tspan class="ts-mark-add">+{t.get("add", 0)}</tspan>'
-                          f' <tspan class="ts-mark-rem">−{t.get("rem", 0)}</tspan></text></g>')
-        # hover: the point grows and its value shows (CSS :hover on the group; a wide invisible target)
-        tip = f"{f['patch']} · {ys[i]} trees"
-        tw = 9 + len(tip) * 6.4
+                          f'<text x="{lx + lw / 2}" y="{ly + 14}">{_esc(f["patch"])}</text></g>')
+        # hover: the point grows and shows its tree count only (CSS :hover on the group; a wide invisible target)
+        tip = str(ys[i])
+        tw = 14 + len(tip) * 7
         tx = min(max(x - tw / 2, pad_l + 2), right - tw - 2)
         ty = y + 14 if y - 30 < pad_t else y - 30
         points.append(f'<g class="ts-pt"><circle class="ts-hit" cx="{x}" cy="{y}" r="9"/>'
@@ -229,12 +238,11 @@ def _cell(f, prev, key):
 
 
 def table_html(files, pages):
-    head = (f'<th class="ts-file">{_icon("ui/gothic/icon_terrain")}<span>Map file</span></th>'
-            f'<th>{_icon("ui/gothic/icon_calendar")}<span>Date</span></th>'
+    head = ('<th class="ts-file"><span>Map file</span></th><th><span>Date</span></th>'
             + "".join(f'<th>{_icon(icon)}<span>{_esc(label)}</span></th>' for _k, label, icon in COLUMNS)
             + '<th><span>Map</span></th>')
     rows, prev = [], None
-    for f in files:
+    for f in group(files):
         ver = f["patch"]
         link = (f'<a href="{_terrain._terrain_filename(ver)}">{_esc(ver)}</a>' if ver in pages else _esc(ver))
         also = f'<span class="ts-also">also {_esc(_ranges(f["also"]))}</span>' if f["also"] else ""

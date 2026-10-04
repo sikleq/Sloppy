@@ -29,15 +29,19 @@ def test_every_map_file_is_one_row_with_the_patches_that_shipped_it():
 def test_cells_show_added_removed_and_moved():
     files = ts.load()
     table = ts.table_html(files, {"7.41", "7.40"})
-    assert table.count("<tr>") == 66 and table.index(">7.41f<") < table.index(">7.08<")    # newest first
+    rows = ts.group(files)                                             # identical files glued (7.41a … 7.41f)
+    assert table.count("<tr>") == len(rows) + 1 and len(rows) < 65
+    assert table.index(">7.41a<") < table.index(">7.08<")              # newest first
+    glued = next(r for r in rows if r["patch"] == "7.41a")
+    assert glued["also"] == ["7.41b", "7.41c", "7.41d", "7.41e", "7.41f"] and ">also 7.41b–7.41f<" in table
+    assert "Spawn boxes" not in table and "icon_calendar" not in table and "icon_terrain" not in table
     assert '<a href="terrain_741.html">7.41</a>' in table and '<a href="terrain_739.html">' not in table
     row = table.split('<a href="terrain_741.html">7.41</a>', 1)[1].split("</tr>", 1)[0]
     assert '<span class="ts-up">+324</span> <span class="ts-down">−304</span>' in row         # trees
     assert '<span class="ts-moved">7 moved</span>' in row and '<span class="ts-moved">2 moved</span>' in row
     assert "What moved" not in table and "picture" not in table
     assert 'src="icons/maps/thumbs/' in table and 'class="ts-thumb"' in table
-    assert 'icons/ui/gothic/icon_calendar.png' in table and 'icons/ui/gothic/icon_terrain.png' in table
-    assert 'icons/ui/gothic/tc_shrines.png' in table and ">15-09-26<" in table
+    assert 'icons/ui/gothic/tc_shrines.png' in table and ">28-03-26<" in table
     for f in files:                                                    # every square and icon is there
         assert os.path.exists(os.path.join(_ROOT, "icons", "maps", "thumbs", f["sha8"] + ".webp")), f["patch"]
     for _k, _label, icon in ts.COLUMNS:
@@ -49,8 +53,8 @@ def test_tiles_chart_and_the_terrain_menu():
     tiles = ts.tiles_html(files, 118)
     assert '<a class="tf-tile ts-tile-link" href="https://github.com/sikleq/Oldgrowth">' in tiles
     chart = ts.chart_svg(files)
-    assert chart.count('class="ts-mark"') == 5 and '<tspan class="ts-mark-v">7.33</tspan>' in chart
-    assert chart.count('class="ts-pt"') == 65 and "7.38 · 2496 trees" in chart          # values on hover
+    assert chart.count('class="ts-mark"') == 5 and '">7.33</text></g>' in chart and "+1838" not in chart  # versions only
+    assert chart.count('class="ts-pt"') == 65 and '">2496</text>' in chart and " trees<" not in chart  # count on hover
     assert 'class="ts-grid ts-grid-major" x1=' in chart and 'class="ts-axis"' in chart
     groups = {g[0]: g for g in site.MATERIALS_GROUPS}
     assert [c[0] for c in groups["terrain_grp"][3]] == ["terrain", "terrain_stats"]

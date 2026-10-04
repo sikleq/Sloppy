@@ -376,15 +376,17 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
 - **Terrain Stats (2026-10-04)** — the owner: "add the Oldgrowth table somewhere, carefully, not breaking the Terrain
   page visually or technically — a sub-tab of the Terrain button, Terrain Stats, with more info". Materials ▸ Terrain is
   now a group (`MATERIALS_GROUPS` "terrain_grp": Terrain, Terrain Stats). `builders/terrain_stats.py` →
-  dist/terrain_stats.html (build step "tstats"), left-aligned like every Materials page (no intro): tiles (patches,
-  "65 map files" linking to the Oldgrowth repo with a dotted label, trees and camps since 7.08); an inline-SVG step chart
-  of the trees on a faint grid (a line per 100 trees and per year, faint axes), each point's value on hover (CSS
-  `.ts-pt:hover .ts-tip`), the 5 files that moved the most trees on dark plates ("7.33 +1838 −1578", + green, − red);
-  and one row per map file, newest first, full width — the patches that shipped it ("also 7.22b–7.22f"), the date as
-  dd-mm-yy, 18 kinds of object (trees, camps and each tier, spawn boxes, towers, outposts, watchers, lotus pools,
+  dist/terrain_stats.html (build step "tstats"), left-aligned like every Materials page (no intro), the headings 10 px
+  in: tiles centred (patches, "65 map files" linking to the Oldgrowth repo with a dotted label, trees and camps since
+  7.08); an inline-SVG step chart of the trees on a faint grid (a line per 100 trees and per year, faint axes), each
+  point's tree count on hover (CSS `.ts-pt:hover .ts-tip`), the 5 files that moved the most trees labelled with their
+  version only, on dark plates; and the table, newest first, full width — map files with nothing different from the
+  one before glued into its row (`group`: 65 files → 33 rows, "7.41a also 7.41b–7.41f"), the date as dd-mm-yy, no icon
+  on Map file / Date, 17 kinds of object (trees, camps and each tier, towers, outposts, watchers, lotus pools,
   wisdom, Twin Gates, bounty / power runes, shrines — `tc_shrines`, a stone well drawn by gen_terrain_layer_icons.py —,
   Roshan pits, Tormentors), each cell its count plus what changed since the file before: added green, removed red,
-  moved / changed yellow (no "what moved" sentence column; the owner: "show moved like removed / added, in yellow"),
+  moved / changed yellow (no "what moved" sentence column; the owner: "show moved like removed / added, in yellow";
+  no Spawn boxes column — "nearly always empty"),
   and a 28-px square of the map (`icons/maps/thumbs/<sha8>.webp`, scripts/gen/map_thumbs.py) linking to its Oldgrowth
   picture. Data: `data/map/map_history.json` (counts + `moves` parsed from the "what moved" text) from Oldgrowth's
   versions.json (`scripts/gen/map_history_table.py`, rerun when Oldgrowth gains a patch) — the CI build can't reach the
