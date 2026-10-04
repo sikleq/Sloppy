@@ -10924,6 +10924,9 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 }
 .clog-shot:hover { border-color: var(--gold); }
 .clog-shot img, .clog-shot:hover img { border: 0; border-radius: 3px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55); }
+/* a tall shot (the 720x760 map sweeps) no taller than a wide one shows — the owner 2026-10-05: "the animation is too
+   big, a third of the screen"; click still opens it full size */
+.clog-shot img { max-height: 340px; width: auto; }
 /* Patch-page toolbar: tags and group chips in ONE row, no "Tags:" / "Group:" labels — a thin
    vertical line parts them, like the hero / item / unit pages. */
 .legend-stack { flex-direction: row; align-items: center; gap: 6px; }

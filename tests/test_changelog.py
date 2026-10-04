@@ -262,3 +262,11 @@ def test_hero_slots_ignore_the_ability_draft_list():
     assert inv.index("Invoke") < inv.index("Deafening Blast") and inv.index("Exort") < inv.index("Invoke")
     et = _hero_kit("elder_titan")
     assert et.index("Echo Stomp") < et.index("Astral Spirit") < et.index("Natural Order") < et.index("Earth Splitter")
+
+
+def test_tall_shots_are_capped_like_wide_ones():
+    """The 720x760 map sweeps filled a third of the screen (the owner 2026-10-05): a changelog picture is shown at
+    most 340 px tall, narrower if it must; the lightbox still opens it full size."""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    css = open(os.path.join(root, "styles.css"), encoding="utf-8").read()
+    assert ".clog-shot img { max-height: 340px; width: auto; }" in css

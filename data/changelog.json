@@ -16,6 +16,13 @@
       "title": "Terrain: [[icons/ui/gothic/tc_nowards.png|No-ward ground]] drawn stronger"
     },
     {
+      "date": "2026-10-05",
+      "category": "Site",
+      "minor": true,
+      "fix": true,
+      "title": "Changelog: the tall map animations no longer fill a third of the screen"
+    },
+    {
       "date": "2026-10-04",
       "category": "Terrain",
       "title": "Terrain: every map since 7.08, every change shown",
