@@ -386,7 +386,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   with nothing different from the one before glued into its row (`group`: 65 files → 33 rows), the "Map version" a
   range ("7.35 – 7.37e", the owner: "easier than listing them"), the date as dd-mm-yy, no icon on Map version / Date,
   17 kinds of object (trees, camps and each tier, towers, outposts, watchers, lotus pools,
-  wisdom, Twin Gates, bounty / power runes, shrines — `tc_shrines`, a stone well drawn by gen_terrain_layer_icons.py —,
+  wisdom, Twin Gates, bounty / power runes, shrines — `tc_shrines`: the game's own minimap icon of the old healing shrines,
+  `minimap_miscbuilding` (npc_units.txt "MinimapIcon" of npc_dota_*_healers), tinted green by gen_terrain_layer_icons.py
+  `shrines_icon`; a drawn stone well came first, the owner 2026-10-04: "nothing like the game, not the others' style" —,
   Roshan pits, Tormentors), each cell its count plus what changed since the file before: the RESULT of what was added
   and removed ("+20" green / "−9" red / "±0" — the owner: "not +734 −548, write the result, +186"; the Terrain page's
   "Changed in the map file" chips likewise, `_chip`), moved / changed yellow (no "what moved" sentence column; the owner: "show moved like removed / added, in yellow";
@@ -419,7 +421,13 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   collinear pieces joined), so a grove is one dashed contour like the solid one; discs stay circles. Width 0.85 ×
   the solid stroke, dash 1.25 ×, gap 0.9 × (trees: 1.36 / 2.0 / 1.44 viewBox units). First try (10-03) masked the
   merged contour with 45° stripes — the owner 10-04: "too thick a dashed line with few gaps; take the outline we
-  already draw round a tree and just make it dashed". No-ward cells stay filled, they are areas, not outlines. **A picture from another patch (2026-10-03)** — the owner asked for pictures of 7.41's "Radiant offlane
+  already draw round a tree and just make it dashed". **Trees since 2026-10-04: the square itself** — the owner,
+  next to the red dashed contour round a grove and the row pictures' coloured squares: "not an outline round the
+  square — outline the square itself in the colour of its change, only dashed". `_square_outlines` (trees only,
+  `_HL_PER_SQUARE`): each changed tree's own 6.4 square (`_HL_SHAPE["trees"]` = the tree layer's half side) gets its
+  border in the change colour — dashed on the old side over a 35%-opacity solid of the same colour (so the tree's
+  green border does not show in the gaps), solid on the new side, a faint dashed square where a moved tree stood.
+  No union, no mask; camps, towers and the rest keep their ring. No-ward cells stay filled, they are areas, not outlines. **A picture from another patch (2026-10-03)** — the owner asked for pictures of 7.41's "Radiant offlane
   tier 2 tower has been adjusted slightly to the left", which the map file did in 7.40 (37 units west), not 7.41: a
   spot `[x, y, "7.40"]` pictures that patch's two maps (`spot_patch`; its own changes outlined, the entry's marks
   and tier icons left out), so the note shows 7.40c → 7.41 with the tower marked white (`"mark_kind": "towers"`,

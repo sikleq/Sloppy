@@ -72,8 +72,7 @@ def build():
     # Chaos Knight
     W(hero_header("Chaos Knight"))
     W(ul_open())
-    W(li("Base Damage increased by 3", bstat_h("Chaos Knight", "AttackDamageMin", "7.41", 3), extra=note_box(hero="Chaos Knight", field="AttackDamageMin", before_patch="7.41")))
-    W(li("Damage at level 1 increased from 53–73 to 56–76", br(53, 73, 56, 76)))
+    W(li("Base Damage increased by 3", bstat_h("Chaos Knight", "AttackDamageMin", "7.41", 3), extra=note_box(hero="Chaos Knight", field="AttackDamageMin", before_patch="7.41") + inline_note("Damage at level 1 increased from 53–73 to 56–76")))
     W(ul_close())
 
     # Chen
@@ -119,8 +118,7 @@ def build():
     # Invoker
     W(hero_header("Invoker"))
     W(ul_open())
-    W(li("Base Intelligence increased from 20 to 22", b(20, 22)))
-    W(li("Damage at level 1 increased from 39–45 to 41–47", br(39, 45, 41, 47)))
+    W(li("Base Intelligence increased from 20 to 22", b(20, 22), extra=inline_note("Damage at level 1 increased from 39–45 to 41–47")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -185,8 +183,7 @@ def build():
     # Lifestealer
     W(hero_header("Lifestealer"))
     W(ul_open())
-    W(li("Base Damage decreased by 3", bstat_h("Lifestealer", "AttackDamageMin", "7.41", -3), extra=note_box(hero="Lifestealer", field="AttackDamageMin", before_patch="7.41")))
-    W(li("Damage at level 1 decreased from 49–55 to 46–52", br(49, 55, 46, 52)))
+    W(li("Base Damage decreased by 3", bstat_h("Lifestealer", "AttackDamageMin", "7.41", -3), extra=note_box(hero="Lifestealer", field="AttackDamageMin", before_patch="7.41") + inline_note("Damage at level 1 decreased from 49–55 to 46–52")))
     W(ul_close())
     W(ability("Ghoul Frenzy"))
     W(ul_open())
@@ -366,8 +363,7 @@ def build():
     # Windranger
     W(hero_header("Windranger"))
     W(ul_open())
-    W(li("Base Agility increased from 17 to 20", b(17, 20)))
-    W(li("Damage at level 1 increased from 47–59 to 49–61", br(47, 59, 49, 61)))
+    W(li("Base Agility increased from 17 to 20", b(17, 20), extra=inline_note("Damage at level 1 increased from 47–59 to 49–61")))
     W(ul_close())
     W(ability("Tailwind"))
     W(ul_open())

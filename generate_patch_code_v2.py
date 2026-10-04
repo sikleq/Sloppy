@@ -1828,6 +1828,164 @@ def _postprocess_cost_components(lines, version):
 _HERO_DMG_ROW_RE = re.compile(r'W\(li\(\s*"(?:Damage gain per level|Damage at level 30) ')
 
 
+# ---- "Damage at level 1" goes into the (?) of the row it follows from ----
+# The owner 2026-10-04, shown both forms side by side (Magnus 7.41 = its own row, Broodmother 7.41b = in the "?"):
+# "сделай с ?". A "Damage at level 1 …" line is the consequence of a base attribute / base damage change, so it
+# becomes a note on that row: the last such row before it in its list, else the first one after it (Invoker 7.39
+# lists it first). Kept as rows: heroes with a hero_stat_card (those rows are hidden and feed the card), a line Valve
+# worded wrongly (wrong-word span + its correction note must stay in sight), and a list with no base attribute /
+# base damage row (then the line is the change itself). Weights do not move: patch/elements.li scores a folded
+# note exactly like the row it was (_score_folded_damage).
+_DMG_FOLD_PARENT_RE = re.compile(r"^(?:Base (?:damage|strength|agility|intelligence)"
+                                 r"|(?:min(?:imum)?|max(?:imum)?) base damage)\b", re.I)
+_DMG_FOLD_ROW_RE = re.compile(r"^Damage at level 1 ")
+
+
+def _w_inner(st, name=None):
+    """`W(name(...))` statement -> the inner Call node (any name when name is None), else None."""
+    import ast as _ast
+    if not (isinstance(st, _ast.Expr) and isinstance(st.value, _ast.Call) and isinstance(st.value.func, _ast.Name)
+            and st.value.func.id == "W" and st.value.args and isinstance(st.value.args[0], _ast.Call)
+            and isinstance(st.value.args[0].func, _ast.Name)):
+        return None
+    inner = st.value.args[0]
+    return inner if name is None or inner.func.id == name else None
+
+
+def _dmg_fold_plan(body):
+    """[(L1 statement, parent li Call, its li Call)] for one statement list."""
+    import ast as _ast
+    plan, card, ul = [], False, None
+    for i, st in enumerate(body):
+        inner = _w_inner(st)
+        name = inner.func.id if inner is not None else ""
+        if name in ("hero_header", "item_header", "unit_header", "plain_header"):
+            card = False
+            for st2 in body[i + 1:]:
+                n2 = _w_inner(st2)
+                if n2 is not None and n2.func.id in ("hero_header", "item_header", "unit_header", "plain_header"):
+                    break
+                if n2 is not None and n2.func.id == "hero_stat_card":
+                    card = True
+                    break
+        elif name == "ul_open":
+            ul = []
+        elif name == "ul_close" and ul is not None:
+            for j, (st_l, call) in enumerate(ul):
+                a0 = call.args[0] if call.args else None
+                if not (isinstance(a0, _ast.Constant) and isinstance(a0.value, str) and _DMG_FOLD_ROW_RE.match(a0.value)):
+                    continue
+                if card or "wrong-word" in a0.value or len(call.args) != 2:
+                    continue
+                if any(k.arg != "extra" for k in call.keywords):
+                    continue
+                parents = [c for _, c in ul if c is not call and _dmg_fold_is_parent(c)]
+                before = [c for _, c in ul[:j] if _dmg_fold_is_parent(c)]
+                parent = before[-1] if before else (parents[0] if parents else None)
+                if parent is not None:
+                    plan.append((st_l, parent, call))
+            ul = None
+        elif name == "li" and ul is not None:
+            ul.append((st, inner))
+    return plan
+
+
+def _dmg_fold_is_parent(call):
+    import ast as _ast
+    a0 = call.args[0] if call.args else None
+    if isinstance(a0, _ast.Constant) and isinstance(a0.value, str):
+        return bool(_DMG_FOLD_PARENT_RE.match(a0.value))
+    return isinstance(a0, _ast.Call) and isinstance(a0.func, _ast.Name) and a0.func.id == "attr_change"
+
+
+def _py_str(s):
+    return '"' + s.replace('\\', '\\\\').replace('"', '\\"') + '"'
+
+
+def fold_damage_l1_src(src):
+    """Python source -> the same source with every foldable "Damage at level 1" row moved into its parent's (?).
+    Works on generator output and on hand-edited content/p*.py (multi-line statements included)."""
+    import ast as _ast
+    tree = _ast.parse(src)
+    plan = []
+    for node in _ast.walk(tree):
+        body = getattr(node, "body", None)
+        if isinstance(body, list):
+            plan.extend(_dmg_fold_plan(body))
+    if not plan:
+        return src
+    lines = [ln.encode("utf-8") for ln in src.split("\n")]      # ast columns are utf-8 byte offsets
+
+    def seg(n):
+        if n.lineno == n.end_lineno:
+            return lines[n.lineno - 1][n.col_offset:n.end_col_offset].decode("utf-8")
+        parts = [lines[n.lineno - 1][n.col_offset:]] + lines[n.lineno:n.end_lineno - 1] + \
+                [lines[n.end_lineno - 1][:n.end_col_offset]]
+        return b"\n".join(parts).decode("utf-8")
+
+    notes = {}                      # parent node id -> (parent Call, [note texts in page order])
+    drops = []
+    for st_l, parent, call in plan:
+        text = call.args[0].value
+        own = [k for k in call.keywords if k.arg == "extra"]
+        if own:
+            v = own[0].value
+            if not (isinstance(v, _ast.Call) and getattr(v.func, "id", "") == "inline_note" and v.args
+                    and isinstance(v.args[0], _ast.Constant)):
+                continue                                         # an extra we cannot merge as text: keep the row
+            text += "<br>" + v.args[0].value
+        notes.setdefault(id(parent), (parent, []))[1].append(text)
+        drops.append(st_l)
+
+    edits = []                      # (lineno, col, end_lineno, end_col, replacement)
+    for parent, texts in notes.values():
+        note = "<br>".join(texts)
+        ex = [k for k in parent.keywords if k.arg == "extra"]
+        if not ex:
+            # insert ", extra=inline_note(...)" before li(...)'s closing paren
+            edits.append((parent.end_lineno, parent.end_col_offset - 1, parent.end_lineno, parent.end_col_offset - 1,
+                          f", extra=inline_note({_py_str(note)})"))
+            continue
+        v = ex[0].value
+        if isinstance(v, _ast.Call) and getattr(v.func, "id", "") == "inline_note" and v.args \
+                and isinstance(v.args[0], _ast.Constant):
+            new = f"inline_note({_py_str(note + '<br>' + v.args[0].value)})"
+        elif isinstance(v, _ast.BinOp) and isinstance(v.right, _ast.Call) \
+                and getattr(v.right.func, "id", "") == "inline_note" and v.right.args \
+                and isinstance(v.right.args[0], _ast.Constant):
+            new = f"{seg(v.left)} + inline_note({_py_str(note + '<br>' + v.right.args[0].value)})"
+        else:
+            new = f"{seg(v)} + inline_note({_py_str(note)})"
+        edits.append((v.lineno, v.col_offset, v.end_lineno, v.end_col_offset, new))
+
+    for st in drops:                # a dropped row must own its lines
+        first, last = lines[st.lineno - 1], lines[st.end_lineno - 1]
+        if first[:st.col_offset].strip() or last[st.end_col_offset:].strip():
+            raise ValueError(f"line {st.lineno}: a Damage at level 1 row shares its line with other code")
+    # edits and drops never overlap (different statements); applied bottom-up, the earlier positions stay valid
+    ops = [(ln, col, "edit", (eln, ecol, rep)) for ln, col, eln, ecol, rep in edits] + \
+          [(st.lineno, 0, "drop", st.end_lineno) for st in drops]
+    for ln, col, kind, rest in sorted(ops, key=lambda o: (o[0], o[1]), reverse=True):
+        if kind == "drop":
+            del lines[ln - 1:rest]
+            continue
+        eln, ecol, rep = rest
+        head, tail = lines[ln - 1][:col], lines[eln - 1][ecol:]
+        lines[ln - 1:eln] = (head + rep.encode("utf-8") + tail).split(b"\n")
+    out = b"\n".join(lines).decode("utf-8")
+    _ast.parse(out)                 # never hand back broken code (raises SyntaxError)
+    return out
+
+
+def _postprocess_fold_damage_l1(lines):
+    src = "\n".join(lines)
+    try:
+        return fold_damage_l1_src(src).split("\n")
+    except (SyntaxError, ValueError) as e:
+        print(f"  [warn] Damage at level 1 fold skipped: {e}")
+        return lines
+
+
 def _postprocess_hero_stat_card(lines, version=None):
     """Owner 2026-09-28 (Abaddon 7.38): a hero whose GENERAL rows describe its damage growth as rescaled
     ("Damage gain per level …" / "Damage at level 30 …") and whose attributes changed gets ONE row "Starting
@@ -3062,6 +3220,7 @@ def generate(version):
     out = _postprocess_silent_stats(out, version)
     out = _postprocess_card_stat_notes(out)
     out = _postprocess_hero_stat_card(out, version)   # approved by the owner 2026-09-28
+    out = _postprocess_fold_damage_l1(out)            # "Damage at level 1" into the (?) — owner 2026-10-04
     out = _postprocess_unstated_total_cost(out)
     out = _postprocess_item_ability_cards(out, version)
     out = _drop_empty_ul(out)

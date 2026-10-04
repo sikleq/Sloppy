@@ -936,8 +936,7 @@ def build():
     # Axe
     W(hero_header("Axe"))
     W(ul_open())
-    W(li("Base damage increased by 1", bstat_h("Axe", "AttackDamageMin", "7.37e", 1), extra=note_box(hero="Axe", field="AttackDamageMin", before_patch="7.37e")))
-    W(li("Damage at level 1 increased from 55-59 to 56-60", br(55, 59, 56, 60)))
+    W(li("Base damage increased by 1", bstat_h("Axe", "AttackDamageMin", "7.37e", 1), extra=note_box(hero="Axe", field="AttackDamageMin", before_patch="7.37e") + inline_note("Damage at level 1 increased from 55-59 to 56-60")))
     W(ul_close())
     W(ability("Battle Hunger", slug="axe_battle_hunger"))
     W(ul_open())
@@ -3641,8 +3640,7 @@ def build():
     # Warlock
     W(hero_header("Warlock"))
     W(ul_open())
-    W(li("Base damage increased by 3", bstat_h("Warlock", "AttackDamageMin", "7.37e", 3), extra=note_box(hero="Warlock", field="AttackDamageMin", before_patch="7.37e")))
-    W(li("Damage at level 1 increased from 49-59 to 52-62", br(49, 59, 52, 62)))
+    W(li("Base damage increased by 3", bstat_h("Warlock", "AttackDamageMin", "7.37e", 3), extra=note_box(hero="Warlock", field="AttackDamageMin", before_patch="7.37e") + inline_note("Damage at level 1 increased from 49-59 to 52-62")))
     W(ul_close())
     W(ability("Upheaval", slug="warlock_upheaval"))
     W(ul_open())

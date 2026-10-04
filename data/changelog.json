@@ -35,7 +35,7 @@
       "category": "Terrain",
       "minor": true,
       "link": "terrain_740.html",
-      "title": "Terrain: old spots are outlined with thin, close dashes, one contour per grove"
+      "title": "Terrain: a changed tree's own square is outlined in its colour, dashed where it stood"
     },
     {
       "date": "2026-10-04",
@@ -50,6 +50,20 @@
       "minor": true,
       "link": "terrain_stats.html",
       "title": "Terrain Stats: a trend line through the trees, bolder points for major versions, a clicked row stays framed"
+    },
+    {
+      "date": "2026-10-04",
+      "category": "Patch Reader",
+      "minor": true,
+      "link": "patches/7.41.html",
+      "title": "Hero blocks: «Damage at level 1» after a base stat change now sits in that row's ?"
+    },
+    {
+      "date": "2026-10-04",
+      "category": "Terrain",
+      "minor": true,
+      "link": "terrain_stats.html",
+      "title": "Terrain Stats: the old [[icons/ui/gothic/tc_shrines.png|Shrines]] wear the game's own minimap icon"
     },
     {
       "date": "2026-10-03",

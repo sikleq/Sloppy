@@ -60,10 +60,11 @@ subgroup("Talents")...       ← Talents — ВСЕГДА последние
 
 Когда Valve указывает результирующий урон на 1-м уровне рядом с изменением базового атрибута:
 
-- **Урон изменился** → отдельная видимая строка с бейджем `br()`. НЕ `subnote`, НЕ `inline_note`:
+- **Урон изменился** → в «?» строки атрибута / базового урона, из которой он следует (владелец 2026-10-04:
+  «сделай с ?»; подробности и исключения — content-rules.md «Damage at level 1»):
   ```python
-  W(li("Base Agility decreased from 15 to 13", bstat_h("Batrider", "AttributeBaseAgility", "7.39c", -2)))
-  W(li("Damage at level 1 decreased from 39–43 to 38–42", br(39, 43, 38, 42)))
+  W(li("Base Agility decreased from 15 to 13", bstat_h("Batrider", "AttributeBaseAgility", "7.39c", -2),
+       extra=inline_note("Damage at level 1 decreased from 39–43 to 38–42")))
   W(ul_close())
   ```
 - **Урон не изменился** → `extra=inline_note(...)` на строке атрибута, или `subnote()` после `ul_close()`:
@@ -322,7 +323,8 @@ damage» — не про характеристику урона). «+N All Attr
   урона по уровням (1, 5 … 30).
 - Где стоит (одобрено владельцем 2026-09-28): только там, где Valve САМИ пересчитали рост урона — в GENERAL есть
   строка «Damage gain per level …» или «Damage at level 30 …», и у героя по файлам игры поменялись характеристики
-  (`attrs_changed`). Одиночная «Damage at level 1 +1» (Sven 7.41) остаётся строкой: это правка базового урона.
+  (`attrs_changed`). Одиночная «Damage at level 1 +1» (Sven 7.41) карточки не получает: это правка базового урона
+  (с 2026-10-04 она — пометка «?» на строке Base Strength).
   Сейчас: 35 героев 7.38 + Spectre 7.40. Генератор вставляет сам: `_postprocess_hero_stat_card(lines, version)`
   первым в GENERAL. Тест: `tests/test_hero_stat_card.py`.
 

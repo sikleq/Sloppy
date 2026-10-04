@@ -510,8 +510,11 @@ _HL_LAYER = {"trees": "trees", "camps": "camps", "camptiers": "camps", "nowards"
              **{key: key for key, _label, _icon, _colour in _ENTITY_LAYERS}}
 # The outline follows the object's own marker (the owner 2026-10-03: "a square outline, like the tree itself"):
 # squares round trees and camp icons, circles round the round entity markers — (shape, half size in viewBox units)
-_HL_SHAPE = {"trees": ("rect", _TREE_SIDE / 2 + 2.4), "camps": ("rect", _CAMP_SIDE / 2 + 3),
+# trees: the tree's own square (the owner 2026-10-04: "outline the square itself in the colour of its change, only
+# dashed" — not a contour round it); camps and the rest keep a ring round them
+_HL_SHAPE = {"trees": ("rect", _TREE_SIDE / 2), "camps": ("rect", _CAMP_SIDE / 2 + 3),
              "camptiers": ("rect", _CAMP_SIDE / 2 + 3)}
+_HL_PER_SQUARE = {"trees"}
 _HL_ENT_SHAPE = ("circle", _ENT_DISC + 3)
 _HL_STROKE = {"trees": 1.6}           # outline width, viewBox units (others: 2.4)
 # Colour = what happened (the owner 2026-10-03, on 7.41d's "+23" no-ward cells drawn red: "it should be green,
@@ -679,6 +682,27 @@ def _dashed_outlines(kind, centres, shape, colour, stroke, ghost=False):
             f'stroke-dasharray="{dash} {gap}"{faint}>{marks}</g>')
 
 
+def _square_outlines(kind, centres, half, colour, stroke, dashed, ghost=False):
+    """Trees (the owner 2026-10-04, next to a red dashed contour round a grove and the row pictures' coloured squares:
+    "not an outline round the square — outline the square itself in the colour of its change, only dashed"): every
+    changed tree's OWN square gets its border in the change colour — dashed where it stood (old side; on the new side
+    a moved tree's old spot, faint), solid where it stands now (new side). Under the dashes the same colour, faded,
+    covers the tree's green border, so the gaps do not show green. In .tm-hl-g-<kind> for the switches."""
+    if not centres:
+        return ""
+    a = round(half, 2)
+    rects = "".join(f'<rect x="{round(x - a, 1)}" y="{round(y - a, 1)}" width="{2 * a}" height="{2 * a}"/>'
+                    for x, y in centres)
+    if not dashed:
+        return (f'<g class="tm-hl-g tm-hl-g-{kind} tm-hl-sq" fill="none" stroke="{colour}" '
+                f'stroke-width="{stroke}">{rects}</g>')
+    width, dash, gap = round(stroke * 0.85, 2), round(stroke * 1.25, 2), round(stroke * 0.9, 2)
+    cls, faint = ("tm-hl-ghost", ' opacity="0.6"') if ghost else ("tm-hl-dashed", "")
+    return (f'<g class="tm-hl-g tm-hl-g-{kind} {cls} tm-hl-sq" fill="none" stroke="{colour}"{faint}>'
+            f'<g stroke-width="{width}" stroke-opacity="0.35">{rects}</g>'
+            f'<g stroke-width="{width}" stroke-dasharray="{dash} {gap}">{rects}</g></g>')
+
+
 def _highlights_svg(diff, proj):
     """Two SVGs per chip, hidden until the chip is pressed (and its layer is on): the old side's — removed red, moved
     yellow where it stood, all dashed — and the new side's — added green, moved yellow where it stands now, plus a
@@ -696,7 +720,14 @@ def _highlights_svg(diff, proj):
                          "added": g.get("added", []) if side == "new" else []}
                 shape, stroke = _HL_SHAPE.get(key, _HL_ENT_SHAPE), _HL_STROKE.get(key, 2.4)
                 pts = {k: [proj(x, y) for x, y in spots[k]] for k in _HL_KINDS}
-                if side == "old":                       # dashed = where it was
+                if key in _HL_PER_SQUARE:               # each tree's own square in its change colour
+                    half = shape[1]
+                    body = "".join(_square_outlines(k, pts[k], half, _HL_COLOUR[k], stroke, dashed=side == "old")
+                                   for k in _HL_KINDS)
+                    if side == "new":
+                        body += _square_outlines("moved", [proj(*m[0]) for m in g.get("moved", [])], half,
+                                                 _HL_COLOUR["moved"], stroke, dashed=True, ghost=True)
+                elif side == "old":                     # dashed = where it was
                     body = "".join(_dashed_outlines(k, pts[k], shape, _HL_COLOUR[k], stroke) for k in _HL_KINDS)
                 else:                                   # solid = where it is, plus a faint dashed ghost of an old spot
                     body = "".join(_outline_union(f"tm-hl-mask-{key}-{side}-{k}", k, pts[k], shape, _HL_COLOUR[k],

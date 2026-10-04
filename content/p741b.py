@@ -308,8 +308,7 @@ def build():
     # Ember Spirit
     W(hero_header("Ember Spirit"))
     W(ul_open())
-    W(li("Base Damage decreased by 3", bstat_h("Ember Spirit", "AttackDamageMin", "7.41a", -3), extra=note_box(hero="Ember Spirit", field="AttackDamageMin", before_patch="7.41a")))
-    W(li("Damage at level 1 decreased from 55-59 to 52-56", br(55, 59, 52, 56)))
+    W(li("Base Damage decreased by 3", bstat_h("Ember Spirit", "AttackDamageMin", "7.41a", -3), extra=note_box(hero="Ember Spirit", field="AttackDamageMin", before_patch="7.41a") + inline_note("Damage at level 1 decreased from 55-59 to 52-56")))
     W(ul_close())
     W(ability("Sleight of Fist"))
     W(ul_open())

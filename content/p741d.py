@@ -131,8 +131,7 @@ def build():
     # Anti-Mage
     W(hero_header("Anti-Mage"))
     W(ul_open())
-    W(li("Base Agility increased from 24 to 25", b(24, 25)))
-    W(li("Damage at level 1 increased from 53–57 to 54–58", br(53, 57, 54, 58)))
+    W(li("Base Agility increased from 24 to 25", b(24, 25), extra=inline_note("Damage at level 1 increased from 53–57 to 54–58")))
     W(ul_close())
     W(ability("Blink", slug="antimage_blink"))
     W(ul_open())
@@ -234,8 +233,7 @@ def build():
     # Dark Willow
     W(hero_header("Dark Willow"))
     W(ul_open())
-    W(li("Base Intelligence increased from 21 to 22", b(21, 22)))
-    W(li("Damage at level 1 increased from 48–56 to 49–57", br(48, 56, 49, 57)))
+    W(li("Base Intelligence increased from 21 to 22", b(21, 22), extra=inline_note("Damage at level 1 increased from 48–56 to 49–57")))
     W(ul_close())
     W(ability("Cursed Crown", slug="dark_willow_cursed_crown"))
     W(ul_open())
@@ -405,8 +403,7 @@ def build():
     # Jakiro
     W(hero_header("Jakiro"))
     W(ul_open())
-    W(li("Base Intelligence increased from 25 to 26", b(25, 26)))
-    W(li("Damage at level 1 increased from 52–60 to 53–61", br(52, 60, 53, 61)))
+    W(li("Base Intelligence increased from 25 to 26", b(25, 26), extra=inline_note("Damage at level 1 increased from 52–60 to 53–61")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -547,8 +544,7 @@ def build():
     W(hero_header("Morphling"))
     W(ul_open())
     W(li("Base Strength decreased from 23 to 16", b(23, 16)))
-    W(li("Base Agility increased from 24 to 33", b(24, 33)))
-    W(li("Damage at level 1 increased from 36–45 to 45–54", br(36, 45, 45, 54)))
+    W(li("Base Agility increased from 24 to 33", b(24, 33), extra=inline_note("Damage at level 1 increased from 36–45 to 45–54")))
     W(ul_close())
     W(ability("Ebb and Flow", slug="morphling_ebb_and_flow"))
     W(ul_open())
@@ -582,8 +578,7 @@ def build():
     # Ogre Magi
     W(hero_header("Ogre Magi"))
     W(ul_open())
-    W(li("Base Strength increased from 25 to 26", b(25, 26)))
-    W(li("Damage at level 1 increased from 70–76 to 71–77", br(70, 76, 71, 77)))
+    W(li("Base Strength increased from 25 to 26", b(25, 26), extra=inline_note("Damage at level 1 increased from 70–76 to 71–77")))
     W(ul_close())
 
     # Omniknight
@@ -596,15 +591,13 @@ def build():
     W(hero_header("Outworld Destroyer"))
     W(ul_open())
     W(li("Min Base damage increased by 4", bstat_h("Outworld Destroyer", "AttackDamageMin", "7.41c", 4)))
-    W(li("Max Base damage increased by 1", bstat_h("Outworld Destroyer", "AttackDamageMax", "7.41c", 1)))
-    W(li("Damage at level 1 increased from 49-61 to 53-62", br(49, 61, 53, 62), extra=inline_note("Damage spread decreased from 12 to 9")))
+    W(li("Max Base damage increased by 1", bstat_h("Outworld Destroyer", "AttackDamageMax", "7.41c", 1), extra=inline_note("Damage at level 1 increased from 49-61 to 53-62<br>Damage spread decreased from 12 to 9")))
     W(ul_close())
 
     # Pangolier
     W(hero_header("Pangolier"))
     W(ul_open())
-    W(li("Base Agility decreased from 18 to 17", b(18, 17)))
-    W(li("Damage at level 1 decreased from 50–56 to 49–55", br(50, 56, 49, 55)))
+    W(li("Base Agility decreased from 18 to 17", b(18, 17), extra=inline_note("Damage at level 1 decreased from 50–56 to 49–55")))
     W(li("Base Armor decreased by 1", bstat_h("Pangolier", "ArmorPhysical", "7.41c", -1), extra=note_box(hero="Pangolier", field="ArmorPhysical", before_patch="7.41c")))
     W(ul_close())
 
@@ -942,8 +935,7 @@ def build():
     # Wraith King
     W(hero_header("Wraith King"))
     W(ul_open())
-    W(li("Base Damage increased by 2", bstat_h("Wraith King", "AttackDamageMin", "7.41c", 2)))
-    W(li("Damage at level 1 increased from 60-62 to 62-64", br(60, 62, 62, 64)))
+    W(li("Base Damage increased by 2", bstat_h("Wraith King", "AttackDamageMin", "7.41c", 2), extra=inline_note("Damage at level 1 increased from 60-62 to 62-64")))
     W(ul_close())
     W(ability("Vampiric Spirit", slug="skeleton_king_vampiric_spirit"))
     W(ul_open())

@@ -1307,6 +1307,31 @@ def _note_damage_row(text, scores):
     rows["rows"].append((kind, scores[0], scores[1]))
 
 
+_FOLDED_L1_RE = re.compile(r"Damage at level 1 (?:increased|decreased|changed|rescaled)(?:\s+by\s+[\d.\-–]+\s*\()?"
+                           r"\s*from\s+(\d+)[–\-](\d+)\s+to\s+(\d+)[–\-](\d+)", re.I)
+
+
+def _score_folded_damage(extra):
+    """A "Damage at level 1 …" line folded into its base attribute / base damage row's (?) (owner 2026-10-04,
+    generate_patch_code_v2.fold_damage_l1_src) still weighs what it weighed as its own row: the same br() score,
+    recorded with no tag (it is no row any more, so the tag tallies do not count it), and noted as the block's
+    level-1 damage, so a "Base Damage" row next to it drops out as before (damage rows counted once, 2026-09-26)."""
+    if not isinstance(extra, str) or "INLINETIP" not in extra:
+        return
+    from .badges import br as _br
+    for tip in re.findall(r"<!--INLINETIP-->(.*?)<!--/INLINETIP-->", extra, re.S):
+        plain = re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", " ", tip)))
+        m = _FOLDED_L1_RE.search(plain)
+        if not m:
+            continue
+        badge = _br(*(int(x) for x in m.groups()))
+        text = m.group(0)
+        tags = set(re.findall(r'data-tag="(\w+)"', badge)) or set(re.findall(r'data-overall="(\w+)"', badge))
+        scores = _row_scores(text, tags, badge, ctx=_row_ctx(text))
+        _dyn_record_li(set(), scores=scores)
+        _note_damage_row(text, scores)
+
+
 def _flush_damage_rows():
     rows, _State.damage_rows = _State.damage_rows, None
     if not rows:
@@ -2145,6 +2170,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     _dyn_record_li(dyn_tags, extra_keys=also_dyn, scores=_scores)
     _note_cell_row(_score_text, dyn_tags, _scores, _ctx)
     _note_damage_row(_score_text, _scores)
+    _score_folded_damage(extra)
     if isinstance(text, str) and 'del' in dyn_tags:
         _low = text.strip().rstrip('.').lower()
         if _low in ('removed', 'item removed from the game',

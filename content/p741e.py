@@ -382,8 +382,7 @@ def build():
     # Legion Commander
     W(hero_header("Legion Commander"))
     W(ul_open())
-    W(li("Base Strength increased from 24 to 25", b(24, 25)))
-    W(li("Damage at level 1 increased from 57–61 to 58–62", br(57, 61, 58, 62)))
+    W(li("Base Strength increased from 24 to 25", b(24, 25), extra=inline_note("Damage at level 1 increased from 57–61 to 58–62")))
     W(li("Strength gain decreased from 3.1 to 3.0", b(3.1, 3)))
     W(li("Base Attack Speed increased from 100 to 105", b(100, 105)))
     W(ul_close())
@@ -522,8 +521,7 @@ def build():
     # Pugna
     W(hero_header("Pugna"))
     W(ul_open())
-    W(li("Base Intelligence increased from 26 to 27", b(26, 27)))
-    W(li("Damage at level 1 increased from 47–54 to 48–55", br(47, 54, 48, 55)))
+    W(li("Base Intelligence increased from 26 to 27", b(26, 27), extra=inline_note("Damage at level 1 increased from 47–54 to 48–55")))
     W(ul_close())
 
     # Queen of Pain
@@ -628,8 +626,7 @@ def build():
     # Troll Warlord
     W(hero_header("Troll Warlord"))
     W(ul_open())
-    W(li("Base Agility increased from 23 to 24", b(23, 24)))
-    W(li("Damage at level 1 increased from 50–58 to 51–59", br(50, 58, 51, 59)))
+    W(li("Base Agility increased from 23 to 24", b(23, 24), extra=inline_note("Damage at level 1 increased from 50–58 to 51–59")))
     W(ul_close())
     W(ability("Battle Stance", slug="troll_warlord_switch_stance"))
     W(ul_open())

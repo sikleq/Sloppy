@@ -266,8 +266,7 @@ def build():
     # Dark Seer
     W(hero_header("Dark Seer"))
     W(ul_open())
-    W(li("Base Damage decreased by 2", bstat_h("Dark Seer", "AttackDamageMin", "7.38b", -2), extra=note_box(hero="Dark Seer", field="AttackDamageMin", before_patch="7.38b")))
-    W(li("Damage at level 1 decreased from 54–60 to 52–58", br(54, 60, 52, 58)))
+    W(li("Base Damage decreased by 2", bstat_h("Dark Seer", "AttackDamageMin", "7.38b", -2), extra=note_box(hero="Dark Seer", field="AttackDamageMin", before_patch="7.38b") + inline_note("Damage at level 1 decreased from 54–60 to 52–58")))
     W(ul_close())
     W(facet_header("dark_seer_movespd"))
     W(ul_open())
@@ -426,15 +425,13 @@ def build():
     # Lycan
     W(hero_header("Lycan"))
     W(ul_open())
-    W(li("Base Strength increased from 26 to 28", b(26, 28)))
-    W(li("Damage at level 1 increased from 50–55 to 52–57", br(50, 55, 52, 57)))
+    W(li("Base Strength increased from 26 to 28", b(26, 28), extra=inline_note("Damage at level 1 increased from 50–55 to 52–57")))
     W(ul_close())
     
     # Magnus
     W(hero_header("Magnus"))
     W(ul_open())
-    W(li("Base Strength decreased from 25 to 23", b(25, 23)))
-    W(li("Damage at level 1 decreased from 55–63 to 54–62", br(55, 63, 54, 62)))
+    W(li("Base Strength decreased from 25 to 23", b(25, 23), extra=inline_note("Damage at level 1 decreased from 55–63 to 54–62")))
     W(ul_close())
     W(ability("Shockwave", slug="magnataur_shockwave"))
     W(ul_open())

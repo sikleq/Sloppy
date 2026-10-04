@@ -252,8 +252,7 @@ def build():
     # Earth Spirit
     W(hero_header("Earth Spirit"))
     W(ul_open())
-    W(li("Min base damage increased by 6", bstat_h("Earth Spirit", "AttackDamageMin", "7.39c", 6), extra=note_box(hero="Earth Spirit", field="AttackDamageMin", before_patch="7.39c", extra_note="Damage spread decreased from 10 to 4")))
-    W(li("Damage at level 1 increased from 47–57 to 53–57", br(47, 57, 53, 57)))
+    W(li("Min base damage increased by 6", bstat_h("Earth Spirit", "AttackDamageMin", "7.39c", 6), extra=note_box(hero="Earth Spirit", field="AttackDamageMin", before_patch="7.39c", extra_note="Damage spread decreased from 10 to 4") + inline_note("Damage at level 1 increased from 47–57 to 53–57")))
     W(ul_close())
 
     # Ember Spirit
@@ -483,8 +482,7 @@ def build():
     # Spirit Breaker
     W(hero_header("Spirit Breaker"))
     W(ul_open())
-    W(li("Base Damage increased by 3", bstat_h("Spirit Breaker", "AttackDamageMin", "7.39c", 3), extra=note_box(hero="Spirit Breaker", field="AttackDamageMin", before_patch="7.39c")))
-    W(li("Damage at level 1 increased from 59–69 to 62–72", br(59, 69, 62, 72)))
+    W(li("Base Damage increased by 3", bstat_h("Spirit Breaker", "AttackDamageMin", "7.39c", 3), extra=note_box(hero="Spirit Breaker", field="AttackDamageMin", before_patch="7.39c") + inline_note("Damage at level 1 increased from 59–69 to 62–72")))
     W(ul_close())
 
     # Techies
@@ -496,8 +494,7 @@ def build():
     # Templar Assassin
     W(hero_header("Templar Assassin"))
     W(ul_open())
-    W(li("Base Damage decreased by 2–3", bstat_h("Templar Assassin", "AttackDamageMin", "7.39c", -2), extra=note_box(hero="Templar Assassin", field="AttackDamageMin", before_patch="7.39c", extra_note="Damage spread decreased from 6 to 5")))
-    W(li("Damage at level 1 decreased from 53–59 to 51–56", br(53, 59, 51, 56)))
+    W(li("Base Damage decreased by 2–3", bstat_h("Templar Assassin", "AttackDamageMin", "7.39c", -2), extra=note_box(hero="Templar Assassin", field="AttackDamageMin", before_patch="7.39c", extra_note="Damage spread decreased from 6 to 5") + inline_note("Damage at level 1 decreased from 53–59 to 51–56")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -547,8 +544,7 @@ def build():
     # Vengeful Spirit
     W(hero_header("Vengeful Spirit"))
     W(ul_open())
-    W(li("Base Damage increased by 2", bstat_h("Vengeful Spirit", "AttackDamageMin", "7.39c", 2), extra=note_box(hero="Vengeful Spirit", field="AttackDamageMin", before_patch="7.39c")))
-    W(li("Damage at level 1 increased from 49–55 to 51–57", br(49, 55, 51, 57)))
+    W(li("Base Damage increased by 2", bstat_h("Vengeful Spirit", "AttackDamageMin", "7.39c", 2), extra=note_box(hero="Vengeful Spirit", field="AttackDamageMin", before_patch="7.39c") + inline_note("Damage at level 1 increased from 49–55 to 51–57")))
     W(li("Agility gain decreased from 3.2 to 3.0", bstat_h("Vengeful Spirit", "AttributeAgilityGain", "7.39c", -0.2)))
     W(ul_close())
 

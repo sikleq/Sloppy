@@ -125,8 +125,7 @@ def build():
     # Centaur Warrunner
     W(hero_header("Centaur Warrunner"))
     W(ul_open())
-    W(li("Base Damage decreased by 2", bstat_h("Centaur Warrunner", "AttackDamageMin", "7.41e", -2), extra=note_box(hero="Centaur Warrunner", field="AttackDamageMin", before_patch="7.41e")))
-    W(li("Damage at level 1 decreased from 64-66 to 62-64", br(64, 66, 62, 64)))
+    W(li("Base Damage decreased by 2", bstat_h("Centaur Warrunner", "AttackDamageMin", "7.41e", -2), extra=note_box(hero="Centaur Warrunner", field="AttackDamageMin", before_patch="7.41e") + inline_note("Damage at level 1 decreased from 64-66 to 62-64")))
     W(li("Base Movement Speed decreased from 300 to 295", b(300, 295)))
     W(ul_close())
     W(ability("Hitch A Ride", slug="centaur_mount"))
@@ -156,8 +155,7 @@ def build():
     # Disruptor
     W(hero_header("Disruptor"))
     W(ul_open())
-    W(li("Base Intelligence increased from 20 to 21", b(20, 21)))
-    W(li("Damage at level 1 increased from 47-51 to 48-52", br(47, 51, 48, 52)))
+    W(li("Base Intelligence increased from 20 to 21", b(20, 21), extra=inline_note("Damage at level 1 increased from 47-51 to 48-52")))
     W(ul_close())
 
     # Earth Spirit
@@ -182,8 +180,7 @@ def build():
     # Ember Spirit
     W(hero_header("Ember Spirit"))
     W(ul_open())
-    W(li("Base Agility decreased from 22 to 21", b(22, 21)))
-    W(li("Damage at level 1 decreased from 52-56 to 51-55", br(52, 56, 51, 55)))
+    W(li("Base Agility decreased from 22 to 21", b(22, 21), extra=inline_note("Damage at level 1 decreased from 52-56 to 51-55")))
     W(ul_close())
 
     # Enigma
@@ -210,8 +207,7 @@ def build():
     # Huskar
     W(hero_header("Huskar"))
     W(ul_open())
-    W(li("Base Strength decreased from 23 to 22", b(23, 22)))
-    W(li("Damage at level 1 decreased from 44-49 to 43-48", br(44, 49, 43, 48)))
+    W(li("Base Strength decreased from 23 to 22", b(23, 22), extra=inline_note("Damage at level 1 decreased from 44-49 to 43-48")))
     W(li("Strength gain increased from 3.3 to 3.4", b(3.3, 3.4)))
     W(ul_close())
 
@@ -250,8 +246,7 @@ def build():
     # Kez
     W(hero_header("Kez"))
     W(ul_open())
-    W(li("Base Damage decreased by 1", bstat_h("Kez", "AttackDamageMin", "7.41e", -1), extra=note_box(hero="Kez", field="AttackDamageMin", before_patch="7.41e")))
-    W(li("Damage at level 1 decreased from 50-56 to 49-55", br(50, 56, 49, 55)))
+    W(li("Base Damage decreased by 1", bstat_h("Kez", "AttackDamageMin", "7.41e", -1), extra=note_box(hero="Kez", field="AttackDamageMin", before_patch="7.41e") + inline_note("Damage at level 1 decreased from 50-56 to 49-55")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -283,8 +278,7 @@ def build():
     # Lina
     W(hero_header("Lina"))
     W(ul_open())
-    W(li("Base Intelligence decreased from 30 to 28", b(30, 28)))
-    W(li("Damage at level 1 decreased from 51-59 to 49-57", br(51, 59, 49, 57)))
+    W(li("Base Intelligence decreased from 30 to 28", b(30, 28), extra=inline_note("Damage at level 1 decreased from 51-59 to 49-57")))
     W(ul_close())
     W(ability("Fiery Soul", slug="lina_fiery_soul"))
     W(ul_open())

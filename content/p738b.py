@@ -221,8 +221,7 @@ def build():
     # Beastmaster
     W(hero_header("Beastmaster"))
     W(ul_open())
-    W(li("Base Damage decreased by 3", bstat_h("Beastmaster", "AttackDamageMin", "7.38", -3), extra=note_box(hero="Beastmaster", field="AttackDamageMin", before_patch="7.38")))
-    W(li("Damage at level 1 decreased by 3 (from 56-60 to 53-57)", br(56, 60, 53, 57)))
+    W(li("Base Damage decreased by 3", bstat_h("Beastmaster", "AttackDamageMin", "7.38", -3), extra=note_box(hero="Beastmaster", field="AttackDamageMin", before_patch="7.38") + inline_note("Damage at level 1 decreased by 3 (from 56-60 to 53-57)")))
     W(ul_close())
 
     # Brewmaster
@@ -239,8 +238,7 @@ def build():
     # Broodmother
     W(hero_header("Broodmother"))
     W(ul_open())
-    W(li("Base Damage decreased by 2", bstat_h("Broodmother", "AttackDamageMin", "7.38", -2), extra=note_box(hero="Broodmother", field="AttackDamageMin", before_patch="7.38")))
-    W(li("Damage at level 1 decreased by 2 (from 47-53 to 45-51)", br(47, 53, 45, 51)))
+    W(li("Base Damage decreased by 2", bstat_h("Broodmother", "AttackDamageMin", "7.38", -2), extra=note_box(hero="Broodmother", field="AttackDamageMin", before_patch="7.38") + inline_note("Damage at level 1 decreased by 2 (from 47-53 to 45-51)")))
     W(ul_close())
     W(facet_header("broodmother_necrotic_webs"))
     W(ul_open())
@@ -627,8 +625,7 @@ def build():
     # Zeus
     W(hero_header("Zeus"))
     W(ul_open())
-    W(li("Base damage decreased by 4", bstat_h("Zeus", "AttackDamageMin", "7.38", -4), extra=note_box(hero="Zeus", field="AttackDamageMin", before_patch="7.38")))
-    W(li("Damage at level 1 decreased by 4 (from 55-63 to 51-59)", br(55, 63, 51, 59)))
+    W(li("Base damage decreased by 4", bstat_h("Zeus", "AttackDamageMin", "7.38", -4), extra=note_box(hero="Zeus", field="AttackDamageMin", before_patch="7.38") + inline_note("Damage at level 1 decreased by 4 (from 55-63 to 51-59)")))
     W(ul_close())
     W(ability("Lightning Bolt", slug="zuus_lightning_bolt"))
     W(ul_open())

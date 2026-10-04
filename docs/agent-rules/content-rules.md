@@ -86,7 +86,16 @@ extra=inline_note("Cast Range increased to 675/700/725/750 — " + b(675, [675, 
 
 ## «Damage at level 1» и «Damage gain per level»
 
-- **Урон ИЗМЕНИЛСЯ** → отдельная видимая строка с `br(x1, x2, y1, y2)`. Не прятать в inline_note.
+- **Урон ИЗМЕНИЛСЯ** → в «?» той строки, из которой он следует (владелец 2026-10-04, сравнив Magnus 7.41 строкой и
+  Broodmother 7.41b в «?»: «сделай с ?»): `extra=inline_note("Damage at level 1 increased from 55–63 to 56–64")` на
+  последней строке Base Strength / Agility / Intelligence / Base Damage (Min / Max) / `attr_change` перед ней в списке,
+  иначе на первой такой после неё (Invoker 7.39). У строки с `note_box` — `note_box(...) + inline_note(...)`; своя
+  пометка строки урона («Damage spread …») идёт следом через `<br>`. **Остаётся строкой:** у героя с `hero_stat_card`
+  (строки скрыты и питают карточку), строка с `wrong-word` и пометкой-поправкой (должна быть на виду), и список без
+  такой строки-причины (тогда это и есть изменение). Делает генератор: `fold_damage_l1_src` /
+  `_postprocess_fold_damage_l1` (generate_patch_code_v2.py); веса не меняются — `patch/elements._score_folded_damage`
+  считает пометку как бывшую строку (без тега). Тесты: `tests/test_damage_l1_fold.py`.
+  До 2026-10-04 правило было обратным («отдельная видимая строка», 2026-06-19; вычитка 2026-09-18 вернула строки).
 - **Урон НЕ ИЗМЕНИЛСЯ** → `extra=inline_note("Damage at level 1 unchanged at X")` на строке атрибута.
 - **Damage gain per level** — consequence от изменения attribute gain → `extra=inline_note("Damage gain per level decreased...")` на строке атрибута.
 

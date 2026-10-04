@@ -337,6 +337,10 @@ make up for it. The damage the hero really has is "Damage at level 1" (base + at
 (`_note_damage_row` / `_flush_damage_rows`, end of the hero block): with an L1 or L30 row in the block the
 Base Damage row is taken back out of the net and volume; with an L30 row the gain row is too. A Base Damage
 change with no L1/L30 row still counts. The rows stay on the page and in the tag tallies.
+Since 2026-10-04 a "Damage at level 1" line usually sits in its base attribute / base damage row's (?)
+(content-rules.md); `_score_folded_damage` scores that note exactly like the br() row it was (no tag, so the
+tag tallies count one row less) and still marks the block's L1, so the Base Damage drop above is unchanged. The ~30
+notes that were already folded before (e.g. Broodmother 7.41b) now score the same way — before, they weighed 0.
 Effect: 76 hero cells; hero net vs Tier 1–2 pick share ρ 0.250 → 0.253 (signal R constants unchanged).
 Dark Seer 7.38 rows: +1.80 base, +1.00 L1, −1.85 gain, −1.80 L30 = −0.85 → L1 + L30 = −0.80 (the base and
 gain rows nearly cancelled); with signal R +4.94 → +4.99. Largest moves: Lifestealer 7.41 +9.26 → +7.46,

@@ -44,6 +44,7 @@ COLORS = {
     "tc_watchers":   (86, 214, 208),    # cyan (vision)
     "tc_roshan":     (210, 74, 90),     # crimson
 }
+SHRINES = (140, 210, 96)               # tc_shrines: Radiant-ish green (the game drew them team-coloured)
 
 # Layers backed by a game icon in icons/ref/.
 REFS = {
@@ -116,13 +117,22 @@ ICON_RES = 48
 PAD = 3
 
 
-def from_ref(fname, color, tint=True):
+def from_ref(fname, color, tint=True, drop_black=False):
     """Trim the game icon, FILL the ICON_RES canvas (upscaling small sources like
     the 32px rune mapicons), recolour, sharpen, then add a thin dark outline. The
     fill + unsharp keep the icons crisp instead of muddy at marker size. ``tint``
-    recolours to the type colour; ``tint=False`` keeps natural colours (runes)."""
+    recolours to the type colour; ``tint=False`` keeps natural colours (runes).
+    ``drop_black`` clears the source's own thick black ring first (minimap_miscbuilding: tinted, it became a heavy
+    box round the shape), so only our thin outline frames it, like the other icons."""
     from PIL import ImageFilter
     im = _load_ref(fname)
+    if drop_black:
+        px = im.load()
+        for y in range(im.height):
+            for x in range(im.width):
+                r, g, b, a = px[x, y]
+                if a and (0.299 * r + 0.587 * g + 0.114 * b) < 40:
+                    px[x, y] = (0, 0, 0, 0)
     bbox = im.getbbox()
     if bbox:
         im = im.crop(bbox)
@@ -272,33 +282,12 @@ def nowards_icon(color=NOWARDS):
 
 
 def shrines_icon():
-    """The old healing Shrines (before 7.33) have no map icon left (the owner 2026-10-04, with the game model: "a
-    stone well of water — make it like the other icons and keep it, it may come in handy"): a grey stone well, its
-    rim round a pool of water, a vine over it. Drawn at 4x + downscaled, dark outline, like the other drawn icons."""
-    from PIL import ImageDraw, ImageFilter
-    S = ICON_RES * 4
-    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    stone, shade, light = (128, 136, 140, 255), (86, 92, 98, 255), (176, 184, 188, 255)
-    water, water_hi = (70, 170, 215, 255), (150, 220, 245, 255)
-    leaf = (104, 168, 76, 255)
-    d.ellipse([S * 0.20, S * 0.74, S * 0.80, S * 0.92], fill=shade)               # the well's round foot
-    d.rectangle([S * 0.20, S * 0.38, S * 0.80, S * 0.83], fill=stone)            # its stone body
-    d.rectangle([S * 0.20, S * 0.38, S * 0.32, S * 0.83], fill=shade)            # the shaded side
-    for y in (0.53, 0.68):                                                       # courses of stone blocks
-        d.line([S * 0.20, S * y, S * 0.80, S * y], fill=shade, width=int(S * 0.02))
-    for x, y0, y1 in ((0.50, 0.53, 0.68), (0.64, 0.38, 0.53), (0.42, 0.68, 0.83)):
-        d.line([S * x, S * y0, S * x, S * y1], fill=shade, width=int(S * 0.02))
-    d.ellipse([S * 0.16, S * 0.22, S * 0.84, S * 0.52], fill=light)              # the rim
-    d.ellipse([S * 0.26, S * 0.28, S * 0.74, S * 0.46], fill=water)              # the water
-    d.ellipse([S * 0.34, S * 0.31, S * 0.52, S * 0.37], fill=water_hi)           # a glint on it
-    for cx, cy in ((0.18, 0.40), (0.26, 0.56), (0.82, 0.36), (0.76, 0.52)):      # a vine round the rim
-        d.ellipse([S * (cx - 0.07), S * (cy - 0.04), S * (cx + 0.07), S * (cy + 0.04)], fill=leaf)
-    img = img.resize((ICON_RES, ICON_RES), Image.LANCZOS)
-    dil = img.split()[3].filter(ImageFilter.MaxFilter(3))
-    ol = Image.new("RGBA", img.size, OUTLINE)
-    ol.putalpha(dil)
-    return Image.alpha_composite(ol, img)
+    """The old healing Shrines (7.00 – 7.32). The first try (a drawn stone well, 2026-10-04 morning) did not fit — the
+    owner the same day: "nothing like the game and not in the style of the other icons". The game's own answer:
+    npc_units.txt gave both shrines "MinimapIcon" "minimap_miscbuilding" (MinimapIconSize 375) — the grey cylinder of
+    the minimap sheet (materials/vgui/hud/minimap_miscbuilding, extracted with Source2Viewer-CLI into icons/ref/). It
+    goes through from_ref like the towers / outposts / lotus pools: tinted to the layer colour, thin dark outline."""
+    return from_ref("minimap_miscbuilding.png", SHRINES, drop_black=True)
 
 
 def all_icon():

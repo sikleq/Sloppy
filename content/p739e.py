@@ -117,8 +117,7 @@ def build():
 
     W(hero_header("Beastmaster"))
     W(ul_open())
-    W(li("Base damage decreased by 2", bstat_h("Beastmaster", "AttackDamageMin", "7.39d", -2), extra=note_box(hero="Beastmaster", field="AttackDamageMin", before_patch="7.39d")))
-    W(li("Damage at level 1 decreased from 52–56 to 50–54", br(52, 56, 50, 54)))
+    W(li("Base damage decreased by 2", bstat_h("Beastmaster", "AttackDamageMin", "7.39d", -2), extra=note_box(hero="Beastmaster", field="AttackDamageMin", before_patch="7.39d") + inline_note("Damage at level 1 decreased from 52–56 to 50–54")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

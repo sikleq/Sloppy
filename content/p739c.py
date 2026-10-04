@@ -345,8 +345,7 @@ def build():
     # Pangolier
     W(hero_header("Pangolier"))
     W(ul_open())
-    W(li("Base Damage decreased by 2", bstat_h("Pangolier", "AttackDamageMin", "7.39b", -2), extra=note_box(hero="Pangolier", field="AttackDamageMin", before_patch="7.39b")))
-    W(li("Damage at level 1 decreased from 51-57 to 49-55", br(51, 57, 49, 55)))
+    W(li("Base Damage decreased by 2", bstat_h("Pangolier", "AttackDamageMin", "7.39b", -2), extra=note_box(hero="Pangolier", field="AttackDamageMin", before_patch="7.39b") + inline_note("Damage at level 1 decreased from 51-57 to 49-55")))
     W(ul_close())
 
     # Phantom Assassin
@@ -464,8 +463,7 @@ def build():
     # Terrorblade
     W(hero_header("Terrorblade"))
     W(ul_open())
-    W(li("Base Damage decreased by 2", bstat_h("Terrorblade", "AttackDamageMin", "7.39b", -2), extra=note_box(hero="Terrorblade", field="AttackDamageMin", before_patch="7.39b")))
-    W(li("Damage at level 1 decreased from 50-56 to 48-54", br(50, 56, 48, 54)))
+    W(li("Base Damage decreased by 2", bstat_h("Terrorblade", "AttackDamageMin", "7.39b", -2), extra=note_box(hero="Terrorblade", field="AttackDamageMin", before_patch="7.39b") + inline_note("Damage at level 1 decreased from 50-56 to 48-54")))
     W(ul_close())
 
     # Tiny
@@ -527,8 +525,7 @@ def build():
     # Winter Wyvern
     W(hero_header("Winter Wyvern"))
     W(ul_open())
-    W(li("Base Damage increased by 1", bstat_h("Winter Wyvern", "AttackDamageMin", "7.39b", 1), extra=note_box(hero="Winter Wyvern", field="AttackDamageMin", before_patch="7.39b")))
-    W(li("Damage at level 1 increased from 40-47 to 41-48", br(40, 47, 41, 48)))
+    W(li("Base Damage increased by 1", bstat_h("Winter Wyvern", "AttackDamageMin", "7.39b", 1), extra=note_box(hero="Winter Wyvern", field="AttackDamageMin", before_patch="7.39b") + inline_note("Damage at level 1 increased from 40-47 to 41-48")))
     W(ul_close())
 
     # Wraith King

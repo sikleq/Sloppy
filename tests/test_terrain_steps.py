@@ -238,7 +238,9 @@ def test_a_chip_outlines_removed_on_the_old_map_added_on_the_new_moved_on_both()
     assert 'fill="#ffd23f" mask="url(#tm-hl-mask-towers-new-moved)"' in new
     assert "#ff4d4d" not in old + new and "#5dff8a" not in old + new
     t_old, t_new = _hl(svg, "trees", "old"), _hl(svg, "trees", "new")
-    assert "<path d=\"M" in t_old and "<circle" not in t_old and "<rect" in t_new   # squares' edges, like the trees
+    # each changed tree's OWN square (6.4 wide, the tree layer's size) in its change colour — owner 2026-10-04
+    assert 'width="6.4" height="6.4"' in t_old and "<circle" not in t_old and "<path" not in t_old
+    assert 'tm-hl-sq" fill="none"' in t_new and "mask=" not in t_new and 'width="6.4"' in t_new
     assert "#ff4d4d" in t_old and "#5dff8a" not in t_old and "#5dff8a" in t_new and "#ff4d4d" not in t_new
     assert 'data-layer="trees"' in svg.split("tm-hl-trees tm-old")[1][:40]
 
@@ -597,3 +599,18 @@ def test_the_picker_lists_patches_not_ranges():
 def test_a_patch_page_links_to_its_own_terrain_page():
     from patch.elements import plain_header
     assert 'href="../terrain_739b.html"' in plain_header("Terrain Changes", dynamics=False, terrain_link="7.39b")
+
+
+def test_a_changed_tree_outlines_its_own_square_dashed_on_the_old_map():
+    """The owner 2026-10-04 (a red dashed contour round a grove vs the row pictures' coloured squares): "outline the
+    square itself in the colour of its change, only dashed". Old side: each tree's own 6.4 square, dashed, over a
+    faded solid of the same colour (the green border must not show in the gaps); new side: solid squares where they
+    stand, a faint dashed square where a moved tree stood."""
+    sq = terrain._square_outlines("removed", [(10, 10), (12, 10)], 3.2, "#ff4d4d", 1.6, dashed=True)
+    assert sq.count('<rect x="6.8" y="6.8" width="6.4" height="6.4"/>') == 2         # underlay + dashes
+    assert '<g stroke-width="1.36" stroke-opacity="0.35">' in sq and 'stroke-dasharray="2.0 1.44"' in sq
+    solid = terrain._square_outlines("added", [(10, 10)], 3.2, "#5dff8a", 1.6, dashed=False)
+    assert "stroke-dasharray" not in solid and 'stroke-width="1.6"' in solid
+    ghost = terrain._square_outlines("moved", [(10, 10)], 3.2, "#ffd23f", 1.6, dashed=True, ghost=True)
+    assert "tm-hl-ghost" in ghost and 'opacity="0.6"' in ghost
+    assert terrain._square_outlines("moved", [], 3.2, "#ffd23f", 1.6, dashed=True) == ""

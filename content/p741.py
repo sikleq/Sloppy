@@ -1928,8 +1928,7 @@ def build():
     # Dawnbreaker
     W(hero_header("Dawnbreaker"))
     W(ul_open())
-    W(li("Base damage increased by 6", bstat_h("Dawnbreaker", "AttackDamageMin", "7.40c", 6), extra=note_box(hero="Dawnbreaker", field="AttackDamageMin", before_patch="7.40c")))
-    W(li("Damage at level 1 increased from 50–54 to 56–60", br(50, 54, 56, 60)))
+    W(li("Base damage increased by 6", bstat_h("Dawnbreaker", "AttackDamageMin", "7.40c", 6), extra=note_box(hero="Dawnbreaker", field="AttackDamageMin", before_patch="7.40c") + inline_note("Damage at level 1 increased from 50–54 to 56–60")))
     W(ul_close())
     W(ability("Break of Dawn"))
     W(ul_open())
@@ -2158,8 +2157,7 @@ def build():
     # Drow Ranger
     W(hero_header("Drow Ranger"))
     W(ul_open())
-    W(li("Base Damage decreased by 2", bstat_h("Drow Ranger", "AttackDamageMin", "7.40c", -2), extra=note_box(hero="Drow Ranger", field="AttackDamageMin", before_patch="7.40c")))
-    W(li("Damage at level 1 decreased from 51–58 to 49–56", br(51, 58, 49, 56)))
+    W(li("Base Damage decreased by 2", bstat_h("Drow Ranger", "AttackDamageMin", "7.40c", -2), extra=note_box(hero="Drow Ranger", field="AttackDamageMin", before_patch="7.40c") + inline_note("Damage at level 1 decreased from 51–58 to 49–56")))
     W(ul_close())
     W(ability("Precision Aura", slug="drow_ranger_trueshot"))
     W(ul_open())
@@ -2972,10 +2970,9 @@ def build():
     W(ul_open())
     W(li("Base Damage increased by 10",
          bstat_h("Lifestealer", "AttackDamageMin", "7.40c", 10),
-         extra=note_box(hero="Lifestealer", field="AttackDamageMin", before_patch="7.40c")))
+         extra=note_box(hero="Lifestealer", field="AttackDamageMin", before_patch="7.40c") + inline_note("Damage at level 1 increased from 39–45 to 49–55")))
     W(li("Base Attack Speed increased from 100 to 120", b(100, 120)))
     W(li("Base Movement Speed increased from 315 to 320", b(315, 320)))
-    W(li("Damage at level 1 increased from 39–45 to 49–55", br(39, 45, 49, 55)))
     W(ul_close())
     _lsf_pill, _lsf_table = scale_pill(
         "5 per level",
@@ -3172,8 +3169,7 @@ def build():
     # Magnus
     W(hero_header("Magnus"))
     W(ul_open())
-    W(li("Base Agility increased from 12 to 14", b(12, 14)))
-    W(li("Damage at level 1 increased from 55–63 to 56–64", br(55, 63, 56, 64)))
+    W(li("Base Agility increased from 12 to 14", b(12, 14), extra=inline_note("Damage at level 1 increased from 55–63 to 56–64")))
     W(ul_close())
     W(ability("Solid Core"))
     W(ul_open())
@@ -3587,8 +3583,7 @@ def build():
     # Nature's Prophet
     W(hero_header("Nature's Prophet"))
     W(ul_open())
-    W(li("Minimum Base damage increased by 4", bstat_h("Nature's Prophet", "AttackDamageMin", "7.40c", 4), extra=note_box(hero="Nature's Prophet", field="AttackDamageMin", before_patch="7.40c")))
-    W(li("Damage at level 1 increased from 40–50 to 44–50", br(40, 50, 44, 50)))
+    W(li("Minimum Base damage increased by 4", bstat_h("Nature's Prophet", "AttackDamageMin", "7.40c", 4), extra=note_box(hero="Nature's Prophet", field="AttackDamageMin", before_patch="7.40c") + inline_note("Damage at level 1 increased from 40–50 to 44–50")))
     W(ul_close())
     W(ability("Spirit of the Forest"))
     W(ul_open())
@@ -4165,8 +4160,7 @@ def build():
     # Rubick
     W(hero_header("Rubick"))
     W(ul_open())
-    W(li("Base Damage increased by 1", bstat_h("Rubick", "AttackDamageMin", "7.40c", 1), extra=note_box(hero="Rubick", field="AttackDamageMin", before_patch="7.40c")))
-    W(li("Damage at level 1 increased from 49–55 to 50–56", br(49, 55, 50, 56)))
+    W(li("Base Damage increased by 1", bstat_h("Rubick", "AttackDamageMin", "7.40c", 1), extra=note_box(hero="Rubick", field="AttackDamageMin", before_patch="7.40c") + inline_note("Damage at level 1 increased from 49–55 to 50–56")))
     W(ul_close())
     W(ability_change(
         old=dict(
@@ -4657,8 +4651,7 @@ def build():
     # Sven
     W(hero_header("Sven"))
     W(ul_open())
-    W(li("Base Strength increased from 23 to 24", b(23, 24)))
-    W(li("Damage at level 1 increased from 60–62 to 61–63", br(60, 62, 61, 63)))
+    W(li("Base Strength increased from 23 to 24", b(23, 24), extra=inline_note("Damage at level 1 increased from 60–62 to 61–63")))
     W(ul_close())
     _sv_pill, _sv_table = scale_pill(
         "0.08 + 0.02 per level",
@@ -5555,8 +5548,7 @@ def build():
     W(ul_open())
     W(li("Base Strength increased from 19 to 21", b(19, 21)))
     W(li("Base Damage increased by 1–3", bstat_h("Zeus", "AttackDamageMin", "7.40c", 1),
-         extra=note_box(hero="Zeus", field="AttackDamageMin", before_patch="7.40c") + inline_note("Damage spread increased from 8 to 10 — " + b(8, 10))))
-    W(li("Damage at level 1 increased from 52–60 to 53–63", br(52, 60, 53, 63)))
+         extra=note_box(hero="Zeus", field="AttackDamageMin", before_patch="7.40c") + inline_note("Damage spread increased from 8 to 10 — " + b(8, 10)) + inline_note("Damage at level 1 increased from 52–60 to 53–63")))
     W(li("Base Movement Speed decreased from 315 to 305", b(315, 305)))
     W(li("Base Armor decreased by 1", bstat_h("Zeus", "ArmorPhysical", "7.40c", -1), extra=note_box(hero="Zeus", field="ArmorPhysical", before_patch="7.40c")))
     W(ul_close())
