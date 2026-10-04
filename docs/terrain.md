@@ -379,8 +379,10 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   dist/terrain_stats.html (build step "tstats"), left-aligned like every Materials page (no intro), the headings 10 px
   in: tiles centred (patches, "65 map files" linking to the Oldgrowth repo with a dotted label, trees and camps since
   7.08); an inline-SVG step chart of the trees on a faint grid (a line per 100 trees and per year, faint axes), each
-  point's version and tree count on hover ("7.38 · 2496", CSS `.ts-pt:hover .ts-tip`), the 5 files that moved the
-  most trees labelled with their version only, on dark plates; and the table, newest first, full width — map files
+  point's version and tree count on hover ("7.38 · 2496", CSS `.ts-pt:hover .ts-tip`), no labels on the chart (the
+  owner: "remove 7.20, 7.23…"), a version without a letter drawn as a bolder point (`.ts-dot-major`), a faint red
+  least-squares trend line through all the files (`.ts-trend`); and the table, newest first, full width (a clicked
+  row framed in gold like the other table pages, `.ts-row-selected`, scripts.js "TERRAIN STATS") — map files
   with nothing different from the one before glued into its row (`group`: 65 files → 33 rows), the "Map version" a
   range ("7.35 – 7.37e", the owner: "easier than listing them"), the date as dd-mm-yy, no icon on Map version / Date,
   17 kinds of object (trees, camps and each tier, towers, outposts, watchers, lotus pools,

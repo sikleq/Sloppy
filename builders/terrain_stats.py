@@ -47,7 +47,6 @@ COLUMNS = (
     ("roshan", "Roshan pits", "ui/gothic/tc_roshan"),
     ("tormentors", "Tormentors", "ui/gothic/tc_tormentors"),
 )
-MARKS = 5                     # the files that moved the most trees, labelled on the chart
 
 
 def _esc(s):
@@ -98,11 +97,6 @@ def group(files):
     return rows
 
 
-def churn(f):
-    """Trees added + removed in a map file (7.38: +1017 −1052 → 2069)."""
-    t = f["moves"].get("trees", {})
-    return t.get("add", 0) + t.get("rem", 0)
-
 
 def _tile(icon, num, name, delta=None, href=None):
     d = ""
@@ -129,9 +123,9 @@ def tiles_html(files, n_patches):
 
 
 def chart_svg(files, w=1300, h=260):
-    """Trees on the map over the years: a step line on a faint grid (a line per 100 trees and per year), one point
-    per map file — its value shows on hover — and the files that moved the most trees labelled with what they
-    added and removed."""
+    """Trees on the map over the years: a step line on a faint grid (a line per 100 trees and per year), a faint red
+    trend line through all of it, one point per map file — bolder for a version without a letter (7.20, 7.38) — its
+    version and tree count on hover."""
     pad_l, pad_r, pad_t, pad_b = 52, 20, 34, 28
     dates = [_dt.date.fromisoformat(f["date"]) for f in files]
     t0, t1 = dates[0].toordinal(), dates[-1].toordinal()
@@ -163,27 +157,28 @@ def chart_svg(files, w=1300, h=260):
         d.append(f"H{X(dates[i])}V{Y(ys[i])}")
     d.append(f"H{right}")
     parts.append(f'<path class="ts-line" d="{"".join(d)}"/>')
-    top = set(sorted(range(len(files)), key=lambda i: churn(files[i]), reverse=True)[:MARKS])
-    labels, points = [], []
+    # a straight trend through every file, faint red (the owner 2026-10-04: "a light, see-through trend line")
+    xs = [dt.toordinal() for dt in dates]
+    mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
+    slope = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / max(1e-9, sum((x - mx) ** 2 for x in xs))
+    parts.append(f'<line class="ts-trend" x1="{X(dates[0])}" y1="{Y(my + slope * (xs[0] - mx))}" '
+                 f'x2="{X(dates[-1])}" y2="{Y(my + slope * (xs[-1] - mx))}"/>')
+    points = []
     for i, (f, dt) in enumerate(zip(files, dates)):
         x, y = X(dt), Y(ys[i])
-        big = i in top and churn(f)
-        if big:              # the version only, on a plate the line never cuts (the owner: no "+1838 −1578" there)
-            lw = 14 + len(f["patch"]) * 7.5
-            ly = y - 30 if y - 30 > 6 else y + 12
-            lx = min(max(x - lw / 2, pad_l + 2), right - lw - 2)
-            labels.append(f'<g class="ts-mark"><rect x="{lx}" y="{ly}" width="{lw}" height="20" rx="3"/>'
-                          f'<text x="{lx + lw / 2}" y="{ly + 14}">{_esc(f["patch"])}</text></g>')
-        # hover: the point grows and shows its tree count only (CSS :hover on the group; a wide invisible target)
-        tip = f"{f['patch']} · {ys[i]}"          # the version and its tree count (the owner: "bring the versions back")
+        # no labels on the chart (the owner: "remove 7.20, 7.23 …"); a version without a letter is a bolder point
+        major = _re.fullmatch(r"\d+\.\d+", f["patch"]) is not None
+        # hover: the point grows and shows its version and tree count (CSS :hover; a wide invisible target)
+        tip = f"{f['patch']} · {ys[i]}"
         tw = 14 + len(tip) * 7
         tx = min(max(x - tw / 2, pad_l + 2), right - tw - 2)
         ty = y + 14 if y - 30 < pad_t else y - 30
         points.append(f'<g class="ts-pt"><circle class="ts-hit" cx="{x}" cy="{y}" r="9"/>'
-                      f'<circle class="ts-dot{" ts-dot-big" if big else ""}" cx="{x}" cy="{y}" r="{4 if big else 2.6}"/>'
+                      f'<circle class="ts-dot{" ts-dot-major" if major else ""}" cx="{x}" cy="{y}" '
+                      f'r="{4.2 if major else 2.4}"/>'
                       f'<g class="ts-tip"><rect x="{tx}" y="{ty}" width="{round(tw, 1)}" height="20" rx="3"/>'
                       f'<text x="{tx + tw / 2}" y="{ty + 14}">{_esc(tip)}</text></g></g>')
-    parts += labels + points                     # points last: a hovered value lies over the labels
+    parts += points
     return (f'<svg class="ts-chart" viewBox="0 0 {w} {h}" role="img" aria-label="Trees on the map, '
             f'{files[0]["patch"]} to {files[-1]["patch"]}">{"".join(parts)}</svg>')
 

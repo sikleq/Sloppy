@@ -20,7 +20,7 @@ def test_every_map_file_is_one_row_with_the_patches_that_shipped_it():
     assert by["7.22"]["also"][:2] == ["7.22b", "7.22c"]
     assert by["7.41"]["n"]["watchers"] == 10 and by["7.41"]["n"]["outposts"] == 2      # lanterns, not outposts
     assert [by["7.41"]["n"][f"tier{t}"] for t in range(4)] == [6, 14, 6, 2]
-    assert ts.churn(by["7.38"]) == 2069 and by["7.41"]["moves"]["camps"] == {"moved": 7}
+    assert by["7.38"]["moves"]["trees"] == {"add": 1017, "rem": 1052} and by["7.41"]["moves"]["camps"] == {"moved": 7}
     assert ts.short_date("2026-09-15") == "15-09-26"
 
 
@@ -54,7 +54,10 @@ def test_tiles_chart_and_the_terrain_menu():
     tiles = ts.tiles_html(files, 118)
     assert '<a class="tf-tile ts-tile-link" href="https://github.com/sikleq/Oldgrowth">' in tiles
     chart = ts.chart_svg(files)
-    assert chart.count('class="ts-mark"') == 5 and '">7.33</text></g>' in chart and "+1838" not in chart  # versions only
+    # 10-04: no labels; a version without a letter is a bolder point; a faint trend line through it all
+    assert 'class="ts-mark"' not in chart and chart.count('class="ts-trend"') == 1
+    majors = sum(1 for f in files if "." in f["patch"] and f["patch"][-1].isdigit())
+    assert chart.count('class="ts-dot ts-dot-major"') == majors and majors > 10
     assert chart.count('class="ts-pt"') == 65 and '">7.38 · 2496</text>' in chart       # version + count on hover
     assert 'class="ts-grid ts-grid-major" x1=' in chart and 'class="ts-axis"' in chart
     groups = {g[0]: g for g in site.MATERIALS_GROUPS}
@@ -68,6 +71,9 @@ def test_terrain_pages_never_delete_the_stats_page_and_styles_stay_scoped():
     assert not [f for f in glob.glob(os.path.join(_ROOT, "dist", "terrain_[0-9]*.html")) if "stats" in f]
     css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
     block = css.split("/* ---- Terrain Stats", 1)[1].split("a.ts-thumb:hover img", 1)[0]
+    assert ".ts-table tbody tr.ts-row-selected > td" in css             # a clicked row is framed, like other tables
+    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    assert "table.querySelectorAll('tr.ts-row-selected')" in js and "if (e.target.closest('a')) return;" in js
     wrap = block.split(".terrain-stats-page .ts-wrap {", 1)[1].split("}", 1)[0]
     assert "auto" not in wrap and "max-width" not in wrap               # never centred
     for line in block.splitlines():                                   # every rule scoped to the page or its parts

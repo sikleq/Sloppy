@@ -45,6 +45,13 @@
       "title": "Terrain: a change shows its result (+20 trees), not both halves (+324 −304)"
     },
     {
+      "date": "2026-10-04",
+      "category": "Terrain",
+      "minor": true,
+      "link": "terrain_stats.html",
+      "title": "Terrain Stats: a trend line through the trees, bolder points for major versions, a clicked row stays framed"
+    },
+    {
       "date": "2026-10-03",
       "category": "Site",
       "minor": true,

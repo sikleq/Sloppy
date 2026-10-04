@@ -9973,9 +9973,9 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 .ts-chart .ts-xlab { text-anchor: middle; }
 .ts-chart .ts-line { fill: none; stroke: #e3c46a; stroke-width: 2; stroke-linejoin: round; }
 .ts-chart .ts-dot { fill: #e3c46a; transition: r 0.12s ease; }
-.ts-chart .ts-dot-big { fill: #fff3d6; stroke: #e3c46a; stroke-width: 1.5; }
-.ts-chart .ts-mark rect { fill: rgba(20, 17, 12, 0.92); stroke: rgba(227, 196, 106, 0.45); stroke-width: 1; }
-.ts-chart .ts-mark text { font-size: 11.5px; font-weight: 700; text-anchor: middle; fill: #f0e3c2; }
+/* a version without a letter (7.20, 7.38) is a bolder point; the trend is a faint red line through it all */
+.ts-chart .ts-dot-major { fill: #fff3d6; stroke: #e3c46a; stroke-width: 1.6; }
+.ts-chart .ts-trend { stroke: #ff6a55; stroke-width: 2; stroke-opacity: 0.45; stroke-linecap: round; }
 /* a point's value on hover — the owner asked for it */
 .ts-chart .ts-hit { fill: transparent; cursor: default; }
 .ts-chart .ts-tip { opacity: 0; pointer-events: none; transition: opacity 0.12s ease; }
@@ -9993,6 +9993,15 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 .ts-table thead th img { display: block; margin: 0 auto 3px; width: 16px; height: 16px; }
 .ts-table thead th span { display: block; white-space: nowrap; }
 .ts-table tbody tr:hover td { background: rgba(227, 196, 106, 0.05); }
+/* a clicked row: the gold frame round the whole row, like every table page (.mr-row-selected); click again to clear */
+.ts-table tbody tr { cursor: pointer; }
+.ts-table tbody tr.ts-row-selected > td {
+  box-shadow: inset 0 2px 0 var(--gold-95), inset 0 -2px 0 var(--gold-95);
+  background-image: linear-gradient(rgba(231, 196, 106, 0.10), rgba(231, 196, 106, 0.10)); }
+.ts-table tbody tr.ts-row-selected > td:first-child {
+  box-shadow: inset 2px 0 0 var(--gold-95), inset 0 2px 0 var(--gold-95), inset 0 -2px 0 var(--gold-95); }
+.ts-table tbody tr.ts-row-selected > td:last-child {
+  box-shadow: inset -2px 0 0 var(--gold-95), inset 0 2px 0 var(--gold-95), inset 0 -2px 0 var(--gold-95); }
 .ts-table td.ts-file { white-space: nowrap; font-weight: 700; color: var(--text-bright); }
 .ts-table td.ts-file a { color: inherit; text-decoration: underline dotted rgba(227, 196, 106, 0.5); text-underline-offset: 3px; }
 .ts-table .ts-range { white-space: nowrap; }                       /* "7.35 – 7.37e": the versions one row covers */
