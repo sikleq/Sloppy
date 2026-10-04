@@ -379,8 +379,8 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   half, from the same full render) with the pictured square framed yellow. ~65 KB / ~190 KB a picture.
 - **Where a moved object stood: a dashed ghost (2026-10-03)** — the owner, on a camp moved a little ("why the yellow
   squares?"): "on the new map show with a light dashed line where the object was before". The new side draws, at
-  each moved object's OLD spot, the same shape dashed and faint: on the Terrain page `_ghost_outlines` (inside
-  `g.tm-hl-g-moved`, so the "moved" switch hides it), in the pictures `terrain_shots._dashed`. Yellow solid = where
+  each moved object's OLD spot, the same shape dashed and faint: on the Terrain page `_dashed_outlines(…, ghost=True)`
+  (inside `g.tm-hl-g-moved`, so the "moved" switch hides it), in the pictures `terrain_shots._dashed`. Yellow solid = where
   it stands on that side; on the new side the dashed one shows where it came from. Spawn boxes too ("a camp that
   moves moves its spawn boxes — it doesn't show they moved"): the pictures draw the old box red dashed over the new
   green one on the new side (`_boxes`; the Terrain page's spawn box layer already overlays old dashed on new). The
@@ -388,9 +388,12 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   owner, same day: "on the old versions let everything be dashed — then, looking at the new map layer, dashed clearly
   means old"): the old side's outlines — removed red, moved yellow where it stood, the old spawn boxes — are dashed
   too, solid lines are only ever the new state. Pictures: `_outlines` / `_boxes` call `_dashed` / `_dashed_poly` on
-  the old side. Terrain page: `_dashed_old` masks the old SVG's merged contours with 45° stripes (a stroke dash
-  would break the one-contour union of overlapping outlines); no-ward cells stay filled, they are areas, not
-  outlines. **A picture from another patch (2026-10-03)** — the owner asked for pictures of 7.41's "Radiant offlane
+  the old side. Terrain page: `_dashed_outlines` strokes the outline with thin, close dashes along its edges —
+  squares merged into their union's outer edge (`_union_edges`: each square's edges minus what other squares cover,
+  collinear pieces joined), so a grove is one dashed contour like the solid one; discs stay circles. Width 0.85 ×
+  the solid stroke, dash 1.25 ×, gap 0.9 × (trees: 1.36 / 2.0 / 1.44 viewBox units). First try (10-03) masked the
+  merged contour with 45° stripes — the owner 10-04: "too thick a dashed line with few gaps; take the outline we
+  already draw round a tree and just make it dashed". No-ward cells stay filled, they are areas, not outlines. **A picture from another patch (2026-10-03)** — the owner asked for pictures of 7.41's "Radiant offlane
   tier 2 tower has been adjusted slightly to the left", which the map file did in 7.40 (37 units west), not 7.41: a
   spot `[x, y, "7.40"]` pictures that patch's two maps (`spot_patch`; its own changes outlined, the entry's marks
   and tier icons left out), so the note shows 7.40c → 7.41 with the tower marked white (`"mark_kind": "towers"`,

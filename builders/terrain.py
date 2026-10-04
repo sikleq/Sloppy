@@ -621,31 +621,73 @@ def _cells_fill(kind, cells, proj, colour):
             f'fill-opacity="{_CELL_FILL}"/></g>')
 
 
-def _ghost_outlines(points, shape, stroke):
-    """Where moved objects stood, on the NEW side: a light dashed outline of the same shape (the owner 2026-10-03:
-    "on the new map show with a light dashed line where the object was before"). In g.tm-hl-g-moved, so the
-    "moved" switch hides it with the solid outlines."""
-    if not points:
+def _union_edges(rects):
+    """The outer boundary of a union of axis-aligned squares, as merged straight runs: ("h", y, x1, x2) and
+    ("v", x, y1, y2). An edge keeps only the parts no other square covers; collinear pieces join into one run."""
+    size = max((r[2] - r[0] for r in rects), default=1) or 1
+    grid = {}
+    for i, r in enumerate(rects):
+        grid.setdefault((int(r[0] // size), int(r[1] // size)), []).append(i)
+
+    def near(r):
+        gx, gy = int(r[0] // size), int(r[1] // size)
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                yield from grid.get((gx + dx, gy + dy), ())
+
+    def uncovered(lo, hi, cover):
+        out, cur = [], lo
+        for a, b in sorted(cover):
+            if b <= cur:
+                continue
+            if a > cur:
+                out.append((cur, min(a, hi)))
+            cur = max(cur, b)
+            if cur >= hi:
+                break
+        if cur < hi:
+            out.append((cur, hi))
+        return [(a, b) for a, b in out if b - a > 0.05]
+    runs = {}
+    for i, (x1, y1, x2, y2) in enumerate(rects):
+        others = [rects[j] for j in near(rects[i]) if j != i]
+        for y in (y1, y2):                                  # top and bottom edges
+            cover = [(max(x1, o[0]), min(x2, o[2])) for o in others if o[1] < y < o[3] and o[0] < x2 and o[2] > x1]
+            runs.setdefault(("h", round(y, 1)), []).extend(uncovered(x1, x2, cover))
+        for x in (x1, x2):                                  # left and right edges
+            cover = [(max(y1, o[1]), min(y2, o[3])) for o in others if o[0] < x < o[2] and o[1] < y2 and o[3] > y1]
+            runs.setdefault(("v", round(x, 1)), []).extend(uncovered(y1, y2, cover))
+    edges = []
+    for (kind, at), spans in runs.items():
+        merged = []
+        for a, b in sorted(spans):
+            if merged and a <= merged[-1][1] + 0.05:
+                merged[-1][1] = max(merged[-1][1], b)
+            else:
+                merged.append([a, b])
+        edges += [(kind, at, round(a, 1), round(b, 1)) for a, b in merged]
+    return edges
+
+
+def _dashed_outlines(kind, centres, shape, colour, stroke, ghost=False):
+    """Outlines drawn as thin, close dashes along their edges (the owner 2026-10-03: "on the old versions let
+    everything be dashed"; 10-04, on the striped first try: "too thick, too few gaps — take the outline we already
+    draw round a tree and just make it dashed"): squares merge into their union's outer edge (a grove gets one
+    contour, as the solid outlines do), discs stay separate circles. `ghost` = where a moved object stood, on the
+    new side: fainter. In .tm-hl-g-<kind>, so the moved / removed / added switches hide it."""
+    if not centres:
         return ""
-    kind, half = shape
-    marks = "".join(
-        f'<rect x="{x - half:.1f}" y="{y - half:.1f}" width="{2 * half:.1f}" height="{2 * half:.1f}"/>'
-        if kind == "rect" else f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{half:.1f}"/>' for x, y in points)
-    return (f'<g class="tm-hl-g-moved tm-hl-ghost" fill="none" stroke="{_HL_COLOUR["moved"]}" '
-            f'stroke-width="{stroke * 0.7:.2f}" stroke-dasharray="{stroke * 2.2:.1f} {stroke * 1.8:.1f}" '
-            f'opacity="0.6">{marks}</g>')
-
-
-def _dashed_old(body, mask, stroke):
-    """The old side's outlines cut into dashes (the owner 2026-10-03: "on the old versions let everything be dashed,
-    so dashed means old at a glance"): the merged contours stay one shape, masked by 45° stripes — every edge,
-    straight or round, breaks into dashes about as long as the new side's ghost dashes."""
-    w, gap = round(stroke * 1.6, 2), round(stroke * 1.3, 2)
-    return (f'<defs><pattern id="{mask}-p" patternUnits="userSpaceOnUse" width="{w + gap}" height="{w + gap}" '
-            f'patternTransform="rotate(45)"><rect width="{w}" height="{w + gap}" fill="#fff"/></pattern>'
-            f'<mask id="{mask}" maskUnits="userSpaceOnUse" x="0" y="0" width="{MAP_VB}" height="{MAP_VB}">'
-            f'<rect width="{MAP_VB}" height="{MAP_VB}" fill="url(#{mask}-p)"/></mask></defs>'
-            f'<g class="tm-hl-dashed" mask="url(#{mask})">{body}</g>')
+    form, s = shape
+    if form == "rect":
+        edges = _union_edges([(x - s, y - s, x + s, y + s) for x, y in centres])
+        body = "".join(f'M{a} {at}H{b}' if k == "h" else f'M{at} {a}V{b}' for k, at, a, b in edges)
+        marks = f'<path d="{body}"/>'
+    else:
+        marks = "".join(f'<circle cx="{round(x, 1)}" cy="{round(y, 1)}" r="{s}"/>' for x, y in centres)
+    width, dash, gap = round(stroke * 0.85, 2), round(stroke * 1.25, 2), round(stroke * 0.9, 2)
+    cls, faint = ("tm-hl-ghost", ' opacity="0.6"') if ghost else ("tm-hl-dashed", "")
+    return (f'<g class="tm-hl-g tm-hl-g-{kind} {cls}" fill="none" stroke="{colour}" stroke-width="{width}" '
+            f'stroke-dasharray="{dash} {gap}"{faint}>{marks}</g>')
 
 
 def _highlights_svg(diff, proj):
@@ -663,15 +705,15 @@ def _highlights_svg(diff, proj):
                 spots = {"moved": [m[0] if side == "old" else m[1] for m in g.get("moved", [])],
                          "removed": g.get("removed", []) if side == "old" else [],
                          "added": g.get("added", []) if side == "new" else []}
-                body = "".join(_outline_union(f"tm-hl-mask-{key}-{side}-{k}", k, [proj(x, y) for x, y in spots[k]],
-                                              _HL_SHAPE.get(key, _HL_ENT_SHAPE), _HL_COLOUR[k],
-                                              _HL_STROKE.get(key, 2.4))
-                               for k in _HL_KINDS)
-                if side == "new":
-                    body += _ghost_outlines([proj(*m[0]) for m in g.get("moved", [])],
-                                            _HL_SHAPE.get(key, _HL_ENT_SHAPE), _HL_STROKE.get(key, 2.4))
-                elif body:
-                    body = _dashed_old(body, f"tm-hl-dash-{key}", _HL_STROKE.get(key, 2.4))
+                shape, stroke = _HL_SHAPE.get(key, _HL_ENT_SHAPE), _HL_STROKE.get(key, 2.4)
+                pts = {k: [proj(x, y) for x, y in spots[k]] for k in _HL_KINDS}
+                if side == "old":                       # dashed = where it was
+                    body = "".join(_dashed_outlines(k, pts[k], shape, _HL_COLOUR[k], stroke) for k in _HL_KINDS)
+                else:                                   # solid = where it is, plus a faint dashed ghost of an old spot
+                    body = "".join(_outline_union(f"tm-hl-mask-{key}-{side}-{k}", k, pts[k], shape, _HL_COLOUR[k],
+                                                  stroke) for k in _HL_KINDS)
+                    body += _dashed_outlines("moved", [proj(*m[0]) for m in g.get("moved", [])], shape,
+                                             _HL_COLOUR["moved"], stroke, ghost=True)
             if body:
                 out.append(f'<svg class="tc-markers tm-hl tm-hl-{key} tm-{side}" data-layer="{layer}" '
                            f'viewBox="0 0 {MAP_VB} {MAP_VB}" preserveAspectRatio="none" aria-hidden="true">{body}</svg>')

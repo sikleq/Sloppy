@@ -234,11 +234,11 @@ def test_a_chip_outlines_removed_on_the_old_map_added_on_the_new_moved_on_both()
     assert 'data-hl="trees" data-layer="trees"' in html
     assert 'alt="Camp spawn boxes"' in html and "data-hl=\"camp" not in html.split('alt="Camp spawn boxes"')[0][-90:]
     old, new = _hl(svg, "towers", "old"), _hl(svg, "towers", "new")       # the offlane tier 2 tower moved
-    assert 'fill="#ffd23f" mask="url(#tm-hl-mask-towers-old-moved)"' in old and "<circle" in old
+    assert 'tm-hl-g-moved tm-hl-dashed" fill="none" stroke="#ffd23f"' in old and "<circle" in old   # dashed = old
     assert 'fill="#ffd23f" mask="url(#tm-hl-mask-towers-new-moved)"' in new
     assert "#ff4d4d" not in old + new and "#5dff8a" not in old + new
     t_old, t_new = _hl(svg, "trees", "old"), _hl(svg, "trees", "new")
-    assert "<rect" in t_old and "<circle" not in t_old                   # squares, like the trees
+    assert "<path d=\"M" in t_old and "<circle" not in t_old and "<rect" in t_new   # squares' edges, like the trees
     assert "#ff4d4d" in t_old and "#5dff8a" not in t_old and "#5dff8a" in t_new and "#ff4d4d" not in t_new
     assert 'data-layer="trees"' in svg.split("tm-hl-trees tm-old")[1][:40]
 
@@ -445,7 +445,8 @@ def test_moved_objects_leave_a_dashed_ghost_on_the_new_side():
     svg = terrain._highlights_svg(diff, lambda x, y: (x, y))
     new_camps = svg.split('tm-hl-camps tm-new"', 1)[1].split("</svg>", 1)[0]
     old_camps = svg.split('tm-hl-camps tm-old"', 1)[1].split("</svg>", 1)[0]
-    assert 'class="tm-hl-g-moved tm-hl-ghost"' in new_camps and "stroke-dasharray" in new_camps
+    assert 'class="tm-hl-g tm-hl-g-moved tm-hl-ghost"' in new_camps and "stroke-dasharray" in new_camps
+    assert 'opacity="0.6"' in new_camps
     assert "tm-hl-ghost" not in old_camps
     js_css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
     assert ".terrain-compare.hl-hide-moved .tm-hl-g-moved" in js_css
@@ -460,14 +461,23 @@ def test_moved_objects_leave_a_dashed_ghost_on_the_new_side():
 
 def test_everything_on_the_old_side_is_dashed():
     """The owner 2026-10-03: "on the old versions let everything be dashed — then, looking at the new map layer, dashed
-    clearly means old". The page masks the old side's merged outlines into dashes (the new side stays solid, with its
-    dashed ghosts); a note picture draws the old side's outline with gaps where the new side's is solid."""
+    clearly means old". 10-04, on striped dashes: "too thick, too few gaps — take the outline we already draw round
+    a tree and just make it dashed": the old side strokes the merged squares' outer edge with thin, close dashes (the
+    new side stays solid, with its dashed ghosts); a note picture draws the old side's outline with gaps too."""
     svg = terrain._highlights_svg(terrain._load_diff("7.41"), lambda x, y: (x, y))
     old_camps = svg.split('tm-hl-camps tm-old"', 1)[1].split("</svg>", 1)[0]
     new_camps = svg.split('tm-hl-camps tm-new"', 1)[1].split("</svg>", 1)[0]
-    assert '<g class="tm-hl-dashed" mask="url(#tm-hl-dash-camps)">' in old_camps
-    assert 'patternTransform="rotate(45)"' in old_camps and "tm-hl-g-moved" in old_camps
-    assert "tm-hl-dashed" not in new_camps
+    assert 'class="tm-hl-g tm-hl-g-moved tm-hl-dashed" fill="none" stroke="#ffd23f" stroke-width="2.04" ' \
+           'stroke-dasharray="3.0 2.16"' in old_camps
+    assert "mask=" not in old_camps and "tm-hl-dashed" not in new_camps
+    trees = svg.split('tm-hl-trees tm-old"', 1)[1].split("</svg>", 1)[0]
+    assert 'stroke-width="1.36" stroke-dasharray="2.0 1.44"' in trees     # trees: thinner than their 1.6 solid
+    # a grove is one contour: two overlapping squares leave their outer edge only, in merged straight runs
+    edges = terrain._union_edges([(0, 0, 10, 10), (5, 0, 15, 10)])
+    assert sorted(edges) == [("h", 0, 0, 15), ("h", 10, 0, 15), ("v", 0, 0, 10), ("v", 15, 0, 10)]
+    inner = terrain._union_edges([(0, 0, 10, 10), (5, 5, 15, 15)])
+    assert ("v", 10, 0, 5) in inner and ("v", 5, 10, 15) in inner and not [e for e in inner if e[:2] == ("v", 10)
+                                                                             and e[3] > 5]
     pytest.importorskip("PIL")
     from PIL import Image
     sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
