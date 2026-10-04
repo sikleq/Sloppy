@@ -26,11 +26,6 @@ PAD = 6
 #   scope = None (page) | ("block", "<entity name>") | ("row", "<row text>")
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
-    # the changelog's own 10-04 changes: topics as chips, "Show more", a new button shown as its icon
-    "2026-10-04_clog_topics.webp": ("changelog.html", None, [".clog-chips"], [], 200, {"width": 1400}),
-    "2026-10-04_clog_more.webp": ("changelog.html", None, [".clog-more-wrap"], [], 200, {"width": 1400}),
-    "2026-10-04_clog_icon.webp": ("changelog.html", None, ['li:has(img.clog-ui[alt="All layers"])'],
-                                  ["#m-2026-10-02 summary"], 200, {"width": 1400}),
     "2026-10-03_terrain_notes.webp": ("patches/7.41.html", None,
                                       ['li:has-text("The medium flooded camp near the bounty runes can now evolve")',
                                        'li:has-text("Medium neutral camp near offlane defender\'s gate")'],

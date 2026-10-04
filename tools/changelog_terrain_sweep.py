@@ -32,10 +32,7 @@ SCENES = {
     "all_layers": ("7.41", "All layers", ['.tc-layer-btn[data-layer="all"]'], (0.25, 0.25, 0.75, 0.75)),
 }
 # still close-ups: name -> (page patch, clicks, crop, slider position (100 = all old)), shot at triple scale
-STILLS = {
-    "2026-10-04_terrain_dashes.webp": ("7.40", ['.terrain-facts .tf-chip-btn[data-hl="trees"]'],
-                                       (0.05, 0.085, 0.16, 0.195), 100),
-}
+STILLS = {}         # e.g. "x.webp": ("7.40", ['.terrain-facts .tf-chip-btn[data-hl="trees"]'], (0.05, 0.085, 0.16, 0.195), 100)
 STILL_SCALE = 8                        # device pixels per CSS pixel: the outlines are vector, they stay sharp
 HOLD, SWEEP = 8, 22                    # frames resting on a map, frames of one sweep
 HOLD_MS, SWEEP_MS = 110, 60

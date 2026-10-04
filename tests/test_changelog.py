@@ -93,17 +93,17 @@ def test_categories_say_what_changed_icons_stand_for_buttons_and_five_news_show(
     assert "document.querySelectorAll('.clog-chips .clog-chip')" in js
 
 
-def test_every_new_change_comes_with_a_picture():
+def test_every_new_feature_comes_with_a_picture_small_changes_with_icons():
     """The owner 2026-10-04: "everything written in the changelog should come with a screenshot or a GIF, unless it
-    is a fix or an audit". From that day on a feature or a small change without "fix": true carries shots; a small
-    change's pictures show as thumbnails at the end of its line, opening in the lightbox."""
+    is a fix or an audit" — then: "you took the pictures for small changes too literally: I meant icons, not
+    screenshots — added the All layers icon, shown in the line as the icon". From that day on a feature without
+    "fix": true carries shots; a small change carries none (a button / filter / icon it adds is its [[icon]])."""
     entries = clog.load_entries()
-    bare = [e["title"] for e in entries if e["date"] >= "2026-10-04" and not e.get("fix") and not e.get("shots")]
+    bare = [e["title"] for e in entries if e["date"] >= "2026-10-04" and not e.get("minor") and not e.get("fix")
+            and not e.get("shots")]
     assert not bare, bare
-    minor = next(e for e in entries if e.get("minor") and e.get("shots"))
-    html = clog._minor_html(minor["date"], [minor])
-    assert '<span class="clog-shots clog-thumbs"><a class="clog-shot clog-thumb" href="icons/changelog/' in html
-    assert "data-zoom><img" in html
+    assert not [e["title"] for e in entries if e.get("minor") and e.get("shots")]
+    assert "clog-thumb" not in clog.render(entries)
 
 
 def test_notes_are_short_and_heroes_are_icons():

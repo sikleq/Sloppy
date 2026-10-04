@@ -10213,13 +10213,6 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 .clog-page .clog-entry.clog-later, .clog-page .clog-day.clog-later { display: none; }
 .clog-more-wrap { display: flex; justify-content: center; margin: 18px 0 8px; }
 .clog-more-btn[hidden] { display: none; }
-/* a small change's pictures: thumbnails at the end of its line, large in the lightbox */
-.clog-shots.clog-thumbs { display: inline-flex; flex-direction: row; gap: 4px; margin: 0 0 0 8px; vertical-align: middle; }
-.clog-thumbs .clog-thumb { display: inline-block; width: auto; padding: 0; background: none; border: 0; box-shadow: none; }
-.clog-thumbs .clog-thumb img, .clog-thumbs .clog-thumb:hover img { display: block; height: 30px; width: auto;
-  max-width: 64px; object-fit: cover; border-radius: 2px; border: 1px solid rgba(227, 196, 106, 0.3); box-shadow: none;
-  cursor: zoom-in; transition: border-color 0.15s ease; }
-.clog-thumbs .clog-thumb:hover img { border-color: rgba(227, 196, 106, 0.8); }
 /* a button / filter / icon a note adds, shown as itself */
 .clog-ui { width: 16px; height: 16px; vertical-align: -3px; margin: 0 2px; image-rendering: pixelated; }
 .clog-page .clog-entry.is-hidden, .clog-page .clog-day.is-hidden, .clog-page .clog-rail-item.is-hidden,
