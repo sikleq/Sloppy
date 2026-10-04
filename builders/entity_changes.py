@@ -921,7 +921,8 @@ def _unit_camp_map() -> dict:
         return _UNIT_CAMP_CACHE
     src = (_HERE / "builders" / "creeps.py").read_text(encoding="utf-8")
     createhero = dict(_re.findall(r"'([a-z0-9_]+)':\s*'(npc_dota_neutral_[a-z0-9_]+)'", src))
-    block = _re.search(r"CREEP_CAMP\s*=\s*\{(.*?)\n    \}", src, _re.S)
+    # closing brace at any indent: CREEP_CAMP is a module-level constant since 2026-10-05
+    block = _re.search(r"CREEP_CAMP\s*=\s*\{(.*?)\n\s*\}", src, _re.S)
     out = {}
     if block:
         for short, sizes in _re.findall(r"'([a-z0-9_]+)':\s*\[([^\]]+)\]", block.group(1)):
