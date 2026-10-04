@@ -71,6 +71,28 @@ def test_the_two_terrain_page_news_are_one():
     assert "Terrain: a page for every patch" in titles
 
 
+def test_categories_say_what_changed_icons_stand_for_buttons_and_five_news_show():
+    """The owner 2026-10-04: "not Materials but Terrain, not Materials but Heroes"; "a button / filter / icon we add
+    is shown as that icon, not named" ("Terrain: an All layers button"); "show only the last 5 news, the rest under
+    Show more in the middle, loading further without resetting the page"."""
+    entries = clog.load_entries()
+    assert "Materials" not in clog.CATEGORIES and all(e["category"] in clog.CATEGORIES for e in entries)
+    cats = {e["title"]: e["category"] for e in entries}
+    assert cats["Terrain: a page for every patch"] == "Terrain" and cats["Neutral Creeps"] == "Tables"
+    assert cats["Roshan and Tormentor pages"] == "Units"
+    all_layers = next(e for e in entries if "tc_all.png" in e["title"])
+    html = clog._rich(all_layers["title"])
+    assert html.startswith('Terrain: <img class="clog-ui" src="icons/ui/gothic/tc_all.png" alt="All layers"')
+    assert "[[" not in html and clog._plain(all_layers["title"]).startswith("Terrain: All layers turns")
+    page = clog.render(entries)
+    assert "[[" not in page and 'data-cat="materials"' not in page
+    assert '<button type="button" class="clog-chip clog-more-btn" data-step="5" hidden>Show more</button>' in page
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    js = open(os.path.join(root, "src", "scripts.js"), encoding="utf-8").read()
+    assert "e.classList.toggle('clog-later', hide)" in js and "moreBtn.hidden = !later" in js
+    assert "document.querySelectorAll('.clog-chips .clog-chip')" in js
+
+
 def test_notes_are_short_and_heroes_are_icons():
     """The owner 2026-10-03: "too much text, shorten it; where there are hero names, put their small icons instead";
     "Show more changes isn't level with the other items"."""

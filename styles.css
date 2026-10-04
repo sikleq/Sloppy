@@ -10151,7 +10151,11 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 .clog-cat { flex: none; font-size: 10px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
   padding: 2px 6px; border-radius: 3px; border: 1px solid; }
 .clog-cat-patch-reader { color: #d7b56a; border-color: rgba(227,196,106,.35); background: rgba(227,196,106,.08); }
-.clog-cat-materials    { color: #7fb2d9; border-color: rgba(88,166,255,.35);  background: rgba(88,166,255,.08); }
+.clog-cat-terrain      { color: #9fc27a; border-color: rgba(150,200,110,.35); background: rgba(150,200,110,.08); }
+.clog-cat-heroes       { color: #d98f6a; border-color: rgba(220,130,90,.35);  background: rgba(220,130,90,.08); }
+.clog-cat-items        { color: #d6c27a; border-color: rgba(214,194,122,.35); background: rgba(214,194,122,.08); }
+.clog-cat-units        { color: #c98f8f; border-color: rgba(200,130,130,.35); background: rgba(200,130,130,.08); }
+.clog-cat-tables       { color: #7fb2d9; border-color: rgba(88,166,255,.35);  background: rgba(88,166,255,.08); }
 .clog-cat-hero-lab     { color: #86b98f; border-color: rgba(120,215,145,.35); background: rgba(120,215,145,.08); }
 .clog-cat-dynamics     { color: #c29be0; border-color: rgba(190,140,240,.35); background: rgba(190,140,240,.08); }
 .clog-cat-site         { color: #b5b0a5; border-color: rgba(150, 146, 137,.35); background: rgba(150, 146, 137,.08); }
@@ -10205,6 +10209,12 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
   border: 1px solid var(--gold-dim); border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.6);
   animation: clog-zoom .16s ease-out; }
 @keyframes clog-zoom { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
+/* features past the newest few wait under "Show more" (scripts.js paginate) */
+.clog-page .clog-entry.clog-later, .clog-page .clog-day.clog-later { display: none; }
+.clog-more-wrap { display: flex; justify-content: center; margin: 18px 0 8px; }
+.clog-more-btn[hidden] { display: none; }
+/* a button / filter / icon a note adds, shown as itself */
+.clog-ui { width: 16px; height: 16px; vertical-align: -3px; margin: 0 2px; image-rendering: pixelated; }
 .clog-page .clog-entry.is-hidden, .clog-page .clog-day.is-hidden, .clog-page .clog-rail-item.is-hidden,
 .clog-page .clog-minor.is-hidden, .clog-page .clog-minor-list li.is-hidden { display: none; }
 /* a day's small changes continue its list — no heading, no divider of their own (the owner 2026-10-03); many fold

@@ -21,7 +21,9 @@ if _HERE not in _sys.path:
 import builders.site_common as _site  # noqa: E402
 
 DATA = _os.path.join(_HERE, "data", "changelog.json")
-CATEGORIES = ["Patch Reader", "Materials", "Hero Lab", "Dynamics", "Site"]
+# what a change is about (the owner 2026-10-03: "not Materials but Terrain, not Materials but Heroes")
+CATEGORIES = ["Patch Reader", "Terrain", "Heroes", "Items", "Units", "Tables", "Hero Lab", "Dynamics", "Site"]
+FIRST_SHOWN = 5          # features shown before "Show more" (the owner 2026-10-04: "only the last 5 news")
 
 
 def _esc(s):
@@ -44,8 +46,31 @@ def _hero_re():
     return _HERO_RE
 
 
+# a button / filter / icon a note adds is shown as its picture, not named (the owner 2026-10-03: "if we add a
+# button, a filter or an icon, put that icon there instead of text when there is no screenshot") — in the text as
+# [[icons/ui/gothic/tc_all.png|All layers]]
+_UI_ICON_RE = _re.compile(r"\[\[([\w./-]+\.(?:png|svg|webp))\|([^\]]+)\]\]")
+
+
 def _rich(text):
-    """The note's text, escaped, its hero names as icons (alt = the name)."""
+    """The note's text, escaped: its [[icon|name]] marks as the icon, its hero names as their portraits."""
+    out, pos = [], 0
+    for m in _UI_ICON_RE.finditer(text):
+        out.append(_heroes(text[pos:m.start()]))
+        out.append(f'<img class="clog-ui" src="{_esc(m.group(1))}" alt="{_esc(m.group(2))}" width="16" height="16" '
+                   f'loading="lazy" decoding="async">')
+        pos = m.end()
+    out.append(_heroes(text[pos:]))
+    return "".join(out)
+
+
+def _plain(text):
+    """The text with each [[icon|name]] as its name (the rail, anchors, alt texts)."""
+    return _UI_ICON_RE.sub(lambda m: m.group(2), text)
+
+
+def _heroes(text):
+    """Escaped text with every hero name as the hero's small picture (alt = the name)."""
     rx, slugs = _hero_re()
     out, pos = [], 0
     for m in rx.finditer(text):
@@ -108,7 +133,7 @@ def _entry_html(e, minor=""):
 
 
 def _entry_id(e):
-    return f'e-{e["date"]}-{_slug(e["title"])}'
+    return f'e-{e["date"]}-{_slug(_plain(e["title"]))}'
 
 
 def _shots_html(e):
@@ -119,7 +144,7 @@ def _shots_html(e):
         return ""
     slides = "".join(
         f'<a class="clog-shot{" is-active" if i == 0 else ""}" href="{_esc(p)}" data-zoom>'
-        f'<img src="{_esc(p)}" alt="{_esc(e["title"])} — {i + 1}" loading="lazy"></a>'
+        f'<img src="{_esc(p)}" alt="{_esc(_plain(e["title"]))} — {i + 1}" loading="lazy"></a>'
         for i, p in enumerate(paths))
     if len(paths) == 1:
         return f'<div class="clog-shots">{slides}</div>'
@@ -189,18 +214,23 @@ def render(entries):
         majors = [e for e in group if not e.get("minor")]
         minors = [e for e in group if e.get("minor")]
         rail.extend(f'<a class="clog-rail-item" href="#{_entry_id(e)}" data-cat="{_slug(e["category"])}">'
-                    f'{_esc(e["title"])}</a>' for e in majors)
+                    f'{_esc(_plain(e["title"]))}</a>' for e in majors)
         # small changes are not listed in the rail — it names only the features
         minor = _minor_html(date, minors, bool(majors)) if minors else ''
         body = ("".join(_entry_html(e, minor if i == len(majors) - 1 else "") for i, e in enumerate(majors))
                 if majors else minor)
         days.append(f'<section class="clog-day" id="d-{date}" data-cats="{cats}">'
                     f'<h2 class="clog-date">{d.strftime("%b")} {d.day}, {d.year}</h2>{body}</section>')
+    used = {e["category"] for e in entries}
     chips = '<button class="clog-chip active" data-cat="">All</button>' + "".join(
-        f'<button class="clog-chip" data-cat="{_slug(c)}">{_esc(c)}</button>' for c in CATEGORIES)
+        f'<button class="clog-chip" data-cat="{_slug(c)}">{_esc(c)}</button>' for c in CATEGORIES if c in used)
+    # the newest FIRST_SHOWN features show, the rest come FIRST_SHOWN at a time under "Show more" (scripts.js
+    # "SITE CHANGELOG"; without scripts everything shows and the button stays hidden)
+    more = (f'<div class="clog-more-wrap"><button type="button" class="clog-chip clog-more-btn" '
+            f'data-step="{FIRST_SHOWN}" hidden>Show more</button></div>')
     return (f'<div class="clog-layout"><nav class="clog-rail" aria-label="Changes">{"".join(rail)}</nav>'
             f'<div class="clog-main"><div class="clog-chips" role="toolbar" aria-label="Category">{chips}</div>'
-            f'{"".join(days)}</div></div>')
+            f'{"".join(days)}{more}</div></div>')
 
 
 def build():

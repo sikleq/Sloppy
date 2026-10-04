@@ -7355,7 +7355,36 @@ function ecShopMarkup(panels) {
 // ---- SITE CHANGELOG (changelog.html): category chips, current entry in the rail, lightbox, carousels ----
 (function() {
   if (!document.body.classList.contains('clog-page')) return;
-  const chips = document.querySelectorAll('.clog-chip');
+  const chips = document.querySelectorAll('.clog-chips .clog-chip');
+  // only the newest features show, the rest come a step at a time under "Show more" — no reload, the page stays
+  // where it is (the owner 2026-10-04: "show only the last 5 news, hide the rest under Show more")
+  const moreBtn = document.querySelector('.clog-more-btn');
+  const step = moreBtn ? +moreBtn.dataset.step || 5 : 0;
+  let limit = step;
+  function paginate() {
+    if (!moreBtn) return;
+    let shown = 0, later = false;
+    document.querySelectorAll('.clog-day').forEach(day => {
+      const feats = [...day.querySelectorAll('.clog-entry')].filter(e => !e.classList.contains('is-hidden'));
+      feats.forEach(e => {
+        const hide = shown >= limit;
+        e.classList.toggle('clog-later', hide);
+        if (hide) later = true; else shown++;
+      });
+      // a day of small changes only follows the features before it
+      const hideDay = feats.length ? feats.every(e => e.classList.contains('clog-later')) : shown >= limit;
+      day.classList.toggle('clog-later', hideDay);
+      if (hideDay && !day.classList.contains('is-hidden')) later = true;
+    });
+    moreBtn.hidden = !later;
+  }
+  function reveal(el) {                       // a rail link or a #hash pointing past the shown ones
+    while (el && el.closest('.clog-later') && limit < 1000) { limit += step; paginate(); }
+  }
+  if (moreBtn) moreBtn.addEventListener('click', () => { limit += step; paginate(); });
+  document.querySelectorAll('.clog-rail-item').forEach(a => a.addEventListener('click', () => {
+    reveal(document.getElementById(a.getAttribute('href').slice(1)));
+  }));
   function apply(cat) {
     chips.forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
     document.querySelectorAll('.clog-entry').forEach(e => {
@@ -7384,8 +7413,12 @@ function ecShopMarkup(panels) {
       const s = box.querySelector('.clog-minor-s');
       if (s) s.textContent = shown === 1 ? '' : 's';
     });
+    limit = step;
+    paginate();
   }
   chips.forEach(c => c.addEventListener('click', () => apply(c.dataset.cat)));
+  paginate();
+  if (location.hash) reveal(document.getElementById(decodeURIComponent(location.hash.slice(1))));
   // screenshots open in a lightbox over the page (no new tab); in a carousel the arrows page it
   const box = document.createElement('div');
   box.className = 'clog-lightbox';
