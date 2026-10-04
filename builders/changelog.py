@@ -163,6 +163,18 @@ def _shots_html(e):
 MINOR_OPEN_MAX = 3            # a day's small changes: up to 3 shown as a list, more fold under a toggle
 
 
+def _minor_shots(e):
+    """A small change's pictures as thumbnails at the end of its line, opening large in the lightbox (the owner
+    2026-10-04: "everything in the changelog comes with a screenshot or a GIF, unless it is a fix or an audit")."""
+    paths = [p for p in e.get("shots", []) if _os.path.exists(_os.path.join(_HERE, p))]
+    if not paths:
+        return ""
+    thumbs = "".join(f'<a class="clog-shot clog-thumb" href="{_esc(p)}" data-zoom><img src="{_esc(p)}" '
+                     f'alt="{_esc(_plain(e["title"]))} — {i + 1}" loading="lazy" decoding="async"></a>'
+                     for i, p in enumerate(paths))
+    return f'<span class="clog-shots clog-thumbs">{thumbs}</span>'
+
+
 def _minor_html(date, minors, after_features=True):
     """Small changes of one day ("minor": true) continue the day's list — no heading of their own (the owner
     2026-10-03: "don't set smaller changes apart from the main changes, just 'show N more changes' at the end"):
@@ -172,7 +184,7 @@ def _minor_html(date, minors, after_features=True):
     lis = "".join(
         f'<li data-cat="{_slug(e["category"])}">{_cat_html(e)}{_bug_html(e)}<span class="clog-minor-txt">'
         + (f'<a href="{_esc(e["link"])}">{_rich(e["title"])}</a>' if e.get("link") else _rich(e["title"]))
-        + '</span></li>'
+        + _minor_shots(e) + '</span></li>'
         for e in minors)
     if len(minors) <= MINOR_OPEN_MAX:
         return f'<div class="clog-minor" id="m-{date}"><ul class="clog-minor-list">{lis}</ul></div>'

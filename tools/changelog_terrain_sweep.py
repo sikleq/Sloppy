@@ -6,8 +6,8 @@ Each scene opens a Terrain page, presses its chips / layer buttons, sets the sli
 (the split layers' clip-path + the handle's left) and shoots the map (.tc-stage), cropped to a part of it.
 -> icons/changelog/2026-10-04_sweep_<scene>.webp (animated, looped). Needs dist/ served at http://localhost:8799.
 
-    python tools/changelog_terrain_sweep.py            # every scene
-    python tools/changelog_terrain_sweep.py trees      # one
+    python tools/changelog_terrain_sweep.py            # every scene and still
+    python tools/changelog_terrain_sweep.py trees      # one (a scene key or a STILLS file name)
 """
 import io
 import pathlib
@@ -31,6 +31,12 @@ SCENES = {
     "nowards": ("7.38", "No-ward ground", ['.terrain-facts .tf-chip-btn[data-hl="nowards"]'], (0.0, 0.0, 0.6, 0.6)),
     "all_layers": ("7.41", "All layers", ['.tc-layer-btn[data-layer="all"]'], (0.25, 0.25, 0.75, 0.75)),
 }
+# still close-ups: name -> (page patch, clicks, crop, slider position (100 = all old)), shot at triple scale
+STILLS = {
+    "2026-10-04_terrain_dashes.webp": ("7.40", ['.terrain-facts .tf-chip-btn[data-hl="trees"]'],
+                                       (0.05, 0.085, 0.16, 0.195), 100),
+}
+STILL_SCALE = 8                        # device pixels per CSS pixel: the outlines are vector, they stay sharp
 HOLD, SWEEP = 8, 22                    # frames resting on a map, frames of one sweep
 HOLD_MS, SWEEP_MS = 110, 60
 
@@ -83,9 +89,32 @@ def scene(page, key):
     return frames, durations
 
 
+def still(b, name):
+    """A sharp close-up of part of the map (e.g. the old side's dashed tree outlines)."""
+    patch, clicks, crop, pos = STILLS[name]
+    page = b.new_page(viewport={"width": 1400, "height": 1000}, device_scale_factor=STILL_SCALE)
+    page.goto(f"{BASE}terrain_{patch.replace('.', '')}.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    for sel in clicks:
+        page.locator(sel).first.click()
+        page.wait_for_timeout(200)
+    page.evaluate(APPLY, pos)
+    page.wait_for_timeout(1500)
+    im = Image.open(io.BytesIO(page.locator(".tc-stage").screenshot())).convert("RGB")
+    w, h = im.size
+    im = im.crop((round(crop[0] * w), round(crop[1] * h), round(crop[2] * w), round(crop[3] * h)))
+    im.thumbnail((900, 900), Image.LANCZOS)
+    im.save(OUT_DIR / name, "WEBP", quality=86)
+    page.close()
+    print(name, im.size)
+
+
 def main(only):
     with sync_playwright() as pw:
         b = pw.chromium.launch()
+        for name in STILLS:
+            if not only or name in only:
+                still(b, name)
         page = b.new_page(viewport={"width": 1400, "height": 1000}, device_scale_factor=1.5)
         for key in SCENES:
             if only and key not in only:
