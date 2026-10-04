@@ -7,8 +7,8 @@ This covers the sortable data tables under the **Materials** section.
 
 | Page | Content | Builder |
 |---|---|---|
-| `neutral_stats.html` | **Neutral Stats** table (neutral creep stats + abilities). Attack range cells render the same number + melee/ranged icon badge pattern used by Hero Stats, and toolbar Melee/Ranged buttons filter rows by current `AttackCapabilities`. `neutral_creeps.html`, `creeps.html` and `materials.html` are redirects → `neutral_stats.html`. | `builders/creeps.py` |
-| `neutral_abilities.html` | Per-unit-ability table (one row per unit×ability). The Materials sub-nav presents it as a child of Neutral Stats. `unit_abilities.html` is now a small meta-redirect for backwards compatibility. | `builders/creeps.py` (same run) |
+| `neutral_stats.html` | **Neutral Stats** table (neutral creep stats + abilities). Attack range cells render the same number + melee/ranged icon badge pattern used by Hero Stats, and toolbar Melee/Ranged buttons filter rows by current `AttackCapabilities`. `neutral_creeps.html`, `creeps.html` and `materials.html` are redirects → `neutral_stats.html`. | `builders/creeps.py` (entry point; helpers in `creeps_common.py`, cell history in `creeps_history.py`) |
+| `neutral_abilities.html` | Per-unit-ability table (one row per unit×ability). The Materials sub-nav presents it as a child of Neutral Stats. `unit_abilities.html` is now a small meta-redirect for backwards compatibility. | `builders/creeps_abilities.py` (called by `builders/creeps.py`, same run) |
 | `mana_items.html` | Mana / mana-regen items + gold-efficiency metrics. | `builders/mana_items.py` |
 | `heroes_stats.html` | **Hero Stats** — one row per hero (all published + Spirit Bear), every base stat. Three View modes (`#hs-view-mode`): **Base** = raw level-1 KV values and ignores the level control; **Starting** (default) = practical values WITH attribute bonuses; **Expanded** = Starting + extra inspection columns (`EHP phys/mag`, `Gains/lvl`, `Armor %`, `Dmg min/max`, `Attack Interval`, projectile speed, turn rate, collision size, bound radius). The `Lvl` input clamps to 1–30 and recomputes Starting/Expanded values from compact row JSON (`data-hs-stats`) instead of emitting 30 copies of every cell. Melee/Ranged toolbar buttons filter rows by latest-patch `AttackCapabilities` and fire the shared heatmap refresh. Attack range cells render as number + melee/ranged icon badge, matching Neutral Stats. Header groups mirror Neutral Stats: Basic / Essentials / Attributes / Defense / Attack / Vision / Mobility. Spirit Bear is injected from `units.json` + its `npc_units.txt` block because it is a `ConsideredHero` unit, not a normal `npc_dota_hero_*` record. Cells whose value differs between Base & Starting carry `data-base-sort/-html/-hist`; the View IIFE swaps/recomputes them. **Per-hero special cases:** Huskar MP/regen forced to 0; Ogre Magi mana/regen scale with Str. **Innate attribute-conversion modifiers** (`_innate_bonus`, patch-gated): Morphling Ebb&Flow Agi→Range/MoveSpeed (7.41+, 0.2→0.25 range @7.41d), Void Spirit Intrinsic Edge (+33% secondary bonuses in 7.36, +25% in 7.36b–7.40, then 7.41+ = Universal damage multiplier ×1.15 plus +30% HP regen / mana regen / attack speed from Str/Int/Agi, no armor/MR), Centaur Horsepower Str→MoveSpeed (7.36+). Every numeric cell carries full 7.08→today change history (`data-hist`+`data-net`); attribute cell logs primary-attr swaps. **Patch-note shift layer** shifts KV-detected changes back to the patch that `patchnotes_english.txt` announces. Reuses mr-table front-end (`mr-table hs-table`) with its own Neutral-Stats-style two-row header. | `builders/heroes_stats.py` |
 | `hero_lab.html` | **Hero Lab** — current-patch side-by-side hero calculator under the Heroes materials tab. Each side selects a hero, level, six item slots and custom stat overrides (`HP`, `MP`, regen, armor, magic resist, evasion); the center panel shows metric differences. Hero base values reuse Hero Stats data; item passive bonuses are parsed from current `items.txt` `AbilityValues` / `AbilitySpecial` blocks with `items.json` as cost fallback. Melee/ranged-specific item bonuses are applied only to matching attack types. | `builders/hero_lab.py` |
@@ -407,7 +407,7 @@ page → leave the default `stable`.
 - **Cross-hover** lights the hovered row + column by `cellIndex`.
   ⚠ Because it's positional, a semantically-shared ability must sit in the SAME column
   across rows to co-highlight — e.g. **Riverborn Aura is pinned to Ability 1 for every
-  frog unit** (see `builders/creeps.py`, the `abilities.sort(...)` on the riverborn slug).
+  frog unit** (see `builders/creeps.py` `_row_abilities`, the `abilities.sort(...)` on the riverborn slug).
 
 ## Cell change-history tooltips (`data-hist`)
 Payload: `patch|date|KIND|…` segments joined by `;`. Decoded in `scripts.js` `entryParts()`.
@@ -435,7 +435,7 @@ Cells flagged `data-net=""` (a value cell that changed **>1 time**) get an extra
 - colour = buff/nerf via `.stat-pct up/down/flat`; label is "overall".
 
 Who flags `data-net`:
-- **Neutral Creeps** — every numeric `COL_HIST` cell (`builders/creeps.py`), NOT ability cells.
+- **Neutral Creeps** — every numeric `COL_HIST` cell (`builders/creeps_history.py`, rendered by `builders/creeps.py`), NOT ability cells.
 - **Mana Items** — every `_cost_cell`/`_metric_cell` (`builders/mana_items.py`). These also
   **dropped `data-name`** (the item-name tooltip header was a redundant duplicate; the row
   already identifies the item). The blurb's `_int_const_chip` keeps its `data-name`.

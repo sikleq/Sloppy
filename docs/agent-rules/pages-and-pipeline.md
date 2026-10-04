@@ -8,7 +8,8 @@ builders/
   build_patches.py           ← Авто-обнаруживает content/p*.py + calendar + index
   silent.py                  ← Дифф KV-файлов → dist/patches/silent/*.html
   terrain.py                 ← terrain_<code>.html (сравнение карт; terrain_stats.py ← terrain_stats.html)
-  creeps.py, heroes_stats.py, hero_lab.py, mana_items.py, heroes_dyn.py, items_dyn.py
+  creeps.py (+ creeps_common / creeps_history / creeps_abilities.py), heroes_stats.py, hero_lab.py,
+  mana_items.py, heroes_dyn.py, items_dyn.py
   site_common.py             ← Общий HTML-обвёртка (head/nav/foot)
   dyn_matrix_common.py       ← Общий код для динамических матриц
 content/

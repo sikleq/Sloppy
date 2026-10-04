@@ -31,6 +31,7 @@ builders/
   entity_changes.py         ← one page per hero / item / unit + the Hero / Item / Unit Changes indexes
   changelog.py              ← calendar.html, changelog.html
   creeps.py                 ← neutral_stats.html, neutral_abilities.html
+  creeps_common.py / creeps_history.py / creeps_abilities.py  ← its helpers, cell history, abilities page
   heroes_stats.py / heroes_dyn.py / items_dyn.py / hero_lab.py / mana_items.py / aoe_increase.py
   terrain.py                ← terrain_<ver>.html (one page per map change)
   silent.py                 ← dist/patches/silent/<ver>.html (changes the notes don't mention)
