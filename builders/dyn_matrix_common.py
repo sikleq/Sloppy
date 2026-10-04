@@ -17,7 +17,7 @@ only emits the table skeleton: marked data cells (entity changed that patch) and
 static empty diamonds (everything else). The same `.heroes-dyn-table` class is
 reused for BOTH pages so the shared CSS + JS apply unchanged.
 
-Data: `_dynamics.json` (written by build_patch.py) —
+Data: `_dynamics.json` (written by builders/build_patches.py) —
   - `patches`  : ordered newest-first list of {version, filename, date}
   - `entities` : per-entity tag tallies, keyed "<kind>|<slug>"
   - `heroes` / `items` : full alphabetical roster [{name, icon, key}]
@@ -170,11 +170,11 @@ def _load_manifest():
 
 def _roster(manifest, roster_key, kind, *, preserve_order=False):
     """Full roster as [{name, icon, key}]. Prefer the explicit roster
-    build_patch.py writes (manifest[roster_key]); fall back to deriving it from
+    builders/build_patches.py writes (manifest[roster_key]); fall back to deriving it from
     the entities of this kind if an older _dynamics.json is in place.
 
     preserve_order=True keeps the order from the manifest verbatim (items_dyn
-    uses this to get its category-grouped default — build_patch.py already
+    uses this to get its category-grouped default — builders/build_patches.py already
     sorted by class → category → tier → name). Otherwise alpha-by-name."""
     roster = manifest.get(roster_key)
     if roster:

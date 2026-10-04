@@ -28,8 +28,8 @@ Data sources:
     npc_units.txt block, because it is a ConsideredHero unit rather than a
     normal npc_dota_hero_* entry.
 
-Run AFTER build_patch.py (needs data/site_meta.json):
-    python build_patch.py
+Run AFTER builders/build_patches.py (needs data/site_meta.json):
+    python build_site.py patch
     python build_heroes_stats.py
 """
 from __future__ import annotations

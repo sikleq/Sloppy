@@ -40,9 +40,12 @@ Helpers are imported in every `content/p*.py` via `from patch.api import *`.
 | `builders/build_patches.py` | orchestrator — walks `content/p*.py` in chronological order from `RELEASE_HISTORY` |
 
 `python build_site.py` writes everything to `dist/`: one HTML per patch
-under `dist/patches/`, plus `index.html`, `calendar.html`, `creeps.html`,
-`heroes_stats.html`, `heroes_dyn.html`, `items_dyn.html`, `hero_lab.html`,
-`mana_items.html`, `aoe_increase.html`, `terrain.html`, the
+under `dist/patches/`, plus `index.html`, `calendar.html`, `neutral_stats.html`
+(with `creeps.html` / `neutral_creeps.html` / `materials.html` redirects),
+`unit_abilities.html`, `structures.html`, `heroes_stats.html`, `heroes_dyn.html`,
+`items_dyn.html`, `hero_lab.html`, `mana_items.html`, `aoe_increase.html`,
+`terrain_<code>.html` (one per map-changing patch) + `terrain_stats.html`,
+`hero_changes.html` / `item_changes.html` / `unit_changes.html`, `changelog.html`, the
 `dist/patches/silent/*.html` KV-diff pages, `_dynamics.json`, and minified
 copies of `styles.css` + `src/scripts.js`. `styles.css` and `src/scripts.js`
 in the repo root are **source files, not outputs**.

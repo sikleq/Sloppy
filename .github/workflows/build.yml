@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install test dependencies
-        run: pip install pytest rcssmin rjsmin
+        run: pip install -r requirements-dev.txt
 
       - name: Run unit tests
         run: python -m pytest tests/ -v
@@ -292,23 +292,13 @@ jobs:
           print(f'OK — all ability slugs are in abilities_slim.json or registered in known_exceptions')
           PY
 
-      - name: Copy static assets into dist
-        if: github.ref == 'refs/heads/main'
-        run: |
-          cp _dynamics.json dist/
-          cp -r icons dist/
-
-      - name: Stage site for Pages
-        if: github.ref == 'refs/heads/main'
-        run: |
-          mkdir -p _site
-          cp -r dist/. _site/
-
+      # build_site.py already copies styles.css, _dynamics.json, src/ and icons/ into dist/ (audit 2026-10-04:
+      # the old "Copy static assets" + "Stage site" steps copied icons twice and the whole site once more)
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v5
         with:
-          path: _site
+          path: dist
 
   deploy:
     needs: build

@@ -448,10 +448,10 @@ CSS: `.stat-hist-tip .stat-net` (divider) + `.stat-net-label`.
   `(Active)` sub-row (`mr-active-row`, toggled by "Hide Active").
 - **Active-only** items (Soul Ring — no passive regen) render as a single
   `Name (Active)` row also tagged `mr-active-row`.
-- Item **icon hover tooltip**: reuses the global `.abil-ico-hint` + `data-tooltip`
-  (`scripts.js` renders it as innerHTML). Built by `_item_tooltip_html()` — splits the
-  Valve description on `<h1>Active:/Passive:</h1>` into separate `<br>` lines.
-  ⚠ `%value%` placeholders are NOT resolved → "for seconds" (no number).
+- Item icons are **plain** (`_icon_html()`), with no hover description tooltip: the
+  popups were dropped in f5a6ded1 because the page is about mana numbers, not item
+  descriptions, and every row carried a tooltip payload. Hover help stays only on the
+  `?` multiplier hint (`.qhint` + `data-tooltip`).
 
 ## Conventions
 - Dota attribute colours (str/agi/int/uni) — canonical hex, see `MEMORY.md`.

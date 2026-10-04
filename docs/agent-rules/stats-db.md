@@ -16,7 +16,7 @@
 Обходы «взять цены из следующего патча» (auto_components_change, `_postprocess_unstated_total_cost`) убраны: они
 приписывали бы патчу чужое изменение.
 
-## Маппинг описаний → поля БД (HERO_STAT_MAP в generate_patch_code.py)
+## Маппинг описаний → поля БД (`_BSTAT_FIELD` в generate_patch_code_v2.py)
 
 При паттерне `"увеличено/уменьшено на N"` (без явного from-to) генератор смотрит первое совпадение:
 

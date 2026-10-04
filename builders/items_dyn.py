@@ -6,12 +6,12 @@ shared renderer in `dyn_matrix_common.save_dyn_matrix`. Only the config differs:
 item roster + icons/items/ portraits + an items back-arrow token.
 
 The item roster is EVERY real game item (parity with heroes_dyn listing every
-hero), not just touched ones — untouched items render as empty rows. build_patch.py
+hero), not just touched ones — untouched items render as empty rows. builders/build_patches.py
 builds it: touched items (from the dynamics) merged with every other real item from
 items.txt + datafeed names (see `_load_full_game_items`), deduped by icon game slug.
 
-Run AFTER build_patch.py (it needs the fresh _dynamics.json + site_meta.json):
-    python build_patch.py
+Run AFTER builders/build_patches.py (it needs the fresh _dynamics.json + site_meta.json):
+    python build_site.py patch
     python build_items_dyn.py
 """
 import sys as _sys

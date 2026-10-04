@@ -1041,7 +1041,7 @@
   }
 
   // Known entity kinds — must match the strings emitted by _register_entity()
-  // in build_patch.py. Ordered longest-first so "creep-hero" wins over "creep".
+  // in patch/elements.py. Ordered longest-first so "creep-hero" wins over "creep".
   const DYN_KINDS = ['creep-hero', 'hero', 'item', 'unit', 'plain', 'enchant'];
 
   function dynWindow(manifest, offset, n) {

@@ -9,11 +9,14 @@ Pages are built in dependency order:
   creeps  -- neutral stats + abilities tables
   mana    -- mana items table
   stats   -- hero stats table
+  aoe     -- AoE Increase table
   lab     -- hero lab calculator
   hdyn    -- hero dynamics matrix
   idyn    -- item dynamics matrix
   terrain -- terrain comparison
   tstats  -- Terrain Stats (the map history 7.08 -> now)
+  echg    -- Hero / Item Changes pages
+  clog    -- site changelog page
 """
 
 import shutil
@@ -139,7 +142,7 @@ def main() -> int:
             failed.append(desc)
 
     # Copy static assets into dist/ so local `python -m http.server --directory dist` works.
-    # CI does the same in the "Copy static assets" workflow step.
+    # CI deploys dist/ as is, so this copy is the only one (no separate workflow copy step).
     _root = Path(__file__).parent
     _dist = _root / "dist"
     print(f"\n{SEP}")

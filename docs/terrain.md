@@ -64,7 +64,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/gen/build_terrain_m
     camps, towers, watchers, twin gates, lotus pools, tormentor/miniboss, …).
   - root `worlddata.json` — world bounds (`minX -10464 .. maxX 10400`, same Y).
 - Diff: `scripts/gen/build_terrain_diff.py` reads the two cached `mapdata.json`
-  (under `.cache/leamare/`, not committed) → `data/terrain_diff.json` (committed).
+  (under `.cache/leamare/`, not committed) → `data/terrain_diff_<patch>.json` (committed, one per patch).
 - Projection: world `[-10464, 10400]` → `1280px`. Verified pixel-accurate by
   overlaying all 7.41 trees on the map render (they land exactly on the forest).
 - The 7.40→7.41 diff: **+324 / −305 trees, camps moved/relocated + 2 demoted,
@@ -253,7 +253,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
 - **10 point-entity toggle layers** beyond Trees/Camps: towers, lotus pools, twin
   gates, tormentors, bounty runes, power runes, wisdom shrines, **outposts**,
   **watchers**, **roshan** (`_ENTITY_LAYERS` in builders/terrain.py). Data = full
-  old+new coord sets in `terrain_diff.json["entities"]` (built by
+  old+new coord sets in `terrain_diff_<patch>.json["entities"]` (built by
   build_terrain_diff.py). **leamare keys (`layerDefinitions.js`):** `npc_dota_tower`,
   `npc_dota_lotus_pool`, `npc_dota_unit_twin_gate`, `npc_dota_miniboss_spawner`,
   `dota_item_rune_spawner_bounty` / `_powerup`, `npc_dota_xp_fountain`,

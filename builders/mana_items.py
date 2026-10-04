@@ -1008,7 +1008,7 @@ def render_html(rows: list[dict], cost_hist: dict[str, list] | None = None,
 
 def _latest_href() -> str:
     """Read the latest patch HTML path from data/site_meta.json (written by
-    build_patch.py). The key is `latest_patch_filename` (same one build_creeps
+    builders/build_patches.py). The key is `latest_patch_filename` (same one build_creeps
     reads); falls back to the current newest patch if missing."""
     meta_path = _HERE / "data" / "site_meta.json"
     from patch.meta import latest_patch_filename as _lpf

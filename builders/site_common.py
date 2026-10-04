@@ -1,6 +1,6 @@
 """Shared site chrome for the Sloppy static site.
 
-Used by both build_patch.py (patch changelogs + calendar + main hub) and
+Used by both builders/build_patches.py (patch changelogs + calendar + main hub) and
 build_creeps.py (the neutral-creeps table side-project). Owns the single
 source of truth for:
   - the top-nav tab list (so adding a tab is a one-file change)
@@ -61,7 +61,7 @@ def compute_asset_version():
 
 def get_latest_version():
     """Return the latest patch version string (e.g. '7.41c') from site_meta.json,
-    written by build_patch.py. Empty string if the meta hasn't been written yet."""
+    written by builders/build_patches.py. Empty string if the meta hasn't been written yet."""
     import json as _json
     meta_path = _os.path.join(_HERE, "data", "site_meta.json")
     try:

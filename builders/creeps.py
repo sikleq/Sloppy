@@ -1,6 +1,6 @@
 """build_creeps.py — generates neutral_stats.html, the neutral stats
 table. This is a standalone side-project, decoupled from the patch
-changelog generator (build_patch.py). Both share the site chrome via
+changelog generator (builders/build_patches.py). Both share the site chrome via
 site_common.py.
 
 Data sources (read-only):
@@ -8,10 +8,10 @@ Data sources (read-only):
   data/stats/<latest>/units.json       — base neutral stats
   data/stats/<latest>/npc_units.txt    — full KV (regen, bounty, vision, abilities)
   data/abilities_slim.json          — ability slug → display name
-  data/site_meta.json               — latest patch href (written by build_patch.py)
+  data/site_meta.json               — latest patch href (written by builders/build_patches.py)
   icons/units/*.png                 — creep portraits
 
-Run AFTER build_patch.py (which writes data/site_meta.json). If the meta
+Run AFTER builders/build_patches.py (which writes data/site_meta.json). If the meta
 file is missing the Changelogs nav link falls back to a sensible default.
 """
 import json as _json

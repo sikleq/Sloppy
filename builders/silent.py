@@ -12,7 +12,7 @@ Usage:
   python build_silent_changes.py 7.41c       # one specific patch (vs prev)
 
 This script intentionally stays standalone — it does NOT import or modify the
-main build_patch.py monolith. The generated pages live under patches/silent/
+main builders/build_patches.py monolith. The generated pages live under patches/silent/
 and are linked from each regular patch page header (added separately).
 """
 from __future__ import annotations

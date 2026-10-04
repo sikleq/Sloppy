@@ -10,13 +10,13 @@ The actual table renderer lives in `dyn_matrix_common.save_dyn_matrix` — it is
 ENTITY-AGNOSTIC and is reused as-is by `build_items_dyn.py` (Item Dynamics). This
 file is just the hero configuration + entry point.
 
-Data comes entirely from `_dynamics.json` (written by build_patch.py):
+Data comes entirely from `_dynamics.json` (written by builders/build_patches.py):
   - `patches`  : ordered newest-first list of {version, filename, date}
   - `entities` : per-entity tag tallies, keyed "hero|<slug>" / "item|<slug>"
   - `heroes`   : full alphabetical roster [{name, icon, key}]
 
-Run AFTER build_patch.py (it needs the fresh _dynamics.json + site_meta.json):
-    python build_patch.py
+Run AFTER builders/build_patches.py (it needs the fresh _dynamics.json + site_meta.json):
+    python build_site.py patch
     python build_heroes_dyn.py
 """
 import sys as _sys

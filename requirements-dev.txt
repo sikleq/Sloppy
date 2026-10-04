@@ -1,2 +1,6 @@
 # Dev/test dependencies. Установка: py -m pip install -r requirements-dev.txt
+# CI ставит этот же файл (.github/workflows/build.yml, шаг "Install test dependencies").
 pytest>=9.1.0
+# build_site.py минифицирует dist/styles.css и dist/src/scripts.js; без них сборка идёт, но без сжатия
+rcssmin>=1.2
+rjsmin>=1.2
