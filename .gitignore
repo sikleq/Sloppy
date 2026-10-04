@@ -60,6 +60,8 @@ _dynamics.json
 
 # Raw Valve API dumps — fetched ad-hoc via scripts/fetch_*.py for inspection
 # / one-off generation; not load-bearing for the build.
+# EXCEPTION: data/7.38c_datafeed.json is committed on purpose (force-added) — it is the one datafeed CI has, so
+# tests/test_datafeed_coverage.py guards at least one patch there. Do not delete it (audit 2026-10-04 nearly did).
 data/*_datafeed.json
 
 # Audit outputs — generated locally for inspection, not part of the build.

@@ -5667,11 +5667,6 @@ function ecShopMarkup(panels) {
       .replace(/<br\s*\/?>\s*<br\s*\/?>/g, '<br>');
   }
 
-  function dagonProgressionRow(levels, key, label, suffix) {
-    suffix = suffix || '';
-    return levels.map(l => String(l[key]).replace(/\.0$/, '') + suffix).join(' / ') + ' ' + label;
-  }
-
   function buildTooltip(item, modeKey, showSeries, showEnchantSeries, baubleScale, heroCdr) {
     baubleScale = baubleScale || 1;
     heroCdr = heroCdr || 0;

@@ -18,7 +18,6 @@ fetch_npc_history.py (по дате из site_meta.json). Сырьё кэшир�
 """
 import json
 import re
-import subprocess
 import sys
 import urllib.request
 from datetime import date
@@ -32,6 +31,9 @@ except Exception:
 ROOT = Path(__file__).resolve().parents[2]
 STATS_DIR = ROOT / "data" / "stats"
 META_PATH = ROOT / "data" / "site_meta.json"
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _d2vpkr_history as _h  # noqa: E402  shared with the other history fetcher
 CACHE_DIR = ROOT / ".cache" / "d2vpkr_abilities"
 
 REPO = "dotabuff/d2vpkr"
@@ -149,50 +151,11 @@ def parse_abilities(text, wanted):
 
 
 def load_patch_dates():
-    meta = json.loads(META_PATH.read_text(encoding="utf-8"))
-    out = {}
-    for ver, ds in meta.get("patch_dates", {}).items():
-        try:
-            d, mth, y = (int(x) for x in ds.split("."))
-            out[ver] = date(y, mth, d)
-        except (ValueError, AttributeError):
-            continue
-    return out
-
-
-def _fetch_page(page):
-    api = "repos/{}/commits?path={}&per_page=100&page={}".format(
-        REPO, FILE_PATH, page)
-    try:
-        res = subprocess.run(["gh", "api", api], capture_output=True,
-                             text=True, check=True)
-        return json.loads(res.stdout)
-    except (FileNotFoundError, subprocess.CalledProcessError, json.JSONDecodeError):
-        pass
-    with urllib.request.urlopen("https://api.github.com/" + api) as r:
-        return json.loads(r.read().decode("utf-8"))
+    return _h.load_patch_dates(META_PATH)
 
 
 def fetch_commit_index():
-    data, page = [], 1
-    while True:
-        chunk = _fetch_page(page)
-        if not chunk:
-            break
-        data.extend(chunk)
-        if len(chunk) < 100:
-            break
-        page += 1
-    idx = []
-    for c in data:
-        sha = c.get("sha")
-        ds = c.get("commit", {}).get("author", {}).get("date", "")[:10]
-        if not sha or not ds:
-            continue
-        y, mth, d = (int(x) for x in ds.split("-"))
-        idx.append((date(y, mth, d), sha))
-    idx.sort()
-    return idx
+    return _h.fetch_commit_index(REPO, FILE_PATH)
 
 
 def fetch_raw(sha):
@@ -206,14 +169,7 @@ def fetch_raw(sha):
     return text
 
 
-def commit_for_window(commit_idx, win_end):
-    chosen = None
-    for cdate, sha in commit_idx:
-        if cdate < win_end:
-            chosen = sha
-        else:
-            break
-    return chosen
+commit_for_window = _h.commit_for_window
 
 
 def main():

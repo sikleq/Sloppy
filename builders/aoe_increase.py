@@ -272,16 +272,6 @@ def _delta_for(raw) -> tuple[list[float], bool]:
     return out, override
 
 
-def _apply_delta(base: list[float], delta: list[float]) -> list[float]:
-    if not delta:
-        return base
-    if len(delta) == 1:
-        return [b + delta[0] for b in base]
-    if len(delta) == len(base):
-        return [b + d for b, d in zip(base, delta)]
-    return base
-
-
 def _sum_levels(a: list[float], b: list[float]) -> list[float]:
     """Add two per-level delta lists (broadcasting a single value)."""
     if not a:

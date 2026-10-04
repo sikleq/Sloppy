@@ -8,7 +8,6 @@ Left rail (fixed, centred on the left edge, faint until hovered) = the FEATURE t
 category chips filter the entries.
 """
 import datetime as _dt
-import html as _html
 import json as _json
 import os as _os
 import re as _re
@@ -26,8 +25,7 @@ CATEGORIES = ["Patch Reader", "Terrain", "Heroes", "Items", "Units", "Tables", "
 FIRST_SHOWN = 5          # features shown before "Show more" (the owner 2026-10-04: "only the last 5 news")
 
 
-def _esc(s):
-    return _html.escape(str(s), quote=True)
+_esc = _site.esc
 
 
 # hero names in the notes become the hero's small picture (the owner 2026-10-03: "where there are hero names, put

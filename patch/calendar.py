@@ -5,7 +5,7 @@ import html as _html
 
 import builders.site_common as _site
 
-from .meta import PATCHES, RELEASE_HISTORY, _parse_date, _current_version, _render_top_nav
+from .meta import PATCHES, RELEASE_HISTORY, _current_version, _render_top_nav
 from .page import _ASSET_VERSION
 
 

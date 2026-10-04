@@ -9,9 +9,13 @@ so the output is byte-for-byte the same shape.
 Usage:  python tools/slim_from_kv.py 7.41f          # writes heroes/items/units/abilities/ability_ids .json
         python tools/slim_from_kv.py 7.41e --check  # regenerate to a temp dir and diff vs existing (self-test)
 """
-import sys, os, json, tempfile, filecmp, importlib.util
+import sys
+import os
+import json
+import tempfile
+import importlib.util
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FETCH_STATS = r"D:\Sloppy Patches\fetch_stats.py"
+FETCH_STATS = os.environ.get("SLOPPY_FETCH_STATS", r"D:\Sloppy Patches\fetch_stats.py")  # outside the repo
 spec = importlib.util.spec_from_file_location("fetch_stats", FETCH_STATS); fs = importlib.util.module_from_spec(spec); spec.loader.exec_module(fs)
 OUTPUTS = {  # slim file -> (source .txt, extractor)
     "heroes.json": ("npc_heroes.txt", fs.extract_heroes), "items.json": ("items.txt", fs.extract_items),

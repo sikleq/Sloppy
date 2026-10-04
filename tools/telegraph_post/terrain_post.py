@@ -9,6 +9,7 @@ Then open out_terrain/post_telegraph.html in a browser, select all, copy, paste 
 """
 import html
 import json
+import os
 import pathlib
 import sys
 
@@ -21,7 +22,7 @@ import build_post as bp  # noqa: E402
 
 ROOT = bp.ROOT
 SHOTS = ROOT / "icons" / "changelog"
-OLDGROWTH = pathlib.Path(r"C:\Users\sikle\Documents\Oldgrowth")
+OLDGROWTH = pathlib.Path(os.environ.get("OLDGROWTH_DIR", pathlib.Path.home() / "Documents" / "Oldgrowth"))
 bp.WEEK = "2026-10-04_terrain"
 bp.IMG_DIR = ROOT / "icons" / "telegraph" / bp.WEEK
 bp.IMG_URL = f"{bp.SITE}icons/telegraph/{bp.WEEK}/"

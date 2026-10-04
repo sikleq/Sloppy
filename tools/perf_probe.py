@@ -25,7 +25,6 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import json
-import statistics
 import sys
 from pathlib import Path
 

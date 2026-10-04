@@ -50,13 +50,7 @@ def compute_asset_version():
         css = _f.read()
     with open(_os.path.join(_HERE, "src", "scripts.js"), encoding="utf-8") as _f:
         js = _f.read()
-    battle_path = _os.path.join(_HERE, "src", "hero_lab_battle.js")
-    if _os.path.exists(battle_path):
-        with open(battle_path, encoding="utf-8") as _f:
-            battle = _f.read()
-    else:
-        battle = ""
-    return _hashlib.sha1((css + js + battle).encode("utf-8")).hexdigest()[:10]
+    return _hashlib.sha1((css + js).encode("utf-8")).hexdigest()[:10]
 
 
 def get_latest_version():
@@ -314,3 +308,42 @@ def render_materials_subnav(active, prefix=""):
     return (f'<div class="materials-subnav"><div class="materials-subnav-inner">'
             f'<div class="materials-subnav-links">{"".join(parts)}</div>'
             f'</div></div>\n')
+
+# ---- small helpers several builders used to copy (audit 2026-10-04: one copy here) ----
+
+def esc(s, quote=True) -> str:
+    """HTML-escape any value. quote=False leaves quotes alone (text-only escaping)."""
+    import html as _html
+    return _html.escape(str(s), quote=quote)
+
+
+def latest_patch_href() -> str:
+    """Latest patch page href for the Patches nav tab: data/site_meta.json (written by the patch step), falling back to
+    patch.meta (the canonical source) rather than a stale hardcoded version."""
+    import json as _json
+    from patch.meta import latest_patch_filename as _lpf
+    fallback = _lpf()
+    try:
+        with open(_os.path.join(_HERE, "data", "site_meta.json"), encoding="utf-8") as f:
+            return _json.load(f).get("latest_patch_filename", fallback)
+    except (OSError, ValueError):
+        return fallback
+
+
+def attr_filter_buttons() -> str:
+    """Strength / Agility / Intelligence / Universal filter buttons (Hero Stats and the Dynamics matrices)."""
+    buttons = [
+        ("str", "Strength", "icons/strength.webp"),
+        ("agi", "Agility", "icons/agility.webp"),
+        ("int", "Intelligence", "icons/intelligence.webp"),
+        ("uni", "Universal", "icons/universal.webp"),
+    ]
+    html = ['<span class="hs-attr-filter-group" aria-label="Primary attribute filter">']
+    for key, label, icon in buttons:
+        html.append(
+            '<button type="button" class="hs-attr-filter" '
+            f'data-attr-filter="{key}" aria-pressed="false" title="Show {label} heroes">'
+            f'<img src="{icon}" alt="{label}" loading="lazy"></button>'
+        )
+    html.append('</span>')
+    return ''.join(html)

@@ -240,7 +240,6 @@ def _hero_kit(npc: str) -> list[str]:
     if npc in _KIT_CACHE:
         return _KIT_CACHE[npc]
     from patch.meta import latest_stats_version
-    from patch.weights import ultimates
     kv = _HERE / "data" / "stats" / latest_stats_version() / "heroes" / f"npc_dota_hero_{npc}.txt"
     slim = _json.loads((_HERE / "data" / "abilities_slim.json").read_text(encoding="utf-8"))
     basics, ults, aghs, seen = [], [], [], set()

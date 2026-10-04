@@ -3,7 +3,7 @@ Dota 2 Patch Notes — Extractor & Auto-Uploader
 ==============================================
 Достаёт из локального pak01_dir.vpk:
   • patchnotes_english.txt  → data/
-  • patchnotes_russian.txt  → data/
+    (patchnotes_russian.txt больше не берём: его никто не читал, 4 МБ в репо; убран 2026-10-04)
   • npc_heroes.txt          → data/stats/{version}/
   • npc_units.txt           → data/stats/{version}/
   • items.txt               → data/stats/{version}/
@@ -93,7 +93,6 @@ GITHUB_REPO   = "Sloppy"
 # Патчноуты + локализация (описания способностей/предметов) — в data/
 PATCHNOTES_VPK_PATHS = [
     "resource/localization/patchnotes/patchnotes_english.txt",
-    "resource/localization/patchnotes/patchnotes_russian.txt",
     # dota_english.txt держит DOTA_Tooltip_ability_<slug>_Description и
     # прочие тултипы — единственный источник описаний способностей в игре.
     # Заливаем только английскую версию: для UI достаточно, а 80 патчей × 4 МБ

@@ -178,7 +178,6 @@ def wisdom_icon(color):
     """Wisdom Shrine has no in-game minimap icon, so we draw one: a DENSE bright
     purple inner ring (where the shrine's capture glow starts) with that glow
     radiating inward. Drawn at 4x + downscaled for smooth anti-aliasing."""
-    from PIL import ImageDraw
     S = ICON_RES * 4
     cx = cy = S / 2
     ring_r = S * 0.32

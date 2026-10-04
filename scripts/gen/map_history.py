@@ -26,7 +26,8 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from patch.meta import RELEASE_HISTORY  # noqa: E402
 
-DD = os.environ.get("DEPOTDOWNLOADER", r"C:\Users\sikle\tools\depotdownloader\DepotDownloader.exe")
+DD = os.environ.get("DEPOTDOWNLOADER", os.path.join(os.path.expanduser("~"), "tools", "depotdownloader",
+                                                     "DepotDownloader.exe"))
 APP, DEPOT = "570", "373301"
 MAP_FILE = r"game\dota\maps\dota.vpk"
 WINDOW_DAYS = 3                      # manifests within this many days after a release count as its release builds

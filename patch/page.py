@@ -5,10 +5,9 @@ import re
 
 import builders.site_common as _site
 
-from .output import H, W, reset_output, get_output
+from .output import H, W
 from .state import _State
-from .meta import PATCHES, _render_top_nav, _patch_age_line, _patch_meta_parts, _dropdown_options_html
-from .images import HERO_SLUG
+from .meta import _render_top_nav, _patch_meta_parts
 from .elements import _close_block, STAT_ICONS, STAT_DETECT_RULES
 from .static_has import add_static_has_classes
 from .talent_tree import light_talent_trees
@@ -99,7 +98,6 @@ def save_assets():
     """No-op kept for backward compatibility.
     styles.css and scripts.js are source files (read at module load),
     not generated artefacts. Nothing to write."""
-    pass
 
 
 _LI_RE = re.compile(r'<li\b([^>]*)>(.*?)</li>', re.S)

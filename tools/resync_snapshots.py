@@ -19,7 +19,7 @@ import sys
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HISTORY = os.path.join(os.path.expanduser("~"), "outputs", "valve-revealed-weights-20260915")
-FETCH_STATS = r"D:\Sloppy Patches\fetch_stats.py"
+FETCH_STATS = os.environ.get("SLOPPY_FETCH_STATS", r"D:\Sloppy Patches\fetch_stats.py")  # outside the repo
 KINDS = (  # slim file, history folder, raw file, extractor name
     ("items.json", "items_history", "items.txt", "extract_items"),
     ("heroes.json", "heroes_history", "npc_heroes.txt", "extract_heroes"),

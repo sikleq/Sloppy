@@ -1,7 +1,6 @@
 """Badge and percentage-change helpers: b, br, bf, t, gradient_class, facet_badge, scale_pill."""
 
 import re
-from .images import _FACET_ICONS
 
 
 # ---------- BADGE HELPERS ----------

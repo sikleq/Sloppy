@@ -11,7 +11,7 @@ import re
 import sys
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SRC = sys.argv[1] if len(sys.argv) > 1 else r"C:\Users\sikle\Documents\Oldgrowth\versions.json"
+SRC = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.environ.get("OLDGROWTH_DIR", os.path.join(os.path.expanduser("~"), "Documents", "Oldgrowth")), "versions.json")
 OUT = os.path.join(_ROOT, "data", "map", "map_history.json")
 
 

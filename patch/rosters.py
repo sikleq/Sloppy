@@ -5,7 +5,7 @@ import json as _json
 import re
 
 from .state import _State
-from .images import ITEM_SLUG, HERO_SLUG
+from .images import HERO_SLUG
 from .meta import RELEASE_HISTORY, PATCHES
 
 
@@ -357,7 +357,6 @@ _SHOP_CATEGORIES = _load_shop_categories()
 
 def build_rosters():
     """Build hero/item rosters and write _dynamics.json. Called after all patches build."""
-    from datetime import date as _date
 
     neutral_pool_current = _load_neutral_pool_current()
     neutral_tier_by_slug = _load_neutral_tier_map()
@@ -460,7 +459,8 @@ def build_rosters():
     _site_meta = {
         "latest_patch_filename": PATCHES[0]["filename"] if PATCHES else "patches/7.41c.html",
         "latest_patch_version": PATCHES[0]["version"] if PATCHES else "",
-        "asset_version": __import__('site_common').compute_asset_version(),
+        # no "asset_version" here: every builder takes it from site_common.compute_asset_version() itself, and the hash
+        # made this committed file change on every css/js edit (audit 2026-10-04)
         "patch_dates": {r["version"]: r["date"] for r in RELEASE_HISTORY},
     }
     _os.makedirs("data", exist_ok=True)

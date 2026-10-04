@@ -391,16 +391,6 @@ def _prev_patch_version(version):
     return None
 
 
-def _next_patch_version(version):
-    """Return the version string of the patch after `version` in RELEASE_HISTORY,
-    or None if `version` is the newest."""
-    sorted_releases = sorted(RELEASE_HISTORY, key=lambda p: _parse_date(p["date"]))
-    for i, p in enumerate(sorted_releases):
-        if p["version"] == version:
-            return sorted_releases[i + 1]["version"] if i + 1 < len(sorted_releases) else None
-    return None
-
-
 def _patch_index(version):
     """Return 0-based index of `version` in PATCHES (newest-first), or None."""
     for i, p in enumerate(PATCHES):

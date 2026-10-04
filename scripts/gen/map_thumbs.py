@@ -11,7 +11,7 @@ import sys
 from PIL import Image
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-OG = sys.argv[1] if len(sys.argv) > 1 else r"C:\Users\sikle\Documents\Oldgrowth"
+OG = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("OLDGROWTH_DIR", os.path.join(os.path.expanduser("~"), "Documents", "Oldgrowth"))
 OUT = os.path.join(_ROOT, "icons", "maps", "thumbs")
 SIZE = 56
 Image.MAX_IMAGE_PIXELS = None

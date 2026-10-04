@@ -22,7 +22,6 @@ Data: `_dynamics.json` (written by builders/build_patches.py) —
   - `entities` : per-entity tag tallies, keyed "<kind>|<slug>"
   - `heroes` / `items` : full alphabetical roster [{name, icon, key}]
 """
-import html as _html
 import json as _json
 import os as _os
 import re as _re
@@ -82,8 +81,7 @@ def _search_alias(name, icon, kind):
     return " ".join(parts)
 
 
-def _esc(s):
-    return _html.escape(str(s), quote=True)
+_esc = _site.esc
 
 
 # Entity key -> its Changes page (builders/entity_changes.py writes them).
@@ -128,22 +126,7 @@ def _multiselect_dropdown(dd_id, label, options):
         f'{all_row}{opts}</div></div>')
 
 
-def _attr_filter_buttons() -> str:
-    buttons = [
-        ("str", "Strength", "icons/strength.webp"),
-        ("agi", "Agility", "icons/agility.webp"),
-        ("int", "Intelligence", "icons/intelligence.webp"),
-        ("uni", "Universal", "icons/universal.webp"),
-    ]
-    html = ['<span class="hs-attr-filter-group" aria-label="Primary attribute filter">']
-    for key, label, icon in buttons:
-        html.append(
-            '<button type="button" class="hs-attr-filter" '
-            f'data-attr-filter="{key}" aria-pressed="false" title="Show {label} heroes">'
-            f'<img src="{icon}" alt="{label}" loading="lazy"></button>'
-        )
-    html.append('</span>')
-    return ''.join(html)
+_attr_filter_buttons = _site.attr_filter_buttons
 
 
 def _base_version(ver):
@@ -151,16 +134,7 @@ def _base_version(ver):
     return _re.sub(r"[a-z]+$", "", ver)
 
 
-def _latest_href():
-    """Latest patch page href for the Changelogs nav tab (from site_meta.json)."""
-    from patch.meta import latest_patch_filename as _lpf
-    _fallback = _lpf()
-    meta_path = _os.path.join(_HERE, "data", "site_meta.json")
-    try:
-        meta = _json.loads(open(meta_path, encoding="utf-8").read())
-        return meta.get("latest_patch_filename", _fallback)
-    except Exception:
-        return _fallback
+_latest_href = _site.latest_patch_href
 
 
 def _load_manifest():

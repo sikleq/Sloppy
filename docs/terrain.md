@@ -394,7 +394,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   and a 28-px square of the map (`icons/maps/thumbs/<sha8>.webp`, scripts/gen/map_thumbs.py) linking to its Oldgrowth
   picture. Data: `data/map/map_history.json` (counts + `moves` parsed from the "what moved" text) from Oldgrowth's
   versions.json (`scripts/gen/map_history_table.py`, rerun when Oldgrowth gains a patch) — the CI build can't reach the
-  Oldgrowth folder. Styles all under `.terrain-stats-page` / `.ts-*`; terrain.py's stale-page sweep is
+  Oldgrowth folder. Local folders these scripts read are env vars with home-relative defaults (no personal paths in
+  the repo, 2026-10-04): `OLDGROWTH_DIR` (~/Documents/Oldgrowth), `SFM_FINAL` (~/tools/maprender/sfm/final),
+  `DEPOTDOWNLOADER` (~/tools/depotdownloader/DepotDownloader.exe), `SLOPPY_FETCH_STATS` (fetch_stats.py outside the repo). Styles all under `.terrain-stats-page` / `.ts-*`; terrain.py's stale-page sweep is
   `terrain_[0-9]*.html`, so it never deletes terrain_stats.html.
 - **Bigger pictures with a minimap (2026-10-03)** — the owner: "when you show where something is, add a minimap
   with a mark, otherwise it's unclear; the pictures should be bigger and the camera a bit further out". The row

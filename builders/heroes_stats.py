@@ -193,22 +193,7 @@ _ATTR_META = {
 }
 
 
-def _attr_filter_buttons() -> str:
-    buttons = [
-        ("str", "Strength", "icons/strength.webp"),
-        ("agi", "Agility", "icons/agility.webp"),
-        ("int", "Intelligence", "icons/intelligence.webp"),
-        ("uni", "Universal", "icons/universal.webp"),
-    ]
-    html = ['<span class="hs-attr-filter-group" aria-label="Primary attribute filter">']
-    for key, label, icon in buttons:
-        html.append(
-            '<button type="button" class="hs-attr-filter" '
-            f'data-attr-filter="{key}" aria-pressed="false" title="Show {label} heroes">'
-            f'<img src="{icon}" alt="{label}" loading="lazy"></button>'
-        )
-    html.append('</span>')
-    return ''.join(html)
+_attr_filter_buttons = _site.attr_filter_buttons
 
 
 def _attr_of(snap: dict, hero: str):
@@ -695,14 +680,6 @@ def _dmg_avg_start(s, h, r):
     return _dmg_avg_base(s, h, r) + _primary_dmg(s, h)
 
 
-def _dmg_range_base(s, h, r):
-    return f'{_g0(_dmg_min_base(s, h, r))}–{_g0(_dmg_max_base(s, h, r))}'
-
-
-def _dmg_range_start(s, h, r):
-    return f'{_g0(_dmg_min_start(s, h, r))}–{_g0(_dmg_max_start(s, h, r))}'
-
-
 # HP / MP / regens -----------------------------------------------------------
 
 def _hp_l1(s, h, r):
@@ -1177,28 +1154,6 @@ def _patchnote_events() -> dict[tuple[str, str], list[str]]:
     return _PATCHNOTE_EVENTS
 
 
-def _shift_to_patchnote(hero: str, field: str, ver: str, used: set[str]) -> str:
-    """If a patch note announces a `field` change for this hero at a patch
-    <= ver that hasn't been consumed by a previous change, return that
-    patch. Otherwise return `ver` unchanged.
-    `used` tracks patches already assigned to earlier changes of this
-    (hero, field) so we don't reassign one note to two KV changes."""
-    slug = hero.replace("npc_dota_hero_", "")
-    events = _patchnote_events().get((slug, field), [])
-    if not events:
-        return ver
-    # Walk events newest→oldest; pick the latest event that is <= ver and
-    # not used yet.
-    for p in reversed(events):
-        if _patch_sort_key(p) > _patch_sort_key(ver):
-            continue
-        if p in used:
-            continue
-        used.add(p)
-        return p
-    return ver
-
-
 # ---------- history ----------
 
 def _col_fields(col) -> tuple[str, ...]:
@@ -1671,15 +1626,7 @@ def render_html() -> str:
     )
 
 
-def _latest_href() -> str:
-    from patch.meta import latest_patch_filename as _lpf
-    _fallback = _lpf()
-    meta_path = _HERE / "data" / "site_meta.json"
-    try:
-        meta = _json.loads(meta_path.read_text(encoding="utf-8"))
-        return meta.get("latest_patch_filename", _fallback)
-    except Exception:
-        return _fallback
+_latest_href = _site.latest_patch_href
 
 
 def main() -> int:

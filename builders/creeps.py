@@ -27,18 +27,7 @@ import builders.site_common as _site
 ASSET_VERSION = _site.compute_asset_version()
 
 
-def _latest_href():
-    """Latest patch page href for the Changelogs nav tab. Prefer the meta file
-    the patch build emits; fall back to patch.meta (the canonical source)
-    rather than a stale hardcoded version."""
-    from patch.meta import latest_patch_filename as _lpf
-    _fallback = _lpf()
-    meta_path = _os.path.join(_HERE, "data", "site_meta.json")
-    try:
-        meta = _json.loads(open(meta_path, encoding="utf-8").read())
-        return meta.get("latest_patch_filename", _fallback)
-    except Exception:
-        return _fallback
+_latest_href = _site.latest_patch_href
 
 
 def save_creeps_html():

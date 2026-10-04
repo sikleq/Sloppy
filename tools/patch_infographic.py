@@ -13,7 +13,10 @@ Fonts: Reaver / Radiance from the Dota 2 client (fallback: Arial).
 Streaks/untouched are computed over the ANNOTATED patches only (content/p*.py), because
 _dynamics.json has no rows for patches without a page. The footer states the sample.
 """
-import sys, os, re, json, argparse
+import os
+import re
+import json
+import argparse
 from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

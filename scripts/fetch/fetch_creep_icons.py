@@ -1,6 +1,7 @@
 """Download neutral-creep portrait icons from Valve CDN to icons/units/.
 Source path: dota_react/units/npc_dota_neutral_<slug>.png."""
-import json, os, sys
+import json
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 

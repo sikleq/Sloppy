@@ -15,7 +15,6 @@ cannot be read from the notes, Valve's pricing or Valve's follow-up patches (doc
 
 Usage:  python tools/fetch_item_adoption.py      -> data/rules/item_adoption.json, hero_adoption.json
 """
-import collections
 import datetime as dt
 import json
 import os

@@ -249,9 +249,7 @@ def diff_versions(prev: dict, curr: dict) -> dict:
 # ───────────────────────── HTML RENDER ─────────────────────────────────────
 
 def _esc(s) -> str:
-    return (str(s).replace("&", "&amp;")
-                  .replace("<", "&lt;")
-                  .replace(">", "&gt;"))
+    return _site.esc(s, quote=False)
 
 
 def _val_cell(v) -> str:
@@ -304,43 +302,10 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&display=swap">
-<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../../styles.css?v={asset}">
 <link rel="icon" type="image/svg+xml" href="../../icons/favicon/favicon.svg">
 <link rel="icon" type="image/png" sizes="96x96" href="../../icons/favicon/favicon-96x96.png">
 <link rel="shortcut icon" href="../../icons/favicon/favicon.ico">
-<style>
-.sc-page {{ max-width: 1080px; margin: 0 auto; padding: 24px 28px 80px; }}
-.sc-page h1 {{ font-family: 'Jersey 10', monospace; font-size: 38px;
-              letter-spacing: 1px; color: #f3ecdd; margin-bottom: 4px; }}
-.sc-page .sc-sub {{ color: #969289; font-size: 13px; margin-bottom: 24px; }}
-.sc-hero {{ margin: 28px 0; }}
-.sc-hero h2 {{ font-size: 18px; color: #e3c46a; font-weight: 700;
-              border-bottom: 1px solid #262523; padding-bottom: 6px; }}
-.sc-ability {{ margin: 14px 0 14px 0; }}
-.sc-ability-name {{ font-size: 13px; color: #d6d0c3; font-weight: 600;
-                    font-family: 'Courier New', monospace; margin-bottom: 6px; }}
-.sc-table {{ border-collapse: collapse; width: 100%; font-size: 12px;
-            font-variant-numeric: tabular-nums; }}
-.sc-table th, .sc-table td {{ padding: 5px 10px; border: 1px solid #363532;
-                              text-align: left; vertical-align: top; }}
-.sc-table th {{ background: #1b1a18; color: #d6d0c3; font-weight: 600;
-                font-size: 11px; text-transform: uppercase;
-                letter-spacing: 0.5px; }}
-.sc-field {{ font-family: 'Courier New', monospace; color: #969289;
-             max-width: 280px; word-break: break-all; }}
-.sc-old {{ background: rgba(248, 81, 73, 0.08); color: #f8a39e; }}
-.sc-new {{ background: rgba(86, 211, 100, 0.08); color: #92e3a3; }}
-.sc-absent {{ color: #78756e; font-style: italic; }}
-.sc-flag {{ display: inline-block; padding: 1px 6px; margin: 2px 4px 2px 0;
-            background: rgba(227, 196, 106, 0.12); color: #e3c46a;
-            border-radius: 3px; font-size: 10.5px;
-            font-family: 'Courier New', monospace; }}
-.sc-empty {{ color: #969289; font-style: italic; padding: 40px 0;
-             text-align: center; }}
-.sc-back {{ display: inline-block; margin-bottom: 16px; color: #e3c46a;
-            text-decoration: none; font-size: 13px; }}
-.sc-back:hover {{ text-decoration: underline; }}
-</style>
 </head>
 <body>
 <div class="sc-page">
@@ -392,7 +357,8 @@ def build_page(version: str) -> str | None:
         if has_content else
         '<a class="sc-back" href="../../">← All Patches</a>'
     )
-    return PAGE_TEMPLATE.format(version=version, prev=prev, body=body, back_link=back_link)
+    return PAGE_TEMPLATE.format(version=version, prev=prev, body=body, back_link=back_link,
+                                asset=_site.compute_asset_version())
 
 
 def main() -> int:

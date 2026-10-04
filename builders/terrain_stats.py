@@ -9,7 +9,6 @@ removed (red) and moved (yellow) since the file before, a little square of the m
 HTML + inline SVG, the hover in CSS, no script of its own.
 """
 import datetime as _dt
-import html as _html
 import json as _json
 import os as _os
 import re as _re
@@ -49,8 +48,7 @@ COLUMNS = (
 )
 
 
-def _esc(s):
-    return _html.escape(str(s), quote=True)
+_esc = _site.esc
 
 
 def _key(v):

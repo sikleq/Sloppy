@@ -161,14 +161,7 @@ def _load_item_npedesc() -> dict[str, str]:
     return out
 
 
-def _latest_href() -> str:
-    from patch.meta import latest_patch_filename as _lpf
-    _fallback = _lpf()
-    try:
-        meta = _json.loads((_HERE / "data" / "site_meta.json").read_text(encoding="utf-8"))
-        return meta.get("latest_patch_filename", _fallback)
-    except Exception:
-        return _fallback
+_latest_href = _site.latest_patch_href
 
 
 def _num(v) -> float:

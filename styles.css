@@ -1260,24 +1260,6 @@ body:has(.creeps-page) nav.top-nav {
     100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
     0 calc(100% - 2px), 0 2px);
 }
-.nav-context .release-date {
-  color: var(--text-main);
-  font-family: var(--font-j25);
-  font-size: 17px;
-  font-weight: 400;
-  letter-spacing: 0.3px;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-.nav-context .release-version {
-  color: var(--gold);
-  font-size: 14px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.5px;
-  line-height: 1.1;
-  margin-bottom: 1px;
-}
 /* Calendar variant — no dropdown; .release-info takes its place on the right.
    Override the fixed 38px height (designed for version+date only) so the
    3rd line (.patch-age) doesn't overflow above and below the box. */
@@ -4220,8 +4202,7 @@ h4.subgroup {
 }
 /* Raw <li> (no .row-text wrapper) inside ability-block — TWO offsets stack:
    76px to cancel the raw-li padding, plus 60px to clear the ability-block icon. */
-.ability-block ul.changes li.li-notext > .formula-table,
-.ability-block ul.changes li.li-notext > .correction-note {
+.ability-block ul.changes li.li-notext > .formula-table {
   margin-left: -136px;
   width: calc(100% + 136px);
 }
@@ -4345,7 +4326,6 @@ ul.changes li > .badge-group {
    left, and stretching the note across uses it instead of leaving an
    awkward gap. The note's own padding-left (12px) keeps the text from
    running flush against the entity-block edge. */
-ul.changes li > .correction-note,
 ul.changes li > .formula-table {
   grid-column: 1 / -1;
 }
@@ -4382,8 +4362,7 @@ ul.changes li.li-notext::before {
   border: 1px solid rgba(225, 90, 75, 0.28);
 }
 /* Extras inside raw rows (formula-table, correction-note) — extend to left edge */
-ul.changes li.li-notext > .formula-table,
-ul.changes li.li-notext > .correction-note {
+ul.changes li.li-notext > .formula-table {
   margin-left: -76px;
   width: calc(100% + 76px);
 }
@@ -4763,12 +4742,6 @@ ul.subnote-items > li::before {
   border-color: rgba(175, 170, 160, 0.55);   /* picks span 2 rows → naturally taller than bans */
   background: rgba(28, 27, 25, 0.92);
 }
-.cm-sw.changed-sw {
-  width: 12px;
-  height: 12px;
-  border-color: rgba(227, 196, 106, 0.5);
-  box-shadow: 0 0 0 1px rgba(227, 196, 106, 0.16);
-}
 
 /* Tarot-card sub-list entries (Oracle Diviner's Deck): small icon + bold card
    name + effect. Each entry is its own inline-flex row so wrapping reads as
@@ -4974,17 +4947,8 @@ ul.changes li > .badge-group {
   text-decoration-thickness: 1px;
   opacity: 0.55;
 }
-.correction-note .badge {
-  font-style: normal;
-}
 /* Bold values inside the note (prev value, prev patch) — same size as surrounding
 /* "(N days ago)" annotation — fainter so it reads as a side-note. */
-.correction-note .days-ago {
-  font-style: normal;
-  color: var(--text-dimmer);
-  font-size: 11.5px;
-  font-weight: 500;
-}
 /* Patch version chip-link inside correction-note ("changed in <ver>"). */
 /* Patch version reference inside a note_box (i)-popup — plain solid underline,
    not a link (popups aren't clickable). */
@@ -4994,14 +4958,6 @@ ul.changes li > .badge-group {
 }
 /* Badge-group inside correction-note: float to the right edge of the note
    so it visually mirrors the row's main % (which sits in the right grid column). */
-.correction-note > .badge-group {
-  float: right;
-  /* Negative right margin compensates the .correction-note padding-right (12px)
-     so the badge sits flush with the right edge — aligns with the row's main %
-     above/below the note. */
-  margin: 0 -12px 0 12px;
-  font-style: normal;
-}
 /* IMAGE FALLBACK STYLE */
 .entity-icon img[alt]:not([src*="//"]) { background: var(--bg-panel-4); }
 img { max-width: 100%; }
@@ -5135,12 +5091,6 @@ ul.changes li.aghanim-shard.li-formula {
 .formula-table th:first-child,
 .formula-table td:first-child {
   width: 42px;
-}
-.formula-table .axis-label {
-  white-space: nowrap;
-  width: auto;
-  font-style: italic;
-  opacity: 0.75;
 }
 .formula-table[hidden] { display: none; }
 .formula-table thead th {
@@ -5314,14 +5264,7 @@ body.filter-active ul.subnotes { display: none; }
 .f-hide { display: none !important; }
 
 /* MOBILE: stack legend label above strip so 10 segments fit */
-@media (max-width: 540px) {
-  .legend-strip {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 4px;
-  }
-  .gradient-strip .seg { font-size: 8px; }
-}
+
 
 
 /* ==========================================================================
@@ -6351,7 +6294,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
    keep their own field border. Chips keep their own design. */
 .toolbar-panel .ua-upgrades-toggle,
 .toolbar-panel .hd-remove-group,
-.toolbar-panel .hd-class-group,
 .toolbar-panel .hs-attack-filter-group,
 .toolbar-panel .hs-attr-filter-group,
 .toolbar-panel .hs-level-group,
@@ -7730,17 +7672,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   font-size: 11px;
   color: rgba(255,255,255,0.55);
 }
-.hlt-tier-hint {
-  font-size: 10px;
-  color: rgba(255,255,255,0.35);
-  font-style: italic;
-}
-.hlt-tier-badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: #e3c46a;
-  padding: 2px 8px;
-}
 .hl-tier-time {
   font-weight: 400;
   color: rgba(255,255,255,0.4);
@@ -8621,18 +8552,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .creeps-table tr.tier-3 td:first-child { color: #db6d28; }   /* rare/early — orange */
 .creeps-table tr.tier-4 td:first-child { color: #f85149; }   /* worst — red */
 /* Tier legend footer rows (no data, just label in column 3). */
-.creeps-table tr.creeps-footer td {
-  background: rgba(150, 146, 137, 0.06);
-  color: var(--text-dim);
-  font-style: italic;
-  border-bottom: none;
-}
-.creeps-table tr.creeps-footer td:nth-child(3) {
-  font-style: normal;
-  color: var(--text-main);
-  font-weight: 600;
-  padding-left: 16px;
-}
 
 /* ==========================================================================
    09. MANA ITEMS
@@ -9529,24 +9448,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
    horizontal line and the first change row lines up with the map's top edge:
    28px control height (matches .tc-controls-bar's 28px buttons) + 10px bottom
    gap (matches the toolbar's 10px bottom padding). */
-.terrain-list-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 28px;            /* HARD-capped to the toolbar's control height — the
-                             Jersey label's tall line-box must not grow the row
-                             (it just centers/overflows), so the first change row
-                             stays at 28px + 10px = the map's top edge. */
-  margin: 0 0 10px;
-  line-height: 1;
-}
-.terrain-list-head-label {
-  font-family: 'Jersey 25', 'Jersey 10', sans-serif;
-  font-weight: 400;
-  font-size: 24px;
-  letter-spacing: 0.5px;
-  color: var(--gold);
-}
 .terrain-list { padding-left: 4px; }
 .terrain-list li { padding: 3px 0; }
 .terrain-subpatch-head {
@@ -9857,7 +9758,6 @@ a.tsp-label:hover, a.tsp-label:focus-visible { color: #e3c46a; text-decoration-c
   box-shadow: inset 0 2px 3px var(--shadow-55);
 }
 .tc-btn[aria-pressed="false"] img { filter: grayscale(0.85) brightness(0.85); }
-.tc-inline-loupe { image-rendering: pixelated; vertical-align: -3px; margin: 0 3px 0 1px; }
 
 /* version chips → map corners (OLD bottom-left, NEW top-right) */
 .tc-ver {
@@ -10022,41 +9922,11 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
    page's GOLD theme (the calendar's is blue). It sits inline in the heading as
    the version, so the heading reads "[7.41 ▾] Terrain Changes". */
 /* Nudge the patch picker down 1px (the "Terrain Changes" label stays put). */
-.tc-picker { transform: translateY(1px); position: relative; }
 /* `transform` above turns .tc-picker into a stacking context that TRAPS the
    menu's z-index:60 inside it — and since the change-list pane comes LATER in
    the DOM than this heading, those rows painted OVER the (trapped) menu, making
    the open dropdown look transparent. Lift the whole picker above the rows
    while it's open so its menu paints on top. */
-.tc-picker.is-open { z-index: 80; }
-.tc-picker .cal-year-current {
-  background: linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%);
-  border: 1px solid var(--gold);
-  color: #f4e6bf;
-  /* Match the map toolbar's 28px control height so the heading row lines up
-     with the toolbar and the first change row meets the map's top edge. */
-  height: 28px;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-.tc-picker .cal-year-caret { color: var(--gold); }
-.tc-picker .cal-year-current:hover { border-color: var(--gold-strong); }
-.tc-picker.is-open .cal-year-current,
-.tc-picker .cal-year-current:focus-visible {
-  border-color: var(--gold-strong);
-  box-shadow: inset 0 1px 0 rgba(222, 216, 203, 0.12),
-              0 0 0 3px var(--gold-line-soft);
-}
-.tc-picker .cal-year-menu {
-  background: #15110a;
-  border: 1px solid rgba(227, 196, 106, 0.4);
-}
-.tc-picker .cal-year-opt { color: #d8c79a; }
-.tc-picker .cal-year-opt:hover { background: var(--gold-14); color: #fff5dc; }
-.tc-picker .cal-year-opt.is-selected {
-  background: rgba(227, 196, 106, 0.2);
-  box-shadow: inset 0 0 0 1px var(--gold-line);
-}
 .terrain-map-pane[hidden],
 .terrain-list-pane[hidden] { display: none; }
 
@@ -10313,7 +10183,6 @@ details.clog-minor > .clog-minor-list { margin-top: 6px; }
 /* a hero named in a note = its small picture (the owner 2026-10-03) */
 .clog-hero { width: 28px; height: 16px; object-fit: cover; border-radius: 2px; vertical-align: -3px; margin: 0 1px;
   box-shadow: 0 0 0 1px rgba(227, 196, 106, 0.18); }
-.clog-rail-minor { color: var(--text-dim, #969289); font-style: italic; }
 @media (max-width: 1100px) {
   .clog-entry.has-shots { grid-template-columns: 1fr; }
   .clog-shots { margin-top: 10px; }
@@ -10506,17 +10375,15 @@ section.ec-patch .entity-block.ec-item-inject { margin-top: 14px; padding-top: 1
 /* one filter row: Tags | Show | Ability */
 .legend-tags.ec-filters { flex-wrap: wrap; row-gap: 5px; }
 .ec-vsep { width: 1px; height: 16px; margin: 0 8px; background: var(--line-bright, rgba(255,255,255,0.18)); flex: 0 0 auto; }
-.legend-tags.ec-filters strong.ec-lbl { width: auto; margin-right: 6px; }
 /* ability chips: gold, so they do not blend with the blue Show filters */
-.ec-ab-btn, .ec-ab-more {
+.ec-ab-btn {
   cursor: pointer; user-select: none; font-family: inherit; font-size: 11px; padding: 3px 9px; border-radius: 3px;
   background: rgba(227, 196, 106, 0.06); color: #c9b57a; border: 1px solid rgba(227, 196, 106, 0.28);
   text-transform: uppercase; letter-spacing: 0.4px; transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
-.ec-ab-btn:hover, .ec-ab-more:hover { background: rgba(227, 196, 106, 0.13); border-color: rgba(227, 196, 106, 0.5); color: #f0dfa6; }
-.ec-ab-btn.active, .ec-ab-more.active { background: rgba(227, 196, 106, 0.26); border-color: rgba(227, 196, 106, 0.75); color: #fff; }
+.ec-ab-btn:hover { background: rgba(227, 196, 106, 0.13); border-color: rgba(227, 196, 106, 0.5); color: #f0dfa6; }
+.ec-ab-btn.active { background: rgba(227, 196, 106, 0.26); border-color: rgba(227, 196, 106, 0.75); color: #fff; }
 .ec-ab-btn.ec-ab-old { border-style: dashed; opacity: 0.85; }
-.ec-ab-more { border-style: dotted; color: #9a927c; }
 .ec-ab-btn[hidden] { display: none; }
 /* the patch banner = the same red section banner as "ITEM UPDATES" on a patch page */
 h2.section.ec-ver { display: flex; align-items: baseline; gap: 16px; }
@@ -11136,7 +11003,7 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 }
 .search-pop .search-results { top: auto; bottom: calc(100% + 6px); max-height: min(60vh, 520px); overflow: auto; }
 /* Ability chips on hero / item / unit pages: the same pixel font as the tag and scope chips */
-.ec-ab-btn, .ec-ab-more {
+.ec-ab-btn {
   font-family: var(--font-j10);
   font-size: 15px;
   font-weight: 400;
@@ -11278,3 +11145,37 @@ ul.changes li.iab-covered { display: none !important; }
 /* a value with a note (the row's "(…)" / (?)): light dotted underline, the note on hover — no (?) icon in
    the header (owner 2026-09-27, Gleipnir 7.38 radius) */
 .iab-hint { display: inline; border-bottom: 1px dotted currentColor; padding-bottom: 0; line-height: 1.1; }
+
+/* ---- Silent Changes (dist/patches/silent/<ver>.html, builders/silent.py) ----
+   moved here from the page's inline <style> (audit 2026-10-04) */
+.sc-page { max-width: 1080px; margin: 0 auto; padding: 24px 28px 80px; }
+.sc-page h1 { font-family: 'Jersey 10', monospace; font-size: 38px;
+              letter-spacing: 1px; color: #f3ecdd; margin-bottom: 4px; }
+.sc-page .sc-sub { color: #969289; font-size: 13px; margin-bottom: 24px; }
+.sc-hero { margin: 28px 0; }
+.sc-hero h2 { font-size: 18px; color: #e3c46a; font-weight: 700;
+              border-bottom: 1px solid #262523; padding-bottom: 6px; }
+.sc-ability { margin: 14px 0 14px 0; }
+.sc-ability-name { font-size: 13px; color: #d6d0c3; font-weight: 600;
+                    font-family: 'Courier New', monospace; margin-bottom: 6px; }
+.sc-table { border-collapse: collapse; width: 100%; font-size: 12px;
+            font-variant-numeric: tabular-nums; }
+.sc-table th, .sc-table td { padding: 5px 10px; border: 1px solid #363532;
+                              text-align: left; vertical-align: top; }
+.sc-table th { background: #1b1a18; color: #d6d0c3; font-weight: 600;
+                font-size: 11px; text-transform: uppercase;
+                letter-spacing: 0.5px; }
+.sc-field { font-family: 'Courier New', monospace; color: #969289;
+             max-width: 280px; word-break: break-all; }
+.sc-old { background: rgba(248, 81, 73, 0.08); color: #f8a39e; }
+.sc-new { background: rgba(86, 211, 100, 0.08); color: #92e3a3; }
+.sc-absent { color: #78756e; font-style: italic; }
+.sc-flag { display: inline-block; padding: 1px 6px; margin: 2px 4px 2px 0;
+            background: rgba(227, 196, 106, 0.12); color: #e3c46a;
+            border-radius: 3px; font-size: 10.5px;
+            font-family: 'Courier New', monospace; }
+.sc-empty { color: #969289; font-style: italic; padding: 40px 0;
+             text-align: center; }
+.sc-back { display: inline-block; margin-bottom: 16px; color: #e3c46a;
+            text-decoration: none; font-size: 13px; }
+.sc-back:hover { text-decoration: underline; }

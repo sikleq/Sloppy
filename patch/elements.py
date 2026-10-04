@@ -7,9 +7,8 @@ import os as _os
 from .weights import row_scores as _row_scores
 import re
 
-from .images import (HERO_CDN, ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG,
-                     hero_img, item_img, abil_img, _LOCAL_ABIL_ICONS)
-from .output import H, W
+from .images import (ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG, hero_img,
+                     item_img, _LOCAL_ABIL_ICONS)
 from .state import _State
 from .terrain_notes import note_phrase, wrap_phrase
 

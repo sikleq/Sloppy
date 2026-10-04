@@ -13,7 +13,7 @@ gets no outlines. A spot's "show" list in terrain_spots.json overrides it (a ram
 the tower). Each picture comes twice: <code>_<i>.webp (240-px halves, the row) and <code>_<i>_lg.webp (600-px
 halves, opened by a click on the row's picture).
 
-Reads the full renders (C:\\Users\\sikle\\tools\\maprender\\sfm\\final\\map_<sha8>_sfm_full.png, 2 units / px — set
+Reads the full renders (~/tools/maprender/sfm/final/map_<sha8>_sfm_full.png, 2 units / px — set
 SFM_FINAL to move them), so it runs on the owner's PC; the pictures it writes are committed:
 
     python scripts/gen/terrain_shots.py            # every patch in data/terrain_spots.json
@@ -38,7 +38,7 @@ import builders.terrain as terrain  # noqa: E402
 
 if Image:
     Image.MAX_IMAGE_PIXELS = None
-FINAL = os.environ.get("SFM_FINAL", r"C:\Users\sikle\tools\maprender\sfm\final")
+FINAL = os.environ.get("SFM_FINAL", os.path.join(os.path.expanduser("~"), "tools", "maprender", "sfm", "final"))
 OUT = os.path.join(_ROOT, "icons", "terrain")
 SPOTS = os.path.join(_ROOT, "data", "terrain_spots.json")
 UPP = 2.0                 # game units per pixel of the full renders

@@ -26,7 +26,6 @@ parsed at build time; a patch whose notes list none says so.
 """
 import ast as _ast
 import glob as _glob
-import html as _html
 import json as _json
 import os as _os
 import sys as _sys
@@ -55,8 +54,7 @@ SHOW_MARKERS = True
 MAP_VB = 1280
 
 
-def _esc(s):
-    return _html.escape(str(s), quote=True)
+_esc = _site.esc
 
 
 def _load_diff(patch):
@@ -296,16 +294,7 @@ def _markers_svg(diff, pair_id="default"):
             + "".join(ent_svgs) + sb_svg + _highlights_svg(diff, proj), counts)
 
 
-def _latest_href():
-    """Latest patch page href for the Changelogs nav tab (from site_meta.json)."""
-    from patch.meta import latest_patch_filename as _lpf
-    _fallback = _lpf()
-    meta_path = _os.path.join(_HERE, "data", "site_meta.json")
-    try:
-        meta = _json.loads(open(meta_path, encoding="utf-8").read())
-        return meta.get("latest_patch_filename", _fallback)
-    except Exception:
-        return _fallback
+_latest_href = _site.latest_patch_href
 
 
 # ---- terrain change list -----------------------------------------------------
