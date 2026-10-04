@@ -272,6 +272,36 @@ def nowards_icon(color=NOWARDS):
     return Image.alpha_composite(ol, img)
 
 
+def shrines_icon():
+    """The old healing Shrines (before 7.33) have no map icon left (the owner 2026-10-04, with the game model: "a
+    stone well of water — make it like the other icons and keep it, it may come in handy"): a grey stone well, its
+    rim round a pool of water, a vine over it. Drawn at 4x + downscaled, dark outline, like the other drawn icons."""
+    from PIL import ImageDraw, ImageFilter
+    S = ICON_RES * 4
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    stone, shade, light = (128, 136, 140, 255), (86, 92, 98, 255), (176, 184, 188, 255)
+    water, water_hi = (70, 170, 215, 255), (150, 220, 245, 255)
+    leaf = (104, 168, 76, 255)
+    d.ellipse([S * 0.20, S * 0.74, S * 0.80, S * 0.92], fill=shade)               # the well's round foot
+    d.rectangle([S * 0.20, S * 0.38, S * 0.80, S * 0.83], fill=stone)            # its stone body
+    d.rectangle([S * 0.20, S * 0.38, S * 0.32, S * 0.83], fill=shade)            # the shaded side
+    for y in (0.53, 0.68):                                                       # courses of stone blocks
+        d.line([S * 0.20, S * y, S * 0.80, S * y], fill=shade, width=int(S * 0.02))
+    for x, y0, y1 in ((0.50, 0.53, 0.68), (0.64, 0.38, 0.53), (0.42, 0.68, 0.83)):
+        d.line([S * x, S * y0, S * x, S * y1], fill=shade, width=int(S * 0.02))
+    d.ellipse([S * 0.16, S * 0.22, S * 0.84, S * 0.52], fill=light)              # the rim
+    d.ellipse([S * 0.26, S * 0.28, S * 0.74, S * 0.46], fill=water)              # the water
+    d.ellipse([S * 0.34, S * 0.31, S * 0.52, S * 0.37], fill=water_hi)           # a glint on it
+    for cx, cy in ((0.18, 0.40), (0.26, 0.56), (0.82, 0.36), (0.76, 0.52)):      # a vine round the rim
+        d.ellipse([S * (cx - 0.07), S * (cy - 0.04), S * (cx + 0.07), S * (cy + 0.04)], fill=leaf)
+    img = img.resize((ICON_RES, ICON_RES), Image.LANCZOS)
+    dil = img.split()[3].filter(ImageFilter.MaxFilter(3))
+    ol = Image.new("RGBA", img.size, OUTLINE)
+    ol.putalpha(dil)
+    return Image.alpha_composite(ol, img)
+
+
 def all_icon():
     """The "All layers" toggle (the owner 2026-10-02: simpler, like the site's other icons): a 16-px pixel glyph of
     three stacked map layers in the gold ramp, dark outline, scaled up hard-edged like tc_trees."""
@@ -308,7 +338,8 @@ def main(only=()):
         print("wrote", name)
 
     # ---- custom drawn: spawnbox, "all layers" ----
-    for name, make in (("icon_spawnbox", spawnbox_icon), ("tc_all", all_icon), ("tc_nowards", nowards_icon)):
+    for name, make in (("icon_spawnbox", spawnbox_icon), ("tc_all", all_icon), ("tc_nowards", nowards_icon),
+                       ("tc_shrines", shrines_icon)):
         if want(name):
             im = make()
             im.save(os.path.join(_OUT, f"{name}.png"))

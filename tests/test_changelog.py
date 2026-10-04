@@ -114,8 +114,11 @@ def test_no_picture_shows_in_two_news():
         for p in e.get("shots", []):
             assert p not in seen, (p, seen.get(p), e["title"])
             seen[p] = e["title"]
-    shots_0403 = next(e for e in clog.load_entries() if e["title"] == "Terrain changes, shown on the map")["shots"]
-    assert not [p for p in shots_0403 if "_anim.webp" in p]          # the layer comparisons are the 10-04 sweeps
+    # 10-04: the three terrain news of 10-03 / 10-04 are one ("they are one topic — Terrain")
+    titles = [e["title"] for e in clog.load_entries()]
+    assert "Terrain changes, shown on the map" not in titles and "Terrain Stats: the map history in one table" not in titles
+    merged = next(e for e in clog.load_entries() if e["title"] == "Terrain: every map since 7.08, every change shown")
+    assert len(merged["items"]) == 3 and not [p for p in merged["shots"] if "_anim.webp" in p]
 
 
 def test_notes_are_short_and_heroes_are_icons():

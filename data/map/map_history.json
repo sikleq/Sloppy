@@ -26,7 +26,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.09",
@@ -53,6 +54,15 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 2,
+"rem": 3
+},
+"towers": {
+"moved": 2
+}
 }
 },
 {
@@ -86,7 +96,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.12",
@@ -137,6 +148,24 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 1,
+"rem": 5
+},
+"boxes": {
+"changed": 4
+},
+"towers": {
+"moved": 2
+},
+"bounty": {
+"moved": 1
+},
+"power": {
+"moved": 2
+}
 }
 },
 {
@@ -170,7 +199,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.18",
@@ -203,6 +233,12 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 2,
+"rem": 0
+}
 }
 },
 {
@@ -230,7 +266,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.19c",
@@ -257,7 +294,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.19d",
@@ -290,6 +328,27 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 414,
+"rem": 412
+},
+"camps": {
+"moved": 11
+},
+"camp_tiers": {
+"changed": 4
+},
+"boxes": {
+"changed": 14
+},
+"towers": {
+"moved": 3
+},
+"bounty": {
+"moved": 2
+}
 }
 },
 {
@@ -317,6 +376,11 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"boxes": {
+"changed": 1
+}
 }
 },
 {
@@ -350,7 +414,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.20e",
@@ -377,7 +442,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.21",
@@ -404,6 +470,11 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"camp_tiers": {
+"changed": 2
+}
 }
 },
 {
@@ -437,7 +508,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.21d",
@@ -464,7 +536,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.22",
@@ -491,6 +564,24 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 54,
+"rem": 53
+},
+"camps": {
+"moved": 3
+},
+"boxes": {
+"changed": 5
+},
+"towers": {
+"moved": 1
+},
+"bounty": {
+"moved": 1
+}
 }
 },
 {
@@ -548,7 +639,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.22h",
@@ -581,6 +673,34 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 308,
+"rem": 414
+},
+"camps": {
+"moved": 9
+},
+"camp_tiers": {
+"changed": 2
+},
+"boxes": {
+"changed": 10
+},
+"bounty": {
+"moved": 4
+},
+"power": {
+"moved": 2
+},
+"outposts": {
+"add": 2,
+"rem": 0
+},
+"roshan": {
+"moved": 1
+}
 }
 },
 {
@@ -620,7 +740,8 @@
 "shrines": 4,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.23d",
@@ -653,7 +774,8 @@
 "shrines": 2,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.23f",
@@ -680,7 +802,8 @@
 "shrines": 2,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.24",
@@ -707,6 +830,24 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 51,
+"rem": 46
+},
+"camps": {
+"moved": 1
+},
+"boxes": {
+"changed": 1
+},
+"bounty": {
+"moved": 2
+},
+"outposts": {
+"moved": 2
+}
 }
 },
 {
@@ -734,7 +875,8 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.25",
@@ -761,6 +903,11 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"moved": 4
+}
 }
 },
 {
@@ -830,6 +977,21 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 5,
+"rem": 6
+},
+"camps": {
+"moved": 1
+},
+"camp_tiers": {
+"changed": 5
+},
+"boxes": {
+"changed": 3
+}
 }
 },
 {
@@ -881,6 +1043,12 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 1,
+"rem": 3
+}
 }
 },
 {
@@ -914,7 +1082,8 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.28c",
@@ -941,7 +1110,8 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.29",
@@ -968,6 +1138,34 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 734,
+"rem": 548
+},
+"camps": {
+"moved": 15
+},
+"camp_tiers": {
+"changed": 2
+},
+"boxes": {
+"changed": 16
+},
+"towers": {
+"moved": 5
+},
+"bounty": {
+"add": 1,
+"rem": 3
+},
+"power": {
+"moved": 2
+},
+"outposts": {
+"moved": 2
+}
 }
 },
 {
@@ -995,6 +1193,12 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 5,
+"rem": 10
+}
 }
 },
 {
@@ -1022,6 +1226,12 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 6,
+"rem": 5
+}
 }
 },
 {
@@ -1049,7 +1259,8 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.30",
@@ -1106,6 +1317,18 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 4,
+"rem": 0
+},
+"towers": {
+"moved": 2
+},
+"bounty": {
+"moved": 2
+}
 }
 },
 {
@@ -1145,7 +1368,8 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.32",
@@ -1172,6 +1396,26 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
+},
+"moves": {
+"trees": {
+"add": 57,
+"rem": 44
+},
+"camps": {
+"add": 0,
+"rem": 2
+},
+"boxes": {
+"add": 1,
+"rem": 3
+},
+"bounty": {
+"moved": 1
+},
+"outposts": {
+"moved": 1
+}
 }
 },
 {
@@ -1199,7 +1443,8 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.32c",
@@ -1238,7 +1483,8 @@
 "shrines": 0,
 "roshan": 1,
 "tormentors": 0
-}
+},
+"moves": {}
 },
 {
 "patch": "7.33",
@@ -1265,6 +1511,57 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 1838,
+"rem": 1578
+},
+"camps": {
+"add": 24,
+"rem": 12
+},
+"camp_tiers": {
+"changed": 3
+},
+"boxes": {
+"add": 24,
+"rem": 12
+},
+"towers": {
+"moved": 3
+},
+"lotus": {
+"add": 2,
+"rem": 0
+},
+"gates": {
+"add": 2,
+"rem": 0
+},
+"tormentors": {
+"add": 2,
+"rem": 0
+},
+"bounty": {
+"moved": 2
+},
+"wisdom": {
+"add": 2,
+"rem": 0
+},
+"outposts": {
+"add": 4,
+"rem": 2
+},
+"watchers": {
+"add": 8,
+"rem": 0
+},
+"roshan": {
+"add": 2,
+"rem": 1
+}
 }
 },
 {
@@ -1292,7 +1589,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.33c",
@@ -1319,6 +1617,12 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 57,
+"rem": 84
+}
 }
 },
 {
@@ -1358,6 +1662,18 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 0,
+"rem": 1
+},
+"outposts": {
+"moved": 2
+},
+"watchers": {
+"moved": 4
+}
 }
 },
 {
@@ -1391,7 +1707,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.34d",
@@ -1418,7 +1735,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.34e",
@@ -1451,6 +1769,16 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 0,
+"rem": 4
+},
+"watchers": {
+"add": 2,
+"rem": 0
+}
 }
 },
 {
@@ -1484,7 +1812,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.35d",
@@ -1517,7 +1846,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.36a",
@@ -1574,7 +1904,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.37d",
@@ -1601,7 +1932,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.37e",
@@ -1628,7 +1960,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.38",
@@ -1655,6 +1988,42 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 1017,
+"rem": 1052
+},
+"camps": {
+"moved": 21
+},
+"lotus": {
+"moved": 2
+},
+"gates": {
+"moved": 2
+},
+"tormentors": {
+"moved": 2
+},
+"bounty": {
+"moved": 2
+},
+"wisdom": {
+"add": 2,
+"rem": 2
+},
+"outposts": {
+"add": 0,
+"rem": 2
+},
+"watchers": {
+"add": 14,
+"rem": 10
+},
+"roshan": {
+"moved": 2
+}
 }
 },
 {
@@ -1682,6 +2051,12 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 2,
+"rem": 11
+}
 }
 },
 {
@@ -1709,6 +2084,21 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 152,
+"rem": 130
+},
+"camps": {
+"moved": 2
+},
+"towers": {
+"moved": 1
+},
+"watchers": {
+"moved": 1
+}
 }
 },
 {
@@ -1736,6 +2126,30 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 290,
+"rem": 297
+},
+"camps": {
+"moved": 5
+},
+"towers": {
+"moved": 4
+},
+"watchers": {
+"moved": 1
+},
+"lotus": {
+"moved": 2
+},
+"roshan": {
+"moved": 2
+},
+"bounty": {
+"moved": 1
+}
 }
 },
 {
@@ -1763,6 +2177,21 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 38,
+"rem": 27
+},
+"camps": {
+"moved": 2
+},
+"towers": {
+"moved": 1
+},
+"watchers": {
+"moved": 1
+}
 }
 },
 {
@@ -1790,6 +2219,11 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"watchers": {
+"moved": 2
+}
 }
 },
 {
@@ -1817,6 +2251,12 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 0,
+"rem": 3
+}
 }
 },
 {
@@ -1844,7 +2284,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.40",
@@ -1871,6 +2312,25 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 239,
+"rem": 293
+},
+"camps": {
+"moved": 9
+},
+"towers": {
+"moved": 1
+},
+"watchers": {
+"add": 4,
+"rem": 8
+},
+"wisdom": {
+"moved": 2
+}
 }
 },
 {
@@ -1904,7 +2364,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.41",
@@ -1931,6 +2392,30 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 324,
+"rem": 304
+},
+"camps": {
+"moved": 7
+},
+"towers": {
+"moved": 2
+},
+"watchers": {
+"moved": 3
+},
+"lotus": {
+"moved": 2
+},
+"tormentors": {
+"moved": 2
+},
+"gates": {
+"moved": 2
+}
 }
 },
 {
@@ -1958,6 +2443,12 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
+},
+"moves": {
+"trees": {
+"add": 0,
+"rem": 1
+}
 }
 },
 {
@@ -1991,7 +2482,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.41d",
@@ -2018,7 +2510,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.41e",
@@ -2045,7 +2538,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 },
 {
 "patch": "7.41f",
@@ -2072,7 +2566,8 @@
 "shrines": 0,
 "roshan": 2,
 "tormentors": 2
-}
+},
+"moves": {}
 }
 ]
 }

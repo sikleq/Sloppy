@@ -4,35 +4,24 @@
     {
       "date": "2026-10-04",
       "category": "Terrain",
-      "title": "Terrain Stats: the map history in one table",
-      "link": "terrain_stats.html",
+      "title": "Terrain: every map since 7.08, every change shown",
+      "link": "terrain_741.html",
       "items": [
-        "A new page under the Terrain tab: every map file since 7.08, one row each",
-        "Trees, camps by tier, watchers, runes and more, with the change from the file before",
-        "A chart of the trees over the years, the big reworks marked"
-      ],
-      "shots": [
-        "icons/changelog/2026-10-04_terrain_stats.webp",
-        "icons/changelog/2026-10-04_terrain_stats_table.webp"
-      ]
-    },
-    {
-      "date": "2026-10-04",
-      "category": "Terrain",
-      "title": "Terrain: every map since 7.08",
-      "link": "https://github.com/sikleq/Oldgrowth",
-      "items": [
-        "All 65 map files from 7.08 to 7.41f rendered, letter patches too",
-        "Every map's objects are kept, with what moved since the patch before",
-        "Turn a layer on and drag the slider from the old map to the new"
+        "All 65 map files since 7.08, letter patches too: drag the slider, layer by layer",
+        "Click what changed in a terrain note to see it; chips outline it, dashed = old spot",
+        "Terrain Stats: the whole history in one table and a chart"
       ],
       "shots": [
         "icons/changelog/2026-10-04_sweep_trees.webp",
         "icons/changelog/2026-10-04_sweep_objects.webp",
         "icons/changelog/2026-10-04_sweep_nowards.webp",
         "icons/changelog/2026-10-04_sweep_all_layers.webp",
+        "icons/changelog/2026-10-03_terrain_notes.webp",
+        "icons/changelog/2026-10-03_terrain_trees_modes.webp",
         "icons/changelog/2026-10-04_terrain_facts.webp",
-        "icons/changelog/2026-10-04_oldgrowth.webp"
+        "icons/changelog/2026-10-03_terrain_fullscreen.webp",
+        "icons/changelog/2026-10-04_terrain_stats.webp",
+        "icons/changelog/2026-10-04_terrain_stats_table.webp"
       ]
     },
     {
@@ -47,22 +36,6 @@
       "minor": true,
       "link": "terrain_740.html",
       "title": "Terrain: old spots are outlined with thin, close dashes, one contour per grove"
-    },
-    {
-      "date": "2026-10-03",
-      "category": "Terrain",
-      "title": "Terrain changes, shown on the map",
-      "link": "terrain_741.html",
-      "items": [
-        "Click what changed in a terrain note to see the map before and after",
-        "Chips on the Terrain page outline changes: red removed, green added, yellow moved, dashed = old spot",
-        "Notes are numbered; the patch name above the list opens its notes"
-      ],
-      "shots": [
-        "icons/changelog/2026-10-03_terrain_notes.webp",
-        "icons/changelog/2026-10-03_terrain_trees_modes.webp",
-        "icons/changelog/2026-10-03_terrain_fullscreen.webp"
-      ]
     },
     {
       "date": "2026-10-03",

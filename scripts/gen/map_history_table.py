@@ -7,6 +7,7 @@ the numbers are copied here, compact; rerun after Oldgrowth gains a patch:
 """
 import json
 import os
+import re
 import sys
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -36,6 +37,34 @@ def counts(c):
     }
 
 
+# the names builders/terrain._moved_summary writes -> the keys above ("camp tiers" / "camp spawn boxes" have no count)
+_NAMES = {"trees": "trees", "camps": "camps", "camp tiers": "camp_tiers", "camp spawn boxes": "boxes",
+          "towers": "towers", "lotus pools": "lotus", "twin gates": "gates", "Tormentors": "tormentors",
+          "bounty runes": "bounty", "power runes": "power", "wisdom shrines": "wisdom", "wisdom runes": "wisdom",
+          "outposts": "outposts", "watchers": "watchers", "Roshan pits": "roshan", "shrines": "shrines"}
+_DELTA_RE = re.compile(r"^(.+?) \+(\d+) [−-](\d+)$")
+_COUNT_RE = re.compile(r"^(.+?) (moved|changed|re-tiered|resized): (\d+)$")
+
+
+def moves(changes):
+    """'trees +324 −304; camps moved: 7; camp tiers changed: 2' -> {"trees": {"add": 324, "rem": 304},
+    "camps": {"moved": 7}, "camp_tiers": {"changed": 2}} (the owner 2026-10-04: "what moved shows like the removed
+    / added, in yellow" — instead of a sentence per row)."""
+    out = {}
+    for seg in (changes or "").split("; "):
+        m = _DELTA_RE.match(seg)
+        if m and m.group(1) in _NAMES:
+            e = out.setdefault(_NAMES[m.group(1)], {})
+            e["add"], e["rem"] = e.get("add", 0) + int(m.group(2)), e.get("rem", 0) + int(m.group(3))
+            continue
+        m = _COUNT_RE.match(seg)
+        if m and m.group(1) in _NAMES:
+            kind = "moved" if m.group(2) == "moved" else "changed"
+            e = out.setdefault(_NAMES[m.group(1)], {})
+            e[kind] = e.get(kind, 0) + int(m.group(3))
+    return out
+
+
 def main():
     with open(SRC, encoding="utf-8") as f:
         rows = json.load(f)
@@ -47,6 +76,7 @@ def main():
         else:
             e["changes"] = r.get("changes", "")
             e["n"] = counts(r.get("counts") or {})
+            e["moves"] = moves(e["changes"])
         out.append(e)
     with open(OUT, "w", encoding="utf-8", newline="\n") as f:
         json.dump({"_about": "Map history for Terrain Stats, from Oldgrowth versions.json "
