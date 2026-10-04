@@ -27,9 +27,9 @@ outputs/
 tools/telegraph_post/out*/
 _preview_*.png
 
-# IDE / editor local config
-.claude/*
-!.claude/settings.local.json
+# IDE / editor local config. settings.local.json is local-only too (it grants broad tool permissions;
+# untracked 2026-10-04 at the owner's request — the public repo must not carry it)
+.claude/
 .vscode/
 .idea/
 

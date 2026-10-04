@@ -12,7 +12,7 @@
 # Diff (старое → новое):
 W(li_formula("Bonus Night Vision changed",
              "250 + 25 per level up", "225 + 25 per level",
-             lambda L: 250 + 25*L, lambda L: 225 + 25*L,
+             lambda L: 250 + 25*(L-1), lambda L: 225 + 25*L,   # «per level up»: на 1-м уровне прокачки ещё не было → (L-1)
              effective_unchanged=True))
 
 # Новая способность (внутри ability_change new=dict(...)):

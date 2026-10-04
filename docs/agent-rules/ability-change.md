@@ -5,7 +5,7 @@
 ## Когда использовать
 
 - Способность заменяется другой (разные имена) — `ability_change(old, new)`
-- Innate reworked — ВСЕГДА `ability_change`, никогда не два плоских `t("MISC")`. Генератор пишет `# TODO[innate-rework]:` — никогда не оставлять в коммите.
+- Innate reworked — ВСЕГДА `ability_change`, никогда не два плоских `t("MISC")`. Генератор (`generate_patch_code_v2.py`) пишет `# TODO[innate-swap]:` / `# v2-todo:` — никогда не оставлять в коммите.
 - «Innate ability reworked» в патчноуте: лифтить OLD desc из патча, который вводил текущий innate (`hero_innate_<entity>_<ability>` в `patchnotes_english.txt`). **Никогда не придумывать** — спросить у пользователя, если KV-текст не найден.
 
 ## Unified layout (обязателен для всех блоков)
@@ -34,7 +34,7 @@
 
 **Снаружи** (после `W(ability_change(...))`): числовые изменения через `W(ul_open())` / `W(li(...))`. Это stat deltas, пережившие реворк.
 
-**Inline-note к новой механике** → встраивать через `inline_note(...)` прямо в `new.desc=[]`. Никогда не `W(subnote(...))` после блока — это рендерится ВНЕ карточки.
+**Inline-note к новой механике** → приклеивать `+ inline_note(...)` к той строке `new.desc`, которую она поясняет (отдельный элемент `desc=[..., inline_note(...)]` рисуется пустой строкой с одним «?»). Никогда не `W(subnote(...))` после блока — это рендерится ВНЕ карточки.
 
 ```python
 # WRONG — subnote вне карточки
@@ -43,8 +43,7 @@ W(subnote("Movement slow is 100% for 0.2s."))
 
 # RIGHT — clarification внутри
 W(ability_change(old=..., new=dict(
-    desc=["... slows movement by 100% for 0.2s ...",
-          inline_note("Effects linger even if the enemy dies.")])))
+    desc=["... slows movement by 100% for 0.2s ..." + inline_note("Effects linger even if the enemy dies.")])))
 W(ul_open())
 W(li("Cooldown decreased from 45 to 40", b(45, 40, l=True)))
 W(ul_close())

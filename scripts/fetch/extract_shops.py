@@ -9,7 +9,7 @@ file per patch; patch/rosters.py then derives the items_dyn Category filter from
 Run after a patch (needs the game installed + `pip install vpk`), then rebuild:
 
     python scripts/fetch/extract_shops.py
-    python builders/patch.py
+    python build_site.py patch
     # optional: non-default install path
     python scripts/fetch/extract_shops.py "D:\\Steam\\steamapps\\common\\dota 2 beta\\game\\dota"
 """
@@ -73,7 +73,7 @@ def main() -> int:
     items = re.findall(r'^\s*"item"\s*"item_[a-z0-9_]+"', text, re.M)
     print(f"-> {src}  ->  {OUT.relative_to(ROOT)}")
     print(f"   {len(sections)} sections, {len(items)} item entries. "
-          f"Now run:  python builders/patch.py")
+          f"Now run:  python build_site.py patch")
     return 0
 
 

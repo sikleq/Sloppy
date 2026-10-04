@@ -219,7 +219,7 @@ def commit_for_window(commit_idx, win_end):
 def main():
     force = "--force" in sys.argv
     if not META_PATH.exists():
-        print("X site_meta.json не найден — сначала builders/patch.py")
+        print("X site_meta.json не найден — сначала builders/build_patches.py")
         return 1
     patch_dates = load_patch_dates()
     patches = sorted((v for v in patch_dates if (STATS_DIR / v).is_dir()),

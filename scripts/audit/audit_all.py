@@ -3,7 +3,7 @@
    2. audit_items.py      — item_header() display names + ITEM_SLUG + icons
    3. audit_abilities.py  — ability() / ability_change() slugs + names
 
-Run after builders/patch.py before publishing a patch.
+Run after builders/build_patches.py before publishing a patch.
 """
 import subprocess
 import sys

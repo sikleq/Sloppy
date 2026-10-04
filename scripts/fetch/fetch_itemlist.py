@@ -12,7 +12,7 @@ Run this whenever a new patch lands (it changes the neutral pool / adds items), 
 rebuild:
 
     python scripts/fetch/fetch_itemlist.py
-    python builders/patch.py
+    python build_site.py patch
 
 No hand-maintained neutral list — refreshing this file is the whole update.
 """

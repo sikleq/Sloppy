@@ -104,15 +104,27 @@ W(li("...follows global lifesteal rules...", t("NERF"),
      extra=inline_note("Has a 40% penalty against creeps — " + b(100, 60))))
 ```
 
-## Cost-change rows: тег по TOTAL, не recipe
+## Cost-change rows: все бейджи в конце строки, тег по тому, что платит игрок
 
-| Случай | Тег |
-|---|---|
-| Recipe shifted, Total unchanged | `t("MISC")`, recipe % inline в тексте, total = inline_note |
-| Both recipe and total changed | Тег по total badge (BUFF/NERF) |
-| Only total changed | Обычный `b()` |
+Правило владельца 2026-09-26 (образец Octarine Core 7.41f): процентов посреди строки больше нет — каждый бейдж в конце.
+`l=True` всегда (цена: меньше = лучше).
+
+| Случай | Строка | Тег |
+|---|---|---|
+| Recipe сдвинулся, Total не изменился | `b(recipe_old, recipe_new, l=True)` в конце; «Total cost unchanged» без своего % (в тексте или `extra=inline_note(...)`) | по **рецепту**: дешевле = BUFF, дороже = NERF |
+| Изменились и recipe, и total | ОДИН бейдж `b([r_old, t_old], [r_new, t_new], l=True, slash=True)` → «+100% / +4%» | по **TOTAL**; `force_overall="buff"/"nerf"` только когда направления разные |
+| Recipe не менялся, сдвинулся только total | обычный `b(total_old, total_new, l=True)` | по total |
+| Не изменилось ничего | `t("MISC")` | — |
+
+```python
+W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))   # Battle Fury 7.41 = BUFF
+W(li("Recipe cost decreased from 475 to 325. Total cost increased from 1400g to 1500g",
+     b([475, 1400], [325, 1500], l=True, slash=True, force_overall="nerf")))                       # Arcane Boots 7.41
+W(li("Recipe cost unchanged at 500. Total cost unchanged at 2575g (due to Pavise cost decrease)", t("MISC")))  # Solar Crest 7.41
+```
 
 Recipe cost decrease не BUFF, если total вырос. Всегда читать следующее предложение после «Recipe cost».
+Код: `generate_patch_code_v2.py` (ветка recipe/total), тесты в `tests/test_generator.py`.
 
 ## Рецепт и общая цена — все проценты в конце строки (2026-09-26)
 
@@ -238,7 +250,7 @@ W(ul_close())
 extra=inline_note(info_tip("Facet A", "Facet B", "Facet C", header="Affected facets:"))
 ```
 
-`show_list` помечен как устаревший на 7.41 патче — используется только для Spirit Bear consequences (одно исключение).
+`show_list(...)` в контенте не используется (0 вызовов в content/p*.py на 2026-10-04; хелпер остался в patch/elements.py). `tests/test_no_showlist_in_extra.py` падает на любом `extra=show_list(`.
 
 ## Tag-order сортировщик — per-UL, merge related uls
 

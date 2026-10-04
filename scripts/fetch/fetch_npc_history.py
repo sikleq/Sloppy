@@ -8,7 +8,7 @@
 ("Client NNNN"), а не версией патча, поэтому сопоставление патч↔коммит идёт
 ПО ДАТЕ: для каждого нашего патча берётся последний d2vpkr-коммит, попавший
 в окно жизни патча (до даты следующего патча). Даты патчей — из
-`data/site_meta.json` (patch_dates), который пишет builders/patch.py.
+`data/site_meta.json` (patch_dates), который пишет builders/build_patches.py.
 
 Мы сохраняем СВОЮ копию данных (распарсенный JSON), чтобы не зависеть от
 d2vpkr в момент сборки. Сырые .txt кэшируются по SHA в `.cache/d2vpkr/`,
@@ -179,7 +179,7 @@ def commit_for_window(commit_idx, win_end):
 def main():
     force = "--force" in sys.argv
     if not META_PATH.exists():
-        print("X data/site_meta.json не найден — сначала запусти builders/patch.py")
+        print("X data/site_meta.json не найден — сначала запусти builders/build_patches.py")
         return 1
     patch_dates = load_patch_dates()
     # Только патчи, для которых у нас есть папка в data/stats/.

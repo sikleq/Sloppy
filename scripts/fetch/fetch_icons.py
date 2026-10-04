@@ -1,11 +1,11 @@
 """fetch_icons.py — Скачивает все недостающие иконки абилок из Valve CDN.
 
-После `python builders/patch.py` файл `_ability_icons.txt` содержит относительные
+После `python build_site.py patch` файл `_ability_icons.txt` содержит относительные
 пути ко всем иконкам, на которые ссылаются собранные патч-страницы. Этот
 скрипт идёт по списку, проверяет какие файлы локально отсутствуют, и
 качает их с `https://cdn.steamstatic.com/apps/dota2/images/dota_react/abilities/`.
 
-Запускать ПОСЛЕ builders/patch.py — добавление нового slug в builders/patch.py
+Запускать ПОСЛЕ builders/build_patches.py — добавление нового slug в content/ (список пишет patch/rosters.py)
 автоматически попадёт в _ability_icons.txt, и следующий запуск этого
 скрипта добьёт недостающие PNG-ки.
 
