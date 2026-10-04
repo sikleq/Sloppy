@@ -30,7 +30,10 @@ WALKABLE, NO_WARD, OUT = 1, 16, 4
 # share one fainter shade — they were 95 / 38 until 2026-10-03, when 7.41d moving the map's edge (670 cliff cells
 # turned "off the map") read to the owner as "it got more transparent, though nothing was added there"
 # magenta: no other layer uses it (Roshan is crimson, Tormentors red, lotus pink, wisdom purple)
-ZONE, BLOCKED, VOID = (235, 80, 255, 175), (235, 80, 255, 60), (235, 80, 255, 60)
+# 2026-10-05, the owner: "a bit more saturated, it's nearly transparent" -> 175 / 60 became 210 / 105. The two
+# strengths are two kinds of cell, not stacked layers: bright = walkable ground with the no-ward flag (fountains,
+# Roshan pits, secret shop, cliff edges), faint = ground nobody walks on (cliffs, rocks, the void)
+ZONE, BLOCKED, VOID = (235, 80, 255, 210), (235, 80, 255, 105), (235, 80, 255, 105)
 
 
 def parse(raw):

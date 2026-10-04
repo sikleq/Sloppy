@@ -386,9 +386,11 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   with nothing different from the one before glued into its row (`group`: 65 files → 33 rows), the "Map version" a
   range ("7.35 – 7.37e", the owner: "easier than listing them"), the date as dd-mm-yy, no icon on Map version / Date,
   17 kinds of object (trees, camps and each tier, towers, outposts, watchers, lotus pools,
-  wisdom, Twin Gates, bounty / power runes, shrines — `tc_shrines`: the game's own minimap icon of the old healing shrines,
-  `minimap_miscbuilding` (npc_units.txt "MinimapIcon" of npc_dota_*_healers), tinted green by gen_terrain_layer_icons.py
-  `shrines_icon`; a drawn stone well came first, the owner 2026-10-04: "nothing like the game, not the others' style" —,
+  wisdom, Twin Gates, bounty / power runes, shrines — `tc_shrines`: a 24-px pixel drawing
+  of the Radiant shrine's game model (radiant_statue001: a stone basin of water on a rock, ivy round it;
+  `SHRINE_GLYPH` in gen_terrain_layer_icons.py, scaled 2x). Two tries before it were turned down, 2026-10-04/05: a
+  drawn stone well ("nothing like the game, not the others' style") and the game's minimap icon of the shrines,
+  `minimap_miscbuilding`, tinted green ("looks awful, like a barrel of toxic waste — look at the model") —,
   Roshan pits, Tormentors), each cell its count plus what changed since the file before: the RESULT of what was added
   and removed ("+20" green / "−9" red / "±0" — the owner: "not +734 −548, write the result, +186"; the Terrain page's
   "Changed in the map file" chips likewise, `_chip`), moved / changed yellow (no "what moved" sentence column; the owner: "show moved like removed / added, in yellow";
@@ -427,7 +429,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `_HL_PER_SQUARE`): each changed tree's own 6.4 square (`_HL_SHAPE["trees"]` = the tree layer's half side) gets its
   border in the change colour — dashed on the old side over a 35%-opacity solid of the same colour (so the tree's
   green border does not show in the gaps), solid on the new side, a faint dashed square where a moved tree stood.
-  No union, no mask; camps, towers and the rest keep their ring. No-ward cells stay filled, they are areas, not outlines. **A picture from another patch (2026-10-03)** — the owner asked for pictures of 7.41's "Radiant offlane
+  No union, no mask; camps, towers and the rest keep their ring. 2026-10-05 ("too thick, dashed or not — 2–2.5 times
+  thinner, on the outer edge"): the tree line is 0.7 (dashed 0.59, dash 0.88 / gap 0.63), drawn just OUTSIDE the
+  square (rect half = 3.2 + line / 2), so the tree square itself stays whole. No-ward cells stay filled, they are areas, not outlines. **A picture from another patch (2026-10-03)** — the owner asked for pictures of 7.41's "Radiant offlane
   tier 2 tower has been adjusted slightly to the left", which the map file did in 7.40 (37 units west), not 7.41: a
   spot `[x, y, "7.40"]` pictures that patch's two maps (`spot_patch`; its own changes outlined, the entry's marks
   and tier icons left out), so the note shows 7.40c → 7.41 with the tower marked white (`"mark_kind": "towers"`,
@@ -509,7 +513,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `trigger_no_wards` volumes baked in — and on every cliff edge), 20 = out of bounds. A ward stands on a walkable
   cell without bit4 (trees aside — they are entities). Stored per map file as `data/map/gridnav_<code>.gnv.gz`;
   `gridnav.py overlay` draws `icons/maps/nowards_<ver>.png` (one pixel per cell, magenta: walkable no-ward zones
-  strong (175), cliffs and the void off the map one fainter shade (60) — until 2026-10-03 cliffs 95 / void 38, but
+  strong (210), cliffs and the void off the map one fainter shade (105; 175 / 60 until 2026-10-05, the owner: "a bit
+  more saturated, it's nearly transparent" — and the two strengths are two kinds of cell, not stacked layers: bright =
+  walkable no-ward ground, faint = ground nobody walks on) — until 2026-10-03 cliffs 95 / void 38, but
   7.41d moving the map's edge (670 cliff cells turned "off the map", 23 wardable ones too) then looked "more
   transparent, though nothing was added there" to the owner), laid over x -10240..10240, y -10752..10240 with
   `image-rendering: pixelated`, old/new

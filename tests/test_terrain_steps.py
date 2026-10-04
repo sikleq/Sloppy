@@ -239,8 +239,9 @@ def test_a_chip_outlines_removed_on_the_old_map_added_on_the_new_moved_on_both()
     assert "#ff4d4d" not in old + new and "#5dff8a" not in old + new
     t_old, t_new = _hl(svg, "trees", "old"), _hl(svg, "trees", "new")
     # each changed tree's OWN square (6.4 wide, the tree layer's size) in its change colour — owner 2026-10-04
-    assert 'width="6.4" height="6.4"' in t_old and "<circle" not in t_old and "<path" not in t_old
-    assert 'tm-hl-sq" fill="none"' in t_new and "mask=" not in t_new and 'width="6.4"' in t_new
+    # (the line on the square's OUTER edge, owner 2026-10-05: 6.4 square + 0.59 dashed / 0.7 solid line)
+    assert 'width="7.0" height="7.0"' in t_old and "<circle" not in t_old and "<path" not in t_old
+    assert 'tm-hl-sq" fill="none"' in t_new and "mask=" not in t_new and 'width="7.1"' in t_new
     assert "#ff4d4d" in t_old and "#5dff8a" not in t_old and "#5dff8a" in t_new and "#ff4d4d" not in t_new
     assert 'data-layer="trees"' in svg.split("tm-hl-trees tm-old")[1][:40]
 
@@ -473,7 +474,7 @@ def test_everything_on_the_old_side_is_dashed():
            'stroke-dasharray="3.0 2.16"' in old_camps
     assert "mask=" not in old_camps and "tm-hl-dashed" not in new_camps
     trees = svg.split('tm-hl-trees tm-old"', 1)[1].split("</svg>", 1)[0]
-    assert 'stroke-width="1.36" stroke-dasharray="2.0 1.44"' in trees     # trees: thinner than their 1.6 solid
+    assert 'stroke-width="0.59" stroke-dasharray="0.88 0.63"' in trees   # trees: 0.7 line (2026-10-05), dashes 0.85x
     # a grove is one contour: two overlapping squares leave their outer edge only, in merged straight runs
     edges = terrain._union_edges([(0, 0, 10, 10), (5, 0, 15, 10)])
     assert sorted(edges) == [("h", 0, 0, 15), ("h", 10, 0, 15), ("v", 0, 0, 10), ("v", 15, 0, 10)]
@@ -606,11 +607,13 @@ def test_a_changed_tree_outlines_its_own_square_dashed_on_the_old_map():
     square itself in the colour of its change, only dashed". Old side: each tree's own 6.4 square, dashed, over a
     faded solid of the same colour (the green border must not show in the gaps); new side: solid squares where they
     stand, a faint dashed square where a moved tree stood."""
-    sq = terrain._square_outlines("removed", [(10, 10), (12, 10)], 3.2, "#ff4d4d", 1.6, dashed=True)
-    assert sq.count('<rect x="6.8" y="6.8" width="6.4" height="6.4"/>') == 2         # underlay + dashes
-    assert '<g stroke-width="1.36" stroke-opacity="0.35">' in sq and 'stroke-dasharray="2.0 1.44"' in sq
-    solid = terrain._square_outlines("added", [(10, 10)], 3.2, "#5dff8a", 1.6, dashed=False)
-    assert "stroke-dasharray" not in solid and 'stroke-width="1.6"' in solid
+    sq = terrain._square_outlines("removed", [(10, 10), (12, 10)], 3.2, "#ff4d4d", 0.7, dashed=True)
+    # the line sits OUTSIDE the square (owner 2026-10-05: "on the outer edge"): 3.2 + 0.59 / 2 = 3.5
+    assert sq.count('<rect x="6.5" y="6.5" width="7.0" height="7.0"/>') == 2         # underlay + dashes
+    assert '<g stroke-width="0.59" stroke-opacity="0.35">' in sq and 'stroke-dasharray="0.88 0.63"' in sq
+    solid = terrain._square_outlines("added", [(10, 10)], 3.2, "#5dff8a", 0.7, dashed=False)
+    assert '<rect x="6.45" y="6.45" width="7.1" height="7.1"/>' in solid
+    assert "stroke-dasharray" not in solid and 'stroke-width="0.7"' in solid
     ghost = terrain._square_outlines("moved", [(10, 10)], 3.2, "#ffd23f", 1.6, dashed=True, ghost=True)
     assert "tm-hl-ghost" in ghost and 'opacity="0.6"' in ghost
     assert terrain._square_outlines("moved", [], 3.2, "#ffd23f", 1.6, dashed=True) == ""

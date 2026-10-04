@@ -44,7 +44,38 @@ COLORS = {
     "tc_watchers":   (86, 214, 208),    # cyan (vision)
     "tc_roshan":     (210, 74, 90),     # crimson
 }
-SHRINES = (140, 210, 96)               # tc_shrines: Radiant-ish green (the game drew them team-coloured)
+# tc_shrines — the old Radiant healing shrine drawn from its game model (models/props_structures/radiant_statue001,
+# rendered from the glb Source2Viewer-CLI exports): a grey rock pedestal, a round stone basin of water on top, a vine
+# with ivy round it. 24 px, light from the top-left, its outline drawn in ('#'); shrines_icon scales it 2x.
+SHRINE_PAL = {"#": (20, 17, 14), "s": (98, 100, 110), "m": (148, 151, 156), "l": (198, 200, 201),
+              "w": (58, 146, 204), "W": (150, 214, 242), "*": (232, 248, 255),
+              "g": (54, 110, 44), "G": (128, 190, 74), "v": (110, 70, 40)}
+SHRINE_GLYPH = [
+    "........................",
+    ".........######.........",
+    ".......##llllll##.......",
+    "......#lllWWWwlll#......",
+    ".....#lllW**WWwlll#.....",
+    ".....#llwwWWWwwwll#.....",
+    ".....#lllwwwwwwlll#.....",
+    ".....##lllwwwwlll#G#....",
+    ".....##lmllllllssGGg#...",
+    ".....##lmmmmmssssvg#....",
+    ".....##lmmmmmssss#v#....",
+    ".....##lmmmmmssss#v#....",
+    "....#ll##########lvl#...",
+    "...#lllllmmmmGmmsvsGs#..",
+    "...#lllllmmmGGgmvsGGg#..",
+    "...#lllllmmmmgvvsssgs#..",
+    "...#lllGlmmsvvmmsssss#..",
+    "..#lllGGgvvvmmmmsssss#..",
+    ".#Gllllgvmmmsmmmssssss#.",
+    "#GGglvvllmmmsmmsssssss#.",
+    ".#glvllllmmmsmmsssssss#.",
+    "..#vlllllmmmmmmsssssss#.",
+    "...##llllmmmmmmssss###..",
+    ".....##############.....",
+]
 
 # Layers backed by a game icon in icons/ref/.
 REFS = {
@@ -117,22 +148,13 @@ ICON_RES = 48
 PAD = 3
 
 
-def from_ref(fname, color, tint=True, drop_black=False):
+def from_ref(fname, color, tint=True):
     """Trim the game icon, FILL the ICON_RES canvas (upscaling small sources like
     the 32px rune mapicons), recolour, sharpen, then add a thin dark outline. The
     fill + unsharp keep the icons crisp instead of muddy at marker size. ``tint``
-    recolours to the type colour; ``tint=False`` keeps natural colours (runes).
-    ``drop_black`` clears the source's own thick black ring first (minimap_miscbuilding: tinted, it became a heavy
-    box round the shape), so only our thin outline frames it, like the other icons."""
+    recolours to the type colour; ``tint=False`` keeps natural colours (runes)."""
     from PIL import ImageFilter
     im = _load_ref(fname)
-    if drop_black:
-        px = im.load()
-        for y in range(im.height):
-            for x in range(im.width):
-                r, g, b, a = px[x, y]
-                if a and (0.299 * r + 0.587 * g + 0.114 * b) < 40:
-                    px[x, y] = (0, 0, 0, 0)
     bbox = im.getbbox()
     if bbox:
         im = im.crop(bbox)
@@ -282,12 +304,17 @@ def nowards_icon(color=NOWARDS):
 
 
 def shrines_icon():
-    """The old healing Shrines (7.00 – 7.32). The first try (a drawn stone well, 2026-10-04 morning) did not fit — the
-    owner the same day: "nothing like the game and not in the style of the other icons". The game's own answer:
-    npc_units.txt gave both shrines "MinimapIcon" "minimap_miscbuilding" (MinimapIconSize 375) — the grey cylinder of
-    the minimap sheet (materials/vgui/hud/minimap_miscbuilding, extracted with Source2Viewer-CLI into icons/ref/). It
-    goes through from_ref like the towers / outposts / lotus pools: tinted to the layer colour, thin dark outline."""
-    return from_ref("minimap_miscbuilding.png", SHRINES, drop_black=True)
+    """The old healing Shrines (7.00 – 7.32), as the Radiant one stands in the game (radiant_statue001: a stone basin
+    of water on a rock, ivy round it). History, 2026-10-04/05: a drawn stone well ("nothing like the game, not the
+    others' style"), then the game's own minimap icon, minimap_miscbuilding — a grey cylinder, tinted green ("looks
+    awful, like a barrel of toxic waste — look at the model in the files and make an icon"). Now a 24-px pixel drawing
+    of the model (SHRINE_GLYPH), hard-edged 2x like tc_trees / tc_all."""
+    im = Image.new("RGBA", (24, 24), (0, 0, 0, 0))
+    for y, row in enumerate(SHRINE_GLYPH):
+        for x, ch in enumerate(row):
+            if ch in SHRINE_PAL:
+                im.putpixel((x, y), SHRINE_PAL[ch] + (255,))
+    return im.resize((ICON_RES, ICON_RES), Image.NEAREST)
 
 
 def all_icon():

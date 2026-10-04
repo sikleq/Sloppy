@@ -516,7 +516,9 @@ _HL_SHAPE = {"trees": ("rect", _TREE_SIDE / 2), "camps": ("rect", _CAMP_SIDE / 2
              "camptiers": ("rect", _CAMP_SIDE / 2 + 3)}
 _HL_PER_SQUARE = {"trees"}
 _HL_ENT_SHAPE = ("circle", _ENT_DISC + 3)
-_HL_STROKE = {"trees": 1.6}           # outline width, viewBox units (others: 2.4)
+# outline width, viewBox units (others: 2.4). Trees 1.6 -> 0.7 (the owner 2026-10-05 on the per-square outlines:
+# "too thick, dashed or not — 2–2.5 times thinner, on the outer edge")
+_HL_STROKE = {"trees": 0.7}
 # Colour = what happened (the owner 2026-10-03, on 7.41d's "+23" no-ward cells drawn red: "it should be green,
 # since they were added"), like the chip's own +green / −red: removed on the old map, added on the new one, moved
 # on both — where it stood and where it stands (the owner: "a moved tree outlined yellow on the old map, and in its
@@ -687,16 +689,19 @@ def _square_outlines(kind, centres, half, colour, stroke, dashed, ghost=False):
     "not an outline round the square — outline the square itself in the colour of its change, only dashed"): every
     changed tree's OWN square gets its border in the change colour — dashed where it stood (old side; on the new side
     a moved tree's old spot, faint), solid where it stands now (new side). Under the dashes the same colour, faded,
-    covers the tree's green border, so the gaps do not show green. In .tm-hl-g-<kind> for the switches."""
+    covers the tree's green border, so the gaps do not show green. In .tm-hl-g-<kind> for the switches.
+    The line lies OUTSIDE the square (its inner edge on the square's edge — the owner 2026-10-05: "on the outer
+    edge"), so the tree square itself stays whole."""
     if not centres:
         return ""
-    a = round(half, 2)
-    rects = "".join(f'<rect x="{round(x - a, 1)}" y="{round(y - a, 1)}" width="{2 * a}" height="{2 * a}"/>'
-                    for x, y in centres)
+    width = stroke if not dashed else round(stroke * 0.85, 2)
+    a = round(half + width / 2, 2)
+    rects = "".join(f'<rect x="{round(x - a, 2)}" y="{round(y - a, 2)}" width="{round(2 * a, 2)}" '
+                    f'height="{round(2 * a, 2)}"/>' for x, y in centres)
     if not dashed:
         return (f'<g class="tm-hl-g tm-hl-g-{kind} tm-hl-sq" fill="none" stroke="{colour}" '
                 f'stroke-width="{stroke}">{rects}</g>')
-    width, dash, gap = round(stroke * 0.85, 2), round(stroke * 1.25, 2), round(stroke * 0.9, 2)
+    dash, gap = round(stroke * 1.25, 2), round(stroke * 0.9, 2)
     cls, faint = ("tm-hl-ghost", ' opacity="0.6"') if ghost else ("tm-hl-dashed", "")
     return (f'<g class="tm-hl-g tm-hl-g-{kind} {cls} tm-hl-sq" fill="none" stroke="{colour}"{faint}>'
             f'<g stroke-width="{width}" stroke-opacity="0.35">{rects}</g>'
