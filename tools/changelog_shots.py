@@ -26,6 +26,8 @@ PAD = 6
 #   scope = None (page) | ("block", "<entity name>") | ("row", "<row text>")
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
+    "2026-10-05_terrain_heights.webp": ("terrain_741.html", None, [".terrain-compare-col"],
+                                        ['.tc-layer-btn[data-layer="heights"]'], 900, {"width": 1400, "wait": 1500}),
     "2026-10-03_terrain_notes.webp": ("patches/7.41.html", None,
                                       ['li:has-text("The medium flooded camp near the bounty runes can now evolve")',
                                        'li:has-text("Medium neutral camp near offlane defender\'s gate")'],

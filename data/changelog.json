@@ -4,6 +4,20 @@
     {
       "date": "2026-10-05",
       "category": "Terrain",
+      "title": "Terrain: a [[icons/ui/gothic/tc_heights.png|Heights]] layer from the map's own height grid",
+      "link": "terrain_741.html",
+      "items": [
+        "Every map file carries a height grid; decoded straight from the game files",
+        "River, low ground, high ground and the steps up: coloured bands with contours and a key",
+        "The groundwork for a ward map that knows high ground"
+      ],
+      "shots": [
+        "icons/changelog/2026-10-05_terrain_heights.webp"
+      ]
+    },
+    {
+      "date": "2026-10-05",
+      "category": "Terrain",
       "minor": true,
       "link": "terrain_741.html",
       "title": "Terrain: tree outlines 2x thinner, drawn just outside the tree's square"

@@ -9583,6 +9583,19 @@ a.tsp-label:hover, a.tsp-label:focus-visible { color: #e3c46a; text-decoration-c
 /* No-ward ground: the map's gridnav cells (64 units) where a ward can't stand — one pixel per cell, kept square */
 .tm-layer-nowards image { image-rendering: pixelated; }
 .tc-markers.tm-layer-nowards { overflow: hidden; }   /* the grid reaches past the picture's edge */
+/* Heights: the map's own height grid (maps/dota.vhcg, 32 units a pixel; the owner 2026-10-05), bands + contours */
+.terrain-compare.show-heights .tm-layer-heights { opacity: 1; }
+.tm-layer-heights image { image-rendering: pixelated; }
+.tc-markers.tm-layer-heights { overflow: hidden; }
+/* top-left under the OLD label: the stage runs past the visible frame at the bottom, a bottom key got cut off */
+.tc-heights-key { display: none; position: absolute; left: 10px; top: 52px; z-index: 6; flex-direction: column;
+  gap: 3px; padding: 6px 8px; border-radius: 6px; background: rgba(16, 14, 12, 0.82);
+  border: 1px solid rgba(227, 196, 106, 0.35); font-size: 11px; line-height: 1.2; color: var(--text-main);
+  pointer-events: none; }
+.terrain-compare.show-heights .tc-heights-key { display: flex; }
+.tc-hk-title { font-weight: 700; color: var(--gold); letter-spacing: .3px; margin-bottom: 1px; }
+.tc-hk-item { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.tc-hk-sw { width: 12px; height: 9px; border-radius: 2px; background: var(--c); box-shadow: inset 0 0 0 1px rgba(0,0,0,.45); }
 /* trees — ONE colour everywhere. The 7.40 layout (old side) and 7.41 layout
    (new side) are split by the slider, so sweeping reveals how the forest moved. */
 /* match the spectral/leamare tree style (styleDefinitions tree.alive) */

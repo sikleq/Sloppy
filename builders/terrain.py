@@ -281,6 +281,21 @@ def _markers_svg(diff, pair_id="default"):
                 f'x="{gx0}" y="{gy0}" width="{round(gx1 - gx0, 1)}" height="{round(gy1 - gy0, 1)}" '
                 f'preserveAspectRatio="none"/></svg>')
 
+    # ---- heights: the map's own height grid (maps/dota.vhcg, scripts/gen/heightmap.py — the owner 2026-10-05:
+    # "decode dota.vhcg and make a height layer", for a ward tool later), same frame as the no-ward picture, one value
+    # per 32 units, under every other layer ----
+    height_svgs = ""
+    hv = {side: wards.get(side) for side in ("old", "new")}
+    if all(v and _os.path.exists(_os.path.join(_HERE, "icons", "maps", f"heights_{v}.png")) for v in hv.values()):
+        gx0, gy0 = proj(-10240, 10240)
+        gx1, gy1 = proj(10240, -10752)
+        for side in ("old", "new"):
+            height_svgs += (
+                f'<svg class="tc-markers tm-layer tm-layer-heights tm-{side}" viewBox="0 0 {MAP_VB} {MAP_VB}" '
+                f'preserveAspectRatio="none" aria-hidden="true"><image href="icons/maps/heights_{hv[side]}.png" '
+                f'x="{gx0}" y="{gy0}" width="{round(gx1 - gx0, 1)}" height="{round(gy1 - gy0, 1)}" '
+                f'preserveAspectRatio="none"/></svg>')
+
     old_t = tier_counts(diff.get("campsOld", []))
     new_t = tier_counts(diff.get("campsNew", []))
     counts = {
@@ -290,7 +305,7 @@ def _markers_svg(diff, pair_id="default"):
         # every other kind of object, (old, new) — the "On the map" tiles under trees and camps
         "entities": {key: (len(ed.get("old", [])), len(ed.get("new", []))) for key, ed in entities.items() if ed},
     }
-    return (ward_svgs + trees_old + trees_new + camps_old + camps_new
+    return (height_svgs + ward_svgs + trees_old + trees_new + camps_old + camps_new
             + "".join(ent_svgs) + sb_svg + _highlights_svg(diff, proj), counts)
 
 
@@ -826,7 +841,7 @@ def _changes_html(subpatches, skip_first_head=False):
     return "\n".join(parts)
 
 
-def _controls_html(layers=True, changes=("", "")):
+def _controls_html(layers=True, changes=("", ""), heights=False):
     """The control bar ABOVE the map (not overlaid, so it never covers the now
     edge-to-edge map): the Zoom mode button + every overlay-layer toggle (Trees,
     Camps, and the eight point-entity layers). Icon-only square buttons with
@@ -869,6 +884,8 @@ def _controls_html(layers=True, changes=("", "")):
         layer_parts.append(layer_btn("spawnboxes", "Spawn Boxes", "icon_spawnbox"))
         # every place a ward can't stand (the owner 2026-10-02), from the map's gridnav
         layer_parts.append(layer_btn("nowards", "No-ward ground", "tc_nowards"))
+        if heights:   # the map's height grid (2026-10-05), only where both sides have a picture
+            layer_parts.append(layer_btn("heights", "Heights", "tc_heights"))
         for key, label, icon, _color in _ENTITY_LAYERS:
             layer_parts.append(layer_btn(key, label, icon))
 
@@ -937,6 +954,23 @@ def _controls_html(layers=True, changes=("", "")):
     return top_html, fs_html
 
 
+def _height_bands():
+    """(upper bound, RGB, label) of the Heights layer — scripts/gen/heightmap.py BANDS, the one source the pictures
+    were drawn with."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("heightmap", _os.path.join(_HERE, "scripts", "gen", "heightmap.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.BANDS
+
+
+def _heights_legend():
+    """The Heights layer's key, bottom-left on the map, shown only while the layer is on (.show-heights)."""
+    items = "".join(f'<span class="tc-hk-item"><span class="tc-hk-sw" style="--c:rgb{rgb}"></span>{_esc(label)}</span>'
+                    for _top, rgb, label in _height_bands())
+    return f'<div class="tc-heights-key" aria-hidden="true"><span class="tc-hk-title">Height</span>{items}</div>\n'
+
+
 def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, changes=("", "")):
     """The before/after swipe stage + magnifier lens for an old→new map pair.
 
@@ -956,7 +990,9 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, 
     old_map = f"icons/maps/map_{old_pic or old_ver}.webp"
     new_map = f"icons/maps/map_{new_pic or new_ver}.webp"
     old_src, new_src = _picture_attrs(old_map), _picture_attrs(new_map)
-    top_bar, fs_bar = _controls_html(layers=bool(markers_svg), changes=changes)
+    has_heights = "tm-layer-heights" in markers_svg
+    top_bar, fs_bar = _controls_html(layers=bool(markers_svg), changes=changes, heights=has_heights)
+    legend = _heights_legend() if has_heights else ""
     tiled = _tiled_pictures()
     tiles = "".join(f' data-tiles-{side}="{_TILES_BASE}{v}/"'
                     for side, v in (("old", old_pic or old_ver), ("new", new_pic or new_ver)) if v in tiled)
@@ -974,6 +1010,7 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, 
         f'draggable="false" loading="eager">\n'
         '      </div>\n'
         f'      {markers_svg}\n'
+        f'      {legend}'
         f'      <span class="tc-ver tc-ver-new">NEW &nbsp;{new_ver} →</span>\n'
         f'      <span class="tc-ver tc-ver-old">← {old_ver}&nbsp; OLD</span>\n'
         '      <div class="tc-handle" role="slider" tabindex="0" '

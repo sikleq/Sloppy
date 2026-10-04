@@ -317,6 +317,39 @@ def shrines_icon():
     return im.resize((ICON_RES, ICON_RES), Image.NEAREST)
 
 
+# the Heights layer (2026-10-05): a terraced hill in the layer's own band colours (scripts/gen/heightmap.py BANDS),
+# river at the foot, the highest step on top
+HEIGHTS_GLYPH = [
+    "................",
+    "................",
+    "................",
+    ".......rr.......",
+    "......rrrr......",
+    ".....oooooo.....",
+    "....oooooooo....",
+    "....yyyyyyyy....",
+    "...yyyyyyyyyy...",
+    "...gggggggggg...",
+    "..gggggggggggg..",
+    "..gggggggggggg..",
+    ".bbbbbbbbbbbbbb.",
+    ".bbbbbbbbbbbbbb.",
+    "................",
+    "................",
+]
+HEIGHTS_PAL = {"b": (52, 132, 218), "g": (88, 170, 72), "y": (206, 194, 72), "o": (228, 144, 56), "r": (214, 84, 62)}
+
+
+def heights_icon():
+    """The Heights layer button: HEIGHTS_GLYPH, dark outline, scaled up hard-edged like tc_all."""
+    im = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+    for y, row in enumerate(HEIGHTS_GLYPH):
+        for x, ch in enumerate(row):
+            if ch in HEIGHTS_PAL:
+                im.putpixel((x, y), HEIGHTS_PAL[ch] + (255,))
+    return _outline(im).resize((ICON_RES, ICON_RES), Image.NEAREST)
+
+
 def all_icon():
     """The "All layers" toggle (the owner 2026-10-02: simpler, like the site's other icons): a 16-px pixel glyph of
     three stacked map layers in the gold ramp, dark outline, scaled up hard-edged like tc_trees."""
@@ -354,7 +387,7 @@ def main(only=()):
 
     # ---- custom drawn: spawnbox, "all layers" ----
     for name, make in (("icon_spawnbox", spawnbox_icon), ("tc_all", all_icon), ("tc_nowards", nowards_icon),
-                       ("tc_shrines", shrines_icon)):
+                       ("tc_shrines", shrines_icon), ("tc_heights", heights_icon)):
         if want(name):
             im = make()
             im.save(os.path.join(_OUT, f"{name}.png"))

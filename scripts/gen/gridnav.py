@@ -93,9 +93,10 @@ def extract(vpk, out):
     if not cli:
         sys.exit("Set S2V_CLI to Source2Viewer-CLI.exe (https://github.com/ValveResourceFormat/ValveResourceFormat)")
     with tempfile.TemporaryDirectory() as tmp:
-        dst = os.path.join(tmp, "dota.gnv")
-        subprocess.run([cli, "-i", vpk, "-o", dst, "--vpk_filepath", "maps/dota.gnv"], check=True, capture_output=True)
-        with open(dst, "rb") as f:
+        subprocess.run([cli, "-i", vpk, "-o", tmp, "--vpk_filepath", "maps/dota.gnv"], check=True, capture_output=True)
+        # the CLI keeps the file's path inside the output folder (tmp/maps/dota.gnv); an "-o FILE" made a folder
+        # of that name and the open() failed (found 2026-10-05 while adding heightmap.py)
+        with open(os.path.join(tmp, "maps", "dota.gnv"), "rb") as f:
             raw = f.read()
     parse(raw)
     with gzip.open(out, "wb") as f:

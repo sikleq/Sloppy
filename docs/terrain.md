@@ -507,6 +507,21 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   | 7.41c | 149 cells by the Twin Gates and Tormentors became wardable |
   | 7.41d | 23 cells turned no-ward (by Dire small camp 11, a Tormentor, a watcher); 693 cells at the map's edge out of bounds |
   | 7.41e | 2 cells by Radiant top T2 turned no-ward |
+- **Heights layer (2026-10-05)** — the owner: "decode dota.vhcg and make a height layer; we don't go to leamare any
+  more" (a ward map that knows high ground comes later). Every map file since 7.08 carries `maps/dota.vhcg`; decoded
+  from the file alone (`scripts/gen/heightmap.py`, format in its docstring): a 128-byte header ("vhcg", version 1,
+  cell 128, W 165, H 938, sub-grid S 5, then cell / x0 -10752 / y0 -109440 as floats), W x H records of 9 bytes
+  (f32 ground height — -16384 = none; f32 a second surface, the river's water 16 above its bed; u8 flag), then one
+  5 x 5 block of f32 heights per flagged (not flat) cell in the same row-major order, samples every 32 units, edges
+  shared with the neighbours (7.41f: 5206 / 5206 edges agree). Heights on 7.41f: river 0, low ground 128, high ground
+  256, 384, 512, 640, walls 768+. `heightmap.py all` writes, for every map file with a gridnav, a 16-bit grid
+  `data/map/heights_<code>.png` (height + 1024, 0 = no ground, one value per 32 units over x -10240..10240,
+  y -10752..10240 — the data a ward tool reads back) and the layer picture `icons/maps/heights_<ver>.png` (bands
+  filled faintly — low ground lightest — and the step drawn on its upper side). builders/terrain.py lays it under
+  every other layer (`tm-layer-heights`, old/new split by the slider), adds the "Heights" button (`tc_heights`, a
+  terraced hill) and a key top-left (`_heights_legend`, colours from heightmap.BANDS), only where both sides have a
+  picture. Tests: tests/test_heightmap.py. The same session fixed `gridnav.py extract`: Source2Viewer-CLI keeps the
+  file's path inside the `-o` folder, so `-o FILE` had made a folder and the read failed.
 - **No-ward ground layer (2026-10-02)** — the owner: "a layer of every place where wards can't be placed". The map's
   gridnav (`maps/dota.gnv`, one byte per 64-unit cell; `scripts/gen/gridnav.py`) carries it: bit0 = walkable,
   bit4 = no wards (set on the walkable ground of both fountains, both Roshan pits and the secret shop — the five
