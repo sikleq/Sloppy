@@ -38,6 +38,13 @@
       "title": "Terrain: old spots are outlined with thin, close dashes, one contour per grove"
     },
     {
+      "date": "2026-10-04",
+      "category": "Terrain",
+      "minor": true,
+      "link": "terrain_741.html",
+      "title": "Terrain: a change shows its result (+20 trees), not both halves (+324 −304)"
+    },
+    {
       "date": "2026-10-03",
       "category": "Site",
       "minor": true,

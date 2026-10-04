@@ -98,26 +98,6 @@ def group(files):
     return rows
 
 
-def _ranges(patches):
-    """'7.22b, 7.22c, 7.22d' -> '7.22b–7.22d': runs of consecutive letters of one patch number."""
-    out, run = [], []
-
-    def flush():
-        if run:
-            out.append(run[0] if len(run) == 1 else f"{run[0]}–{run[-1]}")
-    for p in patches:
-        base, letter = _re.match(r"(\d+\.\d+)([a-z]?)", p).groups()
-        if run:
-            pb, pl = _re.match(r"(\d+\.\d+)([a-z]?)", run[-1]).groups()
-            if pb == base and pl and letter and ord(letter) == ord(pl) + 1:
-                run.append(p)
-                continue
-        flush()
-        run = [p]
-    flush()
-    return ", ".join(out)
-
-
 def churn(f):
     """Trees added + removed in a map file (7.38: +1017 −1052 → 2069)."""
     t = f["moves"].get("trees", {})
@@ -195,7 +175,7 @@ def chart_svg(files, w=1300, h=260):
             labels.append(f'<g class="ts-mark"><rect x="{lx}" y="{ly}" width="{lw}" height="20" rx="3"/>'
                           f'<text x="{lx + lw / 2}" y="{ly + 14}">{_esc(f["patch"])}</text></g>')
         # hover: the point grows and shows its tree count only (CSS :hover on the group; a wide invisible target)
-        tip = str(ys[i])
+        tip = f"{f['patch']} · {ys[i]}"          # the version and its tree count (the owner: "bring the versions back")
         tw = 14 + len(tip) * 7
         tx = min(max(x - tw / 2, pad_l + 2), right - tw - 2)
         ty = y + 14 if y - 30 < pad_t else y - 30
@@ -209,15 +189,16 @@ def chart_svg(files, w=1300, h=260):
 
 
 def _change(f, prev, key):
-    """What changed in this kind of object since the file before: '+324 −304' (added green, removed red), '7 moved'
-    (yellow), or the bare difference of the counts when the file's own list says nothing (a camp tier)."""
+    """What changed in this kind of object since the file before: the result of what was added and removed ('+20',
+    green up / red down, '±0' when as many went as came), '7 moved' (yellow), or the bare difference of the counts
+    when the file's own list says nothing (a camp tier)."""
     m = f["moves"].get(key, {})
     out = []
-    if m.get("add"):
-        out.append(f'<span class="ts-up">+{m["add"]}</span>')
-    if m.get("rem"):
-        out.append(f'<span class="ts-down">−{m["rem"]}</span>')
-    if not out and prev is not None and key in f["n"] and prev.get(key) is not None and f["n"][key] != prev[key]:
+    if m.get("add") or m.get("rem"):        # the result, not both halves (the owner: "not +734 −548 — +186")
+        net = m.get("add", 0) - m.get("rem", 0)
+        out.append(f'<span class="{"ts-up" if net > 0 else "ts-down" if net < 0 else "ts-zero"}">'
+                   f'{"+" if net > 0 else "−" if net < 0 else "±"}{abs(net)}</span>')
+    elif prev is not None and key in f["n"] and prev.get(key) is not None and f["n"][key] != prev[key]:
         diff = f["n"][key] - prev[key]
         out.append(f'<span class="{"ts-up" if diff > 0 else "ts-down"}">{"+" if diff > 0 else "−"}{abs(diff)}</span>')
     for kind in ("moved", "changed"):
@@ -238,14 +219,15 @@ def _cell(f, prev, key):
 
 
 def table_html(files, pages):
-    head = ('<th class="ts-file"><span>Map file</span></th><th><span>Date</span></th>'
+    head = ('<th class="ts-file"><span>Map version</span></th><th><span>Date</span></th>'
             + "".join(f'<th>{_icon(icon)}<span>{_esc(label)}</span></th>' for _k, label, icon in COLUMNS)
             + '<th><span>Map</span></th>')
     rows, prev = [], None
     for f in group(files):
         ver = f["patch"]
         link = (f'<a href="{_terrain._terrain_filename(ver)}">{_esc(ver)}</a>' if ver in pages else _esc(ver))
-        also = f'<span class="ts-also">also {_esc(_ranges(f["also"]))}</span>' if f["also"] else ""
+        # the versions it covers as a range, first – last (the owner: "7.35 – 7.37e is easier than listing them")
+        also = f'<span class="ts-range"> – {_esc(f["also"][-1])}</span>' if f["also"] else ""
         cells = "".join(_cell(f, prev, k) for k, _l, _i in COLUMNS)
         thumb = (f'<a class="ts-thumb" href="{OG_PAGES}{_esc(ver)}/map.webp" aria-label="The {_esc(ver)} map">'
                  f'<img src="icons/maps/thumbs/{_esc(f["sha8"])}.webp" alt="" width="28" height="28" loading="lazy" '

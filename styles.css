@@ -9922,6 +9922,7 @@ a.tsp-label:hover, a.tsp-label:focus-visible { color: #e3c46a; text-decoration-c
   white-space: nowrap; color: var(--text-dim); line-height: 1.35;
 }
 .tf-chip b { color: var(--text-bright); font-weight: 600; }
+.tf-chip .tf-chip-zero { color: var(--text-main); font-weight: 600; }    /* as many added as removed */
 /* a chip that rings its changes red on the map (scripts.js initChangeHighlights) */
 button.tf-chip-btn { font: inherit; cursor: pointer; }
 button.tf-chip-btn:hover { border-color: rgba(227, 196, 106, 0.45); }
@@ -9994,13 +9995,13 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 .ts-table tbody tr:hover td { background: rgba(227, 196, 106, 0.05); }
 .ts-table td.ts-file { white-space: nowrap; font-weight: 700; color: var(--text-bright); }
 .ts-table td.ts-file a { color: inherit; text-decoration: underline dotted rgba(227, 196, 106, 0.5); text-underline-offset: 3px; }
-.ts-table .ts-also { display: block; font-weight: 400; font-size: 10.5px; color: var(--text-dim); white-space: normal;
-  max-width: 150px; margin: 1px auto 0; text-align: center; line-height: 1.3; }
+.ts-table .ts-range { white-space: nowrap; }                       /* "7.35 – 7.37e": the versions one row covers */
 .ts-table td.ts-date { white-space: nowrap; color: var(--text-dim); }
 .ts-table td.ts-changed { color: var(--text-bright); font-weight: 700; }
 .ts-table .ts-delta { display: block; font-size: 10px; font-weight: 600; line-height: 1.25; }
 .ts-table .ts-up { color: #6fe089; }
 .ts-table .ts-down { color: #ff7a7a; }
+.ts-table .ts-zero { color: var(--text-main); }
 .ts-table .ts-moved { display: block; color: #ffd23f; white-space: nowrap; }
 .ts-table a.ts-thumb { display: inline-block; line-height: 0; }
 .ts-table a.ts-thumb img { width: 28px; height: 28px; border-radius: 3px; border: 1px solid rgba(227, 196, 106, 0.3);

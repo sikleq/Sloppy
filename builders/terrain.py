@@ -1004,7 +1004,9 @@ def _chip(name, kind, n, removed, total):
     img = (f'<img src="icons/{icon}.png" alt="{label}" width="16" height="16">' if icon
            else f'<span class="tf-chip-name">{label}</span>')
     if kind == "delta":
-        value = f'{_signed(n)}{_signed(-removed)}'.strip()
+        # the result, not both halves (the owner 2026-10-04: "not +734 −548 — write the result, +186"); the outlines on
+        # the map still show what was removed and what was added
+        value = _signed(n - removed).strip() or '<span class="tf-chip-zero">±0</span>'
     else:
         value = f'<b>{n}/{total}</b> {_CHANGED_WORD.get(name, kind)}'
     key = _HL_KEY.get(name)

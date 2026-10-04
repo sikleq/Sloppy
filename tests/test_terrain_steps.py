@@ -109,8 +109,8 @@ def test_a_patch_without_terrain_notes_says_nothing_and_shows_what_moved():
     assert "Patch notes" not in html and "No terrain changes" not in html and "terrain-notes-none" not in html
     assert '<ul class="changes terrain-list">\n\n</ul>\n<div class="terrain-facts">' in html
     assert '<div class="tf-head">Changed in the map file<span class="tf-kinds">' in html
-    assert ('alt="Trees" width="16" height="16"><span class="tm-add-text">+2</span> '
-            '<span class="tm-rem-text">−11</span></button>') in html
+    # the result, not both halves (the owner 2026-10-04: "not +734 −548 — write the result"): 7.38b trees +2 −11
+    assert 'alt="Trees" width="16" height="16"><span class="tm-rem-text">−9</span></button>' in html
     assert 'src="icons/maps/map_7.38_2k.webp' in html and 'src="icons/maps/map_7.38b_2k.webp' in html
     assert "← 7.38&nbsp; OLD" in html and "NEW &nbsp;7.38b →" in html
 

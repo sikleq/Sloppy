@@ -198,8 +198,15 @@ COVER_NAME = "cover_site.jpg"     # a new name for a changed cover: Telegram kee
 
 
 def _cover(subtitle):
-    name = _plain_cover(subtitle)
-    (bp.IMG_DIR / name).replace(bp.IMG_DIR / COVER_NAME)
+    """build_post draws its cover as IMG_DIR/cover.jpg — drawn in a scratch folder here, so the cover.jpg an older,
+    published post links to is never overwritten."""
+    real, tmp = bp.IMG_DIR, bp.OUT / "cover_tmp"
+    bp.IMG_DIR = tmp
+    try:
+        name = _plain_cover(subtitle)
+        (tmp / name).replace(real / COVER_NAME)
+    finally:
+        bp.IMG_DIR = real
     return COVER_NAME
 
 

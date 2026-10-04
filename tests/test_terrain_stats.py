@@ -17,9 +17,7 @@ def test_every_map_file_is_one_row_with_the_patches_that_shipped_it():
     files = ts.load()
     assert len(files) == 65 and files[0]["patch"] == "7.08"
     by = {f["patch"]: f for f in files}
-    assert by["7.22"]["also"][:2] == ["7.22b", "7.22c"] and ts._ranges(by["7.22"]["also"]) == "7.22b–7.22f"
-    assert ts._ranges(["7.10"]) == "7.10" and ts._ranges(["7.12", "7.13", "7.13b", "7.14"]) == "7.12, 7.13, 7.13b, 7.14"
-    assert ts._ranges(["7.20b", "7.20c", "7.20d"]) == "7.20b–7.20d"
+    assert by["7.22"]["also"][:2] == ["7.22b", "7.22c"]
     assert by["7.41"]["n"]["watchers"] == 10 and by["7.41"]["n"]["outposts"] == 2      # lanterns, not outposts
     assert [by["7.41"]["n"][f"tier{t}"] for t in range(4)] == [6, 14, 6, 2]
     assert ts.churn(by["7.38"]) == 2069 and by["7.41"]["moves"]["camps"] == {"moved": 7}
@@ -33,11 +31,14 @@ def test_cells_show_added_removed_and_moved():
     assert table.count("<tr>") == len(rows) + 1 and len(rows) < 65
     assert table.index(">7.41a<") < table.index(">7.08<")              # newest first
     glued = next(r for r in rows if r["patch"] == "7.41a")
-    assert glued["also"] == ["7.41b", "7.41c", "7.41d", "7.41e", "7.41f"] and ">also 7.41b–7.41f<" in table
+    assert glued["also"] == ["7.41b", "7.41c", "7.41d", "7.41e", "7.41f"]
+    assert '7.41a<span class="ts-range"> – 7.41f</span>' in table                # a range, not a list (the owner)
+    assert '7.35<span class="ts-range"> – 7.37e</span>' in table and "also " not in table
+    assert ">Map version<" in table and ">Map file<" not in table
     assert "Spawn boxes" not in table and "icon_calendar" not in table and "icon_terrain" not in table
     assert '<a href="terrain_741.html">7.41</a>' in table and '<a href="terrain_739.html">' not in table
     row = table.split('<a href="terrain_741.html">7.41</a>', 1)[1].split("</tr>", 1)[0]
-    assert '<span class="ts-up">+324</span> <span class="ts-down">−304</span>' in row         # trees
+    assert '<span class="ts-up">+20</span>' in row and "+324" not in row          # trees: the result, not +324 −304
     assert '<span class="ts-moved">7 moved</span>' in row and '<span class="ts-moved">2 moved</span>' in row
     assert "What moved" not in table and "picture" not in table
     assert 'src="icons/maps/thumbs/' in table and 'class="ts-thumb"' in table
@@ -54,7 +55,7 @@ def test_tiles_chart_and_the_terrain_menu():
     assert '<a class="tf-tile ts-tile-link" href="https://github.com/sikleq/Oldgrowth">' in tiles
     chart = ts.chart_svg(files)
     assert chart.count('class="ts-mark"') == 5 and '">7.33</text></g>' in chart and "+1838" not in chart  # versions only
-    assert chart.count('class="ts-pt"') == 65 and '">2496</text>' in chart and " trees<" not in chart  # count on hover
+    assert chart.count('class="ts-pt"') == 65 and '">7.38 · 2496</text>' in chart       # version + count on hover
     assert 'class="ts-grid ts-grid-major" x1=' in chart and 'class="ts-axis"' in chart
     groups = {g[0]: g for g in site.MATERIALS_GROUPS}
     assert [c[0] for c in groups["terrain_grp"][3]] == ["terrain", "terrain_stats"]
