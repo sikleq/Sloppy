@@ -10435,6 +10435,10 @@ h2.section.ec-ver a:hover { text-decoration: underline; text-underline-offset: 4
 .ec-scope-btn.active { background: rgba(227, 196, 106, 0.22); border-color: rgba(227, 196, 106, 0.60); color: var(--text-main); }
 .ec-scope-hide { display: none !important; }
 .ec-entity-note { margin: 0 0 6px; }
+/* a creep-hero folded into its hero's section (Spirit Bear under Lone Druid), as on the patch page */
+.ec-sub-entity { display: flex; align-items: center; gap: 6px; margin: 10px 0 4px; font-weight: 700;
+  color: var(--gold); font-size: 13px; }
+.ec-sub-entity img { width: 20px; height: 20px; border-radius: 3px; }
 .ec-ver .ec-ver-label .entity-new-type, .ec-ver .ec-ver-label .entity-changed-type {
   margin-left: 12px; font-family: var(--font-ui); font-size: 11.5px; font-weight: 600; letter-spacing: 0.4px;
   text-transform: uppercase; color: #b08c5a; opacity: 0.85; vertical-align: middle;

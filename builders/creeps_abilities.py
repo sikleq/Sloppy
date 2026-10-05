@@ -939,13 +939,33 @@ def load_ability_descriptions():
     return descs
 
 
-def _ability_cell(slug, name, abil_desc):
+_PLACEHOLDER_RE = re.compile(r"%([A-Za-z_][A-Za-z0-9_]*)%")
+
+
+def _fill_placeholders(desc, fields):
+    """Valve's %name% placeholders -> the ability's own values ("2 / 3 / 4" for levels), "%%" -> "%". Before this the
+    raw "%hero_stun_duration%" / "%damage_pct%%%" reached 8 tooltips on Neutral Abilities (audit 2026-10-05).
+    A name the KV doesn't carry becomes "?" rather than leaking the raw key."""
+    def value(m):
+        key = m.group(1)
+        raw = fields.get("av_" + key, fields.get(key, ""))
+        parts = str(raw).split()
+        if not parts:
+            return "?"
+        return " / ".join(p[:-2] if p.endswith(".0") else p for p in parts)
+    out = _PLACEHOLDER_RE.sub(value, desc)
+    return out.replace("%%", "%")
+
+
+def _ability_cell(slug, name, abil_desc, fields=None):
     if has_abil_icon(slug):
         aico = abil_icon_html(slug, name)
         # Hover-tooltip with Valve's ability description (parsed from
         # abilities_english.txt). Reuses the body-level qhint-tip JS via
         # an `.abil-ico-hint` element carrying data-tooltip.
         desc = abil_desc.get(slug)
+        if desc:
+            desc = _fill_placeholders(desc, fields or {})
         if desc:
             t = attr_esc(desc)
             aico = (f'<span class="abil-ico-hint" tabindex="0" '
@@ -971,7 +991,8 @@ def _unit_rows(row, cur_ab, abil_desc):
     ch = (d.get('createhero') or '').strip()
     icon = d.get('icon')
     unit_img = (
-        f'<a class="unit-link" href="neutral_stats.html#unit-{esc(ch)}">'
+        # the link wraps an alt="" picture, so it names itself (57 nameless links, audit 2026-10-05)
+        f'<a class="unit-link" href="neutral_stats.html#unit-{esc(ch)}" aria-label="{esc(d.get("name", ch))}">'
         f'<img class="creep-copy" src="{esc(icon)}" alt="" loading="lazy" '
         f'onerror="this.style.visibility=\'hidden\'"></a>' if icon else '')
     out = []
@@ -992,7 +1013,7 @@ def _unit_rows(row, cur_ab, abil_desc):
             f'data-cat="basic" data-lvl="{esc(lvl)}">{esc(lvl)}</td>',
             f'<td class="ua-unit creep-icon-cell sticky-col" data-col="unit" '
             f'data-cat="basic" data-sort="{esc(d.get("name", ""))}">{unit_img}</td>',
-            _ability_cell(slug, name, abil_desc),
+            _ability_cell(slug, name, abil_desc, cur_ab.get(slug, {})),
         ]
         cells += [prop_cell(pk, p[pk], p) for pk in PROP_COLS]
         aura_cls = ' class="ua-row-aura"' if p['type'] == 'Aura' else ''

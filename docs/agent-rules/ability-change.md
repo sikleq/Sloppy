@@ -126,6 +126,8 @@ winter_wyvern_eldwurms_edda
 
 Spirit Bear (`hero_id 1961`) — не отдельный герой, а юнит Lone Druid. Рендерить через `unit_header("Spirit Bear", ...)` ВНУТРИ секции Lone Druid, после талантов.
 
+Страница героя (`builders/entity_changes._collect`) делает то же: блок creep-hero, идущий сразу за героем, дописывается в патч этого героя под заголовком `.ec-sub-entity`. Иначе 7.41d (менялся только Медведь) показывал у Lone Druid пустую секцию «Patch 7.41d» (аудит 2026-10-05).
+
 7.40 hero-promotion layout:
 1. `unit_header(...)` + `kind="Creep-hero"`
 2. Один NEW headline li ("Now a Universal melee hero instead of a creep")

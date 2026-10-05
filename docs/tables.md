@@ -332,7 +332,7 @@ every page including the patch notes.
 | `data/stats/<patch>/heroes_raw.json` | per-patch HERO raw-only fields (vision day/night, projectile speed, base attack speed, turn rate, collision hull, bound radius) — NOT in heroes.json. Built by `scripts/fetch/fetch_hero_history.py` from dotabuff/d2vpkr's historical `npc_heroes.txt` (same commit-by-date matching as `fetch_npc_history.py`). Coverage 7.36→today (d2vpkr's window for this file). Run after a new patch lands to backfill. |
 | `data/stats/<patch>/npc_units.txt` | latest-patch source (auto-selected via `latest_stats_version()`): regen, bounty, vision, magres, abilities |
 | `data/stats/<patch>/npc_abilities.json` | per-patch neutral ability balance (`av_*`) |
-| `data/abilities_english.txt` | ability + **item** tooltip descriptions (icon hover) |
+| `data/abilities_english.txt` | ability + **item** tooltip descriptions (icon hover). Valve's `%key%` placeholders are filled from that ability's `npc_abilities.json` values (`_fill_placeholders`, "1 / 1.5 / 2" per level, `%%` → `%`, unknown key → "?"): raw `%hero_stun_duration%` reached 8 tooltips before (audit 2026-10-05) |
 | `data/abilities_slim.json` | ability display names (`dname`) |
 
 Note: KV engine slug ≠ in-game display name (e.g. `frostmourne` → "Curse of Avernus").

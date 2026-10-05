@@ -44,6 +44,21 @@
       "title": "Terrain: layer buttons in one row; heights switch one by one from the panel; fullscreen chips are icon + number"
     },
     {
+      "date": "2026-10-05",
+      "category": "Heroes",
+      "minor": true,
+      "fix": true,
+      "link": "heroes/lone-druid.html",
+      "title": "Hero pages: [[icons/heroes/spirit_bear.png|Spirit Bear]] changes show under Lone Druid; record faces on Hero Changes load again"
+    },
+    {
+      "date": "2026-10-05",
+      "category": "Tables",
+      "minor": true,
+      "fix": true,
+      "title": "Neutral Abilities: tooltips show the numbers instead of Valve's raw %keys%"
+    },
+    {
       "date": "2026-10-04",
       "category": "Terrain",
       "title": "Terrain: every map since 7.08, every change shown",

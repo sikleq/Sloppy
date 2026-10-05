@@ -92,12 +92,23 @@ def _collect():
         if not f.exists():
             continue
         page = f.read_text(encoding="utf-8")
+        last_hero = None
         for kind, slug, name, icon, body in _blocks(page):
             e = ents.setdefault((kind, slug), {"kind": kind, "slug": slug, "name": name, "icon": icon, "patches": []})
             if e["patches"] and e["patches"][-1]["version"] == ver:      # same entity twice on one page
                 e["patches"][-1]["body"] += body
             else:
                 e["patches"].append({"version": ver, "date": dates.get(ver, ""), "body": body})
+            if kind == "hero":
+                last_hero = e
+            elif kind == "creep-hero" and last_hero is not None:
+                # the patch page folds a creep-hero (Spirit Bear) into its hero's section; the hero page does too —
+                # 7.41d changed only the Bear, and Lone Druid's page showed an empty "Patch 7.41d" (audit 2026-10-05)
+                last_hero["patches"][-1]["body"] += (
+                    f'<div class="ec-sub-entity"><img src="{_esc(icon)}" alt="" loading="lazy">{_esc(name)}</div>'
+                    + body)
+            else:
+                last_hero = None
     return ents
 
 
@@ -1140,7 +1151,9 @@ def _hero_group_stats(label, lst):
     def who(w, val):
         """Two cells (owner 2026-09-26): the hero, left-aligned, then the value in its own column."""
         return (td(f'<a class="ec-hstat-who" href="heroes/{_esc(w["slug"])}.html">'
-                   f'<img class="ec-hs-face" src="{_esc(w["icon"])}" alt="" loading="lazy">'
+                   # the record table sits on a top-level page: "../icons" left /Sloppy/ on GitHub Pages and 404'd
+                   # 15 faces (audit 2026-10-05; the local server at / hid it) — strip it like the other cards do
+                   f'<img class="ec-hs-face" src="{_esc(w["icon"].replace("../", "", 1))}" alt="" loading="lazy">'
                    f'<span>{_esc(w["name"])}</span></a>', 2, "ec-hs-hero")
                 + td(f'<b>{num(val)}</b>', 1, "ec-hs-val"))
 

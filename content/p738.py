@@ -1304,7 +1304,6 @@ def build():
     W(li("Damage at level 30 decreased by 75 (from 221-227 to 146-152)", br(221, 227, 146, 152)))
     W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
     W(ul_close())
-    # v2-todo: convert to ability_change(old=<replaced ability>, new=..., summary="New innate ability." / "New ability.", tag="new") — OLD pane = the ability this replaces (lift its desc from prior patchnotes)
     W(ability_change(
         old=dict(
             name="Mental Fortitude", slug="dark_seer_mental_fortitude", innate=True,
