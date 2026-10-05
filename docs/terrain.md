@@ -519,8 +519,13 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   y -10752..10240 — the data a ward tool reads back) and the layer picture `icons/maps/heights_<ver>.png` (bands
   filled faintly — low ground lightest — and the step drawn on its upper side). builders/terrain.py lays it under
   every other layer (`tm-layer-heights`, old/new split by the slider), adds the "Heights" button (`tc_heights`, a
-  terraced hill) and a key top-left (`_heights_legend`, colours from heightmap.BANDS; numbers only — "0", "128" … "768+",
-  the owner: "instead of River 0, Base 512 keep only the values"), only where both sides have a picture. The control
+  terraced hill in the site's gold, "not so rainbow") and, only where both sides have pictures, one switch per height
+  under the change list and in the fullscreen panel (`_heights_buttons`, numbers only — "0", "128" … "768+", the owner:
+  "instead of River 0, Base 512 keep only the values"; 2026-10-05: the key moved off the map, "then 0, 128 … can be
+  clicked to turn those layers on and off"). Each height is its own picture (`icons/maps/heights_<ver>_<band>.png`,
+  heightmap.band_overlays); a switch toggles `.hband-off-<band>` on the map (scripts.js initHeightBands; with the
+  layer off, a click turns it on showing just that height). In fullscreen the change chips shrink to icon + "7/28"
+  (`.tf-chip-word` hidden, the word kept in the chip's tooltip). The control
   bar's gap went 6px → 2px so the 16 toggles + Zoom + Full stay one row (from a 1280-px window up). Samples with no
   height are all gridnav "void" (off the map — 7.41: 53 324, none on walkable ground), not holes in the data. Tests: tests/test_heightmap.py. The same session fixed `gridnav.py extract`: Source2Viewer-CLI keeps the
   file's path inside the `-o` folder, so `-o FILE` had made a folder and the read failed.

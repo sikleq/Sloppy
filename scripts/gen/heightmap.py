@@ -21,7 +21,8 @@ Frame used by the site (the same as the gridnav no-ward picture): x -10240 .. 10
 
     python scripts/gen/heightmap.py extract VPK OUT.vhcg          # maps/dota.vhcg of a map VPK (env S2V_CLI)
     python scripts/gen/heightmap.py grid IN.vhcg OUT.png          # 16-bit grid (height + 1024; 0 = no ground)
-    python scripts/gen/heightmap.py overlay IN.vhcg OUT.png       # the Terrain page's Heights layer picture
+    python scripts/gen/heightmap.py overlay IN.vhcg OUT.png       # every height on one picture (a look)
+    (the page uses one picture per height, icons/maps/heights_<ver>_<band>.png, written by `all`)
     python scripts/gen/heightmap.py all                           # both for every map file with a gridnav
 """
 import gzip
@@ -110,25 +111,37 @@ def band(hgt):
     return len(BANDS) - 1
 
 
-def overlay_image(rows):
-    """Bands filled faintly, their borders drawn strong — a contour map over the map picture."""
+def band_overlays(rows):
+    """{band: picture} — each height on its own transparent picture, so the page can switch the heights one by one
+    (the owner 2026-10-05: "click 0, 128 … to turn those layers on and off"). Bands filled faintly, the step drawn
+    strong on its upper side. Bands with no ground at all are left out."""
     from PIL import Image
     h, w = len(rows), len(rows[0])
     bands = [[None if v is None else band(v) for v in row] for row in rows]
-    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    px = im.load()
+    out = {}
     for j in range(h):
         for i in range(w):
             k = bands[j][i]
             if k is None:
                 continue
+            if k not in out:
+                out[k] = Image.new("RGBA", (w, h), (0, 0, 0, 0))
             rgb = BANDS[k][1]
             edge = any(0 <= jj < h and 0 <= ii < w and bands[jj][ii] is not None and bands[jj][ii] < k
                        for jj, ii in ((j, i + 1), (j, i - 1), (j + 1, i), (j - 1, i)))
             if edge:   # the upper side of a step carries the line, darker
-                px[i, j] = tuple(int(c * 0.55) for c in rgb) + (EDGE_A,)
+                out[k].putpixel((i, j), tuple(int(c * 0.55) for c in rgb) + (EDGE_A,))
             else:
-                px[i, j] = rgb + (LOW_FILL_A if k == 1 else FILL_A,)
+                out[k].putpixel((i, j), rgb + (LOW_FILL_A if k == 1 else FILL_A,))
+    return out
+
+
+def overlay_image(rows):
+    """Every band on one picture (the bands never overlap)."""
+    from PIL import Image
+    im = Image.new("RGBA", (len(rows[0]), len(rows)), (0, 0, 0, 0))
+    for _k, layer in sorted(band_overlays(rows).items()):
+        im.alpha_composite(layer)
     return im
 
 
@@ -177,7 +190,8 @@ def _all():
             extract(vpk, raw_path)
             rows = frame(*load(raw_path))
         grid_image(rows).save(os.path.join(root, "data", "map", f"heights_{code}.png"), optimize=True)
-        overlay_image(rows).save(os.path.join(root, "icons", "maps", f"heights_{ver}.png"), optimize=True)
+        for k, layer in band_overlays(rows).items():     # one picture per height: the page switches them one by one
+            layer.save(os.path.join(root, "icons", "maps", f"heights_{ver}_{k}.png"), optimize=True)
         print("heights", ver)
 
 

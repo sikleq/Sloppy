@@ -9587,15 +9587,22 @@ a.tsp-label:hover, a.tsp-label:focus-visible { color: #e3c46a; text-decoration-c
 .terrain-compare.show-heights .tm-layer-heights { opacity: 1; }
 .tm-layer-heights image { image-rendering: pixelated; }
 .tc-markers.tm-layer-heights { overflow: hidden; }
-/* top-left under the OLD label: the stage runs past the visible frame at the bottom, a bottom key got cut off */
-.tc-heights-key { display: none; position: absolute; left: 10px; top: 52px; z-index: 6; flex-direction: column;
-  gap: 3px; padding: 6px 8px; border-radius: 6px; background: rgba(16, 14, 12, 0.82);
-  border: 1px solid rgba(227, 196, 106, 0.35); font-size: 11px; line-height: 1.2; color: var(--text-main);
-  pointer-events: none; }
-.terrain-compare.show-heights .tc-heights-key { display: flex; }
-.tc-hk-title { font-weight: 700; color: var(--gold); letter-spacing: .3px; margin-bottom: 1px; }
-.tc-hk-item { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-.tc-hk-sw { width: 12px; height: 9px; border-radius: 2px; background: var(--c); box-shadow: inset 0 0 0 1px rgba(0,0,0,.45); }
+/* one picture per height, each switched by its button (scripts.js initHeightBands; the owner 2026-10-05: the key
+   "should move into the panel; then 0, 128 … can be clicked to turn those layers on and off") */
+.terrain-compare.hband-off-0 .tm-hband-0, .terrain-compare.hband-off-1 .tm-hband-1,
+.terrain-compare.hband-off-2 .tm-hband-2, .terrain-compare.hband-off-3 .tm-hband-3,
+.terrain-compare.hband-off-4 .tm-hband-4, .terrain-compare.hband-off-5 .tm-hband-5,
+.terrain-compare.hband-off-6 .tm-hband-6 { display: none; }
+.tf-hbands { display: flex; flex-wrap: wrap; gap: 4px; }
+button.tf-hband {
+  display: inline-flex; align-items: center; gap: 5px; padding: 1px 7px; font: inherit; font-size: 11px;
+  font-weight: 600; color: var(--text-bright); background: none; cursor: pointer;
+  border: 1px solid rgba(227, 196, 106, 0.18); border-radius: 3px;
+}
+button.tf-hband:hover { border-color: rgba(227, 196, 106, 0.45); }
+button.tf-hband[aria-pressed="false"] { opacity: 0.45; }
+.tf-hband-sw { width: 10px; height: 9px; border-radius: 1px; background: var(--c);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45); }
 /* trees — ONE colour everywhere. The 7.40 layout (old side) and 7.41 layout
    (new side) are split by the slider, so sweeping reveals how the forest moved. */
 /* match the spectral/leamare tree style (styleDefinitions tree.alive) */
@@ -9680,8 +9687,11 @@ a.tsp-label:hover, a.tsp-label:focus-visible { color: #e3c46a; text-decoration-c
 .tc-fsp-layers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
 .tc-fsp-layers .tc-btn { width: 100%; }
 .tc-fsp-kinds { display: flex; flex-wrap: wrap; gap: 4px; }
-.tc-fsp-chips { display: flex; flex-direction: column; gap: 4px; }
-.tc-fsp-chips .tf-chip { justify-content: flex-start; }
+/* fullscreen: the chips small and side by side — icon + "7/28", no word (the owner 2026-10-05); the tooltip names it */
+.tc-fsp-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.tc-fsp-chips .tf-chip { justify-content: flex-start; padding: 2px 6px; gap: 4px; font-size: 12px; }
+.tc-fsp-chips .tf-chip img { width: 14px; height: 14px; }
+.tc-fsp-chips .tf-chip-word { display: none; }
 .tc-fsp-hints { margin-top: auto; padding-top: 6px; display: flex; gap: 12px; }
 .tc-fsp-toggle svg { transition: transform 0.15s ease; }
 .tc-fs-active .terrain-compare.tc-fsp-closed .tc-fs-bar { flex-basis: 48px; width: 48px; padding: 10px 6px; }

@@ -25,6 +25,7 @@ parsed at build time; a patch whose notes list none says so.
 ``python build_site.py`` runs it (``save_terrain_html``).
 """
 import ast as _ast
+import functools as _functools
 import glob as _glob
 import json as _json
 import os as _os
@@ -284,17 +285,21 @@ def _markers_svg(diff, pair_id="default"):
     # ---- heights: the map's own height grid (maps/dota.vhcg, scripts/gen/heightmap.py — the owner 2026-10-05:
     # "decode dota.vhcg and make a height layer", for a ward tool later), same frame as the no-ward picture, one value
     # per 32 units, under every other layer ----
+    # one picture per height (the owner 2026-10-05: "click 0, 128 … to turn those layers on and off"):
+    # .hband-off-<k> on .terrain-compare hides band k (scripts.js initHeightBands)
     height_svgs = ""
-    hv = {side: wards.get(side) for side in ("old", "new")}
-    if all(v and _os.path.exists(_os.path.join(_HERE, "icons", "maps", f"heights_{v}.png")) for v in hv.values()):
+    hb = _heights_bands(diff)
+    if hb:
         gx0, gy0 = proj(-10240, 10240)
         gx1, gy1 = proj(10240, -10752)
         for side in ("old", "new"):
-            height_svgs += (
-                f'<svg class="tc-markers tm-layer tm-layer-heights tm-{side}" viewBox="0 0 {MAP_VB} {MAP_VB}" '
-                f'preserveAspectRatio="none" aria-hidden="true"><image href="icons/maps/heights_{hv[side]}.png" '
-                f'x="{gx0}" y="{gy0}" width="{round(gx1 - gx0, 1)}" height="{round(gy1 - gy0, 1)}" '
-                f'preserveAspectRatio="none"/></svg>')
+            ver, bands = hb[side]
+            images = "".join(
+                f'<image class="tm-hband tm-hband-{k}" href="icons/maps/heights_{ver}_{k}.png" x="{gx0}" y="{gy0}" '
+                f'width="{round(gx1 - gx0, 1)}" height="{round(gy1 - gy0, 1)}" preserveAspectRatio="none"/>'
+                for k in bands)
+            height_svgs += (f'<svg class="tc-markers tm-layer tm-layer-heights tm-{side}" viewBox="0 0 {MAP_VB} '
+                            f'{MAP_VB}" preserveAspectRatio="none" aria-hidden="true">{images}</svg>')
 
     old_t = tier_counts(diff.get("campsOld", []))
     new_t = tier_counts(diff.get("campsNew", []))
@@ -938,6 +943,8 @@ def _controls_html(layers=True, changes=("", ""), heights=False):
         body.append('<div class="tc-fsp-title">Changed in the map file</div>'
                     + (f'<div class="tc-fsp-kinds">{kinds}</div>' if kinds else '')
                     + f'<div class="tc-fsp-chips">{chips}</div>')
+    if heights:
+        body.append(f'<div class="tc-fsp-title">Heights</div><div class="tf-hbands">{_heights_buttons()}</div>')
     body.append(f'<div class="tc-fsp-hints">{fs_hints}</div>')
     fs_html = (
         '    <div class="tc-fs-bar" role="region" aria-label="Map controls">\n'
@@ -954,6 +961,7 @@ def _controls_html(layers=True, changes=("", ""), heights=False):
     return top_html, fs_html
 
 
+@_functools.lru_cache(maxsize=1)
 def _height_bands():
     """(upper bound, RGB, label) of the Heights layer — scripts/gen/heightmap.py BANDS, the one source the pictures
     were drawn with."""
@@ -964,11 +972,28 @@ def _height_bands():
     return mod.BANDS
 
 
-def _heights_legend():
-    """The Heights layer's key, top-left on the map, shown only while the layer is on (.show-heights)."""
-    items = "".join(f'<span class="tc-hk-item"><span class="tc-hk-sw" style="--c:rgb{rgb}"></span>{_esc(label)}</span>'
-                    for _top, rgb, label in _height_bands())
-    return f'<div class="tc-heights-key" aria-hidden="true"><span class="tc-hk-title">Height</span>{items}</div>\n'
+def _heights_bands(diff):
+    """{"old": (ver, [band, …]), "new": …} — the map files' heights pictures (one per band, heightmap.py all), or
+    None when a side has none. The versions are the no-ward pictures' (the same map files)."""
+    wards = (diff or {}).get("wards") or {}
+    out = {}
+    for side in ("old", "new"):
+        ver = wards.get(side)
+        bands = [k for k in range(len(_height_bands()))
+                 if ver and _os.path.exists(_os.path.join(_HERE, "icons", "maps", f"heights_{ver}_{k}.png"))]
+        if not bands:
+            return None
+        out[side] = (ver, bands)
+    return out
+
+
+def _heights_buttons():
+    """The heights as switches — swatch + number, each one shows / hides its band on the map (the owner 2026-10-05:
+    the key "should move into the panel; then 0, 128 … can be clicked to turn those layers on and off"). Under the
+    change list and in the fullscreen panel alike; scripts.js initHeightBands keeps both copies in step."""
+    return "".join(f'<button type="button" class="tf-hband" data-hband="{k}" aria-pressed="true" '
+                   f'aria-label="Height {_esc(label)}"><i class="tf-hband-sw" style="--c:rgb{rgb}"></i>'
+                   f'{_esc(label)}</button>' for k, (_top, rgb, label) in enumerate(_height_bands()))
 
 
 def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, changes=("", "")):
@@ -992,7 +1017,6 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, 
     old_src, new_src = _picture_attrs(old_map), _picture_attrs(new_map)
     has_heights = "tm-layer-heights" in markers_svg
     top_bar, fs_bar = _controls_html(layers=bool(markers_svg), changes=changes, heights=has_heights)
-    legend = _heights_legend() if has_heights else ""
     tiled = _tiled_pictures()
     tiles = "".join(f' data-tiles-{side}="{_TILES_BASE}{v}/"'
                     for side, v in (("old", old_pic or old_ver), ("new", new_pic or new_ver)) if v in tiled)
@@ -1010,7 +1034,6 @@ def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, 
         f'draggable="false" loading="eager">\n'
         '      </div>\n'
         f'      {markers_svg}\n'
-        f'      {legend}'
         f'      <span class="tc-ver tc-ver-new">NEW &nbsp;{new_ver} →</span>\n'
         f'      <span class="tc-ver tc-ver-old">← {old_ver}&nbsp; OLD</span>\n'
         '      <div class="tc-handle" role="slider" tabindex="0" '
@@ -1057,6 +1080,13 @@ _ITEM_ICON = {"trees": "ui/gothic/tc_trees", "camps": "camps/creepcamp_mid", "ca
 _CHANGED_WORD = {"camp tiers": "re-tiered", "camp spawn boxes": "resized"}
 
 
+def _strip_tags(html):
+    """Plain text of a chip's value (its tooltip)."""
+    import html as _html
+    import re as _re
+    return _html.unescape(_re.sub(r"<[^>]+>", "", html)).strip()
+
+
 def _chip(name, kind, n, removed, total):
     """One kind of object in the changes: its layer icon and the change — "+added −removed", or "n/of all moved"
     (the owner 2026-10-02: "icon: change" instead of "Added / removed: No-ward cells +2"; "Bounty runes 1 moved
@@ -1070,13 +1100,16 @@ def _chip(name, kind, n, removed, total):
         # the map still show what was removed and what was added
         value = _signed(n - removed).strip() or '<span class="tf-chip-zero">±0</span>'
     else:
-        value = f'<b>{n}/{total}</b> {_CHANGED_WORD.get(name, kind)}'
+        # the word in its own span: the fullscreen panel shows just icon + "7/28" (the owner 2026-10-05), the
+        # tooltip still says what changed
+        value = f'<b>{n}/{total}</b> <span class="tf-chip-word">{_CHANGED_WORD.get(name, kind)}</span>'
+    tip = _esc(f"{name[:1].upper() + name[1:]}: {_strip_tags(value)}")
     key = _HL_KEY.get(name)
     if key:
         # pressed: the changed places outlined on the map, its layer turned on (scripts.js initChangeHighlights)
         return (f'<button type="button" class="tf-chip tf-chip-btn" data-hl="{key}" '
-                f'data-layer="{_HL_LAYER.get(key, "")}" aria-pressed="false">{img}{value}</button>')
-    return f'<span class="tf-chip">{img}{value}</span>'
+                f'data-layer="{_HL_LAYER.get(key, "")}" aria-pressed="false" data-tooltip="{tip}">{img}{value}</button>')
+    return f'<span class="tf-chip" data-tooltip="{tip}">{img}{value}</span>'
 
 
 def _facts_html(counts, step, diff):
@@ -1120,6 +1153,8 @@ def _facts_html(counts, step, diff):
         out.append(f'<div class="tf-head">Changed in the map file{kinds_html}</div>\n'
                    + (f'<div class="tf-chips">{chips}</div>\n' if chips
                       else '<div class="tf-none">Nothing</div>\n'))
+    if _heights_bands(diff):
+        out.append(f'<div class="tf-head">Heights</div>\n<div class="tf-hbands">{_heights_buttons()}</div>\n')
     return f'<div class="terrain-facts">\n{"".join(out)}</div>\n' if out else ""
 
 

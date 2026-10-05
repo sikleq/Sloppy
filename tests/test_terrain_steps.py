@@ -185,7 +185,8 @@ def test_the_facts_read_like_the_list():
     _svg, counts = terrain._markers_svg(diff, "740")
     step = next(s for s in mv.steps() if s.patch == "7.40")
     html = terrain._facts_html(counts, step, diff)
-    assert "<table" not in html and html.count('<div class="tf-head">') == 2
+    # On the map, Changed in the map file, and (since 2026-10-05) Heights — the height switches
+    assert "<table" not in html and html.count('<div class="tf-head">') == 3
     first = html.split('<div class="tf-tiles tf-tiles-more">')[0]
     assert first.count('<div class="tf-tile">') == 5 and 'icons/camps/creepcamp_ancient.png' in first
     names = [n.split(" ")[0].split("<")[0] for n in first.split('<div class="tf-name">')[1:]]
@@ -193,10 +194,13 @@ def test_the_facts_read_like_the_list():
     assert '<div class="tf-name">large <span class="tm-rem-text">−4</span></div>' in html
     assert '<div class="tf-name">medium <span class="tm-add-text">+4</span></div>' in html
     assert "tf-verb" not in html and "Moved</div>" not in html
-    assert 'alt="Camps" width="16" height="16"><b>9/28</b> moved</button>' in html
-    assert 'alt="Towers" width="16" height="16"><b>1/22</b> moved</button>' in html
-    assert 'alt="Camp tiers" width="16" height="16"><b>4/28</b> re-tiered</button>' in html
-    assert 'alt="Camp spawn boxes" width="16" height="16"><b>10/28</b> resized</span>' in html
+    # the word in its own span since 2026-10-05 (fullscreen hides it: icon + "9/28")
+    assert 'alt="Camps" width="16" height="16"><b>9/28</b> <span class="tf-chip-word">moved</span></button>' in html
+    assert 'alt="Towers" width="16" height="16"><b>1/22</b> <span class="tf-chip-word">moved</span></button>' in html
+    assert ('alt="Camp tiers" width="16" height="16"><b>4/28</b> <span class="tf-chip-word">re-tiered</span>'
+            '</button>') in html
+    assert ('alt="Camp spawn boxes" width="16" height="16"><b>10/28</b> <span class="tf-chip-word">resized</span>'
+            '</span>') in html
     assert '<div class="tf-none">Nothing</div>' in terrain._facts_html({}, step, {"treesOld": [], "treesNew": []})
 
 

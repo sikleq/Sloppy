@@ -2773,7 +2773,9 @@ function ecPinnableTip(tip, show, hide, sel) {
   // Selector matches the original `?` badge plus any element that just opts
   // into the body-level tooltip via `.abil-ico-hint` (currently used on
   // ability icons in the Unit Abilities table).
-  const TIP_SEL = '.qhint, .abil-ico-hint, .hd-patch[data-tooltip]';
+  // + the Terrain fullscreen panel's compact change chips (icon + "7/28", the word hidden — the owner 2026-10-05):
+  // the tooltip says what changed
+  const TIP_SEL = '.qhint, .abil-ico-hint, .hd-patch[data-tooltip], .tc-fsp-chips .tf-chip[data-tooltip]';
   // Click pins the tooltip (read it at leisure, select text); a click anywhere else unpins.
   const pin = ecPinnableTip(tip, show, hide, '.qhint');
   document.addEventListener('mouseover', (e) => {
@@ -7268,16 +7270,45 @@ function ecShopMarkup(panels) {
     });
   }
 
+  // Heights: each height a switch (the owner 2026-10-05: "click 0, 128 … to turn those layers on and off").
+  // .hband-off-<k> on the map hides band k; the switches exist twice (under the list, in the fullscreen panel) and
+  // stay in step. With the Heights layer off, a click turns it on showing just that height.
+  function initHeightBands() {
+    const root = document.querySelector('.terrain-compare');
+    const btns = document.querySelectorAll('.tf-hband[data-hband]');
+    if (!root || !btns.length) return;
+    function setBand(k, on) {
+      document.querySelectorAll('.tf-hband[data-hband="' + k + '"]').forEach(function(b) {
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      root.classList.toggle('hband-off-' + k, !on);
+    }
+    btns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const k = btn.dataset.hband;
+        if (!root.classList.contains('show-heights')) {
+          btns.forEach(function(b) { setBand(b.dataset.hband, b.dataset.hband === k); });
+          const layerBtn = root.querySelector('.tc-controls-bar .tc-layer-btn[data-layer="heights"]');
+          if (layerBtn) layerBtn.click();
+          return;
+        }
+        setBand(k, btn.getAttribute('aria-pressed') !== 'true');
+      });
+    });
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       initTerrainCompare();
       initSubpatchPicker();
       initChangeHighlights();
+      initHeightBands();
     });
   } else {
     initTerrainCompare();
     initSubpatchPicker();
     initChangeHighlights();
+    initHeightBands();
   }
 })();
 

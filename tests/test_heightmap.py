@@ -69,13 +69,17 @@ def test_overlay_fills_bands_and_draws_the_step_on_the_upper_side():
 
 
 def test_every_terrain_map_file_has_its_heights():
-    """One overlay picture + one 16-bit grid per map file with a gridnav (heightmap.py all), in the site's frame."""
+    """One picture per height + one 16-bit grid per map file with a gridnav (heightmap.py all), in the site's frame.
+    Since 2026-10-05 the heights are separate pictures, so the page can switch them one by one."""
     codes = [n[len("gridnav_"):-len(".gnv.gz")] for n in os.listdir(os.path.join(_ROOT, "data", "map"))
              if n.startswith("gridnav_")]
     assert codes
     for code in codes:
         ver = f"{code[0]}.{code[1:]}"
-        assert os.path.exists(os.path.join(_ROOT, "icons", "maps", f"heights_{ver}.png")), ver
+        bands = [k for k in range(len(heightmap.BANDS))
+                 if os.path.exists(os.path.join(_ROOT, "icons", "maps", f"heights_{ver}_{k}.png"))]
+        assert {0, 1, 2} <= set(bands), (ver, bands)              # river, low and high ground on every map
+        assert not os.path.exists(os.path.join(_ROOT, "icons", "maps", f"heights_{ver}.png")), ver   # the old one
         assert os.path.exists(os.path.join(_ROOT, "data", "map", f"heights_{code}.png")), code
     pytest.importorskip("PIL")
     from PIL import Image
@@ -83,15 +87,36 @@ def test_every_terrain_map_file_has_its_heights():
     assert g.size == (heightmap.FRAME_W, heightmap.FRAME_H)
 
 
-def test_terrain_page_gets_the_heights_layer_button_and_key():
+def test_terrain_page_gets_the_heights_layer_button_and_switches():
+    """The key moved off the map into the panels (the owner 2026-10-05): under the change list and in the fullscreen
+    panel, one switch per height (numbers only), each showing / hiding its own picture."""
     import builders.terrain as terrain
-    top, _fs = terrain._controls_html(layers=True, heights=True)
+    top, fs = terrain._controls_html(layers=True, heights=True)
     assert 'data-layer="heights"' in top and "tc_heights.png" in top
     assert 'data-layer="heights"' not in terrain._controls_html(layers=True)[0]
-    html = terrain._compare_html("7.40c", "7.41", markers_svg='<svg class="tc-markers tm-layer tm-layer-heights tm-old">')
-    assert 'class="tc-heights-key"' in html and '</span>768+</span>' in html and "--c:rgb(52, 132, 218)" in html
-    assert "River" not in html and "Base" not in html
-    assert "tc-heights-key" not in terrain._compare_html("7.40c", "7.41", markers_svg="<svg></svg>")
+    assert '<div class="tc-fsp-title">Heights</div><div class="tf-hbands">' in fs
+    btns = terrain._heights_buttons()
+    assert btns.count('class="tf-hband"') == 7 and 'data-hband="0"' in btns and "</i>768+</button>" in btns
+    assert "River" not in btns and "Base" not in btns and "--c:rgb(52, 132, 218)" in btns
+    assert "tc-heights-key" not in terrain._compare_html("7.40c", "7.41", markers_svg='<svg class="tm-layer-heights">')
+    diff = terrain._load_diff("7.41")
+    hb = terrain._heights_bands(diff)
+    assert hb["old"][0] == "7.40c" and hb["new"][0] == "7.41" and 0 in hb["new"][1]
+    svg, _counts = terrain._markers_svg(diff)
+    assert 'class="tm-hband tm-hband-0" href="icons/maps/heights_7.41_0.png"' in svg
+    facts = terrain._facts_html({}, "7.41", diff)
+    assert '<div class="tf-head">Heights</div>' in facts and 'data-hband="6"' in facts
+
+
+def test_fullscreen_chips_are_icon_and_number_with_the_word_kept_for_the_tooltip():
+    """The owner 2026-10-05: in fullscreen "icon + 7/28, i.e. without the text 'moved', and a small chip"."""
+    import builders.terrain as terrain
+    chip = terrain._chip("camps", "moved", 7, 0, 28)
+    assert '<b>7/28</b> <span class="tf-chip-word">moved</span>' in chip and 'data-tooltip="Camps: 7/28 moved"' in chip
+    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    assert ".tc-fsp-chips .tf-chip-word { display: none; }" in css
+    js = open(os.path.join(_ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    assert ".tc-fsp-chips .tf-chip[data-tooltip]" in js and "function initHeightBands()" in js
 
 
 def test_the_control_bar_keeps_one_row_with_the_heights_button():

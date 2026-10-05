@@ -317,8 +317,7 @@ def shrines_icon():
     return im.resize((ICON_RES, ICON_RES), Image.NEAREST)
 
 
-# the Heights layer (2026-10-05): a terraced hill in the layer's own band colours (scripts/gen/heightmap.py BANDS),
-# river at the foot, the highest step on top
+# the Heights layer (2026-10-05): a terraced hill, the lowest step at the foot, the highest on top
 HEIGHTS_GLYPH = [
     "................",
     "................",
@@ -337,7 +336,9 @@ HEIGHTS_GLYPH = [
     "................",
     "................",
 ]
-HEIGHTS_PAL = {"b": (52, 132, 218), "g": (88, 170, 72), "y": (206, 194, 72), "o": (228, 144, 56), "r": (214, 84, 62)}
+# one colour, not a rainbow (the owner 2026-10-05: "recolour the icon, not so rainbow"): the site's gold ramp, the
+# steps lighter the higher they are, like tc_all
+HEIGHTS_PAL = {"b": GOLD[1], "g": GOLD[2], "y": GOLD[3], "o": GOLD[4], "r": GOLD[5]}
 
 
 def heights_icon():
