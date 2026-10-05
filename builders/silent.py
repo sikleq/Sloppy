@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import os
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent.parent
@@ -263,9 +264,22 @@ def _val_cell(v) -> str:
     return _esc(s)
 
 
+@lru_cache(maxsize=1)
+def _names() -> tuple[dict[str, str], dict[str, str]]:
+    """(hero engine name → in-game name, ability slug → in-game name). Before this the page read
+    "Zuus", "Nevermore", "Abyssal Underlord" and "abaddon_aphotic_shield" (audit 2026-10-05)."""
+    from builders.heroes_stats import _load_display_names
+    from builders.aoe_increase import _load_ability_names
+    return _load_display_names(), _load_ability_names()
+
+
 def _hero_display(slug: str) -> str:
-    nice = slug.replace("npc_dota_hero_", "").replace("_", " ")
-    return nice.title()
+    from builders.heroes_stats import _display_name
+    return _display_name(slug, _names()[0])
+
+
+def _ability_display(slug: str) -> str:
+    return _names()[1].get(slug) or slug
 
 
 def render_diff_html(version: str, prev: str, diff: dict) -> str:
@@ -277,7 +291,7 @@ def render_diff_html(version: str, prev: str, diff: dict) -> str:
         for ability, fields in abilities.items():
             parts.append(
                 f'<div class="sc-ability">'
-                f'<h3 class="sc-ability-name">{_esc(ability)}</h3>'
+                f'<h3 class="sc-ability-name">{_esc(_ability_display(ability))}</h3>'
                 f'<table class="sc-table">'
                 f'<thead><tr><th>Field</th>'
                 f'<th>{_esc(prev)}</th><th>{_esc(version)}</th></tr></thead>'
@@ -298,7 +312,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SIKLE\\Silent Changes {version}</title>
+<title>SIKLE | Silent Changes {version}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&display=swap">
@@ -312,7 +326,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 {back_link}
 <h1>Silent Changes</h1>
 <p class="sc-sub">Raw KV-field deltas between <strong>{prev}</strong> → <strong>{version}</strong>, parsed
-from <code>data/stats/{{ver}}/heroes/*.txt</code>. These may overlap with the
+from the game's own hero files of both patches. These may overlap with the
 official patchnotes — this is the source-of-truth view. Engine noise (FX, sounds,
 animation, particle resources) is filtered out.</p>
 {body}

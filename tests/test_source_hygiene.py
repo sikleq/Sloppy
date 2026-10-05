@@ -34,3 +34,17 @@ def test_no_control_characters_in_sources():
                 if hits:
                     bad.append(f"{f}:{n} {hits[:3]}")
     assert bad == [], "invisible control characters (a double-escaped '\\b' / '\\x..'?):\n" + "\n".join(bad[:20])
+
+
+def test_no_double_full_stop_in_patch_text():
+    """A shortened Valve sentence left "250 gold.. Cast Range" on Helm of the Overlord 7.38c (audit 2026-10-05).
+    Exactly two dots before a word; "..." stays allowed."""
+    import re
+    two_dots = re.compile(r"(?<!\.)\.\.(?!\.)\s+[A-Za-z]")
+    bad = []
+    for f in sorted(os.listdir(os.path.join(HERE, "content"))):
+        if not (f.startswith("p") and f.endswith(".py")):
+            continue
+        with open(os.path.join(HERE, "content", f), encoding="utf-8") as fh:
+            bad += [f"{f}:{n}" for n, line in enumerate(fh, 1) if two_dots.search(line)]
+    assert bad == [], "'..' inside patch text:\n" + "\n".join(bad[:20])

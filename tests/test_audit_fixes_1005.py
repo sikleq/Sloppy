@@ -71,3 +71,11 @@ def test_top_level_pages_do_not_climb_out_of_the_site(page):
     if not f.exists():
         pytest.skip("dist not built")
     assert 'src="../icons' not in f.read_text(encoding="utf-8")
+
+
+def test_silent_pages_use_in_game_names():
+    from builders import silent
+    assert silent._hero_display("npc_dota_hero_zuus") == "Zeus"
+    assert silent._hero_display("npc_dota_hero_nevermore") == "Shadow Fiend"
+    assert silent._ability_display("abaddon_aphotic_shield") == "Aphotic Shield"
+    assert silent._ability_display("no_such_ability_slug") == "no_such_ability_slug"

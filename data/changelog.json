@@ -59,6 +59,13 @@
       "title": "Neutral Abilities: tooltips show the numbers instead of Valve's raw %keys%"
     },
     {
+      "date": "2026-10-05",
+      "category": "Patch Reader",
+      "minor": true,
+      "fix": true,
+      "title": "Silent Changes: in-game hero and ability names (Zeus, not Zuus)"
+    },
+    {
       "date": "2026-10-04",
       "category": "Terrain",
       "title": "Terrain: every map since 7.08, every change shown",
