@@ -251,22 +251,38 @@ def _pp1(line):
 def test_recipe_cheaper_total_unchanged_inline_is_buff_not_misc():
     out = _pp1('W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))')
     assert 't("MISC")' not in out
-    # every % at the end of the row (owner 2026-09-26); "Total cost unchanged" has no % of its own
-    assert out == 'W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))'
+    # every % at the end of the row (owner 2026-09-26); the unchanged total is a grey "0%" after the
+    # recipe % — "-33% / 0%" (owner 2026-10-05, Hydra's Breath 7.41f)
+    assert out == ('W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", '
+                   'b([600, 3900], [400, 3900], l=True, slash=True)))')
 
 
 def test_recipe_pricier_total_unchanged_inline_keeps_nerf_badge():
     """7.41 "Recipe cost increased from 450 to 800. Total cost unchanged at 2150g": NERF, +78% at the end."""
     out = _pp1('W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b(450, 800, l=True)))')
-    assert out == 'W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b(450, 800, l=True)))'
+    assert out == ('W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", '
+                   'b([450, 2150], [800, 2150], l=True, slash=True)))')
 
 
 def test_recipe_total_unchanged_split_note_is_badge_not_misc():
     out = _pp1('W(li("Recipe cost decreased from 1350 to 1250", b(1350, 1250, l=True), '
                'extra=inline_note("Total cost unchanged at 4500g")))')
     assert 't("MISC")' not in out
-    assert out == ('W(li("Recipe cost decreased from 1350 to 1250", b(1350, 1250, l=True), '
+    assert out == ('W(li("Recipe cost decreased from 1350 to 1250", b([1350, 4500], [1250, 4500], l=True, slash=True), '
                    'extra=inline_note("Total cost unchanged at 4500g")))')
+
+
+def test_recipe_total_unchanged_without_a_number_keeps_the_recipe_badge():
+    """7.38b Heaven's Halberd: Valve wrote "Total cost unchanged" with no total — nothing to put after the slash."""
+    out = _pp1('W(li("Recipe cost increased from 275 to 450. Total cost unchanged", b(275, 450, l=True)))')
+    assert out == 'W(li("Recipe cost increased from 275 to 450. Total cost unchanged", b(275, 450, l=True)))'
+
+
+def test_recipe_unchanged_total_renders_recipe_then_grey_zero():
+    from patch.badges import b
+    html = b([1100, 5900], [1000, 5900], l=True, slash=True)
+    assert 'data-overall="buff"' in html and "slash-sep" in html
+    assert html.index(">-9%<") < html.index('<span class="badge neutral">0%</span>')
 
 
 def test_recipe_and_total_both_change_one_slash_badge_tagged_by_total():
@@ -690,6 +706,48 @@ def test_not_lower_is_better_from_the_cross_check(text):
 def test_valve_improved_or_worsened_sets_the_direction(text, lower):
     """Valve's own word decides l=True when the keywords don't know the stat (2026-10-03 cross-check)."""
     assert ("l=True" in g._emit_badge(text)) == lower
+
+
+@pytest.mark.parametrize("text, tag", [
+    ("Now costs 35 mana", "NERF"),                                 # 7.41f Treant (was NEW)
+    ("Now can't use more than 20 souls per cast", "NERF"),         # 7.41 Shadow Fiend (was NEW)
+    ("First Spawn Time increased from 15:00 to 20:00", "REWORK"),  # 7.39 Tormentor (was BUFF)
+    ("First +1 siege creep timing decreased from 35:00 to 30:00", "REWORK"),   # 7.41 (was NERF)
+    ("Break Distance is no longer affected by AoE bonuses", "DEL"),                       # 7.38 (was MISC)
+    ("Slash Jump Radius is no longer increased by AoE bonuses", "DEL"),                   # 7.38c (was BUFF)
+    ("Initial Blast Width is no longer increased by bonuses to AoE", "DEL"),              # 7.41e (was BUFF)
+    ("Aghanim's Scepter upgrade unit collision radius no longer affected by Area of Effect bonuses", "DEL"),
+])
+def test_audit_1005_canonical_tags(text, tag):
+    assert _guess_tag(text) == tag
+
+
+@pytest.mark.parametrize("text, lower", [
+    ("Forage time decreased from 1s to 0.75s", True),                          # 7.41e
+    ("Vanish Radius rescaled from 625/550/475/400 to 500", True),              # 7.41 Phantom Assassin Blur
+    ("Meditation Time Until Max Bonus decreased from 4s to 3s", True),         # 7.41d Templar Assassin
+    ("Level 25 Talent Lunar Blessing Allied/Self Damage decreased from +30/60 to +25/50", False),   # 7.41 Luna
+])
+def test_audit_1005_lower_is_better(text, lower):
+    assert ("l=True" in g._emit_badge(text)) == lower
+
+
+def test_draft_clock_is_misc_without_a_percent():
+    assert g._emit_li("All Pick drafting time per hero selection reduced from 30s to 25s") == \
+        'W(li("All Pick drafting time per hero selection reduced from 30s to 25s", t("MISC")))'
+
+
+def test_a_bounty_under_a_hero_is_lower_is_better():
+    """Spirit Bear / Tempest Double: the enemy gets the bounty. A neutral creep's bounty stays higher-is-better."""
+    assert "l=True" in g._emit_badge("Gold Bounty decreased from 300 to 250", hero_side=True)
+    assert "l=True" not in g._emit_badge("Gold Bounty decreased from 300 to 250")
+
+
+def test_a_tier_added_at_the_end_is_compared_with_the_old_top_tier():
+    """7.41 Keen-Eyed "+125/135 to +125/135/145": b() zips the lists, so the new tier was dropped (grey 0%)."""
+    assert g._emit_badge("Cast Range bonus rescaled from +125/135 to +125/135/145") == "b([125, 135, 135], [125, 135, 145])"
+    # a real rescale of the shared levels keeps both lists as Valve wrote them
+    assert g._emit_badge("Health Regen rescaled from 3/6/9 to 2/4/6/8") == "b([3, 6, 9], [2, 4, 6, 8])"
 
 
 def test_creep_level_change_is_misc_not_a_percent_badge():

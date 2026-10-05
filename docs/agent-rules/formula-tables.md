@@ -29,6 +29,15 @@ _pill, _table = scale_pill("45.75s − 0.75s per level",
   **С 2026-09-26 автоматически** (`badges.step_levels`): `scale_pill` / `bf` / `li_formula` без `levels=` сами читают «per N levels» (переломы N, 2N…) и «per N level ups» (N+1, 2N+1…), для old→new берут объединение; формула «per level» среди них добавляет сетку по умолчанию (если колонок > 20 — остаётся сетка по умолчанию). `levels=` руками больше не нужен. В узких панелях `ability_change` колонки прячутся только у сетки по умолчанию (класс `lvl-default`); шаговая сетка показывается целиком (Ancient Apparition 7.41 «0.1 + 0.1 per 3 levels»: L1, L3 … L30).
 - **Внутри панелей `ability_change`** (пол-ширины): компактная `levels=[1, 5, 10, 15, 20, 25, 30]` — полная сетка туда физически не влезает (`table-layout:fixed`, колонки сжимаются нечитаемо).
 
+## Бейджи строки-формулы: start / пик / end (аудит 2026-10-05, `patch/badges.py` `bf`)
+- **start = первый столбец таблицы** (L1 у таблицы уровней; 0:00, W2, #1 у других). Столбец, где обе формулы дают 0
+  («per minute» на 0:00), пропускается. Раньше start читал L1, а таблица начиналась с 0:00 / W2 — числа не совпадали
+  (7.39 Tormentor, 7.41 twister).
+- `headline_level=` руками — бейдж подписан этим столбцом («#2», «30:00», «at 200»), а не «start».
+- **Пик**: если тег строки (BUFF/NERF по среднему) не совпадает ни с start, ни с end — между ними бейдж уровня, где
+  изменение сильнее всего в сторону тега («+21% L20» у Monkey King Mischief 7.41, «−25% L9» у Night Stalker).
+  Иначе красный NERF стоял над одними зелёными бейджами.
+
 ## Clarifications для li_formula → inline_note_text kwarg
 
 Clarifying notes к per-level formula («Up to 5.5s at level 30», «Also increased by 1s with Aghs») → передавать через `inline_note_text=` kwarg на `li_formula(...)`. Никогда не `W(subnote(...))` после `ul_close()` — это визуально отрывает ноту от строки.

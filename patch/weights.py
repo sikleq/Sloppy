@@ -97,11 +97,15 @@ def _row_pcts(text, badge_html):
     """|%| values that define the row's size (review F.6): for per-level rows take the badge
     at the level b() used for the DIRECTION — the last non-zero level (max rank) when its
     direction agrees with the row's overall tag; when b() flipped the tag by the average
-    (front-/back-loaded, early-game cut, flatten) use all levels. Recipe+total -> total."""
+    (front-/back-loaded, early-game cut, flatten) use all levels. Recipe+total -> total;
+    recipe with the total unchanged -> recipe."""
     found = [(c, abs(float(v.replace("−", "-")))) for c, v in _PCT_CLS_RE.findall(badge_html or "")]
     if not found:
         return []
     if len(found) >= 2 and _re.search(r"total cost", _plain(text), _re.I):
+        # "-9% / 0%" (recipe changed, total unchanged — owner 2026-10-05): the grey total is not the size
+        if _re.search(r"total cost unchanged", _plain(text), _re.I):
+            return [found[0][1]]
         return [found[-1][1]]
     if len(found) >= 2:
         overall = _OVERALL_RE.search(badge_html or "")

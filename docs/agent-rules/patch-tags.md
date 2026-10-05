@@ -136,6 +136,25 @@ slow/DPS per cooldown, max slow, magic resistance bonus, search radius. `bstat_h
 
 «No longer …» → всегда DEL. «Level N Talent X replaced with Y» → SWAP (с 2026-09-26). «No longer levels with X» (innate decoupling) → REWORK (эффект остаётся, только coupling убирается).
 
+### Аудит 2026-10-05 (проверено на самом генераторе; правила в `CANONICAL_TAGS` / `LOWER_IS_BUFF`)
+- «X is no longer affected / increased by AoE bonuses» → **DEL** для всего класса (было то NERF, то DEL).
+- Время на игровых часах («First Spawn Time increased from 15:00 to 20:00», «siege creep timing 35:00 to 30:00») →
+  **REWORK** без % («где и когда появляется объект»; процент от времени на часах ничего не значит).
+- Время драфта («All Pick drafting time … 30s to 25s») → **MISC**: часы одни на обе команды.
+- «Now costs N mana» → **NERF** (новая цена); «Now can't use more than N» → **NERF** (новый потолок).
+- Меньше — лучше: forage time, Vanish Radius (Blur), «Time Until Max …»; награда за юнита героя (Spirit Bear,
+  Tempest Double) — враг получает её за убийство. Награда нейтрала — больше = лучше. «Allied/Self Damage» (Luna) — не
+  урон по себе.
+- «Attack Damage Reduction» в генератор не внесено: у Jakiro (Double Trouble) это штраф себе (меньше — лучше), у
+  дебаффов на врага — наоборот. Ставится руками.
+- Рецепт изменился, итог тот же: бейдж «−9% / 0%» — `b([рецепт_было, итог], [рецепт_стало, итог], l=True,
+  slash=True)`, серый 0% у итога, тег по рецепту (владелец 2026-10-05, Hydra's Breath 7.41f). Итог Valve не назвал
+  (7.38b Heaven's Halberd) — берётся ItemCost из файлов игры.
+- Списки разной длины в `b()`: b() сравнивает попарно и молча отбрасывает лишнее. Новый тир в конце («+125/135 →
+  +125/135/145») — старый список дополняется последним значением (генератор делает сам). Тиры сдвинулись («4/5 → 2-4»)
+  — бейдж по общему тиру + `inline_note` «Tier 4, the only tier in both». Бесплатный первый уровень (Night Stalker
+  7.38) — сравнение по вложенным очкам. Тест `test_badge_lists_of_different_length_are_reviewed`.
+
 ### Снятое собственное ограничение → BUFF; добавленное → NERF (вычитка 2026-09-18)
 «Toggling is no longer disabled by silence», «Can no longer be interrupted by casting X», «no longer interrupts
 movement», «Now can be cast without cancelling X», «No longer has reduced/fixed X», «no longer freezes/loses X»,

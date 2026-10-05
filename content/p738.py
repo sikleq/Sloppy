@@ -149,12 +149,16 @@ def build():
     W(li("Neutral Creep Camps that reside within a stream are considered Flooded Camps, populated with new amphibian neutral creeps", t("NEW"), extra=inline_note("Small camp on the rim between tier 1 and tier 2 towers<br>Medium camp on the rim near tier 2 tower<br>Medium camp in the main jungle that was on the stream's way and used to be a Large camp")))
     W(li("As the tides of battle rise, every 5 minutes one creep in a Flooded Camp is permanently upgraded to the next tier", t("NEW"), extra=inline_note("Each camp has 3 units, so at 15:00 the Small camp becomes a Medium camp and both Medium camps become Large; at 30:00 the Medium camp becomes Large and both Large camps become Ancient")))
     W(li("These camps consist of the following creeps" + camp_table([
-        ("Small camp", [(3, "Pollywog", _NC_CDN + "tadpole.png")]),
-        ("Medium camp", [(2, "Boglet", _NC_CDN + "froglet.png"), (1, "Marshmage Apprentice", _NC_CDN + "froglet_mage.png")]),
-        ("Large camp", [(2, "Croaker", _NC_CDN + "grown_frog.png"), (1, "Marshmage", _NC_CDN + "grown_frog_mage.png")]),
-        ("Ancient camp", [(2, "Ancient Croaker", _NC_CDN + "ancient_frog.png"), (1, "Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png")]),
+        ("Small camp", [(3, "Pollywog", _NC_CDN + "tadpole.png")], "Average Bounty of 54 gold and 90 XP"),
+        ("Medium camp", [(2, "Boglet", _NC_CDN + "froglet.png"), (1, "Marshmage Apprentice", _NC_CDN + "froglet_mage.png")],
+         "Average Bounty of 81 gold and 126 XP"),
+        ("Large camp", [(2, "Croaker", _NC_CDN + "grown_frog.png"), (1, "Marshmage", _NC_CDN + "grown_frog_mage.png")],
+         "Average Bounty of 117 gold and 165 XP"),
+        ("Ancient camp", [(2, "Ancient Croaker", _NC_CDN + "ancient_frog.png"), (1, "Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png")],
+         "Average Bounty of 163.5 gold and 312 XP"),
     ]), t("NEW")))
-    W(li("Each creep can only be upgraded twice, so a Small camp never reaches Ancient status", t("NEW")))
+    # Valve's sentence; only "Easy" -> "Small" (the camp rename, content-rules)
+    W(li("Each creep can only be upgraded twice, meaning a Small camp will never reach an Ancient status (sorry, Pollywogs)", t("NEW")))
     W(li("Units are not upgraded while the camp is blocked, and the number of upgraded units can't be increased", t("NEW")))
     W(ul_close())
 
@@ -437,7 +441,7 @@ def build():
     W(item_header("Eye of Skadi", changed=True))
     W(auto_components_change("Eye of Skadi", "7.38"))
     W(ul_open())
-    W(li("Recipe cost decreased from 1300 to 1050. Total cost unchanged at 5300", b(1300, 1050, l=True)))
+    W(li("Recipe cost decreased from 1300 to 1050. Total cost unchanged at 5300", b([1300, 5300], [1050, 5300], l=True, slash=True)))
     W(ul_close())
     W(item_header("Hand of Midas"))
     W(ul_open())
@@ -572,7 +576,7 @@ def build():
     W(item_header("Witch Blade", changed=True))
     W(auto_components_change("Witch Blade", "7.38"))
     W(ul_open())
-    W(li("Recipe cost decreased from 600 to 250. Total cost unchanged at 2775", b(600, 250, l=True)))
+    W(li("Recipe cost decreased from 600 to 250. Total cost unchanged at 2775", b([600, 2775], [250, 2775], l=True, slash=True)))
     W(ul_close())
 
     # ===== NEUTRAL ITEM UPDATES =====
@@ -847,7 +851,7 @@ def build():
     W(ability("Cold Feet", slug="ancient_apparition_cold_feet"))
     W(ul_open())
     W(li("Stun Duration rescaled from 1.9/2.2/2.5/2.8s to 1.8/2.2/2.6/3s", b([1.9, 2.2, 2.5, 2.8], [1.8, 2.2, 2.6, 3])))
-    W(li("Break Distance is no longer affected by AoE bonuses", t("NERF")))
+    W(li("Break Distance is no longer affected by AoE bonuses", t("DEL")))
     W(ul_close())
     W(ability("Chilling Touch", slug="ancient_apparition_chilling_touch"))
     W(ul_open())
@@ -2627,8 +2631,12 @@ def build():
     W(ul_open())
     W(li("Changes Roshan's first move to the Top Pit to be at 20 minutes instead of 15 minutes.", t("REWORK")))
     W(li("Hunter in the Night: Is now granted for free on level 1. Max level is increased to 5", t("BUFF")))
-    W(li("Hunter in the Night: Move Speed rescaled from 22/28/34/40% to 16/22/28/34/40%", b([22, 28, 34, 40], [16, 22, 28, 34, 40])))
-    W(li("Hunter in the Night: Attack Speed rescaled from 20/40/60/80 to 15/35/55/75/95", b([20, 40, 60, 80], [15, 35, 55, 75, 95])))
+    # the free level 1 shifts every value one level up: compared by skill points spent (0 points = the free
+    # level), not level by level — zip compared 22 with 16 and read a nerf (audit 2026-10-05)
+    W(li("Hunter in the Night: Move Speed rescaled from 22/28/34/40% to 16/22/28/34/40%", b([0, 22, 28, 34, 40], [16, 22, 28, 34, 40]),
+         extra=inline_note("By skill points spent: the free level adds 16% before the first point, the rest is unchanged")))
+    W(li("Hunter in the Night: Attack Speed rescaled from 20/40/60/80 to 15/35/55/75/95", b([0, 20, 40, 60, 80], [15, 35, 55, 75, 95]),
+         extra=inline_note("By skill points spent: the free level adds 15 before the first point, and every level is 15 higher")))
     W(ul_close())
     W(new_facet("night_stalker_voidbringer", desc=[
         "Number of times +2 All Attributes can be skilled decreased from 7 to 6" + " " + b(7, 6),
@@ -2853,7 +2861,7 @@ def build():
     W(ul_close())
     W(ability("Onslaught", slug="primal_beast_onslaught"))
     W(ul_open())
-    W(li("Knockback radius and distance are no longer affected by AoE increase", t("NERF")))
+    W(li("Knockback radius and distance are no longer affected by AoE increase", t("DEL")))
     W(ul_close())
     W(ability("Uproar", slug="primal_beast_uproar"))
     W(ul_open())

@@ -17,7 +17,8 @@
 
 Расширенное правило: классифицировать по ПРИРОДЕ удалённого, не по «no longer»:
 - Удалено **penalty/downside** → BUFF
-- Удалено **beneficial mechanic** → NERF
+- Удалено **beneficial mechanic** → NERF (кроме класса «X is no longer affected / increased by AoE bonuses» — всегда
+  **DEL**, решение 2026-10-05: в 7.38 было два NERF, в 7.38c–7.41e — DEL; генератор `CANONICAL_TAGS`)
 - Удалена **фича целиком** → DEL
 - **Consolidation** (отдельное значение влито в общую систему) → MISC
 
@@ -216,11 +217,14 @@ properties_change(
 
 ```
 1. section("General Updates")
-2. section("Item Updates")
-3. section("Neutral Creep Updates")     ← creeps ДО neutral items
+2. section("Neutral Creep Updates")     ← creeps ДО предметов (так на страницах 7.38–7.41 и в генераторе)
+3. section("Item Updates")
 4. section("Neutral Item Updates")
 5. section("Hero Updates")
 ```
+
+Совпадает с `_CANONICAL_SECTION_ORDER` в `generate_patch_code_v2.py` (до 2026-10-05 здесь стояло Item Updates перед
+Neutral Creep Updates — расходилось и с генератором, и со страницами).
 
 ## Нейтральные артефакты — заголовок
 

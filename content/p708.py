@@ -22,7 +22,7 @@ def build():
         value_fmt="{:g}g",
     ))
     W(li("Roshan now has 25% Status Resistance", t("NEW")))
-    W(li("All Pick drafting time per hero selection reduced from 30s to 25s", b(30, 25)))
+    W(li("All Pick drafting time per hero selection reduced from 30s to 25s", t("MISC")))   # same clock for both teams
     W(ul_close())
 
     # ===== ITEM UPDATES =====

@@ -210,6 +210,24 @@ def _compute_pct(old_v, new_v, l):
             "buff" if is_buff else "nerf")
 
 
+def _peak_badge(levels, signed_pcts, overall, endpoint_classes, old_fn, new_fn, l, level_fmt):
+    """The level that carries the row's direction when neither endpoint does: a NERF formula row with a green
+    (or grey) start and end got a red tag over only green badges — 7.41 Monkey King Mischief cooldown 0% / -21%
+    while L18 is +29% (audit 2026-10-05). Returns '' when an endpoint already shows the direction."""
+    if overall not in ("buff", "nerf"):
+        return ""
+    if any(cls.startswith(overall) for cls in endpoint_classes):
+        return ""
+    want_positive = overall == "buff"
+    peaks = [(abs(sp), L) for L, sp in zip(levels, signed_pcts) if sp and (sp > 0) == want_positive]
+    if not peaks:
+        return ""
+    peak_L = max(peaks)[1]
+    cls, disp, _, _ = _compute_pct(old_fn(peak_L), new_fn(peak_L), l)
+    return (f'<span class="badge {cls}">{disp}</span>'
+            f'<span class="formula-endpoint-label">{level_fmt(peak_L)}</span>')
+
+
 _formula_id_counter = [0]
 
 
@@ -249,7 +267,7 @@ def step_levels(*formula_texts, max_level=30):
 
 
 def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
-       level_prefix='L', level_fmt=None, jump_at=20, headline_level=1,
+       level_prefix='L', level_fmt=None, jump_at=20, headline_level=None,
        effective_unchanged=False, axis_label=None, extra_formulas=()):
     """Formula-based change. Returns (trigger_html, badge_html, table_html).
     The trigger wraps formula_text as a clickable pill that toggles the table.
@@ -300,10 +318,19 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
         return trigger, badge, table
 
     # Headline-level inline badge (used when row is collapsed).
-    # "start" always means L1 (the level the user thinks of as the beginning
-    # of the game) — even if L1's delta is 0%. Do NOT shift to a later level
-    # just because that level shows a more dramatic delta; the reader can see
-    # the per-level breakdown by clicking the formula trigger.
+    # "start" is the table's FIRST column (L1 on a level table; 0:00, W2, #1 on others) — even if its delta is
+    # 0%. Do NOT shift to a later level just because it shows a more dramatic delta; the reader can see the
+    # per-level breakdown by clicking the formula trigger. Audit 2026-10-05: the badge read L1 while the table
+    # began at 0:00 / W2 (7.39 Tormentor 0% vs -3%, 7.41 twister -17% vs -20%). A caller's own headline_level
+    # (Wisdom Shrine #2, The Shining 30:00) is labelled with that column, not "start".
+    # a leading column where both formulas give 0 ("per minute" at 0:00) says nothing: start after it
+    first_L = next((L for L in levels if old_fn(L) or new_fn(L)), levels[0])
+    if headline_level is None:
+        headline_level = first_L
+
+    def col_label(L):                 # "#2", "30:00", "L7"; a bare number axis ("Attack Damage") reads "at 200"
+        return f"at {L}" if axis_label else level_fmt(L)
+    start_label = "start" if headline_level == first_L else col_label(headline_level)
     cls1, disp1, _, overall1 = _compute_pct(old_fn(headline_level), new_fn(headline_level), l)
     # Overall buff/nerf for the filter: average the SIGNED per-level
     # deltas across ALL levels (including 0% ones) — same convention as
@@ -350,7 +377,8 @@ def bf(old_fn, new_fn, formula_text, levels=None, l=False, value_fmt="{:g}",
     if needs_pair:
         badge_inner = (
             f'<span class="badge {cls1}">{disp1}</span>'
-            f'<span class="formula-endpoint-label">start</span>'
+            f'<span class="formula-endpoint-label">{start_label}</span>'
+            + _peak_badge(levels, signed_pcts, overall_eff, (cls1, clsN), old_fn, new_fn, l, col_label) +
             f'<span class="badge {clsN}">{dispN}</span>'
             f'<span class="formula-endpoint-label">end</span>'
         )

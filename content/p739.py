@@ -13,7 +13,7 @@ def build():
     W(plain_header("Map Objectives"))
     W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())
-    W(li("First Spawn Time increased from 15:00 to 20:00", b(15, 20, l=True)))
+    W(li("First Spawn Time increased from 15:00 to 20:00", t("REWORK")))   # a clock time: no % (audit 2026-10-05)
     W(ul_close())
     W(ability("Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png"))
     W(ul_open())

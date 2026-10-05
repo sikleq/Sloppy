@@ -66,6 +66,25 @@
       "title": "Silent Changes: in-game hero and ability names (Zeus, not Zuus)"
     },
     {
+      "date": "2026-10-05",
+      "category": "Patch Reader",
+      "minor": true,
+      "title": "Formula rows: when start and end disagree with the tag, the level where the change hits hardest shows between them; \"start\" is the table's first column"
+    },
+    {
+      "date": "2026-10-05",
+      "category": "Patch Reader",
+      "minor": true,
+      "title": "Recipe changes with the same total cost read \"−9% / 0%\": the recipe, then a grey total"
+    },
+    {
+      "date": "2026-10-05",
+      "category": "Patch Reader",
+      "minor": true,
+      "fix": true,
+      "title": "Badges compare the right values: 7.41 enchantment tiers, [[icons/items/bloodstone.png|Bloodstone]] 7.41c (−4%), Night Stalker 7.38; Valve's own wording back on Heaven's Halberd, Rubick and the 7.38 flooded camps"
+    },
+    {
       "date": "2026-10-04",
       "category": "Terrain",
       "title": "Terrain: every map since 7.08, every change shown",

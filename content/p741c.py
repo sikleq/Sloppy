@@ -25,8 +25,8 @@ def build():
     W(ul_open())
     W(li(
         '<span class="wrong-word">Health bonus increased from +600 to +625</span>',
-        '<span class="badge-group" data-overall="buff"><span class="badge buff1">+4%</span></span>',
-        extra=note_box('This change is wrongly stated. The real change is 650 → 625 <span class="badge-group" data-overall="nerf"><span class="badge nerf1">-4%</span></span>'),
+        b(650, 625),     # badge by the game files, not by Valve's misstated numbers (patch-tags: wrong-word)
+        extra=note_box('This change is wrongly stated. The real change is 650 → 625'),
         force_tag="nerf"
     ))
     W(li("Bloodpact cooldown increased from 30s to 35s", b(30, 35, l=True)))

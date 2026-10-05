@@ -2356,11 +2356,14 @@ def creep_ref(name, icon_url, count=None):
 def camp_table(rows):
     """Camp compositions as a light table so the creep names line up in columns:
     camp_table([("Easy camp", [(3, "Pollywog", icon)]),
-                ("Medium camp", [(2, "Boglet", icon), (1, "Marshmage Apprentice", icon)])])"""
-    width = max(len(creeps) for _, creeps in rows)
+                ("Medium camp", [(2, "Boglet", icon), (1, "Marshmage Apprentice", icon)])])
+    A third item is Valve's "?" for that camp ("Average Bounty of 54 gold and 90 XP", 7.38) — it was lost
+    when the camps became a table (audit 2026-10-05)."""
+    width = max(len(row[1]) for row in rows)
     cells = []
-    for camp, creeps in rows:
-        cells.append(f'<span class="camp-name">{camp}</span>')
+    for camp, creeps, *info in rows:
+        tip = info_tip(info[0]) if info else ""
+        cells.append(f'<span class="camp-name">{camp}{tip}</span>')
         for i in range(width):
             if i < len(creeps):
                 n, name, icon = creeps[i]

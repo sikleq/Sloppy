@@ -20,7 +20,7 @@ def build():
     W(li("Abilities that had 'per level up' scaling changed to be 'per level'", t("MISC"),
          extra=inline_note("This mostly affects heroes reworked in update 7.40 and Largo.")))
     W(li("Flagbearer Creep Experience Bounty increased from 57 to 60", b(57, 60)))
-    W(li("First +1 siege creep timing decreased from 35:00 to 30:00", b(35, 30, l=True)))
+    W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("REWORK")))   # a clock time: no % (audit 2026-10-05)
     W(li("Second +1 siege creep timing now occurs at 60:00", t("NEW")))
     W(li("Adjusted the meeting point of the lane creeps toward the offlane", t("MISC"),
          extra=inline_note(
@@ -367,7 +367,7 @@ def build():
     W(item_header("Battle Fury", changed=True))
     W(auto_components_change("Battle Fury", "7.41"))
     W(ul_open())
-    W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))
+    W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b([600, 3900], [400, 3900], l=True, slash=True)))
     W(ul_close())
     W(item_header("Black King Bar"))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
@@ -443,7 +443,7 @@ def build():
     W(ul_open())
     W(li("Endurance now shares cooldown with Boots of Bearing", t("NERF")))
     W(li("Swiftness Aura now also provides +2.5 Health Regen", t("NEW")))
-    W(li("Recipe cost increased from 500 to 525. Total cost unchanged at 1625g", b(500, 525, l=True)))
+    W(li("Recipe cost increased from 500 to 525. Total cost unchanged at 1625g", b([500, 1625], [525, 1625], l=True, slash=True)))
     W(ul_close())
     W(item_header("Boots of Bearing"))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
@@ -474,7 +474,7 @@ def build():
     W(item_header("Glimmer Cape", changed=True))
     W(auto_components_change("Glimmer Cape", "7.41"))
     W(ul_open())
-    W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b(450, 800, l=True)))
+    W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b([450, 2150], [800, 2150], l=True, slash=True)))
     W(ul_close())
     W(item_header("Hand of Midas"))
     W(ul_open())
@@ -506,7 +506,7 @@ def build():
     W(li("Disarm cooldown decreased from 20s to 16s", b(20, 16, l=True)))
     W(li("Disarm cast range increased from 650 to 750", b(650, 750)))
     W(li("Disarm duration increased from 3s to 3.5s", b(3, 3.5)))
-    W(li("Removed Damage Block ability", t("DEL")))
+    W(li("No longer has Damage Block passive", t("DEL")))
     W(li("Can no longer be disassembled", t("DEL")))
     W(ul_close())
     W(item_header("Kaya"))
@@ -564,7 +564,7 @@ def build():
     W(ul_close())
     W(item_header("Mekansm"))
     W(ul_open())
-    W(li("Recipe cost increased from 800 to 850", b(800, 850, l=True), extra=inline_note("Total cost unchanged at 1775g (due to Chainmail cost decrease)")))
+    W(li("Recipe cost increased from 800 to 850", b([800, 1775], [850, 1775], l=True, slash=True), extra=inline_note("Total cost unchanged at 1775g (due to Chainmail cost decrease)")))
     W(ul_close())
     W(item_header("Monkey King Bar"))
     W(auto_components_change("Monkey King Bar", "7.41"))
@@ -593,7 +593,7 @@ def build():
              ("",     "+2.5 Mana Regen",  b(3, 2.5)),
              ("",     "+12 Intelligence", b(10, 12))]))
     W(ul_open())
-    W(li("Recipe cost decreased from 450 to 300. Total cost unchanged at 3275g", b(450, 300, l=True)))
+    W(li("Recipe cost decreased from 450 to 300. Total cost unchanged at 3275g", b([450, 3275], [300, 3275], l=True, slash=True)))
     W(ul_close())
     W(item_header("Bloodthorn", changed=True))
     W(auto_components_change("Bloodthorn", "7.41"))
@@ -664,7 +664,7 @@ def build():
         new=["Active: Barrier. Gives a magic damage barrier that absorbs 425 damage to all nearby allies. Lasts 8 seconds. Radius: 1200. Cast Range: 1200. Mana Cost: 150. Cooldown: 60s",
              "Passive: Insight Aura. Gives allied units 8% magic resistance. Radius: 1200."]))
     W(ul_open())
-    W(li("Recipe Cost decreased from 800 to 675", b(800, 675, l=True), extra=inline_note("Total cost unchanged at 3725g (due to Cloak cost increase)")))
+    W(li("Recipe Cost decreased from 800 to 675", b([800, 3725], [675, 3725], l=True, slash=True), extra=inline_note("Total cost unchanged at 3725g (due to Cloak cost increase)")))
     W(li("Barrier no longer affects units that have been affected by Barrier within Pipe of Insight's cooldown", t("NERF")))
     W(li("Insight Aura no longer provides 2.5 health regen", t("DEL")))
     W(ul_close())
@@ -780,7 +780,7 @@ def build():
     W(ul_close())
     W(item_header("Witch Blade"))
     W(ul_open())
-    W(li("Recipe cost increased from 250 to 300", b(250, 300, l=True), extra=inline_note("Total cost unchanged at 2775g (due to Chainmail cost decrease)")))
+    W(li("Recipe cost increased from 250 to 300", b([250, 2775], [300, 2775], l=True, slash=True), extra=inline_note("Total cost unchanged at 2775g (due to Chainmail cost decrease)")))
     W(ul_close())
     # ===== NEUTRAL ITEM UPDATES =====
     W(section("Neutral Item Updates"))
@@ -1040,8 +1040,12 @@ def build():
     W(ul_close())
     W(enchant_header("Crude", "crude"))
     W(ul_open())
-    W(li("Health Restoration bonus rescaled from +30/40% to +10/15/20%", b([30, 40], [10, 15, 20])))
-    W(li("Base Attack Time Reduction bonus rescaled from 12/18% to 8/12/16%", b([12, 18], [8, 12, 16])))
+    # Tiers 4/5 -> 2-4: only Tier 4 exists in both, so the badge compares Tier 4 (audit 2026-10-05; zip of
+    # the two lists compared old Tier 4 with new Tier 2)
+    W(li("Health Restoration bonus rescaled from +30/40% to +10/15/20%", b(30, 20),
+         extra=inline_note("Tier 4, the only tier in both: 30% → 20%")))
+    W(li("Base Attack Time Reduction bonus rescaled from 12/18% to 8/12/16%", b(12, 16),
+         extra=inline_note("Tier 4, the only tier in both: 12% → 16%")))
     W(li("Intelligence Penalty increased from 5% to 6%", b(5, 6, l=True)))
     W(li("Now also modifies incoming healing", t("NEW"),
          extra=inline_note("As a result of Health Restoration changes")))
@@ -1057,15 +1061,18 @@ def build():
     W(enchant_header("Keen-Eyed"))
     W(ul_open())
     W(li("Max Mana Penalty increased from 10% to 10/12/14%", b(10, [10, 12, 14], l=True)))
-    W(li("Cast Range bonus rescaled from +125/135 to +125/135/145", b([125, 135], [125, 135, 145])))
-    W(li("Mana Regen bonus rescaled from 1/1.5 to 1/1.5/2", b([1, 1.5], [1, 1.5, 2])))
+    # Tiers 2/3 -> 2-4: the new Tier 4 is compared with the old top tier, as the penalty row above does
+    W(li("Cast Range bonus rescaled from +125/135 to +125/135/145", b([125, 135, 135], [125, 135, 145])))
+    W(li("Mana Regen bonus rescaled from 1/1.5 to 1/1.5/2", b([1, 1.5, 1.5], [1, 1.5, 2])))
     W(li("Now is a guaranteed option for Intelligence heroes only", t("REWORK")))
     W(li("Tiers changed from 2/3 to 2-4", t("REWORK")))
     W(ul_close())
     W(enchant_header("Titanic"))
     W(ul_open())
-    W(li("Attack Damage bonus rescaled from +10/20% to +8/12/16%", b([10, 20], [8, 12, 16])))
-    W(li("Status Resistance rescaled from 10/15% to +10/12/14%", b([10, 15], [10, 12, 14])))
+    W(li("Attack Damage bonus rescaled from +10/20% to +8/12/16%", b(10, 16),
+         extra=inline_note("Tier 4, the only tier in both: 10% → 16%")))
+    W(li("Status Resistance rescaled from 10/15% to +10/12/14%", b(10, 14),
+         extra=inline_note("Tier 4, the only tier in both: 10% → 14%")))
     W(li("Now also provides -10/12/14% <font color='#e03e2e'>Attack Speed</font>", t("NERF")))
     W(li("Now is a guaranteed option for Universal heroes only", t("REWORK")))
     W(li("Tiers changed from 4/5 to 2-4", t("REWORK")))
@@ -3860,7 +3867,10 @@ def build():
                 "<b>Attack modifiers that spend mana:</b> Max Mana Restoration is <b>25% + 5% per 5 levels</b>.",
             ],
         ),
-        summary="New innate ability.",
+        # Valve's row and its "?" (audit 2026-10-05: the "?" was dropped)
+        summary="Removed OD innate" + info_tip("Aka Ominous Discernment, aka Obstreperous Dissimilator, aka Obnoxious "
+                                               "Determinator, aka Obsequious Deliberator, aka Ornery Deconstructor, aka "
+                                               "Obnubilated Delineator, aka Omniscient Desiderator") + ". New innate ability.",
         tag="new",
     ))
     W(ul_open())
@@ -4188,7 +4198,7 @@ def build():
     ))
     W(ability("Telekinesis"))
     W(ul_open())
-    W(li("Aghanim's Shard Land Distance bonus changed from +35% to +225 (flat)",
+    W(li("Aghanim's Shard throw distance bonus changed from 35% to 225",
          b(506, 600),
          extra=inline_note("Computed off base Telekinesis Land Distance of 375. "
                            "Old: 375 × 1.35 = 506. New: 375 + 225 = 600.")))

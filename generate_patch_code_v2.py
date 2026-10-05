@@ -223,6 +223,17 @@ CANONICAL_TAGS = [
     (re.compile(r'^\s*Level \d+(?: Talent)?:?\s.*\breplaced with\b', re.I), 'SWAP'),
     # …and a facet's own talent swap, prefixed by the facet ("Old Blood: Level 10 Talent … replaced with …")
     (re.compile(r"^\s*[A-Z][\w' ]{0,40}: Level \d+(?: Talent)?:?\s.*\breplaced with\b"), 'SWAP'),
+    # ── 2026-10-05 audit: checked on the generator itself, the content rows were already right ──
+    (re.compile(r'^\s*Now costs \d+(?:\.\d+)?%?\s+(?:mana|health)\b', re.I), 'NERF'),   # a new cost (7.41f Treant; was NEW)
+    (re.compile(r"^\s*Now can(?:'t| ?not| no longer) (?:use|have|store|hold|stack|exceed)\b[^.]*\bmore than\b", re.I),
+     'NERF'),                                                       # a new cap (7.41 Shadow Fiend souls; was NEW)
+    # a game-clock timing ("First Spawn Time increased from 15:00 to 20:00", "siege creep timing 35:00 to 30:00"):
+    # when an object appears is REWORK (rule "Где и когда появляется объект"), and a % of a clock time means nothing
+    (re.compile(r'\bfrom \d{1,2}:\d{2} to \d{1,2}:\d{2}\b'), 'REWORK'),
+    # "X is no longer affected / increased by AoE bonuses": one tag for the class, DEL ("No longer …" → DEL);
+    # 7.38 had two NERF and three later patches DEL, the scaffold said BUFF or MISC
+    (re.compile(r'\bno longer (?:affected|increased|modified) by (?:\w+ )?(?:AoE|Area of Effect) (?:bonus(?:es)?|increase)'
+                r'|\bno longer (?:affected|increased) by bonuses to (?:AoE|Area of Effect)\b', re.I), 'DEL'),
     # ── 2026-10-03 second audit (7.38b-7.41e): classes the scaffold got wrong ──
     (re.compile(r'\bno longer gets? knocked off\b', re.I),           'BUFF'),   # own mount restriction lifted
     (re.compile(r'\b(?:is now|now) undispellable\b|^\s*Now cannot be dispelled\b', re.I), 'BUFF'),
@@ -468,6 +479,10 @@ LOWER_IS_BUFF = re.compile(
     r'|base\s+attack\s+rate'                     # seconds per attack (Kez Sai/Katana) — like BAT
     r'|required\s+to\s+(?:trigger|cast|activate|proc)'
     r'|(?:familiar|summon(?:ed)?|illusion|ward|spirit)s?\s+(?:gold\s+)?bounty'   # own summon's bounty
+    # 2026-10-05 audit: faster forage (7.41e), a smaller Blur vanish radius (7.41 PA), a shorter wait for the max bonus
+    r'|forage\s+time'
+    r'|vanish\s+radius'
+    r'|time\s+until\s+max(?:imum)?\s+\w+'
     r')\b',
     re.I,
 )
@@ -479,6 +494,7 @@ _NOT_LOWER_IS_BUFF = re.compile(
     r'|\bmana\s*cost(?:/\w+)?\s+reduction\b'          # "Manacost/Manaloss Reduction increased" (7.40 talent)
     r'|\bdamage\s+taken\s+reduction\b'                # "Illusion Damage Taken Reduction increased" (7.41 talent)
     r'|\bfalse\s+flight\b'                            # an ability's name, not a flight time
+    r'|\ballied\s*/\s*self\s+damage\b'                # Luna Lunar Blessing bonus damage, not a self-hit (7.41 talent)
     r'|\bwithout\s+(?:a\s+)?cooldown\b'               # "grace period … without a cooldown increased" (7.38b)
     r'|\btime\s+reduction\b'                          # "Charge Restore Time Reduction decreased" (7.39 talent)
     r'|\bincoming\s+damage\s+buff\b'                  # Roshan's own Roar buff (7.39)
@@ -624,9 +640,11 @@ def _l1_only_dip(old, new, l=False):
     return (sum(signed) / len(signed)) < 0
 
 
-def _emit_badge(text):
+def _emit_badge(text, hero_side=False):
     """Try to extract from-N-to-M and emit b(...). Returns badge code str
-    (e.g. 'b([5,7,9,15], [5,7,9,11])') or None if no numeric change."""
+    (e.g. 'b([5,7,9,15], [5,7,9,11])') or None if no numeric change.
+    hero_side: the row sits under a hero, so a bounty is what the ENEMY gets for killing the hero's unit
+    (Spirit Bear, Tempest Double: lower is better — audit 2026-10-05); a neutral creep's bounty stays higher-is-better."""
     m = _FROM_TO_RE.search(text)
     if not m:
         return None
@@ -634,8 +652,14 @@ def _emit_badge(text):
     new = _split_levels(m.group(2))
     if old is None or new is None:
         return None
+    # A tier/level added at the end ("+125/135 to +125/135/145", 7.41 Keen-Eyed): compare the new top tier with
+    # the old top one. b() zips the lists, so the new tier was dropped and the row read a grey 0% (audit 2026-10-05).
+    if isinstance(old, list) and isinstance(new, list) and len(new) > len(old) and new[:len(old)] == old:
+        old = old + [old[-1]] * (len(new) - len(old))
     said = _said_lower_better(text, old, new)
     l = _is_lower_better(text) if said is None else said
+    if hero_side and said is None and re.search(r'\bbounty\b', text, re.I):
+        l = True
     l_arg = ', l=True' if l else ''
     force_arg = ', force_overall="buff"' if _l1_only_dip(old, new, l) else ''
     return f'b({old!r}, {new!r}{l_arg}{force_arg})'
@@ -696,6 +720,11 @@ def _hero_attr(hero_name, stats_version):
     return _ATTR_KV.get((heroes.get(npc) or {}).get('AttributePrimary')) if npc else None
 
 
+_HERO_SIDE = [False]      # True while generate() renders the Heroes section
+# the draft clock (7.08 "All Pick drafting time per hero selection reduced from 30s to 25s" was a red -17%)
+_DRAFT_TIME_RE = re.compile(r'\b(?:drafting|pick(?:ing)?|ban(?:ning)?|strategy|hero selection)\s+(?:phase\s+)?time\b', re.I)
+
+
 def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, version=None):
     """Render one W(li(...)) call. tag_override overrides heuristic; aghs is
     'scepter'/'shard' (already encoded in text if from datafeed); info is
@@ -709,6 +738,8 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
     clean = _strip_html(txt)
     if re.match(r'^Level (?:increased|decreased|changed) from \d+ to \d+$', clean):
         return f'W(li("{txt}", t("MISC")))'        # a creep's level: classification, not a buff/nerf
+    if _DRAFT_TIME_RE.search(clean):
+        return f'W(li("{txt}", t("MISC")))'        # both teams draft under the same clock: nobody gains (audit 2026-10-05)
 
     # "Damage at level 1 changed from X–Y to A–B" → br(X, Y, A, B)
     dmg_m = _DMG_L1_RE.search(clean)
@@ -751,7 +782,7 @@ def _emit_li(text, tag_override=None, aghs=None, info=None, hero_name=None, vers
         merged_esc = merged.replace('"', '\\"')
         return f'W(li("{merged_esc}", t("REWORK")))'
 
-    badge_call = _emit_badge(txt)
+    badge_call = _emit_badge(txt, hero_side=bool(hero_name) or _HERO_SIDE[0])
     tag = tag_override or _guess_tag(txt)
     if badge_call:
         # Numeric change — let b() drive the tag (BUFF/NERF inferred from
@@ -2195,12 +2226,25 @@ def _recipe_total_badge(ra, rb, ta, tb):
     return f"b([{ra}, {ta}], [{rb}, {tb}], l=True, slash=True{tag})"
 
 
+_UNCHANGED_TOTAL_RE = re.compile(r"Total cost unchanged at (\d+)")
+
+
+def _recipe_unchanged_total_badge(a, b_val, tail):
+    """Recipe changed, total unchanged: "-9% / 0%" (owner 2026-10-05, Hydra's Breath 7.41f) — the recipe %
+    (green or red, it drives the tag) and a grey 0% for the total, so the row doesn't read as a cheaper item.
+    Valve's text without the total ("Total cost unchanged", 7.38b) keeps the recipe badge alone."""
+    m = _UNCHANGED_TOTAL_RE.search(tail)
+    if not m:
+        return f"b({a}, {b_val}, l=True)"
+    return f"b([{a}, {m.group(1)}], [{b_val}, {m.group(1)}], l=True, slash=True)"
+
+
 def _postprocess_recipe_cost_zero_net(lines):
     """Rewrite recipe-cost rows to the one badge form (owner 2026-09-26): every % at the end of the row.
     - Both recipe and total changed: "... A to B. Total cost ... C to D", badge "+x% / +y%" (recipe / total),
       tag by the total.
-    - Recipe changed, total unchanged: the recipe % at the end ("Total cost unchanged" has no %), tag by
-      the recipe — a cheaper recipe is a real player benefit.
+    - Recipe changed, total unchanged: "recipe% / 0%" at the end (the 0% grey), tag by the recipe — a
+      cheaper recipe is a real player benefit.
     """
     out = []
     for line in lines:
@@ -2212,12 +2256,12 @@ def _postprocess_recipe_cost_zero_net(lines):
         m = _RECIPE_COST_UNCHANGED_INLINE_RE.match(line)
         if m:
             prefix, a, mid, b_val, tail = m.groups()
-            out.append(f'W(li("{prefix}{a}{mid}{b_val}{tail}", b({a}, {b_val}, l=True)))')
+            out.append(f'W(li("{prefix}{a}{mid}{b_val}{tail}", {_recipe_unchanged_total_badge(a, b_val, tail)}))')
             continue
         m = _RECIPE_COST_UNCHANGED_SPLIT_RE.match(line)
         if m:
             prefix, a, mid, b_val, note_text = m.groups()
-            out.append(f'W(li("{prefix}{a}{mid}{b_val}", b({a}, {b_val}, l=True), '
+            out.append(f'W(li("{prefix}{a}{mid}{b_val}", {_recipe_unchanged_total_badge(a, b_val, note_text)}, '
                        f'extra=inline_note("{note_text}")))')
             continue
         out.append(line)
@@ -3201,8 +3245,13 @@ def generate(version):
             for item in d['neutral_items']:
                 out.extend(_render_item(item, version, neutral=True))
         elif key == 'heroes':
-            for hero in sorted(d['heroes'], key=lambda h: HEROES.get(h['hero_id'], ('', ''))[0]):
-                out.extend(_render_hero(hero, version=version, patchnotes_loc=patchnotes_loc, prev_hero_abils=prev_hero_abils))
+            _HERO_SIDE[0] = True               # every row below sits under a hero (see _emit_badge hero_side)
+            try:
+                for hero in sorted(d['heroes'], key=lambda h: HEROES.get(h['hero_id'], ('', ''))[0]):
+                    out.extend(_render_hero(hero, version=version, patchnotes_loc=patchnotes_loc,
+                                            prev_hero_abils=prev_hero_abils))
+            finally:
+                _HERO_SIDE[0] = False
 
     # Post-process passes that operate on the full emitted line list:
     # 1. Collapse aghs upgrade-row + description into canonical merged li.
