@@ -3100,7 +3100,14 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
         used_innate_fallback = False
         if not icon_url:
             slug = spec.get("slug")
-            if slug:
+            if slug and slug not in _LOCAL_ABIL_ICONS and spec.get("innate"):
+                # a removed innate has no icon left in the game (14 of them: Aggrandize, Gift Bearer, Sight Seer…):
+                # the fallback goes in directly, not as a 404 that onerror swaps (audit 2026-10-05)
+                icon_url = INNATE_ICON_URL
+                used_innate_fallback = True
+            elif slug and slug not in _LOCAL_ABIL_ICONS:
+                icon_url = MISSING_ICON_URL
+            elif slug:
                 icon_url = f"{ABIL_CDN}{slug}.png"
             elif spec.get("innate"):
                 icon_url = INNATE_ICON_URL

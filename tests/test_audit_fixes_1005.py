@@ -131,6 +131,33 @@ def test_nerf_formula_with_green_endpoints_shows_its_worst_level():
     assert '<span class="badge nerf5">+21%</span><span class="formula-endpoint-label">L20</span>' in badge
 
 
+def test_removed_innate_without_an_icon_gets_the_fallback_directly():
+    """14 removed innates (Aggrandize, Gift Bearer, Sight Seer…) had a 404 src that onerror swapped later."""
+    from patch.elements import ability_change, INNATE_ICON_URL
+    from patch.images import _LOCAL_ABIL_ICONS
+    assert "dark_seer_aggrandize" not in _LOCAL_ABIL_ICONS
+    html = ability_change(old=dict(name="Aggrandize", slug="dark_seer_aggrandize", innate=True, desc=["Passive."]),
+                          new=dict(name="Normal Punch", slug="dark_seer_normal_punch", innate=True, desc=["Passive."]))
+    assert "dark_seer_aggrandize.png" not in html
+    assert INNATE_ICON_URL in html
+
+
+def test_full_build_prunes_pages_it_did_not_write(tmp_path):
+    import os
+    import time
+    import build_site
+    (tmp_path / "patches").mkdir()
+    (tmp_path / "icons").mkdir()
+    old_page, new_page, icon_page = tmp_path / "patches" / "7.20.html", tmp_path / "patches" / "7.41.html", tmp_path / "icons" / "x.html"
+    for f in (old_page, new_page, icon_page):
+        f.write_text("x", encoding="utf-8")
+    past = time.time() - 3600
+    os.utime(old_page, (past, past))
+    os.utime(icon_page, (past, past))          # copied folders keep their source mtimes
+    build_site._prune_stale_pages(tmp_path, time.time() - 60)
+    assert not old_page.exists() and new_page.exists() and icon_page.exists()
+
+
 def test_every_page_head_has_the_phone_viewport_and_local_fonts():
     import builders.site_common as site
     head = site.head_common("../")

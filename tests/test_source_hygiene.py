@@ -36,6 +36,17 @@ def test_no_control_characters_in_sources():
     assert bad == [], "invisible control characters (a double-escaped '\\b' / '\\x..'?):\n" + "\n".join(bad[:20])
 
 
+def test_formula_minus_is_a_hyphen_like_valve_writes_it():
+    """Valve writes "60.5s - 0.5s per level"; 14 of our formula strings had a true minus "−" (audit 2026-10-05)."""
+    import re
+    bad = []
+    for f in sorted(os.listdir(os.path.join(HERE, "content"))):
+        if f.startswith("p") and f.endswith(".py"):
+            with open(os.path.join(HERE, "content", f), encoding="utf-8") as fh:
+                bad += [f"{f}:{n}" for n, line in enumerate(fh, 1) if re.search("\\ds − \\d", line)]
+    assert bad == [], "true minus in a formula string:\n" + "\n".join(bad[:20])
+
+
 def test_no_double_full_stop_in_patch_text():
     """A shortened Valve sentence left "250 gold.. Cast Range" on Helm of the Overlord 7.38c (audit 2026-10-05).
     Exactly two dots before a word; "..." stays allowed."""

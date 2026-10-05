@@ -348,7 +348,7 @@ def build():
     W(ability("Admiral's Rum"))
     W(ul_open())
     W(li_formula("Cooldown decreased",
-                 "60.5s − 0.5s per level", "50.5s − 0.5s per level",
+                 "60.5s - 0.5s per level", "50.5s - 0.5s per level",
                  lambda L: 60.5 - 0.5 * L, lambda L: 50.5 - 0.5 * L, l=True,
                  value_fmt="{:g}s"))
     W(ul_close())

@@ -3201,7 +3201,7 @@ def build():
     # Marci
     W(hero_header("Marci"))
     _marci_cd_pill, _marci_cd_table = scale_pill(
-        "245s − 5s per level",
+        "245s - 5s per level",
         lambda L: 245.0 - 5.0 * L,
         value_fmt="{:.0f}s",
     )
@@ -4768,7 +4768,7 @@ def build():
     W(li("Base Health Regen decreased from 1 to 0", b(1, 0)))
     W(ul_close())
     _ta_ramp_pill, _ta_ramp_table = scale_pill(
-        "2.05s − 0.05s per level",
+        "2.05s - 0.05s per level",
         lambda L: 2.05 - 0.05 * L,
         value_fmt="{:.2f}s",
     )
@@ -5263,7 +5263,7 @@ def build():
     # Visage
     W(hero_header("Visage"))
     _visage_satg_pill, _visage_satg_table = scale_pill(
-        "45.75s − 0.75s per level",
+        "45.75s - 0.75s per level",
         lambda L: 45.75 - 0.75 * L,
         value_fmt="{:.2f}s",
     )
@@ -5296,7 +5296,7 @@ def build():
     W(li("Silent as the Grave is now an innate ability (previously granted by Aghanim's Scepter)", t("REWORK")))
     W(li("Mana Cost decreased from 115 to 50", b(115, 50, l=True)))
     W(li_formula("Cooldown changed",
-                 "45s", "45.75s − 0.75s per level",
+                 "45s", "45.75s - 0.75s per level",
                  lambda L: 45.0, lambda L: 45.75 - 0.75 * L,
                  l=True, value_fmt="{:.2f}s"))
     W(ul_close())

@@ -1490,7 +1490,7 @@ def build():
     W(ability("Switch Discipline", slug="kez_switch_weapons"))
     W(ul_open())
     W(li_formula("Cooldown reduction per level increased from 0.2s to 0.25s. Cooldown changed",
-                 "8s − 0.2s per level", "8s − 0.25s per level",
+                 "8s - 0.2s per level", "8s - 0.25s per level",
                  lambda L: 8 - 0.2 * L, lambda L: 8 - 0.25 * L, l=True,
                  value_fmt="{:g}s"))
     W(li("Katana Base Attack Time improved from 2.0s to 1.8s", b(2.0, 1.8, l=True)))

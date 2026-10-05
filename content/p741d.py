@@ -503,7 +503,7 @@ def build():
     W(ability("Special Delivery", slug="marci_special_delivery"))
     W(ul_open())
     W(li_formula("Cooldown decreased",
-                 "245s − 5s per level", "215s − 5s per level",
+                 "245s - 5s per level", "215s - 5s per level",
                  lambda L: 245 - 5 * L, lambda L: 215 - 5 * L, l=True))
     W(ul_close())
     W(ability("Bodyguard", slug="marci_bodyguard"))
@@ -815,7 +815,7 @@ def build():
     W(ul_open())
     W(li("Time until meditation starts decreased from 0.25s to 0.2s", b(0.25, 0.2, l=True)))
     W(li_formula("Meditation Time Until Max Bonus decreased",
-                 "2.05s − 0.05s per level", "1.85s − 0.05s per level",
+                 "2.05s - 0.05s per level", "1.85s - 0.05s per level",
                  lambda L: 2.05 - 0.05 * L, lambda L: 1.85 - 0.05 * L, l=True))
     W(ul_close())
     W(subgroup("Talents"))

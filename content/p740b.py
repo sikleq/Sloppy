@@ -678,7 +678,7 @@ def build():
     W(ability("Nature's Guise", slug="treant_natures_guise"))
     W(ul_open())
     W(li_formula("Cooldown decreased",
-                 "50s − 3s per 2 level ups", "35s − 1s per level up",
+                 "50s - 3s per 2 level ups", "35s - 1s per level up",
                  lambda L: 50 - 3 * ((L - 1) // 2), lambda L: 35 - (L - 1), l=True,
                  value_fmt="{:g}s"))
     W(ul_close())

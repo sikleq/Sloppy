@@ -26,6 +26,20 @@ import time
 from pathlib import Path
 
 
+def _prune_stale_pages(dist: Path, started: float) -> None:
+    """Delete the HTML pages a FULL, successful build did not write (audit 2026-10-05). dist/ is never wiped, so
+    pages of patches, items and units the site dropped stayed behind: 76 old patch fragments (7.09-7.32e) and 66
+    item/unit pages linking to them — local only (CI builds from scratch), but they filled the local server and
+    every link/HTML check with false errors. Copied folders (src/, icons/) keep their own mtimes and are skipped."""
+    copied = {dist / "src", dist / "icons"}
+    stale = [f for f in dist.rglob("*.html")
+             if f.stat().st_mtime < started and not any(c in f.parents for c in copied)]
+    for f in stale:
+        f.unlink()
+    if stale:
+        print(f"  Removed {len(stale)} stale page(s) the build no longer writes")
+
+
 def _minify_assets(dist: Path):
     """Minify CSS and JS files in dist/ (source files untouched)."""
     try:
@@ -124,6 +138,7 @@ def main() -> int:
         print(f"  [--latest] building only the newest patch page (patch step only)")
 
     t0 = time.monotonic()
+    build_started = time.time() - 2          # mtime floor of the pages this run writes (2s clock slack)
     failed = []
 
     for key, script, desc in steps:
@@ -163,6 +178,8 @@ def main() -> int:
     # Minify CSS and JS copies in dist/ (source files stay readable)
     _minify_assets(_dist)
     print("  [OK]")
+    if not failed and not filter_keys:
+        _prune_stale_pages(_dist, build_started)
 
     total = time.monotonic() - t0
     print(f"\n{SEP2}")

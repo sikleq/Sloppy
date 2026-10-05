@@ -88,6 +88,13 @@
       "category": "Patch Reader",
       "minor": true,
       "fix": true,
+      "title": "Icons of removed innates load without errors; formulas write the minus the way Valve does (\"60.5s - 0.5s\")"
+    },
+    {
+      "date": "2026-10-05",
+      "category": "Patch Reader",
+      "minor": true,
+      "fix": true,
       "title": "Badges compare the right values: 7.41 enchantment tiers, [[icons/items/bloodstone.png|Bloodstone]] 7.41c (−4%), Night Stalker 7.38; Valve's own wording back on Heaven's Halberd, Rubick and the 7.38 flooded camps"
     },
     {
