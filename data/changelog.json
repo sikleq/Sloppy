@@ -79,6 +79,12 @@
     },
     {
       "date": "2026-10-05",
+      "category": "Site",
+      "minor": true,
+      "title": "Pages load faster: fonts and the patch background now come from the site itself (background 437 KB → 108 KB)"
+    },
+    {
+      "date": "2026-10-05",
       "category": "Patch Reader",
       "minor": true,
       "fix": true,

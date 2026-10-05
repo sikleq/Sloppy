@@ -1596,11 +1596,7 @@ def render_html() -> str:
     return (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
         '<title>SIKLE | Hero Stats</title>\n'
-        + _site.favicon_links() +
-        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-        '<link rel="stylesheet" '
-        'href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&display=block">\n'
+        + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={ASSET_VERSION}">\n'
         '</head>\n<body>\n'
         f'{nav}\n'

@@ -313,13 +313,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <title>SIKLE | Silent Changes {version}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&display=swap">
-<link rel="stylesheet" href="../../styles.css?v={asset}">
-<link rel="icon" type="image/svg+xml" href="../../icons/favicon/favicon.svg">
-<link rel="icon" type="image/png" sizes="96x96" href="../../icons/favicon/favicon-96x96.png">
-<link rel="shortcut icon" href="../../icons/favicon/favicon.ico">
+{head}<link rel="stylesheet" href="../../styles.css?v={asset}">
 </head>
 <body>
 <div class="sc-page">
@@ -372,7 +366,7 @@ def build_page(version: str) -> str | None:
         '<a class="sc-back" href="../../">← All Patches</a>'
     )
     return PAGE_TEMPLATE.format(version=version, prev=prev, body=body, back_link=back_link,
-                                asset=_site.compute_asset_version())
+                                asset=_site.compute_asset_version(), head=_site.head_common("../../"))
 
 
 def main() -> int:

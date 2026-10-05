@@ -352,13 +352,9 @@ def save_index_html():
         '<head>\n'
         '<meta charset="UTF-8">\n'
         '<title>SIKLE | dota.vpk</title>\n'
-        + _site.favicon_links() +
-        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-        '<link rel="stylesheet" '
-        # Handjet = pixel/dot-matrix font WITH Cyrillic (Jersey 10 is Latin-only),
-        # used for the signature wall so Cyrillic member names render in-style.
-        'href="https://fonts.googleapis.com/css2?family=Handjet:wght@400..700&family=Jersey+10&family=Jersey+25&display=block">\n'
+        # Handjet = pixel/dot-matrix font WITH Cyrillic (Jersey 10 is Latin-only), used for the signature
+        # wall so Cyrillic member names render in-style; self-hosted like Jersey (styles.css @font-face)
+        + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={_ASSET_VERSION}">\n'
         '</head>\n'
         '<body>\n'

@@ -237,13 +237,8 @@ def build():
     nav = _site.render_top_nav("changelog", _latest_href())
     page = (
         '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-        '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         '<title>SIKLE | Changelog</title>\n'
-        + _site.favicon_links() +
-        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-        '<link rel="stylesheet" '
-        'href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&display=block">\n'
+        + _site.head_common() +
         f'<link rel="stylesheet" href="styles.css?v={asset_v}">\n'
         '</head>\n<body class="clog-page">\n'
         f'{nav}\n'

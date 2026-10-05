@@ -42,9 +42,7 @@ def write_head(version, date):
 <head>
 <meta charset="UTF-8">
 <title>SIKLE | Patch {version}</title>
-{_site.favicon_links(prefix="../")}<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&display=block">
+{_site.head_common(prefix="../")}
 <link rel="stylesheet" href="../styles.css?v={_ASSET_VERSION}">
 </head>
 <body class="patch-page">

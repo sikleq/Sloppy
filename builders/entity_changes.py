@@ -114,10 +114,7 @@ def _collect():
 
 def _head(title: str, asset: str, prefix: str, body_cls: str) -> str:
     return ('<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n'
-            f'<title>SIKLE | {_esc(title)}</title>\n' + _site.favicon_links(prefix=prefix) +
-            '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-            '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Jersey+25&display=block">\n'
+            f'<title>SIKLE | {_esc(title)}</title>\n' + _site.head_common(prefix=prefix) +
             f'<link rel="stylesheet" href="{prefix}styles.css?v={asset}">\n</head>\n<body class="{body_cls}"')
 
 

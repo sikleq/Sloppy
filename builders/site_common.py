@@ -17,6 +17,19 @@ _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 DIST_DIR = _os.path.join(_HERE, "dist")
 
 
+PRELOAD_FONTS = ("jersey10-latin", "jersey25-latin")
+
+
+def head_common(prefix=""):
+    """Shared <head> lines for every page (audit 2026-10-05): the phone viewport (95 patch pages, the index and
+    the tables had none — phones drew a 980px page at 40%), the preloaded latin font files (self-hosted in
+    src/fonts, @font-face in styles.css; Google Fonts were two extra hosts) and the favicons."""
+    preload = "".join(f'<link rel="preload" href="{prefix}src/fonts/{name}.woff2" as="font" type="font/woff2" '
+                      f'crossorigin>\n' for name in PRELOAD_FONTS)
+    return ('<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+            + preload + favicon_links(prefix))
+
+
 def favicon_links(prefix=""):
     """Render the shared favicon <link> block. `prefix` is "" for root pages
     and "../" for files under /patches/ so paths resolve correctly."""

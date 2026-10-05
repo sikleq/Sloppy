@@ -129,3 +129,27 @@ def test_nerf_formula_with_green_endpoints_shows_its_worst_level():
     _, badge, _ = bf(rank_step([24.0, 20.0, 16.0, 12.0]), lambda L: 24.5 - 0.5 * L, "24.5s - 0.5s per level", l=True)
     assert 'data-force-left="nerf"' in badge
     assert '<span class="badge nerf5">+21%</span><span class="formula-endpoint-label">L20</span>' in badge
+
+
+def test_every_page_head_has_the_phone_viewport_and_local_fonts():
+    import builders.site_common as site
+    head = site.head_common("../")
+    assert head.count('name="viewport" content="width=device-width, initial-scale=1"') == 1
+    for name in site.PRELOAD_FONTS:
+        assert f'href="../src/fonts/{name}.woff2" as="font"' in head
+        assert (ROOT / "src" / "fonts" / f"{name}.woff2").exists()
+
+
+def test_no_page_builder_loads_google_fonts_or_the_steam_background():
+    srcs = list((ROOT / "builders").glob("*.py")) + list((ROOT / "patch").glob("*.py")) + [ROOT / "styles.css"]
+    needles = ("fonts.googleapis", "fonts.gstatic", "dota_react/backgrounds/featured.jpg")
+    hits = [f.name for f in srcs if any(n in f.read_text(encoding="utf-8") for n in needles)]
+    assert hits == []
+
+
+def test_self_hosted_font_files_exist():
+    import re
+    css = (ROOT / "styles.css").read_text(encoding="utf-8")
+    for path in set(re.findall(r"url\('(src/fonts/[^']+)'\)", css)):
+        assert (ROOT / path).exists(), path
+    assert (ROOT / "icons" / "ui" / "bg" / "patch_bg.jpg").exists()
