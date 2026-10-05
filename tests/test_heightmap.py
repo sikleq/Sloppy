@@ -50,7 +50,8 @@ def test_a_file_whose_detail_does_not_fit_its_flags_is_refused():
 
 def test_bands_follow_the_game_levels():
     assert [heightmap.band(v) for v in (0, 16, 128, 144, 256, 384, 512, 640, 768, 1100)] == [0, 0, 1, 1, 2, 3, 4, 5, 6, 6]
-    assert [label for *_x, label in heightmap.BANDS][:3] == ["River 0", "Low 128", "High 256"]
+    # the key shows the numbers only (the owner 2026-10-05: "instead of River 0, Base 512 keep only the values")
+    assert [label for *_x, label in heightmap.BANDS] == ["0", "128", "256", "384", "512", "640", "768+"]
 
 
 def test_overlay_fills_bands_and_draws_the_step_on_the_upper_side():
@@ -88,5 +89,14 @@ def test_terrain_page_gets_the_heights_layer_button_and_key():
     assert 'data-layer="heights"' in top and "tc_heights.png" in top
     assert 'data-layer="heights"' not in terrain._controls_html(layers=True)[0]
     html = terrain._compare_html("7.40c", "7.41", markers_svg='<svg class="tc-markers tm-layer tm-layer-heights tm-old">')
-    assert 'class="tc-heights-key"' in html and "River 0" in html and "--c:rgb(52, 132, 218)" in html
+    assert 'class="tc-heights-key"' in html and '</span>768+</span>' in html and "--c:rgb(52, 132, 218)" in html
+    assert "River" not in html and "Base" not in html
     assert "tc-heights-key" not in terrain._compare_html("7.40c", "7.41", markers_svg="<svg></svg>")
+
+
+def test_the_control_bar_keeps_one_row_with_the_heights_button():
+    """16 layer toggles + Zoom + Full wrapped at a 6px gap once Heights was added (the owner 2026-10-05: "the new
+    filter doesn't fit in one line"); a 2px minimum fits a 1280-px window's 685-px bar (628 px of buttons)."""
+    css = open(os.path.join(_ROOT, "styles.css"), encoding="utf-8").read()
+    bar = css.replace("\r\n", "\n").split("\n.tc-controls-bar {", 1)[1].split("}", 1)[0]   # the bar's own rule
+    assert "gap: 2px;" in bar and "justify-content: space-between;" in bar

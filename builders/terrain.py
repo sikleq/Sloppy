@@ -965,7 +965,7 @@ def _height_bands():
 
 
 def _heights_legend():
-    """The Heights layer's key, bottom-left on the map, shown only while the layer is on (.show-heights)."""
+    """The Heights layer's key, top-left on the map, shown only while the layer is on (.show-heights)."""
     items = "".join(f'<span class="tc-hk-item"><span class="tc-hk-sw" style="--c:rgb{rgb}"></span>{_esc(label)}</span>'
                     for _top, rgb, label in _height_bands())
     return f'<div class="tc-heights-key" aria-hidden="true"><span class="tc-hk-title">Height</span>{items}</div>\n'

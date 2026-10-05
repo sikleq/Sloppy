@@ -37,6 +37,13 @@
       "title": "Changelog: the tall map animations no longer fill a third of the screen"
     },
     {
+      "date": "2026-10-05",
+      "category": "Terrain",
+      "minor": true,
+      "link": "terrain_741.html",
+      "title": "Terrain: the layer buttons fit one row again; the height key shows numbers only"
+    },
+    {
       "date": "2026-10-04",
       "category": "Terrain",
       "title": "Terrain: every map since 7.08, every change shown",

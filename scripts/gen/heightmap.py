@@ -36,9 +36,10 @@ MAGIC = b"vhcg"
 NONE = -16384.0
 FRAME_X0, FRAME_Y0, FRAME_W, FRAME_H, STEP = -10240, -10752, 640, 656, 32
 # the bands of the Heights layer: (upper bound, RGB, label). Levels are the game's: river 0, low 128, high 256, …
-BANDS = [(64, (52, 132, 218), "River 0"), (192, (88, 170, 72), "Low 128"), (320, (206, 194, 72), "High 256"),
-         (448, (228, 144, 56), "384"), (576, (214, 84, 62), "Base 512"), (704, (176, 86, 176), "640"),
-         (1e9, (150, 150, 160), "Walls 768+")]
+# labels are the numbers only (the owner 2026-10-05: "instead of River 0, Base 512 keep only the values")
+BANDS = [(64, (52, 132, 218), "0"), (192, (88, 170, 72), "128"), (320, (206, 194, 72), "256"),
+         (448, (228, 144, 56), "384"), (576, (214, 84, 62), "512"), (704, (176, 86, 176), "640"),
+         (1e9, (150, 150, 160), "768+")]
 FILL_A, EDGE_A = 95, 225          # band fill and contour alpha
 LOW_FILL_A = 40                   # low ground, the commonest level, stays light so the map shows through
 

@@ -9717,7 +9717,10 @@ a.tsp-label:hover, a.tsp-label:focus-visible { color: #e3c46a; text-decoration-c
   /* spread over the map's width like a header of it: the first button at the map's left edge, the last at its right,
      the gaps between all equal (the owner 2026-10-02) */
   justify-content: space-between;
-  gap: 6px;
+  /* a 2px minimum, not 6: with the Heights button (2026-10-05) 16 layer toggles + Zoom + Full no longer fit one row
+     ("the new filter doesn't fit in one line with the rest"); space-between still spreads the spare width, so on a
+     wide screen the gaps look as before, and a 1280-px window fits one row too (685-px bar, 628 px of buttons) */
+  gap: 2px;
   padding: 0 0 10px;
 }
 .tc-sep {
