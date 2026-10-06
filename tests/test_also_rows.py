@@ -43,6 +43,27 @@ def test_a_lane_creep_gets_a_page_from_general_rows(tmp_path, monkeypatch):
     assert "Meeting point" in ents[("unit", "creep-goodguys-melee")]["patches"][0]["body"]
 
 
+def test_every_roster_unit_gets_a_page_even_without_changes(monkeypatch):
+    """Owner 2026-10-06: unit cards must be clickable like items — a page that says there are no changes."""
+    monkeypatch.setattr(ec, "_unit_camp_map", lambda: {"npc_dota_neutral_polar_furbolg_champion": "Large",
+                                                       "npc_dota_neutral_kobold": "Small"})
+    monkeypatch.setattr(ec, "_creep_display_names", lambda: {"npc_dota_neutral_polar_furbolg_champion": "Hellbear Smasher",
+                                                             "npc_dota_neutral_kobold": "Kobold"})
+    have = [{"kind": "unit", "slug": "kobold", "icon": "../icons/units/npc_dota_neutral_kobold.png", "patches": [1]}]
+    out = ec._unchanged_units(have)
+    names = {e["name"]: e for e in out}
+    assert "Kobold" not in names                                   # it has a change page already
+    assert names["Hellbear Smasher"]["slug"] == "hellbear-smasher" and names["Hellbear Smasher"]["patches"] == []
+    assert {"Necronomicon Warrior", "Necronomicon Archer"} <= set(names)
+    assert names["Necronomicon Warrior"]["_current"] is False      # removed: behind "Show deleted"
+
+
+def test_annotated_patches_are_named_as_ranges(monkeypatch):
+    monkeypatch.setattr(ec, "RELEASE_HISTORY", [{"version": v} for v in ("9.41b", "9.41a", "9.41", "9.40", "9.09", "9.08")])
+    monkeypatch.setattr(ec, "_ANN", ["9.41b", "9.41a", "9.41", "9.08"])
+    assert ec._annotated_ranges() == "9.08, 9.41–9.41b"
+
+
 def test_an_unknown_key_without_a_page_only_feeds_the_squares(tmp_path, monkeypatch):
     ents = _collect(tmp_path, monkeypatch, {"9.41": _page(_row("Skeleton rally", "unit|skeleton-warrior"))})
     assert ("unit", "skeleton-warrior") not in ents

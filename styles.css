@@ -2764,8 +2764,9 @@ h2.section {
     0 2px 4px var(--shadow-60),
     inset 0 0 0 1px var(--white-12),
     0 0 8px var(--white-22),
-    0 0 0 1.5px rgba(227, 196, 106, 0.95),
-    0 0 0 2.5px rgba(0, 0, 0, 0.85);
+    0 0 0 2.5px rgba(227, 196, 106, 0.95),
+    0 0 0 3.5px rgba(0, 0, 0, 0.85),
+    0 0 9px 2px rgba(227, 196, 106, 0.45);
 }
 /* Current patch (the page the user is on) — thin faint blue outline in
    the same style as .cal-patch.current in the calendar, just slimmer
@@ -2777,11 +2778,13 @@ h2.section {
      background. box-shadow paints in source order top→bottom, so gold
      covers the inner 1.5px of the wider 2.5px black layer and leaves
      1px of black exposed as the outermost ring. */
+  /* 2026-10-06 (owner: "не видно, что патч выделен"): ring 1.5px -> 2.5px, black edge 3.5px, a soft gold glow */
   box-shadow:
     0 1px 1.5px var(--shadow-50),
     inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 0 0 1.5px rgba(227, 196, 106, 0.95),
-    0 0 0 2.5px rgba(0, 0, 0, 0.85);
+    0 0 0 2.5px rgba(227, 196, 106, 0.95),
+    0 0 0 3.5px rgba(0, 0, 0, 0.85),
+    0 0 9px 2px rgba(227, 196, 106, 0.45);
 }
 /* The convex highlight + specular layers used to live on ::before/::after
    with mix-blend-mode: screen. They've been folded directly into
