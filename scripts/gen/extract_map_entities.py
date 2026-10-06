@@ -164,14 +164,26 @@ def _current(e):
     """A river current: its spline nodes in world units (node = position, in- and out-tangent, 3 numbers each,
     relative to the entity), and each node's width scale."""
     o, raw = _vec(e.get("origin")), e.get("pathnodes") or []
+    # the nodes are in the entity's own frame: turned by its yaw (the two Dire currents of 7.41 are at 180°, drawn
+    # mirrored off the water until 2026-10-06 — the owner: "Слой течений воды неправильный")
+    yaw = math.radians(_vec(e.get("angles"))[1])
+    c, s = math.cos(yaw), math.sin(yaw)
+
+    def turn(x, y):
+        return x * c - y * s, x * s + y * c
     nodes = []
     for i in range(0, len(raw) - 8, 9):
-        x, y = raw[i] + o[0], raw[i + 1] + o[1]
-        nodes.append({"x": int(round(x)), "y": int(round(y)),
-                      "in": [int(round(raw[i + 3])), int(round(raw[i + 4]))],
-                      "out": [int(round(raw[i + 6])), int(round(raw[i + 7]))]})
+        x, y = turn(raw[i], raw[i + 1])
+        ix, iy = turn(raw[i + 3], raw[i + 4])
+        ox, oy = turn(raw[i + 6], raw[i + 7])
+        nodes.append({"x": int(round(x + o[0])), "y": int(round(y + o[1])),
+                      "in": [int(round(ix)), int(round(iy))], "out": [int(round(ox)), int(round(oy))]})
+    # each node's radius in world units (where the current acts: the buff zone matches the water's banks on the
+    # renders) and its strength (1 moderate, 2 strong — 7.38: "up to 100 / up to 150 bonus movement speed")
     scales = e.get("pathnoderadiusscales") or []
-    return {"nodes": nodes, "radius": [round(s, 2) for s in scales] if isinstance(scales, list) else []}
+    types = e.get("pathnodemovespeedtypes") or []
+    return {"nodes": nodes, "radius": [round(s, 2) for s in scales] if isinstance(scales, list) else [],
+            "types": [int(t) for t in types] if isinstance(types, list) else []}
 
 
 def _layers(by, zones, bounds):

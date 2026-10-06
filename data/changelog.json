@@ -7,9 +7,9 @@
       "title": "Terrain: [[icons/ui/gothic/tc_lanes.png|Lane creep paths]], [[icons/ui/gothic/tc_currents.png|river currents]], [[icons/ui/gothic/tc_shops.png|shops]] and [[icons/ui/gothic/tc_spawns.png|spawn points]] from the map file",
       "link": "terrain_741.html",
       "items": [
-        "Where every wave walks, Radiant and Dire, in every patch since 7.37e",
-        "Changes the notes don't mention show up: 7.39 and 7.39b moved lane paths",
-        "No-ward zones join No-ward ground, the Roshan pit joins Roshan; 7.38c and 7.40 path notes get pictures"
+        "Where every wave walks, Radiant and Dire, since 7.37e; no-ward zones and the Roshan pit join their layers",
+        "Currents show where their speed bonus acts: +150 or +100 (all +150 since 7.41), arrows downstream",
+        "Press a chip to outline what changed — even what the notes skip (7.39, 7.39b lane paths)"
       ],
       "shots": ["icons/changelog/2026-10-06_terrain_layers.webp"]
     },

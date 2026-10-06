@@ -28,6 +28,7 @@ import ast as _ast
 import functools as _functools
 import glob as _glob
 import json as _json
+import math as _math
 import os as _os
 import sys as _sys
 
@@ -325,6 +326,66 @@ _SHOP_COLOUR = "#e3c46a"
 _SHOP_NAME = {"0": "Home shop", "1": "Side shop", "2": "Secret shop"}
 
 
+_CURRENT_ARROW_EVERY = 1100     # world units between the flow arrows along a current
+_CURRENT_ARROW = 5.5            # half-size of a flow arrow, viewBox units
+
+
+def _ring_path(rings, proj):
+    """Closed rings as one SVG path (fill-rule even-odd: an island in the stream stays dry)."""
+    out = []
+    for ring in rings:
+        if len(ring) > 2:
+            p = [proj(x, y) for x, y in ring]
+            out.append("M" + " L".join(f"{x:.1f},{y:.1f}" for x, y in p) + "Z")
+    return "".join(out)
+
+
+def _flow_arrows(line, proj):
+    """Chevrons along a current's centre line, pointing downstream (the nodes run downstream: from the stream's
+    beginning near a base — 7.38 "starting near the T3 towers … down to the T1 towers"); the bonus is downstream only
+    ("going upstream inflicts no penalty")."""
+    out, walked, nxt = [], 0.0, _CURRENT_ARROW_EVERY / 2
+    for (ax, ay), (bx, by) in zip(line, line[1:]):
+        seg = _math.hypot(bx - ax, by - ay)
+        while seg and walked + seg >= nxt:
+            t = (nxt - walked) / seg
+            (px, py), (qx, qy) = proj(ax + (bx - ax) * t, ay + (by - ay) * t), proj(bx, by)
+            d = _math.hypot(qx - px, qy - py) or 1.0
+            ux, uy = (qx - px) / d, (qy - py) / d          # downstream, in viewBox units
+            s = _CURRENT_ARROW
+            out.append(f'<polyline points="{px - s * ux + s * uy:.1f},{py - s * uy - s * ux:.1f} {px:.1f},{py:.1f} '
+                       f'{px - s * ux - s * uy:.1f},{py - s * uy + s * ux:.1f}"/>')
+            nxt += _CURRENT_ARROW_EVERY
+        walked += seg
+    return "".join(out)
+
+
+_CURRENT_ZONE = {150: ("#3f9cf0", 0.5), 100: ("#8fd0ff", 0.3)}     # max bonus speed -> fill, its opacity
+
+
+def _current_svg(lines, areas, proj):
+    """The river currents (the owner 2026-10-06: "точно покажи места, где юнит получает скорость от течения, т.е там,
+    где действует бафф, а не просто линию течения"): each current's buff zone — its spline swept by each node's
+    radius, traced by scripts/gen/build_terrain_diff.current_areas; on the renders it lies on the stream's water bank
+    to bank — filled by its max bonus (7.38–7.40c: strong +150 deeper, moderate +100 paler; 7.41 made them all +150),
+    one opacity per group so two zones that overlap are not darker, outlined, with arrows downstream."""
+    body = ""
+    for bonus, (colour, opacity) in _CURRENT_ZONE.items():
+        fill = "".join(f'<path d="{_ring_path(a["rings"], proj)}" fill-rule="evenodd"/>'
+                       for a in areas if a["rings"] and a["max"] == bonus)
+        if fill:
+            body += (f'<g class="tc-current-zone tc-current-{bonus}" fill="{colour}" opacity="{opacity}">'
+                     f'{fill}</g>')
+    edge = "".join(f'<path d="{_ring_path(a["rings"], proj)}"/>' for a in areas if a["rings"])
+    arrows = "".join(_flow_arrows(line, proj) for line in lines if len(line) > 1)
+    if edge:
+        body += f'<g fill="none" stroke="#9fd6ff" stroke-width="1.2" stroke-opacity="0.85">{edge}</g>'
+    if arrows:
+        body += (f'<g class="tc-current-flow" fill="none" stroke="#e6f6ff" stroke-width="1.8" '
+                 f'stroke-linecap="round" stroke-linejoin="round">{arrows}</g>')
+    return body
+
+
 def _line_zone_svgs(diff, proj):
     """Lane creep paths (Radiant solid, Dire dashed: the two walk the same lane), river currents, shop zones with
     the neutral item stashes, hero / courier spawn points; no-ward zones join the No-ward layer, the Roshan pit
@@ -354,12 +415,9 @@ def _line_zone_svgs(diff, proj):
             body += dots([p["points"][0] for p in lanes], 5, "#0d100b")          # where each wave starts
             out.append(layer("lanes", side, body))
         currents = (diff.get("currents") or {}).get(side) or []
-        if currents:
-            body = "".join(f'<polyline points="{pts(c)}" fill="none" stroke="{_CURRENT_COLOUR}" stroke-opacity="0.45" '
-                           f'stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>'
-                           f'<polyline points="{pts(c)}" fill="none" stroke="#d6efff" stroke-width="1.6" '
-                           f'stroke-dasharray="4 6"/>' for c in currents if len(c) > 1)
-            out.append(layer("currents", side, body))
+        areas = (diff.get("currentAreas") or {}).get(side) or []
+        if currents or areas:
+            out.append(layer("currents", side, _current_svg(currents, areas, proj)))
         shops = (zones.get("shops") or {}).get(side) or []
         stash = (ents.get("stash") or {}).get(side) or []
         if shops or stash:
@@ -602,8 +660,7 @@ def _layer_changes(diff):
         n = sum(1 for k, v in new.items() if old.get(k) != v)
         if n:
             out.append(("lane paths", "changed", n, 0, len(new)))
-    cur = diff.get("currents") or {}
-    co, cn = cur.get("old") or [], cur.get("new") or []
+    co, cn = _current_shapes(diff, "old"), _current_shapes(diff, "new")
     if co != cn:
         if len(co) == len(cn):
             out.append(("river currents", "changed", sum(1 for a, b in zip(co, cn) if a != b), 0, len(cn)))
@@ -627,6 +684,15 @@ def _layer_changes(diff):
 
 def _box_key_xy(points):
     return frozenset(tuple(p) for p in points)
+
+
+def _current_shapes(diff, side):
+    """Each current of one side as what the map file changes: its buff zone's rings (a centre line if a diff has no
+    zones). The max bonus is left out — 7.41 changed it in the notes, not in the map file."""
+    areas = (diff.get("currentAreas") or {}).get(side)
+    if areas is not None:
+        return [a["rings"] for a in areas]
+    return [[line] for line in (diff.get("currents") or {}).get(side) or []]
 
 
 # Chip -> the key of its outlines on the map (scripts.js toggles .tm-hl-<key>); spawn boxes have none — the
@@ -871,7 +937,7 @@ def _highlights_svg(diff, proj):
             if body:
                 out.append(f'<svg class="tc-markers tm-hl tm-hl-{key} tm-{side}" data-layer="{layer}" '
                            f'viewBox="0 0 {MAP_VB} {MAP_VB}" preserveAspectRatio="none" aria-hidden="true">{body}</svg>')
-    return "".join(out)
+    return "".join(out) + _layer_highlights_svg(diff, proj)
 
 
 def _hl_kinds(diff):
@@ -879,7 +945,89 @@ def _hl_kinds(diff):
     have = set()
     for g in _changed_points(diff).values():
         have |= {k for k, v in g.items() if v}
+    for parts in _layer_changed(diff).values():
+        have |= {k for k, v in parts.items() if v}
     return [k for k in _HL_KINDS if k in have]
+
+
+# The 2026-10-06 layers' chips as buttons (the owner: "не могу нажать Changed in the map file фильтры новых слоёв"):
+# chip name -> highlight key -> the layer it turns on
+_LAYER_HL = {"lane paths": ("lanes", "lanes"), "river currents": ("currents", "currents"),
+             "shop zones": ("shopzones", "shops"), "Roshan pit zones": ("roshanpit", "roshan"),
+             "no-ward zones": ("nowardzones", "nowards"), "lane creep spawns": ("lanespawns", "lanes"),
+             "hero spawns": ("herospawns", "spawns")}
+
+
+def _layer_changed(diff):
+    """{highlight key: {"moved": [(old, new)], "removed": [old], "added": [new]}} of the 2026-10-06 layers — a line
+    or a zone as its point list, a spawn as its point."""
+    if not diff:
+        return {}
+    out = {}
+    lanes = diff.get("lanes") or {}
+    lo = {(p["team"], p["lane"]): p["points"] for p in lanes.get("old", [])}
+    ln = {(p["team"], p["lane"]): p["points"] for p in lanes.get("new", [])}
+    out["lanes"] = {"moved": [(lo[k], v) for k, v in ln.items() if k in lo and lo[k] != v],
+                    "removed": [], "added": [v for k, v in ln.items() if k not in lo and lo]}
+    co, cn = _current_shapes(diff, "old"), _current_shapes(diff, "new")
+    pairs = list(zip(co, cn))
+    out["currents"] = {"moved": [(a, b) for a, b in pairs if a != b], "removed": co[len(cn):], "added": cn[len(co):]}
+    for key, zkey in (("shopzones", "shops"), ("roshanpit", "roshanPit"), ("nowardzones", "nowardZones")):
+        z = (diff.get("zones") or {}).get(zkey) or {}
+        a, b = z.get("old") or [], z.get("new") or []
+        ka, kb = {_box_key_xy(p) for p in a}, {_box_key_xy(p) for p in b}
+        out[key] = {"moved": [], "removed": [p for p in a if _box_key_xy(p) not in kb],
+                    "added": [p for p in b if _box_key_xy(p) not in ka]}
+    ents = diff.get("entities") or {}
+    for key, ekey in (("lanespawns", "laneSpawns"), ("herospawns", "heroSpawns")):
+        ed = ents.get(ekey) or {}
+        if ed.get("old") and ed.get("new"):
+            a, b = {tuple(p) for p in ed["old"]}, {tuple(p) for p in ed["new"]}
+            removed, added, moved = _pair_moves(sorted(a - b), sorted(b - a), _MOVE_REACH_ENT)
+            out[key] = {"moved": moved, "removed": removed, "added": added}
+    return {k: v for k, v in out.items() if any(v.values())}
+
+
+def _layer_highlights_svg(diff, proj):
+    """The changed lines, zones and spawns of the 2026-10-06 layers, in the chips' colours (old side dashed: where it
+    was; new side solid, a moved line's old place a faint dashed ghost), hidden until their chip is pressed."""
+    def pts(points):
+        return " ".join(f"{proj(x, y)[0]:.1f},{proj(x, y)[1]:.1f}" for x, y in points)
+
+    def group(kind, body, dashed, ghost=False):
+        if not body:
+            return ""
+        dash = ' stroke-dasharray="6 4"' if dashed else ""
+        faint = ' opacity="0.6"' if ghost else ""
+        return (f'<g class="tm-hl-g tm-hl-g-{kind}" fill="none" stroke="{_HL_COLOUR[kind]}" stroke-width="3.2" '
+                f'stroke-linejoin="round"{dash}{faint}>{body}</g>')
+
+    out = []
+    for key, parts in _layer_changed(diff).items():
+        layer = next(lay for k, lay in _LAYER_HL.values() if k == key)
+        point = key in ("lanespawns", "herospawns")
+        closed = key in ("shopzones", "roshanpit", "nowardzones", "currents")
+
+        def draw(shapes):
+            if point:
+                return "".join(f'<circle cx="{proj(x, y)[0]}" cy="{proj(x, y)[1]}" r="{_ENT_DISC + 3}"/>'
+                               for x, y in shapes)
+            if key == "currents":                  # a current is its zone's rings
+                shapes = [ring for rings in shapes for ring in rings]
+            tag = "polygon" if closed else "polyline"
+            return "".join(f'<{tag} points="{pts(s)}"/>' for s in shapes if len(s) > 1)
+        for side in ("old", "new"):
+            moved = [m[0] if side == "old" else m[1] for m in parts.get("moved", [])]
+            body = group("moved", draw(moved), dashed=side == "old")
+            if side == "old":
+                body += group("removed", draw(parts.get("removed", [])), dashed=True)
+            else:
+                body += group("added", draw(parts.get("added", [])), dashed=False)
+                body += group("moved", draw([m[0] for m in parts.get("moved", [])]), dashed=True, ghost=True)
+            if body:
+                out.append(f'<svg class="tc-markers tm-hl tm-hl-{key} tm-{side}" data-layer="{layer}" '
+                           f'viewBox="0 0 {MAP_VB} {MAP_VB}" preserveAspectRatio="none" aria-hidden="true">{body}</svg>')
+    return "".join(out)
 
 
 def _moved_summary(diff):
@@ -1004,7 +1152,8 @@ def _controls_html(layers=True, changes=("", ""), heights=False):
             layer_parts.append(layer_btn(key, label, icon))
         # 2026-10-06 (the owner: "все слои"): straight from the map file's entities
         layer_parts.append(layer_btn("lanes", "Lane creep paths", "tc_lanes"))
-        layer_parts.append(layer_btn("currents", "River currents", "tc_currents"))
+        layer_parts.append(layer_btn("currents", "River currents: where the bonus movement speed acts, downstream "
+                                     "(arrows); deeper blue up to +150, paler up to +100 (before 7.41)", "tc_currents"))
         layer_parts.append(layer_btn("shops", "Shops and neutral item stashes", "tc_shops"))
         layer_parts.append(layer_btn("spawns", "Hero and courier spawn points", "tc_spawns"))
 
@@ -1224,6 +1373,10 @@ def _chip(name, kind, n, removed, total):
         value = f'<b>{n}/{total}</b> <span class="tf-chip-word">{_CHANGED_WORD.get(name, kind)}</span>'
     tip = _esc(f"{name[:1].upper() + name[1:]}: {_strip_tags(value)}")
     key = _HL_KEY.get(name)
+    if name in _LAYER_HL:                     # a 2026-10-06 layer: its own highlight key and layer
+        key, layer = _LAYER_HL[name]
+        return (f'<button type="button" class="tf-chip tf-chip-btn" data-hl="{key}" '
+                f'data-layer="{layer}" aria-pressed="false" data-tooltip="{tip}">{img}{value}</button>')
     if key:
         # pressed: the changed places outlined on the map, its layer turned on (scripts.js initChangeHighlights)
         return (f'<button type="button" class="tf-chip tf-chip-btn" data-hl="{key}" '
