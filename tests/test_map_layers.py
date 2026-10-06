@@ -112,6 +112,26 @@ def test_the_new_layer_chips_are_buttons_that_light_their_outlines():
         assert f"tm-hl tm-hl-{key} tm-new" in terrain._highlights_svg(diff, terrain._projector(terrain._load_map_meta())), key
 
 
+def test_the_lanes_button_explains_its_colours():
+    """The owner 2026-10-06: "что значат красная/зелёные линии?"."""
+    html = "".join(part for part in terrain._controls_html() if isinstance(part, str))
+    btn = html[html.index('data-layer="lanes"'):]
+    title = btn[btn.index('title="') + 7:]
+    title = title[:title.index('"')]
+    assert "green solid" in title and "red dashed" in title and "Ancient" in title
+
+
+def test_each_waves_path_runs_into_the_enemy_base_to_its_ancient():
+    """Why red dashed lines stand alone in the Radiant base: a Dire wave's path goes on past the Radiant barracks (where
+    the Radiant waves spawn) to the Radiant Ancient."""
+    src = json.load(open(os.path.join(ROOT, "data", "map", "mapdata_740c.json"), encoding="utf-8"))["data"]
+    forts = {("good" if f["x"] < 0 else "bad"): (f["x"], f["y"]) for f in src["npc_dota_fort"]}
+    for p in btd.lane_paths(src):
+        enemy = forts["bad" if p["team"] == "good" else "good"]
+        x, y = p["points"][-1]
+        assert abs(x - enemy[0]) < 600 and abs(y - enemy[1]) < 600, p["team"] + p["lane"]
+
+
 def test_published_map_data_holds_no_vision_entities():
     """Vision (fog blockers, revealers) is never drawn on this site, so the site's map data leaves it out; the full
     entity lists, vision included, are in Oldgrowth (scripts/gen/oldgrowth_mapdata.py: entities.json.gz)."""

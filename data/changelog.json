@@ -18,6 +18,13 @@
       "category": "Terrain",
       "minor": true,
       "link": "terrain_741.html",
+      "title": "Terrain: [[icons/ui/gothic/tc_lanes.png|Lane creep paths]] explains its colours on hover — green Radiant, red dashed Dire, each path to the enemy Ancient"
+    },
+    {
+      "date": "2026-10-06",
+      "category": "Terrain",
+      "minor": true,
+      "link": "terrain_741.html",
       "title": "Terrain: Zoom and Fullscreen are icon buttons, so every layer button stays on one line"
     },
     {
