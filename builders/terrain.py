@@ -25,6 +25,7 @@ parsed at build time; a patch whose notes list none says so.
 ``python build_site.py`` runs it (``save_terrain_html``).
 """
 import ast as _ast
+import difflib as _difflib
 import functools as _functools
 import glob as _glob
 import json as _json
@@ -967,7 +968,7 @@ def _layer_changed(diff):
     lanes = diff.get("lanes") or {}
     lo = {(p["team"], p["lane"]): p["points"] for p in lanes.get("old", [])}
     ln = {(p["team"], p["lane"]): p["points"] for p in lanes.get("new", [])}
-    out["lanes"] = {"moved": [(lo[k], v) for k, v in ln.items() if k in lo and lo[k] != v],
+    out["lanes"] = {"moved": [(o, n) for _team, o, n in _lane_stretches(diff) if o or n],
                     "removed": [], "added": [v for k, v in ln.items() if k not in lo and lo]}
     co, cn = _current_shapes(diff, "old"), _current_shapes(diff, "new")
     pairs = list(zip(co, cn))
@@ -988,6 +989,93 @@ def _layer_changed(diff):
     return {k: v for k, v in out.items() if any(v.values())}
 
 
+_LANE_MOVE_TOL = 60     # world units: a stretch of path within this of the other side's path is not marked
+_LANE_STEP = 40         # world units between the samples that find where a path left the old one
+
+
+def _seg_dist(p, a, b):
+    ax, ay, bx, by = a[0], a[1], b[0], b[1]
+    dx, dy = bx - ax, by - ay
+    t = ((p[0] - ax) * dx + (p[1] - ay) * dy) / ((dx * dx + dy * dy) or 1)
+    t = max(0.0, min(1.0, t))
+    return _math.hypot(p[0] - ax - t * dx, p[1] - ay - t * dy)
+
+
+def _moved_runs(path, other):
+    """The runs of `path` that lie farther than _LANE_MOVE_TOL from `other` ([[x, y], …] each, the last sample within
+    reach at each end so a run joins the path)."""
+    samples = []
+    for a, b in zip(path, path[1:]):
+        n = max(1, int(_math.hypot(b[0] - a[0], b[1] - a[1]) // _LANE_STEP))
+        samples += [[round(a[0] + (b[0] - a[0]) * i / n), round(a[1] + (b[1] - a[1]) * i / n)] for i in range(n)]
+    samples.append(list(path[-1]))
+    far = [min(_seg_dist(q, a, b) for a, b in zip(other, other[1:])) > _LANE_MOVE_TOL for q in samples]
+    runs, i = [], 0
+    while i < len(samples):
+        if not far[i]:
+            i += 1
+            continue
+        j = i
+        while j + 1 < len(samples) and far[j + 1]:
+            j += 1
+        runs.append(samples[max(i - 1, 0):j + 2])
+        i = j + 1
+    return [r for r in runs if len(r) > 1]
+
+
+def _lane_stretches(diff):
+    """(team, old runs, new runs) of every changed lane path: only where the path really left its old line — farther
+    than _LANE_MOVE_TOL. The owner 2026-10-06, the whole changed paths in yellow: "слишком много желтых линий… не
+    понимаю, какая к чему относится"; then corners alone were too much: 7.41 moved a Dire top corner 200 units ALONG
+    its line, which lit the whole top lane. A path whose corners changed but whose line stayed put keeps its changed
+    corners' stretch (difflib on the corner lists), so its chip still shows something."""
+    lanes = diff.get("lanes") or {}
+    old = {(p["team"], p["lane"]): p["points"] for p in lanes.get("old", [])}
+    out = []
+    for p in lanes.get("new", []):
+        a, b = old.get((p["team"], p["lane"])), p["points"]
+        if not a or a == b or len(a) < 2 or len(b) < 2:
+            continue
+        runs_old, runs_new = _moved_runs(a, b), _moved_runs(b, a)
+        if not runs_old and not runs_new:
+            ta, tb = [tuple(q) for q in a], [tuple(q) for q in b]
+            for op, i1, i2, j1, j2 in _difflib.SequenceMatcher(None, ta, tb, autojunk=False).get_opcodes():
+                if op != "equal":
+                    runs_old.append([list(q) for q in ta[max(i1 - 1, 0):i2 + 1]])
+                    runs_new.append([list(q) for q in tb[max(j1 - 1, 0):j2 + 1]])
+        out.append((p["team"], runs_old, runs_new))
+    return out
+
+
+def _lane_highlight_svgs(diff, proj):
+    """A lane path chip's outlines: each changed stretch — on the old side yellow dashed (where it ran); on the new side
+    the stretch in its side's colour and style (Radiant green, Dire red dashed, as the layer draws them) over a yellow
+    glow, its old run a thin yellow dashed ghost. Which side's wave it is stays readable."""
+    def pts(points):
+        return " ".join(f"{proj(x, y)[0]:.1f},{proj(x, y)[1]:.1f}" for x, y in points)
+    stretches = _lane_stretches(diff)
+    if not stretches:
+        return []
+    yellow = _HL_COLOUR["moved"]
+    old = "".join(f'<polyline points="{pts(r)}"/>' for _t, runs, _n in stretches for r in runs)
+    ghost = old
+    glow = "".join(f'<polyline points="{pts(r)}"/>' for _t, _o, runs in stretches for r in runs)
+    dash = {"good": "", "bad": ' stroke-dasharray="7 5"'}
+    line = "".join(f'<polyline points="{pts(r)}" stroke="{_LANE_COLOUR[t]}"{dash[t]}/>'
+                   for t, _o, runs in stretches for r in runs)
+    common = 'fill="none" stroke-linejoin="round" stroke-linecap="round"'
+    sides = {
+        "old": f'<g class="tm-hl-g tm-hl-g-moved" {common} stroke="{yellow}" stroke-width="2.6" '
+               f'stroke-dasharray="6 4">{old}</g>',
+        "new": (f'<g class="tm-hl-g tm-hl-g-moved" {common}>'
+                f'<g stroke="{yellow}" stroke-width="1.8" stroke-dasharray="5 4" opacity="0.75">{ghost}</g>'
+                f'<g stroke="{yellow}" stroke-width="10" opacity="0.45">{glow}</g>'
+                f'<g stroke-width="3">{line}</g></g>'),
+    }
+    return [f'<svg class="tc-markers tm-hl tm-hl-lanes tm-{side}" data-layer="lanes" viewBox="0 0 {MAP_VB} {MAP_VB}" '
+            f'preserveAspectRatio="none" aria-hidden="true">{body}</svg>' for side, body in sides.items()]
+
+
 def _layer_highlights_svg(diff, proj):
     """The changed lines, zones and spawns of the 2026-10-06 layers, in the chips' colours (old side dashed: where it
     was; new side solid, a moved line's old place a faint dashed ghost), hidden until their chip is pressed."""
@@ -1004,6 +1092,9 @@ def _layer_highlights_svg(diff, proj):
 
     out = []
     for key, parts in _layer_changed(diff).items():
+        if key == "lanes" and parts.get("moved"):
+            out += _lane_highlight_svgs(diff, proj)
+            continue
         layer = next(lay for k, lay in _LAYER_HL.values() if k == key)
         point = key in ("lanespawns", "herospawns")
         closed = key in ("shopzones", "roshanpit", "nowardzones", "currents")
