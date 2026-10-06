@@ -2284,6 +2284,11 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         classes += ["iab-covered", "covered-cost"]
     cls_attr = f' class="{" ".join(classes)}"' if classes else ""
     attr = f' data-tag="{tag_str}"' if tag_str else ""
+    if also_dyn:
+        # the row also belongs to these entities ("unit|melee-creep"): their squares count it (above) and their
+        # own pages show it under this patch (builders/entity_changes._collect) — owner 2026-10-06: the 7.41 lane
+        # creep rows sat in General Updates and the creep cards stayed unclickable
+        attr += f' data-also="{" ".join(also_dyn if isinstance(also_dyn, list) else [also_dyn])}"'
     trailing_tips = []
     if isinstance(text, str):
         text_base = text

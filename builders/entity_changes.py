@@ -87,6 +87,7 @@ def _collect():
     built = {p["version"] for p in PATCHES}
     order = [r["version"] for r in RELEASE_HISTORY if r["version"] in built]   # newest first
     ents: dict[tuple, dict] = {}
+    also: dict[tuple, list] = {}          # rows other entities' blocks / General Updates link here (data-also)
     for ver in order:
         f = DIST / "patches" / f"{ver}.html"
         if not f.exists():
@@ -109,7 +110,64 @@ def _collect():
                     + body)
             else:
                 last_hero = None
+        for keys, section, row in _also_rows(page):
+            for key in keys:
+                kind, _, slug = key.partition("|")
+                also.setdefault((kind, slug), []).append((ver, section, row))
+    _add_also_rows(ents, also, dates, order)
     return ents
+
+
+_LI_TAG_RE = _re.compile(r"<(/?)li\b[^>]*>")        # not _LI_RE: that name is taken further down
+_ALSO_RE = _re.compile(r'<li\b[^>]*\bdata-also="([^"]+)"[^>]*>')
+_SECTION_RE = _re.compile(r'<h2 class="section"[^>]*>(.*?)</h2>', _re.S)
+
+
+def _also_rows(page: str):
+    """Yield (entity keys, section title, row html) for every row the patch page links to other entities
+    (li(also_dyn=...) -> data-also: the 7.41 lane creep rows of General Updates, a neutral's spell under
+    Invulnerability Targeting)."""
+    for m in _ALSO_RE.finditer(page):
+        depth, end = 0, len(page)
+        for t in _LI_TAG_RE.finditer(page, m.start()):
+            depth += -1 if t.group(1) else 1
+            if depth == 0:
+                end = t.end()
+                break
+        heads = _SECTION_RE.findall(page, 0, m.start())
+        section = _re.sub(r"<[^>]+>", "", heads[-1]).strip() if heads else ""
+        yield m.group(1).split(), section, page[m.start():end]
+
+
+def _add_also_rows(ents: dict, also: dict, dates: dict, order: list) -> None:
+    """Put the linked rows on their entities' pages, under the row's patch (owner 2026-10-06: "Flagbearer Creep
+    Experience Bounty increased from 57 to 60" sat in General Updates, the Flagbearer card had no page). A lane
+    creep gets its entity here; any other key must already have a page (else the row only feeds its squares)."""
+    lane = {_unit_slug(basename): (basename, name) for basename, name in _LANE_UNITS}
+    rank = {v: i for i, v in enumerate(order)}
+    for (kind, slug), rows in also.items():
+        e = ents.get((kind, slug))
+        if e is None and kind == "unit" and slug in lane:
+            basename, name = lane[slug]
+            e = ents[(kind, slug)] = {"kind": kind, "slug": slug, "name": name,
+                                      "icon": f"../icons/units/{basename}.png", "patches": []}
+        if e is None:
+            continue
+        by_ver = {p["version"]: p for p in e["patches"]}
+        groups: dict[tuple, list] = {}                         # (patch, section) -> rows, in page order
+        for ver, section, row in rows:
+            p = by_ver.get(ver)
+            if p is not None and row in p["body"]:            # already in the entity's own block
+                continue
+            groups.setdefault((ver, section or "General Updates"), []).append(row)
+        for (ver, section), sec_rows in groups.items():
+            p = by_ver.get(ver)
+            if p is None:
+                p = by_ver[ver] = {"version": ver, "date": dates.get(ver, ""), "body": ""}
+                e["patches"].append(p)
+            p["body"] += (f'<div class="entity-block ec-also"><h4 class="subgroup">{_esc(section)}</h4>'
+                          f'<ul class="changes">{"".join(sec_rows)}</ul></div>')
+        e["patches"].sort(key=lambda p: rank.get(p["version"], len(rank)))
 
 
 def _head(title: str, asset: str, prefix: str, body_cls: str) -> str:
@@ -844,6 +902,8 @@ _LANE_UNITS = [
     ("npc_dota_creep_goodguys_flagbearer", "Flagbearer Creep"),
     ("npc_dota_goodguys_siege", "Siege Creep"),
 ]
+# a lane creep with a change page (rows linked from General Updates, li(also_dyn=...)) stays in its column
+_UNIT_BUCKET.update({basename: "Lane Creeps" for basename, _ in _LANE_UNITS})
 
 # Units removed from the game — shown only under the "Show deleted" toggle,
 # as (icon basename, display name, column bucket).

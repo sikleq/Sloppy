@@ -1044,6 +1044,17 @@
   // in patch/elements.py. Ordered longest-first so "creep-hero" wins over "creep".
   const DYN_KINDS = ['creep-hero', 'hero', 'item', 'unit', 'plain', 'enchant'];
 
+  // First offset of a row: the page's own patch sits in the middle of the strip (older on the left, newer on
+  // the right), not always the newest 12 — on 7.38 the strip showed 7.39d-7.41f without 7.38 itself, on 7.08
+  // Blink Dagger's was empty (owner 2026-10-06). No version (hero / item pages) -> 0 = the newest patches.
+  function dynDefaultOffset(manifest, currentVersion, n) {
+    const idx = currentVersion ? manifest.patches.findIndex(p => p.version === currentVersion) : -1;
+    if (idx < 0) return 0;
+    const size = n || DYN_MAX_PATCHES;
+    const maxOff = Math.max(0, manifest.patches.length - size);
+    return Math.min(maxOff, Math.max(0, idx - Math.floor(size / 2)));
+  }
+
   function dynWindow(manifest, offset, n) {
     // manifest.patches is newest-first → slice from offset, reverse so the
     // oldest of the window is on the left in the rendered row.
@@ -1532,8 +1543,10 @@
           const buildRow = (e) => {
             if (e.dataset.dynBuilt) return;
             e.dataset.dynBuilt = '1';
-            const off = parseInt(e.dataset.dynOffset || '0', 10);
-            dynRenderRow(e, manifest, dynWindow(manifest, off, dynRowSize(e, manifest)), currentVersion, off);
+            const n = dynRowSize(e, manifest);
+            if (e.dataset.dynOffset === undefined) e.dataset.dynOffset = String(dynDefaultOffset(manifest, currentVersion, n));
+            const off = parseInt(e.dataset.dynOffset, 10);
+            dynRenderRow(e, manifest, dynWindow(manifest, off, n), currentVersion, off);
           };
           // Hero / Item Changes page: the head row is sized from the name's real width, which changes once the
           // pixel font arrives — size it again then (it was left a few squares short)

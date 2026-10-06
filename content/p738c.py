@@ -10,7 +10,7 @@ def build():
     W(li("The tree lines above and below the tower have been reworked", t("REWORK")))
     W(li("The Dire Safe Lane large camp has been moved away from the Dire Safe Lane Tier 1 tower, and had its tree line reduced and rotated to face the river", t("REWORK")))
     W(li("The Dire Safe Lane Tier 1 tower has been moved forward, away from the Dire base and closer to where the creeps initially meet", t("REWORK")))
-    W(li("The Top Lane creep paths have been slightly adjusted so the creeps meet closer to the Dire tower", t("REWORK")))
+    W(li("The Top Lane creep paths have been slightly adjusted so the creeps meet closer to the Dire tower", t("REWORK"), also_dyn=['unit|creep-goodguys-melee', 'unit|creep-goodguys-ranged', 'unit|creep-goodguys-flagbearer', 'unit|goodguys-siege']))
     W(li("The cliff above the Dire Safe Lane small camp has been extended slightly towards the Dire Safe Lane Tier 1 tower, and the small camp has been moved and had its tree line adjusted", t("REWORK")))
     W(li("The ramp leading to the river and the Roshan Pit from the Dire Safe Lane pull area has been moved towards the Pit slightly", t("REWORK")))
     W(li("Several additional tree and visual adjustments have been made to this area", t("MISC")))

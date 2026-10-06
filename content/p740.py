@@ -48,13 +48,13 @@ def build():
         unit="Gold",
     ))
     W(ul_open())
-    W(li("Melee Creep: Gold Bounty now increases by 1 per lane creep upgrade interval (every 7:30)", t("NEW")))
-    W(li("Flagbearer Creep: Gold Bounty now increases by 1 per lane creep upgrade interval", t("NEW")))
-    W(li("Flagbearer Creep: AoE Bounty Radius increased from 1200 to 1500", b(1200, 1500)))
-    W(li("Flagbearer Creep: When killed by a player controlled unit, the Flagbearer Creep always grants Bonus Bounty to the killer's hero regardless of the hero's proximity to the Flagbearer Creep", t("REWORK")))
-    W(li("Flagbearer Creep: Bonus Gold from killing Flagbearers is now classified as creep gold instead of ability gold", t("QoL"), extra=inline_note("Has no gameplay effect, but makes a post game gold breakdown more accurate")))
-    W(li("Flagbearer Creep: Inspiration Aura no longer affects heroes", t("DEL")))
-    W(li("Flagbearer Creep: Inspiration Aura now also provides a magic resistance bonus to affected creeps starting with 0% and improving by 4% with every lane creep upgrade interval, up to a maximum of 15 upgrades", t("NEW")))
+    W(li("Melee Creep: Gold Bounty now increases by 1 per lane creep upgrade interval (every 7:30)", t("NEW"), also_dyn=['unit|creep-goodguys-melee']))
+    W(li("Flagbearer Creep: Gold Bounty now increases by 1 per lane creep upgrade interval", t("NEW"), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Flagbearer Creep: AoE Bounty Radius increased from 1200 to 1500", b(1200, 1500), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Flagbearer Creep: When killed by a player controlled unit, the Flagbearer Creep always grants Bonus Bounty to the killer's hero regardless of the hero's proximity to the Flagbearer Creep", t("REWORK"), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Flagbearer Creep: Bonus Gold from killing Flagbearers is now classified as creep gold instead of ability gold", t("QoL"), extra=inline_note("Has no gameplay effect, but makes a post game gold breakdown more accurate"), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Flagbearer Creep: Inspiration Aura no longer affects heroes", t("DEL"), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Flagbearer Creep: Inspiration Aura now also provides a magic resistance bonus to affected creeps starting with 0% and improving by 4% with every lane creep upgrade interval, up to a maximum of 15 upgrades", t("NEW"), also_dyn=['unit|creep-goodguys-flagbearer']))
     W(ul_close())
     W(ul_open())
     W(li_formula("Courier respawn time decreased",
@@ -145,7 +145,7 @@ def build():
     W(ul_open())
     W(li("Changed the 'bridges' to actual bridges", t("REWORK")))
     W(li("Slightly expanded the entrance to the bridge by the Lotus pools and adjusted the area within the nearby water areas", t("REWORK")))
-    W(li("Very slightly adjusted the paths and spawn points of the Radiant Offlane lane creeps, and the position of the Radiant Offlane Tier 2 tower. This results in creeps pathing to the right of the tier 2 tower instead of sometimes splitting up to go around it", t("REWORK")))
+    W(li("Very slightly adjusted the paths and spawn points of the Radiant Offlane lane creeps, and the position of the Radiant Offlane Tier 2 tower. This results in creeps pathing to the right of the tier 2 tower instead of sometimes splitting up to go around it", t("REWORK"), also_dyn=['unit|creep-goodguys-melee', 'unit|creep-goodguys-ranged', 'unit|creep-goodguys-flagbearer', 'unit|goodguys-siege']))
     W(li("Radiant Secret Shop trigger area moved slightly towards the radiant Tier 1 tower and more centered around the shopkeeper", t("REWORK")))
     W(ul_close())
 
@@ -157,6 +157,7 @@ def build():
     W(ul_close())
     W(subgroup("Neutral Creeps"))
     W(ul_open())
+    # not linked to Satyr Banisher (also_dyn): Valve wrote it twice, its own 7.40 block already has the change
     W(li("Satyr Banisher's Purge can no longer target invulnerable units", t("DEL")))
     W(ul_close())
     W(subgroup("Heroes"))

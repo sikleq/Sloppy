@@ -3,6 +3,24 @@
   "entries": [
     {
       "date": "2026-10-06",
+      "category": "Units",
+      "title": "Lane creeps get their own pages: Melee, Ranged, Flagbearer, Siege",
+      "link": "unit_changes.html",
+      "items": [
+        "Their changes sat only in General Updates; now they are on the creep's page too",
+        "Flagbearer bounty, siege creep timings, where the waves meet, creep paths (7.38c, 7.40, 7.41)",
+        "The other grey cards are checked: no changes in Valve's notes or the game files"
+      ],
+      "shots": ["icons/changelog/2026-10-06_lane_creeps.webp"]
+    },
+    {
+      "date": "2026-10-06",
+      "category": "Patch Reader",
+      "minor": true,
+      "title": "The patch history squares open on the page's own patch, lit, instead of always the newest 12"
+    },
+    {
+      "date": "2026-10-06",
       "category": "Site",
       "title": "Phones: every page fits the screen",
       "link": "patches/7.41f.html",

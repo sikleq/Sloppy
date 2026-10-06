@@ -98,6 +98,13 @@ For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `neutral_stats
 search sits behind the round loupe button».
 
 
+## Полоса истории (квадратики патчей) открывается на своём патче (2026-10-06)
+
+`scripts.js dynDefaultOffset`: на странице патча текущий патч стоит посередине полосы (слева старее, справа новее) и
+подсвечен (`.dyn-cell-wrap.current`); у краёв списка — первым или последним. Раньше полоса всегда показывала
+последние 12 патчей: на 7.38 самого 7.38 в ней не было, на 7.08 полоса Blink Dagger была пустой. Страницы героев,
+предметов и юнитов (без версии в выборе патча) — как раньше, последние патчи. Стрелки листают от этого места.
+
 ## Talent tree icon, Dynamics hover lens, Changelog columns (2026-09-26)
 
 - **Talent tree** (`patch/talent_tree.py`, post-pass in `patch/page.py save_html`): the Talents block icon lights

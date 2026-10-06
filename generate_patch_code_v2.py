@@ -1053,7 +1053,39 @@ def _render_general_note(note):
     if title:
         out.append(f'\nW(plain_header("{title}"))')
     body, _ = _emit_notes(note.get('generic', []))
-    out.extend(body)
+    out.extend(_link_lane_creeps(body))
+    return out
+
+
+_MELEE, _RANGED, _FLAG, _SIEGE = ("unit|creep-goodguys-melee", "unit|creep-goodguys-ranged",
+                                  "unit|creep-goodguys-flagbearer", "unit|goodguys-siege")
+_LANE_LINKS = [
+    (re.compile(r'\bFlagbearer', re.I), [_FLAG]),
+    (re.compile(r'\bsiege creeps?\b|\bsiege units?\b|\bcatapults?\b', re.I), [_SIEGE]),
+    (re.compile(r'^Melee Creeps?\b', re.I), [_MELEE]),
+    (re.compile(r'^Ranged Creeps?\b', re.I), [_RANGED]),
+    # paths and spawn points: every lane creep walks them (checked before "meet": 7.38c "creep paths … so the
+    # creeps meet closer" is a path change)
+    (re.compile(r'\blane creeps?\b.*\b(?:paths?|spawn)|\b(?:paths?|spawn points?)\b.*\blane creeps?\b|'
+                r'\blane creep paths?\b', re.I), [_MELEE, _RANGED, _FLAG, _SIEGE]),
+    # where the first waves meet — no Siege Creep in them (owner 2026-10-06, 7.41 "meeting point")
+    (re.compile(r'\b(?:lane )?creeps? meet|\bmeeting point\b', re.I), [_MELEE, _RANGED, _FLAG]),
+]
+
+
+def _link_lane_creeps(lines):
+    """General Updates rows about lane creeps → li(..., also_dyn=[...]): the row then counts on the creep's
+    squares and shows on its own page (builders/entity_changes._add_also_rows; owner 2026-10-06 — the 7.41
+    Flagbearer / siege / meeting-point rows sat only in General Updates and the creep cards had no page)."""
+    out = []
+    for line in lines:
+        m = re.match(r'W\(li\("((?:[^"\\]|\\.)*)"', line)
+        if m and line.endswith("))") and "also_dyn=" not in line:
+            text = m.group(1)
+            keys = next((k for rx, k in _LANE_LINKS if rx.search(text)), None)
+            if keys:
+                line = line[:-2] + f", also_dyn={keys!r}))"
+        out.append(line)
     return out
 
 

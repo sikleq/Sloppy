@@ -732,6 +732,24 @@ def test_audit_1005_lower_is_better(text, lower):
     assert ("l=True" in g._emit_badge(text)) == lower
 
 
+@pytest.mark.parametrize("text, units", [
+    ("Flagbearer Creep Experience Bounty increased from 57 to 60", ["creep-goodguys-flagbearer"]),
+    ("First +1 siege creep timing decreased from 35:00 to 30:00", ["goodguys-siege"]),
+    ("Melee Creep: Gold Bounty now increases by 1 per lane creep upgrade interval (every 7:30)", ["creep-goodguys-melee"]),
+    ("Adjusted the meeting point of the lane creeps toward the offlane",
+     ["creep-goodguys-melee", "creep-goodguys-ranged", "creep-goodguys-flagbearer"]),
+    ("The Top Lane creep paths have been slightly adjusted so the creeps meet closer to the Dire tower",
+     ["creep-goodguys-melee", "creep-goodguys-ranged", "creep-goodguys-flagbearer", "goodguys-siege"]),
+    ("Roshan now has 10% more health", []),
+])
+def test_general_rows_about_lane_creeps_link_to_their_pages(text, units):
+    """Owner 2026-10-06: the 7.41 lane creep rows sat only in General Updates and the creep cards had no page."""
+    import re
+    out = g._link_lane_creeps([g._emit_li(text)])[0]
+    found = re.findall(r"unit\|([a-z-]+)", out)
+    assert found == units
+
+
 def test_draft_clock_is_misc_without_a_percent():
     assert g._emit_li("All Pick drafting time per hero selection reduced from 30s to 25s") == \
         'W(li("All Pick drafting time per hero selection reduced from 30s to 25s", t("MISC")))'

@@ -19,13 +19,13 @@ def build():
          extra=inline_note("Pressing ALT key will show base value and increment of the ability.")))
     W(li("Abilities that had 'per level up' scaling changed to be 'per level'", t("MISC"),
          extra=inline_note("This mostly affects heroes reworked in update 7.40 and Largo.")))
-    W(li("Flagbearer Creep Experience Bounty increased from 57 to 60", b(57, 60)))
-    W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("REWORK")))   # a clock time: no % (audit 2026-10-05)
-    W(li("Second +1 siege creep timing now occurs at 60:00", t("NEW")))
+    W(li("Flagbearer Creep Experience Bounty increased from 57 to 60", b(57, 60), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("REWORK"), also_dyn=['unit|goodguys-siege']))   # a clock time: no % (audit 2026-10-05)
+    W(li("Second +1 siege creep timing now occurs at 60:00", t("NEW"), also_dyn=['unit|goodguys-siege']))
     W(li("Adjusted the meeting point of the lane creeps toward the offlane", t("MISC"),
          extra=inline_note(
              "Now offlane creeps are slightly slowed upon leaving the base for a couple of seconds. Safe lane creeps are slightly accelerated upon leaving the base for a couple of seconds. Both of these changes are effective until the 7:30 mark."
-         )))
+         ), also_dyn=['unit|creep-goodguys-melee', 'unit|creep-goodguys-ranged', 'unit|creep-goodguys-flagbearer']))
     W(li("All sections of currents now give a max movement speed bonus of 150", t("BUFF"),
          extra=inline_note("Previously was only provided by sections on the base and near it, while other sections provided max bonus of 100.")))
     W(ul_close())

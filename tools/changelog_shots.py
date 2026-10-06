@@ -26,6 +26,8 @@ PAD = 6
 #   scope = None (page) | ("block", "<entity name>") | ("row", "<row text>")
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
+    "2026-10-06_lane_creeps.webp": ("units/creep-goodguys-flagbearer.html", None, [".ec-head-panel", ".ec-patch >> nth=0"],
+                                    [], 420, {"width": 1400}),
     # a phone-width window (the phone CSS is a max-width: 760px media query, so a 390px desktop window shows it)
     "2026-10-06_phones.webp": ("patches/7.41f.html", None, ["nav.top-nav", ".toolbar", ".entity-block >> nth=0",
                                                             ".entity-block >> nth=1"], [], 620, {"width": 390}),
