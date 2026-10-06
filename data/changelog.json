@@ -18,7 +18,7 @@
       "category": "Terrain",
       "minor": true,
       "link": "terrain_741.html",
-      "title": "Terrain: [[icons/ui/gothic/tc_lanes.png|Lane creep paths]] explains its colours on hover — green Radiant, red dashed Dire, each path to the enemy Ancient"
+      "title": "Terrain: [[icons/ui/gothic/tc_lanes.png|Lane creep paths]] explains its colours on hover, and its chip glows only the stretches that changed, in their side's colour"
     },
     {
       "date": "2026-10-06",

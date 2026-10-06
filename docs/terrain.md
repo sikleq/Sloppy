@@ -120,6 +120,14 @@ The owner (2026-10-06): "все слои" — everything the map file holds besi
   слоёв"): `_LAYER_HL` names each chip's highlight key and the layer it turns on, `_layer_changed` lists what changed
   (a line or zone by its points, a spawn by its point, a current by its zone's rings) and `_layer_highlights_svg`
   outlines it in the chips' colours — old side dashed, new side solid with the old place as a faint dashed ghost.
+- Lane paths are the exception (owner 2026-10-06, the whole changed paths in yellow with the layer on: "слишком много
+  желтых линий… не понимаю, какая к чему относится"): `_lane_stretches` keeps only where a path really left its old
+  line — sampled every 40 units, farther than 60 from the other side's path (`_moved_runs`). Changed corners alone were
+  not enough: 7.41 moved a Dire top corner 200 units ALONG its line, and the stretch to the next corner lit the whole top
+  lane; now that is a 320-unit dropped detour. (A path whose corners changed but whose line stayed put falls back to the
+  changed corners, difflib on the corner lists, so its chip still shows something.) `_lane_highlight_svgs`
+  draws each stretch on the new side in its own side's colour and style over a soft yellow glow, its old run a thin
+  yellow dashed ghost; on the old side the old runs yellow dashed. Still the "moved" group, so the legend hides it.
 - **Currents: where the buff acts** (owner 2026-10-06: "Слой течений воды неправильный"; then "точно покажи места, где
   юнит получает скорость от течения, т.е там, где действует бафф, а не просто линию течения"). Two fixes:
   - the nodes are in the entity's own frame: the two Dire currents of 7.41 stand at yaw 180° and were drawn mirrored,

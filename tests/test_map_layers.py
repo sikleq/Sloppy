@@ -132,6 +132,34 @@ def test_each_waves_path_runs_into_the_enemy_base_to_its_ancient():
         assert abs(x - enemy[0]) < 600 and abs(y - enemy[1]) < 600, p["team"] + p["lane"]
 
 
+def test_a_lane_chip_marks_only_the_stretches_that_changed_in_their_sides_colour():
+    """The owner 2026-10-06 (whole changed paths in yellow): "слишком много желтых линий… не понимаю, какая к чему
+    относится". 7.41 moved 9 corners of 4 paths: Dire bot 3, Dire top 1, Radiant bot 1, Radiant top 4."""
+    import math
+
+    def length(run):
+        return sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(run, run[1:]))
+    diff = terrain._load_diff("7.41")
+    stretches = terrain._lane_stretches(diff)
+    assert len(stretches) == 4
+    # Dire top / Radiant bot: one corner moved 200 units ALONG the line — only the dropped detour is marked, not the lane
+    short = [s for s in stretches if not s[2]]
+    assert len(short) == 2 and all(len(s[1]) == 1 and length(s[1][0]) < 400 for s in short)
+    svg = terrain._highlights_svg(diff, terrain._projector(terrain._load_map_meta()))
+    new = svg[svg.index("tm-hl tm-hl-lanes tm-new"):]
+    new = new[:new.index("</svg>")]
+    assert f'stroke="{terrain._LANE_COLOUR["good"]}"' in new and f'stroke="{terrain._LANE_COLOUR["bad"]}"' in new
+    n_old, n_new = sum(len(s[1]) for s in stretches), sum(len(s[2]) for s in stretches)
+    assert new.count("<polyline") == n_old + 2 * n_new                # ghosts, then glow + the side's line
+
+
+def test_a_path_that_stays_on_its_line_is_not_marked():
+    a = [[0, 0], [1000, 0], [1000, 1000]]
+    assert terrain._moved_runs(a, [[0, 0], [600, 0], [1000, 0], [1000, 1000]]) == []      # an extra corner on the line
+    (run,) = terrain._moved_runs([[0, 0], [500, 300], [1000, 0]], [[0, 0], [1000, 0]])     # a corner pulled 300 aside
+    assert run[0][1] <= 60 and max(p[1] for p in run) == 300
+
+
 def test_published_map_data_holds_no_vision_entities():
     """Vision (fog blockers, revealers) is never drawn on this site, so the site's map data leaves it out; the full
     entity lists, vision included, are in Oldgrowth (scripts/gen/oldgrowth_mapdata.py: entities.json.gz)."""
