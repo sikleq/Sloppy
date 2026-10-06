@@ -107,7 +107,7 @@ The owner (2026-10-06): "все слои" — everything the map file holds besi
 
 | Layer (button) | From the map file | On the map |
 |---|---|---|
-| Lane creep paths `lanes` | `npc_dota_spawner_{good,bad}_{top,mid,bot}` (`npcfirstwaypoint`) → `path_corner` chain (`target`) | Radiant solid green, Dire dashed red (they walk the same lane), a dot where each wave starts |
+| Lane creep paths `lanes` | `npc_dota_spawner_{good,bad}_{top,mid,bot}` (`npcfirstwaypoint`) → `path_corner` chain (`target`) | Radiant solid green, Dire dashed red (they walk the same lane; green is drawn on top), a dot where each wave starts. Each path ends at the ENEMY Ancient, so past a base's barracks only the enemy's lines run (the owner 2026-10-06 asked about "two dashed lines" in the Radiant base) — the button's title says so |
 | River currents `currents` | `dota_movespeed_modifier_path` `pathnodes` (a `"""` block: per node position + in/out tangents, in the entity's frame — turned by its yaw), `pathnoderadiusscales` (each node's radius, world units), `pathnodemovespeedtypes` (2 strong, 1 moderate) | the buff zone (see below), deeper blue = up to +150, paler = up to +100, white arrows downstream |
 | Shops `shops` | `trigger_shop` volumes (`shoptype` 0 home, 1 side, 2 secret) + `ent_dota_neutral_item_stash` | gold zones, green dots |
 | Spawn points `spawns` | `info_player_start_{goodguys,badguys}`, `info_courier_spawn_*` | red / blue dots |

@@ -1151,7 +1151,11 @@ def _controls_html(layers=True, changes=("", ""), heights=False):
         for key, label, icon, _color in _ENTITY_LAYERS:
             layer_parts.append(layer_btn(key, label, icon))
         # 2026-10-06 (the owner: "все слои"): straight from the map file's entities
-        layer_parts.append(layer_btn("lanes", "Lane creep paths", "tc_lanes"))
+        # the colours explained (the owner 2026-10-06 asked what the red and green lines are, and why two dashed
+        # lines stand in the Radiant base: the Dire waves' path goes on past the barracks to the Ancient)
+        layer_parts.append(layer_btn("lanes", "Lane creep paths: green solid — Radiant waves, red dashed — Dire "
+                                     "waves (on a shared lane the green covers the red); a dot — where a wave "
+                                     "spawns; each path ends at the enemy Ancient", "tc_lanes"))
         layer_parts.append(layer_btn("currents", "River currents: where the bonus movement speed acts, downstream "
                                      "(arrows); deeper blue up to +150, paler up to +100 (before 7.41)", "tc_currents"))
         layer_parts.append(layer_btn("shops", "Shops and neutral item stashes", "tc_shops"))
