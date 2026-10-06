@@ -9641,7 +9641,12 @@ a.tsp-label:hover, a.tsp-label:focus-visible { color: #e3c46a; text-decoration-c
 .terrain-compare.show-watchers .tm-layer-watchers,
 .terrain-compare.show-roshan .tm-layer-roshan,
 .terrain-compare.show-spawnboxes .tm-layer-spawnboxes,
-.terrain-compare.show-nowards .tm-layer-nowards { opacity: 1; }
+.terrain-compare.show-nowards .tm-layer-nowards,
+/* 2026-10-06 layers from the map file: lane creep paths, river currents, shops, spawn points */
+.terrain-compare.show-lanes .tm-layer-lanes,
+.terrain-compare.show-currents .tm-layer-currents,
+.terrain-compare.show-shops .tm-layer-shops,
+.terrain-compare.show-spawns .tm-layer-spawns { opacity: 1; }
 /* No-ward ground: the map's gridnav cells (64 units) where a ward can't stand — one pixel per cell, kept square */
 .tm-layer-nowards image { image-rendering: pixelated; }
 .tc-markers.tm-layer-nowards { overflow: hidden; }   /* the grid reaches past the picture's edge */
@@ -9822,7 +9827,8 @@ button.tf-hband[aria-pressed="false"] { opacity: 0.45; }
 /* icon-only square buttons (the layer toggles) */
 .tc-btn-icon {
   position: relative;
-  width: 30px;
+  /* 27, not 30 (2026-10-06): 19 layer toggles + Zoom + Full on one line of the 720-px bar (685 at 1280 px) */
+  width: 27px;
   padding: 0;
   justify-content: center;
 }

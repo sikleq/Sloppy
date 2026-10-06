@@ -99,6 +99,39 @@ shape as leamare's `mapdata.json`. `build_terrain_diff.py` prefers these files a
   hand (`dota-interactive-map/docs/05-mapimage.md`). The courier tile server DOES have some letter patches
   (738b, 739b).
 
+## Map-file layers: lane paths, currents, zones, spawn points (2026-10-06)
+
+The owner (2026-10-06): "все слои" — everything the map file holds besides vision. Same extractor, more classes
+(`extract_map_entities._layers`), per Terrain step in the diff (`build_terrain_diff.py`: `lanes`, `currents`,
+`zones`, entities `laneSpawns` / `heroSpawns` / `couriers` / `stash`), drawn by `builders/terrain._line_zone_svgs`:
+
+| Layer (button) | From the map file | On the map |
+|---|---|---|
+| Lane creep paths `lanes` | `npc_dota_spawner_{good,bad}_{top,mid,bot}` (`npcfirstwaypoint`) → `path_corner` chain (`target`) | Radiant solid green, Dire dashed red (they walk the same lane), a dot where each wave starts |
+| River currents `currents` | `dota_movespeed_modifier_path` `pathnodes` (a `"""` block: per node position + in/out tangents, relative to the entity) | the spline sampled 8 points a segment, a wide translucent blue band |
+| Shops `shops` | `trigger_shop` volumes (`shoptype` 0 home, 1 side, 2 secret) + `ent_dota_neutral_item_stash` | gold zones, green dots |
+| Spawn points `spawns` | `info_player_start_{goodguys,badguys}`, `info_courier_spawn_*` | red / blue dots |
+| — in No-ward ground | `trigger_no_wards` volumes | magenta dashed outlines over the gridnav layer |
+| — in Roshan | `trigger_boss_attackable` volumes (where Roshan can be hit) | crimson zones |
+
+- "Changed in the map file" gets chips for them (`_layer_changes`): lane paths n/6, currents, the zones, lane and hero
+  spawns. Some are in no note: 7.39 and 7.39b moved lane path corners, the notes don't say so.
+- **Vision is not published** (owner 2026-10-06): `ent_fow_blocker_node`, `ent_fow_revealer` and anything about line
+  of sight stay out of `data/map` (test `test_published_map_data_holds_no_vision_entities`).
+- **The map store** (owner 2026-10-06: keep the map files): all 65 map files of 7.08–7.41f in `D:\DotaMaps\maps\<sha1>.vpk`
+  (1.67 GB, copied from `~/tools/maprender/oldbuilds/maps`, which `scripts/gen/map_history.py download` filled),
+  `D:\DotaMaps\patch_maps.json`, and every entity of every map (vision included, never committed) in
+  `D:\DotaMaps\ents\<sha8>.json.gz` (65 files, 7.6 MB). `extract_map_entities.py <codes> --store D:\DotaMaps` reads a
+  per-patch code's map from the store; a legacy code (683 … 737) stays the game's legacy file — that is the LAST map of
+  its patch family, `patch_maps.json`'s "7.22" is the release one (one 7.22 filler differed when mixed up). "741" in
+  `MAPS` is the live `dota.vpk` = the newest patch, so 741 is read from the store too.
+- Micro-shots: a spot with `"show": ["lanes"]` draws the paths (`terrain_shots._lanes`: each side its own, the old one
+  as a white dashed ghost on the new side). 7.38c "The Top Lane creep paths have been slightly adjusted" (738c_9),
+  7.40 "paths and spawn points of the Radiant Offlane lane creeps" (740_10). `patch/terrain_notes.SUBJECTS` knows
+  "lane creep paths" / "lane creeps" → `lanes`.
+- Re-running `terrain_shots.py <patch>` rewrites EVERY picture of that patch and they all come out different now
+  (the renders / the drawing changed since they were made): keep only the pictures you meant to change.
+
 ## Our own top-down picture — shot in the game (2026-10-01)
 
 `scripts/gen/capture_map.py` = leamare's SFM method without SFM's clicks: Dota 2 in Workshop Tools mode runs our

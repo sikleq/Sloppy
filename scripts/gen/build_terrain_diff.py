@@ -67,7 +67,52 @@ _ENTITY_KEYS = {
     "outposts": "npc_dota_watch_tower",
     "watchers": "npc_dota_lantern",
     "roshan": "npc_dota_roshan_spawner",
+    # 2026-10-06 (owner: "все слои"), from extract_map_entities._layers
+    "laneSpawns": "npc_dota_spawner",
+    "heroSpawns": "info_player_start",
+    "couriers": "info_courier_spawn",
+    "stash": "ent_dota_neutral_item_stash",
 }
+
+# Zone layers: brush volumes as polygons (old / new sides like the spawn boxes)
+_ZONE_KEYS = {"nowardZones": "trigger_no_wards", "shops": "trigger_shop", "roshanPit": "trigger_boss_attackable"}
+
+
+def lane_paths(src):
+    """[{"team", "lane", "points": [[x, y], …]}]: each lane creep wave's walk, from its spawner through the
+    path corners (path_corner "next" chain) — absent on maps extracted before 2026-10-06."""
+    corners = {p["name"]: p for p in src.get("path_corner", [])}
+    out = []
+    for s in src.get("npc_dota_spawner", []):
+        pts, name, seen = [[s["x"], s["y"]]], s.get("first"), set()
+        while name in corners and name not in seen:
+            seen.add(name)
+            c = corners[name]
+            pts.append([c["x"], c["y"]])
+            name = c.get("next")
+        out.append({"team": s["team"], "lane": s["lane"], "points": pts})
+    return out
+
+
+def current_paths(src, steps=8):
+    """[[x, y], …] per river current: its spline (cubic Bézier between nodes: node + out-tangent, next node +
+    in-tangent) sampled `steps` points a segment."""
+    out = []
+    for cur in src.get("dota_movespeed_modifier_path", []):
+        nodes, pts = cur.get("nodes", []), []
+        for a, b in zip(nodes, nodes[1:]):
+            p0, p3 = (a["x"], a["y"]), (b["x"], b["y"])
+            p1 = (p0[0] + a["out"][0], p0[1] + a["out"][1])
+            p2 = (p3[0] + b["in"][0], p3[1] + b["in"][1])
+            for i in range(steps):
+                t = i / steps
+                u = 1 - t
+                pts.append([round(u ** 3 * p0[k] + 3 * u * u * t * p1[k] + 3 * u * t * t * p2[k] + t ** 3 * p3[k])
+                            for k in (0, 1)])
+        if nodes:
+            pts.append([nodes[-1]["x"], nodes[-1]["y"]])
+        out.append(pts)
+    return out
 
 
 def _dotted(code):
@@ -203,6 +248,14 @@ def _diff_pair(old_code, new_code):
         "spawnboxesNew": spawnboxes_new,
         # toggleable point-entity layers (full old+new sets, split by slider)
         "entities": entities,
+        # line and zone layers (2026-10-06): lane creep paths, river currents, no-ward / shop / Roshan pit zones
+        "lanes": {"old": lane_paths(A), "new": lane_paths(B)},
+        "currents": {"old": current_paths(A), "new": current_paths(B)},
+        "zones": {name: {"old": [[[p["x"], p["y"]] for p in z["points"]] for z in A.get(key, [])],
+                         "new": [[[p["x"], p["y"]] for p in z["points"]] for z in B.get(key, [])],
+                         **({"oldType": [z.get("shopType", "") for z in A.get(key, [])],
+                             "newType": [z.get("shopType", "") for z in B.get(key, [])]} if key == "trigger_shop" else {})}
+                  for name, key in _ZONE_KEYS.items()},
         # move data kept for reference (not drawn)
         "camps": camps,
         "towers": towers,

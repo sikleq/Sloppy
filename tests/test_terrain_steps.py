@@ -52,9 +52,11 @@ def test_what_moved_is_read_off_the_diff():
 
 
 def test_7_39b_moved_what_its_notes_say():
-    """7.39b's notes: trees cut and planted, Bottom Radiant T1 moved, two camps, one watcher."""
+    """7.39b's notes: trees cut and planted, Bottom Radiant T1 moved, two camps, one watcher. The map file also moved
+    the Radiant bottom lane path past that tower (two path corners, 2026-10-06 layers) — the notes don't say so."""
     assert terrain._moved_summary(terrain._load_diff("7.39b")) == [
-        "trees +38 −27", "camps moved: 2", "camp spawn boxes changed: 2", "towers moved: 1", "watchers moved: 1"]
+        "trees +38 −27", "camps moved: 2", "camp spawn boxes changed: 2", "towers moved: 1", "watchers moved: 1",
+        "lane paths changed: 1"]
 
 
 def test_every_block_linked_to_the_map_is_read():
@@ -327,7 +329,9 @@ def test_an_all_layers_button_leads_the_layer_toggles():
     top, fs = terrain._controls_html(layers=True)
     for bar in (top, fs):
         layers = re.findall(r'data-layer="(\w+)"', bar)
-        assert layers[0] == "all" and "trees" in layers and "nowards" in layers and len(layers) == 15
+        # 15 + the 2026-10-06 map-file layers: lanes, currents, shops, spawns
+        assert layers[0] == "all" and "trees" in layers and "nowards" in layers and len(layers) == 19
+        assert layers[-4:] == ["lanes", "currents", "shops", "spawns"]
     assert 'src="icons/ui/gothic/tc_all.png"' in top
     assert os.path.exists(os.path.join(_ROOT, "icons", "ui", "gothic", "tc_all.png"))
     assert "data-layer" not in terrain._controls_html(layers=False)[0]

@@ -23,6 +23,9 @@ SUBJECTS = (
     (r"\broshan pits?\b", ("roshan",)),
     (r"\bwisdom shrines?\b", ("wisdom",)),
     (r"\boutposts?\b", ("outposts",)),
+    # the lane creeps' walk (2026-10-06, map file path_corner chains): 7.38c "The Top Lane creep paths have been
+    # slightly adjusted", 7.40 "… paths and spawn points of the Radiant Offlane lane creeps"
+    (r"\b(?:lane )?creep paths?\b|\blane creeps?\b", ("lanes",)),
     # the ground itself as the subject: no outlines, the two pictures show it ("The ramp … Roshan Pit", "The cliff
     # above the … camp", "the entrance to the bridge by the Lotus pools")
     (r"\b(?:cliffs?|ramps?|streams?|paths?|entrances?|areas?|rim|bridge|high ground|low ground)\b", ()),
