@@ -11387,8 +11387,9 @@ ul.changes li.iab-covered { display: none !important; }
   ul.changes li.ability-row-end { grid-template-columns: minmax(0, 1fr) auto; }
   /* a long % group (3+ pieces: "-8%, -8%, -9%, -10%", "0% start +35% end") drops under the text,
      still on the right, instead of squeezing the text into a narrow column */
-  ul.changes li:has(> .badge-group > :nth-child(3)) { grid-template-columns: minmax(0, 1fr); }
-  ul.changes li > .badge-group:has(> :nth-child(3)) { grid-column: 1; justify-self: end; }
+  /* li-bg-long / bg-long: written at build time by patch/static_has.py (patch pages get classes, not has-selectors) */
+  ul.changes li.li-bg-long { grid-template-columns: minmax(0, 1fr); }
+  ul.changes li > .badge-group.bg-long { grid-column: 1; justify-self: end; }
   /* level tables (19 level columns) scroll sideways inside themselves */
   ul.changes li > .formula-table:not([hidden]),
   .ability-change-body .formula-table:not([hidden]) {

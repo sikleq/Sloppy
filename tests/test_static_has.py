@@ -36,6 +36,15 @@ def test_static_classes():
     assert "has-formula-wrap" in out
 
 
+def test_long_badge_group_is_marked_for_phones():
+    html = ('<ul class="changes"><li><span class="row-text">a</span><span class="badge-group">'
+            '<span class="badge">1</span><span class="badge">2</span><span class="badge">3</span></span></li>'
+            '<li><span class="row-text">b</span><span class="badge-group"><span class="badge">1</span></span></li></ul>')
+    lis = re.findall(r"<li([^>]*)>", add_static_has_classes(html))
+    assert "li-bg-long" in lis[0] and "li-bg-long" not in lis[1]
+    assert add_static_has_classes(html).count("bg-long") == 2          # the li and its group, first row only
+
+
 def test_new_mechanic_rows_drop_only_the_new_chip():
     from patch.page import _new_mech_rows
     html = ('<ul class="changes"><!--NEWMECH--><li data-tag="buff new"><span class="badge new" data-tag="new">NEW</span>'

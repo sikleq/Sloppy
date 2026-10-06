@@ -10,6 +10,7 @@ classes instead:
     ul.changes > li  with a direct .row-tag-empty child   -> li-notag
     ul.changes > li  without a direct .row-text child     -> li-notext
     ul.changes > li  with a direct .badge-group child     -> li-bg
+      ... whose .badge-group has 3+ children              -> li-bg-long (and bg-long on the group)
     ul.changes > li  with a direct .formula-table child   -> li-formula
     ul.subnotes > li with a direct .subnote-collapse       -> li-collapse
     .ability-block   without a direct ul.changes > li     -> ab-empty
@@ -76,6 +77,13 @@ def add_static_has_classes(html):
                     n.add.append("li-notext")
                 if "badge-group" in kid_cls:
                     n.add.append("li-bg")
+                    # 3+ pieces ("-8%, -8%, -9%", "0% start +21% L20 -21% end"): on phones the group drops under
+                    # the text (styles.css PHONES; was a :has(> .badge-group > :nth-child(3)) — 2026-10-06)
+                    for k in n.kids:
+                        if "badge-group" in k.cls and len(k.kids) >= 3:
+                            n.add.append("li-bg-long")
+                            k.add.append("bg-long")
+                            break
                 if "formula-table" in kid_cls:
                     n.add.append("li-formula")
             if "subnotes" in p.cls and "subnote-collapse" in kid_cls:

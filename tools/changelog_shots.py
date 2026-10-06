@@ -26,6 +26,9 @@ PAD = 6
 #   scope = None (page) | ("block", "<entity name>") | ("row", "<row text>")
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
+    # a phone-width window (the phone CSS is a max-width: 760px media query, so a 390px desktop window shows it)
+    "2026-10-06_phones.webp": ("patches/7.41f.html", None, ["nav.top-nav", ".toolbar", ".entity-block >> nth=0",
+                                                            ".entity-block >> nth=1"], [], 620, {"width": 390}),
     "2026-10-05_terrain_heights.webp": ("terrain_741.html", None, [".terrain-compare-col"],
                                         ['.tc-layer-btn[data-layer="heights"]'], 900, {"width": 1400, "wait": 1500}),
     "2026-10-03_terrain_notes.webp": ("patches/7.41.html", None,
