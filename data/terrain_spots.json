@@ -19,7 +19,8 @@
     {"match": "A tree near the Radiant Safe Lane large camp has been removed", "spots": [[5760, -3456]], "r": 600},
     {"match": "Several trees have been removed from the Radiant high ground leading to the Bottom Roshan Pit", "spots": [[1792, -3392]], "r": 700},
     {"match": "Trees have been added around the Dire Bottom Tier 1 tower", "spots": [[5817, -1700]], "r": 800},
-    {"match": "The Watcher above the secret shop has been repositioned", "spots": [[3346, -818]], "r": 1100}
+    {"match": "The Watcher above the secret shop has been repositioned", "spots": [[3346, -818]], "r": 1100},
+    {"match": "The Top Lane creep paths have been slightly adjusted", "spots": [[-6100, 5000]], "r": 1000, "show": ["lanes"]}
   ],
   "7.39": [
     {"match": "Several trees between the two neutrals camps on the easternmost region", "spots": [[8256, 1003]]},
@@ -71,7 +72,7 @@
     {"match": "Lowered the Wisdom Shrine areas to low ground", "spots": [[8253, -1075], [-8088, 588]], "r": 900},
     {"match": "Cleared up some areas around the Tormentor locations", "spots": [[7488, -7857], [-7202, 7947]], "r": 800, "show": ["trees"]},
     {"match": "Slightly expanded the entrance to the bridge by the Lotus pools", "spots": [[7604, -4805], [-7627, 4598]]},
-    {"match": "Very slightly adjusted the paths and spawn points of the Radiant Offlane lane creeps", "spots": [[-6483, -872]], "r": 600},
+    {"match": "Very slightly adjusted the paths and spawn points of the Radiant Offlane lane creeps", "spots": [[-6483, -872]], "r": 600, "show": ["lanes", "towers"]},
     {"match": "Moved Wisdom Shrines to the low ground", "spots": [[8253, -1075], [-8088, 588]], "r": 900},
     {"match": "Extended the streams into both Radiant and Dire bases", "spots": [[-3700, -7400], [3300, 7200]], "r": 1200},
     {"match": "Removed some trees inside the base near the new safelane defender's gate positions", "spots": [[-4400, -6950], [3750, 6750]], "r": 600},

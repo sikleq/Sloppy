@@ -301,6 +301,8 @@ def _markers_svg(diff, pair_id="default"):
             height_svgs += (f'<svg class="tc-markers tm-layer tm-layer-heights tm-{side}" viewBox="0 0 {MAP_VB} '
                             f'{MAP_VB}" preserveAspectRatio="none" aria-hidden="true">{images}</svg>')
 
+    extra_svgs = _line_zone_svgs(diff, proj)
+
     old_t = tier_counts(diff.get("campsOld", []))
     new_t = tier_counts(diff.get("campsNew", []))
     counts = {
@@ -311,7 +313,75 @@ def _markers_svg(diff, pair_id="default"):
         "entities": {key: (len(ed.get("old", [])), len(ed.get("new", []))) for key, ed in entities.items() if ed},
     }
     return (height_svgs + ward_svgs + trees_old + trees_new + camps_old + camps_new
-            + "".join(ent_svgs) + sb_svg + _highlights_svg(diff, proj), counts)
+            + "".join(ent_svgs) + sb_svg + extra_svgs + _highlights_svg(diff, proj), counts)
+
+
+# Line and zone layers (2026-10-06, the owner: "все слои"), from the map file's own entities
+# (scripts/gen/extract_map_entities._layers → build_terrain_diff: "lanes", "currents", "zones", entities).
+# Vision entities are not drawn on this site.
+_LANE_COLOUR = {"good": "#7ed060", "bad": "#ff6a54"}
+_CURRENT_COLOUR = "#54aaec"
+_SHOP_COLOUR = "#e3c46a"
+_SHOP_NAME = {"0": "Home shop", "1": "Side shop", "2": "Secret shop"}
+
+
+def _line_zone_svgs(diff, proj):
+    """Lane creep paths (Radiant solid, Dire dashed: the two walk the same lane), river currents, shop zones with
+    the neutral item stashes, hero / courier spawn points; no-ward zones join the No-ward layer, the Roshan pit
+    the Roshan layer. Each old / new, split by the slider like the other layers."""
+    def pts(points):
+        return " ".join(f"{proj(x, y)[0]:.1f},{proj(x, y)[1]:.1f}" for x, y in points)
+
+    def layer(key, side, body):
+        return (f'<svg class="tc-markers tm-layer tm-layer-{key} tm-{side}" viewBox="0 0 {MAP_VB} {MAP_VB}" '
+                f'preserveAspectRatio="none" aria-hidden="true">{body}</svg>')
+
+    def dots(coords, r, fill, stroke=_MARKER_GOLD):
+        return "".join(f'<circle cx="{proj(x, y)[0]}" cy="{proj(x, y)[1]}" r="{r}" fill="{fill}" stroke="{stroke}" '
+                       f'stroke-width="1.6"/>' for x, y in coords)
+
+    out = []
+    ents = diff.get("entities") or {}
+    zones = diff.get("zones") or {}
+    for side in ("old", "new"):
+        lanes = (diff.get("lanes") or {}).get(side) or []
+        if lanes:
+            dash = {"good": "", "bad": ' stroke-dasharray="7 5"'}
+            body = "".join(
+                f'<polyline class="tc-lane tc-lane-{p["team"]}" points="{pts(p["points"])}" fill="none" '
+                f'stroke="{_LANE_COLOUR[p["team"]]}" stroke-width="2.6" stroke-linejoin="round"{dash[p["team"]]}/>'
+                for p in lanes)
+            body += dots([p["points"][0] for p in lanes], 5, "#0d100b")          # where each wave starts
+            out.append(layer("lanes", side, body))
+        currents = (diff.get("currents") or {}).get(side) or []
+        if currents:
+            body = "".join(f'<polyline points="{pts(c)}" fill="none" stroke="{_CURRENT_COLOUR}" stroke-opacity="0.45" '
+                           f'stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>'
+                           f'<polyline points="{pts(c)}" fill="none" stroke="#d6efff" stroke-width="1.6" '
+                           f'stroke-dasharray="4 6"/>' for c in currents if len(c) > 1)
+            out.append(layer("currents", side, body))
+        shops = (zones.get("shops") or {}).get(side) or []
+        stash = (ents.get("stash") or {}).get(side) or []
+        if shops or stash:
+            body = "".join(f'<polygon points="{pts(z)}" fill="{_SHOP_COLOUR}" fill-opacity="0.16" '
+                           f'stroke="{_SHOP_COLOUR}" stroke-width="1.6"/>' for z in shops)
+            body += dots(stash, 6, "#5fd06a")
+            out.append(layer("shops", side, body))
+        heroes = (ents.get("heroSpawns") or {}).get(side) or []
+        couriers = (ents.get("couriers") or {}).get(side) or []
+        if heroes or couriers:
+            out.append(layer("spawns", side, dots(heroes, 5, "#d24a5a") + dots(couriers, 3.2, "#7ec8ff")))
+        nw = (zones.get("nowardZones") or {}).get(side) or []
+        if nw:
+            out.append(layer("nowards", side, "".join(
+                f'<polygon points="{pts(z)}" fill="none" stroke="#eb50ff" stroke-width="1.8" stroke-dasharray="6 4"/>'
+                for z in nw)))
+        pit = (zones.get("roshanPit") or {}).get(side) or []
+        if pit:
+            out.append(layer("roshan", side, "".join(
+                f'<polygon points="{pts(z)}" fill="#d24a5a" fill-opacity="0.14" stroke="#d24a5a" stroke-width="1.6"/>'
+                for z in pit)))
+    return "".join(out)
 
 
 _latest_href = _site.latest_patch_href
@@ -517,7 +587,46 @@ def _moved_items(diff):
     if w.get("lost") or w.get("gained"):
         # gridnav cells (64 units) where a ward can't stand: "lost" = became no-ward, so +lost −gained
         out.append(("no-ward cells", "delta", w.get("lost", 0), w.get("gained", 0), w.get("cells", 0)))
+    out += _layer_changes(diff)
     return [i for i in out if i]
+
+
+def _layer_changes(diff):
+    """The 2026-10-06 layers as chips: lane paths changed (n of the 6 lanes), currents, the zones, spawn points —
+    a patch's notes say nothing about some of them (7.39, 7.39b lane paths)."""
+    out = []
+    lanes = diff.get("lanes") or {}
+    old = {(p["team"], p["lane"]): p["points"] for p in lanes.get("old", [])}
+    new = {(p["team"], p["lane"]): p["points"] for p in lanes.get("new", [])}
+    if old and new:
+        n = sum(1 for k, v in new.items() if old.get(k) != v)
+        if n:
+            out.append(("lane paths", "changed", n, 0, len(new)))
+    cur = diff.get("currents") or {}
+    co, cn = cur.get("old") or [], cur.get("new") or []
+    if co != cn:
+        if len(co) == len(cn):
+            out.append(("river currents", "changed", sum(1 for a, b in zip(co, cn) if a != b), 0, len(cn)))
+        else:                                      # 7.38: the streams (and their currents) are new
+            out.append(("river currents", "delta", len(cn), len(co), len(cn)))
+    for key, name in (("shops", "shop zones"), ("roshanPit", "Roshan pit zones"), ("nowardZones", "no-ward zones")):
+        z = (diff.get("zones") or {}).get(key) or {}
+        a, b = {_box_key_xy(p) for p in z.get("old", [])}, {_box_key_xy(p) for p in z.get("new", [])}
+        if a != b:
+            out.append((name, "changed", len(b - a), 0, len(b)) if len(a) == len(b)
+                       else (name, "delta", len(b - a), len(a - b), len(b)))
+    ents = diff.get("entities") or {}
+    for key, name in (("laneSpawns", "lane creep spawns"), ("heroSpawns", "hero spawns")):
+        ed = ents.get(key) or {}
+        if ed.get("old") and ed.get("new"):
+            a, b = {tuple(p) for p in ed["old"]}, {tuple(p) for p in ed["new"]}
+            if a != b:
+                out.append((name, "moved", len(b - a), 0, len(b)))
+    return out
+
+
+def _box_key_xy(points):
+    return frozenset(tuple(p) for p in points)
 
 
 # Chip -> the key of its outlines on the map (scripts.js toggles .tm-hl-<key>); spawn boxes have none — the
@@ -893,16 +1002,21 @@ def _controls_html(layers=True, changes=("", ""), heights=False):
             layer_parts.append(layer_btn("heights", "Heights", "tc_heights"))
         for key, label, icon, _color in _ENTITY_LAYERS:
             layer_parts.append(layer_btn(key, label, icon))
+        # 2026-10-06 (the owner: "все слои"): straight from the map file's entities
+        layer_parts.append(layer_btn("lanes", "Lane creep paths", "tc_lanes"))
+        layer_parts.append(layer_btn("currents", "River currents", "tc_currents"))
+        layer_parts.append(layer_btn("shops", "Shops and neutral item stashes", "tc_shops"))
+        layer_parts.append(layer_btn("spawns", "Hero and courier spawn points", "tc_spawns"))
 
     # Top bar: Zoom + Fullscreen + layer toggles
+    # Icon-only, the word in the tooltip (2026-10-06): with the four map-file layers 19 toggles + "Zoom" + "Full"
+    # needed 792 px of a 720-px bar — the owner wants every toggle on one line (2026-10-02, 2026-10-05)
     top_parts = [
-        '<button type="button" class="tc-btn tc-btn-zoom" aria-pressed="false">'
-        '<img src="icons/ui/gothic/icon_loupe.png" alt="" width="15" height="15">'
-        'Zoom</button>',
-        f'<button type="button" class="tc-btn tc-btn-fs" aria-pressed="false" '
-        f'aria-label="Fullscreen" title="Fullscreen">'
-        # "Full", not "Fullscreen": the owner 2026-10-02 — every toggle on one line
-        f'{_FS_ENTER_ICON}Full</button>',
+        '<button type="button" class="tc-btn tc-btn-icon tc-btn-zoom" aria-pressed="false" '
+        'aria-label="Zoom" title="Zoom">'
+        '<img src="icons/ui/gothic/icon_loupe.png" alt="" width="15" height="15"></button>',
+        f'<button type="button" class="tc-btn tc-btn-icon tc-btn-fs" aria-pressed="false" '
+        f'aria-label="Fullscreen" title="Fullscreen">{_FS_ENTER_ICON}</button>',
     ] + layer_parts
 
     _RMB_ICON = (
@@ -1074,7 +1188,12 @@ _ITEM_ICON = {"trees": "ui/gothic/tc_trees", "camps": "camps/creepcamp_mid", "ca
               "power runes": "ui/gothic/tc_power", "wisdom shrines": "ui/gothic/tc_wisdom",
               "wisdom runes": "ui/gothic/tc_wisdom", "outposts": "ui/gothic/tc_outposts",
               "watchers": "ui/gothic/tc_watchers", "Roshan pits": "ui/gothic/tc_roshan",
-              "no-ward cells": "ui/gothic/tc_nowards"}
+              "no-ward cells": "ui/gothic/tc_nowards",
+              # 2026-10-06 layers
+              "lane paths": "ui/gothic/tc_lanes", "river currents": "ui/gothic/tc_currents",
+              "shop zones": "ui/gothic/tc_shops", "Roshan pit zones": "ui/gothic/tc_roshan",
+              "no-ward zones": "ui/gothic/tc_nowards", "lane creep spawns": "ui/gothic/tc_lanes",
+              "hero spawns": "ui/gothic/tc_spawns"}
 
 
 _CHANGED_WORD = {"camp tiers": "re-tiered", "camp spawn boxes": "resized"}

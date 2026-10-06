@@ -26,6 +26,9 @@ PAD = 6
 #   scope = None (page) | ("block", "<entity name>") | ("row", "<row text>")
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
+    "2026-10-06_terrain_layers.webp": ("terrain_741.html", None, [".terrain-compare-col"],
+                                       ['.tc-layer-btn[data-layer="lanes"]', '.tc-layer-btn[data-layer="currents"]',
+                                        '.tc-layer-btn[data-layer="shops"]'], 560, {"width": 1400, "wait": 1500}),
     "2026-10-06_lane_creeps.webp": ("units/creep-goodguys-flagbearer.html", None, [".ec-head-panel", ".ec-patch >> nth=0"],
                                     [], 420, {"width": 1400}),
     # a phone-width window (the phone CSS is a max-width: 760px media query, so a 390px desktop window shows it)

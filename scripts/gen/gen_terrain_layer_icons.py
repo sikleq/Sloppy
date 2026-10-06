@@ -351,6 +351,101 @@ def heights_icon():
     return _outline(im).resize((ICON_RES, ICON_RES), Image.NEAREST)
 
 
+# Layers of 2026-10-06 (owner: "все слои"): 16-px glyphs, dark outline, hard-edged 2x like tc_heights.
+# Lane creep paths: a lane from the Radiant corner (green, bottom-left) to the Dire one (red, top-right), two arrows
+LANES_GLYPH = [
+    "................",
+    "...........RRRR.",
+    "............RRR.",
+    "...........R.RR.",
+    "..........R...R.",
+    ".........r......",
+    "........r.......",
+    ".......y........",
+    "......y.........",
+    ".....g..........",
+    "....g...........",
+    ".G...G..........",
+    ".GG.G...........",
+    ".GGG............",
+    ".GGGG...........",
+    "................",
+]
+LANES_PAL = {"G": (120, 206, 96), "g": (96, 168, 78), "y": (226, 200, 112), "r": (196, 84, 64), "R": (232, 106, 84)}
+# River currents: three waves
+CURRENTS_GLYPH = [
+    "................",
+    "................",
+    "..ww......ww....",
+    ".wLLw....wLLw...",
+    "w....w..w....w..",
+    "......ww......w.",
+    "................",
+    "..ww......ww....",
+    ".wLLw....wLLw...",
+    "w....w..w....w..",
+    "......ww......w.",
+    "................",
+    "..ww......ww....",
+    ".wLLw....wLLw...",
+    "w....w..w....w..",
+    "......ww......w.",
+]
+CURRENTS_PAL = {"w": (84, 170, 236), "L": (176, 224, 255)}
+# Shops: a coin pouch, a gold coin on it
+SHOPS_GLYPH = [
+    "................",
+    "......bbbb......",
+    ".......bb.......",
+    "......tttt......",
+    ".....bbbbbb.....",
+    "....bbllbbbb....",
+    "...bbllbbbbbb...",
+    "...bblbbYYYbb...",
+    "..bbbbbYyyYYbb..",
+    "..bbbbbYyYYybb..",
+    "..bbbbbYyyYYbb..",
+    "..bbbbbbYYYbbb..",
+    "...bbbbbbbbbb...",
+    "....bbbbbbbb....",
+    "................",
+    "................",
+]
+SHOPS_PAL = {"b": (150, 98, 54), "l": (196, 142, 88), "t": (226, 200, 112), "Y": (246, 214, 92), "y": (196, 150, 40)}
+# Spawn points: a banner on a pole
+SPAWNS_GLYPH = [
+    "................",
+    "...p............",
+    "...pFFFFFFFF....",
+    "...pFFffFFFF....",
+    "...pFFFFFFFFF...",
+    "...pFFFFFFFF....",
+    "...pFFFffFF.....",
+    "...pFFFFFFFF....",
+    "...p............",
+    "...p............",
+    "...p............",
+    "...p............",
+    "..ppp...........",
+    ".ppppp..........",
+    "................",
+    "................",
+]
+SPAWNS_PAL = {"p": GOLD[3], "F": (210, 74, 90), "f": (240, 140, 150)}
+NEW_LAYER_GLYPHS = {"tc_lanes": (LANES_GLYPH, LANES_PAL), "tc_currents": (CURRENTS_GLYPH, CURRENTS_PAL),
+                    "tc_shops": (SHOPS_GLYPH, SHOPS_PAL), "tc_spawns": (SPAWNS_GLYPH, SPAWNS_PAL)}
+
+
+def glyph_icon(name):
+    rows, pal = NEW_LAYER_GLYPHS[name]
+    im = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+    for y, row in enumerate(rows):
+        for x, ch in enumerate(row):
+            if ch in pal:
+                im.putpixel((x, y), pal[ch] + (255,))
+    return _outline(im).resize((ICON_RES, ICON_RES), Image.NEAREST)
+
+
 def all_icon():
     """The "All layers" toggle (the owner 2026-10-02: simpler, like the site's other icons): a 16-px pixel glyph of
     three stacked map layers in the gold ramp, dark outline, scaled up hard-edged like tc_trees."""
@@ -391,6 +486,12 @@ def main(only=()):
                        ("tc_shrines", shrines_icon), ("tc_heights", heights_icon)):
         if want(name):
             im = make()
+            im.save(os.path.join(_OUT, f"{name}.png"))
+            cells.append((name, im))
+            print("wrote", name)
+    for name in NEW_LAYER_GLYPHS:                  # 2026-10-06 layers: lanes, currents, shops, spawns
+        if want(name):
+            im = glyph_icon(name)
             im.save(os.path.join(_OUT, f"{name}.png"))
             cells.append((name, im))
             print("wrote", name)

@@ -298,6 +298,41 @@ def spot_patch(spot, patch):
     return spot[2] if len(spot) > 2 else patch
 
 
+LANE_RGB = {"good": (126, 208, 96), "bad": (255, 106, 84)}
+
+
+def _lanes(img, cx, cy, r, diff, side, half, width):
+    """The lane creep paths of one side (2026-10-06, the owner: "where are the screenshots?" for 7.38c "The Top Lane
+    creep paths have been slightly adjusted"): Radiant solid green, Dire dashed red, as on the Terrain page's Lane
+    creep paths layer; on the new side the old path a light dashed ghost (dashed = "where it was")."""
+    d = ImageDraw.Draw(img, "RGBA")
+    k = half / (2 * r)
+
+    def px(p):
+        return (p[0] - (cx - r)) * k, ((cy + r) - p[1]) * k
+
+    def poly(points, colour, w, dash):
+        xy = [px(p) for p in points]
+        for (x0, y0), (x1, y1) in zip(xy, xy[1:]):
+            if not dash:
+                d.line([x0, y0, x1, y1], fill=colour, width=w)
+                continue
+            seg = math.hypot(x1 - x0, y1 - y0)
+            step, on = dash
+            t = 0.0
+            while t < seg:
+                a, b = t / seg, min(t + on, seg) / seg
+                d.line([x0 + (x1 - x0) * a, y0 + (y1 - y0) * a, x0 + (x1 - x0) * b, y0 + (y1 - y0) * b],
+                       fill=colour, width=w)
+                t += step
+    lanes = (diff or {}).get("lanes") or {}
+    if side == "new":
+        for p in lanes.get("old", []):
+            poly(p["points"], (255, 255, 255, 150), max(1, width - 1), (6 * width, 3 * width))
+    for p in lanes.get(side, []):
+        poly(p["points"], LANE_RGB[p["team"]] + (255,), width, (7 * width, 4 * width) if p["team"] == "bad" else None)
+
+
 def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=True):
     """One picture: the old | new halves. `own` = the entry's own patch; a picture of another patch's step (see
     spot_patch) shows that step's changes and none of the entry's marks or tier icons."""
@@ -309,6 +344,8 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=T
         img = _crop(fulls[ver], rect, cx, cy, r, half)
         if "boxes" in keys:
             _boxes(img, cx, cy, r, diff, side, half, width)
+        if "lanes" in keys:
+            _lanes(img, cx, cy, r, diff, side, half, width)
         _outlines(img, cx, cy, r, groups, side, keys, half, width)
         ys = _marks(img, cx, cy, r, ver, entry.get("mark", []) if own else [], half, width,
                     entry.get("mark_kind", "camps"))
