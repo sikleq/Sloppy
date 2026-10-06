@@ -11271,3 +11271,227 @@ ul.changes li.iab-covered { display: none !important; }
 .sc-back { display: inline-block; margin-bottom: 16px; color: #e3c46a;
             text-decoration: none; font-size: 13px; }
 .sc-back:hover { text-decoration: underline; }
+
+/* ==========================================================================
+   PHONES (2026-10-05)
+   Every page has <meta name="viewport" width=device-width> since 356e152c, so
+   phones now lay the site out at 360-430px instead of a shrunk 980px page.
+   EVERYTHING below sits inside a max-width media query: desktop is untouched
+   (checked by full-page pixel diff at 1440px). Rules (docs/agent-rules/ui-style.md
+   "Phones"): no horizontal page scroll — a wide strip scrolls inside itself;
+   row text >= 14px; tap targets of filters / nav >= 32px; the round corner
+   buttons sit in one low row so they cover as little of the right-hand %s
+   as possible. Keep this block LAST in the file so it wins the cascade.
+   ========================================================================== */
+@media (max-width: 760px) {
+  /* ---- Site header: brand + version picker on row 1, the tabs on row 2 ---- */
+  .nav-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand ctx" "tabs tabs";
+    column-gap: 8px;
+    row-gap: 0;
+    padding: 4px 8px 0;
+  }
+  .nav-brand { grid-area: brand; gap: 6px; padding: 2px 6px 2px 0; }
+  .nav-brand-logo { width: 38px; height: 38px; }
+  .nav-brand-text { font-size: 19px; white-space: nowrap; }
+  .nav-context { grid-area: ctx; }
+  .nav-tabs {
+    grid-area: tabs;
+    justify-self: stretch;
+    min-width: 0;
+    gap: 2px;
+    overflow-x: auto;               /* never wider than the phone: scrolls inside itself */
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  /* auto side margins centre the row but collapse to 0 when it overflows (safe centring) */
+  .nav-tabs > .nav-tab:first-child { margin-left: auto; }
+  .nav-tabs > .nav-tab:last-child { margin-right: auto; }
+  .nav-tab { flex: 0 0 auto; height: 36px; padding: 0 7px; font-size: 16px; letter-spacing: 0.5px; }
+
+  /* Materials sub-tabs: centred, wrapping to a second line when they don't fit (NOT a scroll strip: a
+     scroll box would clip the tap-to-open submenus); the right-hand groups open their menu leftwards */
+  .materials-subnav-inner { padding: 0 6px; justify-content: center; }
+  .materials-subnav-links { flex-wrap: wrap; justify-content: center; row-gap: 0; }
+  .nav-subtab { flex: 0 0 auto; padding-left: 10px; padding-right: 10px; font-size: 17px; }
+  .nav-submenu { min-width: 160px; }
+  .materials-subnav-links > .nav-subgroup:nth-child(n+3) > .nav-submenu { left: auto; right: 0; border-radius: 8px 0 8px 8px; }
+
+  /* ---- Patch toolbar: one row of filter chips that scrolls inside itself ---- */
+  .toolbar-inner {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 8px;
+    padding: 6px 10px;
+  }
+  .toolbar-inner::-webkit-scrollbar { display: none; }
+  .toolbar-inner > .legend-stack { flex: 0 0 auto; }
+  .legend-tags .badge.filter-btn,
+  .cat-filter-btn,
+  .ec-scope-btn,
+  .ec-ab-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    flex: 0 0 auto;
+  }
+
+  /* ---- Page column: 10px side gutters instead of 28-32px (table pages stay edge to edge) ---- */
+  .container:not(.creeps-page) { padding-left: 10px; padding-right: 10px; }
+
+  /* ---- Patch slabs: narrower side insets so the text gets the width ---- */
+  body.patch-page .cat-panel { padding-left: 8px; padding-right: 8px; }
+  body.patch-page h2.section { margin-left: -8px; margin-right: -8px; padding: 10px 12px; font-size: 24px; }
+  body.patch-page .entity-block { padding-left: 10px; padding-right: 10px; }
+  body.patch-page .entity { margin-left: -10px; margin-right: -10px; padding: 8px 10px 7px; }
+  body.patch-page .entity.plain-entity { margin-left: -18px; margin-right: -18px; padding-left: 12px; padding-right: 12px; }
+
+  /* Entity header: icon + name on one line, the patch-dynamics cells on their own line below */
+  .entity { flex-wrap: wrap; row-gap: 6px; column-gap: 10px; }
+  .entity > .dyn-row-wrap,
+  body.patch-page .entity > .dyn-row-wrap {
+    flex: 0 0 100%;
+    order: 9;
+    display: flex;
+    justify-content: flex-end;
+    margin: 0;
+  }
+  .dyn-cell-wrap { width: 22px; height: 22px; }
+  /* the invisible hover bridge to the arrows must not reach past the screen edge */
+  .dyn-row-wrap::before { right: 0; }
+  .patch-dynamics { gap: 3px; padding: 2px 0; }
+
+  /* ---- Round corner buttons: one low row in the bottom-right corner ---- */
+  .nav-back-arrow,
+  .back-to-top,
+  .dyn-w-fab,
+  .search-fab { width: 38px; height: 38px; bottom: 10px; }
+  .nav-back-arrow { left: 10px; }
+  .dyn-w-fab { right: 10px; bottom: 10px; }
+  .search-fab { right: 56px; bottom: 10px; }
+  .back-to-top { right: 10px; }
+  .back-to-top:has(+ .dyn-w-fab) { right: 56px; bottom: 10px; }
+  .back-to-top.has-search { right: 102px; bottom: 10px; }
+  .search-pop { right: 10px; bottom: 58px; width: calc(100vw - 20px); }
+
+  /* ---- Change rows ---- */
+  /* the text column may shrink below its widest word / inner table (they wrap or scroll instead) */
+  ul.changes li,
+  ul.changes li.mech-desc,
+  ul.changes li.ability-row-solo,
+  ul.changes li.ability-row-start,
+  ul.changes li.ability-row-cont,
+  ul.changes li.ability-row-end { grid-template-columns: minmax(0, 1fr) auto; }
+  /* a long % group (3+ pieces: "-8%, -8%, -9%, -10%", "0% start +35% end") drops under the text,
+     still on the right, instead of squeezing the text into a narrow column */
+  ul.changes li:has(> .badge-group > :nth-child(3)) { grid-template-columns: minmax(0, 1fr); }
+  ul.changes li > .badge-group:has(> :nth-child(3)) { grid-column: 1; justify-self: end; }
+  /* level tables (19 level columns) scroll sideways inside themselves */
+  ul.changes li > .formula-table:not([hidden]),
+  .ability-change-body .formula-table:not([hidden]) {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .ability-block ul.changes li > .formula-table { max-width: calc(100% + 60px); }
+  /* The "?" notes open in the shared body-level popup (scripts.js); their hidden in-row copies
+     (position:absolute, 340px wide) only widened the page */
+  .info-tip .info-pop { display: none; }
+  /* CSS hover tips (enchantment chips, ability-order icons, the ability / Aghanim chips in the entity
+     toolbar): their invisible copy sat beside the chip and widened the page. On a phone they exist only
+     while tapped, and then open as a strip above the corner buttons, inside the screen */
+  .enchant-chip[data-tooltip]::after,
+  .ao-icon[data-tooltip]::after,
+  .ec-ab-icon[data-tooltip]::after,
+  .ec-aghs-btn[data-tooltip]::after { display: none; }
+  .enchant-chip[data-tooltip]:hover::after,
+  .ao-icon[data-tooltip]:hover::after,
+  .ec-ab-icon[data-tooltip]:hover::after,
+  .ec-aghs-btn[data-tooltip]:hover::after {
+    display: block;
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    top: auto;
+    bottom: 58px;
+    transform: none;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    white-space: pre-line;
+    text-align: left;
+  }
+
+  /* Before -> after cards: the two panes stack (old, arrow down, new) */
+  .properties-change,
+  .properties-change.new-only,
+  .properties-change.old-only {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .properties-change .properties-pane,
+  .properties-change.iab-change .properties-pane { grid-template-rows: none; grid-row: auto; }
+  .properties-change .properties-arrow { align-self: center; transform: rotate(90deg); }
+  .components-change { grid-template-columns: minmax(0, 1fr); row-gap: 4px; }
+  .components-change .components-arrow { transform: rotate(90deg); }
+  .properties-change .iab-none { display: none; }
+  .ability-change,
+  .ability-change.is-in-place,
+  .ability-change.unified-panes.is-single-new { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+  .ability-change-arrow { transform: rotate(90deg); }
+  /* item / ability card header: the cast range / mana / cooldown values wrap instead of widening the card */
+  .properties-change .properties-pane { min-width: 0; }
+  .properties-change.iab-change .properties-pane { grid-template-columns: minmax(0, 1fr); }
+  .iab-meta { flex: 0 1 auto; min-width: 0; flex-wrap: wrap; justify-content: flex-end; column-gap: 10px; }
+  /* a long "12% + 0.5% per level" formula button wraps like the text around it */
+  .formula-trigger { white-space: normal; max-width: 100%; }
+  /* game-formula change (Assist Gold …): panes stack, the worked example scrolls inside itself */
+  .formula-change-panes { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+  .formula-change-panes > :not(.formula-pane) { justify-self: center; transform: rotate(90deg); }
+  .formula-ex { display: block; overflow-x: auto; max-width: 100%; }
+  /* camp compositions table inside a row: scrolls inside itself */
+  .camp-table { max-width: 100%; overflow-x: auto; }
+  /* 7.38 "List of Neutral Enchantments" table: icon + name, then the tier values, then the squares */
+  body.patch-page .entity-block.enchant-list-head,
+  body.patch-page .entity-block.enchant-list-row { margin-left: -6px; margin-right: 0; padding-left: 8px; padding-right: 8px; }
+  body.patch-page .entity-block.enchant-list-row {
+    grid-template-columns: 34px minmax(0, 1fr);
+    row-gap: 6px;
+  }
+  body.patch-page .entity-block.enchant-list-head { grid-template-columns: minmax(0, 1fr) auto; row-gap: 4px; }
+  .enchant-list-head .ench-name-h { grid-column: 1; grid-row: 1; }
+  .enchant-list-head .ench-dyn-h { grid-column: 2; grid-row: 1; }
+  .enchant-list-head .ench-tiers { grid-column: 1 / -1; grid-row: 2; }
+  .enchant-list-row .ench-tiers { grid-column: 1 / -1; grid-row: 2; }
+  .enchant-list-row .dyn-row-wrap { grid-column: 1 / -1; grid-row: 3; }
+  .ench-tiers { grid-template-columns: minmax(0, 1fr) repeat(5, 44px); }
+  body.patch-page .enchant-list-row .ench-tiers,
+  body.patch-page .enchant-list-head .ench-tiers {
+    background: repeating-linear-gradient(to left, transparent 0 43px, rgba(254, 247, 232, 0.08) 43px 44px)
+                right top / 220px 100% no-repeat;
+  }
+
+  /* ---- Silent Changes pages: narrower gutters, the raw-field tables scroll inside themselves ---- */
+  .sc-page { padding: 16px 10px 80px; }
+  .sc-table { display: block; overflow-x: auto; max-width: 100%; }
+  .sc-old, .sc-new, .sc-ability-name, .sc-hero h2 { overflow-wrap: anywhere; }
+
+  /* ---- Calendar: the every-day grid (31 day columns) scrolls sideways, month names stay put;
+     the compact grid shows 4 months a row ---- */
+  .cal-mode-full { overflow-x: auto; padding-left: 0; padding-right: 0; }
+  .cal-full-grid { grid-template-columns: 44px repeat(31, 30px); width: max-content; padding-right: 12px; }
+  .cal-full-month-name { position: sticky; left: 0; z-index: 2; background: #191817; }
+  .cal-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 12px; }
+
+  /* ---- Main page: the inventory book fits the phone (4 slots a row) ---- */
+  .main-page { padding: 20px 8px 0; }
+  .inv-book { max-width: 100%; box-sizing: border-box; padding: 16px 12px 20px; }
+  .inv-title { font-size: 24px; letter-spacing: 1px; }
+  .inv-grid { grid-template-columns: repeat(4, auto); gap: 8px; }
+  .inv-slot { width: 70px; height: 70px; }
+  .inv-icon { width: 46px; height: 46px; }
+}
