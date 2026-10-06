@@ -17,7 +17,14 @@
       "date": "2026-10-06",
       "category": "Patch Reader",
       "minor": true,
-      "title": "The patch history squares open on the page's own patch, lit, instead of always the newest 12"
+      "title": "The patch history squares open on the page's own patch, with a wider gold ring, instead of always the newest 12"
+    },
+    {
+      "date": "2026-10-06",
+      "category": "Units",
+      "minor": true,
+      "link": "unit_changes.html",
+      "title": "Unit Changes: every card opens a page, also for units without changes in the site's patches"
     },
     {
       "date": "2026-10-06",

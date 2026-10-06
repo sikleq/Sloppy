@@ -45,3 +45,4 @@ generate → adversarial-перетегирование → формулы → b
 - `docs/captains-mode.md` — полное правило **Captains Mode** (`cm_draft`, кодировка `F/S/f/s`).
 - `docs/formula-change.md` — блок `formula_change` для важных **игровых формул** (Assist Gold, Experience…).
 - `docs/terrain.md` — полный план и TODO terrain-страницы.
+- `docs/todo.md` — отложенные задачи владельца (сравнение патчей, страница механик и проверка скрытых изменений).

@@ -637,10 +637,14 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
            f'<div class="entity-icon {icon_cls}"><img src="{_esc(e["icon"])}" alt="{_esc(e["name"])}"></div>'
            f'{_name_block(e)}</div></div></section>\n']
     if not e["patches"]:
-        first = _annotated()[-1] if _annotated() else ""
-        since = f" (since {_esc(first)})" if first else ""
+        # name the annotated patches: "since 7.08" read as "unchanged since 7.08", but 7.09-7.37 have no pages
+        # (owner 2026-10-06, Kobold Foreman: Liquipedia lists 14 changes, the site's patches hold one)
+        ranges = _annotated_ranges()
+        where = f" ({_esc(ranges)})" if ranges else ""
+        stats = (' Its values in every patch since 7.08: <a href="../neutral_stats.html">Neutral Stats</a>.'
+                 if e["kind"] == "unit" and _npc_of(e["icon"]).startswith("npc_dota_neutral_") else "")
         out.append('<section class="cat-panel ec-patch ec-nochange"><p class="ec-nochange-note">'
-                   f'No balance changes to {_esc(e["name"])} in the annotated patches{since} yet.'
+                   f'No changes to {_esc(e["name"])} in the patches this site annotates{where}.{stats}'
                    '</p></section>\n')
     for p in e["patches"]:
         bucket = rec.get("patches", {}).get(p["version"], {})
@@ -703,6 +707,46 @@ def _unchanged_items(have: list[dict], dyn: dict) -> list[dict]:
         out.append({"kind": kind, "slug": slug, "name": i["name"], "icon": f'../icons/items/{i["icon"]}.png',
                     "patches": [], "_nochange": True})
     return out
+
+
+def _unit_slug_for(name: str) -> str:
+    return _re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+def _unchanged_units(have: list[dict]) -> list[dict]:
+    """Every neutral creep of the camp roster and every removed unit that no annotated patch changed — a page with
+    "no changes" and a clickable card, as items have (owner 2026-10-06: "чтобы можно было нажать уже"). Slug from
+    the display name ("hellbear-smasher"), like the units the patch pages name."""
+    got_npc = {_npc_of(e["icon"]) for e in have}
+    got_slug = {e["slug"] for e in have}
+    names = _creep_display_names()
+    out = []
+    roster = [(npc, names.get(npc) or _re.sub(r"^npc_dota_neutral_", "", npc).replace("_", " ").title(), True)
+              for npc in _unit_camp_map()]
+    roster += [(basename, name, False) for basename, name, _bucket in _REMOVED_UNITS]
+    for npc, name, current in roster:
+        slug = _unit_slug_for(name)
+        if npc in got_npc or slug in got_slug or npc in _UNIT_NOT_LISTED:
+            continue
+        out.append({"kind": "unit", "slug": slug, "name": name, "icon": f"../icons/units/{npc}.png",
+                    "patches": [], "_nochange": True, "_current": current})
+        got_slug.add(slug)
+    return out
+
+
+def _annotated_ranges() -> str:
+    """The patches this site annotates, as ranges of the release history: "7.08, 7.38–7.41f"."""
+    ann = set(_annotated())
+    runs, cur = [], []
+    for r in reversed(RELEASE_HISTORY):                 # oldest first
+        if r["version"] in ann:
+            cur.append(r["version"])
+        elif cur:
+            runs.append(cur)
+            cur = []
+    if cur:
+        runs.append(cur)
+    return ", ".join(run[0] if len(run) == 1 else f"{run[0]}–{run[-1]}" for run in runs)
 
 
 def _write_item_picker(items: list[dict], dyn: dict) -> None:
@@ -1014,11 +1058,11 @@ def unit_page_slugs() -> dict:
     names into links. Empty until the patch pages exist (patch step runs first,
     before this and the Neutral Stats build)."""
     out = {}
-    for (kind, _slug), e in _collect().items():
-        if kind == "unit":
-            npc = _npc_of(e["icon"])
-            if npc:
-                out[npc] = _file_slug(e)
+    units = [e for (kind, _slug), e in _collect().items() if kind == "unit"]
+    for e in units + _unchanged_units(units):          # a creep without changes has its page too (2026-10-06)
+        npc = _npc_of(e["icon"])
+        if npc:
+            out[npc] = _file_slug(e)
     return out
 
 
@@ -1323,6 +1367,8 @@ def main() -> int:
                if k == kind or (kind == "item" and k == "enchant") or (kind == "hero" and k == "creep-hero")]
         if kind == "item":
             lst += _unchanged_items(lst, dyn)
+        if kind == "unit":
+            lst += _unchanged_units(lst)
         for e in lst:
             (DIST / folder / f'{_file_slug(e)}.html').write_text(_entity_page(e, asset, latest, dyn), encoding="utf-8")
         (DIST / f"{KINDS[kind][2]}.html").write_text(_index_page(kind, lst, asset, latest, dyn), encoding="utf-8")
