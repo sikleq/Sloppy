@@ -351,87 +351,88 @@ def heights_icon():
     return _outline(im).resize((ICON_RES, ICON_RES), Image.NEAREST)
 
 
-# Layers of 2026-10-06 (owner: "все слои"): 16-px glyphs, dark outline, hard-edged 2x like tc_heights.
-# Lane creep paths: a lane from the Radiant corner (green, bottom-left) to the Dire one (red, top-right), two arrows
+# Layers of 2026-10-06 (owner: "все слои"): 16-px glyphs, dark outline, hard-edged 3x like tc_heights; redrawn
+# the same day ("ВСе новые иконки улучши"): one light from the top left, a lit edge and a shadow edge on each.
+# Lane creep paths: the minimap's three lanes in the gold ramp, the Radiant base (green) and the Dire one (red)
 LANES_GLYPH = [
     "................",
-    "...........RRRR.",
-    "............RRR.",
-    "...........R.RR.",
-    "..........R...R.",
-    ".........r......",
-    "........r.......",
-    ".......y........",
-    "......y.........",
-    ".....g..........",
-    "....g...........",
-    ".G...G..........",
-    ".GG.G...........",
-    ".GGG............",
-    ".GGGG...........",
+    "..#++++++++RRrr.",
+    ".++########Rrrr.",
+    ".+#........rrre.",
+    ".+#........rree.",
+    ".+#.......+#.+#.",
+    ".+#......+#..+#.",
+    ".+#.....+#...+#.",
+    ".+#....+#....+#.",
+    ".+#...+#.....+#.",
+    ".+#..+#......+#.",
+    ".GGgg#.......+#.",
+    ".Gggg........+#.",
+    ".gggd++++++++##.",
+    ".ggdd########+..",
     "................",
 ]
-LANES_PAL = {"G": (120, 206, 96), "g": (96, 168, 78), "y": (226, 200, 112), "r": (196, 84, 64), "R": (232, 106, 84)}
-# River currents: three waves
+LANES_PAL = {"+": GOLD[5], "#": GOLD[3], "G": (168, 232, 120), "g": (110, 196, 86), "d": (60, 128, 56), "R": (255, 150, 120), "r": (226, 92, 70), "e": (150, 48, 40)}
+# River currents: a wave of water that ends in an arrowhead — the current's way downstream
 CURRENTS_GLYPH = [
     "................",
     "................",
-    "..ww......ww....",
-    ".wLLw....wLLw...",
-    "w....w..w....w..",
-    "......ww......w.",
     "................",
-    "..ww......ww....",
-    ".wLLw....wLLw...",
-    "w....w..w....w..",
-    "......ww......w.",
     "................",
-    "..ww......ww....",
-    ".wLLw....wLLw...",
-    "w....w..w....w..",
-    "......ww......w.",
+    ".........L......",
+    ".........wL.....",
+    "...LL....wwL....",
+    "..LwwL...wwwL...",
+    ".LwwwwL..wwwwL..",
+    ".wwbbwwLLwwwwwL.",
+    ".wb..bwwwwwwwb..",
+    ".b....bwwwwwb...",
+    ".......bbwwb....",
+    ".........wb.....",
+    ".........b......",
+    "................",
 ]
-CURRENTS_PAL = {"w": (84, 170, 236), "L": (176, 224, 255)}
-# Shops: a coin pouch, a gold coin on it
+CURRENTS_PAL = {"L": (186, 230, 255), "w": (84, 170, 236), "b": (44, 110, 184)}
+# Shops: a leather coin pouch tied with a gold cord, a gold coin in front
 SHOPS_GLYPH = [
     "................",
-    "......bbbb......",
+    ".....ll..ll.....",
+    "......lbbl......",
     ".......bb.......",
-    "......tttt......",
-    ".....bbbbbb.....",
-    "....bbllbbbb....",
-    "...bbllbbbbbb...",
-    "...bblbbYYYbb...",
-    "..bbbbbYyyYYbb..",
-    "..bbbbbYyYYybb..",
-    "..bbbbbYyyYYbb..",
-    "..bbbbbbYYYbbb..",
-    "...bbbbbbbbbb...",
-    "....bbbbbbbb....",
-    "................",
+    "......tTTt......",
+    ".....llbbbb.....",
+    "....llbbbbbb....",
+    "...llbbbbbbbd...",
+    "..llbbbbbbbbbd..",
+    "..lbbbbbbbYYbd..",
+    "..lbbbbbbYCCCy..",
+    "..lbbbbbYCCyCCy.",
+    "..dbbbbbYCyCCCy.",
+    "...ddbbbbCCCCy..",
+    ".....ddddbyyy...",
     "................",
 ]
-SHOPS_PAL = {"b": (150, 98, 54), "l": (196, 142, 88), "t": (226, 200, 112), "Y": (246, 214, 92), "y": (196, 150, 40)}
-# Spawn points: a banner on a pole
+SHOPS_PAL = {"l": (204, 150, 92), "b": (150, 98, 54), "d": (96, 60, 34), "t": (196, 150, 40), "T": (246, 214, 92), "Y": (255, 240, 160), "C": (240, 200, 70), "y": (176, 128, 30)}
+# Spawn points: a banner waving on a gold pole, on a stone base
 SPAWNS_GLYPH = [
-    "................",
-    "...p............",
-    "...pFFFFFFFF....",
-    "...pFFffFFFF....",
-    "...pFFFFFFFFF...",
-    "...pFFFFFFFF....",
-    "...pFFFffFF.....",
-    "...pFFFFFFFF....",
-    "...p............",
-    "...p............",
-    "...p............",
-    "...p............",
-    "..ppp...........",
-    ".ppppp..........",
-    "................",
+    "...oo...........",
+    "...oo...........",
+    "...PpffffF......",
+    "...PpFFFFFfff...",
+    "...PpFFFFFFFFFf.",
+    "...PpFFFFkFFFFF.",
+    "...PpkFFkkkFFFF.",
+    "...PpkkkkFFkFFk.",
+    "...Pp....kkkkk..",
+    "...Pp...........",
+    "...Pp...........",
+    "...Pp...........",
+    "...Pp...........",
+    "..sSSs..........",
+    ".sSSSSs.........",
     "................",
 ]
-SPAWNS_PAL = {"p": GOLD[3], "F": (210, 74, 90), "f": (240, 140, 150)}
+SPAWNS_PAL = {"o": GOLD[5], "P": GOLD[4], "p": GOLD[2], "F": (214, 70, 84), "f": (250, 150, 158), "k": (140, 36, 52), "s": (110, 106, 100), "S": (160, 156, 148)}
 NEW_LAYER_GLYPHS = {"tc_lanes": (LANES_GLYPH, LANES_PAL), "tc_currents": (CURRENTS_GLYPH, CURRENTS_PAL),
                     "tc_shops": (SHOPS_GLYPH, SHOPS_PAL), "tc_spawns": (SPAWNS_GLYPH, SPAWNS_PAL)}
 

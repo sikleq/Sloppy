@@ -115,6 +115,91 @@ def current_paths(src, steps=8):
     return out
 
 
+AREA_CELL = 16          # world units per cell of the field the buff zones are traced on
+AREA_TOLERANCE = 10     # world units: the traced outline is simplified this much (the field is AREA_CELL / 2 exact)
+
+
+def _spline_samples(cur, steps):
+    """(x, y, radius) along a current's spline: the radius goes linearly from node to node."""
+    nodes, rad = cur.get("nodes", []), cur.get("radius", [])
+    out = []
+    for i, (a, b) in enumerate(zip(nodes, nodes[1:])):
+        p0, p3 = (a["x"], a["y"]), (b["x"], b["y"])
+        p1 = (p0[0] + a["out"][0], p0[1] + a["out"][1])
+        p2 = (p3[0] + b["in"][0], p3[1] + b["in"][1])
+        ra, rb = (rad[i], rad[i + 1]) if i + 1 < len(rad) else (0, 0)
+        for k in range(steps + (i == len(nodes) - 2)):
+            t = k / steps
+            u = 1 - t
+            out.append((u ** 3 * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t ** 3 * p3[0],
+                        u ** 3 * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t ** 3 * p3[1],
+                        ra + (rb - ra) * t))
+    return out
+
+
+def _simplify(ring, tol):
+    """Douglas–Peucker on a closed ring of [x, y]."""
+    def rdp(pts):
+        if len(pts) < 3:
+            return pts
+        (ax, ay), (bx, by) = pts[0], pts[-1]
+        dx, dy = bx - ax, by - ay
+        norm = (dx * dx + dy * dy) ** 0.5 or 1.0
+        far, idx = -1.0, 0
+        for i in range(1, len(pts) - 1):
+            d = abs(dy * (pts[i][0] - ax) - dx * (pts[i][1] - ay)) / norm
+            if d > far:
+                far, idx = d, i
+        if far <= tol:
+            return [pts[0], pts[-1]]
+        return rdp(pts[:idx + 1])[:-1] + rdp(pts[idx:])
+    half = len(ring) // 2
+    return rdp(ring[:half + 1])[:-1] + rdp(ring[half:])[:-1]
+
+
+STRONG, MODERATE = 150, 100     # max bonus movement speed of a strong / moderate current (7.38)
+ALL_STRONG_FROM = 41            # 7.41: "All sections of currents now give a max movement speed bonus of 150"
+
+
+def current_max_bonus(cur, code):
+    """A current's max bonus movement speed. The map files mark each node strong (2) or moderate (1) — every current of
+    7.38-7.41f is one strength end to end (tests/test_map_layers.py) — and still do since 7.41, where the notes made
+    them all 150."""
+    if code.startswith("7") and int(code[1:3]) >= ALL_STRONG_FROM:          # "741f" -> 41; 6.83 maps had none
+        return STRONG
+    return STRONG if 2 in (cur.get("types") or []) else MODERATE
+
+
+def current_areas(src, code, steps=24):
+    """Where each river current acts (the owner 2026-10-06: "точно покажи места, где юнит получает скорость от
+    течения"): the union of the circles of its spline's radius (each node's radius, linear between nodes), traced as
+    outline rings [[[x, y], …], …] (an island in the stream is a ring of its own; draw them even-odd) — with its max
+    bonus speed: [{"max": 150, "rings": …}, …]. Needs numpy + contourpy (the owner's PC; the site build only reads
+    the result)."""
+    import numpy as np
+    from contourpy import contour_generator
+    out = []
+    for cur in src.get("dota_movespeed_modifier_path", []):
+        s = np.array(_spline_samples(cur, steps), dtype=float)
+        if not len(s) or not s[:, 2].any():
+            out.append({"max": current_max_bonus(cur, code), "rings": []})
+            continue
+        pad = s[:, 2].max() + 2 * AREA_CELL
+        xs = np.arange(s[:, 0].min() - pad, s[:, 0].max() + pad, AREA_CELL)
+        ys = np.arange(s[:, 1].min() - pad, s[:, 1].max() + pad, AREA_CELL)
+        gx, gy = np.meshgrid(xs, ys)
+        field = np.full(gx.shape, -1e9)
+        for x, y, r in s:                       # inside where some circle reaches: max(r - distance) > 0
+            np.maximum(field, r - np.hypot(gx - x, gy - y), out=field)
+        rings = []
+        for line in contour_generator(xs, ys, field).lines(0.0):
+            ring = [[int(round(x)), int(round(y))] for x, y in line]
+            if len(ring) > 3:
+                rings.append(_simplify(ring[:-1] if ring[0] == ring[-1] else ring, AREA_TOLERANCE))
+        out.append({"max": current_max_bonus(cur, code), "rings": rings})
+    return out
+
+
 def _dotted(code):
     """'740' -> '7.40' (insert the dot after the major '7')."""
     return code if "." in code else f"{code[0]}.{code[1:]}"
@@ -148,6 +233,16 @@ def _wards(old_code, new_code):
 def _nearest(target, candidates):
     return min(candidates, key=lambda c: (c["x"] - target["x"]) ** 2
                + (c["y"] - target["y"]) ** 2)
+
+
+_AREAS = {}
+
+
+def _areas_of(src, code):
+    """current_areas once per map file (each is the new side of one step and the old side of the next)."""
+    if code not in _AREAS:
+        _AREAS[code] = current_areas(src, code)
+    return _AREAS[code]
 
 
 def _diff_pair(old_code, new_code):
@@ -251,6 +346,7 @@ def _diff_pair(old_code, new_code):
         # line and zone layers (2026-10-06): lane creep paths, river currents, no-ward / shop / Roshan pit zones
         "lanes": {"old": lane_paths(A), "new": lane_paths(B)},
         "currents": {"old": current_paths(A), "new": current_paths(B)},
+        "currentAreas": {"old": _areas_of(A, old_code), "new": _areas_of(B, new_code)},
         "zones": {name: {"old": [[[p["x"], p["y"]] for p in z["points"]] for z in A.get(key, [])],
                          "new": [[[p["x"], p["y"]] for p in z["points"]] for z in B.get(key, [])],
                          **({"oldType": [z.get("shopType", "") for z in A.get(key, [])],

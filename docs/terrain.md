@@ -108,7 +108,7 @@ The owner (2026-10-06): "все слои" — everything the map file holds besi
 | Layer (button) | From the map file | On the map |
 |---|---|---|
 | Lane creep paths `lanes` | `npc_dota_spawner_{good,bad}_{top,mid,bot}` (`npcfirstwaypoint`) → `path_corner` chain (`target`) | Radiant solid green, Dire dashed red (they walk the same lane), a dot where each wave starts |
-| River currents `currents` | `dota_movespeed_modifier_path` `pathnodes` (a `"""` block: per node position + in/out tangents, relative to the entity) | the spline sampled 8 points a segment, a wide translucent blue band |
+| River currents `currents` | `dota_movespeed_modifier_path` `pathnodes` (a `"""` block: per node position + in/out tangents, in the entity's frame — turned by its yaw), `pathnoderadiusscales` (each node's radius, world units), `pathnodemovespeedtypes` (2 strong, 1 moderate) | the buff zone (see below), deeper blue = up to +150, paler = up to +100, white arrows downstream |
 | Shops `shops` | `trigger_shop` volumes (`shoptype` 0 home, 1 side, 2 secret) + `ent_dota_neutral_item_stash` | gold zones, green dots |
 | Spawn points `spawns` | `info_player_start_{goodguys,badguys}`, `info_courier_spawn_*` | red / blue dots |
 | — in No-ward ground | `trigger_no_wards` volumes | magenta dashed outlines over the gridnav layer |
@@ -116,12 +116,37 @@ The owner (2026-10-06): "все слои" — everything the map file holds besi
 
 - "Changed in the map file" gets chips for them (`_layer_changes`): lane paths n/6, currents, the zones, lane and hero
   spawns. Some are in no note: 7.39 and 7.39b moved lane path corners, the notes don't say so.
-- **Vision is not published** (owner 2026-10-06): `ent_fow_blocker_node`, `ent_fow_revealer` and anything about line
-  of sight stay out of `data/map` (test `test_published_map_data_holds_no_vision_entities`).
+- The chips are buttons like the others (owner 2026-10-06: "не могу нажать Changed in the map file фильтры новых
+  слоёв"): `_LAYER_HL` names each chip's highlight key and the layer it turns on, `_layer_changed` lists what changed
+  (a line or zone by its points, a spawn by its point, a current by its zone's rings) and `_layer_highlights_svg`
+  outlines it in the chips' colours — old side dashed, new side solid with the old place as a faint dashed ghost.
+- **Currents: where the buff acts** (owner 2026-10-06: "Слой течений воды неправильный"; then "точно покажи места, где
+  юнит получает скорость от течения, т.е там, где действует бафф, а не просто линию течения"). Two fixes:
+  - the nodes are in the entity's own frame: the two Dire currents of 7.41 stand at yaw 180° and were drawn mirrored,
+    off the water (`extract_map_entities._current` turns them; test `test_a_current_is_turned_by_its_entity_yaw`);
+  - the layer is the ZONE, not the line: `build_terrain_diff.current_areas` sweeps the spline by each node's radius
+    (linear between nodes), on a 16-unit field `max(r − distance)` traced at 0 by contourpy, simplified to 10 units
+    → `currentAreas` rings (even-odd: an island stays dry). Overlaid on the 7.41f render, the zones lie on the
+    streams' water bank to bank, and the big river has none. contourpy/numpy run on the owner's PC only; CI reads the
+    committed diffs.
+  - Strength: 7.38 "strong current up to 150 bonus movement speed … moderate up to 100"; 7.41 "All sections of currents
+    now give a max movement speed bonus of 150". The map files still mark the currents 2 / 1 in 7.41f, so the site
+    sets the bonus by patch (`current_max_bonus`: before 7.41 by the mark, from 7.41 all 150). Each current is one
+    strength end to end in every map file (test). The chip compares the zones only — the 7.41 change is in the notes,
+    not the map file. The bonus is downstream only (7.38 "going upstream inflicts no penalty"): arrows every 1100
+    units along the line, which runs downstream (it starts near a base).
+- **Vision is never drawn** (owner 2026-10-06): no layer for `ent_fow_blocker_node`, `ent_fow_revealer` or line of
+  sight, and `data/map` leaves them out (test `test_published_map_data_holds_no_vision_entities`). The full entity
+  lists, vision included, may be published (the owner, the same day: "Полный список объектов всех карт, включая обзор
+  — можно выложить и на GitHub"): they are in Oldgrowth, `versions/<patch>/entities.json.gz`, next to a `mapdata.json`
+  with every layer above (`scripts/gen/oldgrowth_mapdata.py`).
+- **The icons** of the four layers (`gen_terrain_layer_icons.py` `*_GLYPH`) were redrawn the same day ("ВСе новые
+  иконки улучши"): the minimap's three lanes with the two bases, a wave ending in an arrowhead, a coin pouch with a
+  round coin, a waving banner on a stone base — one light from the top left like the rest of the set.
 - **The map store** (owner 2026-10-06: keep the map files): all 65 map files of 7.08–7.41f in `D:\DotaMaps\maps\<sha1>.vpk`
   (1.67 GB, copied from `~/tools/maprender/oldbuilds/maps`, which `scripts/gen/map_history.py download` filled),
-  `D:\DotaMaps\patch_maps.json`, and every entity of every map (vision included, never committed) in
-  `D:\DotaMaps\ents\<sha8>.json.gz` (65 files, 7.6 MB). `extract_map_entities.py <codes> --store D:\DotaMaps` reads a
+  `D:\DotaMaps\patch_maps.json`, and every entity of every map (vision included; not in this repo, published in
+  Oldgrowth) in `D:\DotaMaps\ents\<sha8>.json.gz` (65 files, 7.6 MB). `extract_map_entities.py <codes> --store D:\DotaMaps` reads a
   per-patch code's map from the store; a legacy code (683 … 737) stays the game's legacy file — that is the LAST map of
   its patch family, `patch_maps.json`'s "7.22" is the release one (one 7.22 filler differed when mixed up). "741" in
   `MAPS` is the live `dota.vpk` = the newest patch, so 741 is read from the store too.
