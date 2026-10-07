@@ -723,6 +723,10 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   markers. A pair WITHOUT a diff passes empty `markers_svg` → `_controls_html(layers=False)` (Zoom only).
   **Add a new patch:** render its map file (SFM section), copy the picture + `mapdata` under the first-shipping
   patch's name, refresh `data/map/patch_maps.json` + `renders.json`, run `build_terrain_diff.py`; the page appears.
+  **Oldgrowth for a new map file (owner's tools read it, 2026-10-07):** the folder `versions/<first patch>/` with
+  `info.json`, then `python scripts/gen/oldgrowth_mapdata.py <patch>` — mapdata.json (every layer), entities.json.gz
+  AND the three grids (gridnav / elev / fow + info.json "grid", `map_grids.py`) in one go — then `build_index.py`
+  there, commit, push. Never skip the grids: another tool waits for them in Oldgrowth and extracts nothing itself.
 - **scripts.js inits ALL sliders** — `initTerrainCompare` does
   `querySelectorAll('.terrain-compare').forEach(initOneTerrainCompare)`; the
   default-hidden second pane (7.40) still gets a working handle/lens/toggles so the
