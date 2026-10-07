@@ -207,6 +207,28 @@ def test_a_zone_chip_counts_zones_not_their_hulls():
     assert [c for c in terrain._layer_changes(diff) if c[0] == "shop zones"] == [("shop zones", "changed", 1, 0, 2)]
 
 
+def test_touching_hulls_are_outlined_as_one_shape():
+    """The owner 2026-10-07: the Dire fountain shop looked "из 2 частей" — 2 entities, 2 hulls each (a pentagon and a
+    rectangle side by side, a 32-unit strip inside them); drawn now as one outline."""
+    pytest.importorskip("contourpy")
+    pentagon = [[5824, 6208], [6720, 5312], [6720, 7104], [5824, 7104]]
+    rect = [[6720, 5312], [7808, 5312], [7808, 7104], [6720, 7104]]
+    strip = [[5824, 7072], [7808, 7072], [7808, 7104], [5824, 7104]]
+    (ring,) = btd.zone_outlines([pentagon, rect, strip])
+    assert all(5820 <= x <= 7812 and 5308 <= y <= 7108 for x, y in ring)
+    assert not any(6700 < x < 6740 and 5400 < y < 7000 for x, y in ring)            # no corner on the inner edge
+    lone = [[0, 0], [100, 0], [100, 100]]
+    assert btd.zone_outlines([lone, [[900, 900], [1000, 900], [1000, 1000]]])[0] == lone   # a lone hull: exact
+
+
+def test_the_741_shops_layer_outlines_each_shop_once():
+    svg = terrain._line_zone_svgs(terrain._load_diff("7.41"), terrain._projector(terrain._load_map_meta()))
+    new = svg[svg.index("tm-layer-shops tm-new"):]
+    new = new[:new.index("</svg>")]
+    stroke = new[new.index('fill="none" stroke='):]
+    assert stroke.count("<polygon") == 4                                            # 2 fountain shops + 2 secret
+
+
 def test_the_741_secret_shop_and_roshan_pits_are_polygons():
     with open(os.path.join(ROOT, "data", "map", "mapdata_741f.json"), encoding="utf-8") as f:
         d = json.load(f)["data"]
