@@ -20,6 +20,7 @@ import json
 import math
 import os
 import re
+import struct
 import subprocess
 import sys
 import tempfile
@@ -120,8 +121,51 @@ def _box(e, bounds):
     return pts
 
 
-def _hull_bounds(vpk, models, tmp):
-    """{model path: ((minx, miny), (maxx, maxy))} of the camp volumes' hull models."""
+_NUM = r"(-?\d+(?:\.\d+)?(?:e[-+]?\d+)?)"
+
+
+def hull_vertices(dump):
+    """[[(x, y), …] per hull] of a hull model's `Source2Viewer-CLI -a` text. Since 7.35c the points are float32 x/y/z
+    in m_VertexPositions (hex bytes; m_Vertices then holds indices); in older .vphys_c they are hex in m_Vertices, and
+    in the oldest maps (before 7.32e) m_Vertices is a text list of [ x, y, z ]."""
+    out = []
+    blocks = re.findall(r"m_VertexPositions = \s*#\[(.*?)\]", dump, re.S) or \
+        re.findall(r"m_Vertices = \s*#\[(.*?)\]", dump, re.S)
+    for block in blocks:
+        raw = bytes.fromhex("".join(block.split()))
+        if len(raw) >= 36 and not len(raw) % 12:
+            out.append([struct.unpack_from("<3f", raw, i)[:2] for i in range(0, len(raw), 12)])
+    if not out:
+        for block in re.findall(r"m_Vertices = \s*\[\s*(\[.*?\],)\s*\]", dump, re.S):
+            pts = [(float(x), float(y)) for x, y, _z in re.findall(rf"\[ {_NUM}, {_NUM}, {_NUM} \]", block)]
+            if len(pts) >= 3:
+                out.append(pts)
+    return out
+
+
+def convex(points):
+    """The convex hull of (x, y) points (monotone chain), counter-clockwise."""
+    pts = sorted({(round(x, 2), round(y, 2)) for x, y in points})
+    if len(pts) < 3:
+        return pts
+
+    def cross(o, a, b):
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+    lower, upper = [], []
+    for p in pts:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
+            lower.pop()
+        lower.append(p)
+    for p in reversed(pts):
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], p) <= 0:
+            upper.pop()
+        upper.append(p)
+    return lower[:-1] + upper[:-1]
+
+
+def _hull_bounds(vpk, models, tmp, polys=None):
+    """{model path: ((minx, miny), (maxx, maxy))} of the volumes' hull models; with `polys` (a dict) it also gets
+    {model path: [[(x, y), …] per hull]} — the hulls' real footprints (convex, in the model's frame)."""
     out = {}
     if not models:
         return out
@@ -140,8 +184,24 @@ def _hull_bounds(vpk, models, tmp):
             if mns and mxs:
                 out[model] = ((min(float(x) for x, _ in mns), min(float(y) for _, y in mns)),
                               (max(float(x) for x, _ in mxs), max(float(y) for _, y in mxs)))
+                if polys is not None:
+                    polys[model] = [convex(h) for h in hull_vertices(dump)]
                 break
     return out
+
+
+def _zone_shapes(e, bounds, polys):
+    """A zone volume's outlines on the ground: each hull's real footprint turned by the entity's yaw (2026-10-07: the
+    7.41 secret shop is an octagon of radius 640 — the box around it reached 905 units out, and a hero standing in
+    its drawn corner could not buy; the Roshan pits' no-ward zones are 7-gons). The box when no vertices are read."""
+    model = _model(e)
+    hulls = [h for h in (polys or {}).get(model, []) if len(h) >= 3]
+    if not hulls:
+        return [_box(e, bounds[model])]
+    o, yaw = _vec(e.get("origin")), math.radians(_vec(e.get("angles"))[1])
+    c, s = math.cos(yaw), math.sin(yaw)
+    return [[{"x": int(round(o[0] + x * c - y * s)), "y": int(round(o[1] + x * s + y * c))} for x, y in h]
+            for h in hulls]
 
 
 def _model(e):
@@ -186,7 +246,7 @@ def _current(e):
             "types": [int(t) for t in types] if isinstance(types, list) else []}
 
 
-def _layers(by, zones, bounds):
+def _layers(by, zones, bounds, polys=None):
     """The records of the 2026-10-06 layers. Vision entities (fog blockers, revealers) are left out on purpose:
     they are not published on this site."""
     out = {"path_corner": [{**_xy(e), "name": _name(e), "next": re.sub(r"^\[PR#\]", "", str(e.get("target") or ""))}
@@ -199,10 +259,11 @@ def _layers(by, zones, bounds):
                              "first": re.sub(r"^\[PR#\]", "", str(e.get("npcfirstwaypoint") or ""))})
     out["npc_dota_spawner"] = sorted(spawners, key=lambda s: (s["team"], s["lane"]))
     out["dota_movespeed_modifier_path"] = [_current(e) for e in by.get("dota_movespeed_modifier_path", [])]
+    # one record per hull; "volume" = which entity (a fountain's shop is 3 hulls), so a count is of shops, not parts
     for cls, es in zones.items():
-        out[cls] = [{"points": _box(e, bounds[_model(e)]), **({"shopType": str(e.get("shoptype", ""))}
-                                                               if cls == "trigger_shop" else {})}
-                    for e in es if _model(e) in bounds]
+        out[cls] = [{"points": shape, "volume": i,
+                     **({"shopType": str(e.get("shoptype", ""))} if cls == "trigger_shop" else {})}
+                    for i, e in enumerate(es) if _model(e) in bounds for shape in _zone_shapes(e, bounds, polys)]
     out["info_player_start"] = [{**_xy(e), "team": "good" if cls.endswith("goodguys") else "bad"}
                                 for cls in ("info_player_start_goodguys", "info_player_start_badguys")
                                 for e in by.get(cls, [])]
@@ -242,7 +303,9 @@ def extract(vpk):
             by.setdefault(str(e.get("classname", "")), []).append(e)
         camps = [e for e in by.get("trigger_multiple", []) if _name(e).startswith("neutralcamp")]
         zones = {k: by.get(k, []) for k in _ZONES}
-        bounds = _hull_bounds(vpk, [_model(e) for e in camps] + [_model(e) for z in zones.values() for e in z], tmp)
+        polys = {}
+        bounds = _hull_bounds(vpk, [_model(e) for e in camps] + [_model(e) for z in zones.values() for e in z], tmp,
+                              polys)
     data = {k: [_xy(e) for e in by.get(k, [])] for k in _POINTS}
     data["npc_dota_tower"] = [{**_xy(e), "subType": _sub(e.get("mapunitname"), r"_(tower\d)")}
                               for e in by.get("npc_dota_tower", [])]
@@ -263,11 +326,25 @@ def extract(vpk):
     data["npc_dota_miniboss_spawner"] = mini or [_xy(e) for e in by.get("npc_dota_miniboss_spawner", [])]
     data["trigger_multiple"] = [{"points": _box(e, bounds[_model(e)]), "name": _name(e)} for e in camps
                                 if _model(e) in bounds]
-    data.update(_layers(by, zones, bounds))
+    data.update(_layers(by, zones, bounds, polys))
     counts = {k: len(v) for k, v in data.items()}
     counts["camps_by_type"] = {t: sum(1 for c in data["npc_dota_neutral_spawner"] if c["neutralType"] == t)
                                for t in sorted({c["neutralType"] for c in data["npc_dota_neutral_spawner"]})}
     return {"source": f"game files: maps/{os.path.basename(vpk)}", "data": data, "counts": counts}
+
+
+def write_ents(store, sha, vpk, refresh=False):
+    """The map's every entity -> <store>/ents/<sha8>.json.gz: only when missing (or `refresh`), and atomically (a .part
+    file renamed over it) — other tools read these files while this runs."""
+    import gzip
+    path = os.path.join(store, "ents", f"{sha[:8]}.json.gz")
+    if os.path.exists(path) and not refresh:
+        return path
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with gzip.open(path + ".part", "wt", encoding="utf-8") as f:
+        json.dump(raw_entities(vpk), f, ensure_ascii=False, separators=(",", ":"))
+    os.replace(path + ".part", path)
+    return path
 
 
 def main():
@@ -278,6 +355,8 @@ def main():
     ap.add_argument("--store", help="the private map store (D:\\DotaMaps): a per-patch code (738c) reads "
                                     "maps/<sha1>.vpk named in data/map/patch_maps.json, and every entity of the "
                                     "map goes to ents/<sha8>.json.gz there (never into data/map)")
+    ap.add_argument("--refresh-ents", action="store_true",
+                    help="rewrite the store's ents/<sha8>.json.gz even where it exists (by default only missing ones)")
     args = ap.parse_args()
     codes = args.codes or list(MAPS)
     os.makedirs(args.out, exist_ok=True)
@@ -299,10 +378,7 @@ def main():
             vpk = os.path.join(MAPS_DIR, MAPS[code])
         md = extract(vpk)
         if in_store:
-            import gzip
-            os.makedirs(os.path.join(args.store, "ents"), exist_ok=True)
-            with gzip.open(os.path.join(args.store, "ents", f"{shas[code][:8]}.json.gz"), "wt", encoding="utf-8") as f:
-                json.dump(raw_entities(vpk), f, ensure_ascii=False, separators=(",", ":"))
+            write_ents(args.store, shas[code], vpk, refresh=args.refresh_ents)
         with open(os.path.join(args.out, f"mapdata_{code}.json"), "w", encoding="utf-8") as f:
             json.dump(md, f, ensure_ascii=False, separators=(",", ":"))
             f.write("\n")
