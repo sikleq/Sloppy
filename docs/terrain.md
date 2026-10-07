@@ -130,6 +130,16 @@ The owner (2026-10-06): "все слои" — everything the map file holds besi
   min over hulls of max over edges of the distance outside the edge — straight edges stay exact — on an 8-unit grid
   per cluster of touching hulls; a lone hull keeps its own vertices) → `zones.<kind>.old/newOutline`; the builder
   fills the hulls in one group (overlaps not darker) and strokes only the outlines.
+- **Map grids in Oldgrowth (2026-10-07)** — the owner asked for the walk, height and vision-blocker grids of all 65
+  map files as raw data: `scripts/gen/map_grids.py` writes `versions/<patch>/{gridnav,elev,fow}.bin.gz` (uint8, row 0
+  = min_y, the map's own gnv grid; `info.json` "grid": w, h, min_x, min_y, edge, z_river). gridnav = the gnv cells as
+  they are; elev = highest z of `world_physics`' "physics_group" mesh (glTF export; legacy maps `.vphys_c`) over each
+  cell centre, levels of 128 from z_river (the lowest 128-step layer with >= 1 % of the covered cells), 255 = no
+  ground; fow = the cells of default_ents' `ent_fow_blocker_node`s. gzip with no name and time 0 (same cells = same
+  bytes). Raw data only — the Terrain pages still draw no vision. Source2Viewer gotcha: exporting ONE model writes
+  `<-o>.gltf` next to the -o path, several go inside it — search the whole temp folder. Tests: `tests/test_map_grids.py`
+  (skip without numpy, i.e. in CI). Trees in mapdata = `ent_dota_tree` of default_ents and the `*_base` world layers,
+  never `*_destruction` (7.41f: 2475).
 - The store's `ents/<sha8>.json.gz` is written only when missing (`--refresh-ents` to redo) and atomically (`.part`
   renamed over it): other tools read those files while extraction runs.
 - "Changed in the map file" gets chips for them (`_layer_changes`): lane paths n/6, currents, the zones, lane and hero
