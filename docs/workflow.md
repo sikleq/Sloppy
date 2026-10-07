@@ -77,6 +77,20 @@ should match the KV diff between the previous version and the new one.
 raw KV straight from the live VPK (the same paths `scripts/fetch/extract_patchnotes.py` uses; keep
 `data/stats/**` LF per `.gitattributes`), then derive the slim JSONs locally:
 
+**Backup when the local game is not at hand** (the owner 2026-10-07): the same files, the same places, from
+SteamTracking/GameTracking-Dota2 (it dumps every game build since 2026-10-07; commit subjects start with the build
+number). Writes only changed files, pushes nothing; then `slim_from_kv` as below:
+
+```powershell
+python scripts/fetch/fetch_gametracking.py 7.42 --dry-run   # what would change against data/stats/7.42
+python scripts/fetch/fetch_gametracking.py 7.42             # write them (newest build; --ref <sha> for another)
+```
+
+Mind the build: GameTracking's newest build can be LATER than a patch (2026-10-07: client 6946 changed Necronomicon —
+cost 2050 → 2700, Staff of Wizardry instead of 2 Sobi Masks, +15/20/25 Intelligence instead of mana regen — with no
+patch notes, three weeks after 7.41f). Never refresh an old patch's snapshot with it; pick the build of the patch
+(`--ref`).
+
 ```powershell
 python tools/slim_from_kv.py 7.42          # heroes/items/units/abilities/ability_ids .json from the .txt
 python tools/slim_from_kv.py 7.41e --check # self-test: regenerate and diff against the committed files
