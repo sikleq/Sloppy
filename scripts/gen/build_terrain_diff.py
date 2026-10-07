@@ -347,8 +347,11 @@ def _diff_pair(old_code, new_code):
         "lanes": {"old": lane_paths(A), "new": lane_paths(B)},
         "currents": {"old": current_paths(A), "new": current_paths(B)},
         "currentAreas": {"old": _areas_of(A, old_code), "new": _areas_of(B, new_code)},
+        # one polygon per hull; old/newVolume = the entity each belongs to (a fountain's shop is 3 hulls)
         "zones": {name: {"old": [[[p["x"], p["y"]] for p in z["points"]] for z in A.get(key, [])],
                          "new": [[[p["x"], p["y"]] for p in z["points"]] for z in B.get(key, [])],
+                         "oldVolume": [z.get("volume", i) for i, z in enumerate(A.get(key, []))],
+                         "newVolume": [z.get("volume", i) for i, z in enumerate(B.get(key, []))],
                          **({"oldType": [z.get("shopType", "") for z in A.get(key, [])],
                              "newType": [z.get("shopType", "") for z in B.get(key, [])]} if key == "trigger_shop" else {})}
                   for name, key in _ZONE_KEYS.items()},

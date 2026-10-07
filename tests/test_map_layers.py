@@ -3,6 +3,7 @@ spawn points — read from the map files (scripts/gen/extract_map_entities.py), 
 (scripts/gen/build_terrain_diff.py), drawn on the Terrain pages (builders/terrain.py)."""
 import glob
 import json
+import math
 import os
 import sys
 
@@ -173,7 +174,45 @@ def test_the_site_maps_carry_the_new_layers():
     with open(os.path.join(ROOT, "data", "map", "mapdata_741.json"), encoding="utf-8") as f:
         d = json.load(f)["data"]
     assert len(d["npc_dota_spawner"]) == 6 and len(d["path_corner"]) == 62
-    assert len(d["dota_movespeed_modifier_path"]) == 5 and len(d["trigger_shop"]) == 5
+    # shops: each fountain's shop is 3 hulls, the two secret shops one each (an octagon and a 12-gon)
+    assert len(d["dota_movespeed_modifier_path"]) == 5 and len(d["trigger_shop"]) == 8
+
+
+def test_a_zone_is_its_hulls_real_footprint():
+    """2026-10-07: the 7.41 secret shop is an octagon of radius 640 — its bounding box reached 905 units out, and a hero
+    standing in the drawn corner could not buy. Three dump formats carry a hull's vertices."""
+    import struct
+    pts = [(640 * math.cos(math.radians(22.5 + 45 * i)), 640 * math.sin(math.radians(22.5 + 45 * i))) for i in range(8)]
+    raw = b"".join(struct.pack("<3f", x, y, 0.0) for x, y in pts).hex()
+    for dump in (f"m_Vertices = #[ 00 01 02 ]\nm_VertexPositions = \n#[\n{raw}\n]",     # 7.35c+: positions apart
+                 f"m_Vertices = \n#[\n{raw}\n]",                                         # older .vphys_c
+                 "m_Vertices = \n[\n" + "".join(f"[ {x:.4f}, {y:.4f}, 0.0 ],\n" for x, y in pts) + "]"):  # oldest
+        (hull,) = ext.hull_vertices(dump)
+        assert len(ext.convex(hull)) == 8
+    e = {"origin": [1000.0, 2000.0, 0.0], "angles": [0.0, 90.0, 0.0], "model": "maps/dota/entities/shop.vmdl"}
+    (shape,) = ext._zone_shapes(e, {"maps/dota/entities/shop.vmdl": ((-640, -640), (640, 640))},
+                                {"maps/dota/entities/shop.vmdl": [ext.convex(pts)]})
+    assert len(shape) == 8
+    assert max(math.hypot(p["x"] - 1000, p["y"] - 2000) for p in shape) <= 641          # not the box's 905
+    (box,) = ext._zone_shapes(e, {"maps/dota/entities/shop.vmdl": ((-640, -640), (640, 640))}, {})
+    assert len(box) == 4                                                                # no vertices read: the box
+
+
+def test_a_zone_chip_counts_zones_not_their_hulls():
+    """A fountain's shop is 3 hulls: one of them moving is 1 shop changed of 2, not 1 of 4 polygons."""
+    sq = [[[0, 0], [1, 0], [1, 1]], [[5, 5], [6, 5], [6, 6]], [[9, 9], [10, 9], [10, 10]]]
+    moved = [sq[0], sq[1], [[9, 9], [11, 9], [11, 11]]]
+    diff = {"zones": {"shops": {"old": sq + [[[50, 50], [51, 50], [51, 51]]], "oldVolume": [0, 0, 0, 1],
+                               "new": moved + [[[50, 50], [51, 50], [51, 51]]], "newVolume": [0, 0, 0, 1]}}}
+    assert [c for c in terrain._layer_changes(diff) if c[0] == "shop zones"] == [("shop zones", "changed", 1, 0, 2)]
+
+
+def test_the_741_secret_shop_and_roshan_pits_are_polygons():
+    with open(os.path.join(ROOT, "data", "map", "mapdata_741f.json"), encoding="utf-8") as f:
+        d = json.load(f)["data"]
+    assert sorted(len(z["points"]) for z in d["trigger_shop"] if z["shopType"] == "2") == [8, 12]
+    assert [len(z["points"]) for z in d["trigger_boss_attackable"]] == [7, 7]
+    assert all(len(c["points"]) == 4 for c in d["trigger_multiple"])                     # camp boxes are rectangles
 
 
 def test_7_38c_shows_its_top_lane_path_change():

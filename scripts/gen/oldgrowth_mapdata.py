@@ -14,7 +14,6 @@ is. Runs on the owner's PC (Source2Viewer-CLI, the store); then `python build_in
     python scripts/gen/oldgrowth_mapdata.py [--store D:/DotaMaps] [--og ~/Documents/Oldgrowth] [patch ...]
 """
 import argparse
-import gzip
 import json
 import os
 import shutil
@@ -42,11 +41,7 @@ def publish(store, og, ver, info):
         json.dump({"source": f"maps/dota.vpk of patch {ver}: sha1 {sha}, Steam depot 373301 manifest "
                              f"{info['manifest']}", "data": md["data"], "counts": md["counts"]},
                   f, ensure_ascii=False, separators=(",", ":"))
-    raw = os.path.join(store, "ents", f"{sha[:8]}.json.gz")
-    if not os.path.exists(raw):                      # the store's dump is written by extract_map_entities --store
-        with gzip.open(raw, "wt", encoding="utf-8") as f:
-            json.dump(ext.raw_entities(os.path.join(store, "maps", f"{sha}.vpk")), f, ensure_ascii=False,
-                      separators=(",", ":"))
+    raw = ext.write_ents(store, sha, os.path.join(store, "maps", f"{sha}.vpk"))     # only when missing, atomically
     shutil.copyfile(raw, os.path.join(vdir, "entities.json.gz"))
     c = md["counts"]
     return (f"{ver}: {c['ent_dota_tree']} trees, {c['path_corner']} lane corners, "

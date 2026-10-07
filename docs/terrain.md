@@ -114,6 +114,18 @@ The owner (2026-10-06): "все слои" — everything the map file holds besi
 | — in No-ward ground | `trigger_no_wards` volumes | magenta dashed outlines over the gridnav layer |
 | — in Roshan | `trigger_boss_attackable` volumes (where Roshan can be hit) | crimson zones |
 
+- **Zones are their hulls' real footprints (2026-10-07)**: the shop / no-ward / Roshan pit volumes were drawn as the
+  hull's min/max box turned by yaw, but they are not boxes — the 7.41 secret shop is an octagon of radius 640 (the
+  box's corners reached 905 units out: the owner stood inside the drawn corner and could not buy), the Roshan pits are
+  7-gons. `extract_map_entities.hull_vertices` reads each hull's vertices from the `Source2Viewer-CLI -a` text — three
+  formats: 7.35c+ float32 x/y/z hex in `m_VertexPositions` (`m_Vertices` is then an index list), 7.32e–7.35 hex right
+  in `m_Vertices` (legacy `.vphys_c` next to the model), 7.08–7.32b `m_Vertices` as a text list — `convex` takes the
+  footprint, `_zone_shapes` turns it by yaw onto the origin: one polygon PER HULL (each fountain's shop is 3 hulls on
+  7.41f, so 8 shop polygons for 4 shops). No vertices read → the old box. Camp boxes (`trigger_multiple`) are true
+  rectangles (checked on 7.35 and 7.41f) and keep `_box`. Tests: `test_a_zone_is_its_hulls_real_footprint`,
+  `test_the_741_secret_shop_and_roshan_pits_are_polygons`.
+- The store's `ents/<sha8>.json.gz` is written only when missing (`--refresh-ents` to redo) and atomically (`.part`
+  renamed over it): other tools read those files while extraction runs.
 - "Changed in the map file" gets chips for them (`_layer_changes`): lane paths n/6, currents, the zones, lane and hero
   spawns. Some are in no note: 7.39 and 7.39b moved lane path corners, the notes don't say so.
 - The chips are buttons like the others (owner 2026-10-06: "не могу нажать Changed in the map file фильтры новых

@@ -669,10 +669,12 @@ def _layer_changes(diff):
             out.append(("river currents", "delta", len(cn), len(co), len(cn)))
     for key, name in (("shops", "shop zones"), ("roshanPit", "Roshan pit zones"), ("nowardZones", "no-ward zones")):
         z = (diff.get("zones") or {}).get(key) or {}
-        a, b = {_box_key_xy(p) for p in z.get("old", [])}, {_box_key_xy(p) for p in z.get("new", [])}
-        if a != b:
-            out.append((name, "changed", len(b - a), 0, len(b)) if len(a) == len(b)
-                       else (name, "delta", len(b - a), len(a - b), len(b)))
+        a, b = _zone_volumes(z, "old"), _zone_volumes(z, "new")
+        if set(a.values()) != set(b.values()):
+            # counted by zone, not by hull (2026-10-07: "1/8 shop zones" for 4 shops — a fountain's shop is 3 hulls)
+            sa, sb = set(a.values()), set(b.values())
+            out.append((name, "changed", len(sb - sa), 0, len(sb)) if len(sa) == len(sb)
+                       else (name, "delta", len(sb - sa), len(sa - sb), len(sb)))
     ents = diff.get("entities") or {}
     for key, name in (("laneSpawns", "lane creep spawns"), ("heroSpawns", "hero spawns")):
         ed = ents.get(key) or {}
@@ -685,6 +687,16 @@ def _layer_changes(diff):
 
 def _box_key_xy(points):
     return frozenset(tuple(p) for p in points)
+
+
+def _zone_volumes(zone, side):
+    """{volume: frozenset of its hulls' point sets} of one side of a zone kind — a zone is one entity, maybe several
+    hulls (no volume numbers in a diff: each polygon its own zone)."""
+    polys, vols = zone.get(side) or [], zone.get(side + "Volume") or []
+    out = {}
+    for i, p in enumerate(polys):
+        out.setdefault(vols[i] if i < len(vols) else ("p", i), set()).add(_box_key_xy(p))
+    return {k: frozenset(v) for k, v in out.items()}
 
 
 def _current_shapes(diff, side):
