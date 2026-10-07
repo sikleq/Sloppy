@@ -405,6 +405,21 @@ def _line_zone_svgs(diff, proj):
     out = []
     ents = diff.get("entities") or {}
     zones = diff.get("zones") or {}
+
+    def zone_svg(kind, fill, fill_opacity, stroke, dash, width=1.6):
+        """A zone kind's hulls filled (one opacity for the group: overlapping hulls are not darker) and outlined
+        ONCE round the shape they make together (build_terrain_diff.zone_outlines; the owner 2026-10-07 saw the
+        Dire fountain shop's inner hull lines as a zone "из 2 частей"). A diff without outlines: each hull outlined."""
+        z = zones.get(kind) or {}
+        hulls, rings = z.get(side) or [], z.get(side + "Outline")
+        body = ""
+        if fill:
+            body += (f'<g fill="{fill}" opacity="{fill_opacity}">'
+                     + "".join(f'<polygon points="{pts(h)}"/>' for h in hulls) + "</g>")
+        edge = rings if rings is not None else hulls
+        return body + (f'<g fill="none" stroke="{stroke}" stroke-width="{width}" stroke-linejoin="round"{dash}>'
+                       + "".join(f'<polygon points="{pts(r)}"/>' for r in edge if len(r) > 2) + "</g>")
+
     for side in ("old", "new"):
         lanes = (diff.get("lanes") or {}).get(side) or []
         if lanes:
@@ -422,24 +437,18 @@ def _line_zone_svgs(diff, proj):
         shops = (zones.get("shops") or {}).get(side) or []
         stash = (ents.get("stash") or {}).get(side) or []
         if shops or stash:
-            body = "".join(f'<polygon points="{pts(z)}" fill="{_SHOP_COLOUR}" fill-opacity="0.16" '
-                           f'stroke="{_SHOP_COLOUR}" stroke-width="1.6"/>' for z in shops)
+            body = zone_svg("shops", _SHOP_COLOUR, 0.16, _SHOP_COLOUR, "")
             body += dots(stash, 6, "#5fd06a")
             out.append(layer("shops", side, body))
         heroes = (ents.get("heroSpawns") or {}).get(side) or []
         couriers = (ents.get("couriers") or {}).get(side) or []
         if heroes or couriers:
             out.append(layer("spawns", side, dots(heroes, 5, "#d24a5a") + dots(couriers, 3.2, "#7ec8ff")))
-        nw = (zones.get("nowardZones") or {}).get(side) or []
-        if nw:
-            out.append(layer("nowards", side, "".join(
-                f'<polygon points="{pts(z)}" fill="none" stroke="#eb50ff" stroke-width="1.8" stroke-dasharray="6 4"/>'
-                for z in nw)))
-        pit = (zones.get("roshanPit") or {}).get(side) or []
-        if pit:
-            out.append(layer("roshan", side, "".join(
-                f'<polygon points="{pts(z)}" fill="#d24a5a" fill-opacity="0.14" stroke="#d24a5a" stroke-width="1.6"/>'
-                for z in pit)))
+        if (zones.get("nowardZones") or {}).get(side):
+            out.append(layer("nowards", side, zone_svg("nowardZones", None, 0, "#eb50ff", ' stroke-dasharray="6 4"',
+                                                       width=1.8)))
+        if (zones.get("roshanPit") or {}).get(side):
+            out.append(layer("roshan", side, zone_svg("roshanPit", "#d24a5a", 0.14, "#d24a5a", "")))
     return "".join(out)
 
 

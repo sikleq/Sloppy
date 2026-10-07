@@ -157,6 +157,67 @@ def _simplify(ring, tol):
     return rdp(ring[:half + 1])[:-1] + rdp(ring[half:])[:-1]
 
 
+OUTLINE_CELL = 8        # world units per cell of the field a zone's outline is traced on (straight edges stay exact)
+
+
+def _convex_field(gx, gy, poly):
+    """Signed distance-like field of a convex polygon on a grid: max over its edges of the distance outside that edge
+    (<= 0 inside). Its zero line runs exactly along straight edges."""
+    import numpy as np
+    # counter-clockwise (the shoelace sum of (x2 - x1)(y2 + y1) is negative), so "outside" is right of every edge
+    pts = poly if sum((b[0] - a[0]) * (b[1] + a[1]) for a, b in zip(poly, poly[1:] + poly[:1])) < 0 else poly[::-1]
+    out = np.full(gx.shape, -np.inf)
+    for (ax, ay), (bx, by) in zip(pts, pts[1:] + pts[:1]):
+        length = ((bx - ax) ** 2 + (by - ay) ** 2) ** 0.5
+        if length:
+            np.maximum(out, ((by - ay) * (gx - ax) - (bx - ax) * (gy - ay)) / length, out=out)
+    return out
+
+
+def zone_outlines(polys):
+    """The outline of a zone kind's polygons as ONE shape where its hulls touch or overlap (the owner 2026-10-07: the
+    Dire fountain shop "будто с пропуском и в целом зона построена из 2 частей" — it is 2 entities of 2 hulls each,
+    one a 32-unit strip inside the other): union of the convex hulls, traced at the zero of min(field) on an
+    OUTLINE_CELL grid per cluster of overlapping polygons → rings [[[x, y], …], …]. Needs numpy + contourpy (the
+    owner's PC; the site build only reads the result)."""
+    import numpy as np
+    from contourpy import contour_generator
+    polys = [[tuple(p) for p in poly] for poly in polys if len(poly) >= 3]
+    boxes = [(min(p[0] for p in q), min(p[1] for p in q), max(p[0] for p in q), max(p[1] for p in q)) for q in polys]
+    group = list(range(len(polys)))
+
+    def root(i):
+        while group[i] != i:
+            group[i] = group[group[i]]
+            i = group[i]
+        return i
+    for i, a in enumerate(boxes):                      # clusters of polygons whose boxes touch
+        for j in range(i):
+            b = boxes[j]
+            if a[0] <= b[2] + 1 and b[0] <= a[2] + 1 and a[1] <= b[3] + 1 and b[1] <= a[3] + 1:
+                group[root(i)] = root(j)
+    rings = []
+    for g in sorted({root(i) for i in range(len(polys))}):
+        members = [polys[i] for i in range(len(polys)) if root(i) == g]
+        if len(members) == 1:                          # a lone hull is its own outline, corners exact
+            rings.append([list(p) for p in members[0]])
+            continue
+        x0 = min(boxes[i][0] for i in range(len(polys)) if root(i) == g) - 3 * OUTLINE_CELL
+        y0 = min(boxes[i][1] for i in range(len(polys)) if root(i) == g) - 3 * OUTLINE_CELL
+        x1 = max(boxes[i][2] for i in range(len(polys)) if root(i) == g) + 3 * OUTLINE_CELL
+        y1 = max(boxes[i][3] for i in range(len(polys)) if root(i) == g) + 3 * OUTLINE_CELL
+        xs, ys = np.arange(x0, x1 + 1, OUTLINE_CELL, dtype=float), np.arange(y0, y1 + 1, OUTLINE_CELL, dtype=float)
+        gx, gy = np.meshgrid(xs, ys)
+        field = np.min([_convex_field(gx, gy, q) for q in members], axis=0)
+        for line in contour_generator(xs, ys, field).lines(0.0):
+            ring = [[int(round(x)), int(round(y))] for x, y in line]
+            if ring and ring[0] == ring[-1]:
+                ring = ring[:-1]
+            if len(ring) > 2:
+                rings.append(_simplify(ring, 2))
+    return rings
+
+
 STRONG, MODERATE = 150, 100     # max bonus movement speed of a strong / moderate current (7.38)
 ALL_STRONG_FROM = 41            # 7.41: "All sections of currents now give a max movement speed bonus of 150"
 
@@ -352,6 +413,9 @@ def _diff_pair(old_code, new_code):
                          "new": [[[p["x"], p["y"]] for p in z["points"]] for z in B.get(key, [])],
                          "oldVolume": [z.get("volume", i) for i, z in enumerate(A.get(key, []))],
                          "newVolume": [z.get("volume", i) for i, z in enumerate(B.get(key, []))],
+                         # the drawn outline: touching / overlapping hulls as one shape, no inner lines
+                         "oldOutline": zone_outlines([[[p["x"], p["y"]] for p in z["points"]] for z in A.get(key, [])]),
+                         "newOutline": zone_outlines([[[p["x"], p["y"]] for p in z["points"]] for z in B.get(key, [])]),
                          **({"oldType": [z.get("shopType", "") for z in A.get(key, [])],
                              "newType": [z.get("shopType", "") for z in B.get(key, [])]} if key == "trigger_shop" else {})}
                   for name, key in _ZONE_KEYS.items()},

@@ -124,6 +124,12 @@ The owner (2026-10-06): "все слои" — everything the map file holds besi
   7.41f, so 8 shop polygons for 4 shops). No vertices read → the old box. Camp boxes (`trigger_multiple`) are true
   rectangles (checked on 7.35 and 7.41f) and keep `_box`. Tests: `test_a_zone_is_its_hulls_real_footprint`,
   `test_the_741_secret_shop_and_roshan_pits_are_polygons`.
+- **One outline per zone (2026-10-07)**: the owner saw the Dire fountain shop as "будто с пропуском… из 2 частей" —
+  it is 2 entities of 2 hulls each (a pentagon + a rectangle side by side, and a 32-unit strip lying inside them),
+  each hull outlined. `build_terrain_diff.zone_outlines` traces the union of a kind's hulls (the zero line of
+  min over hulls of max over edges of the distance outside the edge — straight edges stay exact — on an 8-unit grid
+  per cluster of touching hulls; a lone hull keeps its own vertices) → `zones.<kind>.old/newOutline`; the builder
+  fills the hulls in one group (overlaps not darker) and strokes only the outlines.
 - The store's `ents/<sha8>.json.gz` is written only when missing (`--refresh-ents` to redo) and atomically (`.part`
   renamed over it): other tools read those files while extraction runs.
 - "Changed in the map file" gets chips for them (`_layer_changes`): lane paths n/6, currents, the zones, lane and hero
