@@ -236,6 +236,7 @@ python build_site.py
 python tools/validate_data.py
 python scripts/audit/check_icons.py
 python scripts/audit/audit_all.py
+python tools/patch_check.py 7.42      # every step of this routine: OK / MISSING / WARN, exit 1 on MISSING
 ```
 
 Open `dist/patches/7.42.html` in a browser and verify filters, per-level
