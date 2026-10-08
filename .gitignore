@@ -64,10 +64,6 @@ _dynamics.json
 # tests/test_datafeed_coverage.py guards at least one patch there. Do not delete it (audit 2026-10-04 nearly did).
 data/*_datafeed.json
 
-# Audit outputs — generated locally for inspection, not part of the build.
-audit_aoe.txt
-data/hero_aoe_audit_*.json
-
 # Abandoned logo experiment — kept locally, not committed
 icons/Pixel Logo.gif
 
