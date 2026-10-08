@@ -94,9 +94,10 @@ def test_terrain_page_gets_the_heights_layer_button_and_switches():
     top, fs = terrain._controls_html(layers=True, heights=True)
     assert 'data-layer="heights"' in top and "tc_heights.png" in top
     assert 'data-layer="heights"' not in terrain._controls_html(layers=True)[0]
-    assert '<div class="tc-fsp-title">Heights</div><div class="tf-hbands">' in fs
+    assert '<div class="tc-fsp-title">Heights</div><div class="tf-hbands tc-fsp-chips">' in fs
     btns = terrain._heights_buttons()
-    assert btns.count('class="tf-hband"') == 7 and 'data-hband="0"' in btns and "</i>768+</button>" in btns
+    # chips like "Changed in the map file" (the owner 2026-10-08): swatch in the icon's place, the number bold
+    assert btns.count('class="tf-chip tf-hband"') == 7 and 'data-hband="0"' in btns and "</i><b>768+</b></button>" in btns
     assert "River" not in btns and "Base" not in btns and "--c:rgb(52, 132, 218)" in btns
     assert "tc-heights-key" not in terrain._compare_html("7.40c", "7.41", markers_svg='<svg class="tm-layer-heights">')
     diff = terrain._load_diff("7.41")

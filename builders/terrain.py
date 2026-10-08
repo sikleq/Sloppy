@@ -1323,7 +1323,7 @@ def _controls_html(layers=True, changes=("", ""), heights=False):
                     + (f'<div class="tc-fsp-kinds">{kinds}</div>' if kinds else '')
                     + f'<div class="tc-fsp-chips">{chips}</div>')
     if heights:
-        body.append(f'<div class="tc-fsp-title">Heights</div><div class="tf-hbands">{_heights_buttons()}</div>')
+        body.append(f'<div class="tc-fsp-title">Heights</div><div class="tf-hbands tc-fsp-chips">{_heights_buttons()}</div>')
     body.append(f'<div class="tc-fsp-hints">{fs_hints}</div>')
     fs_html = (
         '    <div class="tc-fs-bar" role="region" aria-label="Map controls">\n'
@@ -1369,10 +1369,12 @@ def _heights_bands(diff):
 def _heights_buttons():
     """The heights as switches — swatch + number, each one shows / hides its band on the map (the owner 2026-10-05:
     the key "should move into the panel; then 0, 128 … can be clicked to turn those layers on and off"). Under the
-    change list and in the fullscreen panel alike; scripts.js initHeightBands keeps both copies in step."""
-    return "".join(f'<button type="button" class="tf-hband" data-hband="{k}" aria-pressed="true" '
+    change list and in the fullscreen panel alike; scripts.js initHeightBands keeps both copies in step. They are
+    chips like "Changed in the map file" (the owner 2026-10-08: "чипы и текст таким же"): the swatch stands where a
+    chip's icon is, the number bold."""
+    return "".join(f'<button type="button" class="tf-chip tf-hband" data-hband="{k}" aria-pressed="true" '
                    f'aria-label="Height {_esc(label)}"><i class="tf-hband-sw" style="--c:rgb{rgb}"></i>'
-                   f'{_esc(label)}</button>' for k, (_top, rgb, label) in enumerate(_height_bands()))
+                   f'<b>{_esc(label)}</b></button>' for k, (_top, rgb, label) in enumerate(_height_bands()))
 
 
 def _compare_html(old_ver, new_ver, markers_svg="", old_pic=None, new_pic=None, changes=("", "")):
@@ -1542,7 +1544,7 @@ def _facts_html(counts, step, diff):
                    + (f'<div class="tf-chips">{chips}</div>\n' if chips
                       else '<div class="tf-none">Nothing</div>\n'))
     if _heights_bands(diff):
-        out.append(f'<div class="tf-head">Heights</div>\n<div class="tf-hbands">{_heights_buttons()}</div>\n')
+        out.append(f'<div class="tf-head">Heights</div>\n<div class="tf-chips tf-hbands">{_heights_buttons()}</div>\n')
     return f'<div class="terrain-facts">\n{"".join(out)}</div>\n' if out else ""
 
 

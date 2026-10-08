@@ -9660,16 +9660,14 @@ a.tsp-label:hover, a.tsp-label:focus-visible { color: #e3c46a; text-decoration-c
 .terrain-compare.hband-off-2 .tm-hband-2, .terrain-compare.hband-off-3 .tm-hband-3,
 .terrain-compare.hband-off-4 .tm-hband-4, .terrain-compare.hband-off-5 .tm-hband-5,
 .terrain-compare.hband-off-6 .tm-hband-6 { display: none; }
-.tf-hbands { display: flex; flex-wrap: wrap; gap: 4px; }
-button.tf-hband {
-  display: inline-flex; align-items: center; gap: 5px; padding: 1px 7px; font: inherit; font-size: 11px;
-  font-weight: 600; color: var(--text-bright); background: none; cursor: pointer;
-  border: 1px solid rgba(227, 196, 106, 0.18); border-radius: 3px;
-}
+/* the height switches are .tf-chip chips like "Changed in the map file" (the owner 2026-10-08); the swatch takes the
+   icon's place and size */
+button.tf-hband { font: inherit; cursor: pointer; }
 button.tf-hband:hover { border-color: rgba(227, 196, 106, 0.45); }
 button.tf-hband[aria-pressed="false"] { opacity: 0.45; }
-.tf-hband-sw { width: 10px; height: 9px; border-radius: 1px; background: var(--c);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45); }
+.tf-hband-sw { width: 13px; height: 13px; margin: 0 1px 0 2px; border-radius: 2px; background: var(--c);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45); flex: none; }
+.tc-fsp-chips .tf-hband-sw { width: 11px; height: 11px; }
 /* trees — ONE colour everywhere. The 7.40 layout (old side) and 7.41 layout
    (new side) are split by the slider, so sweeping reveals how the forest moved. */
 /* match the spectral/leamare tree style (styleDefinitions tree.alive) */
