@@ -31,15 +31,15 @@
 | Вёрстка/стили: patch-page layering, toolbar-panel, Materials rhythm, regen columns, фильтры, Hero Stats, sticky dividers, навигационные стрелки, глобальный UI | [docs/agent-rules/ui-style.md](docs/agent-rules/ui-style.md) |
 | Структура проекта, как запустить, прочие страницы (index/calendar/terrain), грабли | [docs/agent-rules/pages-and-pipeline.md](docs/agent-rules/pages-and-pipeline.md) |
 
-## Скилл разметки патча
+## Скиллы проекта (`.claude/skills/`)
 
-При разметке/вычитке нового патча (`content/p<version>.py`) используется скилл
-**`sloppy-patch-annotate`** (`.claude/skills/sloppy-patch-annotate/`) — workflow с воротами:
-generate → adversarial-перетегирование → формулы → build+тесты → сверка OLD desc. Ядро —
-линтер канонических фраз `lint_tags.py` (заново выводит тег из текста строки через
-`generate_patch_code_v2._guess_tag` и показывает расхождения = обязательные решения). Скилл
-не дублирует правила, а ссылается на `docs/agent-rules/*`. Запуск линтера отдельно:
-`python .claude/skills/sloppy-patch-annotate/lint_tags.py content/p<version>.py`.
+- **`sloppy-patch`** — данные и содержание: новый патч целиком (файлы игры → тихие изменения → разметка
+  `content/p<version>.py` → карта/Terrain/Oldgrowth → выпуск: журнал, доки, тесты, CI). Разметка — workflow с
+  воротами (`references/annotate.md`), ядро — линтер канонических фраз:
+  `python .claude/skills/sloppy-patch/lint_tags.py content/p<version>.py`.
+- **`sloppy-visual`** — внешний вид: стиль сайта, иконки, визуальная проверка лёгким агентом, картинки к журналу.
+
+Скиллы не дублируют правила, а ссылаются на `docs/agent-rules/*` и `docs/*.md`.
 
 Узкоспециальные правила:
 - `docs/captains-mode.md` — полное правило **Captains Mode** (`cm_draft`, кодировка `F/S/f/s`).
