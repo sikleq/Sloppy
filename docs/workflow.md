@@ -13,11 +13,10 @@ order derived from `patch/meta.py` — there is no manual import list to edit.
 
 ## Step 1 — Register patch metadata
 
-Add the new version to `patch/meta.py`:
-
-- Append an entry to `PATCHES` (drives the nav dropdown).
-- Append an entry to `RELEASE_HISTORY` with a `filename` field
-  (drives chronological ordering and the build-discovery code).
+Add the new version to `patch/meta.py` → `RELEASE_HISTORY`: `version` + `date` (+ `filename`
+`patches/<version>.html`) in its chronological place. `PATCHES` (the nav dropdown) is derived from it and from the
+`content/p*.py` files automatically; `tests/test_patch_picker.py` fails when a page misses the picker. Also bump
+`PATCH_ENTRY_COUNTS` in `patch/page.py`.
 
 ## Step 2 — Fetch the full data snapshot
 
