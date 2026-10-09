@@ -86,6 +86,15 @@ For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `neutral_stats
 
 ## Глобальные UI-элементы (во всех страницах через `site_common.py` / `scripts.js`)
 - **Лого** — простой `<img class="nav-brand-logo" src="…/icons/logo_knight.png">` (пиксельный рыцарский шлем, прозрачный фон). Раньше был шлем `header-helmet.png` с canvas-эффектом EyeFire — удалён целиком (файлы + код).
+- **Режим для дальтоников** (2026-10-09): значок-глаз `button.cb-toggle` в правом конце шапки (`.nav-end`, в рамке
+  как `.version`, той же высоты 38px; иконки `icon_cb_off/on.png` из `scripts/gen/gen_cb_icon.py`). Ставит
+  `html.cb-mode`, помнится в localStorage `cbMode`; ранний `<script>` в начале `<nav>` ставит класс до отрисовки
+  бейджей. Меняются ТОЛЬКО теги BUFF/NERF (бейджи, % у строк, счёт патча `.ec-score`, цифры в подсказках предметов,
+  ячейки динамики): зелёный → синий, красный → оранжевый, ярче обычного. CSS — генерируемый блок в конце
+  `styles.css` (`scripts/gen/gen_colorblind_css.py`, список `INCLUDE`; `--check` и `tests/test_colorblind.py`
+  ловят забытую перегенерацию), ячейки динамики — `DYN_TAG_RGB_CB` в scripts.js. Новое правило с цветом
+  бафа/нерфа → перезапустить генератор. DEL остаётся розовым (оранжевый слил бы его с NERF). Карта, таблицы,
+  атрибуты — не трогаем (владелец: «только для тегов/cells»).
 - **Плавающие кнопки** `.nav-back-arrow` (назад в календарь/патч, низ-слева) и `.back-to-top` (низ-справа) — золото/кожа кружок (стиль index) + сплошной пиксельный SVG-треугольник (как `.version-nav-arrow`). Обе во НИЖНИХ углах (back-стрелка раньше была top-left и налезала на теги; JS больше НЕ выставляет ей inline `top`).
 
 
@@ -117,6 +126,9 @@ search sits behind the round loupe button».
   in its own patch; a row that fits neither side lights nothing. Gold copy of the icon: `icons/misc/talents_gold.svg`.
   Each placed row gets `data-tt="20r 25r"`, each twig its own gold `<image data-b>`; scripts.js "TALENT TREE"
   lights only the twigs of rows a filter leaves visible (a hidden NERF row's twig must not glow). Unlit twigs dim to 42%.
+  Any changed talent lights its twig, not only a SWAP. If a hero's twig stays dark, check talent_slots.json first:
+  from 7.39 some KV hero heads sit at column 0 (Earth Spirit, Slark) and the builder used to merge them into the
+  hero above (fixed 2026-10-09, `test_a_single_changed_talent_lights_its_twig_for_unindented_heroes`).
 - **Dynamics matrices**: cells never pop; one `.dyn-lens` (scripts.js) with a copy of the hovered pill grows
   over it and glides between cells (transform/opacity only). A per-cell transition repaints every passing cell.
 - **Changelog**: chip | beetle | text columns (`--clog-cat-w`), titles, bullets and small changes start on one x;

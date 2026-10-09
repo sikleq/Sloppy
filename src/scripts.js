@@ -811,8 +811,25 @@
   const DYN_ALPHA_BASE = 0.50;
   const DYN_ALPHA_STEP = 0.08;
   const DYN_ALPHA_MAX  = 0.90;
+  // Colour-blind mode (header switch, html.cb-mode): BUFF blue, NERF orange — the same hue swap as the badges
+  // (scripts/gen/gen_colorblind_css.py remap: same lightness, more saturation, hue 200° / 30°).
+  const DYN_TAG_RGB_CB = { buff: [48, 154, 207], nerf: [243, 142, 41] };
+  function dynRgb(tag) {
+    return (document.documentElement.classList.contains('cb-mode') && DYN_TAG_RGB_CB[tag]) || DYN_TAG_RGB[tag];
+  }
+  // The switch flips the mode on a built page: swap the buff / nerf colours inside every painted cell.
+  window.addEventListener('cb-mode-changed', () => {
+    const cb = document.documentElement.classList.contains('cb-mode');
+    const pairs = ['buff', 'nerf'].map(t => [DYN_TAG_RGB[t].join(', '), DYN_TAG_RGB_CB[t].join(', ')]);
+    document.querySelectorAll('.dyn-cell').forEach(cell => {
+      let bg = cell.style.getPropertyValue('--dyn-bg');
+      if (!bg) return;
+      pairs.forEach(([plain, safe]) => { bg = bg.split(cb ? plain : safe).join(cb ? safe : plain); });
+      cell.style.setProperty('--dyn-bg', bg);
+    });
+  });
   function dynColorFor(tag, count) {
-    const rgb = DYN_TAG_RGB[tag];
+    const rgb = dynRgb(tag);
     // count=1 → BASE, then each additional hit adds STEP, clamped at MAX.
     const alpha = Math.min(
       DYN_ALPHA_MAX,
@@ -854,7 +871,7 @@
   function dynWeightsStored() { try { return localStorage.getItem(DYN_W_KEY) === '1'; } catch (e) { return false; } }
   function dynWeightsStore(on) { try { localStorage.setItem(DYN_W_KEY, on ? '1' : '0'); } catch (e) {} }
   function dynWeightTint(w) {
-    const rgb = w > 0 ? DYN_TAG_RGB.buff : (w < 0 ? DYN_TAG_RGB.nerf : [110, 110, 110]);
+    const rgb = w > 0 ? dynRgb('buff') : (w < 0 ? dynRgb('nerf') : [110, 110, 110]);
     const alpha = Math.min(0.9, 0.25 + Math.min(Math.abs(w), 4) * 0.16);
     const c = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha.toFixed(2)})`;
     return `linear-gradient(${c}, ${c})`;
@@ -7841,4 +7858,20 @@ function ecShopMarkup(panels) {
   input.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') setTimeout(function () { if (!input.value) close(); }, 0);
   });
+})();
+
+// ---- COLOUR-BLIND MODE: the header switch (builders/site_common.py CB_TOGGLE). html.cb-mode swaps green → blue and
+// red → orange (styles.css, generated block); remembered in localStorage 'cbMode'. Scripts that paint colours
+// themselves (the Materials heatmap) listen for 'cb-mode-changed' and repaint. ----
+(function initCbMode() {
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll('.cb-toggle');
+  const sync = () => buttons.forEach(b => b.setAttribute('aria-pressed', String(root.classList.contains('cb-mode'))));
+  sync();
+  buttons.forEach(b => b.addEventListener('click', () => {
+    const on = root.classList.toggle('cb-mode');
+    try { localStorage.setItem('cbMode', on ? '1' : '0'); } catch (e) { /* private mode: this page only */ }
+    sync();
+    window.dispatchEvent(new Event('cb-mode-changed'));
+  }));
 })();

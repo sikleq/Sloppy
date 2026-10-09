@@ -295,6 +295,8 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
 - **У вложенного пункта свой «?» Valve** («Examples: Cleave…») — в той же строке списка, приглушённо: `<span class="pop-note">(…)</span>`. Генератор делает это в `_nested_info_text`.
 - **Раздел, где все строки REWORK** (кроме QoL/NEW, минимум 3), описывает переделанную механику: `plain_header(..., new="Reworked mechanic")`. Строки REWORK становятся описанием, подсказка про Alt (QoL) остаётся изменением. Под Map Objectives метка «Reworked objective».
 - **Несколько строк в «?» — это список:** `info_tip` сам рисует золотой кружок на каждой строке, строка `&nbsp;&nbsp;– x` становится подпунктом. Одна строка остаётся обычным текстом. Работает на всём сайте, в контенте ничего менять не нужно.
+- **Два «?» в конце одной строки → один** (2026-10-09, Earth Spirit 7.40: `note_box` «Now it's 25» + `inline_note` «Damage at level 1…»): `li()` склеивает их (`merge_tips`), заметки идут частями `.pop-part` через тонкую линию. Тест `tests/test_merge_tips.py`. *Почему:* два «?» подряд выглядят как ошибка.
+- **Удалённый фасет — просто «Removed»** под `facet_header` (2026-10-09): заголовок уже называет фасет, группа Facets говорит, что это фасет; не «Resonance: Facet removed». Генератор пишет `li("Removed", t("DEL"))`, вес — как у целого фасета (`_WHOLE_DEL_RE` знает голое «Removed»). Тест `test_a_bare_removed_under_a_facet_header_is_a_whole_facet`.
 
 ## Новый предмет — карточка (общее правило, 7.38 Orb of Frost)
 Порядок всегда один:

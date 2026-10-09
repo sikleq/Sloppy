@@ -866,7 +866,8 @@ _HERO_KINDS = ("hero", "unit", "creep-hero")
 _EXIT_RE = _re.compile(r"cycled out|removed from the game|^\s*removed\s*$", _re.I)
 # ... nor is one that enters the neutral pool a stronger item (brand-new items are "is-new" blocks: 0 already)
 _ENTER_RE = _re.compile(r"^\s*now is a tier \d+ neutral (?:artifact|item|enchantment)", _re.I)
-_WHOLE_DEL_RE = _re.compile(r"^(?:[\w' ]+: )?removed\b.*\b(?:ability|facets?|innate)\b|\bfacet removed\b"
+# a bare "Removed" is the row under a facet / ability header that names what left (generate_patch_code_v2)
+_WHOLE_DEL_RE = _re.compile(r"^(?:[\w' ]+: )?removed\b.*\b(?:ability|facets?|innate)\b|\bfacet removed\b|^removed$"
                             r"|^(?:[\w' ]+: )?(?:ability|innate) removed\b", _re.I)
 # the lost / gained effect acts ON a niche target (not merely a niche word in the row)
 _NICHE_TARGET_RE = _re.compile(r"\b(?:to|against|on|from|by|vs\.?)\s+(?:\w+\s+)?(?:buildings?|structures?|towers?|"

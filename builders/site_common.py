@@ -151,6 +151,20 @@ def get_materials_label(active_key):
     return ""
 
 
+# Colour-blind mode (owner 2026-10-09: a user can't tell buff / nerf apart). The switch sets html.cb-mode, remembered
+# in localStorage 'cbMode'; styles.css swaps green → blue and red → orange under it (scripts/gen/gen_colorblind_css.py).
+# The early script runs at the top of <body>, before the badges below it paint, so a reload never flashes green/red.
+CB_EARLY_SCRIPT = ("<script>try{if(localStorage.getItem('cbMode')==='1')"
+                   "document.documentElement.classList.add('cb-mode')}catch(e){}</script>")
+def cb_toggle(prefix=""):
+    """The switch: an eye whose iris shows the buff / nerf pair in use (scripts/gen/gen_cb_icon.py), in the same
+    box as the header's version label, at the right end of the header."""
+    ico = f'{prefix}icons/ui/gothic/icon_cb_'
+    return ('<button type="button" class="cb-toggle" aria-pressed="false" aria-label="Colour-blind mode">'
+            f'<img class="cb-ico cb-ico-off" src="{ico}off.png" alt="" width="24" height="24">'
+            f'<img class="cb-ico cb-ico-on" src="{ico}on.png" alt="" width="24" height="24"></button>')
+
+
 def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None,
                    subtabs_active=None, subnav_in_header=True, centre_tabs=True):
     """Render the shared top nav.
@@ -227,10 +241,11 @@ def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None
             f'nav-context-{active}">{ver_html}</div>'
         )
     header = f'''<nav class="top-nav">
+  {CB_EARLY_SCRIPT}
   <div class="nav-inner">
     {brand}
     {centre_html}
-    {right_side}
+    <div class="nav-end">{right_side}{cb_toggle(prefix)}</div>
   </div>
 </nav>
 '''

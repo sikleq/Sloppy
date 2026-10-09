@@ -1322,11 +1322,12 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
         if _general_notes:
             body, _ = _emit_notes(_general_notes, hero_name=name, version=version)
             out.extend(body)
-        # Emit "Facet removed" blocks (one facet_header per removed facet)
+        # Emit "Removed" blocks (one facet_header per removed facet). Just "Removed": the header already names the
+        # facet and the Facets group says it is one (owner 2026-10-09: not "Resonance: Facet removed")
         for facet_slug, _dname in _facet_removed:
             out.append(f'W(facet_header("{facet_slug}"))')
             out.append('W(ul_open())')
-            out.append('W(li("Facet removed", t("DEL")))')
+            out.append('W(li("Removed", t("DEL")))')
             out.append('W(ul_close())')
         # Emit inline facet sections from "FacetName: ..." hero_notes
         for facet_slug, fnotes in _facet_buckets.items():
