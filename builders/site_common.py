@@ -160,9 +160,13 @@ def cb_toggle(prefix=""):
     """The switch: an eye whose iris shows the buff / nerf pair in use (scripts/gen/gen_cb_icon.py), in the same
     box as the header's version label, at the right end of the header."""
     ico = f'{prefix}icons/ui/gothic/icon_cb_'
+    # off: a grey dimmed eye; on: the coloured eye over the active nav tab's gold bar and embers (owner 2026-10-09:
+    # «непонятно, когда иконка нажата»)
+    embers = ''.join(f'<i class="nav-ember" style="left:{x}%;animation-delay:{d}s"></i>'
+                     for x, d in ((28, 0), (52, 0.6), (72, 1.1)))
     return ('<button type="button" class="cb-toggle" aria-pressed="false" aria-label="Colour-blind mode">'
             f'<img class="cb-ico cb-ico-off" src="{ico}off.png" alt="" width="24" height="24">'
-            f'<img class="cb-ico cb-ico-on" src="{ico}on.png" alt="" width="24" height="24"></button>')
+            f'<img class="cb-ico cb-ico-on" src="{ico}on.png" alt="" width="24" height="24">{embers}</button>')
 
 
 def render_top_nav(active, latest_href, *, patch_context=False, picker_html=None,

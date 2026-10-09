@@ -9,7 +9,7 @@
       "items": [
         "Every tag gets a colour colour-blind eyes tell apart: BUFF blue, NERF orange, NEW yellow, SWAP green…",
         "On the tags, the % numbers, the patch scores and the dynamics cells; brighter, so weak ones don't fade",
-        "Remembered in this browser; press the eye again to go back"
+        "On: a coloured eye over a gold bar; off: a grey one. Remembered in this browser"
       ],
       "shots": ["icons/changelog/2026-10-09_colourblind_off.webp", "icons/changelog/2026-10-09_colourblind_on.webp"]
     },

@@ -111,6 +111,10 @@ def test_header_has_switch_and_early_script():
     assert 'class="cb-toggle"' in nav
     assert nav.index(site_common.CB_EARLY_SCRIPT) < nav.index('class="cb-toggle"')
     assert "localStorage.getItem('cbMode')" in site_common.CB_EARLY_SCRIPT
+    toggle = nav[nav.index('class="cb-toggle"'):]
+    assert "cb-ico-off" in toggle and "cb-ico-on" in toggle and 'class="nav-ember"' in toggle   # on = gold bar + embers
+    css = _css()
+    assert ".cb-ico-off { filter: grayscale(1)" in css and "html.cb-mode button.cb-toggle::after" in css
 
 
 def test_switch_is_wired_in_scripts():
