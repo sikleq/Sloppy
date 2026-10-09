@@ -811,16 +811,25 @@
   const DYN_ALPHA_BASE = 0.50;
   const DYN_ALPHA_STEP = 0.08;
   const DYN_ALPHA_MAX  = 0.90;
-  // Colour-blind mode (header switch, html.cb-mode): BUFF blue, NERF orange — the same hue swap as the badges
-  // (scripts/gen/gen_colorblind_css.py remap: same lightness, more saturation, hue 200° / 30°).
-  const DYN_TAG_RGB_CB = { buff: [48, 154, 207], nerf: [243, 142, 41] };
+  // Colour-blind mode (header switch, html.cb-mode): every tag its own colour, apart for deutan / protan eyes too —
+  // the same set as the badges (scripts/gen/gen_colorblind_css.py CB_TAGS; tests/test_colorblind.py keeps them equal).
+  const DYN_TAG_RGB_CB = {
+    buff:   [86, 180, 233],  // sky blue
+    new:    [245, 225, 90],  // yellow
+    rework: [204, 121, 167], // reddish purple
+    swap:   [40, 150, 120],  // bluish green
+    misc:   [200, 200, 200], // light grey
+    qol:    [40, 80, 170],   // dark blue
+    del:    [120, 40, 70],   // dark wine
+    nerf:   [230, 110, 20],  // vermilion orange
+  };
   function dynRgb(tag) {
     return (document.documentElement.classList.contains('cb-mode') && DYN_TAG_RGB_CB[tag]) || DYN_TAG_RGB[tag];
   }
   // The switch flips the mode on a built page: swap the buff / nerf colours inside every painted cell.
   window.addEventListener('cb-mode-changed', () => {
     const cb = document.documentElement.classList.contains('cb-mode');
-    const pairs = ['buff', 'nerf'].map(t => [DYN_TAG_RGB[t].join(', '), DYN_TAG_RGB_CB[t].join(', ')]);
+    const pairs = Object.keys(DYN_TAG_RGB_CB).map(t => [DYN_TAG_RGB[t].join(', '), DYN_TAG_RGB_CB[t].join(', ')]);
     document.querySelectorAll('.dyn-cell').forEach(cell => {
       let bg = cell.style.getPropertyValue('--dyn-bg');
       if (!bg) return;
