@@ -87,7 +87,9 @@ For `HP/sec` and `MP/sec` columns in both `heroes_stats.html` and `neutral_stats
 ## Глобальные UI-элементы (во всех страницах через `site_common.py` / `scripts.js`)
 - **Лого** — простой `<img class="nav-brand-logo" src="…/icons/logo_knight.png">` (пиксельный рыцарский шлем, прозрачный фон). Раньше был шлем `header-helmet.png` с canvas-эффектом EyeFire — удалён целиком (файлы + код).
 - **Режим для дальтоников** (2026-10-09): значок-глаз `button.cb-toggle` в правом конце шапки (`.nav-end`, в рамке
-  как `.version`, той же высоты 38px; иконки `icon_cb_off/on.png` из `scripts/gen/gen_cb_icon.py`). Ставит
+  как `.version`, той же высоты 38px; иконки `icon_cb_off/on.png` из `scripts/gen/gen_cb_icon.py`). Выключен —
+  серый тусклый глаз; включён — цветной глаз над золотой полоской с искрами, как у активной вкладки шапки
+  (`.nav-ember`; владелец: «непонятно, когда иконка нажата»). Ставит
   `html.cb-mode`, помнится в localStorage `cbMode`; ранний `<script>` в начале `<nav>` ставит класс до отрисовки
   бейджей. Меняются ТОЛЬКО теги (бейджи, % у строк, счёт патча `.ec-score`, цифры в подсказках предметов, ячейки
   динамики): у каждого тега свой цвет из `CB_TAGS` (по палитре Okabe–Ito: BUFF голубой, NERF оранжевый, NEW жёлтый,
