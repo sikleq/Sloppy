@@ -29,7 +29,9 @@ HIST = os.path.join(os.path.expanduser("~"), "outputs", "valve-revealed-weights-
 STATS = os.path.join(HERE, "data", "stats")
 OUT = os.path.join(HERE, "data", "rules", "talent_slots.json")
 
-_HERO_HEAD = re.compile(r'^\t"npc_dota_hero_([a-z0-9_]+)"\s*$', re.M)
+# any indent: from 7.39 on a few hero heads sit at column 0 (earth_spirit, slark), and a tab-only pattern merged
+# their blocks into the hero above — the tree then lit nothing for them (owner 2026-10-09, Earth Spirit 7.41)
+_HERO_HEAD = re.compile(r'^[ \t]*"npc_dota_hero_([a-z0-9_]+)"[ \t]*$', re.M)
 _SLOT = re.compile(r'^\t\t"Ability(\d+)"\s+"(special_bonus_[a-z0-9_]+)"', re.M)
 
 

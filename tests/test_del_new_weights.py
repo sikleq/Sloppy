@@ -9,6 +9,18 @@ def test_whole_ability_or_facet_removed_weighs_like_a_numberless_nerf():
     assert net == -round(w.weight_of("other") * w.WHOLE_W, 3)
 
 
+def test_a_bare_removed_under_a_facet_header_is_a_whole_facet():
+    """Owner 2026-10-09: the row under a removed facet's header is just "Removed" (was "X: Facet removed")."""
+    facet = dict(HERO, facet=True)                                  # the row sits in a facet block
+    assert w.row_scores("Removed", {"del"}, ctx=facet) == w.row_scores("Resonance: Facet removed", {"del"}, ctx=facet)
+
+
+def test_generator_writes_a_bare_removed_for_a_removed_facet():
+    import pathlib
+    src = (pathlib.Path(__file__).resolve().parents[1] / "generate_patch_code_v2.py").read_text(encoding="utf-8")
+    assert 'W(li("Removed", t("DEL")))' in src and 'li("Facet removed"' not in src
+
+
 def test_a_replaced_facet_nets_zero():
     gone, _ = w.row_scores("Removed Flayer's Hook Facet", {"del"}, ctx=dict(HERO, base_stat=True))
     came, _ = w.row_scores("", {"new"}, ctx=dict(HERO, facet=True))          # the new facet's card

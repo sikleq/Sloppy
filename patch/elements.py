@@ -2304,6 +2304,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         _lifted = re.findall(r'<!--INLINETIP-->(.*?)<!--/INLINETIP-->', extra, re.S)
         extra = re.sub(r'<!--INLINETIP-->.*?<!--/INLINETIP-->', '', extra, flags=re.S)
         trailing_tips.extend(_lifted)
+    trailing_tips = merge_tips(trailing_tips)
     if not isinstance(text_base, str):
         text_inner = text_base
     elif trailing_tips and "item-ability" in classes:          # the (?) stays with the description's last word
@@ -2401,6 +2402,20 @@ def info_tip(*lines, header=None):
     head = f'<span class="info-pop-h">{header}</span>' if header else ''
     return ('<!--TIP--><span class="info-tip" tabindex="0">?'
             f'<span class="info-pop">{head}{body}</span></span><!--/TIP-->')
+
+
+_TIP_RE = re.compile(r'<!--TIP--><span class="info-tip" tabindex="0">\?<span class="info-pop">(.*)</span></span>'
+                     r'<!--/TIP-->', re.S)
+
+
+def merge_tips(tips):
+    """Several (?) at the end of one row → one (?) (owner 2026-10-09: "два «?» подряд — соединять"): each popup
+    becomes a part of one popup, the parts split by a thin line (.pop-part). Tips of another shape stay as they are."""
+    bodies = [_TIP_RE.fullmatch(t) for t in tips]
+    if len(tips) < 2 or not all(bodies):
+        return tips
+    parts = ''.join(f'<span class="pop-part">{m.group(1)}</span>' for m in bodies)
+    return [f'<!--TIP--><span class="info-tip" tabindex="0">?<span class="info-pop">{parts}</span></span><!--/TIP-->']
 
 
 def show_list(*items, summary='Show list'):

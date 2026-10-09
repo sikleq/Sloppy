@@ -14,6 +14,14 @@ def test_abaddon_741_swaps_light_right_10_and_15():
     assert tt.changed_branches("7.41", "abaddon", rows) == {"10r", "15r"}
 
 
+def test_a_single_changed_talent_lights_its_twig_for_unindented_heroes():
+    # owner 2026-10-09: Earth Spirit 7.41 lit nothing — its KV head sits at column 0 from 7.39 on, so
+    # tools/build_talent_slots.py merged it into the hero above; Slark too
+    row = "Level 25 Talent Geomagnetic Grip Remnant Damage increased from +175 to +250"
+    assert tt.changed_branches("7.41", "earth_spirit", [row]) == {"25l"}
+    assert tt.talent_slots("7.40", "slark") != tt.talent_slots("7.39b", "slark")
+
+
 def test_old_patch_uses_that_patchs_meaning_of_a_reused_slug():
     # sniper_5 was Shrapnel Slow in 7.26c (level 15 left); today it is Take Aim range
     assert tt.changed_branches("7.26c", "sniper", ["Level 15 Talent: reduced from +16% Shrapnel Slow to +14%"]) == {"15l"}
