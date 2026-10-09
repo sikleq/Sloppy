@@ -7,8 +7,8 @@
       "title": "Colour-blind mode: the [[icons/ui/gothic/icon_cb_off.png|eye]] at the right of the header",
       "link": "patches/7.41f.html",
       "items": [
-        "BUFF turns blue, NERF orange — on the tags, the % numbers, the patch scores and the dynamics cells",
-        "Brighter than the usual pair, so weak buffs and nerfs don't fade into each other",
+        "Every tag gets a colour colour-blind eyes tell apart: BUFF blue, NERF orange, NEW yellow, SWAP green…",
+        "On the tags, the % numbers, the patch scores and the dynamics cells; brighter, so weak ones don't fade",
         "Remembered in this browser; press the eye again to go back"
       ],
       "shots": ["icons/changelog/2026-10-09_colourblind_off.webp", "icons/changelog/2026-10-09_colourblind_on.webp"]

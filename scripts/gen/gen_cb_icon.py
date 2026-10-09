@@ -37,12 +37,7 @@ EYE_GLYPH = [
     "................",
     "................",
 ]
-BUFF, NERF = (93, 177, 78), (209, 75, 75)         # scripts.js DYN_TAG_RGB buff / nerf
-
-
-def _safe(rgb):
-    m = cb.COLOUR.search("rgb(%d, %d, %d)" % rgb)
-    return tuple(int(x) for x in cb.remap(m)[4:-1].split(","))
+BUFF, NERF = cb.BASE["buff"], cb.BASE["nerf"]       # scripts.js DYN_TAG_RGB buff / nerf
 
 
 def eye_icon(buff, nerf):
@@ -57,7 +52,7 @@ def eye_icon(buff, nerf):
 
 def main():
     eye_icon(BUFF, NERF).save(os.path.join(_OUT, "icon_cb_off.png"))
-    eye_icon(_safe(BUFF), _safe(NERF)).save(os.path.join(_OUT, "icon_cb_on.png"))
+    eye_icon(cb.CB_TAGS["buff"], cb.CB_TAGS["nerf"]).save(os.path.join(_OUT, "icon_cb_on.png"))
     print("icon_cb_off.png, icon_cb_on.png")
 
 

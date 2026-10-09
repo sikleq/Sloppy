@@ -27,10 +27,10 @@ PAD = 6
 #   parts = selectors inside the scope (":scope" = the scope itself)
 SHOTS = {
     # the colour-blind switch (the eye at the right of the header): the same block off / on, a carousel
-    "2026-10-09_colourblind_off.webp": ("patches/7.41f.html", None, ["nav.top-nav", ".entity-block >> nth=0",
-                                                                     ".entity-block >> nth=1"], [], 520, {"width": 1400}),
-    "2026-10-09_colourblind_on.webp": ("patches/7.41f.html", None, ["nav.top-nav", ".entity-block >> nth=0",
-                                                                    ".entity-block >> nth=1"], [".cb-toggle"], 520,
+    "2026-10-09_colourblind_off.webp": ("patches/7.41f.html", None, ["nav.top-nav", ".toolbar", ".entity-block >> nth=0",
+                                                                     ".entity-block >> nth=1"], [], 560, {"width": 1400}),
+    "2026-10-09_colourblind_on.webp": ("patches/7.41f.html", None, ["nav.top-nav", ".toolbar", ".entity-block >> nth=0",
+                                                                    ".entity-block >> nth=1"], [".cb-toggle"], 560,
                                        {"width": 1400}),
     "2026-10-06_terrain_layers.webp": ("terrain_741.html", None, [".terrain-compare-col"],
                                        ['.tc-layer-btn[data-layer="lanes"]', '.tc-layer-btn[data-layer="currents"]',
