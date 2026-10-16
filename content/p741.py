@@ -7,11 +7,19 @@ def build():
     W(section("General Updates"))
 
     W(plain_header("Global Changes"))
+    # the patch's biggest change leads the section (owner 2026-10-16; generator _general_topics: "X removed from the game")
+    W(section_intro("Facets removed from the game"))
     W(ul_open())
-    W(li("Facets removed from the game", t("DEL")))
-    W(li("Innate abilities no longer scale with other abilities' level", t("REWORK")))
-    W(li("All innate abilities that used to scale with other abilities now either provide unchangeable bonuses or improve on 'per level' basis", t("REWORK"),
-         extra=inline_note(
+    W(li("All sections of currents now give a max movement speed bonus of 150", t("BUFF"),
+         extra=inline_note("Previously was only provided by sections on the base and near it, while other sections provided max bonus of 100.")))
+    W(ul_close())
+    # three rows about abilities growing with hero level, one subgroup (owner 2026-10-16; generator _general_topics)
+    W(subgroup("Scaling with Hero Level"))
+    W(ul_open())
+    # one row (owner 2026-10-16): Valve's follow-up sentence goes into the row's "?" (generator _merge_all_followup)
+    W(li("Innate abilities no longer scale with other abilities' level", t("REWORK"),
+         extra=inline_note("All innate abilities that used to scale with other abilities now either provide unchangeable bonuses or improve on 'per level' basis")
+         + inline_note(
              "Abilities that improve with hero level have a <b>base value</b> and an <b>increment value</b>. Some also specify the <b>number of levels required per increment</b>."
              "<br>Abilities that improve every level provide their increment value already at level 1."
          )))
@@ -19,15 +27,18 @@ def build():
          extra=inline_note("Pressing ALT key will show base value and increment of the ability.")))
     W(li("Abilities that had 'per level up' scaling changed to be 'per level'", t("MISC"),
          extra=inline_note("This mostly affects heroes reworked in update 7.40 and Largo.")))
+    W(ul_close())
+    # the lane creep rows get their own subgroup (owner 2026-10-16; generator _general_topics)
+    W(subgroup("Lane Creeps"))
+    W(ul_open())
     W(li("Flagbearer Creep Experience Bounty increased from 57 to 60", b(57, 60), also_dyn=['unit|creep-goodguys-flagbearer']))
     W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("REWORK"), also_dyn=['unit|goodguys-siege']))   # a clock time: no % (audit 2026-10-05)
-    W(li("Second +1 siege creep timing now occurs at 60:00", t("NEW"), also_dyn=['unit|goodguys-siege']))
+    # REWORK like the first timing, so the two stay first → second (owner 2026-10-16; canon: a clock-time timing)
+    W(li("Second +1 siege creep timing now occurs at 60:00", t("REWORK"), also_dyn=['unit|goodguys-siege']))
     W(li("Adjusted the meeting point of the lane creeps toward the offlane", t("MISC"),
          extra=inline_note(
              "Now offlane creeps are slightly slowed upon leaving the base for a couple of seconds. Safe lane creeps are slightly accelerated upon leaving the base for a couple of seconds. Both of these changes are effective until the 7:30 mark."
          ), also_dyn=['unit|creep-goodguys-melee', 'unit|creep-goodguys-ranged', 'unit|creep-goodguys-flagbearer']))
-    W(li("All sections of currents now give a max movement speed bonus of 150", t("BUFF"),
-         extra=inline_note("Previously was only provided by sections on the base and near it, while other sections provided max bonus of 100.")))
     W(ul_close())
     W(plain_header("Map Objectives"))
     W(subgroup("Wisdom Shrines"))
@@ -665,7 +676,7 @@ def build():
              "Passive: Insight Aura. Gives allied units 8% magic resistance. Radius: 1200."]))
     W(ul_open())
     W(li("Recipe Cost decreased from 800 to 675", b([800, 3725], [675, 3725], l=True, slash=True), extra=inline_note("Total cost unchanged at 3725g (due to Cloak cost increase)")))
-    W(li("Barrier no longer affects units that have been affected by Barrier within Pipe of Insight's cooldown", t("NERF")))
+    W(li("Barrier no longer affects units that have been affected by Barrier within Pipe of Insight's cooldown", t("DEL")))
     W(li("Insight Aura no longer provides 2.5 health regen", t("DEL")))
     W(ul_close())
     W(item_header("Radiance"))
@@ -786,7 +797,7 @@ def build():
     W(section("Neutral Item Updates"))
     W(plain_header("General changes", dynamics=False, sublabel=True))
     W(ul_open())
-    W(li("Tier 1 availability changed from 5:00 to 0:00", t("BUFF")))
+    W(li("Tier 1 availability changed from 5:00 to 0:00", t("REWORK")))   # a clock time: REWORK, no % (canon)
     W(li("Madstone crafting cost for Tier 1 items increased from 5 to 6", b(5, 6, l=True)))
     W(ul_close())
     W(plain_header("Artifact changes", dynamics=False, sublabel=True))
@@ -2543,6 +2554,11 @@ def build():
 
     # Invoker
     W(hero_header("Invoker"))
+    W(ability("Invoke"))
+    W(ul_open())
+    W(li("Now whenever Invoker gets Aghanim's Scepter or Aghanim's Shard, these items are inert in the inventory until Invoker activates them manually. Upon activation, he will be presented with three upgrades to choose from. Upgrades themselves for both Aghanim's Scepter and Aghanim's Shard are unchanged", t("REWORK"), extra=inline_note("You can't change selected upgrades. Selling Aghanim's Scepter and buying it again will provide the same upgrade you chose the first time")))
+    W(li("Aghanim's Scepter no longer provides +1 level to all three orbs. Now it provides +1 level only to a single orb you choose", t("NERF")))
+    W(ul_close())
     W(ability("Quas"))
     W(ul_open())
     W(li("Max Level increased from 7 to 8", b(7, 8)))
@@ -2562,11 +2578,6 @@ def build():
                  lambda W: 40 + 10 * W, lambda W: 30 + 10 * W,
                  levels=list(range(2, 12)), level_prefix='W',
                  value_fmt="{:g}"))
-    W(ul_close())
-    W(ability("Invoke"))
-    W(ul_open())
-    W(li("Now whenever Invoker gets Aghanim's Scepter or Aghanim's Shard, these items are inert in the inventory until Invoker activates them manually. Upon activation, he will be presented with three upgrades to choose from. Upgrades themselves for both Aghanim's Scepter and Aghanim's Shard are unchanged", t("REWORK"), extra=inline_note("You can't change selected upgrades. Selling Aghanim's Scepter and buying it again will provide the same upgrade you chose the first time")))
-    W(li("Aghanim's Scepter no longer provides +1 level to all three orbs. Now it provides +1 level only to a single orb you choose", t("NERF")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

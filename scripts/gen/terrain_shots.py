@@ -333,6 +333,25 @@ def _lanes(img, cx, cy, r, diff, side, half, width):
         poly(p["points"], LANE_RGB[p["team"]] + (255,), width, (7 * width, 4 * width) if p["team"] == "bad" else None)
 
 
+# max bonus speed -> fill (alpha) and outline, as the Terrain page's Currents layer (builders/terrain._CURRENT_ZONE)
+CURRENT_ZONE = {150: ((63, 156, 240, 120), (63, 156, 240, 230)), 100: ((143, 208, 255, 70), (143, 208, 255, 200))}
+
+
+def _currents(img, cx, cy, r, diff, side, half, width):
+    """Where the river currents give their speed bonus (2026-10-16, 7.41 "All sections of currents now give a max
+    movement speed bonus of 150"): the zones of each side, +150 deep blue, +100 pale blue — the Terrain page's
+    Currents layer colours (currentAreas of the map diff)."""
+    d = ImageDraw.Draw(img, "RGBA")
+    k = half / (2 * r)
+    for area in ((diff or {}).get("currentAreas") or {}).get(side, []):
+        fill, line = CURRENT_ZONE.get(area.get("max"), CURRENT_ZONE[100])
+        for ring in area["rings"]:
+            xy = [((x - (cx - r)) * k, ((cy + r) - y) * k) for x, y in ring]
+            if len(xy) > 2:
+                d.polygon(xy, fill=fill)
+                d.line(xy + [xy[0]], fill=line, width=width)
+
+
 def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=True):
     """One picture: the old | new halves. `own` = the entry's own patch; a picture of another patch's step (see
     spot_patch) shows that step's changes and none of the entry's marks or tier icons."""
@@ -344,6 +363,8 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=T
         img = _crop(fulls[ver], rect, cx, cy, r, half)
         if "boxes" in keys:
             _boxes(img, cx, cy, r, diff, side, half, width)
+        if "currents" in keys:
+            _currents(img, cx, cy, r, diff, side, half, width)
         if "lanes" in keys:
             _lanes(img, cx, cy, r, diff, side, half, width)
         _outlines(img, cx, cy, r, groups, side, keys, half, width)

@@ -176,13 +176,13 @@ def build():
 
     # Brewmaster
     W(hero_header("Brewmaster"))
-    W(ability("Thunder Clap", slug="brewmaster_thunder_clap"))
-    W(ul_open())
-    W(li("Slow duration increased from 4s to 4/4.25/4.5/4.75s", b(4, [4, 4.25, 4.5, 4.75])))
-    W(ul_close())
     W(ability("Liquid Courage", slug="brewmaster_liquid_courage"))
     W(ul_open())
     W(li("Aghanim's Shard max HP regen per second increased from 2.5% to 3%", b(2.5, 3)))
+    W(ul_close())
+    W(ability("Thunder Clap", slug="brewmaster_thunder_clap"))
+    W(ul_open())
+    W(li("Slow duration increased from 4s to 4/4.25/4.5/4.75s", b(4, [4, 4.25, 4.5, 4.75])))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

@@ -48,15 +48,6 @@ def build():
         unit="Gold",
     ))
     W(ul_open())
-    W(li("Melee Creep: Gold Bounty now increases by 1 per lane creep upgrade interval (every 7:30)", t("NEW"), also_dyn=['unit|creep-goodguys-melee']))
-    W(li("Flagbearer Creep: Gold Bounty now increases by 1 per lane creep upgrade interval", t("NEW"), also_dyn=['unit|creep-goodguys-flagbearer']))
-    W(li("Flagbearer Creep: AoE Bounty Radius increased from 1200 to 1500", b(1200, 1500), also_dyn=['unit|creep-goodguys-flagbearer']))
-    W(li("Flagbearer Creep: When killed by a player controlled unit, the Flagbearer Creep always grants Bonus Bounty to the killer's hero regardless of the hero's proximity to the Flagbearer Creep", t("REWORK"), also_dyn=['unit|creep-goodguys-flagbearer']))
-    W(li("Flagbearer Creep: Bonus Gold from killing Flagbearers is now classified as creep gold instead of ability gold", t("QoL"), extra=inline_note("Has no gameplay effect, but makes a post game gold breakdown more accurate"), also_dyn=['unit|creep-goodguys-flagbearer']))
-    W(li("Flagbearer Creep: Inspiration Aura no longer affects heroes", t("DEL"), also_dyn=['unit|creep-goodguys-flagbearer']))
-    W(li("Flagbearer Creep: Inspiration Aura now also provides a magic resistance bonus to affected creeps starting with 0% and improving by 4% with every lane creep upgrade interval, up to a maximum of 15 upgrades", t("NEW"), also_dyn=['unit|creep-goodguys-flagbearer']))
-    W(ul_close())
-    W(ul_open())
     W(li_formula("Courier respawn time decreased",
                  "60s + 6s per Hero Level", "45s + 5s per Hero Level",
                  lambda L: 60 + 6 * L, lambda L: 45 + 5 * L, l=True))
@@ -66,6 +57,17 @@ def build():
     W(ul_open())
     W(li("All illusions now have 800 daytime vision and 400 nighttime vision", b([1800, 800], [800, 400], slash=True),
          extra=inline_note("Previously inherited the hero's full vision (typically 1800 daytime / 800 nighttime)")))
+    W(ul_close())
+    # the lane creep rows get their own subgroup (owner 2026-10-16; generator _lane_creeps_subgroup)
+    W(subgroup("Lane Creeps"))
+    W(ul_open())
+    W(li("Melee Creep: Gold Bounty now increases by 1 per lane creep upgrade interval (every 7:30)", t("NEW"), also_dyn=['unit|creep-goodguys-melee']))
+    W(li("Flagbearer Creep: Gold Bounty now increases by 1 per lane creep upgrade interval", t("NEW"), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Flagbearer Creep: AoE Bounty Radius increased from 1200 to 1500", b(1200, 1500), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Flagbearer Creep: When killed by a player controlled unit, the Flagbearer Creep always grants Bonus Bounty to the killer's hero regardless of the hero's proximity to the Flagbearer Creep", t("REWORK"), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Flagbearer Creep: Bonus Gold from killing Flagbearers is now classified as creep gold instead of ability gold", t("QoL"), extra=inline_note("Has no gameplay effect, but makes a post game gold breakdown more accurate"), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Flagbearer Creep: Inspiration Aura no longer affects heroes", t("DEL"), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Flagbearer Creep: Inspiration Aura now also provides a magic resistance bonus to affected creeps starting with 0% and improving by 4% with every lane creep upgrade interval, up to a maximum of 15 upgrades", t("NEW"), also_dyn=['unit|creep-goodguys-flagbearer']))
     W(ul_close())
 
     W(plain_header("Map Objectives"))

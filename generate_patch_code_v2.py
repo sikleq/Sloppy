@@ -39,6 +39,7 @@ Pipeline:
    + canonical-phrase tags (Added to CM=NEW, No longer applied by
      illusions=DEL, etc.) per Sloppy memory rules.
 """
+import ast
 import json
 import os
 import re
@@ -230,6 +231,9 @@ CANONICAL_TAGS = [
     # a game-clock timing ("First Spawn Time increased from 15:00 to 20:00", "siege creep timing 35:00 to 30:00"):
     # when an object appears is REWORK (rule "Где и когда появляется объект"), and a % of a clock time means nothing
     (re.compile(r'\bfrom \d{1,2}:\d{2} to \d{1,2}:\d{2}\b'), 'REWORK'),
+    # a timing that now happens at a clock time ("Second +1 siege creep timing now occurs at 60:00", 7.41): REWORK
+    # like its pair, so the sorter keeps "First … / Second …" in order (owner 2026-10-16; was NEW above the first)
+    (re.compile(r'\btiming\b[^.]*\bnow (?:occurs|happens|starts) at \d{1,2}:\d{2}\b', re.I), 'REWORK'),
     # "X is no longer affected / increased by AoE bonuses": one tag for the class, DEL ("No longer …" → DEL);
     # 7.38 had two NERF and three later patches DEL, the scaffold said BUFF or MISC
     (re.compile(r'\bno longer (?:affected|increased|modified) by (?:\w+ )?(?:AoE|Area of Effect) (?:bonus(?:es)?|increase)'
@@ -1053,7 +1057,89 @@ def _render_general_note(note):
     if title:
         out.append(f'\nW(plain_header("{title}"))')
     body, _ = _emit_notes(note.get('generic', []))
-    out.extend(_link_lane_creeps(body))
+    out.extend(_general_topics(_merge_all_followup(_link_lane_creeps(body)), title))
+    return out
+
+
+def _li_parts(line):
+    """(text, keyword sources {name: source}, call node) of a one-line W(li("text", ...)) statement, else None."""
+    try:
+        call = ast.parse(line.strip()).body[0].value
+    except (SyntaxError, IndexError, AttributeError):
+        return None
+    if not (isinstance(call, ast.Call) and getattr(call.func, "id", "") == "W" and call.args
+            and isinstance(call.args[0], ast.Call) and getattr(call.args[0].func, "id", "") == "li"):
+        return None
+    li = call.args[0]
+    if not (li.args and isinstance(li.args[0], ast.Constant) and isinstance(li.args[0].value, str)):
+        return None
+    src = line.strip()
+    return li.args[0].value, {k.arg: ast.get_source_segment(src, k.value) for k in li.keywords}, li
+
+
+def _merge_all_followup(lines):
+    """Valve's follow-up sentence "All <same subject> that …" goes into the row before it, as its "?" (owner
+    2026-10-16, 7.41: "Innate abilities no longer scale with other abilities' level" + "All innate abilities that
+    used to scale … now either provide unchangeable bonuses or improve on 'per level' basis" → one row). The
+    follow-up's own note follows it in the same "?" (merge_tips joins them)."""
+    out = []
+    for line in lines:
+        prev = _li_parts(out[-1]) if out else None
+        cur = _li_parts(line)
+        if prev and cur:
+            subject = " ".join(prev[0].split()[:2]).lower()
+            if len(subject.split()) == 2 and cur[0].lower().startswith(f"all {subject} "):
+                notes = [s for s in (prev[1].get("extra"), f"inline_note({cur[0]!r})", cur[1].get("extra")) if s]
+                head = out[-1].rstrip()
+                if prev[1].get("extra"):
+                    head = head.replace(f"extra={prev[1]['extra']}", "", 1).replace(", ))", "))").replace(", , ", ", ")
+                out[-1] = head[:-2] + f", extra={' + '.join(notes)}))"
+                continue
+        out.append(line)
+    return out
+
+
+_LANE_ROW = re.compile(r"also_dyn=\[[^\]]*'unit\|(?:creep-goodguys-|goodguys-siege)")
+
+
+# Topics of a general section, in the order their subgroups follow (owner 2026-10-16, 7.41 Global Changes: the
+# rows stood mixed — innate scaling, currents, lane creeps). A lane creep row is the one _link_lane_creeps linked.
+_GENERAL_TOPICS = (
+    ("Scaling with Hero Level", re.compile(r"\bper level\b|\bhero level\b|\binnate abilit", re.I)),
+    ("Lane Creeps", None),
+)
+_MAP_SECTION = re.compile(r"\bmap\b|terrain|objective", re.I)      # map notes keep Valve's order (terrain rows)
+_GONE_FROM_GAME = re.compile(r"^[A-Z][\w' -]{2,40} removed from the game\.?$")
+
+
+def _general_topics(lines, title=""):
+    """A general section's rows sorted into topic subgroups (_GENERAL_TOPICS): a topic with two rows or more gets its
+    subgroup at the end, everything else stays on top. "<X> removed from the game" — the kind of change that sums up
+    a patch (7.41 Facets) — leads the section as its intro line instead of a row. Map sections are left alone."""
+    if _MAP_SECTION.search(title or ""):
+        return lines
+    rows = [l for l in lines if l.startswith("W(li(")]
+
+    def topic(line):
+        if _LANE_ROW.search(line):
+            return "Lane Creeps"
+        text = (_li_parts(line) or ("",))[0]
+        return next((name for name, rx in _GENERAL_TOPICS if rx and rx.search(text)), None)
+
+    lead = [l for l in rows if _GONE_FROM_GAME.match((_li_parts(l) or ("",))[0]) and len(rows) > 1]
+    tops = {l: topic(l) for l in rows if l not in lead}
+    counts = {}
+    for t in tops.values():
+        if t:
+            counts[t] = counts.get(t, 0) + 1
+    groups = [name for name, _rx in _GENERAL_TOPICS if counts.get(name, 0) >= 2]
+    if not groups and not lead:
+        return lines
+    moved = set(lead) | {l for l, t in tops.items() if t in groups}
+    out = [f'W(section_intro({_li_parts(l)[0]!r}))' for l in lead]
+    out += _drop_empty_ul([l for l in lines if l not in moved])
+    for name in groups:
+        out += [f'W(subgroup("{name}"))', 'W(ul_open())'] + [l for l, t in tops.items() if t == name] + ['W(ul_close())']
     return out
 
 
@@ -1211,6 +1297,29 @@ def _facet_card(slug, style, body_lines):
     return [f'W(facet_change("{slug}",\n'
             f'    old_desc=["TODO: the facet as it was in the previous patch (KV values + earlier notes)"],\n'
             f'    new_desc=[{rows}\n]))']
+
+
+# an innate the patch itself turns into another kind of ability — its KV flag may still say innate (7.41 Feast "Now
+# is a basic ability", Minefield Sign "Now only available with Aghanim's Scepter": data/stats/7.41 keeps
+# "Innate" "1" on both; the new innates Ghoul Frenzy / M.A.D. come as cards)
+INNATE_DEMOTED = re.compile(r"\bNow (?:is )?a (?:basic|regular) ability\b|\bno longer (?:an? )?innate\b"
+                            r"|\bnow only available with Aghanim", re.I)
+_INNATE_BY_VERSION = {}
+_KV_BLOCK_RE = re.compile(r'\n\t"([a-z0-9_]+)"\s*\n\t\{(.*?)\n\t\}', re.S)
+
+
+def innate_slugs_of(version):
+    """Slugs flagged "Innate" "1" in that patch's hero KV (data/stats/<version>/heroes/*.txt); empty when the patch
+    has no per-hero files."""
+    if version not in _INNATE_BY_VERSION:
+        folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "stats", str(version), "heroes")
+        found = set()
+        if version and os.path.isdir(folder):
+            for f in os.listdir(folder):
+                text = open(os.path.join(folder, f), encoding="utf-8", errors="replace").read()
+                found |= {s for s, body in _KV_BLOCK_RE.findall(text) if re.search(r'"Innate"\s+"1"', body)}
+        _INNATE_BY_VERSION[version] = found
+    return _INNATE_BY_VERSION[version]
 
 
 def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
@@ -1389,8 +1498,16 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
             card = _facet_card(facet_slug, s.get('style', ''), out[facet_start + 1:])
             if card:
                 out[facet_start:] = card
-    # Abilities
-    for a in hero.get('abilities', []):
+    # Abilities — the innate first, whatever Valve's order (owner 2026-10-16: Invoke, Feast, Minefield Sign 7.41 stood
+    # after the basic abilities). Innate = "Innate" "1" in THAT patch's KV: today's flag can mean another ability
+    # (Precision Aura / Vantage Point, Liquid Courage before 7.41d).
+    _inn = innate_slugs_of(version)
+
+    def _stays_innate(a):
+        return (ABILS.get(a.get('ability_id'), ('', ''))[1] in _inn
+                and not any(INNATE_DEMOTED.search(n.get('note', '')) for n in a.get('ability_notes', [])))
+    abilities = sorted(hero.get('abilities', []), key=lambda a: not _stays_innate(a))
+    for a in abilities:
         aid = a.get('ability_id')
         aname, aslug = ABILS.get(aid, (f'ability_{aid}', f'ability_{aid}'))
         innate_kwarg = ', innate=True' if '_innate_' in aslug else ''

@@ -95,6 +95,8 @@
     {"match": "The medium flooded camp near the safe lane tier 2 towers can now only evolve once", "spots": [[-752, -7644], [253, 7975]], "r": 800, "show": [], "mark": [[-720, -7696], [336, 7696]], "tiers": {"old": ["mid", "big", "ancient"], "new": ["mid", "big"]}},
     {"match": "Tormentor spawn areas have been reduced to low ground", "spots": [[7616, -7032], [-7441, 7141]], "r": 1100},
     {"match": "The ramp leading from the Radiant tier 1 tower to the stream", "spots": [[4500, -7300]], "r": 800, "show": ["nowards"]},
-    {"match": "Radiant offlane tier 2 tower has been adjusted slightly to the left", "spots": [[-6482, -872], [-6482, -872, "7.40"]], "r": 500, "mark": [[-6501, -872]], "mark_kind": "towers"}
+    {"match": "Radiant offlane tier 2 tower has been adjusted slightly to the left", "spots": [[-6482, -872], [-6482, -872, "7.40"]], "r": 500, "mark": [[-6501, -872]], "mark_kind": "towers"},
+    {"match": "Adjusted the meeting point of the lane creeps", "spots": [[-6500, -3968], [-6172, 384], [6264, 352], [6320, 3584]], "r": 700, "show": ["lanes"]},
+    {"match": "All sections of currents now give a max movement speed bonus of 150", "spots": [[1650, -5600], [-2560, 5600]], "r": 2000, "show": ["currents"], "phrase": "sections of currents"}
   ]
 }

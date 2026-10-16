@@ -73,6 +73,15 @@ subgroup("Talents")...       ← Talents — ВСЕГДА последние
 
 Если генератор поставил секции в другом порядке — переставить вручную.
 
+**Врождённая — по файлам игры ТОГО ЖЕ патча** (`"Innate" "1"` в `data/stats/<версия>/heroes/*.txt`,
+`generate_patch_code_v2.innate_slugs_of`), не по сегодняшнему флагу: в 7.41 Invoke, в 7.41d Liquid Courage стояли
+после обычных способностей, потому что у Valve они шли так (владелец 2026-10-16). Генератор сам ставит врождённую
+первой; `tests/test_innate_first.py` проверяет все патчи. **Но строки самого патча главнее флага:** «Now is a basic
+ability», «no longer innate», «Now only available with Aghanim's Scepter» (`INNATE_DEMOTED`) — способность больше
+не врождённая и стоит на своём месте (7.41 Feast и Minefield Sign: в `data/stats/7.41` у них ещё `"Innate" "1"`, а
+новые врождённые Ghoul Frenzy и M.A.D. идут карточкой первыми). Спорный случай оставлен владельцу:
+7.38 Drow Ranger — Valve называет врождённой Vantage Point, а файлы игры — Precision Aura.
+
 ## "Damage at level 1" после изменения атрибута
 
 Когда Valve указывает результирующий урон на 1-м уровне рядом с изменением базового атрибута:

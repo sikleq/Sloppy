@@ -36,23 +36,16 @@
 
 ## Порядок строк внутри `ul` (системное правило)
 
-Все `W(li(...))` внутри одного `ul_open()` … `ul_close()` блока **сортируются по типу тега** в этом порядке (применимо к любой сущности — герои, предметы, чары, способности, нейтралы и т.д.):
+Все `W(li(...))` внутри одного `ul_open()` … `ul_close()` блока **сортируются по типу тега** (любая сущность — герои, предметы, чары, способности, нейтралы). Порядок — один, ниже в «Авто-сортировке»: NEW → REWORK/SWAP → BUFF → NERF → DEL → QoL → MISC → без тега. (Старый список «числовые бейджи первыми, потом NEW…» устарел и убран 2026-10-16: код давно ставит NEW выше BUFF/NERF.)
 
-1. **Числовые бейджи** — `b()`, `br()`, `bf()`, `bstat_h()`, `bstat_i()` (BUFF / NERF / %-дельты). Внутри группы порядок берётся из патчноута.
-2. **`t("NEW")`** — добавление нового поведения/свойства/эффекта.
-3. **`t("REWORK")`** — структурные изменения (смена тира, ограничение доступности, изменение механики).
-4. **`t("DEL")`** — удаления.
-5. **`t("QoL")`** — удобство/quality-of-life (сгруппировано перед MISC).
-6. **`t("MISC")`** — всё прочее, в хвосте.
-
-Применять даже если в исходном патчноуте Valve порядок другой — переставлять при наполнении блока. Примеры в коде: Crippling Crossbow, Jidi Pollen Bag, Crude.
+Применять даже если в исходном патчноуте Valve порядок другой. Примеры в коде: Crippling Crossbow, Jidi Pollen Bag, Crude.
 
 ### Авто-сортировка (per-ability, не нарушать)
 
 Канонический порядок `<li>` строк внутри **каждого** `ul_open()`/`ul_close()` блока (= внутри одной способности / talents subgroup / hero-stat ul; сортировщик НЕ пересекает границы способностей):
 
 1. **NEW** (rank 1) — `t("NEW")`
-2. **REWORK** (rank 2) — `t("REWORK")` / raw `badge rework`
+2. **REWORK / SWAP** (rank 2) — `t("REWORK")`, `t("SWAP")` (талант заменён другим) / raw `badge rework`
 3. **BUFF** (rank 3) — `b()` / `bf()` / `bstat_h()` / `li_formula` с overall=buff, или `t("BUFF")`
 4. **NERF** (rank 4) — numeric с overall=nerf, или `t("NERF")`
 5. **DEL** (rank 5) — `t("DEL")`
@@ -296,6 +289,10 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
 - **Раздел, где все строки REWORK** (кроме QoL/NEW, минимум 3), описывает переделанную механику: `plain_header(..., new="Reworked mechanic")`. Строки REWORK становятся описанием, подсказка про Alt (QoL) остаётся изменением. Под Map Objectives метка «Reworked objective».
 - **Несколько строк в «?» — это список:** `info_tip` сам рисует золотой кружок на каждой строке, строка `&nbsp;&nbsp;– x` становится подпунктом. Одна строка остаётся обычным текстом. Работает на всём сайте, в контенте ничего менять не нужно.
 - **Два «?» в конце одной строки → один** (2026-10-09, Earth Spirit 7.40: `note_box` «Now it's 25» + `inline_note` «Damage at level 1…»): `li()` склеивает их (`merge_tips`), заметки идут частями `.pop-part` через тонкую линию. Тест `tests/test_merge_tips.py`. *Почему:* два «?» подряд выглядят как ошибка.
+- **General раскладывается по темам** (2026-10-16, 7.41 Global Changes: строки про врождённые, течения и лайн крипов стояли вперемешку). Генератор `_general_topics`: тема с двумя строками и больше получает свой подраздел в конце — «Scaling with Hero Level» (per level / hero level / innate abilities), «Lane Creeps» (строки, которым `_link_lane_creeps` дал `also_dyn` на лайн крипа); строки без темы и одиночные остаются сверху. «<X> removed from the game» (7.41 Facets) — вводная фраза раздела (`section_intro`), не строка. Разделы карты (Map / Terrain / Objectives) не трогаются: там порядок Valve. Поправлены 7.41 и 7.40. Тест `tests/test_general_regroup.py`.
+- **Таймер на игровых часах «… timing now occurs at 60:00» — REWORK**, как и пара «… timing decreased from 35:00 to 30:00» (канон): иначе NEW вставал выше и порядок «First → Second» ломался.
+- **Уточняющая фраза Valve «All <тот же предмет> …» — в «?» строки выше** (2026-10-16: «Innate abilities no longer scale…» + «All innate abilities that used to scale… now either provide unchangeable bonuses…» → одна строка). Генератор: `_merge_all_followup`; своя заметка второй строки идёт следом в тот же «?».
+- **Точка встречи лайн крипов — со снимком** (2026-10-16): в `data/terrain_spots.json` у 7.41 «Adjusted the meeting point of the lane creeps» — четыре кадра путей сложных линий (`show: ["lanes"]`; пути в файле карты 7.41 сдвинулись), слова «lane creeps» открывают снимки. Сама скорость крипов в файле карты не записана — на снимке пути, не скорость. Так же «All sections of currents …» — два кадра ручьёв, где зоны +100 стали +150 (`show: ["currents"]`, `scripts/gen/terrain_shots._currents`, цвета слоя течений Terrain).
 - **Удалённый фасет — просто «Removed»** под `facet_header` (2026-10-09): заголовок уже называет фасет, группа Facets говорит, что это фасет; не «Resonance: Facet removed». Генератор пишет `li("Removed", t("DEL"))`, вес — как у целого фасета (`_WHOLE_DEL_RE` знает голое «Removed»). Тест `test_a_bare_removed_under_a_facet_header_is_a_whole_facet`.
 
 ## Новый предмет — карточка (общее правило, 7.38 Orb of Frost)
