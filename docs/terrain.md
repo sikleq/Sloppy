@@ -411,6 +411,10 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `data-tiles-old/-new`; scripts.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
   picture — the old ones next to `.tc-old`, the new ones inside the clipped `.tc-new-layer` — once a picture pixel
   would be drawn bigger than a screen pixel. Pages' 1 GB limit: tiles for the site's maps only.
+- **Where a boss spawns first (2026-10-16)** — a spot's `"first": {"kind": "tormentors" | "roshan", "old": [x, y],
+  "new": [x, y]}`: every lair of that boss ringed thin white, the starting one gold with a "first" plate, on each half
+  (`terrain_shots._first`; lairs from mapdata npc_dota_miniboss_spawner / npc_dota_roshan_spawner). 7.41 Tormentor
+  (whole map, no minimap above `WHOLE_MAP_R`) and Roshan.
 - **Lane paths on the micro-screenshots: dashed = old, solid = new (2026-10-16)** — the owner: "in the line
   screenshots it's unclear which is old and which is new"; white / gold lost the sides and read too thick, so: each
   team in its colour (Radiant green, Dire red), the old paths dashed (the old map; a ghost under the new paths on the

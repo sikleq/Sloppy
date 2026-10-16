@@ -151,7 +151,8 @@ _CAMPS = {}
 
 
 # what a "mark" can outline (an entry's "mark_kind", camps by default): the map data list, square or round
-MARK_KINDS = {"camps": ("npc_dota_neutral_spawner", True), "towers": ("npc_dota_tower", False)}
+MARK_KINDS = {"camps": ("npc_dota_neutral_spawner", True), "towers": ("npc_dota_tower", False),
+              "tormentors": ("npc_dota_miniboss_spawner", False), "roshan": ("npc_dota_roshan_spawner", False)}
 
 
 def _camps(ver, kind="camps"):
@@ -180,6 +181,41 @@ def _marks(img, cx, cy, r, ver, points, half, width, kind="camps"):
         shape([X - s, Y - s, X + s, Y + s], outline=MARK, width=width)
         ys.append(Y)
     return ys                                # where the marked camps sit: the tier plate keeps away from them
+
+
+FIRST = (255, 196, 64)       # where a boss spawns first (the "first" key)
+WHOLE_MAP_R = 7000           # a spot this big shows the whole map
+
+
+def _first(img, cx, cy, r, ver, entry, side, half, width, font):
+    """A boss whose first spawn changed side (2026-10-16, 7.41 "Tormentor's spawn preference has switched" / "Roshan's
+    pit preference has switched"): every lair of that boss ringed thin white, the one it starts in — on this half —
+    ringed gold with a "first" plate. entry["first"] = {"kind": "tormentors" | "roshan", "old": [x, y], "new": [x, y]}."""
+    first = entry.get("first")
+    if not first:
+        return
+    d = ImageDraw.Draw(img, "RGBA")
+    k = half / (2 * r)
+    ring = max(9, half // 16)
+    fx, fy = first[side]
+    lairs = _camps(ver, first["kind"])
+    start = min(lairs, key=lambda c: (c[0] - fx) ** 2 + (c[1] - fy) ** 2)
+    for lx, ly in lairs:
+        X, Y = (lx - (cx - r)) * k, ((cy + r) - ly) * k
+        gold = (lx, ly) == start
+        rr = ring if gold else ring * 0.75
+        d.ellipse([X - rr - 1, Y - rr - 1, X + rr + 1, Y + rr + 1], outline=(0, 0, 0, 220), width=width + 3)
+        d.ellipse([X - rr, Y - rr, X + rr, Y + rr], outline=(FIRST + (255,)) if gold else (240, 240, 240, 200),
+                  width=width + 1 if gold else width)
+        if gold:
+            text = "first"
+            w = d.textlength(text, font=font)
+            pad = max(3, font.size // 4)
+            bx = min(max(X - w / 2 - pad, 2), half - w - 2 * pad - 2)
+            by = Y + rr + 4 if Y + rr + font.size + 3 * pad < half else Y - rr - font.size - 3 * pad
+            d.rounded_rectangle([bx, by, bx + w + 2 * pad, by + font.size + 2 * pad], radius=3,
+                                fill=(20, 16, 9, 215), outline=FIRST + (180,))
+            d.text((bx + pad, by + pad), text, font=font, fill=FIRST + (255,))
 
 
 def _tiers(img, chain, half, camp_ys=()):
@@ -400,7 +436,9 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=T
         ys = _marks(img, cx, cy, r, ver, entry.get("mark", []) if own else [], half, width,
                     entry.get("mark_kind", "camps"))
         _tiers(img, entry.get("tiers", {}).get(side) if own else None, half, ys)
-        if side == "old":
+        if own:
+            _first(img, cx, cy, r, ver, entry, side, half, width, font)
+        if side == "old" and r < WHOLE_MAP_R:         # a picture of the whole map needs no minimap
             _minimap(img, fulls[ver], rect, cx, cy, r, half)
         _label(img, label, font)
         halves.append(img)

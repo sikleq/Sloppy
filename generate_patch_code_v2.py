@@ -230,6 +230,10 @@ CANONICAL_TAGS = [
      'NERF'),                                                       # a new cap (7.41 Shadow Fiend souls; was NEW)
     # a game-clock timing ("First Spawn Time increased from 15:00 to 20:00", "siege creep timing 35:00 to 30:00"):
     # when an object appears is REWORK (rule "Где и когда появляется объект"), and a % of a clock time means nothing
+    # ... except an extra lane creep coming earlier / later: more of that creep sooner is its buff (owner 2026-10-16:
+    # "First +1 siege creep timing decreased from 35:00 to 30:00 — а не buff ли это? на 5 минут раньше"), still no %
+    (re.compile(r'\+\d+ [\w ]*creeps? timing decreased from \d{1,2}:\d{2} to \d{1,2}:\d{2}\b', re.I), 'BUFF'),
+    (re.compile(r'\+\d+ [\w ]*creeps? timing increased from \d{1,2}:\d{2} to \d{1,2}:\d{2}\b', re.I), 'NERF'),
     (re.compile(r'\bfrom \d{1,2}:\d{2} to \d{1,2}:\d{2}\b'), 'REWORK'),
     # a timing that now happens at a clock time where there was none ("Second +1 siege creep timing now occurs at
     # 60:00", 7.41): a new property of the unit — NEW, its own row (owner 2026-10-16, after trying REWORK and one
@@ -2583,6 +2587,28 @@ def _minute_lambda(m):
             else f'lambda M: {base} + {inc} * M')
 
 
+_PER_MINUTE_ROW = re.compile(r'^W\(li\("(?P<name>[^"]*?\b(?:upgrade|growth|gain)) per minute '
+                             r'(?P<dir>increased|decreased) from (?P<a>\d+(?:\.\d+)?) to (?P<b>\d+(?:\.\d+)?)"')
+_MINUTE_LEVELS = "[0, 5, 10, 15, 20, 25, 30, 40, 50, 60]"
+
+
+def _postprocess_per_minute(lines):
+    """"<X> upgrade per minute increased from A to B" (a value that grows with game time, 7.41 Tormentor "Barrier
+    upgrade per minute increased from 20 to 50") -> a minute table li_formula, as the barrier regen row (owner
+    2026-10-16: "formula table")."""
+    out = []
+    for line in lines:
+        m = _PER_MINUTE_ROW.match(line)
+        if not m:
+            out.append(line)
+            continue
+        a, b_ = m.group("a"), m.group("b")
+        out.append(f'W(li_formula("{m.group("name")} {m.group("dir")}", "{a} per minute", "{b_} per minute", '
+                   f'lambda M: {a} * M, lambda M: {b_} * M, levels={_MINUTE_LEVELS}, level_prefix=\'M\', '
+                   f'rework_badge=False))')
+    return out
+
+
 def _postprocess_minute_formula(lines):
     """W(li("X from A + (B per N minutes) to C + (D per K minutes)", t(..)))
     -> W(li_formula(...)) with a minute table (5:00 … 60:00)."""
@@ -3530,6 +3556,7 @@ def generate(version):
     # 3. Drop a v2-todo breadcrumb above ability blocks tagged "reworked".
     out = _postprocess_aghs_merge(out)
     out = _postprocess_boss_blocks(out)
+    out = _postprocess_per_minute(out)                # "… upgrade per minute …" -> minute table
     out = _postprocess_merge_twin_rows(out)
     out = _postprocess_minute_formula(out)
     out = _postprocess_scale_pill(out)

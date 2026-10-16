@@ -31,7 +31,8 @@ def build():
     W(ul_close())
     W(unit_header("Siege Creep", "../icons/units/npc_dota_goodguys_siege.png", general=False, page="goodguys-siege"))
     W(ul_open())
-    W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("REWORK"), also_dyn=['unit|goodguys-siege']))   # a clock time: no %
+    # 5 minutes earlier = more siege creeps sooner: BUFF, no % of a clock time (owner 2026-10-16)
+    W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("BUFF"), also_dyn=['unit|goodguys-siege']))
     # a new property of the siege creep: NEW (owner 2026-10-16, after one merged row; canon: "timing now occurs at")
     W(li("Second +1 siege creep timing now occurs at 60:00", t("NEW"),
          extra=inline_note("Before 7.41 a wave got only one extra siege creep, at 35:00 (since 7.22: \"Siege creeps now spawn two units at 35 minutes instead of 30 minutes\"). The second extra one is new."),
@@ -85,7 +86,12 @@ def build():
     W(ability("Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png"))
     W(ul_open())
     W(li("Base barrier increased from 2000 to 3000", b(2000, 3000)))
-    W(li("Barrier upgrade per minute increased from 20 to 50", b(20, 50)))
+    # a per-minute growth: a minute table, like the regen row below (owner 2026-10-16; generator _postprocess_per_minute)
+    W(li_formula("Barrier upgrade increased",
+                 "20 per minute", "50 per minute",
+                 lambda M: 20 * M, lambda M: 50 * M,
+                 levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
+                 level_prefix='M', rework_badge=False))
     W(li("Base barrier regen decreased from 40 to 20", b(40, 20)))
     W(li_formula("Barrier regen upgrade increased",
                  "3.5 per minute", "5 per minute",

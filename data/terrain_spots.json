@@ -97,6 +97,8 @@
     {"match": "The ramp leading from the Radiant tier 1 tower to the stream", "spots": [[4500, -7300]], "r": 800, "show": ["nowards"]},
     {"match": "Radiant offlane tier 2 tower has been adjusted slightly to the left", "spots": [[-6482, -872], [-6482, -872, "7.40"]], "r": 500, "mark": [[-6501, -872]], "mark_kind": "towers"},
     {"match": "Adjusted the meeting point of the lane creeps", "spots": [[-6500, -3968], [-6172, 384], [6264, 352], [6320, 3584]], "r": 700, "show": ["lanes"]},
-    {"match": "All sections of currents now give a max movement speed bonus of 150", "spots": [[1650, -5600], [-2560, 5600]], "r": 2000, "show": ["currents"], "phrase": "sections of currents"}
+    {"match": "All sections of currents now give a max movement speed bonus of 150", "spots": [[1650, -5600], [-2560, 5600]], "r": 2000, "show": ["currents"], "phrase": "sections of currents"},
+    {"match": "Tormentor's spawn preference has switched", "spots": [[0, 0]], "r": 8400, "show": [], "phrase": "spawn preference", "first": {"kind": "tormentors", "old": [-7202, 7947], "new": [7744, -6208]}},
+    {"match": "Roshan's pit preference has switched", "spots": [[-180, -170]], "r": 4300, "show": [], "phrase": "pit preference", "first": {"kind": "roshan", "old": [2831, -2740], "new": [-3194, 2395]}}
   ]
 }

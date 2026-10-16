@@ -74,7 +74,15 @@ def test_a_lone_topic_row_stays_and_map_sections_are_left_alone():
 
 def test_a_timing_that_now_occurs_is_new():
     assert g._guess_tag("Second +1 siege creep timing now occurs at 60:00") == "NEW"
-    assert g._guess_tag("First +1 siege creep timing decreased from 35:00 to 30:00") == "REWORK"
+    assert g._guess_tag("First +1 siege creep timing decreased from 35:00 to 30:00") == "BUFF"   # sooner = its buff
+
+
+def test_a_per_minute_growth_becomes_a_minute_table():
+    out = g._postprocess_per_minute(['W(li("Barrier upgrade per minute increased from 20 to 50", b(20, 50)))',
+                                     'W(li("Experience per Minute bonus increased from +600 to +1000", b(600, 1000)))'])
+    assert out[0].startswith('W(li_formula("Barrier upgrade increased", "20 per minute", "50 per minute"')
+    assert "level_prefix='M'" in out[0]
+    assert out[1].startswith('W(li("Experience per Minute')                          # a rate, not a growth: left
 
 
 def test_all_followup_goes_into_the_rows_note():

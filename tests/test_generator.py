@@ -712,7 +712,8 @@ def test_valve_improved_or_worsened_sets_the_direction(text, lower):
     ("Now costs 35 mana", "NERF"),                                 # 7.41f Treant (was NEW)
     ("Now can't use more than 20 souls per cast", "NERF"),         # 7.41 Shadow Fiend (was NEW)
     ("First Spawn Time increased from 15:00 to 20:00", "REWORK"),  # 7.39 Tormentor (was BUFF)
-    ("First +1 siege creep timing decreased from 35:00 to 30:00", "REWORK"),   # 7.41 (was NERF)
+    ("First +1 siege creep timing decreased from 35:00 to 30:00", "BUFF"),     # 7.41: an extra creep sooner (owner 10-16)
+    ("Tier 1 availability changed from 5:00 to 0:00", "REWORK"),               # 7.41 neutral items: a clock time
     ("Break Distance is no longer affected by AoE bonuses", "DEL"),                       # 7.38 (was MISC)
     ("Slash Jump Radius is no longer increased by AoE bonuses", "DEL"),                   # 7.38c (was BUFF)
     ("Initial Blast Width is no longer increased by bonuses to AoE", "DEL"),              # 7.41e (was BUFF)
