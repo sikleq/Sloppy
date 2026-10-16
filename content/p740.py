@@ -1723,7 +1723,7 @@ def build():
         + _ao_icon("Entangling Claws", "lone_druid_spirit_bear_entangle")
         + _ao_icon("Fetch", "lone_druid_spirit_bear_fetch")
         + '</div>'
-        + '<span class="ao-arrow">→</span>'
+        + '<span class="ao-arrow">&rarr;</span>'
         + '<div class="ao-group">'
         + _ao_icon("Demolish", "lone_druid_spirit_bear_demolish", dim=True, note="innate, hidden")
         + _ao_icon("Return", "lone_druid_spirit_bear_return")

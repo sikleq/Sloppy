@@ -3129,7 +3129,12 @@ def _postprocess_new_item_card(lines, version=None):
             note = re.search(r'extra=inline_note\("((?:[^"\\]|\\.)*)"\)', b_)
             piece = _new_item_card_parts(raw.group(1), note.group(1) if note else None) if raw else None
             if piece is None:
-                rows.append(re.sub(r't\("(?:MISC|BUFF|NERF|REWORK)"\)', 't("NEW")', b_, count=1))
+                row = re.sub(r't\("(?:MISC|BUFF|NERF|REWORK)"\)', 't("NEW")', b_, count=1)
+                if raw and not re.search(r', (?:t|b|bf|br)\(', row):
+                    # a row with no tag at all ("Passive: Hallowed. …", extra=…): NEW too (audit 2026-10-16:
+                    # 42 such rows in 7.38-7.41 had none — the filter missed them)
+                    row = row[:raw.end()] + ', t("NEW")' + row[raw.end():]
+                rows.append(row)
             elif piece and 'provides(' in piece[0]:
                 bonus += piece
             else:

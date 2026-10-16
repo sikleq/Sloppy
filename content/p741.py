@@ -348,29 +348,29 @@ def build():
                  recipe=('Recipe', 700), total=2600))
     W(provides('+15% Magic Resistance, +250 Health, +6 All Attributes'))
     W(ul_open())
-    W(li("Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Whenever the wearer takes damage from a player-controlled unit or Roshan, all stacks are removed to create an all-damage barrier for 7s that absorbs 120 damage per removed stack (up to 360). If the wearer reached a max amount of stacks at least once in a game, regaining a stack provides a non-stacking buff that increases movespeed by 20% for 7s", extra=inline_note("Has no damage threshold, but doesn't proc from Health Loss damage (like Heartstopper Aura)<br>Can't gain stacks for 3s after taking damage from Roshan or player-controlled sources")))
+    W(li("Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Whenever the wearer takes damage from a player-controlled unit or Roshan, all stacks are removed to create an all-damage barrier for 7s that absorbs 120 damage per removed stack (up to 360). If the wearer reached a max amount of stacks at least once in a game, regaining a stack provides a non-stacking buff that increases movespeed by 20% for 7s", t("NEW"), extra=inline_note("Has no damage threshold, but doesn't proc from Health Loss damage (like Heartstopper Aura)<br>Can't gain stacks for 3s after taking damage from Roshan or player-controlled sources")))
     W(ul_close())
     W(item_header("Crella's Crozier", new="New Magical Item"))
     W(components(('Ghost Scepter', 1500), ('Soul Booster', 3000),
                  recipe=('Recipe', 300), total=4800))
     W(provides('+6 All Attributes, +450 Health, +450 Mana'))
     W(ul_open())
-    W(li("Active: Rite of Rumusque. The wearer enters ghost form for 4 seconds, becoming immune to physical damage, but is unable to attack and 30% more vulnerable to magic damage. Steals 5% movement speed from enemy heroes in a 900 radius every second. Movement speed steal lasts 1.5s. Bonuses stack and have duration refreshed on gaining new stacks. No Mana Cost. Cooldown: 20s", extra=inline_note("The ghost form and stolen speed can be dispelled off the wearer, but the stealing debuff that provides new stacks can't")))
-    W(li("Passive: Putrefaction Aura. Reduces health restoration of nearby enemy heroes by 30%. While Rite of Rumusque is active, the effect is increased to 75% and all of the lost Health Restoration is redirected to the wearer every second. Radius: 900"))
+    W(li("Active: Rite of Rumusque. The wearer enters ghost form for 4 seconds, becoming immune to physical damage, but is unable to attack and 30% more vulnerable to magic damage. Steals 5% movement speed from enemy heroes in a 900 radius every second. Movement speed steal lasts 1.5s. Bonuses stack and have duration refreshed on gaining new stacks. No Mana Cost. Cooldown: 20s", t("NEW"), extra=inline_note("The ghost form and stolen speed can be dispelled off the wearer, but the stealing debuff that provides new stacks can't")))
+    W(li("Passive: Putrefaction Aura. Reduces health restoration of nearby enemy heroes by 30%. While Rite of Rumusque is active, the effect is increased to 75% and all of the lost Health Restoration is redirected to the wearer every second. Radius: 900", t("NEW")))
     W(ul_close())
     W(item_header("Essence Distiller", new="New Support Item"))
     W(components(('Urn of Shadows', 825), ('Chainmail', 500), ('Wizard Hat', 250),
                  recipe=('Recipe', 200), total=1775))
     W(provides('+1.75 Mana Regen, +3 All Attributes, +6 Armor, +150 Mana'))
     W(ul_open())
-    W(li("Active: Soul Release. When cast on an ally, provides 40 health regeneration. If the ally is attacked by an enemy hero or Roshan, the effect is lost. When cast on an enemy, deals 25 damage per second, provides True Sight over them and shares their vision with the wearer's team. Both effects last 8 seconds. Can be cast on the ground to put a dormant effect that will latch to the first enemy hero that comes within 400 range from it. The effect waits for 15s and provides 400 vision until it disappears. Gains charges every time an enemy hero dies within 1500 units. Cast Range: 1000. No Mana Cost. Cooldown: 10s", extra=inline_note("Gains one charge if the wearer dies with an empty Essence Distiller<br>Gains two charges if Essence Distiller had no charges and an enemy hero dies within radius")))
+    W(li("Active: Soul Release. When cast on an ally, provides 40 health regeneration. If the ally is attacked by an enemy hero or Roshan, the effect is lost. When cast on an enemy, deals 25 damage per second, provides True Sight over them and shares their vision with the wearer's team. Both effects last 8 seconds. Can be cast on the ground to put a dormant effect that will latch to the first enemy hero that comes within 400 range from it. The effect waits for 15s and provides 400 vision until it disappears. Gains charges every time an enemy hero dies within 1500 units. Cast Range: 1000. No Mana Cost. Cooldown: 10s", t("NEW"), extra=inline_note("Gains one charge if the wearer dies with an empty Essence Distiller<br>Gains two charges if Essence Distiller had no charges and an enemy hero dies within radius")))
     W(ul_close())
     W(item_header("Specialist's Array", new="Returning Armaments Item"))
     W(components(('Blade of Alacrity', 1000), ('Broadsword', 1000),
                  recipe=('Recipe', 550), total=2550))
     W(provides('+20 Damage, +12 Agility'))
     W(ul_open())
-    W(li("Passive: Splitshot. Ranged Only. Ranged attacks have a 30% chance to fire additional projectiles at up to 2 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects. The primary attack deals 20 + full damage of a normal attack when the ability procs"))
+    W(li("Passive: Splitshot. Ranged Only. Ranged attacks have a 30% chance to fire additional projectiles at up to 2 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("NEW")))
     W(li("Doesn't work with other sources of secondary projectiles from hero abilities " + info_tip(
             "Gyrocopter's Flak Cannon", "Medusa's Split Shot", "Muerta's Gunslinger",
             header="Affected abilities:"),
@@ -381,8 +381,8 @@ def build():
                  recipe=('Recipe', 1100), total=5900))
     W(provides('+25 Damage, +30 Agility, +15 Strength, +150 Attack Range (Ranged Only)'))
     W(ul_open())
-    W(li("Passive: Miasma. Attacks poison the target for 3 seconds, dealing magical damage equal to 2.5% of the target's max health every second. If the debuff is reapplied, the duration is refreshed. Can't be applied by illusions or to Roshan"))
-    W(li("Passive: Polycephaly. Ranged attacks have a 30% chance to fire at up to 3 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects except for Miasma. The primary attack deals 20 + full damage of a normal attack when the ability procs", extra=inline_note("Similarly to Specialist's Array, doesn't work with other sources of secondary projectiles from hero abilities")))
+    W(li("Passive: Miasma. Attacks poison the target for 3 seconds, dealing magical damage equal to 2.5% of the target's max health every second. If the debuff is reapplied, the duration is refreshed. Can't be applied by illusions or to Roshan", t("NEW")))
+    W(li("Passive: Polycephaly. Ranged attacks have a 30% chance to fire at up to 3 nearby enemies that aren't the original attack target within 120 degree angle in front of the wearer and within attack range + 150. The additional projectiles deal 20 + 75% damage of a normal attack and do not trigger on hit effects except for Miasma. The primary attack deals 20 + full damage of a normal attack when the ability procs", t("NEW"), extra=inline_note("Similarly to Specialist's Array, doesn't work with other sources of secondary projectiles from hero abilities")))
     W(ul_close())
     W(item_header("Arcane Boots", changed=True))
     W(auto_components_change("Arcane Boots", "7.41"))
@@ -838,14 +838,15 @@ def build():
     W(ul_close())
     W(item_header("Dagger of Ristul", new="Returning Tier 1 Artifact"))
     W(ul_open())
-    W(li("Active: Imbrue. Increase attack damage by 25 for 8s. Health Cost: 100. Cooldown: 30s"))
+    W(li("Active: Imbrue. Increase attack damage by 25 for 8s. Health Cost: 100. Cooldown: 30s", t("NEW")))
     W(ul_close())
     W(item_header("Forager's Kit", new="New Tier 1 Artifact"))
     W(ul_open())
     # First li opens the ability-row box; subsequent lis without ability_row=True
-    # are treated as continuations by the box-wrapper state machine, so all 8
-    # rows land inside ONE shared bordered box.
-    W(li("When this item is off cooldown, the wearer can see trees that can be foraged. Standing next to one of those trees for 1s will give the wearer one of the following items. Cooldown: 60s. Tree reveal radius: 1200", t("NEW"), ability_row=True))
+    # are treated as continuations by the box-wrapper state machine, so all 3
+    # rows land inside ONE shared bordered box. "Passive: Forage." names the ability (the game's tooltip;
+    # audit 2026-10-16: without it the box had no ability header, unlike every 7.38 artifact).
+    W(li("Passive: Forage. When this item is off cooldown, the wearer can see trees that can be foraged. Standing next to one of those trees for 1s will give the wearer one of the following items. Cooldown: 60s. Tree reveal radius: 1200", t("NEW"), ability_row=True))
     W(li("All items except for bag of gold are placed in inventory (if there are slots available) and can stack up to 5 times per slot.", t("NEW")))
     W(li("Possible items", t("NEW"), extra=inline_note("Ironwood Nut: Passively provides +3 Movement Speed. Grants +1 Primary Stat when consumed (+.4 all stats for universal heroes)<br>Tomo'kan Ringcap: Passively Provides +2 Intelligence. Can be consumed to instantly grant a target 50 + 5% of their maximum mana<br>Vital Toadstool: Passively Provides +2 Damage. Can be consumed to grant a target +1% Max Health Regeneration for 10s. If the unit is attacked by an enemy hero or Roshan the bonus is lost<br>Bag of Gold: Provides 30 gold to the wearer. Don't need to be picked up")))
     W(ul_close())
@@ -856,7 +857,7 @@ def build():
     W(ul_close())
     W(item_header("Stonefeather Satchel", new="New Tier 1 Artifact"))
     W(ul_open())
-    W(li("Toggle: Transmogrify. Activate to switch the contents of the satchel between Feathers or Rocks. No Mana Cost. Cooldown: 6s."))
+    W(li("Toggle: Transmogrify. Activate to switch the contents of the satchel between Feathers or Rocks. No Mana Cost. Cooldown: 6s.", t("NEW")))
     W(li("Pound of Feathers: Increases movement speed by 12 and distance of forced movement effects on yourself by 30%", t("NEW")))
     W(li("Pound of Rocks: Increases armor by 3 and decreases distance of forced movement effects by 30%", t("NEW")))
     W(ul_close())
@@ -984,7 +985,7 @@ def build():
     W(ul_close())
     W(item_header("Witchbane", new="Returning Tier 5 Artifact"))
     W(ul_open())
-    W(li("Active: Cleanse. Apply basic dispel on all units in a 300 unit radius area. Cast Range: 500. Mana Cost: 150. Cooldown: 40s"))
+    W(li("Active: Cleanse. Apply basic dispel on all units in a 300 unit radius area. Cast Range: 500. Mana Cost: 150. Cooldown: 40s", t("NEW")))
     W(li("Passive: Subjugate. Your attacks deal bonus magical damage equal to 4% of target's Max Mana", t("NEW"),
          extra=inline_note("Dormant Curio increases damage from 4% to 5.2%")))
     W(ul_close())
@@ -1077,9 +1078,9 @@ def build():
     # Tiers 4/5 -> 2-4: only Tier 4 exists in both, so the badge compares Tier 4 (audit 2026-10-05; zip of
     # the two lists compared old Tier 4 with new Tier 2)
     W(li("Health Restoration bonus rescaled from +30/40% to +10/15/20%", b(30, 20),
-         extra=inline_note("Tier 4, the only tier in both: 30% → 20%")))
+         extra=inline_note("Tier 4, the only tier in both: 30% &rarr; 20%")))
     W(li("Base Attack Time Reduction bonus rescaled from 12/18% to 8/12/16%", b(12, 16),
-         extra=inline_note("Tier 4, the only tier in both: 12% → 16%")))
+         extra=inline_note("Tier 4, the only tier in both: 12% &rarr; 16%")))
     W(li("Intelligence Penalty increased from 5% to 6%", b(5, 6, l=True)))
     W(li("Now also modifies incoming healing", t("NEW"),
          extra=inline_note("As a result of Health Restoration changes")))
@@ -1104,9 +1105,9 @@ def build():
     W(enchant_header("Titanic"))
     W(ul_open())
     W(li("Attack Damage bonus rescaled from +10/20% to +8/12/16%", b(10, 16),
-         extra=inline_note("Tier 4, the only tier in both: 10% → 16%")))
+         extra=inline_note("Tier 4, the only tier in both: 10% &rarr; 16%")))
     W(li("Status Resistance rescaled from 10/15% to +10/12/14%", b(10, 14),
-         extra=inline_note("Tier 4, the only tier in both: 10% → 14%")))
+         extra=inline_note("Tier 4, the only tier in both: 10% &rarr; 14%")))
     W(li("Now also provides -10/12/14% <font color='#e03e2e'>Attack Speed</font>", t("NERF")))
     W(li("Now is a guaranteed option for Universal heroes only", t("REWORK")))
     W(li("Tiers changed from 4/5 to 2-4", t("REWORK")))
@@ -3362,9 +3363,9 @@ def build():
             desc=[
                 "Passive.",
                 "Each Meepo (main + clones) grants stacking bonuses to <b>all</b> Meepos based on the terrain it stands on:",
-                "<b>Tree within 250 range</b> → +1 Health Regen.",
-                "<b>On solid ground</b> → +2% bonus movement speed.",
-                "<b>In water</b> → attacks slow the target by 2% for 2s. "
+                "<b>Tree within 250 range</b> &rarr; +1 Health Regen.",
+                "<b>On solid ground</b> &rarr; +2% bonus movement speed.",
+                "<b>In water</b> &rarr; attacks slow the target by 2% for 2s. "
                 + inline_note("Each Meepo can provide only one tree bonus regardless of how many trees are in range. "
                               "If there's a tree in the water, that Meepo provides both the water and tree bonuses."),
             ],
@@ -4153,7 +4154,7 @@ def build():
     _souvenir_tips = {
         "Funhouse Mirror": "Throws a mirror that on impact creates a hostile illusion of the target enemy hero, mimicking its abilities for a few seconds.",
         "Strongman Tonic": "Drinks a tonic granting Ringmaster bonus attack damage and movement speed for the duration.",
-        "Unicycle":        "Mounts a unicycle for 10s. Reaches up to 750 speed (turn rate degrades 130→90). Attacking, casting, picking up runes, taking damage, or crashing dismounts.",
+        "Unicycle":        "Mounts a unicycle for 10s. Reaches up to 750 speed (turn rate degrades 130&rarr;90). Attacking, casting, picking up runes, taking damage, or crashing dismounts.",
         "Whoopee Cushion": "Places a delayed-trigger cushion at target point that deals damage and slows enemies in its AoE on activation.",
         "Crystal Ball":    "Reveals target area, providing vision and True Sight for a duration.",
         "Weighted Pie":    "Throws a heavy pie at target, dealing damage and applying a heavy movement slow.",

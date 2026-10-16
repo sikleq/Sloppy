@@ -308,20 +308,20 @@ def build():
     W(ul_close())
     W(item_header("Chipped Vest", new="Returning Tier 1 Artifact"))
     W(ul_open())
-    W(li("Passive: Chipper. Everytime you are attacked, you return 30 damage to heroes and 20 damage to creeps"))
+    W(li("Passive: Chipper. Everytime you are attacked, you return 30 damage to heroes and 20 damage to creeps", t("NEW")))
     W(ul_close())
     W(item_header("Dormant Curio", new="New Tier 1 Artifact"))
     W(ul_open())
-    W(li("Passive: Hidden Potential. Neutral Artifact you choose while holding Dormant Curio will have 30% increased potency", extra=inline_note("Provides an Unleashed enchantment which improves some stats of the next non-curio artifact that you'll choose while crafting. Improved stats will have a special icon in the description to indicate that it is improved by Dormant Curio. All improvements will be listed in this summary under each item's section — This enchantment is tied to the next non-curio artifact you select. It will be saved as long as you keep the upgraded artifact. Selecting a new one will make you lose the Unleashed enchantment<br>This enchantment can't be retained with Techies' Spoon's Stash facet")))
+    W(li("Passive: Hidden Potential. Neutral Artifact you choose while holding Dormant Curio will have 30% increased potency", t("NEW"), extra=inline_note("Provides an Unleashed enchantment which improves some stats of the next non-curio artifact that you'll choose while crafting. Improved stats will have a special icon in the description to indicate that it is improved by Dormant Curio. All improvements will be listed in this summary under each item's section — This enchantment is tied to the next non-curio artifact you select. It will be saved as long as you keep the upgraded artifact. Selecting a new one will make you lose the Unleashed enchantment<br>This enchantment can't be retained with Techies' Spoon's Stash facet")))
     W(ul_close())
     W(item_header("Kobold Cup", new="New Tier 1 Artifact"))
     W(ul_open())
-    W(li("Active: One for the Road. Increases movement speed of all allies within 1000 units by 10% for 6s. Mana Cost: 40. Cooldown: 40s"))
+    W(li("Active: One for the Road. Increases movement speed of all allies within 1000 units by 10% for 6s. Mana Cost: 40. Cooldown: 40s", t("NEW")))
     W(ul_close())
     W(item_header("Sister's Shroud", new="New Tier 1 Artifact"))
     W(ul_open())
-    W(li("Passive: Veiled. Whenever your health falls below 50% you gain a +200% evasion bonus for 8s. Each attack negated by evasion reduces this evasion bonus to 0.25x of its current value", extra=inline_note("As a result the effect will provide +200/50/12.5/3.125/0.78% evasion after 0/1/2/3/4 evaded attacks. Triggers only from damage by player-controlled sources and Roshan")))
-    W(li("Passive: Last Caress. Veiled cooldown is only reset if the wearer dies or kills an enemy hero"))
+    W(li("Passive: Veiled. Whenever your health falls below 50% you gain a +200% evasion bonus for 8s. Each attack negated by evasion reduces this evasion bonus to 0.25x of its current value", t("NEW"), extra=inline_note("As a result the effect will provide +200/50/12.5/3.125/0.78% evasion after 0/1/2/3/4 evaded attacks. Triggers only from damage by player-controlled sources and Roshan")))
+    W(li("Passive: Last Caress. Veiled cooldown is only reset if the wearer dies or kills an enemy hero", t("NEW")))
     W(ul_close())
     W(item_header("Gossamer Cape"))
     W(ul_open())
@@ -347,7 +347,7 @@ def build():
     W(ul_close())
     W(item_header("Poor Man's Shield", new="Returning Tier 2 Artifact"))
     W(ul_open())
-    W(li("Passive: Damage Block. Grants a 50% chance to block 30 damage from attacks on melee wielders, or 20 damage on ranged. Chance to proc increased to 100% against hero attacks"))
+    W(li("Passive: Damage Block. Grants a 50% chance to block 30 damage from attacks on melee wielders, or 20 damage on ranged. Chance to proc increased to 100% against hero attacks", t("NEW")))
     W(li("Dormant Curio increases damage blocked from 30/20 to 39/26", t("NEW")))
     W(ul_close())
     W(item_header("Searing Signet"))
@@ -376,12 +376,12 @@ def build():
     W(ul_close())
     W(item_header("Jidi Pollen Bag", new="New Tier 3 Artifact"))
     W(ul_open())
-    W(li("Active: Pollinate. Spread pollen on enemies within 700 units, decreasing their Health Restoration by 20% for 12s and dealing 12% of the target's max health as damage over the duration. Damage interval: 1s. No Mana Cost. Cooldown: 45s", extra=inline_note("Damage is non-lethal and classified as HP Loss (does not break Blink Dagger)")))
+    W(li("Active: Pollinate. Spread pollen on enemies within 700 units, decreasing their Health Restoration by 20% for 12s and dealing 12% of the target's max health as damage over the duration. Damage interval: 1s. No Mana Cost. Cooldown: 45s", t("NEW"), extra=inline_note("Damage is non-lethal and classified as HP Loss (does not break Blink Dagger)")))
     W(li("Dormant Curio increases total max health damage from 12% to 15.6%", t("NEW")))
     W(ul_close())
     W(item_header("Psychic Headband", new="Returning Tier 3 Artifact"))
     W(ul_open())
-    W(li("Active: Psychic Push. Pushes the target enemy away from you 400 distance. Cast Range: 600. No Mana Cost. Cooldown: 20s"))
+    W(li("Active: Psychic Push. Pushes the target enemy away from you 400 distance. Cast Range: 600. No Mana Cost. Cooldown: 20s", t("NEW")))
     W(li("Dormant Curio increases push distance from 400 to 520", t("NEW")))
     W(ul_close())
     W(item_header("Serrated Shiv"))
@@ -416,12 +416,12 @@ def build():
     W(ul_close())
     W(item_header("Dezun Bloodrite", new="New Tier 4 Artifact"))
     W(ul_open())
-    W(li("Passive: Blood Invocation. Increases Spell AoE by 15%, but Spells now also cost health equal to 35% of their mana cost"))
+    W(li("Passive: Blood Invocation. Increases Spell AoE by 15%, but Spells now also cost health equal to 35% of their mana cost", t("NEW")))
     W(li("Dormant Curio increases AoE bonus from 15% to 19.5%", t("NEW")))
     W(ul_close())
     W(item_header("Giant's Maul", new="New Tier 4 Artifact"))
     W(ul_open())
-    W(li("Passive: Crushing Blow. Your next attack is a critical strike that deals 150% of your attack's regular damage. Hitting an enemy with an empowered strike weakens them, decreasing their Movement Speed by 10%, Attack Speed by 15%, and Cast Speed by 20% for 4s. No Mana Cost. Cooldown: 15s"))
+    W(li("Passive: Crushing Blow. Your next attack is a critical strike that deals 150% of your attack's regular damage. Hitting an enemy with an empowered strike weakens them, decreasing their Movement Speed by 10%, Attack Speed by 15%, and Cast Speed by 20% for 4s. No Mana Cost. Cooldown: 15s", t("NEW")))
     W(li("Dormant Curio increases critical damage from 150% to 195%", t("NEW")))
     W(ul_close())
     W(item_header("Magnifying Monocle"))
@@ -430,7 +430,7 @@ def build():
     W(ul_close())
     W(item_header("Outworld Staff", new="New Tier 4 Artifact"))
     W(ul_open())
-    W(li("Active: Self-Exile: Removes the caster from the world, making them invulnerable and disabled for 0.7s. Caster loses 5% of their max health on return. This damage is not lethal, but it mutes Blink Dagger and similar items after the effect. Mana Cost: 40. Cooldown: 30s", extra=inline_note("Tranquil Boots are not muted on this self-damage")))
+    W(li("Active: Self-Exile: Removes the caster from the world, making them invulnerable and disabled for 0.7s. Caster loses 5% of their max health on return. This damage is not lethal, but it mutes Blink Dagger and similar items after the effect. Mana Cost: 40. Cooldown: 30s", t("NEW"), extra=inline_note("Tranquil Boots are not muted on this self-damage")))
     W(li("Dormant Curio increases duration from 0.7s to 0.91s", t("NEW")))
     W(ul_close())
     W(item_header("Pyrrhic Cloak"))
@@ -456,12 +456,12 @@ def build():
     W(ul_close())
     W(item_header("Divine Regalia", new="New Tier 5 Artifact"))
     W(ul_open())
-    W(li("Passive: Exalted. Increases outgoing damage by 20%. If the wearer is killed, the item permanently loses the current Enchantment and turns into a Disgraced Regalia", extra=inline_note("Enchantments retained with Techies' Spoon's Stash facet are unaffected with the exception of the last obtained Tier 5 enchantment. Unleashed enchantment from Dormant Curio artifact is lost as well")))
+    W(li("Passive: Exalted. Increases outgoing damage by 20%. If the wearer is killed, the item permanently loses the current Enchantment and turns into a Disgraced Regalia", t("NEW"), extra=inline_note("Enchantments retained with Techies' Spoon's Stash facet are unaffected with the exception of the last obtained Tier 5 enchantment. Unleashed enchantment from Dormant Curio artifact is lost as well")))
     W(li("Dormant Curio increases damage multiplier from 20% to 26%", t("NEW")))
     W(ul_close())
     W(item_header("Disgraced Regalia", new="New Tier 5 Artifact"))
     W(ul_open())
-    W(li("Passive: Fallen. Has nothing to provide to one who dared to die"))
+    W(li("Passive: Fallen. Has nothing to provide to one who dared to die", t("NEW")))
     W(li("Appears only to heroes that died with Divine Regalia artifact", t("NEW")))
     W(li("Since the 4th slot is taken by your current Artifact when recrafting items, it is possible to recraft Disgraced Regalia with working Tier 5 Enchantment", t("NEW"), extra=inline_note("The usual Divine Regalia still can reappear among the other 3 choices")))
     W(ul_close())
@@ -471,7 +471,7 @@ def build():
     W(ul_close())
     W(item_header("Helm of the Undying", new="Returning Tier 5 Artifact"))
     W(ul_open())
-    W(li("Passive: Death Delay. Survive for an extra 5 seconds after receiving a killing blow. Enemy heroes dying within 1200 units extends this effect by 5 seconds. Cooldown: 50s", extra=inline_note("Procs before Wraith King's innate Vampiric Spirit ability, but after his Reincarnation ability or Aegis of the Immortal")))
+    W(li("Passive: Death Delay. Survive for an extra 5 seconds after receiving a killing blow. Enemy heroes dying within 1200 units extends this effect by 5 seconds. Cooldown: 50s", t("NEW"), extra=inline_note("Procs before Wraith King's innate Vampiric Spirit ability, but after his Reincarnation ability or Aegis of the Immortal")))
     W(li("Dormant Curio increases base duration from 5s to 6.5s", t("NEW")))
     W(ul_close())
     W(item_header("Minotaur Horn"))
@@ -1121,7 +1121,7 @@ def build():
     W(ul_close())
     W(ability_change(
         sub=True,
-        summary="Aghanim's upgrade reworked: Shard → Scepter.",
+        summary="Aghanim's upgrade reworked: Shard &rarr; Scepter.",
         tag="rework",
         old=dict(name="Ice Wall", slug="invoker_ice_wall",
                  desc=["Aghanim's Shard: Enemy heroes that stay in Ice Wall for longer than 3s freeze, becoming rooted for 1.5s and taking 300 magic damage. Also increases wall's radial thickness by 40 and length by 160"]),
@@ -1132,7 +1132,7 @@ def build():
                  ])))
     W(ability_change(
         sub=True,
-        summary="Aghanim's upgrade reworked: Scepter → Shard.",
+        summary="Aghanim's upgrade reworked: Scepter &rarr; Shard.",
         tag="rework",
         old=dict(name="Ghost Walk", slug="invoker_ghost_walk",
                  desc=["Aghanim's Scepter: When cast, the effect is also applied to all allied heroes and forge spirits within a 600 radius. Allies and spirits have a 0.5s fade time and 30s duration."]),

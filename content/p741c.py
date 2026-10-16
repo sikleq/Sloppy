@@ -26,7 +26,7 @@ def build():
     W(li(
         '<span class="wrong-word">Health bonus increased from +600 to +625</span>',
         b(650, 625),     # badge by the game files, not by Valve's misstated numbers (patch-tags: wrong-word)
-        extra=note_box('This change is wrongly stated. The real change is 650 → 625'),
+        extra=note_box('This change is wrongly stated. The real change is 650 &rarr; 625'),
         force_tag="nerf"
     ))
     W(li("Bloodpact cooldown increased from 30s to 35s", b(30, 35, l=True)))
@@ -559,7 +559,7 @@ def build():
     W(ability("Phantom Rush", slug="phantom_lancer_phantom_edge"))
     W(ul_open())
     W(li("Aghanim's Scepter bonus max rush distance decreased from +625 to +575", b(625, 575),
-         extra=inline_note("Effective max rush distance per Phantom Rush level: 1225/1300/1375/1450 → 1175/1250/1325/1400.")))
+         extra=inline_note("Effective max rush distance per Phantom Rush level: 1225/1300/1375/1450 &rarr; 1175/1250/1325/1400.")))
     W(ul_close())
     W(hero_header("Phoenix"))
     W(subgroup("Abilities"))
