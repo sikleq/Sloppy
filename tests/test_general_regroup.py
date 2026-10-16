@@ -26,10 +26,13 @@ SIEGE2 = "W(li(\"Second +1 siege creep timing now occurs at 60:00\", t(\"REWORK\
 def test_topics_become_subgroups_and_the_lead_a_major_row():
     out = g._general_topics(LANES + ['W(ul_open())', MEET, 'W(ul_close())'], "Global Changes")
     assert out[1] == 'W(li("Facets removed from the game", t("DEL"), major=True))'   # stand-out, tag kept
-    s, l = out.index('W(subgroup("Scaling with Hero Level"))'), out.index('W(subgroup("Lane Creeps"))')
-    assert out.index(CURRENTS) < s < l                                  # a row of no topic stays on top
-    assert out[s + 2:s + 4] == [INNATE, UI]
+    l = out.index('W(subgroup("Lane Creeps"))')
+    assert out.index(CURRENTS) < l                                      # a row of no topic stays on top
     assert out[l + 2] == MEET                                           # a row about several creeps
+    # one system changed as a whole: its own "Reworked mechanic" section after the block, rows REWORK + hidden tag
+    s = out.index('W(plain_header("Scaling with Hero Level", new="Reworked mechanic"))')
+    assert s > l and out[s + 2] == INNATE
+    assert out[s + 3] == UI[:-2].replace('t("QoL")', 't("REWORK")') + ', force_tag="rework qol"))'
     f = out.index('W(unit_header("Flagbearer Creep", "../icons/units/npc_dota_creep_goodguys_flagbearer.png", '
                   'general=False, page="creep-goodguys-flagbearer"))')
     assert out[f + 2].startswith('W(li("Experience Bounty increased from 57 to 60"')   # its name prefix goes
@@ -85,3 +88,30 @@ def test_all_followup_goes_into_the_rows_note():
     assert text == "Innate abilities no longer scale with other abilities' level"
     assert kw["extra"].startswith("inline_note(\"All innate abilities") and "base value" in kw["extra"]
     assert out[1] == CURRENTS                                           # another subject: left alone
+
+
+def test_a_bonus_row_gets_its_number_badge_from_the_note():
+    row = ('W(li("All sections of currents now give a max movement speed bonus of 150", t("BUFF"), '
+           'extra=inline_note("Previously other sections provided max bonus of 100")))')
+    out = g._bonus_from_note([row])
+    assert ', b(100, 150), extra=' in out[0] and 't("BUFF")' not in out[0]
+
+
+def test_a_boss_ability_without_a_colon_gets_its_block():
+    lines = ['W(subgroup("Tormentor"))', 'W(ul_open())',
+             'W(li("Now has 25% Status Resistance", t("NEW")))',
+             'W(li("Unyielding Shield Base barrier increased from 2000 to 3000", b(2000, 3000)))',
+             'W(li("Reflect radius can now be seen by holding ALT key", t("QoL")))', 'W(ul_close())']
+    out = g._postprocess_boss_blocks(lines)
+    i = out.index('W(ability("Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png"))')
+    assert out[i + 2] == 'W(li("Base barrier increased from 2000 to 3000", b(2000, 3000)))'
+    j = out.index('W(ability("Reflect", icon_url="../icons/abilities/miniboss_reflect.png"))')
+    assert out[j + 2] == 'W(li("Radius can now be seen by holding ALT key", t("QoL")))'
+
+
+def test_a_lane_creeps_ability_rows_get_its_block():
+    rows = ["W(li(\"Inspiration Aura no longer affects heroes\", t(\"DEL\"), also_dyn=['unit|creep-goodguys-flagbearer']))",
+            "W(li(\"AoE Bounty Radius increased from 1200 to 1500\", b(1200, 1500), also_dyn=['unit|creep-goodguys-flagbearer']))"]
+    plain, per = g._lane_card_abilities("unit|creep-goodguys-flagbearer", rows)
+    assert plain == rows[1:] and list(per) == ["Inspiration Aura"]
+    assert per["Inspiration Aura"][1][0].startswith('W(li("No longer affects heroes"')

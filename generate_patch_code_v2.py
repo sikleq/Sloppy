@@ -1059,10 +1059,12 @@ def _render_general_note(note):
     """One general_notes[] entry → section title + walked content."""
     out = []
     title = note.get('title', '').strip()
-    if title:
+    if title in _BOSSES:          # 7.41e "Tormentor": the boss's card (link, patch strip), not a plain header
+        out += ['', f'W(subgroup("{title}"))']      # a line of its own: _postprocess_boss_blocks matches it
+    elif title:
         out.append(f'\nW(plain_header("{title}"))')
     body, _ = _emit_notes(note.get('generic', []))
-    out.extend(_general_topics(_merge_all_followup(_link_lane_creeps(body)), title))
+    out.extend(_general_topics(_bonus_from_note(_merge_all_followup(_link_lane_creeps(body))), title))
     return out
 
 
@@ -1125,6 +1127,27 @@ _LANE_CARDS = {
 }
 
 
+_LANE_ABIL_PREFIX = {"unit|creep-goodguys-flagbearer": "flagbearer_creep_"}
+
+
+def _lane_card_abilities(key, rows):
+    """(rows of the creep itself, {ability: (icon url, its rows, name off)}): a lane creep's row that starts with
+    one of its abilities ("Inspiration Aura no longer affects heroes", 7.40) goes to that ability's block, as any
+    unit's ability (owner 2026-10-16)."""
+    prefix = _LANE_ABIL_PREFIX.get(key)
+    abilities = _boss_abilities(prefix) if prefix else {}
+    plain, per_abil = [], {}
+    for line in rows:
+        hit = next((a for a in sorted(abilities, key=len, reverse=True)
+                    if re.match(r'^W\(li(?:_formula)?\("' + re.escape(a) + r':? [A-Za-z]', line)), None)
+        if not hit:
+            plain.append(line)
+            continue
+        m = re.match(r'^(W\(li(?:_formula)?\(")' + re.escape(hit) + r':? ([A-Za-z])', line)
+        per_abil.setdefault(hit, (abilities[hit], []))[1].append(m.group(1) + m.group(2).upper() + line[m.end():])
+    return plain, per_abil
+
+
 def _lane_card(line):
     """The card a lane creep row belongs to: the one creep its also_dyn names, else None (a row about several)."""
     parts = _li_parts(line)
@@ -1169,8 +1192,13 @@ def _general_topics(lines, title=""):
         out += ['W(ul_open())', l[:-2] + ", major=True))", 'W(ul_close())']
     out += _drop_empty_ul([l for l in lines if l not in moved])
     cards = {}
+    mech = []
     for name in groups:
         these = [l for l, t in tops.items() if t == name]
+        if name in _MECH_TOPICS:          # a system that changed as a whole: its own "Reworked mechanic" section
+            mech += ['', f'W(plain_header("{name}", new="Reworked mechanic"))', 'W(ul_open())']
+            mech += [_as_mech_row(l) for l in these] + ['W(ul_close())']
+            continue
         if name == "Lane Creeps":
             for l in these:
                 key = _lane_card(l)
@@ -1186,7 +1214,45 @@ def _general_topics(lines, title=""):
             # clickable, as a rule")
             out += [f'W(unit_header("{name}", "../icons/units/{icon}.png", general=False, page="{key.split("|")[1]}"))',
                     'W(ul_open())']
-            out += cards[key] + ['W(ul_close())']
+            plain, per_abil = _lane_card_abilities(key, cards[key])
+            out += plain + ['W(ul_close())']
+            for ab, (icon_url, ab_rows) in per_abil.items():
+                out += [f'W(ability("{ab}", icon_url="{icon_url}"))', 'W(ul_open())'] + ab_rows + ['W(ul_close())']
+    return out + mech
+
+
+# topics that are one system changed as a whole (7.41 "Scaling with Hero Level"): a section of their own after the
+# general block, its rows the description box — like 7.38 Lifesteal (owner 2026-10-16: "суммируем, показывая, что
+# изменилось"; the rows' QoL / MISC chips read like continuations of the row above). Review: sum the rows and their
+# "?" up into a few description lines.
+_MECH_TOPICS = {"Scaling with Hero Level"}
+
+
+def _as_mech_row(line):
+    """A row of a reworked-mechanic section: REWORK, so it joins the description box; its own tag stays hidden in
+    force_tag (filters, weights)."""
+    m = re.search(r't\("(\w+)"\)', line)
+    if not m or m.group(1).upper() == "REWORK":
+        return line
+    own = m.group(1).lower()
+    return line[:m.start()] + 't("REWORK")' + line[m.end():-2] + f', force_tag="rework {own}"))'
+
+
+_BONUS_WAS = re.compile(r'\bbonus of (\d+)\b', re.I)
+
+
+def _bonus_from_note(lines):
+    """A row "… now give(s) … of N" whose "?" says the others gave M ("other sections provided max bonus of 100",
+    7.41 currents) gets the number badge b(M, N) instead of a bare tag (owner 2026-10-16: "указать на сколько %")."""
+    out = []
+    for line in lines:
+        parts = _li_parts(line)
+        tag = re.search(r', t\("(?:BUFF|NERF|MISC)"\)', line)
+        new = re.search(r'\bnow gives? .* of (\d+)$', parts[0]) if parts and tag else None
+        was = _BONUS_WAS.search(parts[1].get("extra") or "") if new else None
+        if was and was.group(1) != new.group(1):
+            line = line[:tag.start()] + f", b({was.group(1)}, {new.group(1)})" + line[tag.end():]
+        out.append(line)
     return out
 
 
@@ -2697,10 +2763,18 @@ def _postprocess_boss_blocks(lines):
         general, per_abil, todos, new_cards = [], {}, [], []
         for ln in body:
             r = _ROW_RE.match(ln)
-            raw = re.match(r'^W\(li\("((?:[^"\\]|\\.)*)"', ln)
+            raw = re.match(r'^W\(li(?:_formula)?\("((?:[^"\\]|\\.)*)"', ln)
             text = raw.group(1) if raw else ''
             hit = next((a for a in sorted(abil_icons, key=len, reverse=True)
                         if text == a or text.startswith(a + ': ')), None)
+            # Valve without the colon (7.41: "Unyielding Shield Base barrier increased from 2000 to 3000") — the
+            # ability block too, its name off the row (owner 2026-10-16: "оформить, как мы уже делали")
+            bare = next((a for a in sorted(abil_icons, key=len, reverse=True)
+                         if not hit and re.match(re.escape(a) + r' [A-Za-z]', text)), None)
+            if bare:
+                m2 = re.match(r'^(W\(li(?:_formula)?\(")' + re.escape(bare) + r' ([A-Za-z])', ln)
+                per_abil.setdefault(bare, []).append(m2.group(1) + m2.group(2).upper() + ln[m2.end():])
+                continue
             if r and hit and text.startswith(hit + ': New ability. '):
                 new_cards.append((hit, text[len(hit) + len(': New ability. '):]))
                 continue

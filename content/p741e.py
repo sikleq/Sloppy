@@ -18,7 +18,9 @@ def build():
     W(li("Channeling the Twin Gate can now be interrupted by root", t("NERF")))
     W(ul_close())
 
-    W(plain_header("Tormentor"))
+    # a boss gets its unit card (link to its page, patch strip), not a plain header (owner 2026-10-16;
+    # generator _render_general_note)
+    W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())
     W(li("Now disjoints projectiles when moving between chasms", t("NEW")))
     W(ul_close())

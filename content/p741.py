@@ -12,23 +12,9 @@ def build():
     W(li("Facets removed from the game", t("DEL"), major=True))
     W(ul_close())
     W(ul_open())
-    W(li("All sections of currents now give a max movement speed bonus of 150", t("BUFF"),
+    # the sections that gave 100 now give 150: +50% (owner 2026-10-16; generator _bonus_from_note)
+    W(li("All sections of currents now give a max movement speed bonus of 150", b(100, 150),
          extra=inline_note("Previously was only provided by sections on the base and near it, while other sections provided max bonus of 100.")))
-    W(ul_close())
-    # three rows about abilities growing with hero level, one subgroup (owner 2026-10-16; generator _general_topics)
-    W(subgroup("Scaling with Hero Level"))
-    W(ul_open())
-    # one row (owner 2026-10-16): Valve's follow-up sentence goes into the row's "?" (generator _merge_all_followup)
-    W(li("Innate abilities no longer scale with other abilities' level", t("REWORK"),
-         extra=inline_note("All innate abilities that used to scale with other abilities now either provide unchangeable bonuses or improve on 'per level' basis")
-         + inline_note(
-             "Abilities that improve with hero level have a <b>base value</b> and an <b>increment value</b>. Some also specify the <b>number of levels required per increment</b>."
-             "<br>Abilities that improve every level provide their increment value already at level 1."
-         )))
-    W(li("Added UI icon that shows you which parameters increase with hero level and what is the current value. Some non-innate ability might have this per level UI as well", t("QoL"),
-         extra=inline_note("Pressing ALT key will show base value and increment of the ability.")))
-    W(li("Abilities that had 'per level up' scaling changed to be 'per level'", t("MISC"),
-         extra=inline_note("This mostly affects heroes reworked in update 7.40 and Largo.")))
     W(ul_close())
     # lane creeps: the shared row in "Lane Creeps", each creep's own rows under its card, as units elsewhere
     # (owner 2026-10-16; generator _general_topics). also_dyn keeps them on the creeps' pages.
@@ -52,6 +38,20 @@ def build():
          also_dyn=['unit|goodguys-siege']))
     W(ul_close())
 
+    # Valve's four rows and their "?" summed up as one reworked mechanic, like 7.38 Lifesteal / 7.40 Invulnerability
+    # Targeting (owner 2026-10-16: "суммируем, показывая, что изменилось"); the rows' own tags stay hidden (force_tag)
+    W(plain_header("Scaling with Hero Level", new="Reworked mechanic"))
+    W(ul_open())
+    W(li("Innate abilities no longer scale with other abilities' level. The ones that did now either give a fixed "
+         "bonus or grow with hero level", t("REWORK")))
+    W(li("A value that grows with hero level has a <b>base value</b> and an <b>increment</b>; some need several hero "
+         "levels per increment. A value that grows every level gives its increment already at level 1", t("REWORK")))
+    W(li("Abilities that scaled 'per level up' now scale 'per level' — mostly the heroes reworked in 7.40 and Largo",
+         t("REWORK"), force_tag="rework misc"))
+    W(li("A new icon shows which values grow with hero level and their current value; hold ALT to see the base value "
+         "and the increment. Some non-innate abilities show it too", t("REWORK"), force_tag="rework qol"))
+    W(ul_close())
+
     W(plain_header("Map Objectives"))
     W(subgroup("Wisdom Shrines"))
     W(ul_open())
@@ -71,25 +71,6 @@ def build():
     W(ul_open())
     W(li("Tormentor's spawn preference has switched", t("MISC"),
          extra=inline_note("Now begins in the Bottom Chasm.")))
-    W(li("Unyielding Shield Base barrier increased from 2000 to 3000", b(2000, 3000)))
-    W(li("Unyielding Shield Barrier upgrade per minute increased from 20 to 50", b(20, 50)))
-    W(li("Unyielding Shield Base barrier regen decreased from 40 to 20", b(40, 20)))
-    W(li_formula("Unyielding Shield Barrier regen upgrade increased",
-                 "3.5 per minute", "5 per minute",
-                 lambda M: 3.5 * M, lambda M: 5.0 * M,
-                 levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
-                 level_prefix='M', rework_badge=False))
-    W(li("Reflect Base damage reflection percentage decreased from 50% to 30%", b(50, 30)))
-    W(li("Reflect radius can now be seen by holding ALT key", t("QoL")))
-    W(li_formula("The Shining damage rescaled",
-                 "60",
-                 "20 + 2 per minute",
-                 lambda M: 60,
-                 lambda M: 20 + 2 * M,
-                 levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
-                 level_fmt=lambda M: f"{M}:00",
-                 rework_badge=False,
-                 headline_level=30))
     W(li("Now has 25% Status Resistance", t("NEW")))
     W(li("No longer deals damage to neutral units", t("DEL")))
     W(li("Player that got Aghanim's Shard will no longer receive 175 gold", t("DEL"),
@@ -98,6 +79,36 @@ def build():
              f' (total networth change decreased from <b>2275 to 2100</b> {b(2275, 2100)}).'
          )))
     W(li("Reward if all players have Aghanim's Shard decreased from 455 gold to 415 gold", b(455, 415)))
+    W(ul_close())
+    # the boss's abilities as ability blocks, as in 7.38 (owner 2026-10-16; generator _postprocess_boss_blocks
+    # now also reads Valve's "Unyielding Shield Base barrier …" without a colon)
+    W(ability("Unyielding Shield", icon_url="../icons/abilities/miniboss_unyielding_shield.png"))
+    W(ul_open())
+    W(li("Base barrier increased from 2000 to 3000", b(2000, 3000)))
+    W(li("Barrier upgrade per minute increased from 20 to 50", b(20, 50)))
+    W(li("Base barrier regen decreased from 40 to 20", b(40, 20)))
+    W(li_formula("Barrier regen upgrade increased",
+                 "3.5 per minute", "5 per minute",
+                 lambda M: 3.5 * M, lambda M: 5.0 * M,
+                 levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
+                 level_prefix='M', rework_badge=False))
+    W(ul_close())
+    W(ability("Reflect", icon_url="../icons/abilities/miniboss_reflect.png"))
+    W(ul_open())
+    W(li("Base damage reflection percentage decreased from 50% to 30%", b(50, 30)))
+    W(li("Radius can now be seen by holding ALT key", t("QoL")))
+    W(ul_close())
+    W(ability("The Shining", icon_url="../icons/abilities/miniboss_radiance.png"))
+    W(ul_open())
+    W(li_formula("Damage rescaled",
+                 "60",
+                 "20 + 2 per minute",
+                 lambda M: 60,
+                 lambda M: 20 + 2 * M,
+                 levels=[0, 5, 10, 15, 20, 25, 30, 40, 50, 60],
+                 level_fmt=lambda M: f"{M}:00",
+                 rework_badge=False,
+                 headline_level=30))
     W(ul_close())
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())

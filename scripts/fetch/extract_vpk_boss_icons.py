@@ -16,7 +16,9 @@ from extract_vpk_icons import DEFAULT_VPK, decode, read_file, read_tree  # noqa:
 ROOT = Path(__file__).resolve().parents[2]
 ABILITIES = ["roshan_bash", "roshan_slam", "roshan_spell_block", "roshan_revengeroar", "roshan_grab_and_throw",
              "miniboss_unyielding_shield", "miniboss_reflect", "miniboss_radiance", "miniboss_alleviation",
-             "miniboss_fortification"]
+             "miniboss_fortification",
+             # lane creeps' abilities, for their cards in General Updates (2026-10-16, 7.40 Flagbearer Inspiration Aura)
+             "flagbearer_creep_aura_effect"]
 UNITS = {"npc_dota_roshan": "panorama/images/heroes/npc_dota_hero_roshan_png.vtex_c",
          "npc_dota_miniboss": "panorama/images/heroes/npc_dota_tormentor_radiant_png.vtex_c"}
 
