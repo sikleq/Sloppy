@@ -4398,10 +4398,10 @@ ul.changes li > .row-tag-empty {
 ul.changes li > .row-text {
   grid-column: 1;
 }
-/* The change that sums up a patch (li(major=True), 7.41 "Facets removed from the game"): a bigger, brighter row
-   with a gold rule under it, so it doesn't read like one more line; its tag stays (filters, weights). */
-ul.changes li.li-major { padding: 6px 0 9px; margin-bottom: 6px; border-bottom: 1px solid rgba(227, 196, 106, 0.28); }
-ul.changes li.li-major > .row-text { font-size: 16px; font-weight: 600; color: var(--text-bright); letter-spacing: 0.2px; }
+/* The change that sums up a patch (li(major=True), 7.41 "Facets removed from the game"): only bolder and brighter —
+   same size, padding and line as the other rows, so its tag stays in line (owner 2026-10-16: the rule and the
+   bigger text put it out of line); its tag stays (filters, weights). */
+ul.changes li.li-major > .row-text { font-weight: 700; color: var(--text-bright); }
 ul.changes li > .row-text::before {
   content: "";
   float: left;

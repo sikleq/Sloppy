@@ -31,10 +31,29 @@ def test_topics_become_subgroups_and_the_lead_a_major_row():
     assert out[s + 2:s + 4] == [INNATE, UI]
     assert out[l + 2] == MEET                                           # a row about several creeps
     f = out.index('W(unit_header("Flagbearer Creep", "../icons/units/npc_dota_creep_goodguys_flagbearer.png", '
-                  'general=False))')
+                  'general=False, page="creep-goodguys-flagbearer"))')
     assert out[f + 2].startswith('W(li("Experience Bounty increased from 57 to 60"')   # its name prefix goes
     assert l < f and any(x.startswith('W(unit_header("Siege Creep"') for x in out[f:])   # cards after the subgroups
     assert 'W(ul_open())\nW(ul_close())' not in "\n".join(out)          # emptied blocks are gone
+
+
+def test_lane_creep_cards_link_their_unit_pages():
+    """Owner 2026-10-16: a creep card must be clickable, as a rule — the generator gives it page=, and every lane
+    creep card in content/ has it (patch/elements.unit_header links ../units/<page>.html and adds the patch strip)."""
+    import glob
+    import re
+    out = g._general_topics(LANES, "Global Changes")
+    cards = [l for l in out if l.startswith("W(unit_header(")]
+    assert cards and all('page="' in c for c in cards)
+    names = {n for n, _icon in g._LANE_CARDS.values()}
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    bad = []
+    for path in glob.glob(os.path.join(root, "content", "p*.py")):
+        for n, line in enumerate(open(path, encoding="utf-8"), 1):
+            m = re.search(r'W\(unit_header\("([^"]+)"', line)
+            if m and m.group(1) in names and "page=" not in line:
+                bad.append(f"{os.path.basename(path)}:{n}")
+    assert not bad, bad
 
 
 def test_first_and_second_rows_become_one():

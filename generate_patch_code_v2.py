@@ -543,6 +543,10 @@ TAG_OVERRIDES = {
     "moved from tier":              "REWORK",  # tier-change is a structural move, not a buff/nerf
     "dormant curio increases":      "NEW",     # first-ever curio upgrade on an item = new capability
     "destroys the target illusion": "NERF",    # Spectre Reality (7.40): the swapped illusion is lost (audit 2026-10-03)
+    # owner 2026-10-16 (7.41 review): the effect decides, not the phrase template
+    "when determining if mars is outnumbered": "BUFF",   # Dauntless: allies no longer offset enemies -> regen more often
+    "stolen spells now have their cooldown":   "NEW",    # Spell Steal: a new property in place of the debuff amp
+    "avatar duration changed from 9/8/7/6s":   "BUFF",   # BKB: the duration now stops at 7s, not 6s
 }
 
 
@@ -1177,7 +1181,10 @@ def _general_topics(lines, title=""):
     for key in _LANE_CARDS:
         if key in cards:
             name, icon = _LANE_CARDS[key]
-            out += [f'W(unit_header("{name}", "../icons/units/{icon}.png", general=False))', 'W(ul_open())']
+            # page=: the card links to the creep's unit page and gets its patch strip (owner 2026-10-16: "should be
+            # clickable, as a rule")
+            out += [f'W(unit_header("{name}", "../icons/units/{icon}.png", general=False, page="{key.split("|")[1]}"))',
+                    'W(ul_open())']
             out += _merge_ordinal_pair(cards[key]) + ['W(ul_close())']
     return out
 

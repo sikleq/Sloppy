@@ -434,14 +434,15 @@ def _slugify(name):
     return s
 
 
-def _register_entity(kind, name, force=False):
+def _register_entity(kind, name, force=False, slug=None):
     """force=True: tracked even inside General Updates (map units with their own Changes
-    page: Roshan, Tormentor)."""
+    page: Roshan, Tormentor). slug: the page's own slug when it isn't the name's (a lane creep's card,
+    "Flagbearer Creep" -> creep-goodguys-flagbearer)."""
     if _State.current_section_slug == 'general' and not force:
         _State.current_entity_key = None
         _State.current_entity_display = None
         return ''
-    slug = _slugify(name)
+    slug = slug or _slugify(name)
     key = f"{kind}|{slug}"
     _State.current_entity_key = key
     _State.current_ability_kv = None
@@ -496,7 +497,7 @@ def hero_header(name):
 </div>'''
 
 
-def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, new_mech=None, track=False):
+def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, new_mech=None, track=False, page=None):
     """`new="New Neutral Creep"` renders the same NEW-entity block as
     item_header(new=...): is-new block + type label after the name. Pair it
     with new_stats([...]) for the stat sheet and t("NEW") ability rows (the
@@ -515,7 +516,9 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
     _State.next_ul_is_hero_stats = (not new) and general   # a NEW unit shows a stat sheet instead
     kind_attr = f' data-kind="{kind}"' if kind else ''
     entity_kind = "creep-hero" if (kind and kind.lower().startswith("creep-hero")) else "unit"
-    eid = _register_entity(entity_kind, name, force=track)
+    # page="creep-goodguys-flagbearer": a lane creep's card in General Updates links to its unit page and gets the
+    # patch strip, like any tracked unit (owner 2026-10-16: "Flagbearer Creep и Siege Creep не кликабельны")
+    eid = _register_entity(entity_kind, name, force=track or bool(page), slug=page)
     if new:
         type_text = new if isinstance(new, str) else ''
         type_label = f' <span class="entity-new-type">{type_text}</span>' if type_text else ''
@@ -529,7 +532,7 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
     _State.new_mech_tag = _mech_tag(new_mech)
     img = f'<img src="{icon_url}" alt="{name}" loading="lazy" width="128" height="72">'
     if eid:          # a tracked unit has a Changes page (units/<slug>.html; a creep-hero lives with the heroes)
-        href = _entity_link("heroes" if entity_kind == "creep-hero" else "units", name)
+        href = _entity_link("heroes" if entity_kind == "creep-hero" else "units", page or name)
         img = f'<a class="entity-link" href="{href}">{img}</a>'
         name_html = f'<a class="entity-link" href="{href}">{name}</a>'
     else:            # General Updates (Roshan, Tormentor…): no dynamics id, no page
