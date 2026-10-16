@@ -56,12 +56,11 @@ def test_lane_creep_cards_link_their_unit_pages():
     assert not bad, bad
 
 
-def test_first_and_second_rows_become_one():
-    out = g._merge_ordinal_pair([SIEGE, SIEGE2])
-    assert len(out) == 1
-    assert g._li_parts(out[0])[0] == ("First +1 siege creep timing decreased from 35:00 to 30:00, "
-                                      "second now occurs at 60:00")
-    assert "t(\"REWORK\")" in out[0] and "goodguys-siege" in out[0]
+def test_first_and_second_timings_stay_two_rows():
+    """Owner 2026-10-16: the second timing is a new property of the siege creep — its own row, NEW."""
+    out = g._general_topics(['W(ul_open())', SIEGE, SIEGE2, CURRENTS, 'W(ul_close())'], "Global Changes")
+    i = out.index(next(l for l in out if l.startswith('W(unit_header("Siege Creep"')))
+    assert out[i + 2:i + 4] == [SIEGE, SIEGE2]
 
 
 def test_a_lone_topic_row_stays_and_map_sections_are_left_alone():
@@ -70,8 +69,9 @@ def test_a_lone_topic_row_stays_and_map_sections_are_left_alone():
     assert g._general_topics(LANES, "Map Changes") == LANES
 
 
-def test_a_clock_time_timing_is_rework():
-    assert g._guess_tag("Second +1 siege creep timing now occurs at 60:00") == "REWORK"
+def test_a_timing_that_now_occurs_is_new():
+    assert g._guess_tag("Second +1 siege creep timing now occurs at 60:00") == "NEW"
+    assert g._guess_tag("First +1 siege creep timing decreased from 35:00 to 30:00") == "REWORK"
 
 
 def test_all_followup_goes_into_the_rows_note():

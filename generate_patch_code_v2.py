@@ -231,9 +231,10 @@ CANONICAL_TAGS = [
     # a game-clock timing ("First Spawn Time increased from 15:00 to 20:00", "siege creep timing 35:00 to 30:00"):
     # when an object appears is REWORK (rule "Где и когда появляется объект"), and a % of a clock time means nothing
     (re.compile(r'\bfrom \d{1,2}:\d{2} to \d{1,2}:\d{2}\b'), 'REWORK'),
-    # a timing that now happens at a clock time ("Second +1 siege creep timing now occurs at 60:00", 7.41): REWORK
-    # like its pair, so the sorter keeps "First … / Second …" in order (owner 2026-10-16; was NEW above the first)
-    (re.compile(r'\btiming\b[^.]*\bnow (?:occurs|happens|starts) at \d{1,2}:\d{2}\b', re.I), 'REWORK'),
+    # a timing that now happens at a clock time where there was none ("Second +1 siege creep timing now occurs at
+    # 60:00", 7.41): a new property of the unit — NEW, its own row (owner 2026-10-16, after trying REWORK and one
+    # merged row with the first timing)
+    (re.compile(r'\btiming\b[^.]*\bnow (?:occurs|happens|starts) at \d{1,2}:\d{2}\b', re.I), 'NEW'),
     # "X is no longer affected / increased by AoE bonuses": one tag for the class, DEL ("No longer …" → DEL);
     # 7.38 had two NERF and three later patches DEL, the scaffold said BUFF or MISC
     (re.compile(r'\bno longer (?:affected|increased|modified) by (?:\w+ )?(?:AoE|Area of Effect) (?:bonus(?:es)?|increase)'
@@ -1185,29 +1186,7 @@ def _general_topics(lines, title=""):
             # clickable, as a rule")
             out += [f'W(unit_header("{name}", "../icons/units/{icon}.png", general=False, page="{key.split("|")[1]}"))',
                     'W(ul_open())']
-            out += _merge_ordinal_pair(cards[key]) + ['W(ul_close())']
-    return out
-
-
-_ORDINAL = re.compile(r"^First (.+?) (?=decreased|increased|reduced|changed|now|is)\b")
-
-
-def _merge_ordinal_pair(lines):
-    """Valve's "First <X> …" + "Second <X> …" rows → one row "First <X> …, second …" (owner 2026-10-16, 7.41: "First
-    +1 siege creep timing decreased from 35:00 to 30:00" + "Second +1 siege creep timing now occurs at 60:00"). The
-    first row's tag and links stay."""
-    out = []
-    for line in lines:
-        prev = _li_parts(out[-1]) if out else None
-        cur = _li_parts(line)
-        m = _ORDINAL.match(prev[0]) if prev and cur else None
-        lead = f"Second {m.group(1)} " if m else ""
-        if m and cur[0].startswith(lead):
-            joined = f"{prev[0]}, second {cur[0][len(lead):]}"
-            out[-1] = out[-1].replace(repr(prev[0]) if f'"{prev[0]}"' not in out[-1] else f'"{prev[0]}"',
-                                      f'"{joined}"', 1)
-            continue
-        out.append(line)
+            out += cards[key] + ['W(ul_close())']
     return out
 
 

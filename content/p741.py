@@ -45,8 +45,9 @@ def build():
     W(ul_close())
     W(unit_header("Siege Creep", "../icons/units/npc_dota_goodguys_siege.png", general=False, page="goodguys-siege"))
     W(ul_open())
-    # Valve's two timing rows as one (owner 2026-10-16; generator _merge_ordinal_pair); a clock time: REWORK, no %
-    W(li("First +1 siege creep timing decreased from 35:00 to 30:00, second now occurs at 60:00", t("REWORK"),
+    W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("REWORK"), also_dyn=['unit|goodguys-siege']))   # a clock time: no %
+    # a new property of the siege creep: NEW (owner 2026-10-16, after one merged row; canon: "timing now occurs at")
+    W(li("Second +1 siege creep timing now occurs at 60:00", t("NEW"),
          extra=inline_note("Before 7.41 a wave got only one extra siege creep, at 35:00 (since 7.22: \"Siege creeps now spawn two units at 35 minutes instead of 30 minutes\"). The second extra one is new."),
          also_dyn=['unit|goodguys-siege']))
     W(ul_close())
