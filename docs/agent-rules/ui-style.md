@@ -119,7 +119,7 @@ search sits behind the round loupe button».
 последние 12 патчей: на 7.38 самого 7.38 в ней не было, на 7.08 полоса Blink Dagger была пустой. Страницы героев,
 предметов и юнитов (без версии в выборе патча) — как раньше, последние патчи. Стрелки листают от этого места.
 
-## Talent tree icon, Dynamics hover lens, Changelog columns (2026-09-26)
+## Talent tree icon, Dynamics hover lens (2026-09-26)
 
 - **Talent tree** (`patch/talent_tree.py`, post-pass in `patch/page.py save_html`): the Talents block icon lights
   the changed twigs in gold, as the game lights a taken talent. Side = the hero's talent slots of THAT patch
@@ -136,8 +136,6 @@ search sits behind the round loupe button».
   hero above (fixed 2026-10-09, `test_a_single_changed_talent_lights_its_twig_for_unindented_heroes`).
 - **Dynamics matrices**: cells never pop; one `.dyn-lens` (scripts.js) with a copy of the hovered pill grows
   over it and glides between cells (transform/opacity only). A per-cell transition repaints every passing cell.
-- **Changelog**: chip | beetle | text columns (`--clog-cat-w`), titles, bullets and small changes start on one x;
-  small changes are separated by faint lines. Keep titles short (about 90 characters).
 
 ## Телефоны (2026-10-05)
 

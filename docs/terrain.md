@@ -464,9 +464,6 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `write_head`); `?from=terrain_<code>` shows the patch page's bottom-left back arrow, pointed at that map. Dotted
   underline like the notes' picture buttons. The "On the map" tiles pop out on hover (`.tf-tile:hover`, scale
   1.12, a soft gold glow, the dynamics cells' z-index trick) — the owner: "softly, like our dynamics cells".
-- **Changelog animations** — `tools/changelog_terrain_anim.py [layer]` records the trees in every mode on four
-  patches (the other layers moved to the slider sweeps, `tools/changelog_terrain_sweep.py`: no two news show the same
-  layer); needs dist/ on :8799.
 - **Terrain Stats (2026-10-04)** — the owner: "add the Oldgrowth table somewhere, carefully, not breaking the Terrain
   page visually or technically — a sub-tab of the Terrain button, Terrain Stats, with more info". Materials ▸ Terrain is
   now a group (`MATERIALS_GROUPS` "terrain_grp": Terrain, Terrain Stats). `builders/terrain_stats.py` →

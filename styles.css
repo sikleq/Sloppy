@@ -831,8 +831,6 @@ html.cb-mode button.cb-toggle::after {
 .inv-cell-creeps:hover .inv-icon {
   content: url('icons/ui/gothic/icon_creeps.gif');
 }
-/* Changelogs book: on hover, a page lifts off the right, arcs over the spine and
-   settles on the left (replicates icons/ref/book_anim.gif in our gold palette). */
 .inv-cell-patch:hover .inv-icon {
   content: url('icons/ui/gothic/icon_patch.gif');
 }
@@ -10165,156 +10163,14 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
   box-shadow: inset 0 0 16px var(--shadow-55);
 }
 
-/* ---- Site changelog (changelog.html, builders/changelog.py) ---- */
-.clog-container { max-width: none; margin: 0; padding: 22px 32px 60px; }
-/* the rail is fixed at the left edge, vertically centred; the entries keep clear of it */
-.clog-main { margin-left: 236px; }
-.clog-rail { position: fixed; left: 18px; top: 50%; transform: translateY(-50%); z-index: 20;
-  width: 200px; max-height: 78vh; overflow-y: auto; display: flex; flex-direction: column; gap: 1px;
-  padding: 6px 14px 6px 0; border-right: 1px solid rgba(150, 146, 137,.16);
-  opacity: .5; transition: opacity .2s ease; scrollbar-width: thin; }
-.clog-rail:hover, .clog-rail:focus-within { opacity: 1; }
-.clog-rail-month { font-family: 'Jersey 10', monospace; font-size: 16px; color: var(--gold);
-  letter-spacing: .4px; margin: 10px 0 3px; }
-.clog-rail-month:first-child { margin-top: 0; }
-.clog-rail-item { display: block; padding: 3px 8px; border-left: 2px solid transparent; border-radius: 0 4px 4px 0;
-  color: var(--text-main); text-decoration: none; font-size: 12.5px; line-height: 1.3; }
-.clog-rail-item:hover { background: rgba(150, 146, 137,.1); color: var(--text-bright); }
-.clog-rail-item.is-current { border-left-color: var(--gold); color: var(--text-bright); }
-.clog-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
-.clog-chip { background: transparent; border: 1px solid var(--line-soft); color: var(--text-main);
-  border-radius: 14px; padding: 4px 12px; font: inherit; font-size: 12.5px; cursor: pointer; }
-.clog-chip:hover { border-color: var(--gold-dim); color: var(--text-bright); }
-.clog-chip.active { border-color: var(--gold); color: var(--gold); background: rgba(227,196,106,.08); }
-.clog-day { margin-bottom: 26px; scroll-margin-top: 70px; }
-.clog-date { font-family: 'Jersey 10', monospace; font-weight: 400; font-size: 24px; color: var(--gold);
-  letter-spacing: .5px; margin: 0 0 10px; padding-bottom: 5px; border-bottom: 1px solid var(--line-soft); }
-.clog-entry { padding: 12px 0 14px; border-bottom: 1px solid var(--line-soft); scroll-margin-top: 80px; }
-.clog-entry:last-child { border-bottom: 0; }
-/* wide screens: the notes on the left, the screenshots next to them */
-.clog-entry.has-shots { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.6fr); column-gap: 28px; align-items: start; }
-/* Chip | beetle | text columns (owner 2026-09-26): titles, bullets and small changes start on one x */
-.clog-page { --clog-cat-w: 100px; --clog-bug-w: 14px; --clog-gap: 8px;
-  --clog-text-x: calc(var(--clog-cat-w) + var(--clog-bug-w) + 2 * var(--clog-gap)); }
-.clog-entry-head { display: grid; grid-template-columns: var(--clog-cat-w) var(--clog-bug-w) minmax(0, 1fr);
-  column-gap: var(--clog-gap); align-items: baseline; }
-.clog-catcell, .clog-bugcell { display: flex; align-items: center; align-self: center; }
-.clog-title { margin: 0; font-size: 15px; font-weight: 600; color: var(--text-bright); }
-.clog-title-link { color: inherit; text-decoration: underline dotted rgba(227,196,106,.55);
-  text-underline-offset: 4px; text-decoration-thickness: 1px; }
-.clog-title-link:hover { color: var(--gold); text-decoration-color: var(--gold); }
-.clog-cat { flex: none; font-size: 10px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
-  padding: 2px 6px; border-radius: 3px; border: 1px solid; }
-.clog-cat-patch-reader { color: #d7b56a; border-color: rgba(227,196,106,.35); background: rgba(227,196,106,.08); }
-.clog-cat-terrain      { color: #9fc27a; border-color: rgba(150,200,110,.35); background: rgba(150,200,110,.08); }
-.clog-cat-heroes       { color: #d98f6a; border-color: rgba(220,130,90,.35);  background: rgba(220,130,90,.08); }
-.clog-cat-items        { color: #d6c27a; border-color: rgba(214,194,122,.35); background: rgba(214,194,122,.08); }
-.clog-cat-units        { color: #c98f8f; border-color: rgba(200,130,130,.35); background: rgba(200,130,130,.08); }
-.clog-cat-tables       { color: #7fb2d9; border-color: rgba(88,166,255,.35);  background: rgba(88,166,255,.08); }
-.clog-cat-hero-lab     { color: #86b98f; border-color: rgba(120,215,145,.35); background: rgba(120,215,145,.08); }
-.clog-cat-dynamics     { color: #c29be0; border-color: rgba(190,140,240,.35); background: rgba(190,140,240,.08); }
-.clog-cat-site         { color: #b5b0a5; border-color: rgba(150, 146, 137,.35); background: rgba(150, 146, 137,.08); }
-.clog-items { margin: 5px 0 0; padding-left: var(--clog-text-x); color: var(--text-main); font-size: 13.5px; line-height: 1.55; }
-/* our own bullet, centred on the same x as the "Show N more changes" arrow (the owner 2026-10-03: "the dot isn't
-   in the same place"): both are centred 8.5px left of the text */
-.clog-items { list-style: none; }
-.clog-items li { position: relative; }
-.clog-items li::before { content: ""; position: absolute; left: -11px; top: calc(0.775em - 2.5px); width: 5px;
-  height: 5px; border-radius: 50%; background: var(--gold); }
-/* screenshots: a light gold outline always, brighter on hover; click = lightbox */
-.clog-shots { display: flex; flex-direction: column; gap: 6px; }
-.clog-shot { display: block; width: fit-content; max-width: 100%; cursor: zoom-in; }
-.clog-shot img { display: block; max-width: 100%; height: auto; border: 1px solid rgba(227,196,106,.38);
-  border-radius: 6px; box-shadow: 0 4px 14px var(--shadow-45); transition: border-color .15s; }
-.clog-shot:hover img { border-color: var(--gold); }
-/* carousel: every slide sits in the same grid cell, so the box keeps the tallest slide's
-   height and paging only cross-fades (no jump when the screenshots differ in size) */
-.clog-slides { display: grid; overflow: hidden; transition: height .22s ease; }
-.clog-carousel .clog-shot { grid-area: 1 / 1; align-self: start; opacity: 0; visibility: hidden;
-  transition: opacity .18s ease, visibility 0s linear .18s; }
-.clog-carousel .clog-shot.is-active { opacity: 1; visibility: visible; transition: opacity .18s ease; }
-/* the carousel strip: slim bar — site pixel-arrow buttons at the ends, pixel-square dots + counter centred */
-.clog-car-bar { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px;
-  margin-top: 4px; padding: 2px 4px; border-radius: 12px;
-  background: linear-gradient(90deg, rgba(227,196,106,.10), transparent 18%, transparent 82%, rgba(227,196,106,.10)); }
-.clog-car-mid { display: flex; align-items: center; justify-content: center; gap: 10px; }
-.clog-car-btn { width: 20px; height: 20px; padding: 0; appearance: none; border-radius: 50%;
-  border: 1px solid var(--gold); cursor: pointer; image-rendering: pixelated;
-  background-repeat: no-repeat; background-position: center; background-size: auto 9px, cover;
-  transition: filter .15s ease; }
-.clog-car-btn.is-prev { background-image:
-  url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="10" y="0" width="2" height="2"/><rect x="8" y="2" width="4" height="2"/><rect x="6" y="4" width="6" height="2"/><rect x="4" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="4" y="10" width="8" height="2"/><rect x="6" y="12" width="6" height="2"/><rect x="8" y="14" width="4" height="2"/><rect x="10" y="16" width="2" height="2"/></g></svg>'),
-  linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%); }
-.clog-car-btn.is-next { background-image:
-  url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 18" shape-rendering="crispEdges"><g fill="%23e3c46a"><rect x="2" y="0" width="2" height="2"/><rect x="2" y="2" width="4" height="2"/><rect x="2" y="4" width="6" height="2"/><rect x="2" y="6" width="8" height="2"/><rect x="2" y="8" width="10" height="2"/><rect x="2" y="10" width="8" height="2"/><rect x="2" y="12" width="6" height="2"/><rect x="2" y="14" width="4" height="2"/><rect x="2" y="16" width="2" height="2"/></g></svg>'),
-  linear-gradient(180deg, var(--bg-warm-dark) 0%, var(--bg-warm-darker) 100%); }
-.clog-car-btn:hover { filter: brightness(1.25); }
-.clog-dots { display: flex; gap: 6px; }
-.clog-dot { width: 8px; height: 8px; padding: 0; appearance: none; border-radius: 1px; cursor: pointer;
-  border: 1px solid rgba(227,196,106,.5); background: transparent;
-  transition: background .15s, border-color .15s, box-shadow .15s; }
-.clog-dot:hover { border-color: var(--gold); }
-.clog-dot.is-active { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 5px rgba(227,196,106,.5); }
-.clog-car-count { font-family: 'Jersey 10', monospace; font-size: 14px; line-height: 1; letter-spacing: .5px; color: var(--gold-dim); }
-/* click a screenshot: it grows over the page (no new tab); click / Esc closes, arrows page a carousel */
-.clog-lightbox { position: fixed; inset: 0; z-index: 1200; display: none; align-items: center; justify-content: center;
+/* Terrain note pictures (scripts.js): a click on one grows it over the page; a click or Esc closes */
+.tshot-lightbox { position: fixed; inset: 0; z-index: 1200; display: none; align-items: center; justify-content: center;
   background: rgba(7, 7, 6,.86); cursor: zoom-out; padding: 24px; }
-.clog-lightbox.is-open { display: flex; }
-.clog-lightbox img { max-width: min(96vw, 1700px); max-height: 92vh; width: auto; height: auto;
+.tshot-lightbox.is-open { display: flex; }
+.tshot-lightbox img { max-width: min(96vw, 1700px); max-height: 92vh; width: auto; height: auto;
   border: 1px solid var(--gold-dim); border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.6);
-  animation: clog-zoom .16s ease-out; }
-@keyframes clog-zoom { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
-/* features past the newest few wait under "Show more" (scripts.js paginate) */
-.clog-page .clog-entry.clog-later, .clog-page .clog-day.clog-later { display: none; }
-.clog-more-wrap { display: flex; justify-content: center; margin: 18px 0 8px; }
-.clog-more-btn[hidden] { display: none; }
-/* a button / filter / icon a note adds, shown as itself */
-.clog-ui { width: 16px; height: 16px; vertical-align: -3px; margin: 0 2px; image-rendering: pixelated; }
-.clog-page .clog-entry.is-hidden, .clog-page .clog-day.is-hidden, .clog-page .clog-rail-item.is-hidden,
-.clog-page .clog-minor.is-hidden, .clog-page .clog-minor-list li.is-hidden { display: none; }
-/* a day's small changes continue its list — no heading, no divider of their own (the owner 2026-10-03); many fold
-   under "Show N more changes" at the end */
-.clog-minor { margin: 4px 0 4px; }
-/* under the day's last feature, right below its items (the owner 2026-10-03: "move it to the topic, not a separate
-   news item behind a line"); filtered out, that feature keeps only them (scripts.js only-minor) */
-.clog-text > .clog-minor { margin: 10px 0 0; }
-.clog-entry.only-minor { display: block; padding-top: 4px; }
-.clog-entry.only-minor > .clog-shots,
-.clog-entry.only-minor > .clog-text > :not(.clog-minor) { display: none; }
-/* "Show" starts where the items' text starts, its arrow in the bullets' column (the owner 2026-10-03: "not level
-   with the other items") */
-summary.clog-minor-more { position: relative; padding-left: var(--clog-text-x); font-size: 12.5px;
-  color: var(--text-dim, #969289); letter-spacing: .3px; cursor: pointer; list-style: none; display: inline-block; }
-summary.clog-minor-more::-webkit-details-marker { display: none; }
-summary.clog-minor-more::before { content: "\25B8"; position: absolute; left: calc(var(--clog-text-x) - 13.5px); top: 50%;
-  width: 10px; text-align: center; line-height: 1; color: var(--gold-dim); transform: translateY(-50%);
-  transition: transform .15s; }
-details[open] > summary.clog-minor-more::before { transform: translateY(-50%) rotate(90deg); }
-summary.clog-minor-more:hover { color: var(--text-bright); }
-.clog-more-hide, details[open] > summary .clog-more-show { display: none; }
-details[open] > summary .clog-more-hide { display: inline; }
-.clog-minor-n { color: var(--gold-dim); }
-.clog-minor-list { list-style: none; margin: 0; padding: 0; }
-details.clog-minor > .clog-minor-list { margin-top: 6px; }
-.clog-minor-list li { display: grid; grid-template-columns: var(--clog-cat-w) var(--clog-bug-w) minmax(0, 1fr);
-  column-gap: var(--clog-gap); align-items: baseline; padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, .06);
-  font-size: 13px; line-height: 1.45; color: var(--text-main); }
-.clog-minor-list a { color: inherit; text-decoration: underline dotted rgba(227,196,106,.45); text-underline-offset: 3px; }
-.clog-minor-list a:hover { color: var(--gold); }
-/* a hero named in a note = its small picture (the owner 2026-10-03) */
-.clog-hero { width: 28px; height: 16px; object-fit: cover; border-radius: 2px; vertical-align: -3px; margin: 0 1px;
-  box-shadow: 0 0 0 1px rgba(227, 196, 106, 0.18); }
-@media (max-width: 1100px) {
-  .clog-entry.has-shots { grid-template-columns: 1fr; }
-  .clog-shots { margin-top: 10px; }
-}
-@media (max-width: 900px) {
-  .clog-main { margin-left: 0; }
-  .clog-rail { position: static; transform: none; width: auto; max-height: none; opacity: 1;
-    flex-direction: row; flex-wrap: wrap; gap: 4px; padding: 0 0 12px; margin-bottom: 14px;
-    border-right: 0; border-bottom: 1px solid rgba(150, 146, 137,.16); }
-  .clog-rail-month { width: 100%; }
-}
+  animation: tshot-zoom .16s ease-out; }
+@keyframes tshot-zoom { from { transform: scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* ==========================================================================
    14. UTILITIES / OVERRIDES / LEGACY
@@ -10851,8 +10707,8 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .toolbar-panel .mr-price-input { border-bottom-color: var(--px-line); color: #e2d9c4; }
 .toolbar-panel .mr-price-input:focus { border-bottom-color: var(--gold); }
 
-/* Level field (Hero Stats), calendar year picker, changelog category chips — same skin */
-.hs-level-group input, .cal-year-current, .clog-chip {
+/* Level field (Hero Stats), calendar year picker — same skin */
+.hs-level-group input, .cal-year-current {
   box-sizing: border-box;
   border: 2px solid transparent;
   border-image: var(--px-edge) 2 stretch;
@@ -10863,7 +10719,7 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 }
 .hs-level-group input { color: #e2d9c4; }
 .hs-level-group input:focus, .cal-year-current:hover, .cal-year-picker.is-open .cal-year-current,
-.cal-year-current:focus-visible, .clog-chip:hover {
+.cal-year-current:focus-visible {
   border-image-source: var(--px-edge-gold);
   box-shadow: inset 0 -3px 0 var(--px-press);
 }
@@ -10876,13 +10732,6 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
   border-radius: 0;
   background-color: var(--px-menu);
   background-clip: padding-box;
-}
-.clog-chip { font-family: var(--font-j10); font-size: 18px; color: var(--px-text); }
-.clog-chip.active {
-  background: var(--px-on);
-  border-image-source: var(--px-edge-on);
-  color: var(--px-on-text);
-  box-shadow: inset 0 -3px 0 var(--px-on-press);
 }
 .cal-year-opt { font-family: var(--font-j10); font-size: 19px; font-weight: 400; color: var(--px-text-soft); border-radius: 0; }
 .cal-year-opt:hover { background: rgba(255, 138, 26, 0.08); color: var(--px-hi); }
@@ -11030,28 +10879,6 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
   box-shadow: 0 2px 4px var(--shadow-60), inset 0 0 0 1px var(--white-12), 0 0 8px var(--white-22),
     0 0 0 1.5px rgba(227, 196, 106, 0.95), 0 0 0 2.5px rgba(0, 0, 0, 0.85);
 }
-/* Changelog: "fix" marker — the pixel beetle beside the category chip */
-.clog-bug { width: 13px; height: 13px; image-rendering: pixelated; flex: none; display: block; }
-/* Changelog screenshots: every shot sits in a frame as wide as the shots column (same width in
-   every entry); a smaller image is centred on a dark vignette instead of shrinking the frame. */
-.clog-shot {
-  width: 100%;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  background: radial-gradient(ellipse 80% 90% at 50% 40%, #1d1915 0%, #100e0c 70%, #0b0a09 100%);
-  border: 1px solid rgba(227, 196, 106, 0.38);
-  border-radius: 6px;
-  box-shadow: 0 4px 14px var(--shadow-45);
-  transition: border-color .15s;
-}
-.clog-shot:hover { border-color: var(--gold); }
-.clog-shot img, .clog-shot:hover img { border: 0; border-radius: 3px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.55); }
-/* a tall shot (the 720x760 map sweeps) no taller than a wide one shows — the owner 2026-10-05: "the animation is too
-   big, a third of the screen"; click still opens it full size */
-.clog-shot img { max-height: 340px; width: auto; }
 /* Patch-page toolbar: tags and group chips in ONE row, no "Tags:" / "Group:" labels — a thin
    vertical line parts them, like the hero / item / unit pages. */
 .legend-stack { flex-direction: row; align-items: center; gap: 6px; }
@@ -11185,7 +11012,6 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 /* Talent tree: the changed twigs (patch/talent_tree.py) glow a little, like the lit branch in game */
 .ability-block.talents-block svg.ttree.ttree-lit .ttree-base { opacity: .42; }   /* unlit twigs recede */
 .ability-block.talents-block svg.ttree .ttree-on { filter: drop-shadow(0 0 1.6px rgba(255, 190, 40, 1)); }
-.clog-catcell .clog-cat { width: 100%; box-sizing: border-box; text-align: center; }
 /* Item before/after card: stats the patch did not change (patch/elements.py _prop_layout) — shown on
    both sides, a step dimmer so the eye goes to the changes */
 .properties-change .property-text.property-same { color: var(--text-dim); }

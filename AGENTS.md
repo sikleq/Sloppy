@@ -34,10 +34,10 @@
 ## Скиллы проекта (`.claude/skills/`)
 
 - **`sloppy-patch`** — данные и содержание: новый патч целиком (файлы игры → тихие изменения → разметка
-  `content/p<version>.py` → карта/Terrain/Oldgrowth → выпуск: журнал, доки, тесты, CI). Разметка — workflow с
+  `content/p<version>.py` → карта/Terrain/Oldgrowth → выпуск: доки, тесты, CI). Разметка — workflow с
   воротами (`references/annotate.md`), ядро — линтер канонических фраз:
   `python .claude/skills/sloppy-patch/lint_tags.py content/p<version>.py`.
-- **`sloppy-visual`** — внешний вид: стиль сайта, иконки, визуальная проверка лёгким агентом, картинки к журналу.
+- **`sloppy-visual`** — внешний вид: стиль сайта, иконки, визуальная проверка лёгким агентом.
 
 Скиллы не дублируют правила, а ссылаются на `docs/agent-rules/*` и `docs/*.md`.
 

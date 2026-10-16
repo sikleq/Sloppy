@@ -15,7 +15,7 @@ QoL), every numeric delta is computed as a percentage, every per-level formula u
   (cast range, mana, cooldown in a header strip); item stats and recipes as before → after cards with their prices.
 - **Filter by tag.** Click a chip to surface only BUFF, NERF, DEL, … rows across the page.
 - **Every hero, item and unit on its own page** — all its changes across patches, with a patch-by-patch strip.
-- **Calendar and changelog.** Patch lifespans and yearly stats; the site's own changelog.
+- **Calendar.** Patch lifespans and yearly stats.
 - **Terrain comparison.** An old ↔ new map slider per map change, with trees, camps, towers, runes and objectives as
   layers. The map pictures are rendered in Source Filmmaker (`scripts/gen/stitch_sfm.py`) and the map entities are
   read straight from the game's map files (`scripts/gen/extract_map_entities.py`).
@@ -29,7 +29,6 @@ build_site.py               ← SINGLE entrypoint: python build_site.py [steps] 
 builders/
   build_patches.py          ← patch pages: auto-discovers content/p*.py → dist/patches/<ver>.html
   entity_changes.py         ← one page per hero / item / unit + the Hero / Item / Unit Changes indexes
-  changelog.py              ← calendar.html, changelog.html
   creeps.py                 ← neutral_stats.html, neutral_abilities.html
   creeps_common.py / creeps_history.py / creeps_abilities.py  ← its helpers, cell history, abilities page
   heroes_stats.py / heroes_dyn.py / items_dyn.py / hero_lab.py / mana_items.py / aoe_increase.py

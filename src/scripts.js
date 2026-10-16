@@ -7363,7 +7363,7 @@ function ecShopMarkup(panels) {
   function lightbox() {
     if (box) return box;
     box = document.createElement('div');
-    box.className = 'clog-lightbox tshot-lightbox';
+    box.className = 'tshot-lightbox';
     box.innerHTML = '<img alt="">';
     box.addEventListener('click', function() { box.classList.remove('is-open'); });
     document.addEventListener('keydown', function(ev) {
@@ -7430,135 +7430,6 @@ function ecShopMarkup(panels) {
   }
   document.addEventListener('mouseover', handler, true);
   document.addEventListener('focusin', handler, true);
-})();
-
-// ---- SITE CHANGELOG (changelog.html): category chips, current entry in the rail, lightbox, carousels ----
-(function() {
-  if (!document.body.classList.contains('clog-page')) return;
-  const chips = document.querySelectorAll('.clog-chips .clog-chip');
-  // only the newest features show, the rest come a step at a time under "Show more" — no reload, the page stays
-  // where it is (the owner 2026-10-04: "show only the last 5 news, hide the rest under Show more")
-  const moreBtn = document.querySelector('.clog-more-btn');
-  const step = moreBtn ? +moreBtn.dataset.step || 5 : 0;
-  let limit = step;
-  function paginate() {
-    if (!moreBtn) return;
-    let shown = 0, later = false;
-    document.querySelectorAll('.clog-day').forEach(day => {
-      const feats = [...day.querySelectorAll('.clog-entry')].filter(e => !e.classList.contains('is-hidden'));
-      feats.forEach(e => {
-        const hide = shown >= limit;
-        e.classList.toggle('clog-later', hide);
-        if (hide) later = true; else shown++;
-      });
-      // a day of small changes only follows the features before it
-      const hideDay = feats.length ? feats.every(e => e.classList.contains('clog-later')) : shown >= limit;
-      day.classList.toggle('clog-later', hideDay);
-      if (hideDay && !day.classList.contains('is-hidden')) later = true;
-    });
-    moreBtn.hidden = !later;
-  }
-  function reveal(el) {                       // a rail link or a #hash pointing past the shown ones
-    while (el && el.closest('.clog-later') && limit < 1000) { limit += step; paginate(); }
-  }
-  if (moreBtn) moreBtn.addEventListener('click', () => { limit += step; paginate(); });
-  document.querySelectorAll('.clog-rail-item').forEach(a => a.addEventListener('click', () => {
-    reveal(document.getElementById(a.getAttribute('href').slice(1)));
-  }));
-  function apply(cat) {
-    chips.forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
-    document.querySelectorAll('.clog-entry').forEach(e => {
-      // the day's small changes sit under its last feature: filtered out, the feature still shows them when they
-      // match (only-minor hides everything else of it)
-      const off = !!cat && e.dataset.cat !== cat;
-      const box = e.querySelector('.clog-minor');
-      const keep = off && !!box && [...box.querySelectorAll('.clog-minor-list li')].some(li => li.dataset.cat === cat);
-      e.classList.toggle('is-hidden', off && !keep);
-      e.classList.toggle('only-minor', keep);
-    });
-    document.querySelectorAll('.clog-day').forEach(d =>
-      d.classList.toggle('is-hidden', !!cat && !(d.dataset.cats || '').split(' ').includes(cat)));
-    document.querySelectorAll('.clog-rail-item').forEach(a =>
-      a.classList.toggle('is-hidden', !!cat && !((a.dataset.cats || a.dataset.cat || '').split(' ').includes(cat))));
-    document.querySelectorAll('.clog-minor').forEach(box => {
-      let shown = 0;
-      box.querySelectorAll('.clog-minor-list li').forEach(li => {
-        const hide = !!cat && li.dataset.cat !== cat;
-        li.classList.toggle('is-hidden', hide);
-        if (!hide) shown++;
-      });
-      box.classList.toggle('is-hidden', !shown);
-      const n = box.querySelector('.clog-minor-n');      // "Show N more changes" counts what the filter leaves
-      if (n) n.textContent = shown;
-      const s = box.querySelector('.clog-minor-s');
-      if (s) s.textContent = shown === 1 ? '' : 's';
-    });
-    limit = step;
-    paginate();
-  }
-  chips.forEach(c => c.addEventListener('click', () => apply(c.dataset.cat)));
-  paginate();
-  if (location.hash) reveal(document.getElementById(decodeURIComponent(location.hash.slice(1))));
-  // screenshots open in a lightbox over the page (no new tab); in a carousel the arrows page it
-  const box = document.createElement('div');
-  box.className = 'clog-lightbox';
-  box.innerHTML = '<img alt="">';
-  document.body.appendChild(box);
-  const boxImg = box.querySelector('img');
-  let boxSet = [], boxAt = 0;
-  const boxShow = i => { boxAt = (i + boxSet.length) % boxSet.length; boxImg.src = boxSet[boxAt].getAttribute('href'); };
-  document.querySelectorAll('.clog-shot[data-zoom]').forEach(a => a.addEventListener('click', ev => {
-    ev.preventDefault();
-    boxSet = [...a.closest('.clog-shots').querySelectorAll('.clog-shot')];
-    boxShow(boxSet.indexOf(a));
-    box.classList.add('is-open');
-  }));
-  box.addEventListener('click', () => box.classList.remove('is-open'));
-  document.addEventListener('keydown', ev => {
-    if (!box.classList.contains('is-open')) return;
-    if (ev.key === 'Escape') box.classList.remove('is-open');
-    else if (ev.key === 'ArrowRight' && boxSet.length > 1) { boxShow(boxAt + 1); ev.preventDefault(); }
-    else if (ev.key === 'ArrowLeft' && boxSet.length > 1) { boxShow(boxAt - 1); ev.preventDefault(); }
-  });
-  // carousels: arrows, dots, and left/right keys while the pointer is over one
-  document.querySelectorAll('.clog-carousel').forEach(car => {
-    const slides = car.querySelectorAll('.clog-shot'), dots = car.querySelectorAll('.clog-dot');
-    const count = car.querySelector('.clog-car-count');
-    const box = car.querySelector('.clog-slides');
-    let cur = 0;
-    // the box takes the active slide's height (CSS transitions it) — no empty band under a
-    // small screenshot; re-fit when a lazy image arrives or the width changes
-    const fit = () => { box.style.height = slides[cur].offsetHeight + 'px'; };
-    const show = i => {
-      cur = (i + slides.length) % slides.length;
-      slides.forEach((s, k) => s.classList.toggle('is-active', k === cur));
-      dots.forEach((d, k) => d.classList.toggle('is-active', k === cur));
-      count.textContent = (cur + 1) + ' / ' + slides.length;
-      fit();
-    };
-    slides.forEach(sl => sl.querySelector('img').addEventListener('load', () => { if (sl === slides[cur]) fit(); }));
-    window.addEventListener('resize', fit);
-    fit();
-    car.querySelectorAll('.clog-car-btn').forEach(b => b.addEventListener('click', () => show(cur + +b.dataset.step)));
-    dots.forEach(d => d.addEventListener('click', () => show(+d.dataset.i)));
-    let hover = false;
-    car.addEventListener('mouseenter', () => { hover = true; });
-    car.addEventListener('mouseleave', () => { hover = false; });
-    document.addEventListener('keydown', ev => {
-      if (!hover || box.classList.contains('is-open')) return;
-      if (ev.key === 'ArrowRight') { show(cur + 1); ev.preventDefault(); }
-      if (ev.key === 'ArrowLeft') { show(cur - 1); ev.preventDefault(); }
-    });
-  });
-  const days = [...document.querySelectorAll('.clog-entry')];
-  const links = new Map([...document.querySelectorAll('.clog-rail-item')].map(a => [a.hash.slice(1), a]));
-  function mark() {
-    let cur = null;
-    for (const d of days) { if (d.getBoundingClientRect().top < 160 && !d.classList.contains('is-hidden')) cur = d; }
-    links.forEach((a, id) => a.classList.toggle('is-current', !!cur && id === cur.id));
-  }
-  window.addEventListener('scroll', mark, { passive: true });
-  mark();
 })();
 
 // ---- AOE INCREASE (aoe_increase.html): item + upgrade filter recompute ----

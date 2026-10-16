@@ -91,7 +91,7 @@ def test_only_tags_and_dynamics_cells_change():
     block = _css().split(cb.BEGIN, 1)[1].split(cb.END, 1)[0]
     rules = [line.split("{", 1)[0] for line in block.splitlines() if line.strip()]
     assert rules and all(cb.tag_of(s.replace("html.cb-mode ", "")) for s in rules)
-    for sel in (".tm-", ".clog-cat-", ".hl-bar-hp", ".atk-basic", ".cat-filter-btn"):
+    for sel in (".tm-", ".hl-bar-hp", ".atk-basic", ".cat-filter-btn"):
         assert sel not in block, sel
 
 

@@ -95,29 +95,6 @@ def heroes():
     return s
 
 
-# ------------------------------------------------ changelog: scroll + quill (anim: quill writes)
-def changelog():
-    s = new()
-    part(s, "scroll")
-    s.rect(5, 8, 23, 26, P1)
-    s.rect(20, 9, 23, 26, P0)
-    s.rect(3, 4, 25, 8, G3)                                # top roll (cylinder)
-    rows(s, 3, 25, 4, [G7, G6, G4, G2, G1])
-    s.rect(3, 25, 25, 29, G3)                              # bottom roll
-    rows(s, 3, 25, 25, [G6, G5, G3, G1, G0])
-    for y, x1 in ((12, 18), (16, 15), (20, 18)):
-        s.rect(8, y, x1, y + 1, G2)                        # 2px text lines
-    s.outline(O)
-    part(s, "quill")
-    s.polygon([(29, 1), (30, 3), (27, 11), (23, 17), (19, 20), (18, 18), (21, 11), (25, 4)], G7)
-    s.polygon([(30, 3), (27, 11), (23, 17), (20, 19), (24, 11), (28, 5)], G5)
-    s.line(28, 3, 18, 20, G3)                              # shaft
-    s.px(25, 8, O)                                         # vane notch
-    s.line(17, 21, 16, 22, O)                              # nib
-    s.outline(O)
-    return s
-
-
 # ------------------------------------------------ stats: heraldic shield with three stat bars (anim: bars fill)
 # (not a book — the Patches tile is already an open book)
 SHIELD = [(3, 4), (9, 2), (15, 1), (16, 1), (22, 2), (28, 4), (28, 16), (26, 22), (21, 26), (16, 30),
@@ -358,28 +335,6 @@ def abacus():
     return s
 
 
-# ------------------------------------------------ changelog: announcement bell (anim: bell swings, rings)
-def bell():
-    s = new()
-    part(s, "bell")
-    s.polygon([(13, 5), (18, 5), (21, 8), (22, 14), (23, 20), (27, 24), (27, 26), (4, 26), (4, 24),
-               (8, 20), (9, 14), (10, 8)], G4)
-    cols(s, 4, 27, 5, 26, [G6, G7, G6, G5, G4, G4, G3, G2, G1])
-    s.rect(4, 24, 27, 26, G3)                                # lip
-    rows(s, 4, 27, 24, [G6, G4, G2])
-    s.line(11, 9, 11, 19, G7)                                # lit rim of the body
-    s.outline(O)
-    part(s, "loop")
-    s.circle(15, 3, 2, G3)
-    s.px(14, 1, G6)
-    s.outline(O)
-    part(s, "clapper")
-    s.rect(14, 27, 17, 29, G5)
-    s.px(14, 27, G7)
-    s.outline(O)
-    return s
-
-
 # ------------------------------------------------ changes: ring of two arrows around an emblem (anim: ring turns)
 def _arrow_ring(s):
     part(s, "ring")
@@ -467,7 +422,7 @@ def dynamics_variants():
 
 
 ICONS = {
-    "icon_helm": heroes, "icon_abacus": abacus, "icon_cauldron": cauldron, "icon_bell": bell,
+    "icon_helm": heroes, "icon_abacus": abacus, "icon_cauldron": cauldron,
     "icon_aoe": aoe, "icon_changes_hero": changes_hero, "icon_changes_item": changes_item,
     "icon_summons": summons, "icon_swords": lane_creeps, "icon_kofi": kofi,
 }

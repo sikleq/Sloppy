@@ -87,7 +87,6 @@ NAV_TABS = [
     ("changelogs", "Patches",      None),
     ("calendar",   "Calendar",     "calendar.html"),
     ("materials",  "Materials",    "neutral_stats.html"),
-    ("changelog",  "Changelog",    "changelog.html"),     # what changed on the site (builders/changelog.py)
 ]
 
 

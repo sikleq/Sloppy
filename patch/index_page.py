@@ -32,9 +32,7 @@ def save_index_html():
         'patch':    ('Patches',    f'patches/{latest}.html' if latest else 'calendar.html'),
         'calendar': ('Calendar',   'calendar.html'),
         'terrain':  ('Terrain',    'terrain_741.html'),
-        'changelog': ('Changelog', 'changelog.html'),
     }
-    _INV_ICON = {'changelog': 'icon_bell.png'}      # tiles whose icon file isn't icon_<key>.png
     # Arcana (Neutral Abilities) lives under the Materials sub-nav, so it has no
     # hub tile of its own.
     _INV_PLACEHOLDERS = []
@@ -58,7 +56,7 @@ def save_index_html():
         return (
             f'<a class="inv-cell inv-filled inv-cell-{key}" href="{href}">'
             f'<span class="inv-slot">'
-            f'<img class="inv-icon" src="icons/ui/gothic/{_INV_ICON.get(key, f"icon_{key}.png")}" alt="">'
+            f'<img class="inv-icon" src="icons/ui/gothic/icon_{key}.png" alt="">'
             f'</span>'
             f'<span class="inv-cap">{label}</span>'
             f'</a>'
@@ -89,7 +87,6 @@ def save_index_html():
         _opener_tile('items', 'Items', 'items', 'icon_chest.png'),
         _opener_tile('heroes', 'Heroes', 'heroes', 'icon_helm.png'),
         _link_tile('terrain'),
-        _link_tile('changelog'),
     ]
     # Special "star" tile — the slot emits a faint pixel-gold glow (hinting it's
     # special); on hover the star pulses (grows/shrinks) and throws off a burst

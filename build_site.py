@@ -16,7 +16,6 @@ Pages are built in dependency order:
   terrain -- terrain comparison
   tstats  -- Terrain Stats (the map history 7.08 -> now)
   echg    -- Hero / Item Changes pages
-  clog    -- site changelog page
 """
 
 import shutil
@@ -78,7 +77,6 @@ STEPS = [
     ("terrain", "builders/terrain.py",      "Terrain comparison"),
     ("tstats",  "builders/terrain_stats.py", "Terrain Stats (map history)"),
     ("echg",    "builders/entity_changes.py", "Hero / Item Changes pages"),
-    ("clog",    "builders/changelog.py",   "Site changelog page"),
 ]
 
 # Map: artifact filename -> key of the step that produces it.

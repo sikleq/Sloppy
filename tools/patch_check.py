@@ -147,9 +147,6 @@ def check_release(ver):
             yield ("Release", "weights data (refresh_weights_data.py)", ("WARN", f"last refresh {updated}, due since {due}"))
         else:
             yield ("Release", "weights data (refresh_weights_data.py)", ("OK", f"updated {updated}"))
-    log = _json(_p("data", "changelog.json"))["entries"]
-    mention = any(ver in json.dumps(e) for e in log)
-    yield ("Release", "site changelog mentions the patch", ("OK", "") if mention else ("WARN", "a new patch page is worth an entry"))
 
 
 CHECKS = (check_meta, check_stats, check_globals, check_content, check_map, check_release)
