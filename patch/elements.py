@@ -2139,7 +2139,7 @@ def terrain_num_chip(n):
     return f'<span class="badge tnum">{n}</span>'
 
 
-def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None):
+def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None, major=False):
     _tphrase = ""
     if isinstance(text, str):
         # a terrain note's micro-screenshots ride along under its text, opened by the words naming its object
@@ -2226,6 +2226,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         left_tag = terrain_num_chip(_State.terrain_rows)
 
     classes = ["terrain-row"] if _State.terrain_rows is not None and isinstance(text, str) else []
+    if major:                 # the change that sums up a patch (7.41 "Facets removed from the game"): a stand-out row
+        classes.append("li-major")
     marker = ""
     text_noclass = (re.sub(r'<!--TIP-->.*?<!--/TIP-->', '', text, flags=re.S)
                     if isinstance(text, str) else text)

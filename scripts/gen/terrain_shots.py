@@ -298,13 +298,15 @@ def spot_patch(spot, patch):
     return spot[2] if len(spot) > 2 else patch
 
 
-LANE_RGB = {"good": (126, 208, 96), "bad": (255, 106, 84)}
+# old path white, new path gold — not the teams' green / red (owner 2026-10-16: "непонятно, где старая, а где
+# новая, т.к 2 цвета используется"); the side is plain from the minimap
+LANE_OLD, LANE_NEW = (240, 240, 240, 235), (255, 196, 64, 255)
 
 
 def _lanes(img, cx, cy, r, diff, side, half, width):
     """The lane creep paths of one side (2026-10-06, the owner: "where are the screenshots?" for 7.38c "The Top Lane
-    creep paths have been slightly adjusted"): Radiant solid green, Dire dashed red, as on the Terrain page's Lane
-    creep paths layer; on the new side the old path a light dashed ghost (dashed = "where it was")."""
+    creep paths have been slightly adjusted"): the old map shows the old paths white; the new map the new paths gold
+    over the old ones as a white dashed ghost (dashed = "where it was"), with an old / new key in its corner."""
     d = ImageDraw.Draw(img, "RGBA")
     k = half / (2 * r)
 
@@ -326,11 +328,37 @@ def _lanes(img, cx, cy, r, diff, side, half, width):
                        fill=colour, width=w)
                 t += step
     lanes = (diff or {}).get("lanes") or {}
-    if side == "new":
+    if side == "old":
         for p in lanes.get("old", []):
-            poly(p["points"], (255, 255, 255, 150), max(1, width - 1), (6 * width, 3 * width))
-    for p in lanes.get(side, []):
-        poly(p["points"], LANE_RGB[p["team"]] + (255,), width, (7 * width, 4 * width) if p["team"] == "bad" else None)
+            poly(p["points"], LANE_OLD, width, None)
+        return
+    for p in lanes.get("old", []):
+        poly(p["points"], LANE_OLD[:3] + (190,), max(1, width - 1), (6 * width, 3 * width))
+    for p in lanes.get("new", []):
+        poly(p["points"], LANE_NEW, width, None)
+    _lane_key(d, half, width)
+
+
+def _lane_key(d, half, width):
+    """"— old  — new" in the new half's bottom-right corner, on a dark plate like the version label."""
+    font = ImageFont.truetype(os.path.join(_ROOT, "src", "fonts", "radiance-semibold.otf"), max(11, half // 24))
+    pad, seg = max(4, half // 60), max(14, half // 14)
+    items = [("old", LANE_OLD[:3] + (190,), True), ("new", LANE_NEW, False)]
+    tw = sum(seg + pad + d.textlength(t, font=font) + 2 * pad for t, _c, _d in items)
+    h = font.size + 2 * pad
+    x0, y0 = half - tw - 2 * pad, half - h - 2 * pad
+    d.rounded_rectangle([x0, y0, half - pad, half - pad], radius=3, fill=(20, 16, 9, 205), outline=(227, 196, 106, 150))
+    x, ym = x0 + pad, y0 + pad + h / 2 - pad / 2
+    for text, colour, dashed in items:
+        if dashed:
+            step = seg / 3
+            for k in range(3):
+                d.line([x + k * step, ym, x + k * step + step * 0.6, ym], fill=colour, width=width)
+        else:
+            d.line([x, ym, x + seg, ym], fill=colour, width=width)
+        x += seg + pad
+        d.text((x, y0 + pad), text, font=font, fill=(244, 230, 191, 255))
+        x += d.textlength(text, font=font) + 2 * pad
 
 
 # max bonus speed -> fill (alpha) and outline, as the Terrain page's Currents layer (builders/terrain._CURRENT_ZONE)

@@ -411,6 +411,12 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `data-tiles-old/-new`; scripts.js `updateTiles` (fullscreen only, after zoom/pan) lays the tiles in view over each
   picture — the old ones next to `.tc-old`, the new ones inside the clipped `.tc-new-layer` — once a picture pixel
   would be drawn bigger than a screen pixel. Pages' 1 GB limit: tiles for the site's maps only.
+- **Lane paths on the micro-screenshots: old white, new gold (2026-10-16)** — the owner: "in the line screenshots
+  it's unclear which is old and which is new, two colours are used" (the teams' green / red). Now the old map shows
+  the old paths white, the new map the new paths gold over the old ones as a white dashed ghost, with an "old / new"
+  key in its corner (`terrain_shots._lanes`, `_lane_key`). Current zones draw in the Currents layer's blues
+  (`_currents`: +150 deep, +100 pale). Re-rendering a whole patch rewrites pictures an older script made too —
+  keep only the ones the change is about (7.38c_9, 7.40_21 on 10-16).
 - **Terrain notes with micro-screenshots (2026-10-03)** — the owner: the terrain rows were "all under one tag, mush —
   maybe micro-screenshots, tree positions, now that we know which tree went where". `data/terrain_spots.json` places
   each note that can be seen on the map: `{"match": <the row's text start>, "spots": [[x, y], …], "r": half size}`

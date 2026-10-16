@@ -7,8 +7,10 @@ def build():
     W(section("General Updates"))
 
     W(plain_header("Global Changes"))
-    # the patch's biggest change leads the section (owner 2026-10-16; generator _general_topics: "X removed from the game")
-    W(section_intro("Facets removed from the game"))
+    # the patch's biggest change: a stand-out row that keeps its DEL tag (owner 2026-10-16; generator _general_topics)
+    W(ul_open())
+    W(li("Facets removed from the game", t("DEL"), major=True))
+    W(ul_close())
     W(ul_open())
     W(li("All sections of currents now give a max movement speed bonus of 150", t("BUFF"),
          extra=inline_note("Previously was only provided by sections on the base and near it, while other sections provided max bonus of 100.")))
@@ -28,18 +30,26 @@ def build():
     W(li("Abilities that had 'per level up' scaling changed to be 'per level'", t("MISC"),
          extra=inline_note("This mostly affects heroes reworked in update 7.40 and Largo.")))
     W(ul_close())
-    # the lane creep rows get their own subgroup (owner 2026-10-16; generator _general_topics)
+    # lane creeps: the shared row in "Lane Creeps", each creep's own rows under its card, as units elsewhere
+    # (owner 2026-10-16; generator _general_topics). also_dyn keeps them on the creeps' pages.
     W(subgroup("Lane Creeps"))
     W(ul_open())
-    W(li("Flagbearer Creep Experience Bounty increased from 57 to 60", b(57, 60), also_dyn=['unit|creep-goodguys-flagbearer']))
-    W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("REWORK"), also_dyn=['unit|goodguys-siege']))   # a clock time: no % (audit 2026-10-05)
-    # REWORK like the first timing, so the two stay first → second (owner 2026-10-16; canon: a clock-time timing)
-    W(li("Second +1 siege creep timing now occurs at 60:00", t("REWORK"), also_dyn=['unit|goodguys-siege']))
     W(li("Adjusted the meeting point of the lane creeps toward the offlane", t("MISC"),
          extra=inline_note(
              "Now offlane creeps are slightly slowed upon leaving the base for a couple of seconds. Safe lane creeps are slightly accelerated upon leaving the base for a couple of seconds. Both of these changes are effective until the 7:30 mark."
          ), also_dyn=['unit|creep-goodguys-melee', 'unit|creep-goodguys-ranged', 'unit|creep-goodguys-flagbearer']))
     W(ul_close())
+    W(unit_header("Flagbearer Creep", "../icons/units/npc_dota_creep_goodguys_flagbearer.png", general=False))
+    W(ul_open())
+    W(li("Experience Bounty increased from 57 to 60", b(57, 60), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(ul_close())
+    W(unit_header("Siege Creep", "../icons/units/npc_dota_goodguys_siege.png", general=False))
+    W(ul_open())
+    # Valve's two timing rows as one (owner 2026-10-16; generator _merge_ordinal_pair); a clock time: REWORK, no %
+    W(li("First +1 siege creep timing decreased from 35:00 to 30:00, second now occurs at 60:00", t("REWORK"),
+         also_dyn=['unit|goodguys-siege']))
+    W(ul_close())
+
     W(plain_header("Map Objectives"))
     W(subgroup("Wisdom Shrines"))
     W(ul_open())

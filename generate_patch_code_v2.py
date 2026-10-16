@@ -1110,12 +1110,35 @@ _GENERAL_TOPICS = (
 )
 _MAP_SECTION = re.compile(r"\bmap\b|terrain|objective", re.I)      # map notes keep Valve's order (terrain rows)
 _GONE_FROM_GAME = re.compile(r"^[A-Z][\w' -]{2,40} removed from the game\.?$")
+# a row about ONE lane creep goes under that creep's card, as a unit's rows do (owner 2026-10-16: "разделить на
+# категории: Flagbearer, Siege, как с героями/юнитами"); its name prefix goes ("Flagbearer Creep: X" -> "X")
+_LANE_CARDS = {
+    "unit|creep-goodguys-melee": ("Melee Creep", "npc_dota_creep_goodguys_melee"),
+    "unit|creep-goodguys-ranged": ("Ranged Creep", "npc_dota_creep_goodguys_ranged"),
+    "unit|creep-goodguys-flagbearer": ("Flagbearer Creep", "npc_dota_creep_goodguys_flagbearer"),
+    "unit|goodguys-siege": ("Siege Creep", "npc_dota_goodguys_siege"),
+}
+
+
+def _lane_card(line):
+    """The card a lane creep row belongs to: the one creep its also_dyn names, else None (a row about several)."""
+    parts = _li_parts(line)
+    keys = re.findall(r"'(unit\|[a-z-]+)'", (parts[1].get("also_dyn") or "") if parts else "")
+    return keys[0] if len(keys) == 1 and keys[0] in _LANE_CARDS else None
+
+
+def _strip_creep_name(line, key):
+    name = _LANE_CARDS[key][0]
+    m = re.match(rf'^(W\(li\("){re.escape(name)}:? ([a-z])', line, re.I)
+    return f"{m.group(1)}{m.group(2).upper()}{line[m.end():]}" if m else line
 
 
 def _general_topics(lines, title=""):
     """A general section's rows sorted into topic subgroups (_GENERAL_TOPICS): a topic with two rows or more gets its
-    subgroup at the end, everything else stays on top. "<X> removed from the game" — the kind of change that sums up
-    a patch (7.41 Facets) — leads the section as its intro line instead of a row. Map sections are left alone."""
+    subgroup at the end, everything else stays on top. Lane creep rows about one creep go under that creep's card
+    (unit_header, after the subgroups); the shared ones stay in "Lane Creeps". "<X> removed from the game" — the kind
+    of change that sums up a patch (7.41 Facets) — leads the section as a stand-out row (li(major=True)), its tag
+    kept. Map sections are left alone."""
     if _MAP_SECTION.search(title or ""):
         return lines
     rows = [l for l in lines if l.startswith("W(li(")]
@@ -1136,10 +1159,48 @@ def _general_topics(lines, title=""):
     if not groups and not lead:
         return lines
     moved = set(lead) | {l for l, t in tops.items() if t in groups}
-    out = [f'W(section_intro({_li_parts(l)[0]!r}))' for l in lead]
+    out = []
+    for l in lead:
+        out += ['W(ul_open())', l[:-2] + ", major=True))", 'W(ul_close())']
     out += _drop_empty_ul([l for l in lines if l not in moved])
+    cards = {}
     for name in groups:
-        out += [f'W(subgroup("{name}"))', 'W(ul_open())'] + [l for l, t in tops.items() if t == name] + ['W(ul_close())']
+        these = [l for l, t in tops.items() if t == name]
+        if name == "Lane Creeps":
+            for l in these:
+                key = _lane_card(l)
+                if key:
+                    cards.setdefault(key, []).append(_strip_creep_name(l, key))
+            these = [l for l in these if not _lane_card(l)]
+        if these:
+            out += [f'W(subgroup("{name}"))', 'W(ul_open())'] + these + ['W(ul_close())']
+    for key in _LANE_CARDS:
+        if key in cards:
+            name, icon = _LANE_CARDS[key]
+            out += [f'W(unit_header("{name}", "../icons/units/{icon}.png", general=False))', 'W(ul_open())']
+            out += _merge_ordinal_pair(cards[key]) + ['W(ul_close())']
+    return out
+
+
+_ORDINAL = re.compile(r"^First (.+?) (?=decreased|increased|reduced|changed|now|is)\b")
+
+
+def _merge_ordinal_pair(lines):
+    """Valve's "First <X> …" + "Second <X> …" rows → one row "First <X> …, second …" (owner 2026-10-16, 7.41: "First
+    +1 siege creep timing decreased from 35:00 to 30:00" + "Second +1 siege creep timing now occurs at 60:00"). The
+    first row's tag and links stay."""
+    out = []
+    for line in lines:
+        prev = _li_parts(out[-1]) if out else None
+        cur = _li_parts(line)
+        m = _ORDINAL.match(prev[0]) if prev and cur else None
+        lead = f"Second {m.group(1)} " if m else ""
+        if m and cur[0].startswith(lead):
+            joined = f"{prev[0]}, second {cur[0][len(lead):]}"
+            out[-1] = out[-1].replace(repr(prev[0]) if f'"{prev[0]}"' not in out[-1] else f'"{prev[0]}"',
+                                      f'"{joined}"', 1)
+            continue
+        out.append(line)
     return out
 
 

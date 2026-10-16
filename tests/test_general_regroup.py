@@ -18,13 +18,31 @@ LANES = ['W(ul_open())', FACETS, INNATE, UI, 'W(ul_close())', 'W(ul_open())', SI
          'W(ul_open())', CURRENTS, 'W(ul_close())']
 
 
-def test_topics_become_subgroups_and_the_lead_an_intro():
-    out = g._general_topics(LANES, "Global Changes")
-    assert out[0] == "W(section_intro('Facets removed from the game'))"
+MEET = ("W(li(\"Adjusted the meeting point of the lane creeps toward the offlane\", t(\"MISC\"), "
+        "also_dyn=['unit|creep-goodguys-melee', 'unit|creep-goodguys-ranged']))")
+SIEGE2 = "W(li(\"Second +1 siege creep timing now occurs at 60:00\", t(\"REWORK\"), also_dyn=['unit|goodguys-siege']))"
+
+
+def test_topics_become_subgroups_and_the_lead_a_major_row():
+    out = g._general_topics(LANES + ['W(ul_open())', MEET, 'W(ul_close())'], "Global Changes")
+    assert out[1] == 'W(li("Facets removed from the game", t("DEL"), major=True))'   # stand-out, tag kept
     s, l = out.index('W(subgroup("Scaling with Hero Level"))'), out.index('W(subgroup("Lane Creeps"))')
     assert out.index(CURRENTS) < s < l                                  # a row of no topic stays on top
-    assert out[s + 2:s + 4] == [INNATE, UI] and out[l + 2:l + 4] == [SIEGE, FLAG]
+    assert out[s + 2:s + 4] == [INNATE, UI]
+    assert out[l + 2] == MEET                                           # a row about several creeps
+    f = out.index('W(unit_header("Flagbearer Creep", "../icons/units/npc_dota_creep_goodguys_flagbearer.png", '
+                  'general=False))')
+    assert out[f + 2].startswith('W(li("Experience Bounty increased from 57 to 60"')   # its name prefix goes
+    assert l < f and any(x.startswith('W(unit_header("Siege Creep"') for x in out[f:])   # cards after the subgroups
     assert 'W(ul_open())\nW(ul_close())' not in "\n".join(out)          # emptied blocks are gone
+
+
+def test_first_and_second_rows_become_one():
+    out = g._merge_ordinal_pair([SIEGE, SIEGE2])
+    assert len(out) == 1
+    assert g._li_parts(out[0])[0] == ("First +1 siege creep timing decreased from 35:00 to 30:00, "
+                                      "second now occurs at 60:00")
+    assert "t(\"REWORK\")" in out[0] and "goodguys-siege" in out[0]
 
 
 def test_a_lone_topic_row_stays_and_map_sections_are_left_alone():
