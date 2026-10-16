@@ -437,7 +437,7 @@ def _slugify(name):
 def _register_entity(kind, name, force=False, slug=None):
     """force=True: tracked even inside General Updates (map units with their own Changes
     page: Roshan, Tormentor). slug: the page's own slug when it isn't the name's (a lane creep's card,
-    "Flagbearer Creep" -> creep-goodguys-flagbearer)."""
+    "Flagbearer Creep" -> flagbearer-creep)."""
     if _State.current_section_slug == 'general' and not force:
         _State.current_entity_key = None
         _State.current_entity_display = None
@@ -516,7 +516,7 @@ def unit_header(name, icon_url, kind=None, new=False, label=None, general=True, 
     _State.next_ul_is_hero_stats = (not new) and general   # a NEW unit shows a stat sheet instead
     kind_attr = f' data-kind="{kind}"' if kind else ''
     entity_kind = "creep-hero" if (kind and kind.lower().startswith("creep-hero")) else "unit"
-    # page="creep-goodguys-flagbearer": a lane creep's card in General Updates links to its unit page and gets the
+    # page="flagbearer-creep": a lane creep's card in General Updates links to its unit page and gets the
     # patch strip, like any tracked unit (owner 2026-10-16: "Flagbearer Creep и Siege Creep не кликабельны")
     eid = _register_entity(entity_kind, name, force=track or bool(page), slug=page)
     if new:

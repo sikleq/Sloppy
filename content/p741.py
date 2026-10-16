@@ -23,20 +23,20 @@ def build():
     W(li("Adjusted the meeting point of the lane creeps toward the offlane", t("MISC"),
          extra=inline_note(
              "Now offlane creeps are slightly slowed upon leaving the base for a couple of seconds. Safe lane creeps are slightly accelerated upon leaving the base for a couple of seconds. Both of these changes are effective until the 7:30 mark."
-         ), also_dyn=['unit|creep-goodguys-melee', 'unit|creep-goodguys-ranged', 'unit|creep-goodguys-flagbearer']))
+         ), also_dyn=['unit|melee-creep', 'unit|ranged-creep', 'unit|flagbearer-creep']))
     W(ul_close())
-    W(unit_header("Flagbearer Creep", "../icons/units/npc_dota_creep_goodguys_flagbearer.png", general=False, page="creep-goodguys-flagbearer"))
+    W(unit_header("Flagbearer Creep", "../icons/units/npc_dota_creep_goodguys_flagbearer.png", general=False, page="flagbearer-creep"))
     W(ul_open())
-    W(li("Experience Bounty increased from 57 to 60", b(57, 60), also_dyn=['unit|creep-goodguys-flagbearer']))
+    W(li("Experience Bounty increased from 57 to 60", b(57, 60), also_dyn=['unit|flagbearer-creep']))
     W(ul_close())
-    W(unit_header("Siege Creep", "../icons/units/npc_dota_goodguys_siege.png", general=False, page="goodguys-siege"))
+    W(unit_header("Siege Creep", "../icons/units/npc_dota_goodguys_siege.png", general=False, page="siege-creep"))
     W(ul_open())
     # 5 minutes earlier = more siege creeps sooner: BUFF, no % of a clock time (owner 2026-10-16)
-    W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("BUFF"), also_dyn=['unit|goodguys-siege']))
+    W(li("First +1 siege creep timing decreased from 35:00 to 30:00", t("BUFF"), also_dyn=['unit|siege-creep']))
     # a new property of the siege creep: NEW (owner 2026-10-16, after one merged row; canon: "timing now occurs at")
     W(li("Second +1 siege creep timing now occurs at 60:00", t("NEW"),
          extra=inline_note("Before 7.41 a wave got only one extra siege creep, at 35:00 (since 7.22: \"Siege creeps now spawn two units at 35 minutes instead of 30 minutes\"). The second extra one is new."),
-         also_dyn=['unit|goodguys-siege']))
+         also_dyn=['unit|siege-creep']))
     W(ul_close())
 
     # Valve's four rows and their "?" summed up as one reworked mechanic, like 7.38 Lifesteal / 7.40 Invulnerability
@@ -70,8 +70,7 @@ def build():
 
     W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())
-    W(li("Spawn preference has switched", t("MISC"),
-         extra=inline_note("Now begins in the Bottom Chasm.")))
+    W(li("Spawn preference has switched — now begins in the Bottom Chasm", t("MISC")))   # the "?" in the line (owner 2026-10-16)
     W(li("Now has 25% Status Resistance", t("NEW")))
     W(li("No longer deals damage to neutral units", t("DEL")))
     W(li("Player that got Aghanim's Shard will no longer receive 175 gold", t("DEL"),
@@ -118,8 +117,7 @@ def build():
     W(ul_close())
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
-    W(li("Pit preference has switched", t("MISC"),
-         extra=inline_note("Now begins in the Top Pit.")))
+    W(li("Pit preference has switched — now begins in the Top Pit", t("MISC")))
     W(ul_close())
 
     W(plain_header("Terrain Changes", terrain_link="7.41"))
@@ -170,18 +168,16 @@ def build():
     W(ul_close())
     W(plain_header("Mechanics Changes"))
 
-    W(subgroup("Health Restoration"))
+    # summed up as a reworked mechanic, like "Scaling with Hero Level" (owner 2026-10-16; generator: a mechanics
+    # subgroup whose rows are all REWORK gets new="Reworked mechanic")
+    W(subgroup("Health Restoration", new="Reworked mechanic"))
     W(ul_open())
-    W(li("Health Restoration now applies to all forms of life gain", t("REWORK"), extra=inline_note("Previously, it did not apply to incoming heals")))
-    W(ul_close())
-    W(ul_open())
+    W(li("Health Restoration now applies to all forms of life gain — before, it did not apply to incoming heals", t("REWORK")))
     W(li("Incoming Heal Amplification now stacks diminishingly with Health Restoration instead of additively with Outgoing Heal Amplification", t("REWORK")))
     W(li("Spells that previously had a separate value for incoming heal reduction now only modify Health Restoration " + info_tip(
             "Eye of Skadi's Cold Attack", "Spirit Vessel's Soul Release",
             "Omniknight's Guardian Angel with Aghanim's Scepter", "Pudge's Rot with Aghanim's Scepter",
             header="Affected spells:"), t("REWORK")))
-    W(ul_close())
-    W(ul_open())
     W(li("As a result of the changes, spells that only modified Health Restoration will now additionally affect incoming heals " + info_tip(
             "Sange", "Kaya and Sange", "Sange and Yasha", "Abyssal Blade", "Orb of Frost's Frost",
             "Orb of Corrosion's Corrosion", "Crippling Crossbow's Hobble", "Jidi Pollen Bag's Pollinate",
@@ -190,7 +186,7 @@ def build():
             header="Affected spells:"), t("REWORK")))
     W(ul_close())
 
-    W(subgroup("Lifesteal and Damage Manipulations"))
+    W(subgroup("Lifesteal and Damage Manipulations", new="Reworked mechanic"))
     W(ul_open())
     W(li("Physical and Magical Lifesteal will now take into account overall damage reductions/amplifications when computing how much to lifesteal " + info_tip(
             "Aeon Disk", "Bloodstone", "Consecrated Wraps", "Veil of Discord", "Prophet's Pendulum",
@@ -203,15 +199,13 @@ def build():
             "Treant Protector's Living Armor", "Underlord's Invading Force", "Undying's Flesh Golem",
             "Ursa's Enrage", "Visage's Gravekeeper's Cloak", "Warlock's Golem with talent",
             header="This affects the following:"), t("REWORK")))
-    W(ul_close())
-    W(ul_open())
     W(li("Historically, Lifesteal was calculated before some damage reductions or amplifications were applied. As a result, you could gain health from attacks that dealt no damage (like attacks against a hero affected by Aeon Disk's Combo Breaker). This will not happen anymore", t("REWORK"), extra=inline_note("The only amplification that is not taken into account is increased damage against illusions")))
     W(ul_close())
 
     W(subgroup("Miscellaneous"))
     W(ul_open())
     W(li("Reflected damage cannot be reflected back", t("NERF")))
-    W(li("Lifesteal and Spell Lifesteal don't apply to reflected damage", t("DEL")))
+    W(li("Lifesteal and Spell Lifesteal don't apply to reflected damage", t("REWORK")))   # owner 2026-10-16
     W(li("Reflected damage doesn't affect Debuff Immune units", t("DEL")))
     W(li("Units with free movement now can miss their attacks when attacking uphill targets " + info_tip(
             "Batrider during Firefly", "Dragon Knight during Elder Dragon Form with Aghanim's Scepter",
@@ -279,12 +273,12 @@ def build():
     W(ability("Congregations of the Deep", icon_url="../icons/abilities/frogmen_congregation_of_the_deep.png"))
     W(ul_open())
     W(li("After neutrals cast this ability, all copies of Arm of the Deep, Tendrils of the Deep, and Congregations of the Deep on other neutral Boglets, Croakers, and Ancient Croakers within 1200 range are put on 5s cooldown", t("NERF"), extra=inline_note("Previously affected other copies of this ability")))
-    W(li("Radius is now affected by Area of Effect bonuses", t("BUFF")))
+    W(li("Radius is now affected by Area of Effect bonuses", t("NEW")))   # a new property (owner 2026-10-16)
     W(ul_close())
     W(unit_header("Ancient Marshmage", _NC_CDN + "ancient_frog_mage.png"))
     W(ability("Water Bubble (Large)", icon_url="../icons/abilities/frogmen_water_bubble_large.png"))
     W(ul_open())
-    W(li("Radius is now affected by Area of Effect bonuses", t("BUFF")))
+    W(li("Radius is now affected by Area of Effect bonuses", t("NEW")))   # a new property (owner 2026-10-16)
     W(ul_close())
 
     # ===== ITEM UPDATES =====

@@ -7,9 +7,9 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import generate_patch_code_v2 as g  # noqa: E402
 
-SIEGE = "W(li(\"First +1 siege creep timing decreased from 35:00 to 30:00\", t(\"REWORK\"), also_dyn=['unit|goodguys-siege']))"
+SIEGE = "W(li(\"First +1 siege creep timing decreased from 35:00 to 30:00\", t(\"REWORK\"), also_dyn=['unit|siege-creep']))"
 FLAG = ("W(li(\"Flagbearer Creep Experience Bounty increased from 57 to 60\", b(57, 60), "
-        "also_dyn=['unit|creep-goodguys-flagbearer']))")
+        "also_dyn=['unit|flagbearer-creep']))")
 CURRENTS = 'W(li("All sections of currents now give a max movement speed bonus of 150", t("BUFF")))'
 FACETS = 'W(li("Facets removed from the game", t("DEL")))'
 INNATE = 'W(li("Innate abilities no longer scale with other abilities\' level", t("REWORK")))'
@@ -19,8 +19,8 @@ LANES = ['W(ul_open())', FACETS, INNATE, UI, 'W(ul_close())', 'W(ul_open())', SI
 
 
 MEET = ("W(li(\"Adjusted the meeting point of the lane creeps toward the offlane\", t(\"MISC\"), "
-        "also_dyn=['unit|creep-goodguys-melee', 'unit|creep-goodguys-ranged']))")
-SIEGE2 = "W(li(\"Second +1 siege creep timing now occurs at 60:00\", t(\"REWORK\"), also_dyn=['unit|goodguys-siege']))"
+        "also_dyn=['unit|melee-creep', 'unit|ranged-creep']))")
+SIEGE2 = "W(li(\"Second +1 siege creep timing now occurs at 60:00\", t(\"REWORK\"), also_dyn=['unit|siege-creep']))"
 
 
 def test_topics_become_subgroups_and_the_lead_a_major_row():
@@ -34,7 +34,7 @@ def test_topics_become_subgroups_and_the_lead_a_major_row():
     assert s > l and out[s + 2] == INNATE
     assert out[s + 3] == UI[:-2].replace('t("QoL")', 't("REWORK")') + ', force_tag="rework qol"))'
     f = out.index('W(unit_header("Flagbearer Creep", "../icons/units/npc_dota_creep_goodguys_flagbearer.png", '
-                  'general=False, page="creep-goodguys-flagbearer"))')
+                  'general=False, page="flagbearer-creep"))')
     assert out[f + 2].startswith('W(li("Experience Bounty increased from 57 to 60"')   # its name prefix goes
     assert l < f and any(x.startswith('W(unit_header("Siege Creep"') for x in out[f:])   # cards after the subgroups
     assert 'W(ul_open())\nW(ul_close())' not in "\n".join(out)          # emptied blocks are gone
@@ -118,9 +118,9 @@ def test_a_boss_ability_without_a_colon_gets_its_block():
 
 
 def test_a_lane_creeps_ability_rows_get_its_block():
-    rows = ["W(li(\"Inspiration Aura no longer affects heroes\", t(\"DEL\"), also_dyn=['unit|creep-goodguys-flagbearer']))",
-            "W(li(\"AoE Bounty Radius increased from 1200 to 1500\", b(1200, 1500), also_dyn=['unit|creep-goodguys-flagbearer']))"]
-    plain, per = g._lane_card_abilities("unit|creep-goodguys-flagbearer", rows)
+    rows = ["W(li(\"Inspiration Aura no longer affects heroes\", t(\"DEL\"), also_dyn=['unit|flagbearer-creep']))",
+            "W(li(\"AoE Bounty Radius increased from 1200 to 1500\", b(1200, 1500), also_dyn=['unit|flagbearer-creep']))"]
+    plain, per = g._lane_card_abilities("unit|flagbearer-creep", rows)
     assert plain == rows[1:] and list(per) == ["Inspiration Aura"]
     assert per["Inspiration Aura"][1][0].startswith('W(li("No longer affects heroes"')
 
@@ -137,3 +137,33 @@ def test_a_bosss_rows_go_to_its_card_without_its_name():
     assert out[r + 2] == 'W(li("Pit preference has switched", t("MISC")))'
     assert 'W(li("Spawn preference has switched", t("MISC")))' in out
     assert not any("Roshan's" in line for line in out[:r])
+
+
+def test_a_switched_row_takes_its_short_note_into_the_line():
+    out = g._postprocess_switched_note(['W(li("Spawn preference has switched", t("MISC"), '
+                                        'extra=inline_note("Now begins in the Bottom Chasm")))'])
+    assert out == ['W(li("Spawn preference has switched — now begins in the Bottom Chasm", t("MISC")))']
+
+
+def test_a_mechanics_subgroup_of_rework_rows_is_a_reworked_mechanic():
+    """Owner 2026-10-16: 7.41 "Health Restoration" like "Scaling with Hero Level"."""
+    lines = ['W(plain_header("Mechanics Changes"))', 'W(subgroup("Health Restoration"))', 'W(ul_open())',
+             'W(li("Health Restoration now applies to all forms of life gain", t("REWORK")))',
+             'W(li("Incoming Heal Amplification now stacks diminishingly", t("REWORK")))', 'W(ul_close())',
+             'W(subgroup("Miscellaneous"))', 'W(ul_open())',
+             'W(li("Reflected damage cannot be reflected back", t("NERF")))', 'W(ul_close())']
+    out = g._postprocess_new_block_label(lines)
+    assert 'W(subgroup("Health Restoration", new="Reworked mechanic"))' in out
+    assert 'W(subgroup("Miscellaneous"))' in out                       # a NERF row: an ordinary list
+
+
+def test_lane_creep_pages_are_named_after_the_creep():
+    """Owner 2026-10-16: no goodguys / badguys in the address — we don't split by side; old addresses redirect."""
+    from builders import entity_changes as ec
+    assert ec._unit_slug("npc_dota_creep_goodguys_flagbearer") == "flagbearer-creep"
+    assert ec._unit_slug("npc_dota_goodguys_siege") == "siege-creep"
+    assert set(g._LANE_CARDS) == {"unit|melee-creep", "unit|ranged-creep", "unit|flagbearer-creep", "unit|siege-creep"}
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    old = os.path.join(root, "dist", "units", "creep-goodguys-flagbearer.html")
+    if os.path.exists(old):                                             # built: the old page sends readers on
+        assert 'url=flagbearer-creep.html' in open(old, encoding="utf-8").read()

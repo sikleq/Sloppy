@@ -957,8 +957,29 @@ _REMOVED_UNITS = [
 ]
 
 
+# a lane creep's page is named after the creep, not its Radiant model (owner 2026-10-16: "не надо писать
+# goodguys/badguys — мы не подразделяем на стороны"); the old addresses redirect (_write_lane_redirects)
+_LANE_SLUG = {basename: _unit_slug_for(name) for basename, name in _LANE_UNITS}
+
+
 def _unit_slug(basename: str) -> str:
+    if basename in _LANE_SLUG:
+        return _LANE_SLUG[basename]
     return basename.replace("npc_dota_neutral_", "").replace("npc_dota_", "").replace("_", "-")
+
+
+def _write_lane_redirects() -> None:
+    """units/creep-goodguys-flagbearer.html etc. (the pages' names until 2026-10-16) -> the creep's page now."""
+    for basename, _name in _LANE_UNITS:
+        old = basename.replace("npc_dota_", "").replace("_", "-")
+        new = _LANE_SLUG[basename]
+        (DIST / "units" / f"{old}.html").write_text(
+            '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+            # keeps ?from=… / #… (the back arrow and the patch the link opened on); the meta refresh is the fallback
+            f'<script>location.replace("{new}.html" + location.search + location.hash)</script>'
+            f'<meta http-equiv="refresh" content="0; url={new}.html"><link rel="canonical" href="{new}.html">'
+            f'<title>Sloppy — moved</title></head><body><p>This page moved to <a href="{new}.html">{new}.html</a>.'
+            '</p></body></html>', encoding="utf-8")
 
 
 # Small camp-difficulty badge shown beside a column title (icons/camps/creepcamp_*).
@@ -1375,6 +1396,7 @@ def main() -> int:
         if kind == "item":
             _write_item_picker(lst, dyn)
         counts[kind] = (len(lst), sum(len(e["patches"]) for e in lst))
+    _write_lane_redirects()
     print(f"  -> dist/heroes/*.html: {counts['hero'][0]} heroes ({counts['hero'][1]} patch sections); "
           f"dist/items/*.html: {counts['item'][0]} items ({counts['item'][1]} sections); "
           f"dist/units/*.html: {counts.get('unit', (0, 0))[0]} units; "

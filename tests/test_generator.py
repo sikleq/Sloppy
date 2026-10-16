@@ -579,7 +579,8 @@ def test_item_and_creep_canonical_tags_738(text, tag):
     ("Now also provides -10/12/14% Attack Speed", "NERF"),
     ("Break now also goes on cooldown when the item is disassembled", "NERF"),
     ("Now always destroys the target illusion", "NERF"),
-    ("Lifesteal and Spell Lifesteal don't apply to reflected damage", "DEL"),
+    ("Lifesteal and Spell Lifesteal don't apply to reflected damage", "REWORK"),   # owner 2026-10-16 (was DEL)
+    ("Radius is now affected by Area of Effect bonuses", "NEW"),                    # owner 2026-10-16 (was BUFF)
     ("Aghanim's Scepter slightly reworked: No longer increases the number of targets attacked", "REWORK"),
     ("Debuff Immunity ability renamed to Earth Element. No longer grants Debuff Immunity", "REWORK"),
     ("Echoes can no longer trigger Marks, but may still create them", "REWORK"),
@@ -734,13 +735,13 @@ def test_audit_1005_lower_is_better(text, lower):
 
 
 @pytest.mark.parametrize("text, units", [
-    ("Flagbearer Creep Experience Bounty increased from 57 to 60", ["creep-goodguys-flagbearer"]),
-    ("First +1 siege creep timing decreased from 35:00 to 30:00", ["goodguys-siege"]),
-    ("Melee Creep: Gold Bounty now increases by 1 per lane creep upgrade interval (every 7:30)", ["creep-goodguys-melee"]),
+    ("Flagbearer Creep Experience Bounty increased from 57 to 60", ["flagbearer-creep"]),
+    ("First +1 siege creep timing decreased from 35:00 to 30:00", ["siege-creep"]),
+    ("Melee Creep: Gold Bounty now increases by 1 per lane creep upgrade interval (every 7:30)", ["melee-creep"]),
     ("Adjusted the meeting point of the lane creeps toward the offlane",
-     ["creep-goodguys-melee", "creep-goodguys-ranged", "creep-goodguys-flagbearer"]),
+     ["melee-creep", "ranged-creep", "flagbearer-creep"]),
     ("The Top Lane creep paths have been slightly adjusted so the creeps meet closer to the Dire tower",
-     ["creep-goodguys-melee", "creep-goodguys-ranged", "creep-goodguys-flagbearer", "goodguys-siege"]),
+     ["melee-creep", "ranged-creep", "flagbearer-creep", "siege-creep"]),
     ("Roshan now has 10% more health", []),
 ])
 def test_general_rows_about_lane_creeps_link_to_their_pages(text, units):

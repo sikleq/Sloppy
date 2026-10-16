@@ -27,11 +27,13 @@ W(ul_close())
 ```
 
 ## Строка про другую сущность — `li(..., also_dyn=[...])` (2026-10-06)
-Строка в General Updates (или в блоке другой сущности) про конкретного юнита: `also_dyn=["unit|creep-goodguys-flagbearer"]`.
+Строка в General Updates (или в блоке другой сущности) про конкретного юнита: `also_dyn=["unit|flagbearer-creep"]`.
 Строка остаётся на месте и, кроме того, засчитывается этому юниту в квадратиках полосы истории и **показывается на
 его странице** под этим патчем, с подзаголовком своего раздела (`li` → `data-also`, `builders/entity_changes._add_also_rows`).
-- Линейные крипы: `unit|creep-goodguys-melee`, `…-ranged`, `…-flagbearer`, `unit|goodguys-siege`. Их страницы
-  создаются из таких строк (своих блоков у них нет). Владелец 2026-10-06: «место встречи» крипов (7.41 «meeting point»)
+- Линейные крипы: `unit|melee-creep`, `unit|ranged-creep`, `unit|flagbearer-creep`, `unit|siege-creep` — по
+  названию крипа, без goodguys / badguys: стороны мы не делим (владелец 2026-10-16; старые адреса
+  `units/creep-goodguys-*.html` переадресуют на новые). Их страницы создаются из таких строк и карточек
+  `unit_header(..., page=)`. Владелец 2026-10-06: «место встречи» крипов (7.41 «meeting point»)
   → Melee, Ranged, Flagbearer (в первых волнах нет Siege); пути и точки появления крипов → все четыре.
 - Генератор ставит это сам для General Updates (`generate_patch_code_v2._link_lane_creeps`).
 - Не ставить, если у сущности уже есть эта же строка в своём блоке: Valve пишет некоторые изменения дважды (7.40

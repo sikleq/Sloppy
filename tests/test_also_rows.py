@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from builders import entity_changes as ec
 
-FLAG = "unit|creep-goodguys-flagbearer"
+FLAG = "unit|flagbearer-creep"
 
 
 def _page(*rows):
@@ -31,16 +31,16 @@ def _collect(tmp_path, monkeypatch, pages):
 def test_a_lane_creep_gets_a_page_from_general_rows(tmp_path, monkeypatch):
     ents = _collect(tmp_path, monkeypatch, {
         "9.41": _page(_row("Flagbearer XP 57 to 60", FLAG), '<li><span class="row-text">Roshan</span></li>',
-                      _row("Meeting point moved", f"{FLAG} unit|creep-goodguys-melee")),
+                      _row("Meeting point moved", f"{FLAG} unit|melee-creep")),
         "9.40": _page(_row("Flagbearer radius 1200 to 1500", FLAG))})
-    flag = ents[("unit", "creep-goodguys-flagbearer")]
+    flag = ents[("unit", "flagbearer-creep")]
     assert flag["name"] == "Flagbearer Creep" and flag["icon"].endswith("npc_dota_creep_goodguys_flagbearer.png")
     assert [p["version"] for p in flag["patches"]] == ["9.41", "9.40"]          # newest first
     body = flag["patches"][0]["body"]
     assert body.count('<h4 class="subgroup">General Updates</h4>') == 1          # one heading per section
     assert "Flagbearer XP" in body and "Meeting point" in body and "Roshan" not in body
     assert body.count("<li") == body.count("</li>") == 4                         # whole rows, sub-notes included
-    assert "Meeting point" in ents[("unit", "creep-goodguys-melee")]["patches"][0]["body"]
+    assert "Meeting point" in ents[("unit", "melee-creep")]["patches"][0]["body"]
 
 
 def test_every_roster_unit_gets_a_page_even_without_changes(monkeypatch):

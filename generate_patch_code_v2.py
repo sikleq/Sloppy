@@ -243,6 +243,10 @@ CANONICAL_TAGS = [
     # 7.38 had two NERF and three later patches DEL, the scaffold said BUFF or MISC
     (re.compile(r'\bno longer (?:affected|increased|modified) by (?:\w+ )?(?:AoE|Area of Effect) (?:bonus(?:es)?|increase)'
                 r'|\bno longer (?:affected|increased) by bonuses to (?:AoE|Area of Effect)\b', re.I), 'DEL'),
+    # the mirror: "Radius is now affected by Area of Effect bonuses" is a new property — NEW (owner 2026-10-16, 7.41
+    # Congregations of the Deep / Water Bubble (Large); were BUFF)
+    (re.compile(r'\bnow (?:also )?(?:affected|increased|modified) by (?:\w+ )?(?:AoE|Area of Effect) (?:bonus(?:es)?|increase)'
+                r'|\bnow (?:also )?(?:affected|increased) by bonuses to (?:AoE|Area of Effect)\b', re.I), 'NEW'),
     # ── 2026-10-03 second audit (7.38b-7.41e): classes the scaffold got wrong ──
     (re.compile(r'\bno longer gets? knocked off\b', re.I),           'BUFF'),   # own mount restriction lifted
     (re.compile(r'\b(?:is now|now) undispellable\b|^\s*Now cannot be dispelled\b', re.I), 'BUFF'),
@@ -552,6 +556,7 @@ TAG_OVERRIDES = {
     "when determining if mars is outnumbered": "BUFF",   # Dauntless: allies no longer offset enemies -> regen more often
     "stolen spells now have their cooldown":   "NEW",    # Spell Steal: a new property in place of the debuff amp
     "avatar duration changed from 9/8/7/6s":   "BUFF",   # BKB: the duration now stops at 7s, not 6s
+    "lifesteal don't apply to reflected damage": "REWORK",   # how reflected damage works now, not a lost effect
 }
 
 
@@ -1110,7 +1115,7 @@ def _merge_all_followup(lines):
     return out
 
 
-_LANE_ROW = re.compile(r"also_dyn=\[[^\]]*'unit\|(?:creep-goodguys-|goodguys-siege)")
+_LANE_ROW = re.compile(r"also_dyn=\[[^\]]*'unit\|(?:melee|ranged|flagbearer|siege)-creep")
 
 
 # Topics of a general section, in the order their subgroups follow (owner 2026-10-16, 7.41 Global Changes: the
@@ -1124,14 +1129,14 @@ _GONE_FROM_GAME = re.compile(r"^[A-Z][\w' -]{2,40} removed from the game\.?$")
 # a row about ONE lane creep goes under that creep's card, as a unit's rows do (owner 2026-10-16: "разделить на
 # категории: Flagbearer, Siege, как с героями/юнитами"); its name prefix goes ("Flagbearer Creep: X" -> "X")
 _LANE_CARDS = {
-    "unit|creep-goodguys-melee": ("Melee Creep", "npc_dota_creep_goodguys_melee"),
-    "unit|creep-goodguys-ranged": ("Ranged Creep", "npc_dota_creep_goodguys_ranged"),
-    "unit|creep-goodguys-flagbearer": ("Flagbearer Creep", "npc_dota_creep_goodguys_flagbearer"),
-    "unit|goodguys-siege": ("Siege Creep", "npc_dota_goodguys_siege"),
+    "unit|melee-creep": ("Melee Creep", "npc_dota_creep_goodguys_melee"),
+    "unit|ranged-creep": ("Ranged Creep", "npc_dota_creep_goodguys_ranged"),
+    "unit|flagbearer-creep": ("Flagbearer Creep", "npc_dota_creep_goodguys_flagbearer"),
+    "unit|siege-creep": ("Siege Creep", "npc_dota_goodguys_siege"),
 }
 
 
-_LANE_ABIL_PREFIX = {"unit|creep-goodguys-flagbearer": "flagbearer_creep_"}
+_LANE_ABIL_PREFIX = {"unit|flagbearer-creep": "flagbearer_creep_"}
 
 
 def _lane_card_abilities(key, rows):
@@ -1260,8 +1265,8 @@ def _bonus_from_note(lines):
     return out
 
 
-_MELEE, _RANGED, _FLAG, _SIEGE = ("unit|creep-goodguys-melee", "unit|creep-goodguys-ranged",
-                                  "unit|creep-goodguys-flagbearer", "unit|goodguys-siege")
+_MELEE, _RANGED, _FLAG, _SIEGE = ("unit|melee-creep", "unit|ranged-creep",
+                                  "unit|flagbearer-creep", "unit|siege-creep")
 _LANE_LINKS = [
     (re.compile(r'\bFlagbearer', re.I), [_FLAG]),
     (re.compile(r'\bsiege creeps?\b|\bsiege units?\b|\bcatapults?\b', re.I), [_SIEGE]),
@@ -2646,6 +2651,19 @@ def _postprocess_unit_possessive(lines):
     return out
 
 
+_SWITCHED_NOTE_RE = re.compile(r'^(W\(li\("[^"]*\bhas switched)(", t\("\w+"\)), extra=inline_note\("Now ([^".<]{3,60})\.?"\)\)\)$')
+
+
+def _postprocess_switched_note(lines):
+    """"Spawn preference has switched" + "?" "Now begins in the Bottom Chasm" -> one line "… has switched — now begins
+    in the Bottom Chasm": the row says nothing without its note (owner 2026-10-16, 7.41 Tormentor / Roshan)."""
+    out = []
+    for line in lines:
+        m = _SWITCHED_NOTE_RE.match(line)
+        out.append(f"{m.group(1)} — now {m.group(3)}{m.group(2)}))" if m else line)
+    return out
+
+
 def _postprocess_per_minute(lines):
     """"<X> upgrade per minute increased from A to B" (a value that grows with game time, 7.41 Tormentor "Barrier
     upgrade per minute increased from 20 to 50") -> a minute table li_formula, as the barrier regen row (owner
@@ -2728,7 +2746,11 @@ def _postprocess_new_block_label(lines):
         # REWORKED mechanic works now (7.38 Lifesteal): REWORK rows become the description box
         row_tags = [re.search(r't\("([A-Za-z]+)"\)', out[r]) for r in rows]
         row_tags = [m_.group(1) if m_ else None for m_ in row_tags]
-        if (head.group('fn') == 'plain_header' and row_tags.count('REWORK') >= 3
+        # ... and a subgroup of a mechanics section the same way from 2 rows (owner 2026-10-16, 7.41 "Health
+        # Restoration", "Lifesteal and Damage Manipulations": like "Scaling with Hero Level")
+        mech_sub = (head.group('fn') == 'subgroup' and 'mechanic' in (section or '').lower()
+                    and row_tags.count('REWORK') >= 2)
+        if ((head.group('fn') == 'plain_header' and row_tags.count('REWORK') >= 3 or mech_sub)
                 and all(t_ in ('REWORK', 'QoL', 'NEW') for t_ in row_tags)):
             label = 'Reworked objective' if section.lower() == 'map objectives' else 'Reworked mechanic'
             out[i] = pre + line[:-2] + f', new="{label}"))'
@@ -3612,6 +3634,7 @@ def generate(version):
     out = _postprocess_boss_blocks(out)
     out = _postprocess_boss_rows_home(out)            # "Roshan's X" in a flat list -> Roshan's card
     out = _postprocess_unit_possessive(out)           # "Tormentor's X" on its card -> "X"
+    out = _postprocess_switched_note(out)             # "has switched" + "Now …" note -> one line
     out = _postprocess_per_minute(out)                # "… upgrade per minute …" -> minute table
     out = _postprocess_merge_twin_rows(out)
     out = _postprocess_minute_formula(out)
