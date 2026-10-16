@@ -4949,6 +4949,9 @@ ul.changes li > .badge-group {
 }
 /* Slash separator for paired dimensions (e.g. daytime / nighttime). */
 .badge-group.slash-sep .badge:not(:last-child)::after { content: " / "; }
+/* 5+ levels shown as "first … last" (patch/badges.py RANGE_FROM_LEVELS): no comma before the ellipsis */
+.badge-group .badge.rng-start::after { content: none; }
+.badge-group .badge-range { color: var(--text-dimmer); font-weight: 400; margin: 0 0.3em; }
 /* Extra leading space before 0% (neutral) — without +/- prefix it visually crowds the comma */
 .badge-group .badge.neutral:not(:first-child) {
   margin-left: 0.25em;

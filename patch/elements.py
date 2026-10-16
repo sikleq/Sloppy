@@ -1773,6 +1773,11 @@ _IAB_STOP = {"now", "longer", "also", "with", "from", "that", "this", "when", "i
 def _iab_row_ability(low, card, names):
     """The ability (lower-case name) a row speaks of: its name in the row, or the card's only one."""
     hit = [n for n in names if n and re.search(rf"\b{re.escape(n)}\b", low)]
+    # the name the row starts with wins: "Guard base damage block rescaled …" is Guard, not Damage Block
+    # (Crimson Guard 7.41)
+    lead = [n for n in hit if re.match(rf"{re.escape(n)}\b", low)]
+    if lead:
+        return max(lead, key=len)
     if hit:
         return max(hit, key=len)
     return next(iter(names)) if len(names) == 1 else ""
@@ -1794,7 +1799,7 @@ def _iab_text_change(text, tags):
     low = plain.lower()
     # numbers: only a "no longer …" row whose numbers the removed text shows (checked below)
     nums = re.findall(r"\d+(?:\.\d+)?", plain)
-    if not direction or (nums and "no longer" not in low):
+    if not direction:
         return False
     ability = _iab_row_ability(low, card, set(card.get("segs", {})))
     diff = card.get("segs", {}).get(ability)
@@ -1805,13 +1810,17 @@ def _iab_text_change(text, tags):
         # row's colour ("Disarm can now be dispelled" -> "Dispellable.", Heaven's Halberd 7.38; "Freezing Aura
         # now pierces debuff immunity" -> "Pierces Debuff Immunity.", Shiva's Guard 7.41) — or, when the
         # tooltip already says it, that sentence is coloured
-        if re.match(rf"^{re.escape(ability)}'?s? {rx}$", low):
+        hit = re.match(rf"^{re.escape(ability)}'?s? {rx}$", low)
+        if hit:
+            tail = tail.format(*hit.groups())
             new_text = card.get("pairs_by", {}).get((ability, "new"), "")
             at = new_text.lower().find(tail.lower().rstrip("."))
             entry = ({"ability": ability, "side": "new", "span": (at, at + len(tail.rstrip("."))), "dir": direction}
                      if at >= 0 else {"ability": ability, "side": "new", "append": tail, "dir": direction})
             _IAB_HL.setdefault(card["key"], []).append(entry)
             return True
+    if nums and "no longer" not in low:
+        return False
     words = _iab_stems(low, drop=set(ability.split()) | _IAB_VERBS)
     if not words:
         return False
@@ -1841,6 +1850,13 @@ def _iab_text_change(text, tags):
     # a row with numbers ("…by 25%", Shiva's Guard 7.41) only when the coloured text shows every one of them
     if nums and not all(any(_iab_has(n, full[s[0]:s[1]]) for s in hits) for n in nums):
         hits = []
+    if not hits and side == "old" and after and not nums:
+        # "no longer refreshes items" and the old text lost "items and" ("all your items and abilities" -> "all your
+        # abilities", Refresher Shard 7.41 — owner 2026-10-16: it wasn't coloured): the word itself, even one the
+        # stem lists skip as too common in item tooltips
+        said = set(re.findall(r"[a-z]{4,}", after.group(1)))
+        hits = [(s[0], s[1] - (4 if s[2].endswith(" and") else 0)) + s[2:] for s in diff["old"]
+                if s[3] == "delete" and set(re.findall(r"[a-z]{4,}", s[2].lower())) & said]
     if not hits:
         return False
     # removed text is red whatever the row's tag (owner 2026-09-27); added text takes the tag's colour
@@ -1856,6 +1872,11 @@ _IAB_TAILS = (   # (the row after the ability's name, the sentence the new descr
     (r"can no longer be dispelled", "Not dispellable."),
     (r"now pierces debuff immunity", "Pierces Debuff Immunity."),
     (r"no longer pierces debuff immunity", "Does not pierce Debuff Immunity."),
+    # a value the tooltip keeps for one kind of unit only (owner 2026-10-16, Crimson Guard 7.41: "Guard base damage
+    # block rescaled from 70 for all units to 70 on melee heroes and buildings and 45 on ranged heroes" — the new
+    # tooltip still says "70"); {0} = the row's number
+    (r"base damage block rescaled from \d+ for all units to \d+ on melee heroes(?: and buildings)? and (\d+) on "
+     r"ranged heroes", "{0} base damage block on ranged heroes."),
 )
 _IAB_DETERMINERS = ("your ", "their ", "its ", "the ")
 

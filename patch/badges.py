@@ -22,6 +22,9 @@ def gradient_class(magnitude, is_buff):
     return f"{prefix}10"
 
 
+RANGE_FROM_LEVELS = 5        # per-level badges collapse to "first … last" from this many levels
+
+
 def b(old, new, l=False, slash=False, force_overall=None):
     """Generate per-level badges. old/new can be scalar or list.
     l=True means lower-is-buff (cooldowns, mana costs, penalties).
@@ -178,6 +181,12 @@ def b(old, new, l=False, slash=False, force_overall=None):
     # Collapse if every level produced an identical badge
     if len(keys) > 1 and len(set(keys)) == 1:
         parts = [parts[0]]
+    # 5 levels or more (Dagon, Necronomicon, Invoker's orbs): the first and the last level only, "−9% … −29%" —
+    # five badges in a row drown the line and the item card's hints (owner 2026-10-16, Dagon 7.41). The tag still
+    # weighs every level (above).
+    elif len(parts) >= RANGE_FROM_LEVELS and not slash:
+        parts = [re.sub(r'class="(badge[^"]*)"', r'class="\1 rng-start"', parts[0], count=1),
+                 '<span class="badge-range" aria-hidden="true">…</span>', parts[-1]]
 
     overall_attr = f' data-overall="{overall}"' if overall else ""
     grp_cls = "badge-group slash-sep" if slash else "badge-group"
