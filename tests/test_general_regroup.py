@@ -123,3 +123,17 @@ def test_a_lane_creeps_ability_rows_get_its_block():
     plain, per = g._lane_card_abilities("unit|creep-goodguys-flagbearer", rows)
     assert plain == rows[1:] and list(per) == ["Inspiration Aura"]
     assert per["Inspiration Aura"][1][0].startswith('W(li("No longer affects heroes"')
+
+
+def test_a_bosss_rows_go_to_its_card_without_its_name():
+    """Owner 2026-10-16: "Tormentor's spawn preference has switched" -> "Spawn preference has switched" on the card;
+    a stray "Roshan's ..." row in a flat list moves to Roshan's card."""
+    lines = ['W(ul_open())', 'W(li("Wisdom Shrines now reverse their countdowns", t("REWORK")))',
+             'W(li("Roshan' + "'" + 's pit preference has switched", t("MISC")))', 'W(ul_close())',
+             'W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))',
+             'W(ul_open())', 'W(li("Tormentor' + "'" + 's spawn preference has switched", t("MISC")))', 'W(ul_close())']
+    out = g._postprocess_unit_possessive(g._postprocess_boss_rows_home(lines))
+    r = out.index('W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))')
+    assert out[r + 2] == 'W(li("Pit preference has switched", t("MISC")))'
+    assert 'W(li("Spawn preference has switched", t("MISC")))' in out
+    assert not any("Roshan's" in line for line in out[:r])

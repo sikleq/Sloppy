@@ -190,7 +190,8 @@ WHOLE_MAP_R = 7000           # a spot this big shows the whole map
 def _first(img, cx, cy, r, ver, entry, side, half, width, font):
     """A boss whose first spawn changed side (2026-10-16, 7.41 "Tormentor's spawn preference has switched" / "Roshan's
     pit preference has switched"): every lair of that boss ringed thin white, the one it starts in — on this half —
-    ringed gold with a "first" plate. entry["first"] = {"kind": "tormentors" | "roshan", "old": [x, y], "new": [x, y]}."""
+    ringed gold with a plate saying when it first spawns there. entry["first"] = {"kind": "tormentors" | "roshan",
+    "label": "20:00", "old": [x, y], "new": [x, y]} (the owner 2026-10-16: the time, not "first")."""
     first = entry.get("first")
     if not first:
         return
@@ -208,7 +209,7 @@ def _first(img, cx, cy, r, ver, entry, side, half, width, font):
         d.ellipse([X - rr, Y - rr, X + rr, Y + rr], outline=(FIRST + (255,)) if gold else (240, 240, 240, 200),
                   width=width + 1 if gold else width)
         if gold:
-            text = "first"
+            text = first.get("label", "first")      # the boss's first spawn time (owner 2026-10-16)
             w = d.textlength(text, font=font)
             pad = max(3, font.size // 4)
             bx = min(max(X - w / 2 - pad, 2), half - w - 2 * pad - 2)

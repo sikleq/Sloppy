@@ -60,7 +60,7 @@ def build():
     W(ul_open())
     W(li("Roshan is back in the river, with one pit located near each sidelane", t("REWORK"), extra=inline_note("Top lair is slightly closer to Dire's jungle entrance, and bottom one is closer to Radiant's<br>Only the active Roshan pit will show as a minimap icon<br>Roshan initially spawns in the Bottom Pit<br>Starting at 15:00, Roshan will follow the day/night cycle, walking across the river towards his designated pit: Top at night and Bottom at day<br>&nbsp;&nbsp;– Roshan no longer has bonus movement speed while moving between pits<br>&nbsp;&nbsp;– Roshan now has basic 25% Slow Resistance and an additional 25% Slow Resistance when running between pits")))
     W(li("Added a Roshan icon near the minimap that shows Roshan's state (alive, dead, maybe alive) and location", t("QoL"), extra=inline_note("If Roshan is dead, the status will also include a timer until his possible respawn<br>Since Roshan's respawn takes between 8 to 11 minutes, during this window the status will say that he may be alive, but also include a timer until the guaranteed respawn<br>If a team gains vision over Roshan or Roshan's Roar of Retribution is heard during this status, the timer will be updated to inform that Roshan is alive<br>Templar Assassin's Third Eye Innate will cause the icon to display exactly when and where Roshan will respawn")))
-    W(li("Roshan's knockback now has a 2s cooldown before it can be applied to the same unit again", t("NERF"), extra=inline_note("The knockback of Roshan's Walk: since 7.33 Roshan pushes units aside while walking between his pits (listed among knockback effects in 7.36b)")))
+    W(li("Knockback now has a 2s cooldown before it can be applied to the same unit again", t("NERF"), extra=inline_note("The knockback of Roshan's Walk: since 7.33 Roshan pushes units aside while walking between his pits (listed among knockback effects in 7.36b)")))
     W(li("Roshan no longer drops Aghanim's Blessing", t("DEL")))
     W(ul_close())
     W(ability_change(None, {"name": "Throw", "icon_url": "../icons/abilities/roshan_grab_and_throw.png",
@@ -81,7 +81,7 @@ def build():
     W(li("Tormentor is also dependent on the day and night cycle, so it's at Radiant side at night and at Dire's side at day. As a result, it will always appear at the Radiant side first", t("REWORK"), extra=inline_note("Or at Dire side in Turbo<br>Due to this Roshan and Tormentor are always on opposite sides — Exceptions may apply in Turbo")))
     W(li("Tormentor spawns repositioned to the corners of the map", t("REWORK")))
     W(li("Tormentor now spawns for the first time at 15:00", t("REWORK"), extra=inline_note("7:30 in Turbo")))
-    W(li("Tormentor's abilities now scale with game time instead of the number of deaths", t("REWORK")))
+    W(li("Abilities now scale with game time instead of the number of deaths", t("REWORK")))
     W(li("Tormentor now grants 250 gold to each team member on death", t("NEW"), extra=inline_note("Still grants additional 280 gold when all team members already have Aghanim's Shard")))
     W(ul_close())
     # Tooltips: game localization 7.37e / 7.38 (dotabuff/d2vpkr abilities_english.txt) — the text did not

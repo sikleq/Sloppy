@@ -2592,6 +2592,60 @@ _PER_MINUTE_ROW = re.compile(r'^W\(li\("(?P<name>[^"]*?\b(?:upgrade|growth|gain)
 _MINUTE_LEVELS = "[0, 5, 10, 15, 20, 25, 30, 40, 50, 60]"
 
 
+_UNIT_HEAD_RE = re.compile(r'^W\(unit_header\("(?P<name>[^"]+)"')
+
+
+def _postprocess_boss_rows_home(lines):
+    """A row "Roshan's …" / "Tormentor's …" outside that boss's card (7.41: "Roshan's pit preference has switched" sat
+    in the flat Map Objectives list) moves to the card — the one already on the page, or a new one right after the
+    list it came from (owner 2026-10-16)."""
+    out = list(lines)
+    for boss, (icon, _prefix) in _BOSSES.items():
+        head = f'W(unit_header("{boss}", "{icon}", general=False, track=True))'
+        unit, stray = None, []
+        for i, line in enumerate(out):
+            m = _UNIT_HEAD_RE.match(line)
+            if m:
+                unit = m.group("name")
+            elif re.match(r'^W\((?:hero_header|item_header|plain_header|section|subgroup)\(', line):
+                unit = None
+            elif unit != boss and line.startswith(f'W(li("{boss}\'s '):
+                stray.append(i)
+        if not stray:
+            continue
+        rows = [out[i] for i in stray]
+        for i in reversed(stray):
+            del out[i]
+        out = _drop_empty_ul(out)
+        card = next((i for i, l in enumerate(out) if l.startswith(f'W(unit_header("{boss}"')), None)
+        if card is not None:
+            close = next(i for i in range(card, len(out)) if out[i] == 'W(ul_close())')
+            out[close:close] = rows
+        else:
+            at = next((i + 1 for i in range(min(stray[0], len(out) - 1), len(out)) if out[i] == 'W(ul_close())'),
+                      len(out))
+            out[at:at] = [head, 'W(ul_open())'] + rows + ['W(ul_close())']
+    return out
+
+
+def _postprocess_unit_possessive(lines):
+    """Under a unit's card the unit's name off the front of its rows: "Tormentor's spawn preference has switched" ->
+    "Spawn preference has switched" (owner 2026-10-16: the card already says whose it is)."""
+    out, unit = [], None
+    for line in lines:
+        m = _UNIT_HEAD_RE.match(line)
+        if m:
+            unit = m.group("name")
+        elif re.match(r'^W\((?:hero_header|item_header|plain_header|section)\(', line):
+            unit = None
+        elif unit:
+            m2 = re.match(r'^(W\(li(?:_formula)?\(")' + re.escape(unit) + r"'s? ([a-z])", line)
+            if m2:
+                line = m2.group(1) + m2.group(2).upper() + line[m2.end():]
+        out.append(line)
+    return out
+
+
 def _postprocess_per_minute(lines):
     """"<X> upgrade per minute increased from A to B" (a value that grows with game time, 7.41 Tormentor "Barrier
     upgrade per minute increased from 20 to 50") -> a minute table li_formula, as the barrier regen row (owner
@@ -3556,6 +3610,8 @@ def generate(version):
     # 3. Drop a v2-todo breadcrumb above ability blocks tagged "reworked".
     out = _postprocess_aghs_merge(out)
     out = _postprocess_boss_blocks(out)
+    out = _postprocess_boss_rows_home(out)            # "Roshan's X" in a flat list -> Roshan's card
+    out = _postprocess_unit_possessive(out)           # "Tormentor's X" on its card -> "X"
     out = _postprocess_per_minute(out)                # "… upgrade per minute …" -> minute table
     out = _postprocess_merge_twin_rows(out)
     out = _postprocess_minute_formula(out)

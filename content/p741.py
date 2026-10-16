@@ -70,7 +70,7 @@ def build():
 
     W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())
-    W(li("Tormentor's spawn preference has switched", t("MISC"),
+    W(li("Spawn preference has switched", t("MISC"),
          extra=inline_note("Now begins in the Bottom Chasm.")))
     W(li("Now has 25% Status Resistance", t("NEW")))
     W(li("No longer deals damage to neutral units", t("DEL")))
@@ -118,7 +118,7 @@ def build():
     W(ul_close())
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
-    W(li("Roshan's pit preference has switched", t("MISC"),
+    W(li("Pit preference has switched", t("MISC"),
          extra=inline_note("Now begins in the Top Pit.")))
     W(ul_close())
 
