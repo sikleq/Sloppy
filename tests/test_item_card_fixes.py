@@ -96,10 +96,11 @@ def test_block_of_cheese_has_a_hand_written_card():
     assert len(shown) == 1 and "fully shareable" in shown[0]               # the row says more than the card
 
 
-def test_crude_7_41_marks_valves_wrong_numbers():
-    # Valve's "8/12/16%" isn't in the game files (bat_reduce 6 9 12): wrong-word + the real values (patch-tags)
-    seg = _block(_page("7.41"), "enchant-crude") if 'id="dyn-item-enchant-crude"' in _page("7.41") else _page("7.41")
-    assert '<span class="wrong-word">8/12/16%</span>' in seg and "The game files give 6/9/12%" in seg
+def test_crude_7_41_keeps_valves_numbers():
+    # owner 2026-10-17: 6/9/12% came in 7.41a ("worsened from 8/12/16% to 6/9/12%") — the local "7.41" items.txt is
+    # the 7.41a build, Valve's 7.41 "8/12/16%" was right
+    html = _page("7.41")
+    assert '<span class="wrong-word">8/12/16%</span>' not in html and "The game files give 6/9/12%" not in html
 
 
 def test_refresher_shard_colours_the_lost_word():

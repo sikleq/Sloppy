@@ -18,6 +18,9 @@ from item_ability_text import _items  # noqa: E402
 from patch.elements import _ENCHANT_DESC  # noqa: E402
 
 OUT = os.path.join(_ROOT, "data", "rules", "enchant_values.json")
+# The local "7.41" items.txt is byte-identical to "7.41a" — the 7.41a build. 7.41a's notes change one enchantment:
+# Crude "Base Attack Time Reduction bonus worsened from 8/12/16% to 6/9/12%" (owner 2026-10-17), so 7.41 had these.
+CORRECTIONS = {"7.41": {"Crude": {"bat_reduce": "8 12 16"}}}
 _NUM = re.compile(r"(?<![\w.])([+\-−]?)(\d+(?:\.\d+)?)")
 
 
@@ -38,12 +41,20 @@ def _fmt(x):
     return f"{abs(x):g}"
 
 
-def enchant(name, tiers, kv):
-    """{tier: lines} of one enchantment in one patch, or (None, why)."""
+def kv_values(name, kv, version=""):
+    """{key: raw value} of an enchantment's AbilityValues in a patch, CORRECTIONS applied, or None."""
     blk = kv.get(_slug(name))
     if not isinstance(blk, dict) or not isinstance(blk.get("AbilityValues"), dict):
+        return None
+    return {**blk["AbilityValues"], **CORRECTIONS.get(version, {}).get(name, {})}
+
+
+def enchant(name, tiers, kv, version=""):
+    """{tier: lines} of one enchantment in one patch, or (None, why)."""
+    vals = kv_values(name, kv, version)
+    if vals is None:
         return None, "not in items.txt"
-    cols = [lv for lv in (_levels(v) for v in blk["AbilityValues"].values()) if lv]
+    cols = [lv for lv in (_levels(v) for v in vals.values()) if lv]
     order = sorted(tiers)
     out = {}
     for t in order:
@@ -79,7 +90,7 @@ def main(versions):
             continue
         got = {}
         for name, tiers in _ENCHANT_DESC.items():
-            lines, why = enchant(name, tiers, kv)
+            lines, why = enchant(name, tiers, kv, v)
             if lines is None:
                 print(f"{v} {name}: left to the table - {why}")
             else:

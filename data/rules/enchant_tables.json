@@ -1,0 +1,925 @@
+{
+ "7.41": {
+  "Alert": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "bonus_attack_speed",
+     "label": "Attack Speed",
+     "new": {
+      "1": "+7",
+      "2": "+15",
+      "3": "+23",
+      "4": "+31"
+     },
+     "old": {
+      "1": "+10",
+      "2": "+17",
+      "3": "+24",
+      "4": "+31"
+     },
+     "penalty": false
+    },
+    {
+     "key": "bonus_night_vision",
+     "label": "Bonus Night Vision",
+     "new": {
+      "1": "0",
+      "2": "+150",
+      "3": "+225",
+      "4": "+300"
+     },
+     "old": {
+      "1": "0",
+      "2": "+150",
+      "3": "+225",
+      "4": "+300"
+     },
+     "penalty": false
+    },
+    {
+     "key": "bonus_attack_range",
+     "label": "Attack Range",
+     "new": {
+      "1": "0",
+      "2": "0",
+      "3": "0",
+      "4": "+100"
+     },
+     "old": {
+      "1": "0",
+      "2": "0",
+      "3": "0",
+      "4": "+100"
+     },
+     "penalty": false
+    }
+   ],
+   "tiers_new": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "tiers_old": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  "Audacious": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "attack_speed",
+     "label": "Attack Speed",
+     "new": {
+      "5": "+100"
+     },
+     "old": {
+      "5": "+100"
+     },
+     "penalty": false
+    },
+    {
+     "key": "magic_damage",
+     "label": "Magic Attack Damage",
+     "new": {
+      "5": "+80"
+     },
+     "old": {
+      "5": "+80"
+     },
+     "penalty": false
+    },
+    {
+     "key": "incoming_damage",
+     "label": "Incoming Damage",
+     "new": {
+      "5": "+10%"
+     },
+     "old": {
+      "5": "+10%"
+     },
+     "penalty": true
+    }
+   ],
+   "tiers_new": [
+    5
+   ],
+   "tiers_old": [
+    5
+   ]
+  },
+  "Brawny": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "health_bonus",
+     "label": "Health",
+     "new": {
+      "1": "+110",
+      "2": "+150",
+      "3": "+190",
+      "4": "+230"
+     },
+     "old": {
+      "1": "+110",
+      "2": "+150",
+      "3": "+190",
+      "4": "+230"
+     },
+     "penalty": false
+    },
+    {
+     "key": "health_regen",
+     "label": "Health Regen",
+     "new": {
+      "1": "0",
+      "2": "+3",
+      "3": "+6",
+      "4": "+9"
+     },
+     "old": {
+      "1": "0",
+      "2": "+3",
+      "3": "+6",
+      "4": "+9"
+     },
+     "penalty": false
+    },
+    {
+     "key": "slow_resist",
+     "label": "Slow Resistance",
+     "new": {
+      "1": "0",
+      "2": "0",
+      "3": "0",
+      "4": "+25%"
+     },
+     "old": {
+      "1": "0",
+      "2": "0",
+      "3": "0",
+      "4": "+25%"
+     },
+     "penalty": false
+    }
+   ],
+   "tiers_new": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "tiers_old": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  "Crude": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "health_restoration",
+     "label": "Health Restoration",
+     "new": {
+      "2": "+10%",
+      "3": "+15%",
+      "4": "+20%"
+     },
+     "old": {
+      "4": "+30%",
+      "5": "+40%"
+     },
+     "penalty": false
+    },
+    {
+     "key": "bat_reduce",
+     "label": "BAT Reduction",
+     "new": {
+      "2": "+8%",
+      "3": "+12%",
+      "4": "+16%"
+     },
+     "old": {
+      "4": "+12%",
+      "5": "+18%"
+     },
+     "penalty": false
+    },
+    {
+     "key": "intelligence_pct",
+     "label": "Intelligence",
+     "new": {
+      "2": "−6%",
+      "3": "−6%",
+      "4": "−6%"
+     },
+     "old": {
+      "4": "−5%",
+      "5": "−5%"
+     },
+     "penalty": true
+    }
+   ],
+   "tiers_new": [
+    2,
+    3,
+    4
+   ],
+   "tiers_old": [
+    4,
+    5
+   ]
+  },
+  "Evolved": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "primary_stat",
+     "label": "Primary Stat",
+     "new": {
+      "5": "+40"
+     },
+     "old": {
+      "5": "+40"
+     },
+     "penalty": false
+    },
+    {
+     "key": "primary_stat_universal",
+     "label": "All Attributes (Universal heroes)",
+     "new": {
+      "5": "+24"
+     },
+     "old": {
+      "5": "+24"
+     },
+     "penalty": false
+    }
+   ],
+   "tiers_new": [
+    5
+   ],
+   "tiers_old": [
+    5
+   ]
+  },
+  "Feverish": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "cooldown_reduction",
+     "label": "Cooldown Reduction",
+     "new": {
+      "5": "+15%"
+     },
+     "old": {
+      "5": "+15%"
+     },
+     "penalty": false
+    },
+    {
+     "key": "cost_increase",
+     "label": "Mana Cost/Loss Increase",
+     "new": {
+      "5": "+7%"
+     },
+     "old": {
+      "5": "+7%"
+     },
+     "penalty": true
+    }
+   ],
+   "tiers_new": [
+    5
+   ],
+   "tiers_old": [
+    5
+   ]
+  },
+  "Fleetfooted": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "movespeed",
+     "label": "Movement Speed",
+     "new": {
+      "5": "+115"
+     },
+     "old": {
+      "5": "+115"
+     },
+     "penalty": false
+    }
+   ],
+   "tiers_new": [
+    5
+   ],
+   "tiers_old": [
+    5
+   ]
+  },
+  "Greedy": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "bonus_gpm",
+     "label": "GPM",
+     "new": {
+      "2": "+75",
+      "3": "+100"
+     },
+     "old": {
+      "2": "+75",
+      "3": "+100"
+     },
+     "penalty": false
+    },
+    {
+     "key": "bonus_mana",
+     "label": "Mana",
+     "new": {
+      "2": "+200",
+      "3": "+250"
+     },
+     "old": {
+      "2": "+200",
+      "3": "+250"
+     },
+     "penalty": false
+    },
+    {
+     "key": "bonus_damage",
+     "label": "Attack Damage",
+     "new": {
+      "2": "−30",
+      "3": "−60"
+     },
+     "old": {
+      "2": "−30",
+      "3": "−60"
+     },
+     "penalty": true
+    }
+   ],
+   "tiers_new": [
+    2,
+    3
+   ],
+   "tiers_old": [
+    2,
+    3
+   ]
+  },
+  "Hulking": {
+   "brand_new": true,
+   "stats": [
+    {
+     "key": "max_health",
+     "label": "Max Health",
+     "new": {
+      "5": "+5%"
+     },
+     "old": {},
+     "penalty": false
+    },
+    {
+     "key": "max_health_regen",
+     "label": "Max Health Regen",
+     "new": {
+      "5": "+1.5%"
+     },
+     "old": {},
+     "penalty": false
+    },
+    {
+     "key": "attack_speed",
+     "label": "Attack Speed",
+     "new": {
+      "5": "−30%"
+     },
+     "old": {},
+     "penalty": true
+    }
+   ],
+   "tiers_new": [
+    5
+   ],
+   "tiers_old": []
+  },
+  "Keen-Eyed": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "cast_range_bonus",
+     "label": "Cast Range",
+     "new": {
+      "2": "+125",
+      "3": "+135",
+      "4": "+145"
+     },
+     "old": {
+      "2": "+125",
+      "3": "+135"
+     },
+     "penalty": false
+    },
+    {
+     "key": "bonus_mana_regen",
+     "label": "Mana Regen",
+     "new": {
+      "2": "+1",
+      "3": "+1.5",
+      "4": "+2"
+     },
+     "old": {
+      "2": "+1",
+      "3": "+1.5"
+     },
+     "penalty": false
+    },
+    {
+     "key": "mana_reduction_pct",
+     "label": "Max Mana",
+     "new": {
+      "2": "−10%",
+      "3": "−12%",
+      "4": "−14%"
+     },
+     "old": {
+      "2": "−10%",
+      "3": "−10%"
+     },
+     "penalty": true
+    }
+   ],
+   "tiers_new": [
+    2,
+    3,
+    4
+   ],
+   "tiers_old": [
+    2,
+    3
+   ]
+  },
+  "Manic": {
+   "brand_new": true,
+   "stats": [
+    {
+     "key": "bat_reduce",
+     "label": "Base Attack Time",
+     "new": {
+      "5": "−18%"
+     },
+     "old": {},
+     "penalty": false
+    },
+    {
+     "key": "cast_speed",
+     "label": "Cast Speed",
+     "new": {
+      "5": "+20%"
+     },
+     "old": {},
+     "penalty": false
+    },
+    {
+     "key": "vision_reduce",
+     "label": "Vision",
+     "new": {
+      "5": "−20%"
+     },
+     "old": {},
+     "penalty": true
+    }
+   ],
+   "tiers_new": [
+    5
+   ],
+   "tiers_old": []
+  },
+  "Mystical": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "mana_regen",
+     "label": "Mana Regen",
+     "new": {
+      "1": "+0.8",
+      "2": "+1.6",
+      "3": "+2.4",
+      "4": "+3.2"
+     },
+     "old": {
+      "1": "+0.8",
+      "2": "+1.6",
+      "3": "+2.4",
+      "4": "+3.2"
+     },
+     "penalty": false
+    },
+    {
+     "key": "magic_res",
+     "label": "Magic Resistance",
+     "new": {
+      "1": "0",
+      "2": "+10%",
+      "3": "+13%",
+      "4": "+16%"
+     },
+     "old": {
+      "1": "0",
+      "2": "+10%",
+      "3": "+13%",
+      "4": "+16%"
+     },
+     "penalty": false
+    },
+    {
+     "key": "manacost_reduction",
+     "label": "Mana Cost/Loss Reduction",
+     "new": {
+      "1": "0",
+      "2": "0",
+      "3": "0",
+      "4": "+15%"
+     },
+     "old": {},
+     "penalty": false
+    },
+    {
+     "key": "bonus_cast_range",
+     "label": "Cast Range",
+     "new": {},
+     "old": {
+      "1": "0",
+      "2": "0",
+      "3": "0",
+      "4": "+100"
+     },
+     "penalty": false
+    }
+   ],
+   "tiers_new": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "tiers_old": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  "Nimble": {
+   "brand_new": true,
+   "stats": [
+    {
+     "key": "movespeed_pct",
+     "label": "Movement Speed",
+     "new": {
+      "2": "+6%",
+      "3": "+8%",
+      "4": "+10%"
+     },
+     "old": {},
+     "penalty": false
+    },
+    {
+     "key": "bonus_damage",
+     "label": "Damage",
+     "new": {
+      "2": "+10",
+      "3": "+15",
+      "4": "+20"
+     },
+     "old": {},
+     "penalty": false
+    },
+    {
+     "key": "hp_regen_reduce",
+     "label": "Health Regen",
+     "new": {
+      "2": "−1.5",
+      "3": "−2.25",
+      "4": "−3"
+     },
+     "old": {},
+     "penalty": true
+    }
+   ],
+   "tiers_new": [
+    2,
+    3,
+    4
+   ],
+   "tiers_old": []
+  },
+  "Quickened": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "movement_speed",
+     "label": "Movement Speed",
+     "new": {
+      "1": "+15",
+      "2": "+20",
+      "3": "+25",
+      "4": "+30"
+     },
+     "old": {
+      "1": "+15",
+      "2": "+20",
+      "3": "+25",
+      "4": "+30"
+     },
+     "penalty": false
+    },
+    {
+     "key": "max_mana",
+     "label": "Mana",
+     "new": {
+      "1": "0",
+      "2": "+100",
+      "3": "+160",
+      "4": "+220"
+     },
+     "old": {
+      "1": "0",
+      "2": "+100",
+      "3": "+160",
+      "4": "+220"
+     },
+     "penalty": false
+    },
+    {
+     "key": "evasion",
+     "label": "Evasion",
+     "new": {
+      "1": "0",
+      "2": "0",
+      "3": "0",
+      "4": "+15%"
+     },
+     "old": {
+      "1": "0",
+      "2": "0",
+      "3": "0",
+      "4": "+15%"
+     },
+     "penalty": false
+    }
+   ],
+   "tiers_new": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "tiers_old": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  "Timeless": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "debuff_amp",
+     "label": "Debuff Amplification",
+     "new": {
+      "4": "+8%",
+      "5": "+15%"
+     },
+     "old": {
+      "4": "+8%",
+      "5": "+15%"
+     },
+     "penalty": false
+    },
+    {
+     "key": "spell_amp",
+     "label": "Spell Amplification",
+     "new": {
+      "4": "+6%",
+      "5": "+16%"
+     },
+     "old": {
+      "4": "+6%",
+      "5": "+16%"
+     },
+     "penalty": false
+    }
+   ],
+   "tiers_new": [
+    4,
+    5
+   ],
+   "tiers_old": [
+    4,
+    5
+   ]
+  },
+  "Titanic": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "base_attack_damage",
+     "label": "Attack Damage",
+     "new": {
+      "2": "+8%",
+      "3": "+12%",
+      "4": "+16%"
+     },
+     "old": {
+      "4": "+10%",
+      "5": "+20%"
+     },
+     "penalty": false
+    },
+    {
+     "key": "status_resistance",
+     "label": "Status Resistance",
+     "new": {
+      "2": "+10%",
+      "3": "+12%",
+      "4": "+14%"
+     },
+     "old": {
+      "4": "+10%",
+      "5": "+15%"
+     },
+     "penalty": false
+    },
+    {
+     "key": "attack_speed",
+     "label": "Attack Speed",
+     "new": {
+      "2": "−10%",
+      "3": "−12%",
+      "4": "−14%"
+     },
+     "old": {},
+     "penalty": true
+    }
+   ],
+   "tiers_new": [
+    2,
+    3,
+    4
+   ],
+   "tiers_old": [
+    4,
+    5
+   ]
+  },
+  "Tough": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "bonus_damage",
+     "label": "Damage",
+     "new": {
+      "1": "+7",
+      "2": "+10",
+      "3": "+13",
+      "4": "+16"
+     },
+     "old": {
+      "1": "+7",
+      "2": "+10",
+      "3": "+13",
+      "4": "+16"
+     },
+     "penalty": false
+    },
+    {
+     "key": "armor",
+     "label": "Armor",
+     "new": {
+      "1": "0",
+      "2": "+4",
+      "3": "+6",
+      "4": "+8"
+     },
+     "old": {
+      "1": "0",
+      "2": "+4",
+      "3": "+6",
+      "4": "+8"
+     },
+     "penalty": false
+    },
+    {
+     "key": "knockback_resist",
+     "label": "Knockback Resistance",
+     "new": {
+      "1": "0",
+      "2": "0",
+      "3": "0",
+      "4": "+40%"
+     },
+     "old": {
+      "1": "0",
+      "2": "0",
+      "3": "0",
+      "4": "+40%"
+     },
+     "penalty": false
+    }
+   ],
+   "tiers_new": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "tiers_old": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  "Vampiric": {
+   "brand_new": false,
+   "stats": [
+    {
+     "key": "attack_lifesteal",
+     "label": "Lifesteal",
+     "new": {
+      "5": "+30%"
+     },
+     "old": {
+      "2": "+12%",
+      "3": "+14%",
+      "4": "+16%"
+     },
+     "penalty": false
+    },
+    {
+     "key": "spell_lifesteal",
+     "label": "Spell Lifesteal",
+     "new": {
+      "5": "+20%"
+     },
+     "old": {
+      "2": "+6%",
+      "3": "+8%",
+      "4": "+10%"
+     },
+     "penalty": false
+    },
+    {
+     "key": "bonus_night_vision",
+     "label": "Bonus Night Vision",
+     "new": {
+      "5": "+300"
+     },
+     "old": {
+      "2": "0",
+      "3": "0",
+      "4": "+200"
+     },
+     "penalty": false
+    }
+   ],
+   "tiers_new": [
+    5
+   ],
+   "tiers_old": [
+    2,
+    3,
+    4
+   ]
+  },
+  "Vital": {
+   "brand_new": true,
+   "stats": [
+    {
+     "key": "health_regen",
+     "label": "Health Regen",
+     "new": {
+      "1": "+2"
+     },
+     "old": {},
+     "penalty": false
+    }
+   ],
+   "tiers_new": [
+    1
+   ],
+   "tiers_old": []
+  }
+ }
+}

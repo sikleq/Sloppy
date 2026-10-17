@@ -241,7 +241,8 @@
     if (hit(el) || Array.from(el.querySelectorAll('[data-tag]')).some(hit)) return true;
     const block = el.closest('.entity-block');
     const kind = el.classList.contains('iab-change') ? 'covered-iab'
-      : el.classList.contains('components-change') ? 'covered-cost' : null;
+      : el.classList.contains('components-change') ? 'covered-cost'
+      : el.classList.contains('ench-change') ? 'covered-ench' : null;   // an enchantment's tier table (7.41)
     return !!(block && kind && block.querySelector(`ul.changes > li.${kind}:not(.f-hide):not(.cat-hide)`));
   }
   function refreshPatchFilterLayout() {

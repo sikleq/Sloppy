@@ -821,10 +821,95 @@ def enchant_header(name, slug=None, new=False, removed=None):
         block_data_attr = ''
     eid = _register_entity("enchant", name)
     href = _entity_link("items", "enchantment " + name)
+    table = "" if removed else _enchant_change(name)
     return _open_block((extra_cls + ' item-block').strip(), block_data_attr) + f'''<div class="entity item-entity"{eid}>
   <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{icon}" alt="{name}" loading="lazy"></a></div>
   <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a>{type_label}</div>
-</div>'''
+</div>''' + table
+
+
+_ENCHANT_TABLES = None
+
+
+def _enchant_tables():
+    global _ENCHANT_TABLES
+    if _ENCHANT_TABLES is None:
+        try:
+            with open(_os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
+                                    "data", "rules", "enchant_tables.json"), encoding="utf-8") as f:
+                _ENCHANT_TABLES = _json.load(f)
+        except OSError:
+            _ENCHANT_TABLES = {}
+    return _ENCHANT_TABLES
+
+
+def _ench_num(v):
+    m = re.search(r"\d+(?:\.\d+)?", v or "")
+    return float(m.group(0)) if m else 0.0
+
+
+def _ench_cell(old, new, penalty, brand_new, added_line=False):
+    """One tier's cell: the value; "was → now" coloured by what it does to the owner; a tier it has only now gold
+    (a whole new penalty red: Titanic 7.41 "Now also provides -10/12/14% Attack Speed", NERF), one it lost struck in
+    the DEL colour; "—" for no such bonus at that tier."""
+    zero = lambda v: v is not None and _ench_num(v) == 0
+    if old is None and new is None:
+        return '<span class="ench-v ench-off"></span>'
+    if new is not None and (brand_new or old == new or (zero(old) and zero(new))):
+        return '<span class="ench-v ench-zero">—</span>' if zero(new) else f'<span class="ench-v">{new}</span>'
+    if new is None or zero(new):
+        if old is None or zero(old):
+            return '<span class="ench-v ench-zero">—</span>'
+        return f'<span class="ench-v"><span class="iab-lv iab-del">{old}</span></span>'
+    if old is None or zero(old):
+        tone = "nerf" if added_line and penalty else "new"
+        return f'<span class="ench-v"><span class="iab-lv iab-{tone}">{new}</span></span>'
+    up = _ench_num(new) > _ench_num(old)
+    d = "nerf" if up == penalty else "buff"
+    return (f'<span class="ench-v ench-chg"><span class="ench-was">{old}</span><span class="ench-arrow">→</span>'
+            f'<span class="iab-lv iab-{d}">{new}</span></span>')
+
+
+def _enchant_change(name):
+    """An enchantment's bonuses by tier, before → after (owner 2026-10-17, 7.41: "Vital is written as a bare row… a
+    table? a card?" — variant A: the 7.38 table, a changed cell "was → now" in colour). Data:
+    data/rules/enchant_tables.json (scripts/gen/enchant_table.py). The number rows under it go into it
+    (_ench_covered); "Now is a guaranteed option …" rows stay."""
+    ent = _enchant_tables().get(_State.current_patch_version or "", {}).get(name)
+    _State.ench_card = None
+    if not ent or not ent["stats"]:
+        return ""
+    _State.ench_card = {"ek": _State.current_entity_key, "pv": _State.current_patch_version,
+                        "labels": [s["label"] for s in ent["stats"]]}
+    head = ('<span class="ench-row-h"><span class="ench-stat-h"></span>'
+            + "".join(f'<span class="ench-tier-h">Tier {t}</span>' for t in _ENCHANT_TIERS) + "</span>")
+    lines = [head]
+    for s in ent["stats"]:
+        gone = not any(_ench_num(v) for v in s["new"].values())
+        added = not ent["brand_new"] and not any(_ench_num(v) for v in s["old"].values())
+        cells = "".join(_ench_cell(s["old"].get(str(t)), s["new"].get(str(t)), s["penalty"], ent["brand_new"], added)
+                        for t in _ENCHANT_TIERS)
+        cls = (" ench-neg" if s["penalty"] else "") + (" ench-gone" if gone else " ench-added" if added else "")
+        lines.append(f'<span class="ench-stat{cls}">{s["label"]}</span>{cells}')
+    return f'<div class="ench-tiers ench-change">{"".join(lines)}</div>'
+
+
+def _ench_covered(text):
+    """A number row of an enchantment whose table (above) shows that bonus, or a "Tiers changed …" row: hidden,
+    still counted by the tag filters (like the item cards' rows)."""
+    card = getattr(_State, "ench_card", None)
+    if not card or (card["ek"], card["pv"]) != (_State.current_entity_key, _State.current_patch_version):
+        return False
+    plain = re.sub(r"<[^>]+>", " ", re.sub(r"<!--TIP-->.*?<!--/TIP-->", " ", text, flags=re.S))
+    low = plain.lower()
+    if "guaranteed" in low:
+        return False
+    if re.search(r"\btiers? changed from\b", low):
+        return True
+    if not re.search(r"\d", low):
+        return False
+    words = _iab_stems(low)
+    return any(_iab_stems(lab.lower()) & words for lab in card["labels"])
 
 
 def section(title):
@@ -2455,6 +2540,10 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
                  or _iab_unpaired_row(text, dyn_tags, extra)
                  or (not extra and _iab_text_change(text, dyn_tags)))):
         classes += ["iab-covered", "covered-iab"]       # covered-*: the card that shows it (tag filters)
+    # a number row of an enchantment its tier table above shows (owner 2026-10-17, 7.41 variant A)
+    if (isinstance(text, str) and "iab-covered" not in classes
+            and (_State.current_entity_key or "").startswith("enchant|") and _ench_covered(text)):
+        classes += ["iab-covered", "covered-ench"]
     # an attribute / damage row the hero's attributes card shows: hidden, its tag on the card
     if (isinstance(text, str) and "iab-covered" not in classes
             and (_State.current_entity_key or "").startswith("hero|") and _hs_covered(text, dyn_tags)):

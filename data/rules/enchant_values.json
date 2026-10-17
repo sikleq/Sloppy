@@ -46,17 +46,17 @@
   "Crude": {
    "2": [
     "+10% Health Restoration",
-    "+6% BAT Reduction",
+    "+8% BAT Reduction",
     "−6% Intelligence"
    ],
    "3": [
     "+15% Health Restoration",
-    "+9% BAT Reduction",
+    "+12% BAT Reduction",
     "−6% Intelligence"
    ],
    "4": [
     "+20% Health Restoration",
-    "+12% BAT Reduction",
+    "+16% BAT Reduction",
     "−6% Intelligence",
     "Also modifies incoming healing"
    ]

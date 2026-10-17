@@ -1,0 +1,74 @@
+"""Enchantments as tier tables, before -> after (owner 2026-10-17, 7.41: "Vital is written as a bare row… a table? a
+card? Mystical / Crude too" -> variant A: the 7.38 table under each enchantment, a changed cell "was → now")."""
+import glob
+import json
+import os
+import re
+import sys
+
+import pytest
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
+sys.path.insert(0, os.path.join(ROOT, "scripts", "gen"))
+from patch import elements as e  # noqa: E402
+
+
+def test_tier_specs_and_cells():
+    import enchant_table as et
+    assert et._tiers("4/5") == [4, 5] and et._tiers("2-4") == [2, 3, 4] and et._tiers("5") == [5]
+    assert 'class="iab-lv iab-buff">+16%' in e._ench_cell("+12%", "+16%", False, False)
+    assert 'class="iab-lv iab-nerf">−6%' in e._ench_cell("−5%", "−6%", True, False)          # a bigger penalty
+    assert 'class="iab-lv iab-new">+10%' in e._ench_cell(None, "+10%", False, False)          # a tier it has now
+    assert 'class="iab-lv iab-nerf">−10%' in e._ench_cell(None, "−10%", True, False, True)    # a whole new penalty
+    assert 'class="iab-lv iab-del">+40%' in e._ench_cell("+40%", None, False, False)          # a tier it lost
+    assert "ench-zero" in e._ench_cell(None, "0", False, False) and "ench-off" in e._ench_cell(None, None, False, False)
+    assert e._ench_cell(None, "+2", False, True) == '<span class="ench-v">+2</span>'          # a new enchantment
+
+
+def test_every_patch_with_enchant_boxes_has_its_tables():
+    with open(os.path.join(ROOT, "data", "rules", "enchant_tables.json"), encoding="utf-8") as f:
+        have = json.load(f)
+    for path in glob.glob(os.path.join(ROOT, "content", "p*.py")):
+        if "enchant_tier_box(" in open(path, encoding="utf-8").read():
+            code = os.path.basename(path)[1:-3]
+            ver = f"{code[0]}.{code[1:3]}{code[3:]}"
+            assert ver in have, f"run: python scripts/gen/enchant_table.py {ver}"
+    crude = have["7.41"]["Crude"]
+    assert crude["tiers_old"] == [4, 5] and crude["tiers_new"] == [2, 3, 4]
+    bat = next(s for s in crude["stats"] if s["key"] == "bat_reduce")
+    assert bat["new"] == {"2": "+8%", "3": "+12%", "4": "+16%"}          # 7.41, not the 7.41a 6/9/12 (CORRECTIONS)
+
+
+def _page():
+    p = os.path.join(ROOT, "dist", "patches", "7.41.html")
+    if not os.path.exists(p):
+        pytest.skip("site not built")
+    return open(p, encoding="utf-8").read()
+
+
+def _block(html, slug):
+    i = html.index(f'id="dyn-enchant-{slug}"')
+    return html[i:html.find('class="entity ', i + 50)]
+
+
+def test_7_41_enchantments_show_tables_and_keep_only_word_rows():
+    html = _page()
+    assert html.count('class="ench-tiers ench-change"') == 19
+    crude = _block(html, "crude")
+    assert '<span class="ench-was">+30%</span><span class="ench-arrow">→</span><span class="iab-lv iab-nerf">+20%' in crude
+    assert '<span class="iab-lv iab-del">+40%</span>' in crude and '<span class="iab-lv iab-new">+10%</span>' in crude
+    shown = [re.sub(r"<[^>]+>", "", m.group(2)) for m in re.finditer(r"<li\b([^>]*)>(.*?)</li>", crude, re.S)
+             if "iab-covered" not in m.group(1)]
+    assert len(shown) == 2 and any("guaranteed" in s for s in shown) and any("incoming healing" in s for s in shown)
+    vital = _block(html, "vital")
+    assert '<span class="ench-v">+2</span>' in vital and 'class="iab-covered covered-ench"' in vital
+    mystical = _block(html, "mystical")
+    assert 'class="ench-stat ench-gone">Cast Range' in mystical and "None" not in mystical
+
+
+def test_the_filters_know_the_table():
+    js = open(os.path.join(ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    assert "el.classList.contains('ench-change') ? 'covered-ench'" in js
+    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    assert "html.cb-mode .iab-lv.iab-del" in css or "html.cb-mode" in css and ".iab-lv.iab-del" in css
