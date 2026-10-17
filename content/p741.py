@@ -1109,8 +1109,12 @@ def build():
     # the two lists compared old Tier 4 with new Tier 2)
     W(li("Health Restoration bonus rescaled from +30/40% to +10/15/20%", b(30, 20),
          extra=inline_note("Tier 4, the only tier in both: 30% &rarr; 20%")))
-    W(li("Base Attack Time Reduction bonus rescaled from 12/18% to 8/12/16%", b(12, 16),
-         extra=inline_note("Tier 4, the only tier in both: 12% &rarr; 16%")))
+    # Valve's "8/12/16%" is not in the game: items.txt bat_reduce is 6 9 12 in 7.41 (and every later 7.41 build), so
+    # Tier 4 stays at 12% — tagged by the files (patch-tags: wrong-word), the values moved to new tiers: REWORK
+    W(li('Base Attack Time Reduction bonus rescaled from 12/18% to <span class="wrong-word">8/12/16%</span>',
+         t("REWORK"),
+         extra=note_box("This change is wrongly stated. The game files give 6/9/12%: Tier 4, the only tier in both, "
+                        "stays at 12%")))
     W(li("Intelligence Penalty increased from 5% to 6%", b(5, 6, l=True)))
     W(li("Now also modifies incoming healing", t("NEW"),
          extra=inline_note("As a result of Health Restoration changes")))

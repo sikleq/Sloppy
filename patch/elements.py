@@ -1808,6 +1808,22 @@ def _iab_stems(text, drop=()):
     return {_iab_stem(w) for w in re.findall(r"[a-z]{4,}", text.lower()) if w not in _IAB_STOP and w not in drop}
 
 
+def _iab_grow(full, s, segs):
+    """A span (start, end, …) joined with the changed pieces right before / after it (only spaces between), a
+    trailing "and" dropped: "Restores 3000 health" + "and 2000 mana and" -> "Restores 3000 health and 2000 mana"."""
+    a, b = s[0], s[1]
+    grew = True
+    while grew:
+        grew = False
+        for seg in segs:
+            if seg[0] >= b and not full[b:seg[0]].strip():
+                b, grew = seg[1], True
+            elif seg[1] <= a and not full[seg[1]:a].strip():
+                a, grew = seg[0], True
+    m = re.search(r"[\s,;]+and$", full[a:b])
+    return (a, b - (len(m.group(0)) if m else 0), *s[2:])
+
+
 def _iab_with_number(full, s, nums):
     """A coloured span (start, end, …) grown back, within its clause, to the first of the row's numbers before it
     ("2.5 health regeneration"; Mask of Madness 7.41 "8% / 12% movement speed (ranged/melee)", where the diff, numbers
@@ -1860,7 +1876,7 @@ def _iab_text_change(text, tags):
             break
     # a row with numbers: "no longer …", a new property with its value ("now also grants 30% Slow Resistance",
     # Mask of Madness 7.41) or a rewrite ("changed from +25 … to +8%/12% …") — checked below against the text
-    if nums and not re.search(r"\bno longer\b|\bnow (?:also )?(?:provides?|grants?|gives?|increases?|has)\b"
+    if nums and not re.search(r"\bno longer\b|\bnow (?:also )?(?:provides?|grants?|gives?|increases?|has|restores?)\b"
                               r"|\bchanged from\b", low):
         return tailed
     ch = re.search(r"\bchanged from .*? to (.*)", low)
@@ -1905,7 +1921,10 @@ def _iab_text_change(text, tags):
         return any(n in lv and set(lv) <= set(nums) for lv in
                    (re.findall(r"\d+(?:\.\d+)?", g) for g in re.findall(r"\d+(?:\.\d+)?%?(?:\s*/\s*\d+(?:\.\d+)?%?)+", seg)))
     if nums and not all(any(shown(n, full[s[0]:s[1]]) for s in hits) for n in nums):
-        hits = []
+        # a clause the diff cut at "and" ("Restores 3000 health" | "and 2000 mana and", Block of Cheese 7.38): the
+        # pieces right next to a hit join it, then the numbers are checked again
+        grown = [_iab_grow(full, s, diff[side]) for s in hits]
+        hits = grown if grown and all(any(shown(n, full[g[0]:g[1]]) for g in grown) for n in nums) else []
     if not hits and side == "old" and after and not nums:
         # "no longer refreshes items" and the old text lost "items and" ("all your items and abilities" -> "all your
         # abilities", Refresher Shard 7.41 — owner 2026-10-16: it wasn't coloured): the word itself, even one the
@@ -1966,23 +1985,26 @@ def _iab_phrase(card, ability, side, words):
     text, other = (pair[0], pair[1]) if side == "old" else (pair[1], pair[0])
     toks = [(m.start(), m.end(), _iab_stems(m.group(0)))
             for m in _IAB_WORD_RE.finditer(text)]
-    best = None
+    found = []
     for i in range(len(toks)):
+        if not toks[i][2] & words:           # a phrase opens on one of the row's words ("you Savory Shield" doesn't)
+            continue
         got = set()
         for j in range(i, min(i + 6, len(toks))):
             got |= toks[j][2] & words
             if len(got) >= 2:
-                if best is None or toks[j][1] - toks[i][0] < best[1] - best[0]:
-                    best = (toks[i][0], toks[j][1])
+                found.append((toks[i][0], toks[j][1]))
                 break
-    if not best:
-        return None
-    phrase = text[best[0]:best[1]].strip(".,;: ")
-    if phrase.lower() in other.lower():
-        return None
-    before = text[:best[0]].lower()
-    det = next((d for d in _IAB_DETERMINERS if before.endswith(d)), "")
-    return (best[0] - len(det), best[0] + len(phrase))
+    # the shortest that the other side doesn't also say ("Savory Shield" is on both sides of Block of Cheese 7.38,
+    # "Duration: 5 minutes" only on the new one)
+    for best in sorted(found, key=lambda s: s[1] - s[0]):
+        phrase = text[best[0]:best[1]].strip(".,;: ")
+        if phrase.lower() in other.lower():
+            continue
+        before = text[:best[0]].lower()
+        det = next((d for d in _IAB_DETERMINERS if before.endswith(d)), "")
+        return (best[0] - len(det), best[0] + len(phrase))
+    return None
 
 
 def _iab_unpaired_row(text, tags, extra=""):

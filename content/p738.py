@@ -319,6 +319,13 @@ def build():
     # ===== ITEM UPDATES =====
     W(section("Item Updates"))
     W(item_header("Block of Cheese"))
+    # abilities before -> after — written by hand (owner 2026-10-17): the game's tooltip says only "Try me!" in both
+    # patches. Values: items.txt 7.37e / 7.38 (shield 500, regen 100, idle 5, cast range 250 -> none, duration 5,
+    # health_restore 3000, mana_restore 2000); what they mean: server.dll (a barrier against any damage, +100 per
+    # second once 5 s pass without damage, duration x60 = minutes). 7.37e had no duration value.
+    W(item_abilities_change(
+        old=["Use: Scrumptious. Gives an allied hero Savory Shield: a 500 damage barrier that regenerates 100 per second after 5 seconds without taking damage. Cast Range: 250. Cooldown: 40s"],
+        new=["Use: Scrumptious. Restores 3000 health and 2000 mana and gives you Savory Shield: a 500 damage barrier that regenerates 100 per second after 5 seconds without taking damage. Duration: 5 minutes. Cooldown: 40s"]))
     W(ul_open())
     W(li("Scrumptious can no longer be cast on an ally to give them the buff. However, item is still fully shareable", t("REWORK")))
     W(li("Scrumptious now restores 3000 health and 2000 mana when consumed", t("NEW")))

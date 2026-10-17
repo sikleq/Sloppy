@@ -87,6 +87,21 @@ def test_an_item_only_taken_out_says_so_in_its_label():
     assert "html.cb-mode .entity-name .entity-removed-type" in css
 
 
+def test_block_of_cheese_has_a_hand_written_card():
+    # owner 2026-10-17: "Block of Cheese 7.38 — old > new card; the game has no real description" (only "Try me!")
+    seg = re.sub(r'</?b(?: class="iab-num")?>', "", _block(_page("7.38"), "block-of-cheese"))
+    assert 'data-tag="new">Restores 3000 health and 2000 mana</span>' in seg
+    assert 'data-tag="rework">Duration: 5 minutes</span>' in seg
+    shown = [li for li in seg.split("<li")[1:] if "iab-covered" not in li.split(">", 1)[0]]
+    assert len(shown) == 1 and "fully shareable" in shown[0]               # the row says more than the card
+
+
+def test_crude_7_41_marks_valves_wrong_numbers():
+    # Valve's "8/12/16%" isn't in the game files (bat_reduce 6 9 12): wrong-word + the real values (patch-tags)
+    seg = _block(_page("7.41"), "enchant-crude") if 'id="dyn-item-enchant-crude"' in _page("7.41") else _page("7.41")
+    assert '<span class="wrong-word">8/12/16%</span>' in seg and "The game files give 6/9/12%" in seg
+
+
 def test_refresher_shard_colours_the_lost_word():
     seg = _block(_page("7.41"), "refresher-shard")
     assert '<span class="iab-hl iab-hl-del" data-tag="del">items</span>' in seg
