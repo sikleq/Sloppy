@@ -26,7 +26,11 @@ def main():
         dest = os.path.join(OUT, f"{r['sha8']}.webp")
         if os.path.exists(dest):
             continue
-        im = Image.open(os.path.join(OG, "versions", r["patch"], "map.webp")).convert("RGB")
+        src = os.path.join(OG, "versions", r["patch"], "map.webp")
+        if not os.path.exists(src):            # Oldgrowth hasn't drawn this map file yet: rerun once it has
+            print("no picture yet:", r["patch"], "-", os.path.relpath(src, OG))
+            continue
+        im = Image.open(src).convert("RGB")
         im.thumbnail((SIZE, SIZE), Image.LANCZOS)
         im.save(dest, "WEBP", quality=80, method=6)
         made += 1

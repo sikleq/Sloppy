@@ -65,6 +65,14 @@ def test_tiles_chart_and_the_terrain_menu():
     assert 'href="terrain_stats.html">Terrain Stats</a>' in site.render_materials_subnav("terrain_stats")
 
 
+def test_a_client_update_map_file_sorts_after_its_patch_and_is_not_a_patch():
+    # 2026-10-17: Valve shipped a new map file inside 7.41f (2026-10-07, no patch notes), keyed '7.41f-1007'
+    keys = ["7.42", "7.41f-1007", "7.41f", "7.41e", "7.41"]
+    assert sorted(keys, key=ts._key) == ["7.41", "7.41e", "7.41f", "7.41f-1007", "7.42"]
+    assert ts.is_update("7.41f-1007") and not ts.is_update("7.41f") and not ts.is_update("7.41")
+    assert ts.count_patches([{"patch": "7.41f"}, {"patch": "7.41f-1007"}, {"patch": "7.42"}]) == 2
+
+
 def test_terrain_pages_never_delete_the_stats_page_and_styles_stay_scoped():
     src = open(os.path.join(_ROOT, "builders", "terrain.py"), encoding="utf-8").read()
     assert '"terrain_[0-9]*.html"' in src and '"terrain_*.html"' not in src

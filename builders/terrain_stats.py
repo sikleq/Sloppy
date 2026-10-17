@@ -52,8 +52,20 @@ _esc = _site.esc
 
 
 def _key(v):
-    m = _re.match(r"(\d+)\.(\d+)([a-z]?)", v)
-    return int(m.group(1)), int(m.group(2)), m.group(3)
+    """'7.41f' < '7.41f-1007' < '7.42': a map file Valve shipped inside a patch, in a client update with no patch
+    notes, is keyed '<patch>-MMDD' and sorts right after its patch (2026-10-17, a new map file of 2026-10-07)."""
+    m = _re.match(r"(\d+)\.(\d+)([a-z]?)(?:-(\d{4}))?", v)
+    return int(m.group(1)), int(m.group(2)), m.group(3), m.group(4) or ""
+
+
+def is_update(v):
+    """A '<patch>-MMDD' key: a map file of a client update inside a patch, not a patch of its own."""
+    return _re.fullmatch(r"\d+\.\d+[a-z]?-\d{4}", v) is not None
+
+
+def count_patches(rows):
+    """The patches of the history — client updates inside a patch are map files, not patches."""
+    return sum(1 for r in rows if not is_update(r["patch"]))
 
 
 def _icon(path, size=16):
@@ -235,7 +247,7 @@ def table_html(files, pages):
 def build():
     files = load()
     with open(DATA, encoding="utf-8") as f:
-        n_patches = len(_json.load(f)["patches"])
+        n_patches = count_patches(_json.load(f)["patches"])
     pages = set(_terrain.page_patches()[0])
     nav = _site.render_top_nav("materials", _terrain._latest_href(), patch_context=False,
                                subtabs_active="terrain_stats", subnav_in_header=False)
