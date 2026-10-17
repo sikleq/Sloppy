@@ -27,17 +27,22 @@ def test_the_ability_a_row_starts_with_wins():
     assert e._iab_row_ability("damage block chance increased", None, {"guard", "damage block"}) == "damage block"
 
 
-def test_header_levels_compact_and_a_changed_level_alone_is_coloured():
-    # owner 2026-10-17, Dagon 7.41: the header's 5-level values like the % badges; a change at one level shows it
+def test_header_levels_show_level_one_dotted_and_every_level_on_hover():
+    # owner 2026-10-17, Dagon 7.41: "the level-1 value in the header, dotted — the popup has all levels"; a change at
+    # one level is coloured in that popup
     ico = '<img class="iab-ico" src="../icons/ui/ability/cooldown.png" alt="">'
     chip = f'<span class="iab-m">{ico}27/24/21/18/15</span>'
     out = e._iab_compact_levels(chip)
-    assert '27<span class="iab-range" aria-hidden="true">…</span>15' in out and "21" not in out
-    assert e._iab_compact_levels(chip, keep={"cooldown"}) == chip               # a changed value keeps every level
+    assert 'data-tooltip="Levels 1–5: 27 / 24 / 21 / 18 / 15">27</span>' in out and "iab-hint" in out
+    pct = e._iab_compact_levels(f'<span class="iab-m">{ico}10/20/30/40/50%</span>')
+    assert '">10%</span>' in pct                                                 # the unit of the last level
     four = f'<span class="iab-m">{ico}12/10/8/6</span>'
     assert e._iab_compact_levels(four) == four
     marked = e._iab_chip_mark(ico, "27/24/21/18/12", "27/24/21/18/15", "buff", "")
-    assert marked.endswith('27/24/21/18/<span class="iab-lv iab-buff">12</span></span>')
+    assert 'class="iab-m iab-buff"' in marked and '">27</span></span>' in marked
+    assert "18 / &lt;span class=&quot;iab-lv iab-buff&quot;&gt;12&lt;/span&gt;" in marked
+    three = e._iab_chip_mark(ico, "12/10/6", "12/10/8", "buff", "")
+    assert three.endswith('12/10/<span class="iab-lv iab-buff">6</span></span>')
     assert 'class="iab-m iab-nerf"' in e._iab_chip_mark(ico, "640", "700/750/800/850/900", "nerf", "")
     assert e._tone_cls('<span class="badge nerf3 rng-start">-9%</span>') == "badge nerf3 tone"
 
@@ -54,16 +59,46 @@ def _block(html, item):
     return html[i:html.find('class="entity ', i + 50)]
 
 
+def test_components_keep_the_old_sides_order():
+    # owner 2026-10-17: Guardian Greaves 7.41 "1775 + 1400 → 1500 + 1775" read as a cheaper Mekansm
+    assert e._in_old_order([("Mekansm", 1775), ("Arcane Boots", 1400)],
+                           [("Arcane Boots", 1500), ("Mekansm", 1775), ("Chainmail", 500)]) == \
+        [("Mekansm", 1775), ("Arcane Boots", 1500), ("Chainmail", 500)]
+    seg = re.sub(r"<[^>]+>", " ", _block(_page("7.41"), "guardian-greaves"))
+    assert re.search(r"1775\s+\+\s+1400\s+\+\s+1125\s+=\s+4300\s+→\s+1775\s+\+\s+1500\s+\+\s+1175", seg)
+
+
+def test_two_changes_of_an_ability_bring_its_card():
+    # owner 2026-10-17: Ash Legion Shield 7.41 "2 changes of the ability — shouldn't it be a card?"
+    seg = re.sub(r'</?b(?: class="iab-num")?>', "", _block(_page("7.41"), "ash-legion-shield"))
+    assert "iab-change" in seg and '<span class="iab-name">Shield Wall</span>' in seg
+    shown = [li for li in seg.split("<li")[1:] if "iab-covered" not in li.split(">", 1)[0]]
+    assert not shown                                                      # both rows went into the card
+
+
+def test_an_item_only_taken_out_says_so_in_its_label():
+    # owner 2026-10-17: "Neutral Item cycled out" in the DEL colour where "Returning Tier 2 Artifact" stands, the tag
+    # hidden for the filters
+    seg = _block(_page("7.39"), "pig-pole")
+    assert '<span class="entity-removed-type">Neutral Item cycled out</span>' in seg and 'data-tag="del' in seg
+    assert '<span class="entity-removed-type">Item removed</span>' in _block(_page("7.41"), "cornucopia")
+    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    assert ".entity-block.is-removed ul.changes { display: none !important; }" in css
+    assert "html.cb-mode .entity-name .entity-removed-type" in css
+
+
 def test_refresher_shard_colours_the_lost_word():
     seg = _block(_page("7.41"), "refresher-shard")
     assert '<span class="iab-hl iab-hl-del" data-tag="del">items</span>' in seg
 
 
-def test_dagon_header_shows_ranges_and_the_changed_cast_range_in_full():
+def test_dagon_header_shows_level_one_values_on_both_sides():
     seg = _block(_page("7.41"), "dagon")
     card = seg[seg.index("iab-change"):]
-    assert card.count('<span class="iab-range" aria-hidden="true">…</span>') == 4      # mana + cooldown, both sides
-    assert "700/750/800/850/900" in card and "120/140/160/180/200" not in card
+    assert card.count('data-tooltip="Levels 1–5: 120 / 140 / 160 / 180 / 200">120</span>') == 2   # mana, both sides
+    assert card.count('data-tooltip="Levels 1–5: 27 / 24 / 21 / 18 / 15">27</span>') == 2         # cooldown
+    assert 'data-tooltip="Levels 1–5: 700 / 750 / 800 / 850 / 900">700</span>' in card              # old cast range
+    assert not re.search(r'class="iab-m[^"]*"><img[^>]*>\d+(?:/\d+){4}<', card)    # no header shows the full list
 
 
 def test_rows_the_card_shows_go_into_it():

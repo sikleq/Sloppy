@@ -47,6 +47,10 @@ def build():
     W(li("Health Regen bonus increased from +6 to +6.5", b(6, 6.5)))
     W(ul_close())
     W(item_header("Helm of the Overlord"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Dominate. Takes control of one neutral target unit and sets its movement speed to 380 and max health to a minimum of 1800. Also provides the unit with +70 base attack damage, +12 health regen, +4 mana regen, +7 armor, and levels up some abilities of the target by 1 level. Dominated units with a max health of greater than 1800 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 250 gold and it can no longer be killed by abilities that instantly kill creeps otherwise. The Helm cannot be used for 3 seconds after the dominated creep takes damage from an enemy hero or Roshan. Cast Range: 700. Mana Cost: 50. Cooldown: 45s"],
+        new=["Active: Dominate. Takes control of one neutral target unit and sets its movement speed to 380 and max health to a minimum of 1900. Also provides the unit with +70 base attack damage, +12 health regen, +4 mana regen, +7 armor, and levels up some abilities of the target by 1 level. Dominated units with a max health of greater than 1900 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 250 gold and it can no longer be killed by abilities that instantly kill creeps otherwise. The Helm cannot be used for 3 seconds after the dominated creep takes damage from an enemy hero or Roshan. Cast Range: 700. Mana Cost: 50. Cooldown: 40s"]))
     W(ul_open())
     W(li("Dominate cooldown decreased from 45s to 40s", b(45, 40, l=True)))
     W(li("Dominate target unit's max health minimum increased from 1800 to 1900", b(1800, 1900)))
@@ -85,6 +89,10 @@ def build():
     W(li("Pollinate radius increased from 700 to 900", b(700, 900)))
     W(ul_close())
     W(item_header("Conjurer's Catalyst"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Spellover. Dealing 100 spell damage to an enemy causes them to overheat and deal damage to their allies in a 300 unit radius. Hero targets deal 40 damage to their allies, other targets deal 15 damage."],
+        new=["Passive: Spellover. Dealing 200 spell damage to an enemy causes them to overheat and deal damage to their allies in a 300 unit radius. Hero targets deal 80 damage to their allies, other targets deal 30 damage."]))
     W(ul_open())
     W(li("Spellover now has a 0.1s internal cooldown", t("NERF"), extra=inline_note("Still can proc multiple times from a single instance of high damage")))
     W(li("Spellover damage threshold increased from 100 to 200", b(100, 200, l=True)))

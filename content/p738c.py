@@ -93,6 +93,10 @@ def build():
     W(li("Flay Bonus Damage (Heroes) increased from 12 to 16", b(12, 16)))
     W(ul_close())
     W(item_header("Searing Signet"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Burn Through. Instances of magic damage from spells over 55 ignites enemies, causing them to take 75 magic damage over 5 seconds."],
+        new=["Passive: Burn Through. Instances of magic damage from spells over 55 ignites enemies, causing them to take 72 magic damage over 6 seconds."]))
     W(ul_open())
     W(li("Burn Through duration increased from 5s to 6s", b(5, 6)))
     W(li("Burn Through total damage decreased from 75 to 72", b(75, 72), extra=inline_note("Damage per second decreased from 15 to 12 — " + b(15, 12))))

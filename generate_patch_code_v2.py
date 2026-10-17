@@ -2543,6 +2543,35 @@ def _recipe_unchanged_total_badge(a, b_val, tail):
     return f"b([{a}, {m.group(1)}], [{b_val}, {m.group(1)}], l=True, slash=True)"
 
 
+_REMOVED_ROW_RE = re.compile(r'^\s*W\(li\("(Item [Cc]ycled [Oo]ut|Item removed from the game|Removed)", t\("DEL"\)\)\)\s*$')
+_REMOVED_HDR_RE = re.compile(r'^(\s*)W\((item_header|enchant_header)\(("(?:[^"\\]|\\.)*")\)\)\s*$')
+
+
+def _postprocess_removed_label(lines):
+    """An item / enchantment whose one row says it was taken out gets its label where "Returning Tier 2 Artifact"
+    stands, in the DEL colour (owner 2026-10-17): "Neutral Item cycled out" / "Neutral Item removed" in the neutral
+    items' section, else "Item cycled out" / "Item removed", "Enchantment removed". The row stays (hidden by CSS,
+    still counted by the tag filters)."""
+    out = list(lines)
+    neutral = False
+    for i, ln in enumerate(out):
+        if re.match(r'\s*W\(section\(', ln):
+            neutral = "Neutral Item" in ln
+        m = _REMOVED_HDR_RE.match(ln)
+        if not m or i + 3 >= len(out) or out[i + 1].strip() != "W(ul_open())" or out[i + 3].strip() != "W(ul_close())":
+            continue
+        r = _REMOVED_ROW_RE.match(out[i + 2])
+        if not r:
+            continue
+        if m.group(2) == "enchant_header":
+            label = "Enchantment removed"
+        else:
+            label = (("Neutral Item " if neutral else "Item ")
+                     + ("cycled out" if "cycled out" in r.group(1).lower() else "removed"))
+        out[i] = f'{m.group(1)}W({m.group(2)}({m.group(3)}, removed="{label}"))'
+    return out
+
+
 def _postprocess_recipe_cost_zero_net(lines):
     """Rewrite recipe-cost rows to the one badge form (owner 2026-09-26): every % at the end of the row.
     - Both recipe and total changed: "... A to B. Total cost ... C to D", badge "+x% / +y%" (recipe / total),
@@ -3701,6 +3730,7 @@ def generate(version):
     out = _postprocess_drop_now_requires(out)
     out = _postprocess_recipe_cost_zero_net(out)
     out = _postprocess_rework_marker(out)
+    out = _postprocess_removed_label(out)             # "Neutral Item cycled out" label — owner 2026-10-17
 
     # Close the page: footer + save. Emitted so the wrapped content/pXXX.py is
     # complete — without these the site build runs green but the patch HTML is

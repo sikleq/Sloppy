@@ -110,6 +110,12 @@ def build():
     W(plain_header("Artifact changes", dynamics=False, sublabel=True))
 
     W(item_header("Sister's Shroud"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Veiled. When falling below 50% HP, gain 200% evasion for 8 seconds. While active, dodging an attack decreases the evasion bonus by 75% of its current value.",
+             "Passive: Last Caress. Veiled cooldown is only reset if the wearer dies or kills an enemy hero."],
+        new=["Passive: Veiled. When falling below 50% HP, gain 150% evasion for 5 seconds. While active, dodging an attack decreases the evasion bonus by 75% of its current value.",
+             "Passive: Last Caress. Veiled cooldown is only reset if the wearer dies or kills an enemy hero."]))
     W(ul_open())
     W(li("Veiled starting evasion decreased from 200% to 150%", b(200, 150)))
     W(li("Veiled duration decreased from 8s to 5s", b(8, 5)))

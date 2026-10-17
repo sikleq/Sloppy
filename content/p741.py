@@ -312,7 +312,7 @@ def build():
     W(li("Magic Resistance bonus decreased from +20% to +18%", b(20, 18)))
     W(li("Cost increased from 800g to 900g", b(800, 900, l=True)))
     W(ul_close())
-    W(item_header("Cornucopia"))
+    W(item_header("Cornucopia", removed="Item removed"))
     W(ul_open())
     W(li("Item removed from the game", t("DEL")))
     W(ul_close())
@@ -457,6 +457,10 @@ def build():
     W(li("Ranged Attack Range bonus decreased from +140 to +130", b(140, 130)))
     W(ul_close())
     W(item_header("Hurricane Pike"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Hurricane Thrust. Pushes you and target enemy 450 units away from each other, and for 6 seconds, allows you to make 5 attacks against the target without range restrictions and with +100 attack speed. Can be cast on self or allies to push the target 600 units in the direction it is facing. Enemy Range: 450. Cast Range: 650. Mana Cost: 150. Cooldown: 19s"],
+        new=["Active: Hurricane Thrust. Pushes you and target enemy 425 units away from each other, and for 6 seconds, allows you to make 5 attacks against the target without range restrictions and with +100 attack speed. Can be cast on self or allies to push the target 600 units in the direction it is facing. Enemy Range: 425. Cast Range: 650. Mana Cost: 150. Cooldown: 19s"]))
     W(ul_open())
     W(li("Ranged Attack Range bonus decreased from +140 to +130", b(140, 130)))
     W(li("Hurricane Thrust cast range on enemies decreased from 450 to 425", b(450, 425)))
@@ -491,7 +495,7 @@ def build():
     W(li("Endurance now shares cooldown with Drum of Endurance", t("NERF")))
     W(li("Swiftness Aura now also provides +2.5 Health Regen", t("NEW")))
     W(ul_close())
-    W(item_header("Eternal Shroud"))
+    W(item_header("Eternal Shroud", removed="Item removed"))
     W(ul_open())
     W(li("Item removed from the game", t("DEL")))
     W(ul_close())
@@ -651,6 +655,10 @@ def build():
          extra=inline_note("As a result of Health Restoration changes")))
     W(ul_close())
     W(item_header("Eye of Skadi"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Cold Attack. Attacks lower enemy movement by -25% if they are melee and -50% if they are ranged. Attacks also lower enemy attack speed by -20%. Additionally it reduces Health Restoration by 40% and Incoming Heals by 40% Lasts for 3 seconds."],
+        new=["Passive: Cold Attack. Attacks lower enemy movement by -25% if they are melee and -50% if they are ranged. Attacks also lower enemy attack speed by -20% and Health Restoration by 50%. Lasts for 3 seconds."]))
     W(ul_open())
     W(li("Cold Attack no longer has a separate value for incoming heal reduction", t("MISC"),
          extra=inline_note("Still reduces incoming heals due to Health Restoration changes")))
@@ -827,6 +835,10 @@ def build():
     W(li("Number of artifact choices increased from 4 to 5 for Tiers 2-5", b(4, 5)))
     W(ul_close())
     W(item_header("Ash Legion Shield"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Shield Wall. Reduce your own movement speed by 12 to provide a 140 physical damage barrier to all friendly player-controlled units in a 800 unit radius. Lasts for 6 seconds. Cooldown: 40s"],
+        new=["Active: Shield Wall. Reduce your own movement speed by 20 to provide a 160 physical damage barrier to allied player controlled units in a 800 unit radius. Lasts for 6 seconds. Cooldown: 40s"]))
     W(ul_open())
     W(li("Shield Wall damage barrier increased from 140 to 160", b(140, 160)))
     W(li("Shield Wall movement speed reduction increased from 12 to 20", b(12, 20, l=True)))
@@ -869,6 +881,10 @@ def build():
     W(li("Loaded now also increases max base damage by 6", t("NEW")))
     W(ul_close())
     W(item_header("Crippling Crossbow"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Hobble. Hits an enemy for 75 damage, then slows them by 80% and reduces Health Restoration by 40% for 4 seconds. The slow gradually fades over the duration of the spell. Cast Range: 800. Mana Cost: 50. Cooldown: 12s"],
+        new=["Active: Hobble. Hits an enemy for 25 damage, then slows them by 50% and reduces Health Restoration by 40% for 4 seconds. The slow gradually fades over the duration of the spell. Cast Range: 650. Mana Cost: 50. Cooldown: 30s"]))
     W(ul_open())
     W(li("Hobble initial damage decreased from 75 to 25", b(75, 25)))
     W(li("Hobble Max slow decreased from 80% to 50%", b(80, 50)))
@@ -886,6 +902,10 @@ def build():
          extra=inline_note("Dormant Curio increases duration from 8s to 10.4s")))
     W(ul_close())
     W(item_header("Searing Signet"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Burn Through. Instances of magic damage from spells over 55 ignites enemies, causing them to take 90 magic damage over 6 seconds. Burn damage against non-hero targets is decreased by 50%."],
+        new=["Passive: Burn Through. Instances of magic damage from spells over 60 ignites enemies, causing them to take 80 magic damage over 6 seconds. Burn damage against non-hero targets is decreased by 50%."]))
     W(ul_open())
     W(li("Burn Through: Total Damage decreased from 90 to 80", b(90, 80), extra=inline_note("From 117 to 104 with Dormant Curio")))
     W(li("Burn Through: Damage Threshold increased from 55 to 60", b(55, 60, l=True)))
@@ -895,7 +915,7 @@ def build():
     W(li("Active: Verdurous Dale. Place a 400 unit circle on the ground for 8s that increases health regeneration of allies inside by 8 + 25% of the caster's health regeneration. Cast Range: 350. No Mana Cost. Cooldown: 35s", t("NEW"),
          extra=inline_note("Dormant Curio increases health regeneration from 8 to 10.4 and from 25% to 32.5%")))
     W(ul_close())
-    W(item_header("Whisper of the Dread"))
+    W(item_header("Whisper of the Dread", removed="Neutral Item cycled out"))
     W(ul_open())
     W(li("Item cycled out", t("DEL")))
     W(ul_close())
@@ -956,6 +976,10 @@ def build():
                            "<br>You can select any Enchantments during re-craft and bonus will still keep increasing as long as you keep Enchanter's Bauble")))
     W(ul_close())
     W(item_header("Metamorphic Mandible"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Pupate. Enter into an insect form for 4 seconds, increasing magic resistance by 35% and movement speed by 15%. While an insect, your size is decreased and your armor is reduced by 45%. Cooldown: 30s"],
+        new=["Active: Pupate. Enter into an insect form for 5 seconds, increasing magic resistance by 50% and movement speed by 15%. While an insect, your size is decreased and your armor is reduced by 45%. Cooldown: 30s"]))
     W(ul_open())
     W(li("Pupate duration increased from 4s to 5s", b(4, 5), extra=inline_note("From 5.2s to 6.5s with Dormant Curio")))
     W(li("Pupate bonus magic resistance increased from 35% to 50%", b(35, 50)))
@@ -977,6 +1001,10 @@ def build():
                            "<br>The buff counts only current abilities that have cooldown, even if it's passive — Invoked abilities and sub-abilities don't count when they're hidden")))
     W(ul_close())
     W(item_header("Riftshadow Prism"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Refract. Spend 10% of your current health to create a full health illusion that lasts for 20 seconds. The illusion has 50% outgoing damage and takes 240% of incoming damage. Cooldown: 30s"],
+        new=["Active: Refract. Spend 8% of your current life total to create a full health illusion that lasts for 20 seconds. The illusion has 50% outgoing damage and takes 200% of incoming damage. Cooldown: 30s"]))
     W(ul_open())
     W(li("Refract health cost decreased from 10% to 8%", b(10, 8, l=True)))
     W(li("Refract incoming damage decreased from 240% to 200%", b(240, 200, l=True)))
@@ -1032,15 +1060,15 @@ def build():
         ("int", ["Feverish"]),
         ("uni", ["Manic"]),
     ], tiers=5))
-    W(enchant_header("Boundless"))
+    W(enchant_header("Boundless", removed="Enchantment removed"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
-    W(enchant_header("Vast"))
+    W(enchant_header("Vast", removed="Enchantment removed"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())
-    W(enchant_header("Wise"))
+    W(enchant_header("Wise", removed="Enchantment removed"))
     W(ul_open())
     W(li("Removed", t("DEL")))
     W(ul_close())

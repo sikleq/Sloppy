@@ -139,11 +139,10 @@ def insert_cards(lines, version, prev, name_to_slug):
             i = j
             continue
         old, new = item_abilities(slug, prev), item_abilities(slug, version)
-        if old is None or new is None or not (old or new) or _norm(old) == _norm(new) or _same_words(old, new):
+        if old is None or new is None or not (old or new):
             i = j
             continue
         names = {re.match(r"\w+: ([^.!]+)", t).group(1).lower() for t in old + new if re.match(r"\w+: ([^.!]+)", t)}
-        about = False
         stmts, cur, depth = [], "", 0                  # whole statements: an li() may span several lines
         for x in block:
             cur += x + "\n"
@@ -151,6 +150,18 @@ def insert_cards(lines, version, prev, name_to_slug):
             if depth <= 0:
                 stmts.append(cur)
                 cur, depth = "", 0
+        # two or more rows about the ability bring the card even when only its numbers changed (owner 2026-10-17,
+        # Ash Legion Shield 7.41: "2 changes of the ability — shouldn't it be a card?")
+        rows_about = [tm.group(1) for x in stmts for tm in [re.search(r'W\(li\(\s*"((?:[^"\\]|\\.)*)"', x)]
+                      if tm and not _NOT_ABILITY_RE.search(tm.group(1))
+                      and any(n and tm.group(1).lower().startswith(n) for n in names)]
+        # never two identical boxes (Block of Cheese 7.38 "Try me!" both times): the description changed, or the rows
+        # change the header's values (Witchbane 7.41d cast range + mana cost)
+        header = any(re.search(r"\b(?:cast range|mana cost|health cost|cooldown|radius)\b", r, re.I) for r in rows_about)
+        about = len(rows_about) >= 2 and old != new and (not _same_words(old, new) or header)
+        if not about and (_norm(old) == _norm(new) or _same_words(old, new)):
+            i = j
+            continue
         for x in stmts:
             if "properties_change(" in x:               # "Damage Block (passive)" removed in the stats card
                 for pm in re.finditer(r'\(\s*"(?:DEL|NEW|REWORK)"\s*,\s*"((?:[^"\\]|\\.)*)"', x):

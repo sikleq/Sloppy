@@ -22,6 +22,12 @@ def build():
 
     W(section("Item Updates"))
     W(item_header("Bloodstone"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Bloodpact. Increases Bloodstone's Spell Lifesteal to 60%. Lasts 5 seconds. Cooldown: 30s",
+             "Passive: Spell Weakness Aura. Enemy units take 12% increased damage from spells. Radius: 1200."],
+        new=["Active: Bloodpact. Increases Bloodstone's Spell Lifesteal to 60%. Lasts 5 seconds. Cooldown: 35s",
+             "Passive: Spell Weakness Aura. Enemy units take 10% increased damage from spells. Radius: 1200."]))
     W(ul_open())
     W(li(
         '<span class="wrong-word">Health bonus increased from +600 to +625</span>',
@@ -61,6 +67,10 @@ def build():
     W(li("Mage Slayer damage per second decreased from 40 to 35", b(40, 35)))
     W(ul_close())
     W(item_header("Silver Edge"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Shadow Walk. Makes you invisible for 17 seconds, or until you attack or cast a spell. While invisible, you move 25% faster and can move through units. Attacking to end the invisibility will deal 300 bonus physical damage, disable their passive abilities for 5 seconds, and cap their movement speed to 200. Mana Cost: 75. Cooldown: 20s"],
+        new=["Active: Shadow Walk. Makes you invisible for 17 seconds, or until you attack or cast a spell. While invisible, you move 22% faster and can move through units. Attacking to end the invisibility will deal 300 bonus physical damage, disable their passive abilities for 5 seconds, and cap their movement speed to 200. Mana Cost: 75. Cooldown: 22s"]))
     W(ul_open())
     W(li("Shadow Walk bonus movement speed decreased from 25% to 22%", b(25, 22)))
     W(li("Shadow Walk cooldown increased from 20s to 22s", b(20, 22, l=True)))

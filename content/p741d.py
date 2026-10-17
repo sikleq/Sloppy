@@ -71,11 +71,21 @@ def build():
     W(li("Refract illusion's outgoing damage increased from 50% to 60%", b(50, 60)))
     W(ul_close())
     W(item_header("Spider Legs"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Skitter. Grants you 20% bonus movement speed, 50% improved turn rate, and free pathing for 14 seconds. Walking over trees causes them to be destroyed. Cooldown: 20s"],
+        new=["Active: Skitter. Grants you 20% bonus movement speed, 50% improved turn rate, and free pathing for 12 seconds. Walking over trees causes them to be destroyed. Cooldown: 15s"]))
     W(ul_open())
     W(li("Skitter cooldown decreased from 20s to 15s", b(20, 15, l=True)))
     W(li("Skitter duration decreased from 14s to 12s", b(14, 12)))
     W(ul_close())
     W(item_header("Witchbane"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Cleanse. Dispel all enemies and allies in a 300 unit radius. Dispel Type: Basic Dispel. Cast Range: 500. Mana Cost: 150. Cooldown: 40s",
+             "Passive: Subjugate. Your attacks deal bonus magical damage equal to 4% of your target's Max Mana."],
+        new=["Active: Cleanse. Dispel all enemies and allies in a 300 unit radius. Dispel Type: Basic Dispel. Cast Range: 700. Mana Cost: 50. Cooldown: 40s",
+             "Passive: Subjugate. Your attacks deal bonus magical damage equal to 4% of your target's Max Mana."]))
     W(ul_open())
     W(li("Cleanse cast range increased from 500 to 700", b(500, 700)))
     W(li("Cleanse: Mana Cost decreased from 150 to 50", b(150, 50, l=True)))

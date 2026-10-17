@@ -28,11 +28,19 @@ def build():
     # ===== ITEM UPDATES =====
     W(section("Item Updates"))
     W(item_header("Eye of Skadi"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Cold Attack. Attacks lower enemy movement by -20% if they are melee and -50% if they are ranged. Attacks also lower enemy attack speed by -10%. Additionally it reduces all healing, lifesteal and regen by 40% Lasts for 3 seconds."],
+        new=["Passive: Cold Attack. Attacks lower enemy movement by -25% if they are melee and -50% if they are ranged. Attacks also lower enemy attack speed by -20%. Additionally it reduces all healing, lifesteal and regen by 40% Lasts for 3 seconds."]))
     W(ul_open())
     W(li("Cold Attack Melee Movement Slow increased from 20% to 25%", b(20, 25)))
     W(li("Cold Attack no longer has a separate attack speed slow value against melee targets", t("BUFF"), extra=inline_note("As a result, attack slow against melee units increased from 10% to 20% — " + b(10, 20))))
     W(ul_close())
     W(item_header("Glimmer Cape"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Glimmer. After a 0.5 second delay, grants invisibility, 40 movement speed and a magic damage barrier that absorbs up to 300 damage to you or a target allied unit for 5 seconds. Can be cast while channeling. Cast Range: 600. Mana Cost: 90. Cooldown: 14s"],
+        new=["Active: Glimmer. After a 0.5 second delay, grants invisibility, 20 movement speed and a magic damage barrier that absorbs up to 300 damage to you or a target allied unit for 5 seconds. Can be cast while channeling. Cast Range: 600. Mana Cost: 125. Cooldown: 14s"]))
     W(ul_open())
     W(li("Glimmer Bonus Movement Speed decreased from 40 to 20", b(40, 20)))
     W(li("Glimmer Mana Cost increased from 90 to 125", b(90, 125, l=True)))
@@ -44,6 +52,10 @@ def build():
     W(li("Recipe cost increased from 275 to 450", b([275, 2600], [450, 2600], l=True, slash=True), extra=inline_note("Total cost unchanged")))
     W(ul_close())
     W(item_header("Khanda"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Empower Spell. The next Unit Target spell you cast on an enemy deals a separate 250 additional damage and applies a debuff that slows the target by 30% and disables their passives for 3s. Cooldown: 12s"],
+        new=["Passive: Empower Spell. The next Unit Target spell you cast on an enemy deals a separate 250 additional damage and applies a debuff that slows the target by 30% and disables their passives for 4s. Cooldown: 10s"]))
     W(ul_open())
     W(li("Empower Spell Debuff Duration increased from 3s to 4s", b(3, 4)))
     W(li("Empower Spell Cooldown decreased from 12s to 10s", b(12, 10, l=True)))
@@ -81,6 +93,10 @@ def build():
     W(li("Impeding Corruption duration decreased from 5s to 3s", b(5, 3)))
     W(ul_close())
     W(item_header("Pig Pole"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Pig, Out!. Turns your hero into a critter for 4 seconds and gives them +15% Movement Speed. Cooldown: 25s"],
+        new=["Active: Pig, Out!. Turns your hero into a critter for 3 seconds and gives them +20% Movement Speed. Cooldown: 20s"]))
     W(ul_open())
     W(li("Pig, Out! bonus movement speed increased from 15% to 20%", b(15, 20)))
     W(li("Pig, Out! cooldown decreased from 25s to 20s", b(25, 20, l=True)))
@@ -103,6 +119,10 @@ def build():
     W(li("Dark Mercy enemy HP increment increased from 5% to 7%", b(5, 7)))
     W(ul_close())
     W(item_header("Essence Ring"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Life Essence. Increases your current and max health by 240 for 15 seconds. Mana Cost: 150. Cooldown: 25s"],
+        new=["Active: Life Essence. Increases your current and max health by 240 for 10 seconds. Mana Cost: 160. Cooldown: 25s"]))
     W(ul_open())
     W(li("Life Essence duration decreased from 15s to 10s", b(15, 10)))
     W(li("Life Essence mana cost increased from 150 to 160", b(150, 160, l=True)))

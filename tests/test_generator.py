@@ -291,6 +291,23 @@ def test_recipe_total_unchanged_split_note_is_badge_not_misc():
                    'extra=inline_note("Total cost unchanged at 4500g")))')
 
 
+def test_an_item_only_taken_out_gets_the_removed_label():
+    """Owner 2026-10-17: "Neutral Item cycled out" / "Item removed" where "Returning Tier 2 Artifact" stands."""
+    lines = ['W(section("Item Updates"))', 'W(item_header("Cornucopia"))', 'W(ul_open())',
+             'W(li("Item removed from the game", t("DEL")))', 'W(ul_close())',
+             'W(section("Neutral Item Updates"))', 'W(item_header("Pig Pole"))', 'W(ul_open())',
+             'W(li("Item Cycled Out", t("DEL")))', 'W(ul_close())',
+             'W(enchant_header("Vast"))', 'W(ul_open())', 'W(li("Removed", t("DEL")))', 'W(ul_close())',
+             'W(item_header("Pirate Hat"))', 'W(ul_open())', 'W(li("Item cycled out", t("DEL")))',
+             'W(li("Something else", t("BUFF")))', 'W(ul_close())']
+    out = g._postprocess_removed_label(lines)
+    assert out[1] == 'W(item_header("Cornucopia", removed="Item removed"))'
+    assert out[6] == 'W(item_header("Pig Pole", removed="Neutral Item cycled out"))'
+    assert out[10] == 'W(enchant_header("Vast", removed="Enchantment removed"))'
+    assert out[14] == 'W(item_header("Pirate Hat"))'                    # another row too: not "only taken out"
+    assert out[3] == lines[3]                                            # the DEL row stays for the filters
+
+
 def test_an_abilities_card_brings_the_stats_card():
     """Owner 2026-10-17, Refresher Orb 7.41: no build change, but an abilities card — its stats go into a card too;
     without either card the stat rows stay rows (Sange and Yasha, 2026-09-28)."""

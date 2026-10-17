@@ -556,11 +556,21 @@ def new_stats(rows, title=None):
     return f'{head}<div class="stat-table">{"".join(cells)}</div>'
 
 
-def item_header(name, new=False, changed=False):
+def _removed_label(removed):
+    """("Neutral Item cycled out" / "Item removed" / "Enchantment removed") — an item that was only taken out: its
+    label in the DEL colour where "Returning Tier 2 Artifact" stands; its one DEL row stays, hidden, for the filters
+    (owner 2026-10-17: "the tag itself set hidden for the filters")."""
+    return f' <span class="entity-removed-type">{removed}</span>', 'is-removed'
+
+
+def item_header(name, new=False, changed=False, removed=None):
     out = _close_ability_block()
     _State.current_hero = None
     _State.current_unit = None
-    if new:
+    if removed:
+        type_label, extra_cls = _removed_label(removed)
+        block_data_attr = ''
+    elif new:
         tag_text = 'NEW'
         type_text = new if isinstance(new, str) else ''
         type_label = (f' <span class="entity-new-type">{type_text}</span>'
@@ -792,11 +802,14 @@ def enchant_row(name, stats, tiers, slug=None, new=True):
 </div><div class="ench-tiers"{tag}>{"".join(lines)}</div>''')
 
 
-def enchant_header(name, slug=None, new=False):
+def enchant_header(name, slug=None, new=False, removed=None):
     if slug is None:
         slug = name.lower().replace(" ", "_").replace("-", "_").replace("'", "")
     icon = f"{ITEM_CDN}enhancement_{slug}.png"
-    if new:
+    if removed:
+        type_label, extra_cls = _removed_label(removed)
+        block_data_attr = ''
+    elif new:
         type_text = new if isinstance(new, str) else ''
         type_label = (f' <span class="entity-new-type">{type_text}</span>'
                       if type_text else '')
@@ -2082,11 +2095,31 @@ def _iab_same_ability(o, n):
     return bool(o and n) and _iab_ability_key(o) == _iab_ability_key(n)
 
 
+def _iab_first_level(levels):
+    """The level-1 value with the unit the last level carries ("10/20/30/40/50%" -> "10%")."""
+    unit = re.sub(r"^[+\-]?[\d.]+", "", levels[-1])
+    return levels[0] if levels[0].endswith(unit) else levels[0] + unit
+
+
+def _iab_levels_note(levels, was=None, direction=""):
+    """"Levels 1–5: 120 / 140 / 160 / 180 / 200" — a level that changed in its colour."""
+    shown = [lv if not was or lv == w else f'<span class="iab-lv iab-{direction}">{lv}</span>'
+             for lv, w in zip(levels, was or levels)]
+    return f"Levels 1–{len(levels)}: " + " / ".join(shown)
+
+
 def _iab_chip_mark(ico, value, was, direction, note):
     """A changed header value: coloured whole, or — the same number of levels before and after — only the levels
-    that changed (owner 2026-10-17, Dagon 7.41: "for the future, when something changes at one level")."""
+    that changed (owner 2026-10-17, Dagon 7.41: "for the future, when something changes at one level"). 5+ levels:
+    the level-1 value, dotted, every level in the hover (owner 2026-10-17: "the level-1 value, underlined dotted —
+    the popup has all levels")."""
+    from .badges import RANGE_FROM_LEVELS
     new, old = value.split("/"), (was or "").split("/")
-    if len(new) > 1 and len(new) == len(old) and new != old:
+    same = len(new) == len(old) and new != old
+    if len(new) >= RANGE_FROM_LEVELS:
+        full = "<br>".join(x for x in (_iab_levels_note(new, old if same else None, direction), note) if x)
+        return f'<span class="iab-m iab-{direction}">{ico}{_iab_hint(_iab_first_level(new), full)}</span>'
+    if len(new) > 1 and same:
         lv = "/".join(n if n == o else f'<span class="iab-lv iab-{direction}">{n}</span>' for n, o in zip(new, old))
         return f'<span class="iab-m">{ico}{_iab_hint(lv, note)}</span>'
     return f'<span class="iab-m iab-{direction}">{ico}{_iab_hint(value, note)}</span>'
@@ -2095,18 +2128,17 @@ def _iab_chip_mark(ico, value, was, direction, note):
 _IAB_CHIP_RE = re.compile(r'<span class="iab-m">(<img class="iab-ico" src="[^"]*?(\w+)\.png" alt="">)([^<]+)</span>')
 
 
-def _iab_compact_levels(html, keep=()):
-    """A header value of 5+ levels that no row changes as first … last, like the % badges (owner 2026-10-17, Dagon
-    7.41: "the header's cooldown, mana cost … are written with levels too"); a changed one (`keep`: its icon) keeps
-    every level on both sides, so the reader sees which level moved."""
+def _iab_compact_levels(html):
+    """A header value of 5+ levels as its level-1 value, dotted, every level in the hover, on both sides (owner
+    2026-10-17, Dagon 7.41: "show the active's level-1 value in the header, underline it dotted — the popup will have
+    all levels; for the old and the new cards"). A changed value is drawn so by _iab_chip_mark."""
     from .badges import RANGE_FROM_LEVELS
 
     def one(m):
         lv = m.group(3).split("/")
-        if m.group(2) in keep or len(lv) < RANGE_FROM_LEVELS:
+        if len(lv) < RANGE_FROM_LEVELS:
             return m.group(0)
-        return (f'<span class="iab-m">{m.group(1)}{lv[0]}<span class="iab-range" aria-hidden="true">…</span>'
-                f'{lv[-1]}</span>')
+        return f'<span class="iab-m">{m.group(1)}{_iab_hint(_iab_first_level(lv), _iab_levels_note(lv))}</span>'
     return _IAB_CHIP_RE.sub(one, html)
 
 
@@ -2182,8 +2214,7 @@ def render_iab_card(key):
         else:
             right = re.sub(rf'<span class="iab-m">(<img class="iab-ico" src="[^"]*{target}\.png" alt="">)({num})</span>',
                            lambda m: _iab_chip_mark(m.group(1), m.group(2), was, direction, note), right, count=1)
-    keep = {mk[0] for mk in _IAB_MARKS.get(key, [])}
-    right, left = _iab_compact_levels(right, keep), _iab_compact_levels(left, keep)
+    right, left = _iab_compact_levels(right), _iab_compact_levels(left)
     # one arrow for the whole card, between the two columns (owner 2026-09-27: not one per ability), centred on
     # the rows that have both sides — beside an ability alone on one side it pointed at nothing (owner 2026-09-30,
     # Gleipnir / Heaven's Halberd 7.38); no pair at all: the whole card
@@ -3104,8 +3135,21 @@ def components_change(old, new, total_old, total_new,
     return f"<!--COSTCARD:{key}-->"
 
 
+def _in_old_order(old, new):
+    """The new components in the old side's order, the added ones after (owner 2026-10-17, Guardian Greaves 7.41:
+    "1775 + 1400 → 1500 + 1775" read as a cheaper Mekansm — each component stands under itself)."""
+    rest = list(new)
+    out = []
+    for name, _cost in old:
+        k = next((i for i, (n, _c) in enumerate(rest) if n == name), None)
+        if k is not None:
+            out.append(rest.pop(k))
+    return out + rest
+
+
 def _components_html(old, new, total_old, total_new, recipe_old=None, recipe_new=None,
                      added=None, removed=None, marks=None):
+    new = _in_old_order(old, new)
     marks_old = {name: 'removed' for name in (removed or [])}
     marks_new = {name: 'added' for name in (added or [])}
     right = _components_side(new, recipe_new, total_new, marks_new)

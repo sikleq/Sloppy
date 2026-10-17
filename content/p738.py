@@ -407,6 +407,12 @@ def build():
     W(li("Bloodpact now applies a basic dispel on cast", t("NEW")))
     W(ul_close())
     W(item_header("Bloodthorn"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Soul Rend. Silences a target for 5 seconds. At the end of the silence, an additional 60% of all damage taken during the silence will be dealt to the target as magical damage. All attacks on the silenced target will deal additional damage equal to 50 if the attacker is a hero, and 25, if the attacker is a creep, and have True Strike. Cast Range: 900. Mana Cost: 125. Cooldown: 15s",
+             "Passive: Pierce. Grants each attack a 40% chance to pierce through evasion and deal 60 bonus magical damage."],
+        new=["Active: Soul Rend. Silences a target for 5 seconds. At the end of the silence, an additional 60% of all damage taken during the silence will be dealt to the target as magical damage. All attacks on the silenced target will deal additional damage equal to 50 if the attacker is a hero, and 25, if the attacker is a creep. Provides True Strike for your attacks and attacks from your controlled units against the silenced target. Cast Range: 900. Mana Cost: 125. Cooldown: 15s",
+             "Passive: Pierce. Grants each attack a 40% chance to pierce through evasion and deal 60 bonus magical damage."]))
     W(ul_open())
     W(li("Soul Rend True Strike on the silenced target is now limited only to item owner and their controlled units", t("NERF"), extra=inline_note("Bonus damage is still applied for all attacks against the target, but True Strike doesn't affect your allies anymore")))
     W(li("Soul Rend silence visual above affected targets is now tinted red to better distinguish Bloodthorn's silence from other sources of silence", t("QoL")))
@@ -509,6 +515,10 @@ def build():
          + info_tip("Armor reduction does not stack with its components, Desolator, or Stygian Desolator."), t("REWORK")))
     W(ul_close())
     W(item_header("Phylactery"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Passive: Empower Spell. The next Unit Target spell you cast on an enemy deals a separate 150 bonus damage to the target, and slows them by 50% for 1.5s. Cooldown: 6s"],
+        new=["Passive: Empower Spell. The next Unit Target spell you cast on an enemy deals a separate 150 bonus damage to the target and slows them by 30% for 3s. Cooldown: 12s"]))
     W(ul_open())
     W(li("Empower Spell cooldown increased from 6s to 12s", b(6, 12, l=True)))
     W(li("Empower Spell movement slow decreased from 50% to 30%", b(50, 30)))

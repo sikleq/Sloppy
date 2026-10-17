@@ -69,6 +69,10 @@ def build():
     W(ul_close())
 
     W(item_header("Refresher Orb"))
+    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    W(item_abilities_change(
+        old=["Active: Reset Cooldowns. Resets the cooldowns of all your items and abilities. Shares a cooldown with Refresher Shard. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 350. Cooldown: 180s"],
+        new=["Active: Reset Cooldowns. Resets the cooldowns of all your items and abilities. Shares a cooldown with Refresher Shard. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 400. Cooldown: 180/190/200/210s"]))
     W(ul_open())
     W(li("Reset Cooldowns cooldown now increases by 10s with each subsequent use up to 210s",
          b(180, [180, 190, 200, 210], l=True),
