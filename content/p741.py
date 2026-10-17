@@ -70,7 +70,7 @@ def build():
 
     W(unit_header("Tormentor", "../icons/units/npc_dota_miniboss.png", general=False, track=True))
     W(ul_open())
-    W(li("Spawn preference has switched — now begins in the Bottom Chasm", t("MISC")))   # the "?" in the line (owner 2026-10-16)
+    W(li("Spawn preference has switched — now begins in the Bottom Chasm", t("REWORK")))   # the "?" in the line (owner 2026-10-16)
     W(li("Now has 25% Status Resistance", t("NEW")))
     W(li("No longer deals damage to neutral units", t("DEL")))
     W(li("Player that got Aghanim's Shard will no longer receive 175 gold", t("DEL"),
@@ -117,7 +117,7 @@ def build():
     W(ul_close())
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
-    W(li("Pit preference has switched — now begins in the Top Pit", t("MISC")))
+    W(li("Pit preference has switched — now begins in the Top Pit", t("REWORK")))
     W(ul_close())
 
     W(plain_header("Terrain Changes", terrain_link="7.41"))
@@ -324,18 +324,18 @@ def build():
     W(item_header("Refresher Shard"))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
-        old=["Use: Reset Cooldowns. Resets the cooldowns of all your items and abilities. Shares a cooldown with Refresher Orb. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 200."],
-        new=["Use: Reset Cooldowns. Resets the cooldowns of all your abilities. Shares a cooldown with Refresher Orb. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 200."]))
+        old=["Use: Reset Cooldowns. Resets the cooldowns of all your items and abilities. Shares a cooldown with Refresher Orb. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 200. Cooldown: 180s"],
+        new=["Use: Reset Cooldowns. Resets the cooldowns of all your abilities. Shares a cooldown with Refresher Orb. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 200. Cooldown: 180s"]))
     W(ul_open())
     W(li("Reset Cooldowns no longer refreshes items", t("DEL")))
     W(ul_close())
     W(item_header("Ring of Health"))
     W(ul_open())
-    W(li("Item moved back to Secret Shop from Miscellaneous Shop", t("NERF")))
+    W(li("Item moved back to Secret Shop from Miscellaneous Shop", t("REWORK")))
     W(ul_close())
     W(item_header("Void Stone"))
     W(ul_open())
-    W(li("Item moved back to Secret Shop from Miscellaneous Shop", t("NERF")))
+    W(li("Item moved back to Secret Shop from Miscellaneous Shop", t("REWORK")))
     W(ul_close())
     W(item_header("Voodoo Mask"))
     W(ul_open())
@@ -401,7 +401,7 @@ def build():
     W(item_header("Battle Fury", changed=True))
     W(auto_components_change("Battle Fury", "7.41"))
     W(ul_open())
-    W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b([600, 3900], [400, 3900], l=True, slash=True)))
+    W(li("Recipe cost decreased from 600 to 400", b([600, 3900], [400, 3900], l=True, slash=True), extra=inline_note("Total cost unchanged at 3900g")))
     W(ul_close())
     W(item_header("Black King Bar"))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
@@ -420,6 +420,7 @@ def build():
     W(li("Recipe cost decreased from 750 to 450. Total cost increased from 2300g to 2400g", b([750, 2300], [450, 2400], l=True, slash=True, force_overall="nerf")))
     W(ul_close())
     W(item_header("Crimson Guard"))
+    W(properties_change(old=[("NERF", "+8 Armor")], new=[("", "+6 Armor", b(8, 6))]))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Guard. For 7 seconds, grant nearby allied heroes and buildings a 100% chance to block damage equal to 70 plus 2.2% of the casters max health value from each incoming attack. Units may only be affected by Guard once every 35 seconds. Radius: 1200. Cast Range: 1200. Mana Cost: 75. Cooldown: 40s",
@@ -427,7 +428,6 @@ def build():
         new=["Active: Guard. For 7 seconds, grant nearby allied heroes and buildings a 100% chance to block damage equal to 70 plus 2% of the caster's max health value from each incoming attack. Radius: 1200. Cast Range: 1200. Mana Cost: 75. Cooldown: 40s",
              "Passive: Damage Block. Grants a 60% chance to block 75 damage from incoming attacks on melee heroes, and 50 damage on ranged."]))
     W(ul_open())
-    W(li("Armor bonus decreased from +8 to +6", b(8, 6)))
     W(li("Guard max health damage block decreased from 2.2% to 2%", b(2.2, 2)))
     W(li("Guard base damage block rescaled from 70 for all units to 70 on melee heroes and buildings and 45 on ranged heroes", t("NERF")))
     W(ul_close())
@@ -477,7 +477,7 @@ def build():
     W(ul_open())
     W(li("Endurance now shares cooldown with Boots of Bearing", t("NERF")))
     W(li("Swiftness Aura now also provides +2.5 Health Regen", t("NEW")))
-    W(li("Recipe cost increased from 500 to 525. Total cost unchanged at 1625g", b([500, 1625], [525, 1625], l=True, slash=True)))
+    W(li("Recipe cost increased from 500 to 525", b([500, 1625], [525, 1625], l=True, slash=True), extra=inline_note("Total cost unchanged at 1625g")))
     W(ul_close())
     W(item_header("Boots of Bearing"))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
@@ -508,11 +508,11 @@ def build():
     W(item_header("Glimmer Cape", changed=True))
     W(auto_components_change("Glimmer Cape", "7.41"))
     W(ul_open())
-    W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b([450, 2150], [800, 2150], l=True, slash=True)))
+    W(li("Recipe cost increased from 450 to 800", b([450, 2150], [800, 2150], l=True, slash=True), extra=inline_note("Total cost unchanged at 2150g")))
     W(ul_close())
     W(item_header("Hand of Midas"))
     W(ul_open())
-    W(li("Transmute no longer prevents camp-clearing Madstone Bundles from spawning if it was used on the last creep in neutral camp", t("BUFF"), extra=inline_note("Getting guaranteed Madstone Bundle from Transmute used to prevent the camp-clearing bundle from spawning")))
+    W(li("Transmute no longer prevents camp-clearing Madstone Bundles from spawning if it was used on the last creep in neutral camp", t("MISC"), extra=inline_note("Getting guaranteed Madstone Bundle from Transmute used to prevent the camp-clearing bundle from spawning")))
     W(ul_close())
     W(item_header("Harpoon"))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
@@ -627,7 +627,7 @@ def build():
              ("",     "+2.5 Mana Regen",  b(3, 2.5)),
              ("",     "+12 Intelligence", b(10, 12))]))
     W(ul_open())
-    W(li("Recipe cost decreased from 450 to 300. Total cost unchanged at 3275g", b([450, 3275], [300, 3275], l=True, slash=True)))
+    W(li("Recipe cost decreased from 450 to 300", b([450, 3275], [300, 3275], l=True, slash=True), extra=inline_note("Total cost unchanged at 3275g")))
     W(ul_close())
     W(item_header("Bloodthorn", changed=True))
     W(auto_components_change("Bloodthorn", "7.41"))
@@ -675,7 +675,7 @@ def build():
              ("",     "+200 Mana",   b(300, 200)),
              ("",     "+200 Health", b(175, 200))]))
     W(ul_open())
-    W(li("Recipe cost unchanged at 500. Total cost unchanged at 2575g (due to Pavise cost decrease)", t("MISC")))
+    W(li("Recipe cost unchanged at 500", t("MISC"), extra=inline_note("Total cost unchanged at 2575g (due to Pavise cost decrease)")))
     W(ul_close())
     W(item_header("Perseverance"))
     W(ul_open())
@@ -704,16 +704,15 @@ def build():
     W(ul_close())
     W(item_header("Radiance"))
     W(ul_open())
-    W(li("Burn toggling no longer breaks invisibility nor stops channels", t("MISC")))
+    W(li("Burn toggling no longer breaks invisibility nor stops channels", t("QoL")))
     W(ul_close())
     W(item_header("Refresher Orb"))
+    W(properties_change(old=[("BUFF", "+12 Health Regen"), ("BUFF", "+6 Mana Regen")], new=[("", "+14 Health Regen", b(12, 14)), ("", "+7 Mana Regen", b(6, 7))]))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
-        old=["Active: Reset Cooldowns. Resets the cooldowns of all your items and abilities. Shares a cooldown with Refresher Shard. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 400."],
-        new=["Active: Reset Cooldowns. Resets the cooldowns of all your abilities. Shares a cooldown with Refresher Shard. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 325."]))
+        old=["Active: Reset Cooldowns. Resets the cooldowns of all your items and abilities. Shares a cooldown with Refresher Shard. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 400. Cooldown: 180/190/200/210s"],
+        new=["Active: Reset Cooldowns. Resets the cooldowns of all your abilities. Shares a cooldown with Refresher Shard. This item's cooldown only progresses in your hero's main inventory. Mana Cost: 325. Cooldown: 180s"]))
     W(ul_open())
-    W(li("Health Regen bonus increased from +12 to +14", b(12, 14)))
-    W(li("Mana Regen bonus increased from +6 to +7", b(6, 7)))
     W(li("Reset Cooldowns cooldown decreased from 180/190/200/210s to 180s", b([180, 190, 200, 210], 180, l=True),
          extra=inline_note("No longer scales with uses")))
     W(li("Reset Cooldowns mana cost decreased from 400 to 325", b(400, 325, l=True)))
@@ -874,6 +873,9 @@ def build():
     W(li("Hobble initial damage decreased from 75 to 25", b(75, 25)))
     W(li("Hobble Max slow decreased from 80% to 50%", b(80, 50)))
     W(li("Hobble Cast Range decreased from 800 to 650", b(800, 650)))
+    # a silent change (owner 2026-10-17): items.txt AbilityCooldown 12 in 7.40c, 30 in 7.41; Valve's notes don't say
+    W(li("Hobble cooldown increased from 12s to 30s", b(12, 30, l=True),
+         extra=inline_note("Not in the patch notes: found in the game files")))
     W(li("Hobble now also modifies incoming healing", t("NEW"),
          extra=inline_note("As a result of Health Restoration changes")))
     W(li("Moved from Tier 4 to Tier 2", t("REWORK")))

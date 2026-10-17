@@ -37,3 +37,12 @@ def test_new_item_ability_rows_are_tagged_new(path):
         elif new_card and _ABILITY_ROW.match(line):
             bad.append(n)
     assert not bad, f"t(\"NEW\") missing at lines {bad}"
+
+
+@pytest.mark.parametrize("path", FILES, ids=os.path.basename)
+def test_an_unchanged_total_sits_in_the_rows_note(path):
+    # owner 2026-10-17: one form, the majority's (11 rows of 7.38-7.41 in the note, 9 in the text) — "Recipe cost …"
+    # in the row, "Total cost unchanged at X (due to …)" in its (?) note, where the components card also takes it
+    bad = [n for n, line in enumerate(open(path, encoding="utf-8"), 1)
+           if re.search(r'W\(li\("Recipe [Cc]ost [^"]*\. Total cost unchanged', line)]
+    assert not bad, f"move 'Total cost unchanged …' into extra=inline_note(...) at lines {bad}"

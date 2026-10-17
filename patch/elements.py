@@ -1599,7 +1599,7 @@ def _pane_parts(desc, props=None, facet=False):
             continue                                     # the row was only "Radius: 900."
         html = d if not isinstance(d, str) or d.lstrip().startswith("<div") else f'<div class="ability-change-row">{d}</div>'
         rows.append(_bold_numbers_html(html) if isinstance(html, str) else html)
-    chips = _iab_meta_chips(values, props)
+    chips = _iab_meta_chips(values, props)   # never folded: a hero's old / new panes have no marks to keep a level
     title = (f'<b class="iab-kind">{kind}:</b> <span class="iab-name">{name}</span>' if kind and name
              else f'<b class="iab-kind">{kind}</b>' if kind
              else f'<span class="iab-name">{name}</span>' if name else "")
@@ -1753,9 +1753,12 @@ def _iab_covered_change(text, tags, extra="", badge=""):
             return False
         _IAB_MARKS.setdefault(card["key"], []).append(("aoe", m.group(2), direction, note, ability, m.group(1)))
         return True
-    target = next((v for k, v in _IAB_META_WORDS.items() if k in low), "num")
+    # which header value: read after the ability's own name — "Reset Cooldowns mana cost decreased" is the mana cost
+    # (owner 2026-10-17, Refresher Orb 7.41: the new 325 wasn't marked; "cooldown" was found in the name)
+    lead = next((n for n in sorted(card["names"], key=len, reverse=True) if n and low.startswith(n)), "")
+    target = next((v for k, v in _IAB_META_WORDS.items() if k in low[len(lead):]), "num")
     if m and _iab_has(m.group(2), card["new"]) and _iab_has(m.group(1), card["old"]):
-        _IAB_MARKS.setdefault(card["key"], []).append((target, m.group(2), direction, note, "", ""))
+        _IAB_MARKS.setdefault(card["key"], []).append((target, m.group(2), direction, note, "", m.group(1)))
         return True
     m = _IAB_NOWHAS_RE.search(plain)
     if m and _iab_has(m.group(1), card["new"]):
@@ -1783,8 +1786,26 @@ def _iab_row_ability(low, card, names):
     return next(iter(names)) if len(names) == 1 else ""
 
 
+def _iab_stem(w):
+    # a plural is its word ("trees" = "tree", "pulls" = "pull" — Harpoon 7.41: "can now target trees and will pull")
+    return (w[:-1] if len(w) > 4 and w.endswith("s") and not w.endswith(("ss", "us", "is", "os")) else w)[:5]
+
+
 def _iab_stems(text, drop=()):
-    return {w[:5] for w in re.findall(r"[a-z]{4,}", text.lower()) if w not in _IAB_STOP and w not in drop}
+    return {_iab_stem(w) for w in re.findall(r"[a-z]{4,}", text.lower()) if w not in _IAB_STOP and w not in drop}
+
+
+def _iab_with_number(full, s, nums):
+    """A coloured span (start, end, …) grown back, within its clause, to the first of the row's numbers before it
+    ("2.5 health regeneration"; Mask of Madness 7.41 "8% / 12% movement speed (ranged/melee)", where the diff, numbers
+    aside, saw only "(ranged/melee)" added)."""
+    if re.match(r"and\b", full[s[0]:]):       # the span opens its own clause: what's before belongs to another
+        return s
+    head = full[:s[0]]
+    seps = list(re.finditer(r"[,.;:]\s+|\band\s+", head))
+    start = seps[-1].end() if seps else 0
+    first = next((m.start() for m in re.finditer(r"[+\-]?(\d+(?:\.\d+)?)", head[start:]) if m.group(1) in nums), None)
+    return (start + first, *s[1:]) if first is not None else s
 
 
 def _iab_text_change(text, tags):
@@ -1805,12 +1826,14 @@ def _iab_text_change(text, tags):
     diff = card.get("segs", {}).get(ability)
     if not diff:
         return False
-    for rx, tail in _IAB_TAILS:
+    tailed = False
+    for rx, tail, *also in _IAB_TAILS:
         # a property the game's tooltip doesn't spell out: the new description gets it at its end, in the
         # row's colour ("Disarm can now be dispelled" -> "Dispellable.", Heaven's Halberd 7.38; "Freezing Aura
         # now pierces debuff immunity" -> "Pierces Debuff Immunity.", Shiva's Guard 7.41) — or, when the
-        # tooltip already says it, that sentence is coloured
-        hit = re.match(rf"^{re.escape(ability)}'?s? {rx}$", low)
+        # tooltip already says it, that sentence is coloured. Matched on the row as written, so a name it
+        # carries keeps its capitals ("Shares a cooldown with Boots of Bearing.")
+        hit = re.match(rf"^{re.escape(ability)}'?s? {rx}$", plain, re.I)
         if hit:
             tail = tail.format(*hit.groups())
             new_text = card.get("pairs_by", {}).get((ability, "new"), "")
@@ -1818,12 +1841,21 @@ def _iab_text_change(text, tags):
             entry = ({"ability": ability, "side": "new", "span": (at, at + len(tail.rstrip("."))), "dir": direction}
                      if at >= 0 else {"ability": ability, "side": "new", "append": tail, "dir": direction})
             _IAB_HL.setdefault(card["key"], []).append(entry)
-            return True
-    if nums and "no longer" not in low:
-        return False
+            if not also:
+                return True
+            tailed = True                 # …and the text the tooltip does add is coloured too (Harpoon 7.41)
+            break
+    # a row with numbers: "no longer …", a new property with its value ("now also grants 30% Slow Resistance",
+    # Mask of Madness 7.41) or a rewrite ("changed from +25 … to +8%/12% …") — checked below against the text
+    if nums and not re.search(r"\bno longer\b|\bnow (?:also )?(?:provides?|grants?|gives?|increases?|has)\b"
+                              r"|\bchanged from\b", low):
+        return tailed
+    ch = re.search(r"\bchanged from .*? to (.*)", low)
+    if ch:          # the new text shows what follows the first "to" — values, or words ("600 to the hero's attack range")
+        nums = re.findall(r"\d+(?:\.\d+)?", ch.group(1))
     words = _iab_stems(low, drop=set(ability.split()) | _IAB_VERBS)
     if not words:
-        return False
+        return tailed
     # "no longer …" / DEL speaks of the OLD text, anything else of the NEW one — never the other side (a NEW
     # row must not colour old text: Disperser 7.40)
     side = "old" if ("no longer" in low or direction == "del") else "new"
@@ -1844,11 +1876,22 @@ def _iab_text_change(text, tags):
     # ("no longer stack with Orb of Corrosion" is not "reduces heals, health", Orb of Frost 7.39)
     after = re.search(r"no longer (.*)", low)
     if after:
-        obj = [w[:5] for w in re.findall(r"[a-z]{4,}", after.group(1)) if w not in _IAB_STOP and w not in _IAB_VERBS][:2]
+        obj = [_iab_stem(w) for w in re.findall(r"[a-z]{4,}", after.group(1)) if w not in _IAB_STOP and w not in _IAB_VERBS][:2]
         if not any(set(obj) & _iab_stems(full[s[0]:s[1]]) for s in hits):
             hits = []
-    # a row with numbers ("…by 25%", Shiva's Guard 7.41) only when the coloured text shows every one of them
-    if nums and not all(any(_iab_has(n, full[s[0]:s[1]]) for s in hits) for n in nums):
+    # a number right before the coloured words is theirs: the diff, numbers aside, paired "2.5" with the "8%" after
+    # it and gave only "health regeneration" (Pipe of Insight 7.41 "no longer provides 2.5 health regen")
+    if nums:
+        hits = [_iab_with_number(full, s, nums) for s in hits]
+    # a row with numbers ("…by 25%", Shiva's Guard 7.41) only when the coloured text shows every one of them — a
+    # level of a "15%/30%" counts (Mask of Madness 7.41e "15% … for ranged heroes and 30% for melee heroes")
+    def shown(n, seg):
+        if _iab_has(n, seg):
+            return True
+        # a level counts only when the row names every level of that value ("20/30/40" doesn't show a lone "30")
+        return any(n in lv and set(lv) <= set(nums) for lv in
+                   (re.findall(r"\d+(?:\.\d+)?", g) for g in re.findall(r"\d+(?:\.\d+)?%?(?:\s*/\s*\d+(?:\.\d+)?%?)+", seg)))
+    if nums and not all(any(shown(n, full[s[0]:s[1]]) for s in hits) for n in nums):
         hits = []
     if not hits and side == "old" and after and not nums:
         # "no longer refreshes items" and the old text lost "items and" ("all your items and abilities" -> "all your
@@ -1857,12 +1900,23 @@ def _iab_text_change(text, tags):
         said = set(re.findall(r"[a-z]{4,}", after.group(1)))
         hits = [(s[0], s[1] - (4 if s[2].endswith(" and") else 0)) + s[2:] for s in diff["old"]
                 if s[3] == "delete" and set(re.findall(r"[a-z]{4,}", s[2].lower())) & said]
+    if not hits and side == "old" and not nums:
+        # what the ability did that its old tooltip never said, now gone: written after the old description, red
+        # (owner 2026-10-17, Pipe of Insight 7.41 "Barrier no longer affects units that have been affected by Barrier
+        # within Pipe of Insight's cooldown"; Dagon "Energy Burst no longer instantly kills non-ancient creeps")
+        gone = re.match(rf"^{re.escape(ability)}'?s? no longer ([^.;()]+?)\.?$", plain, re.I)
+        if gone:
+            _IAB_HL.setdefault(card["key"], []).append(
+                {"ability": ability, "side": "old", "append": gone.group(1)[:1].upper() + gone.group(1)[1:] + ".",
+                 "dir": "del"})
+            return True
     if not hits:
-        return False
+        return tailed
     # removed text is red whatever the row's tag (owner 2026-09-27); added text takes the tag's colour
     d = "del" if side == "old" else direction
-    _IAB_HL.setdefault(card["key"], []).extend(
-        {"ability": ability, "side": side, "span": (s[0], s[1]), "dir": d} for s in hits)
+    _IAB_HL.setdefault(card["key"], []).extend(            # a clause's trailing comma stays white
+        {"ability": ability, "side": side, "span": (s[0], s[1] - (full[s[1] - 1:s[1]] in (",", ";"))), "dir": d}
+        for s in hits)
     return True
 
 
@@ -1877,6 +1931,14 @@ _IAB_TAILS = (   # (the row after the ability's name, the sentence the new descr
     # tooltip still says "70"); {0} = the row's number
     (r"base damage block rescaled from \d+ for all units to \d+ on melee heroes(?: and buildings)? and (\d+) on "
      r"ranged heroes", "{0} base damage block on ranged heroes."),
+    # the game's own wording for a shared cooldown (Refresher Orb: "Shares a cooldown with Refresher Shard."); owner
+    # 2026-10-17, Drum of Endurance / Boots of Bearing 7.41: rows the card can carry go into it
+    (r"now shares (?:a |its )?cooldown with ([^.,;()\d]+?)\.?", "Shares a cooldown with {0}."),
+    # what the tooltip leaves out of a new effect it does describe: added after it, and the tooltip's own new
+    # sentence coloured too (Harpoon 7.41 "…can now target trees and will pull the caster to it, destroying all trees
+    # on the way" — the tooltip says only "Targeting a tree always pulls you all the way to that tree.")
+    (r"can now target trees and will pull the caster to it, destroying all trees on the way",
+     "Destroys all trees on the way.", True),
 )
 _IAB_DETERMINERS = ("your ", "their ", "its ", "the ")
 
@@ -2020,6 +2082,34 @@ def _iab_same_ability(o, n):
     return bool(o and n) and _iab_ability_key(o) == _iab_ability_key(n)
 
 
+def _iab_chip_mark(ico, value, was, direction, note):
+    """A changed header value: coloured whole, or — the same number of levels before and after — only the levels
+    that changed (owner 2026-10-17, Dagon 7.41: "for the future, when something changes at one level")."""
+    new, old = value.split("/"), (was or "").split("/")
+    if len(new) > 1 and len(new) == len(old) and new != old:
+        lv = "/".join(n if n == o else f'<span class="iab-lv iab-{direction}">{n}</span>' for n, o in zip(new, old))
+        return f'<span class="iab-m">{ico}{_iab_hint(lv, note)}</span>'
+    return f'<span class="iab-m iab-{direction}">{ico}{_iab_hint(value, note)}</span>'
+
+
+_IAB_CHIP_RE = re.compile(r'<span class="iab-m">(<img class="iab-ico" src="[^"]*?(\w+)\.png" alt="">)([^<]+)</span>')
+
+
+def _iab_compact_levels(html, keep=()):
+    """A header value of 5+ levels that no row changes as first … last, like the % badges (owner 2026-10-17, Dagon
+    7.41: "the header's cooldown, mana cost … are written with levels too"); a changed one (`keep`: its icon) keeps
+    every level on both sides, so the reader sees which level moved."""
+    from .badges import RANGE_FROM_LEVELS
+
+    def one(m):
+        lv = m.group(3).split("/")
+        if m.group(2) in keep or len(lv) < RANGE_FROM_LEVELS:
+            return m.group(0)
+        return (f'<span class="iab-m">{m.group(1)}{lv[0]}<span class="iab-range" aria-hidden="true">…</span>'
+                f'{lv[-1]}</span>')
+    return _IAB_CHIP_RE.sub(one, html)
+
+
 def render_iab_card(key):
     """The abilities card html (page.save_html fills <!--IABCARD:key-->): the abilities in rows, old left /
     new right, an arrow only between an ability and its counterpart; the numbers the hidden rows change
@@ -2034,6 +2124,17 @@ def render_iab_card(key):
             tails.setdefault(k, []).append((hl["append"], hl["dir"]))
         elif hl["span"] not in [s[:2] for s in spans.get(k, [])]:
             spans.setdefault(k, []).append((*hl["span"], hl["dir"]))
+    # only the abilities that changed (owner 2026-10-17, Harpoon / Mask of Madness 7.41: "why the passive, when only
+    # Draw Forth changed"): the same text on both sides, nothing coloured, no moved note, no radius mark — left out;
+    # a card where nothing would stay keeps everything
+    aoe = {mk[4] for mk in _IAB_MARKS.get(key, []) if mk[0] == "aoe"}
+
+    def changed(o, n):
+        k = _iab_ability_key(n or o)
+        return (o != n or any((k, side) in spans or (k, side) in tails for side in ("old", "new")) or k in aoe
+                or _IAB_NOTES.get(f"{key}|{_iab_name(_ITEM_ABILITY_RE.match(n).group(2).strip())[0].lower()}"
+                                  if n and _ITEM_ABILITY_RE.match(n) else ""))
+    rows = [r for r in rows if changed(*r)] or rows
 
     def with_tails(t, k):
         """A sentence the row adds (\"Dispellable.\") at the end of the description, before the header
@@ -2080,8 +2181,9 @@ def render_iab_card(key):
                            lambda m: _iab_hint(f'<b class="iab-num iab-{direction}">{m.group(1)}</b>', note), right, count=1)
         else:
             right = re.sub(rf'<span class="iab-m">(<img class="iab-ico" src="[^"]*{target}\.png" alt="">)({num})</span>',
-                           lambda m: f'<span class="iab-m iab-{direction}">{m.group(1)}{_iab_hint(m.group(2), note)}</span>',
-                           right, count=1)
+                           lambda m: _iab_chip_mark(m.group(1), m.group(2), was, direction, note), right, count=1)
+    keep = {mk[0] for mk in _IAB_MARKS.get(key, [])}
+    right, left = _iab_compact_levels(right, keep), _iab_compact_levels(left, keep)
     # one arrow for the whole card, between the two columns (owner 2026-09-27: not one per ability), centred on
     # the rows that have both sides — beside an ability alone on one side it pointed at nothing (owner 2026-09-30,
     # Gleipnir / Heaven's Halberd 7.38); no pair at all: the whole card
@@ -3045,7 +3147,7 @@ def _is_num(x):
 def _tone_cls(badge_html, fallback=""):
     """The shade class of a b() badge ("badge nerf3 tone"): a changed value painted with it looks exactly like
     its % (owner 2026-09-28: "1000" and "+14%" in two reds); `.badge.tone` drops the chip's box."""
-    m = re.search(r'class="badge ((?:buff|nerf)\d+)"', badge_html or "")
+    m = re.search(r'class="badge ((?:buff|nerf)\d+)[" ]', badge_html or "")   # "badge nerf3 rng-start": 5+ levels
     return f"badge {m.group(1)} tone" if m else fallback
 
 
@@ -3096,7 +3198,8 @@ def _cost_covered(text, extra=""):
             return False
         kinds.add(kind)
         rest = rest[:m.start()] + " " + rest[m.end():]
-    if not kinds & {"total", "recipe", "recipe_gone", "total_same"}:
+    # "Recipe cost unchanged at 500" with the total in its note (Solar Crest 7.41, owner 2026-10-17) counts too
+    if not kinds & {"total", "recipe", "recipe_gone", "total_same", "recipe_same"}:
         return False
     rest = re.sub(r"[+\-−]\d+%", " ", rest)                   # a b() badge written into the text (Pipe 7.41)
     rest = re.sub(r"\s+", " ", rest).strip(" .,;")
@@ -3352,8 +3455,26 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
     )
 
 
+_ENCHANT_VALUES = None
+
+
+def _enchant_desc(name, version):
+    """{tier: lines} of an enchantment in a patch: that patch's own numbers (data/rules/enchant_values.json,
+    scripts/gen/enchant_values.py — owner 2026-10-17, 7.41 Vital's hover said +2.25, its row +2), else the table."""
+    global _ENCHANT_VALUES
+    if _ENCHANT_VALUES is None:
+        try:
+            with open(_os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
+                                    "data", "rules", "enchant_values.json"), encoding="utf-8") as f:
+                _ENCHANT_VALUES = _json.load(f)
+        except OSError:
+            _ENCHANT_VALUES = {}
+    own = _ENCHANT_VALUES.get(version or "", {}).get(name)
+    return {int(t): lines for t, lines in own.items()} if own else _ENCHANT_DESC.get(name, {})
+
+
 def _enchant_tooltip(name, tiers):
-    desc = _ENCHANT_DESC.get(name, {})
+    desc = _enchant_desc(name, _State.current_patch_version)
     if isinstance(tiers, int):
         tiers = [tiers]
     parts = []

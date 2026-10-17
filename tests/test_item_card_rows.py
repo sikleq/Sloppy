@@ -60,11 +60,13 @@ def _item_blocks():
 
 def test_no_stats_card_without_a_build_change():
     # Sange and Yasha 7.38: one changed stat drawn as a whole card — the card comes only with the components
-    # card; otherwise the stats are rows (owner 2026-09-28)
+    # card; otherwise the stats are rows (owner 2026-09-28) — or with an abilities card (owner 2026-10-17, Refresher
+    # Orb 7.41: "no stats card")
     bad = []
     for path in sorted(CONTENT.glob("p7*.py")):
         for block in re.split(r"(?=W\((?:item|hero|unit|plain)_header\(|W\(section\()", path.read_text(encoding="utf-8")):
-            if block.startswith("W(item_header(") and "properties_change(" in block and "components_change(" not in block:
+            if (block.startswith("W(item_header(") and "properties_change(" in block and "components_change(" not in block
+                    and "item_abilities_change(" not in block):
                 bad.append((path.name, re.match(r'W\(item_header\("((?:[^"\\]|\\.)*)"', block).group(1)))
     assert not bad, f"a stats card without a components card: {bad}"
 

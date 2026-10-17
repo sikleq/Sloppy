@@ -11083,15 +11083,17 @@ ul.changes li.ability-row-solo, ul.changes li.ability-row-end { margin-bottom: 8
 .iab-meta { font-family: 'Radiance', 'Segoe UI', Arial, sans-serif; font-weight: 700;
   font-variant-numeric: proportional-nums; letter-spacing: 0; }
 .iab-m { gap: 3px; }
+/* a 5+ level header value no row changes: first … last, like the % badges (owner 2026-10-17, Dagon 7.41) */
+.iab-range { color: var(--text-dimmer); font-weight: 400; margin: 0 0.25em; }
 /* Rows the abilities card already shows (_iab_covered_change / duplicate descriptions): kept in the page,
    hidden, so tag filters and counts still see their tags (owner 2026-09-27) */
 ul.changes li.iab-covered { display: none !important; }
 /* the numbers those rows change, coloured by the row's tag */
-.iab-num.iab-buff, .iab-m.iab-buff { color: #7fd08c; }
-.iab-num.iab-nerf, .iab-m.iab-nerf { color: #e3806e; }
-.iab-num.iab-new, .iab-m.iab-new { color: #e0bd62; }
-.iab-num.iab-misc, .iab-m.iab-misc { color: var(--text-dimmer); }
-.iab-num.iab-rework, .iab-m.iab-rework { color: #b99ae6; }   /* Orb of Venom 7.38: a cooldown where there was none */
+.iab-num.iab-buff, .iab-m.iab-buff, .iab-lv.iab-buff { color: #7fd08c; }
+.iab-num.iab-nerf, .iab-m.iab-nerf, .iab-lv.iab-nerf { color: #e3806e; }
+.iab-num.iab-new, .iab-m.iab-new, .iab-lv.iab-new { color: #e0bd62; }
+.iab-num.iab-misc, .iab-m.iab-misc, .iab-lv.iab-misc { color: var(--text-dimmer); }
+.iab-num.iab-rework, .iab-m.iab-rework, .iab-lv.iab-rework { color: #b99ae6; }   /* Orb of Venom 7.38: a cooldown where there was none */
 /* A changed value painted with its %'s own shade class ("badge nerf3 tone", _tone_cls): the colour of the
    .badge.nerfN rule, none of the chip's box (owner 2026-09-28: "1000" and "+14%" in two different reds) */
 .badge.tone { background: none !important; border: none !important; padding: 0 !important; text-shadow: none !important;
@@ -11190,8 +11192,8 @@ html.cb-mode .badge.swap { color: #5bd3b2; background: rgba(40, 150, 120, 0.14);
 html.cb-mode .badge.del { color: #c95d85; background: rgba(135, 45, 79, 0.14); border-color: rgba(135, 45, 79, 0.51); }
 html.cb-mode .iab-hl-buff { color: #64baeb; }
 html.cb-mode .iab-hl-nerf { color: #f19e60; }
-html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff { color: #64baeb; }
-html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf { color: #f19e60; }
+html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff, html.cb-mode .iab-lv.iab-buff { color: #64baeb; }
+html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf, html.cb-mode .iab-lv.iab-nerf { color: #f19e60; }
 html.cb-mode .components-change .component-price.cost-buff, html.cb-mode .components-change .components-total span.cost-buff { color: #64baeb; }
 html.cb-mode .components-change .component-price.cost-nerf, html.cb-mode .components-change .components-total span.cost-nerf { color: #f19e60; }
 /* === END COLOUR-BLIND MODE (generated) === */

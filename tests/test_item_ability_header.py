@@ -152,8 +152,11 @@ def test_a_phrase_is_found_when_no_changed_piece_holds_the_rows_words():
         assert el._iab_text_change("Empower Spell no longer deals attack damage", {"del"})
         old = el.render_iab_card("item|khanda2-test|7.38").split("pane-new")[0]
         assert '<span class="iab-hl iab-hl-del" data-tag="del">your attack damage</span>' in old
-        # what stopped must be in the text: "no longer stack with …" is not "bonus damage"
-        assert not el._iab_text_change("Empower Spell no longer stacks with Khanda", {"del"})
+        # what stopped must be in the text: "no longer stack with …" is not "bonus damage" — the old tooltip never
+        # said it, so it goes after the old description in red (owner 2026-10-17, Pipe of Insight 7.41)
+        assert el._iab_text_change("Empower Spell no longer stacks with Khanda", {"del"})
+        old = el.render_iab_card("item|khanda2-test|7.38").split("pane-new")[0]
+        assert 'data-tag="del">Stacks with Khanda</span>' in old and 'data-tag="del">bonus damage' not in old
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
 

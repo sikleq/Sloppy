@@ -213,12 +213,14 @@ def item_abilities(slug, version):
     meta = []
     rng, mana, cd = (_num(blk.get(k, "")) for k in ("AbilityCastRange", "AbilityManaCost", "AbilityCooldown"))
     host = next((a for a in out if a[0] == "Active"), out[0])      # the cooldown belongs to the active
-    said = host[2].lower()                                          # the tooltip may state them itself (Dagon)
-    if rng and rng != "0" and "cast range" not in said:
+    # the tooltip may state them itself (Dagon "Cooldown: 27/24/21/18/15s") — a value, not the word: Refresher's
+    # "Resets the cooldowns …" kept its 180s out of the card's header (owner 2026-10-17)
+    said = lambda label: re.search(rf"\b{label}\s*:?\s*\d", host[2], re.I) is not None
+    if rng and rng != "0" and not said("cast range"):
         meta.append(f"Cast Range: {rng}.")
-    if mana and mana != "0" and "mana cost" not in said:
+    if mana and mana != "0" and not said("mana cost"):
         meta.append(f"Mana Cost: {mana}.")
-    if cd and cd != "0" and "cooldown" not in said:
+    if cd and cd != "0" and not said("cooldown"):
         meta.append(f"Cooldown: {cd}s")
     if meta:
         host[2] = (host[2] + " " + " ".join(meta)).strip()

@@ -219,6 +219,9 @@ def _strip_html(s):
 # IMPORTANT: BUFF-override patterns must come BEFORE DEL patterns since
 # 'no longer has a penalty' should NOT be DEL.
 CANONICAL_TAGS = [
+    # Crimson Guard's Guard (owner 2026-10-17, 7.41: "nerf, the values got smaller" — 70 -> 45 on ranged heroes); the
+    # row starts with the ability, so "Vanguard base damage block …" isn't caught
+    (re.compile(r'^\s*Guard base damage block rescaled\b'), 'NERF'),
     # SWAP (owner 2026-09-26): a talent replaced by another in the same slot — its own tag, not REWORK
     # ("Level 15 Talent +110 Rolling Boulder Damage replaced with +80 Boulder Smash Damage")
     (re.compile(r'^\s*Level \d+(?: Talent)?:?\s.*\breplaced with\b', re.I), 'SWAP'),
@@ -247,6 +250,10 @@ CANONICAL_TAGS = [
     # Congregations of the Deep / Water Bubble (Large); were BUFF)
     (re.compile(r'\bnow (?:also )?(?:affected|increased|modified) by (?:\w+ )?(?:AoE|Area of Effect) (?:bonus(?:es)?|increase)'
                 r'|\bnow (?:also )?(?:affected|increased) by bonuses to (?:AoE|Area of Effect)\b', re.I), 'NEW'),
+    # the shop an item is bought in ("Item moved back to Secret Shop from Miscellaneous Shop", 7.41 Ring of Health /
+    # Void Stone): where it is sold, a structural move like "Moved from Tier 4 to Tier 2" — REWORK (owner 2026-10-17;
+    # were NERF)
+    (re.compile(r'\bmoved (?:back )?(?:to|from) (?:the )?(?:Secret|Side|Base|Miscellaneous|Home) Shop\b', re.I), 'REWORK'),
     # ── 2026-10-03 second audit (7.38b-7.41e): classes the scaffold got wrong ──
     (re.compile(r'\bno longer gets? knocked off\b', re.I),           'BUFF'),   # own mount restriction lifted
     (re.compile(r'\b(?:is now|now) undispellable\b|^\s*Now cannot be dispelled\b', re.I), 'BUFF'),
@@ -557,6 +564,10 @@ TAG_OVERRIDES = {
     "stolen spells now have their cooldown":   "NEW",    # Spell Steal: a new property in place of the debuff amp
     "avatar duration changed from 9/8/7/6s":   "BUFF",   # BKB: the duration now stops at 7s, not 6s
     "lifesteal don't apply to reflected damage": "REWORK",   # how reflected damage works now, not a lost effect
+    # owner 2026-10-17 (7.41): where a boss starts changes the game — REWORK, not MISC
+    "preference has switched":                 "REWORK",   # Tormentor's spawn / Roshan's pit preference
+    "no longer prevents camp-clearing madstone": "MISC",   # Hand of Midas Transmute on a camp's last creep
+    "toggling no longer breaks invisibility":  "QoL",      # Radiance Burn: toggling no longer reveals / interrupts
 }
 
 
@@ -1955,7 +1966,15 @@ def _parse_number_or_list(s):
         return None
 
 
-def _postprocess_properties_change(lines):
+def _block_lines(lines, i):
+    """The lines of the item block that starts after lines[i - 1] (its header), up to the next entity header."""
+    j = i
+    while j < len(lines) and not re.match(r'W\((?:item_header|hero_header|section|plain_header|unit_header)\(', lines[j]):
+        j += 1
+    return lines[i:j]
+
+
+def _postprocess_properties_change(lines, with_abilities=False):
     """Collapse stat-grant note patterns inside item blocks into a single
     properties_change(old=[...], new=[...]) call placed right after the
     item_header. The original li rows that fed the diff are removed from
@@ -1985,10 +2004,20 @@ def _postprocess_properties_change(lines):
         # Owner 2026-09-28 (Sange and Yasha: one changed stat drawn as a whole card): the stats card only
         # comes with a changed BUILD — an auto_components_change right under the header. Otherwise the stat
         # rows stay plain rows ("Status Resistance bonus decreased from +25% to +20%").
-        if not (i < len(lines) and lines[i].startswith('W(auto_components_change(')):
-            continue
-        out.append(lines[i])
-        i += 1
+        # ... or with an abilities card (owner 2026-10-17, Refresher Orb 7.41: "no stats card"): a block of cards
+        # shows its stats in one too. That card comes later (_postprocess_item_ability_cards), so a second pass
+        # (with_abilities) takes the blocks that have one and no stats card yet.
+        if with_abilities:
+            block = _block_lines(lines, i)
+            if (not any(ln.lstrip().startswith('W(item_abilities_change(') for ln in block)
+                    or any(ln.lstrip().startswith(('W(properties_change(', 'W(auto_components_change('))
+                           for ln in block)):
+                continue
+        else:
+            if not (i < len(lines) and lines[i].startswith('W(auto_components_change(')):
+                continue
+            out.append(lines[i])
+            i += 1
 
         # Collect li rows of this item block. The block ends at the next
         # W(item_header(...)) / W(hero_header(...)) / section header.
@@ -2462,6 +2491,9 @@ _RECIPE_COST_UNCHANGED_INLINE_RE = re.compile(
     r'(\. Total cost unchanged[^"]*)",\s*'
     r'b\(\d+,\s*\d+,\s*l=True\)\)\)$'
 )
+_RECIPE_SAME_TOTAL_SAME_RE = re.compile(
+    r'^W\(li\("(Recipe [Cc]ost unchanged at \d+g?)\. (Total cost unchanged[^"]*)",\s*(t\("\w+"\))\)\)$'
+)
 _RECIPE_COST_UNCHANGED_SPLIT_RE = re.compile(
     r'^W\(li\("(Recipe cost (?:increased|decreased) from )(\d+)( to )(\d+)",\s*'
     r'b\(\d+,\s*\d+,\s*l=True\),\s*'
@@ -2527,8 +2559,16 @@ def _postprocess_recipe_cost_zero_net(lines):
             continue
         m = _RECIPE_COST_UNCHANGED_INLINE_RE.match(line)
         if m:
+            # one form for the unchanged total (owner 2026-10-17, the majority of 7.38-7.41: 11 rows in the note, 9
+            # in the text): the recipe in the row, "Total cost unchanged at X (due to …)" in its (?) note
             prefix, a, mid, b_val, tail = m.groups()
-            out.append(f'W(li("{prefix}{a}{mid}{b_val}{tail}", {_recipe_unchanged_total_badge(a, b_val, tail)}))')
+            note_text = tail.lstrip(". ")
+            out.append(f'W(li("{prefix}{a}{mid}{b_val}", {_recipe_unchanged_total_badge(a, b_val, tail)}, '
+                       f'extra=inline_note("{note_text}")))')
+            continue
+        m = _RECIPE_SAME_TOTAL_SAME_RE.match(line)
+        if m:                                       # both unchanged (Solar Crest 7.41): the same split, its own tag
+            out.append(f'W(li("{m.group(1)}", {m.group(3)}, extra=inline_note("{m.group(2)}")))')
             continue
         m = _RECIPE_COST_UNCHANGED_SPLIT_RE.match(line)
         if m:
@@ -3654,6 +3694,7 @@ def generate(version):
     out = _postprocess_fold_damage_l1(out)            # "Damage at level 1" into the (?) — owner 2026-10-04
     out = _postprocess_unstated_total_cost(out)
     out = _postprocess_item_ability_cards(out, version)
+    out = _postprocess_properties_change(out, with_abilities=True)   # an abilities card brings the stats card
     out = _drop_empty_ul(out)
     out = _postprocess_innate_rows_out_of_stats(out)
     out = _postprocess_stack_note_into_ability(out)

@@ -267,6 +267,16 @@ bonus damage increased from 150 to 250», «Poison Attack now has a 9s cooldown�
 складывает строки «No longer provides / Now also provides / X bonus increased from A to B» в карточку, только если под
 заголовком стоит `auto_components_change`; иначе это обычные строки («Status Resistance bonus decreased from +25%
 to +20%»). Так же `_postprocess_silent_stats`: без изменения сборки «молчаливые» характеристики становятся строками.
+**Или когда у предмета есть карточка способностей** (владелец 2026-10-17, Refresher Orb 7.41: «отсутствует карточка
+характеристик»): блок из карточек показывает и характеристики карточкой. Карточка способностей появляется позже
+(`_postprocess_item_ability_cards`), поэтому второй проход `_postprocess_properties_change(with_abilities=True)`.
+Так стало у Refresher Orb и Crimson Guard 7.41, Radiance 7.40.
+
+В карточке способностей — только изменившиеся способности (владелец 2026-10-17, Harpoon / Mask of Madness 7.41:
+«зачем тут active/passive, если изменилась только Draw Forth»): тот же текст с обеих сторон, без окраски, хвоста,
+перенесённой заметки и отметки радиуса — не рисуется (`render_iab_card`); если не осталось ничего — рисуется всё.
+Шапка способности из файлов игры: `tools/item_ability_text.py` пропускает перезарядку / манакост / дальность, только
+если текст уже говорит «Cooldown: число», а не само слово (Refresher «Resets the cooldowns…» терял 180 с).
 71 блок 7.38–7.41f переведён обратно в строки; сторож — `tests/test_item_card_rows.py::test_no_stats_card_without_a_build_change`.
 Пустые `ul_open/ul_close` убираются (`_drop_empty_ul`).
 

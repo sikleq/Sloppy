@@ -130,6 +130,15 @@ import generate_patch_code_v2 as g
     ("Now levels with Marksmanship", "REWORK"),
     ("Now requires Aghanim's Scepter to cast other abilities during channeling", "NERF"),
     ("Affected units no longer take increased magical and pure damage bonus from Winter Wyvern by default", "NERF"),
+    # owner 2026-10-17 (7.41 items): the shop an item is sold in is a structural move; Crimson Guard's block a nerf
+    ("Item moved back to Secret Shop from Miscellaneous Shop", "REWORK"),
+    ("Guard base damage block rescaled from 70 for all units to 70 on melee heroes and buildings and 45 on ranged heroes",
+     "NERF"),
+    ("Tormentor's spawn preference has switched", "REWORK"),
+    ("Roshan's pit preference has switched", "REWORK"),
+    ("Transmute no longer prevents camp-clearing Madstone Bundles from spawning if it was used on the last creep in "
+     "neutral camp", "MISC"),
+    ("Burn toggling no longer breaks invisibility nor stops channels", "QoL"),
 ])
 def test_guess_tag(text, expected):
     assert _guess_tag(text) == expected
@@ -252,16 +261,26 @@ def test_recipe_cheaper_total_unchanged_inline_is_buff_not_misc():
     out = _pp1('W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", b(600, 400, l=True)))')
     assert 't("MISC")' not in out
     # every % at the end of the row (owner 2026-09-26); the unchanged total is a grey "0%" after the
-    # recipe % — "-33% / 0%" (owner 2026-10-05, Hydra's Breath 7.41f)
-    assert out == ('W(li("Recipe cost decreased from 600 to 400. Total cost unchanged at 3900g", '
-                   'b([600, 3900], [400, 3900], l=True, slash=True)))')
+    # recipe % — "-33% / 0%" (owner 2026-10-05, Hydra's Breath 7.41f); the total itself in the (?) note, the
+    # majority's form (owner 2026-10-17)
+    assert out == ('W(li("Recipe cost decreased from 600 to 400", '
+                   'b([600, 3900], [400, 3900], l=True, slash=True), extra=inline_note("Total cost unchanged at 3900g")))')
 
 
 def test_recipe_pricier_total_unchanged_inline_keeps_nerf_badge():
     """7.41 "Recipe cost increased from 450 to 800. Total cost unchanged at 2150g": NERF, +78% at the end."""
-    out = _pp1('W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", b(450, 800, l=True)))')
-    assert out == ('W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g", '
-                   'b([450, 2150], [800, 2150], l=True, slash=True)))')
+    out = _pp1('W(li("Recipe cost increased from 450 to 800. Total cost unchanged at 2150g (due to Chainmail cost '
+               'decrease)", b(450, 800, l=True)))')
+    assert out == ('W(li("Recipe cost increased from 450 to 800", b([450, 2150], [800, 2150], l=True, slash=True), '
+                   'extra=inline_note("Total cost unchanged at 2150g (due to Chainmail cost decrease)")))')
+
+
+def test_recipe_and_total_both_unchanged_split_the_same_way():
+    """7.41 Solar Crest: "Recipe cost unchanged at 500. Total cost unchanged at 2575g (due to Pavise cost decrease)"."""
+    out = _pp1('W(li("Recipe cost unchanged at 500. Total cost unchanged at 2575g (due to Pavise cost decrease)", '
+               't("MISC")))')
+    assert out == ('W(li("Recipe cost unchanged at 500", t("MISC"), '
+                   'extra=inline_note("Total cost unchanged at 2575g (due to Pavise cost decrease)")))')
 
 
 def test_recipe_total_unchanged_split_note_is_badge_not_misc():
@@ -272,10 +291,28 @@ def test_recipe_total_unchanged_split_note_is_badge_not_misc():
                    'extra=inline_note("Total cost unchanged at 4500g")))')
 
 
+def test_an_abilities_card_brings_the_stats_card():
+    """Owner 2026-10-17, Refresher Orb 7.41: no build change, but an abilities card — its stats go into a card too;
+    without either card the stat rows stay rows (Sange and Yasha, 2026-09-28)."""
+    block = ['W(item_header("Refresher Orb"))',
+             "# abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)",
+             'W(item_abilities_change(', '    old=["Active: Reset Cooldowns. A"],', '    new=["Active: Reset Cooldowns. B"]))',
+             'W(ul_open())',
+             'W(li("Health Regen bonus increased from +12 to +14", b(12, 14)))',
+             'W(li("Reset Cooldowns mana cost decreased from 400 to 325", b(400, 325, l=True)))',
+             'W(ul_close())']
+    out = g._postprocess_properties_change(block, with_abilities=True)
+    assert out[1] == 'W(properties_change(old=[("BUFF", "+12 Health Regen")], new=[("", "+14 Health Regen", b(12, 14))]))'
+    assert not any("Health Regen bonus" in ln for ln in out) and any("mana cost" in ln for ln in out)
+    plain = [block[0], 'W(ul_open())', block[6], 'W(ul_close())']
+    assert g._postprocess_properties_change(plain, with_abilities=True) == plain
+
+
 def test_recipe_total_unchanged_without_a_number_keeps_the_recipe_badge():
     """7.38b Heaven's Halberd: Valve wrote "Total cost unchanged" with no total — nothing to put after the slash."""
     out = _pp1('W(li("Recipe cost increased from 275 to 450. Total cost unchanged", b(275, 450, l=True)))')
-    assert out == 'W(li("Recipe cost increased from 275 to 450. Total cost unchanged", b(275, 450, l=True)))'
+    assert out == ('W(li("Recipe cost increased from 275 to 450", b(275, 450, l=True), '
+                   'extra=inline_note("Total cost unchanged")))')
 
 
 def test_recipe_unchanged_total_renders_recipe_then_grey_zero():

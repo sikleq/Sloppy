@@ -442,12 +442,12 @@ def build():
     W(li("Recipe cost decreased from 300 to 200. Total cost increased from 2500 to 2600", b([300, 2500], [200, 2600], l=True, slash=True, force_overall="nerf")))
     W(ul_close())
     W(item_header("Radiance"))
+    W(properties_change(old=[("BUFF", "+15% Evasion")], new=[("", "+25% Evasion", b(15, 25))]))
     # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
     W(item_abilities_change(
         old=["Toggle: Burn. When active, scorches enemies for 60 magical damage per second and causes them to miss 15% of their attacks. Deals 150% damage to illusions. Illusions deal 35 magical damage per second. Radius: 650."],
         new=["Toggle: Burn. When active, scorches enemies for 60 magical damage per second. Illusions deal 35 magical damage per second. Radius: 650."]))
     W(ul_open())
-    W(li("Evasion bonus increased from +15% to +25%", b(15, 25)))
     W(li("Burn no longer causes enemies to miss 15% of their attacks", t("DEL")))
     W(li("Burn no longer does extra damage to illusions", t("DEL")))
     W(ul_close())
