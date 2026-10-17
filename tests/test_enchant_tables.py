@@ -17,8 +17,10 @@ from patch import elements as e  # noqa: E402
 def test_tier_specs_and_cells():
     import enchant_table as et
     assert et._tiers("4/5") == [4, 5] and et._tiers("2-4") == [2, 3, 4] and et._tiers("5") == [5]
-    assert 'class="iab-lv iab-buff">+16%' in e._ench_cell("+12%", "+16%", False, False)
-    assert 'class="iab-lv iab-nerf">−6%' in e._ench_cell("−5%", "−6%", True, False)          # a bigger penalty
+    up = e._ench_cell("+12%", "+16%", False, False)
+    assert 'class="iab-lv iab-buff badge buff' in up and '+33%' in up and '">+16%</span>' in up
+    worse = e._ench_cell("−5%", "−6%", True, False)                                          # a bigger penalty
+    assert 'class="iab-lv iab-nerf badge nerf' in worse and '">−6%</span>' in worse
     assert 'class="iab-lv iab-new">+10%' in e._ench_cell(None, "+10%", False, False)          # a tier it has now
     assert 'class="iab-lv iab-nerf">−10%' in e._ench_cell(None, "−10%", True, False, True)    # a whole new penalty
     assert 'class="iab-lv iab-del">+40%' in e._ench_cell("+40%", None, False, False)          # a tier it lost
@@ -56,7 +58,10 @@ def test_7_41_enchantments_show_tables_and_keep_only_word_rows():
     html = _page()
     assert html.count('class="ench-tiers ench-change"') == 19
     crude = _block(html, "crude")
-    assert '<span class="ench-was">+30%</span><span class="ench-arrow">→</span><span class="iab-lv iab-nerf">+20%' in crude
+    # the new value dotted with its % on hover / tap, in that %'s shade (owner 2026-10-17)
+    assert re.search(r'<span class="ench-was">\+30%</span><span class="ench-arrow">→</span><span class="iab-lv iab-nerf '
+                     r'badge nerf\d tone"><span class="iab-hint abil-ico-hint" data-tooltip="[^"]*-33%[^"]*">\+20%</span>',
+                     crude)
     assert '<span class="iab-lv iab-del">+40%</span>' in crude and '<span class="iab-lv iab-new">+10%</span>' in crude
     shown = [re.sub(r"<[^>]+>", "", m.group(2)) for m in re.finditer(r"<li\b([^>]*)>(.*?)</li>", crude, re.S)
              if "iab-covered" not in m.group(1)]
@@ -65,6 +70,15 @@ def test_7_41_enchantments_show_tables_and_keep_only_word_rows():
     assert '<span class="ench-v">+2</span>' in vital and 'class="iab-covered covered-ench"' in vital
     mystical = _block(html, "mystical")
     assert 'class="ench-stat ench-gone">Cast Range' in mystical and "None" not in mystical
+
+
+def test_tables_have_lines_between_cells_and_centred_values():
+    # owner 2026-10-17: "все таблицы оформляются с вертикальными линиями-разделителями между ячейками, а значения
+    # стоят центрировано"
+    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    rule = css.split(".ench-change .ench-v, .ench-change .ench-tier-h {", 1)[1].split("}", 1)[0]
+    assert "border-left: 1px solid" in rule and "justify-content: center" in rule
+    assert "row-gap: 0" in css.split(".ench-tiers.ench-change {", 1)[1].split("}", 1)[0]
 
 
 def test_the_filters_know_the_table():

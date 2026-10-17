@@ -866,8 +866,14 @@ def _ench_cell(old, new, penalty, brand_new, added_line=False):
         return f'<span class="ench-v"><span class="iab-lv iab-{tone}">{new}</span></span>'
     up = _ench_num(new) > _ench_num(old)
     d = "nerf" if up == penalty else "buff"
+    # the new value dotted, its % on hover / tap, in that %'s own shade — as the item cards' values (owner
+    # 2026-10-17: "подчеркнуть пунктиром новые значения, а при нажатии видеть % разницы")
+    from .badges import b
+    pct = b(_ench_num(old), _ench_num(new), l=penalty)
+    tone = _tone_cls(pct)
+    value = _iab_hint(new, f'<span class="iab-tip-pct">{pct}</span>')
     return (f'<span class="ench-v ench-chg"><span class="ench-was">{old}</span><span class="ench-arrow">→</span>'
-            f'<span class="iab-lv iab-{d}">{new}</span></span>')
+            f'<span class="iab-lv iab-{d}{" " + tone if tone else ""}">{value}</span></span>')
 
 
 def _enchant_change(name):

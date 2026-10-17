@@ -3116,8 +3116,23 @@ body.patch-page .enchant-list-head .ench-tiers { margin: -5px 0; padding: 5px 0;
   background: var(--muted-04);
   border: 1px solid var(--line-soft);
   border-radius: 6px;
-  row-gap: 4px;
+  row-gap: 0;
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
+/* every table: thin semi-transparent lines between the cells, values centred (owner 2026-10-01 / 2026-10-17:
+   "все таблицы оформляются с вертикальными линиями-разделителями между ячейками") — a vertical line before every
+   tier column (so also between the bonus and Tier 1), a horizontal one between the rows; no row gap, so the
+   vertical lines run through */
+.ench-change .ench-stat, .ench-change .ench-v, .ench-change .ench-tier-h, .ench-change .ench-stat-h {
+  padding: 4px 6px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid rgba(254, 247, 232, 0.06);
+}
+.ench-change .ench-v, .ench-change .ench-tier-h { justify-content: center; border-left: 1px solid rgba(254, 247, 232, 0.10); }
+.ench-change .ench-row-h > * { border-top: none; }
 .ench-change .ench-chg { white-space: nowrap; }
 .ench-change .ench-was { color: var(--text-dimmer); font-weight: 400; font-size: 12px; }
 .ench-change .ench-arrow { color: var(--text-dimmer); font-weight: 400; margin: 0 3px; }
@@ -11430,7 +11445,7 @@ html.cb-mode .components-change .component-price.cost-nerf, html.cb-mode .compon
   .ench-tiers { grid-template-columns: minmax(0, 1fr) repeat(5, 44px); }
   /* a phone: "was" above "now" in the cell, the arrow left out */
   .ench-tiers.ench-change { grid-template-columns: minmax(0, 1fr) repeat(5, 46px); padding: 6px 8px; font-size: 12px; }
-  .ench-change .ench-chg { white-space: normal; }
+  .ench-change .ench-chg { white-space: normal; flex-direction: column; }
   .ench-change .ench-was { display: block; font-size: 11px; }
   .ench-change .ench-arrow { display: none; }
   body.patch-page .enchant-list-row .ench-tiers,

@@ -18,9 +18,10 @@ from item_ability_text import _items  # noqa: E402
 from patch.elements import _ENCHANT_DESC  # noqa: E402
 
 OUT = os.path.join(_ROOT, "data", "rules", "enchant_values.json")
-# The local "7.41" items.txt is byte-identical to "7.41a" — the 7.41a build. 7.41a's notes change one enchantment:
-# Crude "Base Attack Time Reduction bonus worsened from 8/12/16% to 6/9/12%" (owner 2026-10-17), so 7.41 had these.
-CORRECTIONS = {"7.41": {"Crude": {"bat_reduce": "8 12 16"}}}
+# {version: {enchantment: {kv key: value}}} where the local items.txt isn't that patch's build. Empty since
+# 2026-10-17: the "7.41" file was the 7.41a build (byte-identical; Crude 6/9/12 instead of 8/12/16, owner) and was
+# replaced with the real 7.41 build 6728 from the client archive.
+CORRECTIONS = {}
 _NUM = re.compile(r"(?<![\w.])([+\-−]?)(\d+(?:\.\d+)?)")
 
 
