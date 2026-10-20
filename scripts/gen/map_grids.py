@@ -190,7 +190,7 @@ def main():
     ap.add_argument("patches", nargs="*", help="only these Oldgrowth folders (default: every map file)")
     ap.add_argument("--store", default="D:/DotaMaps")
     ap.add_argument("--og", default=os.environ.get("OLDGROWTH_DIR",
-                                                   os.path.join(os.path.expanduser("~"), "Documents", "Oldgrowth")))
+                                                   os.path.join(os.path.expanduser("~"), "Oldgrowth")))
     args = ap.parse_args()
     vdir = os.path.join(args.og, "versions")
     for ver in sorted(os.listdir(vdir)):

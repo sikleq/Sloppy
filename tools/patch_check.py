@@ -15,7 +15,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-OLDGROWTH = os.environ.get("OLDGROWTH_DIR", os.path.join(os.path.expanduser("~"), "Documents", "Oldgrowth"))
+OLDGROWTH = os.environ.get("OLDGROWTH_DIR", os.path.join(os.path.expanduser("~"), "Oldgrowth"))
 STATS_FILES = ("items.txt", "items.json", "units.json", "npc_units.txt", "npc_units.json", "npc_abilities.txt",
                "npc_abilities.json", "npc_heroes.txt", "heroes.json", "heroes_raw.json", "abilities.json",
                "ability_ids.json")

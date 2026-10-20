@@ -61,7 +61,7 @@ def main():
     ap.add_argument("patches", nargs="*", help="only these Oldgrowth folders (default: every map file)")
     ap.add_argument("--store", default="D:/DotaMaps")
     ap.add_argument("--og", default=os.environ.get("OLDGROWTH_DIR",
-                                                   os.path.join(os.path.expanduser("~"), "Documents", "Oldgrowth")))
+                                                   os.path.join(os.path.expanduser("~"), "Oldgrowth")))
     ap.add_argument("--no-grids", action="store_true", help="skip the cell grids (scripts/gen/map_grids.py)")
     args = ap.parse_args()
     for ver, info in _folders(args.og, set(args.patches)):
