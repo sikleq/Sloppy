@@ -1,15 +1,8 @@
 """Compute per-patch terrain diffs -> data/terrain_diff_<newVer>.json.
 
-Primary terrain-data sources:
-  - Interactive map: https://tools.spectral.gg/interactive-map
-  - Coords (GitHub):  leamare/dota-interactive-map
-    (assets/data/<ver>/mapdata.json + root worlddata.json bounds)
-
-For each old->new patch pair we read the two `mapdata.json` exports from
-leamare/dota-interactive-map (cached under .cache/leamare/mapdata_<code>.json —
-NOT committed; this is a regeneration helper, like scripts/fetch_*.py) and emit a
-small, committed diff per NEW patch that the site build (builders/terrain.py)
-projects onto that patch's terrain map:
+For each old->new map file pair we read our own two data/map/mapdata_<code>.json (read from the game's map
+files by scripts/gen/extract_map_entities.py) and emit a small, committed diff per NEW patch that the site build
+(builders/terrain.py) projects onto that patch's terrain map:
 
   - treesOld / treesNew     : full tree coord sets (forest layout each side)
   - campsOld / campsNew      : neutral camps with tier (split old/new by slider)
@@ -37,7 +30,6 @@ import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))  # scripts/gen -> scripts -> repo root
-_CACHE = os.path.join(_ROOT, ".cache", "leamare")
 
 sys.path.insert(0, _ROOT)
 from builders import map_versions  # noqa: E402
@@ -51,7 +43,7 @@ def default_pairs():
 
 
 # Point-entity layers (full old+new sets → toggleable slider-split map layers).
-# leamare keys (layerDefinitions.js): Outpost == npc_dota_watch_tower (2),
+# Outpost == npc_dota_watch_tower (2),
 # Watcher == npc_dota_lantern (10) — SEPARATE layers.
 _ENTITY_KEYS = {
     "towers": "npc_dota_tower",
@@ -270,11 +262,9 @@ _OWN = os.path.join(_ROOT, "data", "map")
 
 
 def _load(code):
-    """Our own map data first (data/map/mapdata_<code>.json, read from the game files by
-    scripts/gen/extract_map_entities.py — same shape), else leamare's cached export."""
-    own = os.path.join(_OWN, f"mapdata_{code}.json")
-    path = own if os.path.exists(own) else os.path.join(_CACHE, f"mapdata_{code}.json")
-    with open(path, encoding="utf-8") as f:
+    """Our own map data (data/map/mapdata_<code>.json, read from the game files by
+    scripts/gen/extract_map_entities.py)."""
+    with open(os.path.join(_OWN, f"mapdata_{code}.json"), encoding="utf-8") as f:
         return json.load(f)["data"]
 
 

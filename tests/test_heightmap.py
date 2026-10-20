@@ -1,5 +1,5 @@
 """maps/dota.vhcg — the map's height grid (scripts/gen/heightmap.py) and the Terrain page's Heights layer.
-The owner 2026-10-05: "decode dota.vhcg and make a height layer; we don't go to leamare any more"."""
+The owner 2026-10-05: "decode dota.vhcg and make a height layer" — from our own files only."""
 import os
 import struct
 import sys

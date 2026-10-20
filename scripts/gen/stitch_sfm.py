@@ -1,11 +1,11 @@
-"""Our top-down map picture rendered in Source Filmmaker, as leamare's maps are (the owner 2026-10-01: "can we do it
-through SFM?" — the in-game capture looked brighter and blurrier than leamare's).
+"""Our top-down map picture rendered in Source Filmmaker (the owner 2026-10-01: "can we do it through SFM?" — the
+in-game capture looked too bright and blurry).
 
 The SFM session (kept outside the repo; see docs/terrain.md for its settings) flies a camera with a 1-degree lens
 from 240000 units up over the map in a serpentine, one frame per second: 6 x 11 frames of 3840x2160, each ~4190 x
 2360 units, ~15% overlap. With such a narrow lens the frames are near-orthographic, so each one is placed by the
 camera's own position and orientation read from the session — no feature matching needed. SFM renders with
-modelLod 0 and without the game's post-processing (SkipMainPipelinePostProcessing) — leamare's look, and none of the
+modelLod 0 and without the game's post-processing (SkipMainPipelinePostProcessing) — a clean look, and none of the
 in-game capture's orange camp glows, lime grass or blocky FSR upscaling.
 
     1. dota2.exe -tools -addon dotamapsfm → Tools → Source Filmmaker → open the session → File → Export → Movie
@@ -386,8 +386,8 @@ def black_void(img):
 
 def fill_void(img, shade=0.8, shadow=90, near_px=2500):
     """The corners beyond the map's edge (nothing renders there: black) painted in our own way (the owner
-    2026-10-01: "fill the black corners, in our own way" — then "the bottom-left is all murky; leamare's looks more
-    harmonious"): plain ground continues past the edge — a texture quilted from the plainest ground next to the
+    2026-10-01: "fill the black corners, in our own way" — then "the bottom-left is all murky" — it should look more
+    harmonious): plain ground continues past the edge — a texture quilted from the plainest ground next to the
     void (grass by Radiant, grey ground by Dire), a little darker than the map, with a soft shadow under the map's
     edge so it reads as outside the playable area. Tried before: mirroring the edge (duplicated cliffs), a
     blurred colour fade (murky)."""

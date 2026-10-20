@@ -1,8 +1,8 @@
 """Map entities (trees, camps, towers, runes, Roshan, Tormentors …) straight from the game's own map files ->
 data/map/mapdata_<code>.json — our own source for the Terrain pages, independent of third-party repos.
 
-The shape is the one of leamare/dota-interactive-map's mapdata.json ("data": {classname: [{x, y, …}]}), so
-scripts/gen/build_terrain_diff.py reads either. Checked against it: 7.41 = 2475 trees, 28 camps (tests).
+The shape is {"data": {classname: [{x, y, …}]}}, read by scripts/gen/build_terrain_diff.py. 7.41 = 2475 trees,
+28 camps (tests).
 
 How it works (no game running, no downloads): Source2Viewer-CLI decompiles the map VPK's entity lumps
 (maps/dota/entities/*.vents_c; default_ents + the *_base world layers, never *_destruction — those are the trees
@@ -35,7 +35,7 @@ MAPS = {"683": "dota_683.vpk", "685": "dota_685.vpk", "688": "dota_688.vpk", "70
         "719": "dota_719.vpk", "722": "dota_722.vpk", "728": "dota_728.vpk", "732": "dota_732.vpk",
         "737": "dota_737.vpk", "741": "dota.vpk"}
 
-# classname -> the same key in the output (leamare's), plus what else a record carries
+# classname -> the same key in the output, plus what else a record carries
 _POINTS = ("ent_dota_tree", "ent_dota_fountain", "ent_dota_shop", "npc_dota_fort", "npc_dota_watch_tower",
            "npc_dota_lantern", "npc_dota_unit_twin_gate", "npc_dota_xp_fountain", "npc_dota_lotus_pool",
            "npc_dota_mango_tree", "npc_dota_healer", "dota_item_rune_spawner_bounty",

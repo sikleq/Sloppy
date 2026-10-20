@@ -1,4 +1,4 @@
-"""Our top-down map picture shot IN THE GAME (the game's own look — as leamare's SFM method, without SFM's clicks):
+"""Our top-down map picture shot IN THE GAME (the game's own look, without SFM's clicks):
 a running Dota 2 in Workshop Tools mode with the custom game scripts/gen/topdown_addon (no fog of war, no units,
 the camera straight down), driven through its remote console (scripts/gen/game_console.py): for every tile the
 camera looks straight down at the tile's centre, the game writes a screenshot, and only the middle of it is kept —

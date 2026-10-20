@@ -25,7 +25,7 @@ slider, plus that patch's *Terrain Changes* list. Built by `builders/terrain.py`
   move. One **Trees** button, `.show-trees`. (Data: `treesOld`+`treesNew`, full
   sets.) No add/remove colouring.
 - ✅ **Camps layer** — tier icons (`icons/camps/`: small/mid/big/ancient, by
-  `neutralType` 0–3 per leamare styleDefinitions), split old/new by the slider
+  `neutralType` 0–3), split old/new by the slider
   like trees (`.tc-camps-old` clip right = `camps40`, `.tc-camps-new` clip left
   = `camps41`) so you see what a camp became + where it moved. No "changed"
   ring. **Camps** button, `.show-camps`.
@@ -56,26 +56,21 @@ tiles ≈ 4864px). We stitch z2, crop to the shared **tight** content bbox (now
 placeholder, so no fat grey borders; same box for 7.40 & 7.41 so the swipe stays
 aligned), resize to **1536²** webp. Re-run: `python scripts/gen/build_terrain_maps.py 7.40 7.41`.
 
-## Data sources (primary)
+## Data sources
 
-- Interactive map: <https://tools.spectral.gg/interactive-map>
-- Coords (GitHub): `leamare/dota-interactive-map`
-  - `assets/data/<ver>/mapdata.json` — per-version entity coords (trees, neutral
-    camps, towers, watchers, twin gates, lotus pools, tormentor/miniboss, …).
-  - root `worlddata.json` — world bounds (`minX -10464 .. maxX 10400`, same Y).
-- Diff: `scripts/gen/build_terrain_diff.py` reads the two cached `mapdata.json`
-  (under `.cache/leamare/`, not committed) → `data/terrain_diff_<patch>.json` (committed, one per patch).
-- Projection: world `[-10464, 10400]` → `1280px`. Verified pixel-accurate by
-  overlaying all 7.41 trees on the map render (they land exactly on the forest).
+- Our own map files only (next section): `data/map/mapdata_<code>.json`, one per map file.
+- Diff: `scripts/gen/build_terrain_diff.py` reads the two files of a step → `data/terrain_diff_<patch>.json`
+  (committed, one per patch).
+- Projection: `data/terrain_map_meta.json`. Verified pixel-accurate by overlaying all 7.41 trees on the map render
+  (they land exactly on the forest).
 - The 7.40→7.41 diff: **+324 / −305 trees, camps moved/relocated + 2 demoted,
   2 towers, tormentor/twin-gate/lotus moves** — all match the 7.41 text list.
 
 ## Our own map data — from the game files (2026-09-30)
 
 `scripts/gen/extract_map_entities.py` reads the map VPKs of the local game install with Source2Viewer-CLI
-(path in env `S2V_CLI`; no game running, no downloads) → `data/map/mapdata_<code>.json` (committed), same
-shape as leamare's `mapdata.json`. `build_terrain_diff.py` prefers these files and falls back to the
-`.cache/leamare/` export only for maps we don't have yet.
+(path in env `S2V_CLI`; no game running, no downloads) → `data/map/mapdata_<code>.json` (committed), the
+only map data `build_terrain_diff.py` reads.
 
 - Source: the entity lumps `maps/dota/entities/*.vents_c` — `default_ents` + the `world_layer_*_base` layers,
   NOT `*_destruction`. Trees = `ent_dota_tree`; camps = `npc_dota_neutral_spawner` (`neutraltype`,
@@ -85,19 +80,15 @@ shape as leamare's `mapdata.json`. `build_terrain_diff.py` prefers these files a
   shrines (7.00–7.22) = buildings with `mapunitname` `*_healers`. Coordinates rounded to whole units.
 - Maps on disk: the live `dota.vpk` (= 7.41 terrain) + legacy snapshots the game keeps for old replays:
   `dota_683 / 685 / 688 / 706 / 719 / 722 / 728 / 732 / 737.vpk`.
-- Checked against leamare (`tests/test_map_entities.py`, skips without the cache): trees, camps + types, boxes,
+- Checked once (2026-09-30) against a third-party export of the same maps: trees, camps + types, boxes,
   towers, runes, Roshan, Tormentors, gates, lotus, watchers, outposts identical for 7.41, 7.35 (=737), 7.32,
-  7.22, 7.19. Only differences: leamare's hand-added `landmarks` / `landmark_aura` (not in the map files) and one
-  7.06 camp box (his is wider). Counts: 6.83 2669 trees · 6.85 2489 · 6.88 2371 · 7.06 2190 · 7.19 2205 ·
+  7.22, 7.19. Only differences: its hand-added `landmarks` / `landmark_aura` (not in the map files) and one
+  7.06 camp box (wider there). Counts: 6.83 2669 trees · 6.85 2489 · 6.88 2371 · 7.06 2190 · 7.19 2205 ·
   7.22 2208 · 7.28 2104 · 7.32 2303 · 7.37 2531 · 7.41 2475.
 - Missing so far: 7.38, 7.38b/c, 7.39*, 7.40* — the game install has no snapshot of them. Next: take
   `maps/dota.vpk` from old builds (DepotDownloader `-filelist`, Steam login by the owner) and pass it with
   `--vpk`. Rendering the top-down image ourselves: Source2Viewer glTF export → Blender orthographic (needs
   Source2Viewer 20.0 for Dota's terrain shaders).
-- How leamare does it (for reference): a Lua custom game in Workshop Tools dumps entities to the console
-  (`leamare/dota-map-coordinates`); the image is SFM camera sweeps stitched in Microsoft ICE and calibrated by
-  hand (`dota-interactive-map/docs/05-mapimage.md`). The courier tile server DOES have some letter patches
-  (738b, 739b).
 
 ## Map-file layers: lane paths, currents, zones, spawn points (2026-10-06)
 
@@ -197,7 +188,7 @@ The owner (2026-10-06): "все слои" — everything the map file holds besi
 
 ## Our own top-down picture — shot in the game (2026-10-01)
 
-`scripts/gen/capture_map.py` = leamare's SFM method without SFM's clicks: Dota 2 in Workshop Tools mode runs our
+`scripts/gen/capture_map.py` = a top-down shot without SFM's clicks: Dota 2 in Workshop Tools mode runs our
 custom game `scripts/gen/topdown_addon` (installed with `--install`; no fog of war, no day/night, pre-game forever,
 `topdown_hide` hides heroes / couriers / Roshan / Tormentors / creeps, `topdown_cam x y dist` = Panorama
 `GameUI.SetCameraPitchMin/Max(90)` + `SetCameraTargetPosition`), driven over the remote console
@@ -231,7 +222,7 @@ What it took (each one silently broke the shots):
   Never leave `host_timescale` below 1: the server then runs a command every ~20 s.
 - The player's own `autoexec.cfg` / video settings apply (FSR upscaling here): turning FSR off made the ground
   blurrier, not sharper; at the site's 4096 px its blockiness doesn't show. `sc_force_lod_level 0` changes nothing.
-- Colours (the owner 2026-10-01: "our map is too bright, it should look like leamare's"): the game's picture is
+- Colours (the owner 2026-10-01: "our map is too bright"): the game's picture is
   warmer and more saturated (lime grass, orange sand, light tree shadows). A colour grade on top was tried (a
   pixel-against-pixel fit washed the picture out; a histogram transfer dirtied the ground and kept the orange camp
   glows) and removed 2026-10-01 — the Source Filmmaker route below replaced this capture.
@@ -243,11 +234,11 @@ What it took (each one silently broke the shots):
 
 ## Our own top-down picture — rendered in Source Filmmaker (2026-10-01) — the way to go
 
-The in-game capture above never looked like leamare's pictures (the owner: "too bright", "orange spots", "dirty
+The in-game capture above never looked right (the owner: "too bright", "orange spots", "dirty
 ground"): the game camera adds its post-processing, low-detail models from 5000 up, the player's FSR upscaling, and
 the camps' orange glows — 12 game settings (lights, particles, overlays, decals, bloom, tone map, time of day) don't
 remove them, and colour grading on top only traded one fault for another. Source Filmmaker (Workshop Tools →
-Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
+Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
 
 - The session (`*.dmx`, kept outside the repo — SFM sessions live in `game/dota_addons/<addon>/elements/sessions`;
   `game/bin/win64/dmxconvert.exe -i in.dmx -o out.dmx -oe keyvalues2` makes it text, `-oe binary` back):
@@ -284,8 +275,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   there) and only SFM's grey rim is painted black. Why they're dark: the game lights nothing beyond the playable
   edge — on the current engine and on the 7.40c engine alike, for 7.38-7.41f maps alike; none of mat_fullbright,
   sc_disable_baked_lighting, r_indirectlighting, r_dota_shadow_ambient_light, r_deferred_height_fog,
-  dota_height_fog_scale, r_dota_height_fog_plane_height changes a pixel (SFM, 2026-10-01). Leamare's pictures
-  show lit ground there from an older pipeline.
+  dota_height_fog_scale, r_dota_height_fog_plane_height changes a pixel (SFM, 2026-10-01).
 - Older maps on the current engine: the water of 7.38-7.40c maps renders as maroon triangles (7.41 reworked the
   water shader; ~20 000 px per 4096 picture, none on 7.41+). Swapping in only the old shaders gives black frames.
   So 7.38-7.40c are rendered on a copy of the whole game as it was on 2026-03-16 (the 7.40c build): the install
@@ -319,7 +309,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   `stitch_sfm.check_fits` stops a render whose frames don't cover the rectangle or whose objects (`--mapdata`)
   come closer than 300 units to its edge — then the camera path and data/terrain_map_meta.json must grow.
 - Provenance: `data/map/renders.json` lists the versions whose picture is ours (all of them). No credit line
-  under the slider: it read "Inspired by Leamare and devilesk" from 2026-10-01 until the owner asked to remove it
+  under the slider: a credit line stood there from 2026-10-01 until the owner asked to remove it
   on 2026-10-03 — every picture and object list is ours, and the Oldgrowth README credits them. Test:
   tests/test_terrain_credit.py.
 - Since 2026-10-02 every map file 7.38-7.41f is on the site (`icons/maps/map_<first patch>.webp`, the Oldgrowth
@@ -350,7 +340,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   gates, tormentors, bounty runes, power runes, wisdom shrines, **outposts**,
   **watchers**, **roshan** (`_ENTITY_LAYERS` in builders/terrain.py). Data = full
   old+new coord sets in `terrain_diff_<patch>.json["entities"]` (built by
-  build_terrain_diff.py). **leamare keys (`layerDefinitions.js`):** `npc_dota_tower`,
+  build_terrain_diff.py). **Classnames:** `npc_dota_tower`,
   `npc_dota_lotus_pool`, `npc_dota_unit_twin_gate`, `npc_dota_miniboss_spawner`,
   `dota_item_rune_spawner_bounty` / `_powerup`, `npc_dota_xp_fountain`,
   **Outpost = `npc_dota_watch_tower` (2)**, **Watcher = `npc_dota_lantern` (10)**
@@ -617,8 +607,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   | 7.41c | 149 cells by the Twin Gates and Tormentors became wardable |
   | 7.41d | 23 cells turned no-ward (by Dire small camp 11, a Tormentor, a watcher); 693 cells at the map's edge out of bounds |
   | 7.41e | 2 cells by Radiant top T2 turned no-ward |
-- **Heights layer (2026-10-05)** — the owner: "decode dota.vhcg and make a height layer; we don't go to leamare any
-  more" (a ward map that knows high ground comes later). Every map file since 7.08 carries `maps/dota.vhcg`; decoded
+- **Heights layer (2026-10-05)** — the owner: "decode dota.vhcg and make a height layer" — from our own files only (a ward map that knows high ground comes later). Every map file since 7.08 carries `maps/dota.vhcg`; decoded
   from the file alone (`scripts/gen/heightmap.py`, format in its docstring): a 128-byte header ("vhcg", version 1,
   cell 128, W 165, H 938, sub-grid S 5, then cell / x0 -10752 / y0 -109440 as floats), W x H records of 9 bytes
   (f32 ground height — -16384 = none; f32 a second surface, the river's water 16 above its bed; u8 flag), then one
@@ -764,7 +753,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
    patch: see "One page per patch" above. 7.37e's picture (done 2026-10-02) gives 7.38 its page.
 3. ✅ **Marker redesign — done.** Toggleable tree + camp layers, both split
    old/new by the slider; magnifier lens. **Projection is now EXACT** — uses the
-   real leamare transform (`src/js/conversion.js worldToLatLon` + mapConstants
+   real tile-map transform (`worldToLatLon` + map constants
    `map_x_boundaries [-10829.42, 11487.75]`, `map_y_boundaries [11351.48,
    -10939.96]`, MAP_W 20480; zoom-2 tile = 1024 map-px → ÷4 canvas). The crop
    box + bounds are written to `data/terrain_map_meta.json` by

@@ -1,4 +1,4 @@
-"""No line under the Terrain slider. Until 2026-10-03 it read "Inspired by Leamare and devilesk"; the owner then
+"""No line under the Terrain slider. Until 2026-10-03 it held a credit line; the owner then
 asked to remove it from the site — every map picture and object list is our own, and the Oldgrowth README already
 credits them."""
 import os

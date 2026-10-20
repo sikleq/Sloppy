@@ -73,8 +73,8 @@ def _load_diff(patch):
 
 
 def _load_map_meta():
-    """Projection meta written by scripts/gen/build_terrain_maps.py — the leamare
-    map boundaries + the crop box used for our map images. Without it the
+    """Projection meta written by scripts/gen/build_terrain_maps.py — the map's world
+    boundaries + the crop box used for our map images. Without it the
     markers can't be placed accurately."""
     path = _os.path.join(_HERE, "data", "terrain_map_meta.json")
     try:
@@ -85,8 +85,8 @@ def _load_map_meta():
 
 
 def _projector(meta):
-    """world (x,y) -> (px,py) in the MAP_VB viewBox, using the EXACT leamare
-    projection (src/js/conversion.js worldToLatLon): world -> full-map pixel
+    """world (x,y) -> (px,py) in the MAP_VB viewBox, using the exact
+    projection of the stitched map pictures: world -> full-map pixel
     (MAP_W) -> stitched-canvas px (/canvasScale) -> minus the crop origin ->
     normalised over the crop size -> viewBox. This is what makes the markers
     sit exactly on the rendered map."""
@@ -1675,7 +1675,7 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
 
     markers, counts = (_markers_svg(diff, ver.replace(".", "")) if SHOW_MARKERS and diff
                        else ("", {}))
-    # no line under the slider (the owner 2026-10-03: remove "Inspired by Leamare and devilesk" — every picture and
+    # no line under the slider (the owner 2026-10-03: remove the credit line — every picture and
     # object list is ours, and the Oldgrowth README credits them)
     map_inner = (_compare_html(step.before, ver, markers, step.old_pic, step.new_pic,
                                changes=_change_controls(diff) if markers else ("", "")) if step

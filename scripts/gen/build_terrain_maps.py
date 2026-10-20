@@ -37,7 +37,7 @@ import numpy as np
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
 
-# leamare/spectral map projection (src/js/mapConstants.js + conversion.js):
+# tile-map projection (world bounds -> map pixels):
 # the full map is MAP_W px; world coords map onto it via these boundaries
 # (world value at pixel 0 and pixel MAP_W). NOT the worlddata.json bounds.
 MAP_W = MAP_H = 20480

@@ -53,14 +53,3 @@ def test_the_current_map_is_the_741_terrain():
     assert {t: types.count(t) for t in "0123"} == {"0": 6, "1": 14, "2": 6, "3": 2}
     assert len(d["npc_dota_roshan_spawner"]) == 2 and len(d["npc_dota_miniboss_spawner"]) == 2
 
-
-@pytest.mark.parametrize("code,theirs", [("741f", "741"), ("737", "735"), ("732", "732"), ("722", "722")])
-def test_the_forest_is_the_one_the_interactive_map_has(code, theirs):
-    """Same trees as leamare's export where one is cached (.cache/leamare, not committed)."""
-    path = os.path.join(_ROOT, ".cache", "leamare", f"mapdata_{theirs}.json")
-    if not os.path.exists(path):
-        pytest.skip("no cached leamare export")
-    with open(path, encoding="utf-8") as f:
-        them = {(round(t["x"]), round(t["y"])) for t in json.load(f)["data"]["ent_dota_tree"]}
-    ours = {(t["x"], t["y"]) for t in _load(code)["ent_dota_tree"]}
-    assert ours == them

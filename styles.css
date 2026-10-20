@@ -9751,7 +9751,7 @@ button.tf-hband[aria-pressed="false"] { opacity: 0.45; }
 .tc-fsp-chips .tf-hband-sw { width: 11px; height: 11px; }
 /* trees — ONE colour everywhere. The 7.40 layout (old side) and 7.41 layout
    (new side) are split by the slider, so sweeping reveals how the forest moved. */
-/* match the spectral/leamare tree style (styleDefinitions tree.alive) */
+/* the classic alive-tree colour of Dota interactive maps */
 .tm-trees-g rect {
   fill: rgba(0, 255, 0, 0.3);
   stroke: rgba(0, 255, 0, 0.85);
