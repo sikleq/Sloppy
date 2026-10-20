@@ -7,7 +7,7 @@
 Ключи из npc_heroes.txt: `ArmorPhysical`, `AttackDamageMin/Max`, `AttackRate`, `MovementSpeed`, `AttackRange`, `AttributeBaseStrength/Agility/Intelligence`, `AttributeStrengthGain/AgilityGain/IntelligenceGain`, `StatusHealth`, `StatusMana`, `StatusHealthRegen`, `StatusManaRegen`.
 Ключи из items.txt: `ItemCost`, `ItemCooldown`, `AbilityManaCost`.
 
-**Ловушка: слепки-копии прошлого патча (2026-09-27).** Скачиватель (`D:\Sloppy Patches\fetch_stats.py`,
+**Ловушка: слепки-копии прошлого патча (2026-09-27).** Скачиватель (`tools/fetch_stats.py`,
 `find_commit_for_patch`) берёт первый коммит d2vpkr, датированный днём патча. Он бывает сделан ДО выхода патча,
 и тогда слепок равен прошлому патчу: `items.json` 7.41 был побайтно 7.40c (вся переработка предметов 7.41 лежала в
 7.41a), в 7.37e у Khanda остался рецепт 7.37d (600, а не 500). Эталон — история items.txt по патчам

@@ -59,7 +59,7 @@ directory — they never create it. The base of the snapshot (the raw Valve KV
    `npc_abilities.txt`, `npc_ability_ids.txt` and every file in
    `dota/scripts/npc/heroes/`; write them into `data/stats/<version>/` verbatim.
 3. Parse each root KV into its slim JSON with the extractors in
-   `D:\Sloppy Patches\fetch_stats.py` (`extract_heroes` → `heroes.json`,
+   `tools/fetch_stats.py` (`extract_heroes` → `heroes.json`,
    `extract_items` → `items.json`, `extract_units` → `units.json`,
    `extract_abilities` → `abilities.json`, `extract_ability_ids` →
    `ability_ids.json`) — same parsers that produced every historical snapshot,

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 r"""Build the slim JSONs of data/stats/<version>/ from the raw KV .txt already in that folder.
 
-Why: fetch_stats.py (D:\Sloppy Patches) derives these only while pulling KV from d2vpkr, which
+Why: tools/fetch_stats.py derives these only while pulling KV from d2vpkr, which
 lands up to a day after a patch. extract_patchnotes.py can drop the raw .txt from the LIVE VPK
 minutes after release — this runner closes the gap using fetch_stats' own parse/extract functions,
 so the output is byte-for-byte the same shape.
@@ -15,7 +15,7 @@ import json
 import tempfile
 import importlib.util
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FETCH_STATS = os.environ.get("SLOPPY_FETCH_STATS", r"D:\Sloppy Patches\fetch_stats.py")  # outside the repo
+FETCH_STATS = os.path.join(HERE, "tools", "fetch_stats.py")
 spec = importlib.util.spec_from_file_location("fetch_stats", FETCH_STATS); fs = importlib.util.module_from_spec(spec); spec.loader.exec_module(fs)
 OUTPUTS = {  # slim file -> (source .txt, extractor)
     "heroes.json": ("npc_heroes.txt", fs.extract_heroes), "items.json": ("items.txt", fs.extract_items),

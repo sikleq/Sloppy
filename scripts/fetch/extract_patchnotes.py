@@ -28,7 +28,8 @@ Dota 2 Patch Notes — Extractor & Auto-Uploader
        Repository permissions:   Contents = Read and write
        Generate token в†’ РЎРљРћРџРР РћР’РђРўР¬ (РїРѕРєР°Р·С‹РІР°РµС‚СЃСЏ РѕРґРёРЅ СЂР°Р·!)
 
-4. Вставить токен в переменную GITHUB_TOKEN ниже.
+4. Токен не нужен, если на ПК выполнен вход в GitHub CLI (`gh auth login`, права repo).
+   Иначе — переменная окружения SLOPPY_GITHUB_TOKEN (см. github_token() ниже).
 5. Вставить текущую версию патча в PATCH_VERSION ниже.
 
 ВАЖНО ⚠ : храни этот файл у себя на ПК. НЕ заливай его никуда —
@@ -46,6 +47,7 @@ Dota 2 Patch Notes — Extractor & Auto-Uploader
 import base64
 import difflib
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -69,11 +71,18 @@ def _pause(msg: str = "\nНажми Enter чтобы закрыть окно..."
 # РќРђРЎРўР РћР™РљР вЂ” РѕС‚СЂРµРґР°РєС‚РёСЂСѓР№ РїРµСЂРµРґ РєР°Р¶РґС‹Рј РїР°С‚С‡РµРј
 # ═════════════════════════════════════════════════════════════════
 
-# Personal Access Token из github.com/settings/tokens.
-# НЕ хранить в файле: задай переменную окружения SLOPPY_GITHUB_TOKEN
-#   PowerShell:  $env:SLOPPY_GITHUB_TOKEN = "github_pat_..."
-#   постоянно:   setx SLOPPY_GITHUB_TOKEN "github_pat_..."
-GITHUB_TOKEN = os.environ.get("SLOPPY_GITHUB_TOKEN", "")
+def github_token() -> str:
+    """Токен с правом записи в sikleq/Sloppy: переменная окружения SLOPPY_GITHUB_TOKEN, иначе вход GitHub CLI
+    (`gh auth token`). В файлах токен не храним."""
+    token = os.environ.get("SLOPPY_GITHUB_TOKEN", "")
+    if token:
+        return token
+    try:
+        out = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return out.stdout.strip() if out.returncode == 0 else ""
+
 
 # Версия патча — меняй при каждом новом патче, например "7.42"
 PATCH_VERSION = "7.41f"
@@ -155,7 +164,7 @@ def _check(r, what: str):
         return r
     if r.status_code == 401:
         stop("GitHub отказал: 401 Unauthorized.\n"
-             "   Невалидный токен. Проверь переменную окружения SLOPPY_GITHUB_TOKEN.")
+             "   Невалидный токен. Проверь SLOPPY_GITHUB_TOKEN или вход GitHub CLI (gh auth status).")
     if r.status_code == 403:
         stop("GitHub отказал: 403 Forbidden.\n"
              "   У токена нет прав на запись. Пересоздай токен с правами\n"
@@ -265,9 +274,11 @@ def main():
              "   В командной строке выполни:  pip install requests")
 
     # ── Проверка токена ─────────────────────────────────────────
-    if not GITHUB_TOKEN:
+    token = github_token()
+    if not token:
         stop("не задан GitHub Token.\n"
-             "   Создай его на https://github.com/settings/tokens?type=beta\n"
+             "   Проще всего — войти в GitHub CLI:  gh auth login\n"
+             "   Или создай токен на https://github.com/settings/tokens?type=beta\n"
              "   (Contents = Read and write для sikleq/Sloppy) и положи в переменную\n"
              "   окружения:  setx SLOPPY_GITHUB_TOKEN \"github_pat_...\"\n"
              "   (после setx перезапусти окно/терминал).")
@@ -350,7 +361,7 @@ def main():
 
     session = requests.Session()
     session.headers.update({
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
         "User-Agent": "patchnotes-sync",

@@ -494,7 +494,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   versions.json (`scripts/gen/map_history_table.py`, rerun when Oldgrowth gains a patch) — the CI build can't reach the
   Oldgrowth folder. Local folders these scripts read are env vars with home-relative defaults (no personal paths in
   the repo, 2026-10-04): `OLDGROWTH_DIR` (~/Oldgrowth), `SFM_FINAL` (~/tools/maprender/sfm/final),
-  `DEPOTDOWNLOADER` (~/tools/depotdownloader/DepotDownloader.exe), `SLOPPY_FETCH_STATS` (fetch_stats.py outside the repo). Styles all under `.terrain-stats-page` / `.ts-*`; terrain.py's stale-page sweep is
+  `DEPOTDOWNLOADER` (~/tools/depotdownloader/DepotDownloader.exe). Styles all under `.terrain-stats-page` / `.ts-*`; terrain.py's stale-page sweep is
   `terrain_[0-9]*.html`, so it never deletes terrain_stats.html.
   A map file Valve ships inside a patch in a client update with no patch notes is keyed `<patch>-MMDD` in
   Oldgrowth (2026-10-17: `7.41f-1007`, a file of 2026-10-07): `_key` sorts it right after its patch, `count_patches`
