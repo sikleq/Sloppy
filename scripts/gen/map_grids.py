@@ -14,7 +14,7 @@ before 7.33 260 x 260 from (-8320, -8320), since 7.33 320 x 328 from (-10240, -1
 "grid": {"w", "h", "min_x", "min_y", "edge": 64, "z_river"}. Sources: the map store (maps/<sha1>.vpk,
 ents/<sha8>.json.gz). gzip without a name or time, so a re-run that finds the same cells writes the same bytes.
 
-    python scripts/gen/map_grids.py [--store D:/DotaMaps] [--og ~/Documents/Oldgrowth] [patch ...]
+    python scripts/gen/map_grids.py [--store D:/DotaMaps] [--og ~/Oldgrowth] [patch ...]
 """
 import argparse
 import gzip

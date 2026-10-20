@@ -1,7 +1,7 @@
 # Рецензия модели «весов изменений» (Sloppy)
 
 Дата: 2026-09-16. Рецензент: независимый агент. Никаких правок кода не вносилось.
-Источники: `C:\Users\sikle\outputs\valve-revealed-weights-20260915\` (модель), `C:\Users\sikle\Documents\Sloppy\` (применение),
+Источники: `C:\Users\sikle\outputs\valve-revealed-weights-20260915\` (модель), `C:\Users\sikle\Sloppy\` (применение),
 `_dynamics.json`, `dist/patches/*.html` (собранный сайт, 4 544 строки изменений).
 
 ---

@@ -14,7 +14,7 @@ history (an Oldgrowth versions/<patch>/ folder without "same_as"),
 from the map store (D:\\DotaMaps: maps/<sha1>.vpk, ents/<sha8>.json.gz). The "changes" line of info.json is left as it
 is. Runs on the owner's PC (Source2Viewer-CLI, the store, numpy); then `python build_index.py` in Oldgrowth:
 
-    python scripts/gen/oldgrowth_mapdata.py [--store D:/DotaMaps] [--og ~/Documents/Oldgrowth] [patch ...]
+    python scripts/gen/oldgrowth_mapdata.py [--store D:/DotaMaps] [--og ~/Oldgrowth] [patch ...]
 """
 import argparse
 import json
