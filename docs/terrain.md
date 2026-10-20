@@ -179,10 +179,12 @@ The owner (2026-10-06): "все слои" — everything the map file holds besi
 - **The icons** of the four layers (`gen_terrain_layer_icons.py` `*_GLYPH`) were redrawn the same day ("ВСе новые
   иконки улучши"): the minimap's three lanes with the two bases, a wave ending in an arrowhead, a coin pouch with a
   round coin, a waving banner on a stone base — one light from the top left like the rest of the set.
-- **The map store** (owner 2026-10-06: keep the map files): all 65 map files of 7.08–7.41f in `D:\DotaMaps\maps\<sha1>.vpk`
-  (1.67 GB, copied from `~/tools/maprender/oldbuilds/maps`, which `scripts/gen/map_history.py download` filled),
-  `D:\DotaMaps\patch_maps.json`, and every entity of every map (vision included; not in this repo, published in
-  Oldgrowth) in `D:\DotaMaps\ents\<sha8>.json.gz` (65 files, 7.6 MB). `extract_map_entities.py <codes> --store D:\DotaMaps` reads a
+- **The map store** (owner 2026-10-06: keep the map files): every map file of 7.08–7.41f in `~/Oldgrowth/store/maps/<sha1>.vpk`
+  (1.67 GB, filled by `scripts/gen/map_history.py download`; moved from `D:\DotaMaps` 2026-10-20, gitignored there —
+  Valve's files are never pushed), `~/Oldgrowth/store/patch_maps.json`, and every entity of every map (vision
+  included; not in this repo, published in Oldgrowth) in `~/Oldgrowth/store/ents/<sha8>.json.gz` (7.6 MB).
+  `oldgrowth_mapdata.py` / `map_grids.py` / `heightmap.py` find the store by `OLDGROWTH_DIR`;
+  `extract_map_entities.py <codes> --store ~/Oldgrowth/store` reads a
   per-patch code's map from the store; a legacy code (683 … 737) stays the game's legacy file — that is the LAST map of
   its patch family, `patch_maps.json`'s "7.22" is the release one (one 7.22 filler differed when mixed up). "741" in
   `MAPS` is the live `dota.vpk` = the newest patch, so 741 is read from the store too.

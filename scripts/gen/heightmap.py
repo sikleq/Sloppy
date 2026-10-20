@@ -177,8 +177,8 @@ def _all():
     """Heights for every map file that has a gridnav in data/map (the Terrain pages' map files)."""
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     maps = json.load(open(os.path.join(root, "data", "map", "patch_maps.json"), encoding="utf-8"))["patches"]
-    vpks = os.environ.get("OLDBUILDS_MAPS",
-                          os.path.join(os.path.expanduser("~"), "tools", "maprender", "oldbuilds", "maps"))
+    vpks = os.path.join(os.environ.get("OLDGROWTH_DIR", os.path.join(os.path.expanduser("~"), "Oldgrowth")),
+                        "store", "maps")
     for name in sorted(os.listdir(os.path.join(root, "data", "map"))):
         if not (name.startswith("gridnav_") and name.endswith(".gnv.gz")):
             continue

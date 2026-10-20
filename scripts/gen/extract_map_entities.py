@@ -352,7 +352,7 @@ def main():
     ap.add_argument("codes", nargs="*", help="map codes (patch without the dot); default: all known")
     ap.add_argument("--vpk", help="a map VPK to read instead of the game's (one code)")
     ap.add_argument("--out", default=OUT_DIR, help="where mapdata_<code>.json goes (default: data/map)")
-    ap.add_argument("--store", help="the private map store (D:\\DotaMaps): a per-patch code (738c) reads "
+    ap.add_argument("--store", help="the private map store (~/Oldgrowth/store): a per-patch code (738c) reads "
                                     "maps/<sha1>.vpk named in data/map/patch_maps.json, and every entity of the "
                                     "map goes to ents/<sha8>.json.gz there (never into data/map)")
     ap.add_argument("--refresh-ents", action="store_true",

@@ -11,10 +11,11 @@ the walkable, height and vision-blocker grids of all 65 map files as raw data):
 
 uint8, row-major, row 0 = the grid's min_y, w x h. Each map file has its own grid (the gnv header; 64-unit cells:
 before 7.33 260 x 260 from (-8320, -8320), since 7.33 320 x 328 from (-10240, -10752)), written into info.json:
-"grid": {"w", "h", "min_x", "min_y", "edge": 64, "z_river"}. Sources: the map store (maps/<sha1>.vpk,
-ents/<sha8>.json.gz). gzip without a name or time, so a re-run that finds the same cells writes the same bytes.
+"grid": {"w", "h", "min_x", "min_y", "edge": 64, "z_river"}. Sources: the map store (~/Oldgrowth/store:
+maps/<sha1>.vpk, ents/<sha8>.json.gz). gzip without a name or time, so a re-run that finds the same cells writes the
+same bytes.
 
-    python scripts/gen/map_grids.py [--store D:/DotaMaps] [--og ~/Oldgrowth] [patch ...]
+    python scripts/gen/map_grids.py [--store ~/Oldgrowth/store] [--og ~/Oldgrowth] [patch ...]
 """
 import argparse
 import gzip
@@ -188,9 +189,9 @@ def publish(store, og, ver, info):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("patches", nargs="*", help="only these Oldgrowth folders (default: every map file)")
-    ap.add_argument("--store", default="D:/DotaMaps")
-    ap.add_argument("--og", default=os.environ.get("OLDGROWTH_DIR",
-                                                   os.path.join(os.path.expanduser("~"), "Oldgrowth")))
+    og = os.environ.get("OLDGROWTH_DIR", os.path.join(os.path.expanduser("~"), "Oldgrowth"))
+    ap.add_argument("--store", default=os.path.join(og, "store"))
+    ap.add_argument("--og", default=og)
     args = ap.parse_args()
     vdir = os.path.join(args.og, "versions")
     for ver in sorted(os.listdir(vdir)):

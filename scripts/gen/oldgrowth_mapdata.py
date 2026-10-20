@@ -11,10 +11,11 @@ history (an Oldgrowth versions/<patch>/ folder without "same_as"),
   versions/<patch>/{gridnav,elev,fow}.bin.gz + info.json "grid"   the cell grids (scripts/gen/map_grids.py) — every
                                     map file gets them, a NEW one too (2026-10-07: another tool reads them from here)
 
-from the map store (D:\\DotaMaps: maps/<sha1>.vpk, ents/<sha8>.json.gz). The "changes" line of info.json is left as it
-is. Runs on the owner's PC (Source2Viewer-CLI, the store, numpy); then `python build_index.py` in Oldgrowth:
+from the map store (~/Oldgrowth/store, never pushed: maps/<sha1>.vpk, ents/<sha8>.json.gz). The "changes" line of
+info.json is left as it is. Runs on the owner's PC (Source2Viewer-CLI, the store, numpy); then `python build_index.py`
+in Oldgrowth:
 
-    python scripts/gen/oldgrowth_mapdata.py [--store D:/DotaMaps] [--og ~/Oldgrowth] [patch ...]
+    python scripts/gen/oldgrowth_mapdata.py [--store ~/Oldgrowth/store] [--og ~/Oldgrowth] [patch ...]
 """
 import argparse
 import json
@@ -59,9 +60,9 @@ def publish(store, og, ver, info, grids=True):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("patches", nargs="*", help="only these Oldgrowth folders (default: every map file)")
-    ap.add_argument("--store", default="D:/DotaMaps")
-    ap.add_argument("--og", default=os.environ.get("OLDGROWTH_DIR",
-                                                   os.path.join(os.path.expanduser("~"), "Oldgrowth")))
+    og = os.environ.get("OLDGROWTH_DIR", os.path.join(os.path.expanduser("~"), "Oldgrowth"))
+    ap.add_argument("--store", default=os.path.join(og, "store"))
+    ap.add_argument("--og", default=og)
     ap.add_argument("--no-grids", action="store_true", help="skip the cell grids (scripts/gen/map_grids.py)")
     args = ap.parse_args()
     for ver, info in _folders(args.og, set(args.patches)):
