@@ -2568,6 +2568,34 @@
 "tormentors": 2
 },
 "moves": {}
+},
+{
+"patch": "7.41f-1007",
+"date": "2026-10-07",
+"sha8": "0845387f",
+"changes": "client update of 2026-10-07 inside 7.41f (no patch notes): no tree, building or zone moved; 35 walkable cells at the right map edge (x 8384-8576, y -3200 to -2688) one height level lower; world particles: 1 removed, 2 added",
+"n": {
+"trees": 2475,
+"camps": 28,
+"camp_tiers": [
+6,
+14,
+6,
+2
+],
+"towers": 22,
+"outposts": 2,
+"watchers": 10,
+"lotus": 2,
+"wisdom": 2,
+"gates": 2,
+"bounty": 2,
+"power": 2,
+"shrines": 0,
+"roshan": 2,
+"tormentors": 2
+},
+"moves": {}
 }
 ]
 }
