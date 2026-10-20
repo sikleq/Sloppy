@@ -136,7 +136,7 @@ python tools/refresh_weights_data.py --fast   # skip that pass (enough when no t
 
 | File | What | Source |
 |---|---|---|
-| `data/rules/ability_priority.json` | share of the first 10 skill points per ability → 0.7–1.3 multiplier | **match database** (path in `MATCH_DB` / `~/.sloppy/match_db.txt`, table `ability_builds`, last 365 days); OpenDota only for heroes it has no builds for (30 of 127 on 2026-09-18) |
+| `data/rules/ability_priority.json` | share of the first 10 skill points per ability → 0.7–1.3 multiplier | **match database** (path in `MATCH_DB` / `.sloppy/match_db.txt`, table `ability_builds`, last 365 days); OpenDota only for heroes it has no builds for (30 of 127 on 2026-09-18) |
 | `data/rules/talent_shift.json`, `talent_tiers.json` | talent replacements: pick-share shift + level moves | research folder `outputs/valve-revealed-weights-20260915` (KV history); new patch windows from **the match database**, history cached from OpenDota |
 
 Run it after a patch has been out for 2–3 weeks (there are no picks on day one) and monthly otherwise; a
@@ -333,7 +333,7 @@ tracked as follow-up work, not yet done.
 ## Old tooltips of any patch (2026-09-27)
 
 `python tools/fetch_loc_history.py` keeps the game's localization of every patch (abilities, items, talents,
-facets, hero texts) in `~/outputs/loc_history/<version>/` (outside the repo, from d2vpkr: the last commit
+facets, hero texts) in `outputs/loc_history/<version>/` (git-ignored, from d2vpkr: the last commit
 before the next patch). Read a tooltip as it was: `tools.loc_history.tooltip(key, "7.37e")` — numbers stay as
 %placeholders%, fill them from that patch's KV. Run it after every new patch (only missing versions are fetched).
 Old descriptions on the site (ability_change / item_abilities_change) come from here — never invented.

@@ -10,7 +10,8 @@ import gzip
 import os
 import re
 
-LOC = os.path.join(os.path.expanduser("~"), "outputs", "loc_history")
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOC = os.path.join(HERE, "outputs", "loc_history")
 _RX = re.compile(r'^\s*"([^"]+)"\s*"((?:[^"\\]|\\.)*)"', re.M)
 _CACHE = {}
 

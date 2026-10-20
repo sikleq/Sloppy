@@ -91,3 +91,6 @@ outputs/infographic/
 # Pixel Art Studio previews (tools/pixel_icons/build.py) — regenerated, not part of the site
 tools/pixel_icons/out/
 tools/autocast/out/
+
+# local config (match database path), never committed
+.sloppy/

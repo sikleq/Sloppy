@@ -4,7 +4,7 @@
 Writes data/rules/item_stat_prices.json (read by patch/weights.py for item rows).
 
 Data: items.txt of every version — data/stats/<v>/items.txt when present, else the d2vpkr history
-kept with the weights model (~/outputs/valve-revealed-weights-20260915/items_history/<v>/items.txt).
+kept with the weights model (outputs/valve-revealed-weights-20260915/items_history/<v>/items.txt).
 Which KV fields are STAT LINES comes from Valve's own tooltips (data/abilities_english.txt):
 `DOTA_Tooltip_ability_<item>_<field>` = "+$armor" / "%+Slow Resistance" is a row of the item's stat
 list; the label names the stat. Items missing from today's tooltips (removed items) use the
@@ -60,7 +60,7 @@ sys.path.insert(0, HERE)
 from builders.silent import parse_kv  # noqa: E402
 from patch.meta import RELEASE_HISTORY  # noqa: E402
 
-MODEL = os.path.join(os.path.expanduser("~"), "outputs", "valve-revealed-weights-20260915")
+MODEL = os.path.join(HERE, "outputs", "valve-revealed-weights-20260915")
 HIST = os.path.join(MODEL, "items_history")
 OUT = os.path.join(HERE, "data", "rules", "item_stat_prices.json")
 LOC = os.path.join(HERE, "data", "abilities_english.txt")

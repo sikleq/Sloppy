@@ -28,7 +28,7 @@ import sys
 import numpy as np
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL = os.path.join(os.path.expanduser("~"), "outputs", "valve-revealed-weights-20260915")
+MODEL = os.path.join(HERE, "outputs", "valve-revealed-weights-20260915")
 MIN_SIDES = 30
 BOOT = 200
 

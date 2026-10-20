@@ -1,5 +1,5 @@
 r"""The game's localization (tooltips of abilities, items, talents, facets; hero texts) as it was in EVERY
-patch -> ~/outputs/loc_history/<version>/{abilities,dota}_english.txt.gz + index.json (owner 2026-09-27:
+patch -> outputs/loc_history/<version>/{abilities,dota}_english.txt.gz + index.json (owner 2026-09-27:
 "why don't we have the descriptions of every patch?"). Old tooltips are then read from the game's own
 files instead of hunting a d2vpkr commit by hand. Outside the repo (≈ 100+ MB); read with
 tools/loc_history.py.
@@ -23,7 +23,7 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 from patch.meta import RELEASE_HISTORY  # noqa: E402
 
-OUT = os.path.join(os.path.expanduser("~"), "outputs", "loc_history")
+OUT = os.path.join(HERE, "outputs", "loc_history")
 REPO = "dotabuff/d2vpkr"
 FILES = {  # name -> candidate paths, newest layout first
     "abilities": ["dota/resource/localization/abilities_english.txt", "dota/resource/dota_english.txt"],

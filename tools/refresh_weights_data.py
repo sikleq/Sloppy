@@ -17,7 +17,7 @@ Then:   python build_site.py && python -m pytest tests -q   and commit data/rule
 import os, sys, subprocess
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL = os.path.join(os.path.expanduser("~"), "outputs", "valve-revealed-weights-20260915")
+MODEL = os.path.join(HERE, "outputs", "valve-revealed-weights-20260915")
 
 
 def run(args, cwd):

@@ -267,7 +267,7 @@ score: at K = 10 the old cap (5.0 score) clipped half an item, so Orb of Corrosi
 
 **3. Against what pros did** (OpenDota Explorer, pro matches `leagueid > 0`, final inventory; 21-day window
 before vs after each patch, min 14 days, capped by the neighbouring patch; 18 patches 7.38–7.41f; data and
-query in `~/outputs/item-winrate-20260926/`). Item cells with ≥ 30 games on both sides, |score| > 0.05:
+query in `outputs/item-winrate-20260926/`). Item cells with ≥ 30 games on both sides, |score| > 0.05:
 
 | | n | ρ(score, Δlog pick share) | ρ(score, Δ win rate) | same sign, |score| ≥ 1 and share moved ≥ 20 % |
 |---|---|---|---|---|

@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.join(HERE, "tools"))
 from builders.silent import parse_kv  # noqa: E402
 from loc_history import tooltip  # noqa: E402
 
-HIST = os.path.join(os.path.expanduser("~"), "outputs", "valve-revealed-weights-20260915", "items_history")
+HIST = os.path.join(HERE, "outputs", "valve-revealed-weights-20260915", "items_history")
 _KV = {}
 
 

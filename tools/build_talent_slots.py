@@ -7,7 +7,7 @@ Kill Buff Duration" = level 10 right). Invoker keeps them at Ability17+, so the 
 fixed slot numbers.
 
 Sources: the d2vpkr npc_heroes.txt history kept with the weights model
-(~/outputs/valve-revealed-weights-20260915/heroes_history/<v>/npc_heroes.txt), and for a patch not
+(outputs/valve-revealed-weights-20260915/heroes_history/<v>/npc_heroes.txt), and for a patch not
 there yet the repo's own data/stats/<v>/heroes/npc_dota_hero_<slug>.txt (7.41f+ layout, where
 npc_heroes.txt is only an include list).
 
@@ -25,7 +25,7 @@ import os
 import re
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HIST = os.path.join(os.path.expanduser("~"), "outputs", "valve-revealed-weights-20260915", "heroes_history")
+HIST = os.path.join(HERE, "outputs", "valve-revealed-weights-20260915", "heroes_history")
 STATS = os.path.join(HERE, "data", "stats")
 OUT = os.path.join(HERE, "data", "rules", "talent_slots.json")
 
