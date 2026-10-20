@@ -507,7 +507,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders leamare's look:
   A map file Valve ships inside a patch in a client update with no patch notes is keyed `<patch>-MMDD` in
   Oldgrowth (2026-10-17: `7.41f-1007`, a file of 2026-10-07): `_key` sorts it right after its patch, `count_patches`
   doesn't count it as a patch (it is a map file), and map_thumbs.py skips a file Oldgrowth hasn't drawn yet (prints
-  "no picture yet", rerun later). Whether such a file gets a Terrain page of its own is the owner's call.
+  "no picture yet", rerun later). Such a file gets no Terrain page of its own — it stays a row of Terrain Stats
+  (the owner 2026-10-20, 7.41f-1007: "Оставь строкой в Terrain Stats"; glued to 7.41a's row while nothing it
+  counts moved). What else changed in it (keys of existing entities) waits for the full map comparison, docs/todo.md.
 - **Bigger pictures with a minimap (2026-10-03)** — the owner: "when you show where something is, add a minimap
   with a mark, otherwise it's unclear; the pictures should be bigger and the camera a bit further out". The row
   picture is 726 x 360 (360-px halves, shown 480 x 238 css), the large copy 1450 x 720; every spot's square is
