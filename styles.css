@@ -11118,7 +11118,11 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-hl-new { color: #e0bd62; }
 .iab-hl-buff { color: #7fd08c; }
 .iab-hl-nerf { color: #cf8299; }
-.iab-hl-del { color: #d97aa2; }            /* removed text: the DEL colour, whatever the row's tag */
+/* another ability named inside a card's text: a small icon + its name (sub_ability, 7.41 Overclocking) */
+.ac-sub { display: inline-flex; align-items: center; gap: 5px; vertical-align: -5px; margin-right: 2px; }
+.ac-sub-ico { width: 20px; height: 20px; border-radius: 3px; border: 1px solid var(--line-soft); }
+.ac-sub-name { color: var(--text-bright); font-weight: 600; }
+.iab-hl-del { color: #e06a6a; }            /* removed text: the DEL colour (red since 2026-10-21), whatever the row's tag */
 .iab-hl-rework, .iab-hl-swap { color: #b99ae6; }
 .iab-hl-qol, .iab-hl-misc { color: var(--text-dimmer); }
 .iab-hl .iab-num { color: inherit; }          /* a number inside the coloured phrase takes its colour */
@@ -11246,6 +11250,7 @@ html.cb-mode .badge.swap { color: #5bd3b2; background: rgba(40, 150, 120, 0.14);
 html.cb-mode .badge.del { color: #c95d85; background: rgba(113, 38, 66, 0.14); border-color: rgba(113, 38, 66, 0.51); }
 html.cb-mode .iab-hl-buff { color: #64baeb; }
 html.cb-mode .iab-hl-nerf { color: #f19e60; }
+html.cb-mode .iab-hl-del { color: #d2789a; }
 html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff, html.cb-mode .iab-lv.iab-buff { color: #64baeb; }
 html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf, html.cb-mode .iab-lv.iab-nerf { color: #f19e60; }
 html.cb-mode .components-change .component-price.cost-buff, html.cb-mode .components-change .components-total span.cost-buff { color: #64baeb; }

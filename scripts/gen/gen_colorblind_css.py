@@ -41,7 +41,7 @@ TAG_SELECTORS = {
                        r'|\.dyn-wl[^,]*\.down' + _END + r'|^ul\.changes li\.li-notext::before$'),   # its default = NERF
     **{t: re.compile(rf'\.badge\.{t}{_END}|data-tag\*="{t}"') for t in ("new", "rework", "swap", "qol", "misc")},
     # …and the label of an item only taken out ("Neutral Item cycled out", owner 2026-10-17)
-    "del": re.compile(rf'\.badge\.del{_END}|data-tag\*="del"|\.entity-removed-type{_END}|\.iab-lv\.iab-del{_END}|\.ench-gone{_END}'),
+    "del": re.compile(rf'\.badge\.del{_END}|data-tag\*="del"|\.entity-removed-type{_END}|\.iab-lv\.iab-del{_END}|\.ench-gone{_END}|\.iab-hl-del{_END}'),
 }
 COLOUR = re.compile(r"#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b|rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)")
 

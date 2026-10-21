@@ -2423,7 +2423,21 @@ def terrain_num_chip(n):
     return f'<span class="badge tnum">{n}</span>'
 
 
-def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None, major=False):
+def sub_ability(slug, name):
+    """A small icon + name of another ability inside a card's text (7.41 Overclocking: the abilities it supercharges,
+    owner 2026-10-21)."""
+    return (f'<span class="ac-sub"><img class="ac-sub-ico" src="{ABIL_CDN}{slug}.png" alt="" loading="lazy">'
+            f'<b class="ac-sub-name">{name}</b></span>')
+
+
+def hl(text, kind):
+    """A phrase coloured like the item cards' changes: kind = new / del / buff / nerf / rework."""
+    return f'<span class="iab-hl iab-hl-{kind}">{text}</span>'
+
+
+def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None, major=False, covered=False):
+    """covered=True: the card above already shows this change (highlighted) — the row is hidden but keeps its weight
+    and tag for the filters, like the item cards' covered rows (owner 2026-10-21, 7.41 Overclocking)."""
     _tphrase = ""
     if isinstance(text, str):
         # a terrain note's micro-screenshots ride along under its text, opened by the words naming its object
@@ -2560,6 +2574,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
                  or _iab_unpaired_row(text, dyn_tags, extra)
                  or (not extra and _iab_text_change(text, dyn_tags)))):
         classes += ["iab-covered", "covered-iab"]       # covered-*: the card that shows it (tag filters)
+    if covered and "iab-covered" not in classes:
+        classes += ["iab-covered", "covered-card"]
     # a number row of an enchantment its tier table above shows (owner 2026-10-17, 7.41 variant A)
     if (isinstance(text, str) and "iab-covered" not in classes
             and (_State.current_entity_key or "").startswith("enchant|") and _ench_covered(text)):

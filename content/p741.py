@@ -1853,19 +1853,24 @@ def build():
     W(li("Mana Cost rescaled from 70 to 60/65/70/75", b(70, [60, 65, 70, 75], l=True)))
     W(li("Mana Burn increased from 35/70/105/140 to 35/75/115/155", b([35, 70, 105, 140], [35, 75, 115, 155])))
     W(ul_close())
+    _ba = sub_ability("rattletrap_battery_assault", "Battery Assault")
+    _pc = sub_ability("rattletrap_power_cogs", "Power Cogs")
+    _rf = sub_ability("rattletrap_rocket_flare", "Rocket Flare")
+    _hs = sub_ability("rattletrap_hookshot", "Hookshot")
+    _jp = sub_ability("rattletrap_jetpack", "Jetpack")
     W(ability_change(
         old=dict(
             name="Overclocking",
             slug="rattletrap_overclocking",
             desc=[
                 "Active (Aghanim's Scepter upgrade). All of Clockwerk's abilities are supercharged for the duration:",
-                "&nbsp;&nbsp;• Battery Assault damages and stuns all enemies within its radius.",
-                "&nbsp;&nbsp;• Power Cogs increase Clockwerk's Attack Speed by 250 while he is inside.",
-                "&nbsp;&nbsp;• Rocket Flare cooldown decreased to 3.5s and fires 2 additional flares to either side of the target.",
-                "&nbsp;&nbsp;• Hookshot stun radius and duration increased by 50%.",
-                "&nbsp;&nbsp;• Jetpack movement speed bonus increased from 20% to 40%.",
+                _ba + " damages and stuns all enemies within its radius.",
+                _pc + " " + hl("increase Clockwerk's Attack Speed by 250 while he is inside", "del") + ".",
+                _rf + " " + hl("cooldown decreased to 3.5s", "del") + " and fires 2 additional flares to either side of the target.",
+                _hs + " stun radius and duration increased by 50%.",
+                _jp + " movement speed bonus increased from 20% to 40%.",
                 "When duration expires, Clockwerk's movement and attack speed are slowed by 100% briefly.",
-                "Duration: 13s. Mana: 90. Cooldown: 50s.",
+                "Duration: " + hl("13s", "nerf") + ".",
             ],
         ),
         new=dict(
@@ -1873,25 +1878,27 @@ def build():
             slug="rattletrap_overclocking",
             desc=[
                 "Active (Aghanim's Scepter upgrade). All of Clockwerk's abilities are supercharged for the duration:",
-                "&nbsp;&nbsp;• Battery Assault damages and stuns all enemies within its radius — radius increased to 330.",
-                "&nbsp;&nbsp;• Power Cogs radius increased to 330 and Clockwerk gets +25% bonus armor while near cogs.",
-                "&nbsp;&nbsp;• Rocket Flare fires 2 additional flares to either side of the target; its damage, vision and slow duration are increased by 35%.",
-                "&nbsp;&nbsp;• Hookshot stun radius and duration increased by 50%.",
-                "&nbsp;&nbsp;• Jetpack movement speed bonus increased from 20% to 40%.",
+                _ba + " damages and stuns all enemies within its radius" + hl(", radius increased to 330", "new") + ".",
+                _pc + " " + hl("radius increased to 330 and Clockwerk gets +25% bonus armor while near cogs", "new") + ".",
+                _rf + " fires 2 additional flares to either side of the target"
+                + hl("; its damage, vision and slow duration are increased by 35%", "new") + ".",
+                _hs + " stun radius and duration increased by 50%.",
+                _jp + " movement speed bonus increased from 20% to 40%.",
                 "When duration expires, Clockwerk's movement and attack speed are slowed by 100% briefly.",
-                "Duration: 18s. Mana: 90. Cooldown: 50s.",
+                "Duration: " + hl("18s", "buff") + ".",
             ],
         ),
         summary="Ability reworked.",
         tag="rework",
     ))
     W(ul_open())
-    W(li("Duration increased from 13s to 18s", b(13, 18)))
-    W(li("Now also increases Battery Assault radius to 330", t("NEW")))
-    W(li("Now also increases Power Cogs radius to 330 and provides 25% bonus armor to Clockwerk while he is near cogs", t("NEW")))
-    W(li("Now increases Rocket Flare damage, vision and slow duration by 35%", t("NEW")))
-    W(li("No longer increases Clockwerk's attack speed while inside Power Cogs", t("DEL")))
-    W(li("No longer decreases Rocket Flare cooldown to 3.5s", t("DEL")))
+    # the card above shows every change highlighted: the rows stay hidden for the weights and the tag filters
+    W(li("Duration increased from 13s to 18s", b(13, 18), covered=True))
+    W(li("Now also increases Battery Assault radius to 330", t("NEW"), covered=True))
+    W(li("Now also increases Power Cogs radius to 330 and provides 25% bonus armor to Clockwerk while he is near cogs", t("NEW"), covered=True))
+    W(li("Now increases Rocket Flare damage, vision and slow duration by 35%", t("NEW"), covered=True))
+    W(li("No longer increases Clockwerk's attack speed while inside Power Cogs", t("DEL"), covered=True))
+    W(li("No longer decreases Rocket Flare cooldown to 3.5s", t("DEL"), covered=True))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

@@ -30,3 +30,14 @@ def test_enchant_change_table_heads_its_stats_column():
     html = page.read_text(encoding="utf-8")
     assert re.search(r'class="ench-tiers ench-change"><span class="ench-row-h"><span class="ench-stat-h">Stats</span>',
                      html)
+
+
+def test_a_covered_row_is_hidden_but_keeps_its_tag():
+    from patch.badges import t
+    html = el.li("Now also increases Battery Assault radius to 330", t("NEW"), covered=True)
+    assert 'class="iab-covered covered-card"' in html and 'data-tag="buff new"' in html
+
+
+def test_sub_ability_shows_the_ability_icon_and_name():
+    html = el.sub_ability("rattletrap_jetpack", "Jetpack")
+    assert 'src="../icons/abilities/rattletrap_jetpack.png"' in html and ">Jetpack</b>" in html
