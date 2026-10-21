@@ -338,6 +338,15 @@ every page including the patch notes.
 Note: KV engine slug ≠ in-game display name (e.g. `frostmourne` → "Curse of Avernus").
 `createhero` CSV shortcuts ≠ URL slugs.
 
+**A new patch needs no code edit (2026-10-21).** Numbers the game files carry are read, never typed:
+Neutral Stats self-auras (`AURA_SELF` names ability + key, value from `npc_abilities.json`), the AoE
+Increase item filter (every current item with an `aoe_bonus` / `bonus_aoe` / `aoe_pct` key), hero innates
+(`builders/innate_rules.py`, `kv` maps), attribute constants (one copy, `patch/game_constants.py`, embedded
+for `scripts.js`). What the files cannot give (camps, enchantment tiers, phantom items, summon rosters,
+neutral tier times, hand-written ability cells) is guarded by `tests/test_roster_guards.py`: a new creep,
+enchantment, ability or unit portrait the lists do not know fails CI and names the list to extend — see
+`docs/agent-rules/stats-db.md`.
+
 ## Scroll / sticky architecture (the tricky part)
 
 **Neutral Creeps & Unit Abilities** scroll inside an inner box `.creeps-scroll`
