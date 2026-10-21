@@ -938,6 +938,9 @@ def subgroup(title, new=None):
     NEW rows of its lists without chips). Without it the subgroup inherits the header's state."""
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
+    # rows under a subgroup no longer belong to the last ability: Clockwerk 7.41's talents read as rows of the
+    # Scepter-granted Overclocking card above them and got the Aghanim stripe (owner 2026-10-21)
+    _State.current_ability_slug = None
     if _State.terrain_rows is not None:
         _State.terrain_rows = 0                           # each terrain category counts from 1
     _State.new_mech = bool(new) or _State.new_mech_header

@@ -24,8 +24,8 @@ TAG_RGB = {
     "rework": (164, 114, 207),
     "misc":   (139, 144, 153),
     "qol":    (108, 171, 240),
-    "del":    (209, 75, 75),
-    "nerf":   (177, 78, 107),
+    "del":    (190, 79, 79),
+    "nerf":   (177, 78, 92),
 }
 SIZE = 48          # output canvas (2x of the 24px dyn-cell)
 INSET = 1          # transparent margin so the outline isn't clipped

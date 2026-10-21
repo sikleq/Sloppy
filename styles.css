@@ -3139,10 +3139,12 @@ body.patch-page .enchant-list-head .ench-tiers { margin: -5px 0; padding: 5px 0;
 /* the head row and the stats column a shade darker; "Stats" heads the column (owner 2026-10-21) */
 .ench-change .ench-row-h > *, .ench-change .ench-stat { background: rgba(0, 0, 0, 0.18); }
 .ench-change .ench-stat-h { color: var(--text-dim); font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
-/* a removed bonus and value: the DEL colour, faded, not struck (owner 2026-10-21) */
-.ench-change .ench-stat.ench-gone { color: #d84e4e; opacity: 0.55; }
-.ench-change .iab-lv.iab-del { text-decoration: none; opacity: 0.55; }
-.iab-lv.iab-del { color: #d84e4e; text-decoration: line-through; }
+/* a removed bonus: grey (red read as a penalty), a red cross before the name, the value goes "→ —" (owner 2026-10-21) */
+.ench-change .ench-stat.ench-gone { color: var(--text-dimmer); }
+.ench-change .ench-stat.ench-gone::before { content: "✕"; color: #c55252; font-weight: 700; margin-right: 5px; }
+.ench-tiers.ench-change .iab-lv.iab-del { text-decoration: none; color: var(--text-dimmer); }   /* beats the colour-blind DEL rule */
+.ench-change .iab-lv.iab-del::after { content: " → —"; }
+.iab-lv.iab-del { color: #c55252; text-decoration: line-through; }
 
 .enchant-attr-grid {
   display: flex;
@@ -3496,7 +3498,7 @@ h4.subgroup .subgroup-new-type {
   font-weight: 600;
   letter-spacing: 0.4px;
   text-transform: uppercase;
-  color: #d84e4e;
+  color: #c55252;
   vertical-align: middle;
 }
 .entity-block.is-removed ul.changes { display: none !important; }
@@ -4503,9 +4505,9 @@ ul.changes li.li-notext::before {
   font-variant-numeric: tabular-nums;
   /* default = nerf-text colors (same as .badge.nerf-text) */
   content: "";
-  background: rgba(199, 101, 130, 0.10);
-  color: #9a6675;
-  border: 1px solid rgba(199, 101, 130, 0.28);
+  background: rgba(199, 101, 115, 0.10);
+  color: #9a666d;
+  border: 1px solid rgba(199, 101, 115, 0.28);
 }
 /* Extras inside raw rows (formula-table, correction-note) — extend to left edge */
 ul.changes li.li-notext > .formula-table {
@@ -4518,7 +4520,7 @@ ul.changes li.li-notext[data-tag*="nerf"]::before  { content: "NERF"; }
 ul.changes li.li-notext[data-tag*="qol"]::before   { content: "QoL"; background: rgba(121,192,255,0.06); color: #87a3bf; border-color: rgba(121,192,255,0.20); }
 ul.changes li.li-notext[data-tag*="misc"]::before  { content: "MISC"; background: rgba(150, 146, 137,0.06); color: var(--text-dimmer); border-color: rgba(150, 146, 137,0.18); }
 ul.changes li.li-notext[data-tag*="new"]::before   { content: "NEW"; background: rgba(220,175,95,0.06); color: #9a7f4d; border-color: rgba(220,175,95,0.22); }
-ul.changes li.li-notext[data-tag*="del"]::before   { content: "DEL"; background: rgba(209, 41, 41, 0.07); color: #bb4d4d; border-color: rgba(209, 41, 41, 0.25); }
+ul.changes li.li-notext[data-tag*="del"]::before   { content: "DEL"; background: rgba(179, 56, 56, 0.07); color: #a85151; border-color: rgba(179, 56, 56, 0.25); }
 ul.changes li.li-notext[data-tag*="rework"]::before { content: "REWORK"; background: rgba(180,145,220,0.05); color: #7d6e93; border-color: rgba(180,145,220,0.15); }
 ul.changes li.li-notext[data-tag*="swap"]::before { content: "SWAP"; background: rgba(95,176,164,0.05); color: #5b8f87; border-color: rgba(95,176,164,0.18); }
 /* Hide redundant inline tag spans (since ::before shows them) */
@@ -5045,9 +5047,9 @@ ul.changes li > .badge-group {
   letter-spacing: 0.5px;
 }
 .badge.del {
-  background: rgba(209, 41, 41, 0.07);
-  color: #bb4d4d;
-  border: 1px solid rgba(209, 41, 41, 0.25);
+  background: rgba(179, 56, 56, 0.07);
+  color: #a85151;
+  border: 1px solid rgba(179, 56, 56, 0.25);
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -5065,16 +5067,16 @@ ul.changes li > .badge-group {
 .badge.buff10 { background: rgba(50, 175, 80, 0.34);   color: #b8e2a4; border: 1px solid rgba(50, 175, 80, 0.55); }
 
 /* NERF GRADIENT (10 tiers, soft-saturated reds) */
-.badge.nerf1  { background: rgba(211, 139, 160, 0.10); color: #d0b4bc; border: 1px solid rgba(211, 139, 160, 0.24); }
-.badge.nerf2  { background: rgba(208, 130, 153, 0.13); color: #d3b1bb; border: 1px solid rgba(208, 130, 153, 0.30); }
-.badge.nerf3  { background: rgba(203, 122, 146, 0.16); color: #d2aab6; border: 1px solid rgba(203, 122, 146, 0.36); }
-.badge.nerf4  { background: rgba(202, 115, 140, 0.20);  color: #d0a4b1; border: 1px solid rgba(202, 115, 140, 0.42); }
-.badge.nerf5  { background: rgba(201, 109, 136, 0.25);  color: #d09cab; border: 1px solid rgba(201, 109, 136, 0.50); }
-.badge.nerf6  { background: rgba(199, 101, 130, 0.30);   color: #d094a6; border: 1px solid rgba(199, 101, 130, 0.56); }
-.badge.nerf7  { background: rgba(197, 93, 123, 0.34);   color: #ce8a9e; border: 1px solid rgba(197, 93, 123, 0.62); }
-.badge.nerf8  { background: rgba(196, 84, 117, 0.38);   color: #cd8399; border: 1px solid rgba(196, 84, 117, 0.68); }
-.badge.nerf9  { background: rgba(194, 76, 111, 0.42);   color: #cb7b92; border: 1px solid rgba(194, 76, 111, 0.74); }
-.badge.nerf10 { background: rgba(192, 83, 115, 0.32);   color: #e6bbc8; border: 1px solid rgba(192, 83, 115, 0.55); }
+.badge.nerf1  { background: rgba(211, 139, 149, 0.10); color: #d0b4b8; border: 1px solid rgba(211, 139, 149, 0.24); }
+.badge.nerf2  { background: rgba(208, 130, 141, 0.13); color: #d3b1b6; border: 1px solid rgba(208, 130, 141, 0.30); }
+.badge.nerf3  { background: rgba(203, 122, 134, 0.16); color: #d2aab0; border: 1px solid rgba(203, 122, 134, 0.36); }
+.badge.nerf4  { background: rgba(202, 115, 127, 0.20);  color: #d0a4aa; border: 1px solid rgba(202, 115, 127, 0.42); }
+.badge.nerf5  { background: rgba(201, 109, 122, 0.25);  color: #d09ca3; border: 1px solid rgba(201, 109, 122, 0.50); }
+.badge.nerf6  { background: rgba(199, 101, 115, 0.30);   color: #d0949d; border: 1px solid rgba(199, 101, 115, 0.56); }
+.badge.nerf7  { background: rgba(197, 93, 107, 0.34);   color: #ce8a94; border: 1px solid rgba(197, 93, 107, 0.62); }
+.badge.nerf8  { background: rgba(196, 84, 100, 0.38);   color: #cd838e; border: 1px solid rgba(196, 84, 100, 0.68); }
+.badge.nerf9  { background: rgba(194, 76, 93, 0.42);   color: #cb7b86; border: 1px solid rgba(194, 76, 93, 0.74); }
+.badge.nerf10 { background: rgba(192, 83, 99, 0.32);   color: #e6bbc2; border: 1px solid rgba(192, 83, 99, 0.55); }
 
 /* Make digits readable on saturated backgrounds */
 .badge.buff1, .badge.buff2, .badge.buff3, .badge.buff4, .badge.buff5,
@@ -5086,7 +5088,7 @@ ul.changes li > .badge-group {
 
 /* Text-tag versions of BUFF/NERF (used by t() for non-numeric changes; pick mid tier) */
 .badge.buff-text { background: rgba(85, 205, 115, 0.10); color: #6da375; border: 1px solid rgba(85, 205, 115, 0.28); }
-.badge.nerf-text { background: rgba(199, 101, 130, 0.10);  color: #9a6675; border: 1px solid rgba(199, 101, 130, 0.28); }
+.badge.nerf-text { background: rgba(199, 101, 115, 0.10);  color: #9a666d; border: 1px solid rgba(199, 101, 115, 0.28); }
 
 /* TYPO NOTE */
 /* WRONG-CHANGE LINE + CORRECTION NOTE — subtle gray */
@@ -10949,7 +10951,7 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
 .badge.new    { color: #d4ae55; background: rgba(220, 175, 95, 0.10);  border-color: rgba(220, 175, 95, 0.38); }
 .badge.rework { color: #a58ad2; background: rgba(170, 135, 220, 0.09); border-color: rgba(170, 135, 220, 0.34); }
 .badge.swap   { color: #6fbfb2; background: rgba(95, 176, 164, 0.09);  border-color: rgba(95, 176, 164, 0.34); }
-.badge.del    { color: #d84e4e; background: rgba(218, 57, 57, 0.09);  border-color: rgba(218, 57, 57, 0.34); }
+.badge.del    { color: #c55252; background: rgba(197, 63, 63, 0.09);  border-color: rgba(197, 63, 63, 0.34); }
 /* A terrain row's number in its category, in the tag chip's frame (the owner 2026-10-03: no rework / buff tags on
    terrain notes, just numbers from 1 in each category) */
 .badge.tnum   { font-family: var(--font-j10); font-size: 15px; font-weight: 400; line-height: 11px; text-align: center;
@@ -11117,12 +11119,12 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
    Dispel." gold = NEW); the % of a changed number sits in its hover tip */
 .iab-hl-new { color: #e0bd62; }
 .iab-hl-buff { color: #7fd08c; }
-.iab-hl-nerf { color: #cf8299; }
+.iab-hl-nerf { color: #cf828d; }
 /* another ability named inside a card's text: a small icon + its name (sub_ability, 7.41 Overclocking) */
 .ac-sub { display: inline-flex; align-items: center; gap: 5px; vertical-align: -5px; margin-right: 2px; }
 .ac-sub-ico { width: 20px; height: 20px; border-radius: 3px; border: 1px solid var(--line-soft); }
 .ac-sub-name { color: var(--text-bright); font-weight: 600; }
-.iab-hl-del { color: #e06a6a; }            /* removed text: the DEL colour (red since 2026-10-21), whatever the row's tag */
+.iab-hl-del { color: #cf6b6b; }            /* removed text: the DEL colour (red since 2026-10-21), whatever the row's tag */
 .iab-hl-rework, .iab-hl-swap { color: #b99ae6; }
 .iab-hl-qol, .iab-hl-misc { color: var(--text-dimmer); }
 .iab-hl .iab-num { color: inherit; }          /* a number inside the coloured phrase takes its colour */
@@ -11145,7 +11147,7 @@ ul.changes li.ability-row-solo, ul.changes li.ability-row-end { margin-bottom: 8
 ul.changes li.iab-covered { display: none !important; }
 /* the numbers those rows change, coloured by the row's tag */
 .iab-num.iab-buff, .iab-m.iab-buff, .iab-lv.iab-buff { color: #7fd08c; }
-.iab-num.iab-nerf, .iab-m.iab-nerf, .iab-lv.iab-nerf { color: #cf8299; }
+.iab-num.iab-nerf, .iab-m.iab-nerf, .iab-lv.iab-nerf { color: #cf828d; }
 .iab-num.iab-new, .iab-m.iab-new, .iab-lv.iab-new { color: #e0bd62; }
 .iab-num.iab-misc, .iab-m.iab-misc, .iab-lv.iab-misc { color: var(--text-dimmer); }
 .iab-num.iab-rework, .iab-m.iab-rework, .iab-lv.iab-rework { color: #b99ae6; }   /* Orb of Venom 7.38: a cooldown where there was none */
@@ -11159,7 +11161,7 @@ ul.changes li.iab-covered { display: none !important; }
    by direction, the total's % at the end of the block on the rows' % column */
 .components-change .components-pct { margin-left: auto; white-space: nowrap; }
 .components-change .component-price.cost-buff, .components-change .components-total span.cost-buff { color: #7fd08c; }
-.components-change .component-price.cost-nerf, .components-change .components-total span.cost-nerf { color: #cf8299; }
+.components-change .component-price.cost-nerf, .components-change .components-total span.cost-nerf { color: #cf828d; }
 /* a value with a note (the row's "(…)" / (?)): light dotted underline, the note on hover — no (?) icon in
    the header (owner 2026-09-27, Gleipnir 7.38 radius) */
 .iab-hint { display: inline; border-bottom: 1px dotted currentColor; padding-bottom: 0; line-height: 1.1; }
@@ -11199,15 +11201,15 @@ ul.changes li.iab-covered { display: none !important; }
 .sc-back:hover { text-decoration: underline; }
 
 /* === COLOUR-BLIND MODE: generated by scripts/gen/gen_colorblind_css.py — do not edit by hand === */
-html.cb-mode .ench-change .ench-stat.ench-gone { color: #c95d85; }
-html.cb-mode .iab-lv.iab-del { color: #c95d85; }
-html.cb-mode .entity-name .entity-removed-type { color: #c95d85; }
+html.cb-mode .ench-change .ench-stat.ench-gone::before { color: #c5527d; }
+html.cb-mode .iab-lv.iab-del { color: #c5527d; }
+html.cb-mode .entity-name .entity-removed-type { color: #c5527d; }
 html.cb-mode ul.changes li.li-notext::before { background: rgba(238, 135, 57, 0.15); color: #eb7115; border: 1px solid rgba(238, 135, 57, 0.42); }
 html.cb-mode ul.changes li.li-notext[data-tag*="buff"]::before { background: rgba(117, 194, 237, 0.15); color: #2ca2e4; border-color: rgba(117, 194, 237, 0.42); }
 html.cb-mode ul.changes li.li-notext[data-tag*="qol"]::before { background: rgba(45, 91, 193, 0.09); color: #6a8ddc; border-color: rgba(45, 91, 193, 0.30); }
 html.cb-mode ul.changes li.li-notext[data-tag*="misc"]::before { background: rgba(198, 198, 198, 0.09); border-color: rgba(198, 198, 198, 0.27); }
 html.cb-mode ul.changes li.li-notext[data-tag*="new"]::before { background: rgba(245, 225, 90, 0.09); color: #dabf0d; border-color: rgba(245, 225, 90, 0.33); }
-html.cb-mode ul.changes li.li-notext[data-tag*="del"]::before { background: rgba(94, 32, 55, 0.11); color: #c24675; border-color: rgba(94, 32, 55, 0.38); }
+html.cb-mode ul.changes li.li-notext[data-tag*="del"]::before { background: rgba(94, 31, 55, 0.11); color: #bb3e6d; border-color: rgba(94, 31, 55, 0.38); }
 html.cb-mode ul.changes li.li-notext[data-tag*="rework"]::before { background: rgba(216, 153, 188, 0.08); border-color: rgba(216, 153, 188, 0.22); }
 html.cb-mode ul.changes li.li-notext[data-tag*="swap"]::before { background: rgba(40, 150, 120, 0.08); color: #31b994; border-color: rgba(40, 150, 120, 0.27); }
 html.cb-mode .badge.rework { background: rgba(216, 153, 188, 0.08); border: 1px solid rgba(216, 153, 188, 0.22); }
@@ -11215,7 +11217,7 @@ html.cb-mode .badge.swap { background: rgba(40, 150, 120, 0.08); color: #31b994;
 html.cb-mode .badge.misc { background: rgba(198, 198, 198, 0.09); }
 html.cb-mode .badge.qol { background: rgba(45, 91, 193, 0.09); color: #6a8ddc; border: 1px solid rgba(45, 91, 193, 0.30); }
 html.cb-mode .badge.new { background: rgba(245, 225, 90, 0.09); color: #dabf0d; border: 1px solid rgba(245, 225, 90, 0.33); }
-html.cb-mode .badge.del { background: rgba(94, 32, 55, 0.11); color: #c24675; border: 1px solid rgba(94, 32, 55, 0.38); }
+html.cb-mode .badge.del { background: rgba(94, 31, 55, 0.11); color: #bb3e6d; border: 1px solid rgba(94, 31, 55, 0.38); }
 html.cb-mode .badge.buff1 { background: rgba(157, 211, 242, 0.15); color: #98d1f2; border: 1px solid rgba(157, 211, 242, 0.39); }
 html.cb-mode .badge.buff2 { background: rgba(152, 209, 242, 0.20); color: #9cd3f2; border: 1px solid rgba(152, 209, 242, 0.48); }
 html.cb-mode .badge.buff3 { background: rgba(148, 207, 241, 0.26); color: #9ad2f2; border: 1px solid rgba(148, 207, 241, 0.57); }
@@ -11247,10 +11249,10 @@ html.cb-mode .ec-score.neg { color: rgb(244, 179, 131); }
 html.cb-mode .badge.new { color: #f3da36; background: rgba(245, 225, 90, 0.15); border-color: rgba(245, 225, 90, 0.57); }
 html.cb-mode .badge.rework { color: #d28ab2; background: rgba(213, 146, 183, 0.14); border-color: rgba(213, 146, 183, 0.51); }
 html.cb-mode .badge.swap { color: #5bd3b2; background: rgba(40, 150, 120, 0.14); border-color: rgba(40, 150, 120, 0.51); }
-html.cb-mode .badge.del { color: #c95d85; background: rgba(113, 38, 66, 0.14); border-color: rgba(113, 38, 66, 0.51); }
+html.cb-mode .badge.del { color: #c5527d; background: rgba(113, 38, 66, 0.14); border-color: rgba(113, 38, 66, 0.51); }
 html.cb-mode .iab-hl-buff { color: #64baeb; }
 html.cb-mode .iab-hl-nerf { color: #f19e60; }
-html.cb-mode .iab-hl-del { color: #d2789a; }
+html.cb-mode .iab-hl-del { color: #ce6c91; }
 html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff, html.cb-mode .iab-lv.iab-buff { color: #64baeb; }
 html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf, html.cb-mode .iab-lv.iab-nerf { color: #f19e60; }
 html.cb-mode .components-change .component-price.cost-buff, html.cb-mode .components-change .components-total span.cost-buff { color: #64baeb; }

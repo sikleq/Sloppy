@@ -41,3 +41,19 @@ def test_a_covered_row_is_hidden_but_keeps_its_tag():
 def test_sub_ability_shows_the_ability_icon_and_name():
     html = el.sub_ability("rattletrap_jetpack", "Jetpack")
     assert 'src="../icons/abilities/rattletrap_jetpack.png"' in html and ">Jetpack</b>" in html
+
+
+def test_talents_after_a_scepter_ability_get_no_aghanim_stripe():
+    # Clockwerk 7.41: the talents under Overclocking (granted by Aghanim's Scepter) were marked as Scepter rows
+    from patch.state import _State
+    _State.current_ability_slug = "rattletrap_overclocking"
+    el.subgroup("Talents")
+    assert _State.current_ability_slug is None
+
+
+def test_filter_keeps_a_header_only_ability_apart_from_its_rows():
+    # Brewmaster 7.41: Primal Split (rows live in the Brewling blocks under it) stayed hidden after the Heroes
+    # category filter was switched off
+    from pathlib import Path
+    js = (Path(__file__).resolve().parents[1] / "src" / "scripts.js").read_text(encoding="utf-8")
+    assert "if (!ul) { headerOnly.push(block); return; }" in js

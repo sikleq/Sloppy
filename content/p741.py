@@ -1465,12 +1465,19 @@ def build():
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
-    W(li("Level 10 Talent +50 Flamebreak Knockback Distance replaced with +1s Smoldering Resin Duration", t("SWAP")))
-    W(li("Level 10 Talent +50 Sticky Napalm Radius replaced with +5% Firefly Max Movement Speed Bonus", t("SWAP")))
-    W(li("Level 15 Talent -8s Flaming Lasso Cooldown replaced with +0.5% Sticky Napalm Movement Slow", t("SWAP")))
-    W(li("Level 15 Talent +20 Movement Speed replaced with +30 Firefly Damage Per Second", t("SWAP")))
-    W(li("Level 20 Talent +4s Smoldering Resin Duration replaced with Attacks apply 1 Stack of Sticky Napalm", t("SWAP")))
-    W(li("Level 25 Talent +10 Sticky Napalm Damage replaced with +0.75s Flaming Lasso Duration", t("SWAP")))
+    # removed talent red, brand-new talent gold; Smoldering Resin only moved (L20 +4s -> L10 +1s), so it stays plain
+    _gone = lambda s: hl(s, "del")
+    _fresh = lambda s: hl(s, "new")
+    W(li("Level 10 Talent " + _gone("+50 Flamebreak Knockback Distance") + " replaced with +1s Smoldering Resin Duration", t("SWAP"),
+         extra=inline_note("Moved from Level 20, where it gave +4s")))
+    W(li("Level 10 Talent " + _gone("+50 Sticky Napalm Radius") + " replaced with " + _fresh("+5% Firefly Max Movement Speed Bonus"), t("NEW")))
+    W(li("Level 15 Talent " + _gone("-8s Flaming Lasso Cooldown") + " replaced with " + _fresh("+0.5% Sticky Napalm Movement Slow"), t("NEW")))
+    W(li("Level 15 Talent " + _gone("+20 Movement Speed") + " replaced with " + _fresh("+30 Firefly Damage Per Second"), t("NEW"),
+         extra=inline_note("Bug: on release (build 6728) this talent also kept the old +10 Sticky Napalm damage. "
+                           "Removed the same day by a silent hotfix (build 6734), not in the patch notes")))
+    W(li("Level 20 Talent +4s Smoldering Resin Duration replaced with " + _fresh("Attacks apply 1 Stack of Sticky Napalm"), t("NEW"),
+         extra=inline_note("Smoldering Resin moved to Level 10 as +1s")))
+    W(li("Level 25 Talent " + _gone("+10 Sticky Napalm Damage") + " replaced with " + _fresh("+0.75s Flaming Lasso Duration"), t("NEW")))
     W(ul_close())
 
     # Beastmaster

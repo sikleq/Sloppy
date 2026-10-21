@@ -253,11 +253,28 @@
     document.querySelectorAll('h4.ability-title').forEach(h => {
       let nx = h.nextElementSibling;
       while (nx && nx.tagName !== 'UL') nx = nx.nextElementSibling;
-      h.classList.toggle('f-hide', !elementVisible(nx));
+      if (nx) h.classList.toggle('f-hide', !elementVisible(nx));
     });
+    // A header-only ability (Primal Split above its Brewlings, ab-empty) has no rows of its own: it follows the
+    // ability blocks right under it. Hiding it as "no visible rows" kept it hidden for good after a category
+    // filter was switched off (owner 2026-10-21, Brewmaster 7.41).
+    const tagFiltering = activeFilters.size > 0;
+    const headerOnly = [];
     document.querySelectorAll('.ability-block').forEach(block => {
       const ul = block.querySelector('ul.changes');
+      if (!ul) { headerOnly.push(block); return; }
       block.classList.toggle('f-hide', !elementVisible(ul));
+    });
+    headerOnly.forEach(block => {
+      const h = block.querySelector('h4.ability-title');
+      let nx = block.nextElementSibling;
+      let shown = !tagFiltering || !!block.querySelector('.ability-change:not(.f-hide):not(.cat-hide)');
+      while (!shown && nx && nx.classList.contains('ability-block') && !nx.classList.contains('ab-empty')) {
+        if (elementVisible(nx)) shown = true;
+        nx = nx.nextElementSibling;
+      }
+      block.classList.toggle('f-hide', !shown);
+      if (h) h.classList.toggle('f-hide', !shown);
     });
     // Component/stat panels (.properties-change, .components-change, etc.) belong to the REWORK filter;
     // under any other filter a panel stays only when it holds a matching tag (panelMatches), so items with
@@ -802,8 +819,8 @@
     swap:   [95, 176, 164],  // teal — a talent replaced (2026-09-26)
     misc:   [139, 144, 153], // grey
     qol:    [108, 171, 240], // blue
-    del:    [209, 75, 75],   // red — removed (owner 2026-10-21: swapped with NERF)
-    nerf:   [177, 78, 107],  // pink
+    del:    [190, 79, 79],   // red — removed (owner 2026-10-21: swapped with NERF)
+    nerf:   [177, 78, 92],  // pink
   };
   // Map a tag's count → rgba alpha. Single-hit bands sit near the old
   // baseline (~0.50), heavy bands push toward fully-saturated 0.90 so
