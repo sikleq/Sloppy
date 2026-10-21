@@ -35,8 +35,11 @@ def heroes(rules):
 
 
 @pytest.fixture(scope="module")
-def constants(rules):
-    return rules["_constants"]
+def constants():
+    # the attribute constants the formulas name live in patch/game_constants.py (one source)
+    from patch import game_constants as gc
+    return {k: getattr(gc, k) for k in ("HPREG_PER_STR", "MANAREG_PER_INT", "AS_PER_AGI",
+                                         "ARMOR_PER_AGI", "MR_PER_INT")}
 
 
 # ---------------------------------------------------------------------------

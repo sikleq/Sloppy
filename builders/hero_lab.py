@@ -1380,8 +1380,10 @@ def render_html() -> str:
     innate_rules = _json.loads(
         (_HERE / "data" / "rules" / "hero_stat_innates.json").read_text(encoding="utf-8")
     ).get("heroes", {})
+    from patch.game_constants import for_js as _game_constants
     data = _json.dumps(
-        {"patch": version, "heroes": heroes, "items": items, "innateRules": innate_rules},
+        {"patch": version, "heroes": heroes, "items": items, "innateRules": innate_rules,
+         "constants": _game_constants()},
         separators=(",", ":"),
     )
     data_script = data.replace("<", "\\u003c")

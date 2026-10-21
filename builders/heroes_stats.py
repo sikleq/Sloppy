@@ -53,23 +53,17 @@ ASSET_VERSION = _site.compute_asset_version()
 _esc = lambda s: _html.escape(str(s), quote=True)
 
 # ---- engine constants for "Starting" mode (level-1 with attribute bonuses) ---
-# Current-patch values. User-correctable — adjust here when Valve tweaks any
-# of these and rerun the build. The computed columns' HISTORY uses these
-# constants for past patches too (the historical constants did differ).
-HP_PER_STR        = 22.0   # +22 max HP per Strength
-HPREG_PER_STR     = 0.1    # +0.1 HP regen per Strength
-MANA_PER_INT      = 12.0   # +12 max mana per Intelligence
-MANAREG_PER_INT   = 0.05   # +0.05 mana regen per Intelligence
-ARMOR_PER_AGI     = 1 / 6  # 0.1667 armor per Agility
-MR_PER_INT        = 0.1    # +0.1 % magic resistance per Intelligence
-AS_PER_AGI        = 1.0    # +1 attack speed per Agility
-DMG_PER_PRIMARY   = 1.0    # Str/Agi/Int hero gains +1 damage per primary point
-# Universal heroes get a multiplier on the SUM of all three attributes, FLOORED
-# before adding to base damage (Abaddon 0.45×62 = 27.9 → 27 → 22-32 base = 49-59).
-# The multiplier has changed over time — patch-gated in _universal_dmg_mult():
-#   7.33  → 0.6 (introduced with Universal heroes)
-#   7.33c → 0.7
-#   7.38  → 0.45 (current)
+# Typed in ONE place, patch/game_constants.py (engine values the KV files do not
+# carry; a test checks them against the game's own tooltips). Today's values;
+# the computed columns' HISTORY uses them for past patches too (the historical
+# constants did differ). Universal heroes get a multiplier on the SUM of all
+# three attributes, FLOORED before adding to base damage (Abaddon 0.45×62 =
+# 27.9 → 27 → 22-32 base = 49-59) — patch-gated in _universal_dmg_mult().
+from patch import game_constants as _gc
+from patch.game_constants import (
+    HP_PER_STR, HPREG_PER_STR, MANA_PER_INT, MANAREG_PER_INT,
+    ARMOR_PER_AGI, MR_PER_INT, AS_PER_AGI, DMG_PER_PRIMARY,
+)
 
 # Ogre Magi innate — mana / mana regen scale with Strength (he has 0 base Int).
 OGRE_MANA_PER_STR    = 6.0
@@ -626,14 +620,9 @@ def _f(field):
 
 def _universal_dmg_mult() -> float:
     """Damage-per-attribute multiplier for Universal heroes at the current
-    context patch. 0.6 (7.33) → 0.7 (7.33c) → 0.45 (7.38+)."""
-    ver = _CTX_VERSION[0]
-    if _ge(ver, "7.38"):
-        return 0.45
-    if _ge(ver, "7.33c"):
-        return 0.7
-    return 0.6   # 7.33–7.33b (and the floor for any earlier ctx; pre-7.33 no
-    #              hero is Universal so this branch isn't reached for them)
+    context patch: 0.6 (7.33) → 0.7 (7.33c) → 0.45 (7.38+), history in
+    patch/game_constants.UNIVERSAL_DMG_HIST (pre-7.33 no hero is Universal)."""
+    return _gc.at(_gc.UNIVERSAL_DMG_HIST, _CTX_VERSION[0])
 
 
 def _primary_dmg(s, h):
@@ -1633,6 +1622,10 @@ def render_html() -> str:
         '</div>\n'
         f'<script type="application/json" id="hs-innate-rules">'
         f'{_json.dumps(_INNATE_RULES, separators=(",", ":"))}'
+        f'</script>\n'
+        # attribute constants for the per-level recompute (scripts.js types no numbers)
+        f'<script type="application/json" id="hs-game-constants">'
+        f'{_json.dumps(_gc.for_js(), separators=(",", ":"))}'
         f'</script>\n'
         f'<script defer src="src/scripts.js?v={ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'

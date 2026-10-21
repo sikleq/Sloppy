@@ -3289,6 +3289,10 @@ function ecPinnableTip(tip, show, hide, sel) {
   const innatesToggle = document.getElementById('hs-innates-toggle');
   const _innateRulesEl = document.getElementById('hs-innate-rules');
   const _innateRules = _innateRulesEl ? JSON.parse(_innateRulesEl.textContent) : {};
+  // Attribute constants (HP per Str, armor per Agi, …) come from the page —
+  // builders/heroes_stats.py embeds patch/game_constants.for_js(); no numbers here.
+  const _constEl = document.getElementById('hs-game-constants');
+  const C = _constEl ? JSON.parse(_constEl.textContent) : {};
   const attackBtns = [...document.querySelectorAll('.hs-attack-filter')];
   const attrBtns = [...document.querySelectorAll('.hs-attr-filter[data-attr-filter]')];
   const cells = [...table.querySelectorAll('tbody td[data-col]')];
@@ -3372,7 +3376,7 @@ function ecPinnableTip(tip, show, hide, sel) {
   };
   // secondary_attr_factor constants: derived-stat-per-attr unit rates.
   const _SEC = {
-    'hpr:str': 0.1, 'mpr:int': 0.05, 'aspd:agi': 1.0, 'armor:agi': 0.16667, 'mr:int': 0.1,
+    'hpr:str': C.hprStr, 'mpr:int': C.mprInt, 'aspd:agi': C.asAgi, 'armor:agi': C.armorAgi, 'mr:int': C.mrInt,
   };
   // Generic innate stat bonus dispatcher. Reads from embedded hero_stat_innates.json.
   // startHp is only needed for hp_pct formula (Ursa dmg).
@@ -3432,7 +3436,7 @@ function ecPinnableTip(tip, show, hide, sel) {
     if (!eff) return 0;
     const entry = _activeEntry(eff, hsTablePatch);
     if (!entry) return 0;
-    return (num(s.armor) + a.agi * 0.16667) * entry.factor;
+    return (num(s.armor) + a.agi * C.armorAgi) * entry.factor;
   };
   // Drow — Trueshot: self-referential AGI bonus, folded into agi before all derived stats.
   const drowAgiBonus = (s, rawA, level) => {
@@ -3458,7 +3462,7 @@ function ecPinnableTip(tip, show, hide, sel) {
   //   7.41a+  — 2 + 0.1·level   (current; Liquipedia EHP: 2.058/mp L1 → 4.9/mp L30)
   // We compare patch strings via the helpers below (same as `_ge` in the
   // Python side). absorption_pct = 98 across every version checked.
-  const hsTablePatch = (table.dataset.patch || '7.41d');
+  const hsTablePatch = table.dataset.patch || '';   // the builder stamps the latest stats patch
   const patchKey = v => {
     const m = String(v || '').match(/^7\.(\d+)([a-z]?)/);
     if (!m) return [0, 0];
@@ -3486,7 +3490,7 @@ function ecPinnableTip(tip, show, hide, sel) {
     if (s.attr === 'str') return Math.floor(a.str);
     if (s.attr === 'agi') return Math.floor(a.agi);
     if (s.attr === 'int') return Math.floor(a.int);
-    const mult = s.slug === 'void_spirit' ? 0.45 * 1.15 : 0.45;
+    const mult = s.slug === 'void_spirit' ? C.uniDmg * 1.15 : C.uniDmg;
     return Math.floor((a.str + a.agi + a.int) * mult);
   };
   const valueFor = (s, col, mode, level) => {
@@ -3500,11 +3504,11 @@ function ecPinnableTip(tip, show, hide, sel) {
     };
     const wa = wholeAttrs(a);
     const baseAs = num(s.bas);
-    const startAs = baseAs + a.agi + innate('aspd', s, a, effectiveLevel);
-    const startArmor = num(s.armor) + a.agi / 6 + innate('armor', s, a, effectiveLevel);
-    const startMr = num(s.mr) + a.int * 0.1;
+    const startAs = baseAs + a.agi * C.asAgi + innate('aspd', s, a, effectiveLevel);
+    const startArmor = num(s.armor) + a.agi * C.armorAgi + innate('armor', s, a, effectiveLevel);
+    const startMr = num(s.mr) + a.int * C.mrInt;
     const rawHp = num(s.hp);
-    const startHp = Math.round(rawHp + wa.str * 22 + innate('hp', s, a, effectiveLevel));
+    const startHp = Math.round(rawHp + wa.str * C.hpStr + innate('hp', s, a, effectiveLevel));
     // bonusDmg references startHp (Ursa Maul = % of current HP), so compute it
     // AFTER startHp. primaryDmg = the universal attribute-to-damage; innateDmg
     // adds Sven/Luna/Ursa on top.
@@ -3513,8 +3517,8 @@ function ecPinnableTip(tip, show, hide, sel) {
     const rawManaRegen = s.slug === 'huskar' ? 0 : num(s.mpr);
     const startMana = (() => {
       if (s.slug === 'huskar') return 0;
-      if (s.slug === 'ogre_magi') return Math.round(num(s.mp) + wa.str * 6 + wa.int * 12);
-      return Math.round(num(s.mp) + wa.int * 12);
+      if (s.slug === 'ogre_magi') return Math.round(num(s.mp) + wa.str * 6 + wa.int * C.mpInt);
+      return Math.round(num(s.mp) + wa.int * C.mpInt);
     })();
     const startManaRegen = (() => {
       if (s.slug === 'huskar') return 0;
@@ -3522,8 +3526,8 @@ function ecPinnableTip(tip, show, hide, sel) {
       const techiesPoolRegen = (innatesToggle?.checked && s.slug === 'techies')
         ? startMana * techiesPoolPct
         : 0;
-      if (s.slug === 'ogre_magi') return num(s.mpr) + a.str * 0.02 + a.int * 0.05;
-      return (num(s.mpr) + wa.int * 0.05 + innate('mpr', s, a, effectiveLevel) + techiesPoolRegen) * innateMult('mpr', s, effectiveLevel);
+      if (s.slug === 'ogre_magi') return num(s.mpr) + a.str * 0.02 + a.int * C.mprInt;
+      return (num(s.mpr) + wa.int * C.mprInt + innate('mpr', s, a, effectiveLevel) + techiesPoolRegen) * innateMult('mpr', s, effectiveLevel);
     })();
     const start = mode !== 'base';
     switch (col) {
@@ -3536,7 +3540,7 @@ function ecPinnableTip(tip, show, hide, sel) {
         const shield = start ? manaShieldEhp(s, startMana, effectiveLevel) : 0;
         return [ehpMag(start ? startHp : rawHp, start ? startMr : num(s.mr)) + shield, g0];
       }
-      case 'hpr': return [start ? (num(s.hpr) + wa.str * 0.1 + innate('hpr', s, a, effectiveLevel)) * innateMult('hpr', s, effectiveLevel) : num(s.hpr), regen];
+      case 'hpr': return [start ? (num(s.hpr) + wa.str * C.hprStr + innate('hpr', s, a, effectiveLevel)) * innateMult('hpr', s, effectiveLevel) : num(s.hpr), regen];
       case 'mp': return [start ? startMana : rawMana, g0];
       case 'mpr': return [start ? startManaRegen : rawManaRegen, regen];
       case 'str': return [a.str, g];
@@ -4039,10 +4043,9 @@ function ecShopMarkup(panels) {
     Weapons: ['lesser_crit','maelstrom','invis_sword','desolator','basher','mage_slayer','bfury','monkey_king_bar','manta','heavens_halberd','radiance','greater_crit','butterfly','silver_edge','satanic','abyssal_blade','mjollnir','rapier','revenants_brooch','nullifier'],
     Armaments: ['sange','yasha','kaya','witch_blade','diffusal_blade','dragon_lance','echo_sabre','devastator','sange_and_yasha','kaya_and_sange','yasha_and_kaya','harpoon','hurricane_pike','disperser','specialists_array','hydras_breath','skadi','arcane_blink','swift_blink','overwhelming_blink'],
   };
-  const C = {
-    hpStr: 22, hprStr: 0.1, mpInt: 12, mprInt: 0.05,
-    armorAgi: 1 / 6, mrInt: 0.1, asAgi: 1, uniDmg: 0.45,
-  };
+  // Attribute constants from the page (builders/hero_lab.py embeds
+  // patch/game_constants.for_js()) — one source for Python and JS.
+  const C = data.constants || {};
   const METRICS = [
     ['hp', 'HP'], ['mp', 'MP'], ['hpr', 'HP/sec'], ['mpr', 'MP/sec'],
     ['str', 'Strength'], ['agi', 'Agility'], ['int', 'Intelligence'],
@@ -4150,9 +4153,9 @@ function ecShopMarkup(panels) {
     const [x1, y1] = patchKey(a), [x2, y2] = patchKey(b);
     return x1 !== x2 ? x1 > x2 : y1 >= y2;
   };
-  const currentPatch = data.patch || root.dataset.patch || '7.41d';
+  const currentPatch = data.patch || root.dataset.patch || '';
   const _SEC = {
-    'hpr:str': 0.1, 'mpr:int': 0.05, 'aspd:agi': 1.0, 'armor:agi': 0.16667, 'mr:int': 0.1,
+    'hpr:str': C.hprStr, 'mpr:int': C.mprInt, 'aspd:agi': C.asAgi, 'armor:agi': C.armorAgi, 'mr:int': C.mrInt,
   };
 
   function heroLabInnatesOn() {
@@ -4278,7 +4281,7 @@ function ecShopMarkup(panels) {
     if (!eff) return 0;
     const entry = activeEntry(eff, currentPatch);
     if (!entry) return 0;
-    return ((Number(s.armor) || 0) + a.agi * 0.16667) * entry.factor;
+    return ((Number(s.armor) || 0) + a.agi * C.armorAgi) * entry.factor;
   }
 
   function drowAgiBonus(s, rawA, level, includeInnates) {
@@ -4310,7 +4313,7 @@ function ecShopMarkup(panels) {
     if (s.attr === 'str') return Math.floor(a.str);
     if (s.attr === 'agi') return Math.floor(a.agi);
     if (s.attr === 'int') return Math.floor(a.int);
-    const mult = includeInnates && s.slug === 'void_spirit' ? 0.45 * 1.15 : 0.45;
+    const mult = includeInnates && s.slug === 'void_spirit' ? C.uniDmg * 1.15 : C.uniDmg;
     return Math.floor((a.str + a.agi + a.int) * mult);
   }
 

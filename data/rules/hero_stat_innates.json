@@ -1,15 +1,7 @@
 {
   "_version": 1,
   "_doc": "Declarative source of truth for hero innate stat bonuses. Used by builders/heroes_stats.py (level-1 seeding) and src/scripts.js (per-level recompute on the heroes-stats table). Stage 1 of innate centralization — do not edit without verifying against KV files in data/stats/<patch>/heroes/.",
-  "_constants": {
-    "HPREG_PER_STR": 0.1,
-    "MANAREG_PER_INT": 0.05,
-    "AS_PER_AGI": 1.0,
-    "ARMOR_PER_AGI": 0.16667,
-    "MR_PER_INT": 0.1,
-    "OGRE_MANA_PER_STR": 6.0,
-    "OGRE_MANAREG_PER_STR": 0.02
-  },
+  "_constants_doc": "HPREG_PER_STR, ARMOR_PER_AGI and the other attribute constants named below live in patch/game_constants.py (one source for Python and scripts.js).",
   "_formula_types": {
     "attr_factor": "bonus = attrs[source] * factor",
     "base_plus_level": "bonus = base + per_level * level",

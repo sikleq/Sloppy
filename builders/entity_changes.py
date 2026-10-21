@@ -1207,8 +1207,9 @@ def _hero_stat_data():
     return _HERO_STAT_CACHE
 
 
-# level-1 HP / mana constants (same as builders/heroes_stats.py: 120 + 22·Str, 75 + 12·Int)
-_HP_BASE, _HP_PER_STR, _MP_BASE, _MP_PER_INT = 120.0, 22.0, 75.0, 12.0
+# level-1 HP / mana = the base hero block (120 / 75, npc_dota_hero_base in heroes_raw.json) + 22·Str / 12·Int
+# (engine constants, typed in one place: patch/game_constants.py) — the same as builders/heroes_stats.py
+from patch.game_constants import HP_PER_STR as _HP_PER_STR, MANA_PER_INT as _MP_PER_INT
 # which base-attribute / gain field the category's "starting stat" refers to
 _CAT_ATTR = {"Strength": "Strength", "Agility": "Agility", "Intelligence": "Intelligence"}
 
@@ -1244,8 +1245,10 @@ def _hero_group_stats(label, lst):
     n = len(rows)
     melee = sum(1 for r in rows if r["melee"])
     avg = lambda f: sum(f(r) for r in rows) / n
-    hp = lambda r: _HP_BASE + _HP_PER_STR * r["str"]
-    mp = lambda r: _MP_BASE + _MP_PER_INT * r["int"]
+    base = raw["npc_dota_hero_base"]                 # engine defaults every hero inherits
+    hp_base, mp_base = float(base["StatusHealth"]), float(base["StatusMana"])
+    hp = lambda r: hp_base + _HP_PER_STR * r["str"]
+    mp = lambda r: mp_base + _MP_PER_INT * r["int"]
     # category attribute: primary for STR/AGI/INT, the sum of all three for Universal
     if label in _CAT_ATTR:
         a = {"strength": "str", "agility": "agi", "intelligence": "int"}[label.lower()]
