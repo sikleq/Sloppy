@@ -82,6 +82,72 @@ def test_bug_note_is_a_bug_box_not_a_question_mark():
     assert 'class="info-tip bug-tip"' in html and 'class="bug-ico"' in html and ">?<" not in html
 
 
+def test_a_brand_new_talent_is_gold_but_the_row_stays_swap():
+    # as NEW the swap scored as a buff: 7.38's net went +54 -> +86
+    from patch import talent_marks as tm
+    from patch.badges import t
+    from patch.state import _State
+    tm._content_file = lambda: "z"
+    tm._cache["z"] = {"Batrider": [(15, "+20 Movement Speed", "+30 Firefly Damage Per Second")]}
+    _State.current_hero_title = "Batrider"
+    try:
+        text, badge, _ = el._mark_talent_swap("Level 15 Talent: +20 Movement Speed replaced with +30 Firefly Damage Per Second",
+                                              t("SWAP"), "")
+        assert 'iab-hl-new' in text and 'iab-hl-del' in text and 'data-tag="swap"' in badge
+    finally:
+        del tm._content_file
+        import importlib
+        importlib.reload(tm)
+
+
+def test_same_talent_in_another_form_is_neither_removed_nor_new():
+    # Arc Warden 7.41 "+50% Spark Wraith Damage -> +200 Spark Wraith Damage", Viper "+30 -> +20/40 Nethertoxin"
+    from patch import talent_marks as tm
+    tm._content_file = lambda: "y"
+    tm._cache["y"] = {}
+    try:
+        assert tm.mark("Level 15 Talent: +30 Nethertoxin Min/Max Damage replaced with +20/40 Nethertoxin Min/Max Damage",
+                       "Viper") == ("same", "same", "")
+    finally:
+        del tm._content_file
+        import importlib
+        importlib.reload(tm)
+
+
+def test_plural_talent_is_the_same_talent():
+    from patch import talent_marks as tm
+    assert tm.key("+1 Acorn Shot Bounce") == tm.key("+2 Acorn Shot Bounces")
+
+
+def test_game_checked_move_overrides_the_text_guess():
+    # Rubick 7.41: the notes never say where Telekinesis Landing Damage went; the game files put it on Level 20
+    from patch import talent_marks as tm
+    from patch.state import _State
+    tm._content_file = lambda: "w"
+    tm._cache["w"] = {}
+    _State.current_patch_version = "7.41"
+    try:
+        fate = tm.mark("Level 10 Talent: +165 Telekinesis Landing Damage replaced with -2s Telekinesis Cooldown", "Rubick")
+        assert fate[0] == "moved" and "Level 20" in fate[2]
+    finally:
+        del tm._content_file
+        import importlib
+        importlib.reload(tm)
+
+
+def test_facet_named_talent_row_is_a_swap():
+    from patch import talent_marks as tm
+    assert tm.SWAP_RE.match("Old Blood: Level 10 Talent +15% Bloodrage Spell Amplification replaced with +15% Amp")
+
+
+def test_aghanim_upgrade_goes_in_brackets_before_the_summary_full_stop():
+    html = el.ability_change(old=dict(name="X", slug="rattletrap_overclocking", desc=["Active (Aghanim's Scepter upgrade). A."]),
+                             new=dict(name="X", slug="rattletrap_overclocking", desc=["B."]),
+                             summary="Ability reworked.", tag="rework")
+    assert "Ability reworked <span class=\"ac-aghs\">(Aghanim's Scepter upgrade)</span>." in html
+    assert "Active (Aghanim" not in html
+
+
 def test_aghanim_upgrade_words_move_from_card_text_to_its_summary():
     spec, kind = el._take_aghs({"desc": ["Active (Aghanim's Scepter upgrade). All abilities are supercharged:"]})
     assert kind == "scepter" and spec["desc"] == ["All abilities are supercharged:"]

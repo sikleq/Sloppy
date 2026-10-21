@@ -2435,10 +2435,9 @@ def sub_ability(slug, name):
 
 
 def _mark_talent_swap(text, badge, extra):
-    """A talent swap row: the removed talent red, a brand-new one gold with NEW for the row, a talent that only
+    """A talent swap row: the removed talent red, a brand-new one gold (the row stays SWAP), a talent that only
     changed level plain with a note (patch/talent_marks.py; owner 2026-10-21)."""
     from . import talent_marks
-    from .badges import t
     if 'data-tag="swap"' not in (badge or "") or "<" in text:
         return text, badge, extra
     fate = talent_marks.mark(text, _State.current_hero_title)
@@ -2450,8 +2449,8 @@ def _mark_talent_swap(text, badge, extra):
     if old_fate == "gone":
         old = hl(old, "del")
     if new_fate == "fresh":
+        # gold only: the row stays SWAP — as NEW it scored as a buff and moved 7.38's net from +54 to +86 (2026-10-21)
         new = hl(new, "new")
-        badge = t("NEW")
     text = text[:m.start(2)] + old + text[m.end(2):m.start(3)] + new + text[m.end(3):]
     if note:
         extra = (extra or "") + inline_note(note)
@@ -2740,14 +2739,23 @@ def info_tip(*lines, header=None):
             f'<span class="info-pop">{head}{body}</span></span><!--/TIP-->')
 
 
-# Lucide "bug" (ISC licence), stroked in the tip's colour (owner 2026-10-21: bugs get a [bug] box like the [?] one)
-_BUG_SVG = ('<svg class="bug-ico" viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" '
-            'stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-            '<path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3 3 0 1 1 6 0v1"/>'
-            '<path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/>'
-            '<path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/>'
-            '<path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/>'
-            '<path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>')
+# A solid 9x9 pixel bug (the site's pixel style; the thin Lucide outline was unreadable at 9px, owner 2026-10-21):
+# antennae, head, a body split down the back, three legs a side. One path of 1x1 squares, crisp-edged.
+_BUG_PIXELS = (
+    "..#...#..",
+    "...#.#...",
+    "..#####..",
+    "#.##.##.#",
+    ".###.###.",
+    "#.##.##.#",
+    ".###.###.",
+    "#.##.##.#",
+    "..##.##..",
+)
+_BUG_SVG = ('<svg class="bug-ico" viewBox="0 0 9 9" width="11" height="11" shape-rendering="crispEdges" '
+            'aria-hidden="true"><path fill="currentColor" d="'
+            + "".join(f"M{x} {y}h1v1h-1z" for y, row in enumerate(_BUG_PIXELS) for x, c in enumerate(row) if c == "#")
+            + '"/></svg>')
 
 
 def bug_note(text):
@@ -3660,13 +3668,17 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
             tag_key = 'new'
         tag_label = tag_key.upper()
         aghs_cls = f' class="aghanim-{_aghs}"' if _aghs else ''
-        aghs_txt = (f' <span class="ac-aghs">Aghanim\'s {_aghs.title()} upgrade</span>'
-                    f'<span class="aghanim-marker {_aghs}"></span>') if _aghs else ''
+        # "Ability reworked (Aghanim's Scepter upgrade)." — in brackets before the full stop (owner 2026-10-21)
+        summary_txt = summary or ""
+        if _aghs:
+            body = summary_txt[:-1] if summary_txt.endswith(".") else summary_txt
+            summary_txt = (f'{body} <span class="ac-aghs">(Aghanim\'s {_aghs.title()} upgrade)</span>.'
+                           f'<span class="aghanim-marker {_aghs}"></span>')
         summary_row = (
             f'<ul class="changes ability-change-summary-ul">'
             f'<li data-tag="{tag_key}"{aghs_cls}>'
             f'<span class="badge {tag_key}" data-tag="{tag_key}">{tag_label}</span>'
-            f'<span class="row-text">{summary or ""}{aghs_txt}</span>'
+            f'<span class="row-text">{summary_txt}</span>'
             f'</li>'
             f'</ul>'
         )
