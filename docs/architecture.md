@@ -21,6 +21,14 @@ build_site.py                       (single entrypoint, runs all steps)
 dist/                               (final site, served by GitHub Pages)
 ```
 
+**One command for the data side** (2026-10-21): `tools/new_patch.py <v> [<date>]` registers the patch, fetches and
+slims the game files, runs the top-ups and the writers of the shared tables (`tools/build_abilities_slim.py` →
+`data/abilities_slim.json`, `tools/build_herolist.py` → `data/herolist.json`, `fetch_itemlist.py`, `extract_shops.py`),
+drafts `content/p<v>.py`, builds and runs `patch_check.py` — see [workflow.md](workflow.md#the-one-command-2026-10-21).
+Every shared file has a writer and a freshness gate (`tests/test_snapshots_fresh.py`). Silent Changes
+(`builders/silent.py`) diffs the per-hero files and the root `items.txt` / `npc_units.txt` / `npc_abilities.txt` of
+consecutive patches.
+
 ## The `patch/` package
 
 Helpers are imported in every `content/p*.py` via `from patch.api import *`.

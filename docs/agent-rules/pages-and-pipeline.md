@@ -6,7 +6,7 @@
 build_site.py                ← ЕДИНЫЙ entrypoint. python build_site.py [steps] [--latest]
 builders/
   build_patches.py           ← Авто-обнаруживает content/p*.py + calendar + index
-  silent.py                  ← Дифф KV-файлов → dist/patches/silent/*.html
+  silent.py                  ← Дифф KV-файлов (heroes/ + items/npc_units/npc_abilities.txt) → dist/patches/silent/*.html
   terrain.py                 ← terrain_<code>.html (сравнение карт; terrain_stats.py ← terrain_stats.html)
   creeps.py (+ creeps_common / creeps_history / creeps_abilities.py), heroes_stats.py, hero_lab.py,
   mana_items.py, heroes_dyn.py, items_dyn.py
@@ -21,6 +21,7 @@ patch/
   meta.py                    ← PATCHES список, RELEASE_HISTORY
   index_page.py              ← index.html + What's New popup
 generate_patch_code_v2.py    ← Datafeed → Python scaffold. Канонический генератор.
+tools/new_patch.py           ← Новый патч: все шаги данных одной командой (docs/workflow.md, «The one command»)
 data/
   normalized/patches/*.json  ← JSON-артефакты (генерятся параллельно со scaffold)
   stats/{version}/           ← KV-файлы героев/предметов (для silent changes)

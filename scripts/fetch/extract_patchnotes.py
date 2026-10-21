@@ -40,6 +40,8 @@ Dota 2 Patch Notes — Extractor & Auto-Uploader
 ЗАПУСК:
 ─────────────────────────────────────────────────────────
    python extract_patchnotes.py
+   python extract_patchnotes.py 7.42 --local   # записать в эту рабочую копию, без заливки и без токена
+                                               # (так его зовёт tools/new_patch.py)
 
 или просто двойной клик по этому файлу (если Python поставился
 правильно и .py-файлы открываются им).
