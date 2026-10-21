@@ -590,12 +590,13 @@
     },
     "ogre_magi": {
       "innate": "ogre_magi_dumb_luck",
-      "since": "7.36",
+      "since": "7.33",
       "effects": [
         {
           "target": "mp",
           "formula": "attr_substitution",
           "sub_attr": "str",
+          "since": "7.33",
           "factor": 6.0,
           "kv": {
             "factor": [
@@ -610,7 +611,6 @@
           "target": "mpr",
           "formula": "attr_substitution",
           "sub_attr": "str",
-          "factor": 0.02,
           "kv": {
             "factor": [
               "mana_regen_per_str",
@@ -618,7 +618,18 @@
               1
             ]
           },
-          "note": "Ogre uses STR * factor (KV mana_regen_per_str) for Mana Regen instead of INT * MANAREG_PER_INT."
+          "history": [
+            {
+              "since": "7.33",
+              "until": "7.36c",
+              "factor": 0.03
+            },
+            {
+              "since": "7.37",
+              "factor": 0.02
+            }
+          ],
+          "note": "Ogre uses STR * factor (KV mana_regen_per_str) for Mana Regen instead of INT * MANAREG_PER_INT. Dumb Luck came in 7.33 (0 Int, 6 MP and 0.03 MP regen per Str); 7.37 reduced the regen to 0.02."
         }
       ]
     },

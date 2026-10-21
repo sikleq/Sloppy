@@ -3352,8 +3352,8 @@ function innateDpm(entry, level) {
     const bonus = includePlus2 ? plus2CountAt(level) * 2 : 0;
     // Ogre Magi has 0 base Intelligence and cannot gain Int from levels OR from
     // the +2-all-stats level-ups (his innate replaces Int scaling with Strength-
-    // based mana) — so the +2 bonus only feeds his Str and Agi, never Int.
-    const intBonus = s.slug === 'ogre_magi' ? 0 : bonus;
+    // based mana) — so the +2 bonus only feeds his Str and Agi, never Int. Before 7.33 (no Dumb Luck) he was normal.
+    const intBonus = s.slug === 'ogre_magi' && innateEntry('ogre_magi', 'mp', 'attr_substitution') ? 0 : bonus;
     return {
       str: num(s.str) + (level - 1) * num(s.strGain) + bonus,
       agi: num(s.agi) + (level - 1) * num(s.agiGain) + bonus,

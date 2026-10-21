@@ -112,3 +112,22 @@ def test_techies_void_ogre_medusa_numbers_come_from_the_rules():
     js = (Path(hs.__file__).resolve().parent.parent / "src" / "scripts.js").read_text(encoding="utf-8")
     for literal in ("2 + 0.1 * level", "* 1.15", "0.001 + lvl", "wa.str * 6", "str * 0.02", "mana * 0.98"):
         assert literal not in js, f"scripts.js types an innate number again: {literal!r}"
+
+
+def test_ogre_dumb_luck_regen_follows_its_history():
+    # owner 2026-10-21: 7.37 reduced Dumb Luck's mana regen per Strength 0.03 -> 0.02. Dumb Luck came in 7.33
+    # ("New innate ability": 0 Int, 6 MP and 0.03 MP regen per Str) — game files 7.35-7.36c say 0.03
+    import builders.heroes_stats as hs
+    for version, factor in (("7.33", 0.03), ("7.35d", 0.03), ("7.36c", 0.03), ("7.37", 0.02), ("7.41f", 0.02)):
+        hs._set_ctx_version(version)
+        assert hs._innate_entry("ogre_magi", "mpr", "attr_substitution")["factor"] == factor, version
+        assert hs._innate_entry("ogre_magi", "mp", "attr_substitution")["factor"] == 6.0, version
+        game = ir.kv_values("ogre_magi", "ogre_magi_dumb_luck", {"factor": ["mana_regen_per_str", "value", 1]}, version)
+        assert game in (None, {"factor": factor}), version          # None: no per-hero file before 7.35
+    hs._set_ctx_version("7.32e")                     # before 7.33 Ogre's mana came from Intelligence
+    assert hs._innate_entry("ogre_magi", "mp", "attr_substitution") is None
+    assert hs._innate_entry("ogre_magi", "mpr", "attr_substitution") is None
+    hs._set_ctx_version(hs._LATEST_STATS_VERSION)
+    from pathlib import Path
+    js = (Path(hs.__file__).resolve().parent.parent / "src" / "scripts.js").read_text(encoding="utf-8")
+    assert "s.slug === 'ogre_magi' ? 0 : bonus" not in js      # the Int level-ups follow the same rule in JS

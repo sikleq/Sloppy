@@ -45,9 +45,9 @@ def test_a_lane_creep_gets_a_page_from_general_rows(tmp_path, monkeypatch):
 
 def test_every_roster_unit_gets_a_page_even_without_changes(monkeypatch):
     """Owner 2026-10-06: unit cards must be clickable like items — a page that says there are no changes."""
-    monkeypatch.setattr(ec, "_unit_camp_map", lambda: {"npc_dota_neutral_polar_furbolg_champion": "Large",
+    monkeypatch.setattr(ec, "_unit_camp_map", lambda: {"npc_dota_neutral_polar_furbolg_ursa_warrior": "Large",
                                                        "npc_dota_neutral_kobold": "Small"})
-    monkeypatch.setattr(ec, "_creep_display_names", lambda: {"npc_dota_neutral_polar_furbolg_champion": "Hellbear Smasher",
+    monkeypatch.setattr(ec, "_creep_display_names", lambda: {"npc_dota_neutral_polar_furbolg_ursa_warrior": "Hellbear Smasher",
                                                              "npc_dota_neutral_kobold": "Kobold"})
     have = [{"kind": "unit", "slug": "kobold", "icon": "../icons/units/npc_dota_neutral_kobold.png", "patches": [1]}]
     out = ec._unchanged_units(have)

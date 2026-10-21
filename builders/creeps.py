@@ -242,8 +242,9 @@ CREEP_DISPLAY_NAMES = {
     'npc_dota_neutral_dark_troll':           'Dark Troll',
     'npc_dota_neutral_dark_troll_warlord':   'Dark Troll Summoner',
     'npc_dota_neutral_warpine_raider':       'Warpine Raider',
-    'npc_dota_neutral_polar_furbolg_ursa_warrior': 'Hellbear',
-    'npc_dota_neutral_polar_furbolg_champion':     'Hellbear Smasher',
+    # as in the game (dota_english): the ursa warrior (Thunder Clap, 950 HP) is the Smasher — was swapped until 2026-10-21
+    'npc_dota_neutral_polar_furbolg_ursa_warrior': 'Hellbear Smasher',
+    'npc_dota_neutral_polar_furbolg_champion':     'Hellbear',
     'npc_dota_neutral_prowler_acolyte':      'Prowler Acolyte',
     'npc_dota_neutral_prowler_shaman':       'Prowler Shaman',
     'npc_dota_neutral_frostbitten_golem':    'Frostbitten Golem',

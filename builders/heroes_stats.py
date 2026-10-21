@@ -722,9 +722,10 @@ def _mp_l1(s, h, r):
     slug = h.replace("npc_dota_hero_", "")
     if slug == "huskar":
         return 0.0
-    if slug == "ogre_magi":
-        # Dumb Luck: mana per Strength (KV mana_per_str) — from the innate rules
-        per_str = _innate_entry(slug, "mp", "attr_substitution")["factor"]
+    sub = _innate_entry(slug, "mp", "attr_substitution") if slug == "ogre_magi" else None
+    if sub:
+        # Dumb Luck (7.33+): mana per Strength (KV mana_per_str) — from the innate rules
+        per_str = sub["factor"]
         return round(_field(s, h, "StatusMana")
                      + per_str * _whole_start_attr(s, h, r, "str")
                      + MANA_PER_INT * _whole_start_attr(s, h, r, "int"))
@@ -742,8 +743,9 @@ def _mpreg_l1(s, h, r):
     slug = h.replace("npc_dota_hero_", "")
     if slug == "huskar":
         return 0.0
-    if slug == "ogre_magi":
-        per_str = _innate_entry(slug, "mpr", "attr_substitution")["factor"]   # KV mana_regen_per_str
+    sub = _innate_entry(slug, "mpr", "attr_substitution") if slug == "ogre_magi" else None
+    if sub:
+        per_str = sub["factor"]   # KV mana_regen_per_str (Dumb Luck, 7.33+)
         return round(_field(s, h, "StatusManaRegen")
                      + per_str * _start_attr(s, h, r, "str")
                      + MANAREG_PER_INT * _start_attr(s, h, r, "int"), 2)

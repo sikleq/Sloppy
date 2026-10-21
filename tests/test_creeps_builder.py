@@ -91,4 +91,16 @@ def test_entity_changes_still_reads_the_creep_tables():
     every_neutral = {creeps.CREEP_NAME_TO_NPC[k] for k in creeps.CREEP_CAMP
                      if creeps.CREEP_NAME_TO_NPC.get(k, '').startswith('npc_dota_neutral_')}
     assert every_neutral <= set(camp)                                 # the whole table, not a prefix of it
-    assert ec._creep_display_names()['npc_dota_neutral_polar_furbolg_ursa_warrior'] == 'Hellbear'
+    names = ec._creep_display_names()
+    assert names['npc_dota_neutral_polar_furbolg_ursa_warrior'] == 'Hellbear Smasher'   # as the game names them
+    assert names['npc_dota_neutral_polar_furbolg_champion'] == 'Hellbear'
+
+
+def test_no_creep_wears_another_creeps_game_name():
+    # 2026-10-21: Hellbear / Hellbear Smasher were swapped. Our names may be older ones (Froglet for Boglet), but a
+    # name the game gives to a DIFFERENT creep is a swap.
+    game = {npc: creeps.game_unit_name(npc) for npc in creeps.CREEP_DISPLAY_NAMES}
+    owner = {name: npc for npc, name in game.items()}
+    swapped = [(npc, ours, owner[ours]) for npc, ours in creeps.CREEP_DISPLAY_NAMES.items()
+               if ours in owner and owner[ours] != npc]
+    assert not swapped, swapped
