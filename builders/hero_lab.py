@@ -488,6 +488,11 @@ _BOOT_ITEMS = {
     "item_phase_boots", "item_power_treads",
 }
 
+# Which neutral tiers drop each enchantment, and its sort slot. The tier pools
+# live in the game's neutral_items.txt, which we do not fetch — so this is kept
+# by hand. tests/test_roster_guards.py fails when items.txt has an enchantment
+# this table (or _ENCHANT_ATTRS) does not list, drops one, or changes how many
+# levels it has.
 _ENCHANT_TIER_LABELS = {
     "item_enhancement_vital":       ("", 0, [1]),
     "item_enhancement_alert":       ("", 1, [1, 2, 3, 4]),

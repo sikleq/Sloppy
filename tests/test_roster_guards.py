@@ -179,3 +179,139 @@ def test_a_new_aoe_item_appears_by_itself(tmp_path, monkeypatch):
     monkeypatch.setattr(aoe, "STATS_DIR", tmp_path)
     got = aoe._resolve_items("9.99")
     assert [(k, kind, amt) for k, _l, _i, kind, amt in got] == [("new_orb", "flat", 30), ("chasm_stone", "flat", 50)]
+
+
+# ---------------------------------------------------------------- Hero Lab enchantments (builders/hero_lab.py)
+
+@lru_cache(maxsize=None)
+def _items(version):
+    return load_kv(STATS / version / "items.txt").get("DOTAAbilities", {})
+
+
+def _levels(block):
+    """How many levels an enchantment has: the longest "a b c" value list of its AbilityValues."""
+    out = 1
+    for v in (block.get("AbilityValues") or {}).values():
+        raw = v.get("value") if isinstance(v, dict) else v
+        if raw is not None:
+            out = max(out, len(str(raw).split()))
+    return out
+
+
+def test_every_enchantment_has_tiers_and_attributes():
+    import builders.hero_lab as hl
+    from patch.rosters import _PHANTOM_ITEMS
+    current = {k: b for k, b in _items(LATEST).items()
+               if k.startswith("item_enhancement_") and k not in _PHANTOM_ITEMS and isinstance(b, dict)}
+    for table in ("_ENCHANT_TIER_LABELS", "_ENCHANT_ATTRS"):
+        known = getattr(hl, table)
+        new = sorted(set(current) - set(known))
+        assert not new, f"{LATEST} items.txt has enchantments hero_lab.{table} does not know: {new}"
+        gone = sorted(set(known) - set(current))
+        assert not gone, f"hero_lab.{table} lists enchantments {LATEST} no longer has: {gone}"
+    wrong = [f"{k}: {len(hl._ENCHANT_TIER_LABELS[k][2])} tiers listed, {_levels(b)} levels in the game"
+             for k, b in current.items() if len(hl._ENCHANT_TIER_LABELS[k][2]) != _levels(b)]
+    assert not wrong, f"enchantment tiers out of step with items.txt (fix _ENCHANT_TIER_LABELS): {wrong}"
+
+
+# ---------------------------------------------------------------- Item rosters (patch/rosters.py)
+
+def _neutral_pool():
+    data = json.loads((ROOT / "data" / "itemlist.json").read_text(encoding="utf-8"))
+    return {i["name"] for i in data["result"]["data"]["itemabilities"] if i.get("neutral_item_tier", -1) >= 0}
+
+
+def test_hand_kept_item_lists_still_hold():
+    from patch import rosters as r
+    items, pool = _items(LATEST), _neutral_pool()
+    shops = (ROOT / "data" / "shops.txt").read_text(encoding="utf-8")
+    real = sorted(p for p in r._PHANTOM_ITEMS if p in pool or f'"{p}"' in shops)
+    assert not real, f"_PHANTOM_ITEMS are in the shop / neutral pool now (no longer phantoms): {real}"
+    back = sorted(k for k in r._OBSOLETE_REMOVED if k in items and str(items[k].get("IsObsolete", "")) != "1")
+    assert not back, f"_OBSOLETE_REMOVED items are not IsObsolete in {LATEST} any more: {back}"
+    pooled = sorted(k for k in r._NEUTRAL_REMOVED_MANUAL if f"item_{k}" in pool)
+    assert not pooled, f"_NEUTRAL_REMOVED_MANUAL neutrals are back in the pool: {pooled}"
+
+
+def test_every_shop_section_is_mapped():
+    import re
+    from patch import rosters as r
+    want = {k for k, _ in r._SHOP_CATEGORY_ORDER}
+    cur, with_items = None, set()
+    for ln in (ROOT / "data" / "shops.txt").read_text(encoding="utf-8").splitlines():
+        if re.match(r'^\s*"item"\s*"item_', ln):
+            with_items.add(cur)
+            continue
+        m = re.match(r'^\s*"([a-z0-9_]+)"\s*(?://.*)?$', ln)
+        if m:
+            cur = m.group(1)
+    unknown = sorted(s for s in with_items - want
+                     if s and s != "dota_shops" and not s.startswith("sideshop") and "pregame" not in s)
+    assert not unknown, f"shops.txt has shop sections _SHOP_CATEGORY_ORDER does not map: {unknown}"
+
+
+# ---------------------------------------------------------------- Unit / Item Changes pages (entity_changes.py)
+
+def test_every_shop_category_has_a_panel():
+    from builders import entity_changes as ec
+    from patch import rosters as r
+    shown = {c for _p, cats in ec._SHOP_PANELS for c in cats}
+    missing = sorted(({d for _k, d in r._SHOP_CATEGORY_ORDER} | {r._SHOP_CATEGORY_OTHER}) - shown)
+    assert not missing, f"item categories with no panel in entity_changes._SHOP_PANELS: {missing}"
+
+
+def test_neutral_tier_times_follow_the_patch_notes():
+    """The unlock times live in the game's neutral_items.txt we do not fetch; Valve announces a change in the
+    patch notes ("Tier 1 availability changed from 5:00 to 0:00") — the latest such line must agree."""
+    import re
+    from builders import entity_changes as ec
+    from patch.game_constants import _vkey
+    latest = {}
+    for ln in (ROOT / "data" / "patchnotes_english.txt").read_text(encoding="utf-8").splitlines():
+        mv = re.search(r'"DOTA_Patch_(\d+)_(\d+)([a-z]?)_', ln)
+        m = (re.search(r"Tier (\d) (?:Neutral Items? )?availability changed from \S+ to (\d+):(\d\d)", ln)
+             or re.search(r"Tier (\d) (?:Neutral )?[Ii]tems now drop at (\d+) minutes()", ln))
+        if mv and m:
+            ver = f"{mv.group(1)}.{mv.group(2)}{mv.group(3)}"
+            tier, minutes = int(m.group(1)), int(m.group(2))
+            if tier not in latest or _vkey(ver) >= _vkey(latest[tier][0]):
+                latest[tier] = (ver, minutes)
+    assert latest, "no neutral tier timing line found in patchnotes_english.txt"
+    for tier, (ver, minutes) in latest.items():
+        assert ec._TIER_TIME[tier] == f"{minutes}:00+", \
+            f"{ver} patch notes: tier {tier} at {minutes}:00, entity_changes._TIER_TIME says {ec._TIER_TIME[tier]}"
+
+
+def _unit_exists(basename):
+    units = _units(LATEST)
+    alias = "npc_dota_" + basename.replace("_unit", "")         # brewmaster_fire_unit -> npc_dota_brewmaster_fire*
+    return any(k.startswith(basename) or k.startswith(alias) for k in units)
+
+
+def test_unit_lists_follow_the_game_files():
+    from builders import creeps as c
+    from builders import entity_changes as ec
+    gone = [b for b, _n in ec._SUMMON_UNITS + ec._LANE_UNITS if not _unit_exists(b)]
+    assert not gone, f"summon / lane units the {LATEST} npc_units.txt no longer has: {gone} (move to _REMOVED_UNITS)"
+    # (the files keep removed units — Necronomicon's are still in npc_units.txt — so _REMOVED_UNITS is not
+    # checked against them; their item is: it must stay obsolete)
+    assert str(_items(LATEST).get("item_necronomicon", {}).get("IsObsolete", "")) == "1", \
+        "Necronomicon is not obsolete any more — its units in _REMOVED_UNITS are back in the game"
+    no_parent = [b for b, _n in ec._SUMMON_UNITS if b not in ec._SUMMON_PARENT]
+    assert not no_parent, f"summons without a parent page in _SUMMON_PARENT: {no_parent}"
+    known = (set(c.CREEP_DISPLAY_NAMES) | {b for b, _n in ec._SUMMON_UNITS + ec._LANE_UNITS}
+             | {b for b, _n, _c in ec._REMOVED_UNITS} | set(ec._UNIT_BUCKET) | ec._UNIT_NOT_LISTED)
+    icons = sorted(p.stem for p in (ROOT / "icons" / "units").glob("*.png"))
+    unlisted = [i for i in icons if i not in known]
+    assert not unlisted, f"unit portraits no Changes list knows (add to _SUMMON_UNITS / _LANE_UNITS / ...): {unlisted}"
+
+
+def test_structures_still_exist():
+    from builders import entity_changes as ec
+    units = _units(LATEST)
+    kinds = {"tower": "npc_dota_goodguys_tower1", "barracks": "npc_dota_goodguys_melee_rax", "tormentor": "npc_dota_miniboss"}
+    for _label, entries in ec._STRUCTURE_DEF:
+        for icon, _name in entries:
+            prefix = next(v for k, v in kinds.items() if icon.startswith(k))
+            assert any(u.startswith(prefix) for u in units), f"{icon}: no {prefix}* unit in {LATEST}"
+            assert (ROOT / "icons" / "structures" / f"{icon}.png").exists(), icon

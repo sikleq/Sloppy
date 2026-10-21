@@ -863,6 +863,9 @@ def _item_groups(ents, dyn):
 
 # In-game shop layout (screenshot of the shop, 7.41f): three panels, categories in this order,
 # icons 4 per row; neutral tiers with their unlock times; enchantments last.
+# Neither the panel layout (game UI) nor the unlock times (neutral_items.txt, not fetched) are in our game
+# files; tests/test_roster_guards.py fails when a shop category has no panel or the patch notes announce
+# a tier time ("Tier 1 availability changed from 5:00 to 0:00") that differs from _TIER_TIME.
 _SHOP_PANELS = [
     ("Basics",   ["Consumables", "Attributes", "Equipment", "Miscellaneous", "Secret Shop", "Other"]),
     ("Upgrades", ["Accessories", "Support", "Magical", "Armor", "Weapons", "Armaments"]),
@@ -895,6 +898,8 @@ _UNIT_NOT_LISTED = {"npc_dota_miniboss"}
 # no neutral camp, so the camp-roster loop never adds them. Listed here as
 # (icon basename without .png, display name) and shown greyed in the Summons
 # column — same reference treatment as unchanged camp creeps.
+# tests/test_roster_guards.py: every icons/units/ portrait must be in one of
+# these lists (or a camp creep), and every listed unit still in npc_units.txt.
 _SUMMON_UNITS = [
     ("npc_dota_warlock_golem", "Golem (Warlock)"),
     ("npc_dota_lycan_wolf", "Wolf (Lycan)"),
