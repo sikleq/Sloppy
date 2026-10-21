@@ -118,6 +118,7 @@ def load(versions: list[str] | None = None) -> dict:
     """The full rules dict (same shape as the JSON) with KV-derived history for patches after
     `_checked_version`. `versions` (oldest first) defaults to every stats snapshot."""
     rules = copy.deepcopy(_raw())
+    _inherit_hero_since(rules)
     checked = rules.get("_checked_version")
     versions = stats_versions() if versions is None else versions
     newer = [v for v in versions if checked and _vkey(v) > _vkey(checked)]
@@ -128,6 +129,21 @@ def load(versions: list[str] | None = None) -> dict:
             if eff.get("kv"):
                 _extend(slug, eff.get("kv_ability") or hero["innate"], eff, newer, checked)
     return rules
+
+
+def _inherit_hero_since(rules: dict) -> None:
+    """An effect (or its first history entry) without its own "since" starts with the hero's innate (2026-10-21:
+    Python, JS and Hero Lab read only the effect, so Luna's Lunar Blessing — innate since 7.37 — also counted in
+    every older patch)."""
+    for hero in rules.get("heroes", {}).values():
+        since = hero.get("since")
+        if not since:
+            continue
+        for eff in hero.get("effects", []):
+            if eff.get("history"):
+                eff["history"][0].setdefault("since", since)
+            else:
+                eff.setdefault("since", since)
 
 
 @lru_cache(maxsize=1)

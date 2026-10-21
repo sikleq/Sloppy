@@ -27,7 +27,7 @@
   "heroes": {
     "axe": {
       "innate": "axe_one_man_army",
-      "since": "7.36",
+      "since": "7.41",
       "effects": [
         {
           "target": "str",
@@ -39,18 +39,20 @@
               "value",
               0.01
             ]
-          }
+          },
+          "since": "7.41"
         }
-      ]
+      ],
+      "since_note": "One Man Army: a facet in 7.36-7.40c, the innate since 7.41 (patch notes 7.41: \"Now Axe's innate ability\")."
     },
     "beastmaster": {
       "innate": "beastmaster_inner_beast",
-      "since": "7.41a",
+      "since": "7.41",
       "effects": [
         {
           "target": "aspd",
           "formula": "base_plus_level",
-          "since": "7.41a",
+          "since": "7.41",
           "base": 7,
           "per_level": 3,
           "kv": {
@@ -66,7 +68,8 @@
             ]
           }
         }
-      ]
+      ],
+      "since_note": "Inner Beast: innate in 7.36 (a levelled one), not innate 7.37-7.40c, the innate again since 7.41 (patch notes 7.41: \"Now an innate ability\", 7 + 3 per level)."
     },
     "centaur": {
       "innate": "centaur_horsepower",
@@ -111,7 +114,7 @@
     },
     "dark_seer": {
       "innate": "dark_seer_aggrandize",
-      "since": "7.36",
+      "since": "7.38",
       "effects": [
         {
           "target": "aspd",
@@ -126,17 +129,13 @@
           },
           "history": [
             {
-              "since": "7.36",
-              "until": "7.37e",
-              "factor": 0.5
-            },
-            {
               "since": "7.38",
               "factor": 1.0
             }
           ]
         }
-      ]
+      ],
+      "since_note": "Aggrandize: a facet in 7.36-7.37e, the innate since 7.38 (game files; 7.38 notes: 0.5 -> 1)."
     },
     "death_prophet": {
       "innate": "death_prophet_witchcraft",
@@ -217,7 +216,7 @@
     },
     "dragon_knight": {
       "innate": "dragon_knight_dragon_blood",
-      "since": "7.36",
+      "since": "7.41",
       "effects": [
         {
           "target": "hpr",
@@ -235,7 +234,8 @@
               "hero_levelup",
               1
             ]
-          }
+          },
+          "since": "7.41"
         },
         {
           "target": "armor",
@@ -253,9 +253,11 @@
               "hero_levelup",
               1
             ]
-          }
+          },
+          "since": "7.41"
         }
-      ]
+      ],
+      "since_note": "Dragon Blood: a regular ability before 7.41, the innate since 7.41 (game files)."
     },
     "elder_titan": {
       "innate": "elder_titan_momentum",
@@ -349,12 +351,11 @@
     },
     "life_stealer": {
       "innate": "life_stealer_ghoul_frenzy",
-      "since": "7.36",
+      "since": "7.41",
       "effects": [
         {
           "target": "aspd",
           "formula": "flat_per_level",
-          "per_level": 4,
           "kv": {
             "per_level": [
               "attack_speed_bonus",
@@ -362,13 +363,25 @@
               1
             ]
           },
-          "note": "KV attack_speed_bonus.hero_levelup=+4 (no base value). KV also has movement_speed_bonus.hero_levelup=+0.3 but this is not modeled by design."
+          "note": "KV attack_speed_bonus.hero_levelup=+4 (no base value). KV also has movement_speed_bonus.hero_levelup=+0.3 but this is not modeled by design.",
+          "history": [
+            {
+              "since": "7.41",
+              "until": "7.41",
+              "per_level": 5
+            },
+            {
+              "since": "7.41a",
+              "per_level": 4
+            }
+          ]
         }
-      ]
+      ],
+      "since_note": "Ghoul Frenzy: reworked into the innate in 7.41 (5 attack speed per level), 7.41a 4."
     },
     "luna": {
       "innate": "luna_lunar_blessing",
-      "since": "7.36",
+      "since": "7.37",
       "effects": [
         {
           "target": "dmg",
@@ -381,13 +394,12 @@
               1
             ]
           },
-          "note": "KV hero_levelup=+2 (damage). Handled in JS innateDmg(); not yet in Python _innate_bonus()."
+          "note": "KV hero_levelup=+2 (damage). Handled in JS innateDmg(); not yet in Python _innate_bonus().",
+          "since": "7.37"
         },
         {
           "target": "nvision",
           "formula": "base_plus_level",
-          "base": 225,
-          "per_level": 25,
           "kv": {
             "base": [
               "bonus_night_vision",
@@ -400,7 +412,20 @@
               1
             ]
           },
-          "note": "KV value=225, hero_levelup=+25. Night Vision is not a displayed column in heroes_stats table — included for completeness."
+          "note": "Innate since 7.37: 400 + 20 per level-up; 7.37e 250 + 25 per level-up; 7.41 re-worded as 225 + 25 per level.",
+          "history": [
+            {
+              "since": "7.37",
+              "until": "7.37d",
+              "base": 380,
+              "per_level": 20
+            },
+            {
+              "since": "7.37e",
+              "base": 225,
+              "per_level": 25
+            }
+          ]
         }
       ]
     },
@@ -570,8 +595,6 @@
         {
           "target": "evasion",
           "formula": "base_plus_level",
-          "base": 4.0,
-          "per_level": 0.1,
           "kv": {
             "base": [
               "evasion_per_naga",
@@ -584,7 +607,20 @@
               1
             ]
           },
-          "note": "Self-inclusive innate: the bonus applies to Naga Siren herself, so the base evasion is always active and scales further with additional nearby Nagas/illusions."
+          "note": "7.41: own evasion 4.9% + 0.1% per level (before only per other Naga); 7.41b: 4% + 0.1%.",
+          "history": [
+            {
+              "since": "7.41",
+              "until": "7.41a",
+              "base": 4.9,
+              "per_level": 0.1
+            },
+            {
+              "since": "7.41b",
+              "base": 4.0,
+              "per_level": 0.1
+            }
+          ]
         }
       ]
     },
@@ -661,7 +697,7 @@
     },
     "sven": {
       "innate": "sven_wrath_of_god",
-      "since": "7.36",
+      "since": "7.41",
       "effects": [
         {
           "target": "dmg",
@@ -681,9 +717,11 @@
               1
             ]
           },
-          "note": "KV value=0.08, hero_levelup=0.02. Handled in JS innateDmg(); not yet in Python _innate_bonus(). Note: sven_vanquisher (value=20) is a separate innate for Great Cleave — not a stat modifier."
+          "note": "KV value=0.08, hero_levelup=0.02. Handled in JS innateDmg(); not yet in Python _innate_bonus(). Note: sven_vanquisher (value=20) is a separate innate for Great Cleave — not a stat modifier.",
+          "since": "7.41"
         }
-      ]
+      ],
+      "since_note": "Wrath of God: the innate since 7.41 (patch notes 7.41: \"New innate ability\")."
     },
     "techies": {
       "innate": "techies_mutually_assured_destruction",
@@ -906,20 +944,36 @@
     },
     "tiny": {
       "innate": "tiny_insurmountable",
-      "since": "7.41",
+      "since": "7.36",
       "effects": [
         {
           "target": "slowRes",
           "formula": "attr_factor",
           "source": "str",
-          "factor": 0.15,
           "kv": {
             "factor": [
               "str_to_slow_resist_pct",
               "value",
               0.01
             ]
-          }
+          },
+          "history": [
+            {
+              "since": "7.36",
+              "until": "7.36",
+              "factor": 0.25
+            },
+            {
+              "since": "7.36a",
+              "until": "7.41c",
+              "factor": 0.2
+            },
+            {
+              "since": "7.41d",
+              "factor": 0.15
+            }
+          ],
+          "note": "Str to slow resistance: 7.36 25%, 7.36a 20%, 7.41d 15% (patch notes)."
         },
         {
           "target": "statusRes",
@@ -932,7 +986,8 @@
               "value",
               0.01
             ]
-          }
+          },
+          "since": "7.41"
         }
       ]
     },
@@ -944,8 +999,6 @@
           "target": "itemCdr",
           "formula": "attr_floor_capped",
           "source": "int",
-          "divisor": 3,
-          "cap": 60,
           "kv": {
             "divisor": [
               "int_per_one_cdr",
@@ -957,7 +1010,20 @@
               "value",
               1
             ]
-          }
+          },
+          "history": [
+            {
+              "since": "7.36",
+              "until": "7.36",
+              "divisor": 4,
+              "cap": 60
+            },
+            {
+              "since": "7.36a",
+              "divisor": 3,
+              "cap": 60
+            }
+          ]
         }
       ]
     },

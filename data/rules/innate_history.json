@@ -1,0 +1,1830 @@
+{
+ "_doc": "Which ability was each hero's innate in every patch, oldest first; written by tools/build_innate_history.py (game files, patch notes for the early ones and for lagged snapshots).",
+ "lagged": [
+  "7.35b",
+  "7.36b",
+  "7.37c",
+  "7.39b",
+  "7.41",
+  "7.41b"
+ ],
+ "heroes": {
+  "abaddon": [
+   {
+    "since": "7.36",
+    "innates": [
+     "abaddon_font_of_avernus"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "abaddon_withering_mist"
+    ],
+    "source": "files"
+   }
+  ],
+  "abyssal_underlord": [
+   {
+    "since": "7.36",
+    "innates": [
+     "abyssal_underlord_atrophy_aura"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "abyssal_underlord_raid_boss"
+    ],
+    "source": "files"
+   }
+  ],
+  "alchemist": [
+   {
+    "since": "7.33",
+    "innates": [
+     "alchemist_goblins_greed"
+    ],
+    "source": "notes"
+   }
+  ],
+  "ancient_apparition": [
+   {
+    "since": "7.36",
+    "innates": [
+     "ancient_apparition_death_rime"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "ancient_apparition_bone_chill",
+     "ancient_apparition_death_rime"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "antimage": [
+   {
+    "since": "7.36",
+    "innates": [
+     "antimage_mana_break"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "antimage_persectur"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "antimage_mana_thirst",
+     "antimage_persectur"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "arc_warden": [
+   {
+    "since": "7.36",
+    "innates": [
+     "arc_warden_runic_infusion"
+    ],
+    "source": "files"
+   }
+  ],
+  "axe": [
+   {
+    "since": "7.36",
+    "innates": [
+     "axe_coat_of_blood"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "axe_one_man_army"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "bane": [
+   {
+    "since": "7.36",
+    "innates": [
+     "bane_ichor_of_nyctasha"
+    ],
+    "source": "files"
+   }
+  ],
+  "batrider": [
+   {
+    "since": "7.36",
+    "innates": [
+     "batrider_smoldering_resin",
+     "batrider_stoked"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.36a",
+    "innates": [
+     "batrider_smoldering_resin"
+    ],
+    "source": "files"
+   }
+  ],
+  "beastmaster": [
+   {
+    "since": "7.36",
+    "innates": [
+     "beastmaster_inner_beast"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "beastmaster_rugged"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "beastmaster_inner_beast",
+     "beastmaster_rugged"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "bloodseeker": [
+   {
+    "since": "7.36",
+    "innates": [
+     "bloodseeker_sanguivore"
+    ],
+    "source": "files"
+   }
+  ],
+  "bounty_hunter": [
+   {
+    "since": "7.36",
+    "innates": [
+     "bounty_hunter_big_game_hunter",
+     "bounty_hunter_cutpurse"
+    ],
+    "source": "files"
+   }
+  ],
+  "brewmaster": [
+   {
+    "since": "7.36",
+    "innates": [
+     "brewmaster_drunken_brawler"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "brewmaster_belligerent"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.40",
+    "innates": [
+     "brewmaster_liquid_courage"
+    ],
+    "source": "files"
+   }
+  ],
+  "bristleback": [
+   {
+    "since": "7.36",
+    "innates": [
+     "bristleback_warpath"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "bristleback_prickly"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "bristleback_brawlers_grit",
+     "bristleback_prickly"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "broodmother": [
+   {
+    "since": "7.36",
+    "innates": [
+     "broodmother_spiders_milk"
+    ],
+    "source": "files"
+   }
+  ],
+  "centaur": [
+   {
+    "since": "7.36",
+    "innates": [
+     "centaur_horsepower",
+     "centaur_rawhide"
+    ],
+    "source": "files"
+   }
+  ],
+  "chaos_knight": [
+   {
+    "since": "7.36",
+    "innates": [
+     "chaos_knight_reins_of_chaos"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "chaos_knight_fundamental_forging",
+     "chaos_knight_reins_of_chaos"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "chen": [
+   {
+    "since": "7.36",
+    "innates": [
+     "chen_summon_convert"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "chen_zealot"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "clinkz": [
+   {
+    "since": "7.36",
+    "innates": [
+     "clinkz_bone_and_arrow"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.40",
+    "innates": [
+     "clinkz_bone_and_arrow",
+     "clinkz_infernal_shred"
+    ],
+    "source": "files"
+   }
+  ],
+  "crystal_maiden": [
+   {
+    "since": "7.36",
+    "innates": [
+     "crystal_maiden_blueheart_floe"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "crystal_maiden_glacial_guard"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "dark_seer": [
+   {
+    "since": "7.36",
+    "innates": [
+     "dark_seer_mental_fortitude"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.38",
+    "innates": [
+     "dark_seer_aggrandize",
+     "dark_seer_mental_fortitude"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "dark_seer_aggrandize",
+     "dark_seer_mental_fortitude",
+     "dark_seer_quick_wit"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "dark_willow": [
+   {
+    "since": "7.36",
+    "innates": [
+     "dark_willow_pixie_dust"
+    ],
+    "source": "files"
+   }
+  ],
+  "dawnbreaker": [
+   {
+    "since": "7.36",
+    "innates": [
+     "dawnbreaker_break_of_dawn"
+    ],
+    "source": "files"
+   }
+  ],
+  "dazzle": [
+   {
+    "since": "7.36",
+    "innates": [
+     "dazzle_innate_weave"
+    ],
+    "source": "files"
+   }
+  ],
+  "death_prophet": [
+   {
+    "since": "7.36",
+    "innates": [
+     "death_prophet_witchcraft"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "death_prophet_mourning_ritual",
+     "death_prophet_witchcraft"
+    ],
+    "source": "files"
+   }
+  ],
+  "disruptor": [
+   {
+    "since": "7.36",
+    "innates": [
+     "disruptor_electromagnetic_repulsion"
+    ],
+    "source": "files"
+   }
+  ],
+  "doom_bringer": [
+   {
+    "since": "7.36",
+    "innates": [
+     "doom_bringer_lvl_pain"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "doom_bringer_devils_bargain",
+     "doom_bringer_lvl_pain"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "dragon_knight": [
+   {
+    "since": "7.36",
+    "innates": [
+     "dragon_knight_inherited_vigor"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "dragon_knight_dragon_blood"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "drow_ranger": [
+   {
+    "since": "7.36",
+    "innates": [
+     "drow_ranger_trueshot"
+    ],
+    "source": "files"
+   }
+  ],
+  "earth_spirit": [
+   {
+    "since": "7.35b",
+    "innates": [
+     "earth_spirit_stone_caller"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "earthshaker": [
+   {
+    "since": "7.36",
+    "innates": [
+     "earthshaker_aftershock"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "earthshaker_spirit_cairn"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.39",
+    "innates": [
+     "earthshaker_slugger",
+     "earthshaker_spirit_cairn"
+    ],
+    "source": "files"
+   }
+  ],
+  "elder_titan": [
+   {
+    "since": "7.36",
+    "innates": [
+     "elder_titan_ancestral_spirit"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "elder_titan_tip_the_scales"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "elder_titan_momentum",
+     "elder_titan_tip_the_scales"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "ember_spirit": [
+   {
+    "since": "7.36",
+    "innates": [
+     "ember_spirit_flame_guard"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "ember_spirit_immolation"
+    ],
+    "source": "files"
+   }
+  ],
+  "enchantress": [
+   {
+    "since": "7.36",
+    "innates": [
+     "enchantress_forest_freebie"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "enchantress_rabblerouser"
+    ],
+    "source": "files"
+   }
+  ],
+  "enigma": [
+   {
+    "since": "7.36",
+    "innates": [
+     "enigma_gravity_well"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "enigma_event_horizon",
+     "enigma_gravity_well"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "faceless_void": [
+   {
+    "since": "7.36",
+    "innates": [
+     "faceless_void_distortion_field"
+    ],
+    "source": "files"
+   }
+  ],
+  "furion": [
+   {
+    "since": "7.36",
+    "innates": [
+     "furion_spirit_of_the_forest"
+    ],
+    "source": "files"
+   }
+  ],
+  "grimstroke": [
+   {
+    "since": "7.36",
+    "innates": [
+     "grimstroke_ink_trail"
+    ],
+    "source": "files"
+   }
+  ],
+  "gyrocopter": [
+   {
+    "since": "7.36",
+    "innates": [
+     "gyrocopter_chop_shop"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "gyrocopter_afterburner",
+     "gyrocopter_chop_shop"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "hoodwink": [
+   {
+    "since": "7.36",
+    "innates": [
+     "hoodwink_mistwoods_wayfarer"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "hoodwink_forager",
+     "hoodwink_mistwoods_wayfarer",
+     "hoodwink_tomokan_tracker"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "huskar": [
+   {
+    "since": "7.36",
+    "innates": [
+     "huskar_blood_magic"
+    ],
+    "source": "files"
+   }
+  ],
+  "invoker": [
+   {
+    "since": "7.36",
+    "innates": [
+     "invoker_mastermind"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.38",
+    "innates": [
+     "invoker_invoke",
+     "invoker_mastermind"
+    ],
+    "source": "files"
+   }
+  ],
+  "jakiro": [
+   {
+    "since": "7.36",
+    "innates": [
+     "jakiro_double_trouble"
+    ],
+    "source": "files"
+   }
+  ],
+  "juggernaut": [
+   {
+    "since": "7.36",
+    "innates": [
+     "juggernaut_duelist"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "juggernaut_bladeform"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "keeper_of_the_light": [
+   {
+    "since": "7.36",
+    "innates": [
+     "keeper_of_the_light_mana_magnifier"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.38",
+    "innates": [
+     "keeper_of_the_light_mana_magnifier",
+     "keeper_of_the_light_special_reserve"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "keeper_of_the_light_bright_speed",
+     "keeper_of_the_light_mana_magnifier",
+     "keeper_of_the_light_special_reserve"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "kez": [
+   {
+    "since": "7.37e",
+    "innates": [
+     "kez_switch_weapons"
+    ],
+    "source": "files"
+   }
+  ],
+  "kunkka": [
+   {
+    "since": "7.36",
+    "innates": [
+     "kunkka_tidebringer"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "kunkka_admirals_rum"
+    ],
+    "source": "files"
+   }
+  ],
+  "largo": [
+   {
+    "since": "7.40",
+    "innates": [
+     "largo_encore"
+    ],
+    "source": "files"
+   }
+  ],
+  "legion_commander": [
+   {
+    "since": "7.36",
+    "innates": [
+     "legion_commander_moment_of_courage"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "legion_commander_outfight_them"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "legion_commander_intimidate",
+     "legion_commander_outfight_them"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "leshrac": [
+   {
+    "since": "7.36",
+    "innates": [
+     "leshrac_defilement"
+    ],
+    "source": "files"
+   }
+  ],
+  "lich": [
+   {
+    "since": "7.36",
+    "innates": [
+     "lich_death_charge"
+    ],
+    "source": "files"
+   }
+  ],
+  "life_stealer": [
+   {
+    "since": "7.36",
+    "innates": [
+     "life_stealer_feast"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "life_stealer_ghoul_frenzy"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "lina": [
+   {
+    "since": "7.36",
+    "innates": [
+     "lina_fiery_soul"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "lina_combustion"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "lina_combustion",
+     "lina_slow_burn"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "lion": [
+   {
+    "since": "7.36",
+    "innates": [
+     "lion_to_hell_and_back"
+    ],
+    "source": "files"
+   }
+  ],
+  "lone_druid": [
+   {
+    "since": "7.36",
+    "innates": [
+     "lone_druid_spirit_bear"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "lone_druid_gift_bearer"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.40",
+    "innates": [
+     "lone_druid_gift_bearer",
+     "lone_druid_spirit_bear",
+     "lone_druid_spirit_bear_demolish"
+    ],
+    "source": "files"
+   }
+  ],
+  "luna": [
+   {
+    "since": "7.36",
+    "innates": [
+     "luna_selemenes_favor"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "luna_lunar_blessing"
+    ],
+    "source": "files"
+   }
+  ],
+  "lycan": [
+   {
+    "since": "7.36",
+    "innates": [
+     "lycan_apex_predator"
+    ],
+    "source": "files"
+   }
+  ],
+  "magnataur": [
+   {
+    "since": "7.36",
+    "innates": [
+     "magnataur_solid_core"
+    ],
+    "source": "files"
+   }
+  ],
+  "marci": [
+   {
+    "since": "7.36",
+    "innates": [
+     "marci_special_delivery"
+    ],
+    "source": "files"
+   }
+  ],
+  "mars": [
+   {
+    "since": "7.36",
+    "innates": [
+     "mars_dauntless"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "mars_dauntless",
+     "mars_immovable"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "medusa": [
+   {
+    "since": "7.36",
+    "innates": [
+     "medusa_mana_shield"
+    ],
+    "source": "files"
+   }
+  ],
+  "meepo": [
+   {
+    "since": "7.36",
+    "innates": [
+     "meepo_sticky_fingers"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "meepo_geomancy",
+     "meepo_sticky_fingers"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "mirana": [
+   {
+    "since": "7.36",
+    "innates": [
+     "mirana_selemenes_faithful"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "mirana_celestial_quiver",
+     "mirana_nightveil",
+     "mirana_selemenes_faithful"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "monkey_king": [
+   {
+    "since": "7.36",
+    "innates": [
+     "monkey_king_mischief"
+    ],
+    "source": "files"
+   }
+  ],
+  "morphling": [
+   {
+    "since": "7.36",
+    "innates": [
+     "morphling_accumulation"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "morphling_ebb_and_flow"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "muerta": [
+   {
+    "since": "7.36",
+    "innates": [
+     "muerta_supernatural"
+    ],
+    "source": "files"
+   }
+  ],
+  "naga_siren": [
+   {
+    "since": "7.36",
+    "innates": [
+     "naga_siren_eelskin"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "naga_siren_eelskin",
+     "naga_siren_slithereen_cutlass"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "necrolyte": [
+   {
+    "since": "7.36",
+    "innates": [
+     "necrolyte_sadist"
+    ],
+    "source": "files"
+   }
+  ],
+  "nevermore": [
+   {
+    "since": "7.36",
+    "innates": [
+     "nevermore_necromastery"
+    ],
+    "source": "files"
+   }
+  ],
+  "night_stalker": [
+   {
+    "since": "7.36",
+    "innates": [
+     "night_stalker_heart_of_darkness"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "night_stalker_heart_of_darkness",
+     "night_stalker_hunter_in_the_night",
+     "night_stalker_night_reign"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "nyx_assassin": [
+   {
+    "since": "7.36",
+    "innates": [
+     "nyx_assassin_nyxth_sense"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "nyx_assassin_neuro_sting",
+     "nyx_assassin_nyxth_sense"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "obsidian_destroyer": [
+   {
+    "since": "7.36",
+    "innates": [
+     "obsidian_destroyer_ominous_discernment"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "obsidian_destroyer_equilibrium",
+     "obsidian_destroyer_ominous_discernment"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "ogre_magi": [
+   {
+    "since": "7.33",
+    "innates": [
+     "ogre_magi_dumb_luck"
+    ],
+    "source": "notes"
+   }
+  ],
+  "omniknight": [
+   {
+    "since": "7.36",
+    "innates": [
+     "omniknight_degen_aura"
+    ],
+    "source": "files"
+   }
+  ],
+  "oracle": [
+   {
+    "since": "7.36",
+    "innates": [
+     "oracle_prognosticate"
+    ],
+    "source": "files"
+   }
+  ],
+  "pangolier": [
+   {
+    "since": "7.36",
+    "innates": [
+     "pangolier_fortune_favors_the_bold"
+    ],
+    "source": "files"
+   }
+  ],
+  "phantom_assassin": [
+   {
+    "since": "7.36",
+    "innates": [
+     "phantom_assassin_immaterial"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.39",
+    "innates": [
+     "phantom_assassin_blur"
+    ],
+    "source": "files"
+   }
+  ],
+  "phantom_lancer": [
+   {
+    "since": "7.36",
+    "innates": [
+     "phantom_lancer_phantom_edge"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "phantom_lancer_illusory_armaments"
+    ],
+    "source": "files"
+   }
+  ],
+  "phoenix": [
+   {
+    "since": "7.36",
+    "innates": [
+     "phoenix_blinding_sun"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "phoenix_dying_light"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "primal_beast": [
+   {
+    "since": "7.36",
+    "innates": [
+     "primal_beast_colossal"
+    ],
+    "source": "files"
+   }
+  ],
+  "puck": [
+   {
+    "since": "7.36",
+    "innates": [
+     "puck_puckish"
+    ],
+    "source": "files"
+   }
+  ],
+  "pudge": [
+   {
+    "since": "7.36",
+    "innates": [
+     "pudge_innate_graft_flesh"
+    ],
+    "source": "files"
+   }
+  ],
+  "pugna": [
+   {
+    "since": "7.36",
+    "innates": [
+     "pugna_oblivion_savant"
+    ],
+    "source": "files"
+   }
+  ],
+  "queenofpain": [
+   {
+    "since": "7.36",
+    "innates": [
+     "queenofpain_bondage"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.38",
+    "innates": [
+     "queenofpain_succubus"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "queenofpain_bondage",
+     "queenofpain_masochist",
+     "queenofpain_succubus"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "rattletrap": [
+   {
+    "since": "7.36",
+    "innates": [
+     "rattletrap_armor_power"
+    ],
+    "source": "files"
+   }
+  ],
+  "razor": [
+   {
+    "since": "7.36",
+    "innates": [
+     "razor_unstable_current"
+    ],
+    "source": "files"
+   }
+  ],
+  "riki": [
+   {
+    "since": "7.36",
+    "innates": [
+     "riki_innate_backstab"
+    ],
+    "source": "files"
+   }
+  ],
+  "ringmaster": [
+   {
+    "since": "7.37c",
+    "innates": [
+     "ringmaster_dark_carnival_souvenirs"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "rubick": [
+   {
+    "since": "7.36",
+    "innates": [
+     "rubick_might_and_magus"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "rubick_curiosity",
+     "rubick_might_and_magus"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "sand_king": [
+   {
+    "since": "7.36",
+    "innates": [
+     "sandking_caustic_finale"
+    ],
+    "source": "files"
+   }
+  ],
+  "shadow_demon": [
+   {
+    "since": "7.36",
+    "innates": [
+     "shadow_demon_menace"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "shadow_demon_menace",
+     "shadow_demon_shadow_servant"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "shadow_shaman": [
+   {
+    "since": "7.36",
+    "innates": [
+     "shadow_shaman_fowl_play"
+    ],
+    "source": "files"
+   }
+  ],
+  "shredder": [
+   {
+    "since": "7.36",
+    "innates": [
+     "shredder_exposure_therapy"
+    ],
+    "source": "files"
+   }
+  ],
+  "silencer": [
+   {
+    "since": "7.36",
+    "innates": [
+     "silencer_brain_drain"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "silencer_brain_drain",
+     "silencer_oppressive_silence"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "skeleton_king": [
+   {
+    "since": "7.36",
+    "innates": [
+     "skeleton_king_vampiric_spirit"
+    ],
+    "source": "files"
+   }
+  ],
+  "skywrath_mage": [
+   {
+    "since": "7.36",
+    "innates": [
+     "skywrath_mage_ruin_and_restoration"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "skywrath_mage_shield_of_the_scion"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "slardar": [
+   {
+    "since": "7.36",
+    "innates": [
+     "slardar_seaborn_sentinel"
+    ],
+    "source": "files"
+   }
+  ],
+  "slark": [
+   {
+    "since": "7.36",
+    "innates": [
+     "slark_barracuda"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.40",
+    "innates": [
+     "slark_essence_shift"
+    ],
+    "source": "files"
+   }
+  ],
+  "snapfire": [
+   {
+    "since": "7.36",
+    "innates": [
+     "snapfire_buckshot"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "snapfire_boomstick",
+     "snapfire_buckshot"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "sniper": [
+   {
+    "since": "7.36",
+    "innates": [
+     "sniper_keen_scope"
+    ],
+    "source": "files"
+   }
+  ],
+  "spectre": [
+   {
+    "since": "7.36",
+    "innates": [
+     "spectre_spectral"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.40",
+    "innates": [
+     "spectre_desolate",
+     "spectre_spectral"
+    ],
+    "source": "files"
+   }
+  ],
+  "spirit_breaker": [
+   {
+    "since": "7.36",
+    "innates": [
+     "spirit_breaker_herd_mentality"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "spirit_breaker_bull_rush",
+     "spirit_breaker_herd_mentality"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "storm_spirit": [
+   {
+    "since": "7.36",
+    "innates": [
+     "storm_spirit_galvanized"
+    ],
+    "source": "files"
+   }
+  ],
+  "sven": [
+   {
+    "since": "7.36",
+    "innates": [
+     "sven_vanquisher"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "sven_vanquisher",
+     "sven_wrath_of_god"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "techies": [
+   {
+    "since": "7.36",
+    "innates": [
+     "techies_minefield_sign"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "techies_mutually_assured_destruction",
+     "techies_spoons_stash"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "templar_assassin": [
+   {
+    "since": "7.36",
+    "innates": [
+     "templar_assassin_psi_blades"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "templar_assassin_third_eye"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.39",
+    "innates": [
+     "templar_assassin_hidden_gates",
+     "templar_assassin_third_eye"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "templar_assassin_hidden_gates",
+     "templar_assassin_inner_peace",
+     "templar_assassin_third_eye"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "terrorblade": [
+   {
+    "since": "7.36",
+    "innates": [
+     "terrorblade_dark_unity"
+    ],
+    "source": "files"
+   }
+  ],
+  "tidehunter": [
+   {
+    "since": "7.36",
+    "innates": [
+     "tidehunter_blubber"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "tidehunter_blubber",
+     "tidehunter_leviathans_catch"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "tinker": [
+   {
+    "since": "7.36",
+    "innates": [
+     "tinker_eureka"
+    ],
+    "source": "files"
+   }
+  ],
+  "tiny": [
+   {
+    "since": "7.36",
+    "innates": [
+     "tiny_craggy_exterior",
+     "tiny_insurmountable",
+     "tiny_rocksteady"
+    ],
+    "source": "files"
+   }
+  ],
+  "treant": [
+   {
+    "since": "7.23c",
+    "innates": [
+     "treant_natures_guise"
+    ],
+    "source": "notes"
+   },
+   {
+    "since": "7.36",
+    "innates": [
+     "treant_innate_attack_damage",
+     "treant_natures_guise"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.39",
+    "innates": [
+     "treant_natures_guise"
+    ],
+    "source": "files"
+   }
+  ],
+  "troll_warlord": [
+   {
+    "since": "7.36",
+    "innates": [
+     "troll_warlord_berserkers_rage"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "troll_warlord_switch_stance"
+    ],
+    "source": "files"
+   }
+  ],
+  "tusk": [
+   {
+    "since": "7.36",
+    "innates": [
+     "tusk_bitter_chill"
+    ],
+    "source": "files"
+   }
+  ],
+  "undying": [
+   {
+    "since": "7.36",
+    "innates": [
+     "undying_ceaseless_dirge"
+    ],
+    "source": "files"
+   }
+  ],
+  "ursa": [
+   {
+    "since": "7.36",
+    "innates": [
+     "ursa_maul"
+    ],
+    "source": "files"
+   }
+  ],
+  "vengefulspirit": [
+   {
+    "since": "7.36",
+    "innates": [
+     "vengefulspirit_retribution"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "vengefulspirit_retribution",
+     "vengefulspirit_soul_strike"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "venomancer": [
+   {
+    "since": "7.36",
+    "innates": [
+     "venomancer_poison_sting"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "venomancer_sepsis"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "venomancer_poison_sting",
+     "venomancer_sepsis"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "viper": [
+   {
+    "since": "7.36",
+    "innates": [
+     "viper_corrosive_skin"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "viper_predator"
+    ],
+    "source": "files"
+   }
+  ],
+  "visage": [
+   {
+    "since": "7.36",
+    "innates": [
+     "visage_gravekeepers_cloak"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "visage_lurker"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "visage_lurker",
+     "visage_silent_as_the_grave"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "void_spirit": [
+   {
+    "since": "7.36",
+    "innates": [
+     "void_spirit_intrinsic_edge"
+    ],
+    "source": "files"
+   }
+  ],
+  "warlock": [
+   {
+    "since": "7.36",
+    "innates": [
+     "warlock_eldritch_summoning"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "warlock_eldritch_summoning",
+     "warlock_imp_explode",
+     "warlock_imp_explode_major"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "weaver": [
+   {
+    "since": "7.36",
+    "innates": [
+     "weaver_geminate_attack"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.37",
+    "innates": [
+     "weaver_rewoven"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "weaver_rewoven",
+     "weaver_threads_of_fate"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "windrunner": [
+   {
+    "since": "7.36",
+    "innates": [
+     "windrunner_easy_breezy"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "windrunner_easy_breezy",
+     "windrunner_tailwind"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "winter_wyvern": [
+   {
+    "since": "7.36",
+    "innates": [
+     "winter_wyvern_eldwurm_scholar"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "winter_wyvern_accelerated_learning",
+     "winter_wyvern_eldwurm_scholar",
+     "winter_wyvern_eldwurms_edda"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "wisp": [
+   {
+    "since": "7.36",
+    "innates": [
+     "wisp_sight_seer"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.39",
+    "innates": [
+     "wisp_essence_conduction",
+     "wisp_sight_seer"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41",
+    "innates": [
+     "wisp_equilibrium",
+     "wisp_essence_conduction"
+    ],
+    "source": "next snapshot"
+   }
+  ],
+  "witch_doctor": [
+   {
+    "since": "7.36",
+    "innates": [
+     "witch_doctor_gris_gris"
+    ],
+    "source": "files"
+   }
+  ],
+  "zuus": [
+   {
+    "since": "7.36",
+    "innates": [
+     "zuus_static_field"
+    ],
+    "source": "files"
+   }
+  ]
+ }
+}

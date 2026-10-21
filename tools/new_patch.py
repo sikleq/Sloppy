@@ -204,6 +204,8 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
              skip=None if local_game else "no local game: data/shops.txt stays — rerun on the owner's PC"),
         Step("abilities_slim", "data/abilities_slim.json from the new snapshot", [PY, "tools/build_abilities_slim.py"]),
         Step("herolist", "data/herolist.json from the new snapshot", [PY, "tools/build_herolist.py"]),
+        Step("innate_history", "data/rules/innate_history.json (which ability is each hero's innate)",
+             [PY, "tools/build_innate_history.py"]),
         Step("item_stat_lines", "data/rules/item_stat_lines.json", [PY, "tools/build_item_stat_lines.py"],
              skip=None if history else no_hist),
         Step("talent_slots", "data/rules/talent_slots.json", [PY, "tools/build_talent_slots.py"],

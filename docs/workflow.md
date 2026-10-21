@@ -25,18 +25,19 @@ python tools/new_patch.py 7.42 --from enchant_values              # resume (afte
 | # | Step | Script | Automatic? |
 |:-:|:---|:---|:---|
 | 1 | register | `RELEASE_HISTORY` row in `patch/meta.py` (version, date, filename; a new cycle gets its comment) | yes |
-| 2 | fetch | `scripts/fetch/extract_patchnotes.py <v> --local` or `fetch_gametracking.py <v> [--ref]` | yes (pick the patch's build) |
+| 2 | fetch | `scripts/fetch/extract_patchnotes.py <v> --local` or `fetch_gametracking.py <v> [--ref]` | yes (pick the patch's build: `tests/test_innate_history.py` fails on a snapshot taken before its patch) |
 | 3 | slim | `tools/slim_from_kv.py <v>` | yes |
 | 4 | meta | `build_site.py patch` (site_meta.json — before the top-ups, they map by date) | yes |
 | 5–8 | top-ups | `fetch_npc_history`, `fetch_hero_history`, `fetch_ability_history`, `fetch_itemlist` | yes |
 | 9 | shops | `scripts/fetch/extract_shops.py` | local game only |
 | 10–11 | shared tables | `tools/build_abilities_slim.py`, `tools/build_herolist.py` | yes |
-| 12–13 | history | `tools/build_item_stat_lines.py`, `tools/build_talent_slots.py` | only with the weights model's KV history (`outputs/valve-revealed-weights-20260915`) |
-| 14 | loc_history | `tools/fetch_loc_history.py <prev> <v>` | yes |
-| 15 | draft | `generate_patch_code_v2.py <v>` | only while `content/p<code>.py` does not exist |
-| 16–17 | enchant | `scripts/gen/enchant_values.py`, `enchant_table.py <v>` | only when the content file has `enchant_tier_box()` |
-| 18 | build | `build_site.py` | yes |
-| 19 | check | `tools/patch_check.py <v>` (its exit code is the command's) | yes |
+| 12 | innate_history | `tools/build_innate_history.py` (which ability is each hero's innate, per patch) | yes |
+| 13–14 | history | `tools/build_item_stat_lines.py`, `tools/build_talent_slots.py` | only with the weights model's KV history (`outputs/valve-revealed-weights-20260915`) |
+| 15 | loc_history | `tools/fetch_loc_history.py <prev> <v>` | yes |
+| 16 | draft | `generate_patch_code_v2.py <v>` | only while `content/p<code>.py` does not exist |
+| 17–18 | enchant | `scripts/gen/enchant_values.py`, `enchant_table.py <v>` | only when the content file has `enchant_tier_box()` |
+| 19 | build | `build_site.py` | yes |
+| 20 | check | `tools/patch_check.py <v>` (its exit code is the command's) | yes |
 
 Each step prints what it does; the first failure stops the run and prints the `--from` line to resume.
 **Still human** (printed at the end): proofread `_generated_p_<v>_v2.py` into `content/p<code>.py` (Steps 4–5 below)

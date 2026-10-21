@@ -251,9 +251,9 @@ class TestPatchBoundaries:
         e = active_entry(self._eff(heroes, "centaur", "ms"), "7.41a")
         assert e["factor"] == pytest.approx(0.40)
 
-    def test_dark_seer_factor_7_36(self, heroes):
-        e = active_entry(self._eff(heroes, "dark_seer", "aspd"), "7.36")
-        assert e["factor"] == pytest.approx(0.5)
+    def test_dark_seer_not_innate_before_7_38(self, heroes):
+        # 2026-10-21: Aggrandize was a facet in 7.36-7.37e; the game files flag it "Innate" only from 7.38
+        assert active_entry(self._eff(heroes, "dark_seer", "aspd"), "7.37e") is None
 
     def test_dark_seer_factor_7_38(self, heroes):
         e = active_entry(self._eff(heroes, "dark_seer", "aspd"), "7.38")
