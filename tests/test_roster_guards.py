@@ -150,3 +150,32 @@ def test_manual_pre_733_history_ends_at_the_first_value_the_game_files_show():
     # Wind Waker's 7.33 regen cut comes from the game files, once (it used to be listed twice)
     ww = [e for e in m.load_metric_history("regen").get("item_wind_waker", []) if e[1] == "7.33"]
     assert len(ww) == 1, ww
+
+
+# ---------------------------------------------------------------- AoE Increase (builders/aoe_increase.py)
+
+def test_aoe_items_are_found_in_the_game_files():
+    import builders.aoe_increase as aoe
+    items = aoe._resolve_items(LATEST)
+    assert [i[0] for i in items] == ["chasm_stone", "shivas_guard", "gungir", "dezun_bloodrite"]
+    for key, _label, icon, _kind, _amt in items:
+        assert (ROOT / "icons" / "items" / icon).exists(), f"AoE item {key} has no icons/items/{icon}"
+
+
+_FAKE_ITEMS = """"DOTAAbilities"
+{
+ "item_chasm_stone" { "AbilityValues" { "aoe_bonus" "50" } }
+ "item_new_orb" { "AbilityValues" { "bonus_aoe" { "value" "30" } } }
+ "item_old_orb" { "IsObsolete" "1" "AbilityValues" { "bonus_aoe" "99" } }
+ "item_lost_neutral" { "ItemIsNeutralActiveDrop" "1" "AbilityValues" { "aoe_pct" "10" } }
+}
+"""
+
+
+def test_a_new_aoe_item_appears_by_itself(tmp_path, monkeypatch):
+    import builders.aoe_increase as aoe
+    (tmp_path / "9.99").mkdir()
+    (tmp_path / "9.99" / "items.txt").write_text(_FAKE_ITEMS, encoding="utf-8")
+    monkeypatch.setattr(aoe, "STATS_DIR", tmp_path)
+    got = aoe._resolve_items("9.99")
+    assert [(k, kind, amt) for k, _l, _i, kind, amt in got] == [("new_orb", "flat", 30), ("chasm_stone", "flat", 50)]
