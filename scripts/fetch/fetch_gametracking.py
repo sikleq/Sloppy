@@ -2,7 +2,7 @@
 reads them from the local game) when that is not at hand (the owner 2026-10-07: "добавь в запасной источник"):
 
   data/patchnotes_english.txt, data/dota_english.txt, data/abilities_english.txt
-  data/stats/<version>/{npc_heroes,npc_units,items,npc_abilities,npc_ability_ids}.txt
+  data/stats/<version>/{npc_heroes,npc_units,items,npc_abilities,npc_ability_ids,npc_dota_hero_base}.txt
   data/stats/<version>/heroes/npc_dota_hero_<name>.txt          (what Silent Changes diffs)
 
 the same files, the same places as extract_patchnotes.py writes (lists checked equal by tests/test_fetch_gametracking.py).
@@ -38,6 +38,7 @@ STATS_VPK_PATHS = [
     "scripts/npc/items.txt",
     "scripts/npc/npc_abilities.txt",
     "scripts/npc/npc_ability_ids.txt",
+    "scripts/npc/heroes/npc_dota_hero_base.txt",   # 7.41f+ parent template (fetch_hero_history.py reads it)
 ]
 HEROES_VPK_DIR = "scripts/npc/heroes/"
 

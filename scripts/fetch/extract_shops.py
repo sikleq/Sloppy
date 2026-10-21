@@ -18,7 +18,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]  # scripts/fetch/ -> repo root (parents[1] wrote to scripts/data/)
 OUT = ROOT / "data" / "shops.txt"
 DEFAULT_DOTA = r"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game\dota"
 
