@@ -25,6 +25,15 @@ def test_the_first_build_with_its_notes_is_taken(monkeypatch):
     assert fs.find_commit_for_patch(COMMITS, "24.03.2026")["sha"] == "6726"      # the old rule, kept for reference
 
 
+def test_the_lag_is_counted_in_builds_not_archive_days(monkeypatch):
+    # 7.33c (13.05.2023): 5711 has no notes; 5713 (out 14.05 per GameTracking, 5712 never existed) was archived
+    # on 24.05 — still the patch's build
+    commits = [_c("5714", "2023-05-24"), _c("5713", "2023-05-24"), _c("5711", "2023-05-13")]
+    notes = {"5713": b'"DOTA_Patch_7_33c_x" "y"', "5714": b'"DOTA_Patch_7_33c_x" "y"'}
+    monkeypatch.setattr(fs, "download_raw", lambda _s, sha, _p: notes.get(sha))
+    assert fs.find_patch_build(None, commits, "7.33c", "13.05.2023")["sha"] == "5713"
+
+
 def test_no_build_with_notes_nearby_skips_the_patch(monkeypatch):
     monkeypatch.setattr(fs, "download_raw", lambda _s, _sha, _p: b'"DOTA_Patch_7_40c_x" "y"')
     assert fs.find_patch_build(None, COMMITS, "7.41", "24.03.2026") is None

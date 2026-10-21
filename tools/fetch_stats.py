@@ -397,7 +397,9 @@ def get_all_commits(session) -> list:
 
 
 PATCHNOTES_PATH = "game/dota/pak01_dir/resource/localization/patchnotes/patchnotes_english.txt"
-MAX_NOTES_LAG_DAYS = 2
+# how many builds after the release day may still be the patch's own. Counted in builds, not days: the archive's
+# commit dates are when it was archived (5713, out 2023-05-14 per GameTracking, sits there on 2023-05-24)
+MAX_NOTES_LAG_BUILDS = 6
 
 
 def has_patch_notes(text: bytes | None, version: str) -> bool:
@@ -407,15 +409,11 @@ def has_patch_notes(text: bytes | None, version: str) -> bool:
 
 def find_patch_build(session, commits: list, version: str, patch_date_str: str) -> dict | None:
     """Первая сборка не раньше даты патча, в которой уже есть его патчноуты (2026-10-21: правило «первый коммит
-    в день выхода» брало сборку ДО патча у 14 патчей — 7.41 = 6726, сам патч — 6728). Не дальше 2 дней от даты
-    (в архиве бывают дыры: у 7.33c заметки впервые через 11 дней) — тогда None."""
+    в день выхода» брало сборку ДО патча у 14 патчей — 7.41 = 6726, сам патч — 6728). Не дальше
+    MAX_NOTES_LAG_BUILDS сборок от первой в день выхода — тогда None."""
     day = datetime.strptime(patch_date_str, "%d.%m.%Y").replace(tzinfo=timezone.utc).date()
-    for c in reversed(commits):                              # oldest first
-        d = c["date"].date()
-        if d < day:
-            continue
-        if (d - day).days > MAX_NOTES_LAG_DAYS:
-            return None
+    after = [c for c in reversed(commits) if c["date"].date() >= day]      # oldest first
+    for c in after[:MAX_NOTES_LAG_BUILDS + 1]:
         if has_patch_notes(download_raw(session, c["sha"], PATCHNOTES_PATH), version):
             return c
     return None
