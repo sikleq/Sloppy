@@ -7,6 +7,11 @@ files (synced by fetch_stats.py + extract_patchnotes.py). They carry every field
 of every ability — including hidden / service abilities the official patchnotes
 don't mention.
 
+Since 2026-10-21 the page also diffs the root files items.txt, npc_units.txt and npc_abilities.txt (sections Items,
+Units, Other abilities) whenever both patches have them (7.41c on): the per-hero files alone missed the Necronomicon
+rework of client 6946 (cost 2050 -> 2700, Staff of Wizardry instead of 2 Sobi Masks, Intelligence instead of mana
+regen), which lives in items.txt.
+
 Usage:
   python build_silent_changes.py             # all available pairs
   python build_silent_changes.py 7.41c       # one specific patch (vs prev)
@@ -58,6 +63,29 @@ INTERESTING_FIELDS = {
     "HasScepterUpgrade", "HasShardUpgrade", "IsGrantedByScepter", "IsGrantedByShard",
     "ItemRequirements", "AbilityValues",  # whole AbilityValues block iterated below
 }
+
+# items.txt: the ability fields above + what an item is in the shop.
+ITEM_FIELDS = {
+    "ItemCost", "ItemRecipe", "ItemResult", "ItemPurchasable", "ItemSellable", "ItemDroppable",
+    "ItemStockMax", "ItemStockTime", "ItemStockInitial", "ItemInitialStockTime", "ItemInitialCharges",
+    "ItemDisplayCharges", "ItemRequiresCharges", "ItemPermanent", "ItemStackable", "ItemShareability",
+    "ItemIsNeutralActiveDrop", "ItemIsNeutralPassiveDrop", "IsObsolete",
+}
+# npc_units.txt: the unit's gameplay numbers and its abilities (Ability1..N); models, sounds, FX are left out.
+UNIT_FIELDS = {
+    "Level", "StatusHealth", "StatusHealthRegen", "StatusMana", "StatusManaRegen", "StatusStartingMana",
+    "ArmorPhysical", "MagicalResistance", "AttackCapabilities", "AttackDamageMin", "AttackDamageMax",
+    "AttackDamageType", "AttackRate", "BaseAttackSpeed", "AttackAnimationPoint", "AttackAcquisitionRange",
+    "AttackRange", "AttackRangeBuffer", "ProjectileSpeed", "BountyXP", "BountyGoldMin", "BountyGoldMax",
+    "MovementCapabilities", "MovementSpeed", "MovementTurnRate", "VisionDaytimeRange", "VisionNighttimeRange",
+    "CombatClassAttack", "CombatClassDefend", "IsAncient", "IsNeutralUnitType", "ConsideredHero", "HasInventory",
+}
+# (file in data/stats/<v>/, section title, which fields count)
+ROOT_FILES = (
+    ("items.txt", "Items", "item"),
+    ("npc_units.txt", "Units", "unit"),
+    ("npc_abilities.txt", "Other abilities", "ability"),
+)
 
 
 # ───────────────────────── KV PARSER ───────────────────────────────────────
@@ -204,6 +232,17 @@ def load_hero_abilities(version: str) -> dict[str, dict[str, dict]]:
     return out
 
 
+def load_root_file(version: str, name: str) -> dict[str, dict]:
+    """{ entity: { flat_field: value } } of one root KV file of data/stats/<version>/ (items.txt, npc_units.txt,
+    npc_abilities.txt). Empty dict if the file is missing (the snapshots before 7.41c keep only heroes/)."""
+    path = DATA_DIR / version / name
+    if not path.exists():
+        return {}
+    kv = parse_kv(_decode_bytes(path.read_bytes()))
+    root = next(iter(kv.values()), {}) if kv else {}
+    return {k: _flatten(v) for k, v in root.items() if isinstance(v, dict) and k not in _SKIP_TOP_KEYS}
+
+
 # ───────────────────────── DIFF ────────────────────────────────────────────
 
 def _interesting(field: str) -> bool:
@@ -218,7 +257,34 @@ def _interesting(field: str) -> bool:
     return False
 
 
-def diff_versions(prev: dict, curr: dict) -> dict:
+def _interesting_item(field: str) -> bool:
+    return _interesting(field) or field.split(".", 1)[0] in ITEM_FIELDS
+
+
+def _interesting_unit(field: str) -> bool:
+    if os.environ.get("SC_FULL_DIFF") == "1":
+        return True
+    top = field.split(".", 1)[0]
+    return top in UNIT_FIELDS or (top.startswith("Ability") and top[len("Ability"):].isdigit())
+
+
+_FILTERS = {"ability": _interesting, "item": _interesting_item, "unit": _interesting_unit}
+
+
+def diff_root_files(prev: str, curr: str) -> list[tuple[str, str, dict]]:
+    """[(section title, kind, { entity: { field: (old, new) } })] for the root files both patches have."""
+    out = []
+    for name, title, kind in ROOT_FILES:
+        a, b = load_root_file(prev, name), load_root_file(curr, name)
+        if not a or not b:
+            continue
+        d = diff_versions({title: a}, {title: b}, _FILTERS[kind]).get(title)
+        if d:
+            out.append((title, kind, d))
+    return out
+
+
+def diff_versions(prev: dict, curr: dict, interesting=_interesting) -> dict:
     """Return { hero: { ability: { field: (old, new) } } }.
     None as old → added field/ability. None as new → removed."""
     out: dict = {}
@@ -234,7 +300,7 @@ def diff_versions(prev: dict, curr: dict) -> dict:
             fields = set(pf) | set(cf)
             f_diff: dict = {}
             for f in sorted(fields):
-                if not _interesting(f):
+                if not interesting(f):
                     continue
                 pv = pf.get(f)
                 cv = cf.get(f)
@@ -282,28 +348,77 @@ def _ability_display(slug: str) -> str:
     return _names()[1].get(slug) or slug
 
 
-def render_diff_html(version: str, prev: str, diff: dict) -> str:
-    if not diff:
+@lru_cache(maxsize=1)
+def _entity_names() -> tuple[dict[str, str], dict[str, str]]:
+    """(item slug → in-game name from data/itemlist.json, unit name → in-game name from abilities_english.txt)."""
+    import json
+    items: dict[str, str] = {}
+    try:
+        with open(_HERE / "data" / "itemlist.json", encoding="utf-8") as f:
+            items = {i["name"]: i.get("name_loc") or i["name"]
+                     for i in json.load(f)["result"]["data"]["itemabilities"]}
+    except (OSError, ValueError, KeyError) as exc:
+        print(f"  ! itemlist.json unreadable ({exc}) — item slugs shown", file=sys.stderr)
+    from tools.build_abilities_slim import load_loc
+    return items, load_loc()
+
+
+def _entity_display(kind: str, slug: str) -> str:
+    if kind == "item":
+        items = _entity_names()[0]
+        if slug in items:
+            return items[slug]
+        if slug.startswith("item_recipe_") and "item_" + slug[len("item_recipe_"):] in items:
+            return items["item_" + slug[len("item_recipe_"):]] + " Recipe"   # the datafeed's own wording
+        return slug
+    if kind == "unit":
+        return _entity_names()[1].get(slug.lower()) or slug
+    return _ability_display(slug)
+
+
+def _section_names(kind: str, slugs) -> dict[str, str]:
+    """slug → heading; a name several entities share (Dagon 1-5, three Zealots) gets its slug in brackets."""
+    names = {s: _entity_display(kind, s) for s in slugs}
+    seen: dict[str, int] = {}
+    for n in names.values():
+        seen[n] = seen.get(n, 0) + 1
+    return {s: (f"{n} ({s})" if seen[n] > 1 and n != s else n) for s, n in names.items()}
+
+
+def _ability_tables(version: str, prev: str, abilities: dict, name) -> list[str]:
+    parts: list[str] = []
+    for ability, fields in abilities.items():
+        parts.append(
+            f'<div class="sc-ability">'
+            f'<h3 class="sc-ability-name">{_esc(name(ability))}</h3>'
+            f'<table class="sc-table">'
+            f'<thead><tr><th>Field</th>'
+            f'<th>{_esc(prev)}</th><th>{_esc(version)}</th></tr></thead>'
+            f'<tbody>'
+        )
+        for f, (pv, cv) in fields.items():
+            parts.append(
+                f'<tr><td class="sc-field">{_esc(f)}</td>'
+                f'<td class="sc-old">{_val_cell(pv)}</td>'
+                f'<td class="sc-new">{_val_cell(cv)}</td></tr>'
+            )
+        parts.append('</tbody></table></div>')
+    return parts
+
+
+def render_diff_html(version: str, prev: str, diff: dict, root_diffs=()) -> str:
+    """Heroes first (one section per hero, its abilities inside), then a section per root file that changed
+    (Items / Units / Other abilities, one table per entity) — the same markup and classes."""
+    if not diff and not root_diffs:
         return '<p class="sc-empty">No diff detected (or both patches are identical for tracked fields).</p>'
     parts: list[str] = []
     for hero, abilities in diff.items():
         parts.append(f'<section class="sc-hero"><h2>{_esc(_hero_display(hero))}</h2>')
-        for ability, fields in abilities.items():
-            parts.append(
-                f'<div class="sc-ability">'
-                f'<h3 class="sc-ability-name">{_esc(_ability_display(ability))}</h3>'
-                f'<table class="sc-table">'
-                f'<thead><tr><th>Field</th>'
-                f'<th>{_esc(prev)}</th><th>{_esc(version)}</th></tr></thead>'
-                f'<tbody>'
-            )
-            for f, (pv, cv) in fields.items():
-                parts.append(
-                    f'<tr><td class="sc-field">{_esc(f)}</td>'
-                    f'<td class="sc-old">{_val_cell(pv)}</td>'
-                    f'<td class="sc-new">{_val_cell(cv)}</td></tr>'
-                )
-            parts.append('</tbody></table></div>')
+        parts += _ability_tables(version, prev, abilities, _ability_display)
+        parts.append('</section>')
+    for title, kind, entities in root_diffs:
+        parts.append(f'<section class="sc-hero sc-group"><h2>{_esc(title)}</h2>')
+        parts += _ability_tables(version, prev, entities, _section_names(kind, entities).get)
         parts.append('</section>')
     return ''.join(parts)
 
@@ -320,7 +435,7 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
 {back_link}
 <h1>Silent Changes</h1>
 <p class="sc-sub">Raw KV-field deltas between <strong>{prev}</strong> → <strong>{version}</strong>, parsed
-from the game's own hero files of both patches. These may overlap with the
+from the game's own {sources} of both patches. These may overlap with the
 official patchnotes — this is the source-of-truth view. Engine noise (FX, sounds,
 animation, particle resources) is filtered out.</p>
 {body}
@@ -351,10 +466,15 @@ def build_page(version: str) -> str | None:
         return None
 
     diff = diff_versions(prev_data, curr_data)
-    body = render_diff_html(version, prev, diff)
+    root_diffs = diff_root_files(prev, version)
+    body = render_diff_html(version, prev, diff, root_diffs)
     n_heroes = len(diff)
     n_changes = sum(len(f) for ab in diff.values() for f in ab.values())
-    print(f"  -> silent/{version}.html  ({n_heroes} heroes, {n_changes} field deltas)")
+    n_root = sum(len(f) for _, _, ents in root_diffs for f in ents.values())
+    print(f"  -> silent/{version}.html  ({n_heroes} heroes, {n_changes} field deltas"
+          + "".join(f"; {t}: {len(e)}" for t, _, e in root_diffs) + (f", {n_root} field deltas)" if root_diffs else ")"))
+    both_roots = all((DATA_DIR / v / name).exists() for v in (prev, version) for name, _, _ in ROOT_FILES)
+    sources = "hero, item and unit files" if both_roots else "hero files"
     # Only show back-link when the annotated patch page actually exists
     has_content = any(
         p.stem == f"p{version.replace('.', '')}"
@@ -365,7 +485,7 @@ def build_page(version: str) -> str | None:
         if has_content else
         '<a class="sc-back" href="../../">← All Patches</a>'
     )
-    return PAGE_TEMPLATE.format(version=version, prev=prev, body=body, back_link=back_link,
+    return PAGE_TEMPLATE.format(version=version, prev=prev, body=body, back_link=back_link, sources=sources,
                                 asset=_site.compute_asset_version(), head=_site.head_common("../../"))
 
 

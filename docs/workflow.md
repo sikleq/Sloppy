@@ -11,6 +11,44 @@ hero lab, …) and writes output to `dist/`. `builders/build_patches.py`
 auto-discovers `content/p*.py` modules and runs them in the chronological
 order derived from `patch/meta.py` — there is no manual import list to edit.
 
+## The one command (2026-10-21)
+
+When a patch ships, the whole data side is one command — every page then picks up the new values by itself:
+
+```powershell
+python tools/new_patch.py 7.42 21.10.2026                         # files from the local game
+python tools/new_patch.py 7.42 21.10.2026 --source gametracking   # no game at hand (--ref <sha> for a given build)
+python tools/new_patch.py 7.42 --dry-run                          # the plan only: nothing runs, nothing changes
+python tools/new_patch.py 7.42 --from enchant_values              # resume (after proofreading, after a failure)
+```
+
+| # | Step | Script | Automatic? |
+|:-:|:---|:---|:---|
+| 1 | register | `RELEASE_HISTORY` row in `patch/meta.py` (version, date, filename; a new cycle gets its comment) | yes |
+| 2 | fetch | `scripts/fetch/extract_patchnotes.py <v> --local` or `fetch_gametracking.py <v> [--ref]` | yes (pick the patch's build) |
+| 3 | slim | `tools/slim_from_kv.py <v>` | yes |
+| 4 | meta | `build_site.py patch` (site_meta.json — before the top-ups, they map by date) | yes |
+| 5–8 | top-ups | `fetch_npc_history`, `fetch_hero_history`, `fetch_ability_history`, `fetch_itemlist` | yes |
+| 9 | shops | `scripts/fetch/extract_shops.py` | local game only |
+| 10–11 | shared tables | `tools/build_abilities_slim.py`, `tools/build_herolist.py` | yes |
+| 12–13 | history | `tools/build_item_stat_lines.py`, `tools/build_talent_slots.py` | only with the weights model's KV history (`outputs/valve-revealed-weights-20260915`) |
+| 14 | loc_history | `tools/fetch_loc_history.py <prev> <v>` | yes |
+| 15 | draft | `generate_patch_code_v2.py <v>` | only while `content/p<code>.py` does not exist |
+| 16–17 | enchant | `scripts/gen/enchant_values.py`, `enchant_table.py <v>` | only when the content file has `enchant_tier_box()` |
+| 18 | build | `build_site.py` | yes |
+| 19 | check | `tools/patch_check.py <v>` (its exit code is the command's) | yes |
+
+Each step prints what it does; the first failure stops the run and prints the `--from` line to resume.
+**Still human** (printed at the end): proofread `_generated_p_<v>_v2.py` into `content/p<code>.py` (Steps 4–5 below)
+and run the command again `--from enchant_values`; new slugs / icons (Step 5); the map, when the map file changed —
+SHA-1 of the game's `maps/dota.vpk` against the previous patch's row in `data/map/patch_maps.json` (GameTracking has
+no map file: then it says "not checked") — Terrain and Oldgrowth need the owner's PC (SFM render, Source2Viewer, Steam
+depots); the weights 2–3 weeks later (Step 2c). The steps below are what the command runs, for reading and for doing
+one by hand.
+
+`.github/workflows/game-build-watch.yml` checks GameTracking every day (`tools/check_game_build.py`) and opens an issue
+when a build's files differ from the newest snapshot — a new patch, or a build without notes (silent changes).
+
 ## Step 1 — Register patch metadata
 
 Add the new version to `patch/meta.py` → `RELEASE_HISTORY`: `version` + `date` (+ `filename`
@@ -102,21 +140,21 @@ rewrite the PREVIOUS latest patch with live data instead.
 
 ## Step 2b — Refresh the GLOBAL snapshots (easy to forget)
 
-Step 2 only fills `data/stats/<version>/`. Four repo-wide files live outside
-that folder, are refreshed **by hand**, and silently go stale otherwise
-(7.41e shipped 30.07 and `patchnotes_english.txt` still had 0 of its keys
-weeks later). Refresh all four every patch:
+Step 2 only fills `data/stats/<version>/`. These repo-wide files live outside that folder and silently go stale
+otherwise (7.41e shipped 30.07 and `patchnotes_english.txt` still had 0 of its keys weeks later). `tools/new_patch.py`
+refreshes all of them; by hand:
 
 | File | Feeds | How to refresh |
 |---|---|---|
-| `data/patchnotes_english.txt` | generator section order + `_info` notes, calendar "major patch" counts, OLD-desc lifts, retroactive KV lines Valve adds later | Bump `PATCH_VERSION` in `scripts/fetch/extract_patchnotes.py` to the new version, run it (reads the live VPK; also writes `data/stats/<version>/` KV) |
-| `data/abilities_slim.json` | ability display names, innate detection (`patch/elements.py`), slug audit (CI + `tests/test_ability_slugs.py`) | KV+loc merge (`dname` / `is_innate`). Regenerate after the KV refresh — a new/renamed ability that is missing here fails the slug audit and loses its innate marker |
-| `data/herolist.json` | hero name resolution (generator, audits) | Valve herolist API (`scripts/fetch/fetch_itemlist.py` sibling flow) |
-| `data/itemlist.json` | item names / Hero Lab item list | `python scripts/fetch/fetch_itemlist.py` |
+| `data/patchnotes_english.txt`, `dota_english.txt`, `abilities_english.txt` | generator section order + `_info` notes, calendar "major patch" counts, OLD-desc lifts, ability / hero / unit names | `python scripts/fetch/extract_patchnotes.py <v> --local` (the live VPK; also writes `data/stats/<v>/` KV; without `--local` it uploads through the GitHub API) or `fetch_gametracking.py <v>` |
+| `data/abilities_slim.json` | ability display names, innate detection (`patch/elements.py`), slug audit (CI + `tests/test_ability_slugs.py`) | `python tools/build_abilities_slim.py` — merges the newest snapshot's abilities (`npc_abilities.txt` + `heroes/`, `"Innate" "1"`) with their `abilities_english.txt` names (talent `{s:…}` numbers filled); rows of removed abilities stay, old pages name them |
+| `data/herolist.json` | hero name resolution (generator, audits, Hero Stats) | `python tools/build_herolist.py` — the hero files' `HeroID` / `AttributePrimary` / `Complexity` + `npc_dota_hero_<x>:n`, only `"Enabled" "1"`, game order (equals the old datafeed copy) |
+| `data/itemlist.json` | item names / Hero Lab item list / neutral pool | `python scripts/fetch/fetch_itemlist.py` (Valve's live datafeed) |
+| `data/shops.txt` | shop categories (Item Changes, items_dyn) | `python scripts/fetch/extract_shops.py` (local game) |
 
-Gate: `tests/test_snapshots_fresh.py` fails when `patchnotes_english.txt` has no
-`DOTA_Patch_<version>_` keys for the newest patch in `patch/meta.py`, or when a
-hero in `data/stats/<latest>/heroes.json` is absent from `herolist.json`.
+Gate: `tests/test_snapshots_fresh.py` fails when `patchnotes_english.txt` has no `DOTA_Patch_<version>_` keys for the
+newest patch, when `abilities_slim.json` or `herolist.json` differ from what the writers make of the newest snapshot,
+when `itemlist.json` does not list exactly the items of the newest `items.txt`, or `shops.txt` names an item it lacks.
 
 For a patch that ships a new map file, its Terrain page: render the map, add its
 picture + mapdata + `data/map/patch_maps.json` / `renders.json` rows, `python scripts/gen/build_terrain_diff.py`

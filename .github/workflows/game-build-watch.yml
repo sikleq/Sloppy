@@ -1,0 +1,30 @@
+name: game-build-watch
+
+# Opens an issue when SteamTracking/GameTracking-Dota2 has a game build whose files differ from the newest
+# data/stats/<v>/ snapshot (a new patch -> tools/new_patch.py; a build without notes -> silent changes).
+# Public data only; the one credential is this workflow's own GITHUB_TOKEN (issues: write). One issue per build.
+on:
+  schedule:
+    - cron: "30 7 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Newer game build than the newest snapshot?
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYTHONIOENCODING: utf-8
+        run: python tools/check_game_build.py --open-issue

@@ -40,6 +40,8 @@ Dota 2 Patch Notes — Extractor & Auto-Uploader
 ЗАПУСК:
 ─────────────────────────────────────────────────────────
    python extract_patchnotes.py
+   python extract_patchnotes.py 7.42 --local   # записать в эту рабочую копию, без заливки и без токена
+                                               # (так его зовёт tools/new_patch.py)
 
 или просто двойной клик по этому файлу (если Python поставился
 правильно и .py-файлы открываются им).
@@ -88,18 +90,23 @@ def github_token() -> str:
 def _patch_version() -> str:
     """Версия патча: аргумент запуска (`python extract_patchnotes.py 7.42`), иначе самый новый патч из
     `patch/meta.py` RELEASE_HISTORY. В коде версию не держим: 7.41c/d перезаписали прошлый патч из-за забытой правки."""
-    if len(sys.argv) > 1:
-        return sys.argv[1]
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    if args:
+        return args[0]
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from patch.meta import _current_version
     return _current_version() or ""
 
 
 PATCH_VERSION = _patch_version()
+# --local: write the files into this checkout (what tools/new_patch.py runs) instead of uploading them to GitHub —
+# no token needed, nothing pushed; commit as usual.
+LOCAL = "--local" in sys.argv[1:]
+ROOT = Path(__file__).resolve().parents[2]
 
 # Путь к папке dota (там, где pak01_dir.vpk).
-# Если Steam стоит на другом диске — поправь.
-DOTA_PATH = r"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game\dota"
+# Если Steam стоит на другом диске — поправь (или переменная окружения DOTA_PATH).
+DOTA_PATH = os.environ.get("DOTA_PATH", r"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game\dota")
 
 # Куда заливать в репо
 GITHUB_OWNER  = "sikleq"
@@ -130,6 +137,8 @@ STATS_VPK_PATHS = [
     "scripts/npc/items.txt",
     "scripts/npc/npc_abilities.txt",
     "scripts/npc/npc_ability_ids.txt",
+    # 7.41f+: родительский шаблон героев — fetch_hero_history.py берёт из него поля, которых нет в файле героя
+    "scripts/npc/heroes/npc_dota_hero_base.txt",
 ]
 
 # Per-hero ability файлы — каталог в VPK, перечисляем при запуске.
@@ -265,6 +274,32 @@ def commit_batch(session, owner: str, repo: str, changes, message: str) -> str:
     return commit.get("html_url", "")
 
 
+def local_targets(patchnotes: dict, stats: dict, hero_files: dict, version: str = None):
+    """[(repo path, bytes)] — the same places the upload writes: localisation -> data/, KV -> data/stats/<v>/."""
+    version = version or PATCH_VERSION
+    out = [(f"data/{n}", b) for n, b in patchnotes.items()]
+    out += [(f"data/stats/{version}/{n}", b) for n, b in stats.items()]
+    out += [(f"data/stats/{version}/heroes/{n}", b) for n, b in sorted(hero_files.items())]
+    return out
+
+
+def write_local(targets, root: Path = None) -> int:
+    """Write the files that differ into the checkout (data/stats/** with LF, as in git). Returns how many."""
+    root = root or ROOT
+    changed = 0
+    for rel, data in targets:
+        new = _normalize_kv(rel, data)
+        path = root / rel
+        old = path.read_bytes() if path.exists() else None
+        if old is not None and _normalize_kv(rel, old) == new:
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(new)
+        print(f"  {'обновлён' if old is not None else 'новый'}: {rel}")
+        changed += 1
+    return changed
+
+
 def main():
     print("=" * 62)
     print("  Dota Patch Notes & Stats Sync")
@@ -277,15 +312,16 @@ def main():
     except ImportError:
         stop("не установлена библиотека vpk.\n"
              "   В командной строке выполни:  pip install vpk")
-    try:
-        import requests
-    except ImportError:
-        stop("не установлена библиотека requests.\n"
-             "   В командной строке выполни:  pip install requests")
+    if not LOCAL:
+        try:
+            import requests
+        except ImportError:
+            stop("не установлена библиотека requests.\n"
+                 "   В командной строке выполни:  pip install requests")
 
     # ── Проверка токена ─────────────────────────────────────────
-    token = github_token()
-    if not token:
+    token = "" if LOCAL else github_token()
+    if not token and not LOCAL:
         stop("не задан GitHub Token.\n"
              "   Проще всего — войти в GitHub CLI:  gh auth login\n"
              "   Или создай токен на https://github.com/settings/tokens?type=beta\n"
@@ -365,6 +401,12 @@ def main():
                 # read_vpk вызывает stop() на ошибке; пропускаем файл
                 continue
     print(f"   ✓ найдено {len(hero_files)} hero-файлов")
+
+    if LOCAL:
+        changed = write_local(local_targets(patchnotes, stats, hero_files))
+        print(f"\n{changed} файл(ов) записано в {ROOT} (ничего не залито — закоммить как обычно).")
+        _pause()
+        return
 
     # ── Заливаем в GitHub ────────────────────────────────────────
     print(f"\nвЃ  РЎРёРЅС…СЂРѕРЅРёР·РёСЂСѓСЋ СЃ {GITHUB_OWNER}/{GITHUB_REPO}...")
