@@ -3670,16 +3670,17 @@ h4.subgroup .subgroup-new-type {
    + title + tag/summary row) with the swap panes inside the block body.
    Title shows `Old → New` when names differ. The block visually matches
    any other ability section on the page. */
-.ability-change-block .ability-title {
+.ability-change-block .ability-title,
+.ability-title:has(.ability-title-arrow) {   /* a plain block renamed too: ability(old_title=…) (owner 2026-10-21) */
   display: inline-flex;
   align-items: baseline;
   gap: 7px;
   flex-wrap: wrap;
 }
-.ability-change-block .ability-title-old {
+.ability-title-old {
   opacity: 0.55;
 }
-.ability-change-block .ability-title-arrow {
+.ability-title-arrow {
   font-weight: 700;
   opacity: 0.7;
   padding: 0 1px;

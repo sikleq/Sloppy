@@ -2465,7 +2465,7 @@ def build():
             slug="slark_saltwater_shiv",
             desc=[
                 "New basic ability — passive, auto-cast attack modifier.",
-                "Slark slices the target with his salty shiv, stealing <b>3 Movement Speed</b>, <b>3 Health Regen</b> and <b>3/4/5/6% Health Restoration</b> from them with each attack. Subsequent uses refresh the duration of all shiv stacks. Steal duration: 6/8/10/12s. Mana Cost: 20. Cooldown: 10/8/6/4s."
+                "Slark slices the target with his salty shiv, stealing <b>3 Movement Speed</b>, <b>3 Health Regen</b> and <b>3/4/5/6% Health Restoration</b> from them with each attack. Subsequent uses refresh the duration of all shiv stacks. Steal duration: 6/8/10/12s."
                 + inline_note("Not Breakable. Disabled by Silence. Has no stack limit. Ignores attack backswing. Enemies with Health Restoration below −100% will not lose health from health-restoration sources."),
             ],
         ),

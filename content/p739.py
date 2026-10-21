@@ -2062,7 +2062,7 @@ def build():
             desc=[
                 "Granted by Aghanim's Scepter.",
                 "Barathrum distorts the fabric of space, increasing his own magic resistance by 75%, and redirecting enemy spells targeted at allied heroes within a 900 radius towards him. Does not trigger if the enemy ability is targeted at Spirit Breaker."
-                + inline_note("Duration: 7s. Cooldown: 20s. Mana Cost: 75"),
+                + inline_note("Duration: 7s."),
             ],
         ),
         new=dict(

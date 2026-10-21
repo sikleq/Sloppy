@@ -935,7 +935,7 @@ _SUMMON_PARENT = {
     "npc_dota_visage_familiar": ("heroes/visage.html", "Summon Familiars"),
     "npc_dota_eidolon": ("heroes/enigma.html", "Demonic Summoning"),
     "npc_dota_invoker_forged_spirit": ("heroes/invoker.html", "Forge Spirit"),
-    "npc_dota_beastmaster_boar": ("heroes/beastmaster.html", None),
+    "npc_dota_beastmaster_boar": ("heroes/beastmaster.html", "Summon Razorback"),
     "npc_dota_unit_undying_zombie": ("heroes/undying.html", "Tombstone"),
     "npc_dota_dark_troll_warlord_skeleton_warrior": ("units/dark-troll-summoner.html", None),
     "brewmaster_fire_unit": ("heroes/brewmaster.html", "Fire Brewling"),

@@ -1453,7 +1453,7 @@ def build():
     ))
     W(ability("Nightmare"))
     W(ul_open())
-    W(li("Now a Unit Vector Target Spell", t("REWORK")))
+    W(li("Now a Unit Vector Target Spell", t("MISC")))
     W(li("Sleeping units walk in Bane's chosen direction at a speed of 110", t("NEW"), extra=inline_note("Can be put on alt-cast to disable sleepwalking behavior")))
     W(ul_close())
 
@@ -1502,7 +1502,6 @@ def build():
         tag="rework",
     ))
     W(ul_open())
-    W(li("Now an innate ability", t("REWORK")))
     W(li_formula("Bonus Attack Speed changed", "10/30/50/70", "7 + 3 per level",
                  rank_step([10.0, 30.0, 50.0, 70.0], ultimate=False), lambda L: 7.0 + 3.0 * L))
     W(ul_close())
@@ -1512,9 +1511,8 @@ def build():
     W(li("Damage Amp per stack decreased from 6/9/11/13% to 5/6/7/8%", b([6, 9, 11, 13], [5, 6, 7, 8])))
     W(li("Aghanim's Shard: Beastmaster's attacks on enemy heroes also apply the Wild Axes debuff of its corresponding level. Illusions of Beastmaster don't apply Wild Axes stacks", t("NEW")))
     W(ul_close())
-    W(ability("Summon Razorback"))
+    W(ability("Summon Razorback", old_title="Call of the Wild Boar"))
     W(ul_open())
-    W(li("Call of the Wild Boar renamed to Summon Razorback", t("MISC")))
     W(li("Boar's armor increased by 1",
          bstat_u("npc_dota_beastmaster_boar", "ArmorPhysical", "7.40c", 1),
          extra=note_box(unit="npc_dota_beastmaster_boar", field="ArmorPhysical", before_patch="7.40c")))
@@ -1635,10 +1633,14 @@ def build():
                  effective_unchanged=True,
                  inline_note_text="Effective values are not changed"))
     W(ul_close())
-    W(ability("Primal Split"))
+    W(ability("Primal Split", slug="brewmaster_primal_split"))
+    W(ability("Earth Brewling", slug="brewmaster_earth_unit", icon_url="../icons/units/brewmaster_earth_unit.png"))
     W(ul_open())
-    W(li("Earth Brewling's Hurl Boulder Stun Duration decreased from 1.6/1.6/1.6/2s to 1.6/1.6/1.6/1.8s", b([1.6, 1.6, 1.6, 2], [1.6, 1.6, 1.6, 1.8])))
-    W(li("Storm Brewling's Cyclone Duration decreased from 3/4/5/6s to 3/3.75/4.5/5.25s", b([3, 4, 5, 6], [3, 3.75, 4.5, 5.25])))
+    W(li("Hurl Boulder Stun Duration decreased from 1.6/1.6/1.6/2s to 1.6/1.6/1.6/1.8s", b([1.6, 1.6, 1.6, 2], [1.6, 1.6, 1.6, 1.8])))
+    W(ul_close())
+    W(ability("Storm Brewling", slug="brewmaster_storm_unit", icon_url="../icons/units/brewmaster_storm_unit.png"))
+    W(ul_open())
+    W(li("Cyclone Duration decreased from 3/4/5/6s to 3/3.75/4.5/5.25s", b([3, 4, 5, 6], [3, 3.75, 4.5, 5.25])))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -1758,6 +1760,7 @@ def build():
 
     # Chen
     W(hero_header("Chen"))
+    _zealot_pill, _zealot_table = scale_pill("2 per Chen's level", lambda L: 2.0 * L)
     W(ability_change(
         old=dict(
             name="Summon Convert",
@@ -1765,7 +1768,7 @@ def build():
             desc=[
                 "Active, levels with Holy Persuasion.",
                 "Chen summons a convert to fight for him. The convert gains bonuses from Holy Persuasion, including its abilities. Health is set to 220 + 80 × Chen's Level. The convert is considered a creep-hero.",
-                "Only one convert can be summoned at a time, and it dies if Chen dies. Mana Cost: 50. Cooldown: 30s. Cooldown starts once the convert dies and automatically refreshes on Chen's respawn.",
+                "Only one convert can be summoned at a time, and it dies if Chen dies. Cooldown starts once the convert dies and automatically refreshes on Chen's respawn.",
                 "Which creature is summoned depends on the chosen Facet. Summoned convert counts toward Holy Persuasion's Max Units limit.",
             ],
         ),
@@ -1775,11 +1778,12 @@ def build():
             innate=True,
             desc=[
                 "Passive and active components. Improves with game's time.",
-                "When Chen respawns, he is joined in battle by a Zealot — a melee creep warrior with the Martyrdom ability. Zealot has the same stats as the current melee creeps on his team (including super or mega form), but has 125 attack range, base damage increased by 2 per Chen's level, base health regen increased from 0.5 to 2.5, and doesn't have Runty attack type. Zealot respawns after 60s dead.",
+                "When Chen respawns, he is joined in battle by a Zealot — a melee creep warrior with the Martyrdom ability. Zealot has the same stats as the current melee creeps on his team (including super or mega form), but has 125 attack range, base damage increased by " + _zealot_pill + ", base health regen increased from 0.5 to 2.5, and doesn't have Runty attack type. Zealot respawns after 60s dead.",
                 "<b>Martyrdom:</b> 500-range unit-targeted ability on the Zealot creep, targeting either an enemy or ally. When cast, the Zealot sacrifices itself, firing a projectile at 1000 speed dealing damage to enemies or healing allies. Damage = 25 + 20% of the Zealot's current health; healing = 50% of these values.",
-                "Can also be cast on a controlled unit to teleport it to Chen after a 6s delay. Self-targeting teleports all controlled units. <b>Mana Cost:</b> 50. <b>Cooldown:</b> 10s."
+                "Can also be cast on a controlled unit to teleport it to Chen after a 6s delay. Self-targeting teleports all controlled units."
                 + inline_note("Mechanics moved from Divine Favor without any changes."),
             ],
+            tables=[_zealot_table],
         ),
         summary="New innate ability.",
         tag="new",
@@ -1787,13 +1791,13 @@ def build():
     W(ability("Holy Persuasion"))
     W(ul_open())
     W(li("Zealots receive the benefits from Holy Persuasion", t("NEW")))
-    W(li("Now may be cast on existing persuaded creeps that have not been damaged in the last 3 seconds to unsummon them", t("NEW"),
+    W(li("Now may be cast on existing persuaded creeps that have not been damaged in the last 3 seconds to unsummon them", t("QoL"),
          extra=inline_note("Unsummoning a unit has a global cast range, costs no mana and sets ability to a 3s cooldown")))
     W(li("Now increases all of creature's outgoing damage by 0/6/12/18% instead of only increasing attack damage by 4/8/12/16", t("REWORK")))
     W(ul_close())
     W(ability("Divine Favor"))
     W(ul_open())
-    W(li("Self-casting no longer teleports Chen's creeps to him", t("DEL"),
+    W(li("Self-casting no longer teleports Chen's creeps to him", t("QoL"),
          extra=inline_note("Still applies the Divine Favor buff to all of them")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -3316,7 +3320,7 @@ def build():
                 "Now has both <b>passive</b> and <b>active</b> components.",
                 "<b>Passive:</b> grants Marci <b>12/18/24/30%</b> lifesteal and <b>12/18/24/30%</b> bonus base attack damage.",
                 "<b>Active:</b> cast on an ally — they receive <b>75%</b> of the passive bonuses and a <b>shared all-damage barrier</b> that blocks 90/160/230/300 damage. Damaging the barrier on either Marci or the target reduces it for both. As Marci attacks heroes, 30% of the damage dealt restores the barrier. <b>Duration: 7s.</b>",
-                "<b>Cast Range:</b> 500. <b>Mana Cost:</b> 60/65/70/75. <b>Cooldown:</b> 20s. <b>Cast Point:</b> 0.2s.",
+                "<b>Cast Range:</b> 500. <b>Cast Point:</b> 0.2s.",
                 "The effect is dispellable. Dispelling Marci removes the barrier; dispelling the target removes both the barrier and passive bonuses (lifesteal + base attack damage).",
             ],
         ),
@@ -4783,7 +4787,7 @@ def build():
             desc=[
                 "Active.",
                 "Places a sign that makes mines within a <b>500 radius</b> invulnerable and deal <b>15% more damage</b>.",
-                "<b>Cast Point:</b> 1.25s. <b>Cooldown:</b> 60s. <b>Duration:</b> 60s. Only one sign can exist at a time.",
+                "<b>Cast Point:</b> 1.25s. <b>Duration:</b> 60s. Only one sign can exist at a time.",
                 aghs_line("Increases radius to 1000 and duration to 4 minutes. When an enemy hero gets within 200 units of the sign, the entire 1000 radius becomes a minefield for 10s — enemy units take 300 damage for every 200 units moved. Minefield area becomes visible to enemies once activated. The sign is destroyed after the minefield expires."),
             ],
         ),

@@ -961,7 +961,8 @@ def subgroup(title, new=None):
     return out + f'<h4 class="subgroup">{title}{label}</h4>'
 
 
-def ability(title, slug=None, innate=None, icon_url=None, sub=False):
+def ability(title, slug=None, innate=None, icon_url=None, sub=False, old_title=None):
+    """old_title: a rename shown in the header "Old → New", like ability_change's (owner 2026-10-21)."""
     icon_html = ''
     is_innate = False
     key = None
@@ -1050,7 +1051,14 @@ def ability(title, slug=None, innate=None, icon_url=None, sub=False):
     _State.current_ability_kv = slug or slug_of(icon_url or "")
     return out + (f'<div class="ability-block{" is-innate" if is_innate else ""}">'
                   f'{icon_html}'
-                  f'<h4 class="ability-title">{title}</h4>')
+                  f'<h4 class="ability-title">{_renamed_title(old_title, title)}</h4>')
+
+
+def _renamed_title(old, new):
+    if not old or old == new:
+        return new
+    return (f'<span class="ability-title-old">{old}</span><span class="ability-title-arrow">→</span>'
+            f'<span class="ability-title-new">{new}</span>')
 
 
 def facet_header(slug):
@@ -1538,6 +1546,7 @@ _IAB_META = (  # (key, icon, pattern of a whole sentence) — header order: radi
     ("cooldown", "cooldown", rf"(?:Cooldown\s*:?\s*({_IAB_N})s?|({_IAB_N})s\s+Cooldown)"),
 )
 _IAB_DROP = r"No Mana Cost|No Cooldown"
+_IAB_BOLD_LABEL_RE = re.compile(r"<b>\s*((?:Cast )?Range|Radius|Mana Cost|Health Cost|Cooldown)\s*:\s*</b>")
 _IAB_SMALL = {"of", "the", "a", "an", "and", "to", "in", "on", "for", "with", "from"}
 # a multiplier "0.25x" is one number; never stop at its decimal point (7.39 Sister's Shroud showed a bold "0" + ".25x")
 _IAB_NUM_RE = re.compile(r"(?<![\w#&.])([+\-]?\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*%?s?x?)(?![\w%]|\.\d)")
@@ -1628,6 +1637,9 @@ def _iab_meta_chips(values, props=None):
 def _iab_take_meta(desc, only=None):
     """({key: value} of the header sentences, the text without them and without "No Mana Cost" / "No Cooldown")."""
     values = {}
+    # "<b>Mana Cost:</b> 50." is the same header sentence as "Mana Cost: 50." (7.41 Zealot / Bane shard: the bold
+    # label kept it in the text under a head that already shows it — owner 2026-10-21)
+    desc = _IAB_BOLD_LABEL_RE.sub(r"\1:", desc)
     for key, icon, pat in _IAB_META:
         mm = re.search(_iab_meta_re(pat), desc) if only is None or key in only else None
         if mm:
@@ -1690,6 +1702,8 @@ def _pane_parts(desc, props=None, facet=False):
         for i in plain:
             items[i] = _PANE_NAME_RE.sub("", items[i], count=1)
             items[i] = items[i][:1].upper() + items[i][1:]
+    for i in plain:
+        items[i] = _IAB_BOLD_LABEL_RE.sub(r"\1:", items[i])
     # a value said twice in one pane (two cooldowns of two sub-abilities) stays in the text: the header can't say whose
     once = {key for key, _, pat in _IAB_META
             if sum(len(re.findall(_iab_meta_re(pat), items[i])) for i in plain) == 1}
