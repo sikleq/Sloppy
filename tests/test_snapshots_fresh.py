@@ -5,6 +5,8 @@ outside the per-patch data/stats/<ver>/ folder (see docs/workflow.md Step 2b):
   - data/patchnotes_english.txt  -> generator section order, _info notes,
                                     calendar "major patch" counts, OLD-desc lifts
   - data/herolist.json           -> hero name resolution for the generator/audits
+  - data/abilities_slim.json     -> ability names, innate markers, slug audit
+  - data/itemlist.json, data/shops.txt -> item names, neutral pool, shop categories
 
 When a patch ships and these are NOT refreshed, the site silently keeps the old
 text (e.g. 7.41e had 0 keys in patchnotes_english.txt for weeks). This test
@@ -12,6 +14,7 @@ fails loudly instead.
 """
 import json
 import os
+import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -70,3 +73,61 @@ def test_latest_heroes_json_not_hollow():
         f"data/stats/{latest}/heroes.json has only {len(playable)} playable heroes — "
         f"regenerate with `python tools/slim_from_kv.py {latest}` (it follows #base includes)."
     )
+
+
+# ── the shared files rebuilt from the newest snapshot (tools/new_patch.py runs the writers) ──────────────────────
+
+def test_abilities_slim_matches_latest_snapshot():
+    """Every ability of the newest data/stats/<v>/ (npc_abilities.txt + heroes/) is in data/abilities_slim.json with
+    the name and innate flag the game files give it. Stale = a new/renamed ability fails the slug audit and loses
+    its innate marker. Fix: python tools/build_abilities_slim.py"""
+    from tools import build_abilities_slim as bas
+    latest = latest_stats_version()
+    with open(bas.OUT, encoding="utf-8") as f:
+        current = json.load(f)
+    diff = bas.changes(current, bas.build(os.path.join(ROOT, "data", "stats", latest), bas.load_loc(), current))
+    assert not diff, (f"data/abilities_slim.json is stale against data/stats/{latest}: {len(diff)} row(s), e.g. "
+                      f"{diff[:3]}. Run: python tools/build_abilities_slim.py")
+
+
+def test_herolist_matches_latest_snapshot():
+    """data/herolist.json is exactly what the newest snapshot's hero files + abilities_english.txt give.
+    Fix: python tools/build_herolist.py"""
+    from tools import build_herolist as bh
+    from tools.build_abilities_slim import load_loc
+    latest = latest_stats_version()
+    fresh = bh.build(os.path.join(ROOT, "data", "stats", latest), load_loc())
+    with open(bh.OUT, encoding="utf-8") as f:
+        text = f.read()
+    diff = bh.changes(json.loads(text), fresh)
+    assert not diff, (f"data/herolist.json is stale against data/stats/{latest}: {diff[:3]}. "
+                      f"Run: python tools/build_herolist.py")
+    assert text == bh.dumps(fresh), "data/herolist.json: same heroes, other order/layout — run tools/build_herolist.py"
+
+
+def _latest_item_slugs():
+    latest = latest_stats_version()
+    with open(os.path.join(ROOT, "data", "stats", latest, "items.txt"), encoding="utf-8", errors="replace") as f:
+        return latest, set(re.findall(r'^\t"(item_[a-z0-9_]+)"', f.read(), re.M))
+
+
+def test_itemlist_names_every_item_of_latest_snapshot():
+    """data/itemlist.json (Valve datafeed) lists exactly the items of the newest items.txt.
+    Fix: python scripts/fetch/fetch_itemlist.py"""
+    latest, kv = _latest_item_slugs()
+    with open(os.path.join(ROOT, "data", "itemlist.json"), encoding="utf-8") as f:
+        listed = {i["name"] for i in json.load(f)["result"]["data"]["itemabilities"]}
+    assert not kv - listed, (f"data/itemlist.json misses {sorted(kv - listed)[:8]} of data/stats/{latest}/items.txt "
+                             f"— run python scripts/fetch/fetch_itemlist.py")
+    assert not listed - kv, (f"data/itemlist.json lists {sorted(listed - kv)[:8]}, gone from data/stats/{latest}/"
+                             f"items.txt — run python scripts/fetch/fetch_itemlist.py")
+
+
+def test_shops_list_only_items_of_latest_snapshot():
+    """data/shops.txt (the game's shop layout) names no item the newest items.txt lacks.
+    Fix: python scripts/fetch/extract_shops.py"""
+    latest, kv = _latest_item_slugs()
+    with open(os.path.join(ROOT, "data", "shops.txt"), encoding="utf-8") as f:
+        shop = set(re.findall(r'"item"\s+"(item_[a-z0-9_]+)"', f.read()))
+    assert not shop - kv, (f"data/shops.txt lists {sorted(shop - kv)[:8]}, not in data/stats/{latest}/items.txt — "
+                           f"run python scripts/fetch/extract_shops.py")
