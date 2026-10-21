@@ -20,3 +20,12 @@ def test_materials_tab_opens_unit_changes():
     assert dict((k, h) for k, _l, h in site.NAV_TABS)["materials"] == "unit_changes.html"
     html = site.render_materials_subnav("hero_changes")
     assert html.index('href="hero_changes.html">Hero Changes') < html.index('href="heroes_stats.html">Hero Stats')
+
+
+def test_index_creeps_panel_links_unit_changes():
+    # The Creeps tile on the main page opens Unit Changes, like Heroes / Items open their Changes (owner 2026-10-21).
+    from pathlib import Path
+    src = Path(__file__).resolve().parents[1].joinpath("patch", "index_page.py").read_text(encoding="utf-8")
+    panel = src[src.index("creeps_panel = ("):src.index("heroes_panel = (")]
+    assert "'unit_changes.html', 'icon_changes_unit.png'" in panel
+    assert Path(__file__).resolve().parents[1].joinpath("icons", "ui", "gothic", "icon_changes_unit.png").exists()

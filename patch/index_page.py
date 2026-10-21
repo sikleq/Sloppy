@@ -186,6 +186,7 @@ def save_index_html():
         + _panel_link_btn('inv-cell-creeps', 'neutral_stats.html', 'icon_creeps.png', 'Neutrals')
         + _panel_soon_btn('icon_summons.png', 'Summons')
         + _panel_soon_btn('icon_swords.png', 'Lane Creeps')
+        + _panel_link_btn('', 'unit_changes.html', 'icon_changes_unit.png', 'Changes')
         + '</div></div>'
     )
     heroes_panel = (

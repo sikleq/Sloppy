@@ -376,6 +376,19 @@ def changes_item():
     return s
 
 
+def changes_unit():
+    s = new()
+    _arrow_ring(s)
+    part(s, "paw")
+    s.ellipse(11, 14, 20, 21, G5)                              # main pad
+    cols(s, 11, 20, 14, 21, [G6, G6, G5, G4, G3])
+    for x0, y0 in ((9, 10), (12, 8), (17, 8), (20, 10)):       # four toes
+        s.ellipse(x0, y0, x0 + 2, y0 + 3, G5)
+        s.px(x0, y0 + 1, G7)
+    s.outline(O)
+    return s
+
+
 # ------------------------------------------------ small category emblems for the Dynamics icons (heroes / items)
 def emblem_helm():
     s = Sprite(12, 12)
@@ -424,6 +437,7 @@ def dynamics_variants():
 ICONS = {
     "icon_helm": heroes, "icon_abacus": abacus, "icon_cauldron": cauldron,
     "icon_aoe": aoe, "icon_changes_hero": changes_hero, "icon_changes_item": changes_item,
+    "icon_changes_unit": changes_unit,
     "icon_summons": summons, "icon_swords": lane_creeps, "icon_kofi": kofi,
 }
 
