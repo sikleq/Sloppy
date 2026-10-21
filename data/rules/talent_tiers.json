@@ -10370,17 +10370,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_clinkz_1",
-     "from": 15,
-     "to": 10,
-     "type": "duration",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_clinkz_10",
      "from": 15,
      "to": 10,
      "type": "cooldown",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_clinkz_1",
+     "from": 15,
+     "to": 10,
+     "type": "duration",
      "steps": 1
     }
    ]
@@ -13691,17 +13691,17 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_spirit_breaker_1",
-     "from": 25,
-     "to": 20,
-     "type": "cooldown",
-     "steps": 1
-    },
-    {
      "slug": "special_bonus_unique_spirit_breaker_shield",
      "from": 25,
      "to": 20,
      "type": "damage",
+     "steps": 1
+    },
+    {
+     "slug": "special_bonus_unique_spirit_breaker_1",
+     "from": 25,
+     "to": 20,
+     "type": "cooldown",
      "steps": 1
     }
    ]
@@ -17954,18 +17954,18 @@
    "changed": 2,
    "moves": [
     {
-     "slug": "special_bonus_unique_batrider_4",
-     "from": 25,
-     "to": 15,
-     "type": "damage",
-     "steps": 2
-    },
-    {
      "slug": "special_bonus_unique_batrider_7",
      "from": 10,
      "to": 15,
      "type": "range",
      "steps": -1
+    },
+    {
+     "slug": "special_bonus_unique_batrider_4",
+     "from": 25,
+     "to": 15,
+     "type": "damage",
+     "steps": 2
     }
    ]
   },
@@ -18898,18 +18898,18 @@
   },
   "7.41c|puck|15": {
    "changed": 1,
-   "share_delta": -0.005,
+   "share_delta": -0.004,
    "n": [
     395,
-    644
+    684
    ]
   },
   "7.41c|puck|25": {
    "changed": 1,
-   "share_delta": -0.466,
+   "share_delta": -0.463,
    "n": [
     122,
-    291
+    312
    ],
    "moves": [
     {
@@ -18923,26 +18923,26 @@
   },
   "7.41c|tiny|10": {
    "changed": 1,
-   "share_delta": 0.075,
+   "share_delta": 0.068,
    "n": [
     635,
-    1027
+    1095
    ]
   },
   "7.41c|tiny|15": {
    "changed": 1,
-   "share_delta": 0.027,
+   "share_delta": 0.023,
    "n": [
     570,
-    917
+    978
    ]
   },
   "7.41c|largo|20": {
    "changed": 1,
-   "share_delta": 0.563,
+   "share_delta": 0.576,
    "n": [
     84,
-    337
+    366
    ],
    "moves": [
     {
@@ -18956,34 +18956,34 @@
   },
   "7.41c|largo|25": {
    "changed": 1,
-   "share_delta": 0.112,
+   "share_delta": 0.105,
    "n": [
     33,
-    143
+    158
    ]
   },
   "7.41d|winter_wyvern|10": {
    "changed": 1,
-   "share_delta": 0.263,
+   "share_delta": 0.284,
    "n": [
     364,
-    411
+    538
    ]
   },
   "7.41d|kez|10": {
    "changed": 1,
-   "share_delta": 0.031,
+   "share_delta": 0.016,
    "n": [
     573,
-    335
+    410
    ]
   },
   "7.41e|snapfire|15": {
    "changed": 1,
-   "share_delta": -0.128,
+   "share_delta": -0.142,
    "n": [
     919,
-    114
+    126
    ]
   },
   "7.41f|bounty_hunter|20": {
@@ -19000,10 +19000,10 @@
   },
   "7.41f|life_stealer|10": {
    "changed": 1,
-   "share_delta": 0.084,
+   "share_delta": 0.065,
    "n": [
     535,
-    35
+    72
    ]
   }
  }

@@ -15336,100 +15336,100 @@
    "new": "special_bonus_unique_puck_5",
    "sibling": "special_bonus_unique_puck_6",
    "share_old": 0.182,
-   "share_new": 0.177,
-   "delta": -0.005,
+   "share_new": 0.178,
+   "delta": -0.004,
    "n_before": 395,
-   "n_after": 644
+   "n_after": 684
   },
   "7.41c|puck|25": {
    "old": "special_bonus_unique_puck_5",
    "new": "special_bonus_unique_puck",
    "sibling": "special_bonus_unique_puck_rift_radius",
    "share_old": 0.713,
-   "share_new": 0.247,
-   "delta": -0.466,
+   "share_new": 0.25,
+   "delta": -0.463,
    "n_before": 122,
-   "n_after": 291
+   "n_after": 312
   },
   "7.41c|tiny|10": {
    "old": "special_bonus_strength_8",
    "new": "special_bonus_unique_tiny_6",
    "sibling": "special_bonus_unique_tiny_4",
    "share_old": 0.657,
-   "share_new": 0.731,
-   "delta": 0.075,
+   "share_new": 0.724,
+   "delta": 0.068,
    "n_before": 635,
-   "n_after": 1027
+   "n_after": 1095
   },
   "7.41c|tiny|15": {
    "old": "special_bonus_unique_tiny_6",
    "new": "special_bonus_strength_10",
    "sibling": "special_bonus_unique_tiny",
    "share_old": 0.711,
-   "share_new": 0.737,
-   "delta": 0.027,
+   "share_new": 0.733,
+   "delta": 0.023,
    "n_before": 570,
-   "n_after": 917
+   "n_after": 978
   },
   "7.41c|largo|20": {
    "old": "special_bonus_unique_largo_5",
    "new": "special_bonus_unique_largo_8",
    "sibling": "special_bonus_unique_largo_6",
    "share_old": 0.143,
-   "share_new": 0.706,
-   "delta": 0.563,
+   "share_new": 0.719,
+   "delta": 0.576,
    "n_before": 84,
-   "n_after": 337
+   "n_after": 366
   },
   "7.41c|largo|25": {
    "old": "special_bonus_unique_largo_8",
    "new": "special_bonus_unique_largo_5",
    "sibling": "special_bonus_unique_largo_7",
    "share_old": 0.091,
-   "share_new": 0.203,
-   "delta": 0.112,
+   "share_new": 0.196,
+   "delta": 0.105,
    "n_before": 33,
-   "n_after": 143
+   "n_after": 158
   },
   "7.41d|winter_wyvern|10": {
    "old": "special_bonus_attack_damage_35",
    "new": "special_bonus_attack_damage_30",
    "sibling": "special_bonus_unique_winter_wyvern_5",
    "share_old": 0.335,
-   "share_new": 0.599,
-   "delta": 0.263,
+   "share_new": 0.619,
+   "delta": 0.284,
    "n_before": 364,
-   "n_after": 411
+   "n_after": 538
   },
   "7.41d|kez|10": {
    "old": "special_bonus_magic_resistance_12",
    "new": "special_bonus_unique_kez_switch_weapons_swap_bonus",
    "sibling": "special_bonus_unique_kez_raptor_dance_radius",
    "share_old": 0.494,
-   "share_new": 0.525,
-   "delta": 0.031,
+   "share_new": 0.51,
+   "delta": 0.016,
    "n_before": 573,
-   "n_after": 335
+   "n_after": 410
   },
   "7.41e|snapfire|15": {
    "old": "special_bonus_unique_snapfire_3",
    "new": "special_bonus_cast_range_125",
    "sibling": "special_bonus_unique_snapfire_2",
    "share_old": 0.777,
-   "share_new": 0.649,
-   "delta": -0.128,
+   "share_new": 0.635,
+   "delta": -0.142,
    "n_before": 919,
-   "n_after": 114
+   "n_after": 126
   },
   "7.41f|life_stealer|10": {
    "old": "special_bonus_movement_speed_20",
    "new": "special_bonus_movement_speed_15",
    "sibling": "special_bonus_all_stats_4",
    "share_old": 0.602,
-   "share_new": 0.686,
-   "delta": 0.084,
+   "share_new": 0.667,
+   "delta": 0.065,
    "n_before": 535,
-   "n_after": 35
+   "n_after": 72
   }
  }
 }
