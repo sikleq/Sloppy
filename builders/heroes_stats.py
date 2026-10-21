@@ -288,6 +288,22 @@ def _extract_hero_block(version: str, hero: str) -> dict[str, str]:
     return _extract_kv_block(version, "npc_heroes.txt", hero)
 
 
+def _inject_hero_base(snaps: dict[str, dict], raws: dict[str, dict]) -> None:
+    """Give every slim snapshot its npc_dota_hero_base block (the engine
+    defaults every hero inherits: 120 HP, 75 mana, 25% magic resist, …).
+
+    From 7.41f npc_heroes.txt is only a list of `#base` includes and the
+    slim heroes.json lost the base block, so _field fell back to the
+    hand-typed _FIELD_DEFAULTS. heroes_raw.json still carries it — use the
+    game's numbers, so a new base value reaches every hero by itself."""
+    for version, snap in snaps.items():
+        if "npc_dota_hero_base" in snap:
+            continue
+        base = (raws.get(version) or {}).get("npc_dota_hero_base")
+        if base:
+            snap["npc_dota_hero_base"] = {k: base[k] for k in _FIELD_DEFAULTS if k in base}
+
+
 def _inject_spirit_bear(snaps: dict[str, dict], raws: dict[str, dict]) -> None:
     """Expose Spirit Bear in Hero Stats without pretending it is in heroes.json.
 
@@ -1419,6 +1435,7 @@ def render_html() -> str:
     snaps = {v: _json.loads((STATS_DIR / v / "heroes.json").read_text(encoding="utf-8"))
              for v in versions}
     raws = {v: _load_raw_heroes(v) for v in versions}
+    _inject_hero_base(snaps, raws)
     _inject_spirit_bear(snaps, raws)
     latest = versions[-1]
     cur = snaps[latest]

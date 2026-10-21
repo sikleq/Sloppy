@@ -27,6 +27,7 @@ from heroes_stats import (
     _load_display_names,
     _display_name,
     _load_raw_heroes,
+    _inject_hero_base,
     _inject_spirit_bear,
     _row_stats,
     _attack_type,
@@ -1329,6 +1330,7 @@ def _load_heroes(version: str) -> list[dict]:
     raw = _load_raw_heroes(version)
     snaps = {version: snap}
     raws = {version: raw}
+    _inject_hero_base(snaps, raws)
     _inject_spirit_bear(snaps, raws)
     snap, raw = snaps[version], raws[version]
     names = _load_display_names()
