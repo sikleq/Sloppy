@@ -23,6 +23,10 @@ def test_the_boar_card_opens_summon_razorback():
 def test_enchant_change_table_heads_its_stats_column():
     import re
     from pathlib import Path
-    html = (Path(__file__).resolve().parents[1] / "dist" / "patches" / "7.41.html").read_text(encoding="utf-8")
+    import pytest
+    page = Path(__file__).resolve().parents[1] / "dist" / "patches" / "7.41.html"
+    if not page.exists():
+        pytest.skip("site not built")
+    html = page.read_text(encoding="utf-8")
     assert re.search(r'class="ench-tiers ench-change"><span class="ench-row-h"><span class="ench-stat-h">Stats</span>',
                      html)
