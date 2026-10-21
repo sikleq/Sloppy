@@ -1057,8 +1057,8 @@ def ability(title, slug=None, innate=None, icon_url=None, sub=False, old_title=N
 def _renamed_title(old, new):
     if not old or old == new:
         return new
-    return (f'<span class="ability-title-old">{old}</span><span class="ability-title-arrow">→</span>'
-            f'<span class="ability-title-new">{new}</span>')
+    return (f'<span class="ability-title-rename"><span class="ability-title-old">{old}</span>'
+            f'<span class="ability-title-arrow">→</span><span class="ability-title-new">{new}</span></span>')
 
 
 def facet_header(slug):
