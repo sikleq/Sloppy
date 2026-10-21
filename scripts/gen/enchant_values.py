@@ -104,4 +104,6 @@ def main(versions):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:] or ["7.41"])
+    if len(sys.argv) < 2:
+        sys.exit("usage: python scripts/gen/enchant_values.py <version> - the patch to build (no default: a new patch passes its own)")
+    main(sys.argv[1:])

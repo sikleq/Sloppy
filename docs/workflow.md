@@ -15,8 +15,9 @@ order derived from `patch/meta.py` — there is no manual import list to edit.
 
 Add the new version to `patch/meta.py` → `RELEASE_HISTORY`: `version` + `date` (+ `filename`
 `patches/<version>.html`) in its chronological place. `PATCHES` (the nav dropdown) is derived from it and from the
-`content/p*.py` files automatically; `tests/test_patch_picker.py` fails when a page misses the picker. Also bump
-`PATCH_ENTRY_COUNTS` in `patch/page.py`.
+`content/p*.py` files automatically; `tests/test_patch_picker.py` fails when a page misses the picker. Nothing
+else holds a version: scripts that need one take it as an argument or read the newest patch from `RELEASE_HISTORY`
+(the hand-kept `PATCH_ENTRY_COUNTS` table is gone, 2026-10-21: nothing on the site read it).
 
 ## Step 2 — Fetch the full data snapshot
 
@@ -117,13 +118,12 @@ Gate: `tests/test_snapshots_fresh.py` fails when `patchnotes_english.txt` has no
 `DOTA_Patch_<version>_` keys for the newest patch in `patch/meta.py`, or when a
 hero in `data/stats/<latest>/heroes.json` is absent from `herolist.json`.
 
-Also bump per patch: `PATCH_ENTRY_COUNTS` in `patch/page.py` (calendar
-"extra-major" highlight) and, for a patch that ships a new map file, its Terrain page: render the map, add its
+For a patch that ships a new map file, its Terrain page: render the map, add its
 picture + mapdata + `data/map/patch_maps.json` / `renders.json` rows, `python scripts/gen/build_terrain_diff.py`
 (docs/terrain.md, "One page per patch"), then `python scripts/gen/terrain_audit.py <patch>` against the notes and
 add every map change no note mentions to docs/terrain.md's "Map changes no note mentions" (tracked every patch, the
-owner 2026-10-02); for a new major, the `terrain_XXX.html` nav link (`builders/site_common.py`)
-and index tile (`patch/index_page.py`).
+owner 2026-10-02). The Terrain nav link and the index tile find the newest Terrain page themselves
+(`site_common.latest_terrain_href` → `terrain.latest_page_file`).
 
 ## Step 2c — Refresh the external data behind the weights
 

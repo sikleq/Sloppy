@@ -30,7 +30,8 @@ Dota 2 Patch Notes — Extractor & Auto-Uploader
 
 4. Токен не нужен, если на ПК выполнен вход в GitHub CLI (`gh auth login`, права repo).
    Иначе — переменная окружения SLOPPY_GITHUB_TOKEN (см. github_token() ниже).
-5. Вставить текущую версию патча в PATCH_VERSION ниже.
+5. Версию патча вписывать не надо: берётся самый новый патч из patch/meta.py
+   (или аргументом: python extract_patchnotes.py 7.42).
 
 ВАЖНО ⚠ : храни этот файл у себя на ПК. НЕ заливай его никуда —
 там твой персональный токен. Если случайно засветил — отозвать
@@ -84,8 +85,17 @@ def github_token() -> str:
     return out.stdout.strip() if out.returncode == 0 else ""
 
 
-# Версия патча — меняй при каждом новом патче, например "7.42"
-PATCH_VERSION = "7.41f"
+def _patch_version() -> str:
+    """Версия патча: аргумент запуска (`python extract_patchnotes.py 7.42`), иначе самый новый патч из
+    `patch/meta.py` RELEASE_HISTORY. В коде версию не держим: 7.41c/d перезаписали прошлый патч из-за забытой правки."""
+    if len(sys.argv) > 1:
+        return sys.argv[1]
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from patch.meta import _current_version
+    return _current_version() or ""
+
+
+PATCH_VERSION = _patch_version()
 
 # Путь к папке dota (там, где pak01_dir.vpk).
 # Если Steam стоит на другом диске — поправь.

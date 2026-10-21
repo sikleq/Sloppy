@@ -9,6 +9,7 @@ source of truth for:
 Keeping these here means the two builders stay decoupled — neither has to
 import the other — while the header stays identical across every page.
 """
+import functools as _functools
 import hashlib as _hashlib
 import os as _os
 
@@ -97,6 +98,8 @@ NAV_TABS = [
 #   (group_key, group_label, group_href, [ (child_key, child_label, child_href|None), ... ])
 # child_href=None ⇒ an unbuilt "soon" placeholder (Summons / Lane Creeps).
 # The Changes page opens each group and stands first in it (owner 2026-10-21).
+# TERRAIN_LATEST stands for the newest Terrain page; resolve_href() turns it into terrain_<patch>.html.
+TERRAIN_LATEST = "<terrain-latest>"
 MATERIALS_GROUPS = [
     ("creeps_grp", "Creeps", "unit_changes.html", [
         ("unit_changes", "Unit Changes",   "unit_changes.html"),
@@ -120,13 +123,25 @@ MATERIALS_GROUPS = [
     ]),
     # Terrain Stats nests under Terrain (the owner 2026-10-04: "a sub-tab of the Terrain button — Terrain Stats,
     # with more info"): the map history 7.08 → now, builders/terrain_stats.py
-    ("terrain_grp", "Terrain", "terrain_741.html", [
-        ("terrain",       "Terrain",       "terrain_741.html"),
+    ("terrain_grp", "Terrain", TERRAIN_LATEST, [
+        ("terrain",       "Terrain",       TERRAIN_LATEST),
         ("terrain_stats", "Terrain Stats", "terrain_stats.html"),
     ]),
     # Buildings / map objectives — towers, barracks, tormentors.
     ("structures", "Structures", "structures.html", None),
 ]
+
+
+@_functools.lru_cache(maxsize=None)
+def latest_terrain_href():
+    """The newest Terrain page (terrain_<patch>.html), found from the map data — a new patch needs no edit here."""
+    from builders import terrain     # terrain imports this module: import it lazily
+    return terrain.latest_page_file()
+
+
+def resolve_href(href):
+    """A Materials href as written in the page: TERRAIN_LATEST becomes the newest Terrain page."""
+    return latest_terrain_href() if href == TERRAIN_LATEST else href
 
 
 def get_materials_label(active_key):
@@ -291,7 +306,7 @@ def render_materials_subnav(active, prefix=""):
                 continue
             # Plain link (Terrain — no children).
             cls = "nav-subtab" + (" active" if active == gkey else "")
-            parts.append(f'<a class="{cls}" href="{prefix}{ghref}">{glabel}</a>')
+            parts.append(f'<a class="{cls}" href="{prefix}{resolve_href(ghref)}">{glabel}</a>')
             continue
         # Flatten child + grandchild keys so the group highlights when any
         # descendant page is active.
@@ -311,7 +326,7 @@ def render_materials_subnav(active, prefix=""):
                 return (f'<span class="nav-subitem nav-subitem-soon" aria-disabled="true">'
                         f'{clabel}<span class="nav-soon-tag">soon</span></span>')
             icls = "nav-subitem" + (" active" if active == ckey else "")
-            return f'<a class="{icls}" href="{prefix}{chref}">{clabel}</a>'
+            return f'<a class="{icls}" href="{prefix}{resolve_href(chref)}">{clabel}</a>'
 
         items = []
         for node in children:
@@ -322,7 +337,7 @@ def render_materials_subnav(active, prefix=""):
                 pcls = "nav-subitem nav-subitem-parent" + (
                     " active" if active == node[0] else "")
                 trigger = (
-                    f'<a class="{pcls}" href="{prefix}{node[2]}">{node[1]}'
+                    f'<a class="{pcls}" href="{prefix}{resolve_href(node[2])}">{node[1]}'
                     f'<span class="nav-caret nav-caret-side" aria-hidden="true">'
                     f'▸</span></a>')
                 flyout = ('<div class="nav-submenu nav-submenu-flyout">'
@@ -332,7 +347,7 @@ def render_materials_subnav(active, prefix=""):
                     f'{trigger}{flyout}</div>')
             else:
                 items.append(_item(node))
-        trigger = (f'<a class="{trig_cls}" href="{prefix}{ghref}">'
+        trigger = (f'<a class="{trig_cls}" href="{prefix}{resolve_href(ghref)}">'
                    f'<span class="nav-subtab-label">{glabel}</span>'
                    f'<span class="nav-caret" aria-hidden="true">▾</span></a>')
         menu = f'<div class="nav-submenu">{"".join(items)}</div>'

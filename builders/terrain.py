@@ -31,6 +31,7 @@ import glob as _glob
 import json as _json
 import math as _math
 import os as _os
+import re as _re
 import sys as _sys
 
 _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
@@ -40,10 +41,15 @@ import builders.site_common as _site
 import builders.map_versions as _map_versions
 ASSET_VERSION = _site.compute_asset_version()
 
-OLD_VER = "7.40"
-NEW_VER = "7.41"
-OLD_MAP = f"icons/maps/map_{OLD_VER}.webp"
-NEW_MAP = f"icons/maps/map_{NEW_VER}.webp"
+
+
+def _newest_map_img():
+    """The newest map picture we hold (icons/maps/map_<ver>.webp) — the fallback's blurred backdrop, so a new
+    patch never needs a version written here."""
+    maps_dir = _os.path.join(_os.path.dirname(_site.DIST_DIR), "icons", "maps")
+    vers = [m.group(1) for f in _os.listdir(maps_dir)
+            if (m := _re.fullmatch(r"map_(\d+\.\d+[a-z]*)\.webp", f))]
+    return f"icons/maps/map_{max(vers, key=_map_versions.ver_key)}.webp"
 
 # Map markers are toggleable layers (off by default; the toolbar buttons reveal
 # them): Trees + Camps + the 10 point-entity layers, each split old/new by the
@@ -1645,7 +1651,7 @@ def _fallback_html(ver):
     so the page stays useful before the art lands."""
     return (
         '<div class="terrain-fallback">\n'
-        f'  <img class="tc-fallback-img" src="{NEW_MAP}?v={ASSET_VERSION}" '
+        f'  <img class="tc-fallback-img" src="{_newest_map_img()}?v={ASSET_VERSION}" '
         'alt="" draggable="false" loading="lazy">\n'
         '  <div class="tc-fallback-veil"></div>\n'
         '  <div class="tc-fallback-msg">\n'
@@ -1726,7 +1732,13 @@ def page_patches():
     steps = {s.patch: s for s in _map_versions.steps()}
     diffs = {p: _load_diff(p) for p in steps}
     quiet = _quiet(steps, notes, diffs)
-    return (_pages([p for p in steps if p not in quiet], notes) or ["7.41"]), notes, steps, diffs
+    newest = max(_map_versions.load_patch_maps(), key=_map_versions.ver_key)
+    return (_pages([p for p in steps if p not in quiet], notes) or [newest]), notes, steps, diffs
+
+
+def latest_page_file():
+    """terrain_<newest page>.html — where the Terrain tab and the index tile point."""
+    return _terrain_filename(page_patches()[0][0])
 
 
 def save_terrain_html():

@@ -70,57 +70,14 @@ SOURCE_FILES = {
 # и для diff'а свойств способностей это самый честный источник.
 HEROES_DIR_PATH = "game/dota/pak01_dir/scripts/npc/heroes"
 
-# Патчи которые нас интересуют (только те, что покрыты muk-as — c 7.33, апрель 2023)
-# Порядок важен: от новых к старым
-RELEASE_HISTORY = [
-    # 7.41 cycle
-    {"version": "7.41c", "date": "06.05.2026"},
-    {"version": "7.41b", "date": "07.04.2026"},
-    {"version": "7.41a", "date": "28.03.2026"},
-    {"version": "7.41",  "date": "24.03.2026"},
-    # 7.40 cycle
-    {"version": "7.40c", "date": "21.01.2026"},
-    {"version": "7.40b", "date": "23.12.2025"},
-    {"version": "7.40",  "date": "15.12.2025"},
-    # 7.39 cycle
-    {"version": "7.39e", "date": "02.10.2025"},
-    {"version": "7.39d", "date": "05.08.2025"},
-    {"version": "7.39c", "date": "24.06.2025"},
-    {"version": "7.39b", "date": "29.05.2025"},
-    {"version": "7.39",  "date": "21.05.2025"},
-    # 7.38 cycle
-    {"version": "7.38c", "date": "27.03.2025"},
-    {"version": "7.38b", "date": "05.03.2025"},
-    {"version": "7.38",  "date": "19.02.2025"},
-    # 7.37 cycle
-    {"version": "7.37e", "date": "19.11.2024"},
-    {"version": "7.37d", "date": "01.10.2024"},
-    {"version": "7.37c", "date": "28.08.2024"},
-    {"version": "7.37b", "date": "14.08.2024"},
-    {"version": "7.37",  "date": "31.07.2024"},
-    # 7.36 cycle
-    {"version": "7.36c", "date": "24.06.2024"},
-    {"version": "7.36b", "date": "05.06.2024"},
-    {"version": "7.36a", "date": "26.05.2024"},
-    {"version": "7.36",  "date": "22.05.2024"},
-    # 7.35 cycle
-    {"version": "7.35d", "date": "21.03.2024"},
-    {"version": "7.35c", "date": "21.02.2024"},
-    {"version": "7.35b", "date": "21.12.2023"},
-    {"version": "7.35",  "date": "14.12.2023"},
-    # 7.34 cycle
-    {"version": "7.34e", "date": "20.11.2023"},
-    {"version": "7.34d", "date": "05.10.2023"},
-    {"version": "7.34c", "date": "08.09.2023"},
-    {"version": "7.34b", "date": "14.08.2023"},
-    {"version": "7.34",  "date": "08.08.2023"},
-    # 7.33 cycle (muk-as начался с апреля 2023)
-    {"version": "7.33e", "date": "13.07.2023"},
-    {"version": "7.33d", "date": "15.06.2023"},
-    {"version": "7.33c", "date": "13.05.2023"},
-    {"version": "7.33b", "date": "25.04.2023"},
-    {"version": "7.33",  "date": "20.04.2023"},
-]
+# Патчи которые нас интересуют: все из patch/meta.py RELEASE_HISTORY (один список на весь проект — новый патч
+# сюда не вписывать), только те, что покрыты muk-as (с 7.33, апрель 2023). Порядок: от новых к старым.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from patch.meta import RELEASE_HISTORY as _ALL_RELEASES, _parse_date  # noqa: E402
+
+MUK_AS_FIRST = "20.04.2023"
+RELEASE_HISTORY = sorted((p for p in _ALL_RELEASES if _parse_date(p["date"]) >= _parse_date(MUK_AS_FIRST)),
+                         key=lambda p: _parse_date(p["date"]), reverse=True)
 
 # Поля которые извлекаем из npc_heroes.txt для каждого героя
 HERO_FIELDS = {

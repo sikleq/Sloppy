@@ -153,5 +153,7 @@ def main(versions):
 
 
 if __name__ == "__main__":
-    vers = sys.argv[1:] or ["7.40", "7.41"]
+    if len(sys.argv) < 2:
+        sys.exit("usage: python scripts/gen/build_terrain_maps.py <old> <new> - the two patches to stitch")
+    vers = sys.argv[1:]
     main(vers)

@@ -31,7 +31,7 @@ def save_index_html():
     _INV_LINKS = {
         'patch':    ('Patches',    f'patches/{latest}.html' if latest else 'calendar.html'),
         'calendar': ('Calendar',   'calendar.html'),
-        'terrain':  ('Terrain',    'terrain_741.html'),
+        'terrain':  ('Terrain',    _site.latest_terrain_href()),
     }
     # Arcana (Neutral Abilities) lives under the Materials sub-nav, so it has no
     # hub tile of its own.

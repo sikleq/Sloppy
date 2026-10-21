@@ -160,5 +160,7 @@ def main(version, prev):
 
 if __name__ == "__main__":
     from patch.weights import _prev_version
-    v = sys.argv[1] if len(sys.argv) > 1 else "7.41"
+    if len(sys.argv) < 2:
+        sys.exit("usage: python scripts/gen/enchant_table.py <version> [<previous>] <version> - the patch to build (no default: a new patch passes its own)")
+    v = sys.argv[1]
     main(v, sys.argv[2] if len(sys.argv) > 2 else _prev_version(v))

@@ -36,12 +36,9 @@ def _code(ver):
 
 def check_meta(ver):
     from patch.meta import RELEASE_HISTORY
-    from patch.page import PATCH_ENTRY_COUNTS
     entry = next((e for e in RELEASE_HISTORY if e["version"] == ver), None)
     yield ("Registration", "RELEASE_HISTORY (patch/meta.py)",
            ("OK", entry["date"]) if entry else ("MISSING", "add version + date"))
-    yield ("Registration", "PATCH_ENTRY_COUNTS (patch/page.py)",
-           ("OK", str(PATCH_ENTRY_COUNTS[ver])) if ver in PATCH_ENTRY_COUNTS else ("MISSING", "calendar highlight"))
 
 
 def _latest():

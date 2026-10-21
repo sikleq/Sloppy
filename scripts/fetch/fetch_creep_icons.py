@@ -10,12 +10,14 @@ try:
 except ImportError:
     print("pip install requests"); sys.exit(1)
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+from patch.meta import latest_stats_version  # noqa: E402
 UNITS_DIR = ROOT / "icons" / "units"
 UNITS_DIR.mkdir(parents=True, exist_ok=True)
 CDN = "https://cdn.steamstatic.com/apps/dota2/images/dota_react/units/"
 
-units = json.loads((ROOT / "data" / "stats" / "7.41c" / "units.json").read_text(encoding='utf-8'))
+units = json.loads((ROOT / "data" / "stats" / latest_stats_version() / "units.json").read_text(encoding='utf-8'))
 slugs = sorted(k for k in units if k.startswith('npc_dota_neutral_'))
 
 # Hero-summoned units we surface alongside neutrals in the creeps table.
