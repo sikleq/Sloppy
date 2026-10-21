@@ -3267,6 +3267,17 @@ function ecPinnableTip(tip, show, hide, sel) {
   search.addEventListener('input', apply);
 })();
 
+// Medusa Mana Shield damage per mana at a hero level, from an innate-rules entry
+// (Hero Stats + Hero Lab): dpm_base + dpm_per_level·level, or the old leveled
+// ability's dpm_ranks (rank = floor((level + 1) / 2), assumes max rank).
+function innateDpm(entry, level) {
+  if (Array.isArray(entry.dpm_ranks)) {
+    const r = entry.dpm_ranks;
+    return r[Math.min(r.length - 1, Math.max(0, Math.floor((level + 1) / 2)))];
+  }
+  return (Number(entry.dpm_base) || 0) + (Number(entry.dpm_per_level) || 0) * level;
+}
+
 // ---- HERO STATS (heroes_stats.html): Base / Starting / Expanded view ----
 // Reuses the mr-table front-end (sort / heatmap / search / stat-hist tooltips).
 // Three modes via the View dropdown (mirrors Neutral Creeps):
@@ -3289,6 +3300,10 @@ function ecPinnableTip(tip, show, hide, sel) {
   const innatesToggle = document.getElementById('hs-innates-toggle');
   const _innateRulesEl = document.getElementById('hs-innate-rules');
   const _innateRules = _innateRulesEl ? JSON.parse(_innateRulesEl.textContent) : {};
+  // Attribute constants (HP per Str, armor per Agi, …) come from the page —
+  // builders/heroes_stats.py embeds patch/game_constants.for_js(); no numbers here.
+  const _constEl = document.getElementById('hs-game-constants');
+  const C = _constEl ? JSON.parse(_constEl.textContent) : {};
   const attackBtns = [...document.querySelectorAll('.hs-attack-filter')];
   const attrBtns = [...document.querySelectorAll('.hs-attr-filter[data-attr-filter]')];
   const cells = [...table.querySelectorAll('tbody td[data-col]')];
@@ -3325,9 +3340,13 @@ function ecPinnableTip(tip, show, hide, sel) {
   const ehpPhys = (hp, armor) => Math.round(hp / Math.max(0.01, 1 - armorFactor(armor)));
   const ehpMag = (hp, mr) => Math.round(hp / Math.max(0.01, 1 - mr / 100));
   const plus2CountAt = level => PLUS2_LEVELS.filter(l => l <= level).length;
+  // Techies M.A.D.: share of the mana pool as mana regen, from the embedded
+  // innate rules (KV bonus_mana_as_mana_regen; followed per patch by the builder).
   const techiesPoolPctAt = level => {
+    const e = innateEntry('techies', 'mpr', 'mana_pool_pct_per_level');
+    if (!e) return 0;
     const lvl = Math.max(1, Number(level) || 1);
-    return 0.001 + lvl * 0.0001;
+    return e.base_pct + lvl * e.per_level_pct;
   };
   const attrsAt = (s, level, includePlus2) => {
     const bonus = includePlus2 ? plus2CountAt(level) * 2 : 0;
@@ -3370,9 +3389,16 @@ function ecPinnableTip(tip, show, hide, sel) {
     }
     return null;
   };
+  // Active entry of one hero's innate effect at the table's patch (null if none) —
+  // Techies / Medusa / Void Spirit / Ogre Magi numbers come from here, not from code.
+  const innateEntry = (slug, target, formula) => {
+    const eff = (_innateRules[slug]?.effects || []).find(e => e.target === target && e.formula === formula);
+    const entry = eff ? _activeEntry(eff, hsTablePatch) : null;
+    return entry ? { ...eff, ...entry } : null;      // entry fields over the effect's own
+  };
   // secondary_attr_factor constants: derived-stat-per-attr unit rates.
   const _SEC = {
-    'hpr:str': 0.1, 'mpr:int': 0.05, 'aspd:agi': 1.0, 'armor:agi': 0.16667, 'mr:int': 0.1,
+    'hpr:str': C.hprStr, 'mpr:int': C.mprInt, 'aspd:agi': C.asAgi, 'armor:agi': C.armorAgi, 'mr:int': C.mrInt,
   };
   // Generic innate stat bonus dispatcher. Reads from embedded hero_stat_innates.json.
   // startHp is only needed for hp_pct formula (Ursa dmg).
@@ -3432,7 +3458,7 @@ function ecPinnableTip(tip, show, hide, sel) {
     if (!eff) return 0;
     const entry = _activeEntry(eff, hsTablePatch);
     if (!entry) return 0;
-    return (num(s.armor) + a.agi * 0.16667) * entry.factor;
+    return (num(s.armor) + a.agi * C.armorAgi) * entry.factor;
   };
   // Drow — Trueshot: self-referential AGI bonus, folded into agi before all derived stats.
   const drowAgiBonus = (s, rawA, level) => {
@@ -3449,16 +3475,13 @@ function ecPinnableTip(tip, show, hide, sel) {
   // it soaks raw pre-mitigation damage, every mana point adds a FLAT, armor/
   // resist-independent 0.98·dpm to BOTH physical and magical EHP.
   //
-  // dpm has changed across patches (values taken from KV files, see
-  // data/stats/<patch>/heroes/npc_dota_hero_medusa.txt):
-  //   ≤ 7.36c — leveled ability: 2/2.4/2.8/3.2/3.6 (assumes max rank at L30+)
-  //   7.37    — 2.4   (became innate with 7.36 hero-rework cycle)
-  //   7.38..7.39d — 2.2
-  //   7.39e..7.40c — 2.0
-  //   7.41a+  — 2 + 0.1·level   (current; Liquipedia EHP: 2.058/mp L1 → 4.9/mp L30)
+  // dpm and the absorbed share come from the embedded innate rules (medusa →
+  // mana_shield_ehp: dpm_base + dpm_per_level·level, or dpm_ranks for the old
+  // leveled ability; absorb_pct) — the builder follows KV damage_per_mana /
+  // absorption_pct for every new patch (7.41a+: 2 + 0.1·level, 98%).
   // We compare patch strings via the helpers below (same as `_ge` in the
-  // Python side). absorption_pct = 98 across every version checked.
-  const hsTablePatch = (table.dataset.patch || '7.41d');
+  // Python side).
+  const hsTablePatch = table.dataset.patch || '';   // the builder stamps the latest stats patch
   const patchKey = v => {
     const m = String(v || '').match(/^7\.(\d+)([a-z]?)/);
     if (!m) return [0, 0];
@@ -3468,25 +3491,17 @@ function ecPinnableTip(tip, show, hide, sel) {
     const [x1, y1] = patchKey(a), [x2, y2] = patchKey(b);
     return x1 !== x2 ? x1 > x2 : y1 >= y2;
   };
-  const medusaDpm = (level) => {
-    const v = hsTablePatch;
-    if (patchGe(v, '7.41a')) return 2 + 0.1 * level;
-    if (patchGe(v, '7.39e')) return 2.0;
-    if (patchGe(v, '7.38'))  return 2.2;
-    if (patchGe(v, '7.37'))  return 2.4;
-    // ≤7.36c: skill with ranks 1-4 → assume max-ranked at hero level ≥ 7.
-    const ranks = [2, 2, 2.4, 2.8, 3.2, 3.6];
-    return ranks[Math.min(5, Math.max(0, Math.floor((level + 1) / 2)))];
-  };
   const manaShieldEhp = (s, mana, level) => {
     if (!innatesToggle?.checked || s.slug !== 'medusa') return 0;
-    return mana * 0.98 * medusaDpm(level);
+    const e = innateEntry('medusa', 'ehp', 'mana_shield_ehp');
+    return e ? mana * e.absorb_pct * innateDpm(e, level) : 0;
   };
   const primaryDmg = (s, a) => {
     if (s.attr === 'str') return Math.floor(a.str);
     if (s.attr === 'agi') return Math.floor(a.agi);
     if (s.attr === 'int') return Math.floor(a.int);
-    const mult = s.slug === 'void_spirit' ? 0.45 * 1.15 : 0.45;
+    const edge = innateEntry(s.slug, 'dmg', 'dmg_universal_bonus_pct');   // Void Spirit Intrinsic Edge
+    const mult = edge ? C.uniDmg * (1 + edge.factor) : C.uniDmg;
     return Math.floor((a.str + a.agi + a.int) * mult);
   };
   const valueFor = (s, col, mode, level) => {
@@ -3500,11 +3515,12 @@ function ecPinnableTip(tip, show, hide, sel) {
     };
     const wa = wholeAttrs(a);
     const baseAs = num(s.bas);
-    const startAs = baseAs + a.agi + innate('aspd', s, a, effectiveLevel);
-    const startArmor = num(s.armor) + a.agi / 6 + innate('armor', s, a, effectiveLevel);
-    const startMr = num(s.mr) + a.int * 0.1;
+    const startAs = baseAs + a.agi * C.asAgi + innate('aspd', s, a, effectiveLevel);
+    // divide by Agility-per-armor (6), not multiply by 1/6: an exact half (12.95) keeps rounding up
+    const startArmor = num(s.armor) + a.agi / (1 / C.armorAgi) + innate('armor', s, a, effectiveLevel);
+    const startMr = num(s.mr) + a.int * C.mrInt;
     const rawHp = num(s.hp);
-    const startHp = Math.round(rawHp + wa.str * 22 + innate('hp', s, a, effectiveLevel));
+    const startHp = Math.round(rawHp + wa.str * C.hpStr + innate('hp', s, a, effectiveLevel));
     // bonusDmg references startHp (Ursa Maul = % of current HP), so compute it
     // AFTER startHp. primaryDmg = the universal attribute-to-damage; innateDmg
     // adds Sven/Luna/Ursa on top.
@@ -3513,17 +3529,20 @@ function ecPinnableTip(tip, show, hide, sel) {
     const rawManaRegen = s.slug === 'huskar' ? 0 : num(s.mpr);
     const startMana = (() => {
       if (s.slug === 'huskar') return 0;
-      if (s.slug === 'ogre_magi') return Math.round(num(s.mp) + wa.str * 6 + wa.int * 12);
-      return Math.round(num(s.mp) + wa.int * 12);
+      // Ogre Magi Dumb Luck: mana / mana regen per Strength from the innate rules
+      const ogreMp = s.slug === 'ogre_magi' && innateEntry('ogre_magi', 'mp', 'attr_substitution');
+      if (ogreMp) return Math.round(num(s.mp) + wa.str * ogreMp.factor + wa.int * C.mpInt);
+      return Math.round(num(s.mp) + wa.int * C.mpInt);
     })();
     const startManaRegen = (() => {
       if (s.slug === 'huskar') return 0;
-      const techiesPoolPct = techiesPoolPctAt(effectiveLevel); // 0.10% + 0.01% per level
+      const techiesPoolPct = techiesPoolPctAt(effectiveLevel); // KV share of the pool per level
       const techiesPoolRegen = (innatesToggle?.checked && s.slug === 'techies')
         ? startMana * techiesPoolPct
         : 0;
-      if (s.slug === 'ogre_magi') return num(s.mpr) + a.str * 0.02 + a.int * 0.05;
-      return (num(s.mpr) + wa.int * 0.05 + innate('mpr', s, a, effectiveLevel) + techiesPoolRegen) * innateMult('mpr', s, effectiveLevel);
+      const ogreMpr = s.slug === 'ogre_magi' && innateEntry('ogre_magi', 'mpr', 'attr_substitution');
+      if (ogreMpr) return num(s.mpr) + a.str * ogreMpr.factor + a.int * C.mprInt;
+      return (num(s.mpr) + wa.int * C.mprInt + innate('mpr', s, a, effectiveLevel) + techiesPoolRegen) * innateMult('mpr', s, effectiveLevel);
     })();
     const start = mode !== 'base';
     switch (col) {
@@ -3536,7 +3555,7 @@ function ecPinnableTip(tip, show, hide, sel) {
         const shield = start ? manaShieldEhp(s, startMana, effectiveLevel) : 0;
         return [ehpMag(start ? startHp : rawHp, start ? startMr : num(s.mr)) + shield, g0];
       }
-      case 'hpr': return [start ? (num(s.hpr) + wa.str * 0.1 + innate('hpr', s, a, effectiveLevel)) * innateMult('hpr', s, effectiveLevel) : num(s.hpr), regen];
+      case 'hpr': return [start ? (num(s.hpr) + wa.str * C.hprStr + innate('hpr', s, a, effectiveLevel)) * innateMult('hpr', s, effectiveLevel) : num(s.hpr), regen];
       case 'mp': return [start ? startMana : rawMana, g0];
       case 'mpr': return [start ? startManaRegen : rawManaRegen, regen];
       case 'str': return [a.str, g];
@@ -4039,10 +4058,9 @@ function ecShopMarkup(panels) {
     Weapons: ['lesser_crit','maelstrom','invis_sword','desolator','basher','mage_slayer','bfury','monkey_king_bar','manta','heavens_halberd','radiance','greater_crit','butterfly','silver_edge','satanic','abyssal_blade','mjollnir','rapier','revenants_brooch','nullifier'],
     Armaments: ['sange','yasha','kaya','witch_blade','diffusal_blade','dragon_lance','echo_sabre','devastator','sange_and_yasha','kaya_and_sange','yasha_and_kaya','harpoon','hurricane_pike','disperser','specialists_array','hydras_breath','skadi','arcane_blink','swift_blink','overwhelming_blink'],
   };
-  const C = {
-    hpStr: 22, hprStr: 0.1, mpInt: 12, mprInt: 0.05,
-    armorAgi: 1 / 6, mrInt: 0.1, asAgi: 1, uniDmg: 0.45,
-  };
+  // Attribute constants from the page (builders/hero_lab.py embeds
+  // patch/game_constants.for_js()) — one source for Python and JS.
+  const C = data.constants || {};
   const METRICS = [
     ['hp', 'HP'], ['mp', 'MP'], ['hpr', 'HP/sec'], ['mpr', 'MP/sec'],
     ['str', 'Strength'], ['agi', 'Agility'], ['int', 'Intelligence'],
@@ -4150,9 +4168,9 @@ function ecShopMarkup(panels) {
     const [x1, y1] = patchKey(a), [x2, y2] = patchKey(b);
     return x1 !== x2 ? x1 > x2 : y1 >= y2;
   };
-  const currentPatch = data.patch || root.dataset.patch || '7.41d';
+  const currentPatch = data.patch || root.dataset.patch || '';
   const _SEC = {
-    'hpr:str': 0.1, 'mpr:int': 0.05, 'aspd:agi': 1.0, 'armor:agi': 0.16667, 'mr:int': 0.1,
+    'hpr:str': C.hprStr, 'mpr:int': C.mprInt, 'aspd:agi': C.asAgi, 'armor:agi': C.armorAgi, 'mr:int': C.mrInt,
   };
 
   function heroLabInnatesOn() {
@@ -4184,6 +4202,14 @@ function ecShopMarkup(panels) {
       }
     }
     return null;
+  }
+
+  // Active entry of one hero's innate effect (entry fields over the effect's own),
+  // null if none — Medusa / Void Spirit / Ogre Magi numbers come from the rules.
+  function innateEntry(slug, target, formula) {
+    const eff = (innateRules[slug]?.effects || []).find(e => e.target === target && e.formula === formula);
+    const entry = eff ? activeEntry(eff, currentPatch) : null;
+    return entry ? { ...eff, ...entry } : null;
   }
 
   function heroLabInnate(key, s, a, level, startHp, includeInnates) {
@@ -4278,7 +4304,7 @@ function ecShopMarkup(panels) {
     if (!eff) return 0;
     const entry = activeEntry(eff, currentPatch);
     if (!entry) return 0;
-    return ((Number(s.armor) || 0) + a.agi * 0.16667) * entry.factor;
+    return ((Number(s.armor) || 0) + a.agi * C.armorAgi) * entry.factor;
   }
 
   function drowAgiBonus(s, rawA, level, includeInnates) {
@@ -4291,27 +4317,23 @@ function ecShopMarkup(panels) {
     return rawA.agi * (entry.base_pct + entry.per_level_pct * (level || 1));
   }
 
-  function medusaDpm(level) {
-    const v = currentPatch;
-    if (patchGe(v, '7.41a')) return 2 + 0.1 * level;
-    if (patchGe(v, '7.39e')) return 2.0;
-    if (patchGe(v, '7.38')) return 2.2;
-    if (patchGe(v, '7.37')) return 2.4;
-    const ranks = [2, 2, 2.4, 2.8, 3.2, 3.6];
-    return ranks[Math.min(5, Math.max(0, Math.floor((level + 1) / 2)))];
-  }
-
   function manaShieldEhp(s, mana, level, includeInnates) {
     if (!includeInnates || s.slug !== 'medusa') return 0;
-    return mana * 0.98 * medusaDpm(level);
+    const e = innateEntry('medusa', 'ehp', 'mana_shield_ehp');   // absorb_pct + damage per mana
+    return e ? mana * e.absorb_pct * innateDpm(e, level) : 0;
+  }
+
+  // Void Spirit Intrinsic Edge: (1 + factor) on the Universal damage per attribute.
+  function universalDmgMult(s, includeInnates) {
+    const edge = includeInnates ? innateEntry(s.slug, 'dmg', 'dmg_universal_bonus_pct') : null;
+    return edge ? C.uniDmg * (1 + edge.factor) : C.uniDmg;
   }
 
   function primaryDmg(s, a, includeInnates) {
     if (s.attr === 'str') return Math.floor(a.str);
     if (s.attr === 'agi') return Math.floor(a.agi);
     if (s.attr === 'int') return Math.floor(a.int);
-    const mult = includeInnates && s.slug === 'void_spirit' ? 0.45 * 1.15 : 0.45;
-    return Math.floor((a.str + a.agi + a.int) * mult);
+    return Math.floor((a.str + a.agi + a.int) * universalDmgMult(s, includeInnates));
   }
 
   function renderPanel(panel, side, heroId) {
@@ -4729,8 +4751,11 @@ function ecShopMarkup(panels) {
     const a = { str: liveAttrs.str, agi: liveAttrs.agi, int: liveAttrs.int };
     const isOgre = st.hero.id === 'ogre_magi';
     const isHuskar = st.hero.id === 'huskar';
-    const mpFromAttr = isHuskar ? 0 : (isOgre ? str * 6 : int * C.mpInt);
-    const mprFromAttr = isHuskar ? 0 : (isOgre ? str * 0.02 : int * C.mprInt);
+    // Ogre Magi Dumb Luck: mana / mana regen per Strength from the innate rules
+    const ogreMp = isOgre ? innateEntry('ogre_magi', 'mp', 'attr_substitution') : null;
+    const ogreMpr = isOgre ? innateEntry('ogre_magi', 'mpr', 'attr_substitution') : null;
+    const mpFromAttr = isHuskar ? 0 : (ogreMp ? str * ogreMp.factor : int * C.mpInt);
+    const mprFromAttr = isHuskar ? 0 : (ogreMpr ? str * ogreMpr.factor : int * C.mprInt);
     const baseMr = (Number(s.mr) || 25) + int * C.mrInt + heroLabInnate('mr', s, a, lvl, 0, includeInnates);
     let mr = Math.min(combinePct([baseMr, ...itemsTotal.mrVals]), 99.9);
     let evasion = Math.min(combinePct([heroLabInnate('evasion', s, a, lvl, 0, includeInnates), ...itemsTotal.evVals]), 99.9);
@@ -5061,10 +5086,9 @@ function ecShopMarkup(panels) {
       const uniDelta = uniTotal - uniBase;
       const uniBon = mergePositive && uniDelta > 0 ? '' : bonusInt(uniDelta);
       const uniShown = mergePositive && uniDelta > 0 ? uniTotal : uniBase;
-      let uniDmgGain = (strGain + agiGain + intGain) * C.uniDmg;
       const innateToggle = document.querySelector('[data-innates-toggle]');
       const hlInnatesOn = innateToggle ? innateToggle.checked : true;
-      if (s.slug === 'void_spirit' && hlInnatesOn) uniDmgGain *= 1.15;
+      const uniDmgGain = (strGain + agiGain + intGain) * universalDmgMult(s, hlInnatesOn);
       const uniGainStr = uniDmgGain.toFixed(1).replace(/\.0$/, '');
       uniRow = `
         <div class="hl-da-row hl-da-primary-row" style="background:${ATTR_BG.uni};margin-left:0">

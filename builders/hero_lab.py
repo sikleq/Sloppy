@@ -18,6 +18,7 @@ _sys.path.insert(0, str(_ROOT))
 _sys.path.insert(0, str(_ROOT / "builders"))
 
 import builders.site_common as _site
+from builders import innate_rules as _innate_rules
 from mana_items import parse_kv
 from heroes_stats import (
     _HERE,
@@ -27,6 +28,7 @@ from heroes_stats import (
     _load_display_names,
     _display_name,
     _load_raw_heroes,
+    _inject_hero_base,
     _inject_spirit_bear,
     _row_stats,
     _attack_type,
@@ -486,6 +488,11 @@ _BOOT_ITEMS = {
     "item_phase_boots", "item_power_treads",
 }
 
+# Which neutral tiers drop each enchantment, and its sort slot. The tier pools
+# live in the game's neutral_items.txt, which we do not fetch — so this is kept
+# by hand. tests/test_roster_guards.py fails when items.txt has an enchantment
+# this table (or _ENCHANT_ATTRS) does not list, drops one, or changes how many
+# levels it has.
 _ENCHANT_TIER_LABELS = {
     "item_enhancement_vital":       ("", 0, [1]),
     "item_enhancement_alert":       ("", 1, [1, 2, 3, 4]),
@@ -917,7 +924,12 @@ def _innate_summary(rule: dict, version: str) -> str:
                 parts.append(f"+{per}% move speed per level")
         elif formula == "mana_shield_ehp":
             absorb = _fmt_pct_value(float(active.get("absorb_pct", 0)))
-            dpm = str(active.get("dpm", "")).replace(" * level", " per level")
+            if "dpm_base" in active:                  # damage per mana = base + per_level * level
+                dpm = _display_value(active["dpm_base"])
+                if float(active.get("dpm_per_level", 0) or 0):
+                    dpm += f" + {_display_value(active['dpm_per_level'])} per level"
+            else:
+                dpm = str(active.get("dpm", ""))
             dpm_txt = f" (damage per mana: {dpm})" if dpm else ""
             parts.append(f"{absorb} of damage taken is absorbed by mana{dpm_txt}")
         elif formula == "bonus_ms_factor":
@@ -1329,13 +1341,12 @@ def _load_heroes(version: str) -> list[dict]:
     raw = _load_raw_heroes(version)
     snaps = {version: snap}
     raws = {version: raw}
+    _inject_hero_base(snaps, raws)
     _inject_spirit_bear(snaps, raws)
     snap, raw = snaps[version], raws[version]
     names = _load_display_names()
     ability_tooltips = _load_ability_tooltips()
-    innate_rules = _json.loads(
-        (_HERE / "data" / "rules" / "hero_stat_innates.json").read_text(encoding="utf-8")
-    ).get("heroes", {})
+    innate_rules = _innate_rules.load().get("heroes", {})
     heroes = sorted(
         (h for h in snap if h.startswith("npc_dota_hero_") and h not in _EXCLUDE),
         key=lambda h: _display_name(h, names).lower(),
@@ -1375,11 +1386,11 @@ def render_html() -> str:
     version = _versions()[-1]
     heroes = _load_heroes(version)
     items = _load_items(version)
-    innate_rules = _json.loads(
-        (_HERE / "data" / "rules" / "hero_stat_innates.json").read_text(encoding="utf-8")
-    ).get("heroes", {})
+    innate_rules = _innate_rules.load().get("heroes", {})     # JSON + history from newer game files
+    from patch.game_constants import for_js as _game_constants
     data = _json.dumps(
-        {"patch": version, "heroes": heroes, "items": items, "innateRules": innate_rules},
+        {"patch": version, "heroes": heroes, "items": items, "innateRules": innate_rules,
+         "constants": _game_constants()},
         separators=(",", ":"),
     )
     data_script = data.replace("<", "\\u003c")

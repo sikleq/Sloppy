@@ -863,6 +863,9 @@ def _item_groups(ents, dyn):
 
 # In-game shop layout (screenshot of the shop, 7.41f): three panels, categories in this order,
 # icons 4 per row; neutral tiers with their unlock times; enchantments last.
+# Neither the panel layout (game UI) nor the unlock times (neutral_items.txt, not fetched) are in our game
+# files; tests/test_roster_guards.py fails when a shop category has no panel or the patch notes announce
+# a tier time ("Tier 1 availability changed from 5:00 to 0:00") that differs from _TIER_TIME.
 _SHOP_PANELS = [
     ("Basics",   ["Consumables", "Attributes", "Equipment", "Miscellaneous", "Secret Shop", "Other"]),
     ("Upgrades", ["Accessories", "Support", "Magical", "Armor", "Weapons", "Armaments"]),
@@ -895,6 +898,8 @@ _UNIT_NOT_LISTED = {"npc_dota_miniboss"}
 # no neutral camp, so the camp-roster loop never adds them. Listed here as
 # (icon basename without .png, display name) and shown greyed in the Summons
 # column — same reference treatment as unchanged camp creeps.
+# tests/test_roster_guards.py: every icons/units/ portrait must be in one of
+# these lists (or a camp creep), and every listed unit still in npc_units.txt.
 _SUMMON_UNITS = [
     ("npc_dota_warlock_golem", "Golem (Warlock)"),
     ("npc_dota_lycan_wolf", "Wolf (Lycan)"),
@@ -1207,8 +1212,9 @@ def _hero_stat_data():
     return _HERO_STAT_CACHE
 
 
-# level-1 HP / mana constants (same as builders/heroes_stats.py: 120 + 22·Str, 75 + 12·Int)
-_HP_BASE, _HP_PER_STR, _MP_BASE, _MP_PER_INT = 120.0, 22.0, 75.0, 12.0
+# level-1 HP / mana = the base hero block (120 / 75, npc_dota_hero_base in heroes_raw.json) + 22·Str / 12·Int
+# (engine constants, typed in one place: patch/game_constants.py) — the same as builders/heroes_stats.py
+from patch.game_constants import HP_PER_STR as _HP_PER_STR, MANA_PER_INT as _MP_PER_INT
 # which base-attribute / gain field the category's "starting stat" refers to
 _CAT_ATTR = {"Strength": "Strength", "Agility": "Agility", "Intelligence": "Intelligence"}
 
@@ -1244,8 +1250,10 @@ def _hero_group_stats(label, lst):
     n = len(rows)
     melee = sum(1 for r in rows if r["melee"])
     avg = lambda f: sum(f(r) for r in rows) / n
-    hp = lambda r: _HP_BASE + _HP_PER_STR * r["str"]
-    mp = lambda r: _MP_BASE + _MP_PER_INT * r["int"]
+    base = raw["npc_dota_hero_base"]                 # engine defaults every hero inherits
+    hp_base, mp_base = float(base["StatusHealth"]), float(base["StatusMana"])
+    hp = lambda r: hp_base + _HP_PER_STR * r["str"]
+    mp = lambda r: mp_base + _MP_PER_INT * r["int"]
     # category attribute: primary for STR/AGI/INT, the sum of all three for Universal
     if label in _CAT_ATTR:
         a = {"strength": "str", "agility": "agi", "intelligence": "int"}[label.lower()]

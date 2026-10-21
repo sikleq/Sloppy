@@ -150,6 +150,9 @@ _SHOP_CATEGORY_ORDER = [
 ]
 _SHOP_CATEGORY_OTHER = "Other"
 
+# Hand-kept item lists (items.txt keeps unused / removed entries, and it cannot tell an enchantment that left
+# the drop pool). tests/test_roster_guards.py fails when a phantom shows up in the shop or the neutral pool,
+# an _OBSOLETE_REMOVED item stops being obsolete, or a _NEUTRAL_REMOVED_MANUAL neutral is back in the pool.
 _PHANTOM_ITEMS = {
     "item_greater_mango", "item_greater_faerie_fire",
     "item_bottomless_chalice", "item_horizon", "item_mechanical_arm",

@@ -34,38 +34,20 @@ ASSET_VERSION = _site.compute_asset_version()
 
 # ── Engine constants ───────────────────────────────────────────────────────
 # Intelligence engine-constant history (hardcoded in the Source 2 engine,
-# not in any of our scraped KV files). Sourced from Liquipedia's curated
-# /Intelligence/Changelogs page. Format: (patch, date, old, new).
-_INT_MANA_HIST = [
-    ("7.07",  "31.10.2017", 13, 14),
-    ("7.20",  "19.11.2018", 14, 12),
-    ("7.36",  "10.05.2024", 12, 11),
-    ("7.39",  "21.05.2025", 11, 12),
-]
-_INT_REGEN_HIST = [
-    ("7.07",  "31.10.2017", 0.04, 0.05),
-]
-# The values in use = the LAST history entry: a new engine change is one new history row.
-INT_TO_MAX_MANA = float(_INT_MANA_HIST[-1][3])   # +12 max mana per Int point
-INT_TO_REGEN    = float(_INT_REGEN_HIST[-1][3])  # +0.05 mana regen per Int point
+# not in any of our scraped KV files) — typed in ONE place for every page,
+# patch/game_constants.py. Format: (patch, date, old, new); the values in use
+# = the LAST history entry, so a new engine change is one new history row there.
+from patch import game_constants as _gc
+_INT_MANA_HIST = _gc.INT_MANA_HIST
+_INT_REGEN_HIST = _gc.INT_REGEN_HIST
+INT_TO_MAX_MANA = _gc.MANA_PER_INT      # +12 max mana per Int point
+INT_TO_REGEN    = _gc.MANAREG_PER_INT   # +0.05 mana regen per Int point
 
 
-def _vkey(v: str) -> tuple:
-    """'7.36' < '7.36a' < '7.37' — numeric major/minor, then the letter."""
-    m = re.match(r"(\d+)\.(\d+)([a-z]?)", v)
-    return (int(m.group(1)), int(m.group(2)), m.group(3)) if m else (0, 0, "")
-
-
-def _int_const_at(hist: list[tuple], patch: str | None) -> float:
+def _int_const_at(hist: tuple, patch: str | None) -> float:
     """The Intelligence constant IN EFFECT at `patch` (history cells of past patches must
     use that patch's value — 11 mana/Int in 7.36–7.38, not today's 12)."""
-    if not patch:
-        return float(hist[-1][3])
-    val = float(hist[0][2])
-    for p, _date, _old, new in hist:
-        if _vkey(p) <= _vkey(patch):
-            val = float(new)
-    return val
+    return _gc.at(hist, patch)
 
 # ── Source data ────────────────────────────────────────────────────────────
 from patch.meta import latest_stats_version as _lsv
@@ -332,15 +314,15 @@ def _flat_metric(d: dict, kind: str, slug: str = "", patch: str | None = None) -
     return 0.0
 
 
-# Manual pre-7.33 history. Our game-file source (muk-as) only goes back to
-# 7.33, so changes that happened in or before 7.33 from an earlier value are
-# invisible to the auto-diff. Sourced from Liquipedia item changelogs. Keyed
-# by (slug, column-kind). Entries are ('V', patch, date, old, new), oldest
-# first — they're prepended to the auto-computed history.
-_MANUAL_METRIC_HISTORY: dict[tuple[str, str], list] = {
-    # Wind Waker: "Reduced mana regeneration bonus from 6 to 3" (7.33).
-    ("item_wind_waker", "regen"): [("V", "7.33", "20.04.2023", 6, 3)],
-}
+# Manual history for changes OLDER than the first items.json that carries the
+# mana fields (the auto-diff cannot see them). Sourced from Liquipedia item
+# changelogs. Keyed by (slug, column-kind). Entries are ('V', patch, date,
+# old, new), oldest first — they're prepended to the auto-computed history.
+# Empty since the snapshots were backfilled to 7.08 (2026): Wind Waker's 7.33
+# "mana regeneration bonus from 6 to 3" is in the game files now and its
+# manual row showed the change twice. tests/test_roster_guards.py fails if a
+# row here reaches into the patches the game files already cover.
+_MANUAL_METRIC_HISTORY: dict[tuple[str, str], list] = {}
 
 
 def load_metric_history(kind: str) -> dict[str, list[tuple[str, str, float, float]]]:

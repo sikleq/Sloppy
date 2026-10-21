@@ -6,14 +6,15 @@ hero holds an AoE-bonus item. Each ability cell shows its icon plus one line
 per affected radius: ``<base> > <increased>``, where the increase is computed
 live from the item filter selected at the top.
 
-Item filter (verified from data/stats/<patch>/items.txt):
+Item filter — found in the latest items.txt by the AoE-bonus keys
+(AOE_BONUS_KEYS); in 7.41f:
   * Chasm Stone   — ``aoe_bonus``  +40 flat
   * Shiva's Guard — ``bonus_aoe``  +75 flat
   * Gleipnir      — ``bonus_aoe``  +75 flat  (engine slug item_gungir)
   * Dezun Bloodrite (neutral) — ``aoe_pct`` +20% of the ability radius
-The three flat items do not stack with each other ("Aoe bonuses from multiple
+The flat items do not stack with each other ("Aoe bonuses from multiple
 Chasm Stones or its upgrades do not stack"), so the UI treats them as a radio
-group; the neutral Dezun Bloodrite stacks on top as a separate toggle.
+group; a % item (Dezun Bloodrite) stacks on top as a separate toggle.
 
 The radius KV ``value`` block is also scanned for upgrade siblings so the line
 can be tinted: ``special_bonus_scepter`` (Scepter), ``special_bonus_shard``
@@ -143,44 +144,64 @@ MANUAL_CANON = {
     "largo_song_good_vibrations":  "largo_amphibian_rhapsody",
 }
 
-# AoE-bonus item filters. The bonus amount is read live from items.txt (key
-# below) so a balance change updates the page automatically; the number here is
-# only a fallback if the parse fails.
-#   (filter_key, label, icon, item_id, value_key, kind, fallback_amount)
-ITEM_DEFS = [
-    ("chasm_stone",  "Chasm Stone",     "chasm_stone.png",    "item_chasm_stone",    "aoe_bonus", "flat", 40),
-    ("shivas_guard", "Shiva's Guard",   "shivas_guard.png",   "item_shivas_guard",   "bonus_aoe", "flat", 75),
-    ("gungir",       "Gleipnir",        "gungir.png",         "item_gungir",         "bonus_aoe", "flat", 75),
-    ("dezun",        "Dezun Bloodrite", "dezun_bloodrite.png", "item_dezun_bloodrite", "aoe_pct",  "pct",  20),
-]
+# AoE-bonus item filters — FOUND in the latest items.txt: every current item
+# whose AbilityValues carry one of these keys (the game's own AoE-bonus
+# fields), with its amount read from that key. A new AoE item, a removed one or
+# a balance change reaches the page by itself. Only the key → kind table is
+# typed here: 'flat' items (+N radius) do not stack with each other (radio
+# group), 'pct' ones (+N% of the radius) stack on top.
+AOE_BONUS_KEYS = {"aoe_bonus": "flat", "bonus_aoe": "flat", "aoe_pct": "pct"}
+
+
+def _neutral_pool() -> set[str]:
+    """Game slugs in the current neutral drop pool (itemlist.json neutral_item_tier >= 0)."""
+    try:
+        data = _json.loads((_HERE / "data" / "itemlist.json").read_text(encoding="utf-8"))
+        return {it["name"] for it in data["result"]["data"]["itemabilities"]
+                if it.get("neutral_item_tier", -1) >= 0}
+    except (OSError, KeyError, ValueError):
+        return set()
+
+
+def _item_names() -> dict[str, str]:
+    try:
+        data = _json.loads((_HERE / "data" / "itemlist.json").read_text(encoding="utf-8"))
+        return {it["name"]: it.get("name_english_loc") or "" for it in data["result"]["data"]["itemabilities"]}
+    except (OSError, KeyError, ValueError):
+        return {}
 
 
 def _resolve_items(version: str) -> list[tuple]:
-    """Build the item filter list with bonus amounts read from items.txt so the
-    page tracks balance changes. Returns (key, label, icon, kind, amount)."""
-    amounts: dict[str, float] = {}
+    """The AoE-bonus item filter list from items.txt (see AOE_BONUS_KEYS):
+    (key, label, icon, kind, amount) — flat items first, by amount then KV
+    order, then the % ones. Obsolete items, recipes and neutral items out of
+    the current pool are left out."""
     path = STATS_DIR / version / "items.txt"
-    if path.exists():
-        try:
-            root = parse_kv(_strip_backslash_lines(
-                path.read_text(encoding="utf-8", errors="replace"))).get("DOTAAbilities", {})
-            for _k, _l, _i, item_id, vkey, _kind, _fb in ITEM_DEFS:
-                block = root.get(item_id, {})
-                av = block.get("AbilityValues", {}) if isinstance(block, dict) else {}
-                node = av.get(vkey)
-                if isinstance(node, dict):
-                    node = node.get("value")
-                if node is not None:
-                    vals = _level_values(node)
-                    if vals:
-                        amounts[item_id] = vals[0]
-        except Exception:
-            pass
-    out = []
-    for key, label, icon, item_id, _vkey, kind, fb in ITEM_DEFS:
-        amt = amounts.get(item_id, fb)
-        out.append((key, label, icon, kind, int(round(amt))))
-    return out
+    root = parse_kv(_strip_backslash_lines(
+        path.read_text(encoding="utf-8", errors="replace"))).get("DOTAAbilities", {})
+    pool, names = _neutral_pool(), _item_names()
+    found = []
+    for order, (item_id, block) in enumerate(root.items()):
+        if not isinstance(block, dict) or not item_id.startswith("item_") or item_id.startswith("item_recipe_"):
+            continue
+        if str(block.get("IsObsolete", "")) == "1":
+            continue
+        neutral = "1" in (str(block.get("ItemIsNeutralActiveDrop", "")), str(block.get("ItemIsNeutralPassiveDrop", "")))
+        if (neutral or str(block.get("ItemPurchasable", "1")) == "0") and item_id not in pool:
+            continue
+        av = block.get("AbilityValues", {}) or {}
+        for vkey, kind in AOE_BONUS_KEYS.items():
+            node = av.get(vkey)
+            if isinstance(node, dict):
+                node = node.get("value")
+            vals = _level_values(node) if node is not None else []
+            if vals:
+                slug = item_id[len("item_"):]
+                label = names.get(item_id) or slug.replace("_", " ").title()
+                found.append((kind != "flat", vals[0], order,
+                              (slug, label, f"{slug}.png", kind, int(round(vals[0])))))
+                break
+    return [it for *_k, it in sorted(found)]
 
 
 def _is_junk_key(key: str) -> bool:
@@ -607,8 +628,8 @@ def _item_filter_bar(items: list[tuple]) -> str:
             f'<img src="{icon}" alt="{_esc(label)}" loading="lazy"></button>'
         )
 
-    # All four items live in ONE group: the three flat items are mutually
-    # exclusive (radio), Dezun Bloodrite (pct) stacks on top.
+    # All the items live in ONE group: the flat items are mutually exclusive
+    # (radio), a pct one (Dezun Bloodrite) stacks on top.
     items_html = "".join(_item_btn(*it) for it in items)
     upgrades_html = "".join(_up_btn(*u) for u in UPGRADE_FILTERS)
     return (

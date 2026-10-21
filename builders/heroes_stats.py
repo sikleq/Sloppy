@@ -53,27 +53,17 @@ ASSET_VERSION = _site.compute_asset_version()
 _esc = lambda s: _html.escape(str(s), quote=True)
 
 # ---- engine constants for "Starting" mode (level-1 with attribute bonuses) ---
-# Current-patch values. User-correctable — adjust here when Valve tweaks any
-# of these and rerun the build. The computed columns' HISTORY uses these
-# constants for past patches too (the historical constants did differ).
-HP_PER_STR        = 22.0   # +22 max HP per Strength
-HPREG_PER_STR     = 0.1    # +0.1 HP regen per Strength
-MANA_PER_INT      = 12.0   # +12 max mana per Intelligence
-MANAREG_PER_INT   = 0.05   # +0.05 mana regen per Intelligence
-ARMOR_PER_AGI     = 1 / 6  # 0.1667 armor per Agility
-MR_PER_INT        = 0.1    # +0.1 % magic resistance per Intelligence
-AS_PER_AGI        = 1.0    # +1 attack speed per Agility
-DMG_PER_PRIMARY   = 1.0    # Str/Agi/Int hero gains +1 damage per primary point
-# Universal heroes get a multiplier on the SUM of all three attributes, FLOORED
-# before adding to base damage (Abaddon 0.45×62 = 27.9 → 27 → 22-32 base = 49-59).
-# The multiplier has changed over time — patch-gated in _universal_dmg_mult():
-#   7.33  → 0.6 (introduced with Universal heroes)
-#   7.33c → 0.7
-#   7.38  → 0.45 (current)
-
-# Ogre Magi innate — mana / mana regen scale with Strength (he has 0 base Int).
-OGRE_MANA_PER_STR    = 6.0
-OGRE_MANAREG_PER_STR = 0.02
+# Typed in ONE place, patch/game_constants.py (engine values the KV files do not
+# carry; a test checks them against the game's own tooltips). Today's values;
+# the computed columns' HISTORY uses them for past patches too (the historical
+# constants did differ). Universal heroes get a multiplier on the SUM of all
+# three attributes, FLOORED before adding to base damage (Abaddon 0.45×62 =
+# 27.9 → 27 → 22-32 base = 49-59) — patch-gated in _universal_dmg_mult().
+from patch import game_constants as _gc
+from patch.game_constants import (
+    HP_PER_STR, HPREG_PER_STR, MANA_PER_INT, MANAREG_PER_INT,
+    ARMOR_PER_AGI, MR_PER_INT, AS_PER_AGI, DMG_PER_PRIMARY,
+)
 
 
 # ---------- patch ordering / dates ----------
@@ -288,6 +278,22 @@ def _extract_hero_block(version: str, hero: str) -> dict[str, str]:
     return _extract_kv_block(version, "npc_heroes.txt", hero)
 
 
+def _inject_hero_base(snaps: dict[str, dict], raws: dict[str, dict]) -> None:
+    """Give every slim snapshot its npc_dota_hero_base block (the engine
+    defaults every hero inherits: 120 HP, 75 mana, 25% magic resist, …).
+
+    From 7.41f npc_heroes.txt is only a list of `#base` includes and the
+    slim heroes.json lost the base block, so _field fell back to the
+    hand-typed _FIELD_DEFAULTS. heroes_raw.json still carries it — use the
+    game's numbers, so a new base value reaches every hero by itself."""
+    for version, snap in snaps.items():
+        if "npc_dota_hero_base" in snap:
+            continue
+        base = (raws.get(version) or {}).get("npc_dota_hero_base")
+        if base:
+            snap["npc_dota_hero_base"] = {k: base[k] for k in _FIELD_DEFAULTS if k in base}
+
+
 def _inject_spirit_bear(snaps: dict[str, dict], raws: dict[str, dict]) -> None:
     """Expose Spirit Bear in Hero Stats without pretending it is in heroes.json.
 
@@ -403,10 +409,20 @@ from patch.elements import _slugify as _changes_slug      # Hero Changes page = 
 _LATEST_STATS_VERSION = _lsv()
 _CTX_VERSION = [_LATEST_STATS_VERSION]
 
-# ── Hero innate rules — loaded once from data/rules/hero_stat_innates.json ──
-_INNATE_RULES: dict = _json.loads(
-    (_HERE / "data" / "rules" / "hero_stat_innates.json").read_text(encoding="utf-8")
-)["heroes"]
+# ── Hero innate rules — loaded once: data/rules/hero_stat_innates.json plus the
+# history builders/innate_rules.py reads from the game files of newer patches ──
+from builders import innate_rules as _innate_rules_mod
+_INNATE_RULES: dict = _innate_rules_mod.load()["heroes"]
+
+
+def _innate_entry(slug: str, target: str, formula: str, version: str | None = None) -> dict | None:
+    """The active history entry of one innate effect (None when the hero has
+    no such effect at that patch) — Techies / Void Spirit / Ogre Magi read
+    their numbers through this instead of typing them."""
+    for eff in _INNATE_RULES.get(slug, {}).get("effects", []):
+        if eff.get("target") == target and eff.get("formula") == formula:
+            return _active_entry(eff, version or _CTX_VERSION[0])
+    return None
 
 # Attribute KV field names used by innate formula dispatch
 _ATTR_FIELD = {
@@ -594,11 +610,15 @@ def _whole_start_attr(s, h, r, key: str) -> int:
 
 
 def _techies_pool_regen_l1(s, h, r) -> float:
-    if not h.endswith("_techies") or not _ge(_CTX_VERSION[0], "7.41a"):
+    """Techies M.A.D. (7.41a+): a share of the mana pool as mana regen —
+    base_pct + per_level_pct·level from the innate rules (KV bonus_mana_as_mana_regen)."""
+    if not h.endswith("_techies"):
+        return 0.0
+    entry = _innate_entry("techies", "mpr", "mana_pool_pct_per_level")
+    if entry is None:
         return 0.0
     lvl = 1
-    pct = (0.001 + 0.0001 * lvl) if _ge(_CTX_VERSION[0], "7.41c") else (0.0008 + 0.0002 * lvl)
-    return _mp_l1(s, h, r) * pct
+    return _mp_l1(s, h, r) * (entry["base_pct"] + entry["per_level_pct"] * lvl)
 
 
 # ---------- value functions ----------
@@ -610,14 +630,9 @@ def _f(field):
 
 def _universal_dmg_mult() -> float:
     """Damage-per-attribute multiplier for Universal heroes at the current
-    context patch. 0.6 (7.33) → 0.7 (7.33c) → 0.45 (7.38+)."""
-    ver = _CTX_VERSION[0]
-    if _ge(ver, "7.38"):
-        return 0.45
-    if _ge(ver, "7.33c"):
-        return 0.7
-    return 0.6   # 7.33–7.33b (and the floor for any earlier ctx; pre-7.33 no
-    #              hero is Universal so this branch isn't reached for them)
+    context patch: 0.6 (7.33) → 0.7 (7.33c) → 0.45 (7.38+), history in
+    patch/game_constants.UNIVERSAL_DMG_HIST (pre-7.33 no hero is Universal)."""
+    return _gc.at(_gc.UNIVERSAL_DMG_HIST, _CTX_VERSION[0])
 
 
 def _primary_dmg(s, h):
@@ -641,9 +656,10 @@ def _primary_dmg(s, h):
                  + _field(s, h, "AttributeBaseAgility")
                  + _field(s, h, "AttributeBaseIntelligence"))
         mult = _universal_dmg_mult()
-        if h.endswith("_void_spirit") and _ge(_CTX_VERSION[0], "7.41"):
-            # Intrinsic Edge: +15% attack damage per attribute since 7.41.
-            mult *= 1.15
+        entry = _innate_entry(h.replace("npc_dota_hero_", ""), "dmg", "dmg_universal_bonus_pct")
+        if entry is not None:
+            # Void Spirit Intrinsic Edge (7.41+): +15% attack damage per attribute.
+            mult *= 1 + entry["factor"]
         bonus = mult * total
     return float(_math.floor(bonus))
 
@@ -707,8 +723,10 @@ def _mp_l1(s, h, r):
     if slug == "huskar":
         return 0.0
     if slug == "ogre_magi":
+        # Dumb Luck: mana per Strength (KV mana_per_str) — from the innate rules
+        per_str = _innate_entry(slug, "mp", "attr_substitution")["factor"]
         return round(_field(s, h, "StatusMana")
-                     + OGRE_MANA_PER_STR * _whole_start_attr(s, h, r, "str")
+                     + per_str * _whole_start_attr(s, h, r, "str")
                      + MANA_PER_INT * _whole_start_attr(s, h, r, "int"))
     return round(_field(s, h, "StatusMana")
                  + MANA_PER_INT * _whole_start_attr(s, h, r, "int"))
@@ -725,8 +743,9 @@ def _mpreg_l1(s, h, r):
     if slug == "huskar":
         return 0.0
     if slug == "ogre_magi":
+        per_str = _innate_entry(slug, "mpr", "attr_substitution")["factor"]   # KV mana_regen_per_str
         return round(_field(s, h, "StatusManaRegen")
-                     + OGRE_MANAREG_PER_STR * _start_attr(s, h, r, "str")
+                     + per_str * _start_attr(s, h, r, "str")
                      + MANAREG_PER_INT * _start_attr(s, h, r, "int"), 2)
     return round((_field(s, h, "StatusManaRegen")
                   + MANAREG_PER_INT * _whole_start_attr(s, h, r, "int")
@@ -1419,6 +1438,7 @@ def render_html() -> str:
     snaps = {v: _json.loads((STATS_DIR / v / "heroes.json").read_text(encoding="utf-8"))
              for v in versions}
     raws = {v: _load_raw_heroes(v) for v in versions}
+    _inject_hero_base(snaps, raws)
     _inject_spirit_bear(snaps, raws)
     latest = versions[-1]
     cur = snaps[latest]
@@ -1616,6 +1636,10 @@ def render_html() -> str:
         '</div>\n'
         f'<script type="application/json" id="hs-innate-rules">'
         f'{_json.dumps(_INNATE_RULES, separators=(",", ":"))}'
+        f'</script>\n'
+        # attribute constants for the per-level recompute (scripts.js types no numbers)
+        f'<script type="application/json" id="hs-game-constants">'
+        f'{_json.dumps(_gc.for_js(), separators=(",", ":"))}'
         f'</script>\n'
         f'<script defer src="src/scripts.js?v={ASSET_VERSION}"></script>\n'
         '</body>\n</html>\n'

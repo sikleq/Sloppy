@@ -1,30 +1,42 @@
 """A hero's base attributes and attack damage by level, from the game files of a patch (data/stats/<v>/heroes.json).
 
 Attack damage = base damage + the primary attribute (x1), or for a Universal hero every attribute x the
-Universal multiplier (0.7 until 7.37e, 0.45 from 7.38: "Universal Heroes' damage per attribute decreased from
-0.7 to 0.45"). An attribute at level L = base + gain x (L - 1). Valve's own "Damage at level 30" counts the
-7 Attribute Bonus levels too (+2 to every attribute each, +14 in all): damage_at(..., bonus=True).
+Universal multiplier (0.6 in 7.33, 0.7 from 7.33c, 0.45 from 7.38 — the history is in
+patch/game_constants.UNIVERSAL_DMG_HIST, shared with Hero Stats). An attribute at level L = base + gain x (L - 1).
+Valve's own "Damage at level 30" counts the 7 Attribute Bonus levels too (+2 to every attribute each, +14 in
+all, read from special_bonus_attributes in the latest npc_abilities.txt): damage_at(..., bonus=True).
 Checked against Valve's 7.38 rows for every Universal hero (tests/test_hero_stat_card.py)."""
-from .meta import RELEASE_HISTORY
+import os
+import re
+
+from . import game_constants
+from .meta import latest_stats_version
 from .stats import stat_h
 
 ATTRS = (("Strength", "str"), ("Agility", "agi"), ("Intelligence", "int"))
 _PRIMARY = {"DOTA_ATTRIBUTE_STRENGTH": "Strength", "DOTA_ATTRIBUTE_AGILITY": "Agility",
             "DOTA_ATTRIBUTE_INTELLECT": "Intelligence", "DOTA_ATTRIBUTE_ALL": "all"}
-ATTRIBUTE_BONUS_MAX = 14            # 7 levels x +2 to every attribute (special_bonus_attributes)
-_UNIVERSAL_FROM = (("7.38", 0.45),)  # (first version, damage per attribute); before the first: 0.7
 
 
-def _order():
-    return [r["version"] for r in RELEASE_HISTORY][::-1]      # oldest first
+def _attribute_bonus_max():
+    """+2 to every attribute per Attribute Bonus level: the last of special_bonus_attributes' values
+    ("2 4 6 8 10 12 14" -> 14). None when the latest npc_abilities.txt lacks it (a test guards that)."""
+    path = os.path.join(os.path.dirname(__file__), "..", "data", "stats", latest_stats_version(),
+                        "npc_abilities.txt")
+    try:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+    except OSError:
+        return None
+    m = re.search(r'"special_bonus_attributes"\s*\{.*?"value"\s*"([\d .]+)"', text, re.S)
+    return int(float(m.group(1).split()[-1])) if m else None
+
+
+ATTRIBUTE_BONUS_MAX = _attribute_bonus_max() or 14     # 14 = 7 levels x +2 (7.33+), if the file lacks it
 
 
 def universal_multiplier(version):
-    order, mult = _order(), 0.7
-    for first, value in _UNIVERSAL_FROM:
-        if version in order and first in order and order.index(version) >= order.index(first):
-            mult = value
-    return mult
+    return game_constants.at(game_constants.UNIVERSAL_DMG_HIST, version)
 
 
 def hero_stats(hero, version):

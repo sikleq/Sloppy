@@ -1,15 +1,9 @@
 {
   "_version": 1,
   "_doc": "Declarative source of truth for hero innate stat bonuses. Used by builders/heroes_stats.py (level-1 seeding) and src/scripts.js (per-level recompute on the heroes-stats table). Stage 1 of innate centralization — do not edit without verifying against KV files in data/stats/<patch>/heroes/.",
-  "_constants": {
-    "HPREG_PER_STR": 0.1,
-    "MANAREG_PER_INT": 0.05,
-    "AS_PER_AGI": 1.0,
-    "ARMOR_PER_AGI": 0.16667,
-    "MR_PER_INT": 0.1,
-    "OGRE_MANA_PER_STR": 6.0,
-    "OGRE_MANAREG_PER_STR": 0.02
-  },
+  "_constants_doc": "HPREG_PER_STR, ARMOR_PER_AGI and the other attribute constants named below live in patch/game_constants.py (one source for Python and scripts.js).",
+  "_checked_version": "7.41f",
+  "_checked_doc": "Every rule below was verified against the game files up to this patch. An effect with a \"kv\" map ({entry field: [AbilityValues key, value|hero_levelup, scale]}) follows the game by itself for newer patches (builders/innate_rules.py adds the history entries). For the rest tests/test_innate_rules_kv.py fails when a newer patch changes the innate: re-check, update the rule, then set this to the newest patch.",
   "_formula_types": {
     "attr_factor": "bonus = attrs[source] * factor",
     "base_plus_level": "bonus = base + per_level * level",
@@ -38,7 +32,14 @@
         {
           "target": "str",
           "formula": "armor_factor",
-          "factor": 0.5
+          "factor": 0.5,
+          "kv": {
+            "factor": [
+              "armor_pct_as_strength",
+              "value",
+              0.01
+            ]
+          }
         }
       ]
     },
@@ -51,7 +52,19 @@
           "formula": "base_plus_level",
           "since": "7.41a",
           "base": 7,
-          "per_level": 3
+          "per_level": 3,
+          "kv": {
+            "base": [
+              "bonus_attack_speed",
+              "value",
+              1
+            ],
+            "per_level": [
+              "bonus_attack_speed",
+              "hero_levelup",
+              1
+            ]
+          }
         }
       ]
     },
@@ -63,6 +76,13 @@
           "target": "ms",
           "formula": "attr_factor",
           "source": "str",
+          "kv": {
+            "factor": [
+              "strength_to_movement_pct",
+              "value",
+              0.01
+            ]
+          },
           "history": [
             {
               "since": "7.36",
@@ -97,6 +117,13 @@
           "target": "aspd",
           "formula": "attr_factor",
           "source": "int",
+          "kv": {
+            "factor": [
+              "int_to_atkspd",
+              "value",
+              1
+            ]
+          },
           "history": [
             {
               "since": "7.36",
@@ -118,6 +145,18 @@
         {
           "target": "ms",
           "formula": "ms_multiplier",
+          "kv": {
+            "base_pct": [
+              "movement_speed_pct",
+              "value",
+              1
+            ],
+            "per_level_pct": [
+              "movement_speed_pct",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "KV movement_speed_pct (7.41a+: value=base_pct, hero_levelup=per_level_pct; 7.36-7.40c: movement_speed_pct_per_level). 7.40 note '0.75% + 0.75% per level up' = 0.75% * level, so base_pct is 0 there. Python applies it in _ms_l1() via _innate_mult(); JS via innateMult()/heroLabInnatePct(). The 7.40 entry runs to 7.41 because the 7.41 KV snapshot is identical to 7.40c (the 7.41 change is visible from 7.41a).",
           "history": [
             {
@@ -154,6 +193,13 @@
         {
           "target": "cdr",
           "formula": "flat_per_level",
+          "kv": {
+            "per_level": [
+              "cooldown_reduction_pct",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "Spell cooldown reduction %. KV cooldown_reduction_pct hero_levelup=+0.75 (7.36-7.40c: cooldown_reduction_pct_per_level). 7.36: 0.5%/level; 7.38: 0.75%/level; 7.40 '0.75% + 0.75% per level up' and 7.41 '0.75% per level' are the same effective value. Hero Lab only (Cooldown Reduction row) — combined multiplicatively with item CDR.",
           "history": [
             {
@@ -177,13 +223,37 @@
           "target": "hpr",
           "formula": "base_plus_level",
           "base": 2,
-          "per_level": 0.5
+          "per_level": 0.5,
+          "kv": {
+            "base": [
+              "health_regen",
+              "value",
+              1
+            ],
+            "per_level": [
+              "health_regen",
+              "hero_levelup",
+              1
+            ]
+          }
         },
         {
           "target": "armor",
           "formula": "base_plus_level",
           "base": 2,
-          "per_level": 0.5
+          "per_level": 0.5,
+          "kv": {
+            "base": [
+              "armor",
+              "value",
+              1
+            ],
+            "per_level": [
+              "armor",
+              "hero_levelup",
+              1
+            ]
+          }
         }
       ]
     },
@@ -194,6 +264,18 @@
         {
           "target": "armor",
           "formula": "bonus_ms_factor",
+          "kv": {
+            "base": [
+              "armor_from_movespeed",
+              "value",
+              1
+            ],
+            "per_level": [
+              "armor_from_movespeed",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "Momentum: armor = factor% of BONUS movement speed (MS above base — starting/base MS is the reference and does NOT count). factor = base + per_level * level and SCALES with hero level: KV value=base, hero_levelup=per_level, and per the 7.41 innate rework the increment is provided at level 1 (so level-1 factor = base + per_level, e.g. 7.0+0.5=7.5% in 7.41e). hero_lab: applied in calc() via elderTitanMomentumArmor() AFTER ms is known — NOT the generic innate() dispatch (which runs before MS). Hero Stats table: Python _innate_bonus() bonus_ms_factor branch reads above-base (innate) MS at level 1; Elder Titan has no innate MS, so it is 0 there. Pre-7.41a Momentum granted attack speed from bonus MS instead; intentionally not modeled.",
           "history": [
             {
@@ -226,6 +308,18 @@
           "formula": "self_attr_pct_per_level",
           "base_pct": 0.1,
           "per_level_pct": 0.01,
+          "kv": {
+            "base_pct": [
+              "trueshot_agi_bonus",
+              "value",
+              0.01
+            ],
+            "per_level_pct": [
+              "trueshot_agi_bonus",
+              "hero_levelup",
+              0.01
+            ]
+          },
           "note": "Self-referential: bonus agi is folded into her agi so all agi-derived stats (dmg, armor, aspd) pick it up. KV value=10, hero_levelup=+1 (both in percent /100)."
         }
       ]
@@ -261,6 +355,13 @@
           "target": "aspd",
           "formula": "flat_per_level",
           "per_level": 4,
+          "kv": {
+            "per_level": [
+              "attack_speed_bonus",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "KV attack_speed_bonus.hero_levelup=+4 (no base value). KV also has movement_speed_bonus.hero_levelup=+0.3 but this is not modeled by design."
         }
       ]
@@ -273,6 +374,13 @@
           "target": "dmg",
           "formula": "flat_per_level",
           "per_level": 2,
+          "kv": {
+            "per_level": [
+              "self_bonus_damage",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "KV hero_levelup=+2 (damage). Handled in JS innateDmg(); not yet in Python _innate_bonus()."
         },
         {
@@ -280,6 +388,18 @@
           "formula": "base_plus_level",
           "base": 225,
           "per_level": 25,
+          "kv": {
+            "base": [
+              "bonus_night_vision",
+              "value",
+              1
+            ],
+            "per_level": [
+              "bonus_night_vision",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "KV value=225, hero_levelup=+25. Night Vision is not a displayed column in heroes_stats table — included for completeness."
         }
       ]
@@ -292,31 +412,59 @@
           "target": "ehp",
           "formula": "mana_shield_ehp",
           "absorb_pct": 0.98,
-          "note": "98% of incoming damage is absorbed by mana at a cost of damage_per_mana. KV absorption_pct=98, damage_per_mana=2 + hero_levelup=+0.1 (since 7.41a). Handled in JS manaShieldEhp() and medusaDpm(); already added to ehpPhys in calc().",
+          "note": "98% of incoming damage is absorbed by mana at a cost of damage per mana = dpm_base + dpm_per_level * level (dpm_ranks: leveled ability, rank = floor((level + 1) / 2)). KV absorption_pct=98, damage_per_mana=2 + hero_levelup=+0.1 (since 7.41a), followed for newer patches via kv. Handled in JS manaShieldEhp() and medusaDpm(); already added to ehpPhys in calc().",
+          "kv": {
+            "dpm_base": [
+              "damage_per_mana",
+              "value",
+              1
+            ],
+            "dpm_per_level": [
+              "damage_per_mana",
+              "hero_levelup",
+              1
+            ],
+            "absorb_pct": [
+              "absorption_pct",
+              "value",
+              0.01
+            ]
+          },
           "history": [
             {
               "since": "7.36",
               "until": "7.36c",
-              "dpm": "leveled: 2/2/2.4/2.8/3.2/3.6 per rank"
+              "dpm": "leveled: 2/2/2.4/2.8/3.2/3.6 per rank",
+              "dpm_ranks": [
+                2,
+                2,
+                2.4,
+                2.8,
+                3.2,
+                3.6
+              ]
             },
             {
               "since": "7.37",
               "until": "7.37e",
-              "dpm": "leveled: 2.4/2.4/2.8/3.2/3.6"
+              "dpm": "leveled: 2.4/2.4/2.8/3.2/3.6",
+              "dpm_base": 2.4
             },
             {
               "since": "7.38",
               "until": "7.39d",
-              "dpm": 2.2
+              "dpm_base": 2.2
             },
             {
               "since": "7.39e",
               "until": "7.40c",
-              "dpm": 2.0
+              "dpm_base": 2.0
             },
             {
               "since": "7.41a",
-              "dpm": "2 + 0.1 * level"
+              "dpm_base": 2,
+              "dpm_per_level": 0.1,
+              "absorb_pct": 0.98
             }
           ]
         }
@@ -330,6 +478,13 @@
           "target": "range",
           "formula": "attr_factor",
           "source": "agi",
+          "kv": {
+            "factor": [
+              "attack_range_per_agi",
+              "value",
+              0.01
+            ]
+          },
           "note": "KV attack_range_per_agi (percent /100).",
           "history": [
             {
@@ -349,12 +504,26 @@
           "source": "agi",
           "since": "7.41",
           "factor": 0.15,
+          "kv": {
+            "factor": [
+              "move_speed_per_agi",
+              "value",
+              0.01
+            ]
+          },
           "note": "KV move_speed_per_agi=15 (percent /100). Unchanged since 7.41."
         },
         {
           "target": "castRange",
           "formula": "attr_factor",
           "source": "str",
+          "kv": {
+            "factor": [
+              "cast_range_per_str",
+              "value",
+              0.01
+            ]
+          },
           "note": "KV cast_range_per_str (flat cast range /100). Introduced 7.41a.",
           "history": [
             {
@@ -372,6 +541,13 @@
           "target": "slowRes",
           "formula": "attr_factor",
           "source": "str",
+          "kv": {
+            "factor": [
+              "slow_resist_per_str",
+              "value",
+              0.01
+            ]
+          },
           "note": "KV slow_resist_per_str (percent /100). Introduced 7.41a.",
           "history": [
             {
@@ -396,6 +572,18 @@
           "formula": "base_plus_level",
           "base": 4.0,
           "per_level": 0.1,
+          "kv": {
+            "base": [
+              "evasion_per_naga",
+              "value",
+              1
+            ],
+            "per_level": [
+              "evasion_per_naga",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "Self-inclusive innate: the bonus applies to Naga Siren herself, so the base evasion is always active and scales further with additional nearby Nagas/illusions."
         }
       ]
@@ -409,14 +597,28 @@
           "formula": "attr_substitution",
           "sub_attr": "str",
           "factor": 6.0,
-          "note": "Ogre uses STR * 6 for MP instead of INT * 12. OGRE_MANA_PER_STR=6.0."
+          "kv": {
+            "factor": [
+              "mana_per_str",
+              "value",
+              1
+            ]
+          },
+          "note": "Ogre uses STR * factor (KV mana_per_str) for MP instead of INT * MANA_PER_INT."
         },
         {
           "target": "mpr",
           "formula": "attr_substitution",
           "sub_attr": "str",
           "factor": 0.02,
-          "note": "Ogre uses STR * 0.02 for Mana Regen instead of INT * 0.05. OGRE_MANAREG_PER_STR=0.02."
+          "kv": {
+            "factor": [
+              "mana_regen_per_str",
+              "value",
+              1
+            ]
+          },
+          "note": "Ogre uses STR * factor (KV mana_regen_per_str) for Mana Regen instead of INT * MANAREG_PER_INT."
         }
       ]
     },
@@ -430,6 +632,18 @@
           "since": "7.36",
           "base_pct": 0,
           "per_level_pct": 1,
+          "kv": {
+            "base_pct": [
+              "movespeed_pct",
+              "value",
+              1
+            ],
+            "per_level_pct": [
+              "movespeed_pct",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "A PERCENT move-speed bonus, not flat: KV movespeed_pct hero_levelup=+1 (7.36-7.41: movespeed_per_level_pct=1), tooltip '%MOVEMENT SPEED:', 7.36 note 'Increases movement speed by 1% per level'."
         }
       ]
@@ -444,6 +658,18 @@
           "source": "str",
           "base_pct": 0.08,
           "per_level_pct": 0.02,
+          "kv": {
+            "base_pct": [
+              "bonus_damage_per_str",
+              "value",
+              1
+            ],
+            "per_level_pct": [
+              "bonus_damage_per_str",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "KV value=0.08, hero_levelup=0.02. Handled in JS innateDmg(); not yet in Python _innate_bonus(). Note: sven_vanquisher (value=20) is a separate innate for Great Cleave — not a stat modifier."
         }
       ]
@@ -456,6 +682,18 @@
           "target": "mpr",
           "formula": "mana_pool_pct_per_level",
           "note": "KV bonus_mana_as_mana_regen: value in percent /100, hero_levelup in percent /100. Handled in Python via _techies_pool_regen_l1(); not in the standard _innate_bonus() dispatch.",
+          "kv": {
+            "base_pct": [
+              "bonus_mana_as_mana_regen",
+              "value",
+              0.01
+            ],
+            "per_level_pct": [
+              "bonus_mana_as_mana_regen",
+              "hero_levelup",
+              0.01
+            ]
+          },
           "history": [
             {
               "since": "7.41a",
@@ -479,6 +717,13 @@
         {
           "target": "dmg",
           "formula": "hp_pct",
+          "kv": {
+            "factor": [
+              "health_as_damage_pct",
+              "value",
+              1
+            ]
+          },
           "note": "KV value=1.75 (percent, 7.41f; 1.25 in 7.39d-7.41e). Leveled phase 7.37b-7.39c: 1.2/1.3/1.4/1.5 per rank — Python/JS both use max rank (1.5) for that window. Handled in JS innateDmg(); Python uses _innate_bonus() with StatusHealth base.",
           "history": [
             {
@@ -514,6 +759,13 @@
           "formula": "secondary_attr_factor",
           "source": "str",
           "note": "bonus_hpr = STR * HPREG_PER_STR * factor",
+          "kv": {
+            "factor": [
+              "secondary_stat_bonus_pct",
+              "value",
+              0.01
+            ]
+          },
           "history": [
             {
               "since": "7.36",
@@ -536,6 +788,13 @@
           "formula": "secondary_attr_factor",
           "source": "int",
           "note": "bonus_mpr = INT * MANAREG_PER_INT * factor",
+          "kv": {
+            "factor": [
+              "secondary_stat_bonus_pct",
+              "value",
+              0.01
+            ]
+          },
           "history": [
             {
               "since": "7.36",
@@ -558,6 +817,13 @@
           "formula": "secondary_attr_factor",
           "source": "agi",
           "note": "bonus_aspd = AGI * AS_PER_AGI * factor",
+          "kv": {
+            "factor": [
+              "secondary_stat_bonus_pct",
+              "value",
+              0.01
+            ]
+          },
           "history": [
             {
               "since": "7.36",
@@ -616,6 +882,13 @@
           "formula": "dmg_universal_bonus_pct",
           "factor": 0.15,
           "since": "7.41",
+          "kv": {
+            "factor": [
+              "damage_stat_bonus_pct",
+              "value",
+              0.01
+            ]
+          },
           "note": "KV damage_stat_bonus_pct=15. Multiplies the universal attribute-to-damage multiplier: mult *= 1.15. Only applies because VS is a Universal hero. Embedded in _primary_dmg() in Python and primaryDmg() in JS — not in innate() dispatch."
         }
       ]
@@ -628,13 +901,27 @@
           "target": "slowRes",
           "formula": "attr_factor",
           "source": "str",
-          "factor": 0.15
+          "factor": 0.15,
+          "kv": {
+            "factor": [
+              "str_to_slow_resist_pct",
+              "value",
+              0.01
+            ]
+          }
         },
         {
           "target": "statusRes",
           "formula": "attr_factor",
           "source": "str",
-          "factor": 0.1
+          "factor": 0.1,
+          "kv": {
+            "factor": [
+              "str_to_status_resist_pct",
+              "value",
+              0.01
+            ]
+          }
         }
       ]
     },
@@ -647,7 +934,19 @@
           "formula": "attr_floor_capped",
           "source": "int",
           "divisor": 3,
-          "cap": 60
+          "cap": 60,
+          "kv": {
+            "divisor": [
+              "int_per_one_cdr",
+              "value",
+              1
+            ],
+            "cap": [
+              "max_cdr",
+              "value",
+              1
+            ]
+          }
         }
       ]
     },
@@ -671,6 +970,13 @@
         {
           "target": "hp",
           "formula": "flat_per_level_interval",
+          "kv": {
+            "value": [
+              "fish_health_bonus",
+              "value",
+              1
+            ]
+          },
           "note": "KV fish_health_bonus=3 per fish. Tidehunter eats a free fish every even hero level (tooltip; 7.41b 'Now gains fish on every even level instead of every level'). 7.41/7.41a: a fish on every level-up (modelled as level-1 fish). Enemy-kill fish not modelled.",
           "history": [
             {
@@ -691,6 +997,13 @@
         {
           "target": "range",
           "formula": "flat_per_level_interval",
+          "kv": {
+            "value": [
+              "fish_attack_range",
+              "value",
+              1
+            ]
+          },
           "note": "KV fish_attack_range=2 per fish. Tidehunter eats a free fish every even hero level (tooltip; 7.41b 'Now gains fish on every even level instead of every level'). 7.41/7.41a: a fish on every level-up (modelled as level-1 fish). Enemy-kill fish not modelled.",
           "history": [
             {
@@ -719,6 +1032,13 @@
           "formula": "regen_amp_pct",
           "since": "7.41a",
           "factor": 20,
+          "kv": {
+            "factor": [
+              "hp_regen_amp",
+              "value",
+              1
+            ]
+          },
           "note": "KV hp_regen_amp=20, always on since the 7.41 rework. hp_regen_amp_out_of_world=100 (while untargetable/invulnerable) is not modelled; 7.36-7.40c Pixie Dust (+100%/+150%) only worked while untargetable/hidden, so it is not modelled either."
         },
         {
@@ -726,6 +1046,13 @@
           "formula": "regen_amp_pct",
           "since": "7.41a",
           "factor": 20,
+          "kv": {
+            "factor": [
+              "mana_regen_amp",
+              "value",
+              1
+            ]
+          },
           "note": "KV mana_regen_amp=20 (see hpr note)."
         }
       ]
@@ -740,6 +1067,18 @@
           "since": "7.41a",
           "base": 24,
           "per_level": 1,
+          "kv": {
+            "base": [
+              "slow_resistance",
+              "value",
+              1
+            ],
+            "per_level": [
+              "slow_resistance",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "KV slow_resistance value=24, hero_levelup=1 (7.41 note '24% + 1% per level'). 7.37b-7.40c: 20/30/40/50% by Reverse Polarity rank — not modelled. Hero Lab only."
         }
       ]
@@ -751,6 +1090,18 @@
         {
           "target": "lifesteal",
           "formula": "base_plus_level",
+          "kv": {
+            "base": [
+              "vampiric_aura",
+              "value",
+              1
+            ],
+            "per_level": [
+              "vampiric_aura",
+              "hero_levelup",
+              1
+            ]
+          },
           "note": "KV vampiric_aura value + hero_levelup. Before 7.41 it levelled with Reincarnation rank — not modelled. Hero Lab only.",
           "history": [
             {
@@ -779,6 +1130,23 @@
           "base": 10,
           "per_threshold": 1,
           "threshold": 100,
+          "kv": {
+            "base": [
+              "base_slow_resist",
+              "value",
+              1
+            ],
+            "per_threshold": [
+              "slow_resistance_per_threshold",
+              "value",
+              1
+            ],
+            "threshold": [
+              "hp_per_threshold",
+              "value",
+              1
+            ]
+          },
           "note": "KV base_slow_resist=10, slow_resistance_per_threshold=1, hp_per_threshold=100 (per 100 Max Health). Pre-7.41 Colossal only gave building damage. Hero Lab only."
         }
       ]
