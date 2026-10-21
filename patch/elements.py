@@ -887,7 +887,7 @@ def _enchant_change(name):
         return ""
     _State.ench_card = {"ek": _State.current_entity_key, "pv": _State.current_patch_version,
                         "labels": [s["label"] for s in ent["stats"]]}
-    head = ('<span class="ench-row-h"><span class="ench-stat-h"></span>'
+    head = ('<span class="ench-row-h"><span class="ench-stat-h">Stats</span>'
             + "".join(f'<span class="ench-tier-h">Tier {t}</span>' for t in _ENCHANT_TIERS) + "</span>")
     lines = [head]
     for s in ent["stats"]:

@@ -802,8 +802,8 @@
     swap:   [95, 176, 164],  // teal — a talent replaced (2026-09-26)
     misc:   [139, 144, 153], // grey
     qol:    [108, 171, 240], // blue
-    del:    [177, 78, 107],  // pink
-    nerf:   [209, 75, 75],   // red
+    del:    [209, 75, 75],   // red — removed (owner 2026-10-21: swapped with NERF)
+    nerf:   [177, 78, 107],  // pink
   };
   // Map a tag's count → rgba alpha. Single-hit bands sit near the old
   // baseline (~0.50), heavy bands push toward fully-saturated 0.90 so

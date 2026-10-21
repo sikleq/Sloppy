@@ -13,7 +13,7 @@ import os
 
 from PIL import Image
 
-HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+HERE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))   # scripts/gen -> repo
 SRC = os.path.join(HERE, "icons", "ref", "gems.png")
 OUT_DIR = os.path.join(HERE, "icons", "dyn_gems")
 
@@ -24,8 +24,8 @@ TAG_RGB = {
     "rework": (164, 114, 207),
     "misc":   (139, 144, 153),
     "qol":    (108, 171, 240),
-    "del":    (177, 78, 107),
-    "nerf":   (209, 75, 75),
+    "del":    (209, 75, 75),
+    "nerf":   (177, 78, 107),
 }
 SIZE = 48          # output canvas (2x of the 24px dyn-cell)
 INSET = 1          # transparent margin so the outline isn't clipped
