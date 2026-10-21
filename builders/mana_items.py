@@ -314,15 +314,15 @@ def _flat_metric(d: dict, kind: str, slug: str = "", patch: str | None = None) -
     return 0.0
 
 
-# Manual pre-7.33 history. Our game-file source (muk-as) only goes back to
-# 7.33, so changes that happened in or before 7.33 from an earlier value are
-# invisible to the auto-diff. Sourced from Liquipedia item changelogs. Keyed
-# by (slug, column-kind). Entries are ('V', patch, date, old, new), oldest
-# first — they're prepended to the auto-computed history.
-_MANUAL_METRIC_HISTORY: dict[tuple[str, str], list] = {
-    # Wind Waker: "Reduced mana regeneration bonus from 6 to 3" (7.33).
-    ("item_wind_waker", "regen"): [("V", "7.33", "20.04.2023", 6, 3)],
-}
+# Manual history for changes OLDER than the first items.json that carries the
+# mana fields (the auto-diff cannot see them). Sourced from Liquipedia item
+# changelogs. Keyed by (slug, column-kind). Entries are ('V', patch, date,
+# old, new), oldest first — they're prepended to the auto-computed history.
+# Empty since the snapshots were backfilled to 7.08 (2026): Wind Waker's 7.33
+# "mana regeneration bonus from 6 to 3" is in the game files now and its
+# manual row showed the change twice. tests/test_roster_guards.py fails if a
+# row here reaches into the patches the game files already cover.
+_MANUAL_METRIC_HISTORY: dict[tuple[str, str], list] = {}
 
 
 def load_metric_history(kind: str) -> dict[str, list[tuple[str, str, float, float]]]:

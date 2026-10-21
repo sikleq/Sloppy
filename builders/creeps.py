@@ -23,6 +23,7 @@ NOTE: builders/entity_changes.py reads CREEP_NAME_TO_NPC, CREEP_DISPLAY_NAMES
 and CREEP_CAMP straight from this file's source text — keep them here.
 """
 import csv as _csv
+import functools as _functools
 import json as _json
 import os as _os
 import re
@@ -197,6 +198,16 @@ CREEP_NAME_TO_NPC = {
 # belong to a different section that will be added later).
 HIDDEN_CREATEHERO = {'flag / melee', 'ranged'}
 
+# Neutral units of npc_units.txt that spawn in no camp (splits / units no camp
+# uses). tests/test_roster_guards.py fails for any OTHER neutral the latest
+# game files carry that CREEP_NAME_TO_NPC (and so the table) does not know.
+NOT_CAMP_UNITS = {
+    'npc_dota_neutral_mud_golem_split',       # Mud Golem's splinters
+    'npc_dota_neutral_mud_golem_split_doom',  # the same, for a Doom-devoured golem
+    'npc_dota_neutral_jungle_stalker',        # in the files, in no camp
+    'npc_dota_neutral_elder_jungle_stalker',
+}
+
 # Full display name (Russian/English) shown in the new Крип column.
 CREEP_DISPLAY_NAMES = {
     'npc_dota_neutral_wildkin':              'Wildwing',
@@ -307,22 +318,61 @@ CAMP_LABEL = {'small': 'Small camp', 'mid': 'Medium camp',
               'big': 'Large camp', 'ancient': 'Ancient camp'}
 
 # Auras that buff the caster's OWN stats — the creep benefits from its own
-# aura, so the displayed stat shows "base (with-aura)". Level-1 aura values,
-# from npc_abilities.json (av_* fields). Keyed by createhero shortname.
-# op '+' = additive flat, '*' = multiplicative. 'dmg' covers min/max/avg.
+# aura, so the displayed stat shows "base (with-aura)". Keyed by createhero
+# shortname: stat -> (op, ability, AbilityValues key). The NUMBER is the
+# level-1 value read from the latest npc_abilities.json (av_<key>), so a
+# balance change reaches the table by itself. op '+' = additive flat,
+# '%' = multiplicative percent (+12 -> x1.12). 'dmg' covers min/max/avg.
 AURA_SELF = {
-    'hellcaller':           {'hp_regen': ('+', 3)},      # Unholy Aura
-    'skeleton_warrior':     {'dmg': ('+', 2)},           # Rally
-    'taskmaster':           {'ms': ('*', 1.12)},         # Speed Aura +12%
-    'soulstealer':          {'mp_regen': ('+', 1.75)},   # Mana Aura (Mindstealer)
-    'outrunner':            {'magres': ('+', 20)},       # Cloak Aura (creep value)
-    'prowler_acolyte':      {'hp_regen': ('+', 9)},      # Spawnlord HP-reg aura
-    'alpha':                {'dmg': ('*', 1.2)},         # Command Aura +20%
-    'enraged':              {'armor': ('+', 3)},         # Toughness Aura
-    'small_thunder_lizard': {'as': ('+', 25)},           # War Drums (atk speed)
-    'black_dragon':         {'armor': ('+', 3)},         # Dragonhide Aura
-    'granite':              {'hp': ('*', 1.16)},         # Granite Aura +16%
+    'hellcaller':           {'hp_regen': ('+', 'satyr_hellcaller_unholy_aura', 'health_regen')},
+    'skeleton_warrior':     {'dmg': ('+', 'hill_troll_rally', 'damage_bonus')},
+    'taskmaster':           {'ms': ('%', 'kobold_taskmaster_speed_aura', 'bonus_movement_speed')},
+    'soulstealer':          {'mp_regen': ('+', 'forest_troll_high_priest_mana_aura', 'mana_regen')},
+    'outrunner':            {'magres': ('+', 'mudgolem_cloak_aura', 'bonus_magical_armor_creeps')},
+    'prowler_acolyte':      {'hp_regen': ('+', 'spawnlord_aura', 'hp_regen')},
+    'alpha':                {'dmg': ('%', 'alpha_wolf_command_aura', 'bonus_damage_pct')},
+    'enraged':              {'armor': ('+', 'enraged_wildkin_toughness_aura', 'bonus_armor')},
+    'small_thunder_lizard': {'as': ('+', 'big_thunder_lizard_wardrums_aura', 'speed_bonus')},
+    'black_dragon':         {'armor': ('+', 'black_dragon_dragonhide_aura', 'bonus_armor')},
+    'granite':              {'hp': ('%', 'granite_golem_hp_aura', 'bonus_hp')},
 }
+
+
+@_functools.lru_cache(maxsize=1)
+def _game_unit_names() -> dict:
+    """{npc_dota_* : name} from the game's localization (abilities_english.txt)."""
+    path = _os.path.join(_HERE, 'data', 'abilities_english.txt')
+    out = {}
+    if _os.path.exists(path):
+        text = open(path, encoding='utf-8', errors='replace').read()
+        for k, v in re.findall(r'^\s*"(npc_dota_[a-z0-9_]+)"\s+"([^"]*)"', text, re.M):
+            out.setdefault(k, v)
+    return out
+
+
+def game_unit_name(npc_key: str) -> str:
+    """A creep CREEP_DISPLAY_NAMES does not list: the game's own name, so a
+    new neutral never shows a made-up title-cased slug."""
+    return (_game_unit_names().get(npc_key)
+            or npc_key.replace('npc_dota_neutral_', '').replace('_', ' ').title())
+
+
+@_functools.lru_cache(maxsize=1)
+def _latest_abilities() -> dict:
+    from patch.meta import latest_stats_version as _lsv
+    path = _os.path.join(_HERE, 'data', 'stats', _lsv(), 'npc_abilities.json')
+    return _json.loads(open(path, encoding='utf-8').read()) if _os.path.exists(path) else {}
+
+
+def aura_self_value(op: str, ability: str, key: str):
+    """(op, value) for _aura_total from the game files: '+' flat level-1
+    value, '%' -> ('*', 1 + pct/100). None when the ability / key is gone
+    (tests/test_roster_guards.py fails then)."""
+    raw = (_latest_abilities().get(ability) or {}).get('av_' + key)
+    if raw is None:
+        return None
+    val = float(str(raw).split()[0])
+    return ('*', 1 + val / 100) if op == '%' else ('+', val)
 
 
 # ---- Row data ----
@@ -513,7 +563,12 @@ def _with_self_aura(result, s, createhero):
     if not aura:
         return result
     out = dict(result)
-    for stat, (op, val) in aura.items():
+    for stat, spec in aura.items():
+        resolved = aura_self_value(*spec)
+        if resolved is None:
+            print(f"  ! creeps: aura {spec[1]}.{spec[2]} not in the latest npc_abilities.json — skipped")
+            continue
+        op, val = resolved
         if stat == 'dmg':
             for dk, dv in (('dmg_min', s.dmg_min), ('dmg_max', s.dmg_max),
                            ('dmg_avg', s.dmg_avg)):
@@ -574,10 +629,8 @@ def _creep_data(createhero, level, padded, atk_idx, src):
     """(npc key, row data) for one visible CSV row."""
     npc_key = _resolve(createhero, src.units)
     if npc_key:
-        display_name = CREEP_DISPLAY_NAMES.get(
-            npc_key,
-            npc_key.replace('npc_dota_neutral_', '').replace('_', ' ').title()
-        )
+        # site names first (CREEP_DISPLAY_NAMES), else the game's own unit name
+        display_name = CREEP_DISPLAY_NAMES.get(npc_key) or game_unit_name(npc_key)
         icon_path = f'icons/units/{npc_key}.png'
     else:
         display_name = createhero.replace('_', ' ').title()

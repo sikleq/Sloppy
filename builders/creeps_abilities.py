@@ -232,6 +232,13 @@ def _dmg_qhint(text: str, tip: str) -> str:
             _qhint(esc(tip)) + '</span>')
 
 
+# The hand-written cells (ABIL_MANUAL texts with their numbers, TYPE_MANUAL,
+# DMGTYPE_MANUAL, DISPEL_MANUAL, THROUGH_BKB) were checked against the game
+# files of this patch. tests/test_roster_guards.py compares the KV blocks of
+# every neutral-creep ability between this patch and the latest one and fails
+# with the changed keys — re-check those cells, then set this to the latest.
+ABIL_MANUAL_CHECKED = "7.41f"
+
 ABIL_MANUAL = {
     'enraged_wildkin_tornado': {
         # Wildkin's `enraged_wildkin_tornado` is only the CAST. The actual
