@@ -1,7 +1,7 @@
 """Hero innate rules = data/rules/hero_stat_innates.json + the game files of every newer patch.
 
 The JSON holds the hand-checked history of each innate effect, verified against the game files up to
-`_checked_version` (older snapshots are not always trustworthy: data/stats/7.41/heroes/ is a copy of 7.40c).
+`_checked_version` (since 2026-10-21 every snapshot is its patch's own build; 14 used to be a build before it).
 An effect whose numbers are plain AbilityValues of the hero's innate carries a "kv" map:
 
     "kv": {"factor": ["secondary_stat_bonus_pct", "value", 0.01]}

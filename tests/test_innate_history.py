@@ -9,9 +9,12 @@ sys.path.insert(0, ROOT)
 from tools import build_innate_history as bih  # noqa: E402
 from builders import innate_rules as ir  # noqa: E402
 
-# snapshots taken from a build before their own patch (7.41: build 6726, the patch is 6728). Refetching them from
-# the patch's build shrinks this list; a NEW one means a fresh snapshot came from a build before its patch.
-KNOWN_LAGGED = {"7.35b", "7.36b", "7.37c", "7.39b", "7.41", "7.41b"}
+# snapshots taken from a build before their own patch. 2026-10-21: 14 of them (7.41 was build 6726, the patch is
+# 6728) were refetched from the first build that carries the patch's own notes; a new one fails here.
+KNOWN_LAGGED = set()
+# rule values that differ from the game files on purpose: Ursa's Maul was levelled 1.2-1.5 (the rules take the
+# max rank); Luna's 7.37e-7.40c night vision "250 + 25 per level up" is the 7.41 wording "225 + 25 per level"
+ON_PURPOSE = {("ursa", "dmg"), ("luna", "nvision")}
 
 
 def _history():
@@ -68,3 +71,22 @@ def test_no_effect_counts_before_its_hero_innate():
     assert _active_entry(luna["nvision"], "7.37")["base"] == 380
     axe = ir.load()["heroes"]["axe"]["effects"][0]
     assert _active_entry(axe, "7.40c") is None and _active_entry(axe, "7.41")["factor"] == 0.5
+
+
+def test_rule_numbers_match_every_snapshot():
+    # 2026-10-21: the rules had been checked against snapshots taken before their patch, so several boundaries sat
+    # one patch late (Elder Titan, Keeper of the Light, Medusa 7.37e …); now every mapped number is checked everywhere
+    from builders.heroes_stats import _active_entry
+    bad = []
+    for slug, hero in ir.load()["heroes"].items():
+        for eff in hero.get("effects", []):
+            if not eff.get("kv") or (slug, eff["target"]) in ON_PURPOSE:
+                continue
+            ability = eff.get("kv_ability") or hero["innate"]
+            for v in ir.stats_versions():
+                game, entry = ir.kv_values(slug, ability, eff["kv"], v), _active_entry(eff, v)
+                if game is None or entry is None:
+                    continue
+                bad += [f"{slug} {eff['target']}.{f} {v}: rules {entry[f]}, game {val}"
+                        for f, val in game.items() if f in entry and abs(float(entry[f]) - val) > 1e-9]
+    assert not bad, "rules disagree with the game files:\n" + "\n".join(bad)

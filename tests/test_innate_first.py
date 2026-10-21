@@ -30,8 +30,11 @@ def test_generator_puts_the_innate_first():
 
 def test_an_innate_the_patch_demotes_keeps_its_place():
     ids = _ids()
-    if "life_stealer_feast" not in ids or "life_stealer_feast" not in g.innate_slugs_of("7.41"):
+    if "life_stealer_feast" not in ids or not g.innate_slugs_of("7.41"):
         pytest.skip("ability ids / 7.41 hero KV not in this checkout")
+    # 2026-10-21: the 7.41 snapshot is now the patch's build (6728) — Feast is no longer innate there, Ghoul Frenzy is
+    assert "life_stealer_feast" not in g.innate_slugs_of("7.41")
+    assert "life_stealer_ghoul_frenzy" in g.innate_slugs_of("7.41")
     hero = {"hero_id": 54, "abilities": [
         {"ability_id": ids["life_stealer_rage"], "ability_notes": [{"note": "Cooldown decreased"}]},
         {"ability_id": ids["life_stealer_feast"], "ability_notes": [{"note": "Now is a basic ability"}]}]}

@@ -396,10 +396,35 @@ def get_all_commits(session) -> list:
     return all_commits  # newest first
 
 
+PATCHNOTES_PATH = "game/dota/pak01_dir/resource/localization/patchnotes/patchnotes_english.txt"
+MAX_NOTES_LAG_DAYS = 2
+
+
+def has_patch_notes(text: bytes | None, version: str) -> bool:
+    """В патчноутах сборки уже есть ключи DOTA_Patch_<version>_ — значит, это сборка самого патча."""
+    return bool(text) and f'"DOTA_Patch_{version.replace(".", "_")}_'.encode() in text
+
+
+def find_patch_build(session, commits: list, version: str, patch_date_str: str) -> dict | None:
+    """Первая сборка не раньше даты патча, в которой уже есть его патчноуты (2026-10-21: правило «первый коммит
+    в день выхода» брало сборку ДО патча у 14 патчей — 7.41 = 6726, сам патч — 6728). Не дальше 2 дней от даты
+    (в архиве бывают дыры: у 7.33c заметки впервые через 11 дней) — тогда None."""
+    day = datetime.strptime(patch_date_str, "%d.%m.%Y").replace(tzinfo=timezone.utc).date()
+    for c in reversed(commits):                              # oldest first
+        d = c["date"].date()
+        if d < day:
+            continue
+        if (d - day).days > MAX_NOTES_LAG_DAYS:
+            return None
+        if has_patch_notes(download_raw(session, c["sha"], PATCHNOTES_PATH), version):
+            return c
+    return None
+
+
 def find_commit_for_patch(commits: list, patch_date_str: str) -> dict | None:
     """
     Находит первый коммит на дату >= patch_date (самый ранний после релиза).
-    commits отсортированы: новые → старые.
+    commits отсортированы: новые → старые. Это может быть сборка ДО патча — main() берёт find_patch_build.
     """
     day = datetime.strptime(patch_date_str, "%d.%m.%Y").replace(tzinfo=timezone.utc)
     # Идём с конца (самые старые) и берём последний, который >= day
@@ -507,9 +532,9 @@ def main():
             continue
 
         # Находим коммит
-        commit = find_commit_for_patch(commits, date)
+        commit = find_patch_build(session, commits, ver, date)
         if commit is None:
-            print(f"[{i+1:2}/{total}] {ver}  ⚠ коммит не найден (дата {date} раньше начала репо)")
+            print(f"[{i+1:2}/{total}] {ver}  ⚠ нет сборки с патчноутами {ver} в 2 днях от {date} — пропущен")
             continue
 
         print(f"[{i+1:2}/{total}] {ver}  →  {commit['date'].strftime('%Y-%m-%d')}  "

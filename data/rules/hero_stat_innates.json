@@ -178,12 +178,12 @@
             },
             {
               "since": "7.40",
-              "until": "7.41",
+              "until": "7.40c",
               "base_pct": 0,
               "per_level_pct": 0.75
             },
             {
-              "since": "7.41a",
+              "since": "7.41",
               "base_pct": 0.5,
               "per_level_pct": 0.75
             }
@@ -261,7 +261,7 @@
     },
     "elder_titan": {
       "innate": "elder_titan_momentum",
-      "since": "7.41a",
+      "since": "7.41",
       "effects": [
         {
           "target": "armor",
@@ -281,13 +281,13 @@
           "note": "Momentum: armor = factor% of BONUS movement speed (MS above base — starting/base MS is the reference and does NOT count). factor = base + per_level * level and SCALES with hero level: KV value=base, hero_levelup=per_level, and per the 7.41 innate rework the increment is provided at level 1 (so level-1 factor = base + per_level, e.g. 7.0+0.5=7.5% in 7.41e). hero_lab: applied in calc() via elderTitanMomentumArmor() AFTER ms is known — NOT the generic innate() dispatch (which runs before MS). Hero Stats table: Python _innate_bonus() bonus_ms_factor branch reads above-base (innate) MS at level 1; Elder Titan has no innate MS, so it is 0 there. Pre-7.41a Momentum granted attack speed from bonus MS instead; intentionally not modeled.",
           "history": [
             {
-              "since": "7.41a",
-              "until": "7.41b",
+              "since": "7.41",
+              "until": "7.41a",
               "base": 3.6,
               "per_level": 0.4
             },
             {
-              "since": "7.41c",
+              "since": "7.41b",
               "until": "7.41d",
               "base": 5.0,
               "per_level": 0.5
@@ -328,7 +328,7 @@
     },
     "keeper_of_the_light": {
       "innate": "keeper_of_the_light_bright_speed",
-      "since": "7.41a",
+      "since": "7.41",
       "effects": [
         {
           "target": "ms",
@@ -337,12 +337,12 @@
           "note": "KV intelligence_per_speed=N; factor = 1/N.",
           "history": [
             {
-              "since": "7.41a",
-              "until": "7.41b",
+              "since": "7.41",
+              "until": "7.41a",
               "factor": 0.4
             },
             {
-              "since": "7.41c",
+              "since": "7.41b",
               "factor": 0.33333
             }
           ]
@@ -471,12 +471,12 @@
             },
             {
               "since": "7.37",
-              "until": "7.37e",
+              "until": "7.37d",
               "dpm": "leveled: 2.4/2.4/2.8/3.2/3.6",
               "dpm_base": 2.4
             },
             {
-              "since": "7.38",
+              "since": "7.37e",
               "until": "7.39d",
               "dpm_base": 2.2
             },
@@ -725,7 +725,7 @@
     },
     "techies": {
       "innate": "techies_mutually_assured_destruction",
-      "since": "7.41a",
+      "since": "7.41",
       "effects": [
         {
           "target": "mpr",
@@ -745,7 +745,7 @@
           },
           "history": [
             {
-              "since": "7.41a",
+              "since": "7.41",
               "until": "7.41b",
               "base_pct": 0.0008,
               "per_level_pct": 0.0002
@@ -1029,12 +1029,12 @@
     },
     "rubick": {
       "innate": "rubick_curiosity",
-      "since": "7.41a",
+      "since": "7.41",
       "effects": [
         {
           "target": "dmg",
           "formula": "flat_per_level",
-          "since": "7.41a",
+          "since": "7.41",
           "per_level": 1,
           "note": "KV curiosity_per_level=1 stack per hero level x curiosity_attack_damage=1 base damage (tooltip: '1 stack of Curiosity per level that grants him 1 base damage'); per the 7.41 rule the increment is granted at level 1. Temporary (spell-cast) and kill stacks are not modelled. New in 7.41 — gated at 7.41a because the 7.41 KV snapshot equals 7.40c."
         }

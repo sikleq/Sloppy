@@ -1,13 +1,6 @@
 {
  "_doc": "Which ability was each hero's innate in every patch, oldest first; written by tools/build_innate_history.py (game files, patch notes for the early ones and for lagged snapshots).",
- "lagged": [
-  "7.35b",
-  "7.36b",
-  "7.37c",
-  "7.39b",
-  "7.41",
-  "7.41b"
- ],
+ "lagged": [],
  "heroes": {
   "abaddon": [
    {
@@ -64,7 +57,7 @@
      "ancient_apparition_bone_chill",
      "ancient_apparition_death_rime"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "antimage": [
@@ -88,7 +81,7 @@
      "antimage_mana_thirst",
      "antimage_persectur"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "arc_warden": [
@@ -113,7 +106,7 @@
     "innates": [
      "axe_one_man_army"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "bane": [
@@ -163,7 +156,7 @@
      "beastmaster_inner_beast",
      "beastmaster_rugged"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "bloodseeker": [
@@ -229,7 +222,7 @@
      "bristleback_brawlers_grit",
      "bristleback_prickly"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "broodmother": [
@@ -265,7 +258,7 @@
      "chaos_knight_fundamental_forging",
      "chaos_knight_reins_of_chaos"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "chen": [
@@ -281,7 +274,7 @@
     "innates": [
      "chen_zealot"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "clinkz": [
@@ -314,7 +307,7 @@
     "innates": [
      "crystal_maiden_glacial_guard"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "dark_seer": [
@@ -340,7 +333,7 @@
      "dark_seer_mental_fortitude",
      "dark_seer_quick_wit"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "dark_willow": [
@@ -410,7 +403,7 @@
      "doom_bringer_devils_bargain",
      "doom_bringer_lvl_pain"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "dragon_knight": [
@@ -426,7 +419,7 @@
     "innates": [
      "dragon_knight_dragon_blood"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "drow_ranger": [
@@ -440,11 +433,11 @@
   ],
   "earth_spirit": [
    {
-    "since": "7.35b",
+    "since": "7.35c",
     "innates": [
      "earth_spirit_stone_caller"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "earthshaker": [
@@ -492,7 +485,7 @@
      "elder_titan_momentum",
      "elder_titan_tip_the_scales"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "ember_spirit": [
@@ -541,7 +534,7 @@
      "enigma_event_horizon",
      "enigma_gravity_well"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "faceless_void": [
@@ -585,7 +578,7 @@
      "gyrocopter_afterburner",
      "gyrocopter_chop_shop"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "hoodwink": [
@@ -603,7 +596,7 @@
      "hoodwink_mistwoods_wayfarer",
      "hoodwink_tomokan_tracker"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "huskar": [
@@ -654,7 +647,7 @@
     "innates": [
      "juggernaut_bladeform"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "keeper_of_the_light": [
@@ -680,7 +673,7 @@
      "keeper_of_the_light_mana_magnifier",
      "keeper_of_the_light_special_reserve"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "kez": [
@@ -738,7 +731,7 @@
      "legion_commander_intimidate",
      "legion_commander_outfight_them"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "leshrac": [
@@ -772,7 +765,7 @@
     "innates": [
      "life_stealer_ghoul_frenzy"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "lina": [
@@ -796,7 +789,7 @@
      "lina_combustion",
      "lina_slow_burn"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "lion": [
@@ -890,7 +883,7 @@
      "mars_dauntless",
      "mars_immovable"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "medusa": [
@@ -916,7 +909,7 @@
      "meepo_geomancy",
      "meepo_sticky_fingers"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "mirana": [
@@ -934,7 +927,7 @@
      "mirana_nightveil",
      "mirana_selemenes_faithful"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "monkey_king": [
@@ -959,7 +952,7 @@
     "innates": [
      "morphling_ebb_and_flow"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "muerta": [
@@ -985,7 +978,7 @@
      "naga_siren_eelskin",
      "naga_siren_slithereen_cutlass"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "necrolyte": [
@@ -1021,7 +1014,7 @@
      "night_stalker_hunter_in_the_night",
      "night_stalker_night_reign"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "nyx_assassin": [
@@ -1038,7 +1031,7 @@
      "nyx_assassin_neuro_sting",
      "nyx_assassin_nyxth_sense"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "obsidian_destroyer": [
@@ -1055,7 +1048,7 @@
      "obsidian_destroyer_equilibrium",
      "obsidian_destroyer_ominous_discernment"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "ogre_magi": [
@@ -1139,7 +1132,7 @@
     "innates": [
      "phoenix_dying_light"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "primal_beast": [
@@ -1200,7 +1193,7 @@
      "queenofpain_masochist",
      "queenofpain_succubus"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "rattletrap": [
@@ -1236,7 +1229,7 @@
     "innates": [
      "ringmaster_dark_carnival_souvenirs"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "rubick": [
@@ -1253,7 +1246,7 @@
      "rubick_curiosity",
      "rubick_might_and_magus"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "sand_king": [
@@ -1279,7 +1272,7 @@
      "shadow_demon_menace",
      "shadow_demon_shadow_servant"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "shadow_shaman": [
@@ -1314,7 +1307,7 @@
      "silencer_brain_drain",
      "silencer_oppressive_silence"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "skeleton_king": [
@@ -1339,7 +1332,7 @@
     "innates": [
      "skywrath_mage_shield_of_the_scion"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "slardar": [
@@ -1381,7 +1374,7 @@
      "snapfire_boomstick",
      "snapfire_buckshot"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "sniper": [
@@ -1424,7 +1417,7 @@
      "spirit_breaker_bull_rush",
      "spirit_breaker_herd_mentality"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "storm_spirit": [
@@ -1450,7 +1443,7 @@
      "sven_vanquisher",
      "sven_wrath_of_god"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "techies": [
@@ -1467,7 +1460,7 @@
      "techies_mutually_assured_destruction",
      "techies_spoons_stash"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "templar_assassin": [
@@ -1500,7 +1493,7 @@
      "templar_assassin_inner_peace",
      "templar_assassin_third_eye"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "terrorblade": [
@@ -1524,9 +1517,17 @@
     "since": "7.41",
     "innates": [
      "tidehunter_blubber",
+     "tidehunter_krill_eater"
+    ],
+    "source": "files"
+   },
+   {
+    "since": "7.41a",
+    "innates": [
+     "tidehunter_blubber",
      "tidehunter_leviathans_catch"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "tinker": [
@@ -1630,7 +1631,7 @@
      "vengefulspirit_retribution",
      "vengefulspirit_soul_strike"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "venomancer": [
@@ -1654,7 +1655,7 @@
      "venomancer_poison_sting",
      "venomancer_sepsis"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "viper": [
@@ -1694,7 +1695,7 @@
      "visage_lurker",
      "visage_silent_as_the_grave"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "void_spirit": [
@@ -1721,7 +1722,7 @@
      "warlock_imp_explode",
      "warlock_imp_explode_major"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "weaver": [
@@ -1745,7 +1746,7 @@
      "weaver_rewoven",
      "weaver_threads_of_fate"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "windrunner": [
@@ -1762,7 +1763,7 @@
      "windrunner_easy_breezy",
      "windrunner_tailwind"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "winter_wyvern": [
@@ -1780,7 +1781,7 @@
      "winter_wyvern_eldwurm_scholar",
      "winter_wyvern_eldwurms_edda"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "wisp": [
@@ -1805,7 +1806,7 @@
      "wisp_equilibrium",
      "wisp_essence_conduction"
     ],
-    "source": "next snapshot"
+    "source": "files"
    }
   ],
   "witch_doctor": [
