@@ -65,10 +65,6 @@ from patch.game_constants import (
     ARMOR_PER_AGI, MR_PER_INT, AS_PER_AGI, DMG_PER_PRIMARY,
 )
 
-# Ogre Magi innate — mana / mana regen scale with Strength (he has 0 base Int).
-OGRE_MANA_PER_STR    = 6.0
-OGRE_MANAREG_PER_STR = 0.02
-
 
 # ---------- patch ordering / dates ----------
 
@@ -413,10 +409,20 @@ from patch.elements import _slugify as _changes_slug      # Hero Changes page = 
 _LATEST_STATS_VERSION = _lsv()
 _CTX_VERSION = [_LATEST_STATS_VERSION]
 
-# ── Hero innate rules — loaded once from data/rules/hero_stat_innates.json ──
-_INNATE_RULES: dict = _json.loads(
-    (_HERE / "data" / "rules" / "hero_stat_innates.json").read_text(encoding="utf-8")
-)["heroes"]
+# ── Hero innate rules — loaded once: data/rules/hero_stat_innates.json plus the
+# history builders/innate_rules.py reads from the game files of newer patches ──
+from builders import innate_rules as _innate_rules_mod
+_INNATE_RULES: dict = _innate_rules_mod.load()["heroes"]
+
+
+def _innate_entry(slug: str, target: str, formula: str, version: str | None = None) -> dict | None:
+    """The active history entry of one innate effect (None when the hero has
+    no such effect at that patch) — Techies / Void Spirit / Ogre Magi read
+    their numbers through this instead of typing them."""
+    for eff in _INNATE_RULES.get(slug, {}).get("effects", []):
+        if eff.get("target") == target and eff.get("formula") == formula:
+            return _active_entry(eff, version or _CTX_VERSION[0])
+    return None
 
 # Attribute KV field names used by innate formula dispatch
 _ATTR_FIELD = {
@@ -604,11 +610,15 @@ def _whole_start_attr(s, h, r, key: str) -> int:
 
 
 def _techies_pool_regen_l1(s, h, r) -> float:
-    if not h.endswith("_techies") or not _ge(_CTX_VERSION[0], "7.41a"):
+    """Techies M.A.D. (7.41a+): a share of the mana pool as mana regen —
+    base_pct + per_level_pct·level from the innate rules (KV bonus_mana_as_mana_regen)."""
+    if not h.endswith("_techies"):
+        return 0.0
+    entry = _innate_entry("techies", "mpr", "mana_pool_pct_per_level")
+    if entry is None:
         return 0.0
     lvl = 1
-    pct = (0.001 + 0.0001 * lvl) if _ge(_CTX_VERSION[0], "7.41c") else (0.0008 + 0.0002 * lvl)
-    return _mp_l1(s, h, r) * pct
+    return _mp_l1(s, h, r) * (entry["base_pct"] + entry["per_level_pct"] * lvl)
 
 
 # ---------- value functions ----------
@@ -646,9 +656,10 @@ def _primary_dmg(s, h):
                  + _field(s, h, "AttributeBaseAgility")
                  + _field(s, h, "AttributeBaseIntelligence"))
         mult = _universal_dmg_mult()
-        if h.endswith("_void_spirit") and _ge(_CTX_VERSION[0], "7.41"):
-            # Intrinsic Edge: +15% attack damage per attribute since 7.41.
-            mult *= 1.15
+        entry = _innate_entry(h.replace("npc_dota_hero_", ""), "dmg", "dmg_universal_bonus_pct")
+        if entry is not None:
+            # Void Spirit Intrinsic Edge (7.41+): +15% attack damage per attribute.
+            mult *= 1 + entry["factor"]
         bonus = mult * total
     return float(_math.floor(bonus))
 
@@ -712,8 +723,10 @@ def _mp_l1(s, h, r):
     if slug == "huskar":
         return 0.0
     if slug == "ogre_magi":
+        # Dumb Luck: mana per Strength (KV mana_per_str) — from the innate rules
+        per_str = _innate_entry(slug, "mp", "attr_substitution")["factor"]
         return round(_field(s, h, "StatusMana")
-                     + OGRE_MANA_PER_STR * _whole_start_attr(s, h, r, "str")
+                     + per_str * _whole_start_attr(s, h, r, "str")
                      + MANA_PER_INT * _whole_start_attr(s, h, r, "int"))
     return round(_field(s, h, "StatusMana")
                  + MANA_PER_INT * _whole_start_attr(s, h, r, "int"))
@@ -730,8 +743,9 @@ def _mpreg_l1(s, h, r):
     if slug == "huskar":
         return 0.0
     if slug == "ogre_magi":
+        per_str = _innate_entry(slug, "mpr", "attr_substitution")["factor"]   # KV mana_regen_per_str
         return round(_field(s, h, "StatusManaRegen")
-                     + OGRE_MANAREG_PER_STR * _start_attr(s, h, r, "str")
+                     + per_str * _start_attr(s, h, r, "str")
                      + MANAREG_PER_INT * _start_attr(s, h, r, "int"), 2)
     return round((_field(s, h, "StatusManaRegen")
                   + MANAREG_PER_INT * _whole_start_attr(s, h, r, "int")
