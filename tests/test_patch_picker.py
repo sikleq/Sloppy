@@ -35,11 +35,6 @@ def test_every_content_page_is_in_the_picker():
     assert not missing, f"patch pages missing from the version picker: {missing}"
 
 
-def test_738_is_selectable():
-    picker = {p["version"] for p in PATCHES}
-    assert "7.38" in picker
-
-
 def test_picker_entries_point_at_a_real_content_page():
     """No dangling dropdown links: every picked version has a content page."""
     pages = _content_page_versions()

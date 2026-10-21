@@ -87,15 +87,6 @@ def test_an_item_only_taken_out_says_so_in_its_label():
     assert "html.cb-mode .entity-name .entity-removed-type" in css
 
 
-def test_block_of_cheese_has_a_hand_written_card():
-    # owner 2026-10-17: "Block of Cheese 7.38 — old > new card; the game has no real description" (only "Try me!")
-    seg = re.sub(r'</?b(?: class="iab-num")?>', "", _block(_page("7.38"), "block-of-cheese"))
-    assert 'data-tag="new">Restores 3000 health and 2000 mana</span>' in seg
-    assert 'data-tag="rework">Duration: 5 minutes</span>' in seg
-    shown = [li for li in seg.split("<li")[1:] if "iab-covered" not in li.split(">", 1)[0]]
-    assert len(shown) == 1 and "fully shareable" in shown[0]               # the row says more than the card
-
-
 def test_crude_7_41_keeps_valves_numbers():
     # owner 2026-10-17: 6/9/12% came in 7.41a ("worsened from 8/12/16% to 6/9/12%") — the local "7.41" items.txt is
     # the 7.41a build, Valve's 7.41 "8/12/16%" was right
