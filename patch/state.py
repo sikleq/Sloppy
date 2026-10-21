@@ -8,6 +8,7 @@ class _State:
     terrain_rows = None
     terrain_anchor = False           # the page's first terrain block got id="terrain" (the Terrain page links to it)
     current_hero = None  # internal slug of current hero block (for ability icon derivation)
+    current_hero_title = None   # hero_header()'s own text: talent_marks groups a hero's talent swaps by it
     ability_icons = set()  # all ability-icon URLs emitted during build (for icon-validator)
     ability_block_open = False  # tracks <div class="ability-block"> wrapper
     current_block_is_facet = False  # True when ability_block_open was set by facet_header()

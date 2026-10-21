@@ -57,3 +57,33 @@ def test_filter_keeps_a_header_only_ability_apart_from_its_rows():
     from pathlib import Path
     js = (Path(__file__).resolve().parents[1] / "src" / "scripts.js").read_text(encoding="utf-8")
     assert "if (!ul) { headerOnly.push(block); return; }" in js
+
+
+def test_talent_swap_marks_removed_new_and_moved_talents():
+    # Batrider 7.41: Smoldering Resin moved L20 +4s -> L10 +1s; the rest are removed / brand-new talents
+    from patch import talent_marks as tm
+    swaps = [(10, "+50 Flamebreak Knockback Distance", "+1s Smoldering Resin Duration"),
+             (20, "+4s Smoldering Resin Duration", "Attacks apply 1 Stack of Sticky Napalm")]
+    tm._cache["x"] = {"Batrider": swaps}
+    tm._content_file = lambda: "x"
+    try:
+        assert tm.mark("Level 10 Talent: +50 Flamebreak Knockback Distance replaced with +1s Smoldering Resin Duration",
+                       "Batrider")[:2] == ("gone", "moved")
+        assert tm.mark("Level 20 Talent: +4s Smoldering Resin Duration replaced with Attacks apply 1 Stack of Sticky Napalm",
+                       "Batrider")[:2] == ("moved", "fresh")
+    finally:
+        del tm._content_file
+        import importlib
+        importlib.reload(tm)
+
+
+def test_bug_note_is_a_bug_box_not_a_question_mark():
+    html = el.bug_note("Kept the old bonus")
+    assert 'class="info-tip bug-tip"' in html and 'class="bug-ico"' in html and ">?<" not in html
+
+
+def test_aghanim_upgrade_words_move_from_card_text_to_its_summary():
+    spec, kind = el._take_aghs({"desc": ["Active (Aghanim's Scepter upgrade). All abilities are supercharged:"]})
+    assert kind == "scepter" and spec["desc"] == ["All abilities are supercharged:"]
+    spec, kind = el._take_aghs({"desc": ["Granted by Aghanim's Scepter. Unit-targeted.", "x"]})
+    assert kind == "scepter" and spec["desc"] == ["Unit-targeted.", "x"]

@@ -61,6 +61,8 @@ _dynamics.json
 # / one-off generation; not load-bearing for the build.
 # EXCEPTION: data/7.38c_datafeed.json is committed on purpose (force-added) — it is the one datafeed CI has, so
 # tests/test_datafeed_coverage.py guards at least one patch there. Do not delete it (audit 2026-10-04 nearly did).
+# Also force-added (2026-10-21): 7.31, 7.38, 7.41, 7.41a-d, 7.41f — the versions tests/test_generator.py generates.
+# Without them CI fetched dota2.com live and failed whenever Valve answered with an empty body.
 data/*_datafeed.json
 
 # Abandoned logo experiment — kept locally, not committed

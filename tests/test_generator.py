@@ -1027,3 +1027,14 @@ def test_now_is_a_tier_artifact_is_a_header_and_its_ability_a_row():
     out = "\n".join(g._render_item(item, "7.38", neutral=True))
     assert 'item_header("Occult Bracelet", new="Now a Tier 1 Artifact")' in out
     assert "Passive: Rites of Eloshar" in out and "inline_note" not in out and "Now is a Tier" not in out
+
+
+# CI has no network cache: every version the scaffold tests generate must have its datafeed committed, or the
+# test fetches dota2.com live and fails when Valve answers "null" (2026-10-21)
+@pytest.mark.parametrize("version", sorted({"7.31", "7.38", "7.41", "7.41a", "7.41b", "7.41c", "7.41d", "7.41f"}))
+def test_scaffold_versions_have_a_committed_datafeed(version):
+    import subprocess
+    root = os.path.dirname(os.path.dirname(__file__))
+    tracked = subprocess.run(["git", "ls-files", f"data/{version}_datafeed.json"], cwd=root,
+                             capture_output=True, text=True).stdout.strip()
+    assert tracked, f"git add -f data/{version}_datafeed.json"

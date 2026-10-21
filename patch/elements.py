@@ -484,7 +484,8 @@ def _item_display_name(slug):
 def hero_header(name):
     _State.current_ability_slug = None
     _State.current_ability_innate = False
-    _State.current_hero = HERO_SLUG.get(name, name.lower().replace(" ", "_").replace("'", "").replace("-", ""))
+    _State.current_hero_title = name
+    _State.current_hero = HERO_SLUG.get(name,name.lower().replace(" ", "_").replace("'", "").replace("-", ""))
     _State.current_unit = None
     _State.next_ul_is_hero_stats = True
     _State.seen_abilities_subgroup = False
@@ -2433,6 +2434,30 @@ def sub_ability(slug, name):
             f'<b class="ac-sub-name">{name}</b></span>')
 
 
+def _mark_talent_swap(text, badge, extra):
+    """A talent swap row: the removed talent red, a brand-new one gold with NEW for the row, a talent that only
+    changed level plain with a note (patch/talent_marks.py; owner 2026-10-21)."""
+    from . import talent_marks
+    from .badges import t
+    if 'data-tag="swap"' not in (badge or "") or "<" in text:
+        return text, badge, extra
+    fate = talent_marks.mark(text, _State.current_hero_title)
+    if not fate:
+        return text, badge, extra
+    old_fate, new_fate, note = fate
+    m = talent_marks.SWAP_RE.match(text)
+    old, new = m.group(2), m.group(3)
+    if old_fate == "gone":
+        old = hl(old, "del")
+    if new_fate == "fresh":
+        new = hl(new, "new")
+        badge = t("NEW")
+    text = text[:m.start(2)] + old + text[m.end(2):m.start(3)] + new + text[m.end(3):]
+    if note:
+        extra = (extra or "") + inline_note(note)
+    return text, badge, extra
+
+
 def hl(text, kind):
     """A phrase coloured like the item cards' changes: kind = new / del / buff / nerf / rework."""
     return f'<span class="iab-hl iab-hl-{kind}">{text}</span>'
@@ -2447,6 +2472,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         _tphrase, _tshots = terrain_note(_State.current_patch_version, text)
         extra = (extra or "") + _tshots
         text = _TALENT_PREFIX_RE.sub(r'\1: ', text)
+        _plain_text = text                     # the weights read the words, not the highlight spans
+        text, badge, extra = _mark_talent_swap(text, badge, extra)
         if _State.in_stats_ul:
             _m = _FACET_INNATE_PREFIX_RE.match(text)
             if _m and _m.group(1) in _FACET_INNATE_NAMES:
@@ -2461,12 +2488,12 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
             dyn_tags = set(primary)
         else:
             dyn_tags = set(re.findall(r'data-overall="(\w+)"', badge))
-    _score_text = text if isinstance(text, str) else ""
+    _score_text = _plain_text if isinstance(text, str) else ""
     if isinstance(extra, str) and _TOTAL_UNCHANGED_RE.search(extra):
         # "Recipe cost 1350 -> 1250" + note "Total cost unchanged": the buyer pays the same
         _score_text += ". " + re.sub(r'<[^>]+>', ' ', extra)
     _cost_panel_covered(_score_text)
-    _ctx = _row_ctx(text if isinstance(text, str) else "")
+    _ctx = _row_ctx(_plain_text if isinstance(text, str) else "")
     _scores = _row_scores(_score_text, dyn_tags, badge, ctx=_ctx)
     _dyn_record_li(dyn_tags, extra_keys=also_dyn, scores=_scores)
     _note_cell_row(_score_text, dyn_tags, _scores, _ctx)
@@ -2711,6 +2738,22 @@ def info_tip(*lines, header=None):
     head = f'<span class="info-pop-h">{header}</span>' if header else ''
     return ('<!--TIP--><span class="info-tip" tabindex="0">?'
             f'<span class="info-pop">{head}{body}</span></span><!--/TIP-->')
+
+
+# Lucide "bug" (ISC licence), stroked in the tip's colour (owner 2026-10-21: bugs get a [bug] box like the [?] one)
+_BUG_SVG = ('<svg class="bug-ico" viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" '
+            'stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+            '<path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3 3 0 1 1 6 0v1"/>'
+            '<path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/>'
+            '<path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/>'
+            '<path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/>'
+            '<path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>')
+
+
+def bug_note(text):
+    """A game bug next to a row: the [?] box with a bug instead of "?", never merged with the row's [?] tips."""
+    return (f'<!--INLINETIP--><span class="info-tip bug-tip" tabindex="0" aria-label="Bug">{_BUG_SVG}'
+            f'<span class="info-pop"><span class="info-pop-h">Bug</span>{_pop_list(text)}</span></span><!--/INLINETIP-->')
 
 
 _TIP_RE = re.compile(r'<!--TIP--><span class="info-tip" tabindex="0">\?<span class="info-pop">(.*)</span></span>'
@@ -3421,7 +3464,29 @@ def aghs_shard_line(text):
     return aghs_line(text, kind="shard")
 
 
+_AC_AGHS_RE = re.compile(r"^(?:(?:Active|Passive)\s*)?\(Aghanim's (Scepter|Shard) upgrade\)\.?\s*"
+                         r"|^Granted by Aghanim's (Scepter|Shard)\.\s*")
+
+
+def _take_aghs(spec):
+    """A card whose text opens with "Active (Aghanim's Scepter upgrade)." / "Granted by Aghanim's Scepter.": the
+    words leave the text (the head shows Active / Passive) and the card's summary row says it with the Aghanim
+    stripe instead (owner 2026-10-21, Clockwerk 7.41 Overclocking). -> (spec, "scepter" / "shard" / None)."""
+    desc = list((spec or {}).get("desc") or [])
+    if not desc or not isinstance(desc[0], str):
+        return spec, None
+    m = _AC_AGHS_RE.match(desc[0])
+    if not m:
+        return spec, None
+    rest = desc[0][m.end():]
+    desc = ([rest] if rest.strip() else []) + desc[1:]
+    return dict(spec, desc=desc), (m.group(1) or m.group(2)).lower()
+
+
 def ability_change(old, new, summary=None, tag=None, sub=False):
+    new, _aghs_new = _take_aghs(new)
+    old, _aghs_old = _take_aghs(old) if old is not None else (None, None)
+    _aghs = _aghs_new or _aghs_old
     _State.current_ability_slug = new.get("slug")          # rows below belong to this ability
     _State.current_ability_innate = bool(new.get("innate"))
     _card_ctx = {"ability": _State.current_ability_slug, "innate": _State.current_ability_innate,
@@ -3594,11 +3659,14 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
         if tag_key not in ('new', 'rework'):
             tag_key = 'new'
         tag_label = tag_key.upper()
+        aghs_cls = f' class="aghanim-{_aghs}"' if _aghs else ''
+        aghs_txt = (f' <span class="ac-aghs">Aghanim\'s {_aghs.title()} upgrade</span>'
+                    f'<span class="aghanim-marker {_aghs}"></span>') if _aghs else ''
         summary_row = (
             f'<ul class="changes ability-change-summary-ul">'
-            f'<li data-tag="{tag_key}">'
+            f'<li data-tag="{tag_key}"{aghs_cls}>'
             f'<span class="badge {tag_key}" data-tag="{tag_key}">{tag_label}</span>'
-            f'<span class="row-text">{summary or ""}</span>'
+            f'<span class="row-text">{summary or ""}{aghs_txt}</span>'
             f'</li>'
             f'</ul>'
         )

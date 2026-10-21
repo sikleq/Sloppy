@@ -3298,6 +3298,8 @@ def fetch_datafeed(version):
     with urllib.request.urlopen(req, timeout=30) as r:
         raw = r.read()
     d = json.loads(raw)
+    if not isinstance(d, dict):     # Valve sometimes answers "null": say so instead of a TypeError further down
+        raise RuntimeError(f'{url} returned {raw[:40]!r} instead of patch notes; try again later')
     # Valve wraps in {"success": true, "result": {...}} — unwrap if needed
     if 'result' in d and 'patch_notes' in d.get('result', {}):
         d = d['result']['patch_notes']
