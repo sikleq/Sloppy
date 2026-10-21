@@ -1446,15 +1446,24 @@ def build():
     W(li("Cooldown decreased from 12/11/10/9s to 10/9/8/7s", b([12, 11, 10, 9], [10, 9, 8, 7], l=True)))
     W(li("Aghanim's Scepter no longer allows to perform attacks if Dazzle is disarmed", t("DEL")))
     W(ul_close())
-    W(ability("Nothl Projection", slug="dazzle_nothl_projection"))
-    W(ul_open())
-    W(li("New Ultimate ability", t("NEW"), extra=inline_note("Dazzle's soul departs his body, becoming an untargetable, invulnerable and tree-walking spirit that can still attack, cast abilities and use items. His mortal body can be attacked and there is a visible tether between it and Dazzle's soul. While in soul form, all Dazzle's basic abilities are improved: Poison Touch hexes enemies, Shallow Grave heals upon expiration and Shadow Wave has reduced cooldown. If the body is killed, Dazzle's soul perishes. When Dazzle's spirit moves further than 1600 units from his body, it is tugged back towards the body with the intensity of this pull increasing the further Dazzle's soul travels. When the effect ends, the soul returns to its body. Cooldown: 70/60/50s, Max Duration: 15s, Min Duration: 5s, Cast Range: 600, Mana Cost: 100/150/200")))
-    W(li("Poison Touch Hex Duration: 1.4/1.6/1.8s", t("NEW")))
-    W(li("Shallow Grave Healing: 225/300/375", t("NEW"), extra=inline_note("Shallow Grave healing will trigger even if it was cast before Nothl Projection, but expired during it")))
-    W(li("Shadow Wave Cooldown Reduction: 30/45/60%", t("NEW")))
-    W(li("Dazzle can't attack buildings or use Hand of Midas while in Soul form", t("NEW")))
-    W(li("Can be upgraded with Aghanim's Shard", t("NEW"), extra=inline_note("Allows to cast Nothl Projection while disabled and provides 20% Outgoing Healing Amplification for the duration")))
-    W(ul_close())
+    W(ability_change(
+        old=None,
+        new=dict(
+            name="Nothl Projection",
+            slug="dazzle_nothl_projection",
+            desc=[
+                "New Ultimate ability.",
+                "Dazzle's soul departs his body, becoming an untargetable, invulnerable and tree-walking spirit that can still attack, cast abilities and use items. His mortal body can be attacked and there is a visible tether between it and Dazzle's soul. If the body is killed, Dazzle's soul perishes. When the effect ends, the soul returns to its body. Duration: <b>5-15s</b>.",
+                "When Dazzle's spirit moves further than <b>1600</b> units from his body, it is tugged back towards the body with the intensity of this pull increasing the further Dazzle's soul travels.",
+                "While in soul form, all Dazzle's basic abilities are improved: Poison Touch hexes enemies for <b>1.4/1.6/1.8s</b>, Shallow Grave heals for <b>225/300/375</b> upon expiration, and Shadow Wave cooldown is reduced by <b>30/45/60%</b>."
+                + inline_note("Shallow Grave healing will trigger even if it was cast before Nothl Projection, but expired during it"),
+                "Dazzle can't attack buildings or use Hand of Midas while in Soul form.",
+                aghs_shard_line("Allows to cast Nothl Projection while disabled and provides 20% Outgoing Healing Amplification for the duration."),
+            ],
+        ),
+        summary="New ability.",
+        tag="new",
+    ))
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 20 Talent 200 Heal on Shallow Grave End replaced with -4s Shallow Grave Cooldown", t("SWAP")))
