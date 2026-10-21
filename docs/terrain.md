@@ -761,8 +761,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
    it wrongly used worlddata.json bounds → trees were misplaced.)
 4. ✅ **Map source — done.** Stitched from spectral tiles
    (`scripts/gen/build_terrain_maps.py`, zoom 2 → 1280²).
-5. **Lens polish (optional):** show tree dots inside the lens too; clamp the
-   lens at map edges; touch support (tap-to-pin).
+5. ✅ **Lens — done** (Zoom mode; tree / camp markers are cloned into it). Closed by the owner 2026-10-21.
 
 ## Gotchas
 

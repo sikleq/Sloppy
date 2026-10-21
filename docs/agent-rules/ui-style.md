@@ -20,6 +20,12 @@
 - `heroes_dyn.html` now supports the same Melee/Ranged toolbar filtering pattern used in Hero Stats. Feed `data-attack-type` per row from the latest hero raw data; Spirit Bear is always melee.
 - Dyn-cell pills inside `td.hd-cell` should stay visually centered by forcing the cell to `line-height: 0`; otherwise the pill sits slightly high in the grid.
 
+## Materials: Changes — первая вкладка группы (2026-10-21)
+
+Кнопка группы (Heroes / Items / Creeps) открывает её страницу Changes (Hero / Item / Unit Changes), и в выпадающем
+списке Changes стоит первой; вкладка Materials в шапке ведёт на Unit Changes (`MATERIALS_GROUPS` / `NAV_TABS` в
+`builders/site_common.py`, тест `tests/test_materials_nav.py`).
+
 ## Materials page vertical rhythm (правило отступов)
 
 Все страницы Materials (Neutral Creeps / Unit Abilities / Mana Items / Terrain) держат **один и тот же** вертикальный ритм между текстом-описанием и основным блоком (таблица/карта). Источник правды — три значения паддингов внутри `.creeps-scroll`:

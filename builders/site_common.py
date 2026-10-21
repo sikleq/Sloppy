@@ -86,7 +86,7 @@ NAV_TABS = [
     ("main",       "Main",         "index.html"),
     ("changelogs", "Patches",      None),
     ("calendar",   "Calendar",     "calendar.html"),
-    ("materials",  "Materials",    "neutral_stats.html"),
+    ("materials",  "Materials",    "unit_changes.html"),
 ]
 
 
@@ -96,26 +96,27 @@ NAV_TABS = [
 # sub-pages. Terrain has no children → a plain link. Single source of truth.
 #   (group_key, group_label, group_href, [ (child_key, child_label, child_href|None), ... ])
 # child_href=None ⇒ an unbuilt "soon" placeholder (Summons / Lane Creeps).
+# The Changes page opens each group and stands first in it (owner 2026-10-21).
 MATERIALS_GROUPS = [
-    ("creeps_grp", "Creeps", "neutral_stats.html", [
+    ("creeps_grp", "Creeps", "unit_changes.html", [
+        ("unit_changes", "Unit Changes",   "unit_changes.html"),
         # Neutral Abilities nests UNDER Neutral Stats (4th tuple element = its
         # own sub-pages, rendered indented inside the dropdown).
         ("creeps",    "Neutral Stats",     "neutral_stats.html", [
             ("abilities", "Neutral Abilities", "neutral_abilities.html"),
         ]),
-        ("unit_changes", "Unit Changes",   "unit_changes.html"),
     ]),
-    ("items_grp", "Items", "mana_items.html", [
+    ("items_grp", "Items", "item_changes.html", [
+        ("item_changes", "Item Changes", "item_changes.html"),
         ("mana_items", "Mana Items",    "mana_items.html"),
         ("items_dyn",  "Item Dynamics", "items_dyn.html"),
-        ("item_changes", "Item Changes", "item_changes.html"),
     ]),
-    ("heroes_grp", "Heroes", "heroes_stats.html", [
+    ("heroes_grp", "Heroes", "hero_changes.html", [
+        ("hero_changes", "Hero Changes",  "hero_changes.html"),
         ("heroes_stats", "Hero Stats",    "heroes_stats.html"),
         ("hero_lab",     "Hero Lab",      "hero_lab.html"),
         ("aoe_increase", "AoE Increase",  "aoe_increase.html"),
         ("heroes_dyn",   "Hero Dynamics", "heroes_dyn.html"),
-        ("hero_changes", "Hero Changes",  "hero_changes.html"),
     ]),
     # Terrain Stats nests under Terrain (the owner 2026-10-04: "a sub-tab of the Terrain button — Terrain Stats,
     # with more info"): the map history 7.08 → now, builders/terrain_stats.py
