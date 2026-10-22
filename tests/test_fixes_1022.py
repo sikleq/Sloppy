@@ -95,3 +95,12 @@ def test_quick_wit_card_highlights_the_new_attack_speed():
     html = page.read_text(encoding="utf-8")
     assert '<span class="iab-hl iab-hl-new">Also provides Dark Seer with' in html
     assert "Aggrandize renamed to Quick Wit" not in html
+
+
+def test_kinetic_fence_741_is_a_shard_card_like_overclocking():
+    # owner 2026-10-22: Kinetic Fence became an Aghanim's Shard ability — a before/after card, rows covered
+    src = (ROOT / "content" / "p741.py").read_text(encoding="utf-8")
+    block = src[src.index('W(hero_header("Disruptor"))'):src.index('W(hero_header("Doom"))')]
+    assert 'name="Kinetic Fence"' in block and "summary=\"Now an Aghanim's Shard ability.\"" in block
+    assert 'W(ability("Kinetic Fence"))' not in block
+    assert 'Has only one level instead", t("NEW"), covered=True' in block
