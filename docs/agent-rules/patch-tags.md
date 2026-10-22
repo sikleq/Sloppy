@@ -275,6 +275,11 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
   - Карточка `ability_change` способности, которую в ЭТОМ патче даёт Aghanim's (KV `IsGrantedByShard/Scepter`), сама
     получает полоску и «(Aghanim's Shard upgrade)» в итоге; фраза «Granted by Aghanim's Shard.» в начале описания
     не подсвечивается — её убирает `_take_aghs` (Kinetic Fence 7.41).
+  - Строка без слов «Aghanim's» получает полоску по тому же правилу — `aghs_granted.kind_of(slug, патч)`: флаг
+    СВОЕГО патча (Liquid Ice был от Shard только в 7.34e–7.35d, Haunt стал ультимейтом в 7.40 — без полоски). Флаг
+    из других патчей берётся, только если в этом патче способность скрытая с одним уровнем и не врождённая (Hitch A
+    Ride: флаг пропал после 7.35) или её нет ни в одном слоте героя (удалена: Counterspell Ally 7.40), и для патча
+    без слепка (7.08).
   - «per Spirit Bear level up» → формула `A + B*(L-1)` (Spirit Bear 7.40b, 7.41c), см. formula-tables.
   - 7.38 (вычитка 2026-10-03): «Aghanim's Scepter/Shard no longer decreases …» → **DEL**, и wind-up тоже (подсказка
     7.37e «Decreases wind-up time»; исключение «wind-up → BUFF» осталось только для строки фасета); «Now has 50%

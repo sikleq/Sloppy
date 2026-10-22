@@ -150,6 +150,17 @@ def test_card_of_an_ability_granted_by_aghanims_gets_the_stripe_of_that_patch_on
     assert kind_of("visage_silent_as_the_grave") == "scepter"        # some older patch granted it
 
 
+def test_row_stripe_follows_the_patchs_own_aghanim_flag():
+    # owner 2026-10-22: a row is an Aghanim row only if that patch's game grants the ability
+    from patch.aghs_granted import kind_of
+    assert kind_of("jakiro_liquid_ice", "7.41") == ""             # Shard only in 7.34e–7.35d
+    assert kind_of("spectre_haunt", "7.40") == ""                 # the ultimate since 7.40
+    assert kind_of("techies_minefield_sign", "7.38") == ""        # an innate active then, no Scepter needed
+    assert kind_of("centaur_mount", "7.41f") == "scepter"         # flag gone after 7.35, still hidden + 1 level
+    assert kind_of("antimage_counterspell_ally", "7.40") == "shard"   # removed in 7.40: no hero slot has it
+    assert kind_of("visage_silent_as_the_grave", "7.08") == "scepter"  # no 7.08 snapshot: any patch decides
+
+
 def test_kinetic_fence_741_is_a_shard_card_like_overclocking():
     # owner 2026-10-22: Kinetic Fence became an Aghanim's Shard ability — a before/after card, rows covered
     src = (ROOT / "content" / "p741.py").read_text(encoding="utf-8")
