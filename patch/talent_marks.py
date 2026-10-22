@@ -7,6 +7,10 @@
 A talent "moved" when the same talent, numbers aside, stands on the other side of another swap row of the
 same hero in the same patch (Batrider 7.41: +4s Smoldering Resin at 20 -> +1s Smoldering Resin at 10).
 
+Every "replaced with" row stays SWAP, moved or not (owner 2026-10-22): the colours tell the fates apart. A talent
+of the same ability whose bonus changed kind (flat -> %, active-only -> permanent) is a different talent, not a
+move — keep such pairs out of _KNOWN (9 game-checked cases, docs/agent-rules/patch-tags.md).
+
 The swaps of a hero are known only as a whole, so the content file is read once with the AST (hero_header()
 and li() calls in source order) the first time one of its talent rows is drawn.
 """
