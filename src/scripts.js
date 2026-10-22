@@ -2415,7 +2415,8 @@
   // Event delegation (not per-cell binding): cells can be removed/re-inserted
   // by the ability-merge logic, so listeners bound at load would be lost on
   // the restored cells. Delegation on the table covers any current cell.
-  const SEL = 'td[data-hist], td[data-name], .mr-const[data-hist]';
+  // th[data-hist]: Hero Stats STR / AGI / INT / Attr headers — what one point gave by patch (2026-10-22)
+  const SEL = 'td[data-hist], td[data-name], th[data-hist], .mr-const[data-hist]';
   // Bind to every table OR standalone history-chip that may carry data-hist:
   // creeps-table (neutral creeps), mr-table (mana items), and the constants
   // chips in the page blurb.

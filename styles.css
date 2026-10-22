@@ -8459,6 +8459,11 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   text-decoration: underline dotted rgba(213, 207, 195, 0.5);
   text-underline-offset: 3px;
 }
+/* Hero Stats STR / AGI / INT / Attr headers: the same cue on the label (the header stays click-to-sort) */
+.mr-table thead th.has-history .th-label {
+  text-decoration: underline dotted rgba(213, 207, 195, 0.5);
+  text-underline-offset: 3px;
+}
 /* Per-stat changelog tooltip — body-level (escapes the .creeps-scroll
    overflow clip), positioned by scripts.js above the hovered cell.
    font-size matches the table cells (11.5px). */

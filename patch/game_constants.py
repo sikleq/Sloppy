@@ -60,6 +60,12 @@ def armor_reduction(armor: float, patch: str | None = None) -> float:
     return a * armor / (b + c * abs(armor))
 
 
+STR_STATUS_RES_HIST = (                             # % status resistance per Strength (shown in history only)
+    ("7.13", "12.04.2018", 0.15, 0.0),               # 7.13 "Removed Status Resistance as a Strength based attribute bonus"
+)
+INT_SPELL_AMP_HIST = (                              # % spell amplification per Intelligence (shown in history only)
+    ("7.26", "17.04.2020", 0.07, 0.0),               # "Attributes no longer provide ... Spell Amplification ..."
+)
 INT_REGEN_AMP_HIST = (                              # % mana regen amplification per Intelligence (before 7.20)
     ("7.13", "12.04.2018", 2.0, 1.8),
     ("7.20", "19.11.2018", 1.8, 0.0),
@@ -132,6 +138,51 @@ def per_point(hist, patch: str | None = None, *, primary: bool = False) -> float
     (7.13–7.20: +25% to every bonus of the primary attribute, items' points too)."""
     multiplier = at(PRIMARY_ATTRIBUTE_BONUS_HIST, patch) if primary else 1.0
     return at(hist, patch) * multiplier
+
+
+# What one point of each attribute gives, for the Hero Stats header tooltips (owner 2026-10-22): (label, history,
+# unit). A new row in a history above shows up there by itself. "attr" = the rules of the attribute types.
+ATTRIBUTE_RULES = {
+    "str": (("HP", STR_HP_HIST, ""), ("HP regen", STR_HPREG_HIST, ""),
+            ("HP regen amplification", STR_HPREG_AMP_HIST, "%"), ("Magic resistance", STR_MR_HIST, "%"),
+            ("Status resistance", STR_STATUS_RES_HIST, "%")),
+    "agi": (("Armor", AGI_ARMOR_HIST, ""), ("Movement speed", AGI_MS_HIST, "%")),
+    "int": (("Mana", INT_MANA_HIST, ""), ("Mana regen", INT_REGEN_HIST, ""),
+            ("Mana regen amplification", INT_REGEN_AMP_HIST, "%"), ("Magic resistance", INT_MR_HIST, "%"),
+            ("Spell amplification", INT_SPELL_AMP_HIST, "%")),
+    "attr": (("Primary attribute bonus", PRIMARY_ATTRIBUTE_BONUS_HIST, "pct-mult"),
+             ("Universal damage per attribute", UNIVERSAL_DMG_HIST, "")),
+}
+
+
+def _show(v, unit):
+    if unit == "pct-mult":                           # 1.25 -> "+25%"
+        return f"+{round((v - 1) * 100):g}%"
+    return f"{round(v, 3):g}{unit}"
+
+
+_ATTR_TITLE = {"str": "Per Strength", "agi": "Per Agility", "int": "Per Intelligence", "attr": "Attributes"}
+
+
+def attribute_today(key: str) -> str:
+    """The tooltip header: what one point gives today ('Per Strength: 22 HP, 0.1 HP regen')."""
+    now = [f"{_show(hist[-1][3], unit)} {label}" for label, hist, unit in ATTRIBUTE_RULES[key]
+           if hist[-1][3] and unit != "pct-mult"]
+    if key == "agi":
+        now.append(f"{AS_PER_AGI:g} Attack speed")
+    if key == "attr":
+        now = [f"+{DMG_PER_PRIMARY:g} damage per primary attribute point",
+               f"Universal: {UNIVERSAL_DMG_PER_ATTR:g} per point of each"]
+    return f"{_ATTR_TITLE[key]}: " + ", ".join(now)
+
+
+def attribute_history(key: str) -> str:
+    """The stat-hist-tip payload of one attribute: 'patch|date|F|label|old|new|hi;…', oldest patch first, the
+    rows of one patch together (scripts.js groups them under one patch header)."""
+    rows = [(_vkey(p), p, d, label, _show(o, unit), _show(n, unit))
+            for label, hist, unit in ATTRIBUTE_RULES[key] for p, d, o, n in hist]
+    rows.sort(key=lambda r: r[0])
+    return ";".join(f"{p}|{d}|F|{label}|{o}|{n}|hi" for _k, p, d, label, o, n in rows)
 
 
 # column -> the engine histories its Starting value depends on (Hero Stats: a change of one of them is that
