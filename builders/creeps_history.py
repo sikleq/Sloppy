@@ -193,7 +193,7 @@ def _ehp_phys_vf(hist, version, npc_key):
     a = raw_at(hist, 'ArmorPhysical', version, npc_key)
     if not hp or a is None:
         return None
-    return fmt_num(ehp_phys_val(hp, a))
+    return fmt_num(ehp_phys_val(hp, a, version))
 
 
 def _ehp_mag_vf(hist, version, npc_key):
@@ -208,7 +208,7 @@ def _armor_pct_vf(hist, version, npc_key):
     a = raw_at(hist, 'ArmorPhysical', version, npc_key)
     if a is None:
         return None
-    return f'{round(armor_factor(a) * 100)}%'
+    return f'{round(armor_factor(a, version) * 100)}%'
 
 
 def _t_per_attack_vf(hist, version, npc_key):

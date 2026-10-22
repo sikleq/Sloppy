@@ -643,6 +643,7 @@ class TestHeroStatsBuilder:
         assert hs._hpreg_l1(s, h, None) == pytest.approx(round((0.25 + 2.0) * 1.2, 2))
         assert hs._mpreg_l1(s, h, None) == pytest.approx(round(1.0 * 1.2, 2))
         hs._set_ctx_version("7.40c")
+        # no Dark Willow amplification then; 0.1 HP regen per Strength (server.dll, not the tooltip's 0.09)
         assert hs._hpreg_l1(s, h, None) == pytest.approx(2.25)
 
     def test_innate_hero_list_derived_from_rules(self, hs):

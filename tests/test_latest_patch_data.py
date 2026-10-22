@@ -37,9 +37,12 @@ def test_latest_heroes_raw_matches_the_local_per_hero_kv():
 
 def test_mana_items_history_uses_the_int_constant_of_each_patch():
     from builders import mana_items as m
-    assert m._int_const_at(m._INT_MANA_HIST, "7.37") == 11      # 7.36 – 7.38c: 11 mana per Int
-    assert m._int_const_at(m._INT_MANA_HIST, "7.39") == 12
+    # server.dll 2018–2026: 12 mana per Int in every patch — the old "11 in 7.36–7.38" never was (owner 2026-10-22)
+    assert m._int_const_at(m._INT_MANA_HIST, "7.37") == 12
+    assert m._int_const_at(m._INT_MANA_HIST, "7.06") == 11      # before 7.07
     assert m._int_const_at(m._INT_MANA_HIST, None) == m.INT_TO_MAX_MANA
     item = {"bonus_intellect": "10"}
-    assert m._flat_metric(item, "mana", patch="7.37") == 110
+    assert m._flat_metric(item, "mana", patch="7.37") == 120
     assert m._flat_metric(item, "mana", patch="7.41f") == 120
+    # flat mana regen from Intelligence only from 7.20 (amplification before)
+    assert m._int_const_at(m._INT_REGEN_HIST, "7.19") == 0 and m._int_const_at(m._INT_REGEN_HIST, "7.20") == 0.05
