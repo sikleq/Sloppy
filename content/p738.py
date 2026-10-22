@@ -2085,7 +2085,8 @@ def build():
     W(ul_close())
     W(ability("Falcon Rush", slug="kez_falcon_rush"))
     W(ul_open())
-    W(li("Rush Range decreased from 575 to 525", b(575, 525)))
+    W(li('Rush Range decreased from <span class="wrong-word">575</span> to 525', b(650, 525),
+         extra=note_box('This change is wrongly stated. The real change is 650 &rarr; 525')))
     W(li("Sai Base Attack Rate increased from 1.2/1.1/1.0/0.9s to 1.3/1.2/1.1/1s", b([1.2, 1.1, 1, 0.9], [1.3, 1.2, 1.1, 1], l=True)))
     W(li("Katana Base Attack Rate increased from 1.4/1.3/1.2/1.1s to 1.5/1.4/1.3/1.2s", b([1.4, 1.3, 1.2, 1.1], [1.5, 1.4, 1.3, 1.2], l=True)))
     W(li("Attack Speed Factor increased from 6/7/8/9% to 6/8/10/12%", b([6, 7, 8, 9], [6, 8, 10, 12])))
@@ -2545,7 +2546,8 @@ def build():
     W(ability("Adaptive Strike", slug="morphling_adaptive_strike_agi"))
     W(ul_open())
     W(li("Now knocks back enemies by default", t("NEW"), extra=inline_note("Distance is between 50-350 units, based on Morphling's Strength. Maximum effect is reached when Morphling's Strength is 50% higher than his Agility")))
-    W(li("Cooldown decreased from 19/16/13/10s to 17/14/11/8s", b([19, 16, 13, 10], [17, 14, 11, 8], l=True)))
+    W(li('Cooldown decreased from <span class="wrong-word">19/16/13</span>/10s to 17/14/11/8s', b([16, 14, 12, 10], [17, 14, 11, 8], l=True),
+         extra=note_box('This change is wrongly stated. The real change is 16/14/12/10s &rarr; 17/14/11/8s')))
     W(li("Base damage rescaled from 55/65/75/85 to 25/50/75/100", b([55, 65, 75, 85], [25, 50, 75, 100])))
     W(li("Merged both abilities into one", t("REWORK")))
     W(li("No longer stuns enemies by default", t("DEL")))

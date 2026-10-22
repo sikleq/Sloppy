@@ -97,6 +97,33 @@ def test_quick_wit_card_highlights_the_new_attack_speed():
     assert "Aggrandize renamed to Quick Wit" not in html
 
 
+def _from_audit():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("audit_from_values", ROOT / "scripts" / "audit" / "audit_from_values.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_from_value_audit_reads_heads_and_facet_values():
+    a = _from_audit()
+    assert a._norm("20/18/16/14") == (20, 18, 16, 14) and a._norm("14/14/14") == (14,)
+    assert a._known((14, 16, 18, 20), {(14, 16, 18, 20, 20)})         # Valve lists 4 of the KV's 5 levels
+    assert not a._known((20, 18, 16, 14), {(20, 17, 14, 11)})
+
+
+def test_every_from_value_matches_the_previous_patch():
+    # owner 2026-10-22: Valve's "from" can be stale (7.41 Kinetic Fence quoted pre-7.38 20/18/16/14s);
+    # such rows carry wrong-word + the real change in a note
+    import pytest
+    if not (ROOT / "dist" / "patches" / "7.41.html").exists():
+        pytest.skip("site not built")
+    a = _from_audit()
+    vers = a._versions()
+    found = [r for v in vers[1:] for r in a.audit_page(v, vers[vers.index(v) - 1])]
+    assert found == []
+
+
 def test_kinetic_fence_741_is_a_shard_card_like_overclocking():
     # owner 2026-10-22: Kinetic Fence became an Aghanim's Shard ability — a before/after card, rows covered
     src = (ROOT / "content" / "p741.py").read_text(encoding="utf-8")
