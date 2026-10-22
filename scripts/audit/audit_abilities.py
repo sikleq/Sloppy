@@ -101,7 +101,8 @@ ach_new_re = re.compile(r'\bnew\s*=\s*dict\(\s*name\s*=\s*"([^"]+)"(?:.*?slug\s*
 for m in re.finditer(
     r'hero_header\("([^"]+)"\)'
     r'|unit_header\(|plain_header\(|item_header\(|section\(|subgroup\(|enchant_header\('
-    r'|ability\("([^"]+)"(?:\s*,\s*slug\s*=\s*"([^"]+)")?',
+    # \b: sub_ability("rattletrap_jetpack", ...) takes a slug, not a display name (Clockwerk 7.41)
+    r'|\bability\("([^"]+)"(?:\s*,\s*slug\s*=\s*"([^"]+)")?',
     src):
     if m.group(1):
         current_hero = m.group(1)

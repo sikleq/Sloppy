@@ -66,6 +66,16 @@ def test_no_rename_row_under_an_arrow_header():
     assert not bad, bad
 
 
+def test_ability_audit_ignores_sub_ability_slugs():
+    # audit-live 2026-10-22 failed: sub_ability("rattletrap_jetpack", "Jetpack") was read as ability("rattletrap_jetpack")
+    import subprocess
+    import sys
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "audit" / "audit_abilities.py")],
+                       cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    assert r.returncode == 0, r.stdout[-2000:]
+    assert "rattletrap_rattletrap" not in r.stdout
+
+
 def test_quick_wit_card_highlights_the_new_attack_speed():
     import pytest
     page = ROOT / "dist" / "patches" / "7.41.html"
