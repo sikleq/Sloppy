@@ -11,13 +11,26 @@ A history is ((patch, release date, old, new), ...), oldest first; the LAST row 
 today, so a Valve change is one new row. Sources: data/patchnotes_english.txt, Liquipedia changelogs."""
 import re
 
-# ---- Strength / Agility / Intelligence: today's values (Hero Stats uses them for its history cells too) ----
-HP_PER_STR = 22.0          # 7.33 "HP per point of Strength increased from 20 to 22"
+# ---- Strength / Agility / Intelligence: today's values ----
 HPREG_PER_STR = 0.1        # +0.1 HP regen per Strength
 AS_PER_AGI = 1.0           # +1 attack speed per Agility
 ARMOR_PER_AGI = 1 / 6      # 7.27 "Armor per agility increased slightly from 0.16 to 1/6"
 MR_PER_INT = 0.1           # 7.33 "Intelligence now grants 0.1% base Magic Resistance per point"
 DMG_PER_PRIMARY = 1.0      # Str/Agi/Int hero: +1 attack damage per point of the primary attribute
+
+# Maximum health per Strength. Valve's 7.13, 7.21 and 7.33 General notes
+# are preserved in data/patchnotes_english.txt.
+STR_HP_HIST = (
+    ("7.13", "12.04.2018", 20, 18),
+    ("7.21", "29.01.2019", 18, 20),
+    ("7.33", "20.04.2023", 20, 22),
+)
+# From 7.13 until 7.21, primary attributes granted 25% more secondary
+# benefits. For HP this applies only to Strength heroes, not to base HP.
+PRIMARY_ATTRIBUTE_BONUS_HIST = (
+    ("7.13", "12.04.2018", 1.0, 1.25),
+    ("7.21", "29.01.2019", 1.25, 1.0),
+)
 
 # Intelligence history (Mana Items history cells use the value in effect at each patch).
 INT_MANA_HIST = (
@@ -36,6 +49,7 @@ UNIVERSAL_DMG_HIST = (
     ("7.38", "19.02.2025", 0.7, 0.45),   # "Universal Heroes' damage per attribute decreased from 0.7 to 0.45"
 )
 
+HP_PER_STR = float(STR_HP_HIST[-1][3])
 MANA_PER_INT = float(INT_MANA_HIST[-1][3])
 MANAREG_PER_INT = float(INT_REGEN_HIST[-1][3])
 UNIVERSAL_DMG_PER_ATTR = float(UNIVERSAL_DMG_HIST[-1][3])
@@ -56,6 +70,12 @@ def at(hist, patch: str | None = None) -> float:
         if _vkey(p) <= _vkey(patch):
             val = float(new)
     return val
+
+
+def hp_per_strength(patch: str | None = None, *, primary: bool = False) -> float:
+    """HP granted by one Strength point at a patch, including primary bonuses."""
+    multiplier = at(PRIMARY_ATTRIBUTE_BONUS_HIST, patch) if primary else 1.0
+    return at(STR_HP_HIST, patch) * multiplier
 
 
 def for_js() -> dict:

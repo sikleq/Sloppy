@@ -54,14 +54,15 @@ _esc = lambda s: _html.escape(str(s), quote=True)
 
 # ---- engine constants for "Starting" mode (level-1 with attribute bonuses) ---
 # Typed in ONE place, patch/game_constants.py (engine values the KV files do not
-# carry; a test checks them against the game's own tooltips). Today's values;
-# the computed columns' HISTORY uses them for past patches too (the historical
-# constants did differ). Universal heroes get a multiplier on the SUM of all
+# carry; a test checks them against the game's own tooltips). HP per Strength
+# and Universal damage use historical coefficients in the per-patch context.
+# Other conversions below still use today's constants.
+# Universal heroes get a multiplier on the SUM of all
 # three attributes, FLOORED before adding to base damage (Abaddon 0.45×62 =
 # 27.9 → 27 → 22-32 base = 49-59) — patch-gated in _universal_dmg_mult().
 from patch import game_constants as _gc
 from patch.game_constants import (
-    HP_PER_STR, HPREG_PER_STR, MANA_PER_INT, MANAREG_PER_INT,
+    HPREG_PER_STR, MANA_PER_INT, MANAREG_PER_INT,
     ARMOR_PER_AGI, MR_PER_INT, AS_PER_AGI, DMG_PER_PRIMARY,
 )
 
@@ -699,8 +700,12 @@ def _dmg_avg_start(s, h, r):
 # HP / MP / regens -----------------------------------------------------------
 
 def _hp_l1(s, h, r):
+    attribute = _attr_of(s, h)
+    hp_per_str = _gc.hp_per_strength(
+        _CTX_VERSION[0], primary=attribute is not None and attribute[0] == "str",
+    )
     return round(_field(s, h, "StatusHealth")
-                 + HP_PER_STR * _whole_start_attr(s, h, r, "str")
+                 + hp_per_str * _whole_start_attr(s, h, r, "str")
                  + _innate_bonus("hp", s, h, r))
 
 
@@ -1256,10 +1261,15 @@ def _history_for(snaps, versions, dates, hero, col, raws, *, mode: str) -> str:
             return []
         return versions[max(0, idx - n): idx]
 
-    def shifted_patch(kv_ver: str) -> str:
+    def shifted_patch(kv_ver: str, previous_ver: str) -> str:
         """If any of this column's fields has an unused patch-note event
         in the patch immediately before `kv_ver` (within LOOKBACK_PATCHES),
-        shift the change there. Otherwise return `kv_ver` unchanged."""
+        shift the change there. Engine-rule changes have known release
+        patches and must not be backdated by this KV-scrape heuristic."""
+        if mode != "base" and col["key"] in {"hp", "ehp_phys", "ehp_mag"}:
+            hp_histories = (_gc.STR_HP_HIST, _gc.PRIMARY_ATTRIBUTE_BONUS_HIST)
+            if any(_gc.at(hist, previous_ver) != _gc.at(hist, kv_ver) for hist in hp_histories):
+                return kv_ver
         if not fields:
             return kv_ver
         slug = hero.replace("npc_dota_hero_", "")
@@ -1290,12 +1300,13 @@ def _history_for(snaps, versions, dates, hero, col, raws, *, mode: str) -> str:
     prev_disp = None
     seen = False
     first_ver = iter_versions[0]
+    previous_ver = first_ver
     for ver in iter_versions:
         snap = snaps[ver]
         if hero not in snap:
             continue
         rw = raws.get(ver, {})
-        # Innate attribute-conversion modifiers are patch-gated — tell the
+        # Engine coefficients and innate modifiers are patch-gated — tell the
         # value functions which patch this is.
         _set_ctx_version(ver)
         if not seen:
@@ -1305,11 +1316,12 @@ def _history_for(snaps, versions, dates, hero, col, raws, *, mode: str) -> str:
                 parts.append((ver, f"|{d0}|A|New hero"))
             prev_val = value_fn(snap, hero, rw)
             prev_disp = display_fn(snap, hero, rw) if display_fn else None
+            previous_ver = ver
             continue
         v = value_fn(snap, hero, rw)
         d = display_fn(snap, hero, rw) if display_fn else None
         if abs(v - prev_val) > 1e-9 or (d is not None and d != prev_disp):
-            shifted = shifted_patch(ver)
+            shifted = shifted_patch(ver, previous_ver)
             shifted_date = dates.get(shifted, "")
             if display_fn:
                 po = _re.sub(r"<[^>]+>", "", prev_disp)
@@ -1320,6 +1332,7 @@ def _history_for(snaps, versions, dates, hero, col, raws, *, mode: str) -> str:
                 parts.append((shifted,
                               f"|{shifted_date}|V|{fmt(prev_val)}|{fmt(v)}|{pol}"))
             prev_val, prev_disp = v, d
+        previous_ver = ver
     # Re-sort by shifted patch so the tooltip lists oldest→newest after shifts.
     parts.sort(key=lambda p: _patch_sort_key(p[0]))
 
