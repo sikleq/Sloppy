@@ -15,11 +15,15 @@ _GRANT_RE = re.compile(r'"IsGrantedBy(Shard|Scepter)"\s+"1"')
 _CACHE: dict = {}
 
 
-def granted() -> dict:
-    """{slug: "shard" | "scepter"}."""
-    if _CACHE:
-        return _CACHE
-    for f in glob.glob(os.path.join(_HERE, "data", "stats", "*", "heroes", "npc_dota_hero_*.txt")):
+_BY_VERSION: dict = {}
+
+
+def granted(version="*") -> dict:
+    """{slug: "shard" | "scepter"}: in any snapshot, or only in `version`'s."""
+    cache = _CACHE if version == "*" else _BY_VERSION.setdefault(version, {})
+    if cache:
+        return cache
+    for f in glob.glob(os.path.join(_HERE, "data", "stats", version, "heroes", "npc_dota_hero_*.txt")):
         with open(f, encoding="utf-8", errors="replace") as fh:
             text = "\n".join(line.split("//")[0] for line in fh)
         heads = list(_BLOCK_RE.finditer(text))
@@ -27,11 +31,12 @@ def granted() -> dict:
             end = heads[i + 1].start() if i + 1 < len(heads) else len(text)
             g = _GRANT_RE.search(text, m.end(), end)
             if g:
-                _CACHE[m.group(1)] = g.group(1).lower()
-    _CACHE.setdefault("", "")                    # computed, even when empty
-    return _CACHE
+                cache[m.group(1)] = g.group(1).lower()
+    cache.setdefault("", "")                     # computed, even when empty
+    return cache
 
 
-def kind_of(slug) -> str:
-    """"shard", "scepter" or "" for an ability slug."""
-    return granted().get(slug or "", "")
+def kind_of(slug, version="*") -> str:
+    """"shard", "scepter" or "" for an ability slug; with a version, only as that patch's KV has it
+    (Visage 7.41 Silent as the Grave: a Scepter ability before, innate now)."""
+    return granted(version).get(slug or "", "")

@@ -3486,6 +3486,12 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
     new, _aghs_new = _take_aghs(new)
     old, _aghs_old = _take_aghs(old) if old is not None else (None, None)
     _aghs = _aghs_new or _aghs_old
+    if not _aghs and new.get("slug"):
+        # an ability the game grants by Aghanim's (KV IsGrantedByShard) gets the stripe without the words too
+        # (owner 2026-10-22, Disruptor 7.41 Kinetic Fence)
+        from .aghs_granted import kind_of
+        _ver = _State.current_patch_version
+        _aghs = (kind_of(new["slug"], _ver) if _ver else "") or None
     _State.current_ability_slug = new.get("slug")          # rows below belong to this ability
     _State.current_ability_innate = bool(new.get("innate"))
     _card_ctx = {"ability": _State.current_ability_slug, "innate": _State.current_ability_innate,

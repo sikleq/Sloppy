@@ -2119,7 +2119,7 @@ def build():
             name="Kinetic Fence",
             slug="disruptor_kinetic_fence",
             desc=[
-                hl("Granted by Aghanim's Shard. Has only one level", "new") + ".",
+                "Granted by Aghanim's Shard. " + hl("Has only one level", "new") + ".",
                 _kf_text,
                 "Cast Range: " + hl("1200", "buff") + ".",
                 "Cooldown: " + hl("14s", "new") + ".",
@@ -2127,7 +2127,7 @@ def build():
                 "Duration: " + hl("4.4s", "buff") + ".",
             ],
         ),
-        summary="Now an Aghanim's Shard ability.",
+        summary="Ability reworked.",
         tag="rework",
     ))
     W(ul_open())
