@@ -46,7 +46,7 @@ INT_TO_REGEN    = _gc.MANAREG_PER_INT   # +0.05 mana regen per Int point
 
 def _int_const_at(hist: tuple, patch: str | None) -> float:
     """The Intelligence constant IN EFFECT at `patch` (history cells of past patches must
-    use that patch's value — 11 mana/Int in 7.36–7.38, not today's 12)."""
+    use that patch's value, not today's)."""
     return _gc.at(hist, patch)
 
 # ── Source data ────────────────────────────────────────────────────────────

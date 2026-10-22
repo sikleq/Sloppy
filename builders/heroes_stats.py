@@ -699,21 +699,25 @@ def _dmg_avg_start(s, h, r):
 
 # HP / MP / regens -----------------------------------------------------------
 
+def _pp(hist, s, h, attr):
+    """One point of `attr`'s bonus in this patch (_CTX_VERSION), +25% when it is the hero's primary (7.13–7.20)."""
+    a = _attr_of(s, h)
+    return _gc.per_point(hist, _CTX_VERSION[0], primary=a is not None and a[0] == attr)
+
+
 def _hp_l1(s, h, r):
-    attribute = _attr_of(s, h)
-    hp_per_str = _gc.hp_per_strength(
-        _CTX_VERSION[0], primary=attribute is not None and attribute[0] == "str",
-    )
     return round(_field(s, h, "StatusHealth")
-                 + hp_per_str * _whole_start_attr(s, h, r, "str")
+                 + _pp(_gc.STR_HP_HIST, s, h, "str") * _whole_start_attr(s, h, r, "str")
                  + _innate_bonus("hp", s, h, r))
 
 
 def _hpreg_l1(s, h, r):
+    st = _whole_start_attr(s, h, r, "str")
+    amp = 1 + _pp(_gc.STR_HPREG_AMP_HIST, s, h, "str") * st / 100     # before 7.20: % amplification
     return round((_field(s, h, "StatusHealthRegen")
-                  + HPREG_PER_STR * _whole_start_attr(s, h, r, "str")
+                  + _pp(_gc.STR_HPREG_HIST, s, h, "str") * st
                   + _innate_bonus("hpr", s, h, r))
-                 * _innate_mult("hpr", s, h), 2)
+                 * amp * _innate_mult("hpr", s, h), 2)
 
 
 def _mp_base_raw(s, h, r):
@@ -733,9 +737,9 @@ def _mp_l1(s, h, r):
         per_str = sub["factor"]
         return round(_field(s, h, "StatusMana")
                      + per_str * _whole_start_attr(s, h, r, "str")
-                     + MANA_PER_INT * _whole_start_attr(s, h, r, "int"))
+                     + _pp(_gc.INT_MANA_HIST, s, h, "int") * _whole_start_attr(s, h, r, "int"))
     return round(_field(s, h, "StatusMana")
-                 + MANA_PER_INT * _whole_start_attr(s, h, r, "int"))
+                 + _pp(_gc.INT_MANA_HIST, s, h, "int") * _whole_start_attr(s, h, r, "int"))
 
 
 def _mpreg_base_raw(s, h, r):
@@ -753,12 +757,14 @@ def _mpreg_l1(s, h, r):
         per_str = sub["factor"]   # KV mana_regen_per_str (Dumb Luck, 7.33+)
         return round(_field(s, h, "StatusManaRegen")
                      + per_str * _start_attr(s, h, r, "str")
-                     + MANAREG_PER_INT * _start_attr(s, h, r, "int"), 2)
+                     + _pp(_gc.INT_REGEN_HIST, s, h, "int") * _start_attr(s, h, r, "int"), 2)
+    it = _whole_start_attr(s, h, r, "int")
+    amp = 1 + _pp(_gc.INT_REGEN_AMP_HIST, s, h, "int") * it / 100      # before 7.20: % amplification
     return round((_field(s, h, "StatusManaRegen")
-                  + MANAREG_PER_INT * _whole_start_attr(s, h, r, "int")
+                  + _pp(_gc.INT_REGEN_HIST, s, h, "int") * it
                   + _innate_bonus("mpr", s, h, r)
                   + _techies_pool_regen_l1(s, h, r))
-                 * _innate_mult("mpr", s, h), 2)
+                 * amp * _innate_mult("mpr", s, h), 2)
 
 
 # Armor / MR / Attack speed --------------------------------------------------
@@ -769,7 +775,7 @@ def _armor_base(s, h, r):
 
 def _armor_l1(s, h, r):
     return round(_field(s, h, "ArmorPhysical")
-                 + ARMOR_PER_AGI * _field(s, h, "AttributeBaseAgility")
+                 + _pp(_gc.AGI_ARMOR_HIST, s, h, "agi") * _field(s, h, "AttributeBaseAgility")
                  + _innate_bonus("armor", s, h, r), 1)
 
 
@@ -778,8 +784,10 @@ def _mr_base(s, h, r):
 
 
 def _mr_l1(s, h, r):
+    # Intelligence gives it from 7.33 (and gave 0.15% before 7.13), Strength gave 0.08% in 7.13–7.25
     return round(_field(s, h, "MagicalResistance")
-                 + MR_PER_INT * _field(s, h, "AttributeBaseIntelligence")
+                 + _pp(_gc.INT_MR_HIST, s, h, "int") * _field(s, h, "AttributeBaseIntelligence")
+                 + _pp(_gc.STR_MR_HIST, s, h, "str") * _field(s, h, "AttributeBaseStrength")
                  + _innate_bonus("mr", s, h, r), 1)
 
 
@@ -788,8 +796,11 @@ def _aspd_base(s, h, r):
 
 
 def _aspd_l1(s, h, r):
+    a = _attr_of(s, h)
+    per_agi = AS_PER_AGI * (_gc.at(_gc.PRIMARY_ATTRIBUTE_BONUS_HIST, _CTX_VERSION[0])
+                            if a is not None and a[0] == "agi" else 1.0)
     return (_raw_num(r, h, "BaseAttackSpeed")
-            + AS_PER_AGI * _field(s, h, "AttributeBaseAgility")
+            + per_agi * _field(s, h, "AttributeBaseAgility")
             + _innate_bonus("aspd", s, h, r))
 
 
@@ -808,8 +819,9 @@ def _ms_base(s, h, r):
 
 
 def _ms_l1(s, h, r):
+    agi_pct = _pp(_gc.AGI_MS_HIST, s, h, "agi") * _field(s, h, "AttributeBaseAgility")   # before 7.26
     return round((_field(s, h, "MovementSpeed") + _innate_bonus("ms", s, h, r))
-                 * _innate_mult("ms", s, h))
+                 * (1 + agi_pct / 100) * _innate_mult("ms", s, h))
 
 
 # Expanded helper values ------------------------------------------------------
@@ -821,7 +833,7 @@ def _gains_per_level(s, h, r):
 
 
 def _armor_factor(a):
-    return (0.06 * a) / (1 + 0.06 * abs(a))
+    return _gc.armor_reduction(a, _CTX_VERSION[0])          # 7.20–7.26 had another formula
 
 
 def _ehp_phys_base(s, h, r):
@@ -1266,9 +1278,9 @@ def _history_for(snaps, versions, dates, hero, col, raws, *, mode: str) -> str:
         in the patch immediately before `kv_ver` (within LOOKBACK_PATCHES),
         shift the change there. Engine-rule changes have known release
         patches and must not be backdated by this KV-scrape heuristic."""
-        if mode != "base" and col["key"] in {"hp", "ehp_phys", "ehp_mag"}:
-            hp_histories = (_gc.STR_HP_HIST, _gc.PRIMARY_ATTRIBUTE_BONUS_HIST)
-            if any(_gc.at(hist, previous_ver) != _gc.at(hist, kv_ver) for hist in hp_histories):
+        if mode != "base":
+            rules = _gc.RULES_OF_COLUMN.get(col["key"], ())
+            if any(_gc.at(hist, previous_ver) != _gc.at(hist, kv_ver) for hist in rules):
                 return kv_ver
         if not fields:
             return kv_ver

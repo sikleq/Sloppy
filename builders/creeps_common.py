@@ -107,12 +107,14 @@ def safe_float(v, default=0.0):
         return default
 
 
-def armor_factor(a):
-    return (0.06 * a) / (1 + 0.06 * abs(a))
+def armor_factor(a, version=None):
+    """Physical damage share armor blocks; a history cell passes its patch (7.20–7.26 had another formula)."""
+    from patch.game_constants import armor_reduction
+    return armor_reduction(a, version)
 
 
-def ehp_phys_val(hp, a):
-    return round(hp / max(0.01, 1 - armor_factor(a))) if hp else 0
+def ehp_phys_val(hp, a, version=None):
+    return round(hp / max(0.01, 1 - armor_factor(a, version))) if hp else 0
 
 
 def ehp_mag_val(hp, mr):
