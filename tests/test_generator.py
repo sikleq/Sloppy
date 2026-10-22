@@ -643,7 +643,8 @@ def test_item_and_creep_canonical_tags_738(text, tag):
     # the 7.41 rows the linter kept flagging (owner-reviewed content was right, the generator wasn't)
     ("Now is a guaranteed Tiers 1-4 option for all heroes", "REWORK"),
     ("Now an innate ability", "REWORK"),
-    ("Now a no target ability that affects only Bloodseeker", "NERF"),
+    ("Now a no target ability that affects only Bloodseeker", "REWORK"),   # owner 2026-10-22
+    ("Now is a no-target ability. The effect is applied in an aura centered around Omniknight", "REWORK"),
     ("Aghanim's Scepter no longer provides +1 level to all three orbs. Now it provides +1 level only to a single orb "
      "you choose", "NERF"),
     ("Now always a basic ability for Naga Siren", "REWORK"),

@@ -1500,7 +1500,7 @@ def build():
             ],
             tables=[_ib_table],
         ),
-        summary="Inner Beast is now the innate ability (replaces Rugged).",
+        summary="Inner Beast is now the innate ability.",
         tag="rework",
     ))
     W(ul_open())
@@ -1573,7 +1573,7 @@ def build():
     W(ul_close())
     W(ability("Bloodrage"))
     W(ul_open())
-    W(li("Now a no target ability that affects only Bloodseeker", t("NERF")))
+    W(li("Now a no target ability that affects only Bloodseeker", t("REWORK")))
     W(li("Pure damage based on target's max health with Aghanim's Shard now pierces Debuff Immunity", t("BUFF")))
     W(ul_close())
     W(subgroup("Talents"))
@@ -1964,17 +1964,18 @@ def build():
             innate=True,
             desc=[
                 "Passive.",
-                "When Dark Seer levels up, he restores 8.5% of Max Health and 8.5% of Max Mana, plus 1.5% per Dark Seer level.",
-                "Also provides Dark Seer with +1 attack speed for each point of Intelligence.",
+                "When Dark Seer levels up, he restores " + hl("8.5%", "nerf") + " of Max Health and " + hl("8.5%", "nerf")
+                + " of Max Mana, plus 1.5% per Dark Seer level.",
+                hl("Also provides Dark Seer with +1 attack speed for each point of Intelligence", "new") + ".",
             ],
         ),
-        summary="Innate renamed and reworked.",
+        summary="Innate reworked.",
         tag="rework",
     ))
     W(ul_open())
-    W(li("Max Health and Mana Restore base value decreased from 10% to 8.5%", b(10, 8.5)))
-    W(li("Now also provides Dark Seer +1 attack speed from each point of Intelligence", t("NEW")))
-    W(li("Aggrandize renamed to Quick Wit", t("MISC")))
+    # the card shows the changes highlighted and the new name by its arrow: the rows stay hidden for the weights
+    W(li("Max Health and Mana Restore base value decreased from 10% to 8.5%", b(10, 8.5), covered=True))
+    W(li("Now also provides Dark Seer +1 attack speed from each point of Intelligence", t("NEW"), covered=True))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -2212,7 +2213,8 @@ def build():
                 "<b>Level 1 — Green Dragon:</b> Attacks apply a Corrosive poison that deals 25 magical damage per second for 3s. Affects buildings.",
                 "<b>Level 2 — Red Dragon:</b> Attacks gain splash damage dealing 75% of attack damage to all enemies within 275 AoE. Splash also applies Corrosive poison; other attack modifiers only affect the primary target.",
                 "<b>Level 3 — Blue Dragon:</b> Attacks also apply a Frost debuff (pierces Debuff Immunity) — 50 attack slow and 30% move slow. Splash attacks now apply both Corrosive poison and Frost to all affected units; other attack modifiers only affect the primary target.",
-                "Bonus Move Speed: 25/30/35 (was flat 20). No longer provides bonus attack damage. Now also increases cast range of all abilities by 350 (doesn't affect items).",
+                "Bonus Move Speed: 25/30/35 (was flat 20). No longer provides bonus attack damage. "
+                + hl("Now also increases cast range of all abilities by 350 (doesn't affect items)", "new") + ".",
                 aghs_line("Upgrades to Level 4 Black Dragon: 40 Bonus Move Speed, 35 Corrosive Damage, 100% Splash Damage, 350 Splash Radius, 65 Attack Slow, 45% Movement Slow, +20% Magic Resistance, and free pathing. No longer improves Wyrm's Wrath effectiveness while in Dragon Form. Black Dragon stats slightly rescaled."),
             ],
         ),
@@ -2221,7 +2223,7 @@ def build():
     ))
     W(ul_open())
     W(li("Bonus Move Speed increased from 20 to 25/30/35", b(20, [25, 30, 35])))
-    W(li("Now also increases cast range of all abilities by 350", t("NEW"),
+    W(li("Now also increases cast range of all abilities by 350", t("NEW"), covered=True,
          extra=inline_note("Doesn't affect items")))
     W(li("Aghanim's Scepter Black Dragon stats slightly rescaled", t("REWORK")))
     W(li("No longer provides bonus attack damage", t("DEL")))
@@ -5415,7 +5417,8 @@ def build():
                 # Source: data/patchnotes_english.txt → DOTA_Patch_7_41_void_spirit_void_spirit_intrinsic_edge_{1,7,8,9} folded into a coherent description.
                 "Passive.",
                 "Void Spirit gains <b>30%</b> more secondary bonuses from Primary Attributes, and his attack damage per point of attribute is multiplicatively increased by <b>15%</b>."
-                + inline_note("Health Regen from Strength, Attack Speed from Agility, Mana Regen from Intelligence. No longer provides Armor or Magic Resistance."),
+                + inline_note("Health Regen from Strength, " + hl("Attack Speed from Agility", "new")
+                              + ", Mana Regen from Intelligence. No longer provides Armor or Magic Resistance."),
             ],
         ),
         summary="Innate reworked.",
@@ -5423,7 +5426,7 @@ def build():
     ))
     W(ul_open())
     W(li("No longer provides increased Armor or Magic Resistance", t("DEL")))
-    W(li("Now provides increased Attack Speed per point of Agility", t("NEW")))
+    W(li("Now provides increased Attack Speed per point of Agility", t("NEW"), covered=True))
     W(li("Attack damage per attribute multiplier increased from 0.45 to 0.5175", b(0.45, 0.5175)))
     W(li("Secondary bonuses increased from 25% to 30%", b(25, 30)))
     W(li("The result of these changes:", t("MISC"),

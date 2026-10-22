@@ -384,6 +384,18 @@ Sniper 7.38 и 7.41, Earth Spirit 7.40 и 7.41f, Io, Lone Druid, Luna 7.40, Elde
 Active/Passive уже в шапке карточки, а Aghanim сборщик сам переносит в строку итога («Ability reworked (Aghanim's
 Scepter upgrade).» — в скобках перед точкой) с полоской. Писать в контенте можно как угодно — `ability_change` вырезает эти слова сам.
 
+## Стрелка «старое → новое» уже всё сказала (владелец 2026-10-22, 7.41)
+- Итог карточки не называет заменённую способность: «Inner Beast is now the innate ability.», не «… (replaces
+  Rugged)»; «Slugger is now an innate ability.», не «Spirit Cairn removed; …»; «Innate reworked.», не «renamed and reworked».
+- Под шапкой со стрелкой (`ability_change` с разными именами, `ability(old_title=)`) строки «X renamed to Y» нет.
+  Переименование предмета без стрелки (Blight Stone → Orb of Blight 7.38) — строка MISC остаётся.
+- Строка «Now also provides …» под реворк-карточкой: эта фраза в карточке крашется `hl(..., "new")`, числа —
+  `hl(..., "nerf"/"buff")`, а строка скрывается `covered=True` (веса и фильтры её видят) — Dark Seer Quick Wit,
+  Dragon Knight Elder Dragon Form, Void Spirit Intrinsic Edge 7.41, как Clockwerk Overclocking.
+- Смена способа применения, после которой способность действует иначе («Now a no target ability that affects only
+  Bloodseeker», Omniknight 7.41) — **REWORK**, не NERF.
+Тест — `tests/test_fixes_1022.py`.
+
 
 ## Переключаемые способности (2026-09-27, решение владельца)
 

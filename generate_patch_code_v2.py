@@ -365,13 +365,15 @@ CANONICAL_TAGS = [
     # targeting / classification rules with no real gain or loss
     (re.compile(r'\bfor prioritization\b|\bself damage before\b|\btreats creep heroes as creeps\b', re.I), 'MISC'),
     # 7.41 classes the linter kept flagging (the generator's bare "^Now " → NEW was wrong for them)
-    (re.compile(r'\bthat affects only\b|\bonly to a single\b', re.I), 'NERF'),       # Bloodseeker / Invoker scepter
+    # a new way to cast is a REWORK even when it narrows the targets (owner 2026-10-22, Bloodseeker 7.41 Bloodrage)
+    (re.compile(r'^Now (?:is )?a no[- ]target ability\b', re.I),   'REWORK'),
+    (re.compile(r'\bthat affects only\b|\bonly to a single\b', re.I), 'NERF'),       # Invoker scepter
     (re.compile(r"^(?:Passive|Active): [A-Z][\w' ]*\.", re.I),     'NEW'),            # a new item's ability card line
     (re.compile(r"^Aghanim's (?:Shard|Scepter): ", re.I),          'NEW'),            # a new upgrade, described
     (re.compile(r'^Now is a guaranteed\b.*\boption\b', re.I),       'REWORK'),         # neutral enchantment pools
     (re.compile(r'^\s*Now (?:is )?(?:an? )?innate ability\b', re.I), 'REWORK'),
     (re.compile(r'^Now (?:always |is )?a basic ability\b|^Now the default (?:\w+ )?ability\b', re.I), 'REWORK'),
-    (re.compile(r'^Now automatically triggers\b|^Now is a no-target ability\b', re.I), 'REWORK'),
+    (re.compile(r'^Now automatically triggers\b', re.I), 'REWORK'),
     (re.compile(r'\bno longer has an? (?:\w+ ){0,3}self debuff\b', re.I), 'BUFF'),    # Bloodpact's own lockout lifted
     # a capability is taken away → DEL
     (re.compile(r'\bno longer (?:stealable|copyable|benefits? from|blinks?|copy|copies|has an alt-cast)\b', re.I), 'DEL'),

@@ -976,7 +976,7 @@ def build():
     W(ul_close())
     W(subgroup("Abilities"))
     W(ability_change(
-        summary="Spirit Cairn removed; Slugger is now an innate ability.",
+        summary="Slugger is now an innate ability.",
         tag="rework",
         old=dict(
             name="Spirit Cairn",
