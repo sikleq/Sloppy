@@ -112,6 +112,23 @@ def test_from_value_audit_reads_heads_and_facet_values():
     assert not a._known((20, 18, 16, 14), {(20, 17, 14, 11)})
 
 
+def test_from_value_audit_catches_a_stale_value_and_reads_game_names(tmp_path, monkeypatch):
+    # Valve's 7.41 Kinetic Fence row without the wrong-word mark; the hero's page id has a hyphen
+    # (ancient-apparition) and an item's differs from the game's name (battle-fury = bfury): the header icon names it
+    a = _from_audit()
+    row = ('<li><span class="row-text">Cooldown decreased from 20/18/16/14s to 14s</span></li>')
+    page = ('<div class="entity hero-entity" id="dyn-hero-disruptor"><div class="entity-icon hero-icon">'
+            '<img src="../icons/_t/heroes/disruptor.webp"></div></div><h4 class="subgroup">Abilities</h4>'
+            '<div class="ability-block"><div class="ability-icon-wrap"><img alt="Kinetic Fence" '
+            'class="ability-icon-img" data-slug="disruptor_kinetic_fence"></div><ul class="changes">' + row + '</ul></div>')
+    (tmp_path / "7.41.html").write_text(page, encoding="utf-8")
+    monkeypatch.setattr(a, "PAGES", tmp_path)
+    assert [r[2] for r in a.audit_page("7.41", "7.40c")] == ["disruptor_kinetic_fence"]
+    ctx = a._contexts('<div class="entity item-entity" id="dyn-item-battle-fury"><div class="entity-icon item-icon">'
+                      '<img src="../icons/_t/items/bfury.webp"></div></div>')
+    assert ctx[-1][1] == ("item", "bfury")
+
+
 def test_every_from_value_matches_the_previous_patch():
     # owner 2026-10-22: Valve's "from" can be stale (7.41 Kinetic Fence quoted pre-7.38 20/18/16/14s);
     # such rows carry wrong-word + the real change in a note
@@ -124,10 +141,32 @@ def test_every_from_value_matches_the_previous_patch():
     assert found == []
 
 
+def test_card_of_an_ability_granted_by_aghanims_gets_the_stripe_of_that_patch_only():
+    # owner 2026-10-22: Kinetic Fence's card "forgot the Shard stripe"; Visage's Silent as the Grave was a Scepter
+    # ability before 7.41 but is innate in it — no stripe
+    from patch.aghs_granted import kind_of
+    assert kind_of("disruptor_kinetic_fence", "7.41") == "shard"
+    assert kind_of("visage_silent_as_the_grave", "7.41") == ""
+    assert kind_of("visage_silent_as_the_grave") == "scepter"        # some older patch granted it
+
+
+def test_row_stripe_follows_the_patchs_own_aghanim_flag():
+    # owner 2026-10-22: a row is an Aghanim row only if that patch's game grants the ability
+    from patch.aghs_granted import kind_of
+    assert kind_of("jakiro_liquid_ice", "7.41") == ""             # Shard only in 7.34e–7.35d
+    assert kind_of("spectre_haunt", "7.40") == ""                 # the ultimate since 7.40
+    assert kind_of("techies_minefield_sign", "7.38") == ""        # an innate active then, no Scepter needed
+    assert kind_of("centaur_mount", "7.41f") == "scepter"         # flag gone after 7.35, still hidden + 1 level
+    assert kind_of("antimage_counterspell_ally", "7.40") == "shard"   # removed in 7.40: no hero slot has it
+    # 7.08 keeps only slim JSON in data/stats: its flags come from data/rules/aghs_granted_old.json
+    assert kind_of("zuus_cloud", "7.08") == "scepter"
+    assert kind_of("omniknight_degen_aura", "7.08") == ""          # a plain ability then (Shard in 7.34e–7.35d)
+
+
 def test_kinetic_fence_741_is_a_shard_card_like_overclocking():
     # owner 2026-10-22: Kinetic Fence became an Aghanim's Shard ability — a before/after card, rows covered
     src = (ROOT / "content" / "p741.py").read_text(encoding="utf-8")
     block = src[src.index('W(hero_header("Disruptor"))'):src.index('W(hero_header("Doom"))')]
-    assert 'name="Kinetic Fence"' in block and "summary=\"Now an Aghanim's Shard ability.\"" in block
+    assert 'name="Kinetic Fence"' in block and "Granted by Aghanim's Shard. " in block
     assert 'W(ability("Kinetic Fence"))' not in block
     assert 'Has only one level instead", t("NEW"), covered=True' in block
