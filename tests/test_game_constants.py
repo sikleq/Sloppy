@@ -6,6 +6,8 @@ so they are typed in one place, patch/game_constants.py. These tests are the gua
 import re
 from pathlib import Path
 
+import pytest
+
 from patch import game_constants as gc
 from patch.meta import RELEASE_HISTORY
 
@@ -60,7 +62,8 @@ def test_universal_damage_matches_the_game_tooltip():
 
 def test_histories_are_chronological_and_dated_like_the_release_history():
     dates = {r["version"]: r["date"] for r in RELEASE_HISTORY}
-    for name in ("INT_MANA_HIST", "INT_REGEN_HIST", "UNIVERSAL_DMG_HIST"):
+    for name in ("STR_HP_HIST", "PRIMARY_ATTRIBUTE_BONUS_HIST", "INT_MANA_HIST",
+                 "INT_REGEN_HIST", "UNIVERSAL_DMG_HIST"):
         hist = getattr(gc, name)
         keys = [gc._vkey(p) for p, _d, _o, _n in hist]
         assert keys == sorted(keys), f"{name} is not oldest-first"
@@ -78,6 +81,26 @@ def test_value_in_effect_at_a_patch():
     assert gc.at(gc.UNIVERSAL_DMG_HIST, "7.38") == 0.45
     assert gc.at(gc.INT_MANA_HIST, "7.37") == 11
     assert gc.at(gc.INT_MANA_HIST) == gc.MANA_PER_INT
+
+
+@pytest.mark.parametrize("version, ordinary, primary", [
+    ("7.08", 20, 20),
+    ("7.12", 20, 20),
+    ("7.13", 18, 22.5),
+    ("7.20e", 18, 22.5),
+    ("7.21", 20, 20),
+    ("7.32e", 20, 20),
+    ("7.33", 22, 22),
+    ("7.33b", 22, 22),
+])
+def test_hp_per_strength_history(version, ordinary, primary):
+    assert gc.hp_per_strength(version) == ordinary
+    assert gc.hp_per_strength(version, primary=True) == primary
+
+
+def test_current_hp_coefficient_matches_the_history_and_browser():
+    assert gc.hp_per_strength() == gc.hp_per_strength(primary=True) == gc.HP_PER_STR
+    assert gc.for_js()["hpStr"] == gc.hp_per_strength()
 
 
 def test_patch_cards_and_hero_stats_share_the_universal_history():
