@@ -1402,6 +1402,13 @@ def _sep_cls(col) -> str:
     return " col-sep" if col["key"] in _CAT_FIRST_KEYS else ""
 
 
+def _attr_hist(key: str) -> str:
+    """STR / AGI / INT / Attr header: what one point gives by patch (hover, the cells' stat-hist-tip; owner
+    2026-10-22) — read from patch/game_constants.py, so a new history row shows up here by itself."""
+    return (f' data-name="{_esc(_gc.attribute_today(key))}"'
+            f' data-hist="{_esc(_gc.attribute_history(key))}"')
+
+
 def _label_html(label: str) -> str:
     if "\n" in label:
         main, sub = label.split("\n", 1)
@@ -1485,16 +1492,17 @@ def render_html() -> str:
     head = [
         '<th class="mr-th hs-th hs-name sortable" data-col="name" data-cat="basic">'
         '<span class="th-label">Hero</span><span class="sort-ind"></span></th>',
-        '<th class="mr-th hs-th hs-col-attr sortable" data-col="attr" data-cat="basic">'
+        f'<th class="mr-th hs-th hs-col-attr sortable has-history" data-col="attr" data-cat="basic"{_attr_hist("attr")}>'
         '<span class="th-label">Attr</span><span class="sort-ind"></span></th>',
     ]
     for col in COLUMNS:
         direction = "lower" if col["pol"] == "lo" else "higher"
+        hist = _attr_hist(col["key"]) if col["key"] in _gc.ATTRIBUTE_RULES else ""
         head.append(
             f'<th class="mr-th hs-th hs-col-{col["key"]}{_mode_cls(col)}'
-            f'{_sep_cls(col)} sortable" '
+            f'{_sep_cls(col)} sortable{" has-history" if hist else ""}" '
             f'data-col="{col["key"]}" data-direction={direction} '
-            f'data-cat="{col.get("cat", "other")}">'
+            f'data-cat="{col.get("cat", "other")}"{hist}>'
             f'<span class="th-label">{_label_html(col["label"])}</span>'
             f'<span class="sort-ind"></span></th>')
     thead = "".join(head)

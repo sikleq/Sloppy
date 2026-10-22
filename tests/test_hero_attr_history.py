@@ -50,6 +50,20 @@ def test_magic_resistance(version, primary, mr):
     assert hs._mr_l1(snap(primary), HERO, {}) == mr
 
 
+def test_attribute_headers_carry_their_rule_history(monkeypatch):
+    # owner 2026-10-22: hovering STR / AGI / INT / Attr shows what one point gave by patch; a new history row
+    # in patch/game_constants.py appears there by itself
+    from patch import game_constants as gc
+    agi = gc.attribute_history("agi")
+    assert "7.27|28.06.2020|F|Armor|0.16|0.167|hi" in agi
+    assert gc.attribute_today("str") == "Per Strength: 22 HP, 0.1 HP regen"
+    monkeypatch.setitem(gc.ATTRIBUTE_RULES, "agi", gc.ATTRIBUTE_RULES["agi"]
+                        + (("Test", (("7.42", "01.01.2027", 0, 1),), ""),))
+    assert gc.attribute_history("agi").endswith("7.42|01.01.2027|F|Test|0|1|hi")
+    head = hs._attr_hist("int")
+    assert 'data-name="Per Intelligence: 12 Mana' in head and "7.33|20.04.2023|F|Magic resistance|0%|0.1%" in head
+
+
 def test_mana_regen_and_speed_before_and_after_the_rules_changed():
     hs._set_ctx_version("7.13")
     assert hs._mp_l1(snap(INT), HERO, {}) == 75 + 20 * 15                     # 12 x 1.25
