@@ -158,7 +158,9 @@ def test_row_stripe_follows_the_patchs_own_aghanim_flag():
     assert kind_of("techies_minefield_sign", "7.38") == ""        # an innate active then, no Scepter needed
     assert kind_of("centaur_mount", "7.41f") == "scepter"         # flag gone after 7.35, still hidden + 1 level
     assert kind_of("antimage_counterspell_ally", "7.40") == "shard"   # removed in 7.40: no hero slot has it
-    assert kind_of("visage_silent_as_the_grave", "7.08") == "scepter"  # no 7.08 snapshot: any patch decides
+    # 7.08 keeps only slim JSON in data/stats: its flags come from data/rules/aghs_granted_old.json
+    assert kind_of("zuus_cloud", "7.08") == "scepter"
+    assert kind_of("omniknight_degen_aura", "7.08") == ""          # a plain ability then (Shard in 7.34e–7.35d)
 
 
 def test_kinetic_fence_741_is_a_shard_card_like_overclocking():
