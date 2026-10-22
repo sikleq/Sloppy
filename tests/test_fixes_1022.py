@@ -63,7 +63,18 @@ def test_no_rename_row_under_an_arrow_header():
         for node, lines in _calls(f, "ability"):
             if _kw(node, "old_title") is not None:
                 bad += [f"{f.name}: {r.strip()}" for r in _rows_after(node, lines) if "renamed to" in r]
+        # a renamed item gets the arrow too (owner 2026-10-22, Blight Stone -> Orb of Blight 7.38)
+        for node, lines in _calls(f, "item_header"):
+            name = node.args[0].value if node.args and isinstance(node.args[0], ast.Constant) else None
+            bad += [f"{f.name}: {r.strip()}" for r in _rows_after(node, lines) if name and f"renamed to {name}" in r]
     assert not bad, bad
+
+
+def test_renamed_item_header_shows_old_arrow_new():
+    from patch import elements as el
+    html = el.item_header("Orb of Blight", old_title="Blight Stone")
+    assert ('<span class="ability-title-old">Blight Stone</span><span class="ability-title-arrow">→</span>'
+            '<a class="entity-link"') in html
 
 
 def test_ability_audit_ignores_sub_ability_slugs():

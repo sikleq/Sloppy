@@ -564,7 +564,8 @@ def _removed_label(removed):
     return f' <span class="entity-removed-type">{removed}</span>', 'is-removed'
 
 
-def item_header(name, new=False, changed=False, removed=None):
+def item_header(name, new=False, changed=False, removed=None, old_title=None):
+    """old_title: a renamed item shows "Old → New" like a renamed ability, no "renamed to" row (owner 2026-10-22)."""
     out = _close_ability_block()
     _State.current_hero = None
     _State.current_unit = None
@@ -589,10 +590,14 @@ def item_header(name, new=False, changed=False, removed=None):
         block_data_attr = ''
     eid = _register_entity("item", name)
     href = _entity_link("items", name)
+    name_html = f'<a class="entity-link" href="{href}" title="All changes of {name}">{name}</a>'
+    if old_title and old_title != name:
+        name_html = (f'<span class="ability-title-rename"><span class="ability-title-old">{old_title}</span>'
+                     f'<span class="ability-title-arrow">→</span>{name_html}</span>')
     # item-block: every framed box of an item hangs out on one common edge (CSS, owner 2026-09-28)
     return out + _open_block((extra_cls + ' item-block').strip(), block_data_attr) + f'''<div class="entity item-entity"{eid}>
   <div class="entity-icon item-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{item_img(name)}" alt="{name}" loading="lazy" width="88" height="64"></a></div>
-  <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a>{type_label}</div>
+  <div class="entity-name">{name_html}{type_label}</div>
 </div>'''
 
 

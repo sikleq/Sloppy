@@ -388,7 +388,9 @@ Scepter upgrade).» — в скобках перед точкой) с полос
 - Итог карточки не называет заменённую способность: «Inner Beast is now the innate ability.», не «… (replaces
   Rugged)»; «Slugger is now an innate ability.», не «Spirit Cairn removed; …»; «Innate reworked.», не «renamed and reworked».
 - Под шапкой со стрелкой (`ability_change` с разными именами, `ability(old_title=)`) строки «X renamed to Y» нет.
-  Переименование предмета без стрелки (Blight Stone → Orb of Blight 7.38) — строка MISC остаётся.
+  Переименованный предмет — тоже стрелкой: `item_header("Orb of Blight", old_title="Blight Stone")` (7.38), без
+  строки «renamed to». Способность внутри предмета без своей шапки (Replenish Mana → Replenish 7.38, Magic Weakness →
+  Spell Weakness 7.41) — строка MISC остаётся.
 - Строка «Now also provides …» под реворк-карточкой: эта фраза в карточке крашется `hl(..., "new")`, числа —
   `hl(..., "nerf"/"buff")`, а строка скрывается `covered=True` (веса и фильтры её видят) — Dark Seer Quick Wit,
   Dragon Knight Elder Dragon Form, Void Spirit Intrinsic Edge 7.41, как Clockwerk Overclocking.
