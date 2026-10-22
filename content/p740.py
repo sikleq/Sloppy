@@ -2193,7 +2193,8 @@ def build():
     W(ul_open())
     W(li("Health Cost per second decreased from 6% to 5%", b(6, 5, l=True)))
     W(li("Base Damage per second rescaled from 14/20/26/32 to 15/20/25/30", b([14, 20, 26, 32], [15, 20, 25, 30])))
-    W(li("Max Damage rescaled from 1.25/2.75/4.5/6.75% to 1.5/3/4.5/6%", b([1.25, 2.75, 4.5, 6.75], [1.5, 3, 4.5, 6])))
+    W(li('Max Damage rescaled from <span class="wrong-word">1.25</span>/2.75/4.5/<span class="wrong-word">6.75</span>% to 1.5/3/4.5/6%', b([1, 2.75, 4.5, 6.25], [1.5, 3, 4.5, 6]),
+         extra=note_box('This change is wrongly stated. The real change is 1/2.75/4.5/6.25% &rarr; 1.5/3/4.5/6%')))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

@@ -1510,7 +1510,8 @@ def build():
     W(ability("Wild Axes"))
     W(ul_open())
     W(li("Damage per axe increased from 30/65/100/135 to 40/80/120/160", b([30, 65, 100, 135], [40, 80, 120, 160])))
-    W(li("Damage Amp per stack decreased from 6/9/11/13% to 5/6/7/8%", b([6, 9, 11, 13], [5, 6, 7, 8])))
+    W(li('Damage Amp per stack decreased from <span class="wrong-word">6</span>/9/11/13% to 5/6/7/8%', b([7, 9, 11, 13], [5, 6, 7, 8]),
+         extra=note_box('This change is wrongly stated. The real change is 7/9/11/13% &rarr; 5/6/7/8% (7.40b raised it from 6/8/10/12%)')))
     W(li("Aghanim's Shard: Beastmaster's attacks on enemy heroes also apply the Wild Axes debuff of its corresponding level. Illusions of Beastmaster don't apply Wild Axes stacks", t("NEW")))
     W(ul_close())
     W(ability("Summon Razorback", old_title="Call of the Wild Boar"))
@@ -2099,14 +2100,45 @@ def build():
     W(li("Strike Damage increased from 25/55/85/115 to 30/60/90/120", b([25, 55, 85, 115], [30, 60, 90, 120])))
     W(li("No longer upgraded with Aghanim's Shard", t("DEL")))
     W(ul_close())
-    W(ability("Kinetic Fence"))
+    # 7.40c / 7.41 KV: 2 charges (restore 20/17/14/11s) -> a plain 14s cooldown, MaxLevel 1, IsGrantedByShard
+    _kf_text = "After a short formation time, creates a wall out of kinetic energy that enemies cannot pass."
+    W(ability_change(
+        old=dict(
+            name="Kinetic Fence",
+            slug="disruptor_kinetic_fence",
+            desc=[
+                hl("Shares level with Kinetic Field", "del") + ".",
+                _kf_text,
+                "Cast Range: " + hl("1050", "nerf") + ".",
+                hl("Charges: 2. Charge Restore Time: 20/17/14/11s", "del") + ".",
+                "Formation Delay: " + hl("0.4s", "buff") + ".",
+                "Duration: " + hl("2.6/3.2/3.8/4.4s", "nerf") + ".",
+            ],
+        ),
+        new=dict(
+            name="Kinetic Fence",
+            slug="disruptor_kinetic_fence",
+            desc=[
+                hl("Granted by Aghanim's Shard. Has only one level", "new") + ".",
+                _kf_text,
+                "Cast Range: " + hl("1200", "buff") + ".",
+                "Cooldown: " + hl("14s", "new") + ".",
+                "Formation Delay: " + hl("1s", "nerf") + ".",
+                "Duration: " + hl("4.4s", "buff") + ".",
+            ],
+        ),
+        summary="Now an Aghanim's Shard ability.",
+        tag="rework",
+    ))
     W(ul_open())
-    W(li("Cast Range increased from 1050 to 1200", b(1050, 1200)))
-    W(li("Cooldown decreased from 20/18/16/14s to 14s", b([20, 18, 16, 14], 14, l=True)))
+    # the card above shows every change highlighted: the rows stay hidden for the weights and the tag filters
+    W(li("Cast Range increased from 1050 to 1200", b(1050, 1200), covered=True))
+    W(li('Cooldown decreased from <span class="wrong-word">20/18/16/14s</span> to 14s', b([20, 17, 14, 11], 14, l=True), covered=True,
+         extra=note_box('This change is wrongly stated. Before it had 2 charges restored every 20/17/14/11s (since 7.38)')))
     W(li("Duration increased from 2.6/3.2/3.8/4.4s to 4.4s", b([2.6, 3.2, 3.8, 4.4], 4.4),
          extra=inline_note("Can be increased with Kinetic Field Duration talent")))
-    W(li("Formation Delay increased from 0.4s to 1s", b(0.4, 1, l=True)))
-    W(li("Aghanim's Shard: Now grants this ability. No longer shares level with Kinetic Field. Has only one level instead", t("NEW")))
+    W(li("Formation Delay increased from 0.4s to 1s", b(0.4, 1, l=True), covered=True))
+    W(li("Aghanim's Shard: Now grants this ability. No longer shares level with Kinetic Field. Has only one level instead", t("NEW"), covered=True))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

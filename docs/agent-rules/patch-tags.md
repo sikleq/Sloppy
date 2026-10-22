@@ -266,6 +266,10 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
     союзник врага отключает пассивку (Desolate), — `l=True` ставится руками.
   - Опечатка Valve в числах (Techies Proximity Mines 7.41a «450», «225») — `wrong-word` + `note_box` с реальными
     значениями из KV, бейдж по KV. Valve пишет «decreased», а числа выросли — то же (Grimstroke 7.40c).
+    Устаревшее «from» (Valve взяли число до прошлой правки: Kinetic Fence 7.41 «20/18/16/14s» — с 7.38 было
+    20/17/14/11s; Wild Axes 7.41 «6/9/11/13» — 7.40b дал 7/9/11/13) — так же. Ищет такие строки
+    `python scripts/audit/audit_from_values.py` (сверка «from» героя с KV прошлого снимка, только своя способность);
+    тест `test_every_from_value_matches_the_previous_patch` держит ноль (владелец 2026-10-22).
   - «per Spirit Bear level up» → формула `A + B*(L-1)` (Spirit Bear 7.40b, 7.41c), см. formula-tables.
   - 7.38 (вычитка 2026-10-03): «Aghanim's Scepter/Shard no longer decreases …» → **DEL**, и wind-up тоже (подсказка
     7.37e «Decreases wind-up time»; исключение «wind-up → BUFF» осталось только для строки фасета); «Now has 50%
