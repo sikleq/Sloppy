@@ -1,4 +1,4 @@
-"""Talent tree icon with the changed branches in gold (owner 2026-09-26).
+"""Talent tree icon with the changed branches lit (owner 2026-09-26), each in its row's tag colour (2026-10-22).
 
 In the game the talent tree lights the left or right twig of every level (10/15/20/25) that was
 taken. Here the same twigs light up for the talents a patch changed. The side comes from the
@@ -145,17 +145,33 @@ def changed_branches(version, hero, row_texts):
     return lit
 
 
-def tree_svg(icon_url, gold_url, lit, uid):
-    """Inline SVG: the official icon (dimmed) with each changed twig overlaid from its gold copy.
-    One gold layer per twig (data-b), so scripts.js can light only the twigs of the rows a filter
+SHAPE_ID = "ttree-shape"
+_shape_d = None
+
+
+def shape_sprite():
+    """The tree's outline once per page (from talents_gold.svg), drawn by every lit twig with <use>, so a
+    twig takes its row's tag colour from CSS instead of the one gold picture."""
+    global _shape_d
+    if _shape_d is None:
+        with open(os.path.join(_HERE, "icons", "misc", "talents_gold.svg"), encoding="utf-8") as f:
+            _shape_d = re.search(r'<path d="([^"]+)"', f.read()).group(1)
+    return (f'<svg width="0" height="0" style="position:absolute" aria-hidden="true">'
+            f'<defs><path id="{SHAPE_ID}" d="{_shape_d}"/></defs></svg>')
+
+
+def tree_svg(icon_url, lit, uid):
+    """Inline SVG: the official icon (dimmed) with each changed twig drawn over it in its row's tag colour
+    (owner 2026-10-22; lit = {twig: tag}, "mixed" when the twig's rows disagree — gold as before).
+    One layer per twig (data-b), so scripts.js can light only the twigs of the rows a filter
     leaves visible (owner 2026-09-26: with SWAP on, a hidden NERF row's twig still glowed)."""
     title = ", ".join(f"level {k[:2]} {'left' if k[2] == 'l' else 'right'}" for k in sorted(lit))
     clips = "".join(f'<clipPath id="{uid}-{k}"><polygon points="{BRANCH_POLYS[k]}"/></clipPath>' for k in sorted(lit))
-    golds = "".join(f'<image class="ttree-on" data-b="{k}" href="{gold_url}" width="73" height="77" '
+    twigs = "".join(f'<use class="ttree-on" data-b="{k}" data-tag="{lit[k]}" href="#{SHAPE_ID}" '
                     f'clip-path="url(#{uid}-{k})"/>' for k in sorted(lit))
     return (f'<svg class="ability-icon-img ttree" viewBox="0 0 73 77" width="128" height="128" role="img" '
             f'aria-label="Talent tree, changed: {title}"><defs>{clips}</defs>'
-            f'<image class="ttree-base" href="{icon_url}" width="73" height="77"/>{golds}</svg>')
+            f'<image class="ttree-base" href="{icon_url}" width="73" height="77"/>{twigs}</svg>')
 
 
 _BLOCK_RE = re.compile(
@@ -164,11 +180,19 @@ _BLOCK_RE = re.compile(
 _HERO_RE = re.compile(r'class="entity hero-entity"[^>]*>\s*<div class="entity-icon hero-icon">.*?/heroes/([a-z0-9_]+)\.(?:webp|png)"', re.S)
 _ROW_RE = re.compile(r'<span class="row-text">(.*?)</span>', re.S)
 _LI_RE = re.compile(r'<li\b([^>]*)>(.*?)</li>', re.S)
+_BADGE_TAG_RE = re.compile(r'<span class="badge[^"]*" data-tag="([a-z]+)"')
+_LI_TAG_RE = re.compile(r'data-tag="([a-z]+)')
+
+
+def _row_tag(li_attrs, li_body):
+    """The row's tag as its chip shows it: the first badge's data-tag (a NEW row's li says "buff new")."""
+    m = _BADGE_TAG_RE.search(li_body) or _LI_TAG_RE.search(li_attrs)
+    return m.group(1) if m else "mixed"
 
 
 def light_talent_trees(html, version):
     """Patch page post-pass: every Talents block whose rows changed a known twig gets the tree
-    with those twigs in gold. Blocks with nothing placed keep the plain icon."""
+    with those twigs in their rows' tag colours. Blocks with nothing placed keep the plain icon."""
     heroes = [(m.start(), m.group(1)) for m in _HERO_RE.finditer(html)]
     n = [0]
 
@@ -180,23 +204,27 @@ def light_talent_trees(html, version):
             hero = h
         if not hero:
             return m.group(0)
-        lit = set()
+        lit = {}
 
         def tag_li(li):
             row = _ROW_RE.search(li.group(2))
             own = changed_branches(version, hero, [row.group(1)]) if row else set()
             if not own:
                 return li.group(0)
-            lit.update(own)
+            tag = _row_tag(li.group(1), li.group(2))
+            for k in own:
+                lit[k] = tag if lit.get(k, tag) == tag else "mixed"
             return f'<li{li.group(1)} data-tt="{" ".join(sorted(own))}">{li.group(2)}</li>'
 
         rows = _LI_RE.sub(tag_li, m.group(5))
         if not lit:
             return m.group(0)
         n[0] += 1
-        icon = m.group(3)
-        gold = icon.replace("talents.svg", "talents_gold.svg")
         uid = f"tt-{version.replace('.', '_')}-{hero}-{n[0]}"
-        return m.group(1) + tree_svg(icon, gold, lit, uid) + m.group(4) + rows + m.group(6)
+        return m.group(1) + tree_svg(m.group(3), lit, uid) + m.group(4) + rows + m.group(6)
 
-    return _BLOCK_RE.sub(repl, html)
+    out = _BLOCK_RE.sub(repl, html)
+    if n[0]:
+        # the shape every twig draws, once, outside any block a filter can hide
+        out = re.sub(r"(<body\b[^>]*>)", lambda b: b.group(1) + shape_sprite(), out, count=1)
+    return out

@@ -1754,8 +1754,8 @@
 })();
 
 // ---- TALENT TREE: light only the twigs of the talent rows a filter leaves visible ----
-// Each talent row carries data-tt="20r 25r" (patch/talent_tree.py); each gold twig is one
-// <image data-b>. Filters only toggle hide classes, so a class-change observer (hide classes only)
+// Each talent row carries data-tt="20r 25r" (patch/talent_tree.py); each lit twig is one
+// <use data-b> in its row's tag colour. Filters only toggle hide classes, so a class-change observer (hide classes only)
 // re-syncs the trees once per frame.
 (function() {
   const trees = document.querySelectorAll('svg.ttree');
@@ -1772,7 +1772,7 @@
         if (li.closest(HIDE) || (catActive && li.closest('.cat-hide'))) return;
         li.dataset.tt.split(' ').forEach(b => on.add(b));
       });
-      svg.querySelectorAll('image[data-b]').forEach(img => {
+      svg.querySelectorAll('[data-b]').forEach(img => {
         img.style.display = on.has(img.dataset.b) ? '' : 'none';
       });
       svg.classList.toggle('ttree-lit', on.size > 0);

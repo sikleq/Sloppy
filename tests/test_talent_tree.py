@@ -43,10 +43,35 @@ def test_placed_row_gets_the_gold_overlay():
             '<img src="../icons/misc/talents.svg" class="ability-icon-img"></div>\n<ul class="changes">'
             '<li><span class="row-text">Level 15 Talent: +40 Curse of Avernus DPS replaced with -10s Borrowed Time '
             'Cooldown</span></li></ul>')
-    out = tt.light_talent_trees(html, "7.41")
-    assert 'class="ability-icon-img ttree"' in out and "talents_gold.svg" in out
+    out = tt.light_talent_trees("<body>" + html, "7.41")
+    assert 'class="ability-icon-img ttree"' in out and f'href="#{tt.SHAPE_ID}"' in out
+    assert out.count(f'id="{tt.SHAPE_ID}"') == 1                      # the shape once per page
     assert tt.BRANCH_POLYS["15r"] in out and tt.BRANCH_POLYS["15l"] not in out
     assert 'data-tt="15r"' in out and 'data-b="15r"' in out        # a filter can switch this twig off
+
+
+def _abaddon_block(rows):
+    return ('<body><div class="entity hero-entity" id="dyn-hero-abaddon">\n  <div class="entity-icon hero-icon"><a href="x">'
+            '<img src="../icons/_t/heroes/abaddon.webp"></a></div></div>'
+            '<div class="ability-block talents-block"><div class="ability-icon-wrap">'
+            '<img src="../icons/misc/talents.svg" class="ability-icon-img"></div>\n<ul class="changes">'
+            + "".join(rows) + '</ul>')
+
+
+def test_twig_takes_its_rows_tag_colour():
+    # owner 2026-10-22: "Веточки талантов красим" — a SWAP twig is SWAP-coloured, not gold
+    swap = ('<li data-tag="swap"><span class="badge swap" data-tag="swap">SWAP</span><span class="row-text">Level 15 '
+            'Talent: +40 Curse of Avernus DPS replaced with -10s Borrowed Time Cooldown</span></li>')
+    out = tt.light_talent_trees(_abaddon_block([swap]), "7.41")
+    assert 'data-b="15r" data-tag="swap"' in out
+
+
+def test_twig_with_rows_of_different_tags_stays_gold():
+    a = ('<li data-tag="buff"><span class="badge buff1" data-tag="buff">+5%</span><span class="row-text">Level 15 '
+         'Talent: +40 Curse of Avernus DPS replaced with -10s Borrowed Time Cooldown</span></li>')
+    b = a.replace('data-tag="buff"', 'data-tag="nerf"').replace("buff1", "nerf1")
+    out = tt.light_talent_trees(_abaddon_block([a, b]), "7.41")
+    assert 'data-b="15r" data-tag="mixed"' in out
 
 
 def test_swap_value_trades_level_for_size_at_valves_rate():

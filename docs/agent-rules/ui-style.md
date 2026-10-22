@@ -136,6 +136,10 @@ search sits behind the round loupe button».
   `BranchChoice RightBranch`, Upgrade2/4/6/8 `LeftBranch` (Upgrade N = the N-th talent slot). Liquipedia agrees
   (14 heroes, 56 levels, 0 mirrored); no need to re-check per patch. A row is placed by words vs. today's tooltip + the ability/value the talent changed
   in its own patch; a row that fits neither side lights nothing. Gold copy of the icon: `icons/misc/talents_gold.svg`.
+  **Twig colour = its row's tag** (owner 2026-10-22: BUFF green, NERF red, SWAP cyan, DEL / REWORK / QoL / MISC by
+  their chips; a twig whose rows have different tags stays gold). The outline is one `<path id="ttree-shape">`
+  per page (sprite after `<body>`), each twig a `<use data-b data-tag>` filled from CSS (`--tt`, colour-blind
+  mode has its own). SWAP is cyan, not the chip's teal: at twig size teal read as BUFF green.
   Each placed row gets `data-tt="20r 25r"`, each twig its own gold `<image data-b>`; scripts.js "TALENT TREE"
   lights only the twigs of rows a filter leaves visible (a hidden NERF row's twig must not glow). Unlit twigs dim to 42%.
   Any changed talent lights its twig, not only a SWAP. If a hero's twig stays dark, check talent_slots.json first:
