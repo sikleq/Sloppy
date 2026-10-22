@@ -3312,8 +3312,7 @@ body.patch-page .enchant-list-head .ench-tiers { margin: -5px 0; padding: 5px 0;
   transition: background 0.15s, border-color 0.15s;
 }
 /* a game bug: the [?] box with a pixel bug in it, warm orange so it reads at a glance (owner 2026-10-21) */
-.info-tip.bug-tip { width: 15px; height: 15px; color: #f0a050; border-color: rgba(240, 160, 80, 0.75);
-  background: rgba(240, 160, 80, 0.12); vertical-align: -2px; }
+.info-tip.bug-tip { color: #f0a050; border-color: rgba(240, 160, 80, 0.75); background: rgba(240, 160, 80, 0.12); }
 .info-tip.bug-tip .bug-ico { display: block; }
 /* "Ability reworked (Aghanim's Scepter upgrade)." — taken out of the card text (2026-10-21) */
 .ability-change-summary-ul .ac-aghs { color: var(--text-dim); }

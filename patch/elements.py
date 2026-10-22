@@ -2739,20 +2739,18 @@ def info_tip(*lines, header=None):
             f'<span class="info-pop">{head}{body}</span></span><!--/TIP-->')
 
 
-# A solid 9x9 pixel bug (the site's pixel style; the thin Lucide outline was unreadable at 9px, owner 2026-10-21):
-# antennae, head, a body split down the back, three legs a side. One path of 1x1 squares, crisp-edged.
+# A 7x7 pixel bug drawn 1:1 (7px) in the middle of the 13px [?] box: antennae, head, body, three legs a side.
+# The 9x9 bug scaled to 11px blurred off-centre and looked heavy (owner 2026-10-22). One path of 1x1 squares.
 _BUG_PIXELS = (
-    "..#...#..",
-    "...#.#...",
-    "..#####..",
-    "#.##.##.#",
-    ".###.###.",
-    "#.##.##.#",
-    ".###.###.",
-    "#.##.##.#",
-    "..##.##..",
+    ".#...#.",
+    "..###..",
+    "#.###.#",
+    ".#####.",
+    "#.###.#",
+    ".#####.",
+    "..###..",
 )
-_BUG_SVG = ('<svg class="bug-ico" viewBox="0 0 9 9" width="11" height="11" shape-rendering="crispEdges" '
+_BUG_SVG = ('<svg class="bug-ico" viewBox="0 0 7 7" width="7" height="7" shape-rendering="crispEdges" '
             'aria-hidden="true"><path fill="currentColor" d="'
             + "".join(f"M{x} {y}h1v1h-1z" for y, row in enumerate(_BUG_PIXELS) for x, c in enumerate(row) if c == "#")
             + '"/></svg>')

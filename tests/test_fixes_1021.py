@@ -80,6 +80,8 @@ def test_talent_swap_marks_removed_new_and_moved_talents():
 def test_bug_note_is_a_bug_box_not_a_question_mark():
     html = el.bug_note("Kept the old bonus")
     assert 'class="info-tip bug-tip"' in html and 'class="bug-ico"' in html and ">?<" not in html
+    # drawn 1:1 so it stays crisp and centred in the 13px box (owner 2026-10-22)
+    assert 'viewBox="0 0 7 7" width="7" height="7"' in html
 
 
 def test_a_brand_new_talent_is_gold_but_the_row_stays_swap():
