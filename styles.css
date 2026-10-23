@@ -6264,6 +6264,12 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
   margin-bottom: 3px;
   border-bottom: 1px solid rgba(150, 146, 137, 0.25);
 }
+/* Hero Stats STR/AGI/INT/Attr header tip: today's values, one per line under the title. */
+.stat-hist-tip .abil-tip-name .tip-now {
+  display: block;
+  font-weight: 400;
+  color: var(--text-main);
+}
 /* Standard view hides Expanded-only columns. Super-category headers span all
    their columns; the colspan shrinks automatically as hidden cells collapse. */
 .creeps-table.mode-standard .col-exp { display: none; }

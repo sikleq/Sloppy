@@ -56,12 +56,15 @@ def test_attribute_headers_carry_their_rule_history(monkeypatch):
     from patch import game_constants as gc
     agi = gc.attribute_history("agi")
     assert "7.27|28.06.2020|F|Armor|0.16|0.167|hi" in agi
-    assert gc.attribute_today("str") == "Per Strength: 22 HP, 0.1 HP regen"
+    assert gc.attribute_today("str") == ('Per Strength<span class="tip-now">22 HP</span>'
+                                         '<span class="tip-now">0.1 HP regen</span>')
+    # one value per line: the long "attr" header made the window too wide (owner 2026-10-23)
+    assert gc.attribute_today("attr").count('class="tip-now"') == 2
     monkeypatch.setitem(gc.ATTRIBUTE_RULES, "agi", gc.ATTRIBUTE_RULES["agi"]
                         + (("Test", (("7.42", "01.01.2027", 0, 1),), ""),))
     assert gc.attribute_history("agi").endswith("7.42|01.01.2027|F|Test|0|1|hi")
     head = hs._attr_hist("int")
-    assert 'data-name="Per Intelligence: 12 Mana' in head and "7.33|20.04.2023|F|Magic resistance|0%|0.1%" in head
+    assert 'data-name="Per Intelligence&lt;span class=&quot;tip-now&quot;&gt;12 Mana' in head and "7.33|20.04.2023|F|Magic resistance|0%|0.1%" in head
 
 
 def test_mana_regen_and_speed_before_and_after_the_rules_changed():

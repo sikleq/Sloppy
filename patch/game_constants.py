@@ -165,15 +165,16 @@ _ATTR_TITLE = {"str": "Per Strength", "agi": "Per Agility", "int": "Per Intellig
 
 
 def attribute_today(key: str) -> str:
-    """The tooltip header: what one point gives today ('Per Strength: 22 HP, 0.1 HP regen')."""
+    """The tooltip header: what one point gives today, one value per line so the tip stays narrow (owner
+    2026-10-23: a one-line header made the window too wide) — 'Per Strength<span …>22 HP</span>…'."""
     now = [f"{_show(hist[-1][3], unit)} {label}" for label, hist, unit in ATTRIBUTE_RULES[key]
            if hist[-1][3] and unit != "pct-mult"]
     if key == "agi":
         now.append(f"{AS_PER_AGI:g} Attack speed")
     if key == "attr":
-        now = [f"+{DMG_PER_PRIMARY:g} damage per primary attribute point",
-               f"Universal: {UNIVERSAL_DMG_PER_ATTR:g} per point of each"]
-    return f"{_ATTR_TITLE[key]}: " + ", ".join(now)
+        now = [f"Primary: +{DMG_PER_PRIMARY:g} damage per point",
+               f"Universal: +{UNIVERSAL_DMG_PER_ATTR:g} per point of each"]
+    return _ATTR_TITLE[key] + "".join(f'<span class="tip-now">{v}</span>' for v in now)
 
 
 def attribute_history(key: str) -> str:
