@@ -376,3 +376,12 @@ facets, hero texts) in `outputs/loc_history/<version>/` (git-ignored, from d2vpk
 before the next patch). Read a tooltip as it was: `tools.loc_history.tooltip(key, "7.37e")` — numbers stay as
 %placeholders%, fill them from that patch's KV. Run it after every new patch (only missing versions are fetched).
 Old descriptions on the site (ability_change / item_abilities_change) come from here — never invented.
+
+## Liquipedia cache (2026-10-23)
+
+`python tools/liquipedia_cache.py sync heroes items mechanics` keeps the Liquipedia pages of every hero, item and
+mechanics article plus their `/Changelogs` in `outputs/liquipedia/` (git-ignored, CC BY-SA). A page is downloaded again
+only when its revision changed; the tool keeps Liquipedia's limits by itself (2 s between requests, 30 s for rendered
+pages, gzip, stop on 429) — never call the Liquipedia API directly (2026-10-23 a burst got us blocked). Read:
+`get "Roshan/Changelogs"` (wikitext), `html "Roshan"` (rendered text with template values), `grep "Glyph" --in Changelogs`
+(offline search). Tests: `tests/test_liquipedia_cache.py`.
