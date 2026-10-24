@@ -28,7 +28,8 @@ python tools/new_patch.py 7.42 --from enchant_values              # resume (afte
 | 2 | fetch | `scripts/fetch/extract_patchnotes.py <v> --local` or `fetch_gametracking.py <v> [--ref]` | yes (pick the patch's build: `tests/test_innate_history.py` fails on a snapshot taken before its patch) |
 | 3 | slim | `tools/slim_from_kv.py <v>` | yes |
 | 4 | meta | `build_site.py patch` (site_meta.json — before the top-ups, they map by date) | yes |
-| 5 | store | `<store>/tools/build_store.py add <v> [--local]` — the patch's game files into our store (`--local`: from the installed game; with `--source gametracking`: from the archives); then push the store | only where the store is on this PC (`DOTA_FILES_DIR`) |
+| 5 | store | `<store>/tools/build_store.py add <v> [--local]` — the patch's game files into our store (`--local`: from the installed game; with `--source gametracking`: from the archives) | only where the store is on this PC (`DOTA_FILES_DIR`) |
+| 5a | publish | `<store>/tools/publish.py` — checks (tags = builds.json, tests), saves the remote to `.cache/backups/`, pushes main and the tags (overwrites them after a rebuild); Claude may run it without asking | same |
 | 6–9 | top-ups | `fetch_npc_history`, `fetch_hero_history`, `fetch_ability_history` (read the store), `fetch_itemlist` (Valve's datafeed) | yes |
 | 10 | shops | `scripts/fetch/extract_shops.py` | local game only |
 | 11–12 | shared tables | `tools/build_abilities_slim.py`, `tools/build_herolist.py` | yes |
@@ -43,8 +44,8 @@ Each step prints what it does; the first failure stops the run and prints the `-
 The store (2026-10-24) is our private git repo of the game's plain-text files, one commit per patch, tag = version
 (local clone `C:\Users\sikle\dota-patch-files`, env `DOTA_FILES_DIR`); what it holds and how each patch's build is
 chosen is in its own README (`dota-patch-files/README.md`) — not repeated here. Sloppy reads it only through
-`tools/game_files.py` (`read` / `read_bytes` / `path` / `listing` / `npc` / `versions`). After the `store` step push
-the store — BEFORE pushing Sloppy: CI lays out the raw files of every patch from it.
+`tools/game_files.py` (`read` / `read_bytes` / `path` / `listing` / `npc` / `versions`). The `publish` step sends
+the store to GitHub — BEFORE pushing Sloppy: CI lays out the raw files of every patch from it.
 **Raw files in `data/stats/<v>/` are not in git** (2026-10-24): `heroes/npc_dota_hero_*.txt` (7.34e+), the root KV
 files (7.41c+) and `npc_dota_hero_base.txt` (7.41f+) are git-ignored and written from the store by
 `python tools/game_files.py materialize` (rules: `raw_plan`; ~20 s). CI (`build.yml`, `game-build-watch.yml`) checks the
