@@ -3102,10 +3102,9 @@
     "Ability1": "techies_sticky_bomb",
     "Ability2": "techies_reactive_tazer",
     "Ability3": "techies_suicide",
-    "Ability4": "generic_hidden",
+    "Ability4": "techies_reactive_tazer_stop",
     "Ability5": "techies_minefield_sign",
     "Ability6": "techies_land_mines",
-    "Ability7": "techies_reactive_tazer_stop",
     "AbilityDraftAbilities": {
       "Ability1": "techies_sticky_bomb",
       "Ability2": "techies_reactive_tazer",

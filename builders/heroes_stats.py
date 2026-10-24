@@ -1285,6 +1285,11 @@ def _history_for(snaps, versions, dates, hero, col, raws, *, mode: str) -> str:
         if not fields:
             return kv_ver
         slug = hero.replace("npc_dota_hero_", "")
+        # The patch whose build changed the field has its own note for it: that is the patch (2026-10-24: with
+        # snapshots taken from each patch's own build, shifting such changes moved Beastmaster's 7.34d armor to a
+        # 7.34c Hawk-health note and merged Magnus' 7.33 and 7.33b strength gain into one row).
+        if any(kv_ver in _patchnote_events().get((slug, f), []) for f in fields):
+            return kv_ver
         window = set(_adjacent_prior_patches(kv_ver, LOOKBACK_PATCHES))
         if not window:
             return kv_ver

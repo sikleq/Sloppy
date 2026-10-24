@@ -762,7 +762,7 @@
     "bonus_mana_regen": 1.75
   },
   "item_recipe_cyclone": {
-    "ItemCost": 775,
+    "ItemCost": 675,
     "ItemRecipe": 1,
     "ItemResult": "item_cyclone",
     "ItemRequirements": {
@@ -772,12 +772,12 @@
   "item_cyclone": {
     "AbilityCooldown": 23.0,
     "AbilityManaCost": 175,
-    "ItemCost": 2725,
+    "ItemCost": 2625,
     "bonus_intellect": 10,
     "bonus_mana_regen": 2.5
   },
   "item_recipe_wind_waker": {
-    "ItemCost": 1300,
+    "ItemCost": 1400,
     "ItemRecipe": 1,
     "ItemResult": "item_wind_waker",
     "ItemRequirements": {
@@ -1003,7 +1003,7 @@
     "ItemCost": 5125
   },
   "item_recipe_heart": {
-    "ItemCost": 1200,
+    "ItemCost": 1300,
     "ItemRecipe": 1,
     "ItemResult": "item_heart",
     "ItemRequirements": {
@@ -1011,7 +1011,7 @@
     }
   },
   "item_heart": {
-    "ItemCost": 5000
+    "ItemCost": 5100
   },
   "item_recipe_black_king_bar": {
     "ItemCost": 1450,
@@ -2118,7 +2118,7 @@
     "ItemCost": 0
   },
   "item_ninja_gear": {
-    "AbilityCooldown": 45.0,
+    "AbilityCooldown": 60.0,
     "ItemCost": 0
   },
   "item_illusionsts_cape": {
@@ -2341,7 +2341,7 @@
   "item_pogo_stick": {
     "ItemCost": 0,
     "AbilityCooldown": 15.0,
-    "bonus_mana": 200
+    "bonus_mana": 150
   },
   "item_paintball": {
     "ItemCost": 0,
@@ -2359,7 +2359,7 @@
   "item_occult_bracelet": {
     "ItemCost": 0,
     "bonus_all_stats": 4,
-    "mana_regen": 0.5
+    "mana_regen": 0.4
   },
   "item_tome_of_omniscience": {
     "ItemCost": 0,

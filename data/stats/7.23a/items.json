@@ -1526,7 +1526,7 @@
   "item_ring_of_aquila": {
     "ItemCost": 0,
     "bonus_intellect": 3,
-    "aura_mana_regen": 1.25
+    "aura_mana_regen": 0.5
   },
   "item_recipe_tranquil_boots": {
     "ItemCost": 0,
@@ -1605,7 +1605,7 @@
   },
   "item_keen_optic": {
     "ItemCost": 0,
-    "bonus_mana_regen": 1
+    "bonus_mana_regen": 1.25
   },
   "item_grove_bow": {
     "ItemCost": 0
@@ -1680,12 +1680,10 @@
     "ItemCost": 0
   },
   "item_mind_breaker": {
-    "ItemCost": 0,
-    "AbilityCooldown": 20.0
+    "ItemCost": 0
   },
   "item_third_eye": {
-    "ItemCost": 0,
-    "bonus_all_stats": 7
+    "ItemCost": 0
   },
   "item_spell_prism": {
     "ItemCost": 0,
@@ -1748,7 +1746,7 @@
     "ItemCost": 0
   },
   "item_trusty_shovel": {
-    "AbilityCooldown": 55.0,
+    "AbilityCooldown": 70.0,
     "ItemCost": 0
   },
   "item_nether_shawl": {

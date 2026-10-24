@@ -2184,9 +2184,9 @@
     "AttributeBaseStrength": 17,
     "AttributeStrengthGain": 1.5,
     "AttributeBaseIntelligence": 23,
-    "AttributeIntelligenceGain": 3.4,
+    "AttributeIntelligenceGain": 3.6,
     "AttributeBaseAgility": 22,
-    "AttributeAgilityGain": 3.6,
+    "AttributeAgilityGain": 3.4,
     "StatusHealthRegen": 0.25,
     "MovementSpeed": 275
   },

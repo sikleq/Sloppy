@@ -1527,9 +1527,5 @@
   "item_super_blink": {
     "AbilityCooldown": 15.0,
     "AbilityManaCost": 0
-  },
-  "item_pocket_tower": {
-    "AbilityCooldown": 15.0,
-    "AbilityManaCost": 0
   }
 }

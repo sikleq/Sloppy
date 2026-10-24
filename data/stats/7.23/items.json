@@ -1487,7 +1487,7 @@
     }
   },
   "item_iron_talon": {
-    "AbilityCooldown": 25.0,
+    "AbilityCooldown": 20.0,
     "AbilityManaCost": 0,
     "ItemCost": 301
   },
@@ -1605,7 +1605,7 @@
   },
   "item_keen_optic": {
     "ItemCost": 0,
-    "bonus_mana_regen": 1.25
+    "bonus_mana_regen": 1.5
   },
   "item_grove_bow": {
     "ItemCost": 0
@@ -1626,7 +1626,8 @@
     "ItemCost": 0
   },
   "item_phoenix_ash": {
-    "ItemCost": 0
+    "ItemCost": 0,
+    "bonus_all_stats": 30
   },
   "item_seer_stone": {
     "ItemCost": 0
@@ -1687,8 +1688,8 @@
   },
   "item_spell_prism": {
     "ItemCost": 0,
-    "bonus_all_stats": 12,
-    "mana_regen": 4
+    "AbilityCooldown": 80.0,
+    "bonus_all_stats": 8
   },
   "item_princes_knife": {
     "ItemCost": 0,
@@ -1696,7 +1697,7 @@
   },
   "item_witless_shako": {
     "ItemCost": 0,
-    "max_mana": 400
+    "max_mana": 40
   },
   "item_imp_claw": {
     "AbilityCooldown": 10.0,
@@ -1765,7 +1766,7 @@
   "item_clumsy_net": {
     "AbilityCooldown": 25.0,
     "ItemCost": 0,
-    "mana_regen": 2
+    "mana_regen": 3
   },
   "item_enchanted_quiver": {
     "AbilityCooldown": 8.0,
@@ -1809,7 +1810,7 @@
     }
   },
   "item_demonicon": {
-    "AbilityCooldown": 90.0,
+    "AbilityCooldown": 75.0,
     "ItemCost": 0,
     "bonus_intellect": 35
   },

@@ -368,10 +368,10 @@
     "AttributeBaseStrength": 22,
     "AttributeStrengthGain": 2.8,
     "AttributeBaseIntelligence": 21,
-    "AttributeIntelligenceGain": 2.2,
+    "AttributeIntelligenceGain": 1.8,
     "AttributeBaseAgility": 22,
-    "AttributeAgilityGain": 2.6,
-    "MovementSpeed": 285
+    "AttributeAgilityGain": 2.3,
+    "MovementSpeed": 280
   },
   "npc_dota_hero_sand_king": {
     "Ability1": "sandking_burrowstrike",
@@ -1851,7 +1851,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "chaos_knight_phantasm",
-    "ArmorPhysical": 2,
+    "ArmorPhysical": 1,
     "AttackDamageMin": 29,
     "AttackDamageMax": 59,
     "AttackRate": 1.7,

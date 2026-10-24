@@ -928,7 +928,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "death_prophet_exorcism",
-    "ArmorPhysical": 1,
+    "ArmorPhysical": 2,
     "AttackDamageMin": 26,
     "AttackDamageMax": 38,
     "AttackRate": 1.7,
@@ -1834,7 +1834,7 @@
     "AttributeBaseIntelligence": 20,
     "AttributeIntelligenceGain": 1.6,
     "StatusHealthRegen": 1.75,
-    "MovementSpeed": 310
+    "MovementSpeed": 320
   },
   "npc_dota_hero_treant": {
     "Ability1": "treant_natures_guise",

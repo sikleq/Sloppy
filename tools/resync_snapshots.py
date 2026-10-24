@@ -51,19 +51,50 @@ def _undo_later_state(v, slim_name, truth):
     return {k: ({**row, **fix[k]} if k in fix else row) for k, row in truth.items()}
 
 
-def stale_snapshots(fs):
+class ArchiveSource:
+    """Raw KV of the patch's own build from the game-file archives (tools/item_history.py: GameTracking 7.08 …
+    7.32d, DOTA2_CLIENT 7.32e …; build = first with the patch's notes + release-night fixes). Authority since
+    2026-10-24: the d2vpkr history ("last commit <= release + 4 days") held a neighbouring patch's state in 7.23,
+    7.23a, 7.33d, 7.33e and 7.34d items."""
+    undo_later_state = False
+
+    def __init__(self):
+        sys.path.insert(0, HERE)
+        from tools.item_history import Archive
+        self.arch = Archive()
+
+    def text(self, v, hist, raw_name):
+        b = self.arch.build(v) if v in self.arch.dates else None
+        if not b:
+            return None
+        return self.arch.clone(b["archive"]).npc(b["sha"], raw_name)
+
+
+class HistorySource:
+    """The weights model's d2vpkr history in outputs/ (the authority until 2026-10-23)."""
+    undo_later_state = True
+
+    def text(self, v, hist, raw_name):
+        raw = os.path.join(HISTORY, hist, v, raw_name)
+        return open(raw, encoding="utf-8", errors="replace").read() if os.path.exists(raw) else None
+
+
+def stale_snapshots(fs, source=None):
     """[(version, slim file, items differing, extracted truth)] for every slim JSON that differs."""
+    source = source or ArchiveSource()
     stats = os.path.join(HERE, "data", "stats")
     out = []
     for slim_name, hist, raw_name, fn in KINDS:
         for v in sorted(os.listdir(stats)):
-            slim, raw = os.path.join(stats, v, slim_name), os.path.join(HISTORY, hist, v, raw_name)
-            if not (os.path.exists(slim) and os.path.exists(raw)) or os.path.exists(os.path.join(stats, v, raw_name)):
+            slim = os.path.join(stats, v, slim_name)
+            if not os.path.exists(slim) or os.path.exists(os.path.join(stats, v, raw_name)):
                 continue
-            text = open(raw, encoding="utf-8", errors="replace").read()
-            if "#base" in text:
+            text = source.text(v, hist, raw_name)
+            if text is None or "#base" in text:
                 continue                                   # an include list (7.41f+): slim_from_kv's job
-            truth = _undo_later_state(v, slim_name, getattr(fs, fn)(fs.parse_kv(text)))
+            truth = getattr(fs, fn)(fs.parse_kv(text))
+            if source.undo_later_state:
+                truth = _undo_later_state(v, slim_name, truth)
             have = json.load(open(slim, encoding="utf-8"))
             if truth != have:
                 out.append((v, slim_name, sum(1 for k in set(truth) | set(have) if truth.get(k) != have.get(k)), truth))
@@ -77,8 +108,8 @@ def load_fetch_stats():
     return fs
 
 
-def main(write):
-    stale = stale_snapshots(load_fetch_stats())
+def main(write, source):
+    stale = stale_snapshots(load_fetch_stats(), source)
     for v, slim_name, n, truth in stale:
         if write:
             with open(os.path.join(HERE, "data", "stats", v, slim_name), "w", encoding="utf-8", newline="\n") as f:
@@ -88,4 +119,4 @@ def main(write):
 
 
 if __name__ == "__main__":
-    main("--write" in sys.argv)
+    main("--write" in sys.argv, HistorySource() if "--d2vpkr" in sys.argv else ArchiveSource())
