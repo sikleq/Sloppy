@@ -760,7 +760,7 @@
     "Ability6": "sniper_assassinate",
     "ArmorPhysical": -1,
     "AttackDamageMin": 15,
-    "AttackDamageMax": "21a",
+    "AttackDamageMax": 21,
     "AttackRate": 1.7,
     "AttackRange": 550,
     "AttributePrimary": "DOTA_ATTRIBUTE_AGILITY",

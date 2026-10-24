@@ -403,7 +403,7 @@ other field or the shop category use `python tools/item_history.py <item_x> <ver
 since 7.08): it reads `items.txt`, `neutral_items.txt` and `shops.txt` of the patch's own build from the store
 (`tools/game_files.py`; until 2026-10-24 from local clones of the GameTracking and DOTA2_CLIENT archives) and prints every
 changed field against the previous patch. The patch's build = the first build with its notes and without the next
-patch's notes, plus release-night fixes within 12 h (values reach the notes only there: 7.27, 7.31); how it is chosen
+patch's notes, plus release-day fixes within 24 h (owner 2026-10-24; values reach the notes only there: 7.27, 7.31, 7.41 Batrider talents); how it is chosen
 is in the store's README. Patches whose notes never shipped in the game (7.20, 7.20b, 7.23, 7.28) take the first
 `items.txt` change of the release day. Checked 2026-10-24 against the slim snapshots: all 118 patches map to a build; the remaining
 differences are snapshot errors (7.23, 7.23a, 7.33d, 7.33e, 7.34d items). Tests: `tests/test_item_history.py`.
