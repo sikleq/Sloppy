@@ -98,3 +98,6 @@ tools/autocast/out/
 
 # local config (match database path), never committed
 .sloppy/
+
+# owner's deferred tasks: local only, never in the public repo (2026-10-24)
+docs/todo.md
