@@ -29,9 +29,10 @@ QoL), every numeric delta is computed as a percentage, every per-level formula u
 - **Patch notes** — Valve's datafeed (`data/<version>_datafeed.json`) and the game's own `patchnotes_english.txt`.
 - **Game files of every patch since 7.08** — our own copy: one snapshot per patch, taken from that patch's own
   build (the first build with its notes, plus the release-night fixes). The slim per-patch tables the site needs are
-  committed in `data/stats/<version>/`; the full files live in a separate private store, read through
-  `tools/game_files.py` by the history tools (`tools/item_history.py`, `tools/resync_snapshots.py`, the
-  `scripts/fetch/` top-ups). New patches are taken from the installed game (`tools/new_patch.py`).
+  committed in `data/stats/<version>/`; the game files themselves live in a separate private store, read through
+  `tools/game_files.py`. The raw files some pages need (per-hero KV, the newest patches' root KV) are laid out into
+  `data/stats/` from the store by `python tools/game_files.py materialize` — CI does it with a read-only deploy key,
+  so a full build needs access to the store. New patches are taken from the installed game (`tools/new_patch.py`).
 - **Icons** — Valve's CDN, mirrored in `icons/`; **map entities** — the game's map files.
 
 ## Repository layout
