@@ -3859,6 +3859,7 @@ h4.subgroup .subgroup-new-type {
   max-width: 100%;
   justify-content: center;
   padding: 8px 14px;
+  --pt: 8px; --px: 14px;   /* the header strip spans this padding too (it stood inset, owner 2026-10-24) */
 }
 /* In-place rework where NEW outgrew OLD: centering puts new's first row
    at the Y-level of old's HEADER (since new pane has no head). Switch to
@@ -3872,6 +3873,7 @@ h4.subgroup .subgroup-new-type {
   max-width: none;
   justify-content: flex-start;
   padding: 8px 14px;
+  --pt: 8px; --px: 14px;
 }
 /* Asymmetric content: the pane with fewer description rows shrinks and
    centers in its column, instead of stretching to mirror the taller pane
@@ -3883,6 +3885,7 @@ h4.subgroup .subgroup-new-type {
   width: fit-content;
   max-width: 100%;
   padding: 8px 14px;
+  --pt: 8px; --px: 14px;
 }
 /* Aghanim's Scepter upgrade row inside an ability-change pane — same blue
    gradient stripe + scepter glyph as the canonical `ul.changes li.aghanim-
@@ -11177,6 +11180,10 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .hl-marker .iab-hl-swap { --hl-bg: rgba(185, 154, 230, 0.22); }
 .hl-marker .iab-hl-qol,
 .hl-marker .iab-hl-misc { --hl-bg: rgba(160, 150, 130, 0.18); }
+/* on an Aghanim line's blue strip the see-through colour mixed with the blue (purple ≈ blue, owner 2026-10-24):
+   there it lies on the card's own dark colour, so it looks the same as outside the strip */
+.hl-marker .aghanim-scepter .iab-hl,
+.hl-marker .aghanim-shard .iab-hl { background: linear-gradient(var(--hl-bg), var(--hl-bg)), var(--bg-panel-3); }
 /* the colour-blind variants come from scripts/gen/gen_colorblind_css.py */
 .iab-tip-pct .badge-group { display: inline-flex; }
 .iab-card { background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px; padding: 6px 12px; }
