@@ -389,7 +389,12 @@ pages, gzip, stop on 429) — never call the Liquipedia API directly (2026-10-23
 ## Full item data of any patch (2026-10-24)
 
 `data/stats/<v>/items.json` keeps only cost, cooldown and mana fields (full `items.txt` only from 7.41c). For any
-other field or the shop category use `python tools/item_history.py <item_x> <version> [...] [--show]`: it reads
-`items.txt`, `neutral_items.txt` and `shops.txt` of the patch's own build (same choice as `fetch_stats.find_patch_build`)
-from a local clone of muk-as/DOTA2_CLIENT (`DOTA2_CLIENT_DIR`, default `C:\Program Files\GitHub\DOTA2_CLIENT`) and prints
-every changed field against the previous patch. The archive starts at 7.33. Tests: `tests/test_item_history.py`.
+other field or the shop category use `python tools/item_history.py <item_x> <version> [...] [--show]` (any patch
+since 7.08): it reads `items.txt`, `neutral_items.txt` and `shops.txt` of the patch's own build from local clones of
+two archives of the game's plain-text files — SteamTracking/GameTracking-Dota2 (2016 … 2023-02, `GAMETRACKING_DIR`) and
+muk-as/DOTA2_CLIENT (2023-03 …, `DOTA2_CLIENT_DIR`) — and prints every changed field against the previous patch.
+The patch's build = the first build with its notes and without the next patch's notes, then the last release-night
+fix within 12 h (values reach the notes only there: 7.27, 7.31). Commit dates are archiving dates, not build dates.
+Patches whose notes never shipped in the game (7.20, 7.20b, 7.23, 7.28) take the first `items.txt` change of the
+release day and say so. Checked 2026-10-24 against the slim snapshots: all 118 patches map to a build; the remaining
+differences are snapshot errors (7.23, 7.23a, 7.33d, 7.33e, 7.34d items). Tests: `tests/test_item_history.py`.
