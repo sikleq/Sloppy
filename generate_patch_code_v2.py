@@ -2063,7 +2063,7 @@ def _postprocess_properties_change(lines, with_abilities=False):
                     continue
             # a reworked item's own stat list "Provides +35 Damage and +16% Spell Lifesteal"
             # (Revenant's Brooch 7.38): the new side; the old side must come from the previous
-            # patch's tooltips (d2vpkr abilities_english) — flagged with a TODO comment
+            # patch's tooltips (tools/loc_history.py, the game-files store) — flagged with a TODO comment
             mp = _PROP_PROVIDES_RE.match(txt)
             if mp:
                 grants = _parse_stat_grants(mp.group(1))
@@ -2116,7 +2116,7 @@ def _postprocess_properties_change(lines, with_abilities=False):
             new_repr = ', '.join(_fmt_new(r) for r in new_rows) or ''
             if needs_old and not old_rows:
                 out.append(f'    # TODO {item_name}: old bonus stats — take them from the previous patch\'s '
-                           f'tooltips (d2vpkr abilities_english), never invent them')
+                           f'tooltips (tools/loc_history.py), never invent them')
             out.append(
                 f'W(properties_change(old=[{old_repr}], new=[{new_repr}]))'
             )
@@ -2914,7 +2914,7 @@ def _postprocess_boss_blocks(lines):
       "Alleviation: New ability. X"            -> new-ability card (ability_change(None, …, tag="new"))
       "The Shining: <change>" / "Roar of Retribution" + info lines -> ability(...) + its rows
       info line "Unyielding Shield: … rescaled from A + (B per death) to …" -> a TODO for the
-      old/new card (old tooltip: dotabuff/d2vpkr history; scale_pill tables — see content/p738.py).
+      old/new card (old tooltip: tools/loc_history.py (the game-files store); scale_pill tables — see content/p738.py).
     If every general row is REWORK except NEW ones (and ≥3 REWORK) -> new_mech="Reworked objective":
     the REWORK rows become the description box, the NEW rows stay changes."""
     out = []
@@ -2979,7 +2979,7 @@ def _postprocess_boss_blocks(lines):
         out += ['W(ul_open())'] + general + ['W(ul_close())']
         for ab, part in todos:
             out.append(f'# v2-todo: {ab} — scaling changed ({part}). Make an ability_change(old=…, new=…, '
-                       f'tag="rework") card: old tooltip from dotabuff/d2vpkr abilities_english.txt history, '
+                       f'tag="rework") card: old tooltip from tools/loc_history.py (the game-files store), '
                        f'formulas as scale_pill tables (deaths / game time) — see content/p738.py Tormentor')
         for ab, rows in per_abil.items():
             out += [f'W(ability("{ab}", icon_url="{abil_icons[ab]}"))', 'W(ul_open())'] + rows + ['W(ul_close())']
@@ -3096,7 +3096,7 @@ def _postprocess_innate_rows_out_of_stats(lines):
     Bearer innate ability"); Sloppy puts it in the innate's own block after the stats ul (owner 2026-09-26,
     rule "innate + facet changes go under Abilities"). A plain change -> ability(<name>, innate=True) block;
     a removal -> the same block plus a TODO to render it as ability_change(old=<removed>, new=<the hero's new
-    innate>) with the OLD description lifted from d2vpkr abilities_english of the previous patch (never
+    innate>) with the OLD description lifted from the previous patch's abilities_english (tools/loc_history.py) (never
     invented)."""
     names = _innate_names()
     out, i = [], 0
@@ -3128,7 +3128,7 @@ def _postprocess_innate_rows_out_of_stats(lines):
             out += [lines[i + 1]] + keep + [lines[j]]
         for name, ln, removed, slug in moved:
             if removed:
-                out.append(f"{ind}# TODO[innate-swap]: ability_change(old={name!r} desc from d2vpkr abilities_english "
+                out.append(f"{ind}# TODO[innate-swap]: ability_change(old={name!r} desc from tools/loc_history.py "
                            f"before this patch, new=<the hero's new innate>) — never invent the old text")
             out.append(f'{ind}W(ability("{name}", slug="{slug}", innate=True))')
             out += [f"{ind}W(ul_open())", ln.replace(f'W(li("{name}: ', 'W(li("', 1), f"{ind}W(ul_close())"]
@@ -3629,7 +3629,7 @@ def _drop_empty_ul(lines):
 def _postprocess_item_ability_cards(lines, version):
     """Owner 2026-09-27: an item whose ability changed gets its abilities before -> after card
     (item_abilities_change) from the game's tooltips of both patches. Needs the local tooltip history
-    (tools/fetch_loc_history.py); without it the pass is skipped with a note."""
+    (the game-files store, tools/game_files.py via tools/loc_history.py); without it the pass is skipped."""
     try:
         sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools"))
         from item_ability_text import insert_cards

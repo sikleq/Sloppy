@@ -19,8 +19,20 @@ QoL), every numeric delta is computed as a percentage, every per-level formula u
 - **Terrain comparison.** An old ↔ new map slider per map change, with trees, camps, towers, runes and objectives as
   layers. The map pictures are rendered in Source Filmmaker (`scripts/gen/stitch_sfm.py`) and the map entities are
   read straight from the game's map files (`scripts/gen/extract_map_entities.py`).
-- **Materials.** Hero stats, Hero Lab, hero/item change matrices, neutral creeps and their abilities, mana items,
-  AoE bonuses, structures.
+- **Silent changes.** What a patch changed in the game files without a line in the notes, per hero
+  (`dist/patches/silent/<ver>.html`, since 7.35).
+- **Materials.** Hero stats with the history of every cell, Hero Lab, hero/item change matrices, neutral creeps and
+  their abilities, mana items, AoE bonuses, structures.
+
+## Where the data comes from
+
+- **Patch notes** — Valve's datafeed (`data/<version>_datafeed.json`) and the game's own `patchnotes_english.txt`.
+- **Game files of every patch since 7.08** — our own copy: one snapshot per patch, taken from that patch's own
+  build (the first build with its notes, plus the release-night fixes). The slim per-patch tables the site needs are
+  committed in `data/stats/<version>/`; the full files live in a separate private store, read through
+  `tools/game_files.py` by the history tools (`tools/item_history.py`, `tools/resync_snapshots.py`, the
+  `scripts/fetch/` top-ups). New patches are taken from the installed game (`tools/new_patch.py`).
+- **Icons** — Valve's CDN, mirrored in `icons/`; **map entities** — the game's map files.
 
 ## Repository layout
 
@@ -40,19 +52,24 @@ generate_patch_code_v2.py   ← Valve datafeed → Python scaffold for content/p
 styles.css / src/scripts.js ← the one stylesheet and script of every page (minified into dist/)
 
 patch/                      ← the content API used by content/p*.py: li(), b(), t(), headers, cards, …
+                              and the release list (patch/meta.py RELEASE_HISTORY)
 content/p<version>.py       ← one annotated patch each; auto-discovered, no registration
 tests/                      ← pytest (run in CI)
+tools/                      ← new_patch.py (a new patch end to end), game_files.py (the game-files store),
+                              item_history.py, resync_snapshots.py, slim_from_kv.py, patch_check.py, ci_local.py, …
 
 data/
-  stats/<version>/          ← per-patch game-file snapshots (heroes, items, abilities, units)
+  stats/<version>/          ← per-patch snapshots of the game files (heroes, items, abilities, units)
   <version>_datafeed.json   ← cached Valve datafeed
   normalized/patches/*.json ← structured per-patch artifact
+  rules/                    ← tables built from the game history (talent slots, item stat prices, weights, …)
   map/mapdata_<code>.json   ← map entities read from the game's map files
 icons/                      ← local mirror of hero, item, ability and map images
 scripts/
-  fetch/                    ← data fetchers
+  fetch/                    ← data fetchers (local game, Valve datafeed, the game-files store)
   gen/                      ← generators: map entities, map pictures, layer icons, …
   audit/                    ← content and icon audits
+docs/                       ← architecture, workflow, data format, agent rules
 
 dist/                       ← build output, served by GitHub Pages (not committed)
 ```
@@ -77,19 +94,13 @@ python -m pytest tests -q
 
 Short version (full guide: [docs/workflow.md](docs/workflow.md)):
 
-1. Register the version in `patch/meta.py` (`PATCHES` + `RELEASE_HISTORY`).
-2. Refresh `data/stats/<version>/` with the `scripts/fetch/` helpers, then the global snapshots
-   (`patchnotes_english.txt`, `abilities_slim.json`, `herolist.json`, `itemlist.json`).
-3. Generate the scaffold: `python generate_patch_code_v2.py 7.42`.
-4. Review it and save it as `content/p742.py` (auto-discovered).
-5. Run the gates:
+1. One command does the data side — registers the version, reads the game files from the installed game, builds the
+   snapshots and shared tables, drafts the page, builds the site and checks it:
    ```powershell
-   python -m pytest tests -q
-   python build_site.py
-   python tools/validate_data.py
-   python scripts/audit/check_icons.py
-   python scripts/audit/audit_all.py
+   python tools/new_patch.py 7.42 21.10.2026
    ```
+2. Proofread the draft into `content/p742.py` (auto-discovered), then `python tools/new_patch.py 7.42 --from enchant`.
+3. Run the gates: `python -m pytest tests -q` and `python tools/ci_local.py` (the CI audits).
 
 ## Architecture & rules
 
@@ -105,6 +116,8 @@ Short version (full guide: [docs/workflow.md](docs/workflow.md)):
   `dist/` is published to GitHub Pages.
 - **`.github/workflows/audit-live.yml`** — daily (and on demand): checks display names against Valve's live datafeed.
   Kept out of the deploy path, so a Valve outage never blocks a deploy.
+- **`.github/workflows/game-build-watch.yml`** — daily: opens an issue when a new game build differs from the newest
+  snapshot (a new patch, or a build without notes).
 
 ## Contributing
 
@@ -122,9 +135,12 @@ license.
 
 ## Acknowledgements
 
-- Game data history from [muk-as/DOTA2_CLIENT](https://github.com/muk-as/DOTA2_CLIENT) and
-  [dotabuff/d2vpkr](https://github.com/dotabuff/d2vpkr).
-- Game files read with [ValveResourceFormat](https://github.com/ValveResourceFormat/ValveResourceFormat) (Source2Viewer).
+- The history of the game files before our own snapshots was assembled once from the archives of
+  [SteamTracking/GameTracking-Dota2](https://github.com/SteamTracking/GameTracking-Dota2) (2016 – 2023) and
+  [muk-as/DOTA2_CLIENT](https://github.com/muk-as/DOTA2_CLIENT) (2023 – now); GameTracking also feeds the daily
+  new-build watch.
+- Game files read with [ValveResourceFormat](https://github.com/ValveResourceFormat/ValveResourceFormat) (Source2Viewer)
+  and [vpk](https://github.com/ValvePython/vpk).
 - Terrain page: inspired by [devilesk](https://github.com/devilesk/dota-interactive-map); map pictures and data:
   [Oldgrowth](https://github.com/sikleq/Oldgrowth).
 - Icons from Valve's CDN; patch notes from Valve's datafeed.

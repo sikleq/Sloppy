@@ -61,19 +61,19 @@ def test_the_real_meta_file_takes_a_new_patch_and_stays_importable(tmp_path):
 
 
 def test_plan_skips_what_does_not_apply(monkeypatch, tmp_path):
-    monkeypatch.setattr(np_, "WEIGHTS_MODEL", str(tmp_path / "absent"))
+    monkeypatch.setattr(np_, "STORE", str(tmp_path / "absent"))
     steps = {s.name: s for s in np_.plan("7.41f", None, "gametracking", "abc123", dota_path=str(tmp_path))}
     assert steps["register"].skip.startswith("already registered")
     assert steps["fetch"].argv[1:] == ["scripts/fetch/fetch_gametracking.py", "7.41f", "--ref", "abc123"]
     assert steps["shops"].skip and steps["item_stat_lines"].skip and steps["talent_slots"].skip
+    assert steps["store"].skip                                    # no store on this PC
     assert "exists" in steps["draft"].skip                        # a proofread page is never regenerated
     assert steps["enchant_values"].skip and steps["enchant_table"].skip   # 7.41f has no enchant blocks
     assert steps["build"].skip is None and steps["check"].argv[-1] == "7.41f"
-    assert steps["loc_history"].argv[-2:] == ["7.41e", "7.41f"]     # the previous patch's text is closed by this one
     names = list(steps)
     assert names.index("register") < names.index("fetch") < names.index("slim") < names.index("meta") \
-        < names.index("npc_units") < names.index("abilities_slim") < names.index("draft") < names.index("build") \
-        < names.index("check")
+        < names.index("store") < names.index("npc_units") < names.index("abilities_slim") < names.index("draft") \
+        < names.index("build") < names.index("check")
     # source game without a local game: the fetch says why it cannot run
     game = {s.name: s for s in np_.plan("7.41f", None, "game", dota_path=str(tmp_path))}
     assert "pak01_dir.vpk" in game["fetch"].skip
@@ -84,8 +84,9 @@ def test_a_new_patch_gets_a_draft_and_enchant_steps_wait_for_the_content(monkeyp
     assert steps["register"].skip is None and steps["draft"].skip is None
     assert steps["draft"].argv[1:] == ["generate_patch_code_v2.py", "9.01"]
     assert "enchant_tier_box" in steps["enchant_values"].skip
-    from patch.meta import RELEASE_HISTORY
-    assert steps["loc_history"].argv[-2:] == [RELEASE_HISTORY[0]["version"], "9.01"]
+    assert steps["store"].argv[-2:] == ["add", "9.01"]              # archives: no --local for the gametracking source
+    local = {s.name: s for s in np_.plan("9.01", "01.01.2099", "game")}
+    assert local["store"].argv[-3:] == ["add", "9.01", "--local"]
 
 
 def test_map_status_from_patch_maps_and_from_the_local_map_file(tmp_path):

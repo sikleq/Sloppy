@@ -22,6 +22,7 @@ patch/
   index_page.py              ← index.html + What's New popup
 generate_patch_code_v2.py    ← Datafeed → Python scaffold. Канонический генератор.
 tools/new_patch.py           ← Новый патч: все шаги данных одной командой (docs/workflow.md, «The one command»)
+tools/game_files.py          ← Чтение хранилища файлов игры (dota-patch-files, env DOTA_FILES_DIR): сборка каждого патча с 7.08
 data/
   normalized/patches/*.json  ← JSON-артефакты (генерятся параллельно со scaffold)
   stats/{version}/           ← KV-файлы героев/предметов (для silent changes)
@@ -204,7 +205,7 @@ Start-Process python -ArgumentList "-m http.server 8765 --directory dist"
 
 
 ## Новый патч → страницы Materials (проверено 2026-09-25)
-- `heroes_raw.json` (скорость атаки, обзор, снаряд, поворот, хитбокс) для раскладки 7.41f+ собирается **из локальных `data/stats/<ver>/heroes/*.txt`** (`scripts/fetch/fetch_hero_history.py → build_from_local`), шаблон `npc_dota_hero_base` — из `data/stats/<ver>/npc_dota_hero_base.txt` (достать из VPK игры), иначе переносится с прошлого патча с предупреждением. d2vpkr давал 7.41f = копия 7.41e (Earth Spirit/KotL/Warlock BAS). Тест: `tests/test_latest_patch_data.py`.
+- `heroes_raw.json` (скорость атаки, обзор, снаряд, поворот, хитбокс) для раскладки 7.41f+ собирается **из локальных `data/stats/<ver>/heroes/*.txt`** (`scripts/fetch/fetch_hero_history.py → build_from_local`), шаблон `npc_dota_hero_base` — из `data/stats/<ver>/npc_dota_hero_base.txt` (достать из VPK игры), иначе переносится с прошлого патча с предупреждением. Патч, уже лежащий в хранилище файлов игры (`tools/game_files.py`), читается оттуда (`build_from_store`). До 2026-10-24 источником был d2vpkr и давал 7.41f = копия 7.41e (Earth Spirit/KotL/Warlock BAS). Тест: `tests/test_latest_patch_data.py`.
 - `RELEASE_HISTORY` сортируется по дате (новые сверху) при загрузке `patch/meta.py` — порядок в файле больше не важен.
 - Mana Items: история предметов с интеллектом считается по константе ТОГО патча (`_int_const_at`: 11 маны/Int в 7.36–7.38).
-- Остаток аудита (не сделано): d2vpkr-история нейтралов/способностей может отставать на патч; 4 разных «последних версии»; движковые константы продублированы (heroes_stats / entity_changes / scripts.js); `_bucket` в terrain сравнивает только мажор.
+- Остаток аудита (не сделано; пункт про отставание истории нейтралов/способностей на патч снят 2026-10-24: они читаются из хранилища файлов игры, по сборке самого патча): 4 разных «последних версии»; движковые константы продублированы (heroes_stats / entity_changes / scripts.js); `_bucket` в terrain сравнивает только мажор.

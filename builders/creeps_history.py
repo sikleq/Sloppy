@@ -3,7 +3,7 @@ per-cell changelog tooltips (builders/creeps.py).
 
 Walks data/stats/<patch>/npc_units.json chronologically and records each
 change per neutral. npc_units.json (written by scripts/fetch/fetch_npc_history.py
-from dotabuff/d2vpkr) is the full Valve KV, present for all 115 patches — so
+from the game-files store, each patch's own build) is the full Valve KV, present for all 118 patches — so
 EVERY stat column can carry history, raw or derived. Patch dates come from
 site_meta.json. Ability cells use npc_abilities.json (written by
 scripts/fetch/fetch_ability_history.py) for their value changelog.

@@ -42,7 +42,7 @@ def main():
                 r.append([v, stats])
     doc = {"_doc": "Per item: [first version, {stat: value}] whenever its stat lines change (stat keys as in "
                    "item_stat_prices.json; %-stats in %). Built by tools/build_item_stat_lines.py from the "
-                   "d2vpkr items.txt history + data/stats/<v>/items.txt.",
+                   "items.txt of each patch (data/stats/<v>/items.txt, else the game-files store).",
            "versions": versions, "items": runs}
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(doc, f, ensure_ascii=False, separators=(",", ":"))

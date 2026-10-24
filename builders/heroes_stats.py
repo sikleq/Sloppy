@@ -22,8 +22,8 @@ Data sources:
     armor, damage, BAT, MS, range, magic resistance). All 116 patches.
   * data/stats/<patch>/heroes_raw.json — raw-only fields (vision day/night,
     projectile speed, base attack speed, turn rate, collision hull, bound
-    radius). Built by scripts/fetch/fetch_hero_history.py from d2vpkr's historical
-    npc_heroes.txt. All 116 patches.
+    radius). Built by scripts/fetch/fetch_hero_history.py from each patch's own npc_heroes.txt (the game-files
+    store). All 118 patches.
   * Spirit Bear is injected from data/stats/<patch>/units.json plus its
     npc_units.txt block, because it is a ConsideredHero unit rather than a
     normal npc_dota_hero_* entry.
@@ -211,7 +211,7 @@ _RAW_DEFAULTS = {
 def _load_raw_heroes(version: str) -> dict[str, dict]:
     """Raw-only hero fields for one patch, from the pre-parsed
     data/stats/<version>/heroes_raw.json (produced by
-    scripts/fetch/fetch_hero_history.py from d2vpkr's historical npc_heroes.txt)."""
+    scripts/fetch/fetch_hero_history.py from each patch's own npc_heroes.txt in the game-files store)."""
     path = STATS_DIR / version / "heroes_raw.json"
     if not path.exists():
         return {}
@@ -1024,7 +1024,7 @@ _CAT_FIRST_KEYS = {keys[0] for _cat_name, cat_slug, keys in CATEGORIES
 
 
 # ---------- patch-note → field event index ----------
-# The KV scrape (and d2vpkr's npc_heroes.txt) sometimes captures a balance
+# The KV scrape (and, until 2026-10-24, d2vpkr's npc_heroes.txt) sometimes captures a balance
 # change ONE PATCH LATE — Valve's server-side balance updates can ship in
 # patch X but the public KV file only reflects them in X+1 (e.g. Treant
 # 7.34d "Base Damage decreased by 2" → KV shows the new value at 7.34e).

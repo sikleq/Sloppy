@@ -8,20 +8,25 @@
 Ключи из items.txt: `ItemCost`, `ItemCooldown`, `AbilityManaCost`.
 
 **Ловушка: слепки-копии прошлого патча (2026-09-27).** Скачиватель (`tools/fetch_stats.py`,
-`find_commit_for_patch`) берёт первый коммит d2vpkr, датированный днём патча. Он бывает сделан ДО выхода патча,
+`find_commit_for_patch`) брал первый коммит d2vpkr, датированный днём патча (до 2026-10-24; d2vpkr больше нигде не
+используется). Он бывал сделан ДО выхода патча,
 и тогда слепок равен прошлому патчу: `items.json` 7.41 был побайтно 7.40c (вся переработка предметов 7.41 лежала в
-7.41a), в 7.37e у Khanda остался рецепт 7.37d (600, а не 500). Эталон — история items.txt по патчам
-(`outputs/valve-revealed-weights-20260915/items_history`, по ней же считаются веса). `tools/resync_snapshots.py`
-пересобирает `items.json`, `heroes.json` и `units.json` (история npc_heroes.txt — `heroes_history`; npc_units.txt — `units_history`, скачана 2026-09-27 из dotabuff/d2vpkr по коммитам плана истории предметов) — у героев это чинит подсказки «Now it's …» / «Before this patch it was changed in …» (Night Stalker 7.36a писал «−1.25, now 1.5» вместо 0.25); тест `tests/test_snapshots_match_history.py` (пропускается без истории).
+7.41a), в 7.37e у Khanda остался рецепт 7.37d (600, а не 500). Эталон — items.txt / npc_heroes.txt / npc_units.txt того патча в хранилище файлов игры (см. ниже).
+`tools/resync_snapshots.py` пересобирает `items.json`, `heroes.json` и `units.json` из хранилища — у героев это чинит
+подсказки «Now it's …» / «Before this patch it was changed in …» (Night Stalker 7.36a писал «−1.25, now 1.5» вместо
+0.25); тест `tests/test_snapshots_match_history.py` (пропускается, если хранилища нет на машине).
 Обходы «взять цены из следующего патча» (auto_components_change, `_postprocess_unstated_total_cost`) убраны: они
 приписывали бы патчу чужое изменение.
 
-**С 2026-10-24 эталон — сборка самого патча** из архивов файлов игры (`tools/item_history.py`: GameTracking 7.08 …
-7.32d, DOTA2_CLIENT 7.32e …; сборка = первая с патчноутами патча и без патчноутов следующего + исправления той же ночи
-≤12 ч). История d2vpkr («последний коммит ≤ выход + 4 дня») держала соседний патч: 52 слепка героев, предметов и юнитов
-(7.13 — броня и скорость из 7.13b, 7.33d/7.33e/7.34d — герои до патча, …) перезаписаны, каждое расхождение сверено с
-заметками Valve. `tools/resync_snapshots.py` берёт архив по умолчанию (`--d2vpkr` — старый источник); тест
-`tests/test_snapshots_match_history.py` пропускается без клонов архивов. Hero Stats (`_history_for`) переносит изменение
+**С 2026-10-24 эталон — сборка самого патча** из нашего хранилища файлов игры (приватный git-репозиторий
+`dota-patch-files`: один коммит на патч, тег = версия, каждый патч с 7.08 — своя сборка: первая с патчноутами патча и
+без патчноутов следующего + исправления той же ночи ≤12 ч; локальный клон `C:\Users\sikle\dota-patch-files`, env
+`DOTA_FILES_DIR`; описание и выбор сборок — в README репозитория `dota-patch-files`). Читать только через
+`tools/game_files.py` (`read` / `read_bytes` / `path` / `listing` / `npc` / `versions`). Прежняя история d2vpkr
+(«последний коммит ≤ выход + 4 дня») держала соседний патч: 52 слепка героев, предметов и юнитов (7.13 — броня и
+скорость из 7.13b, 7.33d/7.33e/7.34d — герои до патча, …) перезаписаны, каждое расхождение сверено с заметками Valve.
+`tools/resync_snapshots.py` (источник `StoreSource`; ключа `--d2vpkr` больше нет) и `tools/item_history.py` читают
+хранилище; тест `tests/test_snapshots_match_history.py` пропускается без него. Hero Stats (`_history_for`) переносит изменение
 на заметку прошлого подпатча, только если у патча сборки своей заметки об этом поле нет.
 
 ## Маппинг описаний → поля БД (`_BSTAT_FIELD` в generate_patch_code_v2.py)

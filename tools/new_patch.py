@@ -13,13 +13,12 @@ to resume):
   fetch         raw KV + localisation -> data/stats/<v>/, data/*.txt (local game: extract_patchnotes.py --local;
                 backup: fetch_gametracking.py [--ref] — mind the build: GameTracking's newest can be LATER than the patch)
   slim          tools/slim_from_kv.py <v> -> heroes/items/units/abilities/ability_ids .json
-  meta          build_site.py patch -> data/site_meta.json knows the new patch (BEFORE the top-ups, which map by date)
-  npc_units … itemlist   the d2vpkr / datafeed top-ups (npc_units.json, heroes_raw.json, npc_abilities.json, itemlist.json)
+  meta          build_site.py patch -> data/site_meta.json knows the new patch
+  store         the patch's game files -> our store (dota-patch-files: build_store.py add <v> [--local]); push it after
+  npc_units … itemlist   the store / datafeed top-ups (npc_units.json, heroes_raw.json, npc_abilities.json, itemlist.json)
   shops         scripts/fetch/extract_shops.py -> data/shops.txt (local game only)
   abilities_slim, herolist   the shared tables rebuilt from the new snapshot
-  item_stat_lines, talent_slots   only where the KV history kept with the weights model is on this PC
-  loc_history   tools/fetch_loc_history.py <prev> <v> (the new patch's tooltips, the previous one's closed by it;
-                outside the repo)
+  item_stat_lines, talent_slots   only where the store is on this PC (old tooltips: tools/loc_history.py, also the store)
   draft         generate_patch_code_v2.py <v> -> _generated_p_<v>_v2.py + data/normalized/patches/<v>.json, only while
                 content/p<code>.py does not exist (a proofread page is never regenerated)
   enchant       scripts/gen/enchant_values.py + enchant_table.py <v>, only when content/p<code>.py has enchant_tier_box()
@@ -45,9 +44,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 META = os.path.join(ROOT, "patch", "meta.py")
 DOTA_PATH = os.environ.get("DOTA_PATH", r"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game\dota")
-# the d2vpkr KV history kept with the weights model (git-ignored, the owner's PC): build_item_stat_lines.py
-# (fit_item_prices.MODEL) and build_talent_slots.py (HIST) read the old patches from it
-WEIGHTS_MODEL = os.path.join(ROOT, "outputs", "valve-revealed-weights-20260915")
+# our store of the game files of every patch (private repo, the owner's PC; tools/game_files.py): the top-ups,
+# build_item_stat_lines.py and build_talent_slots.py read the patches from it
+STORE = os.environ.get("DOTA_FILES_DIR", r"C:\Users\sikle\dota-patch-files")
 PY = sys.executable
 _VERSION = re.compile(r"^\d+\.\d+[a-z]?$")
 _ENTRY = re.compile(r'^\s*\{"version":\s*"([^"]+)",\s*"date":\s*"(\d\d\.\d\d\.\d{4})"')
@@ -117,15 +116,6 @@ def code(version):
     return version.replace(".", "")
 
 
-def previous(version, date=None):
-    """The patch released before `version` (by RELEASE_HISTORY date; `date` for one not registered yet)."""
-    from patch.meta import RELEASE_HISTORY
-    rows = {r["version"]: _day(r["date"]) for r in RELEASE_HISTORY}
-    day = rows.get(version) or (_day(date) if date else datetime.date.max)
-    older = [(d, v) for v, d in rows.items() if d < day and v != version]
-    return max(older)[1] if older else None
-
-
 def content_path(version):
     return os.path.join(ROOT, "content", f"p{code(version)}.py")
 
@@ -181,10 +171,11 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
     """[Step] in the documented order; `skip` is the reason a step does not apply, or None."""
     content = os.path.exists(content_path(version))
     local_game = os.path.exists(os.path.join(dota_path, "pak01_dir.vpk"))
-    history = os.path.isdir(WEIGHTS_MODEL)
+    history = os.path.isdir(os.path.join(STORE, ".git"))
     fetch = ([PY, "scripts/fetch/extract_patchnotes.py", version, "--local"] if source == "game" else
              [PY, "scripts/fetch/fetch_gametracking.py", version] + (["--ref", ref] if ref else []))
-    no_hist = "the KV history of the weights model (outputs/valve-revealed-weights-20260915) is not on this PC"
+    no_hist = f"the game-files store ({STORE}) is not on this PC"
+    store = [PY, os.path.join(STORE, "tools", "build_store.py"), "add", version] + (["--local"] if source == "game" else [])
     with open(META, encoding="utf-8") as f:
         have = registered(f.read(), version)
     return [
@@ -196,6 +187,8 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
              skip=None if source != "game" or local_game else f"no pak01_dir.vpk under {dota_path} (use --source gametracking)"),
         Step("slim", f"slim JSONs of data/stats/{version}/", [PY, "tools/slim_from_kv.py", version]),
         Step("meta", "data/site_meta.json with the new patch (before the top-ups)", [PY, "build_site.py", "patch"]),
+        Step("store", f"the patch's game files -> the store ({'installed game' if source == 'game' else 'archives'}); "
+             "then push it", store, skip=None if history else no_hist),
         Step("npc_units", "npc_units.json top-up", [PY, "scripts/fetch/fetch_npc_history.py"]),
         Step("heroes_raw", "heroes_raw.json top-up", [PY, "scripts/fetch/fetch_hero_history.py"]),
         Step("npc_abilities", "npc_abilities.json top-up", [PY, "scripts/fetch/fetch_ability_history.py"]),
@@ -210,8 +203,6 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
              skip=None if history else no_hist),
         Step("talent_slots", "data/rules/talent_slots.json", [PY, "tools/build_talent_slots.py"],
              skip=None if history else no_hist),
-        Step("loc_history", f"the patch's tooltips + the previous patch's (now closed by {version}) -> outputs/loc_history",
-             [PY, "tools/fetch_loc_history.py"] + [v for v in (previous(version, date), version) if v]),
         Step("draft", f"generator draft _generated_p_{version}_v2.py + data/normalized/patches/{version}.json",
              [PY, "generate_patch_code_v2.py", version],
              skip=f"content/p{code(version)}.py exists (proofread pages are never regenerated)" if content else None),
