@@ -1677,25 +1677,25 @@
   "npc_dota_unit_tombstone1": {
     "ArmorPhysical": 5,
     "MovementSpeed": 0,
-    "StatusHealth": 16,
+    "StatusHealth": 20,
     "StatusMana": 0
   },
   "npc_dota_unit_tombstone2": {
     "ArmorPhysical": 5,
     "MovementSpeed": 0,
-    "StatusHealth": 20,
+    "StatusHealth": 24,
     "StatusMana": 0
   },
   "npc_dota_unit_tombstone3": {
     "ArmorPhysical": 5,
     "MovementSpeed": 0,
-    "StatusHealth": 24,
+    "StatusHealth": 28,
     "StatusMana": 0
   },
   "npc_dota_unit_tombstone4": {
     "ArmorPhysical": 5,
     "MovementSpeed": 0,
-    "StatusHealth": 28,
+    "StatusHealth": 32,
     "StatusMana": 0
   },
   "npc_dota_unit_undying_zombie": {

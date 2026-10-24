@@ -2955,7 +2955,7 @@
     "AttributeIntelligenceGain": 1.9,
     "AttributeBaseAgility": 20,
     "AttributeAgilityGain": 2.4,
-    "StatusManaRegen": 0.5,
+    "StatusManaRegen": 0.0,
     "MovementSpeed": 310
   }
 }

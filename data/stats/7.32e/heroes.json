@@ -3022,7 +3022,7 @@
     "ArmorPhysical": -1,
     "AttackDamageMin": 24,
     "AttackDamageMax": 32,
-    "AttackRate": 1.7,
+    "AttackRate": 1.6,
     "AttackRange": 575,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
     "AttributeBaseStrength": 19,

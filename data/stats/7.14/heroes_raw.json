@@ -136,7 +136,7 @@
 "AttributePrimary":"DOTA_ATTRIBUTE_STRENGTH",
 "AttributeStrengthGain":"2.800000",
 "BoundsHullName":"DOTA_HULL_SIZE_HERO",
-"MovementSpeed":"285",
+"MovementSpeed":"290",
 "MovementTurnRate":"0.600000",
 "StatusHealthRegen":"4.250000"
 },
