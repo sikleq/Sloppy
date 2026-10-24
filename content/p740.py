@@ -1075,13 +1075,14 @@ def build():
             slug="clinkz_searing_arrows",
             desc=[
                 "Imbues Clinkz's arrows with fire for <b>18/32/46/60</b> extra damage. Skeleton Archers always fire Searing Arrows with 50% reduced damage. Mana Cost: 10.",
+                hl("Skeleton Archers target the enemy attacked by Clinkz with Searing Arrows effect", "new") + ".",
             ],
         ),
         summary="Returning as a base ability.",
         tag="new",
     ))
     W(ul_open())
-    W(li("Skeleton Archers target the enemy attacked by Clinkz with Searing Arrows effect", t("NEW")))
+    W(li("Skeleton Archers target the enemy attacked by Clinkz with Searing Arrows effect", t("NEW"), covered=True))
     W(ul_close())
     W(ability("Death Pact", slug="clinkz_death_pact"))
     W(ul_open())
@@ -1635,14 +1636,18 @@ def build():
                 "Summons a powerful Spirit Bear companion that can equip items.",
                 "If the bear moves <b>1100</b> distance away from the Lone Druid, it cannot attack. Lone Druid suffers <b>20%</b> of his max health as backlash damage if the Spirit Bear dies.",
                 "Spirit Bear receives a copy of Lone Druid's Neutral Item that has an independent cooldown.",
+                hl("Ability is in the 4th ability slot", "misc") + ". " + inline_note("D key by default"),
+                hl("Spirit Bear counts as a melee hero for most spells", "rework") + ". "
+                + inline_note("Since the bear is now a hero, all unit-related changes moved to a separate Spirit Bear section below. This section is for the summon ability changes only"),
             ],
         ),
         summary="Moved to an innate ability. Cannot be leveled up. Gift Bearer's effect is now a part of it",
         tag="rework",
     ))
     W(ul_open())
-    W(li("Ability is moved to the 4th ability slot", t("MISC"), extra=inline_note("D key by default")))
-    W(li("Spirit Bear now counts as a melee hero for most spells", t("REWORK"), extra=inline_note("Since the bear is now a hero, all unit-related changes moved to a separate Spirit Bear section below. This section is for the summon ability changes only")))
+    # both are in the card above with their notes: the rows stay hidden for the weights
+    W(li("Ability is moved to the 4th ability slot", t("MISC"), covered=True))
+    W(li("Spirit Bear now counts as a melee hero for most spells", t("REWORK"), covered=True))
     W(li("Cooldown decreased from 150/140/130/120s to 120s", b([150, 140, 130, 120], 120, l=True)))
     W(ul_close())
     W(ability_change(
@@ -2789,7 +2794,7 @@ def build():
             slug="treant_leech_seed",
             desc=[
                 "Active.",
-                "Plants a leeching seed in an enemy unit, slowing it by <b>8/14/20/26%</b> and dealing <b>15/30/45/60</b> damage per second for 5 seconds. The leeched life heals nearby allied units (50% effectiveness on creeps). Mana Cost: 80/90/100/110. Cooldown: 24/20/16/12s.",
+                "Plants a leeching seed in an enemy unit, slowing it by <b>8/14/20/26%</b> and dealing <b>15/30/45/60</b> damage per second for 5 seconds. The leeched life heals nearby allied units " + hl("(50% effectiveness on creeps)", "del") + ". Mana Cost: 80/90/100/110. Cooldown: 24/20/16/12s.",
             ],
         ),
         new=dict(
@@ -2805,7 +2810,7 @@ def build():
         tag="rework",
     ))
     W(ul_open())
-    W(li("No longer has a creep penalty for healing", t("BUFF")))
+    W(li("No longer has a creep penalty for healing", t("BUFF"), covered=True))   # the old card shows the penalty
     W(ul_close())
     W(ability("Living Armor", slug="treant_living_armor"))
     W(ul_open())

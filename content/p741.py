@@ -1527,10 +1527,11 @@ def build():
             slug="beastmaster_call_of_the_wild_hawk",
             desc=[
                 "Active.",
-                "Beastmaster summons a Hawk that circles around him and dives onto an enemy within 500 range, dealing 50/80/110/140 damage and rooting them for 0.25/0.5/0.75/1s.",
+                "Beastmaster summons a Hawk that circles around him and dives onto an enemy within 500 range, dealing "
+                + hl("50/80/110/140", "nerf") + " damage and rooting them for " + hl("0.25/0.5/0.75/1s", "nerf") + ".",
                 "Hawk cannot be controlled, prioritizes heroes, and is killed upon Beastmaster's death. Hawk has an attack interval of 4s, but it scales with attack speed.",
-                "Hawk Duration: 25s. Mana Cost: 50. Cooldown: 45/40/35/30s.",
-                aghs_shard_line("Increases Hawk duration by 5s and summons an additional Hawk."),
+                "Hawk Duration: 25s. Mana Cost: 50. Cooldown: " + hl("45/40/35/30s", "nerf") + ".",
+                aghs_shard_line(hl("Increases Hawk duration by 5s and summons an additional Hawk.", "del")),
             ],
         ),
         new=dict(
@@ -1538,23 +1539,26 @@ def build():
             slug="beastmaster_summon_raptor",
             desc=[
                 "Active. Now a separately leveled ability, occupying Inner Beast's old slot (Inner Beast moved to innate).",
-                "Summons 2 hawks (with 0.75s delay between them) that circle around Beastmaster and dive onto an enemy within 500 range, dealing 60/95/130/165 damage and rooting them for 0.4/0.6/0.8/1s.",
+                "Summons 2 hawks (with 0.75s delay between them) that circle around Beastmaster and dive onto an enemy within 500 range, dealing "
+                + hl("60/95/130/165", "buff") + " damage and rooting them for " + hl("0.4/0.6/0.8/1s", "buff") + ".",
                 "Hawks now prioritize Beastmaster's current attack target when selecting their Dive target.",
                 "Hawks are invisible whenever Beastmaster is invisible or affected by Smoke of Deceit. They do not attack while invisible.",
-                "Mana Cost: 50. Cooldown: 30s.",
+                "Mana Cost: 50. Cooldown: " + hl("30s", "buff") + ".",
             ],
         ),
         summary="New ability.",
         tag="new",
     ))
     W(ul_open())
-    W(li("Cooldown decreased from 45/40/35/30s to 30s", b([45, 40, 35, 30], 30, l=True)))
-    W(li("Dive Damage increased from 50/80/110/140 to 60/95/130/165", b([50, 80, 110, 140], [60, 95, 130, 165])))
-    W(li("Root Duration increased from 0.25/0.5/0.75/1s to 0.4/0.6/0.8/1s", b([0.25, 0.5, 0.75, 1], [0.4, 0.6, 0.8, 1])))
+    W(li("Cooldown decreased from 45/40/35/30s to 30s", b([45, 40, 35, 30], 30, l=True), covered=True))
+    # damage and root are highlighted in the cards (old left, new right): those rows stay hidden for the weights
+    W(li("Dive Damage increased from 50/80/110/140 to 60/95/130/165", b([50, 80, 110, 140], [60, 95, 130, 165]), covered=True))
+    W(li("Root Duration increased from 0.25/0.5/0.75/1s to 0.4/0.6/0.8/1s", b([0.25, 0.5, 0.75, 1], [0.4, 0.6, 0.8, 1]),
+         covered=True))
     W(li("Hawk armor increased by 1",
          bstat_u("npc_dota_beastmaster_hawk", "ArmorPhysical", "7.40c", 1),
          extra=note_box(unit="npc_dota_beastmaster_hawk", field="ArmorPhysical", before_patch="7.40c")))
-    W(li("No longer upgraded with Aghanim's Shard", t("DEL")))
+    W(li("No longer upgraded with Aghanim's Shard", t("DEL"), covered=True))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -2109,7 +2113,6 @@ def build():
             desc=[
                 hl("Shares level with Kinetic Field", "del") + ".",
                 _kf_text,
-                "Cast Range: " + hl("1050", "nerf") + ".",
                 hl("Charges: 2. Charge Restore Time: 20/17/14/11s", "del") + ".",
                 "Formation Delay: " + hl("0.4s", "buff") + ".",
                 "Duration: " + hl("2.6/3.2/3.8/4.4s", "nerf") + ".",
@@ -2121,10 +2124,9 @@ def build():
             desc=[
                 "Granted by Aghanim's Shard. " + hl("Has only one level", "new") + ".",
                 _kf_text,
-                "Cast Range: " + hl("1200", "buff") + ".",
                 "Cooldown: " + hl("14s", "new") + ".",
                 "Formation Delay: " + hl("1s", "nerf") + ".",
-                "Duration: " + hl("4.4s", "buff") + ".",
+                "Duration: " + hl("4.4s", "buff") + ". " + inline_note("Can be increased with Kinetic Field Duration talent"),
             ],
         ),
         summary="Ability reworked.",
@@ -2135,8 +2137,7 @@ def build():
     W(li("Cast Range increased from 1050 to 1200", b(1050, 1200), covered=True))
     W(li('Cooldown decreased from <span class="wrong-word">20/18/16/14s</span> to 14s', b([20, 17, 14, 11], 14, l=True), covered=True,
          extra=note_box('This change is wrongly stated. Before it had 2 charges restored every 20/17/14/11s (since 7.38)')))
-    W(li("Duration increased from 2.6/3.2/3.8/4.4s to 4.4s", b([2.6, 3.2, 3.8, 4.4], 4.4),
-         extra=inline_note("Can be increased with Kinetic Field Duration talent")))
+    W(li("Duration increased from 2.6/3.2/3.8/4.4s to 4.4s", b([2.6, 3.2, 3.8, 4.4], 4.4), covered=True))
     W(li("Formation Delay increased from 0.4s to 1s", b(0.4, 1, l=True), covered=True))
     W(li("Aghanim's Shard: Now grants this ability. No longer shares level with Kinetic Field. Has only one level instead", t("NEW"), covered=True))
     W(ul_close())
@@ -2232,9 +2233,11 @@ def build():
             slug="dragon_knight_elder_dragon_form",
             desc=[
                 "Ultimate. No target, transforms Dragon Knight into a ranged elder dragon for 60s. The dragon type (Corrosive / Fire / Frost) is chosen by Facet.",
-                "+20 bonus move speed, +350 attack range, +20/50/80 attack damage. Attacks splash 30/40/50% of attack damage within 275 AoE and apply Wyrm's Wrath on-hit effects; Wyrm's Wrath effects increased by 20/30/40%.",
+                hl("+20", "nerf") + " bonus move speed, +350 attack range, " + hl("+20/50/80 attack damage", "del")
+                + ". Attacks splash 30/40/50% of attack damage within 275 AoE and apply Wyrm's Wrath on-hit effects; Wyrm's Wrath effects increased by 20/30/40%.",
                 "Increases Dragon Tail range, and health regeneration and armor bonuses from Dragon Blood. Mana Cost: 50. Cooldown: 100s.",
-                aghs_line("Adds a Level 4 Black Dragon: free pathing, increased damage (+110), 60% splash, and increased Wyrm's Wrath effectiveness (50%)."),
+                aghs_line("Adds a Level 4 Black Dragon: free pathing, increased damage (+110), 60% splash, and "
+                          + hl("increased Wyrm's Wrath effectiveness (50%)", "del") + "."),
             ],
         ),
         new=dict(
@@ -2245,21 +2248,24 @@ def build():
                 "<b>Level 1 — Green Dragon:</b> Attacks apply a Corrosive poison that deals 25 magical damage per second for 3s. Affects buildings.",
                 "<b>Level 2 — Red Dragon:</b> Attacks gain splash damage dealing 75% of attack damage to all enemies within 275 AoE. Splash also applies Corrosive poison; other attack modifiers only affect the primary target.",
                 "<b>Level 3 — Blue Dragon:</b> Attacks also apply a Frost debuff (pierces Debuff Immunity) — 50 attack slow and 30% move slow. Splash attacks now apply both Corrosive poison and Frost to all affected units; other attack modifiers only affect the primary target.",
-                "Bonus Move Speed: 25/30/35 (was flat 20). No longer provides bonus attack damage. "
+                "Bonus Move Speed: " + hl("25/30/35", "buff") + ". "
                 + hl("Now also increases cast range of all abilities by 350 (doesn't affect items)", "new") + ".",
-                aghs_line("Upgrades to Level 4 Black Dragon: 40 Bonus Move Speed, 35 Corrosive Damage, 100% Splash Damage, 350 Splash Radius, 65 Attack Slow, 45% Movement Slow, +20% Magic Resistance, and free pathing. No longer improves Wyrm's Wrath effectiveness while in Dragon Form. Black Dragon stats slightly rescaled."),
+                aghs_line(hl("Upgrades to Level 4 Black Dragon: 40 Bonus Move Speed, 35 Corrosive Damage, 100% Splash Damage, "
+                             "350 Splash Radius, 65 Attack Slow, 45% Movement Slow, +20% Magic Resistance", "rework")
+                          + ", and free pathing."),
             ],
         ),
         summary="Ability reworked.",
         tag="rework",
     ))
     W(ul_open())
-    W(li("Bonus Move Speed increased from 20 to 25/30/35", b(20, [25, 30, 35])))
+    # the card shows every change highlighted (old values left, new right): the rows stay hidden for the weights
+    W(li("Bonus Move Speed increased from 20 to 25/30/35", b(20, [25, 30, 35]), covered=True))
     W(li("Now also increases cast range of all abilities by 350", t("NEW"), covered=True,
          extra=inline_note("Doesn't affect items")))
-    W(li("Aghanim's Scepter Black Dragon stats slightly rescaled", t("REWORK")))
-    W(li("No longer provides bonus attack damage", t("DEL")))
-    W(li("Aghanim's Scepter no longer improves Wyrm's Wrath effectiveness while in Dragon Form", t("DEL")))
+    W(li("Aghanim's Scepter Black Dragon stats slightly rescaled", t("REWORK"), covered=True))
+    W(li("No longer provides bonus attack damage", t("DEL"), covered=True))
+    W(li("Aghanim's Scepter no longer improves Wyrm's Wrath effectiveness while in Dragon Form", t("DEL"), covered=True))
     W(ul_close())
     W(ability("Fireball"))
     W(ul_open())
@@ -2386,7 +2392,8 @@ def build():
     ))
     W(ability("Astral Spirit", slug="elder_titan_ancestral_spirit"))
     W(ul_open())
-    W(li("No longer provides armor on return", t("DEL"),
+    # MISC, not DEL: the armor moved to the innate Momentum (owner 2026-10-24)
+    W(li("No longer provides armor on return", t("MISC"),
          extra=inline_note("Still grants movement speed, which is then used by the innate ability to provide armor")))
     W(ul_close())
     W(ability("Earth Splitter"))
@@ -2487,28 +2494,36 @@ def build():
             name="Distortion Field",
             innate=True,
             desc=[
-                "Passive, levels up with Chronosphere.",
-                "Enemy attack projectiles are slowed when they fly near Faceless Void. Affects projectiles even if Faceless Void isn't the target.",
-                "<b>Projectile Slow:</b> 35/40/45/50%. <b>Radius:</b> 600.",
+                "Passive, " + hl("levels up with Chronosphere", "del") + ".",
+                "Enemy attack projectiles are slowed when they fly near " + hl("Faceless Void", "rework") + ". "
+                + hl("Affects projectiles even if Faceless Void isn't the target", "del") + ".",
+                "<b>Projectile Slow:</b> " + hl("35/40/45/50%", "rework") + ". <b>Radius:</b> " + hl("600", "rework")
+                + " " + hl("around Faceless Void", "rework") + ".",
             ],
         ),
         new=dict(
             name="Distortion Field",
             innate=True,
             desc=[
-                "Passive, no longer levels with Chronosphere.",
-                "Now only applies to projectiles targeting Faceless Void or an allied hero within a 1200 radius of him.",
-                "Slows enemy attack projectile speed by a flat 40% within a 500 radius around the targeted hero.",
+                "Passive.",
+                "Enemy attack projectiles are slowed when they fly near " + hl("the targeted hero", "rework") + ". "
+                + hl("Only applies to projectiles targeting Faceless Void or an allied hero within a 1200 radius of him",
+                     "nerf") + ".",
+                "<b>Projectile Slow:</b> " + hl("40%", "rework") + ". <b>Radius:</b> " + hl("500", "rework") + " "
+                + hl("around the targeted hero", "rework") + ".",
             ],
         ),
         summary="Innate reworked.",
         tag="rework",
     ))
     W(ul_open())
-    W(li("Enemy attack projectile speed slow rescaled from 35/40/45/50% to 40%", b([35, 40, 45, 50], 40)))
-    W(li("Max slow distance rescaled from 600 around Faceless Void to 500 around the targeted hero", t("REWORK")))
-    W(li("Now only applies to projectiles targeting Faceless Void or an allied hero within a 1200 radius of him", t("NERF")))
-    W(li("No longer levels with Chronosphere", t("REWORK")))
+    # the card shows every change highlighted (old left, new right): the rows stay hidden for the weights
+    W(li("Enemy attack projectile speed slow rescaled from 35/40/45/50% to 40%", b([35, 40, 45, 50], 40), covered=True))
+    W(li("Max slow distance rescaled from 600 around Faceless Void to 500 around the targeted hero", t("REWORK"),
+         covered=True))
+    W(li("Now only applies to projectiles targeting Faceless Void or an allied hero within a 1200 radius of him", t("NERF"),
+         covered=True))
+    W(li("No longer levels with Chronosphere", t("REWORK"), covered=True))
     W(ul_close())
     W(ability("Time Walk"))
     W(ul_open())
@@ -3462,37 +3477,43 @@ def build():
             slug="meepo_divided_we_stand",
             desc=[
                 "Ultimate. Passive — at the ult's level-up points, Meepo gains an additional clone.",
-                "<b>Max Level:</b> 3 (levels at 4 / 11 / 18).",
-                "Passively grants Meepo and all clones bonus <b>Magic Resistance</b>.",
-                "Clones cannot wield any items but the boots that Meepo himself wears.",
+                "<b>Max Level:</b> " + hl("3", "nerf") + " (levels at " + hl("4 / 11 / 18", "rework") + ").",
+                hl("Passively grants Meepo and all clones bonus Magic Resistance", "del") + ".",
+                "Clones cannot wield any items but the boots that Meepo himself wears. "
+                + hl("Strength, Agility and Intelligence from items have a penalty", "del") + ".",
+                hl("Clones gain 30% experience independently", "del") + ".",
             ],
         ),
         new=dict(
             name="Divided We Stand",
             slug="meepo_divided_we_stand",
             desc=[
-                "Ultimate. Reworked — adds a 4th level and item sharing:",
-                "<b>Max Level:</b> 4 (levels at <b>3 / 10 / 17 / 24</b>).",
+                "Ultimate. Passive — at the ult's level-up points, Meepo gains an additional clone.",
+                "<b>Max Level:</b> " + hl("4", "buff") + " (levels at " + hl("3 / 10 / 17 / 24", "rework") + ").",
                 "Each duplicate now <b>copies all of Meepo's items</b>, but they <b>share their cooldowns</b>.",
-                "Damage, attack speed, health / mana regeneration, mana burn, and proc-chance bonuses from items are <b>distributed equally</b> across all Meepos — a 50% / 66.6% / 75% / 80% penalty per Meepo at each level.",
-                "Clones can't use consumable shared items on the main Meepo.",
-                "<b>No longer</b> passively grants Magic Resistance.",
+                "Damage, attack speed, health / mana regeneration, mana burn, and proc-chance bonuses from items are <b>distributed equally</b> across all Meepos — a 50% / 66.6% / 75% / 80% penalty per Meepo at each level. "
+                + hl("No penalty for Strength, Agility and Intelligence from items", "buff") + ".",
+                hl("Clones can't use consumable shared items on the main Meepo", "nerf") + ".",
+                hl("Meepo gains 100% of the experience from Hero Kills or Assists as long as at least one Meepo is in range",
+                   "rework") + ". " + inline_note("Multiple Meepos within experience range does not increase the amount gained"),
+                hl("All other experience gained by any Meepo is divided by the number of Meepos", "rework") + ". "
+                + inline_note("Each Meepo gains experience independently"),
             ],
         ),
         summary="Ability reworked.",
         tag="rework",
     ))
     W(ul_open())
-    W(li("Max Level increased from 3 to 4", b(3, 4)))
-    W(li("Level requirement rescaled from 4/11/18 to 3/10/17/24", t("REWORK")))
+    # the card shows every change highlighted (old left, new right): the rows stay hidden for the weights
+    W(li("Max Level increased from 3 to 4", b(3, 4), covered=True))
+    W(li("Level requirement rescaled from 4/11/18 to 3/10/17/24", t("REWORK"), covered=True))
     W(li("Meepo gains 100% of the experience from Hero Kills or Assists as long as at least one Meepo is in range", t("REWORK"),
-         extra=inline_note("Multiple Meepos within experience range does not increase the amount gained")))
-    W(li("All other experience gained by any Meepo is divided by the number of Meepos", t("REWORK"),
-         extra=inline_note("Each Meepo gains experience independently")))
-    W(li("No longer has a penalty for Strength, Agility, or Intelligence gained from items", t("BUFF")))
-    W(li("Clones can't use consumable shared items on the main Meepo", t("NERF")))
-    W(li("Clones no longer gain 30% experience independently", t("DEL")))
-    W(li("No longer passively grants Magic Resistance", t("DEL")))
+         covered=True))
+    W(li("All other experience gained by any Meepo is divided by the number of Meepos", t("REWORK"), covered=True))
+    W(li("No longer has a penalty for Strength, Agility, or Intelligence gained from items", t("BUFF"), covered=True))
+    W(li("Clones can't use consumable shared items on the main Meepo", t("NERF"), covered=True))
+    W(li("Clones no longer gain 30% experience independently", t("DEL"), covered=True))
+    W(li("No longer passively grants Magic Resistance", t("DEL"), covered=True))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -3523,7 +3544,7 @@ def build():
                 "Auto-cast attack modifier.",
                 "Mirana consumes a charge to empower her next attack with bonus magic damage equal to " + _mira_pill + ".",
                 "Starts with <b>2 max charges</b> and gains <b>+1 max charge every 7 levels</b>. <b>Base Charge Restore Time:</b> 6s.",
-                aghs_shard_line("Casting Leap provides 3 temporary charges for the duration of the buff. These temporary charges ignore the max-charges cap and stack from each Leap cast."),
+                aghs_shard_line(hl("Casting Leap provides 3 temporary charges for the duration of the buff. These temporary charges ignore the max-charges cap and stack from each Leap cast.", "new")),
             ],
             tables=[_mira_table],
         ),
@@ -3531,7 +3552,7 @@ def build():
         tag="new",
     ))
     W(ul_open())
-    W(li("Upgraded with Aghanim's Shard", t("NEW")))
+    W(li("Upgraded with Aghanim's Shard", t("NEW"), covered=True))
     W(ul_close())
     W(ability("Leap"))
     W(ul_open())
@@ -3649,7 +3670,7 @@ def build():
             desc=[
                 "Active ultimate. <b>Duration:</b> 8s.",
                 "Muerta's attacks deal <b>magical damage</b> instead of physical and gain <b>+70/100/130 bonus attack damage</b>.",
-                aghs_shard_line("Muerta gains <b>30% Spell Lifesteal</b> during Pierce the Veil and permanently gains <b>+2% Spell Amplification</b> whenever she kills an enemy hero during Pierce the Veil, or any enemy hero dies within 925 units of her. Applies retroactively."),
+                aghs_shard_line(hl("Muerta gains 30% Spell Lifesteal during Pierce the Veil and permanently gains +2% Spell Amplification whenever she kills an enemy hero during Pierce the Veil, or any enemy hero dies within 925 units of her. Applies retroactively.", "del")),
             ],
         ),
         new=dict(
@@ -3666,7 +3687,7 @@ def build():
         tag="rework",
     ))
     W(ul_open())
-    W(li("No longer upgraded with Aghanim's Shard", t("DEL")))
+    W(li("No longer upgraded with Aghanim's Shard", t("DEL"), covered=True))
     W(ul_close())
     W(ability("Spectral Slug"))
     W(ul_open())
@@ -4410,26 +4431,30 @@ def build():
             name="Feast of Souls",
             slug="nevermore_frenzy",
             desc=[
-                "Active. Costs <b>5 souls</b> to cast.",
-                "Shadow Fiend gains <b>40/55/70/85 Attack Speed</b> and <b>5/7/9/11% Movement Speed</b> for the duration.",
+                "Active. " + hl("Costs 5 souls to cast", "del") + ".",
+                "Shadow Fiend gains " + hl("40/55/70/85", "buff") + " Attack Speed and " + hl("5/7/9/11%", "buff")
+                + " Movement Speed for the duration.",
             ],
         ),
         new=dict(
             name="Feast of Souls",
             slug="nevermore_frenzy",
             desc=[
-                "Active. No longer requires souls to cast.",
-                "Instead, while active, Shadow Fiend gains souls from <b>2 enemies in a 600 radius every 0.5s</b>, prioritizing heroes. Each enemy can provide souls once — creeps give <b>1 soul</b>, heroes give <b>3</b>. Can collect souls from up to <b>4/6/8/10 enemies</b>.",
-                "After the effect ends, Shadow Fiend loses souls whose owners are still alive, retaining the rest for <b>8s</b>."
-                + inline_note("The enemy threshold limits only the amount of enemies affected, not the total souls collected. At the cap of 10, you can collect souls from 5 heroes and 5 creeps for 20 souls. 10 Dummy Targets in Hero Demo mode yield 30 souls."),
+                "Active.",
+                "Shadow Fiend gains " + hl("35/50/65/80", "nerf") + " Attack Speed and " + hl("4/6/8/10%", "nerf")
+                + " Movement Speed for the duration.",
+                hl("While active, Shadow Fiend gains souls from <b>2 enemies in a 600 radius every 0.5s</b>, prioritizing heroes. Each enemy can provide souls once — creeps give <b>1 soul</b>, heroes give <b>3</b>. Can collect souls from up to <b>4/6/8/10 enemies</b>", "new") + ".",
+                hl("After the effect ends, Shadow Fiend loses souls whose owners are still alive, retaining the rest for <b>8s</b>", "new")
+                + ". " + inline_note("The enemy threshold limits only the amount of enemies affected, not the total souls collected. At the cap of 10, you can collect souls from 5 heroes and 5 creeps for 20 souls. 10 Dummy Targets in Hero Demo mode yield 30 souls."),
             ],
         ),
         summary="Ability reworked.",
         tag="rework",
     ))
     W(ul_open())
-    W(li("Bonus Attack Speed decreased from 40/55/70/85 to 35/50/65/80", b([40, 55, 70, 85], [35, 50, 65, 80])))
-    W(li("Bonus Move Speed decreased from 5/7/9/11% to 4/6/8/10%", b([5, 7, 9, 11], [4, 6, 8, 10])))
+    # both values are highlighted in the cards (old left, new right): the rows stay hidden for the weights
+    W(li("Bonus Attack Speed decreased from 40/55/70/85 to 35/50/65/80", b([40, 55, 70, 85], [35, 50, 65, 80]), covered=True))
+    W(li("Bonus Move Speed decreased from 5/7/9/11% to 4/6/8/10%", b([5, 7, 9, 11], [4, 6, 8, 10]), covered=True))
     W(ul_close())
     W(ability("Requiem of Souls", slug="nevermore_requiem"))
     W(ul_open())
@@ -5315,7 +5340,9 @@ def build():
                 "Infects an enemy with a deadly plague that does an initial burst of damage and additional damage over time based on the unit's maximum health.",
                 "Enemies in a radius around the target are slowed, with values decreasing the farther you are from the affected enemy.",
                 "When the target dies or the debuff expires/is absorbed, all nearby enemies are infected with a noncommunicable version of the plague.",
-                "<b>Duration:</b> 5s. <b>Initial Damage:</b> 200/300/400. <b>Max HP as Damage:</b> 3/4/5%. <b>Debuff Radius:</b> 800. <b>Min/Max Slow:</b> 15% / 50%. <b>Cooldown:</b> 100/90/80s. <b>Mana Cost:</b> 200/300/400.",
+                "<b>Duration:</b> " + hl("5s", "buff") + ". <b>Initial Damage:</b> " + hl("200/300/400", "buff")
+                + ". <b>Max HP as Damage:</b> " + hl("3/4/5%", "buff") + ". <b>Debuff Radius:</b> " + hl("800", "buff")
+                + ". <b>Min/Max Slow:</b> 15% / 50%. <b>Cooldown:</b> 100/90/80s. <b>Mana Cost:</b> 200/300/400.",
             ],
         ),
         new=dict(
@@ -5327,7 +5354,9 @@ def build():
                 "No longer has AoE effect, now affects only the host.",
                 "Now when the plague spreads, it also carries all debuffs placed by Venomancer. Now spreads a second time, but all spreads after the first one deal no initial damage."
                 + inline_note("Doesn't stack. Applying plague to an already plague-infected unit will deal projectile damage again, but won't affect the remaining debuff duration. Duration of carried debuffs is fixed and cannot be altered with Status Resistance or Debuff Amplification."),
-                "<b>Duration:</b> 4s. <b>Initial Damage:</b> 150/200/250. <b>Max HP as Damage:</b> 2/3/4%. <b>Spread Radius:</b> 700. <b>Cooldown:</b> 100/90/80s. <b>Mana Cost:</b> 200/250/300.",
+                "<b>Duration:</b> " + hl("4s", "nerf") + ". <b>Initial Damage:</b> " + hl("150/200/250", "nerf")
+                + ". <b>Max HP as Damage:</b> " + hl("2/3/4%", "nerf") + ". <b>Spread Radius:</b> " + hl("700", "nerf")
+                + ". <b>Cooldown:</b> 100/90/80s. <b>Mana Cost:</b> 200/250/300.",
                 aghs_line("Decreases cooldown by 35s. Reduces Magic Resistance of affected units by 20% and allows additional spreads to deal initial damage."),
             ],
         ),
@@ -5335,11 +5364,12 @@ def build():
         tag="rework",
     ))
     W(ul_open())
-    W(li("Mana Cost decreased from 200/300/400 to 200/250/300", b([200, 300, 400], [200, 250, 300], l=True)))
-    W(li("Duration decreased from 5s to 4s", b(5, 4)))
-    W(li("Initial Damage decreased from 200/300/400 to 150/200/250", b([200, 300, 400], [150, 200, 250])))
-    W(li("Spread Radius decreased from 800 to 700", b(800, 700)))
-    W(li("Max HP as damage decreased from 3/4/5% to 2/3/4%", b([3, 4, 5], [2, 3, 4])))
+    # every value is highlighted in the cards (old left, new right): the rows stay hidden for the weights
+    W(li("Mana Cost decreased from 200/300/400 to 200/250/300", b([200, 300, 400], [200, 250, 300], l=True), covered=True))
+    W(li("Duration decreased from 5s to 4s", b(5, 4), covered=True))
+    W(li("Initial Damage decreased from 200/300/400 to 150/200/250", b([200, 300, 400], [150, 200, 250]), covered=True))
+    W(li("Spread Radius decreased from 800 to 700", b(800, 700), covered=True))
+    W(li("Max HP as damage decreased from 3/4/5% to 2/3/4%", b([3, 4, 5], [2, 3, 4]), covered=True))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -5437,8 +5467,9 @@ def build():
             desc=[
                 # Source: data/patchnotes_english.txt → DOTA_Patch_7_36_void_spirit_hero_innate_void_spirit_intrinsic_edge_{1,2,2_info} + 7.36b tweak.
                 "Passive.",
-                "Void Spirit gains <b>25%</b> more secondary bonuses from Primary Attributes."
-                + inline_note("Health Regen from Strength, Armor from Agility, Mana Regen and Magic Resistance from Intelligence."),
+                "Void Spirit gains " + hl("25%", "nerf") + " more secondary bonuses from Primary Attributes."
+                + inline_note("Health Regen from Strength, " + hl("Armor from Agility", "del") + ", Mana Regen and "
+                              + hl("Magic Resistance", "del") + " from Intelligence."),
             ],
         ),
         new=dict(
@@ -5448,19 +5479,21 @@ def build():
             desc=[
                 # Source: data/patchnotes_english.txt → DOTA_Patch_7_41_void_spirit_void_spirit_intrinsic_edge_{1,7,8,9} folded into a coherent description.
                 "Passive.",
-                "Void Spirit gains <b>30%</b> more secondary bonuses from Primary Attributes, and his attack damage per point of attribute is multiplicatively increased by <b>15%</b>."
+                "Void Spirit gains " + hl("30%", "buff") + " more secondary bonuses from Primary Attributes, and "
+                + hl("his attack damage per point of attribute is multiplicatively increased by 15%", "buff") + "."
                 + inline_note("Health Regen from Strength, " + hl("Attack Speed from Agility", "new")
-                              + ", Mana Regen from Intelligence. No longer provides Armor or Magic Resistance."),
+                              + ", Mana Regen from Intelligence."),
             ],
         ),
         summary="Innate reworked.",
         tag="rework",
     ))
     W(ul_open())
-    W(li("No longer provides increased Armor or Magic Resistance", t("DEL")))
+    # the card shows these changes highlighted (old left, new right): the rows stay hidden for the weights
+    W(li("No longer provides increased Armor or Magic Resistance", t("DEL"), covered=True))
     W(li("Now provides increased Attack Speed per point of Agility", t("NEW"), covered=True))
-    W(li("Attack damage per attribute multiplier increased from 0.45 to 0.5175", b(0.45, 0.5175)))
-    W(li("Secondary bonuses increased from 25% to 30%", b(25, 30)))
+    W(li("Attack damage per attribute multiplier increased from 0.45 to 0.5175", b(0.45, 0.5175), covered=True))
+    W(li("Secondary bonuses increased from 25% to 30%", b(25, 30), covered=True))
     W(li("The result of these changes:", t("MISC"),
          extra=inline_note(
              "Damage at level 1 is unchanged at 52–56."

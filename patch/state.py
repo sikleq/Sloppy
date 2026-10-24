@@ -22,6 +22,7 @@ class _State:
     current_ability_slug = None      # engine slug of the ability() block a row sits in (weights context)
     current_ability_innate = False   # that block is an innate
     current_ability_kv = None        # that block's ability for its game-file values (slug, or its icon's file name)
+    card_meta = {}                   # {header key: (old, new)} the ability_change card above coloured; ul_close clears
     section_panel_open = False       # True while inside a <section class="cat-panel"> wrapper
     seen_abilities_subgroup = False  # set when first ability() emits "Abilities" subgroup
     seen_facets_subgroup = False     # set when first facet_header() emits "Facets" subgroup

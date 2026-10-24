@@ -990,11 +990,13 @@ def build():
             slug="earthshaker_slugger",
             innate=True,
             desc=[
-                "Enemies killed with Enchant Totem or Earthshaker's other abilities are sent flying, dealing damage to enemies they hit.",
+                "Enemies killed with Enchant Totem or Earthshaker's other abilities are sent flying, dealing damage to enemies they hit. "
+                + inline_note("Almost no values were changed, still improves with Echo Slam"),
             ],
         )))
     W(ul_open())
-    W(li("Now is an innate ability", t("REWORK"), extra=inline_note("Almost no values were changed, still improves with Echo Slam")))
+    # the card's summary says it, its note is in the card: the row stays hidden for the weights
+    W(li("Now is an innate ability", t("REWORK"), covered=True))
     W(li("Damage (Creep Death) decreased from 40/60/80/100 to 30/45/60/75", b([40, 60, 80, 100], [30, 45, 60, 75])))
     W(ul_close())
     W(ability("Aftershock", slug="earthshaker_aftershock"))
@@ -2061,8 +2063,8 @@ def build():
             slug="spirit_breaker_planar_pocket",
             desc=[
                 "Granted by Aghanim's Scepter.",
-                "Barathrum distorts the fabric of space, increasing his own magic resistance by 75%, and redirecting enemy spells targeted at allied heroes within a 900 radius towards him. Does not trigger if the enemy ability is targeted at Spirit Breaker."
-                + inline_note("Duration: 7s."),
+                "Barathrum distorts the fabric of space, increasing his own magic resistance by 75%, and redirecting enemy spells targeted at allied heroes within a 900 radius towards him. Does not trigger if the enemy ability is targeted at Spirit Breaker.",
+                "Duration: " + hl("7s", "buff") + ".",
             ],
         ),
         new=dict(
@@ -2072,18 +2074,23 @@ def build():
                 "Granted by Aghanim's Scepter. Unit-targeted.",
                 "Barathrum gains 75% magic resistance and distorts reality around the selected hero, making any unit-targeted spells cast by enemy heroes on the target to get redirected towards Spirit Breaker. Can be cast on both allied and enemy heroes, but only spells cast by enemies of Spirit Breaker will be redirected. Cast Range: 700."
                 + inline_note("Io's Tether is the only exception that will ignore this effect."),
+                hl("Redirected spells are not considered as reflected. If Spirit Breaker is under effects such as Lotus Orb's Echo Shell, redirected spells will be reflected back to the enemy caster", "misc") + ".",
+                hl("If the redirected spell has different interactions for allies and enemies, Spirit Breaker will receive the enemy interaction", "rework")
+                + ". " + inline_note("Example: Oracle's Fate's Edict will disarm Spirit Breaker even if the ability was redirected from Oracle's ally"),
+                "Duration: " + hl("6s", "nerf") + ". " + hl("Dispellable only by Strong Dispel", "nerf") + ".",
             ],
         ),
         summary="Ability reworked.",
         tag="rework",
     ))
     W(ul_open())
-    W(li("Now dispellable only by Strong Dispel", t("NERF")))
+    # the card shows every change highlighted (old left, new right; cooldown and mana in its headers): rows hidden
+    W(li("Now dispellable only by Strong Dispel", t("NERF"), covered=True))
     W(li("Cooldown increased from 20s to 25s", b(20, 25, l=True)))
     W(li("Mana Cost increased from 75 to 100", b(75, 100, l=True)))
-    W(li("Duration decreased from 7s to 6s", b(7, 6)))
-    W(li("Redirected spells are not considered as reflected. If Spirit Breaker is under effects such as Lotus Orb's Echo Shell, redirected spells will be reflected back to the enemy caster", t("MISC")))
-    W(li("If the redirected spell has different interactions for allies and enemies, Spirit Breaker will receive the enemy interaction", t("REWORK"), extra=inline_note("Example: Oracle's Fate's Edict will disarm Spirit Breaker even if the ability was redirected from Oracle's ally")))
+    W(li("Duration decreased from 7s to 6s", b(7, 6), covered=True))
+    W(li("Redirected spells are not considered as reflected. If Spirit Breaker is under effects such as Lotus Orb's Echo Shell, redirected spells will be reflected back to the enemy caster", t("MISC"), covered=True))
+    W(li("If the redirected spell has different interactions for allies and enemies, Spirit Breaker will receive the enemy interaction", t("REWORK"), covered=True))
     W(ul_close())
 
     # Techies

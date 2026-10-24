@@ -3135,12 +3135,14 @@ def build():
         old=dict(name="Arcane Curse", slug="silencer_curse_of_the_silent", desc=[
             "Curses the target area, causing enemy heroes to take damage over time and slowing their movement speed. If a target casts a spell, they are silenced for a short period. The duration is paused as long as the target is silenced."]),
         new=dict(name="Arcane Curse", slug="silencer_curse_of_the_silent", desc=[
-            "Curses the target area, dealing damage and causing enemy heroes to take damage over time and slowing their movement speed. Silenced enemies take 1.5x slow and damage. Anytime affected enemies cast a spell, the duration is increased. The duration is paused as long as the target is silenced " + inline_note("Returned to pre-7.36 behavior"),
+            "Curses the target area, dealing damage and causing enemy heroes to take damage over time and slowing their movement speed. Silenced enemies take 1.5x slow and damage. Anytime affected enemies cast a spell, the duration is increased. The duration is paused as long as the target is silenced " + inline_note("Returned to pre-7.36 behavior")
+            + " " + hl("Duration can be decreased by Status Resistance or increased by Debuff Duration bonuses", "buff") + ".",
             "Initial Damage: 20/40/60/80. Damage: 16/24/32/40. Radius: 350. Base Duration: 6s. Movement Slow: 16/19/22/25%. Penalty Duration: 2s. Silenced Multiplier: 1.5x",
             "Cast Range: 1000, Mana Cost: 120/130/140/150, Cooldown: 22/20/18/16s"]),
         summary="Ability reworked", tag="rework"))
     W(ul_open())
-    W(li("Compared to previous iterations, ability duration can now be decreased by Status Resistance or increased by Debuff Duration bonuses", t("BUFF")))
+    W(li("Compared to previous iterations, ability duration can now be decreased by Status Resistance or increased by Debuff Duration bonuses", t("BUFF"),
+         covered=True))                  # highlighted in the card above
     W(ul_close())
     W(ability("Glaives of Wisdom", slug="silencer_glaives_of_wisdom"))
     W(ul_open())

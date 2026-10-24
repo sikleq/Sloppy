@@ -409,6 +409,13 @@ Scepter upgrade).» — в скобках перед точкой) с полос
 - Строка «Now also provides …» под реворк-карточкой: эта фраза в карточке крашется `hl(..., "new")`, числа —
   `hl(..., "nerf"/"buff")`, а строка скрывается `covered=True` (веса и фильтры её видят) — Dark Seer Quick Wit,
   Dragon Knight Elder Dragon Form, Void Spirit Intrinsic Edge 7.41, как Clockwerk Overclocking.
+- Числовые строки и «No longer …» под карточкой — так же (2026-10-24, Dragon Knight Elder Dragon Form 7.41: Bonus
+  Move Speed, Wyrm's Wrath, «Black Dragon stats slightly rescaled»): в карточках выделены, строка `covered=True`.
+  Проверено по всем карточкам 7.38–7.41 (Distortion Field, Divided We Stand, Summon Raptors, Feast of Souls,
+  Noxious Plague, Intrinsic Edge, Kinetic Fence, Celestial Quiver, Pierce the Veil, Planar Pocket, Slugger, Searing
+  Arrows, Summon Spirit Bear, Leech Seed, Arcane Curse).
+- «No longer provides X», когда X переехал в другую способность того же героя (Elder Titan 7.41 Astral Spirit: броня
+  ушла во врождённую Momentum) — **MISC**, не DEL (владелец 2026-10-24); линтер предлагает DEL — оставить MISC.
 - Смена способа применения, после которой способность действует иначе («Now a no target ability that affects only
   Bloodseeker», Omniknight 7.41) — **REWORK**, не NERF.
 Тест — `tests/test_fixes_1022.py`.
