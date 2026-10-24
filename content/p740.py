@@ -2451,7 +2451,7 @@ def build():
                 "Slark steals the life essence of enemy heroes with his attacks, draining <b>1</b> of each of their attributes and converting them to bonus <b>3</b> Agility. If Slark kills an affected enemy hero, he permanently steals <b>1</b> Agility.",
             ],
         ),
-        summary="Now an innate ability. Passive, improves with Slark's level. Barracuda's effect moved to the Ultimate",
+        summary="Now an innate ability. Barracuda's effect moved to the Ultimate",
         tag="rework",
     ))
     W(ul_open())
@@ -2551,7 +2551,7 @@ def build():
                 "Spectre and her illusions deal bonus Pure damage if attacking an enemy that does not have any allied units within a <b>350</b> radius around them.",
             ],
         ),
-        summary="Now an innate ability. Passive, improves with Spectre's level",
+        summary="Now an innate ability.",
         tag="rework",
     ))
     W(ul_open())

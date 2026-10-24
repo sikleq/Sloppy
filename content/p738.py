@@ -1336,11 +1336,11 @@ def build():
         new=dict(
             name="Aggrandize", slug="dark_seer_aggrandize", innate=True,
             desc=[
-                "Passive.",
+                "Passive, improves with Dark Seer's level.",
                 "When Dark Seer levels up, he restores a percentage of his max health and mana. Restore percentage is equal to <b>10% + 2%</b> per hero level. Disabled by Break.",
             ],
         ),
-        summary="New innate ability. Passive, improves with Dark Seer's level",
+        summary="New innate ability.",
         tag="new",
     ))
     W(facet_header("dark_seer_atkspd"))
@@ -2036,7 +2036,7 @@ def build():
                 "Keeper of the Light cannot go below <b>75</b> mana.",
             ],
         ),
-        summary="New innate ability. Passive, can't be leveled up",
+        summary="New innate ability.",
         tag="new",
     ))
     W(ability("Blinding Light", slug="keeper_of_the_light_blinding_light"))

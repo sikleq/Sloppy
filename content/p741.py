@@ -2236,8 +2236,9 @@ def build():
                 hl("+20", "nerf") + " bonus move speed, +350 attack range, " + hl("+20/50/80 attack damage", "del")
                 + ". Attacks splash 30/40/50% of attack damage within 275 AoE and apply Wyrm's Wrath on-hit effects; Wyrm's Wrath effects increased by 20/30/40%.",
                 "Increases Dragon Tail range, and health regeneration and armor bonuses from Dragon Blood. Mana Cost: 50. Cooldown: 100s.",
-                aghs_line("Adds a Level 4 Black Dragon: free pathing, increased damage (+110), 60% splash, and "
-                          + hl("increased Wyrm's Wrath effectiveness (50%)", "del") + "."),
+                # the Black Dragon itself is the same on both sides (owner 2026-10-24): only its values are coloured
+                aghs_line("Adds a Level 4 Black Dragon: free pathing, " + hl("increased damage (+110), 60% splash", "rework")
+                          + ", and " + hl("increased Wyrm's Wrath effectiveness (50%)", "del") + "."),
             ],
         ),
         new=dict(
@@ -2250,8 +2251,9 @@ def build():
                 "<b>Level 3 — Blue Dragon:</b> Attacks also apply a Frost debuff (pierces Debuff Immunity) — 50 attack slow and 30% move slow. Splash attacks now apply both Corrosive poison and Frost to all affected units; other attack modifiers only affect the primary target.",
                 "Bonus Move Speed: " + hl("25/30/35", "buff") + ". "
                 + hl("Now also increases cast range of all abilities by 350 (doesn't affect items)", "new") + ".",
-                aghs_line(hl("Upgrades to Level 4 Black Dragon: 40 Bonus Move Speed, 35 Corrosive Damage, 100% Splash Damage, "
-                             "350 Splash Radius, 65 Attack Slow, 45% Movement Slow, +20% Magic Resistance", "rework")
+                aghs_line("Upgrades to Level 4 Black Dragon: "
+                          + hl("40 Bonus Move Speed, 35 Corrosive Damage, 100% Splash Damage, 350 Splash Radius, "
+                               "65 Attack Slow, 45% Movement Slow, +20% Magic Resistance", "rework")
                           + ", and free pathing."),
             ],
         ),
@@ -2634,7 +2636,7 @@ def build():
     W(ul_close())
     W(ability("Sharpshooter"))
     W(ul_open())
-    W(li("Now treats creep heroes as creeps", t("MISC"),
+    W(li("Now treats creep heroes as creeps", t("REWORK"),     # the arrow flies on: changes play (owner 2026-10-24)
          extra=inline_note("The projectile flies through creeps, dealing them damage for half value, but still applying Slow and Break at full force and duration."
                            "<br>Since Spirit Bear is considered a true hero, the projectile will stop on impact with it.")))
     W(ul_close())

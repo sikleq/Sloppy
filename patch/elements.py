@@ -481,6 +481,11 @@ def _item_display_name(slug):
 
 # ---- Public element functions ----
 
+# heroes whose highlighted text shows the tag colour as a light highlighter (styles.css .hl-marker): a preview for the
+# owner before the whole site (2026-10-24); a class, not :has(), which patch pages must not use (test_static_has)
+HL_MARKER_PREVIEW = {"Dragon Knight"}
+
+
 def hero_header(name):
     _State.current_ability_slug = None
     _State.current_ability_innate = False
@@ -492,7 +497,7 @@ def hero_header(name):
     _State.seen_facets_subgroup = False
     eid = _register_entity("hero", name)
     href = _entity_link("heroes", name)
-    return _open_block() + f'''<div class="entity hero-entity"{eid}>
+    return _open_block("hl-marker" if name in HL_MARKER_PREVIEW else "") + f'''<div class="entity hero-entity"{eid}>
   <div class="entity-icon hero-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{hero_img(name)}" alt="{name}" loading="lazy" width="256" height="144"></a></div>
   <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a></div>
 </div>'''
@@ -1651,7 +1656,23 @@ def _item_ability_html(text, props=None):
 
 def _iab_meta_re(pat):
     # a whole sentence, "." or "," separated ("Cast Range: 550, Mana Cost: 90, Cooldown: 16s" — 7.38 Marshmage)
-    return rf"(?:^|(?<=[.!,]))\s*(?:{pat})\s*[.,]?\s*(?=$|[A-Z])"
+    # A sentence ended by "." may be followed by a tag: "Radius: 1500. <b>Max Mana Restored:</b> …" (7.41 Death Charge);
+    # any may be followed by its (?) note: "Cast Range: 750 (?)" (7.38 Weighted Pie)
+    return rf"(?:^|(?<=[.!,]))\s*(?:{pat})(?:\s*[.,]?\s*(?=$|[A-Z]|<!--INLINETIP-->)|\s*\.\s*(?=<))"
+
+
+# the value of a header sentence highlighted in the text: "Cooldown: <hl nerf>45/40/35/30s</hl>." (7.41 Summon Hawk) —
+# the header takes it with its colour
+_IAB_HL_LABEL = {"aoe": "Radius", "castrange": "(?:Cast )?Range", "manacost": "Mana Cost", "healthcost": "Health Cost",
+                 "cooldown": "Cooldown"}
+_IAB_HL_VALUE = rf'(\s*:\s*)<span class="iab-hl iab-hl-(\w+)">({_IAB_N}%?s?)</span>'
+_IAB_HL_ANY_RE = re.compile(rf'\b({"|".join(_IAB_HL_LABEL.values())}){_IAB_HL_VALUE}')
+_IAB_HL_MARK_RE = re.compile(r'^<span class="iab-hl iab-hl-(\w+)">(.*)</span>$', re.S)
+
+
+def _iab_unhl(text):
+    """The text with the highlight taken off every header sentence's value (to count those sentences)."""
+    return _IAB_HL_ANY_RE.sub(r"\1\2\4", text)
 
 
 def _iab_meta_chips(values, props=None, marks=None):
@@ -1660,12 +1681,15 @@ def _iab_meta_chips(values, props=None, marks=None):
     out = []
     for key, icon, _ in _IAB_META:
         val = (props or {}).get(key) or values.get(key)
+        own = _IAB_HL_MARK_RE.match(values.get(key) or "")
+        if val and own:                        # the text's own highlight on the value wins (it says the change)
+            val = hl(_IAB_HL_MARK_RE.sub(r"\2", str(val)), own.group(1))
+        elif val and marks and key in marks:
+            # coloured only if a row under the card says exactly this change (page.save_html, _CARD_CONFIRMED):
+            # a header difference no row names (Kinetic Fence 7.41 mana 50 -> 70) stays plain
+            mark, card = marks[key]
+            val = f"<!--CHIPMARK:{card}:{key}:{mark}-->{val}<!--/CHIPMARK-->"
         if val:
-            if marks and key in marks:
-                # coloured only if a row under the card says exactly this change (page.save_html, _CARD_CONFIRMED):
-                # a header difference no row names (Kinetic Fence 7.41 mana 50 -> 70) stays plain
-                mark, card = marks[key]
-                val = f"<!--CHIPMARK:{card}:{key}:{mark}-->{val}<!--/CHIPMARK-->"
             out.append(f'<span class="iab-m"><img class="iab-ico" src="{ABILITY_ICON_DIR}{icon}.png" alt="">{val}</span>')
     return "".join(out)
 
@@ -1702,17 +1726,38 @@ def _iab_meta_marks(old_vals, new_vals):
     return old_m, new_m
 
 
+_IAB_BOLD_META_RE = re.compile(r"<b>([^<]*)</b>")
+
+
+def _iab_only_meta(text) -> bool:
+    """True when the text is only header sentences ("No Mana Cost. Cooldown: 120s.") and nothing else."""
+    for _, _, pat in _IAB_META:
+        text = re.sub(_iab_meta_re(pat), " ", text)
+    text = re.sub(rf"(?:^|(?<=[.!,]))\s*(?:{_IAB_DROP})\s*[.,]?", " ", text)
+    return not text.strip()
+
+
 def _iab_take_meta(desc, only=None):
     """({key: value} of the header sentences, the text without them and without "No Mana Cost" / "No Cooldown")."""
     values = {}
     # "<b>Mana Cost:</b> 50." is the same header sentence as "Mana Cost: 50." (7.41 Zealot / Bane shard: the bold
     # label kept it in the text under a head that already shows it — owner 2026-10-21)
     desc = _IAB_BOLD_LABEL_RE.sub(r"\1:", desc)
+    # so is a bold run of nothing but header sentences: "<b>No Mana Cost. Cooldown: 120s.</b>" (7.41 Sacrifice)
+    desc = _IAB_BOLD_META_RE.sub(lambda m: m.group(1) if _iab_only_meta(m.group(1)) else m.group(0), desc)
     for key, icon, pat in _IAB_META:
-        mm = re.search(_iab_meta_re(pat), desc) if only is None or key in only else None
+        if only is not None and key not in only:
+            continue
+        hm = re.search(rf"\b({_IAB_HL_LABEL[key]}){_IAB_HL_VALUE}", desc)
+        cand = desc[:hm.start()] + hm.group(1) + hm.group(2) + hm.group(4) + desc[hm.end():] if hm else desc
+        mm = re.search(_iab_meta_re(pat), cand)
+        if hm and not (mm and mm.start() <= hm.start() < mm.end()):
+            cand, hm = desc, None                       # the highlighted one isn't the sentence taken
+            mm = re.search(_iab_meta_re(pat), cand)
         if mm:
-            values[key] = next(g for g in mm.groups() if g)
-            desc = (desc[:mm.start()] + " " + desc[mm.end():]).strip()
+            val = next(g for g in mm.groups() if g)
+            values[key] = hl(val, hm.group(3)) if hm else val
+            desc = (cand[:mm.start()] + " " + cand[mm.end():]).strip()
     desc = re.sub(rf"(?:^|(?<=[.!,]))\s*(?:{_IAB_DROP})\s*[.,]?", " ", desc).strip()
     return values, re.sub(r"\s{2,}", " ", desc).strip()
 
@@ -1747,7 +1792,13 @@ def _bold_numbers_html(html_text):
     return "".join(out)
 
 
-_PANE_KIND_RE = re.compile(r"^\s*(Active|Passive|Toggle|Aura)\.\s*")
+_PANE_KIND_RE = re.compile(r"^\s*(Active|Passive|Toggle|Aura)([.,])\s*")
+# What the ability levels / scales with leaves the text for the header, in brackets after the kind: "Passive, levels
+# up with Duel." -> "Passive (Scales with Duel)" (owner 2026-10-24, 7.41 Gravity Well / Distortion Field / Outfight
+# Them!). A highlight on the phrase (Distortion Field 7.41: "del") stays on it in the header.
+_PANE_SCALE_RE = re.compile(r"(?:^|(?<=[.!]))\s*(<span[^>]*>)?(?:[Ll]evels(?: up)?|[Ss]cales|[Ii]mproves) with "
+                            r"([^.<]+?)(</span>)?\.(?=\s|$)")
+_PANE_NOLEVEL_RE = re.compile(r"(?:^|(?<=[.!]))\s*(?:Innate, )?[Cc]an(?:'t|not) be leveled up\.(?=\s|$)")
 _PANE_NAME_RE = re.compile(r"^\s*([A-Z][\w'’-]*(?: [A-Za-z][\w'’-]*){0,4}):\s+")
 
 
@@ -1771,7 +1822,19 @@ def _pane_parts(desc, props=None, facet=False, marks=None):
         mk = _PANE_KIND_RE.match(items[plain[0]])
         if mk:
             kind = kind or mk.group(1)
-            items[plain[0]] = items[plain[0]][mk.end():]
+            rest = items[plain[0]][mk.end():]
+            # "Active, targets an allied creep …" (7.41 Sacrifice): the clause after the comma starts the text
+            items[plain[0]] = rest[:1].upper() + rest[1:] if mk.group(2) == "," else rest
+    scale = ""
+    if kind:
+        found = [m for i in plain for m in _PANE_SCALE_RE.finditer(items[i])]
+        if len(found) == 1:                     # two of them (two sub-abilities) can't say whose: they stay
+            o, what, c = found[0].group(1, 2, 3)
+            scale = f'{o or ""}Scales with {what.strip()}{c if o else ""}'
+        for i in plain:
+            cut = _PANE_NOLEVEL_RE.sub("", _PANE_SCALE_RE.sub("", items[i], count=1) if scale else items[i]).strip()
+            if cut != items[i]:                 # rule of 2026-05-16: "can't be leveled up" is never said in a card
+                items[i] = cut[:1].upper() + cut[1:]
     name = ""
     names = {(_PANE_NAME_RE.match(items[i]) or [None, None])[1] for i in plain if items[i]}
     if facet and len(names) == 1 and None not in names:
@@ -1781,11 +1844,17 @@ def _pane_parts(desc, props=None, facet=False, marks=None):
             items[i] = items[i][:1].upper() + items[i][1:]
     for i in plain:
         items[i] = _IAB_BOLD_LABEL_RE.sub(r"\1:", items[i])
-    # a value said twice in one pane (two cooldowns of two sub-abilities) stays in the text: the header can't say whose
+    # a value said twice in one pane (two cooldowns of two sub-abilities) stays in the text: the header can't say whose;
+    # so does one in a row of a named sub-ability among several ("Crystal Ball: …", "Weighted Pie: … Cast Range: 750",
+    # 7.38 Dark Carnival Barker)
+    subs = {i: m.group(1) for i in plain if (m := _PANE_NAME_RE.match(items[i]))
+            and m.group(1) not in ("Active", "Passive", "Toggle", "Aura")
+            and re.match(r"[A-Z][a-z]+ [a-z]", items[i][m.end():])}      # a sentence follows, not a value
+    own = [i for i in plain if len(set(subs.values())) < 2 or i not in subs]
     once = {key for key, _, pat in _IAB_META
-            if sum(len(re.findall(_iab_meta_re(pat), items[i])) for i in plain) == 1}
+            if sum(len(re.findall(_iab_meta_re(pat), _iab_unhl(items[i]))) for i in plain) == 1}
     values = {}
-    for i in plain:
+    for i in own:
         found, items[i] = _iab_take_meta(items[i], only=once)
         values.update(found)
     rows = []
@@ -1798,6 +1867,8 @@ def _pane_parts(desc, props=None, facet=False, marks=None):
     title = (f'<b class="iab-kind">{kind}:</b> <span class="iab-name">{name}</span>' if kind and name
              else f'<b class="iab-kind">{kind}</b>' if kind
              else f'<span class="iab-name">{name}</span>' if name else "")
+    if scale:
+        title += f' <span class="iab-scale">({scale})</span>'
     head = (f'<div class="iab-head pane-head"><span class="iab-title">{title}</span>'
             f'<span class="iab-meta">{chips}</span></div>') if chips or title else ""
     return head, "".join(rows)

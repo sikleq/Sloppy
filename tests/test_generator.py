@@ -139,6 +139,7 @@ import generate_patch_code_v2 as g
     ("Transmute no longer prevents camp-clearing Madstone Bundles from spawning if it was used on the last creep in "
      "neutral camp", "MISC"),
     ("Burn toggling no longer breaks invisibility nor stops channels", "QoL"),
+    ("Now treats creep heroes as creeps", "REWORK"),     # owner 2026-10-24, 7.41 Sharpshooter
 ])
 def test_guess_tag(text, expected):
     assert _guess_tag(text) == expected
@@ -661,7 +662,7 @@ def test_item_and_creep_canonical_tags_738(text, tag):
     ("Now killer's icon is shown as a buff on Vengeful Spirit to know who to hate", "QoL"),
     ("Now considers Spirit Bear as a true hero for prioritization", "MISC"),
     ("Now deals its self damage before damaging enemies", "MISC"),
-    ("Now treats creep heroes as creeps", "MISC"),
+    ("Now treats creep heroes as creeps", "REWORK"),   # was MISC; owner 2026-10-24: the arrow flies on
 ])
 def test_canonical_tags_from_the_740_741_audit(text, tag):
     assert g._guess_tag(text) == tag

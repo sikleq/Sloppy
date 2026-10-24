@@ -3910,8 +3910,12 @@ h4.subgroup .subgroup-new-type {
 }
 /* Formula table inside a pane: compact + horizontally scrollable when it
    overflows the pane width. */
+/* The gap belongs to an OPEN table: a wrap of a closed (hidden) table used to
+   leave empty space under the last row (7.41 Sacrifice, two tables: the body's
+   6px flex gap per wrap = 12px). The wrap cancels its gap; an open table puts
+   back the old 6px gap + 6px margin. */
 .ability-change-body .formula-table-wrap {
-  margin-top: 6px;
+  margin-top: -6px;
 }
 /* Formula tables inside ability_change panes show only 7 key levels
    (L1/5/10/15/20/25/30) — columns 3-5, 7-10, 12-15 are the intermediate
@@ -3924,6 +3928,9 @@ h4.subgroup .subgroup-new-type {
   width: 100%;
   table-layout: fixed;
   font-variant-numeric: tabular-nums;
+}
+.ability-change-body .formula-table:not([hidden]) {
+  margin-top: 12px;
 }
 .ability-change-body .formula-table.lvl-default th:is(:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(7),:nth-child(8),:nth-child(9),:nth-child(10),:nth-child(12),:nth-child(13),:nth-child(14),:nth-child(15)),
 .ability-change-body .formula-table.lvl-default td:is(:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(7),:nth-child(8),:nth-child(9),:nth-child(10),:nth-child(12),:nth-child(13),:nth-child(14),:nth-child(15)) {
@@ -11116,6 +11123,8 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 /* the name stays on one line; long values (Dagon's 5 levels) wrap below it, still on the right */
 .iab-title { white-space: nowrap; }
 .iab-name { color: var(--text-bright); font-weight: 600; }
+/* "Passive (Scales with Duel)": what the ability levels with, moved out of the text (owner 2026-10-24) */
+.iab-scale { color: var(--text-dim); font-weight: 400; }
 .iab-meta { display: flex; align-items: center; gap: 12px; flex: none; font-weight: 600; margin-left: auto;
   color: var(--text-bright); font-variant-numeric: tabular-nums; }
 .iab-m { display: inline-flex; align-items: center; gap: 4px; }
@@ -11156,6 +11165,19 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-hl-rework, .iab-hl-swap { color: #b99ae6; }
 .iab-hl-qol, .iab-hl-misc { color: var(--text-dimmer); }
 .iab-hl .iab-num { color: inherit; }          /* a number inside the coloured phrase takes its colour */
+/* PREVIEW (owner 2026-10-24): the tag colour as a light highlighter under the text instead of the text's colour —
+   heroes in patch/elements.py HL_MARKER_PREVIEW (Dragon Knight), to look at before the whole site */
+.hl-marker .iab-hl { color: inherit; padding: 0 3px; margin: 0 -1px; border-radius: 3px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone; background: var(--hl-bg); }
+.hl-marker .iab-hl-new { --hl-bg: rgba(224, 189, 98, 0.22); }
+.hl-marker .iab-hl-buff { --hl-bg: rgba(127, 208, 140, 0.20); }
+.hl-marker .iab-hl-nerf { --hl-bg: rgba(207, 130, 141, 0.22); }
+.hl-marker .iab-hl-del { --hl-bg: rgba(207, 107, 107, 0.24); }
+.hl-marker .iab-hl-rework,
+.hl-marker .iab-hl-swap { --hl-bg: rgba(185, 154, 230, 0.22); }
+.hl-marker .iab-hl-qol,
+.hl-marker .iab-hl-misc { --hl-bg: rgba(160, 150, 130, 0.18); }
+/* the colour-blind variants come from scripts/gen/gen_colorblind_css.py */
 .iab-tip-pct .badge-group { display: inline-flex; }
 .iab-card { background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px; padding: 6px 12px; }
 .iab-card .iab-desc { line-height: 1.45; }
@@ -11281,6 +11303,9 @@ html.cb-mode .badge.del { color: #c5527d; background: rgba(113, 38, 66, 0.14); b
 html.cb-mode .iab-hl-buff { color: #64baeb; }
 html.cb-mode .iab-hl-nerf { color: #f19e60; }
 html.cb-mode .iab-hl-del { color: #ce6c91; }
+html.cb-mode .hl-marker .iab-hl-buff { --hl-bg: rgba(157, 211, 242, 0.30); }
+html.cb-mode .hl-marker .iab-hl-nerf { --hl-bg: rgba(241, 155, 91, 0.33); }
+html.cb-mode .hl-marker .iab-hl-del { --hl-bg: rgba(154, 51, 90, 0.36); }
 html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff, html.cb-mode .iab-lv.iab-buff { color: #64baeb; }
 html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf, html.cb-mode .iab-lv.iab-nerf { color: #f19e60; }
 html.cb-mode .components-change .component-price.cost-buff, html.cb-mode .components-change .components-total span.cost-buff { color: #64baeb; }

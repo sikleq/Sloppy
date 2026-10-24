@@ -570,6 +570,8 @@ TAG_OVERRIDES = {
     "preference has switched":                 "REWORK",   # Tormentor's spawn / Roshan's pit preference
     "no longer prevents camp-clearing madstone": "MISC",   # Hand of Midas Transmute on a camp's last creep
     "toggling no longer breaks invisibility":  "QoL",      # Radiance Burn: toggling no longer reveals / interrupts
+    # owner 2026-10-24 (7.41): what a projectile stops on changes play — REWORK, not MISC
+    "treats creep heroes as creeps":           "REWORK",   # Sharpshooter: the arrow now flies through them
 }
 
 
