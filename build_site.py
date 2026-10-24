@@ -161,8 +161,7 @@ def main() -> int:
     print(f"\n{SEP}")
     print("  Copying static assets into dist/")
     print(SEP)
-    for name in ("styles.css", "_dynamics.json"):
-        src = _root / name
+    for name, src in (("styles.css", _root / "styles.css"), ("_dynamics.json", _root / ".cache" / "_dynamics.json")):
         if src.exists():
             shutil.copy2(src, _dist / name)
     for name in ("src", "icons"):

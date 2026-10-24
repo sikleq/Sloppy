@@ -1385,7 +1385,7 @@ def main() -> int:
         return 1
     asset = _site.compute_asset_version()
     latest = _annotated()[0]
-    dyn_path = _HERE / "_dynamics.json"
+    dyn_path = _HERE / ".cache" / "_dynamics.json"
     dyn = _json.loads(dyn_path.read_text(encoding="utf-8")) if dyn_path.exists() else {}
     counts = {}
     for kind, (folder, *_rest) in KINDS.items():

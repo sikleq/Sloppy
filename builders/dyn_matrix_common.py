@@ -138,7 +138,7 @@ _latest_href = _site.latest_patch_href
 
 
 def _load_manifest():
-    with open(_os.path.join(_HERE, "_dynamics.json"), encoding="utf-8") as f:
+    with open(_os.path.join(_HERE, ".cache", "_dynamics.json"), encoding="utf-8") as f:
         return _json.load(f)
 
 

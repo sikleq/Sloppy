@@ -1,4 +1,4 @@
-"""Compute per-patch terrain diffs -> data/terrain_diff_<newVer>.json.
+"""Compute per-patch terrain diffs -> data/terrain/terrain_diff_<newVer>.json.
 
 For each old->new map file pair we read our own two data/map/mapdata_<code>.json (read from the game's map
 files by scripts/gen/extract_map_entities.py) and emit a small, committed diff per NEW patch that the site build
@@ -21,7 +21,7 @@ Since 2026-10-02 every map file 7.38-7.41f is our own (data/map/mapdata_<code>.j
 named by the first patch that shipped it), and the default pairs are the Terrain pages' steps
 (builders/map_versions.py): every patch whose map file differs from the patch before's, old file -> new file::
 
-    python scripts/gen/build_terrain_diff.py            # every step -> data/terrain_diff_<patch>.json
+    python scripts/gen/build_terrain_diff.py            # every step -> data/terrain/terrain_diff_<patch>.json
     python scripts/gen/build_terrain_diff.py 739:740    # or a single pair
 """
 import json
@@ -424,7 +424,8 @@ def main(pairs):
         old_code, new_code = pair[:2]
         diff = _diff_pair(old_code, new_code)
         page = pair[2] if len(pair) > 2 else diff["newVer"]
-        out = os.path.join(_ROOT, "data", f"terrain_diff_{page}.json")
+        out = os.path.join(_ROOT, "data", "terrain", f"terrain_diff_{page}.json")
+        os.makedirs(os.path.dirname(out), exist_ok=True)
         with open(out, "w", encoding="utf-8") as f:
             json.dump(diff, f, separators=(",", ":"))
         tiers = Counter(c["tier"] for c in diff["campsNew"])

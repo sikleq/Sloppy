@@ -35,7 +35,7 @@ def test_every_step_has_its_pictures_objects_and_diff():
         for pic in (s.old_pic, s.new_pic):
             assert os.path.exists(os.path.join(_ROOT, "icons", "maps", f"map_{pic}.webp")), pic
             assert os.path.exists(os.path.join(_ROOT, "data", "map", f"mapdata_{mv.code(pic)}.json")), pic
-        with open(os.path.join(_ROOT, "data", f"terrain_diff_{s.patch}.json"), encoding="utf-8") as f:
+        with open(os.path.join(_ROOT, "data", "terrain", f"terrain_diff_{s.patch}.json"), encoding="utf-8") as f:
             d = json.load(f)
         assert (d["oldVer"], d["newVer"]) == (s.old_pic, s.new_pic)
 

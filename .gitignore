@@ -10,7 +10,6 @@ _insert_patches.py
 data/_vpk_shops/
 
 # Список URL иконок — генерируется builders/patch.py для check_icons.py
-_ability_icons.txt
 
 # Local caches (tools/game_files.py copies of store files, terrain tiles, …)
 .cache/
@@ -58,7 +57,6 @@ items_dyn.html
 terrain.html
 hero_lab.html
 index.html
-_dynamics.json
 
 
 # Raw Valve API dumps — fetched ad-hoc via scripts/fetch_*.py for inspection

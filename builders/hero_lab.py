@@ -193,7 +193,7 @@ def _slug_from_item(item: str) -> str:
 
 def _load_item_meta() -> dict[str, dict]:
     try:
-        dyn = _json.loads((_HERE / "_dynamics.json").read_text(encoding="utf-8"))
+        dyn = _json.loads((_HERE / ".cache" / "_dynamics.json").read_text(encoding="utf-8"))
     except Exception:
         return {}
     out: dict[str, dict] = {}

@@ -90,7 +90,7 @@ def parse_page(html):
 
 
 def load(version):
-    dyn = json.load(open(os.path.join(HERE, "_dynamics.json"), encoding="utf-8"))
+    dyn = json.load(open(os.path.join(HERE, ".cache", "_dynamics.json"), encoding="utf-8"))
     meta = next(p for p in dyn["patches"] if p["version"] == version)
     html = open(os.path.join(HERE, "dist", "patches", f"{version}.html"), encoding="utf-8").read()
     return parse_page(html), dyn, meta

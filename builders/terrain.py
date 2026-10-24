@@ -6,7 +6,7 @@ what moved in the map file. Every patch whose map file changed is a page
 (builders/map_versions.py: 7.38b … 7.41f), letter patches included; the header
 picker and the subpatch arrows step through them. Each page has the FULL marker
 toolbar (Trees / Camps / point-entities) from its committed
-``data/terrain_diff_<patch>.json``.
+``data/terrain/terrain_diff_<patch>.json``.
 
 Maps live in ``icons/maps/`` as ``map_<ver>.webp``, one per distinct map file,
 named by the first patch that shipped it — our own Source Filmmaker renders
@@ -67,10 +67,10 @@ _esc = _site.esc
 
 
 def _load_diff(patch):
-    """The committed per-patch terrain diff (data/terrain_diff_<patch>.json,
+    """The committed per-patch terrain diff (data/terrain/terrain_diff_<patch>.json,
     written by scripts/gen/build_terrain_diff.py). Returns None if absent so the page
     still builds (maps only, no markers) for a patch without a diff."""
-    path = _os.path.join(_HERE, "data", f"terrain_diff_{patch}.json")
+    path = _os.path.join(_HERE, "data", "terrain", f"terrain_diff_{patch}.json")
     try:
         with open(path, encoding="utf-8") as f:
             return _json.load(f)
@@ -475,7 +475,7 @@ _latest_href = _site.latest_patch_href
 # of the slider. Patches that shipped the very same map file (7.40b, 7.41b) get
 # none; the next step's page names them.
 # Marker overlays + tree/camp counts come from the committed per-step diff
-# (data/terrain_diff_<patch>.json, scripts/gen/build_terrain_diff.py). The shared
+# (data/terrain/terrain_diff_<patch>.json, scripts/gen/build_terrain_diff.py). The shared
 # crop meta projects every patch's markers identically.
 
 

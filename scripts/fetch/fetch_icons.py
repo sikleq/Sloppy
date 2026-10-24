@@ -1,6 +1,6 @@
 """fetch_icons.py — Скачивает все недостающие иконки абилок из Valve CDN.
 
-После `python build_site.py patch` файл `_ability_icons.txt` содержит относительные
+После `python build_site.py patch` файл `.cache/_ability_icons.txt` содержит относительные
 пути ко всем иконкам, на которые ссылаются собранные патч-страницы. Этот
 скрипт идёт по списку, проверяет какие файлы локально отсутствуют, и
 качает их с `https://cdn.steamstatic.com/apps/dota2/images/dota_react/abilities/`.
@@ -26,7 +26,7 @@ except ImportError:
 import re
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-URLS_FILE = ROOT / "_ability_icons.txt"
+URLS_FILE = ROOT / ".cache" / "_ability_icons.txt"
 ICONS_DIR = ROOT / "icons" / "abilities"
 CDN_BASE = "https://cdn.steamstatic.com/apps/dota2/images/dota_react/abilities/"
 
