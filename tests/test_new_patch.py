@@ -66,14 +66,16 @@ def test_plan_skips_what_does_not_apply(monkeypatch, tmp_path):
     assert steps["register"].skip.startswith("already registered")
     assert steps["fetch"].argv[1:] == ["scripts/fetch/fetch_gametracking.py", "7.41f", "--ref", "abc123"]
     assert steps["shops"].skip and steps["item_stat_lines"].skip and steps["talent_slots"].skip
-    assert steps["store"].skip                                    # no store on this PC
+    assert steps["store"].skip and steps["publish"].skip          # no store on this PC
     assert "exists" in steps["draft"].skip                        # a proofread page is never regenerated
     assert steps["enchant_values"].skip and steps["enchant_table"].skip   # 7.41f has no enchant blocks
     assert steps["build"].skip is None and steps["check"].argv[-1] == "7.41f"
     names = list(steps)
+    # the store goes to GitHub right after its new patch: Sloppy's CI reads it there (2026-10-24)
     assert names.index("register") < names.index("fetch") < names.index("slim") < names.index("meta") \
-        < names.index("store") < names.index("npc_units") < names.index("abilities_slim") < names.index("draft") \
-        < names.index("build") < names.index("check")
+        < names.index("store") < names.index("publish") < names.index("npc_units") < names.index("abilities_slim") \
+        < names.index("draft") < names.index("build") < names.index("check")
+    assert steps["publish"].argv[-1].endswith("publish.py")
     # source game without a local game: the fetch says why it cannot run
     game = {s.name: s for s in np_.plan("7.41f", None, "game", dota_path=str(tmp_path))}
     assert "pak01_dir.vpk" in game["fetch"].skip

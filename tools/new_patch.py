@@ -14,7 +14,8 @@ to resume):
                 backup: fetch_gametracking.py [--ref] — mind the build: GameTracking's newest can be LATER than the patch)
   slim          tools/slim_from_kv.py <v> -> heroes/items/units/abilities/ability_ids .json
   meta          build_site.py patch -> data/site_meta.json knows the new patch
-  store         the patch's game files -> our store (dota-patch-files: build_store.py add <v> [--local]); push it after
+  store         the patch's game files -> our store (dota-patch-files: build_store.py add <v> [--local])
+  publish       the store -> GitHub (dota-patch-files: tools/publish.py — checks, backup, push; before Sloppy's push)
   npc_units … itemlist   the store / datafeed top-ups (npc_units.json, heroes_raw.json, npc_abilities.json, itemlist.json)
   shops         scripts/fetch/extract_shops.py -> data/shops.txt (local game only)
   abilities_slim, herolist   the shared tables rebuilt from the new snapshot
@@ -187,8 +188,11 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
              skip=None if source != "game" or local_game else f"no pak01_dir.vpk under {dota_path} (use --source gametracking)"),
         Step("slim", f"slim JSONs of data/stats/{version}/", [PY, "tools/slim_from_kv.py", version]),
         Step("meta", "data/site_meta.json with the new patch (before the top-ups)", [PY, "build_site.py", "patch"]),
-        Step("store", f"the patch's game files -> the store ({'installed game' if source == 'game' else 'archives'}); "
-             "then push it", store, skip=None if history else no_hist),
+        Step("store", f"the patch's game files -> the store ({'installed game' if source == 'game' else 'archives'})",
+             store, skip=None if history else no_hist),
+        # before Sloppy is pushed: CI lays the raw files out from the store on GitHub (checks + backup inside)
+        Step("publish", "the store -> GitHub (tools/publish.py)", [PY, os.path.join(STORE, "tools", "publish.py")],
+             skip=None if history else no_hist),
         Step("npc_units", "npc_units.json top-up", [PY, "scripts/fetch/fetch_npc_history.py"]),
         Step("heroes_raw", "heroes_raw.json top-up", [PY, "scripts/fetch/fetch_hero_history.py"]),
         Step("npc_abilities", "npc_abilities.json top-up", [PY, "scripts/fetch/fetch_ability_history.py"]),
