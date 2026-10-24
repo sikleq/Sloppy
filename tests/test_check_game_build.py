@@ -1,5 +1,6 @@
 """tools/check_game_build.py — the scheduled check for a game build newer than the newest snapshot (offline parts)."""
 import os
+import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -51,5 +52,8 @@ def test_the_workflow_uses_only_its_own_token():
     with open(os.path.join(ROOT, ".github", "workflows", "game-build-watch.yml"), encoding="utf-8") as f:
         text = f.read()
     assert "issues: write" in text and "contents: read" in text
-    assert text.count("secrets.") == 1 and "secrets.GITHUB_TOKEN" in text
+    # its own token, plus (2026-10-24) the read-only deploy key of the game-files store, used by the store checkout only
+    assert sorted(re.findall(r"secrets\.(\w+)", text)) == ["DOTA_FILES_DEPLOY_KEY", "GITHUB_TOKEN"]
+    store_step = text[text.index("Check out the game-files store"):text.index("Set up Python")]
+    assert "secrets.DOTA_FILES_DEPLOY_KEY" in store_step and "repository: sikleq/dota-patch-files" in store_step
     assert "tools/check_game_build.py --open-issue" in text
