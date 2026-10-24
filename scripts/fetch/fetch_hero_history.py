@@ -1,32 +1,21 @@
-"""fetch_hero_history.py — historical npc_heroes.txt from dotabuff/d2vpkr →
-compact per-patch `data/stats/<patch>/heroes_raw.json` carrying the hero
-stats that the slim heroes.json scrape DOESN'T have (vision, projectile
-speed, base attack speed, turn rate, collision hull, bound radius).
-
-Mirrors scripts/fetch/fetch_npc_history.py exactly (same d2vpkr commit-by-date
-matching, same SHA disk cache), just a different file + parser. Needed so
-the Hero Stats table (builders/heroes_stats.py) can show per-patch change
-history for those raw-only fields (e.g. Gyrocopter night vision 7.41d).
+"""fetch_hero_history.py — npc_heroes.txt of every patch from our game-files store (tools/game_files.py: the
+patch's own build) → compact per-patch `data/stats/<patch>/heroes_raw.json` carrying the hero stats that the
+slim heroes.json scrape DOESN'T have (vision, projectile speed, base attack speed, turn rate, collision hull,
+bound radius), plus the core stats. Needed so the Hero Stats table (builders/heroes_stats.py) can show per-patch
+change history for those raw-only fields (e.g. Gyrocopter night vision 7.41d).
 
     python scripts/fetch/fetch_hero_history.py           # backfill missing + refresh latest
-    python scripts/fetch/fetch_hero_history.py --force    # re-fetch every patch
+    python scripts/fetch/fetch_hero_history.py --force    # rebuild every patch
 
-After a new patch ships: create data/stats/<patch>/ and run — it fills in
-heroes_raw.json for the newcomer.
-
-7.41f+ (per-hero KV layout): a patch folder that has the local per-hero files
-(data/stats/<patch>/heroes/*.txt) is built FROM THEM, not from d2vpkr. d2vpkr's
-npc_heroes.txt became a #base include list in 7.41f and its commits can predate the
-release, which silently froze 7.41f at the 7.41e values (Earth Spirit / KotL / Warlock
-base attack speed). The parent template npc_dota_hero_base comes from
-data/stats/<patch>/npc_dota_hero_base.txt when present (extract it from the game VPK),
-otherwise it is carried over from the previous patch with a warning.
+7.41f+ (per-hero KV layout): npc_heroes.txt is a #base include list; the hero stats are read from the per-hero
+files scripts/npc/heroes/*.txt of the same patch (store), or — for a patch not in the store yet — from
+data/stats/<patch>/heroes/*.txt with npc_dota_hero_base.txt (carried over from the previous patch with a warning
+when missing). Until 2026-10-24 the source was dotabuff/d2vpkr ("the last commit before the next patch": the
+end-of-patch state, and 7.41f froze at 7.41e values because d2vpkr's commits predated the release).
 """
 import json
 import re
 import sys
-import urllib.request
-from datetime import date
 from pathlib import Path
 
 try:
@@ -36,28 +25,17 @@ except Exception:
 
 ROOT = Path(__file__).resolve().parents[2]
 STATS_DIR = ROOT / "data" / "stats"
-META_PATH = ROOT / "data" / "site_meta.json"
+sys.path.insert(0, str(ROOT))
+from patch.meta import RELEASE_HISTORY  # noqa: E402
+from tools import game_files  # noqa: E402
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import _d2vpkr_history as _h  # noqa: E402  shared with the other history fetcher
-CACHE_DIR = ROOT / ".cache" / "d2vpkr_heroes"
-
-REPO = "dotabuff/d2vpkr"
-FILE_PATH = "dota/scripts/npc/npc_heroes.txt"
-RAW_TMPL = "https://raw.githubusercontent.com/" + REPO + "/{sha}/" + FILE_PATH
-
-# Hero fields to extract. We carry the FULL stat set (not just raw-only
-# fields) so build_heroes_stats can use d2vpkr as the AUTHORITATIVE history
-# source — the muk-as/DOTA2_CLIENT slim scrape (heroes.json) was found to
-# be one-patch-late for some balance changes (e.g. Treant 7.34d Base
-# Damage decrease shows up at 7.34e in muk-as data, but at 7.34d in
-# d2vpkr, which matches the Valve patch notes).
+# Hero fields to extract: the raw-only ones and the full core stat set.
 HERO_FIELDS = (
     # Raw-only (not in heroes.json):
     "VisionDaytimeRange", "VisionNighttimeRange", "ProjectileSpeed",
     "BaseAttackSpeed", "MovementTurnRate", "BoundsHullName", "RingRadius",
     "AttackAcquisitionRange", "AttackAnimationPoint",
-    # Core stats — d2vpkr is the authoritative timing source.
+    # Core stats.
     "StatusHealth", "StatusMana", "StatusHealthRegen", "StatusManaRegen",
     "ArmorPhysical", "MagicalResistance",
     "AttackDamageMin", "AttackDamageMax", "AttackRate", "AttackRange",
@@ -141,87 +119,44 @@ def _write(out_path, parsed):
         encoding="utf-8")
 
 
-def load_patch_dates():
-    return _h.load_patch_dates(META_PATH)
-
-
-def fetch_commit_index():
-    return _h.fetch_commit_index(REPO, FILE_PATH)
-
-
-def fetch_raw(sha):
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cached = CACHE_DIR / (sha + ".txt")
-    if cached.exists():
-        return cached.read_text(encoding="utf-8")
-    with urllib.request.urlopen(RAW_TMPL.format(sha=sha)) as r:
-        text = r.read().decode("utf-8")
-    cached.write_text(text, encoding="utf-8")
-    return text
-
-
-commit_for_window = _h.commit_for_window
+def build_from_store(ver):
+    """heroes_raw of a patch from the store, else None (patch not in the store)."""
+    text = game_files.npc(ver, "npc_heroes.txt")
+    if text is None:
+        return None
+    if "#base" not in text[:4096]:
+        return parse_npc_heroes(text)
+    out = {}                                     # 7.41f+: include list -> the per-hero files of the same patch
+    for rel in game_files.listing(ver, "scripts/npc/heroes"):
+        if re.search(r"/npc_dota_hero_[a-z0-9_]+\.txt$", rel):
+            out.update(parse_npc_heroes(game_files.read(ver, rel) or ""))
+    return out
 
 
 def main():
     force = "--force" in sys.argv
-    if not META_PATH.exists():
-        print("X data/site_meta.json не найден — сначала запусти builders/build_patches.py")
-        return 1
-    patch_dates = load_patch_dates()
-    patches = sorted((v for v in patch_dates if (STATS_DIR / v).is_dir()),
-                     key=lambda v: patch_dates[v])
+    patches = [p["version"] for p in reversed(RELEASE_HISTORY) if (STATS_DIR / p["version"]).is_dir()]
     if not patches:
         print("X нет папок data/stats/<patch>/")
         return 1
-    # Local per-hero KV first (7.41f+): no network, always rebuilt (cheap, exact).
-    local_done = set()
-    for i, ver in enumerate(patches):
-        prev = STATS_DIR / patches[i - 1] / "heroes_raw.json" if i else None
-        parsed = build_from_local(STATS_DIR / ver, prev)
-        if parsed is not None:
-            _write(STATS_DIR / ver / "heroes_raw.json", parsed)
-            local_done.add(ver)
-            print("  + {} ← локальные heroes/*.txt ({} героев)".format(ver, len(parsed)))
-    if all(v in local_done or ((STATS_DIR / v / "heroes_raw.json").exists() and not force)
-           for v in patches[:-1]) and patches[-1] in local_done:
-        print("Готово: всё из локальных файлов / кэша")
-        return 0
-    print("Индексирую коммиты d2vpkr (npc_heroes.txt)…")
-    commit_idx = fetch_commit_index()
-    if not commit_idx:
-        print("X не удалось получить список коммитов")
-        return 1
-    print("  {} коммитов, {}—{}".format(len(commit_idx), commit_idx[0][0], commit_idx[-1][0]))
-
-    far_future = date(9999, 1, 1)
     written = skipped = missing = 0
     latest = patches[-1]
     for i, ver in enumerate(patches):
         out_path = STATS_DIR / ver / "heroes_raw.json"
-        if ver in local_done:
-            continue
         if out_path.exists() and not force and ver != latest:
             skipped += 1
             continue
-        win_end = patch_dates[patches[i + 1]] if i + 1 < len(patches) else far_future
-        sha = commit_for_window(commit_idx, win_end)
-        if not sha:
-            print("  - {}: нет коммита до {}".format(ver, win_end))
+        parsed, src = build_from_store(ver), "хранилище"
+        if parsed is None:                       # a new patch not in the store yet: the repo's own per-hero files
+            prev = STATS_DIR / patches[i - 1] / "heroes_raw.json" if i else None
+            parsed, src = build_from_local(STATS_DIR / ver, prev), "локальные heroes/*.txt"
+        if not parsed:
+            print("  - {}: нет данных ни в хранилище, ни локально".format(ver))
             missing += 1
             continue
-        try:
-            parsed = parse_npc_heroes(fetch_raw(sha))
-        except Exception as e:  # noqa: BLE001
-            print("  ! {}: ошибка {}".format(ver, e))
-            missing += 1
-            continue
-        out_path.write_text(
-            json.dumps(parsed, ensure_ascii=False, indent=0,
-                       separators=(",", ":"), sort_keys=True),
-            encoding="utf-8")
+        _write(out_path, parsed)
         written += 1
-        print("  + {} ← d2vpkr {} ({} героев)".format(ver, sha[:7], len(parsed)))
+        print("  + {} ← {} ({} героев)".format(ver, src, len(parsed)))
     print("Готово: записано {}, пропущено {}, без данных {}".format(
         written, skipped, missing))
     return 0

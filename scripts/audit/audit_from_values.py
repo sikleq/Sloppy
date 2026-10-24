@@ -23,10 +23,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from builders.silent import _decode_bytes  # noqa: E402
+from tools import game_files  # noqa: E402
 
 STATS = ROOT / "data" / "stats"
 PAGES = ROOT / "dist" / "patches"
-ITEMS_HIST = ROOT / "outputs" / "valve-revealed-weights-20260915" / "items_history"
 
 _NUM = r"-?\d+(?:\.\d+)?"
 _VAL = rf"{_NUM}(?:\s*/\s*{_NUM})*"
@@ -86,10 +86,11 @@ def _hero_kv(version, hero):
 
 def _items_kv(version):
     def make():
-        for p in (STATS / version / "items.txt", ITEMS_HIST / version / "items.txt"):
-            if p.exists():
-                return _decode_bytes(p.read_bytes())
-        return ""
+        p = STATS / version / "items.txt"
+        if p.exists():
+            return _decode_bytes(p.read_bytes())
+        data = game_files.read_bytes(version, "scripts/npc/items.txt")
+        return _decode_bytes(data) if data is not None else ""
     return _cached(("items", version), make)
 
 

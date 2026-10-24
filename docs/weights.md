@@ -84,8 +84,8 @@ Owner's request: find the gold price of every stat items have, value everything 
 cost, decide how to count mana costs, and count a stat that is replaced by a passive (Heaven's Halberd 7.38 lost
 +25 % Evasion and got Passive: Damage Block).
 
-**Method** (`tools/fit_item_prices.py`, needs numpy + scipy; reads `data/stats/<v>/items.txt`, else the d2vpkr
-history in the weights-model folder; 118 versions 7.08 → 7.41f, ~11 s):
+**Method** (`tools/fit_item_prices.py`, needs numpy + scipy; reads `data/stats/<v>/items.txt`, else the patch's own
+build from the game-files store (`tools/game_files.py`); 118 versions 7.08 → 7.41f, ~11 s):
 1. *Which KV values are stats* — Valve's own tooltips: `DOTA_Tooltip_ability_<item>_<field>` = "+$armor",
    "%+Slow Resistance" is a line of the item's stat list, the label names the stat. Items no longer in the
    tooltips use the field-name map learned from the same tooltips. Melee/ranged variants (Phase Boots damage,

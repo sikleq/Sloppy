@@ -6,10 +6,9 @@ FIRST of each pair is the RIGHT twig (checked against Liquipedia: Axe 7.41 Abili
 Kill Buff Duration" = level 10 right). Invoker keeps them at Ability17+, so the order is used, not
 fixed slot numbers.
 
-Sources: the d2vpkr npc_heroes.txt history kept with the weights model
-(outputs/valve-revealed-weights-20260915/heroes_history/<v>/npc_heroes.txt), and for a patch not
-there yet the repo's own data/stats/<v>/heroes/npc_dota_hero_<slug>.txt (7.41f+ layout, where
-npc_heroes.txt is only an include list).
+Sources: npc_heroes.txt of each patch's own build from our game-files store (tools/game_files.py; until
+2026-10-24 the d2vpkr history), and where it is only an include list (7.41f+ layout) the repo's own
+data/stats/<v>/heroes/npc_dota_hero_<slug>.txt.
 
 Each talent also gets HINT words from the KV of its own patch: the display name of the ability whose
 values the talent changes and the value's key ("Shrapnel slow movement speed"). Today's tooltip of a
@@ -23,9 +22,12 @@ import bisect
 import json
 import os
 import re
+import sys
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HIST = os.path.join(HERE, "outputs", "valve-revealed-weights-20260915", "heroes_history")
+sys.path.insert(0, HERE)
+from tools import game_files  # noqa: E402
+
 STATS = os.path.join(HERE, "data", "stats")
 OUT = os.path.join(HERE, "data", "rules", "talent_slots.json")
 
@@ -67,7 +69,6 @@ def from_hero_files(folder):
     return out
 
 
-ABIL_HIST = os.path.join(os.path.dirname(HIST), "abilities_history")
 _META_KEYS = {"var_type", "value", "linkedspecialbonus", "linkedspecialbonusfield", "linkedspecialbonusoperation",
               "calculatespelldamagetooltip", "requiresscepter", "requiresshard", "ad_linked_abilities",
               "dynamicvalue", "levelkey", "affected_by_aoe_increase"}
@@ -119,8 +120,8 @@ def talent_hints(texts):
 
 def _kv_texts(v):
     out = []
-    for p in (os.path.join(ABIL_HIST, v, "npc_abilities.txt"), os.path.join(STATS, v, "npc_abilities.txt")):
-        if os.path.exists(p):
+    for p in (game_files.path(v, "scripts/npc/npc_abilities.txt"), os.path.join(STATS, v, "npc_abilities.txt")):
+        if p and os.path.exists(p):
             out.append(open(p, encoding="utf-8", errors="replace").read())
             break
     own = os.path.join(STATS, v, "heroes")
@@ -133,9 +134,9 @@ def main():
     versions = sorted(v for v in os.listdir(STATS) if os.path.isdir(os.path.join(STATS, v)))
     per_version = {}
     for v in versions:
-        hist = os.path.join(HIST, v, "npc_heroes.txt")
+        hist = game_files.path(v, "scripts/npc/npc_heroes.txt")
         own = os.path.join(STATS, v, "heroes")
-        if os.path.exists(hist):
+        if hist and "#base" not in open(hist, encoding="utf-8", errors="replace").read(4096):
             per_version[v] = from_npc_heroes(hist)
         elif os.path.isdir(own):
             per_version[v] = from_hero_files(own)

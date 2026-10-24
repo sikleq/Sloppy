@@ -1,4 +1,5 @@
-"""Read a tooltip as it was in a given patch (history fetched by tools/fetch_loc_history.py).
+"""Read a tooltip as it was in a given patch (the patch's own build in our game-files store, tools/game_files.py;
+until 2026-10-24 a d2vpkr download in outputs/loc_history).
 
     from tools.loc_history import tooltip
     tooltip("DOTA_Tooltip_Ability_item_angels_demise_Description", "7.37e")
@@ -6,25 +7,30 @@
 Keys are case-insensitive (Valve mixes DOTA_Tooltip_Ability_ / DOTA_Tooltip_ability_). Returns None when the
 patch or the key is missing. Numbers stay as %placeholders% — fill them from that patch's KV.
 """
-import gzip
 import os
 import re
+import sys
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOC = os.path.join(HERE, "outputs", "loc_history")
+sys.path.insert(0, HERE)
+from tools import game_files  # noqa: E402
+
 _RX = re.compile(r'^\s*"([^"]+)"\s*"((?:[^"\\]|\\.)*)"', re.M)
 _CACHE = {}
+FILES = {  # name -> candidate files of a patch, newest layout first (before 7.20 everything sat in dota_english)
+    "abilities": ("resource/localization/abilities_english.txt", "resource/dota_english.txt"),
+    "dota": ("resource/localization/dota_english.txt", "resource/dota_english.txt"),
+}
 
 
 def _table(version, name):
     key = (version, name)
     if key not in _CACHE:
-        path = os.path.join(LOC, version, f"{name}_english.txt.gz")
         table = {}
-        if os.path.exists(path):
-            with gzip.open(path, "rt", encoding="utf-8") as f:
-                for m in _RX.finditer(f.read()):
-                    table.setdefault(m.group(1).lower(), m.group(2))
+        text = next((t for t in (game_files.read(version, rel) for rel in FILES[name]) if t), None)
+        if text:
+            for m in _RX.finditer(text):
+                table.setdefault(m.group(1).lower(), m.group(2))
         _CACHE[key] = table
     return _CACHE[key]
 

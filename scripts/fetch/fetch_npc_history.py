@@ -1,32 +1,19 @@
-"""fetch_npc_history.py — качает исторические npc_units.txt из dotabuff/d2vpkr
-и сохраняет компактные per-patch JSON `data/stats/<patch>/npc_units.json` с
-полями нейтралов. Нужно для истории магрезиста (и прочих npc-only статов),
-которой нет в units.json.
+"""fetch_npc_history.py — npc_units.txt каждого патча из нашего хранилища файлов игры (tools/game_files.py:
+сборка самого патча) → компактные per-patch JSON `data/stats/<patch>/npc_units.json` с полями нейтралов.
+Нужно для истории магрезиста (и прочих npc-only статов), которой нет в units.json.
 
-Источник: github.com/dotabuff/d2vpkr — там npc_units.txt автоматически
-коммитится каждый патч с 2015 года. Коммиты помечены номером билда
-("Client NNNN"), а не версией патча, поэтому сопоставление патч↔коммит идёт
-ПО ДАТЕ: для каждого нашего патча берётся последний d2vpkr-коммит, попавший
-в окно жизни патча (до даты следующего патча). Даты патчей — из
-`data/site_meta.json` (patch_dates), который пишет builders/build_patches.py.
-
-Мы сохраняем СВОЮ копию данных (распарсенный JSON), чтобы не зависеть от
-d2vpkr в момент сборки. Сырые .txt кэшируются по SHA в `.cache/d2vpkr/`,
-чтобы не качать один и тот же блоб дважды (соседние патчи часто делят коммит).
+До 2026-10-24 источником был dotabuff/d2vpkr («последний коммит до даты следующего патча» — состояние конца
+патча, а не самого патча; сырые .txt лежали в `.cache/d2vpkr/`).
 
 Запуск:
     python scripts/fetch/fetch_npc_history.py           # добить недостающие + обновить свежий
-    python scripts/fetch/fetch_npc_history.py --force    # перекачать все патчи
+    python scripts/fetch/fetch_npc_history.py --force    # пересобрать все патчи
 
-После выхода нового патча: создай `data/stats/<patch>/` (с units.json от
-build-пайплайна) и запусти скрипт — он добьёт npc_units.json для новинки.
+После выхода нового патча: добавь его в хранилище, создай `data/stats/<patch>/` и запусти скрипт.
 """
 import json
 import re
-import subprocess
 import sys
-import urllib.request
-from datetime import date
 from pathlib import Path
 
 try:
@@ -35,13 +22,11 @@ except Exception:
     pass
 
 ROOT = Path(__file__).resolve().parents[2]
-STATS_DIR = ROOT / "data" / "stats"
-META_PATH = ROOT / "data" / "site_meta.json"
-CACHE_DIR = ROOT / ".cache" / "d2vpkr"
+sys.path.insert(0, str(ROOT))
+from patch.meta import RELEASE_HISTORY  # noqa: E402
+from tools import game_files  # noqa: E402
 
-REPO = "dotabuff/d2vpkr"
-FILE_PATH = "dota/scripts/npc/npc_units.txt"
-RAW_TMPL = "https://raw.githubusercontent.com/" + REPO + "/{sha}/" + FILE_PATH
+STATS_DIR = ROOT / "data" / "stats"
 
 # Поля, которые вынимаем из каждого npc-блока (надмножество того, что
 # использует builders/creeps.py — храним с запасом, чтобы потом можно было
@@ -98,134 +83,35 @@ def parse_npc_units(text):
     return out
 
 
-def load_patch_dates():
-    meta = json.loads(META_PATH.read_text(encoding="utf-8"))
-    raw = meta.get("patch_dates", {})
-    out = {}
-    for ver, ds in raw.items():
-        try:
-            d, mth, y = (int(x) for x in ds.split("."))
-            out[ver] = date(y, mth, d)
-        except (ValueError, AttributeError):
-            continue
-    return out
-
-
-def _fetch_page(page):
-    """Одна страница (до 100 коммитов) для FILE_PATH. Сначала пробуем
-    авторизованный `gh api` (5000/час), иначе публичный API (60/час)."""
-    api = "repos/{}/commits?path={}&per_page=100&page={}".format(
-        REPO, FILE_PATH, page)
-    try:
-        res = subprocess.run(
-            ["gh", "api", api],
-            capture_output=True, text=True, check=True,
-        )
-        return json.loads(res.stdout)
-    except (FileNotFoundError, subprocess.CalledProcessError, json.JSONDecodeError):
-        pass
-    with urllib.request.urlopen("https://api.github.com/" + api) as r:
-        return json.loads(r.read().decode("utf-8"))
-
-
-def fetch_commit_index():
-    """[(commit_date, sha), ...] по возрастанию даты для FILE_PATH."""
-    data = []
-    page = 1
-    while True:
-        chunk = _fetch_page(page)
-        if not chunk:
-            break
-        data.extend(chunk)
-        if len(chunk) < 100:
-            break
-        page += 1
-    idx = []
-    for c in data:
-        sha = c.get("sha")
-        ds = c.get("commit", {}).get("author", {}).get("date", "")[:10]
-        if not sha or not ds:
-            continue
-        y, mth, d = (int(x) for x in ds.split("-"))
-        idx.append((date(y, mth, d), sha))
-    idx.sort()
-    return idx
-
-
-def fetch_raw(sha):
-    """Сырой npc_units.txt на коммите sha (с дисковым кэшем по sha)."""
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cached = CACHE_DIR / (sha + ".txt")
-    if cached.exists():
-        return cached.read_text(encoding="utf-8")
-    with urllib.request.urlopen(RAW_TMPL.format(sha=sha)) as r:
-        text = r.read().decode("utf-8")
-    cached.write_text(text, encoding="utf-8")
-    return text
-
-
-def commit_for_window(commit_idx, win_end):
-    """Последний коммит строго раньше win_end (даты следующего патча).
-    Это состояние файла, актуальное в течение жизни патча."""
-    chosen = None
-    for cdate, sha in commit_idx:
-        if cdate < win_end:
-            chosen = sha
-        else:
-            break
-    return chosen
-
-
 def main():
     force = "--force" in sys.argv
-    if not META_PATH.exists():
-        print("X data/site_meta.json не найден — сначала запусти builders/build_patches.py")
+    if not game_files.available():
+        print(f"X нет хранилища файлов игры: {game_files.STORE}")
         return 1
-    patch_dates = load_patch_dates()
-    # Только патчи, для которых у нас есть папка в data/stats/.
-    patches = sorted(
-        (v for v in patch_dates if (STATS_DIR / v).is_dir()),
-        key=lambda v: patch_dates[v],
-    )
+    patches = [p["version"] for p in reversed(RELEASE_HISTORY) if (STATS_DIR / p["version"]).is_dir()]
     if not patches:
         print("X нет папок data/stats/<patch>/ — нечего заполнять")
         return 1
-    print("Индексирую коммиты d2vpkr…")
-    commit_idx = fetch_commit_index()
-    if not commit_idx:
-        print("X не удалось получить список коммитов d2vpkr")
-        return 1
-    print("  {} коммитов, {}—{}".format(
-        len(commit_idx), commit_idx[0][0], commit_idx[-1][0]))
-
-    far_future = date(9999, 1, 1)
     written = skipped = missing = 0
     latest = patches[-1]
-    for i, ver in enumerate(patches):
+    for ver in patches:
         out_path = STATS_DIR / ver / "npc_units.json"
-        # Свежий патч всегда обновляем (в нём данные ещё могут доезжать).
         if out_path.exists() and not force and ver != latest:
             skipped += 1
             continue
-        win_end = patch_dates[patches[i + 1]] if i + 1 < len(patches) else far_future
-        sha = commit_for_window(commit_idx, win_end)
-        if not sha:
-            print("  - {}: нет коммита до {}".format(ver, win_end))
+        raw = game_files.npc(ver, "npc_units.txt")
+        if raw is None or "#base" in raw[:4096]:
+            print("  - {}: нет npc_units.txt в хранилище".format(ver))
             missing += 1
             continue
-        try:
-            parsed = parse_npc_units(fetch_raw(sha))
-        except Exception as e:  # noqa: BLE001 — сетевой/парсинг, продолжаем
-            print("  ! {}: ошибка {}".format(ver, e))
-            missing += 1
-            continue
+        parsed = parse_npc_units(raw)
         out_path.write_text(
             json.dumps(parsed, ensure_ascii=False, indent=0,
                        separators=(",", ":"), sort_keys=True),
             encoding="utf-8",
         )
         written += 1
-        print("  + {} ← d2vpkr {} ({} юнитов)".format(ver, sha[:7], len(parsed)))
+        print("  + {} ({} юнитов)".format(ver, len(parsed)))
     print("Готово: записано {}, пропущено {}, без данных {}".format(
         written, skipped, missing))
     return 0

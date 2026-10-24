@@ -1,8 +1,8 @@
 """An item's abilities as they were in a patch, as one-line texts for item_abilities_change():
 "Passive: Empower Spell. The next Unit Target spell ... Cooldown: 6s".
 
-Text = the game's tooltip of that patch (tools/loc_history.py, d2vpkr), numbers = that patch's items.txt
-(data/stats/<v>/items.txt or the items_history kept with the weights model). Nothing is invented: a
+Text = the game's tooltip of that patch (tools/loc_history.py), numbers = that patch's items.txt
+(data/stats/<v>/items.txt or the patch's own build in our game-files store). Nothing is invented: a
 placeholder the KV doesn't have leaves the ability out (returns None for the item).
 
     from tools.item_ability_text import item_abilities
@@ -19,16 +19,14 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "tools"))
 from builders.silent import parse_kv  # noqa: E402
 from loc_history import tooltip  # noqa: E402
+from tools import game_files  # noqa: E402
 
-HIST = os.path.join(HERE, "outputs", "valve-revealed-weights-20260915", "items_history")
 _KV = {}
 
 
 def _kv_path(v):
-    for p in (os.path.join(HERE, "data", "stats", v, "items.txt"), os.path.join(HIST, v, "items.txt")):
-        if os.path.exists(p):
-            return p
-    return None
+    p = os.path.join(HERE, "data", "stats", v, "items.txt")
+    return p if os.path.exists(p) else game_files.path(v, "scripts/npc/items.txt")
 
 
 def _items(v):

@@ -3,8 +3,8 @@
 
 Writes data/rules/item_stat_prices.json (read by patch/weights.py for item rows).
 
-Data: items.txt of every version — data/stats/<v>/items.txt when present, else the d2vpkr history
-kept with the weights model (outputs/valve-revealed-weights-20260915/items_history/<v>/items.txt).
+Data: items.txt of every version — data/stats/<v>/items.txt when present, else the patch's own build
+from our game-files store (tools/game_files.py; until 2026-10-24 the d2vpkr history).
 Which KV fields are STAT LINES comes from Valve's own tooltips (data/abilities_english.txt):
 `DOTA_Tooltip_ability_<item>_<field>` = "+$armor" / "%+Slow Resistance" is a row of the item's stat
 list; the label names the stat. Items missing from today's tooltips (removed items) use the
@@ -59,9 +59,8 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 from builders.silent import parse_kv  # noqa: E402
 from patch.meta import RELEASE_HISTORY  # noqa: E402
+from tools import game_files  # noqa: E402
 
-MODEL = os.path.join(HERE, "outputs", "valve-revealed-weights-20260915")
-HIST = os.path.join(MODEL, "items_history")
 OUT = os.path.join(HERE, "data", "rules", "item_stat_prices.json")
 LOC = os.path.join(HERE, "data", "abilities_english.txt")
 
@@ -189,8 +188,7 @@ def kv_path(v):
     p = os.path.join(HERE, "data", "stats", v, "items.txt")
     if os.path.exists(p):
         return p
-    p = os.path.join(HIST, v, "items.txt")
-    return p if os.path.exists(p) else None
+    return game_files.path(v, "scripts/npc/items.txt")
 
 
 def damage_block(vals):

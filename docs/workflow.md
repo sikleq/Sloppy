@@ -28,18 +28,23 @@ python tools/new_patch.py 7.42 --from enchant_values              # resume (afte
 | 2 | fetch | `scripts/fetch/extract_patchnotes.py <v> --local` or `fetch_gametracking.py <v> [--ref]` | yes (pick the patch's build: `tests/test_innate_history.py` fails on a snapshot taken before its patch) |
 | 3 | slim | `tools/slim_from_kv.py <v>` | yes |
 | 4 | meta | `build_site.py patch` (site_meta.json — before the top-ups, they map by date) | yes |
-| 5–8 | top-ups | `fetch_npc_history`, `fetch_hero_history`, `fetch_ability_history`, `fetch_itemlist` | yes |
-| 9 | shops | `scripts/fetch/extract_shops.py` | local game only |
-| 10–11 | shared tables | `tools/build_abilities_slim.py`, `tools/build_herolist.py` | yes |
-| 12 | innate_history | `tools/build_innate_history.py` (which ability is each hero's innate, per patch) | yes |
-| 13–14 | history | `tools/build_item_stat_lines.py`, `tools/build_talent_slots.py` | only with the weights model's KV history (`outputs/valve-revealed-weights-20260915`) |
-| 15 | loc_history | `tools/fetch_loc_history.py <prev> <v>` | yes |
+| 5 | store | `<store>/tools/build_store.py add <v> [--local]` — the patch's game files into our store (`--local`: from the installed game; with `--source gametracking`: from the archives); then push the store | only where the store is on this PC (`DOTA_FILES_DIR`) |
+| 6–9 | top-ups | `fetch_npc_history`, `fetch_hero_history`, `fetch_ability_history` (read the store), `fetch_itemlist` (Valve's datafeed) | yes |
+| 10 | shops | `scripts/fetch/extract_shops.py` | local game only |
+| 11–12 | shared tables | `tools/build_abilities_slim.py`, `tools/build_herolist.py` | yes |
+| 13 | innate_history | `tools/build_innate_history.py` (which ability is each hero's innate, per patch) | yes |
+| 14–15 | history | `tools/build_item_stat_lines.py`, `tools/build_talent_slots.py` | only where the store is on this PC |
 | 16 | draft | `generate_patch_code_v2.py <v>` | only while `content/p<code>.py` does not exist |
 | 17–18 | enchant | `scripts/gen/enchant_values.py`, `enchant_table.py <v>` | only when the content file has `enchant_tier_box()` |
 | 19 | build | `build_site.py` | yes |
 | 20 | check | `tools/patch_check.py <v>` (its exit code is the command's) | yes |
 
 Each step prints what it does; the first failure stops the run and prints the `--from` line to resume.
+The store (2026-10-24) is our private git repo of the game's plain-text files, one commit per patch, tag = version
+(local clone `C:\Users\sikle\dota-patch-files`, env `DOTA_FILES_DIR`); what it holds and how each patch's build is
+chosen is in its own README (`dota-patch-files/README.md`) — not repeated here. Sloppy reads it only through
+`tools/game_files.py` (`read` / `read_bytes` / `path` / `listing` / `npc` / `versions`). After the `store` step push
+the store.
 **Still human** (printed at the end): proofread `_generated_p_<v>_v2.py` into `content/p<code>.py` (Steps 4–5 below)
 and run the command again `--from enchant_values`; new slugs / icons (Step 5); the map, when the map file changed —
 SHA-1 of the game's `maps/dota.vpk` against the previous patch's row in `data/map/patch_maps.json` (GameTracking has
@@ -65,10 +70,10 @@ input that builders + audits consume. Refresh the JSON-derived files via
 the fetch scripts in `scripts/fetch/`:
 
 ```powershell
-python scripts/fetch/fetch_npc_history.py     # npc_units.json
-python scripts/fetch/fetch_hero_history.py    # heroes_raw.json
-python scripts/fetch/fetch_ability_history.py # npc_abilities.json
-python scripts/fetch/fetch_itemlist.py        # itemlist.json
+python scripts/fetch/fetch_npc_history.py     # npc_units.json (from the store)
+python scripts/fetch/fetch_hero_history.py    # heroes_raw.json (from the store)
+python scripts/fetch/fetch_ability_history.py # npc_abilities.json (from the store)
+python scripts/fetch/fetch_itemlist.py        # itemlist.json (Valve's datafeed)
 ```
 
 `data/stats/<version>/` must end up with this exact set of files
@@ -90,29 +95,27 @@ The per-hero KV files in `heroes/` are checked against the hero list in
 
 The four scripts above only *top up* an existing `data/stats/<version>/`
 directory — they never create it. The base of the snapshot (the raw Valve KV
-`.txt` files, their slim JSON parses, and the `heroes/` dir) comes from
-**dotabuff/d2vpkr**, whose `Client NNNN` commits land within a day of a patch:
+`.txt` files, their slim JSON parses, and the `heroes/` dir) comes from the game
+itself (below: the live VPK, or GameTracking when the game is not at hand); the
+parsers are the extractors in `tools/fetch_stats.py` (`extract_heroes` →
+`heroes.json`, `extract_items` → `items.json`, `extract_units` → `units.json`,
+`extract_abilities` → `abilities.json`, `extract_ability_ids` →
+`ability_ids.json`), run by `tools/slim_from_kv.py` — the same parsers that
+produced every historical snapshot, so the JSON shape stays stable.
 
-1. Pick the first `dota/scripts/npc/npc_heroes.txt` commit dated **after** the
-   patch release (GitHub API `…/commits?path=…&per_page=1` right after a patch).
-2. From that SHA download `items.txt`, `npc_units.txt`, `npc_heroes.txt`,
-   `npc_abilities.txt`, `npc_ability_ids.txt` and every file in
-   `dota/scripts/npc/heroes/`; write them into `data/stats/<version>/` verbatim.
-3. Parse each root KV into its slim JSON with the extractors in
-   `tools/fetch_stats.py` (`extract_heroes` → `heroes.json`,
-   `extract_items` → `items.json`, `extract_units` → `units.json`,
-   `extract_abilities` → `abilities.json`, `extract_ability_ids` →
-   `ability_ids.json`) — same parsers that produced every historical snapshot,
-   so the JSON shape stays stable.
-4. Only then run the four `scripts/fetch/*.py` scripts; they read
-   `data/site_meta.json` patch dates and fill in `npc_units.json`,
-   `npc_abilities.json`, `heroes_raw.json`.
+Then add the patch to the store (`build_store.py add <v> [--local]` in the store
+repo, then push it: the store step of `tools/new_patch.py`) and run the three
+store top-ups (`fetch_npc_history`, `fetch_hero_history`, `fetch_ability_history`);
+they read `data/site_meta.json` patch dates and the patch's own build from the
+store (`tools/game_files.py`) and fill in `npc_units.json`, `npc_abilities.json`,
+`heroes_raw.json`. Until 2026-10-24 they read dotabuff/d2vpkr ("the last commit
+before the next patch" — the end-of-patch state, not the patch's own).
 
 Sanity-check the snapshot against the patch notes before trusting it — a
 couple of "decreased by N" rows (e.g. a base-armor or base-regen change)
 should match the KV diff between the previous version and the new one.
 
-**Fast path (minutes after release, no d2vpkr wait):** once Steam has updated the client, write the
+**Fast path (minutes after release):** once Steam has updated the client, write the
 raw KV straight from the live VPK (the same paths `scripts/fetch/extract_patchnotes.py` uses; keep
 `data/stats/**` LF per `.gitattributes`), then derive the slim JSONs locally:
 
@@ -176,7 +179,7 @@ python tools/refresh_weights_data.py --fast   # skip that pass (enough when no t
 | File | What | Source |
 |---|---|---|
 | `data/rules/ability_priority.json` | share of the first 10 skill points per ability → 0.7–1.3 multiplier | **match database** (path in `MATCH_DB` / `.sloppy/match_db.txt`, table `ability_builds`, last 365 days); OpenDota only for heroes it has no builds for (30 of 127 on 2026-09-18) |
-| `data/rules/talent_shift.json`, `talent_tiers.json` | talent replacements: pick-share shift + level moves | research folder `outputs/valve-revealed-weights-20260915` (KV history); new patch windows from **the match database**, history cached from OpenDota |
+| `data/rules/talent_shift.json`, `talent_tiers.json` | talent replacements: pick-share shift + level moves | research folder `outputs/valve-revealed-weights-20260915` (KV of each patch from the store, `common.game_file`); new patch windows from **the match database**, history cached from OpenDota |
 
 Run it after a patch has been out for 2–3 weeks (there are no picks on day one) and monthly otherwise; a
 scheduled task does the monthly run. Then `python build_site.py`, tests, commit `data/rules/*.json`.
@@ -371,11 +374,12 @@ tracked as follow-up work, not yet done.
 
 ## Old tooltips of any patch (2026-09-27)
 
-`python tools/fetch_loc_history.py` keeps the game's localization of every patch (abilities, items, talents,
-facets, hero texts) in `outputs/loc_history/<version>/` (git-ignored, from d2vpkr: the last commit
-before the next patch). Read a tooltip as it was: `tools.loc_history.tooltip(key, "7.37e")` — numbers stay as
-%placeholders%, fill them from that patch's KV. Run it after every new patch (only missing versions are fetched).
-Old descriptions on the site (ability_change / item_abilities_change) come from here — never invented.
+`tools/loc_history.py` reads the game's localization of any patch (abilities, items, talents, facets, hero texts) from
+the store — `resource/localization/{abilities,dota}_english.txt` of the patch's own build, before 7.20 the single
+`resource/dota_english.txt` (until 2026-10-24: `tools/fetch_loc_history.py` and a git-ignored `outputs/loc_history/`
+from d2vpkr — both gone, nothing to run after a new patch: the `store` step of `tools/new_patch.py` covers it). Read a
+tooltip as it was: `tools.loc_history.tooltip(key, "7.37e")` — numbers stay as %placeholders%, fill them from that
+patch's KV. Old descriptions on the site (ability_change / item_abilities_change) come from here — never invented.
 
 ## Liquipedia cache (2026-10-23)
 
@@ -390,11 +394,10 @@ pages, gzip, stop on 429) — never call the Liquipedia API directly (2026-10-23
 
 `data/stats/<v>/items.json` keeps only cost, cooldown and mana fields (full `items.txt` only from 7.41c). For any
 other field or the shop category use `python tools/item_history.py <item_x> <version> [...] [--show]` (any patch
-since 7.08): it reads `items.txt`, `neutral_items.txt` and `shops.txt` of the patch's own build from local clones of
-two archives of the game's plain-text files — SteamTracking/GameTracking-Dota2 (2016 … 2023-02, `GAMETRACKING_DIR`) and
-muk-as/DOTA2_CLIENT (2023-03 …, `DOTA2_CLIENT_DIR`) — and prints every changed field against the previous patch.
-The patch's build = the first build with its notes and without the next patch's notes, then the last release-night
-fix within 12 h (values reach the notes only there: 7.27, 7.31). Commit dates are archiving dates, not build dates.
-Patches whose notes never shipped in the game (7.20, 7.20b, 7.23, 7.28) take the first `items.txt` change of the
-release day and say so. Checked 2026-10-24 against the slim snapshots: all 118 patches map to a build; the remaining
+since 7.08): it reads `items.txt`, `neutral_items.txt` and `shops.txt` of the patch's own build from the store
+(`tools/game_files.py`; until 2026-10-24 from local clones of the GameTracking and DOTA2_CLIENT archives) and prints every
+changed field against the previous patch. The patch's build = the first build with its notes and without the next
+patch's notes, plus release-night fixes within 12 h (values reach the notes only there: 7.27, 7.31); how it is chosen
+is in the store's README. Patches whose notes never shipped in the game (7.20, 7.20b, 7.23, 7.28) take the first
+`items.txt` change of the release day. Checked 2026-10-24 against the slim snapshots: all 118 patches map to a build; the remaining
 differences are snapshot errors (7.23, 7.23a, 7.33d, 7.33e, 7.34d items). Tests: `tests/test_item_history.py`.
