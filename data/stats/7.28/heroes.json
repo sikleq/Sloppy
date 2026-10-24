@@ -2081,9 +2081,9 @@
     "Ability8": "keeper_of_the_light_spirit_form_illuminate",
     "AbilityDraftAbilities": {
       "Ability1": "keeper_of_the_light_illuminate",
-      "Ability2": "keeper_of_the_light_radiant_bind",
+      "Ability2": "keeper_of_the_light_blinding_light",
       "Ability3": "keeper_of_the_light_chakra_magic",
-      "Ability4": "keeper_of_the_light_spirit_form"
+      "Ability4": "keeper_of_the_light_will_o_wisp"
     },
     "ArmorPhysical": -1.0,
     "AttackDamageMin": 18,
@@ -2101,12 +2101,13 @@
   },
   "npc_dota_hero_wisp": {
     "Ability1": "wisp_tether",
-    "Ability2": "wisp_spirits",
-    "Ability3": "wisp_overcharge",
-    "Ability4": "wisp_spirits_in",
-    "Ability5": "wisp_spirits_out",
+    "Ability2": "wisp_overcharge",
+    "Ability3": "wisp_spirits",
+    "Ability4": "wisp_spirits_out",
+    "Ability5": "generic_hidden",
     "Ability6": "wisp_relocate",
     "Ability7": "wisp_tether_break",
+    "Ability8": "wisp_spirits_in",
     "ArmorPhysical": 1,
     "AttackDamageMin": 28,
     "AttackDamageMax": 34,
@@ -2880,7 +2881,7 @@
     "AttributeStrengthGain": 1.8,
     "AttributeBaseIntelligence": 21,
     "AttributeIntelligenceGain": 2.9,
-    "AttributeBaseAgility": 24,
+    "AttributeBaseAgility": 28,
     "AttributeAgilityGain": 3.6,
     "StatusHealthRegen": 0.25,
     "MovementSpeed": 320

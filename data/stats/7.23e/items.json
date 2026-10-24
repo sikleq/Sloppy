@@ -1431,6 +1431,7 @@
     "ItemCost": 80
   },
   "item_tome_of_knowledge": {
+    "AbilityCooldown": 300.0,
     "ItemCost": 150
   },
   "item_recipe_veil_of_discord": {

@@ -74,6 +74,20 @@ def test_real_axe_history_combines_base_hp_and_strength_coefficient_changes():
     assert history(snaps) == "7.33|20.04.2023|V|700|670|hi"
 
 
+def test_change_with_its_own_note_is_not_shifted_to_the_previous_patch(monkeypatch):
+    # 2026-10-24: Beastmaster 7.34d "Base Armor decreased by 1" went to 7.34c because 7.34c had a Hawk health note
+    monkeypatch.setattr(hs, "_PATCHNOTE_EVENTS", {("axe", "StatusHealth"): ["7.34c", "7.34d"]})
+    result = history({"7.34c": snapshot(base_hp=200), "7.34d": snapshot(base_hp=150)}, mode="base")
+    assert result.startswith("7.34d|")
+
+
+def test_change_without_its_own_note_still_takes_the_previous_patchs_note(monkeypatch):
+    # 7.14 Axe "+5 movement speed": the files settled on it only in the 7.15 build
+    monkeypatch.setattr(hs, "_PATCHNOTE_EVENTS", {("axe", "StatusHealth"): ["7.34c"]})
+    result = history({"7.34c": snapshot(base_hp=200), "7.34d": snapshot(base_hp=150)}, mode="base")
+    assert result.startswith("7.34c|")
+
+
 def test_global_hp_change_is_not_shifted_to_an_earlier_hero_note(monkeypatch):
     monkeypatch.setattr(hs, "_PATCHNOTE_EVENTS", {("axe", "AttributeBaseStrength"): ["7.32e"]})
     snap = snapshot()

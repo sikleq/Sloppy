@@ -314,7 +314,7 @@
   "npc_dota_hero_morphling": {
     "Ability1": "morphling_waveform",
     "Ability2": "morphling_adaptive_strike_agi",
-    "Ability3": "generic_hidden",
+    "Ability3": "morphling_ebb_and_flow",
     "Ability4": "morphling_morph_agi",
     "Ability5": "morphling_morph_str",
     "Ability6": "morphling_replicate",
@@ -829,7 +829,7 @@
     "Ability4": "tidehunter_dead_in_the_water",
     "Ability5": "generic_hidden",
     "Ability6": "tidehunter_ravage",
-    "Ability7": "tidehunter_leviathans_catch",
+    "Ability7": "tidehunter_krill_eater",
     "AbilityDraftAbilities": {
       "Ability1": "tidehunter_gush",
       "Ability2": "tidehunter_kraken_shell",
@@ -1056,7 +1056,7 @@
     "Ability7": "generic_hidden",
     "AbilityDraftAbilities": {
       "Ability1": "beastmaster_wild_axes",
-      "Ability2": "beastmaster_summon_razorback",
+      "Ability2": "beastmaster_summon_raptor",
       "Ability3": "beastmaster_summon_raptor",
       "Ability4": "beastmaster_primal_roar"
     },
@@ -2899,8 +2899,8 @@
     "Ability1": "elder_titan_echo_stomp",
     "Ability2": "elder_titan_ancestral_spirit",
     "Ability3": "elder_titan_natural_order",
-    "Ability4": "elder_titan_move_spirit",
-    "Ability5": "elder_titan_momentum",
+    "Ability4": "elder_titan_momentum",
+    "Ability5": "elder_titan_move_spirit",
     "Ability6": "elder_titan_earth_splitter",
     "Ability7": "elder_titan_return_spirit",
     "AbilityDraftAbilities": {
@@ -3241,7 +3241,7 @@
     "Ability5": "monkey_king_mischief",
     "Ability6": "monkey_king_wukongs_command",
     "Ability7": "monkey_king_primal_spring_early",
-    "Ability8": "monkey_king_untransform",
+    "Ability8": "monkey_king_transfiguration",
     "AbilityDraftAbilities": {
       "Ability1": "monkey_king_boundless_strike",
       "Ability2": "monkey_king_tree_dance",

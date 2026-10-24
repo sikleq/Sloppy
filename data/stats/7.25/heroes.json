@@ -315,8 +315,8 @@
       "Ability2": "puck_phase_shift",
       "Ability3": "puck_dream_coil"
     },
-    "AttackDamageMin": 23,
-    "AttackDamageMax": 34,
+    "AttackDamageMin": 21,
+    "AttackDamageMax": 32,
     "AttackRate": 1.7,
     "AttackRange": 550,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
@@ -465,7 +465,7 @@
     "Ability5": "generic_hidden",
     "Ability6": "vengefulspirit_nether_swap",
     "AttackDamageMin": 21,
-    "AttackDamageMax": 29,
+    "AttackDamageMax": 31,
     "AttackRate": 1.7,
     "AttackRange": 400,
     "AttributePrimary": "DOTA_ATTRIBUTE_AGILITY",
@@ -773,7 +773,7 @@
     "Ability6": "sniper_assassinate",
     "ArmorPhysical": -1,
     "AttackDamageMin": 19,
-    "AttackDamageMax": 25,
+    "AttackDamageMax": 24,
     "AttackRate": 1.7,
     "AttackRange": 550,
     "AttributePrimary": "DOTA_ATTRIBUTE_AGILITY",
@@ -1030,7 +1030,7 @@
     "AttributeBaseIntelligence": 20,
     "AttributeIntelligenceGain": 2.0,
     "StatusHealthRegen": 0.25,
-    "MovementSpeed": 305
+    "MovementSpeed": 300
   },
   "npc_dota_hero_viper": {
     "Ability1": "viper_poison_attack",
@@ -1063,8 +1063,7 @@
     "AbilityDraftAbilities": {
       "Ability1": "luna_lucent_beam",
       "Ability2": "luna_moon_glaive",
-      "Ability3": "luna_lunar_blessing",
-      "Ability4": "luna_eclipse"
+      "Ability3": "luna_lunar_blessing"
     },
     "ArmorPhysical": 0,
     "AttackDamageMin": 29,
@@ -1339,7 +1338,7 @@
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_STRENGTH",
     "AttributeBaseStrength": 23,
-    "AttributeStrengthGain": 3.0,
+    "AttributeStrengthGain": 3.2,
     "AttributeBaseIntelligence": 15,
     "AttributeIntelligenceGain": 1.6,
     "AttributeBaseAgility": 18,
@@ -1584,7 +1583,7 @@
     "AttributeAgilityGain": 2.4,
     "AttributeBaseIntelligence": 16,
     "AttributeIntelligenceGain": 1.5,
-    "MovementSpeed": 310,
+    "MovementSpeed": 315,
     "StatusHealthRegen": 0.5
   },
   "npc_dota_hero_spirit_breaker": {
@@ -1730,12 +1729,6 @@
     "Ability4": "lycan_wolf_bite",
     "Ability5": "generic_hidden",
     "Ability6": "lycan_shapeshift",
-    "AbilityDraftAbilities": {
-      "Ability1": "lycan_summon_wolves",
-      "Ability2": "lycan_howl",
-      "Ability3": "lycan_feral_impulse",
-      "Ability4": "lycan_shapeshift"
-    },
     "ArmorPhysical": -1,
     "AttackDamageMin": 30,
     "AttackDamageMax": 35,
@@ -2807,12 +2800,6 @@
     "Ability4": "snapfire_gobble_up",
     "Ability5": "snapfire_spit_creep",
     "Ability6": "snapfire_mortimer_kisses",
-    "AbilityDraftAbilities": {
-      "Ability1": "snapfire_scatterblast",
-      "Ability2": "snapfire_firesnap_cookie",
-      "Ability3": "snapfire_lil_shredder",
-      "Ability4": "snapfire_mortimer_kisses"
-    },
     "ArmorPhysical": 0,
     "AttackDamageMin": 26,
     "AttackDamageMax": 32,

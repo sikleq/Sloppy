@@ -55,7 +55,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "axe_culling_blade",
-    "ArmorPhysical": -2,
+    "ArmorPhysical": -1,
     "AttackDamageMin": 24,
     "AttackDamageMax": 28,
     "AttackRate": 1.7,
@@ -68,7 +68,7 @@
     "AttributeBaseAgility": 20,
     "AttributeAgilityGain": 2.2,
     "StatusHealthRegen": 4.25,
-    "MovementSpeed": 285
+    "MovementSpeed": 290
   },
   "npc_dota_hero_bane": {
     "Ability1": "bane_enfeeble",
@@ -126,7 +126,7 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 18,
+    "AttributeBaseStrength": 16,
     "AttributeStrengthGain": 2.0,
     "AttributeBaseIntelligence": 16,
     "AttributeIntelligenceGain": 2.9,
@@ -162,7 +162,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "earthshaker_echo_slam",
-    "ArmorPhysical": 0,
+    "ArmorPhysical": 1,
     "AttackDamageMin": 24,
     "AttackDamageMax": 34,
     "AttackRate": 1.7,
@@ -175,7 +175,7 @@
     "AttributeBaseAgility": 12,
     "AttributeAgilityGain": 1.4,
     "StatusHealthRegen": 2.0,
-    "MovementSpeed": 305
+    "MovementSpeed": 310
   },
   "npc_dota_hero_juggernaut": {
     "Ability1": "juggernaut_blade_fury",
@@ -305,7 +305,7 @@
     "AttackRate": 1.7,
     "AttackRange": 550,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 17,
+    "AttributeBaseStrength": 15,
     "AttributeStrengthGain": 2.0,
     "AttributeBaseIntelligence": 25,
     "AttributeIntelligenceGain": 2.4,
@@ -320,7 +320,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "pudge_dismember",
-    "ArmorPhysical": -2,
+    "ArmorPhysical": -1,
     "AttackDamageMin": 27,
     "AttackDamageMax": 33,
     "AttackRate": 1.7,
@@ -332,7 +332,7 @@
     "AttributeIntelligenceGain": 1.5,
     "AttributeBaseAgility": 14,
     "AttributeAgilityGain": 1.5,
-    "MovementSpeed": 275
+    "MovementSpeed": 280
   },
   "npc_dota_hero_razor": {
     "ArmorPhysical": -1,
@@ -362,7 +362,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "sandking_epicenter",
-    "ArmorPhysical": -1,
+    "ArmorPhysical": 0,
     "AttackDamageMin": 25,
     "AttackDamageMax": 41,
     "AttackRate": 1.7,
@@ -374,7 +374,7 @@
     "AttributeIntelligenceGain": 1.8,
     "AttributeBaseAgility": 19,
     "AttributeAgilityGain": 2.1,
-    "MovementSpeed": 285
+    "MovementSpeed": 290
   },
   "npc_dota_hero_storm_spirit": {
     "Ability1": "storm_spirit_static_remnant",
@@ -389,7 +389,7 @@
     "AttackRate": 1.7,
     "AttackRange": 480,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 21,
+    "AttributeBaseStrength": 19,
     "AttributeStrengthGain": 1.8,
     "AttributeBaseIntelligence": 24,
     "AttributeIntelligenceGain": 3.0,
@@ -404,7 +404,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "sven_gods_strength",
-    "ArmorPhysical": 1,
+    "ArmorPhysical": 2,
     "AttackDamageMin": 41,
     "AttackDamageMax": 43,
     "AttackRate": 1.8,
@@ -416,7 +416,7 @@
     "AttributeIntelligenceGain": 1.3,
     "AttributeBaseAgility": 21,
     "AttributeAgilityGain": 2.0,
-    "MovementSpeed": 285
+    "MovementSpeed": 290
   },
   "npc_dota_hero_tiny": {
     "Ability1": "tiny_avalanche",
@@ -444,7 +444,7 @@
     "AttributeBaseAgility": 0,
     "AttributeAgilityGain": 0.0,
     "StatusHealthRegen": 1.5,
-    "MovementSpeed": 280
+    "MovementSpeed": 285
   },
   "npc_dota_hero_vengefulspirit": {
     "Ability1": "vengefulspirit_magic_missile",
@@ -480,7 +480,7 @@
     "AttackRate": 1.5,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 17,
+    "AttributeBaseStrength": 15,
     "AttributeStrengthGain": 2.8,
     "AttributeBaseIntelligence": 22,
     "AttributeIntelligenceGain": 2.6,
@@ -507,7 +507,7 @@
     "AttackRate": 1.7,
     "AttackRange": 380,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 21,
+    "AttributeBaseStrength": 19,
     "AttributeStrengthGain": 2.6,
     "AttributeBaseIntelligence": 22,
     "AttributeIntelligenceGain": 2.7,
@@ -523,7 +523,7 @@
     "Ability5": "generic_hidden",
     "Ability6": "kunkka_ghostship",
     "Ability7": "kunkka_return",
-    "ArmorPhysical": 1,
+    "ArmorPhysical": 2,
     "AttackDamageMin": 26,
     "AttackDamageMax": 36,
     "AttackRate": 1.7,
@@ -535,7 +535,7 @@
     "AttributeIntelligenceGain": 1.5,
     "AttributeBaseAgility": 14,
     "AttributeAgilityGain": 1.3,
-    "MovementSpeed": 295
+    "MovementSpeed": 300
   },
   "npc_dota_hero_lina": {
     "Ability1": "lina_dragon_slave",
@@ -550,7 +550,7 @@
     "AttackRate": 1.6,
     "AttackRange": 670,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 20,
+    "AttributeBaseStrength": 18,
     "AttributeStrengthGain": 1.8,
     "AttributeBaseIntelligence": 30,
     "AttributeIntelligenceGain": 3.2,
@@ -571,7 +571,7 @@
     "AttackRate": 1.7,
     "AttackRange": 550,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 20,
+    "AttributeBaseStrength": 18,
     "AttributeStrengthGain": 1.85,
     "AttributeBaseIntelligence": 18,
     "AttributeIntelligenceGain": 3.25,
@@ -592,7 +592,7 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 18,
+    "AttributeBaseStrength": 16,
     "AttributeStrengthGain": 2.0,
     "AttributeBaseIntelligence": 20,
     "AttributeIntelligenceGain": 3.0,
@@ -613,7 +613,7 @@
     "AttackRate": 1.7,
     "AttackRange": 400,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 23,
+    "AttributeBaseStrength": 21,
     "AttributeStrengthGain": 2.1,
     "AttributeBaseIntelligence": 21,
     "AttributeIntelligenceGain": 3.0,
@@ -628,12 +628,12 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "slardar_amplify_damage",
-    "ArmorPhysical": 2,
+    "ArmorPhysical": 3,
     "AttackDamageMin": 30,
     "AttackDamageMax": 38,
     "AttackRate": 1.7,
     "AttackRange": 150,
-    "MovementSpeed": 285,
+    "MovementSpeed": 290,
     "AttributePrimary": "DOTA_ATTRIBUTE_STRENGTH",
     "AttributeBaseStrength": 21,
     "AttributeStrengthGain": 3.1,
@@ -649,7 +649,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "tidehunter_ravage",
-    "ArmorPhysical": 0,
+    "ArmorPhysical": 1,
     "AttackDamageMin": 25,
     "AttackDamageMax": 31,
     "AttackRate": 1.7,
@@ -661,7 +661,7 @@
     "AttributeIntelligenceGain": 1.7,
     "AttributeBaseAgility": 15,
     "AttributeAgilityGain": 1.5,
-    "MovementSpeed": 300
+    "MovementSpeed": 305
   },
   "npc_dota_hero_witch_doctor": {
     "Ability1": "witch_doctor_paralyzing_cask",
@@ -676,7 +676,7 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 18,
+    "AttributeBaseStrength": 16,
     "AttributeStrengthGain": 2.1,
     "AttributeBaseIntelligence": 24,
     "AttributeIntelligenceGain": 2.9,
@@ -718,7 +718,7 @@
     "AttackRate": 1.7,
     "AttackRange": 500,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 21,
+    "AttributeBaseStrength": 19,
     "AttributeStrengthGain": 2.4,
     "AttributeBaseIntelligence": 20,
     "AttributeIntelligenceGain": 3.4,
@@ -781,8 +781,8 @@
     "AttackRate": 1.7,
     "AttackRange": 550,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 18,
-    "AttributeStrengthGain": 2.6,
+    "AttributeBaseStrength": 16,
+    "AttributeStrengthGain": 2.3,
     "AttributeBaseIntelligence": 22,
     "AttributeIntelligenceGain": 2.5,
     "AttributeBaseAgility": 15,
@@ -802,7 +802,7 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 24,
+    "AttributeBaseStrength": 22,
     "AttributeStrengthGain": 2.8,
     "AttributeBaseIntelligence": 24,
     "AttributeIntelligenceGain": 2.7,
@@ -817,7 +817,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "beastmaster_primal_roar",
-    "ArmorPhysical": 1,
+    "ArmorPhysical": 2,
     "AttackDamageMin": 41,
     "AttackDamageMax": 45,
     "AttackRate": 1.7,
@@ -829,7 +829,7 @@
     "AttributeIntelligenceGain": 1.9,
     "AttributeBaseAgility": 18,
     "AttributeAgilityGain": 1.6,
-    "MovementSpeed": 305
+    "MovementSpeed": 310
   },
   "npc_dota_hero_queenofpain": {
     "Ability1": "queenofpain_shadow_strike",
@@ -844,8 +844,8 @@
     "AttackRate": 1.5,
     "AttackRange": 550,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 18,
-    "AttributeStrengthGain": 2.3,
+    "AttributeBaseStrength": 16,
+    "AttributeStrengthGain": 2.0,
     "AttributeBaseIntelligence": 24,
     "AttributeIntelligenceGain": 2.5,
     "AttributeBaseAgility": 18,
@@ -902,7 +902,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "skeleton_king_reincarnation",
-    "ArmorPhysical": -1,
+    "ArmorPhysical": 0,
     "AttackDamageMin": 39,
     "AttackDamageMax": 41,
     "AttackRate": 1.7,
@@ -914,7 +914,7 @@
     "AttributeIntelligenceGain": 1.6,
     "AttributeBaseAgility": 18,
     "AttributeAgilityGain": 1.7,
-    "MovementSpeed": 295
+    "MovementSpeed": 300
   },
   "npc_dota_hero_death_prophet": {
     "Ability1": "death_prophet_carrion_swarm",
@@ -929,8 +929,8 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 19,
-    "AttributeStrengthGain": 2.9,
+    "AttributeBaseStrength": 17,
+    "AttributeStrengthGain": 2.6,
     "AttributeBaseAgility": 14,
     "AttributeAgilityGain": 1.4,
     "AttributeBaseIntelligence": 23,
@@ -972,8 +972,8 @@
     "AttackRate": 1.7,
     "AttackRange": 630,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 19,
-    "AttributeStrengthGain": 1.8,
+    "AttributeBaseStrength": 17,
+    "AttributeStrengthGain": 1.5,
     "AttributeBaseAgility": 16,
     "AttributeAgilityGain": 1.0,
     "AttributeBaseIntelligence": 26,
@@ -1066,7 +1066,7 @@
       "Ability2": "dragon_knight_dragon_tail",
       "Ability3": "dragon_knight_dragon_blood"
     },
-    "ArmorPhysical": 0,
+    "ArmorPhysical": 1,
     "AttackDamageMin": 31,
     "AttackDamageMax": 37,
     "AttackRate": 1.7,
@@ -1078,7 +1078,7 @@
     "AttributeAgilityGain": 2.0,
     "AttributeBaseIntelligence": 15,
     "AttributeIntelligenceGain": 1.7,
-    "MovementSpeed": 285
+    "MovementSpeed": 290
   },
   "npc_dota_hero_dazzle": {
     "Ability1": "dazzle_poison_touch",
@@ -1093,7 +1093,7 @@
     "AttackRate": 1.7,
     "AttackRange": 550,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 18,
+    "AttributeBaseStrength": 16,
     "AttributeStrengthGain": 2.15,
     "AttributeBaseIntelligence": 27,
     "AttributeIntelligenceGain": 3.4,
@@ -1108,7 +1108,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "rattletrap_hookshot",
-    "ArmorPhysical": -1,
+    "ArmorPhysical": 0,
     "AttackDamageMin": 28,
     "AttackDamageMax": 30,
     "AttackRate": 1.7,
@@ -1120,7 +1120,7 @@
     "AttributeAgilityGain": 2.3,
     "AttributeBaseIntelligence": 17,
     "AttributeIntelligenceGain": 1.3,
-    "MovementSpeed": 310
+    "MovementSpeed": 315
   },
   "npc_dota_hero_leshrac": {
     "Ability1": "leshrac_split_earth",
@@ -1135,8 +1135,8 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 18,
-    "AttributeStrengthGain": 2.1,
+    "AttributeBaseStrength": 16,
+    "AttributeStrengthGain": 1.8,
     "AttributeBaseIntelligence": 26,
     "AttributeIntelligenceGain": 3,
     "AttributeBaseAgility": 23,
@@ -1156,8 +1156,8 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 21,
-    "AttributeStrengthGain": 2.4,
+    "AttributeBaseStrength": 19,
+    "AttributeStrengthGain": 2.1,
     "AttributeBaseIntelligence": 25,
     "AttributeIntelligenceGain": 2.9,
     "AttributeBaseAgility": 18,
@@ -1178,7 +1178,7 @@
       "Ability2": "life_stealer_feast",
       "Ability3": "life_stealer_open_wounds"
     },
-    "ArmorPhysical": -2,
+    "ArmorPhysical": -1,
     "AttackDamageMin": 27,
     "AttackDamageMax": 37,
     "AttackRate": 1.85,
@@ -1190,7 +1190,7 @@
     "AttributeIntelligenceGain": 1.75,
     "AttributeBaseAgility": 18,
     "AttributeAgilityGain": 1.9,
-    "MovementSpeed": 310
+    "MovementSpeed": 315
   },
   "npc_dota_hero_dark_seer": {
     "Ability1": "dark_seer_vacuum",
@@ -1205,8 +1205,8 @@
     "AttackRate": 1.7,
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 24,
-    "AttributeStrengthGain": 2.9,
+    "AttributeBaseStrength": 22,
+    "AttributeStrengthGain": 2.6,
     "AttributeBaseAgility": 12,
     "AttributeAgilityGain": 1.2,
     "AttributeBaseIntelligence": 23,
@@ -1241,7 +1241,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "omniknight_guardian_angel",
-    "ArmorPhysical": 2,
+    "ArmorPhysical": 3,
     "AttackDamageMin": 31,
     "AttackDamageMax": 41,
     "AttackRate": 1.7,
@@ -1253,7 +1253,7 @@
     "AttributeAgilityGain": 1.75,
     "AttributeBaseIntelligence": 15,
     "AttributeIntelligenceGain": 1.8,
-    "MovementSpeed": 300
+    "MovementSpeed": 305
   },
   "npc_dota_hero_enchantress": {
     "Ability1": "enchantress_untouchable",
@@ -1268,7 +1268,7 @@
     "AttackRate": 1.7,
     "AttackRange": 550,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 18,
+    "AttributeBaseStrength": 16,
     "AttributeStrengthGain": 1.3,
     "AttributeBaseAgility": 19,
     "AttributeAgilityGain": 1.8,
@@ -1283,7 +1283,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "huskar_life_break",
-    "ArmorPhysical": -2,
+    "ArmorPhysical": -1,
     "AttackDamageMin": 21,
     "AttackDamageMax": 30,
     "AttackRate": 1.6,
@@ -1295,7 +1295,7 @@
     "AttributeAgilityGain": 1.4,
     "AttributeBaseIntelligence": 18,
     "AttributeIntelligenceGain": 1.5,
-    "MovementSpeed": 290
+    "MovementSpeed": 295
   },
   "npc_dota_hero_night_stalker": {
     "Ability1": "night_stalker_void",
@@ -1304,7 +1304,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "night_stalker_darkness",
-    "ArmorPhysical": 2,
+    "ArmorPhysical": 3,
     "AttackDamageMin": 38,
     "AttackDamageMax": 42,
     "AttackRate": 1.7,
@@ -1317,7 +1317,7 @@
     "AttributeBaseAgility": 18,
     "AttributeAgilityGain": 2.25,
     "StatusHealthRegen": 3.25,
-    "MovementSpeed": 290
+    "MovementSpeed": 295
   },
   "npc_dota_hero_broodmother": {
     "Ability1": "broodmother_spawn_spiderlings",
@@ -1396,7 +1396,7 @@
     "AttackRate": 1.7,
     "AttackRange": 400,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 27,
+    "AttributeBaseStrength": 25,
     "AttributeStrengthGain": 2.6,
     "AttributeBaseIntelligence": 28,
     "AttributeIntelligenceGain": 2.8,
@@ -1417,7 +1417,7 @@
     "AttackRate": 1.7,
     "AttackRange": 375,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 25,
+    "AttributeBaseStrength": 23,
     "AttributeStrengthGain": 2.7,
     "AttributeBaseAgility": 15,
     "AttributeAgilityGain": 1.5,
@@ -1445,7 +1445,7 @@
     "AttackRate": 1.7,
     "AttackRange": 650,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 25,
+    "AttributeBaseStrength": 23,
     "AttributeStrengthGain": 1.8,
     "AttributeBaseAgility": 15,
     "AttributeAgilityGain": 2.1,
@@ -1504,7 +1504,7 @@
     "AttributeAgilityGain": 0.9,
     "AttributeBaseIntelligence": 15,
     "AttributeIntelligenceGain": 2.1,
-    "MovementSpeed": 285
+    "MovementSpeed": 290
   },
   "npc_dota_hero_ancient_apparition": {
     "Ability1": "ancient_apparition_cold_feet",
@@ -1520,7 +1520,7 @@
     "AttackRate": 1.7,
     "AttackRange": 675,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 20,
+    "AttributeBaseStrength": 18,
     "AttributeStrengthGain": 1.7,
     "AttributeBaseAgility": 20,
     "AttributeAgilityGain": 2.2,
@@ -1548,7 +1548,7 @@
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_AGILITY",
     "AttributeBaseStrength": 23,
-    "AttributeStrengthGain": 3.3,
+    "AttributeStrengthGain": 3.0,
     "AttributeBaseAgility": 18,
     "AttributeAgilityGain": 2.1,
     "AttributeBaseIntelligence": 16,
@@ -1563,7 +1563,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "spirit_breaker_nether_strike",
-    "ArmorPhysical": 2.0,
+    "ArmorPhysical": 3.0,
     "AttackDamageMin": 31,
     "AttackDamageMax": 41,
     "AttackRate": 1.9,
@@ -1576,7 +1576,7 @@
     "AttributeBaseIntelligence": 14,
     "AttributeIntelligenceGain": 1.8,
     "StatusHealthRegen": 1.0,
-    "MovementSpeed": 280
+    "MovementSpeed": 285
   },
   "npc_dota_hero_gyrocopter": {
     "Ability1": "gyrocopter_rocket_barrage",
@@ -1613,7 +1613,7 @@
     "Ability5": "generic_hidden",
     "Ability6": "alchemist_chemical_rage",
     "Ability7": "alchemist_unstable_concoction_throw",
-    "ArmorPhysical": -1,
+    "ArmorPhysical": 0,
     "AttackDamageMin": 24,
     "AttackDamageMax": 33,
     "AttackRate": 1.7,
@@ -1625,7 +1625,7 @@
     "AttributeAgilityGain": 1.2,
     "AttributeBaseIntelligence": 25,
     "AttributeIntelligenceGain": 1.8,
-    "MovementSpeed": 290
+    "MovementSpeed": 295
   },
   "npc_dota_hero_invoker": {
     "Ability1": "invoker_quas",
@@ -1642,7 +1642,7 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 18,
+    "AttributeBaseStrength": 16,
     "AttributeStrengthGain": 2.2,
     "AttributeBaseAgility": 14,
     "AttributeAgilityGain": 1.9,
@@ -1663,7 +1663,7 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 19,
+    "AttributeBaseStrength": 17,
     "AttributeStrengthGain": 2.5,
     "AttributeBaseAgility": 22,
     "AttributeAgilityGain": 3.0,
@@ -1711,7 +1711,7 @@
     "AttributeAgilityGain": 1.0,
     "AttributeBaseIntelligence": 17,
     "AttributeIntelligenceGain": 1.55,
-    "MovementSpeed": 300
+    "MovementSpeed": 305
   },
   "npc_dota_hero_brewmaster": {
     "Ability1": "brewmaster_thunder_clap",
@@ -1720,7 +1720,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "brewmaster_primal_split",
-    "ArmorPhysical": -2.0,
+    "ArmorPhysical": -1.0,
     "AttackDamageMin": 29,
     "AttackDamageMax": 36,
     "AttackRate": 1.7,
@@ -1733,7 +1733,7 @@
     "AttributeBaseIntelligence": 14,
     "AttributeIntelligenceGain": 1.25,
     "StatusHealthRegen": 2.0,
-    "MovementSpeed": 295
+    "MovementSpeed": 300
   },
   "npc_dota_hero_shadow_demon": {
     "Ability1": "shadow_demon_disruption",
@@ -1753,7 +1753,7 @@
     "AttackRate": 1.7,
     "AttackRange": 500,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 23,
+    "AttributeBaseStrength": 21,
     "AttributeStrengthGain": 2.2,
     "AttributeBaseAgility": 18,
     "AttributeAgilityGain": 2.2,
@@ -1791,7 +1791,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "chaos_knight_phantasm",
-    "ArmorPhysical": 1,
+    "ArmorPhysical": 2,
     "AttackDamageMin": 29,
     "AttackDamageMax": 59,
     "AttackRate": 1.7,
@@ -1803,7 +1803,7 @@
     "AttributeAgilityGain": 2.1,
     "AttributeBaseIntelligence": 16,
     "AttributeIntelligenceGain": 1.2,
-    "MovementSpeed": 320
+    "MovementSpeed": 325
   },
   "npc_dota_hero_meepo": {
     "Ability1": "meepo_earthbind",
@@ -1839,7 +1839,7 @@
       "Ability3": "treant_living_armor",
       "Ability4": "treant_overgrowth"
     },
-    "ArmorPhysical": -2,
+    "ArmorPhysical": -1,
     "AttackDamageMin": 62,
     "AttackDamageMax": 70,
     "AttackRate": 1.9,
@@ -1851,7 +1851,7 @@
     "AttributeAgilityGain": 2.0,
     "AttributeBaseIntelligence": 20,
     "AttributeIntelligenceGain": 1.8,
-    "MovementSpeed": 265
+    "MovementSpeed": 270
   },
   "npc_dota_hero_ogre_magi": {
     "Ability1": "ogre_magi_fireblast",
@@ -1871,7 +1871,7 @@
     "AttackRate": 1.7,
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 25,
+    "AttributeBaseStrength": 23,
     "AttributeStrengthGain": 3.5,
     "AttributeBaseAgility": 14,
     "AttributeAgilityGain": 1.55,
@@ -1887,7 +1887,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "undying_flesh_golem",
-    "ArmorPhysical": 2,
+    "ArmorPhysical": 3,
     "AttackDamageMin": 35,
     "AttackDamageMax": 43,
     "AttackRate": 1.7,
@@ -1899,7 +1899,7 @@
     "AttributeAgilityGain": 0.8,
     "AttributeBaseIntelligence": 27,
     "AttributeIntelligenceGain": 2.8,
-    "MovementSpeed": 305
+    "MovementSpeed": 310
   },
   "npc_dota_hero_rubick": {
     "Ability1": "rubick_telekinesis",
@@ -1916,7 +1916,7 @@
     "AttackRate": 1.7,
     "AttackRange": 550,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 21,
+    "AttributeBaseStrength": 19,
     "AttributeStrengthGain": 1.8,
     "AttributeBaseAgility": 14,
     "AttributeAgilityGain": 1.6,
@@ -1937,7 +1937,7 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 21,
+    "AttributeBaseStrength": 19,
     "AttributeStrengthGain": 2.2,
     "AttributeBaseAgility": 15,
     "AttributeAgilityGain": 1.4,
@@ -2017,7 +2017,7 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 16,
+    "AttributeBaseStrength": 14,
     "AttributeStrengthGain": 2.1,
     "AttributeBaseAgility": 15,
     "AttributeAgilityGain": 1.6,
@@ -2045,7 +2045,7 @@
     "AttributeAgilityGain": 1.6,
     "AttributeBaseIntelligence": 23,
     "AttributeIntelligenceGain": 1.7,
-    "MovementSpeed": 290
+    "MovementSpeed": 295
   },
   "npc_dota_hero_visage": {
     "Ability1": "visage_grave_chill",
@@ -2061,8 +2061,8 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 24,
-    "AttributeStrengthGain": 3.0,
+    "AttributeBaseStrength": 22,
+    "AttributeStrengthGain": 2.7,
     "AttributeBaseAgility": 11,
     "AttributeAgilityGain": 1.3,
     "AttributeBaseIntelligence": 24,
@@ -2144,7 +2144,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "centaur_stampede",
-    "ArmorPhysical": -1,
+    "ArmorPhysical": 0,
     "AttackDamageMin": 32,
     "AttackDamageMax": 34,
     "AttackRate": 1.7,
@@ -2156,7 +2156,7 @@
     "AttributeIntelligenceGain": 1.6,
     "AttributeBaseAgility": 15,
     "AttributeAgilityGain": 1.0,
-    "MovementSpeed": 295
+    "MovementSpeed": 300
   },
   "npc_dota_hero_magnataur": {
     "Ability1": "magnataur_shockwave",
@@ -2165,7 +2165,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "magnataur_reverse_polarity",
-    "ArmorPhysical": 1,
+    "ArmorPhysical": 2,
     "AttackDamageMin": 32,
     "AttackDamageMax": 44,
     "AttackRate": 1.8,
@@ -2178,7 +2178,7 @@
     "AttributeBaseAgility": 15,
     "AttributeAgilityGain": 2.5,
     "StatusHealthRegen": 2.0,
-    "MovementSpeed": 305
+    "MovementSpeed": 310
   },
   "npc_dota_hero_shredder": {
     "Ability1": "shredder_whirling_death",
@@ -2207,7 +2207,7 @@
     "AttributeAgilityGain": 1.3,
     "AttributeBaseIntelligence": 21,
     "AttributeIntelligenceGain": 2.4,
-    "MovementSpeed": 285
+    "MovementSpeed": 290
   },
   "npc_dota_hero_bristleback": {
     "Ability1": "bristleback_viscous_nasal_goo",
@@ -2216,7 +2216,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "bristleback_warpath",
-    "ArmorPhysical": 0.0,
+    "ArmorPhysical": 1.0,
     "AttackDamageMin": 22,
     "AttackDamageMax": 32,
     "AttackRate": 1.8,
@@ -2228,7 +2228,7 @@
     "AttributeAgilityGain": 1.8,
     "AttributeBaseIntelligence": 14,
     "AttributeIntelligenceGain": 2.8,
-    "MovementSpeed": 285
+    "MovementSpeed": 290
   },
   "npc_dota_hero_tusk": {
     "Ability1": "tusk_ice_shards",
@@ -2244,7 +2244,7 @@
       "Ability3": "tusk_frozen_sigil",
       "Ability4": "tusk_walrus_punch"
     },
-    "ArmorPhysical": -1.0,
+    "ArmorPhysical": 0.0,
     "AttackDamageMin": 27,
     "AttackDamageMax": 31,
     "AttackRate": 1.7,
@@ -2256,7 +2256,7 @@
     "AttributeAgilityGain": 2.1,
     "AttributeBaseIntelligence": 18,
     "AttributeIntelligenceGain": 1.7,
-    "MovementSpeed": 295
+    "MovementSpeed": 300
   },
   "npc_dota_hero_skywrath_mage": {
     "Ability1": "skywrath_mage_arcane_bolt",
@@ -2271,7 +2271,7 @@
     "AttackRate": 1.7,
     "AttackRange": 600,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 21,
+    "AttributeBaseStrength": 19,
     "AttributeStrengthGain": 1.8,
     "AttributeBaseAgility": 13,
     "AttributeAgilityGain": 0.8,
@@ -2286,7 +2286,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "abaddon_borrowed_time",
-    "ArmorPhysical": -2.0,
+    "ArmorPhysical": -1.0,
     "AttackDamageMin": 32,
     "AttackDamageMax": 42,
     "AttackRate": 1.7,
@@ -2298,7 +2298,7 @@
     "AttributeAgilityGain": 1.5,
     "AttributeBaseIntelligence": 21,
     "AttributeIntelligenceGain": 2.0,
-    "MovementSpeed": 305
+    "MovementSpeed": 310
   },
   "npc_dota_hero_elder_titan": {
     "Ability1": "elder_titan_echo_stomp",
@@ -2313,7 +2313,7 @@
       "Ability2": "elder_titan_natural_order",
       "Ability3": "elder_titan_earth_splitter"
     },
-    "ArmorPhysical": 0.0,
+    "ArmorPhysical": 1.0,
     "AttackDamageMin": 23,
     "AttackDamageMax": 33,
     "AttackRate": 1.7,
@@ -2325,7 +2325,7 @@
     "AttributeAgilityGain": 1.8,
     "AttributeBaseIntelligence": 23,
     "AttributeIntelligenceGain": 1.6,
-    "MovementSpeed": 310
+    "MovementSpeed": 315
   },
   "npc_dota_hero_legion_commander": {
     "Ability1": "legion_commander_overwhelming_odds",
@@ -2334,7 +2334,7 @@
     "Ability4": "generic_hidden",
     "Ability5": "generic_hidden",
     "Ability6": "legion_commander_duel",
-    "ArmorPhysical": -1.0,
+    "ArmorPhysical": 0.0,
     "AttackDamageMin": 35,
     "AttackDamageMax": 39,
     "AttackRate": 1.7,
@@ -2346,7 +2346,7 @@
     "AttributeAgilityGain": 1.7,
     "AttributeBaseIntelligence": 20,
     "AttributeIntelligenceGain": 2.2,
-    "MovementSpeed": 315
+    "MovementSpeed": 320
   },
   "npc_dota_hero_ember_spirit": {
     "AbilityDraftAbilities": {
@@ -2368,7 +2368,7 @@
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_AGILITY",
     "AttributeBaseStrength": 19,
-    "AttributeStrengthGain": 2.4,
+    "AttributeStrengthGain": 2.1,
     "AttributeBaseAgility": 22,
     "AttributeAgilityGain": 1.8,
     "AttributeBaseIntelligence": 20,
@@ -2383,7 +2383,7 @@
     "Ability4": "earth_spirit_stone_caller",
     "Ability5": "earth_spirit_petrify",
     "Ability6": "earth_spirit_magnetize",
-    "ArmorPhysical": 0.0,
+    "ArmorPhysical": 1.0,
     "AttackDamageMin": 25,
     "AttackDamageMax": 35,
     "AttackRate": 1.7,
@@ -2395,7 +2395,7 @@
     "AttributeAgilityGain": 1.5,
     "AttributeBaseIntelligence": 18,
     "AttributeIntelligenceGain": 2.1,
-    "MovementSpeed": 285
+    "MovementSpeed": 290
   },
   "npc_dota_hero_terrorblade": {
     "Ability1": "terrorblade_reflection",
@@ -2450,7 +2450,7 @@
     "AttributeIntelligenceGain": 1.8,
     "AttributeBaseAgility": 12,
     "AttributeAgilityGain": 1.3,
-    "MovementSpeed": 280
+    "MovementSpeed": 285
   },
   "npc_dota_hero_oracle": {
     "Ability1": "oracle_fortunes_end",
@@ -2465,7 +2465,7 @@
     "AttackRate": 1.4,
     "AttackRange": 620,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 20,
+    "AttributeBaseStrength": 18,
     "AttributeStrengthGain": 2.2,
     "AttributeBaseIntelligence": 23,
     "AttributeIntelligenceGain": 3.2,
@@ -2487,7 +2487,7 @@
     "AttackRate": 1.7,
     "AttackRange": 700,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 19,
+    "AttributeBaseStrength": 17,
     "AttributeStrengthGain": 2.3,
     "AttributeBaseIntelligence": 22,
     "AttributeIntelligenceGain": 2.9,
@@ -2534,7 +2534,7 @@
     "AttackRate": 1.7,
     "AttackRange": 425,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 26,
+    "AttributeBaseStrength": 24,
     "AttributeStrengthGain": 2.4,
     "AttributeBaseIntelligence": 26,
     "AttributeIntelligenceGain": 3.1,
@@ -2576,7 +2576,7 @@
     "Ability5": "generic_hidden",
     "Ability6": "abyssal_underlord_dark_rift",
     "Ability7": "abyssal_underlord_cancel_dark_rift",
-    "ArmorPhysical": 1.0,
+    "ArmorPhysical": 2.0,
     "AttackDamageMin": 37,
     "AttackDamageMax": 43,
     "AttackRate": 1.7,
@@ -2588,7 +2588,7 @@
     "AttributeAgilityGain": 1.3,
     "AttributeBaseIntelligence": 17,
     "AttributeIntelligenceGain": 2.6,
-    "MovementSpeed": 285
+    "MovementSpeed": 290
   },
   "npc_dota_hero_monkey_king": {
     "Ability1": "monkey_king_boundless_strike",
@@ -2655,7 +2655,7 @@
     "AttackRate": 1.3,
     "AttackRange": 475,
     "AttributePrimary": "DOTA_ATTRIBUTE_INTELLECT",
-    "AttributeBaseStrength": 20,
+    "AttributeBaseStrength": 18,
     "AttributeStrengthGain": 1.8,
     "AttributeBaseIntelligence": 20,
     "AttributeIntelligenceGain": 3.0,

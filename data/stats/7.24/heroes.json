@@ -1459,8 +1459,8 @@
     "AbilityDraftAbilities": {
       "Ability1": "chen_penitence",
       "Ability2": "chen_divine_favor",
-      "Ability3": "chen_holy_persuasion",
-      "Ability4": "chen_hand_of_god"
+      "Ability4": "chen_holy_persuasion",
+      "Ability5": "chen_hand_of_god"
     },
     "ArmorPhysical": -1,
     "AttackDamageMin": 25,

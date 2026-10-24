@@ -431,7 +431,7 @@
     "AttackRate": 1.9,
     "AttackRange": 150,
     "AttributePrimary": "DOTA_ATTRIBUTE_STRENGTH",
-    "AttributeBaseStrength": 22,
+    "AttributeBaseStrength": 23,
     "AttributeStrengthGain": 3.2,
     "AttributeBaseIntelligence": 16,
     "AttributeIntelligenceGain": 1.3,

@@ -33,8 +33,9 @@ sys.path.insert(0, str(ROOT))
 
 from tools.fetch_stats import PATCHNOTES_PATH, parse_kv  # noqa: E402
 
-ITEMS = "game/dota/pak01_dir/scripts/npc/items.txt"
-NEUTRALS = "game/dota/pak01_dir/scripts/npc/neutral_items.txt"
+NPC_DIRS = ("game/dota/pak01_dir/scripts/npc/", "game/dota/scripts/npc/")
+ITEMS = NPC_DIRS[0] + "items.txt"
+NEUTRALS = NPC_DIRS[0] + "neutral_items.txt"
 SHOPS = "game/dota/pak01_dir/scripts/shops.txt"
 OLD_NOTES_DIR = "game/dota/pak01_dir/scripts/patchnotes"          # patch_708.txt … until 7.18
 NOTES_PATHS = (PATCHNOTES_PATH,                                    # since 7.19
@@ -137,6 +138,15 @@ class Clone:
         except RuntimeError:
             return None
 
+    def npc(self, sha: str, name: str) -> str | None:
+        """scripts/npc/<name>: pak01_dir/ in most builds; npc_heroes / npc_units / npc_abilities sat in
+        game/dota/scripts/npc/ until about 2022 in GameTracking."""
+        for d in NPC_DIRS:
+            text = self.file(sha, d + name)
+            if text is not None:
+                return text
+        return None
+
     def has_notes(self, sha: str, version: str) -> bool:
         key = f'"DOTA_Patch_{version.replace(".", "_")}_'
         for path in NOTES_PATHS:
@@ -219,8 +229,8 @@ class Archive:
         if b["sha"] not in self._kv:
             c = self.clone(b["archive"])
             merged = {}
-            for path in (ITEMS, NEUTRALS):
-                text = c.file(b["sha"], path)
+            for name in ("items.txt", "neutral_items.txt"):
+                text = c.npc(b["sha"], name)
                 if text:
                     for root in parse_kv(text).values():
                         merged.update({k: v for k, v in root.items() if isinstance(v, dict)})

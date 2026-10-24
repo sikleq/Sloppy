@@ -1115,11 +1115,11 @@
     "StatusMana": 0
   },
   "npc_dota_observer_wards": {
-    "StatusHealth": 8,
+    "StatusHealth": 100,
     "StatusMana": 0
   },
   "npc_dota_sentry_wards": {
-    "StatusHealth": 8,
+    "StatusHealth": 100,
     "StatusMana": 0
   },
   "npc_dota_courier": {
