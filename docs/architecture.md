@@ -42,7 +42,7 @@ Helpers are imported in every `content/p*.py` via `from patch.api import *`.
 | `patch/page.py` | `write_head()` / `write_footer()` / `save_html()`; reads `styles.css` + `src/scripts.js` from disk, minifies into `dist/`, stamps a cache-busting `?v=` |
 | `patch/meta.py` | `PATCHES`, `RELEASE_HISTORY`, `latest_stats_version()` |
 | `patch/known_exceptions.py` | shared ability/icon allowlists (imported by audits AND builders so they cannot drift) |
-| `patch/rosters.py` | hero/item rosters, writes `_dynamics.json` |
+| `patch/rosters.py` | hero/item rosters, writes `.cache/_dynamics.json` (copied into `dist/`) |
 | `patch/index_page.py` / `patch/calendar.py` | landing "inventory book" + calendar/cadence infographic |
 | `content/p<version>.py` | per-patch `def build()` — auto-discovered, never imported manually |
 | `builders/build_patches.py` | orchestrator — walks `content/p*.py` in chronological order from `RELEASE_HISTORY` |

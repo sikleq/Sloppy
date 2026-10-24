@@ -53,7 +53,7 @@ renderer is **entity-agnostic**. `builders/heroes_dyn.py` passes the hero config
 `icon_dir="icons/items"`, `from_token="items_dyn"`, …). Both emit the SAME
 `class="creeps-table heroes-dyn-table"` so the shared CSS + `scripts.js`
 (`dynBuildMatrix`/`dynLayoutMatrix`/`dynSetupMatrix`) apply unchanged.
-- `patch/rosters.py` writes BOTH rosters into `_dynamics.json` (`heroes` = full
+- `patch/rosters.py` writes BOTH rosters into `.cache/_dynamics.json` (`heroes` = full
   HERO_SLUG roster; `items` = every `item|<slug>` entity touched in any tracked
   patch, with its icon slug stamped in `_register_entity`).
 - **Back-arrow token is data-driven:** each page sets `<body data-dyn-from=...>`;
@@ -230,7 +230,7 @@ matrix only draws the item's slots WITHIN its life:
   added/removed → nothing is blanked there (could be wired later via heroes.json).
 
 ### Hero Dynamics matrix (`builders/heroes_dyn.py`)
-- Reads **`_dynamics.json`** (written by `patch/rosters.py`): `patches` (newest-first), `entities`
+- Reads **`.cache/_dynamics.json`** (written by `patch/rosters.py`): `patches` (newest-first), `entities`
   (`hero|<slug>` → per-patch tag tallies), and **`heroes`** (full roster `[{name, icon, key}]`,
   added so every hero lists even if untouched in a rendered patch). `patch/rosters.py` also stamps an
   `icon` field on each hero entity. `builders/heroes_dyn.py` does **not** import `builders/build_patches.py` —

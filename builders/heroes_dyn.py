@@ -41,7 +41,7 @@ def _hero_attack_types() -> dict[str, dict[str, str]]:
     raw = _load_raw_heroes(latest)
     stats = _json.loads((_HERE / "data" / "stats" / latest / "heroes.json").read_text(encoding="utf-8"))
     out = {}
-    manifest = _json.loads((_HERE / "_dynamics.json").read_text(encoding="utf-8"))
+    manifest = _json.loads((_HERE / ".cache" / "_dynamics.json").read_text(encoding="utf-8"))
     for rec in manifest.get("heroes", []):
         slug = rec.get("icon") or rec["key"].split("|", 1)[-1]
         if slug == "spirit_bear":

@@ -192,7 +192,7 @@ Start-Process python -ArgumentList "-m http.server 8765 --directory dist"
 
 ## Источники данных по рельефу (terrain)
 
-Координаты карты (деревья/кэмпы/башни/тормент/гейты/лотосы по версиям) — только наши, из файлов игры: `scripts/gen/extract_map_entities.py` → `data/map/mapdata_<code>.json`. Дифф считает `scripts/gen/build_terrain_diff.py` → `data/terrain_diff_<patch>.json`. Проекция — `data/terrain_map_meta.json` (проверено наложением всех деревьев на рендер карты).
+Координаты карты (деревья/кэмпы/башни/тормент/гейты/лотосы по версиям) — только наши, из файлов игры: `scripts/gen/extract_map_entities.py` → `data/map/mapdata_<code>.json`. Дифф считает `scripts/gen/build_terrain_diff.py` → `data/terrain/terrain_diff_<patch>.json`. Проекция — `data/terrain_map_meta.json` (проверено наложением всех деревьев на рендер карты).
 
 ## Шапка
 - Шапка: вкладка латест-патча называется **Patches**; в правом углу шапки версии патча нет, там только название таблицы на страницах Materials.

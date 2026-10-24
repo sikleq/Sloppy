@@ -440,9 +440,12 @@ def build_rosters():
     dyn_payload = {"patches": dyn_patches, "entities": _State.dynamics,
                    "heroes": hero_roster, "items": item_roster,
                    "item_categories": _item_cat_list}
-    with open('_dynamics.json', 'w', encoding='utf-8') as _f:
+    # build products, not sources: .cache/ (build_site.py copies _dynamics.json into dist/)
+    _cache = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), '.cache')
+    _os.makedirs(_cache, exist_ok=True)
+    with open(_os.path.join(_cache, '_dynamics.json'), 'w', encoding='utf-8') as _f:
         _json.dump(dyn_payload, _f, separators=(',', ':'))
-    print(f"  → _dynamics.json: {len(_State.dynamics)} entities × {len(dyn_patches)} patches in RELEASE_HISTORY")
+    print(f"  → .cache/_dynamics.json: {len(_State.dynamics)} entities × {len(dyn_patches)} patches in RELEASE_HISTORY")
     _cls_counts = {}
     for _d in item_roster:
         _cls_counts[_d["class"]] = _cls_counts.get(_d["class"], 0) + 1
@@ -451,10 +454,10 @@ def build_rosters():
           f"{_n_removed} not current (class source: {latest_stats_ver}/items.txt)")
 
     # Write ability-icon URL list for the validator
-    with open('_ability_icons.txt', 'w', encoding='utf-8') as _f:
+    with open(_os.path.join(_cache, '_ability_icons.txt'), 'w', encoding='utf-8') as _f:
         for _u in sorted(_State.ability_icons):
             _f.write(_u + '\n')
-    print(f"  → _ability_icons.txt: {len(_State.ability_icons)} unique URLs")
+    print(f"  → .cache/_ability_icons.txt: {len(_State.ability_icons)} unique URLs")
 
     # Write site_meta.json
     import json as _json2

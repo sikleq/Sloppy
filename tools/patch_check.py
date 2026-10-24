@@ -115,7 +115,7 @@ def check_map(ver):
     yield ("Map", "map file", ("OK", "a new map file"))
     yield ("Map", f"mapdata_{_code(ver)}.json", ("OK", "") if os.path.exists(_p("data", "map", f"mapdata_{_code(ver)}.json"))
            else ("MISSING", "extract_map_entities.py --store"))
-    yield ("Map", f"terrain_diff_{ver}.json", ("OK", "") if os.path.exists(_p("data", f"terrain_diff_{ver}.json"))
+    yield ("Map", f"terrain_diff_{ver}.json", ("OK", "") if os.path.exists(_p("data", "terrain", f"terrain_diff_{ver}.json"))
            else ("MISSING", "build_terrain_diff.py"))
     pics = _json(_p("data", "map", "renders.json")).get("pictures", {})
     yield ("Map", "own picture (renders.json + icons/maps)",

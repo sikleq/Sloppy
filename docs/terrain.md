@@ -59,7 +59,7 @@ aligned), resize to **1536²** webp. Re-run: `python scripts/gen/build_terrain_m
 ## Data sources
 
 - Our own map files only (next section): `data/map/mapdata_<code>.json`, one per map file.
-- Diff: `scripts/gen/build_terrain_diff.py` reads the two files of a step → `data/terrain_diff_<patch>.json`
+- Diff: `scripts/gen/build_terrain_diff.py` reads the two files of a step → `data/terrain/terrain_diff_<patch>.json`
   (committed, one per patch).
 - Projection: `data/terrain_map_meta.json`. Verified pixel-accurate by overlaying all 7.41 trees on the map render
   (they land exactly on the forest).
@@ -722,7 +722,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
 - **Each page's list = that patch's own notes**; a patch whose notes list none shows "The patch notes list no terrain
   changes." Under the counts, **"Moved in the map file"** (`_moved_summary`, read off the diff: "trees +38 −27, camps
   moved: 2, towers moved: 1, watchers moved: 1" for 7.39b — what its notes say) or "nothing (the file still changed)".
-- **Markers + layer toolbar** — every step ships `data/terrain_diff_<patch>.json`
+- **Markers + layer toolbar** — every step ships `data/terrain/terrain_diff_<patch>.json`
   (`python scripts/gen/build_terrain_diff.py` builds every step; `<old>:<new>` one pair; generic keys
   `treesOld/New`, `campsOld/New`, `entities`). The SHARED crop meta (`terrain_map_meta.json`) projects any patch's
   markers. A pair WITHOUT a diff passes empty `markers_svg` → `_controls_html(layers=False)` (Zoom only).
