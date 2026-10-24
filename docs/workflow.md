@@ -385,3 +385,11 @@ only when its revision changed; the tool keeps Liquipedia's limits by itself (2 
 pages, gzip, stop on 429) — never call the Liquipedia API directly (2026-10-23 a burst got us blocked). Read:
 `get "Roshan/Changelogs"` (wikitext), `html "Roshan"` (rendered text with template values), `grep "Glyph" --in Changelogs`
 (offline search). Tests: `tests/test_liquipedia_cache.py`.
+
+## Full item data of any patch (2026-10-24)
+
+`data/stats/<v>/items.json` keeps only cost, cooldown and mana fields (full `items.txt` only from 7.41c). For any
+other field or the shop category use `python tools/item_history.py <item_x> <version> [...] [--show]`: it reads
+`items.txt`, `neutral_items.txt` and `shops.txt` of the patch's own build (same choice as `fetch_stats.find_patch_build`)
+from a local clone of muk-as/DOTA2_CLIENT (`DOTA2_CLIENT_DIR`, default `C:\Program Files\GitHub\DOTA2_CLIENT`) and prints
+every changed field against the previous patch. The archive starts at 7.33. Tests: `tests/test_item_history.py`.
