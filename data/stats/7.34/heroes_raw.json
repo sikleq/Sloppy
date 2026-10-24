@@ -1247,7 +1247,7 @@
 "AttributeBaseAgility":"22",
 "AttributeBaseIntelligence":"25",
 "AttributeBaseStrength":"0",
-"AttributeIntelligenceGain":"3.4",
+"AttributeIntelligenceGain":"3.4000",
 "AttributePrimary":"DOTA_ATTRIBUTE_AGILITY",
 "AttributeStrengthGain":"0",
 "BaseAttackSpeed":"100",

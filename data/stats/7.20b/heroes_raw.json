@@ -1,6 +1,6 @@
 {
 "npc_dota_hero_abaddon":{
-"ArmorPhysical":"-2.000000",
+"ArmorPhysical":"-3.000000",
 "AttackAcquisitionRange":"600",
 "AttackAnimationPoint":"0.560000",
 "AttackCapabilities":"DOTA_UNIT_CAP_MELEE_ATTACK",
@@ -31,7 +31,7 @@
 "AttributeBaseAgility":"12",
 "AttributeBaseIntelligence":"17",
 "AttributeBaseStrength":"25",
-"AttributeIntelligenceGain":"2.300000",
+"AttributeIntelligenceGain":"2.600000",
 "AttributePrimary":"DOTA_ATTRIBUTE_STRENGTH",
 "AttributeStrengthGain":"2.900000",
 "MovementSpeed":"285",
@@ -520,9 +520,10 @@
 "AttributePrimary":"DOTA_ATTRIBUTE_INTELLECT",
 "AttributeStrengthGain":"3.100000",
 "BoundsHullName":"DOTA_HULL_SIZE_HERO",
-"MovementSpeed":"310",
+"MovementSpeed":"305",
 "MovementTurnRate":"0.500000",
-"ProjectileSpeed":"1000"
+"ProjectileSpeed":"1000",
+"StatusHealthRegen":"2.0000"
 },
 "npc_dota_hero_disruptor":{
 "ArmorPhysical":"-1.000000",
@@ -594,7 +595,7 @@
 "AttackRange":"625",
 "AttackRate":"1.700000",
 "AttributeAgilityGain":"2.200000",
-"AttributeBaseAgility":"23",
+"AttributeBaseAgility":"19",
 "AttributeBaseIntelligence":"15",
 "AttributeBaseStrength":"17",
 "AttributeIntelligenceGain":"1.400000",
@@ -1154,8 +1155,8 @@
 "AttackDamageMin":"24",
 "AttackRange":"600",
 "AttackRate":"1.700000",
-"AttributeAgilityGain":"3.400000",
-"AttributeBaseAgility":"22",
+"AttributeAgilityGain":"2.500000",
+"AttributeBaseAgility":"20",
 "AttributeBaseIntelligence":"19",
 "AttributeBaseStrength":"15",
 "AttributeIntelligenceGain":"2.1000",
@@ -1176,7 +1177,7 @@
 "AttackDamageMin":"20",
 "AttackRange":"150",
 "AttackRate":"1.700000",
-"AttributeAgilityGain":"1.400000",
+"AttributeAgilityGain":"2.200000",
 "AttributeBaseAgility":"23",
 "AttributeBaseIntelligence":"20",
 "AttributeBaseStrength":"24",
@@ -1368,7 +1369,7 @@
 "AttackRate":"1.700000",
 "AttributeAgilityGain":"2.00000",
 "AttributeBaseAgility":"24",
-"AttributeBaseIntelligence":"28",
+"AttributeBaseIntelligence":"24",
 "AttributeBaseStrength":"19",
 "AttributeIntelligenceGain":"2.700000",
 "AttributePrimary":"DOTA_ATTRIBUTE_INTELLECT",
@@ -1895,6 +1896,7 @@
 "MovementSpeed":"285",
 "MovementTurnRate":"0.700000",
 "ProjectileSpeed":"3000",
+"StatusHealthRegen":"1.50",
 "VisionNighttimeRange":"1400"
 },
 "npc_dota_hero_spectre":{

@@ -1,5 +1,5 @@
 {
- "source": "dotabuff/d2vpkr npc_abilities.txt per patch (tools/build_aghs_granted_old.py)",
+ "source": "npc_abilities.txt of each patch's own build (tools/build_aghs_granted_old.py)",
  "versions": {
   "7.08": {
    "granted": {

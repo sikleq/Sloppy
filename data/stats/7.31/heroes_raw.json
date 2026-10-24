@@ -1613,7 +1613,7 @@
 "AttributeStrengthGain":"4.300000",
 "BoundsHullName":"DOTA_HULL_SIZE_HERO",
 "MovementSpeed":"305",
-"MovementTurnRate":"0.600000",
+"MovementTurnRate":"0.500000",
 "StatusHealthRegen":"0"
 },
 "npc_dota_hero_puck":{
