@@ -35,6 +35,9 @@ def _values(block, kind):
             bonus = next((v[b] for b in (f"special_bonus_{kind}", f"special_bonus_{kind}".replace("scepter", "aghanim"))
                           if b in v), None)
             n = _num(bonus if bonus is not None else v.get("value", ""))
+            if bonus is not None and _num(bonus) is not None:
+                # "%bonus_AbilityCooldown%" = the upgrade's own bonus to that value (7.41 Vendetta, 7.40 Infest)
+                out["bonus_" + k.lower()] = _num(bonus)
         else:
             n = _num(v)
         if n is not None:

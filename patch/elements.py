@@ -1341,7 +1341,10 @@ def _aghs_rework_card(text) -> bool:
     prev = _prev_patch_version(version)
     old, new = aghs_text(slug, kind, prev), aghs_text(slug, kind, version)
     if not old or not new or old == new:
-        return False
+        # owner 2026-10-24: "ты всегда должен знать, как было и как стало" — never a row without its card
+        raise RuntimeError(f"Aghanim's {kind} reworked under {slug} ({version}): "
+                           f"{'no ' + prev + ' text' if not old else 'no ' + version + ' text' if not new else 'same text'}"
+                           f" — teach patch/aghs_text.py where this tooltip or its numbers are")
     old_html, new_html = _aghs_diff_html(old, new)
     pane = lambda side, body: (f'<div class="ability-change-pane ability-change-{side}"><div class="ability-change-body">'
                                f'{_bold_numbers_html(aghs_line(body, kind=kind))}</div></div>')

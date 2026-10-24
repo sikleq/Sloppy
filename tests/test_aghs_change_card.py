@@ -3,6 +3,8 @@ old = the previous patch's game tooltip, new = this patch's, each with the upgra
 import os
 import sys
 
+import pytest
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from patch import aghs_text as at  # noqa: E402
@@ -56,10 +58,18 @@ def test_row_becomes_a_hidden_card(monkeypatch):
     assert _State.aghs_cards == []
 
 
-def test_no_old_tooltip_keeps_the_row(monkeypatch):
+def test_no_old_tooltip_stops_the_build(monkeypatch):
+    # owner 2026-10-24: "ты всегда должен знать, как было и как стало" — no row is left without its card
     monkeypatch.setattr(at, "aghs_text", lambda slug, kind, v: None if v != "7.41" else "New text.")
     monkeypatch.setattr(_State, "current_ability_slug", "nyx_assassin_vendetta")
     monkeypatch.setattr(_State, "current_patch_version", "7.41")
     monkeypatch.setattr(_State, "aghs_cards", [])
-    row = el.li("Aghanim's Shard reworked: Decreases cooldown by 10s", t("REWORK"))
-    assert "iab-covered" not in row and el.ul_close() == "</ul>"
+    with pytest.raises(RuntimeError, match="no 7.40c text"):
+        el.li("Aghanim's Shard reworked: Decreases cooldown by 10s", t("REWORK"))
+
+
+def test_bonus_placeholder_is_the_upgrades_own_bonus():
+    # "%bonus_AbilityCooldown%" / "%bonus_open_wounds_duration_pct%" (7.41 Vendetta, 7.40 Infest)
+    vals = at._values({"AbilityValues": {"AbilityCooldown": {"value": "70", "special_bonus_shard": "-10"},
+                                         "open_wounds_duration_pct": {"special_bonus_shard": "50"}}}, "shard")
+    assert vals["bonus_abilitycooldown"] == "-10" and vals["bonus_open_wounds_duration_pct"] == "50"
