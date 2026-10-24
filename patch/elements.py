@@ -1263,7 +1263,28 @@ def ul_open():
 
 def ul_close():
     _State.in_stats_ul = False
+    _State.card_meta = {}            # the rows under an ability_change card end here
     return '</ul>'
+
+
+_CARD_META_ROW_RE = re.compile(
+    r"^(Cooldown|Mana Cost|Health Cost|Cast Range|Radius)\s+(?:increased|decreased|changed|rescaled|reduced)\s+"
+    r"from\s+(.+?)\s+to\s+([^\s,;]+)\s*$", re.I)
+_CARD_META_KEY = {"cooldown": "cooldown", "mana cost": "manacost", "health cost": "healthcost",
+                  "cast range": "castrange", "radius": "aoe"}
+
+
+def _card_meta_covered(text) -> bool:
+    """A "Cooldown increased from 20s to 25s" row whose both values the card's headers show: the row is hidden and the
+    headers' values get their colour (_CARD_CONFIRMED)."""
+    m = _CARD_META_ROW_RE.match(re.sub(r"<[^>]+>", "", text or ""))
+    key = _CARD_META_KEY[m.group(1).lower()] if m else None
+    pair = _State.card_meta.get(key) if key else None
+    hit = bool(pair) and (_iab_meta_numbers(m.group(2)), _iab_meta_numbers(m.group(3))) == \
+        (_iab_meta_numbers(pair[0]), _iab_meta_numbers(pair[1]))
+    if hit:
+        _CARD_CONFIRMED.add((pair[2], key))
+    return hit
 
 
 _TALENT_PREFIX_RE = re.compile(r'^(Level \d+ Talent) (?!:)')
@@ -1633,14 +1654,52 @@ def _iab_meta_re(pat):
     return rf"(?:^|(?<=[.!,]))\s*(?:{pat})\s*[.,]?\s*(?=$|[A-Z])"
 
 
-def _iab_meta_chips(values, props=None):
-    """The header's icon + value chips in the game's order; the game files' value wins over the text's."""
+def _iab_meta_chips(values, props=None, marks=None):
+    """The header's icon + value chips in the game's order; the game files' value wins over the text's. marks:
+    {key: "buff" / "nerf"} — a value the old / new card pair changed is coloured like the cards' text (owner 2026-10-24)."""
     out = []
     for key, icon, _ in _IAB_META:
         val = (props or {}).get(key) or values.get(key)
         if val:
+            if marks and key in marks:
+                # coloured only if a row under the card says exactly this change (page.save_html, _CARD_CONFIRMED):
+                # a header difference no row names (Kinetic Fence 7.41 mana 50 -> 70) stays plain
+                mark, card = marks[key]
+                val = f"<!--CHIPMARK:{card}:{key}:{mark}-->{val}<!--/CHIPMARK-->"
             out.append(f'<span class="iab-m"><img class="iab-ico" src="{ABILITY_ICON_DIR}{icon}.png" alt="">{val}</span>')
     return "".join(out)
+
+
+_CARD_CONFIRMED: set = set()          # (card id, header key) a row under the card confirmed
+_CARD_SEQ = [0]
+_CHIPMARK_RE = re.compile(r"<!--CHIPMARK:(\d+):(\w+):(\w+)-->(.*?)<!--/CHIPMARK-->", re.S)
+
+
+def resolve_chip_marks(html_text: str) -> str:
+    """page.save_html: a confirmed header value gets its colour, any other is left plain."""
+    return _CHIPMARK_RE.sub(lambda m: hl(m.group(4), m.group(3)) if (int(m.group(1)), m.group(2)) in _CARD_CONFIRMED
+                            else m.group(4), html_text)
+
+
+# header values where a bigger number is better; for the costs and the cooldown a smaller one is
+_IAB_META_BIGGER_BETTER = {"aoe", "castrange"}
+
+
+def _iab_meta_numbers(val) -> tuple:
+    return tuple(float(x) for x in re.findall(r"\d+(?:\.\d+)?", str(val or "")))
+
+
+def _iab_meta_marks(old_vals, new_vals):
+    """({key: mark} of the old pane, {key: mark} of the new one) for header values that differ: the new value takes the
+    change's colour, the old one the opposite (as Kinetic Fence 7.41: old 1050 nerf-red, new 1200 buff-green)."""
+    old_m, new_m = {}, {}
+    for key, _, _ in _IAB_META:
+        a, b = _iab_meta_numbers(old_vals.get(key)), _iab_meta_numbers(new_vals.get(key))
+        if not a or not b or a == b:
+            continue
+        better = (sum(b) / len(b) > sum(a) / len(a)) == (key in _IAB_META_BIGGER_BETTER)
+        new_m[key], old_m[key] = ("buff", "nerf") if better else ("nerf", "buff")
+    return old_m, new_m
 
 
 def _iab_take_meta(desc, only=None):
@@ -1692,10 +1751,19 @@ _PANE_KIND_RE = re.compile(r"^\s*(Active|Passive|Toggle|Aura)\.\s*")
 _PANE_NAME_RE = re.compile(r"^\s*([A-Z][\w'’-]*(?: [A-Za-z][\w'’-]*){0,4}):\s+")
 
 
-def _pane_parts(desc, props=None, facet=False):
+def _pane_values(desc, props=None) -> dict:
+    """The header values a pane would show: the game files' over the text's own "Cooldown: 20s." sentences."""
+    text = " ".join(d for d in (desc if isinstance(desc, list) else [desc]) if isinstance(d, str)
+                    and not d.lstrip().startswith("<div"))
+    found, _ = _iab_take_meta(text)
+    return {key: (props or {}).get(key) or found.get(key) for key, _, _ in _IAB_META
+            if (props or {}).get(key) or found.get(key)}
+
+
+def _pane_parts(desc, props=None, facet=False, marks=None):
     """(header strip html or "", body rows html) of an ability / facet card pane. The text's own leading "Active." goes
     to the header (7.41 Summon Raptors said it twice); a facet's rows that all start with the ability they change
-    ("Arcane Aura: …", 7.38 Arcane Overflow) give the header its name."""
+    ("Arcane Aura: …", 7.38 Arcane Overflow) give the header its name. marks: see _iab_meta_chips."""
     items = [d for d in (desc if isinstance(desc, list) else [desc]) if d is not None]
     plain = [i for i, d in enumerate(items) if isinstance(d, str) and not d.lstrip().startswith("<div")]
     kind = (props or {}).get("kind", "")
@@ -1726,7 +1794,7 @@ def _pane_parts(desc, props=None, facet=False):
             continue                                     # the row was only "Radius: 900."
         html = d if not isinstance(d, str) or d.lstrip().startswith("<div") else f'<div class="ability-change-row">{d}</div>'
         rows.append(_bold_numbers_html(html) if isinstance(html, str) else html)
-    chips = _iab_meta_chips(values, props)   # never folded: a hero's old / new panes have no marks to keep a level
+    chips = _iab_meta_chips(values, props, marks)   # never folded: a hero's old / new panes have no marks to keep a level
     title = (f'<b class="iab-kind">{kind}:</b> <span class="iab-name">{name}</span>' if kind and name
              else f'<b class="iab-kind">{kind}</b>' if kind
              else f'<span class="iab-name">{name}</span>' if name else "")
@@ -2608,7 +2676,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
                  or _iab_unpaired_row(text, dyn_tags, extra)
                  or (not extra and _iab_text_change(text, dyn_tags)))):
         classes += ["iab-covered", "covered-iab"]       # covered-*: the card that shows it (tag filters)
-    if covered and "iab-covered" not in classes:
+    _meta_hit = isinstance(text, str) and _card_meta_covered(text)      # also confirms an explicit covered=True row
+    if (covered or _meta_hit) and "iab-covered" not in classes:
         classes += ["iab-covered", "covered-card"]
     # a number row of an enchantment its tier table above shows (owner 2026-10-17, 7.41 variant A)
     if (isinstance(text, str) and "iab-covered" not in classes
@@ -3546,6 +3615,22 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
     else:
         compact_side = None
 
+    from .weights import _prev_version
+    _pv = _State.current_patch_version
+    _props = {"new": _pane_props(new, _pv), "old": _pane_props(old, _prev_version(_pv)) if old else None}
+    # header values the pair changed are coloured, and the rows below that say exactly that change are hidden
+    # (owner 2026-10-24: "всё в карточку"; li() reads card_meta, ul_close() clears it)
+    _vals = {"new": _pane_values(new.get("desc", []), _props["new"]),
+             "old": _pane_values(old.get("desc", []), _props["old"]) if old else {}}
+    # only for the same ability on both sides: Tinker's Defense Matrix -> Deploy Turrets (7.41) are two abilities whose
+    # headers differ, not a change; Lich's Sacrifice even kept Death Charge's slug
+    _same = bool(old) and old.get("name") == new.get("name") and old.get("slug") == new.get("slug")
+    _CARD_SEQ[0] += 1
+    _card_id = _CARD_SEQ[0]
+    _marks = {side: {k: (mark, _card_id) for k, mark in m.items()}
+              for side, m in zip(("old", "new"), _iab_meta_marks(_vals["old"], _vals["new"]))} if _same else {}
+    _State.card_meta = {k: (_vals["old"][k], _vals["new"][k], _card_id) for k in _marks.get("new", {})}
+
     def _side(spec, kind):
         name = spec["name"]
         icon_url, used_innate_fallback = _resolve_icon(spec)
@@ -3555,10 +3640,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
             f'class="innate-marker">'
             if spec.get("innate") and not used_innate_fallback else ''
         )
-        from .weights import _prev_version
-        pv = _State.current_patch_version
-        strip_html, desc_html = _pane_parts(spec.get("desc", []),
-                                            _pane_props(spec, _prev_version(pv) if kind == "old" else pv))
+        strip_html, desc_html = _pane_parts(spec.get("desc", []), _props[kind], marks=_marks.get(kind))
         tables_html = ''.join(
             f'<div class="formula-table-wrap">{tbl}</div>'
             for tbl in (spec.get("tables", []) or [])
