@@ -1269,7 +1269,85 @@ def ul_open():
 def ul_close():
     _State.in_stats_ul = False
     _State.card_meta = {}            # the rows under an ability_change card end here
-    return '</ul>'
+    cards, _State.aghs_cards = "".join(_State.aghs_cards), []
+    return '</ul>' + cards
+
+
+# ---- "Aghanim's Shard reworked: …" -> an old -> new card of the upgrade (owner 2026-10-24) ----
+# Old = the game's tooltip of the previous patch, new = this patch's, both with their own numbers (patch/aghs_text.py);
+# the words that differ are highlighted (removed: del, added: new, rewritten: rework). The row stays, hidden, for the
+# weights and filters. No old or new tooltip (or the same text) -> no card, the row shows as before.
+_AGHS_REWORK_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard) reworked\s*:", re.I)
+_AGHS_WORD_RE = re.compile(r"\S+")
+
+
+_AGHS_VALUE_RE = re.compile(r"([^:.]+):\s*([^.]+(?:\.\d+[^.]*)?)\.")
+
+
+def _aghs_values_html(old, new):
+    """The numbers line of both sides, compared by label: same value plain, another value rework, a label only the
+    old side has del, only the new side new."""
+    o = {m.group(1).strip(): m.group(2).strip() for m in _AGHS_VALUE_RE.finditer(old or "")}
+    n = {m.group(1).strip(): m.group(2).strip() for m in _AGHS_VALUE_RE.finditer(new or "")}
+    esc = lambda s: _html.escape(s, quote=False)
+    side = lambda own, other, gone: " ".join(
+        f"{esc(k)}: {esc(v)}." if other.get(k) == v
+        else (f"{esc(k)}: {hl(esc(v), 'rework')}." if k in other else f"{hl(esc(k) + ': ' + esc(v), gone)}.")
+        for k, v in own.items())
+    return side(o, n, "del"), side(n, o, "new")
+
+
+def _aghs_diff_html(old, new):
+    """(old html, new html): the descriptions with the differing word runs highlighted, then the numbers line."""
+    (old, _, ov), (new, _, nv) = old.partition("\n"), new.partition("\n")
+    vo, vn = _aghs_values_html(ov, nv)
+    do, dn = _aghs_words_html(old, new)
+    return do + (f"<br>{vo}" if vo else ""), dn + (f"<br>{vn}" if vn else "")
+
+
+def _aghs_words_html(old, new):
+    a, b_ = [m for m in _AGHS_WORD_RE.finditer(old)], [m for m in _AGHS_WORD_RE.finditer(new)]
+    key = lambda m: m.group(0).lower().strip(".,;:()")
+    sm = difflib.SequenceMatcher(a=[key(m) for m in a], b=[key(m) for m in b_], autojunk=False)
+    marks = {"old": [], "new": []}
+    for op, i1, i2, j1, j2 in sm.get_opcodes():
+        if op == "equal":
+            continue
+        if i2 > i1:
+            marks["old"].append((a[i1].start(), a[i2 - 1].end(), "del" if op == "delete" else "rework"))
+        if j2 > j1:
+            marks["new"].append((b_[j1].start(), b_[j2 - 1].end(), "new" if op == "insert" else "rework"))
+
+    def paint(text, spans):
+        out, pos = "", 0
+        for s, e, mark in spans:
+            while e > s and text[e - 1] in ".,;:":          # the sentence's own stop stays outside
+                e -= 1
+            out += _html.escape(text[pos:s], quote=False) + hl(_html.escape(text[s:e], quote=False), mark)
+            pos = e
+        return out + _html.escape(text[pos:], quote=False)
+    return paint(old, marks["old"]), paint(new, marks["new"])
+
+
+def _aghs_rework_card(text) -> bool:
+    """A reworked-upgrade row under an ability: queue its old -> new card (ul_close draws it). True when queued."""
+    m = _AGHS_REWORK_RE.match(re.sub(r"<[^>]+>", "", text or ""))
+    slug, version = _State.current_ability_slug, _State.current_patch_version
+    if not m or not slug or not version:
+        return False
+    from .aghs_text import aghs_text
+    from .meta import _prev_patch_version
+    kind = m.group(1).lower()
+    prev = _prev_patch_version(version)
+    old, new = aghs_text(slug, kind, prev), aghs_text(slug, kind, version)
+    if not old or not new or old == new:
+        return False
+    old_html, new_html = _aghs_diff_html(old, new)
+    pane = lambda side, body: (f'<div class="ability-change-pane ability-change-{side}"><div class="ability-change-body">'
+                               f'{_bold_numbers_html(aghs_line(body, kind=kind))}</div></div>')
+    _State.aghs_cards.append(f'<div class="ability-change unified-panes aghs-change">{pane("old", old_html)}'
+                             f'<span class="ability-change-arrow">→</span>{pane("new", new_html)}</div>')
+    return True
 
 
 _CARD_META_ROW_RE = re.compile(
@@ -2636,6 +2714,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         # "Recipe cost 1350 -> 1250" + note "Total cost unchanged": the buyer pays the same
         _score_text += ". " + re.sub(r'<[^>]+>', ' ', extra)
     _cost_panel_covered(_score_text)
+    if isinstance(text, str) and _aghs_rework_card(_plain_text):
+        covered = True                          # the old -> new upgrade card under the rows shows it
     _ctx = _row_ctx(_plain_text if isinstance(text, str) else "")
     _scores = _row_scores(_score_text, dyn_tags, badge, ctx=_ctx)
     _dyn_record_li(dyn_tags, extra_keys=also_dyn, scores=_scores)

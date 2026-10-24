@@ -84,7 +84,7 @@ def write_footer():
     # Search = a round loupe button above the weights; the field slides out to its left
     # ("/" opens it, Esc closes). It used to be a toolbar field that never lined up with the chips.
     W('<button class="search-fab" id="search-fab" type="button" aria-label="Search heroes, items, abilities" '
-      'aria-expanded="false" aria-controls="search-pop" title="Search (\\)" aria-keyshortcuts="Backslash"></button>')
+      'aria-expanded="false" aria-controls="search-pop" title="Search (\\ or /)" aria-keyshortcuts="Backslash Slash"></button>')
     W('<div class="search-pop" id="search-pop" hidden><div class="search-box">'
       '<input type="text" id="entity-search" placeholder="Search heroes, items, abilities…" autocomplete="off" spellcheck="false">'
       '<div class="search-results" id="search-results"></div></div></div>')

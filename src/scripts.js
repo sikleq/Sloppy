@@ -7718,12 +7718,40 @@ function ecShopMarkup(panels) {
 })();
 
 // ---------------------------------------------------------------------
+// INPUTS: every text field of the site takes English only (patch search 2026-09-26, the whole site
+// 2026-10-24: Cyrillic broke the pixel fonts). A Russian-layout letter becomes the English letter on
+// the same key ("ыуфк" -> "sear"), anything else non-ASCII is dropped. Fixed in the CAPTURE phase, so
+// the field's own input listeners (filters, search) already see the English text.
+// ---------------------------------------------------------------------
+var SITE_RU = 'йцукенгшщзхъфывапролджэячсмитьбюё', SITE_EN = "qwertyuiop[]asdfghjkl;'zxcvbnm,.`";
+function siteToEnglish(s) {
+  var out = '';
+  for (var i = 0; i < s.length; i++) {
+    var ch = s[i], low = ch.toLowerCase(), k = SITE_RU.indexOf(low);
+    if (k >= 0) ch = ch === low ? SITE_EN[k] : SITE_EN[k].toUpperCase();
+    if (ch >= ' ' && ch <= '~') out += ch;
+  }
+  return out;
+}
+(function () {
+  var TEXTLIKE = { text: 1, search: 1, url: 1, email: 1, tel: 1, '': 1 };
+  document.addEventListener('input', function (e) {
+    var t = e.target;
+    if (!t || !(t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && TEXTLIKE[(t.getAttribute('type') || '').toLowerCase()]))) return;
+    var v = t.value, fixed = siteToEnglish(v);
+    if (fixed === v) return;
+    var pos = (t.selectionStart || 0) - (v.length - fixed.length);
+    t.value = fixed;
+    try { t.setSelectionRange(pos, pos); } catch (err) {}
+  }, true);
+})();
+
+// ---------------------------------------------------------------------
 // Patch pages: the search sits behind the round loupe button in the corner stack.
-// Click / "\" opens the field (slides out left of the button); "\" again, Esc or a click outside
-// closes it, picking a result closes it too (the jump itself lives in ENTITY SEARCH).
-// The key is found by its PHYSICAL position (e.code "Backslash"), so it works in any keyboard layout,
-// and it is never typed into the field. The field takes English only: a Russian-layout letter becomes
-// the English letter on the same key ("ыуфк" -> "sear"), anything else non-ASCII is dropped.
+// Click / "\" / "/" opens the field (slides out left of the button); the key again, Esc or a click
+// outside closes it, picking a result closes it too (the jump itself lives in ENTITY SEARCH).
+// The key is found by its PHYSICAL position (e.code "Backslash" / "Slash", "/" since 2026-10-24), so it
+// works in any keyboard layout, and it is never typed into the field. English only: see INPUTS below.
 // ---------------------------------------------------------------------
 (function () {
   var fab = document.getElementById('search-fab');
@@ -7745,31 +7773,12 @@ function ecShopMarkup(panels) {
   document.addEventListener('keydown', function (e) {
     var t = e.target;
     var typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
-    var hotkey = e.code === 'Backslash' && !e.ctrlKey && !e.altKey && !e.metaKey;
+    var hotkey = (e.code === 'Backslash' || e.code === 'Slash') && !e.ctrlKey && !e.altKey && !e.metaKey;
     if (hotkey && (!typing || t === input)) {       // never typed; toggles from the page or the field
       e.preventDefault();
       if (pop.hidden) open(); else close();
     }
     else if (e.key === 'Escape' && !pop.hidden) close();
-  });
-  // English only (owner 2026-09-26): a wrong layout must not produce "ыуфк" instead of "sear"
-  var RU = 'йцукенгшщзхъфывапролджэячсмитьбюё', EN = "qwertyuiop[]asdfghjkl;'zxcvbnm,.`";
-  function toEnglish(s) {
-    var out = '';
-    for (var i = 0; i < s.length; i++) {
-      var ch = s[i], low = ch.toLowerCase(), k = RU.indexOf(low);
-      if (k >= 0) ch = ch === low ? EN[k] : EN[k].toUpperCase();
-      if (ch >= ' ' && ch <= '~') out += ch;
-    }
-    return out;
-  }
-  input.addEventListener('input', function () {
-    var v = input.value, fixed = toEnglish(v);
-    if (fixed === v) return;
-    var pos = input.selectionStart - (v.length - fixed.length);
-    input.value = fixed;
-    try { input.setSelectionRange(pos, pos); } catch (err) {}
-    input.dispatchEvent(new Event('input'));
   });
   document.addEventListener('mousedown', function (e) {
     if (!pop.hidden && !pop.contains(e.target) && e.target !== fab) close();
