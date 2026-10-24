@@ -1,6 +1,6 @@
 """Our store of the game's plain-text files: one commit per patch, tagged with the version (private repo
 dota-patch-files, local clone at env DOTA_FILES_DIR, default C:\\Users\\sikle\\dota-patch-files). Each patch = its own
-build (first build with the patch's notes and without the next patch's, plus release-night fixes; the store's
+build (first build with the patch's notes and without the next patch's, plus release-day fixes within 24 h; the store's
 tools/builds.py). Paths are the game's below game/dota/[pak01_dir/]: scripts/npc/items.txt,
 scripts/npc/heroes/npc_dota_hero_axe.txt, resource/localization/abilities_english.txt, scripts/shops.txt, …
 
@@ -52,14 +52,22 @@ def listing(version: str, rel_dir: str) -> list[str]:
 CACHE = Path(__file__).resolve().parent.parent / ".cache" / "game_files"
 
 
+@lru_cache(maxsize=None)
+def commit_of(version: str) -> str | None:
+    """The store commit a version's tag points at (a rebuilt store retags every patch)."""
+    r = subprocess.run(["git", "-C", str(STORE), "rev-parse", f"{version}^{{commit}}"], capture_output=True, text=True)
+    return r.stdout.strip() if r.returncode == 0 else None
+
+
 def path(version: str, rel: str) -> str | None:
-    """A file path for tools that open files: files/<rel> of a patch copied once to .cache/game_files/<version>/,
-    or None when the patch or file is not in the store."""
-    dst = CACHE / version / rel
-    if dst.exists():
-        return str(dst)
+    """A file path for tools that open files: files/<rel> of a patch copied once to
+    .cache/game_files/<version>@<commit>/, or None when the patch or file is not in the store. Keyed by the commit too:
+    after the store was rebuilt (2026-10-24, release-day window 12 -> 24 h) a folder per version served old files."""
     if version not in versions():
         return None
+    dst = CACHE / f"{version}@{commit_of(version)[:12]}" / rel
+    if dst.exists():
+        return str(dst)
     data = read_bytes(version, rel)
     if data is None:
         return None

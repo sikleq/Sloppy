@@ -48,3 +48,14 @@ def test_the_site_build_stops_with_what_to_do_when_raw_files_are_missing(monkeyp
 def test_a_hero_without_a_kv_file_has_an_empty_kit_not_a_crash():
     from builders import entity_changes
     assert entity_changes._hero_kit("no_such_hero_for_the_test") == []
+
+
+def test_the_file_cache_follows_the_store_commit_not_just_the_version(tmp_path, monkeypatch):
+    monkeypatch.setattr(gf, "CACHE", tmp_path)
+    monkeypatch.setattr(gf, "versions", lambda: frozenset({"7.41e"}))
+    store = {"commit": "a" * 40, "data": b"old"}
+    monkeypatch.setattr(gf, "commit_of", lambda v: store["commit"])
+    monkeypatch.setattr(gf, "read_bytes", lambda v, rel: store["data"])
+    assert open(gf.path("7.41e", "scripts/npc/items.txt"), "rb").read() == b"old"
+    store.update(commit="b" * 40, data=b"new")             # the store was rebuilt: 7.41e is another build now
+    assert open(gf.path("7.41e", "scripts/npc/items.txt"), "rb").read() == b"new"
