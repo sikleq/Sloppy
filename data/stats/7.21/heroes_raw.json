@@ -525,7 +525,7 @@
 "ProjectileSpeed":"1000"
 },
 "npc_dota_hero_disruptor":{
-"ArmorPhysical":"0.000000",
+"ArmorPhysical":"-1.000000",
 "AttackAcquisitionRange":"800",
 "AttackAnimationPoint":"0.400000",
 "AttackCapabilities":"DOTA_UNIT_CAP_RANGED_ATTACK",
@@ -1769,7 +1769,7 @@
 "MovementTurnRate":"0.600000"
 },
 "npc_dota_hero_silencer":{
-"ArmorPhysical":"-1",
+"ArmorPhysical":"0",
 "AttackAcquisitionRange":"800",
 "AttackAnimationPoint":"0.500000",
 "AttackCapabilities":"DOTA_UNIT_CAP_RANGED_ATTACK",
@@ -2445,7 +2445,7 @@
 "ProjectileSpeed":"1200"
 },
 "npc_dota_hero_zuus":{
-"ArmorPhysical":"0",
+"ArmorPhysical":"1",
 "AttackAcquisitionRange":"800",
 "AttackAnimationPoint":"0.633000",
 "AttackCapabilities":"DOTA_UNIT_CAP_RANGED_ATTACK",

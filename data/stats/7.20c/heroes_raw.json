@@ -1831,7 +1831,7 @@
 "ProjectileSpeed":"1000"
 },
 "npc_dota_hero_slardar":{
-"ArmorPhysical":"3",
+"ArmorPhysical":"2",
 "AttackAcquisitionRange":"600",
 "AttackAnimationPoint":"0.360000",
 "AttackCapabilities":"DOTA_UNIT_CAP_MELEE_ATTACK",

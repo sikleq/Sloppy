@@ -564,7 +564,7 @@
 "AttackRate":"1.35",
 "BountyGoldMax":"25",
 "BountyGoldMin":"20",
-"BountyXP":"28",
+"BountyXP":"25",
 "CombatClassAttack":"DOTA_COMBAT_CLASS_ATTACK_BASIC",
 "CombatClassDefend":"DOTA_COMBAT_CLASS_DEFEND_BASIC",
 "MovementSpeed":"330",

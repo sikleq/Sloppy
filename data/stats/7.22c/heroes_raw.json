@@ -461,6 +461,7 @@
 "AttributeIntelligenceGain":"3.100000",
 "AttributePrimary":"DOTA_ATTRIBUTE_INTELLECT",
 "AttributeStrengthGain":"3.100000",
+"BaseAttackSpeed":"115",
 "BoundsHullName":"DOTA_HULL_SIZE_HERO",
 "MovementSpeed":"300",
 "MovementTurnRate":"0.600000"

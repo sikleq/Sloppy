@@ -589,7 +589,7 @@
 "npc_dota_hero_drow_ranger":{
 "ArmorPhysical":"-3",
 "AttackAcquisitionRange":"800",
-"AttackAnimationPoint":"0.65",
+"AttackAnimationPoint":"0.700000",
 "AttackCapabilities":"DOTA_UNIT_CAP_RANGED_ATTACK",
 "AttackDamageMax":"36",
 "AttackDamageMin":"25",
@@ -604,7 +604,7 @@
 "AttributeStrengthGain":"1.900000",
 "BoundsHullName":"DOTA_HULL_SIZE_HERO",
 "MovementSpeed":"285",
-"MovementTurnRate":"0.7000",
+"MovementTurnRate":"0.65000",
 "ProjectileSpeed":"1250",
 "StatusHealthRegen":"1.75",
 "VisionDaytimeRange":"1800"
