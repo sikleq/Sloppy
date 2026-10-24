@@ -22,3 +22,29 @@ def test_root_kv_files_from_7_41c_and_the_hero_base_where_npc_heroes_is_an_inclu
     plan = gf.raw_plan("7.41f")
     assert plan["npc_dota_hero_base.txt"] == "scripts/npc/heroes/npc_dota_hero_base.txt"
     assert "heroes/npc_dota_hero_base.txt" not in plan
+
+
+def test_missing_raw_names_what_a_clone_without_the_store_lacks(tmp_path, monkeypatch):
+    monkeypatch.setattr(gf, "_order", lambda: {"7.41c": 2, "7.41f": 3})
+    assert gf.missing_raw("7.41f", tmp_path) == ["items.txt", "npc_abilities.txt", "npc_heroes.txt", "npc_units.txt",
+                                                 "heroes/"]
+    d = tmp_path / "7.41f"
+    (d / "heroes").mkdir(parents=True)
+    (d / "heroes" / "npc_dota_hero_axe.txt").write_text("x")
+    for n in ("items.txt", "npc_abilities.txt", "npc_heroes.txt", "npc_units.txt"):
+        (d / n).write_text("x")
+    assert gf.missing_raw("7.41f", tmp_path) == []
+
+
+def test_the_site_build_stops_with_what_to_do_when_raw_files_are_missing(monkeypatch, capsys):
+    import build_site
+    monkeypatch.setattr(gf, "missing_raw", lambda v: ["items.txt", "heroes/"])
+    monkeypatch.setattr(build_site.sys, "argv", ["build_site.py"])
+    assert build_site.main() == 2
+    err = capsys.readouterr().err
+    assert "missing: items.txt, heroes/" in err and "python tools/game_files.py materialize" in err
+
+
+def test_a_hero_without_a_kv_file_has_an_empty_kit_not_a_crash():
+    from builders import entity_changes
+    assert entity_changes._hero_kit("no_such_hero_for_the_test") == []
