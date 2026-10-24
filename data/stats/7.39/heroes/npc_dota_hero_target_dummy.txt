@@ -1,5 +1,0 @@
-// Abilities for target_dummy
-"DOTAAbilities"
-{
-    "Version"       "1"
-}

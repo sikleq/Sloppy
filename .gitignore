@@ -12,10 +12,14 @@ data/_vpk_shops/
 # Список URL иконок — генерируется builders/patch.py для check_icons.py
 _ability_icons.txt
 
-# Raw npc_units.txt blobs cached by scripts/fetch_npc_history.py (keyed by
-# d2vpkr commit SHA). Large; the parsed data/stats/<patch>/npc_units.json is
-# what we commit and the build consumes.
+# Local caches (tools/game_files.py copies of store files, terrain tiles, …)
 .cache/
+
+# Raw game files of each patch (heroes/*.txt, root KV .txt): not in git since 2026-10-24 — they live in the private
+# game-files store and `python tools/game_files.py materialize` lays them out here (CI does it before the build).
+data/stats/*/heroes/
+data/stats/*/*.txt
+.store/
 
 # pytest cache
 .pytest_cache/

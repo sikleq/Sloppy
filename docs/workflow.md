@@ -44,7 +44,12 @@ The store (2026-10-24) is our private git repo of the game's plain-text files, o
 (local clone `C:\Users\sikle\dota-patch-files`, env `DOTA_FILES_DIR`); what it holds and how each patch's build is
 chosen is in its own README (`dota-patch-files/README.md`) — not repeated here. Sloppy reads it only through
 `tools/game_files.py` (`read` / `read_bytes` / `path` / `listing` / `npc` / `versions`). After the `store` step push
-the store.
+the store — BEFORE pushing Sloppy: CI lays out the raw files of every patch from it.
+**Raw files in `data/stats/<v>/` are not in git** (2026-10-24): `heroes/npc_dota_hero_*.txt` (7.34e+), the root KV
+files (7.41c+) and `npc_dota_hero_base.txt` (7.41f+) are git-ignored and written from the store by
+`python tools/game_files.py materialize` (rules: `raw_plan`; ~20 s). CI (`build.yml`, `game-build-watch.yml`) checks the
+store out with the read-only deploy key in the secret `DOTA_FILES_DEPLOY_KEY` and runs it before the tests. On a new PC:
+clone the store, then run `materialize`.
 **Still human** (printed at the end): proofread `_generated_p_<v>_v2.py` into `content/p<code>.py` (Steps 4–5 below)
 and run the command again `--from enchant_values`; new slugs / icons (Step 5); the map, when the map file changed —
 SHA-1 of the game's `maps/dota.vpk` against the previous patch's row in `data/map/patch_maps.json` (GameTracking has

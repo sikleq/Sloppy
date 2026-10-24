@@ -19,13 +19,28 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DOTA_FILES_DIR: ${{ github.workspace }}/.store/dota-patch-files
     steps:
       - uses: actions/checkout@v7
+
+      # The raw game files of each patch (data/stats/<v>/heroes/*.txt, root KV .txt) are not in this repo: they live
+      # in the private game-files store, read with a read-only deploy key (secret DOTA_FILES_DEPLOY_KEY).
+      - name: Check out the game-files store
+        uses: actions/checkout@v7
+        with:
+          repository: sikleq/dota-patch-files
+          ssh-key: ${{ secrets.DOTA_FILES_DEPLOY_KEY }}
+          path: .store/dota-patch-files
+          fetch-depth: 0          # every patch is a tag: the whole (7.5 MB) history
 
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+
+      - name: Lay out the raw game files from the store
+        run: python tools/game_files.py materialize
 
       - name: Install test dependencies
         run: pip install -r requirements-dev.txt
