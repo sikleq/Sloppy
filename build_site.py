@@ -132,6 +132,15 @@ def main() -> int:
         print(f"Unknown page key(s). Known: {known}", file=sys.stderr)
         return 1
 
+    # raw game files are not in git (2026-10-24): stop with what to do instead of tracebacks in three builders
+    from patch.meta import latest_stats_version
+    from tools import game_files
+    missing = game_files.missing_raw(latest_stats_version())
+    if missing:
+        print(game_files.NO_RAW_FILES.format(version=latest_stats_version(), missing=", ".join(missing),
+                                             store=game_files.STORE), file=sys.stderr)
+        return 2
+
     if latest:
         print(f"  [--latest] building only the newest patch page (patch step only)")
 

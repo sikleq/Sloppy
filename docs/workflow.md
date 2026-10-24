@@ -49,7 +49,8 @@ the store — BEFORE pushing Sloppy: CI lays out the raw files of every patch fr
 files (7.41c+) and `npc_dota_hero_base.txt` (7.41f+) are git-ignored and written from the store by
 `python tools/game_files.py materialize` (rules: `raw_plan`; ~20 s). CI (`build.yml`, `game-build-watch.yml`) checks the
 store out with the read-only deploy key in the secret `DOTA_FILES_DEPLOY_KEY` and runs it before the tests. On a new PC:
-clone the store, then run `materialize`.
+clone the store, then run `materialize`. Without them `build_site.py` stops at once (exit 2) and prints these two
+steps (`game_files.missing_raw`), instead of failing in three builders.
 **Still human** (printed at the end): proofread `_generated_p_<v>_v2.py` into `content/p<code>.py` (Steps 4–5 below)
 and run the command again `--from enchant_values`; new slugs / icons (Step 5); the map, when the map file changed —
 SHA-1 of the game's `maps/dota.vpk` against the previous patch's row in `data/map/patch_maps.json` (GameTracking has

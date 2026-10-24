@@ -309,6 +309,7 @@ def _hero_kit(npc: str) -> list[str]:
     kv = _HERE / "data" / "stats" / latest_stats_version() / "heroes" / f"npc_dota_hero_{npc}.txt"
     slim = _json.loads((_HERE / "data" / "abilities_slim.json").read_text(encoding="utf-8"))
     basics, ults, aghs, seen = [], [], [], set()
+    slotted, defs, txt = [], {}, ""                 # a hero with no KV file has no kit (was an UnboundLocalError)
     if kv.exists():
         txt = kv.read_text(encoding="utf-8", errors="replace")
         defs = {}                                   # slug -> its KV block text

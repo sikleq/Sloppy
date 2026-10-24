@@ -85,6 +85,25 @@ def _order() -> dict:
     return {p["version"]: i for i, p in enumerate(reversed(RELEASE_HISTORY))}      # oldest = 0
 
 
+def missing_raw(version: str, stats: Path = STATS) -> list[str]:
+    """The raw files of `version` the site build reads that are not laid out in data/stats/<version>/ — a clone
+    without the store, or materialize not run yet. Static: the store is not asked."""
+    d = stats / version
+    missing = []
+    if _order().get(version, -1) >= _order()[RAW_TXT_SINCE]:
+        missing += [n for n in ("items.txt", "npc_abilities.txt", "npc_heroes.txt", "npc_units.txt")
+                    if not (d / n).exists()]
+    if not any((d / "heroes").glob("npc_dota_hero_*.txt")):
+        missing.append("heroes/")
+    return missing
+
+
+NO_RAW_FILES = """The raw game files are not laid out in data/stats/{version}/ (missing: {missing}).
+They come from the private game-files store (repo dota-patch-files), not from git:
+  1. clone the store and point DOTA_FILES_DIR at it (now: {store})
+  2. python tools/game_files.py materialize"""
+
+
 def tree(version: str, rel_dir: str) -> dict[str, bytes]:
     """{path under files/: content} of everything under files/<rel_dir> of a patch — one `git archive` call."""
     import io
