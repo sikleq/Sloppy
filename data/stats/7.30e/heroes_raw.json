@@ -1194,7 +1194,7 @@
 "MovementSpeed":"310",
 "MovementTurnRate":"0.900000",
 "ProjectileSpeed":"0",
-"StatusManaRegen":"0.5"
+"StatusManaRegen":"0.0"
 },
 "npc_dota_hero_mars":{
 "ArmorPhysical":"-1",

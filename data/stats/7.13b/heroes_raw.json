@@ -626,7 +626,7 @@
 "VisionDaytimeRange":"1800"
 },
 "npc_dota_hero_earthshaker":{
-"ArmorPhysical":"1",
+"ArmorPhysical":"0",
 "AttackAcquisitionRange":"600",
 "AttackAnimationPoint":"0.467000",
 "AttackCapabilities":"DOTA_UNIT_CAP_MELEE_ATTACK",
@@ -2089,7 +2089,7 @@
 "ProjectileSpeed":"900"
 },
 "npc_dota_hero_tiny":{
-"ArmorPhysical":"-1",
+"ArmorPhysical":"0",
 "AttackAcquisitionRange":"600",
 "AttackAnimationPoint":"0.40000",
 "AttackCapabilities":"DOTA_UNIT_CAP_MELEE_ATTACK",

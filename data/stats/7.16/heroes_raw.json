@@ -505,7 +505,7 @@
 "ProjectileSpeed":"1200"
 },
 "npc_dota_hero_death_prophet":{
-"ArmorPhysical":"2",
+"ArmorPhysical":"1",
 "AttackAcquisitionRange":"800",
 "AttackAnimationPoint":"0.56000",
 "AttackCapabilities":"DOTA_UNIT_CAP_RANGED_ATTACK",
@@ -1164,7 +1164,7 @@
 "AttributeIntelligenceGain":"1.600000",
 "AttributePrimary":"DOTA_ATTRIBUTE_AGILITY",
 "AttributeStrengthGain":"1.600000",
-"MovementSpeed":"320",
+"MovementSpeed":"310",
 "MovementTurnRate":"0.650000",
 "StatusHealthRegen":"1.75",
 "VisionDaytimeRange":"1800"

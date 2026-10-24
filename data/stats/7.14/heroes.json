@@ -68,7 +68,7 @@
     "AttributeBaseAgility": 20,
     "AttributeAgilityGain": 2.2,
     "StatusHealthRegen": 4.25,
-    "MovementSpeed": 285
+    "MovementSpeed": 290
   },
   "npc_dota_hero_bane": {
     "Ability1": "bane_enfeeble",

@@ -17,7 +17,7 @@
 "AttributeStrengthGain":"3.000000",
 "BaseAttackSpeed":"120",
 "MovementSpeed":"325",
-"MovementTurnRate":"0.500000",
+"MovementTurnRate":"0.600000",
 "StatusHealthRegen":"1"
 },
 "npc_dota_hero_abyssal_underlord":{
@@ -480,7 +480,7 @@
 "VisionNighttimeRange":"800"
 },
 "npc_dota_hero_dawnbreaker":{
-"ArmorPhysical":"0.000000",
+"ArmorPhysical":"2.000000",
 "AttackAcquisitionRange":"600",
 "AttackAnimationPoint":"0.460000",
 "AttackCapabilities":"DOTA_UNIT_CAP_MELEE_ATTACK",
@@ -494,7 +494,7 @@
 "AttributeBaseStrength":"26",
 "AttributeIntelligenceGain":"2.200000",
 "AttributePrimary":"DOTA_ATTRIBUTE_STRENGTH",
-"AttributeStrengthGain":"3.20000",
+"AttributeStrengthGain":"3.80000",
 "MovementSpeed":"315",
 "MovementTurnRate":"0.600000"
 },
@@ -2043,7 +2043,7 @@
 "ArmorPhysical":"0",
 "AttackAcquisitionRange":"0",
 "AttackAnimationPoint":"0.500000",
-"AttackCapabilities":"DOTA_UNIT_CAP_NO_ATTACK",
+"AttackCapabilities":"DOTA_UNIT_CAP_RANGED_ATTACK",
 "AttackDamageMax":"0",
 "AttackDamageMin":"0",
 "AttackRange":"700",

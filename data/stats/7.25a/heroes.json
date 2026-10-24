@@ -1063,7 +1063,8 @@
     "AbilityDraftAbilities": {
       "Ability1": "luna_lucent_beam",
       "Ability2": "luna_moon_glaive",
-      "Ability3": "luna_lunar_blessing"
+      "Ability3": "luna_lunar_blessing",
+      "Ability4": "luna_eclipse"
     },
     "ArmorPhysical": 0,
     "AttackDamageMin": 29,
@@ -1729,6 +1730,12 @@
     "Ability4": "lycan_wolf_bite",
     "Ability5": "generic_hidden",
     "Ability6": "lycan_shapeshift",
+    "AbilityDraftAbilities": {
+      "Ability1": "lycan_summon_wolves",
+      "Ability2": "lycan_howl",
+      "Ability3": "lycan_feral_impulse",
+      "Ability4": "lycan_shapeshift"
+    },
     "ArmorPhysical": -1,
     "AttackDamageMin": 30,
     "AttackDamageMax": 35,
@@ -2800,6 +2807,12 @@
     "Ability4": "snapfire_gobble_up",
     "Ability5": "snapfire_spit_creep",
     "Ability6": "snapfire_mortimer_kisses",
+    "AbilityDraftAbilities": {
+      "Ability1": "snapfire_scatterblast",
+      "Ability2": "snapfire_firesnap_cookie",
+      "Ability3": "snapfire_lil_shredder",
+      "Ability4": "snapfire_mortimer_kisses"
+    },
     "ArmorPhysical": 0,
     "AttackDamageMin": 26,
     "AttackDamageMax": 32,
