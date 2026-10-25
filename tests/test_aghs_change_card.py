@@ -115,6 +115,25 @@ def test_granted_ability_text_and_upgrade_bonus_placeholders():
     assert vals["shard_bonus_spell_damage"] == "25" and vals["abilitycastrange"] == "700"   # 7.37 Lina, 7.41 Gyro
 
 
+def test_numbers_go_into_the_description_line():
+    # owner 2026-10-25: "Increases range. / Range: +150." in one line
+    assert el._aghs_inline("Increases range.\nRange: +150.") == "Increases range (+150)."
+    assert (el._aghs_inline("Increases Blade Fury radius, and slows enemies by 35%.\nRadius: +100.")
+            == "Increases Blade Fury radius (+100), and slows enemies by 35%.")
+    # no word of the label in the text: after the description, same line; a number the text says: not twice
+    assert el._aghs_inline("Lasts longer.\nDuration: +2.") == "Lasts longer. Duration: +2."
+    assert el._aghs_inline("Grants 6 armor to allies.\nPassive bonus armor: 6.") == "Grants 6 armor to allies."
+
+
+def test_number_highlight_is_a_number_change_not_a_strip():
+    html = el.mark_number_highlights(el.hl("45/40/35/30s", "nerf") + " " + el.hl("Dispellable", "nerf"))
+    assert 'class="iab-hl iab-hl-nerf iab-hl-num">45/40/35/30s' in html
+    assert 'class="iab-hl iab-hl-nerf">Dispellable' in html
+    # the new side's number gets the old one's % on hover
+    out = el._pair_number_tips(el.hl("20", "del"), el.hl("25", "buff"))
+    assert "iab-hl-num" in out and "iab-hint" in out and "+25%" in out
+
+
 def test_bonus_placeholder_is_the_upgrades_own_bonus():
     # "%bonus_AbilityCooldown%" / "%bonus_open_wounds_duration_pct%" (7.41 Vendetta, 7.40 Infest)
     vals = at._values({"AbilityValues": {"AbilityCooldown": {"value": "70", "special_bonus_shard": "-10"},

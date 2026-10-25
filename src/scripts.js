@@ -599,7 +599,7 @@
   function drawAbilityChangeConnectors() {
     const blocks = document.querySelectorAll('.ability-change-block');
     blocks.forEach((block) => {
-      const svg = block.querySelector(':scope > .ability-change-connector');
+      const svg = block.querySelector(':scope > .ability-change-connector:not(.under-rows-connector)');
       const path = svg && svg.querySelector('path');
       const icon = block.querySelector(':scope > .ability-icon-wrap');
       const oldPane = block.querySelector(
@@ -630,6 +630,29 @@
       // icon, then horizontal segment right to the pane's left edge.
       const d = 'M ' + x1 + ' ' + y1 + ' L ' + x1 + ' ' + y2 + ' L ' + x2 + ' ' + y2;
       path.setAttribute('d', d);
+    });
+    // An old -> new card under an ability's rows (Aghanim's upgrade, what it scales with — 2026-10-25): the same
+    // dashed elbow from the ability's icon to that card's old pane; the svg sits right before the card's caption.
+    document.querySelectorAll('.ability-block > svg.under-rows-connector').forEach((svg) => {
+      const block = svg.parentElement;
+      const path = svg.querySelector('path');
+      const icon = block.querySelector(':scope > .ability-icon-wrap');
+      let card = svg.nextElementSibling;
+      while (card && !card.classList.contains('ability-change')) card = card.nextElementSibling;
+      const oldPane = card && card.querySelector(':scope > .ability-change-old');
+      if (!path || !icon || !oldPane) return;
+      const blockRect = block.getBoundingClientRect();
+      const iconRect = icon.getBoundingClientRect();
+      const paneRect = oldPane.getBoundingClientRect();
+      if (!blockRect.width || !paneRect.width) return;
+      svg.setAttribute('viewBox', '0 0 ' + blockRect.width + ' ' + blockRect.height);
+      svg.style.width = blockRect.width + 'px';
+      svg.style.height = blockRect.height + 'px';
+      const x1 = iconRect.left - blockRect.left + iconRect.width / 2;
+      const y1 = iconRect.bottom - blockRect.top;
+      const x2 = paneRect.left - blockRect.left;
+      const y2 = paneRect.top - blockRect.top + paneRect.height / 2;
+      path.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' L ' + x1 + ' ' + y2 + ' L ' + x2 + ' ' + y2);
     });
   }
   drawAbilityChangeConnectors();

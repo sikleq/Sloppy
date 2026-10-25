@@ -434,6 +434,8 @@ def save_html(filename):
     # (?) notes of hidden duplicate item-ability rows, moved into the abilities card (elements._IAB_NOTES)
     from .elements import _IAB_NOTES, render_iab_card, render_cost_card, render_hs_card, resolve_chip_marks
     out = resolve_chip_marks(out)          # ability card headers: colour only what a row under the card names
+    from .elements import mark_number_highlights
+    out = mark_number_highlights(out)      # a highlighted number: text colour + dotted, not a strip (2026-10-25)
     out = re.sub(r'<!--HSCARD:(.*?)-->', lambda m: render_hs_card(m.group(1)), out)
     out = re.sub(r'<!--COSTCARD:(.*?)-->', lambda m: render_cost_card(m.group(1)), out)
     out = re.sub(r'<!--IABCARD:(.*?)-->', lambda m: render_iab_card(m.group(1)), out)

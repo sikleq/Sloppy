@@ -83,6 +83,8 @@ def ability_props(slug, version):
                    manacost=_levels(pick("AbilityManaCost")), healthcost=_levels(pick("AbilityHealthCost")),
                    cooldown=_levels(pick("AbilityCooldown")),
                    aoe=next((_levels(values[k]) for k in _RADIUS_KEYS if k in values), ""))
+        # a value that grows with the hero's level ("hero_levelup", 7.41 innates): the header says "scales with level"
+        out["level_scaled"] = any(isinstance(v, dict) and "hero_levelup" in v for v in values.values())
         return out
     other = _json(version, "abilities.json").get(slug) or {}
     npc = _json(version, "npc_abilities.json").get(slug) or {}

@@ -3702,6 +3702,13 @@ h4.subgroup .subgroup-new-type {
 .ability-change-block {
   position: relative;
 }
+/* an old -> new card under an ability's rows (Aghanim's upgrade, what it scales with; 2026-10-25): its caption row
+   and the dashed line from the ability's icon, as an ability_change block's */
+.ability-block { position: relative; }
+.ability-block > .under-rows-connector { position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0; overflow: visible; }
+.ability-block > .under-rows-caption { margin: 10px 0 2px; position: relative; z-index: 1; }
+.ability-block > .under-rows-caption + .ability-change { position: relative; z-index: 1; }
 /* Connector curve from the icon's bottom-center down-right toward the
    centre of the old pane — visual cue that the swap panes belong to
    the icon above. Sized to bridge the gap between the icon (col 1) and
@@ -8530,10 +8537,15 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   text-align: left;
   margin-top: 1px;
 }
-/* one row per change (2026-10-25): patch | old → new % | date in aligned columns; a thin line between patches */
-.stat-hist-tip .stat-chg-grid { display: grid; grid-template-columns: auto 1fr auto; column-gap: 12px;
-  align-items: baseline; font-variant-numeric: tabular-nums; }
-.stat-hist-tip .stat-chg-grid > span { padding: 2px 0; }
+/* one row per change (2026-10-25): patch | old → new % | date in aligned columns; a thin line between patches and
+   faint see-through vertical lines between the columns (owner: "слабенькие полупрозрачные вертикальные линии") */
+.stat-hist-tip .stat-chg-grid { display: grid; grid-template-columns: auto 1fr auto;
+  align-items: stretch; font-variant-numeric: tabular-nums; }
+.stat-hist-tip .stat-chg-grid > span { padding: 2px 7px; }
+.stat-hist-tip .stat-chg-grid > .chg-patch { padding-left: 0; }
+.stat-hist-tip .stat-chg-grid > .chg-date { padding-right: 0; line-height: 1.6; }
+.stat-hist-tip .stat-chg-grid > .stat-chg-line,
+.stat-hist-tip .stat-chg-grid > .chg-date { border-left: 1px solid rgba(150, 146, 137, 0.12); }
 .stat-hist-tip .stat-chg-grid > .grp-start { border-top: 1px solid rgba(150, 146, 137, 0.14); }
 .stat-hist-tip .stat-chg-grid > .chg-patch { text-align: left; }
 .stat-hist-tip .stat-chg-grid > .chg-date { text-align: right; }
@@ -11166,6 +11178,18 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-hl-qol,
 .iab-hl-misc { --hl-bg: rgba(160, 150, 130, 0.12); }
 .iab-hl .iab-num { color: inherit; }          /* a number inside the highlighted phrase: the phrase's text colour */
+/* a changed NUMBER (patch/elements.py mark_number_highlights): the text's colour and a dotted underline, as the item
+   cards' values (its % on hover where the pair is known) — words keep the strip (owner 2026-10-25) */
+.iab-hl.iab-hl-num, .aghanim-scepter .iab-hl.iab-hl-num, .aghanim-shard .iab-hl.iab-hl-num {
+  background: none; padding: 0; margin: 0; border-radius: 0; font-weight: 700;
+  border-bottom: 1px dotted currentColor; }
+.iab-hl.iab-hl-num .iab-hint { border-bottom: 0; }
+.iab-hl-num.iab-hl-new { color: #e0bd62; }
+.iab-hl-num.iab-hl-buff { color: #7fd08c; }
+.iab-hl-num.iab-hl-nerf { color: #cf828d; }
+.iab-hl-num.iab-hl-del { color: #cf6b6b; }
+.iab-hl-num.iab-hl-rework, .iab-hl-num.iab-hl-swap { color: #b99ae6; }
+.iab-hl-num.iab-hl-qol, .iab-hl-num.iab-hl-misc { color: var(--text-dimmer); }
 /* on an Aghanim line's blue strip the see-through colour mixed with the blue (purple ≈ blue, owner 2026-10-24):
    there it lies on the card's own dark colour, three layers of it — outside the strips one layer */
 .aghanim-scepter .iab-hl,
@@ -11297,6 +11321,9 @@ html.cb-mode .badge.del { color: #c5527d; background: rgba(113, 38, 66, 0.14); b
 html.cb-mode .iab-hl-buff { --hl-bg: rgba(157, 211, 242, 0.21); }
 html.cb-mode .iab-hl-nerf { --hl-bg: rgba(241, 155, 91, 0.22); }
 html.cb-mode .iab-hl-del { --hl-bg: rgba(154, 51, 90, 0.24); }
+html.cb-mode .iab-hl-num.iab-hl-buff { color: #64baeb; }
+html.cb-mode .iab-hl-num.iab-hl-nerf { color: #f19e60; }
+html.cb-mode .iab-hl-num.iab-hl-del { color: #ce6c91; }
 html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff, html.cb-mode .iab-lv.iab-buff { color: #64baeb; }
 html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf, html.cb-mode .iab-lv.iab-nerf { color: #f19e60; }
 html.cb-mode .components-change .component-price.cost-buff, html.cb-mode .components-change .components-total span.cost-buff { color: #64baeb; }

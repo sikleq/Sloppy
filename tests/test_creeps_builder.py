@@ -65,7 +65,7 @@ def test_build_rows_skips_legend_and_lane_rows_but_keeps_their_level():
     src = creeps.CreepSources(units={}, npc_data={}, abil_slim={}, hist=_hist())
     out = creeps.build_rows(rows, src)
     assert [(r['data']['name'], r['level'], r['tier_break'], r['data']['attack_type']) for r in out] == [
-        ('Kobold', '1', True, 'Default'), ('Gnoll Assassin', '2', True, 'Piercing')]
+        ('Kobold', '1', True, 'Default'), ('Vhoul Assassin', '2', True, 'Piercing')]   # the game's name
 
 
 def test_abil_props_aura_defaults_and_manual_overrides():
@@ -97,8 +97,8 @@ def test_entity_changes_still_reads_the_creep_tables():
 
 
 def test_no_creep_wears_another_creeps_game_name():
-    # 2026-10-21: Hellbear / Hellbear Smasher were swapped. Our names may be older ones (Froglet for Boglet), but a
-    # name the game gives to a DIFFERENT creep is a swap.
+    # 2026-10-21: Hellbear / Hellbear Smasher were swapped: a name the game gives to a DIFFERENT creep is a swap
+    # (since 10-25 every name is the game's, tests/test_creep_names.py).
     game = {npc: creeps.game_unit_name(npc) for npc in creeps.CREEP_DISPLAY_NAMES}
     owner = {name: npc for npc, name in game.items()}
     swapped = [(npc, ours, owner[ours]) for npc, ours in creeps.CREEP_DISPLAY_NAMES.items()

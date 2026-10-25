@@ -11,21 +11,21 @@ from patch import elements as el  # noqa: E402
 
 def test_passive_with_what_it_levels_with_goes_to_the_header():
     head, body = el._pane_parts(["Passive, levels up with Duel.", "When attacking an enemy hero, she heals."])
-    assert '<b class="iab-kind">Passive</b> <span class="iab-scale">(Scales with Duel)</span>' in head
+    assert '<b class="iab-kind">Passive</b> <span class="iab-scale">– scales with Duel</span>' in head
     assert "levels up" not in body and "Passive" not in body
 
 
 def test_scales_and_improves_wordings_and_active_kind():
     head, _ = el._pane_parts(["Passive, scales with Black Hole.", "Allies in a 500 radius take less damage."])
-    assert "(Scales with Black Hole)" in head
+    assert "– scales with Black Hole" in head
     head, body = el._pane_parts(["Active, levels with Holy Persuasion.", "Chen summons a convert."])
-    assert '<b class="iab-kind">Active</b>' in head and "(Scales with Holy Persuasion)" in head
+    assert '<b class="iab-kind">Active</b>' in head and "– scales with Holy Persuasion" in head
     assert "levels with" not in body
 
 
 def test_highlight_on_the_phrase_moves_with_it():
     head, body = el._pane_parts(["Passive, " + el.hl("levels up with Chronosphere", "del") + ".", "Slows projectiles."])
-    assert "(" + el.hl("Scales with Chronosphere", "del") + ")" in head
+    assert "– " + el.hl("scales with Chronosphere", "del") in head
     assert "Chronosphere" not in body
 
 
@@ -80,6 +80,30 @@ def test_value_of_one_named_sub_ability_among_several_stays_in_the_text():
 def test_innate_cannot_be_leveled_up_is_never_said():
     _, body = el._pane_parts(["Innate, cannot be leveled up.", "Summons a Spirit Bear."], props={"kind": "Active"})
     assert "leveled" not in body and "Summons a Spirit Bear" in body
+
+
+def test_value_growing_with_hero_level_says_scales_with_level():
+    # owner 2026-10-25: "Passive - scales with level." (the game files' hero_levelup, 7.41 Precision Aura)
+    head, _ = el._pane_parts(["Passive.", "Grants agility."], props={"kind": "Passive", "level_scaled": True})
+    assert '<span class="iab-scale">– scales with level</span>' in head
+
+
+def test_no_longer_levels_with_row_gets_a_header_card(monkeypatch):
+    from patch import ability_kv
+    props = {"7.40c": {"kind": "Passive", "level_scaled": False}, "7.41": {"kind": "Passive", "level_scaled": True}}
+    monkeypatch.setattr(ability_kv, "ability_props", lambda slug, v: dict(props[v]))
+    monkeypatch.setattr(el._State, "current_ability_slug", "drow_ranger_trueshot")
+    monkeypatch.setattr(el._State, "current_patch_version", "7.41")
+    monkeypatch.setattr(el._State, "aghs_cards", [])
+    row = el.li("No longer levels with Marksmanship", "")
+    assert "iab-covered" in row
+    card = el.ul_close()
+    assert "– " + el.hl("scales with Marksmanship", "del") in card
+    assert "– " + el.hl("scales with level", "new") in card
+    # a fixed value now: the new header is the kind alone
+    props["7.41"]["level_scaled"] = False
+    el.li("No longer levels with Marksmanship", "")
+    assert "scales with level" not in el.ul_close()
 
 
 def test_highlighter_is_the_whole_site_not_a_preview():
