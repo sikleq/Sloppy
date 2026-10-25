@@ -1301,22 +1301,25 @@ def _aghs_diff_html(old, new):
 
 
 _AGHS_LABEL_SKIP = {"bonus", "max", "the", "of", "per", "a"}
+# "Label: value." sentences of a numbers line; a value may hold several decimals ("12.5/15/17.5/20",
+# "1.35 + 0.15 per level"): it ends at a full stop before the next capital or the end
+_AGHS_VALUE_SENT_RE = re.compile(r"([^:]+?):\s*(.+?)\.(?=\s+[A-Z(]|\s*$)")
 
 
-def _aghs_inline(text):
+def _aghs_inline(text, loose=True):
     """One line: each number goes right after the words it names in the description ("Increases range." + "Range:
     +150." -> "Increases range (+150)."), found as the whole label or its last word said once; the rest follow the
     description on the same line (owner 2026-10-25, 60 upgrade texts of 7.38-7.41: 47 of 103 numbers name a word of
     their description)."""
     desc, _, vals = (text or "").partition("\n")
     rest = []
-    for m in _AGHS_VALUE_RE.finditer(vals):
+    for m in _AGHS_VALUE_SENT_RE.finditer(vals):
         label, value = m.group(1).strip(), m.group(2).strip()
         bare = value.lstrip("+")
         if re.search(rf"(?<![\d.]){re.escape(bare)}(?![\d.])", desc):
             continue                            # the description already says it ("grants 6 armor", 7.40 Warcry)
         spot = re.search(rf"\b{re.escape(label)}\b", desc, re.I)
-        if not spot:
+        if not spot and loose:                  # an ability's own longer text: the whole label only (7.40 "level (1%)")
             words = [w for w in re.findall(r"[A-Za-z]+", label) if w.lower() not in _AGHS_LABEL_SKIP]
             hits = list(re.finditer(rf"\b{re.escape(words[-1])}\b", desc, re.I)) if words else []
             spot = hits[0] if len(hits) == 1 else None
@@ -1409,13 +1412,15 @@ def _aghs_rework_card(text, covered=False) -> bool:
         esc = lambda s: _html.escape(s, quote=False)
         old_lines = [aghs_line(sub_ability(s, ability_name(s, prev) or s) + " " + esc(old), kind=kind) for s, old in olds]
         new_html = sub_ability(slug, ability_name(slug, version) or slug) + " " + esc(new)
-        caption = f"{up} moved from {', '.join(ability_name(s, prev) or s for s, _ in olds)}."
+        caption = f"Added {up}."                # owner 2026-10-25: not "moved from X" — the card says from where
     pane = lambda side, lines: (f'<div class="ability-change-pane ability-change-{side}"><div class="ability-change-body">'
                                 f'{_bold_numbers_html("".join(lines))}</div></div>')
     old_pane, new_pane = pane("old", old_lines), pane("new", [aghs_line(new_html, kind=kind)])
     if sources == [slug]:
         new_pane = _pair_number_tips(old_pane, new_pane)
-    _State.aghs_cards.append(_under_rows_card(caption, "rework", f"aghanim-{kind}", "aghs-change", old_pane, new_pane))
+    # no blue Aghanim strip on the caption: the card's lines already carry it (owner 2026-10-25)
+    tag = "rework" if sources == [slug] else "new"
+    _State.aghs_cards.append(_under_rows_card(caption, tag, "", "aghs-change", old_pane, new_pane))
     return True
 
 
@@ -1424,10 +1429,11 @@ def _under_rows_card(caption, tag, li_cls, card_cls, old_pane, new_pane):
     the tag, like an ability_change's summary, and a dashed line from the ability's icon to the old pane (scripts.js
     drawAbilityChangeConnectors) — owner 2026-10-25."""
     marker = f'<span class="aghanim-marker {li_cls[9:]}"></span>' if li_cls.startswith("aghanim-") else ""
+    li_attr = f' class="{li_cls}"' if li_cls else ""
     return ('<svg class="ability-change-connector under-rows-connector" viewBox="0 0 100 100" preserveAspectRatio="none" '
             'aria-hidden="true"><path d="" fill="none" stroke="rgba(150, 146, 137, 0.45)" stroke-width="1.3" '
             'stroke-dasharray="3 3" stroke-linecap="round" /></svg>'
-            f'<ul class="changes ability-change-summary-ul under-rows-caption"><li data-tag="{tag}" class="{li_cls}">'
+            f'<ul class="changes ability-change-summary-ul under-rows-caption"><li data-tag="{tag}"{li_attr}>'
             f'<span class="badge {tag}" data-tag="{tag}">{tag.upper()}</span>'
             f'<span class="row-text">{caption}{marker}</span></li></ul>'
             f'<div class="ability-change unified-panes {card_cls}">{old_pane}'
@@ -1452,13 +1458,22 @@ def _scale_card(text) -> bool:
     kind_old, kind_new = old_p.get("kind") or new_p.get("kind"), new_p.get("kind") or old_p.get("kind")
     if not kind_new:
         return False                            # the files don't know the ability: the row says it
-    old_head, _ = _pane_parts([f"{kind_old}, levels with {m.group(1).strip()}."], old_p, marks={"_scale": "del"})
-    new_head, _ = _pane_parts([f"{kind_new}."], new_p, marks={"_scale": "new"})
-    pane = lambda side, head: (f'<div class="ability-change-pane ability-change-{side}">{head}'
-                               f'<div class="ability-change-body"></div></div>')
+    from .aghs_text import ability_text
+    prev = _prev_patch_version(version)
+    old_t, new_t = ability_text(slug, prev), ability_text(slug, version)
+    if not old_t or not new_t:
+        # the card shows the ability's own text on both sides (owner 2026-10-25: "нет описаний"); never an empty one
+        raise RuntimeError(f"{slug} ({version}): no {prev if not old_t else version} description — teach "
+                           f"patch/aghs_text.py ability_text where this tooltip or its numbers are")
+    old_html, new_html = _aghs_words_html(_aghs_inline(old_t, loose=False), _aghs_inline(new_t, loose=False))
+    old_head, old_body = _pane_parts([f"{kind_old}, levels with {m.group(1).strip()}.", old_html], old_p)
+    new_head, new_body = _pane_parts([f"{kind_new}.", new_html], new_p)
+    pane = lambda side, head, body: (f'<div class="ability-change-pane ability-change-{side}">{head}'
+                                     f'<div class="ability-change-body">{body}</div></div>')
+    old_pane = pane("old", old_head, old_body)
+    new_pane = _pair_number_tips(old_pane, pane("new", new_head, new_body))
     caption = _html.escape(re.sub(r"<[^>]+>", "", text).strip().rstrip(".") + ".", quote=False)
-    _State.aghs_cards.append(_under_rows_card(caption, "rework", "", "scale-change",
-                                              pane("old", old_head), pane("new", new_head)))
+    _State.aghs_cards.append(_under_rows_card(caption, "rework", "", "scale-change", old_pane, new_pane))
     return True
 
 
@@ -2002,16 +2017,6 @@ def _pane_values(desc, props=None) -> dict:
             if (props or {}).get(key) or found.get(key)}
 
 
-def _pane_scale(desc, props=None) -> str:
-    """What a pane's header will say the ability scales with ("Chronosphere", "level") or "" — to compare two sides."""
-    items = [d for d in (desc if isinstance(desc, list) else [desc]) if isinstance(d, str)
-             and not d.lstrip().startswith("<div")]
-    found = [m for d in items for m in _PANE_SCALE_RE.finditer(d)]
-    if len(found) == 1:
-        return re.sub(r"<[^>]+>", "", found[0].group(2)).strip()
-    return "level" if (props or {}).get("level_scaled") else ""
-
-
 def _pane_parts(desc, props=None, facet=False, marks=None):
     """(header strip html or "", body rows html) of an ability / facet card pane. The text's own leading "Active." goes
     to the header (7.41 Summon Raptors said it twice); a facet's rows that all start with the ability they change
@@ -2070,9 +2075,7 @@ def _pane_parts(desc, props=None, facet=False, marks=None):
              else f'<span class="iab-name">{name}</span>' if name else "")
     if kind and not scale and (props or {}).get("level_scaled"):
         scale = "scales with level"             # the game files: a value grows with hero level (7.41 innates)
-    smark = (marks or {}).get("_scale")
-    if scale and smark and "iab-hl" not in scale:
-        scale = hl(scale, smark)                # the pair's scaling changed: removed del, added new
+    scale = re.sub(r"<[^>]+>", "", scale)      # never coloured in the header (owner 2026-10-25: "не крась scales with")
     if scale:
         title += f' <span class="iab-scale">– {scale}</span>'
     head = (f'<div class="iab-head pane-head"><span class="iab-title">{title}</span>'
@@ -3958,14 +3961,6 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
     _marks = {side: {k: (mark, _card_id) for k, mark in m.items()}
               for side, m in zip(("old", "new"), _iab_meta_marks(_vals["old"], _vals["new"]))} if _same else {}
     _State.card_meta = {k: (_vals["old"][k], _vals["new"][k], _card_id) for k in _marks.get("new", {})}
-    if _same:                                   # "scales with Chronosphere" -> "scales with level" / none (7.41)
-        _so = _pane_scale(old.get("desc", []), _props["old"])
-        _sn = _pane_scale(new.get("desc", []), _props["new"])
-        if _so != _sn:
-            if _so:
-                _marks.setdefault("old", {})["_scale"] = "del"
-            if _sn:
-                _marks.setdefault("new", {})["_scale"] = "new"
 
     def _side(spec, kind):
         name = spec["name"]

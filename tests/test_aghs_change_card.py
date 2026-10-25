@@ -87,6 +87,9 @@ def test_upgrade_moved_to_another_ability_becomes_a_card(monkeypatch):
     assert "arc_warden_spark_wraith upgrade, old" in out and "arc_warden_tempest_double upgrade, new" in out
     assert out.count('class="ac-sub"') == 2                       # whose upgrade: icon + name on both sides
     assert "iab-hl" not in out                                    # two abilities: no word diff
+    # owner 2026-10-25: "Added Aghanim's Shard." (NEW), no blue strip on the caption: the card's lines have it
+    assert "Added Aghanim&#x27;s Shard." in out or "Added Aghanim's Shard." in out
+    assert '<li data-tag="new">' in out
 
 
 def test_named_ability_icon_is_downloaded_and_has_a_fallback(monkeypatch):

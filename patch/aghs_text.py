@@ -138,6 +138,53 @@ def _granted_text(slug, kind, version, block):
     return f"Grants this ability: {text}" + ("" if text.endswith((".", "!")) else ".")
 
 
+def _per_level(base, inc, pct=""):
+    """"10% + 1% per level"; a value that shrinks with level: "6.9 - 0.1 per level" (7.41 Weave)."""
+    sign = "-" if str(inc).startswith("-") else "+"
+    return f"{base}{pct} {sign} {str(inc).lstrip('-')}{pct} per level"
+
+
+def ability_text(slug, version):
+    """An ability's own description in `version` with that patch's numbers; a value growing with hero level
+    ("hero_levelup") reads "10% + 1% per level" (7.41 innates). None when the files don't have it."""
+    from tools.item_ability_text import _clean, _fill
+    from tools.loc_history import tooltip
+    block = _blocks(version).get(slug)
+    desc = tooltip(f"DOTA_Tooltip_ability_{slug}_Description", version)
+    if not isinstance(block, dict) or not desc:
+        return None
+    av = block.get("AbilityValues")
+    grow = {k.lower(): (_num(v.get("value", "0")), _num(v["hero_levelup"]))
+            for k, v in (av.items() if isinstance(av, dict) else ()) if isinstance(v, dict) and "hero_levelup" in v}
+
+    def per_level(m):
+        base, inc = grow.get(m.group(1).lower(), (None, None))
+        if base is None or inc is None:
+            return m.group(0)
+        pct = "%" if m.group(2) else ""
+        return _per_level(base, inc, pct)
+    filled = _fill(re.sub(r"%([A-Za-z_]\w*)%(%%)?", per_level, desc), _values(block, "base"))
+    text = _clean(filled).replace("%%", "%") if filled is not None else ""      # "0%%" the file writes bare
+    if not text:
+        return None
+    text += "" if text.endswith((".", "!")) else "."
+    # the values the game lists under the description ("AGILITY BASE BONUS: 10% + 1%"): 7.41 Precision Aura's text
+    # names no number at all
+    lines = []
+    for k, v in (av.items() if isinstance(av, dict) else ()):
+        label = tooltip(f"DOTA_Tooltip_ability_{slug}_{k}", version)
+        n = _num(v.get("value", "") if isinstance(v, dict) else v)
+        if not label or not re.search(r"[A-Za-z]", label) or n is None:
+            continue
+        pct = "%" if label.lstrip().startswith("%") else ""
+        label = re.sub(r"^[%$+\s]+|[:\s]+$", "", label).strip().capitalize()
+        base, inc = grow.get(k.lower(), (None, None))
+        val = _per_level(n, inc, pct) if inc else f"{n}{pct}"
+        if inc or any(float(x) for x in n.split("/")):
+            lines.append(f"{label}: {val}.")
+    return text + ("\n" + " ".join(lines) if lines else "")
+
+
 def aghs_text(slug, kind, version):
     """The upgrade text of `slug` ("scepter" / "shard") in `version`: the description, then (after a line break) its
     numbers "Radius: +100. Barrier duration: 6." — or None. An ability the upgrade grants: "Grants <name>: …"."""

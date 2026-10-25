@@ -23,10 +23,11 @@ def test_scales_and_improves_wordings_and_active_kind():
     assert "levels with" not in body
 
 
-def test_highlight_on_the_phrase_moves_with_it():
+def test_phrase_moves_to_the_header_without_its_colour():
+    # owner 2026-10-25: "в шапке не крась scales with"
     head, body = el._pane_parts(["Passive, " + el.hl("levels up with Chronosphere", "del") + ".", "Slows projectiles."])
-    assert "– " + el.hl("scales with Chronosphere", "del") in head
-    assert "Chronosphere" not in body
+    assert '<span class="iab-scale">– scales with Chronosphere</span>' in head
+    assert "Chronosphere" not in body and "iab-hl" not in head
 
 
 def test_two_level_phrases_stay_in_the_text():
@@ -98,8 +99,10 @@ def test_no_longer_levels_with_row_gets_a_header_card(monkeypatch):
     row = el.li("No longer levels with Marksmanship", "")
     assert "iab-covered" in row
     card = el.ul_close()
-    assert "– " + el.hl("scales with Marksmanship", "del") in card
-    assert "– " + el.hl("scales with level", "new") in card
+    assert '<span class="iab-scale">– scales with Marksmanship</span>' in card
+    assert '<span class="iab-scale">– scales with level</span>' in card
+    # both sides carry the ability's own text from the game files (owner 2026-10-25: "нет описаний")
+    assert card.count('class="ability-change-row"') >= 2 and "per level" in card
     # a fixed value now: the new header is the kind alone
     props["7.41"]["level_scaled"] = False
     el.li("No longer levels with Marksmanship", "")
