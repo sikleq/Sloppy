@@ -137,6 +137,28 @@ def test_number_highlight_is_a_number_change_not_a_strip():
     assert "iab-hl-num" in out and "iab-hint" in out and "+25%" in out
 
 
+def test_rework_colours_only_changed_numbers_of_the_same_words():
+    # owner 2026-10-25: a rewritten meaning stays plain; only a values-only change is coloured, numbers only
+    o, n = el._rework_diff_html("Gives 100 bonus radius when cast during Duel.",
+                                "Overwhelming Odds has larger radius (+100).")
+    assert "iab-hl" not in o and "iab-hl" not in n
+    o, n = el._rework_diff_html("Increases radius (+100). Duration: 5s.", "Increases radius (+150). Duration: 5s.")
+    assert o == "Increases radius (" + el.hl("+100", "nerf") + "). Duration: 5s."
+    assert n == "Increases radius (" + el.hl("+150", "buff") + "). Duration: 5s."
+    _, n = el._rework_diff_html("Lowers cooldown (-2s).", "Lowers cooldown (-3s).")
+    assert el.hl("-3s", "buff") in n                    # a cooldown: lower is better
+
+
+def test_huskar_inner_fire_numbers_are_right():
+    # owner 2026-10-25: "на сколько снижается кулдаун? почему 10% heal?" — the cooldown has no tooltip label
+    # (AbilityCooldown -3) and two labels end in "heal": none of them goes after the word
+    line = el._aghs_inline("Lowers Inner Fire cooldown and causes it to apply a movement speed slow and heal Huskar."
+                           "\nCooldown: -3s. Movement slow: 50%. Hero damage as heal: 50%. Non-hero damage as heal: 10%.")
+    assert line == ("Lowers Inner Fire cooldown (-3s) and causes it to apply a movement speed slow (50%) and heal "
+                    "Huskar. Hero damage as heal: 50%. Non-hero damage as heal: 10%.")
+    assert at._HEADER_LABELS["abilitycooldown"] == "Cooldown" and at._num("-50%") == "-50%"
+
+
 def test_bonus_placeholder_is_the_upgrades_own_bonus():
     # "%bonus_AbilityCooldown%" / "%bonus_open_wounds_duration_pct%" (7.41 Vendetta, 7.40 Infest)
     vals = at._values({"AbilityValues": {"AbilityCooldown": {"value": "70", "special_bonus_shard": "-10"},

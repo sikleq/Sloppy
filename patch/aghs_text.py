@@ -14,15 +14,20 @@ _KEYS = {"scepter": ("aghanim_description", "scepter_description"), "shard": ("s
 
 
 def _num(raw):
-    """KV "100" / "+100" / "=500" / "8 10 12" -> "100" / "8/10/12"; None when not a number list."""
+    """KV "100" / "+100" / "=500" / "8 10 12" / "-50%" -> "100" / "8/10/12" / "-50%"; None when not a number list."""
     parts = []
     for x in str(raw).split():
+        pct = x.endswith("%")                   # "-50%": a share of the base value (7.41 Pugna's Life Drain cooldown)
         try:
-            f = float(x.lstrip("+=x"))
+            f = float(x.lstrip("+=x").rstrip("%"))
         except ValueError:
             return None
-        parts.append(f"{f:g}")
+        parts.append(f"{f:g}" + ("%" if pct else ""))
     return "/".join(parts) if parts else None
+
+
+def _nonzero(n):
+    return any(float(x.rstrip("%")) for x in n.split("/"))
 
 
 def _values(block, kind):
@@ -57,6 +62,13 @@ def _values(block, kind):
     return out
 
 
+_HEADER_LABELS = {"abilitycooldown": "Cooldown", "abilitymanacost": "Mana cost", "abilityhealthcost": "Health cost",
+                  "abilitycastrange": "Cast range", "abilitychargerestoretime": "Charge restore time",
+                  "abilitycharges": "Charges", "abilityduration": "Duration", "abilitycastpoint": "Cast point",
+                  "abilitychanneltime": "Channel time"}
+_SECONDS = {"abilitycooldown", "abilitychargerestoretime", "abilityduration", "abilitycastpoint", "abilitychanneltime"}
+
+
 def _value_lines(block, kind, slug, version, tooltip):
     """The upgrade's own numbers as the game lists them under the description ("RADIUS: 600 (+100)"): every value the
     upgrade sets that has a label -> "Radius: +100." (a bonus on a base value keeps its sign, an upgrade-only value is
@@ -68,17 +80,21 @@ def _value_lines(block, kind, slug, version, tooltip):
             continue
         raw = next((v[b] for b in (f"special_bonus_{kind}", "special_bonus_aghanim" if kind == "scepter" else "")
                     if b and b in v), None)
-        label = tooltip(f"DOTA_Tooltip_ability_{slug}_{k}", version) if raw is not None else None
+        # the header values have no tooltip label of their own: "AbilityCooldown" -3 = "Cooldown: -3" (7.40 Huskar's
+        # Inner Fire said "Lowers Inner Fire cooldown" with no number)
+        label = (tooltip(f"DOTA_Tooltip_ability_{slug}_{k}", version) or _HEADER_LABELS.get(k.lower())
+                 if raw is not None else None)
         n = _num(raw) if raw is not None else None
-        if not label or n is None or not re.search(r"[A-Za-z]", label) or not any(float(x) for x in n.split("/")):
+        if not label or n is None or not re.search(r"[A-Za-z]", label) or not _nonzero(n):
             continue                                     # "+0": the upgrade no longer sets it (Sven 7.41 armor)
         pct = label.lstrip().startswith("%")
         label = re.sub(r"^[%$+\s]+|[:\s]+$", "", label).strip().capitalize()
         base = _num(v.get("value", "")) if "value" in v else None
-        signed = base is not None and any(float(x) for x in base.split("/"))
+        signed = base is not None and _nonzero(base)
         sign = "-" if str(raw).strip().startswith("-") else "+"
         val = (sign + n.lstrip("-")) if signed else n
-        out.append(f"{label}: {val}{'%' if pct else ''}.")
+        unit = "%" if pct else "s" if k.lower() in _SECONDS and not n.endswith("%") else ""
+        out.append(f"{label}: {val}{unit}.")
     return out
 
 
@@ -128,14 +144,9 @@ def ability_name(slug, version):
 def _granted_text(slug, kind, version, block):
     """An ability the upgrade grants: "Grants this ability: <its description>." (the game shows the ability itself;
     the card names it with its icon)."""
-    from tools.item_ability_text import _clean, _fill
-    from tools.loc_history import tooltip
-    desc = tooltip(f"DOTA_Tooltip_ability_{slug}_Description", version)
-    filled = _fill(desc, _values(block, kind)) if desc else None
-    if filled is None or not _clean(filled):
-        return None
-    text = _clean(filled)
-    return f"Grants this ability: {text}" + ("" if text.endswith((".", "!")) else ".")
+    # with the numbers the game lists under it (7.38 Treant's Eyes in the Forest: "Vision radius: 800")
+    text = ability_text(slug, version, kind)
+    return f"Grants this ability: {text}" if text else None
 
 
 def _per_level(base, inc, pct=""):
@@ -144,9 +155,10 @@ def _per_level(base, inc, pct=""):
     return f"{base}{pct} {sign} {str(inc).lstrip('-')}{pct} per level"
 
 
-def ability_text(slug, version):
+def ability_text(slug, version, kind="base"):
     """An ability's own description in `version` with that patch's numbers; a value growing with hero level
-    ("hero_levelup") reads "10% + 1% per level" (7.41 innates). None when the files don't have it."""
+    ("hero_levelup") reads "10% + 1% per level" (7.41 innates). kind: the Aghanim's upgrade that grants it, whose
+    values ("special_bonus_scepter": "800") are its numbers. None when the files don't have it."""
     from tools.item_ability_text import _clean, _fill
     from tools.loc_history import tooltip
     block = _blocks(version).get(slug)
@@ -163,7 +175,7 @@ def ability_text(slug, version):
             return m.group(0)
         pct = "%" if m.group(2) else ""
         return _per_level(base, inc, pct)
-    filled = _fill(re.sub(r"%([A-Za-z_]\w*)%(%%)?", per_level, desc), _values(block, "base"))
+    filled = _fill(re.sub(r"%([A-Za-z_]\w*)%(%%)?", per_level, desc), _values(block, kind))
     text = _clean(filled).replace("%%", "%") if filled is not None else ""      # "0%%" the file writes bare
     if not text:
         return None
@@ -173,14 +185,14 @@ def ability_text(slug, version):
     lines = []
     for k, v in (av.items() if isinstance(av, dict) else ()):
         label = tooltip(f"DOTA_Tooltip_ability_{slug}_{k}", version)
-        n = _num(v.get("value", "") if isinstance(v, dict) else v)
+        n = _num((v.get("value") or v.get(f"special_bonus_{kind}", "")) if isinstance(v, dict) else v)
         if not label or not re.search(r"[A-Za-z]", label) or n is None:
             continue
         pct = "%" if label.lstrip().startswith("%") else ""
         label = re.sub(r"^[%$+\s]+|[:\s]+$", "", label).strip().capitalize()
         base, inc = grow.get(k.lower(), (None, None))
         val = _per_level(n, inc, pct) if inc else f"{n}{pct}"
-        if inc or any(float(x) for x in n.split("/")):
+        if inc or _nonzero(n):
             lines.append(f"{label}: {val}.")
     return text + ("\n" + " ".join(lines) if lines else "")
 
@@ -202,6 +214,7 @@ def aghs_text(slug, kind, version):
     if filled is None:
         return None
     text = _DECREASE_RE.sub(r"\1", _clean(filled))     # "Decreases cooldown by -2s": the word says the minus
+    text = re.sub(r"(\d%)s\b", r"\1", text)             # "by %abilitycooldown%s" with "-50%" -> "by 50%" (7.41 Pugna)
     if not text:
         return None
     text += "" if text.endswith((".", "!")) else "."

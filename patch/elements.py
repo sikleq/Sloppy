@@ -1312,22 +1312,71 @@ def _aghs_inline(text, loose=True):
     description on the same line (owner 2026-10-25, 60 upgrade texts of 7.38-7.41: 47 of 103 numbers name a word of
     their description)."""
     desc, _, vals = (text or "").partition("\n")
+    said = desc                                 # the game's own words, before any number is put in
+    pairs = [(m.group(1).strip(), m.group(2).strip()) for m in _AGHS_VALUE_SENT_RE.finditer(vals)]
+    last = lambda label: ([w for w in re.findall(r"[A-Za-z]+", label) if w.lower() not in _AGHS_LABEL_SKIP] or [""])[-1]
     rest = []
-    for m in _AGHS_VALUE_SENT_RE.finditer(vals):
-        label, value = m.group(1).strip(), m.group(2).strip()
+    for label, value in pairs:
         bare = value.lstrip("+")
-        if re.search(rf"(?<![\d.]){re.escape(bare)}(?![\d.])", desc):
+        if re.search(rf"(?<![\d.]){re.escape(bare)}(?!\d|\.\d)", said):
             continue                            # the description already says it ("grants 6 armor", 7.40 Warcry)
         spot = re.search(rf"\b{re.escape(label)}\b", desc, re.I)
-        if not spot and loose:                  # an ability's own longer text: the whole label only (7.40 "level (1%)")
-            words = [w for w in re.findall(r"[A-Za-z]+", label) if w.lower() not in _AGHS_LABEL_SKIP]
-            hits = list(re.finditer(rf"\b{re.escape(words[-1])}\b", desc, re.I)) if words else []
+        # an ability's own longer text: the whole label only (7.40 "level (1%)"); a last word two labels share says
+        # neither (7.40 Inner Fire: "Hero damage as heal" / "Non-hero damage as heal" -> no "heal (10%)")
+        if not spot and loose and last(label) and sum(last(x).lower() == last(label).lower() for x, _ in pairs) == 1:
+            hits = list(re.finditer(rf"\b{re.escape(last(label))}\b", desc, re.I))
             spot = hits[0] if len(hits) == 1 else None
         if spot and "(" not in desc[spot.end():spot.end() + 2]:
             desc = f"{desc[:spot.end()]} ({value}){desc[spot.end():]}"
         else:
             rest.append(f"{label}: {value}.")
     return " ".join([desc] + rest)
+
+
+_NUM_TOKEN_RE = re.compile(r"^\(?[+\-]?\d[\d.,/]*(?:%|s|x)?\)?[.,;:]?$")
+_LOWER_BETTER_RE = re.compile(r"cooldown|mana|cost|delay|cast point|restore time|channel", re.I)
+
+
+def _rework_diff_html(old, new):
+    """(old html, new html) of a reworked text: only numbers are coloured, and only when the words stayed the same —
+    a rewritten meaning stays plain (owner 2026-10-25: "красим только значения, если реворк = изменение значений, а не
+    смысл, иначе всё слишком покрашенное"). The new number takes the change's colour, the old the opposite one."""
+    a, b_ = list(_AGHS_WORD_RE.finditer(old)), list(_AGHS_WORD_RE.finditer(new))
+    esc = lambda s: _html.escape(s, quote=False)
+    skeleton = lambda ms: ["#" if _NUM_TOKEN_RE.match(m.group(0)) else m.group(0).lower() for m in ms]
+    if skeleton(a) != skeleton(b_):
+        return esc(old), esc(new)
+    def nums(s):                                # signed: a cooldown "-2s" -> "-3s" goes down, lower is better
+        out = []
+        for x in re.findall(r"[+\-]?\d[\d.,]*", s):
+            try:
+                out.append(float(x.replace(",", "").rstrip(".")))
+            except ValueError:
+                pass
+        return out
+    marks = {"old": [], "new": []}
+    for i, (mo, mn) in enumerate(zip(a, b_)):
+        if mo.group(0) == mn.group(0) or not _NUM_TOKEN_RE.match(mn.group(0)):
+            continue
+        o, n = nums(mo.group(0)), nums(mn.group(0))
+        before = " ".join(m.group(0) for m in a[max(0, i - 4):i])
+        lower = bool(_LOWER_BETTER_RE.search(before))
+        up = (sum(n) / len(n) if n else 0) > (sum(o) / len(o) if o else 0)
+        kind = "buff" if up != lower else "nerf"
+        marks["old"].append((mo.start(), mo.end(), "nerf" if kind == "buff" else "buff"))
+        marks["new"].append((mn.start(), mn.end(), kind))
+
+    def paint(text, spans):
+        out, pos = "", 0
+        for s, e, mark in spans:
+            while e > s and text[e - 1] in ".,;:)":
+                e -= 1
+            while s < e and text[s] == "(":
+                s += 1
+            out += esc(text[pos:s]) + hl(esc(text[s:e]), mark)
+            pos = e
+        return out + esc(text[pos:])
+    return paint(old, marks["old"]), paint(new, marks["new"])
 
 
 def _aghs_words_html(old, new):
@@ -1405,7 +1454,7 @@ def _aghs_rework_card(text, covered=False) -> bool:
     new, olds = _aghs_inline(new), [(s, _aghs_inline(old)) for s, old in olds]
     up = f"Aghanim's {kind.title()}"
     if sources == [slug]:
-        old_html, new_html = _aghs_words_html(olds[0][1], new)
+        old_html, new_html = _rework_diff_html(olds[0][1], new)
         old_lines = [aghs_line(old_html, kind=kind)]
         caption = f"{up} reworked."
     else:                                       # another ability's upgrade: no word diff, its icon + name say whose
@@ -1465,7 +1514,7 @@ def _scale_card(text) -> bool:
         # the card shows the ability's own text on both sides (owner 2026-10-25: "нет описаний"); never an empty one
         raise RuntimeError(f"{slug} ({version}): no {prev if not old_t else version} description — teach "
                            f"patch/aghs_text.py ability_text where this tooltip or its numbers are")
-    old_html, new_html = _aghs_words_html(_aghs_inline(old_t, loose=False), _aghs_inline(new_t, loose=False))
+    old_html, new_html = _rework_diff_html(_aghs_inline(old_t, loose=False), _aghs_inline(new_t, loose=False))
     old_head, old_body = _pane_parts([f"{kind_old}, levels with {m.group(1).strip()}.", old_html], old_p)
     new_head, new_body = _pane_parts([f"{kind_new}.", new_html], new_p)
     pane = lambda side, head, body: (f'<div class="ability-change-pane ability-change-{side}">{head}'
