@@ -8505,11 +8505,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   overflow-y: auto;
 }
 .stat-hist-tip.is-visible { display: block; }
-.stat-hist-tip .stat-chg { padding: 3px 0; }
-.stat-hist-tip .stat-chg + .stat-chg {
-  border-top: 1px solid var(--line-soft);
-  margin-top: 3px;
-}
 /* Net first→today summary pinned at the top of the tooltip, divider below. */
 .stat-hist-tip .stat-net {
   padding: 1px 0 6px;
@@ -8527,17 +8522,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   letter-spacing: 0.6px;
   margin-right: 5px;
 }
-/* Entry header: patch number top-left, date top-right (dd.mm.yy). */
-.stat-hist-tip .stat-chg-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 14px;
-  font-variant-numeric: tabular-nums;
-  padding-bottom: 2px;
-  margin-bottom: 2px;
-  border-bottom: 1px solid rgba(150, 146, 137, 0.14);
-}
 .stat-hist-tip .chg-patch { font-weight: 600; color: var(--gold); }
 .stat-hist-tip .chg-date { color: var(--text-dim); font-size: 10px; }
 .stat-hist-tip .stat-chg-line {
@@ -8546,6 +8530,14 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   text-align: left;
   margin-top: 1px;
 }
+/* one row per change (2026-10-25): patch | old → new % | date in aligned columns; a thin line between patches */
+.stat-hist-tip .stat-chg-grid { display: grid; grid-template-columns: auto 1fr auto; column-gap: 12px;
+  align-items: baseline; font-variant-numeric: tabular-nums; }
+.stat-hist-tip .stat-chg-grid > span { padding: 2px 0; }
+.stat-hist-tip .stat-chg-grid > .grp-start { border-top: 1px solid rgba(150, 146, 137, 0.14); }
+.stat-hist-tip .stat-chg-grid > .chg-patch { text-align: left; }
+.stat-hist-tip .stat-chg-grid > .chg-date { text-align: right; }
+.stat-hist-tip .stat-chg-grid > .stat-chg-line { margin-top: 0; }
 .stat-hist-tip .chg-label { color: #bdb8ad; }
 .stat-hist-tip .chg-cycle { color: var(--text-main); padding: 0 3px; }
 /* Ability tags — same palette as the changelog NEW/DEL badges. */
@@ -11155,36 +11147,29 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-none { border: 0; }
 .iab-card.iab-added { border: 1px dashed rgba(110, 170, 118, 0.42); }   /* a step darker (owner 2026-09-30) */
 .iab-card.iab-removed { border: 1px dashed rgba(227, 128, 110, 0.5); }
-/* card text a hidden row without numbers describes, in its tag's colour (Bloodpact 7.38 "Dispel Type: Basic
-   Dispel." gold = NEW); the % of a changed number sits in its hover tip */
-.iab-hl-new { color: #e0bd62; }
-.iab-hl-buff { color: #7fd08c; }
-.iab-hl-nerf { color: #cf828d; }
 /* another ability named inside a card's text: a small icon + its name (sub_ability, 7.41 Overclocking) */
 .ac-sub { display: inline-flex; align-items: center; gap: 5px; vertical-align: -5px; margin-right: 2px; }
 .ac-sub-ico { width: 20px; height: 20px; border-radius: 3px; border: 1px solid var(--line-soft); }
 .ac-sub-name { color: var(--text-bright); font-weight: 600; }
-.iab-hl-del { color: #cf6b6b; }            /* removed text: the DEL colour (red since 2026-10-21), whatever the row's tag */
-.iab-hl-rework, .iab-hl-swap { color: #b99ae6; }
-.iab-hl-qol, .iab-hl-misc { color: var(--text-dimmer); }
-.iab-hl .iab-num { color: inherit; }          /* a number inside the coloured phrase takes its colour */
-/* PREVIEW (owner 2026-10-24): the tag colour as a light highlighter under the text instead of the text's colour —
-   heroes in patch/elements.py HL_MARKER_PREVIEW (Dragon Knight), to look at before the whole site */
-.hl-marker .iab-hl { color: inherit; padding: 0 3px; margin: 0 -1px; border-radius: 3px;
+/* changed words in a card's text: the change's colour as a light highlighter under the text, the text keeps its
+   own colour (owner: preview on Dragon Knight 2026-10-24, the whole site 10-25 at ~0.15). The colour is the side
+   of the change, not the row's tag: removed = del, added = new, rewritten = rework; the % of a changed number sits
+   in its hover tip */
+.iab-hl { padding: 0 3px; margin: 0 -1px; border-radius: 3px;
   -webkit-box-decoration-break: clone; box-decoration-break: clone; background: var(--hl-bg); }
-.hl-marker .iab-hl-new { --hl-bg: rgba(224, 189, 98, 0.075); }
-.hl-marker .iab-hl-buff { --hl-bg: rgba(127, 208, 140, 0.07); }
-.hl-marker .iab-hl-nerf { --hl-bg: rgba(207, 130, 141, 0.075); }
-.hl-marker .iab-hl-del { --hl-bg: rgba(207, 107, 107, 0.08); }
-.hl-marker .iab-hl-rework,
-.hl-marker .iab-hl-swap { --hl-bg: rgba(128, 84, 214, 0.13); }   /* a darker, deeper purple (owner 2026-10-24) */
-.hl-marker .iab-hl-qol,
-.hl-marker .iab-hl-misc { --hl-bg: rgba(160, 150, 130, 0.06); }
+.iab-hl-new { --hl-bg: rgba(224, 189, 98, 0.15); }
+.iab-hl-buff { --hl-bg: rgba(127, 208, 140, 0.14); }
+.iab-hl-nerf { --hl-bg: rgba(207, 130, 141, 0.15); }
+.iab-hl-del { --hl-bg: rgba(207, 107, 107, 0.16); }
+.iab-hl-rework,
+.iab-hl-swap { --hl-bg: rgba(128, 84, 214, 0.26); }   /* a darker, deeper purple (owner 2026-10-24) */
+.iab-hl-qol,
+.iab-hl-misc { --hl-bg: rgba(160, 150, 130, 0.12); }
+.iab-hl .iab-num { color: inherit; }          /* a number inside the highlighted phrase: the phrase's text colour */
 /* on an Aghanim line's blue strip the see-through colour mixed with the blue (purple ≈ blue, owner 2026-10-24):
-   there it lies on the card's own dark colour, three layers of it (~0.4) — outside the strips one layer (~0.15):
-   "ещё прозрачнее вне полосок", 0.24 was still "одно и то же"; then half of 0.15 ("на 50% меньше") */
-.hl-marker .aghanim-scepter .iab-hl,
-.hl-marker .aghanim-shard .iab-hl { background: linear-gradient(var(--hl-bg), var(--hl-bg)),
+   there it lies on the card's own dark colour, three layers of it — outside the strips one layer */
+.aghanim-scepter .iab-hl,
+.aghanim-shard .iab-hl { background: linear-gradient(var(--hl-bg), var(--hl-bg)),
   linear-gradient(var(--hl-bg), var(--hl-bg)), linear-gradient(var(--hl-bg), var(--hl-bg)), var(--bg-panel-3); }
 /* the colour-blind variants come from scripts/gen/gen_colorblind_css.py */
 .iab-tip-pct .badge-group { display: inline-flex; }
@@ -11309,12 +11294,9 @@ html.cb-mode .badge.new { color: #f3da36; background: rgba(245, 225, 90, 0.15); 
 html.cb-mode .badge.rework { color: #d28ab2; background: rgba(213, 146, 183, 0.14); border-color: rgba(213, 146, 183, 0.51); }
 html.cb-mode .badge.swap { color: #5bd3b2; background: rgba(40, 150, 120, 0.14); border-color: rgba(40, 150, 120, 0.51); }
 html.cb-mode .badge.del { color: #c5527d; background: rgba(113, 38, 66, 0.14); border-color: rgba(113, 38, 66, 0.51); }
-html.cb-mode .iab-hl-buff { color: #64baeb; }
-html.cb-mode .iab-hl-nerf { color: #f19e60; }
-html.cb-mode .iab-hl-del { color: #ce6c91; }
-html.cb-mode .hl-marker .iab-hl-buff { --hl-bg: rgba(157, 211, 242, 0.11); }
-html.cb-mode .hl-marker .iab-hl-nerf { --hl-bg: rgba(241, 155, 91, 0.11); }
-html.cb-mode .hl-marker .iab-hl-del { --hl-bg: rgba(154, 51, 90, 0.12); }
+html.cb-mode .iab-hl-buff { --hl-bg: rgba(157, 211, 242, 0.21); }
+html.cb-mode .iab-hl-nerf { --hl-bg: rgba(241, 155, 91, 0.22); }
+html.cb-mode .iab-hl-del { --hl-bg: rgba(154, 51, 90, 0.24); }
 html.cb-mode .iab-num.iab-buff, html.cb-mode .iab-m.iab-buff, html.cb-mode .iab-lv.iab-buff { color: #64baeb; }
 html.cb-mode .iab-num.iab-nerf, html.cb-mode .iab-m.iab-nerf, html.cb-mode .iab-lv.iab-nerf { color: #f19e60; }
 html.cb-mode .components-change .component-price.cost-buff, html.cb-mode .components-change .components-total span.cost-buff { color: #64baeb; }

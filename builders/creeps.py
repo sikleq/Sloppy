@@ -225,7 +225,7 @@ CREEP_DISPLAY_NAMES = {
     'npc_dota_neutral_ghost':                'Ghost',
     'npc_dota_neutral_satyr_trickster':      'Satyr Banisher',
     'npc_dota_neutral_satyr_soulstealer':    'Satyr Mindstealer',
-    'npc_dota_neutral_satyr_hellcaller':     'Satyr Hellcaller',
+    'npc_dota_neutral_satyr_hellcaller':     'Satyr Tormenter',     # the game's name, as on the patch pages (10-25)
     'npc_dota_neutral_centaur_outrunner':    'Centaur Courser',
     'npc_dota_neutral_centaur_khan':         'Centaur Conqueror',
     'npc_dota_neutral_tadpole':              'Tadpole',
@@ -238,7 +238,7 @@ CREEP_DISPLAY_NAMES = {
     'npc_dota_neutral_ancient_frog':         'Ancient Frog',
     'npc_dota_neutral_ancient_frog_mage':    'Ancient Frog Mage',
     'npc_dota_neutral_mud_golem':            'Mud Golem',
-    'npc_dota_neutral_mud_golem_split':      'Mud Golem Splinter',
+    'npc_dota_neutral_mud_golem_split':      'Shard Golem',
     'npc_dota_neutral_dark_troll':           'Dark Troll',
     'npc_dota_neutral_dark_troll_warlord':   'Dark Troll Summoner',
     'npc_dota_neutral_warpine_raider':       'Warpine Raider',

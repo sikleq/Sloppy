@@ -481,11 +481,6 @@ def _item_display_name(slug):
 
 # ---- Public element functions ----
 
-# heroes whose highlighted text shows the tag colour as a light highlighter (styles.css .hl-marker): a preview for the
-# owner before the whole site (2026-10-24); a class, not :has(), which patch pages must not use (test_static_has)
-HL_MARKER_PREVIEW = {"Dragon Knight"}
-
-
 def hero_header(name):
     _State.current_ability_slug = None
     _State.current_ability_innate = False
@@ -497,7 +492,7 @@ def hero_header(name):
     _State.seen_facets_subgroup = False
     eid = _register_entity("hero", name)
     href = _entity_link("heroes", name)
-    return _open_block("hl-marker" if name in HL_MARKER_PREVIEW else "") + f'''<div class="entity hero-entity"{eid}>
+    return _open_block() + f'''<div class="entity hero-entity"{eid}>
   <div class="entity-icon hero-icon"><a class="entity-link" href="{href}" title="All changes of {name}"><img src="{hero_img(name)}" alt="{name}" loading="lazy" width="256" height="144"></a></div>
   <div class="entity-name"><a class="entity-link" href="{href}" title="All changes of {name}">{name}</a></div>
 </div>'''
@@ -1329,27 +1324,64 @@ def _aghs_words_html(old, new):
     return paint(old, marks["old"]), paint(new, marks["new"])
 
 
-def _aghs_rework_card(text) -> bool:
+# "Aghanim's Shard: <what it does>" (NEW) / "Aghanim's Scepter granting moved from A to B" while the hero had that
+# upgrade before on another ability: the upgrade moved — old card = the ability that lost it (icon + name), new = this
+# one; an upgrade the hero didn't have, or one only added to another ability, stays a row (owner 2026-10-25, 7.41 Arc
+# Warden's Shard Spark Wraith -> Tempest Double)
+_AGHS_DEF_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard)\s*:", re.I)
+_AGHS_MOVED_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard) (?:granting |upgrade )?moved from\b", re.I)
+
+
+def _aghs_missing(kind, slug, version, prev, old, new):
+    # owner 2026-10-24: "ты всегда должен знать, как было и как стало" — never a row without its card
+    raise RuntimeError(f"Aghanim's {kind} under {slug} ({version}): "
+                       f"{'no ' + prev + ' text' if not old else 'no ' + version + ' text' if not new else 'same text'}"
+                       f" — teach patch/aghs_text.py where this tooltip or its numbers are")
+
+
+def _aghs_moved_from(slug, kind, version, prev):
+    """The hero's abilities that held the upgrade in `prev` and lost it now, when `slug` didn't hold it ([] = no card).
+    `slug` must hold it now by the game's flags: a part added to one upgrade text that lives on another ability is
+    no move (7.38 Slardar's Corrosive Haze trail; the Scepter text sits on Seaborn Sentinel)."""
+    from .aghs_text import holders
+    old_h, new_h = holders(_State.current_hero, kind, prev), holders(_State.current_hero, kind, version)
+    if slug in old_h:
+        return [slug]
+    return [a for a in old_h if a not in new_h] if slug in new_h else []
+
+
+def _aghs_rework_card(text, covered=False) -> bool:
     """A reworked-upgrade row under an ability: queue its old -> new card (ul_close draws it). True when queued."""
-    m = _AGHS_REWORK_RE.match(re.sub(r"<[^>]+>", "", text or ""))
+    plain = re.sub(r"<[^>]+>", "", text or "")
+    m = _AGHS_REWORK_RE.match(plain)
+    defn = None if m or covered else (_AGHS_DEF_RE.match(plain) or _AGHS_MOVED_RE.match(plain))
     slug, version = _State.current_ability_slug, _State.current_patch_version
-    if not m or not slug or not version:
+    if not (m or defn) or not slug or not version:
         return False
-    from .aghs_text import aghs_text
+    from .aghs_text import ability_name, aghs_text
     from .meta import _prev_patch_version
-    kind = m.group(1).lower()
+    kind = (m or defn).group(1).lower()
     prev = _prev_patch_version(version)
-    old, new = aghs_text(slug, kind, prev), aghs_text(slug, kind, version)
-    if not old or not new or old == new:
-        # owner 2026-10-24: "ты всегда должен знать, как было и как стало" — never a row without its card
-        raise RuntimeError(f"Aghanim's {kind} reworked under {slug} ({version}): "
-                           f"{'no ' + prev + ' text' if not old else 'no ' + version + ' text' if not new else 'same text'}"
-                           f" — teach patch/aghs_text.py where this tooltip or its numbers are")
-    old_html, new_html = _aghs_diff_html(old, new)
-    pane = lambda side, body: (f'<div class="ability-change-pane ability-change-{side}"><div class="ability-change-body">'
-                               f'{_bold_numbers_html(aghs_line(body, kind=kind))}</div></div>')
-    _State.aghs_cards.append(f'<div class="ability-change unified-panes aghs-change">{pane("old", old_html)}'
-                             f'<span class="ability-change-arrow">→</span>{pane("new", new_html)}</div>')
+    sources = [slug] if m else _aghs_moved_from(slug, kind, version, prev)
+    if not sources:
+        return False                            # a new upgrade, or one added to this ability: the row says it
+    new = aghs_text(slug, kind, version)
+    olds = [(s, aghs_text(s, kind, prev)) for s in sources]
+    for s, old in olds:
+        if not old or not new or (s == slug and old == new):
+            _aghs_missing(kind, slug, version, prev, old, new)
+    if sources == [slug]:
+        old_html, new_html = _aghs_diff_html(olds[0][1], new)
+        old_lines = [aghs_line(old_html, kind=kind)]
+    else:                                       # another ability's upgrade: no word diff, its icon + name say whose
+        esc = lambda s: _html.escape(s, quote=False).replace("\n", "<br>")
+        old_lines = [aghs_line(sub_ability(s, ability_name(s, prev) or s) + " " + esc(old), kind=kind) for s, old in olds]
+        new_html = sub_ability(slug, ability_name(slug, version) or slug) + " " + esc(new)
+    pane = lambda side, lines: (f'<div class="ability-change-pane ability-change-{side}"><div class="ability-change-body">'
+                                f'{_bold_numbers_html("".join(lines))}</div></div>')
+    _State.aghs_cards.append(f'<div class="ability-change unified-panes aghs-change">{pane("old", old_lines)}'
+                             f'<span class="ability-change-arrow">→</span>'
+                             f'{pane("new", [aghs_line(new_html, kind=kind)])}</div>')
     return True
 
 
@@ -2717,7 +2749,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         # "Recipe cost 1350 -> 1250" + note "Total cost unchanged": the buyer pays the same
         _score_text += ". " + re.sub(r'<[^>]+>', ' ', extra)
     _cost_panel_covered(_score_text)
-    if isinstance(text, str) and _aghs_rework_card(_plain_text):
+    if isinstance(text, str) and _aghs_rework_card(_plain_text, covered):
         covered = True                          # the old -> new upgrade card under the rows shows it
     _ctx = _row_ctx(_plain_text if isinstance(text, str) else "")
     _scores = _row_scores(_score_text, dyn_tags, badge, ctx=_ctx)

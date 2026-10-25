@@ -68,6 +68,46 @@ def test_no_old_tooltip_stops_the_build(monkeypatch):
         el.li("Aghanim's Shard reworked: Decreases cooldown by 10s", t("REWORK"))
 
 
+def _moved(monkeypatch, old_h, new_h, slug):
+    monkeypatch.setattr(at, "holders", lambda hero, kind, v: old_h if v == "7.40c" else new_h)
+    monkeypatch.setattr(at, "aghs_text", lambda s, kind, v: f"{s} upgrade, {'old' if v == '7.40c' else 'new'}.")
+    monkeypatch.setattr(at, "ability_name", lambda s, v: s.title())
+    monkeypatch.setattr(_State, "current_hero", "arc_warden")
+    monkeypatch.setattr(_State, "current_ability_slug", slug)
+    monkeypatch.setattr(_State, "current_patch_version", "7.41")
+    monkeypatch.setattr(_State, "aghs_cards", [])
+
+
+def test_upgrade_moved_to_another_ability_becomes_a_card(monkeypatch):
+    # owner 2026-10-25: 7.41 Arc Warden's Shard moved from Spark Wraith to Tempest Double
+    _moved(monkeypatch, ["arc_warden_spark_wraith"], ["arc_warden_tempest_double"], "arc_warden_tempest_double")
+    row = el.li("Aghanim's Shard: The Tempest Double is infused with the bonuses of runes", t("NEW"))
+    assert "iab-covered" in row
+    out = el.ul_close()
+    assert "arc_warden_spark_wraith upgrade, old" in out and "arc_warden_tempest_double upgrade, new" in out
+    assert out.count('class="ac-sub"') == 2                       # whose upgrade: icon + name on both sides
+    assert "iab-hl" not in out                                    # two abilities: no word diff
+
+
+def test_upgrade_only_added_stays_a_row(monkeypatch):
+    # 7.41 Tinker: March of the Machines gets a Scepter part, Laser keeps its own -> no move, no card
+    _moved(monkeypatch, ["tinker_laser"], ["tinker_laser", "tinker_march_of_the_machines"], "tinker_march_of_the_machines")
+    row = el.li("Aghanim's Scepter: Robots heal allies", t("NEW"))
+    assert "iab-covered" not in row and _State.aghs_cards == []
+    # 7.38 Slardar: the part lives in Seaborn Sentinel's text, Corrosive Haze holds no upgrade by the game's flags
+    _moved(monkeypatch, ["slardar_scepter"], ["slardar_seaborn_sentinel"], "slardar_amplify_damage")
+    assert "iab-covered" not in el.li("Aghanim's Scepter: Increases trail duration", t("NEW"))
+
+
+def test_granted_ability_text_and_upgrade_bonus_placeholders():
+    blk = {"IsGrantedByShard": "1"}
+    assert at._granted(blk, "shard") and not at._granted(blk, "scepter")
+    assert at._granted({"AbilityValues": {"enabled": {"value": "0", "special_bonus_scepter": "+1"}}}, "scepter")
+    vals = at._values({"AbilityCastRange": "700", "AbilityValues": {
+        "bonus_spell_damage": {"value": "0", "special_bonus_shard": "+25"}}}, "shard")
+    assert vals["shard_bonus_spell_damage"] == "25" and vals["abilitycastrange"] == "700"   # 7.37 Lina, 7.41 Gyro
+
+
 def test_bonus_placeholder_is_the_upgrades_own_bonus():
     # "%bonus_AbilityCooldown%" / "%bonus_open_wounds_duration_pct%" (7.41 Vendetta, 7.40 Infest)
     vals = at._values({"AbilityValues": {"AbilityCooldown": {"value": "70", "special_bonus_shard": "-10"},

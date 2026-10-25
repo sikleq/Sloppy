@@ -2289,10 +2289,6 @@
     if (num.endsWith('.0')) num = num.slice(0, -2);  // 50.0 → 50, 1900.0 → 1900
     return ' <span class="stat-pct ' + cls + '">' + sign + num + '%</span>';
   }
-  function chgHead(patch, date) {
-    return '<div class="stat-chg-head"><span class="chg-patch">' + patch
-         + '</span><span class="chg-date">' + shortDate(date) + '</span></div>';
-  }
   // One history entry → its old/new values (display + numeric) + polarity, or
   // null for non-value markers (A added / R removed / P replaced) which carry
   // no comparable value. 'C' computed cells carry pretty display (p3/p4) AND
@@ -2377,11 +2373,16 @@
     const nameHtml = name ? '<div class="abil-tip-name">' + name + '</div>' : '';
     // Net first→today summary at the very top (gold test: cells flagged data-net).
     const netHtml = (td.dataset.net !== undefined) ? netSummary(entries) : '';
-    el.innerHTML = nameHtml + netHtml + groups.map(g =>
-      '<div class="stat-chg">' + chgHead(g.patch, g.date)
-      + g.lines.map(l => '<div class="stat-chg-line">' + l + '</div>').join('')
-      + '</div>'
-    ).join('');
+    // One row per change: patch · old → new % · date, aligned in columns — half the height of a header line
+    // over each change (owner 2026-10-25: Guardian Greaves' price history was too long a list)
+    el.innerHTML = nameHtml + netHtml + '<div class="stat-chg-grid">' + groups.map((g, gi) =>
+      g.lines.map((l, i) => {
+        const sep = (gi && !i) ? ' grp-start' : '';       // a thin line above every patch but the newest
+        return '<span class="chg-patch' + sep + '">' + (i ? '' : g.patch) + '</span>'
+          + '<span class="stat-chg-line' + sep + '">' + l + '</span>'
+          + '<span class="chg-date' + sep + '">' + (i ? '' : shortDate(g.date)) + '</span>';
+      }).join('')
+    ).join('') + '</div>';
     el.classList.add('is-visible');
     const r = td.getBoundingClientRect();
     const tr = el.getBoundingClientRect();

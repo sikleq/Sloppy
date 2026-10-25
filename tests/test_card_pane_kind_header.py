@@ -82,9 +82,13 @@ def test_innate_cannot_be_leveled_up_is_never_said():
     assert "leveled" not in body and "Summons a Spirit Bear" in body
 
 
-def test_highlighter_preview_hero_block_has_its_class():
-    assert 'class="entity-block hl-marker"' in el.hero_header("Dragon Knight")
-    assert "hl-marker" not in el.hero_header("Axe")
+def test_highlighter_is_the_whole_site_not_a_preview():
+    # owner 2026-10-25: the Dragon Knight preview became every card's look; no per-hero class is left
+    assert "hl-marker" not in el.hero_header("Dragon Knight")
+    css = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "styles.css"),
+               encoding="utf-8").read()
+    assert ".hl-marker" not in css
+    assert ".iab-hl-new { --hl-bg: rgba(224, 189, 98, 0.15); }" in css
 
 
 def test_radius_sentence_followed_by_a_tag_goes_to_the_header():
