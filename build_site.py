@@ -77,6 +77,9 @@ STEPS = [
     ("terrain", "builders/terrain.py",      "Terrain comparison"),
     ("tstats",  "builders/terrain_stats.py", "Terrain Stats (map history)"),
     ("echg",    "builders/entity_changes.py", "Hero / Item Changes pages"),
+    # every build checks the Aghanim's texts its cards are made of (owner 2026-10-25: "генератор должен уметь");
+    # CI checks all 118 patches
+    ("aghs",    "scripts/audit/check_aghs_texts.py --site", "Aghanim's Scepter / Shard texts audit"),
 ]
 
 # Map: artifact filename -> key of the step that produces it.
@@ -91,7 +94,7 @@ def _build_dependents() -> dict[str, list[str]]:
     references that filename — those steps must rebuild whenever the producer runs.
     """
     root = Path(__file__).parent
-    step_scripts = {key: root / script for key, script, _ in STEPS}
+    step_scripts = {key: root / script.split()[0] for key, script, _ in STEPS}
     result: dict[str, list[str]] = {}
     for artifact, producer_key in _PRODUCERS.items():
         consumers = []
@@ -153,7 +156,7 @@ def main() -> int:
         print(f"  {desc}")
         print(SEP)
         t = time.monotonic()
-        cmd = [sys.executable, script]
+        cmd = [sys.executable, *script.split()]
         if latest and key == "patch":
             cmd.append("--latest")
         result = subprocess.run(cmd, cwd=Path(__file__).parent, timeout=300)

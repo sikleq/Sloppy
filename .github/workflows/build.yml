@@ -266,6 +266,10 @@ jobs:
       - name: Audit — local ability icon coverage
         run: python scripts/audit/check_icons.py
 
+      # every Aghanim's Scepter / Shard text of all 118 patches (the build itself checks the patches with cards)
+      - name: Audit — Aghanim's texts, every patch
+        run: python scripts/audit/check_aghs_texts.py
+
       - name: Audit — ability slugs registered in known_exceptions (no live requests)
         run: |
           python - <<'PY'
