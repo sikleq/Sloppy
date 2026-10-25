@@ -135,4 +135,8 @@ KNOWN_INNATE_NO_CDN_ICON = {
     "spectre_spectral",             # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
     "wisp_sight_seer",              # Io's old innate on the 7.39 old -> new card (was mislabelled wisp_essence_conduction);
                                     # Valve CDN 404 (2026-10-03)
+    # named in the "whole old upgrade" Aghanim cards (2026-10-25); Valve CDN 404, the VPK not checked yet
+    "clinkz_bone_and_arrow",
+    "slardar_seaborn_sentinel",
+    "techies_squees_scope",
 }

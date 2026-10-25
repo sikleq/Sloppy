@@ -3709,10 +3709,6 @@ h4.subgroup .subgroup-new-type {
   pointer-events: none; z-index: 0; overflow: visible; }
 .ability-block > .under-rows-caption { margin: 10px 0 2px; position: relative; z-index: 1; }
 .ability-block > .under-rows-caption + .ability-change { position: relative; z-index: 1; }
-/* a removed Aghanim's upgrade: its old text in a light red dashed frame -> an empty place, as a removed item
-   ability (owner 2026-10-25, 7.41 Reincarnation) */
-.aghs-change.aghs-removed > .ability-change-old { border: 1px dashed rgba(227, 128, 110, 0.5); }
-.ability-change-pane.ability-change-none { background: none; border: 0; padding: 0; }
 /* a card with no caption of its own ("scales with" cards: the headers say it) */
 .ability-block > .under-rows-connector + .ability-change { position: relative; z-index: 1; margin-top: 10px; }
 /* Connector curve from the icon's bottom-center down-right toward the

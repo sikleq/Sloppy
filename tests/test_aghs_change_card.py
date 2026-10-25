@@ -1,6 +1,7 @@
 """'Aghanim's Shard reworked: …' rows -> an old -> new card of the upgrade under the ability's rows (owner 2026-10-24):
 old = the previous patch's game tooltip, new = this patch's, each with the upgrade's own numbers; the row is hidden."""
 import os
+import re
 import sys
 
 import pytest
@@ -90,6 +91,59 @@ def test_upgrade_moved_to_another_ability_becomes_a_card(monkeypatch):
     # owner 2026-10-25: "Added Aghanim's Shard." (NEW), no blue strip on the caption: the card's lines have it
     assert "Added Aghanim&#x27;s Shard." in out or "Added Aghanim's Shard." in out
     assert '<li data-tag="new">' in out
+
+
+def test_reworked_card_shows_the_old_parts_other_abilities_lost(monkeypatch):
+    # owner 2026-10-25, 7.41 Wraith King: the old Shard was also "Reincarnation has no mana cost" — the Mortal Strike
+    # card shows it on the old side, each part with its icon + name
+    _moved(monkeypatch, ["skeleton_king_mortal_strike", "skeleton_king_reincarnation"],
+           ["skeleton_king_mortal_strike"], "skeleton_king_mortal_strike")
+    assert "iab-covered" in el.li("Aghanim's Shard reworked: Mortal Strike hits curse their target", t("REWORK"))
+    out = el.ul_close()
+    old_side = out[out.index("ability-change-old"):out.index("ability-change-arrow")]
+    assert "skeleton_king_reincarnation upgrade, old" in old_side and "skeleton_king_mortal_strike upgrade, old" in old_side
+    assert old_side.count('class="ac-sub"') == 2 and out.count('class="ac-sub"') == 3
+    # a part another ability keeps: not on the old side
+    _moved(monkeypatch, ["skeleton_king_mortal_strike", "skeleton_king_reincarnation"],
+           ["skeleton_king_mortal_strike", "skeleton_king_reincarnation"], "skeleton_king_mortal_strike")
+    el.li("Aghanim's Shard reworked: Mortal Strike hits curse their target", t("REWORK"))
+    out = el.ul_close()
+    assert "skeleton_king_reincarnation" not in out and 'class="ac-sub"' not in out
+
+
+def _parts(monkeypatch, old, new, slug, hero="windrunner"):
+    """old / new: {ability: upgrade text} of the hero in 7.40c / 7.41."""
+    monkeypatch.setattr(at, "holders", lambda h, kind, v: sorted(old if v == "7.40c" else new) if kind == "scepter" else [])
+    monkeypatch.setattr(at, "aghs_text", lambda s, kind, v: (old if v == "7.40c" else new).get(s))
+    monkeypatch.setattr(at, "ability_name", lambda s, v: s.title())
+    monkeypatch.setattr(_State, "current_patch_version", "7.41")
+    monkeypatch.setattr(_State, "aghs_part_slug", (slug, hero))
+    monkeypatch.setattr(el, "_AGHS_SHOWN", set())
+
+
+def test_upgrade_gone_to_an_ability_without_a_card_gets_one(monkeypatch):
+    # owner 2026-10-25, group A: 7.41 Windrun's Scepter -> Tailwind; the card sits under Tailwind
+    _parts(monkeypatch, {"windrun": "Grants invisibility."}, {"tailwind": "Attacks grant Tailwind."}, "tailwind")
+    out = el._aghs_parts_cards()
+    assert "Added Aghanim's Scepter." in out and "Grants invisibility." in out and "Attacks grant Tailwind." in out
+    assert out.count('class="ac-sub"') == 2
+    assert el._aghs_parts_cards() == ""                 # drawn once
+
+
+def test_part_gone_and_the_rest_changed_is_one_reworked_card(monkeypatch):
+    # group B: 7.41f Pit of Malice's part gone, Fiend's Gate's -10s -> -20s
+    _parts(monkeypatch, {"gate": "Reduces cooldown by 10s.", "pit": "Increases radius."},
+           {"gate": "Reduces cooldown by 20s."}, "gate", hero="abyssal_underlord")
+    out = el._aghs_parts_cards()
+    old_side = out[out.index("ability-change-old"):out.index("ability-change-arrow")]
+    assert "Aghanim's Scepter reworked." in out and "Increases radius." in old_side and "iab-hl" in out
+
+
+def test_part_gone_and_the_rest_the_same_is_only_the_row(monkeypatch):
+    # group C: 7.39 Glaives of Wisdom's part gone, Brain Drain's the same — the "Removed" row says it
+    _parts(monkeypatch, {"drain": "Steals more.", "glaives": "Steal duration."}, {"drain": "Steals more."}, "drain",
+           hero="silencer")
+    assert el._aghs_parts_cards() == ""
 
 
 def test_named_ability_icon_is_downloaded_and_has_a_fallback(monkeypatch):
@@ -190,9 +244,9 @@ def test_store_has_old_patches_hero_data():
     assert "axe_culling_blade" in blocks and sum(1 for b in blocks.values() if b.get("HasScepterUpgrade") == "1") > 50
 
 
-def test_added_and_removed_upgrades_are_one_sided_cards(monkeypatch):
-    # owner 2026-10-25: 7.41 Press the Attack's Scepter "не сделано в виде карточки"; Duel's Shard (+5 damage per win)
-    # was only "No longer upgraded"
+def test_added_upgrade_is_a_card_and_removed_one_a_row(monkeypatch):
+    # owner 2026-10-25: 7.41 Press the Attack's Scepter "не сделано в виде карточки"; a removed one is only the row
+    # "Removed Aghanim's Shard." (7.41 Reincarnation: "Хватит просто строки Removed Aghanim's Shard")
     _moved(monkeypatch, ["legion_commander_duel"], ["legion_commander_duel", "legion_commander_press_the_attack"],
            "legion_commander_press_the_attack")
     assert "iab-covered" in el.li("Aghanim's Scepter: Increases bonus movement speed by 12%", t("NEW"))
@@ -200,12 +254,16 @@ def test_added_and_removed_upgrades_are_one_sided_cards(monkeypatch):
     assert "Added Aghanim's Scepter." in out and "is-single-new" in out and "ability-change-old" not in out
     _moved(monkeypatch, ["legion_commander_duel", "legion_commander_overwhelming_odds"],
            ["legion_commander_overwhelming_odds"], "legion_commander_duel")
-    assert "iab-covered" in el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
-    out = el.ul_close()
-    assert "Removed Aghanim's Shard." in out and "legion_commander_duel upgrade, old" in out
-    # moved to another ability: that ability's card shows the old text, this row stays
+    plain = lambda h: re.sub(r"<[^>]+>", "", h)
+    row = el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
+    assert "iab-covered" not in row and plain(row).endswith("Removed Aghanim's Shard.") and "No longer" not in row
+    assert "ability-change" not in el.ul_close()
+    # moved to another ability: the same row
     _moved(monkeypatch, ["arc_warden_spark_wraith"], ["arc_warden_tempest_double"], "arc_warden_spark_wraith")
-    assert "iab-covered" not in el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
+    row = el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
+    assert "iab-covered" not in row and plain(row).endswith("Removed Aghanim's Shard.")
+    # two upgrades in one row stay as the patch note says them (7.40)
+    assert "No longer upgraded" in el.li("No longer upgraded with Aghanim's Shard or Aghanim's Scepter", t("DEL"))
 
 
 def test_a_number_the_text_says_is_not_repeated():

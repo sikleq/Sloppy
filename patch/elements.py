@@ -372,12 +372,13 @@ def _close_block():
 
 
 def _close_ability_block():
+    cards = _aghs_parts_cards()                 # an ability with no rows under it draws its card here
     if _State.ability_block_open:
         _State.ability_block_open = False
         _State.current_block_is_facet = False
         _State.facet_block_had_ul = False
-        return '</div>\n'
-    return ''
+        return cards + '</div>\n'
+    return cards
 
 
 _DYN_TAG_WHITELIST = {"buff", "nerf", "new", "del", "rework", "swap", "misc", "qol"}
@@ -1055,6 +1056,7 @@ def ability(title, slug=None, innate=None, icon_url=None, sub=False, old_title=N
     _State.ability_block_open = True
     _State.current_block_is_facet = False
     _State.current_ability_slug = slug
+    _State.aghs_part_slug = (slug, _State.current_hero)
     _State.current_ability_innate = bool(is_innate)
     from .ability_kv import slug_of
     _State.current_ability_kv = slug or slug_of(icon_url or "")
@@ -1266,7 +1268,7 @@ def ul_close():
     _State.card_meta = {}            # the rows under an ability_change card end here
     _State.card_innate = None
     cards, _State.aghs_cards = "".join(_State.aghs_cards), []
-    return '</ul>' + cards
+    return '</ul>' + cards + _aghs_parts_cards()
 
 
 # ---- "Aghanim's Shard reworked: …" -> an old -> new card of the upgrade (owner 2026-10-24) ----
@@ -1462,7 +1464,7 @@ def _aghs_rework_card(text, covered=False) -> bool:
     prev = _prev_patch_version(version)
     up = f"Aghanim's {kind.title()}"
     if gone:
-        return _aghs_removed_card(slug, kind, version, prev, up)
+        return False                            # a row "Removed Aghanim's Shard." (li), no card
     sources = [slug] if m else _aghs_moved_from(slug, kind, version, prev)
     if not sources:
         # an upgrade this ability didn't have and no other ability lost: a card of its new text alone (owner
@@ -1480,12 +1482,25 @@ def _aghs_rework_card(text, covered=False) -> bool:
         if not old or not new or (s == slug and old == new):
             _aghs_missing(kind, slug, version, prev, old, new)
     new, olds = _aghs_inline(new), [(s, _aghs_inline(old)) for s, old in olds]
+    esc = lambda s: _html.escape(s, quote=False)
     if sources == [slug]:
         old_html, new_html = _rework_diff_html(olds[0][1], new)
         old_lines = [aghs_line(old_html, kind=kind)]
         caption = f"{up} reworked."
+        # the old upgrade's parts on other abilities that are gone now: on the old side too, each with its icon + name
+        # (owner 2026-10-25, 7.41 Wraith King: the Shard was also "Reincarnation has no mana cost")
+        lost = [s for s in holders(_State.current_hero, kind, prev)
+                if s != slug and s not in holders(_State.current_hero, kind, version)]
+        if lost:
+            gone_olds = [(s, aghs_text(s, kind, prev)) for s in lost]
+            for s, old in gone_olds:
+                if not old:
+                    _aghs_missing(kind, s, version, prev, old, "-")
+            name = lambda s, v: sub_ability(s, ability_name(s, v) or s) + " "
+            old_lines = [aghs_line(name(slug, prev) + old_html, kind=kind)] + [
+                aghs_line(name(s, prev) + esc(_aghs_inline(old)), kind=kind) for s, old in gone_olds]
+            new_html = name(slug, version) + new_html
     else:                                       # another ability's upgrade: no word diff, its icon + name say whose
-        esc = lambda s: _html.escape(s, quote=False)
         old_lines = [aghs_line(sub_ability(s, ability_name(s, prev) or s) + " " + esc(old), kind=kind) for s, old in olds]
         new_html = sub_ability(slug, ability_name(slug, version) or slug) + " " + esc(new)
         caption = f"Added {up}."                # owner 2026-10-25: not "moved from X" — the card says from where
@@ -1497,6 +1512,7 @@ def _aghs_rework_card(text, covered=False) -> bool:
     # no blue Aghanim strip on the caption: the card's lines already carry it (owner 2026-10-25)
     tag = "rework" if sources == [slug] else "new"
     _State.aghs_cards.append(_under_rows_card(caption, tag, "", "aghs-change", old_pane, new_pane))
+    _AGHS_SHOWN.add((version, _State.current_hero, kind))     # its old parts are in this card
     return True
 
 
@@ -1538,28 +1554,75 @@ def _granted_card(tags) -> bool:
     return False
 
 
+_AGHS_SHOWN: set = set()               # (version, hero, kind) whose old upgrade parts a card already shows
+
+
+def _aghs_parts_cards() -> str:
+    """The whole old upgrade -> the new one, under the ability that holds it now, when a part of it on another ability
+    is gone and no card shows that part yet (owner 2026-10-25): A — the upgrade moved to an ability that had none (7.41
+    Windrun -> Tailwind), B — a part is gone and the part that stayed changed (7.41f Pit of Malice + Fiend's Gate). A
+    part gone while the rest stayed the same (7.39 Glaives of Wisdom + Brain Drain) is only its row "Removed …".
+    Each part with its ability's icon + name; drawn once per hero and upgrade, where the open ability block ends."""
+    pending, _State.aghs_part_slug = _State.aghs_part_slug, None
+    slug, hero = pending if pending else (None, None)
+    version = _State.current_patch_version
+    if not slug or not hero or not version:
+        return ""
+    from .aghs_text import ability_name, aghs_text, holders
+    from .meta import _prev_patch_version
+    prev = _prev_patch_version(version)
+    if not prev:
+        return ""                               # the first patch: nothing to compare with
+    out = []
+    for kind in ("shard", "scepter"):
+        if (version, hero, kind) in _AGHS_SHOWN:
+            continue
+        # the parts: abilities the game flags as holding it that have a text of their own (a flag without a text is
+        # the same upgrade told on another ability, 7.38 Axe)
+        parts = lambda v: {s: t for s in holders(hero, kind, v) if (t := aghs_text(s, kind, v))}
+        old_t, new_t = parts(prev), parts(version)
+        lost = [s for s in old_t if s not in new_t]
+        # this and the other abilities that hold it now and are new to it or changed it: the new side
+        moved = [s for s in new_t if old_t.get(s) != new_t[s]]
+        if not lost or slug not in moved:
+            continue                            # C: the part that stayed is the same — the row says it
+        olds = [(s, t) for s, t in old_t.items() if s in lost or s in moved]
+        news = [(s, new_t[s]) for s in moved]
+        esc = lambda s: _html.escape(_aghs_inline(s), quote=False)
+        name = lambda s, v: sub_ability(s, ability_name(s, v) or s) + " "
+        old_text = dict(olds)
+        lines = {"old": [], "new": []}
+        for s, t in olds:
+            lines["old"].append((s, esc(t)))
+        for s, t in news:
+            lines["new"].append((s, esc(t)))
+        # the same ability on both sides (B): its numbers coloured as in a reworked card
+        for s, t in news:
+            if s in old_text:
+                o, n = _rework_diff_html(_aghs_inline(old_text[s]), _aghs_inline(t))
+                lines["old"] = [(x, o if x == s else h) for x, h in lines["old"]]
+                lines["new"] = [(x, n if x == s else h) for x, h in lines["new"]]
+        pane = lambda side, v: (f'<div class="ability-change-pane ability-change-{side}"><div class="ability-change-body">'
+                                + _bold_numbers_html("".join(aghs_line(name(s, v) + h, kind=kind)
+                                                             for s, h in lines[side])) + '</div></div>')
+        old_pane = pane("old", prev)
+        new_pane = _pair_number_tips(old_pane, pane("new", version))
+        up = f"Aghanim's {kind.title()}"
+        b_case = any(s in old_t for s in moved)
+        caption, tag = (f"{up} reworked.", "rework") if b_case else (f"Added {up}.", "new")
+        out.append(_under_rows_card(caption, tag, "", "aghs-change", old_pane, new_pane))
+        _AGHS_SHOWN.add((version, hero, kind))
+    return "".join(out)
+
+
 _AGHS_REMOVED_RE = re.compile(r"^\s*No longer upgraded with Aghanim's (Scepter|Shard)\b", re.I)
 
 
-def _aghs_removed_card(slug, kind, version, prev, up) -> bool:
-    """"No longer upgraded with Aghanim's Shard": a card of what it did, the old side alone (owner 2026-10-25: 7.41
-    Duel's Shard gave +5 damage per win and nothing said it). An upgrade that moved to another ability of the hero stays
-    a row: that ability's card shows this old text already."""
-    from .aghs_text import aghs_text, holders
-    old_h, new_h = holders(_State.current_hero, kind, prev), holders(_State.current_hero, kind, version)
-    if slug not in old_h or slug in new_h or set(new_h) - set(old_h):
-        return False
-    old = aghs_text(slug, kind, prev)
-    if not old:
-        _aghs_missing(kind, slug, version, prev, old, "-")
-    pane = (f'<div class="ability-change-pane ability-change-old"><div class="ability-change-body">'
-            f'{_bold_numbers_html(aghs_line(_html.escape(_aghs_inline(old), quote=False), kind=kind))}</div></div>')
-    # old -> nothing, as a removed item ability: the old text on the left in a light red dashed frame, an empty place on
-    # the right (owner 2026-10-25, 7.41 Reincarnation: "Removed Aghanim's Shard." over "Causes Reincarnation to have
-    # no mana cost." read as what the Shard does now)
-    none = '<div class="ability-change-pane ability-change-new ability-change-none"></div>'
-    _State.aghs_cards.append(_under_rows_card(f"Removed {up}.", "del", "", "aghs-change aghs-removed", pane, none))
-    return True
+def _aghs_removed_row(plain):
+    """"No longer upgraded with Aghanim's Shard" -> the row reads "Removed Aghanim's Shard.", no card of the old text
+    (owner 2026-10-25, 7.41 Reincarnation: "Хватит просто строки Removed Aghanim's Shard"); None for any other row."""
+    m = re.fullmatch(r"\s*No longer upgraded with Aghanim's (Scepter|Shard)\.?\s*", plain or "", re.I)
+    return f"Removed Aghanim's {m.group(1).title()}." if m else None
 
 
 def _under_rows_single(caption, tag, card_cls, pane):
@@ -3114,6 +3177,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         covered = True                          # ... the old -> new header strips show what it scales with
     elif isinstance(text, str) and not covered and not re.match(r"\s*Aghanim's", _plain_text):
         _granted_card(dyn_tags)                 # an upgrade-granted ability's new text: a card, the row stays
+    if isinstance(text, str) and not covered and _aghs_removed_row(_plain_text):
+        text = _aghs_removed_row(_plain_text)   # the weights still read the patch note's words (_plain_text)
     _ctx = _row_ctx(_plain_text if isinstance(text, str) else "")
     _scores = _row_scores(_score_text, dyn_tags, badge, ctx=_ctx)
     _dyn_record_li(dyn_tags, extra_keys=also_dyn, scores=_scores)
@@ -4144,6 +4209,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
     else:
         _dyn_record_card({'new', 'del', 'rework'}, **_card_ctx)
     out = _close_ability_block()
+    _State.aghs_part_slug = (new.get("slug"), _State.current_hero)
     _State.next_ul_is_hero_stats = False
     if not sub and (_State.current_hero or _State.current_unit) and not _State.seen_abilities_subgroup:
         out += '<h4 class="subgroup">Abilities</h4>'

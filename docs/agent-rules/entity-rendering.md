@@ -153,8 +153,21 @@ Field map: Base Armor → `ArmorPhysical`; Base Damage → `AttackDamageMin`; Mi
   новая сторона несёт старое значение в CHIPMARK, `resolve_chip_marks` → `_number_tip`.
 - Aghanim: «… (+200) and projectile speed (+300) by 25%» → без «by 25%», если плоские числа стоят прямо перед ним
   (`_drop_said_percent`); «slows by 25%» — другой эффект, остаётся.
-- Убранный Aghanim (`No longer upgraded with …`) — «было → пусто»: старый текст слева в светло-красной пунктирной
-  рамке, справа пусто, как убранная способность предмета (7.41 Reincarnation читалась как то, что Shard делает сейчас).
+- Убранный Aghanim (`No longer upgraded with …`) — **только строка «Removed Aghanim's Shard.»** (DEL), без карточки
+  со старым текстом (владелец 2026-10-25, 7.41 Reincarnation: «Хватит просто строки Removed Aghanim's Shard»; карточка
+  читалась как то, что Shard делает сейчас). Веса читают исходные слова патчноута (`_aghs_removed_row`).
+- **Весь старый апгрейд в карточке «reworked»**: если в прошлом патче у апгрейда была часть на другой способности и
+  теперь её нет, она стоит на старой стороне той же карточки, у каждой части значок + имя способности (владелец
+  2026-10-25: Mortal Strike 7.41 + «Causes Reincarnation to have no mana cost»; Overwhelming Odds + Duel). Часть,
+  которая осталась у другой способности, в карточку не идёт.
+- **Убранная часть без такой карточки** (`_aghs_parts_cards`, рисуется в конце строк или блока способности, один раз
+  на героя и апгрейд, `_AGHS_SHOWN`): **А** — апгрейд ушёл на способность, у которой его не было (7.41 Windrun →
+  Tailwind, Thunder Strike → Kinetic Fence, Reactive Tazer → M.A.D. + Squee's Scope; 7.40 Primal Split → Liquid
+  Courage …) — карточка «Added Aghanim's X.» под новой способностью; **Б** — часть убрана, оставшаяся изменилась (7.41f
+  Pit of Malice + Fiend's Gate, 7.39 Flaming Lasso + Sticky Napalm, 7.38 Divine Favor + Holy Persuasion) — «Aghanim's X
+  reworked.» под оставшейся. Слева все старые части, справа новые, у каждой значок + имя. **В** — часть убрана,
+  остальное то же (7.39 Glaives + Brain Drain, 7.38 Demonic Cleanse, 7.40b Necromastery, 7.40c Skeleton Walk) — только
+  строка «Removed …». Части — способности с флагом игры и своим текстом (флаг без текста — тот же апгрейд, 7.38 Axe).
 - Способность, которую выдаёт Aghanim (флаг игры `IsGrantedByShard/Scepter` в обоих патчах), с REWORK-строкой и
   изменённым текстом игры → карточка «Ability reworked (Aghanim's Shard upgrade).» под строками; строка остаётся
   (говорит больше подсказки). Один раз на способность, не под `ability_change`. 7.41 Warp Flare, 7.38 Demonic Cleanse.
@@ -197,9 +210,8 @@ Slardar). Апгрейд, которого у героя не было, или �
 `%AbilityCastRange%` — из шапки способности (7.41 Side Gunner).
 **Каждое изменение Aghanim у способности — карточка** (владелец 2026-10-25): переработан / переехал — «было →
 стало»; **добавлен** без переезда (7.41 Press the Attack, Tinker) — одна сторона «Added Aghanim's Scepter.» с текстом
-игры; **убран** («No longer upgraded with Aghanim's Shard», 7.41 Duel: +5 урона за победу) — одна сторона «Removed
-Aghanim's Shard.» с прошлым текстом; убран, потому что переехал на другую способность героя, — строка (старый текст
-уже в карточке той способности). **Новая способность — всегда карточка «New ability.»**, не строка: `new_ability(name,
+игры; **убран** («No longer upgraded with Aghanim's Shard») — строка «Removed Aghanim's Shard.» без карточки
+(владелец 2026-10-25 вечером, Reincarnation; прежняя карточка со старым текстом, 7.41 Duel, отменена). **Новая способность — всегда карточка «New ability.»**, не строка: `new_ability(name,
 slug, note=)` берёт текст и числа из файлов игры (`game_ability_desc`), строка патчноута под ней `covered=True`;
 `game_ability_desc(slug, version)` — сторона любой карточки из файлов игры (7.41 Changing of the Guard: аспект 7.40c →
 под-способность). «Ultimate. Passive — …» в начале текста уходит в шапку. Подсветка в синей полоске Aghanim — та же,
