@@ -1264,6 +1264,7 @@ def ul_open():
 def ul_close():
     _State.in_stats_ul = False
     _State.card_meta = {}            # the rows under an ability_change card end here
+    _State.card_innate = None
     cards, _State.aghs_cards = "".join(_State.aghs_cards), []
     return '</ul>' + cards
 
@@ -1315,7 +1316,7 @@ def _aghs_inline(text, loose=True):
     said = desc                                 # the game's own words, before any number is put in
     pairs = [(m.group(1).strip(), m.group(2).strip()) for m in _AGHS_VALUE_SENT_RE.finditer(vals)]
     last = lambda label: ([w for w in re.findall(r"[A-Za-z]+", label) if w.lower() not in _AGHS_LABEL_SKIP] or [""])[-1]
-    rest = []
+    rest, put = [], []
     for label, value in pairs:
         bare = value.lstrip("+-")               # "-10s" and "Lowers cooldown by 10s" say the same (7.41 Arena of Blood)
         if re.search(rf"(?<![\d.]){re.escape(bare)}(?!\d|\.\d)", said):
@@ -1328,9 +1329,24 @@ def _aghs_inline(text, loose=True):
             spot = hits[0] if len(hits) == 1 else None
         if spot and "(" not in desc[spot.end():spot.end() + 2]:
             desc = f"{desc[:spot.end()]} ({value}){desc[spot.end():]}"
+            put.append(value)
         else:
             rest.append(f"{label}: {value}.")
-    return " ".join([desc] + rest)
+    return " ".join([_drop_said_percent(desc, put)] + rest)
+
+
+def _drop_said_percent(desc, put):
+    """"Increases cast range (+200) and projectile speed (+300) by 25%." -> without "by 25%": the flat numbers put in
+    already say it (owner 2026-10-25, 7.41 Venomous Gale). Only right after such a bracket ("slows by 25%" is another
+    effect) and in a sentence whose every bracket is a flat number put in here."""
+    flat = {v for v in put if "%" not in v}
+
+    def one(sent):
+        brackets = re.findall(r"\(([^)]*)\)", sent)
+        if brackets and all(b in flat for b in brackets):
+            return re.sub(r"(\([^)]*\))\s+by\s+\d+(?:\.\d+)?%(?=[.,;]|\s*$)", r"\1", sent, count=1)
+        return sent
+    return "".join(one(s) for s in re.split(r"(?<=[.!])(?=\s)", desc))
 
 
 _NUM_TOKEN_RE = re.compile(r"^\(?[+\-]?\d[\d.,/]*(?:%|s|x)?\)?[.,;:]?$")
@@ -1484,6 +1500,44 @@ def _aghs_rework_card(text, covered=False) -> bool:
     return True
 
 
+_GRANTED_CARDS: set = set()            # (version, slug) of granted abilities that already have their card
+
+
+def _granted_card(tags) -> bool:
+    """A REWORK row under an ability an Aghanim's upgrade grants, whose text the game changed: the old -> new card of
+    its description under the rows, once per ability (owner 2026-10-25, 7.41 Warp Flare: "Teleport distance now
+    depends on Warp Flare cast range …" had no card). The row stays: it says more than the tooltip."""
+    slug, version = _State.current_ability_slug, _State.current_patch_version
+    if "rework" not in tags or not slug or not version or (version, slug) in _GRANTED_CARDS:
+        return False
+    from .aghs_text import _FLAGS, _blocks, aghs_text
+    from .meta import _prev_patch_version
+    prev = _prev_patch_version(version)
+    # the game's own flag only: an "enabled 0 -> +1" value is an upgrade of the ability too (7.39 Sticky Napalm, 7.41
+    # Guardian Angel), not an ability the upgrade grants
+    def granted(v, kind):
+        block = _blocks(v).get(slug)
+        return isinstance(block, dict) and str(block.get(_FLAGS[kind][1], "0")).strip() == "1"
+    for kind in ("shard", "scepter"):
+        if not (granted(version, kind) and granted(prev, kind)):
+            continue
+        old, new = aghs_text(slug, kind, prev), aghs_text(slug, kind, version)
+        if not old or not new:
+            _aghs_missing(kind, slug, version, prev, old, new)
+        if old == new:
+            return False
+        old_html, new_html = _rework_diff_html(_aghs_inline(old), _aghs_inline(new))
+        pane = lambda side, h: (f'<div class="ability-change-pane ability-change-{side}"><div class="ability-change-body">'
+                                f'{_bold_numbers_html(aghs_line(h, kind=kind))}</div></div>')
+        old_pane = pane("old", old_html)
+        new_pane = _pair_number_tips(old_pane, pane("new", new_html))
+        caption = f"Ability reworked (Aghanim's {kind.title()} upgrade)."
+        _State.aghs_cards.append(_under_rows_card(caption, "rework", "", "aghs-change", old_pane, new_pane))
+        _GRANTED_CARDS.add((version, slug))
+        return True
+    return False
+
+
 _AGHS_REMOVED_RE = re.compile(r"^\s*No longer upgraded with Aghanim's (Scepter|Shard)\b", re.I)
 
 
@@ -1500,7 +1554,11 @@ def _aghs_removed_card(slug, kind, version, prev, up) -> bool:
         _aghs_missing(kind, slug, version, prev, old, "-")
     pane = (f'<div class="ability-change-pane ability-change-old"><div class="ability-change-body">'
             f'{_bold_numbers_html(aghs_line(_html.escape(_aghs_inline(old), quote=False), kind=kind))}</div></div>')
-    _State.aghs_cards.append(_under_rows_single(f"Removed {up}.", "del", "aghs-change", pane))
+    # old -> nothing, as a removed item ability: the old text on the left in a light red dashed frame, an empty place on
+    # the right (owner 2026-10-25, 7.41 Reincarnation: "Removed Aghanim's Shard." over "Causes Reincarnation to have
+    # no mana cost." read as what the Shard does now)
+    none = '<div class="ability-change-pane ability-change-new ability-change-none"></div>'
+    _State.aghs_cards.append(_under_rows_card(f"Removed {up}.", "del", "", "aghs-change aghs-removed", pane, none))
     return True
 
 
@@ -1515,12 +1573,14 @@ def _under_rows_card(caption, tag, li_cls, card_cls, old_pane, new_pane):
     drawAbilityChangeConnectors) — owner 2026-10-25."""
     marker = f'<span class="aghanim-marker {li_cls[9:]}"></span>' if li_cls.startswith("aghanim-") else ""
     li_attr = f' class="{li_cls}"' if li_cls else ""
+    # caption None: the card says it all (what it scales with — "No longer levels with X." repeated its headers)
+    head = (f'<ul class="changes ability-change-summary-ul under-rows-caption"><li data-tag="{tag}"{li_attr}>'
+            f'<span class="badge {tag}" data-tag="{tag}">{tag.upper()}</span>'
+            f'<span class="row-text">{caption}{marker}</span></li></ul>') if caption else ""
     return ('<svg class="ability-change-connector under-rows-connector" viewBox="0 0 100 100" preserveAspectRatio="none" '
             'aria-hidden="true"><path d="" fill="none" stroke="rgba(150, 146, 137, 0.45)" stroke-width="1.3" '
             'stroke-dasharray="3 3" stroke-linecap="round" /></svg>'
-            f'<ul class="changes ability-change-summary-ul under-rows-caption"><li data-tag="{tag}"{li_attr}>'
-            f'<span class="badge {tag}" data-tag="{tag}">{tag.upper()}</span>'
-            f'<span class="row-text">{caption}{marker}</span></li></ul>'
+            + head +
             f'<div class="ability-change unified-panes {card_cls}">{old_pane}'
             + (f'<span class="ability-change-arrow">→</span>{new_pane}' if new_pane else '') + '</div>')
 
@@ -1557,8 +1617,8 @@ def _scale_card(text) -> bool:
                                      f'<div class="ability-change-body">{body}</div></div>')
     old_pane = pane("old", old_head, old_body)
     new_pane = _pair_number_tips(old_pane, pane("new", new_head, new_body))
-    caption = _html.escape(re.sub(r"<[^>]+>", "", text).strip().rstrip(".") + ".", quote=False)
-    _State.aghs_cards.append(_under_rows_card(caption, "rework", "", "scale-change", old_pane, new_pane))
+    # no caption: "No longer levels with X." only repeats the headers (owner 2026-10-25); the row stays hidden
+    _State.aghs_cards.append(_under_rows_card(None, "rework", "", "scale-change", old_pane, new_pane))
     return True
 
 
@@ -1977,8 +2037,11 @@ def _iab_meta_chips(values, props=None, marks=None):
         elif val and marks and key in marks:
             # coloured only if a row under the card says exactly this change (page.save_html, _CARD_CONFIRMED):
             # a header difference no row names (Kinetic Fence 7.41 mana 50 -> 70) stays plain
-            mark, card = marks[key]
-            val = f"<!--CHIPMARK:{card}:{key}:{mark}-->{val}<!--/CHIPMARK-->"
+            mark, card, old = (tuple(marks[key]) + (None,))[:3]
+            # the new side's value carries the old one: the % on hover, as the cards' numbers (owner 2026-10-25,
+            # 7.41 Noxious Plague mana 200/300/400 -> 200/250/300 was dotted with no %)
+            old = re.sub(r"[^\d./%+\-]", "", re.sub(r"<[^>]+>", "", str(old))) if old else ""
+            val = f"<!--CHIPMARK:{card}:{key}:{mark}:{old}-->{val}<!--/CHIPMARK-->"
         if val:
             out.append(f'<span class="iab-m"><img class="iab-ico" src="{ABILITY_ICON_DIR}{icon}.png" alt="">{val}</span>')
     return "".join(out)
@@ -1986,13 +2049,19 @@ def _iab_meta_chips(values, props=None, marks=None):
 
 _CARD_CONFIRMED: set = set()          # (card id, header key) a row under the card confirmed
 _CARD_SEQ = [0]
-_CHIPMARK_RE = re.compile(r"<!--CHIPMARK:(\d+):(\w+):(\w+)-->(.*?)<!--/CHIPMARK-->", re.S)
+_CHIPMARK_RE = re.compile(r"<!--CHIPMARK:(\d+):(\w+):(\w+):([^-]*(?:-(?!->)[^-]*)*)-->(.*?)<!--/CHIPMARK-->", re.S)
 
 
 def resolve_chip_marks(html_text: str) -> str:
-    """page.save_html: a confirmed header value gets its colour, any other is left plain."""
-    return _CHIPMARK_RE.sub(lambda m: hl(m.group(4), m.group(3)) if (int(m.group(1)), m.group(2)) in _CARD_CONFIRMED
-                            else m.group(4), html_text)
+    """page.save_html: a confirmed header value gets its colour (the new side's also its % on hover), any other is
+    left plain."""
+    def one(m):
+        card, key, mark, old, val = int(m.group(1)), m.group(2), m.group(3), m.group(4), m.group(5)
+        if (card, key) not in _CARD_CONFIRMED:
+            return val
+        tipped = _number_tip(old, val, mark) if old else None
+        return (f'<span class="iab-hl iab-hl-{mark} iab-hl-num">{tipped}</span>' if tipped else hl(val, mark))
+    return _CHIPMARK_RE.sub(one, html_text)
 
 
 # header values where a bigger number is better; for the costs and the cooldown a smaller one is
@@ -2094,6 +2163,46 @@ _PANE_NOLEVEL_RE = re.compile(r"(?:^|(?<=[.!]))\s*(?:Innate, )?[Cc]an(?:'t|not) 
 _PANE_NAME_RE = re.compile(r"^\s*([A-Z][\w'’-]*(?: [A-Za-z][\w'’-]*){0,4}):\s+")
 
 
+# "Base damage: 17 + 3 per level." in a card's text (the game files' hero_levelup, aghs_text.ability_text): a formula
+# pill with its level table, as every row's "X + Y per level" (owner 2026-10-25: 7.41 Caustic Finale, Necromastery,
+# Keen Scope, Bitter Chill, Fiend's Gate — 33 cards of 7.38-7.41 had it as bare text). A pill already there (its
+# number right after the trigger's ">") is left alone.
+# "<b>10% + 2%</b> per hero level" (7.38 Dark Seer, hand-written) is one too: the bold closes after the pill
+_PER_LEVEL_RE = re.compile(r'(?<![\w.])(?<!">)(\d+(?:\.\d+)?)(%|s)?( [+\-] )(\d+(?:\.\d+)?)(%|s)?(</b>)?'
+                           r'( per (?:hero )?level)\b(?! up)')
+
+
+def _pill_formulas(html_text):
+    """(html with each bare "A + B per level" as a formula pill, the pills' tables html)."""
+    from .badges import scale_pill
+    tables = []
+
+    def pill(m):
+        base, unit, sign, inc = float(m.group(1)), m.group(2) or m.group(5) or "", m.group(3).strip(), float(m.group(4))
+        step = inc if sign == "+" else -inc
+        places = max(len((x.split(".") + [""])[1]) for x in (m.group(1), m.group(4)))
+        trigger, table = scale_pill(m.group(0).replace("</b>", ""), lambda L: base + step * L,
+                                    value_fmt=f"{{:.{places}f}}{unit}")
+        tables.append(f'<div class="formula-table-wrap">{table}</div>')
+        return trigger + (m.group(6) or "")
+    return _PER_LEVEL_RE.sub(pill, html_text), "".join(tables)
+
+
+# A header radius / cast range the text already names with its own words ("Vanish radius: 625/550/475/400", 7.41
+# Blur) or the same as the radius (a self-centred ability's cast range = its radius: Crimson Guard, Blur, Frost
+# Shield) is not said twice: the header keeps one line (owner 2026-10-25, Blur's "scales with Coup de Grace" wrapped).
+_HEAD_SAID_LABEL = {"aoe": r"radius", "castrange": r"range"}
+
+
+def _head_said_twice(key, val, text, props) -> bool:
+    if not val or key not in _HEAD_SAID_LABEL:
+        return False
+    if key == "castrange" and str(val) == str((props or {}).get("aoe") or ""):
+        return True
+    plain = re.sub(r"<[^>]+>", "", text)
+    return bool(re.search(rf"\b{_HEAD_SAID_LABEL[key]}\s*:\s*{re.escape(str(val))}(?![\d/]|\.\d)", plain, re.I))
+
+
 def _pane_values(desc, props=None) -> dict:
     """The header values a pane would show: the game files' over the text's own "Cooldown: 20s." sentences."""
     text = " ".join(d for d in (desc if isinstance(desc, list) else [desc]) if isinstance(d, str)
@@ -2149,13 +2258,22 @@ def _pane_parts(desc, props=None, facet=False, marks=None):
     for i in own:
         found, items[i] = _iab_take_meta(items[i], only=once)
         values.update(found)
-    rows = []
+    rows, tables = [], []
     for i, d in enumerate(items):
         if i in plain and not d:
             continue                                     # the row was only "Radius: 900."
+        if i in plain:
+            d, tbl = _pill_formulas(d)
+            tables.append(tbl)
         html = d if not isinstance(d, str) or d.lstrip().startswith("<div") else f'<div class="ability-change-row">{d}</div>'
         rows.append(_bold_numbers_html(html) if isinstance(html, str) else html)
-    chips = _iab_meta_chips(values, props, marks)   # never folded: a hero's old / new panes have no marks to keep a level
+    rows += tables
+    said = " ".join(items[i] for i in plain)
+    head_props = {k: v for k, v in (props or {}).items()
+                  if not (_head_said_twice(k, v, said, props) and k not in (marks or {}))}
+    head_values = {k: v for k, v in values.items()
+                   if not (_head_said_twice(k, v, said, props) and k not in (marks or {}))}
+    chips = _iab_meta_chips(head_values, head_props, marks)   # never folded: a hero's old / new panes have no marks to keep a level
     title = (f'<b class="iab-kind">{kind}:</b> <span class="iab-name">{name}</span>' if kind and name
              else f'<b class="iab-kind">{kind}</b>' if kind
              else f'<span class="iab-name">{name}</span>' if name else "")
@@ -2926,26 +3044,32 @@ def _hl_numbers(text: str) -> list:
 def _pair_number_tips(old_html: str, new_html: str) -> str:
     """The new pane's changed numbers get the item cards' % on hover, paired in order with the old pane's (the
     same count on both sides, else none: no guessing which was which)."""
-    from .badges import b
     olds, news = _hl_numbers(old_html), _hl_numbers(new_html)
     if not news or len(olds) != len(news):
         return new_html
-    num = lambda s: [float(x.replace(",", "").replace("−", "-")) for x in re.findall(r"[+\-−]?\d[\d.,]*", s)]
     for (_, _, _, ov), (s, e, kind, nv) in reversed(list(zip(olds, news))):
-        o, n = num(ov), num(nv)
-        if not o or not n or (len(o) > 1 and len(n) > 1 and len(o) != len(n)) or o == n:
-            continue
-        mean = lambda xs: sum(xs) / len(xs)
-        lower_better = (kind == "buff") == (mean(n) < mean(o)) if kind in ("buff", "nerf") else False
-        pct = b(o if len(o) > 1 else o[0], n if len(n) > 1 else n[0], l=lower_better)
-        if "badge" not in pct:
-            continue
         span = new_html[s:e]
-        opener = re.sub(r'class="iab-hl (iab-hl-\w+)"', r'class="iab-hl \1 iab-hl-num"', span[:span.index(">") + 1])
         inner = span[span.index(">") + 1:-len("</span>")]
-        new_html = (new_html[:s] + opener
-                    + _iab_hint(inner, f'<span class="iab-tip-pct">{pct}</span>') + "</span>" + new_html[e:])
+        tipped = _number_tip(ov, inner, kind)
+        if not tipped:
+            continue
+        opener = re.sub(r'class="iab-hl (iab-hl-\w+)"', r'class="iab-hl \1 iab-hl-num"', span[:span.index(">") + 1])
+        new_html = new_html[:s] + opener + tipped + "</span>" + new_html[e:]
     return new_html
+
+
+def _number_tip(old_plain, new_inner, kind):
+    """The new number's html with the item cards' % on hover ("200/300/400" -> "200/250/300": 0% / -17% / -25%), or
+    None when there is no % to say. kind: the new side's colour (buff / nerf) says which way is better."""
+    from .badges import b
+    num = lambda s: [float(x.replace(",", "").replace("−", "-")) for x in re.findall(r"[+\-−]?\d[\d.,]*", s)]
+    o, n = num(old_plain), num(re.sub(r"<[^>]+>", "", new_inner))
+    if not o or not n or (len(o) > 1 and len(n) > 1 and len(o) != len(n)) or o == n:
+        return None
+    mean = lambda xs: sum(xs) / len(xs)
+    lower_better = (kind == "buff") == (mean(n) < mean(o)) if kind in ("buff", "nerf") else False
+    pct = b(o if len(o) > 1 else o[0], n if len(n) > 1 else n[0], l=lower_better)
+    return _iab_hint(new_inner, f'<span class="iab-tip-pct">{pct}</span>') if "badge" in pct else None
 
 
 def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None, major=False, covered=False):
@@ -2978,10 +3102,18 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         # "Recipe cost 1350 -> 1250" + note "Total cost unchanged": the buyer pays the same
         _score_text += ". " + re.sub(r'<[^>]+>', ' ', extra)
     _cost_panel_covered(_score_text)
-    if isinstance(text, str) and _aghs_rework_card(_plain_text, covered):
+    if isinstance(text, str) and _State.card_innate and re.fullmatch(
+            rf"\s*{re.escape(_State.card_innate)} is now an innate ability(?: \(previously a basic ability\))?\.?\s*",
+            _plain_text):
+        # the card above shows it as the innate already (owner 2026-10-25, 7.41 Poison Sting); "(previously granted by
+        # Aghanim's Scepter)" says what the card doesn't and stays
+        covered = True
+    elif isinstance(text, str) and _aghs_rework_card(_plain_text, covered):
         covered = True                          # the old -> new upgrade card under the rows shows it
     elif isinstance(text, str) and not covered and _scale_card(_plain_text):
         covered = True                          # ... the old -> new header strips show what it scales with
+    elif isinstance(text, str) and not covered and not re.match(r"\s*Aghanim's", _plain_text):
+        _granted_card(dyn_tags)                 # an upgrade-granted ability's new text: a card, the row stays
     _ctx = _row_ctx(_plain_text if isinstance(text, str) else "")
     _scores = _row_scores(_score_text, dyn_tags, badge, ctx=_ctx)
     _dyn_record_li(dyn_tags, extra_keys=also_dyn, scores=_scores)
@@ -4000,6 +4132,8 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
         from .aghs_granted import kind_of
         _aghs = kind_of(new["slug"], _State.current_patch_version or "*") or None
     _State.current_ability_slug = new.get("slug")          # rows below belong to this ability
+    _GRANTED_CARDS.add((_State.current_patch_version, new.get("slug")))   # this card shows its text already
+    _State.card_innate = new.get("name") if new.get("innate") else None
     _State.current_ability_innate = bool(new.get("innate"))
     _card_ctx = {"ability": _State.current_ability_slug, "innate": _State.current_ability_innate,
                  "facet": False, "base_stat": False}
@@ -4066,7 +4200,7 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
     _same = bool(old) and old.get("name") == new.get("name") and old.get("slug") == new.get("slug")
     _CARD_SEQ[0] += 1
     _card_id = _CARD_SEQ[0]
-    _marks = {side: {k: (mark, _card_id) for k, mark in m.items()}
+    _marks = {side: {k: (mark, _card_id) + ((_vals["old"][k],) if side == "new" else ()) for k, mark in m.items()}
               for side, m in zip(("old", "new"), _iab_meta_marks(_vals["old"], _vals["new"]))} if _same else {}
     _State.card_meta = {k: (_vals["old"][k], _vals["new"][k], _card_id) for k in _marks.get("new", {})}
 
