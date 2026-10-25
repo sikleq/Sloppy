@@ -89,6 +89,13 @@ def test_upgrade_moved_to_another_ability_becomes_a_card(monkeypatch):
     assert "iab-hl" not in out                                    # two abilities: no word diff
 
 
+def test_named_ability_icon_is_downloaded_and_has_a_fallback(monkeypatch):
+    # CI icon audit 2026-10-25: Silencer's old Brain Drain has no art; Parting Shot was never downloaded
+    monkeypatch.setattr(_State, "ability_icons", set())
+    html = el.sub_ability("muerta_parting_shot", "Parting Shot")
+    assert "innate_icon.png" in html and any("muerta_parting_shot.png" in u for u in _State.ability_icons)
+
+
 def test_upgrade_only_added_stays_a_row(monkeypatch):
     # 7.41 Tinker: March of the Machines gets a Scepter part, Laser keeps its own -> no move, no card
     _moved(monkeypatch, ["tinker_laser"], ["tinker_laser", "tinker_march_of_the_machines"], "tinker_march_of_the_machines")

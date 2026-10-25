@@ -2687,7 +2687,11 @@ def terrain_num_chip(n):
 def sub_ability(slug, name):
     """A small icon + name of another ability inside a card's text (7.41 Overclocking: the abilities it supercharges,
     owner 2026-10-21)."""
-    return (f'<span class="ac-sub"><img class="ac-sub-ico" src="{ABIL_CDN}{slug}.png" alt="" loading="lazy">'
+    # an ability without art (7.41 Silencer's old Brain Drain) falls back to the innate icon, as the headers do
+    on_err = f"this.onerror=null;this.src='{INNATE_ICON_URL}';"
+    _State.ability_icons.add(f"{ABIL_CDN}{slug}.png")          # scripts/fetch/fetch_icons.py downloads it
+    return (f'<span class="ac-sub"><img class="ac-sub-ico" src="{ABIL_CDN}{slug}.png" alt="" loading="lazy" '
+            f'onerror="{on_err}">'
             f'<b class="ac-sub-name">{name}</b></span>')
 
 
