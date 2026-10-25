@@ -11180,7 +11180,7 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-hl .iab-num { color: inherit; }          /* a number inside the highlighted phrase: the phrase's text colour */
 /* a changed NUMBER (patch/elements.py mark_number_highlights): the text's colour and a dotted underline, as the item
    cards' values (its % on hover where the pair is known) — words keep the strip (owner 2026-10-25) */
-.iab-hl.iab-hl-num, .aghanim-scepter .iab-hl.iab-hl-num, .aghanim-shard .iab-hl.iab-hl-num {
+.iab-hl.iab-hl-num {
   background: none; padding: 0; margin: 0; border-radius: 0; font-weight: 700;
   border-bottom: 1px dotted currentColor; }
 .iab-hl.iab-hl-num .iab-hint { border-bottom: 0; }
@@ -11190,11 +11190,8 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-hl-num.iab-hl-del { color: #cf6b6b; }
 .iab-hl-num.iab-hl-rework, .iab-hl-num.iab-hl-swap { color: #b99ae6; }
 .iab-hl-num.iab-hl-qol, .iab-hl-num.iab-hl-misc { color: var(--text-dimmer); }
-/* on an Aghanim line's blue strip the see-through colour mixed with the blue (purple ≈ blue, owner 2026-10-24):
-   there it lies on the card's own dark colour, three layers of it — outside the strips one layer */
-.aghanim-scepter .iab-hl,
-.aghanim-shard .iab-hl { background: linear-gradient(var(--hl-bg), var(--hl-bg)),
-  linear-gradient(var(--hl-bg), var(--hl-bg)), linear-gradient(var(--hl-bg), var(--hl-bg)), var(--bg-panel-3); }
+/* on an Aghanim line's blue strip the same see-through highlighter as anywhere (owner 2026-10-25: "не разграничивать
+   правила"; the three-layer one on the card's dark colour of 10-24 is gone) */
 /* the colour-blind variants come from scripts/gen/gen_colorblind_css.py */
 .iab-tip-pct .badge-group { display: inline-flex; }
 .iab-card { background: var(--muted-04); border: 1px solid var(--line-soft); border-radius: 6px; padding: 6px 12px; }

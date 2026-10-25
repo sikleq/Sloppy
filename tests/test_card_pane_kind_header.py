@@ -83,6 +83,26 @@ def test_innate_cannot_be_leveled_up_is_never_said():
     assert "leveled" not in body and "Summons a Spirit Bear" in body
 
 
+def test_ultimate_passive_dash_goes_to_the_header():
+    # 7.41 Divided We Stand: "Ultimate. Passive — at the ult's level-up points …" repeated the header
+    head, body = el._pane_parts(["Ultimate. Passive — at the ult's level-up points, Meepo gains a clone."])
+    assert '<b class="iab-kind">Passive</b>' in head
+    assert "Ultimate" not in body and "Passive" not in body and "At the ult's level-up points" in body
+
+
+def test_new_ability_is_a_card_from_the_game_files(monkeypatch):
+    # owner 2026-10-25: "разве мы так оформляем появление новой способности?" (7.41 Objurgation was a row)
+    from patch import aghs_text as at
+    monkeypatch.setattr(at, "ability_text", lambda slug, v, kind="base": "Grants mana.\nBonus mana: 80/160.")
+    monkeypatch.setattr(el._State, "current_patch_version", "7.41")
+    html = el.new_ability("Objurgation", "obsidian_destroyer_objurgation", note="Barrier can be dispelled.")
+    assert "is-single-new" in html and "New ability." in html and "Grants mana" in html and "80/160" in html
+    monkeypatch.setattr(at, "ability_text", lambda slug, v, kind="base": None)
+    import pytest
+    with pytest.raises(RuntimeError, match="no description"):
+        el.new_ability("X", "x")
+
+
 def test_value_growing_with_hero_level_says_scales_with_level():
     # owner 2026-10-25: "Passive - scales with level." (the game files' hero_levelup, 7.41 Precision Aura)
     head, _ = el._pane_parts(["Passive.", "Grants agility."], props={"kind": "Passive", "level_scaled": True})

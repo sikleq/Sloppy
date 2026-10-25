@@ -3588,7 +3588,16 @@ def build():
     W(li("Now has Changing of the Guard sub-ability by default", t("NEW"),
          extra=inline_note("While Wukong's Command is active, Monkey King gains a Changing of the Guard ability which allows him to transform into any one of his soldiers. Upon cast, Monkey King takes the place of the soldier closest to the target location for 1.5s, and leaves another one in his stead. While Transfigured, Monkey King is indistinguishable from other soldiers and invulnerable, but can't issue commands. Cast Point: 0.3s. No Mana Cost. Cooldown: 3s")))
     W(ul_close())
-    W(ability("Changing of the Guard", slug="monkey_king_transfiguration"))
+    # 7.40c: the Transfiguration facet's ability (mana 25); 7.41: Wukong's Command's own sub-ability, no mana cost —
+    # the game's text is the same on both sides, the header and the rows say the change (owner 2026-10-25)
+    W(ability_change(
+        old=dict(name="Changing of the Guard", slug="monkey_king_transfiguration",
+                 desc=game_ability_desc("monkey_king_transfiguration", "7.40c")),
+        new=dict(name="Changing of the Guard", slug="monkey_king_transfiguration",
+                 desc=game_ability_desc("monkey_king_transfiguration")),
+        summary="Now a sub-ability of Wukong's Command for everyone (was the Transfiguration facet's).",
+        tag="rework",
+    ))
     W(ul_open())
     W(li("Ability appears in place of Wukong's Command and starts on a 1s cooldown after casting Wukong's Command. Can't be cast while rooted and can't target soldiers created by Aghanim's Scepter effect. Monkey King disjoints projectiles upon transformation.", t("NEW"),
          extra=inline_note("The possessed soldier has a small ring around it which is visible only to Monkey King and his allies. When the effect is over, Monkey King becomes his usual self leaving the overtaken soldier's position empty.")))
@@ -3828,12 +3837,11 @@ def build():
     W(ul_open())
     W(li("No longer upgraded with Aghanim's Scepter", t("DEL")))
     W(ul_close())
-    W(ability("Midnight Feast"))
+    W(new_ability("Midnight Feast", "night_stalker_midnight_feast",
+                  note="Attacks on allied units and buildings will not heal Night Stalker.<br>Can't be cast on allies."))
     W(ul_open())
     W(li("New basic ability with both passive and active components — passively, Night Stalker heals himself <b>6/8/10/12 health</b> when attacking enemy units. Actively at night, eats a non-ancient creep to restore <b>10/15/20/25% max health</b> and <b>10/12/14/16% mana</b>. <b>Cast Range:</b> 125. <b>No Mana Cost.</b> <b>Cooldown:</b> 39/36/33/30s",
-         t("NEW"),
-         extra=inline_note("Attacks on allied units and buildings will not heal Night Stalker."
-                           "<br>Can't be cast on allies.")))
+         t("NEW"), covered=True))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
@@ -4020,11 +4028,11 @@ def build():
                  lambda L: 25.0 + 5.0 * (L // 5),
                  levels=[1, 5, 10, 15, 20, 25, 30]))
     W(ul_close())
-    W(ability("Objurgation"))
+    W(new_ability("Objurgation", "obsidian_destroyer_objurgation",
+                  note="Barrier can be dispelled. Multiple instances of Objurgation barrier stack."))
     W(ul_open())
     W(li("New basic ability with both passive and active components — passively, increases max mana by <b>80/160/240/320</b>. Active: creates an all-damage barrier equal to <b>120/180/240/300 + 12% of Outworld Destroyer's max mana</b>. <b>Duration:</b> 10s. <b>Mana Cost:</b> 250. <b>Cooldown:</b> 36/34/32/30s.",
-         t("NEW"),
-         extra=inline_note("Barrier can be dispelled. Multiple instances of Objurgation barrier stack.")))
+         t("NEW"), covered=True))
     W(li("Aghanim's Scepter: Increases Max Mana to Barrier by 4%. Damage that would bring Outworld Destroyer below 20% is prevented, triggering a strong dispel and an automatic instance of undispellable Objurgation. This effect cannot trigger more than once every 80s, but refreshes on death", t("NEW")))
     W(ul_close())
     W(ability("Sanity's Eclipse", slug="obsidian_destroyer_sanity_eclipse"))
@@ -5328,10 +5336,10 @@ def build():
     W(ul_open())
     W(li("Aghanim's Shard reworked: Increases cast range and projectile speed by 25%. Creates 2 Plague Wards around every enemy hero hit", t("REWORK")))
     W(ul_close())
-    W(ability("Snakebite"))
+    W(new_ability("Snakebite", "venomancer_snakebite"))
     W(ul_open())
     W(li("New basic ability — Venomancer summons a Spawn of Aktok to sink its fangs into an enemy, dealing <b>40/60/80/100</b> magic damage and applying a deadly toxin which does <b>20/25/30/35</b> magical damage per second for 6 seconds. When the target attacks, they take the initial magic damage again. <b>Cast Range:</b> 600. <b>Mana Cost:</b> 70/80/90/100. <b>Cooldown:</b> 20/18/16/14s",
-         t("NEW")))
+         t("NEW"), covered=True))
     W(ul_close())
     W(ability_change(
         old=dict(

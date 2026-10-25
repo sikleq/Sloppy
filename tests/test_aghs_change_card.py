@@ -99,11 +99,12 @@ def test_named_ability_icon_is_downloaded_and_has_a_fallback(monkeypatch):
     assert "innate_icon.png" in html and any("muerta_parting_shot.png" in u for u in _State.ability_icons)
 
 
-def test_upgrade_only_added_stays_a_row(monkeypatch):
-    # 7.41 Tinker: March of the Machines gets a Scepter part, Laser keeps its own -> no move, no card
+def test_upgrade_only_added_is_a_new_side_card(monkeypatch):
+    # 7.41 Tinker: March of the Machines gets a Scepter part, Laser keeps its own -> no move: "Added" with the new
+    # text alone (since 2026-10-25; it was a row before)
     _moved(monkeypatch, ["tinker_laser"], ["tinker_laser", "tinker_march_of_the_machines"], "tinker_march_of_the_machines")
     row = el.li("Aghanim's Scepter: Robots heal allies", t("NEW"))
-    assert "iab-covered" not in row and _State.aghs_cards == []
+    assert "iab-covered" in row and "Added Aghanim's Scepter." in el.ul_close()
     # 7.38 Slardar: the part lives in Seaborn Sentinel's text, Corrosive Haze holds no upgrade by the game's flags
     _moved(monkeypatch, ["slardar_scepter"], ["slardar_seaborn_sentinel"], "slardar_amplify_damage")
     assert "iab-covered" not in el.li("Aghanim's Scepter: Increases trail duration", t("NEW"))
@@ -187,6 +188,29 @@ def test_store_has_old_patches_hero_data():
         pytest.skip("no game-files store here")
     blocks = _hero_blocks("7.20")
     assert "axe_culling_blade" in blocks and sum(1 for b in blocks.values() if b.get("HasScepterUpgrade") == "1") > 50
+
+
+def test_added_and_removed_upgrades_are_one_sided_cards(monkeypatch):
+    # owner 2026-10-25: 7.41 Press the Attack's Scepter "не сделано в виде карточки"; Duel's Shard (+5 damage per win)
+    # was only "No longer upgraded"
+    _moved(monkeypatch, ["legion_commander_duel"], ["legion_commander_duel", "legion_commander_press_the_attack"],
+           "legion_commander_press_the_attack")
+    assert "iab-covered" in el.li("Aghanim's Scepter: Increases bonus movement speed by 12%", t("NEW"))
+    out = el.ul_close()
+    assert "Added Aghanim's Scepter." in out and "is-single-new" in out and "ability-change-old" not in out
+    _moved(monkeypatch, ["legion_commander_duel", "legion_commander_overwhelming_odds"],
+           ["legion_commander_overwhelming_odds"], "legion_commander_duel")
+    assert "iab-covered" in el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
+    out = el.ul_close()
+    assert "Removed Aghanim's Shard." in out and "legion_commander_duel upgrade, old" in out
+    # moved to another ability: that ability's card shows the old text, this row stays
+    _moved(monkeypatch, ["arc_warden_spark_wraith"], ["arc_warden_tempest_double"], "arc_warden_spark_wraith")
+    assert "iab-covered" not in el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
+
+
+def test_a_number_the_text_says_is_not_repeated():
+    # 7.41 Arena of Blood: "Lowers cooldown (-10s) by 10s"
+    assert el._aghs_inline("Lowers cooldown by 10s.\nCooldown: -10s.") == "Lowers cooldown by 10s."
 
 
 def test_bonus_placeholder_is_the_upgrades_own_bonus():

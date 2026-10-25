@@ -639,7 +639,8 @@
       const icon = block.querySelector(':scope > .ability-icon-wrap');
       let card = svg.nextElementSibling;
       while (card && !card.classList.contains('ability-change')) card = card.nextElementSibling;
-      const oldPane = card && card.querySelector(':scope > .ability-change-old');
+      // a one-sided card (an upgrade added / removed) has only its new or old pane
+      const oldPane = card && card.querySelector(':scope > .ability-change-old, :scope > .ability-change-new');
       if (!path || !icon || !oldPane) return;
       const blockRect = block.getBoundingClientRect();
       const iconRect = icon.getBoundingClientRect();

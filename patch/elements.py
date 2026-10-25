@@ -1317,7 +1317,7 @@ def _aghs_inline(text, loose=True):
     last = lambda label: ([w for w in re.findall(r"[A-Za-z]+", label) if w.lower() not in _AGHS_LABEL_SKIP] or [""])[-1]
     rest = []
     for label, value in pairs:
-        bare = value.lstrip("+")
+        bare = value.lstrip("+-")               # "-10s" and "Lowers cooldown by 10s" say the same (7.41 Arena of Blood)
         if re.search(rf"(?<![\d.]){re.escape(bare)}(?!\d|\.\d)", said):
             continue                            # the description already says it ("grants 6 armor", 7.40 Warcry)
         spot = re.search(rf"\b{re.escape(label)}\b", desc, re.I)
@@ -1436,23 +1436,34 @@ def _aghs_rework_card(text, covered=False) -> bool:
     plain = re.sub(r"<[^>]+>", "", text or "")
     m = _AGHS_REWORK_RE.match(plain)
     defn = None if m or covered else (_AGHS_DEF_RE.match(plain) or _AGHS_MOVED_RE.match(plain))
+    gone = None if m or defn or covered else _AGHS_REMOVED_RE.match(plain)
     slug, version = _State.current_ability_slug, _State.current_patch_version
-    if not (m or defn) or not slug or not version:
+    if not (m or defn or gone) or not slug or not version:
         return False
-    from .aghs_text import ability_name, aghs_text
+    from .aghs_text import ability_name, aghs_text, holders
     from .meta import _prev_patch_version
-    kind = (m or defn).group(1).lower()
+    kind = (m or defn or gone).group(1).lower()
     prev = _prev_patch_version(version)
+    up = f"Aghanim's {kind.title()}"
+    if gone:
+        return _aghs_removed_card(slug, kind, version, prev, up)
     sources = [slug] if m else _aghs_moved_from(slug, kind, version, prev)
     if not sources:
-        return False                            # a new upgrade, or one added to this ability: the row says it
+        # an upgrade this ability didn't have and no other ability lost: a card of its new text alone (owner
+        # 2026-10-25: 7.41 Press the Attack's Scepter "не сделано в виде карточки"); no text of its own — the row
+        new = aghs_text(slug, kind, version)
+        if not new or not (slug in holders(_State.current_hero, kind, version)):
+            return False
+        pane = (f'<div class="ability-change-pane ability-change-new"><div class="ability-change-body">'
+                f'{_bold_numbers_html(aghs_line(_html.escape(_aghs_inline(new), quote=False), kind=kind))}</div></div>')
+        _State.aghs_cards.append(_under_rows_single(f"Added {up}.", "new", "aghs-change", pane))
+        return True
     new = aghs_text(slug, kind, version)
     olds = [(s, aghs_text(s, kind, prev)) for s in sources]
     for s, old in olds:
         if not old or not new or (s == slug and old == new):
             _aghs_missing(kind, slug, version, prev, old, new)
     new, olds = _aghs_inline(new), [(s, _aghs_inline(old)) for s, old in olds]
-    up = f"Aghanim's {kind.title()}"
     if sources == [slug]:
         old_html, new_html = _rework_diff_html(olds[0][1], new)
         old_lines = [aghs_line(old_html, kind=kind)]
@@ -1473,6 +1484,31 @@ def _aghs_rework_card(text, covered=False) -> bool:
     return True
 
 
+_AGHS_REMOVED_RE = re.compile(r"^\s*No longer upgraded with Aghanim's (Scepter|Shard)\b", re.I)
+
+
+def _aghs_removed_card(slug, kind, version, prev, up) -> bool:
+    """"No longer upgraded with Aghanim's Shard": a card of what it did, the old side alone (owner 2026-10-25: 7.41
+    Duel's Shard gave +5 damage per win and nothing said it). An upgrade that moved to another ability of the hero stays
+    a row: that ability's card shows this old text already."""
+    from .aghs_text import aghs_text, holders
+    old_h, new_h = holders(_State.current_hero, kind, prev), holders(_State.current_hero, kind, version)
+    if slug not in old_h or slug in new_h or set(new_h) - set(old_h):
+        return False
+    old = aghs_text(slug, kind, prev)
+    if not old:
+        _aghs_missing(kind, slug, version, prev, old, "-")
+    pane = (f'<div class="ability-change-pane ability-change-old"><div class="ability-change-body">'
+            f'{_bold_numbers_html(aghs_line(_html.escape(_aghs_inline(old), quote=False), kind=kind))}</div></div>')
+    _State.aghs_cards.append(_under_rows_single(f"Removed {up}.", "del", "aghs-change", pane))
+    return True
+
+
+def _under_rows_single(caption, tag, card_cls, pane):
+    """A one-sided card under an ability's rows: an upgrade added (its new text) or removed (its old text)."""
+    return _under_rows_card(caption, tag, "", f"{card_cls} is-single-new", pane, None)
+
+
 def _under_rows_card(caption, tag, li_cls, card_cls, old_pane, new_pane):
     """An old -> new card under an ability's rows (Aghanim's upgrade, what it scales with): its own caption row with
     the tag, like an ability_change's summary, and a dashed line from the ability's icon to the old pane (scripts.js
@@ -1486,7 +1522,7 @@ def _under_rows_card(caption, tag, li_cls, card_cls, old_pane, new_pane):
             f'<span class="badge {tag}" data-tag="{tag}">{tag.upper()}</span>'
             f'<span class="row-text">{caption}{marker}</span></li></ul>'
             f'<div class="ability-change unified-panes {card_cls}">{old_pane}'
-            f'<span class="ability-change-arrow">→</span>{new_pane}</div>')
+            + (f'<span class="ability-change-arrow">→</span>{new_pane}' if new_pane else '') + '</div>')
 
 
 # "No longer levels with Marksmanship" under an ability without a card: an old -> new pair of its header strips,
@@ -2046,7 +2082,8 @@ def _bold_numbers_html(html_text):
     return "".join(out)
 
 
-_PANE_KIND_RE = re.compile(r"^\s*(Active|Passive|Toggle|Aura)([.,])\s*")
+# "Ultimate. Passive — at the ult's level-up points …" (7.41 Divided We Stand): the header says the kind, the text not
+_PANE_KIND_RE = re.compile(r"^\s*(?:Ultimate[.,]\s*)?(Active|Passive|Toggle|Aura)(?:([.,])|\s+([—–-]))\s*")
 # What the ability levels / scales with leaves the text for the header, after the kind: "Passive, levels up with
 # Duel." -> "Passive – scales with Duel" (owner 2026-10-24, 7.41 Gravity Well / Distortion Field / Outfight Them!;
 # brackets -> a dash 10-25); a value growing with hero level in the game files -> "Passive – scales with level". A
@@ -2079,7 +2116,7 @@ def _pane_parts(desc, props=None, facet=False, marks=None):
             kind = kind or mk.group(1)
             rest = items[plain[0]][mk.end():]
             # "Active, targets an allied creep …" (7.41 Sacrifice): the clause after the comma starts the text
-            items[plain[0]] = rest[:1].upper() + rest[1:] if mk.group(2) == "," else rest
+            items[plain[0]] = rest[:1].upper() + rest[1:] if mk.group(2) == "," or mk.group(3) else rest
     scale = ""
     if kind:
         found = [m for i in plain for m in _PANE_SCALE_RE.finditer(items[i])]
@@ -3929,6 +3966,28 @@ def _take_aghs(spec):
     rest = desc[0][m.end():]
     desc = ([rest] if rest.strip() else []) + desc[1:]
     return dict(spec, desc=desc), (m.group(1) or m.group(2)).lower()
+
+
+def game_ability_desc(slug, version=None, note=None):
+    """A card side's desc from the game files: the ability's own text and the numbers the game lists under it, one
+    line (patch/aghs_text.ability_text); note: a (?) after it. Never empty: no text stops the build."""
+    from .aghs_text import ability_text
+    version = version or _State.current_patch_version
+    text = ability_text(slug, version)
+    if not text:
+        raise RuntimeError(f"{slug} ({version}): no description in the game files — teach patch/aghs_text.ability_text")
+    line = _html.escape(_aghs_inline(text, loose=False), quote=False)
+    return [line + (" " + inline_note(note) if note else "")]
+
+
+def new_ability(name, slug, note=None, innate=False):
+    """A brand-new ability: the "New ability." card with its game text, as every new ability on the site (owner
+    2026-10-25: «разве мы так оформляем появление новой способности?» — 7.41 Objurgation / Midnight Feast / Snakebite
+    were rows). The patch-note row goes under it covered, for the weights and filters."""
+    spec = {"name": name, "slug": slug, "desc": game_ability_desc(slug, note=note)}
+    if innate:
+        spec["innate"] = True
+    return ability_change(None, spec, summary="New ability.", tag="new")
 
 
 def ability_change(old, new, summary=None, tag=None, sub=False):
