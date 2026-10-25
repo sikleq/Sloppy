@@ -74,12 +74,16 @@ def _value_lines(block, kind, slug, version, tooltip):
     upgrade sets that has a label -> "Radius: +100." (a bonus on a base value keeps its sign, an upgrade-only value is
     bare; "%LABEL" = a percent)."""
     out = []
+    req = "RequiresScepter" if kind == "scepter" else "RequiresShard"
     av = block.get("AbilityValues")
     for k, v in (av.items() if isinstance(av, dict) else ()):
         if not isinstance(v, dict):
             continue
         raw = next((v[b] for b in (f"special_bonus_{kind}", "special_bonus_aghanim" if kind == "scepter" else "")
                     if b and b in v), None)
+        only = raw is None and str(v.get(req, "0")).strip() == "1"
+        if only:
+            raw = v.get("value")                # a value only the upgrade has: "RequiresScepter" (7.33 Assimilate)
         # the header values have no tooltip label of their own: "AbilityCooldown" -3 = "Cooldown: -3" (7.40 Huskar's
         # Inner Fire said "Lowers Inner Fire cooldown" with no number)
         label = (tooltip(f"DOTA_Tooltip_ability_{slug}_{k}", version) or _HEADER_LABELS.get(k.lower())
@@ -90,11 +94,27 @@ def _value_lines(block, kind, slug, version, tooltip):
         pct = label.lstrip().startswith("%")
         label = re.sub(r"^[%$+\s]+|[:\s]+$", "", label).strip().capitalize()
         base = _num(v.get("value", "")) if "value" in v else None
-        signed = base is not None and _nonzero(base)
+        signed = not only and base is not None and _nonzero(base)
         sign = "-" if str(raw).strip().startswith("-") else "+"
         val = (sign + n.lstrip("-")) if signed else n
         unit = "%" if pct else "s" if k.lower() in _SECONDS and not n.endswith("%") else ""
         out.append(f"{label}: {val}{unit}.")
+    # before 7.31 ("AbilitySpecial"): a value the upgrade sets is its own entry marked "RequiresScepter" / "RequiresShard"
+    # ("damage_scepter" 200, 7.08-7.30) — the game lists it bare
+    asp = block.get("AbilitySpecial")
+    for d in (asp.values() if isinstance(asp, dict) else ()):
+        if not isinstance(d, dict) or str(d.get(req, "0")).strip() != "1":
+            continue
+        for k, raw in d.items():
+            if k in ("var_type", "LinkedSpecialBonus", "RequiresScepter", "RequiresShard", "CalculateSpellDamageTooltip"):
+                continue
+            n = _num(raw)
+            label = tooltip(f"DOTA_Tooltip_ability_{slug}_{k}", version)
+            if not label or n is None or not re.search(r"[A-Za-z]", label) or not _nonzero(n):
+                continue
+            pct = label.lstrip().startswith("%")
+            label = re.sub(r"^[%$+\s]+|[:\s]+$", "", label).strip().capitalize()
+            out.append(f"{label}: {n}{'%' if pct else ''}.")
     return out
 
 
@@ -175,7 +195,8 @@ def ability_text(slug, version, kind="base"):
             return m.group(0)
         pct = "%" if m.group(2) else ""
         return _per_level(base, inc, pct)
-    filled = _fill(re.sub(r"%([A-Za-z_]\w*)%(%%)?", per_level, desc), _values(block, kind))
+    filled = _fill(re.sub(r"%([A-Za-z_]\w*)%(%%)?", per_level, desc),
+                   _with_kin_values(desc, _values(block, kind), slug, kind, version))
     text = _clean(filled).replace("%%", "%") if filled is not None else ""      # "0%%" the file writes bare
     if not text:
         return None
@@ -183,7 +204,13 @@ def ability_text(slug, version, kind="base"):
     # the values the game lists under the description ("AGILITY BASE BONUS: 10% + 1%"): 7.41 Precision Aura's text
     # names no number at all
     lines = []
-    for k, v in (av.items() if isinstance(av, dict) else ()):
+    asp = block.get("AbilitySpecial")
+    entries = list(av.items() if isinstance(av, dict) else ())
+    for d in (asp.values() if isinstance(asp, dict) else ()):          # before 7.31: "AbilitySpecial" {"01": {k: v}}
+        if isinstance(d, dict):
+            entries += [(k, x) for k, x in d.items() if k not in ("var_type", "LinkedSpecialBonus", "RequiresScepter",
+                                                                   "RequiresShard", "CalculateSpellDamageTooltip")]
+    for k, v in entries:
         label = tooltip(f"DOTA_Tooltip_ability_{slug}_{k}", version)
         n = _num((v.get("value") or v.get(f"special_bonus_{kind}", "")) if isinstance(v, dict) else v)
         if not label or not re.search(r"[A-Za-z]", label) or n is None:
@@ -197,6 +224,23 @@ def ability_text(slug, version, kind="base"):
     return text + ("\n" + " ".join(lines) if lines else "")
 
 
+def _with_kin_values(desc, vals, slug, kind, version):
+    """A placeholder the ability's own KV doesn't have, taken from another ability of the same hero when exactly one
+    value is found there (7.22 Nature's Prophet's Scepter: "%treant_large_damage_bonus%" lives on Nature's Call)."""
+    missing = {m.group(1).lower() for m in re.finditer(r"%([A-Za-z_]\w*)%", desc or "")} - set(vals)
+    if not missing:
+        return vals
+    pre = slug.split("_")[0] + "_"
+    found = {}
+    for other, blk in _blocks(version).items():
+        if other == slug or not other.startswith(pre) or not isinstance(blk, dict):
+            continue
+        for k, v in _values(blk, kind).items():
+            if k in missing:
+                found.setdefault(k, set()).add(v)
+    return {**vals, **{k: next(iter(v)) for k, v in found.items() if len(v) == 1}}
+
+
 def aghs_text(slug, kind, version):
     """The upgrade text of `slug` ("scepter" / "shard") in `version`: the description, then (after a line break) its
     numbers "Radius: +100. Barrier duration: 6." — or None. An ability the upgrade grants: "Grants <name>: …"."""
@@ -205,12 +249,14 @@ def aghs_text(slug, kind, version):
     from tools.item_ability_text import _clean, _fill
     from tools.loc_history import tooltip
     block = _blocks(version).get(slug)
-    desc = next((d for d in (tooltip(f"DOTA_Tooltip_ability_{slug}_{k}", version) for k in _KEYS[kind]) if d), None)
+    # "<slug>_ad_shard_description": the only key 7.30-7.31b Skywrath's Mystic Flare Shard had (Valve's own name)
+    desc = next((d for d in (tooltip(f"DOTA_Tooltip_ability_{slug}_{pre}{k}", version)
+                             for pre in ("", "ad_") for k in _KEYS[kind]) if d), None)
     if not desc and _granted(block, kind):
         return _granted_text(slug, kind, version, block)
     if not isinstance(block, dict) or not desc:
         return None
-    filled = _fill(desc, _values(block, kind))
+    filled = _fill(desc, _with_kin_values(desc, _values(block, kind), slug, kind, version))
     if filled is None:
         return None
     text = _DECREASE_RE.sub(r"\1", _clean(filled))     # "Decreases cooldown by -2s": the word says the minus

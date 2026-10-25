@@ -156,9 +156,15 @@ Field map: Base Armor → `ArmorPhysical`; Base Damage → `AttackDamageMin`; Mi
 не красится вовсе (так же карточки «scales with»). Строка остаётся скрытой (`covered`) ради весов и фильтров.
 Значения без своей подписи в подсказках (`AbilityCooldown` −3 у Inner Fire 7.40) получают её из `_HEADER_LABELS`
 («Cooldown: -3s.»); «-50%» в KV — доля значения (7.41 Pugna); два названия с одним последним словом («Hero / Non-hero
-damage as heal») — ни одно не встаёт после слова. Аудит 2026-10-25 всех текстов апгрейдов 7.34e–7.41f (10 384, все
-патчи с данными героев у генератора): ни одного неподписанного числа; без текста — только способности без подсказок
-в игре (оставшиеся в файлах, в т.ч. Invoker’s sub-spells), карточкам они не нужны, а нужны — сборка остановится.
+damage as heal») — ни одно не встаёт после слова. **Все патчи 7.08 → сейчас**: нет `data/stats/<v>/heroes` (до
+7.34e) — `ability_kv._hero_blocks` читает сборку патча из хранилища файлов игры (`npc_abilities.txt` или файлы
+героев); старый формат чисел апгрейда — `AbilitySpecial` с `RequiresScepter` / `RequiresShard` (и в `AbilityValues`
+тоже); число, которого нет у способности, берётся у другой способности того же героя (`_with_kin_values`, 7.22
+Nature's Prophet); ключ `<slug>_ad_shard_description` (7.30 Skywrath). **Аудит** — `python
+scripts/audit/check_aghs_texts.py` (~2 мин, 118 патчей, 26 684 текста): каждое подписанное игрой число апгрейда есть в
+тексте, у каждого героя есть текст апгрейда на одной из способностей; 2026-10-25 — 0 проблем. Сломанные подсказки
+самой игры, проверенные руками, — локальный `outputs/aghs_valve_gaps.json` (не в git: находки об игре не публикуем).
+Запускать после нового патча и после правок `patch/aghs_text.py`.
 `%bonus_X%` в подсказке — бонус апгрейда к значению X (`special_bonus_<kind>`; 7.40 Infest, 7.41 Vendetta).
 **Апгрейд переехал** (владелец 2026-10-25, 7.41 Arc Warden: Shard со Spark Wraith на Tempest Double): строка
 `Aghanim's Shard: …` (NEW) или `Aghanim's Scepter granting moved from A to B` тоже становится карточкой, если у героя

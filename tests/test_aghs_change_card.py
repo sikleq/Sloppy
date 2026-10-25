@@ -159,6 +159,36 @@ def test_huskar_inner_fire_numbers_are_right():
     assert at._HEADER_LABELS["abilitycooldown"] == "Cooldown" and at._num("-50%") == "-50%"
 
 
+def test_old_kv_layout_numbers_are_listed(monkeypatch):
+    # owner 2026-10-25: 7.08-7.30 too — "AbilitySpecial" entries marked "RequiresScepter" are the upgrade's numbers
+    block = {"AbilitySpecial": {"01": {"var_type": "FIELD_INTEGER", "damage": "100"},
+                                "02": {"var_type": "FIELD_INTEGER", "damage_scepter": "200", "RequiresScepter": "1"}},
+             "AbilityValues": {"radius": {"value": "700", "RequiresScepter": "1"}}}
+    tips = {"dota_tooltip_ability_x_damage_scepter": "SCEPTER DAMAGE:", "dota_tooltip_ability_x_radius": "RADIUS:"}
+    lines = at._value_lines(block, "scepter", "x", "7.20", lambda k, v: tips.get(k.lower()))
+    assert lines == ["Radius: 700.", "Scepter damage: 200."]
+
+
+def test_placeholder_from_another_ability_of_the_hero(monkeypatch):
+    # 7.22 Nature's Prophet: the Scepter text names values of Nature's Call
+    blocks = {"furion_wrath_of_nature": {"AbilityValues": {}},
+              "furion_force_of_nature": {"AbilityValues": {"treant_large_hp_bonus": "325"}},
+              "lina_dragon_slave": {"AbilityValues": {"treant_large_hp_bonus": "1"}}}
+    monkeypatch.setattr(at, "_blocks", lambda v: blocks)
+    vals = at._with_kin_values("Treants get %treant_large_hp_bonus% hp.", {}, "furion_wrath_of_nature", "scepter", "7.22h")
+    assert vals["treant_large_hp_bonus"] == "325"                 # another hero's ability is never asked
+
+
+def test_store_has_old_patches_hero_data():
+    # 7.08-7.34 had no data/stats/<v>/heroes: the store's npc_abilities.txt is read instead
+    from patch.ability_kv import _hero_blocks
+    from tools import game_files
+    if "7.20" not in game_files.versions():
+        pytest.skip("no game-files store here")
+    blocks = _hero_blocks("7.20")
+    assert "axe_culling_blade" in blocks and sum(1 for b in blocks.values() if b.get("HasScepterUpgrade") == "1") > 50
+
+
 def test_bonus_placeholder_is_the_upgrades_own_bonus():
     # "%bonus_AbilityCooldown%" / "%bonus_open_wounds_duration_pct%" (7.41 Vendetta, 7.40 Infest)
     vals = at._values({"AbilityValues": {"AbilityCooldown": {"value": "70", "special_bonus_shard": "-10"},

@@ -23,12 +23,30 @@ def _hero_blocks(version):
     out = {}
     folder = os.path.join(_STATS, version, "heroes")
     if not os.path.isdir(folder):
-        return out
+        return _store_blocks(version)
     for name in sorted(os.listdir(folder)):
         if not name.startswith("npc_dota_hero_") or name == "npc_dota_hero_base.txt":
             continue
         with open(os.path.join(folder, name), "rb") as f:
             root = site.hero_ability_blocks(parse_kv(_decode_bytes(f.read())))
+        out.update({k: v for k, v in (root or {}).items() if isinstance(v, dict)})
+    return out
+
+
+def _store_blocks(version):
+    """A patch without data/stats/<v>/heroes (7.08-7.34, owner 2026-10-25: "мы должны решать такое и добыть все
+    данные"): the store's own build — one npc_abilities.txt for every ability then, or per-hero files if it has them."""
+    from builders.silent import parse_kv
+    import builders.site_common as site
+    from tools import game_files
+    if version not in game_files.versions():
+        return {}
+    out = {}
+    heroes = [p for p in game_files.listing(version, "scripts/npc/heroes")
+              if p.rsplit("/", 1)[-1].startswith("npc_dota_hero_") and not p.endswith("npc_dota_hero_base.txt")]
+    texts = [game_files.read(version, p) for p in heroes] or [game_files.npc(version, "npc_abilities.txt")]
+    for text in texts:
+        root = site.hero_ability_blocks(parse_kv(text)) if text else {}
         out.update({k: v for k, v in (root or {}).items() if isinstance(v, dict)})
     return out
 
