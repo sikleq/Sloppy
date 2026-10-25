@@ -317,22 +317,24 @@ def shrines_icon():
     return im.resize((ICON_RES, ICON_RES), Image.NEAREST)
 
 
-# the Heights layer (2026-10-05): a terraced hill, the lowest step at the foot, the highest on top
+# the Heights layer: steps rising to the right, cut into layers like the heightmap — the lower the darker, each
+# layer's top row one shade lighter (the owner 2026-10-25: the old terraced hill "looks like a mountain", "make
+# steps"; variant B "layers" of four). Straight edges only, so no jagged pixels at 16 px.
 HEIGHTS_GLYPH = [
     "................",
     "................",
-    "................",
-    ".......rr.......",
-    "......rrrr......",
-    ".....oooooo.....",
-    "....oooooooo....",
-    "....yyyyyyyy....",
-    "...yyyyyyyyyy...",
-    "...gggggggggg...",
-    "..gggggggggggg..",
-    "..gggggggggggg..",
-    ".bbbbbbbbbbbbbb.",
-    ".bbbbbbbbbbbbbb.",
+    "...........rrrr.",
+    "...........rrrr.",
+    "...........rrrr.",
+    "........rrrrrrr.",
+    "........ooooooo.",
+    "........ooooooo.",
+    ".....oooooooooo.",
+    ".....yyyyyyyyyy.",
+    ".....yyyyyyyyyy.",
+    ".yyyyyyyyyyyyyy.",
+    ".gggggggggggggg.",
+    ".gggggggggggggg.",
     "................",
     "................",
 ]

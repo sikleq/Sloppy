@@ -617,8 +617,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   `data/map/heights_<code>.png` (height + 1024, 0 = no ground, one value per 32 units over x -10240..10240,
   y -10752..10240 — the data a ward tool reads back) and the layer picture `icons/maps/heights_<ver>.png` (bands
   filled faintly — low ground lightest — and the step drawn on its upper side). builders/terrain.py lays it under
-  every other layer (`tm-layer-heights`, old/new split by the slider), adds the "Heights" button (`tc_heights`, a
-  terraced hill in the site's gold, "not so rainbow") and, only where both sides have pictures, one switch per height
+  every other layer (`tm-layer-heights`, old/new split by the slider), adds the "Heights" button (`tc_heights`, steps
+  rising to the right in the site's gold, the lower layers darker — "not so rainbow"; the terraced hill it was looked
+  "like a mountain", the owner 2026-10-25) and, only where both sides have pictures, one switch per height
   under the change list and in the fullscreen panel (`_heights_buttons`, numbers only — "0", "128" … "768+", the owner:
   "instead of River 0, Base 512 keep only the values"; 2026-10-05: the key moved off the map, "then 0, 128 … can be
   clicked to turn those layers on and off"). Each height is its own picture (`icons/maps/heights_<ver>_<band>.png`,
