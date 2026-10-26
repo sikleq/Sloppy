@@ -105,6 +105,6 @@ def test_icons_missing_on_the_cdn_are_looked_for_in_the_game_files():
     # 7.41 Squee's Scope draws Stasis Trap's icon (KV AbilityTextureName): found, not an exception
     assert "techies_squees_scope" not in KNOWN_INNATE_NO_CDN_ICON
     assert os.path.exists(os.path.join(ROOT, "icons", "abilities", "techies_squees_scope.png"))
-    sys.path.insert(0, os.path.join(ROOT, "scripts", "fetch"))
-    import extract_vpk_icons
-    assert 16 in extract_vpk_icons.EMBEDDED                 # PNG_RGBA8888: spell icons are PNG files inside
+    # PNG_RGBA8888 (16): spell icons are PNG files inside; read, not imported — CI has no numpy
+    vpk = open(os.path.join(ROOT, "scripts", "fetch", "extract_vpk_icons.py"), encoding="utf-8").read()
+    assert re.search(r"^EMBEDDED = \{[^}]*\b16\b", vpk, re.M)
