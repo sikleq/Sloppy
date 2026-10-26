@@ -1587,8 +1587,9 @@ def _aghs_parts_cards() -> str:
     """The whole old upgrade -> the new one, under the ability that holds it now, when a part of it on another ability
     is gone and no card shows that part yet (owner 2026-10-25): A — the upgrade moved to an ability that had none (7.41
     Windrun -> Tailwind), B — a part is gone and the part that stayed changed (7.41f Pit of Malice + Fiend's Gate), C —
-    a part gone while the rest stayed the same (7.39 Glaives of Wisdom + Brain Drain): "Aghanim's X reworked." under
-    the ability that lost it, all old parts -> the ones left (owner 2026-10-26; till then only the row "Removed …").
+    a part gone while the rest stayed the same (7.39 Glaives of Wisdom + Brain Drain): a card without a caption under
+    the ability that lost it — its row "Removed …" is the caption — all old parts -> the ones left (owner 2026-10-26;
+    till then only the row).
     Each part with its ability's icon + name; drawn once per hero and upgrade, where the open ability block ends."""
     pending, _State.aghs_part_slug = _State.aghs_part_slug, None
     slug, hero = pending if pending else (None, None)
@@ -1640,6 +1641,10 @@ def _aghs_parts_cards() -> str:
         up = f"Aghanim's {kind.title()}"
         b_case = same or any(s in old_t for s in moved)
         caption, tag = (f"{up} reworked.", "rework") if b_case else (f"Added {up}.", "new")
+        if same:
+            # no caption: the "Removed Aghanim's X." row right above is it — "reworked" under it told one change in
+            # two rows, and the upgrade of the ability that kept it didn't change (owner 2026-10-26, 7.40b)
+            caption = None
         out.append(_under_rows_card(caption, tag, "", "aghs-change", old_pane, new_pane))
         _AGHS_SHOWN.add((version, hero, kind))
     return "".join(out)
@@ -1652,7 +1657,21 @@ def _aghs_removed_row(plain):
     """"No longer upgraded with Aghanim's Shard" -> the row reads "Removed Aghanim's Shard.", no card of the old text
     (owner 2026-10-25, 7.41 Reincarnation: "Хватит просто строки Removed Aghanim's Shard"); None for any other row."""
     m = re.fullmatch(r"\s*No longer upgraded with Aghanim's (Scepter|Shard)\.?\s*", plain or "", re.I)
-    return f"Removed Aghanim's {m.group(1).title()}." if m else None
+    if not m:
+        return None
+    up = f"Aghanim's {m.group(1).title()}"
+    # the hero keeps the upgrade on another ability: only this ability's part is gone (owner 2026-10-26, 7.40b
+    # Necromastery: "кажется, что удалили весь аганим, а не часть")
+    return f"Removed {up} bonus from this ability." if _aghs_kept_elsewhere(m.group(1).lower()) else f"Removed {up}."
+
+
+def _aghs_kept_elsewhere(kind) -> bool:
+    """True when another ability of the current hero holds the upgrade in this patch, with a text of its own."""
+    hero, slug, version = _State.current_hero, _State.current_ability_slug, _State.current_patch_version
+    if not hero or not version:
+        return False
+    from .aghs_text import aghs_text, holders
+    return any(s != slug and aghs_text(s, kind, version) for s in holders(hero, kind, version))
 
 
 def _under_rows_single(caption, tag, card_cls, pane):

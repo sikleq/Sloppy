@@ -68,7 +68,8 @@ def test_plan_skips_what_does_not_apply(monkeypatch, tmp_path):
     assert steps["shops"].skip and steps["item_stat_lines"].skip and steps["talent_slots"].skip
     assert steps["store"].skip and steps["publish"].skip          # no store on this PC
     assert "exists" in steps["draft"].skip                        # a proofread page is never regenerated
-    assert steps["enchant_values"].skip and steps["enchant_table"].skip   # 7.41f has no enchant blocks
+    # 7.41f changes Greedy: the enchant table steps run (since 2026-10-26 any changed enchantment, not only tier boxes)
+    assert steps["enchant_values"].skip is None and steps["enchant_table"].skip is None
     assert steps["build"].skip is None and steps["check"].argv[-1] == "7.41f"
     names = list(steps)
     # the store goes to GitHub right after its new patch: Sloppy's CI reads it there (2026-10-24)
@@ -85,7 +86,7 @@ def test_a_new_patch_gets_a_draft_and_enchant_steps_wait_for_the_content(monkeyp
     steps = {s.name: s for s in np_.plan("9.01", "01.01.2099", "gametracking")}
     assert steps["register"].skip is None and steps["draft"].skip is None
     assert steps["draft"].argv[1:] == ["generate_patch_code_v2.py", "9.01"]
-    assert "enchant_tier_box" in steps["enchant_values"].skip
+    assert "no enchantment changes" in steps["enchant_values"].skip
     assert steps["store"].argv[-2:] == ["add", "9.01"]              # archives: no --local for the gametracking source
     local = {s.name: s for s in np_.plan("9.01", "01.01.2099", "game")}
     assert local["store"].argv[-3:] == ["add", "9.01", "--local"]

@@ -22,7 +22,7 @@ to resume):
   item_stat_lines, talent_slots   only where the store is on this PC (old tooltips: tools/loc_history.py, also the store)
   draft         generate_patch_code_v2.py <v> -> _generated_p_<v>_v2.py + data/normalized/patches/<v>.json, only while
                 content/p<code>.py does not exist (a proofread page is never regenerated)
-  enchant       scripts/gen/enchant_values.py + enchant_table.py <v>, only when content/p<code>.py has enchant_tier_box()
+  enchant       scripts/gen/enchant_values.py + enchant_table.py <v>, when content/p<code>.py changes an enchantment
   build         python build_site.py (every page)
   check         tools/patch_check.py <v> (OK / MISSING / WARN; its exit code is this command's)
 
@@ -126,7 +126,10 @@ def has_enchant_blocks(version):
     if not os.path.exists(path):
         return False
     with open(path, encoding="utf-8") as f:
-        return "enchant_tier_box(" in f.read()
+        src = f.read()
+    # any changed enchantment, not only tier boxes: the table's tiers come from the game's neutral_items.txt
+    # (owner 2026-10-26, 7.39 "Enchantment Changes" as tables like 7.41)
+    return "enchant_tier_box(" in src or bool(re.search(r'enchant_header\("[^"]+"(?![^)]*removed=)', src))
 
 
 def _sha1(path):
@@ -212,10 +215,10 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
              skip=f"content/p{code(version)}.py exists (proofread pages are never regenerated)" if content else None),
         Step("enchant_values", f"data/rules/enchant_values.json for {version}",
              [PY, "scripts/gen/enchant_values.py", version],
-             skip=None if has_enchant_blocks(version) else "no enchant_tier_box() in the content file"),
+             skip=None if has_enchant_blocks(version) else "no enchantment changes in the content file"),
         Step("enchant_table", f"data/rules/enchant_tables.json for {version}",
              [PY, "scripts/gen/enchant_table.py", version],
-             skip=None if has_enchant_blocks(version) else "no enchant_tier_box() in the content file"),
+             skip=None if has_enchant_blocks(version) else "no enchantment changes in the content file"),
         Step("build", "the whole site", [PY, "build_site.py"]),
         Step("check", f"tools/patch_check.py {version}", [PY, "tools/patch_check.py", version]),
     ]

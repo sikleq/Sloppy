@@ -18,8 +18,11 @@ PATCH_FILE = _HERE / "dist" / "patches" / "7.41d.html"
 # Known-good metrics for 7.41d. Update when patch content changes intentionally.
 EXPECTED = {
     "entity_names": 102,
-    "badge_buff": 388,  # -4 / -12: 5+ level badges show "first … last" only (2026-10-16, Dagon 7.41); +6 / +2: the
-    "badge_nerf": 191,  # Spider Legs / Witchbane abilities cards repeat their rows' % in the values' hover (2026-10-17)
+    # -4 / -12: 5+ level badges show "first … last" only (2026-10-16, Dagon 7.41); +6 / +2: the Spider Legs / Witchbane
+    # abilities cards repeat their rows' % in the values' hover (2026-10-17); +8 / +12: Alert, Timeless, Titanic, Vital
+    # got their tier tables, a changed cell's % on hover (2026-10-26)
+    "badge_buff": 396,
+    "badge_nerf": 203,
     "badge_new": 1,
     "badge_del": 5,
     "badge_rework": 1,  # -1: the talent swap row is SWAP now (2026-09-26)

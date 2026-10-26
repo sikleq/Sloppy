@@ -167,3 +167,25 @@ def test_lane_creep_pages_are_named_after_the_creep():
     old = os.path.join(root, "dist", "units", "creep-goodguys-flagbearer.html")
     if os.path.exists(old):                                             # built: the old page sends readers on
         assert 'url=flagbearer-creep.html' in open(old, encoding="utf-8").read()
+
+
+def test_general_changes_split_into_mechanic_blocks_with_every_valve_row():
+    # owner 2026-10-26, 7.39 General Changes: each mechanic its own block as 7.38 Lifesteal; Valve's sub-rows stay rows
+    note = {"title": "General Changes", "generic": [
+        {"indent_level": 1, "note": "Lifesteal Amplification has been removed and a new umbrella stat has been created "
+                                    "in its place: Health Restoration"},
+        {"indent_level": 2, "note": "Provides a percentage increase to the health gained", "info": "Also negative"},
+        {"indent_level": 2, "note": "Health Restoration cannot go higher than 100%"},
+        {"indent_level": 1, "hide_dot": True, "note": "<br>"},
+        {"indent_level": 1, "note": "Sources of Heal Amplification now stack additively"},
+        {"indent_level": 1, "note": "Heal Amplification has no upper limit"},
+        {"indent_level": 1, "hide_dot": True, "note": "<br>"},
+        {"indent_level": 1, "note": "Effects that root and disarm are now considered Bind Effects"},
+    ]}
+    out = "\n".join(g._render_general_note(note))
+    assert 'W(plain_header("Health Restoration", new="New mechanic"))' in out
+    assert 'W(plain_header("Heal Amplification", new="Reworked mechanic"))' in out
+    assert 'W(li("Provides a percentage increase to the health gained", t("NEW")' in out    # a row, not a "?"
+    assert 'extra=inline_note("Also negative")' in out
+    rest = out[out.index('W(plain_header("General Changes"))'):]
+    assert "Bind Effects" in rest and "Heal Amplification" not in rest

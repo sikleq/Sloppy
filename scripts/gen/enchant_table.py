@@ -39,6 +39,53 @@ PENALTIES = {"Intelligence", "Max Mana", "Attack Damage", "Incoming Damage", "Ma
 PENALTY_OWNERS = {"Health Regen": {"Nimble"}, "Attack Speed": {"Titanic", "Hulking"}, "Attack Damage": {"Greedy"}}
 
 
+def game_tiers(version):
+    """{enchantment name: [tiers]} the game offers it at in `version` (neutral_items.txt "neutral_tiers" ->
+    "enhancements"); {} when the patch's file isn't there. The page's tier boxes, where it has them, win; a patch
+    page without them (7.39 "Enchantment Changes", owner 2026-10-26: "сделать таблицей как в 7.41") takes these."""
+    from builders.silent import parse_kv
+    from tools import game_files
+    text = game_files.npc(version, "neutral_items.txt") if game_files.available() else None
+    if not text:
+        return {}
+    root = parse_kv(text)
+    tiers = (root.get("neutral_items", root).get("neutral_tiers") or {})
+    out = {}
+    for tier, blk in tiers.items():
+        ench = (blk or {}).get("enhancements") or {}
+        # from 7.41 by attribute: {"global": {slug: "1"}, "strength": {...}, ...}; before, {slug: "1"}
+        slugs = [s for k, v in ench.items() for s in (v if isinstance(v, dict) else {k: v})]
+        for slug in slugs:
+            if tier.isdigit() and slug.startswith("item_enhancement_"):
+                out.setdefault(slug[len("item_enhancement_"):], set()).add(int(tier))
+    return {k: sorted(v) for k, v in out.items()}
+
+
+def game_label(name, key, version):
+    """(sign, unit, label) of a KV key as that patch's game text names it ("%+$slow_resistance" -> ("+", "%", "Slow
+    Resistance")), else None. The _ENCHANT_DESC lines are today's text, matched by order: in an older patch the keys
+    differ (7.39 Mystical's third value is Cast Range, not Mana Cost/Loss Reduction — owner 2026-10-26)."""
+    from loc_history import tooltip
+    raw = tooltip(f"DOTA_Tooltip_ability_item_enhancement_{_game_name(name)}_{key}", version)
+    m = re.fullmatch(r"\s*(%?)([+\-]?)(%?)\s*(.+?)\s*", raw or "")
+    if not m:
+        return None
+    label = m.group(4)
+    if label.startswith("$"):
+        label = tooltip(f"dota_ability_variable_{label[1:]}", version)
+    if not label or not re.search(r"[A-Za-z]", label):
+        return None
+    return m.group(2) or "+", "%" if (m.group(1) or m.group(3)) else "", label.strip()
+
+
+def _stems(label):
+    return {w[:5] for w in re.findall(r"[a-z]+", label.lower()) if len(w) > 2}
+
+
+def _game_name(name):
+    return name.lower().replace("-", "_").replace(" ", "_").replace("'", "")
+
+
 def _tiers(spec):
     """'4/5' -> [4, 5], '2-4' -> [2, 3, 4], '5' -> [5]."""
     spec = spec.strip()
@@ -114,12 +161,15 @@ def side(name, kv, version, tiers):
 
 def build(version, prev):
     kv_new, kv_old = _items(version), _items(prev)
+    game_new, game_old = game_tiers(version), game_tiers(prev)
     out = {}
     for name, blk in page_blocks(version).items():
-        tiers_new = blk["tiers"]
+        tiers_new = blk["tiers"] or game_new.get(_game_name(name), [])
         moved = next((re.search(r"Tiers changed from (\S+) to (\S+)", r) for r in blk["rows"]
                       if re.search(r"Tiers changed from", r)), None)
-        tiers_old = _tiers(moved.group(1)) if moved else list(tiers_new)
+        tiers_old = (_tiers(moved.group(1)) if moved
+                     else game_old.get(_game_name(name)) if not blk["tiers"] and game_old.get(_game_name(name))
+                     else list(tiers_new))
         new = side(name, kv_new, version, tiers_new)
         if new is None:
             print(f"{version} {name}: new values don't fit tiers {tiers_new} — left out")
@@ -130,7 +180,12 @@ def build(version, prev):
         lab = labels(name, new[1], tiers_new)
         stats = []
         for k in list(new[0]) + [k for k in (old[0] if old else {}) if k not in new[0]]:
+            game = game_label(name, k, version) or game_label(name, k, prev)
             info = lab.get(k) or EXTRA_LABELS.get((name, k))
+            # today's line that names another key (its words not in the key's, nor in the game's label): the patch's
+            # own text wins; one about this key keeps its wording ("BAT Reduction" for bat_reduce, 7.41)
+            if game and not (info and _stems(info[2]) & (_stems(k.replace("_", " ")) | _stems(game[2]))):
+                info = game
             if not info:
                 if any((new[0].get(k) or {}).values()) or any(((old[0] if old else {}).get(k) or {}).values()):
                     print(f"{version} {name}: no label for {k} — left out")

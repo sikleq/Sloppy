@@ -1085,11 +1085,72 @@ def _render_general_note(note):
     title = note.get('title', '').strip()
     if title in _BOSSES:          # 7.41e "Tormentor": the boss's card (link, patch strip), not a plain header
         out += ['', f'W(subgroup("{title}"))']      # a line of its own: _postprocess_boss_blocks matches it
+    notes = note.get('generic', [])
+    mech = []
+    if title not in _BOSSES and not _MAP_SECTION.search(title):
+        notes, mech = _mechanic_blocks(notes)
     elif title:
         out.append(f'\nW(plain_header("{title}"))')
-    body, _ = _emit_notes(note.get('generic', []))
+    if mech:
+        out += mech
+    if title and title not in _BOSSES and not _MAP_SECTION.search(title) and _has_rows(notes):
+        out.append(f'\nW(plain_header("{title}"))')
+    if not _has_rows(notes):
+        return out
+    body, _ = _emit_notes(notes)
     out.extend(_general_topics(_bonus_from_note(_merge_all_followup(_link_lane_creeps(body))), title))
     return out
+
+
+def _has_rows(notes):
+    return any(not n.get('hide_dot') and _strip_html(n.get('note', '')).strip() for n in notes)
+
+
+# Two Title Case words — the name of the thing a group of general rows is about ("Health Restoration")
+_MECH_NAME_RE = re.compile(r"\b([A-Z][a-z]+ [A-Z][a-z]+)\b")
+_NEW_MECH_RE = re.compile(r"\bnew\b[^.]*\b(?:stat|mechanic|created|system)\b", re.I)
+
+
+def _mechanic_name(texts):
+    """The name a group of general rows shares: the two-word Title Case term of its first row that the most rows of
+    the group say (at least 2), else None."""
+    rows = {}
+    for i, text in enumerate(texts):
+        for m in _MECH_NAME_RE.finditer(_strip_html(text)):
+            rows.setdefault(m.group(1), set()).add(i)
+    best = sorted(((len(r), n) for n, r in rows.items() if 0 in r and len(r) >= 2), reverse=True)
+    return best[0][1] if best else None
+
+
+def _mechanic_blocks(notes):
+    """(the notes left, lines of mechanic blocks): a general section's group of rows (Valve splits them with a "<br>"
+    row) about one named thing becomes its own block — plain_header(<name>, new="New mechanic" / "Reworked
+    mechanic") — with every Valve row a row of its own (its "info" its "?"), as 7.38 Lifesteal (owner 2026-10-26, 7.39
+    General Changes: Health Restoration's sub-rows had been folded into one row's "?" and an intro). A group of one
+    row, or without a shared name, stays in the section."""
+    groups, cur = [], []
+    for n in notes:
+        if n.get('hide_dot') and _strip_html(n.get('note', '')).strip() in ('', ):
+            groups.append(cur)
+            cur = []
+        else:
+            cur.append(n)
+    groups.append(cur)
+    left, out = [], []
+    for group in groups:
+        texts = [n.get('note', '') for n in group if not n.get('hide_dot')]
+        name = _mechanic_name(texts) if len(texts) >= 2 else None
+        if not name:
+            if left and group:
+                left.append({'indent_level': 1, 'hide_dot': True, 'note': '<br>'})
+            left += group
+            continue
+        label = "New mechanic" if _NEW_MECH_RE.search(_strip_html(texts[0])) else "Reworked mechanic"
+        body, _ = _emit_notes([dict(n, indent_level=1) for n in group])     # each Valve row a row: no folding
+        tag = "NEW" if label == "New mechanic" else "REWORK"
+        out += ['', f'W(plain_header("{name}", new="{label}"))']
+        out += [_as_mech_row(l, tag) if l.startswith('W(li(') else l for l in body]
+    return left, out
 
 
 def _li_parts(line):
@@ -1252,14 +1313,14 @@ def _general_topics(lines, title=""):
 _MECH_TOPICS = {"Scaling with Hero Level"}
 
 
-def _as_mech_row(line):
-    """A row of a reworked-mechanic section: REWORK, so it joins the description box; its own tag stays hidden in
-    force_tag (filters, weights)."""
+def _as_mech_row(line, tag="REWORK"):
+    """A row of a reworked- (or new-) mechanic section: REWORK (NEW), so it joins the description box; its own tag
+    stays hidden in force_tag (filters, weights)."""
     m = re.search(r't\("(\w+)"\)', line)
-    if not m or m.group(1).upper() == "REWORK":
+    if not m or m.group(1).upper() == tag:
         return line
     own = m.group(1).lower()
-    return line[:m.start()] + 't("REWORK")' + line[m.end():-2] + f', force_tag="rework {own}"))'
+    return line[:m.start()] + f't("{tag}")' + line[m.end():-2] + f', force_tag="{tag.lower()} {own}"))'
 
 
 _BONUS_WAS = re.compile(r'\bbonus of (\d+)\b', re.I)

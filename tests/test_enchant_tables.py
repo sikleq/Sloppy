@@ -28,14 +28,20 @@ def test_tier_specs_and_cells():
     assert e._ench_cell(None, "+2", False, True) == '<span class="ench-v">+2</span>'          # a new enchantment
 
 
-def test_every_patch_with_enchant_boxes_has_its_tables():
+def test_every_patch_with_enchant_changes_has_its_tables():
+    # every patch, not only the ones with tier boxes: the tiers come from the game's neutral_items.txt (owner
+    # 2026-10-26: 7.39 "Enchantment Changes" as tables like 7.41, "сделать везде так")
     with open(os.path.join(ROOT, "data", "rules", "enchant_tables.json"), encoding="utf-8") as f:
         have = json.load(f)
     for path in glob.glob(os.path.join(ROOT, "content", "p*.py")):
-        if "enchant_tier_box(" in open(path, encoding="utf-8").read():
+        src = open(path, encoding="utf-8").read()
+        changed = [m for m in re.findall(r'enchant_header\("([^"]+)"([^)]*)\)', src) if "removed=" not in m[1]]
+        if "enchant_tier_box(" in src or changed:
             code = os.path.basename(path)[1:-3]
             ver = f"{code[0]}.{code[1:3]}{code[3:]}"
             assert ver in have, f"run: python scripts/gen/enchant_table.py {ver}"
+            for name, _ in changed:
+                assert have[ver].get(name, {}).get("stats"), f"{ver} {name}: no table"
     crude = have["7.41"]["Crude"]
     assert crude["tiers_old"] == [4, 5] and crude["tiers_new"] == [2, 3, 4]
     bat = next(s for s in crude["stats"] if s["key"] == "bat_reduce")

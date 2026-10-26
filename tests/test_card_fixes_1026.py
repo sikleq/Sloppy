@@ -98,6 +98,36 @@ def test_aghanims_cards_keep_even_padding_inside_an_ability_change_block():
     assert rule and "padding: 10px 14px" in rule.group(1) and "--pt: 10px" in rule.group(1)
 
 
+def test_removed_items_grey_aghs_panes_on_top_and_a_gone_enchant_value_struck():
+    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    # an item taken out of the game: icon and name greyed (the label and the patch strip keep their colours)
+    assert re.search(r"\.entity-block\.is-removed \.entity-icon img \{[^}]*grayscale", css)
+    assert re.search(r"\.entity-block\.is-removed \.entity-name > \.entity-link", css)
+    # Aghanim's card panes top-anchored: the caption stays by the card (7.41 Techies)
+    rule = re.search(r"\.ability-change-block \.ability-change\.unified-panes\.aghs-change > \.ability-change-pane"
+                     r"\s*\{([^}]*)\}", css)
+    assert "align-self: start" in rule.group(1)
+    # a bonus an enchantment lost: its old value struck, no "→ —" (7.41 Mystical Cast Range)
+    assert '" → —"' not in css
+    assert re.search(r"\.ench-tiers\.ench-change \.iab-lv\.iab-del \{[^}]*line-through", css)
+    # ... and its name struck too, no cross before it; "was" and "now" one size (owner, the same day, 7.39 Alert)
+    assert not re.search(r"\.ench-gone::before \{[^}]*content", css)
+    assert re.search(r"\.ench-change \.ench-stat\.ench-gone \{[^}]*line-through", css)
+    assert re.search(r"\.ench-change \.ench-was \{[^}]*font-size: inherit", css)
+    # the Aghanim's card arrow stands at the old pane's middle (7.41 Techies)
+    js = open(os.path.join(ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    assert ".ability-change.aghs-change" in js and "arrow.style.marginTop" in js
+
+
+def test_older_enchant_tables_take_the_patchs_own_labels_and_tiers():
+    import json
+    have = json.load(open(os.path.join(ROOT, "data", "rules", "enchant_tables.json"), encoding="utf-8"))
+    mystical = {s["label"]: s for s in have["7.39"]["Mystical"]["stats"]}
+    # 7.39's third value is Cast Range (today's text says Mana Cost/Loss Reduction there)
+    assert mystical["Cast Range"]["new"]["4"] == "+100" and "Mana Cost/Loss Reduction" not in mystical
+    assert have["7.39"]["Vampiric"]["tiers_new"] == [2, 3, 4]        # from neutral_items.txt, no tier boxes on the page
+
+
 def test_icons_missing_on_the_cdn_are_looked_for_in_the_game_files():
     src = open(os.path.join(ROOT, "scripts", "fetch", "fetch_icons.py"), encoding="utf-8").read()
     assert "AbilityTextureName" in src and "from_vpk" in src

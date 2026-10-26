@@ -149,7 +149,8 @@ def test_part_gone_and_the_rest_the_same_is_a_card_under_the_ability_that_lost_i
     out = el._aghs_parts_cards()
     old_side = out[out.index("ability-change-old"):out.index("ability-change-arrow")]
     new_side = out[out.index("ability-change-new"):]
-    assert "Aghanim's Scepter reworked." in out
+    # no caption: the "Removed Aghanim's Scepter." row above says it ("reworked" made one change two rows)
+    assert "reworked" not in out and "under-rows-caption" not in out
     assert "Steals more." in old_side and "Steal duration." in old_side
     assert "Steals more." in new_side and "Steal duration." not in new_side
     assert "iab-hl" not in out                          # the kept part is the same: nothing coloured
@@ -265,12 +266,18 @@ def test_added_upgrade_is_a_card_and_removed_one_a_row(monkeypatch):
            ["legion_commander_overwhelming_odds"], "legion_commander_duel")
     plain = lambda h: re.sub(r"<[^>]+>", "", h)
     row = el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
-    assert "iab-covered" not in row and plain(row).endswith("Removed Aghanim's Shard.") and "No longer" not in row
+    # the hero keeps the Shard on Overwhelming Odds: only this ability's part is gone (owner 2026-10-26)
+    assert ("iab-covered" not in row and plain(row).endswith("Removed Aghanim's Shard bonus from this ability.")
+            and "No longer" not in row)
     assert "ability-change" not in el.ul_close()
     # moved to another ability: the same row
     _moved(monkeypatch, ["arc_warden_spark_wraith"], ["arc_warden_tempest_double"], "arc_warden_spark_wraith")
     row = el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
-    assert "iab-covered" not in row and plain(row).endswith("Removed Aghanim's Shard.")
+    assert "iab-covered" not in row and plain(row).endswith("Removed Aghanim's Shard bonus from this ability.")
+    # nothing of it left on the hero: the whole upgrade is gone
+    _moved(monkeypatch, ["arc_warden_spark_wraith"], [], "arc_warden_spark_wraith")
+    row = el.li("No longer upgraded with Aghanim's Shard", t("DEL"))
+    assert plain(row).endswith("Removed Aghanim's Shard.")
     # two upgrades in one row stay as the patch note says them (7.40)
     assert "No longer upgraded" in el.li("No longer upgraded with Aghanim's Shard or Aghanim's Scepter", t("DEL"))
 

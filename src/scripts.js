@@ -655,6 +655,19 @@
       const y2 = paneRect.top - blockRect.top + paneRect.height / 2;
       path.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' L ' + x1 + ' ' + y2 + ' L ' + x2 + ' ' + y2);
     });
+    // Aghanim's cards are top-anchored (styles.css, 2026-10-26): the arrow stands at the middle of the OLD pane, not of
+    // the taller new side (owner, 7.41 Techies: "стрелочка теперь не соотносится к левой карточке"). On a phone the
+    // panes stack and the arrow sits between them: no shift.
+    document.querySelectorAll('.ability-change.aghs-change').forEach((card) => {
+      const arrow = card.querySelector(':scope > .ability-change-arrow');
+      const oldPane = card.querySelector(':scope > .ability-change-old');
+      if (!arrow || !oldPane) return;
+      arrow.style.marginTop = '';
+      const a = arrow.getBoundingClientRect();
+      const p = oldPane.getBoundingClientRect();
+      if (!p.height || a.top >= p.bottom) return;              // stacked layout
+      arrow.style.marginTop = Math.max(0, p.top - a.top + (p.height - a.height) / 2) + 'px';
+    });
   }
   drawAbilityChangeConnectors();
   window.addEventListener('resize', drawAbilityChangeConnectors);

@@ -100,19 +100,23 @@ def build():
     W(li("The top lane lotus pool has been moved slightly to the north, and some of the tree paths have been adjusted", t("REWORK")))
     W(ul_close())
 
-    W(plain_header("General Changes"))
-    W(subgroup("Health Restoration"))
-    W(section_intro("Lifesteal Amplification and Spell Lifesteal Amplification have been removed and a new umbrella stat has been created in their place: Health Restoration — a percentage increase to the health gained from Lifesteal, Spell Lifesteal, and Health Regeneration." + inline_note("Also decreases those values when negative")))
+    # every Valve row is a row of its own, each mechanic its own block, as 7.38 Lifesteal (owner 2026-10-26: the old
+    # version folded "Provides …" into an intro); generate_patch_code_v2._mechanic_blocks drafts it so
+    W(plain_header("Health Restoration", new="New mechanic"))
     W(ul_open())
-    W(li("Positive and Negative sources of Health Restoration stack diminishingly with each other", t("REWORK"), extra=inline_note("\"Stacking diminishingly\" is the same behavior as evasion and magic resistance. Given N sources of positive Health Restoration, the final value will be calculated as: 1 - (1 - n0) * (1 - n1) * ...<br><br>For example, if you have a Sange (16%) and a Tier 4 Neutral Item with the Crude Enchantment (20%), your total Health Restoration would be 1 - (1 - .16) * (1 - .2) = 32.8%. In other words, multiple smaller sources are less effective than one single large source.<br><br>Negative sources of Health Restoration are stacked the same way, and then the positive and negative values are added together for your final Health Restoration.")))
-    W(li("Health Restoration cannot go lower than -100% and cannot go higher than 100%", t("REWORK")))
+    W(li("Lifesteal Amplification and Spell Lifesteal Amplification have been removed and a new umbrella stat has been created in their place: Health Restoration", t("NEW"), force_tag="new del"))
+    W(li("Provides a percentage increase to the health gained from Lifesteal, Spell Lifesteal, and Health Regeneration", t("NEW"), extra=inline_note("Also decreases those values when negative")))
+    W(li("Positive and Negative sources of Health Restoration stack diminishingly with each other", t("NEW"), extra=inline_note("\"Stacking diminishingly\" is the same behavior as evasion and magic resistance. Given N sources of positive Health Restoration, the final value will be calculated as: 1 - (1 - n0) * (1 - n1) * ...<br><br>For example, if you have a Sange (16%) and a Tier 4 Neutral Item with the Crude Enchantment (20%), your total Health Restoration would be 1 - (1 - .16) * (1 - .2) = 32.8%. In other words, multiple smaller sources are less effective than one single large source.<br><br>Negative sources of Health Restoration are stacked the same way, and then the positive and negative values are added together for your final Health Restoration.")))
+    W(li("Health Restoration cannot go lower than -100% and cannot go higher than 100%", t("NEW")))
     W(ul_close())
-    W(subgroup("Heal Amplification"))
+
+    W(plain_header("Heal Amplification", new="Reworked mechanic"))
     W(ul_open())
     W(li("Sources of Heal Amplification now stack additively with each other instead of diminishingly", t("REWORK"), extra=inline_note("This includes both Incoming Heal Amplification and Outgoing Heal Amplification")))
     W(li("Heal Amplification cannot go lower than -100% and has no upper limit", t("REWORK")))
     W(ul_close())
-    W(subgroup("Status Effects"))
+
+    W(plain_header("General Changes"))
     W(ul_open())
     W(li("Effects that root and disarm are now considered Bind Effects and will have the status effect \"Bound\" overhead", t("QoL"), extra=inline_note("Example: Crystal Maiden’s Frostbite")))
     W(ul_close())

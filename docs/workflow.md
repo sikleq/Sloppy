@@ -36,7 +36,7 @@ python tools/new_patch.py 7.42 --from enchant_values              # resume (afte
 | 13 | innate_history | `tools/build_innate_history.py` (which ability is each hero's innate, per patch) | yes |
 | 14–15 | history | `tools/build_item_stat_lines.py`, `tools/build_talent_slots.py` | only where the store is on this PC |
 | 16 | draft | `generate_patch_code_v2.py <v>` | only while `content/p<code>.py` does not exist |
-| 17–18 | enchant | `scripts/gen/enchant_values.py`, `enchant_table.py <v>` | only when the content file has `enchant_tier_box()` |
+| 17–18 | enchant | `scripts/gen/enchant_values.py`, `enchant_table.py <v>` | when the content file changes an enchantment (tiers from the game's `neutral_items.txt`) |
 | 19 | build | `build_site.py` | yes |
 | 20 | check | `tools/patch_check.py <v>` (its exit code is the command's) | yes |
 
