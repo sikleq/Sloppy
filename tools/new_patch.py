@@ -23,6 +23,7 @@ to resume):
   draft         generate_patch_code_v2.py <v> -> _generated_p_<v>_v2.py + data/normalized/patches/<v>.json, only while
                 content/p<code>.py does not exist (a proofread page is never regenerated)
   enchant       scripts/gen/enchant_values.py + enchant_table.py <v>, when content/p<code>.py changes an enchantment
+  thumbs        tools/make_thumbs.py: the pages' small WebP icons for any new or changed icon (audit 2026-10-26)
   build         python build_site.py (every page)
   check         tools/patch_check.py <v> (OK / MISSING / WARN; its exit code is this command's)
 
@@ -47,7 +48,7 @@ META = os.path.join(ROOT, "patch", "meta.py")
 DOTA_PATH = os.environ.get("DOTA_PATH", r"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game\dota")
 # our store of the game files of every patch (private repo, the owner's PC; tools/game_files.py): the top-ups,
 # build_item_stat_lines.py and build_talent_slots.py read the patches from it
-STORE = os.environ.get("DOTA_FILES_DIR", r"C:\Users\sikle\dota-patch-files")
+STORE = os.environ.get("DOTA_FILES_DIR", os.path.join(os.path.expanduser("~"), "dota-patch-files"))
 PY = sys.executable
 _VERSION = re.compile(r"^\d+\.\d+[a-z]?$")
 _ENTRY = re.compile(r'^\s*\{"version":\s*"([^"]+)",\s*"date":\s*"(\d\d\.\d\d\.\d{4})"')
@@ -219,6 +220,7 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
         Step("enchant_table", f"data/rules/enchant_tables.json for {version}",
              [PY, "scripts/gen/enchant_table.py", version],
              skip=None if has_enchant_blocks(version) else "no enchantment changes in the content file"),
+        Step("thumbs", "small WebP copies of new icons (icons/_t/)", [PY, "tools/make_thumbs.py"]),
         Step("build", "the whole site", [PY, "build_site.py"]),
         Step("check", f"tools/patch_check.py {version}", [PY, "tools/patch_check.py", version]),
     ]

@@ -14,7 +14,8 @@
 (KV `AbilityTextureName`, 7.41 Squee's Scope = techies_stasis_trap) — на CDN и в VPK,
 потом `panorama/images/spellicons/<slug>_png.vtex_c` в pak01_dir.vpk клиента.
 Только то, чего нет и там (innate без своего арта), остаётся с пометкой —
-в браузере для них onerror-fallback на innate_icon.png; такие slug'и вносить
+сборка сразу ставит им в src innate_icon.png (docs/architecture.md, «Ability icons —
+missing-file fallback»); такие slug'и вносить
 в patch/known_exceptions.py KNOWN_INNATE_NO_CDN_ICON с пометкой «not in the client VPK nor the CDN».
 """
 import sys
@@ -165,7 +166,7 @@ if fail:
 print(f"\nDownloaded: {ok}")
 print(f"Skipped:    {len(fail)}")
 if fail:
-    print("\nNot on the CDN nor in the game files (browser uses onerror fallback to innate_icon.png;")
+    print("\nNot on the CDN nor in the game files (the build puts innate_icon.png in their src;")
     print("add them to patch/known_exceptions.py KNOWN_INNATE_NO_CDN_ICON):")
     for slug, status in sorted(fail):
         print(f"  {slug}: {status}")

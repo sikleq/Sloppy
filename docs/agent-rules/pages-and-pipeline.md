@@ -28,7 +28,7 @@ data/
   stats/{version}/           ← KV-файлы героев/предметов (для silent changes)
   itemlist.json              ← Имена + engine slug всех предметов (Valve datafeed)
   abilities_by_id.json       ← ability_id → (dname, slug) для ability()
-dist/                        ← Финальный сайт (в .gitignore, кроме dist/patches/)
+dist/                        ← Финальный сайт (весь в .gitignore; CI собирает его с нуля)
 ```
 
 Полная успешная сборка (`python build_site.py` без ключей) удаляет из `dist/` HTML-страницы, которые она не записала
@@ -49,34 +49,21 @@ dist/                        ← Финальный сайт (в .gitignore, к�
 
 ## Добавление нового патча — полный workflow
 
+С 2026-10-21 всю сторону данных делает одна команда — `tools/new_patch.py` (шаги и возобновление — в её docstring
+и в `docs/workflow.md`; навык `sloppy-patch` ведёт по всему выпуску):
+
 ```bash
-# 1. Обновить itemlist (engine slugs предметов, нейтрал-пул)
-python scripts/fetch/fetch_itemlist.py
-
-# 2. Сгенерировать scaffold
-python generate_patch_code_v2.py 7.42
-# → _generated_p_7.42_v2.py + data/normalized/patches/7.42.json
-
-# 3. Сохранить scaffold как content/p742.py:
-#    - добавить в начало: from patch.api import *
-#    - обернуть в: def build():
-#    - добавить в конец: write_footer(); save_html('patches/7.42.html')
-#    ⚠ генератор НЕ добавляет эти три обёртки — нужно вручную
-
-# 4. Зарегистрировать патч
-#    - patch/meta.py: добавить в PATCHES + RELEASE_HISTORY (filename ОБЯЗАТЕЛЬНО)
-#    ⚠ ручной регистрации в builders/ НЕТ — builders/build_patches.py авто-обнаруживает content/p*.py
-
-# 5. Собрать + проверить иконки
-python build_site.py --latest      # только новый патч, ~3-4s
-python scripts/fetch/fetch_icons.py  # скачать недостающие иконки способностей
-python build_site.py --latest      # пересобрать чтобы пересчитать _LOCAL_ABIL_ICONS
-
-# 6. Полная сборка перед коммитом
-python build_site.py
-git add content/p742.py icons/abilities/*.png ...
-git commit -m "feat: add 7.42 patch page"
+python tools/new_patch.py 7.42 21.10.2026 --dry-run   # план, ничего не меняет
+python tools/new_patch.py 7.42 21.10.2026             # строка RELEASE_HISTORY, файлы игры, хранилище, черновик, сборка
+# вычитать черновик _generated_p_7.42_v2.py в content/p742.py, затем:
+python tools/new_patch.py 7.42 --from enchant
 ```
+
+- Регистрировать патч руками не нужно: `new_patch.py` пишет строку в `RELEASE_HISTORY` (`patch/meta.py`), список
+  `PATCHES` выводится из неё сам, `builders/build_patches.py` сам находит `content/p*.py`.
+- Недостающие иконки способностей: `python scripts/fetch/fetch_icons.py`, затем `python tools/make_thumbs.py`
+  (миниатюры; `new_patch.py` делает это шагом `thumbs`).
+- Перед коммитом — полная сборка `python build_site.py`, `python -m pytest -q`, `python tools/ci_local.py`.
 
 ## Известные ловушки генератора (generate_patch_code_v2.py)
 

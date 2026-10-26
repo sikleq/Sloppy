@@ -75,7 +75,9 @@ def test_plan_skips_what_does_not_apply(monkeypatch, tmp_path):
     # the store goes to GitHub right after its new patch: Sloppy's CI reads it there (2026-10-24)
     assert names.index("register") < names.index("fetch") < names.index("slim") < names.index("meta") \
         < names.index("store") < names.index("publish") < names.index("npc_units") < names.index("abilities_slim") \
-        < names.index("draft") < names.index("build") < names.index("check")
+        < names.index("draft") < names.index("thumbs") < names.index("build") < names.index("check")
+    # new icons get their small WebP copies before the build points the pages at them (audit 2026-10-26)
+    assert steps["thumbs"].argv[1:] == ["tools/make_thumbs.py"] and steps["thumbs"].skip is None
     assert steps["publish"].argv[-1].endswith("publish.py")
     # source game without a local game: the fetch says why it cannot run
     game = {s.name: s for s in np_.plan("7.41f", None, "game", dota_path=str(tmp_path))}

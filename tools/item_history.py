@@ -6,7 +6,7 @@ RELEASE_HISTORY: every KV field (old -> new) and the shop categories.
 
 usage: python tools/item_history.py <item_name> <version> [<version> ...] [--show]
        item_name: internal name (item_skadi) or a substring of it; --show also prints the item's full block.
-Store: env DOTA_FILES_DIR, default C:\\Users\\sikle\\dota-patch-files.
+Store: env DOTA_FILES_DIR, default ~/dota-patch-files.
 """
 import json
 import re

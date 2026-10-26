@@ -27,6 +27,8 @@
 | Теги/бейджи (`b()`/`t()`), порядок строк, канонические фразы (penalty→BUFF, Aghs reworked, pool-style, innate reworked, `_info`→inline_note, чипы-тултипы) | [docs/agent-rules/patch-tags.md](docs/agent-rules/patch-tags.md) |
 | Формулы, per-level, `li_formula`/`scale_pill`, сетка уровней, `effective_unchanged`, «per level up» vs «per level» | [docs/agent-rules/formula-tables.md](docs/agent-rules/formula-tables.md) |
 | Заголовки сущностей, структура changes-блока, `ability_change` (внутри/снаружи + layout), `cm_draft`, `correction-note` | [docs/agent-rules/entity-rendering.md](docs/agent-rules/entity-rendering.md) |
+| Блок замены/реворка способности `ability_change(old, new)`: когда ставить, обе панели | [docs/agent-rules/ability-change.md](docs/agent-rules/ability-change.md) |
+| Контент патч-страниц: DEL vs NERF, спецслучаи тегов, фразы, секции, нейтральные предметы, перечисления | [docs/agent-rules/content-rules.md](docs/agent-rules/content-rules.md) |
 | База статов (`stats DB`) + маппинг описаний → поля БД (`_BSTAT_FIELD` в `generate_patch_code_v2.py`) | [docs/agent-rules/stats-db.md](docs/agent-rules/stats-db.md) |
 | Вёрстка/стили: patch-page layering, toolbar-panel, Materials rhythm, regen columns, фильтры, Hero Stats, sticky dividers, навигационные стрелки, глобальный UI | [docs/agent-rules/ui-style.md](docs/agent-rules/ui-style.md) |
 | Структура проекта, как запустить, прочие страницы (index/calendar/terrain), грабли | [docs/agent-rules/pages-and-pipeline.md](docs/agent-rules/pages-and-pipeline.md) |

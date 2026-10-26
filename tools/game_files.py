@@ -1,5 +1,5 @@
 """Our store of the game's plain-text files: one commit per patch, tagged with the version (private repo
-dota-patch-files, local clone at env DOTA_FILES_DIR, default C:\\Users\\sikle\\dota-patch-files). Each patch = its own
+dota-patch-files, local clone at env DOTA_FILES_DIR, default ~/dota-patch-files). Each patch = its own
 build (first build with the patch's notes and without the next patch's, plus release-day fixes within 24 h; the store's
 tools/builds.py). Paths are the game's below game/dota/[pak01_dir/]: scripts/npc/items.txt,
 scripts/npc/heroes/npc_dota_hero_axe.txt, resource/localization/abilities_english.txt, scripts/shops.txt, …
@@ -12,7 +12,7 @@ import subprocess
 from functools import lru_cache
 from pathlib import Path
 
-STORE = Path(os.environ.get("DOTA_FILES_DIR", r"C:\Users\sikle\dota-patch-files"))
+STORE = Path(os.environ.get("DOTA_FILES_DIR", Path.home() / "dota-patch-files"))
 
 
 def available() -> bool:

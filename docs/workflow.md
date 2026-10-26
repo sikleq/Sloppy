@@ -42,7 +42,7 @@ python tools/new_patch.py 7.42 --from enchant_values              # resume (afte
 
 Each step prints what it does; the first failure stops the run and prints the `--from` line to resume.
 The store (2026-10-24) is our private git repo of the game's plain-text files, one commit per patch, tag = version
-(local clone `C:\Users\sikle\dota-patch-files`, env `DOTA_FILES_DIR`); what it holds and how each patch's build is
+(local clone `~/dota-patch-files`, env `DOTA_FILES_DIR`); what it holds and how each patch's build is
 chosen is in its own README (`dota-patch-files/README.md`) — not repeated here. Sloppy reads it only through
 `tools/game_files.py` (`read` / `read_bytes` / `path` / `listing` / `npc` / `versions`). The `publish` step sends
 the store to GitHub — BEFORE pushing Sloppy: CI lays out the raw files of every patch from it.
