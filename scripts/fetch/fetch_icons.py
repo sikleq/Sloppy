@@ -56,7 +56,15 @@ if DIST.is_dir():
             slugs.append(m.group(1))
 
 slugs = sorted(set(slugs))
-missing_local = [s for s in slugs if not (ICONS_DIR / f"{s}.png").exists()]
+
+
+def _is_png(path):
+    """A real PNG, not a saved error page (2026-10-26: skywrath_mage_ancient_seal.png was nginx's "301 Moved")."""
+    with open(path, "rb") as f:
+        return f.read(8) == b"\x89PNG\r\n\x1a\n"
+
+
+missing_local = [s for s in slugs if not (ICONS_DIR / f"{s}.png").exists() or not _is_png(ICONS_DIR / f"{s}.png")]
 
 print(f"Total icons referenced: {len(slugs)}")
 print(f"Already present locally: {len(slugs) - len(missing_local)}")
