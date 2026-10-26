@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from tools import game_files  # noqa: E402
-from tools.fetch_stats import parse_kv  # noqa: E402
+from patch.kv import parse_kv  # noqa: E402
 
 STORE = game_files.STORE
 store_file = game_files.read

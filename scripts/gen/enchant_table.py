@@ -43,7 +43,7 @@ def game_tiers(version):
     """{enchantment name: [tiers]} the game offers it at in `version` (neutral_items.txt "neutral_tiers" ->
     "enhancements"); {} when the patch's file isn't there. The page's tier boxes, where it has them, win; a patch
     page without them (7.39 "Enchantment Changes", owner 2026-10-26: "сделать таблицей как в 7.41") takes these."""
-    from builders.silent import parse_kv
+    from patch.kv import parse_kv
     from tools import game_files
     text = game_files.npc(version, "neutral_items.txt") if game_files.available() else None
     if not text:

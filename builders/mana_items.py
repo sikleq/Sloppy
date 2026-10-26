@@ -199,73 +199,9 @@ ITEM_DISPLAY_OVERRIDES = {
 }
 
 
-# ─────────────────────── KV parser (minimal) ───────────────────────────────
+# ─────────────────────── KV parser ─────────────────────────────────────────
 
-def _tokenize(text: str) -> list[str]:
-    out, i, n = [], 0, len(text)
-    while i < n:
-        c = text[i]
-        if c in " \t\r\n":
-            i += 1
-        elif c == "/" and i + 1 < n and text[i + 1] == "/":
-            while i < n and text[i] != "\n":
-                i += 1
-        elif c == "#":
-            while i < n and text[i] != "\n":
-                i += 1
-        elif c in "{}":
-            out.append(c); i += 1
-        elif c == '"':
-            i += 1
-            j = i
-            while j < n and text[j] != '"':
-                if text[j] == "\\" and j + 1 < n:
-                    j += 2
-                else:
-                    j += 1
-            out.append(text[i:j])
-            i = j + 1
-        else:
-            j = i
-            while j < n and text[j] not in ' \t\r\n{}"':
-                j += 1
-            if j > i:
-                out.append(text[i:j])
-            i = j
-    return out
-
-
-def parse_kv(text: str) -> dict:
-    tokens = _tokenize(text)
-    pos = [0]
-
-    def parse_block() -> dict:
-        result: dict = {}
-        while pos[0] < len(tokens) and tokens[pos[0]] != "}":
-            key = tokens[pos[0]]; pos[0] += 1
-            if pos[0] >= len(tokens):
-                break
-            val = tokens[pos[0]]
-            if val == "{":
-                pos[0] += 1
-                result[key] = parse_block()
-                if pos[0] < len(tokens) and tokens[pos[0]] == "}":
-                    pos[0] += 1
-            else:
-                pos[0] += 1
-                result[key] = val
-        return result
-
-    if not tokens:
-        return {}
-    root = tokens[pos[0]]; pos[0] += 1
-    if pos[0] < len(tokens) and tokens[pos[0]] == "{":
-        pos[0] += 1
-        body = parse_block()
-        if pos[0] < len(tokens) and tokens[pos[0]] == "}":
-            pos[0] += 1
-        return {root: body}
-    return {}
+from patch.kv import parse_kv  # noqa: E402,F401  the project's one KV parser (audit 2026-10-26)
 
 
 def _patches_with_items() -> list[tuple[str, str]]:

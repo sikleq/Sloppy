@@ -49,7 +49,7 @@ def load_loc(data_dir=None):
 
 def ability_blocks(stats_dir):
     """{slug: KV block} of npc_abilities.txt + every per-hero file, in file order."""
-    from tools.fetch_stats import parse_kv
+    from patch.kv import parse_kv
     from builders.site_common import hero_ability_blocks
     blocks = {}
     path = os.path.join(stats_dir, "npc_abilities.txt")

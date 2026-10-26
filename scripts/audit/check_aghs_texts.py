@@ -22,7 +22,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT)
 
-from builders.silent import parse_kv  # noqa: E402
+from patch.kv import parse_kv  # noqa: E402
 from patch.ability_kv import _hero_blocks  # noqa: E402
 from patch.aghs_text import _FLAGS, _HEADER_LABELS, _KEYS, _granted, _num, _values, _with_kin_values, aghs_text  # noqa: E402
 from patch.meta import RELEASE_HISTORY, _prev_patch_version  # noqa: E402

@@ -18,7 +18,7 @@ _RADIUS_KEYS = ("radius", "aura_radius")        # the one radius an ability has;
 @functools.lru_cache(maxsize=None)
 def _hero_blocks(version):
     """{ability slug: its KV block} of every hero ability in a version."""
-    from builders.silent import _decode_bytes, parse_kv
+    from .kv import _decode_bytes, parse_kv
     import builders.site_common as site
     out = {}
     folder = os.path.join(_STATS, version, "heroes")
@@ -36,7 +36,7 @@ def _hero_blocks(version):
 def _store_blocks(version):
     """A patch without data/stats/<v>/heroes (7.08-7.34, owner 2026-10-25: "мы должны решать такое и добыть все
     данные"): the store's own build — one npc_abilities.txt for every ability then, or per-hero files if it has them."""
-    from builders.silent import parse_kv
+    from .kv import parse_kv
     import builders.site_common as site
     from tools import game_files
     if version not in game_files.versions():

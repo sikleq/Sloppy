@@ -57,7 +57,7 @@ from scipy.optimize import lsq_linear
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
-from builders.silent import parse_kv  # noqa: E402
+from patch.kv import parse_kv  # noqa: E402
 from patch.meta import RELEASE_HISTORY  # noqa: E402
 from tools import game_files  # noqa: E402
 

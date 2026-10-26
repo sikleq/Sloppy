@@ -17,7 +17,7 @@ import sys
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "tools"))
-from builders.silent import parse_kv  # noqa: E402
+from patch.kv import parse_kv  # noqa: E402
 from loc_history import tooltip  # noqa: E402
 from tools import game_files  # noqa: E402
 
