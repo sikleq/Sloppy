@@ -45,13 +45,14 @@ jobs:
       - name: Install test dependencies
         run: pip install -r requirements-dev.txt
 
-      - name: Run unit tests
-        run: python -m pytest tests/ -v
-
       - name: Build site
         env:
           PYTHONIOENCODING: utf-8
         run: python build_site.py
+
+      # after the build: eight tests read dist/ and skip themselves without it (audit 2026-10-26)
+      - name: Run unit tests
+        run: python -m pytest tests/ -v
 
       - name: Verify minification
         run: |
