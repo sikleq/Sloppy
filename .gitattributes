@@ -1,3 +1,8 @@
+# Every text file: LF in the index, whatever an editor or a tool on Windows wrote (audit 2026-10-26: .gitignore,
+# a test and a CSV had mixed line endings in the working copy). The game's own texts stay byte for byte (CRLF).
+* text=auto
+data/*_english.txt -text
+
 # KV/JSON snapshots: LF in the index. VPK ships CRLF; without this every
 # local commit flipped line endings in ~450 files (pure noise).
 data/stats/**/*.txt  text eol=lf
