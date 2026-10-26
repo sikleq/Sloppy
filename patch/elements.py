@@ -9,7 +9,7 @@ import re
 
 from .images import (ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG, hero_img,
                      item_img, _LOCAL_ABIL_ICONS)
-from .state import _State
+from .state import _State, page_cache
 from .terrain_notes import note_phrase, wrap_phrase
 
 try:
@@ -643,7 +643,7 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
 # up for it: "Base Damage increased by 26" (+650%) alone meant nothing. The damage rows of such a hero (base
 # damage, damage at level 1 / 30, damage gain per level) become two rows, "Starting damage" and "Damage gain per
 # level", each with its own tag; the old rows stay in the page hidden (weights as before). Attribute rows stay rows.
-_HS_CARDS = {}                  # "<ek>|<pv>" -> {"hero", "before", "after", "valve": {1: ..., 30: ..., "gain": ...}}
+_HS_CARDS = page_cache({})      # "<ek>|<pv>" -> {"hero", "before", "after", "valve": {1: ..., 30: ..., "gain": ...}}
 _HS_GAIN_VALVE_RE = re.compile(r"damage gain per level \w+ from \+?([\d.]+) to \+?([\d.]+)", re.I)
 # Valve writes "decreased by 36 (from 189-195 to 153-159)", "decreased by 51-49 (from …)" (min and max moved
 # apart: Sand King, Mirana, Marci 7.38), "rescaled from 46-54 to 45-55" and, in 7.40, an en dash (Spectre)
@@ -1516,7 +1516,7 @@ def _aghs_rework_card(text, covered=False) -> bool:
     return True
 
 
-_GRANTED_CARDS: set = set()            # (version, slug) of granted abilities that already have their card
+_GRANTED_CARDS: set = page_cache(set())  # (version, slug) of granted abilities that already have their card
 
 
 def _granted_flag(slug, version):
@@ -1580,7 +1580,7 @@ def _granted_card(tags) -> bool:
     return True
 
 
-_AGHS_SHOWN: set = set()               # (version, hero, kind) whose old upgrade parts a card already shows
+_AGHS_SHOWN: set = page_cache(set())   # (version, hero, kind) whose old upgrade parts a card already shows
 
 
 def _aghs_parts_cards() -> str:
@@ -2160,8 +2160,8 @@ def _iab_meta_chips(values, props=None, marks=None):
     return "".join(out)
 
 
-_CARD_CONFIRMED: set = set()          # (card id, header key) a row under the card confirmed
-_CARD_SEQ = [0]
+_CARD_CONFIRMED: set = page_cache(set())  # (card id, header key) a row under the card confirmed
+_CARD_SEQ = page_cache([0])
 _CHIPMARK_RE = re.compile(r"<!--CHIPMARK:(\d+):(\w+):(\w+):([^-]*(?:-(?!->)[^-]*)*)-->(.*?)<!--/CHIPMARK-->", re.S)
 
 
@@ -2415,7 +2415,7 @@ def _pane_props(spec, version):
     return ability_props(slug_of(spec), version) if isinstance(spec, dict) else None
 
 
-_IAB_NOTES = {}           # "<ek>|<pv>|<ability>" -> (?) html moved from a hidden duplicate row into the card
+_IAB_NOTES = page_cache({})  # "<ek>|<pv>|<ability>" -> (?) html moved from a hidden duplicate row into the card
 
 
 def _iab_shown_in_card(text, extra):
@@ -2496,8 +2496,8 @@ def _iab_text_diff(old, new):
     return out
 
 
-_IAB_CARDS = {}           # "<ek>|<pv>" -> (old texts, new texts)
-_IAB_MARKS = {}           # "<ek>|<pv>" -> [(target, value, direction)] from the hidden rows under the card
+_IAB_CARDS = page_cache({})  # "<ek>|<pv>" -> (old texts, new texts)
+_IAB_MARKS = page_cache({})  # "<ek>|<pv>" -> [(target, value, direction)] from the hidden rows under the card
 _IAB_META_WORDS = {"cooldown": "cooldown", "mana cost": "manacost", "cast range": "castrange", "health cost": "healthcost"}
 _IAB_FROMTO_RE = re.compile(r"from\s+[+\-]?(\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*)\S*\s+to\s+[+\-]?(\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*)", re.I)
 _IAB_NOWHAS_RE = re.compile(r"now has an?\s+(\d+(?:\.\d+)?)s?\s+(cooldown|mana cost)", re.I)
@@ -2568,7 +2568,7 @@ def _iab_covered_change(text, tags, extra="", badge=""):
     return False
 
 
-_IAB_HL = {}              # "<ek>|<pv>" -> [(ability, side, span index, direction)] text a hidden row describes
+_IAB_HL = page_cache({})  # "<ek>|<pv>" -> [(ability, side, span index, direction)] text a hidden row describes
 _IAB_TAG_ORDER = ("new", "del", "buff", "nerf", "rework", "swap", "qol", "misc")
 _IAB_STOP = {"now", "longer", "also", "with", "from", "that", "this", "when", "into", "than", "have", "been",
              "will", "your", "their", "them", "only", "each", "item", "items", "ability", "abilities"}
@@ -4047,8 +4047,8 @@ def _components_side(parts, recipe, total, marks):
             f'<div class="components-total">= <span>{total}</span></div>')
 
 
-_COST_CARDS = {}          # "<ek>|<pv>" -> components_change arguments, drawn by render_cost_card
-_COST_MARKS = {}          # "<ek>|<pv>" -> {"total": dir, "recipe": dir, "note": html} from the hidden cost rows
+_COST_CARDS = page_cache({})  # "<ek>|<pv>" -> components_change arguments, drawn by render_cost_card
+_COST_MARKS = page_cache({})  # "<ek>|<pv>" -> {"total": dir, "recipe": dir, "note": html} from the hidden cost rows
 
 
 def components_change(old, new, total_old, total_new,

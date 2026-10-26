@@ -6,7 +6,7 @@ import re
 import builders.site_common as _site
 
 from .output import H, W
-from .state import _State
+from .state import _State, reset_page_state
 from .meta import _render_top_nav, _patch_meta_parts
 from .elements import _close_block, STAT_ICONS, STAT_DETECT_RULES
 from .static_has import add_static_has_classes
@@ -452,6 +452,4 @@ def save_html(filename):
         f.write(out)
     print(f"  → dist/{filename}: {len(out):,} bytes")
     H.clear()
-    _State.block_open = False
-    _State.current_sections = []
-    _State.current_entity_key = None
+    reset_page_state()                 # nothing of this page reaches the next one (audit 2026-10-26)

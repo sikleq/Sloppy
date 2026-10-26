@@ -56,3 +56,53 @@ class _State:
 
 
 state = _State()
+
+
+# ---- One reset for the whole build state (audit 2026-10-26) ----
+# A patch page leaves nothing for the next one: every _State field goes back to its default and every per-page cache
+# of the card code (registered with page_cache) is emptied. Only the build's totals stay — the patch-dynamics tallies
+# and the icon list rosters.py dumps after the last page. Tests reset those too.
+def _copy(value):
+    return type(value)(value) if isinstance(value, (list, dict, set)) else value
+
+
+_BUILD_TOTALS = ("dynamics", "ability_icons")
+_DEFAULTS = {k: _copy(v) for k, v in vars(_State).items() if not k.startswith("__")}
+_PAGE_CACHES = []                # [(container, its starting contents)]
+
+
+def page_cache(container):
+    """Register a module-level dict / set / list that holds one page's cards: reset_page_state empties it."""
+    _PAGE_CACHES.append((container, _copy(container)))
+    return container
+
+
+def _refill(container, start):
+    """Back to `start` in place: modules keep their reference to the container."""
+    container.clear()
+    if isinstance(container, list):
+        container.extend(start)
+    else:
+        container.update(start)
+
+
+def reset_page_state():
+    """After a page is written (page.save_html): defaults everywhere except the build's totals."""
+    state.__dict__.clear()                       # instance attributes would hide the class ones
+    for key, default in _DEFAULTS.items():
+        if key in _BUILD_TOTALS:
+            continue
+        cur = getattr(_State, key)
+        if isinstance(cur, (list, dict, set)) and type(cur) is type(default):
+            _refill(cur, default)
+        else:
+            setattr(_State, key, _copy(default))
+    for container, start in _PAGE_CACHES:
+        _refill(container, start)
+
+
+def reset_build_state():
+    """Everything, the build's totals too (tests: no test sees another one's state)."""
+    reset_page_state()
+    for key in _BUILD_TOTALS:
+        getattr(_State, key).clear()

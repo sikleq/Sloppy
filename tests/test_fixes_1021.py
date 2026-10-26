@@ -145,9 +145,11 @@ def test_facet_named_talent_row_is_a_swap():
     assert tm.SWAP_RE.match("Old Blood: Level 10 Talent +15% Bloodrage Spell Amplification replaced with +15% Amp")
 
 
-def test_aghanim_upgrade_goes_to_the_header_and_the_summary_keeps_the_stripe():
+def test_aghanim_upgrade_goes_to_the_header_and_the_summary_keeps_the_stripe(monkeypatch):
     # 2026-10-21 the words went in brackets into the summary; 2026-10-26 the header says "granted by Aghanim's X" and
-    # the summary keeps only the stripe (owner, 7.41 Kinetic Fence)
+    # the summary keeps only the stripe (owner, 7.41 Kinetic Fence). The panes need the page's patch: until the
+    # 2026-10-26 state reset the test got it from whichever test ran before.
+    monkeypatch.setattr(el._State, "current_patch_version", "7.41")
     html = el.ability_change(old=dict(name="X", slug="rattletrap_overclocking", desc=["Active (Aghanim's Scepter upgrade). A."]),
                              new=dict(name="X", slug="rattletrap_overclocking", desc=["B."]),
                              summary="Ability reworked.", tag="rework")
