@@ -131,6 +131,7 @@ def test_nerf_formula_with_green_endpoints_shows_its_worst_level():
     assert '<span class="badge nerf5">+21%</span><span class="formula-endpoint-label">L20</span>' in badge
 
 
+@pytest.mark.slow
 def test_removed_innate_without_an_icon_gets_the_fallback_directly():
     """14 removed innates (Aggrandize, Gift Bearer, Sight Seer…) had a 404 src that onerror swapped later."""
     from patch.elements import ability_change, INNATE_ICON_URL

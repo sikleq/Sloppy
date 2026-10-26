@@ -2,6 +2,8 @@
 import ast
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -77,6 +79,7 @@ def test_renamed_item_header_shows_old_arrow_new():
             '<a class="entity-link"') in html
 
 
+@pytest.mark.slow
 def test_ability_audit_ignores_sub_ability_slugs():
     # audit-live 2026-10-22 failed: sub_ability("rattletrap_jetpack", "Jetpack") was read as ability("rattletrap_jetpack")
     import subprocess
@@ -129,6 +132,7 @@ def test_from_value_audit_catches_a_stale_value_and_reads_game_names(tmp_path, m
     assert ctx[-1][1] == ("item", "bfury")
 
 
+@pytest.mark.slow
 def test_every_from_value_matches_the_previous_patch():
     # owner 2026-10-22: Valve's "from" can be stale (7.41 Kinetic Fence quoted pre-7.38 20/18/16/14s);
     # such rows carry wrong-word + the real change in a note

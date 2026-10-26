@@ -21,6 +21,7 @@ def _store_here():
     return game_files.available() and len(game_files.versions()) > 100
 
 
+@pytest.mark.slow
 @pytest.mark.skipif(not _store_here(), reason="the game-files store (dota-patch-files) is not on this machine")
 def test_snapshots_equal_their_patch_kv():
     stale = [(v, name) for v, name, _, _ in rs.stale_snapshots(rs.load_fetch_stats())]

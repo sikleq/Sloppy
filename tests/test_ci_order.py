@@ -11,6 +11,13 @@ def _step_names():
         return re.findall(r"^\s*- name:\s*(.+?)\s*$", f.read(), re.M)
 
 
+def test_slow_tests_are_marked_and_ci_still_runs_them(pytestconfig):
+    """@pytest.mark.slow is a registered marker for the quick local loop; CI never deselects it (audit 2026-10-26)."""
+    assert any(m.startswith("slow:") for m in pytestconfig.getini("markers"))
+    with open(os.path.join(ROOT, ".github", "workflows", "build.yml"), encoding="utf-8") as f:
+        assert "not slow" not in f.read()
+
+
 def test_unit_tests_run_after_the_build():
     names = _step_names()
     assert names.index("Run unit tests") > names.index("Build site")

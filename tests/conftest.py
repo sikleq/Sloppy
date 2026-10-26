@@ -1,6 +1,14 @@
-"""Shared pytest fixtures for the Sloppy patch-builder test suite."""
+"""Shared pytest fixtures for the Sloppy patch-builder test suite.
+
+Five tests take ~2 of the suite's 3 minutes (they read every patch); they carry @pytest.mark.slow. CI and the check
+before a commit run everything; a quick loop while editing:  python -m pytest -q -m "not slow"
+"""
 import os
 import pytest
+
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "slow: reads every patch (~10-50 s); skipped by -m \"not slow\"")
 
 
 @pytest.fixture(autouse=True, scope="session")

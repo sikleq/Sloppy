@@ -3,6 +3,8 @@ import json
 import os
 import sys
 
+import pytest
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
@@ -30,6 +32,7 @@ def _innates_at(rows, v):
     return cur
 
 
+@pytest.mark.slow
 def test_the_history_file_is_fresh():
     assert bih.main(["--check"]) == 0, "python tools/build_innate_history.py"
 
