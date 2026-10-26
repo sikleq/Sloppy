@@ -78,7 +78,8 @@ dist/                       ← build output, served by GitHub Pages (not commit
 ## Quick start
 
 Requires **Python 3.10+**. The build has **no third-party dependencies**; the test suite needs `pytest`, `rcssmin`,
-`rjsmin`.
+`rjsmin`. The maintenance scripts (fetching icons and game files, map tools) need more — not for the build:
+`pip install -r requirements-tools.txt`.
 
 ```powershell
 git clone https://github.com/sikleq/Sloppy.git

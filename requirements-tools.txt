@@ -1,0 +1,18 @@
+# Пакеты скриптов-инструментов (scripts/, tools/). Сборке сайта и тестам они НЕ нужны — там requirements-dev.txt.
+# Установка: py -m pip install -r requirements-tools.txt
+# Карта: тест tests/test_requirements_tools.py сверяет этот список с импортами в репозитории.
+# Скачивание: scripts/fetch/fetch_icons.py, fetch_creep_icons.py, extract_patchnotes.py, tools/fetch_stats.py
+requests>=2.32
+# Картинки: иконки из VPK (extract_vpk_icons.py), миниатюры (tools/make_thumbs.py), генераторы scripts/gen/*
+Pillow>=12.0
+numpy>=2.0
+# Карта и Terrain: scripts/gen/build_terrain_diff.py, mend_map.py, stitch_sfm.py, terrain_audit.py; tools/fit_*.py
+scipy>=1.13
+contourpy>=1.3
+# Чтение pak01_dir.vpk клиента: scripts/fetch/extract_patchnotes.py, extract_shops.py
+vpk>=1.4
+# Замер прокрутки в браузере: tools/perf_probe.py (после установки: python -m playwright install chromium)
+playwright>=1.50
+# Подписи из Telegram-канала: scripts/fetch/fetch_signatures.py (api_id/api_hash из env)
+telethon>=1.40
+# Не из pip: bpy / mathutils (scripts/gen/render_map_blender.py) — запускается внутри Blender.
