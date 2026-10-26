@@ -18,6 +18,7 @@ Pages are built in dependency order:
   echg    -- Hero / Item Changes pages
 """
 
+import os
 import shutil
 import subprocess
 import sys
@@ -112,6 +113,21 @@ def _build_dependents() -> dict[str, list[str]]:
 
 DEPENDENTS = _build_dependents()
 
+STEP_TIMEOUT = 300                  # seconds; the full build takes ~2 min
+
+
+def _run_step(cmd) -> bool:
+    """Run one builder; True when it succeeded. Its output is UTF-8 even when redirected to a file on Windows (audit
+    2026-10-26: 18 builders print without a UTF-8 wrapper, `> build.log` risked UnicodeEncodeError), and a step that
+    runs past STEP_TIMEOUT is a FAIL line, not a traceback."""
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+    try:
+        return subprocess.run(cmd, cwd=Path(__file__).parent, timeout=STEP_TIMEOUT, env=env).returncode == 0
+    except subprocess.TimeoutExpired:
+        print(f"  step ran past {STEP_TIMEOUT}s and was stopped", file=sys.stderr)
+        return False
+
+
 SEP  = "-" * 60
 SEP2 = "=" * 60
 
@@ -159,11 +175,10 @@ def main() -> int:
         cmd = [sys.executable, *script.split()]
         if latest and key == "patch":
             cmd.append("--latest")
-        result = subprocess.run(cmd, cwd=Path(__file__).parent, timeout=300)
+        ok = _run_step(cmd)
         elapsed = time.monotonic() - t
-        status = "OK" if result.returncode == 0 else "FAIL"
-        print(f"  [{status}] {elapsed:.1f}s")
-        if result.returncode != 0:
+        print(f"  [{'OK' if ok else 'FAIL'}] {elapsed:.1f}s")
+        if not ok:
             failed.append(desc)
 
     # Copy static assets into dist/ so local `python -m http.server --directory dist` works.

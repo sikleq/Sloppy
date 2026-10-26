@@ -35,7 +35,7 @@ Header sub-tabs (under the logo) switch between Neutral Stats / Unit Abilities /
 ## Build order (IMPORTANT)
 
 ```bash
-# On Windows always:  PYTHONIOENCODING=utf-8
+# On Windows, running a builder by hand:  PYTHONIOENCODING=utf-8  (build_site.py sets it for its steps itself)
 python builders/build_patches.py       # 1. writes data/site_meta.json (asset version, patch list)
 python builders/creeps.py      # 2. -> neutral_stats.html + neutral_abilities.html (+ neutral_creeps/creeps/materials/unit_abilities redirects)
 python builders/mana_items.py  # 3. -> mana_items.html  (run AFTER builders/build_patches.py)
