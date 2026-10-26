@@ -170,6 +170,9 @@ The owner (2026-10-06): "все слои" — everything the map file holds besi
 - **The icons** of the four layers (`gen_terrain_layer_icons.py` `*_GLYPH`) were redrawn the same day ("ВСе новые
   иконки улучши"): the minimap's three lanes with the two bases, a wave ending in an arrowhead, a coin pouch with a
   round coin, a waving banner on a stone base — one light from the top left like the rest of the set.
+  2026-10-26 the owner swapped lanes and currents for ready 48-px pictures: `icons/ref/lanes_icon.png` /
+  `currents_icon.png` (local only, like all of `icons/ref/`), copied as they are by `READY_ICONS`
+  (test `tests/test_lanes_currents_icons.py`).
 - **The map store** (owner 2026-10-06: keep the map files): every map file of 7.08–7.41f in `~/Oldgrowth/store/maps/<sha1>.vpk`
   (1.67 GB, filled by `scripts/gen/map_history.py download`; moved from `D:\DotaMaps` 2026-10-20, gitignored there —
   Valve's files are never pushed), `~/Oldgrowth/store/patch_maps.json`, and every entity of every map (vision

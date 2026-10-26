@@ -355,46 +355,8 @@ def heights_icon():
 
 # Layers of 2026-10-06 (owner: "все слои"): 16-px glyphs, dark outline, hard-edged 3x like tc_heights; redrawn
 # the same day ("ВСе новые иконки улучши"): one light from the top left, a lit edge and a shadow edge on each.
-# Lane creep paths: the minimap's three lanes in the gold ramp, the Radiant base (green) and the Dire one (red)
-LANES_GLYPH = [
-    "................",
-    "..#++++++++RRrr.",
-    ".++########Rrrr.",
-    ".+#........rrre.",
-    ".+#........rree.",
-    ".+#.......+#.+#.",
-    ".+#......+#..+#.",
-    ".+#.....+#...+#.",
-    ".+#....+#....+#.",
-    ".+#...+#.....+#.",
-    ".+#..+#......+#.",
-    ".GGgg#.......+#.",
-    ".Gggg........+#.",
-    ".gggd++++++++##.",
-    ".ggdd########+..",
-    "................",
-]
-LANES_PAL = {"+": GOLD[5], "#": GOLD[3], "G": (168, 232, 120), "g": (110, 196, 86), "d": (60, 128, 56), "R": (255, 150, 120), "r": (226, 92, 70), "e": (150, 48, 40)}
-# River currents: a wave of water that ends in an arrowhead — the current's way downstream
-CURRENTS_GLYPH = [
-    "................",
-    "................",
-    "................",
-    "................",
-    ".........L......",
-    ".........wL.....",
-    "...LL....wwL....",
-    "..LwwL...wwwL...",
-    ".LwwwwL..wwwwL..",
-    ".wwbbwwLLwwwwwL.",
-    ".wb..bwwwwwwwb..",
-    ".b....bwwwwwb...",
-    ".......bbwwb....",
-    ".........wb.....",
-    ".........b......",
-    "................",
-]
-CURRENTS_PAL = {"L": (186, 230, 255), "w": (84, 170, 236), "b": (44, 110, 184)}
+# Lane creep paths + river currents (the owner 2026-10-26): ready 48-px pictures in icons/ref/, copied as they are
+READY_ICONS = {"tc_lanes": "lanes_icon.png", "tc_currents": "currents_icon.png"}
 # Shops: a leather coin pouch tied with a gold cord, a gold coin in front
 SHOPS_GLYPH = [
     "................",
@@ -435,8 +397,11 @@ SPAWNS_GLYPH = [
     "................",
 ]
 SPAWNS_PAL = {"o": GOLD[5], "P": GOLD[4], "p": GOLD[2], "F": (214, 70, 84), "f": (250, 150, 158), "k": (140, 36, 52), "s": (110, 106, 100), "S": (160, 156, 148)}
-NEW_LAYER_GLYPHS = {"tc_lanes": (LANES_GLYPH, LANES_PAL), "tc_currents": (CURRENTS_GLYPH, CURRENTS_PAL),
-                    "tc_shops": (SHOPS_GLYPH, SHOPS_PAL), "tc_spawns": (SPAWNS_GLYPH, SPAWNS_PAL)}
+NEW_LAYER_GLYPHS = {"tc_shops": (SHOPS_GLYPH, SHOPS_PAL), "tc_spawns": (SPAWNS_GLYPH, SPAWNS_PAL)}
+
+
+def ready_icon(name):
+    return Image.open(os.path.join(_REF, READY_ICONS[name])).convert("RGBA")
 
 
 def glyph_icon(name):
@@ -492,9 +457,9 @@ def main(only=()):
             im.save(os.path.join(_OUT, f"{name}.png"))
             cells.append((name, im))
             print("wrote", name)
-    for name in NEW_LAYER_GLYPHS:                  # 2026-10-06 layers: lanes, currents, shops, spawns
+    for name in (*READY_ICONS, *NEW_LAYER_GLYPHS):  # 2026-10-06 layers: lanes, currents, shops, spawns
         if want(name):
-            im = glyph_icon(name)
+            im = ready_icon(name) if name in READY_ICONS else glyph_icon(name)
             im.save(os.path.join(_OUT, f"{name}.png"))
             cells.append((name, im))
             print("wrote", name)
