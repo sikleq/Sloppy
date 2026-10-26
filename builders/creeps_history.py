@@ -398,18 +398,6 @@ def _slash(s):
     return '/'.join(fmt_num(t) for t in str(s).split())
 
 
-def _abilities_at(hist, abil_slim, version, npc_key):
-    """Filtered ability dnames for a neutral at a patch (same filter as
-    _row_data: skip hidden markers). Mirrors the displayed slot order."""
-    out = []
-    for i in range(1, 6):
-        slug = raw_at(hist, f'Ability{i}', version, npc_key)
-        if not slug or slug in ABILITY_SKIP:
-            continue
-        out.append(ability_dname(slug, abil_slim))
-    return out
-
-
 def _ability_slugs_at(hist, version, npc_key):
     """Filtered ability SLUGS for a neutral at a patch (slot order)."""
     out = []

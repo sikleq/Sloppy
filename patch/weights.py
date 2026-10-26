@@ -931,8 +931,3 @@ def _sole_new_del(text, tags, ctx, w, cm):
         return round(sign * v, 3), round(v, 3)
     v = w * DELNEW_HERO_W * (NICHE_W if _NICHE_TARGET_RE.search(t) else 1.0)
     return round(sign * v, 3), round(v, 3)
-
-
-def row_score(text, tags, badge_html=""):
-    """Back-compat: the net scale only."""
-    return row_scores(text, tags, badge_html)[0]

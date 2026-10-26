@@ -139,9 +139,9 @@ evasion 0.70, mechanic_flag 0.27, spell_amp 0.10.
 * `data/rules/valve_weights.json` — таблица весов. Это **дословная копия** consensus, включая все восемь
   «ненадёжных» значений, **плюс три ручные добавки** без единого сигнала: `cost 0.45`, `turn_rate 0.2`, `other 0.4`.
 * `patch/weights.py` — своя копия таблицы `CAT` (отличается от модельной только KV-шными вариантами написания,
-  на прозе результат тот же), функция `classify()` и `row_score(text, tags, badge_html)`.
+  на прозе результат тот же), функция `classify()` и `row_scores(text, tags, badge_html)` (пара «со знаком / без знака»).
   Проценты вытаскиваются регуляркой `class="badge (buff|nerf)\d+">…%<`.
-* `patch/elements.py`: `li()` вызывает `row_score` и передаёт в `_dyn_record_li()`, который копит сумму
+* `patch/elements.py`: `li()` вызывает `row_scores` и передаёт в `_dyn_record_li()`, который копит сумму
   в `patches[версия]["w"]` (округление до 2 знаков на каждом шаге).
 * `docs/data-format.md` — раздел «Dynamics "Weights" mode».
 * `src/scripts.js`: `dynFmtW` (формат числа), `dynWeightTint` (заливка клетки, |w| каппится на 4),
@@ -506,7 +506,7 @@ w_final = w_other + (w_consensus − w_other) × k,   k = min(1, n_signals / 3)
 
 Данные для контекста на сайте **уже есть**: `elements.py` знает, в каком блоке строка
 (`ability_block`, `talents-block`, `facet-block`, `is-innate`), а префикс «Level N Talent:» разбирается
-регуляркой `_TALENT_PREFIX_RE`. Нужно только протащить контекст в `row_score()`.
+регуляркой `_TALENT_PREFIX_RE`. Нужно только протащить контекст в `row_scores()`.
 
 ### E.5 Дать реворкам ненулевую величину (приоритет 2, трудоёмкость низкая)
 

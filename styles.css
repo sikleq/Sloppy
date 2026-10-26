@@ -1422,13 +1422,6 @@ html.cb-mode button.cb-toggle::after {
    so the version-static box sits at the same vertical centre as .nav-tab. */
 .nav-context.nav-context-materials { }
 
-.nav-right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  min-width: 0;
-}
 .nav-context .version-chev {
   font-size: 14px;
   color: var(--text-muted-blue-2);
@@ -6029,15 +6022,6 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 .unit-abilities-table .ua-flag.ua-yes  { color: #56d364; }            /* green check */
 .unit-abilities-table .ua-flag.ua-no   { color: #f85149; }            /* red x */
 .unit-abilities-table .ua-flag.ua-dispel        { color: #e3c14a; text-shadow: 0 0 4px rgba(227,193,74,0.6); }  /* yellow star */
-.unit-abilities-table .ua-flag.ua-dispel-strong { color: #f85149; text-shadow: 0 0 4px rgba(248,81,73,0.55); } /* red star */
-/* Not-dispellable — hollow (outline) star, same shape/size as the others. */
-.unit-abilities-table .ua-flag.ua-dispel-no {
-  color: transparent;
-  -webkit-text-stroke: 1.1px #85827a;
-  text-stroke: 1.1px #85827a;
-}
-/* Aura Stack red-x glyph — small. */
-.unit-abilities-table .ua-stack-glyph { font-size: 8px; }
 /* Cell dashes — half size. */
 .unit-abilities-table .ua-dash,
 .creeps-table .ua-dash,
@@ -6176,47 +6160,6 @@ nav.top-nav::after { background: rgba(227, 196, 106, 0.42); opacity: 1; }
 .qhint-tip .hint-aura { color: #f4e3b3; font-weight: 600; }
 /* (Legacy `.show-upgrades` rule lived here — replaced by the segmented
     tier control + table[data-tier="all"] selector further below.) */
-/* Aura Stack "yes" — green rounded diamond made of stacked tiles. The wrapper
-   is NOT rotated and carries a screen-space top-fade mask, so the upper part
-   of the icon fades out (weaker colour). ::after = front tile, ::before =
-   tile behind/above (the "multiple levels" look). */
-.unit-abilities-table .ua-stack-yes {
-  position: relative;
-  display: inline-block;
-  width: 16px;
-  height: 18px;
-  vertical-align: middle;
-  -webkit-mask: linear-gradient(to top, #000 70%, var(--shadow-55) 100%);
-          mask: linear-gradient(to top, #000 70%, var(--shadow-55) 100%);
-}
-.unit-abilities-table .ua-stack-yes::before,
-.unit-abilities-table .ua-stack-yes::after,
-.unit-abilities-table .ua-stack-yes > i {
-  content: "";
-  position: absolute;
-  width: 9px;
-  height: 9px;
-  left: 3px;
-  border-radius: 3px;
-  transform: rotate(45deg);
-  /* dark outer outline separates the overlapping tiles clearly */
-  box-shadow: 0 0 0 1px rgba(8, 14, 10, 0.9);
-}
-/* Painting order: ::before (bottom) → <i> → ::after (top). So ::after is the
-   FRONT tile (lowest, brightest), <i> the middle, ::before the back (highest,
-   dimmest) — each tile sits behind and a little above the one in front. */
-.unit-abilities-table .ua-stack-yes::after {  /* front tile */
-  top: 6px;
-  background: #5fe06d;
-}
-.unit-abilities-table .ua-stack-yes > i {     /* middle tile */
-  top: 3px;
-  background: #45a851;
-}
-.unit-abilities-table .ua-stack-yes::before { /* back tile (dimmest) */
-  top: 0;
-  background: #2c6f3a;
-}
 /* Unit Abilities: duplicate (same-unit continuation) rows hide the repeated
    icon and drop the top border so the unit's rows read as one block. */
 .unit-abilities-table tr.ua-dup .ua-unit img { visibility: hidden; }
@@ -6896,30 +6839,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 }
 /* No connector pseudo-element */
 .hl-neutral-stack::after { content: none; }
-/* Neutral slot — 56×56 circle with Valve bg_neutral_slot_png.png texture */
-.hl-neutral-slot {
-  position: relative;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 1px solid #5b5853;
-  background-image: url('icons/inventory/bg_neutral_slot_png.png');
-  background-size: 100%;
-  background-color: #0c0e10;
-  box-shadow: inset 0 2px 14px -2px #000000f0;
-  padding: 0;
-  overflow: visible;
-  transition: filter 0.12s ease;
-  flex-shrink: 0;
-}
-.hl-neutral-slot img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-.hl-neutral-slot:hover { filter: brightness(1.5); z-index: 2; }
 /* Enchant slot — 34×34 circle, metallic, no bg_neutral texture */
 .hl-enchant-slot {
   position: relative;
@@ -7018,7 +6937,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .hl-bauble-level::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .hl-bauble-level:focus { outline: none; border-color: rgba(255,200,80,0.5); color: #e3c46a; }
 /* Hide N/E labels — no text markers */
-.hl-neutral-mark,
 .hl-enchant-mark {
   display: none;
 }
@@ -7038,7 +6956,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   opacity: 0; transition: opacity .15s;
 }
 .hl-inv-slot:hover .hl-slot-clear,
-.hl-neutral-slot:hover .hl-slot-clear,
 .hl-enchant-slot:hover .hl-slot-clear { opacity: 1; }
 .hl-slot-clear:hover { background: rgba(180,40,40,0.88); color: #fff; }
 .hl-cost-badge {
@@ -7284,20 +7201,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   letter-spacing: 0.08em;
   font-size: 11px;
 }
-.hl-custom-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  padding-top: 10px;
-}
-.hl-custom-grid label {
-  display: grid;
-  gap: 4px;
-  color: #cac4b8;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
 .hl-diff-list {
   display: grid;
   gap: 1px;
@@ -7307,25 +7210,15 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   margin-right: -8px;
   margin-bottom: -8px;
 }
-.hl-stat-row,
 .hl-diff-row {
   min-height: 22px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   color: #e2dcce;
 }
-.hl-stat-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-  padding: 4px 0;
-}
-.hl-stat-row span,
 .hl-diff-row span {
   color: #a9a49a;
   font-size: 12px;
 }
-.hl-stat-row strong,
 .hl-diff-row strong {
   color: #fbf4e5;
   font-variant-numeric: tabular-nums;
@@ -7562,25 +7455,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   margin-top: 1px;
   word-break: break-word;
 }
-/* Items cost row */
-.hl-dota-cost {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-  padding: 5px 8px;
-  background: #000;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-.hl-ds-cost-label {
-  font-size: 12px;
-  color: #a9a49a;
-}
-.hl-ds-cost-val {
-  font-size: 13px;
-  color: #fbf4e5;
-  font-variant-numeric: tabular-nums;
-}
 @media (max-width: 420px) {
   .hl-dota-combat {
     flex-direction: column;
@@ -7730,11 +7604,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   height: 16px;
   display: block;
 }
-.hl-item-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(58px, 58px));
-  gap: 6px;
-}
 /* Hero picker columns mirror hero_changes: fixed count per attribute column, icons fill the cell */
 .hl-hero-grid {
   display: grid;
@@ -7804,41 +7673,11 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
     0 0 0 2px #f1d27b,
     0 0 10px 2px rgba(241, 210, 123, 0.55);
 }
-.hl-shop-4col {
-  display: grid;
-  grid-template-columns: auto auto auto auto;
-  gap: 0 16px;
-}
-.hl-shop-col {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.hl-item-grid {
-  grid-template-columns: repeat(4, 56px);
-  gap: 4px;
-}
 .hl-item-tile {
   width: 56px;
   height: 42px;
 }
-.hl-shop-single {
-  padding: 14px 16px 16px;
-  display: grid;
-  gap: 14px;
-}
-.hl-neutral-cols {
-  display: grid;
-  grid-template-columns: repeat(5, auto);
-  gap: 0 12px;
-}
-.hl-neutral-cols .hl-item-grid {
-  grid-template-columns: repeat(2, 48px);
-}
 .hl-enchant-picker { width: auto; min-width: 380px; }
-.hl-enchant-body .hl-item-grid {
-  grid-template-columns: repeat(5, 56px);
-}
 .hl-tier-picker {
   width: auto;
   min-width: 280px;
@@ -7880,11 +7719,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
 .hl-tier-stats {
   font-size: 11px;
   color: rgba(255,255,255,0.55);
-}
-.hl-tier-time {
-  font-weight: 400;
-  color: rgba(255,255,255,0.4);
-  margin-left: 4px;
 }
 /* ---- Item tooltip — 1:1 port of the in-game Dota 2 Panorama tooltip ----
    Values lifted from the decompiled game CSS (tooltip_ability.css +
@@ -8073,13 +7907,9 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   .hl-diff-panel {
     order: 3;
   }
-  .hl-shop-4col {
-    grid-template-columns: auto auto;
-  }
 }
 @media (max-width: 820px) {
-  .hl-hud,
-  .hl-level-row {
+  .hl-hud {
     grid-template-columns: 1fr;
   }
   .hl-inventory {
@@ -8095,8 +7925,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
     padding-left: 10px;
     padding-right: 10px;
   }
-  .hl-identity,
-  .hl-custom-grid {
+  .hl-identity {
     grid-template-columns: 1fr;
   }
   .hl-identity {
@@ -8109,11 +7938,6 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   .hl-inv-grid {
     grid-template-columns: repeat(3, minmax(0, 60px));
   }
-  /* Neutral slot stays circular on mobile. */
-  .hl-neutral-slot {
-    width: 52px;
-    height: 52px;
-  }
   .hl-enchant-slot {
     width: 30px;
     height: 30px;
@@ -8121,8 +7945,7 @@ a.ec-name-link:hover { color: #f0dfa6; text-decoration: underline; text-underlin
   .hl-inv-slot {
     width: 100%;
   }
-  .hl-hero-grid,
-  .hl-item-grid {
+  .hl-hero-grid {
     grid-template-columns: repeat(auto-fill, minmax(48px, 48px));
   }
   .hl-hero-tile,

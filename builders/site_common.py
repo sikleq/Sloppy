@@ -67,18 +67,6 @@ def compute_asset_version():
     return _hashlib.sha1((css + js).encode("utf-8")).hexdigest()[:10]
 
 
-def get_latest_version():
-    """Return the latest patch version string (e.g. '7.41c') from site_meta.json,
-    written by builders/build_patches.py. Empty string if the meta hasn't been written yet."""
-    import json as _json
-    meta_path = _os.path.join(_HERE, "data", "site_meta.json")
-    try:
-        with open(meta_path, encoding="utf-8") as _f:
-            return _json.loads(_f.read()).get("latest_patch_version", "")
-    except Exception:
-        return ""
-
-
 # Header tabs in the centre of the site nav. Tuple: (key, label, root_href).
 # `changelogs` (label: Patch Reader) is special — its href is the latest patch
 # page, passed in per-call (it isn't a fixed root file). "Main" lives in the

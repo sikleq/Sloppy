@@ -1295,14 +1295,6 @@ def _aghs_values_html(old, new):
     return side(o, n, "del"), side(n, o, "new")
 
 
-def _aghs_diff_html(old, new):
-    """(old html, new html): the descriptions with the differing word runs highlighted, then the numbers line."""
-    (old, _, ov), (new, _, nv) = old.partition("\n"), new.partition("\n")
-    vo, vn = _aghs_values_html(ov, nv)
-    do, dn = _aghs_words_html(old, new)
-    return do + (f"<br>{vo}" if vo else ""), dn + (f"<br>{vn}" if vn else "")
-
-
 _AGHS_LABEL_SKIP = {"bonus", "max", "the", "of", "per", "a"}
 # "Label: value." sentences of a numbers line; a value may hold several decimals ("12.5/15/17.5/20",
 # "1.35 + 0.15 per level"): it ends at a full stop before the next capital or the end
@@ -1394,32 +1386,6 @@ def _rework_diff_html(old, new):
             out += esc(text[pos:s]) + hl(esc(text[s:e]), mark)
             pos = e
         return out + esc(text[pos:])
-    return paint(old, marks["old"]), paint(new, marks["new"])
-
-
-def _aghs_words_html(old, new):
-    a, b_ = [m for m in _AGHS_WORD_RE.finditer(old)], [m for m in _AGHS_WORD_RE.finditer(new)]
-    key = lambda m: m.group(0).lower().strip(".,;:()")
-    sm = difflib.SequenceMatcher(a=[key(m) for m in a], b=[key(m) for m in b_], autojunk=False)
-    marks = {"old": [], "new": []}
-    for op, i1, i2, j1, j2 in sm.get_opcodes():
-        if op == "equal":
-            continue
-        if i2 > i1:
-            marks["old"].append((a[i1].start(), a[i2 - 1].end(), "del" if op == "delete" else "rework"))
-        if j2 > j1:
-            marks["new"].append((b_[j1].start(), b_[j2 - 1].end(), "new" if op == "insert" else "rework"))
-
-    def paint(text, spans):
-        out, pos = "", 0
-        for s, e, mark in spans:
-            while e > s and text[e - 1] in ".,;:)":         # the sentence's own stop and an inline "(+150)" stay outside
-                e -= 1
-            while s < e and text[s] == "(":
-                s += 1
-            out += _html.escape(text[pos:s], quote=False) + hl(_html.escape(text[s:e], quote=False), mark)
-            pos = e
-        return out + _html.escape(text[pos:], quote=False)
     return paint(old, marks["old"]), paint(new, marks["new"])
 
 
@@ -4777,19 +4743,7 @@ def li_formula(prefix, old_formula, new_formula, old_fn, new_fn, l=False,
 
 def auto_components_change(item_display, this_version):
     from .stats import _STATS_I
-    from .meta import RELEASE_HISTORY
-
-    def _patch_index(version):
-        for i, p in enumerate(RELEASE_HISTORY):
-            if p['version'] == version:
-                return i
-        return None
-
-    def _prev_patch_version(version):
-        idx = _patch_index(version)
-        if idx is None or idx + 1 >= len(RELEASE_HISTORY):
-            return None
-        return RELEASE_HISTORY[idx + 1]['version']
+    from .meta import _prev_patch_version
 
     def _get_recipe(item_display, version):
         raw_slug = ITEM_SLUG.get(item_display,

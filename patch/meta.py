@@ -391,9 +391,3 @@ def _prev_patch_version(version):
     return None
 
 
-def _patch_index(version):
-    """Return 0-based index of `version` in PATCHES (newest-first), or None."""
-    for i, p in enumerate(PATCHES):
-        if p["version"] == version:
-            return i
-    return None
