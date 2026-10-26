@@ -129,12 +129,19 @@ def _site_versions():
     return out
 
 
+NO_STORE = """Aghanim's texts audit: no patch to check — the game-files store has none of them (store: {store}).
+The audit reads the store itself, not data/stats/: clone dota-patch-files and point DOTA_FILES_DIR at it."""
+
+
 def main(argv):
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
     site = "--site" in argv
     wanted = _site_versions() if site else None
     versions = [p["version"] for p in RELEASE_HISTORY if p["version"] in game_files.versions()
                 and (wanted is None or p["version"] in wanted)]
+    if not versions:                     # audit 2026-10-26: no store printed "0 patches, 0 problem(s)" and passed
+        print(NO_STORE.format(store=game_files.STORE), file=sys.stderr)
+        return 2
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
     bad = broke = 0
     for v in versions:
         problems, gaps = audit(v)
