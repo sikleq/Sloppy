@@ -139,11 +139,20 @@ def test_part_gone_and_the_rest_changed_is_one_reworked_card(monkeypatch):
     assert "Aghanim's Scepter reworked." in out and "Increases radius." in old_side and "iab-hl" in out
 
 
-def test_part_gone_and_the_rest_the_same_is_only_the_row(monkeypatch):
-    # group C: 7.39 Glaives of Wisdom's part gone, Brain Drain's the same — the "Removed" row says it
+def test_part_gone_and_the_rest_the_same_is_a_card_under_the_ability_that_lost_it(monkeypatch):
+    # group C: 7.39 Glaives of Wisdom's part gone, Brain Drain's the same. Till 2026-10-26 only the "Removed" row,
+    # which read as the hero having no Shard left (owner, 7.40b Necromastery): now the whole old -> what is left
     _parts(monkeypatch, {"drain": "Steals more.", "glaives": "Steal duration."}, {"drain": "Steals more."}, "drain",
            hero="silencer")
-    assert el._aghs_parts_cards() == ""
+    assert el._aghs_parts_cards() == ""                 # not under the ability that kept its part
+    monkeypatch.setattr(_State, "aghs_part_slug", ("glaives", "silencer"))
+    out = el._aghs_parts_cards()
+    old_side = out[out.index("ability-change-old"):out.index("ability-change-arrow")]
+    new_side = out[out.index("ability-change-new"):]
+    assert "Aghanim's Scepter reworked." in out
+    assert "Steals more." in old_side and "Steal duration." in old_side
+    assert "Steals more." in new_side and "Steal duration." not in new_side
+    assert "iab-hl" not in out                          # the kept part is the same: nothing coloured
 
 
 def test_named_ability_icon_is_downloaded_and_has_a_fallback(monkeypatch):

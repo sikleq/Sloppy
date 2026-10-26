@@ -1586,8 +1586,9 @@ _AGHS_SHOWN: set = set()               # (version, hero, kind) whose old upgrade
 def _aghs_parts_cards() -> str:
     """The whole old upgrade -> the new one, under the ability that holds it now, when a part of it on another ability
     is gone and no card shows that part yet (owner 2026-10-25): A — the upgrade moved to an ability that had none (7.41
-    Windrun -> Tailwind), B — a part is gone and the part that stayed changed (7.41f Pit of Malice + Fiend's Gate). A
-    part gone while the rest stayed the same (7.39 Glaives of Wisdom + Brain Drain) is only its row "Removed …".
+    Windrun -> Tailwind), B — a part is gone and the part that stayed changed (7.41f Pit of Malice + Fiend's Gate), C —
+    a part gone while the rest stayed the same (7.39 Glaives of Wisdom + Brain Drain): "Aghanim's X reworked." under
+    the ability that lost it, all old parts -> the ones left (owner 2026-10-26; till then only the row "Removed …").
     Each part with its ability's icon + name; drawn once per hero and upgrade, where the open ability block ends."""
     pending, _State.aghs_part_slug = _State.aghs_part_slug, None
     slug, hero = pending if pending else (None, None)
@@ -1610,10 +1611,13 @@ def _aghs_parts_cards() -> str:
         lost = [s for s in old_t if s not in new_t]
         # this and the other abilities that hold it now and are new to it or changed it: the new side
         moved = [s for s in new_t if old_t.get(s) != new_t[s]]
-        if not lost or slug not in moved:
-            continue                            # C: the part that stayed is the same — the row says it
-        olds = [(s, t) for s, t in old_t.items() if s in lost or s in moved]
-        news = [(s, new_t[s]) for s in moved]
+        # C: the part that stayed is the same — the card under the ability that lost its part, so "Removed …" doesn't
+        # read as the hero having no upgrade left (owner 2026-10-26, 7.40b Necromastery: Requiem of Souls keeps it)
+        same = not moved and bool(new_t)
+        if not lost or (slug not in lost if same else slug not in moved):
+            continue
+        olds = [(s, t) for s, t in old_t.items() if s in lost or s in moved or same]
+        news = [(s, new_t[s]) for s in (new_t if same else moved)]
         esc = lambda s: _html.escape(_aghs_inline(s), quote=False)
         name = lambda s, v: sub_ability(s, ability_name(s, v) or s) + " "
         old_text = dict(olds)
@@ -1634,7 +1638,7 @@ def _aghs_parts_cards() -> str:
         old_pane = pane("old", prev)
         new_pane = _pair_number_tips(old_pane, pane("new", version))
         up = f"Aghanim's {kind.title()}"
-        b_case = any(s in old_t for s in moved)
+        b_case = same or any(s in old_t for s in moved)
         caption, tag = (f"{up} reworked.", "rework") if b_case else (f"Added {up}.", "new")
         out.append(_under_rows_card(caption, tag, "", "aghs-change", old_pane, new_pane))
         _AGHS_SHOWN.add((version, hero, kind))

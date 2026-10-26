@@ -93,7 +93,8 @@ def build():
     W(ul_open())
     W(li("Skeleton Building Damage penalty increased from 25% to 75%", b(25, 75, l=True),
          extra=inline_note("Also applies to Burning Army skeletons.")))
-    W(li("No longer upgraded with Aghanim's Scepter", t("DEL"), extra=inline_note("Aghanim's Scepter now only provides Burning Army ability without increasing Skeleton Archer Hits to Kill by 1")))
+    # the card under the rows shows what the Scepter keeps (Burning Army) — the old (?) note said the same
+    W(li("No longer upgraded with Aghanim's Scepter", t("DEL")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

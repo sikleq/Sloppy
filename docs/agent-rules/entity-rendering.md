@@ -166,8 +166,10 @@ Field map: Base Armor → `ArmorPhysical`; Base Damage → `AttackDamageMin`; Mi
   Courage …) — карточка «Added Aghanim's X.» под новой способностью; **Б** — часть убрана, оставшаяся изменилась (7.41f
   Pit of Malice + Fiend's Gate, 7.39 Flaming Lasso + Sticky Napalm, 7.38 Divine Favor + Holy Persuasion) — «Aghanim's X
   reworked.» под оставшейся. Слева все старые части, справа новые, у каждой значок + имя. **В** — часть убрана,
-  остальное то же (7.39 Glaives + Brain Drain, 7.38 Demonic Cleanse, 7.40b Necromastery, 7.40c Skeleton Walk) — только
-  строка «Removed …». Части — способности с флагом игры и своим текстом (флаг без текста — тот же апгрейд, 7.38 Axe).
+  остальное то же (7.39 Glaives + Brain Drain, 7.38 Demonic Cleanse, 7.40b Necromastery, 7.40c Skeleton Walk) — тоже
+  «Aghanim's X reworked.», под способностью, которая потеряла часть: слева все старые части, справа оставшиеся, без
+  покраски (владелец 2026-10-26: одна строка «Removed …» читалась как «у героя больше нет Scepter»; до того — только
+  строка). Части — способности с флагом игры и своим текстом (флаг без текста — тот же апгрейд, 7.38 Axe).
   Группа В сверена с файлами игры 2026-10-26: Shard/Scepter у героя остаётся, меняется только набор частей (7.39
   Silencer: Brain Drain +2 к краже интеллекта остался, часть Glaives +1 / +50 с ушла).
 - Способность, которую выдаёт Aghanim (флаг игры `IsGrantedByShard/Scepter` в обоих патчах), с REWORK-строкой и
