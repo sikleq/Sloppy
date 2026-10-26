@@ -145,12 +145,15 @@ def test_facet_named_talent_row_is_a_swap():
     assert tm.SWAP_RE.match("Old Blood: Level 10 Talent +15% Bloodrage Spell Amplification replaced with +15% Amp")
 
 
-def test_aghanim_upgrade_goes_in_brackets_before_the_summary_full_stop():
+def test_aghanim_upgrade_goes_to_the_header_and_the_summary_keeps_the_stripe():
+    # 2026-10-21 the words went in brackets into the summary; 2026-10-26 the header says "granted by Aghanim's X" and
+    # the summary keeps only the stripe (owner, 7.41 Kinetic Fence)
     html = el.ability_change(old=dict(name="X", slug="rattletrap_overclocking", desc=["Active (Aghanim's Scepter upgrade). A."]),
                              new=dict(name="X", slug="rattletrap_overclocking", desc=["B."]),
                              summary="Ability reworked.", tag="rework")
-    assert "Ability reworked <span class=\"ac-aghs\">(Aghanim's Scepter upgrade)</span>." in html
-    assert "Active (Aghanim" not in html
+    assert '<span class="row-text">Ability reworked.<span class="aghanim-marker scepter"></span>' in html
+    assert "ac-aghs" not in html and "Active (Aghanim" not in html
+    assert "– granted by Aghanim's Scepter" in html
 
 
 def test_aghanim_upgrade_words_move_from_card_text_to_its_summary():

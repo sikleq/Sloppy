@@ -3778,6 +3778,14 @@ h4.subgroup .subgroup-new-type {
   padding: 0 4px;
   --pt: 0px; --px: 4px;
 }
+/* Aghanim's cards keep the even inner padding wherever they stand: inside an
+   ability_change block the rule above would leave them padded on the left only
+   (the Aghanim's row has no header strip to fill the pane). */
+.ability-change.unified-panes.aghs-change > .ability-change-pane,
+.ability-change-block .ability-change.unified-panes.aghs-change > .ability-change-pane {
+  padding: 10px 14px;
+  --pt: 10px; --px: 14px;
+}
 /* Old-icon underlay: when an ability_change unified block has a different
    icon for old vs new, both icons fully overlap inside the same 48px wrap.
    New is on top by default. Hovering the wrap shuffles them — old comes

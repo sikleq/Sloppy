@@ -168,9 +168,29 @@ Field map: Base Armor → `ArmorPhysical`; Base Damage → `AttackDamageMin`; Mi
   reworked.» под оставшейся. Слева все старые части, справа новые, у каждой значок + имя. **В** — часть убрана,
   остальное то же (7.39 Glaives + Brain Drain, 7.38 Demonic Cleanse, 7.40b Necromastery, 7.40c Skeleton Walk) — только
   строка «Removed …». Части — способности с флагом игры и своим текстом (флаг без текста — тот же апгрейд, 7.38 Axe).
+  Группа В сверена с файлами игры 2026-10-26: Shard/Scepter у героя остаётся, меняется только набор частей (7.39
+  Silencer: Brain Drain +2 к краже интеллекта остался, часть Glaives +1 / +50 с ушла).
 - Способность, которую выдаёт Aghanim (флаг игры `IsGrantedByShard/Scepter` в обоих патчах), с REWORK-строкой и
-  изменённым текстом игры → карточка «Ability reworked (Aghanim's Shard upgrade).» под строками; строка остаётся
-  (говорит больше подсказки). Один раз на способность, не под `ability_change`. 7.41 Warp Flare, 7.38 Demonic Cleanse.
+  изменённым текстом или значениями игры → карточка способности под строками (`_granted_card`): шапки
+  «Active – granted by Aghanim's Shard» со значениями игры, текст игры (`ability_text`, не строка апгрейда «Grants this
+  ability: …»), подпись «Ability reworked.» с полоской. Строка остаётся (говорит больше подсказки). Один раз на
+  способность, не под `ability_change`. 7.41 Warp Flare. Когда изменений много (7.38 Demonic Cleanse) — в content
+  `ability_change` из `game_ability_pair(slug, version)` перед строками, строки, которые карточка показывает, скрыты.
+
+**Уроки вычитки 7.41 / 7.38 (владелец 2026-10-26), тест `tests/test_card_fixes_1026.py`:**
+- «Shares level with X.» уходит в шапку, как «scales with»: «Active – shares level with Kinetic Field»
+  (`_PANE_SCALE_RE`); из файлов игры — `DependentOnAbility` у способности с несколькими уровнями (`_shares_level`,
+  7.37e Demonic Cleanse → Demonic Purge).
+- «Has only one level» в карточке не пишется (как «can't be leveled up»); шапка говорит «granted by Aghanim's Shard»:
+  у `ability_change` — сторона с «Granted by Aghanim's X.» / «(Aghanim's X upgrade)» в тексте или с флагом игры
+  `IsGrantedBy*` в своём патче. Тогда подпись — без «(Aghanim's Shard upgrade)», только полоска.
+- Текст способности (`ability_text`, kind="base") не перечисляет значения только Aghanim (`RequiresScepter` /
+  `RequiresShard`): у Demonic Cleanse 7.37e «Max charges: 2» — это Scepter.
+- Карточки Aghanim (`.aghs-change`) — ровный отступ 10px 14px и внутри блока `ability_change` (там общее правило
+  давало 0 4px: отступ только слева).
+- Нет значка на CDN — искать в файлах игры: `scripts/fetch/fetch_icons.py` сам пробует KV `AbilityTextureName`
+  (7.41 Squee's Scope рисуется значком Stasis Trap) и `spellicons` в VPK клиента; в `KNOWN_INNATE_NO_CDN_ICON` — только
+  то, чего нет и там.
 - «X is now an innate ability (previously a basic ability)» под карточкой, где X уже врождённая — скрыта
   (`_State.card_innate`); «(previously granted by Aghanim's Scepter)» говорит новое и остаётся (7.41 Silent as the Grave).
 Шапка нового и старого — у краёв карточки: каждое правило с `padding` панели задаёт и `--pt` /

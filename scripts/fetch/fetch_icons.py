@@ -9,10 +9,13 @@
 автоматически попадёт в _ability_icons.txt, и следующий запуск этого
 скрипта добьёт недостающие PNG-ки.
 
-Иконки, которых нет на CDN (например innate-абилки), просто пропускаются
-с пометкой `404`. В браузере для них работает onerror-fallback на
-innate_icon.png — пользователь видит дефолтный маркер, а не сломанную
-картинку.
+Нет на CDN — ищем в файлах игры (правило владельца 2026-10-26: «если не находишь —
+ищешь в файлах игры»): сначала значок, который игра рисует для способности
+(KV `AbilityTextureName`, 7.41 Squee's Scope = techies_stasis_trap) — на CDN и в VPK,
+потом `panorama/images/spellicons/<slug>_png.vtex_c` в pak01_dir.vpk клиента.
+Только то, чего нет и там (innate без своего арта), остаётся с пометкой —
+в браузере для них onerror-fallback на innate_icon.png; такие slug'и вносить
+в patch/known_exceptions.py KNOWN_INNATE_NO_CDN_ICON с пометкой «not in the client VPK nor the CDN».
 """
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -66,19 +69,73 @@ if not missing_local:
 _PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 
 
-def fetch(slug):
-    url = f"{CDN_BASE}{slug}.png"
-    out = ICONS_DIR / f"{slug}.png"
+def _from_cdn(name, out):
+    """(status, bytes written) of the CDN's <name>.png saved as `out`."""
     try:
-        r = requests.get(url, timeout=15, allow_redirects=True)
-        if r.status_code == 200 and r.content:
-            if not r.content.startswith(_PNG_MAGIC):
-                return slug, "not-png", 0
-            out.write_bytes(r.content)
-            return slug, "OK", len(r.content)
-        return slug, str(r.status_code), 0
+        r = requests.get(f"{CDN_BASE}{name}.png", timeout=15, allow_redirects=True)
     except Exception as e:
-        return slug, str(e), 0
+        return str(e), 0
+    if r.status_code != 200 or not r.content:
+        return str(r.status_code), 0
+    if not r.content.startswith(_PNG_MAGIC):
+        return "not-png", 0
+    out.write_bytes(r.content)
+    return "OK", len(r.content)
+
+
+def texture_name(slug):
+    """The icon the game draws for the ability: KV AbilityTextureName of the newest patch that has it, or None."""
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from patch.aghs_text import _blocks
+    from patch.meta import RELEASE_HISTORY, _parse_date
+    for p in sorted(RELEASE_HISTORY, key=lambda p: _parse_date(p["date"]), reverse=True):
+        block = _blocks(p["version"]).get(slug)
+        if isinstance(block, dict):
+            return block.get("AbilityTextureName") or None
+    return None
+
+
+_VPK = {}
+
+
+def from_vpk(name, out):
+    """(status, bytes) of panorama/images/spellicons/<name>_png.vtex_c from the client's pak01_dir.vpk saved as `out`."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import extract_vpk_icons as vpk
+    if not vpk.DEFAULT_VPK.exists():
+        return "no-vpk", 0
+    if not _VPK:
+        _VPK["entries"], _VPK["base"] = vpk.read_tree(vpk.DEFAULT_VPK)
+    internal = f"panorama/images/spellicons/{name}_png.vtex_c"
+    if internal not in _VPK["entries"]:
+        return "not-in-vpk", 0
+    try:
+        vpk.decode(vpk.read_file(vpk.DEFAULT_VPK, internal, _VPK["entries"], _VPK["base"])).save(out)
+    except ValueError as e:                 # a texture format the decoder doesn't know yet: say so, don't stop
+        return f"vpk-decode: {e}", 0
+    return "OK", out.stat().st_size
+
+
+def fetch(slug):
+    out = ICONS_DIR / f"{slug}.png"
+    status, size = _from_cdn(slug, out)
+    if status == "OK":
+        return slug, status, size
+    return slug, f"{status} (CDN)", 0
+
+
+def from_game_files(slug):
+    """CDN 404 -> the game's own icon for it: its AbilityTextureName (CDN, then VPK), then its own name in the VPK."""
+    out = ICONS_DIR / f"{slug}.png"
+    tex = texture_name(slug)
+    tried = []
+    for name, src in ([(tex, "cdn"), (tex, "vpk")] if tex and tex != slug else []) + [(slug, "vpk")]:
+        status, size = (_from_cdn if src == "cdn" else from_vpk)(name, out)
+        tried.append(f"{src}:{name}={status}")
+        if status == "OK":
+            return slug, f"OK via {src}:{name}", size
+    return slug, "; ".join(tried), 0
 
 
 print(f"\nFetching {len(missing_local)} icons from Valve CDN...")
@@ -93,9 +150,22 @@ with ThreadPoolExecutor(max_workers=8) as ex:
         else:
             fail.append((slug, status))
 
+if fail:
+    print(f"\nNot on CDN: {len(fail)} — looking in the game files (AbilityTextureName, client VPK)...")
+    still = []
+    for slug, _ in sorted(fail):
+        slug, status, size = from_game_files(slug)
+        if status.startswith("OK"):
+            ok += 1
+            print(f"  + {slug}  ({size:,} bytes, {status[3:]})")
+        else:
+            still.append((slug, status))
+    fail = still
+
 print(f"\nDownloaded: {ok}")
 print(f"Skipped:    {len(fail)}")
 if fail:
-    print("\nNot on CDN (browser uses onerror fallback to innate_icon.png):")
+    print("\nNot on the CDN nor in the game files (browser uses onerror fallback to innate_icon.png;")
+    print("add them to patch/known_exceptions.py KNOWN_INNATE_NO_CDN_ICON):")
     for slug, status in sorted(fail):
-        print(f"  {status:>3}  {slug}")
+        print(f"  {slug}: {status}")

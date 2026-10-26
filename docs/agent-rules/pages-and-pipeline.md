@@ -111,7 +111,11 @@ git commit -m "feat: add 7.42 patch page"
 
 ### Иконки способностей не скачиваются автоматически
 `fetch_icons.py` нужно запускать вручную после каждой новой сборки патча.
-Иконки innate/facet (404 на CDN) — нормально: `ability()` отдаёт `innate_icon.png` сразу в `src`, без 404+onerror.
+**Нет на CDN — ищем в файлах игры** (владелец 2026-10-26): `fetch_icons.py` сам пробует KV `AbilityTextureName`
+(значок, который рисует игра: 7.41 Squee's Scope = Stasis Trap) на CDN и в VPK, затем
+`panorama/images/spellicons/<slug>_png.vtex_c` в `pak01_dir.vpk`. В `KNOWN_INNATE_NO_CDN_ICON` — только то, чего нет и
+там, с пометкой «not in the client VPK nor the CDN» и датой.
+Иконки innate/facet без арта в игре — нормально: `ability()` отдаёт `innate_icon.png` сразу в `src`, без 404+onerror.
 `_LOCAL_ABIL_ICONS` в `patch/images.py` строится при загрузке модуля — пересборка нужна после скачивания.
 
 **Подтверждённые real-innate без CDN art** лежат в `patch/known_exceptions.py::KNOWN_INNATE_NO_CDN_ICON`.

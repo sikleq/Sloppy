@@ -3071,15 +3071,24 @@ def build():
     W(ul_open())
     W(li("Duration decreased from 6s to 5s", b(6, 5)))
     W(ul_close())
-    W(ability("Demonic Cleanse", slug="shadow_demon_demonic_cleanse"))
+    # the old -> new card from the game files (owner 2026-10-26: "Demonic Cleanse в 7.38 надо сделать old>new
+    # карточками", as Kinetic Fence 7.41): 7.37e shares Demonic Purge's 3 levels, 7.38 has one; the rows the card
+    # shows stay hidden for the weights and the tag filters
+    _dc_old, _dc_new = game_ability_pair("shadow_demon_demonic_cleanse", "7.38")
+    W(ability_change(
+        old=dict(name="Demonic Cleanse", slug="shadow_demon_demonic_cleanse", desc=_dc_old),
+        new=dict(name="Demonic Cleanse", slug="shadow_demon_demonic_cleanse", desc=_dc_new),
+        summary="Ability reworked.",
+        tag="rework",
+    ))
     W(ul_open())
     W(li("Duration decreased from 6s to 5s", b(6, 5)))
     W(li("Cooldown decreased from 70/65/60s to 60s", b([70, 65, 60], 60, l=True)))
-    W(li("Cleanse Heal rescaled from 300/450/600 to 450", b([300, 450, 600], 450)))
+    W(li("Cleanse Heal rescaled from 300/450/600 to 450", b([300, 450, 600], 450), covered=True))
     W(li("Mana Cost decreased from 150/175/200 to 150", b([150, 175, 200], 150, l=True)))
     W(li("No longer upgraded with Aghanim's Scepter", t("DEL")))
     W(li("No longer requires at least Level 1 Demonic Purge to be castable", t("BUFF")))
-    W(li("No longer upgrades with levels of Demonic Purge", t("REWORK")))
+    W(li("No longer upgrades with levels of Demonic Purge", t("REWORK"), covered=True))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())

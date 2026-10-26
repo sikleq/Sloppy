@@ -1519,39 +1519,65 @@ def _aghs_rework_card(text, covered=False) -> bool:
 _GRANTED_CARDS: set = set()            # (version, slug) of granted abilities that already have their card
 
 
+def _granted_flag(slug, version):
+    """"shard" / "scepter" when that patch's game files flag the ability IsGrantedByShard / IsGrantedByScepter, else
+    None — the flag only: an "enabled 0 -> +1" value is an upgrade of the ability too (7.39 Sticky Napalm, 7.41
+    Guardian Angel), not an ability the upgrade grants."""
+    if not slug or not version:
+        return None
+    from .aghs_text import _FLAGS, _blocks
+    block = _blocks(version).get(slug)
+    for kind in ("shard", "scepter"):
+        if isinstance(block, dict) and str(block.get(_FLAGS[kind][1], "0")).strip() == "1":
+            return kind
+    return None
+
+
 def _granted_card(tags) -> bool:
-    """A REWORK row under an ability an Aghanim's upgrade grants, whose text the game changed: the old -> new card of
-    its description under the rows, once per ability (owner 2026-10-25, 7.41 Warp Flare: "Teleport distance now
-    depends on Warp Flare cast range …" had no card). The row stays: it says more than the tooltip."""
+    """A REWORK row under an ability an Aghanim's upgrade grants, whose text or header values the game changed: the
+    old -> new card of the ability under the rows, once per ability (owner 2026-10-25, 7.41 Warp Flare: "Teleport
+    distance now depends on Warp Flare cast range …" had no card). Its sides are ability cards as an ability_change's:
+    "Active – granted by Aghanim's Shard" and the game's values in the header, the game's text below (owner 2026-10-26:
+    as Kinetic Fence, not the upgrade's "Grants this ability: …" line). The row stays: it says more than the tooltip."""
     slug, version = _State.current_ability_slug, _State.current_patch_version
     if "rework" not in tags or not slug or not version or (version, slug) in _GRANTED_CARDS:
         return False
-    from .aghs_text import _FLAGS, _blocks, aghs_text
+    from .ability_kv import ability_props
+    from .aghs_text import ability_text
     from .meta import _prev_patch_version
     prev = _prev_patch_version(version)
-    # the game's own flag only: an "enabled 0 -> +1" value is an upgrade of the ability too (7.39 Sticky Napalm, 7.41
-    # Guardian Angel), not an ability the upgrade grants
-    def granted(v, kind):
-        block = _blocks(v).get(slug)
-        return isinstance(block, dict) and str(block.get(_FLAGS[kind][1], "0")).strip() == "1"
-    for kind in ("shard", "scepter"):
-        if not (granted(version, kind) and granted(prev, kind)):
-            continue
-        old, new = aghs_text(slug, kind, prev), aghs_text(slug, kind, version)
-        if not old or not new:
-            _aghs_missing(kind, slug, version, prev, old, new)
-        if old == new:
-            return False
-        old_html, new_html = _rework_diff_html(_aghs_inline(old), _aghs_inline(new))
-        pane = lambda side, h: (f'<div class="ability-change-pane ability-change-{side}"><div class="ability-change-body">'
-                                f'{_bold_numbers_html(aghs_line(h, kind=kind))}</div></div>')
-        old_pane = pane("old", old_html)
-        new_pane = _pair_number_tips(old_pane, pane("new", new_html))
-        caption = f"Ability reworked (Aghanim's {kind.title()} upgrade)."
-        _State.aghs_cards.append(_under_rows_card(caption, "rework", "", "aghs-change", old_pane, new_pane))
-        _GRANTED_CARDS.add((version, slug))
-        return True
-    return False
+    kind = _granted_flag(slug, version)
+    if not kind or _granted_flag(slug, prev) != kind:
+        return False
+    old_t, new_t = ability_text(slug, prev), ability_text(slug, version)
+    if not old_t or not new_t:
+        raise RuntimeError(f"{slug} ({version}): no {prev if not old_t else version} description — teach "
+                           f"patch/aghs_text.py ability_text where this tooltip or its numbers are")
+    old_p, new_p = ability_props(slug, prev), ability_props(slug, version)
+    old_sh, new_sh = _shares_level(slug, prev), _shares_level(slug, version)
+    if (old_t, old_p, old_sh) == (new_t, new_p, new_sh):
+        return False
+    old_html, new_html = _rework_diff_html(_aghs_inline(old_t, loose=False), _aghs_inline(new_t, loose=False))
+    old_d = ([f"Shares level with {old_sh}."] if old_sh else []) + [old_html]
+    new_d = ([f"Shares level with {new_sh}."] if new_sh else []) + [new_html]
+    _CARD_SEQ[0] += 1
+    card_id = _CARD_SEQ[0]
+    old_v, new_v = _pane_values(old_d, old_p), _pane_values(new_d, new_p)
+    old_m, new_m = _iab_meta_marks(old_v, new_v)
+    # the rows below that say exactly a header change are hidden and confirm its colour, as under an ability_change
+    _State.card_meta = {k: (old_v[k], new_v[k], card_id) for k in new_m}
+    old_head, old_body = _pane_parts(old_d, old_p, marks={k: (m, card_id) for k, m in old_m.items()}, granted=kind)
+    new_head, new_body = _pane_parts(new_d, new_p, marks={k: (m, card_id, old_v[k]) for k, m in new_m.items()},
+                                     granted=kind)
+    pane = lambda side, head, body: (f'<div class="ability-change-pane ability-change-{side}">{head}'
+                                     f'<div class="ability-change-body">{body}</div></div>')
+    old_pane = pane("old", old_head, old_body)
+    new_pane = _pair_number_tips(old_pane, pane("new", new_head, new_body))
+    # the headers say "granted by Aghanim's X": the caption keeps only the stripe (owner 2026-10-26)
+    _State.aghs_cards.append(_under_rows_card("Ability reworked.", "rework", f"aghanim-{kind}", "granted-change",
+                                              old_pane, new_pane))
+    _GRANTED_CARDS.add((version, slug))
+    return True
 
 
 _AGHS_SHOWN: set = set()               # (version, hero, kind) whose old upgrade parts a card already shows
@@ -1634,7 +1660,8 @@ def _under_rows_card(caption, tag, li_cls, card_cls, old_pane, new_pane):
     """An old -> new card under an ability's rows (Aghanim's upgrade, what it scales with): its own caption row with
     the tag, like an ability_change's summary, and a dashed line from the ability's icon to the old pane (scripts.js
     drawAbilityChangeConnectors) — owner 2026-10-25."""
-    marker = f'<span class="aghanim-marker {li_cls[9:]}"></span>' if li_cls.startswith("aghanim-") else ""
+    marker = (f'<span class="aghanim-marker {li_cls[len("aghanim-"):]}"></span>' if li_cls.startswith("aghanim-")
+              else "")
     li_attr = f' class="{li_cls}"' if li_cls else ""
     # caption None: the card says it all (what it scales with — "No longer levels with X." repeated its headers)
     head = (f'<ul class="changes ability-change-summary-ul under-rows-caption"><li data-tag="{tag}"{li_attr}>'
@@ -2220,9 +2247,13 @@ _PANE_KIND_RE = re.compile(r"^\s*(?:Ultimate[.,]\s*)?(Active|Passive|Toggle|Aura
 # Duel." -> "Passive – scales with Duel" (owner 2026-10-24, 7.41 Gravity Well / Distortion Field / Outfight Them!;
 # brackets -> a dash 10-25); a value growing with hero level in the game files -> "Passive – scales with level". A
 # highlight on the phrase (Distortion Field 7.41: "del") stays on it in the header.
-_PANE_SCALE_RE = re.compile(r"(?:^|(?<=[.!]))\s*(<span[^>]*>)?(?:[Ll]evels(?: up)?|[Ss]cales|[Ii]mproves) with "
-                            r"([^.<]+?)(</span>)?\.(?=\s|$)")
-_PANE_NOLEVEL_RE = re.compile(r"(?:^|(?<=[.!]))\s*(?:Innate, )?[Cc]an(?:'t|not) be leveled up\.(?=\s|$)")
+# "Shares level with Kinetic Field." goes there too (owner 2026-10-26, 7.41 Kinetic Fence: "в шапку, как scales with").
+_PANE_SCALE_RE = re.compile(r"(?:^|(?<=[.!]))\s*(<span[^>]*>)?((?:[Ll]evels(?: up)?|[Ss]cales|[Ii]mproves)|"
+                            r"[Ss]hares (?:its )?level) with ([^.<]+?)(</span>)?\.(?=\s|$)")
+# never said in a card: "can't be leveled up", and "Has only one level" (the header's "granted by Aghanim's X" says it,
+# owner 2026-10-26) — with its highlight, if any
+_PANE_NOLEVEL_RE = re.compile(r"(?:^|(?<=[.!]))\s*(?:<span[^>]*>)?(?:(?:Innate, )?[Cc]an(?:'t|not) be leveled up|"
+                              r"Has only one level)(?:</span>)?\.(?=\s|$)")
 _PANE_NAME_RE = re.compile(r"^\s*([A-Z][\w'’-]*(?: [A-Za-z][\w'’-]*){0,4}):\s+")
 
 
@@ -2275,10 +2306,11 @@ def _pane_values(desc, props=None) -> dict:
             if (props or {}).get(key) or found.get(key)}
 
 
-def _pane_parts(desc, props=None, facet=False, marks=None):
+def _pane_parts(desc, props=None, facet=False, marks=None, granted=None):
     """(header strip html or "", body rows html) of an ability / facet card pane. The text's own leading "Active." goes
     to the header (7.41 Summon Raptors said it twice); a facet's rows that all start with the ability they change
-    ("Arcane Aura: …", 7.38 Arcane Overflow) give the header its name. marks: see _iab_meta_chips."""
+    ("Arcane Aura: …", 7.38 Arcane Overflow) give the header its name. marks: see _iab_meta_chips. granted: "shard" /
+    "scepter" — the header says "Active – granted by Aghanim's Shard" (owner 2026-10-26)."""
     items = [d for d in (desc if isinstance(desc, list) else [desc]) if d is not None]
     plain = [i for i, d in enumerate(items) if isinstance(d, str) and not d.lstrip().startswith("<div")]
     kind = (props or {}).get("kind", "")
@@ -2293,8 +2325,9 @@ def _pane_parts(desc, props=None, facet=False, marks=None):
     if kind:
         found = [m for i in plain for m in _PANE_SCALE_RE.finditer(items[i])]
         if len(found) == 1:                     # two of them (two sub-abilities) can't say whose: they stay
-            o, what, c = found[0].group(1, 2, 3)
-            scale = f'{o or ""}scales with {what.strip()}{c if o else ""}'
+            o, verb, what, c = found[0].group(1, 2, 3, 4)
+            verb = "shares level" if verb.lower().startswith("shares") else "scales"
+            scale = f'{o or ""}{verb} with {what.strip()}{c if o else ""}'
         for i in plain:
             cut = _PANE_NOLEVEL_RE.sub("", _PANE_SCALE_RE.sub("", items[i], count=1) if scale else items[i]).strip()
             if cut != items[i]:                 # rule of 2026-05-16: "can't be leveled up" is never said in a card
@@ -2343,8 +2376,11 @@ def _pane_parts(desc, props=None, facet=False, marks=None):
     if kind and not scale and (props or {}).get("level_scaled"):
         scale = "scales with level"             # the game files: a value grows with hero level (7.41 innates)
     scale = re.sub(r"<[^>]+>", "", scale)      # never coloured in the header (owner 2026-10-25: "не крась scales with")
-    if scale:
-        title += f' <span class="iab-scale">– {scale}</span>'
+    says = ", ".join(([f"granted by Aghanim's {granted.title()}"] if granted else []) + ([scale] if scale else []))
+    if says and title:
+        title += f' <span class="iab-scale">– {says}</span>'
+    elif says:
+        title = f'<span class="iab-scale">{says[:1].upper() + says[1:]}</span>'
     head = (f'<div class="iab-head pane-head"><span class="iab-title">{title}</span>'
             f'<span class="iab-meta">{chips}</span></div>') if chips or title else ""
     return head, "".join(rows)
@@ -4174,7 +4210,36 @@ def game_ability_desc(slug, version=None, note=None):
     if not text:
         raise RuntimeError(f"{slug} ({version}): no description in the game files — teach patch/aghs_text.ability_text")
     line = _html.escape(_aghs_inline(text, loose=False), quote=False)
-    return [line + (" " + inline_note(note) if note else "")]
+    shares = _shares_level(slug, version)
+    return ([f"Shares level with {shares}."] if shares else []) + [line + (" " + inline_note(note) if note else "")]
+
+
+def game_ability_pair(slug, version=None):
+    """(old desc, new desc) of an ability_change from the game files of the patch before and this one: the texts with
+    their changed numbers coloured (_rework_diff_html), and "Shares level with X." for the header (owner 2026-10-26,
+    7.38 Demonic Cleanse "надо сделать old>new карточками"). Never empty: no text stops the build."""
+    from .aghs_text import ability_text
+    from .meta import _prev_patch_version
+    version = version or _State.current_patch_version
+    prev = _prev_patch_version(version)
+    old_t, new_t = ability_text(slug, prev), ability_text(slug, version)
+    if not old_t or not new_t:
+        raise RuntimeError(f"{slug} ({version}): no {prev if not old_t else version} description — teach "
+                           f"patch/aghs_text.ability_text")
+    old_html, new_html = _rework_diff_html(_aghs_inline(old_t, loose=False), _aghs_inline(new_t, loose=False))
+    side = lambda v, html: ([f"Shares level with {s}."] if (s := _shares_level(slug, v)) else []) + [html]
+    return side(prev, old_html), side(version, new_html)
+
+
+def _shares_level(slug, version):
+    """The ability whose levels this one takes, as the game files say (DependentOnAbility on a many-level ability,
+    7.37e Demonic Cleanse -> Demonic Purge) — the card's header says it; None for a one-level one."""
+    from .aghs_text import _blocks, ability_name
+    block = _blocks(version).get(slug)
+    dep = block.get("DependentOnAbility") if isinstance(block, dict) else None
+    if not dep or str(block.get("MaxLevel", "")).strip() == "1":
+        return None
+    return ability_name(dep, version) or None
 
 
 def new_ability(name, slug, note=None, innate=False):
@@ -4190,6 +4255,11 @@ def new_ability(name, slug, note=None, innate=False):
 def ability_change(old, new, summary=None, tag=None, sub=False):
     new, _aghs_new = _take_aghs(new)
     old, _aghs_old = _take_aghs(old) if old is not None else (None, None)
+    from .meta import _prev_patch_version
+    # each side's header says "granted by Aghanim's X" (owner 2026-10-26): its text said so, or that patch's game flag
+    _granted_by = {"new": _aghs_new or _granted_flag(new.get("slug"), _State.current_patch_version),
+                   "old": (_aghs_old or _granted_flag(old.get("slug"), _prev_patch_version(_State.current_patch_version)))
+                   if old else None}
     _aghs = _aghs_new or _aghs_old
     if not _aghs and new.get("slug"):
         # an ability the game grants by Aghanim's (KV IsGrantedByShard) gets the stripe without the words too
@@ -4279,7 +4349,8 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
             f'class="innate-marker">'
             if spec.get("innate") and not used_innate_fallback else ''
         )
-        strip_html, desc_html = _pane_parts(spec.get("desc", []), _props[kind], marks=_marks.get(kind))
+        strip_html, desc_html = _pane_parts(spec.get("desc", []), _props[kind], marks=_marks.get(kind),
+                                            granted=_granted_by[kind])
         tables_html = ''.join(
             f'<div class="formula-table-wrap">{tbl}</div>'
             for tbl in (spec.get("tables", []) or [])
@@ -4387,7 +4458,11 @@ def ability_change(old, new, summary=None, tag=None, sub=False):
         aghs_cls = f' class="aghanim-{_aghs}"' if _aghs else ''
         # "Ability reworked (Aghanim's Scepter upgrade)." — in brackets before the full stop (owner 2026-10-21)
         summary_txt = summary or ""
-        if _aghs:
+        if _aghs and _aghs in (_granted_by["new"], _granted_by["old"]):
+            # the headers say "granted by Aghanim's X": the summary keeps only the stripe (owner 2026-10-26, 7.41
+            # Kinetic Fence: "убрать (Aghanim's Shard upgrade) из строки")
+            summary_txt += f'<span class="aghanim-marker {_aghs}"></span>'
+        elif _aghs:
             body = summary_txt[:-1] if summary_txt.endswith(".") else summary_txt
             summary_txt = (f'{body} <span class="ac-aghs">(Aghanim\'s {_aghs.title()} upgrade)</span>.'
                            f'<span class="aghanim-marker {_aghs}"></span>')

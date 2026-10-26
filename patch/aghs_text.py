@@ -211,6 +211,11 @@ def ability_text(slug, version, kind="base"):
             entries += [(k, x) for k, x in d.items() if k not in ("var_type", "LinkedSpecialBonus", "RequiresScepter",
                                                                    "RequiresShard", "CalculateSpellDamageTooltip")]
     for k, v in entries:
+        # the ability's own text lists no value only an Aghanim's upgrade gives (7.37e Demonic Cleanse: "Max charges: 2"
+        # is the Scepter's, the base ability has a cooldown; owner 2026-10-26 card)
+        if kind == "base" and isinstance(v, dict) and any(str(v.get(f, "0")).strip() == "1"
+                                                          for f in ("RequiresScepter", "RequiresShard")):
+            continue
         label = tooltip(f"DOTA_Tooltip_ability_{slug}_{k}", version)
         n = _num((v.get("value") or v.get(f"special_bonus_{kind}", "")) if isinstance(v, dict) else v)
         if not label or not re.search(r"[A-Za-z]", label) or n is None:

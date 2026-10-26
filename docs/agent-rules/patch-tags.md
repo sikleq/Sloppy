@@ -273,8 +273,9 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
     файла иконки в шапке). Найденное, но не ошибочное (ключа для старого числа нет, Valve дали среднее min/max) —
     в `UNCHECKABLE`. Тест `test_every_from_value_matches_the_previous_patch` держит ноль (владелец 2026-10-22).
   - Карточка `ability_change` способности, которую в ЭТОМ патче даёт Aghanim's (KV `IsGrantedByShard/Scepter`), сама
-    получает полоску и «(Aghanim's Shard upgrade)» в итоге; фраза «Granted by Aghanim's Shard.» в начале описания
-    не подсвечивается — её убирает `_take_aghs` (Kinetic Fence 7.41).
+    получает полоску в итоге и «Active – granted by Aghanim's Shard» в шапке (с 2026-10-26; раньше — слова в скобках
+    в итоге); фраза «Granted by Aghanim's Shard.» в начале описания не подсвечивается — её убирает `_take_aghs`
+    (Kinetic Fence 7.41).
   - Строка без слов «Aghanim's» получает полоску по тому же правилу — `aghs_granted.kind_of(slug, патч)`: флаг
     СВОЕГО патча (Liquid Ice был от Shard только в 7.34e–7.35d, Haunt стал ультимейтом в 7.40 — без полоски). Флаг
     из других патчей берётся, только если в этом патче способность скрытая с одним уровнем и не врождённая (Hitch A
@@ -396,8 +397,9 @@ Sniper 7.38 и 7.41, Earth Spirit 7.40 и 7.41f, Io, Lone Druid, Luna 7.40, Elde
 
 ## Карточка способности от Aghanim (2026-10-21, Clockwerk 7.41 Overclocking)
 Текст карточки не начинается с «Active (Aghanim's Scepter upgrade).» / «Granted by Aghanim's Scepter.»:
-Active/Passive уже в шапке карточки, а Aghanim сборщик сам переносит в строку итога («Ability reworked (Aghanim's
-Scepter upgrade).» — в скобках перед точкой) с полоской. Писать в контенте можно как угодно — `ability_change` вырезает эти слова сам.
+Active/Passive уже в шапке карточки, а Aghanim сборщик сам переносит в шапку той стороны («Active – granted by
+Aghanim's Scepter», владелец 2026-10-26, Kinetic Fence 7.41); строка итога — «Ability reworked.» с полоской, без слов в
+скобках (они были с 2026-10-21 до 10-26). Писать в контенте можно как угодно — `ability_change` вырезает эти слова сам.
 
 ## Стрелка «старое → новое» уже всё сказала (владелец 2026-10-22, 7.41)
 - Итог карточки не называет заменённую способность: «Inner Beast is now the innate ability.», не «… (replaces

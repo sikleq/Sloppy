@@ -43,6 +43,7 @@ DIFF_THRESHOLD = 8.0          # средняя разница по канала�
 FOURCC = {1: b"DXT1", 2: b"DXT5"}
 DX10 = {19: 95, 20: 98}       # BC6H_UF16, BC7_UNORM
 BGRA8888 = 28
+EMBEDDED = {15, 16, 17, 18}   # JPEG_RGBA8888, PNG_RGBA8888, JPEG_DXT5, PNG_DXT5: the payload is an image file
 
 
 # ---------- VPK v2 ----------
@@ -143,6 +144,8 @@ def decode(blob: bytes) -> Image.Image:
     if fmt == BGRA8888:
         arr = np.frombuffer(payload[:w * h * 4], dtype=np.uint8).reshape(h, w, 4)
         return Image.fromarray(arr[..., [2, 1, 0, 3]], "RGBA")
+    if fmt in EMBEDDED:                     # the mip is a whole PNG / JPEG file (spell icons, 2026-10-26)
+        return Image.open(BytesIO(payload)).convert("RGBA")
     img = Image.open(BytesIO(_dds(w, h, fmt, payload)))
     meta_len = struct.unpack_from("<I", blob, 0)[0]
     if b"YCoCg" in blob[:meta_len]:

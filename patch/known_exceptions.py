@@ -38,6 +38,10 @@ Maintenance rules (read before adding entries):
   (data-slug attr + INNATE_ICON_URL), NOT a duplicated PNG file.
   Builders that reference these slugs should emit innate_icon.png
   directly rather than a 404-then-onerror dance.
+  An entry goes here only after the game files were searched too (owner
+  2026-10-26: "если не находишь — ищешь в файлах игры"):
+  scripts/fetch/fetch_icons.py tries the KV AbilityTextureName and the
+  client's pak01_dir.vpk by itself (7.41 Squee's Scope = Stasis Trap's icon).
 """
 
 KNOWN_HISTORICAL_RENAMES = {
@@ -135,8 +139,8 @@ KNOWN_INNATE_NO_CDN_ICON = {
     "spectre_spectral",             # old innate on an old -> new card; no art in the VPK nor the CDN (2026-09-26)
     "wisp_sight_seer",              # Io's old innate on the 7.39 old -> new card (was mislabelled wisp_essence_conduction);
                                     # Valve CDN 404 (2026-10-03)
-    # named in the "whole old upgrade" Aghanim cards (2026-10-25); Valve CDN 404, the VPK not checked yet
+    # named in the "whole old upgrade" Aghanim cards (2026-10-25); no AbilityTextureName, not in the client VPK nor
+    # the CDN (scripts/fetch/fetch_icons.py, 2026-10-26)
     "clinkz_bone_and_arrow",
     "slardar_seaborn_sentinel",
-    "techies_squees_scope",
 }

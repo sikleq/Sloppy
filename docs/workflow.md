@@ -253,7 +253,8 @@ slug is real but Valve publishes no public CDN icon, add it to
 `KNOWN_INNATE_NO_CDN_ICON` in `patch/known_exceptions.py`; the existing
 fallback in `patch/elements.py` will render `innate_icon.png` directly.
 
-Fetch any new icons that *do* exist on the CDN:
+Fetch the new icons — from the CDN, and for a CDN 404 from the game files (the KV `AbilityTextureName`, then
+`panorama/images/spellicons/` in the client's VPK):
 
 ```powershell
 python scripts/fetch/fetch_icons.py
