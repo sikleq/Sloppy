@@ -548,6 +548,8 @@ TAG_OVERRIDES = {
     # "Now requires", which is REWORK below)
     "added an auto-cast":              "QoL",   # Quill Spray: "Right-click the ability to … cast it"
     "no longer automatically rejoins": "QoL",   # Astral Spirit: now the duration or Return brings it back
+    # a click past max range used to blink only 75% of it — a penalty gone (owner 2026-10-27, 7.39 Blinks)
+    "no longer has an overshoot range": "BUFF",
     "starts with all":              "MISC",
     "separate heal reduction":      "MISC",
     "health restoration consolidat": "MISC",  # "consolidated Health Restoration" = structural

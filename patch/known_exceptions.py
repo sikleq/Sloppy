@@ -150,6 +150,8 @@ KNOWN_INNATE_NO_CDN_ICON = {
 # keeps them. Every other never-slotted one is dust in the files (data/rules/abilities_not_in_game.json).
 KNOWN_UNSLOTTED_REAL = {
     "dragon_knight_frost_breath": "Elder Dragon Form level 3 (Liquipedia: Dragon Knight, desc4 Frost Breath)",
+    "lone_druid_entangling_claws": "the Spirit Bear's ability (owner 2026-10-27)",
+    "meepo_fling": "Meepo's Aghanim's Scepter ability (owner 2026-10-27)",
     "lycan_summon_wolves_hightail": "the wolves' ability (Liquipedia: Lycan, Lycan Wolf Hightail)",
     "morphling_hybrid": "Aghanim's Scepter 7.08 (data/rules/aghs_granted_old.json; Liquipedia {{A|Morphling|Hybrid}})",
     "tinker_shrink_ray": "Aghanim's Scepter 7.28 (Liquipedia: Version 7.28, Scepter Rework: Shrink Ray)",

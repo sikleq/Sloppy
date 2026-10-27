@@ -638,14 +638,13 @@
    "name": null
   },
   "lone_druid_entangling_claws": {
+   "evidence": "the Spirit Bear's ability (owner 2026-10-27)",
    "first": "7.23",
    "flags": {},
    "hero": "lone_druid",
-   "kind": "never",
+   "kind": "code",
    "last": "7.39e",
-   "liquipedia": null,
-   "name": "Entangling Claws",
-   "patch_notes": "patchnotes_english.txt: \"DOTA_Patch_7_36_lone_druid_hero_facet_1_lone_druid_true_form\"\t\t\"Transforms Lone Druid, providing him with bonus armor, increased health and improved versions o"
+   "name": "Entangling Claws"
   },
   "luna_lunar_grace": {
    "first": "7.23",
@@ -701,14 +700,13 @@
    "patch_notes": null
   },
   "meepo_fling": {
+   "evidence": "Meepo's Aghanim's Scepter ability (owner 2026-10-27)",
    "first": "7.41",
    "flags": {},
    "hero": "meepo",
-   "kind": "never",
+   "kind": "code",
    "last": "7.41f",
-   "liquipedia": null,
-   "name": "Fling",
-   "patch_notes": "patchnotes_english.txt: \"DOTA_Patch_7_32c_meepo_meepo_divided_we_stand\"\t\t\"Shard Fling Slow increased from 50% to 60%\""
+   "name": "Fling"
   },
   "meepo_fling_release": {
    "first": "7.41",

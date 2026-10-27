@@ -32,6 +32,11 @@ def test_control_conveniences_are_qol(text):
     assert g._guess_tag(text) == "QoL"
 
 
+def test_losing_the_blink_overshoot_penalty_is_a_buff():
+    # a click past max range used to blink 75% of it (owner 2026-10-27)
+    assert g._guess_tag("Blink no longer has an overshoot range") == "BUFF"
+
+
 def test_aghanims_upgrade_reworked_makes_a_card_too():
     assert _AGHS_REWORK_RE.match("Aghanim's Shard upgrade reworked: Removes the 20 stack limit")   # Batrider 7.39
     assert _AGHS_REWORK_RE.match("Aghanim's Scepter reworked: Silences when the target is alone")
