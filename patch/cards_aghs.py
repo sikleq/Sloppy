@@ -13,7 +13,7 @@ from .cards_item_abilities import (_CARD_CONFIRMED, _CARD_SEQ, _bold_numbers_htm
 # Old = the game's tooltip of the previous patch, new = this patch's, both with their own numbers (patch/aghs_text.py);
 # the words that differ are highlighted (removed: del, added: new, rewritten: rework). The row stays, hidden, for the
 # weights and filters. No old or new tooltip (or the same text) -> no card, the row shows as before.
-_AGHS_REWORK_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard) reworked\s*:", re.I)
+_AGHS_REWORK_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard)(?: upgrade)? reworked\s*:", re.I)   # 7.39 Batrider: "upgrade"
 
 
 _AGHS_WORD_RE = re.compile(r"\S+")

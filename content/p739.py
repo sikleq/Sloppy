@@ -176,7 +176,7 @@ def build():
         old=["Passive: Frost. Your attacks slow the target's movement by -13% (-6% against melee targets) and reduces heals, health regeneration, lifesteal and Spell lifesteal by 13%. Lasts for 3 seconds."],
         new=["Passive: Frost. Your attacks slow the target's movement by -13% (-6% against melee targets), and reduces Health Restoration by 13%. Lasts for 3 seconds."]))
     W(ul_open())
-    W(li("Frost instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 13%, now reduces Health Restoration by 13%", t("REWORK")))
+    W(li("Frost instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 13%, now reduces Health Restoration by 13%", t("MISC")))
     W(li("Cost increased from 250 to 300", b(250, 300, l=True)))
     W(li("Frost's slow and health restoration reduction no longer stack with Orb of Corrosion and Eye of Skadi", t("DEL")))
     W(ul_close())
@@ -187,7 +187,7 @@ def build():
         old=["Passive: Corrosion. Your attacks reduce the target's armor by -2, slows their movement by -16% (-8% against melee targets), and reduces heals, health regeneration, lifesteal and Spell lifesteal by 16% for 3 seconds."],
         new=["Passive: Corrosion. Your attacks reduce the target's armor by -2, slows their movement by -16% (-8% against melee targets), and reduces Health Restoration by 16%. Lasts for 3 seconds."]))
     W(ul_open())
-    W(li("Corrosion instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 16%, now reduces Health Restoration by 16%", t("REWORK")))
+    W(li("Corrosion instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 16%, now reduces Health Restoration by 16%", t("MISC")))
     W(li("Total Cost increased from 1000 to 1050", b(1000, 1050, l=True)))
     W(li("Corrosion's slow and health restoration reduction no longer stack with Orb of Frost and Eye of Skadi", t("DEL")))
     W(ul_close())
@@ -202,7 +202,7 @@ def build():
         new=["Passive: Cold Attack. Attacks lower enemy movement by -25% if they are melee and -50% if they are ranged. Attacks also lower enemy attack speed by -20%. Additionally it reduces Health Restoration by 40% and Incoming Heals by 40% Lasts for 3 seconds."]))
     W(ul_open())
     W(li("No longer requires a 1050 gold recipe. Total Cost increased from 5300 to 5900", b(5300, 5900, l=True)))
-    W(li("Cold Attack instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 40%, now reduces Health Restoration and Heal Amplification by 40%", t("REWORK")))
+    W(li("Cold Attack instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 40%, now reduces Health Restoration and Heal Amplification by 40%", t("MISC")))
     W(li("Cold Attack's slow and health restoration reduction no longer stack with Orb of Frost and Orb of Corrosion", t("DEL")))
     W(ul_close())
     W(item_header("Shiva's Guard"))
@@ -213,7 +213,7 @@ def build():
         new=["Active: Arctic Blast. Emits a freezing wave that causes enemies to take 15% more damage from spells for 16 seconds, deals 200 magical damage and slows their movement by -40% for 4 seconds. Deals 150% damage to illusions. Radius: 900. Mana Cost: 75. Cooldown: 27s",
              "Passive: Freezing Aura. Reduces the attack speed of all enemies by -45 and Health Restoration and Incoming Heal Amplification by 25%. Radius: 1200."]))
     W(ul_open())
-    W(li("Freezing Aura instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 25%, now reduces Health Restoration and Heal Amplification by 25%", t("REWORK")))
+    W(li("Freezing Aura instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 25%, now reduces Health Restoration and Heal Amplification by 25%", t("MISC")))
     W(ul_close())
     W(item_header("Bloodstone"))
     W(ul_open())
@@ -286,7 +286,7 @@ def build():
         old=["Active: Soul Release. When used against enemies, it reduces health by 4% of current health per second, and reduces HP regeneration, healing, lifesteal and Spell lifesteal by 70%. Deals 25 damage per second. When used on allies, it provides 40 health regeneration per second. Lasts 8 seconds. If the unit is attacked by an enemy hero or Roshan, the effect is lost. Gains charges every time an enemy hero dies within 1400 units or the user dies. Only the closest Spirit Vessel to the dying hero will gain a charge. Cast Range: 750. Cooldown: 10s"],
         new=["Active: Soul Release. When used against enemies, it reduces health by 4% of current health per second, and reduces Health Restoration by 70% and incoming heals by 70%. Deals 25 damage per second. When used on allies, it provides 40 health regeneration per second. Lasts 8 seconds. If the unit is attacked by an enemy hero or Roshan, the effect is lost. Gains charges every time an enemy hero dies within 1400 units or the user dies. Only the closest Spirit Vessel to the dying hero will gain a charge. Cast Range: 750. Cooldown: 10s"]))
     W(ul_open())
-    W(li("Soul Release when cast on enemy, instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 70%, now reduces Health Restoration and Heal Amplification by 70%", t("REWORK")))
+    W(li("Soul Release when cast on enemy, instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 70%, now reduces Health Restoration and Heal Amplification by 70%", t("MISC")))
     W(li("Recipe cost unchanged. Total Cost decreased from 2780 to 2725 due to Urn of Shadows change", b(2780, 2725, l=True)))
     W(ul_close())
     W(item_header("Vladmir's Offering"))
@@ -416,7 +416,7 @@ def build():
         new=["Active: Hobble. Hits an enemy for 75 damage, then slows them by 80% and reduces Health Restoration by 40% for 4 seconds. The slow gradually fades over the duration of the spell. Cast Range: 800. Mana Cost: 50. Cooldown: 12s"]))
     W(ul_open())
     W(li("Dormant Curio increases Health Restoration reduction from 40% to 52%", t("NEW")))
-    W(li("Hobble 40% Healing, Health Regen, Lifesteal and Spell Lifesteal reductions replaced with a new 40% Health Restoration reduction stat", t("REWORK")))
+    W(li("Hobble 40% Healing, Health Regen, Lifesteal and Spell Lifesteal reductions replaced with a new 40% Health Restoration reduction stat", t("MISC")))
     W(ul_close())
     W(item_header("Dezun Bloodrite", new="New Tier 4 Artifact"))
     W(ul_open())
@@ -548,7 +548,7 @@ def build():
         desc=f"Mist Coil also deals 40/60/80/100% attack damage and applies effects from items and abilities. Self damage when cast on an enemy is increased from 40% to 70%. {inline_note("Self damage is not affected by attack damage. This is exactly how it was with the previous Aghanim's Shard effect")}"))
     W(ability("Withering Mist", slug="abaddon_withering_mist"))
     W(ul_open())
-    W(li("Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 35%, now reduces Health Restoration by 35%", t("REWORK")))
+    W(li("Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 35%, now reduces Health Restoration by 35%", t("MISC")))
     W(ul_close())
     W(ability("Mist Coil", slug="abaddon_death_coil"))
     W(ul_open())
@@ -748,7 +748,7 @@ def build():
     W(ul_close())
     W(ability("Quill Spray", slug="bristleback_quill_spray"))
     W(ul_open())
-    W(li("Added an auto-cast. Right-click the ability to make Bristleback automatically cast it whenever it's possible", t("NEW")))
+    W(li("Added an auto-cast. Right-click the ability to make Bristleback automatically cast it whenever it's possible", t("QoL")))
     W(ul_close())
 
     # Broodmother
@@ -956,14 +956,14 @@ def build():
     W(hero_header("Dragon Knight"))
     W(facet_header("dragon_knight_frost_dragon"))
     W(ul_open())
-    W(li("Wyrm's Wrath: Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 14/21/28/35%, now reduces Health Restoration by 14/21/28/35%", t("REWORK")))
+    W(li("Wyrm's Wrath: Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 14/21/28/35%, now reduces Health Restoration by 14/21/28/35%", t("MISC")))
     W(ul_close())
 
     # Drow Ranger
     W(hero_header("Drow Ranger"))
     W(ability("Frost Arrows", slug="drow_ranger_frost_arrows"))
     W(ul_open())
-    W(li("Aghanim's Scepter instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 10% per stack, now reduces Health Restoration by 10% per stack", t("REWORK")))
+    W(li("Aghanim's Scepter instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 10% per stack, now reduces Health Restoration by 10% per stack", t("MISC")))
     W(ul_close())
     W(ability("Glacier", slug="drow_ranger_glacier"))
     W(ul_open())
@@ -976,7 +976,11 @@ def build():
         desc=f"Enemy heroes stunned by Fissure emit an echo to each nearby unit within a 400 radius, dealing 60% of Echo Slam's current echo damage. {inline_note("It's equal to 54/60/66 damage, plus 30 with level 20 talent")}"))
     W(facet_header("earthshaker_tectonic_buildup"))
     W(ul_open())
-    W(li("Aftershock: Radius increase rescaled from (+50 with every 10 hero levels) to (+40 with every level of Echo Slam)", t("REWORK")))
+    # by hero level, Echo Slam taken at 6 / 12 / 18 (owner 2026-10-27: a formula table, buff or nerf — not REWORK)
+    W(li_formula("Aftershock: Radius increase rescaled", "+50 with every 10 hero levels", "+40 with every level of Echo Slam",
+                 lambda L: 50 * (L // 10), lambda L: 40 * (0 if L < 6 else min(3, (L - 6) // 6 + 1)),
+                 levels=[1, 6, 10, 12, 18, 20, 30], label="Hero level", value_fmt="+{:g}",
+                 inline_note_text="Echo Slam taken at hero levels 6, 12 and 18"))
     W(ul_close())
     W(subgroup("Abilities"))
     W(ability_change(
@@ -1021,7 +1025,7 @@ def build():
     W(ul_close())
     W(ability("Astral Spirit", slug="elder_titan_ancestral_spirit"))
     W(ul_open())
-    W(li("Astral Spirit no longer automatically rejoins Elder Titan on collision with him. Now requires the duration to run out or the Return ability to be cast", t("DEL")))
+    W(li("Astral Spirit no longer automatically rejoins Elder Titan on collision with him. Now requires the duration to run out or the Return ability to be cast", t("QoL")))
     W(ul_close())
 
     # Ember Spirit
@@ -1377,7 +1381,15 @@ def build():
 
     # Legion Commander
     W(hero_header("Legion Commander"))
-    W(ability("Outfight Them!", slug="legion_commander_outfight_them"))
+    # the game's text of both patches says how it works now (owner 2026-10-27: "unclear how it works now")
+    W(ability_change(
+        old=dict(name="Outfight Them!", slug="legion_commander_outfight_them",
+                 desc=game_ability_desc("legion_commander_outfight_them", "7.38c")),
+        new=dict(name="Outfight Them!", slug="legion_commander_outfight_them",
+                 desc=game_ability_desc("legion_commander_outfight_them")),
+        summary="Reworked: levels up with Duel, also works against heroes of your own level.",
+        tag="rework",
+    ))
     W(ul_open())
     W(li("Now levels up with Duel", t("REWORK")))
     W(li("Now applies when attacking enemy heroes that are equal or higher level than you, instead of only higher level enemy heroes", t("BUFF")))
@@ -1814,7 +1826,7 @@ def build():
     W(hero_header("Pudge"))
     W(ability("Rot", slug="pudge_rot"))
     W(ul_open())
-    W(li("Aghanim's Scepter instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 20%, now reduces Health Restoration by 20%", t("REWORK")))
+    W(li("Aghanim's Scepter instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 20%, now reduces Health Restoration by 20%", t("MISC")))
     W(ul_close())
 
     # Pugna

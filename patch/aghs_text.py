@@ -5,12 +5,17 @@ invented: a missing tooltip or a placeholder the KV doesn't have gives None.
     from patch.aghs_text import aghs_text
     aghs_text("legion_commander_overwhelming_odds", "shard", "7.40c")
 """
+import functools
+import json
+import os
 import re
 
 from patch.ability_kv import _hero_blocks
 from patch.item_ability_text import _clean, _fill
 from patch.loc_history import tooltip
 
+_NOT_IN_GAME = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "rules",
+                            "abilities_not_in_game.json")
 _KEYS = {"scepter": ("aghanim_description", "scepter_description"), "shard": ("shard_description",)}
 
 
@@ -142,13 +147,22 @@ def _granted(block, kind):
                for v in (av.values() if isinstance(av, dict) else ()))
 
 
+@functools.lru_cache(maxsize=1)
+def not_in_game():
+    """Hero abilities that sit in the game files but were never in the game — no slot or facet ever named them
+    (data/rules/abilities_not_in_game.json, tools/build_ability_registry.py; kind "code" ones are in the game)."""
+    with open(_NOT_IN_GAME, encoding="utf-8") as f:
+        return frozenset(s for s, r in json.load(f)["abilities"].items() if r["kind"] != "code")
+
+
 def holders(hero, kind, version):
     """The hero's abilities the upgrade improves or grants in `version` (the game's HasShardUpgrade /
-    IsGrantedByShard flags), sorted."""
+    IsGrantedByShard flags), sorted. Abilities that never were in the game are left out, though their KV keeps the
+    flag (owner 2026-10-27: Ice Age, Naga's Critical Strike, Invoker's Ability Draft copies)."""
     if not hero or kind not in _FLAGS:
         return []
     return sorted(s for s, b in _blocks(version).items()
-                  if s.startswith(hero + "_") and isinstance(b, dict)
+                  if s.startswith(hero + "_") and isinstance(b, dict) and s not in not_in_game()
                   and any(str(b.get(f, "0")).strip() == "1" for f in _FLAGS[kind]))
 
 

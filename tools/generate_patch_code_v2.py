@@ -544,6 +544,10 @@ _NOT_LOWER_IS_BUFF = re.compile(
 # Key = substring to look for (case-insensitive), Value = forced tag.
 # Add here when a generated scaffold consistently gets the wrong tag.
 TAG_OVERRIDES = {
+    # owner 2026-10-27 (7.39): convenience of control, not a gameplay change → QoL (first: the row also says
+    # "Now requires", which is REWORK below)
+    "added an auto-cast":              "QoL",   # Quill Spray: "Right-click the ability to … cast it"
+    "no longer automatically rejoins": "QoL",   # Astral Spirit: now the duration or Return brings it back
     "starts with all":              "MISC",
     "separate heal reduction":      "MISC",
     "health restoration consolidat": "MISC",  # "consolidated Health Restoration" = structural
@@ -575,10 +579,31 @@ TAG_OVERRIDES = {
 }
 
 
+_OLD_HEAL_STATS = re.compile(r"\bHealing, Health Regen, Lifesteal,? and Spell Lifesteal\b", re.I)
+_RENAME_SPLIT = re.compile(r"\b(?:now|replaced with)\b", re.I)
+_ROW_NUMS = re.compile(r"\d+(?:\.\d+)?(?:/\d+(?:\.\d+)?)*%?")
+
+
+def _heal_stats_renamed(clean):
+    """7.39: Health Restoration took the place of Healing / Health Regen / Lifesteal / Spell Lifesteal. A row that only
+    says so with the same numbers ("instead of reducing … by 14/21/28/35%, now reduces Health Restoration by
+    14/21/28/35%") renames the mechanic, the effect stays — MISC, not REWORK (owner 2026-10-27). Other numbers
+    (Outfight Them! 50% -> 30/40/50/60%) are a change."""
+    if not _OLD_HEAL_STATS.search(clean) or "health restoration" not in clean.lower():
+        return False
+    parts = _RENAME_SPLIT.split(clean, maxsplit=1)
+    if len(parts) != 2:
+        return False
+    before, after = (_ROW_NUMS.findall(p) for p in parts)
+    return bool(before) and before == after
+
+
 def _guess_tag(text):
     """Heuristic tag from row text. Returns 'BUFF'/'NERF'/'REWORK'/'NEW'/'DEL'/
     'MISC'/'QoL'/None. None means caller should derive from b()/badge."""
     clean = _strip_html(text)
+    if _heal_stats_renamed(clean):
+        return 'MISC'
     # Manual overrides checked first — highest priority
     clean_lower = clean.lower()
     for substr, tag in TAG_OVERRIDES.items():

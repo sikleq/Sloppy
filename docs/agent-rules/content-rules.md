@@ -305,3 +305,16 @@ Gift Bearer → Summon Spirit Bear, Spectral → Desolate (7.40). Передел
 → `ability_change` с одинаковым именем. Тексты old/new — из хранилища файлов игры (`patch/loc_history.py`, `abilities_english.txt` предыдущего и самого патча),
 числа — из `data/stats/<версия>` KV; не выдумывать. Генератор: `_postprocess_innate_rows_out_of_stats`
 (переносит строки, для удаления ставит `# TODO[innate-swap]`).
+
+## Способности, которых не было в игре (владелец 2026-10-27)
+
+В файлах игры лежат способности, которых игроки не видели: заготовки (Ice Age у Ancient Apparition, Tempest Recall у
+Arc Warden), старые остатки (Critical Strike у Naga — до 7.08), копии для Ability Draft (`invoker_emp_ad`), служебные
+(`…_stop`, `…_release`, пустые слоты). У них бывают флаги `IsGrantedByShard` / `IsGrantedByScepter`, и карточка
+Aghanim's называла их «Grants this ability». Учёт — `data/rules/abilities_not_in_game.json`
+(`python tools/build_ability_registry.py`, после каждого патча): способность героя, которую за 7.08 → сегодня не
+назвал ни один слот (`AbilityN`) героя или юнита и ни один фасет, с доказательствами (имя в подсказке, патчноуты,
+Liquipedia). Виды: `never` / `old` / `helper` / `draft`; `code` — всё-таки в игре (её выдаёт код), список с
+доказательствами в `patch/known_exceptions.KNOWN_UNSLOTTED_REAL`. Сайт не называет ни одну из них, кроме `code`
+(`patch/aghs_text.holders`). Тест: `tests/test_not_in_game.py`. Фасеты, помеченные `Deprecated` во всех своих патчах,
+тоже попадают в файл (`facets_never_live`; на 2026-10-27 — ни одного).

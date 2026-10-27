@@ -979,6 +979,17 @@ def facet_header(slug):
                   f'<h4 class="ability-title">{name}</h4>')
 
 
+def _facet_pane(desc, facet, version):
+    """(head, rows) of a facet card pane. A text that says no kind ("Passive: …") gets the kind of the ability the
+    facet changes (patch/ability_kv.facet_ability) — 7.39 Transference's card said no Passive (owner 2026-10-27).
+    No single ability named for the facet in the files: no kind, as before."""
+    from .ability_kv import ability_props, facet_ability
+    head, rows = _pane_parts(desc, facet=True)
+    abil = facet_ability(facet, version) if version and 'class="iab-kind"' not in head else None
+    kind = ability_props(abil, version)["kind"] if abil else ""
+    return _pane_parts(desc, props={"kind": kind}, facet=True) if kind else (head, rows)
+
+
 def new_facet(slug, desc, summary=None, tag="new"):
     """New or reworked facet — renders like ability_change(old=None, tag=...) but with facet styling."""
     from .badges import FACETS, _FACET_COLOR_GRADIENT
@@ -1004,7 +1015,7 @@ def new_facet(slug, desc, summary=None, tag="new"):
                     f'class="facet-icon-overlay" loading="lazy" width="72" height="72">') if icon_name else ''
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
                  f'style="background-image:{gradient}">{icon_overlay}</div>')
-    head_html, desc_html = _pane_parts(desc, facet=True)
+    head_html, desc_html = _facet_pane(desc, slug, _State.current_patch_version)
     default_summary = "New facet" if tag_key == "new" else "Reworked facet"
     summary_text = summary or default_summary
     tag_label = tag_key.upper()
@@ -1061,8 +1072,10 @@ def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_a
     icon_html = (f'<div class="ability-icon-wrap facet-icon-wrap" '
                  f'style="background-image:{gradient}">{icon_overlay}</div>')
 
-    def _pane_body(desc):
-        head, rows = _pane_parts(desc, facet=True)
+    from .meta import _prev_patch_version
+
+    def _pane_body(desc, version):
+        head, rows = _facet_pane(desc, slug, version)
         return f'{head}<div class="ability-change-body">{rows}</div>'
 
     def _ability_head(abil_slug):
@@ -1101,12 +1114,12 @@ def facet_change(slug, old_desc, new_desc, summary=None, old_ability=None, new_a
         f'<div class="ability-change unified-panes is-in-place" data-tag="new del rework">'
         f'<div class="ability-change-pane ability-change-old">'
         f'{_ability_head(old_ability)}'
-        f'{_pane_body(old_desc)}'
+        f'{_pane_body(old_desc, _prev_patch_version(_State.current_patch_version))}'
         f'</div>'
         f'<span class="ability-change-arrow">→</span>'
         f'<div class="ability-change-pane ability-change-new">'
         f'{_ability_head(new_ability)}'
-        f'{_pane_body(new_desc)}'
+        f'{_pane_body(new_desc, _State.current_patch_version)}'
         f'</div>'
         f'</div>'
     )

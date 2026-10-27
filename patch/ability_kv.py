@@ -75,7 +75,7 @@ def _levels(raw):
     return nums[0] if len(set(nums)) == 1 else "/".join(nums)
 
 
-def _kind(behavior):
+def _kind(behavior, innate=False):
     b = (behavior or "").upper()
     if "PASSIVE" in b:
         return "Passive"
@@ -83,7 +83,23 @@ def _kind(behavior):
         return "Toggle"
     if re.search(r"UNIT_TARGET|POINT|NO_TARGET|CHANNELLED|AUTOCAST", b):
         return "Active"
-    return ""
+    # an innate with nothing to cast is passive though its KV says only NOT_LEARNABLE (7.39 Electromagnetic
+    # Repulsion; owner 2026-10-27: "the header lacks Passive")
+    return "Passive" if innate else ""
+
+
+def _names_facet(node, facet):
+    """True when a KV block names the facet: a "special_bonus_facet_<facet>" value or "RequiresFacet" "<facet>"."""
+    if isinstance(node, dict):
+        return any(k == f"special_bonus_facet_{facet}" or (k == "RequiresFacet" and v == facet) or _names_facet(v, facet)
+                   for k, v in node.items())
+    return False
+
+
+def facet_ability(facet, version):
+    """The hero ability a facet changes — the one ability whose KV names the facet — or None (none or several)."""
+    hits = [s for s, b in _hero_blocks(version).items() if isinstance(b, dict) and _names_facet(b, facet)]
+    return hits[0] if len(hits) == 1 else None
 
 
 def ability_props(slug, version):
@@ -95,7 +111,8 @@ def ability_props(slug, version):
     if block:
         values = block.get("AbilityValues") or {}
         pick = lambda key: block.get(key) or values.get(key)
-        out.update(kind=_kind(block.get("AbilityBehavior")), castrange=_levels(pick("AbilityCastRange")),
+        out.update(kind=_kind(block.get("AbilityBehavior"), innate=str(block.get("Innate", "")).strip() == "1"),
+                   castrange=_levels(pick("AbilityCastRange")),
                    manacost=_levels(pick("AbilityManaCost")), healthcost=_levels(pick("AbilityHealthCost")),
                    cooldown=_levels(pick("AbilityCooldown")),
                    aoe=next((_levels(values[k]) for k in _RADIUS_KEYS if k in values), ""))

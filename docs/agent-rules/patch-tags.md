@@ -447,3 +447,19 @@ Aghanim's Scepter», владелец 2026-10-26, Kinetic Fence 7.41); стро�
 - «Now levels up with / Now scales with <способность> / Now upgrades with …» → **REWORK** (зеркало «No longer levels with»).
 - «Can no longer be cast while rooted» → **DEL** (Tusk 7.08 выровнен с 7.41c).
 - Тест: `test_owner_decisions_2026_09_27_del_qol_rework`.
+
+## Вычитка 7.39 (владелец 2026-10-27)
+
+| Строка | Тег | Почему |
+|---|---|---|
+| «Instead of reducing Healing, Health Regen, Lifesteal, and Spell Lifesteal by X, now reduces Health Restoration by X» (те же числа) | **MISC** | сменилось только имя механики, эффект тот же (Wyrm's Wrath, Frost Arrows, Skadi…). Другие числа (Outfight Them! 50% → 30/40/50/60%) — изменение |
+| «Added an auto-cast. Right-click …» | **QoL** | удобство управления (Quill Spray) |
+| «… no longer automatically rejoins … Now requires … Return» | **QoL** | Astral Spirit |
+| «Radius increase rescaled from (+50 every 10 hero levels) to (+40 every level of X)» | **`li_formula`** по уровню героя, BUFF/NERF по таблице | не REWORK (Aftershock; ульта взята на 6/12/18) |
+| «Aghanim's Shard **upgrade** reworked: …» | карточка old → new, строка скрыта | то же, что «Aghanim's Shard reworked:» (Batrider) |
+
+Генератор: `_heal_stats_renamed`, `TAG_OVERRIDES` (`tools/generate_patch_code_v2.py`); карточка — `_AGHS_REWORK_RE`
+(`patch/cards_aghs.py`). Тесты: `tests/test_review_739.py`. Оставлены как есть (линтер не прав): Roshan's message
+QoL, Blink «no longer has an overshoot range» BUFF, Invoker Scepter REWORK, Naga «no longer reduces enemy status
+resistance» DEL (вражеский дебафф), Sprout REWORK, Take Aim NEW; `l=True` у Grow / Focus Fire / Plague Ward bounty /
+Desolate / Infest / Riptide — штраф самого героя или выгода врагу.

@@ -1,0 +1,1106 @@
+{
+ "abilities": {
+  "abaddon_soul_suck": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "abaddon",
+   "kind": "never",
+   "last": "7.36a",
+   "liquipedia": null,
+   "name": "Soul Suck",
+   "patch_notes": null
+  },
+  "abyssal_underlord_portal_warp": {
+   "first": "7.30",
+   "flags": {},
+   "hero": "abyssal_underlord",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "ancient_apparition_ice_age": {
+   "first": "7.33",
+   "flags": {
+    "IsGrantedByShard": "1"
+   },
+   "hero": "ancient_apparition",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Ice Age",
+   "patch_notes": null
+  },
+  "antimage_mana_thirst": {
+   "first": "7.41",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "antimage",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "arc_warden_tempest_recall": {
+   "first": "7.34",
+   "flags": {},
+   "hero": "arc_warden",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Tempest Recall",
+   "patch_notes": null
+  },
+  "beastmaster_call_of_the_wild_hawk_attack": {
+   "first": "7.34",
+   "flags": {},
+   "hero": "beastmaster",
+   "kind": "never",
+   "last": "7.40c",
+   "liquipedia": null,
+   "name": "Hawk Attack",
+   "patch_notes": null
+  },
+  "beastmaster_hawk_perch": {
+   "first": "7.34",
+   "flags": {},
+   "hero": "beastmaster",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "beastmaster_summon_raptor_attack": {
+   "first": "7.41",
+   "flags": {},
+   "hero": "beastmaster",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "bounty_hunter_lookout": {
+   "first": "7.32",
+   "flags": {
+    "IsGrantedByShard": "1"
+   },
+   "hero": "bounty_hunter",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "brewmaster_drunken_brawler_brew_up": {
+   "first": "7.40",
+   "flags": {},
+   "hero": "brewmaster",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": "Drunken Brawler - Brew Up"
+  },
+  "brewmaster_fire_pull": {
+   "first": "7.40",
+   "flags": {},
+   "hero": "brewmaster",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "bristleback_brawlers_grit": {
+   "first": "7.41",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "bristleback",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Brawler's Grit",
+   "patch_notes": null
+  },
+  "centaur_overrun": {
+   "first": "7.28",
+   "flags": {},
+   "hero": "centaur",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Overrun",
+   "patch_notes": null
+  },
+  "chaos_knight_innate_spell_refund": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "chaos_knight",
+   "kind": "helper",
+   "last": "7.36c",
+   "name": null
+  },
+  "chen_innate_check_for_team_change": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "chen",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "chen_test_of_faith_teleport": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "chen",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "clinkz_empty1": {
+   "first": "7.31",
+   "flags": {},
+   "hero": "clinkz",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": "Creep Ability"
+  },
+  "clinkz_scepter": {
+   "first": "7.22",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "clinkz",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "crystal_maiden_ice_rink": {
+   "first": "7.32",
+   "flags": {},
+   "hero": "crystal_maiden",
+   "kind": "helper",
+   "last": "7.33e",
+   "name": null
+  },
+  "crystal_maiden_let_it_go": {
+   "first": "7.28",
+   "flags": {},
+   "hero": "crystal_maiden",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Let It Go",
+   "patch_notes": null
+  },
+  "dawnbreaker_unbreakable": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "dawnbreaker",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Unbreakable",
+   "patch_notes": null
+  },
+  "dazzle_rain_of_vermin": {
+   "first": "7.28",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "dazzle",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "death_prophet_innate_healing_mastery": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "death_prophet",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "disruptor_innate_kinetic_circle": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "disruptor",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "dragon_knight_frost_breath": {
+   "evidence": "Elder Dragon Form level 3 (Liquipedia: Dragon Knight, desc4 Frost Breath)",
+   "first": "7.08",
+   "flags": {},
+   "hero": "dragon_knight",
+   "kind": "code",
+   "last": "7.35d",
+   "name": "Frost Breath"
+  },
+  "drow_ranger_creep_rally": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "drow_ranger",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Creep Rally",
+   "patch_notes": null
+  },
+  "drow_ranger_silence": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "drow_ranger",
+   "kind": "old",
+   "last": "7.41f",
+   "liquipedia": "Drow Ranger.txt.gz: *** Drow Ranger's old ability, {{A|Drow Ranger|Silence}}, was identical to the Dark Rangers' {{wc3|Dark Ranger|Silence}}.",
+   "name": "Silence",
+   "patch_notes": null
+  },
+  "elder_titan_fundamental_fury": {
+   "first": "7.41",
+   "flags": {},
+   "hero": "elder_titan",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "elder_titan_fundamental_fury_spirit": {
+   "first": "7.41",
+   "flags": {},
+   "hero": "elder_titan",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "faceless_void_backtrack": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "faceless_void",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "furion_arboreal_might": {
+   "first": "7.33",
+   "flags": {},
+   "hero": "furion",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Arboreal Might",
+   "patch_notes": null
+  },
+  "furion_fecundity": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "furion",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "furion_greater_sprout": {
+   "first": "7.28",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "furion",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Greater Sprout",
+   "patch_notes": null
+  },
+  "furion_hedgerow": {
+   "first": "7.33",
+   "flags": {},
+   "hero": "furion",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Hedgerow",
+   "patch_notes": null
+  },
+  "furion_summon_fey": {
+   "first": "7.39",
+   "flags": {
+    "IsGrantedByShard": "1"
+   },
+   "hero": "furion",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "gyrocopter_lock_on": {
+   "first": "7.31",
+   "flags": {},
+   "hero": "gyrocopter",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "hoodwink_forager": {
+   "first": "7.41",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "hoodwink",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "hoodwink_tomokan_tracker": {
+   "first": "7.41",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "hoodwink",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Tomo'kan Tracker",
+   "patch_notes": null
+  },
+  "invoker_alacrity_ad": {
+   "first": "7.27",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": "Alacrity (AD)"
+  },
+  "invoker_attribute_bonus": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "old",
+   "last": "7.41f",
+   "liquipedia": "Abilities_Changelogs.txt.gz: * {{cf|Added}} {{A|Attributes|Attribute Bonus}} to every hero except {{H|Invoker}}.",
+   "name": "Attribute Bonus",
+   "patch_notes": null
+  },
+  "invoker_chaos_meteor_ad": {
+   "first": "7.27",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": "Chaos Meteor (AD)"
+  },
+  "invoker_cold_snap_ad": {
+   "first": "7.27",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": "Cold Snap (AD)"
+  },
+  "invoker_deafening_blast_ad": {
+   "first": "7.27",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": "Deafening Blast"
+  },
+  "invoker_emp_ad": {
+   "first": "7.27",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": "E.M.P. (AD)"
+  },
+  "invoker_forge_spirit_ad": {
+   "first": "7.27",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": "Forge Spirit (AD)"
+  },
+  "invoker_ghost_walk_ad": {
+   "first": "7.27",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": "Ghost Walk (AD)"
+  },
+  "invoker_ice_wall_ad": {
+   "first": "7.27",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": "Ice Wall (AD)"
+  },
+  "invoker_sun_strike_ad": {
+   "first": "7.27",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": "Sun Strike (AD)"
+  },
+  "invoker_tornado_ad": {
+   "first": "7.27",
+   "flags": {},
+   "hero": "invoker",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": "Tornado (AD)"
+  },
+  "juggernaut_innate_mask_crit_lifesteal": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "juggernaut",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "juggernaut_innate_mask_spin_crit": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "juggernaut",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "juggernaut_trinity": {
+   "first": "7.41",
+   "flags": {
+    "IsGrantedByShard": "1"
+   },
+   "hero": "juggernaut",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "juggernaut_vaulted_strike": {
+   "first": "7.41",
+   "flags": {
+    "IsGrantedByShard": "1"
+   },
+   "hero": "juggernaut",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "keeper_of_the_light_empty1": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "keeper_of_the_light",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": "Empty"
+  },
+  "keeper_of_the_light_empty2": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "keeper_of_the_light",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": "Empty"
+  },
+  "kez_falcon_rush_ad": {
+   "first": "7.38",
+   "flags": {},
+   "hero": "kez",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": null
+  },
+  "kez_ravens_veil_ad": {
+   "first": "7.38",
+   "flags": {},
+   "hero": "kez",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": null
+  },
+  "kez_shodo_sai_ad": {
+   "first": "7.38",
+   "flags": {},
+   "hero": "kez",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": null
+  },
+  "kez_talon_toss_ad": {
+   "first": "7.38",
+   "flags": {},
+   "hero": "kez",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": null
+  },
+  "kunkka_ghost_ship_fire_cannons": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "kunkka",
+   "kind": "helper",
+   "last": "7.36c",
+   "name": null
+  },
+  "kunkka_innate_kunkkas_flask": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "kunkka",
+   "kind": "helper",
+   "last": "7.36c",
+   "name": null
+  },
+  "kunkka_innate_kunkkas_spyglass": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "kunkka",
+   "kind": "helper",
+   "last": "7.36c",
+   "name": null
+  },
+  "legion_commander_intimidate": {
+   "first": "7.41",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "legion_commander",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "lich_dark_sorcery": {
+   "first": "7.20",
+   "flags": {},
+   "hero": "lich",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Unholy Pact",
+   "patch_notes": null
+  },
+  "lich_frost_aura": {
+   "first": "7.20",
+   "flags": {},
+   "hero": "lich",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Frost Aura",
+   "patch_notes": null
+  },
+  "lich_innate_chain_frost_bounces": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "lich",
+   "kind": "helper",
+   "last": "7.37e",
+   "name": null
+  },
+  "lich_innate_chain_frost_projectile_speed": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "lich",
+   "kind": "helper",
+   "last": "7.37e",
+   "name": null
+  },
+  "lich_variant_ice_rite": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "lich",
+   "kind": "helper",
+   "last": "7.37e",
+   "name": null
+  },
+  "life_stealer_empty_1": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "life_stealer",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "life_stealer_empty_2": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "life_stealer",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "life_stealer_empty_3": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "life_stealer",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "life_stealer_empty_4": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "life_stealer",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "lone_druid_entangling_claws": {
+   "first": "7.23",
+   "flags": {},
+   "hero": "lone_druid",
+   "kind": "never",
+   "last": "7.39e",
+   "liquipedia": null,
+   "name": "Entangling Claws",
+   "patch_notes": "patchnotes_english.txt: \"DOTA_Patch_7_36_lone_druid_hero_facet_1_lone_druid_true_form\"\t\t\"Transforms Lone Druid, providing him with bonus armor, increased health and improved versions o"
+  },
+  "luna_lunar_grace": {
+   "first": "7.23",
+   "flags": {},
+   "hero": "luna",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Lunar Blessing",
+   "patch_notes": "patchnotes_english.txt: \"DOTA_Patch_7_20_luna_talent\"\t\t\"Level 15 Talent changed from +24 Lunar Blessing Damage to +14 Lunar Blessing Attributes\""
+  },
+  "lycan_summon_wolves_bash": {
+   "first": "7.37",
+   "flags": {},
+   "hero": "lycan",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Ferocious Bite",
+   "patch_notes": null
+  },
+  "lycan_summon_wolves_hightail": {
+   "evidence": "the wolves' ability (Liquipedia: Lycan, Lycan Wolf Hightail)",
+   "first": "7.37",
+   "flags": {},
+   "hero": "lycan",
+   "kind": "code",
+   "last": "7.41f",
+   "name": "Hightail"
+  },
+  "magnataur_greater_shockwave": {
+   "first": "7.28",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "magnataur",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Rolling Shockwave",
+   "patch_notes": null
+  },
+  "mars_immovable": {
+   "first": "7.41",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "mars",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Immovable",
+   "patch_notes": null
+  },
+  "meepo_fling": {
+   "first": "7.41",
+   "flags": {},
+   "hero": "meepo",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Fling",
+   "patch_notes": "patchnotes_english.txt: \"DOTA_Patch_7_32c_meepo_meepo_divided_we_stand\"\t\t\"Shard Fling Slow increased from 50% to 60%\""
+  },
+  "meepo_fling_release": {
+   "first": "7.41",
+   "flags": {},
+   "hero": "meepo",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": "Fling Release"
+  },
+  "mirana_nightveil": {
+   "first": "7.41",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "mirana",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "morphling_hybrid": {
+   "evidence": "Aghanim's Scepter 7.08 (data/rules/aghs_granted_old.json; Liquipedia {{A|Morphling|Hybrid}})",
+   "first": "7.08",
+   "flags": {},
+   "hero": "morphling",
+   "kind": "code",
+   "last": "7.41f",
+   "name": "Hybrid"
+  },
+  "morphling_syntropy": {
+   "first": "7.41",
+   "flags": {},
+   "hero": "morphling",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Syntropy",
+   "patch_notes": null
+  },
+  "muerta_grave_tracker": {
+   "first": "7.33",
+   "flags": {},
+   "hero": "muerta",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "muerta_grave_visitation": {
+   "first": "7.33",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "muerta",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "naga_siren_crit": {
+   "first": "7.28",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "naga_siren",
+   "kind": "old",
+   "last": "7.41f",
+   "liquipedia": "Naga Siren.txt.gz: ** Naga Siren's old ability, {{A|Naga Siren|Critical Strike}}, was identical to the Blademaster's {{wc3|Blademaster|Critical Strike}}.",
+   "name": "Critical Strike",
+   "patch_notes": null
+  },
+  "naga_siren_reel_in_ad": {
+   "first": "7.39b",
+   "flags": {},
+   "hero": "naga_siren",
+   "kind": "draft",
+   "last": "7.41f",
+   "name": null
+  },
+  "naga_siren_slithereen_cutlass": {
+   "first": "7.41",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "naga_siren",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Slithereen Cutlass",
+   "patch_notes": null
+  },
+  "necrolyte_sadist_stop": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "necrolyte",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "obsidian_destroyer_mind_over_matter": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "obsidian_destroyer",
+   "kind": "helper",
+   "last": "7.19d",
+   "name": null
+  },
+  "ogre_magi_school": {
+   "first": "7.41",
+   "flags": {},
+   "hero": "ogre_magi",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "omniknight_angelic_flight": {
+   "first": "7.28",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "omniknight",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Angelic Flight",
+   "patch_notes": null
+  },
+  "omniknight_pacify": {
+   "first": "7.20",
+   "flags": {},
+   "hero": "omniknight",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Divine Sanction",
+   "patch_notes": null
+  },
+  "primal_beast_innate_slow_resistance_per_time": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "primal_beast",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "primal_beast_innate_status_resistance_per_time": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "primal_beast",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "shadow_shaman_innate_piglet_pole": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "shadow_shaman",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "shadow_shaman_innate_snake_jar": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "shadow_shaman",
+   "kind": "helper",
+   "last": "7.40c",
+   "name": null
+  },
+  "shadow_shaman_serpentine": {
+   "first": "7.28",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "shadow_shaman",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Serpentine",
+   "patch_notes": null
+  },
+  "slardar_scepter": {
+   "first": "7.22",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "slardar",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "sniper_take_aim_stop": {
+   "first": "7.41",
+   "flags": {},
+   "hero": "sniper",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": "Stop Take Aim"
+  },
+  "spirit_breaker_knockback_amp": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "spirit_breaker",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "techies_snare_trap": {
+   "first": "7.41",
+   "flags": {
+    "IsGrantedByShard": "0"
+   },
+   "hero": "techies",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Snare Trap",
+   "patch_notes": null
+  },
+  "templar_assassin_hidden_gates": {
+   "first": "7.39",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "templar_assassin",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Hidden Gates",
+   "patch_notes": null
+  },
+  "templar_assassin_meditation_end": {
+   "first": "7.41",
+   "flags": {},
+   "hero": "templar_assassin",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": "End Meditation"
+  },
+  "tinker_innate_keen_teleport_gold_on_death": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "tinker",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "tinker_innate_keen_teleport_xp_on_death": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "tinker",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "tinker_shrink_ray": {
+   "evidence": "Aghanim's Scepter 7.28 (Liquipedia: Version 7.28, Scepter Rework: Shrink Ray)",
+   "first": "7.28",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "tinker",
+   "kind": "code",
+   "last": "7.41f",
+   "name": "Shrink Ray"
+  },
+  "tiny_rocksteady": {
+   "first": "7.36",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "tiny",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Rocksteady",
+   "patch_notes": null
+  },
+  "treant_super_bloom": {
+   "evidence": "Aghanim's Scepter 7.40 (Liquipedia: Treant Protector, Super Bloom buff)",
+   "first": "7.40",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "treant",
+   "kind": "code",
+   "last": "7.41f",
+   "name": "Super Bloom"
+  },
+  "troll_warlord_innate_masterful": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "troll_warlord",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "troll_warlord_innate_unflinching": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "troll_warlord",
+   "kind": "helper",
+   "last": "7.36c",
+   "name": null
+  },
+  "troll_warlord_scepter": {
+   "first": "7.22",
+   "flags": {
+    "IsGrantedByScepter": "1"
+   },
+   "hero": "troll_warlord",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "tusk_ice_shards_stop": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "tusk",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": "Ice Shards Stop"
+  },
+  "undying_tombstone_unit_grab": {
+   "evidence": "Tombstone's Grab Ally 7.33–7.33d (Liquipedia: {{A|Undying|Grab Ally (7.33-7.33d)}})",
+   "first": "7.33",
+   "flags": {},
+   "hero": "undying",
+   "kind": "code",
+   "last": "7.41f",
+   "name": "Grab Ally"
+  },
+  "undying_tombstone_zombie_aura": {
+   "first": "7.08",
+   "flags": {},
+   "hero": "undying",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  },
+  "undying_zombie_master": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "undying",
+   "kind": "helper",
+   "last": "7.39b",
+   "name": null
+  },
+  "venomancer_area_poison": {
+   "first": "7.28",
+   "flags": {},
+   "hero": "venomancer",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Venomancer Scepter",
+   "patch_notes": null
+  },
+  "viper_innate_corrosive_skin_vile": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "viper",
+   "kind": "helper",
+   "last": "7.36c",
+   "name": null
+  },
+  "viper_innate_corrosive_skin_virulent": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "viper",
+   "kind": "helper",
+   "last": "7.36c",
+   "name": null
+  },
+  "winter_wyvern_accelerated_learning": {
+   "first": "7.41",
+   "flags": {
+    "Innate": "1"
+   },
+   "hero": "winter_wyvern",
+   "kind": "never",
+   "last": "7.41f",
+   "liquipedia": null,
+   "name": "Eldwurm Studies",
+   "patch_notes": null
+  },
+  "witch_doctor_innate_maledict_heal_reduction": {
+   "first": "7.36",
+   "flags": {},
+   "hero": "witch_doctor",
+   "kind": "helper",
+   "last": "7.41f",
+   "name": null
+  }
+ },
+ "facets_never_live": {},
+ "source": "every patch's own build, 7.08 → today (tools/build_ability_registry.py)"
+}

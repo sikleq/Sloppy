@@ -144,3 +144,15 @@ KNOWN_INNATE_NO_CDN_ICON = {
     "clinkz_bone_and_arrow",
     "slardar_seaborn_sentinel",
 }
+
+# Hero abilities no Ability slot or facet ever names (7.08 → today) that were in the game all the same: the game
+# grants them in code. Each with the evidence; tools/build_ability_registry.py marks them kind "code" and the site
+# keeps them. Every other never-slotted one is dust in the files (data/rules/abilities_not_in_game.json).
+KNOWN_UNSLOTTED_REAL = {
+    "dragon_knight_frost_breath": "Elder Dragon Form level 3 (Liquipedia: Dragon Knight, desc4 Frost Breath)",
+    "lycan_summon_wolves_hightail": "the wolves' ability (Liquipedia: Lycan, Lycan Wolf Hightail)",
+    "morphling_hybrid": "Aghanim's Scepter 7.08 (data/rules/aghs_granted_old.json; Liquipedia {{A|Morphling|Hybrid}})",
+    "tinker_shrink_ray": "Aghanim's Scepter 7.28 (Liquipedia: Version 7.28, Scepter Rework: Shrink Ray)",
+    "treant_super_bloom": "Aghanim's Scepter 7.40 (Liquipedia: Treant Protector, Super Bloom buff)",
+    "undying_tombstone_unit_grab": "Tombstone's Grab Ally 7.33–7.33d (Liquipedia: {{A|Undying|Grab Ally (7.33-7.33d)}})",
+}
