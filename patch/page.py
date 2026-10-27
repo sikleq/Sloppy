@@ -17,6 +17,11 @@ _ASSET_VERSION = _site.compute_asset_version()
 
 def write_head(version, date):
     """Render head + top nav (Patches+Calendar tabs + version) + container + toolbar."""
+    if H:
+        # rows written after the previous page's save_html would open this page, above its header (2026-10-27: 7.38c's
+        # last talent block sat after save_html — 7.39 began with it and lost its layout)
+        raise RuntimeError(f"{version}: {len(H)} fragment(s) written after the previous page was saved: "
+                           f"{''.join(H)[:200]!r}")
     _State.current_patch_version = version
     _State.current_entity_key = None
     _State.current_section_slug = None

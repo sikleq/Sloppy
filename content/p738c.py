@@ -704,10 +704,10 @@ def build():
     W(ul_open())
     W(li("Mana Cost increased from 200 to 225", b(200, 225, l=True)))
     W(ul_close())
-
-    write_footer()
-    save_html('patches/7.38c.html')
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent +25%/-25% Bone Guard Duration / Cooldown replaced with +2s Wraithfire Blast Slow Duration", t("SWAP"), facet="skeleton_king_facet_bone_guard"))
     W(ul_close())
+
+    write_footer()
+    save_html('patches/7.38c.html')
