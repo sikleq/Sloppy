@@ -398,6 +398,10 @@ CANONICAL_TAGS = [
     (re.compile(r'\bno longer uses charges\b', re.I),            'REWORK'),  # how the item is used changes
     (re.compile(r'\bcan now be dispelled\b|\bis now dispellable\b', re.I), 'NERF'),   # the effect can now be removed
     (re.compile(r'\bcan no longer be dispelled\b', re.I),        'BUFF'),
+    # a new condition on using it is a restriction, not a feature taken away (owner 2026-10-27, Helm of the Dominator
+    # 7.39e "Dominate can no longer be used if the currently dominated creep took damage …": NERF, not DEL); "Can no
+    # longer be cast while rooted" stays DEL (owner 2026-09-27, patch-tags.md)
+    (re.compile(r'\bcan no longer be used (?:if|when|after|within)\b', re.I), 'NERF'),
     # a protection is gone -> a NEW way to interact with it (Kobold aura can now be broken)
     (re.compile(r'\bno longer unbreakable\b', re.I),             'NEW'),
     # something that did not exist before: a cooldown, a restore on use

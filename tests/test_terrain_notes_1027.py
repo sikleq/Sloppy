@@ -55,3 +55,13 @@ def test_a_tree_note_shows_the_trees_layer_and_the_removed_tree_only_on_the_old_
     assert any(_red(sides["old"], (x, 180 - 23)) for x in range(160, 200))
     raw = sides["new"].tobytes()
     assert not any(raw[i] > 150 and raw[i + 1] < 120 for i in range(0, len(raw), 3))   # nothing red on the right
+
+
+def test_a_terrain_row_with_a_percent_tints_its_number():
+    """7.40 "Watcher night vision range decreased from 800 to 450" -44% (owner 2026-10-27): the number chip lightly in
+    the % colour; a row with a text tag only keeps the plain number."""
+    from patch.badges import b
+    assert elements.terrain_num_chip(4, b(800, 450)) == '<span class="badge tnum tnum-nerf">4</span>'
+    assert elements.terrain_num_chip(5, b(450, 800)) == '<span class="badge tnum tnum-buff">5</span>'
+    tag = '<span class="badge del" data-tag="del" data-overall="nerf">DEL</span>'
+    assert elements.terrain_num_chip(1, tag) == '<span class="badge tnum">1</span>'

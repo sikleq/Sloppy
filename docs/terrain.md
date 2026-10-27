@@ -781,6 +781,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   `match` in `data/terrain_spots.json` (`patch/elements.terrain_note`, counted per page). 7.38c's jungle one shows the
   5 tree changes no other picture covers; the Bottom Lane one has none — all its tree changes are in the pictures of
   the rows above.
+- A terrain row with a % (a `b()` badge on the patch page: 7.40 "Watcher night vision range decreased from 800 to
+  450" -44%) tints its number chip lightly in the %'s colour, green / red like the text BUFF / NERF chips
+  (`patch/elements.terrain_num_chip`, `.badge.tnum.tnum-buff/-nerf`). Rows with a text tag only keep the gold number.
 - Notes the map files can't show yet (owner's todo 2026-10-27: find out what changed; checked against the gridnav, the entities and the trees): 7.38c "Fixed unnecessary
   pathing blockers at the left of the entrance to the Dire Base through the team only gate" (no cell or entity near
   the Dire gates changed), 7.39b "Fixed some locations that were incorrectly blocked for warding" (the gridnav of

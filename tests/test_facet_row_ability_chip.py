@@ -17,8 +17,10 @@ def _facet_row(text):
 
 def test_a_facet_row_naming_an_ability_shows_its_icon():
     row = _facet_row("Defense Matrix: No longer blinks Tinker if he is rooted or leashed")
-    assert ('<span class="ability-chip" role="img" aria-label="Defense Matrix"><img src="../icons/abilities/'
-            'tinker_defense_matrix.png"') in row
+    chip = ('<span class="ability-chip" data-tooltip="Defense Matrix" role="img" aria-label="Defense Matrix"><img '
+            'src="../icons/abilities/tinker_defense_matrix.png" alt="" loading="lazy" width="19" height="19"></span>')
+    # the name only on hover, as a facet talent's facet chip (owner 2026-10-27)
+    assert f'{chip}No longer blinks Tinker' in row and "Defense Matrix:" not in row
 
 
 def test_a_facet_row_without_an_ability_name_gets_none():

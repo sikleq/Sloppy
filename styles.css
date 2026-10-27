@@ -4348,7 +4348,8 @@ h4.subgroup {
   object-fit: contain;
   filter: drop-shadow(0 1px 1px var(--shadow-55));
 }
-.facet-chip[data-tooltip]::after {
+.facet-chip[data-tooltip]::after,
+.ability-chip[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: calc(100% + 8px);
@@ -4367,23 +4368,26 @@ h4.subgroup {
   transition: opacity 0.12s 0.05s;
   box-shadow: 0 4px 18px var(--shadow-45);
 }
-.facet-chip[data-tooltip]:hover::after {
+.facet-chip[data-tooltip]:hover::after,
+.ability-chip[data-tooltip]:hover::after {
   opacity: 1;
 }
-/* a facet row's ability ("Defense Matrix: …"): its icon as a square the size of the facet chip (owner 2026-10-27) */
+/* a facet row's ability ("Defense Matrix: …"): its icon as a square the size of the facet chip in place of the
+   name, the name on hover (owner 2026-10-27) */
 .ability-chip {
+  position: relative;
   display: inline-flex;
   width: 19px;
   height: 19px;
   margin-right: 5px;
   vertical-align: -4px;
   border-radius: 3px;
-  overflow: hidden;
   box-shadow: 0 0 0 1px var(--muted-35);
 }
 .ability-chip > img {
   width: 100%;
   height: 100%;
+  border-radius: 3px;
   object-fit: cover;
 }
 .facet-icon-overlay {
@@ -4807,6 +4811,11 @@ ul.subnote-items > li::before {
   font-size: 13.5px;
   font-weight: 600;
   color: #dbd5c8;
+}
+/* the title's tag as wide as every row's (owner 2026-10-27, 7.40 Assist Gold Formula: REWORK 60px beside 64px) */
+.formula-change-title > .badge {
+  width: 64px;
+  min-width: 64px;
 }
 /* Number input — reader plugs in their own value; scripts.js recomputes rows. */
 .formula-input-row {
@@ -10902,6 +10911,9 @@ body.patch-page .cat-panel > .entity-block:last-child > ul.changes:last-child { 
    terrain notes, just numbers from 1 in each category) */
 .badge.tnum   { font-family: var(--font-j10); font-size: 15px; font-weight: 400; line-height: 11px; text-align: center;
   color: var(--gold-dim); background: rgba(227, 196, 106, 0.06); border-color: rgba(227, 196, 106, 0.30); }
+/* ... a row with a % lightly in its colour, as the text BUFF / NERF chips (owner 2026-10-27, 7.40 Watcher rows) */
+.badge.tnum.tnum-buff { color: #6da375; background: rgba(85, 205, 115, 0.10); border-color: rgba(85, 205, 115, 0.28); }
+.badge.tnum.tnum-nerf { color: #9a666d; background: rgba(199, 101, 115, 0.10); border-color: rgba(199, 101, 115, 0.28); }
 /* Pressed filter chip = a neon sign: the letters glow in the chip's own colour and the frame
    lights up with a soft halo of the same colour (no plain outline ring). */
 .legend-tags .badge.filter-btn.active,

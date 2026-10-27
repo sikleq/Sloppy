@@ -865,16 +865,18 @@ _FACET_ROW_ABILITY_RE = re.compile(r"([A-Z][\w'.\- ]{2,40}?):\s")
 
 def _facet_row_ability_chip(text):
     """A facet's row that opens with an ability's name ("Defense Matrix: No longer blinks Tinker …", 7.39b
-    Translocator) gets that ability's icon as a small square before it, like a facet talent's facet chip (owner
-    2026-10-27); no name on hover — the row says it. A name that is no ability of the hero's with an icon: nothing."""
+    Translocator): that ability's icon as a small square in place of the name, the name on hover only — like a facet
+    talent's facet chip (owner 2026-10-27). The row's text with the chip, or the text as it was when the name is no
+    ability of the hero's with an icon."""
     m = _FACET_ROW_ABILITY_RE.match(text) if _State.current_hero else None
     if not m:
-        return ""
+        return text
     slug = _hero_ability_slug(_State.current_hero, m.group(1))
     if slug not in _LOCAL_ABIL_ICONS:
-        return ""
-    return (f'<span class="ability-chip" role="img" aria-label="{_html.escape(m.group(1))}"><img src="{ABIL_CDN}'
-            f'{slug}.png" alt="" loading="lazy" width="19" height="19"></span>')
+        return text
+    label = _html.escape(m.group(1))
+    return (f'<span class="ability-chip" data-tooltip="{label}" role="img" aria-label="{label}"><img src="{ABIL_CDN}'
+            f'{slug}.png" alt="" loading="lazy" width="19" height="19"></span>{text[m.end():]}')
 
 
 def ability(title, slug=None, innate=None, icon_url=None, sub=False, old_title=None):
@@ -1565,10 +1567,13 @@ def terrain_button(html, phrase):
     return out
 
 
-def terrain_num_chip(n):
+def terrain_num_chip(n, badge=""):
     """A terrain row's chip: its number in its category, in the tag chip's frame (the owner 2026-10-03: "the rows
-    are just numbered instead of tag chips")."""
-    return f'<span class="badge tnum">{n}</span>'
+    are just numbered instead of tag chips"). A row with a % (its b() badge: buff / nerf) tints the chip lightly in
+    that colour (owner 2026-10-27, 7.40 "Watcher night vision range decreased from 800 to 450")."""
+    m = re.search(r'class="badge (buff|nerf)\d', badge or "")      # a b() badge's % tier, not a t() tag
+    tone = f" tnum-{m.group(1)}" if m else ""
+    return f'<span class="badge tnum{tone}">{n}</span>'
 
 
 def sub_ability(slug, name):
@@ -1767,7 +1772,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         # a terrain row's chip is its number in its category (the owner 2026-10-03: "just number the rows instead of
         # tag chips"); data-tag keeps the tag for the filters / weights
         _State.terrain_rows += 1
-        left_tag = terrain_num_chip(_State.terrain_rows)
+        left_tag = terrain_num_chip(_State.terrain_rows, badge if force_tag is None else "")
 
     classes = ["terrain-row"] if _State.terrain_rows is not None and isinstance(text, str) else []
     if major:                 # the change that sums up a patch (7.41 "Facets removed from the game"): a stand-out row
@@ -1886,8 +1891,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         # Profit); only on screen — the weights and the talent context read the row's own words
         text_inner = f'{_facet_chip(facet)} {text_inner}'
     elif _State.current_block_is_facet and isinstance(text_inner, str):
-        chip = _facet_row_ability_chip(text_inner)
-        text_inner = f'{chip}{text_inner}' if chip else text_inner
+        text_inner = _facet_row_ability_chip(text_inner)
     # An ability row with its own chip keeps the chip as the li's first child: page.py
     # marks its whole box `ability-box-tagged`, and the CSS moves the box right by the tag
     # column so the chip sits in the SAME column, size and height as every other row's

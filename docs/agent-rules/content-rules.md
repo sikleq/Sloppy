@@ -9,6 +9,12 @@
 
 Строки с «No longer» → всегда DEL, не NERF. Строки «Level N Talent X replaced with Y» → SWAP (с 2026-09-26; слот остаётся, контент меняется).
 
+Исключение (владелец 2026-10-27, Helm of the Dominator 7.39e): «can no longer be used **if / when / after …**» —
+новое условие на применение, то есть ограничение → **NERF** («Dominate can no longer be used if the currently dominated
+creep took damage…»). «Can no longer be cast while rooted / Snowballed» остаётся DEL (владелец 2026-09-27,
+patch-tags.md), как и «can no longer be cast on enemies». Генератор: `CANONICAL_TAGS`; тест
+`tests/test_no_longer_usable_is_nerf.py`.
+
 ## «No longer has a penalty» → BUFF
 
 «No longer» + **negative noun** (penalty, downside, restriction, limitation, damage penalty, cooldown penalty) = BUFF — удаление штрафа это хорошо для героя.
