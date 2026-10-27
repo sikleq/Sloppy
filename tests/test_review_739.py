@@ -73,6 +73,17 @@ def test_ringmasters_souvenir_rows():
                         "Creep or Roshan") == "DEL"
 
 
+def test_a_follow_up_list_stays_in_its_rows_note():
+    """7.38c Flaming Lasso: "The following abilities continue to break the lasso" is the rest of the row above's note
+    (the generator writes it so), not a row of its own (owner 2026-10-27)."""
+    import glob
+    import os
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    bad = [f"{os.path.basename(p)}:{n}" for p in glob.glob(os.path.join(root, "content", "p*.py"))
+           for n, line in enumerate(open(p, encoding="utf-8"), 1) if 'W(li("The following abilities continue' in line]
+    assert not bad, bad
+
+
 def test_losing_the_blink_overshoot_penalty_is_a_buff():
     # a click past max range used to blink 75% of it (owner 2026-10-27)
     assert g._guess_tag("Blink no longer has an overshoot range") == "BUFF"

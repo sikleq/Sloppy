@@ -4032,7 +4032,8 @@ h4.subgroup .subgroup-new-type {
 /* ... and 15px right, the mirror: the cards' % bands end on the change rows' % column (owner 2026-09-27,
    Battle Fury 7.38: -23% in the card vs -14% in the row) */
 body.patch-page .entity-block > .components-change,
-body.patch-page .entity-block > .properties-change { margin-left: -15px; margin-right: -15px; }
+body.patch-page .entity-block > .properties-change,
+body.patch-page .entity-block > .ench-change { margin-left: -15px; margin-right: -15px; }   /* the tiers table too (2026-10-27) */
 /* a new item's cost box and a full-width item ability box (no chip column) hang the same way, so every
    item box starts on one line (owner 2026-09-27: Orb of Frost 7.38 sat 15px right of Block of Cheese
    and Orb of Venom) */

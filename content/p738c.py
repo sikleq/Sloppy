@@ -39,18 +39,10 @@ def build():
     W(li("Damage bonus increased from +50 to +55", b(50, 55)))
     W(ul_close())
     W(item_header("Helm of the Dominator"))
-    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
-    W(item_abilities_change(
-        old=["Active: Dominate. Takes control of one neutral, non-ancient target unit and sets its movement speed to 380 and max health to a minimum of 1000. Also provides the unit with +25 base attack damage, +12 health regen, +4 mana regen and +4 armor. Dominated units with a max health of greater than 1000 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 100 gold. Cast Range: 700. Cooldown: 45s"],
-        new=["Active: Dominate. Takes control of one neutral, non-ancient target unit and sets its movement speed to 380 and max health to a minimum of 1000. Also provides the unit with +25 base attack damage, +12 health regen, +4 mana regen and +4 armor. Dominated units with a max health of greater than 1000 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 100 gold and it can no longer be killed by abilities that instantly kill creeps otherwise. Cast Range: 700. Cooldown: 45s"]))
     W(ul_open())
     W(li("Dominated creep is now considered a creep-hero", t("NEW"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
     W(ul_close())
     W(item_header("Helm of the Overlord"))
-    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
-    W(item_abilities_change(
-        old=["Active: Dominate. Takes control of one neutral target unit and sets its movement speed to 380 and max health to a minimum of 1800. Also provides the unit with +70 base attack damage, +12 health regen, +4 mana regen, +7 armor, and levels up some abilities of the target by 1 level. Dominated units with a max health of greater than 1800 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 250 gold. Cast Range: 700. Cooldown: 45s"],
-        new=["Active: Dominate. Takes control of one neutral target unit and sets its movement speed to 380 and max health to a minimum of 1800. Also provides the unit with +70 base attack damage, +12 health regen, +4 mana regen, +7 armor, and levels up some abilities of the target by 1 level. Dominated units with a max health of greater than 1800 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 250 gold and it can no longer be killed by abilities that instantly kill creeps otherwise. Cast Range: 700. Cooldown: 45s"]))
     W(ul_open())
     W(li("Dominated creep is now considered a creep-hero", t("NEW"), extra=inline_note("It cannot be dominated, persuaded or enchanted, and it isn't instantly killed by Hand of Midas, Mirana's Sacred Arrow, etc.")))
     W(ul_close())
@@ -227,10 +219,9 @@ def build():
             "Terrorblade's Terror Wave<br>"
             "Tinker's Defense Matrix (blink with Translocator facet)<br>"
             "Tinker's Warp Flare (still applies damage, but does not move the target)<br>"
-            "Tusk's Walrus Kick (still applies damage, but does not move the target)"
-        )))
-    W(li("The following abilities continue to break the lasso", t("MISC"),
-        extra=inline_note(
+            "Tusk's Walrus Kick (still applies damage, but does not move the target)<br><br>"
+            # one row, as the generator writes it (owner 2026-10-27: the second list was a row of its own)
+            "The following abilities continue to break the lasso:<br>"
             "Centaur Warrunner's Hitch a Ride<br>"
             "Chaos Knight's Reality Rift<br>"
             "Disruptor's Glimpse<br>"
