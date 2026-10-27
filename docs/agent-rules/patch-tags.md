@@ -475,10 +475,9 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 - Обычная способность стала врождённой («Now is an innate ability…», 7.39 Blur) — карточка old → new из текстов игры,
   как Slugger: итог «<Имя> is now an innate ability.», строка скрыта.
 - Улучшение Aghanim's ушло со способности целиком на другую («No longer upgraded with Aghanim's Shard» → «Removed
-  Aghanim's Shard bonus from this ability.», 7.39 Mist Coil → Aphotic Shield): карточка старое → новое стоит **под
-  способностью, которая его потеряла**, без заголовка (строка — заголовок), чтобы было видно, что работает теперь;
-  способность, которая его получила, — «Added Aghanim's Shard.» только с новым текстом (`left_here`, `_added_alone`
-  в `patch/cards_aghs.py`, тест `tests/test_aghs_left_here.py`).
+  Aghanim's Shard bonus from this ability.», 7.39 Mist Coil → Aphotic Shield): под потерявшей — только эта строка,
+  карточка «Added Aghanim's Shard.» старое → новое — под способностью, которая его получила (владелец 2026-10-27:
+  карточка и там, и там — лишняя). Тест `tests/test_aghs_left_here.py`.
 - Шапка карточки — в одну строку: «Aghanim's» в ней — иконка улучшения («granted by [иконка] Shard»), числа 14px.
 - Ringmaster 7.39: «will be granted one upon death (instead of upon respawn)» — **NEW**, «will no longer be granted …»
   — **DEL**.
