@@ -4290,6 +4290,23 @@ h4.subgroup {
   object-fit: cover;
   box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px var(--shadow-40);
 }
+/* A facet's ability without art of its own (7.38b Venomous Volley): the facet's gradient + icon, as a facet block's */
+.ability-block > .ability-icon-wrap > .facet-ability-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  background-size: cover;
+  box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px var(--shadow-40);
+}
+.facet-ability-icon > img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px var(--shadow-55));
+}
 /* Facet block — same 48px geometry as ability(), but the icon-wrap renders
    the facet's gradient color + the generic facet icon (extracted from
    pak01_dir.vpk, white silhouette on transparent) overlaid on top.

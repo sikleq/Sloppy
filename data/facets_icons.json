@@ -1271,6 +1271,10 @@
   "Red0",
   "snake"
  ],
+ "medusa_slow_attacks": [
+  "Yellow2",
+  "slow"
+ ],
  "magnataur_eternal_empowerment": [
   "Gray1",
   "empower"

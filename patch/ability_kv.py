@@ -96,6 +96,35 @@ def _names_facet(node, facet):
     return False
 
 
+@functools.lru_cache(maxsize=None)
+def _facet_grants(version):
+    """{ability slug: facet slug} of the abilities a facet grants in a version (Facets → <facet> → Abilities →
+    AbilityName in the heroes' KV of that patch's build, the game-files store)."""
+    from patch.kv import parse_kv as _parse
+    if version not in game_files.versions():
+        return {}
+    texts = [game_files.npc(version, "npc_heroes.txt") or ""] + [
+        game_files.read(version, p) or "" for p in game_files.listing(version, "scripts/npc/heroes")
+        if p.rsplit("/", 1)[-1].startswith("npc_dota_hero_")]
+    out = {}
+    for text in texts:
+        for root in _parse(text).values():
+            for hero in (root.values() if isinstance(root, dict) else []):
+                for fslug, f in ((hero.get("Facets") or {}).items() if isinstance(hero, dict) else []):
+                    if not isinstance(f, dict) or f.get("Deprecated"):
+                        continue                # 7.41: facets gone, their abilities live on as innates (Slugger)
+                    for a in (f.get("Abilities") or {}).values():
+                        if isinstance(a, dict) and a.get("AbilityName"):
+                            out.setdefault(a["AbilityName"], fslug)
+    return out
+
+
+def facet_of_ability(slug, version):
+    """The facet that grants an ability in a version, or None (7.38b Venomous Volley: Medusa's slow-attacks facet; a
+    hidden passive without art of its own — the game shows the facet's icon)."""
+    return _facet_grants(version).get(slug) if slug and version else None
+
+
 def facet_ability(facet, version):
     """The hero ability a facet changes — the one ability whose KV names the facet — or None (none or several)."""
     hits = [s for s, b in _hero_blocks(version).items() if isinstance(b, dict) and _names_facet(b, facet)]

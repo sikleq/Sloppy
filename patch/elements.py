@@ -884,7 +884,14 @@ def ability(title, slug=None, innate=None, icon_url=None, sub=False, old_title=N
                       f'title="missing icon: {title}">')
     elif slug and not icon_url and slug not in _LOCAL_ABIL_ICONS:
         _State.ability_icons.add(f"{ABIL_CDN}{slug}.png")
-        if is_innate:
+        from .ability_kv import facet_of_ability
+        from .badges import FACETS
+        facet = facet_of_ability(slug, _State.current_patch_version)
+        if facet in FACETS:
+            # a facet's ability without art of its own: the facet's icon, as the game shows it (owner 2026-10-27,
+            # 7.38b Venomous Volley); no innate marker, no "missing"
+            icon_inner, skip_marker = _facet_icon_html(facet), True
+        elif is_innate:
             icon_inner = (f'<img src="{INNATE_ICON_URL}" alt="{title}" '
                           f'class="ability-icon-img" loading="lazy" width="128" height="128" '
                           f'data-slug="{slug}">')
@@ -979,17 +986,30 @@ def facet_header(slug):
                   f'<h4 class="ability-title">{name}</h4>')
 
 
-def _facet_chip(slug):
-    """A facet as a small square, as its header's icon: the facet's gradient and icon, the name on hover only (owner
-    2026-10-27: the named chip made a talent row too long)."""
+def _facet_parts(slug):
+    """(name, gradient css, icon file stem or None) of a facet."""
     from .badges import FACETS, _FACET_COLOR_GRADIENT
     from .images import _FACET_ICONS
     if slug not in FACETS:
         raise KeyError(f"unknown facet {slug!r}: add it to patch/badges.FACETS")
     name, color = FACETS[slug]
-    grad = _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"])
     fi = _FACET_ICONS.get(slug)
-    icon = fi[1] if isinstance(fi, list) and len(fi) > 1 else None
+    return name, _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"]), (
+        fi[1] if isinstance(fi, list) and len(fi) > 1 else None)
+
+
+def _facet_icon_html(slug):
+    """An ability header's icon drawn as its facet's (gradient + icon), for a facet's ability without art."""
+    name, grad, icon = _facet_parts(slug)
+    img = (f'<img src="../icons/facets/{icon}.png" alt="" loading="lazy" width="72" height="72">' if icon else '')
+    return (f'<span class="facet-ability-icon" style="background-image:{grad}" role="img" '
+            f'aria-label="{_html.escape(name)}">{img}</span>')
+
+
+def _facet_chip(slug):
+    """A facet as a small square, as its header's icon: the facet's gradient and icon, the name on hover only (owner
+    2026-10-27: the named chip made a talent row too long)."""
+    name, grad, icon = _facet_parts(slug)
     img = f'<img src="../icons/facets/{icon}.png" alt="" loading="lazy" width="16" height="16">' if icon else ''
     label = _html.escape(name)
     return (f'<span class="facet-chip" style="background-image:{grad}" data-tooltip="{label}" role="img" '
@@ -1532,10 +1552,12 @@ def terrain_num_chip(n):
 def sub_ability(slug, name):
     """A small icon + name of another ability inside a card's text (7.41 Overclocking: the abilities it supercharges,
     owner 2026-10-21)."""
-    # an ability without art (7.41 Silencer's old Brain Drain) falls back to the innate icon, as the headers do
+    # an ability without art (7.41 Silencer's old Brain Drain) gets the innate icon, as the headers do — at build
+    # time, not by a request to a file that isn't there (2026-10-27: the site's page check listed 3 such)
     on_err = f"this.onerror=null;this.src='{INNATE_ICON_URL}';"
     _State.ability_icons.add(f"{ABIL_CDN}{slug}.png")          # scripts/fetch/fetch_icons.py downloads it
-    return (f'<span class="ac-sub"><img class="ac-sub-ico" src="{ABIL_CDN}{slug}.png" alt="" loading="lazy" '
+    src = f"{ABIL_CDN}{slug}.png" if slug in _LOCAL_ABIL_ICONS else INNATE_ICON_URL
+    return (f'<span class="ac-sub"><img class="ac-sub-ico" src="{src}" alt="" loading="lazy" '
             f'onerror="{on_err}">'
             f'<b class="ac-sub-name">{name}</b></span>')
 

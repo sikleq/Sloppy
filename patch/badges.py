@@ -666,6 +666,8 @@ FACETS = {
     "nyx_assassin_burn_mana": ("Mana Burn", "Blue3"),
     "visage_faithful_followers": ("Faithful Followers", "Blue2"),
     "medusa_undulation": ("Undulation", "Red0"),
+    # 7.37–7.40c: the facet that grants Venomous Volley (its name in the game's files; Color Yellow, GradientID 2)
+    "medusa_slow_attacks": ("Venomous Volley", "Yellow2"),
     "magnataur_eternal_empowerment": ("Eternal Empowerment", "Gray1"),
     "shredder_second_chakram": ("Twisted Chakram", "Red1"),
     "techies_backpack": ("Spoon's Stash", "Blue1"),
