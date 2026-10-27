@@ -4307,6 +4307,49 @@ h4.subgroup {
   align-items: center;
   justify-content: center;
 }
+/* A facet's talent row (li(facet=…)): the facet as a small square before the text, as its header's icon; the name
+   shows on hover (owner 2026-10-27). */
+.facet-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  margin-right: 4px;
+  border-radius: 3px;
+  background-size: cover;
+  vertical-align: -4px;
+  box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18);
+}
+.facet-chip > img {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px var(--shadow-55));
+}
+.facet-chip[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--bg-deep-97);
+  color: var(--text-main);
+  font-size: 12px;
+  padding: 5px 9px;
+  border: 1px solid var(--muted-35);
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+  transition: opacity 0.12s 0.05s;
+  box-shadow: 0 4px 18px var(--shadow-45);
+}
+.facet-chip[data-tooltip]:hover::after {
+  opacity: 1;
+}
 .facet-icon-overlay {
   width: 36px;
   height: 36px;

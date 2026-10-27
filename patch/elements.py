@@ -979,6 +979,23 @@ def facet_header(slug):
                   f'<h4 class="ability-title">{name}</h4>')
 
 
+def _facet_chip(slug):
+    """A facet as a small square, as its header's icon: the facet's gradient and icon, the name on hover only (owner
+    2026-10-27: the named chip made a talent row too long)."""
+    from .badges import FACETS, _FACET_COLOR_GRADIENT
+    from .images import _FACET_ICONS
+    if slug not in FACETS:
+        raise KeyError(f"unknown facet {slug!r}: add it to patch/badges.FACETS")
+    name, color = FACETS[slug]
+    grad = _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"])
+    fi = _FACET_ICONS.get(slug)
+    icon = fi[1] if isinstance(fi, list) and len(fi) > 1 else None
+    img = f'<img src="../icons/facets/{icon}.png" alt="" loading="lazy" width="16" height="16">' if icon else ''
+    label = _html.escape(name)
+    return (f'<span class="facet-chip" style="background-image:{grad}" data-tooltip="{label}" role="img" '
+            f'aria-label="{label}">{img}</span>')
+
+
 def _facet_pane(desc, facet, version):
     """(head, rows) of a facet card pane. A text that says no kind ("Passive: …") gets the kind of the ability the
     facet changes (patch/ability_kv.facet_ability) — 7.39 Transference's card said no Passive (owner 2026-10-27).
@@ -1817,8 +1834,7 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     if facet and isinstance(text_inner, str):
         # a facet's talent among the hero's Talents: the facet's chip says whose (owner 2026-10-27, 7.39 Nature's
         # Profit); only on screen — the weights and the talent context read the row's own words
-        from .badges import facet_badge
-        text_inner = f'{facet_badge(facet)} {text_inner}'
+        text_inner = f'{_facet_chip(facet)} {text_inner}'
     # An ability row with its own chip keeps the chip as the li's first child: page.py
     # marks its whole box `ability-box-tagged`, and the CSS moves the box right by the tag
     # column so the chip sits in the SAME column, size and height as every other row's

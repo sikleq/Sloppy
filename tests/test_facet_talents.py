@@ -16,8 +16,10 @@ def test_the_row_shows_the_facet_chip_before_its_text():
     _State.current_hero = "Nature's Prophet"
     html = li("Level 15 Talent +100 Teleportation Barrier replaced with +30% Sprout Heal Per Second", "",
               facet="furion_soothing_saplings")
-    assert re.search(r'<span class="row-text"><span class="badge facet-badge"[^>]*>Soothing Saplings</span> Level 15 '
-                     r'Talent', html)
+    # a square with the facet's icon, no words (owner 2026-10-27): the name only on hover
+    m = re.search(r'<span class="row-text">(<span class="facet-chip"[^>]*>(.*?)</span>) Level 15 Talent', html)
+    assert m and 'data-tooltip="Soothing Saplings"' in m.group(1)
+    assert re.fullmatch(r'(?:<img [^>]*icons/facets/[^>]*>)?', m.group(2))
 
 
 def test_the_generator_moves_a_facets_talents_to_talents():
