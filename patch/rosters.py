@@ -358,6 +358,14 @@ def _load_full_game_items(latest_stats_ver, neutral_slugs, obsolete_slugs, prese
 _SHOP_CATEGORIES = _load_shop_categories()
 
 
+def write_dynamics(path, payload):
+    """_dynamics.json with sorted keys: the entity records come in page-build order, which differs run to run —
+    sorted, two builds of one commit give the same bytes. The arrays keep their order; scripts.js and the builders
+    look the records up by key."""
+    with open(path, 'w', encoding='utf-8') as f:
+        _json.dump(payload, f, separators=(',', ':'), sort_keys=True)
+
+
 def build_rosters():
     """Build hero/item rosters and write _dynamics.json. Called after all patches build."""
 
@@ -443,8 +451,7 @@ def build_rosters():
     # build products, not sources: .cache/ (build_site.py copies _dynamics.json into dist/)
     _cache = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), '.cache')
     _os.makedirs(_cache, exist_ok=True)
-    with open(_os.path.join(_cache, '_dynamics.json'), 'w', encoding='utf-8') as _f:
-        _json.dump(dyn_payload, _f, separators=(',', ':'))
+    write_dynamics(_os.path.join(_cache, '_dynamics.json'), dyn_payload)
     print(f"  → .cache/_dynamics.json: {len(_State.dynamics)} entities × {len(dyn_patches)} patches in RELEASE_HISTORY")
     _cls_counts = {}
     for _d in item_roster:
