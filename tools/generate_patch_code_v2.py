@@ -936,6 +936,37 @@ _KIDS_ARE_BODY = re.compile(
 )
 
 
+_AGHS_NOW_RE = re.compile(r"Now upgraded with Aghanim's (Scepter|Shard)\.?", re.I)
+# a kid that is a row of its own, not the upgrade's description ("is decreased by 2s" is description: Storm Surge 7.41)
+_NOT_AGHS_DESC = re.compile(r"^No longer\b|Aghanim's", re.I)
+
+
+def _merge_aghs_description(notes):
+    """"Now upgraded with Aghanim's Shard" with its description nested under it (Valve, 7.39 Aphotic Shield: "Deals
+    75% of absorbed damage to nearby enemies" one level deeper) -> one note "Aghanim's Shard: <description>": the card
+    under the ability is drawn from that row (owner 2026-10-27: the draft had two rows, NEW + a MISC description, and
+    the proofread merged them by hand). Before the rows are sorted by tag. A kid that is a row of its own ("No
+    longer …", another Aghanim's line) keeps the rows apart."""
+    out, i = [], 0
+    while i < len(notes):
+        n = notes[i]
+        m = _AGHS_NOW_RE.fullmatch((n.get('note') or '').strip())
+        level = n.get('indent_level', 0)
+        kids = []
+        j = i + 1
+        while m and j < len(notes) and notes[j].get('indent_level', 0) > level:
+            kids.append((notes[j].get('note') or '').strip())
+            j += 1
+        if kids and all(k and not _NOT_AGHS_DESC.search(k) for k in kids):
+            desc = " ".join(k if k.endswith(".") or k is kids[-1] else k + "." for k in kids)
+            out.append(dict(n, note=f"Aghanim's {m.group(1).title()}: {desc}"))
+            i = j
+            continue
+        out.append(n)
+        i += 1
+    return out
+
+
 def _descendants(notes, i):
     """Indices of every note nested under notes[i] (deeper indent, contiguous)."""
     lvl = notes[i].get('indent_level', 1)
@@ -1015,6 +1046,7 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
             lines.append('W(ul_open())')
             open_ul = True
 
+    notes = _merge_aghs_description(notes)
     consumed = set()                # sub-note indices already folded into a parent row
 
     for i, n in enumerate(notes):
