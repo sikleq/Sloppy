@@ -173,8 +173,8 @@ def test_mana_cost_reduction_stat_is_not_a_mana_cost_row():
 # ---- the components panel --------------------------------------------------------------------
 
 def _halberd_738():
-    from patch.elements import (components_change, item_header, li, properties_change, ul_close,
-                                ul_open)
+    from patch.elements import item_header, li, ul_close, ul_open
+    from patch.cards_item_stats import components_change, properties_change
     item_header("Heaven's Halberd", changed="Item Reworked")
     components_change(old=[("Sange", 2100), ("Talisman of Evasion", 1300)],
                       new=[("Vanguard", 1700), ("Crown", 450)], total_old=3500, total_new=2600,
@@ -206,7 +206,8 @@ def test_heavens_halberd_738_is_a_nerf(v738):
 
 
 def test_panel_total_cost_is_counted_once(v738):
-    from patch.elements import components_change, item_header, li, ul_close, ul_open
+    from patch.elements import item_header, li, ul_close, ul_open
+    from patch.cards_item_stats import components_change
     item_header("Gleipnir", changed="Item Reworked")
     components_change(old=[("Maelstrom", 2950)], new=[("Point Booster", 1200)],
                       total_old=5750, total_new=4550)
@@ -222,7 +223,8 @@ def test_panel_total_cost_is_counted_once(v738):
 
 
 def test_panel_alone_scores_the_total_and_unchanged_totals_score_nothing(v738):
-    from patch.elements import components_change, item_header, section
+    from patch.elements import item_header, section
+    from patch.cards_item_stats import components_change
     item_header("Shadow Blade", changed=True)
     components_change(old=[("Claymore", 1350)], new=[("Broadsword", 1000)], total_old=3000, total_new=3350)
     item_header("Eye of Skadi", changed=True)

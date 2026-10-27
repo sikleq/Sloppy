@@ -11,6 +11,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 from patch import elements as e  # noqa: E402
 from patch.badges import RANGE_FROM_LEVELS, b  # noqa: E402
+from patch import cards_item_abilities  # noqa: E402
+from patch import cards_item_stats  # noqa: E402
 
 
 def test_five_levels_show_first_and_last_only():
@@ -23,8 +25,8 @@ def test_five_levels_show_first_and_last_only():
 
 
 def test_the_ability_a_row_starts_with_wins():
-    assert e._iab_row_ability("guard base damage block rescaled from 70", None, {"guard", "damage block"}) == "guard"
-    assert e._iab_row_ability("damage block chance increased", None, {"guard", "damage block"}) == "damage block"
+    assert cards_item_abilities._iab_row_ability("guard base damage block rescaled from 70", None, {"guard", "damage block"}) == "guard"
+    assert cards_item_abilities._iab_row_ability("damage block chance increased", None, {"guard", "damage block"}) == "damage block"
 
 
 def test_header_levels_show_level_one_dotted_and_every_level_on_hover():
@@ -32,19 +34,19 @@ def test_header_levels_show_level_one_dotted_and_every_level_on_hover():
     # one level is coloured in that popup
     ico = '<img class="iab-ico" src="../icons/ui/ability/cooldown.png" alt="">'
     chip = f'<span class="iab-m">{ico}27/24/21/18/15</span>'
-    out = e._iab_compact_levels(chip)
+    out = cards_item_abilities._iab_compact_levels(chip)
     assert 'data-tooltip="Levels 1–5: 27 / 24 / 21 / 18 / 15">27</span>' in out and "iab-hint" in out
-    pct = e._iab_compact_levels(f'<span class="iab-m">{ico}10/20/30/40/50%</span>')
+    pct = cards_item_abilities._iab_compact_levels(f'<span class="iab-m">{ico}10/20/30/40/50%</span>')
     assert '">10%</span>' in pct                                                 # the unit of the last level
     four = f'<span class="iab-m">{ico}12/10/8/6</span>'
-    assert e._iab_compact_levels(four) == four
-    marked = e._iab_chip_mark(ico, "27/24/21/18/12", "27/24/21/18/15", "buff", "")
+    assert cards_item_abilities._iab_compact_levels(four) == four
+    marked = cards_item_abilities._iab_chip_mark(ico, "27/24/21/18/12", "27/24/21/18/15", "buff", "")
     assert 'class="iab-m iab-buff"' in marked and '">27</span></span>' in marked
     assert "18 / &lt;span class=&quot;iab-lv iab-buff&quot;&gt;12&lt;/span&gt;" in marked
-    three = e._iab_chip_mark(ico, "12/10/6", "12/10/8", "buff", "")
+    three = cards_item_abilities._iab_chip_mark(ico, "12/10/6", "12/10/8", "buff", "")
     assert three.endswith('12/10/<span class="iab-lv iab-buff">6</span></span>')
-    assert 'class="iab-m iab-nerf"' in e._iab_chip_mark(ico, "640", "700/750/800/850/900", "nerf", "")
-    assert e._tone_cls('<span class="badge nerf3 rng-start">-9%</span>') == "badge nerf3 tone"
+    assert 'class="iab-m iab-nerf"' in cards_item_abilities._iab_chip_mark(ico, "640", "700/750/800/850/900", "nerf", "")
+    assert cards_item_abilities._tone_cls('<span class="badge nerf3 rng-start">-9%</span>') == "badge nerf3 tone"
 
 
 def _page(ver):
@@ -61,7 +63,7 @@ def _block(html, item):
 
 def test_components_keep_the_old_sides_order():
     # owner 2026-10-17: Guardian Greaves 7.41 "1775 + 1400 → 1500 + 1775" read as a cheaper Mekansm
-    assert e._in_old_order([("Mekansm", 1775), ("Arcane Boots", 1400)],
+    assert cards_item_stats._in_old_order([("Mekansm", 1775), ("Arcane Boots", 1400)],
                            [("Arcane Boots", 1500), ("Mekansm", 1775), ("Chainmail", 500)]) == \
         [("Mekansm", 1775), ("Arcane Boots", 1500), ("Chainmail", 500)]
     seg = re.sub(r"<[^>]+>", " ", _block(_page("7.41"), "guardian-greaves"))

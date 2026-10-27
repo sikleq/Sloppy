@@ -38,6 +38,8 @@ Helpers are imported in every `content/p*.py` via `from patch.api import *`.
 | `patch/images.py` | CDN constants, `HERO_SLUG` / `ITEM_SLUG`, `_LOCAL_ABIL_ICONS` |
 | `patch/badges.py` | `gradient_class()`, `b()`, `br()`, `bf()`, `t()`, `scale_pill()` |
 | `patch/elements.py` | HTML helpers: `hero_header()`, `item_header()`, `section()`, `ability()`, `li()`, `subnote()`, … |
+| `patch/cards_*.py` | the cards, cut out of `elements.py` (audit 2026-10-26 #8): `cards_hero_stats` (hero stat card), `cards_aghs` (Aghanim's), `cards_item_abilities` (`item_abilities_change`), `cards_item_stats` (`properties_change`, `components_change`), `cards_ability_change` (`ability_change`, `new_ability`). They import their helpers from `elements`, which imports them back at its end; `patch/__init__.py` loads `elements` first |
+| `patch/site_common.py`, `kv.py`, `game_files.py`, `loc_history.py`, `terrain_index.py` | the core every builder shares: site header, the KV parser, the game-files store, old tooltips, which patches get a Terrain page. `patch/` imports nothing from `builders/` or `tools/` (`tests/test_layers.py`) |
 | `patch/output.py` / `patch/state.py` | `W()` writer accumulator + `_State` build singleton |
 | `patch/page.py` | `write_head()` / `write_footer()` / `save_html()`; reads `styles.css` + `src/scripts.js` from disk, minifies into `dist/`, stamps a cache-busting `?v=` |
 | `patch/meta.py` | `PATCHES`, `RELEASE_HISTORY`, `latest_stats_version()` |

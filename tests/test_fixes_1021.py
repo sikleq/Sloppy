@@ -1,10 +1,12 @@
 """Generator fixes of 2026-10-21 (owner's 7.41 review)."""
 from patch import elements as el
+from patch import cards_ability_change
+from patch import cards_item_abilities
 
 
 def test_bold_mana_and_cooldown_labels_go_to_the_head():
     # "<b>Mana Cost:</b> 50." stayed in the text under a head that already showed 50 (7.41 Zealot)
-    values, desc = el._iab_take_meta("Teleports units. <b>Mana Cost:</b> 50. <b>Cooldown:</b> 10s.")
+    values, desc = cards_item_abilities._iab_take_meta("Teleports units. <b>Mana Cost:</b> 50. <b>Cooldown:</b> 10s.")
     assert values == {"manacost": "50", "cooldown": "10"}
     assert desc == "Teleports units."
 
@@ -150,7 +152,7 @@ def test_aghanim_upgrade_goes_to_the_header_and_the_summary_keeps_the_stripe(mon
     # the summary keeps only the stripe (owner, 7.41 Kinetic Fence). The panes need the page's patch: until the
     # 2026-10-26 state reset the test got it from whichever test ran before.
     monkeypatch.setattr(el._State, "current_patch_version", "7.41")
-    html = el.ability_change(old=dict(name="X", slug="rattletrap_overclocking", desc=["Active (Aghanim's Scepter upgrade). A."]),
+    html = cards_ability_change.ability_change(old=dict(name="X", slug="rattletrap_overclocking", desc=["Active (Aghanim's Scepter upgrade). A."]),
                              new=dict(name="X", slug="rattletrap_overclocking", desc=["B."]),
                              summary="Ability reworked.", tag="rework")
     assert '<span class="row-text">Ability reworked.<span class="aghanim-marker scepter"></span>' in html
@@ -159,7 +161,7 @@ def test_aghanim_upgrade_goes_to_the_header_and_the_summary_keeps_the_stripe(mon
 
 
 def test_aghanim_upgrade_words_move_from_card_text_to_its_summary():
-    spec, kind = el._take_aghs({"desc": ["Active (Aghanim's Scepter upgrade). All abilities are supercharged:"]})
+    spec, kind = cards_ability_change._take_aghs({"desc": ["Active (Aghanim's Scepter upgrade). All abilities are supercharged:"]})
     assert kind == "scepter" and spec["desc"] == ["All abilities are supercharged:"]
-    spec, kind = el._take_aghs({"desc": ["Granted by Aghanim's Scepter. Unit-targeted.", "x"]})
+    spec, kind = cards_ability_change._take_aghs({"desc": ["Granted by Aghanim's Scepter. Unit-targeted.", "x"]})
     assert kind == "scepter" and spec["desc"] == ["Unit-targeted.", "x"]

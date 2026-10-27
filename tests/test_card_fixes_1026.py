@@ -10,6 +10,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from patch import elements as el  # noqa: E402
 from patch.state import _State  # noqa: E402
+from patch import cards_ability_change  # noqa: E402
+from patch import cards_aghs  # noqa: E402
+from patch import cards_item_abilities  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,28 +22,28 @@ def _title(head):
 
 
 def test_shares_level_goes_to_the_header():
-    head, body = el._pane_parts([el.hl("Shares level with Kinetic Field", "del") + ".", "Creates a wall."],
+    head, body = cards_item_abilities._pane_parts([el.hl("Shares level with Kinetic Field", "del") + ".", "Creates a wall."],
                                 {"kind": "Active"})
     assert _title(head) == "Active – shares level with Kinetic Field"
     assert "Shares level" not in body and "Creates a wall." in body
 
 
 def test_only_one_level_is_never_said_and_granted_is_in_the_header():
-    head, body = el._pane_parts([el.hl("Has only one level", "new") + ".", "Creates a wall."], {"kind": "Active"},
+    head, body = cards_item_abilities._pane_parts([el.hl("Has only one level", "new") + ".", "Creates a wall."], {"kind": "Active"},
                                 granted="shard")
     assert _title(head) == "Active – granted by Aghanim's Shard"
     assert "one level" not in body
 
 
 def test_granted_and_shares_level_together():
-    head, _ = el._pane_parts(["Shares level with Demonic Purge.", "Cleanses."], {"kind": "Active"}, granted="shard")
+    head, _ = cards_item_abilities._pane_parts(["Shares level with Demonic Purge.", "Cleanses."], {"kind": "Active"}, granted="shard")
     assert _title(head) == "Active – granted by Aghanim's Shard, shares level with Demonic Purge"
 
 
 def test_kinetic_fence_card_says_it_in_the_headers_not_the_summary():
     _State.current_patch_version = "7.41"
     try:
-        html = el.ability_change(
+        html = cards_ability_change.ability_change(
             old=dict(name="Kinetic Fence", slug="disruptor_kinetic_fence",
                      desc=[el.hl("Shares level with Kinetic Field", "del") + ".", "Wall."]),
             new=dict(name="Kinetic Fence", slug="disruptor_kinetic_fence",
@@ -56,12 +59,12 @@ def test_kinetic_fence_card_says_it_in_the_headers_not_the_summary():
 
 
 def test_shares_level_comes_from_the_game_files():
-    assert el._shares_level("shadow_demon_demonic_cleanse", "7.37e") == "Demonic Purge"
-    assert el._shares_level("shadow_demon_demonic_cleanse", "7.38") is None      # one level since 7.38
+    assert cards_aghs._shares_level("shadow_demon_demonic_cleanse", "7.37e") == "Demonic Purge"
+    assert cards_aghs._shares_level("shadow_demon_demonic_cleanse", "7.38") is None      # one level since 7.38
 
 
 def test_game_ability_pair_colours_numbers_and_says_the_shared_level():
-    old, new = el.game_ability_pair("shadow_demon_demonic_cleanse", "7.38")
+    old, new = cards_ability_change.game_ability_pair("shadow_demon_demonic_cleanse", "7.38")
     assert old[0] == "Shares level with Demonic Purge." and len(new) == 1
     assert "300/450/600" in old[-1] and "450" in new[-1]
 
@@ -78,9 +81,9 @@ def test_base_text_lists_no_aghanims_only_value():
 def test_granted_card_is_an_ability_card_with_headers():
     _State.current_patch_version, _State.current_ability_slug = "7.41", "tinker_warp_grenade"
     _State.aghs_cards = []
-    el._GRANTED_CARDS.discard(("7.41", "tinker_warp_grenade"))
+    cards_aghs._GRANTED_CARDS.discard(("7.41", "tinker_warp_grenade"))
     try:
-        assert el._granted_card({"rework"})
+        assert cards_aghs._granted_card({"rework"})
         card = _State.aghs_cards[-1]
     finally:
         _State.aghs_cards, _State.card_meta = [], {}

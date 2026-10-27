@@ -11,9 +11,14 @@ from patch import aghs_text as at  # noqa: E402
 from patch import elements as el  # noqa: E402
 from patch import state as st  # noqa: E402
 from patch.state import _State, reset_build_state, reset_page_state  # noqa: E402
+from patch import cards_aghs, cards_hero_stats, cards_item_abilities, cards_item_stats  # noqa: E402
 
-PAGE_CACHES = ("_HS_CARDS", "_GRANTED_CARDS", "_AGHS_SHOWN", "_CARD_CONFIRMED", "_IAB_NOTES", "_IAB_CARDS",
-               "_IAB_MARKS", "_IAB_HL", "_COST_CARDS", "_COST_MARKS")
+# (module, cache) — the card caches live with their cards (audit 2026-10-26 #8)
+PAGE_CACHES = ((cards_hero_stats, "_HS_CARDS"), (cards_aghs, "_GRANTED_CARDS"), (cards_aghs, "_AGHS_SHOWN"),
+               (cards_item_abilities, "_CARD_CONFIRMED"), (cards_item_abilities, "_IAB_NOTES"),
+               (cards_item_abilities, "_IAB_CARDS"), (cards_item_abilities, "_IAB_MARKS"),
+               (cards_item_abilities, "_IAB_HL"), (cards_item_stats, "_COST_CARDS"),
+               (cards_item_stats, "_COST_MARKS"))
 
 
 def _dirty_everything():
@@ -28,10 +33,10 @@ def _dirty_everything():
         else:
             setattr(_State, key, "left over")
     st.state.block_open = "instance left over"
-    for name in PAGE_CACHES:
-        cache = getattr(el, name)
+    for mod, name in PAGE_CACHES:
+        cache = getattr(mod, name)
         cache.add("left over") if isinstance(cache, set) else cache.__setitem__("left over", 1)
-    el._CARD_SEQ[0] = 41
+    cards_item_abilities._CARD_SEQ[0] = 41
 
 
 def test_page_reset_brings_every_field_and_cache_back():
@@ -42,9 +47,9 @@ def test_page_reset_brings_every_field_and_cache_back():
             assert "left over" in getattr(_State, key), f"{key} is a build total: the next page adds to it"
         else:
             assert getattr(st.state, key) == default, f"_State.{key} survived the page"
-    for name in PAGE_CACHES:
-        assert not getattr(el, name), f"{name} survived the page"
-    assert el._CARD_SEQ == [0]
+    for mod, name in PAGE_CACHES:
+        assert not getattr(mod, name), f"{name} survived the page"
+    assert cards_item_abilities._CARD_SEQ == [0]
 
 
 def test_build_reset_clears_the_totals_too():
@@ -55,8 +60,8 @@ def test_build_reset_clears_the_totals_too():
 
 def test_every_card_cache_is_registered():
     registered = {id(c) for c, _ in st._PAGE_CACHES}
-    for name in PAGE_CACHES + ("_CARD_SEQ",):
-        assert id(getattr(el, name)) in registered, name
+    for mod, name in PAGE_CACHES + ((cards_item_abilities, "_CARD_SEQ"),):
+        assert id(getattr(mod, name)) in registered, name
 
 
 def _pending_card(monkeypatch, hero="centaur", slug="centaur_horsepower"):

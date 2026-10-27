@@ -336,7 +336,7 @@ extra=inline_note(info_tip("Batrider's Arsonist", "Magnus' Diminishing Return", 
 ## Способность предмета — шапка как в игре (2026-09-27)
 
 Строка предмета «Active/Passive/Toggle/Aura: Название. Описание. Cast Range: X. Mana Cost: Y. Cooldown: Zs» (без тега
-изменения или с NEW) рисуется карточкой (`_item_ability_html` в patch/elements.py): невысокая шапка — слева
+изменения или с NEW) рисуется карточкой (`_item_ability_html` в patch/cards_item_abilities.py): невысокая шапка — слева
 «Active: Название», справа дальность, мана, цена здоровьем, перезарядка со значками игры
 (pak01 `panorama/images/status_icons/ability_*_icon_psd` → `icons/ui/ability/*.png`); «No Mana Cost» / «No Cooldown»
 не выводятся; в описании все числа жирные и чуть светлее (`iab-num`). В content ничего менять не нужно —
@@ -473,7 +473,7 @@ damage» — не про характеристику урона). «+N All Attr
 ## Урон атаки героя: стартовый урон + прирост за уровень (2026-09-28, 36 героев)
 
 7.38 снизил урон универсалов за очко характеристики 0.7 → 0.45 и поднял базовый урон и прирост в компенсацию:
-«Base Damage increased by 26» (+650%) сам по себе ничего не значил. `hero_stat_card()` (patch/elements.py,
+«Base Damage increased by 26» (+650%) сам по себе ничего не значил. `hero_stat_card()` (patch/cards_hero_stats.py,
 модель — patch/hero_stats.py по файлам игры обоих патчей) — ДВЕ строки вместо строк урона, у каждой свой тег и %:
 
 «BUFF  Starting damage increased from 40–50 to 50–60  +22%»

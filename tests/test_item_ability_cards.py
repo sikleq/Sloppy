@@ -5,8 +5,8 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
 import patch.item_ability_text as iat  # noqa: E402
-from patch import elements as el  # noqa: E402
 from patch.state import _State  # noqa: E402
+from patch import cards_item_abilities  # noqa: E402
 
 BLOCK = ['    W(item_header("Orb of Venom"))',
          '    W(ul_open())',
@@ -37,10 +37,10 @@ def test_a_duplicate_description_row_hides_and_keeps_its_note():
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
     try:
         _State.current_entity_key, _State.current_patch_version = "item|x", "7.38"
-        el.item_abilities_change(old=["Toggle: Old. Something."], new=["Passive: Phantom Critical. Grants a 30% chance."])
+        cards_item_abilities.item_abilities_change(old=["Toggle: Old. Something."], new=["Passive: Phantom Critical. Grants a 30% chance."])
         tip = "<!--INLINETIP--><span>note</span><!--/INLINETIP-->"
-        assert el._iab_shown_in_card("Passive: Phantom Critical. Grants a 30% chance", tip)
-        assert el._IAB_NOTES["item|x|7.38|phantom critical"] == "<span>note</span>"
-        assert not el._iab_shown_in_card("Passive: Other Thing. Text", "")
+        assert cards_item_abilities._iab_shown_in_card("Passive: Phantom Critical. Grants a 30% chance", tip)
+        assert cards_item_abilities._IAB_NOTES["item|x|7.38|phantom critical"] == "<span>note</span>"
+        assert not cards_item_abilities._iab_shown_in_card("Passive: Other Thing. Text", "")
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved

@@ -16,6 +16,10 @@ content/
 patch/                       ← ЯДРО: не импортирует builders/ и tools/ (тест tests/test_layers.py)
   api.py                     ← from patch.api import * — публичный API для content/*.py
   elements.py                ← Все хелперы: W(), li(), hero_header(), ability(), ...
+  cards_*.py                 ← Карточки, вынесены из elements.py (тест tests/test_elements_split.py):
+                               cards_hero_stats (render_hs_card), cards_aghs (Aghanim's), cards_item_abilities
+                               (item_abilities_change, render_iab_card), cards_item_stats (properties_change,
+                               components_change, render_cost_card), cards_ability_change (ability_change, new_ability)
   images.py                  ← ITEM_SLUG, HERO_SLUG, item_img(), abil_img()
   meta.py                    ← PATCHES список, RELEASE_HISTORY
   index_page.py              ← index.html + What's New popup

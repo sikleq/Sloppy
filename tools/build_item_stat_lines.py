@@ -1,5 +1,5 @@
 r"""Every item's stat lines in every patch -> data/rules/item_stat_lines.json (read by
-patch/elements.py properties_change).
+patch/cards_item_stats.py properties_change).
 
 Why (owner 2026-09-27, Mage Slayer 7.38): a "before -> after" stats card must list ALL the item's
 stats, also the ones the patch did not touch (+20% Magic Resistance, +2 Mana Regen). Patch notes

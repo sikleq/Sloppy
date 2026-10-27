@@ -3,15 +3,17 @@ from .output import W
 from .state import _State
 from .badges import b, br, bf, t, gradient_class, facet_badge, scale_pill, rank_step
 from .elements import (
-    hero_header, item_header, unit_header, ability, facet_header, new_facet, facet_change,
-    section, subgroup, li, ul_open, ul_close, li_formula, enchant_header,
-    enchant_attr_row, enchant_tier_box, souvenir_chip, plain_header,
-    components, item_cost, provides, properties_change, auto_components_change, new_stats,
-    components_change, aghs_line, aghs_shard_line, ability_change, formula_change, item_abilities_change,
-    inline_note, info_tip, show_list, subnote, section_intro, note_box, cm_draft, attr_change, creep_ref, camp_table,
-    enchant_list_head, enchant_row, hero_stat_card, sub_ability, hl, bug_note, new_ability, game_ability_desc,
-    game_ability_pair,
+    hero_header, item_header, unit_header, ability, facet_header, new_facet, facet_change, section, subgroup, li,
+    ul_open, ul_close, li_formula, enchant_header, enchant_attr_row, enchant_tier_box, souvenir_chip, plain_header,
+    components, item_cost, provides, auto_components_change, new_stats, formula_change, inline_note, info_tip,
+    show_list, subnote, section_intro, note_box, cm_draft, attr_change, creep_ref, camp_table, enchant_list_head,
+    enchant_row, sub_ability, hl, bug_note
 )
+from .cards_ability_change import ability_change, new_ability, game_ability_desc, game_ability_pair
+from .cards_aghs import aghs_line, aghs_shard_line
+from .cards_item_abilities import item_abilities_change
+from .cards_item_stats import properties_change, components_change
+from .cards_hero_stats import hero_stat_card
 from .stats import stat_h, stat_i, bstat_h, bstat_i, bstat_u, prev_change_patch_h, prev_change_patch_i, prev_change_patch_u
 from .images import hero_img, item_img, abil_img, HERO_CDN, ITEM_CDN, ABIL_CDN, NEUTRAL_CDN
 from .page import write_head, save_html, write_footer, save_assets

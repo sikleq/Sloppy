@@ -74,7 +74,7 @@ def test_no_stats_card_without_a_build_change():
 def test_item_cards_show_every_stat_the_game_changed():
     # Gleipnir 7.38 lost +25 Damage and +25 Attack Speed, Heaven's Halberd 7.41 +5 All Attributes, and the
     # patch notes said nothing: the game's items.txt of both patches is the truth (owner 2026-09-27)
-    from patch.elements import silent_stat_changes
+    from patch.cards_item_stats import silent_stat_changes
     missing = []
     for f, version, name, named in _item_blocks():
         removed, added, changed = silent_stat_changes(name, version, named)

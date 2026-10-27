@@ -377,45 +377,45 @@ class TestItemCost:
 
 class TestAghsLine:
     def test_returns_string(self):
-        from patch.elements import aghs_line
+        from patch.cards_aghs import aghs_line
         result = aghs_line("Adds new ability")
         assert isinstance(result, str)
 
     def test_contains_text(self):
-        from patch.elements import aghs_line
+        from patch.cards_aghs import aghs_line
         result = aghs_line("Adds new ability")
         assert "Adds new ability" in result
 
     def test_default_kind_is_scepter(self):
-        from patch.elements import aghs_line
+        from patch.cards_aghs import aghs_line
         result = aghs_line("text")
         assert "aghanim-scepter" in result
         assert "scepter" in result
 
     def test_shard_kind(self):
-        from patch.elements import aghs_line
+        from patch.cards_aghs import aghs_line
         result = aghs_line("Shard effect", kind="shard")
         assert "aghanim-shard" in result
         assert "shard" in result
 
     def test_wrapped_in_ability_change_row(self):
-        from patch.elements import aghs_line
+        from patch.cards_aghs import aghs_line
         result = aghs_line("text")
         assert 'class="ability-change-row' in result
 
     def test_aghanim_marker_span_present(self):
-        from patch.elements import aghs_line
+        from patch.cards_aghs import aghs_line
         result = aghs_line("text")
         assert 'class="aghanim-marker' in result
 
     def test_inline_note_text_included_when_provided(self):
-        from patch.elements import aghs_line
+        from patch.cards_aghs import aghs_line
         result = aghs_line("text", inline_note_text="Extra detail")
         assert "Extra detail" in result
         assert 'class="inline-note"' in result
 
     def test_no_inline_note_by_default(self):
-        from patch.elements import aghs_line
+        from patch.cards_aghs import aghs_line
         result = aghs_line("text")
         assert "inline-note" not in result
 
@@ -447,7 +447,7 @@ class TestNoteBox:
 
 
 def test_properties_change_puts_change_chip_on_new_side():
-    from patch.elements import properties_change
+    from patch.cards_item_stats import properties_change
     html = properties_change(old=[("BUFF", "+10 Strength"), ("DEL", "+250 Health")],
                              new=[("", "+26 Strength", "<b>+160%</b>"), ("NEW", "+25% Slow Resistance")])
     old_pane, new_pane = html.split("→", 1) if "→" in html else html.split("properties-pane", 2)[1:3]

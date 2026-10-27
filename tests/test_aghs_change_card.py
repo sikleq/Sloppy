@@ -12,6 +12,7 @@ from patch import aghs_text as at  # noqa: E402
 from patch import elements as el  # noqa: E402
 from patch.badges import t  # noqa: E402
 from patch.state import _State  # noqa: E402
+from patch import cards_aghs  # noqa: E402
 
 LABELS = {"dota_tooltip_ability_x_radius": "RADIUS:", "dota_tooltip_ability_x_shield_pct": "%DAMAGE TO BARRIER:",
           "dota_tooltip_ability_x_armor": "PASSIVE BONUS ARMOR:"}
@@ -37,10 +38,10 @@ def test_a_decrease_never_says_minus():
 
 
 def test_numbers_line_is_compared_by_label():
-    vo, vn = el._aghs_values_html("Bonus speed: +3%. Passive radius: 1200.", "Bonus speed: +3%. Radius: +200.")
+    vo, vn = cards_aghs._aghs_values_html("Bonus speed: +3%. Passive radius: 1200.", "Bonus speed: +3%. Radius: +200.")
     assert vo == "Bonus speed: +3%. " + el.hl("Passive radius: 1200", "del") + "."
     assert vn == "Bonus speed: +3%. " + el.hl("Radius: +200", "new") + "."
-    vo, vn = el._aghs_values_html("Duration: 5.", "Duration: 6.")
+    vo, vn = cards_aghs._aghs_values_html("Duration: 5.", "Duration: 6.")
     assert vn == "Duration: " + el.hl("6", "rework") + "."
 
 
@@ -118,23 +119,23 @@ def _parts(monkeypatch, old, new, slug, hero="windrunner"):
     monkeypatch.setattr(at, "ability_name", lambda s, v: s.title())
     monkeypatch.setattr(_State, "current_patch_version", "7.41")
     monkeypatch.setattr(_State, "aghs_part_slug", (slug, hero))
-    monkeypatch.setattr(el, "_AGHS_SHOWN", set())
+    monkeypatch.setattr(cards_aghs, "_AGHS_SHOWN", set())
 
 
 def test_upgrade_gone_to_an_ability_without_a_card_gets_one(monkeypatch):
     # owner 2026-10-25, group A: 7.41 Windrun's Scepter -> Tailwind; the card sits under Tailwind
     _parts(monkeypatch, {"windrun": "Grants invisibility."}, {"tailwind": "Attacks grant Tailwind."}, "tailwind")
-    out = el._aghs_parts_cards()
+    out = cards_aghs._aghs_parts_cards()
     assert "Added Aghanim's Scepter." in out and "Grants invisibility." in out and "Attacks grant Tailwind." in out
     assert out.count('class="ac-sub"') == 2
-    assert el._aghs_parts_cards() == ""                 # drawn once
+    assert cards_aghs._aghs_parts_cards() == ""                 # drawn once
 
 
 def test_part_gone_and_the_rest_changed_is_one_reworked_card(monkeypatch):
     # group B: 7.41f Pit of Malice's part gone, Fiend's Gate's -10s -> -20s
     _parts(monkeypatch, {"gate": "Reduces cooldown by 10s.", "pit": "Increases radius."},
            {"gate": "Reduces cooldown by 20s."}, "gate", hero="abyssal_underlord")
-    out = el._aghs_parts_cards()
+    out = cards_aghs._aghs_parts_cards()
     old_side = out[out.index("ability-change-old"):out.index("ability-change-arrow")]
     assert "Aghanim's Scepter reworked." in out and "Increases radius." in old_side and "iab-hl" in out
 
@@ -144,9 +145,9 @@ def test_part_gone_and_the_rest_the_same_is_a_card_under_the_ability_that_lost_i
     # which read as the hero having no Shard left (owner, 7.40b Necromastery): now the whole old -> what is left
     _parts(monkeypatch, {"drain": "Steals more.", "glaives": "Steal duration."}, {"drain": "Steals more."}, "drain",
            hero="silencer")
-    assert el._aghs_parts_cards() == ""                 # not under the ability that kept its part
+    assert cards_aghs._aghs_parts_cards() == ""                 # not under the ability that kept its part
     monkeypatch.setattr(_State, "aghs_part_slug", ("glaives", "silencer"))
-    out = el._aghs_parts_cards()
+    out = cards_aghs._aghs_parts_cards()
     old_side = out[out.index("ability-change-old"):out.index("ability-change-arrow")]
     new_side = out[out.index("ability-change-new"):]
     # no caption: the "Removed Aghanim's Scepter." row above says it ("reworked" made one change two rows)
@@ -185,12 +186,12 @@ def test_granted_ability_text_and_upgrade_bonus_placeholders():
 
 def test_numbers_go_into_the_description_line():
     # owner 2026-10-25: "Increases range. / Range: +150." in one line
-    assert el._aghs_inline("Increases range.\nRange: +150.") == "Increases range (+150)."
-    assert (el._aghs_inline("Increases Blade Fury radius, and slows enemies by 35%.\nRadius: +100.")
+    assert cards_aghs._aghs_inline("Increases range.\nRange: +150.") == "Increases range (+150)."
+    assert (cards_aghs._aghs_inline("Increases Blade Fury radius, and slows enemies by 35%.\nRadius: +100.")
             == "Increases Blade Fury radius (+100), and slows enemies by 35%.")
     # no word of the label in the text: after the description, same line; a number the text says: not twice
-    assert el._aghs_inline("Lasts longer.\nDuration: +2.") == "Lasts longer. Duration: +2."
-    assert el._aghs_inline("Grants 6 armor to allies.\nPassive bonus armor: 6.") == "Grants 6 armor to allies."
+    assert cards_aghs._aghs_inline("Lasts longer.\nDuration: +2.") == "Lasts longer. Duration: +2."
+    assert cards_aghs._aghs_inline("Grants 6 armor to allies.\nPassive bonus armor: 6.") == "Grants 6 armor to allies."
 
 
 def test_number_highlight_is_a_number_change_not_a_strip():
@@ -204,20 +205,20 @@ def test_number_highlight_is_a_number_change_not_a_strip():
 
 def test_rework_colours_only_changed_numbers_of_the_same_words():
     # owner 2026-10-25: a rewritten meaning stays plain; only a values-only change is coloured, numbers only
-    o, n = el._rework_diff_html("Gives 100 bonus radius when cast during Duel.",
+    o, n = cards_aghs._rework_diff_html("Gives 100 bonus radius when cast during Duel.",
                                 "Overwhelming Odds has larger radius (+100).")
     assert "iab-hl" not in o and "iab-hl" not in n
-    o, n = el._rework_diff_html("Increases radius (+100). Duration: 5s.", "Increases radius (+150). Duration: 5s.")
+    o, n = cards_aghs._rework_diff_html("Increases radius (+100). Duration: 5s.", "Increases radius (+150). Duration: 5s.")
     assert o == "Increases radius (" + el.hl("+100", "nerf") + "). Duration: 5s."
     assert n == "Increases radius (" + el.hl("+150", "buff") + "). Duration: 5s."
-    _, n = el._rework_diff_html("Lowers cooldown (-2s).", "Lowers cooldown (-3s).")
+    _, n = cards_aghs._rework_diff_html("Lowers cooldown (-2s).", "Lowers cooldown (-3s).")
     assert el.hl("-3s", "buff") in n                    # a cooldown: lower is better
 
 
 def test_huskar_inner_fire_numbers_are_right():
     # owner 2026-10-25: "на сколько снижается кулдаун? почему 10% heal?" — the cooldown has no tooltip label
     # (AbilityCooldown -3) and two labels end in "heal": none of them goes after the word
-    line = el._aghs_inline("Lowers Inner Fire cooldown and causes it to apply a movement speed slow and heal Huskar."
+    line = cards_aghs._aghs_inline("Lowers Inner Fire cooldown and causes it to apply a movement speed slow and heal Huskar."
                            "\nCooldown: -3s. Movement slow: 50%. Hero damage as heal: 50%. Non-hero damage as heal: 10%.")
     assert line == ("Lowers Inner Fire cooldown (-3s) and causes it to apply a movement speed slow (50%) and heal "
                     "Huskar. Hero damage as heal: 50%. Non-hero damage as heal: 10%.")
@@ -284,7 +285,7 @@ def test_added_upgrade_is_a_card_and_removed_one_a_row(monkeypatch):
 
 def test_a_number_the_text_says_is_not_repeated():
     # 7.41 Arena of Blood: "Lowers cooldown (-10s) by 10s"
-    assert el._aghs_inline("Lowers cooldown by 10s.\nCooldown: -10s.") == "Lowers cooldown by 10s."
+    assert cards_aghs._aghs_inline("Lowers cooldown by 10s.\nCooldown: -10s.") == "Lowers cooldown by 10s."
 
 
 def test_bonus_placeholder_is_the_upgrades_own_bonus():

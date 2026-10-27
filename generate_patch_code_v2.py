@@ -2463,7 +2463,7 @@ def _postprocess_silent_stats(lines, version):
     the stats card also gets what the game's items.txt shows changed between the previous patch and this
     one but the block never mentions — removed -> DEL on the old side, added -> NEW, changed -> old / new
     with its b() badge. Guarded by tests/test_item_card_rows.py."""
-    from patch.elements import silent_stat_changes, _stat_text
+    from patch.cards_item_stats import silent_stat_changes, _stat_text
     out, i = [], 0
     while i < len(lines):
         m_hdr = re.match(r'W\(item_header\("([^"]+)"(?![^)]*new=)[^)]*\)\)', lines[i])
@@ -2511,7 +2511,7 @@ def _postprocess_silent_stats(lines, version):
 
 
 def _stat_line_name(stat):
-    from patch.elements import _STAT_LINE
+    from patch.cards_item_stats import _STAT_LINE
     return _STAT_LINE[stat][0]
 
 

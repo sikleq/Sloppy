@@ -136,7 +136,8 @@ def test_total_cost_unchanged_in_the_inline_note_zeroes_the_row(v741):
 
 def test_item_property_panes_are_scored(v741):
     """properties_change rows were tallied with scores (0, 0)."""
-    from patch.elements import item_header, properties_change
+    from patch.elements import item_header
+    from patch.cards_item_stats import properties_change
     item_header("Blade Mail")
     properties_change(old=[("BUFF", "+6 Armor")], new=[("", "+7 Armor", b(6, 7))])
     cell = _cell("item|blade-mail")
@@ -148,7 +149,8 @@ def test_item_property_panes_are_scored(v741):
 
 
 def test_item_property_new_and_del_score_like_new_del_rows(v741):
-    from patch.elements import item_header, properties_change
+    from patch.elements import item_header
+    from patch.cards_item_stats import properties_change
     item_header("Arcane Boots")
     properties_change(old=[("DEL", "+250 Health")], new=[("NEW", "+125 Mana")])
     cell = _cell("item|arcane-boots")
@@ -156,7 +158,8 @@ def test_item_property_new_and_del_score_like_new_del_rows(v741):
 
 
 def test_ability_and_facet_cards_add_volume(v741):
-    from patch.elements import ability_change, hero_header
+    from patch.elements import hero_header
+    from patch.cards_ability_change import ability_change
     hero_header("Shadow Fiend")
     ability_change({"name": "Frenzy", "slug": "nevermore_frenzy", "desc": ["old"]},
                    {"name": "Frenzy", "slug": "nevermore_frenzy", "desc": ["new"]}, tag="rework")

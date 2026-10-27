@@ -134,7 +134,8 @@ def test_nerf_formula_with_green_endpoints_shows_its_worst_level():
 @pytest.mark.slow
 def test_removed_innate_without_an_icon_gets_the_fallback_directly():
     """14 removed innates (Aggrandize, Gift Bearer, Sight Seer…) had a 404 src that onerror swapped later."""
-    from patch.elements import ability_change, INNATE_ICON_URL
+    from patch.elements import INNATE_ICON_URL
+    from patch.cards_ability_change import ability_change
     from patch.images import _LOCAL_ABIL_ICONS
     assert "dark_seer_aggrandize" not in _LOCAL_ABIL_ICONS
     html = ability_change(old=dict(name="Aggrandize", slug="dark_seer_aggrandize", innate=True, desc=["Passive."]),

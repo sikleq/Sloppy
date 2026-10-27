@@ -2,11 +2,11 @@
 cast range / mana / health cost / cooldown right with the game's icons; numbers bold."""
 import re
 
-from patch import elements as el
+from patch import cards_item_abilities
 
 
 def test_meta_goes_to_the_header_and_leaves_the_description():
-    h = el._item_ability_html("Active: Ribbit. Increases an ally's health regeneration by 8 for 10 seconds. "
+    h = cards_item_abilities._item_ability_html("Active: Ribbit. Increases an ally's health regeneration by 8 for 10 seconds. "
                               "Cast Range: 1000. Mana Cost: 40. Cooldown: 45s")
     head, desc = h.split('<span class="iab-desc">')
     assert '<span class="iab-name">Ribbit</span>' in head
@@ -17,23 +17,23 @@ def test_meta_goes_to_the_header_and_leaves_the_description():
 
 def test_a_multiplier_is_bold_whole_not_cut_at_its_decimal_point():
     # 7.39 Sister's Shroud "reduces this evasion bonus to 0.25x" showed a bold "0" and a plain ".25x"
-    html = el._iab_bold_numbers("reduces it to 0.25x of its value, take 1.5x damage, ends at 5. Then 2x")
+    html = cards_item_abilities._iab_bold_numbers("reduces it to 0.25x of its value, take 1.5x damage, ends at 5. Then 2x")
     assert '<b class="iab-num">0.25x</b> of' in html and '<b class="iab-num">1.5x</b> damage' in html
     assert '<b class="iab-num">5</b>. Then <b class="iab-num">2x</b>' in html
 
 
 def test_no_mana_cost_is_dropped_and_a_name_with_bang_is_kept():
-    h = el._item_ability_html("Active: Pig, Out! Turn your hero into a critter for 4 seconds. No Mana Cost. Cooldown: 25s")
+    h = cards_item_abilities._item_ability_html("Active: Pig, Out! Turn your hero into a critter for 4 seconds. No Mana Cost. Cooldown: 25s")
     assert "Pig, Out!" in h and "No Mana Cost" not in h and "manacost.png" not in h
 
 
 def test_a_description_without_a_name_keeps_its_first_sentence():
-    h = el._item_ability_html("Active: Increases your current and max health by 240 for 10 seconds")
+    h = cards_item_abilities._item_ability_html("Active: Increases your current and max health by 240 for 10 seconds")
     assert "iab-name" not in h and "Increases your current" in h
 
 
 def test_a_radius_sentence_goes_to_the_header_with_the_aoe_icon():
-    h = el._item_ability_html("Active: Arctic Blast. Emits a freezing wave. Radius: 825. Mana Cost: 75. Cooldown: 27s")
+    h = cards_item_abilities._item_ability_html("Active: Arctic Blast. Emits a freezing wave. Radius: 825. Mana Cost: 75. Cooldown: 27s")
     head, desc = h.split('<span class="iab-desc">')
     assert "aoe.png" in head and ">825<" in head and "Radius" not in desc
 
@@ -44,14 +44,14 @@ def test_a_misc_radius_row_joins_the_header_grey_with_its_note_on_hover():
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
     try:
         _State.current_entity_key, _State.current_patch_version = "item|gleipnir-test", "7.38"
-        el.item_abilities_change(
+        cards_item_abilities.item_abilities_change(
             old=["Active: Eternal Chains. Roots all enemies in a target 350 radius for 2 seconds. Cooldown: 18s"],
             new=["Active: Eternal Chains. Roots all enemies in a 350 radius for 2 seconds. Cooldown: 18s"])
         row = ("Eternal Chains radius decreased from 350 to 275 "
                "(effective spell radius unchanged due to item's built-in AoE Bonus)")
-        assert el._iab_covered_change(row, {"misc"})
-        assert not el._iab_covered_change("Chain Lightning radius increased from 600 to 650", {"buff"})
-        old, new = el.render_iab_card("item|gleipnir-test|7.38").split("pane-new")
+        assert cards_item_abilities._iab_covered_change(row, {"misc"})
+        assert not cards_item_abilities._iab_covered_change("Chain Lightning radius increased from 600 to 650", {"buff"})
+        old, new = cards_item_abilities.render_iab_card("item|gleipnir-test|7.38").split("pane-new")
         assert "aoe.png" in old and ">350<" in old
         assert 'class="iab-m iab-misc"' in new and "aoe.png" in new
         assert ('class="iab-hint abil-ico-hint" data-tooltip="Effective spell radius unchanged due to '
@@ -62,20 +62,20 @@ def test_a_misc_radius_row_joins_the_header_grey_with_its_note_on_hover():
 
 def test_abilities_pair_by_name_and_only_a_pair_gets_an_arrow():
     # Heaven's Halberd 7.38: Disarm -> Disarm gets the arrow, the new Damage Block has nothing to point from
-    rows = el._iab_pair_rows(["Active: Disarm. Old text."],
+    rows = cards_item_abilities._iab_pair_rows(["Active: Disarm. Old text."],
                              ["Active: Disarm. New text.", "Passive: Damage Block. Blocks damage."])
     assert rows == [("Active: Disarm. Old text.", "Active: Disarm. New text."),
                     (None, "Passive: Damage Block. Blocks damage.")]
     # Gleipnir 7.38: the removed Chain Lightning keeps its place, an empty cell on the right
-    rows = el._iab_pair_rows(["Active: Eternal Chains. A.", "Passive: Chain Lightning. B."], ["Active: Eternal Chains. C."])
+    rows = cards_item_abilities._iab_pair_rows(["Active: Eternal Chains. A.", "Passive: Chain Lightning. B."], ["Active: Eternal Chains. C."])
     assert rows[1] == ("Passive: Chain Lightning. B.", None)
     from patch.state import _State
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
     try:
         _State.current_entity_key, _State.current_patch_version = "item|halberd-test", "7.38"
-        el.item_abilities_change(old=["Active: Disarm. Old text."],
+        cards_item_abilities.item_abilities_change(old=["Active: Disarm. Old text."],
                                  new=["Active: Disarm. New text.", "Passive: Damage Block. Blocks damage."])
-        html = el.render_iab_card("item|halberd-test|7.38")
+        html = cards_item_abilities.render_iab_card("item|halberd-test|7.38")
         # one arrow for the whole card (owner 2026-09-27), centred across every row
         # ...centred on the rows that have both sides: here row 1 only (owner 2026-09-30: it pointed at nothing)
         assert html.count('class="properties-arrow"') == 1 and 'style="grid-row:1 / 2"' in html
@@ -83,9 +83,9 @@ def test_abilities_pair_by_name_and_only_a_pair_gets_an_arrow():
         # owner 2026-09-30: the added ability's own card gets the light green dashed frame, the paired one none
         assert html.count("iab-added") == 1 and "iab-removed" not in html
         assert re.search(r'class="iab-card iab-added">.*?Damage Block', html, re.S)
-        el.item_abilities_change(old=["Active: Eternal Chains. A.", "Passive: Chain Lightning. B."],
+        cards_item_abilities.item_abilities_change(old=["Active: Eternal Chains. A.", "Passive: Chain Lightning. B."],
                                  new=["Active: Eternal Chains. C."])
-        html = el.render_iab_card("item|halberd-test|7.38")
+        html = cards_item_abilities.render_iab_card("item|halberd-test|7.38")
         assert re.search(r'class="iab-card iab-removed">.*?Chain Lightning', html, re.S) and "iab-added" not in html
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
@@ -93,12 +93,12 @@ def test_abilities_pair_by_name_and_only_a_pair_gets_an_arrow():
 
 def test_a_removed_and_an_added_ability_are_a_replacement_row():
     # Revenant's Brooch 7.38: Toggle: Phantom Province -> Passive: Phantom Critical (owner 2026-09-28)
-    rows = el._iab_pair_rows(["Toggle: Phantom Province. Attacks cost 50 mana."],
+    rows = cards_item_abilities._iab_pair_rows(["Toggle: Phantom Province. Attacks cost 50 mana."],
                              ["Passive: Phantom Critical. Grants each attack a 30% chance."])
     assert rows == [("Toggle: Phantom Province. Attacks cost 50 mana.", "Passive: Phantom Critical. Grants each attack a 30% chance.")]
     # a removal with nothing added stays alone (Gleipnir 7.38), and so does an addition (Heaven's Halberd 7.38)
-    assert el._iab_pair_rows(["Active: A. x.", "Passive: B. y."], ["Active: A. z."])[1] == ("Passive: B. y.", None)
-    assert not el._iab_same_ability("Toggle: Phantom Province. a.", "Passive: Phantom Critical. b.")
+    assert cards_item_abilities._iab_pair_rows(["Active: A. x.", "Passive: B. y."], ["Active: A. z."])[1] == ("Passive: B. y.", None)
+    assert not cards_item_abilities._iab_same_ability("Toggle: Phantom Province. a.", "Passive: Phantom Critical. b.")
 
 
 def test_a_row_without_numbers_colours_the_card_text_it_describes():
@@ -107,12 +107,12 @@ def test_a_row_without_numbers_colours_the_card_text_it_describes():
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
     try:
         _State.current_entity_key, _State.current_patch_version = "item|bloodstone-test", "7.38"
-        el.item_abilities_change(old=["Active: Bloodpact. Increases Spell Lifesteal by 4x. Lasts 5 seconds. Cooldown: 35s"],
+        cards_item_abilities.item_abilities_change(old=["Active: Bloodpact. Increases Spell Lifesteal by 4x. Lasts 5 seconds. Cooldown: 35s"],
                                  new=["Active: Bloodpact. Increases Spell Lifesteal by 4x. Lasts 5 seconds. "
                                       "Dispel Type: Basic Dispel. Cooldown: 35s"])
-        assert el._iab_text_change("Bloodpact now applies a basic dispel on cast", {"new"})
-        assert not el._iab_text_change("Bloodpact lifesteal increased from 4x to 5x", {"buff"})   # numbers: not this rule
-        new = el.render_iab_card("item|bloodstone-test|7.38").split("pane-new")[1]
+        assert cards_item_abilities._iab_text_change("Bloodpact now applies a basic dispel on cast", {"new"})
+        assert not cards_item_abilities._iab_text_change("Bloodpact lifesteal increased from 4x to 5x", {"buff"})   # numbers: not this rule
+        new = cards_item_abilities.render_iab_card("item|bloodstone-test|7.38").split("pane-new")[1]
         assert '<span class="iab-hl iab-hl-new" data-tag="new">Dispel Type: Basic Dispel</span>.' in new
         assert "cooldown.png" in new                                    # the header values still found
     finally:
@@ -122,7 +122,7 @@ def test_a_row_without_numbers_colours_the_card_text_it_describes():
 def _card_for(key, old, new):
     from patch.state import _State
     _State.current_entity_key, _State.current_patch_version = key, "7.38"
-    el.item_abilities_change(old=old, new=new)
+    cards_item_abilities.item_abilities_change(old=old, new=new)
 
 
 def test_no_longer_colours_the_removed_sentence_red_not_the_rewritten_fragment():
@@ -133,8 +133,8 @@ def test_no_longer_colours_the_removed_sentence_red_not_the_rewritten_fragment()
         _card_for("item|drum2-test",
                   ["Active: Endurance. Consumes a charge and gives +45 attack speed for 6 seconds. Comes with 8 charges."],
                   ["Active: Endurance. Gives +35 attack speed for 6 seconds."])
-        assert el._iab_text_change("Endurance no longer uses charges", {"rework"})
-        old = el.render_iab_card("item|drum2-test|7.38").split("pane-new")[0]
+        assert cards_item_abilities._iab_text_change("Endurance no longer uses charges", {"rework"})
+        old = cards_item_abilities.render_iab_card("item|drum2-test|7.38").split("pane-new")[0]
         assert '<span class="iab-hl iab-hl-del" data-tag="del">Comes with <b class="iab-num">8</b> charges</span>' in old
         assert "iab-hl-del\">Consumes" not in old
     finally:
@@ -149,13 +149,13 @@ def test_a_phrase_is_found_when_no_changed_piece_holds_the_rows_words():
         _card_for("item|khanda2-test",
                   ["Passive: Empower Spell. The next spell deals 150 + 60% of your attack damage as bonus damage to the target."],
                   ["Passive: Empower Spell. The next spell deals a separate 250 additional damage to the target."])
-        assert el._iab_text_change("Empower Spell no longer deals attack damage", {"del"})
-        old = el.render_iab_card("item|khanda2-test|7.38").split("pane-new")[0]
+        assert cards_item_abilities._iab_text_change("Empower Spell no longer deals attack damage", {"del"})
+        old = cards_item_abilities.render_iab_card("item|khanda2-test|7.38").split("pane-new")[0]
         assert '<span class="iab-hl iab-hl-del" data-tag="del">your attack damage</span>' in old
         # what stopped must be in the text: "no longer stack with …" is not "bonus damage" — the old tooltip never
         # said it, so it goes after the old description in red (owner 2026-10-17, Pipe of Insight 7.41)
-        assert el._iab_text_change("Empower Spell no longer stacks with Khanda", {"del"})
-        old = el.render_iab_card("item|khanda2-test|7.38").split("pane-new")[0]
+        assert cards_item_abilities._iab_text_change("Empower Spell no longer stacks with Khanda", {"del"})
+        old = cards_item_abilities.render_iab_card("item|khanda2-test|7.38").split("pane-new")[0]
         assert 'data-tag="del">Stacks with Khanda</span>' in old and 'data-tag="del">bonus damage' not in old
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
@@ -168,8 +168,8 @@ def test_can_now_be_dispelled_adds_dispellable_at_the_end_of_the_description():
         _card_for("item|halberd2-test",
                   ["Active: Disarm. Prevents a target from attacking for 3 seconds. Cast Range: 650. Cooldown: 18s"],
                   ["Active: Disarm. Prevents a target from attacking for 3 seconds. Cast Range: 650. Cooldown: 18s"])
-        assert el._iab_text_change("Disarm can now be dispelled", {"nerf"})
-        new = el.render_iab_card("item|halberd2-test|7.38").split("pane-new")[1]
+        assert cards_item_abilities._iab_text_change("Disarm can now be dispelled", {"nerf"})
+        new = cards_item_abilities.render_iab_card("item|halberd2-test|7.38").split("pane-new")[1]
         assert '<b class="iab-num">3</b> seconds. <span class="iab-hl iab-hl-nerf" data-tag="nerf">Dispellable</span>.' in new
         assert "castrange.png" in new and "cooldown.png" in new           # the header values still found
     finally:
@@ -185,12 +185,12 @@ def test_pierces_debuff_immunity_and_a_no_longer_row_with_its_number():
                   ["Passive: Freezing Aura. Reduces the attack speed of all enemies by -45 and Health Restoration "
                    "and Incoming Heal Amplification by 25%. Radius: 1200."],
                   ["Passive: Freezing Aura. Reduces the attack speed of all enemies by -45. Radius: 1200."])
-        assert el._iab_text_change("Freezing Aura now pierces debuff immunity", {"new"})
-        assert el._iab_text_change("Freezing Aura no longer reduces Health Restoration and Incoming Heal "
+        assert cards_item_abilities._iab_text_change("Freezing Aura now pierces debuff immunity", {"new"})
+        assert cards_item_abilities._iab_text_change("Freezing Aura no longer reduces Health Restoration and Incoming Heal "
                                    "Amplification by 25%", {"del"})
         # a number the card text doesn't show keeps the row
-        assert not el._iab_text_change("Freezing Aura no longer reduces Health Restoration by 30%", {"del"})
-        old, new = el.render_iab_card("item|shiva-test|7.38").split("pane-new")
+        assert not cards_item_abilities._iab_text_change("Freezing Aura no longer reduces Health Restoration by 30%", {"del"})
+        old, new = cards_item_abilities.render_iab_card("item|shiva-test|7.38").split("pane-new")
         assert 'data-tag="new">Pierces Debuff Immunity</span>.' in new and "aoe.png" in new
         assert 'iab-hl-del" data-tag="del">and Incoming Heal Amplification by <b class="iab-num">25%</b></span>' in old
     finally:
@@ -216,9 +216,9 @@ def test_removed_ability_row_is_hidden_when_the_card_shows_it_on_one_side():
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
     try:
         _State.current_entity_key, _State.current_patch_version = "item|halberd41-test", "7.41"
-        el.item_abilities_change(old=["Active: Disarm. A.", "Passive: Damage Block. B."], new=["Active: Disarm. C."])
-        assert el._iab_unpaired_row("Removed Damage Block ability", {"del"})
-        assert not el._iab_unpaired_row("Removed Disarm ability", {"del"})       # Disarm is on both sides
+        cards_item_abilities.item_abilities_change(old=["Active: Disarm. A.", "Passive: Damage Block. B."], new=["Active: Disarm. C."])
+        assert cards_item_abilities._iab_unpaired_row("Removed Damage Block ability", {"del"})
+        assert not cards_item_abilities._iab_unpaired_row("Removed Disarm ability", {"del"})       # Disarm is on both sides
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
 
@@ -229,10 +229,10 @@ def test_a_changed_number_carries_its_percent_in_the_hover_tip():
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
     try:
         _State.current_entity_key, _State.current_patch_version = "item|drum-test", "7.38"
-        el.item_abilities_change(old=["Passive: Swiftness Aura. Grants 20 movement speed to allies."],
+        cards_item_abilities.item_abilities_change(old=["Passive: Swiftness Aura. Grants 20 movement speed to allies."],
                                  new=["Passive: Swiftness Aura. Grants 15 movement speed to allies."])
-        assert el._iab_covered_change("Swiftness Aura movement speed decreased from 20 to 15", {"nerf"}, "", b(20, 15))
-        new = el.render_iab_card("item|drum-test|7.38").split("pane-new")[1]
+        assert cards_item_abilities._iab_covered_change("Swiftness Aura movement speed decreased from 20 to 15", {"nerf"}, "", b(20, 15))
+        new = cards_item_abilities.render_iab_card("item|drum-test|7.38").split("pane-new")[1]
         assert 'class="iab-hint abil-ico-hint" data-tooltip="' in new and "-25%" in new
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
@@ -254,15 +254,15 @@ def test_item_abilities_change_puts_each_ability_in_a_card_on_its_side():
     saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
     try:
         _State.current_entity_key, _State.current_patch_version = "item|khanda-test", "7.38"
-        slot = el.item_abilities_change(
+        slot = cards_item_abilities.item_abilities_change(
             old=["Passive: Empower Spell. Deals 150 bonus damage. Cooldown: 6s", "Passive: Critical Strike. 30% chance"],
             new=["Passive: Empower Spell. Deals 250 bonus damage. Cooldown: 12s"])
         assert slot == "<!--IABCARD:item|khanda-test|7.38-->"          # drawn when the page is saved
         # rows under the card that it already shows: hidden, their numbers coloured
-        assert el._iab_covered_change("Empower Spell bonus damage increased from 150 to 250", {"buff"})
-        assert el._iab_covered_change("Empower Spell cooldown increased from 6s to 12s", {"nerf"})
-        assert not el._iab_covered_change("Recipe cost increased from 500 to 1500", {"nerf"})
-        html = el.render_iab_card("item|khanda-test|7.38")
+        assert cards_item_abilities._iab_covered_change("Empower Spell bonus damage increased from 150 to 250", {"buff"})
+        assert cards_item_abilities._iab_covered_change("Empower Spell cooldown increased from 6s to 12s", {"nerf"})
+        assert not cards_item_abilities._iab_covered_change("Recipe cost increased from 500 to 1500", {"nerf"})
+        html = cards_item_abilities.render_iab_card("item|khanda-test|7.38")
         old, new = html.split('pane-new')
         assert old.count('class="iab-card') == 2 and new.count('class="iab-card') == 1
         assert old.count("iab-removed") == 1                              # Critical Strike: gone in the new item
@@ -274,9 +274,9 @@ def test_item_abilities_change_puts_each_ability_in_a_card_on_its_side():
 
 def test_an_ability_card_gets_the_item_header_strip_with_its_kind_from_the_game_files():
     # owner 2026-09-30, 7.38 Tormentor's Alleviation: "you could have added a Passive header" — as an item ability
-    props = el._pane_props({"icon_url": "../icons/abilities/miniboss_alleviation.png"}, "7.38")
+    props = cards_item_abilities._pane_props({"icon_url": "../icons/abilities/miniboss_alleviation.png"}, "7.38")
     assert props["kind"] == "Passive"
-    head, rows = el._pane_parts(["After death, the Tormentor leaves behind a verdant dale, increasing the regeneration "
+    head, rows = cards_item_abilities._pane_parts(["After death, the Tormentor leaves behind a verdant dale, increasing the regeneration "
                                  "of everyone nearby by <b>2%</b> of their Max Health.", "Radius: 900. Duration: 15s."],
                                 props)
     assert head.startswith('<div class="iab-head pane-head">') and '<b class="iab-kind">Passive</b>' in head
@@ -289,7 +289,7 @@ def test_the_game_files_fill_the_header_where_the_text_is_silent():
     from patch.ability_kv import ability_props
     p = ability_props("frogmen_riverborn_aura", "7.38")
     assert (p["kind"], p["aoe"]) == ("Passive", "1200")
-    h = el._item_ability_html("Passive: All allies within a 1200 range receive a 10/12/14/16% movement speed bonus", p)
+    h = cards_item_abilities._item_ability_html("Passive: All allies within a 1200 range receive a 10/12/14/16% movement speed bonus", p)
     assert "aoe.png" in h.split('<span class="iab-desc">')[0] and ">1200<" in h
     # Throw 7.38: Roshan's ability, from abilities.json
     t = ability_props("roshan_grab_and_throw", "7.38")
@@ -299,12 +299,12 @@ def test_the_game_files_fill_the_header_where_the_text_is_silent():
 
 
 def test_a_value_said_twice_in_one_pane_stays_in_the_text():
-    head, rows = el._pane_parts(["Summons a hawk. Cooldown: 20s.", "Recast: a dive. Cooldown: 5s."])
+    head, rows = cards_item_abilities._pane_parts(["Summons a hawk. Cooldown: 20s.", "Recast: a dive. Cooldown: 5s."])
     assert head == "" and "Cooldown: <b" in rows
 
 
 def test_numbers_in_a_popup_a_badge_or_a_table_are_not_touched():
-    html = el._bold_numbers_html('Deals 50 <span class="info-tip">?<span class="info-pop">was 40 '
+    html = cards_item_abilities._bold_numbers_html('Deals 50 <span class="info-tip">?<span class="info-pop">was 40 '
                                  '<span class="badge buff3">+25%</span></span></span> '
                                  '<div class="formula-table-wrap"><table><td>7</td></table></div> and 3x')
     assert '<b class="iab-num">50</b>' in html and '<b class="iab-num">3x</b>' in html
@@ -313,20 +313,20 @@ def test_numbers_in_a_popup_a_badge_or_a_table_are_not_touched():
 
 def test_a_units_ability_row_gets_the_item_header_with_comma_separated_values():
     # 7.38 Marshmage Apprentice: "Cast Range: 550, Mana Cost: 90, Cooldown: 16s"; Boglet: "Range: 275"
-    h = el._item_ability_html("Active: Creates a barrier bubble for 10s. Cast Range: 550, Mana Cost: 90, Cooldown: 16s")
+    h = cards_item_abilities._item_ability_html("Active: Creates a barrier bubble for 10s. Cast Range: 550, Mana Cost: 90, Cooldown: 16s")
     head, desc = h.split('<span class="iab-desc">')
     assert "castrange.png" in head and ">550<" in head and ">90<" in head and ">16<" in head
     assert "Cast Range" not in desc and "Cooldown" not in desc and '<b class="iab-num">10s</b>' in desc
-    h = el._item_ability_html("Active: Sends out tentacles, dealing 80 damage. Range: 275. Mana Cost: 40. Cooldown: 16s")
+    h = cards_item_abilities._item_ability_html("Active: Sends out tentacles, dealing 80 damage. Range: 275. Mana Cost: 40. Cooldown: 16s")
     assert "castrange.png" in h and ">275<" in h and "Range:" not in h
 
 
 def test_the_texts_own_kind_and_a_facets_ability_name_go_to_the_header():
     # 7.41 Summon Raptors: "Active." again under an "Active" header; 7.38 Arcane Overflow: "Arcane Aura: ..." rows
-    head, rows = el._pane_parts(["Active. Now a separately leveled ability.", "Summons 2 hawks. Cooldown: 30s."])
+    head, rows = cards_item_abilities._pane_parts(["Active. Now a separately leveled ability.", "Summons 2 hawks. Cooldown: 30s."])
     assert '<b class="iab-kind">Active</b>' in head and rows.startswith('<div class="ability-change-row">Now a')
-    head, rows = el._pane_parts(["Arcane Aura: Can be activated. Cooldown: 30s.", "Arcane Aura: Paused during X."],
+    head, rows = cards_item_abilities._pane_parts(["Arcane Aura: Can be activated. Cooldown: 30s.", "Arcane Aura: Paused during X."],
                                 facet=True)
     assert '<span class="iab-name">Arcane Aura</span>' in head and "Arcane Aura:" not in rows
     # not in an ability card: "Damage Barrier: 1900" is a value, not a name
-    assert "iab-name" not in el._pane_parts(["Damage Barrier: 1900."])[0]
+    assert "iab-name" not in cards_item_abilities._pane_parts(["Damage Barrier: 1900."])[0]

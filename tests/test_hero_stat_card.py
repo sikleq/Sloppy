@@ -3,9 +3,9 @@
 Valve's damage rows under them are hidden."""
 import re
 
-from patch import elements as el
 from patch.hero_stats import damage_at, hero_stats, universal_multiplier
 from patch.state import _State
+from patch import cards_hero_stats
 
 
 def test_the_damage_model_matches_valves_level_1_figures():
@@ -22,16 +22,16 @@ def test_card_hides_its_rows_and_carries_their_tags():
     saved = (_State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card)
     try:
         _State.current_entity_key, _State.current_patch_version, _State.current_hero = "hero|abaddon", "7.38", "Abaddon"
-        slot = el.hero_stat_card()
+        slot = cards_hero_stats.hero_stat_card()
         assert slot == "<!--HSCARD:hero|abaddon|7.38-->"
-        assert el._hs_covered("Base Damage increased by 26", {"buff"})
-        assert el._hs_covered("Damage at level 1 increased by 10 (from 40-50 to 50-60)", {"buff"})
-        assert el._hs_covered("Damage at level 30 decreased by 25 (from 173-183 to 148-158)", {"nerf"})
+        assert cards_hero_stats._hs_covered("Base Damage increased by 26", {"buff"})
+        assert cards_hero_stats._hs_covered("Damage at level 1 increased by 10 (from 40-50 to 50-60)", {"buff"})
+        assert cards_hero_stats._hs_covered("Damage at level 30 decreased by 25 (from 173-183 to 148-158)", {"nerf"})
         # the attribute rows stay rows (owner 2026-09-28: "more laconic")
-        assert not el._hs_covered("Strength gain increased from 2.2 to 2.6", {"buff"})
-        assert not el._hs_covered("Mist Coil damage increased from 100 to 120", {"buff"})
-        assert el._hs_covered("Damage gain per level decreased from +3.6 to +2.7", {"nerf"})
-        html = el.render_hs_card("hero|abaddon|7.38")
+        assert not cards_hero_stats._hs_covered("Strength gain increased from 2.2 to 2.6", {"buff"})
+        assert not cards_hero_stats._hs_covered("Mist Coil damage increased from 100 to 120", {"buff"})
+        assert cards_hero_stats._hs_covered("Damage gain per level decreased from +3.6 to +2.7", {"nerf"})
+        html = cards_hero_stats.render_hs_card("hero|abaddon|7.38")
         # TWO rows, each with its own tag (owner 2026-09-28: the start went up, the growth went down)
         start, gain = re.findall(r"<li .*?</li>(?=<li |$)", html, re.S)
         assert start.startswith('<li data-tag="buff" class="li-bg hs-dmg-li">')
@@ -67,7 +67,7 @@ def test_valves_figures_are_read_in_every_way_valve_writes_them():
             ("Damage at level 30 decreased by 51-49 (from 196-204 to 145-155)", 30, ((196, 204), (145, 155))),
             ("Damage at level 1 rescaled from 46-54 to 45-55", 1, ((46, 54), (45, 55))),
             ("Damage at level 30 decreased by 27 (from 149–153 to 122–126)", 30, ((149, 153), (122, 126)))):
-        m = el._HS_DMG_VALVE_RE.search(text)
+        m = cards_hero_stats._HS_DMG_VALVE_RE.search(text)
         assert m and int(m.group(1)) == level, text
         assert ((int(m.group(2)), int(m.group(3))), (int(m.group(4)), int(m.group(5)))) == figures
 
@@ -76,9 +76,9 @@ def test_unchanged_starting_damage_is_said_so():
     saved = (_State.current_entity_key, _State.current_patch_version, _State.current_hero, _State.hs_card)
     try:
         _State.current_entity_key, _State.current_patch_version, _State.current_hero = "hero|batrider", "7.38", "Batrider"
-        el.hero_stat_card()
-        el._hs_covered("Damage at level 1 increased by 0 (from 39-43 to 39-43)", {"misc"})
-        html = el.render_hs_card("hero|batrider|7.38")
+        cards_hero_stats.hero_stat_card()
+        cards_hero_stats._hs_covered("Damage at level 1 increased by 0 (from 39-43 to 39-43)", {"misc"})
+        html = cards_hero_stats.render_hs_card("hero|batrider|7.38")
         # the start did not move: no row for it, only the growth's row, the (?) says so
         assert html.count("<li ") == 1 and "Starting damage unchanged at 39–43" in html
         assert re.search(r'data-tag="nerf".*>Damage gain per level decreased from [\d.]+ to [\d.]+<', html)
