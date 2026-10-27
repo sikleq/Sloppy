@@ -3,11 +3,11 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pytest
-from generate_patch_code_v2 import (
+from tools.generate_patch_code_v2 import (
     _guess_tag, LOWER_IS_BUFF, _NOT_LOWER_IS_BUFF,
     _postprocess_recipe_cost_zero_net, _DMG_L1_RE,
 )
-import generate_patch_code_v2 as g
+import tools.generate_patch_code_v2 as g
 
 
 # ── _guess_tag: canonical phrase → expected tag ────────────────────────────
@@ -399,7 +399,7 @@ def test_generated_scaffold_executes(version, capsys):
 # "Caster's facet upgrades" in the popup, "Bonuses from talents" and the Aghs line
 # as separate rows, and hung the Aghs explanation on the wrong row).
 def _gen_rows(notes):
-    from generate_patch_code_v2 import _emit_notes
+    from tools.generate_patch_code_v2 import _emit_notes
     lines, _ = _emit_notes(notes)
     return [l for l in lines if l.startswith("W(li(")]
 
@@ -459,7 +459,7 @@ def test_card_body_parents_keep_their_kids_as_rows():
 
 
 def test_item_reworked_title_gets_changed_label_and_component_diff():
-    from generate_patch_code_v2 import _render_item
+    from tools.generate_patch_code_v2 import _render_item
     item = {"ability_id": 1, "title": '<span class="Rework">Item Reworked</span>',
             "ability_notes": [
                 {"indent_level": 1, "note": "Requires Orb of Frost (250), Orb of Blight (300) and Band of Elvenskin (450). Total cost: 1000"},
@@ -848,14 +848,14 @@ def test_dispel_direction():
 def test_charge_gain_time_is_lower_is_buff():
     """7.41b Consecrated Wraps: "Hallowed charge gain time increased from 3s to 4s" is a NERF —
     a longer time to gain a charge (found by the weights audit, 2026-09-25)."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     assert g.LOWER_IS_BUFF.search("Hallowed charge gain time increased from 3s to 4s")
 
 
 def test_item_ability_mana_cost_is_a_row_not_a_card_line():
     """Gleipnir 7.38: "Eternal Chains mana cost 200 -> 100" is the active's number — a plain row
     ("mana cost decreased from 200 to 100"), never a "+200 … mana cost" line in the stat cards."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     out = g._postprocess_properties_change([
         'W(item_header("Gleipnir", changed=True))',
         'W(auto_components_change("Gleipnir", "7.38"))',      # the build changed: the stats card comes with it
@@ -868,7 +868,7 @@ def test_item_ability_mana_cost_is_a_row_not_a_card_line():
 
 def test_does_not_stack_note_goes_into_the_passive_rows_info():
     """Orb of Corrosion 7.38: "Armor reduction does not stack with …" is the Passive's footnote."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     out = g._postprocess_stack_note_into_ability([
         '    W(li("Passive: Corrosion. Reduces armor by 3", t("REWORK")))',
         '    W(li("Armor reduction does not stack with its components, Desolator, or Stygian Desolator", t("MISC")))'])
@@ -879,7 +879,7 @@ def test_does_not_stack_note_goes_into_the_passive_rows_info():
 def test_now_provides_x_instead_of_y_goes_into_the_cards():
     """Khanda 7.38: "Now provides +8 Mana Regen instead of +50 Damage" = old +50 Damage -> new +8 Mana Regen;
     "Empower Spell bonus damage 150 -> 250" is the active's number and stays a row."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     out = g._postprocess_properties_change([
         'W(item_header("Khanda", changed=True))',
         'W(auto_components_change("Khanda", "7.38"))',
@@ -892,7 +892,7 @@ def test_now_provides_x_instead_of_y_goes_into_the_cards():
 def test_reworked_item_provides_list_is_the_new_card_and_asks_for_old_stats():
     """Revenant's Brooch 7.38: "Provides +35 Damage and +16% Spell Lifesteal" -> new card; the old side is a TODO
     (from the previous patch's tooltips, never invented)."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     out = g._postprocess_properties_change([
         'W(item_header("Revenant\'s Brooch", changed=True))',
         'W(auto_components_change("Revenant\'s Brooch", "7.38"))',
@@ -904,7 +904,7 @@ def test_reworked_item_provides_list_is_the_new_card_and_asks_for_old_stats():
 def test_unstated_total_cost_change_gets_its_own_row():
     """Revenant's Brooch 7.38: the notes never state the price, the components give 4900 -> 3300 —
     a "Total cost decreased" row (owner, 2026-09-25); no "Read from the item's components" note (2026-09-27)."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     block = ['    W(item_header("Revenant\'s Brooch", changed=True))',
              '    W(auto_components_change("Revenant\'s Brooch", "7.38"))',
              '    W(ul_open())',
@@ -959,7 +959,7 @@ def test_innate_rows_leave_the_stats_ul():
     """Owner 2026-09-26: "Barracuda: Innate ability removed" / "Septic Shock: ..." sat in the hero's general
     (stats) notes. An innate change goes to its own innate block; a removal also gets a TODO for the
     old -> new ability_change card (old text from d2vpkr, never invented)."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     out = g._postprocess_innate_rows_out_of_stats([
         'W(hero_header("Venomancer"))', 'W(ul_open())',
         'W(li("Base Armor increased by 1", b(1, 2)))',
@@ -977,7 +977,7 @@ def test_innate_rows_leave_the_stats_ul():
 
 def test_a_talent_replacement_is_swap_not_rework():
     """Owner 2026-09-26: "Level N Talent X replaced with Y" gets its own SWAP tag."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     assert g._guess_tag("Level 15 Talent +110 Rolling Boulder Damage replaced with +80 Boulder Smash Damage") == "SWAP"
     assert g._guess_tag("Level 10: +8 Strength replaced with +2 Tree Grab Attacks") == "SWAP"
     assert g._guess_tag("Wisdom Runes removed and replaced with new buildings") != "SWAP"
@@ -995,7 +995,7 @@ def test_no_talent_replacement_left_as_rework_in_content():
 def test_toggle_under_silence_or_invisibility_is_misc():
     """Owner 2026-09-27: what a toggle may be switched under doesn't change its gameplay → MISC.
     Damage type rows keep their old tags (REWORK; "classified as reflection damage" MISC)."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     assert g._guess_tag("Toggling is no longer disabled by silence") == "MISC"
     assert g._guess_tag("Toggling on/off no longer breaks invisibility and can be done while silenced") == "MISC"
     assert g._guess_tag("Now can be toggled while silenced") == "MISC"
@@ -1007,7 +1007,7 @@ def test_toggle_under_silence_or_invisibility_is_misc():
 def test_owner_decisions_2026_09_27_del_qol_rework():
     """Owner 2026-09-27: target class excluded → DEL; HUD indicator / timer → QoL;
     starts leveling with another ability → REWORK; "Can no longer be cast while rooted" → DEL."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     assert g._guess_tag("Reflected damage doesn't affect Debuff Immune units") == "DEL"
     assert g._guess_tag("Now has an overhead indicator when the ability is active") == "QoL"
     assert g._guess_tag("Added a Tormentor Timer near the minimap") == "QoL"
@@ -1020,7 +1020,7 @@ def test_owner_decisions_2026_09_27_del_qol_rework():
 def test_now_is_a_tier_artifact_is_a_header_and_its_ability_a_row():
     """Owner 2026-09-27, Occult Bracelet 7.38: "Now is a Tier 1 Neutral Artifact" goes to the header
     ("Now a Tier 1 Artifact" — the item existed before, so not "New"); the ability is a row, not an (i)."""
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     aid = next(a for a, (n, s) in g.ITEMS.items() if n == "Occult Bracelet")
     item = {"ability_id": aid, "ability_notes": [
         {"note": "Now is a Tier 1 Neutral Artifact", "indent_level": 1},

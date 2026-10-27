@@ -3,7 +3,7 @@ from patch.api import *
 def build():
     write_head("7.41e", "30.07.2026")
 
-    # 7.41e — auto-generated from data/7.41e_datafeed.json (generate_patch_code_v2.py)
+    # 7.41e — auto-generated from data/7.41e_datafeed.json (tools/generate_patch_code_v2.py)
     # then hand-reviewed: recipe-cost rows with unchanged total moved to the
     # canonical MISC + inline-badge form, "Damage at level 1"/"Damage gain per
     # level" consequence lines folded into their attribute row's info-note,

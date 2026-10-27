@@ -2,7 +2,7 @@
 
 ## Normalized JSON (`data/normalized/patches/<ver>.json`)
 
-`generate_patch_code_v2.py` writes this alongside the Python scaffold. It
+`tools/generate_patch_code_v2.py` writes this alongside the Python scaffold. It
 is the structured per-change artifact that:
 
 - `tools/validate_data.py` audits for malformed entries.
@@ -144,7 +144,7 @@ W(li(
 
 ## Fixing mislabeled tags
 
-`generate_patch_code_v2.py` infers a tag for every row by text heuristics and is
+`tools/generate_patch_code_v2.py` infers a tag for every row by text heuristics and is
 right ~80% of the time. There is **no override table** — corrections are made by
 hand in the generated `content/p<version>.py`: edit the `t(...)` / `b(...)` call
 on the row directly (e.g. flip `t("BUFF")` → `t("NERF")`, drop the badge for a

@@ -20,7 +20,7 @@ to resume):
   shops         scripts/fetch/extract_shops.py -> data/shops.txt (local game only)
   abilities_slim, herolist   the shared tables rebuilt from the new snapshot
   item_stat_lines, talent_slots   only where the store is on this PC (old tooltips: patch/loc_history.py, also the store)
-  draft         generate_patch_code_v2.py <v> -> _generated_p_<v>_v2.py + data/normalized/patches/<v>.json, only while
+  draft         tools/generate_patch_code_v2.py <v> -> _generated_p_<v>_v2.py + data/normalized/patches/<v>.json, only while
                 content/p<code>.py does not exist (a proofread page is never regenerated)
   enchant       scripts/gen/enchant_values.py + enchant_table.py <v>, when content/p<code>.py changes an enchantment
   thumbs        tools/make_thumbs.py: the pages' small WebP icons for any new or changed icon (audit 2026-10-26)
@@ -212,7 +212,7 @@ def plan(version, date, source="game", ref=None, dota_path=DOTA_PATH):
         Step("talent_slots", "data/rules/talent_slots.json", [PY, "tools/build_talent_slots.py"],
              skip=None if history else no_hist),
         Step("draft", f"generator draft _generated_p_{version}_v2.py + data/normalized/patches/{version}.json",
-             [PY, "generate_patch_code_v2.py", version],
+             [PY, "tools/generate_patch_code_v2.py", version],
              skip=f"content/p{code(version)}.py exists (proofread pages are never regenerated)" if content else None),
         Step("enchant_values", f"data/rules/enchant_values.json for {version}",
              [PY, "scripts/gen/enchant_values.py", version],

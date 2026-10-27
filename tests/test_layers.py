@@ -36,5 +36,17 @@ def test_tools_game_files_is_only_the_command_line():
 
 def test_moved_modules_are_gone_from_their_old_homes():
     for old in ("builders/site_common.py", "builders/map_versions.py", "tools/loc_history.py",
-                "tools/item_ability_text.py"):
+                "tools/item_ability_text.py", "generate_patch_code_v2.py"):
         assert not os.path.exists(os.path.join(ROOT, old)), old
+
+
+def test_the_generator_runs_from_tools_and_reads_the_repo_root():
+    """generate_patch_code_v2.py moved from the repo root to tools/ (audit 2026-10-26): its data paths still start at
+    the root, and it starts as a script."""
+    import subprocess
+    import sys
+    import tools.generate_patch_code_v2 as g
+    assert os.path.samefile(g._HERE, ROOT)
+    r = subprocess.run([sys.executable, os.path.join("tools", "generate_patch_code_v2.py")], cwd=ROOT,
+                       capture_output=True, text=True)
+    assert r.returncode != 0 and "Usage: python tools/generate_patch_code_v2.py" in r.stderr

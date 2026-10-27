@@ -5,7 +5,7 @@
 ## Когда использовать
 
 - Способность заменяется другой (разные имена) — `ability_change(old, new)`
-- Innate reworked — ВСЕГДА `ability_change`, никогда не два плоских `t("MISC")`. Генератор (`generate_patch_code_v2.py`) пишет `# TODO[innate-swap]:` / `# v2-todo:` — никогда не оставлять в коммите.
+- Innate reworked — ВСЕГДА `ability_change`, никогда не два плоских `t("MISC")`. Генератор (`tools/generate_patch_code_v2.py`) пишет `# TODO[innate-swap]:` / `# v2-todo:` — никогда не оставлять в коммите.
 - «Innate ability reworked» в патчноуте: лифтить OLD desc из патча, который вводил текущий innate (`hero_innate_<entity>_<ability>` в `patchnotes_english.txt`). **Никогда не придумывать** — спросить у пользователя, если KV-текст не найден.
 
 ## Unified layout (обязателен для всех блоков)

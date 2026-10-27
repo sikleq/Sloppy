@@ -84,7 +84,7 @@ def test_item_cards_show_every_stat_the_game_changed():
 
 
 def test_generator_adds_the_stats_the_notes_kept_quiet_about():
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     lines = ['W(item_header("Gleipnir", changed="Item Reworked"))', 'W(auto_components_change("Gleipnir", "7.38"))',
              'W(properties_change(old=[("BUFF", "+275 Health"), ("NERF", "+24 Intelligence")], '
              'new=[("", "+450 Health", b(275, 450)), ("", "+15 Intelligence", b(24, 15)), '
@@ -98,7 +98,7 @@ def test_generator_adds_the_stats_the_notes_kept_quiet_about():
 
 
 def test_generator_never_folds_an_ability_into_the_card():
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     lines = ['W(item_header("Heaven\'s Halberd", changed=True))', 'W(auto_components_change("Heaven\'s Halberd", "7.41"))',
              "W(ul_open())", 'W(li("No longer provides +275 Health", t("DEL")))',
              'W(li("Removed Damage Block ability", t("DEL")))', "W(ul_close())"]
@@ -110,7 +110,7 @@ def test_generator_never_folds_an_ability_into_the_card():
 
 def test_generator_keeps_stat_rows_when_the_build_did_not_change():
     # Sange and Yasha 7.38: no components card -> the row stays a row (owner 2026-09-28)
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     lines = ['W(item_header("Sange and Yasha"))', "W(ul_open())",
              'W(li("Status Resistance bonus decreased from +25% to +20%", b(25, 20)))', "W(ul_close())"]
     assert g._postprocess_properties_change(lines) == lines

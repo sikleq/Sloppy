@@ -8,13 +8,13 @@ hierarchy, facet subsections, entity titles ("New Tier 1 Artifact"), aghanims
 markers, and info clarifications.
 
 Usage:
-    python generate_patch_code_v2.py <version>
+    python tools/generate_patch_code_v2.py <version>
 
-E.g.: python generate_patch_code_v2.py 7.40
+E.g.: python tools/generate_patch_code_v2.py 7.40
 
 Output: `_generated_p_<version>_v2.py` in the repo root — review it, then save the
-reviewed block as `content/p<version>.py` wrapped in `def build():` and register
-it in `builders/patch.py`.
+reviewed block as `content/p<version>.py` wrapped in `def build():` (builders/build_patches.py
+finds it by itself; until 2026-10-27 this script lay in the repo root).
 
 Pipeline:
 1. Load datafeed JSON (data/<version>_datafeed.json) + itemlist + herolist
@@ -45,7 +45,7 @@ import os
 import re
 import sys
 
-_HERE = os.path.dirname(os.path.abspath(__file__))
+_HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # the repo root
 sys.path.insert(0, _HERE)
 try:
     from patch.images import ITEM_SLUG as _KNOWN_ITEM_SLUGS
@@ -1504,7 +1504,7 @@ def innate_slugs_of(version):
     """Slugs flagged "Innate" "1" in that patch's hero KV (data/stats/<version>/heroes/*.txt); empty when the patch
     has no per-hero files."""
     if version not in _INNATE_BY_VERSION:
-        folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "stats", str(version), "heroes")
+        folder = os.path.join(_HERE, "data", "stats", str(version), "heroes")
         found = set()
         if version and os.path.isdir(folder):
             for f in os.listdir(folder):
@@ -2949,7 +2949,7 @@ _BOSS_ABIL_CACHE = {}
 def _boss_abilities(prefix):
     """{display name: icon url} of a boss's abilities, from the game localization."""
     if prefix not in _BOSS_ABIL_CACHE:
-        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "abilities_english.txt")
+        path = os.path.join(_HERE, "data", "abilities_english.txt")
         found = {}
         try:
             txt = open(path, encoding="utf-8").read()
@@ -3112,12 +3112,12 @@ _INNATE_NAMES = {}
 def _innate_names():
     """display name -> engine slug of every innate (abilities_slim is_innate)."""
     if not _INNATE_NAMES:
-        slim = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "abilities_slim.json"),
+        slim = json.load(open(os.path.join(_HERE, "data", "abilities_slim.json"),
                               encoding="utf-8"))
         _INNATE_NAMES.update({v["dname"]: k for k, v in slim.items() if v and v.get("is_innate") and v.get("dname")})
         _ALL_NAMES.update({v["dname"]: k for k, v in slim.items() if v and v.get("dname")})
         # removed abilities are gone from abilities_slim but their tooltip name stays in the game's text
-        loc = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "abilities_english.txt")
+        loc = os.path.join(_HERE, "data", "abilities_english.txt")
         if os.path.exists(loc):
             for slug, name in re.findall(r'"DOTA_Tooltip_ability_([a-z0-9_]+)"\s+"([^"]+)"',
                                          open(loc, encoding="utf-8", errors="replace").read()):
@@ -3134,7 +3134,7 @@ def _removed_innate_slug(hero_display, name):
     snapshot's ability_ids.json ever had it."""
     if not _EVER_IDS:
         import glob
-        for f in glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "stats", "*", "ability_ids.json")):
+        for f in glob.glob(os.path.join(_HERE, "data", "stats", "*", "ability_ids.json")):
             _EVER_IDS.update(json.load(open(f, encoding="utf-8")).values())
     from patch.images import HERO_SLUG
     npc = HERO_SLUG.get(hero_display, "")
@@ -3685,7 +3685,6 @@ def _postprocess_item_ability_cards(lines, version):
     (item_abilities_change) from the game's tooltips of both patches. Needs the local tooltip history
     (the game-files store, patch/game_files.py via patch/loc_history.py); without it the pass is skipped."""
     try:
-        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools"))
         from patch.item_ability_text import insert_cards
         from patch.weights import _prev_version
     except Exception as e:                                   # pragma: no cover — optional local data
@@ -3846,7 +3845,7 @@ def _auto_register_facets(version, datafeed):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('Usage: python generate_patch_code_v2.py <version>', file=sys.stderr)
+        print('Usage: python tools/generate_patch_code_v2.py <version>', file=sys.stderr)
         sys.exit(1)
     version = sys.argv[1]
     d = fetch_datafeed(version)

@@ -94,7 +94,7 @@ extra=inline_note("Cast Range increased to 675/700/725/750 — " + b(675, [675, 
   пометка строки урона («Damage spread …») идёт следом через `<br>`. **Остаётся строкой:** у героя с `hero_stat_card`
   (строки скрыты и питают карточку), строка с `wrong-word` и пометкой-поправкой (должна быть на виду), и список без
   такой строки-причины (тогда это и есть изменение). Делает генератор: `fold_damage_l1_src` /
-  `_postprocess_fold_damage_l1` (generate_patch_code_v2.py); веса не меняются — `patch/elements._score_folded_damage`
+  `_postprocess_fold_damage_l1` (tools/generate_patch_code_v2.py); веса не меняются — `patch/elements._score_folded_damage`
   считает пометку как бывшую строку (без тега). Тесты: `tests/test_damage_l1_fold.py`.
   До 2026-10-04 правило было обратным («отдельная видимая строка», 2026-06-19; вычитка 2026-09-18 вернула строки).
 - **Урон НЕ ИЗМЕНИЛСЯ** → `extra=inline_note("Damage at level 1 unchanged at X")` на строке атрибута.
@@ -134,7 +134,7 @@ W(li("Recipe cost unchanged at 500. Total cost unchanged at 2575g (due to Pavise
 ```
 
 Recipe cost decrease не BUFF, если total вырос. Всегда читать следующее предложение после «Recipe cost».
-Код: `generate_patch_code_v2.py` (ветка recipe/total), тесты в `tests/test_generator.py`.
+Код: `tools/generate_patch_code_v2.py` (ветка recipe/total), тесты в `tests/test_generator.py`.
 
 ## Рецепт и общая цена — все проценты в конце строки (2026-09-26)
 
@@ -223,7 +223,7 @@ properties_change(
 5. section("Hero Updates")
 ```
 
-Совпадает с `_CANONICAL_SECTION_ORDER` в `generate_patch_code_v2.py` (до 2026-10-05 здесь стояло Item Updates перед
+Совпадает с `_CANONICAL_SECTION_ORDER` в `tools/generate_patch_code_v2.py` (до 2026-10-05 здесь стояло Item Updates перед
 Neutral Creep Updates — расходилось и с генератором, и со страницами).
 
 ## Нейтральные артефакты — заголовок

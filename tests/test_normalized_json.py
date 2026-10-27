@@ -1,5 +1,5 @@
 """Regression tests for the normalized per-patch JSON artifacts written by
-generate_patch_code_v2.py.
+tools/generate_patch_code_v2.py.
 
 The flagship guarantee: no committed normalized JSON may contain an entity
 with an empty `changes` list. Previously this surfaced for heroes whose
@@ -56,7 +56,7 @@ def test_current_patch_has_normalized_json():
     path = NORMALIZED_DIR / f"{ver}.json"
     assert path.exists(), (
         f"Current patch {ver} is missing {path.relative_to(_ROOT)} — "
-        f"regenerate via `python generate_patch_code_v2.py {ver}`."
+        f"regenerate via `python tools/generate_patch_code_v2.py {ver}`."
     )
 
 
@@ -76,6 +76,6 @@ def test_a_gold_price_is_parsed_so_a_cost_increase_is_a_nerf_with_lower_is_bette
     # 7.41f Hurricane Pike "Total cost increased from 4450g to 4550g": no old/new was read, so the record had no
     # lower_is_better and the CI validator took the right NERF for a mistake
     sys.path.insert(0, str(_ROOT))
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     rec = g._normalize_note_text("Total cost increased from 4450g to 4550g (due to Dragon Lance cost increase)")
     assert (rec["old"], rec["new"], rec["tag"], rec.get("lower_is_better")) == (4450, 4550, "nerf", True)

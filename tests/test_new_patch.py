@@ -87,7 +87,7 @@ def test_plan_skips_what_does_not_apply(monkeypatch, tmp_path):
 def test_a_new_patch_gets_a_draft_and_enchant_steps_wait_for_the_content(monkeypatch, tmp_path):
     steps = {s.name: s for s in np_.plan("9.01", "01.01.2099", "gametracking")}
     assert steps["register"].skip is None and steps["draft"].skip is None
-    assert steps["draft"].argv[1:] == ["generate_patch_code_v2.py", "9.01"]
+    assert steps["draft"].argv[1:] == ["tools/generate_patch_code_v2.py", "9.01"]
     assert "no enchantment changes" in steps["enchant_values"].skip
     assert steps["store"].argv[-2:] == ["add", "9.01"]              # archives: no --local for the gametracking source
     local = {s.name: s for s in np_.plan("9.01", "01.01.2099", "game")}
@@ -113,7 +113,7 @@ def test_dry_run_runs_and_writes_nothing(monkeypatch, capsys):
     monkeypatch.setattr(np_, "_run", boom)
     assert np_.main(["9.01", "01.01.2099", "--dry-run", "--source", "gametracking"]) == 0
     out = capsys.readouterr().out
-    assert "DRY RUN" in out and "generate_patch_code_v2.py 9.01" in out and "Still human" in out
+    assert "DRY RUN" in out and "tools/generate_patch_code_v2.py 9.01" in out and "Still human" in out
     assert "proofread _generated_p_9.01_v2.py" in out
 
 

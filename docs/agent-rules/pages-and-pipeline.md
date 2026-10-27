@@ -28,7 +28,7 @@ patch/                       ← ЯДРО: не импортирует builders/
   game_files.py              ← Чтение хранилища файлов игры (dota-patch-files, env DOTA_FILES_DIR): сборка каждого патча с 7.08
   loc_history.py / item_ability_text.py ← Подсказки игры любого патча; тексты способностей предметов
   map_versions.py / terrain_index.py    ← Шаги карты; какие патчи получают страницу Terrain и что сдвинулось
-generate_patch_code_v2.py    ← Datafeed → Python scaffold. Канонический генератор.
+tools/generate_patch_code_v2.py    ← Datafeed → Python scaffold. Канонический генератор.
 tools/                       ← Только команды: new_patch.py (новый патч одной командой, docs/workflow.md),
                                game_files.py materialize (раскладка сырых файлов из хранилища), …
 data/
@@ -73,7 +73,7 @@ python tools/new_patch.py 7.42 --from enchant
   (миниатюры; `new_patch.py` делает это шагом `thumbs`).
 - Перед коммитом — полная сборка `python build_site.py`, `python -m pytest -q`, `python tools/ci_local.py`.
 
-## Известные ловушки генератора (generate_patch_code_v2.py)
+## Известные ловушки генератора (tools/generate_patch_code_v2.py)
 
 ### Enchantment items → enchant_header, не item_header
 Генератор автоматически использует `enchant_header()` когда engine slug начинается с `enhancement_`.
@@ -123,7 +123,7 @@ else:                    raise RuntimeError
 
 ### Ability slug неправильный
 Генератор берёт slug из `data/abilities_by_id.json`. Если способность переименована в новом патче,
-нужно обновить `abilities_by_id.json`: `python -c "from generate_patch_code_v2 import _refresh_abilities; _refresh_abilities()"`.
+нужно обновить `abilities_by_id.json`: `python -c "from tools.generate_patch_code_v2 import _refresh_abilities; _refresh_abilities()"`.
 
 ### Scaffold не включает write_head/write_footer/save_html
 Генератор выдаёт только тело `build()`. Нужно вручную добавить:

@@ -2,7 +2,7 @@
 
 This file is the source of truth for two things in the build:
   1. Item display names (slugs are legacy joke names: item_angels_demise = "Khanda",
-     item_gungir = "Gleipnir", …) → used by generate_patch_code_v2.py + the items_dyn
+     item_gungir = "Gleipnir", …) → used by tools/generate_patch_code_v2.py + the items_dyn
      roster labels.
   2. The CURRENT neutral pool — field `neutral_item_tier` (>= 0 = in the live drop
      pool). patch/rosters.py derives `_NEUTRAL_POOL_CURRENT` from it, so the items_dyn

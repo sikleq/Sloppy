@@ -248,7 +248,7 @@ jobs:
           if not norm_path.exists():
               problems.append(
                   f'Missing {norm_path} — regenerate via '
-                  f'generate_patch_code_v2.py for patch {ver}.')
+                  f'tools/generate_patch_code_v2.py for patch {ver}.')
 
           # 3. RELEASE_HISTORY entry has filename (patch page will be built)
           from patch.meta import RELEASE_HISTORY

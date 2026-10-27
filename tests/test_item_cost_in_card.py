@@ -63,7 +63,7 @@ def test_the_rows_reason_becomes_a_dotted_hint_on_the_total():
 
 
 def test_generator_gives_a_components_card_only_to_an_item_with_other_changes():
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     mkb = ['W(item_header("Monkey King Bar"))', 'W(properties_change(old=[], new=[("NEW", "+50 Attack Range")]))',
            "W(ul_open())", 'W(li("Recipe cost increased from 600 to 900. Total cost increased from 4700g to 5000g", '
            'b([600, 4700], [900, 5000], l=True, slash=True)))', "W(ul_close())"]

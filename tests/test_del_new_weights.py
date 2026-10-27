@@ -17,7 +17,7 @@ def test_a_bare_removed_under_a_facet_header_is_a_whole_facet():
 
 def test_generator_writes_a_bare_removed_for_a_removed_facet():
     import pathlib
-    src = (pathlib.Path(__file__).resolve().parents[1] / "generate_patch_code_v2.py").read_text(encoding="utf-8")
+    src = (pathlib.Path(__file__).resolve().parents[1] / "tools" / "generate_patch_code_v2.py").read_text(encoding="utf-8")
     assert 'W(li("Removed", t("DEL")))' in src and 'li("Facet removed"' not in src
 
 

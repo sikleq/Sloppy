@@ -6,7 +6,7 @@
 data/<version>_datafeed.json        (Valve datafeed JSON, cached)
 data/stats/<version>/               (full per-patch KV+JSON snapshot)
         ↓
-generate_patch_code_v2.py           (parser → patch/ helper calls)
+tools/generate_patch_code_v2.py           (parser → patch/ helper calls)
         ↓
 _generated_p_<version>_v2.py        (intermediate, reviewed by hand)
 data/normalized/patches/<ver>.json  (structured artifact, CI-required)
@@ -93,7 +93,7 @@ elif slug in allowlist:     emit innate_icon.png directly
 else:                       raise RuntimeError — real missing file
 ```
 
-## generate_patch_code_v2.py
+## tools/generate_patch_code_v2.py
 
 The canonical scaffold generator (datafeed-aware):
 

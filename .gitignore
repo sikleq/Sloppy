@@ -2,7 +2,7 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Промежуточные артефакты — воспроизводятся через generate_patch_code_v2.py
+# Промежуточные артефакты — воспроизводятся через tools/generate_patch_code_v2.py
 _generated_p_*.py
 _insert_patches.py
 

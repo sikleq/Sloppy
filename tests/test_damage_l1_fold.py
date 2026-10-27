@@ -8,7 +8,7 @@ import re
 
 import pytest
 
-from generate_patch_code_v2 import fold_damage_l1_src
+from tools.generate_patch_code_v2 import fold_damage_l1_src
 from patch.badges import b, br
 from patch.state import _State
 
@@ -110,7 +110,7 @@ def test_folded_note_weighs_what_the_row_weighed():
 
 
 def test_generator_folds_its_own_output():
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     lines = _block('W(li("Base Strength increased from 20 to 22", b(20, 22)))',
                    'W(li("Damage at level 1 increased from 50–56 to 52–58", br(50, 56, 52, 58)))').split("\n")
     out = "\n".join(g._postprocess_fold_damage_l1(lines))

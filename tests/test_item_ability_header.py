@@ -198,7 +198,7 @@ def test_pierces_debuff_immunity_and_a_no_longer_row_with_its_number():
 
 
 def test_generator_moves_a_stat_remark_into_the_card_as_info():
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     block = ['W(item_header("Shiva\'s Guard", changed="Item Reworked"))',
              'W(auto_components_change("Shiva\'s Guard", "7.41"))',
              'W(properties_change(old=[("BUFF", "+15 Armor")], new=[("", "+17 Armor", b(15, 17)), ("NEW", "+75 Area of Effect")]))',

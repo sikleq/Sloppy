@@ -2,7 +2,7 @@
 
 Catches interpretation errors BEFORE they reach the generated page — the main
 recurring pain of the project (wrong buff/nerf direction, unparsed numbers,
-stale facet slugs). Reads the JSON artifact emitted by generate_patch_code_v2.py
+stale facet slugs). Reads the JSON artifact emitted by tools/generate_patch_code_v2.py
 and reports issues by severity.
 
 Usage:
@@ -27,7 +27,7 @@ sys.path.insert(0, _HERE)
 
 # Reuse the generator's regexes/reference data so checks stay in lock-step
 # with what the normalizer actually produced.
-from generate_patch_code_v2 import _FROM_TO_RE, CANONICAL_TAGS  # noqa: E402
+from tools.generate_patch_code_v2 import _FROM_TO_RE, CANONICAL_TAGS  # noqa: E402
 
 try:
     from patch.badges import FACETS  # facet slug -> (display, icon)
@@ -91,7 +91,7 @@ def validate_patch(version):
     path = os.path.join(NORM_DIR, f'{version}.json')
     if not os.path.exists(path):
         print(f'  ! not found: {path}')
-        return [('HIGH', version, 'normalized JSON missing — run generate_patch_code_v2.py')]
+        return [('HIGH', version, 'normalized JSON missing — run tools/generate_patch_code_v2.py')]
 
     d = json.load(open(path, encoding='utf-8'))
     issues = []

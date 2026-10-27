@@ -13,7 +13,7 @@ Writes: data/creep_abilities.json
 
 The output maps npc slug -> list of ability slugs, filtering out generic
 non-informative entries (neutral_upgrade, creep_piercing, ability_hidden,
-ability_deward). Used by generate_patch_code_v2.py to auto-split neutral
+ability_deward). Used by tools/generate_patch_code_v2.py to auto-split neutral
 creep patch notes into per-ability ability() blocks.
 """
 import json

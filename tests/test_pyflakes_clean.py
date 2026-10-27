@@ -8,7 +8,7 @@ import sys
 import pytest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TARGETS = ["patch", "builders", "tools", "scripts", "tests", "build_site.py", "generate_patch_code_v2.py"]
+TARGETS = ["patch", "builders", "tools", "scripts", "tests", "build_site.py"]
 REEXPORTS = (os.path.join("patch", "api.py"), os.path.join("patch", "__init__.py"))
 
 

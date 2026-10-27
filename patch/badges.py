@@ -587,7 +587,7 @@ FACETS = {
     "monkey_king_wukongs_faithful":     ("Wukong's Faithful",    "Red2"),
     "silencer_irrepressible":           ("Irrepressible",         "Purple1"),
     "silencer_reverberating_silence":   ("Reverberating Silence", "Gray3"),
-    # 7.39 — auto-registered by generate_patch_code_v2.py
+    # 7.39 — auto-registered by tools/generate_patch_code_v2.py
     "axe_call_out": ("Call Out", "Red2"),
     "mirana_leaps_and_bounds": ("Leaps and Bounds", "Gray3"),
     "nevermore_shadowmire": ("Shadowmire", "Red0"),
@@ -613,7 +613,7 @@ FACETS = {
     "phoenix_hotspot": ("Hotspot", "Red1"),
     "arc_warden_runed_replica": ("Runed Replica", "Blue1"),
     "dawnbreaker_blaze": ("Starsurge", "Red1"),
-    # 7.38c — auto-registered by generate_patch_code_v2.py
+    # 7.38c — auto-registered by tools/generate_patch_code_v2.py
     "tiny_crash_landing": ("Crash Landing", "Gray2"),
     "windrunner_killshot": ("Killshot", "Green0"),
     "life_stealer_fleshfeast": ("Fleshfeast", "Gray0"),
@@ -624,13 +624,13 @@ FACETS = {
     "meepo_codependent": ("Codependent", "Yellow1"),
     "marci_buddy_system": ("Buddy System", "Blue1"),
     "marci_pickmeup": ("Pick-me-up", "Purple0"),
-    # 7.38b — auto-registered by generate_patch_code_v2.py
+    # 7.38b — auto-registered by tools/generate_patch_code_v2.py
     "warlock_grimoire": ("Black Grimoire", "Gray3"),
     "dragon_knight_fire_dragon": ("Fire Dragon", "Red1"),
     "night_stalker_dayswap": ("Night Reign", "Gray0"),
     "tusk_facet_fist_bump": ("Drinking Buddies", "Yellow0"),
     "winter_wyvern_recursive": ("Recursive", "Blue0"),
-    # 7.38 — auto-registered by generate_patch_code_v2.py
+    # 7.38 — auto-registered by tools/generate_patch_code_v2.py
     "bane_dream_stalker": ("Dream Stalker", "Gray0"),
     "bane_sleepwalk": ("Sleepwalk", "Purple1"),
     "crystal_maiden_glacial_guard": ("Glacial Guard", "Gray3"),

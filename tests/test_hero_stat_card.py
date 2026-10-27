@@ -47,7 +47,7 @@ def test_card_hides_its_rows_and_carries_their_tags():
 
 
 def test_generator_puts_the_card_first_in_general():
-    import generate_patch_code_v2 as g
+    import tools.generate_patch_code_v2 as g
     lines = ['W(hero_header("Abaddon"))', "W(ul_open())", 'W(li("Base Damage increased by 26", t("BUFF")))',
              'W(li("Damage at level 1 increased by 10 (from 40-50 to 50-60)", br(40, 50, 50, 60)))',
              'W(li("Damage gain per level decreased from +3.6 to +2.7", b(3.6, 2.7)))', "W(ul_close())"]

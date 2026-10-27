@@ -10,7 +10,7 @@ import pytest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-import generate_patch_code_v2 as g  # noqa: E402
+import tools.generate_patch_code_v2 as g  # noqa: E402
 
 
 def _ids():
