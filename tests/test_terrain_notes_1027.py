@@ -27,13 +27,21 @@ def test_a_second_row_without_a_spot_of_its_own_gets_none(monkeypatch):
     assert elements.terrain_note("7.38c", text) == ("", "")      # Bottom Lane's: all its trees are in other pictures
 
 
+def _red(img, xy):
+    r, g, _ = img.getpixel(xy)
+    return r > 150 and g < 120
+
+
 def test_the_new_side_marks_where_removed_trees_stood():
+    """A cross, not the old side's dashed square: "both before and after dashed?" (owner 2026-10-27)."""
     pytest.importorskip("PIL")
     from PIL import Image
     import scripts.gen.terrain_shots as ts
-    img = Image.new("RGB", (360, 360))
     groups = {"trees": {"removed": [(0, 0)], "added": [], "moved": []}}
-    ts._outlines(img, 0, 0, 500, groups, "new", {"trees"}, 360, 3)
-    raw = img.tobytes()
-    reds = sum(1 for i in range(0, len(raw), 3) if raw[i] > 150 and raw[i + 1] < 120)
-    assert reds > 0
+    sides = {}
+    for side in ("old", "new"):
+        sides[side] = Image.new("RGB", (360, 360))
+        ts._outlines(sides[side], 0, 0, 500, groups, side, {"trees"}, 360, 3)
+    assert _red(sides["new"], (180, 180))           # the cross meets in the middle of where the tree stood
+    assert not _red(sides["old"], (180, 180))       # the old side's dashed square is empty inside
+    assert any(_red(sides["old"], (x, 180 - 23)) for x in range(160, 200))

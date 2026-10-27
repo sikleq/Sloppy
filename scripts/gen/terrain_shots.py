@@ -89,8 +89,8 @@ def _crop(full, rect, cx, cy, r, half):
 def _outlines(img, cx, cy, r, groups, side, keys, half, width):
     """Draw one side's outlines of the given keys: old side = removed + moved (where it stood), new side = added +
     moved (where it stands); trees and camps as squares, the round entity markers as circles. Everything on the old
-    side is dashed, as is the ghost of an old spot on the new side: dashed always means "where it was" (the owner
-    2026-10-03)."""
+    side is dashed, as is the ghost of a moved one's old spot on the new side: dashed always means "where it was" (the owner
+    2026-10-03); a removed one's spot on the new side is a red cross (owner 2026-10-27)."""
     d = ImageDraw.Draw(img)
     k = half / (2 * r)
 
@@ -119,14 +119,24 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
                 shape([X - s, Y - s, X + s, Y + s], outline=COLOUR[kind], width=width)
         if side == "new":            # where the moved ones stood: a light dashed outline, on top (the owner 2026-10-03)
             ghost = ImageDraw.Draw(img, "RGBA")
-            # ... and where the removed ones stood, red: a note that only removes trees showed a new side with nothing
-            # on it (owner 2026-10-27, 7.38b "Removed several trees around camps")
+            # ... and where the removed ones stood, a red cross: a note that only removes trees showed a new side with
+            # nothing on it, and a dashed square there read the same as the old side's (owner 2026-10-27, 7.38b
+            # "Removed several trees around camps": "both before and after dashed?")
             gone = [(m[0], "moved") for m in g.get("moved", [])] + [(p, "removed") for p in g.get("removed", [])]
             for (x, y), kind in gone:
                 if abs(x - cx) <= r + 300 and abs(y - cy) <= r + 300:
                     X, Y = px(x, y)
                     s = (SIZE[key] if key in SIZE else CIRCLE) * k
-                    _dashed(ghost, key in SIZE, X, Y, s, COLOUR[kind] + (200,), max(1, width - 1))
+                    if kind == "removed":
+                        _cross(ghost, X, Y, s * 0.7, COLOUR[kind] + (230,), width)
+                    else:
+                        _dashed(ghost, key in SIZE, X, Y, s, COLOUR[kind] + (200,), max(1, width - 1))
+
+
+def _cross(d, X, Y, s, colour, width):
+    """A cross of half size s round (X, Y): on the new side, the spot of something removed."""
+    d.line([(X - s, Y - s), (X + s, Y + s)], fill=colour, width=width)
+    d.line([(X - s, Y + s), (X + s, Y - s)], fill=colour, width=width)
 
 
 def _dashed(d, square, X, Y, s, colour, width):
