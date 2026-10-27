@@ -32,6 +32,26 @@ def test_control_conveniences_are_qol(text):
     assert g._guess_tag(text) == "QoL"
 
 
+def test_a_card_summary_does_not_repeat_its_header():
+    """The header says what the ability levels with ("Passive – shares level with Duel"); the summary is the canonical
+    "Innate reworked." / "Ability reworked." (owner 2026-10-27, Outfight Them! 7.39 said "levels up with Duel" twice)."""
+    import ast
+    import glob
+    import os
+    import re
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    bad = []
+    for path in glob.glob(os.path.join(root, "content", "p*.py")):
+        with open(path, encoding="utf-8") as f:
+            tree = ast.parse(f.read())
+        for n in ast.walk(tree):
+            if isinstance(n, ast.Call) and getattr(n.func, "id", None) == "ability_change":
+                s = next((k.value.value for k in n.keywords if k.arg == "summary" and isinstance(k.value, ast.Constant)), "")
+                if re.search(r"\b(?:levels? up with|scales with|shares level)\b", s or "", re.I):
+                    bad.append(f"{os.path.basename(path)}:{n.lineno} {s}")
+    assert not bad, bad
+
+
 def test_losing_the_blink_overshoot_penalty_is_a_buff():
     # a click past max range used to blink 75% of it (owner 2026-10-27)
     assert g._guess_tag("Blink no longer has an overshoot range") == "BUFF"

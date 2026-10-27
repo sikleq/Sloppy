@@ -1387,13 +1387,15 @@ def build():
                  desc=game_ability_desc("legion_commander_outfight_them", "7.38c")),
         new=dict(name="Outfight Them!", slug="legion_commander_outfight_them",
                  desc=game_ability_desc("legion_commander_outfight_them")),
-        summary="Reworked: levels up with Duel, also works against heroes of your own level.",
+        summary="Innate reworked.",
         tag="rework",
     ))
+    # the card says all three (the header: "shares level with Duel"; the texts: equal or higher level, the numbers) —
+    # the rows stay hidden for the weights and filters (docs/agent-rules/patch-tags.md, "Стрелка … уже всё сказала")
     W(ul_open())
-    W(li("Now levels up with Duel", t("REWORK")))
-    W(li("Now applies when attacking enemy heroes that are equal or higher level than you, instead of only higher level enemy heroes", t("BUFF")))
-    W(li("Instead of increasing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 50%, now increases Health Restoration by 30/40/50/60%", t("REWORK")))
+    W(li("Now levels up with Duel", t("REWORK"), covered=True))
+    W(li("Now applies when attacking enemy heroes that are equal or higher level than you, instead of only higher level enemy heroes", t("BUFF"), covered=True))
+    W(li("Instead of increasing Healing, Health Regen, Lifesteal, and Spell Lifesteal by 50%, now increases Health Restoration by 30/40/50/60%", t("REWORK"), covered=True))
     W(ul_close())
 
     # Leshrac
