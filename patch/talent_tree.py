@@ -178,10 +178,26 @@ _BLOCK_RE = re.compile(
     r'(<div class="ability-block talents-block"><div class="ability-icon-wrap">)(<img [^>]*src="([^"]*talents\.svg)"[^>]*>)'
     r'(</div>\s*<ul class="changes">)(.*?)(</ul>)', re.S)
 _HERO_RE = re.compile(r'class="entity hero-entity"[^>]*>\s*<div class="entity-icon hero-icon">.*?/heroes/([a-z0-9_]+)\.(?:webp|png)"', re.S)
-_ROW_RE = re.compile(r'<span class="row-text">(.*?)</span>', re.S)
 _LI_RE = re.compile(r'<li\b([^>]*)>(.*?)</li>', re.S)
 _BADGE_TAG_RE = re.compile(r'<span class="badge[^"]*" data-tag="([a-z]+)"')
 _LI_TAG_RE = re.compile(r'data-tag="([a-z]+)')
+
+
+_SPAN_RE = re.compile(r'<(/?)span\b[^>]*>')
+
+
+def _row_text(li_body):
+    """The inner html of the row's <span class="row-text">, nested spans included — a facet's chip opens the row
+    (li(facet=...), 2026-10-27), and the first "</span>" was the chip's, so its words lit nothing."""
+    start = li_body.find('<span class="row-text">')
+    if start < 0:
+        return None
+    pos, depth = start + len('<span class="row-text">'), 1
+    for m in _SPAN_RE.finditer(li_body, pos):
+        depth += -1 if m.group(1) else 1
+        if not depth:
+            return li_body[pos:m.start()]
+    return li_body[pos:]
 
 
 def _row_tag(li_attrs, li_body):
@@ -207,8 +223,8 @@ def light_talent_trees(html, version):
         lit = {}
 
         def tag_li(li):
-            row = _ROW_RE.search(li.group(2))
-            own = changed_branches(version, hero, [row.group(1)]) if row else set()
+            row = _row_text(li.group(2))
+            own = changed_branches(version, hero, [row]) if row else set()
             if not own:
                 return li.group(0)
             tag = _row_tag(li.group(1), li.group(2))

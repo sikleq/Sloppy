@@ -22,6 +22,17 @@ def test_the_row_shows_the_facet_chip_before_its_text():
     assert re.fullmatch(r'(?:<img [^>]*icons/facets/[^>]*>)?', m.group(2))
 
 
+def test_the_talent_tree_reads_a_row_behind_a_facet_chip():
+    """The tree lights the twig of a facet's talent too (owner 2026-10-27: Nature's Prophet 7.39 lit nothing — the
+    chip's </span> ended the row's text)."""
+    from patch.talent_tree import _row_text
+    _State.current_hero = "Nature's Prophet"
+    html = li("Level 15 Talent +100 Teleportation Barrier replaced with +30% Sprout Heal Per Second", "",
+              facet="furion_soothing_saplings")
+    text = _row_text(html)
+    assert "Teleportation Barrier" in text and "Sprout Heal Per Second" in text
+
+
 def test_the_generator_moves_a_facets_talents_to_talents():
     rows = ['W(li("Level 15 Talent +100 Teleportation Barrier replaced with +1 Gold Bag", t("SWAP")))']
     assert g._with_facet(rows, "furion_natures_profit") == [
