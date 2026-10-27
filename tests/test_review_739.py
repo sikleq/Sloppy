@@ -52,6 +52,20 @@ def test_a_card_summary_does_not_repeat_its_header():
     assert not bad, bad
 
 
+def test_now_granted_by_aghanims_hides_under_its_card(monkeypatch):
+    """7.39 Fan of Knives: "Now granted by Aghanim's Scepter" + the card "Added Aghanim's Scepter." said it twice."""
+    from patch import cards_aghs
+    from patch.state import _State
+    flags = {("phantom_assassin_fan_of_knives", "7.39"): "scepter", ("phantom_assassin_fan_of_knives", "7.38c"): "shard"}
+    monkeypatch.setattr(cards_aghs, "_granted_flag", lambda s, v: flags.get((s, v)))
+    monkeypatch.setattr(_State, "current_ability_slug", "phantom_assassin_fan_of_knives")
+    monkeypatch.setattr(_State, "current_patch_version", "7.39")
+    assert cards_aghs._granted_now_covered("Now granted by Aghanim's Scepter")
+    assert not cards_aghs._granted_now_covered("Now granted by Aghanim's Shard")     # the files say Scepter
+    flags[("phantom_assassin_fan_of_knives", "7.38c")] = "scepter"                  # nothing moved: the row stays
+    assert not cards_aghs._granted_now_covered("Now granted by Aghanim's Scepter")
+
+
 def test_losing_the_blink_overshoot_penalty_is_a_buff():
     # a click past max range used to blink 75% of it (owner 2026-10-27)
     assert g._guess_tag("Blink no longer has an overshoot range") == "BUFF"

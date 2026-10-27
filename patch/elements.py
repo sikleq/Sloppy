@@ -1594,9 +1594,11 @@ def _number_tip(old_plain, new_inner, kind):
     return _iab_hint(new_inner, f'<span class="iab-tip-pct">{pct}</span>') if "badge" in pct else None
 
 
-def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None, major=False, covered=False):
+def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=None, major=False, covered=False,
+       facet=None):
     """covered=True: the card above already shows this change (highlighted) — the row is hidden but keeps its weight
-    and tag for the filters, like the item cards' covered rows (owner 2026-10-21, 7.41 Overclocking)."""
+    and tag for the filters, like the item cards' covered rows (owner 2026-10-21, 7.41 Overclocking).
+    facet="<facet slug>": a facet's talent, written under the hero's Talents with the facet's chip before it."""
     _tphrase = ""
     if isinstance(text, str):
         # a terrain note's micro-screenshots ride along under its text, opened by the words naming its object
@@ -1630,6 +1632,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         # the card above shows it as the innate already (owner 2026-10-25, 7.41 Poison Sting); "(previously granted by
         # Aghanim's Scepter)" says what the card doesn't and stays
         covered = True
+    elif isinstance(text, str) and not covered and _granted_now_covered(_plain_text):
+        covered = True                          # "Now granted by Aghanim's X": the upgrade's card under it says so
     elif isinstance(text, str) and _aghs_rework_card(_plain_text, covered):
         covered = True                          # the old -> new upgrade card under the rows shows it
     elif isinstance(text, str) and not covered and _scale_card(_plain_text):
@@ -1810,6 +1814,11 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         text_inner = text_base
     if _tphrase and isinstance(text_inner, str):
         text_inner = terrain_button(text_inner, _tphrase)
+    if facet and isinstance(text_inner, str):
+        # a facet's talent among the hero's Talents: the facet's chip says whose (owner 2026-10-27, 7.39 Nature's
+        # Profit); only on screen — the weights and the talent context read the row's own words
+        from .badges import facet_badge
+        text_inner = f'{facet_badge(facet)} {text_inner}'
     # An ability row with its own chip keeps the chip as the li's first child: page.py
     # marks its whole box `ability-box-tagged`, and the CSS moves the box right by the tag
     # column so the chip sits in the SAME column, size and height as every other row's
@@ -2419,5 +2428,6 @@ from .cards_aghs import (  # noqa: E402
     _aghs_rework_card,
     _card_meta_covered,
     _granted_card,
+    _granted_now_covered,
     _scale_card,
 )

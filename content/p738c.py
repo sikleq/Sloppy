@@ -695,7 +695,6 @@ def build():
     W(ul_open())
     W(li("Cooldown decreased from 50s to 42s", b(50, 42, l=True)))
     W(li("Skeleton Duration increased from 40s to 46s", b(40, 46)))
-    W(li("Level 10 Talent +25%/-25% Bone Guard Duration / Cooldown replaced with +2s Wraithfire Blast Slow Duration", t("SWAP")))
     W(ul_close())
     W(ability("Wraithfire Blast", slug="skeleton_king_hellfire_blast"))
     W(ul_open())
@@ -708,3 +707,7 @@ def build():
 
     write_footer()
     save_html('patches/7.38c.html')
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 10 Talent +25%/-25% Bone Guard Duration / Cooldown replaced with +2s Wraithfire Blast Slow Duration", t("SWAP"), facet="skeleton_king_facet_bone_guard"))
+    W(ul_close())

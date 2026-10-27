@@ -689,7 +689,7 @@ def build():
     W(subgroup("Talents"))
     W(ul_open())
     W(li("Level 10 Talent +25 Bloodrage Attack Speed replaced with +175 Health", t("SWAP")))
-    W(li("Old Blood: Level 10 Talent +15% Bloodrage Spell Amplification replaced with +15% Bloodrage Base Damage Amp", t("SWAP")))
+    W(li("Level 10 Talent +15% Bloodrage Spell Amplification replaced with +15% Bloodrage Base Damage Amp", t("SWAP"), facet="bloodseeker_old_blood"))
     W(ul_close())
 
     # Bounty Hunter
@@ -1654,13 +1654,9 @@ def build():
     W(ul_close())
     W(new_facet("furion_natures_profit",
         desc=f"Whenever an enemy hero is killed by Nature's Prophet or dies within 750 range of him, 2 seconds later a money tree grows in their place. Each tree spawns 2 gold bags every second, which can be picked up by any hero. Each gold bag grants gold equal to 1.5x of the killed hero's level. Each money tree has a lifespan of 3s {inline_note('Gold bags are created in 200–250 radius from the tree and disappear after 15s of lying on the ground. Gold Bags are automatically picked up by heroes within 50 range from them. Money tree provides 2x Tango healing similarly to Ironwood Tree')}"))
-    W(ul_open())
-    W(li("Level 15 Talent +100 Teleportation Barrier replaced with +1 Nature's Profit Gold Bags Per Tick", t("SWAP")))
-    W(ul_close())
     W(facet_header("furion_soothing_saplings"))
     W(ul_open())
     W(li("Sprout: Healing mechanic reworked. Now enchants all trees in a 1200 AoE around the Sprout. Each enchanted tree emits a 175 radius healing aura. No longer heals buildings", t("REWORK")))
-    W(li("Level 15 Talent +100 Teleportation Barrier replaced with +30% Sprout Heal Per Second", t("SWAP")))
     W(li("Sprout: Heal per second increased from 10/20/30/40 to 14/26/38/50", b([10, 20, 30, 40], [14, 26, 38, 50])))
     W(ul_close())
     W(ability("Sprout", slug="furion_sprout"))
@@ -1670,6 +1666,11 @@ def build():
     W(ability("Teleportation", slug="furion_teleportation"))
     W(ul_open())
     W(li("Barrier decreased from 100/150/200/250 to 70/130/190/250", b([100, 150, 200, 250], [70, 130, 190, 250])))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 15 Talent +100 Teleportation Barrier replaced with +1 Nature's Profit Gold Bags Per Tick", t("SWAP"), facet="furion_natures_profit"))
+    W(li("Level 15 Talent +100 Teleportation Barrier replaced with +30% Sprout Heal Per Second", t("SWAP"), facet="furion_soothing_saplings"))
     W(ul_close())
 
     # Necrophos
@@ -1766,9 +1767,17 @@ def build():
 
     # Phantom Assassin
     W(hero_header("Phantom Assassin"))
-    W(ability("Blur", slug="phantom_assassin_blur"))
+    # a basic ability -> the innate: old -> new from the game's texts, as Slugger above (owner 2026-10-27); the header
+    # says what it levels with, the card that the values stayed — the row hides
+    W(ability_change(
+        summary="Blur is now an innate ability.",
+        tag="rework",
+        old=dict(name="Blur", slug="phantom_assassin_blur", desc=game_ability_desc("phantom_assassin_blur", "7.38c")),
+        new=dict(name="Blur", slug="phantom_assassin_blur", innate=True,
+                 desc=game_ability_desc("phantom_assassin_blur")),
+    ))
     W(ul_open())
-    W(li("Now is an innate ability that improves with Coup de Grace level", t("REWORK"), extra=inline_note("Values were not changed")))
+    W(li("Now is an innate ability that improves with Coup de Grace level", t("REWORK"), extra=inline_note("Values were not changed"), covered=True))
     W(li("No longer dispelled when near enemy Outposts, Watchers or base buildings (other than Towers/Ancient)", t("BUFF")))
     W(li("Now dispelled when attacking Roshan or enemy Barracks", t("NERF")))
     W(li("Aghanim's Shard: Decreases cooldown from 60/55/50/45s to 50/45/40/35s. Any time Phantom Assassin gets a hero kill, her ability cooldowns advance 60% of their max cooldown values", t("NEW")))

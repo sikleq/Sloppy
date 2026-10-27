@@ -1501,7 +1501,6 @@ def build():
     W(ul_open())
     W(li("Base Charge Restore Time decreased from 20/18/16/14s to 20/17/14/11s", b([20, 18, 16, 14], [20, 17, 14, 11], l=True)))
     W(li("Mana Cost decreased from 70 to 50", b(70, 50, l=True)))
-    W(li("Level 20 Talent +2s Kinetic Fence Duration replaced with +1 Kinetic Fence Charge", t("SWAP")))
     W(ul_close())
     W(ability("Thunder Strike", slug="disruptor_thunder_strike"))
     W(ul_open())
@@ -1512,6 +1511,7 @@ def build():
     W(li("Level 10 Talent -3s Kinetic Field Cooldown replaced with +20 Movement Speed", t("SWAP")))
     W(li("Level 10 Talent Thunder Strike Damage per Strike increased from +10 to +15", b(10, 15)))
     W(li("Level 20 Talent Thunder Strike Slow Duration increased from +0.5s to +0.6s", b(0.5, 0.6)))
+    W(li("Level 20 Talent +2s Kinetic Fence Duration replaced with +1 Kinetic Fence Charge", t("SWAP"), facet="disruptor_line_walls"))
     W(ul_close())
 
     # Doom
@@ -1730,7 +1730,6 @@ def build():
     W(li("Turn Speed Manipulation increased from 40/50/60% to 60%", b([40, 50, 60], 60)))
     W(li("Projectile Speed Manipulation rescaled from 30/40/50% to 40%", b([30, 40, 50], 40)))
     W(li("No longer manipulates attack speed", t("DEL")))
-    W(li("Level 20 Talent +80 Attack Speed during Time Zone now affects only Faceless Void himself", t("NERF")))
     W(ul_close())
     W(ability("Time Walk", slug="faceless_void_time_walk"))
     W(ul_open())
@@ -1739,6 +1738,10 @@ def build():
     W(ability("Time Dilation", slug="faceless_void_time_dilation"))
     W(ul_open())
     W(li("Recasting Time Dilation on an enemy will now add a separate, stacking debuff instead of refreshing the duration of the existing debuff", t("REWORK")))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 20 Talent +80 Attack Speed during Time Zone now affects only Faceless Void himself", t("NERF"), facet="faceless_void_time_zone"))
     W(ul_close())
 
     # Grimstroke
@@ -3781,17 +3784,14 @@ def build():
     W(facet_header("skeleton_king_facet_bone_guard"))
     W(ul_open())
     W(li("Hero kills now give 2 skeleton charges", t("BUFF")))
-    W(li("Level 10 Talent +25% Wraithfire Blast Impact Damage/DPS replaced with +25%/-25% Bone Guard Duration / Cooldown", t("SWAP")))
-    W(li("Level 20 Talent +60 Attack Speed replaced with +5 Bone Guard Skeletons Spawned", t("SWAP")))
-    W(ul_close())
-    W(facet_header("skeleton_king_facet_cursed_blade"))
-    W(ul_open())
-    W(li("Level 10 Talent +25% Wraithfire Blast Impact Damage/DPS replaced with +15% Spectral Blade Curse Damage", t("SWAP")))
-    W(li("Level 20 Talent +60 Attack Speed replaced with -25% Spectral Blade Curse Cooldown", t("SWAP")))
     W(ul_close())
     W(subgroup("Talents"))
     W(ul_open())
+    W(li("Level 10 Talent +25% Wraithfire Blast Impact Damage/DPS replaced with +25%/-25% Bone Guard Duration / Cooldown", t("SWAP"), facet="skeleton_king_facet_bone_guard"))
+    W(li("Level 10 Talent +25% Wraithfire Blast Impact Damage/DPS replaced with +15% Spectral Blade Curse Damage", t("SWAP"), facet="skeleton_king_facet_cursed_blade"))
     W(li("Level 20 Talent +40% Cleave replaced with +60 Attack Speed", t("SWAP")))
+    W(li("Level 20 Talent +60 Attack Speed replaced with +5 Bone Guard Skeletons Spawned", t("SWAP"), facet="skeleton_king_facet_bone_guard"))
+    W(li("Level 20 Talent +60 Attack Speed replaced with -25% Spectral Blade Curse Cooldown", t("SWAP"), facet="skeleton_king_facet_cursed_blade"))
     W(ul_close())
 
     # Zeus

@@ -228,6 +228,23 @@ def _aghs_rework_card(text, covered=False) -> bool:
     return True
 
 
+_GRANTED_NOW_RE = re.compile(r"^\s*Now granted by Aghanim's (Scepter|Shard)\b", re.I)
+
+
+def _granted_now_covered(plain) -> bool:
+    """"Now granted by Aghanim's Scepter" under an ability the upgrade grants in this patch and didn't in the one
+    before: the hero's upgrade moved here, and its old -> new card under this ability says so ("Added Aghanim's
+    Scepter.", the old upgrade on its ability -> this one) — the row hides (owner 2026-10-27, 7.39 Fan of Knives;
+    7.40 Eyes In The Forest, 7.41 Planar Pocket)."""
+    m = _GRANTED_NOW_RE.match(plain or "")
+    slug, version = _State.current_ability_slug, _State.current_patch_version
+    if not m or not slug or not version:
+        return False
+    from .meta import _prev_patch_version
+    kind = m.group(1).lower()
+    return _granted_flag(slug, version) == kind and _granted_flag(slug, _prev_patch_version(version)) != kind
+
+
 _GRANTED_CARDS: set = page_cache(set())  # (version, slug) of granted abilities that already have their card
 
 

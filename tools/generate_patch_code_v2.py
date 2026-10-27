@@ -1670,6 +1670,7 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
             out.extend(body)
     # Facet subsections — before Abilities (order: stats > innates > facets > abilities > talents)
     from patch.badges import FACETS as _FACETS
+    facet_talent_rows = []
     for s in hero.get('subsections', []):
         if s.get('style', '').startswith('hero_facet'):
             facet_slug = s.get('facet')
@@ -1707,12 +1708,12 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
                     all_facet_notes.extend(notes)
             body, _ = _emit_notes(all_facet_notes)
             out.extend(body)
-            # talent_notes inside facet subsection (e.g. NP Soothing Saplings).
-            # Emit directly (no subgroup call) so notes land inside the facet block.
+            # talent_notes inside a facet subsection (NP Soothing Saplings 7.39): they go to the hero's Talents with the
+            # facet's chip (li(facet=...)) — the talents in one place, the chip says whose (owner 2026-10-27)
             facet_talents = s.get('talent_notes', [])
             if facet_talents:
                 tbody, _ = _emit_notes(facet_talents)
-                out.extend(tbody)
+                facet_talent_rows.extend(_with_facet(_ul_inner(tbody), facet_slug))
             # Valve flags the facet itself: "hero_facet NewFacet" / "hero_facet ReworkedFacet"
             card = _facet_card(facet_slug, s.get('style', ''), out[facet_start + 1:])
             if card:
@@ -1742,13 +1743,24 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
             stripped.append(n2)
         body, _ = _emit_notes(stripped, loc_map=hero_loc, current_ability_slug=aslug)
         out.extend(body)
-    # Talents — always last
+    # Talents — always last; the facets' talents after the hero's own, each with its facet's chip
     talents = hero.get('talent_notes', [])
-    if talents:
+    if talents or facet_talent_rows:
         out.append('W(subgroup("Talents"))')
-        body, _ = _emit_notes(talents)
-        out.extend(body)
+        body = _emit_notes(talents)[0] if talents else ['W(ul_open())', 'W(ul_close())']
+        inner = _ul_inner(body)
+        out.extend(['W(ul_open())'] + inner + facet_talent_rows + ['W(ul_close())'])
     return out
+
+
+def _ul_inner(body):
+    """The rows of one emitted ul (its W(ul_open()) / W(ul_close()) lines dropped)."""
+    return [ln for ln in body if ln.strip() not in ('W(ul_open())', 'W(ul_close())')]
+
+
+def _with_facet(rows, facet_slug):
+    """A facet's talent rows with facet="<slug>": each li call's last line ("…))") gets the keyword."""
+    return [re.sub(r'\)\)\s*$', f', facet="{facet_slug}"))', ln) if ln.rstrip().endswith('))') else ln for ln in rows]
 
 
 def _render_neutral_creep(creep):

@@ -326,13 +326,13 @@ def build():
 
     # Nature's Prophet
     W(hero_header("Nature's Prophet"))
-    W(facet_header("furion_soothing_saplings"))
-    W(ul_open())
-    W(li("Level 15 Talent Sprout Heal Per Second decreased from +30% to +20%", b(30, 20)))
-    W(ul_close())
     W(ability("Curse of the Oldgrowth", slug="furion_curse_of_the_forest"))
     W(ul_open())
     W(li("DPS per Tree decreased from 20 to 15", b(20, 15)))
+    W(ul_close())
+    W(subgroup("Talents"))
+    W(ul_open())
+    W(li("Level 15 Talent Sprout Heal Per Second decreased from +30% to +20%", b(30, 20), facet="furion_soothing_saplings"))
     W(ul_close())
 
     # Nyx Assassin

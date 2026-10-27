@@ -464,3 +464,13 @@ Aghanim's Scepter», владелец 2026-10-26, Kinetic Fence 7.41); стро�
 QoL, Invoker Scepter REWORK, Naga «no longer reduces enemy status
 resistance» DEL (вражеский дебафф), Sprout REWORK, Take Aim NEW; `l=True` у Grow / Focus Fire / Plague Ward bounty /
 Desolate / Infest / Riptide — штраф самого героя или выгода врагу.
+
+**Ещё 2026-10-27:**
+- Таланты фасетов — в блоке Talents героя с чипом фасета перед текстом: `li("Level 15 Talent …", t("SWAP"),
+  facet="furion_natures_profit")`, не под шапкой фасета и не «Old Blood: Level 10 Talent …». Генератор переносит сам
+  (`facet_talent_rows`), тест `tests/test_facet_talents.py`. Фасет, у которого кроме талантов ничего, шапки не получает.
+- «Now granted by Aghanim's Scepter» под способностью, которую улучшение выдаёт впервые в этом патче, скрыт: карточка
+  «Added Aghanim's Scepter.» под ней говорит то же (`_granted_now_covered`, 7.39 Fan of Knives, 7.40 Eyes In The
+  Forest, 7.41 Planar Pocket).
+- Обычная способность стала врождённой («Now is an innate ability…», 7.39 Blur) — карточка old → new из текстов игры,
+  как Slugger: итог «<Имя> is now an innate ability.», строка скрыта.
