@@ -1343,9 +1343,6 @@ html.cb-mode button.cb-toggle::after {
     100% calc(100% - 2px), calc(100% - 2px) 100%, 2px 100%,
     0 calc(100% - 2px), 0 2px);
 }
-/* Calendar variant — no dropdown; .release-info takes its place on the right.
-   Override the fixed 38px height (designed for version+date only) so the
-   3rd line (.patch-age) doesn't overflow above and below the box. */
 /* Universal rule: every non-patch tab (calendar, creeps, anything added
    later) reserves the same vertical space as the patch-page version
    picker via .nav-context-flat. New tabs only need to use this class —
@@ -1359,20 +1356,12 @@ html.cb-mode button.cb-toggle::after {
   min-height: 38px;
 }
 .nav-context-picker { justify-self: end; }
+/* Calendar variant — no dropdown; .release-info takes its place on the right, its height set by its lines. */
 .nav-context-calendar .release-info {
   align-items: center;
   padding: 6px 18px;
   min-width: 110px;
   height: auto;
-}
-.nav-context .patch-age {
-  color: var(--text-muted-blue-2);
-  font-family: var(--font-j25);
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.3px;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.05;
 }
 .nav-context .version {
   color: var(--text-main);
@@ -2354,11 +2343,6 @@ span.cal-full-day.has-patch {
 .toolbar-patch-info .ti-official:hover b {
   color: #e3c46a;
   border-bottom-color: rgba(227, 196, 106, 0.85);
-}
-.patch-age .age-sep {
-  margin: 0 8px;
-  opacity: 0.45;
-  font-weight: 300;
 }
 /* On narrow viewports the patch meta-info (date / days live) competes with
    the search box. Hide it below 640px — filters and search are the primary

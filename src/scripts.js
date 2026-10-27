@@ -211,17 +211,6 @@
     bar.style.visibility = 'visible';
   });
 
-  // ---- BOLD NUMBERS AND VERSION IN PATCH-AGE ----
-  const ageEl = document.querySelector('.patch-age');
-  if (ageEl) {
-    const text = ageEl.textContent;
-    const html = text
-      .replace(/\b(\d+\.\d+[a-z]?)\b/g, '<strong>$1</strong>')   // version like 7.41b
-      .replace(/\b(\d+)\b(?=\s+days?)/g, '<strong>$1</strong>')   // numbers before "days"
-      .replace(/·/g, '<span class="age-sep">·</span>');
-    ageEl.innerHTML = html;
-  }
-
   // ---- TAG FILTERING (multi-select, OR semantics) ----
   const buttons = document.querySelectorAll('.filter-btn');
   const activeFilters = new Set();
