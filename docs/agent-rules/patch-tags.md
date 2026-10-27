@@ -488,3 +488,9 @@ Desolate / Infest / Riptide — штраф самого героя или выг
   `li("Aghanim's Shard: <описание>", t("NEW"))`, по ней рисуется карточка «Added Aghanim's Shard.»
   (`_merge_aghs_description`; до 2026-10-27 черновик давал две строки, NEW + MISC, и при вычитке их склеивали руками —
   7.39 Aphotic Shield). Вложенная строка «No longer …» / с «Aghanim's» остаётся отдельной.
+- Генератор (2026-10-27) делает сам и то, что в 7.39 правили руками: «… rescaled from (+X with every N hero levels) to
+  (+Y with every level of <способность>)» → `li_formula` по уровню героя (ульта на 6/12/18, обычная на 1/3/5/7;
+  `_postprocess_ability_level_formula`); «Now is an innate ability …» → карточка «<Имя> is now an innate ability.» из
+  текстов игры обоих патчей, строка `covered=True`; врождённая с «Now levels up with …» / «Instead of …» (не MISC) и
+  другим текстом игры → карточка «Innate reworked.» + `# TODO[covered]` для строк, которые она показывает
+  (`_postprocess_innate_cards`). Тест `tests/test_generator_review_739.py`.

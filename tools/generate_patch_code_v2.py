@@ -3863,6 +3863,8 @@ def generate(version):
     out = _postprocess_recipe_cost_zero_net(out)
     out = _postprocess_rework_marker(out)
     out = _postprocess_removed_label(out)             # "Neutral Item cycled out" label — owner 2026-10-17
+    out = _postprocess_ability_level_formula(out, version)   # "+X with every level of Y" -> table (owner 2026-10-27)
+    out = _postprocess_innate_cards(out, version)     # innate old -> new from the game's texts (owner 2026-10-27)
 
     # Close the page: footer + save. Emitted so the wrapped content/pXXX.py is
     # complete — without these the site build runs green but the patch HTML is
@@ -3873,6 +3875,92 @@ def generate(version):
     out.append(f"save_html('patches/{version}.html')")
 
     return '\n'.join(out)
+
+
+_LEVEL_OF_RE = re.compile(
+    r'^(?P<ind>\s*)W\(li\("(?P<pre>[^"]*?) rescaled from \(\+(?P<a>\d+(?:\.\d+)?) with every (?P<n>\d+) hero levels\) '
+    r'to \(\+(?P<b>\d+(?:\.\d+)?) with every level of (?P<abil>[^)"]+)\)", t\("[A-Za-z]+"\)\)\)\s*$')
+
+
+def _postprocess_ability_level_formula(lines, version):
+    """"Radius increase rescaled from (+50 with every 10 hero levels) to (+40 with every level of Echo Slam)" -> a
+    formula table by hero level with its BUFF / NERF, not a REWORK row (owner 2026-10-27, 7.39 Aftershock). The
+    ability's levels: an ultimate at 6 / 12 / 18, a basic ability at 1 / 3 / 5 / 7 (as soon as it can be taken)."""
+    from patch.ability_kv import _hero_blocks
+    by_name = {name.lower(): slug for name, slug in ABILS.values()}
+    out = []
+    for line in lines:
+        m = _LEVEL_OF_RE.match(line)
+        if not m:
+            out.append(line)
+            continue
+        slug = by_name.get(m.group("abil").strip().lower())
+        block = _hero_blocks(version).get(slug) if slug and version else None
+        ult = "ULTIMATE" in str((block or {}).get("AbilityType", "")).upper()
+        a, n, b, abil = m.group("a"), m.group("n"), m.group("b"), m.group("abil").strip()
+        if ult:
+            new_fn, levels, at = f"lambda L: {b} * (0 if L < 6 else min(3, (L - 6) // 6 + 1))", "[1, 6, 10, 12, 18, 20, 30]", "6, 12 and 18"
+        else:
+            new_fn, levels, at = f"lambda L: {b} * min(4, (L + 1) // 2)", "[1, 3, 5, 7, 10, 20, 30]", "1, 3, 5 and 7"
+        ind = m.group("ind")
+        out.append(f'{ind}W(li_formula("{m.group("pre")} rescaled", "+{a} with every {n} hero levels", '
+                   f'"+{b} with every level of {abil}",\n{ind}             lambda L: {a} * (L // {n}), {new_fn},\n'
+                   f'{ind}             levels={levels}, label="Hero level", value_fmt="+{{:g}}",\n'
+                   f'{ind}             inline_note_text="{abil} taken at hero levels {at}"))')
+    return out
+
+
+_ABILITY_LINE_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([^"]+)"(, innate=True)?\)\)\s*$')
+_NOW_INNATE_ROW_RE = re.compile(r'^\s*W\(li\("Now is an innate ability\b')
+_INNATE_REWORK_ROW_RE = re.compile(r'^\s*W\(li\("(?:Now levels up with|Instead of )')
+
+
+def _postprocess_innate_cards(lines, version):
+    """An ability that became an innate ("Now is an innate ability that improves with …", 7.39 Blur) or an innate
+    whose rows rework it ("Now levels up with Duel", "Instead of increasing …", 7.39 Outfight Them!): an old -> new
+    card from the game's texts of both patches in place of the plain header (owner 2026-10-27: "Blur — old > new",
+    "Outfight Them! — unclear how it works now"). The "Now is an innate ability" row hides under the card (covered);
+    the rows an innate rework card shows are for the proofread to hide (TODO[covered])."""
+    from patch.aghs_text import ability_text
+    from patch.weights import _prev_version
+    prev = _prev_version(version) if version else None
+    if not prev:
+        return lines
+    innate_now = innate_slugs_of(version)
+    out, i = [], 0
+    while i < len(lines):
+        m = _ABILITY_LINE_RE.match(lines[i])
+        if not m or i + 1 >= len(lines) or lines[i + 1].strip() != "W(ul_open())":
+            out.append(lines[i])
+            i += 1
+            continue
+        end = next((k for k in range(i + 2, len(lines)) if lines[k].strip() == "W(ul_close())"), None)
+        rows = lines[i + 2:end] if end else []
+        ind, name, slug = m.group(1), m.group(2), m.group(3)
+        became = any(_NOW_INNATE_ROW_RE.match(r) for r in rows)
+        # a MISC row is a renamed mechanic, not a rework (Withering Mist 7.39: Health Restoration, same numbers)
+        reworked = (not became and slug in innate_now
+                    and any(_INNATE_REWORK_ROW_RE.match(r) and 't("MISC")' not in r for r in rows)
+                    and ability_text(slug, prev) and ability_text(slug, version)
+                    and ability_text(slug, prev) != ability_text(slug, version))
+        if not (became or reworked):
+            out.append(lines[i])
+            i += 1
+            continue
+        summary = f"{name} is now an innate ability." if became else "Innate reworked."
+        out += [f'{ind}W(ability_change(',
+                f'{ind}    summary="{summary}",',
+                f'{ind}    tag="rework",',
+                f'{ind}    old=dict(name="{name}", slug="{slug}", desc=game_ability_desc("{slug}", "{prev}")),',
+                f'{ind}    new=dict(name="{name}", slug="{slug}", innate=True, desc=game_ability_desc("{slug}")),',
+                f'{ind}))']
+        if reworked:
+            out.append(f"{ind}# TODO[covered]: the rows the card shows (its texts, the header's level) get covered=True")
+        out.append(lines[i + 1])
+        for r in rows:
+            out.append(re.sub(r"\)\)\s*$", ", covered=True))", r) if _NOW_INNATE_ROW_RE.match(r) else r)
+        i += 2 + len(rows)
+    return out
 
 
 def _auto_register_facets(version, datafeed):
