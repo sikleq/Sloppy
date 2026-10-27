@@ -19,7 +19,6 @@ fetch_stats.py — Скачивает базу статов героев/пре�
 
 import json
 import os
-import re
 import subprocess
 import sys
 import time
@@ -453,7 +452,7 @@ def main():
 
         # Скачиваем и парсим npc_heroes.txt (только если нет, и не в refresh-items-only режиме)
         if not heroes_json.exists():
-            print(f"         ↓ npc_heroes.txt...", end=" ", flush=True)
+            print("         ↓ npc_heroes.txt...", end=" ", flush=True)
             raw_heroes = download_raw(session, commit["sha"], SOURCE_FILES["heroes"])
             if raw_heroes:
                 text = _decode(raw_heroes)
@@ -467,7 +466,7 @@ def main():
 
         # Скачиваем и парсим items.txt (если нет ИЛИ запрошен refresh-items)
         if not items_json.exists() or items_need_refresh:
-            print(f"         ↓ items.txt...", end=" ", flush=True)
+            print("         ↓ items.txt...", end=" ", flush=True)
             raw_items = download_raw(session, commit["sha"], SOURCE_FILES["items"])
             if raw_items:
                 text = _decode(raw_items)
@@ -482,7 +481,7 @@ def main():
         # npc_units.txt (slim JSON)
         units_json = ver_dir / "units.json"
         if not units_json.exists():
-            print(f"         ↓ npc_units.txt...", end=" ", flush=True)
+            print("         ↓ npc_units.txt...", end=" ", flush=True)
             raw = download_raw(session, commit["sha"], SOURCE_FILES["units"])
             if raw:
                 data = extract_units(parse_kv(_decode(raw)))
@@ -495,7 +494,7 @@ def main():
         # npc_abilities.txt (slim JSON)
         abilities_json = ver_dir / "abilities.json"
         if not abilities_json.exists():
-            print(f"         ↓ npc_abilities.txt...", end=" ", flush=True)
+            print("         ↓ npc_abilities.txt...", end=" ", flush=True)
             raw = download_raw(session, commit["sha"], SOURCE_FILES["abilities"])
             if raw:
                 data = extract_abilities(parse_kv(_decode(raw)))
@@ -508,7 +507,7 @@ def main():
         # npc_ability_ids.txt (id → slug)
         ability_ids_json = ver_dir / "ability_ids.json"
         if not ability_ids_json.exists():
-            print(f"         ↓ npc_ability_ids.txt...", end=" ", flush=True)
+            print("         ↓ npc_ability_ids.txt...", end=" ", flush=True)
             raw = download_raw(session, commit["sha"], SOURCE_FILES["ability_ids"])
             if raw:
                 data = extract_ability_ids(parse_kv(_decode(raw)))
@@ -524,7 +523,7 @@ def main():
         # heroes/ уже есть, шаг пропускается.
         heroes_dir = ver_dir / "heroes"
         if not heroes_dir.exists():
-            print(f"         ↓ heroes/ ...", end=" ", flush=True)
+            print("         ↓ heroes/ ...", end=" ", flush=True)
             listing = list_dir(session, commit["sha"], HEROES_DIR_PATH)
             if listing is None:
                 print("ОШИБКА (не получили список папки)")
@@ -550,7 +549,7 @@ def main():
     print(f"\n{'='*60}")
     print(f"  Готово: {fetched} скачано, {skipped} уже были")
     print(f"  Файлы в: {OUT_DIR}")
-    print(f"\n  Следующий шаг: запусти upload_stats.py чтобы залить в GitHub")
+    print("\n  Следующий шаг: запусти upload_stats.py чтобы залить в GitHub")
     print("=" * 60)
     input("\nНажми Enter чтобы закрыть окно...")
 

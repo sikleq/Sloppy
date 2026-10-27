@@ -113,8 +113,6 @@ def _wrap_ability_boxes(html):
     """
     def fix_ul(m):
         head, body, tail = m.group(1), m.group(2), m.group(3)
-        parts = []
-        last_idx = 0
         items = list(_LI_RE.finditer(body))
         if not items:
             return m.group(0)

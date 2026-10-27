@@ -51,7 +51,6 @@ from patch.known_exceptions import (  # noqa: E402
     KNOWN_DISPLAY_NAME_OVERRIDES,
     KNOWN_ICON_URL_PSEUDO_SLUGS,
     KNOWN_SYNTHETIC_SUBBLOCKS,
-    KNOWN_INNATE_NO_CDN_ICON,  # noqa: F401
 )
 
 _content_files = sorted((ROOT / "content").glob("*.py"))
@@ -270,7 +269,7 @@ slug_miss = [p for p in current if not p[6].startswith("renamed")]
 renamed_actionable = [p for p in renamed if (p[0], p[1], p[7]) not in KNOWN_HISTORICAL_RENAMES]
 renamed_suppressed = [p for p in renamed if (p[0], p[1], p[7]) in KNOWN_HISTORICAL_RENAMES]
 
-print(f"== CURRENT-STATE ISSUES (action required) ==")
+print("== CURRENT-STATE ISSUES (action required) ==")
 suppressed_note = f"  ({len(renamed_suppressed)} suppressed as known historical)" if renamed_suppressed else ""
 print(f"Renamed abilities (display name out of date): {len(renamed_actionable)}{suppressed_note}")
 print(f"Slug mismatches (icon won't load): {len(slug_miss)}\n")
@@ -289,7 +288,7 @@ if slug_miss:
     print()
 
 if historical:
-    print(f"== HISTORICAL REFERENCES (ach.old side — usually intentional) ==")
+    print("== HISTORICAL REFERENCES (ach.old side — usually intentional) ==")
     print(f"{len(historical)} entries skipped by default.")
     print("Run with --include-historical to inspect them.\n")
     if "--include-historical" in sys.argv:

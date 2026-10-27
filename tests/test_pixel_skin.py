@@ -1,6 +1,5 @@
 """Warm pixel skin: controls use the pixel icons and the shared --px-* tokens, not the old cold ones."""
 import os
-import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

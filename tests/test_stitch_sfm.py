@@ -31,8 +31,6 @@ def test_the_cross_fade_weights_of_two_neighbours_add_up_to_one():
 
 
 def test_a_render_must_cover_the_picture_and_hold_the_whole_map():
-    text = ss.session_text(os.path.join(_ROOT, "tests", "fixtures", "sfm_session_text.dmx")) \
-        if os.path.exists(os.path.join(_ROOT, "tests", "fixtures", "sfm_session_text.dmx")) else None
     frames = [np.array([x, y, 240000.0]) for y in (-9793.1 + 2000 * j for j in range(11))
               for x in (-6000 + 3600 * i for i in range(6))]
     prints = ss.footprints(frames, SESSION_QUAT, 1.0, 3840)

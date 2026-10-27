@@ -229,37 +229,6 @@ def _patch_meta_parts(version):
     return "", ""
 
 
-def _patch_age_line(version):
-    """Build the small subtitle under the release date.
-
-    For latest patch:   "29 days after 7.41b · running for 2 days"
-    For older patches:  "10 days after 7.41a · ran for 29 days"
-    Returns empty string if previous patch unknown.
-    """
-    from datetime import date as _D
-    today = _D.today()
-    sorted_releases = sorted(RELEASE_HISTORY, key=lambda p: _parse_date(p["date"]))
-    for i, p in enumerate(sorted_releases):
-        if p["version"] != version:
-            continue
-        cur_date = _parse_date(p["date"])
-        prev_part = ""
-        if i > 0:
-            prev = sorted_releases[i - 1]
-            n = (cur_date - _parse_date(prev["date"])).days
-            prev_part = f"{n} days after {prev['version']}"
-        if i < len(sorted_releases) - 1:
-            nxt = sorted_releases[i + 1]
-            n = (_parse_date(nxt["date"]) - cur_date).days
-            tail = f"ran for {n} days"
-        else:
-            n = (today - cur_date).days
-            unit = "day" if n == 1 else "days"
-            tail = f"running for {n} {unit}" if n > 0 else "released today"
-        return f"{prev_part} · {tail}" if prev_part else tail
-    return ""
-
-
 def _dropdown_options_html(current_version, patch_context=False):
     """Render menu items list for the version dropdown.
     patch_context=True when rendered inside a patch page (patches/ folder) —
@@ -294,8 +263,6 @@ def _render_top_nav(active="changelogs", current_version=None, date=None, patch_
     show_picker = (active == "changelogs"
                    and current_version is not None and date is not None)
     if show_picker:
-        age_line = _patch_age_line(current_version)
-        age_html = f'<span class="patch-age">{age_line}</span>' if age_line else ''
         options = _dropdown_options_html(current_version, patch_context=patch_context)
         # Prev/Next arrows flanking the version button — let the user
         # walk one step backward / forward through the patch list

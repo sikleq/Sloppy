@@ -1137,7 +1137,6 @@ def new_facet(slug, desc, summary=None, tag="new"):
         f'</li>'
         f'</ul>'
     )
-    pane_kind = "new" if tag_key == "new" else "new"
     panes_html = (
         f'<div class="ability-change unified-panes is-single-new" data-tag="{tag_key}">'
         f'<div class="ability-change-pane ability-change-new">'

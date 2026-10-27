@@ -62,7 +62,7 @@ _esc = lambda s: _html.escape(str(s), quote=True)
 # 27.9 → 27 → 22-32 base = 49-59) — patch-gated in _universal_dmg_mult().
 from patch import game_constants as _gc
 from patch.game_constants import (
-    HPREG_PER_STR, MANA_PER_INT, MANAREG_PER_INT,
+    HPREG_PER_STR, MANAREG_PER_INT,
     ARMOR_PER_AGI, MR_PER_INT, AS_PER_AGI, DMG_PER_PRIMARY,
 )
 

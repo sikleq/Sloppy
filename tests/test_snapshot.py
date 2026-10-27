@@ -6,7 +6,6 @@ EXPECTED dict below.
 """
 import re
 import sys
-import os
 import pytest
 from pathlib import Path
 

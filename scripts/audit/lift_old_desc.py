@@ -103,7 +103,6 @@ def _find_related_slugs(slug, hero_prefix=None):
     text = (DATA / 'patchnotes_english.txt').read_text(encoding='utf-8')
     # Extract slug fragments
     tokens = [t for t in slug.split('_') if len(t) > 3]
-    rx = re.compile(r'"DOTA_Patch_[^"]+"\s*"[^"]*"')
     seen = {}
     key_rx = re.compile(r'"DOTA_Patch_([^"]+)"')
     for m in key_rx.finditer(text):

@@ -12,7 +12,7 @@ import pathlib
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from patch.meta import PATCHES, RELEASE_HISTORY
+from patch.meta import PATCHES
 
 _ROOT = pathlib.Path(__file__).resolve().parent.parent
 _STEM_RE = re.compile(r'^p(\d)(\d{2})([a-z]?)$')

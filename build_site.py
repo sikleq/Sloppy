@@ -161,7 +161,7 @@ def main() -> int:
         return 2
 
     if latest:
-        print(f"  [--latest] building only the newest patch page (patch step only)")
+        print("  [--latest] building only the newest patch page (patch step only)")
 
     t0 = time.monotonic()
     build_started = time.time() - 2          # mtime floor of the pages this run writes (2s clock slack)

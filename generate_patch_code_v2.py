@@ -975,8 +975,6 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
     hide_dot/empty.
     """
     lines = []
-    pending_parent_text = None      # last emitted li-text (so we can patch info)
-    last_indent = 0
     open_ul = ul_open_called
     has_content = False
 
@@ -1025,8 +1023,6 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
                 lines.append('W(ul_close())')
                 open_ul = False
             lines.append(f'W(subgroup("{clean}"))')
-            last_indent = lvl
-            pending_parent_text = None
             continue
 
         open_ul_if_needed()
@@ -1037,8 +1033,6 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
             if expected_slug is not None and expected_slug != current_ability_slug:
                 lines.append(f'# [patchnotes: belongs to {expected_slug}]')
         lines.append(_emit_li(txt, info=info, aghs=aghs, hero_name=hero_name, version=version))
-        pending_parent_text = txt
-        last_indent = lvl
         has_content = True
 
         # Nested notes (the official patch page indents them under this bullet)
@@ -1908,7 +1902,6 @@ def _postprocess_scale_pill(lines):
                 continue
         base_s = m.group('base')
         inc_s = m.group('inc')
-        pct = m.group('pct')
         formula_text = m.group(0)
         # Linear formula L → base + inc * L (per memory rule
         # sloppy_per_level_formula). Build a string lambda that survives
@@ -2091,7 +2084,6 @@ def _postprocess_properties_change(lines, with_abilities=False):
         kept_lines = []
         needs_old = False
         block_end = i
-        in_ul = False
         while block_end < len(lines):
             ln = lines[block_end]
             if (ln.startswith('W(item_header(') or ln.startswith('W(hero_header(')
@@ -3655,7 +3647,6 @@ def _build_prev_hero_abils(version):
     prev_ver = _prev_patch_version(version)
     if not prev_ver:
         return {}
-    prev_path = os.path.join(_HERE, 'data', f'{prev_ver}_datafeed.json')
     try:
         prev_d = fetch_datafeed(prev_ver)
     except Exception:
@@ -3838,7 +3829,7 @@ def _auto_register_facets(version, datafeed):
     import re as _re
     facets_end = _re.search(r'\n}\n\n# Mapping from Valve', src)
     if not facets_end:
-        print(f'[WARN] Could not auto-register facets — could not locate FACETS closing brace')
+        print('[WARN] Could not auto-register facets — could not locate FACETS closing brace')
         return
     last_brace_idx = facets_end.start()
 

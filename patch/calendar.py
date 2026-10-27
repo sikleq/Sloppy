@@ -63,7 +63,6 @@ def save_calendar_html():
         }
     months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     has_html = {p['version'] for p in PATCHES}
-    expanded_years = {years[0]} if years else set()  # only current (newest) year expanded by default
 
     def patch_class(v):
         if _re.search(r'[a-z]$', v):
@@ -208,8 +207,6 @@ def save_calendar_html():
                        else (span_vals[n // 2 - 1] + span_vals[n // 2]) // 2)
     else:
         median_span = 0
-    max_year_count = max(year_counts.values()) if year_counts else 1
-    max_month_count = max(month_counts) if month_counts else 1
 
     min_year = min(year_counts) if year_counts else None
 

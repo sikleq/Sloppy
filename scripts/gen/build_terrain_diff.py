@@ -274,7 +274,7 @@ def _wards(old_code, new_code):
     paths = [os.path.join(_OWN, f"gridnav_{c}.gnv.gz") for c in (old_code, new_code)]
     if not all(os.path.exists(p) for p in paths):
         return None
-    (_ha, a), (hb, b) = gridnav.load(paths[0]), gridnav.load(paths[1])
+    (_, a), (hb, b) = gridnav.load(paths[0]), gridnav.load(paths[1])
     lost, gained = gridnav.ward_changes(a, b)
     to_no_ward, to_wardable = gridnav.changed_cells(hb, a, b)
     return {"old": _dotted(old_code), "new": _dotted(new_code), "lost": lost, "gained": gained,
@@ -299,12 +299,6 @@ def _areas_of(src, code):
 def _diff_pair(old_code, new_code):
     A = _load(old_code)
     B = _load(new_code)
-
-    # ---- trees: exact coordinate set difference (move records, not drawn) ----
-    ta = {(t["x"], t["y"]) for t in A["ent_dota_tree"]}
-    tb = {(t["x"], t["y"]) for t in B["ent_dota_tree"]}
-    added_trees = sorted(tb - ta)
-    removed_trees = sorted(ta - tb)
 
     # ---- neutral camps: match by triggerName ----
     ca = {e["triggerName"]: e for e in A["npc_dota_neutral_spawner"]}

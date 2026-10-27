@@ -1104,7 +1104,7 @@ def save_creeps_html():
     csv_path = _os.path.join(_HERE,
                              'data', 'creeps_raw.csv')
     if not _os.path.exists(csv_path):
-        print(f"  ! creeps_raw.csv not found, skipping neutral_stats.html")
+        print("  ! creeps_raw.csv not found, skipping neutral_stats.html")
         return
     src = load_sources()
     with open(csv_path, encoding='utf-8') as f:

@@ -49,6 +49,7 @@ import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import NoReturn
 
 # scripts/fetch/<this> -> the repo is three levels up. It was two before the move into scripts/fetch/, so the
 # 2026-09-18 run wrote scripts/data/signatures.json and the site kept the June list (found 2026-10-03).
@@ -77,7 +78,7 @@ _LINK_RE = re.compile(
 )
 
 
-def _die(msg: str) -> "NoReturn":  # type: ignore[name-defined]
+def _die(msg: str) -> NoReturn:
     print(f"error: {msg}", file=sys.stderr)
     sys.exit(1)
 

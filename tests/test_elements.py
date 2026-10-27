@@ -6,7 +6,6 @@ get_output(). Functions that return strings are tested directly.
 All tests follow Arrange-Act-Assert and are isolated via the autouse fixtures
 in conftest.py (reset_output, reset_state).
 """
-import pytest
 from patch.output import get_output
 from patch.badges import t, b
 

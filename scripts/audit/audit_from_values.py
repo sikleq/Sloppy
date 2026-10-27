@@ -145,13 +145,13 @@ def values(version, ctx):
 def _contexts(doc):
     """[(pos, ctx or None)] — the context every row after pos belongs to."""
     out = []
-    hero = item = None
+    hero = None
     for m in _MARKS.finditer(doc):
         if m.group(1):
             # the page id is the display name (battle-fury); the header icon's file is the game's (bfury)
             icon = _ICON.search(doc, m.end(), m.end() + 600)
             name = icon.group(1) if icon else m.group(2).replace("-", "_")
-            hero, item = (name, None) if m.group(1) == "hero" else (None, name)
+            hero = name if m.group(1) == "hero" else None
             out.append((m.start(), (m.group(1), name)))
         elif m.group(3) and hero:
             out.append((m.start(), ("ability", hero, m.group(3))))
@@ -160,7 +160,7 @@ def _contexts(doc):
             # "Abilities" waits for the first icon; Talents / Facets / anything else: no context
             out.append((m.start(), ("hero", hero) if hero and title == "general" else None))
         elif m.group(0).startswith("<"):
-            hero = item = None                           # a new block: its own id (if any) follows in the tag
+            hero = None                                  # a new block: its own id (if any) follows in the tag
             out.append((m.start(), None))
     return out
 

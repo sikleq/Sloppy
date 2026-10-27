@@ -3,6 +3,7 @@
 Five tests take ~2 of the suite's 3 minutes (they read every patch); they carry @pytest.mark.slow. CI and the check
 before a commit run everything; a quick loop while editing:  python -m pytest -q -m "not slow"
 """
+import importlib
 import os
 import pytest
 
@@ -31,7 +32,7 @@ def reset_output():
 def reset_state():
     """Every _State field and every per-page card cache back to its default between tests (patch/state.py — the
     same reset save_html does after each page, plus the build's totals)."""
-    import patch.elements  # noqa: F401  registers its page caches
+    importlib.import_module("patch.elements")  # registers its page caches
     from patch.state import reset_build_state
     reset_build_state()
     yield

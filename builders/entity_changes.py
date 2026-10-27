@@ -540,9 +540,8 @@ def _entity_page(e: dict, asset: str, latest: str, dyn: dict) -> str:
     eid = f'dyn-{e["kind"]}-{e["slug"]}'
     icon_cls = "item-icon" if e["kind"] in ("item", "enchant") else "hero-icon"
     ent_cls = "hero" if e["kind"] == "hero" else ("item" if e["kind"] in ("item", "enchant") else "unit")
-    n = len(e["patches"])
     info = ""
-    sections, seen = [], []
+    seen = []
     for p in e["patches"]:
         body, sc, tt, _ = _wrap_scopes(p["body"])
         p["_body"] = body

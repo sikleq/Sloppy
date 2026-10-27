@@ -5,7 +5,6 @@ silent.py уже хорошо разложен: `diff_versions` — чистая
 Здесь запираем поведение чистого ядра: KV-парсер, flatten, noise/interesting
 фильтры и сам diff — плюс smoke на реальных данных.
 """
-import pytest
 
 from builders.silent import (
     parse_kv, _flatten, _is_noise, _interesting, diff_versions,
