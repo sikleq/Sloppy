@@ -242,7 +242,7 @@ def test_generator_skips_a_card_whose_tooltips_say_the_same_words():
     import sys
     import pathlib
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "tools"))
-    from item_ability_text import _same_words
+    from patch.item_ability_text import _same_words
     # Block of Cheese 7.38: "Try me!" both times, only the 250 cast range gone
     assert _same_words(["Use: Scrumptious. Try me! Cast Range: 250. Cooldown: 40s"],
                        ["Use: Scrumptious. Try me! Cooldown: 40s"])

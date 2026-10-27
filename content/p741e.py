@@ -51,7 +51,7 @@ def build():
          extra=inline_note("Total cost unchanged at 4650g")))
     W(ul_close())
     W(item_header("Crella's Crozier"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Rite of Rumusque. You enter ghost form for 4 seconds, becoming immune to physical damage, but are unable to attack and -30% more vulnerable to magic damage. Steal 6% movement speed from enemy heroes in 900 range every second. Movement speed steal lasts 1.5s. Putrefaction Aura's effect is increased to 75%. All of the lost Health Restoration is redirected to you every second. Cooldown: 20s",
              "Passive: Putrefaction Aura. Reduces nearby enemy heroes' Health Restoration by 30%. Radius: 900."],
@@ -98,7 +98,7 @@ def build():
     W(li("Mana Regen Amplification bonus decreased from +40% to +30%", b(40, 30)))
     W(ul_close())
     W(item_header("Mask of Madness"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Berserk. Gives 100 attack speed, 8% / 12% movement speed (ranged/melee), and 30% slow resistance, but reduces your armor by 7 and silences you. Lasts 6 seconds. Mana Cost: 25. Cooldown: 16s",
              "Passive: Lifesteal. Heals the attacker for a percentage of physical damage dealt."],
@@ -109,7 +109,7 @@ def build():
     W(li("Berserk movement speed bonus on ranged heroes decreased from 8% to 6%", b(8, 6)))
     W(ul_close())
     W(item_header("Orb of Frost"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Frost. Your attacks slow the target's movement by -13% (-6% against melee targets), and reduces Health Restoration by 13%. Lasts for 3 seconds."],
         new=["Passive: Frost. Your attacks slow the target's movement by -13% (-6% against melee targets), and reduces Health Restoration by 15%. Lasts for 3 seconds."]))
@@ -166,7 +166,7 @@ def build():
     W(li("Forage time decreased from 1s to 0.75s", b(1, 0.75, l=True)))
     W(ul_close())
     W(item_header("Conjurer's Catalyst"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Spellover. Dealing 200 spell damage to an enemy causes them to overheat and deal damage to their allies in a 300 unit radius. Hero targets deal 80 damage to their allies, other targets deal 30 damage."],
         new=["Passive: Spellover. Dealing 200 spell damage to an enemy causes them to overheat and deal damage to their allies in a 300 unit radius. Hero targets deal 80 damage to their allies, other targets deal 20 damage."]))

@@ -22,7 +22,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 sys.path.insert(0, _ROOT)
 sys.path.insert(0, os.path.join(_ROOT, "tools"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from item_ability_text import _items  # noqa: E402
+from patch.item_ability_text import _items  # noqa: E402
 from enchant_values import kv_values, _levels  # noqa: E402
 from patch.elements import _ENCHANT_DESC  # noqa: E402
 
@@ -44,7 +44,7 @@ def game_tiers(version):
     "enhancements"); {} when the patch's file isn't there. The page's tier boxes, where it has them, win; a patch
     page without them (7.39 "Enchantment Changes", owner 2026-10-26: "сделать таблицей как в 7.41") takes these."""
     from patch.kv import parse_kv
-    from tools import game_files
+    from patch import game_files
     text = game_files.npc(version, "neutral_items.txt") if game_files.available() else None
     if not text:
         return {}
@@ -65,7 +65,7 @@ def game_label(name, key, version):
     """(sign, unit, label) of a KV key as that patch's game text names it ("%+$slow_resistance" -> ("+", "%", "Slow
     Resistance")), else None. The _ENCHANT_DESC lines are today's text, matched by order: in an older patch the keys
     differ (7.39 Mystical's third value is Cast Range, not Mana Cost/Loss Reduction — owner 2026-10-26)."""
-    from loc_history import tooltip
+    from patch.loc_history import tooltip
     raw = tooltip(f"DOTA_Tooltip_ability_item_enhancement_{_game_name(name)}_{key}", version)
     m = re.fullmatch(r"\s*(%?)([+\-]?)(%?)\s*(.+?)\s*", raw or "")
     if not m:

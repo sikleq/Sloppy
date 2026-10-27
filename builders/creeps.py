@@ -34,7 +34,7 @@ from typing import NamedTuple
 _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 _sys.path.insert(0, _HERE)
 
-import builders.site_common as _site
+import patch.site_common as _site
 from builders.creeps_abilities import UA_CANONICAL_UNIT, save_neutral_abilities_html
 from builders.creeps_common import (
     ABILITY_COLS, ABILITY_SKIP, DASH, HULL_BOUNDS, NEUTRAL_DEFAULT_HULL,

@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.join(ROOT, "scripts", "gen"))
 import build_terrain_diff as btd  # noqa: E402
 import extract_map_entities as ext  # noqa: E402
 from builders import terrain  # noqa: E402
+from patch import terrain_index  # noqa: E402
 
 
 def test_a_three_quoted_value_spans_lines():
@@ -94,11 +95,11 @@ def test_a_currents_zone_is_its_spline_swept_by_the_node_radius():
 
 
 def test_the_currents_layer_draws_buff_zones_by_strength_and_flow_arrows():
-    svg = terrain._line_zone_svgs(terrain._load_diff("7.38"), terrain._projector(terrain._load_map_meta()))
+    svg = terrain._line_zone_svgs(terrain_index._load_diff("7.38"), terrain._projector(terrain._load_map_meta()))
     new = svg[svg.index("tm-layer-currents tm-new"):]
     new = new[:new.index("</svg>")]
     assert "tc-current-150" in new and "tc-current-100" in new and "tc-current-flow" in new
-    svg = terrain._line_zone_svgs(terrain._load_diff("7.41"), terrain._projector(terrain._load_map_meta()))
+    svg = terrain._line_zone_svgs(terrain_index._load_diff("7.41"), terrain._projector(terrain._load_map_meta()))
     new = svg[svg.index("tm-layer-currents tm-new"):]
     new = new[:new.index("</svg>")]
     assert "tc-current-150" in new and "tc-current-100" not in new          # 7.41: all +150
@@ -106,8 +107,8 @@ def test_the_currents_layer_draws_buff_zones_by_strength_and_flow_arrows():
 
 def test_the_new_layer_chips_are_buttons_that_light_their_outlines():
     """The owner 2026-10-06: "не могу нажать Changed in the map file фильтры новых слоёв"."""
-    diff = terrain._load_diff("7.40")
-    html = "".join(terrain._chip(*c) for c in terrain._moved_items(diff) if c[0] in terrain._LAYER_HL)
+    diff = terrain_index._load_diff("7.40")
+    html = "".join(terrain._chip(*c) for c in terrain_index._moved_items(diff) if c[0] in terrain._LAYER_HL)
     for key, layer in (("lanes", "lanes"), ("currents", "currents"), ("shopzones", "shops"), ("lanespawns", "lanes")):
         assert f'data-hl="{key}" data-layer="{layer}"' in html, key
         assert f"tm-hl tm-hl-{key} tm-new" in terrain._highlights_svg(diff, terrain._projector(terrain._load_map_meta())), key
@@ -140,7 +141,7 @@ def test_a_lane_chip_marks_only_the_stretches_that_changed_in_their_sides_colour
 
     def length(run):
         return sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(run, run[1:]))
-    diff = terrain._load_diff("7.41")
+    diff = terrain_index._load_diff("7.41")
     stretches = terrain._lane_stretches(diff)
     assert len(stretches) == 4
     # Dire top / Radiant bot: one corner moved 200 units ALONG the line — only the dropped detour is marked, not the lane
@@ -204,7 +205,7 @@ def test_a_zone_chip_counts_zones_not_their_hulls():
     moved = [sq[0], sq[1], [[9, 9], [11, 9], [11, 11]]]
     diff = {"zones": {"shops": {"old": sq + [[[50, 50], [51, 50], [51, 51]]], "oldVolume": [0, 0, 0, 1],
                                "new": moved + [[[50, 50], [51, 50], [51, 51]]], "newVolume": [0, 0, 0, 1]}}}
-    assert [c for c in terrain._layer_changes(diff) if c[0] == "shop zones"] == [("shop zones", "changed", 1, 0, 2)]
+    assert [c for c in terrain_index._layer_changes(diff) if c[0] == "shop zones"] == [("shop zones", "changed", 1, 0, 2)]
 
 
 def test_touching_hulls_are_outlined_as_one_shape():
@@ -222,7 +223,7 @@ def test_touching_hulls_are_outlined_as_one_shape():
 
 
 def test_the_741_shops_layer_outlines_each_shop_once():
-    svg = terrain._line_zone_svgs(terrain._load_diff("7.41"), terrain._projector(terrain._load_map_meta()))
+    svg = terrain._line_zone_svgs(terrain_index._load_diff("7.41"), terrain._projector(terrain._load_map_meta()))
     new = svg[svg.index("tm-layer-shops tm-new"):]
     new = new[:new.index("</svg>")]
     stroke = new[new.index('fill="none" stroke='):]
@@ -239,11 +240,11 @@ def test_the_741_secret_shop_and_roshan_pits_are_polygons():
 
 def test_7_38c_shows_its_top_lane_path_change():
     """7.38c "The Top Lane creep paths have been slightly adjusted": both top lanes changed in the map file."""
-    chips = [c for c in terrain._moved_items(terrain._load_diff("7.38c")) if c[0] == "lane paths"]
+    chips = [c for c in terrain_index._moved_items(terrain_index._load_diff("7.38c")) if c[0] == "lane paths"]
     assert chips == [("lane paths", "changed", 2, 0, 6)]
 
 
 def test_new_layers_are_drawn_per_side():
-    svg, _counts = terrain._markers_svg(terrain._load_diff("7.41"))
+    svg, _counts = terrain._markers_svg(terrain_index._load_diff("7.41"))
     for key in ("lanes", "currents", "shops", "spawns"):
         assert f"tm-layer-{key} tm-old" in svg and f"tm-layer-{key} tm-new" in svg, key

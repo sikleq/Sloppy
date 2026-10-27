@@ -17,7 +17,7 @@ spec.loader.exec_module(rs)
 
 def _store_here():
     sys.path.insert(0, str(ROOT))
-    from tools import game_files
+    from patch import game_files
     return game_files.available() and len(game_files.versions()) > 100
 
 

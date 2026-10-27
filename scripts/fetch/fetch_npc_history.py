@@ -1,4 +1,4 @@
-"""fetch_npc_history.py — npc_units.txt каждого патча из нашего хранилища файлов игры (tools/game_files.py:
+"""fetch_npc_history.py — npc_units.txt каждого патча из нашего хранилища файлов игры (patch/game_files.py:
 сборка самого патча) → компактные per-patch JSON `data/stats/<patch>/npc_units.json` с полями нейтралов.
 Нужно для истории магрезиста (и прочих npc-only статов), которой нет в units.json.
 
@@ -24,7 +24,7 @@ except Exception:
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from patch.meta import RELEASE_HISTORY  # noqa: E402
-from tools import game_files  # noqa: E402
+from patch import game_files  # noqa: E402
 
 STATS_DIR = ROOT / "data" / "stats"
 

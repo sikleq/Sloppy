@@ -10,7 +10,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "scripts", "gen"))
 
 import gen_colorblind_css as cb  # noqa: E402
-from builders import site_common  # noqa: E402
+from patch import site_common  # noqa: E402
 
 # Machado, Oliveira & Fernandes 2009, severity 1.0, on linear RGB
 _SIM = {

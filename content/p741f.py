@@ -65,7 +65,7 @@ def build():
     W(li("Arctic Blast damage decreased from 260 to 225", b(260, 225)))
     W(ul_close())
     W(item_header("Silver Edge"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Shadow Walk. Makes you invisible for 17 seconds, or until you attack or cast a spell. While invisible, you move 22% faster and can move through units. Attacking to end the invisibility will deal 300 bonus physical damage, disable their passive abilities for 5 seconds, and cap their movement speed to 200. Mana Cost: 75. Cooldown: 22s"],
         new=["Active: Shadow Walk. Makes you invisible for 17 seconds, or until you attack or cast a spell. While invisible, you move 20% faster and can move through units. Attacking to end the invisibility will deal 300 bonus physical damage, disable their passive abilities for 5 seconds, and cap their movement speed to 200. Mana Cost: 75. Cooldown: 23s"]))

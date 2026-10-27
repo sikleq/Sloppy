@@ -55,7 +55,7 @@ def build():
     W(ul_close())
 
     W(item_header("Maelstrom"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Chain Lightning. Grants a 25% chance on attack to release a bolt of electricity that leaps between 4 targets within a 650 radius, dealing 110 magical damage to each. Lightning proc pierces evasion. Deals 150% damage to illusions."],
         new=["Passive: Chain Lightning. Grants a 25% chance on attack to release a bolt of electricity that leaps between 4 targets within a 650 radius, dealing 110 magical damage to each. Lightning proc pierces evasion."]))
@@ -110,7 +110,7 @@ def build():
     W(plain_header("Artifact changes", dynamics=False, sublabel=True))
 
     W(item_header("Sister's Shroud"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Veiled. When falling below 50% HP, gain 200% evasion for 8 seconds. While active, dodging an attack decreases the evasion bonus by 75% of its current value.",
              "Passive: Last Caress. Veiled cooldown is only reset if the wearer dies or kills an enemy hero."],
@@ -127,7 +127,7 @@ def build():
     W(ul_close())
 
     W(item_header("Helm of the Undying"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Death Delay. Survive for an extra 5 seconds after receiving a killing blow. If any enemy heroes dies within 1200 units, the death delay effect is extended by 5 seconds. Cooldown: 100s"],
         new=["Passive: Death Delay. Survive for an extra 6 seconds after receiving a killing blow. If any enemy heroes dies within 1200 units, the death delay effect is extended by 5 seconds. The hero cannot attack buildings during Death Delay. Cooldown: 100s"]))

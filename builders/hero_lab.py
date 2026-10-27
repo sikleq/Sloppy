@@ -17,7 +17,7 @@ _ROOT = Path(__file__).resolve().parent.parent
 _sys.path.insert(0, str(_ROOT))
 _sys.path.insert(0, str(_ROOT / "builders"))
 
-import builders.site_common as _site
+import patch.site_common as _site
 from builders import innate_rules as _innate_rules
 from mana_items import parse_kv
 from heroes_stats import (

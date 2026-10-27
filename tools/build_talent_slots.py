@@ -6,7 +6,7 @@ FIRST of each pair is the RIGHT twig (checked against Liquipedia: Axe 7.41 Abili
 Kill Buff Duration" = level 10 right). Invoker keeps them at Ability17+, so the order is used, not
 fixed slot numbers.
 
-Sources: npc_heroes.txt of each patch's own build from our game-files store (tools/game_files.py; until
+Sources: npc_heroes.txt of each patch's own build from our game-files store (patch/game_files.py; until
 2026-10-24 the d2vpkr history), and where it is only an include list (7.41f+ layout) the repo's own
 data/stats/<v>/heroes/npc_dota_hero_<slug>.txt.
 
@@ -26,7 +26,7 @@ import sys
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
-from tools import game_files  # noqa: E402
+from patch import game_files  # noqa: E402
 
 STATS = os.path.join(HERE, "data", "stats")
 OUT = os.path.join(HERE, "data", "rules", "talent_slots.json")

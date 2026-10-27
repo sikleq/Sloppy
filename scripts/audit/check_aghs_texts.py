@@ -26,8 +26,8 @@ from patch.kv import parse_kv  # noqa: E402
 from patch.ability_kv import _hero_blocks  # noqa: E402
 from patch.aghs_text import _FLAGS, _HEADER_LABELS, _KEYS, _granted, _num, _values, _with_kin_values, aghs_text  # noqa: E402
 from patch.meta import RELEASE_HISTORY, _prev_patch_version  # noqa: E402
-from tools import game_files  # noqa: E402
-from tools.loc_history import tooltip  # noqa: E402
+from patch import game_files  # noqa: E402
+from patch.loc_history import tooltip  # noqa: E402
 
 _SKIP_KEYS = ("var_type", "LinkedSpecialBonus", "RequiresScepter", "RequiresShard", "CalculateSpellDamageTooltip")
 

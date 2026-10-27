@@ -288,7 +288,7 @@ def build():
     W(li("Total cost decreased from 2850 to 2800 due to Voodoo Mask cost decrease", b(2850, 2800, l=True), extra=inline_note("Total cost for all levels decreased from 2850/4000/5150/6300/7450 to 2800/3950/5100/6250/7400 " + b([2850,4000,5150,6300,7450], [2800,3950,5100,6250,7400], l=True))))
     W(ul_close())
     W(item_header("Diffusal Blade"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Inhibit. Targets an enemy, slowing it for 4 seconds. Cast Range: 600. Mana Cost: 25. Cooldown: 15s",
              "Passive: Manabreak. Each attack burns 40 mana from the target, and deals 1 physical damage per burned mana. Burns 8 mana per attack from melee illusions and 8 mana per attack from ranged illusions."],
@@ -298,7 +298,7 @@ def build():
     W(li("Manabreak no longer applied by illusions", t("DEL")))
     W(ul_close())
     W(item_header("Disperser"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Suppress. Slows the target for 5 seconds if they are an enemy or applies a basic dispell and grants bonus movespeed and 40% slow resistance for 5 seconds if they are an ally. Caster is always granted the ally benefit on cast. Both movement speed reduction and increase start at 100% and gradually decrease to 0% over the course of the buff duration. Dispel Type: Basic Dispel. Cast Range: 600. Mana Cost: 75. Cooldown: 15s",
              "Passive: Manabreak. Each attack burns 40 mana from the target, and deals 1 physical damage per burned mana. Burns 8 mana per attack from melee illusions and 8 mana per attack from ranged illusions."],
@@ -316,7 +316,7 @@ def build():
              ("DEL",  "+3 Mana Regen"),
              ("DEL",  "+250 Cast Range")],
         new=[("",    "+24 All Attributes", b(8, 24))]))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Ether Blast. Converts the target unit to ethereal form, rendering them immune to physical damage, but unable to attack and -40% more vulnerable to magic damage. Enemy targets are also slowed by -80%, and take 1.5x your target's primary attribute + 50 as magical damage. Duration: 4 seconds. Cast Range: 800. Mana Cost: 100. Cooldown: 22s"],
         new=["Active: Ether Blast. Converts the target unit to ethereal form, rendering them immune to physical damage, but unable to attack and -30% more vulnerable to magic damage. Enemy targets are also slowed by -80%, and take 1x the sum of all your attributes + 50 as magical damage. Duration: 4 seconds. Cast Range: 800. Mana Cost: 100. Cooldown: 22s"]))
@@ -334,7 +334,7 @@ def build():
     W(properties_change(
         old=[("BUFF", "+4 Armor")],
         new=[("",    "+5 Armor", b(4, 5))]))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Mend. Restores 325 health and 200 mana to nearby allies, and removes most negative effects from the caster. Radius: 1200. Dispel Type: Basic Dispel. Cooldown: 45s",
              "Passive: Guardian Aura. Grants 2.5 health regeneration, 1.5 mana regeneration and 3 armor to allied units. If an allied hero's health falls below 25%, this is increased to 14.5 health regeneration, 5 mana regeneration and 8 armor. Radius: 1200. Movement speed bonuses from multiple pairs of boots do not stack."],
@@ -347,7 +347,7 @@ def build():
     W(li("Guardian Aura no longer provides increased armor and increased mana regeneration when below 25% health", t("DEL"), extra=inline_note("Still provides bonus health regeneration to the wearer when below 25% health")))
     W(ul_close())
     W(item_header("Hand of Midas"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Transmute. Kills a non-hero target for 160 gold and 2.1x experience. Killing a neutral creep additionally grants a madstone bundle. Cannot be used on Ancient creeps. Cast Range: 600."],
         new=["Active: Transmute. Kills a non-hero target for 160 gold. Killing a neutral creep additionally grants a madstone bundle. Cannot be used on Ancient creeps. Cast Range: 600."]))
@@ -365,7 +365,7 @@ def build():
          extra=inline_note("Multiple instances of Behemoth's Blood don't stack")))
     W(ul_close())
     W(item_header("Heaven's Halberd"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Disarm. Prevents a target from attacking for 3.5 seconds on melee targets, and 4.5 seconds on ranged targets. Cast Range: 650. Mana Cost: 25. Cooldown: 18s",
              "Passive: Damage Block. Grants a 60% chance to block 60 damage from incoming attacks on melee heroes, and 30 damage on ranged."],
@@ -449,7 +449,7 @@ def build():
     W(ul_close())
     W(item_header("Radiance"))
     W(properties_change(old=[("BUFF", "+15% Evasion")], new=[("", "+25% Evasion", b(15, 25))]))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Toggle: Burn. When active, scorches enemies for 60 magical damage per second and causes them to miss 15% of their attacks. Deals 150% damage to illusions. Illusions deal 35 magical damage per second. Radius: 650."],
         new=["Toggle: Burn. When active, scorches enemies for 60 magical damage per second. Illusions deal 35 magical damage per second. Radius: 650."]))
@@ -479,7 +479,7 @@ def build():
     W(li("Total cost decreased from 3350 to 3250 due to Shadow Amulet cost decrease", b(3350, 3250, l=True)))
     W(ul_close())
     W(item_header("Shiva's Guard"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Arctic Blast. Emits a freezing wave that causes enemies to take 15% more damage from spells for 16 seconds, deals 200 magical damage and slows their movement by -40% for 4 seconds. Deals 150% damage to illusions. Radius: 900. Mana Cost: 75. Cooldown: 27s",
              "Passive: Freezing Aura. Reduces the attack speed of all enemies by -45 and Health Restoration and Incoming Heal Amplification by 25%. Radius: 1200."],
@@ -490,7 +490,7 @@ def build():
     W(ul_close())
     W(item_header("Silver Edge"))
     W(auto_components_change("Silver Edge", "7.40"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Shadow Walk. Makes you invisible for 17 seconds, or until you attack or cast a spell. While invisible, you move 25% faster and can move through units. Attacking to end the invisibility will deal 300 bonus physical damage and disable their passive abilities for 6 seconds. Mana Cost: 75. Cooldown: 20s"],
         new=["Active: Shadow Walk. Makes you invisible for 17 seconds, or until you attack or cast a spell. While invisible, you move 25% faster and can move through units. Attacking to end the invisibility will deal 300 bonus physical damage, disable their passive abilities for 6 seconds, and cap their movement speed to 200. Mana Cost: 75. Cooldown: 20s"]))
@@ -499,7 +499,7 @@ def build():
     W(li("Shadow Walk debuff now caps the target's movement speed to 200. This debuff is not dispellable and does not pierce debuff immunity", t("NEW")))
     W(ul_close())
     W(item_header("Urn of Shadows"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Soul Release. Provides 30 health regeneration when cast on allies, and deals 25 damage per second when cast on enemies. Lasts 8 seconds. If the unit is attacked by an enemy hero or Roshan, the effect is lost. Gains charges every time an enemy hero dies within 1400 units. Only the closest Urn to the dying hero will gain a charge. Cast Range: 750. Cooldown: 10s"],
         new=["Active: Soul Release. Provides 30 health regeneration when cast on allies, and deals 25 damage per second when cast on enemies. Lasts 8 seconds. Gains charges every time an enemy hero dies within 1500 units. Cast Range: 750. Cooldown: 10s"]))
@@ -510,7 +510,7 @@ def build():
     W(li("Soul Release charges can now be gained by both Urn of Shadows and Spirit Vessel from the same hero death", t("BUFF"), extra=inline_note("Example to show the result of these two changes:<br>Two allied heroes. Both of them have both Urn of Shadows and Spirit Vessel. An enemy hero dies within 1500 range from them. Both Urns of Shadows will gain a charge. Spirit Vessel will also gain a charge as well, but only for the ally that was closer to the dying enemy")))
     W(ul_close())
     W(item_header("Spirit Vessel"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Soul Release. When used against enemies, it reduces health by 4% of current health per second, and reduces Health Restoration by 70% and incoming heals by 70%. Deals 25 damage per second. When used on allies, it provides 40 health regeneration per second. Lasts 8 seconds. If the unit is attacked by an enemy hero or Roshan, the effect is lost. Gains charges every time an enemy hero dies within 1400 units or the user dies. Only the closest Spirit Vessel to the dying hero will gain a charge. Cast Range: 750. Cooldown: 10s"],
         new=["Active: Soul Release. When used against enemies, it reduces health by 4% of current health per second, and reduces Health Restoration by 70% and incoming heals by 70%. Deals 25 damage per second. When used on allies, it provides 40 health regeneration per second. Lasts 8 seconds. Gains charges every time an enemy hero dies within 1500 units or the user dies. Cast Range: 750. Cooldown: 10s"]))
@@ -570,7 +570,7 @@ def build():
          extra=inline_note("Dormant Curio increases counter-attack damage from 80% to 104%")))
     W(ul_close())
     W(item_header("Searing Signet"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Burn Through. Instances of magic damage from spells over 55 ignites enemies, causing them to take 72 magic damage over 6 seconds."],
         new=["Passive: Burn Through. Instances of magic damage from spells over 55 ignites enemies, causing them to take 90 magic damage over 6 seconds. Burn damage against non-hero targets is decreased by 50%."]))
@@ -583,7 +583,7 @@ def build():
     W(li("Item cycled out", t("DEL")))
     W(ul_close())
     W(item_header("Jidi Pollen Bag"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Pollinate. Spreads pollen on all nearby enemy units, decreasing their health restoration and dealing damage over time based on their maximum health. Cooldown: 45s"],
         new=["Active: Pollinate. Spreads pollen on all nearby enemy units, decreasing their health restoration and dealing damage over time based on their maximum health. Cooldown: 25s"]))
@@ -593,7 +593,7 @@ def build():
     W(li("Pollinate Cooldown decreased from 45s to 25s", b(45, 25, l=True)))
     W(ul_close())
     W(item_header("Psychic Headband"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Psychic Push. Pushes the target enemy unit away from you 400 distance. Cast Range: 600. Cooldown: 15s"],
         new=["Active: Psychic Push. Pushes the target unit away from you 400 distance. Cast Range: 600. Cooldown: 15s"]))
@@ -601,7 +601,7 @@ def build():
     W(li("Psychic Push can now target allies", t("NEW"), extra=inline_note("Still can't target the wearer themself")))
     W(ul_close())
     W(item_header("Unrelenting Eye"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Relentless. Increases slow resistance by 100%. This bonus is reduced by 20% for every enemy hero within 600 units. Increases status resistance by 10% for every enemy hero within 600 units."],
         new=["Passive: Relentless. Increases slow resistance by 50%. This bonus is reduced by 10% for every enemy hero within the wearer's attack radius."]))

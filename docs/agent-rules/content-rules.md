@@ -168,7 +168,7 @@ W(li("Recipe cost decreased from 1350 to 1250", b(1350, 1250, l=True), extra=inl
 его бонусных характеристик — в `properties_change`, не строками:
 - «Now provides +8 Mana Regen instead of +50 Damage» → old `("DEL", "+50 Damage")`, new `("NEW", "+8 Mana Regen")` (Khanda 7.38);
 - «Provides +35 Damage and +16% Spell Lifesteal» → new-карточка; старые значения — из подсказок игры
-  прошлого патча (хранилище файлов игры: `tools/loc_history.py`), генератор оставляет `# TODO` (Revenant's Brooch 7.38: было +70 / +20%);
+  прошлого патча (хранилище файлов игры: `patch/loc_history.py`), генератор оставляет `# TODO` (Revenant's Brooch 7.38: было +70 / +20%);
 - «No longer provides +6 Health Regen» → old `("DEL", ...)` (Nullifier 7.41).
 В карточку идёт только настоящая характеристика (`_ITEM_STAT_NAME_RE`: Damage, Mana Regen, Spell Lifesteal…);
 «Empower Spell bonus damage 150 → 250» — число способности, остаётся строкой.
@@ -189,7 +189,7 @@ W(li("Recipe cost decreased from 1350 to 1250", b(1350, 1250, l=True), extra=inl
 «Passive: …» — это сноска к способности: `info_tip(...)` в конце её текста, отдельной MISC-строки нет
 (Orb of Corrosion 7.38). Генератор: `_postprocess_stack_note_into_ability`.
 У переделанного предмета старые/новые бонусные характеристики — карточками `properties_change`;
-старые значения брать из подсказок игры тех лет (хранилище файлов игры, `tools/loc_history.py`), не выдумывать.
+старые значения брать из подсказок игры тех лет (хранилище файлов игры, `patch/loc_history.py`), не выдумывать.
 
 ## Порядок строк в properties_change
 
@@ -302,6 +302,6 @@ W(li("Aghanim's Shard reworked: Applies 3 Fury Swipe stacks to each affected ene
 Удалённая врождённая + новая в том же патче → одна карточка `ability_change(old=<удалённая>, new=<новая>)`:
 Mental Fortitude → Aggrandize, Mana Magnifier → Special Reserve (7.38), Barracuda → Essence Shift,
 Gift Bearer → Summon Spirit Bear, Spectral → Desolate (7.40). Переделка на месте («Gift Bearer: Reworked»)
-→ `ability_change` с одинаковым именем. Тексты old/new — из хранилища файлов игры (`tools/loc_history.py`, `abilities_english.txt` предыдущего и самого патча),
+→ `ability_change` с одинаковым именем. Тексты old/new — из хранилища файлов игры (`patch/loc_history.py`, `abilities_english.txt` предыдущего и самого патча),
 числа — из `data/stats/<версия>` KV; не выдумывать. Генератор: `_postprocess_innate_rows_out_of_stats`
 (переносит строки, для удаления ставит `# TODO[innate-swap]`).

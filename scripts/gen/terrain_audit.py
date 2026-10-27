@@ -19,8 +19,8 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
 sys.path.insert(0, _ROOT)
 sys.path.insert(0, _HERE)
-from builders import map_versions as mv  # noqa: E402
-import builders.terrain as terrain  # noqa: E402
+from patch import map_versions as mv  # noqa: E402
+from patch import terrain_index  # noqa: E402
 
 CLUSTER = 450             # units: trees closer than this are one cluster
 POINTS = {"npc_dota_watch_tower": "outpost", "npc_dota_lantern": "watcher", "npc_dota_unit_twin_gate": "twin gate",
@@ -203,7 +203,7 @@ def main():
     ap.add_argument("patches", nargs="*")
     ap.add_argument("--pictures", help="folder of the full renders map_<sha8>_sfm_full.png")
     args = ap.parse_args()
-    notes = terrain._terrain_notes_by_patch()
+    notes = terrain_index._terrain_notes_by_patch()
     for step in mv.steps():
         if args.patches and step.patch not in args.patches:
             continue

@@ -1,15 +1,16 @@
 """An ability's Aghanim's Scepter / Shard upgrade as the game described it in one patch: the tooltip of that patch's
-build (tools/loc_history.py) with that patch's numbers (data/stats/<v>/heroes, patch/ability_kv.py). Nothing is
+build (patch/loc_history.py) with that patch's numbers (data/stats/<v>/heroes, patch/ability_kv.py). Nothing is
 invented: a missing tooltip or a placeholder the KV doesn't have gives None.
 
     from patch.aghs_text import aghs_text
     aghs_text("legion_commander_overwhelming_odds", "shard", "7.40c")
 """
-import os
 import re
-import sys
 
-_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from patch.ability_kv import _hero_blocks
+from patch.item_ability_text import _clean, _fill
+from patch.loc_history import tooltip
+
 _KEYS = {"scepter": ("aghanim_description", "scepter_description"), "shard": ("shard_description",)}
 
 
@@ -125,9 +126,6 @@ _FLAGS = {"scepter": ("HasScepterUpgrade", "IsGrantedByScepter"), "shard": ("Has
 
 
 def _blocks(version):
-    if _ROOT not in sys.path:
-        sys.path.insert(0, _ROOT)
-    from patch.ability_kv import _hero_blocks
     return _hero_blocks(version)
 
 
@@ -155,9 +153,6 @@ def holders(hero, kind, version):
 
 
 def ability_name(slug, version):
-    if _ROOT not in sys.path:
-        sys.path.insert(0, _ROOT)
-    from tools.loc_history import tooltip
     return tooltip(f"DOTA_Tooltip_ability_{slug}", version)
 
 
@@ -179,8 +174,6 @@ def ability_text(slug, version, kind="base"):
     """An ability's own description in `version` with that patch's numbers; a value growing with hero level
     ("hero_levelup") reads "10% + 1% per level" (7.41 innates). kind: the Aghanim's upgrade that grants it, whose
     values ("special_bonus_scepter": "800") are its numbers. None when the files don't have it."""
-    from tools.item_ability_text import _clean, _fill
-    from tools.loc_history import tooltip
     block = _blocks(version).get(slug)
     desc = tooltip(f"DOTA_Tooltip_ability_{slug}_Description", version)
     if not isinstance(block, dict) or not desc:
@@ -251,8 +244,6 @@ def aghs_text(slug, kind, version):
     numbers "Radius: +100. Barrier duration: 6." — or None. An ability the upgrade grants: "Grants <name>: …"."""
     if not slug or not version or kind not in _KEYS:
         return None
-    from tools.item_ability_text import _clean, _fill
-    from tools.loc_history import tooltip
     block = _blocks(version).get(slug)
     # "<slug>_ad_shard_description": the only key 7.30-7.31b Skywrath's Mystic Flare Shard had (Valve's own name)
     desc = next((d for d in (tooltip(f"DOTA_Tooltip_ability_{slug}_{pre}{k}", version)

@@ -8,7 +8,7 @@ def build():
 
     W(item_header("Consecrated Wraps"))
     W(properties_change(old=[("NERF", "+15% Magic Resistance")], new=[("", "+12% Magic Resistance", b(15, 12))]))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Upon gaining a stack, your movement speed is increased by 20% for 7s. Whenever you take damage from a player-controlled unit or Roshan, consume all stacks to gain an all damage barrier for 7s that absorbs 120 damage per stack (360 max)."],
         new=["Passive: Hallowed. Gain a stack every 3s, up to a maximum of 3 stacks. Upon gaining a stack, your movement speed is increased by 15% for 5s. Whenever you take damage from a player-controlled unit or Roshan, consume all stacks to gain an all damage barrier for 5s that absorbs 120 damage per stack (360 max)."]))

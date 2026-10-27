@@ -85,7 +85,7 @@ cost, decide how to count mana costs, and count a stat that is replaced by a pas
 +25 % Evasion and got Passive: Damage Block).
 
 **Method** (`tools/fit_item_prices.py`, needs numpy + scipy; reads `data/stats/<v>/items.txt`, else the patch's own
-build from the game-files store (`tools/game_files.py`); 118 versions 7.08 → 7.41f, ~11 s):
+build from the game-files store (`patch/game_files.py`); 118 versions 7.08 → 7.41f, ~11 s):
 1. *Which KV values are stats* — Valve's own tooltips: `DOTA_Tooltip_ability_<item>_<field>` = "+$armor",
    "%+Slow Resistance" is a line of the item's stat list, the label names the stat. Items no longer in the
    tooltips use the field-name map learned from the same tooltips. Melee/ranged variants (Phase Boots damage,

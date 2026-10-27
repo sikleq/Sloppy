@@ -18,8 +18,9 @@ _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 if _HERE not in _sys.path:
     _sys.path.insert(0, _HERE)
 
-import builders.site_common as _site  # noqa: E402
+import patch.site_common as _site  # noqa: E402
 import builders.terrain as _terrain  # noqa: E402
+from patch import terrain_index  # noqa: E402
 
 DATA = _os.path.join(_HERE, "data", "map", "map_history.json")
 OG_REPO = "https://github.com/sikleq/Oldgrowth"
@@ -230,7 +231,7 @@ def table_html(files, pages):
     rows, prev = [], None
     for f in group(files):
         ver = f["patch"]
-        link = (f'<a href="{_terrain._terrain_filename(ver)}">{_esc(ver)}</a>' if ver in pages else _esc(ver))
+        link = (f'<a href="{terrain_index._terrain_filename(ver)}">{_esc(ver)}</a>' if ver in pages else _esc(ver))
         # the versions it covers as a range, first – last (the owner: "7.35 – 7.37e is easier than listing them")
         also = f'<span class="ts-range"> – {_esc(f["also"][-1])}</span>' if f["also"] else ""
         cells = "".join(_cell(f, prev, k) for k, _l, _i in COLUMNS)
@@ -248,7 +249,7 @@ def build():
     files = load()
     with open(DATA, encoding="utf-8") as f:
         n_patches = count_patches(_json.load(f)["patches"])
-    pages = set(_terrain.page_patches()[0])
+    pages = set(terrain_index.page_patches()[0])
     nav = _site.render_top_nav("materials", _terrain._latest_href(), patch_context=False,
                                subtabs_active="terrain_stats", subnav_in_header=False)
     subnav = _site.render_materials_subnav("terrain_stats")

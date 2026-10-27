@@ -1,4 +1,4 @@
-"""fetch_hero_history.py — npc_heroes.txt of every patch from our game-files store (tools/game_files.py: the
+"""fetch_hero_history.py — npc_heroes.txt of every patch from our game-files store (patch/game_files.py: the
 patch's own build) → compact per-patch `data/stats/<patch>/heroes_raw.json` carrying the hero stats that the
 slim heroes.json scrape DOESN'T have (vision, projectile speed, base attack speed, turn rate, collision hull,
 bound radius), plus the core stats. Needed so the Hero Stats table (builders/heroes_stats.py) can show per-patch
@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parents[2]
 STATS_DIR = ROOT / "data" / "stats"
 sys.path.insert(0, str(ROOT))
 from patch.meta import RELEASE_HISTORY  # noqa: E402
-from tools import game_files  # noqa: E402
+from patch import game_files  # noqa: E402
 
 # Hero fields to extract: the raw-only ones and the full core stat set.
 HERO_FIELDS = (

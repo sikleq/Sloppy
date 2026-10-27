@@ -37,7 +37,7 @@ def counts(c):
     }
 
 
-# the names builders/terrain._moved_summary writes -> the keys above ("camp tiers" / "camp spawn boxes" have no count)
+# the names builders/terrain_index._moved_summary writes -> the keys above ("camp tiers" / "camp spawn boxes" have no count)
 _NAMES = {"trees": "trees", "camps": "camps", "camp tiers": "camp_tiers", "camp spawn boxes": "boxes",
           "towers": "towers", "lotus pools": "lotus", "twin gates": "gates", "Tormentors": "tormentors",
           "bounty runes": "bounty", "power runes": "power", "wisdom shrines": "wisdom", "wisdom runes": "wisdom",

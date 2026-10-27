@@ -19,7 +19,7 @@ to resume):
   npc_units … itemlist   the store / datafeed top-ups (npc_units.json, heroes_raw.json, npc_abilities.json, itemlist.json)
   shops         scripts/fetch/extract_shops.py -> data/shops.txt (local game only)
   abilities_slim, herolist   the shared tables rebuilt from the new snapshot
-  item_stat_lines, talent_slots   only where the store is on this PC (old tooltips: tools/loc_history.py, also the store)
+  item_stat_lines, talent_slots   only where the store is on this PC (old tooltips: patch/loc_history.py, also the store)
   draft         generate_patch_code_v2.py <v> -> _generated_p_<v>_v2.py + data/normalized/patches/<v>.json, only while
                 content/p<code>.py does not exist (a proofread page is never regenerated)
   enchant       scripts/gen/enchant_values.py + enchant_table.py <v>, when content/p<code>.py changes an enchantment
@@ -46,7 +46,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 META = os.path.join(ROOT, "patch", "meta.py")
 DOTA_PATH = os.environ.get("DOTA_PATH", r"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game\dota")
-# our store of the game files of every patch (private repo, the owner's PC; tools/game_files.py): the top-ups,
+# our store of the game files of every patch (private repo, the owner's PC; patch/game_files.py): the top-ups,
 # build_item_stat_lines.py and build_talent_slots.py read the patches from it
 STORE = os.environ.get("DOTA_FILES_DIR", os.path.join(os.path.expanduser("~"), "dota-patch-files"))
 PY = sys.executable

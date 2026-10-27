@@ -4,7 +4,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
-import item_ability_text as iat  # noqa: E402
+import patch.item_ability_text as iat  # noqa: E402
 from patch import elements as el  # noqa: E402
 from patch.state import _State  # noqa: E402
 

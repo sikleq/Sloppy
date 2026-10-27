@@ -91,6 +91,7 @@ def test_terrain_page_gets_the_heights_layer_button_and_switches():
     """The key moved off the map into the panels (the owner 2026-10-05): under the change list and in the fullscreen
     panel, one switch per height (numbers only), each showing / hiding its own picture."""
     import builders.terrain as terrain
+    from patch import terrain_index
     top, fs = terrain._controls_html(layers=True, heights=True)
     assert 'data-layer="heights"' in top and "tc_heights.png" in top
     assert 'data-layer="heights"' not in terrain._controls_html(layers=True)[0]
@@ -100,7 +101,7 @@ def test_terrain_page_gets_the_heights_layer_button_and_switches():
     assert btns.count('class="tf-chip tf-hband"') == 7 and 'data-hband="0"' in btns and "</i><b>768+</b></button>" in btns
     assert "River" not in btns and "Base" not in btns and "--c:rgb(52, 132, 218)" in btns
     assert "tc-heights-key" not in terrain._compare_html("7.40c", "7.41", markers_svg='<svg class="tm-layer-heights">')
-    diff = terrain._load_diff("7.41")
+    diff = terrain_index._load_diff("7.41")
     hb = terrain._heights_bands(diff)
     assert hb["old"][0] == "7.40c" and hb["new"][0] == "7.41" and 0 in hb["new"][1]
     svg, _counts = terrain._markers_svg(diff)

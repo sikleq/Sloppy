@@ -44,7 +44,7 @@ Each step prints what it does; the first failure stops the run and prints the `-
 The store (2026-10-24) is our private git repo of the game's plain-text files, one commit per patch, tag = version
 (local clone `~/dota-patch-files`, env `DOTA_FILES_DIR`); what it holds and how each patch's build is
 chosen is in its own README (`dota-patch-files/README.md`) — not repeated here. Sloppy reads it only through
-`tools/game_files.py` (`read` / `read_bytes` / `path` / `listing` / `npc` / `versions`). The `publish` step sends
+`patch/game_files.py` (`read` / `read_bytes` / `path` / `listing` / `npc` / `versions`). The `publish` step sends
 the store to GitHub — BEFORE pushing Sloppy: CI lays out the raw files of every patch from it.
 **Raw files in `data/stats/<v>/` are not in git** (2026-10-24): `heroes/npc_dota_hero_*.txt` (7.34e+), the root KV
 files (7.41c+) and `npc_dota_hero_base.txt` (7.41f+) are git-ignored and written from the store by
@@ -114,7 +114,7 @@ Then add the patch to the store (`build_store.py add <v> [--local]` in the store
 repo, then push it: the store step of `tools/new_patch.py`) and run the three
 store top-ups (`fetch_npc_history`, `fetch_hero_history`, `fetch_ability_history`);
 they read `data/site_meta.json` patch dates and the patch's own build from the
-store (`tools/game_files.py`) and fill in `npc_units.json`, `npc_abilities.json`,
+store (`patch/game_files.py`) and fill in `npc_units.json`, `npc_abilities.json`,
 `heroes_raw.json`. Until 2026-10-24 they read dotabuff/d2vpkr ("the last commit
 before the next patch" — the end-of-patch state, not the patch's own).
 
@@ -382,11 +382,11 @@ tracked as follow-up work, not yet done.
 
 ## Old tooltips of any patch (2026-09-27)
 
-`tools/loc_history.py` reads the game's localization of any patch (abilities, items, talents, facets, hero texts) from
+`patch/loc_history.py` reads the game's localization of any patch (abilities, items, talents, facets, hero texts) from
 the store — `resource/localization/{abilities,dota}_english.txt` of the patch's own build, before 7.20 the single
 `resource/dota_english.txt` (until 2026-10-24: `tools/fetch_loc_history.py` and a git-ignored `outputs/loc_history/`
 from d2vpkr — both gone, nothing to run after a new patch: the `store` step of `tools/new_patch.py` covers it). Read a
-tooltip as it was: `tools.loc_history.tooltip(key, "7.37e")` — numbers stay as %placeholders%, fill them from that
+tooltip as it was: `patch.loc_history.tooltip(key, "7.37e")` — numbers stay as %placeholders%, fill them from that
 patch's KV. Old descriptions on the site (ability_change / item_abilities_change) come from here — never invented.
 
 ## Liquipedia cache (2026-10-23)
@@ -403,7 +403,7 @@ pages, gzip, stop on 429) — never call the Liquipedia API directly (2026-10-23
 `data/stats/<v>/items.json` keeps only cost, cooldown and mana fields (full `items.txt` only from 7.41c). For any
 other field or the shop category use `python tools/item_history.py <item_x> <version> [...] [--show]` (any patch
 since 7.08): it reads `items.txt`, `neutral_items.txt` and `shops.txt` of the patch's own build from the store
-(`tools/game_files.py`; until 2026-10-24 from local clones of the GameTracking and DOTA2_CLIENT archives) and prints every
+(`patch/game_files.py`; until 2026-10-24 from local clones of the GameTracking and DOTA2_CLIENT archives) and prints every
 changed field against the previous patch. The patch's build = the first build with its notes and without the next
 patch's notes, plus release-day fixes within 24 h (owner 2026-10-24; values reach the notes only there: 7.27, 7.31, 7.41 Batrider talents), and up to 7 days later the last build that brings a value of the patch's own notes from exactly A to exactly B (11 patches, e.g. 7.39c Sand King 28 h, 7.40 Spectre Haunt 44 h; store `builds.json` "notes+late"); how it is chosen
 is in the store's README. Patches whose notes never shipped in the game (7.20, 7.20b, 7.23, 7.28) take the first

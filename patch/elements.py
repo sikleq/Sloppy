@@ -2410,7 +2410,7 @@ def item_abilities_change(old, new):
     """An item's abilities before -> after (owner 2026-09-27, Khanda 7.38 pilot): two panes like the
     stats card, each ability in the game-tooltip style (_item_ability_html). `old` / `new` are lists of
     one-line ability texts ("Passive: Empower Spell. The next ... Cooldown: 6s"); the old ones are the
-    game's tooltips of the previous patch (tools/loc_history.py), never invented. The card is not scored — the tagged
+    game's tooltips of the previous patch (patch/loc_history.py), never invented. The card is not scored — the tagged
     rows under it keep the weights. It is drawn when the page is saved (render_iab_card), after the rows
     under it have marked the numbers they change."""
     names = {_iab_ability_key(t) for t in new if _ITEM_ABILITY_RE.match(t)}

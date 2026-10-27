@@ -14,7 +14,7 @@ import sys
 _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, _ROOT)
 sys.path.insert(0, os.path.join(_ROOT, "tools"))
-from item_ability_text import _items  # noqa: E402
+from patch.item_ability_text import _items  # noqa: E402
 from patch.elements import _ENCHANT_DESC  # noqa: E402
 
 OUT = os.path.join(_ROOT, "data", "rules", "enchant_values.json")

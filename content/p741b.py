@@ -47,7 +47,7 @@ def build():
     W(li("Health Regen bonus increased from +6 to +6.5", b(6, 6.5)))
     W(ul_close())
     W(item_header("Helm of the Overlord"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Dominate. Takes control of one neutral target unit and sets its movement speed to 380 and max health to a minimum of 1800. Also provides the unit with +70 base attack damage, +12 health regen, +4 mana regen, +7 armor, and levels up some abilities of the target by 1 level. Dominated units with a max health of greater than 1800 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 250 gold and it can no longer be killed by abilities that instantly kill creeps otherwise. The Helm cannot be used for 3 seconds after the dominated creep takes damage from an enemy hero or Roshan. Cast Range: 700. Mana Cost: 50. Cooldown: 45s"],
         new=["Active: Dominate. Takes control of one neutral target unit and sets its movement speed to 380 and max health to a minimum of 1900. Also provides the unit with +70 base attack damage, +12 health regen, +4 mana regen, +7 armor, and levels up some abilities of the target by 1 level. Dominated units with a max health of greater than 1900 retain their original max health. Grants the caster the gold and experience bounty of the dominated creep. Dominated unit's bounty is set to 250 gold and it can no longer be killed by abilities that instantly kill creeps otherwise. The Helm cannot be used for 3 seconds after the dominated creep takes damage from an enemy hero or Roshan. Cast Range: 700. Mana Cost: 50. Cooldown: 40s"]))
@@ -89,7 +89,7 @@ def build():
     W(li("Pollinate radius increased from 700 to 900", b(700, 900)))
     W(ul_close())
     W(item_header("Conjurer's Catalyst"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Passive: Spellover. Dealing 100 spell damage to an enemy causes them to overheat and deal damage to their allies in a 300 unit radius. Hero targets deal 40 damage to their allies, other targets deal 15 damage."],
         new=["Passive: Spellover. Dealing 200 spell damage to an enemy causes them to overheat and deal damage to their allies in a 300 unit radius. Hero targets deal 80 damage to their allies, other targets deal 30 damage."]))
@@ -116,7 +116,7 @@ def build():
     W(li("Reverberate projectile physical damage decreased from 110 to 90", b(110, 90), extra=inline_note("From 143 to 117 with Dormant Curio")))
     W(ul_close())
     W(item_header("Book of the Dead"))
-    # abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)
+    # abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)
     W(item_abilities_change(
         old=["Active: Greater Demonic Summoning. Summon 2 demonic warriors and 2 demonic archers that last 65 seconds. The Warrior burns mana every hit, reveals invisible units, and deals magical damage to whoever kills it. The Archer has a basic dispel ability with a slow and a passive movement speed aura. Cooldown: 80s"],
         new=["Active: Greater Demonic Summoning. Summon 2 demonic warriors and 2 demonic archers that last 65 seconds. The Warrior burns mana every hit and deals magical damage to whoever kills it. The Archer has a basic dispel ability with a slow and a passive movement speed aura. Cooldown: 80s"]))

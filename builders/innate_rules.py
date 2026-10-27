@@ -39,7 +39,7 @@ def stats_versions() -> list[str]:
 def innate_blocks(slug: str, version: str) -> dict:
     """{ability: KV block} of the hero's abilities flagged "Innate" "1" in that patch ({} without a file)."""
     from tools.slim_from_kv import load_kv
-    from builders.site_common import hero_ability_blocks
+    from patch.kv import hero_ability_blocks
     path = STATS_DIR / version / "heroes" / f"npc_dota_hero_{slug}.txt"
     if not path.exists():
         return {}

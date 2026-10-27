@@ -153,7 +153,7 @@ def main() -> int:
 
     # raw game files are not in git (2026-10-24): stop with what to do instead of tracebacks in three builders
     from patch.meta import latest_stats_version
-    from tools import game_files
+    from patch import game_files
     missing = game_files.missing_raw(latest_stats_version())
     if missing:
         print(game_files.NO_RAW_FILES.format(version=latest_stats_version(), missing=", ".join(missing),

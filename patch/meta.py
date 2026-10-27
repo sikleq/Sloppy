@@ -3,7 +3,7 @@
 import datetime
 import re as _re
 import pathlib as _pl
-import builders.site_common as _site
+import patch.site_common as _site
 
 # Single source of truth. Add "filename" when a patch page exists.
 # PATCHES is derived automatically — do NOT maintain it separately.

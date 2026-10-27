@@ -247,7 +247,7 @@ def test_placeholder_from_another_ability_of_the_hero(monkeypatch):
 def test_store_has_old_patches_hero_data():
     # 7.08-7.34 had no data/stats/<v>/heroes: the store's npc_abilities.txt is read instead
     from patch.ability_kv import _hero_blocks
-    from tools import game_files
+    from patch import game_files
     if "7.20" not in game_files.versions():
         pytest.skip("no game-files store here")
     blocks = _hero_blocks("7.20")

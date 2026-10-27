@@ -27,11 +27,11 @@ KINDS = (  # slim file, raw file under scripts/npc/, extractor name
 
 
 class StoreSource:
-    """scripts/npc/<raw file> of the patch in the store (tools/game_files.py)."""
+    """scripts/npc/<raw file> of the patch in the store (patch/game_files.py)."""
 
     def __init__(self):
         sys.path.insert(0, HERE)
-        from tools import game_files
+        from patch import game_files
         self.gf = game_files
 
     def text(self, v, raw_name):

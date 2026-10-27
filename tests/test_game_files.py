@@ -1,5 +1,5 @@
-"""tools/game_files.raw_plan: which raw game files each patch gets in data/stats/<v>/ (no store needed)."""
-from tools import game_files as gf
+"""patch/game_files.raw_plan: which raw game files each patch gets in data/stats/<v>/ (no store needed)."""
+from patch import game_files as gf
 
 
 def _fake_store(monkeypatch, heroes, root, include_list):

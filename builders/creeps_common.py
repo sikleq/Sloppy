@@ -7,7 +7,7 @@ Leaf module — imports nothing from the other creeps modules.
 """
 import os as _os
 
-import builders.site_common as _site
+import patch.site_common as _site
 
 _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 _ABIL_ICON_DIR = _os.path.join(_HERE, 'icons', 'abilities')

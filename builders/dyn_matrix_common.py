@@ -26,7 +26,7 @@ import json as _json
 import os as _os
 import re as _re
 
-import builders.site_common as _site
+import patch.site_common as _site
 
 # builders/dyn_matrix_common.py lives one directory below the project root.
 _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))

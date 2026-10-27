@@ -38,7 +38,7 @@ sys.path.insert(0, str(_HERE))
 
 # Import from canonical source instead of maintaining a duplicate list.
 from patch.meta import RELEASE_HISTORY as _RH
-import builders.site_common as _site   # hero_ability_blocks: per-hero KV layout (7.41f+)
+import patch.site_common as _site
 RELEASE_HISTORY = [p["version"] for p in _RH]
 
 # Field-path patterns we suppress as engine-noise: visual FX, sound events,
@@ -90,7 +90,7 @@ ROOT_FILES = (
 
 # ───────────────────────── KV PARSER ───────────────────────────────────────
 # one parser for the whole project: patch/kv.py (audit 2026-10-26)
-from patch.kv import _decode_bytes, parse_kv  # noqa: E402,F401
+from patch.kv import _decode_bytes, hero_ability_blocks, parse_kv  # noqa: E402,F401
 
 
 # ───────────────────────── LOAD HEROES DIR ─────────────────────────────────
@@ -138,7 +138,7 @@ def load_hero_abilities(version: str) -> dict[str, dict[str, dict]]:
             print(f"  ⚠ parse failed: {p.name}: {e}", file=sys.stderr)
             continue
         hero_slug = p.stem
-        root = _site.hero_ability_blocks(kv)       # DOTAAbilities, or 7.41f+ AbilityDefinitions
+        root = hero_ability_blocks(kv)       # DOTAAbilities, or 7.41f+ AbilityDefinitions
         if not isinstance(root, dict):
             continue
         abilities: dict[str, dict] = {}

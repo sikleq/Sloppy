@@ -33,8 +33,9 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
 sys.path.insert(0, _ROOT)
 sys.path.insert(0, _HERE)
-from builders import map_versions as mv  # noqa: E402
+from patch import map_versions as mv  # noqa: E402
 import builders.terrain as terrain  # noqa: E402
+from patch import terrain_index  # noqa: E402
 
 if Image:
     Image.MAX_IMAGE_PIXELS = None
@@ -255,8 +256,8 @@ def _boxes(img, cx, cy, r, diff, side, half, width):
     everything be dashed")."""
     d = ImageDraw.Draw(img, "RGBA")
     k = half / (2 * r)
-    old = {terrain._box_key(b) for b in diff.get("spawnboxesOld", [])}
-    new = {terrain._box_key(b) for b in diff.get("spawnboxesNew", [])}
+    old = {terrain_index._box_key(b) for b in diff.get("spawnboxesOld", [])}
+    new = {terrain_index._box_key(b) for b in diff.get("spawnboxesNew", [])}
 
     def corners(b):
         pts = [((p["x"] - (cx - r)) * k, ((cy + r) - p["y"]) * k) for p in b]
@@ -264,14 +265,14 @@ def _boxes(img, cx, cy, r, diff, side, half, width):
     boxes = diff.get("spawnboxesOld" if side == "old" else "spawnboxesNew", [])
     other = new if side == "old" else old
     for b in boxes:
-        pts = None if terrain._box_key(b) in other else corners(b)
+        pts = None if terrain_index._box_key(b) in other else corners(b)
         if pts and side == "old":
             _dashed_poly(d, pts, COLOUR["removed"], width, max(5.0, half / 36), max(3.0, half / 60))
         elif pts:
             d.line(pts + pts[:1], fill=COLOUR["added"], width=width)
     if side == "new":                # on top, so a box moved by a few pixels still shows its old edge
         for b in diff.get("spawnboxesOld", []):
-            pts = None if terrain._box_key(b) in new else corners(b)
+            pts = None if terrain_index._box_key(b) in new else corners(b)
             if pts:
                 _dashed_poly(d, pts, COLOUR["removed"] + (220,), max(1, width - 1), max(4.0, half / 45),
                              max(3.0, half / 70))
@@ -460,7 +461,7 @@ def make(patch, entries, maps, steps):
             for v in (st.old_pic, st.new_pic):
                 if v not in fulls:
                     fulls[v] = Image.open(os.path.join(FINAL, f"map_{_sha8(v, maps)}_sfm_full.png")).convert("RGB")
-            diff = terrain._load_diff(p)
+            diff = terrain_index._load_diff(p)
             steps_of[p] = (st, diff, terrain._changed_points(diff))
         return steps_of[p]
     os.makedirs(OUT, exist_ok=True)

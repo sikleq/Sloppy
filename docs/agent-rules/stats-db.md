@@ -22,7 +22,7 @@
 `dota-patch-files`: один коммит на патч, тег = версия, каждый патч с 7.08 — своя сборка: первая с патчноутами патча и
 без патчноутов следующего + исправления дня выхода ≤24 ч (с 2026-10-24) + до 7 дней позже сборка, которая приносит значение из заметок самого патча (ровно A → B; 11 патчей, «notes+late»); локальный клон `~/dota-patch-files`, env
 `DOTA_FILES_DIR`; описание и выбор сборок — в README репозитория `dota-patch-files`). Читать только через
-`tools/game_files.py` (`read` / `read_bytes` / `path` / `listing` / `npc` / `versions`). Прежняя история d2vpkr
+`patch/game_files.py` (`read` / `read_bytes` / `path` / `listing` / `npc` / `versions`). Прежняя история d2vpkr
 («последний коммит ≤ выход + 4 дня») держала соседний патч: 52 слепка героев, предметов и юнитов (7.13 — броня и
 скорость из 7.13b, 7.33d/7.33e/7.34d — герои до патча, …) перезаписаны, каждое расхождение сверено с заметками Valve.
 `tools/resync_snapshots.py` (источник `StoreSource`; ключа `--d2vpkr` больше нет) и `tools/item_history.py` читают
@@ -49,7 +49,7 @@
 
 ## Формат файлов героев с 7.41f (ловушка)
 - `data/stats/<ver>/npc_heroes.txt` с 7.41f — только список `#base "heroes/npc_dota_hero_<slug>.txt"`. Героев читать вместе с включениями: `tools/slim_from_kv.load_kv`, `builders/aoe_increase._heroes_root`.
-- `heroes/npc_dota_hero_<slug>.txt` до 7.41e: `"DOTAAbilities" { <ability> {…} }`. С 7.41f: `"DOTAHeroes" { npc_dota_hero_<slug> { …, "AbilityDefinitions" { <ability> {…} } } }`. Способности брать **только** через `builders.site_common.hero_ability_blocks(kv)`, он понимает оба варианта. Иначе страница молча теряет все способности: так было с AoE Increase, Silent changes 7.41f и врождёнными способностями в Hero Lab. Тест: `tests/test_hero_kv_layout.py`.
+- `heroes/npc_dota_hero_<slug>.txt` до 7.41e: `"DOTAAbilities" { <ability> {…} }`. С 7.41f: `"DOTAHeroes" { npc_dota_hero_<slug> { …, "AbilityDefinitions" { <ability> {…} } } }`. Способности брать **только** через `patch.kv.hero_ability_blocks(kv)`, он понимает оба варианта. Иначе страница молча теряет все способности: так было с AoE Increase, Silent changes 7.41f и врождёнными способностями в Hero Lab. Тест: `tests/test_hero_kv_layout.py`.
 - С 7.41f в slim `heroes.json` нет блока `npc_dota_hero_base` (120 HP, 75 маны, 25% магрезиста…). Hero Stats / Hero Lab берут его из `heroes_raw.json` (`heroes_stats._inject_hero_base`), а не из `_FIELD_DEFAULTS`. Тест: `tests/test_hero_base_block.py`.
 
 ## Новый патч — числа без правки кода (2026-10-21)

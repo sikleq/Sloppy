@@ -4,7 +4,7 @@
 Writes data/rules/item_stat_prices.json (read by patch/weights.py for item rows).
 
 Data: items.txt of every version — data/stats/<v>/items.txt when present, else the patch's own build
-from our game-files store (tools/game_files.py; until 2026-10-24 the d2vpkr history).
+from our game-files store (patch/game_files.py; until 2026-10-24 the d2vpkr history).
 Which KV fields are STAT LINES comes from Valve's own tooltips (data/abilities_english.txt):
 `DOTA_Tooltip_ability_<item>_<field>` = "+$armor" / "%+Slow Resistance" is a row of the item's stat
 list; the label names the stat. Items missing from today's tooltips (removed items) use the
@@ -59,7 +59,7 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 from patch.kv import parse_kv  # noqa: E402
 from patch.meta import RELEASE_HISTORY  # noqa: E402
-from tools import game_files  # noqa: E402
+from patch import game_files  # noqa: E402
 
 OUT = os.path.join(HERE, "data", "rules", "item_stat_prices.json")
 LOC = os.path.join(HERE, "data", "abilities_english.txt")

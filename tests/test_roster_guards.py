@@ -22,7 +22,7 @@ def _units(version):
 def _abilities(version):
     """Every ability block of a patch: npc_abilities.txt + the per-hero files (Ogre Frostmage's Frost Armor
     and the Dark Troll Summoner's spells live in hero files)."""
-    from builders.site_common import hero_ability_blocks
+    from patch.kv import hero_ability_blocks
     out = dict(load_kv(STATS / version / "npc_abilities.txt").get("DOTAAbilities", {}))
     for p in sorted((STATS / version / "heroes").glob("npc_dota_hero_*.txt")):
         for name, block in hero_ability_blocks(load_kv(p)).items():

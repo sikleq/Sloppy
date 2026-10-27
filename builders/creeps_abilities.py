@@ -11,7 +11,7 @@ files, so they render blank (would need a manual/external source).
 import os as _os
 import re
 
-import builders.site_common as _site
+import patch.site_common as _site
 from builders.creeps_common import (
     ABILITY_COLS, DASH, abil_icon_html, attr_esc, esc, has_abil_icon,
     page_shell, write_dist,

@@ -1,5 +1,5 @@
 """fetch_ability_history.py — npc_abilities.txt каждого патча из нашего хранилища файлов игры
-(tools/game_files.py: сборка самого патча) → компактные per-patch JSON `data/stats/<patch>/npc_abilities.json`
+(patch/game_files.py: сборка самого патча) → компактные per-patch JSON `data/stats/<patch>/npc_abilities.json`
 с балансными полями способностей нейтралов (cooldown, manacost, damage, cast range + все AbilityValues).
 
 Нужно для полноценного чейнджлога способностей: builders/creeps.py показывает в
@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parents[2]
 STATS_DIR = ROOT / "data" / "stats"
 sys.path.insert(0, str(ROOT))
 from patch.meta import RELEASE_HISTORY  # noqa: E402
-from tools import game_files  # noqa: E402
+from patch import game_files  # noqa: E402
 
 ABILITY_SKIP = {"neutral_upgrade", "creep_piercing"}
 # Top-level numeric stats worth a changelog.

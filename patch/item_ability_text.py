@@ -1,25 +1,23 @@
 """An item's abilities as they were in a patch, as one-line texts for item_abilities_change():
 "Passive: Empower Spell. The next Unit Target spell ... Cooldown: 6s".
 
-Text = the game's tooltip of that patch (tools/loc_history.py), numbers = that patch's items.txt
+Text = the game's tooltip of that patch (patch/loc_history.py), numbers = that patch's items.txt
 (data/stats/<v>/items.txt or the patch's own build in our game-files store). Nothing is invented: a
 placeholder the KV doesn't have leaves the ability out (returns None for the item).
 
-    from tools.item_ability_text import item_abilities
+    from patch.item_ability_text import item_abilities
     item_abilities("angels_demise", "7.37e")
 """
 import html as _html
 import json
 import os
 import re
-import sys
+
+from patch import game_files
+from patch.kv import parse_kv
+from patch.loc_history import tooltip
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, HERE)
-sys.path.insert(0, os.path.join(HERE, "tools"))
-from patch.kv import parse_kv  # noqa: E402
-from loc_history import tooltip  # noqa: E402
-from tools import game_files  # noqa: E402
 
 _KV = {}
 
@@ -189,7 +187,7 @@ def insert_cards(lines, version, prev, name_to_slug):
                 if depth <= 0:
                     break
         lit = lambda s: json.dumps(s, ensure_ascii=False)
-        card = ([f"{ind}# abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)",
+        card = ([f"{ind}# abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)",
                  f"{ind}W(item_abilities_change("]
                 + [f"{ind}    old=[" + (",\n" + ind + "         ").join(lit(t) for t in old) + "],"]
                 + [f"{ind}    new=[" + (",\n" + ind + "         ").join(lit(t) for t in new) + "]))"])

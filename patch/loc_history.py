@@ -1,19 +1,15 @@
-"""Read a tooltip as it was in a given patch (the patch's own build in our game-files store, tools/game_files.py;
+"""Read a tooltip as it was in a given patch (the patch's own build in our game-files store, patch/game_files.py;
 until 2026-10-24 a d2vpkr download in outputs/loc_history).
 
-    from tools.loc_history import tooltip
+    from patch.loc_history import tooltip
     tooltip("DOTA_Tooltip_Ability_item_angels_demise_Description", "7.37e")
 
 Keys are case-insensitive (Valve mixes DOTA_Tooltip_Ability_ / DOTA_Tooltip_ability_). Returns None when the
 patch or the key is missing. Numbers stay as %placeholders% — fill them from that patch's KV.
 """
-import os
 import re
-import sys
 
-HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, HERE)
-from tools import game_files  # noqa: E402
+from patch import game_files
 
 _RX = re.compile(r'^\s*"([^"]+)"\s*"((?:[^"\\]|\\.)*)"', re.M)
 _CACHE = {}

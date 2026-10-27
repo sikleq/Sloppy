@@ -4,7 +4,7 @@ import os as _os
 import html as _html
 import re
 
-import builders.site_common as _site
+import patch.site_common as _site
 
 from .meta import PATCHES, _render_top_nav
 from .page import _ASSET_VERSION

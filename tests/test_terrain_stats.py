@@ -10,7 +10,7 @@ import sys
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
-import builders.site_common as site  # noqa: E402
+import patch.site_common as site  # noqa: E402
 import builders.terrain_stats as ts  # noqa: E402
 
 

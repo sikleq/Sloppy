@@ -391,7 +391,7 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   → no drift. One `(text, TAG)` list per `plain_header("Terrain Changes")`
   section. `b(...)` rows → BUFF/NERF by direction honouring `l=True`.
 - **One page per patch (2026-10-02)** — the owner: "the difference between the letter patches has to be shown too,
-  not just two major versions" (7.39b's own changes used to sit under a 7.39 → 7.40 slider). `builders/map_versions.py`
+  not just two major versions" (7.39b's own changes used to sit under a 7.39 → 7.40 slider). `patch/map_versions.py`
   reads `data/map/patch_maps.json` (which map file every patch shipped — `map_history.py`'s `patch_maps.json`) and
   `data/map/renders.json` (the files we hold a picture of). A **step** = a patch whose map file differs from the
   patch before's, both files pictured → a page `terrain_<code>.html` (unless quiet, below). The OLD side is labelled with

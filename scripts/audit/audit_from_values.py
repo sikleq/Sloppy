@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from builders.silent import _decode_bytes  # noqa: E402
-from tools import game_files  # noqa: E402
+from patch import game_files  # noqa: E402
 
 STATS = ROOT / "data" / "stats"
 PAGES = ROOT / "dist" / "patches"

@@ -10,12 +10,13 @@ import sys
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 
-from builders import site_common as site
+from patch import site_common as site
 from builders import terrain
+from patch import terrain_index
 
 
 def test_terrain_link_is_the_newest_terrain_page():
-    newest = terrain.page_patches()[0][0]
+    newest = terrain_index.page_patches()[0][0]
     assert site.latest_terrain_href() == f"terrain_{newest.replace('.', '')}.html"
     html = site.render_materials_subnav("terrain_stats")
     assert f'href="{site.latest_terrain_href()}">Terrain</a>' in html and site.TERRAIN_LATEST not in html

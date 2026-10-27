@@ -36,8 +36,8 @@ _HERE = Path(__file__).resolve().parent.parent
 _sys.path.insert(0, str(_HERE))
 _sys.path.insert(0, str(_HERE / "builders"))
 
-import builders.site_common as _site
-from mana_items import parse_kv
+import patch.site_common as _site
+from patch.kv import hero_ability_blocks, parse_kv
 from patch.known_exceptions import KNOWN_INNATE_NO_CDN_ICON
 from heroes_stats import (
     STATS_DIR,
@@ -550,7 +550,7 @@ def _hero_abilities(version: str, hero_slug: str, kit: set[str] | None) -> list[
     except Exception as exc:
         print(f"  ! parse failed for {hero_slug}: {exc}")
         return []
-    root = _site.hero_ability_blocks(parsed)
+    root = hero_ability_blocks(parsed)
     abilities = []
     for slug, block in root.items():
         if slug == "Version" or not isinstance(block, dict):

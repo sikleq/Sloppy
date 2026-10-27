@@ -24,7 +24,7 @@ _HERE = Path(__file__).resolve().parent.parent
 _sys.path.insert(0, str(_HERE))
 _sys.path.insert(0, str(_HERE / "builders"))
 
-import builders.site_common as _site          # noqa: E402
+import patch.site_common as _site          # noqa: E402
 from patch.meta import PATCHES, RELEASE_HISTORY        # noqa: E402
 
 DIST = _HERE / "dist"

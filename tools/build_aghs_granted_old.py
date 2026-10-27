@@ -2,7 +2,7 @@
 per-hero KV (before 7.34e only slim JSON is kept there), for patch/aghs_granted.py (owner 2026-10-22: the 7.08
 page had no data for its Aghanim stripes).
 
-Source: the full npc_abilities.txt of each patch's own build from our game-files store (tools/game_files.py; until
+Source: the full npc_abilities.txt of each patch's own build from our game-files store (patch/game_files.py; until
 2026-10-24 the dotabuff/d2vpkr history). Rerun only if the store changes; new patches have per-hero snapshots and
 need nothing here.
 
@@ -16,7 +16,7 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 from builders.silent import _decode_bytes  # noqa: E402
 from patch.aghs_granted import OLD_PATH, scan  # noqa: E402
-from tools import game_files  # noqa: E402
+from patch import game_files  # noqa: E402
 
 
 def main():

@@ -2,7 +2,7 @@
 
 An eye (after pixelarticons' "eye", MIT) in the site's gold ramp, its iris split into the BUFF / NERF pair in use:
 green / red (off) or blue / orange (on, the colour-blind mode — scripts/gen/gen_colorblind_css.py). The header
-switch shows the one that matches the mode (builders/site_common.py CB_TOGGLE). Dark outline, hard-edged like the
+switch shows the one that matches the mode (patch/site_common.py CB_TOGGLE). Dark outline, hard-edged like the
 terrain layer icons (gen_terrain_layer_icons.py).
 
     python scripts/gen/gen_cb_icon.py

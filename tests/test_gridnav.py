@@ -11,8 +11,9 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
 sys.path.insert(0, _ROOT)
 import gridnav  # noqa: E402
-import builders.map_versions as mv  # noqa: E402
+import patch.map_versions as mv  # noqa: E402
 import builders.terrain as terrain  # noqa: E402
+from patch import terrain_index  # noqa: E402
 
 
 def _gnv(cells, w=4, h=2):
@@ -51,7 +52,7 @@ def test_every_pictured_map_file_has_its_grid_and_its_layer_picture():
 
 
 def _wards(patch):
-    return terrain._load_diff(patch)["wards"]
+    return terrain_index._load_diff(patch)["wards"]
 
 
 def test_what_the_grids_say_about_valves_ward_fixes():
@@ -65,7 +66,7 @@ def test_what_the_grids_say_about_valves_ward_fixes():
 
 def test_the_layer_shows_each_sides_grid_and_starts_off():
     """Off on every page, a ward-only one (7.41c) too — the owner 2026-10-02: "forgot to turn it off by default"."""
-    diff = terrain._load_diff("7.41c")
+    diff = terrain_index._load_diff("7.41c")
     svg, _counts = terrain._markers_svg(diff, "741c")
     assert 'tm-layer-nowards tm-old' in svg and 'href="icons/maps/nowards_7.41a.png"' in svg
     assert 'tm-layer-nowards tm-new' in svg and 'href="icons/maps/nowards_7.41c.png"' in svg

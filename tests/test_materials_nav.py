@@ -5,7 +5,7 @@ import sys
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 
-from builders import site_common as site
+from patch import site_common as site
 
 
 def test_each_group_opens_its_changes_page_and_lists_it_first():

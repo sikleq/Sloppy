@@ -19,7 +19,7 @@ markers correctly.
 
 Since 2026-10-02 every map file 7.38-7.41f is our own (data/map/mapdata_<code>.json, one per distinct map file,
 named by the first patch that shipped it), and the default pairs are the Terrain pages' steps
-(builders/map_versions.py): every patch whose map file differs from the patch before's, old file -> new file::
+(patch/map_versions.py): every patch whose map file differs from the patch before's, old file -> new file::
 
     python scripts/gen/build_terrain_diff.py            # every step -> data/terrain/terrain_diff_<patch>.json
     python scripts/gen/build_terrain_diff.py 739:740    # or a single pair
@@ -32,7 +32,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))  # scripts/gen -> scripts -> repo root
 
 sys.path.insert(0, _ROOT)
-from builders import map_versions  # noqa: E402
+from patch import map_versions  # noqa: E402
 
 
 def default_pairs():

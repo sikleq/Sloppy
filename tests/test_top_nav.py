@@ -1,7 +1,7 @@
 """Header: only the active main button carries the ember sparks."""
 import re
 
-from builders.site_common import render_top_nav
+from patch.site_common import render_top_nav
 
 
 def test_only_the_active_tab_smoulders():

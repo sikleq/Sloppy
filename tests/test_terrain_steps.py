@@ -8,8 +8,9 @@ import pytest
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
-import builders.map_versions as mv  # noqa: E402
+import patch.map_versions as mv  # noqa: E402
 import builders.terrain as terrain  # noqa: E402
+from patch import terrain_index  # noqa: E402
 
 
 def test_a_step_is_a_patch_whose_map_file_changed():
@@ -46,15 +47,15 @@ def test_what_moved_is_read_off_the_diff():
             "campsNew": [{"x": 0, "y": 0, "tier": 2}, {"x": 8, "y": 9, "tier": 2}],
             "entities": {"watchers": {"old": [[1, 1]], "new": [[1, 1], [2, 2]]},
                          "towers": {"old": [[3, 3]], "new": [[3, 3]]}}}
-    assert terrain._moved_summary(diff) == ["trees +1 −2", "camps moved: 1", "camp tiers changed: 1",
+    assert terrain_index._moved_summary(diff) == ["trees +1 −2", "camps moved: 1", "camp tiers changed: 1",
                                             "watchers +1 −0"]
-    assert terrain._moved_summary(None) == []
+    assert terrain_index._moved_summary(None) == []
 
 
 def test_7_39b_moved_what_its_notes_say():
     """7.39b's notes: trees cut and planted, Bottom Radiant T1 moved, two camps, one watcher. The map file also moved
     the Radiant bottom lane path past that tower (two path corners, 2026-10-06 layers) — the notes don't say so."""
-    assert terrain._moved_summary(terrain._load_diff("7.39b")) == [
+    assert terrain_index._moved_summary(terrain_index._load_diff("7.39b")) == [
         "trees +38 −27", "camps moved: 2", "camp spawn boxes changed: 2", "towers moved: 1", "watchers moved: 1",
         "lane paths changed: 1"]
 
@@ -63,7 +64,7 @@ def test_every_block_linked_to_the_map_is_read():
     """The owner: "check the changed terrain for other errors too" — 7.38b's map notes sat in the General list and
     7.38c's under "Dire Safe Lane Jungle" / "Top Roshan Pit" / "Bottom Lane", so both pages said "no terrain
     changes". A block with terrain_link= is map notes, whatever its title."""
-    notes = terrain._terrain_notes_by_patch()
+    notes = terrain_index._terrain_notes_by_patch()
     assert len(notes["7.38b"]) == 2 and len(notes["7.38c"]) == 15
     assert {r[2] for r in notes["7.38c"]} == {"Dire Safe Lane Jungle", "Top Roshan Pit", "Bottom Lane"}
     assert all(r[2] != "Terrain Changes" for rows in notes.values() for r in rows)   # that title is no subgroup
@@ -71,7 +72,7 @@ def test_every_block_linked_to_the_map_is_read():
 
 def test_a_rows_inline_note_comes_along():
     """7.41's "Result:" lines are the Watcher row's inline note; the Terrain page shows them as the patch page does."""
-    rows = terrain._terrain_notes_by_patch()["7.41"]
+    rows = terrain_index._terrain_notes_by_patch()["7.41"]
     watcher = next(r for r in rows if r[0].startswith("The watcher between"))
     assert watcher[3].startswith("Tormentor is on the low ground")
     html = terrain._changes_html([("7.41", [watcher])], skip_first_head=True)
@@ -82,18 +83,18 @@ def test_camp_tier_changes_follow_the_camp_not_its_name():
     """7.40 demoted 4 camps (2 of them also moved — an exact-position match read 2); 7.41 too. 7.38 renumbered its
     camps, so matching by name would call camps 12000 units apart the same camp."""
     for patch in ("7.40", "7.41"):
-        assert "camp tiers changed: 4" in terrain._moved_summary(terrain._load_diff(patch))
+        assert "camp tiers changed: 4" in terrain_index._moved_summary(terrain_index._load_diff(patch))
     old = [{"x": 0, "y": 0, "tier": 2}, {"x": 5000, "y": 0, "tier": 1}]
     new = [{"x": 300, "y": 0, "tier": 1}, {"x": 5000, "y": 3000, "tier": 3}]
-    assert terrain._retiered(old, new) == 1                       # the far one is another camp, not a promotion
+    assert terrain_index._retiered(old, new) == 1                       # the far one is another camp, not a promotion
 
 
 def test_7_39d_bigger_triangle_ancient_boxes_show():
     """The owner: 7.39d "Increased spawnboxes of Triangle Ancient camps", yet the map showed no difference — the
     summary didn't count boxes, and the old dashed box hid a few px inside the new one."""
-    diff = terrain._load_diff("7.39d")
+    diff = terrain_index._load_diff("7.39d")
     # + "Fixed a ward spot in Radiant safe lane hard camp": 10 gridnav cells turned no-ward
-    assert terrain._moved_summary(diff) == ["trees +0 −3", "camp spawn boxes changed: 2", "no-ward cells +10 −0"]
+    assert terrain_index._moved_summary(diff) == ["trees +0 −3", "camp spawn boxes changed: 2", "no-ward cells +10 −0"]
     svg, _counts = terrain._markers_svg(diff, "739d")
     assert svg.count("tc-sb-new tc-sb-changed") == 2 and svg.count("tc-sb-old tc-sb-changed") == 2
     assert svg.count("tc-sb-same") == 26
@@ -101,7 +102,7 @@ def test_7_39d_bigger_triangle_ancient_boxes_show():
 
 def _page(ver):
     steps = {s.patch: s for s in mv.steps()}
-    return terrain._build_terrain_page(ver, list(steps), {}, steps[ver], terrain._load_diff(ver), "")
+    return terrain._build_terrain_page(ver, list(steps), {}, steps[ver], terrain_index._load_diff(ver), "")
 
 
 def test_a_patch_without_terrain_notes_says_nothing_and_shows_what_moved():
@@ -143,8 +144,8 @@ def test_small_pictures_are_swapped_for_full_ones_only_when_drawn_bigger():
 
 def _quiet_set():
     steps = {s.patch: s for s in mv.steps()}
-    notes = terrain._terrain_notes_by_patch()
-    return steps, notes, terrain._quiet(steps, notes, {p: terrain._load_diff(p) for p in steps})
+    notes = terrain_index._terrain_notes_by_patch()
+    return steps, notes, terrain_index._quiet(steps, notes, {p: terrain_index._load_diff(p) for p in steps})
 
 
 def test_a_patch_that_changed_nothing_gets_no_page_but_the_newest_does():
@@ -152,10 +153,10 @@ def test_a_patch_that_changed_nothing_gets_no_page_but_the_newest_does():
     the newest patch keeps its page all the same, "or one could think the patch doesn't exist" (7.41f)."""
     steps, notes, quiet = _quiet_set()
     assert quiet == {"7.39e", "7.40c"}                   # 7.41c-e changed where wards can stand
-    pages = terrain._pages([p for p in steps if p not in quiet], notes)
+    pages = terrain_index._pages([p for p in steps if p not in quiet], notes)
     assert pages == ["7.41f", "7.41e", "7.41d", "7.41c", "7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39",
                      "7.38c", "7.38b", "7.38"]
-    html = terrain._build_terrain_page("7.41f", pages, notes, steps["7.41f"], terrain._load_diff("7.41f"), "")
+    html = terrain._build_terrain_page("7.41f", pages, notes, steps["7.41f"], terrain_index._load_diff("7.41f"), "")
     assert '<div class="tf-none">Nothing</div>' in html and "NEW &nbsp;7.41f →" in html
 
 
@@ -163,17 +164,17 @@ def test_7_38_has_its_page_and_its_map_notes():
     """The owner: "make the 7.37e picture so 7.38 has a page"; 7.38's map notes sit under "Wandering Waters" and
     "Other Terrain Changes", and its Lotus Pools were npc_dota_mango_tree before."""
     assert mv.Step("7.38", "7.37e", "7.37e", "7.38") in mv.steps()
-    rows = terrain._terrain_notes_by_patch()["7.38"]
+    rows = terrain_index._terrain_notes_by_patch()["7.38"]
     assert {r[2] for r in rows} == {"Wandering Waters", "Other Terrain Changes"}
-    moved = terrain._moved_summary(terrain._load_diff("7.38"))
+    moved = terrain_index._moved_summary(terrain_index._load_diff("7.38"))
     assert "lotus pools moved: 2" in moved and "wisdom runes +0 −2" in moved and "wisdom shrines +2 −0" in moved
 
 
 def test_the_patches_that_changed_nothing_are_not_mentioned():
     """The owner 2026-10-02: "remove 'Unchanged in 7.41f'" — no page and no line about them."""
     steps, notes, quiet = _quiet_set()
-    pages = terrain._pages([p for p in steps if p not in quiet], notes)
-    html = terrain._build_terrain_page("7.39d", pages, notes, steps["7.39d"], terrain._load_diff("7.39d"), "")
+    pages = terrain_index._pages([p for p in steps if p not in quiet], notes)
+    html = terrain._build_terrain_page("7.39d", pages, notes, steps["7.39d"], terrain_index._load_diff("7.39d"), "")
     body = html.split('<div class="terrain-wrap">')[1]
     assert "7.39e" not in body and "Unchanged" not in body
     assert 'href="terrain_739e.html"' not in html
@@ -183,7 +184,7 @@ def test_the_facts_read_like_the_list():
     """The owner: four lines of text "should be laid out better", then the tables "aren't harmonious" — headings like
     the list's subgroup heads, five tiles (trees, then camps small → ancient), the changes as "icon: change" chips
     with "n/of all" ("Bounty runes 1 moved (1/2)"; not "Added / removed: No-ward cells +2")."""
-    diff = terrain._load_diff("7.40")
+    diff = terrain_index._load_diff("7.40")
     _svg, counts = terrain._markers_svg(diff, "740")
     step = next(s for s in mv.steps() if s.patch == "7.40")
     html = terrain._facts_html(counts, step, diff)
@@ -209,7 +210,7 @@ def test_the_facts_read_like_the_list():
 def test_every_kind_of_object_has_a_tile_under_trees_and_camps():
     """The owner 2026-10-03: "add all the other objects the way you show trees and camps — only with a gap, so trees
     and camps stand on one row and everything else on the others"."""
-    diff = terrain._load_diff("7.40")
+    diff = terrain_index._load_diff("7.40")
     _svg, counts = terrain._markers_svg(diff, "740")
     step = next(s for s in mv.steps() if s.patch == "7.40")
     html = terrain._facts_html(counts, step, diff)
@@ -232,7 +233,7 @@ def test_a_chip_outlines_removed_on_the_old_map_added_on_the_new_moved_on_both()
     boxes, their layer already shows them. 2026-10-03: in the object's own shape (a square like the tree itself),
     red = removed (old map), green = added (new map), yellow = moved — where it stood on the old map and where it
     stands on the new one; the chip turns its layer on."""
-    diff = terrain._load_diff("7.39b")
+    diff = terrain_index._load_diff("7.39b")
     svg, counts = terrain._markers_svg(diff, "739b")
     step = next(s for s in mv.steps() if s.patch == "7.39b")
     html = terrain._facts_html(counts, step, diff)
@@ -254,7 +255,7 @@ def test_a_chip_outlines_removed_on_the_old_map_added_on_the_new_moved_on_both()
 
 def test_moved_removed_added_switches_sit_by_the_heading():
     """The owner 2026-10-03: "somehow choose what to show: moved, removed or added"."""
-    diff = terrain._load_diff("7.39b")
+    diff = terrain_index._load_diff("7.39b")
     _svg, counts = terrain._markers_svg(diff, "739b")
     step = next(s for s in mv.steps() if s.patch == "7.39b")
     html = terrain._facts_html(counts, step, diff)
@@ -267,8 +268,8 @@ def test_no_ward_cells_added_are_green_and_removed_red_filled():
     """The owner 2026-10-03: 7.41d's "+23" no-ward cells were drawn red — "it should be green, since they were
     added" — and filled half-transparent like the magenta layer, not outlined; 7.41c's 149 cells that turned
     wardable are the removed ones, red on the old map."""
-    d_svg = terrain._markers_svg(terrain._load_diff("7.41d"), "741d")[0]
-    c_svg = terrain._markers_svg(terrain._load_diff("7.41c"), "741c")[0]
+    d_svg = terrain._markers_svg(terrain_index._load_diff("7.41d"), "741d")[0]
+    c_svg = terrain._markers_svg(terrain_index._load_diff("7.41c"), "741c")[0]
     added, removed = _hl(d_svg, "nowards", "new"), _hl(c_svg, "nowards", "old")
     assert 'fill="#5dff8a" fill-opacity="0.55"' in added and added.count("Z") == 23
     assert 'fill="#ff4d4d" fill-opacity="0.55"' in removed and removed.count("Z") == 149
@@ -341,7 +342,7 @@ def test_fullscreen_has_a_folding_panel_with_the_change_filters():
     """The owner 2026-10-03: the "Changed in the map file" filters in fullscreen too, in "a separate panel that opens
     and closes" — the same chips and switches as under the list."""
     steps = {s.patch: s for s in mv.steps()}
-    html = terrain._build_terrain_page("7.40", list(steps), {}, steps["7.40"], terrain._load_diff("7.40"), "")
+    html = terrain._build_terrain_page("7.40", list(steps), {}, steps["7.40"], terrain_index._load_diff("7.40"), "")
     panel = html.split('<div class="tc-fs-bar"')[1].split('<div class="terrain-list-box">')[0]
     assert 'class="tc-btn tc-btn-icon tc-fsp-toggle" aria-expanded="true"' in panel
     assert '<div class="tc-fsp-title">Layers</div>' in panel and 'data-layer="nowards"' in panel
@@ -452,7 +453,7 @@ def test_moved_objects_leave_a_dashed_ghost_on_the_new_side():
     """The owner 2026-10-03: "on the new map show with a light dashed line where the object was before" — the new
     side's SVG carries a dashed outline at each moved object's old spot, in the moved group (so the switch hides it);
     the old side has none."""
-    diff = terrain._load_diff("7.41")
+    diff = terrain_index._load_diff("7.41")
     svg = terrain._highlights_svg(diff, lambda x, y: (x, y))
     new_camps = svg.split('tm-hl-camps tm-new"', 1)[1].split("</svg>", 1)[0]
     old_camps = svg.split('tm-hl-camps tm-old"', 1)[1].split("</svg>", 1)[0]
@@ -475,7 +476,7 @@ def test_everything_on_the_old_side_is_dashed():
     clearly means old". 10-04, on striped dashes: "too thick, too few gaps — take the outline we already draw round
     a tree and just make it dashed": the old side strokes the merged squares' outer edge with thin, close dashes (the
     new side stays solid, with its dashed ghosts); a note picture draws the old side's outline with gaps too."""
-    svg = terrain._highlights_svg(terrain._load_diff("7.41"), lambda x, y: (x, y))
+    svg = terrain._highlights_svg(terrain_index._load_diff("7.41"), lambda x, y: (x, y))
     old_camps = svg.split('tm-hl-camps tm-old"', 1)[1].split("</svg>", 1)[0]
     new_camps = svg.split('tm-hl-camps tm-new"', 1)[1].split("</svg>", 1)[0]
     assert 'class="tm-hl-g tm-hl-g-moved tm-hl-dashed" fill="none" stroke="#ffd23f" stroke-width="2.04" ' \
@@ -514,9 +515,9 @@ def test_the_offlane_tower_note_shows_where_it_stands_and_where_it_moved():
     entry = next(e for e in ts.spot_list()["7.41"] if row.startswith(e["match"]))
     assert [ts.spot_patch(s, "7.41") for s in entry["spots"]] == ["7.41", "7.40"]
     assert entry["mark_kind"] == "towers" and ts.MARK_KINDS["towers"] == ("npc_dota_tower", False)
-    moved = terrain._changed_points(terrain._load_diff("7.40"))["towers"]["moved"]
+    moved = terrain._changed_points(terrain_index._load_diff("7.40"))["towers"]["moved"]
     assert ((-6464, -872), (-6501, -872)) in moved                        # 37 units left, in 7.40
-    moved_741 = terrain._changed_points(terrain._load_diff("7.41"))["towers"]["moved"]
+    moved_741 = terrain._changed_points(terrain_index._load_diff("7.41"))["towers"]["moved"]
     assert all(abs(a[0] + 6501) > 500 for a, _b in moved_741)            # and not in 7.41
 
 

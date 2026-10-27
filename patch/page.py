@@ -3,7 +3,7 @@
 import os
 import re
 
-import builders.site_common as _site
+import patch.site_common as _site
 
 from .output import H, W
 from .state import _State, reset_page_state

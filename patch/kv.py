@@ -87,3 +87,16 @@ def parse_kv(text: str) -> dict:
             pos[0] += 1
         return {root: body}
     return {}
+
+
+def hero_ability_blocks(kv: dict) -> dict:
+    """Ability blocks of one parsed per-hero KV file (data/stats/<ver>/heroes/npc_dota_hero_*.txt).
+    Up to 7.41e the file is "DOTAAbilities" { "Version" …, <ability> {…} }. Since 7.41f it is the
+    hero definition "DOTAHeroes" { npc_dota_hero_x { …, "AbilityDefinitions" { <ability> {…} } } }."""
+    if isinstance(kv.get("DOTAAbilities"), dict):
+        return kv["DOTAAbilities"]
+    out = {}
+    for hero in (kv.get("DOTAHeroes") or {}).values():
+        if isinstance(hero, dict) and isinstance(hero.get("AbilityDefinitions"), dict):
+            out.update(hero["AbilityDefinitions"])
+    return out

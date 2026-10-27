@@ -30,7 +30,7 @@ QoL), every numeric delta is computed as a percentage, every per-level formula u
 - **Game files of every patch since 7.08** — our own copy: one snapshot per patch, taken from that patch's own
   build (the first build with its notes, plus the release-day fixes within 24 h and a later build that brings the patch's own noted values). The slim per-patch tables the site needs are
   committed in `data/stats/<version>/`; the game files themselves live in a separate private store, read through
-  `tools/game_files.py`. The raw files some pages need (per-hero KV, the newest patches' root KV) are laid out into
+  `patch/game_files.py`. The raw files some pages need (per-hero KV, the newest patches' root KV) are laid out into
   `data/stats/` from the store by `python tools/game_files.py materialize` — CI does it with a read-only deploy key,
   so a full build needs access to the store. New patches are taken from the installed game (`tools/new_patch.py`).
 - **Icons** — Valve's CDN, mirrored in `icons/`; **map entities** — the game's map files.
@@ -47,16 +47,18 @@ builders/
   heroes_stats.py / heroes_dyn.py / items_dyn.py / hero_lab.py / mana_items.py / aoe_increase.py
   terrain.py                ← terrain_<ver>.html (one page per map change)
   silent.py                 ← dist/patches/silent/<ver>.html (changes the notes don't mention)
-  site_common.py            ← shared nav, favicons, asset versioning
 
 generate_patch_code_v2.py   ← Valve datafeed → Python scaffold for content/p<ver>.py + normalized JSON
 styles.css / src/scripts.js ← the one stylesheet and script of every page (minified into dist/)
 
 patch/                      ← the content API used by content/p*.py: li(), b(), t(), headers, cards, …
-                              and the release list (patch/meta.py RELEASE_HISTORY)
+                              and the release list (patch/meta.py RELEASE_HISTORY); also the core every builder
+                              shares — site_common.py (nav, favicons, asset versioning), kv.py, game_files.py (the
+                              game-files store), loc_history.py, terrain_index.py; it imports nothing from builders/
+                              or tools/
 content/p<version>.py       ← one annotated patch each; auto-discovered, no registration
 tests/                      ← pytest (run in CI)
-tools/                      ← new_patch.py (a new patch end to end), game_files.py (the game-files store),
+tools/                      ← commands: new_patch.py (a new patch end to end), game_files.py materialize,
                               item_history.py, resync_snapshots.py, slim_from_kv.py, patch_check.py, ci_local.py, …
 
 data/

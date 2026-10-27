@@ -10,6 +10,9 @@ import json
 import os
 import re
 
+from patch import game_files
+from patch.kv import _decode_bytes, hero_ability_blocks, parse_kv
+
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _STATS = os.path.join(_ROOT, "data", "stats")
 _RADIUS_KEYS = ("radius", "aura_radius")        # the one radius an ability has; start/end/bounce radii are not it
@@ -18,8 +21,6 @@ _RADIUS_KEYS = ("radius", "aura_radius")        # the one radius an ability has;
 @functools.lru_cache(maxsize=None)
 def _hero_blocks(version):
     """{ability slug: its KV block} of every hero ability in a version."""
-    from .kv import _decode_bytes, parse_kv
-    import builders.site_common as site
     out = {}
     folder = os.path.join(_STATS, version, "heroes")
     if not os.path.isdir(folder):
@@ -28,7 +29,7 @@ def _hero_blocks(version):
         if not name.startswith("npc_dota_hero_") or name == "npc_dota_hero_base.txt":
             continue
         with open(os.path.join(folder, name), "rb") as f:
-            root = site.hero_ability_blocks(parse_kv(_decode_bytes(f.read())))
+            root = hero_ability_blocks(parse_kv(_decode_bytes(f.read())))
         out.update({k: v for k, v in (root or {}).items() if isinstance(v, dict)})
     return out
 
@@ -36,9 +37,6 @@ def _hero_blocks(version):
 def _store_blocks(version):
     """A patch without data/stats/<v>/heroes (7.08-7.34, owner 2026-10-25: "мы должны решать такое и добыть все
     данные"): the store's own build — one npc_abilities.txt for every ability then, or per-hero files if it has them."""
-    from .kv import parse_kv
-    import builders.site_common as site
-    from tools import game_files
     if version not in game_files.versions():
         return {}
     out = {}
@@ -46,7 +44,7 @@ def _store_blocks(version):
               if p.rsplit("/", 1)[-1].startswith("npc_dota_hero_") and not p.endswith("npc_dota_hero_base.txt")]
     texts = [game_files.read(version, p) for p in heroes] or [game_files.npc(version, "npc_abilities.txt")]
     for text in texts:
-        root = site.hero_ability_blocks(parse_kv(text)) if text else {}
+        root = hero_ability_blocks(parse_kv(text)) if text else {}
         out.update({k: v for k, v in (root or {}).items() if isinstance(v, dict)})
     return out
 

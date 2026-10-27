@@ -13,7 +13,9 @@ import functools as _functools
 import hashlib as _hashlib
 import os as _os
 
-# builders/site_common.py lives one directory below the project root.
+from patch import terrain_index as _terrain_index
+
+# patch/site_common.py lives one directory below the project root.
 _HERE = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 DIST_DIR = _os.path.join(_HERE, "dist")
 
@@ -43,19 +45,6 @@ def favicon_links(prefix=""):
         f'<link rel="apple-touch-icon" sizes="180x180" href="{prefix}icons/favicon/apple-touch-icon.png">\n'
         f'<link rel="manifest" href="{prefix}icons/favicon/site.webmanifest">\n'
     )
-
-
-def hero_ability_blocks(kv: dict) -> dict:
-    """Ability blocks of one parsed per-hero KV file (data/stats/<ver>/heroes/npc_dota_hero_*.txt).
-    Up to 7.41e the file is "DOTAAbilities" { "Version" …, <ability> {…} }. Since 7.41f it is the
-    hero definition "DOTAHeroes" { npc_dota_hero_x { …, "AbilityDefinitions" { <ability> {…} } } }."""
-    if isinstance(kv.get("DOTAAbilities"), dict):
-        return kv["DOTAAbilities"]
-    out = {}
-    for hero in (kv.get("DOTAHeroes") or {}).values():
-        if isinstance(hero, dict) and isinstance(hero.get("AbilityDefinitions"), dict):
-            out.update(hero["AbilityDefinitions"])
-    return out
 
 
 def compute_asset_version():
@@ -123,8 +112,7 @@ MATERIALS_GROUPS = [
 @_functools.lru_cache(maxsize=None)
 def latest_terrain_href():
     """The newest Terrain page (terrain_<patch>.html), found from the map data — a new patch needs no edit here."""
-    from builders import terrain     # terrain imports this module: import it lazily
-    return terrain.latest_page_file()
+    return _terrain_index.latest_page_file()
 
 
 def resolve_href(href):

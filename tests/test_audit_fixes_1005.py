@@ -160,7 +160,7 @@ def test_full_build_prunes_pages_it_did_not_write(tmp_path):
 
 
 def test_every_page_head_has_the_phone_viewport_and_local_fonts():
-    import builders.site_common as site
+    import patch.site_common as site
     head = site.head_common("../")
     assert head.count('name="viewport" content="width=device-width, initial-scale=1"') == 1
     for name in site.PRELOAD_FONTS:

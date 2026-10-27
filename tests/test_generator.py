@@ -313,7 +313,7 @@ def test_an_abilities_card_brings_the_stats_card():
     """Owner 2026-10-17, Refresher Orb 7.41: no build change, but an abilities card — its stats go into a card too;
     without either card the stat rows stay rows (Sange and Yasha, 2026-09-28)."""
     block = ['W(item_header("Refresher Orb"))',
-             "# abilities before -> after: the game's tooltips of each patch (tools/item_ability_text.py)",
+             "# abilities before -> after: the game's tooltips of each patch (patch/item_ability_text.py)",
              'W(item_abilities_change(', '    old=["Active: Reset Cooldowns. A"],', '    new=["Active: Reset Cooldowns. B"]))',
              'W(ul_open())',
              'W(li("Health Regen bonus increased from +12 to +14", b(12, 14)))',
