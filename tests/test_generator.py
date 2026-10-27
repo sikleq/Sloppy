@@ -710,7 +710,8 @@ def test_terrain_canon(text, tag):
     ("Now is a basic ability", "REWORK"),
     ("Now applies when attacking enemy heroes that are equal or higher level than you, instead of only higher level "
      "enemy heroes", "BUFF"),
-    ("If Ringmaster does not have a Souvenir, he will be granted one upon death (instead of upon respawn)", "REWORK"),
+    # owner 2026-10-27: a Souvenir on death is a new grant (was REWORK)
+    ("If Ringmaster does not have a Souvenir, he will be granted one upon death (instead of upon respawn)", "NEW"),
     # 7.38 second proofread
     ("Aghanim's Scepter no longer decreases max wind-up time", "DEL"),
     ("Now has 50% block value against creeps", "NERF"),

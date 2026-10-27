@@ -18,7 +18,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def _title(head):
-    return re.sub(r"<[^>]+>", "", re.search(r'<span class="iab-title">(.*?)</span><span class="iab-meta">', head).group(1))
+    """The header's words; the Aghanim's icon (2026-10-27: an icon, not the word, so the header stays one line) reads
+    as its aria-label."""
+    t = re.search(r'<span class="iab-title">(.*?)</span><span class="iab-meta">', head).group(1)
+    t = re.sub(r'<span class="aghanim-marker [a-z]+" role="img" aria-label="([^"]*)"></span>', r"\1 ", t)
+    return re.sub(r"<[^>]+>", "", t)
+
+
+def test_the_aghanim_word_is_its_icon_in_the_header():
+    head, _ = cards_item_abilities._pane_parts(["Active. Creates a wall."], granted="shard")
+    assert '<span class="aghanim-marker shard" role="img" aria-label="Aghanim\'s"></span>Shard' in head
+    assert "Aghanim's Shard" not in re.sub(r'aria-label="[^"]*"', "", head)
 
 
 def test_shares_level_goes_to_the_header():

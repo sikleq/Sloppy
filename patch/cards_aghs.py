@@ -161,6 +161,22 @@ def _aghs_moved_from(slug, kind, version, prev):
     return [a for a in old_h if a not in new_h] if slug in new_h else []
 
 
+_ADDED_DONE: set = page_cache(set())   # (version, ability, kind) whose "Added Aghanim's X." card of its text is drawn
+
+
+def _added_alone(slug, kind, version):
+    """"Added Aghanim's X." with the ability's new upgrade text alone (no old side), once per ability; "" when the files
+    have no text for it."""
+    from .aghs_text import aghs_text
+    new = aghs_text(slug, kind, version)
+    if not new or (version, slug, kind) in _ADDED_DONE:
+        return ""
+    _ADDED_DONE.add((version, slug, kind))
+    pane = (f'<div class="ability-change-pane ability-change-new"><div class="ability-change-body">'
+            f'{_bold_numbers_html(aghs_line(_html.escape(_aghs_inline(new), quote=False), kind=kind))}</div></div>')
+    return _under_rows_single(f"Added Aghanim's {kind.title()}.", "new", "aghs-change", pane)
+
+
 def _aghs_rework_card(text, covered=False) -> bool:
     """A reworked-upgrade row under an ability: queue its old -> new card (ul_close draws it). True when queued."""
     plain = re.sub(r"<[^>]+>", "", text or "")
@@ -178,16 +194,15 @@ def _aghs_rework_card(text, covered=False) -> bool:
     if gone:
         return False                            # a row "Removed Aghanim's Shard." (li), no card
     sources = [slug] if m else _aghs_moved_from(slug, kind, version, prev)
+    if sources != [slug] and (version, _State.current_hero, kind) in _AGHS_SHOWN:
+        sources = []                            # the ability that lost it showed old -> new already: the new text alone
     if not sources:
         # an upgrade this ability didn't have and no other ability lost: a card of its new text alone (owner
         # 2026-10-25: 7.41 Press the Attack's Scepter "не сделано в виде карточки"); no text of its own — the row
-        new = aghs_text(slug, kind, version)
-        if not new or not (slug in holders(_State.current_hero, kind, version)):
-            return False
-        pane = (f'<div class="ability-change-pane ability-change-new"><div class="ability-change-body">'
-                f'{_bold_numbers_html(aghs_line(_html.escape(_aghs_inline(new), quote=False), kind=kind))}</div></div>')
-        _State.aghs_cards.append(_under_rows_single(f"Added {up}.", "new", "aghs-change", pane))
-        return True
+        card = _added_alone(slug, kind, version) if slug in holders(_State.current_hero, kind, version) else ""
+        if card:
+            _State.aghs_cards.append(card)
+        return bool(card)
     new = aghs_text(slug, kind, version)
     olds = [(s, aghs_text(s, kind, prev)) for s in sources]
     for s, old in olds:
@@ -310,6 +325,7 @@ def _granted_card(tags) -> bool:
 
 
 _AGHS_SHOWN: set = page_cache(set())   # (version, hero, kind) whose old upgrade parts a card already shows
+_LEFT_SHOWN: set = page_cache(set())   # ... shown under the ability that lost it (the ones that got it: new text alone)
 
 
 def _aghs_parts_cards() -> str:
@@ -333,6 +349,10 @@ def _aghs_parts_cards() -> str:
     out = []
     for kind in ("shard", "scepter"):
         if (version, hero, kind) in _AGHS_SHOWN:
+            # the ability that lost it showed old -> new: one that got it now shows its new text alone
+            if (version, hero, kind) in _LEFT_SHOWN and slug in holders(hero, kind, version) \
+                    and slug not in holders(hero, kind, prev):
+                out.append(_added_alone(slug, kind, version))
             continue
         # the parts: abilities the game flags as holding it that have a text of their own (a flag without a text is
         # the same upgrade told on another ability, 7.38 Axe)
@@ -344,7 +364,12 @@ def _aghs_parts_cards() -> str:
         # C: the part that stayed is the same — the card under the ability that lost its part, so "Removed …" doesn't
         # read as the hero having no upgrade left (owner 2026-10-26, 7.40b Necromastery: Requiem of Souls keeps it)
         same = not moved and bool(new_t)
-        if not lost or (slug not in lost if same else slug not in moved):
+        # A seen from the ability that lost it: the whole upgrade went to another ability — the card goes here, under
+        # its "Removed … bonus from this ability." row, so it shows what still works (owner 2026-10-27, 7.39 Mist Coil
+        # -> Aphotic Shield); the ability that got it keeps a card of its new text alone (_aghs_rework_card)
+        left_here = (bool(moved) and slug in lost and not any(s in old_t for s in moved)
+                     and (version, slug, kind) in _REMOVED_ROWS)
+        if not lost or (slug not in lost if same or left_here else slug not in moved):
             continue
         olds = [(s, t) for s, t in old_t.items() if s in lost or s in moved or same]
         news = [(s, new_t[s]) for s in (new_t if same else moved)]
@@ -370,13 +395,18 @@ def _aghs_parts_cards() -> str:
         up = f"Aghanim's {kind.title()}"
         b_case = same or any(s in old_t for s in moved)
         caption, tag = (f"{up} reworked.", "rework") if b_case else (f"Added {up}.", "new")
-        if same:
+        if same or left_here:
             # no caption: the "Removed Aghanim's X." row right above is it — "reworked" under it told one change in
             # two rows, and the upgrade of the ability that kept it didn't change (owner 2026-10-26, 7.40b)
             caption = None
         out.append(_under_rows_card(caption, tag, "", "aghs-change", old_pane, new_pane))
         _AGHS_SHOWN.add((version, hero, kind))
+        if left_here:
+            _LEFT_SHOWN.add((version, hero, kind))
     return "".join(out)
+
+
+_REMOVED_ROWS: set = page_cache(set())   # (version, ability, kind) with a "Removed Aghanim's X …" row on the page
 
 
 _AGHS_REMOVED_RE = re.compile(r"^\s*No longer upgraded with Aghanim's (Scepter|Shard)\b", re.I)
@@ -388,6 +418,7 @@ def _aghs_removed_row(plain):
     m = re.fullmatch(r"\s*No longer upgraded with Aghanim's (Scepter|Shard)\.?\s*", plain or "", re.I)
     if not m:
         return None
+    _REMOVED_ROWS.add((_State.current_patch_version, _State.current_ability_slug, m.group(1).lower()))
     up = f"Aghanim's {m.group(1).title()}"
     # the hero keeps the upgrade on another ability: only this ability's part is gone (owner 2026-10-26, 7.40b
     # Necromastery: "кажется, что удалили весь аганим, а не часть")

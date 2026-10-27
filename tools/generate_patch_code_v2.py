@@ -550,6 +550,10 @@ TAG_OVERRIDES = {
     "no longer automatically rejoins": "QoL",   # Astral Spirit: now the duration or Return brings it back
     # a click past max range used to blink only 75% of it — a penalty gone (owner 2026-10-27, 7.39 Blinks)
     "no longer has an overshoot range": "BUFF",
+    # owner 2026-10-27 (7.39 Ringmaster): a Souvenir on death is a new grant, not a rework of the respawn one;
+    # "will no longer be granted … if he dies to a Neutral Creep or Roshan" takes a case away — DEL
+    "will be granted one upon death":   "NEW",
+    "will no longer be granted":        "DEL",
     "starts with all":              "MISC",
     "separate heal reduction":      "MISC",
     "health restoration consolidat": "MISC",  # "consolidated Health Restoration" = structural

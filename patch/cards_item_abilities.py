@@ -340,7 +340,7 @@ def _pane_values(desc, props=None) -> dict:
             if (props or {}).get(key) or found.get(key)}
 
 
-def _pane_parts(desc, props=None, facet=False, marks=None, granted=None):
+def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hint=None):
     """(header strip html or "", body rows html) of an ability / facet card pane. The text's own leading "Active." goes
     to the header (7.41 Summon Raptors said it twice); a facet's rows that all start with the ability they change
     ("Arcane Aura: …", 7.38 Arcane Overflow) give the header its name. marks: see _iab_meta_chips. granted: "shard" /
@@ -373,6 +373,8 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None):
         for i in plain:
             items[i] = _PANE_NAME_RE.sub("", items[i], count=1)
             items[i] = items[i][:1].upper() + items[i][1:]
+    if facet and not name and name_hint:
+        name = _html.escape(name_hint)          # the ability the facet changes, from the files (patch/elements._facet_pane)
     for i in plain:
         items[i] = _IAB_BOLD_LABEL_RE.sub(r"\1:", items[i])
     # a value said twice in one pane (two cooldowns of two sub-abilities) stays in the text: the header can't say whose;
@@ -410,7 +412,10 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None):
     if kind and not scale and (props or {}).get("level_scaled"):
         scale = "scales with level"             # the game files: a value grows with hero level (7.41 innates)
     scale = re.sub(r"<[^>]+>", "", scale)      # never coloured in the header (owner 2026-10-25: "не крась scales with")
-    says = ", ".join(([f"granted by Aghanim's {granted.title()}"] if granted else []) + ([scale] if scale else []))
+    # "Aghanim's" as the upgrade's own icon: the header stays on one line (owner 2026-10-27, Planar Pocket 7.41)
+    grant = (f'granted by <span class="aghanim-marker {granted}" role="img" aria-label="Aghanim\'s"></span>'
+             f'{granted.title()}') if granted else ""
+    says = ", ".join(([grant] if granted else []) + ([scale] if scale else []))
     if says and title:
         title += f' <span class="iab-scale">– {says}</span>'
     elif says:

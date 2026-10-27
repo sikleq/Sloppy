@@ -1001,10 +1001,16 @@ def _facet_pane(desc, facet, version):
     facet changes (patch/ability_kv.facet_ability) — 7.39 Transference's card said no Passive (owner 2026-10-27).
     No single ability named for the facet in the files: no kind, as before."""
     from .ability_kv import ability_props, facet_ability
-    head, rows = _pane_parts(desc, facet=True)
-    abil = facet_ability(facet, version) if version and 'class="iab-kind"' not in head else None
-    kind = ability_props(abil, version)["kind"] if abil else ""
-    return _pane_parts(desc, props={"kind": kind}, facet=True) if kind else (head, rows)
+    from .aghs_text import ability_name
+    abil = facet_ability(facet, version) if version else None
+    if not abil:
+        return _pane_parts(desc, facet=True)
+    # the header names the ability the facet changes, when the text doesn't (owner 2026-10-27, 7.39 Old Blood:
+    # "Active" alone didn't say that it changes Bloodrage)
+    hint = ability_name(abil, version)
+    head, rows = _pane_parts(desc, facet=True, name_hint=hint)
+    kind = ability_props(abil, version)["kind"] if 'class="iab-kind"' not in head else ""
+    return _pane_parts(desc, props={"kind": kind}, facet=True, name_hint=hint) if kind else (head, rows)
 
 
 def new_facet(slug, desc, summary=None, tag="new"):

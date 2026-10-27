@@ -157,7 +157,9 @@ def test_aghanim_upgrade_goes_to_the_header_and_the_summary_keeps_the_stripe(mon
                              summary="Ability reworked.", tag="rework")
     assert '<span class="row-text">Ability reworked.<span class="aghanim-marker scepter"></span>' in html
     assert "ac-aghs" not in html and "Active (Aghanim" not in html
-    assert "– granted by Aghanim's Scepter" in html
+    # "Aghanim's" is the upgrade's icon in the header (2026-10-27: one line)
+    assert ('– granted by <span class="aghanim-marker scepter" role="img" aria-label="Aghanim\'s"></span>Scepter'
+            in html)
 
 
 def test_aghanim_upgrade_words_move_from_card_text_to_its_summary():

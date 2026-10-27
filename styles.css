@@ -4319,7 +4319,7 @@ h4.subgroup {
   margin-right: 4px;
   border-radius: 3px;
   background-size: cover;
-  vertical-align: -4px;
+  vertical-align: -2px;               /* the same top and height as the row's tag chip (owner 2026-10-27) */
   box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18);
 }
 .facet-chip > img {
@@ -11002,7 +11002,7 @@ html.cb-mode .ability-block.talents-block svg.ttree .ttree-on[data-tag="swap"] {
    a low header strip — "Active: Name" left, cast range / mana / health cost / cooldown right with the
    game's own icons — then the description with every number bold and a step brighter. */
 ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
-.iab-head { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+.iab-head { display: flex; align-items: center; justify-content: space-between; gap: 8px;
   margin: -6px -12px 5px; padding: 2px 12px; min-height: 22px; box-sizing: border-box;
   background: rgba(255, 255, 255, 0.035); border-bottom: 1px solid var(--line-soft);
   border-radius: 6px 6px 0 0; line-height: 18px; flex-wrap: wrap; row-gap: 0; }
@@ -11010,8 +11010,9 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .iab-title { white-space: nowrap; }
 .iab-name { color: var(--text-bright); font-weight: 600; }
 /* "Passive (Scales with Duel)": what the ability levels with, moved out of the text (owner 2026-10-24) */
-.iab-scale { color: var(--text-dim); font-weight: 400; }
-.iab-meta { display: flex; align-items: center; gap: 12px; flex: none; font-weight: 600; margin-left: auto;
+.iab-scale { color: var(--text-dim); font-weight: 400; font-size: 0.92em; }
+.iab-scale .aghanim-marker { margin: 0 2px 0 3px; width: 13px; height: 13px; }
+.iab-meta { display: flex; align-items: center; gap: 9px; flex: none; font-weight: 600; margin-left: auto;
   color: var(--text-bright); font-variant-numeric: tabular-nums; }
 .iab-m { display: inline-flex; align-items: center; gap: 4px; }
 .iab-ico { width: 13px; height: 13px; border-radius: 2px; display: block; }
@@ -11084,7 +11085,7 @@ ul.changes li.ability-row-solo, ul.changes li.ability-row-end { margin-bottom: 8
 /* Header numbers as in the game's tooltip: Radiance bold, proportional digits (tabular "1 1 0 0" looked
    spaced out — owner 2026-09-27) */
 .iab-meta { font-family: 'Radiance', 'Segoe UI', Arial, sans-serif; font-weight: 700;
-  font-variant-numeric: proportional-nums; letter-spacing: 0; }
+  font-variant-numeric: proportional-nums; letter-spacing: 0; font-size: 14px; gap: 7px; }
 .iab-m { gap: 3px; }
 /* Rows the abilities card already shows (_iab_covered_change / duplicate descriptions): kept in the page,
    hidden, so tag filters and counts still see their tags (owner 2026-09-27) */

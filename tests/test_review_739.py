@@ -66,6 +66,13 @@ def test_now_granted_by_aghanims_hides_under_its_card(monkeypatch):
     assert not cards_aghs._granted_now_covered("Now granted by Aghanim's Scepter")
 
 
+def test_ringmasters_souvenir_rows():
+    assert g._guess_tag("If Ringmaster does not have a Souvenir, he will be granted one upon death (instead of upon "
+                        "respawn)") == "NEW"
+    assert g._guess_tag("Ringmaster will no longer be granted a Souvenir if he has no Souvenirs and dies to a Neutral "
+                        "Creep or Roshan") == "DEL"
+
+
 def test_losing_the_blink_overshoot_penalty_is_a_buff():
     # a click past max range used to blink 75% of it (owner 2026-10-27)
     assert g._guess_tag("Blink no longer has an overshoot range") == "BUFF"
@@ -88,9 +95,11 @@ def test_a_facet_card_takes_the_kind_of_the_ability_it_changes(monkeypatch):
               "disruptor_thunder_strike": {"AbilityBehavior": "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"}}
     monkeypatch.setattr(ability_kv, "_hero_blocks", lambda v: blocks)
     assert ability_kv.facet_ability("disruptor_conduit", "7.39") == "disruptor_electromagnetic_repulsion"
+    monkeypatch.setattr("patch.aghs_text.ability_name", lambda s, v: "Electromagnetic Repulsion")
     head, _ = elements._facet_pane(["Increases the max level of Electromagnetic Repulsion to 4."], "disruptor_conduit",
                                    "7.39")
-    assert '<b class="iab-kind">Passive</b>' in head
+    # the kind and the name of the ability the facet changes (owner 2026-10-27, Old Blood: "Active: Bloodrage")
+    assert '<b class="iab-kind">Passive:</b> <span class="iab-name">Electromagnetic Repulsion</span>' in head
     # the text's own kind wins
     head, _ = elements._facet_pane(["Active. Pushes enemies away."], "disruptor_conduit", "7.39")
-    assert '<b class="iab-kind">Active</b>' in head and "Passive" not in head
+    assert '<b class="iab-kind">Active:</b>' in head and "Passive" not in head
