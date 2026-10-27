@@ -378,6 +378,8 @@ def test_a_terrain_note_shows_its_micro_screenshots():
     assert html.count("<img") == 2 and "<a " not in html and 'data-large="../icons/terrain/741_' in html
     assert 'width="480" height="238"' in html and "Show" not in html
     assert terrain_note("7.41", "Some row no spot matches") == ("", "")
+    from patch.elements import _TSPOT_SEEN
+    _TSPOT_SEEN.clear()                 # same words twice on one page are two rows (7.38c); each call here is its own
     li = terrain._change_li(row, "REWORK", None, "7.41", num=2)
     assert li.startswith('<li class="terrain-row" data-tag="rework"><span class="badge tnum">2</span>'
                          f'<span class="row-text">The {btn} have been moved')
@@ -389,11 +391,13 @@ def test_a_terrain_note_shows_its_micro_screenshots():
     elements._State.current_patch_version = "7.41"
     try:
         elements.plain_header("Terrain Changes", dynamics=False, terrain_link="7.41")
+        _TSPOT_SEEN.clear()
         page_li = elements.li(row, '<span class="badge rework" data-tag="rework">REWORK</span>')
         plain_li = elements.li("A rule", '<span class="badge nerf-text" data-tag="nerf">NERF</span>')
         elements.subgroup("Camps")
         next_li = elements.li("Another rule", '<span class="badge nerf-text" data-tag="nerf">NERF</span>')
         elements.plain_header("General Changes", dynamics=False)
+        _TSPOT_SEEN.clear()
         outside = elements.li(row, '<span class="badge rework" data-tag="rework">REWORK</span>')
     finally:
         elements._State.current_patch_version = saved

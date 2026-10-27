@@ -1381,6 +1381,8 @@ def _build_terrain_page(ver, patches, notes, step, diff, subnav):
     """Build one terrain HTML page: patch ``ver``'s map file against the patch
     before's (``step``, None when there's no pair → fallback), its own notes
     (``notes`` = {patch: rows}) and what moved (``diff``)."""
+    from patch.elements import _TSPOT_SEEN
+    _TSPOT_SEEN.clear()                 # a page counts its own same-worded rows (patch/elements.terrain_note)
     nav = _site.render_top_nav('materials', _latest_href(),
                                patch_context=False,
                                subtabs_active='terrain',

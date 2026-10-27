@@ -767,6 +767,21 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
    (`scripts/gen/build_terrain_maps.py`, zoom 2 → 1280²).
 5. ✅ **Lens — done** (Zoom mode; tree / camp markers are cloned into it). Closed by the owner 2026-10-21.
 
+## Note pictures, owner 2026-10-27
+
+- The new side of a note's picture also shows **where removed objects stood**: red, dashed, faint — like the yellow
+  ghost of a moved one (7.38b "Removed several trees around camps": the new side had nothing on it). Dashed still
+  means "where it was". `scripts/gen/terrain_shots.py _outlines`; every picture regenerated.
+- Two rows with the same words in two sections of one patch (7.38c "Several additional tree and visual adjustments
+  have been made to this area": Dire Safe Lane Jungle, Bottom Lane): the n-th row takes the n-th spot of that
+  `match` in `data/terrain_spots.json` (`patch/elements.terrain_note`, counted per page). 7.38c's jungle one shows the
+  5 tree changes no other picture covers; the Bottom Lane one has none — all its tree changes are in the pictures of
+  the rows above.
+- Notes the map files can't show (checked against the gridnav, the entities and the trees): 7.38c "Fixed unnecessary
+  pathing blockers at the left of the entrance to the Dire Base through the team only gate" (no cell or entity near
+  the Dire gates changed), 7.39b "Fixed some locations that were incorrectly blocked for warding" (the gridnav of
+  7.39 and 7.39b are identical, cell for cell) — no picture. Test: `tests/test_terrain_notes_1027.py`.
+
 ## Gotchas
 
 - **Right patch section.** The `content/` files have multiple `Terrain Changes`

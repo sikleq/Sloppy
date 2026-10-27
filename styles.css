@@ -3108,6 +3108,8 @@ body.patch-page .enchant-list-head .ench-tiers { margin: -5px 0; padding: 5px 0;
   align-items: center;
   border-top: 1px solid rgba(254, 247, 232, 0.06);
 }
+/* a flex cell drops the space before the game's grey "(Melee & Ranged)" (owner 2026-10-27, 7.38c Vast) */
+.ench-change .ench-stat > font { margin-left: 0.3em; }
 .ench-change .ench-v, .ench-change .ench-tier-h { justify-content: center; border-left: 1px solid rgba(254, 247, 232, 0.10); }
 .ench-change .ench-row-h > * { border-top: none; }
 .ench-change .ench-chg { white-space: nowrap; }

@@ -119,11 +119,14 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
                 shape([X - s, Y - s, X + s, Y + s], outline=COLOUR[kind], width=width)
         if side == "new":            # where the moved ones stood: a light dashed outline, on top (the owner 2026-10-03)
             ghost = ImageDraw.Draw(img, "RGBA")
-            for x, y in (m[0] for m in g.get("moved", [])):
+            # ... and where the removed ones stood, red: a note that only removes trees showed a new side with nothing
+            # on it (owner 2026-10-27, 7.38b "Removed several trees around camps")
+            gone = [(m[0], "moved") for m in g.get("moved", [])] + [(p, "removed") for p in g.get("removed", [])]
+            for (x, y), kind in gone:
                 if abs(x - cx) <= r + 300 and abs(y - cy) <= r + 300:
                     X, Y = px(x, y)
                     s = (SIZE[key] if key in SIZE else CIRCLE) * k
-                    _dashed(ghost, key in SIZE, X, Y, s, COLOUR["moved"] + (200,), max(1, width - 1))
+                    _dashed(ghost, key in SIZE, X, Y, s, COLOUR[kind] + (200,), max(1, width - 1))
 
 
 def _dashed(d, square, X, Y, s, colour, width):

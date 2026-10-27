@@ -28,5 +28,11 @@ def test_dominator_and_overlord_738c_have_no_abilities_card():
     assert not _cards_under("p738c.py", "Helm of the Overlord")
 
 
+def test_the_enchant_cells_grey_note_keeps_its_space():
+    """7.38c Vast: "Attack Range(Melee & Ranged)" — a flex cell drops the space before the game's <font> note."""
+    with open(os.path.join(ROOT, "styles.css"), encoding="utf-8") as f:
+        assert ".ench-change .ench-stat > font { margin-left: 0.3em; }" in f.read()
+
+
 def test_harpoon_741_keeps_its_card():
     assert _cards_under("p741.py", "Harpoon")

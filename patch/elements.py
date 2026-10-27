@@ -9,7 +9,7 @@ import re
 
 from .images import (ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG, hero_img,
                      item_img, _LOCAL_ABIL_ICONS)
-from .state import _State
+from .state import _State, page_cache
 from .terrain_notes import note_phrase, wrap_phrase
 
 try:
@@ -1480,6 +1480,8 @@ def _prop_row_text(o, nw):
 
 
 _TERRAIN_SPOTS = None
+# (patch, row text) -> [how many such rows this page drew]: the n-th of two same-worded rows takes the n-th spot
+_TSPOT_SEEN: dict = page_cache({})
 
 
 def _terrain_spot_index():
@@ -1523,8 +1525,13 @@ def terrain_note(patch, text, prefix="../"):
     if not patch or not isinstance(text, str):
         return "", ""
     plain = re.sub(r"<[^>]+>", "", text).strip()
-    for match, names, phrase in _terrain_spot_index().get(patch, []):
-        if names and plain.startswith(match):
+    # the same words in two sections of a patch (7.38c "Several additional tree and visual adjustments have been made
+    # to this area", Dire Safe Lane Jungle and Bottom Lane): the n-th such row takes the n-th spot that matches
+    seen = _TSPOT_SEEN.setdefault((patch, plain), [0])
+    nth, seen[0] = seen[0], seen[0] + 1
+    hits = [s for s in _terrain_spot_index().get(patch, []) if plain.startswith(s[0])]
+    for match, names, phrase in hits[nth:nth + 1] if len(hits) > 1 or nth == 0 else []:
+        if names:
             imgs = "".join(
                 f'<img src="{prefix}icons/terrain/{n}" data-large="{prefix}icons/terrain/{n[:-5]}_lg.webp" '
                 f'width="{TSHOT_W}" height="{TSHOT_H}" alt="The old and the new map here" loading="lazy" '

@@ -16,6 +16,7 @@
     {"match": "The Dire Safe Lane Tier 1 tower has been moved forward", "spots": [[-4942, 5962]], "r": 800},
     {"match": "The cliff above the Dire Safe Lane small camp has been extended", "spots": [[-3698, 4832]], "r": 800},
     {"match": "The ramp leading to the river and the Roshan Pit from the Dire Safe Lane pull area", "spots": [[-4000, 3600]], "r": 900},
+    {"match": "Several additional tree and visual adjustments have been made to this area", "spots": [[-800, 4650]], "r": 1200, "show": ["trees"], "phrase": "tree and visual adjustments"},
     {"match": "A tree near the Radiant Safe Lane large camp has been removed", "spots": [[5760, -3456]], "r": 600},
     {"match": "Several trees have been removed from the Radiant high ground leading to the Bottom Roshan Pit", "spots": [[1792, -3392]], "r": 700},
     {"match": "Trees have been added around the Dire Bottom Tier 1 tower", "spots": [[5817, -1700]], "r": 800},
