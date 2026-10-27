@@ -13,6 +13,7 @@ class _State:
     ability_block_open = False  # tracks <div class="ability-block"> wrapper
     current_block_is_facet = False  # True when ability_block_open was set by facet_header()
     facet_block_had_ul = False      # True once ul_open() was called inside a facet block
+    current_facet_name = None       # facet_header()'s facet name: its rows drop a "<that name>: " prefix
     # Auto-categorize hero block contents (Stats / Abilities / Talents subgroups):
     next_ul_is_hero_stats = False    # set by hero_header()/unit_header(), consumed by ul_open()
     current_unit = None              # display name of the current unit_header() block

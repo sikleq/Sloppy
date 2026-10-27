@@ -413,6 +413,11 @@ CANONICAL_TAGS = [
     (re.compile(r'^No longer (?:refills|triggers|activates)\b', re.I), 'DEL'),
     (re.compile(r'\bno longer have special rules\b|\bnow consistent across\b', re.I), 'REWORK'),
     (re.compile(r'^The following (?:sources|targets|abilities|items|units)\b.*\b(?:do not|no longer|now)\b', re.I), 'REWORK'),
+    # a rule changed for many abilities at once, its list and its special cases (owner 2026-10-27, 7.40 Invulnerability
+    # Targeting "like 7.38 Lifesteal"): REWORK rows of a reworked mechanic, not MISC
+    (re.compile(r'^The following (?:spells|abilities|items) have been changed\b', re.I), 'REWORK'),
+    (re.compile(r'\bthat previously could\b.*\bno longer do so\b', re.I), 'REWORK'),
+    (re.compile(r'\bthere are these special cases\b', re.I), 'REWORK'),
     (re.compile(r'\bstill result in\b.*\bcan benefit from\b', re.I), 'REWORK'),
     (re.compile(r"^[A-Z][\w']*(?: [\w']+){0,2} now (?:also )?(?:grants|provides|drops|gives)\b"), 'NEW'),
     (re.compile(r'\bAdded to Captains Mode\b', re.I),               'NEW'),
@@ -986,23 +991,39 @@ def _nested_info_text(notes, lvl, desc):
     """Nested notes → one popup text: each direct child on its own line; a
     single deeper note is appended to its line after " — ", several deeper
     notes follow on their own indented "– " lines."""
-    groups = []                                  # [direct child text, [deeper texts]]
+    groups = []                                  # [direct child text, [deeper texts], [their levels]]
     for j in desc:
         t = (notes[j].get('note') or '').strip()
         if (notes[j].get('info') or '').strip():
             t += f' <span class="pop-note">({notes[j]["info"].strip()})</span>'
-        if notes[j].get('indent_level', 1) == lvl + 1 or not groups:
-            groups.append([t, []])
+        level = notes[j].get('indent_level', 1)
+        if level == lvl + 1 or not groups:
+            groups.append([t, [], []])
+        elif groups[-1][2] and level > groups[-1][2][0]:
+            # a note on a deeper item, not an item of its own: in brackets after it (owner 2026-10-27, 7.40
+            # Invulnerability Targeting: Ogre Magi's "Can still target invulnerable buildings" was a list item);
+            # its own "(i.e. …)" becomes ", i.e. …" — no brackets in brackets
+            t = re.sub(r'\s*\(([^()]*)\)', r', \1', t)
+            groups[-1][1][-1] += f' <span class="pop-note">({t})</span>'
         else:
             groups[-1][1].append(t)
-    lines = []
-    for head, deeper in groups:
+            groups[-1][2].append(level)
+    lines, after = [], []
+    for head, deeper, _levels in groups:
+        # "All three of these will also …": about the whole list, a line of its own after it (7.40 Cyclone cases)
+        deeper, whole = ([d for d in deeper if not _ABOUT_ALL_RE.match(d)],
+                         [d for d in deeper if _ABOUT_ALL_RE.match(d)])
+        after += whole
         if len(deeper) == 1:
             lines.append(f'{head} — {deeper[0]}')
         else:
             lines.append(head)
             lines.extend(f'&nbsp;&nbsp;– {d}' for d in deeper)
+    lines += [f'<span class="pop-note">{a}</span>' for a in after]
     return '<br>'.join(lines)
+
+
+_ABOUT_ALL_RE = re.compile(r'^(?:All|Both|Each) (?:\w+ )?of (?:these|them)\b', re.I)
 
 
 def _fold_into_row(lines, idx, text):
@@ -2927,6 +2948,30 @@ def _block_boundary(line):
     return line.startswith('W(') and not line.startswith(('W(li(', 'W(li_formula(', 'W(ul_open(', 'W(ul_close('))
 
 
+def _postprocess_mechanic_rules_row(lines, after_label=False):
+    """A reworked mechanic like 7.38 Lifesteal (owner 2026-10-27, 7.40 Invulnerability Targeting). Before the label
+    pass: a row that only restates its header ("Invulnerability targeting rules of certain items and abilities have
+    been updated" under "Invulnerability Targeting") goes — the header says it. After it: the rows of a "Reworked
+    mechanic" block in ONE list (Valve's blank line between them had split it in two)."""
+    out, title, mech = [], "", False
+    for line in lines:
+        head = _BLOCK_HEAD_RE.match(line.lstrip('\n'))
+        if head:
+            title = head.group('title') if head.group('fn') == 'plain_header' else ""
+            mech = 'new="Reworked mechanic"' in head.group('rest')
+        elif _block_boundary(line):           # a section / hero / item heading ends the mechanic's block
+            title, mech = "", False
+        parts = _li_parts(line) if title and line.startswith('W(li(') else None
+        if (not after_label and parts and re.match(rf'{re.escape(title)} rules\b.*\bhave been (?:updated|changed)\.?$',
+                                                   parts[0], re.I)):
+            continue
+        if after_label and mech and line == 'W(ul_open())' and out and out[-1] == 'W(ul_close())':
+            out.pop()
+            continue
+        out.append(line)
+    return out
+
+
 def _postprocess_new_block_label(lines):
     out = list(lines)
     moves = []
@@ -3849,7 +3894,9 @@ def generate(version):
     out = _postprocess_merge_twin_rows(out)
     out = _postprocess_minute_formula(out)
     out = _postprocess_scale_pill(out)
+    out = _postprocess_mechanic_rules_row(out)        # a row restating its header goes (owner 2026-10-27)
     out = _postprocess_new_block_label(out)
+    out = _postprocess_mechanic_rules_row(out, after_label=True)   # a reworked mechanic in one list
     out = _postprocess_new_item_card(out, version)
     out = _postprocess_cost_components(out, version)
     out = _postprocess_properties_change(out)

@@ -871,6 +871,11 @@ def _facet_row_ability_chip(text):
     m = _FACET_ROW_ABILITY_RE.match(text) if _State.current_hero else None
     if not m:
         return text
+    if m.group(1) == _State.current_facet_name:
+        # the facet's own name: the header above already says it (owner 2026-10-27, 7.40 "Arsonist: No longer has
+        # decreased number of +2 All Attributes bonuses" -> "No longer has …")
+        rest = text[m.end():]
+        return rest[:1].upper() + rest[1:]
     slug = _hero_ability_slug(_State.current_hero, m.group(1))
     if slug not in _LOCAL_ABIL_ICONS:
         return text
@@ -993,6 +998,7 @@ def facet_header(slug):
         _State.seen_facets_subgroup = True
     _State.ability_block_open = True
     _State.current_block_is_facet = True
+    _State.current_facet_name = name
     icon_overlay = (f'<img src="../icons/facets/{icon_name}.png" alt="" '
                     f'class="facet-icon-overlay" loading="lazy" width="72" height="72" '
                     f'data-slug="{slug}">') if icon_name else ''

@@ -25,4 +25,11 @@ def test_a_facet_row_naming_an_ability_shows_its_icon():
 
 def test_a_facet_row_without_an_ability_name_gets_none():
     assert "ability-chip" not in _facet_row("Now also restores mana")
-    assert "ability-chip" not in _facet_row("Translocator: something")      # the facet's own name has no icon file
+
+
+
+def test_a_facet_row_naming_the_facet_itself_drops_the_name():
+    """7.40 "Arsonist: No longer has decreased number of …" -> "No longer has …": the header says whose (owner
+    2026-10-27)."""
+    row = _facet_row("Translocator: something changed")
+    assert '<span class="row-text">Something changed' in row and "Translocator:" not in row and "ability-chip" not in row

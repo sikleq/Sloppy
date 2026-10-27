@@ -61,7 +61,8 @@ W(ul_close())
 На странице префикс заменяет иконка этой способности — квадрат размером и высотой с тег, название только при
 наведении (владелец 2026-10-27, 7.39b Translocator «Defense Matrix: …»; как квадрат аспекта у талантов аспекта). Рисует
 `li()` сам (`elements._facet_row_ability_chip`, класс `.ability-chip`): префикс — способность героя с файлом в
-`icons/abilities/`; иначе (сам аспект, способность без иконки) — без квадрата. Тест
+`icons/abilities/`; способность без иконки — без квадрата; префикс-имя самого аспекта («Arsonist: …» под
+заголовком Arsonist) не выводится — заголовок его уже называет (владелец 2026-10-27). Тест
 `tests/test_facet_row_ability_chip.py`.
 
 **Исключение:** если display name фасета (из `FACETS` dict в `badges.py`) совпадает с названием способности, которую он модифицирует — префикс `"AbilityName: "` НЕ нужен. Пример: фасет `faceless_void_chronosphere` называется «Chronosphere» и модифицирует способность «Chronosphere» — пишем `li("Cooldown decreased …")` без «Chronosphere: ». Если же facet-имя ≠ ability-имя (например, `naga_siren_active_riptide` называется «Deluge», а способность «Rip Tide») — префикс «Rip Tide: » нужен.
