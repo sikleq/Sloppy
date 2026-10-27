@@ -3952,7 +3952,7 @@ def _postprocess_innate_cards(lines, version):
                 f'{ind}    summary="{summary}",',
                 f'{ind}    tag="rework",',
                 f'{ind}    old=dict(name="{name}", slug="{slug}", desc=game_ability_desc("{slug}", "{prev}")),',
-                f'{ind}    new=dict(name="{name}", slug="{slug}", innate=True, desc=game_ability_desc("{slug}")),',
+                f'{ind}    new=dict(name="{name}", slug="{slug}", innate=True, desc=game_ability_desc("{slug}", "{version}")),',
                 f'{ind}))']
         if reworked:
             out.append(f"{ind}# TODO[covered]: the rows the card shows (its texts, the header's level) get covered=True")
