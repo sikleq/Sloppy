@@ -36,3 +36,22 @@ def test_the_enchant_cells_grey_note_keeps_its_space():
 
 def test_harpoon_741_keeps_its_card():
     assert _cards_under("p741.py", "Harpoon")
+
+
+def test_a_card_that_marks_nothing_is_left_out():
+    """Owner 2026-10-27 (7.39 Orb of Frost: "either the row or the card"): no row colours anything in the card ->
+    no card, the row says it; one coloured number keeps it (7.39e Dominator's cooldown)."""
+    from patch import cards_item_abilities as c
+    from patch.state import reset_page_state
+    reset_page_state()
+    old = ["Passive: Frost. Reduces Healing, Health Regen and Lifesteal by 13%."]
+    new = ["Passive: Frost. Reduces Health Restoration by 13%."]
+    c._IAB_CARDS["item|orb|t"] = (old, new)
+    assert c.render_iab_card("item|orb|t") == ""
+    c._IAB_CARDS["item|helm|t"] = (["Active: Dominate. Takes control. Cooldown: 45s"],
+                                   ["Active: Dominate. Takes control. Cannot be used for 3 seconds. Cooldown: 50s"])
+    c._IAB_MARKS["item|helm|t"] = [("num", "50", "nerf", "", "dominate", "45")]
+    assert "iab-change" in c.render_iab_card("item|helm|t")
+    c._IAB_CARDS["item|gone|t"] = (["Passive: Old. Something."], [])  # a removed ability: its red frame says it
+    assert "iab-removed" in c.render_iab_card("item|gone|t")
+    reset_page_state()

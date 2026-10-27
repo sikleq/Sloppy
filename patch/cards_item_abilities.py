@@ -988,6 +988,16 @@ def _iab_compact_levels(html):
     return _IAB_CHIP_RE.sub(one, html)
 
 
+def _iab_nothing_marked(key, rows, spans, tails) -> bool:
+    """A card whose changes no row of the patch colours — no word, number, radius, note or added / removed ability:
+    the two boxes read the same and the rows under it already say what changed, so it is left out (owner 2026-10-27:
+    7.38c Helm of the Dominator "old > new though nothing changed", then the same for every patch — 7.39 Orb of
+    Frost's "Health Restoration" row and card said one thing twice, "either the row or the card")."""
+    if spans or tails or _IAB_MARKS.get(key) or any(not o or not n for o, n in rows):
+        return False
+    return not any(k.startswith(f"{key}|") for k in _IAB_NOTES)
+
+
 def render_iab_card(key):
     """The abilities card html (page.save_html fills <!--IABCARD:key-->): the abilities in rows, old left /
     new right, an arrow only between an ability and its counterpart; the numbers the hidden rows change
@@ -1006,6 +1016,8 @@ def render_iab_card(key):
     # Draw Forth changed"): the same text on both sides, nothing coloured, no moved note, no radius mark — left out;
     # a card where nothing would stay keeps everything
     aoe = {mk[4] for mk in _IAB_MARKS.get(key, []) if mk[0] == "aoe"}
+    if _iab_nothing_marked(key, rows, spans, tails):
+        return ""
 
     def changed(o, n):
         k = _iab_ability_key(n or o)

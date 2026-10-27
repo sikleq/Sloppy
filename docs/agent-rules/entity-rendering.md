@@ -392,6 +392,14 @@ data/stats/<v>/npc_abilities.json (`av_radius` — радиус ауры: Riverb
 (в весах учитывается); её «?» переезжает в карточку (`<!--IABNOTE:…-->`, page.save_html). Тесты:
 `tests/test_item_ability_cards.py`.
 
+Карточка, в которой ничего не выделено, не рисуется (владелец 2026-10-27: 7.38c Helm of the Dominator «old > new,
+хотя ничего не менялось»; 7.39 Orb of Frost — строка и карточка говорят одно и то же, «либо строкой, либо в
+карточке»). Ни одно слово, число, радиус, «?» и ни одна добавленная/убранная способность не окрашены строками под
+ней → `render_iab_card` отдаёт пусто, остаётся строка (`_iab_nothing_marked`). Одно окрашенное число карточку
+оставляет (7.39e Dominator: перезарядка 45 → 50). Ушли 10: 7.39 Orb of Frost, Orb of Corrosion, Eye of Skadi,
+Shiva's Guard, Spirit Vessel, Crippling Crossbow; 7.40 Silver Edge, Psychic Headband; 7.41 Jidi Pollen Bag; 7.41b
+Book of the Dead. Тест: `tests/test_appended_item_cards.py`.
+
 Без дублей (2026-09-27): строка-изменение числа, у которой и старое, и новое значение есть в карточке («Empower Spell
 bonus damage increased from 150 to 250», «Poison Attack now has a 9s cooldown»), не видна — число в правой колонке
 окрашено по её тегу (зелёное BUFF, красное NERF, золотое NEW; `_iab_covered_change`). Такие строки и строки-повторы

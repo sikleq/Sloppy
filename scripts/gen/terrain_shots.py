@@ -90,7 +90,8 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
     """Draw one side's outlines of the given keys: old side = removed + moved (where it stood), new side = added +
     moved (where it stands); trees and camps as squares, the round entity markers as circles. Everything on the old
     side is dashed, as is the ghost of a moved one's old spot on the new side: dashed always means "where it was" (the owner
-    2026-10-03); a removed one's spot on the new side is a red cross (owner 2026-10-27)."""
+    2026-10-03). A removed one has nothing on the new side: the Trees layer under it shows the gap (owner
+    2026-10-27)."""
     d = ImageDraw.Draw(img)
     k = half / (2 * r)
 
@@ -119,24 +120,28 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
                 shape([X - s, Y - s, X + s, Y + s], outline=COLOUR[kind], width=width)
         if side == "new":            # where the moved ones stood: a light dashed outline, on top (the owner 2026-10-03)
             ghost = ImageDraw.Draw(img, "RGBA")
-            # ... and where the removed ones stood, a red cross: a note that only removes trees showed a new side with
-            # nothing on it, and a dashed square there read the same as the old side's (owner 2026-10-27, 7.38b
-            # "Removed several trees around camps": "both before and after dashed?")
-            gone = [(m[0], "moved") for m in g.get("moved", [])] + [(p, "removed") for p in g.get("removed", [])]
-            for (x, y), kind in gone:
+            for (x, y), _ in g.get("moved", []):
                 if abs(x - cx) <= r + 300 and abs(y - cy) <= r + 300:
                     X, Y = px(x, y)
                     s = (SIZE[key] if key in SIZE else CIRCLE) * k
-                    if kind == "removed":
-                        _cross(ghost, X, Y, s * 0.7, COLOUR[kind] + (230,), width)
-                    else:
-                        _dashed(ghost, key in SIZE, X, Y, s, COLOUR[kind] + (200,), max(1, width - 1))
+                    _dashed(ghost, key in SIZE, X, Y, s, COLOUR["moved"] + (200,), max(1, width - 1))
 
 
-def _cross(d, X, Y, s, colour, width):
-    """A cross of half size s round (X, Y): on the new side, the spot of something removed."""
-    d.line([(X - s, Y - s), (X + s, Y + s)], fill=colour, width=width)
-    d.line([(X - s, Y + s), (X + s, Y - s)], fill=colour, width=width)
+TREE_FILL, TREE_EDGE = (0, 255, 0, 64), (0, 255, 0, 200)    # the Terrain page's Trees layer (.tm-trees-g rect)
+
+
+def _tree_layer(img, cx, cy, r, coords, half):
+    """Every tree of this side's map as the Terrain page's Trees layer draws it, a green square: a removed tree is
+    a square on the old side and none on the new one, so a note about trees reads without hunting the art (owner
+    2026-10-27, 7.38b: "just show the trees layer, both pictures, and outline the removed trees red dashed on the
+    left")."""
+    d = ImageDraw.Draw(img, "RGBA")
+    k = half / (2 * r)
+    s = SIZE["trees"] * 0.8 * k
+    for x, y in coords:
+        if abs(x - cx) <= r + 100 and abs(y - cy) <= r + 100:
+            X, Y = (x - (cx - r)) * k, ((cy + r) - y) * k
+            d.rectangle([X - s, Y - s, X + s, Y + s], fill=TREE_FILL, outline=TREE_EDGE, width=1)
 
 
 def _dashed(d, square, X, Y, s, colour, width):
@@ -447,6 +452,8 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=T
             _currents(img, cx, cy, r, diff, side, half, width)
         if "lanes" in keys:
             _lanes(img, cx, cy, r, diff, side, half, width)
+        if "trees" in keys:
+            _tree_layer(img, cx, cy, r, diff.get("treesOld" if side == "old" else "treesNew", []), half)
         _outlines(img, cx, cy, r, groups, side, keys, half, width)
         ys = _marks(img, cx, cy, r, ver, entry.get("mark", []) if own else [], half, width,
                     entry.get("mark_kind", "camps"))

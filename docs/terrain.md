@@ -769,11 +769,13 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
 
 ## Note pictures, owner 2026-10-27
 
-- The new side of a note's picture also shows **where removed objects stood**: a red cross (7.38b "Removed several
-  trees around camps": the new side had nothing on it). Not a dashed square — that read the same as the old side's
-  ("both before and after dashed?"). Old side: dashed = where it was; new side: solid = where it is, a faint dashed
-  ghost = a moved one's old spot, a cross = a removed one's spot. `scripts/gen/terrain_shots.py _outlines` /
-  `_cross`; every picture regenerated.
+- A note about trees shows the **Trees layer** on both halves — every tree of that side's map as a green square, like
+  the Terrain page's Trees button (7.38b "Removed several trees around camps": the new side showed nothing changed).
+  Removed trees: red dashed on the old side only; on the new side their squares are simply missing — no mark there
+  (owner 2026-10-27: "just show the trees layer, both pictures, and outline the removed trees red dashed on the
+  left"; a cross on the right was tried and dropped). Added: green solid on the new side; moved: yellow, dashed old
+  spot / solid new spot + a faint dashed ghost on the new side. `scripts/gen/terrain_shots.py _tree_layer`,
+  `_outlines`; every picture regenerated.
 - Two rows with the same words in two sections of one patch (7.38c "Several additional tree and visual adjustments
   have been made to this area": Dire Safe Lane Jungle, Bottom Lane): the n-th row takes the n-th spot of that
   `match` in `data/terrain_spots.json` (`patch/elements.terrain_note`, counted per page). 7.38c's jungle one shows the
