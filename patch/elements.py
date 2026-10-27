@@ -850,26 +850,41 @@ def subgroup(title, new=None):
     return out + f'<h4 class="subgroup">{title}{label}</h4>'
 
 
+def _hero_ability_slug(hero, title):
+    """A hero's ability slug from its display name (tinker + "Defense Matrix" -> tinker_defense_matrix)."""
+    part = ABILITY_DISPLAY_TO_SLUG.get((hero, title))
+    if part is None:
+        part = title.lower()
+        for a, b in (("'", ""), ("-", "_"), (" ", "_"), (".", ""), ("(", ""), (")", "")):
+            part = part.replace(a, b)
+    return f"{HERO_TO_ABIL_PREFIX.get(hero, hero)}_{part}"
+
+
+_FACET_ROW_ABILITY_RE = re.compile(r"([A-Z][\w'.\- ]{2,40}?):\s")
+
+
+def _facet_row_ability_chip(text):
+    """A facet's row that opens with an ability's name ("Defense Matrix: No longer blinks Tinker …", 7.39b
+    Translocator) gets that ability's icon as a small square before it, like a facet talent's facet chip (owner
+    2026-10-27); no name on hover — the row says it. A name that is no ability of the hero's with an icon: nothing."""
+    m = _FACET_ROW_ABILITY_RE.match(text) if _State.current_hero else None
+    if not m:
+        return ""
+    slug = _hero_ability_slug(_State.current_hero, m.group(1))
+    if slug not in _LOCAL_ABIL_ICONS:
+        return ""
+    return (f'<span class="ability-chip" role="img" aria-label="{_html.escape(m.group(1))}"><img src="{ABIL_CDN}'
+            f'{slug}.png" alt="" loading="lazy" width="19" height="19"></span>')
+
+
 def ability(title, slug=None, innate=None, icon_url=None, sub=False, old_title=None):
     """old_title: a rename shown in the header "Old → New", like ability_change's (owner 2026-10-21)."""
     icon_html = ''
     is_innate = False
     key = None
     if slug is None and _State.current_hero:
-        hero = _State.current_hero
-        prefix = HERO_TO_ABIL_PREFIX.get(hero, hero)
-        key = (hero, title)
-        if key in ABILITY_DISPLAY_TO_SLUG:
-            ability_part = ABILITY_DISPLAY_TO_SLUG[key]
-        else:
-            ability_part = (title.lower()
-                            .replace("'", "")
-                            .replace("-", "_")
-                            .replace(" ", "_")
-                            .replace(".", "")
-                            .replace("(", "")
-                            .replace(")", ""))
-        slug = f"{prefix}_{ability_part}"
+        key = (_State.current_hero, title)
+        slug = _hero_ability_slug(_State.current_hero, title)
     elif _State.current_hero:
         key = (_State.current_hero, title)
     if innate is not None:
@@ -1870,6 +1885,9 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         # a facet's talent among the hero's Talents: the facet's chip says whose (owner 2026-10-27, 7.39 Nature's
         # Profit); only on screen — the weights and the talent context read the row's own words
         text_inner = f'{_facet_chip(facet)} {text_inner}'
+    elif _State.current_block_is_facet and isinstance(text_inner, str):
+        chip = _facet_row_ability_chip(text_inner)
+        text_inner = f'{chip}{text_inner}' if chip else text_inner
     # An ability row with its own chip keeps the chip as the li's first child: page.py
     # marks its whole box `ability-box-tagged`, and the CSS moves the box right by the tag
     # column so the chip sits in the SAME column, size and height as every other row's

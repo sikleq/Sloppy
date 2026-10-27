@@ -4370,6 +4370,22 @@ h4.subgroup {
 .facet-chip[data-tooltip]:hover::after {
   opacity: 1;
 }
+/* a facet row's ability ("Defense Matrix: …"): its icon as a square the size of the facet chip (owner 2026-10-27) */
+.ability-chip {
+  display: inline-flex;
+  width: 19px;
+  height: 19px;
+  margin-right: 5px;
+  vertical-align: -4px;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--muted-35);
+}
+.ability-chip > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .facet-icon-overlay {
   width: 36px;
   height: 36px;

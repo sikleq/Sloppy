@@ -44,3 +44,25 @@ def test_a_duplicate_description_row_hides_and_keeps_its_note():
         assert not cards_item_abilities._iab_shown_in_card("Passive: Other Thing. Text", "")
     finally:
         _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+
+
+def test_a_can_no_longer_be_used_row_colours_the_new_tooltips_sentence():
+    """Helm of the Dominator 7.39e (owner 2026-10-27): "Dominate can no longer be used if …" is a new condition the
+    NEW tooltip states — that sentence is coloured, the row goes into the card."""
+    from patch.state import reset_page_state
+    saved = (_State.current_entity_key, _State.current_patch_version, getattr(_State, "iab_card", None))
+    try:
+        reset_page_state()
+        _State.current_entity_key, _State.current_patch_version = "item|helm", "7.39e"
+        cards_item_abilities.item_abilities_change(
+            old=["Active: Dominate. Takes control of one neutral unit. Cooldown: 45s"],
+            new=["Active: Dominate. Takes control of one neutral unit. The Helm cannot be used for 3 seconds after the "
+                 "dominated creep takes damage from an enemy hero or Roshan. Cooldown: 45s"])
+        row = "Dominate can no longer be used if the currently dominated creep took damage from hero-based sources in the last 3s"
+        assert cards_item_abilities._iab_text_change(row, ["del"])
+        (mark,) = cards_item_abilities._IAB_HL["item|helm|7.39e"]
+        new = _State.iab_card["pairs_by"][("dominate", "new")]
+        assert mark["side"] == "new" and new[slice(*mark["span"])].startswith("The Helm cannot be used for 3 seconds")
+    finally:
+        _State.current_entity_key, _State.current_patch_version, _State.iab_card = saved
+        reset_page_state()

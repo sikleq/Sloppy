@@ -707,7 +707,10 @@ def _iab_text_change(text, tags):
         return tailed
     # "no longer …" / DEL speaks of the OLD text, anything else of the NEW one — never the other side (a NEW
     # row must not colour old text: Disperser 7.40)
-    side = "old" if ("no longer" in low or direction == "del") else "new"
+    # ... except "can no longer be used if …": a new condition, which the NEW tooltip states ("The Helm cannot be used
+    # for 3 seconds after …", Helm of the Dominator 7.39e — owner 2026-10-27: it stayed a row, the card's sentence white)
+    side = ("new" if re.search(r"\bcan no longer be (?:used|cast|activated)\b", low)
+            else "old" if ("no longer" in low or direction == "del") else "new")
     wordy = lambda seg: len(re.findall(r"[A-Za-z]{2,}", seg)) >= 2
     got = lambda seg: len(words & _iab_stems(seg))
     # the old side: only text removed outright — a rewritten "Consumes a charge and gives" isn't what "no
