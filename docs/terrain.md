@@ -804,9 +804,14 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
 4. Render: `python scripts/gen/terrain_shots.py <patch>` (writes `icons/terrain/<code>_<i>[_lg].webp`; delete the
    patch's old numbers above the new count first), look at the `_lg` pictures, build, check the button on :8765.
 5. Keys drawn (`show`): camps, camptiers, boxes, trees (Trees layer + outlines), lanes, currents, nowards, cliffs (cliff
-   lines gone red / new green, from `data/map/heights_<code>.png`), and the objectives (roshan, tormentors, wisdom,
-   wisdomRunes, outposts, twinGates, lotus, watchers, bounty, towers).
-6. `tests/test_terrain_objectives_pictured.py` fails while a moved objective has no picture in its patch.
+   lines gone red / new green, from `data/map/heights_<code>.png`), the zones of the map file — shopzones,
+   roshanpit, nowardzones (`diff["zones"]`, the changed outlines: old dashed red, new green; 7.40 "Radiant Secret
+   Shop trigger area moved slightly") — and the objectives (roshan, tormentors, wisdom, wisdomRunes, outposts,
+   twinGates, lotus, watchers, bounty, towers).
+6. `tests/test_terrain_objectives_pictured.py` fails while a moved objective or a changed zone has no picture in its
+   patch (a zone moving with its pictured objective — Roshan's pit no-ward zone — counts as shown). When re-rendering
+   an older patch, keep only the new pictures (`git checkout -- icons/terrain/`, then add the new numbers): the old
+   ones drift by a few pixels from render to render.
 
 ## Objectives moved — a picture wherever the note is (owner 2026-10-28)
 

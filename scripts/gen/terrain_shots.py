@@ -318,6 +318,38 @@ def _boxes(img, cx, cy, r, diff, side, half, width):
                              max(3.0, half / 70))
 
 
+# a zone of the map file (diff["zones"]): show key -> zone key (owner 2026-10-28, 7.40 "Radiant Secret Shop trigger
+# area moved slightly towards the radiant Tier 1 tower")
+ZONE_KEYS = {"shopzones": "shops", "roshanpit": "roshanPit", "nowardzones": "nowardZones"}
+
+
+def changed_zones(zone):
+    """(old polygons only the old map has, new polygons only the new map has) of one zone key."""
+    old = [tuple(map(tuple, p)) for p in zone.get("old", [])]
+    new = [tuple(map(tuple, p)) for p in zone.get("new", [])]
+    return [p for p in old if p not in new], [p for p in new if p not in old]
+
+
+def _zones(img, cx, cy, r, zone, side, half, width):
+    """The zones that changed: the old outline dashed red on the old half, the new one green on the new half — like a
+    removed / added object; the old one also faint dashed on the new half, "where it was"."""
+    d = ImageDraw.Draw(img, "RGBA")
+    k = half / (2 * r)
+
+    def px(poly):
+        return [((x - (cx - r)) * k, ((cy + r) - y) * k) for x, y in poly]
+    gone, came = changed_zones(zone)
+    dash, gap = max(6, half // 40), max(4, half // 60)
+    if side == "old":
+        for p in gone:
+            _dashed_poly(d, px(p), COLOUR["removed"], width, dash, gap)
+        return
+    for p in gone:
+        _dashed_poly(d, px(p), COLOUR["removed"] + (150,), max(1, width - 1), dash, gap)
+    for p in came:
+        d.polygon(px(p), outline=COLOUR["added"], width=width)
+
+
 def _dashed_poly(d, pts, colour, width, dash, gap):
     """A closed polygon drawn dashed."""
     for (ax, ay), (bx, by) in zip(pts, pts[1:] + pts[:1]):
@@ -474,6 +506,9 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=T
             _currents(img, cx, cy, r, diff, side, half, width)
         if "lanes" in keys:
             _lanes(img, cx, cy, r, diff, side, half, width)
+        for key, zone in ZONE_KEYS.items():
+            if key in keys:
+                _zones(img, cx, cy, r, (diff.get("zones") or {}).get(zone) or {}, side, half, width)
         if "trees" in keys:
             _tree_layer(img, cx, cy, r, diff.get("treesOld" if side == "old" else "treesNew", []), half)
         if "cliffs" in keys:

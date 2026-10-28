@@ -17,6 +17,10 @@ from patch import map_versions as mv  # noqa: E402
 from patch import terrain_index  # noqa: E402
 from patch.terrain_notes import show_keys  # noqa: E402
 
+sys.path.insert(0, os.path.join(ROOT, "scripts", "gen"))
+from terrain_shots import changed_zones  # noqa: E402
+
+ZONES = {"shops": {"shopzones"}, "roshanPit": {"roshanpit", "roshan"}, "nowardZones": {"nowardzones", "nowards"}}
 OBJECTIVES = ("roshan", "tormentors", "wisdom", "wisdomRunes", "outposts", "twinGates", "lotus", "watchers", "bounty")
 MIN_MOVE = 100
 
@@ -44,7 +48,23 @@ def _missing():
             v = (diff.get("entities") or {}).get(key) or {}
             if _changed(v.get("old", []), v.get("new", [])) and key not in drawn:
                 out.append(f"{step.patch} {key}")
+        # a zone of the map file whose outline changed (7.40 "Radiant Secret Shop trigger area moved slightly", owner
+        # 2026-10-28: "нет места") — drawn by its own key, or by the object the zone belongs to
+        # an objective's own zone moved with it (7.38: the no-ward zones of Roshan's pits, corners -> river) is in that
+        # objective's picture already
+        moved_at = [tuple(p) for key in OBJECTIVES if key in drawn
+                    for side in ("old", "new") for p in ((diff.get("entities") or {}).get(key) or {}).get(side, [])]
+        for zone, keys in ZONES.items():
+            gone, came = changed_zones((diff.get("zones") or {}).get(zone) or {})
+            loose = [p for p in gone + came if not any(math.dist(_centre(p), q) < 1200 for q in moved_at)]
+            if loose and not keys & drawn:
+                out.append(f"{step.patch} zone {zone}")
     return out
+
+
+def _centre(poly):
+    xs, ys = [q[0] for q in poly], [q[1] for q in poly]
+    return (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
 
 
 def test_every_moved_objective_has_a_picture():

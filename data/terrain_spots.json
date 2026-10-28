@@ -111,7 +111,8 @@
     {"match": "Extended the streams into both Radiant and Dire bases", "spots": [[-3700, -7400], [3300, 7200]], "r": 1200},
     {"match": "Removed some trees inside the base near the new safelane defender's gate positions", "spots": [[-4400, -6950], [3750, 6750]], "r": 600},
     {"match": "Removed a tree between Dire Safelane Tier 1 tower and the small pull camp", "spots": [[-4800, 5248]], "r": 500},
-    {"match": "Changed the 'bridges' to actual bridges", "spots": [[7604, -4805], [-7627, 4598]], "phrase": "actual bridges"}
+    {"match": "Changed the 'bridges' to actual bridges", "spots": [[7604, -4805], [-7627, 4598]], "phrase": "actual bridges"},
+    {"match": "Radiant Secret Shop trigger area moved slightly", "spots": [[-4980, 1820]], "r": 700, "show": ["shopzones"], "phrase": "Radiant Secret Shop trigger area"}
   ],
   "7.41": [
     {"match": "Removed several trees from Dire Safelane small pull camp and Radiant Safelane large pull camp", "spots": [[-3500, 4829], [4649, -3699]]},
