@@ -27,8 +27,11 @@ _SUB = "&nbsp;&nbsp;– "
 _CATEGORY_RE = re.compile(r"^(?:Items|Neutral Creeps|Heroes|Creeps|Units)(?:\s+—\s+|$)")
 _NOTE_ONLY_RE = re.compile(r'^<span class="pop-note">(.*)</span>$', re.S)
 _TRAIL_NOTE_RE = re.compile(r'\s*<span class="pop-note">\(?(.*?)\)?</span>\s*$', re.S)
+_TRAIL_BRACKET_RE = re.compile(r"\s+\(([^()<>]+)\)\s*$")
+_TRAIL_ABILITY_RE = re.compile(r" ability$")
 # an ability's name: capitalised words ("Fortune's End", "Storm Hammer"); the sentence starts at the first lower-case one
-_ABIL_RE = re.compile(r"((?:[A-Z][\w'\-]*)(?: [A-Z][\w'\-]*)*)(?: (?=[a-z])|$)")
+# ("Scream of Pain", "Echo of the Wild": a small "of" / "the" between capitalised words is still the name)
+_ABIL_RE = re.compile(r"((?:[A-Z][\w'\-]*)(?: (?:of |the |of the )?[A-Z][\w'\-]*)*)(?: (?=[a-z])|$)")
 _OWNER_END_RE = re.compile(r"'s |(?<=s)' ")             # "Oracle's Fortune's End", "Mars' Bulwark"
 
 
@@ -42,6 +45,8 @@ def ability_chip(label, src):
 _ENCHANT_RE = re.compile(r"^(?:Item bonus from )?(\w+) [Ee]nchantment$")   # "Audacious Enchantment"
 # a unit named like an ability: the icon of the ability that summons it (7.41 "Warlock's Golem with talent")
 _ICON_ALIASES = {("warlock", "Golem"): "warlock_rain_of_chaos"}
+# a map unit that is neither a hero nor a neutral creep: its abilities' prefix (7.41 "Tormentor's Reflect")
+_UNIT_PREFIXES = {"Tormentor": "miniboss"}
 
 
 # a rune's name in the notes -> its icon (scripts/fetch/fetch_rune_icons.py; Illusion has none in the game client —
@@ -106,7 +111,7 @@ def _icon(owner, abil):
     icon = _item_icon(owner)                         # an item's ability: the item's own icon
     if icon:
         return icon
-    prefix = _creep_prefix(owner)
+    prefix = _UNIT_PREFIXES.get(owner) or _creep_prefix(owner)
     if prefix:
         slug = f"{prefix}_{abil.lower().replace(' ', '_')}"
         return f"{ABIL_CDN}{slug}.png" if slug in _LOCAL_ABIL_ICONS else None
@@ -121,10 +126,11 @@ def _sentence(rest):
 def _parse_line(line):
     """'Oracle's Fortune's End can no longer …' -> (label, icon, sentence, caveat); 'Sange' -> (…, "", ""); or None."""
     caveat = ""
-    m = _TRAIL_NOTE_RE.search(line)
+    m = _TRAIL_NOTE_RE.search(line) or _TRAIL_BRACKET_RE.search(line)
     if m:
         caveat, line = m.group(1).strip(), line[:m.start()]
-    line = line.replace("’", "'").strip()
+    # Valve's own words around a name: "Tormentor's Reflect ability", "Blade Mail (both active and passive)" (7.41)
+    line = _TRAIL_ABILITY_RE.sub("", line.replace("’", "'").strip())
     icon = _item_icon(line)
     if icon:
         return line, icon, "", caveat
@@ -193,9 +199,13 @@ _ICONS_TITLE = {frozenset({"item"}): "Items", frozenset({"ability"}): "Abilities
                 frozenset({"item", "ability"}): "Items and abilities"}
 
 
+_CONDITION_RE = re.compile(r"^(?:With|Triggered by|During|While) ")
+
+
 def _first_title(groups):
-    """"Condition" when the rows say only when (Always / With Aghanim's Scepter / With talent), else "Change"."""
-    return "Condition" if all(s == ALWAYS or s.startswith("With ") for s in groups) else "Change"
+    """"Condition" when the rows say only when (Always / With Aghanim's Scepter / With talent / Triggered by
+    Bristleback passive), else "Change"."""
+    return "Condition" if all(s == ALWAYS or _CONDITION_RE.match(s) for s in groups) else "Change"
 
 
 _EXAMPLES_RE = re.compile(r"^(?:(?P<pre>.*?),?\s+like\s+|Examples?:\s*)(?P<list>.+)$", re.S)

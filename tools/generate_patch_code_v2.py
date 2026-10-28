@@ -328,7 +328,9 @@ CANONICAL_TAGS = [
     (re.compile(r'\bnow only (?:starts?|begins?|deals?|activates?)\b', re.I), 'NERF'),   # Tormentor "only when attacked"
     (re.compile(r'\bnow takes \d+(?:\.\d+)?\s*(?:s|seconds?) to\b', re.I), 'NERF'),     # Pangolier roll ramp-up
     (re.compile(r'\bnow heals? (?:for )?half\b', re.I),            'NERF'),            # Salve / shared Tango
-    (re.compile(r'\b(?:can now|now can) be reflected\b|\bcannot be reflected back\b', re.I), 'NERF'),
+    (re.compile(r'\b(?:can now|now can) be reflected\b', re.I), 'NERF'),
+    # reflected damage taken out of reflecting: an effect removed, DEL (owner 2026-10-28, 7.41)
+    (re.compile(r'\bcannot be reflected back\b', re.I),             'DEL'),
     (re.compile(r'\b(?:can now|now can) miss\b', re.I),            'NERF'),            # free-movement units uphill
     (re.compile(r'^Now also provides -\d', re.I),                   'NERF'),            # a penalty added (Titanic)
     (re.compile(r'\balso goes on cooldown when\b', re.I),           'NERF'),            # Tranquil Boots' break on disassembly
@@ -3001,6 +3003,44 @@ def _join_following_list(out, line):
     return True
 
 
+# a topic several rows of a mechanics section's "Miscellaneous" share: those rows are a mechanic of their own (owner
+# 2026-10-28, 7.41 reflected damage: four rows, the last one's [?] the sources, drawn as a table of icons)
+_MISC_TOPICS = [(re.compile(r"\breflect(?:ed|ion) damage\b", re.I), "Reflected Damage")]
+_MISC_TOPIC_MIN = 3
+
+
+def _postprocess_misc_topics(lines):
+    out = list(lines)
+    section = ''
+    i = 0
+    while i < len(out):
+        head = _BLOCK_HEAD_RE.match(out[i].lstrip('\n'))
+        if head and head.group('fn') == 'plain_header':
+            section = head.group('title')
+        if not (head and head.group('fn') == 'subgroup' and head.group('title') == 'Miscellaneous'
+                and 'mechanic' in section.lower()):
+            i += 1
+            continue
+        j = i + 1
+        while j < len(out) and not _block_boundary(out[j]):
+            j += 1
+        for rx, title in _MISC_TOPICS:
+            rows = [k for k in range(i + 1, j) if out[k].startswith('W(li(') and rx.search(out[k])]
+            if len(rows) < _MISC_TOPIC_MIN:
+                continue
+            moved = [out[k] for k in rows]
+            rest = [out[k] for k in range(i + 1, j) if k not in rows]
+            block = [f'W(subgroup("{title}", new="Reworked mechanic"))', 'W(ul_open())', *moved, 'W(ul_close())', '']
+            if not any(x.startswith('W(li(') for x in rest):
+                out[i:j] = block                      # nothing else left in Miscellaneous
+            else:
+                out[i:j] = block + [out[i]] + rest
+            j = i + len(block)
+            break
+        i = j
+    return out
+
+
 def _postprocess_new_block_label(lines):
     out = list(lines)
     moves = []
@@ -3924,6 +3964,7 @@ def generate(version):
     out = _postprocess_minute_formula(out)
     out = _postprocess_scale_pill(out)
     out = _postprocess_mechanic_rules_row(out)        # a row restating its header goes (owner 2026-10-27)
+    out = _postprocess_misc_topics(out)               # rows on one topic -> a mechanic block (owner 2026-10-28)
     out = _postprocess_new_block_label(out)
     out = _postprocess_mechanic_rules_row(out, after_label=True)   # a reworked mechanic in one list
     out = _postprocess_new_item_card(out, version)

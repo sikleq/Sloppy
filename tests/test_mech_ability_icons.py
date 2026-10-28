@@ -78,6 +78,38 @@ def test_names_alone_are_one_row_of_icons_and_with_scepter_its_own():
     assert re.search(r"\.mech-abils\.mech-cols-icons \{ grid-template-columns: fit-content", css)
 
 
+def test_reflected_damage_sources_are_a_table_of_icons():
+    """7.41 "All sources of reflection damage now have an ALT-note": the [?] list as a table (owner 2026-10-28)."""
+    # Valve's whole list, word for word: one name without an icon and the table falls back to a "?" (it did:
+    # Retaliate is centaur_return, "Scream of Pain" has a small "of")
+    row = _mech_row(lambda: "All sources of reflection damage now have an ALT-note " + elements.info_tip(
+        "Tormentor's Reflect ability", "Blade Mail (both active and passive)", "Chipped Vest", "Rattlecage",
+        "Axe's Counter Helix", "Bristleback's Quill Spray triggered by Bristleback passive",
+        "Centaur Warrunner's Retaliate", "Nyx Assassin's Spiked Carapace", "Queen of Pain's Scream of Pain",
+        "Razor's Storm Surge", "Shadow Demon's Disseminate", "Spectre's Dispersion",
+        "Tidehunter's Anchor Smash triggered by Kraken Shell passive", "Viper's Corrosive Skin",
+        "Warlock's Fatal Bonds",
+        header="The following items and abilities deal reflected damage:"))
+    assert row.count('class="ability-chip"') == 15
+    assert "miniboss_reflect.png" in row and "items/blade_mail.png" in row and "bristleback_quill_spray.png" in row
+    assert "centaur_return.png" in row and "queenofpain_scream_of_pain.png" in row
+    row = "".join(re.split(r'(?=<span class="mech-cell mech-label">Triggered by Kraken)', row)[:1])
+    labels = re.findall(r'<span class="mech-cell mech-label">([^<]*)', row)
+    assert labels == ["Condition", "Always ", "Triggered by Bristleback passive"]
+    assert "Blade Mail: Both active and passive" in row                  # its caveat: a "?" after "Always"
+
+
+def test_every_mechanic_list_of_7_41_is_a_table_on_the_page():
+    """The built page: Health Restoration (2), Lifesteal (1), Reflected Damage (1) — none fell back to a "?"."""
+    import pytest
+    page = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dist", "patches", "7.41.html")
+    if not os.path.exists(page):
+        pytest.skip("site not built")
+    html = open(page, encoding="utf-8").read()
+    assert html.count('class="mech-abils mech-cols-icons"') == 4
+    assert "Tormentor&#x27;s Reflect" in html and 'Reflected Damage <span class="subgroup-new-type">' in html
+
+
 def test_the_icons_column_says_what_its_icons_are():
     row = _mech_row(lambda: "Spells changed " + elements.info_tip(
         "Sniper's Assassinate", "Pudge's Rot with Aghanim's Scepter", header="Affected spells:"))

@@ -151,10 +151,10 @@ def test_a_mechanics_subgroup_of_rework_rows_is_a_reworked_mechanic():
              'W(li("Health Restoration now applies to all forms of life gain", t("REWORK")))',
              'W(li("Incoming Heal Amplification now stacks diminishingly", t("REWORK")))', 'W(ul_close())',
              'W(subgroup("Miscellaneous"))', 'W(ul_open())',
-             'W(li("Reflected damage cannot be reflected back", t("NERF")))', 'W(ul_close())']
+             'W(li("Reflected damage cannot be reflected back", t("DEL")))', 'W(ul_close())']
     out = g._postprocess_new_block_label(lines)
     assert 'W(subgroup("Health Restoration", new="Reworked mechanic"))' in out
-    assert 'W(subgroup("Miscellaneous"))' in out                       # a NERF row: an ordinary list
+    assert 'W(subgroup("Miscellaneous"))' in out                       # a DEL row: an ordinary list
 
 
 def test_lane_creep_pages_are_named_after_the_creep():
@@ -189,3 +189,22 @@ def test_general_changes_split_into_mechanic_blocks_with_every_valve_row():
     assert 'extra=inline_note("Also negative")' in out
     rest = out[out.index('W(plain_header("General Changes"))'):]
     assert "Bind Effects" in rest and "Heal Amplification" not in rest
+
+
+def test_misc_rows_on_one_topic_become_their_own_mechanic():
+    # owner 2026-10-28, 7.41: the reflected-damage rows of Miscellaneous are a block, their sources a table of icons
+    rows = ['W(li("Reflected damage cannot be reflected back", t("DEL")))',
+            'W(li("Lifesteal and Spell Lifesteal don\'t apply to reflected damage", t("REWORK")))',
+            'W(li("Reflected damage doesn\'t affect Debuff Immune units", t("DEL")))',
+            'W(li("All sources of reflection damage now have an ALT-note " + info_tip("Axe\'s Counter Helix"), t("QoL")))']
+    uphill = 'W(li("Units with free movement now can miss their attacks", t("NERF")))'
+    lines = ['W(plain_header("Mechanics Changes"))', 'W(subgroup("Miscellaneous"))', 'W(ul_open())',
+             rows[0], rows[1], uphill, rows[2], rows[3], 'W(ul_close())']
+    out = g._postprocess_new_block_label(g._postprocess_misc_topics(lines))
+    assert out[1] == 'W(subgroup("Reflected Damage", new="Reworked mechanic"))'
+    assert out[2:8] == ['W(ul_open())', *rows, 'W(ul_close())']
+    assert out[9:] == ['W(subgroup("Miscellaneous"))', 'W(ul_open())', uphill, 'W(ul_close())']
+    # two rows on a topic stay in Miscellaneous
+    few = ['W(plain_header("Mechanics Changes"))', 'W(subgroup("Miscellaneous"))', 'W(ul_open())', rows[0], rows[1],
+           'W(ul_close())']
+    assert g._postprocess_misc_topics(few) == few

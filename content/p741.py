@@ -202,15 +202,13 @@ def build():
     W(li("Historically, Lifesteal was calculated before some damage reductions or amplifications were applied. As a result, you could gain health from attacks that dealt no damage (like attacks against a hero affected by Aeon Disk's Combo Breaker). This will not happen anymore", t("REWORK"), extra=inline_note("The only amplification that is not taken into account is increased damage against illusions")))
     W(ul_close())
 
-    W(subgroup("Miscellaneous"))
+    # the rows about reflected damage are a mechanic of their own, its sources a table of icons (owner 2026-10-28:
+    # "взять из [?] список reflection спеллов и сделать тоже таблицей"; generator: _postprocess_misc_topics)
+    W(subgroup("Reflected Damage", new="Reworked mechanic"))
     W(ul_open())
-    W(li("Reflected damage cannot be reflected back", t("NERF")))
+    W(li("Reflected damage cannot be reflected back", t("DEL")))           # owner 2026-10-28 (was NERF)
     W(li("Lifesteal and Spell Lifesteal don't apply to reflected damage", t("REWORK")))   # owner 2026-10-16
     W(li("Reflected damage doesn't affect Debuff Immune units", t("DEL")))
-    W(li("Units with free movement now can miss their attacks when attacking uphill targets " + info_tip(
-            "Batrider during Firefly", "Dragon Knight during Elder Dragon Form with Aghanim's Scepter",
-            "Lina during Flame Cloak", "Terrorblade's Reflection illusions",
-            header="Affected units:"), t("NERF")))
     W(li("All sources of reflection damage now have an ALT-note detailing mechanics of reflected damage " + info_tip(
             "Tormentor's Reflect ability", "Blade Mail (both active and passive)", "Chipped Vest", "Rattlecage",
             "Axe's Counter Helix", "Bristleback's Quill Spray triggered by Bristleback passive",
@@ -219,6 +217,14 @@ def build():
             "Tidehunter's Anchor Smash triggered by Kraken Shell passive", "Viper's Corrosive Skin",
             "Warlock's Fatal Bonds",
             header="The following items and abilities deal reflected damage:"), t("QoL")))
+    W(ul_close())
+
+    W(subgroup("Miscellaneous"))
+    W(ul_open())
+    W(li("Units with free movement now can miss their attacks when attacking uphill targets " + info_tip(
+            "Batrider during Firefly", "Dragon Knight during Elder Dragon Form with Aghanim's Scepter",
+            "Lina during Flame Cloak", "Terrorblade's Reflection illusions",
+            header="Affected units:"), t("NERF")))
     W(ul_close())
 
     # ===== NEUTRAL CREEP UPDATES =====

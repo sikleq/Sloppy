@@ -155,6 +155,7 @@ ABILITY_DISPLAY_TO_SLUG = {
     ("luna", "Bouncing Glaives"): "moon_glaive",
     ("luna", "Moon Glaives"): "moon_glaive",
     ("ogre_magi", "Fire Shield"): "smash",
+    ("centaur", "Retaliate"): "return",
     ("alchemist", "Greevil's Greed"): "goblins_greed",
     ("bounty_hunter", "Shadow Walk"): "wind_walk",
     ("drow_ranger", "Gust"): "wave_of_silence",

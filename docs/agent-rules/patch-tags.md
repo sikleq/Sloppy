@@ -322,6 +322,7 @@ HTML-escape тултип через `_html.escape(text, quote=True)`. CSS `.ench
   которые есть в первой строке и в большинстве строк группы; «new … stat/mechanic/created» → New mechanic).
 - **Подраздел механики, где все строки REWORK, — тоже «Reworked mechanic»** (2026-10-16, 7.41 «Health Restoration», «Lifesteal and Damage Manipulations»): от двух строк, только в разделе механик (`_postprocess_new_block_label`); короткие «?» — в саму строку, списки затронутых способностей остаются в «?».
 - **«Lifesteal … don't apply to reflected damage» — REWORK** (владелец 2026-10-16): так теперь работает отражённый урон, а не убранный эффект (`TAG_OVERRIDES`).
+- **«Reflected damage cannot be reflected back» — DEL** (владелец 2026-10-28, было NERF): эффект убран (`CANONICAL_TAGS`).
 - **«… now affected by Area of Effect / AoE bonuses» — NEW** (владелец 2026-10-16, 7.41 Congregations of the Deep, Water Bubble (Large); были BUFF): новое свойство, зеркало «no longer affected …» → DEL. Канон в генераторе.
 - **«… has switched» + «?» «Now …» — одной строкой** (2026-10-16, 7.41 Tormentor / Roshan: «Spawn preference has switched — now begins in the Bottom Chasm»): без заметки строка ничего не говорит (`_postprocess_switched_note`).
 - **5 уровней и больше — проценты диапазоном** (владелец 2026-10-16, Dagon 7.41: «слишком много надписей»): бейдж показывает первый и последний уровень «−9% … −29%» (`patch/badges.py RANGE_FROM_LEVELS`), тег считается по всем уровням. 4 уровня (способности героев) — как раньше, каждый.

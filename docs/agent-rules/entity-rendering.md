@@ -350,6 +350,12 @@ Damage), Illusion, Invisibility, Regeneration, Arcane, Shield, Water, Wisdom (у
   «сначала столбец с always», «не хватает шапки». Шапка любой такой таблицы — первая строка
   `.mech-abil-row.mech-head` из ячеек `.mech-cell` (первая ещё `.mech-label`): темнее таблицы, 12px, тусклый цвет;
   её же ставят `text_list_rows` и `mech_table`;
+- условие ряда — «With …», «Triggered by …», «During …», «While …» (7.41 «Quill Spray triggered by Bristleback
+  passive»); слова Valve вокруг имени не мешают: «Tormentor's Reflect ability» — значок Reflect (`_UNIT_PREFIXES`),
+  «Blade Mail (both active and passive)» — значок Blade Mail, скобка — «?» ряда;
+- строки «Miscellaneous» раздела механик на одну тему (≥3, `_MISC_TOPICS`: reflected / reflection damage) генератор
+  выносит в свой блок «<Тема>» с «Reworked mechanic» (`_postprocess_misc_topics`; владелец 2026-10-28, 7.41
+  Reflected Damage: список источников из «?» — таблица значков);
 - скобка-оговорка строки (`pop-note` в конце) — «?» после фразы ряда, в нём «<Способность>: оговорка»; НЕ в ряду
   значков — там «?» читался как ещё одна способность (владелец 2026-10-28, Bloodlust); строка-оговорка всего списка
   («All three of these …») — серым В ОДНОЙ СТРОКЕ с текстом ряда, не последней строкой таблицы (владелец 2026-10-28);
