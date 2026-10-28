@@ -88,6 +88,8 @@ _UNEQUAL_OK = {
     "b([1.25, 2, 2.75, 3.5, 4.25, 5, 5.75, 6.5], [1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6])",
     # 7.38 Night Stalker Voidbringer: Void gets a 5th level
     "b([2.5, 3, 3.5, 4], [2, 2.5, 3, 3.5, 4])",
+    # 7.37e Tusk Bitter Chill: scaled with Tag Team (0-4), now with the ultimate Walrus Punch (0-3)
+    "b([20, 30, 40, 50, 60], [15, 35, 55, 75])",
 }
 
 

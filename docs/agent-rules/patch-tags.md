@@ -483,6 +483,22 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 - Шапка карточки — в одну строку: «Aghanim's» в ней — иконка улучшения («granted by [иконка] Shard»), числа 14px.
 - Ringmaster 7.39: «will be granted one upon death (instead of upon respawn)» — **NEW**, «will no longer be granted …»
   — **DEL**.
+
+## Вычитка 7.37e (2026-10-28)
+
+| Строка | Тег | Почему |
+|---|---|---|
+| «Enemies that leave the AoE now lose 1 stack per second instead of all stacks instantly» | **BUFF** | дебафф держится дольше — не REWORK по слову «instead of» (Natural Order) |
+| «Now also applies to units under Lycan's control» | **BUFF** | свой бонус расширен (Apex Predator) |
+| «Chain Frost will no longer follow that hero» (после выкупа) | **DEL** | поведение убрано |
+| «Now Bonus Armor Reduction buff is removed when Shadow Fiend dies» | **NERF** | новый способ потерять бонус |
+| «Turn Rate bonus changed from flat +110 to +40% (results in +48)» | **NERF** | итог меньше (Rolling Thunder) |
+| «Treant / Eidolon gold bounty …» | **NERF** при росте | золото получает враг; LOWER_IS_BUFF знает treant, eidolon |
+| «Imps no longer explode if killed by enemy heroes» | **DEL** | эффект убран |
+| «charge restoration time», «Outgoing Spell Damage reflected» (QoP) | **`l=True`** | своё ожидание заряда; свой урон по себе |
+
+Генератор: `TAG_OVERRIDES`, `LOWER_IS_BUFF` (`tools/generate_patch_code_v2.py`). Тест `tests/test_review_737e.py`.
+Оставлено как в черновике: Ringmaster Spotlight «Now summons 3 separate spotlights» — **NEW** (новое поведение).
 - Карточка фасета без своего имени в тексте называет в шапке способность, которую фасет меняет: «Active: Bloodrage»
   (Old Blood 7.39) — способность из файлов игры (`patch/ability_kv.facet_ability`: её KV называет фасет).
 - Чип фасета у таланта — квадрат 19 px вровень с тегом строки (та же высота и верх).

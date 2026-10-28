@@ -511,7 +511,10 @@ LOWER_IS_BUFF = re.compile(
     r'|charge\s+(?:gain|restore|replenish|regen(?:eration)?)\s+time'
     r'|base\s+attack\s+rate'                     # seconds per attack (Kez Sai/Katana) — like BAT
     r'|required\s+to\s+(?:trigger|cast|activate|proc)'
-    r'|(?:familiar|summon(?:ed)?|illusion|ward|spirit)s?\s+(?:gold\s+)?bounty'   # own summon's bounty
+    r'|(?:familiar|summon(?:ed)?|illusion|ward|spirit|eidolon|treant)s?\s+(?:gold\s+)?bounty'   # own summon's bounty
+    # 7.37e proofread: a charge's wait (Demonic Purge Scepter), the caster's own spell damage reflected back (QoP)
+    r'|charge\s+restoration\s+time'
+    r'|outgoing\s+(?:spell\s+)?damage\s+reflected'
     # 2026-10-05 audit: faster forage (7.41e), a smaller Blur vanish radius (7.41 PA), a shorter wait for the max bonus
     r'|forage\s+time'
     r'|vanish\s+radius'
@@ -573,6 +576,14 @@ TAG_OVERRIDES = {
     "now requires aghanim's":       "NERF",    # a capability now gated behind Aghs (checked before "now requires")
     "now requires":                 "REWORK",  # "Now requires X instead of Y"
     "instead of only higher":       "BUFF",    # scope widened ("…equal or higher level, instead of only higher"; audit 2026-10-03)
+    # 7.37e proofread (2026-10-28): the effect decides, not the phrase template
+    "stack per second instead of all stacks": "BUFF",   # Natural Order: enemies keep the debuff longer after leaving
+    "now also applies to units under":        "BUFF",   # Apex Predator: own bonus widened to controlled units
+    "will no longer follow":                  "DEL",    # Chain Frost: a bought-back hero is no longer chased
+    "buff is removed when":                   "NERF",   # Presence of the Dark Lord: a new way to lose the bonus
+    "turn rate bonus changed from flat":      "NERF",   # Rolling Thunder: +110 → +40% (results in +48)
+    "treant gold bounty rescaled":            "NERF",   # Nature's Call: the enemy gets more gold for a treant
+    "no longer explode":                      "DEL",    # Eldritch Summoning: imps killed by heroes do not blow up
     "instead of":                   "REWORK",  # component/requirement swap
     "respawn time increased":       "NERF",    # "increased" heuristic gives BUFF, but higher respawn = worse
     "respawn time decreased":       "BUFF",

@@ -678,6 +678,10 @@ FACETS = {
     "hoodwink_hipshot": ("Hipshot", "Green0"),
     "mars_victory_feast": ("Victory Feast", "Red2"),
     "dawnbreaker_hearthfire": ("Trailblazer", "Yellow1"),
+    # 7.37e — auto-registered by generate_patch_code_v2.py
+    "nevermore_lasting_presence": ("Lasting Presence", "Gray0"),
+    "alchemist_mixologist": ("Mixologist", "Purple2"),
+    "visage_gold_assumption": ("Death Toll", "Yellow0"),
 }
 
 # Mapping from Valve's facet_color name -> CSS gradient that EXACTLY matches

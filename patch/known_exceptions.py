@@ -96,6 +96,10 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     # Slark's 7.39-era innate (data/stats/7.39/heroes/npc_dota_hero_slark.txt "slark_barracuda", Innate 1); p739b
     # showed it under slark_pounce, i.e. Pounce's icon and link (audit 2026-10-03)
     ("Slark", "slark_barracuda"),
+    # 7.37-era innates in content/p737e.py (data/stats/7.37e/heroes KV, abilities_slim is_innate=True), gone from
+    # live herodata (2026-10-28)
+    ("Outworld Destroyer", "obsidian_destroyer_ominous_discernment"),
+    ("Sven", "sven_vanquisher"),
 }
 
 KNOWN_DISPLAY_NAME_OVERRIDES = set()
@@ -143,6 +147,9 @@ KNOWN_INNATE_NO_CDN_ICON = {
     # the CDN (scripts/fetch/fetch_icons.py, 2026-10-26)
     "clinkz_bone_and_arrow",
     "slardar_seaborn_sentinel",
+    # 7.37-era innates of content/p737e.py: not in the client VPK nor the CDN (scripts/fetch/fetch_icons.py, 2026-10-28)
+    "obsidian_destroyer_ominous_discernment",
+    "sven_vanquisher",
 }
 
 # Hero abilities no Ability slot or facet ever names (7.08 → today) that were in the game all the same: the game
