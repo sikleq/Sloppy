@@ -4,7 +4,12 @@
     {"match": "The top and bottom outer rim areas are now flooded by streams of traversable water", "spots": [[3500, -7900], [-3500, 7900]], "r": 1400, "phrase": "top and bottom outer rim areas"},
     {"match": "The Twin Gates have been repositioned to the corners of the map", "spots": [[6624, -6848], [-6816, 7232]], "r": 1100},
     {"match": "Radiant and Dire main jungles now also have a stream with moderate current", "spots": [[300, -5400], [-600, 5100]], "r": 1300},
-    {"match": "Corner outposts have been removed", "spots": [[4992, -8256], [-5312, 7680]]}
+    {"match": "Corner outposts have been removed", "spots": [[4992, -8256], [-5312, 7680]]},
+    {"match": "Shrines of Wisdom are located in the offlane side jungles", "spots": [[8340, -1008], [-8088, 408]], "r": 1100, "show": ["wisdom", "wisdomRunes", "camps"], "phrase": "offlane side jungles"},
+    {"match": "Roshan is back in the river", "spots": [[0, 0]], "r": 8400, "show": ["roshan"], "phrase": "back in the river", "first": {"kind": "roshan", "label": "Start", "new": [2966, -2967]}},
+    {"match": "Tormentor spawns repositioned to the corners of the map", "spots": [[0, 0]], "r": 8400, "show": ["tormentors"], "phrase": "corners of the map"},
+    {"match": "Watchers, camps and pathways in the areas have been slightly adjusted", "spots": [[0, 0]], "r": 8400, "show": ["watchers"], "phrase": "Watchers, camps and pathways"},
+    {"match": "Touched up the map in general", "spots": [[0, 0]], "r": 8400, "show": ["camps", "lotus", "bounty"], "phrase": "Touched up the map"}
   ],
   "7.38b": [
     {"match": "Removed several trees around camps, making it easier", "spots": [[-8300, -600], [-1056, -3264]], "r": 600},

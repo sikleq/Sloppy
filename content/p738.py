@@ -58,7 +58,14 @@ def build():
 
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
-    W(li("Roshan is back in the river, with one pit located near each sidelane", t("REWORK"), extra=inline_note("Top lair is slightly closer to Dire's jungle entrance, and bottom one is closer to Radiant's<br>Only the active Roshan pit will show as a minimap icon<br>Roshan initially spawns in the Bottom Pit<br>Starting at 15:00, Roshan will follow the day/night cycle, walking across the river towards his designated pit: Top at night and Bottom at day<br>&nbsp;&nbsp;– Roshan no longer has bonus movement speed while moving between pits<br>&nbsp;&nbsp;– Roshan now has basic 25% Slow Resistance and an additional 25% Slow Resistance when running between pits")))
+    # Valve's six lines behind a "?" as a table of the two pits (owner 2026-10-28: "много текста спрятано в [?]")
+    W(li("Roshan is back in the river, with one pit located near each sidelane", t("REWORK"), extra=mech_table(
+        ["Pit", "Roshan is there", "Location"],
+        [["Top", "At night, from 15:00", "Slightly closer to Dire's jungle entrance"],
+         ["Bottom", "At the start of the game<br>At day, from 15:00", "Slightly closer to Radiant's jungle entrance"],
+         "From 15:00 Roshan walks across the river to the pit of the time of day. On the way he no longer gets bonus "
+         "movement speed, but gets +25% Slow Resistance on top of his new base 25%",
+         "Only the active pit shows as a minimap icon"])))
     W(li("Added a Roshan icon near the minimap that shows Roshan's state (alive, dead, maybe alive) and location", t("QoL"), extra=inline_note("If Roshan is dead, the status will also include a timer until his possible respawn<br>Since Roshan's respawn takes between 8 to 11 minutes, during this window the status will say that he may be alive, but also include a timer until the guaranteed respawn<br>If a team gains vision over Roshan or Roshan's Roar of Retribution is heard during this status, the timer will be updated to inform that Roshan is alive<br>Templar Assassin's Third Eye Innate will cause the icon to display exactly when and where Roshan will respawn")))
     W(li("Knockback now has a 2s cooldown before it can be applied to the same unit again", t("NERF"), extra=inline_note("The knockback of Roshan's Walk: since 7.33 Roshan pushes units aside while walking between his pits (listed among knockback effects in 7.36b)")))
     W(li("Roshan no longer drops Aghanim's Blessing", t("DEL")))

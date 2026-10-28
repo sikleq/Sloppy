@@ -94,9 +94,18 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
     2026-10-27)."""
     d = ImageDraw.Draw(img)
     k = half / (2 * r)
+    whole = r >= WHOLE_MAP_R
+    if whole:                    # a mark on the whole map is a few pixels big: thicker, and never under a set size
+        width += 1
 
     def px(x, y):
         return (x - (cx - r)) * k, ((cy + r) - y) * k
+
+    def size(key):
+        s = (SIZE[key] if key in SIZE else CIRCLE) * k
+        # the whole map (7.38 Roshan back in the river, Tormentors to the corners): a mark a reader can find
+        # (owner 2026-10-28)
+        return max(s, half / 32) if whole else s
     for key, g in groups.items():
         if key not in keys:
             continue
@@ -112,7 +121,7 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
                 if abs(x - cx) > r + 300 or abs(y - cy) > r + 300:
                     continue
                 X, Y = px(x, y)
-                s = (SIZE[key] if key in SIZE else CIRCLE) * k
+                s = size(key)
                 if side == "old":
                     _dashed(d, key in SIZE, X, Y, s, COLOUR[kind], width)
                     continue
@@ -123,7 +132,7 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
             for (x, y), _ in g.get("moved", []):
                 if abs(x - cx) <= r + 300 and abs(y - cy) <= r + 300:
                     X, Y = px(x, y)
-                    s = (SIZE[key] if key in SIZE else CIRCLE) * k
+                    s = size(key)
                     _dashed(ghost, key in SIZE, X, Y, s, COLOUR["moved"] + (200,), max(1, width - 1))
 
 
@@ -212,7 +221,7 @@ def _first(img, cx, cy, r, ver, entry, side, half, width, font):
     ringed gold with a plate saying when it first spawns there. entry["first"] = {"kind": "tormentors" | "roshan",
     "label": "20:00", "old": [x, y], "new": [x, y]} (the owner 2026-10-16: the time, not "first")."""
     first = entry.get("first")
-    if not first:
+    if not first or side not in first:      # a half the note says nothing about (7.38 Roshan: the new pits only)
         return
     d = ImageDraw.Draw(img, "RGBA")
     k = half / (2 * r)

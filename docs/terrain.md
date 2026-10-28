@@ -789,6 +789,24 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   the Dire gates changed), 7.39b "Fixed some locations that were incorrectly blocked for warding" (the gridnav of
   7.39 and 7.39b are identical, cell for cell) — no picture. Test: `tests/test_terrain_notes_1027.py`.
 
+## Objectives moved — a picture wherever the note is (owner 2026-10-28)
+
+- Every map objective (Roshan, Tormentors, Shrines / Wisdom Runes, outposts, Twin Gates, Lotus Pools, Watchers, bounty
+  runes) that a patch's map file moved, added or removed gets a picture on that patch's page, whatever section its note
+  sits in (7.38 "Shrines of Wisdom are located …" and "Roshan is back in the river" are under Map Objectives, not
+  Terrain Changes). The entry in `data/terrain_spots.json` matches the row by its words, as any terrain note.
+- **Caught automatically:** `tests/test_terrain_objectives_pictured.py` fails when a patch's map diff changed an
+  objective (a shift over 100 units; 7.39b's 22-unit watcher nudge isn't one) and no entry of that patch draws it. A new
+  patch: add the entry to the row that names the move; a move no row names goes on the patch's catch-all row
+  ("Touched up the map in general") or a whole-map picture of its own.
+- **Whole map** (`"spots": [[0, 0]], "r": 8400`) for a move across the map — 7.38 Roshan corners → river, Tormentors →
+  corners, watchers, "Touched up the map in general" (camps, lotus, bounty): the old spot dashed on the old half, the new
+  one on the new half. On the whole map a mark never gets smaller than 1/32 of the picture and is a pixel thicker
+  (`_outlines`), or it is a dot nobody finds.
+- `first` may name one half only (`"new": [x, y]`): 7.38 Roshan "initially spawns in the Bottom Pit" — the gold "Start"
+  ring on the 7.38 half; the old half says nothing about it.
+- 7.38 Roshan's six lines from behind the "?" are a table of the two pits in the content (`mech_table`).
+
 ## Gotchas
 
 - **Right patch section.** The `content/` files have multiple `Terrain Changes`
