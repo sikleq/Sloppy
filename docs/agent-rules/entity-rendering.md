@@ -242,7 +242,10 @@ Slardar). Апгрейд, которого у героя не было, или �
 `%AbilityCastRange%` — из шапки способности (7.41 Side Gunner).
 **Каждое изменение Aghanim у способности — карточка** (владелец 2026-10-25): переработан / переехал — «было →
 стало»; **добавлен** без переезда (7.41 Press the Attack, Tinker) — одна сторона «Added Aghanim's Scepter.» с текстом
-игры; **убран** («No longer upgraded with Aghanim's Shard») — строка «Removed Aghanim's Shard.» без карточки
+игры и шапкой способности, как у всех карточек: Active / Passive, радиус, дальность, мана, перезарядка из файлов игры
+(владелец 2026-10-28, 7.37e Escape Act; `cards_aghs._added_upgrade_head`). Улучшение меняет перезарядку на заряды
+(«Cooldown: -100%. Charge restore time: 38/32/26/20s.») — в шапку идёт время восстановления заряда, обе фразы из
+текста уходят; **убран** («No longer upgraded with Aghanim's Shard») — строка «Removed Aghanim's Shard.» без карточки
 (владелец 2026-10-25 вечером, Reincarnation; прежняя карточка со старым текстом, 7.41 Duel, отменена). **Новая способность — всегда карточка «New ability.»**, не строка: `new_ability(name,
 slug, note=)` берёт текст и числа из файлов игры (`game_ability_desc`), строка патчноута под ней `covered=True`;
 `game_ability_desc(slug, version)` — сторона любой карточки из файлов игры (7.41 Changing of the Guard: аспект 7.40c →

@@ -35,5 +35,17 @@ def test_an_old_min_max_range_is_compared_by_its_middle():
     assert g._emit_badge("Eidolon gold bounty increased from 14-20 to 17-20", hero_side=True) == "br(14, 20, 17, 20, l=True)"
 
 
+def test_an_added_upgrade_card_has_the_ability_header_and_charges_take_the_cooldown():
+    """Owner 2026-10-28 (7.37e Escape Act): an "Added Aghanim's Scepter." card has its ability's header (Active, range,
+    mana, cooldown); an upgrade that swaps the cooldown for charges shows the charge restore time there instead."""
+    from patch.cards_aghs import _added_upgrade_head
+    text = ("Escape Act has 2 charges. When the box pops open, Impalement Art daggers are thrown in all directions, and "
+            "all enemies in an 225 radius take 300 damage. Cooldown: -100%. Charge restore time: 38/32/26/20s.")
+    body, head = _added_upgrade_head("ringmaster_the_box", "7.37e", text)
+    assert "Cooldown" not in body and "Charge restore" not in body and body.endswith("300 damage.")
+    assert '<b class="iab-kind">Active</b>' in head
+    assert all(v in head for v in (">600<", ">80<", ">38/32/26/20<"))
+
+
 def test_an_enemy_damage_reflection_stays_higher_is_better():
     assert "l=True" not in g._emit_badge("Damage reflected increased from 10% to 12%")

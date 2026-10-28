@@ -184,8 +184,9 @@ def _aghs_rework_card(text, covered=False) -> bool:
         new = aghs_text(slug, kind, version)
         if not new or not (slug in holders(_State.current_hero, kind, version)):
             return False
-        pane = (f'<div class="ability-change-pane ability-change-new"><div class="ability-change-body">'
-                f'{_bold_numbers_html(aghs_line(_html.escape(_aghs_inline(new), quote=False), kind=kind))}</div></div>')
+        new, head = _added_upgrade_head(slug, version, _aghs_inline(new))
+        pane = (f'<div class="ability-change-pane ability-change-new">{head}<div class="ability-change-body">'
+                f'{_bold_numbers_html(aghs_line(_html.escape(new, quote=False), kind=kind))}</div></div>')
         _State.aghs_cards.append(_under_rows_single(f"Added {up}.", "new", "aghs-change", pane))
         return True
     new = aghs_text(slug, kind, version)
@@ -226,6 +227,26 @@ def _aghs_rework_card(text, covered=False) -> bool:
     _State.aghs_cards.append(_under_rows_card(caption, tag, "", "aghs-change", old_pane, new_pane))
     _AGHS_SHOWN.add((version, _State.current_hero, kind))     # its old parts are in this card
     return True
+
+
+# an upgrade that trades the cooldown for charges: "Cooldown: -100%. Charge restore time: 38/32/26/20s." (7.37e Escape
+# Act) — the restore time is the cooldown the game shows, so it goes to the header and both sentences leave the text
+_AGHS_NO_COOLDOWN_RE = re.compile(r"\s*Cooldown:\s*-100%\.")
+_AGHS_RESTORE_RE = re.compile(r"\s*Charge restore time:\s*([\d.]+(?:/[\d.]+)*)s?\.")
+
+
+def _added_upgrade_head(slug, version, text):
+    """(text, header html) of an "Added Aghanim's X." card on the ability's own block: the ability's header as every
+    card has it — Active / Passive, radius, range, mana, cooldown from the game files (owner 2026-10-28, 7.37e Escape
+    Act: "у нас шапки в таких способностях разве нет?")."""
+    from .ability_kv import ability_props
+    props = dict(ability_props(slug, version))
+    restore = _AGHS_RESTORE_RE.search(text)
+    if restore and _AGHS_NO_COOLDOWN_RE.search(text):
+        props["cooldown"] = restore.group(1)
+        text = _AGHS_RESTORE_RE.sub("", _AGHS_NO_COOLDOWN_RE.sub("", text)).strip()
+    head, _ = _pane_parts([""], props)
+    return text, head
 
 
 _GRANTED_NOW_RE = re.compile(r"^\s*Now granted by Aghanim's (Scepter|Shard)\b", re.I)
