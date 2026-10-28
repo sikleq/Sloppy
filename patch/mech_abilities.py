@@ -137,6 +137,9 @@ def _parse_line(line):
     return None
 
 
+ALWAYS = "Always"
+
+
 def ability_list_rows(raw):
     """The note's lines as rows of icons, or None when it is not a list of abilities that all have an icon."""
     groups, caveats, notes = {}, {}, []
@@ -162,6 +165,14 @@ def ability_list_rows(raw):
     if sum(len(v) for v in groups.values()) < 2:
         return None
     from .elements import info_tip
+    # the plain abilities next to ones that need a condition ("with Aghanim's Scepter"): one row like the others,
+    # "Always" in its sentence cell — across the whole table it stood apart and the icons column shrank to the
+    # conditions' few icons (owner 2026-10-28, 7.41 Lifesteal "криво")
+    mixed = "" in groups and len(groups) > 1
+    if mixed:
+        groups = {ALWAYS: groups.pop(""), **groups}
+        if "" in caveats:
+            caveats[ALWAYS] = caveats.pop("")
     rows = ""                                          # the list's closing notes: the caller puts them in the row's text
     for sentence, chips in groups.items():
         tip = f" {info_tip(*caveats[sentence])}" if sentence in caveats else ""

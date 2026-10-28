@@ -57,10 +57,22 @@ def test_names_alone_are_one_row_of_icons_and_with_scepter_its_own():
     row = _mech_row(lambda: "Spells now only modify Health Restoration " + elements.info_tip(
         "Eye of Skadi's Cold Attack", "Sange", "Pudge's Rot with Aghanim's Scepter", "Audacious Enchantment",
         header="Affected spells:"))
-    assert 'class="mech-abil-row mech-abil-only"' in row
     assert "items/skadi.png" in row and "items/sange.png" in row and "enhancement_audacious.png" in row
     assert '<span class="mech-abil-text">With Aghanim\'s Scepter</span>' in row and "pudge_rot.png" in row
     assert "info-tip" not in row and "Affected spells:" not in row
+    # next to a condition the plain ones are a row in the same columns, "Always", first: across the whole table they
+    # stood apart and the icons column shrank to the Scepter's one icon (owner 2026-10-28, 7.41 "криво")
+    assert "mech-abil-only" not in row
+    rows = re.findall(r'<span class="mech-abil-text">([^<]*)</span>', row)
+    assert rows == ["Always", "With Aghanim's Scepter"]
+    always = row.split('<span class="mech-abil-text">Always</span>')[0].rsplit('<span class="mech-abil-row">', 1)[1]
+    assert "items/skadi.png" in always and "pudge_rot.png" not in always
+
+
+def test_names_alone_without_a_condition_stay_one_row_across():
+    row = _mech_row(lambda: "Spells now only modify Health Restoration " + elements.info_tip(
+        "Eye of Skadi's Cold Attack", "Sange", header="Affected spells:"))
+    assert 'class="mech-abil-row mech-abil-only"' in row and "Always" not in row
 
 
 def test_a_list_with_an_ability_without_an_icon_is_not_drawn_as_icons():
