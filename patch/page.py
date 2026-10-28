@@ -421,8 +421,46 @@ def _new_mech_rows(html):
             rest.append(body[last:it.start()])
             last = it.end()
         rest.append(body[last:])
+        if one_box and len(box) > 1:
+            box = [_one_paragraph(box)]
         return '<ul class="changes">' + "".join(box) + "".join(rest) + '</ul>'
     return _NEWMECH_UL_RE.sub(fix, html)
+
+
+_ROW_TEXT_RE = re.compile(r'^(<li\b[^>]*>)(.*?)<span class="row-text">(.*)</span></li>$', re.S)
+_TABLE_START_RE = re.compile(r'<span class="mech-(?:abils|pair)\b')
+
+
+def _one_paragraph(lis):
+    """A one_box block's rows as one paragraph, the sentences one after another with a full stop (owner 2026-10-28,
+    7.41 Reflected Damage: "не по одной строчке, а через точку в одну строку"); their tables after it, the row's
+    data-tag the union of theirs (each tag's filter still finds it)."""
+    parts, tables, tags, head = [], "", [], None
+    for li in lis:
+        m = _ROW_TEXT_RE.match(li)
+        if not m:
+            return "".join(lis)                       # a row of another shape: leave the lines as they are
+        open_tag, lead, inner = m.groups()
+        head = head or (open_tag, lead)
+        t = _TABLE_START_RE.search(inner)
+        text, table = (inner[:t.start()], inner[t.start():]) if t else (inner, "")
+        text = text.rstrip()
+        if text:
+            parts.append(text)
+        tables += table
+        tag = re.search(r'data-tag="([^"]*)"', open_tag)
+        tags += [x for x in (tag.group(1).split() if tag else []) if x not in tags]
+    open_tag, lead = head
+    open_tag = re.sub(r'data-tag="[^"]*"', f'data-tag="{" ".join(tags)}"', open_tag, count=1)
+    open_tag = re.sub(r'\bmech-desc[^"]*', "mech-desc mech-first mech-last", open_tag, count=1)
+    # a full stop between the sentences; the last one ends as every row of the site does, without one
+    text = " ".join(p if _plain_end(p).endswith((".", "!", "?", ":")) or n == len(parts) - 1 else p + "."
+                    for n, p in enumerate(parts))
+    return f'{open_tag}{lead}<span class="row-text">{text}{tables}</span></li>'
+
+
+def _plain_end(html_text):
+    return re.sub(r"<[^>]+>", "", re.sub(r"<!--TIP-->.*?<!--/TIP-->", "", html_text, flags=re.S)).rstrip()
 
 
 def save_html(filename):

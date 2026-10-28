@@ -356,8 +356,9 @@ Damage), Illusion, Invisibility, Regeneration, Arcane, Shield, Water, Wisdom (у
 - строки «Miscellaneous» раздела механик на одну тему (≥3, `_MISC_TOPICS`: reflected / reflection damage) генератор
   выносит в свой блок «<Тема>» с «Reworked mechanic» (`_postprocess_misc_topics`; владелец 2026-10-28, 7.41
   Reflected Damage: список источников из «?» — таблица значков) и `one_box=True`: ВСЕ строки списка — один бокс
-  описания без значков тегов (data-tag для фильтров остаётся), таблица последней строки — внутри бокса
-  («в одном блоке без тегов + таблица»);
+  описания без значков тегов, таблица последней строки — внутри бокса («в одном блоке без тегов + таблица»);
+  строки бокса — ОДИН абзац через точку, не строка на фразу (владелец 2026-10-28 «глупо смотрится»; page.py
+  `_one_paragraph`, data-tag абзаца — все теги строк, фильтры их находят);
 - строки Valve «X now <глагол> <новое> instead of <старое>» / «X now … — before, it …» в Reworked mechanic (≥2
   подряд) — одна таблица «Mechanic | Before | After» (`mech_before_after`, генератор `_postprocess_before_after`;
   владелец 2026-10-28, 7.41 Health Restoration «как было до и как стало после патча»); строка без текста — только

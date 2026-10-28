@@ -116,12 +116,14 @@ def test_one_box_block_puts_every_row_in_one_box_without_chips():
     finally:
         reset_page_state()
     out = page._new_mech_rows(html)
+    # one paragraph, the sentences through a full stop, not a line each (owner 2026-10-28: "глупо смотрится")
     lis = re.findall(r"<li\b[^>]*>", out)
-    assert len(lis) == 3 and all("mech-desc" in x for x in lis)
-    assert "mech-first" in lis[0] and "mech-last" in lis[2] and "mech-last" not in lis[1] and "mech-first" not in lis[2]
+    assert len(lis) == 1 and "mech-desc mech-first mech-last" in lis[0]
+    assert ('<span class="row-text">Lifesteal doesn\'t apply to reflected damage. Reflected damage cannot be '
+            'reflected back. All sources now have an ALT-note') in out
     chips = [out[m.start() - 80:m.start() + 60] for m in re.finditer('class="badge', out)]
-    assert not chips and 'data-tag="del' in out           # no chips, the tags kept for the filters
-    assert 'class="mech-abils mech-cols-icons"' in out
+    assert not chips and 'data-tag="rework del nerf qol"' in lis[0]   # no chips; every row's tag kept for the filters
+    assert 'class="mech-abils mech-cols-icons"' in out.split("ALT-note", 1)[1]    # the table after the paragraph
 
 
 def test_before_and_after_the_patch_is_a_table():
