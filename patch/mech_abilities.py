@@ -49,7 +49,8 @@ _ICON_ALIASES = {("warlock", "Golem"): "warlock_rain_of_chaos"}
 RUNE_ICONS = {"Bounty": "bounty", "Haste": "haste", "Double Damage": "doubledamage", "Amplify Damage": "doubledamage",
               "Illusion": "illusion",
               "Invisibility": "invisibility", "Regeneration": "regeneration", "Arcane": "arcane", "Shield": "shield",
-              "Water": "water", "Wisdom": "wisdom"}       # no "Power": the game has no icon of its own for it
+              "Water": "water", "Wisdom": "wisdom",
+              "Power": "power"}       # the game has none for the power runes as a whole: ours, gen_power_rune_icon.py
 _RUNE_ROW_RE = re.compile(r"(?P<name>[A-Z][a-z]+(?: [A-Z][a-z]+)?) Runes?:\s")
 _RUNE_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "icons", "runes")
 

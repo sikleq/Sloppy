@@ -11,9 +11,9 @@ wisdom/water, придерживаемся этого, остальные док
   scripts/gen/gen_terrain_layer_icons.py, from the Liquipedia map icons in icons/ref/);
 - water.png, wisdom.png: "<Name> Rune mapicon dota2 gameasset.png" from Liquipedia's Runes page, downloaded once
   through tools/liquipedia_cache.py's throttle and kept here (this script does not touch them);
-- no icon for the power runes as a whole: the client's HUD power-rune timer icon is the Water rune (owner
-  2026-10-28), and the Terrain page has none either (its button cycles the 7 runes) — a "Power Rune: …" row keeps
-  its words.
+- power.png, the power runes as a whole: the game has no icon for it (the client's HUD power-rune timer icon is the
+  Water rune, owner 2026-10-28; the Terrain page's button cycles the 7 runes), so it is our own, drawn from three of
+  the runes' icons by scripts/gen/gen_power_rune_icon.py (run it after this script; this one does not touch it).
 """
 import os
 import shutil

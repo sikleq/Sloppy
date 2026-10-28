@@ -324,8 +324,11 @@ Damage), Illusion, Invisibility, Regeneration, Arcane, Shield, Water, Wisdom (у
 миникарты, как на странице Terrain (владелец 2026-10-28: «в terrain всё есть кроме wisdom/water, придерживаемся этого,
 остальные докачиваем»): 7 power-рун и Bounty копируются из `icons/ui/gothic/tc_rune_0..6`, `tc_bounty`
 (`python scripts/fetch/fetch_rune_icons.py`); Water и Wisdom — «<Name> Rune mapicon dota2 gameasset.png» с Liquipedia
-(через `tools/liquipedia_cache.py`), лежат в `icons/runes/` как есть. Общего значка power-руны нет: значок таймера HUD
-— это руна воды; строка «Power Rune: …» остаётся текстом. Прозрачный значок лежит на тёмном квадрате
+(через `tools/liquipedia_cache.py`), лежат в `icons/runes/` как есть. Общего значка power-рун в игре нет (значок
+таймера HUD — это руна воды), поэтому `icons/runes/power.png` — свой: связка из трёх значков рун игры (Regeneration
+сзади слева, Haste сзади справа, крупнее спереди Double Damage; выбор владельца 2026-10-28 из трёх вариантов —
+связка / кристалл в семи цветах / кольцо из семи камней), генератор `scripts/gen/gen_power_rune_icon.py` (запускать
+после `fetch_rune_icons.py`); строка «Power Rune: …» показывает его. Прозрачный значок лежит на тёмном квадрате
 (`.ability-chip > img` background), чтобы при увеличении не просвечивал текст. Тест:
 `tests/test_runes_and_two_colours.py`.
 

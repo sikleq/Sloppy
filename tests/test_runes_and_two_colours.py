@@ -24,8 +24,25 @@ def test_illusion_has_its_icon_and_a_row_without_a_rune_keeps_its_text():
     assert "icons/runes/illusion.png" in rune_row_chip("Illusion Rune: Illusions now …")
     assert rune_row_chip("Rune spawn interval increased") == "Rune spawn interval increased"
     assert rune_row_chip("Fire Rune: x") == "Fire Rune: x"
-    # no icon of its own for the power runes (the HUD timer's is the Water rune, owner 2026-10-28)
-    assert rune_row_chip("Power Rune: spawn every 2 minutes") == "Power Rune: spawn every 2 minutes"
+
+
+def test_a_power_rune_row_shows_our_own_power_rune_icon():
+    # the game has none for the power runes as a whole (the HUD timer's is the Water rune): ours (owner 2026-10-28)
+    out = rune_row_chip("Power Rune: spawn every 2 minutes")
+    assert 'data-tooltip="Power Rune"' in out and "icons/runes/power.png" in out
+    assert out.endswith("</span>Spawn every 2 minutes")
+    assert 'data-tooltip="Power Rune"' in rune_row_chip("Power Runes: x")
+
+
+def test_the_power_rune_icon_is_the_generators_bunch_of_three_runes():
+    """power.png is what scripts/gen/gen_power_rune_icon.py draws (not a hand-made file): 32 px, transparent round
+    the bunch, with the front Double Damage's blue and the Regeneration green and Haste red behind it."""
+    from PIL import Image, ImageChops
+    import gen_power_rune_icon as gp
+    on_disk = Image.open(os.path.join(ROOT, "icons", "runes", "power.png")).convert("RGBA")
+    assert on_disk.size == (32, 32) and on_disk.getpixel((0, 31))[3] == 0
+    assert ImageChops.difference(on_disk, gp.power_icon()).getbbox() is None
+    assert [k for k, _, _ in gp.BUNCH] == ["regeneration", "haste", "doubledamage"]
 
 
 def test_runes_share_the_terrain_page_icons():
