@@ -152,10 +152,38 @@ def ability_list_rows(raw):
     return f'<span class="mech-abils">{rows}</span>', notes
 
 
-def text_list_rows(raw):
+_EXAMPLES_RE = re.compile(r"^(?:(?P<pre>.*?),?\s+like\s+|Examples?:\s*)(?P<list>.+)$", re.S)
+# a mechanic named without an owner: the icon of what players know it from (7.38 "Examples: Cleave, …")
+_GENERIC_ICONS = {"Cleave": f"{ITEM_CDN}bfury.png"}
+
+
+def _example_chip(name):
+    """An example's icon (an item, "<Owner>'s <Ability>", "Blade Mail return damage" -> Blade Mail), else its name."""
+    if name in _GENERIC_ICONS:
+        return ability_chip(name, _GENERIC_ICONS[name])
+    words = name.split()
+    for n in range(len(words), 0, -1):
+        parsed = _parse_line(" ".join(words[:n]))
+        if parsed and not parsed[2]:
+            return ability_chip(name, parsed[1])
+    return f'<span class="mech-ex-name">{name}</span>'
+
+
+def _split_examples(caveat):
+    """"Examples: Cleave, Luna's Bouncing Glaives" -> ("", [chips]); "Effects that don't break Blink Dagger, like Orb
+    of Venom or Necrophos' Heartstopper Aura" -> ("Effects that don't break Blink Dagger", [chips]); else None."""
+    m = _EXAMPLES_RE.match(caveat)
+    if not m:
+        return None
+    names = [x.strip() for x in re.split(r",\s*|\s+or\s+|\s+and\s+", m.group("list")) if x.strip()]
+    return (m.group("pre") or "").strip(), [_example_chip(x) for x in names]
+
+
+def text_list_rows(raw, row_text=""):
     """A list that names no abilities (7.38 Lifesteal "The following sources and targets do not provide any
     lifesteal"): its lines as the table's rows, open on the page instead of behind a "?" (owner 2026-10-28); a line's
-    caveat in brackets is a "?" after it. None for a single line or a list with sub-items (it stays a "?")."""
+    caveat in brackets is a "?" after it, its examples ("Examples: …", "… like X or Y") a column of icons. None for
+    a single line or a list with sub-items (it stays a "?")."""
     lines, notes = [], []
     for line in (x.strip() for x in raw.split("<br>")):
         if not line:
@@ -170,16 +198,62 @@ def text_list_rows(raw):
     if len(lines) < 2:
         return None
     from .elements import info_tip
-    rows = ""
+    cells = []                                   # (the line with its "?", its examples' icons)
     for line in lines:
+        examples = ""
         m = _TRAIL_NOTE_RE.search(line)
         if m:
-            line = f"{line[:m.start()]} {info_tip(_sentence(m.group(1)))}"
-        rows += f'<span class="mech-abil-row"><span class="mech-abil-line">{line}</span></span>'
-    return f'<span class="mech-abils">{rows}</span>', notes
+            line, caveat = line[:m.start()].rstrip(), m.group(1).strip()
+            split = _split_examples(caveat)
+            if split:
+                caveat, chips = split
+                examples = "".join(chips)
+            if caveat:
+                line = f"{line} {info_tip(_sentence(caveat))}"
+        cells.append((line, examples))
+    if not any(ex for _l, ex in cells):
+        rows = "".join(f'<span class="mech-abil-row"><span class="mech-abil-line">{line}</span></span>'
+                       for line, _ex in cells)
+        return f'<span class="mech-abils">{rows}</span>', notes
+    # every column has its title (owner 2026-10-28): the first one names what the row lists ("The following sources
+    # and targets …" -> "Sources and targets"); an empty examples cell is a short dash
+    rows = (f'<span class="mech-abil-row mech-head"><span class="mech-cell mech-label">{_list_title(row_text)}</span>'
+            '<span class="mech-cell">Examples</span></span>')
+    rows += "".join(f'<span class="mech-abil-row"><span class="mech-cell mech-label">{line}</span>'
+                    f'<span class="mech-cell mech-ex">{ex or "–"}</span></span>' for line, ex in cells)
+    return f'<span class="mech-abils mech-cols-ex">{rows}</span>', notes
 
 
-def lift_ability_lists(tips, open_text=False):
+_FOLLOWING_RE = re.compile(r"\bthe following ([a-z][a-z ]*?)(?= (?:do|does|have|has|are|is|will|can|no|now)\b|$)",
+                           re.I)
+
+
+def _list_title(row_text):
+    """What a row's list is ("The following sources and targets do not …" -> "Sources and targets"), else "Case"."""
+    m = _FOLLOWING_RE.search(re.sub(r"<[^>]+>", "", row_text or ""))
+    return _sentence(m.group(1)) if m else "Case"
+
+
+def mech_table(head, rows):
+    """A mechanic's rules as a table written in the content (7.38 Lifesteal: Lifesteal / Spell Lifesteal × what each
+    applies to × its cut against non-heroes — Valve's three sentences, owner 2026-10-28 "неудобно читается"). head: the
+    column titles; rows: lists of cells, or a str for a line across the whole table. The first column reads as a
+    label (left), the others are values (centred). li() puts it under the row's text."""
+    cols = len(head)
+    out = ('<span class="mech-abil-row mech-head">'
+           + "".join(f'<span class="mech-cell{" mech-label" if i == 0 else ""}">{h}</span>' for i, h in enumerate(head))
+           + '</span>')
+    for row in rows:
+        if isinstance(row, str):
+            out += f'<span class="mech-abil-row"><span class="mech-abil-line">{row}</span></span>'
+        else:
+            out += ('<span class="mech-abil-row">' + "".join(
+                f'<span class="mech-cell{" mech-label" if i == 0 else ""}">{c}</span>' for i, c in enumerate(row))
+                + '</span>')
+    return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}">{out}</span><!--/MECHTABLE-->'
+
+
+def lift_ability_lists(tips, open_text=False, row_text=""):
     """A mechanic row's trailing "?" notes: (the ones left, the tables that replace the others, the lists' closing
     notes — they go into the row's own text, "in one line with it" (owner 2026-10-28, 7.40 "All three of these …")).
     open_text: a list without abilities the row introduces (inline_list) opens too — only in a "Reworked mechanic"
@@ -189,7 +263,7 @@ def lift_ability_lists(tips, open_text=False):
     for tip in tips:
         raw = TIP_RAW.get(tip)
         found = raw is not None and (ability_list_rows(raw)
-                                     or (open_text and tip in LIST_TIPS and text_list_rows(raw)))
+                                     or (open_text and tip in LIST_TIPS and text_list_rows(raw, row_text)))
         if found:
             rows += found[0]
             notes += found[1]

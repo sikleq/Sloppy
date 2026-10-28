@@ -402,10 +402,14 @@ def _new_mech_rows(html):
         if not box_idx:
             return '<ul class="changes">' + body + '</ul>'
         box, rest, last = [], [], 0
-        for i, it in enumerate(items):
-            if i not in box_idx:
-                continue
-            cls = "mech-desc" + (" mech-first" if i == box_idx[0] else "") + (" mech-last" if i == box_idx[-1] else "")
+        # a row with its table (7.38 Lifesteal, 7.40 Cyclone cases) is a box of its own, apart from the rows around
+        # it (owner 2026-10-28: "в отдельном блоке, с отступом от предыдущего")
+        tabled = {i for i in box_idx if 'class="mech-abils' in items[i].group(0)}
+        for n, i in enumerate(box_idx):
+            first = n == 0 or i in tabled or box_idx[n - 1] in tabled
+            end = n == len(box_idx) - 1 or i in tabled or box_idx[n + 1] in tabled
+            it = items[i]
+            cls = "mech-desc" + (" mech-first" if first else "") + (" mech-last" if end else "")
             li = chip_re.sub(r'\1<span class="row-tag-empty"></span>', it.group(0), count=1)
             li = (re.sub(r'class="([^"]*)"', lambda mm: f'class="{mm.group(1)} {cls}"', li, count=1)
                   if re.match(r'<li\b[^>]*\bclass="', li) else li.replace('<li', f'<li class="{cls}"', 1))

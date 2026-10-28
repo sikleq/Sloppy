@@ -4,6 +4,7 @@ import os
 import re
 
 from patch import elements
+from patch.mech_abilities import mech_table
 from patch.state import _State, reset_page_state
 
 
@@ -78,9 +79,39 @@ def test_a_reworked_mechanic_shows_a_plain_list_open_as_a_table():
     """7.38 Lifesteal "The following sources and targets do not provide any lifesteal" (owner 2026-10-28)."""
     row = _mech_row(lambda: "The following sources and targets do not provide any lifesteal",
                     extra=lambda: elements.inline_list(_SOURCES))
-    assert row.count('class="mech-abil-line"') == 3
-    assert '<span class="mech-abil-line">Reflected damage</span>' in row
-    assert "Attacks that do not proc Attack Modifiers <!--TIP-->" in row and "Examples: Cleave" in row
+    # its examples are a column of icons, with a header (owner 2026-10-28: "в примерах нет иконок")
+    assert 'class="mech-abils mech-cols-ex"' in row and '<span class="mech-cell">Examples</span>' in row
+    assert '<span class="mech-cell mech-label">Reflected damage</span>' in row
+    assert ('<span class="mech-cell mech-label">Attacks that do not proc Attack Modifiers</span>'
+            '<span class="mech-cell mech-ex"><span class="ability-chip" data-tooltip="Cleave"') in row
+    assert "info-tip" not in row
+    # every column titled, an empty examples cell a short dash (owner 2026-10-28)
+    assert '<span class="mech-cell mech-label">Sources and targets</span>' in row
+    assert ('<span class="mech-cell mech-label">Reflected damage</span><span class="mech-cell mech-ex">–</span>'
+            in row)
+
+
+def test_examples_find_their_icons_and_the_rest_stays_a_question_mark():
+    from patch.mech_abilities import _split_examples
+    pre, chips = _split_examples("Effects that don't break Blink Dagger, like Orb of Venom or Necrophos' "
+                                 "Heartstopper Aura")
+    assert pre == "Effects that don't break Blink Dagger"
+    assert "items/orb_of_venom.png" in chips[0] and "necrolyte_heartstopper_aura.png" in chips[1]
+    _pre, chips = _split_examples("Example: Blade Mail return damage")
+    assert "items/blade_mail.png" in chips[0] and 'data-tooltip="Blade Mail return damage"' in chips[0]
+    _pre, chips = _split_examples("Examples: Cleave, Luna's Bouncing Glaives")
+    assert "luna_moon_glaive.png" in chips[1]
+
+
+def test_mech_table_lays_out_columns_under_the_row():
+    row = _mech_row(lambda: "Lifesteal mechanics are now consistent across every ability",
+                    extra=lambda: mech_table(["", "Applies to"],
+                                             [["Lifesteal", "Attacks"], "Neither applies to pure damage"]))
+    text = row.split('<span class="row-text">', 1)[1]
+    assert text.startswith("Lifesteal mechanics are now consistent across every ability<span class=\"mech-abils "
+                           "mech-cols-2\">")
+    assert '<span class="mech-cell mech-label">Lifesteal</span><span class="mech-cell">Attacks</span>' in text
+    assert '<span class="mech-abil-line">Neither applies to pure damage</span>' in text
 
 
 def test_a_new_mechanic_keeps_its_plain_list_behind_the_question_mark():

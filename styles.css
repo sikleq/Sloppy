@@ -4417,7 +4417,40 @@ h4.subgroup {
 .mech-abil-only > .mech-abil-icons,                     /* the names alone (7.41 "Affected spells") */
 .mech-abil-line { grid-column: 1 / -1; border-right: 0; line-height: 1.45; }  /* a list without abilities */
 .mech-abil-icons .ability-chip { margin-right: 0; vertical-align: 0; }
-.mech-row-note { color: var(--text-dim, #969289); }        /* a list's closing note, in the row's own line */
+/* a list's closing note, in the row's own line and its colour (owner 2026-10-28: "не надо серым") */
+.mech-row-note { color: inherit; }
+/* cells of a table with columns: a list with its examples (7.38 Lifesteal sources), mech_table (Lifesteal rules) */
+.mech-abils.mech-cols-ex { grid-template-columns: 1fr fit-content(40%); }
+.mech-abils.mech-cols-3 { grid-template-columns: fit-content(28%) minmax(0, 1fr) fit-content(28%); }
+.mech-abils.mech-cols-4 { grid-template-columns: fit-content(22%) minmax(0, 1fr) fit-content(20%) fit-content(22%); }
+.mech-abils.mech-cols-2 { grid-template-columns: fit-content(35%) minmax(0, 1fr); }
+.mech-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  line-height: 1.45;
+  border-right: 1px solid var(--line-soft);
+}
+.mech-cell:last-child { border-right: 0; }
+.mech-cell.mech-label { justify-content: flex-start; text-align: left; column-gap: 5px; }
+/* the header row a shade darker than the table, to stand out from it (owner 2026-10-28) */
+.mech-head > .mech-cell {
+  color: var(--text-dim, #969289);
+  font-size: 12px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  background: var(--shadow-28);
+}
+.mech-head:first-child > .mech-cell:first-child { border-top-left-radius: 5px; }
+.mech-head:first-child > .mech-cell:last-child { border-top-right-radius: 5px; }
+.mech-ex-name { white-space: nowrap; }
+@media (max-width: 600px) { .mech-abil-row > span { padding-left: 6px; padding-right: 6px; } }
+/* a row with its table stands as a box of its own (page.py), with air above it */
+ul.changes li.mech-desc.mech-first + li.mech-desc.mech-first,
+ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; }
 /* an ability's square grows on hover to be made out (owner 2026-10-28); its name moves up above the grown icon */
 .ability-chip > img { transition: transform 0.12s ease; transform-origin: center; }
 .ability-chip:hover { z-index: 101; }

@@ -134,10 +134,16 @@ def build():
 
     W(plain_header("Lifesteal", new="Reworked mechanic"))
     W(ul_open())
-    W(li("Individual abilities no longer have special rules about how lifesteal works in different situations (heroes vs creeps vs illusions, damage types, etc.). Lifesteal mechanics are now consistent across every ability", t("REWORK"), extra=inline_list("Lifesteal applies to physical damage from attacks and is reduced by 40% when damaging non-heroes<br>Spell Lifesteal now applies to physical damage from spells and magical damage from spells or attacks and is reduced by 80% when damaging non-heroes<br>Neither Lifesteal nor Spell Lifesteal applies to pure damage")))
+    W(li("Individual abilities no longer have special rules about how lifesteal works in different situations (heroes vs creeps vs illusions, damage types, etc.). Lifesteal mechanics are now consistent across every ability", t("REWORK"), extra=mech_table(
+        # pure damage: a column of its own, not a line under the table (owner 2026-10-28)
+        ["Type", "Applies to", "Pure damage", "Against non-heroes"],
+        [["Lifesteal", "Physical damage from attacks", "Doesn't apply", "Reduced by 40%"],
+         ["Spell Lifesteal", "Physical damage from spells<br>Magical damage from spells or attacks", "Doesn't apply",
+          "Reduced by 80%"]])))
     W(li("The following sources and targets do not provide any lifesteal", t("REWORK"), extra=inline_list("Attacks that do not proc Attack Modifiers <span class=\"pop-note\">(Examples: Cleave, Luna's Bouncing Glaives)</span><br>Attack damage against wards, buildings, or couriers<br>Spell damage against illusions, wards, buildings, or couriers<br>Reflected damage <span class=\"pop-note\">(Example: Blade Mail return damage)</span><br>Spells that remove Health instead of dealing direct damage <span class=\"pop-note\">(Effects that don't break Blink Dagger, like Orb of Venom or Necrophos' Heartstopper Aura)</span><br>Any damage dealt to self or allies")))
     W(li("A small number of abilities that do not use Lifesteal or Spell Lifesteal still result in healing and can benefit from Lifesteal Amp", t("REWORK"), extra=inline_note("Lifestealer's Open Wounds heals attackers for a percentage of the damage done<br>Lifestealer's Feast heals for a percentage of the target's max health<br>Meepo's Ransack heals all Meepos a flat amount for each strike<br><span class=\"pop-note\">Holding Alt while looking at tooltips for these abilities will describe their interaction with Lifesteal Amp</span>")))
-    W(li("Holding Alt while looking at items that provide Lifesteal or Spell Lifesteal will show the lifesteal percentages for attacking and casting spells, and targeting creeps vs heroes", t("QoL")))
+    # Valve's QoL row "Holding Alt while looking at items that provide Lifesteal … will show the lifesteal
+    # percentages" left out: the block above already says it (owner 2026-10-28)
     W(ul_close())
 
     # ===== NEUTRAL CREEP UPDATES =====

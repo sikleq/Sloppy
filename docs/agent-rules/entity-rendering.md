@@ -334,6 +334,13 @@ extra=inline_note(info_tip("Batrider's Arsonist", "Magnus' Diminishing Return", 
   генератор пишет `inline_list(...)` вместо `inline_note(...)`; в «Reworked mechanic» он открыт таблицей
   (7.38 Lifesteal: правила и «sources and targets»). Пояснения (7.38 Tormentor «Or at Dire side in Turbo») —
   `inline_note`, остаются «?». В «New mechanic» `inline_list` пока тоже «?» — открывать там только по слову владельца;
+- примеры строки («(Examples: Cleave, Luna's Bouncing Glaives)», «… like Orb of Venom or …») — своя колонка
+  «Examples» со значками; пустая ячейка — «–»; первая колонка подписана тем, что перечисляет строка («The following
+  sources and targets …» → «Sources and targets», иначе «Case»); шапка таблицы темнее (`--shadow-28`);
+- каждая строка со своей таблицей — отдельный блок с отступом (`page.py _new_mech_rows`);
+- ВРУЧНУЮ в контенте (генератор этого не выводит): `mech_table(head, rows)` — правила с колонками (7.38 Lifesteal:
+  Type | Applies to | Pure damage | Against non-heroes, из трёх фраз Valve); убранная строка-повтор (7.38 QoL
+  «Holding Alt while looking at items …» — то же, что в блоке выше). При перегенерации 7.38 — сохранить;
 - вид — таблица, как все таблицы сайта: тонкие линии `--line-soft` между строками и между «значки | фраза», рамка;
   значки по центру ячейки, фраза слева (это подпись, не значение);
 - категории «Items — », «Heroes» отбрасываются — вид значка и так говорит, чьё.

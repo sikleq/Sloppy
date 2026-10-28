@@ -152,6 +152,8 @@ _ENCHANT_DESC = {
 ABILITY_DISPLAY_TO_SLUG = {
     ("antimage", "Persecutor"): "persectur",
     ("grimstroke", "Soulbind"): "soul_chain",
+    ("luna", "Bouncing Glaives"): "moon_glaive",
+    ("luna", "Moon Glaives"): "moon_glaive",
     ("ogre_magi", "Fire Shield"): "smash",
     ("alchemist", "Greevil's Greed"): "goblins_greed",
     ("bounty_hunter", "Shadow Walk"): "wind_walk",
@@ -1870,10 +1872,15 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         extra = re.sub(r'<!--INLINETIP-->.*?<!--/INLINETIP-->', '', extra, flags=re.S)
         trailing_tips.extend(_lifted)
     _abil_rows = ""
+    if isinstance(extra, str) and '<!--MECHTABLE-->' in extra:      # mech_table: under the row's text
+        _abil_rows = "".join(re.findall(r'<!--MECHTABLE-->(.*?)<!--/MECHTABLE-->', extra, re.S))
+        extra = re.sub(r'<!--MECHTABLE-->.*?<!--/MECHTABLE-->', '', extra, flags=re.S)
     if _State.new_mech and isinstance(text_base, str):
         # a reworked mechanic's list of abilities: rows of icons under the text, not a "?" (owner 2026-10-28)
-        trailing_tips, _abil_rows, _list_notes = lift_ability_lists([x.strip() for x in trailing_tips],
-                                                                    open_text=_State.new_mech_tag == "rework")
+        trailing_tips, _lifted_rows, _list_notes = lift_ability_lists([x.strip() for x in trailing_tips],
+                                                                    open_text=_State.new_mech_tag == "rework",
+                                                                    row_text=text_base)
+        _abil_rows += _lifted_rows
         for _n in _list_notes:              # "All three of these …": in one line with the row's text (owner 2026-10-28)
             _end = "" if text_base.rstrip().endswith((".", ":", "!", "?")) else "."
             text_base = f'{text_base.rstrip()}{_end} <span class="mech-row-note">{_n}</span>'
