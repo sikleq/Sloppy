@@ -49,12 +49,15 @@ def test_a_list_the_row_introduces_is_an_inline_list():
     listed = [{"note": "Lifesteal mechanics are now consistent across every ability:", "indent_level": 1},
               {"note": "Lifesteal applies to physical damage from attacks", "indent_level": 2},
               {"note": "Neither applies to pure damage", "indent_level": 2}]
-    lines, _ = gen._emit_notes(listed)
+    lines, _ = gen._emit_notes(listed, general=True)
     row = next(x for x in lines if x.startswith("W(li("))
     assert "extra=inline_list(" in row and "every ability:" not in row
+    # a hero's / item's list keeps inline_note: the rule stays in General Updates (owner 2026-10-28)
+    lines, _ = gen._emit_notes(listed)
+    assert "extra=inline_note(" in next(x for x in lines if x.startswith("W(li("))
     plain = [{"note": "Tormentor is also dependent on the day and night cycle", "indent_level": 1},
              {"note": "Or at Dire side in Turbo", "indent_level": 2}]
-    lines, _ = gen._emit_notes(plain)
+    lines, _ = gen._emit_notes(plain, general=True)
     row = next(x for x in lines if x.startswith("W(li("))
     assert "extra=inline_note(" in row
 

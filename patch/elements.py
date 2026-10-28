@@ -1875,7 +1875,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     if isinstance(extra, str) and '<!--MECHTABLE-->' in extra:      # mech_table: under the row's text
         _abil_rows = "".join(re.findall(r'<!--MECHTABLE-->(.*?)<!--/MECHTABLE-->', extra, re.S))
         extra = re.sub(r'<!--MECHTABLE-->.*?<!--/MECHTABLE-->', '', extra, flags=re.S)
-    if _State.new_mech and isinstance(text_base, str):
+    # only in General Updates, where the mechanics are: other parts of the site keep their "?" (owner 2026-10-28)
+    if _State.new_mech and _State.current_section_slug == "general" and isinstance(text_base, str):
         # a reworked mechanic's list of abilities: rows of icons under the text, not a "?" (owner 2026-10-28)
         trailing_tips, _lifted_rows, _list_notes = lift_ability_lists([x.strip() for x in trailing_tips],
                                                                     open_text=_State.new_mech_tag == "rework",

@@ -241,16 +241,28 @@ def mech_table(head, rows):
     label (left), the others are values (centred). li() puts it under the row's text."""
     cols = len(head)
     out = ('<span class="mech-abil-row mech-head">'
-           + "".join(f'<span class="mech-cell{" mech-label" if i == 0 else ""}">{h}</span>' for i, h in enumerate(head))
+           + "".join(f'<span class="mech-cell{" mech-label" if i == 0 and cols > 1 else ""}">{h}</span>' for i, h in enumerate(head))
            + '</span>')
     for row in rows:
         if isinstance(row, str):
             out += f'<span class="mech-abil-row"><span class="mech-abil-line">{row}</span></span>'
         else:
             out += ('<span class="mech-abil-row">' + "".join(
-                f'<span class="mech-cell{" mech-label" if i == 0 else ""}">{c}</span>' for i, c in enumerate(row))
+                f'<span class="mech-cell{" mech-label" if i == 0 and cols > 1 else ""}">{c}</span>' for i, c in enumerate(row))
                 + '</span>')
     return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}">{out}</span><!--/MECHTABLE-->'
+
+
+def mech_pair(main, side):
+    """Two mech_tables side by side, their rows level with each other (owner 2026-10-28, 7.38 Lifesteal: "Against
+    non-heroes" a block of its own next to the damage types). Both must have the same number of rows."""
+    def body(t):
+        return re.sub(r"<!--/?MECHTABLE-->", "", t)
+    rows = body(main).count('class="mech-abil-row')
+    if rows != body(side).count('class="mech-abil-row'):
+        raise ValueError("mech_pair: the two tables need the same number of rows")
+    return (f'<!--MECHTABLE--><span class="mech-pair" style="--mech-rows:{rows}">{body(main)}{body(side)}</span>'
+            '<!--/MECHTABLE-->')
 
 
 def lift_ability_lists(tips, open_text=False, row_text=""):

@@ -8,11 +8,12 @@ from patch.mech_abilities import mech_table
 from patch.state import _State, reset_page_state
 
 
-def _mech_row(text, extra=None, new="Reworked mechanic"):
+def _mech_row(text, extra=None, new="Reworked mechanic", section="General Updates"):
     """text / extra: callables, run inside the page (its notes are the page's own)."""
     reset_page_state()
     _State.current_patch_version = "7.40"
     try:
+        elements.section(section)
         elements.plain_header("Invulnerability Targeting", new=new)
         elements.ul_open()
         return elements.li(text(), '<span class="badge rework" data-tag="rework">REWORK</span>',
@@ -131,6 +132,21 @@ def test_icons_grow_on_hover():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     css = open(os.path.join(root, "styles.css"), encoding="utf-8").read()
     assert re.search(r"\.ability-chip:hover > img \{[^}]*transform: scale\(", css)
+
+
+def test_outside_general_updates_the_list_stays_a_note():
+    """Mechanics live in General Updates; the rules do not reach other parts of the site (owner 2026-10-28)."""
+    row = _mech_row(lambda: "Spells changed " + elements.info_tip("Sniper's Assassinate", "Dark Seer's Vacuum"),
+                    section="Neutral Creep Updates")
+    assert "mech-abils" not in row and "info-tip" in row
+
+
+def test_two_tables_side_by_side_keep_their_rows_level():
+    from patch.mech_abilities import mech_pair
+    html = mech_pair(mech_table(["Type", "Physical damage"], [["Lifesteal", "From attacks"]]),
+                     mech_table(["Against non-heroes"], [["Reduced by 40%"]]))
+    assert 'class="mech-pair" style="--mech-rows:2"' in html
+    assert '<span class="mech-cell">Reduced by 40%</span>' in html        # one column: centred, not a label
 
 
 def test_outside_a_mechanic_block_the_list_stays_a_note():

@@ -338,8 +338,12 @@ extra=inline_note(info_tip("Batrider's Arsonist", "Magnus' Diminishing Return", 
   «Examples» со значками; пустая ячейка — «–»; первая колонка подписана тем, что перечисляет строка («The following
   sources and targets …» → «Sources and targets», иначе «Case»); шапка таблицы темнее (`--shadow-28`);
 - каждая строка со своей таблицей — отдельный блок с отступом (`page.py _new_mech_rows`);
-- ВРУЧНУЮ в контенте (генератор этого не выводит): `mech_table(head, rows)` — правила с колонками (7.38 Lifesteal:
-  Type | Applies to | Pure damage | Against non-heroes, из трёх фраз Valve); убранная строка-повтор (7.38 QoL
+- ГДЕ: все эти правила — только в General Updates (там механики; владелец 2026-10-28): сборка проверяет
+  `current_section_slug == "general"`, генератор — `_emit_notes(general=True)` и раздел в
+  `_postprocess_mechanic_rules_row`. Герои, предметы, крипы не затрагиваются;
+- ВРУЧНУЮ в контенте (генератор этого не выводит): `mech_table(head, rows)` — правила с колонками и
+  `mech_pair(main, side)` — две таблицы рядом, строки вровень (7.38 Lifesteal: Type | Physical | Magical | Pure
+  damage и рядом отдельный блок «Against non-heroes», из трёх фраз Valve); убранная строка-повтор (7.38 QoL
   «Holding Alt while looking at items …» — то же, что в блоке выше). При перегенерации 7.38 — сохранить;
 - вид — таблица, как все таблицы сайта: тонкие линии `--line-soft` между строками и между «значки | фраза», рамка;
   значки по центру ячейки, фраза слева (это подпись, не значение);

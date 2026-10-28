@@ -4422,6 +4422,16 @@ h4.subgroup {
 /* cells of a table with columns: a list with its examples (7.38 Lifesteal sources), mech_table (Lifesteal rules) */
 .mech-abils.mech-cols-ex { grid-template-columns: 1fr fit-content(40%); }
 .mech-abils.mech-cols-3 { grid-template-columns: fit-content(28%) minmax(0, 1fr) fit-content(28%); }
+/* two tables side by side, their rows level (subgrid): 7.38 Lifesteal damage types | Against non-heroes */
+.mech-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) fit-content(30%);
+  grid-template-rows: repeat(var(--mech-rows), auto);
+  column-gap: 12px;
+  margin: 6px 0 2px;
+}
+.mech-pair > .mech-abils { grid-row: 1 / -1; grid-template-rows: subgrid; margin: 0; }
+.mech-abils.mech-cols-1 { grid-template-columns: auto; }
 .mech-abils.mech-cols-4 { grid-template-columns: fit-content(22%) minmax(0, 1fr) fit-content(20%) fit-content(22%); }
 .mech-abils.mech-cols-2 { grid-template-columns: fit-content(35%) minmax(0, 1fr); }
 .mech-cell {

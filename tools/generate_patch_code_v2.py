@@ -1047,7 +1047,7 @@ def _fold_into_row(lines, idx, text):
         lines[idx] = old_line[:k] + joiner
 
 def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
-                loc_map=None, current_ability_slug=None):
+                loc_map=None, current_ability_slug=None, general=False):
     """Walk notes array, respecting indent_level hierarchy and special
     fields (hide_dot, info, aghanims). Returns list of source lines.
 
@@ -1136,9 +1136,10 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
                       if not _DMG_L1_RE.search(_strip_html(notes[j].get('note') or ''))]
             if folded:
                 # a list the row introduces ("…every ability:", "The following …"): inline_list, a table open under
-                # the row in a Reworked mechanic (owner 2026-10-28, 7.38 Lifesteal); clarifications stay a "?"
-                is_list = (bool(re.search(r':\s*(?=")', lines[-1])) or clean.lower().startswith("the following ")) \
-                    and 'extra=' not in lines[-1]
+                # the row in a Reworked mechanic (owner 2026-10-28, 7.38 Lifesteal); clarifications stay a "?". Only
+                # in General Updates, where the mechanics are — heroes / items keep their "?" (owner 2026-10-28)
+                is_list = general and (bool(re.search(r':\s*(?=")', lines[-1]))
+                                       or clean.lower().startswith("the following ")) and 'extra=' not in lines[-1]
                 lines[-1] = re.sub(r':(?=")', '', lines[-1], count=1)   # "…the following:" → "…the following"
                 _fold_into_row(lines, len(lines) - 1, _nested_info_text(notes, lvl, folded))
                 if is_list:
@@ -1185,7 +1186,7 @@ def _render_general_note(note):
         out.append(f'\nW(plain_header("{title}"))')
     if not _has_rows(notes):
         return out
-    body, _ = _emit_notes(notes)
+    body, _ = _emit_notes(notes, general=True)
     out.extend(_general_topics(_bonus_from_note(_merge_all_followup(_link_lane_creeps(body))), title))
     return out
 
@@ -2959,8 +2960,11 @@ def _postprocess_mechanic_rules_row(lines, after_label=False):
     pass: a row that only restates its header ("Invulnerability targeting rules of certain items and abilities have
     been updated" under "Invulnerability Targeting") goes — the header says it. After it: the rows of a "Reworked
     mechanic" block in ONE list (Valve's blank line between them had split it in two)."""
-    out, title, mech = [], "", False
+    out, title, mech, general = [], "", False, True
     for line in lines:
+        if line.lstrip('\n').startswith('W(section('):
+            # mechanics live in General Updates: the rules stay there (owner 2026-10-28)
+            general = 'General' in line
         head = _BLOCK_HEAD_RE.match(line.lstrip('\n'))
         if head:
             title = head.group('title') if head.group('fn') == 'plain_header' else ""
@@ -2974,7 +2978,7 @@ def _postprocess_mechanic_rules_row(lines, after_label=False):
         if after_label and mech and line == 'W(ul_open())' and out and out[-1] == 'W(ul_close())':
             out.pop()
             continue
-        if after_label and mech and out and _join_following_list(out, line):
+        if after_label and mech and general and out and _join_following_list(out, line):
             continue
         out.append(line)
     return out
