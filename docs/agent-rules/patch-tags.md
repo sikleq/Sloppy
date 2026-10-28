@@ -496,6 +496,8 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 | «Treant / Eidolon gold bounty …» | **NERF** при росте | золото получает враг; LOWER_IS_BUFF знает treant, eidolon |
 | «Imps no longer explode if killed by enemy heroes» | **DEL** | эффект убран |
 | «charge restoration time», «Outgoing Spell Damage reflected» (QoP) | **`l=True`** | своё ожидание заряда; свой урон по себе |
+| «Improved behavior when casting at maximum cast range» | **QoL** | удобство управления, не сила (владелец 2026-10-28, Stroke of Fate) |
+| «from 18-24 on all levels to 16/24/32/40», «from 14-20 to 17-20» | **`b(21, [...])`** / **`br(14, 20, 17, 20)`** | старый разброс сравнивается по середине, % на каждый уровень (владелец 2026-10-28, Treant); генератор `_emit_range_badge` |
 
 Генератор: `TAG_OVERRIDES`, `LOWER_IS_BUFF` (`tools/generate_patch_code_v2.py`). Тест `tests/test_review_737e.py`.
 Оставлено как в черновике: Ringmaster Spotlight «Now summons 3 separate spotlights» — **NEW** (новое поведение).

@@ -584,6 +584,7 @@ TAG_OVERRIDES = {
     "turn rate bonus changed from flat":      "NERF",   # Rolling Thunder: +110 → +40% (results in +48)
     "treant gold bounty rescaled":            "NERF",   # Nature's Call: the enemy gets more gold for a treant
     "no longer explode":                      "DEL",    # Eldritch Summoning: imps killed by heroes do not blow up
+    "improved behavior":                      "QoL",    # Stroke of Fate at max cast range: handling, not power (owner)
     "instead of":                   "REWORK",  # component/requirement swap
     "respawn time increased":       "NERF",    # "increased" heuristic gives BUFF, but higher respawn = worse
     "respawn time decreased":       "BUFF",
@@ -733,7 +734,7 @@ def _emit_badge(text, hero_side=False):
     (Spirit Bear, Tempest Double: lower is better — audit 2026-10-05); a neutral creep's bounty stays higher-is-better."""
     m = _FROM_TO_RE.search(text)
     if not m:
-        return None
+        return _emit_range_badge(text, hero_side)
     old = _split_levels(m.group(1))
     new = _split_levels(m.group(2))
     if old is None or new is None:
@@ -749,6 +750,30 @@ def _emit_badge(text, hero_side=False):
     l_arg = ', l=True' if l else ''
     force_arg = ', force_overall="buff"' if _l1_only_dip(old, new, l) else ''
     return f'b({old!r}, {new!r}{l_arg}{force_arg})'
+
+
+# "from 18-24 on all levels to 16/24/32/40" (7.37e Treant bounty), "from 14-20 to 17-20" (Eidolon bounty): a min-max
+# range on the old side — compared by its middle (owner 2026-10-28: "среднее от 18-24 взять для сравнения")
+_RANGE_FROM_RE = re.compile(
+    r'\bfrom\s+(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)(?:\s+on\s+all\s+levels)?\s+to\s+'
+    r'(\d+(?:\.\d+)?(?:-\d+(?:\.\d+)?|(?:/\d+(?:\.\d+)?)+)?)\b')
+
+
+def _emit_range_badge(text, hero_side=False):
+    m = _RANGE_FROM_RE.search(text)
+    if not m:
+        return None
+    lo, hi, new = float(m.group(1)), float(m.group(2)), m.group(3)
+    l = _is_lower_better(text) or bool(hero_side and re.search(r'\bbounty\b', text, re.I))
+    l_arg = ', l=True' if l else ''
+    num = lambda v: int(v) if v == int(v) else v
+    if '-' in new:
+        n_lo, n_hi = (float(x) for x in new.split('-'))
+        return f'br({num(lo)}, {num(hi)}, {num(n_lo)}, {num(n_hi)}{l_arg})'
+    levels = _split_levels(new)
+    if levels is None:
+        return None
+    return f'b({num((lo + hi) / 2)!r}, {levels!r}{l_arg})'
 
 
 # "Damage at level N increased/decreased from X–Y to A–B" (any level, not just 1)

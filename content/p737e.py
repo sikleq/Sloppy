@@ -161,14 +161,14 @@ def build():
     W(hero_header("Enigma"))
     W(ability("Demonic Summoning", slug="enigma_demonic_conversion"))
     W(ul_open())
-    W(li("Eidolon gold bounty increased from 14-20 to 17-20", t("NERF")))
+    W(li("Eidolon gold bounty increased from 14-20 to 17-20", br(14, 20, 17, 20, l=True)))
     W(ul_close())
 
     # Grimstroke
     W(hero_header("Grimstroke"))
     W(facet_header("grimstroke_fine_art"))
     W(ul_open())
-    W(li("Stroke of Fate: Improved behavior when casting at maximum cast range", t("BUFF")))
+    W(li("Stroke of Fate: Improved behavior when casting at maximum cast range", t("QoL")))
     W(ul_close())
 
     # Gyrocopter
@@ -319,7 +319,7 @@ def build():
     W(facet_header("furion_ironwood_treant"))
     W(ul_open())
     W(li("Nature's Call: Treant XP bounty increased from 30 to 30/40/50/60", b(30, [30, 40, 50, 60], l=True)))
-    W(li("Nature's Call: Treant gold bounty rescaled from 18-24 on all levels to 16/24/32/40", t("NERF")))
+    W(li("Nature's Call: Treant gold bounty rescaled from 18-24 on all levels to 16/24/32/40", b(21, [16, 24, 32, 40], l=True)))
     W(ul_close())
 
     # Outworld Destroyer
