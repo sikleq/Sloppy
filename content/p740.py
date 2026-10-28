@@ -86,7 +86,11 @@ def build():
     W(ul_close())
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
-    W(li("Roshan is no longer considered a hero for Lifesteal mechanics. As a result, Physical Lifesteal from damage to Roshan is reduced by 40%, and Spell Lifesteal from damage to Roshan is reduced by 80%", t("BUFF")))
+    # the two cuts as a table, like 7.38 Lifesteal's "Against non-heroes" (owner 2026-10-28: "с Roshan получше")
+    W(li("Roshan is no longer considered a hero for Lifesteal mechanics", t("BUFF"), extra=mech_table(
+        ["Lifesteal from damage to Roshan", "Before", "Now"],
+        [["Physical Lifesteal", "Full, as against a hero", "Reduced by 40%"],
+         ["Spell Lifesteal", "Full, as against a hero", "Reduced by 80%"]])))
     W(ul_close())
     W(ability("Roar of Retribution", icon_url="../icons/abilities/roshan_revengeroar.png"))
     W(ul_open())

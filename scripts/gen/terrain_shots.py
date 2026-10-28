@@ -136,6 +136,19 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
                     _dashed(ghost, key in SIZE, X, Y, s, COLOUR["moved"] + (200,), max(1, width - 1))
 
 
+def _cliff_layer(img, cx, cy, r, points, half, colour):
+    """The cliff lines one side has and the other hasn't (terrain_hotspots.cliff_changes, 32-unit samples): gone ones
+    red on the old half, new ones green on the new half, like removed / added objects (owner 2026-10-28, 7.38 "… and
+    cliffs": a tint of the whole changed ground read as a yellow grid)."""
+    d = ImageDraw.Draw(img, "RGBA")
+    k = half / (2 * r)
+    s = max(1.5, 16 * k)
+    for x, y in points:
+        if abs(x - cx) <= r + 32 and abs(y - cy) <= r + 32:
+            X, Y = (x - (cx - r)) * k, ((cy + r) - y) * k
+            d.rectangle([X - s, Y - s, X + s, Y + s], fill=colour + (230,))
+
+
 TREE_FILL, TREE_EDGE = (0, 255, 0, 64), (0, 255, 0, 200)    # the Terrain page's Trees layer (.tm-trees-g rect)
 
 
@@ -463,6 +476,10 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=T
             _lanes(img, cx, cy, r, diff, side, half, width)
         if "trees" in keys:
             _tree_layer(img, cx, cy, r, diff.get("treesOld" if side == "old" else "treesNew", []), half)
+        if "cliffs" in keys:
+            removed, added = diff.get("_cliffs", ([], []))
+            _cliff_layer(img, cx, cy, r, removed if side == "old" else added, half,
+                         COLOUR["removed" if side == "old" else "added"])
         _outlines(img, cx, cy, r, groups, side, keys, half, width)
         ys = _marks(img, cx, cy, r, ver, entry.get("mark", []) if own else [], half, width,
                     entry.get("mark_kind", "camps"))
@@ -491,6 +508,9 @@ def make(patch, entries, maps, steps):
                 if v not in fulls:
                     fulls[v] = Image.open(os.path.join(FINAL, f"map_{_sha8(v, maps)}_sfm_full.png")).convert("RGB")
             diff = terrain_index._load_diff(p)
+            if any("cliffs" in spot_keys(e) for e in entries):
+                from terrain_hotspots import cliff_changes       # cliff lines gone / new (owner 2026-10-28)
+                diff = dict(diff, _cliffs=cliff_changes(st.before.replace(".", ""), p.replace(".", "")))
             steps_of[p] = (st, diff, terrain._changed_points(diff))
         return steps_of[p]
     os.makedirs(OUT, exist_ok=True)

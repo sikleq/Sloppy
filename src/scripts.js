@@ -7446,7 +7446,10 @@ function ecShopMarkup(panels) {
     const btn = ev.target.closest && ev.target.closest('.tshots-btn');
     if (btn) {
       const row = btn.closest('li');
-      const pics = row && row.querySelector(':scope > .tshots');
+      // a row with a picture under each of its words (7.38 "neutral camps, trees, and cliffs"): the box of its number
+      const part = btn.getAttribute('data-part');
+      const pics = row && row.querySelector(part === null ? ':scope > .tshots'
+                                                          : ':scope > .tshots[data-part="' + part + '"]');
       const open = btn.getAttribute('aria-expanded') !== 'true';
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       if (pics) pics.hidden = !open;

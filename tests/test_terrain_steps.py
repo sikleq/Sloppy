@@ -407,7 +407,7 @@ def test_a_terrain_note_shows_its_micro_screenshots():
     assert '<span class="badge tnum">1</span>' in next_li                         # each category counts from 1
     assert 'class="badge rework"' in outside and "terrain-row" not in outside and btn in outside  # elsewhere: the tag
     for patch, rows in _terrain_spot_index().items():
-        for _match, names, _phrase in rows:
+        for _match, names, _phrase, *_part in rows:
             for n in names:
                 assert os.path.exists(os.path.join(_ROOT, "icons", "terrain", n)), n
                 assert os.path.exists(os.path.join(_ROOT, "icons", "terrain", n[:-5] + "_lg.webp")), n
@@ -450,7 +450,11 @@ def test_the_button_is_the_name_of_what_changed():
     for patch, entries in spots.items():
         for e in entries if not patch.startswith("_") else []:
             phrase, _shots = terrain_note(patch, e["match"] + " …")
-            assert phrase and phrase in e["match"], (patch, e["match"])
+            # a row with a picture under each of its words gives them all (7.38 "the map", "neutral camps", …)
+            if e.get("part"):
+                assert isinstance(phrase, tuple) and e["phrase"] in phrase, (patch, e["match"])
+            else:
+                assert phrase and phrase in e["match"], (patch, e["match"])
 
 
 def test_moved_objects_leave_a_dashed_ghost_on_the_new_side():

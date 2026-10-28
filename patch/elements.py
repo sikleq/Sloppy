@@ -1530,7 +1530,7 @@ def _terrain_spot_index():
                 n = len(e.get("spots", []))
                 names = [f"{code}_{k}.webp" for k in range(i, i + n)
                          if _os.path.exists(_os.path.join(root, "icons", "terrain", f"{code}_{k}.webp"))]
-                rows.append((e["match"], names, e.get("phrase") or note_phrase(e["match"])))
+                rows.append((e["match"], names, e.get("phrase") or note_phrase(e["match"]), bool(e.get("part"))))
                 i += n
             _TERRAIN_SPOTS[patch] = rows
     return _TERRAIN_SPOTS
@@ -1551,23 +1551,47 @@ def terrain_note(patch, text, prefix="../"):
     if not patch or not isinstance(text, str):
         return "", ""
     plain = re.sub(r"<[^>]+>", "", text).strip()
+
+    def imgs(names):
+        return "".join(
+            f'<img src="{prefix}icons/terrain/{n}" data-large="{prefix}icons/terrain/{n[:-5]}_lg.webp" '
+            f'width="{TSHOT_W}" height="{TSHOT_H}" alt="The old and the new map here" loading="lazy" '
+            f'decoding="async">' for n in names)
+    every = [s for s in _terrain_spot_index().get(patch, []) if plain.startswith(s[0])]
+    # one row, a picture under each of its words (owner 2026-10-28, 7.38 "Touched up the map in general. Slightly
+    # adjusted neutral camps, trees, and cliffs"): entries with "part" — a tuple of phrases, a box per phrase
+    parts = {}                                     # phrase -> its pictures, in file order (one entry per spot / scale)
+    every = [tuple(s) + (False,) * (4 - len(s)) for s in every]     # (match, names, phrase, part)
+    for s in every:
+        if s[3] and s[1]:
+            parts.setdefault(s[2], []).extend(s[1])
+    if parts:
+        return (tuple(parts),
+                "".join(f'<span class="tshots" data-part="{k}" hidden>{imgs(names)}</span>'
+                        for k, names in enumerate(parts.values())))
     # the same words in two sections of a patch (7.38c "Several additional tree and visual adjustments have been made
     # to this area", Dire Safe Lane Jungle and Bottom Lane): the n-th such row takes the n-th spot that matches
     seen = _TSPOT_SEEN.setdefault((patch, plain), [0])
     nth, seen[0] = seen[0], seen[0] + 1
-    hits = [s for s in _terrain_spot_index().get(patch, []) if plain.startswith(s[0])]
-    for match, names, phrase in hits[nth:nth + 1] if len(hits) > 1 or nth == 0 else []:
+    hits = [s for s in every if not s[3]]
+    for _match, names, phrase, _part in hits[nth:nth + 1] if len(hits) > 1 or nth == 0 else []:
         if names:
-            imgs = "".join(
-                f'<img src="{prefix}icons/terrain/{n}" data-large="{prefix}icons/terrain/{n[:-5]}_lg.webp" '
-                f'width="{TSHOT_W}" height="{TSHOT_H}" alt="The old and the new map here" loading="lazy" '
-                f'decoding="async">' for n in names)
-            return phrase, f'<span class="tshots" hidden>{imgs}</span>'
+            return phrase, f'<span class="tshots" hidden>{imgs(names)}</span>'
     return "", ""
 
 
 def terrain_button(html, phrase):
-    """The row's html with its phrase as the pictures' button (unchanged, with a warning, when markup splits it)."""
+    """The row's html with its phrase as the pictures' button (unchanged, with a warning, when markup splits it).
+    A tuple of phrases (terrain_note "part" entries): each its own button, opening the box of its own number."""
+    if isinstance(phrase, tuple):
+        for k, p in enumerate(phrase):
+            out = wrap_phrase(html, p, lambda w, k=k: f'<button type="button" class="tshots-btn" data-part="{k}" '
+                                                      f'aria-expanded="false">{w}</button>')
+            if out is None:
+                print(f"  [warn] terrain note: {p!r} not found in its row — its pictures have no button")
+            else:
+                html = out
+        return html
     out = wrap_phrase(html, phrase,
                       lambda p: f'<button type="button" class="tshots-btn" aria-expanded="false">{p}</button>')
     if out is None:

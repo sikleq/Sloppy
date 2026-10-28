@@ -789,6 +789,25 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   the Dire gates changed), 7.39b "Fixed some locations that were incorrectly blocked for warding" (the gridnav of
   7.39 and 7.39b are identical, cell for cell) — no picture. Test: `tests/test_terrain_notes_1027.py`.
 
+## Recipe: a picture for a patch note (read this first — no code digging)
+
+1. Find what changed and where: `python scripts/gen/terrain_hotspots.py <patch>` (camps / trees / cliffs, outside the
+   patch's other pictures) and the map diff (`patch.terrain_index._load_diff(<patch>)`: `entities.<key>.old/new`,
+   `camps`, `tormentors`, … ; keys in `data/terrain_spots.json` `_about`).
+2. Add an entry to `data/terrain_spots.json` under the patch (append — pictures are numbered in file order):
+   `{"match": "<the row's first words>", "spots": [[x, y], …], "r": <half side, game units>, "show": [<keys>],
+   "phrase": "<the row's words that open it>"}`. Optional: `"first"` (a boss's start: gold ring + plate, one half or
+   both), `"mark"`, `"tiers"`, `"part": true` (below). Whole map: `"spots": [[0, 0]], "r": 8400`.
+3. A row naming several things ("neutral camps, trees, and cliffs"): one entry per spot with `"part": true` and the
+   word as `"phrase"`; every word becomes its own button with its own pictures (`elements.terrain_note` groups them by
+   phrase, `terrain_button` numbers the buttons `data-part`).
+4. Render: `python scripts/gen/terrain_shots.py <patch>` (writes `icons/terrain/<code>_<i>[_lg].webp`; delete the
+   patch's old numbers above the new count first), look at the `_lg` pictures, build, check the button on :8765.
+5. Keys drawn (`show`): camps, camptiers, boxes, trees (Trees layer + outlines), lanes, currents, nowards, cliffs (cliff
+   lines gone red / new green, from `data/map/heights_<code>.png`), and the objectives (roshan, tormentors, wisdom,
+   wisdomRunes, outposts, twinGates, lotus, watchers, bounty, towers).
+6. `tests/test_terrain_objectives_pictured.py` fails while a moved objective has no picture in its patch.
+
 ## Objectives moved — a picture wherever the note is (owner 2026-10-28)
 
 - Every map objective (Roshan, Tormentors, Shrines / Wisdom Runes, outposts, Twin Gates, Lotus Pools, Watchers, bounty
