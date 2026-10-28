@@ -500,6 +500,12 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 | «from 18-24 on all levels to 16/24/32/40», «from 14-20 to 17-20» | **`b(21, [...])`** / **`br(14, 20, 17, 20)`** | старый разброс сравнивается по середине, % на каждый уровень (владелец 2026-10-28, Treant); генератор `_emit_range_badge` |
 
 Генератор: `TAG_OVERRIDES`, `LOWER_IS_BUFF` (`tools/generate_patch_code_v2.py`). Тест `tests/test_review_737e.py`.
+
+**Владелец 2026-10-29:** «Removed X (and Y) Facet(s)» и «Removed Mastermind ability» (врождённая, общая для снятых
+фасетов Invoker) — не в GENERAL, а в разделе героя **Facets**: свой список сразу под заголовком, перед карточками
+фасетов (нет карточек — перед способностями). Генератор `_postprocess_removed_facets`; заголовок `subgroup("Facets")`
+ставит флаг, и карточки фасетов его не повторяют. % строки внутри карточки — у правого края строки, как в списках
+(styles.css `.ability-change-row > .badge-group`, 7.38 Ice Breaker).
 Оставлено как в черновике: Ringmaster Spotlight «Now summons 3 separate spotlights» — **NEW** (новое поведение).
 - Карточка фасета без своего имени в тексте называет в шапке способность, которую фасет меняет: «Active: Bloodrage»
   (Old Blood 7.39) — способность из файлов игры (`patch/ability_kv.facet_ability`: её KV называет фасет).

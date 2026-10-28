@@ -49,3 +49,24 @@ def test_an_added_upgrade_card_has_the_ability_header_and_charges_take_the_coold
 
 def test_an_enemy_damage_reflection_stays_higher_is_better():
     assert "l=True" not in g._emit_badge("Damage reflected increased from 10% to 12%")
+
+
+def test_removed_facets_go_to_the_heros_facets_category():
+    """Owner 2026-10-29 (7.38 Invoker): "Removed Agnostic and Elitist Facets" and "Removed Mastermind ability" sit
+    under the Facets heading before the facet blocks, not in GENERAL; a GENERAL list left empty goes."""
+    lines = [
+        'W(hero_header("Invoker"))', 'W(ul_open())', 'W(li("Base Intelligence increased from 19 to 20", b(19, 20)))',
+        'W(li("Removed Mastermind ability", t("DEL")))', 'W(li("Removed Agnostic and Elitist Facets", t("DEL")))',
+        'W(ul_close())', 'W(new_facet("invoker_quas_focus", desc=[]))', 'W(ability("Quas", slug="invoker_quas"))',
+        'W(hero_header("Bristleback"))', 'W(ul_open())', 'W(li("Removed Berserk Facet", t("DEL")))', 'W(ul_close())',
+        'W(ability("Hairball", slug="bristleback_hairball"))',
+    ]
+    out = g._postprocess_removed_facets(lines)
+    assert out[:9] == [
+        'W(hero_header("Invoker"))', 'W(ul_open())', 'W(li("Base Intelligence increased from 19 to 20", b(19, 20)))',
+        'W(ul_close())', 'W(subgroup("Facets"))', 'W(ul_open())', 'W(li("Removed Mastermind ability", t("DEL")))',
+        'W(li("Removed Agnostic and Elitist Facets", t("DEL")))', 'W(ul_close())']
+    assert out[9] == 'W(new_facet("invoker_quas_focus", desc=[]))'
+    assert out[11:] == ['W(hero_header("Bristleback"))', 'W(subgroup("Facets"))', 'W(ul_open())',
+                        'W(li("Removed Berserk Facet", t("DEL")))', 'W(ul_close())',
+                        'W(ability("Hairball", slug="bristleback_hairball"))']

@@ -919,8 +919,11 @@ def build():
     W(li("Damage gain per level increased from +3.0 to +3.6", b(3, 3.6)))
     W(li("Damage at level 30 increased by 21 (from 154-160 to 175-181)", br(154, 160, 175, 181)))
     W(li("Zet has attuned to the New Frontiers and no longer has 'Tempest' versions of abilities", t("DEL")))
-    W(li("Removed Order and Disorder Facets", t("DEL")))
     W(li(attr_change("Agility", "Universal"), t("REWORK")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Order and Disorder Facets", t("DEL")))
     W(ul_close())
     W(new_facet("arc_warden_runed_replica", desc=[
         "Tempest Double: Tempest Double is infused with the bonuses of Power Runes for 10s when created",
@@ -1130,6 +1133,7 @@ def build():
 
     # Bristleback
     W(hero_header("Bristleback"))
+    W(subgroup("Facets"))
     W(ul_open())
     W(li("Removed Berserk Facet", t("DEL")))
     W(ul_close())
@@ -1194,6 +1198,9 @@ def build():
     W(hero_header("Chaos Knight"))
     W(ul_open())
     W(li("Agility gain increased from 1.4 to 1.8", b(1.4, 1.8)))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
     W(li("Removed Phantasmagoria Facet", t("DEL")))
     W(ul_close())
     W(new_facet("chaos_knight_facet_fundamental_forging", desc=[
@@ -1222,8 +1229,11 @@ def build():
     W(li("Base Damage increased by 18-21", bstat_h("Chen", "AttackDamageMin", "7.37e", 18), extra=note_box(hero="Chen", field="AttackDamageMin", before_patch="7.37e", extra_note="Damage spread increased from 7 to 10")))
     W(li("Damage gain per level decreased from +5.1 to +3.2", b(5.1, 3.2)))
     W(li("Damage at level 30 decreased from 226-233 to 152-162", br(226, 233, 152, 162)))
-    W(li("Removed Wolf Convert Facet", t("DEL")))
     W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Wolf Convert Facet", t("DEL")))
     W(ul_close())
     W(new_facet("chen_frog_convert", desc=[
         "Chen's convert is an amphibian creep. Summoned unit depends on the level of Holy Persuasion: Marshmage Apprentice (levels 0 and 1) or Marshmage (levels 2-4)",
@@ -1303,13 +1313,14 @@ def build():
 
     # Crystal Maiden
     W(hero_header("Crystal Maiden"))
-    W(ul_open())
-    W(li("Removed Frozen Expanse and Cold Comfort Facets", t("DEL")))
-    W(ul_close())
     W(ability("Blueheart Floe", slug="crystal_maiden_blueheart_floe", innate=True))
     W(ul_open())
     W(li("Now levels up with Freezing Field", t("REWORK")))
     W(li("Mana Regen Amplification rescaled from 50% to 25/50/75/100%", b(50, [25, 50, 75, 100])))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Frozen Expanse and Cold Comfort Facets", t("DEL")))
     W(ul_close())
     W(new_facet("crystal_maiden_arcane_overflow", desc=[
         "Arcane Aura: Arcane Aura can be activated to temporarily provide Crystal Maiden with 35% Spell Amplification, but increasing Mana Costs of her abilities by 50%. While active, any time Crystal Maiden uses her other abilities, allied heroes within 1200 radius receive 25% of the mana spent. Duration: 10s. No Mana Cost. Cooldown: 30s",
@@ -1371,8 +1382,11 @@ def build():
     W(li("Intelligence gain increased from 2.6 to 3.5", b(2.6, 3.5)))
     W(li("Damage gain per level decreased from +4.1 to +3.5", b(4.1, 3.5)))
     W(li("Damage at level 30 decreased by 32 (from 195-203 to 163-171)", br(195, 203, 163, 171)))
-    W(li("Removed Thorny Thicket Facet", t("DEL")))
     W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Thorny Thicket Facet", t("DEL")))
     W(ul_close())
     W(new_facet("dark_willow_shattering_crown", desc=[
         "Cursed Crown: While ticking, the effect accumulates 35% of any damage dealt to the target by Dark Willow, and 15% of attack damage dealt by allied heroes. When the counter ends, the accumulated damage is dealt to each enemy in the stun radius as magical damage" + " " + inline_note("Accumulates damage before reductions. Will not deal damage when dispelled"),
@@ -1391,6 +1405,7 @@ def build():
 
     # Dawnbreaker
     W(hero_header("Dawnbreaker"))
+    W(subgroup("Facets"))
     W(ul_open())
     W(li("Removed Gleaming Hammer Facet", t("DEL")))
     W(ul_close())
@@ -1489,9 +1504,12 @@ def build():
     W(li("Base Agility increased from 16 to 17", b(16, 17)))
     W(li("Damage gain per level increased from +3 to +3.6", b(3, 3.6)))
     W(li("Damage at level 30 increased by 21 (from 150-160 to 171-181)", br(150, 160, 171, 181)))
-    W(li("Removed Suppress Facet", t("DEL")))
     W(li(attr_change("Intelligence", "Universal"), t("REWORK")))
     W(li("Damage at level 1 unchanged (49-59)", t("MISC")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Suppress Facet", t("DEL")))
     W(ul_close())
     W(facet_header("death_prophet_ghosts"))
     W(ul_open())
@@ -1787,6 +1805,9 @@ def build():
     W(hero_header("Hoodwink"))
     W(ul_open())
     W(li("Base Agility increased from 24 to 25", b(24, 25)))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
     W(li("Removed Treebounce Trickshot Facet", t("DEL")))
     W(ul_close())
     W(facet_header("hoodwink_hunter"))
@@ -1824,6 +1845,7 @@ def build():
 
     # Huskar
     W(hero_header("Huskar"))
+    W(subgroup("Facets"))
     W(ul_open())
     W(li("Removed Bloodbath and Nothl Transfusion Facets", t("DEL")))
     W(ul_close())
@@ -1854,10 +1876,13 @@ def build():
     W(li("Damage gain per level decreased from +5.9 to +4.7", b(5.9, 4.7)))
     W(li("Damage at level 1 decreased by 4-6 (from 39-47 to 35-41)", br(39, 47, 35, 41)))
     W(li("Damage at level 30 decreased by 46 (from 224-232 to 180-186)", br(224, 232, 180, 186)))
-    W(li("Removed Mastermind ability", t("DEL"), extra=inline_note("Now Invoke is classified as Invoker's only innate ability")))
-    W(li("Removed Agnostic and Elitist Facets", t("DEL")))
     W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
     W(li("Aghanim's Scepter still provides +1 level to all orbs, but also provides an additional level to the orb of the chosen facet, allowing it to reach max level of 10", t("BUFF"), extra=inline_note("By default, Level 30 Invoker will have two orbs at level 7 and one facet-related orb at level 8. Buying Aghanim's Scepter will increase these levels to 8 and 10 respectively")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Mastermind ability", t("DEL"), extra=inline_note("Now Invoke is classified as Invoker's only innate ability")))
+    W(li("Removed Agnostic and Elitist Facets", t("DEL")))
     W(ul_close())
     W(new_facet("invoker_quas_focus", desc=[
         "Quas: When Invoker reaches level 6, he gains a bonus level of Quas without spending a skill point. Also increases its max level up to 8",
@@ -1989,9 +2014,12 @@ def build():
     W(hero_header("Jakiro"))
     W(ul_open())
     W(li("Now always attacks with his ice head first, then his fire head", t("NEW"), extra=inline_note("The cooler head prevailed!")))
-    W(li("Removed Liquid Fire and Liquid Frost Facets", t("DEL")))
     W(li("Both Liquid Fire and Liquid Frost abilities are now available to the hero at the same time. They have a shared level and cooldown", t("REWORK")))
     W(li("This results in swapping special attacks: Liquid Frost is always applied with the first attack, Liquid Fire - with the second, whenever applicable", t("REWORK")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Liquid Fire and Liquid Frost Facets", t("DEL")))
     W(ul_close())
     W(new_facet("jakiro_twin_terror", desc=[
         "Double Trouble: Damage penalty is decreased from 50% to 40% and improves even further by 5% per Macropyre level" + " " + b(50, 40, l=True) + " " + inline_note("Total damage penalty decreased from 50% to 40/35/30/25% — " + b(50, [40, 35, 30, 25], l=True)),
@@ -2071,6 +2099,9 @@ def build():
     W(li("Base Armor decreased by 1", bstat_h("Kez", "ArmorPhysical", "7.37e", -1), extra=note_box(hero="Kez", field="ArmorPhysical", before_patch="7.37e")))
     W(li("Base Agility increased from 26 to 27", b(26, 27)))
     W(li("Base Movement Speed decreased from 320 to 315", b(320, 315)))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
     W(li("Removed Hero of the Flightless Facet", t("DEL")))
     W(ul_close())
     W(new_facet("kez_flutter", desc=[
@@ -2203,6 +2234,9 @@ def build():
     W(hero_header("Lifestealer"))
     W(ul_open())
     W(li("Base Movement Speed decreased from 320 to 315", b(320, 315)))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
     W(li("Removed Rage and Unfettered Facets", t("DEL"), extra=inline_note("Rage remains as Lifestealer's default basic ability")))
     W(ul_close())
     W(new_facet("life_stealer_fleshfeast", desc=[
@@ -2273,7 +2307,6 @@ def build():
     W(li("Intelligence gain decreased from 2.0 to 1.4", b(2, 1.4)))
     W(li("Damage gain per level decreased from +4.1 to +2.8", b(4.1, 2.8)))
     W(li("Damage at level 30 decreased by 52 (from 185-189 to 133-137)", t("NERF")))
-    W(li("Removed Unbearable Facet", t("DEL"), extra=inline_note("It's a facet's name, not the description")))
     W(li(attr_change("Universal", "Agility"), t("REWORK"), extra=inline_note("Spirit Bear remains a Universal Hero")))
     W(li("Damage at level 1 unchanged (38-42)", t("MISC")))
     W(ul_close())
@@ -2295,6 +2328,10 @@ def build():
         summary="Reworked",
         tag="rework",
     ))
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Unbearable Facet", t("DEL"), extra=inline_note("It's a facet's name, not the description")))
+    W(ul_close())
     W(facet_header("lone_druid_bear_necessities"))
     W(ul_open())
     W(li("Stat Bonus increased from 30/45/60/75% to 45/55/65/75%", b([30, 45, 60, 75], [45, 55, 65, 75])))
@@ -2349,6 +2386,9 @@ def build():
     W(li("Intelligence gain increased from 1.6 to 2.1", b(1.6, 2.1)))
     W(li("Damage gain per level decreased from +4.7 to +3.2", b(4.7, 3.2)))
     W(li("Damage at level 30 decreased by 46 (from 214-222 to 168-176)", t("NERF")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
     W(li("Removed Reverse Polarity and Reverse Reverse Polarity Facets", t("DEL"), extra=inline_note("Reverse Polarity remains as Magnus' default ultimate")))
     W(ul_close())
     W(new_facet("magnataur_diminishing_return", desc=[
@@ -2385,6 +2425,9 @@ def build():
     W(li("Intelligence gain increased from 1.5 to 1.9", b(1.5, 1.9)))
     W(li("Damage gain per level decreased from +4.4 to +3.0", b(4.4, 3)))
     W(li("Damage at level 30 decreased by 44-46 (from 207-213 to 163-167)", t("NERF")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
     W(li("Removed Sidekick and Bodyguard Facets", t("DEL"), extra=inline_note("Bodyguard remains as Marci's default basic ability")))
     W(ul_close())
     W(new_facet("marci_buddy_system", desc=[
@@ -2461,12 +2504,13 @@ def build():
 
     # Meepo
     W(hero_header("Meepo"))
-    W(ul_open())
-    W(li("Removed Pack Rat Facet", t("DEL")))
-    W(ul_close())
     W(ability("Sticky Fingers", slug="meepo_sticky_fingers", innate=True))
     W(ul_open())
     W(li("Updated to the new Neutral crafting system. Increases selection of Artifacts and Enchantments from 4 to 5", b(4, 5)))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Pack Rat Facet", t("DEL")))
     W(ul_close())
     W(facet_header("meepo_more_meepo"))
     W(ul_open())
@@ -2488,12 +2532,15 @@ def build():
     W(li("Intelligence gain increased from 1.4 to 1.9", b(1.4, 1.9)))
     W(li("Damage gain per level decreased from +4.1 to +3.1", b(4.1, 3.1)))
     W(li("Damage at level 30 decreased by 40-38 (from 191-195 to 151-157)", t("NERF")))
-    W(li("Removed Moonlight Shadow and Solar Flare Facets", t("DEL"), extra=inline_note("Moonlight Shadow remains as Mirana's default ultimate")))
     W(li(attr_change("Universal", "Agility"), t("REWORK")))
     W(ul_close())
     W(ability("Selemene's Faithful", slug="mirana_selemenes_faithful", innate=True))
     W(ul_open())
     W(li("Healing Lotus Effectiveness increased from 20% to 50%", b(20, 50)))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Moonlight Shadow and Solar Flare Facets", t("DEL"), extra=inline_note("Moonlight Shadow remains as Mirana's default ultimate")))
     W(ul_close())
     W(new_facet("mirana_starstruck", desc=[
         "Starstorm: Starstorm's second meteor deals more damage and blinds the target. Second Meteor Damage: 100%. Blind Miss Rate: 60%. Blind Duration: 3.5/4/4.5/5s" + " " + inline_note("Does not apply to the second Starstorm created by Sacred Arrow with Aghanim's Scepter"),
@@ -2667,6 +2714,7 @@ def build():
 
     # Night Stalker
     W(hero_header("Night Stalker"))
+    W(subgroup("Facets"))
     W(ul_open())
     W(li("Removed Blinding Void Facet", t("DEL")))
     W(ul_close())
@@ -2806,6 +2854,7 @@ def build():
 
     # Phantom Assassin
     W(hero_header("Phantom Assassin"))
+    W(subgroup("Facets"))
     W(ul_open())
     W(li("Removed Veiled One Facet", t("DEL")))
     W(ul_close())
@@ -2849,6 +2898,9 @@ def build():
     W(hero_header("Phantom Lancer"))
     W(ul_open())
     W(li("Base Strength increased from 19 to 21", b(19, 21)))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
     W(li("Removed Convergence Facet", t("DEL")))
     W(ul_close())
     W(new_facet("phantom_lancer_lancelot", desc=[
@@ -2890,6 +2942,7 @@ def build():
 
     # Primal Beast
     W(hero_header("Primal Beast"))
+    W(subgroup("Facets"))
     W(ul_open())
     W(li("Removed Romp N' Stomp Facet", t("DEL")))
     W(ul_close())
@@ -2936,8 +2989,11 @@ def build():
     # Pudge
     W(hero_header("Pudge"))
     W(ul_open())
-    W(li("Removed Flayer's Hook Facet", t("DEL")))
     W(li("Removed Eject ability", t("DEL"), extra=inline_note("And reworked Aghanim's Shard upgrade")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Flayer's Hook Facet", t("DEL")))
     W(ul_close())
     W(facet_header("pudge_fresh_meat"))
     W(ul_open())
@@ -3032,6 +3088,9 @@ def build():
     W(hero_header("Ringmaster"))
     W(ul_open())
     W(li("Added to Captains Mode", t("NEW")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
     W(li("Removed Center Stage Facet", t("DEL")))
     W(ul_close())
     W(new_facet("ringmaster_carny_classics", desc=[
@@ -3128,6 +3187,7 @@ def build():
 
     # Shadow Shaman
     W(hero_header("Shadow Shaman"))
+    W(subgroup("Facets"))
     W(ul_open())
     W(li("Removed Cluster Cluck Facet", t("DEL")))
     W(ul_close())
@@ -3342,6 +3402,7 @@ def build():
 
     # Spirit Breaker
     W(hero_header("Spirit Breaker"))
+    W(subgroup("Facets"))
     W(ul_open())
     W(li("Removed Imbalanced Facet", t("DEL"), extra=inline_note("That's also the facet's name, not the description")))
     W(ul_close())
@@ -3727,6 +3788,9 @@ def build():
     W(li("Intelligence gain increased from 2.4 to 3.2", b(2.4, 3.2)))
     W(li("Damage gain per level decreased from +4.1 to +3.4", b(4.1, 3.4)))
     W(li("Damage at level 30 decreased by 32-26 (from 193-199 to 161-173)", br(193, 199, 161, 173)))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
     W(li("Removed Focus Fire and Whirlwind Facets", t("DEL"), extra=inline_note("Focus Fire remains as Windranger's default ultimate")))
     W(ul_close())
     W(new_facet("windrunner_tangled", desc=[
@@ -3762,12 +3826,15 @@ def build():
     W(li("Damage gain per level decreased from +4.6 to +3.6", b(4.6, 3.6)))
     W(li("Base Attack Speed increased from 90 to 100", b(90, 100)))
     W(li("Damage at level 30 decreased by 45-43 (from 203-208 to 158-165)", br(203, 208, 158, 165)))
-    W(li("Removed Essence of the Blueheart and Dragon Sight Facets", t("DEL")))
     W(li(attr_change("Universal", "Intelligence"), t("REWORK")))
     W(ul_close())
     W(ability("Eldwurm Scholar", slug="winter_wyvern_eldwurm_scholar", innate=True))
     W(ul_open())
     W(li("Now applies to Shrines of Wisdom instead of removed Wisdom Runes", t("REWORK"), extra=inline_note("Effect and mechanics are not changed")))
+    W(ul_close())
+    W(subgroup("Facets"))
+    W(ul_open())
+    W(li("Removed Essence of the Blueheart and Dragon Sight Facets", t("DEL")))
     W(ul_close())
     W(new_facet("winter_wyvern_winterproof", desc=[
         "Cold Embrace: Can be cast on buildings. Chosen building isn't healed, but still protected from physical damage. Affected units or buildings gain 60% bonus attack damage after the cocoon thaws. Buff Duration: 6s",
@@ -3783,6 +3850,7 @@ def build():
 
     # Witch Doctor
     W(hero_header("Witch Doctor"))
+    W(subgroup("Facets"))
     W(ul_open())
     W(li("Removed Voodoo Festeration Facet", t("DEL")))
     W(ul_close())

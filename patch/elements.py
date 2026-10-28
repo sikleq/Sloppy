@@ -844,6 +844,8 @@ def subgroup(title, new=None, one_box=False):
         _State.new_mech_tag = _mech_tag(new)
     if title.lower() == "abilities":
         _State.seen_abilities_subgroup = True
+    if title.lower() == "facets":
+        _State.seen_facets_subgroup = True   # the facet blocks after it don't repeat the heading (7.38 removed facets)
     if title.lower() == "talents":
         on_err = (
             "this.onerror=function(){this.style.display='none'};"

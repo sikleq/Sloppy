@@ -2520,6 +2520,48 @@ def _postprocess_fold_damage_l1(lines):
         return lines
 
 
+_REMOVED_FACETS_RE = re.compile(r'W\(li\("Removed (?:[^"]*\bFacets?|Mastermind ability)"')
+_FACET_BLOCK_RE = re.compile(r'W\((?:facet_header|new_facet|facet_change)\(')
+
+
+def _postprocess_removed_facets(lines):
+    """Owner 2026-10-29 (7.38 Invoker): "Removed Agnostic and Elitist Facets" (and "Removed Mastermind ability", the
+    innate those facets shared) go to the hero's Facets category, not GENERAL: a list of their own right under the
+    "Facets" heading, before the hero's facet blocks (or where GENERAL ends when the hero has none). A GENERAL list left
+    empty goes. Works on generator output and indented content."""
+    out, i = [], 0
+    while i < len(lines):
+        if not lines[i].lstrip().startswith('W(hero_header('):
+            out.append(lines[i])
+            i += 1
+            continue
+        end = next((j for j in range(i + 1, len(lines))
+                    if lines[j].lstrip().startswith(('W(hero_header(', 'W(item_header(', 'W(section(', 'write_footer('))),
+                   len(lines))
+        block = lines[i:end]
+        moved = [k for k, l in enumerate(block) if _REMOVED_FACETS_RE.match(l.lstrip())]
+        if not moved:
+            out.extend(block)
+            i = end
+            continue
+        ind = block[moved[0]][:len(block[moved[0]]) - len(block[moved[0]].lstrip())]
+        rows = [block[k] for k in moved]
+        rest = [l for k, l in enumerate(block) if k not in moved]
+        # a GENERAL list with nothing left in it (hero_stat_card aside, it needs rows) goes
+        for k in range(len(rest) - 1):
+            if rest[k].strip() == 'W(ul_open())' and rest[k + 1].strip() == 'W(ul_close())':
+                del rest[k:k + 2]
+                break
+        at = next((k for k, l in enumerate(rest) if _FACET_BLOCK_RE.match(l.lstrip())), None)
+        if at is None:                          # no facet blocks: where the abilities / talents start
+            at = next((k for k, l in enumerate(rest) if l.lstrip().startswith(('W(ability(', 'W(subgroup('))),
+                      len(rest))
+        out.extend(rest[:at] + [f'{ind}W(subgroup("Facets"))', f'{ind}W(ul_open())'] + rows
+                   + [f'{ind}W(ul_close())'] + rest[at:])
+        i = end
+    return out
+
+
 def _postprocess_hero_stat_card(lines, version=None):
     """Owner 2026-09-28 (Abaddon 7.38): a hero whose GENERAL rows describe its damage growth as rescaled
     ("Damage gain per level …" / "Damage at level 30 …") and whose attributes changed gets ONE row "Starting
@@ -4065,6 +4107,7 @@ def generate(version):
     out = _postprocess_removed_label(out)             # "Neutral Item cycled out" label — owner 2026-10-17
     out = _postprocess_ability_level_formula(out, version)   # "+X with every level of Y" -> table (owner 2026-10-27)
     out = _postprocess_innate_cards(out, version)     # innate old -> new from the game's texts (owner 2026-10-27)
+    out = _postprocess_removed_facets(out)            # "Removed X Facets" under Facets (owner 2026-10-29)
 
     # Close the page: footer + save. Emitted so the wrapped content/pXXX.py is
     # complete — without these the site build runs green but the patch HTML is

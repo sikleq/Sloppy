@@ -11164,6 +11164,9 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 .ability-change-pane > .pane-head { margin: calc(-1 * var(--pt, 0px)) calc(-1 * var(--px, 0px)) 0;
   padding: 2px var(--px, 12px); border-radius: 5px 5px 0 0; }
 .ability-change-head + .pane-head { margin-top: 0; border-radius: 0; }   /* under a pane's own icon + name head */
+/* a card row's own % badges (a facet's "Path Duration increased from 3/3.5/4/4.5s to 6s") sit at the row's right edge,
+   as on every list row — not right after the text (owner 2026-10-29, 7.38 Ice Breaker) */
+.ability-change-row > .badge-group { float: right; margin-left: 10px; white-space: nowrap; }
 .formula-trigger .iab-num { color: inherit; }     /* a number inside a formula button keeps the button's colour */
 /* Item abilities before -> after (item_abilities_change): one row per ability, old left / new right paired
    by name (render_iab_card); a pair's two cards share the row height; an arrow only between a pair, an
