@@ -316,6 +316,23 @@ Second pick. Структура 7.34+: Бан7·Пик2·Бан3·Пик6·Ба�
 extra=inline_note(info_tip("Batrider's Arsonist", "Magnus' Diminishing Return", header="Affected facets:"))
 ```
 
+### Список способностей в разделе механики → ряды иконок (владелец 2026-10-28)
+
+В блоке «New/Reworked mechanic» (`plain_header(new=…)` / `subgroup(new=…)`) `li()` сам превращает «?»-список
+способностей в ряды под строкой (`patch/mech_abilities.py`, классы `.mech-abils` / `.mech-abil-row`):
+- строка «<Владелец>'s <Способность> <что изменилось>» → иконка вместо имени (имя при наведении), дальше фраза;
+  способности с одинаковой фразой — один ряд иконок (7.40 Invulnerability: 7 способностей «Can no longer target…»);
+- имена без фразы (7.41 «Affected spells: Eye of Skadi's Cold Attack, Sange, …») — один ряд одних иконок;
+  «… with Aghanim's Scepter» / «… with talent» — свой ряд с этой фразой;
+- скобка-оговорка строки (`pop-note` в конце) — «?» у её иконки; строка-оговорка целиком — серой строкой в конце;
+- категории «Items — », «Heroes» отбрасываются — вид значка и так говорит, чьё.
+
+Значок: герой — `_hero_ability_slug` (+ `ABILITY_DISPLAY_TO_SLUG`), врождённая без файла — значок innate; предмет и
+зачарование — значок предмета; нейтральный крип — по его имени в игре (`data/abilities_english.txt`). Хоть одна
+строка без значка — список остаётся «?» целиком (не смешиваем). Генератор ничего особого не пишет: он выдаёт
+обычные `inline_note` / `info_tip`, правило срабатывает при сборке.
+Тест: `tests/test_mech_ability_icons.py`.
+
 ## `correction-note` фразировка (note_box со stats DB)
 
 - Текст: `"Before this patch it was changed in <PATCH_LINK> (age)"`. Без двоеточия после `in` — это предлог, не лейбл.

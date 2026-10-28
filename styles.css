@@ -4390,6 +4390,32 @@ h4.subgroup {
   border-radius: 3px;
   object-fit: cover;
 }
+/* a reworked mechanic's list of abilities: rows under the text, icons in place of the names, the abilities with the
+   same sentence in one row (owner 2026-10-28, 7.40 Invulnerability Targeting) */
+.mech-abils {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+}
+.mech-abil-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.mech-abil-icons {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex-shrink: 0;
+  max-width: 50%;
+  padding-top: 1px;
+}
+.mech-abil-only > .mech-abil-icons { max-width: none; }     /* the names alone (7.41 "Affected spells") */
+.mech-abil-icons .ability-chip { margin-right: 0; vertical-align: 0; }
+.mech-abil-caveat { display: inline-flex; align-items: center; gap: 1px; }
+.mech-abil-text { line-height: 21px; }
+.mech-abil-note { color: var(--text-dim, #969289); line-height: 1.4; }
 .facet-icon-overlay {
   width: 36px;
   height: 36px;

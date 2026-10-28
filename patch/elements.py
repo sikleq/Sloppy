@@ -10,6 +10,7 @@ import re
 from .images import (ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG, hero_img,
                      item_img, _LOCAL_ABIL_ICONS)
 from .state import _State, page_cache
+from .mech_abilities import TIP_RAW, ability_chip, lift_ability_lists
 from .terrain_notes import note_phrase, wrap_phrase
 
 try:
@@ -150,6 +151,8 @@ _ENCHANT_DESC = {
 # ---- Ability display-name → CDN slug overrides ----
 ABILITY_DISPLAY_TO_SLUG = {
     ("antimage", "Persecutor"): "persectur",
+    ("grimstroke", "Soulbind"): "soul_chain",
+    ("ogre_magi", "Fire Shield"): "smash",
     ("alchemist", "Greevil's Greed"): "goblins_greed",
     ("bounty_hunter", "Shadow Walk"): "wind_walk",
     ("drow_ranger", "Gust"): "wave_of_silence",
@@ -879,9 +882,7 @@ def _facet_row_ability_chip(text):
     slug = _hero_ability_slug(_State.current_hero, m.group(1))
     if slug not in _LOCAL_ABIL_ICONS:
         return text
-    label = _html.escape(m.group(1))
-    return (f'<span class="ability-chip" data-tooltip="{label}" role="img" aria-label="{label}"><img src="{ABIL_CDN}'
-            f'{slug}.png" alt="" loading="lazy" width="19" height="19"></span>{text[m.end():]}')
+    return ability_chip(m.group(1), f"{ABIL_CDN}{slug}.png") + text[m.end():]
 
 
 def ability(title, slug=None, innate=None, icon_url=None, sub=False, old_title=None):
@@ -1868,6 +1869,10 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         _lifted = re.findall(r'<!--INLINETIP-->(.*?)<!--/INLINETIP-->', extra, re.S)
         extra = re.sub(r'<!--INLINETIP-->.*?<!--/INLINETIP-->', '', extra, flags=re.S)
         trailing_tips.extend(_lifted)
+    _abil_rows = ""
+    if _State.new_mech and isinstance(text_base, str):
+        # a reworked mechanic's list of abilities: rows of icons under the text, not a "?" (owner 2026-10-28)
+        trailing_tips, _abil_rows = lift_ability_lists([x.strip() for x in trailing_tips])
     trailing_tips = merge_tips(trailing_tips)
     if not isinstance(text_base, str):
         text_inner = text_base
@@ -1898,6 +1903,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         text_inner = f'{_facet_chip(facet)} {text_inner}'
     elif _State.current_block_is_facet and isinstance(text_inner, str):
         text_inner = _facet_row_ability_chip(text_inner)
+    if _abil_rows:
+        text_inner += _abil_rows
     # An ability row with its own chip keeps the chip as the li's first child: page.py
     # marks its whole box `ability-box-tagged`, and the CSS moves the box right by the tag
     # column so the chip sits in the SAME column, size and height as every other row's
@@ -1970,8 +1977,10 @@ def _pop_list(body):
 def info_tip(*lines, header=None):
     body = _pop_list('<br>'.join(lines))
     head = f'<span class="info-pop-h">{header}</span>' if header else ''
-    return ('<!--TIP--><span class="info-tip" tabindex="0">?'
-            f'<span class="info-pop">{head}{body}</span></span><!--/TIP-->')
+    out = ('<!--TIP--><span class="info-tip" tabindex="0">?'
+           f'<span class="info-pop">{head}{body}</span></span><!--/TIP-->')
+    TIP_RAW[out] = '<br>'.join(lines)     # a mechanic's list of abilities is read back as icon rows (li)
+    return out
 
 
 # The owner's bug silhouette (icons/ui/bug.png, background cut to alpha, 2026-10-22), drawn as a CSS mask so it
