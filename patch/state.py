@@ -33,6 +33,8 @@ class _State:
     new_mech_header = False          # plain_header(new=…): the whole block is a new mechanic
     new_mech = False                 # current ul lists a new mechanic → its NEW rows lose the chip
     new_mech_tag = "new"             # rows of this tag form the description box ("rework" for a Reworked … label)
+    new_mech_one_box = False         # subgroup(one_box=True): every row of the list in one box, no chips (7.41
+                                     # Reflected Damage, owner 2026-10-28 "в одном блоке без тегов")
     current_sections = []            # per-patch list of {slug, label}; reset in save_html()
     current_section_slug = None      # slug of the active section(); "general" suppresses dyn-cells
     # Patch-dynamics widget: tag tallies per (entity, patch). Populated by

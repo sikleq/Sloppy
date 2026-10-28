@@ -201,10 +201,27 @@ def test_misc_rows_on_one_topic_become_their_own_mechanic():
     lines = ['W(plain_header("Mechanics Changes"))', 'W(subgroup("Miscellaneous"))', 'W(ul_open())',
              rows[0], rows[1], uphill, rows[2], rows[3], 'W(ul_close())']
     out = g._postprocess_new_block_label(g._postprocess_misc_topics(lines))
-    assert out[1] == 'W(subgroup("Reflected Damage", new="Reworked mechanic"))'
+    assert out[1] == 'W(subgroup("Reflected Damage", new="Reworked mechanic", one_box=True))'
     assert out[2:8] == ['W(ul_open())', *rows, 'W(ul_close())']
     assert out[9:] == ['W(subgroup("Miscellaneous"))', 'W(ul_open())', uphill, 'W(ul_close())']
     # two rows on a topic stay in Miscellaneous
     few = ['W(plain_header("Mechanics Changes"))', 'W(subgroup("Miscellaneous"))', 'W(ul_open())', rows[0], rows[1],
            'W(ul_close())']
     assert g._postprocess_misc_topics(few) == few
+
+
+def test_now_instead_of_rows_become_a_before_after_table():
+    # owner 2026-10-28, 7.41 Health Restoration: "оформить как было до и как стало после патча"
+    hr = ('W(li("Health Restoration now applies to all forms of life gain — before, it did not apply to incoming '
+          'heals", t("REWORK")))')
+    ia = ('W(li("Incoming Heal Amplification now stacks diminishingly with Health Restoration instead of additively '
+          'with Outgoing Heal Amplification", t("REWORK")))')
+    head = 'W(subgroup("Health Restoration", new="Reworked mechanic"))'
+    out = g._postprocess_before_after([head, 'W(ul_open())', hr, ia, 'W(ul_close())'])
+    assert len(out) == 4 and out[2].startswith('W(li("", t("REWORK"), extra=mech_before_after("Mechanic", [')
+    assert "('Health Restoration', 'Did not apply to incoming heals', 'Applies to all forms of life gain')" in out[2]
+    assert ("('Incoming Heal Amplification', 'Stacks additively with Outgoing Heal Amplification', "
+            "'Stacks diminishingly with Health Restoration')") in out[2]
+    # outside a reworked mechanic the rows stay as they are (a hero's REWORK rows)
+    hero = ['W(hero_header("Axe"))', 'W(ul_open())', hr, ia, 'W(ul_close())']
+    assert g._postprocess_before_after(hero) == hero

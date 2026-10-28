@@ -3030,7 +3030,9 @@ def _postprocess_misc_topics(lines):
                 continue
             moved = [out[k] for k in rows]
             rest = [out[k] for k in range(i + 1, j) if k not in rows]
-            block = [f'W(subgroup("{title}", new="Reworked mechanic"))', 'W(ul_open())', *moved, 'W(ul_close())', '']
+            # one box, no chips: the rows read as one description, the last one's table inside it (owner 2026-10-28)
+            block = [f'W(subgroup("{title}", new="Reworked mechanic", one_box=True))', 'W(ul_open())', *moved,
+                     'W(ul_close())', '']
             if not any(x.startswith('W(li(') for x in rest):
                 out[i:j] = block                      # nothing else left in Miscellaneous
             else:
@@ -3038,6 +3040,46 @@ def _postprocess_misc_topics(lines):
             j = i + len(block)
             break
         i = j
+    return out
+
+
+# Valve's "X now <verb> <new> instead of <old>" / "X now <verb> <new> — before, it <old>" rows of a reworked mechanic
+# (7.41 Health Restoration): together one table, before and after the patch (owner 2026-10-28)
+_BA_ROW_RE = re.compile(r'^W\(li\("(?P<text>[^"]+)", t\("REWORK"\)\)\)$')
+_BA_TEXT_RES = (re.compile(r"^(?P<what>[A-Z][\w' ]+?) now (?P<verb>[a-z]+) (?P<new>.+?) instead of (?P<old>.+)$"),
+                re.compile(r"^(?P<what>[A-Z][\w' ]+?) now (?P<verb>[a-z]+) (?P<new>.+?) — before, it (?P<old>.+)$"))
+
+
+def _before_after(text):
+    """(what, before, after) of one such row, else None."""
+    for n, rx in enumerate(_BA_TEXT_RES):
+        m = rx.match(text)
+        if m:
+            verb = m.group("verb")
+            before = f"{verb} {m.group('old')}" if n == 0 else m.group("old")
+            return m.group("what"), before[:1].upper() + before[1:], f"{verb[:1].upper()}{verb[1:]} {m.group('new')}"
+    return None
+
+
+def _postprocess_before_after(lines):
+    out, i, in_mech = [], 0, False
+    while i < len(lines):
+        if _block_boundary(lines[i]):                 # only inside a "Reworked mechanic" block
+            in_mech = 'new="Reworked mechanic"' in lines[i]
+        run = []
+        while in_mech and i + len(run) < len(lines):
+            m = _BA_ROW_RE.match(lines[i + len(run)])
+            parts = m and _before_after(m.group("text"))
+            if not parts:
+                break
+            run.append(parts)
+        if len(run) >= 2:
+            rows = ", ".join(repr(r) for r in run)
+            out.append(f'W(li("", t("REWORK"), extra=mech_before_after("Mechanic", [{rows}])))')
+            i += len(run)
+        else:
+            out.append(lines[i])
+            i += 1
     return out
 
 
@@ -3966,6 +4008,7 @@ def generate(version):
     out = _postprocess_mechanic_rules_row(out)        # a row restating its header goes (owner 2026-10-27)
     out = _postprocess_misc_topics(out)               # rows on one topic -> a mechanic block (owner 2026-10-28)
     out = _postprocess_new_block_label(out)
+    out = _postprocess_before_after(out)              # "now … instead of …" rows -> before / after table
     out = _postprocess_mechanic_rules_row(out, after_label=True)   # a reworked mechanic in one list
     out = _postprocess_new_item_card(out, version)
     out = _postprocess_cost_components(out, version)

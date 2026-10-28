@@ -309,6 +309,17 @@ def mech_table(head, rows):
     return f'<!--MECHTABLE--><span class="mech-abils mech-cols-{cols}">{out}</span><!--/MECHTABLE-->'
 
 
+BEFORE, AFTER = "Before", "After"
+
+
+def mech_before_after(title, rows):
+    """How a mechanic worked before the patch and how it works now, one row per thing (owner 2026-10-28, 7.41 Health
+    Restoration: Valve's "X now … — before, …" / "… instead of …" rows). rows: (what, before, after)."""
+    # Before and After get the same width: side by side they read as a pair
+    return mech_table([title, BEFORE, AFTER], [list(r) for r in rows]).replace(
+        'class="mech-abils mech-cols-3"', 'class="mech-abils mech-cols-3 mech-ba"', 1)
+
+
 def mech_pair(main, side):
     """Two mech_tables side by side, their rows level with each other (owner 2026-10-28, 7.38 Lifesteal: "Against
     non-heroes" a block of its own next to the damage types). Both must have the same number of rows."""

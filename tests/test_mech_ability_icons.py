@@ -99,6 +99,45 @@ def test_reflected_damage_sources_are_a_table_of_icons():
     assert "Blade Mail: Both active and passive" in row                  # its caveat: a "?" after "Always"
 
 
+def test_one_box_block_puts_every_row_in_one_box_without_chips():
+    """7.41 Reflected Damage (owner 2026-10-28): "всё это в одном блоке без тегов + таблица"."""
+    from patch import page
+    from patch.badges import t
+    reset_page_state()
+    _State.current_patch_version = "7.41"
+    try:
+        html = elements.section("General Updates") + elements.plain_header("Mechanics Changes")
+        html += elements.subgroup("Reflected Damage", new="Reworked mechanic", one_box=True) + elements.ul_open()
+        html += elements.li("Lifesteal doesn't apply to reflected damage", t("REWORK"))
+        html += elements.li("Reflected damage cannot be reflected back", t("DEL"))
+        html += elements.li("All sources now have an ALT-note " + elements.info_tip(
+            "Axe's Counter Helix", "Bristleback's Quill Spray triggered by Bristleback passive"), t("QoL"))
+        html += elements.ul_close()
+    finally:
+        reset_page_state()
+    out = page._new_mech_rows(html)
+    lis = re.findall(r"<li\b[^>]*>", out)
+    assert len(lis) == 3 and all("mech-desc" in x for x in lis)
+    assert "mech-first" in lis[0] and "mech-last" in lis[2] and "mech-last" not in lis[1] and "mech-first" not in lis[2]
+    chips = [out[m.start() - 80:m.start() + 60] for m in re.finditer('class="badge', out)]
+    assert not chips and 'data-tag="del' in out           # no chips, the tags kept for the filters
+    assert 'class="mech-abils mech-cols-icons"' in out
+
+
+def test_before_and_after_the_patch_is_a_table():
+    from patch.mech_abilities import mech_before_after
+    html = mech_before_after("Stat", [("Health Restoration", "Applies to all life gain except incoming heals",
+                                       "Applies to all forms of life gain")])
+    assert ('<span class="mech-cell mech-label">Stat</span><span class="mech-cell">Before</span>'
+            '<span class="mech-cell">After</span>') in html
+    assert '<span class="mech-cell mech-label">Health Restoration</span>' in html
+    assert 'class="mech-abils mech-cols-3 mech-ba"' in html             # Before and After one width
+    css = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "styles.css"),
+               encoding="utf-8").read()
+    assert re.search(r"\.mech-cols-3\.mech-ba \{ grid-template-columns: fit-content\(30%\) minmax\(0, 1fr\) "
+                     r"minmax\(0, 1fr\)", css)
+
+
 def test_every_mechanic_list_of_7_41_is_a_table_on_the_page():
     """The built page: Health Restoration (2), Lifesteal (1), Reflected Damage (1) — none fell back to a "?"."""
     import pytest

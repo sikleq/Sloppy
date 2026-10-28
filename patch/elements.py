@@ -341,6 +341,7 @@ def _open_block(extra_cls='', extra_attrs=''):
     _flush_rework()                                       # ... and its REWORK rows (signal R)
     pre = _close_ability_block()
     _State.new_mech_header = _State.new_mech = False     # a new block ends any "new mechanic" run
+    _State.new_mech_one_box = False
     _State.terrain_rows = None                            # ... and any terrain block
     cls = 'entity-block' + ((' ' + extra_cls) if extra_cls else '')
     s = (pre + ('</div>\n' if _State.block_open else '')
@@ -825,9 +826,12 @@ def section(title):
     return out
 
 
-def subgroup(title, new=None):
+def subgroup(title, new=None, one_box=False):
     """new="New mechanic": same as plain_header(new=…) for one subgroup (a label after the title,
-    NEW rows of its lists without chips). Without it the subgroup inherits the header's state."""
+    NEW rows of its lists without chips). Without it the subgroup inherits the header's state.
+    one_box: with new=…, every row of its list in one description box whatever its tag, no chips (data-tag stays for
+    the filters), a row's table inside the box (owner 2026-10-28, 7.41 Reflected Damage)."""
+    _State.new_mech_one_box = bool(new) and one_box
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False
     # rows under a subgroup no longer belong to the last ability: Clockwerk 7.41's talents read as rows of the
@@ -1221,7 +1225,8 @@ def ul_open():
     if _State.current_block_is_facet:
         _State.facet_block_had_ul = True
     # marker read by patch/page.py _new_mech_rows (NEW rows lose the chip, keep data-tag)
-    return out + '<ul class="changes">' + (f'<!--NEWMECH:{_State.new_mech_tag}-->' if _State.new_mech else '')
+    one = ':all' if _State.new_mech_one_box else ''
+    return out + '<ul class="changes">' + (f'<!--NEWMECH:{_State.new_mech_tag}{one}-->' if _State.new_mech else '')
 
 
 def ul_close():

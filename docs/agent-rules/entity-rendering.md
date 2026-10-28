@@ -355,7 +355,13 @@ Damage), Illusion, Invisibility, Regeneration, Arcane, Shield, Water, Wisdom (у
   «Blade Mail (both active and passive)» — значок Blade Mail, скобка — «?» ряда;
 - строки «Miscellaneous» раздела механик на одну тему (≥3, `_MISC_TOPICS`: reflected / reflection damage) генератор
   выносит в свой блок «<Тема>» с «Reworked mechanic» (`_postprocess_misc_topics`; владелец 2026-10-28, 7.41
-  Reflected Damage: список источников из «?» — таблица значков);
+  Reflected Damage: список источников из «?» — таблица значков) и `one_box=True`: ВСЕ строки списка — один бокс
+  описания без значков тегов (data-tag для фильтров остаётся), таблица последней строки — внутри бокса
+  («в одном блоке без тегов + таблица»);
+- строки Valve «X now <глагол> <новое> instead of <старое>» / «X now … — before, it …» в Reworked mechanic (≥2
+  подряд) — одна таблица «Mechanic | Before | After» (`mech_before_after`, генератор `_postprocess_before_after`;
+  владелец 2026-10-28, 7.41 Health Restoration «как было до и как стало после патча»); строка без текста — только
+  таблица;
 - скобка-оговорка строки (`pop-note` в конце) — «?» после фразы ряда, в нём «<Способность>: оговорка»; НЕ в ряду
   значков — там «?» читался как ещё одна способность (владелец 2026-10-28, Bloodlust); строка-оговорка всего списка
   («All three of these …») — серым В ОДНОЙ СТРОКЕ с текстом ряда, не последней строкой таблицы (владелец 2026-10-28);

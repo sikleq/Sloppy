@@ -172,8 +172,13 @@ def build():
     # subgroup whose rows are all REWORK gets new="Reworked mechanic")
     W(subgroup("Health Restoration", new="Reworked mechanic"))
     W(ul_open())
-    W(li("Health Restoration now applies to all forms of life gain — before, it did not apply to incoming heals", t("REWORK")))
-    W(li("Incoming Heal Amplification now stacks diminishingly with Health Restoration instead of additively with Outgoing Heal Amplification", t("REWORK")))
+    # Valve's two "now … — before / instead of …" rows: one table, before and after the patch (owner 2026-10-28;
+    # generator: _postprocess_before_after)
+    W(li("", t("REWORK"), extra=mech_before_after("Mechanic", [
+        ("Health Restoration", "Applies to all forms of life gain except incoming heals",
+         "Applies to all forms of life gain"),
+        ("Incoming Heal Amplification", "Stacks additively with Outgoing Heal Amplification",
+         "Stacks diminishingly with Health Restoration")])))
     W(li("Spells that previously had a separate value for incoming heal reduction now only modify Health Restoration " + info_tip(
             "Eye of Skadi's Cold Attack", "Spirit Vessel's Soul Release",
             "Omniknight's Guardian Angel with Aghanim's Scepter", "Pudge's Rot with Aghanim's Scepter",
@@ -204,7 +209,7 @@ def build():
 
     # the rows about reflected damage are a mechanic of their own, its sources a table of icons (owner 2026-10-28:
     # "взять из [?] список reflection спеллов и сделать тоже таблицей"; generator: _postprocess_misc_topics)
-    W(subgroup("Reflected Damage", new="Reworked mechanic"))
+    W(subgroup("Reflected Damage", new="Reworked mechanic", one_box=True))   # one box, no chips (owner 2026-10-28)
     W(ul_open())
     W(li("Reflected damage cannot be reflected back", t("DEL")))           # owner 2026-10-28 (was NERF)
     W(li("Lifesteal and Spell Lifesteal don't apply to reflected damage", t("REWORK")))   # owner 2026-10-16

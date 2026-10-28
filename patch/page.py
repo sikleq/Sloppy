@@ -380,7 +380,9 @@ def _thumb_srcs(html):
     return _THUMB_RE.sub(repl, html)
 
 
-_NEWMECH_UL_RE = re.compile(r'<ul class="changes"><!--NEWMECH(?::(\w+))?-->(.*?)</ul>', re.S)
+_NEWMECH_UL_RE = re.compile(r'<ul class="changes"><!--NEWMECH(?::(\w+))?(:all)?-->(.*?)</ul>', re.S)
+# any row's chip, for a block drawn as one box (the row's data-tag stays)
+_ANY_CHIP_RE = re.compile(r'(<li\b[^>]*>)<span class="badge [\w-]+"[^>]*>[^<]*</span>')
 _NEW_CHIP_RE = re.compile(r'(<li\b[^>]*data-tag="[^"]*\bnew\b[^"]*"[^>]*>)<span class="badge new"[^>]*>NEW</span>')
 
 
@@ -395,16 +397,18 @@ def _new_mech_rows(html):
     (classes mech-desc / mech-first / mech-last); data-tag stays for the filters and dynamics.
     Rows with other tags stay normal change rows below it."""
     def fix(m):
-        chip_re = _mech_chip_re(m.group(1) or "new")
-        body = m.group(2)
+        one_box = bool(m.group(2))
+        chip_re = _ANY_CHIP_RE if one_box else _mech_chip_re(m.group(1) or "new")
+        body = m.group(3)
         items = list(_LI_RE.finditer(body))
-        box_idx = [i for i, it in enumerate(items) if chip_re.match(it.group(0))]
+        box_idx = [i for i, it in enumerate(items) if one_box or chip_re.match(it.group(0))]
         if not box_idx:
             return '<ul class="changes">' + body + '</ul>'
         box, rest, last = [], [], 0
         # a row with its table (7.38 Lifesteal, 7.40 Cyclone cases) is a box of its own, apart from the rows around
-        # it (owner 2026-10-28: "в отдельном блоке, с отступом от предыдущего")
-        tabled = {i for i in box_idx if 'class="mech-abils' in items[i].group(0)}
+        # it (owner 2026-10-28: "в отдельном блоке, с отступом от предыдущего") — unless the block is one box
+        # (subgroup(one_box=True): 7.41 Reflected Damage, its sources' table under the last line)
+        tabled = set() if one_box else {i for i in box_idx if 'class="mech-abils' in items[i].group(0)}
         for n, i in enumerate(box_idx):
             first = n == 0 or i in tabled or box_idx[n - 1] in tabled
             end = n == len(box_idx) - 1 or i in tabled or box_idx[n + 1] in tabled
