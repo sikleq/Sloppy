@@ -4419,7 +4419,11 @@ h4.subgroup {
 .mech-abil-text { display: flex; align-items: center; flex-wrap: wrap; column-gap: 5px; line-height: 21px; }
 .mech-abil-only > .mech-abil-icons,                     /* the names alone (7.41 "Affected spells") */
 .mech-abil-line { grid-column: 1 / -1; border-right: 0; line-height: 1.45; }  /* a list without abilities */
-.mech-abil-icons .ability-chip { margin-right: 0; vertical-align: 0; }
+.mech-abil-icons .ability-chip,
+.mech-icons .ability-chip { margin-right: 0; vertical-align: 0; }
+/* a list of abilities in columns: the sentence or the condition ("Always", "With Aghanim's Scepter") as the label,
+   the icons centred after it (owner 2026-10-28) */
+.mech-abils.mech-cols-icons { grid-template-columns: fit-content(50%) minmax(0, 1fr); }
 /* a list's closing note, in the row's own line and its colour (owner 2026-10-28: "не надо серым") */
 .mech-row-note { color: inherit; }
 /* cells of a table with columns: a list with its examples (7.38 Lifesteal sources), mech_table (Lifesteal rules) */

@@ -142,7 +142,7 @@ ALWAYS = "Always"
 
 def ability_list_rows(raw):
     """The note's lines as rows of icons, or None when it is not a list of abilities that all have an icon."""
-    groups, caveats, notes = {}, {}, []
+    groups, caveats, notes, kinds = {}, {}, [], set()
     for line in (x.strip() for x in raw.split("<br>")):
         if line.startswith(_SUB):
             line = line[len(_SUB):]
@@ -162,27 +162,40 @@ def ability_list_rows(raw):
             # extra words about one ability: a "?" after the row's sentence, not among the icons where it read as one
             # more ability (owner 2026-10-28, 7.40 Bloodlust)
             caveats.setdefault(sentence, []).append(f"{label}: {caveat[:1].upper()}{caveat[1:]}")
+        kinds.add("item" if icon.startswith(ITEM_CDN) else "ability")
     if sum(len(v) for v in groups.values()) < 2:
         return None
     from .elements import info_tip
+    if list(groups) == [""]:                           # the names alone: one row of icons across, no columns
+        tip = f" {info_tip(*caveats[''])}" if "" in caveats else ""
+        return (f'<span class="mech-abils"><span class="mech-abil-row mech-abil-only"><span class="mech-abil-icons">'
+                f'{"".join(groups[""])}{tip}</span></span></span>', notes)
     # the plain abilities next to ones that need a condition ("with Aghanim's Scepter"): one row like the others,
-    # "Always" in its sentence cell — across the whole table it stood apart and the icons column shrank to the
+    # "Always" in its first cell — across the whole table it stood apart and the icons column shrank to the
     # conditions' few icons (owner 2026-10-28, 7.41 Lifesteal "криво")
-    mixed = "" in groups and len(groups) > 1
-    if mixed:
+    if "" in groups:
         groups = {ALWAYS: groups.pop(""), **groups}
         if "" in caveats:
             caveats[ALWAYS] = caveats.pop("")
-    rows = ""                                          # the list's closing notes: the caller puts them in the row's text
+    # the sentence (or the condition) first, the icons after it, under a header like every table of columns (owner
+    # 2026-10-28: "сначала столбец с always", "не хватает шапки, как в Lifesteal 7.38")
+    rows = (f'<span class="mech-abil-row mech-head"><span class="mech-cell mech-label">{_first_title(groups)}</span>'
+            f'<span class="mech-cell">{_ICONS_TITLE[frozenset(kinds)]}</span></span>')
     for sentence, chips in groups.items():
         tip = f" {info_tip(*caveats[sentence])}" if sentence in caveats else ""
-        if sentence:
-            rows += (f'<span class="mech-abil-row"><span class="mech-abil-icons">{"".join(chips)}</span>'
-                     f'<span class="mech-abil-text">{sentence}{tip}</span></span>')
-        else:
-            rows += (f'<span class="mech-abil-row mech-abil-only"><span class="mech-abil-icons">{"".join(chips)}'
-                     f'{tip}</span></span>')
-    return f'<span class="mech-abils">{rows}</span>', notes
+        rows += (f'<span class="mech-abil-row"><span class="mech-cell mech-label">{sentence}{tip}</span>'
+                 f'<span class="mech-cell mech-icons">{"".join(chips)}</span></span>')
+    return f'<span class="mech-abils mech-cols-icons">{rows}</span>', notes
+
+
+# the icons column's title: what its icons are (an item's own ability, "Eye of Skadi's Cold Attack", is the item's)
+_ICONS_TITLE = {frozenset({"item"}): "Items", frozenset({"ability"}): "Abilities",
+                frozenset({"item", "ability"}): "Items and abilities"}
+
+
+def _first_title(groups):
+    """"Condition" when the rows say only when (Always / With Aghanim's Scepter / With talent), else "Change"."""
+    return "Condition" if all(s == ALWAYS or s.startswith("With ") for s in groups) else "Change"
 
 
 _EXAMPLES_RE = re.compile(r"^(?:(?P<pre>.*?),?\s+like\s+|Examples?:\s*)(?P<list>.+)$", re.S)
