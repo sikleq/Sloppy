@@ -316,6 +316,14 @@ Second pick. Структура 7.34+: Бан7·Пик2·Бан3·Пик6·Ба�
 extra=inline_note(info_tip("Batrider's Arsonist", "Magnus' Diminishing Return", header="Affected facets:"))
 ```
 
+### Строка руны → значок руны (владелец 2026-10-28)
+
+«Haste Rune: Duration no longer …» → значок руны вместо «Haste Rune:», имя при наведении, как способность у строки
+аспекта (`mech_abilities.rune_row_chip`, вызывается в `li()`). Рун в игре 10: Bounty, Haste, Amplify Damage (Double
+Damage), Illusion, Invisibility, Regeneration, Arcane, Shield, Water, Wisdom (удалена 7.38); значки из клиента —
+`python scripts/fetch/fetch_rune_icons.py` → `icons/runes/<key>.png`. У Illusion 2D-значка в игре нет — строка
+остаётся текстом. Тест: `tests/test_runes_and_two_colours.py`.
+
 ### Список способностей в разделе механики → ряды иконок (владелец 2026-10-28)
 
 В блоке «New/Reworked mechanic» (`plain_header(new=…)` / `subgroup(new=…)`) `li()` сам превращает «?»-список

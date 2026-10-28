@@ -105,13 +105,13 @@
     {"match": "The watchers in the primary jungles have been repositioned", "spots": [[1978, -4434], [-2346, 4136]], "r": 1200},
     {"match": "Lowered the Wisdom Shrine areas to low ground", "spots": [[8253, -1075], [-8088, 588]], "r": 900},
     {"match": "Cleared up some areas around the Tormentor locations", "spots": [[7488, -7857], [-7202, 7947]], "r": 800, "show": ["trees"]},
-    {"match": "Slightly expanded the entrance to the bridge by the Lotus pools", "spots": [[7604, -4805], [-7627, 4598]]},
+    {"match": "Slightly expanded the entrance to the bridge by the Lotus pools", "spots": [[8500, -2950], [-8370, 2800]], "r": 800, "show": ["cliffs"]},
     {"match": "Very slightly adjusted the paths and spawn points of the Radiant Offlane lane creeps", "spots": [[-6483, -872]], "r": 600, "show": ["lanes", "towers"]},
     {"match": "Moved Wisdom Shrines to the low ground", "spots": [[8253, -1075], [-8088, 588]], "r": 900},
     {"match": "Extended the streams into both Radiant and Dire bases", "spots": [[-3700, -7400], [3300, 7200]], "r": 1200},
     {"match": "Removed some trees inside the base near the new safelane defender's gate positions", "spots": [[-4400, -6950], [3750, 6750]], "r": 600},
     {"match": "Removed a tree between Dire Safelane Tier 1 tower and the small pull camp", "spots": [[-4800, 5248]], "r": 500},
-    {"match": "Changed the 'bridges' to actual bridges", "spots": [[7604, -4805], [-7627, 4598]], "phrase": "actual bridges"},
+    {"match": "Changed the 'bridges' to actual bridges", "spots": [[8500, -2950], [-8370, 2800]], "r": 600, "show": [], "phrase": "actual bridges"},
     {"match": "Radiant Secret Shop trigger area moved slightly", "spots": [[-4980, 1820]], "r": 700, "show": ["shopzones"], "phrase": "Radiant Secret Shop trigger area"}
   ],
   "7.41": [

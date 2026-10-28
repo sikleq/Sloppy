@@ -473,7 +473,8 @@ def test_moved_objects_leave_a_dashed_ghost_on_the_new_side():
     sys.path.insert(0, os.path.join(_ROOT, "scripts", "gen"))
     import terrain_shots as ts
     src = open(ts.__file__, encoding="utf-8").read()
-    assert 'if side == "new":            # where the moved ones stood' in src and "def _dashed(" in src
+    # the ghost of a moved one's old spot on the new side: red dashed, faint (owner 2026-10-28: two colours only)
+    assert 'if side == "new" and key != "trees":' in src and 'COLOUR["removed"] + (160,)' in src and "def _dashed(" in src
     # a camp's spawn box that moved a little: the old box dashed red on top of the new one (the owner 2026-10-03)
     boxes = src.split("def _boxes(", 1)[1].split("\ndef ", 1)[0]
     assert 'if side == "new":                # on top' in boxes and "_dashed_poly(" in boxes

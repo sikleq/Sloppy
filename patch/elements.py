@@ -10,7 +10,7 @@ import re
 from .images import (ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG, hero_img,
                      item_img, _LOCAL_ABIL_ICONS)
 from .state import _State, page_cache
-from .mech_abilities import LIST_TIPS, TIP_RAW, ability_chip, lift_ability_lists
+from .mech_abilities import LIST_TIPS, TIP_RAW, ability_chip, lift_ability_lists, rune_row_chip
 from .terrain_notes import note_phrase, wrap_phrase
 
 try:
@@ -1939,6 +1939,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
         text_inner = f'{_facet_chip(facet)} {text_inner}'
     elif _State.current_block_is_facet and isinstance(text_inner, str):
         text_inner = _facet_row_ability_chip(text_inner)
+    elif isinstance(text_inner, str):
+        text_inner = rune_row_chip(text_inner)      # "Haste Rune: …" -> the rune's icon (owner 2026-10-28)
     if _abil_rows:
         text_inner += _abil_rows
     # An ability row with its own chip keeps the chip as the li's first child: page.py

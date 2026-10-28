@@ -49,7 +49,8 @@ UPP = 2.0                 # game units per pixel of the full renders
 SIZES = ((360, "", 6, 3, 20), (720, "_lg", 10, 5, 32))
 ZOOM_OUT = 1.4
 MINIMAP = 0.32                # minimap side, share of a half
-COLOUR = {"removed": (255, 77, 77), "added": (93, 255, 138), "moved": (255, 210, 63)}
+# the two colours of every picture (owner 2026-10-28): red dashed = where it was and how; green solid = how it is
+COLOUR = {"removed": (255, 77, 77), "added": (93, 255, 138)}
 MARK = (240, 240, 240)       # "here": an unchanged camp a note is about (evolutions, pull timers)
 # camp tier icons for "tiers" (the owner 2026-10-03: "a demoted camp's pictures get the camp icons, before / after")
 TIER_ICON = {t: os.path.join(_ROOT, "icons", "camps", f"creepcamp_{t}.png") for t in ("small", "mid", "big", "ancient")}
@@ -113,27 +114,29 @@ def _outlines(img, cx, cy, r, groups, side, keys, half, width):
             _cells(img, g.get("removed" if side == "old" else "added", []), px, k,
                    COLOUR["removed" if side == "old" else "added"], width)
             continue
-        spots = {"moved": [m[0] if side == "old" else m[1] for m in g.get("moved", [])],
-                 "removed": g.get("removed", []) if side == "old" else [],
-                 "added": g.get("added", []) if side == "new" else []}
-        for kind, pts in spots.items():
-            for x, y in pts:
-                if abs(x - cx) > r + 300 or abs(y - cy) > r + 300:
-                    continue
-                X, Y = px(x, y)
-                s = size(key)
-                if side == "old":
-                    _dashed(d, key in SIZE, X, Y, s, COLOUR[kind], width)
-                    continue
-                shape = d.rectangle if key in SIZE else d.ellipse
-                shape([X - s, Y - s, X + s, Y + s], outline=COLOUR[kind], width=width)
-        if side == "new":            # where the moved ones stood: a light dashed outline, on top (the owner 2026-10-03)
+        # two colours only (owner 2026-10-28: "то жёлтым, то красным"): red dashed = where it stood and how, on the old
+        # half; green solid = how it is now, on the new half. A moved one is both: its old spot red, its new one green
+        # (yellow "moved" is gone).
+        pts = ([m[0] for m in g.get("moved", [])] + g.get("removed", []) if side == "old"
+               else [m[1] for m in g.get("moved", [])] + g.get("added", []))
+        for x, y in pts:
+            if abs(x - cx) > r + 300 or abs(y - cy) > r + 300:
+                continue
+            X, Y = px(x, y)
+            s = size(key)
+            if side == "old":
+                _dashed(d, key in SIZE, X, Y, s, COLOUR["removed"], width)
+                continue
+            shape = d.rectangle if key in SIZE else d.ellipse
+            shape([X - s, Y - s, X + s, Y + s], outline=COLOUR["added"], width=width)
+        if side == "new" and key != "trees":
+            # where the moved ones stood: faint red dashed on top (the owner 2026-10-03), so a small shift shows; not
+            # for trees — the old half shows those (owner 2026-10-28: "несколько цветов и каша")
             ghost = ImageDraw.Draw(img, "RGBA")
             for (x, y), _ in g.get("moved", []):
                 if abs(x - cx) <= r + 300 and abs(y - cy) <= r + 300:
                     X, Y = px(x, y)
-                    s = size(key)
-                    _dashed(ghost, key in SIZE, X, Y, s, COLOUR["moved"] + (200,), max(1, width - 1))
+                    _dashed(ghost, key in SIZE, X, Y, size(key), COLOUR["removed"] + (160,), max(1, width - 1))
 
 
 def _cliff_layer(img, cx, cy, r, points, half, colour):
@@ -149,11 +152,13 @@ def _cliff_layer(img, cx, cy, r, points, half, colour):
             d.rectangle([X - s, Y - s, X + s, Y + s], fill=colour + (230,))
 
 
-TREE_FILL, TREE_EDGE = (0, 255, 0, 64), (0, 255, 0, 200)    # the Terrain page's Trees layer (.tm-trees-g rect)
+# the Trees layer in a neutral light shade: red / green belong to old / new only (owner 2026-10-28: "слой деревьев до
+# и слой после, отметив 2 цветами, где изменения"; the Terrain page's own green layer read as "added" everywhere)
+TREE_FILL, TREE_EDGE = (235, 232, 220, 50), (235, 232, 220, 150)
 
 
 def _tree_layer(img, cx, cy, r, coords, half):
-    """Every tree of this side's map as the Terrain page's Trees layer draws it, a green square: a removed tree is
+    """Every tree of this side's map as a light square (the Terrain page's Trees layer): a removed tree is
     a square on the old side and none on the new one, so a note about trees reads without hunting the art (owner
     2026-10-27, 7.38b: "just show the trees layer, both pictures, and outline the removed trees red dashed on the
     left")."""
@@ -410,8 +415,6 @@ def spot_patch(spot, patch):
 
 # the teams' colours (Radiant green, Dire red), old = dashed, new = solid, thin lines (owner 2026-10-16: white / gold
 # lost the sides and read too thick — "основные красные/зелёные и пунктирные красные/зелёные"; the old / new key stays)
-LANE_RGB = {"good": (126, 208, 96), "bad": (255, 106, 84)}
-LANE_KEY = (232, 226, 210, 230)          # the key's sample lines: neutral, they show dashed vs solid only
 
 
 def _lanes(img, cx, cy, r, diff, side, half, width):
@@ -440,13 +443,15 @@ def _lanes(img, cx, cy, r, diff, side, half, width):
                 d.line([x0 + (x1 - x0) * a, y0 + (y1 - y0) * a, x0 + (x1 - x0) * b, y0 + (y1 - y0) * b],
                        fill=colour, width=w)
                 t += step
+    # old red dashed, new green solid, both teams alike (owner 2026-10-28: one meaning for the two colours — the team
+    # colours green / red read as new / old)
     lanes = (diff or {}).get("lanes") or {}
     for p in lanes.get("old", []):
-        poly(p["points"], LANE_RGB[p["team"]] + ((255,) if side == "old" else (230,)), dash)
+        poly(p["points"], COLOUR["removed"] + ((255,) if side == "old" else (170,)), dash)
     if side == "old":
         return
     for p in lanes.get("new", []):
-        poly(p["points"], LANE_RGB[p["team"]] + (255,), None)
+        poly(p["points"], COLOUR["added"] + (255,), None)
     _lane_key(d, half, w)
 
 
@@ -454,7 +459,7 @@ def _lane_key(d, half, width):
     """"— old  — new" in the new half's bottom-right corner, on a dark plate like the version label."""
     font = ImageFont.truetype(os.path.join(_ROOT, "src", "fonts", "radiance-semibold.otf"), max(11, half // 24))
     pad, seg = max(4, half // 60), max(14, half // 14)
-    items = [("old", LANE_KEY, True), ("new", LANE_KEY, False)]
+    items = [("old", COLOUR["removed"] + (255,), True), ("new", COLOUR["added"] + (255,), False)]
     tw = sum(seg + pad + d.textlength(t, font=font) + 2 * pad for t, _c, _d in items)
     h = font.size + 2 * pad
     x0, y0 = half - tw - 2 * pad, half - h - 2 * pad
@@ -500,7 +505,7 @@ def _sheet(fulls, rect, step, patch, diff, groups, cx, cy, r, entry, size, own=T
     halves = []
     for side, ver, label in (("old", step.old_pic, step.before), ("new", step.new_pic, patch)):
         img = _crop(fulls[ver], rect, cx, cy, r, half)
-        if "boxes" in keys:
+        if "boxes" in keys or "camps" in keys:     # a camp shows its spawn boxes too (owner 2026-10-28)
             _boxes(img, cx, cy, r, diff, side, half, width)
         if "currents" in keys:
             _currents(img, cx, cy, r, diff, side, half, width)

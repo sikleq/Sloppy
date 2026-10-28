@@ -32,9 +32,9 @@ def _red(img, xy):
     return r > 150 and g < 120
 
 
-def _green(img, xy):
-    r, g, _ = img.getpixel(xy)
-    return g > 40 and r < 30
+def _light(img, xy):
+    r, g, b = img.getpixel(xy)
+    return r > 30 and abs(r - g) < 12 and abs(g - b) < 15
 
 
 def test_a_tree_note_shows_the_trees_layer_and_the_removed_tree_only_on_the_old_side():
@@ -50,8 +50,9 @@ def test_a_tree_note_shows_the_trees_layer_and_the_removed_tree_only_on_the_old_
         sides[side] = Image.new("RGB", (360, 360))
         ts._tree_layer(sides[side], 0, 0, 500, layer[side], 360)
         ts._outlines(sides[side], 0, 0, 500, groups, side, {"trees"}, 360, 3)
-    assert _green(sides["old"], (180, 180)) and not _green(sides["new"], (180, 180))
-    assert _green(sides["new"], (180 + 108, 180))                   # the tree that stays: on both sides
+    # the layer is a neutral light square per tree (owner 2026-10-28: red / green mean old / new only)
+    assert _light(sides["old"], (180, 180)) and not _light(sides["new"], (180, 180))
+    assert _light(sides["new"], (180 + 108, 180))                   # the tree that stays: on both sides
     assert any(_red(sides["old"], (x, 180 - 23)) for x in range(160, 200))
     raw = sides["new"].tobytes()
     assert not any(raw[i] > 150 and raw[i + 1] < 120 for i in range(0, len(raw), 3))   # nothing red on the right

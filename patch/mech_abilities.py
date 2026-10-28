@@ -44,6 +44,25 @@ _ENCHANT_RE = re.compile(r"^(?:Item bonus from )?(\w+) [Ee]nchantment$")   # "Au
 _ICON_ALIASES = {("warlock", "Golem"): "warlock_rain_of_chaos"}
 
 
+# a rune's name in the notes -> its icon (scripts/fetch/fetch_rune_icons.py; Illusion has none in the game)
+RUNE_ICONS = {"Bounty": "bounty", "Haste": "haste", "Double Damage": "doubledamage", "Amplify Damage": "doubledamage",
+              "Invisibility": "invisibility", "Regeneration": "regeneration", "Arcane": "arcane", "Shield": "shield",
+              "Water": "water", "Wisdom": "wisdom", "Power": "power"}
+_RUNE_ROW_RE = re.compile(r"(?P<name>[A-Z][a-z]+(?: [A-Z][a-z]+)?) Runes?:\s")
+_RUNE_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "icons", "runes")
+
+
+def rune_row_chip(text, prefix="../"):
+    """"Haste Rune: Duration no longer …" -> the rune's icon (its name on hover) + "Duration no longer …", like a facet
+    row's ability (owner 2026-10-28, 7.40 Runes). The text as it was for a rune without an icon (Illusion)."""
+    m = _RUNE_ROW_RE.match(text)
+    key = RUNE_ICONS.get(m.group("name")) if m else None
+    if not key or not _os.path.exists(_os.path.join(_RUNE_DIR, f"{key}.png")):
+        return text
+    rest = text[m.end():]
+    return ability_chip(f"{m.group('name')} Rune", f"{prefix}icons/runes/{key}.png") + rest[:1].upper() + rest[1:]
+
+
 def _item_icon(name):
     m = _ENCHANT_RE.match(name)
     item = (f"enhancement_{m.group(1).lower()}" if m

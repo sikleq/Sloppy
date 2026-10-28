@@ -789,6 +789,16 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   the Dire gates changed), 7.39b "Fixed some locations that were incorrectly blocked for warding" (the gridnav of
   7.39 and 7.39b are identical, cell for cell) — no picture. Test: `tests/test_terrain_notes_1027.py`.
 
+## Two colours, one meaning (owner 2026-10-28)
+
+Every note picture: **red dashed = where it was and how it was** (the old half), **green solid = how it is now** (the new
+half). Nothing else colours a change — the yellow "moved" is gone: a moved object is red dashed at its old spot on the
+old half and green at its new spot on the new half (plus a faint red dashed ghost of the old spot on the new half, so
+a small shift shows; not for trees). Lanes too (not the team colours any more), zones, spawn boxes, cliffs. Layers that
+are not a change stay neutral: the Trees layer is a light square per tree on both halves (no longer green), the
+currents keep their blue. A camp note always shows the camps' spawn boxes as well. Gold is only the boss's start ring
+(`first`) and the minimap frame. `scripts/gen/terrain_shots.py COLOUR`; test `tests/test_runes_and_two_colours.py`.
+
 ## Recipe: a picture for a patch note (read this first — no code digging)
 
 1. Find what changed and where: `python scripts/gen/terrain_hotspots.py <patch>` (camps / trees / cliffs, outside the
