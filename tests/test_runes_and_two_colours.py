@@ -24,6 +24,16 @@ def test_illusion_has_its_icon_and_a_row_without_a_rune_keeps_its_text():
     assert "icons/runes/illusion.png" in rune_row_chip("Illusion Rune: Illusions now …")
     assert rune_row_chip("Rune spawn interval increased") == "Rune spawn interval increased"
     assert rune_row_chip("Fire Rune: x") == "Fire Rune: x"
+    # no icon of its own for the power runes (the HUD timer's is the Water rune, owner 2026-10-28)
+    assert rune_row_chip("Power Rune: spawn every 2 minutes") == "Power Rune: spawn every 2 minutes"
+
+
+def test_runes_share_the_terrain_page_icons():
+    """One style — the minimap icons the Terrain page shows (owner 2026-10-28)."""
+    import filecmp
+    for key, name in (("haste", "tc_rune_2"), ("illusion", "tc_rune_3"), ("bounty", "tc_bounty")):
+        assert filecmp.cmp(os.path.join(ROOT, "icons", "runes", f"{key}.png"),
+                           os.path.join(ROOT, "icons", "ui", "gothic", f"{name}.png"), shallow=False)
 
 
 def test_a_transparent_icon_sits_on_a_dark_square():
