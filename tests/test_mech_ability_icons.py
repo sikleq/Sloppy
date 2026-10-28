@@ -29,14 +29,19 @@ _SENTENCES = ("Items — Nullifier's Nullify can no longer target invulnerable u
 def test_abilities_with_the_same_sentence_share_one_row_of_icons():
     row = _mech_row(lambda: "The following spells have been changed",
                    extra=lambda: elements.inline_note(_SENTENCES))
-    assert row.count('class="mech-abil-row"') == 2
+    assert row.count('class="mech-abil-text"') == 2
     assert 'data-tooltip="Nullifier&#x27;s Nullify"' in row and "icons/items/nullifier.png" in row
     assert 'data-tooltip="Dark Seer&#x27;s Vacuum"' in row and "dark_seer_vacuum.png" in row
     same = row.split('<span class="mech-abil-text">Can no longer target invulnerable units</span>')[0]
     assert "nullifier.png" in same and "ogre_magi_bloodlust.png" in same and "sniper_assassinate.png" in same
     assert "satyr_trickster_purge.png" in same          # a neutral creep's, by the game's own name of the creep
-    # Bloodlust's own caveat: a "?" at its icon; the list's closing note stays a line under the rows
-    assert 'class="mech-abil-caveat"' in row and "Can still target invulnerable buildings" in row
+    # Bloodlust's own caveat: a "?" after the row's sentence naming whose it is, not among the icons where it read as
+    # one more ability (owner 2026-10-28); the list's closing note stays a line under the rows
+    icons = same.rsplit('<span class="mech-abil-icons">', 1)[1]
+    assert "info-tip" not in icons
+    assert ("Can no longer target invulnerable units <!--TIP-->" in row
+            and "Ogre Magi&#x27;s Bloodlust: Can still target invulnerable buildings" not in row
+            and "Ogre Magi's Bloodlust: Can still target invulnerable buildings" in row)
     assert '<span class="mech-abil-note">All of these were changed</span>' in row
     assert "Items —" not in row and ">Heroes<" not in row
 

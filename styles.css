@@ -4392,29 +4392,31 @@ h4.subgroup {
 }
 /* a reworked mechanic's list of abilities: rows under the text, icons in place of the names, the abilities with the
    same sentence in one row (owner 2026-10-28, 7.40 Invulnerability Targeting) */
+/* a table like every table of the site: thin translucent lines between the rows and between icons | sentence; the
+   icons centred in their cell, the sentence reads from the left like a label */
 .mech-abils {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-top: 6px;
+  display: grid;
+  grid-template-columns: fit-content(45%) 1fr;
+  margin: 6px 0 2px;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
 }
-.mech-abil-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
+.mech-abil-row { display: contents; }
+.mech-abil-row > span { padding: 5px 10px; border-top: 1px solid var(--line-soft); }
+.mech-abil-row:first-child > span { border-top: 0; }
 .mech-abil-icons {
-  display: inline-flex;
+  display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
   gap: 4px;
-  flex-shrink: 0;
-  max-width: 50%;
-  padding-top: 1px;
+  border-right: 1px solid var(--line-soft);
 }
-.mech-abil-only > .mech-abil-icons { max-width: none; }     /* the names alone (7.41 "Affected spells") */
+.mech-abil-text { display: flex; align-items: center; flex-wrap: wrap; column-gap: 5px; line-height: 21px; }
+.mech-abil-only > .mech-abil-icons,                     /* the names alone (7.41 "Affected spells") */
+.mech-abil-note { grid-column: 1 / -1; border-right: 0; }
 .mech-abil-icons .ability-chip { margin-right: 0; vertical-align: 0; }
-.mech-abil-caveat { display: inline-flex; align-items: center; gap: 1px; }
-.mech-abil-text { line-height: 21px; }
 .mech-abil-note { color: var(--text-dim, #969289); line-height: 1.4; }
 .facet-icon-overlay {
   width: 36px;

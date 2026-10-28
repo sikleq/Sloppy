@@ -115,7 +115,7 @@ def _parse_line(line):
 
 def ability_list_rows(raw):
     """The note's lines as rows of icons, or None when it is not a list of abilities that all have an icon."""
-    groups, notes = {}, []
+    groups, caveats, notes = {}, {}, []
     for line in (x.strip() for x in raw.split("<br>")):
         if line.startswith(_SUB):
             line = line[len(_SUB):]
@@ -130,18 +130,24 @@ def ability_list_rows(raw):
         if parsed is None:
             return None
         label, icon, sentence, caveat = parsed
-        chip = ability_chip(label, icon)
+        groups.setdefault(sentence, []).append(ability_chip(label, icon))
         if caveat:
-            from .elements import info_tip
-            chip = f'<span class="mech-abil-caveat">{chip}{info_tip(caveat)}</span>'
-        groups.setdefault(sentence, []).append(chip)
+            # extra words about one ability: a "?" after the row's sentence, not among the icons where it read as one
+            # more ability (owner 2026-10-28, 7.40 Bloodlust)
+            caveats.setdefault(sentence, []).append(f"{label}: {caveat[:1].upper()}{caveat[1:]}")
     if sum(len(v) for v in groups.values()) < 2:
         return None
-    rows = "".join(
-        f'<span class="mech-abil-row{"" if sentence else " mech-abil-only"}"><span class="mech-abil-icons">'
-        f'{"".join(chips)}</span>' + (f'<span class="mech-abil-text">{sentence}</span>' if sentence else "")
-        + '</span>' for sentence, chips in groups.items())
-    rows += "".join(f'<span class="mech-abil-note">{n}</span>' for n in notes)
+    from .elements import info_tip
+    rows = ""
+    for sentence, chips in groups.items():
+        tip = f" {info_tip(*caveats[sentence])}" if sentence in caveats else ""
+        if sentence:
+            rows += (f'<span class="mech-abil-row"><span class="mech-abil-icons">{"".join(chips)}</span>'
+                     f'<span class="mech-abil-text">{sentence}{tip}</span></span>')
+        else:
+            rows += (f'<span class="mech-abil-row mech-abil-only"><span class="mech-abil-icons">{"".join(chips)}'
+                     f'{tip}</span></span>')
+    rows += "".join(f'<span class="mech-abil-row"><span class="mech-abil-note">{n}</span></span>' for n in notes)
     return f'<span class="mech-abils">{rows}</span>'
 
 
