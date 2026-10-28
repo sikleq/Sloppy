@@ -1135,8 +1135,14 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
             folded = [j for j in desc
                       if not _DMG_L1_RE.search(_strip_html(notes[j].get('note') or ''))]
             if folded:
+                # a list the row introduces ("…every ability:", "The following …"): inline_list, a table open under
+                # the row in a Reworked mechanic (owner 2026-10-28, 7.38 Lifesteal); clarifications stay a "?"
+                is_list = (bool(re.search(r':\s*(?=")', lines[-1])) or clean.lower().startswith("the following ")) \
+                    and 'extra=' not in lines[-1]
                 lines[-1] = re.sub(r':(?=")', '', lines[-1], count=1)   # "…the following:" → "…the following"
                 _fold_into_row(lines, len(lines) - 1, _nested_info_text(notes, lvl, folded))
+                if is_list:
+                    lines[-1] = lines[-1].replace('extra=inline_note(', 'extra=inline_list(', 1)
                 consumed.update(folded)
 
     if open_ul:
@@ -2968,8 +2974,27 @@ def _postprocess_mechanic_rules_row(lines, after_label=False):
         if after_label and mech and line == 'W(ul_open())' and out and out[-1] == 'W(ul_close())':
             out.pop()
             continue
+        if after_label and mech and out and _join_following_list(out, line):
+            continue
         out.append(line)
     return out
+
+
+_FOLLOWING_LIST_RE = re.compile(r"^The following (?:spells|abilities|items)\b", re.I)
+
+
+def _join_following_list(out, line):
+    """"The following spells have been changed" (+ its list) goes in one line with the row above it when that row has
+    no note of its own (owner 2026-10-28, 7.40 Invulnerability Targeting). True when joined into out[-1]."""
+    cur, prev = _li_parts(line), _li_parts(out[-1])
+    if not (cur and prev and _FOLLOWING_LIST_RE.match(cur[0]) and "extra" not in prev[1]):
+        return False
+    src = out[-1].strip()
+    badge = ast.get_source_segment(src, prev[2].args[1]) if len(prev[2].args) > 1 else '""'
+    text = prev[0].rstrip().rstrip(".") + ". " + cur[0]
+    keys = "".join(f", {k}={v}" for k, v in {**prev[1], **cur[1]}.items())
+    out[-1] = f"W(li({json.dumps(text, ensure_ascii=False)}, {badge}{keys}))"
+    return True
 
 
 def _postprocess_new_block_label(lines):

@@ -5,7 +5,7 @@ from .badges import b, br, bf, t, gradient_class, facet_badge, scale_pill, rank_
 from .elements import (
     hero_header, item_header, unit_header, ability, facet_header, new_facet, facet_change, section, subgroup, li,
     ul_open, ul_close, li_formula, enchant_header, enchant_attr_row, enchant_tier_box, souvenir_chip, plain_header,
-    components, item_cost, provides, auto_components_change, new_stats, formula_change, inline_note, info_tip,
+    components, item_cost, provides, auto_components_change, new_stats, formula_change, inline_note, inline_list, info_tip,
     show_list, subnote, section_intro, note_box, cm_draft, attr_change, creep_ref, camp_table, enchant_list_head,
     enchant_row, sub_ability, hl, bug_note
 )

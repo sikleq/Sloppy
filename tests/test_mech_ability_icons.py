@@ -1,5 +1,8 @@
 """A reworked mechanic's list of abilities is rows of icons under the row, not a "?" (owner 2026-10-28: 7.40
 Invulnerability Targeting, 7.38 Lifesteal, 7.41 Health Restoration / Lifesteal)."""
+import os
+import re
+
 from patch import elements
 from patch.state import _State, reset_page_state
 
@@ -42,7 +45,9 @@ def test_abilities_with_the_same_sentence_share_one_row_of_icons():
     assert ("Can no longer target invulnerable units <!--TIP-->" in row
             and "Ogre Magi&#x27;s Bloodlust: Can still target invulnerable buildings" not in row
             and "Ogre Magi's Bloodlust: Can still target invulnerable buildings" in row)
-    assert '<span class="mech-abil-note">All of these were changed</span>' in row
+    # the list's closing note: in one line with the row's text, not the table's last line (owner 2026-10-28)
+    assert ('The following spells have been changed. <span class="mech-row-note">All of these were changed</span>'
+            in row.split('<span class="mech-abils">')[0])
     assert "Items —" not in row and ">Heroes<" not in row
 
 
@@ -56,9 +61,45 @@ def test_names_alone_are_one_row_of_icons_and_with_scepter_its_own():
     assert "info-tip" not in row and "Affected spells:" not in row
 
 
-def test_a_list_with_an_ability_without_an_icon_stays_a_note():
-    row = _mech_row(lambda: "Spells changed " + elements.info_tip("Sniper's Assassinate", "Sniper's Imaginary Shot"))
+def test_a_list_with_an_ability_without_an_icon_is_not_drawn_as_icons():
+    """No mixing: one line without an icon -> the list's lines as text rows (a Reworked mechanic), or a "?"."""
+    note = lambda: elements.inline_list("Sniper's Assassinate<br>Sniper's Imaginary Shot")  # noqa: E731
+    row = _mech_row(lambda: "Spells changed", extra=note)
+    assert "ability-chip" not in row and '<span class="mech-abil-line">Sniper\'s Imaginary Shot</span>' in row
+    row = _mech_row(lambda: "Spells changed", extra=note, new="New mechanic")
     assert "mech-abils" not in row and "info-tip" in row
+
+
+_SOURCES = ('Attacks that do not proc Attack Modifiers <span class="pop-note">(Examples: Cleave)</span><br>'
+            'Reflected damage<br>Any damage dealt to self or allies')
+
+
+def test_a_reworked_mechanic_shows_a_plain_list_open_as_a_table():
+    """7.38 Lifesteal "The following sources and targets do not provide any lifesteal" (owner 2026-10-28)."""
+    row = _mech_row(lambda: "The following sources and targets do not provide any lifesteal",
+                    extra=lambda: elements.inline_list(_SOURCES))
+    assert row.count('class="mech-abil-line"') == 3
+    assert '<span class="mech-abil-line">Reflected damage</span>' in row
+    assert "Attacks that do not proc Attack Modifiers <!--TIP-->" in row and "Examples: Cleave" in row
+
+
+def test_a_new_mechanic_keeps_its_plain_list_behind_the_question_mark():
+    row = _mech_row(lambda: "The following sources and targets do not provide any lifesteal",
+                    extra=lambda: elements.inline_list(_SOURCES), new="New mechanic")
+    assert "mech-abil-line" not in row and "info-tip" in row
+
+
+def test_clarifications_stay_behind_the_question_mark():
+    """7.38 Tormentor "Or at Dire side in Turbo<br>Due to this …": notes, not a list the row introduces."""
+    row = _mech_row(lambda: "Tormentor is also dependent on the day and night cycle",
+                    extra=lambda: elements.inline_note(_SOURCES))
+    assert "mech-abil-line" not in row and "info-tip" in row
+
+
+def test_icons_grow_on_hover():
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    css = open(os.path.join(root, "styles.css"), encoding="utf-8").read()
+    assert re.search(r"\.ability-chip:hover > img \{[^}]*transform: scale\(", css)
 
 
 def test_outside_a_mechanic_block_the_list_stays_a_note():

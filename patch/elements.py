@@ -10,7 +10,7 @@ import re
 from .images import (ITEM_CDN, ABIL_CDN, HERO_SLUG, ITEM_SLUG, hero_img,
                      item_img, _LOCAL_ABIL_ICONS)
 from .state import _State, page_cache
-from .mech_abilities import TIP_RAW, ability_chip, lift_ability_lists
+from .mech_abilities import LIST_TIPS, TIP_RAW, ability_chip, lift_ability_lists
 from .terrain_notes import note_phrase, wrap_phrase
 
 try:
@@ -1872,7 +1872,11 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
     _abil_rows = ""
     if _State.new_mech and isinstance(text_base, str):
         # a reworked mechanic's list of abilities: rows of icons under the text, not a "?" (owner 2026-10-28)
-        trailing_tips, _abil_rows = lift_ability_lists([x.strip() for x in trailing_tips])
+        trailing_tips, _abil_rows, _list_notes = lift_ability_lists([x.strip() for x in trailing_tips],
+                                                                    open_text=_State.new_mech_tag == "rework")
+        for _n in _list_notes:              # "All three of these …": in one line with the row's text (owner 2026-10-28)
+            _end = "" if text_base.rstrip().endswith((".", ":", "!", "?")) else "."
+            text_base = f'{text_base.rstrip()}{_end} <span class="mech-row-note">{_n}</span>'
     trailing_tips = merge_tips(trailing_tips)
     if not isinstance(text_base, str):
         text_inner = text_base
@@ -1958,6 +1962,14 @@ def camp_table(rows):
 
 def inline_note(text):
     return f'<!--INLINETIP-->{info_tip(text)}<!--/INLINETIP-->'
+
+
+def inline_list(text):
+    """inline_note of a list the row introduces (Valve's "…:" / "The following …"): in a Reworked mechanic it is a
+    table open under the row, not a "?" (owner 2026-10-28, 7.38 Lifesteal)."""
+    tip = info_tip(text)
+    LIST_TIPS.add(tip)
+    return f'<!--INLINETIP-->{tip}<!--/INLINETIP-->'
 
 
 _POP_SUB = '&nbsp;&nbsp;– '

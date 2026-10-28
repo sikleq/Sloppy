@@ -4415,9 +4415,20 @@ h4.subgroup {
 }
 .mech-abil-text { display: flex; align-items: center; flex-wrap: wrap; column-gap: 5px; line-height: 21px; }
 .mech-abil-only > .mech-abil-icons,                     /* the names alone (7.41 "Affected spells") */
-.mech-abil-note { grid-column: 1 / -1; border-right: 0; }
+.mech-abil-line { grid-column: 1 / -1; border-right: 0; line-height: 1.45; }  /* a list without abilities */
 .mech-abil-icons .ability-chip { margin-right: 0; vertical-align: 0; }
-.mech-abil-note { color: var(--text-dim, #969289); line-height: 1.4; }
+.mech-row-note { color: var(--text-dim, #969289); }        /* a list's closing note, in the row's own line */
+/* an ability's square grows on hover to be made out (owner 2026-10-28); its name moves up above the grown icon */
+.ability-chip > img { transition: transform 0.12s ease; transform-origin: center; }
+.ability-chip:hover { z-index: 101; }
+.ability-chip:hover > img {
+  position: relative;
+  z-index: 1;
+  transform: scale(2.6);
+  box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55);
+}
+.ability-chip[data-tooltip]::after { bottom: calc(100% + 22px); }
+@media (prefers-reduced-motion: reduce) { .ability-chip > img { transition: none; } }
 .facet-icon-overlay {
   width: 36px;
   height: 36px;

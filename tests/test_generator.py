@@ -418,7 +418,8 @@ def test_enumeration_children_all_fold_into_parent_popup():
     for part in ("Caster's facet upgrades", "Bonuses from talents",
                  "Aghanim's Shard and Aghanim's Scepter upgrades — Upgrades used to depend"):
         assert part in r, (part, r)
-    assert r.count("inline_note(") == 1
+    # one "?"; "…including the following:" introduces a list -> inline_list (owner 2026-10-28)
+    assert r.count("inline_list(") == 1 and "inline_note(" not in r
 
 
 def test_single_child_still_folds_as_info():

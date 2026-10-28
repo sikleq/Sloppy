@@ -31,6 +31,34 @@ def test_a_row_restating_the_header_goes_and_the_mechanic_is_one_list():
     assert out.count('W(ul_open())') == 1 and out.count('W(ul_close())') == 1
 
 
+def test_the_following_spells_row_joins_the_row_above():
+    """7.40: "… no longer do so. The following spells have been changed" in one line (owner 2026-10-28)."""
+    rows = ['W(plain_header("Invulnerability Targeting", new="Reworked mechanic"))', 'W(ul_open())',
+            'W(li("Most items no longer do so", t("REWORK")))',
+            'W(li("The following spells have been changed", t("REWORK"), extra=inline_note("A<br>B")))',
+            'W(ul_close())']
+    out = gen._postprocess_mechanic_rules_row(rows, after_label=True)
+    assert out[2] == ('W(li("Most items no longer do so. The following spells have been changed", t("REWORK"), '
+                      'extra=inline_note("A<br>B")))')
+    assert len(out) == 4
+
+
+def test_a_list_the_row_introduces_is_an_inline_list():
+    """7.38 Lifesteal "…consistent across every ability:" + its rules -> inline_list (open as a table in a Reworked
+    mechanic, owner 2026-10-28); a row of clarifications (7.38 Tormentor) keeps inline_note."""
+    listed = [{"note": "Lifesteal mechanics are now consistent across every ability:", "indent_level": 1},
+              {"note": "Lifesteal applies to physical damage from attacks", "indent_level": 2},
+              {"note": "Neither applies to pure damage", "indent_level": 2}]
+    lines, _ = gen._emit_notes(listed)
+    row = next(x for x in lines if x.startswith("W(li("))
+    assert "extra=inline_list(" in row and "every ability:" not in row
+    plain = [{"note": "Tormentor is also dependent on the day and night cycle", "indent_level": 1},
+             {"note": "Or at Dire side in Turbo", "indent_level": 2}]
+    lines, _ = gen._emit_notes(plain)
+    row = next(x for x in lines if x.startswith("W(li("))
+    assert "extra=inline_note(" in row
+
+
 def test_a_note_on_a_listed_spell_goes_in_brackets_and_all_three_gets_its_own_line():
     notes = [{"note": "Heroes", "indent_level": 2},
              {"note": "Ogre Magi's Bloodlust can no longer target invulnerable units", "indent_level": 3},

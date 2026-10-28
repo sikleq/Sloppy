@@ -20,6 +20,8 @@ _ITEM_ICON_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..
 
 # the lines of each info_tip (its rendered html -> its lines joined by <br>): li() reads a list back from it
 TIP_RAW = page_cache({})
+# the info_tips inline_list made: a list the row introduces, opened as a table in a Reworked mechanic
+LIST_TIPS = page_cache(set())
 
 _SUB = "&nbsp;&nbsp;– "
 _CATEGORY_RE = re.compile(r"^(?:Items|Neutral Creeps|Heroes|Creeps|Units)(?:\s+—\s+|$)")
@@ -138,7 +140,7 @@ def ability_list_rows(raw):
     if sum(len(v) for v in groups.values()) < 2:
         return None
     from .elements import info_tip
-    rows = ""
+    rows = ""                                          # the list's closing notes: the caller puts them in the row's text
     for sentence, chips in groups.items():
         tip = f" {info_tip(*caveats[sentence])}" if sentence in caveats else ""
         if sentence:
@@ -147,17 +149,50 @@ def ability_list_rows(raw):
         else:
             rows += (f'<span class="mech-abil-row mech-abil-only"><span class="mech-abil-icons">{"".join(chips)}'
                      f'{tip}</span></span>')
-    rows += "".join(f'<span class="mech-abil-row"><span class="mech-abil-note">{n}</span></span>' for n in notes)
-    return f'<span class="mech-abils">{rows}</span>'
+    return f'<span class="mech-abils">{rows}</span>', notes
 
 
-def lift_ability_lists(tips):
-    """A mechanic row's trailing "?" notes: (the ones left, the rows of icons that replace the others)."""
-    left, rows = [], ""
+def text_list_rows(raw):
+    """A list that names no abilities (7.38 Lifesteal "The following sources and targets do not provide any
+    lifesteal"): its lines as the table's rows, open on the page instead of behind a "?" (owner 2026-10-28); a line's
+    caveat in brackets is a "?" after it. None for a single line or a list with sub-items (it stays a "?")."""
+    lines, notes = [], []
+    for line in (x.strip() for x in raw.split("<br>")):
+        if not line:
+            continue
+        if line.startswith(_SUB):
+            return None
+        m = _NOTE_ONLY_RE.match(line)
+        if m:
+            notes.append(m.group(1))
+            continue
+        lines.append(line)
+    if len(lines) < 2:
+        return None
+    from .elements import info_tip
+    rows = ""
+    for line in lines:
+        m = _TRAIL_NOTE_RE.search(line)
+        if m:
+            line = f"{line[:m.start()]} {info_tip(_sentence(m.group(1)))}"
+        rows += f'<span class="mech-abil-row"><span class="mech-abil-line">{line}</span></span>'
+    return f'<span class="mech-abils">{rows}</span>', notes
+
+
+def lift_ability_lists(tips, open_text=False):
+    """A mechanic row's trailing "?" notes: (the ones left, the tables that replace the others, the lists' closing
+    notes — they go into the row's own text, "in one line with it" (owner 2026-10-28, 7.40 "All three of these …")).
+    open_text: a list without abilities the row introduces (inline_list) opens too — only in a "Reworked mechanic"
+    block so far (7.38 Lifesteal); a "New mechanic" (7.38 Neutral Items, Flooded Camps) keeps its "?" until the owner
+    says otherwise, and so does a note of clarifications (7.38 Tormentor "Or at Dire side in Turbo …")."""
+    left, rows, notes = [], "", []
     for tip in tips:
-        html = ability_list_rows(TIP_RAW[tip]) if tip in TIP_RAW else None
-        if html:
-            rows += html
+        raw = TIP_RAW.get(tip)
+        found = raw is not None and (ability_list_rows(raw)
+                                     or (open_text and tip in LIST_TIPS and text_list_rows(raw)))
+        if found:
+            rows += found[0]
+            notes += found[1]
         else:
             left.append(tip)
-    return left, rows
+    return left, rows, notes
