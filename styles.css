@@ -4389,6 +4389,9 @@ h4.subgroup {
   height: 100%;
   border-radius: 3px;
   object-fit: cover;
+  /* an icon with a transparent background (7.40 Bounty Rune, Water, Wisdom, Illusion) sits on a dark square of its
+     own: grown on hover, the text behind no longer shows through it (owner 2026-10-28) */
+  background: var(--bg-deep-97);
 }
 /* a reworked mechanic's list of abilities: rows under the text, icons in place of the names, the abilities with the
    same sentence in one row (owner 2026-10-28, 7.40 Invulnerability Targeting) */

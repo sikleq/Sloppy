@@ -320,9 +320,13 @@ extra=inline_note(info_tip("Batrider's Arsonist", "Magnus' Diminishing Return", 
 
 «Haste Rune: Duration no longer …» → значок руны вместо «Haste Rune:», имя при наведении, как способность у строки
 аспекта (`mech_abilities.rune_row_chip`, вызывается в `li()`). Рун в игре 10: Bounty, Haste, Amplify Damage (Double
-Damage), Illusion, Invisibility, Regeneration, Arcane, Shield, Water, Wisdom (удалена 7.38); значки из клиента —
-`python scripts/fetch/fetch_rune_icons.py` → `icons/runes/<key>.png`. У Illusion 2D-значка в игре нет — строка
-остаётся текстом. Тест: `tests/test_runes_and_two_colours.py`.
+Damage), Illusion, Invisibility, Regeneration, Arcane, Shield, Water, Wisdom (удалена 7.38); плюс общий значок
+power-руны (таймер HUD). Источники `icons/runes/<key>.png`: клиент — `python scripts/fetch/fetch_rune_icons.py`
+(Bounty — таймер HUD, power-руны — их значки баффа); Water и Wisdom — игровые значки миникарты с Liquipedia («<Name>
+Rune mapicon dota2 gameasset.png», через `tools/liquipedia_cache.py`; эмоции и вспышка таймера из клиента — не те,
+владелец 2026-10-28); Illusion — `icons/ui/gothic/tc_rune_3.png` (в клиенте 2D-значка нет). Прозрачный значок лежит на
+тёмном квадрате (`.ability-chip > img` background), чтобы при увеличении не просвечивал текст. Тест:
+`tests/test_runes_and_two_colours.py`.
 
 ### Список способностей в разделе механики → ряды иконок (владелец 2026-10-28)
 

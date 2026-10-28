@@ -19,9 +19,18 @@ def test_a_rune_row_shows_the_rune_icon_with_its_name_on_hover():
     assert "icons/runes/haste.png" in out and out.endswith("</span>Duration no longer increases by 3s per rune cycle")
 
 
-def test_a_rune_without_an_icon_keeps_its_name():
-    assert rune_row_chip("Illusion Rune: Illusions now …") == "Illusion Rune: Illusions now …"
+def test_illusion_has_its_icon_and_a_row_without_a_rune_keeps_its_text():
+    # the client has no 2D Illusion icon: the Terrain page's own power-rune picture (owner 2026-10-28)
+    assert "icons/runes/illusion.png" in rune_row_chip("Illusion Rune: Illusions now …")
     assert rune_row_chip("Rune spawn interval increased") == "Rune spawn interval increased"
+    assert rune_row_chip("Fire Rune: x") == "Fire Rune: x"
+
+
+def test_a_transparent_icon_sits_on_a_dark_square():
+    """7.40 Bounty Rune's icon is transparent: grown on hover, the text behind showed through (owner 2026-10-28)."""
+    import re
+    css = open(os.path.join(ROOT, "styles.css"), encoding="utf-8").read()
+    assert re.search(r"\.ability-chip > img \{[^}]*background: var\(--bg-deep-97\)", css)
 
 
 def test_every_rune_icon_named_is_on_disk():

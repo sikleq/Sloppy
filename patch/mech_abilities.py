@@ -44,8 +44,10 @@ _ENCHANT_RE = re.compile(r"^(?:Item bonus from )?(\w+) [Ee]nchantment$")   # "Au
 _ICON_ALIASES = {("warlock", "Golem"): "warlock_rain_of_chaos"}
 
 
-# a rune's name in the notes -> its icon (scripts/fetch/fetch_rune_icons.py; Illusion has none in the game)
+# a rune's name in the notes -> its icon (scripts/fetch/fetch_rune_icons.py; Illusion has none in the game client —
+# its icon is the Terrain page's own power-rune picture, icons/ui/gothic/tc_rune_3.png, owner 2026-10-28)
 RUNE_ICONS = {"Bounty": "bounty", "Haste": "haste", "Double Damage": "doubledamage", "Amplify Damage": "doubledamage",
+              "Illusion": "illusion",
               "Invisibility": "invisibility", "Regeneration": "regeneration", "Arcane": "arcane", "Shield": "shield",
               "Water": "water", "Wisdom": "wisdom", "Power": "power"}
 _RUNE_ROW_RE = re.compile(r"(?P<name>[A-Z][a-z]+(?: [A-Z][a-z]+)?) Runes?:\s")
