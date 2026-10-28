@@ -45,6 +45,17 @@ def test_the_power_rune_icon_is_the_generators_bunch_of_three_runes():
     assert [k for k, _, _ in gp.BUNCH] == ["regeneration", "haste", "doubledamage"]
 
 
+def test_the_terrain_power_layer_button_is_our_power_rune_icon():
+    """Owner 2026-10-28: the Terrain page's Power layer button shows our power-rune icon (48 px, like its other
+    buttons), no longer a random rune; the map's markers still cycle the 7 runes."""
+    from PIL import Image, ImageChops
+    import gen_power_rune_icon as gp
+    btn = Image.open(os.path.join(ROOT, "icons", "ui", "gothic", "tc_power.png")).convert("RGBA")
+    assert btn.size == (48, 48) and ImageChops.difference(btn, gp.power_icon(48)).getbbox() is None
+    js = open(os.path.join(ROOT, "src", "scripts.js"), encoding="utf-8").read()
+    assert "powerBtnImg" not in js and "togglePowerCycle" in js
+
+
 def test_runes_share_the_terrain_page_icons():
     """One style — the minimap icons the Terrain page shows (owner 2026-10-28)."""
     import filecmp

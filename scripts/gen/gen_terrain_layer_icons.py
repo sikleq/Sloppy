@@ -94,7 +94,7 @@ REFS = {
 # The 7 power runes (icons/ref/runes/, downloaded from liquipedia). Kept in their
 # NATURAL colours (so they're distinguishable) — build_terrain wraps each marker
 # in the faint-GREEN power disc; scripts.js cycles tc_rune_0..6 every 3s on the
-# map. tc_power.png (button default + initial marker) = the regeneration rune.
+# map. tc_power.png (the button) = our power-rune icon (gen_power_rune_icon.py).
 RUNE_ORDER = ["amplify_damage", "arcane", "haste", "illusion",
               "invisibility", "regeneration", "shield"]
 
@@ -464,16 +464,16 @@ def main(only=()):
             cells.append((name, im))
             print("wrote", name)
 
-    # ---- 7 power runes (natural colours) → tc_rune_0..6.png; tc_power.png defaults
-    # to the regeneration rune (green, matches the layer). scripts.js cycles them. ----
+    # ---- 7 power runes (natural colours) → tc_rune_0..6.png (scripts.js cycles them on the map); tc_power.png
+    # (the layer button) = our own power-rune icon, a bunch of three of them (gen_power_rune_icon, owner 2026-10-28) ----
     if want("tc_power"):
         for i, nm in enumerate(RUNE_ORDER):
             im = from_ref(f"runes/{nm}.png", (255, 255, 255), tint=False)
             im.save(os.path.join(_OUT, f"tc_rune_{i}.png"))
             cells.append((f"tc_rune_{i}", im))
             print("wrote", f"tc_rune_{i} ({nm})")
-        Image.open(os.path.join(_OUT, "tc_rune_5.png")).save(os.path.join(_OUT, "tc_power.png"))
-        print("wrote tc_power (= regeneration default)")
+        import gen_power_rune_icon
+        gen_power_rune_icon.main([])
 
     # montage on mid-grey so the dark outline reads
     cols = 5

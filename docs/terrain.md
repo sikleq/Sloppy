@@ -369,8 +369,9 @@ Tools → Source Filmmaker, `tools/sfm.dll`) renders the clean look:
   liquipedia into `icons/ref/runes/`, kept in their NATURAL colours + soft
   outline) cycle on the MAP every 3 s while the layer is ON (scripts.js
   `togglePowerCycle` / `setRune`, sets `<image>` `href`/`xlink:href`). The toolbar
-  button shows a RANDOM rune on load. `tc_power.png` (button + initial marker
-  default) = the regeneration rune. Markers still sit in the faint-green power
+  button (and the "power runes" chips) show `tc_power.png` = our own power-rune
+  icon, a bunch of three runes (`scripts/gen/gen_power_rune_icon.py`, owner
+  2026-10-28; it was a random rune). Markers still sit in the faint-green power
   disc. Order: amplify, arcane, haste, illusion, invisibility, regeneration, shield.
 - **Controls ABOVE the map** (`.tc-controls-bar`) — icon-only toggle buttons with
   tooltips. Generic JS handler over `.tc-layer-btn[data-layer]` flips

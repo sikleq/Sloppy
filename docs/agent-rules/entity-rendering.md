@@ -328,7 +328,9 @@ Damage), Illusion, Invisibility, Regeneration, Arcane, Shield, Water, Wisdom (у
 таймера HUD — это руна воды), поэтому `icons/runes/power.png` — свой: связка из трёх значков рун игры (Regeneration
 сзади слева, Haste сзади справа, крупнее спереди Double Damage; выбор владельца 2026-10-28 из трёх вариантов —
 связка / кристалл в семи цветах / кольцо из семи камней), генератор `scripts/gen/gen_power_rune_icon.py` (запускать
-после `fetch_rune_icons.py`); строка «Power Rune: …» показывает его. Прозрачный значок лежит на тёмном квадрате
+после `fetch_rune_icons.py`); строка «Power Rune: …» показывает его. Тот же генератор пишет 48-px
+`icons/ui/gothic/tc_power.png` — кнопку слоя Power на странице Terrain (владелец 2026-10-28; руны на карте по-прежнему
+сменяют друг друга). Прозрачный значок лежит на тёмном квадрате
 (`.ability-chip > img` background), чтобы при увеличении не просвечивал текст. Тест:
 `tests/test_runes_and_two_colours.py`.
 

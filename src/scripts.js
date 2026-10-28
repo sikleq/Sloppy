@@ -6975,7 +6975,8 @@ function ecShopMarkup(panels) {
 
     // ---- POWER RUNE cycling: a power-rune spot can roll any of the 7 runes, so
     // while the Power layer is ON its map markers cycle through tc_rune_0..6
-    // every 3s. The toolbar button shows a random rune on load. ----
+    // every 3s. The toolbar button keeps tc_power.png: our power-rune icon, a bunch
+    // of three runes (owner 2026-10-28; it was a random rune). ----
     const RUNE_BASE = 'icons/ui/gothic/tc_rune_';
     const RUNE_COUNT = 7;
     let powerTimer = null, powerIdx = 0;
@@ -6995,8 +6996,6 @@ function ecShopMarkup(panels) {
         setRune(powerIdx);
       }, 3000);
     }
-    const powerBtnImg = root.querySelector('.tc-layer-btn[data-layer="power"] img');
-    if (powerBtnImg) powerBtnImg.src = RUNE_BASE + Math.floor(Math.random() * RUNE_COUNT) + '.png';
 
     // Layer toggles — both in .tc-controls-bar and .tc-fs-bar; keep in sync.
     // data-layer="all" turns every layer on (or all off when all are on already)
