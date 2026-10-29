@@ -124,7 +124,12 @@ def _base_values(version, hero):
         for name in ("heroes_raw.json", "heroes.json"):
             p = STATS / version / name
             if p.exists():
-                rec = json.loads(p.read_text(encoding="utf-8")).get(f"npc_dota_hero_{hero}") or {}
+                data = json.loads(p.read_text(encoding="utf-8"))
+                # a key the hero leaves out is npc_dota_hero_base's of that patch (7.37b Dawnbreaker: no own
+                # StatusHealthRegen, so the 0.25 every hero had — not the 0 of HERO_DEFAULTS); a hero not in the
+                # patch at all stays unknown (Ringmaster is not in the 7.37b files)
+                own = data.get(f"npc_dota_hero_{hero}") or {}
+                rec = {**(data.get("npc_dota_hero_base") or {}), **own} if own else {}
                 for v in rec.values():
                     if isinstance(v, (int, float)) or (isinstance(v, str) and re.fullmatch(r"\s*-?[\d.]+\s*", v)):
                         vals.add((float(v),))

@@ -148,16 +148,18 @@ def hero_facets(hero_slug, version):
 
 
 @functools.lru_cache(maxsize=None)
-def hero_innates(hero_slug, version):
-    """{name lowercased: ability slug} of a hero's innates in a version ("Innate" "1" in its KV, the name from the
-    patch's own texts). A hero note "Duelist: Bonus damage …" (7.37d) belongs in the innate's own block."""
+def hero_abilities(hero_slug, version):
+    """{name lowercased: (ability slug, is innate)} of a hero's abilities in a version (its KV blocks, the name from
+    the patch's own texts). A hero note "Duelist: Bonus damage …" (7.37d innate) or "Defense Matrix: Cast Range …"
+    (7.37c) belongs in that ability's own block, not among the hero's general rows."""
     from patch import loc_history
     out = {}
     for slug, block in _hero_blocks(version).items():
-        if slug.startswith(f"{hero_slug}_") and str(block.get("Innate", "")).strip() == "1":
-            name = loc_history.tooltip(f"DOTA_Tooltip_Ability_{slug}", version) or ""
-            if name:
-                out.setdefault(name.lower(), slug)
+        if not slug.startswith(f"{hero_slug}_") or slug.startswith("special_bonus"):
+            continue
+        name = loc_history.tooltip(f"DOTA_Tooltip_Ability_{slug}", version) or ""
+        if name:
+            out.setdefault(name.lower(), (slug, str(block.get("Innate", "")).strip() == "1"))
     return out
 
 

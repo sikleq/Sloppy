@@ -501,6 +501,21 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 
 Генератор: `TAG_OVERRIDES`, `LOWER_IS_BUFF` (`tools/generate_patch_code_v2.py`). Тест `tests/test_review_737e.py`.
 
+## Вычитка 7.37c (2026-10-29)
+
+| Строка | Тег | Почему |
+|---|---|---|
+| «No longer requires Enchant Totem to be leveled to be active» (Slugger) | **BUFF** | снято требование — класс «penalty» |
+| «Multicasts now prioritize Ogre Magi himself, followed by heroes…» (Fire Shield) | **BUFF** | цели умнее, без пустых кастов |
+| «Bonus Agility is now applied during the rush as well as …» (Phantom Rush) | **BUFF** | ловкость держится дольше |
+| «Defense Matrix: …» в общих строках Tinker | блок способности | правило Duelist расширено на любую способность героя этого патча (`ability_kv.hero_abilities`) |
+
+Фасеты: авторегистрация берёт имя и цвет из файлов игры патча (`hero_facets`), не с сайта Valve — там Convergence
+«Yellow0» (в игре Yellow1), Slugger «Slugger Facet». Проверка «from» (`scripts/audit/audit_from_values.py`): значение,
+которого у героя нет, берётся из `npc_dota_hero_base` того патча (7.37b Dawnbreaker regen 0.25), герой без записи
+в патче — не проверяется (Ringmaster в 7.37b). Карта: 7.37 и 7.37b шли с файлом 7.36 → картинка 7.36 из Oldgrowth,
+7.36 → 7.37c ничего не сдвинулось. Тест `tests/test_review_737c.py`.
+
 ## Вычитка 7.37d (2026-10-29)
 
 | Строка | Тег | Почему |

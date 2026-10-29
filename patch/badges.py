@@ -634,7 +634,7 @@ FACETS = {
     "bane_dream_stalker": ("Dream Stalker", "Gray0"),
     "bane_sleepwalk": ("Sleepwalk", "Purple1"),
     "crystal_maiden_glacial_guard": ("Glacial Guard", "Gray3"),
-    "earthshaker_slugger": ("Slugger Facet", "Yellow1"),
+    "earthshaker_slugger": ("Slugger", "Yellow1"),   # Valve's feed title "Slugger Facet"; the game names it Slugger
     "morphling_agi": ("Ebb", "Green0"),
     "pudge_rotten_core": ("Rotten Core", "Green3"),
     "sven_heavy_plate": ("Heavy Plate", "Blue0"),
@@ -693,6 +693,9 @@ FACETS = {
     "tusk_facet_tag_team": ("Tag Team", "Blue3"),
     "winter_wyvern_heal_mana": ("Essence of the Blueheart", "Blue0"),
     "marci_sidekick": ("Sidekick", "Gray3"),
+    # 7.37c — auto-registered by generate_patch_code_v2.py
+    "phantom_lancer_convergence": ("Convergence", "Yellow1"),
+    "death_prophet_delayed_damage": ("Mourning Ritual", "Red1"),
 }
 
 # Mapping from Valve's facet_color name -> CSS gradient that EXACTLY matches

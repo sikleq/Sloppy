@@ -44,8 +44,8 @@ def test_the_same_text_for_two_abilities_is_not_flagged_as_misplaced():
 def test_a_hero_note_named_after_an_innate_goes_in_the_innate_block():
     """7.37d "Duelist: Bonus damage increased from 10% to 12%" — Juggernaut's innate that patch: its own innate block,
     not a plain row under the hero."""
-    from patch.ability_kv import hero_innates
-    assert hero_innates("juggernaut", "7.37d").get("duelist") == "juggernaut_duelist"
+    from patch.ability_kv import hero_abilities
+    assert hero_abilities("juggernaut", "7.37d").get("duelist") == ("juggernaut_duelist", True)
     out = "\n".join(g._render_hero({"hero_id": 8, "hero_notes": [
         {"indent_level": 1, "note": "Duelist: Bonus damage increased from 10% to 12%"}]}, version="7.37d"))
     assert 'W(ability("Duelist", slug="juggernaut_duelist", innate=True))' in out

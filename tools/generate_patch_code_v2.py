@@ -587,6 +587,10 @@ TAG_OVERRIDES = {
     "treant gold bounty rescaled":            "NERF",   # Nature's Call: the enemy gets more gold for a treant
     "no longer explode":                      "DEL",    # Eldritch Summoning: imps killed by heroes do not blow up
     "improved behavior":                      "QoL",    # Stroke of Fate at max cast range: handling, not power (owner)
+    # 7.37c proofread (2026-10-29)
+    "no longer requires enchant totem to be leveled": "BUFF",  # Slugger: a requirement gone (penalty-class)
+    "multicasts now prioritize":              "BUFF",   # Fire Shield: smarter targets, no wasted casts
+    "is now applied during the rush":         "BUFF",   # Phantom Rush: the agility lasts longer
     # 7.37d proofread (2026-10-29)
     "no longer doubles its bonuses":          "DEL",    # Bracer / Wraith Band / Null Talisman: the 25-minute doubling
     "no longer makes caster or ally unslowable": "DEL", # Disperser Suppress (40% slow resistance comes instead, NEW)
@@ -1788,16 +1792,17 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
                     )
                     _facet_buckets.setdefault(facet_slug, []).append(stripped_note)
                     continue
-                # "Duelist: Bonus damage increased …" (7.37d): the prefix is an innate of this patch → its own block
-                from patch.ability_kv import hero_innates
-                innate_slug = hero_innates(slug, version).get(prefix.lower()) if version else None
-                if innate_slug:
+                # "Duelist: Bonus damage increased …" (7.37d innate), "Defense Matrix: Cast Range …" (7.37c): the prefix is
+                # an ability of the hero in this patch → its own block
+                from patch.ability_kv import hero_abilities
+                own = hero_abilities(slug, version).get(prefix.lower()) if version else None
+                if own:
                     stripped_note = dict(n)
                     stripped_note['note'] = re.sub(
                         re.escape(prefix) + r':\s*', '', n.get('note', ''), count=1, flags=re.I
                     )
                     _abil_buckets.setdefault(
-                        innate_slug, {'name': prefix, 'is_innate': True, 'notes': []})['notes'].append(stripped_note)
+                        own[0], {'name': prefix, 'is_innate': own[1], 'notes': []})['notes'].append(stripped_note)
                     continue
                 # Check for "AbilityName: change text" where AbilityName refers to
                 # an ability that no longer exists in the current game (renamed or
@@ -4349,13 +4354,19 @@ def _auto_register_facets(version, datafeed):
     from patch.badges import FACETS
     badges_path = os.path.join(_HERE, 'patch', 'badges.py')
 
+    from patch.ability_kv import hero_facets
     missing = {}
     for hero in datafeed.get('heroes', []):
+        hero_slug = HEROES.get(hero.get('hero_id'), ('', ''))[1]
         for s in hero.get('subsections', []):
             if s.get('style', '').startswith('hero_facet'):
                 slug = s.get('facet', '')
                 if slug and slug not in FACETS and slug not in missing:
-                    missing[slug] = (s.get('title', slug), s.get('facet_color', 'Gray3'))
+                    # the game files of the patch first: Valve's web feed had Convergence "Yellow0", npc_heroes.txt
+                    # Yellow + GradientID 1 in every 7.37 build (2026-10-29)
+                    game = hero_facets(hero_slug, version).get(slug) if hero_slug else None
+                    missing[slug] = (game[0] or s.get('title', slug), game[1]) if game else \
+                        (s.get('title', slug), s.get('facet_color', 'Gray3'))
 
     if not missing:
         return
