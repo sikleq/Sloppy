@@ -501,11 +501,14 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 
 Генератор: `TAG_OVERRIDES`, `LOWER_IS_BUFF` (`tools/generate_patch_code_v2.py`). Тест `tests/test_review_737e.py`.
 
-**Владелец 2026-10-29:** «Removed X (and Y) Facet(s)» и «Removed Mastermind ability» (врождённая, общая для снятых
-фасетов Invoker) — не в GENERAL, а в разделе героя **Facets**: свой список сразу под заголовком, перед карточками
-фасетов (нет карточек — перед способностями). Генератор `_postprocess_removed_facets`; заголовок `subgroup("Facets")`
-ставит флаг, и карточки фасетов его не повторяют. % строки внутри карточки — у правого края строки, как в списках
-(styles.css `.ability-change-row > .badge-group`, 7.38 Ice Breaker).
+**Владелец 2026-10-29:** «Removed X (and Y) Facet(s)» — не строка GENERAL, а **блок каждого снятого фасета** с его
+картинкой и именем и строкой «Removed» (DEL), перед остальными фасетами героя — как 7.39 (Mephitic Shroud). Имя, цвет,
+значок — из файлов игры прошлого патча (`ability_kv.hero_facets`; у фасета без своего текста — имя способности,
+которую он даёт: Phantasmagoria). Снятая **врождённая** («Removed Mastermind ability») — свой блок innate первым в
+Abilities. Генератор `_postprocess_removed_facets(lines, version)`; `facet_header` берёт фасет из файлов игры, если
+его нет в `badges.FACETS`. Первая попытка (текстовый список под заголовком Facets) владелец отверг: «где картинки
+фасетов?». % строки внутри карточки — у правого края строки, с пунктирной линейкой при наведении, как в списках
+(styles.css `.ability-change-row > .badge-group`, класс `acr-bg` из `patch/static_has.py`; 7.38 Ice Breaker).
 Оставлено как в черновике: Ringmaster Spotlight «Now summons 3 separate spotlights» — **NEW** (новое поведение).
 - Карточка фасета без своего имени в тексте называет в шапке способность, которую фасет меняет: «Active: Bloodrage»
   (Old Blood 7.39) — способность из файлов игры (`patch/ability_kv.facet_ability`: её KV называет фасет).

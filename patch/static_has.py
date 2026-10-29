@@ -15,6 +15,7 @@ classes instead:
     ul.subnotes > li with a direct .subnote-collapse       -> li-collapse
     .ability-block   without a direct ul.changes > li     -> ab-empty
     .ability-change.unified-panes containing a .formula-table-wrap -> has-formula-wrap
+    .ability-change-row with a direct .badge-group child -> acr-bg
 """
 import re
 
@@ -94,6 +95,8 @@ def add_static_has_classes(html):
                 n.add.append("ab-empty")
         elif n.name == "div" and {"ability-change", "unified-panes"} <= n.cls and n.has_fw:
             n.add.append("has-formula-wrap")
+        elif n.name == "div" and "ability-change-row" in n.cls and "badge-group" in kid_cls:
+            n.add.append("acr-bg")               # a card row with its own % badges: the hover ruler (2026-10-29)
     out, last = [], 0
     for n in nodes:
         if not n.add:

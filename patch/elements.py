@@ -990,16 +990,30 @@ def _renamed_title(old, new):
             f'<span class="ability-title-arrow">→</span><span class="ability-title-new">{new}</span></span>')
 
 
+def _facet_from_game(slug):
+    """(name, colour, icon) of a facet the site's list lacks, from the game files of the patch before this one (a
+    facet this patch removes) or of this patch — 7.38's removed facets (owner 2026-10-29: "где картинки фасетов?")."""
+    from .ability_kv import hero_facets
+    from .meta import _prev_patch_version
+    hero, version = _State.current_hero, _State.current_patch_version
+    for v in (_prev_patch_version(version) if version else None, version):
+        found = hero_facets(hero, v).get(slug) if v and hero else None
+        if found and found[0]:
+            return found
+    return None
+
+
 def facet_header(slug):
     from .badges import FACETS, _FACET_COLOR_GRADIENT
     from .images import _FACET_ICONS
-    if slug not in FACETS:
+    if slug in FACETS:
+        name, color = FACETS[slug]
+        fi = _FACET_ICONS.get(slug)
+        icon_name = fi[1] if isinstance(fi, list) and len(fi) > 1 else None
+    elif (game := _facet_from_game(slug)):
+        name, color, icon_name = game
+    else:
         return f'<!-- facet_header: unknown slug {slug} -->'
-    name, color = FACETS[slug]
-    icon_name = None
-    fi = _FACET_ICONS.get(slug)
-    if isinstance(fi, list) and len(fi) > 1:
-        icon_name = fi[1]
     gradient = _FACET_COLOR_GRADIENT.get(color, _FACET_COLOR_GRADIENT["Gray0"])
     out = _close_ability_block()
     _State.next_ul_is_hero_stats = False

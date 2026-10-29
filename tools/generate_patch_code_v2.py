@@ -2520,44 +2520,109 @@ def _postprocess_fold_damage_l1(lines):
         return lines
 
 
-_REMOVED_FACETS_RE = re.compile(r'W\(li\("Removed (?:[^"]*\bFacets?|Mastermind ability)"')
+_REMOVED_FACETS_RE = re.compile(r'W\(li\("Removed (.+?) Facets?", t\("DEL"\)(?:, extra=(.*))?\)\)$')
+_REMOVED_ABILITY_RE = re.compile(r'W\(li\("Removed ([A-Z][^"]*?) ability", t\("DEL"\)(?:, extra=(.*))?\)\)$')
 _FACET_BLOCK_RE = re.compile(r'W\((?:facet_header|new_facet|facet_change)\(')
+_HERO_NAME_RE = re.compile(r'W\(hero_header\("([^"]+)"')
 
 
-def _postprocess_removed_facets(lines):
-    """Owner 2026-10-29 (7.38 Invoker): "Removed Agnostic and Elitist Facets" (and "Removed Mastermind ability", the
-    innate those facets shared) go to the hero's Facets category, not GENERAL: a list of their own right under the
-    "Facets" heading, before the hero's facet blocks (or where GENERAL ends when the hero has none). A GENERAL list left
-    empty goes. Works on generator output and indented content."""
+def _removed_facet_blocks(hero_slug, names, extra, prev, ind):
+    """facet_header + "Removed" row per removed facet, named as the game's files of the patch before name them; None if
+    a name has no facet there. A note ("Rage remains as Lifestealer's default basic ability") goes to the facet it
+    names, else to the first."""
+    from patch.ability_kv import hero_facets
+    facets = {n.lower(): s for s, (n, _c, _i) in hero_facets(hero_slug, prev).items() if n}
+    slugs = [facets.get(n.lower()) for n in names]
+    if not names or None in slugs:
+        return None
+    note_at = next((k for k, n in enumerate(names) if extra and n.lower() in extra.lower()), 0)
+    out = []
+    for k, s in enumerate(slugs):
+        tail = f', extra={extra}' if extra and k == note_at else ''
+        out += [f'{ind}W(facet_header("{s}"))', f'{ind}W(ul_open())', f'{ind}W(li("Removed", t("DEL"){tail}))',
+                f'{ind}W(ul_close())']
+    return out
+
+
+def _removed_innate_block(hero_slug, name, extra, prev, ind):
+    """ability(innate=True) + "Removed" row for "Removed <innate> ability" (owner 2026-10-29: "Mastermind вообще
+    innate"), or None when the ability wasn't the hero's innate in the patch before."""
+    from patch.ability_kv import _hero_blocks
+    for slug, block in _hero_blocks(prev).items():
+        if (slug.startswith(f"{hero_slug}_") and str(block.get("Innate", "")).strip() == "1"
+                and _slug_dname(slug) == name):
+            tail = f', extra={extra}' if extra else ''
+            return [f'{ind}W(ability("{name}", slug="{slug}", innate=True))', f'{ind}W(ul_open())',
+                    f'{ind}W(li("Removed", t("DEL"){tail}))', f'{ind}W(ul_close())']
+    return None
+
+
+def _slug_dname(slug):
+    try:
+        with open(os.path.join(_HERE, 'data', 'abilities_slim.json'), encoding='utf-8') as f:
+            return (json.load(f).get(slug) or {}).get('dname')
+    except (OSError, ValueError):
+        return None
+
+
+def _postprocess_removed_facets(lines, version=None):
+    """Owner 2026-10-29 (7.38 Invoker): "Removed Agnostic and Elitist Facets" is not a GENERAL row — each removed facet
+    is its own block in the hero's Facets category, with its icon and name and a "Removed" row, as 7.39 does
+    (Mephitic Shroud), before the hero's new facets; "Removed Mastermind ability" of an innate goes the same way into
+    Abilities, as the innate's own block first there. The names are read from the game files of the patch before. A
+    GENERAL list left empty goes. Works on generator output and indented content."""
+    from patch.images import HERO_SLUG
+    from patch.meta import _prev_patch_version
+    prev = _prev_patch_version(version) if version else None
+    if not prev:
+        return lines
     out, i = [], 0
     while i < len(lines):
-        if not lines[i].lstrip().startswith('W(hero_header('):
+        m = _HERO_NAME_RE.match(lines[i].lstrip())
+        if not m:
             out.append(lines[i])
             i += 1
             continue
+        hero_slug = HERO_SLUG.get(m.group(1), m.group(1).lower().replace(" ", "_").replace("'", ""))
         end = next((j for j in range(i + 1, len(lines))
                     if lines[j].lstrip().startswith(('W(hero_header(', 'W(item_header(', 'W(section(', 'write_footer('))),
                    len(lines))
-        block = lines[i:end]
-        moved = [k for k, l in enumerate(block) if _REMOVED_FACETS_RE.match(l.lstrip())]
-        if not moved:
+        block, facets, innates, gone = lines[i:end], [], [], set()
+        for k, l in enumerate(block):
+            ind = l[:len(l) - len(l.lstrip())]
+            fm, am = _REMOVED_FACETS_RE.match(l.lstrip()), _REMOVED_ABILITY_RE.match(l.lstrip())
+            if fm:
+                names = [n.strip() for n in re.split(r',\s*|\s+and\s+', fm.group(1)) if n.strip()]
+                new = _removed_facet_blocks(hero_slug, names, fm.group(2), prev, ind)
+                if new:
+                    facets += new
+                    gone.add(k)
+            elif am:
+                new = _removed_innate_block(hero_slug, am.group(1), am.group(2), prev, ind)
+                if new:
+                    innates += new
+                    gone.add(k)
+        if not gone:
             out.extend(block)
             i = end
             continue
-        ind = block[moved[0]][:len(block[moved[0]]) - len(block[moved[0]].lstrip())]
-        rows = [block[k] for k in moved]
-        rest = [l for k, l in enumerate(block) if k not in moved]
-        # a GENERAL list with nothing left in it (hero_stat_card aside, it needs rows) goes
-        for k in range(len(rest) - 1):
+        rest = [l for k, l in enumerate(block) if k not in gone]
+        for k in range(len(rest) - 1):          # a GENERAL list with nothing left in it goes
             if rest[k].strip() == 'W(ul_open())' and rest[k + 1].strip() == 'W(ul_close())':
                 del rest[k:k + 2]
                 break
-        at = next((k for k, l in enumerate(rest) if _FACET_BLOCK_RE.match(l.lstrip())), None)
-        if at is None:                          # no facet blocks: where the abilities / talents start
-            at = next((k for k, l in enumerate(rest) if l.lstrip().startswith(('W(ability(', 'W(subgroup('))),
-                      len(rest))
-        out.extend(rest[:at] + [f'{ind}W(subgroup("Facets"))', f'{ind}W(ul_open())'] + rows
-                   + [f'{ind}W(ul_close())'] + rest[at:])
+        starts = lambda pfx: next((k for k, l in enumerate(rest) if l.lstrip().startswith(pfx)), None)
+        at_abil = starts(('W(ability(', 'W(subgroup("Talents"', 'W(subgroup("Abilities"'))
+        at_abil = len(rest) if at_abil is None else at_abil
+        # with the hero's other facets (Meepo 7.38: its innate block stands before them), else before the abilities
+        at_facet = next((k for k, l in enumerate(rest) if _FACET_BLOCK_RE.match(l.lstrip())), at_abil)
+        if at_facet <= at_abil:
+            rest = rest[:at_abil] + innates + rest[at_abil:]
+            rest = rest[:at_facet] + facets + rest[at_facet:]
+        else:
+            rest = rest[:at_facet] + facets + rest[at_facet:]
+            rest = rest[:at_abil] + innates + rest[at_abil:]
+        out.extend(rest)
         i = end
     return out
 
@@ -4107,7 +4172,7 @@ def generate(version):
     out = _postprocess_removed_label(out)             # "Neutral Item cycled out" label — owner 2026-10-17
     out = _postprocess_ability_level_formula(out, version)   # "+X with every level of Y" -> table (owner 2026-10-27)
     out = _postprocess_innate_cards(out, version)     # innate old -> new from the game's texts (owner 2026-10-27)
-    out = _postprocess_removed_facets(out)            # "Removed X Facets" under Facets (owner 2026-10-29)
+    out = _postprocess_removed_facets(out, version)   # "Removed X Facets" -> facet blocks (owner 2026-10-29)
 
     # Close the page: footer + save. Emitted so the wrapped content/pXXX.py is
     # complete — without these the site build runs green but the patch HTML is

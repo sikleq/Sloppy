@@ -11167,6 +11167,17 @@ ul.changes li.item-ability > .row-text { display: block; grid-column: 1 / -1; }
 /* a card row's own % badges (a facet's "Path Duration increased from 3/3.5/4/4.5s to 6s") sit at the row's right edge,
    as on every list row — not right after the text (owner 2026-10-29, 7.38 Ice Breaker) */
 .ability-change-row > .badge-group { float: right; margin-left: 10px; white-space: nowrap; }
+/* ...with the list rows' hover ruler: a dashed line under the row's first line, text to % (owner 2026-10-29) */
+.ability-change-row.acr-bg { position: relative; }   /* acr-bg: patch/static_has.py */
+.ability-change-row.acr-bg:hover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(4px + 1.45em);     /* row padding-top + line-height of its first line */
+  border-bottom: 1px dashed rgba(150, 146, 137, 0.32);
+  pointer-events: none;
+}
 .formula-trigger .iab-num { color: inherit; }     /* a number inside a formula button keeps the button's colour */
 /* Item abilities before -> after (item_abilities_change): one row per ability, old left / new right paired
    by name (render_iab_card); a pair's two cards share the row height; an arrow only between a pair, an

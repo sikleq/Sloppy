@@ -51,22 +51,36 @@ def test_an_enemy_damage_reflection_stays_higher_is_better():
     assert "l=True" not in g._emit_badge("Damage reflected increased from 10% to 12%")
 
 
-def test_removed_facets_go_to_the_heros_facets_category():
-    """Owner 2026-10-29 (7.38 Invoker): "Removed Agnostic and Elitist Facets" and "Removed Mastermind ability" sit
-    under the Facets heading before the facet blocks, not in GENERAL; a GENERAL list left empty goes."""
+def test_a_card_row_with_its_own_badges_gets_the_hover_ruler_class():
+    """Owner 2026-10-29 (7.38 Ice Breaker): a card row's % sit at its right edge and the row has the list rows' dashed
+    hover ruler — a build-time class, no CSS :has() on patch pages."""
+    from patch.static_has import add_static_has_classes
+    html = ('<div class="ability-change-row">Path Duration <span class="badge-group"><span class="badge">+1</span>'
+            '</span></div><div class="ability-change-row">no badges</div>')
+    out = add_static_has_classes(html)
+    assert out.count("acr-bg") == 1 and out.startswith('<div class="ability-change-row acr-bg">')
+
+
+def test_removed_facets_are_facet_blocks_and_a_removed_innate_is_its_own_block():
+    """Owner 2026-10-29 (7.38 Invoker, "где картинки фасетов? Mastermind вообще innate"): each removed facet is its own
+    block (icon, name, "Removed" row) before the hero's new facets, as 7.39 does; a removed innate is its block first in
+    Abilities; a GENERAL list left empty goes. Names from the game files of 7.37e."""
+    ul = ['W(ul_open())', 'W(li("Removed", t("DEL")))', 'W(ul_close())']
     lines = [
         'W(hero_header("Invoker"))', 'W(ul_open())', 'W(li("Base Intelligence increased from 19 to 20", b(19, 20)))',
         'W(li("Removed Mastermind ability", t("DEL")))', 'W(li("Removed Agnostic and Elitist Facets", t("DEL")))',
         'W(ul_close())', 'W(new_facet("invoker_quas_focus", desc=[]))', 'W(ability("Quas", slug="invoker_quas"))',
-        'W(hero_header("Bristleback"))', 'W(ul_open())', 'W(li("Removed Berserk Facet", t("DEL")))', 'W(ul_close())',
-        'W(ability("Hairball", slug="bristleback_hairball"))',
+        'W(hero_header("Chaos Knight"))', 'W(ul_open())', 'W(li("Removed Phantasmagoria Facet", t("DEL")))',
+        'W(ul_close())', 'W(ability("Chaos Bolt", slug="chaos_knight_chaos_bolt"))',
     ]
-    out = g._postprocess_removed_facets(lines)
-    assert out[:9] == [
+    out = g._postprocess_removed_facets(lines, "7.38")
+    assert out == [
         'W(hero_header("Invoker"))', 'W(ul_open())', 'W(li("Base Intelligence increased from 19 to 20", b(19, 20)))',
-        'W(ul_close())', 'W(subgroup("Facets"))', 'W(ul_open())', 'W(li("Removed Mastermind ability", t("DEL")))',
-        'W(li("Removed Agnostic and Elitist Facets", t("DEL")))', 'W(ul_close())']
-    assert out[9] == 'W(new_facet("invoker_quas_focus", desc=[]))'
-    assert out[11:] == ['W(hero_header("Bristleback"))', 'W(subgroup("Facets"))', 'W(ul_open())',
-                        'W(li("Removed Berserk Facet", t("DEL")))', 'W(ul_close())',
-                        'W(ability("Hairball", slug="bristleback_hairball"))']
+        'W(ul_close())', 'W(facet_header("invoker_agnostic"))', *ul, 'W(facet_header("invoker_elitist"))', *ul,
+        'W(new_facet("invoker_quas_focus", desc=[]))',
+        'W(ability("Mastermind", slug="invoker_mastermind", innate=True))', *ul,
+        'W(ability("Quas", slug="invoker_quas"))',
+        # a facet that grants an ability is named by it: Phantasmagoria = chaos_knight_strong_illusions
+        'W(hero_header("Chaos Knight"))', 'W(facet_header("chaos_knight_strong_illusions"))', *ul,
+        'W(ability("Chaos Bolt", slug="chaos_knight_chaos_bolt"))',
+    ]

@@ -125,6 +125,28 @@ def facet_of_ability(slug, version):
     return _facet_grants(version).get(slug) if slug and version else None
 
 
+@functools.lru_cache(maxsize=None)
+def hero_facets(hero_slug, version):
+    """{facet slug: (name, colour, icon)} of a hero in a version, in the game's order: npc_heroes.txt "Facets" of that
+    patch's build (Color + GradientID -> "Purple0", the name from the patch's own texts). The facets a later patch
+    removes are named and drawn from here (owner 2026-10-29, 7.38 "Removed Agnostic and Elitist Facets")."""
+    from patch import loc_history
+    text = game_files.npc(version, "npc_heroes.txt") if version in game_files.versions() else None
+    hero = next((h for root in parse_kv(text or "").values() if isinstance(root, dict)
+                 for k, h in root.items() if k == f"npc_dota_hero_{hero_slug}" and isinstance(h, dict)), None)
+    out = {}
+    for slug, f in ((hero or {}).get("Facets") or {}).items():
+        if not isinstance(f, dict) or f.get("Deprecated"):
+            continue
+        name = loc_history.tooltip(f"DOTA_Tooltip_Facet_{slug}", version) or ""
+        if not name:                            # a facet that grants an ability is named by it (7.37e Phantasmagoria)
+            granted = [a.get("AbilityName") for a in (f.get("Abilities") or {}).values() if isinstance(a, dict)]
+            name = next((n for a in granted if a and (n := loc_history.tooltip(f"DOTA_Tooltip_Ability_{a}", version))),
+                        "")
+        out[slug] = (name, f"{f.get('Color', 'Gray')}{f.get('GradientID', '0')}", f.get("Icon", ""))
+    return out
+
+
 def facet_ability(facet, version):
     """The hero ability a facet changes — the one ability whose KV names the facet — or None (none or several)."""
     hits = [s for s, b in _hero_blocks(version).items() if isinstance(b, dict) and _names_facet(b, facet)]
