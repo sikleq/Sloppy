@@ -111,8 +111,8 @@ def build():
     W(hero_header("Earthshaker"))
     W(facet_header("earthshaker_slugger"))
     W(ul_open())
+    W(li("No longer requires Enchant Totem to be leveled to be active", t("NEW")))
     W(li("Now scales with Echo Slam instead of Enchant Totem (values unchanged)", t("REWORK")))
-    W(li("No longer requires Enchant Totem to be leveled to be active", t("BUFF")))
     W(ul_close())
 
     # Ember Spirit
@@ -231,7 +231,7 @@ def build():
     W(ul_close())
     W(ability("Fire Shield", slug="ogre_magi_smash"))
     W(ul_open())
-    W(li("Multicasts now prioritize Ogre Magi himself, followed by heroes, then buildings, then creeps, skipping units that already have the buff", t("BUFF")))
+    W(li("Multicasts now prioritize Ogre Magi himself, followed by heroes, then buildings, then creeps, skipping units that already have the buff", t("NEW")))
     W(ul_close())
 
     # Omniknight
@@ -278,7 +278,7 @@ def build():
     W(ul_close())
     W(ability("Phantom Rush", slug="phantom_lancer_phantom_edge"))
     W(ul_open())
-    W(li("Bonus Agility is now applied during the rush as well as the 1.5s after it ends", t("BUFF")))
+    W(li("Bonus Agility is now applied during the rush as well as the 1.5s after it ends", t("NEW")))
     W(ul_close())
 
     # Primal Beast

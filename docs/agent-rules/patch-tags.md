@@ -505,9 +505,13 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 
 | Строка | Тег | Почему |
 |---|---|---|
-| «No longer requires Enchant Totem to be leveled to be active» (Slugger) | **BUFF** | снято требование — класс «penalty» |
-| «Multicasts now prioritize Ogre Magi himself, followed by heroes…» (Fire Shield) | **BUFF** | цели умнее, без пустых кастов |
-| «Bonus Agility is now applied during the rush as well as …» (Phantom Rush) | **BUFF** | ловкость держится дольше |
+| «No longer requires Enchant Totem to be leveled to be active» (Slugger) | **NEW** | новое свойство (владелец 2026-10-29; не BUFF) |
+| «Multicasts now prioritize Ogre Magi himself, followed by heroes…» (Fire Shield) | **NEW** | новый порядок целей (владелец) |
+| «Bonus Agility is now applied during the rush as well as …» (Phantom Rush) | **NEW** | новое свойство (владелец) |
+
+Владелец 2026-10-29 (7.37c и 7.37d): **новое свойство или поведение способности — NEW, даже если оно усиливает**
+(Spirit Vessel заряд при своей смерти, Martyrdom On Death, Illusory Armaments, Slugger без Enchant Totem, порядок
+мультикастов, ловкость во время рывка). BUFF — когда меняется число или сила того, что уже было.
 | «Defense Matrix: …» в общих строках Tinker | блок способности | правило Duelist расширено на любую способность героя этого патча (`ability_kv.hero_abilities`) |
 
 Фасеты: авторегистрация берёт имя и цвет из файлов игры патча (`hero_facets`), не с сайта Valve — там Convergence

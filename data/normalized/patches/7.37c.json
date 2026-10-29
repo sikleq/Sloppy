@@ -297,7 +297,7 @@
       "changes": [
         {
           "text": "No longer requires Enchant Totem to be leveled to be active",
-          "tag": "buff",
+          "tag": "new",
           "scope": "facet:earthshaker_slugger"
         },
         {
@@ -597,7 +597,7 @@
         },
         {
           "text": "Multicasts now prioritize Ogre Magi himself, followed by heroes, then buildings, then creeps, skipping units that already have the buff",
-          "tag": "buff",
+          "tag": "new",
           "scope": "Fire Shield"
         }
       ]
@@ -695,7 +695,7 @@
         },
         {
           "text": "Bonus Agility is now applied during the rush as well as the 1.5s after it ends",
-          "tag": "buff",
+          "tag": "new",
           "scope": "Phantom Rush"
         },
         {

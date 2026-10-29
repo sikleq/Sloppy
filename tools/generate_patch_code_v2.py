@@ -588,9 +588,10 @@ TAG_OVERRIDES = {
     "no longer explode":                      "DEL",    # Eldritch Summoning: imps killed by heroes do not blow up
     "improved behavior":                      "QoL",    # Stroke of Fate at max cast range: handling, not power (owner)
     # 7.37c proofread (2026-10-29)
-    "no longer requires enchant totem to be leveled": "BUFF",  # Slugger: a requirement gone (penalty-class)
-    "multicasts now prioritize":              "BUFF",   # Fire Shield: smarter targets, no wasted casts
-    "is now applied during the rush":         "BUFF",   # Phantom Rush: the agility lasts longer
+    # owner 2026-10-29: these three are NEW (a new property), not BUFF
+    "no longer requires enchant totem to be leveled": "NEW",   # Slugger: active without Enchant Totem
+    "multicasts now prioritize":              "NEW",    # Fire Shield: a target order for multicasts
+    "is now applied during the rush":         "NEW",    # Phantom Rush: the agility during the rush too
     # 7.37d proofread (2026-10-29)
     "no longer doubles its bonuses":          "DEL",    # Bracer / Wraith Band / Null Talisman: the 25-minute doubling
     "no longer makes caster or ally unslowable": "DEL", # Disperser Suppress (40% slow resistance comes instead, NEW)

@@ -5,10 +5,11 @@ import tools.generate_patch_code_v2 as g
 
 
 @pytest.mark.parametrize("text, tag", [
-    ("No longer requires Enchant Totem to be leveled to be active", "BUFF"),
+    # owner 2026-10-29: NEW, not BUFF
+    ("No longer requires Enchant Totem to be leveled to be active", "NEW"),
     ("Multicasts now prioritize Ogre Magi himself, followed by heroes, then buildings, then creeps, skipping units that "
-     "already have the buff", "BUFF"),
-    ("Bonus Agility is now applied during the rush as well as the 1.5s after it ends", "BUFF"),
+     "already have the buff", "NEW"),
+    ("Bonus Agility is now applied during the rush as well as the 1.5s after it ends", "NEW"),
 ])
 def test_7_37c_rows_get_the_tag_of_their_effect(text, tag):
     assert g._guess_tag(text) == tag
