@@ -492,7 +492,7 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 | «Now also applies to units under Lycan's control» | **BUFF** | свой бонус расширен (Apex Predator) |
 | «Chain Frost will no longer follow that hero» (после выкупа) | **DEL** | поведение убрано |
 | «Now Bonus Armor Reduction buff is removed when Shadow Fiend dies» | **NERF** | новый способ потерять бонус |
-| «Turn Rate bonus changed from flat +110 to +40% (results in +48)» | **NERF** | итог меньше (Rolling Thunder) |
+| «Turn Rate bonus changed from flat +110 to +40% (results in +48)» | **`b(230, 168)`** | база = 48 / 40% = 120, сравниваются итоги 120+110 и 120+48, −27% (владелец 2026-10-29: «да»); генератор `_emit_flat_to_pct_badge` |
 | «Treant / Eidolon gold bounty …» | **NERF** при росте | золото получает враг; LOWER_IS_BUFF знает treant, eidolon |
 | «Imps no longer explode if killed by enemy heroes» | **DEL** | эффект убран |
 | «charge restoration time», «Outgoing Spell Damage reflected» (QoP) | **`l=True`** | своё ожидание заряда; свой урон по себе |
@@ -500,6 +500,27 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 | «from 18-24 on all levels to 16/24/32/40», «from 14-20 to 17-20» | **`b(21, [...])`** / **`br(14, 20, 17, 20)`** | старый разброс сравнивается по середине, % на каждый уровень (владелец 2026-10-28, Treant); генератор `_emit_range_badge` |
 
 Генератор: `TAG_OVERRIDES`, `LOWER_IS_BUFF` (`tools/generate_patch_code_v2.py`). Тест `tests/test_review_737e.py`.
+
+## Вычитка 7.37d (2026-10-29)
+
+| Строка | Тег | Почему |
+|---|---|---|
+| «No longer doubles its bonuses at 25 minutes» (Bracer, Wraith Band, Null Talisman) | **DEL** | удвоение убрано — «No longer» → DEL |
+| «Suppress no longer makes caster or ally unslowable» | **DEL** | эффект убран; 40% slow resistance рядом — NEW |
+| «Soul Release now always gains a charge when the owner dies» | **BUFF** | ещё один способ получить заряд |
+| «Absorbing damage with Mana Shield now disables Blink Dagger» | **NERF** | новое ограничение |
+| «Aghanim's Shard no longer allows to hit the same enemy … secondary Starstorms» | **DEL** | поведение убрано |
+| «Effects that percentually change the base damage now also affect … Illusory Armaments» | **BUFF** | бонус теперь учитывается |
+| «Toggling items no longer breaks invisibility» (Riki) | **QoL** | как 7.41 Burn toggling |
+| «Windranger can no longer shoot arrows while channeling» | **DEL** | поведение убрано |
+| «Aghanim's Scepter invisibility buff is now dispelled if …» (Windrun) | **NERF** | новый способ потерять невидимость |
+| «from 28-32/44-48/60-64/76-80 to 22-26/40-44/58-62/76-80» | **`b([30,46,62,78], [24,42,60,78])`** | разброс на каждом уровне — по середине, как 7.37e Treant; `_LEVEL_RANGES_RE` |
+| «Duelist: Bonus damage …» в общих строках героя | блок **innate** | префикс — врождённая этого патча (`ability_kv.hero_innates`) → свой блок |
+| Одинаковый текст у двух способностей (Omniknight: Purification и Repel, мана) | без пометки «belongs to» | обе поменялись в файлах игры; `_load_patchnotes_loc` хранит множество способностей |
+
+Shadow Poison «Vision radius decreased from 400 to 300»: ключ `vision_radius` появился только в 7.37d, в 7.37c его
+нет — строка в `UNCHECKABLE` (`scripts/audit/audit_from_values.py`). Карта 7.37c → 7.37d: ничего не сдвинулось, своей
+страницы Terrain нет (как 7.37e). Тест `tests/test_review_737d.py`.
 
 **Владелец 2026-10-29:** «Removed X (and Y) Facet(s)» — не строка GENERAL, а **блок каждого снятого фасета** с его
 картинкой и именем и строкой «Removed» (DEL), перед остальными фасетами героя — как 7.39 (Mephitic Shroud). Имя, цвет,

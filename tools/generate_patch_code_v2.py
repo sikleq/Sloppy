@@ -117,8 +117,10 @@ def _load_patchnotes_loc(version):
             else:
                 ability_slug = None  # hero-level note
             text_norm = re.sub(r'\s+', ' ', text).lower().strip()
+            # a set: the same text can belong to two abilities (7.37d Omniknight: Purification and Repel both "Mana
+            # Cost increased from 80/95/110/125 to 90/105/120/135") — the last key won and the first row read as misplaced
             if text_norm:
-                result.setdefault(hero_slug, {})[text_norm] = ability_slug
+                result.setdefault(hero_slug, {}).setdefault(text_norm, set()).add(ability_slug)
     return result
 
 
@@ -585,6 +587,16 @@ TAG_OVERRIDES = {
     "treant gold bounty rescaled":            "NERF",   # Nature's Call: the enemy gets more gold for a treant
     "no longer explode":                      "DEL",    # Eldritch Summoning: imps killed by heroes do not blow up
     "improved behavior":                      "QoL",    # Stroke of Fate at max cast range: handling, not power (owner)
+    # 7.37d proofread (2026-10-29)
+    "no longer doubles its bonuses":          "DEL",    # Bracer / Wraith Band / Null Talisman: the 25-minute doubling
+    "no longer makes caster or ally unslowable": "DEL", # Disperser Suppress (40% slow resistance comes instead, NEW)
+    "always gains a charge when the owner dies": "BUFF", # Spirit Vessel: one more way to get charges
+    "now disables blink dagger":              "NERF",   # Mana Shield: absorbing damage now counts as taking it
+    "no longer allows to hit the same enemy": "DEL",    # Mirana Shard: secondary Starstorms no longer stack on one unit
+    "percentually change the base damage":    "BUFF",   # Illusory Armaments: base-damage % effects now count the bonus
+    "toggling items no longer breaks invis":  "QoL",    # Riki: as 7.41 Burn toggling — handling, not power
+    "can no longer shoot arrows while":       "DEL",    # Whirlwind Focus Fire: no own attacks while channeling
+    "invisibility buff is now dispelled if":  "NERF",   # Windrun Scepter: a new way to lose the invisibility
     "instead of":                   "REWORK",  # component/requirement swap
     "respawn time increased":       "NERF",    # "increased" heuristic gives BUFF, but higher respawn = worse
     "respawn time decreased":       "BUFF",
@@ -732,6 +744,9 @@ def _emit_badge(text, hero_side=False):
     (e.g. 'b([5,7,9,15], [5,7,9,11])') or None if no numeric change.
     hero_side: the row sits under a hero, so a bounty is what the ENEMY gets for killing the hero's unit
     (Spirit Bear, Tempest Double: lower is better — audit 2026-10-05); a neutral creep's bounty stays higher-is-better."""
+    flat = _emit_flat_to_pct_badge(text)
+    if flat:
+        return flat
     m = _FROM_TO_RE.search(text)
     if not m:
         return _emit_range_badge(text, hero_side)
@@ -752,6 +767,25 @@ def _emit_badge(text, hero_side=False):
     return f'b({old!r}, {new!r}{l_arg}{force_arg})'
 
 
+# "bonus changed from flat +110 to +40% (results in +48)" (7.37e Rolling Thunder): the % is of a base the row itself
+# gives (48 / 40% = 120), so the badge compares the totals 120+110 = 230 → 168 (owner 2026-10-29: "да", −27%)
+_FLAT_TO_PCT_RE = re.compile(
+    r'\bfrom\s+flat\s+\+?(\d+(?:\.\d+)?)\s+to\s+\+?(\d+(?:\.\d+)?)%\s*\(results?\s+in\s+\+?(\d+(?:\.\d+)?)\)', re.I)
+
+
+def _emit_flat_to_pct_badge(text):
+    m = _FLAT_TO_PCT_RE.search(text)
+    if not m:
+        return None
+    old_bonus, pct, new_bonus = (float(x) for x in m.groups())
+    if not pct:
+        return None
+    num = lambda v: int(round(v)) if abs(v - round(v)) < 1e-6 else round(v, 2)
+    base = new_bonus * 100 / pct
+    l_arg = ', l=True' if _is_lower_better(text) else ''
+    return f'b({num(base + old_bonus)!r}, {num(base + new_bonus)!r}{l_arg})'
+
+
 # "from 18-24 on all levels to 16/24/32/40" (7.37e Treant bounty), "from 14-20 to 17-20" (Eidolon bounty): a min-max
 # range on the old side — compared by its middle (owner 2026-10-28: "среднее от 18-24 взять для сравнения")
 _RANGE_FROM_RE = re.compile(
@@ -759,7 +793,25 @@ _RANGE_FROM_RE = re.compile(
     r'(\d+(?:\.\d+)?(?:-\d+(?:\.\d+)?|(?:/\d+(?:\.\d+)?)+)?)\b')
 
 
+# "from 28-32/44-48/60-64/76-80 to 22-26/40-44/58-62/76-80" (7.37d Treant Damage): a min-max range per level — each
+# level compared by its middle, as the single range above
+_LEVEL_RANGES_RE = re.compile(
+    r'\bfrom\s+((?:\d+(?:\.\d+)?-\d+(?:\.\d+)?/)+\d+(?:\.\d+)?-\d+(?:\.\d+)?)\s+to\s+'
+    r'((?:\d+(?:\.\d+)?-\d+(?:\.\d+)?/)+\d+(?:\.\d+)?-\d+(?:\.\d+)?)\b')
+
+
+def _level_range_middles(s):
+    num = lambda v: int(v) if v == int(v) else v
+    return [num(sum(float(x) for x in r.split('-')) / 2) for r in s.split('/')]
+
+
 def _emit_range_badge(text, hero_side=False):
+    lv = _LEVEL_RANGES_RE.search(text)
+    if lv:
+        old, new = _level_range_middles(lv.group(1)), _level_range_middles(lv.group(2))
+        if len(old) == len(new):
+            l = _is_lower_better(text) or bool(hero_side and re.search(r'\bbounty\b', text, re.I))
+            return f'b({old!r}, {new!r}{", l=True" if l else ""})'
     m = _RANGE_FROM_RE.search(text)
     if not m:
         return None
@@ -1155,9 +1207,9 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
         # Check patchnotes_english: warn if this text belongs to a different ability.
         if loc_map is not None and current_ability_slug is not None:
             txt_norm = re.sub(r'\s+', ' ', _strip_html(txt)).lower().strip()
-            expected_slug = loc_map.get(txt_norm)
-            if expected_slug is not None and expected_slug != current_ability_slug:
-                lines.append(f'# [patchnotes: belongs to {expected_slug}]')
+            expected = loc_map.get(txt_norm, set()) - {None}
+            if expected and current_ability_slug not in expected:
+                lines.append(f'# [patchnotes: belongs to {", ".join(sorted(expected))}]')
         lines.append(_emit_li(txt, info=info, aghs=aghs, hero_name=hero_name, version=version))
         has_content = True
 
@@ -1730,6 +1782,17 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
                         re.escape(prefix) + r':\s*', '', n.get('note', ''), count=1, flags=re.I
                     )
                     _facet_buckets.setdefault(facet_slug, []).append(stripped_note)
+                    continue
+                # "Duelist: Bonus damage increased …" (7.37d): the prefix is an innate of this patch → its own block
+                from patch.ability_kv import hero_innates
+                innate_slug = hero_innates(slug, version).get(prefix.lower()) if version else None
+                if innate_slug:
+                    stripped_note = dict(n)
+                    stripped_note['note'] = re.sub(
+                        re.escape(prefix) + r':\s*', '', n.get('note', ''), count=1, flags=re.I
+                    )
+                    _abil_buckets.setdefault(
+                        innate_slug, {'name': prefix, 'is_innate': True, 'notes': []})['notes'].append(stripped_note)
                     continue
                 # Check for "AbilityName: change text" where AbilityName refers to
                 # an ability that no longer exists in the current game (renamed or

@@ -682,6 +682,17 @@ FACETS = {
     "nevermore_lasting_presence": ("Lasting Presence", "Gray0"),
     "alchemist_mixologist": ("Mixologist", "Purple2"),
     "visage_gold_assumption": ("Death Toll", "Yellow0"),
+    # 7.37d — auto-registered by generate_patch_code_v2.py
+    "mirana_sunlight": ("Solar Flare", "Gray3"),
+    "windrunner_whirlwind": ("Whirlwind", "Green0"),
+    "sniper_scattershot": ("Scattershot", "Red0"),
+    "luna_moonstorm": ("Moonstorm", "Blue1"),
+    "rattletrap_expanded_armature": ("Expanded Armature", "Red2"),
+    "omniknight_dmgheals": ("Healing Hammer", "Yellow0"),
+    "huskar_nothl_transfusion": ("Nothl Transfusion", "Blue2"),
+    "tusk_facet_tag_team": ("Tag Team", "Blue3"),
+    "winter_wyvern_heal_mana": ("Essence of the Blueheart", "Blue0"),
+    "marci_sidekick": ("Sidekick", "Gray3"),
 }
 
 # Mapping from Valve's facet_color name -> CSS gradient that EXACTLY matches

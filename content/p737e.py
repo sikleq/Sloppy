@@ -333,7 +333,7 @@ def build():
     W(hero_header("Pangolier"))
     W(facet_header("pangolier_thunderbolt"))
     W(ul_open())
-    W(li("Rolling Thunder: Turn Rate bonus changed from flat +110 to +40% (results in +48)", t("NERF")))
+    W(li("Rolling Thunder: Turn Rate bonus changed from flat +110 to +40% (results in +48)", b(230, 168)))
     W(ul_close())
 
     # Phantom Lancer

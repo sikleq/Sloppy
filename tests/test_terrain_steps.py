@@ -23,10 +23,10 @@ def test_a_step_needs_both_pictures():
     assert mv.steps({"7.37e": "x", "7.38": "y"}, {"7.38"}) == []
 
 
-def test_the_site_has_every_map_file_from_737e_to_741f():
-    # 7.37e: the 7.37d picture came from Oldgrowth (2026-10-28)
+def test_the_site_has_every_map_file_from_737d_to_741f():
+    # 7.37e: the 7.37d picture came from Oldgrowth (2026-10-28); 7.37d: the 7.37c picture (2026-10-29)
     got = [s.patch for s in mv.steps()]
-    assert got == ["7.37e", "7.38", "7.38b", "7.38c", "7.39", "7.39b", "7.39c", "7.39d", "7.39e", "7.40", "7.40c",
+    assert got == ["7.37d", "7.37e", "7.38", "7.38b", "7.38c", "7.39", "7.39b", "7.39c", "7.39d", "7.39e", "7.40", "7.40c",
                    "7.41", "7.41a", "7.41c", "7.41d", "7.41e", "7.41f"]
     same = mv.same_file_as()
     assert same["7.40b"] == "7.40" and same["7.41b"] == "7.41a"
@@ -153,7 +153,7 @@ def test_a_patch_that_changed_nothing_gets_no_page_but_the_newest_does():
     """The owner: "if nothing changed in a patch, there's nothing to compare" — no object moved, no notes. 2026-10-03:
     the newest patch keeps its page all the same, "or one could think the patch doesn't exist" (7.41f)."""
     steps, notes, quiet = _quiet_set()
-    assert quiet == {"7.37e", "7.39e", "7.40c"}                   # 7.41c-e changed where wards can stand
+    assert quiet == {"7.37d", "7.37e", "7.39e", "7.40c"}                   # 7.41c-e changed where wards can stand
     pages = terrain_index._pages([p for p in steps if p not in quiet], notes)
     assert pages == ["7.41f", "7.41e", "7.41d", "7.41c", "7.41a", "7.41", "7.40", "7.39d", "7.39c", "7.39b", "7.39",
                      "7.38c", "7.38b", "7.38"]

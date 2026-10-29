@@ -35,6 +35,13 @@ def test_an_old_min_max_range_is_compared_by_its_middle():
     assert g._emit_badge("Eidolon gold bounty increased from 14-20 to 17-20", hero_side=True) == "br(14, 20, 17, 20, l=True)"
 
 
+def test_a_flat_bonus_turned_percent_compares_the_totals():
+    """Owner 2026-10-29: Rolling Thunder "from flat +110 to +40% (results in +48)" — the base is 48 / 40% = 120, so the
+    turn rate went 230 → 168 (−27%), a % badge, not a bare NERF tag."""
+    text = "Rolling Thunder: Turn Rate bonus changed from flat +110 to +40% (results in +48)"
+    assert g._emit_badge(text) == "b(230, 168)"
+
+
 def test_an_added_upgrade_card_has_the_ability_header_and_charges_take_the_cooldown():
     """Owner 2026-10-28 (7.37e Escape Act): an "Added Aghanim's Scepter." card has its ability's header (Active, range,
     mana, cooldown); an upgrade that swaps the cooldown for charges shows the charge restore time there instead."""

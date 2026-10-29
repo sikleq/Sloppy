@@ -101,6 +101,9 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     ("Outworld Destroyer", "obsidian_destroyer_ominous_discernment"),
     ("Sven", "sven_vanquisher"),
     ("Invoker", "invoker_mastermind"),      # removed in 7.38, its own block there since 2026-10-29
+    # 7.37-era innates of content/p737d.py (data/stats/7.37d/heroes KV "Innate" "1"), gone from live herodata (2026-10-29)
+    ("Juggernaut", "juggernaut_duelist"),
+    ("Tidehunter", "tidehunter_blubber"),
 }
 
 KNOWN_DISPLAY_NAME_OVERRIDES = set()
@@ -152,6 +155,8 @@ KNOWN_INNATE_NO_CDN_ICON = {
     "obsidian_destroyer_ominous_discernment",
     "sven_vanquisher",
     "invoker_mastermind",           # 7.37 innate removed in 7.38; not in the client VPK nor the CDN (2026-10-29)
+    "juggernaut_duelist",           # 7.37d innates: not in the client VPK nor the CDN (scripts/fetch/fetch_icons.py,
+    "tidehunter_blubber",           # 2026-10-29)
 }
 
 # Hero abilities no Ability slot or facet ever names (7.08 → today) that were in the game all the same: the game
