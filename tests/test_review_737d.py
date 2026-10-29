@@ -7,12 +7,17 @@ import tools.generate_patch_code_v2 as g
 @pytest.mark.parametrize("text, tag", [
     ("No longer doubles its bonuses at 25 minutes", "DEL"),
     ("Suppress no longer makes caster or ally unslowable", "DEL"),
-    ("Soul Release now always gains a charge when the owner dies", "BUFF"),
+    ("Soul Release now always gains a charge when the owner dies", "NEW"),                 # owner 2026-10-29
+    ("Sacrificing creeps with Martyrdom (Aghanim's Scepter) now triggers On Death effects", "NEW"),   # owner
+    ("Enemy heroes caught are no longer pulled to the center of the formation. Now they are placed inside as far away "
+     "from the center as possible while not touching a cog", "REWORK"),                     # owner
+    ("Alt cast behavior now has 50% of base spell's cast range", "NERF"),                  # owner
+    ("Now heals creeps for 50% effectiveness", "NERF"),   # creeps were healed in full in 7.37c (KV, tooltip)
     ("Absorbing damage with Mana Shield now disables Blink Dagger", "NERF"),
     ("Aghanim's Shard no longer allows to hit the same enemy unit by multiple secondary Starstorms in a single cast",
      "DEL"),
     ("Effects that percentually change the base damage now also affect base damage bonus provided by Illusory "
-     "Armaments", "BUFF"),
+     "Armaments", "NEW"),                                                                  # owner 2026-10-29
     ("Toggling items no longer breaks invisibility", "QoL"),
     ("Focus Fire: Windranger can no longer shoot arrows while channeling", "DEL"),
     ("Aghanim's Scepter invisibility buff is now dispelled if the base Windrun buff is dispelled", "NERF"),

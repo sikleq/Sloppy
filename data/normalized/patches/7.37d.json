@@ -250,7 +250,7 @@
         },
         {
           "text": "Soul Release now always gains a charge when the owner dies",
-          "tag": "buff",
+          "tag": "new",
           "scope": "base"
         }
       ]
@@ -401,7 +401,7 @@
       "changes": [
         {
           "text": "Sacrificing creeps with Martyrdom (Aghanim's Scepter) now triggers On Death effects",
-          "tag": "misc",
+          "tag": "new",
           "scope": "Holy Persuasion"
         }
       ]
@@ -413,7 +413,7 @@
       "changes": [
         {
           "text": "Enemy heroes caught are no longer pulled to the center of the formation. Now they are placed inside as far away from the center as possible while not touching a cog",
-          "tag": "misc",
+          "tag": "rework",
           "scope": "facet:rattletrap_expanded_armature"
         }
       ]
@@ -1273,7 +1273,7 @@
       "changes": [
         {
           "text": "Effects that percentually change the base damage now also affect base damage bonus provided by Illusory Armaments",
-          "tag": "buff",
+          "tag": "new",
           "scope": "Illusory Armaments"
         },
         {
@@ -1708,7 +1708,7 @@
         },
         {
           "text": "Alt cast behavior now has 50% of base spell's cast range",
-          "tag": "misc",
+          "tag": "nerf",
           "scope": "facet:tusk_facet_fist_bump"
         }
       ]

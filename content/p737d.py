@@ -81,8 +81,8 @@ def build():
         old=["Active: Soul Release. When used against enemies, it reduces health by 4% of current health per second, and reduces HP regeneration, healing, lifesteal and spell lifesteal by 50%. Deals 25 damage per second. When used on allies, it provides 40 health regeneration per second. Lasts 8 seconds. Gains charges every time an enemy hero dies within 1400 units. Only the closest Spirit Vessel to the dying hero will gain a charge. Cast Range: 750. Cooldown: 10s"],
         new=["Active: Soul Release. When used against enemies, it reduces health by 4% of current health per second, and reduces HP regeneration, healing, lifesteal and spell lifesteal by 60%. Deals 25 damage per second. When used on allies, it provides 40 health regeneration per second. Lasts 8 seconds. Gains charges every time an enemy hero dies within 1400 units or the user dies. Only the closest Spirit Vessel to the dying hero will gain a charge. Cast Range: 750. Cooldown: 10s"]))
     W(ul_open())
+    W(li("Soul Release now always gains a charge when the owner dies", t("NEW")))
     W(li("Soul Release health restoration reduction on enemies increased from 50% to 60%", b(50, 60)))
-    W(li("Soul Release now always gains a charge when the owner dies", t("BUFF")))
     W(ul_close())
     W(item_header("Wraith Band"))
     W(ul_open())
@@ -151,14 +151,14 @@ def build():
     W(hero_header("Chen"))
     W(ability("Holy Persuasion", slug="chen_holy_persuasion"))
     W(ul_open())
-    W(li("Sacrificing creeps with Martyrdom (Aghanim's Scepter) now triggers On Death effects", t("MISC")))
+    W(li("Sacrificing creeps with Martyrdom (Aghanim's Scepter) now triggers On Death effects", t("NEW")))
     W(ul_close())
 
     # Clockwerk
     W(hero_header("Clockwerk"))
     W(facet_header("rattletrap_expanded_armature"))
     W(ul_open())
-    W(li("Power Cogs: Enemy heroes caught are no longer pulled to the center of the formation. Now they are placed inside as far away from the center as possible while not touching a cog", t("MISC")))
+    W(li("Power Cogs: Enemy heroes caught are no longer pulled to the center of the formation. Now they are placed inside as far away from the center as possible while not touching a cog", t("REWORK")))
     W(ul_close())
 
     # Crystal Maiden
@@ -453,7 +453,7 @@ def build():
     W(hero_header("Phantom Lancer"))
     W(ability("Illusory Armaments", slug="phantom_lancer_illusory_armaments"))
     W(ul_open())
-    W(li("Effects that percentually change the base damage now also affect base damage bonus provided by Illusory Armaments", t("BUFF")))
+    W(li("Effects that percentually change the base damage now also affect base damage bonus provided by Illusory Armaments", t("NEW")))
     W(li("Bonus to Base Damage for illusions increased from 65% to 70%", b(65, 70)))
     W(ul_close())
 
@@ -588,8 +588,10 @@ def build():
     W(ul_close())
     W(ability("Leech Seed", slug="treant_leech_seed"))
     W(ul_open())
-    W(li("Now heals creeps for 50% effectiveness", t("NEW")))
     W(li("Damage/Heal per second decreased from 20/35/50/65 to 15/30/45/60", b([20, 35, 50, 65], [15, 30, 45, 60])))
+    W(li("Now heals creeps for 50% effectiveness", t("NERF"),
+         extra=note_box('Creeps were healed in full before: in 7.37c the seed healed all friendly units around it. '
+                        '7.37d added the 50% heal reduction on creeps')))
     W(ul_close())
 
     # Troll Warlord
@@ -609,7 +611,7 @@ def build():
     W(facet_header("tusk_facet_fist_bump"))
     W(ul_open())
     W(li("Movement Bonus decreased from 25% to 10/15/20/25%", b(25, [10, 15, 20, 25])))
-    W(li("Alt cast behavior now has 50% of base spell's cast range", t("MISC")))
+    W(li("Alt cast behavior now has 50% of base spell's cast range", t("NERF")))
     W(ul_close())
 
     # Underlord

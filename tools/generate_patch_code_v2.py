@@ -590,10 +590,15 @@ TAG_OVERRIDES = {
     # 7.37d proofread (2026-10-29)
     "no longer doubles its bonuses":          "DEL",    # Bracer / Wraith Band / Null Talisman: the 25-minute doubling
     "no longer makes caster or ally unslowable": "DEL", # Disperser Suppress (40% slow resistance comes instead, NEW)
-    "always gains a charge when the owner dies": "BUFF", # Spirit Vessel: one more way to get charges
+    "always gains a charge when the owner dies": "NEW", # Spirit Vessel: a new way to get charges (owner 2026-10-29)
+    "now triggers on death effects":          "NEW",    # Chen Martyrdom: sacrificed creeps' On Death effects (owner)
+    "are no longer pulled to the center":     "REWORK", # Power Cogs: caught heroes placed another way (owner)
+    "alt cast behavior now has":              "NERF",   # Drinking Buddies: alt cast at 50% of the cast range (owner)
+    "now heals creeps for":                   "NERF",   # Leech Seed: creeps were healed in full before (7.37c KV +
+                                                        # tooltip), now at 50% — creep_heal_reduction_pct (owner asked)
     "now disables blink dagger":              "NERF",   # Mana Shield: absorbing damage now counts as taking it
     "no longer allows to hit the same enemy": "DEL",    # Mirana Shard: secondary Starstorms no longer stack on one unit
-    "percentually change the base damage":    "BUFF",   # Illusory Armaments: base-damage % effects now count the bonus
+    "percentually change the base damage":    "NEW",    # Illusory Armaments: base-damage % effects now count the bonus
     "toggling items no longer breaks invis":  "QoL",    # Riki: as 7.41 Burn toggling — handling, not power
     "can no longer shoot arrows while":       "DEL",    # Whirlwind Focus Fire: no own attacks while channeling
     "invisibility buff is now dispelled if":  "NERF",   # Windrun Scepter: a new way to lose the invisibility

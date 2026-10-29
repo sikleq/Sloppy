@@ -507,10 +507,14 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 |---|---|---|
 | «No longer doubles its bonuses at 25 minutes» (Bracer, Wraith Band, Null Talisman) | **DEL** | удвоение убрано — «No longer» → DEL |
 | «Suppress no longer makes caster or ally unslowable» | **DEL** | эффект убран; 40% slow resistance рядом — NEW |
-| «Soul Release now always gains a charge when the owner dies» | **BUFF** | ещё один способ получить заряд |
+| «Soul Release now always gains a charge when the owner dies» | **NEW** | новый способ получить заряд (владелец 2026-10-29) |
+| «Sacrificing creeps with Martyrdom … now triggers On Death effects» | **NEW** | новое свойство (владелец) |
+| «Enemy heroes caught are no longer pulled to the center … Now they are placed inside …» (Power Cogs) | **REWORK** | поведение заменено другим, не убрано (владелец) |
+| «Alt cast behavior now has 50% of base spell's cast range» (Drinking Buddies) | **NERF** | дальность урезана (владелец) |
+| «Now heals creeps for 50% effectiveness» (Leech Seed) | **NERF** + note_box | не новое: в 7.37c семя лечило всех союзников целиком, 7.37d ввёл `creep_heal_reduction_pct` 50 (KV + подсказка игры; владелец просил проверить) |
 | «Absorbing damage with Mana Shield now disables Blink Dagger» | **NERF** | новое ограничение |
 | «Aghanim's Shard no longer allows to hit the same enemy … secondary Starstorms» | **DEL** | поведение убрано |
-| «Effects that percentually change the base damage now also affect … Illusory Armaments» | **BUFF** | бонус теперь учитывается |
+| «Effects that percentually change the base damage now also affect … Illusory Armaments» | **NEW** | новое взаимодействие (владелец 2026-10-29) |
 | «Toggling items no longer breaks invisibility» (Riki) | **QoL** | как 7.41 Burn toggling |
 | «Windranger can no longer shoot arrows while channeling» | **DEL** | поведение убрано |
 | «Aghanim's Scepter invisibility buff is now dispelled if …» (Windrun) | **NERF** | новый способ потерять невидимость |
