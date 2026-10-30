@@ -5000,10 +5000,14 @@ def _take_innate_text_rows(out, slug, version):
     taken = []
     for k in range(len(out) - 1, start, -1):
         ln = out[k]
-        if not (ln.lstrip().startswith('W(li("') and ', t("' in ln and " from " not in ln):
+        if not ln.lstrip().startswith('W(li("'):
             continue
+        # a "from … to" row is a change of values — unless it is the description itself, word for word (owner
+        # 2026-10-30, 7.37 Beastmaster: "melee hero damage block chance is increased from 50% to 100% versus non-hero
+        # units" is Rugged's whole text: "это разве не innate?")
+        least = 0.6 if ', t("' in ln and " from " not in ln else 0.9
         words = set(_WORD_RE.findall(ln.lower()))
-        if len(words) >= 8 and len(words & desc) / len(words) >= 0.6:
+        if len(words) >= 8 and len(words & desc) / len(words) >= least:
             taken.insert(0, out.pop(k))
     # a general list left empty goes
     for k in range(len(out) - 2, start, -1):

@@ -316,3 +316,18 @@ def test_a_facet_prefix_with_the_word_facet_and_an_old_abilitys_real_slug():
     luna = "\n".join(g._render_hero({"hero_id": 48, "hero_notes": [
         {"indent_level": 1, "note": "Selemene's Favor: Ability removed"}]}, version="7.37"))
     assert 'slug="luna_selemenes_favor"' in luna
+
+
+def test_a_from_row_that_is_the_new_innates_whole_text_goes_under_its_card():
+    """7.37 Beastmaster: "… damage block chance is increased from 50% to 100% versus non-hero units" is Rugged's
+    description word for word — under the card, hidden; a "from" row that only shares some words stays."""
+    out = ['W(hero_header("Beastmaster"))', 'W(ul_open())',
+           'W(li("Beastmaster\'s melee hero damage block chance is increased from 50% to 100% versus non-hero units", b(50, 100)))',
+           'W(li("Base armor increased from 2 to 3 for melee hero damage versus units", b(2, 3)))', 'W(ul_close())']
+    taken = g._take_innate_text_rows(out, "beastmaster_rugged", "7.37")
+    assert len(taken) == 1 and "damage block chance" in taken[0]
+    assert any("Base armor" in ln for ln in out)
+    from pathlib import Path
+    src = (Path(g._HERE) / "content" / "p737.py").read_text(encoding="utf-8")
+    row = next(ln for ln in src.splitlines() if "damage block chance is increased" in ln)
+    assert "covered=True" in row

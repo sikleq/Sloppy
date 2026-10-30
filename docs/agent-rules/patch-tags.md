@@ -567,6 +567,10 @@ Desolate / Infest / Riptide — штраф самого героя или выг
   «Levels 1-4 unchanged; the 0.8 it had at level 0 as an innate is gone», не пустой бейдж.
 - Строки под карточкой новой врождённой скрыты все (кроме строк про Аганим); заметка строки («Illusions cause full
   effect») — в «?» карточки (`game_ability_desc(…, note=…)`). Владелец 2026-10-30: «дубль того, что уже в карточке».
+  Строка из общего списка героя, повторяющая описание новой врождённой, тоже уходит под карточку; строка с
+  «from … to» — только если совпадает с описанием почти слово в слово (≥ 90% слов): 7.37 Beastmaster «melee hero
+  damage block chance is increased from 50% to 100% versus non-hero units» = весь текст Rugged
+  (`_take_innate_text_rows`; владелец: «это разве не innate?»).
 - «No longer an innate ability» и строка, где ушло только значение уровня 0, — одна строка: «No longer an innate
   ability. Max Mana Burned per hit rescaled from …» (`_merge_no_longer_innate`; в 7.37 так 14 раз).
 - «Now has 750 charges, and depletes a charge …» (Philosopher's Stone) — REWORK: предмет работал иначе.

@@ -326,9 +326,6 @@ def build():
 
     # Beastmaster
     W(hero_header("Beastmaster"))
-    W(ul_open())
-    W(li("Beastmaster's melee hero damage block chance is increased from 50% to 100% versus non-hero units", b(50, 100)))
-    W(ul_close())
     W(ability_change(
         old=dict(name="Inner Beast", slug="beastmaster_inner_beast", innate=True, desc=game_ability_desc("beastmaster_inner_beast", "7.36c")),
         new=dict(name="Rugged", slug="beastmaster_rugged", innate=True, desc=game_ability_desc("beastmaster_rugged", "7.37")),
@@ -336,6 +333,7 @@ def build():
         tag="new",
     ))
     W(ul_open())
+    W(li("Beastmaster's melee hero damage block chance is increased from 50% to 100% versus non-hero units", b(50, 100), covered=True))
     W(li("New Innate ability. Passive, can't be leveled up", t("MISC"), covered=True))
     W(ul_close())
     W(facet_header("beastmaster_wild_hunt"))
