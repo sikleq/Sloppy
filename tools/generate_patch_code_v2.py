@@ -588,6 +588,60 @@ TAG_OVERRIDES = {
     "treant gold bounty rescaled":            "NERF",   # Nature's Call: the enemy gets more gold for a treant
     "no longer explode":                      "DEL",    # Eldritch Summoning: imps killed by heroes do not blow up
     "improved behavior":                      "QoL",    # Stroke of Fate at max cast range: handling, not power (owner)
+    # 7.37 proofread (2026-10-30)
+    "no longer an innate ability":            "REWORK", # the old innate becomes a basic ability ("is now an innate" = REWORK)
+    "no longer a levelable innate ability":   "REWORK", # Lina Fiery Soul
+    "now always drops roshan's banner":       "NEW",    # Roshan's second death
+    "now drops refresher shard and cheese during daytime": "REWORK",  # third death: by the time of day
+    "are now fully disabled by break":        "NERF",
+    "are now partially disabled by break":    "NERF",
+    "no longer always cast chain lightning":  "DEL",    # Harpy Stormcrafter pulled by lane creeps
+    "no longer requires the target to remain still": "BUFF",  # Shadow Amulet Fade: a restriction gone
+    "no longer refreshes its cooldown if cast on self": "DEL",
+    "now slows the target by":                "NEW",    # Fade
+    "cooldown no longer ticks down if":       "NERF",   # Trusty Shovel out of the neutral slot
+    "always digs up a water rune":            "NEW",
+    "returning as a tier":                    "NEW",    # a neutral item back in the pool
+    "now is a tier":                          "REWORK", # a neutral item's tier moved, as "Moved from Tier X to Y"
+    "can now change direction while flopping": "NEW",   # Ogre Seal Totem
+    "now stacks with other sources of":       "BUFF",   # Void Brawler status resistance
+    "can now target roshan and tormentors":   "NEW",
+    "is now applied on any kill made by":     "NEW",    # Earthshaker knockback, not only Enchant Totem
+    "no longer prevents damage for a short duration": "DEL",  # Time Walk (Chronosphere facet)
+    "touched by the ghostship receive a stronger": "NEW",  # Ghostship Scepter
+    "in addition, lifestealer gains permanent max hp": "NEW",  # Feast
+    "now also increases the attack distance threshold": "NEW",  # Spirit Bear
+    "spirit bear can no longer equip its own neutral items": "REWORK",  # copies Lone Druid's instead
+    "can no longer be activated. rotating glaives moved": "REWORK",  # Lucent Beam / Lunar Orbit split
+    "health gained from lifesteal now also heals": "NEW",  # Bodyguard
+    "new facet":                              "NEW",
+    "no longer a levelable ability, now has a base": "REWORK",  # Mana Shield
+    "now also increases duration by":         "NEW",    # Wukong's Command (facet)
+    "is no longer destroyed or goes on additional cooldown": "BUFF",  # Ofrenda: a penalty gone
+    "no longer scales with vendetta":         "REWORK",
+    "no longer spell stealable":              "DEL",
+    "no longer procs magic stick":            "BUFF",   # the enemy no longer gets charges
+    "now procs magic stick":                  "NERF",   # the enemy now gets charges
+    "now shows a preview of":                 "QoL",
+    "now also lowers strike cooldown by":     "NEW",    # Storm Surge
+    "aghanim's shard pulses apply 1 stinger": "NEW",
+    "every hero kill increases max souls by 1 until": "NEW",   # the facet takes the old default
+    "hero kills no longer increase max souls": "DEL",
+    "debuff now grants that the next attack": "NEW",    # Electric Vortex (facet)
+    "no longer passively grants allies movement speed": "DEL",
+    "now increases active movement speed bonus by additional": "BUFF",
+    "now also grants 1 attack projectile speed": "NEW",
+    "can see roshan's respawn timer":         "NEW",
+    "are now applied when denying allies or traps": "NEW",
+    "traps no longer provide vision":         "DEL",
+    "traps now always take":                  "REWORK",
+    "now always teleports the target enemy to": "REWORK",
+    "damage no longer pierces magic resistance": "NERF",
+    "can now be put on alt-cast":             "NEW",
+    "can no longer be refreshed":             "NERF",
+    "aoe now equals to":                      "REWORK", # Focus Fire (Tailwind facet)
+    "now cannot be lower than the average":   "NEW",    # Mental Fortitude
+    "when in melee form, troll warlord has":  "REWORK", # Berserker's Rage, a basic ability by stance
     # 7.37b proofread (2026-10-30): a new property is NEW even when it helps (owner's 7.37c/d rule)
     "now refunds clockwerk":                  "NEW",    # Hookshot (Hookup): mana refund
     "now also increases attack range for units under": "NEW",  # Enchant (Spellbound)
@@ -763,11 +817,21 @@ def _l1_only_dip(old, new, l=False):
     return (sum(signed) / len(signed)) < 0
 
 
+_MISSING_FROM_RE = re.compile(r'\b(increased|decreased|rescaled|reduced)\s+(?=[-+]?\d[\d./%s]*\s+to\s+[-+]?\d)', re.I)
+
+
+def _add_missing_from(text):
+    """"Damage increase per armor decreased 0.3% to 0.25%", "Split Amount rescaled 80/85/90/95/100% to 85/90/95/100%"
+    (7.37): Valve left out "from" — the row still has its old and new values."""
+    return _MISSING_FROM_RE.sub(r'\1 from ', text)
+
+
 def _emit_badge(text, hero_side=False):
     """Try to extract from-N-to-M and emit b(...). Returns badge code str
     (e.g. 'b([5,7,9,15], [5,7,9,11])') or None if no numeric change.
     hero_side: the row sits under a hero, so a bounty is what the ENEMY gets for killing the hero's unit
     (Spirit Bear, Tempest Double: lower is better — audit 2026-10-05); a neutral creep's bounty stays higher-is-better."""
+    text = _add_missing_from(text)
     flat = _emit_flat_to_pct_badge(text)
     if flat:
         return flat
@@ -778,6 +842,9 @@ def _emit_badge(text, hero_side=False):
     new = _split_levels(m.group(2))
     if old is None or new is None:
         return None
+    # every value negative: Valve's word and the effect follow the size ("Armor Corruption decreased from -4 to -3",
+    # 7.37 Hoodwink talent: a weaker armor reduction) — compare the sizes; mixed signs (7.38 Self Speed) stay as they are
+    old, new = _by_size(old, new)
     # A tier/level added at the end ("+125/135 to +125/135/145", 7.41 Keen-Eyed): compare the new top tier with
     # the old top one. b() zips the lists, so the new tier was dropped and the row read a grey 0% (audit 2026-10-05).
     if isinstance(old, list) and isinstance(new, list) and len(new) > len(old) and new[:len(old)] == old:
@@ -1737,10 +1804,10 @@ def _render_item(item, version, neutral=False):
     return out
 
 
-def _facet_card(slug, style, body_lines):
+def _facet_card(slug, style, body_lines, version=None):
     """Valve-flagged facet → card lines, else None. NewFacet → new_facet(desc=rows);
-    ReworkedFacet → facet_change with the rows as NEW and an OLD pane the proofreader
-    fills from the previous patch's state (KV values + earlier patch notes)."""
+    ReworkedFacet → facet_change with the rows as NEW and an OLD pane: the facet's text of the previous patch with
+    its numbers (patch/aghs_text.facet_text, 7.37 Ferocity / Voidblades); a TODO only when the files lack it."""
     kind = 'new' if 'NewFacet' in style else ('rework' if 'ReworkedFacet' in style else None)
     if not kind:
         return None
@@ -1769,8 +1836,14 @@ def _facet_card(slug, style, body_lines):
     rows = ''.join(f'\n    {it},' for it in items)
     if kind == 'new':
         return [f'W(new_facet("{slug}", desc=[{rows}\n]))']
+    from patch.aghs_text import facet_text
+    from patch.meta import _prev_patch_version
+    prev = _prev_patch_version(version) if version else None
+    old = facet_text(slug, prev) if prev else None
+    old_item = (f'"{old.replace(chr(92), chr(92) * 2).replace(chr(34), chr(92) + chr(34))}"' if old else
+                '"TODO: the facet as it was in the previous patch (KV values + earlier notes)"')
     return [f'W(facet_change("{slug}",\n'
-            f'    old_desc=["TODO: the facet as it was in the previous patch (KV values + earlier notes)"],\n'
+            f'    old_desc=[{old_item}],\n'
             f'    new_desc=[{rows}\n]))']
 
 
@@ -1873,12 +1946,14 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
             m = _FACET_PREFIX_RE.match(clean)
             if m:
                 prefix = m.group(1).strip()
-                facet_slug = _facet_name_to_slug.get(prefix.lower())
+                # "Cold Comfort Facet: Blueheart Floe: …" (7.37): Valve's prefix may carry the word "Facet"
+                facet_name = re.sub(r'\s+Facet$', '', prefix, flags=re.I) or prefix
+                facet_slug = _facet_name_to_slug.get(facet_name.lower())
                 if not facet_slug and version:
                     # a facet of this patch the registry lacks (7.37b "Elitist: Exort: …" became an innate block)
                     from patch.ability_kv import hero_facets
                     facet_slug = next((fs for fs, (fname, _c, _i) in hero_facets(slug, version).items()
-                                       if fname.lower() == prefix.lower()), None)
+                                       if fname.lower() == facet_name.lower()), None)
                 if facet_slug:
                     stripped_note = dict(n)
                     stripped_note['note'] = re.sub(
@@ -1904,8 +1979,12 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
                 # ability (found in abilities_slim by dname), it's not a routing
                 # signal — fall through to _general_notes.
                 if prefix.lower() not in _current_abil_dname_to_slug:
-                    # Derive slug: hero_slug + "_" + display name words
-                    derived_slug = slug + '_' + re.sub(r"[^a-z0-9]+", '_', prefix.lower()).strip('_')
+                    # The patch before names it (7.37 "Selemene's Favor: Ability removed" = luna_selemenes_faithful?
+                    # the files say which); else derive: hero_slug + "_" + display name words
+                    from patch.meta import _prev_patch_version as _pv
+                    before = hero_abilities(slug, _pv(version)).get(prefix.lower()) if version and _pv(version) else None
+                    derived_slug = before[0] if before else \
+                        slug + '_' + re.sub(r"[^a-z0-9]+", '_', prefix.lower()).strip('_')
                     # Innate status: check if the hero currently has a known innate
                     # (abilities_slim). If yes, the old ability being discussed was
                     # likely the previous innate — mark innate=True.
@@ -1988,7 +2067,7 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
                 tbody, _ = _emit_notes(facet_talents)
                 facet_talent_rows.extend(_with_facet(_ul_inner(tbody), facet_slug))
             # Valve flags the facet itself: "hero_facet NewFacet" / "hero_facet ReworkedFacet"
-            card = _facet_card(facet_slug, s.get('style', ''), out[facet_start + 1:])
+            card = _facet_card(facet_slug, s.get('style', ''), out[facet_start + 1:], version)
             if card:
                 out[facet_start:] = card
     # Abilities — the innate first, whatever Valve's order (owner 2026-10-16: Invoke, Feast, Minefield Sign 7.41 stood
@@ -3997,6 +4076,18 @@ _RANGE_TO_RE = re.compile(
 )
 
 
+def _by_size(old, new):
+    """(old, new) by size when every value is negative — the direction of an armor reduction "-4 → -3" (7.37 Hoodwink
+    talent) is its size's, as the b() badge (_emit_badge); else as they are."""
+    if old is None or new is None:
+        return old, new
+    vals = [*(old if isinstance(old, list) else [old]), *(new if isinstance(new, list) else [new])]
+    if not all(isinstance(v, (int, float)) and v < 0 for v in vals):
+        return old, new
+    flip = lambda x: [abs(v) for v in x] if isinstance(x, list) else abs(x)
+    return flip(old), flip(new)
+
+
 def _num(x):
     f = float(x)
     return int(f) if f == int(f) else f
@@ -4018,7 +4109,7 @@ def _normalize_note_text(text):
     lower = _is_lower_better(clean)
     old = new = None
     is_range = False
-    m = _FROM_TO_RE.search(clean)
+    m = _FROM_TO_RE.search(_add_missing_from(clean))
     if m:
         po, pn = _split_levels(m.group(1)), _split_levels(m.group(2))
         if po is not None and pn is not None:
@@ -4033,7 +4124,7 @@ def _normalize_note_text(text):
     said = _said_lower_better(clean, old, new)
     if said is not None:
         lower = said
-    rec = {'text': clean, 'tag': _resolve_tag(clean, old, new, lower)}
+    rec = {'text': clean, 'tag': _resolve_tag(clean, *_by_size(old, new), lower)}
     if old is not None:
         rec['old'] = old
         rec['new'] = new
@@ -4340,6 +4431,10 @@ def generate(version):
     out = _postprocess_removed_label(out)             # "Neutral Item cycled out" label — owner 2026-10-17
     out = _postprocess_ability_level_formula(out, version)   # "+X with every level of Y" -> table (owner 2026-10-27)
     out = _postprocess_innate_cards(out, version)     # innate old -> new from the game's texts (owner 2026-10-27)
+    out = _postprocess_new_innate_cards(out, version)  # "New innate ability" -> the hero's old innate -> new (7.37)
+    out = _postprocess_new_facet_rows(out)             # a "New Facet" row -> the new facet card (7.37 Medusa)
+    out = _merge_adjacent_lists(out)                   # ul_close + ul_open back to back -> one list (7.37 Chronosphere)
+    out = _postprocess_innate_level0(out, version)     # a 7.36 innate's level-0 value out of the comparison (7.37)
     out = _postprocess_removed_facets(out, version)   # "Removed X Facets" -> facet blocks (owner 2026-10-29)
     out = _postprocess_same_change_abilities(out)     # one block, stacked icons (owner 2026-10-30)
 
@@ -4388,7 +4483,7 @@ def _postprocess_ability_level_formula(lines, version):
 
 
 _ABILITY_LINE_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([^"]+)"(, innate=True)?\)\)\s*$')
-_NOW_INNATE_ROW_RE = re.compile(r'^\s*W\(li\("Now is an innate ability\b')
+_NOW_INNATE_ROW_RE = re.compile(r'^\s*W\(li\("(?:Now is an innate ability|Moved to innate ability)\b')  # 7.37 Lunar Blessing
 _INNATE_REWORK_ROW_RE = re.compile(r'^\s*W\(li\("(?:Now levels up with|Instead of )')
 
 
@@ -4438,6 +4533,189 @@ def _postprocess_innate_cards(lines, version):
             out.append(re.sub(r"\)\)\s*$", ", covered=True))", r) if _NOW_INNATE_ROW_RE.match(r) else r)
         i += 2 + len(rows)
     return out
+
+
+_NEW_INNATE_ROW_RE = re.compile(r'^\s*W\(li\("New innate ability\b', re.I)
+_NEW_BASIC_ROW_RE = re.compile(r'^\s*W\(li\("New basic ability\b', re.I)
+_ANY_ABILITY_LINE_RE = re.compile(r'^(\s*)W\(ability\("([^"]+)", slug="([^"]+)"(?:, innate=True)?\)\)\s*$')
+_HERO_LINE_RE = re.compile(r'^\s*W\(hero_header\("([^"]+)"')
+
+
+def _postprocess_new_innate_cards(lines, version):
+    """A block whose first row is "New innate ability. …" (7.37: every hero got a new innate, the old one became a
+    basic ability) → an old -> new card: the hero's innate of the patch before → the new one, both from the game's
+    texts, summary "New innate ability.", tag NEW — as 7.38's Aggrandize. The rows the card shows are covered; a row
+    with a note of its own ("Illusions cause full effect") stays."""
+    from patch import loc_history
+    from patch.aghs_text import ability_text
+    from patch.meta import _prev_patch_version
+    prev = _prev_patch_version(version) if version else None
+    if not prev:
+        return lines
+    old_innates = {s for s in innate_slugs_of(prev) if ability_text(s, prev)}
+    hero_slug_of = {name: slug for name, slug in HEROES.values()}
+    out, i, hero = [], 0, None
+    while i < len(lines):
+        h = _HERO_LINE_RE.match(lines[i])
+        if h:
+            hero = hero_slug_of.get(h.group(1))
+        m = _ANY_ABILITY_LINE_RE.match(lines[i])
+        end = (next((k for k in range(i + 2, len(lines)) if lines[k].strip() == "W(ul_close())"), len(lines))
+               if m and i + 1 < len(lines) and lines[i + 1].strip() == "W(ul_open())" else None)
+        # the "New innate ability" row anywhere in the block (7.37 Venomancer: the Scepter row came first); a card
+        # only when the game files describe the ability (7.41 Leviathan's Catch, 7.31 have none) — else as it was
+        has_text = end is not None and bool(ability_text(m.group(3), version))
+        if not has_text or not any(_NEW_INNATE_ROW_RE.match(r) for r in lines[i + 2:end]):
+            if has_text and any(_NEW_BASIC_ROW_RE.match(r) for r in lines[i + 2:end]):
+                # "New basic ability." (7.37 Medusa Gorgon's Grasp, Luna Lunar Orbit): the "New ability." card, as 7.41
+                if out and out[-1].lstrip().startswith("# v2-todo: convert to ability_change"):
+                    out.pop()
+                out.append(f'{m.group(1)}W(new_ability("{m.group(2)}", "{m.group(3)}", version="{version}"))')
+                out.append(lines[i + 1])
+                for r in lines[i + 2:end]:
+                    plain = r.lstrip().startswith("W(li(") and "extra=" not in r and "Aghanim" not in r
+                    out.append(re.sub(r"\)\)\s*$", ", covered=True))", r) if plain else r)
+                out.append(lines[end] if end < len(lines) else "")
+                i = end + 1
+                continue
+            out.append(lines[i])
+            i += 1
+            continue
+        ind, name, slug = m.group(1), m.group(2), m.group(3)
+        moved = _take_innate_text_rows(out, slug, version)
+        if out and out[-1].lstrip().startswith("# v2-todo: convert to ability_change"):
+            out.pop()                                   # the card is made: no todo
+        olds = sorted(s for s in old_innates if hero and s.startswith(f"{hero}_") and s != slug)
+        out.append(f'{ind}W(ability_change(')
+        if olds:
+            old = olds[0]
+            old_name = loc_history.tooltip(f"DOTA_Tooltip_Ability_{old}", prev) or old
+            _drop_removed_block(out, old)               # the card's old side shows it: no "Ability removed" twice
+            out.append(f'{ind}    old=dict(name="{old_name}", slug="{old}", innate=True, '
+                       f'desc=game_ability_desc("{old}", "{prev}")),')
+        else:
+            out.append(f'{ind}    old=None,')
+        out += [f'{ind}    new=dict(name="{name}", slug="{slug}", innate=True, desc=game_ability_desc("{slug}", "{version}")),',
+                f'{ind}    summary="New innate ability.",',
+                f'{ind}    tag="new",',
+                f'{ind}))', lines[i + 1]]
+        for r in [*moved, *lines[i + 2:end]]:
+            covered = r.lstrip().startswith("W(li(") and "extra=" not in r
+            out.append(re.sub(r"\)\)\s*$", ", covered=True))", r) if covered else r)
+        out.append(lines[end] if end < len(lines) else "")
+        i = end + 1
+    return out
+
+
+def _drop_removed_block(out, slug):
+    """Take out of `out` (this hero's part) the block `ability(…, slug)` + "Ability removed" — 7.37 Abaddon's Font of
+    Avernus, Enchantress's Forest Freebie: the new innate's card shows the old one on its left side."""
+    start = max((k for k, ln in enumerate(out) if _HERO_LINE_RE.match(ln)), default=0)
+    for k in range(start, len(out) - 3):
+        if (f'slug="{slug}"' in out[k] and out[k].lstrip().startswith("W(ability(")
+                and out[k + 1].strip() == "W(ul_open())" and out[k + 2].lstrip().startswith('W(li("Ability removed"')
+                and out[k + 3].strip() == "W(ul_close())"):
+            del out[k:k + 4]
+            return True
+    return False
+
+
+def _postprocess_innate_level0(lines, version):
+    """7.37: a 7.36 innate that became a basic ability had a value at level 0 too (5 values) — the new one has 4
+    levels. "Mana Burned per hit rescaled from 16/23/30/37/44 to 25/30/35/40": compare level 1–4 with level 1–4, the
+    old level 0 dropped (the b() lists were of different length on 51 rows)."""
+    from patch.meta import _prev_patch_version
+    prev = _prev_patch_version(version) if version else None
+    if not prev:
+        return lines
+    from patch.ability_kv import hero_abilities
+    was = innate_slugs_of(prev) - innate_slugs_of(version)
+    hero_slug_of = {name: s for name, s in HEROES.values()}
+    out, slug, hero = [], None, None
+    rx = re.compile(r'b\(\[([^\]]+)\], \[([^\]]+)\]')
+    for ln in lines:
+        m = _ANY_ABILITY_LINE_RE.match(ln)
+        h = _HERO_LINE_RE.match(ln)
+        if h:
+            hero = hero_slug_of.get(h.group(1))
+        if m or h or ln.lstrip().startswith(("W(facet_header(", "W(subgroup(")):
+            slug = m.group(3) if m else None
+        row_slug = slug
+        p = re.match(r'\s*W\(li\("([^":]{2,40}):\s', ln)
+        if p and hero:                                  # a facet's row about the old innate (7.37 "Inner Beast: …")
+            row_slug = (hero_abilities(hero, prev).get(p.group(1).lower()) or (slug,))[0]
+        if row_slug in was and ln.lstrip().startswith("W(li("):
+            def cut(mm):
+                old, new = mm.group(1).split(", "), mm.group(2).split(", ")
+                return f"b([{', '.join(old[1:])}], [{mm.group(2)}]" if len(old) == len(new) + 1 else mm.group(0)
+            ln = rx.sub(cut, ln, count=1)
+        out.append(ln)
+    return out
+
+
+def _merge_adjacent_lists(lines):
+    """A list closed and the next opened right away — the rows of one block split in two (7.37 Faceless Void: the
+    facet's "Renamed from Temporal Impunity" and its "Time Walk: …" row, from two parts of Valve's notes): one list."""
+    out = []
+    for ln in lines:
+        if ln.strip() == "W(ul_open())" and out and out[-1].strip() == "W(ul_close())":
+            out.pop()
+            continue
+        out.append(ln)
+    return out
+
+
+_FACET_LINE_RE = re.compile(r'^(\s*)W\(facet_header\("([^"]+)"\)\)\s*$')
+_NEW_FACET_ROW_RE = re.compile(r'^\s*W\(li\("New Facet"', re.I)
+_LI_TEXT_RE = re.compile(r'^\s*W\(li\("((?:[^"\\]|\\.)*)"')
+
+
+def _postprocess_new_facet_rows(lines):
+    """facet_header + a "New Facet" row + its description rows (7.37 Medusa: Valve wrote them as rows) → the new
+    facet card new_facet(slug, desc=[…]), as 7.38's new facets."""
+    out, i = [], 0
+    while i < len(lines):
+        m = _FACET_LINE_RE.match(lines[i])
+        if not (m and i + 2 < len(lines) and lines[i + 1].strip() == "W(ul_open())"
+                and _NEW_FACET_ROW_RE.match(lines[i + 2])):
+            out.append(lines[i])
+            i += 1
+            continue
+        end = next((k for k in range(i + 3, len(lines)) if lines[k].strip() == "W(ul_close())"), len(lines))
+        desc = [t.group(1) for t in (_LI_TEXT_RE.match(r) for r in lines[i + 3:end]) if t]
+        items = ", ".join(f'"{d}"' for d in desc)
+        out.append(f'{m.group(1)}W(new_facet("{m.group(2)}", desc=[{items}]))')
+        i = end + 1
+    return out
+
+
+_WORD_RE = re.compile(r"[a-z]{4,}")
+
+
+def _take_innate_text_rows(out, slug, version):
+    """Rows in the hero's general list (already in `out`, after the hero's header) that only describe the new innate
+    — 7.37 Visage: "Visage's ability cooldown durations are reduced as long as he's not taking damage …" stood among
+    the hero's rows, Lurker's text: most of its words are in the game's description. Taken out of `out` and returned."""
+    from patch.aghs_text import ability_text
+    desc = set(_WORD_RE.findall((ability_text(slug, version) or "").lower()))
+    if not desc:
+        return []
+    start = max((k for k, ln in enumerate(out) if _HERO_LINE_RE.match(ln)), default=None)
+    if start is None:
+        return []
+    taken = []
+    for k in range(len(out) - 1, start, -1):
+        ln = out[k]
+        if not (ln.lstrip().startswith('W(li("') and ', t("' in ln and " from " not in ln):
+            continue
+        words = set(_WORD_RE.findall(ln.lower()))
+        if len(words) >= 8 and len(words & desc) / len(words) >= 0.6:
+            taken.insert(0, out.pop(k))
+    # a general list left empty goes
+    for k in range(len(out) - 2, start, -1):
+        if out[k].strip() == "W(ul_open())" and out[k + 1].strip() == "W(ul_close())":
+            del out[k:k + 2]
+    return taken
 
 
 def _auto_register_facets(version, datafeed):

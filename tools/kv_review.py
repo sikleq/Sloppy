@@ -34,6 +34,13 @@ _PREFIX = re.compile(r"^([^:]{2,40}):\s+")
 # a new key whose name says it takes something away: a row that calls it NEW / BUFF / MISC may be a cut
 _CUT_KEY = re.compile(r"reduction|penalty|reduce|loss|lost", re.I)
 _GOOD_TAGS = {"new", "buff", "misc", "qol"}
+_CD_KEY = re.compile(r"cooldown|_cd_|_cd$|cd_reduction", re.I)
+
+
+def _cut(field, new):
+    """A new key that takes something away from the hero: a reduction / penalty with a value — not a zero (7.37
+    Sanguivore "deny_lifesteal_reduction_pct: 0" = full heal) and not a cooldown reduction (a gain: Storm Surge)."""
+    return bool(_CUT_KEY.search(field)) and not _CD_KEY.search(field) and any(_nums(new))
 # a value's flags, not a value: how the tooltip shows it, what scales it
 _META = {"affected_by_aoe_increase", "DamageTypeTooltip", "CalculateSpellDamageTooltip", "RequiresFacet",
          "LinkedSpecialBonus", "RequiresScepter", "RequiresShard", "CalculateAttackDamageTooltip"}
@@ -209,7 +216,7 @@ def review(version):
                     continue
                 flag = ""
                 if not is_new and r.get("tag") in _GOOD_TAGS and any(
-                        old is None and _CUT_KEY.search(f) for f, (old, _n) in open_fields.items()):
+                        old is None and _cut(f, new) for f, (old, new) in open_fields.items()):
                     flag, checks = "проверить тег", checks + 1
                 words.append((ent["name"], slug, r, {} if is_new else open_fields, flag))
             if unstated and not is_new and not any(r not in numeric for r in rows):

@@ -501,6 +501,27 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 
 Генератор: `TAG_OVERRIDES`, `LOWER_IS_BUFF` (`tools/generate_patch_code_v2.py`). Тест `tests/test_review_737e.py`.
 
+## Вычитка 7.37 (2026-10-30) — патч реворка врождённых
+
+| Что | Как | Генератор |
+|---|---|---|
+| «New innate ability …» в блоке способности | карточка «старая врождённая 7.36 → новая», summary «New innate ability.», NEW; строки под ней скрыты (с заметкой — остаются); блок «Ability removed» старой врождённой убирается (она слева в карточке) | `_postprocess_new_innate_cards`, `_drop_removed_block` |
+| Описание новой врождённой в общих строках героя (Visage Lurker) | в блок карточки, скрыто | `_take_innate_text_rows` (≥60% слов из описания игры) |
+| «New basic ability» | карточка «New ability.», как 7.41 | там же; `new_ability(..., version=)` |
+| «Moved to innate ability» (Lunar Blessing) | карточка «X is now an innate ability.», как 7.39 Blur | `_NOW_INNATE_ROW_RE` |
+| «New Facet» строкой | карточка нового фасета `new_facet` | `_postprocess_new_facet_rows` |
+| Бывшая врождённая 7.36 (5 значений, уровень 0) → обычная (4 уровня) | сравнение уровней 1–4, значение уровня 0 не участвует (51 строка) | `_postprocess_innate_level0` |
+| Все значения отрицательные («Armor Corruption decreased from -4 to -3») | сравнение по величине — нерф | `_by_size` (бейдж и разметка) |
+| «decreased 0.3% to 0.25%», «rescaled 80/… to …» без «from» | бейдж всё равно | `_add_missing_from` |
+| «Cold Comfort Facet: …» | фасет Cold Comfort (слово «Facet» в префиксе) | `_render_hero` |
+| Удалённая способность прошлого патча по имени | настоящий слаг из файлов прошлого патча (luna_selemenes_favor) | `_render_hero` |
+| Два списка подряд в одном блоке | один список | `_merge_adjacent_lists` |
+| «No longer an innate ability» | REWORK (как «is now an innate») | `TAG_OVERRIDES` |
+| Остальные словесные строки | по правилу «новое свойство — NEW»: ~40 правил | `TAG_OVERRIDES` |
+
+Ложные «from» сверки: Unstable Wand (скорость стала ключом файла только в 7.37), Beastmaster блок урона (в коде) —
+`UNCHECKABLE`. Тест `tests/test_review_737.py`.
+
 ## Вычитка 7.37b (2026-10-30)
 
 По правилу владельца «новое свойство — NEW»: Hookshot возврат маны, Enchant дальность атаки юнитов, Scurry у фасета

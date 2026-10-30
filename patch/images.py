@@ -103,6 +103,7 @@ ITEM_SLUG = {
     "Eul's Scepter of Divinity": "cyclone",
     "Orb of Blight": "blight_stone",
     "Block of Cheese": "royale_with_cheese",
+    "Fairy's Trinket": "mysterious_hat",          # 7.37 neutral item (generator warning 2026-10-30)
     # 7.40-era / engine-slug-vs-display-name overrides
     "Brigand's Blade": "misericorde",
     "Ghost Scepter": "ghost",

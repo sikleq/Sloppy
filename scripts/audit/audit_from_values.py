@@ -37,6 +37,8 @@ UNCHECKABLE = {("7.39c", "kunkka_tidal_wave"), ("7.40", "clinkz_wind_walk"), ("7
                ("7.39c", "crystal_maiden_freezing_field"), ("7.40", "antimage_counterspell"),
                ("7.40", "treant_natures_grasp"),
                ("7.37d", "shadow_demon_shadow_poison"),   # vision_radius first a KV key in 7.37d (300); 7.37c had none
+               ("7.37", "unstable_wand"),     # active_movespeed_pct first a KV key in 7.37 (15); 7.36c had none
+               ("7.37", "beastmaster"),       # melee damage block chance vs creeps: no hero KV key (code)
                ("7.40", "furion_force_of_nature")}    # Valve gave the average of treant_damage_min / _max
 # npc_dota_hero_base values a hero's own record leaves out: 100 attack speed, 0 health / mana regen
 HERO_DEFAULTS = {(100.0,), (0.0,)}

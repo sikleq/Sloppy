@@ -49,6 +49,7 @@ KNOWN_HISTORICAL_RENAMES = {
     ("Dark Seer", "Aggrandize", "p738b.py"),  # innate; Valve renamed to Quick Wit after 7.38b
     ("Dark Seer", "Aggrandize", "p738.py"),   # same innate, 7.38 (predates the Quick Wit rename)
     ("Lich", "Death Charge", "p737c.py"),     # the 7.37 innate; renamed to Sacrifice in 7.41
+    ("Silencer", "Brain Drain", "p737.py"),   # the 7.37 innate; renamed to Suffer In Silence later
 }
 
 KNOWN_NON_DATAFEED_ABILITIES = {
@@ -108,6 +109,16 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     # 7.37b innates of content/p737b.py (KV "Innate" "1" that build), gone from live herodata (2026-10-30)
     ("Ancient Apparition", "ancient_apparition_death_rime"),
     ("Visage", "visage_lurker"),
+    # 7.36 innates removed in 7.37 (content/p737.py "Ability removed"; KV of 7.36c), gone from live herodata (2026-10-30)
+    ("Luna", "luna_selemenes_favor"),
+    # 7.37 innates of content/p737.py (KV of 7.37, data/stats/7.37/heroes), gone from live herodata (2026-10-30)
+    ("Dark Seer", "dark_seer_mental_fortitude"),
+    ("Enigma", "enigma_gravity_well"),
+    ("Rubick", "rubick_might_and_magus"),
+    ("Earthshaker", "earthshaker_spirit_cairn"),
+    ("Elder Titan", "elder_titan_tip_the_scales"),
+    ("Templar Assassin", "templar_assassin_third_eye"),
+    ("Weaver", "weaver_rewoven"),
 }
 
 KNOWN_DISPLAY_NAME_OVERRIDES = set()

@@ -708,6 +708,27 @@ FACETS = {
     "dark_willow_throwing_shade": ("Throwing Shade", "Purple1"),
     "void_spirit_aether_artifice": ("Call of the Void", "Gray3"),
     "primal_beast_romp_n_stomp": ("Romp n' Stomp", "Red0"),
+    # 7.37 — auto-registered by generate_patch_code_v2.py
+    "storm_spirit_shock_collar": ("Shock Collar", "Blue1"),
+    "windrunner_focusfire": ("Focus Fire", "Yellow2"),
+    "witch_doctor_voodoo_festeration": ("Voodoo Festeration", "Red2"),
+    "beastmaster_beast_mode": ("Beast Mode", "Yellow1"),
+    "templar_assassin_voidblades": ("Voidblades", "Gray3"),
+    "life_stealer_rage": ("Rage", "Yellow3"),
+    "spirit_breaker_bull_rush": ("Bull Rush", "Red1"),
+    "lone_druid_unbearable": ("Unbearable", "Yellow1"),
+    "chaos_knight_irrationality": ("Irrationality", "Gray0"),
+    "medusa_mana_pact": ("Mana Pact", "Blue1"),
+    "magnataur_reverse_polarity": ("Reverse Polarity", "Gray3"),
+    "shredder_shredder": ("Shredder", "Green0"),
+    "skywrath_mage_shield": ("Shield of the Scion", "Blue0"),
+    "techies_atk_range": ("Squee's Scope", "Gray0"),
+    "ember_spirit_double_impact": ("Double Impact", "Red0"),
+    "arc_warden_order": ("Order", "Gray3"),
+    "arc_warden_disorder": ("Disorder", "Gray0"),
+    "void_spirit_phys_barrier": ("Symmetry", "Gray3"),
+    "void_spirit_sanctuary": ("Sanctuary", "Purple1"),
+    "marci_bodyguard": ("Bodyguard", "Blue1"),
 }
 
 # Mapping from Valve's facet_color name -> CSS gradient that EXACTLY matches

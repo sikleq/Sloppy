@@ -236,6 +236,39 @@ def ability_text(slug, version, kind="base"):
     return text + ("\n" + " ".join(lines) if lines else "")
 
 
+_FACET_HOLDER = re.compile(r"\{s:(?:bonus_)?([A-Za-z_]\w*)\}")
+
+
+def facet_text(facet, version):
+    """A facet's description in `version` with that patch's numbers: "{s:bonus_roared_bonus_aoe_pct}" is the value
+    `special_bonus_facet_<facet>` of the key roared_bonus_aoe_pct in the hero's abilities (7.36c Ferocity "+10").
+    None when the text is missing or a number can't be found — the old pane of a reworked facet card (7.37)."""
+    desc = tooltip(f"DOTA_Tooltip_Facet_{facet}_Description", version)
+    if not desc:
+        return None
+    pre = facet.split("_")[0] + "_"
+    values = {}
+    for slug, blk in _blocks(version).items():
+        av = blk.get("AbilityValues") if isinstance(blk, dict) and slug.startswith(pre) else None
+        for k, v in (av.items() if isinstance(av, dict) else ()):
+            if isinstance(v, dict) and f"special_bonus_facet_{facet}" in v:
+                values.setdefault(k.lower(), set()).add(str(v[f"special_bonus_facet_{facet}"]).strip().lstrip("+="))
+    missing = False
+
+    def fill(m):
+        nonlocal missing
+        found = values.get(m.group(1).lower())
+        if not found or len(found) != 1:
+            missing = True
+            return m.group(0)
+        return next(iter(found))
+    text = _FACET_HOLDER.sub(fill, desc)
+    if missing:
+        return None
+    text = _clean(text).replace("%%", "%")
+    return text + ("" if text.endswith((".", "!")) else ".")
+
+
 def _with_kin_values(desc, vals, slug, kind, version):
     """A placeholder the ability's own KV doesn't have, taken from another ability of the same hero when exactly one
     value is found there (7.22 Nature's Prophet's Scepter: "%treant_large_damage_bonus%" lives on Nature's Call)."""
