@@ -4477,9 +4477,8 @@ h4.subgroup {
 .mech-cols-hero > .mech-abil-row > .mech-cell { justify-content: flex-start; text-align: left; min-width: 0; }
 /* the row's own words lead the table; its items one line, then the heroes (owner 2026-10-30) */
 .mech-cols-hero > .mech-abil-row > .mech-table-lead { color: var(--text-main); }
-.mech-items-line { gap: 6px 14px; }
 .mech-abil-set { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
-.mech-items-label { color: var(--text-dim, #969289); font-size: 12px; margin-right: 2px; }
+.mech-hero-item > img { object-fit: contain; }    /* an item / Twin Gates in the hero column (owner 2026-10-30) */
 .mech-item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 /* a facet's chip grows on hover with its name above, as an ability's (owner 2026-10-30) */
 .mech-abils .facet-chip { position: relative; transition: transform 0.12s ease; }
@@ -10447,8 +10446,10 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 /* ---- Hero / Item Changes pages (builders/entity_changes.py) ---- */
 .entity-link { color: inherit; text-decoration: none; }
 /* an item named in a row's text: a link to its Changes page (owner 2026-10-30, 7.37 Roshan's drops) */
-a.item-mention { color: var(--gold); text-decoration: underline dotted; text-underline-offset: 3px; }
-a.item-mention:hover { text-decoration-style: solid; }
+/* a thin solid line, half-transparent: the dotted one drew crooked (owner 2026-10-30) */
+a.item-mention { color: var(--gold); text-decoration: underline; text-decoration-thickness: 1px;
+  text-underline-offset: 3px; text-decoration-color: rgba(227, 196, 106, 0.45); }
+a.item-mention:hover { text-decoration-color: var(--gold); }
 .entity-name .entity-link:hover { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 .entity-icon .entity-link { display: block; line-height: 0; }
 .entity-icon .entity-link:hover img { filter: brightness(1.15); }

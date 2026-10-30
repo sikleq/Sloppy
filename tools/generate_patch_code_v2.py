@@ -4436,6 +4436,7 @@ def generate(version):
     out = _merge_adjacent_lists(out)                   # ul_close + ul_open back to back -> one list (7.37 Chronosphere)
     out = _postprocess_innate_level0(out, version)     # a 7.36 innate's level-0 value out of the comparison (7.37)
     out = _postprocess_roshan_block(out)               # General rows about Roshan himself -> his block (owner 2026-10-30)
+    out = _postprocess_row_notes(out)                  # facts a row needs that Valve left out (ROW_NOTES)
     out = _postprocess_mechanic_lists(out)             # General subgroups of lists -> mechanic blocks, tables (10-30)
     out = _postprocess_removed_facets(out, version)   # "Removed X Facets" -> facet blocks (owner 2026-10-29)
     out = _postprocess_same_change_abilities(out)     # one block, stacked icons (owner 2026-10-30)
@@ -4663,6 +4664,26 @@ _SECTION_RE = re.compile(r'^\s*W\(section\("([^"]+)"')
 ROSHAN_HEADER = 'W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))'
 
 
+# a row's "?" with what Valve's words leave out, found from the map or the game files — kept here so a regenerated
+# page keeps it (the hand-written note was lost on every rewrap, 2026-10-30)
+ROW_NOTES = {
+    "Teleport time to Roshan's outposts decreased from 6s to 4s":
+        "The two corner outposts next to Roshan's pits (added in 7.33 by the Twin Gates, removed in 7.38). "
+        "The jungle outposts got 4s in 7.35",
+}
+
+
+def _postprocess_row_notes(lines):
+    out = []
+    for ln in lines:
+        t = _LI_TEXT_RE.match(ln)
+        note = ROW_NOTES.get(t.group(1)) if t else None
+        if note and "extra=" not in ln:
+            ln = re.sub(r"\)\)\s*$", f", extra=inline_note({_py_str(note)})))", ln)
+        out.append(ln)
+    return out
+
+
 def _link_items(row):
     """The items a row's text names → links to their Changes pages (owner 2026-10-30, Roshan's drops: "кликабельные
     ссылки, ведущие на свои изменения"): '"… drops " + item_link("Refresher Shard") + " and …"'. Longest name first
@@ -4762,8 +4783,9 @@ def _fold_sentences_into_tables(out, lo, hi):
         target = (pick("partially") if "partially" in low and "fully" not in low else None) or \
                  pick("fully") or lists[0]
         # a sentence about the game's tooltips ('"Breakable: Yes" has been added …', "… an alt+tooltip line …") is a
-        # "?" on the table's leading words; any other sentence a line of the table
-        kind = "pop-tip" if "tooltip" in low or "has been added" in low else "pop-note"
+        # "?" on the table's leading words; any other sentence goes before them ("The breakability rules … have been
+        # updated. The following are now Fully Disabled by Break:", owner 2026-10-30)
+        kind = "pop-tip" if "tooltip" in low or "has been added" in low else "pop-lead"
         out[target] = _INLINE_LIST_END_RE.sub(
             lambda mm: f'{mm.group(1)}<br><span class=\\"{kind}\\">{text}</span>{mm.group(2)}', out[target], count=1)
         out[j] = None

@@ -27,6 +27,7 @@ _SUB = "&nbsp;&nbsp;– "
 _CATEGORY_RE = re.compile(r"^(?:Items|Neutral Creeps|Heroes|Creeps|Units)(?:\s+—\s+|$)")
 _NOTE_ONLY_RE = re.compile(r'^<span class="pop-note">(.*)</span>$', re.S)
 _TIP_ONLY_RE = re.compile(r'^<span class="pop-tip">(.*)</span>$', re.S)     # hero_ability_rows: a "?" on the lead
+_LEAD_ONLY_RE = re.compile(r'^<span class="pop-lead">(.*)</span>$', re.S)   # … a sentence before the lead
 _TRAIL_NOTE_RE = re.compile(r'\s*<span class="pop-note">\(?(.*?)\)?</span>\s*$', re.S)
 _TRAIL_BRACKET_RE = re.compile(r"\s+\(([^()<>]+)\)\s*$")
 _TRAIL_ABILITY_RE = re.compile(r" ability$")
@@ -400,7 +401,7 @@ def hero_ability_rows(raw, least=1, row_text=""):
     last lines. None when the list is not in that form or a line has no icon."""
     from .elements import info_tip
     from .images import HERO_CDN, HERO_SLUG
-    pairs, items, notes, tips = [], [], [], []
+    pairs, notes, tips, leads, kinds = [], [], [], [], set()
     for line in (x.strip() for x in raw.split("<br>")):
         if line.startswith(_SUB):
             line = line[len(_SUB):]
@@ -413,6 +414,10 @@ def hero_ability_rows(raw, least=1, row_text=""):
         m = _TIP_ONLY_RE.match(line)          # a sentence for the "?" on the leading words (owner 2026-10-30)
         if m:
             tips.append(m.group(1))
+            continue
+        m = _LEAD_ONLY_RE.match(line)         # a sentence before the leading words (owner 2026-10-30)
+        if m:
+            leads.append(m.group(1))
             continue
         h = _HERO_LINE_RE.match(line)
         if h and h.group(1) in HERO_SLUG:
@@ -427,12 +432,7 @@ def hero_ability_rows(raw, least=1, row_text=""):
                     f'width="32" height="18">{_html.escape(h.group(1))}</span>')
             ability = (f'<span class="mech-item">{ability_chip(name, icon)}'
                        f'<span class="mech-abil-name">{_html.escape(name)}</span>{tip}</span>')
-            # one row per hero, his abilities side by side (owner 2026-10-30: "не дублируй героя")
-            same = next((k for k, (hr, _a) in enumerate(pairs) if hr == hero), None)
-            if same is None:
-                pairs.append((hero, ability))
-            else:
-                pairs[same] = (hero, pairs[same][1] + ability)
+            kinds.add("Hero")
         else:
             parsed = _parse_line(line) if h else None      # an item's ability: "Gleipnir: Eternal Chains (…)"
             if parsed:
@@ -445,11 +445,25 @@ def hero_ability_rows(raw, least=1, row_text=""):
             if not icon:
                 return None
             tip = f" {info_tip(caveat[:1].upper() + caveat[1:])}" if caveat else ""
-            items.append(f'<span class="mech-item">{ability_chip(name, icon)}'
-                         f'<span class="mech-abil-name">{_html.escape(name)}</span>{tip}</span>')
+            # an item (or a map object) is a row as a hero is (owner 2026-10-30: "Items … гармонично встроить по
+            # аналогии с hero"): its icon and name first, its ability — "Gleipnir: Eternal Chains" — next to it
+            owner = h.group(1) if parsed and h else name
+            owner_icon = _item_icon(owner) or icon
+            hero = (f'<span class="mech-hero mech-hero-item"><img src="{owner_icon}" alt="" loading="lazy" '
+                    f'width="25" height="18">{_html.escape(owner)}</span>')
+            ability = (f'<span class="mech-item">{ability_chip(name[len(owner) + 2:], icon)}<span class="mech-abil-name">'
+                       f'{_html.escape(name[len(owner) + 2:])}</span>{tip}</span>' if parsed and h else
+                       (f'<span class="mech-item">{tip.strip()}</span>' if tip else ""))
+            kinds.add("Item")
+        # one row per hero (or item), his abilities side by side (owner 2026-10-30: "не дублируй героя")
+        same = next((k for k, (hr, _a) in enumerate(pairs) if hr == hero), None)
+        if same is None:
+            pairs.append((hero, ability))
+        else:
+            pairs[same] = (hero, pairs[same][1] + ability)
     # items alone: a table only in a mechanic block of one box, where every list of the block is one (7.37 "Neutral
     # item active effects …: Book of Shadows, Force Boots"); elsewhere such lists keep their own form (7.41)
-    if not (pairs or (items and _State.new_mech_one_box)) or len(pairs) + len(items) < least:
+    if not ("Hero" in kinds or (kinds and _State.new_mech_one_box)) or len(pairs) < least:
         return None
     two = len(pairs) >= TWO_PAIRS_FROM
     width = 4 if two else 2
@@ -459,13 +473,13 @@ def hero_ability_rows(raw, least=1, row_text=""):
     if row_text:
         text = row_text.rstrip()
         tip = f" {info_tip(*tips)}" if tips else ""
-        html += line((text if text.endswith(":") else f"{text}:") + tip, "mech-table-lead")
-    if items:
-        html += line(f'<span class="mech-items-label">Items</span>{"".join(items)}', "mech-items-line")
+        before = "".join(f"{s.rstrip('.')}. " for s in leads)
+        html += line(before + (text if text.endswith(":") else f"{text}:") + tip, "mech-table-lead")
     cells = lambda xs: "".join(f'<span class="mech-cell">{x}</span>' for x in xs)
     pairs = [(hero, f'<span class="mech-abil-set">{abilities}</span>') for hero, abilities in pairs]
     if pairs:
-        html += f'<span class="mech-abil-row mech-head">{cells(["Hero", "Ability"] * (width // 2))}</span>'
+        first = "Hero or item" if kinds == {"Hero", "Item"} else next(iter(kinds))
+        html += f'<span class="mech-abil-row mech-head">{cells([first, "Ability"] * (width // 2))}</span>'
     if two:
         half = (len(pairs) + 1) // 2
         left, right = pairs[:half], pairs[half:] + [("", "")] * (half - len(pairs[half:]))

@@ -122,7 +122,7 @@ def test_a_mechanic_blocks_plain_sentences_go_under_the_table_they_speak_of():
     part = next(ln for ln in out if "Partially Disabled" in ln)
     assert "rules have been updated" in fully and "Breakable: Yes" in fully and "alt+tooltip" in part
     # owner 2026-10-30: sentences about the game's tooltips are a "?" on the table's words, the rest a line of it
-    assert 'pop-note\\">The breakability rules' in fully and 'pop-tip\\">\\"Breakable: Yes' in fully
+    assert 'pop-lead\\">The breakability rules' in fully and 'pop-tip\\">\\"Breakable: Yes' in fully
     assert 'pop-tip\\">All abilities that are partially' in part
     assert not any("t(\"MISC\")" in ln for ln in out)
 
@@ -148,7 +148,8 @@ def test_a_hero_ability_list_is_a_table_led_by_its_row_with_items_on_a_line_of_t
     finally:
         _State.current_patch_version = keep
     assert "The following are considered a Teleport:" in html and "mech-captioned" in html
-    assert 'mech-items-label">Items' in html and "Town Portal Scroll" in html
+    # items are rows as heroes are (owner 2026-10-30), the header says both
+    assert 'mech-hero mech-hero-item' in html and "Town Portal Scroll" in html and ">Hero or item<" in html
     assert ">How<" not in html and "info-tip" in html                 # Visage's "recall (Faithful Followers)"
     assert "mech-cols-hero4" in long_html
     assert oracle.count('class="mech-hero"') == 1 and "Clairvoyant Curse" in oracle and "Clairvoyant Cure" in oracle
