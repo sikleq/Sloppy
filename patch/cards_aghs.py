@@ -13,7 +13,9 @@ from .cards_item_abilities import (_CARD_CONFIRMED, _CARD_SEQ, _bold_numbers_htm
 # Old = the game's tooltip of the previous patch, new = this patch's, both with their own numbers (patch/aghs_text.py);
 # the words that differ are highlighted (removed: del, added: new, rewritten: rework). The row stays, hidden, for the
 # weights and filters. No old or new tooltip (or the same text) -> no card, the row shows as before.
-_AGHS_REWORK_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard)(?: upgrade)? reworked\s*:", re.I)   # 7.39 Batrider: "upgrade"
+# 7.39 Batrider: "upgrade"; 7.37 Anti-Mage "Aghanim's Scepter upgrade reworked. Reduces cooldown …" (a full stop,
+# owner 2026-10-30: "не опознал, что надо сделать old > new карточками аганим")
+_AGHS_REWORK_RE = re.compile(r"^\s*Aghanim's (Scepter|Shard)(?: upgrade)? reworked\s*[:.]", re.I)
 
 
 _AGHS_WORD_RE = re.compile(r"\S+")
@@ -178,6 +180,12 @@ def _aghs_rework_card(text, covered=False) -> bool:
     if gone:
         return False                            # a row "Removed Aghanim's Shard." (li), no card
     sources = [slug] if m else _aghs_moved_from(slug, kind, version, prev)
+    if m and not aghs_text(slug, kind, prev):
+        # "reworked" under an ability that had no upgrade before: the old one sat on another ability (7.37 Anti-Mage
+        # Blink: 7.36c's Scepter granted Mana Overload — still in 7.37's files, so not "moved from") — its text is the
+        # old side
+        sources = [a for a in holders(_State.current_hero, kind, prev) if a != slug and aghs_text(a, kind, prev)] \
+            or sources
     if not sources:
         # an upgrade this ability didn't have and no other ability lost: a card of its new text alone (owner
         # 2026-10-25: 7.41 Press the Attack's Scepter "не сделано в виде карточки"); no text of its own — the row
@@ -217,13 +225,15 @@ def _aghs_rework_card(text, covered=False) -> bool:
         old_lines = [aghs_line(sub_ability(s, ability_name(s, prev) or s) + " " + esc(old), kind=kind) for s, old in olds]
         new_html = sub_ability(slug, ability_name(slug, version) or slug) + " " + esc(new)
         caption = f"Added {up}."                # owner 2026-10-25: not "moved from X" — the card says from where
+        if m:                                   # Valve said "reworked" (7.37 Anti-Mage: Mana Overload's → Blink's)
+            caption = f"{up} reworked."
     pane = lambda side, lines: (f'<div class="ability-change-pane ability-change-{side}"><div class="ability-change-body">'
                                 f'{_bold_numbers_html("".join(lines))}</div></div>')
     old_pane, new_pane = pane("old", old_lines), pane("new", [aghs_line(new_html, kind=kind)])
     if sources == [slug]:
         new_pane = _pair_number_tips(old_pane, new_pane)
     # no blue Aghanim strip on the caption: the card's lines already carry it (owner 2026-10-25)
-    tag = "rework" if sources == [slug] else "new"
+    tag = "rework" if sources == [slug] or m else "new"
     _State.aghs_cards.append(_under_rows_card(caption, tag, "", "aghs-change", old_pane, new_pane))
     _AGHS_SHOWN.add((version, _State.current_hero, kind))     # its old parts are in this card
     return True

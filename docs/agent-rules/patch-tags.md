@@ -555,6 +555,18 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 - Возвращённые нейтральные предметы 7.37 («Returning as a Tier 1 Neutral item», «Now is a Tier 3 Neutral item») — как
   7.38: метка в заголовке «Returning Tier 1 Neutral Item» / «Now a Tier 3 Neutral Item», описание — NEW
   (`_NEW_RET_RE`, `_postprocess_returning_rows`).
+- Строка возвращённого / нового предмета «Provides +5 to All Attributes. Use: Plant Tree. …» — как новые предметы 7.41:
+  `provides('+5 All Attributes')` под заголовком и строка «Active: Plant Tree. …» (карточка способности, «Use:» =
+  Active). Владелец 2026-10-30: «пример — 7.38 Pyrrhic Cloak, Book of the Dead, Fallen Sky».
+- Две характеристики в одной строке («No longer provides +6 All Attributes. Now provides +375 Health») — два
+  предложения; «новая» характеристика, которая у предмета была с другим числом (Spirit Vessel +125 Health), — пара
+  «было → стало» с % (`_split_stat_sentences`, `_new_stat_that_was_there`, файлы обоих патчей).
+- «Aghanim's Scepter upgrade reworked.» (с точкой) — тоже карточка Аганима; если в прошлом патче улучшение было у
+  другой способности (7.36c: Скипетр давал Mana Overload), её текст — старая сторона (`patch/cards_aghs.py`).
+- Бывшая врождённая, у которой уровни 1–4 не изменились (ушло только значение уровня 0), — тег REWORK с «?»
+  «Levels 1-4 unchanged; the 0.8 it had at level 0 as an innate is gone», не пустой бейдж.
+- Старая сторона карточки предмета «… no longer affects units that have been affected …» → «…that have already been
+  affected …» (7.41 Pipe of Insight, владелец 2026-10-30).
 - Множитель в карточке способности предмета («by 2.5x» → «by 4x») подсвечивается, как обычное число
   (`patch/cards_item_abilities.py`).
 - Пояснения, которых нет у Valve, но которые нашлись по карте или файлам, — в `ROW_NOTES` генератора (иначе

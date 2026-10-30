@@ -761,9 +761,11 @@ def _iab_text_change(text, tags):
         # within Pipe of Insight's cooldown"; Dagon "Energy Burst no longer instantly kills non-ancient creeps")
         gone = re.match(rf"^{re.escape(ability)}'?s? no longer ([^.;()]+?)\.?$", plain, re.I)
         if gone:
+            # "that have been affected" reads as the old rule only with "already" (owner 2026-10-30, Pipe of Insight
+            # 7.41: "Affects units that have already been affected by Barrier within Pipe of Insight's cooldown.")
+            said = re.sub(r"\bthat have been\b", "that have already been", gone.group(1))
             _IAB_HL.setdefault(card["key"], []).append(
-                {"ability": ability, "side": "old", "append": gone.group(1)[:1].upper() + gone.group(1)[1:] + ".",
-                 "dir": "del"})
+                {"ability": ability, "side": "old", "append": said[:1].upper() + said[1:] + ".", "dir": "del"})
             return True
     if not hits:
         return tailed

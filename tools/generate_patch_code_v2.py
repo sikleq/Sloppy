@@ -2431,14 +2431,55 @@ def _block_lines(lines, i):
 def _swaps_stats(block):
     """The block's rows add a stat the item did not have and take one it had ("Now provides +50/100 Health" + "No
     longer provides +3/6 Damage") — its stats card, though its build did not change."""
-    texts = [m.group(1) for m in (re.match(r'^\s*W\(li\("(.+?)",', ln) for ln in block) if m]
+    texts = [m.group(1) for m in (re.match(r'^\s*W\(li\("(.+?)",', ln) for ln in _split_stat_sentences(block)) if m]
     adds = any((m := (_PROP_ADD_PREFIX_RE.match(t) or _PROP_NOW_PROVIDES_RE.match(t))) and _parse_stat_grants(t[m.end():])
                for t in texts)
     dels = any((m := _PROP_DEL_PREFIX_RE.match(t)) and _parse_stat_grants(t[m.end():]) for t in texts)
     return adds and dels
 
 
-def _postprocess_properties_change(lines, with_abilities=False):
+_STAT_SENTENCE_RE = re.compile(r'^(\s*W\(li\(")(.+?)\.\s+((?:Now|No longer) (?:also )?(?:provides?|grants?|gives?)\s.+?)'
+                               r'(",\s*[bt]\(.*)$')
+
+
+def _split_stat_sentences(rows):
+    """"No longer provides +6 All Attributes. Now provides +375 Health" (7.37 Spirit Vessel): two stat rows, each with
+    the row's tag — the whole line was read as two stats gone (owner 2026-10-30: "не хватает других ха-к")."""
+    out = []
+    for ln in rows:
+        m = _STAT_SENTENCE_RE.match(ln)
+        if m and re.match(r'(?:Now|No longer) (?:also )?(?:provides?|grants?|gives?)\s', m.group(2)):
+            out += [f'{m.group(1)}{m.group(2)}{m.group(4)}', f'{m.group(1)}{m.group(3)}{m.group(4)}']
+        else:
+            out.append(ln)
+    return out
+
+
+def _new_stat_that_was_there(item_name, version, old_rows, new_rows):
+    """A "new" stat the item had before with another number (7.37 Spirit Vessel "Now provides +375 Health": it had +125)
+    is a change — "+125 Health" → "+375 Health" with its %, from the game files of both patches."""
+    if not version or not new_rows:
+        return old_rows, new_rows
+    from patch.cards_item_stats import _STAT_LINE, _stat_text, item_stats_pair
+    pair = item_stats_pair(item_name, version)
+    if not pair:
+        return old_rows, new_rows
+    before = pair[0]
+    olds, news, changed = list(old_rows), [], []
+    for row in new_rows:
+        m = re.match(r'^\+([\d.]+)%?\s+(.+)$', row[1]) if len(row) == 2 and row[0] == 'NEW' else None
+        key = next((k for k, spec in _STAT_LINE.items() if m and spec[0].lower() == m.group(2).strip().lower()), None)
+        was = before.get(key) if key else None
+        now = float(m.group(1)) if m else None
+        if was and now is not None and abs(was - now) > 1e-9:
+            num = lambda x: int(x) if x == int(x) else x
+            changed.append((('BUFF' if now > was else 'NERF', _stat_text(key, was)), (None, row[1], (num(was), num(now)))))
+        else:
+            news.append(row)
+    return [o for o, _n in changed] + olds, [n for _o, n in changed] + news
+
+
+def _postprocess_properties_change(lines, with_abilities=False, version=None):
     """Collapse stat-grant note patterns inside item blocks into a single
     properties_change(old=[...], new=[...]) call placed right after the
     item_header. The original li rows that fed the diff are removed from
@@ -2501,8 +2542,7 @@ def _postprocess_properties_change(lines, with_abilities=False):
                 break
             block_end += 1
 
-        for j in range(i, block_end):
-            ln = lines[j]
+        for ln in _split_stat_sentences(lines[i:block_end]):
             m_li = re.match(r'^W\(li\("(.+?)",\s*[bt]\(.*$', ln)
             if not m_li:
                 kept_lines.append(ln)
@@ -2571,6 +2611,7 @@ def _postprocess_properties_change(lines, with_abilities=False):
                     continue
             kept_lines.append(ln)
 
+        old_rows, new_rows = _new_stat_that_was_there(item_name, version, old_rows, new_rows)
         if old_rows or new_rows:
             old_repr = ', '.join(
                 f'("{t}", "{s}")' for (t, s) in old_rows
@@ -4438,14 +4479,14 @@ def generate(version):
     out = _postprocess_mechanic_rules_row(out, after_label=True)   # a reworked mechanic in one list
     out = _postprocess_new_item_card(out, version)
     out = _postprocess_cost_components(out, version)
-    out = _postprocess_properties_change(out)
+    out = _postprocess_properties_change(out, version=version)
     out = _postprocess_silent_stats(out, version)
     out = _postprocess_card_stat_notes(out)
     out = _postprocess_hero_stat_card(out, version)   # approved by the owner 2026-09-28
     out = _postprocess_fold_damage_l1(out)            # "Damage at level 1" into the (?) — owner 2026-10-04
     out = _postprocess_unstated_total_cost(out)
     out = _postprocess_item_ability_cards(out, version)
-    out = _postprocess_properties_change(out, with_abilities=True)   # an abilities card brings the stats card
+    out = _postprocess_properties_change(out, with_abilities=True, version=version)   # an abilities card brings it
     out = _drop_empty_ul(out)
     out = _postprocess_innate_rows_out_of_stats(out)
     out = _postprocess_stack_note_into_ability(out)
@@ -4676,7 +4717,18 @@ def _postprocess_innate_level0(lines, version):
             def cut(mm):
                 old, new = mm.group(1).split(", "), mm.group(2).split(", ")
                 return f"b([{', '.join(old[1:])}], [{mm.group(2)}]" if len(old) == len(new) + 1 else mm.group(0)
+            was_l0 = rx.search(ln)
             ln = rx.sub(cut, ln, count=1)
+            same = re.search(r'b\(\[([^\]]+)\], \[\1\](?:, l=True)?\)', ln)
+            if same and was_l0:
+                # levels 1–4 the same: only the level-0 value went — a row with a tag and its why, not an empty
+                # badge (owner 2026-10-30: "нет тега, кружок какой-то в начале вместо тега", Mana Break 7.37)
+                lvl0 = was_l0.group(1).split(", ")[0]
+                levels = len(same.group(1).split(", "))
+                note = (f"Levels 1-{levels} unchanged; the {lvl0} it had at level 0 as an innate is gone (now a "
+                        f"basic ability)")
+                ln = ln.replace(same.group(0), f't("REWORK"), extra=inline_note({_py_str(note)})', 1) \
+                    if "extra=" not in ln else ln.replace(same.group(0), 't("REWORK")', 1)
         out.append(ln)
     return out
 
@@ -4701,15 +4753,36 @@ ROW_NOTES = {
 _RETURNING_HEADER_RE = re.compile(r'^\s*W\(item_header\("[^"]+", new="(?:Returning|New)\b')
 
 
+_PROVIDES_KIND_RE = re.compile(r'^Provides\s+(?P<stats>\+.+?)\.\s+(?P<kind>Use|Active|Passive|Toggle|Aura):\s+(?P<rest>.+)$')
+
+
+def _provides_stats(text):
+    """"+5 to All Attributes", "+20 Attack Speed and +4 Armor" → "+5 All Attributes", "+20 Attack Speed, +4 Armor"."""
+    parts = re.split(r",\s*(?:and\s+)?|\s+and\s+", text)
+    return ", ".join(re.sub(r"^(\+[\d.%/]+)\s+to\s+", r"\1 ", p.strip()) for p in parts if p.strip())
+
+
 def _postprocess_returning_rows(lines):
     """Under a returning or new item's header (7.37 Ironwood Tree "Returning Tier 1 Neutral Item") the rows are its
-    description — NEW, as 7.38's returning artifacts (owner 2026-10-30: "смотри примеры в 7.38"), not MISC."""
-    out, inside = [], False
+    description — NEW, as 7.38's returning artifacts (owner 2026-10-30: "смотри примеры в 7.38"), not MISC. A row
+    "Provides +5 to All Attributes. Use: Plant Tree. …" is the item's stats and its ability, as a new item of 7.41:
+    provides('+5 All Attributes') under the header and the row "Active: Plant Tree. …" — drawn as the ability's card
+    (owner 2026-10-30: "всё ещё неправильно … пример — 7.38 Pyrrhic Cloak, Book of the Dead, Fallen Sky")."""
+    out, inside, ul_at = [], False, None
     for ln in lines:
         if re.match(r'^\s*W\((?:item_header|hero_header|unit_header|section|plain_header)\(', ln):
-            inside = bool(_RETURNING_HEADER_RE.match(ln))
+            inside, ul_at = bool(_RETURNING_HEADER_RE.match(ln)), None
+        elif inside and ln.strip() == "W(ul_open())":
+            ul_at = len(out)
         elif inside and ln.lstrip().startswith("W(li(") and 't("MISC")' in ln:
             ln = ln.replace('t("MISC")', 't("NEW")', 1)
+        t = _LI_TEXT_RE.match(ln) if inside else None
+        m = _PROVIDES_KIND_RE.match(t.group(1)) if t else None
+        if m and ul_at is not None:
+            ind = ln[:len(ln) - len(ln.lstrip())]
+            out.insert(ul_at, f"{ind}W(provides({_py_str(_provides_stats(m.group('stats')))}))")
+            kind = "Active" if m.group("kind") == "Use" else m.group("kind")
+            ln = ln.replace(t.group(1), f"{kind}: {m.group('rest')}", 1)
         out.append(ln)
     return out
 

@@ -60,6 +60,26 @@ def test_an_old_innates_level_0_value_leaves_the_comparison():
              'b([16, 23, 30, 37, 44], [25, 30, 35, 40])))', 'W(ul_close())']
     out = g._postprocess_innate_level0(lines, "7.37")
     assert "b([23, 30, 37, 44], [25, 30, 35, 40])" in out[3]
+    # levels 1–4 the same: a REWORK row with its why, not an empty badge (owner 2026-10-30: "кружок вместо тега")
+    same = g._postprocess_innate_level0(
+        ['W(hero_header("Anti-Mage"))', 'W(ability("Mana Break", slug="antimage_mana_break"))', 'W(ul_open())',
+         'W(li("Max Mana Burned per hit rescaled from 0.8/1.6/2.4/3.2/4% to 1.6/2.4/3.2/4%", '
+         'b([0.8, 1.6, 2.4, 3.2, 4], [1.6, 2.4, 3.2, 4])))', 'W(ul_close())'], "7.37")
+    assert 't("REWORK"), extra=inline_note("Levels 1-4 unchanged; the 0.8 it had at level 0' in same[3]
+
+
+def test_an_aghanims_rework_with_a_full_stop_is_a_card():
+    """7.37 Anti-Mage "Aghanim's Scepter upgrade reworked. Reduces cooldown by 1s. …" — a full stop, not a colon; the
+    old side is 7.36c's Scepter, which granted Blink Fragment (Mana Overload); the caption says "reworked"."""
+    from pathlib import Path
+    from patch.cards_aghs import _AGHS_REWORK_RE
+    assert _AGHS_REWORK_RE.match("Aghanim's Scepter upgrade reworked. Reduces cooldown by 1s.")
+    assert _AGHS_REWORK_RE.match("Aghanim's Shard reworked: Vendetta applies Break")
+    page = Path(__file__).resolve().parents[1] / "dist" / "patches" / "7.37.html"
+    if page.exists():
+        html = page.read_text(encoding="utf-8")
+        i = html.find("Blink Fragment")
+        assert i > 0 and "Aghanim's Scepter reworked." in html[i - 700:i]
 
 
 def test_a_new_facet_row_becomes_the_new_facet_card():
@@ -201,7 +221,33 @@ def test_a_returning_neutral_item_is_labelled_in_its_header_and_described_as_new
              'W(li("Provides +5 to All Attributes. Use: Plant Tree", t("MISC")))', 'W(ul_close())',
              'W(item_header("Vambrace"))', 'W(ul_open())', 'W(li("Something", t("MISC")))', 'W(ul_close())']
     out = g._postprocess_returning_rows(lines)
-    assert 't("NEW")' in out[2] and 't("MISC")' in out[6]
+    assert 't("NEW")' in out[3] and 't("MISC")' in out[7]          # out[1]: its provides() line
+
+
+def test_a_returning_items_provides_row_is_its_stats_and_its_ability_card():
+    """Owner 2026-10-30 (7.38 Pyrrhic Cloak / Fallen Sky, 7.41 new items): "Provides +5 to All Attributes. Use: Plant
+    Tree. …" → provides('+5 All Attributes') under the header and the row "Active: Plant Tree. …" (the ability card)."""
+    lines = ['W(item_header("Ironwood Tree", new="Returning Tier 1 Neutral Item"))', 'W(ul_open())',
+             'W(li("Provides +5 to All Attributes. Use: Plant Tree. Plants a happy little tree. Cooldown: 15s", '
+             't("MISC")))', 'W(ul_close())',
+             'W(item_header("Iron Talon", new="Returning Tier 2 Neutral Item"))', 'W(ul_open())',
+             'W(li("Provides +20 Attack Speed and +4 Armor. Active: Chop. Removes 80% HP", t("MISC")))', 'W(ul_close())']
+    out = g._postprocess_returning_rows(lines)
+    assert out[1] == 'W(provides("+5 All Attributes"))'
+    assert out[3] == 'W(li("Active: Plant Tree. Plants a happy little tree. Cooldown: 15s", t("NEW")))'
+    assert 'W(provides("+20 Attack Speed, +4 Armor"))' in out and any(ln.startswith('W(li("Active: Chop.') for ln in out)
+
+
+def test_two_stat_sentences_in_one_row_and_a_stat_that_was_there():
+    """7.37 Spirit Vessel "No longer provides +6 All Attributes. Now provides +375 Health": one stat gone, and Health it
+    had (+125) grew — "+125 Health" → "+375 Health", not both stats gone (owner 2026-10-30: "не хватает других ха-к")."""
+    lines = ['W(item_header("Spirit Vessel", changed=True))', 'W(auto_components_change("Spirit Vessel", "7.37"))',
+             'W(ul_open())', 'W(li("No longer provides +6 All Attributes. Now provides +375 Health", t("DEL")))',
+             'W(ul_close())']
+    out = g._postprocess_properties_change(lines, version="7.37")
+    card = next(ln for ln in out if ln.startswith("W(properties_change("))
+    assert card == ('W(properties_change(old=[("BUFF", "+125 Health"), ("DEL", "+6 All Attributes")], '
+                    'new=[("", "+375 Health", b(125, 375))]))')
 
 
 def test_a_multiplier_in_an_item_card_is_marked():

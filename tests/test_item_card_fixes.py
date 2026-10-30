@@ -148,8 +148,9 @@ def test_a_card_shows_only_the_abilities_that_changed():
 def test_what_an_old_tooltip_never_said_goes_after_it_in_red():
     # owner 2026-10-17, Pipe of Insight 7.41: the Barrier row into the card; Dagon's "instantly kills" the same way
     html = _page("7.41")
-    assert ('data-tag="del">Affects units that have been affected by Barrier within Pipe of Insight\'s cooldown</span>'
-            in _block(html, "pipe-of-insight"))
+    # "already" (owner 2026-10-30: "Affects units that have already been affected by Barrier …")
+    assert ('data-tag="del">Affects units that have already been affected by Barrier within Pipe of Insight\'s '
+            'cooldown</span>' in _block(html, "pipe-of-insight"))
     assert 'data-tag="del">Instantly kills non-ancient creeps</span>' in _block(html, "dagon")
 
 
