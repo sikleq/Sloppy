@@ -439,9 +439,9 @@ def _fold_named_parts(rows):
     if len(named) < FOLD_NAMED_FROM:
         return rows
     first, last = named[0], named[-1]
-    # under the faded text a strip of faint golden mist with sparks says it opens, and folds it back (owner 2026-10-30:
-    # "чтобы было видно, что оно разворачиваться может, а также возможность свернуть обратно"; then, of a gold chevron:
-    # "не нравится, надо почти прозрачное что-то, может типа лёгких искр золотых/туманки?")
+    # over the faded text's bottom a strip of soft glass says it opens, and folds it back (owner 2026-10-30: "чтобы
+    # было видно, что оно разворачиваться может, а также возможность свернуть обратно"; a chevron and golden pollen
+    # were tried and dropped: "эффект стекла снизу, но не резкий, а плавный … чтобы не нагружало страницу")
     toggle = ('<button type="button" class="acr-fold-toggle" aria-expanded="false" aria-label="Show the whole text">'
               '</button>')
     return (rows[:first] + [f'<div class="acr-fold"><div class="acr-fold-body">{"".join(rows[first:last + 1])}</div>'
