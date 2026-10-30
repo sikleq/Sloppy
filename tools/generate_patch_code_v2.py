@@ -521,6 +521,7 @@ LOWER_IS_BUFF = re.compile(
     r'|forage\s+time'
     r'|vanish\s+radius'
     r'|time\s+until\s+max(?:imum)?\s+\w+'
+    r'|time\s+to\s+max(?:imum)?\s+\w+'           # 7.37b Solar Flare "Time to max damage/attack speed"
     r')\b',
     re.I,
 )
@@ -587,6 +588,19 @@ TAG_OVERRIDES = {
     "treant gold bounty rescaled":            "NERF",   # Nature's Call: the enemy gets more gold for a treant
     "no longer explode":                      "DEL",    # Eldritch Summoning: imps killed by heroes do not blow up
     "improved behavior":                      "QoL",    # Stroke of Fate at max cast range: handling, not power (owner)
+    # 7.37b proofread (2026-10-30): a new property is NEW even when it helps (owner's 7.37c/d rule)
+    "now refunds clockwerk":                  "NEW",    # Hookshot (Hookup): mana refund
+    "now also increases attack range for units under": "NEW",  # Enchant (Spellbound)
+    "now increases duration to":              "NEW",    # Scurry (Hunter facet): the facet takes over the old duration
+    "duration is no longer reduced":          "BUFF",   # Burning Spear (Incendiary): a penalty gone
+    "can now be cast during channeling":      "NEW",    # Quas / Wex / Exort / Invoke
+    "now stacks instead of refreshing":       "NEW",    # Magnus talent
+    "of bonus damage is converted to base damage": "BUFF",  # Illusory Armaments: Phantom Lancer 65% → 100%
+    "self bonus move speed when activated":   "NEW",    # Trample (Romp n' Stomp)
+    "stun duration now increases by":         "NEW",    # Snowball: +0.2s per ally
+    "now counts one debuff per unique":       "NERF",   # Septic Shock: Shiva's counts 1, not 3
+    "is now decreased by the illusion damage reduction": "NERF",  # Predator: illusions' bonus cut
+    "now has a primary and secondary target": "NEW",    # Death Ward (Cleft Death)
     # 7.37c proofread (2026-10-29)
     # owner 2026-10-29: these three are NEW (a new property), not BUFF
     "no longer requires enchant totem to be leveled": "NEW",   # Slugger: active without Enchant Totem
@@ -1786,6 +1800,11 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
             if m:
                 prefix = m.group(1).strip()
                 facet_slug = _facet_name_to_slug.get(prefix.lower())
+                if not facet_slug and version:
+                    # a facet of this patch the registry lacks (7.37b "Elitist: Exort: …" became an innate block)
+                    from patch.ability_kv import hero_facets
+                    facet_slug = next((fs for fs, (fname, _c, _i) in hero_facets(slug, version).items()
+                                       if fname.lower() == prefix.lower()), None)
                 if facet_slug:
                     stripped_note = dict(n)
                     stripped_note['note'] = re.sub(
@@ -1910,7 +1929,8 @@ def _render_hero(hero, version=None, patchnotes_loc=None, prev_hero_abils=None):
     for a in abilities:
         aid = a.get('ability_id')
         aname, aslug = ABILS.get(aid, (f'ability_{aid}', f'ability_{aid}'))
-        innate_kwarg = ', innate=True' if '_innate_' in aslug else ''
+        # the patch's own KV flag too: 7.37b Predator and Maul were innates, their slugs say nothing
+        innate_kwarg = ', innate=True' if '_innate_' in aslug or _stays_innate(a) else ''
         out.append(f'W(ability("{aname}", slug="{aslug}"{innate_kwarg}))')
         # Strip "AbilityName: " prefix from notes — the ability() block already shows the name
         notes = a.get('ability_notes', [])

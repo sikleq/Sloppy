@@ -39,6 +39,8 @@ NORM_DIR = os.path.join(_HERE, 'data', 'normalized', 'patches')
 
 _INCREASED_RE = re.compile(r'\b(increased|raised|improved)\b', re.I)
 _DECREASED_RE = re.compile(r'\b(decreased|reduced|lowered|worsened)\b', re.I)
+_NEGATED_DIR_RE = re.compile(r'\bno\s+longer\s+(?:\w+\s+)?(?:increased|raised|improved|decreased|reduced|lowered|worsened)\b',
+                             re.I)
 
 
 def _canonical_tag(text):
@@ -62,7 +64,8 @@ def _check_change(entity, change, issues):
     # lower_is_better or a canonical rework/del/new override).
     # Skip when BOTH increased AND decreased words appear (ability name
     # contains a direction word, e.g. "Reduced Damage ... increased").
-    if canon is None:
+    # a negated direction says the opposite: "Duration is no longer reduced" (7.37b Burning Spear) is a BUFF
+    if canon is None and not _NEGATED_DIR_RE.search(text):
         has_inc = _INCREASED_RE.search(text)
         has_dec = _DECREASED_RE.search(text)
         if has_inc and has_dec:

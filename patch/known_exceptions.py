@@ -105,6 +105,9 @@ KNOWN_NON_DATAFEED_ABILITIES = {
     # 7.37-era innates of content/p737d.py (data/stats/7.37d/heroes KV "Innate" "1"), gone from live herodata (2026-10-29)
     ("Juggernaut", "juggernaut_duelist"),
     ("Tidehunter", "tidehunter_blubber"),
+    # 7.37b innates of content/p737b.py (KV "Innate" "1" that build), gone from live herodata (2026-10-30)
+    ("Ancient Apparition", "ancient_apparition_death_rime"),
+    ("Visage", "visage_lurker"),
 }
 
 KNOWN_DISPLAY_NAME_OVERRIDES = set()
@@ -158,6 +161,8 @@ KNOWN_INNATE_NO_CDN_ICON = {
     "invoker_mastermind",           # 7.37 innate removed in 7.38; not in the client VPK nor the CDN (2026-10-29)
     "juggernaut_duelist",           # 7.37d innates: not in the client VPK nor the CDN (scripts/fetch/fetch_icons.py,
     "tidehunter_blubber",           # 2026-10-29)
+    "ancient_apparition_death_rime",  # 7.37b innates: not in the client VPK nor the CDN (fetch_icons.py, 2026-10-30)
+    "visage_lurker",
 }
 
 # Hero abilities no Ability slot or facet ever names (7.08 → today) that were in the game all the same: the game

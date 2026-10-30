@@ -203,7 +203,7 @@ def build():
     W(ul_open())
     W(li("Devour: Base Charge Restore Time decreased from 90s to 85s", b(90, 85, l=True)))
     W(ul_close())
-    W(ability("Lvl ? Pain", slug="doom_bringer_lvl_pain"))
+    W(ability("Lvl ? Pain", slug="doom_bringer_lvl_pain", innate=True))
     W(ul_open())
     W(li("Now only applies to Doom's attacks", t("NERF")))
     W(ul_close())
@@ -288,7 +288,7 @@ def build():
 
     # Kunkka
     W(hero_header("Kunkka"))
-    W(ability("Admiral's Rum", slug="kunkka_admirals_rum"))
+    W(ability("Admiral's Rum", slug="kunkka_admirals_rum", innate=True))
     W(ul_open())
     W(li("Rum Duration decreased from 10s to 6s", b(10, 6), extra=inline_note("Ghostship's Rum Duration isn't affected")))
     W(ul_close())
@@ -307,7 +307,7 @@ def build():
 
     # Lifestealer
     W(hero_header("Lifestealer"))
-    W(ability("Feast", slug="life_stealer_feast"))
+    W(ability("Feast", slug="life_stealer_feast", innate=True))
     W(ul_open())
     W(li("Max Health Life Steal increased from 1.25/1.75/2.25/2.75% to 1.5/2/2.5/3%", b([1.25, 1.75, 2.25, 2.75], [1.5, 2, 2.5, 3])))
     W(li("Max Health Damage increased from 1.25/1.75/2.25/2.75% to 1.5/2/2.5/3%", b([1.25, 1.75, 2.25, 2.75], [1.5, 2, 2.5, 3])))
@@ -354,7 +354,7 @@ def build():
 
     # Medusa
     W(hero_header("Medusa"))
-    W(ability("Mana Shield", slug="medusa_mana_shield"))
+    W(ability("Mana Shield", slug="medusa_mana_shield", innate=True))
     W(ul_open())
     W(li("Absorbing damage with Mana Shield now disables Blink Dagger", t("NERF")))
     W(ul_close())
@@ -451,7 +451,7 @@ def build():
 
     # Phantom Lancer
     W(hero_header("Phantom Lancer"))
-    W(ability("Illusory Armaments", slug="phantom_lancer_illusory_armaments"))
+    W(ability("Illusory Armaments", slug="phantom_lancer_illusory_armaments", innate=True))
     W(ul_open())
     W(li("Effects that percentually change the base damage now also affect base damage bonus provided by Illusory Armaments", t("NEW")))
     W(li("Bonus to Base Damage for illusions increased from 65% to 70%", b(65, 70)))
@@ -459,7 +459,7 @@ def build():
 
     # Puck
     W(hero_header("Puck"))
-    W(ability("Puckish", slug="puck_puckish"))
+    W(ability("Puckish", slug="puck_puckish", innate=True))
     W(ul_open())
     W(li("Base health restored decreased from 20 to 15", b(20, 15)))
     W(li("Base mana restored decreased from 20 to 15", b(20, 15)))
@@ -528,7 +528,7 @@ def build():
 
     # Shadow Shaman
     W(hero_header("Shadow Shaman"))
-    W(ability("Fowl Play", slug="shadow_shaman_fowl_play"))
+    W(ability("Fowl Play", slug="shadow_shaman_fowl_play", innate=True))
     W(ul_open())
     W(li("Invulnerability duration increased from 0.75s to 1s", b(0.75, 1)))
     W(ul_close())
@@ -582,7 +582,7 @@ def build():
 
     # Treant Protector
     W(hero_header("Treant Protector"))
-    W(ability("Nature's Guise", slug="treant_natures_guise"))
+    W(ability("Nature's Guise", slug="treant_natures_guise", innate=True))
     W(ul_open())
     W(li("Movement Speed bonus decreased from 12% to 10%", b(12, 10)))
     W(ul_close())

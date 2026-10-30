@@ -696,6 +696,18 @@ FACETS = {
     # 7.37c — auto-registered by generate_patch_code_v2.py
     "phantom_lancer_convergence": ("Convergence", "Yellow1"),
     "death_prophet_delayed_damage": ("Mourning Ritual", "Red1"),
+    # 7.37b — auto-registered by generate_patch_code_v2.py
+    "lina_supercharge": ("Thermal Runaway", "Yellow0"),
+    "tinker_repair_bots": ("Repair Bots", "Blue2"),
+    "beastmaster_wild_hunt": ("Wild Hunt", "Red1"),
+    "death_prophet_suppress": ("Suppress", "Purple2"),
+    "huskar_nothl_conflagration": ("Incendiary", "Yellow0"),
+    "weaver_hivemind": ("Hivemind", "Blue1"),
+    "jakiro_ice": ("Liquid Frost", "Blue1"),
+    "legion_commander_stonehall_plate": ("Stonehall Plate", "Yellow1"),
+    "dark_willow_throwing_shade": ("Throwing Shade", "Purple1"),
+    "void_spirit_aether_artifice": ("Call of the Void", "Gray3"),
+    "primal_beast_romp_n_stomp": ("Romp n' Stomp", "Red0"),
 }
 
 # Mapping from Valve's facet_color name -> CSS gradient that EXACTLY matches

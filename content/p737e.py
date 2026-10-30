@@ -56,7 +56,7 @@ def build():
 
     # Batrider
     W(hero_header("Batrider"))
-    W(ability("Smoldering Resin", slug="batrider_smoldering_resin"))
+    W(ability("Smoldering Resin", slug="batrider_smoldering_resin", innate=True))
     W(ul_open())
     W(li("Damage increased from 15% to 20%", b(15, 20)))
     W(ul_close())
@@ -248,7 +248,7 @@ def build():
 
     # Luna
     W(hero_header("Luna"))
-    W(ability("Lunar Blessing", slug="luna_lunar_blessing"))
+    W(ability("Lunar Blessing", slug="luna_lunar_blessing", innate=True))
     W(ul_open())
     W(li_formula("Bonus Night Vision rescaled", "400 + 20 per level", "250 + 25 per level", lambda L: 400 + 20*L, lambda L: 250 + 25*L, value_fmt="{:g}"))
     W(ul_close())
@@ -265,7 +265,7 @@ def build():
     W(ul_open())
     W(li("Summon Wolves: Fixed spirit wolves being visible when Lycan himself is invisible", t("MISC")))
     W(ul_close())
-    W(ability("Apex Predator", slug="lycan_apex_predator"))
+    W(ability("Apex Predator", slug="lycan_apex_predator", innate=True))
     W(ul_open())
     W(li("Now also applies to units under Lycan's control. Bonus is still based on Lycan's level", t("BUFF")))
     W(ul_close())
@@ -279,7 +279,7 @@ def build():
     W(li("Attack speed slow rescaled from 80 to 20/35/50/65/80", b(80, [20, 35, 50, 65, 80])))
     W(li("Poison is no longer applied by illusions", t("DEL")))
     W(ul_close())
-    W(ability("Mana Shield", slug="medusa_mana_shield"))
+    W(ability("Mana Shield", slug="medusa_mana_shield", innate=True))
     W(ul_open())
     W(li("Base Damage per mana decreased from 2.4 to 2.2", b(2.4, 2.2)))
     W(ul_close())
@@ -290,7 +290,7 @@ def build():
 
     # Monkey King
     W(hero_header("Monkey King"))
-    W(ability("Mischief", slug="monkey_king_mischief"))
+    W(ability("Mischief", slug="monkey_king_mischief", innate=True))
     W(ul_open())
     W(li("Damage immunity duration decreased from 0.2s to 0.1s", b(0.2, 0.1)))
     W(ul_close())
@@ -360,7 +360,7 @@ def build():
 
     # Puck
     W(hero_header("Puck"))
-    W(ability("Puckish", slug="puck_puckish"))
+    W(ability("Puckish", slug="puck_puckish", innate=True))
     W(ul_open())
     W(li("Spell Dodge multiplier decreased from 4x to 3.5x", b(4, 3.5)))
     W(ul_close())
@@ -428,7 +428,7 @@ def build():
     W(li("Presence of the Dark Lord: Hero Reduction Duration decreased from 70s to 60s", b(70, 60)))
     W(li("Presence of the Dark Lord: Now Bonus Armor Reduction buff is removed when Shadow Fiend dies", t("NERF")))
     W(ul_close())
-    W(ability("Necromastery", slug="nevermore_necromastery"))
+    W(ability("Necromastery", slug="nevermore_necromastery", innate=True))
     W(ul_open())
     W(li("Damage per soul decreased from 1/3/4/5 to 1/2/3/4", b([1, 3, 4, 5], [1, 2, 3, 4])))
     W(ul_close())
@@ -493,7 +493,7 @@ def build():
 
     # Tusk
     W(hero_header("Tusk"))
-    W(ability("Bitter Chill", slug="tusk_bitter_chill"))
+    W(ability("Bitter Chill", slug="tusk_bitter_chill", innate=True))
     W(ul_open())
     W(li("Now scales with Walrus Punch instead of Tag Team or Drinking Buddies", t("REWORK")))
     W(li("Attack Speed Slow rescaled from 20/30/40/50/60 to 15/35/55/75", b([20, 30, 40, 50, 60], [15, 35, 55, 75])))
@@ -522,7 +522,7 @@ def build():
 
     # Warlock
     W(hero_header("Warlock"))
-    W(ability("Eldritch Summoning", slug="warlock_eldritch_summoning"))
+    W(ability("Eldritch Summoning", slug="warlock_eldritch_summoning", innate=True))
     W(ul_open())
     W(li("Imps no longer explode if killed by enemy heroes", t("DEL")))
     W(ul_close())
@@ -539,7 +539,7 @@ def build():
     W(ul_open())
     W(li("Base Armor increased by 2", bstat_h("Wraith King", "ArmorPhysical", "7.37d", 2), extra=note_box(hero="Wraith King", field="ArmorPhysical", before_patch="7.37d")))
     W(ul_close())
-    W(ability("Vampiric Spirit", slug="skeleton_king_vampiric_spirit"))
+    W(ability("Vampiric Spirit", slug="skeleton_king_vampiric_spirit", innate=True))
     W(ul_open())
     W(li('Lifesteal decreased from <span class="wrong-word">20/30/40</span>/50% to 16/24/32/40%', b([26, 34, 42, 50], [16, 24, 32, 40]),
          extra=note_box('This change is wrongly stated. The real change is 26/34/42/50% &rarr; 16/24/32/40% (the whole 7.37 cycle had 26/34/42/50%)')))

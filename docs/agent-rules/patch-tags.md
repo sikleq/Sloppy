@@ -501,6 +501,25 @@ Desolate / Infest / Riptide — штраф самого героя или выг
 
 Генератор: `TAG_OVERRIDES`, `LOWER_IS_BUFF` (`tools/generate_patch_code_v2.py`). Тест `tests/test_review_737e.py`.
 
+## Вычитка 7.37b (2026-10-30)
+
+По правилу владельца «новое свойство — NEW»: Hookshot возврат маны, Enchant дальность атаки юнитов, Scurry у фасета
+Hunter, Quas/Wex/Exort/Invoke во время ченнелинга, талант Magnus «stacks instead of refreshing», Trample +10% при
+активации, Snowball +0.2s за союзника, Death Ward основная и вторая цель — **NEW**.
+
+| Строка | Тег | Почему |
+|---|---|---|
+| «Burning Spear: Duration is no longer reduced» (Incendiary) | **BUFF** | снят штраф; validator больше не читает «no longer reduced» как «decreased» (`_NEGATED_DIR_RE`) |
+| «100% of bonus damage is converted to base damage for Phantom Lancer» | **BUFF** | герою 65% → 100% |
+| «Now counts one debuff per unique ability/item» (Septic Shock) | **NERF** | Shiva's считается за 1, а не за 3 |
+| «Bonus damage is now decreased by the illusion damage reduction …» (Predator) | **NERF** | иллюзиям меньше |
+| «Time to max damage/attack speed decreased» (Solar Flare) | **`l=True`** | быстрее до максимума; `LOWER_IS_BUFF` «time to max» |
+| «Elitist: Exort: …» в общих строках Invoker | блок **фасета** | фасет этого патча, которого нет в `badges.FACETS` — генератор ищет его в `hero_facets` |
+| Блок способности, врождённой в своём патче (Predator, Maul) | **`innate=True`** | флаг `Innate` KV того патча, не только `_innate_` в слаге; заодно 7.37c/d/e: 19 блоков (Feast, Mana Shield, Necromastery…) |
+
+Ошибка Valve: Shadow Word «Cast Range rescaled from 600/700/800/**950**» — в 7.37 было 900 → `wrong-word` + note_box.
+Карта 7.37b — файл 7.36, своего шага Terrain нет. Тест `tests/test_review_737b.py`.
+
 ## Вычитка 7.37c (2026-10-29)
 
 | Строка | Тег | Почему |

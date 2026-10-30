@@ -331,7 +331,7 @@ def build():
     W(ul_open())
     W(li("Base Strength decreased from 22 to 21", b(22, 21)))
     W(ul_close())
-    W(ability("Caustic Finale", slug="sandking_caustic_finale"))
+    W(ability("Caustic Finale", slug="sandking_caustic_finale", innate=True))
     W(ul_open())
     W(li("Base Damage decreased from 20/40/60/80 to 15/35/55/75", b([20, 40, 60, 80], [15, 35, 55, 75])))
     W(ul_close())
