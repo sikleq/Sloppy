@@ -4605,7 +4605,13 @@ ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; 
   box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55);
 }
 .ability-chip[data-tooltip]::after { bottom: calc(100% + 22px); }
-.acr-lead-colon { margin-left: -3px; }     /* "[Wex]: …" in a card row, the colon next to the icon (owner 2026-10-30) */
+/* "[Wex] – …" in a card row; several abilities saying one thing stand side by side (owner 2026-10-30) */
+.acr-lead-chips .ability-chip + .ability-chip { margin-left: -2px; }
+/* a folded text's icons don't grow: the fold would cut the grown icon and its name (owner 2026-10-30); a click opens
+   the text, and there they grow */
+.acr-fold:not(.is-open) .acr-fold-body .ability-chip:hover > img { transform: none; box-shadow: none; }
+.acr-fold:not(.is-open) .acr-fold-body .ability-chip[data-tooltip]::after,
+.acr-fold:not(.is-open) .acr-fold-body .ability-chip[data-tooltip]::before { display: none; }
 @media (prefers-reduced-motion: reduce) { .ability-chip > img { transition: none; } }
 .facet-icon-overlay {
   width: 36px;

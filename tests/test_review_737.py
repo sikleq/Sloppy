@@ -423,7 +423,7 @@ def test_a_long_card_side_folds():
     """Owner 2026-10-30: "для таких длинных описаний может сделаем свёрнутый вид?", then "раскатай на весь сайт": a side
     over FOLD_CHARS folds — Drunken Brawler's short intro stays open; a side with no short first row folds whole and
     taller; a short side stays as it is."""
-    from patch.cards_item_abilities import FOLD_CHARS, fold_long_rows
+    from patch.cards_rows import FOLD_CHARS, fold_long_rows
     row = lambda s: f'<div class="ability-change-row">{s}</div>'
     long = "Grants 1/3/5/7/9 armor and 4/8/12/16/20% Magic Resistance. Bonuses are 2.5x when Brewed Up. " * 2
     rows = [row("Brewmaster can switch stances."), *(row(f"<b>{n} Brawler</b> — {long}")
@@ -461,19 +461,76 @@ def test_the_fold_glass_is_light_on_the_page():
     assert re.search(r"\.acr-fold\.is-open \.acr-fold-toggle \{[^}]*backdrop-filter: none", block)
 
 
-def test_a_card_row_opening_with_a_heros_ability_shows_its_icon_and_a_colon():
-    """Owner 2026-10-30 (7.38 Invoker's new facets): "его способности заменить на иконки … после иконки ставить
-    двоеточие. Типа [Wex]: [описание]"; a word that is no ability of the hero's stays."""
-    from patch.cards_item_abilities import _lead_ability_chip
+def _as_hero(hero, fn, *args):
     from patch.state import _State
     keep = _State.current_hero
-    _State.current_hero = "invoker"
+    _State.current_hero = hero
     try:
-        row = _lead_ability_chip('<div class="ability-change-row">Quas: When Invoker reaches level 6, he gains …</div>')
-        same = '<div class="ability-change-row">Passive: Grants armor.</div>'
-        other = '<div class="ability-change-row">Unknown Thing: does a thing.</div>'
-        assert _lead_ability_chip(same) == same and _lead_ability_chip(other) == other
+        return fn(*args)
     finally:
         _State.current_hero = keep
-    assert 'class="ability-chip" data-tooltip="Quas"' in row and "invoker_quas.png" in row
-    assert '<span class="acr-lead-colon">:</span> When Invoker reaches' in row and ">Quas:" not in row
+
+
+def test_a_card_row_opening_with_a_heros_ability_shows_its_icon_and_a_dash():
+    """Owner 2026-10-30 (7.38 Invoker's new facets): "его способности заменить на иконки"; after the icon a dash, not a
+    colon ("меняем двоеточие на тире"); a word that is no ability of the hero's stays."""
+    from patch.cards_item_abilities import _pane_parts
+    _, body = _as_hero("invoker", _pane_parts, ["Quas: When Invoker reaches level 6, he gains a bonus level",
+                                                 "Passive: Grants armor.", "Unknown Thing: does a thing."])
+    assert 'class="ability-chip" data-tooltip="Quas"' in body and "invoker_quas.png" in body
+    assert '<span class="acr-lead-dash">–</span> When Invoker reaches' in body and ">Quas:" not in body
+    assert "acr-lead-colon" not in body and ">Unknown Thing: does" in body
+
+
+def test_card_rows_saying_the_same_of_several_abilities_merge_into_one_with_their_icons():
+    """Owner 2026-10-30, 7.38 Dark Carnival Barker: three "Made exclusive to Carny Classics Facet" rows → one row,
+    three icons side by side."""
+    from patch.cards_item_abilities import _pane_parts
+    _, body = _as_hero("ringmaster", _pane_parts, [
+        "Dark Carnival Barker: Sets Dark Carnival Souvenirs to Funhouse Mirror",
+        "Funhouse Mirror: Made exclusive to Carny Classics Facet",
+        "Strongman Tonic: Made exclusive to Carny Classics Facet",
+        "Whoopee Cushion: Made exclusive to Carny Classics Facet"])
+    assert body.count("Made exclusive to Carny Classics Facet") == 1
+    chips = body.split("Made exclusive")[0].rsplit('<div class="ability-change-row">', 1)[1]
+    assert all(f'data-tooltip="{n}"' in chips for n in ("Funhouse Mirror", "Strongman Tonic", "Whoopee Cushion"))
+
+
+@pytest.mark.parametrize("text, kind", [
+    ("E.M.P.: Can be upgraded with Aghanim's Shard. Increases Burn Damage from 60% to 90%", "shard"),
+    ("Wex: Aghanim's Scepter grants 1 additional current level, and increases max level to 10", "scepter"),
+    ("Sun Strike: Now Aghanim's Scepter grants Cataclysm exclusively with this facet", "scepter"),
+])
+def test_a_card_row_about_an_aghanims_upgrade_gets_its_stripe(text, kind):
+    """Owner 2026-10-30, 7.38 Invoker's facets: "не подсвечено аганимной подложкой, как и шард — шардовой"."""
+    from patch.cards_item_abilities import _pane_parts
+    _, body = _as_hero("invoker", _pane_parts, [text, "Alacrity: Grants bonus attack range"])
+    assert body.count(f'<div class="ability-change-row aghanim-{kind}"><span class="aghanim-marker {kind}">') == 1
+    assert body.count("aghanim-marker") == 1                  # the other row stays plain
+
+
+def test_a_card_rows_closing_tip_never_wraps_alone():
+    """Owner 2026-10-30, 7.38 E.M.P.: the [?] stood on a line of its own — "у нас в правилах это запрещено"."""
+    from patch.cards_item_abilities import _pane_parts
+    from patch.elements import inline_note
+    _, body = _as_hero("invoker", _pane_parts, [
+        "E.M.P.: Pulls units to its center at 150 units per second " + inline_note("Unchanged from previous Shard")])
+    import re
+    assert re.search(r'<span class="li-tail">second&nbsp;(?:<!--INLINETIP-->)?(?:<!--TIP-->)?<span class="info-tip"', body)
+
+
+def test_a_folded_texts_icons_do_not_grow():
+    """Owner 2026-10-30: a hovered icon in a folded text was cut with the text (7.38 Mind of Tornarus' Wex)."""
+    import os
+    css = open(os.path.join(os.path.dirname(__file__), "..", "styles.css"), encoding="utf-8").read()
+    assert ".acr-fold:not(.is-open) .acr-fold-body .ability-chip:hover > img { transform: none;" in css
+
+
+def test_an_existing_roshan_blocks_items_link_too():
+    """Owner 2026-10-30, 7.38 "Roshan no longer drops Aghanim's Blessing": a link, as 7.37's drops."""
+    lines = ['W(section("General Updates"))', g.ROSHAN_HEADER, 'W(ul_open())',
+             'W(li("Roshan no longer drops Aghanim\'s Blessing", t("DEL")))', 'W(ul_close())',
+             'W(li("Aghanim\'s Blessing is elsewhere", t("MISC")))']
+    out = g._postprocess_roshan_block(lines)
+    assert out[3] == 'W(li("Roshan no longer drops " + item_link("Aghanim\'s Blessing"), t("DEL")))'
+    assert out[5] == lines[5]                                  # only the Roshan block's rows

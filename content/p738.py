@@ -58,17 +58,19 @@ def build():
 
     W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))
     W(ul_open())
-    # Valve's six lines behind a "?" as a table of the two pits (owner 2026-10-28: "много текста спрятано в [?]")
+    # Valve's six lines behind a "?" as a table (owner 2026-10-28: "много текста спрятано в [?]"), by time: when
+    # Roshan is in which pit (owner 2026-10-30: "переделать блок с информацией, когда он где находится")
     W(li("Roshan is back in the river, with one pit located near each sidelane", t("REWORK"), extra=mech_table(
-        ["Pit", "Roshan is there", "Location"],
-        [["Top", "At night, from 15:00", "Slightly closer to Dire's jungle entrance"],
-         ["Bottom", "At the start of the game<br>At day, from 15:00", "Slightly closer to Radiant's jungle entrance"],
+        ["When", "Pit", "Location"],
+        [["Start of the game – 15:00", "Bottom", "Slightly closer to Radiant's jungle entrance"],
+         ["Day, from 15:00", "Bottom", "Slightly closer to Radiant's jungle entrance"],
+         ["Night, from 15:00", "Top", "Slightly closer to Dire's jungle entrance"],
          "From 15:00 Roshan walks across the river to the pit of the time of day. On the way he no longer gets bonus "
          "movement speed, but gets +25% Slow Resistance on top of his new base 25%",
          "Only the active pit shows as a minimap icon"])))
     W(li("Added a Roshan icon near the minimap that shows Roshan's state (alive, dead, maybe alive) and location", t("QoL"), extra=inline_note("If Roshan is dead, the status will also include a timer until his possible respawn<br>Since Roshan's respawn takes between 8 to 11 minutes, during this window the status will say that he may be alive, but also include a timer until the guaranteed respawn<br>If a team gains vision over Roshan or Roshan's Roar of Retribution is heard during this status, the timer will be updated to inform that Roshan is alive<br>Templar Assassin's Third Eye Innate will cause the icon to display exactly when and where Roshan will respawn")))
     W(li("Knockback now has a 2s cooldown before it can be applied to the same unit again", t("NERF"), extra=inline_note("The knockback of Roshan's Walk: since 7.33 Roshan pushes units aside while walking between his pits (listed among knockback effects in 7.36b)")))
-    W(li("Roshan no longer drops Aghanim's Blessing", t("DEL")))
+    W(li("Roshan no longer drops " + item_link("Aghanim's Blessing"), t("DEL")))
     W(ul_close())
     W(ability_change(None, {"name": "Throw", "icon_url": "../icons/abilities/roshan_grab_and_throw.png",
                             "desc": ["When running into a hero while moving between pits, Roshan will stop and grab them before violently throwing them away. Upon landing, heroes are stunned for 1s and take 200 pure damage + 0.5% of target's current health per minute of game time. Each time Roshan throws a hero, he gains 70 bonus movement speed and increases throw damage by additional 100 until he reaches his destination pit. After 5 throws Roshan ignores heroes on his way",

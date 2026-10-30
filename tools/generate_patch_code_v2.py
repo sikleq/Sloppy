@@ -4857,7 +4857,13 @@ def _postprocess_roshan_block(lines):
     (owner 2026-10-30, 7.37: "Starting from his second death, Roshan now always drops Roshan's Banner" — "надо в
     блок к Roshan определять")."""
     start = next((k for k, ln in enumerate(lines) if _SECTION_RE.match(ln) and "General" in ln), None)
-    if start is None or any(ROSHAN_HEADER in ln for ln in lines):
+    head = next((k for k, ln in enumerate(lines) if ROSHAN_HEADER in ln), None)
+    if head is not None:
+        # a Roshan block already there: its rows' items link too (owner 2026-10-30, 7.38 "Roshan no longer drops
+        # Aghanim's Blessing": "подчеркнуть с ссылкой … научить генератор такое сразу подчеркивать")
+        stop = next((k for k in range(head + 1, len(lines)) if "W(ul_close())" in lines[k]), len(lines))
+        return lines[:head + 1] + [_link_items(ln) for ln in lines[head + 1:stop]] + lines[stop:]
+    if start is None:
         return lines
     end = next((k for k in range(start + 1, len(lines)) if _SECTION_RE.match(lines[k])), len(lines))
     while end > start + 1 and (not lines[end - 1].strip() or lines[end - 1].lstrip().startswith("#")):
