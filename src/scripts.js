@@ -822,6 +822,30 @@
   drawBrewlingConnectors();
   window.addEventListener('resize', drawBrewlingConnectors);
   window.addEventListener('load', drawBrewlingConnectors);
+  // a card's folded text (.acr-fold, patch/cards_item_abilities._fold_named_parts): a click or Enter opens it; the
+  // card's connectors and the dashed tree below follow the taller card ('toggle' listeners above)
+  function openFold(fold) {
+    if (fold.classList.contains('is-open')) return;
+    fold.classList.add('is-open');
+    fold.setAttribute('aria-expanded', 'true');
+    fold.removeAttribute('role');
+    // out of the Tab order, but focus stays on it (removing tabindex dropped it to <body>, visual check 2026-10-30)
+    const hadFocus = document.activeElement === fold;
+    fold.setAttribute('tabindex', '-1');
+    if (hadFocus) fold.focus({ preventScroll: true });
+    fold.dispatchEvent(new Event('toggle'));
+  }
+  document.addEventListener('click', (e) => {
+    const fold = e.target.closest && e.target.closest('.acr-fold');
+    if (fold) openFold(fold);
+  });
+  document.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('acr-fold')) {
+      e.preventDefault();
+      openFold(e.target);
+    }
+  });
+  document.addEventListener('toggle', drawBrewlingConnectors, true);
 
   // ---------------------------------------------------------------------
   // PATCH DYNAMICS WIDGET

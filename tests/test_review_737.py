@@ -171,10 +171,31 @@ def test_a_hero_ability_list_is_a_table_led_by_its_row_with_items_on_a_line_of_t
     assert "The following are considered a Teleport:" in html and "mech-captioned" in html
     # items are rows as heroes are (owner 2026-10-30), the header says both
     assert 'mech-hero mech-hero-item' in html and "Town Portal Scroll" in html and ">Hero or item<" in html
-    assert ">How<" not in html and "info-tip" in html                 # Visage's "recall (Faithful Followers)"
+    # a short list: Visage's "recall (Faithful Followers)" in a Details column (owner 2026-10-30); a long one in two
+    # pairs keeps it behind a "?"
+    assert ">How<" not in html and ">Details<" in html and "mech-cols-hero3" in html
+    assert ">Details<" not in long_html
     assert "mech-cols-hero4" in long_html
     assert oracle.count('class="mech-hero"') == 1 and "Clairvoyant Curse" in oracle and "Clairvoyant Cure" in oracle
-    # an item with no ability of its own: a short dash in the Ability cell, not an empty one (owner 2026-10-30)
+    # an item's own active from the game's tooltip (owner 2026-10-30: "у предметов тоже есть способности")
+    assert '>Teleport</span>' in html
+
+
+def test_items_in_a_hero_table_show_their_own_active():
+    """Town Portal Scroll → Teleport, Boots of Travel (an upgrade of the scroll) → Teleport, Book of Shadows → Shadows,
+    Force Boots → Force; Twin Gates, a map object the game names no ability of: a short dash."""
+    import patch.mech_abilities as ma
+    from patch.state import _State
+    keep = _State.current_patch_version
+    _State.current_patch_version = "7.37"
+    try:
+        names = {n: ma._item_ability(n, "7.37") for n in ("Town Portal Scroll", "Boots of Travel", "Boots of Travel 2",
+                                                          "Book of Shadows", "Force Boots", "Twin Gates")}
+        html, _n = ma.hero_ability_rows("Twin Gates<br>Chen: Divine Favor")
+    finally:
+        _State.current_patch_version = keep
+    assert names == {"Town Portal Scroll": "Teleport", "Boots of Travel": "Teleport", "Boots of Travel 2": "Teleport",
+                     "Book of Shadows": "Shadows", "Force Boots": "Force", "Twin Gates": None}
     assert '<span class="mech-none">–</span>' in html
 
 
@@ -396,3 +417,18 @@ def test_a_talent_rows_is_goes_with_its_name():
     text = "Level 25 Talent is +4s Burning Spears Duration instead of +6s"
     assert _TALENT_PREFIX_RE.sub(r"\1: ", text) == "Level 25 Talent: +4s Burning Spears Duration instead of +6s"
     assert _TALENT_PREFIX_RE.sub(r"\1: ", "Level 10 Talent +20 Damage") == "Level 10 Talent: +20 Damage"
+
+
+def test_a_text_of_named_parts_folds_under_their_names():
+    """Owner 2026-10-30: "для таких длинных описаний может сделаем свёрнутый вид?" — Drunken Brawler's intro stays,
+    its four stances open from one line naming them; two named parts stay open."""
+    from patch.cards_item_abilities import _fold_named_parts
+    row = lambda s: f'<div class="ability-change-row">{s}</div>'
+    rows = [row("Brewmaster can switch stances."), *(row(f"<b>{n} Brawler</b> — Grants armor.")
+                                                    for n in ("Earth", "Storm", "Fire", "Void"))]
+    out = _fold_named_parts(rows)
+    assert out[0] == rows[0] and len(out) == 2
+    # its first lines fade out, a click opens it — no arrow (owner 2026-10-30: "нижняя часть блока полупрозрачная")
+    assert out[1].startswith('<div class="acr-fold" role="button" tabindex="0" aria-expanded="false">')
+    assert out[1].count("ability-change-row") == 4 and "<summary>" not in out[1]
+    assert _fold_named_parts(rows[:3]) == rows[:3]

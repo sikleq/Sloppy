@@ -399,6 +399,7 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
             tables.append(tbl)
         html = d if not isinstance(d, str) or d.lstrip().startswith("<div") else f'<div class="ability-change-row">{d}</div>'
         rows.append(_bold_numbers_html(html) if isinstance(html, str) else html)
+    rows = _fold_named_parts(rows)
     rows += tables
     said = " ".join(items[i] for i in plain)
     head_props = {k: v for k, v in (props or {}).items()
@@ -423,6 +424,23 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
     head = (f'<div class="iab-head pane-head"><span class="iab-title">{title}</span>'
             f'<span class="iab-meta">{chips}</span></div>') if chips or title else ""
     return head, "".join(rows)
+
+
+_NAMED_ROW_RE = re.compile(r'^<div class="ability-change-row"><b>([^<]+)</b> — ')
+FOLD_NAMED_FROM = 3               # this many named parts (Drunken Brawler's four stances) fold under one line
+
+
+def _fold_named_parts(rows):
+    """A text of named parts ("<b>Earth Brawler</b> — Grants …", patch/cards_ability_change._named_parts) folds: its
+    intro stays, the parts show their first lines fading out, a click opens them (owner 2026-10-30: "для таких длинных
+    описаний может сделаем свёрнутый вид?", then "вместо стрелочки … нижняя часть блока полупрозрачная и если её
+    нажать, то она развернётся"). src/scripts.js opens it and redraws the card's connectors."""
+    named = [k for k, r in enumerate(rows) if isinstance(r, str) and _NAMED_ROW_RE.match(r)]
+    if len(named) < FOLD_NAMED_FROM:
+        return rows
+    first, last = named[0], named[-1]
+    return (rows[:first] + ['<div class="acr-fold" role="button" tabindex="0" aria-expanded="false">'
+                            f'{"".join(rows[first:last + 1])}</div>'] + rows[last + 1:])
 
 
 def _pane_props(spec, version):

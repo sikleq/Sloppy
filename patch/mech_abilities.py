@@ -87,17 +87,39 @@ def rune_row_chip(text, prefix="../"):
 _MAP_OBJECT_ICONS = {"Twin Gates": "../icons/ui/gothic/tc_twingates.png"}
 
 
+def _item_slug(name):
+    if name == "Town Portal Scroll":
+        return "tpscroll"
+    m = _ENCHANT_RE.match(name)
+    return (f"enhancement_{m.group(1).lower()}" if m
+            else ITEM_SLUG.get(name, name.lower().replace(" ", "_").replace("'", "")))
+
+
 def _item_icon(name):
     if name in _MAP_OBJECT_ICONS:
         return _MAP_OBJECT_ICONS[name]
-    if name == "Town Portal Scroll":
-        name = "tpscroll"
-    m = _ENCHANT_RE.match(name)
-    item = (f"enhancement_{m.group(1).lower()}" if m
-            else ITEM_SLUG.get(name, name.lower().replace(" ", "_").replace("'", "")))
+    item = _item_slug(name)
     if _os.path.exists(_os.path.join(_ITEM_ICON_DIR, f"{item}.png")):
         return f"{ITEM_CDN}{item}.png"
     return None
+
+
+_UPGRADE_OF_RE = re.compile(r"<h1>\s*Upgrade:\s*([^<]+?)\s*</h1>")
+
+
+def _item_ability(name, version):
+    """The item's own active in `version`, from the game's tooltip: Town Portal Scroll → "Teleport", Book of Shadows →
+    "Shadows"; an item that upgrades another one's ("Upgrade: Town Portal Scroll", Boots of Travel) → that one's. None
+    when the game names none (Twin Gates is a map object) — owner 2026-10-30: "у предметов тоже есть способности"."""
+    from .item_ability_text import item_abilities
+    from .loc_history import tooltip
+    slug = _item_slug(name)
+    for text in item_abilities(slug, version) or []:
+        m = re.match(r"(?:Active|Use): ([^.!]+)", text)
+        if m:
+            return m.group(1).strip()
+    up = _UPGRADE_OF_RE.search(tooltip(f"DOTA_Tooltip_Ability_item_{slug}_Description", version) or "")
+    return _item_ability(up.group(1), version) if up and up.group(1) != name else None
 
 
 @_functools.lru_cache(maxsize=1)
@@ -427,11 +449,9 @@ def hero_ability_rows(raw, least=1, row_text=""):
             label, icon, sentence, caveat = parsed
             name = label[len(h.group(1)) + 2:]
             how = " ".join(x for x in (sentence.strip(" .,"), caveat) if x)
-            tip = f" {info_tip(how[:1].upper() + how[1:])}" if how else ""
             hero = (f'<span class="mech-hero"><img src="{HERO_CDN}{HERO_SLUG[h.group(1)]}.png" alt="" loading="lazy" '
                     f'width="32" height="18">{_html.escape(h.group(1))}</span>')
-            ability = (f'<span class="mech-item">{ability_chip(name, icon)}'
-                       f'<span class="mech-abil-name">{_html.escape(name)}</span>{tip}</span>')
+            ability = (name, f'{ability_chip(name, icon)}<span class="mech-abil-name">{_html.escape(name)}</span>')
             kinds.add("Hero")
         else:
             parsed = _parse_line(line) if h else None      # an item's ability: "Gleipnir: Eternal Chains (…)"
@@ -444,29 +464,33 @@ def hero_ability_rows(raw, least=1, row_text=""):
                 icon = _item_icon(name)
             if not icon:
                 return None
-            tip = f" {info_tip(caveat[:1].upper() + caveat[1:])}" if caveat else ""
+            how = caveat
             # an item (or a map object) is a row as a hero is (owner 2026-10-30: "Items … гармонично встроить по
             # аналогии с hero"): its icon and name first, its ability — "Gleipnir: Eternal Chains" — next to it
             owner = h.group(1) if parsed and h else name
             owner_icon = _item_icon(owner) or icon
             hero = (f'<span class="mech-hero mech-hero-item"><img src="{owner_icon}" alt="" loading="lazy" '
                     f'width="25" height="18">{_html.escape(owner)}</span>')
-            # no ability of its own (Town Portal Scroll, Twin Gates): a short dash, not an empty cell (owner 2026-10-30)
-            ability = (f'<span class="mech-item">{ability_chip(name[len(owner) + 2:], icon)}<span class="mech-abil-name">'
-                       f'{_html.escape(name[len(owner) + 2:])}</span>{tip}</span>' if parsed and h else
-                       f'<span class="mech-item"><span class="mech-none">–</span>{tip}</span>')
+            own = name[len(owner) + 2:] if parsed and h else _item_ability(name, _State.current_patch_version)
+            # no ability the game names (Twin Gates): a short dash, not an empty cell (owner 2026-10-30)
+            ability = ((own, f'{ability_chip(own, owner_icon)}<span class="mech-abil-name">{_html.escape(own)}</span>')
+                       if own else ("", '<span class="mech-none">–</span>'))
             kinds.add("Item")
+        detail = how[:1].upper() + how[1:] if how else ""
         # one row per hero (or item), his abilities side by side (owner 2026-10-30: "не дублируй героя")
         same = next((k for k, (hr, _a) in enumerate(pairs) if hr == hero), None)
         if same is None:
-            pairs.append((hero, ability))
+            pairs.append((hero, [(*ability, detail)]))
         else:
-            pairs[same] = (hero, pairs[same][1] + ability)
+            pairs[same][1].append((*ability, detail))
     # items alone: a table only in a mechanic block of one box, where every list of the block is one (7.37 "Neutral
     # item active effects …: Book of Shadows, Force Boots"); elsewhere such lists keep their own form (7.41)
     if not ("Hero" in kinds or (kinds and _State.new_mech_one_box)) or len(pairs) < least:
         return None
     two = len(pairs) >= TWO_PAIRS_FROM
+    # a short list with its words on how (7.37 "Partially Disabled by Break", the blocking lists): those words in a
+    # column of their own; a long one in two pairs keeps them behind a "?" (owner 2026-10-30)
+    with_details = not two and any(d for _h, abils in pairs for _n, _a, d in abils)
     width = 4 if two else 2
     line = lambda inner, cls="": (f'<span class="mech-abil-row"><span class="mech-cell mech-abil-line {cls}">'
                                   f'{inner}</span></span>')
@@ -477,10 +501,23 @@ def hero_ability_rows(raw, least=1, row_text=""):
         before = "".join(f"{s.rstrip('.')}. " for s in leads)
         html += line(before + (text if text.endswith(":") else f"{text}:") + tip, "mech-table-lead")
     cells = lambda xs: "".join(f'<span class="mech-cell">{x}</span>' for x in xs)
-    pairs = [(hero, f'<span class="mech-abil-set">{abilities}</span>') for hero, abilities in pairs]
+
+    def tipped(a, d):
+        return f'<span class="mech-item">{a}{" " + info_tip(d) if d else ""}</span>'
+
+    def said(abils):                            # the details cell: each ability's words, named when there are two
+        named = sum(1 for _n, _a, d in abils if d) > 1
+        return "<br>".join(f"{n}: {d}" if named and n else d for n, _a, d in abils if d)
+    if with_details:
+        pairs = [(hero, f'<span class="mech-abil-set">{"".join(tipped(a, "") for _n, a, _d in abils)}</span>', said(abils))
+                 for hero, abils in pairs]
+    else:
+        pairs = [(hero, f'<span class="mech-abil-set">{"".join(tipped(a, d) for _n, a, d in abils)}</span>')
+                 for hero, abils in pairs]
     if pairs:
         first = "Hero or item" if kinds == {"Hero", "Item"} else next(iter(kinds))
-        html += f'<span class="mech-abil-row mech-head">{cells([first, "Ability"] * (width // 2))}</span>'
+        head = [first, "Ability", "Details"] if with_details else [first, "Ability"] * (width // 2)
+        html += f'<span class="mech-abil-row mech-head">{cells(head)}</span>'
     if two:
         half = (len(pairs) + 1) // 2
         left, right = pairs[:half], pairs[half:] + [("", "")] * (half - len(pairs[half:]))
@@ -492,7 +529,7 @@ def hero_ability_rows(raw, least=1, row_text=""):
     # the block's sentences about this list: lines of the table, across it (owner 2026-10-30, 7.37 Breakability)
     for note in notes:
         html += line(note, "mech-table-note")
-    cols = "mech-cols-hero4" if two else "mech-cols-hero2"
+    cols = "mech-cols-hero4" if two else "mech-cols-hero3" if with_details else "mech-cols-hero2"
     lead = " mech-captioned" if row_text else ""
     return f'<span class="mech-abils mech-cols-hero {cols}{lead}">{html}</span>', []
 

@@ -3646,6 +3646,15 @@ h4.subgroup .subgroup-new-type {
   min-width: 0;
 }
 .ability-change-row { padding: 4px 0; line-height: 1.45; }
+/* a text of named parts (Drunken Brawler's stances) folds: its first lines fade out, a click opens it (owner
+   2026-10-30: "нижняя часть блока полупрозрачная и если её нажать, то она развернётся") */
+.acr-fold { max-height: 4.4em; overflow: hidden; cursor: pointer;
+  -webkit-mask-image: linear-gradient(to bottom, #000 15%, transparent);
+  mask-image: linear-gradient(to bottom, #000 15%, transparent); }
+.acr-fold:hover { -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
+  mask-image: linear-gradient(to bottom, #000 35%, transparent); }
+.acr-fold:focus-visible { outline: 1px solid var(--muted-45); outline-offset: 2px; }
+.acr-fold.is-open { max-height: none; cursor: auto; -webkit-mask-image: none; mask-image: none; }
 /* Dense stat-list mode — used by per-unit comparison cards (e.g. Brewmaster
    brewlings) where each row is a single short stat line. Tightens vertical
    rhythm so the panes don't tower over the rest of the hero block. */
@@ -4471,7 +4480,8 @@ h4.subgroup {
 /* Valve's "Hero: Ability (how)" lists (7.37 Breakability, Teleport Classification): the hero | the ability (icon or the
    facet's coloured chip + its name) | how — many 7.37 innates have only the general innate icon (owner 2026-10-30) */
 .mech-abils.mech-cols-hero2 { grid-template-columns: fit-content(40%) minmax(0, 1fr); }
-/* a long list in two pairs of columns (owner 2026-10-30: "в 2 столбца можно, а то длинный список") */
+/* a short list with Valve's words on how: hero | ability | details (owner 2026-10-30, 7.37 "Partially Disabled") */
+.mech-abils.mech-cols-hero3 { grid-template-columns: fit-content(30%) fit-content(35%) minmax(0, 1fr); }/* a long list in two pairs of columns (owner 2026-10-30: "в 2 столбца можно, а то длинный список") */
 .mech-abils.mech-cols-hero4 { grid-template-columns: fit-content(25%) minmax(0, 1fr) fit-content(25%) minmax(0, 1fr); }
 .mech-cols-hero4 > .mech-abil-row:not(.mech-head) > .mech-cell:nth-child(2) { border-right: 2px solid var(--line-soft); }
 .mech-cols-hero > .mech-abil-row > .mech-cell { justify-content: flex-start; text-align: left; min-width: 0; }
@@ -4496,6 +4506,14 @@ h4.subgroup {
    the rules above, which keep names on one line on a wide screen */
 @media (max-width: 700px) {
   .mech-abils.mech-cols-hero2, .mech-abils.mech-cols-hero4 { grid-template-columns: fit-content(45%) minmax(0, 1fr); }
+  /* hero | ability, the details on a line of their own under them: three columns at 375px squeezed the names into
+     each other and broke "Phantas-magoria" (visual check 2026-10-30) */
+  .mech-abils.mech-cols-hero3 { grid-template-columns: fit-content(50%) minmax(0, 1fr); }
+  .mech-cols-hero3 > .mech-head > .mech-cell:nth-child(3) { display: none; }
+  .mech-cols-hero3 > .mech-abil-row:not(.mech-head) > .mech-cell:nth-child(3) { grid-column: 1 / -1; border-top: 0;
+    padding-top: 0; }
+  .mech-cols-hero3 > .mech-abil-row:not(.mech-head) > .mech-cell:nth-child(3):empty { display: none; }
+  .mech-abils.mech-cols-hero3 .mech-abil-name, .mech-abils.mech-cols-hero3 .mech-hero { overflow-wrap: normal; }
   .mech-cols-hero4 > .mech-head > .mech-cell:nth-child(n+3) { display: none; }
   .mech-cols-hero .mech-abil-name, .mech-cols-hero .mech-hero, .mech-cols-hero .mech-item {
     white-space: normal; min-width: 0; overflow-wrap: anywhere; }
