@@ -3648,13 +3648,22 @@ h4.subgroup .subgroup-new-type {
 .ability-change-row { padding: 4px 0; line-height: 1.45; }
 /* a text of named parts (Drunken Brawler's stances) folds: its first lines fade out, a click opens it (owner
    2026-10-30: "нижняя часть блока полупрозрачная и если её нажать, то она развернётся") */
-.acr-fold { max-height: 4.4em; overflow: hidden; cursor: pointer;
+.acr-fold-body { max-height: 4.4em; overflow: hidden; cursor: pointer;
   -webkit-mask-image: linear-gradient(to bottom, #000 15%, transparent);
   mask-image: linear-gradient(to bottom, #000 15%, transparent); }
-.acr-fold:hover { -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
+.acr-fold:not(.is-open) .acr-fold-body:hover { -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
   mask-image: linear-gradient(to bottom, #000 35%, transparent); }
-.acr-fold:focus-visible { outline: 1px solid var(--muted-45); outline-offset: 2px; }
-.acr-fold.is-open { max-height: none; cursor: auto; -webkit-mask-image: none; mask-image: none; }
+.acr-fold.is-open .acr-fold-body { max-height: none; cursor: auto; -webkit-mask-image: none; mask-image: none; }
+/* the open / close control: a gold chevron between two thin lines, turned up when open (owner 2026-10-30) */
+.acr-fold-toggle { display: flex; align-items: center; gap: 8px; width: 100%; margin: 2px 0 0; padding: 2px 0;
+  background: none; border: 0; color: var(--gold-dim); cursor: pointer; }
+.acr-fold-toggle::before, .acr-fold-toggle::after { content: ""; flex: 1; height: 1px; background: var(--gold-line); }
+.acr-fold-toggle > svg { flex: none; transition: transform 0.15s ease; }
+.acr-fold-toggle:hover, .acr-fold:not(.is-open) .acr-fold-body:hover + .acr-fold-toggle { color: var(--gold-strong); }
+.acr-fold-toggle:hover::before, .acr-fold-toggle:hover::after { background: var(--gold-dim); }
+.acr-fold-toggle:focus-visible { outline: 1px solid var(--gold-line); outline-offset: 2px; }
+.acr-fold.is-open .acr-fold-toggle > svg { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .acr-fold-toggle > svg { transition: none; } }
 /* Dense stat-list mode — used by per-unit comparison cards (e.g. Brewmaster
    brewlings) where each row is a single short stat line. Tightens vertical
    rhythm so the panes don't tower over the rest of the hero block. */

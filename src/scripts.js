@@ -822,28 +822,29 @@
   drawBrewlingConnectors();
   window.addEventListener('resize', drawBrewlingConnectors);
   window.addEventListener('load', drawBrewlingConnectors);
-  // a card's folded text (.acr-fold, patch/cards_item_abilities._fold_named_parts): a click or Enter opens it; the
-  // card's connectors and the dashed tree below follow the taller card ('toggle' listeners above)
-  function openFold(fold) {
-    if (fold.classList.contains('is-open')) return;
-    fold.classList.add('is-open');
-    fold.setAttribute('aria-expanded', 'true');
-    fold.removeAttribute('role');
-    // out of the Tab order, but focus stays on it (removing tabindex dropped it to <body>, visual check 2026-10-30)
-    const hadFocus = document.activeElement === fold;
-    fold.setAttribute('tabindex', '-1');
-    if (hadFocus) fold.focus({ preventScroll: true });
+  // a card's folded text (.acr-fold, patch/cards_item_abilities._fold_named_parts): its chevron button opens and
+  // closes it, a click on the faded text opens it; the card's connectors and the dashed tree below follow the card's
+  // new height ('toggle' listeners above)
+  function setFold(fold, open) {
+    if (fold.classList.contains('is-open') === open) return;
+    fold.classList.toggle('is-open', open);
+    const btn = fold.querySelector('.acr-fold-toggle');
+    if (btn) {
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Fold the text' : 'Show the whole text');
+    }
     fold.dispatchEvent(new Event('toggle'));
   }
   document.addEventListener('click', (e) => {
-    const fold = e.target.closest && e.target.closest('.acr-fold');
-    if (fold) openFold(fold);
-  });
-  document.addEventListener('keydown', (e) => {
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('acr-fold')) {
-      e.preventDefault();
-      openFold(e.target);
+    if (!e.target.closest) return;
+    const btn = e.target.closest('.acr-fold-toggle');
+    if (btn) {
+      const fold = btn.closest('.acr-fold');
+      setFold(fold, !fold.classList.contains('is-open'));
+      return;
     }
+    const body = e.target.closest('.acr-fold-body');
+    if (body) setFold(body.closest('.acr-fold'), true);
   });
   document.addEventListener('toggle', drawBrewlingConnectors, true);
 

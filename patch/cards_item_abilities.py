@@ -439,8 +439,13 @@ def _fold_named_parts(rows):
     if len(named) < FOLD_NAMED_FROM:
         return rows
     first, last = named[0], named[-1]
-    return (rows[:first] + ['<div class="acr-fold" role="button" tabindex="0" aria-expanded="false">'
-                            f'{"".join(rows[first:last + 1])}</div>'] + rows[last + 1:])
+    # a gold chevron between two lines under the faded text says it opens, and closes it again (owner 2026-10-30:
+    # "чтобы было видно, что оно разворачиваться может, а также возможность свернуть обратно")
+    toggle = ('<button type="button" class="acr-fold-toggle" aria-expanded="false" aria-label="Show the whole text">'
+              '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" '
+              'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>')
+    return (rows[:first] + [f'<div class="acr-fold"><div class="acr-fold-body">{"".join(rows[first:last + 1])}</div>'
+                            f'{toggle}</div>'] + rows[last + 1:])
 
 
 def _pane_props(spec, version):
