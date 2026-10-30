@@ -3653,7 +3653,6 @@ h4.subgroup .subgroup-new-type {
   mask-image: linear-gradient(to bottom, #000 15%, transparent); }
 .acr-fold:not(.is-open) .acr-fold-body:hover { -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
   mask-image: linear-gradient(to bottom, #000 35%, transparent); }
-.acr-fold-tall .acr-fold-body { max-height: 6.6em; }     /* no intro above it: show more lines */
 .acr-fold.is-open .acr-fold-body { max-height: none; cursor: auto; -webkit-mask-image: none; mask-image: none; }
 /* the open / close control: a strip of soft glass over the faded text's bottom — a slight blur growing smoothly
    downward, a faint warm tint and a thin highlight along its top (owner 2026-10-30: "эффект стекла снизу, но не
@@ -3663,7 +3662,7 @@ h4.subgroup .subgroup-new-type {
    in gradually, not a cut-off band ("края постепенные, а не сразу обрывистые"): two masks intersected */
 .acr-fold-toggle { position: relative; display: block; width: 100%; height: 30px; margin: -30px 0 0; padding: 0;
   border: 0; cursor: pointer;
-  background: linear-gradient(to bottom, rgba(227, 196, 106, 0), rgba(227, 196, 106, 0.06));
+  background: linear-gradient(to bottom, rgba(227, 196, 106, 0), rgba(227, 196, 106, 0.13));
   -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
   -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.35) 35%, #000 85%),
     linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
@@ -3673,14 +3672,15 @@ h4.subgroup .subgroup-new-type {
   mask-composite: intersect;
   transition: background-color 0.15s ease-out; }
 .acr-fold-toggle::after { content: ""; position: absolute; left: 12%; right: 12%; bottom: 0; height: 1px;
-  pointer-events: none; background: linear-gradient(to right, transparent, rgba(240, 216, 150, 0.28), transparent); }
+  pointer-events: none; background: linear-gradient(to right, transparent, rgba(240, 216, 150, 0.5), transparent); }
+/* more visible (owner 2026-10-30: "почти не видна … да, можно" заметнее) */
 .acr-fold-toggle:hover, .acr-fold:not(.is-open) .acr-fold-body:hover + .acr-fold-toggle {
-  background-color: rgba(227, 196, 106, 0.05); }
-.acr-fold-toggle:hover::after { background: linear-gradient(to right, transparent, rgba(240, 216, 150, 0.5), transparent); }
+  background-color: rgba(227, 196, 106, 0.08); }
+.acr-fold-toggle:hover::after { background: linear-gradient(to right, transparent, rgba(240, 216, 150, 0.75), transparent); }
 /* open: no overlap and no blur — a thin tinted strip under the text that folds it back */
 .acr-fold.is-open .acr-fold-toggle { height: 12px; margin-top: 2px; -webkit-backdrop-filter: none; backdrop-filter: none;
   -webkit-mask-image: none; mask-image: none;
-  background: linear-gradient(to bottom, rgba(227, 196, 106, 0), rgba(227, 196, 106, 0.04)); }
+  background: linear-gradient(to bottom, rgba(227, 196, 106, 0), rgba(227, 196, 106, 0.09)); }
 .acr-fold-toggle:focus-visible { outline: 1px solid var(--gold-line); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .acr-fold-toggle { transition: none; } }
 /* Dense stat-list mode — used by per-unit comparison cards (e.g. Brewmaster
@@ -4605,6 +4605,7 @@ ul.changes li.mech-desc.mech-last + li.mech-desc.mech-first { margin-top: 10px; 
   box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55);
 }
 .ability-chip[data-tooltip]::after { bottom: calc(100% + 22px); }
+.acr-lead-colon { margin-left: -3px; }     /* "[Wex]: …" in a card row, the colon next to the icon (owner 2026-10-30) */
 @media (prefers-reduced-motion: reduce) { .ability-chip > img { transition: none; } }
 .facet-icon-overlay {
   width: 36px;

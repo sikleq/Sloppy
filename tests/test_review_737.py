@@ -436,8 +436,9 @@ def test_a_long_card_side_folds():
     assert out[1].startswith('<div class="acr-fold"><div class="acr-fold-body">')
     assert out[1].count("ability-change-row") == 4 and "<summary>" not in out[1]
     assert '<button type="button" class="acr-fold-toggle" aria-expanded="false"' in out[1] and "<svg" not in out[1]
+    # no short intro: stays open (owner 2026-10-30, 7.38 Roshan's Throw: "можно и не сворачивать")
     one = [row("x" * (FOLD_CHARS + 50))]
-    assert fold_long_rows(one)[0].startswith('<div class="acr-fold acr-fold-tall">')
+    assert fold_long_rows(one) == one
     short = [row("Deals damage."), row("Slows enemies.")]
     assert fold_long_rows(short) == short
     assert fold_long_rows(out) == out                       # folded once
@@ -458,3 +459,21 @@ def test_the_fold_glass_is_light_on_the_page():
     assert not re.search(r"\banimation(?:-name)?\s*:", block) and "@keyframes" not in block
     assert "backdrop-filter: blur(" in block
     assert re.search(r"\.acr-fold\.is-open \.acr-fold-toggle \{[^}]*backdrop-filter: none", block)
+
+
+def test_a_card_row_opening_with_a_heros_ability_shows_its_icon_and_a_colon():
+    """Owner 2026-10-30 (7.38 Invoker's new facets): "его способности заменить на иконки … после иконки ставить
+    двоеточие. Типа [Wex]: [описание]"; a word that is no ability of the hero's stays."""
+    from patch.cards_item_abilities import _lead_ability_chip
+    from patch.state import _State
+    keep = _State.current_hero
+    _State.current_hero = "invoker"
+    try:
+        row = _lead_ability_chip('<div class="ability-change-row">Quas: When Invoker reaches level 6, he gains …</div>')
+        same = '<div class="ability-change-row">Passive: Grants armor.</div>'
+        other = '<div class="ability-change-row">Unknown Thing: does a thing.</div>'
+        assert _lead_ability_chip(same) == same and _lead_ability_chip(other) == other
+    finally:
+        _State.current_hero = keep
+    assert 'class="ability-chip" data-tooltip="Quas"' in row and "invoker_quas.png" in row
+    assert '<span class="acr-lead-colon">:</span> When Invoker reaches' in row and ">Quas:" not in row

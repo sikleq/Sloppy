@@ -398,7 +398,7 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
             d, tbl = _pill_formulas(d)
             tables.append(tbl)
         html = d if not isinstance(d, str) or d.lstrip().startswith("<div") else f'<div class="ability-change-row">{d}</div>'
-        rows.append(_bold_numbers_html(html) if isinstance(html, str) else html)
+        rows.append(_lead_ability_chip(_bold_numbers_html(html)) if isinstance(html, str) else html)
     rows = fold_long_rows(rows)
     rows += tables
     said = " ".join(items[i] for i in plain)
@@ -426,7 +426,27 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
     return head, "".join(rows)
 
 
-FOLD_CHARS = 600                  # a card side longer than this folds (owner 2026-10-30: "раскатай на весь сайт"; 28
+_LEAD_ROW_RE = re.compile(r'^<div class="ability-change-row">([A-Z][\w\'.\- ]{2,40}?):\s')
+
+
+def _lead_ability_chip(row):
+    """A card row that opens with one of the hero's abilities ("Quas: When Invoker reaches level 6 …", 7.38 Quas Focus):
+    the ability's icon in place of its name, then the colon — "[Wex]: …"; the icon grows on hover with the name above it,
+    as in every facet row (owner 2026-10-30). A name that is no ability of the hero's with an icon stays a word."""
+    from .elements import _hero_ability_slug
+    from .images import ABIL_CDN, _LOCAL_ABIL_ICONS
+    from .mech_abilities import ability_chip
+    m = _LEAD_ROW_RE.match(row) if _State.current_hero else None
+    if not m or m.group(1) in ("Active", "Passive", "Toggle", "Aura", "Ultimate"):
+        return row
+    slug = _hero_ability_slug(_State.current_hero, m.group(1))
+    if slug not in _LOCAL_ABIL_ICONS:
+        return row
+    return (f'<div class="ability-change-row">{ability_chip(m.group(1), f"{ABIL_CDN}{slug}.png")}'
+            f'<span class="acr-lead-colon">:</span> ' + row[m.end():])
+
+
+FOLD_CHARS = 600                 # a card side longer than this folds (owner 2026-10-30: "раскатай на весь сайт"; 28
                                   # sides of 569 in 7.37–7.41, 7.37 Drunken Brawler's 733 the first)
 _INTRO_SHARE = 0.45               # a first row this short a part of the whole stays open as the intro
 
@@ -464,15 +484,17 @@ def fold_long_rows(rows):
     if total <= FOLD_CHARS or any("acr-fold" in r for r in texts):
         return rows
     k = [i for i, r in enumerate(rows) if isinstance(r, str)]
-    intro = len(k) > 1 and _plain_len(rows[k[0]]) <= _INTRO_SHARE * total
-    first, last = (k[1] if intro else k[0]), k[-1]
-    tall = "" if intro else " acr-fold-tall"
+    # no short intro to keep open: the side stays as it is (owner 2026-10-30, 7.38 Roshan's Throw: "как будто можно и
+    # не сворачивать")
+    if not (len(k) > 1 and _plain_len(rows[k[0]]) <= _INTRO_SHARE * total):
+        return rows
+    first, last = k[1], k[-1]
     # over the faded text's bottom a strip of soft glass says it opens, and folds it back (owner 2026-10-30: "чтобы
     # было видно, что оно разворачиваться может, а также возможность свернуть обратно"; a chevron and golden pollen
     # were tried and dropped: "эффект стекла снизу, но не резкий, а плавный … чтобы не нагружало страницу")
     toggle = ('<button type="button" class="acr-fold-toggle" aria-expanded="false" aria-label="Show the whole text">'
               '</button>')
-    return (rows[:first] + [f'<div class="acr-fold{tall}"><div class="acr-fold-body">{"".join(rows[first:last + 1])}</div>'
+    return (rows[:first] + [f'<div class="acr-fold"><div class="acr-fold-body">{"".join(rows[first:last + 1])}</div>'
                             f'{toggle}</div>'] + rows[last + 1:])
 
 
