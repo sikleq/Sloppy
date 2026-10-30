@@ -609,9 +609,10 @@ def item_header(name, new=False, changed=False, removed=None, old_title=None):
 </div>'''
 
 
-def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=None):
+def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=None, one_box=False):
     """new="New mechanic": a label after the title says the whole block is new; its NEW rows
-    then drop the per-row chip (the header already says it) — other tags keep theirs."""
+    then drop the per-row chip (the header already says it) — other tags keep theirs. one_box: no row has a chip
+    (owner 2026-10-30, 7.37 Breakability: "везде убрать теги"), as subgroup(one_box=True)."""
     out = _close_ability_block()
     _State.current_hero = None
     _State.current_unit = None
@@ -641,6 +642,7 @@ def plain_header(name, dynamics=True, terrain_link=None, sublabel=False, new=Non
         _State.terrain_rows = 0
     _State.new_mech_header = _State.new_mech = bool(new)
     _State.new_mech_tag = _mech_tag(new)
+    _State.new_mech_one_box = bool(new) and one_box
     label = f' <span class="entity-new-type">{new}</span>' if new else ''
     return out + head + f'<div class="entity plain-entity"{eid}><div class="entity-name">{name}{label}</div>{link_html}</div>'
 
@@ -1928,6 +1930,8 @@ def li(text, badge="", extra="", force_tag=None, ability_row=False, also_dyn=Non
                                                                     open_text=_State.new_mech_tag == "rework",
                                                                     row_text=text_base)
         _abil_rows += _lifted_rows
+        if 'mech-captioned' in _lifted_rows:    # the row's text leads its table (owner 2026-10-30, 7.37)
+            text_base = ""
         for _n in _list_notes:              # "All three of these …": in one line with the row's text (owner 2026-10-28)
             _end = "" if text_base.rstrip().endswith((".", ":", "!", "?")) else "."
             text_base = f'{text_base.rstrip()}{_end} <span class="mech-row-note">{_n}</span>'

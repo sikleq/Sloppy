@@ -80,6 +80,111 @@ def test_a_reworked_facets_old_pane_is_its_text_of_the_patch_before():
     assert "TODO" not in card and "Uproar provides 10% increased area" in card
 
 
+def test_general_rows_about_roshan_go_in_his_block():
+    """Owner 2026-10-30: "Starting from his second death, Roshan now always drops Roshan's Banner" — in the Roshan
+    block; "Teleport time to Roshan's outposts" stays a map row."""
+    lines = ['W(section("General Updates"))', 'W(ul_open())',
+             'W(li("Starting from his second death, Roshan now always drops Roshan\'s Banner", t("NEW")))',
+             'W(li("Teleport time to Roshan\'s outposts decreased from 6s to 4s", b(6, 4)))', 'W(ul_close())', '',
+             '# ===== NEUTRAL CREEP UPDATES =====', 'W(section("Neutral Creep Updates"))']
+    out = g._postprocess_roshan_block(lines)
+    k = out.index(g.ROSHAN_HEADER)
+    assert "Roshan now always drops" in out[k + 2] and "outposts" not in "".join(out[k:])
+    assert out.index('# ===== NEUTRAL CREEP UPDATES =====') > k
+
+
+def test_a_general_subgroup_of_lists_is_a_mechanic_block():
+    lines = ['W(section("General Updates"))', 'W(subgroup("Teleport Classification"))', 'W(ul_open())',
+             'W(li("The following are considered a Teleport", t("MISC"), extra=inline_list("Twin Gates<br>Chen: Divine '
+             'Favor")))', 'W(ul_close())', 'W(subgroup("Breakability Update"))', 'W(ul_open())',
+             'W(li("The following are now Fully Disabled by Break", t("NERF"), extra=inline_list("Batrider: Smoldering '
+             'Resin")))', 'W(ul_close())']
+    out = g._postprocess_mechanic_lists(lines)
+    # no tags in a mechanic block (owner 2026-10-30: "везде убрать теги")
+    assert out[1] == 'W(plain_header("Teleport Classification", new="New mechanic", one_box=True))'
+    assert out[5] == 'W(plain_header("Breakability Update", new="Reworked mechanic", one_box=True))'
+
+
+def test_a_mechanic_blocks_plain_sentences_go_under_the_table_they_speak_of():
+    """'"Breakable: Yes" … partially or fully …' → the Fully table; "… partially disabled … alt+tooltip …" → the
+    Partially table; "The breakability rules … updated" → the first table. The rows themselves go."""
+    lines = ['W(section("General Updates"))', 'W(subgroup("Breakability Update"))', 'W(ul_open())',
+             'W(li("The following are now Fully Disabled by Break", t("NERF"), extra=inline_list("Batrider: Smoldering '
+             'Resin")))',
+             'W(li("The following are now Partially Disabled by Break", t("NERF"), extra=inline_list("Ember Spirit: '
+             'Immolation")))',
+             'W(li("The breakability rules have been updated", t("MISC")))',
+             'W(li("\\"Breakable: Yes\\" has been added to all abilities that are partially or fully disabled", t("MISC")))',
+             'W(li("All abilities that are partially disabled by Break have an alt+tooltip line", t("MISC")))',
+             'W(ul_close())']
+    out = g._postprocess_mechanic_lists(lines)
+    fully = next(ln for ln in out if "Fully Disabled" in ln)
+    part = next(ln for ln in out if "Partially Disabled" in ln)
+    assert "rules have been updated" in fully and "Breakable: Yes" in fully and "alt+tooltip" in part
+    # owner 2026-10-30: sentences about the game's tooltips are a "?" on the table's words, the rest a line of it
+    assert 'pop-note\\">The breakability rules' in fully and 'pop-tip\\">\\"Breakable: Yes' in fully
+    assert 'pop-tip\\">All abilities that are partially' in part
+    assert not any("t(\"MISC\")" in ln for ln in out)
+
+
+def test_a_hero_ability_list_is_a_table_led_by_its_row_with_items_on_a_line_of_their_own():
+    """Owner 2026-10-30: the row's words lead the table, items are not heroes, no "How" column (a "?" on the ability),
+    a long list in two pairs of columns."""
+    import patch.mech_abilities as ma
+    from patch.state import _State
+    keep = _State.current_patch_version
+    _State.current_patch_version = "7.37"
+    try:
+        html, notes = ma.hero_ability_rows("Town Portal Scroll<br>Chen: Divine Favor<br>Visage: Summon Familiars "
+                                           "recall (Faithful Followers)", row_text="The following are considered a "
+                                           "Teleport")
+        long_raw = "<br>".join(["Alchemist: Greevil's Greed", "Batrider: Smoldering Resin", "Bloodseeker: Thirst",
+                                "Bounty Hunter: Jinada", "Chaos Knight: Reins of Chaos", "Clockwerk: Armor Power",
+                                "Crystal Maiden: Cold Comfort", "Dark Seer: Heart of Battle", "Dark Willow: Pixie Dust",
+                                "Death Prophet: Witchcraft", "Enigma: Gravity Well", "Faceless Void: Distortion Field"])
+        long_html, _n = ma.hero_ability_rows(long_raw)
+        # one row per hero, his abilities side by side (owner 2026-10-30: "не дублируй героя")
+        oracle, _n = ma.hero_ability_rows("Oracle: Clairvoyant Curse<br>Oracle: Clairvoyant Cure")
+    finally:
+        _State.current_patch_version = keep
+    assert "The following are considered a Teleport:" in html and "mech-captioned" in html
+    assert 'mech-items-label">Items' in html and "Town Portal Scroll" in html
+    assert ">How<" not in html and "info-tip" in html                 # Visage's "recall (Faithful Followers)"
+    assert "mech-cols-hero4" in long_html
+    assert oracle.count('class="mech-hero"') == 1 and "Clairvoyant Curse" in oracle and "Clairvoyant Cure" in oracle
+
+
+def test_roshans_drops_link_to_their_changes_pages():
+    row = ('W(li("Starting from his third death Roshan now drops Refresher Shard and Cheese during daytime or '
+           'Aghanim\'s Blessing during night", t("REWORK")))')
+    out = g._link_items(row)
+    assert out.count("item_link(") == 3 and 'item_link("Aghanim\'s Blessing")' in out
+    from patch.item_links import item_page
+    assert item_page("Aghanim's Blessing") == "ultimate-scepter-2" and item_page("Refresher Shard") == "refresher-shard"
+
+
+@pytest.mark.parametrize("line, label", [
+    ("Chen: Divine Favor", "Chen: Divine Favor"),                     # Valve's 7.37 form "Hero: Ability"
+    ("Twin Gates", "Twin Gates"),                                     # a map object among items
+    ("Town Portal Scroll", "Town Portal Scroll"),
+    ("Batrider: Smoldering Resin", "Batrider: Smoldering Resin"),     # a 7.37 innate gone since: the patch's files
+    ("Dark Seer: Heart of Battle", "Dark Seer: Heart of Battle"),     # a facet's ability: the facet's icon
+    ("Rubick: Might and Magus", "Rubick: Might and Magus"),           # "and" inside a name
+    ("Beastmaster: Call of the Wild Hawk Dive Bomb", "Beastmaster: Call of the Wild Hawk"),
+    ("Lone Druid: Spirit Bear's Return", "Lone Druid: Spirit Bear's Return"),
+])
+def test_7_37_list_lines_get_an_icon(line, label):
+    import patch.mech_abilities as ma
+    from patch.state import _State
+    keep = _State.current_patch_version
+    _State.current_patch_version = "7.37"
+    try:
+        parsed = ma._parse_line(line)
+    finally:
+        _State.current_patch_version = keep
+    assert parsed and parsed[0] == label and parsed[1]
+
+
 def test_no_page_keeps_the_old_facet_placeholder():
     from pathlib import Path
     pages = Path(__file__).resolve().parents[1].glob("content/p*.py")

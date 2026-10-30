@@ -4468,6 +4468,41 @@ h4.subgroup {
 /* a list of abilities in columns: the sentence or the condition ("Always", "With Aghanim's Scepter") as the label,
    the icons centred after it (owner 2026-10-28) */
 .mech-abils.mech-cols-icons { grid-template-columns: fit-content(50%) minmax(0, 1fr); }
+/* Valve's "Hero: Ability (how)" lists (7.37 Breakability, Teleport Classification): the hero | the ability (icon or the
+   facet's coloured chip + its name) | how — many 7.37 innates have only the general innate icon (owner 2026-10-30) */
+.mech-abils.mech-cols-hero2 { grid-template-columns: fit-content(40%) minmax(0, 1fr); }
+/* a long list in two pairs of columns (owner 2026-10-30: "в 2 столбца можно, а то длинный список") */
+.mech-abils.mech-cols-hero4 { grid-template-columns: fit-content(25%) minmax(0, 1fr) fit-content(25%) minmax(0, 1fr); }
+.mech-cols-hero4 > .mech-abil-row:not(.mech-head) > .mech-cell:nth-child(2) { border-right: 2px solid var(--line-soft); }
+.mech-cols-hero > .mech-abil-row > .mech-cell { justify-content: flex-start; text-align: left; min-width: 0; }
+/* the row's own words lead the table; its items one line, then the heroes (owner 2026-10-30) */
+.mech-cols-hero > .mech-abil-row > .mech-table-lead { color: var(--text-main); }
+.mech-items-line { gap: 6px 14px; }
+.mech-abil-set { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
+.mech-items-label { color: var(--text-dim, #969289); font-size: 12px; margin-right: 2px; }
+.mech-item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+/* a facet's chip grows on hover with its name above, as an ability's (owner 2026-10-30) */
+.mech-abils .facet-chip { position: relative; transition: transform 0.12s ease; }
+.mech-abils .facet-chip:hover { z-index: 101; transform: scale(2.6);
+  box-shadow: 0 0 0 1px var(--muted-35), 0 4px 14px var(--shadow-55); }
+.mech-abils .facet-chip[data-tooltip]:hover::after { transform: translateX(-50%) scale(0.385); transform-origin: bottom center; }
+@media (prefers-reduced-motion: reduce) { .mech-abils .facet-chip { transition: none; } }
+.mech-hero { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.mech-hero > img { width: 32px; height: 18px; object-fit: cover; border-radius: 2px; }
+.mech-cols-hero .mech-abil-name { white-space: nowrap; }
+.mech-cols-hero .ability-chip, .mech-cols-hero .facet-chip { margin-right: 2px; flex: none; }
+.mech-cols-hero > .mech-abil-row > .mech-table-note { justify-content: flex-start; text-align: left; color: var(--text-dim, #969289); }
+/* a phone: one pair of columns, long names wrap inside their cell (7.37 "Fortune Favors the Bold" ran past it) — after
+   the rules above, which keep names on one line on a wide screen */
+@media (max-width: 700px) {
+  .mech-abils.mech-cols-hero2, .mech-abils.mech-cols-hero4 { grid-template-columns: fit-content(45%) minmax(0, 1fr); }
+  .mech-cols-hero4 > .mech-head > .mech-cell:nth-child(n+3) { display: none; }
+  .mech-cols-hero .mech-abil-name, .mech-cols-hero .mech-hero, .mech-cols-hero .mech-item {
+    white-space: normal; min-width: 0; overflow-wrap: anywhere; }
+  .mech-cols-hero .mech-abil-set, .mech-cols-hero .mech-item { min-width: 0; max-width: 100%; }
+  .mech-cols-hero .mech-hero > img { flex: none; width: 24px; height: 14px; }
+  .mech-cols-hero .mech-hero { overflow-wrap: normal; gap: 4px; }   /* a hero's name wraps at spaces only ("Bloodseeker") */
+}
 /* a list's closing note, in the row's own line and its colour (owner 2026-10-28: "не надо серым") */
 .mech-row-note { color: inherit; }
 /* cells of a table with columns: a list with its examples (7.38 Lifesteal sources), mech_table (Lifesteal rules) */
@@ -10411,6 +10446,9 @@ button.tf-kind[aria-pressed="false"] { opacity: 0.45; }
 
 /* ---- Hero / Item Changes pages (builders/entity_changes.py) ---- */
 .entity-link { color: inherit; text-decoration: none; }
+/* an item named in a row's text: a link to its Changes page (owner 2026-10-30, 7.37 Roshan's drops) */
+a.item-mention { color: var(--gold); text-decoration: underline dotted; text-underline-offset: 3px; }
+a.item-mention:hover { text-decoration-style: solid; }
 .entity-name .entity-link:hover { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 .entity-icon .entity-link { display: block; line-height: 0; }
 .entity-icon .entity-link:hover img { filter: brightness(1.15); }

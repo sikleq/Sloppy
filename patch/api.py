@@ -10,6 +10,7 @@ from .elements import (
     enchant_row, sub_ability, hl, bug_note
 )
 from .ability_group import ability_group
+from .item_links import item_link
 from .mech_abilities import mech_before_after, mech_pair, mech_table
 from .cards_ability_change import ability_change, new_ability, game_ability_desc, game_ability_pair
 from .cards_aghs import aghs_line, aghs_shard_line

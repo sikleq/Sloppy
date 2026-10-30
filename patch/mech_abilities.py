@@ -14,7 +14,7 @@ import os as _os
 import re
 
 from .images import ABIL_CDN, HERO_SLUG, ITEM_CDN, ITEM_SLUG, _LOCAL_ABIL_ICONS
-from .state import page_cache
+from .state import _State, page_cache
 
 _ITEM_ICON_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "icons", "items")
 
@@ -26,25 +26,36 @@ LIST_TIPS = page_cache(set())
 _SUB = "&nbsp;&nbsp;– "
 _CATEGORY_RE = re.compile(r"^(?:Items|Neutral Creeps|Heroes|Creeps|Units)(?:\s+—\s+|$)")
 _NOTE_ONLY_RE = re.compile(r'^<span class="pop-note">(.*)</span>$', re.S)
+_TIP_ONLY_RE = re.compile(r'^<span class="pop-tip">(.*)</span>$', re.S)     # hero_ability_rows: a "?" on the lead
 _TRAIL_NOTE_RE = re.compile(r'\s*<span class="pop-note">\(?(.*?)\)?</span>\s*$', re.S)
 _TRAIL_BRACKET_RE = re.compile(r"\s+\(([^()<>]+)\)\s*$")
 _TRAIL_ABILITY_RE = re.compile(r" ability$")
 # an ability's name: capitalised words ("Fortune's End", "Storm Hammer"); the sentence starts at the first lower-case one
 # ("Scream of Pain", "Echo of the Wild": a small "of" / "the" between capitalised words is still the name)
-_ABIL_RE = re.compile(r"((?:[A-Z][\w'\-]*)(?: (?:of |the |of the )?[A-Z][\w'\-]*)*)(?: (?=[a-z])|$)")
-_OWNER_END_RE = re.compile(r"'s |(?<=s)' ")             # "Oracle's Fortune's End", "Mars' Bulwark"
+_ABIL_RE = re.compile(r"((?:[A-Z][\w'\-!]*)(?: (?:of |the |of the |and )?[A-Z][\w'\-!]*)*)(?: (?=[a-z])|[.,]|$)")
+# "Oracle's Fortune's End", "Mars' Bulwark", and 7.37's lists "Chen: Divine Favor"
+_OWNER_END_RE = re.compile(r"'s |(?<=s)' |: ")
 
 
 def ability_chip(label, src):
-    """An ability's icon as a small square, its name on hover only (facet rows, mechanic lists)."""
+    """An ability's icon as a small square, its name on hover only (facet rows, mechanic lists). A facet ("facet:<colour>:
+    <icon>", from _icon_of_patch) is its coloured chip, as on every patch page (owner 2026-10-30: "фасеты … с цветами")."""
     label = _html.escape(label)
+    if src.startswith("facet:"):
+        from .badges import _FACET_COLOR_GRADIENT
+        _f, colour, icon = src.split(":", 2)
+        grad = _FACET_COLOR_GRADIENT.get(colour, _FACET_COLOR_GRADIENT["Gray0"])
+        return (f'<span class="facet-chip" style="background-image:{grad}" data-tooltip="{label}" role="img" '
+                f'aria-label="{label}"><img src="../icons/facets/{icon}.png" alt="" loading="lazy" width="16" '
+                f'height="16"></span>')
     return (f'<span class="ability-chip" data-tooltip="{label}" role="img" aria-label="{label}"><img src="{src}" '
             f'alt="" loading="lazy" width="19" height="19"></span>')
 
 
 _ENCHANT_RE = re.compile(r"^(?:Item bonus from )?(\w+) [Ee]nchantment$")   # "Audacious Enchantment"
 # a unit named like an ability: the icon of the ability that summons it (7.41 "Warlock's Golem with talent")
-_ICON_ALIASES = {("warlock", "Golem"): "warlock_rain_of_chaos"}
+_ICON_ALIASES = {("warlock", "Golem"): "warlock_rain_of_chaos",
+                 ("lone_druid", "Spirit Bear's Return"): "lone_druid_spirit_bear_return"}   # the game's name: "Return"
 # a map unit that is neither a hero nor a neutral creep: its abilities' prefix (7.41 "Tormentor's Reflect")
 _UNIT_PREFIXES = {"Tormentor": "miniboss"}
 
@@ -71,7 +82,15 @@ def rune_row_chip(text, prefix="../"):
     return ability_chip(f"{m.group('name')} Rune", f"{prefix}icons/runes/{key}.png") + rest[:1].upper() + rest[1:]
 
 
+# map objects a list may name among items (7.37 Teleport Classification "Twin Gates"): the Terrain page's own icon
+_MAP_OBJECT_ICONS = {"Twin Gates": "../icons/ui/gothic/tc_twingates.png"}
+
+
 def _item_icon(name):
+    if name in _MAP_OBJECT_ICONS:
+        return _MAP_OBJECT_ICONS[name]
+    if name == "Town Portal Scroll":
+        name = "tpscroll"
     m = _ENCHANT_RE.match(name)
     item = (f"enhancement_{m.group(1).lower()}" if m
             else ITEM_SLUG.get(name, name.lower().replace(" ", "_").replace("'", "")))
@@ -107,7 +126,9 @@ def _icon(owner, abil):
         if slug in _LOCAL_ABIL_ICONS:
             return f"{ABIL_CDN}{slug}.png"
         # an innate without an icon of its own gets the innate mark, as its ability header does
-        return INNATE_ICON_URL if (hero, abil) in INNATE_ABILITIES else None
+        if (hero, abil) in INNATE_ABILITIES:
+            return INNATE_ICON_URL
+        return _icon_of_patch(hero, abil)
     icon = _item_icon(owner)                         # an item's ability: the item's own icon
     if icon:
         return icon
@@ -115,6 +136,30 @@ def _icon(owner, abil):
     if prefix:
         slug = f"{prefix}_{abil.lower().replace(' ', '_')}"
         return f"{ABIL_CDN}{slug}.png" if slug in _LOCAL_ABIL_ICONS else None
+    return None
+
+
+def _icon_of_patch(hero, name):
+    """The icon of a hero's ability or facet by its name in the page's own patch — 7.37's lists name innates and
+    facets gone since (Smoldering Resin, Cold Comfort): the ability's art, the innate mark, or the facet's icon."""
+    from .ability_kv import hero_abilities, hero_facets
+    from .elements import INNATE_ICON_URL
+    version = _State.current_patch_version
+    if not version:
+        return None
+    own = hero_abilities(hero, version).get(name.lower())
+    if own:
+        slug, innate = own
+        if slug in _LOCAL_ABIL_ICONS:
+            return f"{ABIL_CDN}{slug}.png"
+        if innate:
+            return INNATE_ICON_URL
+    # a facet's ability without art (7.37 Heart of Battle, Phantasmagoria): the facet's icon, as its header shows
+    for fname, colour, icon in hero_facets(hero, version).values():
+        if fname.lower() == name.lower() and icon:
+            path = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "icons", "facets", f"{icon}.png")
+            if _os.path.exists(path):
+                return f"facet:{colour}:{icon}"            # drawn by ability_chip as the facet's coloured chip
     return None
 
 
@@ -137,17 +182,27 @@ def _parse_line(line):
     for end in _OWNER_END_RE.finditer(line):
         owner = line[:end.start()]
         m = _ABIL_RE.match(line, end.end())
-        icon = m and _icon(owner, m.group(1))
-        if icon:
-            return line[:m.end(1)], icon, _sentence(line[m.end():]), caveat
+        if not m:
+            continue
+        # the longest name with an icon: "Call of the Wild Hawk Dive Bomb" is Call of the Wild Hawk's Dive Bomb (7.37)
+        words = m.group(1).split(" ")
+        for n in range(len(words), 0, -1):
+            name = " ".join(words[:n])
+            icon = _icon(owner, name)
+            if icon:
+                cut = end.end() + len(name)
+                rest = line[cut:] if n < len(words) else line[m.end():]
+                return line[:cut], icon, _sentence(rest), caveat
     return None
 
 
 ALWAYS = "Always"
 
 
-def ability_list_rows(raw):
-    """The note's lines as rows of icons, or None when it is not a list of abilities that all have an icon."""
+def ability_list_rows(raw, least=2):
+    """The note's lines as rows of icons, or None when it is not a list of abilities that all have an icon. least: a
+    list the row introduces ("The following are no longer Disabled by Break: Lich: Death Charge", 7.37) is a table
+    even with one icon — as the lists around it."""
     groups, caveats, notes, kinds = {}, {}, [], set()
     for line in (x.strip() for x in raw.split("<br>")):
         if line.startswith(_SUB):
@@ -169,7 +224,7 @@ def ability_list_rows(raw):
             # more ability (owner 2026-10-28, 7.40 Bloodlust)
             caveats.setdefault(sentence, []).append(f"{label}: {caveat[:1].upper()}{caveat[1:]}")
         kinds.add("item" if icon.startswith(ITEM_CDN) else "ability")
-    if sum(len(v) for v in groups.values()) < 2:
+    if sum(len(v) for v in groups.values()) < least:
         return None
     from .elements import info_tip
     if list(groups) == [""]:                           # the names alone: one row of icons across, no columns
@@ -332,6 +387,101 @@ def mech_pair(main, side):
             '<!--/MECHTABLE-->')
 
 
+_HERO_LINE_RE = re.compile(r"^([A-Z][\w'.\- ]+?): (\S.*)$")
+TWO_PAIRS_FROM = 12           # a list this long reads in two pairs of columns (hero | ability, hero | ability)
+
+
+def hero_ability_rows(raw, least=1, row_text=""):
+    """Valve's 7.37 lists "Hero: Ability (how)" as a table (owner 2026-10-30): the row's own text is its first line
+    ("The following are considered a Teleport:" — "встроить внутри таблицы … как начало предложения"); the items and
+    map objects of the list ("Town Portal Scroll", "Twin Gates") one line of their own — they are not heroes; then the
+    hero (portrait + name) | the ability (its icon, or the facet's coloured chip, + its name, a line's "how" behind a
+    "?" on it — no column of its own); a long list in two pairs of columns; the block's sentences about the list as its
+    last lines. None when the list is not in that form or a line has no icon."""
+    from .elements import info_tip
+    from .images import HERO_CDN, HERO_SLUG
+    pairs, items, notes, tips = [], [], [], []
+    for line in (x.strip() for x in raw.split("<br>")):
+        if line.startswith(_SUB):
+            line = line[len(_SUB):]
+        if not line:
+            continue
+        m = _NOTE_ONLY_RE.match(line)
+        if m:
+            notes.append(m.group(1))
+            continue
+        m = _TIP_ONLY_RE.match(line)          # a sentence for the "?" on the leading words (owner 2026-10-30)
+        if m:
+            tips.append(m.group(1))
+            continue
+        h = _HERO_LINE_RE.match(line)
+        if h and h.group(1) in HERO_SLUG:
+            parsed = _parse_line(line)
+            if parsed is None:
+                return None
+            label, icon, sentence, caveat = parsed
+            name = label[len(h.group(1)) + 2:]
+            how = " ".join(x for x in (sentence.strip(" .,"), caveat) if x)
+            tip = f" {info_tip(how[:1].upper() + how[1:])}" if how else ""
+            hero = (f'<span class="mech-hero"><img src="{HERO_CDN}{HERO_SLUG[h.group(1)]}.png" alt="" loading="lazy" '
+                    f'width="32" height="18">{_html.escape(h.group(1))}</span>')
+            ability = (f'<span class="mech-item">{ability_chip(name, icon)}'
+                       f'<span class="mech-abil-name">{_html.escape(name)}</span>{tip}</span>')
+            # one row per hero, his abilities side by side (owner 2026-10-30: "не дублируй героя")
+            same = next((k for k, (hr, _a) in enumerate(pairs) if hr == hero), None)
+            if same is None:
+                pairs.append((hero, ability))
+            else:
+                pairs[same] = (hero, pairs[same][1] + ability)
+        else:
+            parsed = _parse_line(line) if h else None      # an item's ability: "Gleipnir: Eternal Chains (…)"
+            if parsed:
+                name, icon, sentence, caveat = parsed
+                caveat = " ".join(x for x in (sentence.strip(" .,"), caveat) if x)
+            else:
+                t = _TRAIL_BRACKET_RE.search(line)
+                caveat, name = (t.group(1), line[:t.start()].strip()) if t else ("", line.strip())
+                icon = _item_icon(name)
+            if not icon:
+                return None
+            tip = f" {info_tip(caveat[:1].upper() + caveat[1:])}" if caveat else ""
+            items.append(f'<span class="mech-item">{ability_chip(name, icon)}'
+                         f'<span class="mech-abil-name">{_html.escape(name)}</span>{tip}</span>')
+    # items alone: a table only in a mechanic block of one box, where every list of the block is one (7.37 "Neutral
+    # item active effects …: Book of Shadows, Force Boots"); elsewhere such lists keep their own form (7.41)
+    if not (pairs or (items and _State.new_mech_one_box)) or len(pairs) + len(items) < least:
+        return None
+    two = len(pairs) >= TWO_PAIRS_FROM
+    width = 4 if two else 2
+    line = lambda inner, cls="": (f'<span class="mech-abil-row"><span class="mech-cell mech-abil-line {cls}">'
+                                  f'{inner}</span></span>')
+    html = ""
+    if row_text:
+        text = row_text.rstrip()
+        tip = f" {info_tip(*tips)}" if tips else ""
+        html += line((text if text.endswith(":") else f"{text}:") + tip, "mech-table-lead")
+    if items:
+        html += line(f'<span class="mech-items-label">Items</span>{"".join(items)}', "mech-items-line")
+    cells = lambda xs: "".join(f'<span class="mech-cell">{x}</span>' for x in xs)
+    pairs = [(hero, f'<span class="mech-abil-set">{abilities}</span>') for hero, abilities in pairs]
+    if pairs:
+        html += f'<span class="mech-abil-row mech-head">{cells(["Hero", "Ability"] * (width // 2))}</span>'
+    if two:
+        half = (len(pairs) + 1) // 2
+        left, right = pairs[:half], pairs[half:] + [("", "")] * (half - len(pairs[half:]))
+        for a, b in zip(left, right):
+            html += f'<span class="mech-abil-row">{cells([*a, *b])}</span>'
+    else:
+        for a in pairs:
+            html += f'<span class="mech-abil-row">{cells(a)}</span>'
+    # the block's sentences about this list: lines of the table, across it (owner 2026-10-30, 7.37 Breakability)
+    for note in notes:
+        html += line(note, "mech-table-note")
+    cols = "mech-cols-hero4" if two else "mech-cols-hero2"
+    lead = " mech-captioned" if row_text else ""
+    return f'<span class="mech-abils mech-cols-hero {cols}{lead}">{html}</span>', []
+
+
 def lift_ability_lists(tips, open_text=False, row_text=""):
     """A mechanic row's trailing "?" notes: (the ones left, the tables that replace the others, the lists' closing
     notes — they go into the row's own text, "in one line with it" (owner 2026-10-28, 7.40 "All three of these …")).
@@ -341,7 +491,8 @@ def lift_ability_lists(tips, open_text=False, row_text=""):
     left, rows, notes = [], "", []
     for tip in tips:
         raw = TIP_RAW.get(tip)
-        found = raw is not None and (ability_list_rows(raw)
+        found = raw is not None and (hero_ability_rows(raw, row_text=row_text)
+                                     or ability_list_rows(raw, least=1 if tip in LIST_TIPS else 2)
                                      or (open_text and tip in LIST_TIPS and text_list_rows(raw, row_text)))
         if found:
             rows += found[0]

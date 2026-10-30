@@ -4435,6 +4435,8 @@ def generate(version):
     out = _postprocess_new_facet_rows(out)             # a "New Facet" row -> the new facet card (7.37 Medusa)
     out = _merge_adjacent_lists(out)                   # ul_close + ul_open back to back -> one list (7.37 Chronosphere)
     out = _postprocess_innate_level0(out, version)     # a 7.36 innate's level-0 value out of the comparison (7.37)
+    out = _postprocess_roshan_block(out)               # General rows about Roshan himself -> his block (owner 2026-10-30)
+    out = _postprocess_mechanic_lists(out)             # General subgroups of lists -> mechanic blocks, tables (10-30)
     out = _postprocess_removed_facets(out, version)   # "Removed X Facets" -> facet blocks (owner 2026-10-29)
     out = _postprocess_same_change_abilities(out)     # one block, stacked icons (owner 2026-10-30)
 
@@ -4651,6 +4653,120 @@ def _postprocess_innate_level0(lines, version):
             ln = rx.sub(cut, ln, count=1)
         out.append(ln)
     return out
+
+
+# a General row about Roshan himself: "Roshan now …", "… death, Roshan now drops …", "Roshan's HP / armor / Base …";
+# not his outposts, pit or banner item (7.37 "Teleport time to Roshan's outposts" stays a map row)
+_ROSHAN_ROW_RE = re.compile(r"""^\s*W\(li\(["'](?:[^"']*?\bRoshan(?:'s)? (?:now|no longer|will|is|has|gains|drops|"""
+                            r"""HP|health|armor|base|attack|damage|magic|respawn|bounty|ability)\b)""", re.I)
+_SECTION_RE = re.compile(r'^\s*W\(section\("([^"]+)"')
+ROSHAN_HEADER = 'W(unit_header("Roshan", "../icons/units/npc_dota_roshan.png", general=False, track=True))'
+
+
+def _link_items(row):
+    """The items a row's text names → links to their Changes pages (owner 2026-10-30, Roshan's drops: "кликабельные
+    ссылки, ведущие на свои изменения"): '"… drops " + item_link("Refresher Shard") + " and …"'. Longest name first
+    (Block of Cheese before Cheese); a row not in plain double quotes stays."""
+    from patch.item_links import _roster
+    m = re.match(r'^(\s*W\(li\()"((?:[^"\\]|\\.)*)"(.*)$', row)
+    if not m:
+        return row
+    text = m.group(2)
+    names = sorted((n for n in _roster() if len(n) > 3 and n in text), key=len, reverse=True)
+    if not names:
+        return row
+    rx = re.compile(r"(?<![\w'])(" + "|".join(re.escape(n) for n in names) + r")(?![\w])")
+    linked = rx.sub(lambda mm: f'" + item_link("{mm.group(1)}") + "', text)
+    return f'{m.group(1)}"{linked}"{m.group(3)}'.replace('"" + ', "").replace(' + ""', "")
+
+
+def _postprocess_roshan_block(lines):
+    """General Updates rows about Roshan himself → a Roshan block at the end of the section, as 7.38–7.41's pages
+    (owner 2026-10-30, 7.37: "Starting from his second death, Roshan now always drops Roshan's Banner" — "надо в
+    блок к Roshan определять")."""
+    start = next((k for k, ln in enumerate(lines) if _SECTION_RE.match(ln) and "General" in ln), None)
+    if start is None or any(ROSHAN_HEADER in ln for ln in lines):
+        return lines
+    end = next((k for k in range(start + 1, len(lines)) if _SECTION_RE.match(lines[k])), len(lines))
+    while end > start + 1 and (not lines[end - 1].strip() or lines[end - 1].lstrip().startswith("#")):
+        end -= 1                                        # the next section's "# =====" comment stays with it
+    body = lines[start + 1:end]
+    rows = [ln for ln in body if _ROSHAN_ROW_RE.match(ln)]
+    if not rows:
+        return lines
+    body = _merge_adjacent_lists([ln for ln in body if ln not in rows])
+    # a list left empty goes
+    body = [ln for k, ln in enumerate(body) if not (ln.strip() == "W(ul_open())" and k + 1 < len(body)
+                                                     and body[k + 1].strip() == "W(ul_close())")
+            and not (ln.strip() == "W(ul_close())" and k > 0 and body[k - 1].strip() == "W(ul_open())")]
+    while body and not body[-1].strip():
+        body.pop()
+    ind = rows[0][:len(rows[0]) - len(rows[0].lstrip())]
+    block = [f"{ind}{ROSHAN_HEADER}", f"{ind}W(ul_open())", *map(_link_items, rows), f"{ind}W(ul_close())", ""]
+    return lines[:start + 1] + body + block + lines[end:]
+
+
+_SUBGROUP_LINE_RE = re.compile(r'^(\s*)W\(subgroup\("([^"]+)"\)\)\s*$')
+_NEW_TERM_RE = re.compile(r'\bClassification\b|\bare considered\b', re.I)
+
+
+def _postprocess_mechanic_lists(lines):
+    """A General subgroup whose rows introduce lists of abilities / items (7.37 Teleport Classification, Breakability
+    Update, Ability blocking and reflection) → a mechanic block, plain_header(title, new=…): its lists open as tables
+    of icons under the rows, as 7.38 Lifesteal (owner 2026-10-30: "сделать в виде таблиц, мы умеем; научить
+    генератор"). A classification of things that had none is a "New mechanic", the rest "Reworked mechanic"."""
+    start = next((k for k, ln in enumerate(lines) if _SECTION_RE.match(ln) and "General" in ln), None)
+    if start is None:
+        return lines
+    end = next((k for k in range(start + 1, len(lines)) if _SECTION_RE.match(lines[k])), len(lines))
+    out = list(lines)
+    for k in range(start + 1, end):
+        m = _SUBGROUP_LINE_RE.match(out[k] or "")
+        if not m:
+            continue
+        stop = next((j for j in range(k + 1, end)
+                     if out[j] and (_SUBGROUP_LINE_RE.match(out[j]) or ROSHAN_HEADER in out[j])), end)
+        rows = [ln for ln in out[k + 1:stop] if ln and ln.lstrip().startswith("W(li(")]
+        if not any("extra=inline_list(" in r for r in rows):
+            continue
+        kind = "New mechanic" if _NEW_TERM_RE.search(m.group(2)) or any(_NEW_TERM_RE.search(r) for r in rows) \
+            else "Reworked mechanic"
+        # no tags in the block (owner 2026-10-30: "везде убрать теги")
+        out[k] = f'{m.group(1)}W(plain_header("{m.group(2)}", new="{kind}", one_box=True))'
+        _fold_sentences_into_tables(out, k + 1, stop)
+    return [ln for ln in out if ln is not None]
+
+
+_INLINE_LIST_END_RE = re.compile(r'(extra=inline_list\("(?:[^"\\]|\\.)*)("\))')
+
+
+def _fold_sentences_into_tables(out, lo, hi):
+    """A mechanic block's MISC rows without a list of their own are sentences of its tables (owner 2026-10-30,
+    7.37 Breakability: "The breakability rules … have been updated", '"Breakable: Yes" has been added …', "… have an
+    alt+tooltip line …" — "гармонично в таблицу встроить предложениями"): a line under the table of the row they
+    speak of — "partially" → the Partially row, "fully" → the Fully row, else the block's first list. The rows go."""
+    lists = [j for j in range(lo, hi) if out[j] and "extra=inline_list(" in out[j]]
+    if not lists:
+        return
+    for j in range(lo, hi):
+        ln = out[j]
+        if not (ln and ln.lstrip().startswith("W(li(") and 't("MISC")' in ln and "extra=" not in ln):
+            continue
+        t = _LI_TEXT_RE.match(ln)
+        if not t:
+            continue
+        text = t.group(1)
+        low = text.lower()
+        pick = lambda word: next((x for x in lists if word in out[x].lower().split("extra=")[0]), None)
+        # owner 2026-10-30: the general sentence ("rules … have been updated") goes with the Fully table, not the first
+        target = (pick("partially") if "partially" in low and "fully" not in low else None) or \
+                 pick("fully") or lists[0]
+        # a sentence about the game's tooltips ('"Breakable: Yes" has been added …', "… an alt+tooltip line …") is a
+        # "?" on the table's leading words; any other sentence a line of the table
+        kind = "pop-tip" if "tooltip" in low or "has been added" in low else "pop-note"
+        out[target] = _INLINE_LIST_END_RE.sub(
+            lambda mm: f'{mm.group(1)}<br><span class=\\"{kind}\\">{text}</span>{mm.group(2)}', out[target], count=1)
+        out[j] = None
 
 
 def _merge_adjacent_lists(lines):

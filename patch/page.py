@@ -408,7 +408,10 @@ def _new_mech_rows(html):
         # a row with its table (7.38 Lifesteal, 7.40 Cyclone cases) is a box of its own, apart from the rows around
         # it (owner 2026-10-28: "в отдельном блоке, с отступом от предыдущего") — unless the block is one box
         # (subgroup(one_box=True): 7.41 Reflected Damage, its sources' table under the last line)
-        tabled = set() if one_box else {i for i in box_idx if 'class="mech-abils' in items[i].group(0)}
+        # … a table its row's words lead (7.37 Breakability, mech-captioned) is a box of its own even then: 10px apart,
+        # as the tables of 7.38–7.41 (owner 2026-10-30: "посмотри как в других патчах похожие категории строятся")
+        tabled = ({i for i in box_idx if 'mech-captioned' in items[i].group(0)} if one_box
+                  else {i for i in box_idx if 'class="mech-abils' in items[i].group(0)})
         for n, i in enumerate(box_idx):
             first = n == 0 or i in tabled or box_idx[n - 1] in tabled
             end = n == len(box_idx) - 1 or i in tabled or box_idx[n + 1] in tabled
@@ -421,7 +424,7 @@ def _new_mech_rows(html):
             rest.append(body[last:it.start()])
             last = it.end()
         rest.append(body[last:])
-        if one_box and len(box) > 1:
+        if one_box and len(box) > 1 and not tabled:      # led tables stay boxes of their own (7.37)
             box = [_one_paragraph(box)]
         return '<ul class="changes">' + "".join(box) + "".join(rest) + '</ul>'
     return _NEWMECH_UL_RE.sub(fix, html)
