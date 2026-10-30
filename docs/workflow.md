@@ -230,6 +230,22 @@ Review checklist for the scaffold (auto-detector is right ~80% of the time):
 - Formula rows — `bf()` / `li_formula()` lambdas.
 - New hero / item / ability slugs (see Step 5).
 
+**Check the rows against the game files** (2026-10-30, owner: "научить генератор подобные предложения проверять и
+сравнивать с другими версиями" — a report first, no page edits):
+
+```
+python tools/kv_review.py 7.42
+```
+
+Needs the site built and the normalized JSON. Three parts: (1) Valve's "from" the game did not have, not yet marked
+wrong-word; (2) every row in words (no "from … to") with what changed in its ability's files — the facts for its
+"?", and **проверить тег** where a row tagged NEW / BUFF / MISC / QoL sits over a new reduction / penalty key
+(7.37d Leech Seed "Now heals creeps for 50% effectiveness" = a new `creep_heal_reduction_pct` 50, a cut); (3) changes
+in the files of the page's abilities no row states — that hero's hidden changes. It knows a value moved inside the
+file, per tick vs per second, a facet's "+x" on the base, talents inside the ability, numbers written in a row's
+text, a new hero's abilities. The meaning (nerf or new) stays with a person. Hidden findings are private: print the
+report, do not commit it. Hero abilities only for now (not items). Tests `tests/test_kv_review.py`.
+
 ## Step 5 — Register new entities and verify icons
 
 New hero or item with a slug that differs from its display name — add the
