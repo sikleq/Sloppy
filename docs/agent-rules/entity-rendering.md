@@ -47,13 +47,20 @@ W(ul_close())
 
 ## Одно изменение у нескольких способностей — `ability_group` (2026-10-30)
 
-Владелец (7.37b Quas / Wex / Exort / Invoke, «Can now be cast during channeling…»): подряд идущие блоки способностей с
-**одинаковыми строками** — один блок. Иконки внахлёст слева направо (шаг 20px, последняя целиком сверху), заголовок —
-имена через запятую, имя каждой — при наведении на её иконку. Генератор `_postprocess_same_change_abilities`
-(врождённые и блоки не из одного списка строк не склеивает), элемент `patch/ability_group.py`, CSS
-`.has-icon-stack`. Тест `tests/test_ability_group.py`. Генератор находит такие же пары и на других патчах (7.37d
-Omniknight мана, 7.37e/7.40 Demonic Purge + Cleanse, 7.38 Jakiro, Morphling, Skywrath, 7.39 Morphling, 7.41 Invoker
-орбы и Jakiro) — страницы этих патчей не менялись, пока владелец не скажет.
+Владелец (7.37b Quas / Wex / Exort / Invoke, «Can now be cast during channeling…»): подряд идущие блоки **смежных**
+способностей с **одинаковыми строками** — один блок. Смежные — части одной механики (`SIBLING_ABILITIES` в генераторе):
+орбы Invoker и Invoke, два Attribute Shift Morphling, Liquid Fire / Frost Jakiro, Demonic Purge / Cleanse Shadow Demon.
+Разные способности героя с одинаковой строкой случайно (Omniknight Purification + Repel мана, Skywrath Ancient Seal +
+Mystic Flare) — отдельными блоками (владелец 10-30). Если Valve потом изменит Invoker/Morphling так, что орбы станут
+разными, — убрать их из списка.
+
+Вид: иконки в обычном квадрате 48px, чтобы тег и текст стояли там же, где у всех блоков (владелец: «чтобы тег и текст
+не уезжал вправо»): 2 — по диагонали внахлёст (34px), 3–4 — сеткой 2×2 (23px). При наведении иконка растёт ×2 и над
+ней имя (`data-tooltip`, как чипы способностей). Заголовок — имена через запятую. Подсказка скрыта через
+`display:none`, не `visibility` (скрытый блок у края расширял страницу). Генератор `_postprocess_same_change_abilities`
+(блок без слага `ability("Quas")` узнаёт по имени; старую пометку «belongs to» выбрасывает), элемент
+`patch/ability_group.py`, CSS `.has-icon-stack` / `.stack-icon`. Применено: 7.37b, 7.37e, 7.38, 7.39, 7.40, 7.41.
+Тест `tests/test_ability_group.py`.
 
 ## Facet li() строки — префикс с названием способности
 

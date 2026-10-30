@@ -2052,12 +2052,7 @@ def build():
         "Ice Path: Path Duration increased from 3/3.5/4/4.5s to 6s" + " " + b([3, 3.5, 4, 4.5], 6),
         "Ice Path: Upon expiration, Ice Path detonates, dealing an additional 75/125/175/225 damage and stunning enemies for 0.5s a second time",
     ]))
-    W(ability("Liquid Fire", slug="jakiro_liquid_fire"))
-    W(ul_open())
-    # [patchnotes: belongs to jakiro_liquid_ice]
-    W(li("Aghanim's Shard reworked: Makes Liquid Fire and Liquid Frost abilities not share cooldowns", t("REWORK")))
-    W(ul_close())
-    W(ability("Liquid Frost", slug="jakiro_liquid_ice"))
+    W(ability_group(("Liquid Fire", "jakiro_liquid_fire"), ("Liquid Frost", "jakiro_liquid_ice")))
     W(ul_open())
     W(li("Aghanim's Shard reworked: Makes Liquid Fire and Liquid Frost abilities not share cooldowns", t("REWORK")))
     W(ul_close())
@@ -2654,12 +2649,7 @@ def build():
     W(li("Merged both abilities into one", t("REWORK")))
     W(li("No longer stuns enemies by default", t("DEL")))
     W(ul_close())
-    W(ability("Attribute Shift (Agility Gain)", slug="morphling_morph_agi"))
-    W(ul_open())
-    # [patchnotes: belongs to morphling_morph_str]
-    W(li("Mana Cost rescaled from 5/10/15/20 to 10", b([5, 10, 15, 20], 10, l=True)))
-    W(ul_close())
-    W(ability("Attribute Shift (Strength Gain)", slug="morphling_morph_str"))
+    W(ability_group(("Attribute Shift (Agility Gain)", "morphling_morph_agi"), ("Attribute Shift (Strength Gain)", "morphling_morph_str")))
     W(ul_open())
     W(li("Mana Cost rescaled from 5/10/15/20 to 10", b([5, 10, 15, 20], 10, l=True)))
     W(ul_close())

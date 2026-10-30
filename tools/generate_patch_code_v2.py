@@ -1141,23 +1141,45 @@ _ABOUT_ALL_RE = re.compile(r'^(?:All|Both|Each) (?:\w+ )?of (?:these|them)\b', r
 _FOLD_INTO_PREV_RE = re.compile(r'^(?:[^:]{2,40}:\s+)?Damage to (?:the )?secondary target is equal to\b', re.I)
 
 
-_PLAIN_ABILITY_RE = re.compile(r'^W\(ability\("([^"]+)", slug="([^"]+)"\)\)$')
+_PLAIN_ABILITY_RE = re.compile(r'^W\(ability\("([^"]+)"(?:, slug="([^"]+)")?\)\)$')
+_STALE_NOTE_RE = re.compile(r'^# \[patchnotes: belongs to ')      # a pre-2026-10-29 marker: the same text, two abilities
+# Sibling abilities — parts of one mechanic — that may share a block (owner 2026-10-30): Invoker's orbs and Invoke,
+# Morphling's two Attribute Shifts, Jakiro's Liquid Fire / Frost, Shadow Demon's Demonic Purge / Cleanse. Different
+# abilities of a hero with the same row by chance (Omniknight's mana, Skywrath's Scepter range) stay apart.
+# slug -> name: a page may name the ability without its slug (7.41 `ability("Quas")`).
+SIBLING_ABILITIES = (
+    {"invoker_quas": "Quas", "invoker_wex": "Wex", "invoker_exort": "Exort", "invoker_invoke": "Invoke"},
+    {"morphling_morph_agi": "Attribute Shift (Agility Gain)", "morphling_morph_str": "Attribute Shift (Strength Gain)"},
+    {"jakiro_liquid_fire": "Liquid Fire", "jakiro_liquid_ice": "Liquid Frost"},
+    {"shadow_demon_demonic_purge": "Demonic Purge", "shadow_demon_demonic_cleanse": "Demonic Cleanse"},
+)
+_SIBLING_SLUG_OF = {name: slug for family in SIBLING_ABILITIES for slug, name in family.items()}
+
+
+def _siblings(a, b):
+    return any(a in family and b in family for family in SIBLING_ABILITIES)
 
 
 def _postprocess_same_change_abilities(lines):
-    """Consecutive ability blocks whose rows are the very same → one ability_group block with their icons stacked
-    (owner 2026-10-30, 7.37b Quas / Wex / Exort / Invoke "Can now be cast during channeling …"). Innates and blocks
-    with anything but one ul of rows are left alone."""
+    """Consecutive blocks of sibling abilities whose rows are the very same → one ability_group block with their icons
+    stacked (owner 2026-10-30, 7.37b Quas / Wex / Exort / Invoke "Can now be cast during channeling …"). Innates,
+    abilities that are not SIBLING_ABILITIES and blocks with anything but one ul of rows are left alone; a stale
+    "belongs to" marker inside a block goes."""
     def block_at(i):
         m = _PLAIN_ABILITY_RE.match(lines[i].strip()) if i < len(lines) else None
         if not m or i + 1 >= len(lines) or lines[i + 1].strip() != 'W(ul_open())':
             return None
-        j = i + 2
-        while j < len(lines) and lines[j].strip().startswith('W(li('):
-            j += 1
-        if j == i + 2 or j >= len(lines) or lines[j].strip() != 'W(ul_close())':
+        slug = m.group(2) or _SIBLING_SLUG_OF.get(m.group(1))
+        if not slug:
             return None
-        return (m.group(1), m.group(2)), [ln.strip() for ln in lines[i + 2:j]], j + 1
+        j, rows = i + 2, []
+        while j < len(lines) and (lines[j].strip().startswith('W(li(') or _STALE_NOTE_RE.match(lines[j].strip())):
+            if lines[j].strip().startswith('W(li('):
+                rows.append(lines[j])
+            j += 1
+        if not rows or j >= len(lines) or lines[j].strip() != 'W(ul_close())':
+            return None
+        return (m.group(1), slug), rows, j + 1
     out, i = [], 0
     while i < len(lines):
         first = block_at(i)
@@ -1167,7 +1189,7 @@ def _postprocess_same_change_abilities(lines):
             continue
         group, rows, end = [first[0]], first[1], first[2]
         nxt = block_at(end)
-        while nxt and nxt[1] == rows:
+        while nxt and [r.strip() for r in nxt[1]] == [r.strip() for r in rows] and _siblings(group[0][1], nxt[0][1]):
             group.append(nxt[0])
             end = nxt[2]
             nxt = block_at(end)
@@ -1176,7 +1198,7 @@ def _postprocess_same_change_abilities(lines):
         else:
             ind = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
             pairs = ", ".join(f'("{t}", "{s}")' for t, s in group)
-            out += [f'{ind}W(ability_group({pairs}))', lines[i + 1], *lines[i + 2:i + 2 + len(rows)], lines[i + 2 + len(rows)]]
+            out += [f'{ind}W(ability_group({pairs}))', lines[i + 1], *rows, f'{ind}W(ul_close())']
         i = end
     return out
 
