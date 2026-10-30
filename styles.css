@@ -4489,6 +4489,7 @@ h4.subgroup {
 .mech-hero { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .mech-hero > img { width: 32px; height: 18px; object-fit: cover; border-radius: 2px; }
 .mech-cols-hero .mech-abil-name { white-space: nowrap; }
+.mech-none { color: var(--text-dim); }
 .mech-cols-hero .ability-chip, .mech-cols-hero .facet-chip { margin-right: 2px; flex: none; }
 .mech-cols-hero > .mech-abil-row > .mech-table-note { justify-content: flex-start; text-align: left; color: var(--text-dim, #969289); }
 /* a phone: one pair of columns, long names wrap inside their cell (7.37 "Fortune Favors the Bold" ran past it) — after

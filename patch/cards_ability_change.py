@@ -38,9 +38,23 @@ def game_ability_desc(slug, version=None, note=None):
     text = ability_text(slug, version)
     if not text:
         raise RuntimeError(f"{slug} ({version}): no description in the game files — teach patch/aghs_text.ability_text")
-    line = _html.escape(_aghs_inline(text, loose=False), quote=False)
+    paras = _named_parts(_html.escape(_aghs_inline(text, loose=False), quote=False))
+    paras[-1] += " " + inline_note(note) if note else ""
     shares = _shares_level(slug, version)
-    return ([f"Shares level with {shares}."] if shares else []) + [line + (" " + inline_note(note) if note else "")]
+    return ([f"Shares level with {shares}."] if shares else []) + paras
+
+
+# "… when Brewed Up. Earth Brawler - Grants … Storm Brawler - Grants …": the game's tooltip puts each named part on a
+# line of its own (Drunken Brawler's stances, coloured names) — a paragraph each, the name bold (owner 2026-10-30:
+# "раздели на абзацы, тут слишком сплошной текст")
+_NAMED_PART_RE = re.compile(r"(?<=[.!?]) (?=(?:[A-Z][\w']*\s){0,3}[A-Z][\w']* - )")
+
+
+def _named_parts(html):
+    parts = _NAMED_PART_RE.split(html)
+    if len(parts) < 3:                          # one "Name - …" is a sentence, not a list of parts
+        return [html]
+    return [parts[0]] + [re.sub(r"^((?:[A-Z][\w']*\s){0,3}[A-Z][\w']*) - ", r"<b>\1</b> — ", p) for p in parts[1:]]
 
 
 def game_ability_pair(slug, version=None):
@@ -56,7 +70,7 @@ def game_ability_pair(slug, version=None):
         raise RuntimeError(f"{slug} ({version}): no {prev if not old_t else version} description — teach "
                            f"patch/aghs_text.ability_text")
     old_html, new_html = _rework_diff_html(_aghs_inline(old_t, loose=False), _aghs_inline(new_t, loose=False))
-    side = lambda v, html: ([f"Shares level with {s}."] if (s := _shares_level(slug, v)) else []) + [html]
+    side = lambda v, html: ([f"Shares level with {s}."] if (s := _shares_level(slug, v)) else []) + _named_parts(html)
     return side(prev, old_html), side(version, new_html)
 
 

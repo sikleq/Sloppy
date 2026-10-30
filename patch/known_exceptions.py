@@ -132,6 +132,7 @@ KNOWN_SYNTHETIC_SUBBLOCKS = {
     # Brewmaster Drunken Brawler per-element stance bonus blocks
     # (parent: brewmaster_drunken_brawler).
     "brewmaster_drunken_brawler_earth",
+    "brewmaster_drunken_brawler_storm",       # 7.37–7.39 had four stances
     "brewmaster_drunken_brawler_fire",
     "brewmaster_drunken_brawler_void",
 }

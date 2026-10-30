@@ -62,9 +62,10 @@ def build():
     W(ul_open())
     W(li("Aghanim's Shard Max HP Regen per second increased from 2% to 2.5%", b(2, 2.5)))
     W(ul_close())
-    W(ability("Drunken Brawler"))
+    W(ability("Drunken Brawler", slug="brewmaster_drunken_brawler"))
+    W(ability("Earth Brawler", slug="brewmaster_drunken_brawler_earth"))
     W(ul_open())
-    W(li("Earth Brawler Armor increased from 2/4/6/8 to 3/5/7/9", b([2, 4, 6, 8], [3, 5, 7, 9])))
+    W(li("Armor increased from 2/4/6/8 to 3/5/7/9", b([2, 4, 6, 8], [3, 5, 7, 9])))
     W(ul_close())
 
     # Broodmother

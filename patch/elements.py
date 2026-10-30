@@ -1255,7 +1255,8 @@ def ul_close():
     return '</ul>' + cards + _aghs_parts_cards()
 
 
-_TALENT_PREFIX_RE = re.compile(r'^(Level \d+ Talent) (?!:)')
+# "Level 25 Talent is +4s Burning Spears Duration instead of +6s" → "Level 25 Talent: +4s …", not "Talent: is +4s"
+_TALENT_PREFIX_RE = re.compile(r'^(Level \d+ Talent) (?!:)(?:is )?')
 _TALENT_LEVEL_RE = re.compile(r'^\s*Level (\d+)(?: Talent)?\s*:', re.I)
 
 

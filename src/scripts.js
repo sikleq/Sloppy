@@ -696,6 +696,7 @@
       parent: 'brewmaster_drunken_brawler',
       children: [
         'brewmaster_drunken_brawler_earth',
+        'brewmaster_drunken_brawler_storm',
         'brewmaster_drunken_brawler_fire',
         'brewmaster_drunken_brawler_void',
       ],

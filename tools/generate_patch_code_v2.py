@@ -577,6 +577,7 @@ TAG_OVERRIDES = {
     "now shares cooldown":          "MISC",
     "now has a shared cooldown":    "MISC",
     "now requires aghanim's":       "NERF",    # a capability now gated behind Aghs (checked before "now requires")
+    "now requires a single target tree": "NERF",  # 7.37 Nature's Call (Ironwood Treant): a new cast restriction
     "now requires":                 "REWORK",  # "Now requires X instead of Y"
     "instead of only higher":       "BUFF",    # scope widened ("…equal or higher level, instead of only higher"; audit 2026-10-03)
     # 7.37e proofread (2026-10-28): the effect decides, not the phrase template
@@ -619,7 +620,11 @@ TAG_OVERRIDES = {
     "no longer a levelable ability, now has a base": "REWORK",  # Mana Shield
     "now also increases duration by":         "NEW",    # Wukong's Command (facet)
     "is no longer destroyed or goes on additional cooldown": "BUFF",  # Ofrenda: a penalty gone
-    "no longer scales with vendetta":         "REWORK",
+    "no longer scales with vendetta":         "DEL",    # as "no longer benefits from" (owner 2026-10-30: not REWORK)
+    "now scales with pierce the veil":        "BUFF",   # Ofrenda's attack speed grows with the ultimate
+    # owner 2026-10-30 ("Warpath почему-то rework … много где ещё такие же ситуации"): the effect decides
+    "instead of a 33% chance to do nothing, now has": "BUFF",  # Reality Rift (Irrationality): Silence instead of nothing
+    "lingering bonus movement speed is now determined by": "NERF",  # Charge of Darkness: the current speed, not the max
     "no longer spell stealable":              "DEL",
     "no longer procs magic stick":            "BUFF",   # the enemy no longer gets charges
     "now procs magic stick":                  "NERF",   # the enemy now gets charges
@@ -836,6 +841,11 @@ def _emit_badge(text, hero_side=False):
     flat = _emit_flat_to_pct_badge(text)
     if flat:
         return flat
+    m = _TALENT_INSTEAD_RE.search(text)
+    if m:                           # "Level 25 Talent is +4s Burning Spears Duration instead of +6s" (7.37 Huskar): 6 → 4
+        old, new = float(m.group("old")), float(m.group("new"))
+        num = lambda v: int(v) if v.is_integer() else v
+        return f'b({num(old)!r}, {num(new)!r}{", l=True" if _is_lower_better(text) else ""})'
     m = _FROM_TO_RE.search(text)
     if not m:
         return _emit_range_badge(text, hero_side)
@@ -857,6 +867,10 @@ def _emit_badge(text, hero_side=False):
     l_arg = ', l=True' if l else ''
     force_arg = ', force_overall="buff"' if _l1_only_dip(old, new, l) else ''
     return f'b({old!r}, {new!r}{l_arg}{force_arg})'
+
+
+_TALENT_INSTEAD_RE = re.compile(r"\bTalent is [+\-]?(?P<new>\d+(?:\.\d+)?)(?P<u>%|s)?\s+[A-Za-z' ]+?\s+instead of\s+"
+                                r"[+\-]?(?P<old>\d+(?:\.\d+)?)(?P=u)?\s*$")
 
 
 # "bonus changed from flat +110 to +40% (results in +48)" (7.37e Rolling Thunder): the % is of a base the row itself
@@ -4507,6 +4521,7 @@ def generate(version):
     out = _postprocess_new_facet_rows(out)             # a "New Facet" row -> the new facet card (7.37 Medusa)
     out = _merge_adjacent_lists(out)                   # ul_close + ul_open back to back -> one list (7.37 Chronosphere)
     out = _postprocess_innate_level0(out, version)     # a 7.36 innate's level-0 value out of the comparison (7.37)
+    out = _postprocess_stance_blocks(out)              # "Earth Brawler …" rows -> stance blocks, as 7.40 (10-30)
     out = _merge_no_longer_innate(out)                 # "No longer an innate ability" leads its level-0 row (10-30)
     out = _postprocess_roshan_block(out)               # General rows about Roshan himself -> his block (owner 2026-10-30)
     out = _postprocess_row_notes(out)                  # facts a row needs that Valve left out (ROW_NOTES)
@@ -4741,10 +4756,16 @@ def _postprocess_innate_level0(lines, version):
                 # badge (owner 2026-10-30: "нет тега, кружок какой-то в начале вместо тега", Mana Break 7.37)
                 lvl0 = was_l0.group(1).split(", ")[0]
                 levels = len(same.group(1).split(", "))
+                # NERF: what the hero had before the first point is gone, as Night Stalker 7.38's free level read by
+                # points spent (owner 2026-10-30: "Warpath почему-то rework везде вместо buff/nerf"); a 0 at level 0
+                # lost nothing — MISC, unless the row also says "No longer an innate ability" (_merge_no_longer_innate)
+                lost = float(lvl0) != 0
                 note = (f"Levels 1-{levels} unchanged; the {lvl0} it had at level 0 as an innate is gone (now a "
-                        f"basic ability)")
-                ln = ln.replace(same.group(0), f't("REWORK"), extra=inline_note({_py_str(note)})', 1) \
-                    if "extra=" not in ln else ln.replace(same.group(0), 't("REWORK")', 1)
+                        f"basic ability)" if lost else
+                        f"Levels 1-{levels} unchanged; it had 0 at level 0 as an innate, so nothing is lost")
+                tag = 't("NERF")' if lost else 't("MISC")'
+                ln = ln.replace(same.group(0), f'{tag}, extra=inline_note({_py_str(note)})', 1) \
+                    if "extra=" not in ln else ln.replace(same.group(0), tag, 1)
         out.append(ln)
     return out
 
@@ -4925,6 +4946,48 @@ _NO_LONGER_INNATE_ROW_RE = re.compile(r'^\s*W\(li\("No longer an innate ability"
 _LEVEL0_NOTE = "level 0 as an innate"
 
 
+# an ability whose rows name its parts ("Earth Brawler bonus armor …"): each part a block of its own with its icon,
+# dashed to the parent (ABILITY_TREES in src/scripts.js) — as 7.40's Earth / Fire / Void Stance (owner 2026-10-30, 7.37:
+# "у нас вроде для drunken brawler stances есть отдельное оформление")
+STANCE_ABILITIES = {
+    "brewmaster_drunken_brawler": (("Earth Brawler", "brewmaster_drunken_brawler_earth"),
+                                   ("Storm Brawler", "brewmaster_drunken_brawler_storm"),
+                                   ("Fire Brawler", "brewmaster_drunken_brawler_fire"),
+                                   ("Void Brawler", "brewmaster_drunken_brawler_void")),
+}
+
+
+def _postprocess_stance_blocks(lines):
+    """The parent's rows "Earth Brawler bonus armor rescaled …" → a block "Earth Brawler" (its own slug) right after the
+    parent, the row without the name: "Bonus armor rescaled …"; the parent keeps its other rows."""
+    out, i = [], 0
+    while i < len(lines):
+        m = re.match(r'^(\s*)W\(ability\("[^"]+", slug="([^"]+)"\)\)\s*$', lines[i])
+        parts = STANCE_ABILITIES.get(m.group(2)) if m else None
+        if not (parts and i + 1 < len(lines) and lines[i + 1].strip() == "W(ul_open())"):
+            out.append(lines[i])
+            i += 1
+            continue
+        ind = m.group(1)
+        end = next((k for k in range(i + 2, len(lines)) if lines[k].strip() == "W(ul_close())"), len(lines))
+        keep, by_part = [], {name: [] for name, _ in parts}
+        for r in lines[i + 2:end]:
+            pm = re.match(r'^(\s*W\(li\(")(' + "|".join(re.escape(n) for n, _ in parts) + r')(?: stance)? (\w)', r)
+            if pm:
+                by_part[pm.group(2)].append(pm.group(1) + pm.group(3).upper() + r[pm.end():])
+            else:
+                keep.append(r)
+        out.append(lines[i])
+        if keep:
+            out += [lines[i + 1], *keep, lines[end]]
+        for name, slug in parts:
+            if by_part[name]:
+                out += [f'{ind}W(ability("{name}", slug="{slug}"))', f"{ind}W(ul_open())", *by_part[name],
+                        f"{ind}W(ul_close())"]
+        i = end + 1
+    return out
+
+
 def _merge_no_longer_innate(lines):
     """A list with "No longer an innate ability" and a row whose levels 1-4 kept their values (only the level-0 value
     went): one row, "No longer an innate ability. Max Mana Burned per hit rescaled from …" (owner 2026-10-30, 7.37
@@ -4940,7 +5003,9 @@ def _merge_no_longer_innate(lines):
         lone = next((k for k, ln in enumerate(block) if _NO_LONGER_INNATE_ROW_RE.match(ln)), None)
         lvl0 = next((k for k, ln in enumerate(block) if _LEVEL0_NOTE in ln and ln.lstrip().startswith('W(li("')), None)
         if lone is not None and lvl0 is not None:
-            block[lvl0] = block[lvl0].replace('W(li("', 'W(li("No longer an innate ability. ', 1)
+            # the ability is gone before its first point: NERF even where the level-0 value was 0
+            block[lvl0] = block[lvl0].replace('W(li("', 'W(li("No longer an innate ability. ', 1).replace(
+                't("MISC")', 't("NERF")', 1).replace(", so nothing is lost", " (now a basic ability)", 1)
             del block[lone]
         out += block
         i = end + 1

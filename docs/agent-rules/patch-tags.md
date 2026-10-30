@@ -563,8 +563,23 @@ Desolate / Infest / Riptide — штраф самого героя или выг
   «было → стало» с % (`_split_stat_sentences`, `_new_stat_that_was_there`, файлы обоих патчей).
 - «Aghanim's Scepter upgrade reworked.» (с точкой) — тоже карточка Аганима; если в прошлом патче улучшение было у
   другой способности (7.36c: Скипетр давал Mana Overload), её текст — старая сторона (`patch/cards_aghs.py`).
-- Бывшая врождённая, у которой уровни 1–4 не изменились (ушло только значение уровня 0), — тег REWORK с «?»
-  «Levels 1-4 unchanged; the 0.8 it had at level 0 as an innate is gone», не пустой бейдж.
+- Бывшая врождённая, у которой уровни 1–4 не изменились (ушло только значение уровня 0), — тег NERF с «?»
+  «Levels 1-4 unchanged; the 0.8 it had at level 0 as an innate is gone», не пустой бейдж и не REWORK (владелец
+  2026-10-30: «Warpath почему-то rework везде вместо buff/nerf»): то, что было у героя до первого очка, пропало — как
+  бесплатный уровень Night Stalker 7.38 по вложенным очкам, только наоборот. На уровне 0 было 0 — ничего не
+  потеряно, MISC «so nothing is lost»; но строка, которую ведёт «No longer an innate ability», — NERF.
+- Строки «instead of» — тег по смыслу, не REWORK по шаблону: «Talent is +4s … instead of +6s» — бейдж b(6, 4)
+  (`_TALENT_INSTEAD_RE`); Silence вместо «ничего» — BUFF; «Now requires a single target tree» — NERF; скорость
+  «current … instead of always the max» — NERF; «No longer scales with Vendetta» — DEL (как «no longer benefits
+  from»); «Now scales with Pierce the Veil» — BUFF (все в `TAG_OVERRIDES`).
+- Строки «Earth / Storm / Fire / Void Brawler …» способности Drunken Brawler — блоки стоек со своими значками сразу
+  после неё, как в 7.40; в строке имя стойки снято («Bonus armor rescaled …»), пунктир к родителю рисует
+  `ABILITY_TREES` в `src/scripts.js` (`STANCE_ABILITIES`, `_postprocess_stance_blocks`). Применено к 7.37, 7.37e, 7.38,
+  7.40c.
+- Описание из файлов игры с частями «Имя - …» на своих строках (стойки Drunken Brawler) — абзац на часть, имя жирным
+  (`_named_parts` в `patch/cards_ability_change.py`).
+- В таблице «Hero или item | Ability» у предмета без своей способности (Town Portal Scroll, Twin Gates) — короткий
+  серый прочерк «–», не пустая ячейка.
 - Строки под карточкой новой врождённой скрыты все (кроме строк про Аганим); заметка строки («Illusions cause full
   effect») — в «?» карточки (`game_ability_desc(…, note=…)`). Владелец 2026-10-30: «дубль того, что уже в карточке».
   Строка из общего списка героя, повторяющая описание новой врождённой, тоже уходит под карточку; строка с

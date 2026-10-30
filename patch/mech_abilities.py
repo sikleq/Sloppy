@@ -451,9 +451,10 @@ def hero_ability_rows(raw, least=1, row_text=""):
             owner_icon = _item_icon(owner) or icon
             hero = (f'<span class="mech-hero mech-hero-item"><img src="{owner_icon}" alt="" loading="lazy" '
                     f'width="25" height="18">{_html.escape(owner)}</span>')
+            # no ability of its own (Town Portal Scroll, Twin Gates): a short dash, not an empty cell (owner 2026-10-30)
             ability = (f'<span class="mech-item">{ability_chip(name[len(owner) + 2:], icon)}<span class="mech-abil-name">'
                        f'{_html.escape(name[len(owner) + 2:])}</span>{tip}</span>' if parsed and h else
-                       (f'<span class="mech-item">{tip.strip()}</span>' if tip else ""))
+                       f'<span class="mech-item"><span class="mech-none">–</span>{tip}</span>')
             kinds.add("Item")
         # one row per hero (or item), his abilities side by side (owner 2026-10-30: "не дублируй героя")
         same = next((k for k, (hr, _a) in enumerate(pairs) if hr == hero), None)

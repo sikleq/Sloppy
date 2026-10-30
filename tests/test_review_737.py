@@ -60,12 +60,13 @@ def test_an_old_innates_level_0_value_leaves_the_comparison():
              'b([16, 23, 30, 37, 44], [25, 30, 35, 40])))', 'W(ul_close())']
     out = g._postprocess_innate_level0(lines, "7.37")
     assert "b([23, 30, 37, 44], [25, 30, 35, 40])" in out[3]
-    # levels 1–4 the same: a REWORK row with its why, not an empty badge (owner 2026-10-30: "кружок вместо тега")
+    # levels 1–4 the same: a NERF row with its why, not an empty badge (owner 2026-10-30: "кружок вместо тега"; then
+    # "rework везде вместо buff/nerf")
     same = g._postprocess_innate_level0(
         ['W(hero_header("Anti-Mage"))', 'W(ability("Mana Break", slug="antimage_mana_break"))', 'W(ul_open())',
          'W(li("Max Mana Burned per hit rescaled from 0.8/1.6/2.4/3.2/4% to 1.6/2.4/3.2/4%", '
          'b([0.8, 1.6, 2.4, 3.2, 4], [1.6, 2.4, 3.2, 4])))', 'W(ul_close())'], "7.37")
-    assert 't("REWORK"), extra=inline_note("Levels 1-4 unchanged; the 0.8 it had at level 0' in same[3]
+    assert 't("NERF"), extra=inline_note("Levels 1-4 unchanged; the 0.8 it had at level 0' in same[3]
 
 
 def test_an_aghanims_rework_with_a_full_stop_is_a_card():
@@ -173,6 +174,8 @@ def test_a_hero_ability_list_is_a_table_led_by_its_row_with_items_on_a_line_of_t
     assert ">How<" not in html and "info-tip" in html                 # Visage's "recall (Faithful Followers)"
     assert "mech-cols-hero4" in long_html
     assert oracle.count('class="mech-hero"') == 1 and "Clairvoyant Curse" in oracle and "Clairvoyant Cure" in oracle
+    # an item with no ability of its own: a short dash in the Ability cell, not an empty one (owner 2026-10-30)
+    assert '<span class="mech-none">–</span>' in html
 
 
 def test_roshans_drops_link_to_their_changes_pages():
@@ -331,3 +334,65 @@ def test_a_from_row_that_is_the_new_innates_whole_text_goes_under_its_card():
     src = (Path(g._HERE) / "content" / "p737.py").read_text(encoding="utf-8")
     row = next(ln for ln in src.splitlines() if "damage block chance is increased" in ln)
     assert "covered=True" in row
+
+
+def test_a_former_innates_level0_row_is_a_nerf_not_a_rework():
+    """Owner 2026-10-30: "Warpath почему-то rework везде вместо buff/nerf". Levels 1-3 the same, the level-0 value gone:
+    NERF (what the hero had before the first point is gone, as Night Stalker 7.38's free level by points spent); a 0
+    at level 0 lost nothing — MISC, but NERF once "No longer an innate ability" leads the row."""
+    lines = ['W(hero_header("Bristleback"))', 'W(ability("Warpath", slug="bristleback_warpath"))', "W(ul_open())",
+             'W(li("No longer an innate ability", t("REWORK")))',
+             'W(li("Damage per stack rescaled from 5/15/20/25 to 15/20/25", b([5, 15, 20, 25], [15, 20, 25])))',
+             'W(li("Movement per stack rescaled from 0/2/3/4% to 2/3/4%", b([0, 2, 3, 4], [2, 3, 4])))', "W(ul_close())"]
+    out = g._postprocess_innate_level0(lines, "7.37")
+    assert 't("NERF")' in out[4] and 'the 5 it had at level 0' in out[4]
+    assert 't("MISC")' in out[5] and "nothing is lost" in out[5]
+    merged = g._merge_no_longer_innate(['W(ul_open())', 'W(li("No longer an innate ability", t("REWORK")))', out[5],
+                                        'W(ul_close())'])
+    assert merged[1].startswith('W(li("No longer an innate ability. Movement') and 't("NERF")' in merged[1]
+    assert "nothing is lost" not in merged[1]
+
+
+def test_instead_of_rows_are_tagged_by_their_effect():
+    """Owner 2026-10-30 ("много где ещё такие же ситуации"): a talent's "+4s … instead of +6s" is a number badge; a
+    Silence instead of nothing BUFF; a single-tree requirement and the current speed instead of the max NERF."""
+    assert g._emit_badge("Level 25 Talent is +4s Burning Spears Duration instead of +6s") == "b(6, 4)"
+    assert g._guess_tag("Reality Rift: Instead of a 33% chance to do Nothing, now has a 33% chance to Silence") == "BUFF"
+    assert g._guess_tag("Nature's Call: Now requires a single target tree to be selected to cast") == "NERF"
+    assert g._guess_tag("Charge of Darkness: Lingering bonus movement speed is now determined by Spirit Breaker's "
+                        "current bonus speed, instead of always the max") == "NERF"
+    assert g._guess_tag("No longer scales with Vendetta") == "DEL"
+    assert g._guess_tag("Now scales with Pierce the Veil") == "BUFF"
+
+
+def test_drunken_brawlers_stance_rows_are_stance_blocks():
+    """Owner 2026-10-30: "у нас вроде для drunken brawler stances есть отдельное оформление" — as 7.40's stance blocks,
+    each its icon, the row without the stance's name; the parent keeps its other rows."""
+    lines = ['W(ability("Drunken Brawler", slug="brewmaster_drunken_brawler"))', "W(ul_open())",
+             'W(li("Earth Brawler bonus armor rescaled from 1/3/5/7/9 to 1/3/5/7", b([3, 5, 7, 9], [1, 3, 5, 7])))',
+             'W(li("No longer an innate ability", t("REWORK")))',
+             'W(li("Void Brawler bonus status resistance now stacks with other sources", t("BUFF")))', "W(ul_close())"]
+    out = g._postprocess_stance_blocks(lines)
+    assert out[:4] == [lines[0], lines[1], lines[3], lines[5]]
+    assert out[4] == 'W(ability("Earth Brawler", slug="brewmaster_drunken_brawler_earth"))'
+    assert out[6].startswith('W(li("Bonus armor rescaled from')
+    assert 'W(ability("Void Brawler", slug="brewmaster_drunken_brawler_void"))' in out
+    assert any(ln.startswith('W(li("Bonus status resistance now stacks') for ln in out)
+
+
+def test_a_tooltips_named_parts_are_paragraphs():
+    """Drunken Brawler's tooltip: a line per stance, named in colour — a paragraph each, the name bold (owner
+    2026-10-30: "раздели на абзацы, тут слишком сплошной текст")."""
+    from patch.cards_ability_change import _named_parts, game_ability_desc
+    paras = game_ability_desc("brewmaster_drunken_brawler", "7.36c")
+    assert len(paras) == 5 and paras[0].startswith("Brewmaster can switch stances")
+    assert paras[1].startswith("<b>Earth Brawler</b> — Grants") and paras[4].startswith("<b>Void Brawler</b>")
+    assert _named_parts("Deals damage. Slows - enemies.") == ["Deals damage. Slows - enemies."]
+
+
+def test_a_talent_rows_is_goes_with_its_name():
+    """7.37 Huskar: "Level 25 Talent is +4s …" read "Talent: is +4s …" on the page (visual check 2026-10-30)."""
+    from patch.elements import _TALENT_PREFIX_RE
+    text = "Level 25 Talent is +4s Burning Spears Duration instead of +6s"
+    assert _TALENT_PREFIX_RE.sub(r"\1: ", text) == "Level 25 Talent: +4s Burning Spears Duration instead of +6s"
+    assert _TALENT_PREFIX_RE.sub(r"\1: ", "Level 10 Talent +20 Damage") == "Level 10 Talent: +20 Damage"

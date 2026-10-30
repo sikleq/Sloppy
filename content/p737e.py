@@ -85,8 +85,9 @@ def build():
     W(li("Base Intelligence increased from 15 to 17", b(15, 17)))
     W(ul_close())
     W(ability("Drunken Brawler", slug="brewmaster_drunken_brawler"))
+    W(ability("Earth Brawler", slug="brewmaster_drunken_brawler_earth"))
     W(ul_open())
-    W(li("Earth Brawler stance armor increased from 1/3/5/7 to 2/4/6/8", b([1, 3, 5, 7], [2, 4, 6, 8])))
+    W(li("Armor increased from 1/3/5/7 to 2/4/6/8", b([1, 3, 5, 7], [2, 4, 6, 8])))
     W(ul_close())
 
     # Bristleback
