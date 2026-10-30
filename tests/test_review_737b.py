@@ -46,6 +46,19 @@ def test_an_ability_innate_in_its_own_patch_is_marked_innate():
     assert 'W(ability("Predator", slug="viper_predator", innate=True))' in out
 
 
+def test_a_value_of_the_new_secondary_target_goes_in_the_rows_question_mark():
+    """Owner 2026-10-30 (7.37b Death Ward): "Damage to secondary target is equal to 65% of the primary" is not a row of
+    its own — it goes in the "?" of "Now has a primary and secondary target", even with another row between them."""
+    body, _ = g._emit_notes([
+        {"indent_level": 1, "note": "Death Ward: Damage to primary target increased from 45/70/95 to 55/90/125"},
+        {"indent_level": 1, "note": "Death Ward: Now has a primary and secondary target"},
+        {"indent_level": 1, "note": "Death Ward: Damage to secondary target is equal to 65% of the primary"}])
+    rows = [ln for ln in body if ln.startswith("W(li(")]
+    assert len(rows) == 2
+    assert ('W(li("Death Ward: Now has a primary and secondary target", t("NEW"), '
+            'extra=inline_note("Damage to secondary target is equal to 65% of the primary")))') in rows
+
+
 def test_the_validator_reads_a_negated_direction():
     from tools.validate_data import _check_change
     issues = []

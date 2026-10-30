@@ -1138,6 +1138,7 @@ def _nested_info_text(notes, lvl, desc):
 
 
 _ABOUT_ALL_RE = re.compile(r'^(?:All|Both|Each) (?:\w+ )?of (?:these|them)\b', re.I)
+_FOLD_INTO_PREV_RE = re.compile(r'^(?:[^:]{2,40}:\s+)?Damage to (?:the )?secondary target is equal to\b', re.I)
 
 
 def _fold_into_row(lines, idx, text):
@@ -1227,6 +1228,17 @@ def _emit_notes(notes, ul_open_called=False, hero_name=None, version=None,
             lines.append(f'W(subgroup("{clean}"))')
             continue
 
+        # a row that only gives a value of the row before (owner 2026-10-30, 7.37b Death Ward: "Damage to secondary target
+        # is equal to 65% of the primary" goes in the "?" of "Now has a primary and secondary target")
+        if _FOLD_INTO_PREV_RE.match(clean) and lines and lines[-1].startswith('W(li('):
+            # into the row of this list that brings the secondary target in, else the row right before
+            k = len(lines) - 1
+            while k >= 0 and lines[k].startswith('W(li(') and 'secondary target' not in lines[k]:
+                k -= 1
+            if k < 0 or not lines[k].startswith('W(li('):
+                k = len(lines) - 1
+            _fold_into_row(lines, k, re.sub(r'^[^:]{2,40}:\s+', '', clean, count=1))
+            continue
         open_ul_if_needed()
         # Check patchnotes_english: warn if this text belongs to a different ability.
         if loc_map is not None and current_ability_slug is not None:

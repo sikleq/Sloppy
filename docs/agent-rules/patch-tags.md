@@ -509,7 +509,9 @@ Hunter, Quas/Wex/Exort/Invoke во время ченнелинга, талант
 
 | Строка | Тег | Почему |
 |---|---|---|
-| «Burning Spear: Duration is no longer reduced» (Incendiary) | **BUFF** | снят штраф; validator больше не читает «no longer reduced» как «decreased» (`_NEGATED_DIR_RE`) |
+| «Burning Spear: Duration is no longer reduced» (Incendiary) | **BUFF** + inline_note | в 7.37 фасет ставил горению 6s (10s с талантом) вместо 9s (15s) — `duration_for_nothl_conflagration`; в 7.37b ключ убран (KV, проверено 10-30). Validator больше не читает «no longer reduced» как «decreased» (`_NEGATED_DIR_RE`) |
+| «Damage to secondary target is equal to 65% of the primary» (Death Ward) | в **«?»** строки «Now has a primary and secondary target» | не отдельная строка — значение нового свойства (владелец 2026-10-30); `_FOLD_INTO_PREV_RE` |
+| «Max Channel Time increased» (Primal Spring) | **NERF** (`l=True`) | дольше до полной силы (владелец подтвердил 10-30) |
 | «100% of bonus damage is converted to base damage for Phantom Lancer» | **BUFF** | герою 65% → 100% |
 | «Now counts one debuff per unique ability/item» (Septic Shock) | **NERF** | Shiva's считается за 1, а не за 3 |
 | «Bonus damage is now decreased by the illusion damage reduction …» (Predator) | **NERF** | иллюзиям меньше |
