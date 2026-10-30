@@ -428,9 +428,10 @@ def test_a_text_of_named_parts_folds_under_their_names():
                                                     for n in ("Earth", "Storm", "Fire", "Void"))]
     out = _fold_named_parts(rows)
     assert out[0] == rows[0] and len(out) == 2
-    # its first lines fade out, a click opens it (owner 2026-10-30: "нижняя часть блока полупрозрачная"); a chevron
-    # button shows it opens and folds it back ("видно, что оно разворачиваться может … свернуть обратно")
+    # its first lines fade out, a click opens it (owner 2026-10-30: "нижняя часть блока полупрозрачная"); a button of
+    # faint golden mist shows it opens and folds it back ("видно, что оно разворачиваться может … свернуть обратно";
+    # no chevron: "не нравится, надо почти прозрачное … искр золотых/туманки")
     assert out[1].startswith('<div class="acr-fold"><div class="acr-fold-body">')
     assert out[1].count("ability-change-row") == 4 and "<summary>" not in out[1]
-    assert '<button type="button" class="acr-fold-toggle" aria-expanded="false"' in out[1]
+    assert '<button type="button" class="acr-fold-toggle" aria-expanded="false"' in out[1] and "<svg" not in out[1]
     assert _fold_named_parts(rows[:3]) == rows[:3]
