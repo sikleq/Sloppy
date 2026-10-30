@@ -186,6 +186,37 @@ def test_7_37_list_lines_get_an_icon(line, label):
     assert parsed and parsed[0] == label and parsed[1]
 
 
+def test_an_item_that_trades_one_stat_for_another_gets_its_stats_card():
+    """Owner 2026-10-30, 7.37 Bracer: "Now provides +50/100 Health" + "No longer provides +3/6 Damage" — a card."""
+    lines = ['W(item_header("Bracer"))', 'W(ul_open())', 'W(li("Now provides +50/100 Health", t("NEW")))',
+             'W(li("No longer provides +3/6 Damage", t("DEL")))', 'W(ul_close())']
+    out = g._postprocess_properties_change(lines)
+    assert out[1] == 'W(properties_change(old=[("DEL", "+3/6 Damage")], new=[("NEW", "+50/100 Health")]))'
+
+
+def test_a_returning_neutral_item_is_labelled_in_its_header_and_described_as_new():
+    """Owner 2026-10-30 ("смотри примеры в 7.38"): "Returning as a Tier 1 Neutral item" → the header's label, the
+    description rows NEW."""
+    lines = ['W(item_header("Ironwood Tree", new="Returning Tier 1 Neutral Item"))', 'W(ul_open())',
+             'W(li("Provides +5 to All Attributes. Use: Plant Tree", t("MISC")))', 'W(ul_close())',
+             'W(item_header("Vambrace"))', 'W(ul_open())', 'W(li("Something", t("MISC")))', 'W(ul_close())']
+    out = g._postprocess_returning_rows(lines)
+    assert 't("NEW")' in out[2] and 't("MISC")' in out[6]
+
+
+def test_a_multiplier_in_an_item_card_is_marked():
+    """7.37 Bloodpact "by 2.5x" → "by 4x": the card's new number takes its row's colour, as a plain number does."""
+    import re
+    src = open(g.__file__.replace("tools", "patch").replace("generate_patch_code_v2.py", "cards_item_abilities.py"),
+               encoding="utf-8").read()
+    assert re.search(r"\(\?:%\|s\|x\)\?\)</b>'", src)
+
+
+def test_a_rows_known_fact_stays_after_a_rewrap():
+    lines = ['W(li("Teleport time to Roshan\'s outposts decreased from 6s to 4s", b(6, 4)))']
+    assert "corner outposts" in g._postprocess_row_notes(lines)[0]
+
+
 def test_no_page_keeps_the_old_facet_placeholder():
     from pathlib import Path
     pages = Path(__file__).resolve().parents[1].glob("content/p*.py")

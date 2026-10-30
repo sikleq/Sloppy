@@ -546,6 +546,19 @@ Desolate / Infest / Riptide — штраф самого героя или выг
   которой говорят: «partially» (без «fully») → Partially, иначе Fully, иначе первая; фраза о подсказках игры
   («has been added», «tooltip») — в «?» у вводной фразы таблицы, остальные — строкой внизу таблицы
   (`_fold_sentences_into_tables`, `pop-tip` / `pop-note`).
+- Предметы в этих списках — строками таблицы, как герои (значок и имя в первом столбце, способность предмета —
+  «Gleipnir: Eternal Chains» — во втором); шапка «Hero», «Item» или «Hero or item». Фраза о правилах («The breakability
+  rules … updated») — перед вводной фразой Fully, в той же строке (`pop-lead`).
+- Bracer 7.37: предмет меняет одну характеристику на другую («Now provides +50/100 Health» + «No longer provides +3/6
+  Damage») — карточка характеристик и без смены сборки (`_swaps_stats`; правило 2026-09-28 про Sange and Yasha
+  остаётся для простых изменений чисел).
+- Возвращённые нейтральные предметы 7.37 («Returning as a Tier 1 Neutral item», «Now is a Tier 3 Neutral item») — как
+  7.38: метка в заголовке «Returning Tier 1 Neutral Item» / «Now a Tier 3 Neutral Item», описание — NEW
+  (`_NEW_RET_RE`, `_postprocess_returning_rows`).
+- Множитель в карточке способности предмета («by 2.5x» → «by 4x») подсвечивается, как обычное число
+  (`patch/cards_item_abilities.py`).
+- Пояснения, которых нет у Valve, но которые нашлись по карте или файлам, — в `ROW_NOTES` генератора (иначе
+  теряются при пересоздании страницы).
 - Предметы в строках блока Roshan — ссылки на их страницы истории (`item_link`, `patch/item_links.py`): у предмета
   с блоком на какой-то странице — по имени, у остальных — по имени из игры (Aghanim's Blessing → ultimate-scepter-2).
   Генератор `_link_items`.

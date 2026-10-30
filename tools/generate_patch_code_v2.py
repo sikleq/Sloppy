@@ -1766,8 +1766,10 @@ def _render_item(item, version, neutral=False):
     # Owner 2026-09-27: "Now is a Tier 1 Neutral Artifact" (7.38, an old neutral item in the new artifact
     # list) is a header too — "Now a Tier 1 Artifact" (not "New": the item existed before) — and its
     # ability description, nested under that note, becomes the item's own row(s), not an inline_note.
+    # 7.37 and before: "Returning as a Tier 1 Neutral item", "Now is a Tier 3 Neutral item" (owner 2026-10-30:
+    # "Ironwood Tree, Iron Talon … смотри примеры в 7.38") → "Returning Tier 1 Neutral Item"
     _NEW_RET_RE = re.compile(
-        r'^(New|Returning(?:\s+as\s+a)|Now\s+is\s+a)\s+Tier\s+\d+\s+(?:Neutral\s+)?Artifact$',
+        r'^(New|Returning(?:\s+as\s+a)|Now\s+is\s+a)\s+Tier\s+\d+\s+(?:Neutral\s+)?(?:Artifact|item)$',
         re.I,
     )
     if neutral and not deco and notes:
@@ -1777,7 +1779,8 @@ def _render_item(item, version, neutral=False):
             # Normalise: "Returning as a Tier 2 Neutral Artifact" → "Returning Tier 2 Artifact"
             norm = re.sub(r'^Now\s+is\s+a\b', 'Now a', first_txt, flags=re.I)
             norm = re.sub(r'\s+as\s+a\b', '', norm, flags=re.I)
-            norm = re.sub(r'\s+Neutral\b', '', norm, flags=re.I)
+            norm = re.sub(r'\s+Neutral\b', '', norm, flags=re.I) if re.search(r'Artifact$', norm, re.I) else \
+                re.sub(r'\s+Neutral\s+item$', ' Neutral Item', norm, flags=re.I)
             deco = f', new="{norm}"'
             lvl = notes[0].get('indent_level', 1)
             notes = [dict(n, indent_level=max(1, n.get('indent_level', 1) - 1)) if i and n.get('indent_level', 1) > lvl
@@ -2371,6 +2374,7 @@ _STAT_GRANT_RE = re.compile(
 
 _PROP_INSTEAD_RE = re.compile(r'^Now (?:provides?|grants?|gives?)\s+(\+.+?)\s+instead of\s+(\+.+)$')
 _PROP_PROVIDES_RE = re.compile(r'^Provides\s+(\+.+)$')
+_PROP_NOW_PROVIDES_RE = re.compile(r'^Now (?:provides?|grants?|gives?)\s+(?=\+)')
 
 
 def _parse_stat_grants(text):
@@ -2424,6 +2428,16 @@ def _block_lines(lines, i):
     return lines[i:j]
 
 
+def _swaps_stats(block):
+    """The block's rows add a stat the item did not have and take one it had ("Now provides +50/100 Health" + "No
+    longer provides +3/6 Damage") — its stats card, though its build did not change."""
+    texts = [m.group(1) for m in (re.match(r'^\s*W\(li\("(.+?)",', ln) for ln in block) if m]
+    adds = any((m := (_PROP_ADD_PREFIX_RE.match(t) or _PROP_NOW_PROVIDES_RE.match(t))) and _parse_stat_grants(t[m.end():])
+               for t in texts)
+    dels = any((m := _PROP_DEL_PREFIX_RE.match(t)) and _parse_stat_grants(t[m.end():]) for t in texts)
+    return adds and dels
+
+
 def _postprocess_properties_change(lines, with_abilities=False):
     """Collapse stat-grant note patterns inside item blocks into a single
     properties_change(old=[...], new=[...]) call placed right after the
@@ -2464,10 +2478,13 @@ def _postprocess_properties_change(lines, with_abilities=False):
                            for ln in block)):
                 continue
         else:
-            if not (i < len(lines) and lines[i].startswith('W(auto_components_change(')):
+            if i < len(lines) and lines[i].startswith('W(auto_components_change('):
+                out.append(lines[i])
+                i += 1
+            elif not _swaps_stats(_block_lines(lines, i)):
                 continue
-            out.append(lines[i])
-            i += 1
+            # … or the item's stats themselves change in kind: one added, one gone (owner 2026-10-30, 7.37 Bracer
+            # "Now provides +50/100 Health" / "No longer provides +3/6 Damage": "тут разве не карточкой надо?")
 
         # Collect li rows of this item block. The block ends at the next
         # W(item_header(...)) / W(hero_header(...)) / section header.
@@ -2507,6 +2524,13 @@ def _postprocess_properties_change(lines, with_abilities=False):
                 if news and olds:
                     new_rows.extend(('NEW', st) for st in news)
                     old_rows.extend(('DEL', st) for st in olds)
+                    continue
+            # "Now provides +50/100 Health" (7.37 Bracer, without "also"): a stat the item did not have
+            mn = _PROP_NOW_PROVIDES_RE.match(txt)
+            if mn:
+                grants = _parse_stat_grants(txt[mn.end():])
+                if grants:
+                    new_rows.extend(('NEW', st) for st in grants)
                     continue
             # a reworked item's own stat list "Provides +35 Damage and +16% Spell Lifesteal"
             # (Revenant's Brooch 7.38): the new side; the old side must come from the previous
@@ -4437,6 +4461,7 @@ def generate(version):
     out = _postprocess_innate_level0(out, version)     # a 7.36 innate's level-0 value out of the comparison (7.37)
     out = _postprocess_roshan_block(out)               # General rows about Roshan himself -> his block (owner 2026-10-30)
     out = _postprocess_row_notes(out)                  # facts a row needs that Valve left out (ROW_NOTES)
+    out = _postprocess_returning_rows(out)             # a returning / new item's description rows are NEW (as 7.38)
     out = _postprocess_mechanic_lists(out)             # General subgroups of lists -> mechanic blocks, tables (10-30)
     out = _postprocess_removed_facets(out, version)   # "Removed X Facets" -> facet blocks (owner 2026-10-29)
     out = _postprocess_same_change_abilities(out)     # one block, stacked icons (owner 2026-10-30)
@@ -4671,6 +4696,22 @@ ROW_NOTES = {
         "The two corner outposts next to Roshan's pits (added in 7.33 by the Twin Gates, removed in 7.38). "
         "The jungle outposts got 4s in 7.35",
 }
+
+
+_RETURNING_HEADER_RE = re.compile(r'^\s*W\(item_header\("[^"]+", new="(?:Returning|New)\b')
+
+
+def _postprocess_returning_rows(lines):
+    """Under a returning or new item's header (7.37 Ironwood Tree "Returning Tier 1 Neutral Item") the rows are its
+    description — NEW, as 7.38's returning artifacts (owner 2026-10-30: "смотри примеры в 7.38"), not MISC."""
+    out, inside = [], False
+    for ln in lines:
+        if re.match(r'^\s*W\((?:item_header|hero_header|unit_header|section|plain_header)\(', ln):
+            inside = bool(_RETURNING_HEADER_RE.match(ln))
+        elif inside and ln.lstrip().startswith("W(li(") and 't("MISC")' in ln:
+            ln = ln.replace('t("MISC")', 't("NEW")', 1)
+        out.append(ln)
+    return out
 
 
 def _postprocess_row_notes(lines):

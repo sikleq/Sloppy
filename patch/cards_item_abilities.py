@@ -1070,7 +1070,8 @@ def render_iab_card(key):
             right = _iab_set_radius(right, ability, value, f"iab-{direction}", note)
             left = _iab_set_radius(left, ability, was)
         elif target == "num":
-            right = re.sub(rf'<b class="iab-num">([+\-]?{num}(?:%|s)?)</b>',
+            # a multiplier too: "by 4x" (7.37 Bloodpact 2.5x → 4x was not marked, owner 2026-10-30)
+            right = re.sub(rf'<b class="iab-num">([+\-]?{num}(?:%|s|x)?)</b>',
                            lambda m: _iab_hint(f'<b class="iab-num iab-{direction}">{m.group(1)}</b>', note), right, count=1)
         else:
             right = re.sub(rf'<span class="iab-m">(<img class="iab-ico" src="[^"]*{target}\.png" alt="">)({num})</span>',
