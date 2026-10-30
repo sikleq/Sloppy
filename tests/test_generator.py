@@ -946,7 +946,7 @@ def test_no_rows_hang_after_a_facet_block_without_a_header():
                 state = "hero"
             elif re.match(r'W\((facet_header|new_facet)\(', s):
                 state = "facet"
-            elif re.match(r'W\((ability|ability_change|subgroup)\(', s):
+            elif re.match(r'W\((ability|ability_group|ability_change|subgroup)\(', s):
                 state = "block"
             elif s == "W(ul_close())" and state == "facet":
                 state = "after_facet"

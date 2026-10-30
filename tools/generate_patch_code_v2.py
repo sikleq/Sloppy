@@ -1141,6 +1141,46 @@ _ABOUT_ALL_RE = re.compile(r'^(?:All|Both|Each) (?:\w+ )?of (?:these|them)\b', r
 _FOLD_INTO_PREV_RE = re.compile(r'^(?:[^:]{2,40}:\s+)?Damage to (?:the )?secondary target is equal to\b', re.I)
 
 
+_PLAIN_ABILITY_RE = re.compile(r'^W\(ability\("([^"]+)", slug="([^"]+)"\)\)$')
+
+
+def _postprocess_same_change_abilities(lines):
+    """Consecutive ability blocks whose rows are the very same → one ability_group block with their icons stacked
+    (owner 2026-10-30, 7.37b Quas / Wex / Exort / Invoke "Can now be cast during channeling …"). Innates and blocks
+    with anything but one ul of rows are left alone."""
+    def block_at(i):
+        m = _PLAIN_ABILITY_RE.match(lines[i].strip()) if i < len(lines) else None
+        if not m or i + 1 >= len(lines) or lines[i + 1].strip() != 'W(ul_open())':
+            return None
+        j = i + 2
+        while j < len(lines) and lines[j].strip().startswith('W(li('):
+            j += 1
+        if j == i + 2 or j >= len(lines) or lines[j].strip() != 'W(ul_close())':
+            return None
+        return (m.group(1), m.group(2)), [ln.strip() for ln in lines[i + 2:j]], j + 1
+    out, i = [], 0
+    while i < len(lines):
+        first = block_at(i)
+        if not first:
+            out.append(lines[i])
+            i += 1
+            continue
+        group, rows, end = [first[0]], first[1], first[2]
+        nxt = block_at(end)
+        while nxt and nxt[1] == rows:
+            group.append(nxt[0])
+            end = nxt[2]
+            nxt = block_at(end)
+        if len(group) < 2:
+            out.extend(lines[i:end])
+        else:
+            ind = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
+            pairs = ", ".join(f'("{t}", "{s}")' for t, s in group)
+            out += [f'{ind}W(ability_group({pairs}))', lines[i + 1], *lines[i + 2:i + 2 + len(rows)], lines[i + 2 + len(rows)]]
+        i = end
+    return out
+
+
 def _fold_into_row(lines, idx, text):
     """Append `text` to the "?" popup of the W(li(…)) at lines[idx]: extend an
     existing inline_note with <br>, otherwise add one. A row that already has
@@ -4279,6 +4319,7 @@ def generate(version):
     out = _postprocess_ability_level_formula(out, version)   # "+X with every level of Y" -> table (owner 2026-10-27)
     out = _postprocess_innate_cards(out, version)     # innate old -> new from the game's texts (owner 2026-10-27)
     out = _postprocess_removed_facets(out, version)   # "Removed X Facets" -> facet blocks (owner 2026-10-29)
+    out = _postprocess_same_change_abilities(out)     # one block, stacked icons (owner 2026-10-30)
 
     # Close the page: footer + save. Emitted so the wrapped content/pXXX.py is
     # complete — without these the site build runs green but the patch HTML is

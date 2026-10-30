@@ -4293,6 +4293,14 @@ h4.subgroup {
   object-fit: cover;
   box-shadow: 0 0 0 1px rgba(210, 168, 255, 0.18), 0 2px 6px var(--shadow-40);
 }
+/* Several abilities with the same change in one block (owner 2026-10-30, 7.37b Quas/Wex/Exort/Invoke): the icons
+   overlap left to right (left/z-index inline, patch/elements.py ability_group), the last one whole */
+.ability-block.has-icon-stack { grid-template-columns: auto 1fr; }
+.ability-block > .ability-icon-wrap.ability-icon-stack > .ability-icon-img {
+  position: absolute;
+  top: 0;
+  background: #111110;
+}
 /* A facet's ability without art of its own (7.38b Venomous Volley): the facet's gradient + icon, as a facet block's */
 .ability-block > .ability-icon-wrap > .facet-ability-icon {
   display: flex;
