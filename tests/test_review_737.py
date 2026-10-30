@@ -250,6 +250,37 @@ def test_two_stat_sentences_in_one_row_and_a_stat_that_was_there():
                     'new=[("", "+375 Health", b(125, 375))]))')
 
 
+def test_a_new_innates_rows_hide_under_its_card_their_note_in_its_question_mark():
+    """Owner 2026-10-30 (Persecutor: "дубль того, что уже в карточке"): the description row with its own note is hidden
+    too, the note ("Illusions cause full effect") goes into the card's "?"."""
+    lines = ['W(hero_header("Anti-Mage"))', 'W(ability("Persecutor", slug="antimage_persectur", innate=True))',
+             'W(ul_open())', 'W(li("New innate ability. Passive, scales with Mana Void", t("MISC")))',
+             'W(li("Attacks slow enemies based on how much mana they are missing", t("MISC"), '
+             'extra=inline_note("Illusions cause full effect")))', 'W(ul_close())']
+    out = "\n".join(g._postprocess_new_innate_cards(lines, "7.37"))
+    assert 'game_ability_desc("antimage_persectur", "7.37", note="Illusions cause full effect")' in out
+    assert out.count("covered=True") == 2
+
+
+def test_no_longer_an_innate_leads_its_level_0_row():
+    """Owner 2026-10-30: "No longer an innate ability" at the start of "Max Mana Burned per hit rescaled …" — one row."""
+    lines = ['W(ul_open())', 'W(li("No longer an innate ability", t("REWORK")))',
+             'W(li("Max Mana Burned per hit rescaled from 0.8/1.6 to 1.6", t("REWORK"), extra=inline_note("Levels 1-4 '
+             'unchanged; the 0.8 it had at level 0 as an innate is gone (now a basic ability)")))', 'W(ul_close())']
+    out = g._merge_no_longer_innate(lines)
+    assert len(out) == 3 and out[1].startswith('W(li("No longer an innate ability. Max Mana Burned per hit')
+
+
+def test_an_item_moved_to_another_tier_gets_its_cards():
+    """Owner 2026-10-30, 7.37 Vambrace / Ogre Seal Totem "Now a Tier N Neutral Item": cards as any item's."""
+    lines = ['W(item_header("Vambrace", new="Now a Tier 3 Neutral Item"))', 'W(ul_open())',
+             'W(li("Main Attribute bonus increased from +8 to +10", b(8, 10)))',
+             'W(li("Strength Magic Resistance bonus increased from +8% to +10%", b(8, 10)))', 'W(ul_close())']
+    out = g._postprocess_properties_change(lines, version="7.37")
+    assert out[1].startswith('W(properties_change(old=[("BUFF", "+8 Main Attribute"), ("BUFF", "+8% Strength Magic')
+    assert g._guess_tag("Now has 750 charges, and depletes a charge every time it grants gold to the owner") == "REWORK"
+
+
 def test_a_multiplier_in_an_item_card_is_marked():
     """7.37 Bloodpact "by 2.5x" → "by 4x": the card's new number takes its row's colour, as a plain number does."""
     import re

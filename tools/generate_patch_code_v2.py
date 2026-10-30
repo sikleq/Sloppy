@@ -590,6 +590,7 @@ TAG_OVERRIDES = {
     "improved behavior":                      "QoL",    # Stroke of Fate at max cast range: handling, not power (owner)
     # 7.37 proofread (2026-10-30)
     "no longer an innate ability":            "REWORK", # the old innate becomes a basic ability ("is now an innate" = REWORK)
+    "charges, and depletes a charge every time": "REWORK",  # Philosopher's Stone: a stone that runs out (owner)
     "no longer a levelable innate ability":   "REWORK", # Lina Fiery Soul
     "now always drops roshan's banner":       "NEW",    # Roshan's second death
     "now drops refresher shard and cheese during daytime": "REWORK",  # third death: by the time of day
@@ -2400,7 +2401,10 @@ _ITEM_STAT_NAME_RE = re.compile(
     r'health regen(?:eration)?|mana regen(?:eration)?|health restoration|mana regen(?:eration)? amplification|'
     r'armor|magic(?:al)? resistance|damage|attack damage|attack speed|movement speed|move speed|evasion|'
     r'spell amp(?:lification)?|lifesteal|spell lifesteal|(?:spell )?lifesteal amplification|cast range|'
-    r'attack range|status resistance|slow resistance|aoe bonus|cooldown reduction)(?:\s+bonus)?$', re.I)
+    r'attack range|status resistance|slow resistance|aoe bonus|cooldown reduction|'
+    # Vambrace (7.37): its attribute bonuses and the one each chosen attribute gives
+    r'main attribute|other attributes|(?:strength|agility|intelligence) (?:magic resistance|attack speed|spell amp))'
+    r'(?:\s+bonus)?$', re.I)
 
 
 def _parse_number_or_list(s):
@@ -2497,11 +2501,14 @@ def _postprocess_properties_change(lines, with_abilities=False, version=None):
         line = lines[i]
         # Any item header except a new / returning item (owner 2026-09-27, Bloodstone 7.38: "No longer
         # provides +75 AoE radius" stayed a row because only changed=True items got the stats card)
-        m_hdr = re.match(r'W\(item_header\("([^"]+)"(?![^)]*new=)[^)]*\)\)', line)
+        # (an item only moved to another neutral tier, "Now a Tier 3 Neutral Item", is no new item: its card too —
+        # owner 2026-10-30, 7.37 Vambrace / Ogre Seal Totem "по аналогии с обычными предметами")
+        m_hdr = re.match(r'W\(item_header\("([^"]+)"(?![^)]*new="(?:New|Returning)\b)[^)]*\)\)', line)
         if not m_hdr:
             out.append(line)
             i += 1
             continue
+        tier_move = 'new="Now a Tier' in line
 
         item_name = m_hdr.group(1)
         out.append(line)
@@ -2522,7 +2529,7 @@ def _postprocess_properties_change(lines, with_abilities=False, version=None):
             if i < len(lines) and lines[i].startswith('W(auto_components_change('):
                 out.append(lines[i])
                 i += 1
-            elif not _swaps_stats(_block_lines(lines, i)):
+            elif not (_swaps_stats(_block_lines(lines, i)) or tier_move):   # a tier move counts as a build change
                 continue
             # … or the item's stats themselves change in kind: one added, one gone (owner 2026-10-30, 7.37 Bracer
             # "Now provides +50/100 Health" / "No longer provides +3/6 Damage": "тут разве не карточкой надо?")
@@ -4500,6 +4507,7 @@ def generate(version):
     out = _postprocess_new_facet_rows(out)             # a "New Facet" row -> the new facet card (7.37 Medusa)
     out = _merge_adjacent_lists(out)                   # ul_close + ul_open back to back -> one list (7.37 Chronosphere)
     out = _postprocess_innate_level0(out, version)     # a 7.36 innate's level-0 value out of the comparison (7.37)
+    out = _merge_no_longer_innate(out)                 # "No longer an innate ability" leads its level-0 row (10-30)
     out = _postprocess_roshan_block(out)               # General rows about Roshan himself -> his block (owner 2026-10-30)
     out = _postprocess_row_notes(out)                  # facts a row needs that Valve left out (ROW_NOTES)
     out = _postprocess_returning_rows(out)             # a returning / new item's description rows are NEW (as 7.38)
@@ -4664,12 +4672,20 @@ def _postprocess_new_innate_cards(lines, version):
                        f'desc=game_ability_desc("{old}", "{prev}")),')
         else:
             out.append(f'{ind}    old=None,')
-        out += [f'{ind}    new=dict(name="{name}", slug="{slug}", innate=True, desc=game_ability_desc("{slug}", "{version}")),',
+        rows = [*moved, *lines[i + 2:end]]
+        # every row the card's text says is under it, hidden — a row's own note goes into the card's "?" (owner
+        # 2026-10-30, 7.37 Persecutor: "Attacks slow enemies … — дубль того, что уже в карточке"); an Aghanim row is a
+        # change of its own and stays
+        notes = [n.group(1) for r in rows for n in [re.search(r'extra=inline_note\("((?:[^"\\]|\\.)*)"\)', r)]
+                 if n and r.lstrip().startswith("W(li(") and "Aghanim" not in r]
+        note_arg = f', note={_py_str("<br>".join(notes))}' if notes else ""
+        out += [f'{ind}    new=dict(name="{name}", slug="{slug}", innate=True, '
+                f'desc=game_ability_desc("{slug}", "{version}"{note_arg})),',
                 f'{ind}    summary="New innate ability.",',
                 f'{ind}    tag="new",',
                 f'{ind}))', lines[i + 1]]
-        for r in [*moved, *lines[i + 2:end]]:
-            covered = r.lstrip().startswith("W(li(") and "extra=" not in r
+        for r in rows:
+            covered = r.lstrip().startswith("W(li(") and "Aghanim" not in r and "covered=True" not in r
             out.append(re.sub(r"\)\)\s*$", ", covered=True))", r) if covered else r)
         out.append(lines[end] if end < len(lines) else "")
         i = end + 1
@@ -4903,6 +4919,32 @@ def _fold_sentences_into_tables(out, lo, hi):
         out[target] = _INLINE_LIST_END_RE.sub(
             lambda mm: f'{mm.group(1)}<br><span class=\\"{kind}\\">{text}</span>{mm.group(2)}', out[target], count=1)
         out[j] = None
+
+
+_NO_LONGER_INNATE_ROW_RE = re.compile(r'^\s*W\(li\("No longer an innate ability", t\("REWORK"\)\)\)\s*$')
+_LEVEL0_NOTE = "level 0 as an innate"
+
+
+def _merge_no_longer_innate(lines):
+    """A list with "No longer an innate ability" and a row whose levels 1-4 kept their values (only the level-0 value
+    went): one row, "No longer an innate ability. Max Mana Burned per hit rescaled from …" (owner 2026-10-30, 7.37
+    Mana Break: "сделав не 2 строки, а одну")."""
+    out, i = [], 0
+    while i < len(lines):
+        if lines[i].strip() != "W(ul_open())":
+            out.append(lines[i])
+            i += 1
+            continue
+        end = next((k for k in range(i + 1, len(lines)) if lines[k].strip() == "W(ul_close())"), len(lines))
+        block = lines[i:end + 1]
+        lone = next((k for k, ln in enumerate(block) if _NO_LONGER_INNATE_ROW_RE.match(ln)), None)
+        lvl0 = next((k for k, ln in enumerate(block) if _LEVEL0_NOTE in ln and ln.lstrip().startswith('W(li("')), None)
+        if lone is not None and lvl0 is not None:
+            block[lvl0] = block[lvl0].replace('W(li("', 'W(li("No longer an innate ability. ', 1)
+            del block[lone]
+        out += block
+        i = end + 1
+    return out
 
 
 def _merge_adjacent_lists(lines):

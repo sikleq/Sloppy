@@ -122,7 +122,9 @@ def insert_cards(lines, version, prev, name_to_slug):
     i = 0
     while i < len(out):
         m = re.match(r'(\s*)W\(item_header\("((?:[^"\\]|\\.)*)"(.*)$', out[i])
-        if not m or "new=" in m.group(3):
+        # a new / returning item has no "before"; an item only moved to another tier ("Now a Tier 4 Neutral Item",
+        # 7.37 Ogre Seal Totem) does — its card as any item's (owner 2026-10-30: "по аналогии с обычными предметами")
+        if not m or re.search(r'new="(?:New|Returning)\b', m.group(3)):
             i += 1
             continue
         ind, name = m.group(1), json.loads('"' + m.group(2) + '"')

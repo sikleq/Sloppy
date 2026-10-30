@@ -565,6 +565,14 @@ Desolate / Infest / Riptide — штраф самого героя или выг
   другой способности (7.36c: Скипетр давал Mana Overload), её текст — старая сторона (`patch/cards_aghs.py`).
 - Бывшая врождённая, у которой уровни 1–4 не изменились (ушло только значение уровня 0), — тег REWORK с «?»
   «Levels 1-4 unchanged; the 0.8 it had at level 0 as an innate is gone», не пустой бейдж.
+- Строки под карточкой новой врождённой скрыты все (кроме строк про Аганим); заметка строки («Illusions cause full
+  effect») — в «?» карточки (`game_ability_desc(…, note=…)`). Владелец 2026-10-30: «дубль того, что уже в карточке».
+- «No longer an innate ability» и строка, где ушло только значение уровня 0, — одна строка: «No longer an innate
+  ability. Max Mana Burned per hit rescaled from …» (`_merge_no_longer_innate`; в 7.37 так 14 раз).
+- «Now has 750 charges, and depletes a charge …» (Philosopher's Stone) — REWORK: предмет работал иначе.
+- Предмет, который только сменил тир («Now a Tier 3 Neutral Item», Vambrace / Ogre Seal Totem), — карточки как у
+  обычного предмета: смена тира = смена сборки (`_postprocess_properties_change`, `patch/item_ability_text.py`);
+  характеристики Vambrace (Main Attribute, Other Attributes, «Strength Magic Resistance» …) — в `_ITEM_STAT_NAME_RE`.
 - Старая сторона карточки предмета «… no longer affects units that have been affected …» → «…that have already been
   affected …» (7.41 Pipe of Insight, владелец 2026-10-30).
 - Множитель в карточке способности предмета («by 2.5x» → «by 4x») подсвечивается, как обычное число

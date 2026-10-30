@@ -67,6 +67,8 @@ def test_no_stats_card_without_a_build_change():
     for path in sorted(CONTENT.glob("p7*.py")):
         for block in re.split(r"(?=W\((?:item|hero|unit|plain)_header\(|W\(section\()", path.read_text(encoding="utf-8")):
             swap = '("NEW", "+' in block and '("DEL", "+' in block
+            # an item moved to another neutral tier: a build change of its kind (owner 2026-10-30, 7.37 Vambrace)
+            swap = swap or 'new="Now a Tier' in block.split("\n", 1)[0]
             if (block.startswith("W(item_header(") and "properties_change(" in block and "components_change(" not in block
                     and "item_abilities_change(" not in block and not swap):
                 bad.append((path.name, re.match(r'W\(item_header\("((?:[^"\\]|\\.)*)"', block).group(1)))
