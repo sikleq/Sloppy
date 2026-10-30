@@ -3653,6 +3653,7 @@ h4.subgroup .subgroup-new-type {
   mask-image: linear-gradient(to bottom, #000 15%, transparent); }
 .acr-fold:not(.is-open) .acr-fold-body:hover { -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent);
   mask-image: linear-gradient(to bottom, #000 35%, transparent); }
+.acr-fold-tall .acr-fold-body { max-height: 6.6em; }     /* no intro above it: show more lines */
 .acr-fold.is-open .acr-fold-body { max-height: none; cursor: auto; -webkit-mask-image: none; mask-image: none; }
 /* the open / close control: a strip of soft glass over the faded text's bottom — a slight blur growing smoothly
    downward, a faint warm tint and a thin highlight along its top (owner 2026-10-30: "эффект стекла снизу, но не

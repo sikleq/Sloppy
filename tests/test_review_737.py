@@ -419,14 +419,16 @@ def test_a_talent_rows_is_goes_with_its_name():
     assert _TALENT_PREFIX_RE.sub(r"\1: ", "Level 10 Talent +20 Damage") == "Level 10 Talent: +20 Damage"
 
 
-def test_a_text_of_named_parts_folds_under_their_names():
-    """Owner 2026-10-30: "для таких длинных описаний может сделаем свёрнутый вид?" — Drunken Brawler's intro stays,
-    its four stances open from one line naming them; two named parts stay open."""
-    from patch.cards_item_abilities import _fold_named_parts
+def test_a_long_card_side_folds():
+    """Owner 2026-10-30: "для таких длинных описаний может сделаем свёрнутый вид?", then "раскатай на весь сайт": a side
+    over FOLD_CHARS folds — Drunken Brawler's short intro stays open; a side with no short first row folds whole and
+    taller; a short side stays as it is."""
+    from patch.cards_item_abilities import FOLD_CHARS, fold_long_rows
     row = lambda s: f'<div class="ability-change-row">{s}</div>'
-    rows = [row("Brewmaster can switch stances."), *(row(f"<b>{n} Brawler</b> — Grants armor.")
+    long = "Grants 1/3/5/7/9 armor and 4/8/12/16/20% Magic Resistance. Bonuses are 2.5x when Brewed Up. " * 2
+    rows = [row("Brewmaster can switch stances."), *(row(f"<b>{n} Brawler</b> — {long}")
                                                     for n in ("Earth", "Storm", "Fire", "Void"))]
-    out = _fold_named_parts(rows)
+    out = fold_long_rows(rows)
     assert out[0] == rows[0] and len(out) == 2
     # its first lines fade out, a click opens it (owner 2026-10-30: "нижняя часть блока полупрозрачная"); a button of
     # soft glass shows it opens and folds it back ("видно, что оно разворачиваться может … свернуть обратно"; no
@@ -434,7 +436,15 @@ def test_a_text_of_named_parts_folds_under_their_names():
     assert out[1].startswith('<div class="acr-fold"><div class="acr-fold-body">')
     assert out[1].count("ability-change-row") == 4 and "<summary>" not in out[1]
     assert '<button type="button" class="acr-fold-toggle" aria-expanded="false"' in out[1] and "<svg" not in out[1]
-    assert _fold_named_parts(rows[:3]) == rows[:3]
+    one = [row("x" * (FOLD_CHARS + 50))]
+    assert fold_long_rows(one)[0].startswith('<div class="acr-fold acr-fold-tall">')
+    short = [row("Deals damage."), row("Slows enemies.")]
+    assert fold_long_rows(short) == short
+    assert fold_long_rows(out) == out                       # folded once
+    # a "?" popup's hidden words don't count (7.39 Changing of the Guard: 414 shown, 420 in its popup)
+    tipped = [row("Shown words. " * 30 + '<span class="info-tip">?<span class="info-pop"><span class="pop-li">'
+                  + "hidden " * 200 + "</span></span></span>")]
+    assert fold_long_rows(tipped) == tipped
 
 
 def test_the_fold_glass_is_light_on_the_page():

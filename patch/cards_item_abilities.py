@@ -399,7 +399,7 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
             tables.append(tbl)
         html = d if not isinstance(d, str) or d.lstrip().startswith("<div") else f'<div class="ability-change-row">{d}</div>'
         rows.append(_bold_numbers_html(html) if isinstance(html, str) else html)
-    rows = _fold_named_parts(rows)
+    rows = fold_long_rows(rows)
     rows += tables
     said = " ".join(items[i] for i in plain)
     head_props = {k: v for k, v in (props or {}).items()
@@ -426,25 +426,53 @@ def _pane_parts(desc, props=None, facet=False, marks=None, granted=None, name_hi
     return head, "".join(rows)
 
 
-_NAMED_ROW_RE = re.compile(r'^<div class="ability-change-row"><b>([^<]+)</b> — ')
-FOLD_NAMED_FROM = 3               # this many named parts (Drunken Brawler's four stances) fold under one line
+FOLD_CHARS = 600                  # a card side longer than this folds (owner 2026-10-30: "раскатай на весь сайт"; 28
+                                  # sides of 569 in 7.37–7.41, 7.37 Drunken Brawler's 733 the first)
+_INTRO_SHARE = 0.45               # a first row this short a part of the whole stays open as the intro
 
 
-def _fold_named_parts(rows):
-    """A text of named parts ("<b>Earth Brawler</b> — Grants …", patch/cards_ability_change._named_parts) folds: its
-    intro stays, the parts show their first lines fading out, a click opens them (owner 2026-10-30: "для таких длинных
-    описаний может сделаем свёрнутый вид?", then "вместо стрелочки … нижняя часть блока полупрозрачная и если её
-    нажать, то она развернётся"). src/scripts.js opens it and redraws the card's connectors."""
-    named = [k for k, r in enumerate(rows) if isinstance(r, str) and _NAMED_ROW_RE.match(r)]
-    if len(named) < FOLD_NAMED_FROM:
+def _without_popups(html):
+    """The text a card shows: a "?" popup's words (.info-pop, hidden till hovered) left out — 7.39 Changing of the
+    Guard's 420 of them folded a side of 414 visible characters."""
+    out, i = [], 0
+    while (k := html.find('<span class="info-pop"', i)) >= 0:
+        out.append(html[i:k])
+        depth, j = 0, k
+        for m in re.finditer(r"<span\b|</span>", html[k:]):
+            depth += 1 if m.group(0) == "<span" else -1
+            if depth == 0:
+                j = k + m.end()
+                break
+        else:
+            j = len(html)
+        i = j
+    return "".join(out) + html[i:]
+
+
+def _plain_len(html):
+    return len(re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", " ", _without_popups(html)))).strip())
+
+
+def fold_long_rows(rows):
+    """A long card side folds: its intro row stays (the first one when it is short), the rest shows its first lines
+    fading out under soft glass, a click opens it (owner 2026-10-30: "для таких длинных описаний может сделаем
+    свёрнутый вид?", the glass "чтобы было видно, что оно разворачиваться может, а также возможность свернуть
+    обратно"). A side with no short intro folds whole and shows more lines. src/scripts.js opens and folds it and
+    redraws the card's connectors."""
+    texts = [r for r in rows if isinstance(r, str)]
+    total = sum(_plain_len(r) for r in texts)
+    if total <= FOLD_CHARS or any("acr-fold" in r for r in texts):
         return rows
-    first, last = named[0], named[-1]
+    k = [i for i, r in enumerate(rows) if isinstance(r, str)]
+    intro = len(k) > 1 and _plain_len(rows[k[0]]) <= _INTRO_SHARE * total
+    first, last = (k[1] if intro else k[0]), k[-1]
+    tall = "" if intro else " acr-fold-tall"
     # over the faded text's bottom a strip of soft glass says it opens, and folds it back (owner 2026-10-30: "чтобы
     # было видно, что оно разворачиваться может, а также возможность свернуть обратно"; a chevron and golden pollen
     # were tried and dropped: "эффект стекла снизу, но не резкий, а плавный … чтобы не нагружало страницу")
     toggle = ('<button type="button" class="acr-fold-toggle" aria-expanded="false" aria-label="Show the whole text">'
               '</button>')
-    return (rows[:first] + [f'<div class="acr-fold"><div class="acr-fold-body">{"".join(rows[first:last + 1])}</div>'
+    return (rows[:first] + [f'<div class="acr-fold{tall}"><div class="acr-fold-body">{"".join(rows[first:last + 1])}</div>'
                             f'{toggle}</div>'] + rows[last + 1:])
 
 
