@@ -3658,12 +3658,18 @@ h4.subgroup .subgroup-new-type {
    downward, a faint warm tint and a thin highlight along its top (owner 2026-10-30: "эффект стекла снизу, но не
    резкий, а плавный … чтобы не нагружало страницу"). Light on the page: no animation; the blur is one 22px strip,
    only while folded (open, the strip is a plain tint); hover changes colours only */
-.acr-fold-toggle { position: relative; display: block; width: 100%; height: 22px; margin: -22px 0 0; padding: 0;
-  border: 0; cursor: pointer; border-radius: 0 0 3px 3px;
+/* a bit more frosted (owner 2026-10-30: "чуть более мутный"), feathered on every side — the top and both sides fade
+   in gradually, not a cut-off band ("края постепенные, а не сразу обрывистые"): two masks intersected */
+.acr-fold-toggle { position: relative; display: block; width: 100%; height: 30px; margin: -30px 0 0; padding: 0;
+  border: 0; cursor: pointer;
   background: linear-gradient(to bottom, rgba(227, 196, 106, 0), rgba(227, 196, 106, 0.06));
-  -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 70%);
-  mask-image: linear-gradient(to bottom, transparent, #000 70%);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.35) 35%, #000 85%),
+    linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.35) 35%, #000 85%),
+    linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+  mask-composite: intersect;
   transition: background-color 0.15s ease-out; }
 .acr-fold-toggle::after { content: ""; position: absolute; left: 12%; right: 12%; bottom: 0; height: 1px;
   pointer-events: none; background: linear-gradient(to right, transparent, rgba(240, 216, 150, 0.28), transparent); }
